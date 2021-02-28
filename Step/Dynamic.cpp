@@ -124,7 +124,8 @@ int Dynamic::analyze() {
 			}
 			// check if time overflows
 			if(step_time > remain_time) step_time = remain_time;
-		} else if(SUANPAN_FAIL == code) {
+		}
+		else if(SUANPAN_FAIL == code) {
 			// failed step
 			// reset to the start of current substep
 			G->reset_status();
@@ -142,6 +143,7 @@ int Dynamic::analyze() {
 			step_time *= .5;
 			set_max_substep(num_increment + static_cast<unsigned>(remain_time / step_time) + 1);
 			num_converged_step = 0;
-		} else return SUANPAN_FAIL; // positive codes are from lapack subroutines
+		}
+		else return SUANPAN_FAIL; // positive codes are from lapack subroutines
 	}
 }

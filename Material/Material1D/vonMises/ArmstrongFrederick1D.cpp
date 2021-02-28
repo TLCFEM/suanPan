@@ -92,7 +92,8 @@ int ArmstrongFrederick1D::update_trial_status(const vec& t_strain) {
 		for(unsigned I = 0; I < size; ++I) trial_history(I) = (trial_history(I) + a(I) * gamma) / (1. + b(I) * gamma);
 
 		trial_stress -= elastic_modulus * gamma;
-	} else {
+	}
+	else {
 		for(unsigned I = 0; I < size; ++I) trial_history(I) = (trial_history(I) - a(I) * gamma) / (1. + b(I) * gamma);
 
 		trial_stress += elastic_modulus * gamma;

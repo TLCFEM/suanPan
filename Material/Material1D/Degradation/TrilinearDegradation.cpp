@@ -25,10 +25,12 @@ podarray<double> TrilinearDegradation::compute_degradation(const double t_strain
 	if(abs_e > e_strain) {
 		damage(0) = e_damage;
 		damage(1) = 0.;
-	} else if(abs_e > s_strain) {
+	}
+	else if(abs_e > s_strain) {
 		damage(0) = 1. + slope * (abs_e - s_strain);
 		damage(1) = slope;
-	} else {
+	}
+	else {
 		damage(0) = 1.;
 		damage(1) = 0.;
 	}

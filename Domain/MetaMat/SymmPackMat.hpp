@@ -107,7 +107,8 @@ template<typename T> Mat<T> SymmPackMat<T>::operator*(const Mat<T>& X) {
 	if(std::is_same<T, float>::value) {
 		using E = float;
 		arma_fortran(arma_sspmv)(&UPLO, &N, (E*)&ALPHA, (E*)this->memptr(), (E*)X.memptr(), &INC, (E*)&BETA, (E*)Y.memptr(), &INC);
-	} else if(std::is_same<T, double>::value) {
+	}
+	else if(std::is_same<T, double>::value) {
 		using E = double;
 		arma_fortran(arma_dspmv)(&UPLO, &N, (E*)&ALPHA, (E*)this->memptr(), (E*)X.memptr(), &INC, (E*)&BETA, (E*)Y.memptr(), &INC);
 	}
@@ -131,7 +132,8 @@ template<typename T> int SymmPackMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
 	if(std::is_same<T, float>::value) {
 		using E = float;
 		arma_fortran(arma_sppsv)(&UPLO, &N, &NRHS, (E*)this->memptr(), (E*)X.memptr(), &LDB, &INFO);
-	} else if(std::is_same<T, double>::value) {
+	}
+	else if(std::is_same<T, double>::value) {
 		using E = double;
 		arma_fortran(arma_dppsv)(&UPLO, &N, &NRHS, (E*)this->memptr(), (E*)X.memptr(), &LDB, &INFO);
 	}
@@ -158,7 +160,8 @@ template<typename T> int SymmPackMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 	if(std::is_same<T, float>::value) {
 		using E = float;
 		arma_fortran(arma_spptrs)(&UPLO, &N, &NRHS, (E*)this->memptr(), (E*)X.memptr(), &LDB, &INFO);
-	} else if(std::is_same<T, double>::value) {
+	}
+	else if(std::is_same<T, double>::value) {
 		using E = double;
 		arma_fortran(arma_dpptrs)(&UPLO, &N, &NRHS, (E*)this->memptr(), (E*)X.memptr(), &LDB, &INFO);
 	}
@@ -180,7 +183,8 @@ template<typename T> unique_ptr<MetaMat<T>> SymmPackMat<T>::factorize() {
 	if(std::is_same<T, float>::value) {
 		using E = float;
 		arma_fortran(arma_spptrf)(&UPLO, &N, (E*)X->memptr(), &INFO);
-	} else if(std::is_same<T, double>::value) {
+	}
+	else if(std::is_same<T, double>::value) {
 		using E = double;
 		arma_fortran(arma_dpptrf)(&UPLO, &N, (E*)X->memptr(), &INFO);
 	}
@@ -188,7 +192,8 @@ template<typename T> unique_ptr<MetaMat<T>> SymmPackMat<T>::factorize() {
 	if(INFO != 0) {
 		suanpan_error("factorize() fails.\n");
 		X->reset();
-	} else X->factored = true;
+	}
+	else X->factored = true;
 
 	return X;
 }
@@ -202,7 +207,8 @@ template<typename T> unique_ptr<MetaMat<T>> SymmPackMat<T>::i() {
 	if(std::is_same<T, float>::value) {
 		using E = float;
 		arma_fortran(arma_spptrf)(&X->UPLO, &N, (E*)X->memptr(), &INFO);
-	} else if(std::is_same<T, double>::value) {
+	}
+	else if(std::is_same<T, double>::value) {
 		using E = double;
 		arma_fortran(arma_dpptrf)(&X->UPLO, &N, (E*)X->memptr(), &INFO);
 	}
@@ -217,7 +223,8 @@ template<typename T> unique_ptr<MetaMat<T>> SymmPackMat<T>::i() {
 	if(std::is_same<T, float>::value) {
 		using E = float;
 		arma_fortran(arma_spptri)(&X->UPLO, &N, (E*)X->memptr(), (E*)WORK, &INFO);
-	} else if(std::is_same<T, double>::value) {
+	}
+	else if(std::is_same<T, double>::value) {
 		using E = double;
 		arma_fortran(arma_dpptri)(&X->UPLO, &N, (E*)X->memptr(), (E*)WORK, &INFO);
 	}

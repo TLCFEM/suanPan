@@ -110,7 +110,8 @@ void Recorder::save() {
 
 		H5Gclose(group_id);
 		H5Fclose(file_id);
-	} else {
+	}
+	else {
 		for(const auto& s_data_pool : data_pool) {
 			mat data_to_write(s_data_pool.cbegin()->size() * s_data_pool.cbegin()->cbegin()->n_elem + 1, time_pool.size() + 1);
 			data_to_write.col(0).zeros();

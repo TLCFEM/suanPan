@@ -36,7 +36,8 @@ bool FixedNumber::is_converged() {
 	if(get_max_iteration() <= counter) {
 		counter = 0;
 		set_conv_flag(true);
-	} else set_conv_flag(false);
+	}
+	else set_conv_flag(false);
 
 	return get_conv_flag();
 }

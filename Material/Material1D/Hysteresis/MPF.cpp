@@ -59,10 +59,12 @@ int MPF::update_trial_status(const vec& t_strain) {
 			if(trial_load_sign > 0.) inter_strain = -inter_strain;
 			inter_strain = (inter_strain + elastic_modulus * reverse_strain - reverse_stress) / (elastic_modulus - hardening_ratio * elastic_modulus);
 			inter_stress = elastic_modulus * (inter_strain - reverse_strain) + reverse_stress;
-		} else if(trial_load_sign > 0.) {
+		}
+		else if(trial_load_sign > 0.) {
 			inter_stress = yield_stress;
 			inter_strain = yield_strain;
-		} else {
+		}
+		else {
 			inter_stress = -yield_stress;
 			inter_strain = -yield_strain;
 		}

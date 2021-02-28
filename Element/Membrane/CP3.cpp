@@ -218,7 +218,8 @@ int CP3::update_status() {
 
 		trial_stiffness = area * thickness * BN.t() * m_material->get_trial_stiffness() * BN;
 		trial_resistance = area * thickness * BN.t() * t_stress;
-	} else {
+	}
+	else {
 		vec t_strain(3, fill::zeros);
 		for(unsigned I = 0; I < m_node; ++I) {
 			const auto& t_disp = node_ptr[I].lock()->get_trial_displacement();

@@ -326,7 +326,8 @@ int CP4::update_status() {
 			trial_stiffness += t_weight * BN.t() * I.m_material->get_trial_stiffness() * BN;
 			trial_resistance += t_weight * BN.t() * t_stress;
 		}
-	} else
+	}
+	else
 		for(const auto& I : int_pt) {
 			vec t_strain(3, fill::zeros);
 			for(unsigned J = 0, K = 0, L = 1; J < m_node; ++J, K += m_dof, L += m_dof) {
@@ -390,7 +391,8 @@ vector<vec> CP4::record(const OutputType P) {
 		output.emplace_back(vec{dot(interpolation::linear(1., 1.), X)});
 		output.emplace_back(vec{dot(interpolation::linear(-1., 1.), X)});
 		output.emplace_back(vec{dot(interpolation::linear(0., 0.), X)});
-	} else for(const auto& I : int_pt) for(const auto& J : I.m_material->record(P)) output.emplace_back(J);
+	}
+	else for(const auto& I : int_pt) for(const auto& J : I.m_material->record(P)) output.emplace_back(J);
 
 	return output;
 }

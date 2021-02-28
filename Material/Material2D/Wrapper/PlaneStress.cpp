@@ -113,7 +113,8 @@ int PlaneStress::update_trial_status(const vec& t_strain) {
 		}
 
 		trial_stress = t_stress(F1);
-	} else {
+	}
+	else {
 		trial_full_strain(F2) -= solve(t_stiffness(F2, F2), t_stress(F2) + t_stiffness(F2, F1) * incre_strain);
 
 		if(SUANPAN_SUCCESS != base->update_trial_status(trial_full_strain)) return SUANPAN_FAIL;

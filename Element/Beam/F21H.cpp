@@ -59,11 +59,13 @@ void F21H::initialize(const shared_ptr<DomainBase>& D) {
 			// left inner Radau point
 			coor = 16. / 3. * hinge_length - 1.;
 			weight = 3. * hinge_length;
-		} else if(I == int_pt_num - 1) {
+		}
+		else if(I == int_pt_num - 1) {
 			// right inner Radau point
 			coor = 1. - 16. / 3. * hinge_length;
 			weight = 3. * hinge_length;
-		} else {
+		}
+		else {
 			// Gauss points
 			coor = plan(I - 1, 0) * elastic_length;
 			weight = .5 * plan(I - 1, 1) * elastic_length;

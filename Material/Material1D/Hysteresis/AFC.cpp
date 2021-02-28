@@ -58,7 +58,8 @@ void AFC::compute_degradation(const double yield_strain, const double stiffness)
 	if(0. == degrade) {
 		trial_stiffness = (e_stress - s_stress) / (e_strain - s_strain);
 		trial_stress = s_stress + trial_stiffness * (trial_strain(0) - s_strain);
-	} else {
+	}
+	else {
 		max_strain = std::max(std::max(fabs(trial_strain(0)), fabs(e_strain)), max_strain);
 
 		const auto factor = .9 * exp(-degrade * max_strain / fabs(yield_strain));
@@ -109,7 +110,8 @@ int AFC::update_trial_status(const vec& t_strain) {
 			}
 			if(trial_strain(0) < e_strain) compute_degradation(t_yield_strain, t_unloading);
 			else trial_stress = (trial_strain(0) - e_strain) * (trial_stiffness = t_hardening) + e_stress;
-		} else {
+		}
+		else {
 			if(load_sign > 0.) r_strain = current_strain(0) - current_stress(0) / t_unloading;
 			if(trial_strain(0) >= r_strain) trial_stress = current_stress + i_strain * (trial_stiffness = t_unloading);
 			else {
@@ -130,7 +132,8 @@ int AFC::update_trial_status(const vec& t_strain) {
 		}
 		if(trial_strain(0) > e_strain) compute_degradation(c_yield_strain, c_unloading);
 		else trial_stress = (trial_strain - e_strain) * (trial_stiffness = c_hardening) + e_stress;
-	} else {
+	}
+	else {
 		if(load_sign < 0.) r_strain = current_strain(0) - current_stress(0) / c_unloading;
 		if(trial_strain(0) <= r_strain) trial_stress = current_stress + i_strain * (trial_stiffness = c_unloading);
 		else {

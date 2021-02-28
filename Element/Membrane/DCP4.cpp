@@ -171,7 +171,8 @@ vector<vec> DCP4::record(const OutputType P) {
 		output.emplace_back(vec{dot(interpolation::linear(1., 1.), X)});
 		output.emplace_back(vec{dot(interpolation::linear(-1., 1.), X)});
 		output.emplace_back(vec{dot(interpolation::linear(0., 0.), X)});
-	} else if(P == OutputType::DAMAGE) output.emplace_back(get_current_displacement()(d_dof));
+	}
+	else if(P == OutputType::DAMAGE) output.emplace_back(get_current_displacement()(d_dof));
 	else for(const auto& I : int_pt) for(const auto& J : I.m_material->record(P)) output.emplace_back(J);
 
 	return output;

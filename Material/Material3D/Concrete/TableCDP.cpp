@@ -23,10 +23,12 @@ podarray<double> TableCDP::compute_tension_backbone(const double kappa) const {
 	if(kappa < dt_table(0, 0)) {
 		out(3) = dt_table(0, 1) / dt_table(0, 0); // \md{d}
 		out(0) = kappa * out(3);                  // d
-	} else if(kappa > dt_table(dt_table.n_rows - 1, 0)) {
+	}
+	else if(kappa > dt_table(dt_table.n_rows - 1, 0)) {
 		out(3) = (1. - dt_table(dt_table.n_rows - 1, 1)) / (1. - dt_table(dt_table.n_rows - 1, 0)); // \md{d}
 		out(0) = std::min(1., 1. - (1. - kappa) * out(3));                                          // d
-	} else
+	}
+	else
 		for(uword I = 1; I < dt_table.n_rows; ++I) {
 			if(kappa <= dt_table(I, 0)) {
 				out(3) = (dt_table(I, 1) - dt_table(I - 1, 1)) / (dt_table(I, 0) - dt_table(I - 1, 0));
@@ -56,10 +58,12 @@ podarray<double> TableCDP::compute_compression_backbone(const double kappa) cons
 	if(kappa < dc_table(0, 0)) {
 		out(3) = dc_table(0, 1) / dc_table(0, 0); // \md{d}
 		out(0) = kappa * out(3);                  // d
-	} else if(kappa > dc_table(dc_table.n_rows - 1, 0)) {
+	}
+	else if(kappa > dc_table(dc_table.n_rows - 1, 0)) {
 		out(3) = (1. - dc_table(dc_table.n_rows - 1, 1)) / (1. - dc_table(dc_table.n_rows - 1, 0)); // \md{d}
 		out(0) = std::min(1., 1. - (1. - kappa) * out(3));                                          // d
-	} else
+	}
+	else
 		for(uword I = 1; I < dc_table.n_rows; ++I) {
 			if(kappa <= dc_table(I, 0)) {
 				out(3) = (dc_table(I, 1) - dc_table(I - 1, 1)) / (dc_table(I, 0) - dc_table(I - 1, 0));

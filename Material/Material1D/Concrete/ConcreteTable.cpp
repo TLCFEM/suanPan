@@ -51,7 +51,8 @@ podarray<double> ConcreteTable::compute_compression_backbone(const double n_stra
 			if(0 == I) {
 				response(1) = c_table(I, 1) / c_table(I, 0);
 				response(0) = n_strain * response(1);
-			} else {
+			}
+			else {
 				response(1) = (c_table(I, 1) - c_table(I - 1, 1)) / (c_table(I, 0) - c_table(I - 1, 0));
 				response(0) = c_table(I - 1, 1) + (n_strain - c_table(I - 1, 0)) * response(1);
 			}
@@ -72,7 +73,8 @@ podarray<double> ConcreteTable::compute_tension_backbone(const double n_strain) 
 			if(0 == I) {
 				response(1) = t_table(I, 1) / t_table(I, 0);
 				response(0) = n_strain * response(1);
-			} else {
+			}
+			else {
 				response(1) = (t_table(I, 1) - t_table(I - 1, 1)) / (t_table(I, 0) - t_table(I - 1, 0));
 				response(0) = t_table(I - 1, 1) + (n_strain - t_table(I - 1, 0)) * response(1);
 			}

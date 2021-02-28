@@ -87,7 +87,8 @@ int PenaltyBC::process(const shared_ptr<DomainBase>& D) {
 					auto& t_dof = t_node->get_reordered_dof();
 					for(const auto& J : dofs) if(J <= t_dof.n_elem) if(auto& t_idx = t_dof(J - 1); D->insert_restrained_dof(t_idx)) t_matrix->at(t_idx, t_idx) = max_term;
 				}
-	} else {
+	}
+	else {
 		auto& t_set_b = D->get_constrained_dof();
 
 		for(const auto& I : nodes)

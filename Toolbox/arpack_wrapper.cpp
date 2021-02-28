@@ -76,7 +76,8 @@ int eig_solve(cx_vec& eigval, cx_mat& eigvec, const std::shared_ptr<MetaMat<doub
 				eigvec.at(J, I + 1llu) = std::complex<T>(Z[N * I + J], -Z[N * I + N + J]);
 			}
 			++I;
-		} else if(I == NEV - 1llu && std::complex<T>(eigval[I]).imag() != 0.) for(auto J = 0; J < N; ++J) eigvec.at(J, I) = std::complex<T>(Z[N * I + J], Z[N * I + N + J]);
+		}
+		else if(I == NEV - 1llu && std::complex<T>(eigval[I]).imag() != 0.) for(auto J = 0; J < N; ++J) eigvec.at(J, I) = std::complex<T>(Z[N * I + J], Z[N * I + N + J]);
 		else for(auto J = 0; J < N; ++J) eigvec.at(J, I) = std::complex<T>(Z[N * I + J], 0.);
 	}
 
@@ -115,10 +116,12 @@ int eig_solve(vec& eigval, mat& eigvec, const std::shared_ptr<MetaMat<double>>& 
 			vec X(WORKD.memptr() + IPNTR[0] - 1, N, false);
 			X = K * X;
 			Y = M->solve(X);
-		} else if(1 == IDO) {
+		}
+		else if(1 == IDO) {
 			const vec X(WORKD.memptr() + IPNTR[2] - 1, N, false);
 			Y = M->solve_trs(X);
-		} else if(2 == IDO) {
+		}
+		else if(2 == IDO) {
 			const vec X(WORKD.memptr() + IPNTR[0] - 1, N, false);
 			Y = K * X;
 		}
@@ -180,11 +183,14 @@ int eig_solve(cx_vec& eigval, cx_mat& eigvec, const std::shared_ptr<MetaMat<doub
 			if(first_solve) {
 				Y = K->solve(X);
 				first_solve = false;
-			} else Y = K->solve_trs(X);
-		} else if(1 == IDO) {
+			}
+			else Y = K->solve_trs(X);
+		}
+		else if(1 == IDO) {
 			const vec X(WORKD.memptr() + IPNTR[2] - 1, N, false);
 			Y = K->solve_trs(X);
-		} else if(2 == IDO) {
+		}
+		else if(2 == IDO) {
 			const vec X(WORKD.memptr() + IPNTR[0] - 1, N, false);
 			Y = M * X;
 		}
@@ -216,7 +222,8 @@ int eig_solve(cx_vec& eigval, cx_mat& eigvec, const std::shared_ptr<MetaMat<doub
 				eigvec.at(J, I + 1llu) = std::complex<T>(Z[N * I + J], -Z[N * I + N + J]);
 			}
 			++I;
-		} else if(I == NEV - 1llu && std::complex<T>(eigval[I]).imag() != 0.) for(auto J = 0; J < N; ++J) eigvec.at(J, I) = std::complex<T>(Z[N * I + J], Z[N * I + N + J]);
+		}
+		else if(I == NEV - 1llu && std::complex<T>(eigval[I]).imag() != 0.) for(auto J = 0; J < N; ++J) eigvec.at(J, I) = std::complex<T>(Z[N * I + J], Z[N * I + N + J]);
 		else for(auto J = 0; J < N; ++J) eigvec.at(J, I) = std::complex<T>(Z[N * I + J], 0.);
 	}
 
@@ -258,10 +265,12 @@ int eig_solve(vec& eigval, mat& eigvec, const std::shared_ptr<MetaMat<double>>& 
 			vec X(WORKD.memptr() + IPNTR[0] - 1, N, false);
 			X = K * X;
 			Y = KG->solve(X);
-		} else if(1 == IDO) {
+		}
+		else if(1 == IDO) {
 			const vec X(WORKD.memptr() + IPNTR[2] - 1, N, false);
 			Y = KG->solve_trs(X);
-		} else if(2 == IDO) {
+		}
+		else if(2 == IDO) {
 			const vec X(WORKD.memptr() + IPNTR[0] - 1, N, false);
 			Y = K * X;
 		}
@@ -318,10 +327,12 @@ int eig_solve(cx_vec& eigval, cx_mat& eigvec, const std::shared_ptr<MetaMat<doub
 			vec X(WORKD.memptr() + IPNTR[0] - 1, N, false);
 			X = KG * X;
 			Y = K->solve(X);
-		} else if(1 == IDO) {
+		}
+		else if(1 == IDO) {
 			const vec X(WORKD.memptr() + IPNTR[2] - 1, N, false);
 			Y = K->solve_trs(X);
-		} else if(2 == IDO) {
+		}
+		else if(2 == IDO) {
 			const vec X(WORKD.memptr() + IPNTR[0] - 1, N, false);
 			Y = KG * X;
 		}
@@ -353,7 +364,8 @@ int eig_solve(cx_vec& eigval, cx_mat& eigvec, const std::shared_ptr<MetaMat<doub
 				eigvec.at(J, I + 1llu) = std::complex<T>(Z[N * I + J], -Z[N * I + N + J]);
 			}
 			++I;
-		} else if(I == NEV - 1llu && std::complex<T>(eigval[I]).imag() != 0.) for(auto J = 0; J < N; ++J) eigvec.at(J, I) = std::complex<T>(Z[N * I + J], Z[N * I + N + J]);
+		}
+		else if(I == NEV - 1llu && std::complex<T>(eigval[I]).imag() != 0.) for(auto J = 0; J < N; ++J) eigvec.at(J, I) = std::complex<T>(Z[N * I + J], Z[N * I + N + J]);
 		else for(auto J = 0; J < N; ++J) eigvec.at(J, I) = std::complex<T>(Z[N * I + J], 0.);
 	}
 

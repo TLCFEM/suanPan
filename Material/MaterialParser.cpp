@@ -779,7 +779,8 @@ void new_bilinearoo(unique_ptr<Material>& return_obj, istringstream& command) {
 	if(3 == pool.size()) {
 		pool.insert(pool.end(), pool.begin() + 1, pool.begin() + 3);
 		pool.emplace_back(0.);
-	} else if(4 == pool.size()) pool.insert(pool.end() - 1, pool.begin() + 1, pool.begin() + 3);
+	}
+	else if(4 == pool.size()) pool.insert(pool.end() - 1, pool.begin() + 1, pool.begin() + 3);
 	else if(5 == pool.size()) pool.emplace_back(0.);
 
 	if(6 != pool.size()) {
@@ -806,7 +807,8 @@ void new_bilinearpo(unique_ptr<Material>& return_obj, istringstream& command) {
 	if(3 == pool.size()) {
 		pool.insert(pool.end(), pool.begin() + 1, pool.begin() + 3);
 		pool.emplace_back(0.);
-	} else if(4 == pool.size()) pool.insert(pool.end() - 1, pool.begin() + 1, pool.begin() + 3);
+	}
+	else if(4 == pool.size()) pool.insert(pool.end() - 1, pool.begin() + 1, pool.begin() + 3);
 	else if(5 == pool.size()) pool.emplace_back(0.);
 
 	if(6 != pool.size()) {
@@ -2538,7 +2540,8 @@ void new_steelbrb(unique_ptr<Material>& return_obj, istringstream& command) {
 	if(6 == pool.size()) {
 		pool.insert(pool.end(), pool.begin() + 3, pool.begin() + 6);
 		pool.emplace_back(0.);
-	} else if(7 == pool.size()) pool.insert(pool.end() - 1, pool.begin() + 3, pool.begin() + 6);
+	}
+	else if(7 == pool.size()) pool.insert(pool.end() - 1, pool.begin() + 3, pool.begin() + 6);
 	else if(9 == pool.size()) pool.emplace_back(0.);
 
 	if(10 != pool.size()) {

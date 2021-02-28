@@ -120,7 +120,8 @@ int C3D4::update_status() {
 				trial_geometry(N, L) += t_factor;
 			}
 		}
-	} else {
+	}
+	else {
 		if(c_material->update_trial_status(strain_mat * get_trial_displacement()) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 		trial_stiffness = volume * strain_mat.t() * c_material->get_trial_stiffness() * strain_mat;
 		trial_resistance = volume * strain_mat.t() * c_material->get_trial_stress();

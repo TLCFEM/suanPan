@@ -32,11 +32,13 @@ void GlobalRecorder::record(const shared_ptr<DomainBase>& D) {
 		auto kinetic_energy = 0.;
 		for(auto& I : D->get_pool<Element>()) kinetic_energy += I->get_kinetic_energy();
 		insert({{kinetic_energy}}, 0);
-	} else if(OutputType::SE == get_variable_type()) {
+	}
+	else if(OutputType::SE == get_variable_type()) {
 		auto strain_energy = 0.;
 		for(auto& I : D->get_pool<Element>()) strain_energy += I->get_strain_energy();
 		insert({{strain_energy}}, 0);
-	} else insert({{.0}}, 0);
+	}
+	else insert({{.0}}, 0);
 
 	if(if_record_time()) insert(D->get_factory()->get_current_time());
 }

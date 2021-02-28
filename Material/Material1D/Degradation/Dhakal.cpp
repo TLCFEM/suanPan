@@ -23,13 +23,16 @@ podarray<double> Dhakal::compute_degradation(const double t_strain) const {
 	if(t_strain < final_strain) {
 		damage(0) = .2;
 		damage(1) = 0.;
-	} else if(t_strain < inter_strain) {
+	}
+	else if(t_strain < inter_strain) {
 		damage(1) = -.02 / yield_strain;
 		damage(0) = (t_strain - inter_strain) * damage(1) + inter_factor;
-	} else if(t_strain < yield_strain) {
+	}
+	else if(t_strain < yield_strain) {
 		damage(1) = slope;
 		damage(0) = (t_strain - yield_strain) * damage(1) + 1.;
-	} else {
+	}
+	else {
 		damage(0) = 1.;
 		damage(1) = 0.;
 	}

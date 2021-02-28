@@ -90,7 +90,8 @@ int Newton::analyze() {
 			if(!aitken) {
 				aitken = true;
 				pre_ninja = ninja;
-			} else {
+			}
+			else {
 				aitken = false;
 				const vec diff_ninja = pre_ninja - ninja;
 				ninja *= dot(pre_ninja, diff_ninja) / dot(diff_ninja, diff_ninja);

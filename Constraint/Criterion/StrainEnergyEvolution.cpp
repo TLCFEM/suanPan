@@ -63,11 +63,13 @@ int StrainEnergyEvolution::process(const shared_ptr<DomainBase>& D) {
 			if(!t_element->is_active()) {
 				current_energy(I) = 0.;
 				state(I) = 0; // disabled
-			} else {
+			}
+			else {
 				current_energy(I) = t_element->get_strain_energy() / t_element->get_characteristic_length();
 				state(I) = 1; // enabled
 			}
-		} else {
+		}
+		else {
 			current_energy(I) = 0.;
 			state(I) = -1; // not defined
 		}
@@ -79,11 +81,13 @@ int StrainEnergyEvolution::process(const shared_ptr<DomainBase>& D) {
 			if(!t_element->is_active()) {
 				current_energy(I) = 0.;
 				state(I) = 0; // disabled
-			} else {
+			}
+			else {
 				current_energy(I) = t_element->get_strain_energy() / t_element->get_characteristic_length();
 				state(I) = 1; // enabled
 			}
-		} else {
+		}
+		else {
 			current_energy(I) = 0.;
 			state(I) = -1; // not defined
 		}

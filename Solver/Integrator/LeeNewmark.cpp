@@ -96,7 +96,8 @@ int LeeNewmark::process_constraint() const {
 		// access::rw(current_mass).swap(t_mass);
 
 		access::rw(current_mass) = t_mass->make_copy();
-	} else {
+	}
+	else {
 		// if not first iteration
 		// erase the tangent stiffness entries
 		if(!stiffness->triplet_mat.csc_sort()) return SUANPAN_FAIL;

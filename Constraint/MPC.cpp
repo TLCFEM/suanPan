@@ -74,7 +74,8 @@ int MPC::process(const shared_ptr<DomainBase>& D) {
 		W->incre_mpc();
 		get_auxiliary_stiffness(W).col(last_pos) = slice;
 		get_auxiliary_load(W).back() = psudo_load * magnitude->get_amplitude(W->get_trial_time()) - residual;
-	} else suanpan_debug("some node or DoF is not active, the MPC %u is not applied.\n", get_tag());
+	}
+	else suanpan_debug("some node or DoF is not active, the MPC %u is not applied.\n", get_tag());
 
 	return SUANPAN_SUCCESS;
 }

@@ -42,12 +42,14 @@ bool RelIncreEnergy::is_converged() {
 	if(fabs(ref_energy + 1.) < 1E-12) {
 		ref_energy = fabs(dot(W->get_ninja(), residual));
 		set_error(1.);
-	} else set_error(fabs(dot(W->get_ninja(), residual)) / ref_energy);
+	}
+	else set_error(fabs(dot(W->get_ninja(), residual)) / ref_energy);
 
 	if(get_tolerance() > get_error()) {
 		set_conv_flag(true);
 		ref_energy = -1.;
-	} else set_conv_flag(false);
+	}
+	else set_conv_flag(false);
 
 	if(is_print()) suanpan_info("relative energy increment error: %.5E.\n", get_error());
 

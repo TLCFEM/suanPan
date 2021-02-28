@@ -54,7 +54,8 @@ int T3D2::update_status() {
 
 		trial_stiffness = t_trans->to_global_stiffness_mat(t_material->get_trial_stiffness() * new_area / d_strain + t_stiff);
 		trial_geometry = t_trans->to_global_geometry_mat(new_area / new_length * t_material->get_trial_stress());
-	} else {
+	}
+	else {
 		if(t_material->update_trial_status(t_trans->to_local_vec(get_trial_displacement()) / length) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 
 		trial_stiffness = t_trans->to_global_stiffness_mat(area / length * t_material->get_trial_stiffness());

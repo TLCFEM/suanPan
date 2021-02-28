@@ -51,13 +51,16 @@ int NonlinearViscosity::update_trial_status(const vec& t_strain, const vec& t_st
 	if(0. == alpha) {
 		term_a = 0.;
 		term_b = 1.;
-	} else if(1. == alpha) {
+	}
+	else if(1. == alpha) {
 		term_a = 1.;
 		term_b = v;
-	} else if(1. < alpha || limit < abs_v) {
+	}
+	else if(1. < alpha || limit < abs_v) {
 		term_a = alpha * pow(abs_v, alpha - 1.);
 		term_b = term_a * v / alpha;
-	} else {
+	}
+	else {
 		term_a = 3. * a * v * v + b;
 		term_b = (a * v * v + b) * v;
 	}

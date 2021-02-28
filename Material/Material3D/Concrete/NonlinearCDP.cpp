@@ -144,7 +144,8 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
 			const auto tmp_term = one_minus_alpha * max_stress / t_para(2);
 			jacobian(0, 1) = tmp_term * c_para(2) / t_para(2) * t_para(5);
 			jacobian(0, 2) = (one_minus_alpha - tmp_term) * c_para(5);
-		} else {
+		}
+		else {
 			jacobian(0, 0) = pfplambda;
 			jacobian(0, 1) = 0.;
 			jacobian(0, 2) = one_minus_alpha * c_para(5);

@@ -31,7 +31,8 @@ void NZStrongMotion::initialize(const shared_ptr<DomainBase>& D) {
 	if(0 != stat(file_name.c_str(), &buffer) || !data.load(file_name, auto_detect)) {
 		suanpan_error("cannot load file %s.\n", file_name.c_str());
 		D->disable_amplitude(get_tag());
-	} else magnitude = conv_to<vec>::from(data);
+	}
+	else magnitude = conv_to<vec>::from(data);
 }
 
 double NZStrongMotion::get_amplitude(const double T) {

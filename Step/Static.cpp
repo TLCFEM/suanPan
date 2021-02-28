@@ -108,7 +108,8 @@ int Static::analyze() {
 			// some criteria may update the model
 			code = G->process_criterion();
 			if(SUANPAN_SUCCESS != code) return code;
-		} else if(SUANPAN_FAIL == code) {
+		}
+		else if(SUANPAN_FAIL == code) {
 			// failed step
 			// reset to the start of current substep
 			G->reset_status();
@@ -126,6 +127,7 @@ int Static::analyze() {
 			step_time *= .5;
 			set_max_substep(num_increment + static_cast<unsigned>(remain_time / step_time) + 1);
 			num_converged_step = 0;
-		} else return SUANPAN_FAIL;
+		}
+		else return SUANPAN_FAIL;
 	}
 }

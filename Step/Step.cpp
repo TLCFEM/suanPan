@@ -34,10 +34,12 @@ int Step::initialize() {
 	if(sparse_mat) {
 		// LAPACK and SPIKE are for dense only
 		if(SolverType::LAPACK == system_solver || SolverType::SPIKE == system_solver) system_solver = SolverType::SUPERLU;
-	} else if(!symm_mat && band_mat) {
+	}
+	else if(!symm_mat && band_mat) {
 		// only LAPACK and SPIKE are supported
 		if(SolverType::LAPACK != system_solver && SolverType::SPIKE != system_solver) system_solver = SolverType::LAPACK;
-	} else if(!symm_mat && !band_mat) {
+	}
+	else if(!symm_mat && !band_mat) {
 		// only LAPACK solvers are supported
 		system_solver = SolverType::LAPACK;
 	}
@@ -93,7 +95,8 @@ void Step::set_time_perid(const double T) {
 	if(tmp_iteration > static_cast<int>(std::numeric_limits<unsigned>::max())) {
 		suanpan_warning("set_ini_step_size() exceeds limits.\n");
 		set_max_substep(std::numeric_limits<unsigned>::max());
-	} else set_max_substep(tmp_iteration);
+	}
+	else set_max_substep(tmp_iteration);
 }
 
 void Step::set_time_left(const double T) { time_left = T; }

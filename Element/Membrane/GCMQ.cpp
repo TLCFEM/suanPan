@@ -121,10 +121,12 @@ mat GCMQ::form_enhanced_strain(const vec& coor, const int num_enhanced_mode) {
 	if(1 == num_enhanced_mode) {
 		poly(0, 0) = 3. * X * X - 1.;
 		poly(1, 0) = 3. * Y * Y - 1.;
-	} else if(2 == num_enhanced_mode) {
+	}
+	else if(2 == num_enhanced_mode) {
 		poly(2, 1) = poly(0, 0) = 3. * X * X - 1.;
 		poly(2, 0) = poly(1, 1) = 3. * Y * Y - 1.;
-	} else throw invalid_argument("not supported");
+	}
+	else throw invalid_argument("not supported");
 
 	return poly;
 }

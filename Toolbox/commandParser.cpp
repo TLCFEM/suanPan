@@ -221,7 +221,8 @@ int process_file(const shared_ptr<Bead>& model, const char* file_name) {
 			if(*command_line.crbegin() == '\\') {
 				command_line.back() = ' ';
 				all_line.append(command_line);
-			} else {
+			}
+			else {
 				all_line.append(command_line);
 				istringstream tmp_str(all_line);
 				if(process_command(model, tmp_str) == SUANPAN_EXIT) return SUANPAN_EXIT;
@@ -363,19 +364,23 @@ int save_object(const shared_ptr<DomainBase>& domain, istringstream& command) {
 	if(is_equal(object_id, "Recorder")) {
 		unsigned tag;
 		while(get_input(command, tag)) if(domain->find_recorder(tag)) domain->get_recorder(tag)->save();
-	} else if(is_equal(object_id, "Stiffness")) {
+	}
+	else if(is_equal(object_id, "Stiffness")) {
 		string name = "K";
 		if(!command.eof() && !get_input(command, name)) name = "K";
 		domain->get_factory()->get_stiffness()->save(name.c_str());
-	} else if(is_equal(object_id, "Mass")) {
+	}
+	else if(is_equal(object_id, "Mass")) {
 		string name = "M";
 		if(!command.eof() && !get_input(command, name)) name = "M";
 		domain->get_factory()->get_mass()->save(name.c_str());
-	} else if(is_equal(object_id, "Damping")) {
+	}
+	else if(is_equal(object_id, "Damping")) {
 		string name = "C";
 		if(!command.eof() && !get_input(command, name)) name = "C";
 		domain->get_factory()->get_damping()->save(name.c_str());
-	} else if(is_equal(object_id, "Model")) {
+	}
+	else if(is_equal(object_id, "Model")) {
 		string name = "Model.h5";
 		if(!command.eof() && !get_input(command, name)) name = "Model.h5";
 		domain->save(name);
@@ -512,7 +517,8 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& co
 			return SUANPAN_SUCCESS;
 		}
 		domain->insert(make_shared<Tabular>(tag, std::move(file_name), step_tag));
-	} else if(is_equal(amplitude_type, "Decay")) {
+	}
+	else if(is_equal(amplitude_type, "Decay")) {
 		double A;
 		if(!get_input(command, A)) {
 			suanpan_error("create_new_amplitude() needs a A.\n");
@@ -524,19 +530,22 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& co
 			return SUANPAN_SUCCESS;
 		}
 		domain->insert(make_shared<Decay>(tag, A, TD, step_tag));
-	} else if(is_equal(amplitude_type, "Linear")) {
+	}
+	else if(is_equal(amplitude_type, "Linear")) {
 		double A;
 		if(!get_input(command, A)) {
 			suanpan_error("create_new_amplitude() needs a slope.\n");
 			return SUANPAN_SUCCESS;
 		}
 		domain->insert(make_shared<Linear>(tag, A, step_tag));
-	} else if(is_equal(amplitude_type, "Combine")) {
+	}
+	else if(is_equal(amplitude_type, "Combine")) {
 		vector<uword> tag_pool;
 		uword t_tag;
 		while(get_input(command, t_tag)) tag_pool.emplace_back(t_tag);
 		domain->insert(make_shared<Combine>(tag, uvec(tag_pool), step_tag));
-	} else if(is_equal(amplitude_type, "Modulated") || is_equal(amplitude_type, "Sine") || is_equal(amplitude_type, "Cosine")) {
+	}
+	else if(is_equal(amplitude_type, "Modulated") || is_equal(amplitude_type, "Sine") || is_equal(amplitude_type, "Cosine")) {
 		double W;
 		if(!get_input(command, W)) {
 			suanpan_error("create_new_amplitude() needs a period/amplitude.\n");
@@ -550,7 +559,8 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& co
 		if(is_equal(amplitude_type, "Modulated")) domain->insert(make_shared<Modulated>(tag, W, std::move(A), step_tag));
 		else if(is_equal(amplitude_type, "Sine")) domain->insert(make_shared<Sine>(tag, W, std::move(A), step_tag));
 		else if(is_equal(amplitude_type, "Cosine")) domain->insert(make_shared<Cosine>(tag, W, std::move(A), step_tag));
-	} else if(is_equal(amplitude_type, "NZStrongMotion")) {
+	}
+	else if(is_equal(amplitude_type, "NZStrongMotion")) {
 		string name;
 		if(!get_input(command, name)) {
 			suanpan_error("create_new_amplitude() needs a name.\n");
@@ -596,7 +606,8 @@ int create_new_bc(const shared_ptr<DomainBase>& domain, istringstream& command, 
 		else if(is_equal(bc_type, '4')) domain->insert(make_shared<PenaltyBC>(bc_id, step_tag, uvec(node_tag), 4));
 		else if(is_equal(bc_type, '5')) domain->insert(make_shared<PenaltyBC>(bc_id, step_tag, uvec(node_tag), 5));
 		else if(is_equal(bc_type, '6')) domain->insert(make_shared<PenaltyBC>(bc_id, step_tag, uvec(node_tag), 6));
-	} else {
+	}
+	else {
 		if(is_equal(bc_type, 'p')) domain->insert(make_shared<MultiplierBC>(bc_id, step_tag, uvec(node_tag), "PINNED"));
 		else if(is_equal(bc_type, 'e')) domain->insert(make_shared<MultiplierBC>(bc_id, step_tag, uvec(node_tag), "ENCASTRE"));
 		else if(is_equal(bc_type, 'x')) domain->insert(make_shared<MultiplierBC>(bc_id, step_tag, uvec(node_tag), "XSYMM"));
@@ -646,7 +657,8 @@ int create_new_groupbc(const shared_ptr<DomainBase>& domain, istringstream& comm
 		else if(is_equal(bc_type, '4')) domain->insert(make_shared<GroupPenaltyBC>(bc_id, step_tag, uvec(group_tag), 4));
 		else if(is_equal(bc_type, '5')) domain->insert(make_shared<GroupPenaltyBC>(bc_id, step_tag, uvec(group_tag), 5));
 		else if(is_equal(bc_type, '6')) domain->insert(make_shared<GroupPenaltyBC>(bc_id, step_tag, uvec(group_tag), 6));
-	} else {
+	}
+	else {
 		if(is_equal(bc_type, 'p')) domain->insert(make_shared<GroupMultiplierBC>(bc_id, step_tag, uvec(group_tag), "PINNED"));
 		else if(is_equal(bc_type, 'e')) domain->insert(make_shared<GroupMultiplierBC>(bc_id, step_tag, uvec(group_tag), "ENCASTRE"));
 		else if(is_equal(bc_type, 'x')) domain->insert(make_shared<GroupMultiplierBC>(bc_id, step_tag, uvec(group_tag), "XSYMM"));
@@ -692,7 +704,8 @@ int create_new_bodyforce(const shared_ptr<DomainBase>& domain, istringstream& co
 	vector<uword> element_tag;
 	while(get_input(command, element)) element_tag.push_back(element);
 
-	if(flag) { if(!domain->insert(make_shared<GroupBodyForce>(load_id, domain->get_current_step_tag(), magnitude, uvec(element_tag), dof_id, amplitude_id))) suanpan_error("create_new_bodyforce() fails to create new load.\n"); } else if(!domain->insert(make_shared<BodyForce>(load_id, domain->get_current_step_tag(), magnitude, uvec(element_tag), dof_id, amplitude_id))) suanpan_error("create_new_bodyforce() fails to create new load.\n");
+	if(flag) { if(!domain->insert(make_shared<GroupBodyForce>(load_id, domain->get_current_step_tag(), magnitude, uvec(element_tag), dof_id, amplitude_id))) suanpan_error("create_new_bodyforce() fails to create new load.\n"); }
+	else if(!domain->insert(make_shared<BodyForce>(load_id, domain->get_current_step_tag(), magnitude, uvec(element_tag), dof_id, amplitude_id))) suanpan_error("create_new_bodyforce() fails to create new load.\n");
 
 	return SUANPAN_SUCCESS;
 }
@@ -726,7 +739,8 @@ int create_new_cload(const shared_ptr<DomainBase>& domain, istringstream& comman
 	vector<uword> node_tag;
 	while(get_input(command, node)) node_tag.push_back(node);
 
-	if(flag) { if(!domain->insert(make_shared<GroupNodalForce>(load_id, domain->get_current_step_tag(), magnitude, uvec(node_tag), dof_id, amplitude_id))) suanpan_error("create_new_cload() fails to create new load.\n"); } else { if(!domain->insert(make_shared<NodalForce>(load_id, domain->get_current_step_tag(), magnitude, uvec(node_tag), dof_id, amplitude_id))) suanpan_error("create_new_cload() fails to create new load.\n"); }
+	if(flag) { if(!domain->insert(make_shared<GroupNodalForce>(load_id, domain->get_current_step_tag(), magnitude, uvec(node_tag), dof_id, amplitude_id))) suanpan_error("create_new_cload() fails to create new load.\n"); }
+	else { if(!domain->insert(make_shared<NodalForce>(load_id, domain->get_current_step_tag(), magnitude, uvec(node_tag), dof_id, amplitude_id))) suanpan_error("create_new_cload() fails to create new load.\n"); }
 
 	return SUANPAN_SUCCESS;
 }
@@ -779,7 +793,8 @@ int create_new_converger(const shared_ptr<DomainBase>& domain, istringstream& co
 	if(1 == code) {
 		if(domain->get_current_step_tag() != 0) domain->get_current_step()->set_converger_tag(tag);
 		domain->set_current_converger_tag(tag);
-	} else suanpan_error("create_new_converger() fails to create the new converger.\n");
+	}
+	else suanpan_error("create_new_converger() fails to create the new converger.\n");
 
 	return SUANPAN_SUCCESS;
 }
@@ -919,7 +934,8 @@ int create_new_displacement(const shared_ptr<DomainBase>& domain, istringstream&
 
 	const auto& step_tag = domain->get_current_step_tag();
 
-	if(flag) { if(!domain->insert(make_shared<GroupNodalDisplacement>(load_id, step_tag, magnitude, uvec(node_tag), dof_id, amplitude_id))) suanpan_error("create_new_displacement() fails to create new load.\n"); } else { if(!domain->insert(make_shared<NodalDisplacement>(load_id, step_tag, magnitude, uvec(node_tag), dof_id, amplitude_id))) suanpan_error("create_new_displacement() fails to create new load.\n"); }
+	if(flag) { if(!domain->insert(make_shared<GroupNodalDisplacement>(load_id, step_tag, magnitude, uvec(node_tag), dof_id, amplitude_id))) suanpan_error("create_new_displacement() fails to create new load.\n"); }
+	else { if(!domain->insert(make_shared<NodalDisplacement>(load_id, step_tag, magnitude, uvec(node_tag), dof_id, amplitude_id))) suanpan_error("create_new_displacement() fails to create new load.\n"); }
 
 	return SUANPAN_SUCCESS;
 }
@@ -978,7 +994,8 @@ int create_new_generate(const shared_ptr<DomainBase>& domain, istringstream& com
 	if(!get_input(command, interval)) {
 		interval = 1;
 		end = start;
-	} else if(!get_input(command, end)) {
+	}
+	else if(!get_input(command, end)) {
 		end = interval;
 		interval = end > start ? 1 : -1;
 	}
@@ -1169,7 +1186,8 @@ int create_new_initial(const shared_ptr<DomainBase>& domain, istringstream& comm
 				auto t_coor = t_node->get_coordinate();
 				t_coor.resize(3);
 				t_node->update_current_velocity(cross(magnitude, t_coor - t_ref_coor));
-			} else {
+			}
+			else {
 				suanpan_error("create_new_initial() needs a valid node tag.\n");
 				return SUANPAN_SUCCESS;
 			}
@@ -1199,7 +1217,8 @@ int create_new_initial(const shared_ptr<DomainBase>& domain, istringstream& comm
 				if(t_variable.n_elem < dof_tag) t_variable.resize(dof_tag);
 				t_variable(dof_tag - 1) = magnitude;
 				t_node->update_current_displacement(t_variable);
-			} else {
+			}
+			else {
 				suanpan_error("create_new_initial() needs a valid node tag.\n");
 				return SUANPAN_SUCCESS;
 			}
@@ -1213,7 +1232,8 @@ int create_new_initial(const shared_ptr<DomainBase>& domain, istringstream& comm
 				if(t_variable.n_elem < dof_tag) t_variable.resize(dof_tag);
 				t_variable(dof_tag - 1) = magnitude;
 				t_node->update_current_velocity(t_variable);
-			} else {
+			}
+			else {
 				suanpan_error("create_new_initial() needs a valid node tag.\n");
 				return SUANPAN_SUCCESS;
 			}
@@ -1227,7 +1247,8 @@ int create_new_initial(const shared_ptr<DomainBase>& domain, istringstream& comm
 				if(t_variable.n_elem < dof_tag) t_variable.resize(dof_tag);
 				t_variable(dof_tag - 1) = magnitude;
 				t_node->update_current_acceleration(t_variable);
-			} else {
+			}
+			else {
 				suanpan_error("create_new_initial() needs a valid node tag.\n");
 				return SUANPAN_SUCCESS;
 			}
@@ -1263,7 +1284,8 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
 			}
 		}
 		if(domain->insert(make_shared<Newmark>(tag, alpha, beta))) code = 1;
-	} else if(is_equal(integrator_type, "RayleighNewmark")) {
+	}
+	else if(is_equal(integrator_type, "RayleighNewmark")) {
 		double damping_alpha, damping_beta, damping_zeta;
 		if(!get_input(command, damping_alpha)) {
 			suanpan_error("create_new_integrator() needs a valid alpha for Rayleigh damping.\n");
@@ -1290,7 +1312,8 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
 			}
 		}
 		if(domain->insert(make_shared<RayleighNewmark>(tag, damping_alpha, damping_beta, damping_zeta, alpha, beta))) code = 1;
-	} else if(is_equal(integrator_type, "LeeNewmark")) {
+	}
+	else if(is_equal(integrator_type, "LeeNewmark")) {
 		double alpha, beta;
 		if(!get_input(command, alpha)) {
 			suanpan_error("create_new_integrator() needs a valid alpha.\n");
@@ -1319,7 +1342,8 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
 		}
 
 		if(domain->insert(make_shared<LeeNewmark>(tag, damping_coef, frequency, alpha, beta))) code = 1;
-	} else if(is_equal(integrator_type, "LeeNewmarkFull")) {
+	}
+	else if(is_equal(integrator_type, "LeeNewmarkFull")) {
 		double alpha, beta;
 		if(!get_input(command, alpha)) {
 			suanpan_error("create_new_integrator() needs a valid alpha.\n");
@@ -1371,23 +1395,28 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
 			if(is_equal("-type0", type)) {
 				if(SUANPAN_SUCCESS != get_basic_input()) return SUANPAN_SUCCESS;
 				modes.emplace_back(LeeNewmarkFull::Mode{LeeNewmarkFull::Type::T0, vec{}, zeta, omega});
-			} else if(is_equal("-type1", type)) {
+			}
+			else if(is_equal("-type1", type)) {
 				if(SUANPAN_SUCCESS != get_basic_input() || SUANPAN_SUCCESS != get_first()) return SUANPAN_SUCCESS;
 				modes.emplace_back(LeeNewmarkFull::Mode{LeeNewmarkFull::Type::T1, vec{static_cast<double>(static_cast<unsigned>(para_a))}, zeta, omega});
-			} else if(is_equal("-type2", type)) {
+			}
+			else if(is_equal("-type2", type)) {
 				if(SUANPAN_SUCCESS != get_basic_input() || SUANPAN_SUCCESS != get_first() || SUANPAN_SUCCESS != get_second()) return SUANPAN_SUCCESS;
 				modes.emplace_back(LeeNewmarkFull::Mode{LeeNewmarkFull::Type::T2, vec{static_cast<double>(static_cast<unsigned>(para_a)), static_cast<double>(std::max(1u, static_cast<unsigned>(para_b)))}, zeta, omega});
-			} else if(is_equal("-type3", type)) {
+			}
+			else if(is_equal("-type3", type)) {
 				if(SUANPAN_SUCCESS != get_basic_input() || SUANPAN_SUCCESS != get_first()) return SUANPAN_SUCCESS;
 				modes.emplace_back(LeeNewmarkFull::Mode{LeeNewmarkFull::Type::T3, vec{para_a}, zeta, omega});
-			} else {
+			}
+			else {
 				suanpan_error("create_new_integrator() needs a valid type.\n");
 				return SUANPAN_SUCCESS;
 			}
 		}
 
 		if(domain->insert(make_shared<LeeNewmarkFull>(tag, std::move(modes), alpha, beta))) code = 1;
-	} else if(is_equal(integrator_type, "WilsonPenzienNewmark")) {
+	}
+	else if(is_equal(integrator_type, "WilsonPenzienNewmark")) {
 		double alpha, beta;
 		if(!get_input(command, alpha)) {
 			suanpan_error("create_new_integrator() needs a valid alpha.\n");
@@ -1410,7 +1439,8 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
 		}
 
 		if(domain->insert(make_shared<WilsonPenzienNewmark>(tag, damping_coef, alpha, beta))) code = 1;
-	} else if(is_equal(integrator_type, "GeneralizedAlpha") || is_equal(integrator_type, "GeneralisedAlpha")) {
+	}
+	else if(is_equal(integrator_type, "GeneralizedAlpha") || is_equal(integrator_type, "GeneralisedAlpha")) {
 		vector<double> pool;
 		pool.reserve(2);
 
@@ -1420,12 +1450,14 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
 		if(pool.empty() && domain->insert(make_shared<GeneralizedAlpha>(tag, .5))) code = 1; // NOLINT(bugprone-branch-clone)
 		else if(1 == pool.size() && domain->insert(make_shared<GeneralizedAlpha>(tag, std::min(std::max(0., pool[0]), 1.)))) code = 1;
 		else if(2 == pool.size() && domain->insert(make_shared<GeneralizedAlpha>(tag, pool[0], pool[1]))) code = 1;
-	} else if(is_equal(integrator_type, "BatheTwoStep") && domain->insert(make_shared<BatheTwoStep>(tag))) code = 1;
+	}
+	else if(is_equal(integrator_type, "BatheTwoStep") && domain->insert(make_shared<BatheTwoStep>(tag))) code = 1;
 
 	if(code == 1) {
 		if(domain->get_current_step_tag() != 0) domain->get_current_step()->set_integrator_tag(tag);
 		domain->set_current_integrator_tag(tag);
-	} else suanpan_error("create_new_integrator() fails to create the new integrator.\n");
+	}
+	else suanpan_error("create_new_integrator() fails to create the new integrator.\n");
 
 	return SUANPAN_SUCCESS;
 }
@@ -1479,7 +1511,8 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
 		while(!command.eof() && get_input(command, e_tag)) element_tag.emplace_back(e_tag);
 
 		new_modifier = make_unique<LumpedSimple>(tag, uvec(element_tag));
-	} else if(is_equal(modifier_type, "LumpedScale")) {
+	}
+	else if(is_equal(modifier_type, "LumpedScale")) {
 		unsigned tag;
 		if(!get_input(command, tag)) {
 			suanpan_error("create_new_modifier() needs a valid tag.\n");
@@ -1491,7 +1524,8 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
 		while(!command.eof() && get_input(command, e_tag)) element_tag.emplace_back(e_tag);
 
 		new_modifier = make_unique<LumpedScale>(tag, uvec(element_tag));
-	} else if(is_equal(modifier_type, "Rayleigh")) {
+	}
+	else if(is_equal(modifier_type, "Rayleigh")) {
 		unsigned tag;
 		if(!get_input(command, tag)) {
 			suanpan_error("create_new_modifier() needs a valid tag.\n");
@@ -1516,7 +1550,8 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
 		while(!command.eof() && get_input(command, e_tag)) element_tag.emplace_back(e_tag);
 
 		new_modifier = make_unique<Rayleigh>(tag, a, b, c, uvec(element_tag));
-	} else if(is_equal(modifier_type, "ElementalModal")) {
+	}
+	else if(is_equal(modifier_type, "ElementalModal")) {
 		unsigned tag;
 		if(!get_input(command, tag)) {
 			suanpan_error("create_new_modifier() needs a valid tag.\n");
@@ -1538,7 +1573,8 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
 		while(!command.eof() && get_input(command, e_tag)) element_tag.emplace_back(e_tag);
 
 		new_modifier = make_unique<ElementalModal>(tag, a, b, uvec(element_tag));
-	} else {
+	}
+	else {
 		// check if the library is already loaded
 		auto code = false;
 		for(const auto& I : domain->get_external_module_pool())
@@ -1833,7 +1869,8 @@ int create_new_hdf5recorder(const shared_ptr<DomainBase>& domain, istringstream&
 					width = 6;
 					suanpan_error("create_new_recorder() needs a proper scale.\n");
 				}
-			} else if(is_equal(para, "Scale")) {
+			}
+			else if(is_equal(para, "Scale")) {
 				if(!get_input(command, scale)) {
 					scale = 1.;
 					suanpan_error("create_new_recorder() needs a proper scale.\n");
@@ -1951,7 +1988,10 @@ int create_new_solver(const shared_ptr<DomainBase>& domain, istringstream& comma
 	}
 
 	auto code = 0;
-	if(is_equal(solver_type, "Newton")) { if(domain->insert(make_shared<Newton>(tag))) code = 1; } else if(is_equal(solver_type, "modifiedNewton") || is_equal(solver_type, "mNewton")) { if(domain->insert(make_shared<Newton>(tag, true))) code = 1; } else if(is_equal(solver_type, "BFGS")) { if(domain->insert(make_shared<BFGS>(tag))) code = 1; } else if(is_equal(solver_type, "LBFGS")) {
+	if(is_equal(solver_type, "Newton")) { if(domain->insert(make_shared<Newton>(tag))) code = 1; }
+	else if(is_equal(solver_type, "modifiedNewton") || is_equal(solver_type, "mNewton")) { if(domain->insert(make_shared<Newton>(tag, true))) code = 1; }
+	else if(is_equal(solver_type, "BFGS")) { if(domain->insert(make_shared<BFGS>(tag))) code = 1; }
+	else if(is_equal(solver_type, "LBFGS")) {
 		auto max_history = 20;
 		if(!command.eof() && !get_input(command, max_history)) {
 			suanpan_error("create_new_solver() requires a valid maximum step for LBFGS algorithm.\n");
@@ -1959,7 +1999,8 @@ int create_new_solver(const shared_ptr<DomainBase>& domain, istringstream& comma
 		}
 
 		if(domain->insert(make_shared<BFGS>(tag, max_history))) code = 1;
-	} else if(is_equal(solver_type, "Ramm")) {
+	}
+	else if(is_equal(solver_type, "Ramm")) {
 		auto arc_length = .1;
 		string fixed_arc_length = "False";
 
@@ -1973,12 +2014,15 @@ int create_new_solver(const shared_ptr<DomainBase>& domain, istringstream& comma
 		}
 
 		if(domain->insert(make_shared<Ramm>(tag, arc_length, is_true(fixed_arc_length)))) code = 1;
-	} else if(is_equal(solver_type, "DisplacementControl") || is_equal(solver_type, "MPDC")) { if(domain->insert(make_shared<MPDC>(tag))) code = 1; } else suanpan_error("create_new_solver() cannot identify solver type.\n");
+	}
+	else if(is_equal(solver_type, "DisplacementControl") || is_equal(solver_type, "MPDC")) { if(domain->insert(make_shared<MPDC>(tag))) code = 1; }
+	else suanpan_error("create_new_solver() cannot identify solver type.\n");
 
 	if(code == 1) {
 		if(domain->get_current_step_tag() != 0) domain->get_current_step()->set_solver_tag(tag);
 		domain->set_current_solver_tag(tag);
-	} else suanpan_error("create_new_solver() cannot create the new solver.\n");
+	}
+	else suanpan_error("create_new_solver() cannot create the new solver.\n");
 
 	return SUANPAN_SUCCESS;
 }
@@ -2004,10 +2048,12 @@ int create_new_step(const shared_ptr<DomainBase>& domain, istringstream& command
 		}
 		if(domain->insert(make_shared<Frequency>(tag, eigen_number))) domain->set_current_step_tag(tag);
 		else suanpan_error("create_new_step() cannot create the new step.\n");
-	} else if(is_equal(step_type, "Buckling") || is_equal(step_type, "Buckle")) {
+	}
+	else if(is_equal(step_type, "Buckling") || is_equal(step_type, "Buckle")) {
 		if(domain->insert(make_shared<Buckle>(tag))) domain->set_current_step_tag(tag);
 		else suanpan_error("create_new_step() cannot create the new step.\n");
-	} else if(is_equal(step_type, "Optimization") || is_equal(step_type, "Optimisation")) {
+	}
+	else if(is_equal(step_type, "Optimization") || is_equal(step_type, "Optimisation")) {
 		auto time = 1.;
 		if(!command.eof() && !get_input(command, time)) {
 			suanpan_error("create_new_step() reads a wrong time period.\n");
@@ -2015,7 +2061,8 @@ int create_new_step(const shared_ptr<DomainBase>& domain, istringstream& command
 		}
 		if(domain->insert(make_shared<Optimization>(tag, time))) domain->set_current_step_tag(tag);
 		else suanpan_error("create_new_step() cannot create the new step.\n");
-	} else if(is_equal(step_type, "Static")) {
+	}
+	else if(is_equal(step_type, "Static")) {
 		auto time = 1.;
 		if(!command.eof() && !get_input(command, time)) {
 			suanpan_error("create_new_step() reads a wrong time period.\n");
@@ -2023,7 +2070,8 @@ int create_new_step(const shared_ptr<DomainBase>& domain, istringstream& command
 		}
 		if(domain->insert(make_shared<Static>(tag, time))) domain->set_current_step_tag(tag);
 		else suanpan_error("create_new_step() cannot create the new step.\n");
-	} else if(is_equal(step_type, "Dynamic")) {
+	}
+	else if(is_equal(step_type, "Dynamic")) {
 		auto time = 1.;
 		if(!command.eof() && !get_input(command, time)) {
 			suanpan_error("create_new_step() reads a wrong time period.\n");
@@ -2031,7 +2079,8 @@ int create_new_step(const shared_ptr<DomainBase>& domain, istringstream& command
 		}
 		if(domain->insert(make_shared<Dynamic>(tag, time))) domain->set_current_step_tag(tag);
 		else suanpan_error("create_new_step() cannot create the new step.\n");
-	} else if(is_equal(step_type, "ArcLength")) {
+	}
+	else if(is_equal(step_type, "ArcLength")) {
 		unsigned node;
 		if(!get_input(command, node)) {
 			suanpan_error("create_new_step() requires a node.\n");
@@ -2052,7 +2101,8 @@ int create_new_step(const shared_ptr<DomainBase>& domain, istringstream& command
 
 		if(domain->insert(make_shared<ArcLength>(tag, node, dof, magnitude))) domain->set_current_step_tag(tag);
 		else suanpan_error("create_new_step() cannot create the new step.\n");
-	} else suanpan_error("create_new_step() cannot identify step type.\n");
+	}
+	else suanpan_error("create_new_step() cannot identify step type.\n");
 
 	return SUANPAN_SUCCESS;
 }
@@ -2431,19 +2481,24 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
 	if(is_equal(property_id, "color_model")) {
 		string value;
 		get_input(command, value) ? domain->set_color_model(is_true(value)) : suanpan_error("set_property() need a valid value.\n");
-	} else if(is_equal(property_id, "fixed_step_size")) {
+	}
+	else if(is_equal(property_id, "fixed_step_size")) {
 		string value;
 		get_input(command, value) ? tmp_step->set_fixed_step_size(is_true(value)) : suanpan_error("set_property() need a valid value.\n");
-	} else if(is_equal(property_id, "symm_mat")) {
+	}
+	else if(is_equal(property_id, "symm_mat")) {
 		string value;
 		get_input(command, value) ? tmp_step->set_symm(is_true(value)) : suanpan_error("set_property() need a valid value.\n");
-	} else if(is_equal(property_id, "band_mat")) {
+	}
+	else if(is_equal(property_id, "band_mat")) {
 		string value;
 		get_input(command, value) ? tmp_step->set_band(is_true(value)) : suanpan_error("set_property() need a valid value.\n");
-	} else if(is_equal(property_id, "sparse_mat")) {
+	}
+	else if(is_equal(property_id, "sparse_mat")) {
 		string value;
 		get_input(command, value) ? tmp_step->set_sparse(is_true(value)) : suanpan_error("set_property() need a valid value.\n");
-	} else if(is_equal(property_id, "system_solver")) {
+	}
+	else if(is_equal(property_id, "system_solver")) {
 		string value;
 		if(!get_input(command, value)) suanpan_error("set_property() need a valid value.\n");
 		else if(is_equal(value, "LAPACK")) tmp_step->set_system_solver(SolverType::LAPACK);
@@ -2453,44 +2508,56 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
 		else if(is_equal(value, "CUDA")) tmp_step->set_system_solver(SolverType::CUDA);
 		else if(is_equal(value, "PARDISO")) tmp_step->set_system_solver(SolverType::PARDISO);
 		else suanpan_error("set_property() need a valid solver id.\n");
-	} else if(is_equal(property_id, "precision")) {
+	}
+	else if(is_equal(property_id, "precision")) {
 		string value;
 		if(!get_input(command, value)) suanpan_error("set_property() need a valid value.\n");
 		else if(is_equal(value, "DOUBLE")) tmp_step->set_precision(Precision::DOUBLE);
 		else if(is_equal(value, "SINGLE")) tmp_step->set_precision(Precision::SINGLE);
 		else suanpan_error("set_property() need a valid precision.\n");
-	} else if(is_equal(property_id, "tolerance")) {
+	}
+	else if(is_equal(property_id, "tolerance")) {
 		double value;
 		get_input(command, value) ? tmp_step->set_tolerance(value) : suanpan_error("set_property() need a valid value.\n");
-	} else if(is_equal(property_id, "ini_step_size")) {
+	}
+	else if(is_equal(property_id, "ini_step_size")) {
 		double step_time;
 		get_input(command, step_time) ? tmp_step->set_ini_step_size(step_time) : suanpan_error("set_property() need a valid value.\n");
-	} else if(is_equal(property_id, "min_step_size")) {
+	}
+	else if(is_equal(property_id, "min_step_size")) {
 		double step_time;
 		get_input(command, step_time) ? tmp_step->set_min_step_size(step_time) : suanpan_error("set_property() need a valid value.\n");
-	} else if(is_equal(property_id, "max_step_size")) {
+	}
+	else if(is_equal(property_id, "max_step_size")) {
 		double step_time;
 		get_input(command, step_time) ? tmp_step->set_max_step_size(step_time) : suanpan_error("set_property() need a valid value.\n");
-	} else if(is_equal(property_id, "max_iteration")) {
+	}
+	else if(is_equal(property_id, "max_iteration")) {
 		unsigned max_number;
 		get_input(command, max_number) ? tmp_step->set_max_substep(max_number) : suanpan_error("set_property() need a valid value.\n");
-	} else if(is_equal(property_id, "eigen_number")) {
+	}
+	else if(is_equal(property_id, "eigen_number")) {
 		unsigned eigen_number;
 		if(get_input(command, eigen_number)) {
 			const auto eigen_step = std::dynamic_pointer_cast<Frequency>(tmp_step);
 			if(nullptr == eigen_step) suanpan_error("set_property() cannot set eigen number for noneigen step.\n");
 			else eigen_step->set_eigen_number(eigen_number);
-		} else suanpan_error("set_property() need a valid eigen number.\n");
-	} else if(is_equal(property_id, "constraint_multiplier")) {
+		}
+		else suanpan_error("set_property() need a valid eigen number.\n");
+	}
+	else if(is_equal(property_id, "constraint_multiplier")) {
 		double value;
 		get_input(command, value) ? set_constraint_multiplier(value) : suanpan_error("set_property() need a valid value.\n");
-	} else if(is_equal(property_id, "load_multiplier")) {
+	}
+	else if(is_equal(property_id, "load_multiplier")) {
 		double value;
 		get_input(command, value) ? set_load_multiplier(value) : suanpan_error("set_property() need a valid value.\n");
-	} else if(is_equal(property_id, "num_threads")) {
+	}
+	else if(is_equal(property_id, "num_threads")) {
 		if(int value; get_input(command, value)) SUANPAN_NUM_THREADS = value;
 		else suanpan_error("set_property() need a valid value.\n");
-	} else if(is_equal(property_id, "screen_output")) {
+	}
+	else if(is_equal(property_id, "screen_output")) {
 		if(string value; get_input(command, value)) SUANPAN_PRINT = is_true(value);
 		else suanpan_error("set_property() need a valid value.\n");
 	}

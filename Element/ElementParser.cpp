@@ -2152,7 +2152,8 @@ void new_patchquad(unique_ptr<Element>& return_obj, istringstream& command) {
 					return;
 				}
 				ignore_whitespace(command);
-			} else if(is_equal(parameter, "-thickness")) {
+			}
+			else if(is_equal(parameter, "-thickness")) {
 				if(!get_input(command, thickness)) {
 					suanpan_error("new_patchquad() needs a valid thickness.\n");
 					return;

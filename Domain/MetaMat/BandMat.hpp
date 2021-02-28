@@ -120,7 +120,8 @@ template<typename T> Mat<T> BandMat<T>::operator*(const Mat<T>& X) {
 		if(std::is_same<T, float>::value) {
 			using E = float;
 			arma_fortran(arma_sgbmv)(&TRAN, &M, &N, &KL, &KU, (E*)&ALPHA, (E*)(this->memptr() + l_band), &LDA, (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC);
-		} else if(std::is_same<T, double>::value) {
+		}
+		else if(std::is_same<T, double>::value) {
 			using E = double;
 			arma_fortran(arma_dgbmv)(&TRAN, &M, &N, &KL, &KU, (E*)&ALPHA, (E*)(this->memptr() + l_band), &LDA, (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC);
 		}
@@ -130,7 +131,8 @@ template<typename T> Mat<T> BandMat<T>::operator*(const Mat<T>& X) {
 		if(std::is_same<T, float>::value) {
 			using E = float;
 			arma_fortran(arma_sgbmv)(&TRAN, &M, &N, &KL, &KU, (E*)&ALPHA, (E*)(this->memptr() + l_band), &LDA, (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC);
-		} else if(std::is_same<T, double>::value) {
+		}
+		else if(std::is_same<T, double>::value) {
 			using E = double;
 			arma_fortran(arma_dgbmv)(&TRAN, &M, &N, &KL, &KU, (E*)&ALPHA, (E*)(this->memptr() + l_band), &LDA, (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC);
 		}
@@ -166,7 +168,8 @@ template<typename T> int BandMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
 		if(std::is_same<T, float>::value) {
 			using E = float;
 			arma_fortran(arma_sgbsv)(&N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
-		} else if(std::is_same<T, double>::value) {
+		}
+		else if(std::is_same<T, double>::value) {
 			using E = double;
 			arma_fortran(arma_dgbsv)(&N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
 		}
@@ -277,7 +280,8 @@ template<typename T> int BandMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 		if(std::is_same<T, float>::value) {
 			using E = float;
 			arma_fortran(arma_sgbtrs)(&TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
-		} else if(std::is_same<T, double>::value) {
+		}
+		else if(std::is_same<T, double>::value) {
 			using E = double;
 			arma_fortran(arma_dgbtrs)(&TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
 		}
@@ -360,7 +364,8 @@ template<typename T> unique_ptr<MetaMat<T>> BandMat<T>::factorize() {
 	if(std::is_same<T, float>::value) {
 		using E = float;
 		arma_fortran(arma_sgbtrf)(&M, &N, &KL, &KU, (E*)X->memptr(), &LDAB, X->IPIV.memptr(), &INFO);
-	} else if(std::is_same<T, double>::value) {
+	}
+	else if(std::is_same<T, double>::value) {
 		using E = double;
 		arma_fortran(arma_dgbtrf)(&M, &N, &KL, &KU, (E*)X->memptr(), &LDAB, X->IPIV.memptr(), &INFO);
 	}
@@ -368,7 +373,8 @@ template<typename T> unique_ptr<MetaMat<T>> BandMat<T>::factorize() {
 	if(INFO != 0) {
 		suanpan_error("factorize() fails.\n");
 		X->reset();
-	} else X->factored = true;
+	}
+	else X->factored = true;
 
 	return X;
 }

@@ -131,7 +131,8 @@ template<typename T> Mat<T> BandMatSpike<T>::operator*(const Mat<T>& X) {
 		if(std::is_same<T, float>::value) {
 			using E = float;
 			arma_fortran(arma_sgbmv)(&TRAN, &M, &N, &KL, &KU, (E*)&ALPHA, (E*)this->memptr(), &LDA, (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC);
-		} else if(std::is_same<T, double>::value) {
+		}
+		else if(std::is_same<T, double>::value) {
 			using E = double;
 			arma_fortran(arma_dgbmv)(&TRAN, &M, &N, &KL, &KU, (E*)&ALPHA, (E*)this->memptr(), &LDA, (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC);
 		}
@@ -141,7 +142,8 @@ template<typename T> Mat<T> BandMatSpike<T>::operator*(const Mat<T>& X) {
 		if(std::is_same<T, float>::value) {
 			using E = float;
 			arma_fortran(arma_sgbmv)(&TRAN, &M, &N, &KL, &KU, (E*)&ALPHA, (E*)this->memptr(), &LDA, (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC);
-		} else if(std::is_same<T, double>::value) {
+		}
+		else if(std::is_same<T, double>::value) {
 			using E = double;
 			arma_fortran(arma_dgbmv)(&TRAN, &M, &N, &KL, &KU, (E*)&ALPHA, (E*)this->memptr(), &LDA, (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC);
 		}
@@ -169,7 +171,8 @@ template<typename T> int BandMatSpike<T>::solve(Mat<T>& X, const Mat<T>& B) {
 		using E = float;
 		sspike_gbtrf_(SPIKE.memptr(), &N, &KL, &KU, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), &INFO);
 		sspike_gbtrs_(SPIKE.memptr(), &TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), (E*)X.memptr(), &LDB);
-	} else {
+	}
+	else {
 		using E = double;
 		dspike_gbtrf_(SPIKE.memptr(), &N, &KL, &KU, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), &INFO);
 		dspike_gbtrs_(SPIKE.memptr(), &TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), (E*)X.memptr(), &LDB);
@@ -196,7 +199,8 @@ template<typename T> int BandMatSpike<T>::solve_trs(Mat<T>& X, const Mat<T>& B) 
 	if(std::is_same<T, float>::value) {
 		using E = float;
 		sspike_gbtrs_(SPIKE.memptr(), &TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), (E*)X.memptr(), &LDB);
-	} else {
+	}
+	else {
 		using E = double;
 		dspike_gbtrs_(SPIKE.memptr(), &TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), (E*)X.memptr(), &LDB);
 	}

@@ -61,7 +61,8 @@ int Bilinear2D::update_trial_status(const vec& t_strain) {
 		trial_stiffness = form_stiffness(t_stiffness);
 
 		trial_stress = t_stress(F1) - t_stiffness(F1, F2) * solve(t_stiffness(F2, F2), t_stress(F2));
-	} else {
+	}
+	else {
 		trial_full_strain(F1) = trial_strain = t_strain;
 
 		if(base.update_trial_status(trial_full_strain) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
@@ -129,7 +130,8 @@ vector<vec> Bilinear2D::record(const OutputType P) {
 			trial_mises(0) = sqrt(1.5 * (tmp_a * tmp_a + tmp_b * tmp_b + tmp_c * tmp_c + 2. * current_stress(2) * current_stress(2)));
 		}
 		output.emplace_back(trial_mises);
-	} else if(P == OutputType::EEEQ) output.emplace_back(vec{sqrt(2. / 3.) * tensor::strain::norm(current_full_strain)});
+	}
+	else if(P == OutputType::EEEQ) output.emplace_back(vec{sqrt(2. / 3.) * tensor::strain::norm(current_full_strain)});
 	else return Material2D::record(P);
 
 	return output;

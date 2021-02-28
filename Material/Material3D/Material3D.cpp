@@ -34,16 +34,20 @@ vector<vec> Material3D::record(const OutputType P) {
 	else if(P == OutputType::SP) {
 		vec principal_stress;
 		if(eig_sym(principal_stress, tensor::stress::to_tensor(current_stress))) data.emplace_back(principal_stress);
-	} else if(P == OutputType::EP) {
+	}
+	else if(P == OutputType::EP) {
 		vec principal_strain;
 		if(eig_sym(principal_strain, tensor::strain::to_tensor(current_strain))) data.emplace_back(principal_strain);
-	} else if(P == OutputType::EEP) {
+	}
+	else if(P == OutputType::EEP) {
 		vec principal_strain;
 		if(eig_sym(principal_strain, tensor::strain::to_tensor(solve(initial_stiffness, current_stress)))) data.emplace_back(principal_strain);
-	} else if(P == OutputType::PEP) {
+	}
+	else if(P == OutputType::PEP) {
 		vec principal_strain;
 		if(eig_sym(principal_strain, tensor::strain::to_tensor(current_strain - solve(initial_stiffness, current_stress)))) data.emplace_back(principal_strain);
-	} else if(P == OutputType::S11) data.emplace_back(vec{current_stress.n_elem > 0 ? current_stress(0) : 0.});
+	}
+	else if(P == OutputType::S11) data.emplace_back(vec{current_stress.n_elem > 0 ? current_stress(0) : 0.});
 	else if(P == OutputType::S22) data.emplace_back(vec{current_stress.n_elem > 1 ? current_stress(1) : 0.});
 	else if(P == OutputType::S33) data.emplace_back(vec{current_stress.n_elem > 2 ? current_stress(2) : 0.});
 	else if(P == OutputType::S12) data.emplace_back(vec{current_stress.n_elem > 3 ? current_stress(3) : 0.});
@@ -58,22 +62,28 @@ vector<vec> Material3D::record(const OutputType P) {
 	else if(P == OutputType::SP1) {
 		vec principal_stress;
 		if(eig_sym(principal_stress, tensor::stress::to_tensor(current_stress))) data.emplace_back(vec{principal_stress(0)});
-	} else if(P == OutputType::SP2) {
+	}
+	else if(P == OutputType::SP2) {
 		vec principal_stress;
 		if(eig_sym(principal_stress, tensor::stress::to_tensor(current_stress))) data.emplace_back(vec{principal_stress(1)});
-	} else if(P == OutputType::SP3) {
+	}
+	else if(P == OutputType::SP3) {
 		vec principal_stress;
 		if(eig_sym(principal_stress, tensor::stress::to_tensor(current_stress))) data.emplace_back(vec{principal_stress(2)});
-	} else if(P == OutputType::EP1) {
+	}
+	else if(P == OutputType::EP1) {
 		vec principal_strain;
 		if(eig_sym(principal_strain, tensor::strain::to_tensor(current_strain))) data.emplace_back(vec{principal_strain(0)});
-	} else if(P == OutputType::EP2) {
+	}
+	else if(P == OutputType::EP2) {
 		vec principal_strain;
 		if(eig_sym(principal_strain, tensor::strain::to_tensor(current_strain))) data.emplace_back(vec{principal_strain(1)});
-	} else if(P == OutputType::EP3) {
+	}
+	else if(P == OutputType::EP3) {
 		vec principal_strain;
 		if(eig_sym(principal_strain, tensor::strain::to_tensor(current_strain))) data.emplace_back(vec{principal_strain(2)});
-	} else if(P == OutputType::HIST) data.emplace_back(current_history);
+	}
+	else if(P == OutputType::HIST) data.emplace_back(current_history);
 
 	return data;
 }

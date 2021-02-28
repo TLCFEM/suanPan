@@ -64,7 +64,8 @@ int NonlinearMises1D::update_trial_status(const vec& t_strain) {
 		if(shifted_stress > 0.) {
 			back_stress += incre_h;
 			trial_stress -= elastic_modulus * gamma;
-		} else {
+		}
+		else {
 			back_stress -= incre_h;
 			trial_stress += elastic_modulus * gamma;
 		}

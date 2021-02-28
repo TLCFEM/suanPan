@@ -258,7 +258,8 @@ vector<vec> SGCMQ::record(const OutputType T) {
 		data.emplace_back(vec{dot(interpolation::quadratic(1., 1.), X)});
 		data.emplace_back(vec{dot(interpolation::quadratic(-1., 1.), X)});
 		data.emplace_back(vec{dot(interpolation::quadratic(0., 0.), X)});
-	} else if(T == OutputType::K) data.emplace_back(vectorise(current_stiffness));
+	}
+	else if(T == OutputType::K) data.emplace_back(vectorise(current_stiffness));
 	else if(T == OutputType::M) data.emplace_back(vectorise(current_mass));
 	else for(const auto& I : int_pt) for(const auto& J : I.m_material->record(T)) data.emplace_back(J);
 

@@ -88,7 +88,8 @@ template<typename T> Mat<T> operator*(const Mat<T>& A, const FullMat<T>& B) {
 	if(std::is_same<T, float>::value) {
 		using E = float;
 		arma_fortran(arma_sgemm)(&TRAN, &TRAN, &M, &N, &K, (E*)&ALPHA, (E*)A.memptr(), &LDA, (E*)B.memptr(), &LDB, (E*)&BETA, (E*)C.memptr(), &LDC);
-	} else if(std::is_same<T, double>::value) {
+	}
+	else if(std::is_same<T, double>::value) {
 		using E = double;
 		arma_fortran(arma_dgemm)(&TRAN, &TRAN, &M, &N, &K, (E*)&ALPHA, (E*)A.memptr(), &LDA, (E*)B.memptr(), &LDB, (E*)&BETA, (E*)C.memptr(), &LDC);
 	}
@@ -143,7 +144,8 @@ template<const char S, const char T, typename T1> Mat<T1> spmm(const SymmPackMat
 	if(std::is_same<T1, float>::value) {
 		using E = float;
 		arma_fortran(arma_sspmm)(&SIDE, &UPLO, &TRAN, &M, &N, (E*)A.memptr(), (E*)&ALPHA, (E*)B.memptr(), &LDB, (E*)&BETA, (E*)C.memptr(), &LDC);
-	} else if(std::is_same<T1, double>::value) {
+	}
+	else if(std::is_same<T1, double>::value) {
 		using E = double;
 		arma_fortran(arma_dspmm)(&SIDE, &UPLO, &TRAN, &M, &N, (E*)A.memptr(), (E*)&ALPHA, (E*)B.memptr(), &LDB, (E*)&BETA, (E*)C.memptr(), &LDC);
 	}

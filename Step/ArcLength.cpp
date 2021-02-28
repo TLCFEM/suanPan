@@ -86,7 +86,8 @@ int ArcLength::analyze() {
 			// if exit is returned, the analysis shall be terminated
 			code = G->process_criterion();
 			if(SUANPAN_SUCCESS != code) return code;
-		} else if(code == SUANPAN_FAIL) G->reset_status();
+		}
+		else if(code == SUANPAN_FAIL) G->reset_status();
 		else return SUANPAN_FAIL;
 	}
 }

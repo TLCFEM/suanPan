@@ -84,7 +84,8 @@ int NonlinearDruckerPrager::update_trial_status(const vec& t_strain) {
 		const mat t_mat = eta_yield * factor_c / denominator / norm_s * dev_stress * tensor::unit_tensor2.t();
 
 		associated ? trial_stiffness -= t_mat + t_mat.t() : trial_stiffness -= t_mat + eta_flow / eta_yield * t_mat.t();
-	} else {
+	}
+	else {
 		// apex return
 		gamma = 0.; // volumetric strain reuse variable
 		plastic_strain = current_history(0);

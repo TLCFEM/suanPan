@@ -869,7 +869,8 @@ int Domain::initialize() {
 		if(t_section.second->is_active()) {
 			t_section.second->initialize(shared_from_this());
 			t_section.second->set_initialized(true);
-		} else erase_section(t_section.first);
+		}
+		else erase_section(t_section.first);
 	});
 	section_pond.update();
 
@@ -915,7 +916,8 @@ int Domain::initialize() {
 			// cannot update status here due to some unknown reason
 			// maybe machine error or inconsistent tolerance due to material models
 			if(!nlgeom && t_element->is_nlgeom()) nlgeom = true;
-		} else {
+		}
+		else {
 			t_element->initialize(shared_from_this());
 			// if first initialisation fails, the element can be safely deleted
 			if(t_element->is_active()) {
@@ -924,7 +926,8 @@ int Domain::initialize() {
 				// to get the very first matrix
 				t_element->update_status();
 				if(!nlgeom && t_element->is_nlgeom()) nlgeom = true;
-			} else erase_element(t_element->get_tag());
+			}
+			else erase_element(t_element->get_tag());
 		}
 	});
 	element_pond.update();
@@ -1263,7 +1266,8 @@ void Domain::assemble_trial_stiffness() const {
 void Domain::assemble_initial_geometry() const {
 	if(!factory->get_nlgeom()) return;
 	factory->clear_geometry();
-	if(factory->get_storage_scheme() == StorageScheme::SPARSE) { for(const auto& I : element_pond.get()) if(I->is_nlgeom()) factory->assemble_geometry(I->get_initial_geometry(), I->get_dof_encoding()); } else
+	if(factory->get_storage_scheme() == StorageScheme::SPARSE) { for(const auto& I : element_pond.get()) if(I->is_nlgeom()) factory->assemble_geometry(I->get_initial_geometry(), I->get_dof_encoding()); }
+	else
 		for_each(color_map.begin(), color_map.end(), [&](const vector<unsigned>& color) {
 			suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
 				const auto& I = get_element(tag);
@@ -1277,7 +1281,8 @@ void Domain::assemble_initial_geometry() const {
 void Domain::assemble_current_geometry() const {
 	if(!factory->get_nlgeom()) return;
 	factory->clear_geometry();
-	if(factory->get_storage_scheme() == StorageScheme::SPARSE) { for(const auto& I : element_pond.get()) if(I->is_nlgeom()) factory->assemble_geometry(I->get_current_geometry(), I->get_dof_encoding()); } else
+	if(factory->get_storage_scheme() == StorageScheme::SPARSE) { for(const auto& I : element_pond.get()) if(I->is_nlgeom()) factory->assemble_geometry(I->get_current_geometry(), I->get_dof_encoding()); }
+	else
 		for_each(color_map.begin(), color_map.end(), [&](const vector<unsigned>& color) {
 			suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
 				const auto& I = get_element(tag);
@@ -1291,7 +1296,8 @@ void Domain::assemble_current_geometry() const {
 void Domain::assemble_trial_geometry() const {
 	if(!factory->get_nlgeom()) return;
 	factory->clear_geometry();
-	if(factory->get_storage_scheme() == StorageScheme::SPARSE) { for(const auto& I : element_pond.get()) if(I->is_nlgeom()) factory->assemble_geometry(I->get_trial_geometry(), I->get_dof_encoding()); } else
+	if(factory->get_storage_scheme() == StorageScheme::SPARSE) { for(const auto& I : element_pond.get()) if(I->is_nlgeom()) factory->assemble_geometry(I->get_trial_geometry(), I->get_dof_encoding()); }
+	else
 		for_each(color_map.begin(), color_map.end(), [&](const vector<unsigned>& color) {
 			suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
 				const auto& I = get_element(tag);
@@ -1355,7 +1361,8 @@ int Domain::update_current_status() const {
 		factory->update_current_displacement(c_g_dsp);
 
 		update_current_resistance();
-	} else if(analysis_type == AnalysisType::DYNAMICS) {
+	}
+	else if(analysis_type == AnalysisType::DYNAMICS) {
 		vec c_g_vel(factory->get_size(), fill::zeros);
 		vec c_g_acc(factory->get_size(), fill::zeros);
 

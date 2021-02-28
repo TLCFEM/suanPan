@@ -51,7 +51,8 @@ void Fibre3D::initialize(const shared_ptr<DomainBase>& D) {
 				const auto t_area = fibre.back()->get_parameter(ParameterType::AREA);
 				total_a += t_area;
 				total_q += fibre.back()->get_eccentricity() * t_area;
-			} else suanpan_warning("skip Section %u since it is not a 3D section.\n", fibre_tag(I));
+			}
+			else suanpan_warning("skip Section %u since it is not a 3D section.\n", fibre_tag(I));
 		}
 
 	access::rw(area) = total_a;

@@ -56,7 +56,8 @@ int BatheTwoStep::update_trial_status() {
 	if(FLAG::TRAP == step_flag) {
 		W->update_incre_acceleration(C6 * W->get_incre_displacement() - C4 * W->get_current_velocity() - 2. * W->get_current_acceleration());
 		W->update_incre_velocity(C3 * W->get_incre_displacement() - 2. * W->get_current_velocity());
-	} else {
+	}
+	else {
 		W->update_trial_velocity(C2 * W->get_incre_displacement() + C1 * (W->get_pre_displacement() - W->get_current_displacement()));
 		W->update_trial_acceleration(C1 * W->get_pre_velocity() - C3 * W->get_current_velocity() + C2 * W->get_trial_velocity());
 	}
@@ -71,7 +72,8 @@ void BatheTwoStep::commit_status() {
 	if(FLAG::TRAP == step_flag) {
 		step_flag = FLAG::EULER;
 		set_time_step_switch(false);
-	} else {
+	}
+	else {
 		step_flag = FLAG::TRAP;
 		set_time_step_switch(true);
 	}
@@ -99,7 +101,8 @@ void BatheTwoStep::update_compatibility() const {
 	if(FLAG::TRAP == step_flag) {
 		W->update_incre_acceleration(-C4 * W->get_current_velocity() - 2. * W->get_current_acceleration());
 		W->update_incre_velocity(-2. * W->get_current_velocity());
-	} else {
+	}
+	else {
 		W->update_trial_velocity(C1 * (W->get_pre_displacement() - W->get_current_displacement()));
 		W->update_trial_acceleration(C1 * W->get_pre_velocity() - C3 * W->get_current_velocity() + C2 * W->get_trial_velocity());
 	}

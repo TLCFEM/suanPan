@@ -76,7 +76,8 @@ int Ramm::analyze() {
 
 			// check the sign of stiffness for unloading
 			if(W->get_stiffness()->sign_det() < 0) t_lambda = -t_lambda;
-		} else t_lambda = -dot(disp_ref, t_ninja) / dot(disp_ref, disp_a);
+		}
+		else t_lambda = -dot(disp_ref, t_ninja) / dot(disp_ref, disp_a);
 
 		// abaqus update
 		disp_ref = disp_a;

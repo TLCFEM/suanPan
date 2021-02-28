@@ -85,10 +85,12 @@ int Concrete22::update_trial_status(const vec& t_strain) {
 	if(principal_strain(2) > shear_strain) {
 		trial_stiffness(2, 2) = shear_retention * shear_modulus;
 		principal_stress(2) = shear_stress + (principal_strain(2) - shear_strain) * trial_stiffness(2, 2);
-	} else if(principal_strain(2) < -shear_strain) {
+	}
+	else if(principal_strain(2) < -shear_strain) {
 		trial_stiffness(2, 2) = shear_retention * shear_modulus;
 		principal_stress(2) = -shear_stress + (principal_strain(2) + shear_strain) * trial_stiffness(2, 2);
-	} else {
+	}
+	else {
 		trial_stiffness(2, 2) = shear_modulus;
 		principal_stress(2) = principal_strain(2) * shear_modulus;
 	}

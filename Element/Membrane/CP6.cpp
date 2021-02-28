@@ -137,7 +137,8 @@ int CP6::update_status() {
 			trial_stiffness += I.weight * BN.t() * I.m_material->get_trial_stiffness() * BN;
 			trial_resistance += I.weight * BN.t() * t_stress;
 		}
-	} else
+	}
+	else
 		for(const auto& I : int_pt) {
 			vec t_strain(3, fill::zeros);
 			for(unsigned J = 0; J < m_node; ++J) {

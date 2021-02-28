@@ -337,7 +337,7 @@ Element::~Element() { suanpan_debug("Element %u dtor() called.\n", get_tag()); }
 
 void Element::initialize_base(const shared_ptr<DomainBase>& D) {
 	// initialized already
-	// check node vadality
+	// check node validity
 	if(num_node == node_ptr.size()) {
 		for(const auto& I : node_ptr)
 			if(const auto& t_node = I.lock(); t_node == nullptr || !t_node->is_active()) {
@@ -374,7 +374,8 @@ void Element::initialize_base(const shared_ptr<DomainBase>& D) {
 			auto& n_encoding = access::rw(node_encoding);
 			n_encoding.resize(size);
 			n_encoding.tail(size - 1llu) = t_element->get_node_encoding();
-		} else {
+		}
+		else {
 			D->disable_element(get_tag());
 			return;
 		}

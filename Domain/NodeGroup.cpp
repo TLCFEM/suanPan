@@ -69,7 +69,8 @@ void NodeGroup::initialize(const shared_ptr<DomainBase>& D) {
 						}
 					if(flag) pond.emplace_back(I->get_tag());
 				}
-			} else if(fabs(m_point(0) - .5 * (e_point(0) + s_point(0))) < 1E-8) {
+			}
+			else if(fabs(m_point(0) - .5 * (e_point(0) + s_point(0))) < 1E-8) {
 				// on vertical line
 				auto flag = true;
 				for(uword K = 1; K < size; ++K)

@@ -79,7 +79,8 @@ int BFGS::analyze() {
 				// W->update_trial_auxiliary_resistance(W->get_trial_auxiliary_resistance() + border * aux_factor);
 				ninja -= right * aux_factor;
 			}
-		} else {
+		}
+		else {
 			// clear temporary factor container
 			alpha.clear();
 			// commit current residual

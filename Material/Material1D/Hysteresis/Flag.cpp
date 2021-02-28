@@ -68,13 +68,15 @@ int Flag::update_trial_status(const vec& t_strain) {
 		if(load_direction > 0.) {
 			tr_strain = (tr_low_strain = current_strain(0)) + t_yield_strain - t_residual_strain;
 			trial_status = trial_strain(0) < tr_strain ? Status::TUNLOAD : Status::TLOAD;
-		} else trial_status = trial_strain(0) > t_residual_strain ? Status::TLOW : trial_strain(0) > 0. ? Status::TLOAD : Status::CLOAD;
+		}
+		else trial_status = trial_strain(0) > t_residual_strain ? Status::TLOW : trial_strain(0) > 0. ? Status::TLOAD : Status::CLOAD;
 		break;
 	case Status::CLOW:
 		if(load_direction < 0.) {
 			cr_strain = (cr_low_strain = current_strain(0)) + c_yield_strain - c_residual_strain;
 			trial_status = trial_strain(0) > cr_strain ? Status::CUNLOAD : Status::CLOAD;
-		} else trial_status = trial_strain(0) < c_residual_strain ? Status::CLOW : trial_strain(0) < 0. ? Status::CLOAD : Status::TLOAD;
+		}
+		else trial_status = trial_strain(0) < c_residual_strain ? Status::CLOW : trial_strain(0) < 0. ? Status::CLOAD : Status::TLOAD;
 		break;
 	case Status::TUNLOAD:
 		trial_status = trial_strain(0) > tr_strain ? Status::TLOAD : trial_strain(0) > tr_low_strain ? Status::TUNLOAD : trial_strain(0) > t_residual_strain ? Status::TLOW : trial_strain(0) > 0. ? Status::TLOAD : Status::CLOAD;

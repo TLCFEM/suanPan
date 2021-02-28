@@ -61,10 +61,12 @@ podarray<double> ConcreteCM::compute_compression_unload(const double n_strain) {
 	if(n_strain > unload_t_strain) {
 		trial_load_status = Status::TBACKBONE;
 		response = compute_tension_backbone(n_strain);
-	} else if(n_strain > residual_c_strain) {
+	}
+	else if(n_strain > residual_c_strain) {
 		trial_load_status = Status::CUNLOAD;
 		response = compute_transition(n_strain, residual_c_strain, 0., residual_c_stiffness, unload_t_strain, unload_t_stress, reload_t_stiffness);
-	} else {
+	}
+	else {
 		trial_load_status = Status::CUNLOAD;
 		response = compute_transition(n_strain, unload_c_strain, unload_c_stress, initial_stiffness(0), residual_c_strain, 0., residual_c_stiffness);
 	}
@@ -86,10 +88,12 @@ podarray<double> ConcreteCM::compute_tension_unload(const double n_strain) {
 	if(n_strain < unload_c_strain) {
 		trial_load_status = Status::CBACKBONE;
 		response = compute_compression_backbone(n_strain);
-	} else if(n_strain < residual_t_strain) {
+	}
+	else if(n_strain < residual_t_strain) {
 		trial_load_status = Status::TUNLOAD;
 		response = compute_transition(n_strain, residual_t_strain, 0., residual_t_stiffness, unload_c_strain, unload_c_stress, reload_c_stiffness);
-	} else {
+	}
+	else {
 		trial_load_status = Status::TUNLOAD;
 		response = compute_transition(n_strain, unload_t_strain, unload_t_stress, initial_stiffness(0), residual_t_strain, 0., residual_t_stiffness);
 	}
@@ -106,7 +110,8 @@ podarray<double> ConcreteCM::compute_compression_reload(const double n_strain) {
 	if(n_strain < unload_c_strain) {
 		trial_load_status = Status::CBACKBONE;
 		response = compute_compression_backbone(n_strain);
-	} else {
+	}
+	else {
 		trial_load_status = Status::CRELOAD;
 		response(1) = reload_c_stiffness;
 		response(0) = current_stress(0) + (n_strain - current_strain(0)) * response(1);
@@ -124,7 +129,8 @@ podarray<double> ConcreteCM::compute_tension_reload(const double n_strain) {
 	if(n_strain > unload_t_strain) {
 		trial_load_status = Status::TBACKBONE;
 		response = compute_tension_backbone(n_strain);
-	} else {
+	}
+	else {
 		trial_load_status = Status::TRELOAD;
 		response(1) = reload_t_stiffness;
 		response(0) = current_stress(0) + (n_strain - current_strain(0)) * response(1);
@@ -173,13 +179,16 @@ podarray<double> ConcreteCM::compute_transition(const double EM, const double EA
 	if(fabs(EM - EA) <= 1E-15) {
 		response(0) = SA;
 		response(1) = KA;
-	} else if(fabs(EM - EB) <= 1E-15) {
+	}
+	else if(fabs(EM - EB) <= 1E-15) {
 		response(0) = SB;
 		response(1) = KB;
-	} else if(linear_trans) {
+	}
+	else if(linear_trans) {
 		response(1) = (SB - SA) / (EB - EA);
 		response(0) = SA + response(1) * (EM - EA);
-	} else {
+	}
+	else {
 		const auto i_strain = EM - EA;
 		const auto d_strain = EB - EA;
 		const auto secant = (SB - SA) / d_strain;
@@ -359,19 +368,22 @@ int ConcreteCM::update_trial_status(const vec& n_strain) {
 			update_compression_unload(current_strain(0));
 			response = compute_compression_unload(trial_strain(0));
 		}
-	} else if(Status::TBACKBONE == trial_load_status) {
+	}
+	else if(Status::TBACKBONE == trial_load_status) {
 		if(tension_sign) response = compute_tension_backbone(trial_strain(0));
 		else {
 			update_tension_unload(current_strain(0));
 			response = compute_tension_unload(trial_strain(0));
 		}
-	} else if(Status::CUNLOAD == trial_load_status) {
+	}
+	else if(Status::CUNLOAD == trial_load_status) {
 		if(tension_sign) response = compute_compression_unload(trial_strain(0));
 		else if(current_strain(0) > residual_t_strain) {
 			reverse_t_strain = current_strain(0);
 			reverse_t_stress = current_stress(0);
 			response = compute_tension_subunload(trial_strain(0));
-		} else if(current_strain(0) > residual_c_strain)
+		}
+		else if(current_strain(0) > residual_c_strain)
 			if(trial_strain(0) < residual_c_strain) response = compute_tension_unload(trial_strain(0));
 			else {
 				trial_load_status = Status::CTRANS;
@@ -384,13 +396,15 @@ int ConcreteCM::update_trial_status(const vec& n_strain) {
 			reload_c_stiffness = (unload_c_stress - current_stress(0)) / (unload_c_strain - current_strain(0));
 			response = compute_compression_reload(trial_strain(0));
 		}
-	} else if(Status::TUNLOAD == trial_load_status) {
+	}
+	else if(Status::TUNLOAD == trial_load_status) {
 		if(!tension_sign) response = compute_tension_unload(trial_strain(0));
 		else if(current_strain(0) < residual_c_strain) {
 			reverse_c_strain = current_strain(0);
 			reverse_c_stress = current_stress(0);
 			response = compute_compression_subunload(trial_strain(0));
-		} else if(current_strain(0) < residual_t_strain)
+		}
+		else if(current_strain(0) < residual_t_strain)
 			if(trial_strain(0) > residual_t_strain) response = compute_compression_unload(trial_strain(0));
 			else {
 				trial_load_status = Status::TTRANS;
@@ -403,33 +417,38 @@ int ConcreteCM::update_trial_status(const vec& n_strain) {
 			reload_t_stiffness = (unload_t_stress - current_stress(0)) / (unload_t_strain - current_strain(0));
 			response = compute_tension_reload(trial_strain(0));
 		}
-	} else if(Status::CSUBUNLOAD == trial_load_status) {
+	}
+	else if(Status::CSUBUNLOAD == trial_load_status) {
 		if(tension_sign) response = compute_compression_subunload(trial_strain(0));
 		else {
 			reload_c_stiffness = (unload_c_stress - current_stress(0)) / (unload_c_strain - current_strain(0));
 			response = compute_compression_reload(trial_strain(0));
 		}
-	} else if(Status::TSUBUNLOAD == trial_load_status) {
+	}
+	else if(Status::TSUBUNLOAD == trial_load_status) {
 		if(!tension_sign) response = compute_tension_subunload(trial_strain(0));
 		else {
 			reload_t_stiffness = (unload_t_stress - current_stress(0)) / (unload_t_strain - current_strain(0));
 			response = compute_tension_reload(trial_strain(0));
 		}
-	} else if(Status::CRELOAD == trial_load_status) {
+	}
+	else if(Status::CRELOAD == trial_load_status) {
 		if(!tension_sign) response = compute_compression_reload(trial_strain(0));
 		else {
 			reverse_c_strain = current_strain(0);
 			reverse_c_stress = current_stress(0);
 			response = compute_compression_subunload(trial_strain(0));
 		}
-	} else if(Status::TRELOAD == trial_load_status) {
+	}
+	else if(Status::TRELOAD == trial_load_status) {
 		if(tension_sign) response = compute_tension_reload(trial_strain(0));
 		else {
 			reverse_t_strain = current_strain(0);
 			reverse_t_stress = current_stress(0);
 			response = compute_tension_subunload(trial_strain(0));
 		}
-	} else if(Status::CTRANS == trial_load_status) {
+	}
+	else if(Status::CTRANS == trial_load_status) {
 		if(tension_sign)
 			if(trial_strain(0) > residual_t_strain) response = compute_compression_unload(trial_strain(0));
 			else {
@@ -444,7 +463,8 @@ int ConcreteCM::update_trial_status(const vec& n_strain) {
 			response(1) = (connect_c_stress - inter_stress) / (residual_c_strain - inter_strain);
 			response(0) = current_stress(0) + incre_strain(0) * response(1);
 		}
-	} else if(Status::TTRANS == trial_load_status) {
+	}
+	else if(Status::TTRANS == trial_load_status) {
 		if(tension_sign)
 			if(trial_strain(0) > residual_t_strain) response = compute_compression_unload(trial_strain(0));
 			else {
@@ -459,11 +479,13 @@ int ConcreteCM::update_trial_status(const vec& n_strain) {
 			response(1) = (connect_c_stress - inter_stress) / (residual_c_strain - inter_strain);
 			response(0) = current_stress(0) + incre_strain(0) * response(1);
 		}
-	} else {
+	}
+	else {
 		if(tension_sign) {
 			trial_load_status = Status::TBACKBONE;
 			response = compute_tension_backbone(trial_strain(0));
-		} else {
+		}
+		else {
 			trial_load_status = Status::CBACKBONE;
 			response = compute_compression_backbone(trial_strain(0));
 		}

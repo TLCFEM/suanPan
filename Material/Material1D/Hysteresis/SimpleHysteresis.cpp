@@ -30,12 +30,14 @@ podarray<double> SimpleHysteresis::compute_compression_inner(const double t_stra
 	if(t_strain < residual_c_strain) {
 		response(1) = reverse_c_stress / (reverse_c_strain - residual_c_strain);
 		response(0) = response(1) * (t_strain - residual_c_strain);
-	} else {
+	}
+	else {
 		const auto middle_strain = (1. - middle_point) * residual_t_strain + middle_point * reverse_t_strain;
 		if(t_strain < middle_strain) {
 			response(1) = middle_point * reverse_t_stress / (middle_strain - residual_c_strain);
 			response(0) = response(1) * (t_strain - residual_c_strain);
-		} else {
+		}
+		else {
 			response(1) = reverse_t_stress / (reverse_t_strain - residual_t_strain);
 			response(0) = response(1) * (t_strain - residual_t_strain);
 		}
@@ -57,12 +59,14 @@ podarray<double> SimpleHysteresis::compute_tension_inner(const double t_strain) 
 	if(t_strain > residual_t_strain) {
 		response(1) = reverse_t_stress / (reverse_t_strain - residual_t_strain);
 		response(0) = response(1) * (t_strain - residual_t_strain);
-	} else {
+	}
+	else {
 		const auto middle_strain = (1. - middle_point) * residual_c_strain + middle_point * reverse_c_strain;
 		if(t_strain > middle_strain) {
 			response(1) = middle_point * reverse_c_stress / (middle_strain - residual_t_strain);
 			response(0) = response(1) * (t_strain - residual_t_strain);
-		} else {
+		}
+		else {
 			response(1) = reverse_c_stress / (reverse_c_strain - residual_c_strain);
 			response(0) = response(1) * (t_strain - residual_c_strain);
 		}
@@ -89,7 +93,8 @@ int SimpleHysteresis::update_trial_status(const vec& t_strain) {
 		current_history(4) = point(0);
 		current_history(5) = point(1);
 		initial_history = current_history;
-	} else if(current_history.size() != 8) {
+	}
+	else if(current_history.size() != 8) {
 		current_history.resize(8);
 		initial_history = current_history;
 	}
@@ -110,57 +115,70 @@ int SimpleHysteresis::update_trial_status(const vec& t_strain) {
 		if(incre_strain(0) > 0.) {
 			trial_flag = Status::TBACKBONE;
 			response = compute_tension_backbone(max_t_strain = trial_strain(0));
-		} else {
+		}
+		else {
 			trial_flag = Status::CBACKBONE;
 			response = compute_compression_backbone(max_c_strain = trial_strain(0));
 		}
-	} else if(Status::CBACKBONE == current_flag) {
+	}
+	else if(Status::CBACKBONE == current_flag) {
 		if(incre_strain(0) > 0.) {
 			residual_c_strain = compute_compression_residual(reverse_c_strain = current_strain(0), reverse_c_stress = current_stress(0));
 			if(trial_strain(0) > reverse_t_strain) {
 				trial_flag = Status::TBACKBONE;
 				response = compute_tension_backbone(max_t_strain = trial_strain(0));
-			} else {
+			}
+			else {
 				trial_flag = Status::CINNER;
 				response = compute_compression_inner(trial_strain(0));
 			}
-		} else {
+		}
+		else {
 			trial_flag = Status::CBACKBONE;
 			response = compute_compression_backbone(max_c_strain = trial_strain(0));
 		}
-	} else if(Status::TBACKBONE == current_flag) {
+	}
+	else if(Status::TBACKBONE == current_flag) {
 		if(incre_strain(0) < 0.) {
 			residual_t_strain = compute_tension_residual(reverse_t_strain = current_strain(0), reverse_t_stress = current_stress(0));
 			if(trial_strain(0) < reverse_c_strain) {
 				trial_flag = Status::CBACKBONE;
 				response = compute_compression_backbone(max_c_strain = trial_strain(0));
-			} else {
+			}
+			else {
 				trial_flag = Status::TINNER;
 				response = compute_tension_inner(trial_strain(0));
 			}
-		} else {
+		}
+		else {
 			trial_flag = Status::TBACKBONE;
 			response = compute_tension_backbone(max_t_strain = trial_strain(0));
 		}
-	} else if(Status::CINNER == current_flag) {
+	}
+	else if(Status::CINNER == current_flag) {
 		if(trial_strain(0) > reverse_t_strain) {
 			trial_flag = Status::TBACKBONE;
 			response = compute_tension_backbone(max_t_strain = trial_strain(0));
-		} else if(trial_strain(0) < reverse_c_strain) {
+		}
+		else if(trial_strain(0) < reverse_c_strain) {
 			trial_flag = Status::CBACKBONE;
 			response = compute_compression_backbone(max_c_strain = trial_strain(0));
-		} else {
+		}
+		else {
 			trial_flag = Status::CINNER;
 			response = compute_compression_inner(trial_strain(0));
 		}
-	} else if(Status::TINNER == current_flag) {
+	}
+	else if(Status::TINNER == current_flag) {
 		if(trial_strain(0) > reverse_t_strain) {
 			trial_flag = Status::TBACKBONE;
 			response = compute_tension_backbone(max_t_strain = trial_strain(0));
-		} else if(trial_strain(0) < reverse_c_strain) {
+		}
+		else if(trial_strain(0) < reverse_c_strain) {
 			trial_flag = Status::CBACKBONE;
 			response = compute_compression_backbone(max_c_strain = trial_strain(0));
-		} else {
+		}
+		else {
 			trial_flag = Status::TINNER;
 			response = compute_tension_inner(trial_strain(0));
 		}

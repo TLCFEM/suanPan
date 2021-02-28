@@ -42,12 +42,14 @@ void Tabular::initialize(const shared_ptr<DomainBase>& D) {
 		if(2 == ext_data.n_cols) {
 			time = ext_data.col(0);
 			magnitude = ext_data.col(1);
-		} else if(ext_data.n_cols > 2) suanpan_warning("Tabular() reads more than two columns from the given file, check it.\n");
+		}
+		else if(ext_data.n_cols > 2) suanpan_warning("Tabular() reads more than two columns from the given file, check it.\n");
 		else {
 			suanpan_error("Tabular() requires two valid columns.\n");
 			D->disable_amplitude(get_tag());
 		}
-	} else {
+	}
+	else {
 		suanpan_error("cannot load file.\n");
 		D->disable_amplitude(get_tag());
 	}

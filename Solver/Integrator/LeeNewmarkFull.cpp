@@ -225,14 +225,16 @@ void LeeNewmarkFull::assemble_by_mode_two(uword& current_pos, double mass_coef, 
 				stiffness->at(M + I, N + J) = stiffness->at(M + J, N + I) = s_coef * s_val[L];
 			}
 			current_pos = K;
-		} else if(order > -.5) {
+		}
+		else if(order > -.5) {
 			// eq. 73
 			for(index_ts L = 0; L < current_stiffness.c_size; ++L) {
 				const auto M = s_row[L], N = s_col[L];
 				stiffness->at(M + I, N + I) = -s_coef * s_val[L];
 			}
 			current_pos = J;
-		} else {
+		}
+		else {
 			// eq. 71
 			for(index_tm L = 0; L < current_mass.c_size; ++L) {
 				const auto M = m_row[L], N = m_col[L];
@@ -359,7 +361,8 @@ int LeeNewmarkFull::process_constraint() const {
 		stiffness->triplet_mat += t_stiff;
 
 		access::rw(first_iteration) = false;
-	} else {
+	}
+	else {
 		// if not first iteration
 		// erase the tangent stiffness entries
 		if(!stiffness->triplet_mat.csc_sort()) return SUANPAN_FAIL;

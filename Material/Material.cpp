@@ -143,7 +143,8 @@ int Material::clear_status() {
 	if(initial_history.is_empty()) {
 		if(!current_history.is_empty()) current_history.zeros();
 		if(!trial_history.is_empty()) trial_history.zeros();
-	} else trial_history = current_history = initial_history;
+	}
+	else trial_history = current_history = initial_history;
 
 	if(!initial_stiffness.is_empty()) trial_stiffness = current_stiffness = initial_stiffness;
 

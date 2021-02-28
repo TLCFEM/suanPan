@@ -119,7 +119,8 @@ int Maxwell::update_trial_status(const vec& t_strain, const vec& t_strain_rate) 
 			spring->update_incre_status(solution(0));
 			damper->update_incre_status(solution(1), solution(2));
 		}
-	} else
+	}
+	else
 		while(++counter < max_iteration) {
 			const auto residual_a = incre_strain(0) - solution(0) - solution(1);
 			const auto residual_b = target - solution(0) - factor_a * solution(2);

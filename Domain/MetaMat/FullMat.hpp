@@ -79,11 +79,13 @@ template<typename T> Mat<T> FullMat<T>::operator*(const Mat<T>& B) {
 		if(std::is_same<T, float>::value) {
 			using E = float;
 			arma_fortran(arma_sgemv)(&this->TRAN, &M, &N, (E*)&ALPHA, (E*)this->memptr(), &LDA, (E*)B.memptr(), &INCX, (E*)&BETA, (E*)C.memptr(), &INCY);
-		} else if(std::is_same<T, double>::value) {
+		}
+		else if(std::is_same<T, double>::value) {
 			using E = double;
 			arma_fortran(arma_dgemv)(&this->TRAN, &M, &N, (E*)&ALPHA, (E*)this->memptr(), &LDA, (E*)B.memptr(), &INCX, (E*)&BETA, (E*)C.memptr(), &INCY);
 		}
-	} else {
+	}
+	else {
 		auto M = static_cast<int>(n_rows);
 		auto N = static_cast<int>(B.n_cols);
 		auto K = static_cast<int>(n_cols);
@@ -96,7 +98,8 @@ template<typename T> Mat<T> FullMat<T>::operator*(const Mat<T>& B) {
 		if(std::is_same<T, float>::value) {
 			using E = float;
 			arma_fortran(arma_sgemm)(&this->TRAN, &this->TRAN, &M, &N, &K, (E*)&ALPHA, (E*)this->memptr(), &LDA, (E*)B.memptr(), &LDB, (E*)&BETA, (E*)C.memptr(), &LDC);
-		} else if(std::is_same<T, double>::value) {
+		}
+		else if(std::is_same<T, double>::value) {
 			using E = double;
 			arma_fortran(arma_dgemm)(&this->TRAN, &this->TRAN, &M, &N, &K, (E*)&ALPHA, (E*)this->memptr(), &LDA, (E*)B.memptr(), &LDB, (E*)&BETA, (E*)C.memptr(), &LDC);
 		}
@@ -124,7 +127,8 @@ template<typename T> int FullMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
 	if(std::is_same<T, float>::value) {
 		using E = float;
 		arma_fortran(arma_sgesv)(&N, &NRHS, (E*)this->memptr(), &LDA, IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
-	} else if(std::is_same<T, double>::value) {
+	}
+	else if(std::is_same<T, double>::value) {
 		using E = double;
 		arma_fortran(arma_dgesv)(&N, &NRHS, (E*)this->memptr(), &LDA, IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
 	}
@@ -155,7 +159,8 @@ template<typename T> int FullMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 	if(std::is_same<T, float>::value) {
 		using E = float;
 		arma_fortran(arma_sgetrs)(const_cast<char*>(&this->TRAN), &N, &NRHS, (E*)this->memptr(), &LDA, IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
-	} else if(std::is_same<T, double>::value) {
+	}
+	else if(std::is_same<T, double>::value) {
 		using E = double;
 		arma_fortran(arma_dgetrs)(const_cast<char*>(&this->TRAN), &N, &NRHS, (E*)this->memptr(), &LDA, IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
 	}
@@ -182,7 +187,8 @@ template<typename T> unique_ptr<MetaMat<T>> FullMat<T>::factorize() {
 	if(std::is_same<T, float>::value) {
 		using E = float;
 		arma_fortran(arma_sgetrf)(&M, &N, (E*)X->memptr(), &LDA, X->IPIV.memptr(), &INFO);
-	} else if(std::is_same<T, double>::value) {
+	}
+	else if(std::is_same<T, double>::value) {
 		using E = double;
 		arma_fortran(arma_dgetrf)(&M, &N, (E*)X->memptr(), &LDA, X->IPIV.memptr(), &INFO);
 	}
@@ -190,7 +196,8 @@ template<typename T> unique_ptr<MetaMat<T>> FullMat<T>::factorize() {
 	if(INFO != 0) {
 		suanpan_error("factorize() fails.\n");
 		X->reset();
-	} else X->factored = true;
+	}
+	else X->factored = true;
 
 	return X;
 }
@@ -209,7 +216,8 @@ template<typename T> unique_ptr<MetaMat<T>> FullMat<T>::i() {
 	if(std::is_same<T, float>::value) {
 		using E = float;
 		arma_fortran(arma_sgetrf)(&M, &N, (E*)X->memptr(), &LDA, X->IPIV.memptr(), &INFO);
-	} else if(std::is_same<T, double>::value) {
+	}
+	else if(std::is_same<T, double>::value) {
 		using E = double;
 		arma_fortran(arma_dgetrf)(&M, &N, (E*)X->memptr(), &LDA, X->IPIV.memptr(), &INFO);
 	}
@@ -225,7 +233,8 @@ template<typename T> unique_ptr<MetaMat<T>> FullMat<T>::i() {
 	if(std::is_same<T, float>::value) {
 		using E = float;
 		arma_fortran(arma_sgetri)(&N, (E*)X->memptr(), &LDA, X->IPIV.memptr(), (E*)WORK, &LWORK, &INFO);
-	} else if(std::is_same<T, double>::value) {
+	}
+	else if(std::is_same<T, double>::value) {
 		using E = double;
 		arma_fortran(arma_dgetri)(&N, (E*)X->memptr(), &LDA, X->IPIV.memptr(), (E*)WORK, &LWORK, &INFO);
 	}

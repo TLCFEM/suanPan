@@ -127,15 +127,18 @@ template<typename T> Mat<T> shape::truss(const T int_pts, const unsigned order, 
 		if(order == 0) {
 			N(0, 0) = 1. - X;
 			N(0, 1) = 1. + X;
-		} else N(0, 0) = -(N(0, 1) = 1.);
+		}
+		else N(0, 0) = -(N(0, 1) = 1.);
 		N *= .5;
-	} else if(num_node == 3) {
+	}
+	else if(num_node == 3) {
 		if(order == 0) {
 			const auto XX = X * X;
 			N(0, 0) = .5 * (XX - X);
 			N(0, 1) = 1. - XX;
 			N(0, 2) = .5 * (XX + X);
-		} else {
+		}
+		else {
 			N(0, 0) = X - .5;
 			N(0, 1) = -2. * X;
 			N(0, 2) = X + .5;
@@ -158,7 +161,8 @@ template<typename T> Col<T> shape::beam(const T int_pts, const unsigned order, c
 		N(1) = length * XMM * XP;
 		N(2) = 2. * XPP * (XM + 1.);
 		N(3) = length * XM * XPP;
-	} else if(order == 1) {
+	}
+	else if(order == 1) {
 		N(0) = -6. * XP * XM;
 		N(1) = length * XM * (3. * int_pts + 1.);
 		N(2) = 6. * XP * XM;
@@ -194,7 +198,8 @@ template<typename T> Mat<T> shape::triangle(const Col<T>& int_pts, const unsigne
 		N(0, 3) = X * Y;
 		N(0, 4) = X * X;
 		N(0, 5) = Y * Y;
-	} else if(order == 1) {
+	}
+	else if(order == 1) {
 		N(0, 1) = N(1, 2) = 1.;
 		N(0, 4) = 2. * (N(1, 3) = X);
 		N(1, 5) = 2. * (N(0, 3) = Y);
@@ -227,7 +232,8 @@ template<typename T> Mat<T> shape::quad(const Col<T>& int_pts, const unsigned or
 			N(0, 1) = .25 * XP * YM - .5 * (N(0, 4) + N(0, 5));
 			N(0, 2) = .25 * XP * YP - .5 * (N(0, 5) + N(0, 6));
 			N(0, 3) = .25 * XM * YP - .5 * (N(0, 6) + N(0, 7));
-		} else if(1 == order) {
+		}
+		else if(1 == order) {
 			const auto X2 = .5 * X;
 			const auto Y2 = .5 * Y;
 			const auto X4 = .25 * X;
@@ -252,13 +258,15 @@ template<typename T> Mat<T> shape::quad(const Col<T>& int_pts, const unsigned or
 			N(0, 1) = X2 - Y4 - XY2 + Y24;
 			N(0, 0) = X2 + Y4 - XY2 - Y24;
 		}
-	} else {
+	}
+	else {
 		if(0 == order) {
 			N(0, 3) = XM * YP;
 			N(0, 2) = XP * YP;
 			N(0, 1) = XP * YM;
 			N(0, 0) = XM * YM;
-		} else if(1 == order) {
+		}
+		else if(1 == order) {
 			N(1, 1) = -(N(1, 2) = XP);
 			N(1, 0) = -(N(1, 3) = XM);
 			N(0, 3) = -(N(0, 2) = YP);
@@ -270,7 +278,8 @@ template<typename T> Mat<T> shape::quad(const Col<T>& int_pts, const unsigned or
 				N(0, 4) = .25 * (1. - X * X) * (1. - Y);
 				N(0, 0) -= .5 * N(0, 4);
 				N(0, 1) -= .5 * N(0, 4);
-			} else {
+			}
+			else {
 				N(0, 4) = -.5 * X * (1. - Y);
 				N(1, 4) = -.25 * (1. - X * X);
 				N(0, 0) -= .5 * N(0, 4);
@@ -283,7 +292,8 @@ template<typename T> Mat<T> shape::quad(const Col<T>& int_pts, const unsigned or
 				N(0, 5) = .25 * (1. - Y * Y) * (1. + X);
 				N(0, 1) -= .5 * N(0, 5);
 				N(0, 2) -= .5 * N(0, 5);
-			} else {
+			}
+			else {
 				N(0, 5) = .25 * (1. - Y * Y);
 				N(1, 5) = -.5 * Y * (1. + X);
 				N(0, 1) -= .5 * N(0, 5);
@@ -296,7 +306,8 @@ template<typename T> Mat<T> shape::quad(const Col<T>& int_pts, const unsigned or
 				N(0, 6) = .25 * (1. - X * X) * (1. + Y);
 				N(0, 2) -= .5 * N(0, 6);
 				N(0, 3) -= .5 * N(0, 6);
-			} else {
+			}
+			else {
 				N(0, 6) = -.5 * X * (1. + Y);
 				N(1, 6) = .25 * (1. - X * X);
 				N(0, 2) -= .5 * N(0, 6);
@@ -337,7 +348,8 @@ template<typename T> Mat<T> shape::cube(const Col<T>& int_pts, const unsigned or
 			N(0, 5) = XP * YM * ZP;
 			N(0, 6) = XP * YP * ZP;
 			N(0, 7) = XM * YP * ZP;
-		} else if(order == 1) {
+		}
+		else if(order == 1) {
 			N(0, 0) = -YM * ZM;
 			N(0, 1) = YM * ZM;
 			N(0, 2) = YP * ZM;
@@ -393,7 +405,8 @@ template<typename T> Mat<T> shape::cube(const Col<T>& int_pts, const unsigned or
 			N(0, 17) = .25 * ZZ * XP * YM;
 			N(0, 18) = .25 * ZZ * XP * YP;
 			N(0, 19) = .25 * ZZ * XM * YP;
-		} else if(order == 1) {
+		}
+		else if(order == 1) {
 			N(0, 0) = YM * ZM * (2. * X + Y + Z + 1.) * .125;
 			N(0, 1) = YM * ZM * (2. * X - Y - Z - 1.) * .125;
 			N(0, 2) = YP * ZM * (2. * X + Y - Z - 1.) * .125;
@@ -607,7 +620,8 @@ template<typename T> Mat<T> shape::plate::triangle(const Col<T>& int_pts, const 
 				N(IDX++) = B(J) * L(I) * L(K) * (L(I) + .5 * L(J)) - B(K) * L(I) * L(J) * (L(I) + .5 * L(K));
 				N(IDX++) = C(J) * L(I) * L(K) * (L(I) + .5 * L(J)) - C(K) * L(I) * L(J) * (L(I) + .5 * L(K));
 			}
-		} else {
+		}
+		else {
 			mat DNDL(3, 3);
 			auto IDX = 0;
 			for(auto I = 0; I < 3; ++I) {

@@ -159,7 +159,8 @@ int C3D8::update_status() {
 			trial_stiffness += I.weight * BN.t() * I.c_material->get_trial_stiffness() * BN;
 			trial_resistance += I.weight * BN.t() * t_stress;
 		}
-	} else
+	}
+	else
 		for(const auto& I : int_pt) {
 			if(I.c_material->update_trial_status(I.strain_mat * t_disp) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 			trial_stiffness += I.weight * I.strain_mat.t() * I.c_material->get_trial_stiffness() * I.strain_mat;

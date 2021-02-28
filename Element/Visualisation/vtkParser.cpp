@@ -183,11 +183,13 @@ void vtk_plot_node_quantity(const shared_ptr<DomainBase>& domain, vtkInfo config
 		grid->GetPointData()->SetScalars(data);
 		grid->GetPointData()->SetActiveScalars(vtk_get_name(config.type));
 		config.grid_ptr = grid;
-	} else if(config.save_file) {
+	}
+	else if(config.save_file) {
 		grid->GetPointData()->SetScalars(data);
 		grid->GetPointData()->SetActiveScalars(vtk_get_name(config.type));
 		vtk_save(grid, config);
-	} else {
+	}
+	else {
 		auto sub_data = vtkSmartPointer<vtkDoubleArray>::New();
 
 		sub_data->SetNumberOfTuples(data->GetNumberOfTuples());
@@ -255,11 +257,13 @@ void vtk_plot_element_quantity(const shared_ptr<DomainBase>& domain, vtkInfo con
 		grid->GetPointData()->SetScalars(data);
 		grid->GetPointData()->SetActiveScalars(vtk_get_name(config.type));
 		config.grid_ptr = grid;
-	} else if(config.save_file) {
+	}
+	else if(config.save_file) {
 		grid->GetPointData()->SetScalars(data);
 		grid->GetPointData()->SetActiveScalars(vtk_get_name(config.type));
 		vtk_save(grid, config);
-	} else {
+	}
+	else {
 		auto sub_data = vtkSmartPointer<vtkDoubleArray>::New();
 
 		sub_data->SetNumberOfTuples(data->GetNumberOfTuples());

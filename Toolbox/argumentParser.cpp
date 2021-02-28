@@ -50,10 +50,12 @@ void argument_parser(const int argc, char** argv) {
 			else if(is_equal(argv[I], "-s") || is_equal(argv[I], "--strip")) {
 				strip = true;
 				convert = false;
-			} else if(is_equal(argv[I], "-c") || is_equal(argv[I], "--convert")) {
+			}
+			else if(is_equal(argv[I], "-c") || is_equal(argv[I], "--convert")) {
 				convert = true;
 				strip = false;
-			} else if(is_equal(argv[I], "-ctest") || is_equal(argv[I], "--catch2test")) {
+			}
+			else if(is_equal(argv[I], "-ctest") || is_equal(argv[I], "--catch2test")) {
 				catchtest_main(argc, argv);
 				return;
 			}
@@ -96,7 +98,8 @@ void argument_parser(const int argc, char** argv) {
 				cli_mode(model);
 			}
 		}
-	} else {
+	}
+	else {
 		print_header();
 		const auto model = make_shared<Bead>();
 		cli_mode(model);
@@ -191,7 +194,8 @@ void cli_mode(const shared_ptr<Bead>& model) {
 			if(*command_line.crbegin() == '\\') {
 				command_line.back() = ' ';
 				all_line.append(command_line);
-			} else {
+			}
+			else {
 				all_line.append(command_line);
 				istringstream tmp_str(all_line);
 				if(process_command(model, tmp_str) == SUANPAN_EXIT) return;

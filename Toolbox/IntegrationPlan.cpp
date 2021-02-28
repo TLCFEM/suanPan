@@ -39,7 +39,8 @@ IntegrationPlan::IntegrationPlan(const unsigned intDimension, const unsigned int
 				for(auto I = 0; I < 6; ++I) int_pts[I][3] = WB;
 				int_pts[0][0] = int_pts[2][1] = int_pts[4][2] = -(int_pts[1][0] = int_pts[3][1] = int_pts[5][2] = 1.);
 				int_pts[0][1] = int_pts[0][2] = int_pts[1][1] = int_pts[1][2] = int_pts[2][0] = int_pts[2][2] = int_pts[3][0] = int_pts[3][2] = int_pts[4][0] = int_pts[4][1] = int_pts[5][0] = int_pts[5][1] = 0.;
-			} else if(intOrder == 3) {
+			}
+			else if(intOrder == 3) {
 				const auto WB = .886426593;
 				const auto WC = .335180055;
 				const auto LB = .795822426;
@@ -1103,7 +1104,8 @@ IntegrationPlan::IntegrationPlan(const unsigned intDimension, const unsigned int
 			break;
 		}
 		}
-	} else if(intType == IntegrationType::RADAU) {
+	}
+	else if(intType == IntegrationType::RADAU) {
 		switch(intOrder) {
 		case 2: {
 			PTL[0] = -1.;

@@ -96,7 +96,8 @@ vector<vec> Elastic2D::record(const OutputType P) {
 			trial_mises(0) = sqrt(1.5 * (tmp_a * tmp_a + tmp_b * tmp_b + tmp_c * tmp_c + 2. * current_stress(2) * current_stress(2)));
 		}
 		output.emplace_back(trial_mises);
-	} else if(P == OutputType::S) {
+	}
+	else if(P == OutputType::S) {
 		vec trail_sigma(4);
 
 		trail_sigma(0) = trial_stress(0);
@@ -105,7 +106,8 @@ vector<vec> Elastic2D::record(const OutputType P) {
 		trail_sigma(2) = plane_type == PlaneType::S ? 0. : sigma_33;
 
 		output.emplace_back(trail_sigma);
-	} else if(P == OutputType::SP) output.emplace_back(transform::stress::principal(trial_stress));
+	}
+	else if(P == OutputType::SP) output.emplace_back(transform::stress::principal(trial_stress));
 	else return Material2D::record(P);
 
 	return output;

@@ -323,7 +323,8 @@ template<typename data_t, typename index_t> void triplet_form<data_t, index_t>::
 			if(I == row_idx[current_pos] && J == col_idx[current_pos]) {
 				suanpan_info(" X");
 				++current_pos;
-			} else suanpan_info(" .");
+			}
+			else suanpan_info(" .");
 		suanpan_info("\n");
 	}
 }

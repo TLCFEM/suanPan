@@ -88,7 +88,8 @@ void Node::initialize(const shared_ptr<DomainBase>& D) {
 		trial_displacement.resize(num_dof);
 		trial_velocity.resize(num_dof);
 		trial_acceleration.resize(num_dof);
-	} else {
+	}
+	else {
 		suanpan_debug("Node %u is not used in the problem, now disable it.\n", get_tag());
 		D->disable_node(get_tag());
 	}

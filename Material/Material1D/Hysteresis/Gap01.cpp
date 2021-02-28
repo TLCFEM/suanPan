@@ -51,7 +51,8 @@ int Gap01::update_trial_status(const vec& t_strain) {
 	if(trial_stress(0) < 0.) {
 		trial_stress(0) = 0.;
 		trial_stiffness(0) = 0.;
-	} else if(trial_stress(0) > yield_stress) {
+	}
+	else if(trial_stress(0) > yield_stress) {
 		trial_stress(0) = yield_stress;
 		trial_stiffness(0) = 0.;
 	}

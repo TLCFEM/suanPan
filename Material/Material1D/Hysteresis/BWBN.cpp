@@ -76,7 +76,8 @@ int BWBN::update_trial_status(const vec& t_strain) {
 		if(n_strain >= 0.) {
 			f_term = (z - q * zm) / zb;
 			pfpz = (-f_term * pzbpz + 1. - q * pzmpz) / zb;
-		} else {
+		}
+		else {
 			f_term = (-z - q * zm) / zb;
 			pfpz = (-f_term * pzbpz - 1. - q * pzmpz) / zb;
 		}
