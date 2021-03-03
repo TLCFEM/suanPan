@@ -84,7 +84,11 @@ sp_mat Integrator::get_reference_load() { return database.lock()->get_factory()-
 
 sp_mat Integrator::get_auxiliary_stiffness() { return database.lock()->get_factory()->get_auxiliary_stiffness(); }
 
-vec Integrator::get_auxiliary_load() { return database.lock()->get_factory()->get_auxiliary_load(); }
+vec Integrator::get_auxiliary_residual() {
+	const auto& W = get_domain().lock()->get_factory();
+
+	return W->get_auxiliary_load() - W->get_trial_auxiliary_resistance();
+}
 
 void Integrator::update_trial_time(const double T) {
 	const auto& W = get_domain().lock()->get_factory();

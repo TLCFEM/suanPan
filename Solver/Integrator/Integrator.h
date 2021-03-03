@@ -78,7 +78,7 @@ public:
 	virtual mat get_displacement_residual();
 	virtual sp_mat get_reference_load();
 	virtual sp_mat get_auxiliary_stiffness();
-	virtual vec get_auxiliary_load();
+	virtual vec get_auxiliary_residual();
 
 	void update_trial_time(double);
 	void update_incre_time(double);

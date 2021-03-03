@@ -67,7 +67,7 @@ int Ramm::analyze() {
 			mat right, kernel;
 			auto& border = W->get_auxiliary_stiffness();
 			if(G->solve_trs(right, border) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
-			t_ninja -= right * solve(kernel = border.t() * right, border.t() * t_ninja - W->get_auxiliary_load());
+			t_ninja -= right * solve(kernel = border.t() * right, border.t() * t_ninja - G->get_auxiliary_residual());
 			disp_a -= right * solve(kernel, border.t() * disp_a);
 		}
 
