@@ -53,6 +53,7 @@ public:
 	void assemble_resistance() override;
 	void assemble_matrix() override;
 
+	[[nodiscard]] int process_constraint() const override;
 	[[nodiscard]] int process_load() const override;
 
 	int update_trial_status() override;

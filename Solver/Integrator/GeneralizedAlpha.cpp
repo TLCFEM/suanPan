@@ -78,6 +78,22 @@ void GeneralizedAlpha::assemble_matrix() {
 	t_stiffness += F5 * W->get_mass() + F6 * W->get_damping();
 }
 
+int GeneralizedAlpha::process_constraint() const {
+	const auto& D = get_domain().lock();
+	auto& W = D->get_factory();
+
+	const auto current_time = W->get_current_time();
+	const auto trial_time = W->get_trial_time();
+
+	W->update_trial_time(F1 * current_time + F2 * trial_time);
+
+	const auto code = D->process_constraint();
+
+	W->update_trial_time(trial_time);
+
+	return code;
+}
+
 int GeneralizedAlpha::process_load() const {
 	const auto& D = get_domain().lock();
 	auto& W = D->get_factory();
