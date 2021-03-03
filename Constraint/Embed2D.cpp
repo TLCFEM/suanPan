@@ -76,7 +76,7 @@ int Embed2D::process(const shared_ptr<DomainBase>& D) {
 
 	W->incre_mpc();
 	get_auxiliary_stiffness(W).col(last_pos++) = slice_x;
-	get_auxiliary_load(W).back() = 0.;
+	// get_auxiliary_load(W).back() = 0.;
 
 	sp_vec slice_y(W->get_size());
 	slice_y(n_dof(1)) = -1.;
@@ -84,7 +84,7 @@ int Embed2D::process(const shared_ptr<DomainBase>& D) {
 
 	W->incre_mpc();
 	get_auxiliary_stiffness(W).col(last_pos) = slice_y;
-	get_auxiliary_load(W).back() = 0.;
+	// get_auxiliary_load(W).back() = 0.;
 
 	return SUANPAN_SUCCESS;
 }

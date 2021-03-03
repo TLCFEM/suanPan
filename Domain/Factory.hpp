@@ -732,9 +732,9 @@ template<typename T> void Factory<T>::initialize_temperature() {
 }
 
 template<typename T> void Factory<T>::initialize_auxiliary_resistance() {
-	trial_auxiliary_resistance.zeros(n_size);
-	incre_auxiliary_resistance.zeros(n_size);
-	current_auxiliary_resistance.zeros(n_size);
+	trial_auxiliary_resistance.reset();
+	incre_auxiliary_resistance.reset();
+	current_auxiliary_resistance.reset();
 }
 
 template<typename T> void Factory<T>::initialize_mass() {
