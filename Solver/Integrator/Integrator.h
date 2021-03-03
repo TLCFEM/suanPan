@@ -53,7 +53,7 @@ public:
 	Integrator(Integrator&&) = delete;                 // move forbidden
 	Integrator& operator=(const Integrator&) = delete; // assign forbidden
 	Integrator& operator=(Integrator&&) = delete;      // assign forbidden
-	virtual ~Integrator();
+	~Integrator() override;
 
 	void set_domain(const weak_ptr<DomainBase>&);
 	[[nodiscard]] const weak_ptr<DomainBase>& get_domain() const;
@@ -77,6 +77,8 @@ public:
 	virtual mat get_force_residual();
 	virtual mat get_displacement_residual();
 	virtual sp_mat get_reference_load();
+	virtual sp_mat get_auxiliary_stiffness();
+	virtual vec get_auxiliary_load();
 
 	void update_trial_time(double);
 	void update_incre_time(double);

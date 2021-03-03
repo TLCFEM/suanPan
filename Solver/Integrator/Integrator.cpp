@@ -29,7 +29,7 @@ void Integrator::set_domain(const weak_ptr<DomainBase>& D) { if(database.lock() 
 const weak_ptr<DomainBase>& Integrator::get_domain() const { return database; }
 
 int Integrator::initialize() {
-	if(database.lock() == nullptr) {
+	if(nullptr == database.lock()) {
 		suanpan_error("initialize() needs a valid domain.\n");
 		return SUANPAN_FAIL;
 	}
@@ -81,6 +81,10 @@ mat Integrator::get_displacement_residual() {
 }
 
 sp_mat Integrator::get_reference_load() { return database.lock()->get_factory()->get_reference_load(); }
+
+sp_mat Integrator::get_auxiliary_stiffness() { return database.lock()->get_factory()->get_auxiliary_stiffness(); }
+
+vec Integrator::get_auxiliary_load() { return database.lock()->get_factory()->get_auxiliary_load(); }
 
 void Integrator::update_trial_time(const double T) {
 	const auto& W = get_domain().lock()->get_factory();
