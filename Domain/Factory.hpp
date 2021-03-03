@@ -879,6 +879,7 @@ template<typename T> void Factory<T>::set_sushi(const Col<T>& S) { sushi = S; }
 template<typename T> void Factory<T>::incre_mpc() {
 	auxiliary_load.resize(++n_mpc);
 	auxiliary_stiffness.resize(n_size, n_mpc);
+	trial_auxiliary_resistance.resize(n_mpc);
 }
 
 template<typename T> void Factory<T>::set_reference_load(const SpMat<T>& L) { reference_load = L; }
@@ -1633,6 +1634,7 @@ template<typename T> void Factory<T>::clear_auxiliary() {
 	n_mpc = 0;
 	auxiliary_load.reset();
 	auxiliary_stiffness.set_size(n_size, 0);
+	trial_auxiliary_resistance.reset();
 }
 
 template<typename T> void Factory<T>::assemble_resistance(const Mat<T>& ER, const uvec& EI) {
