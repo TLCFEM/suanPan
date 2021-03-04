@@ -880,6 +880,7 @@ template<typename T> void Factory<T>::incre_mpc() {
 	auxiliary_load.resize(++n_mpc);
 	auxiliary_stiffness.resize(n_size, n_mpc);
 	trial_auxiliary_resistance.resize(n_mpc);
+	current_auxiliary_resistance.resize(n_mpc);
 }
 
 template<typename T> void Factory<T>::set_reference_load(const SpMat<T>& L) { reference_load = L; }

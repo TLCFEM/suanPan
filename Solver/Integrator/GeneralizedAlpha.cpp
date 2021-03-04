@@ -48,6 +48,12 @@ GeneralizedAlpha::GeneralizedAlpha(const unsigned T, const double AF, const doub
 	F9 = -.5 / beta;
 }
 
+vec GeneralizedAlpha::get_auxiliary_residual() {
+	const auto& W = get_domain().lock()->get_factory();
+
+	return W->get_auxiliary_load() - F1 * W->get_current_auxiliary_resistance() - F2 * W->get_trial_auxiliary_resistance();
+}
+
 void GeneralizedAlpha::assemble_resistance() {
 	const auto& D = get_domain().lock();
 	auto& W = D->get_factory();

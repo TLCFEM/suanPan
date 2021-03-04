@@ -52,7 +52,8 @@ int MPC::process(const shared_ptr<DomainBase>& D) {
 	const auto last_pos = W->get_mpc();
 
 	auto flag = true;
-	auto resistance = 0.;
+	auto c_resistance = 0.;
+	auto t_resistance = 0.;
 	sp_vec slice(W->get_size());
 	for(uword I = 0; I < nodes.n_elem; ++I) {
 		auto& t_node = D->get<Node>(nodes(I));
@@ -61,20 +62,23 @@ int MPC::process(const shared_ptr<DomainBase>& D) {
 			break;
 		}
 		auto& t_dof = t_node->get_reordered_dof();
+		auto& c_disp = t_node->get_current_displacement();
 		auto& t_disp = t_node->get_trial_displacement();
 		if(t_dof.n_elem <= dofs(I)) {
 			flag = false;
 			break;
 		}
 		slice(t_dof(dofs(I) - 1)) = weight_pool(I);
-		resistance += weight_pool(I) * t_disp(dofs(I) - 1);
+		c_resistance += weight_pool(I) * c_disp(dofs(I) - 1);
+		t_resistance += weight_pool(I) * t_disp(dofs(I) - 1);
 	}
 
 	if(flag) {
 		W->incre_mpc();
 		get_auxiliary_stiffness(W).col(last_pos) = slice;
 		get_auxiliary_load(W).back() = psudo_load * magnitude->get_amplitude(W->get_trial_time());
-		get_trial_auxiliary_resistance(W).back() = resistance;
+		get_current_auxiliary_resistance(W).back() = c_resistance;
+		get_trial_auxiliary_resistance(W).back() = t_resistance;
 	}
 	else suanpan_debug("some node or DoF is not active, the MPC %u is not applied.\n", get_tag());
 

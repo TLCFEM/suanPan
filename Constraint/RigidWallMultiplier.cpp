@@ -51,7 +51,7 @@ int RigidWallMultiplier::process(const shared_ptr<DomainBase>& D) {
 			for(auto J = 0llu; J < size; ++J) {
 				W->incre_mpc();
 				get_auxiliary_stiffness(W)(t_dof(J), W->get_mpc() - 1) = -1.;
-				get_auxiliary_load(W).back() = pen * norm(J);
+				get_trial_auxiliary_resistance(W).back() = -pen * norm(J);
 			}
 	}
 
