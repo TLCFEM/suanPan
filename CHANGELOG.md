@@ -2,6 +2,9 @@
 
 ## version 1.x
 
+1. update handling of constraints
+2. store commands in backup file in CLI mode
+
 ## version 1.2
 
 1. remove dependency on `MAGMA`, now `CUDA` is directly used as the GPU solver
