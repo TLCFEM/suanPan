@@ -29,12 +29,10 @@ void Integrator::set_domain(const weak_ptr<DomainBase>& D) { if(database.lock() 
 const weak_ptr<DomainBase>& Integrator::get_domain() const { return database; }
 
 int Integrator::initialize() {
-	if(nullptr == database.lock()) {
-		suanpan_error("initialize() needs a valid domain.\n");
-		return SUANPAN_FAIL;
-	}
+	if(nullptr != database.lock()) return SUANPAN_SUCCESS;
 
-	return SUANPAN_SUCCESS;
+	suanpan_error("initialize() needs a valid domain.\n");
+	return SUANPAN_FAIL;
 }
 
 void Integrator::set_time_step_switch(const bool T) { time_step_switch = T; }
