@@ -181,6 +181,8 @@ void print_helper() {
 }
 
 void cli_mode(const shared_ptr<Bead>& model) {
+	ofstream output_file(".suanpan-history.sp", std::ios_base::app | std::ios_base::out);
+
 	string all_line;
 	while(true) {
 		string command_line;
@@ -198,6 +200,7 @@ void cli_mode(const shared_ptr<Bead>& model) {
 			else {
 				all_line.append(command_line);
 				istringstream tmp_str(all_line);
+				if(output_file.is_open()) output_file << all_line << '\n';
 				if(process_command(model, tmp_str) == SUANPAN_EXIT) return;
 				all_line.clear();
 			}
