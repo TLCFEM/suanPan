@@ -38,12 +38,10 @@ int MPC::initialize(const shared_ptr<DomainBase>& D) {
 		}
 	}
 
-	if(!flag) {
-		D->disable_constraint(get_tag());
-		return SUANPAN_FAIL;
-	}
+	if(flag) return Constraint::initialize(D);
 
-	return Constraint::initialize(D);
+	D->disable_constraint(get_tag());
+	return SUANPAN_FAIL;
 }
 
 int MPC::process(const shared_ptr<DomainBase>& D) {
@@ -52,8 +50,7 @@ int MPC::process(const shared_ptr<DomainBase>& D) {
 	const auto last_pos = W->get_mpc();
 
 	auto flag = true;
-	auto c_resistance = 0.;
-	auto t_resistance = 0.;
+	auto c_resistance = 0., t_resistance = 0.;
 	sp_vec slice(W->get_size());
 	for(uword I = 0; I < nodes.n_elem; ++I) {
 		auto& t_node = D->get<Node>(nodes(I));
