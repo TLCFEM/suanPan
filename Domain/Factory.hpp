@@ -70,6 +70,9 @@ template<typename T> class Factory final {
 	Col<T> auxiliary_load;        // for constraints using multiplier method
 	SpMat<T> auxiliary_stiffness; // for constraints using multiplier method
 
+	uvec auxiliary_encoding; // for constraints using multiplier method
+
+	Col<T> incre_auxiliary_lambda;       // for constraints using multiplier method
 	Col<T> trial_auxiliary_resistance;   // for constraints using multiplier method
 	Col<T> incre_auxiliary_resistance;   // for constraints using multiplier method
 	Col<T> current_auxiliary_resistance; // for constraints using multiplier method
@@ -275,6 +278,10 @@ public:
 	const Col<T>& get_auxiliary_load() const;
 	const SpMat<T>& get_auxiliary_stiffness() const;
 
+	const uvec& get_auxiliary_encoding() const;
+
+	const Col<T>& get_incre_auxiliary_lambda() const;
+
 	const Col<T>& get_trial_auxiliary_resistance() const;
 	const Col<T>& get_incre_auxiliary_resistance() const;
 	const Col<T>& get_current_auxiliary_resistance() const;
@@ -387,6 +394,10 @@ public:
 
 	template<typename T1> friend Col<T1>& get_auxiliary_load(const shared_ptr<Factory<T1>>&);
 	template<typename T1> friend SpMat<T1>& get_auxiliary_stiffness(const shared_ptr<Factory<T1>>&);
+
+	template<typename T1> friend uvec& get_auxiliary_encoding(const shared_ptr<Factory<T1>>&);
+
+	template<typename T1> friend Col<T1>& get_incre_auxiliary_lambda(const shared_ptr<Factory<T1>>&);
 
 	template<typename T1> friend Col<T1>& get_trial_auxiliary_resistance(const shared_ptr<Factory<T1>>&);
 	template<typename T1> friend Col<T1>& get_incre_auxiliary_resistance(const shared_ptr<Factory<T1>>&);
@@ -589,12 +600,11 @@ template<typename T> void Factory<T>::set_storage_scheme(const StorageScheme& SS
 template<typename T> const StorageScheme& Factory<T>::get_storage_scheme() const { return storage_type; }
 
 template<typename T> void Factory<T>::set_bandwidth(const unsigned L, const unsigned U) {
-	if(n_lobw != L || n_upbw != U) {
-		n_lobw = L;
-		n_upbw = U;
-		n_sfbw = L + U;
-		access::rw(initialized) = false;
-	}
+	if(n_lobw == L && n_upbw == U) return;
+	n_lobw = L;
+	n_upbw = U;
+	n_sfbw = L + U;
+	access::rw(initialized) = false;
 }
 
 template<typename T> void Factory<T>::get_bandwidth(unsigned& L, unsigned& U) const {
@@ -879,8 +889,9 @@ template<typename T> void Factory<T>::set_sushi(const Col<T>& S) { sushi = S; }
 template<typename T> void Factory<T>::incre_mpc() {
 	auxiliary_load.resize(++n_mpc);
 	auxiliary_stiffness.resize(n_size, n_mpc);
-	trial_auxiliary_resistance.resize(n_mpc);
 	current_auxiliary_resistance.resize(n_mpc);
+	trial_auxiliary_resistance.resize(n_mpc);
+	auxiliary_encoding.resize(n_mpc);
 }
 
 template<typename T> void Factory<T>::set_reference_load(const SpMat<T>& L) { reference_load = L; }
@@ -1002,6 +1013,10 @@ template<typename T> const SpMat<T>& Factory<T>::get_reference_load() const { re
 template<typename T> const Col<T>& Factory<T>::get_auxiliary_load() const { return auxiliary_load; }
 
 template<typename T> const SpMat<T>& Factory<T>::get_auxiliary_stiffness() const { return auxiliary_stiffness; }
+
+template<typename T> const uvec& Factory<T>::get_auxiliary_encoding() const { return auxiliary_encoding; }
+
+template<typename T> const Col<T>& Factory<T>::get_incre_auxiliary_lambda() const { return incre_auxiliary_lambda; }
 
 template<typename T> const Col<T>& Factory<T>::get_trial_auxiliary_resistance() const { return trial_auxiliary_resistance; }
 
@@ -1310,80 +1325,69 @@ template<typename T> void Factory<T>::commit_time() {
 }
 
 template<typename T> void Factory<T>::commit_load_factor() {
-	if(!trial_load_factor.is_empty()) {
-		current_load_factor = trial_load_factor;
-		incre_load_factor.zeros();
-	}
+	if(trial_load_factor.is_empty()) return;
+	current_load_factor = trial_load_factor;
+	incre_load_factor.zeros();
 }
 
 template<typename T> void Factory<T>::commit_load() {
-	if(!trial_load.is_empty()) {
-		current_load = trial_load;
-		incre_load.zeros();
-	}
+	if(trial_load.is_empty()) return;
+	current_load = trial_load;
+	incre_load.zeros();
 }
 
 template<typename T> void Factory<T>::commit_settlement() {
-	if(!trial_settlement.is_empty()) {
-		current_settlement = trial_settlement;
-		incre_settlement.zeros();
-	}
+	if(trial_settlement.is_empty()) return;
+	current_settlement = trial_settlement;
+	incre_settlement.zeros();
 }
 
 template<typename T> void Factory<T>::commit_resistance() {
-	if(!trial_resistance.is_empty()) {
-		current_resistance = trial_resistance;
-		incre_resistance.zeros();
-	}
+	if(trial_resistance.is_empty()) return;
+	current_resistance = trial_resistance;
+	incre_resistance.zeros();
 }
 
 template<typename T> void Factory<T>::commit_damping_force() {
-	if(!trial_damping_force.is_empty()) {
-		current_damping_force = trial_damping_force;
-		incre_damping_force.zeros();
-	}
+	if(trial_damping_force.is_empty()) return;
+	current_damping_force = trial_damping_force;
+	incre_damping_force.zeros();
 }
 
 template<typename T> void Factory<T>::commit_inertial_force() {
-	if(!trial_inertial_force.is_empty()) {
-		current_inertial_force = trial_inertial_force;
-		incre_inertial_force.zeros();
-	}
+	if(trial_inertial_force.is_empty()) return;
+	current_inertial_force = trial_inertial_force;
+	incre_inertial_force.zeros();
 }
 
 template<typename T> void Factory<T>::commit_displacement() {
-	if(!trial_displacement.is_empty()) {
-		current_displacement = trial_displacement;
-		incre_displacement.zeros();
-	}
+	if(trial_displacement.is_empty()) return;
+	current_displacement = trial_displacement;
+	incre_displacement.zeros();
 }
 
 template<typename T> void Factory<T>::commit_velocity() {
-	if(!trial_velocity.is_empty()) {
-		current_velocity = trial_velocity;
-		incre_velocity.zeros();
-	}
+	if(trial_velocity.is_empty()) return;
+	current_velocity = trial_velocity;
+	incre_velocity.zeros();
 }
 
 template<typename T> void Factory<T>::commit_acceleration() {
-	if(!trial_acceleration.is_empty()) {
-		current_acceleration = trial_acceleration;
-		incre_acceleration.zeros();
-	}
+	if(trial_acceleration.is_empty()) return;
+	current_acceleration = trial_acceleration;
+	incre_acceleration.zeros();
 }
 
 template<typename T> void Factory<T>::commit_temperature() {
-	if(!trial_temperature.is_empty()) {
-		current_temperature = trial_temperature;
-		incre_temperature.zeros();
-	}
+	if(trial_temperature.is_empty()) return;
+	current_temperature = trial_temperature;
+	incre_temperature.zeros();
 }
 
 template<typename T> void Factory<T>::commit_auxiliary_resistance() {
-	if(!trial_auxiliary_resistance.is_empty()) {
-		current_auxiliary_resistance = trial_auxiliary_resistance;
-		incre_auxiliary_resistance.zeros();
-	}
+	if(trial_auxiliary_resistance.is_empty()) return;
+	current_auxiliary_resistance = trial_auxiliary_resistance;
+	incre_auxiliary_resistance.zeros();
 }
 
 template<typename T> void Factory<T>::commit_pre_status() {
@@ -1542,80 +1546,69 @@ template<typename T> void Factory<T>::reset_time() {
 }
 
 template<typename T> void Factory<T>::reset_load_factor() {
-	if(!trial_load_factor.is_empty()) {
-		trial_load_factor = current_load_factor;
-		incre_load_factor.zeros();
-	}
+	if(trial_load_factor.is_empty()) return;
+	trial_load_factor = current_load_factor;
+	incre_load_factor.zeros();
 }
 
 template<typename T> void Factory<T>::reset_load() {
-	if(!trial_load.is_empty()) {
-		trial_load = current_load;
-		incre_load.zeros();
-	}
+	if(trial_load.is_empty()) return;
+	trial_load = current_load;
+	incre_load.zeros();
 }
 
 template<typename T> void Factory<T>::reset_settlement() {
-	if(!trial_settlement.is_empty()) {
-		trial_settlement = current_settlement;
-		incre_settlement.zeros();
-	}
+	if(trial_settlement.is_empty()) return;
+	trial_settlement = current_settlement;
+	incre_settlement.zeros();
 }
 
 template<typename T> void Factory<T>::reset_resistance() {
-	if(!trial_resistance.is_empty()) {
-		trial_resistance = current_resistance;
-		incre_resistance.zeros();
-	}
+	if(trial_resistance.is_empty()) return;
+	trial_resistance = current_resistance;
+	incre_resistance.zeros();
 }
 
 template<typename T> void Factory<T>::reset_damping_force() {
-	if(!trial_damping_force.is_empty()) {
-		trial_damping_force = current_damping_force;
-		incre_damping_force.zeros();
-	}
+	if(trial_damping_force.is_empty()) return;
+	trial_damping_force = current_damping_force;
+	incre_damping_force.zeros();
 }
 
 template<typename T> void Factory<T>::reset_inertial_force() {
-	if(!trial_inertial_force.is_empty()) {
-		trial_inertial_force = current_inertial_force;
-		incre_inertial_force.zeros();
-	}
+	if(trial_inertial_force.is_empty()) return;
+	trial_inertial_force = current_inertial_force;
+	incre_inertial_force.zeros();
 }
 
 template<typename T> void Factory<T>::reset_displacement() {
-	if(!trial_displacement.is_empty()) {
-		trial_displacement = current_displacement;
-		incre_displacement.zeros();
-	}
+	if(trial_displacement.is_empty()) return;
+	trial_displacement = current_displacement;
+	incre_displacement.zeros();
 }
 
 template<typename T> void Factory<T>::reset_velocity() {
-	if(!trial_velocity.is_empty()) {
-		trial_velocity = current_velocity;
-		incre_velocity.zeros();
-	}
+	if(trial_velocity.is_empty()) return;
+	trial_velocity = current_velocity;
+	incre_velocity.zeros();
 }
 
 template<typename T> void Factory<T>::reset_acceleration() {
-	if(!trial_acceleration.is_empty()) {
-		trial_acceleration = current_acceleration;
-		incre_acceleration.zeros();
-	}
+	if(trial_acceleration.is_empty()) return;
+	trial_acceleration = current_acceleration;
+	incre_acceleration.zeros();
 }
 
 template<typename T> void Factory<T>::reset_temperature() {
-	if(!trial_temperature.is_empty()) {
-		trial_temperature = current_temperature;
-		incre_temperature.zeros();
-	}
+	if(trial_temperature.is_empty()) return;
+	trial_temperature = current_temperature;
+	incre_temperature.zeros();
 }
 
 template<typename T> void Factory<T>::reset_auxiliary_resistance() {
-	if(!trial_auxiliary_resistance.is_empty()) {
-		trial_auxiliary_resistance = current_auxiliary_resistance;
-		incre_auxiliary_resistance.zeros();
-	}
+	if(trial_auxiliary_resistance.is_empty()) return;
+	trial_auxiliary_resistance = current_auxiliary_resistance;
+	incre_auxiliary_resistance.zeros();
 }
 
 template<typename T> void Factory<T>::clear_eigen() {
@@ -1635,7 +1628,9 @@ template<typename T> void Factory<T>::clear_auxiliary() {
 	n_mpc = 0;
 	auxiliary_load.reset();
 	auxiliary_stiffness.set_size(n_size, 0);
+	current_auxiliary_resistance.reset();
 	trial_auxiliary_resistance.reset();
+	auxiliary_encoding.reset();
 }
 
 template<typename T> void Factory<T>::assemble_resistance(const Mat<T>& ER, const uvec& EI) {
@@ -1694,6 +1689,10 @@ template<typename T> SpMat<T>& get_reference_load(const shared_ptr<Factory<T>>& 
 template<typename T> Col<T>& get_auxiliary_load(const shared_ptr<Factory<T>>& W) { return W->auxiliary_load; }
 
 template<typename T> SpMat<T>& get_auxiliary_stiffness(const shared_ptr<Factory<T>>& W) { return W->auxiliary_stiffness; }
+
+template<typename T1> uvec& get_auxiliary_encoding(const shared_ptr<Factory<T1>>& W) { return W->auxiliary_encoding; }
+
+template<typename T1> Col<T1>& get_incre_auxiliary_lambda(const shared_ptr<Factory<T1>>& W) { return W->incre_auxiliary_lambda; }
 
 template<typename T> Col<T>& get_trial_auxiliary_resistance(const shared_ptr<Factory<T>>& W) { return W->trial_auxiliary_resistance; }
 

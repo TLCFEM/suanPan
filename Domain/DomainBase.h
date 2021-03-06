@@ -344,6 +344,8 @@ public:
 
 	virtual void erase_machine_error() const = 0;
 
+	virtual void update_constraint() = 0;
+
 	[[nodiscard]] virtual int update_current_status() const = 0;
 	[[nodiscard]] virtual int update_incre_status() const = 0;
 	[[nodiscard]] virtual int update_trial_status() const = 0;

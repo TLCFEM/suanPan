@@ -67,17 +67,20 @@ int Ramm::analyze() {
 			mat right, kernel;
 			auto& border = W->get_auxiliary_stiffness();
 			if(G->solve_trs(right, border) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
-			t_ninja -= right * solve(kernel = border.t() * right, border.t() * t_ninja - G->get_auxiliary_residual());
+			auto& aux_factor = get_incre_auxiliary_lambda(W);
+			if(!solve(aux_factor, kernel = border.t() * right, border.t() * t_ninja - G->get_auxiliary_residual())) return SUANPAN_FAIL;
+			G->update_constraint();
+			t_ninja -= right * aux_factor;
 			disp_a -= right * solve(kernel, border.t() * disp_a);
 		}
 
-		if(0 == counter) {
+		if(0 < counter) t_lambda = -dot(disp_ref, t_ninja) / dot(disp_ref, disp_a);
+		else {
 			t_lambda = arc_length / sqrt(dot(disp_a, disp_a) + 1.);
 
 			// check the sign of stiffness for unloading
 			if(W->get_stiffness()->sign_det() < 0) t_lambda = -t_lambda;
 		}
-		else t_lambda = -dot(disp_ref, t_ninja) / dot(disp_ref, disp_a);
 
 		// abaqus update
 		disp_ref = disp_a;

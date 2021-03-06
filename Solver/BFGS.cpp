@@ -74,9 +74,9 @@ int BFGS::analyze() {
 				auto& border = W->get_auxiliary_stiffness();
 				mat right;
 				if(G->solve_trs(right, border) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
-				vec aux_factor;
+				auto& aux_factor = get_incre_auxiliary_lambda(W);
 				if(!solve(aux_factor, border.t() * right.head_rows(n_size), border.t() * ninja.head_rows(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
-				// W->update_trial_auxiliary_resistance(W->get_trial_auxiliary_resistance() + border * aux_factor);
+				G->update_constraint(); // for tracking multiplier
 				ninja -= right * aux_factor;
 			}
 		}
@@ -102,9 +102,9 @@ int BFGS::analyze() {
 				auto& border = W->get_auxiliary_stiffness();
 				mat right;
 				if(G->solve_trs(right, border) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
-				vec aux_factor;
+				auto& aux_factor = get_incre_auxiliary_lambda(W);
 				if(!solve(aux_factor, border.t() * right.head_rows(n_size), border.t() * ninja.head_rows(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
-				// W->update_trial_auxiliary_resistance(W->get_trial_auxiliary_resistance() + border * aux_factor);
+				G->update_constraint();
 				ninja -= right * aux_factor;
 			}
 			// left side loop

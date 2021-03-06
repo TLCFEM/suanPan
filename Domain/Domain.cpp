@@ -1313,6 +1313,20 @@ void Domain::erase_machine_error() const {
 	for(const auto& I : restrained_dofs) t_ninja(I) = 0.;
 }
 
+void Domain::update_constraint() {
+	auto& t_encoding = factory->get_auxiliary_encoding();
+	auto& t_lambda = factory->get_incre_auxiliary_lambda();
+
+	for(auto I = 0llu; I < t_encoding.n_elem;)
+		if(0 == t_encoding(I)) ++I;
+		else {
+			auto& t_constraint = get<Constraint>(t_encoding(I));
+			const auto t_size = t_constraint->get_multiplier_size();
+			t_constraint->update_incre_lambda(t_lambda.subvec(I, I + t_size - 1));
+			I += t_size;
+		}
+}
+
 int Domain::update_trial_status() const {
 	auto& trial_displacement = factory->get_trial_displacement();
 	auto& trial_velocity = factory->get_trial_velocity();

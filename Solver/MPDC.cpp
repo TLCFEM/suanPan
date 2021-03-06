@@ -51,7 +51,10 @@ int MPDC::analyze() {
 			mat right, kernel;
 			auto& border = W->get_auxiliary_stiffness();
 			if(G->solve_trs(right, border) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
-			ninja -= right * solve(kernel = border.t() * right.head_rows(n_size), border.t() * ninja.head_rows(n_size) - G->get_auxiliary_residual());
+			auto& aux_factor = get_incre_auxiliary_lambda(W);
+			if(!solve(aux_factor, kernel = border.t() * right.head_rows(n_size), border.t() * ninja.head_rows(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
+			G->update_constraint();
+			ninja -= right * aux_factor;
 			disp_a -= right * solve(kernel, border.t() * disp_a.head_rows(n_size));
 		}
 

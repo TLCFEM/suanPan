@@ -22,10 +22,11 @@
 
 const double Constraint::multiplier = 1E8;
 
-Constraint::Constraint(const unsigned T, const unsigned ST, const unsigned AT, uvec&& N, uvec&& D)
+Constraint::Constraint(const unsigned T, const unsigned ST, const unsigned AT, uvec&& N, uvec&& D, const unsigned S)
 	: Tag(T)
 	, start_step(0 == ST ? 1 : ST)
 	, amplitude_tag(AT)
+	, num_size(S)
 	, nodes(std::forward<uvec>(N))
 	, dofs(std::forward<uvec>(D)) { suanpan_debug("Constraint %u ctor() called.\n", get_tag()); }
 
@@ -56,6 +57,12 @@ int Constraint::initialize(const shared_ptr<DomainBase>& D) {
 }
 
 void Constraint::set_initialized(const bool B) const { access::rw(initialized) = B; }
+
+bool Constraint::is_initialized() const { return initialized; }
+
+void Constraint::set_multiplier_size(const unsigned S) { num_size = S; }
+
+unsigned Constraint::get_multiplier_size() const { return num_size; }
 
 /**
  * \brief method to set `start_step`.
@@ -90,10 +97,15 @@ bool Constraint::validate_step(const shared_ptr<DomainBase>& D) const {
 	return true;
 }
 
-void Constraint::commit_status() {}
+void Constraint::update_incre_lambda(const vec& i_lambda) { trial_lambda += i_lambda; }
 
-void Constraint::clear_status() { access::rw(initialized) = false; }
+void Constraint::commit_status() { current_lambda = trial_lambda; }
 
-void Constraint::reset_status() {}
+void Constraint::clear_status() {
+	current_lambda = trial_lambda = 0.;
+	access::rw(initialized) = false;
+}
+
+void Constraint::reset_status() { trial_lambda = current_lambda; }
 
 void set_constraint_multiplier(const double M) { access::rw(Constraint::multiplier) = M; }

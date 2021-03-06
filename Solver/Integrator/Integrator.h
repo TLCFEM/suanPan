@@ -80,6 +80,8 @@ public:
 	virtual sp_mat get_auxiliary_stiffness();
 	virtual vec get_auxiliary_residual();
 
+	virtual void update_constraint();
+
 	void update_trial_time(double);
 	void update_incre_time(double);
 	virtual int update_trial_status();

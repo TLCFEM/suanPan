@@ -88,6 +88,8 @@ vec Integrator::get_auxiliary_residual() {
 	return W->get_auxiliary_load() - W->get_trial_auxiliary_resistance();
 }
 
+void Integrator::update_constraint() { database.lock()->update_constraint(); }
+
 void Integrator::update_trial_time(const double T) {
 	const auto& W = get_domain().lock()->get_factory();
 

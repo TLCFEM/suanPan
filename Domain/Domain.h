@@ -352,6 +352,8 @@ public:
 
 	void erase_machine_error() const override;
 
+	void update_constraint() override;
+
 	int update_current_status() const override;
 	int update_incre_status() const override;
 	int update_trial_status() const override;
