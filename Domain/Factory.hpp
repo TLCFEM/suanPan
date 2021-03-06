@@ -74,7 +74,6 @@ template<typename T> class Factory final {
 
 	Col<T> incre_auxiliary_lambda;       // for constraints using multiplier method
 	Col<T> trial_auxiliary_resistance;   // for constraints using multiplier method
-	Col<T> incre_auxiliary_resistance;   // for constraints using multiplier method
 	Col<T> current_auxiliary_resistance; // for constraints using multiplier method
 
 	T trial_time = 0.;   // global trial (pseudo) time
@@ -207,7 +206,6 @@ public:
 	void set_reference_load(const SpMat<T>&);
 
 	void set_trial_auxiliary_resistance(const Col<T>&) const;
-	void set_incre_auxiliary_resistance(const Col<T>&) const;
 	void set_current_auxiliary_resistance(const Col<T>&) const;
 
 	void set_trial_time(const T&);
@@ -283,7 +281,6 @@ public:
 	const Col<T>& get_incre_auxiliary_lambda() const;
 
 	const Col<T>& get_trial_auxiliary_resistance() const;
-	const Col<T>& get_incre_auxiliary_resistance() const;
 	const Col<T>& get_current_auxiliary_resistance() const;
 
 	const T& get_trial_time() const;
@@ -345,7 +342,6 @@ public:
 	/*************************UPDATER*************************/
 
 	void update_trial_auxiliary_resistance(const Col<T>&);
-	void update_incre_auxiliary_resistance(const Col<T>&);
 	void update_current_auxiliary_resistance(const Col<T>&);
 
 	void update_trial_time(const T&);
@@ -400,7 +396,6 @@ public:
 	template<typename T1> friend Col<T1>& get_incre_auxiliary_lambda(const shared_ptr<Factory<T1>>&);
 
 	template<typename T1> friend Col<T1>& get_trial_auxiliary_resistance(const shared_ptr<Factory<T1>>&);
-	template<typename T1> friend Col<T1>& get_incre_auxiliary_resistance(const shared_ptr<Factory<T1>>&);
 	template<typename T1> friend Col<T1>& get_current_auxiliary_resistance(const shared_ptr<Factory<T1>>&);
 
 	template<typename T1> friend T& get_trial_time(const shared_ptr<Factory<T1>>&);
@@ -743,7 +738,6 @@ template<typename T> void Factory<T>::initialize_temperature() {
 
 template<typename T> void Factory<T>::initialize_auxiliary_resistance() {
 	trial_auxiliary_resistance.reset();
-	incre_auxiliary_resistance.reset();
 	current_auxiliary_resistance.reset();
 }
 
@@ -898,8 +892,6 @@ template<typename T> void Factory<T>::set_reference_load(const SpMat<T>& L) { re
 
 template<typename T> void Factory<T>::set_trial_auxiliary_resistance(const Col<T>& R) const { trial_auxiliary_resistance = R; }
 
-template<typename T> void Factory<T>::set_incre_auxiliary_resistance(const Col<T>& R) const { incre_auxiliary_resistance = R; }
-
 template<typename T> void Factory<T>::set_current_auxiliary_resistance(const Col<T>& R) const { current_auxiliary_resistance = R; }
 
 template<typename T> void Factory<T>::set_trial_time(const T& M) { trial_time = M; }
@@ -1020,8 +1012,6 @@ template<typename T> const Col<T>& Factory<T>::get_incre_auxiliary_lambda() cons
 
 template<typename T> const Col<T>& Factory<T>::get_trial_auxiliary_resistance() const { return trial_auxiliary_resistance; }
 
-template<typename T> const Col<T>& Factory<T>::get_incre_auxiliary_resistance() const { return incre_auxiliary_resistance; }
-
 template<typename T> const Col<T>& Factory<T>::get_current_auxiliary_resistance() const { return current_auxiliary_resistance; }
 
 template<typename T> const T& Factory<T>::get_trial_time() const { return trial_time; }
@@ -1124,20 +1114,9 @@ template<typename T> const Col<T>& Factory<T>::get_eigenvalue() const { return e
 
 template<typename T> const Mat<T>& Factory<T>::get_eigenvector() const { return eigenvector; }
 
-template<typename T> void Factory<T>::update_trial_auxiliary_resistance(const Col<T>& R) {
-	trial_auxiliary_resistance = R;
-	incre_auxiliary_resistance = trial_auxiliary_resistance - current_auxiliary_resistance;
-}
+template<typename T> void Factory<T>::update_trial_auxiliary_resistance(const Col<T>& R) { trial_auxiliary_resistance = R; }
 
-template<typename T> void Factory<T>::update_incre_auxiliary_resistance(const Col<T>& R) {
-	incre_auxiliary_resistance = R;
-	trial_auxiliary_resistance = current_auxiliary_resistance + incre_auxiliary_resistance;
-}
-
-template<typename T> void Factory<T>::update_current_auxiliary_resistance(const Col<T>& R) {
-	trial_auxiliary_resistance = current_auxiliary_resistance = R;
-	incre_auxiliary_resistance.zeros();
-}
+template<typename T> void Factory<T>::update_current_auxiliary_resistance(const Col<T>& R) { trial_auxiliary_resistance = current_auxiliary_resistance = R; }
 
 template<typename T> void Factory<T>::update_trial_time(const T& M) {
 	trial_time = M;
@@ -1387,7 +1366,6 @@ template<typename T> void Factory<T>::commit_temperature() {
 template<typename T> void Factory<T>::commit_auxiliary_resistance() {
 	if(trial_auxiliary_resistance.is_empty()) return;
 	current_auxiliary_resistance = trial_auxiliary_resistance;
-	incre_auxiliary_resistance.zeros();
 }
 
 template<typename T> void Factory<T>::commit_pre_status() {
@@ -1519,7 +1497,6 @@ template<typename T> void Factory<T>::clear_temperature() {
 
 template<typename T> void Factory<T>::clear_auxiliary_resistance() {
 	if(!trial_auxiliary_resistance.is_empty()) trial_auxiliary_resistance.zeros();
-	if(!incre_auxiliary_resistance.is_empty()) incre_auxiliary_resistance.zeros();
 	if(!current_auxiliary_resistance.is_empty()) current_auxiliary_resistance.zeros();
 }
 
@@ -1608,7 +1585,6 @@ template<typename T> void Factory<T>::reset_temperature() {
 template<typename T> void Factory<T>::reset_auxiliary_resistance() {
 	if(trial_auxiliary_resistance.is_empty()) return;
 	trial_auxiliary_resistance = current_auxiliary_resistance;
-	incre_auxiliary_resistance.zeros();
 }
 
 template<typename T> void Factory<T>::clear_eigen() {
@@ -1695,8 +1671,6 @@ template<typename T1> uvec& get_auxiliary_encoding(const shared_ptr<Factory<T1>>
 template<typename T1> Col<T1>& get_incre_auxiliary_lambda(const shared_ptr<Factory<T1>>& W) { return W->incre_auxiliary_lambda; }
 
 template<typename T> Col<T>& get_trial_auxiliary_resistance(const shared_ptr<Factory<T>>& W) { return W->trial_auxiliary_resistance; }
-
-template<typename T> Col<T>& get_incre_auxiliary_resistance(const shared_ptr<Factory<T>>& W) { return W->incre_auxiliary_resistance; }
 
 template<typename T> Col<T>& get_current_auxiliary_resistance(const shared_ptr<Factory<T>>& W) { return W->current_auxiliary_resistance; }
 

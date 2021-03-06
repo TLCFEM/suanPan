@@ -92,9 +92,8 @@ void Constraint::set_end_step(const unsigned ST) { end_step = ST; }
 unsigned Constraint::get_end_step() const { return end_step; }
 
 bool Constraint::validate_step(const shared_ptr<DomainBase>& D) const {
-	if(const auto& t_step = D->get_current_step_tag(); t_step < start_step || t_step >= end_step) return false;
-
-	return true;
+	const auto t_step = D->get_current_step_tag();
+	return t_step >= start_step && t_step < end_step;
 }
 
 void Constraint::update_incre_lambda(const vec& i_lambda) { trial_lambda += i_lambda; }

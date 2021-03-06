@@ -67,9 +67,8 @@ void Load::set_end_step(const unsigned T) { end_step = T; }
 unsigned Load::get_end_step() const { return end_step; }
 
 bool Load::validate_step(const shared_ptr<DomainBase>& D) const {
-	if(const auto& t_step = D->get_current_step_tag(); t_step < start_step || t_step >= end_step) return false;
-
-	return true;
+	const auto t_step = D->get_current_step_tag();
+	return t_step >= start_step && t_step < end_step;
 }
 
 void Load::commit_status() {}

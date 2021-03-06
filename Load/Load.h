@@ -41,6 +41,8 @@ class Load : public Tag {
 protected:
 	static const double multiplier;
 
+	const bool initialized = false;
+
 	unsigned start_step, amplitude_tag;
 
 	unsigned end_step = static_cast<unsigned>(-1);
@@ -53,10 +55,8 @@ protected:
 
 	friend void set_load_multiplier(double);
 public:
-	const bool initialized = false;
-
 	explicit Load(unsigned = 0, unsigned = 0, unsigned = 0, uvec&& = {}, uvec&& = {}, double = 0.);
-	virtual ~Load();
+	~Load() override;
 
 	virtual int initialize(const shared_ptr<DomainBase>&);
 
