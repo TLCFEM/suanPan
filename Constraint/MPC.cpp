@@ -19,6 +19,7 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Domain/Node.h>
+#include <Load/Amplitude/Amplitude.h>
 
 MPC::MPC(const unsigned T, const unsigned S, const unsigned A, uvec&& N, uvec&& D, vec&& W, const double L)
 	: Constraint(T, S, A, std::forward<uvec>(N), std::forward<uvec>(D))

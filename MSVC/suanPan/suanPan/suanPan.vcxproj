@@ -132,6 +132,7 @@
     <ClCompile Include="..\..\..\Database\Database.cpp" />
     <ClCompile Include="..\..\..\Database\HDF.cpp" />
     <ClCompile Include="..\..\..\Database\SQL.cpp" />
+    <ClCompile Include="..\..\..\Domain\ConditionalModifier.cpp" />
     <ClCompile Include="..\..\..\Domain\Domain.cpp" />
     <ClCompile Include="..\..\..\Domain\DomainBase.cpp" />
     <ClCompile Include="..\..\..\Domain\ElementGroup.cpp" />
@@ -475,6 +476,7 @@
     <ClInclude Include="..\..\..\Database\Database.h" />
     <ClInclude Include="..\..\..\Database\HDF.h" />
     <ClInclude Include="..\..\..\Database\SQL.h" />
+    <ClInclude Include="..\..\..\Domain\ConditionalModifier.h" />
     <ClInclude Include="..\..\..\Domain\Domain.h" />
     <ClInclude Include="..\..\..\Domain\DomainBase.h" />
     <ClInclude Include="..\..\..\Domain\ElementGroup.h" />

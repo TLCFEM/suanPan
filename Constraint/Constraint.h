@@ -31,27 +31,16 @@
 #ifndef CONSTRAINT_H
 #define CONSTRAINT_H
 
-#include <Domain/Tag.h>
-#include <Load/Amplitude/Amplitude.h>
+#include <Domain/ConditionalModifier.h>
 
-class DomainBase;
-
-class Constraint : public Tag {
+class Constraint : public ConditionalModifier {
 protected:
 	static const double multiplier;
-
-	const bool initialized = false;
-
-	unsigned start_step = 0; /**< step tag */
-	unsigned end_step = static_cast<unsigned>(-1);
-	unsigned amplitude_tag = 0;
 
 	unsigned num_size; // size of multiplier
 
 	uvec nodes; /**< node indices */
 	uvec dofs;  /**< DoF indices */
-
-	shared_ptr<Amplitude> magnitude;
 
 	vec trial_lambda = zeros(num_size);
 	vec current_lambda = zeros(num_size);
@@ -66,30 +55,15 @@ public:
 
 	~Constraint() override;
 
-	virtual int initialize(const shared_ptr<DomainBase>&);
-
-	virtual int process(const shared_ptr<DomainBase>&) = 0;
-
-	void set_initialized(bool) const;
-	[[nodiscard]] bool is_initialized() const;
-
 	void set_multiplier_size(unsigned);
 	[[nodiscard]] unsigned get_multiplier_size() const;
-
-	void set_start_step(unsigned);
-	[[nodiscard]] unsigned get_start_step() const;
-
-	void set_end_step(unsigned);
-	[[nodiscard]] unsigned get_end_step() const;
-
-	[[nodiscard]] bool validate_step(const shared_ptr<DomainBase>&) const;
 
 	void update_incre_lambda(const vec&);
 
 	// some constraint may manage state
-	virtual void commit_status();
-	virtual void clear_status();
-	virtual void reset_status();
+	void commit_status() override;
+	void clear_status() override;
+	void reset_status() override;
 };
 
 void set_constraint_multiplier(double);

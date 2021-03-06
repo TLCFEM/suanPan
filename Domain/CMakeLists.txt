@@ -10,6 +10,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         Domain/NodeGroup.cpp
         Domain/Storage.hpp
         Domain/Tag.cpp
+        Domain/ConditionalModifier.cpp
         )
 
 add_subdirectory(MetaMat)

@@ -32,50 +32,25 @@
 #ifndef LOAD_H
 #define LOAD_H
 
-#include <Domain/Tag.h>
+#include <Domain/ConditionalModifier.h>
 
-class Amplitude;
-class DomainBase;
-
-class Load : public Tag {
+class Load : public ConditionalModifier {
 protected:
 	static const double multiplier;
-
-	const bool initialized = false;
-
-	unsigned start_step, amplitude_tag;
-
-	unsigned end_step = static_cast<unsigned>(-1);
 
 	const uvec nodes, dofs;
 
 	const double pattern;
 
-	shared_ptr<Amplitude> magnitude;
-
 	friend void set_load_multiplier(double);
 public:
 	explicit Load(unsigned = 0, unsigned = 0, unsigned = 0, uvec&& = {}, uvec&& = {}, double = 0.);
+	Load(const Load&) = delete;            // copy forbidden
+	Load(Load&&) = delete;                 // move forbidden
+	Load& operator=(const Load&) = delete; // assign forbidden
+	Load& operator=(Load&&) = delete;      // assign forbidden
+
 	~Load() override;
-
-	virtual int initialize(const shared_ptr<DomainBase>&);
-
-	virtual int process(const shared_ptr<DomainBase>&) = 0;
-
-	void set_initialized(bool) const;
-
-	void set_start_step(unsigned);
-	[[nodiscard]] unsigned get_start_step() const;
-
-	void set_end_step(unsigned);
-	[[nodiscard]] unsigned get_end_step() const;
-
-	[[nodiscard]] bool validate_step(const shared_ptr<DomainBase>&) const;
-
-	// some loads may manage state
-	virtual void commit_status();
-	virtual void clear_status();
-	virtual void reset_status();
 };
 
 void set_load_multiplier(double);

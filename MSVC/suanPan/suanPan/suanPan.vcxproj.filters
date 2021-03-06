@@ -1189,6 +1189,9 @@
     <ClCompile Include="..\..\..\Element\Membrane\SGCMQ.cpp">
       <Filter>Element\Membrane</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Domain\ConditionalModifier.cpp">
+      <Filter>Domain</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2271,6 +2274,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Element\Membrane\SGCMQ.h">
       <Filter>Element\Membrane</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\ConditionalModifier.h">
+      <Filter>Domain</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

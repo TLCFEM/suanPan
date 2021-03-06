@@ -12,3 +12,4 @@
 #include "NodeGroup.h"
 #include "Storage.hpp"
 #include "Tag.h"
+#include "ConditionalModifier.h"
