@@ -740,9 +740,18 @@ int Domain::reorder_dof() {
 	// collect connectivity
 	vector<unordered_set<uword>> adjacency(dof_counter);
 	for(const auto& t_element : element_pond.get()) {
+		if(!t_element->is_active()) continue;
 		t_element->update_dof_encoding();
 		auto& t_encoding = t_element->get_dof_encoding();
-		for(const auto& i : t_encoding) for(const auto& j : t_encoding) adjacency[i].insert(j);
+		for(const auto& I : t_encoding) for(const auto& J : t_encoding) adjacency[I].insert(J);
+	}
+
+	// for nonlinear constraint
+	for(const auto& t_constraint : constraint_pond.get()) {
+		if(0 == t_constraint->get_multiplier_size()) continue;
+		vector<uword> t_encoding;
+		for(auto& I : t_constraint->get_encoding()) if(find<Node>(I)) for(auto& J : get<Node>(I)->get_reordered_dof()) t_encoding.emplace_back(J);
+		for(const auto& I : t_encoding) for(const auto& J : t_encoding) adjacency[I].insert(J);
 	}
 
 	// count number of degree
@@ -889,7 +898,6 @@ int Domain::initialize() {
 	// element may reply on groups
 	suanpan_for_each(element_pond.cbegin(), element_pond.cend(), [&](const std::pair<unsigned, shared_ptr<Element>>& t_element) {
 		if(!t_element.second->is_active()) return;
-
 		// clear node pointer array to enable initialisation
 		t_element.second->clear_node_ptr();
 		t_element.second->initialize_base(shared_from_this());

@@ -22,7 +22,7 @@
 #include <Load/Amplitude/Amplitude.h>
 
 MPC::MPC(const unsigned T, const unsigned S, const unsigned A, uvec&& N, uvec&& D, vec&& W, const double L)
-	: Constraint(T, S, A, std::forward<uvec>(N), std::forward<uvec>(D))
+	: Constraint(T, S, A, std::forward<uvec>(N), std::forward<uvec>(D), 0)
 	, weight_pool(std::forward<vec>(W))
 	, psudo_load(L) {}
 

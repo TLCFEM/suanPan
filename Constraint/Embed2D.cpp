@@ -23,16 +23,16 @@
 #include <Toolbox/shapeFunction.h>
 
 Embed2D::Embed2D(const unsigned T, const unsigned S, const unsigned ET, const unsigned NT)
-	: Constraint(T, S, 0, {ET, NT}, {}) {}
+	: Constraint(T, S, 0, {NT}, {ET}, 0) {}
 
 int Embed2D::initialize(const shared_ptr<DomainBase>& D) {
-	if(!D->find<Node>(nodes(1)) || !D->find<Element>(nodes(0))) {
+	if(!D->find<Node>(nodes(0)) || !D->find<Element>(dofs(0))) {
 		D->disable_constraint(get_tag());
 		return SUANPAN_SUCCESS;
 	}
 
-	auto& t_node = D->get<Node>(nodes(1));
-	auto& t_element = D->get<Element>(nodes(0));
+	auto& t_node = D->get<Node>(nodes(0));
+	auto& t_element = D->get<Element>(dofs(0));
 
 	if(!t_node->is_active() || !t_element->is_active() || 4 != t_element->get_node_number()) {
 		D->disable_constraint(get_tag());
@@ -67,8 +67,8 @@ int Embed2D::process(const shared_ptr<DomainBase>& D) {
 
 	auto last_pos = W->get_mpc();
 
-	auto& n_dof = D->get<Node>(nodes(1))->get_reordered_dof();
-	auto& e_dof = D->get<Element>(nodes(0))->get_dof_encoding();
+	auto& n_dof = D->get<Node>(nodes(0))->get_reordered_dof();
+	auto& e_dof = D->get<Element>(dofs(0))->get_dof_encoding();
 
 	sp_vec slice_x(W->get_size());
 	slice_x(n_dof(0)) = -1.;

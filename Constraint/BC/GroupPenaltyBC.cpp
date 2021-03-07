@@ -39,8 +39,6 @@ GroupPenaltyBC::GroupPenaltyBC(const unsigned T, const unsigned S, uvec&& N, con
 	: MultiplierBC(T, S, uvec{}, TP)
 	, groups(std::forward<uvec>(N)) {}
 
-GroupPenaltyBC::~GroupPenaltyBC() = default;
-
 int GroupPenaltyBC::process(const shared_ptr<DomainBase>& D) {
 	update_node_tag(D);
 

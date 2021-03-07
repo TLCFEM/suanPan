@@ -21,13 +21,13 @@
 #include <Domain/Node.h>
 
 RigidWallPenalty::RigidWallPenalty(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& N, const double F)
-	: Constraint(T, S, A, {}, {})
+	: Constraint(T, S, A, {}, {}, 0)
 	, alpha(F)
 	, origin(std::forward<vec>(O))
 	, norm(normalise(N)) {}
 
 RigidWallPenalty::RigidWallPenalty(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double F)
-	: Constraint(T, S, A, {}, {})
+	: Constraint(T, S, A, {}, {}, 0)
 	, alpha(F)
 	, edge_a(E1 - O)
 	, edge_b(E2 - O)

@@ -27,6 +27,8 @@ Constraint::Constraint(const unsigned T, const unsigned ST, const unsigned AT, u
 
 Constraint::~Constraint() { suanpan_debug("Constraint %u dtor() called.\n", get_tag()); }
 
+const uvec& Constraint::get_encoding() const { return nodes; }
+
 void Constraint::set_multiplier_size(const unsigned S) { num_size = S; }
 
 unsigned Constraint::get_multiplier_size() const { return num_size; }

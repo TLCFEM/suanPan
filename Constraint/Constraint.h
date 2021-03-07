@@ -47,13 +47,15 @@ protected:
 
 	friend void set_constraint_multiplier(double);
 public:
-	Constraint(unsigned, unsigned, unsigned, uvec&&, uvec&&, unsigned = 0);
+	Constraint(unsigned, unsigned, unsigned, uvec&&, uvec&&, unsigned);
 	Constraint(const Constraint&) = delete;            // copy forbidden
 	Constraint(Constraint&&) = delete;                 // move forbidden
 	Constraint& operator=(const Constraint&) = delete; // assign forbidden
 	Constraint& operator=(Constraint&&) = delete;      // assign forbidden
 
 	~Constraint() override;
+
+	const uvec& get_encoding() const;
 
 	void set_multiplier_size(unsigned);
 	[[nodiscard]] unsigned get_multiplier_size() const;

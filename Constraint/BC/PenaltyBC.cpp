@@ -29,7 +29,7 @@
  * \param D `dofs`
  */
 PenaltyBC::PenaltyBC(const unsigned T, const unsigned S, uvec&& N, const unsigned D)
-	: Constraint(T, S, 0, std::forward<uvec>(N), {D}) {}
+	: Constraint(T, S, 0, std::forward<uvec>(N), {D}, 0) {}
 
 /**
  * \brief the constructor uses DoF vector.
@@ -39,7 +39,7 @@ PenaltyBC::PenaltyBC(const unsigned T, const unsigned S, uvec&& N, const unsigne
  * \param D `dofs`
  */
 PenaltyBC::PenaltyBC(const unsigned T, const unsigned S, uvec&& N, uvec&& D)
-	: Constraint(T, S, 0, std::forward<uvec>(N), std::forward<uvec>(D)) {}
+	: Constraint(T, S, 0, std::forward<uvec>(N), std::forward<uvec>(D), 0) {}
 
 /**
  * \brief the constructor uses predefined TYPE: "XSYMM", "YSYMM",
@@ -51,7 +51,7 @@ PenaltyBC::PenaltyBC(const unsigned T, const unsigned S, uvec&& N, uvec&& D)
  * \param TP PenaltyBC TYPE
  */
 PenaltyBC::PenaltyBC(const unsigned T, const unsigned S, uvec&& N, const char* TP)
-	: Constraint(T, S, 0, std::forward<uvec>(N), {}) {
+	: Constraint(T, S, 0, std::forward<uvec>(N), {}, 0) {
 	if(is_equal(TP[0], 'X')) dofs = uvec{1, 5, 6};
 	else if(is_equal(TP[0], 'Y')) dofs = uvec{2, 4, 6};
 	else if(is_equal(TP[0], 'Z')) dofs = uvec{3, 4, 5};
