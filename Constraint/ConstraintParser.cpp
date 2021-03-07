@@ -29,6 +29,8 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, istringstream& c
 	unique_ptr<Constraint> new_constraint = nullptr;
 
 	if(is_equal(constraint_id, "Embed2D")) new_embed2d(new_constraint, command);
+	else if(is_equal(constraint_id, "FixedLength2D")) new_fixedlength(new_constraint, command, 2);
+	else if(is_equal(constraint_id, "FixedLength3D")) new_fixedlength(new_constraint, command, 3);
 	else if(is_equal(constraint_id, "MPC")) new_mpc(new_constraint, command);
 	else if(is_equal(constraint_id, "ParticleCollision2D")) new_particlecollision2d(new_constraint, command);
 	else if(is_equal(constraint_id, "ParticleCollision3D")) new_particlecollision3d(new_constraint, command);
@@ -69,6 +71,22 @@ void new_bc(unique_ptr<Constraint>& return_obj, istringstream& command, const bo
 	const auto bc_type = suanpan::to_lower(dof_id[0]);
 
 	penalty ? group ? return_obj = make_unique<GroupPenaltyBC>(bc_id, 0, uvec(node_tag), bc_type) : return_obj = make_unique<PenaltyBC>(bc_id, 0, uvec(node_tag), bc_type) : group ? return_obj = make_unique<GroupMultiplierBC>(bc_id, 0, uvec(node_tag), bc_type) : return_obj = make_unique<MultiplierBC>(bc_id, 0, uvec(node_tag), bc_type);
+}
+
+void new_fixedlength(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dof) {
+	unsigned tag;
+	if(!get_input(command, tag)) {
+		suanpan_error("new_fixedlength() needs a valid tag.\n");
+		return;
+	}
+
+	uword node_i, node_j;
+	if(!get_input(command, node_i) || !get_input(command, node_j)) {
+		suanpan_error("new_fixedlength() needs two node tags.\n");
+		return;
+	}
+
+	return_obj = make_unique<FixedLength>(tag, 0, 0, dof, uvec{node_i, node_j});
 }
 
 void new_embed2d(unique_ptr<Constraint>& return_obj, istringstream& command) {

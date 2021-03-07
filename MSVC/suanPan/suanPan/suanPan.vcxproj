@@ -111,6 +111,7 @@
     <ClCompile Include="..\..\..\Constraint\Criterion\NodeBasedCriterion.cpp" />
     <ClCompile Include="..\..\..\Constraint\Criterion\StrainEnergyEvolution.cpp" />
     <ClCompile Include="..\..\..\Constraint\Embed2D.cpp" />
+    <ClCompile Include="..\..\..\Constraint\FixedLength.cpp" />
     <ClCompile Include="..\..\..\Constraint\MPC.cpp" />
     <ClCompile Include="..\..\..\Constraint\ParticleCollision.cpp" />
     <ClCompile Include="..\..\..\Constraint\ParticleCollision2D.cpp" />
@@ -455,6 +456,7 @@
     <ClInclude Include="..\..\..\Constraint\Criterion\NodeBasedCriterion.h" />
     <ClInclude Include="..\..\..\Constraint\Criterion\StrainEnergyEvolution.h" />
     <ClInclude Include="..\..\..\Constraint\Embed2D.h" />
+    <ClInclude Include="..\..\..\Constraint\FixedLength.h" />
     <ClInclude Include="..\..\..\Constraint\MPC.h" />
     <ClInclude Include="..\..\..\Constraint\ParticleCollision.h" />
     <ClInclude Include="..\..\..\Constraint\ParticleCollision2D.h" />

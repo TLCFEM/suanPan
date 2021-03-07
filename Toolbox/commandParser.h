@@ -49,6 +49,7 @@ int create_new_converger(const shared_ptr<DomainBase>&, istringstream&);
 int create_new_criterion(const shared_ptr<DomainBase>&, istringstream&);
 int create_new_displacement(const shared_ptr<DomainBase>&, istringstream&, bool = false);
 int create_new_external_module(const shared_ptr<DomainBase>&, istringstream&);
+int create_new_fixedlength(const shared_ptr<DomainBase>&, istringstream&, unsigned);
 int create_new_nodegroup(const shared_ptr<DomainBase>&, istringstream&);
 int create_new_elementgroup(const shared_ptr<DomainBase>&, istringstream&);
 int create_new_generate(const shared_ptr<DomainBase>&, istringstream&);

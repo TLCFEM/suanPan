@@ -14,20 +14,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @class FixedLength
+ * @brief A FixedLength class.
+ *
+ * @author tlc
+ * @date 07/03/2021
+ * @version 0.1.0
+ * @file FixedLength.h
+ * @addtogroup Constraint
+ * @{
+ */
 
-#ifndef CONSTRAINTPARSER_H
-#define CONSTRAINTPARSER_H
+#ifndef FIXEDLENGTH_H
+#define FIXEDLENGTH_H
 
-#include <suanPan.h>
+#include <Constraint/Constraint.h>
 
-int create_new_constraint(const shared_ptr<DomainBase>&, istringstream&);
+class FixedLength final : public Constraint {
+public:
+	FixedLength(unsigned, unsigned, unsigned, unsigned, uvec&&);
 
-void new_embed2d(unique_ptr<Constraint>&, istringstream&);
-void new_fixedlength(unique_ptr<Constraint>&, istringstream&, unsigned);
-void new_mpc(unique_ptr<Constraint>&, istringstream&);
-void new_particlecollision2d(unique_ptr<Constraint>&, istringstream&);
-void new_particlecollision3d(unique_ptr<Constraint>&, istringstream&);
-void new_rigidwall(unique_ptr<Constraint>&, istringstream&, bool, bool);
-void new_bc(unique_ptr<Constraint>&, istringstream&, bool, bool);
+	int initialize(const shared_ptr<DomainBase>&) override;
+
+	int process(const shared_ptr<DomainBase>&) override;
+};
 
 #endif
+
+//! @}

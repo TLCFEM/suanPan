@@ -67,6 +67,8 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
 	if(is_equal(command_id, "finiterigidwallmultiplier")) return create_new_rigidwall(domain, command, true, false);
 	if(is_equal(command_id, "fix")) return create_new_bc(domain, command, true);
 	if(is_equal(command_id, "fix2")) return create_new_bc(domain, command, false);
+	if(is_equal(command_id, "fixedlength2d")) return create_new_fixedlength(domain, command, 2);
+	if(is_equal(command_id, "fixedlength3d")) return create_new_fixedlength(domain, command, 3);
 	if(is_equal(command_id, "generate")) return create_new_generate(domain, command);
 	if(is_equal(command_id, "generatebyrule")) return create_new_generatebyrule(domain, command);
 	if(is_equal(command_id, "generatebypoint")) return create_new_generatebypoint(domain, command);
@@ -1129,6 +1131,24 @@ int create_new_external_module(const shared_ptr<DomainBase>& domain, istringstre
 		}
 
 	if(code == 0) domain->insert(make_shared<ExternalModule>(library_name));
+
+	return SUANPAN_SUCCESS;
+}
+
+int create_new_fixedlength(const shared_ptr<DomainBase>& domain, istringstream& command, const unsigned dof) {
+	unsigned tag;
+	if(!get_input(command, tag)) {
+		suanpan_error("create_new_fixedlength() needs a valid tag.\n");
+		return SUANPAN_SUCCESS;
+	}
+
+	uword node_i, node_j;
+	if(!get_input(command, node_i) || !get_input(command, node_j)) {
+		suanpan_error("create_new_fixedlength() needs two node tags.\n");
+		return SUANPAN_SUCCESS;
+	}
+
+	domain->insert(make_unique<FixedLength>(tag, domain->get_current_step_tag(), 0, dof, uvec{node_i, node_j}));
 
 	return SUANPAN_SUCCESS;
 }

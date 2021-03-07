@@ -4,6 +4,7 @@
 
 1. update handling of constraints
 2. store commands in backup file in CLI mode
+3. add `FixedLength2D` and `FixedLength3D` nonlinear constraints
 
 ## version 1.2
 

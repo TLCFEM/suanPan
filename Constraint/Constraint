@@ -10,3 +10,4 @@
 #include "ParticleCollision3D.h"
 #include "RigidWallMultiplier.h"
 #include "RigidWallPenalty.h"
+#include "FixedLength.h"

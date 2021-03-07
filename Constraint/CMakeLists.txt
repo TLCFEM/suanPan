@@ -8,6 +8,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         Constraint/ParticleCollision3D.cpp
         Constraint/RigidWallMultiplier.cpp
         Constraint/RigidWallPenalty.cpp
+        Constraint/FixedLength.cpp
         )
 
 add_subdirectory(BC)

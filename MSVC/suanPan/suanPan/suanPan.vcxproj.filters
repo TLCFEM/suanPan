@@ -1192,6 +1192,9 @@
     <ClCompile Include="..\..\..\Domain\ConditionalModifier.cpp">
       <Filter>Domain</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\FixedLength.cpp">
+      <Filter>Constraint</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2277,6 +2280,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Domain\ConditionalModifier.h">
       <Filter>Domain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\FixedLength.h">
+      <Filter>Constraint</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
