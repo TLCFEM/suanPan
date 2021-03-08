@@ -67,15 +67,25 @@ void Integrator::assemble_matrix() {
 }
 
 mat Integrator::get_force_residual() {
-	const auto& W = get_domain().lock()->get_factory();
+	const auto& D = database.lock();
+	const auto& W = D->get_factory();
 
-	return W->get_trial_load() - W->get_sushi();
+	vec residual = W->get_trial_load() - W->get_sushi();
+
+	for(auto& I : D->get_restrained_dof()) residual(I) = 0.;
+
+	return residual;
 }
 
 mat Integrator::get_displacement_residual() {
-	const auto& W = get_domain().lock()->get_factory();
+	const auto& D = database.lock();
+	const auto& W = D->get_factory();
 
-	return W->get_reference_load() * W->get_trial_load_factor() + W->get_trial_load() - W->get_sushi();
+	vec residual = W->get_reference_load() * W->get_trial_load_factor() + W->get_trial_load() - W->get_sushi();
+
+	for(auto& I : D->get_restrained_dof()) residual(I) = 0.;
+
+	return residual;
 }
 
 sp_mat Integrator::get_reference_load() { return database.lock()->get_factory()->get_reference_load(); }
