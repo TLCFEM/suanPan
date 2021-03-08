@@ -63,7 +63,7 @@ unsigned ConditionalModifier::get_end_step() const { return end_step; }
 
 bool ConditionalModifier::validate_step(const shared_ptr<DomainBase>& D) const {
 	const auto t_step = D->get_current_step_tag();
-	return t_step >= start_step && t_step < end_step;
+	return t_step >= start_step && t_step < end_step && is_active();
 }
 
 void ConditionalModifier::commit_status() {}
