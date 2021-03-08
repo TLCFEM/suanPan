@@ -34,11 +34,11 @@ int NodalDisplacement::initialize(const shared_ptr<DomainBase>& D) {
 
 	set_end_step(start_step + 1);
 
-	const auto& t_factory = D->get_factory();
+	const auto& W = D->get_factory();
 
 	vector<uword> r_dof;
 
-	for(auto I : t_factory->get_reference_dof()) r_dof.emplace_back(I);
+	for(auto I : W->get_reference_dof()) r_dof.emplace_back(I);
 
 	for(auto I : nodes)
 		if(auto& t_node = D->get<Node>(I); t_node != nullptr && t_node->is_active()) {
@@ -50,27 +50,24 @@ int NodalDisplacement::initialize(const shared_ptr<DomainBase>& D) {
 				}
 		}
 
-	t_factory->set_reference_dof(uvec(r_dof));
-	t_factory->set_reference_size(static_cast<unsigned>(r_dof.size()));
+	W->set_reference_dof(uvec(r_dof));
+	W->set_reference_size(static_cast<unsigned>(r_dof.size()));
 
 	return SUANPAN_SUCCESS;
 }
 
 int NodalDisplacement::process(const shared_ptr<DomainBase>& D) {
-	const auto& t_factory = D->get_factory();
+	const auto& W = D->get_factory();
 
-	const auto final_settlement = pattern * magnitude->get_amplitude(t_factory->get_trial_time());
+	const auto final_settlement = pattern * magnitude->get_amplitude(W->get_trial_time());
 
-	auto& t_settlement = get_trial_settlement(t_factory);
+	trial_settlement.zeros(W->get_size());
 
 	for(const auto& I : nodes)
-		if(D->find<Node>(I))
-			if(auto& t_node = D->get<Node>(I); t_node->is_active()) {
-				auto& t_dof = t_node->get_reordered_dof();
-				for(const auto& J : dofs) if(J <= t_dof.n_elem) t_settlement(t_dof(J - 1)) = final_settlement;
-			}
-
-	t_factory->set_incre_settlement(t_settlement - t_factory->get_current_settlement());
+		if(auto& t_node = D->get<Node>(I); nullptr != t_node && t_node->is_active()) {
+			auto& t_dof = t_node->get_reordered_dof();
+			for(const auto& J : dofs) if(J <= t_dof.n_elem) trial_settlement(t_dof(J - 1)) = final_settlement;
+		}
 
 	return SUANPAN_SUCCESS;
 }

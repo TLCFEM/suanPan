@@ -750,7 +750,7 @@ int Domain::reorder_dof() {
 	for(const auto& t_constraint : constraint_pond.get()) {
 		if(0 == t_constraint->get_multiplier_size()) continue;
 		vector<uword> t_encoding;
-		for(auto& I : t_constraint->get_encoding()) if(find<Node>(I)) for(auto& J : get<Node>(I)->get_reordered_dof()) t_encoding.emplace_back(J);
+		for(auto& I : t_constraint->get_node_encoding()) if(find<Node>(I)) for(auto& J : get<Node>(I)->get_reordered_dof()) t_encoding.emplace_back(J);
 		for(const auto& I : t_encoding) for(const auto& J : t_encoding) adjacency[I].insert(J);
 	}
 
@@ -1009,13 +1009,22 @@ int Domain::process_load() {
 	loaded_dofs.clear();
 
 	auto& t_load = get_trial_load(factory);
-	if(!t_load.is_empty()) t_load.zeros();
+	if(!t_load.empty()) t_load.zeros();
 
 	auto& t_settlement = get_trial_settlement(factory);
-	if(!t_settlement.is_empty()) t_settlement.zeros();
+	if(!t_settlement.empty()) t_settlement.zeros();
 
 	auto code = 0;
-	for(auto& I : load_pond.get()) if(I->validate_step(shared_from_this())) code += I->process(shared_from_this());
+	for(auto& I : load_pond.get())
+		if(I->validate_step(shared_from_this())) {
+			code += I->process(shared_from_this());
+			if(!I->get_trial_load().empty()) t_load += I->get_trial_load();
+			if(!I->get_trial_settlement().empty()) t_settlement += I->get_trial_settlement();
+		}
+
+	factory->update_trial_load(t_load);
+	factory->update_trial_settlement(t_settlement);
+
 	return code;
 }
 

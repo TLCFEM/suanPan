@@ -31,25 +31,26 @@ NodalAcceleration::NodalAcceleration(const unsigned T, const unsigned ST, const 
 	: Load(T, ST, AT, std::forward<uvec>(NT), uvec{DT}, L) {}
 
 int NodalAcceleration::process(const shared_ptr<DomainBase>& D) {
-	const auto& t_factory = D->get_factory();
+	const auto& W = D->get_factory();
 
-	if(t_factory->get_mass() == nullptr) return SUANPAN_SUCCESS;
+	trial_load.zeros(W->get_size());
 
-	vec ref_acc(t_factory->get_size(), fill::zeros);
+	if(nullptr == W->get_mass()) return SUANPAN_SUCCESS;
+
 	if(nodes.is_empty())
 		for(const auto& I : D->get_node_pool()) {
 			auto& t_dof = I->get_reordered_dof();
-			for(const auto& J : dofs) if(J <= t_dof.n_elem) ref_acc(t_dof(J - 1)) = 1.;
+			for(const auto& J : dofs) if(J <= t_dof.n_elem) trial_load(t_dof(J - 1)) = 1.;
 		}
 	else
 		for(const auto& I : nodes)
 			if(D->find<Node>(I))
 				if(auto& t_node = D->get<Node>(I); t_node->is_active()) {
 					auto& t_dof = t_node->get_reordered_dof();
-					for(const auto& J : dofs) if(J <= t_dof.n_elem) ref_acc(t_dof(J - 1)) = 1.;
+					for(const auto& J : dofs) if(J <= t_dof.n_elem) trial_load(t_dof(J - 1)) = 1.;
 				}
 
-	t_factory->update_trial_load(t_factory->get_trial_load() + t_factory->get_mass() * ref_acc * pattern * magnitude->get_amplitude(t_factory->get_trial_time()));
+	trial_load = W->get_mass() * trial_load * pattern * magnitude->get_amplitude(W->get_trial_time());
 
 	return SUANPAN_SUCCESS;
 }

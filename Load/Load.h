@@ -42,6 +42,9 @@ protected:
 
 	const double pattern;
 
+	vec trial_load;
+	vec trial_settlement;
+
 	friend void set_load_multiplier(double);
 public:
 	explicit Load(unsigned = 0, unsigned = 0, unsigned = 0, uvec&& = {}, uvec&& = {}, double = 0.);
@@ -51,6 +54,9 @@ public:
 	Load& operator=(Load&&) = delete;      // assign forbidden
 
 	~Load() override;
+
+	const vec& get_trial_load() const;
+	const vec& get_trial_settlement() const;
 };
 
 void set_load_multiplier(double);

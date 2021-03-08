@@ -30,7 +30,7 @@ BodyForce::BodyForce(const unsigned T, const unsigned S, const double L, uvec&& 
 int BodyForce::process(const shared_ptr<DomainBase>& D) {
 	const auto& t_factory = D->get_factory();
 
-	auto& t_load = get_trial_load(t_factory);
+	trial_load.zeros(t_factory->get_size());
 
 	const auto final_load = pattern * magnitude->get_amplitude(t_factory->get_trial_time());
 
@@ -38,11 +38,8 @@ int BodyForce::process(const shared_ptr<DomainBase>& D) {
 		if(auto& t_element = D->get<Element>(I); t_element != nullptr && t_element->is_active()) {
 			vec t_body_load(t_element->get_dof_number(), fill::zeros);
 			for(const auto& J : dofs) if(J <= t_element->get_dof_number()) t_body_load(J - 1) = final_load;
-			const auto& t_body_force = t_element->update_body_force(t_body_load);
-			if(!t_body_force.empty()) t_load(t_element->get_dof_encoding()) += t_element->update_body_force(t_body_load);
+			if(const auto& t_body_force = t_element->update_body_force(t_body_load); !t_body_force.empty()) trial_load(t_element->get_dof_encoding()) += t_body_force;
 		}
-
-	t_factory->set_incre_load(t_load - t_factory->get_current_load());
 
 	return SUANPAN_SUCCESS;
 }

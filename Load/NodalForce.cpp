@@ -28,24 +28,21 @@ NodalForce::NodalForce(const unsigned T, const unsigned S, const double L, uvec&
 	: Load(T, S, AT, std::forward<uvec>(N), std::forward<uvec>(D), L) {}
 
 int NodalForce::process(const shared_ptr<DomainBase>& D) {
-	const auto& t_factory = D->get_factory();
+	const auto& W = D->get_factory();
 
-	const auto final_load = pattern * magnitude->get_amplitude(t_factory->get_trial_time());
+	const auto final_load = pattern * magnitude->get_amplitude(W->get_trial_time());
 
-	auto& t_load = get_trial_load(t_factory);
+	trial_load.zeros(W->get_size());
 
 	for(const auto& I : nodes)
-		if(D->find<Node>(I))
-			if(auto& t_node = D->get<Node>(I); t_node->is_active()) {
-				auto& t_dof = t_node->get_reordered_dof();
-				for(const auto& J : dofs)
-					if(J <= t_dof.n_elem) {
-						t_load(t_dof(J - 1)) += final_load;
-						D->insert_loaded_dof(t_dof(J - 1));
-					}
-			}
-
-	t_factory->set_incre_load(t_load - t_factory->get_current_load());
+		if(auto& t_node = D->get<Node>(I); nullptr != t_node && t_node->is_active()) {
+			auto& t_dof = t_node->get_reordered_dof();
+			for(const auto& J : dofs)
+				if(J <= t_dof.n_elem) {
+					trial_load(t_dof(J - 1)) += final_load;
+					D->insert_loaded_dof(t_dof(J - 1));
+				}
+		}
 
 	return SUANPAN_SUCCESS;
 }

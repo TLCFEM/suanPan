@@ -27,4 +27,8 @@ Load::Load(const unsigned T, const unsigned ST, const unsigned AT, uvec&& NT, uv
 
 Load::~Load() { suanpan_debug("Load %u dtor() called.\n", get_tag()); }
 
+const vec& Load::get_trial_load() const { return trial_load; }
+
+const vec& Load::get_trial_settlement() const { return trial_settlement; }
+
 void set_load_multiplier(const double M) { access::rw(Load::multiplier) = M; }
