@@ -49,6 +49,8 @@ public:
 	GroupPenaltyBC(unsigned, unsigned, uvec&&, uvec&&);
 	GroupPenaltyBC(unsigned, unsigned, uvec&&, const char*);
 
+	int initialize(const shared_ptr<DomainBase>&) override;
+
 	int process(const shared_ptr<DomainBase>&) override;
 };
 

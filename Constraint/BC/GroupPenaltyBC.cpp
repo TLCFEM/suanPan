@@ -24,7 +24,7 @@ void GroupPenaltyBC::update_node_tag(const shared_ptr<DomainBase>& D) {
 
 	for(auto& I : groups) if(D->find<Group>(I)) for(auto& J : D->get<Group>(I)->get_pool()) tag.emplace_back(J);
 
-	nodes = unique(uvec(tag));
+	node_encoding = unique(uvec(tag));
 }
 
 GroupPenaltyBC::GroupPenaltyBC(const unsigned T, const unsigned S, uvec&& N, const unsigned D)
@@ -39,8 +39,12 @@ GroupPenaltyBC::GroupPenaltyBC(const unsigned T, const unsigned S, uvec&& N, con
 	: MultiplierBC(T, S, uvec{}, TP)
 	, groups(std::forward<uvec>(N)) {}
 
-int GroupPenaltyBC::process(const shared_ptr<DomainBase>& D) {
+int GroupPenaltyBC::initialize(const shared_ptr<DomainBase>& D) {
 	update_node_tag(D);
 
+	return MultiplierBC::initialize(D);
+}
+
+int GroupPenaltyBC::process(const shared_ptr<DomainBase>& D) {
 	return PenaltyBC::process(D); // NOLINT(bugprone-parent-virtual-call)
 }

@@ -18,7 +18,5 @@
 #include "GroupMultiplierBC.h"
 
 int GroupMultiplierBC::process(const shared_ptr<DomainBase>& D) {
-	update_node_tag(D);
-
 	return MultiplierBC::process(D); // NOLINT(bugprone-parent-virtual-call)
 }
