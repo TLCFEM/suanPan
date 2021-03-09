@@ -39,13 +39,32 @@ void Integrator::set_time_step_switch(const bool T) { time_step_switch = T; }
 
 bool Integrator::allow_to_change_time_step() const { return time_step_switch; }
 
-int Integrator::process_load() const { return database.lock()->process_load(); }
+int Integrator::process_load() { return database.lock()->process_load(); }
 
-int Integrator::process_constraint() const { return database.lock()->process_constraint(); }
+int Integrator::process_constraint() {
+	const auto& D = database.lock();
 
-int Integrator::process_criterion() const { return database.lock()->process_criterion(); }
+	const auto code = D->process_constraint();
 
-int Integrator::process_modifier() const { return database.lock()->process_modifier(); }
+	// some constraints may have stiffness
+	D->assemble_constraint_stiffness();
+
+	return code;
+}
+
+int Integrator::process_criterion() { return database.lock()->process_criterion(); }
+
+int Integrator::process_modifier() { return database.lock()->process_modifier(); }
+
+void Integrator::process_load_resistance() {}
+
+void Integrator::process_constraint_resistance() {
+	const auto& D = database.lock();
+	const auto& W = D->get_factory();
+
+	D->process_constraint_resistance();
+	W->set_sushi(W->get_sushi() + W->get_trial_constraint_resistance());
+}
 
 void Integrator::record() const { database.lock()->record(); }
 
@@ -66,7 +85,7 @@ void Integrator::assemble_matrix() {
 	}
 }
 
-mat Integrator::get_force_residual() {
+vec Integrator::get_force_residual() {
 	const auto& D = database.lock();
 	const auto& W = D->get_factory();
 
@@ -77,7 +96,7 @@ mat Integrator::get_force_residual() {
 	return residual;
 }
 
-mat Integrator::get_displacement_residual() {
+vec Integrator::get_displacement_residual() {
 	const auto& D = database.lock();
 	const auto& W = D->get_factory();
 
@@ -88,29 +107,29 @@ mat Integrator::get_displacement_residual() {
 	return residual;
 }
 
+vec Integrator::get_auxiliary_residual() {
+	const auto& W = get_domain().lock()->get_factory();
+
+	return W->get_auxiliary_load() - W->get_auxiliary_resistance();
+}
+
 sp_mat Integrator::get_reference_load() { return database.lock()->get_factory()->get_reference_load(); }
 
 sp_mat Integrator::get_auxiliary_stiffness() { return database.lock()->get_factory()->get_auxiliary_stiffness(); }
 
-vec Integrator::get_auxiliary_residual() {
-	const auto& W = get_domain().lock()->get_factory();
-
-	return W->get_auxiliary_load() - W->get_trial_auxiliary_resistance();
-}
+void Integrator::update_load() { database.lock()->update_load(); }
 
 void Integrator::update_constraint() { database.lock()->update_constraint(); }
 
 void Integrator::update_trial_time(const double T) {
 	const auto& W = get_domain().lock()->get_factory();
-
 	W->update_trial_time(T);
 	update_parameter(W->get_incre_time());
 }
 
 void Integrator::update_incre_time(const double T) {
 	const auto& W = get_domain().lock()->get_factory();
-
-	database.lock()->get_factory()->update_incre_time(T);
+	W->update_incre_time(T);
 	update_parameter(W->get_incre_time());
 }
 

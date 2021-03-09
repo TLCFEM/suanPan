@@ -64,22 +64,26 @@ public:
 	void set_time_step_switch(bool);
 	[[nodiscard]] bool allow_to_change_time_step() const;
 
-	[[nodiscard]] virtual int process_load() const;
-	[[nodiscard]] virtual int process_constraint() const;
-	[[nodiscard]] virtual int process_criterion() const;
-	[[nodiscard]] virtual int process_modifier() const;
+	[[nodiscard]] virtual int process_load();
+	[[nodiscard]] virtual int process_constraint();
+	[[nodiscard]] virtual int process_criterion();
+	[[nodiscard]] virtual int process_modifier();
+
+	virtual void process_load_resistance();
+	virtual void process_constraint_resistance();
 
 	void record() const;
 
 	virtual void assemble_resistance();
 	virtual void assemble_matrix();
 
-	virtual mat get_force_residual();
-	virtual mat get_displacement_residual();
+	virtual vec get_force_residual();
+	virtual vec get_displacement_residual();
+	virtual vec get_auxiliary_residual();
 	virtual sp_mat get_reference_load();
 	virtual sp_mat get_auxiliary_stiffness();
-	virtual vec get_auxiliary_residual();
 
+	virtual void update_load();
 	virtual void update_constraint();
 
 	void update_trial_time(double);
