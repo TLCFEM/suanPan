@@ -69,7 +69,6 @@ int Ramm::analyze() {
 			if(G->solve_trs(right, border) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 			auto& aux_factor = get_incre_auxiliary_lambda(W);
 			if(!solve(aux_factor, kernel = border.t() * right, border.t() * t_ninja - G->get_auxiliary_residual())) return SUANPAN_FAIL;
-			G->update_constraint();
 			t_ninja -= right * aux_factor;
 			disp_a -= right * solve(kernel, border.t() * disp_a);
 		}
@@ -95,6 +94,8 @@ int Ramm::analyze() {
 		W->update_trial_load_factor(W->get_trial_load_factor() + t_lambda);
 		// set time to load factor
 		W->update_trial_time(W->get_trial_load_factor().at(0));
+		G->update_load();
+		G->update_constraint();
 		// update for nodes and elements
 		if(G->update_trial_status() != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 

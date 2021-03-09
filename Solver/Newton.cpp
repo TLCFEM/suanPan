@@ -52,7 +52,11 @@ int Newton::analyze() {
 		// assemble resistance
 		G->assemble_resistance();
 
-		if(initial_stiffness && counter != 0) flag = G->solve_trs(ninja, G->get_force_residual());
+		if(initial_stiffness && counter != 0) {
+			G->process_load_resistance();
+			G->process_constraint_resistance();
+			flag = G->solve_trs(ninja, G->get_force_residual());
+		}
 		else {
 			// first iteration
 			// assemble stiffness
@@ -82,7 +86,6 @@ int Newton::analyze() {
 			if(G->solve_trs(right, border) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 			auto& aux_factor = get_incre_auxiliary_lambda(W);
 			if(!solve(aux_factor, border.t() * right.head_rows(n_size), border.t() * ninja.head_rows(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
-			G->update_constraint();
 			ninja -= right * aux_factor;
 		}
 
@@ -104,6 +107,8 @@ int Newton::analyze() {
 		G->update_internal(ninja);
 		// update trial status for factory
 		W->update_trial_displacement(W->get_trial_displacement() + ninja);
+		G->update_load();
+		G->update_constraint();
 		// update for nodes and elements
 		if(G->update_trial_status() != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 

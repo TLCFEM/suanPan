@@ -76,11 +76,12 @@ int BFGS::analyze() {
 				if(G->solve_trs(right, border) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 				auto& aux_factor = get_incre_auxiliary_lambda(W);
 				if(!solve(aux_factor, border.t() * right.head_rows(n_size), border.t() * ninja.head_rows(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
-				G->update_constraint(); // for tracking multiplier
 				ninja -= right * aux_factor;
 			}
 		}
 		else {
+			G->process_load_resistance();
+			G->process_constraint_resistance();
 			// clear temporary factor container
 			alpha.clear();
 			// commit current residual
@@ -104,7 +105,6 @@ int BFGS::analyze() {
 				if(G->solve_trs(right, border) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 				auto& aux_factor = get_incre_auxiliary_lambda(W);
 				if(!solve(aux_factor, border.t() * right.head_rows(n_size), border.t() * ninja.head_rows(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
-				G->update_constraint();
 				ninja -= right * aux_factor;
 			}
 			// left side loop
@@ -121,6 +121,10 @@ int BFGS::analyze() {
 		G->update_internal(ninja);
 		// update trial status for factory
 		W->update_trial_displacement(W->get_trial_displacement() + ninja);
+		// for tracking
+		G->update_load();
+		// for tracking multiplier
+		G->update_constraint();
 		// update for nodes and elements
 		if(G->update_trial_status() != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 
