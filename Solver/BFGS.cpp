@@ -40,6 +40,8 @@ int BFGS::analyze() {
 
 	// ninja alias
 	auto& ninja = get_ninja(W);
+	// lambda alias
+	auto& aux_lambda = get_auxiliary_lambda(W);
 
 	// clear container
 	hist_ninja.clear();
@@ -48,7 +50,7 @@ int BFGS::analyze() {
 
 	while(true) {
 		// process modifiers
-		if(G->process_modifier() != SUANPAN_SUCCESS) return SUANPAN_FAIL;
+		if(SUANPAN_SUCCESS != G->process_modifier()) return SUANPAN_FAIL;
 		// assemble resistance
 		G->assemble_resistance();
 
@@ -63,23 +65,24 @@ int BFGS::analyze() {
 			// asemble stiffness for the first iteration
 			G->assemble_matrix();
 			// process loads and constraints
-			if(G->process_load() != SUANPAN_SUCCESS) return SUANPAN_FAIL;
-			if(G->process_constraint() != SUANPAN_SUCCESS) return SUANPAN_FAIL;
+			if(SUANPAN_SUCCESS != G->process_load()) return SUANPAN_FAIL;
+			if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
 			// commit current residual
 			hist_residual.emplace_back(G->get_force_residual());
 			// solve the system and commit current displacement increment
-			if(G->solve(ninja, *hist_residual.crbegin()) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
+			if(SUANPAN_SUCCESS != G->solve(ninja, *hist_residual.crbegin())) return SUANPAN_FAIL;
 			// deal with mpc
-			if(const auto n_size = W->get_size(); 0 != W->get_mpc()) {
+			if(0 != W->get_mpc()) {
+				const auto n_size = W->get_size();
 				auto& border = W->get_auxiliary_stiffness();
 				mat right;
-				if(G->solve_trs(right, border) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
-				auto& aux_factor = get_incre_auxiliary_lambda(W);
-				if(!solve(aux_factor, border.t() * right.head_rows(n_size), border.t() * ninja.head_rows(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
-				ninja -= right * aux_factor;
+				if(SUANPAN_SUCCESS != G->solve_trs(right, border)) return SUANPAN_FAIL;
+				if(!solve(aux_lambda, border.t() * right.head_rows(n_size), border.t() * ninja.head_rows(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
+				ninja -= right * aux_lambda;
 			}
 		}
 		else {
+			// process resistance of loads and constraints
 			G->process_load_resistance();
 			G->process_constraint_resistance();
 			// clear temporary factor container
@@ -99,13 +102,13 @@ int BFGS::analyze() {
 			// apply the Hessian from the factorazation in the first iteration
 			ninja = G->solve_trs(ninja);
 			// deal with mpc
-			if(const auto n_size = W->get_size(); 0 != W->get_mpc()) {
+			if(0 != W->get_mpc()) {
+				const auto n_size = W->get_size();
 				auto& border = W->get_auxiliary_stiffness();
 				mat right;
-				if(G->solve_trs(right, border) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
-				auto& aux_factor = get_incre_auxiliary_lambda(W);
-				if(!solve(aux_factor, border.t() * right.head_rows(n_size), border.t() * ninja.head_rows(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
-				ninja -= right * aux_factor;
+				if(SUANPAN_SUCCESS != G->solve_trs(right, border)) return SUANPAN_FAIL;
+				if(!solve(aux_lambda, border.t() * right.head_rows(n_size), border.t() * ninja.head_rows(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
+				ninja -= right * aux_lambda;
 			}
 			// left side loop
 			for(size_t I = 0, J = hist_factor.size() - 1; I < hist_factor.size(); ++I, --J) ninja += (alpha[J] - dot(hist_residual[I], ninja) / hist_factor[I]) * hist_ninja[I];
@@ -126,7 +129,7 @@ int BFGS::analyze() {
 		// for tracking multiplier
 		G->update_constraint();
 		// update for nodes and elements
-		if(G->update_trial_status() != SUANPAN_SUCCESS) return SUANPAN_FAIL;
+		if(SUANPAN_SUCCESS != G->update_trial_status()) return SUANPAN_FAIL;
 
 		// exit if converged
 		if(C->is_converged()) return SUANPAN_SUCCESS;

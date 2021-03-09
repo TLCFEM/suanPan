@@ -36,12 +36,11 @@ int WilsonPenzienNewmark::initialize() {
 	return SUANPAN_SUCCESS;
 }
 
-int WilsonPenzienNewmark::process_constraint() const {
-	const auto& D = get_domain().lock();
-	auto& W = D->get_factory();
-
+int WilsonPenzienNewmark::process_constraint() {
 	// process constraint for the first time to obtain proper stiffness
-	if(D->process_constraint() != SUANPAN_SUCCESS) return SUANPAN_FAIL;
+	if(SUANPAN_SUCCESS != Integrator::process_constraint()) return SUANPAN_FAIL;
+
+	auto& W = get_domain().lock()->get_factory();
 
 	W->get_stiffness()->csc_condense();
 	W->get_mass()->csc_condense();
@@ -55,7 +54,6 @@ int WilsonPenzienNewmark::process_constraint() const {
 				suanpan_error("fail to perform eigen analysis, check the model.");
 				return SUANPAN_FAIL;
 			}
-
 			eig_val = eig_val.head(damping_ratio.n_elem);
 			eig_vec = eig_vec.head_cols(damping_ratio.n_elem);
 		}

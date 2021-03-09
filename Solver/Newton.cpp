@@ -48,13 +48,16 @@ int Newton::analyze() {
 
 	while(true) {
 		// process modifiers
-		if(G->process_modifier() != SUANPAN_SUCCESS) return SUANPAN_FAIL;
+		if(SUANPAN_SUCCESS != G->process_modifier()) return SUANPAN_FAIL;
 		// assemble resistance
 		G->assemble_resistance();
 
 		if(initial_stiffness && counter != 0) {
+			// some loads may have resistance
 			G->process_load_resistance();
+			// some constraints may have resistance
 			G->process_constraint_resistance();
+			// call solver
 			flag = G->solve_trs(ninja, G->get_force_residual());
 		}
 		else {
@@ -62,9 +65,9 @@ int Newton::analyze() {
 			// assemble stiffness
 			G->assemble_matrix();
 			// process loads
-			if(G->process_load() != SUANPAN_SUCCESS) return SUANPAN_FAIL;
+			if(SUANPAN_SUCCESS != G->process_load()) return SUANPAN_FAIL;
 			// process constraints
-			if(G->process_constraint() != SUANPAN_SUCCESS) return SUANPAN_FAIL;
+			if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
 			// call solver
 			flag = G->solve(ninja, G->get_force_residual());
 		}
@@ -80,13 +83,14 @@ int Newton::analyze() {
 		if(SUANPAN_SUCCESS != flag) return flag;
 
 		// deal with mpc
-		if(const auto n_size = W->get_size(); 0 != W->get_mpc()) {
+		if(0 != W->get_mpc()) {
+			const auto n_size = W->get_size();
 			auto& border = W->get_auxiliary_stiffness();
 			mat right;
-			if(G->solve_trs(right, border) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
-			auto& aux_factor = get_incre_auxiliary_lambda(W);
-			if(!solve(aux_factor, border.t() * right.head_rows(n_size), border.t() * ninja.head_rows(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
-			ninja -= right * aux_factor;
+			if(SUANPAN_SUCCESS != G->solve_trs(right, border)) return SUANPAN_FAIL;
+			auto& aux_lambda = get_auxiliary_lambda(W);
+			if(!solve(aux_lambda, border.t() * right.head_rows(n_size), border.t() * ninja.head_rows(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
+			ninja -= right * aux_lambda;
 		}
 
 		if(initial_stiffness) {
@@ -107,10 +111,12 @@ int Newton::analyze() {
 		G->update_internal(ninja);
 		// update trial status for factory
 		W->update_trial_displacement(W->get_trial_displacement() + ninja);
+		// for tracking
 		G->update_load();
+		// for tracking
 		G->update_constraint();
 		// update for nodes and elements
-		if(G->update_trial_status() != SUANPAN_SUCCESS) return SUANPAN_FAIL;
+		if(SUANPAN_SUCCESS != G->update_trial_status()) return SUANPAN_FAIL;
 
 		// exit if converged
 		if(C->is_converged()) return SUANPAN_SUCCESS;

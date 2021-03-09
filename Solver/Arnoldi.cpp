@@ -26,13 +26,15 @@ Arnoldi::Arnoldi(const unsigned T, const unsigned N)
 	, eigen_num(N) {}
 
 int Arnoldi::analyze() {
-	const auto& D = get_integrator()->get_domain().lock();
+	auto& G = get_integrator();
+	const auto& D = G->get_domain().lock();
 	auto& W = D->get_factory();
 
 	D->assemble_trial_mass();
 	D->assemble_trial_stiffness();
 
-	if(D->process_load() != SUANPAN_SUCCESS || D->process_constraint() != SUANPAN_SUCCESS) return SUANPAN_FAIL;
+	if(SUANPAN_SUCCESS != G->process_load()) return SUANPAN_FAIL;
+	if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
 
 	return eig_solve(get_eigenvalue(W), get_eigenvector(W), W->get_stiffness(), W->get_mass(), eigen_num, "SM");
 }

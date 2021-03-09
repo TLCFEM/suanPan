@@ -76,11 +76,11 @@ int LeeNewmark::initialize() {
 	return SUANPAN_SUCCESS;
 }
 
-int LeeNewmark::process_constraint() const {
+int LeeNewmark::process_constraint() {
 	const auto& D = get_domain().lock();
 
 	// process constraint for the first time to obtain proper stiffness
-	if(D->process_constraint() != SUANPAN_SUCCESS) return SUANPAN_FAIL;
+	if(SUANPAN_SUCCESS != Integrator::process_constraint()) return SUANPAN_FAIL;
 
 	auto& t_stiff = get_stiffness(factory);
 	auto& t_mass = get_mass(factory);
@@ -91,11 +91,11 @@ int LeeNewmark::process_constraint() const {
 		stiffness->triplet_mat.resize((4 * n_damping + 2) * t_stiff->n_elem);
 		stiffness->zeros();
 
-		// access::rw(current_mass).swap(t_mass);
+		// current_mass.swap(t_mass);
 		// D->assemble_current_mass();
-		// access::rw(current_mass).swap(t_mass);
+		// current_mass.swap(t_mass);
 
-		access::rw(current_mass) = t_mass->make_copy();
+		current_mass = t_mass->make_copy();
 	}
 	else {
 		// if not first iteration
@@ -126,15 +126,15 @@ int LeeNewmark::process_constraint() const {
 		// for the first iteration of each substep
 		// store current stiffness to be used in the whole substep
 		// check in constant terms that does not change in the substep
-		access::rw(current_stiffness).swap(t_stiff);
+		current_stiffness.swap(t_stiff);
 		D->assemble_current_stiffness();
-		if(SUANPAN_SUCCESS != D->process_constraint()) return SUANPAN_FAIL;
+		if(SUANPAN_SUCCESS != Integrator::process_constraint()) return SUANPAN_FAIL;
 		t_stiff->csc_condense();
-		access::rw(current_stiffness).swap(t_stiff);
+		current_stiffness.swap(t_stiff);
 
 		update_stiffness();
 
-		access::rw(first_iteration) = false;
+		first_iteration = false;
 	}
 
 	update_residual();

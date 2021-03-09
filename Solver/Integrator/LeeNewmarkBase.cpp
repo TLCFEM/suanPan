@@ -57,13 +57,13 @@ int LeeNewmarkBase::solve_trs(mat& X, const mat& B) { return solve(X, B); }
 
 int LeeNewmarkBase::solve_trs(mat& X, const sp_mat& B) { return solve(X, B); }
 
-mat LeeNewmarkBase::get_force_residual() {
+vec LeeNewmarkBase::get_force_residual() {
 	residual.head_rows(n_block) = Newmark::get_force_residual();
 
 	return residual;
 }
 
-mat LeeNewmarkBase::get_displacement_residual() {
+vec LeeNewmarkBase::get_displacement_residual() {
 	residual.head_rows(n_block) = Newmark::get_displacement_residual();
 
 	return residual;

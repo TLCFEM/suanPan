@@ -66,7 +66,7 @@ public:
 
 	int initialize() override;
 
-	[[nodiscard]] int process_constraint() const override;
+	int process_constraint() override;
 
 	void print() override;
 };

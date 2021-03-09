@@ -296,11 +296,11 @@ int LeeNewmarkFull::initialize() {
 	return SUANPAN_SUCCESS;
 }
 
-int LeeNewmarkFull::process_constraint() const {
+int LeeNewmarkFull::process_constraint() {
 	const auto& D = get_domain().lock();
 
 	// process constraint for the first time to obtain proper stiffness
-	if(SUANPAN_SUCCESS != D->process_constraint()) return SUANPAN_FAIL;
+	if(SUANPAN_SUCCESS != Integrator::process_constraint()) return SUANPAN_FAIL;
 
 	auto& t_stiff = factory->get_stiffness()->triplet_mat;
 
@@ -332,7 +332,7 @@ int LeeNewmarkFull::process_constraint() const {
 		t_stiff = triplet_form<double, uword>(n_block, n_block, t_rabbit.c_size);
 
 		D->assemble_current_stiffness();
-		if(SUANPAN_SUCCESS != D->process_constraint()) return SUANPAN_FAIL;
+		if(SUANPAN_SUCCESS != Integrator::process_constraint()) return SUANPAN_FAIL;
 		t_stiff.csc_condense();
 
 		access::rw(current_stiffness) = std::move(t_stiff);
@@ -360,7 +360,7 @@ int LeeNewmarkFull::process_constraint() const {
 
 		stiffness->triplet_mat += t_stiff;
 
-		access::rw(first_iteration) = false;
+		first_iteration = false;
 	}
 	else {
 		// if not first iteration

@@ -42,7 +42,7 @@ public:
 
 	int initialize() override;
 
-	[[nodiscard]] int process_constraint() const override;
+	[[nodiscard]] int process_constraint() override;
 
 	int solve(mat&, const mat&) override;
 	int solve(mat&, const sp_mat&) override;

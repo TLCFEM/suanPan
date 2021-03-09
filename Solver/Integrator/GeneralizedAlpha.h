@@ -50,13 +50,11 @@ public:
 	GeneralizedAlpha(unsigned, double);
 	GeneralizedAlpha(unsigned, double, double);
 
-	vec get_auxiliary_residual() override;
-
 	void assemble_resistance() override;
 	void assemble_matrix() override;
 
-	[[nodiscard]] int process_constraint() const override;
-	[[nodiscard]] int process_load() const override;
+	int process_constraint() override;
+	int process_load() override;
 
 	int update_trial_status() override;
 

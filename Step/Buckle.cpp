@@ -65,11 +65,11 @@ int Buckle::analyze() {
 	D->assemble_trial_geometry();
 
 	// now need to apply constraints on both stiffness and geometry
-	if(G->process_constraint() != SUANPAN_SUCCESS) return SUANPAN_FAIL;
+	if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
 	// swap stiffness and geometry
 	access::rw(W->get_stiffness()).swap(access::rw(W->get_geometry()));
 	// apply constraints again on geometry part
-	if(G->process_constraint() != SUANPAN_SUCCESS) return SUANPAN_FAIL;
+	if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
 	// swap back
 	access::rw(W->get_stiffness()).swap(access::rw(W->get_geometry()));
 

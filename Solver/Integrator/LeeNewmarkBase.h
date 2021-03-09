@@ -61,8 +61,8 @@ public:
 	int solve_trs(mat&, const mat&) final;
 	int solve_trs(mat&, const sp_mat&) final;
 
-	mat get_force_residual() final;
-	mat get_displacement_residual() final;
+	vec get_force_residual() final;
+	vec get_displacement_residual() final;
 
 	void commit_status() final;
 	void clear_status() final;
