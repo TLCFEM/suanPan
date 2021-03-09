@@ -466,15 +466,15 @@ template<typename data_t, typename index_t> data_t& triplet_form<data_t, index_t
 template<typename data_t, typename index_t> template<typename T2> triplet_form<data_t, index_t> triplet_form<data_t, index_t>::operator*(const T2 scalar) {
 	triplet_form<data_t, index_t> copy = *this;
 
-	if(1. == scalar) return copy;
+	if(suanpan::approx_equal(1., scalar)) return copy;
 
 #ifdef SUANPAN_MT
-	if(-1. == scalar) tbb::parallel_for(static_cast<index_t>(0), copy.c_size, [&](const index_t I) { copy.val_idx[I] = -copy.val_idx[I]; });
-	else if(0. == scalar) tbb::parallel_for(static_cast<index_t>(0), copy.c_size, [&](const index_t I) { copy.val_idx[I] = data_t(0.); });
+	if(suanpan::approx_equal(-1., scalar)) tbb::parallel_for(static_cast<index_t>(0), copy.c_size, [&](const index_t I) { copy.val_idx[I] = -copy.val_idx[I]; });
+	else if(suanpan::approx_equal(0., scalar)) tbb::parallel_for(static_cast<index_t>(0), copy.c_size, [&](const index_t I) { copy.val_idx[I] = data_t(0.); });
 	else tbb::parallel_for(static_cast<index_t>(0), copy.c_size, [&](const index_t I) { copy.val_idx[I] *= data_t(scalar); });
 #else
-	if(-1. == scalar) for(auto I = 0; I < copy.c_size; ++I) copy.val_idx[I] = -copy.val_idx[I];
-	else if(0. == scalar) for(auto I = 0; I < copy.c_size; ++I) copy.val_idx[I] = data_t(0.);
+	if(suanpan::approx_equal(-1., scalar)) for(auto I = 0; I < copy.c_size; ++I) copy.val_idx[I] = -copy.val_idx[I];
+	else if(suanpan::approx_equal(0., scalar)) for(auto I = 0; I < copy.c_size; ++I) copy.val_idx[I] = data_t(0.);
 	else for(auto I = 0; I < copy.c_size; ++I) copy.val_idx[I] *= data_t(scalar);
 #endif
 
@@ -484,13 +484,13 @@ template<typename data_t, typename index_t> template<typename T2> triplet_form<d
 template<typename data_t, typename index_t> template<typename T2> triplet_form<data_t, index_t> triplet_form<data_t, index_t>::operator/(const T2 scalar) {
 	triplet_form<data_t, index_t> copy = *this;
 
-	if(1. == scalar) return copy;
+	if(suanpan::approx_equal(1., scalar)) return copy;
 
 #ifdef SUANPAN_MT
-	if(-1. == scalar) tbb::parallel_for(static_cast<index_t>(0), copy.c_size, [&](const index_t I) { copy.val_idx[I] = -copy.val_idx[I]; });
+	if(suanpan::approx_equal(-1., scalar)) tbb::parallel_for(static_cast<index_t>(0), copy.c_size, [&](const index_t I) { copy.val_idx[I] = -copy.val_idx[I]; });
 	else tbb::parallel_for(static_cast<index_t>(0), copy.c_size, [&](const index_t I) { copy.val_idx[I] /= data_t(scalar); });
 #else
-	if(-1. == scalar) for(auto I = 0; I < copy.c_size; ++I) copy.val_idx[I] = -copy.val_idx[I];
+	if(suanpan::approx_equal(-1., scalar)) for(auto I = 0; I < copy.c_size; ++I) copy.val_idx[I] = -copy.val_idx[I];
 	else for(auto I = 0; I < copy.c_size; ++I) copy.val_idx[I] /= data_t(scalar);
 #endif
 
@@ -498,15 +498,15 @@ template<typename data_t, typename index_t> template<typename T2> triplet_form<d
 }
 
 template<typename data_t, typename index_t> template<typename T2> triplet_form<data_t, index_t>& triplet_form<data_t, index_t>::operator*=(const T2 scalar) {
-	if(1. == scalar) return *this;
+	if(suanpan::approx_equal(1., scalar)) return *this;
 
 #ifdef SUANPAN_MT
-	if(-1. == scalar) tbb::parallel_for(static_cast<index_t>(0), c_size, [&](const index_t I) { val_idx[I] = -val_idx[I]; });
-	else if(0. == scalar) triplet_form<data_t, index_t>::zeros();
+	if(suanpan::approx_equal(-1., scalar)) tbb::parallel_for(static_cast<index_t>(0), c_size, [&](const index_t I) { val_idx[I] = -val_idx[I]; });
+	else if(suanpan::approx_equal(0., scalar)) triplet_form<data_t, index_t>::zeros();
 	else tbb::parallel_for(static_cast<index_t>(0), c_size, [&](const index_t I) { val_idx[I] *= data_t(scalar); });
 #else
-	if(-1. == scalar) for(index_t I = 0; I < c_size; ++I) val_idx[I] = -val_idx[I];
-	else if(0. == scalar) triplet_form<data_t, index_t>::zeros();
+	if(suanpan::approx_equal(-1., scalar)) for(index_t I = 0; I < c_size; ++I) val_idx[I] = -val_idx[I];
+	else if(suanpan::approx_equal(0., scalar)) triplet_form<data_t, index_t>::zeros();
 	else for(index_t I = 0; I < c_size; ++I) val_idx[I] *= data_t(scalar);
 #endif
 
@@ -514,13 +514,13 @@ template<typename data_t, typename index_t> template<typename T2> triplet_form<d
 }
 
 template<typename data_t, typename index_t> template<typename T2> triplet_form<data_t, index_t>& triplet_form<data_t, index_t>::operator/=(const T2 scalar) {
-	if(1. == scalar) return *this;
+	if(suanpan::approx_equal(1., scalar)) return *this;
 
 #ifdef SUANPAN_MT
-	if(-1. == scalar) tbb::parallel_for(static_cast<index_t>(0), c_size, [&](const index_t I) { val_idx[I] = -val_idx[I]; });
+	if(suanpan::approx_equal(-1., scalar)) tbb::parallel_for(static_cast<index_t>(0), c_size, [&](const index_t I) { val_idx[I] = -val_idx[I]; });
 	else tbb::parallel_for(static_cast<index_t>(0), c_size, [&](const index_t I) { val_idx[I] /= data_t(scalar); });
 #else
-	if(-1. == scalar) for(auto I = 0; I < c_size; ++I) val_idx[I] = -val_idx[I];
+	if(suanpan::approx_equal(-1., scalar)) for(auto I = 0; I < c_size; ++I) val_idx[I] = -val_idx[I];
 	else for(auto I = 0; I < c_size; ++I) val_idx[I] /= data_t(scalar);
 #endif
 

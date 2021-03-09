@@ -23,6 +23,7 @@
 #include <armadillo/armadillo>
 #include <vector>
 #include <cstring>
+#include <Toolbox/utility.h>
 
 template<typename data_t, typename index_t, typename form_t> class sparse_form {
 protected:
