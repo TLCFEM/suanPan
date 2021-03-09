@@ -47,12 +47,14 @@ class ParticleCollision : public Constraint {
 	[[nodiscard]] virtual double compute_df(double) const = 0;
 protected:
 	[[nodiscard]] vec get_postion(const shared_ptr<Node>&) const;
+
+	void apply_contact(const shared_ptr<DomainBase>&, const shared_ptr<Node>&, const shared_ptr<Node>&);
 public:
 	ParticleCollision(unsigned, unsigned, unsigned);
 
 	int initialize(const shared_ptr<DomainBase>&) override;
 
-	void apply_contact(const shared_ptr<DomainBase>&, const shared_ptr<Node>&, const shared_ptr<Node>&) const;
+	int process_resistance(const shared_ptr<DomainBase>&) override;
 };
 
 #endif

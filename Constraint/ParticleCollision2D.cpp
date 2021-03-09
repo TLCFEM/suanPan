@@ -46,6 +46,8 @@ int ParticleCollision2D::process(const shared_ptr<DomainBase>& D) {
 
 	suanpan_sort(list.begin(), list.end(), [](const CellList& a, const CellList& b) { return a.x < b.x || a.x == b.x && a.y < b.y ? true : false; });
 
+	trial_resistance.zeros();
+
 	for(auto I = list.cbegin(); I != list.cend(); ++I)
 		for(auto J = I + 1; J != list.cend(); ++J) {
 			const auto diff_x = J->x - I->x;

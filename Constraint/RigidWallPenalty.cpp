@@ -40,53 +40,69 @@ int RigidWallPenalty::initialize(const shared_ptr<DomainBase>& D) {
 		return SUANPAN_SUCCESS;
 	}
 
+	current_resistance = trial_resistance.zeros(D->get_factory()->get_size());
+
 	return Constraint::initialize(D);
 }
 
 int RigidWallPenalty::process(const shared_ptr<DomainBase>& D) {
 	auto& W = D->get_factory();
-	auto& t_stiff = W->get_stiffness();
-	auto& t_load = get_trial_load(W);
 
 	const auto factor = alpha * pow(W->get_incre_time(), -2.);
 
-	// penalty method
-	if(StorageScheme::SPARSE == W->get_storage_scheme())
-		for(const auto& I : D->get_node_pool()) {
-			auto& t_dof = I->get_reordered_dof();
-			auto& t_coor = I->get_coordinate();
-			auto& t_disp = I->get_trial_displacement();
-			const auto size = std::min(norm.n_elem, std::min(t_coor.n_elem, t_disp.n_elem));
-			vec new_pos(norm.n_elem, fill::zeros);
-			for(auto J = 0llu; J < size; ++J) new_pos(J) = t_coor(J) + t_disp(J);
-			new_pos -= origin;
-			if(!edge_a.empty() && dot(new_pos, edge_a) > arma::norm(edge_a)) continue;
-			if(!edge_b.empty() && dot(new_pos, edge_b) > arma::norm(edge_b)) continue;
-			const auto pen = dot(new_pos, norm);
-			if(pen >= datum::eps) continue;
-			for(auto J = 0llu; J < size; ++J) {
-				for(auto K = 0llu; K < size; ++K) t_stiff->at(t_dof(J), t_dof(K)) = factor * norm(J) * norm(K);
-				t_load(t_dof(J)) -= factor * pen * norm(J);
-			}
+	stiffness.reset();
+	trial_resistance.zeros();
+	vector<uword> pool;
+
+	auto counter = 0llu;
+	for(const auto& I : D->get_node_pool()) {
+		auto& t_coor = I->get_coordinate();
+		auto& t_disp = I->get_trial_displacement();
+		const auto t_size = std::min(norm.n_elem, std::min(t_coor.n_elem, t_disp.n_elem));
+		vec t_pos = -origin;
+		for(auto J = 0llu; J < t_size; ++J) t_pos(J) += t_coor(J) + t_disp(J);
+		if(!edge_a.empty() && dot(t_pos, edge_a) > arma::norm(edge_a) || !edge_b.empty() && dot(t_pos, edge_b) > arma::norm(edge_b)) continue;
+		const auto t_pen = dot(t_pos, norm);
+		if(t_pen > datum::eps) continue;
+		const auto next_counter = counter + t_size;
+		stiffness.resize(next_counter, next_counter);
+		stiffness.submat(counter, counter, size(t_size, t_size)) = factor * norm.head(t_size) * norm.head(t_size).t();
+		auto& t_dof = I->get_reordered_dof();
+		for(auto J = 0llu; J < t_size; ++J) {
+			pool.emplace_back(t_dof(J));
+			trial_resistance(t_dof(J)) += factor * t_pen * norm(J);
 		}
-	else
-		for(const auto& I : D->get_node_pool()) {
-			auto& t_dof = I->get_reordered_dof();
-			auto& t_coor = I->get_coordinate();
-			auto& t_disp = I->get_trial_displacement();
-			const auto size = std::min(norm.n_elem, std::min(t_coor.n_elem, t_disp.n_elem));
-			vec new_pos(norm.n_elem, fill::zeros);
-			for(auto J = 0llu; J < size; ++J) new_pos(J) = t_coor(J) + t_disp(J);
-			new_pos -= origin;
-			if(!edge_a.empty() && dot(new_pos, edge_a) > arma::norm(edge_a)) continue;
-			if(!edge_b.empty() && dot(new_pos, edge_b) > arma::norm(edge_b)) continue;
-			const auto pen = dot(new_pos, norm);
-			if(pen >= datum::eps) continue;
-			for(auto J = 0llu; J < size; ++J) {
-				for(auto K = 0llu; K < size; ++K) t_stiff->at(t_dof(J), t_dof(K)) += factor * norm(J) * norm(K);
-				t_load(t_dof(J)) -= factor * pen * norm(J);
-			}
-		}
+		counter = next_counter;
+	}
+
+	dof_encoding = pool;
 
 	return SUANPAN_SUCCESS;
 }
+
+int RigidWallPenalty::process_resistance(const shared_ptr<DomainBase>& D) {
+	const auto factor = alpha * pow(D->get_factory()->get_incre_time(), -2.);
+
+	trial_resistance.zeros();
+
+	for(const auto& I : D->get_node_pool()) {
+		auto& t_coor = I->get_coordinate();
+		auto& t_disp = I->get_trial_displacement();
+		const auto t_size = std::min(norm.n_elem, std::min(t_coor.n_elem, t_disp.n_elem));
+		vec t_pos = -origin;
+		for(auto J = 0llu; J < t_size; ++J) t_pos(J) += t_coor(J) + t_disp(J);
+		if(!edge_a.empty() && dot(t_pos, edge_a) > arma::norm(edge_a) || !edge_b.empty() && dot(t_pos, edge_b) > arma::norm(edge_b)) continue;
+		const auto t_pen = dot(t_pos, norm);
+		if(t_pen > datum::eps) continue;
+		auto& t_dof = I->get_reordered_dof();
+		for(auto J = 0llu; J < t_size; ++J) trial_resistance(t_dof(J)) += factor * t_pen * norm(J);
+	}
+
+	return SUANPAN_SUCCESS;
+}
+
+void RigidWallPenalty::commit_status() { current_resistance = trial_resistance; }
+
+void RigidWallPenalty::clear_status() { current_resistance = trial_resistance.zeros(); }
+
+void RigidWallPenalty::reset_status() { trial_resistance = current_resistance; }

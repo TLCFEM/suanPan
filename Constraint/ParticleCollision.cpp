@@ -38,13 +38,17 @@ int ParticleCollision::initialize(const shared_ptr<DomainBase>& D) {
 	if(StorageScheme::FULL != D->get_factory()->get_storage_scheme() && StorageScheme::SPARSE != D->get_factory()->get_storage_scheme()) {
 		suanpan_warning("DEM requires full/sparse matrix storage scheme.\n");
 		D->disable_constraint(get_tag());
-		return SUANPAN_SUCCESS;
+		return SUANPAN_FAIL;
 	}
+
+	current_resistance = trial_resistance.zeros(D->get_factory()->get_size());
 
 	return Constraint::initialize(D);
 }
 
-void ParticleCollision::apply_contact(const shared_ptr<DomainBase>& D, const shared_ptr<Node>& node_i, const shared_ptr<Node>& node_j) const {
+int ParticleCollision::process_resistance(const shared_ptr<DomainBase>&) { return SUANPAN_SUCCESS; }
+
+void ParticleCollision::apply_contact(const shared_ptr<DomainBase>& D, const shared_ptr<Node>& node_i, const shared_ptr<Node>& node_j) {
 	const auto& dof_i = node_i->get_reordered_dof();
 	const auto& dof_j = node_j->get_reordered_dof();
 
@@ -57,10 +61,11 @@ void ParticleCollision::apply_contact(const shared_ptr<DomainBase>& D, const sha
 
 	auto& W = D->get_factory();
 	auto& t_stiff = W->get_stiffness();
-	auto& t_load = get_trial_load(W);
 
-	t_load(dof_i) -= force * diff_pos;
-	t_load(dof_j) += force * diff_pos;
+	for(auto I = 0llu; I < diff_pos.n_elem; ++I) {
+		trial_resistance(dof_i(I)) += force * diff_pos(I);
+		trial_resistance(dof_j(I)) -= force * diff_pos(I);
+	}
 
 	const mat d_norm = (compute_df(diff_norm) - force / diff_norm) * diff_pos * diff_pos.t() + force / diff_norm * eye(num_dof, num_dof);
 
