@@ -43,8 +43,11 @@ int Integrator::process_load() { return database.lock()->process_load(); }
 
 int Integrator::process_constraint() {
 	const auto& D = database.lock();
+	const auto& W = D->get_factory();
 
 	const auto code = D->process_constraint();
+
+	W->set_sushi(W->get_sushi() + W->get_trial_constraint_resistance());
 
 	// some constraints may have stiffness
 	D->assemble_constraint_stiffness();
@@ -63,6 +66,7 @@ void Integrator::process_constraint_resistance() {
 	const auto& W = D->get_factory();
 
 	D->process_constraint_resistance();
+
 	W->set_sushi(W->get_sushi() + W->get_trial_constraint_resistance());
 }
 
