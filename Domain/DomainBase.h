@@ -288,9 +288,9 @@ public:
 	[[nodiscard]] virtual const shared_ptr<Integrator>& get_current_integrator() const = 0;
 	[[nodiscard]] virtual const shared_ptr<Solver>& get_current_solver() const = 0;
 
-	virtual bool insert_loaded_dof(uword) = 0;
-	virtual bool insert_restrained_dof(uword) = 0;
-	virtual bool insert_constrained_dof(uword) = 0;
+	virtual void insert_loaded_dof(uword) = 0;
+	virtual void insert_restrained_dof(uword) = 0;
+	virtual void insert_constrained_dof(uword) = 0;
 
 	[[nodiscard]] virtual const unordered_set<uword>& get_loaded_dof() const = 0;
 	[[nodiscard]] virtual const unordered_set<uword>& get_restrained_dof() const = 0;
@@ -316,7 +316,10 @@ public:
 	[[nodiscard]] virtual int process_load() = 0;
 	[[nodiscard]] virtual int process_constraint() = 0;
 	[[nodiscard]] virtual int process_criterion() = 0;
-	[[nodiscard]] virtual int process_modifier() const = 0;
+	[[nodiscard]] virtual int process_modifier() = 0;
+	virtual void process_load_resistance() = 0;
+	virtual void process_constraint_resistance() = 0;
+
 	virtual void record() = 0;
 	virtual void enable_all() = 0;
 	virtual void summary() const = 0;
@@ -344,7 +347,11 @@ public:
 
 	virtual void erase_machine_error() const = 0;
 
+	virtual void update_load() = 0;
 	virtual void update_constraint() = 0;
+
+	virtual void assemble_load_stiffness() = 0;
+	virtual void assemble_constraint_stiffness() = 0;
 
 	[[nodiscard]] virtual int update_current_status() const = 0;
 	[[nodiscard]] virtual int update_incre_status() const = 0;

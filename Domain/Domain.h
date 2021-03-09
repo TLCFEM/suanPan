@@ -287,9 +287,9 @@ public:
 	const shared_ptr<Integrator>& get_current_integrator() const override;
 	const shared_ptr<Solver>& get_current_solver() const override;
 
-	bool insert_loaded_dof(uword) override;
-	bool insert_restrained_dof(uword) override;
-	bool insert_constrained_dof(uword) override;
+	void insert_loaded_dof(uword) override;
+	void insert_restrained_dof(uword) override;
+	void insert_constrained_dof(uword) override;
 
 	const unordered_set<uword>& get_loaded_dof() const override;
 	const unordered_set<uword>& get_restrained_dof() const override;
@@ -318,10 +318,12 @@ public:
 	// initiaze constraints for each step
 	int initialize_reference() override;
 	// process loads and constraints
-	int process_load() override;
-	int process_constraint() override;
-	int process_criterion() override;
-	int process_modifier() const override;
+	[[nodiscard]] int process_load() override;
+	[[nodiscard]] int process_constraint() override;
+	[[nodiscard]] int process_criterion() override;
+	[[nodiscard]] int process_modifier() override;
+	void process_load_resistance() override;
+	void process_constraint_resistance() override;
 	// record response
 	void record() override;
 	// enable all objects
@@ -352,7 +354,11 @@ public:
 
 	void erase_machine_error() const override;
 
+	void update_load() override;
 	void update_constraint() override;
+
+	void assemble_load_stiffness() override;
+	void assemble_constraint_stiffness() override;
 
 	int update_current_status() const override;
 	int update_incre_status() const override;

@@ -67,14 +67,14 @@ template<typename T> class Factory final {
 	uvec reference_dof;
 	SpMat<T> reference_load;
 
+	uvec auxiliary_encoding;      // for constraints using multiplier method
+	Col<T> auxiliary_lambda;      // for constraints using multiplier method
+	Col<T> auxiliary_resistance;  // for constraints using multiplier method
 	Col<T> auxiliary_load;        // for constraints using multiplier method
 	SpMat<T> auxiliary_stiffness; // for constraints using multiplier method
 
-	uvec auxiliary_encoding; // for constraints using multiplier method
-
-	Col<T> incre_auxiliary_lambda;       // for constraints using multiplier method
-	Col<T> trial_auxiliary_resistance;   // for constraints using multiplier method
-	Col<T> current_auxiliary_resistance; // for constraints using multiplier method
+	SpCol<T> trial_constraint_resistance;
+	SpCol<T> current_constraint_resistance;
 
 	T trial_time = 0.;   // global trial (pseudo) time
 	T incre_time = 0.;   // global incremental (pseudo) time
@@ -201,12 +201,9 @@ public:
 	void set_ninja(const Col<T>&);
 	void set_sushi(const Col<T>&);
 
-	void incre_mpc();
+	void set_mpc(unsigned);
 
 	void set_reference_load(const SpMat<T>&);
-
-	void set_trial_auxiliary_resistance(const Col<T>&) const;
-	void set_current_auxiliary_resistance(const Col<T>&) const;
 
 	void set_trial_time(const T&);
 	void set_trial_load_factor(const Col<T>&);
@@ -273,15 +270,14 @@ public:
 
 	const SpMat<T>& get_reference_load() const;
 
+	[[nodiscard]] const uvec& get_auxiliary_encoding() const;
+	const Col<T>& get_auxiliary_lambda() const;
+	const Col<T>& get_auxiliary_resistance() const;
 	const Col<T>& get_auxiliary_load() const;
 	const SpMat<T>& get_auxiliary_stiffness() const;
 
-	const uvec& get_auxiliary_encoding() const;
-
-	const Col<T>& get_incre_auxiliary_lambda() const;
-
-	const Col<T>& get_trial_auxiliary_resistance() const;
-	const Col<T>& get_current_auxiliary_resistance() const;
+	const SpCol<T>& get_trial_constraint_resistance() const;
+	const SpCol<T>& get_current_constraint_resistance() const;
 
 	const T& get_trial_time() const;
 	const Col<T>& get_trial_load_factor() const;
@@ -341,9 +337,6 @@ public:
 
 	/*************************UPDATER*************************/
 
-	void update_trial_auxiliary_resistance(const Col<T>&);
-	void update_current_auxiliary_resistance(const Col<T>&);
-
 	void update_trial_time(const T&);
 	void update_trial_load_factor(const Col<T>&);
 	void update_trial_load(const Col<T>&);
@@ -388,15 +381,14 @@ public:
 	template<typename T1> friend uvec& get_reference_dof(const shared_ptr<Factory<T1>>&);
 	template<typename T1> friend SpMat<T1>& get_reference_load(const shared_ptr<Factory<T1>>&);
 
+	template<typename T1> friend uvec& get_auxiliary_encoding(const shared_ptr<Factory<T1>>&);
+	template<typename T1> friend Col<T1>& get_auxiliary_lambda(const shared_ptr<Factory<T1>>&);
+	template<typename T1> friend Col<T1>& get_auxiliary_resistance(const shared_ptr<Factory<T1>>&);
 	template<typename T1> friend Col<T1>& get_auxiliary_load(const shared_ptr<Factory<T1>>&);
 	template<typename T1> friend SpMat<T1>& get_auxiliary_stiffness(const shared_ptr<Factory<T1>>&);
 
-	template<typename T1> friend uvec& get_auxiliary_encoding(const shared_ptr<Factory<T1>>&);
-
-	template<typename T1> friend Col<T1>& get_incre_auxiliary_lambda(const shared_ptr<Factory<T1>>&);
-
-	template<typename T1> friend Col<T1>& get_trial_auxiliary_resistance(const shared_ptr<Factory<T1>>&);
-	template<typename T1> friend Col<T1>& get_current_auxiliary_resistance(const shared_ptr<Factory<T1>>&);
+	template<typename T1> friend SpCol<T1>& get_trial_constraint_resistance(const shared_ptr<Factory<T1>>&);
+	template<typename T1> friend SpCol<T1>& get_current_constraint_resistance(const shared_ptr<Factory<T1>>&);
 
 	template<typename T1> friend T& get_trial_time(const shared_ptr<Factory<T1>>&);
 	template<typename T1> friend Col<T1>& get_trial_load_factor(const shared_ptr<Factory<T1>>&);
@@ -527,6 +519,7 @@ public:
 	void assemble_damping(const Mat<T>&, const uvec&);
 	void assemble_stiffness(const Mat<T>&, const uvec&);
 	void assemble_geometry(const Mat<T>&, const uvec&);
+	void assemble_stiffness(const SpMat<T>&, const uvec&);
 
 	/*************************UTILITY*************************/
 
@@ -737,8 +730,8 @@ template<typename T> void Factory<T>::initialize_temperature() {
 }
 
 template<typename T> void Factory<T>::initialize_auxiliary_resistance() {
-	trial_auxiliary_resistance.reset();
-	current_auxiliary_resistance.reset();
+	trial_constraint_resistance.zeros(n_size);
+	current_constraint_resistance.zeros(n_size);
 }
 
 template<typename T> void Factory<T>::initialize_mass() {
@@ -880,19 +873,15 @@ template<typename T> void Factory<T>::set_ninja(const Col<T>& N) { ninja = N; }
 
 template<typename T> void Factory<T>::set_sushi(const Col<T>& S) { sushi = S; }
 
-template<typename T> void Factory<T>::incre_mpc() {
-	auxiliary_load.resize(++n_mpc);
-	auxiliary_stiffness.resize(n_size, n_mpc);
-	current_auxiliary_resistance.resize(n_mpc);
-	trial_auxiliary_resistance.resize(n_mpc);
-	auxiliary_encoding.resize(n_mpc);
+template<typename T> void Factory<T>::set_mpc(const unsigned S) {
+	n_mpc = S;
+	auxiliary_encoding.zeros(n_mpc);
+	auxiliary_resistance.zeros(n_mpc);
+	auxiliary_load.zeros(n_mpc);
+	auxiliary_stiffness.zeros(n_size, n_mpc);
 }
 
 template<typename T> void Factory<T>::set_reference_load(const SpMat<T>& L) { reference_load = L; }
-
-template<typename T> void Factory<T>::set_trial_auxiliary_resistance(const Col<T>& R) const { trial_auxiliary_resistance = R; }
-
-template<typename T> void Factory<T>::set_current_auxiliary_resistance(const Col<T>& R) const { current_auxiliary_resistance = R; }
 
 template<typename T> void Factory<T>::set_trial_time(const T& M) { trial_time = M; }
 
@@ -1002,17 +991,19 @@ template<typename T> unsigned Factory<T>::get_mpc() const { return n_mpc; }
 
 template<typename T> const SpMat<T>& Factory<T>::get_reference_load() const { return reference_load; }
 
+template<typename T> const uvec& Factory<T>::get_auxiliary_encoding() const { return auxiliary_encoding; }
+
+template<typename T> const Col<T>& Factory<T>::get_auxiliary_lambda() const { return auxiliary_lambda; }
+
+template<typename T> const Col<T>& Factory<T>::get_auxiliary_resistance() const { return auxiliary_resistance; }
+
 template<typename T> const Col<T>& Factory<T>::get_auxiliary_load() const { return auxiliary_load; }
 
 template<typename T> const SpMat<T>& Factory<T>::get_auxiliary_stiffness() const { return auxiliary_stiffness; }
 
-template<typename T> const uvec& Factory<T>::get_auxiliary_encoding() const { return auxiliary_encoding; }
+template<typename T> const SpCol<T>& Factory<T>::get_trial_constraint_resistance() const { return trial_constraint_resistance; }
 
-template<typename T> const Col<T>& Factory<T>::get_incre_auxiliary_lambda() const { return incre_auxiliary_lambda; }
-
-template<typename T> const Col<T>& Factory<T>::get_trial_auxiliary_resistance() const { return trial_auxiliary_resistance; }
-
-template<typename T> const Col<T>& Factory<T>::get_current_auxiliary_resistance() const { return current_auxiliary_resistance; }
+template<typename T> const SpCol<T>& Factory<T>::get_current_constraint_resistance() const { return current_constraint_resistance; }
 
 template<typename T> const T& Factory<T>::get_trial_time() const { return trial_time; }
 
@@ -1113,10 +1104,6 @@ template<typename T> const shared_ptr<MetaMat<T>>& Factory<T>::get_geometry() co
 template<typename T> const Col<T>& Factory<T>::get_eigenvalue() const { return eigenvalue; }
 
 template<typename T> const Mat<T>& Factory<T>::get_eigenvector() const { return eigenvector; }
-
-template<typename T> void Factory<T>::update_trial_auxiliary_resistance(const Col<T>& R) { trial_auxiliary_resistance = R; }
-
-template<typename T> void Factory<T>::update_current_auxiliary_resistance(const Col<T>& R) { trial_auxiliary_resistance = current_auxiliary_resistance = R; }
 
 template<typename T> void Factory<T>::update_trial_time(const T& M) {
 	trial_time = M;
@@ -1364,8 +1351,8 @@ template<typename T> void Factory<T>::commit_temperature() {
 }
 
 template<typename T> void Factory<T>::commit_auxiliary_resistance() {
-	if(trial_auxiliary_resistance.is_empty()) return;
-	current_auxiliary_resistance = trial_auxiliary_resistance;
+	if(trial_constraint_resistance.is_empty()) return;
+	current_constraint_resistance = trial_constraint_resistance;
 }
 
 template<typename T> void Factory<T>::commit_pre_status() {
@@ -1496,8 +1483,8 @@ template<typename T> void Factory<T>::clear_temperature() {
 }
 
 template<typename T> void Factory<T>::clear_auxiliary_resistance() {
-	if(!trial_auxiliary_resistance.is_empty()) trial_auxiliary_resistance.zeros();
-	if(!current_auxiliary_resistance.is_empty()) current_auxiliary_resistance.zeros();
+	if(!trial_constraint_resistance.is_empty()) trial_constraint_resistance.zeros();
+	if(!current_constraint_resistance.is_empty()) current_constraint_resistance.zeros();
 }
 
 template<typename T> void Factory<T>::reset_status() {
@@ -1583,8 +1570,8 @@ template<typename T> void Factory<T>::reset_temperature() {
 }
 
 template<typename T> void Factory<T>::reset_auxiliary_resistance() {
-	if(trial_auxiliary_resistance.is_empty()) return;
-	trial_auxiliary_resistance = current_auxiliary_resistance;
+	if(trial_constraint_resistance.is_empty()) return;
+	trial_constraint_resistance = current_constraint_resistance;
 }
 
 template<typename T> void Factory<T>::clear_eigen() {
@@ -1604,8 +1591,7 @@ template<typename T> void Factory<T>::clear_auxiliary() {
 	n_mpc = 0;
 	auxiliary_load.reset();
 	auxiliary_stiffness.set_size(n_size, 0);
-	current_auxiliary_resistance.reset();
-	trial_auxiliary_resistance.reset();
+	auxiliary_resistance.reset();
 	auxiliary_encoding.reset();
 }
 
@@ -1652,6 +1638,13 @@ template<typename T> void Factory<T>::assemble_geometry(const Mat<T>& EG, const 
 	else for(unsigned I = 0; I < EI.n_elem; ++I) for(unsigned J = 0; J < EI.n_elem; ++J) global_geometry->at(EI(J), EI(I)) += EG(J, I);
 }
 
+template<typename T> void Factory<T>::assemble_stiffness(const SpMat<T>& EK, const uvec& EI) {
+	if(EK.is_empty()) return;
+
+	if(storage_type == StorageScheme::SPARSE) for(unsigned I = 0; I < EI.n_elem; ++I) for(unsigned J = 0; J < EI.n_elem; ++J) global_stiffness->at(EI(J), EI(I)) = EK(J, I);
+	else for(unsigned I = 0; I < EI.n_elem; ++I) for(unsigned J = 0; J < EI.n_elem; ++J) global_stiffness->at(EI(J), EI(I)) += EK(J, I);
+}
+
 template<typename T> void Factory<T>::print() const { suanpan_info("This is a Factory object with size of %u.\n", n_size); }
 
 template<typename T> Col<T>& get_ninja(const shared_ptr<Factory<T>>& W) { return W->ninja; }
@@ -1662,17 +1655,19 @@ template<typename T> uvec& get_reference_dof(const shared_ptr<Factory<T>>& W) { 
 
 template<typename T> SpMat<T>& get_reference_load(const shared_ptr<Factory<T>>& W) { return W->reference_load; }
 
+template<typename T1> uvec& get_auxiliary_encoding(const shared_ptr<Factory<T1>>& W) { return W->auxiliary_encoding; }
+
+template<typename T1> Col<T1>& get_auxiliary_lambda(const shared_ptr<Factory<T1>>& W) { return W->auxiliary_lambda; }
+
+template<typename T> Col<T>& get_auxiliary_resistance(const shared_ptr<Factory<T>>& W) { return W->auxiliary_resistance; }
+
 template<typename T> Col<T>& get_auxiliary_load(const shared_ptr<Factory<T>>& W) { return W->auxiliary_load; }
 
 template<typename T> SpMat<T>& get_auxiliary_stiffness(const shared_ptr<Factory<T>>& W) { return W->auxiliary_stiffness; }
 
-template<typename T1> uvec& get_auxiliary_encoding(const shared_ptr<Factory<T1>>& W) { return W->auxiliary_encoding; }
+template<typename T1> SpCol<T1>& get_trial_constraint_resistance(const shared_ptr<Factory<T1>>& W) { return W->trial_constraint_resistance; }
 
-template<typename T1> Col<T1>& get_incre_auxiliary_lambda(const shared_ptr<Factory<T1>>& W) { return W->incre_auxiliary_lambda; }
-
-template<typename T> Col<T>& get_trial_auxiliary_resistance(const shared_ptr<Factory<T>>& W) { return W->trial_auxiliary_resistance; }
-
-template<typename T> Col<T>& get_current_auxiliary_resistance(const shared_ptr<Factory<T>>& W) { return W->current_auxiliary_resistance; }
+template<typename T1> SpCol<T1>& get_current_constraint_resistance(const shared_ptr<Factory<T1>>& W) { return W->current_constraint_resistance; }
 
 template<typename T> T& get_trial_time(const shared_ptr<Factory<T>>& W) { return W->trial_time; }
 

@@ -675,11 +675,11 @@ const shared_ptr<Integrator>& Domain::get_current_integrator() const { return ge
 
 const shared_ptr<Solver>& Domain::get_current_solver() const { return get_solver(current_solver_tag); }
 
-bool Domain::insert_loaded_dof(const uword T) { return loaded_dofs.insert(T).second; }
+void Domain::insert_loaded_dof(const uword T) { loaded_dofs.insert(T); }
 
-bool Domain::insert_restrained_dof(const uword T) { return restrained_dofs.insert(T).second; }
+void Domain::insert_restrained_dof(const uword T) { restrained_dofs.insert(T); }
 
-bool Domain::insert_constrained_dof(const uword T) { return constrained_dofs.insert(T).second; }
+void Domain::insert_constrained_dof(const uword T) { constrained_dofs.insert(T); }
 
 const unordered_set<uword>& Domain::get_loaded_dof() const { return loaded_dofs; }
 
@@ -748,7 +748,7 @@ int Domain::reorder_dof() {
 
 	// for nonlinear constraint
 	for(const auto& t_constraint : constraint_pond.get()) {
-		if(0 == t_constraint->get_multiplier_size()) continue;
+		if(!t_constraint->is_connected()) continue;
 		vector<uword> t_encoding;
 		for(auto& I : t_constraint->get_node_encoding()) if(find<Node>(I)) for(auto& J : get<Node>(I)->get_reordered_dof()) t_encoding.emplace_back(J);
 		for(const auto& I : t_encoding) for(const auto& J : t_encoding) adjacency[I].insert(J);
@@ -968,7 +968,7 @@ int Domain::initialize() {
 int Domain::initialize_load() {
 	auto code = 0;
 
-	for_each(load_pond.cbegin(), load_pond.cend(), [&](const std::pair<unsigned, shared_ptr<Load>>& t_load) { if(current_step_tag >= t_load.second->get_start_step()) code += t_load.second->initialize(shared_from_this()); });
+	suanpan_for_each(load_pond.cbegin(), load_pond.cend(), [&](const std::pair<unsigned, shared_ptr<Load>>& t_load) { code += t_load.second->initialize(shared_from_this()); });
 
 	load_pond.update();
 
@@ -978,7 +978,7 @@ int Domain::initialize_load() {
 int Domain::initialize_constraint() {
 	auto code = 0;
 
-	for_each(constraint_pond.cbegin(), constraint_pond.cend(), [&](const std::pair<unsigned, shared_ptr<Constraint>>& t_constraint) { if(current_step_tag >= t_constraint.second->get_start_step()) code += t_constraint.second->initialize(shared_from_this()); });
+	suanpan_for_each(constraint_pond.cbegin(), constraint_pond.cend(), [&](const std::pair<unsigned, shared_ptr<Constraint>>& t_constraint) { code += t_constraint.second->initialize(shared_from_this()); });
 
 	constraint_pond.update();
 
@@ -1015,12 +1015,12 @@ int Domain::process_load() {
 	if(!t_settlement.empty()) t_settlement.zeros();
 
 	auto code = 0;
-	for(auto& I : load_pond.get())
-		if(I->validate_step(shared_from_this())) {
-			code += I->process(shared_from_this());
-			if(!I->get_trial_load().empty()) t_load += I->get_trial_load();
-			if(!I->get_trial_settlement().empty()) t_settlement += I->get_trial_settlement();
-		}
+	for(auto& I : load_pond.get()) {
+		if(!I->is_initialized()) continue;
+		code += I->process(shared_from_this());
+		if(!I->get_trial_load().empty()) t_load += I->get_trial_load();
+		if(!I->get_trial_settlement().empty()) t_settlement += I->get_trial_settlement();
+	}
 
 	factory->update_trial_load(t_load);
 	factory->update_trial_settlement(t_settlement);
@@ -1029,13 +1029,49 @@ int Domain::process_load() {
 }
 
 int Domain::process_constraint() {
+	// ! Tasks:
+	// ! 1. clear previous auxiliary variables as they may change size
+	// ! 2. process initialised constraints
+	// ! 3. assemble constraint resistance
+	// ! 4. assemble auxiliary resistance, load, and stiffness
+	// ! 5. record auxiliary encoding
+	// ! assemble stiffness shall be done in integrator
+
 	factory->clear_auxiliary();
 
 	restrained_dofs.clear();
 	constrained_dofs.clear();
 
-	auto code = 0;
-	for(auto& I : constraint_pond.get()) if(I->validate_step(shared_from_this())) code += I->process(shared_from_this());
+	auto& constraint_resistance = get_trial_constraint_resistance(factory);
+	constraint_resistance.zeros();
+
+	auto code = 0, counter = 0;
+	for(auto& I : constraint_pond.get()) {
+		if(!I->is_initialized()) continue;
+		code += I->process(shared_from_this());
+		if(!I->get_trial_resistance().empty()) constraint_resistance += I->get_trial_resistance();
+		counter += I->get_multiplier_size();
+	}
+
+	if(counter > 0) {
+		factory->set_mpc(counter);
+		auto& t_encoding = get_auxiliary_encoding(factory);
+		auto& t_resistance = get_auxiliary_resistance(factory);
+		auto& t_load = get_auxiliary_load(factory);
+		auto& t_stiffness = get_auxiliary_stiffness(factory);
+		counter = 0;
+		for(auto& I : constraint_pond.get()) {
+			const auto m_size = I->get_multiplier_size();
+			if(!I->is_initialized() || 0 == m_size) continue;
+			const auto e_size = counter + m_size - 1;
+			t_encoding.subvec(counter, e_size).fill(I->get_tag());
+			if(!I->get_trial_auxiliary_resistance().empty()) t_resistance.subvec(counter, e_size) = I->get_trial_auxiliary_resistance();
+			if(!I->get_auxiliary_load().empty()) t_load.subvec(counter, e_size) = I->get_auxiliary_load();
+			if(!I->get_auxiliary_stiffness().empty()) t_stiffness.cols(counter, e_size) = I->get_auxiliary_stiffness();
+			counter += m_size;
+		}
+	}
+
 	return code;
 }
 
@@ -1045,11 +1081,29 @@ int Domain::process_criterion() {
 	return code;
 }
 
-int Domain::process_modifier() const {
+int Domain::process_modifier() {
 	auto code = 0;
 	// use sequential for_each only
 	for(auto& I : modifier_pond.get()) code += I->update_status();
 	return code;
+}
+
+void Domain::process_load_resistance() {}
+
+void Domain::process_constraint_resistance() {
+	auto& constraint_resistance = get_trial_constraint_resistance(factory);
+	constraint_resistance.zeros();
+
+	auto& t_encoding = get_auxiliary_encoding(factory);
+	auto& t_resistance = get_auxiliary_resistance(factory);
+
+	for(auto& I : constraint_pond.get()) {
+		if(!I->is_initialized()) continue;
+		I->process_resistance(shared_from_this());
+		if(!I->get_trial_resistance().empty()) constraint_resistance += I->get_trial_resistance();
+		if(0 == I->get_multiplier_size()) continue;
+		if(!I->get_trial_auxiliary_resistance().empty()) t_resistance(arma::find(t_encoding == I->get_tag())) = I->get_trial_auxiliary_resistance();
+	}
 }
 
 void Domain::record() { for(const auto& I : recorder_pond.get()) if(I->is_active()) I->record(shared_from_this()); }
@@ -1086,6 +1140,7 @@ void Domain::update_current_resistance() const {
 				factory->assemble_resistance(I->get_current_resistance(), I->get_dof_encoding());
 			});
 		});
+
 	factory->commit_resistance();
 }
 
@@ -1330,19 +1385,23 @@ void Domain::erase_machine_error() const {
 	for(const auto& I : restrained_dofs) t_ninja(I) = 0.;
 }
 
+void Domain::update_load() {}
+
 void Domain::update_constraint() {
 	auto& t_encoding = factory->get_auxiliary_encoding();
-	auto& t_lambda = factory->get_incre_auxiliary_lambda();
+	auto& t_lambda = factory->get_auxiliary_lambda();
 
-	for(auto I = 0llu; I < t_encoding.n_elem;)
-		if(0 == t_encoding(I)) ++I;
-		else {
-			auto& t_constraint = get<Constraint>(t_encoding(I));
-			const auto t_size = t_constraint->get_multiplier_size();
-			t_constraint->update_incre_lambda(t_lambda.subvec(I, I + t_size - 1));
-			I += t_size;
-		}
+	for(auto I = 0llu; I < t_encoding.n_elem;) {
+		auto& t_constraint = get<Constraint>(t_encoding(I));
+		const auto t_size = t_constraint->get_multiplier_size();
+		t_constraint->update_status(t_lambda.subvec(I, I + t_size - 1));
+		I += t_size;
+	}
 }
+
+void Domain::assemble_load_stiffness() {}
+
+void Domain::assemble_constraint_stiffness() { for(auto& I : get_constraint_pool()) if(I->is_initialized() && !I->get_stiffness().empty()) factory->assemble_stiffness(I->get_stiffness(), I->get_dof_encoding()); }
 
 int Domain::update_trial_status() const {
 	auto& trial_displacement = factory->get_trial_displacement();
