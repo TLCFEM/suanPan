@@ -24,75 +24,84 @@ FixedLength::FixedLength(const unsigned T, const unsigned S, const unsigned A, c
 	: Constraint(T, S, A, std::forward<uvec>(N), {D}, 1) {}
 
 int FixedLength::initialize(const shared_ptr<DomainBase>& D) {
-	auto flag = true;
-	for(uword I = 0; I < nodes.n_elem; ++I) {
-		if(!D->find<Node>(nodes(I))) {
-			flag = false;
-			break;
-		}
-		if(auto& t_node = D->get<Node>(nodes(I)); !t_node->is_active() || t_node->get_reordered_dof().n_elem <= dofs(0)) {
-			flag = false;
-			break;
+	for(uword I = 0; I < node_encoding.n_elem; ++I) {
+		auto& t_node = D->get<Node>(node_encoding(I));
+		if(nullptr == t_node || !t_node->is_active() || t_node->get_reordered_dof().n_elem <= dof_reference(0)) {
+			D->disable_constraint(get_tag());
+			return SUANPAN_SUCCESS;
 		}
 	}
 
-	if(flag) return Constraint::initialize(D);
+	set_connected(true);
 
-	D->disable_constraint(get_tag());
-	return SUANPAN_FAIL;
+	const auto& n_dof = dof_reference(0);
+
+	dof_encoding = join_cols(D->get<Node>(node_encoding(0))->get_reordered_dof().head(n_dof), D->get<Node>(node_encoding(1))->get_reordered_dof().head(n_dof));
+
+	current_resistance = trial_resistance.zeros(num_size);
+
+	return Constraint::initialize(D);
 }
 
 int FixedLength::process(const shared_ptr<DomainBase>& D) {
+	auto& node_i = D->get<Node>(node_encoding(0));
+	auto& node_j = D->get<Node>(node_encoding(1));
+
+	const auto& n_dof = dof_reference(0);
+
+	vec coor = resize(node_j->get_coordinate(), n_dof, 1) - resize(node_i->get_coordinate(), n_dof, 1);
+	vec t_disp = node_j->get_trial_displacement().head(n_dof) - node_i->get_trial_displacement().head(n_dof);
+	uvec dof_i = node_i->get_reordered_dof().head(n_dof);
+	uvec dof_j = node_j->get_reordered_dof().head(n_dof);
+
 	auto& W = D->get_factory();
 
-	auto& node_i = D->get<Node>(nodes(0));
-	auto& node_j = D->get<Node>(nodes(1));
-
-	vec coor_i = resize(node_i->get_coordinate(), dofs(0), 1);
-	vec coor_j = resize(node_j->get_coordinate(), dofs(0), 1);
-	vec t_disp_i = node_i->get_trial_displacement().head(dofs(0));
-	vec t_disp_j = node_j->get_trial_displacement().head(dofs(0));
-	vec c_disp_i = node_i->get_current_displacement().head(dofs(0));
-	vec c_disp_j = node_j->get_current_displacement().head(dofs(0));
-	uvec dof_i = node_i->get_reordered_dof().head(dofs(0));
-	uvec dof_j = node_j->get_reordered_dof().head(dofs(0));
-
-	const auto last_pos = W->get_mpc();
-
-	W->incre_mpc();
-
-	auto c_resistance = 0., t_resistance = 0.;
-	sp_vec slice(W->get_size());
-
-	for(auto I = 0llu; I < dofs(0); ++I) {
-		slice(dof_i(I)) = -(slice(dof_j(I)) = 2. * (coor_j(I) - coor_i(I) + t_disp_j(I) - t_disp_i(I)));
-		c_resistance += (c_disp_j(I) - c_disp_i(I)) * (2. * (coor_j(I) - coor_i(I)) + c_disp_j(I) - c_disp_i(I));
-		t_resistance += (t_disp_j(I) - t_disp_i(I)) * (2. * (coor_j(I) - coor_i(I)) + t_disp_j(I) - t_disp_i(I));
+	auxiliary_stiffness.zeros(W->get_size(), num_size);
+	trial_auxiliary_resistance.zeros();
+	for(auto I = 0llu; I < n_dof; ++I) {
+		auxiliary_stiffness(dof_i(I)) = -(auxiliary_stiffness(dof_j(I)) = 2. * (coor(I) + t_disp(I)));
+		trial_auxiliary_resistance += t_disp(I) * (2. * coor(I) + t_disp(I));
 	}
 
-	get_auxiliary_stiffness(W).col(last_pos) = slice;
-	get_current_auxiliary_resistance(W).back() = c_resistance;
-	get_trial_auxiliary_resistance(W).back() = t_resistance;
-	get_auxiliary_encoding(W).back() = get_tag();
+	stiffness.zeros(2 * n_dof, 2 * n_dof);
+	const auto t_factor = 2. * trial_lambda(0);
+	for(auto I = 0llu; I < n_dof; ++I) stiffness(I + n_dof, I) = stiffness(I, I + n_dof) = -(stiffness(I, I) = stiffness(I + n_dof, I + n_dof) = t_factor);
 
-	auto& t_matrix = W->get_stiffness();
-	auto t_factor = 2. * trial_lambda(0);
-	if(StorageScheme::SPARSE == D->get_factory()->get_storage_scheme())
-		for(auto I = 0llu; I < dofs(0); ++I) {
-			t_matrix->at(dof_i(I), dof_i(I)) = t_factor;
-			t_matrix->at(dof_j(I), dof_j(I)) = t_factor;
-			t_matrix->at(dof_i(I), dof_j(I)) = -t_factor;
-			t_matrix->at(dof_j(I), dof_i(I)) = -t_factor;
-		}
-	else
-		for(auto I = 0llu; I < dofs(0); ++I) {
-			t_matrix->at(dof_i(I), dof_i(I)) += t_factor;
-			t_matrix->at(dof_j(I), dof_j(I)) += t_factor;
-			t_matrix->at(dof_i(I), dof_j(I)) -= t_factor;
-			t_matrix->at(dof_j(I), dof_i(I)) -= t_factor;
-		}
-
-	W->update_trial_load(W->get_trial_load() - trial_lambda(0) * slice);
+	trial_resistance = auxiliary_stiffness * trial_lambda;
 
 	return SUANPAN_SUCCESS;
+}
+
+int FixedLength::process_resistance(const shared_ptr<DomainBase>& D) {
+	auto& node_i = D->get<Node>(node_encoding(0));
+	auto& node_j = D->get<Node>(node_encoding(1));
+
+	const auto& n_dof = dof_reference(0);
+
+	vec coor = resize(node_j->get_coordinate(), n_dof, 1) - resize(node_i->get_coordinate(), n_dof, 1);
+	vec t_disp = node_j->get_trial_displacement().head(n_dof) - node_i->get_trial_displacement().head(n_dof);
+
+	trial_auxiliary_resistance.zeros();
+	for(auto I = 0llu; I < n_dof; ++I) trial_auxiliary_resistance += t_disp(I) * (2. * coor(I) + t_disp(I));
+
+	trial_resistance = auxiliary_stiffness * trial_lambda;
+
+	return SUANPAN_SUCCESS;
+}
+
+void FixedLength::update_status(const vec& i_lambda) { trial_lambda += i_lambda; }
+
+void FixedLength::commit_status() {
+	current_lambda = trial_lambda;
+	current_resistance = trial_resistance;
+}
+
+void FixedLength::clear_status() {
+	current_lambda = trial_lambda.zeros();
+	current_resistance = trial_resistance.zeros();
+}
+
+void FixedLength::reset_status() {
+	trial_lambda = current_lambda;
+	trial_resistance = current_resistance;
 }

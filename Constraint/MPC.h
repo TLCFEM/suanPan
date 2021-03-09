@@ -40,6 +40,7 @@ public:
 	int initialize(const shared_ptr<DomainBase>&) override;
 
 	int process(const shared_ptr<DomainBase>&) override;
+	int process_resistance(const shared_ptr<DomainBase>&) override;
 };
 
 #endif

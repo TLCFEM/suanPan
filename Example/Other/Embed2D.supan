@@ -1,4 +1,4 @@
-# A TEST MODEL FOR CP4 ELEMENT
+# A TEST MODEL FOR EMBED2D CONSTRAINT
 
 node 1 0 0
 node 2 1 0
@@ -24,9 +24,9 @@ cload 1 0 1 2 3 4
 
 step static 1
 set fixed_step_size true
-set ini_step_size .1
+set ini_step_size .2
 
-converger AbsIncreDisp 1 1E-10 10 1
+converger RelIncreDisp 1 1E-10 10 1
 
 analyze
 

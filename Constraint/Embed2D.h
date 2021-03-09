@@ -33,14 +33,13 @@
 
 class Embed2D final : public Constraint {
 	static constexpr unsigned max_iteration = 20;
-
-	const rowvec weight;
 public:
 	Embed2D(unsigned, unsigned, unsigned, unsigned);
 
 	int initialize(const shared_ptr<DomainBase>&) override;
 
 	int process(const shared_ptr<DomainBase>&) override;
+	int process_resistance(const shared_ptr<DomainBase>&) override;
 };
 
 #endif

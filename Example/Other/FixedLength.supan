@@ -21,23 +21,23 @@ set ini_step_size .2
 set fixed_step_size true
 set symm_mat false
 
-converger RelIncreDisp 1 1E-10 5 1
+converger RelIncreDisp 1 1E-10 10 1
 
 analyze
 
 # Node 2:
 #    1.0000        0
 # Displacement:
-#    0.0206   0.3088   0.4633
+#    0.0170   0.3127   0.4691
 # Resistance:
-#    2.4769e+00   9.2654e+00  -9.2654e-08
+#    2.0430e+00   9.3821e+00   8.8818e-16
 # 
 # Node 3:
 #    2.0000        0
 # Displacement:
-#   -0.0206   0.0245  -0.0367
+#   -0.0170   0.0206  -0.0309
 # Resistance:
-#   -2.4769e+00   7.3465e-01   7.3465e-09
+#   -2.0430e+00   6.1789e-01  -5.5511e-17
 peek node 2 3
 
 peek element 1

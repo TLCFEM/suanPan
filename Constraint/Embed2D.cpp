@@ -23,20 +23,15 @@
 #include <Toolbox/shapeFunction.h>
 
 Embed2D::Embed2D(const unsigned T, const unsigned S, const unsigned ET, const unsigned NT)
-	: Constraint(T, S, 0, {NT}, {ET}, 0) {}
+	: Constraint(T, S, 0, {NT}, {ET}, 2) {}
 
 int Embed2D::initialize(const shared_ptr<DomainBase>& D) {
-	if(!D->find<Node>(nodes(0)) || !D->find<Element>(dofs(0))) {
-		D->disable_constraint(get_tag());
-		return SUANPAN_SUCCESS;
-	}
+	auto& t_node = D->get<Node>(node_encoding(0));
+	auto& t_element = D->get<Element>(dof_reference(0));
 
-	auto& t_node = D->get<Node>(nodes(0));
-	auto& t_element = D->get<Element>(dofs(0));
-
-	if(!t_node->is_active() || !t_element->is_active() || 4 != t_element->get_node_number()) {
+	if(nullptr == t_node || nullptr == t_element || !t_node->is_active() || !t_element->is_active() || 4 != t_element->get_node_number()) {
 		D->disable_constraint(get_tag());
-		return SUANPAN_SUCCESS;
+		return SUANPAN_FAIL;
 	}
 
 	const auto t_coor = get_coordinate(t_element.get(), 2);
@@ -45,13 +40,13 @@ int Embed2D::initialize(const shared_ptr<DomainBase>& D) {
 
 	vec t_para = zeros(2);
 
-	auto& n = access::rw(weight);
+	rowvec n;
 
 	unsigned counter = 0;
 	while(true) {
 		if(max_iteration == ++counter) {
 			D->disable_constraint(get_tag());
-			return SUANPAN_SUCCESS;
+			return SUANPAN_FAIL;
 		}
 
 		const vec incre = solve((shape::quad(t_para, 1, 4) * t_coor).t(), n_coor - ((n = shape::quad(t_para, 0, 4)) * t_coor).t());
@@ -59,32 +54,23 @@ int Embed2D::initialize(const shared_ptr<DomainBase>& D) {
 		t_para += incre;
 	}
 
+	auto& n_dof = t_node->get_reordered_dof();
+	auto& e_dof = t_element->get_dof_encoding();
+
+	auxiliary_stiffness.zeros(D->get_factory()->get_size(), num_size);
+
+	for(auto K = 0u; K < num_size; ++K) {
+		auxiliary_stiffness(n_dof(K), K) = -1.;
+		for(uword I = 0, J = K; I < n.n_elem; ++I, J += num_size) auxiliary_stiffness(e_dof(J), K) = n(I);
+	}
+
 	return Constraint::initialize(D);
 }
 
-int Embed2D::process(const shared_ptr<DomainBase>& D) {
-	auto& W = D->get_factory();
+int Embed2D::process(const shared_ptr<DomainBase>& D) { return process_resistance(D); }
 
-	auto last_pos = W->get_mpc();
-
-	auto& n_dof = D->get<Node>(nodes(0))->get_reordered_dof();
-	auto& e_dof = D->get<Element>(dofs(0))->get_dof_encoding();
-
-	sp_vec slice_x(W->get_size());
-	slice_x(n_dof(0)) = -1.;
-	for(uword I = 0, J = 0; I < weight.n_elem; ++I, J += 2) slice_x(e_dof(J)) = weight(I);
-
-	W->incre_mpc();
-	get_auxiliary_stiffness(W).col(last_pos++) = slice_x;
-	// get_auxiliary_load(W).back() = 0.;
-
-	sp_vec slice_y(W->get_size());
-	slice_y(n_dof(1)) = -1.;
-	for(uword I = 0, J = 1; I < weight.n_elem; ++I, J += 2) slice_y(e_dof(J)) = weight(I);
-
-	W->incre_mpc();
-	get_auxiliary_stiffness(W).col(last_pos) = slice_y;
-	// get_auxiliary_load(W).back() = 0.;
+int Embed2D::process_resistance(const shared_ptr<DomainBase>& D) {
+	trial_auxiliary_resistance = auxiliary_stiffness.t() * D->get_factory()->get_trial_displacement();
 
 	return SUANPAN_SUCCESS;
 }
