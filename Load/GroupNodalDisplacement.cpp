@@ -19,14 +19,12 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Group.h>
 
-void GroupNodalDisplacement::update_node_tag(const shared_ptr<DomainBase>& D) const {
-	if(!nodes.empty()) return;
-
+void GroupNodalDisplacement::update_node_tag(const shared_ptr<DomainBase>& D) {
 	vector<uword> tag;
 
 	for(auto& I : groups) if(D->find<Group>(I)) for(auto& J : D->get<Group>(I)->get_pool()) tag.emplace_back(J);
 
-	access::rw(nodes) = unique(uvec(tag));
+	node_encoding = unique(uvec(tag));
 }
 
 GroupNodalDisplacement::GroupNodalDisplacement(const unsigned T, const unsigned ST, const double L, uvec&& N, const unsigned D, const unsigned AT)

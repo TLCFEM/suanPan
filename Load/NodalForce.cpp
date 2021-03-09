@@ -34,7 +34,7 @@ int NodalForce::process(const shared_ptr<DomainBase>& D) {
 
 	trial_load.zeros(W->get_size());
 
-	for(const auto& I : nodes)
+	for(const auto& I : node_encoding)
 		if(auto& t_node = D->get<Node>(I); nullptr != t_node && t_node->is_active()) {
 			auto& t_dof = t_node->get_reordered_dof();
 			for(const auto& J : dofs)

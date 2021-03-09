@@ -36,7 +36,7 @@
 class GroupNodalForce final : public NodalForce {
 	const uvec groups;
 
-	void update_node_tag(const shared_ptr<DomainBase>&) const;
+	void update_node_tag(const shared_ptr<DomainBase>&);
 public:
 	explicit GroupNodalForce(unsigned = 0, // tag
 	                         unsigned = 0, // start step tag

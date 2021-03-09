@@ -19,14 +19,12 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Group.h>
 
-void GroupNodalForce::update_node_tag(const shared_ptr<DomainBase>& D) const {
-	if(!nodes.empty()) return;
-
+void GroupNodalForce::update_node_tag(const shared_ptr<DomainBase>& D) {
 	vector<uword> tag;
 
 	for(auto& I : groups) if(D->find<Group>(I)) for(auto& J : D->get<Group>(I)->get_pool()) tag.emplace_back(J);
 
-	access::rw(nodes) = unique(uvec(tag));
+	node_encoding = unique(uvec(tag));
 }
 
 GroupNodalForce::GroupNodalForce(const unsigned T, const unsigned S, const double L, uvec&& N, const unsigned D, const unsigned AT)

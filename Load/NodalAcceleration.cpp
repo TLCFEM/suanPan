@@ -37,13 +37,13 @@ int NodalAcceleration::process(const shared_ptr<DomainBase>& D) {
 
 	if(nullptr == W->get_mass()) return SUANPAN_SUCCESS;
 
-	if(nodes.is_empty())
+	if(node_encoding.is_empty())
 		for(const auto& I : D->get_node_pool()) {
 			auto& t_dof = I->get_reordered_dof();
 			for(const auto& J : dofs) if(J <= t_dof.n_elem) trial_load(t_dof(J - 1)) = 1.;
 		}
 	else
-		for(const auto& I : nodes)
+		for(const auto& I : node_encoding)
 			if(D->find<Node>(I))
 				if(auto& t_node = D->get<Node>(I); t_node->is_active()) {
 					auto& t_dof = t_node->get_reordered_dof();

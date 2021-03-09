@@ -34,7 +34,7 @@ int BodyForce::process(const shared_ptr<DomainBase>& D) {
 
 	const auto final_load = pattern * magnitude->get_amplitude(t_factory->get_trial_time());
 
-	for(const auto& I : nodes)
+	for(const auto& I : node_encoding)
 		if(auto& t_element = D->get<Element>(I); t_element != nullptr && t_element->is_active()) {
 			vec t_body_load(t_element->get_dof_number(), fill::zeros);
 			for(const auto& J : dofs) if(J <= t_element->get_dof_number()) t_body_load(J - 1) = final_load;

@@ -36,7 +36,7 @@
 class GroupNodalDisplacement final : public NodalDisplacement {
 	const uvec groups;
 
-	void update_node_tag(const shared_ptr<DomainBase>&) const;
+	void update_node_tag(const shared_ptr<DomainBase>&);
 public:
 	explicit GroupNodalDisplacement(unsigned = 0, // tag
 	                                unsigned = 0, // step tag

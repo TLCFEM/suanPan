@@ -36,7 +36,7 @@
 class GroupBodyForce final : public BodyForce {
 	const uvec groups;
 
-	void update_element_tag(const shared_ptr<DomainBase>&) const;
+	void update_element_tag(const shared_ptr<DomainBase>&);
 public:
 	explicit GroupBodyForce(unsigned = 0, // tag
 	                        unsigned = 0, // start step tag

@@ -40,7 +40,7 @@ int NodalDisplacement::initialize(const shared_ptr<DomainBase>& D) {
 
 	for(auto I : W->get_reference_dof()) r_dof.emplace_back(I);
 
-	for(auto I : nodes)
+	for(auto I : node_encoding)
 		if(auto& t_node = D->get<Node>(I); t_node != nullptr && t_node->is_active()) {
 			auto& t_dof = t_node->get_reordered_dof();
 			for(auto J : dofs)
@@ -63,7 +63,7 @@ int NodalDisplacement::process(const shared_ptr<DomainBase>& D) {
 
 	trial_settlement.zeros(W->get_size());
 
-	for(const auto& I : nodes)
+	for(const auto& I : node_encoding)
 		if(auto& t_node = D->get<Node>(I); nullptr != t_node && t_node->is_active()) {
 			auto& t_dof = t_node->get_reordered_dof();
 			for(const auto& J : dofs) if(J <= t_dof.n_elem) trial_settlement(t_dof(J - 1)) = final_settlement;

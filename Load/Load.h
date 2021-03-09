@@ -38,7 +38,7 @@ class Load : public ConditionalModifier {
 protected:
 	static const double multiplier;
 
-	const uvec nodes, dofs;
+	const uvec dofs;
 
 	const double pattern;
 
@@ -55,8 +55,8 @@ public:
 
 	~Load() override;
 
-	const vec& get_trial_load() const;
-	const vec& get_trial_settlement() const;
+	[[nodiscard]] const vec& get_trial_load() const;
+	[[nodiscard]] const vec& get_trial_settlement() const;
 };
 
 void set_load_multiplier(double);
