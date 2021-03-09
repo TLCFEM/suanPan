@@ -52,23 +52,18 @@ PenaltyBC::PenaltyBC(const unsigned T, const unsigned S, uvec&& N, uvec&& D)
  */
 PenaltyBC::PenaltyBC(const unsigned T, const unsigned S, uvec&& N, const char* TP)
 	: Constraint(T, S, 0, std::forward<uvec>(N), {}, 0) {
-	if(is_equal(TP[0], 'X')) dofs = uvec{1, 5, 6};
-	else if(is_equal(TP[0], 'Y')) dofs = uvec{2, 4, 6};
-	else if(is_equal(TP[0], 'Z')) dofs = uvec{3, 4, 5};
-	else if(is_equal(TP[0], 'E')) dofs = uvec{1, 2, 3, 4, 5, 6};
-	else if(is_equal(TP[0], 'P')) dofs = uvec{1, 2, 3};
-	else if(is_equal(TP[0], '1')) dofs = uvec{1};
-	else if(is_equal(TP[0], '2')) dofs = uvec{2};
-	else if(is_equal(TP[0], '3')) dofs = uvec{3};
-	else if(is_equal(TP[0], '4')) dofs = uvec{4};
-	else if(is_equal(TP[0], '5')) dofs = uvec{5};
-	else if(is_equal(TP[0], '6')) dofs = uvec{6};
+	if(is_equal(TP[0], 'X')) dof_reference = uvec{1, 5, 6};
+	else if(is_equal(TP[0], 'Y')) dof_reference = uvec{2, 4, 6};
+	else if(is_equal(TP[0], 'Z')) dof_reference = uvec{3, 4, 5};
+	else if(is_equal(TP[0], 'E')) dof_reference = uvec{1, 2, 3, 4, 5, 6};
+	else if(is_equal(TP[0], 'P')) dof_reference = uvec{1, 2, 3};
+	else if(is_equal(TP[0], '1')) dof_reference = uvec{1};
+	else if(is_equal(TP[0], '2')) dof_reference = uvec{2};
+	else if(is_equal(TP[0], '3')) dof_reference = uvec{3};
+	else if(is_equal(TP[0], '4')) dof_reference = uvec{4};
+	else if(is_equal(TP[0], '5')) dof_reference = uvec{5};
+	else if(is_equal(TP[0], '6')) dof_reference = uvec{6};
 }
-
-/**
- * \brief default destructor.
- */
-PenaltyBC::~PenaltyBC() = default;
 
 /**
  * \brief method to apply the PenaltyBC to the system.
@@ -76,36 +71,30 @@ PenaltyBC::~PenaltyBC() = default;
  * \return 0
  */
 int PenaltyBC::process(const shared_ptr<DomainBase>& D) {
-	auto& t_matrix = D->get_factory()->get_stiffness();
+	const auto max_term = 1E14;
 
-	if(StorageScheme::SPARSE == D->get_factory()->get_storage_scheme()) {
-		const auto max_term = std::min(multiplier * t_matrix->max(), 1E13);
+	stiffness.reset();
+	vector<uword> pool;
+	pool.reserve(node_encoding.n_elem * dof_reference.n_elem);
 
-		for(const auto& I : nodes)
-			if(D->find<Node>(I))
-				if(auto& t_node = D->get<Node>(I); t_node->is_active()) {
-					auto& t_dof = t_node->get_reordered_dof();
-					for(const auto& J : dofs) if(J <= t_dof.n_elem) if(auto& t_idx = t_dof(J - 1); D->insert_restrained_dof(t_idx)) t_matrix->at(t_idx, t_idx) = max_term;
+	auto counter = 0llu;
+	for(const auto& I : node_encoding)
+		if(auto& t_node = D->get<Node>(I); nullptr != t_node && t_node->is_active()) {
+			auto& t_dof = t_node->get_reordered_dof();
+			for(const auto& J : dof_reference)
+				if(J <= t_dof.n_elem) {
+					auto& t_idx = t_dof(J - 1);
+					D->insert_restrained_dof(t_idx);
+					++counter;
+					stiffness.resize(counter, counter);
+					stiffness(counter - 1, counter - 1) = max_term;
+					pool.emplace_back(t_idx);
 				}
-	}
-	else {
-		auto& t_set_b = D->get_constrained_dof();
+		}
 
-		for(const auto& I : nodes)
-			if(D->find<Node>(I))
-				if(auto& t_node = D->get<Node>(I); t_node->is_active()) {
-					auto& t_dof = t_node->get_reordered_dof();
-					for(const auto& J : dofs)
-						if(J <= t_dof.n_elem)
-							if(auto& t_idx = t_dof(J - 1); D->insert_restrained_dof(t_idx)) {
-								if(0. != t_matrix->operator()(t_idx, t_idx)) t_matrix->at(t_idx, t_idx) = std::min(multiplier * t_matrix->operator()(t_idx, t_idx), 1E13);
-								else {
-									auto& t_set = D->get_restrained_dof();
-									t_matrix->at(t_idx, t_idx) = t_set.size() == 1 ? t_set_b.empty() ? std::min(multiplier * t_matrix->max(), 1E13) : t_matrix->operator()(*t_set_b.cbegin(), *t_set_b.cbegin()) : *t_set.cbegin() == t_idx ? t_matrix->operator()(*++t_set.cbegin(), *++t_set.cbegin()) : t_matrix->operator()(*t_set.cbegin(), *t_set.cbegin());
-								}
-							}
-				}
-	}
+	dof_encoding = pool;
 
 	return SUANPAN_SUCCESS;
 }
+
+int PenaltyBC::process_resistance(const shared_ptr<DomainBase>&) { return SUANPAN_SUCCESS; }

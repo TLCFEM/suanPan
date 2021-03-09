@@ -20,12 +20,15 @@
 #include <Load/Amplitude/Ramp.h>
 #include <Step/Step.h>
 
-ConditionalModifier::ConditionalModifier(const unsigned T, const unsigned ST, const unsigned AT)
+ConditionalModifier::ConditionalModifier(const unsigned T, const unsigned ST, const unsigned AT, uvec&& N)
 	: Tag(T)
 	, start_step(0 == ST ? 1 : ST)
-	, amplitude_tag(AT) {}
+	, amplitude_tag(AT)
+	, node_encoding(std::forward<uvec>(N)) {}
 
 int ConditionalModifier::initialize(const shared_ptr<DomainBase>& D) {
+	if(!validate_step(D)) return SUANPAN_SUCCESS;
+
 	0 == amplitude_tag ? magnitude = make_shared<Ramp>(0) : magnitude = D->get<Amplitude>(amplitude_tag);
 
 	if(nullptr != magnitude && !magnitude->is_active()) magnitude = nullptr;
@@ -46,6 +49,8 @@ int ConditionalModifier::initialize(const shared_ptr<DomainBase>& D) {
 	return SUANPAN_SUCCESS;
 }
 
+const uvec& ConditionalModifier::get_node_encoding() const { return node_encoding; }
+
 void ConditionalModifier::set_initialized(const bool B) const { access::rw(initialized) = B; }
 
 bool ConditionalModifier::is_initialized() const { return initialized; }
@@ -61,13 +66,19 @@ void ConditionalModifier::set_end_step(const unsigned ST) { end_step = ST; }
 
 unsigned ConditionalModifier::get_end_step() const { return end_step; }
 
+void ConditionalModifier::set_connected(const bool B) const { access::rw(connected) = B; }
+
+bool ConditionalModifier::is_connected() const { return connected; }
+
 bool ConditionalModifier::validate_step(const shared_ptr<DomainBase>& D) const {
 	const auto t_step = D->get_current_step_tag();
 	return t_step >= start_step && t_step < end_step && is_active();
 }
 
+void ConditionalModifier::update_status(const vec&) {}
+
 void ConditionalModifier::commit_status() {}
 
-void ConditionalModifier::clear_status() { set_initialized(false); }
+void ConditionalModifier::clear_status() { }
 
 void ConditionalModifier::reset_status() {}

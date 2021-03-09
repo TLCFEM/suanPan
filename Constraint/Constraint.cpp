@@ -20,28 +20,28 @@
 const double Constraint::multiplier = 1E8;
 
 Constraint::Constraint(const unsigned T, const unsigned ST, const unsigned AT, uvec&& N, uvec&& D, const unsigned S)
-	: ConditionalModifier(T, ST, AT)
+	: ConditionalModifier(T, ST, AT, std::forward<uvec>(N))
 	, num_size(S)
-	, nodes(std::forward<uvec>(N))
-	, dofs(std::forward<uvec>(D)) { suanpan_debug("Constraint %u ctor() called.\n", get_tag()); }
+	, dof_reference(std::forward<uvec>(D)) { suanpan_debug("Constraint %u ctor() called.\n", get_tag()); }
 
 Constraint::~Constraint() { suanpan_debug("Constraint %u dtor() called.\n", get_tag()); }
 
-const uvec& Constraint::get_encoding() const { return nodes; }
+const uvec& Constraint::get_dof_encoding() const { return dof_encoding; }
+
+const sp_vec& Constraint::get_trial_resistance() const { return trial_resistance; }
+
+const sp_vec& Constraint::get_current_resistance() const { return current_resistance; }
+
+const vec& Constraint::get_trial_auxiliary_resistance() const { return trial_auxiliary_resistance; }
+
+const sp_mat& Constraint::get_auxiliary_stiffness() const { return auxiliary_stiffness; }
+
+const sp_mat& Constraint::get_stiffness() const { return stiffness; }
+
+const vec& Constraint::get_auxiliary_load() const { return auxiliary_load; }
 
 void Constraint::set_multiplier_size(const unsigned S) { num_size = S; }
 
 unsigned Constraint::get_multiplier_size() const { return num_size; }
-
-void Constraint::update_incre_lambda(const vec& i_lambda) { trial_lambda += i_lambda; }
-
-void Constraint::commit_status() { current_lambda = trial_lambda; }
-
-void Constraint::clear_status() {
-	current_lambda = trial_lambda = 0.;
-	access::rw(initialized) = false;
-}
-
-void Constraint::reset_status() { trial_lambda = current_lambda; }
 
 void set_constraint_multiplier(const double M) { access::rw(Constraint::multiplier) = M; }

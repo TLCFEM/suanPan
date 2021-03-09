@@ -39,11 +39,21 @@ protected:
 
 	unsigned num_size; // size of multiplier
 
-	uvec nodes; /**< node indices */
-	uvec dofs;  /**< DoF indices */
+	uvec dof_reference; /**< DoF reference */
+	uvec dof_encoding;  /**< DoF encoding */
 
 	vec trial_lambda = zeros(num_size);
 	vec current_lambda = zeros(num_size);
+
+	sp_vec trial_resistance;
+	sp_vec current_resistance;
+
+	vec trial_auxiliary_resistance;
+
+	sp_mat stiffness;
+	sp_mat auxiliary_stiffness;
+
+	vec auxiliary_load;
 
 	friend void set_constraint_multiplier(double);
 public:
@@ -55,17 +65,20 @@ public:
 
 	~Constraint() override;
 
-	const uvec& get_encoding() const;
+	const uvec& get_dof_encoding() const;
+
+	const sp_vec& get_trial_resistance() const;
+	const sp_vec& get_current_resistance() const;
+
+	const vec& get_trial_auxiliary_resistance() const;
+
+	const sp_mat& get_auxiliary_stiffness() const;
+	const sp_mat& get_stiffness() const;
+
+	const vec& get_auxiliary_load() const;
 
 	void set_multiplier_size(unsigned);
 	[[nodiscard]] unsigned get_multiplier_size() const;
-
-	void update_incre_lambda(const vec&);
-
-	// some constraint may manage state
-	void commit_status() override;
-	void clear_status() override;
-	void reset_status() override;
 };
 
 void set_constraint_multiplier(double);

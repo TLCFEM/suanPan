@@ -29,23 +29,20 @@
 int MultiplierBC::process(const shared_ptr<DomainBase>& D) {
 	// for eignevalue problem, only use penalty method
 	auto& t_step = *D->get_current_step();
-	if(typeid(t_step) == typeid(Frequency)) return PenaltyBC::process(D);
+	if(typeid(Frequency) == typeid(t_step)) return PenaltyBC::process(D);
 
 	auto& t_matrix = D->get_factory()->get_stiffness();
-	auto& t_load = get_trial_load(D->get_factory());
-	auto& t_sushi = get_sushi(D->get_factory());
 
-	for(const auto& I : nodes)
-		if(D->find<Node>(I))
-			if(auto& t_node = D->get<Node>(I); t_node->is_active()) {
-				auto& t_dof = t_node->get_reordered_dof();
-				for(const auto& J : dofs)
-					if(J <= t_dof.n_elem)
-						if(const auto& t_idx = t_dof(J - 1); D->insert_restrained_dof(t_idx)) {
-							t_matrix->unify(t_idx);
-							t_sushi(t_idx) = t_load(t_idx) = 0.;
-						}
-			}
+	for(const auto& I : node_encoding)
+		if(auto& t_node = D->get<Node>(I); nullptr != t_node && t_node->is_active()) {
+			auto& t_dof = t_node->get_reordered_dof();
+			for(const auto& J : dof_reference)
+				if(J <= t_dof.n_elem) {
+					const auto& t_idx = t_dof(J - 1);
+					D->insert_restrained_dof(t_idx);
+					t_matrix->unify(t_idx);
+				}
+		}
 
 	return SUANPAN_SUCCESS;
 }
