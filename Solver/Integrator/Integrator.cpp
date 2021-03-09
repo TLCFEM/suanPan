@@ -59,15 +59,17 @@ int Integrator::process_criterion() { return database.lock()->process_criterion(
 
 int Integrator::process_modifier() { return database.lock()->process_modifier(); }
 
-void Integrator::process_load_resistance() {}
+int Integrator::process_load_resistance() { return SUANPAN_SUCCESS; }
 
-void Integrator::process_constraint_resistance() {
+int Integrator::process_constraint_resistance() {
 	const auto& D = database.lock();
 	const auto& W = D->get_factory();
 
-	D->process_constraint_resistance();
+	const auto code = D->process_constraint_resistance();
 
 	W->set_sushi(W->get_sushi() + W->get_trial_constraint_resistance());
+
+	return code;
 }
 
 void Integrator::record() const { database.lock()->record(); }

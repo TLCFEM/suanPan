@@ -68,9 +68,8 @@ public:
 	[[nodiscard]] virtual int process_constraint();
 	[[nodiscard]] virtual int process_criterion();
 	[[nodiscard]] virtual int process_modifier();
-
-	virtual void process_load_resistance();
-	virtual void process_constraint_resistance();
+	[[nodiscard]] virtual int process_load_resistance();
+	[[nodiscard]] virtual int process_constraint_resistance();
 
 	void record() const;
 

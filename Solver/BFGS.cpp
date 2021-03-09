@@ -83,8 +83,8 @@ int BFGS::analyze() {
 		}
 		else {
 			// process resistance of loads and constraints
-			G->process_load_resistance();
-			G->process_constraint_resistance();
+			if(SUANPAN_SUCCESS != G->process_load_resistance()) return SUANPAN_FAIL;
+			if(SUANPAN_SUCCESS != G->process_constraint_resistance()) return SUANPAN_FAIL;
 			// clear temporary factor container
 			alpha.clear();
 			// commit current residual

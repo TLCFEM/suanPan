@@ -1088,22 +1088,25 @@ int Domain::process_modifier() {
 	return code;
 }
 
-void Domain::process_load_resistance() {}
+int Domain::process_load_resistance() { return SUANPAN_SUCCESS; }
 
-void Domain::process_constraint_resistance() {
+int Domain::process_constraint_resistance() {
 	auto& constraint_resistance = get_trial_constraint_resistance(factory);
 	constraint_resistance.zeros();
 
 	auto& t_encoding = get_auxiliary_encoding(factory);
 	auto& t_resistance = get_auxiliary_resistance(factory);
 
+	auto code = 0;
 	for(auto& I : constraint_pond.get()) {
 		if(!I->is_initialized()) continue;
-		I->process_resistance(shared_from_this());
+		code += I->process_resistance(shared_from_this());
 		if(!I->get_trial_resistance().empty()) constraint_resistance += I->get_trial_resistance();
 		if(0 == I->get_multiplier_size()) continue;
 		if(!I->get_trial_auxiliary_resistance().empty()) t_resistance(arma::find(t_encoding == I->get_tag())) = I->get_trial_auxiliary_resistance();
 	}
+
+	return code;
 }
 
 void Domain::record() { for(const auto& I : recorder_pond.get()) if(I->is_active()) I->record(shared_from_this()); }

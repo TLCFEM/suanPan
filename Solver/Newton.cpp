@@ -54,9 +54,9 @@ int Newton::analyze() {
 
 		if(initial_stiffness && counter != 0) {
 			// some loads may have resistance
-			G->process_load_resistance();
+			if(SUANPAN_SUCCESS != G->process_load_resistance()) return SUANPAN_FAIL;
 			// some constraints may have resistance
-			G->process_constraint_resistance();
+			if(SUANPAN_SUCCESS != G->process_constraint_resistance()) return SUANPAN_FAIL;
 			// call solver
 			flag = G->solve_trs(ninja, G->get_force_residual());
 		}

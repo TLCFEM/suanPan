@@ -322,8 +322,8 @@ public:
 	[[nodiscard]] int process_constraint() override;
 	[[nodiscard]] int process_criterion() override;
 	[[nodiscard]] int process_modifier() override;
-	void process_load_resistance() override;
-	void process_constraint_resistance() override;
+	[[nodiscard]] int process_load_resistance() override;
+	[[nodiscard]] int process_constraint_resistance() override;
 	// record response
 	void record() override;
 	// enable all objects
