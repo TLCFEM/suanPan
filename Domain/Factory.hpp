@@ -1641,8 +1641,25 @@ template<typename T> void Factory<T>::assemble_geometry(const Mat<T>& EG, const 
 template<typename T> void Factory<T>::assemble_stiffness(const SpMat<T>& EK, const uvec& EI) {
 	if(EK.is_empty()) return;
 
-	if(storage_type == StorageScheme::SPARSE) for(unsigned I = 0; I < EI.n_elem; ++I) for(unsigned J = 0; J < EI.n_elem; ++J) global_stiffness->at(EI(J), EI(I)) = EK(J, I);
-	else for(unsigned I = 0; I < EI.n_elem; ++I) for(unsigned J = 0; J < EI.n_elem; ++J) global_stiffness->at(EI(J), EI(I)) += EK(J, I);
+	EK.sync();
+
+	const auto& val_ptr = EK.values;
+	const auto& rol_ptr = EK.row_indices;
+	const auto& col_ptr = EK.col_ptrs;
+
+	auto idx = 0;
+	if(storage_type == StorageScheme::SPARSE) {
+		while(col_ptr[idx] != EK.n_nonzero) {
+			for(auto I = col_ptr[idx]; I < col_ptr[idx + 1]; ++I) global_stiffness->at(EI(rol_ptr[I]), EI(idx)) = val_ptr[I];
+			++idx;
+		}
+	}
+	else {
+		while(col_ptr[idx] != EK.n_nonzero) {
+			for(auto I = col_ptr[idx]; I < col_ptr[idx + 1]; ++I) global_stiffness->at(EI(rol_ptr[I]), EI(idx)) += val_ptr[I];
+			++idx;
+		}
+	}
 }
 
 template<typename T> void Factory<T>::print() const { suanpan_info("This is a Factory object with size of %u.\n", n_size); }
