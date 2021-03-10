@@ -55,7 +55,7 @@ public:
 	virtual int initialize(const shared_ptr<DomainBase>&);
 
 	virtual int process(const shared_ptr<DomainBase>&) = 0;
-	virtual int process_resistance(const shared_ptr<DomainBase>&) = 0;
+	virtual int process_resistance(const shared_ptr<DomainBase>&);
 
 	[[nodiscard]] const uvec& get_node_encoding() const;
 

@@ -46,13 +46,11 @@ int MPC::initialize(const shared_ptr<DomainBase>& D) {
 }
 
 int MPC::process(const shared_ptr<DomainBase>& D) {
-	auxiliary_load = psudo_load * magnitude->get_amplitude(D->get_factory()->get_trial_time());
+	auto& W = D->get_factory();
+
+	auxiliary_load = psudo_load * magnitude->get_amplitude(W->get_trial_time());
+
+	trial_auxiliary_resistance = auxiliary_stiffness.t() * W->get_trial_displacement();
 
 	return process_resistance(D);
-}
-
-int MPC::process_resistance(const shared_ptr<DomainBase>& D) {
-	trial_auxiliary_resistance = auxiliary_stiffness.t() * D->get_factory()->get_trial_displacement();
-
-	return SUANPAN_SUCCESS;
 }

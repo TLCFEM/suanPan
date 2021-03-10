@@ -39,7 +39,7 @@ GeneralizedAlpha::GeneralizedAlpha(const unsigned T, const double AF, const doub
 	, alpha_m(std::min(alpha_f, std::max(AM, -1.)))
 	, gamma(.5 - alpha_m + alpha_f)
 	, beta(.25 * (gamma + .5) * (gamma + .5)) {
-	if(alpha_m != AM || alpha_f != AF) suanpan_error("GeneralizedAlpha() parameters are not acceptable hence automatically adjusted.\n"); // NOLINT(clang-diagnostic-float-equal)
+	if(!suanpan::approx_equal(alpha_m, AM) || !suanpan::approx_equal(alpha_f, AF)) suanpan_error("GeneralizedAlpha() parameters are not acceptable hence automatically adjusted.\n");
 
 	F1 = alpha_f;
 	F2 = 1. - F1;
@@ -103,7 +103,7 @@ int GeneralizedAlpha::process_load() {
 
 	W->update_trial_time(F1 * current_time + F2 * trial_time);
 
-	const auto code = D->process_load();
+	const auto code = D->process_load(true);
 
 	W->update_trial_time(trial_time);
 
@@ -121,7 +121,7 @@ int GeneralizedAlpha::update_trial_status() {
 }
 
 void GeneralizedAlpha::update_parameter(const double NT) {
-	if(F10 == NT) return; // NOLINT(clang-diagnostic-float-equal)
+	if(suanpan::approx_equal(F10, NT)) return;
 
 	F10 = NT;
 	F11 = F10 * gamma;

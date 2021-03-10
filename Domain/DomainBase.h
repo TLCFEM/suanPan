@@ -313,12 +313,10 @@ public:
 	virtual int initialize_constraint() = 0;
 	virtual int initialize_reference() = 0;
 
-	[[nodiscard]] virtual int process_load() = 0;
-	[[nodiscard]] virtual int process_constraint() = 0;
+	[[nodiscard]] virtual int process_load(bool) = 0;
+	[[nodiscard]] virtual int process_constraint(bool) = 0;
 	[[nodiscard]] virtual int process_criterion() = 0;
 	[[nodiscard]] virtual int process_modifier() = 0;
-	[[nodiscard]] virtual int process_load_resistance() = 0;
-	[[nodiscard]] virtual int process_constraint_resistance() = 0;
 
 	virtual void record() = 0;
 	virtual void enable_all() = 0;

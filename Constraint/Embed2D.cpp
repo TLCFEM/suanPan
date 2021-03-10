@@ -67,9 +67,7 @@ int Embed2D::initialize(const shared_ptr<DomainBase>& D) {
 	return Constraint::initialize(D);
 }
 
-int Embed2D::process(const shared_ptr<DomainBase>& D) { return process_resistance(D); }
-
-int Embed2D::process_resistance(const shared_ptr<DomainBase>& D) {
+int Embed2D::process(const shared_ptr<DomainBase>& D) {
 	trial_auxiliary_resistance = auxiliary_stiffness.t() * D->get_factory()->get_trial_displacement();
 
 	return SUANPAN_SUCCESS;

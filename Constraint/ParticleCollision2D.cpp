@@ -23,12 +23,7 @@ double ParticleCollision2D::compute_f(const double distance) const { return dist
 
 double ParticleCollision2D::compute_df(const double distance) const { return distance >= space ? 0. : -alpha / distance; }
 
-ParticleCollision2D::ParticleCollision2D(const unsigned T, const unsigned S, const double G, const double A)
-	: ParticleCollision(T, S, 2)
-	, space(std::max(G, 1E-4))
-	, alpha(A) {}
-
-int ParticleCollision2D::process(const shared_ptr<DomainBase>& D) {
+int ParticleCollision2D::process_meta(const shared_ptr<DomainBase>& D, const bool full) {
 	auto& W = D->get_factory();
 
 	auto& node_pool = D->get_node_pool();
@@ -55,8 +50,13 @@ int ParticleCollision2D::process(const shared_ptr<DomainBase>& D) {
 			const auto diff_y = J->y - I->y;
 			if(diff_x == 1 && diff_y > 1) break;
 			if(abs(diff_y) > 1) continue;
-			apply_contact(D, D->get<Node>(I->tag), D->get<Node>(J->tag));
+			apply_contact(D, D->get<Node>(I->tag), D->get<Node>(J->tag), full);
 		}
 
 	return SUANPAN_SUCCESS;
 }
+
+ParticleCollision2D::ParticleCollision2D(const unsigned T, const unsigned S, const double G, const double A)
+	: ParticleCollision(T, S, 2)
+	, space(std::max(G, 1E-4))
+	, alpha(A) {}

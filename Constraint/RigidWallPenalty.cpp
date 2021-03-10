@@ -80,27 +80,6 @@ int RigidWallPenalty::process(const shared_ptr<DomainBase>& D) {
 	return SUANPAN_SUCCESS;
 }
 
-int RigidWallPenalty::process_resistance(const shared_ptr<DomainBase>& D) {
-	const auto factor = alpha * pow(D->get_factory()->get_incre_time(), -2.);
-
-	trial_resistance.zeros();
-
-	for(const auto& I : D->get_node_pool()) {
-		auto& t_coor = I->get_coordinate();
-		auto& t_disp = I->get_trial_displacement();
-		const auto t_size = std::min(norm.n_elem, std::min(t_coor.n_elem, t_disp.n_elem));
-		vec t_pos = -origin;
-		for(auto J = 0llu; J < t_size; ++J) t_pos(J) += t_coor(J) + t_disp(J);
-		if(!edge_a.empty() && dot(t_pos, edge_a) > arma::norm(edge_a) || !edge_b.empty() && dot(t_pos, edge_b) > arma::norm(edge_b)) continue;
-		const auto t_pen = dot(t_pos, norm);
-		if(t_pen > datum::eps) continue;
-		auto& t_dof = I->get_reordered_dof();
-		for(auto J = 0llu; J < t_size; ++J) trial_resistance(t_dof(J)) += factor * t_pen * norm(J);
-	}
-
-	return SUANPAN_SUCCESS;
-}
-
 void RigidWallPenalty::commit_status() { current_resistance = trial_resistance; }
 
 void RigidWallPenalty::clear_status() { current_resistance = trial_resistance.zeros(); }

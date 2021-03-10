@@ -43,7 +43,6 @@ public:
 	int initialize(const shared_ptr<DomainBase>&) override;
 
 	int process(const shared_ptr<DomainBase>&) override;
-	int process_resistance(const shared_ptr<DomainBase>&) override;
 
 	void commit_status() override;
 	void clear_status() override;

@@ -45,15 +45,19 @@ class ParticleCollision : public Constraint {
 	 * \return the derivative of force w.r.t. distance
 	 */
 	[[nodiscard]] virtual double compute_df(double) const = 0;
+
 protected:
 	[[nodiscard]] vec get_postion(const shared_ptr<Node>&) const;
 
-	void apply_contact(const shared_ptr<DomainBase>&, const shared_ptr<Node>&, const shared_ptr<Node>&);
+	void apply_contact(const shared_ptr<DomainBase>&, const shared_ptr<Node>&, const shared_ptr<Node>&, bool);
+
+	virtual int process_meta(const shared_ptr<DomainBase>&, bool) = 0;
 public:
 	ParticleCollision(unsigned, unsigned, unsigned);
 
 	int initialize(const shared_ptr<DomainBase>&) override;
 
+	int process(const shared_ptr<DomainBase>&) override;
 	int process_resistance(const shared_ptr<DomainBase>&) override;
 };
 

@@ -44,10 +44,10 @@ class ParticleCollision3D final : public ParticleCollision {
 
 	[[nodiscard]] double compute_f(double) const override;
 	[[nodiscard]] double compute_df(double) const override;
+
+	int process_meta(const shared_ptr<DomainBase>&, bool) override;
 public:
 	ParticleCollision3D(unsigned, unsigned, double = 1., double = 1.);
-
-	int process(const shared_ptr<DomainBase>&) override;
 };
 
 #endif

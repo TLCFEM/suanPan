@@ -28,7 +28,7 @@ ParticleCollision3D::ParticleCollision3D(const unsigned T, const unsigned S, con
 	, space(std::max(G, 1E-4))
 	, alpha(A) {}
 
-int ParticleCollision3D::process(const shared_ptr<DomainBase>& D) {
+int ParticleCollision3D::process_meta(const shared_ptr<DomainBase>& D, const bool full) {
 	auto& W = D->get_factory();
 
 	auto& node_pool = D->get_node_pool();
@@ -57,7 +57,7 @@ int ParticleCollision3D::process(const shared_ptr<DomainBase>& D) {
 			const auto diff_z = J->z - I->z;
 			if(diff_x == 1 && (diff_y > 1 || diff_z > 1)) break;
 			if(abs(diff_y) > 1 || abs(diff_z) > 1) continue;
-			apply_contact(D, D->get<Node>(I->tag), D->get<Node>(J->tag));
+			apply_contact(D, D->get<Node>(I->tag), D->get<Node>(J->tag), full);
 		}
 
 	return SUANPAN_SUCCESS;

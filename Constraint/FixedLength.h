@@ -31,14 +31,16 @@
 
 #include <Constraint/Constraint.h>
 
+class Node;
+
 class FixedLength final : public Constraint {
+	weak_ptr<Node> node_i, node_j;
 public:
 	FixedLength(unsigned, unsigned, unsigned, unsigned, uvec&&);
 
 	int initialize(const shared_ptr<DomainBase>&) override;
 
 	int process(const shared_ptr<DomainBase>&) override;
-	int process_resistance(const shared_ptr<DomainBase>&) override;
 
 	void update_status(const vec&) override;
 	void commit_status() override;

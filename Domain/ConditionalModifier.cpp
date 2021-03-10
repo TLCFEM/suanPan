@@ -49,6 +49,8 @@ int ConditionalModifier::initialize(const shared_ptr<DomainBase>& D) {
 	return SUANPAN_SUCCESS;
 }
 
+int ConditionalModifier::process_resistance(const shared_ptr<DomainBase>& D) { return process(D); }
+
 const uvec& ConditionalModifier::get_node_encoding() const { return node_encoding; }
 
 void ConditionalModifier::set_initialized(const bool B) const { access::rw(initialized) = B; }

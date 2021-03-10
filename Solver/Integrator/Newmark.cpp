@@ -84,7 +84,7 @@ void Newmark::update_compatibility() const {
 }
 
 void Newmark::update_parameter(const double NT) {
-	if(fabs(C5 - NT) <= 1E-12) return;
+	if(suanpan::approx_equal(C5, NT)) return;
 
 	C5 = NT;
 	C2 = 1. / beta / C5;

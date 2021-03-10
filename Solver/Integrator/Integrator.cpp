@@ -39,13 +39,13 @@ void Integrator::set_time_step_switch(const bool T) { time_step_switch = T; }
 
 bool Integrator::allow_to_change_time_step() const { return time_step_switch; }
 
-int Integrator::process_load() { return database.lock()->process_load(); }
+int Integrator::process_load() { return database.lock()->process_load(true); }
 
 int Integrator::process_constraint() {
 	const auto& D = database.lock();
 	const auto& W = D->get_factory();
 
-	const auto code = D->process_constraint();
+	const auto code = D->process_constraint(true);
 
 	W->set_sushi(W->get_sushi() + W->get_trial_constraint_resistance());
 
@@ -65,7 +65,7 @@ int Integrator::process_constraint_resistance() {
 	const auto& D = database.lock();
 	const auto& W = D->get_factory();
 
-	const auto code = D->process_constraint_resistance();
+	const auto code = D->process_constraint(false);
 
 	W->set_sushi(W->get_sushi() + W->get_trial_constraint_resistance());
 

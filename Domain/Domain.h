@@ -318,12 +318,10 @@ public:
 	// initiaze constraints for each step
 	int initialize_reference() override;
 	// process loads and constraints
-	[[nodiscard]] int process_load() override;
-	[[nodiscard]] int process_constraint() override;
+	[[nodiscard]] int process_load(bool) override;
+	[[nodiscard]] int process_constraint(bool) override;
 	[[nodiscard]] int process_criterion() override;
 	[[nodiscard]] int process_modifier() override;
-	[[nodiscard]] int process_load_resistance() override;
-	[[nodiscard]] int process_constraint_resistance() override;
 	// record response
 	void record() override;
 	// enable all objects

@@ -32,6 +32,7 @@
 #define NONLINEARDRUCKERPRAGER_H
 
 #include <Material/Material3D/Material3D.h>
+#include <Toolbox/utility.h>
 
 struct DataNonlinearDruckerPrager {
 	const double elastic_modulus; // elastic modulus
@@ -55,7 +56,7 @@ class NonlinearDruckerPrager : protected DataNonlinearDruckerPrager, public Mate
 	const double factor_c = sqrt(2.) * shear * bulk;
 	const double factor_d = bulk * bulk * eta_flow * eta_yield;
 
-	const bool associated = eta_yield == eta_flow; // NOLINT(clang-diagnostic-float-equal)
+	const bool associated = suanpan::approx_equal(eta_yield, eta_flow);
 
 	[[nodiscard]] virtual double compute_c(double) const = 0;
 	[[nodiscard]] virtual double compute_dc(double) const = 0;

@@ -1005,7 +1005,7 @@ int Domain::initialize_reference() {
 	return SUANPAN_SUCCESS;
 }
 
-int Domain::process_load() {
+int Domain::process_load(const bool full) {
 	loaded_dofs.clear();
 
 	auto& t_load = get_trial_load(factory);
@@ -1014,10 +1014,12 @@ int Domain::process_load() {
 	auto& t_settlement = get_trial_settlement(factory);
 	if(!t_settlement.empty()) t_settlement.zeros();
 
+	const auto process_handler = full ? std::mem_fn(&Load::process) : std::mem_fn(&Load::process_resistance);
+
 	auto code = 0;
 	for(auto& I : load_pond.get()) {
 		if(!I->is_initialized()) continue;
-		code += I->process(shared_from_this());
+		code += std::invoke(process_handler, I, shared_from_this());
 		if(!I->get_trial_load().empty()) t_load += I->get_trial_load();
 		if(!I->get_trial_settlement().empty()) t_settlement += I->get_trial_settlement();
 	}
@@ -1028,16 +1030,14 @@ int Domain::process_load() {
 	return code;
 }
 
-int Domain::process_constraint() {
+int Domain::process_constraint(const bool full) {
 	// ! Tasks:
-	// ! 1. clear previous auxiliary variables as they may change size
-	// ! 2. process initialised constraints
+	// ! 1. process initialised constraints
+	// ! 2. clear previous auxiliary variables as they may change size
 	// ! 3. assemble constraint resistance
 	// ! 4. assemble auxiliary resistance, load, and stiffness
 	// ! 5. record auxiliary encoding
 	// ! assemble stiffness shall be done in integrator
-
-	factory->clear_auxiliary();
 
 	restrained_dofs.clear();
 	constrained_dofs.clear();
@@ -1045,16 +1045,19 @@ int Domain::process_constraint() {
 	auto& constraint_resistance = get_trial_constraint_resistance(factory);
 	constraint_resistance.zeros();
 
+	const auto process_handler = full ? std::mem_fn(&Constraint::process) : std::mem_fn(&Constraint::process_resistance);
+
 	auto code = 0, counter = 0;
 	for(auto& I : constraint_pond.get()) {
 		if(!I->is_initialized()) continue;
-		code += I->process(shared_from_this());
+		code += std::invoke(process_handler, I, shared_from_this());
 		if(!I->get_trial_resistance().empty()) constraint_resistance += I->get_trial_resistance();
 		counter += I->get_multiplier_size();
 	}
 
+	factory->set_mpc(counter);
+
 	if(counter > 0) {
-		factory->set_mpc(counter);
 		auto& t_encoding = get_auxiliary_encoding(factory);
 		auto& t_resistance = get_auxiliary_resistance(factory);
 		auto& t_load = get_auxiliary_load(factory);
@@ -1077,7 +1080,7 @@ int Domain::process_constraint() {
 
 int Domain::process_criterion() {
 	auto code = 0;
-	for(auto& I : criterion_pond.get()) if(I->is_active()) code += I->process(shared_from_this());
+	for(auto& I : criterion_pond.get()) code += I->process(shared_from_this());
 	return code;
 }
 
@@ -1088,28 +1091,7 @@ int Domain::process_modifier() {
 	return code;
 }
 
-int Domain::process_load_resistance() { return SUANPAN_SUCCESS; }
-
-int Domain::process_constraint_resistance() {
-	auto& constraint_resistance = get_trial_constraint_resistance(factory);
-	constraint_resistance.zeros();
-
-	auto& t_encoding = get_auxiliary_encoding(factory);
-	auto& t_resistance = get_auxiliary_resistance(factory);
-
-	auto code = 0;
-	for(auto& I : constraint_pond.get()) {
-		if(!I->is_initialized()) continue;
-		code += I->process_resistance(shared_from_this());
-		if(!I->get_trial_resistance().empty()) constraint_resistance += I->get_trial_resistance();
-		if(0 == I->get_multiplier_size()) continue;
-		if(!I->get_trial_auxiliary_resistance().empty()) t_resistance(arma::find(t_encoding == I->get_tag())) = I->get_trial_auxiliary_resistance();
-	}
-
-	return code;
-}
-
-void Domain::record() { for(const auto& I : recorder_pond.get()) if(I->is_active()) I->record(shared_from_this()); }
+void Domain::record() { for(const auto& I : recorder_pond.get()) I->record(shared_from_this()); }
 
 void Domain::enable_all() {
 	updated = false;

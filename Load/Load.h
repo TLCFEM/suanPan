@@ -57,8 +57,6 @@ public:
 
 	[[nodiscard]] const vec& get_trial_load() const;
 	[[nodiscard]] const vec& get_trial_settlement() const;
-
-	int process_resistance(const shared_ptr<DomainBase>&) override;
 };
 
 void set_load_multiplier(double);

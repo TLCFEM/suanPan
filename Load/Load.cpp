@@ -30,6 +30,4 @@ const vec& Load::get_trial_load() const { return trial_load; }
 
 const vec& Load::get_trial_settlement() const { return trial_settlement; }
 
-int Load::process_resistance(const shared_ptr<DomainBase>&) { return SUANPAN_SUCCESS; }
-
 void set_load_multiplier(const double M) { access::rw(Load::multiplier) = M; }

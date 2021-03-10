@@ -46,9 +46,7 @@ int ParticleCollision::initialize(const shared_ptr<DomainBase>& D) {
 	return Constraint::initialize(D);
 }
 
-int ParticleCollision::process_resistance(const shared_ptr<DomainBase>&) { return SUANPAN_SUCCESS; }
-
-void ParticleCollision::apply_contact(const shared_ptr<DomainBase>& D, const shared_ptr<Node>& node_i, const shared_ptr<Node>& node_j) {
+void ParticleCollision::apply_contact(const shared_ptr<DomainBase>& D, const shared_ptr<Node>& node_i, const shared_ptr<Node>& node_j, const bool full) {
 	const auto& dof_i = node_i->get_reordered_dof();
 	const auto& dof_j = node_j->get_reordered_dof();
 
@@ -59,13 +57,15 @@ void ParticleCollision::apply_contact(const shared_ptr<DomainBase>& D, const sha
 
 	const auto force = compute_f(diff_norm);
 
-	auto& W = D->get_factory();
-	auto& t_stiff = W->get_stiffness();
-
 	for(auto I = 0llu; I < diff_pos.n_elem; ++I) {
 		trial_resistance(dof_i(I)) += force * diff_pos(I);
 		trial_resistance(dof_j(I)) -= force * diff_pos(I);
 	}
+
+	if(!full) return;
+
+	auto& W = D->get_factory();
+	auto& t_stiff = W->get_stiffness();
 
 	const mat d_norm = (compute_df(diff_norm) - force / diff_norm) * diff_pos * diff_pos.t() + force / diff_norm * eye(num_dof, num_dof);
 
@@ -86,3 +86,7 @@ void ParticleCollision::apply_contact(const shared_ptr<DomainBase>& D, const sha
 				t_stiff->at(dof_j(K), dof_i(L)) += d_norm(K, L);
 			}
 }
+
+int ParticleCollision::process(const shared_ptr<DomainBase>& D) { return process_meta(D, true); }
+
+int ParticleCollision::process_resistance(const shared_ptr<DomainBase>& D) { return process_meta(D, false); }

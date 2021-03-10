@@ -34,9 +34,12 @@ int FixedLength::initialize(const shared_ptr<DomainBase>& D) {
 
 	set_connected(true);
 
+	node_i = D->get<Node>(node_encoding(0));
+	node_j = D->get<Node>(node_encoding(1));
+
 	const auto& n_dof = dof_reference(0);
 
-	dof_encoding = join_cols(D->get<Node>(node_encoding(0))->get_reordered_dof().head(n_dof), D->get<Node>(node_encoding(1))->get_reordered_dof().head(n_dof));
+	dof_encoding = join_cols(node_i.lock()->get_reordered_dof().head(n_dof), node_j.lock()->get_reordered_dof().head(n_dof));
 
 	current_resistance = trial_resistance.zeros(num_size);
 
@@ -44,15 +47,15 @@ int FixedLength::initialize(const shared_ptr<DomainBase>& D) {
 }
 
 int FixedLength::process(const shared_ptr<DomainBase>& D) {
-	auto& node_i = D->get<Node>(node_encoding(0));
-	auto& node_j = D->get<Node>(node_encoding(1));
+	const auto& node_ptr_i = node_i.lock();
+	const auto& node_ptr_j = node_j.lock();
 
 	const auto& n_dof = dof_reference(0);
 
-	vec coor = resize(node_j->get_coordinate(), n_dof, 1) - resize(node_i->get_coordinate(), n_dof, 1);
-	vec t_disp = node_j->get_trial_displacement().head(n_dof) - node_i->get_trial_displacement().head(n_dof);
-	uvec dof_i = node_i->get_reordered_dof().head(n_dof);
-	uvec dof_j = node_j->get_reordered_dof().head(n_dof);
+	vec coor = resize(node_ptr_j->get_coordinate(), n_dof, 1) - resize(node_ptr_i->get_coordinate(), n_dof, 1);
+	vec t_disp = node_ptr_j->get_trial_displacement().head(n_dof) - node_ptr_i->get_trial_displacement().head(n_dof);
+	uvec dof_i = node_ptr_i->get_reordered_dof().head(n_dof);
+	uvec dof_j = node_ptr_j->get_reordered_dof().head(n_dof);
 
 	auto& W = D->get_factory();
 
@@ -66,23 +69,6 @@ int FixedLength::process(const shared_ptr<DomainBase>& D) {
 	stiffness.zeros(2 * n_dof, 2 * n_dof);
 	const auto t_factor = 2. * trial_lambda(0);
 	for(auto I = 0llu; I < n_dof; ++I) stiffness(I + n_dof, I) = stiffness(I, I + n_dof) = -(stiffness(I, I) = stiffness(I + n_dof, I + n_dof) = t_factor);
-
-	trial_resistance = auxiliary_stiffness * trial_lambda;
-
-	return SUANPAN_SUCCESS;
-}
-
-int FixedLength::process_resistance(const shared_ptr<DomainBase>& D) {
-	auto& node_i = D->get<Node>(node_encoding(0));
-	auto& node_j = D->get<Node>(node_encoding(1));
-
-	const auto& n_dof = dof_reference(0);
-
-	vec coor = resize(node_j->get_coordinate(), n_dof, 1) - resize(node_i->get_coordinate(), n_dof, 1);
-	vec t_disp = node_j->get_trial_displacement().head(n_dof) - node_i->get_trial_displacement().head(n_dof);
-
-	trial_auxiliary_resistance.zeros();
-	for(auto I = 0llu; I < n_dof; ++I) trial_auxiliary_resistance += t_disp(I) * (2. * coor(I) + t_disp(I));
 
 	trial_resistance = auxiliary_stiffness * trial_lambda;
 

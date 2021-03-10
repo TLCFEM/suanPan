@@ -117,7 +117,7 @@ void BatheTwoStep::update_compatibility() const {
 }
 
 void BatheTwoStep::update_parameter(const double NT) {
-	if(fabs(C0 - NT) <= 1E-12) return;
+	if(suanpan::approx_equal(C0, NT)) return;
 
 	C0 = NT;
 	C1 = .5 / C0;
