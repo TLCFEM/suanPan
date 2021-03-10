@@ -52,5 +52,5 @@ int MPC::process(const shared_ptr<DomainBase>& D) {
 
 	trial_auxiliary_resistance = auxiliary_stiffness.t() * W->get_trial_displacement();
 
-	return process_resistance(D);
+	return SUANPAN_SUCCESS;
 }
