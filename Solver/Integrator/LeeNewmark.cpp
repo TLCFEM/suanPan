@@ -43,9 +43,9 @@ void LeeNewmark::update_stiffness() const {
 				for(unsigned L = 0; L < n_block; ++L) {
 					const auto N = L + J;
 					auto t_val = current_mass->operator()(K, L);
-					if(0. != t_val) stiffness->at(M, L) = C1 * (stiffness->at(K, N) = -(stiffness->at(M, N) = mass_coef(I) * t_val));
+					if(!suanpan::approx_equal(0., t_val)) stiffness->at(M, L) = C1 * (stiffness->at(K, N) = -(stiffness->at(M, N) = mass_coef(I) * t_val));
 					t_val = current_stiffness->operator()(K, L);
-					if(0. != t_val) stiffness->at(M, N) = stiffness_coef(I) * t_val;
+					if(!suanpan::approx_equal(0., t_val)) stiffness->at(M, N) = stiffness_coef(I) * t_val;
 				}
 			}
 }
@@ -120,7 +120,7 @@ int LeeNewmark::process_constraint() {
 
 	// check in tangent stiffness
 	if(StorageScheme::SPARSE == factory->get_storage_scheme()) stiffness->triplet_mat += t_stiff->triplet_mat;
-	else for(unsigned I = 0; I < n_block; ++I) for(unsigned J = 0; J < n_block; ++J) if(const auto t_val = t_stiff->operator()(I, J); 0. != t_val) stiffness->at(I, J) = t_val;
+	else for(unsigned I = 0; I < n_block; ++I) for(unsigned J = 0; J < n_block; ++J) if(const auto t_val = t_stiff->operator()(I, J); !suanpan::approx_equal(0., t_val)) stiffness->at(I, J) = t_val;
 
 	if(first_iteration) {
 		// for the first iteration of each substep

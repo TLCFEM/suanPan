@@ -49,8 +49,6 @@ class RayleighNewmark final : public Newmark {
 public:
 	explicit RayleighNewmark(unsigned, double, double, double, double = .25, double = .5);
 
-	sp_mat get_auxiliary_stiffness() override;
-
 	void assemble_resistance() override;
 };
 

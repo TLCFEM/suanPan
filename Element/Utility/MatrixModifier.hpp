@@ -21,7 +21,7 @@
  * @author tlc
  * @date 27/10/2017
  * @version 0.1.0
- * @file MatrixModifier.h
+ * @file MatrixModifier.hpp
  * @addtogroup Utility
  * @ingroup Element
  * @{

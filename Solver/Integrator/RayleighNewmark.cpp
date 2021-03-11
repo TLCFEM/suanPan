@@ -26,8 +26,6 @@ RayleighNewmark::RayleighNewmark(const unsigned T, const double DA, const double
 	, damping_beta(DB)
 	, damping_zeta(DC) {}
 
-sp_mat RayleighNewmark::get_auxiliary_stiffness() { return (1. + C1) * get_domain().lock()->get_factory()->get_auxiliary_stiffness(); }
-
 void RayleighNewmark::assemble_resistance() {
 	const auto& element_pool = get_domain().lock()->get_element_pool();
 
