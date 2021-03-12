@@ -42,7 +42,7 @@ void CircularHollow3D::initialize(const shared_ptr<DomainBase>& D) {
 	const auto m_radius = radius - .5 * thickness;
 
 	int_pt.clear();
-	int_pt.reserve(2 * int_pt_num);
+	int_pt.reserve(2llu * int_pt_num);
 	initial_stiffness.zeros(3, 3);
 	for(unsigned I = 0; I < int_pt_num; ++I) {
 		const auto t_angle = .5 * plan(I, 0) * datum::pi;
