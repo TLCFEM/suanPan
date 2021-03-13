@@ -16,6 +16,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "SlipLock.h"
+#include <Toolbox/utility.h>
 
 SlipLock::SlipLock(const unsigned T, const double E, const double Y, const double H, const double R, const double D)
 	: DataSlipLock{fabs(E), 1. / H, fabs(Y), fabs(R)}
@@ -42,7 +43,7 @@ int SlipLock::update_trial_status(const vec& t_strain) {
 		suanpan_debug("SlipLock local iteraton error: %.5E.\n", fabs(error));
 		if(fabs(error) <= tolerance) return SUANPAN_SUCCESS;
 		trial_stress += error * trial_stiffness;
-		if(sign(trial_stress(0)) != sign(trial_strain(0))) trial_stress = 0.;
+		if(!suanpan::approx_equal(sign(trial_stress(0)), sign(trial_strain(0)))) trial_stress = 0.;
 	}
 
 	suanpan_error("SlipLock cannot converge within %u iterations.\n", max_iteration);

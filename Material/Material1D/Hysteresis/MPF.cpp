@@ -50,8 +50,8 @@ int MPF::update_trial_status(const vec& t_strain) {
 		max_strain = std::max(max_strain, fabs(trial_strain(0)));
 	}
 
-	if(const auto trial_load_sign = suanpan::sign(incre_strain(0)); trial_load_sign != load_sign) {
-		if(load_sign != 0.) {
+	if(const auto trial_load_sign = suanpan::sign(incre_strain(0)); !suanpan::approx_equal(trial_load_sign, load_sign)) {
+		if(!suanpan::approx_equal(load_sign, 0.)) {
 			reverse_stress = current_stress(0);
 			reverse_strain = current_strain(0);
 			pre_inter_strain = inter_strain;
