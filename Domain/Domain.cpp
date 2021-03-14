@@ -1068,7 +1068,7 @@ int Domain::process_constraint(const bool full) {
 			if(!I->is_initialized() || 0 == m_size) continue;
 			const auto e_size = counter + m_size - 1;
 			t_encoding.subvec(counter, e_size).fill(I->get_tag());
-			if(!I->get_trial_auxiliary_resistance().empty()) t_resistance.subvec(counter, e_size) = I->get_trial_auxiliary_resistance();
+			if(!I->get_auxiliary_resistance().empty()) t_resistance.subvec(counter, e_size) = I->get_auxiliary_resistance();
 			if(!I->get_auxiliary_load().empty()) t_load.subvec(counter, e_size) = I->get_auxiliary_load();
 			if(!I->get_auxiliary_stiffness().empty()) t_stiffness.cols(counter, e_size) = I->get_auxiliary_stiffness();
 			counter += m_size;

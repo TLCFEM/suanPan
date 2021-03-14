@@ -20,9 +20,8 @@
 const double Constraint::multiplier = 1E8;
 
 Constraint::Constraint(const unsigned T, const unsigned ST, const unsigned AT, uvec&& N, uvec&& D, const unsigned S)
-	: ConditionalModifier(T, ST, AT, std::forward<uvec>(N))
-	, num_size(S)
-	, dof_reference(std::forward<uvec>(D)) { suanpan_debug("Constraint %u ctor() called.\n", get_tag()); }
+	: ConditionalModifier(T, ST, AT, std::forward<uvec>(N), std::forward<uvec>(D))
+	, num_size(S) { suanpan_debug("Constraint %u ctor() called.\n", get_tag()); }
 
 Constraint::~Constraint() { suanpan_debug("Constraint %u dtor() called.\n", get_tag()); }
 
@@ -32,7 +31,7 @@ const sp_vec& Constraint::get_trial_resistance() const { return trial_resistance
 
 const sp_vec& Constraint::get_current_resistance() const { return current_resistance; }
 
-const vec& Constraint::get_trial_auxiliary_resistance() const { return trial_auxiliary_resistance; }
+const vec& Constraint::get_auxiliary_resistance() const { return auxiliary_resistance; }
 
 const sp_mat& Constraint::get_auxiliary_stiffness() const { return auxiliary_stiffness; }
 

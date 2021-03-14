@@ -38,8 +38,6 @@ class Load : public ConditionalModifier {
 protected:
 	static const double multiplier;
 
-	const uvec dofs;
-
 	const double pattern;
 
 	vec trial_load;

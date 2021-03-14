@@ -47,10 +47,11 @@ protected:
 	const unsigned amplitude_tag;
 
 	uvec node_encoding; /**< node encoding */
+	uvec dof_reference; /**< DoF reference */
 
 	shared_ptr<Amplitude> magnitude;
 public:
-	ConditionalModifier(unsigned, unsigned, unsigned, uvec&&);
+	ConditionalModifier(unsigned, unsigned, unsigned, uvec&&, uvec&&);
 
 	virtual int initialize(const shared_ptr<DomainBase>&);
 

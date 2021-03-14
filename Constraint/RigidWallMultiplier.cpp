@@ -59,9 +59,9 @@ int RigidWallMultiplier::process(const shared_ptr<DomainBase>& D) {
 		}
 	}
 
-	trial_auxiliary_resistance = t_pool;
+	auxiliary_resistance = t_pool;
 
-	num_size = static_cast<unsigned>(trial_auxiliary_resistance.n_elem);
+	num_size = static_cast<unsigned>(auxiliary_resistance.n_elem);
 
 	return SUANPAN_SUCCESS;
 }

@@ -40,13 +40,13 @@ int NodalAcceleration::process(const shared_ptr<DomainBase>& D) {
 	if(node_encoding.is_empty())
 		for(const auto& I : D->get_node_pool()) {
 			auto& t_dof = I->get_reordered_dof();
-			for(const auto& J : dofs) if(J <= t_dof.n_elem) trial_load(t_dof(J - 1)) = 1.;
+			for(const auto& J : dof_reference) if(J <= t_dof.n_elem) trial_load(t_dof(J - 1)) = 1.;
 		}
 	else
 		for(const auto& I : node_encoding)
 			if(auto& t_node = D->get<Node>(I); nullptr != t_node && t_node->is_active()) {
 				auto& t_dof = t_node->get_reordered_dof();
-				for(const auto& J : dofs) if(J <= t_dof.n_elem) trial_load(t_dof(J - 1)) = 1.;
+				for(const auto& J : dof_reference) if(J <= t_dof.n_elem) trial_load(t_dof(J - 1)) = 1.;
 			}
 
 	trial_load = W->get_mass() * trial_load * pattern * magnitude->get_amplitude(W->get_trial_time());

@@ -39,21 +39,18 @@ protected:
 
 	unsigned num_size; // size of multiplier
 
-	uvec dof_reference; /**< DoF reference */
-	uvec dof_encoding;  /**< DoF encoding */
+	uvec dof_encoding; /**< DoF encoding */
 
 	vec trial_lambda = zeros(num_size);
 	vec current_lambda = zeros(num_size);
 
 	sp_vec trial_resistance;
 	sp_vec current_resistance;
-
-	vec trial_auxiliary_resistance;
-
 	sp_mat stiffness;
-	sp_mat auxiliary_stiffness;
 
+	vec auxiliary_resistance;
 	vec auxiliary_load;
+	sp_mat auxiliary_stiffness;
 
 	friend void set_constraint_multiplier(double);
 public:
@@ -69,13 +66,11 @@ public:
 
 	const sp_vec& get_trial_resistance() const;
 	const sp_vec& get_current_resistance() const;
-
-	const vec& get_trial_auxiliary_resistance() const;
-
-	const sp_mat& get_auxiliary_stiffness() const;
 	const sp_mat& get_stiffness() const;
 
+	const vec& get_auxiliary_resistance() const;
 	const vec& get_auxiliary_load() const;
+	const sp_mat& get_auxiliary_stiffness() const;
 
 	void set_multiplier_size(unsigned);
 	[[nodiscard]] unsigned get_multiplier_size() const;

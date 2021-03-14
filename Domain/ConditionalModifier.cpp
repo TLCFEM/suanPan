@@ -20,11 +20,12 @@
 #include <Load/Amplitude/Ramp.h>
 #include <Step/Step.h>
 
-ConditionalModifier::ConditionalModifier(const unsigned T, const unsigned ST, const unsigned AT, uvec&& N)
+ConditionalModifier::ConditionalModifier(const unsigned T, const unsigned ST, const unsigned AT, uvec&& N, uvec&& D)
 	: Tag(T)
 	, start_step(0 == ST ? 1 : ST)
 	, amplitude_tag(AT)
-	, node_encoding(std::forward<uvec>(N)) {}
+	, node_encoding(std::forward<uvec>(N))
+	, dof_reference(std::forward<uvec>(D)) {}
 
 int ConditionalModifier::initialize(const shared_ptr<DomainBase>& D) {
 	if(!validate_step(D)) return SUANPAN_SUCCESS;

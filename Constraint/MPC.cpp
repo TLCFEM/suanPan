@@ -50,7 +50,7 @@ int MPC::process(const shared_ptr<DomainBase>& D) {
 
 	auxiliary_load = psudo_load * magnitude->get_amplitude(W->get_trial_time());
 
-	trial_auxiliary_resistance = auxiliary_stiffness.t() * W->get_trial_displacement();
+	auxiliary_resistance = auxiliary_stiffness.t() * W->get_trial_displacement();
 
 	return SUANPAN_SUCCESS;
 }

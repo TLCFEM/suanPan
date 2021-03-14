@@ -20,8 +20,7 @@
 const double Load::multiplier = 1E8;
 
 Load::Load(const unsigned T, const unsigned ST, const unsigned AT, uvec&& NT, uvec&& DT, const double PT)
-	: ConditionalModifier(T, ST, AT, std::forward<uvec>(NT))
-	, dofs(std::forward<uvec>(DT))
+	: ConditionalModifier(T, ST, AT, std::forward<uvec>(NT), std::forward<uvec>(DT))
 	, pattern(PT) { suanpan_debug("Load %u ctor() called.\n", get_tag()); }
 
 Load::~Load() { suanpan_debug("Load %u dtor() called.\n", get_tag()); }
