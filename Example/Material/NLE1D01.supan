@@ -1,0 +1,35 @@
+# A TEST MODEL FOR ELASTIC1D AND NLE1D01 MATERIAL
+
+node 1 0 0
+node 2 4 0
+node 3 0 -3
+
+material Elastic1D 1 100
+material NLE1D01 2 100 5 .2 20.
+
+element T2D2 1 1 2 1 10
+element T2D2 2 3 2 2 10
+
+fix 1 P 1 3
+
+step static 1
+
+cload 1 0 40 2 2
+
+converger RelIncreDisp 1 1E-4 10 1
+
+analyze
+
+# Node 2:
+#    4.0000        0
+# Displacement:
+#   -0.2133   1.3956
+# Resistance:
+#   -2.1579e-11   4.0000e+01
+peek node 2
+
+peek element 1 2
+
+reset
+clear
+exit

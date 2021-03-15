@@ -91,6 +91,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
 	else if(is_equal(material_id, "MultilinearElastic1D")) new_multilinearelastic1d(new_material, command);
 	else if(is_equal(material_id, "MultilinearJ2")) new_multilinearj2(new_material, command);
 	else if(is_equal(material_id, "MultilinearMises1D")) new_multilinearmises1d(new_material, command);
+	else if(is_equal(material_id, "NLE1D01")) new_nle1d01(new_material, command);
 	else if(is_equal(material_id, "NLE3D01")) new_nle3d01(new_material, command);
 	else if(is_equal(material_id, "OrthotropicElastic3D")) new_orthotropicelastic3d(new_material, command);
 	else if(is_equal(material_id, "ParabolicCC")) new_paraboliccc(new_material, command);
@@ -630,7 +631,48 @@ void new_bilinearelastic1d(unique_ptr<Material>& return_obj, istringstream& comm
 		return;
 	}
 
-	return_obj = make_unique<BilinearElastic1D>(tag, elastic_modulus, yield_stress, hardening_ratio, density);
+	return_obj = make_unique<BilinearElastic1D>(tag, elastic_modulus, yield_stress, hardening_ratio, 0., density);
+}
+
+void new_nle1d01(unique_ptr<Material>& return_obj, istringstream& command) {
+	unsigned tag;
+	if(!get_input(command, tag)) {
+		suanpan_error("new_nle1d01() requires a valid tag.\n");
+		return;
+	}
+
+	double elastic_modulus;
+	if(!get_input(command, elastic_modulus)) {
+		suanpan_error("new_nle1d01() requires a valid elastic modulus.\n");
+		return;
+	}
+
+	double yield_stress;
+	if(!get_input(command, yield_stress)) {
+		suanpan_error("new_nle1d01() requires a valid yield stress.\n");
+		return;
+	}
+
+	double hardening_ratio;
+	if(!get_input(command, hardening_ratio)) {
+		suanpan_error("new_nle1d01() requires a valid hardening ratio.\n");
+		return;
+	}
+
+	double radius;
+	if(!get_input(command, radius)) {
+		suanpan_error("new_nle1d01() requires a valid radius for transition.\n");
+		return;
+	}
+
+	auto density = 0.;
+	if(command.eof()) suanpan_debug("new_nle1d01() assumes zero density.\n");
+	else if(!get_input(command, density)) {
+		suanpan_error("new_nle1d01() requires a valid density.\n");
+		return;
+	}
+
+	return_obj = make_unique<BilinearElastic1D>(tag, elastic_modulus, yield_stress, hardening_ratio, radius, density);
 }
 
 void new_bilinearhoffman(unique_ptr<Material>& return_obj, istringstream& command) {

@@ -73,6 +73,7 @@ void new_multilinearpo(unique_ptr<Material>&, istringstream&);
 void new_multilinearelastic1d(unique_ptr<Material>&, istringstream&);
 void new_multilinearj2(unique_ptr<Material>&, istringstream&);
 void new_multilinearmises1d(unique_ptr<Material>&, istringstream&);
+void new_nle1d01(unique_ptr<Material>&, istringstream&);
 void new_nle3d01(unique_ptr<Material>&, istringstream&);
 void new_orthotropicelastic3d(unique_ptr<Material>&, istringstream&);
 void new_paraboliccc(unique_ptr<Material>&, istringstream&);

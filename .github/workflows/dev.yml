@@ -103,6 +103,7 @@ jobs:
           ./suanPan -f ../Example/Material/Bilinear2D.supan > /dev/null
           ./suanPan -f ../Example/Material/BilinearCC.supan > /dev/null
           ./suanPan -f ../Example/Material/BilinearElastic1D.supan > /dev/null
+          ./suanPan -f ../Example/Material/NLE1D01.supan > /dev/null
           ./suanPan -f ../Example/Material/BilinearHoffman.supan > /dev/null
           ./suanPan -f ../Example/Material/BilinearJ2.supan > /dev/null
           ./suanPan -f ../Example/Material/BilinearJ22.supan > /dev/null

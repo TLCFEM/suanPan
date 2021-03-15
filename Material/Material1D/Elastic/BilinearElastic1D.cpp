@@ -18,9 +18,9 @@
 #include "BilinearElastic1D.h"
 #include <Toolbox/utility.h>
 
-BilinearElastic1D::BilinearElastic1D(const unsigned T, const double E, const double Y, const double H, const double R)
-	: DataBilinearElastic1D{fabs(E), fabs(Y), fabs(E) * H}
-	, Material1D(T, R) {}
+BilinearElastic1D::BilinearElastic1D(const unsigned T, const double E, const double Y, const double H, const double R, const double D)
+	: DataBilinearElastic1D{fabs(E), fabs(Y), fabs(E) * H, R}
+	, Material1D(T, D) {}
 
 void BilinearElastic1D::initialize(const shared_ptr<DomainBase>&) { trial_stiffness = current_stiffness = initial_stiffness = elastic_modulus; }
 
@@ -33,7 +33,15 @@ int BilinearElastic1D::update_trial_status(const vec& t_strain) {
 
 	const auto abs_strain = fabs(trial_strain(0));
 
-	abs_strain > yield_strain ? trial_stress = yield_stress + (abs_strain - yield_strain) * (trial_stiffness = hardening_modulus) : trial_stress = abs_strain * (trial_stiffness = elastic_modulus);
+	if(suanpan::approx_equal(radius, 0.)) { abs_strain > yield_strain ? trial_stress = yield_stress + (abs_strain - yield_strain) * (trial_stiffness = hardening_modulus) : trial_stress = abs_strain * (trial_stiffness = elastic_modulus); }
+	else {
+		const auto normal_strain = std::max(datum::eps, abs_strain / yield_strain);
+		const auto factor_a = 1. + pow(normal_strain, radius);
+		const auto factor_b = (1. - hardening_modulus / elastic_modulus) * pow(factor_a, -1. / radius);
+
+		trial_stress = (hardening_modulus * yield_strain + factor_b * yield_stress) * normal_strain;
+		trial_stiffness = hardening_modulus + elastic_modulus * factor_b / factor_a;
+	}
 
 	if(suanpan::sign(trial_strain(0)) < 0.) trial_stress = -trial_stress;
 
