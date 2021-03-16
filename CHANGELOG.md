@@ -2,11 +2,14 @@
 
 ## version 1.x
 
+## version 1.3
+
 1. update handling of constraints and loads
 2. store commands in backup file in CLI mode
 3. add `FixedLength2D` and `FixedLength3D` nonlinear constraints
 4. improve handling of constraints in dynamic analysis
-5. minor bugfixes
+5. add `NLE1D01` model
+6. minor bugfixes
 
 ## version 1.2
 
