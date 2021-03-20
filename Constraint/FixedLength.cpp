@@ -26,7 +26,7 @@ FixedLength::FixedLength(const unsigned T, const unsigned S, const unsigned A, c
 int FixedLength::initialize(const shared_ptr<DomainBase>& D) {
 	for(uword I = 0; I < node_encoding.n_elem; ++I) {
 		auto& t_node = D->get<Node>(node_encoding(I));
-		if(nullptr == t_node || !t_node->is_active() || t_node->get_reordered_dof().n_elem <= dof_reference(0)) {
+		if(nullptr == t_node || !t_node->is_active() || t_node->get_reordered_dof().n_elem < dof_reference(0)) {
 			D->disable_constraint(get_tag());
 			return SUANPAN_SUCCESS;
 		}
