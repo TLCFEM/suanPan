@@ -747,7 +747,7 @@ int Domain::reorder_dof() {
 	}
 
 	// for nonlinear constraint
-	for(const auto& t_constraint : constraint_pond.get()) {
+	for(const auto& [t_tag, t_constraint] : constraint_pond) {
 		if(!t_constraint->is_connected()) continue;
 		vector<uword> t_encoding;
 		for(auto& I : t_constraint->get_node_encoding()) if(find<Node>(I)) for(auto& J : get<Node>(I)->get_reordered_dof()) t_encoding.emplace_back(J);

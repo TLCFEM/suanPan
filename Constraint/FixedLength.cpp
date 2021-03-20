@@ -21,7 +21,7 @@
 #include <Domain/Node.h>
 
 FixedLength::FixedLength(const unsigned T, const unsigned S, const unsigned A, const unsigned D, uvec&& N)
-	: Constraint(T, S, A, std::forward<uvec>(N), {D}, 1) {}
+	: Constraint(T, S, A, std::forward<uvec>(N), {D}, 1) { set_connected(true); }
 
 int FixedLength::initialize(const shared_ptr<DomainBase>& D) {
 	for(uword I = 0; I < node_encoding.n_elem; ++I) {
@@ -31,8 +31,6 @@ int FixedLength::initialize(const shared_ptr<DomainBase>& D) {
 			return SUANPAN_SUCCESS;
 		}
 	}
-
-	set_connected(true);
 
 	node_i = D->get<Node>(node_encoding(0));
 	node_j = D->get<Node>(node_encoding(1));
