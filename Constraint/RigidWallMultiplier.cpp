@@ -37,7 +37,7 @@ int RigidWallMultiplier::process(const shared_ptr<DomainBase>& D) {
 	auto& W = D->get_factory();
 
 	auxiliary_stiffness.reset();
-	vector<double> t_pool;
+	vector<double> t_resistance, t_load;
 
 	// multiplier method
 	auto counter = 0llu;
@@ -46,20 +46,25 @@ int RigidWallMultiplier::process(const shared_ptr<DomainBase>& D) {
 		auto& t_coor = I->get_coordinate();
 		auto& t_disp = I->get_trial_displacement();
 		const auto t_size = std::min(std::min(t_coor.n_elem, t_disp.n_elem), norm.n_elem);
-		vec t_pos = -origin;
-		for(auto J = 0llu; J < t_size; ++J) t_pos(J) += t_coor(J) + t_disp(J);
-		if(!edge_a.empty() && dot(t_pos, edge_a) > arma::norm(edge_a) || !edge_b.empty() && dot(t_pos, edge_b) > arma::norm(edge_b)) continue;
-		const auto t_pen = dot(t_pos, norm);
-		if(t_pen > datum::eps) continue;
+		vec t_a = -origin;
+		vec t_b = zeros(size(t_a));
 		for(auto J = 0llu; J < t_size; ++J) {
-			++counter;
-			auxiliary_stiffness.resize(W->get_size(), counter);
-			auxiliary_stiffness(t_dof(J), counter - 1) = 1.;
-			t_pool.emplace_back(t_pen * norm(J));
+			t_a(J) += t_coor(J);
+			t_b(J) = t_disp(J);
 		}
+		vec t_c = t_a + t_b;
+		if(!edge_a.empty() && dot(t_c, edge_a) > arma::norm(edge_a) || !edge_b.empty() && dot(t_c, edge_b) > arma::norm(edge_b)) continue;
+		const auto t_pen = dot(t_c, norm);
+		if(t_pen > datum::eps) continue;
+		++counter;
+		auxiliary_stiffness.resize(W->get_size(), counter);
+		for(auto J = 0llu; J < t_size; ++J) auxiliary_stiffness(t_dof(J), counter - 1) = norm(J);
+		t_resistance.emplace_back(dot(t_b, norm));
+		t_load.emplace_back(-dot(t_a, norm));
 	}
 
-	auxiliary_resistance = t_pool;
+	auxiliary_resistance = t_resistance;
+	auxiliary_load = t_load;
 
 	num_size = static_cast<unsigned>(auxiliary_resistance.n_elem);
 
