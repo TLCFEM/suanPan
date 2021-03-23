@@ -65,6 +65,9 @@ The binaries, which are compiled with Intel MKL and VTK, are available on [Choco
     choco install suanpan
     ```
 
+4. It is recommended to use a modern terminal such as [Windows Terminal](https://github.com/microsoft/terminal) and [Fluent Terminal](https://github.com/felixse/FluentTerminal) for better output display.
+
+
 ### Linux
 
 Linux users are recommended to obtain the binaries via snap. The snap supports visualization via VTK and uses Intel MKL for linear algebra.

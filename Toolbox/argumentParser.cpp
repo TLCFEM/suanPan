@@ -123,23 +123,23 @@ void print_header() {
 	suanpan_info("+--------------------------------------------------+\n");
 	suanpan_info("|  https://gitter.im/suanPan-dev/community         |\n");
 #else
-    vector<const char*> POOL;
-    POOL.reserve(10);
-    POOL.emplace_back(u8"\U0001F308");
-    POOL.emplace_back(u8"\U0001F30F");
-    POOL.emplace_back(u8"\U0001F3A7");
-    POOL.emplace_back(u8"\U0001F3B1");
-    POOL.emplace_back(u8"\U0001F479");
-    POOL.emplace_back(u8"\U0001F4BB");
-    POOL.emplace_back(u8"\U0001F50B");
-    POOL.emplace_back(u8"\U0001F514");
-    POOL.emplace_back(u8"\U0001F680");
-    POOL.emplace_back(u8"\U0001F9E9");
-    srand(static_cast<unsigned>(time(nullptr)));
-    suanpan_info("|  %-6shttp://doi.org/10.5281/zenodo.1285221       |\n", POOL[std::rand() % POOL.size()]);
-    suanpan_info("+--------------------------------------------------+\n");
-    suanpan_info("|  %-6shttps://github.com/TLCFEM/suanPan           |\n", u8"\U0001F9EE");
-    suanpan_info("|  %-6shttps://github.com/TLCFEM/suanPan-manual    |\n", u8"\U0001F4DA");
+	vector<const char*> POOL;
+	POOL.reserve(10);
+	POOL.emplace_back(u8"\U0001F308");
+	POOL.emplace_back(u8"\U0001F30F");
+	POOL.emplace_back(u8"\U0001F3A7");
+	POOL.emplace_back(u8"\U0001F3B1");
+	POOL.emplace_back(u8"\U0001F479");
+	POOL.emplace_back(u8"\U0001F4BB");
+	POOL.emplace_back(u8"\U0001F50B");
+	POOL.emplace_back(u8"\U0001F514");
+	POOL.emplace_back(u8"\U0001F680");
+	POOL.emplace_back(u8"\U0001F9E9");
+	arma_rng::set_seed_random();
+	suanpan_info("|  %-5shttps://github.com/TLCFEM/suanPan            |\n", u8"\U0001F9EE");
+	suanpan_info("|  %-5shttps://github.com/TLCFEM/suanPan-manual     |\n", u8"\U0001F4DA");
+	suanpan_info("+--------------------------------------------------+\n");
+	suanpan_info("|  %-5shttps://gitter.im/suanPan-dev/community      |\n", POOL[randi() % POOL.size()]);
 #endif
 	suanpan_info("+--------------------------------------------------+\n\n");
 }
