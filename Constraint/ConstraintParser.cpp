@@ -29,8 +29,8 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, istringstream& c
 	unique_ptr<Constraint> new_constraint = nullptr;
 
 	if(is_equal(constraint_id, "Embed2D")) new_embed2d(new_constraint, command);
-	else if(is_equal(constraint_id, "FixedLength2D")) new_fixedlength(new_constraint, command, 2);
-	else if(is_equal(constraint_id, "FixedLength3D")) new_fixedlength(new_constraint, command, 3);
+	else if(is_equal(constraint_id, "FixedLength2D") || is_equal(constraint_id, "R2D2")) new_fixedlength(new_constraint, command, 2);
+	else if(is_equal(constraint_id, "FixedLength3D") || is_equal(constraint_id, "R3D2")) new_fixedlength(new_constraint, command, 3);
 	else if(is_equal(constraint_id, "MPC")) new_mpc(new_constraint, command);
 	else if(is_equal(constraint_id, "ParticleCollision2D")) new_particlecollision2d(new_constraint, command);
 	else if(is_equal(constraint_id, "ParticleCollision3D")) new_particlecollision3d(new_constraint, command);

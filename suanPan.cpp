@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
 	const auto current_attribute = info.wAttributes;
 	SetConsoleTextAttribute(handle, FOREGROUND_INTENSITY | FOREGROUND_GREEN);
 #else
-    std::cout << "\033[1;32m";
+	std::cout << "\033[1;32m";
 #endif
 
 	if(check_debugger()) return 0;
@@ -48,7 +48,7 @@ int main(int argc, char** argv) {
 #ifdef SUANPAN_WIN
 	SetConsoleTextAttribute(handle, current_attribute);
 #else
-    std::cout << "\033[0m";
+	std::cout << "\033[0m";
 #endif
 
 	return 0;

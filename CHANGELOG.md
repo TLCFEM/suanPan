@@ -2,6 +2,8 @@
 
 ## version 1.x
 
+1. add `R2D2` and `R3D2` alias for fixed length constraint
+
 ## version 1.3
 
 1. update handling of constraints and loads
