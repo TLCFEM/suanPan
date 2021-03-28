@@ -108,7 +108,7 @@ void QE2::initialize(const shared_ptr<DomainBase>& D) {
 	current_alpha = trial_alpha.zeros(7);
 	current_beta = trial_beta.zeros(7);
 
-	if(const auto t_density = mat_proto->get_parameter(); t_density > 0.) {
+	if(const auto t_density = mat_proto->get_parameter(ParameterType::DENSITY); t_density > 0.) {
 		initial_mass.zeros(m_size, m_size);
 		for(const auto& I : int_pt) {
 			const auto n_int = shape::quad(I.coor, 0);

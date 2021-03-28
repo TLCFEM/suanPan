@@ -74,7 +74,7 @@ void C3D8I::initialize(const shared_ptr<DomainBase>& D) {
 	initial_stiffness -= stiff_b * solve(stiff_a, stiff_b.t());
 	trial_stiffness = current_stiffness = initial_stiffness;
 
-	if(const auto t_density = mat_proto->get_parameter(); t_density > 0.) {
+	if(const auto t_density = mat_proto->get_parameter(ParameterType::DENSITY); t_density > 0.) {
 		initial_mass.zeros(c_size, c_size);
 		for(const auto& I : int_pt) {
 			const auto n_int = shape::cube(I.coor, 0);

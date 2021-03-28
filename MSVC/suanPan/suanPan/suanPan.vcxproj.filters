@@ -1878,9 +1878,6 @@
     <ClInclude Include="..\..\..\Material\Material.h">
       <Filter>Material</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Material\MaterialBase.h">
-      <Filter>Material</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Material\MaterialParser.h">
       <Filter>Material</Filter>
     </ClInclude>

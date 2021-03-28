@@ -38,7 +38,7 @@ void Degradation::initialize(const shared_ptr<DomainBase>& D) {
 	base->Material::initialize(D);
 	base->initialize(D);
 
-	access::rw(density) = base->get_parameter();
+	access::rw(density) = base->get_parameter(ParameterType::DENSITY);
 
 	const auto degrade = compute_degradation(0.);
 	const auto& d = degrade(0);

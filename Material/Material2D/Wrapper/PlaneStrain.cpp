@@ -46,7 +46,7 @@ void PlaneStrain::initialize(const shared_ptr<DomainBase>& D) {
 		base->set_initialized(true);
 	}
 
-	access::rw(density) = base->get_parameter();
+	access::rw(density) = base->get_parameter(ParameterType::DENSITY);
 
 	current_stiffness = trial_stiffness = initial_stiffness = base->get_initial_stiffness()(F, F);
 }

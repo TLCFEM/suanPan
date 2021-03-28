@@ -35,7 +35,7 @@ void T3D2::initialize(const shared_ptr<DomainBase>& D) {
 
 	trial_stiffness = current_stiffness = initial_stiffness = t_trans->to_global_stiffness_mat(area / length * t_material->get_initial_stiffness());
 
-	if(t_material->get_parameter() > 0.) trial_mass = current_mass = initial_mass = t_trans->to_global_mass_mat(t_material->get_parameter() * area);
+	if(const auto t_density = t_material->get_parameter(ParameterType::DENSITY); t_density > 0.) trial_mass = current_mass = initial_mass = t_trans->to_global_mass_mat(t_density * area);
 }
 
 int T3D2::update_status() {

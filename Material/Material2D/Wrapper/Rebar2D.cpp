@@ -45,7 +45,7 @@ void Rebar2D::initialize(const shared_ptr<DomainBase>& D) {
 	rebar_x = get_material(D, tag_x)->get_copy();
 	rebar_y = get_material(D, tag_y)->get_copy();
 
-	access::rw(density) = ratio_x * rebar_x->get_parameter() + ratio_y * rebar_y->get_parameter();
+	access::rw(density) = ratio_x * rebar_x->get_parameter(ParameterType::DENSITY) + ratio_y * rebar_y->get_parameter(ParameterType::DENSITY);
 
 	initial_stiffness.zeros(3, 3);
 

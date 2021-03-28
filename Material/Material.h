@@ -110,7 +110,7 @@ public:
 
 	[[nodiscard]] MaterialType get_material_type() const;
 
-	[[nodiscard]] virtual double get_parameter(ParameterType = ParameterType::DENSITY) const;
+	[[nodiscard]] virtual double get_parameter(ParameterType) const;
 
 	virtual const vec& get_trial_strain();
 	virtual const vec& get_trial_strain_rate();

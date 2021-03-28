@@ -719,7 +719,6 @@
     <ClInclude Include="..\..\..\Material\Material3D\Wrapper\Rotation3D.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Wrapper\Stacked.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Wrapper\Substepping.h" />
-    <ClInclude Include="..\..\..\Material\MaterialBase.h" />
     <ClInclude Include="..\..\..\Material\MaterialParser.h" />
     <ClInclude Include="..\..\..\Material\MaterialTemplate.h" />
     <ClInclude Include="..\..\..\Material\MaterialTester.h" />

@@ -47,7 +47,7 @@ void PatchCube::initialize(const shared_ptr<DomainBase>& D) {
 
 	auto& ini_stiffness = material_proto->get_initial_stiffness();
 
-	const auto t_density = material_proto->get_parameter();
+	const auto t_density = material_proto->get_parameter(ParameterType::DENSITY);
 
 	const IntegrationPlan plan(3, 2, IntegrationType::GAUSS);
 
