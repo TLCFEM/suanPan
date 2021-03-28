@@ -85,13 +85,17 @@ public:
 
 	virtual int update_incre_status(double) = 0;
 	virtual int update_incre_status(double, double) = 0;
+	virtual int update_incre_status(double, double, double) = 0;
 	virtual int update_trial_status(double) = 0;
 	virtual int update_trial_status(double, double) = 0;
+	virtual int update_trial_status(double, double, double) = 0;
 
 	virtual int update_incre_status(const vec&) = 0;
 	virtual int update_incre_status(const vec&, const vec&) = 0;
+	virtual int update_incre_status(const vec&, const vec&, const vec&) = 0;
 	virtual int update_trial_status(const vec&) = 0;
 	virtual int update_trial_status(const vec&, const vec&) = 0;
+	virtual int update_trial_status(const vec&, const vec&, const vec&) = 0;
 
 	virtual int clear_status() = 0;
 	virtual int commit_status() = 0;

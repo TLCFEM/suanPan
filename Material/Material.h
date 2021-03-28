@@ -45,16 +45,19 @@ struct MaterialData {
 
 	vec current_strain;      // current status
 	vec current_strain_rate; // current status
+	vec current_strain_acc;  // current status
 	vec current_stress;      // current status
 	// vec current_stress_rate; // current status
 
 	vec trial_strain;      // trial status
 	vec trial_strain_rate; // trial status
+	vec trial_strain_acc;  // trial status
 	vec trial_stress;      // trial status
 	// vec trial_stress_rate; // trial status
 
 	vec incre_strain;      // incremental status
 	vec incre_strain_rate; // incremental status
+	vec incre_strain_acc;  // incremental status
 	vec incre_stress;      // incremental status
 	// vec incre_stress_rate; // incremental status
 
@@ -126,13 +129,17 @@ public:
 
 	int update_incre_status(double);
 	int update_incre_status(double, double);
+	int update_incre_status(double, double, double);
 	int update_trial_status(double);
 	int update_trial_status(double, double);
+	int update_trial_status(double, double, double);
 
 	virtual int update_incre_status(const vec&);
 	virtual int update_incre_status(const vec&, const vec&);
+	virtual int update_incre_status(const vec&, const vec&, const vec&);
 	virtual int update_trial_status(const vec&);
 	virtual int update_trial_status(const vec&, const vec&);
+	virtual int update_trial_status(const vec&, const vec&, const vec&);
 
 	virtual int clear_status() = 0;
 	virtual int commit_status() = 0;
