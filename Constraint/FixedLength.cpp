@@ -58,7 +58,7 @@ int FixedLength::process(const shared_ptr<DomainBase>& D) {
 	auto& W = D->get_factory();
 
 	auxiliary_stiffness.zeros(W->get_size(), num_size);
-	auxiliary_resistance.zeros();
+	auxiliary_resistance = 0.;
 	for(auto I = 0llu; I < n_dof; ++I) {
 		auxiliary_stiffness(dof_i(I)) = -(auxiliary_stiffness(dof_j(I)) = 2. * (coor(I) + t_disp(I)));
 		auxiliary_resistance += t_disp(I) * (2. * coor(I) + t_disp(I));
