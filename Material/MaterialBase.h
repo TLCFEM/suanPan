@@ -65,21 +65,26 @@ public:
 
 	[[nodiscard]] virtual const vec& get_trial_strain() = 0;
 	[[nodiscard]] virtual const vec& get_trial_strain_rate() = 0;
+	[[nodiscard]] virtual const vec& get_trial_strain_acc() = 0;
 	[[nodiscard]] virtual const vec& get_trial_stress() = 0;
 	[[nodiscard]] virtual const mat& get_trial_stiffness() = 0;
 	[[nodiscard]] virtual const mat& get_trial_secant() = 0;
 	[[nodiscard]] virtual const mat& get_trial_damping() = 0;
+	[[nodiscard]] virtual const mat& get_trial_inertial() = 0;
 
 	[[nodiscard]] virtual const vec& get_current_strain() = 0;
 	[[nodiscard]] virtual const vec& get_current_strain_rate() = 0;
+	[[nodiscard]] virtual const vec& get_current_strain_acc() = 0;
 	[[nodiscard]] virtual const vec& get_current_stress() = 0;
 	[[nodiscard]] virtual const mat& get_current_stiffness() = 0;
 	[[nodiscard]] virtual const mat& get_current_secant() = 0;
 	[[nodiscard]] virtual const mat& get_current_damping() = 0;
+	[[nodiscard]] virtual const mat& get_current_inertial() = 0;
 
 	[[nodiscard]] virtual const vec& get_initial_history() const = 0;
 	[[nodiscard]] virtual const mat& get_initial_stiffness() const = 0;
 	[[nodiscard]] virtual const mat& get_initial_damping() const = 0;
+	[[nodiscard]] virtual const mat& get_initial_inertial() const = 0;
 
 	virtual unique_ptr<MaterialBase> get_copy() = 0;
 

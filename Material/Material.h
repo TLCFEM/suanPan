@@ -72,14 +72,19 @@ struct MaterialData {
 	mat initial_damping; // damping matrix
 	mat current_damping; // damping matrix
 	mat trial_damping;   // damping matrix
+
+	mat initial_inertial; // inertial matrix
+	mat current_inertial; // inertial matrix
+	mat trial_inertial;   // inertial matrix
 };
 
 class Material : protected MaterialData, public Tag {
 	const bool initialized = false;
 	const bool symmetric = false;
 
-	friend void ConstantDamping(MaterialData*);
 	friend void ConstantStiffness(MaterialData*);
+	friend void ConstantDamping(MaterialData*);
+	friend void ConstantInertial(MaterialData*);
 	friend void PureWrapper(MaterialData*);
 public:
 	explicit Material(unsigned = 0,                    // tag
@@ -109,21 +114,26 @@ public:
 
 	virtual const vec& get_trial_strain();
 	virtual const vec& get_trial_strain_rate();
+	virtual const vec& get_trial_strain_acc();
 	virtual const vec& get_trial_stress();
 	virtual const mat& get_trial_stiffness();
 	virtual const mat& get_trial_secant();
 	virtual const mat& get_trial_damping();
+	virtual const mat& get_trial_inertial();
 
 	virtual const vec& get_current_strain();
 	virtual const vec& get_current_strain_rate();
+	virtual const vec& get_current_strain_acc();
 	virtual const vec& get_current_stress();
 	virtual const mat& get_current_stiffness();
 	virtual const mat& get_current_secant();
 	virtual const mat& get_current_damping();
+	virtual const mat& get_current_inertial();
 
 	[[nodiscard]] virtual const vec& get_initial_history() const;
 	[[nodiscard]] virtual const mat& get_initial_stiffness() const;
 	[[nodiscard]] virtual const mat& get_initial_damping() const;
+	[[nodiscard]] virtual const mat& get_initial_inertial() const;
 
 	virtual unique_ptr<Material> get_copy() = 0;
 
