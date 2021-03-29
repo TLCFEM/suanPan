@@ -18,6 +18,9 @@
  * @class FixedLength
  * @brief A FixedLength class.
  *
+ * The `FixedLength` constraint applies constraint to two nodes so that the
+ * distance remain constant between those two nodes.
+ *
  * @author tlc
  * @date 07/03/2021
  * @version 0.1.0
@@ -33,10 +36,14 @@
 
 class Node;
 
-class FixedLength final : public Constraint {
+class FixedLength : public Constraint {
+	const bool inequal;
+	const double min_gap;
+
 	weak_ptr<Node> node_i, node_j;
 public:
 	FixedLength(unsigned, unsigned, unsigned, unsigned, uvec&&);
+	FixedLength(unsigned, unsigned, unsigned, unsigned, double, uvec&&);
 
 	int initialize(const shared_ptr<DomainBase>&) override;
 
@@ -46,6 +53,11 @@ public:
 	void commit_status() override;
 	void clear_status() override;
 	void reset_status() override;
+};
+
+class MinimumGap final : public FixedLength {
+public:
+	MinimumGap(unsigned, unsigned, unsigned, unsigned, double, uvec&&);
 };
 
 #endif

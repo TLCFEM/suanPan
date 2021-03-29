@@ -21,7 +21,14 @@
 #include <Domain/Node.h>
 
 FixedLength::FixedLength(const unsigned T, const unsigned S, const unsigned A, const unsigned D, uvec&& N)
-	: Constraint(T, S, A, std::forward<uvec>(N), {D}, 1) { set_connected(true); }
+	: Constraint(T, S, A, std::forward<uvec>(N), {D}, 1)
+	, inequal(false)
+	, min_gap(0.) { set_connected(true); }
+
+FixedLength::FixedLength(const unsigned T, const unsigned S, const unsigned A, const unsigned D, const double M, uvec&& N)
+	: Constraint(T, S, A, std::forward<uvec>(N), {D}, 1)
+	, inequal(true)
+	, min_gap(M * M) { set_connected(true); }
 
 int FixedLength::initialize(const shared_ptr<DomainBase>& D) {
 	for(uword I = 0; I < node_encoding.n_elem; ++I) {
@@ -57,6 +64,15 @@ int FixedLength::process(const shared_ptr<DomainBase>& D) {
 
 	auto& W = D->get_factory();
 
+	if(inequal) {
+		if(accu(square(coor + t_disp)) > min_gap + datum::eps) {
+			set_multiplier_size(0);
+			return SUANPAN_SUCCESS;
+		}
+		set_multiplier_size(1);
+		auxiliary_load = min_gap - dot(coor, coor);
+	}
+
 	auxiliary_stiffness.zeros(W->get_size(), num_size);
 	auxiliary_resistance = 0.;
 	for(auto I = 0llu; I < n_dof; ++I) {
@@ -68,7 +84,7 @@ int FixedLength::process(const shared_ptr<DomainBase>& D) {
 	const auto t_factor = 2. * trial_lambda(0);
 	for(auto I = 0llu; I < n_dof; ++I) stiffness(I + n_dof, I) = stiffness(I, I + n_dof) = -(stiffness(I, I) = stiffness(I + n_dof, I + n_dof) = t_factor);
 
-	trial_resistance = auxiliary_stiffness * trial_lambda;
+	trial_resistance = current_resistance + auxiliary_stiffness * (trial_lambda - current_lambda);
 
 	return SUANPAN_SUCCESS;
 }
@@ -89,3 +105,6 @@ void FixedLength::reset_status() {
 	trial_lambda = current_lambda;
 	trial_resistance = current_resistance;
 }
+
+MinimumGap::MinimumGap(const unsigned T, const unsigned S, const unsigned A, const unsigned D, const double M, uvec&& N)
+	: FixedLength(T, S, A, D, M, std::forward<uvec>(N)) {}

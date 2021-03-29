@@ -3,6 +3,7 @@
 ## version 1.x
 
 1. add `R2D2` and `R3D2` alias for fixed length constraint
+2. add `MinGap2D` and `MinGap3D` inequality constraints
 
 ## version 1.3
 
