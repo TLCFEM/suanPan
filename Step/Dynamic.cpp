@@ -59,7 +59,7 @@ int Dynamic::initialize() {
 	if(nullptr == solver) {
 		auto flag = false;
 		for(const auto& I : t_domain->get_load_pool())
-			if(const auto& J = *I; (typeid(J) == typeid(NodalDisplacement) || typeid(J) == typeid(GroupNodalDisplacement)) && I->get_start_step() == get_tag()) {
+			if(I->if_displacement_control() && I->get_start_step() == get_tag()) {
 				flag = true;
 				break;
 			}

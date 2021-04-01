@@ -103,6 +103,9 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
 	if(is_equal(command_id, "section")) return create_new_section(domain, command);
 	if(is_equal(command_id, "solver")) return create_new_solver(domain, command);
 	if(is_equal(command_id, "step")) return create_new_step(domain, command);
+	if(is_equal(command_id, "supportdisplacement")) return create_new_supportmotion(domain, command, 0);
+	if(is_equal(command_id, "supportvelocity")) return create_new_supportmotion(domain, command, 1);
+	if(is_equal(command_id, "supportacceleration")) return create_new_supportmotion(domain, command, 2);
 	if(is_equal(command_id, "set")) return set_property(domain, command);
 
 	if(is_equal(command_id, "materialtest1d")) return test_material1d(domain, command);
@@ -2123,6 +2126,44 @@ int create_new_step(const shared_ptr<DomainBase>& domain, istringstream& command
 		else suanpan_error("create_new_step() cannot create the new step.\n");
 	}
 	else suanpan_error("create_new_step() cannot identify step type.\n");
+
+	return SUANPAN_SUCCESS;
+}
+
+int create_new_supportmotion(const shared_ptr<DomainBase>& domain, istringstream& command, const unsigned flag) {
+	unsigned load_id;
+	if(!get_input(command, load_id)) {
+		suanpan_error("create_new_supportmotion() needs a tag.\n");
+		return SUANPAN_SUCCESS;
+	}
+
+	unsigned amplitude_id;
+	if(!get_input(command, amplitude_id)) {
+		suanpan_error("create_new_supportmotion() needs a valid amplitude tag.\n");
+		return SUANPAN_SUCCESS;
+	}
+
+	double magnitude;
+	if(!get_input(command, magnitude)) {
+		suanpan_error("create_new_supportmotion() needs load magnitude.\n");
+		return SUANPAN_SUCCESS;
+	}
+
+	unsigned dof_id;
+	if(!get_input(command, dof_id)) {
+		suanpan_error("create_new_supportmotion() needs a valid DoF.\n");
+		return SUANPAN_SUCCESS;
+	}
+
+	unsigned node;
+	vector<uword> node_tag;
+	while(get_input(command, node)) node_tag.push_back(node);
+
+	const auto& step_tag = domain->get_current_step_tag();
+
+	if(0 == flag) { if(!domain->insert(make_shared<SupportDisplacement>(load_id, step_tag, magnitude, uvec(node_tag), dof_id, amplitude_id))) suanpan_error("create_new_supportmotion() fails to create new load.\n"); }
+	else if(1 == flag) { if(!domain->insert(make_shared<SupportVelocity>(load_id, step_tag, magnitude, uvec(node_tag), dof_id, amplitude_id))) suanpan_error("create_new_supportmotion() fails to create new load.\n"); }
+	else { if(!domain->insert(make_shared<SupportAcceleration>(load_id, step_tag, magnitude, uvec(node_tag), dof_id, amplitude_id))) suanpan_error("create_new_supportmotion() fails to create new load.\n"); }
 
 	return SUANPAN_SUCCESS;
 }

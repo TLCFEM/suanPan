@@ -7,6 +7,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         "Load/NodalAcceleration.cpp"
         "Load/NodalDisplacement.cpp"
         "Load/NodalForce.cpp"
+        "Load/SupportMotion.cpp"
         )
 
 add_subdirectory(Amplitude)

@@ -1195,6 +1195,9 @@
     <ClCompile Include="..\..\..\Constraint\FixedLength.cpp">
       <Filter>Constraint</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Load\SupportMotion.cpp">
+      <Filter>Load</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2280,6 +2283,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Constraint\FixedLength.h">
       <Filter>Constraint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Load\SupportMotion.h">
+      <Filter>Load</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

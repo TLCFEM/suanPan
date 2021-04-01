@@ -72,6 +72,7 @@ int create_new_plainrecorder(const shared_ptr<DomainBase>&, istringstream&);
 int create_new_hdf5recorder(const shared_ptr<DomainBase>&, istringstream&);
 int create_new_solver(const shared_ptr<DomainBase>&, istringstream&);
 int create_new_step(const shared_ptr<DomainBase>&, istringstream&);
+int create_new_supportmotion(const shared_ptr<DomainBase>&, istringstream&, unsigned);
 
 int test_material1d(const shared_ptr<DomainBase>&, istringstream&);
 int test_material2d(const shared_ptr<DomainBase>&, istringstream&);

@@ -8,3 +8,4 @@
 #include "NodalAcceleration.h"
 #include "NodalDisplacement.h"
 #include "NodalForce.h"
+#include "SupportMotion.h"

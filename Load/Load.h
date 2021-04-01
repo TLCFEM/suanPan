@@ -38,6 +38,8 @@ class Load : public ConditionalModifier {
 protected:
 	static const double multiplier;
 
+	const bool mpdc_flag = false;
+
 	const double pattern;
 
 	vec trial_load;
@@ -52,6 +54,9 @@ public:
 	Load& operator=(Load&&) = delete;      // assign forbidden
 
 	~Load() override;
+
+	void enable_displacement_control() const;
+	bool if_displacement_control() const;
 
 	[[nodiscard]] const vec& get_trial_load() const;
 	[[nodiscard]] const vec& get_trial_settlement() const;

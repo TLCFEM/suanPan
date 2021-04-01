@@ -208,5 +208,6 @@ jobs:
           ./suanPan -f ../Example/Solver/RayleighNewmark.supan > /dev/null
           ./suanPan -f ../Example/Solver/SHALLOW.ARC.supan > /dev/null
           ./suanPan -f ../Example/Solver/WilsonPenzien.supan > /dev/null
+          ./suanPan -f ../Example/Solver/SupportMotion.supan > /dev/null
           for SRC in `find . | egrep '\.o'`; do gcov -n $SRC > /dev/null; done
           bash <(curl -s https://codecov.io/bash)

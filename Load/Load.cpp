@@ -25,6 +25,10 @@ Load::Load(const unsigned T, const unsigned ST, const unsigned AT, uvec&& NT, uv
 
 Load::~Load() { suanpan_debug("Load %u dtor() called.\n", get_tag()); }
 
+void Load::enable_displacement_control() const { access::rw(mpdc_flag) = true; }
+
+bool Load::if_displacement_control() const { return mpdc_flag; }
+
 const vec& Load::get_trial_load() const { return trial_load; }
 
 const vec& Load::get_trial_settlement() const { return trial_settlement; }

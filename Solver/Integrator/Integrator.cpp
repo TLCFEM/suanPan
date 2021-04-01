@@ -224,3 +224,27 @@ vec Integrator::from_total_acceleration(const vec& total_acceleration, const uve
 
 	return from_incre_acceleration(total_acceleration - W->get_current_acceleration()(encoding), encoding);
 }
+
+vec Integrator::from_incre_velocity(const double magnitude, const uvec& encoding) {
+	vec incre_velocity(encoding.n_elem);
+	incre_velocity.fill(magnitude);
+	return from_incre_velocity(incre_velocity, encoding);
+}
+
+vec Integrator::from_incre_acceleration(const double magnitude, const uvec& encoding) {
+	vec incre_acceleration(encoding.n_elem);
+	incre_acceleration.fill(magnitude);
+	return from_incre_acceleration(incre_acceleration, encoding);
+}
+
+vec Integrator::from_total_velocity(const double magnitude, const uvec& encoding) {
+	vec total_velocity(encoding.n_elem);
+	total_velocity.fill(magnitude);
+	return from_total_velocity(total_velocity, encoding);
+}
+
+vec Integrator::from_total_acceleration(const double magnitude, const uvec& encoding) {
+	vec total_acceleration(encoding.n_elem);
+	total_acceleration.fill(magnitude);
+	return from_total_acceleration(total_acceleration, encoding);
+}
