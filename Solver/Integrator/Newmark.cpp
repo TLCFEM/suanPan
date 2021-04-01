@@ -83,6 +83,18 @@ void Newmark::update_compatibility() const {
 	suanpan_for_each(t_node_pool.cbegin(), t_node_pool.cend(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_status(trial_dsp, trial_vel, trial_acc); });
 }
 
+vec Newmark::from_incre_velocity(const vec& incre_velocity, const uvec& encoding) {
+	auto& W = get_domain().lock()->get_factory();
+
+	return incre_velocity / (C3 * C0) + C5 * W->get_current_velocity()(encoding) + (C3 * C4 - C5) / (C3 * C0) * W->get_current_acceleration()(encoding);
+}
+
+vec Newmark::from_incre_acceleration(const vec& incre_acceleration, const uvec& encoding) {
+	auto& W = get_domain().lock()->get_factory();
+
+	return incre_acceleration / C0 + C5 * W->get_current_velocity()(encoding) + C4 / C0 * W->get_current_acceleration()(encoding);
+}
+
 void Newmark::update_parameter(const double NT) {
 	if(suanpan::approx_equal(C5, NT)) return;
 

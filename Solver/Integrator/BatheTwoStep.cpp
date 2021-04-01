@@ -116,6 +116,22 @@ void BatheTwoStep::update_compatibility() const {
 	suanpan_for_each(t_node_pool.cbegin(), t_node_pool.cend(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_status(trial_dsp, trial_vel, trial_acc); });
 }
 
+vec BatheTwoStep::from_incre_velocity(const vec& incre_velocity, const uvec& encoding) {
+	auto& W = get_domain().lock()->get_factory();
+
+	if(FLAG::TRAP == step_flag) return incre_velocity / C3 + C0 * W->get_current_velocity()(encoding);
+
+	return (incre_velocity + W->get_current_velocity()(encoding)) / C2 + (W->get_current_displacement()(encoding) - W->get_pre_displacement()(encoding)) / 3.;
+}
+
+vec BatheTwoStep::from_incre_acceleration(const vec& incre_acceleration, const uvec& encoding) {
+	auto& W = get_domain().lock()->get_factory();
+
+	if(FLAG::TRAP == step_flag) return incre_acceleration / C6 + C0 * W->get_current_velocity()(encoding) + 2. / C6 * W->get_current_acceleration()(encoding);
+
+	return (incre_acceleration + W->get_current_acceleration()(encoding)) / C5 + C3 / C5 * W->get_current_velocity()(encoding) - C1 / C5 * W->get_pre_velocity()(encoding) - (W->get_pre_displacement()(encoding) - W->get_current_displacement()(encoding)) / 3.;
+}
+
 void BatheTwoStep::update_parameter(const double NT) {
 	if(suanpan::approx_equal(C0, NT)) return;
 

@@ -204,3 +204,23 @@ void Integrator::reset_status() {
 void Integrator::update_parameter(double) {}
 
 void Integrator::update_compatibility() const {}
+
+vec Integrator::from_incre_velocity(const vec&, const uvec& encoding) { return zeros(encoding.n_elem); }
+
+vec Integrator::from_incre_acceleration(const vec&, const uvec& encoding) { return zeros(encoding.n_elem); }
+
+vec Integrator::from_total_velocity(const vec& total_velocity, const uvec& encoding) {
+	const auto& W = get_domain().lock()->get_factory();
+
+	if(AnalysisType::DYNAMICS != W->get_analysis_type()) return zeros(encoding.n_elem);
+
+	return from_incre_velocity(total_velocity - W->get_current_velocity()(encoding), encoding);
+}
+
+vec Integrator::from_total_acceleration(const vec& total_acceleration, const uvec& encoding) {
+	const auto& W = get_domain().lock()->get_factory();
+
+	if(AnalysisType::DYNAMICS != W->get_analysis_type()) return zeros(encoding.n_elem);
+
+	return from_incre_acceleration(total_acceleration - W->get_current_acceleration()(encoding), encoding);
+}

@@ -109,6 +109,11 @@ public:
 
 	virtual void update_parameter(double);
 	virtual void update_compatibility() const;
+
+	virtual vec from_incre_velocity(const vec&, const uvec&);     // obtain increment of displacement from increment of velocity
+	virtual vec from_incre_acceleration(const vec&, const uvec&); // obtain increment of acceleration from increment of velocity
+	vec from_total_velocity(const vec&, const uvec&);             // obtain increment of displacement from total velocity
+	vec from_total_acceleration(const vec&, const uvec&);         // obtain increment of displacement from total acceleration
 };
 
 #endif
