@@ -86,7 +86,7 @@ void Newmark::update_compatibility() const {
 vec Newmark::from_incre_velocity(const vec& incre_velocity, const uvec& encoding) {
 	auto& W = get_domain().lock()->get_factory();
 
-	return incre_velocity / (C3 * C0) + C5 * W->get_current_velocity()(encoding) + (C3 * C4 - C5) / (C3 * C0) * W->get_current_acceleration()(encoding) + W->get_current_displacement()(encoding);
+	return incre_velocity / C1 + C5 * W->get_current_velocity()(encoding) + (C3 * C4 - C5) / C1 * W->get_current_acceleration()(encoding) + W->get_current_displacement()(encoding);
 }
 
 vec Newmark::from_incre_acceleration(const vec& incre_acceleration, const uvec& encoding) {

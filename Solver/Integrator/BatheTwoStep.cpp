@@ -119,23 +119,23 @@ void BatheTwoStep::update_compatibility() const {
 vec BatheTwoStep::from_incre_velocity(const vec& incre_velocity, const uvec& encoding) {
 	auto& W = get_domain().lock()->get_factory();
 
-	vec incre_displacement;
+	vec total_displacement = W->get_current_displacement()(encoding);
 
-	if(FLAG::TRAP == step_flag) incre_displacement = incre_velocity / C3 + C0 * W->get_current_velocity()(encoding);
-	else incre_displacement = (incre_velocity + W->get_current_velocity()(encoding)) / C2 + (W->get_current_displacement()(encoding) - W->get_pre_displacement()(encoding)) / 3.;
+	if(FLAG::TRAP == step_flag) total_displacement += incre_velocity / C3 + C0 * W->get_current_velocity()(encoding);
+	else total_displacement += (incre_velocity + W->get_current_velocity()(encoding)) / C2 + (W->get_current_displacement()(encoding) - W->get_pre_displacement()(encoding)) / 3.;
 
-	return incre_displacement + W->get_current_displacement()(encoding);
+	return total_displacement;
 }
 
 vec BatheTwoStep::from_incre_acceleration(const vec& incre_acceleration, const uvec& encoding) {
 	auto& W = get_domain().lock()->get_factory();
 
-	vec incre_displacement;
+	vec total_displacement = W->get_current_displacement()(encoding);
 
-	if(FLAG::TRAP == step_flag) incre_displacement = incre_acceleration / C6 + C0 * W->get_current_velocity()(encoding) + 2. / C6 * W->get_current_acceleration()(encoding);
-	else incre_displacement = (incre_acceleration + W->get_current_acceleration()(encoding)) / C5 + C3 / C5 * W->get_current_velocity()(encoding) - C1 / C5 * W->get_pre_velocity()(encoding) + (W->get_current_displacement()(encoding) - W->get_pre_displacement()(encoding)) / 3.;
+	if(FLAG::TRAP == step_flag) total_displacement += incre_acceleration / C6 + C0 * W->get_current_velocity()(encoding) + 2. / C6 * W->get_current_acceleration()(encoding);
+	else total_displacement += (incre_acceleration + W->get_current_acceleration()(encoding)) / C5 + C3 / C5 * W->get_current_velocity()(encoding) - C1 / C5 * W->get_pre_velocity()(encoding) + (W->get_current_displacement()(encoding) - W->get_pre_displacement()(encoding)) / 3.;
 
-	return incre_displacement + W->get_current_displacement()(encoding);
+	return total_displacement;
 }
 
 void BatheTwoStep::update_parameter(const double NT) {
