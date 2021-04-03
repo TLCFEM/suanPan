@@ -1,0 +1,58 @@
+name: With MKL VTK
+on:
+  push:
+    branches: [dev]
+  pull_request:
+    branches: [dev]
+jobs:
+  linux-mkl-vtk:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Clone
+        uses: actions/checkout@v2
+      - name: Install MKL
+        run: |
+          echo "SP_TIME=suanPan-daily-$(date +''%Y%m%d%H'')" >> $GITHUB_ENV
+          wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+          sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+          rm GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+          echo "deb https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
+      - name: Install VTK
+        run: |
+          wget https://github.com/TLCFEM/vtk-prebuild/releases/download/latest/VTK-8.2.0-linux.tar.gz
+          mkdir VTK-build && tar xf VTK-8.2.0-linux.tar.gz -C VTK-build
+      - name: Compile
+        run: |
+          sudo apt-get update && sudo env ACCEPT_EULA=Y apt-get upgrade -y -o Dpkg::Options::="--force-overwrite" && sudo apt-get install libglu1-mesa-dev libgl1-mesa-dev freeglut3-dev mesa-common-dev intel-oneapi-mkl-devel
+          cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=/home/runner/work/suanPan/suanPan/VTK-build/lib/cmake/vtk-8.2/ -DUSE_MKL=ON -DMKLROOT=/opt/intel/oneapi/mkl/latest/ .
+          make -j4
+      - name: Pack
+        run: |
+          mkdir suanPan-linux-mkl-vtk
+          cp suanPan suanPan-linux-mkl-vtk
+          cp README.md suanPan-linux-mkl-vtk
+          cp CHANGELOG.md suanPan-linux-mkl-vtk
+          cp LICENSE suanPan-linux-mkl-vtk
+          cp Enhancement/suanPan.sh suanPan-linux-mkl-vtk
+          cp Enhancement/suanPan.sublime-completions suanPan-linux-mkl-vtk
+          cp Enhancement/suanPan.sublime-syntax suanPan-linux-mkl-vtk
+          cp Libs/gcc-linux/libtbb.so suanPan-linux-mkl-vtk
+          cp Libs/gcc-linux/libtbb.so.2 suanPan-linux-mkl-vtk
+          cp Libs/gcc-linux/libtbbmalloc.so suanPan-linux-mkl-vtk
+          cp Libs/gcc-linux/libtbbmalloc.so.2 suanPan-linux-mkl-vtk
+          cp Libs/gcc-linux/libtbbmalloc_proxy.so suanPan-linux-mkl-vtk
+          cp Libs/gcc-linux/libtbbmalloc_proxy.so.2 suanPan-linux-mkl-vtk
+          cp /opt/intel/oneapi/compiler/latest/linux/compiler/lib/intel64_lin/libiomp5.so suanPan-linux-mkl-vtk
+          cp /opt/intel/oneapi/mkl/latest/lib/intel64/libmkl_core.so.1 suanPan-linux-mkl-vtk
+          cp /opt/intel/oneapi/mkl/latest/lib/intel64/libmkl_intel_lp64.so.1 suanPan-linux-mkl-vtk
+          cp /opt/intel/oneapi/mkl/latest/lib/intel64/libmkl_intel_thread.so.1 suanPan-linux-mkl-vtk
+          cp /opt/intel/oneapi/mkl/latest/lib/intel64/libmkl_def.so.1 suanPan-linux-mkl-vtk
+          cp /opt/intel/oneapi/mkl/latest/lib/intel64/libmkl_avx512.so.1 suanPan-linux-mkl-vtk
+          cp /opt/intel/oneapi/mkl/latest/lib/intel64/libmkl_avx2.so.1 suanPan-linux-mkl-vtk
+          cp /opt/intel/oneapi/mkl/latest/lib/intel64/libmkl_avx.so.1 suanPan-linux-mkl-vtk
+          tar cvzf suanPan-linux-mkl-vtk.tar.gz suanPan-linux-mkl-vtk
+      - name: Upload
+        uses: actions/upload-artifact@v1
+        with:
+          name: suanPan-linux-mkl-vtk
+          path: suanPan-linux-mkl-vtk.tar.gz
