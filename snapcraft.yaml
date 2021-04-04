@@ -27,7 +27,7 @@ parts:
       wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
       sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
       echo "deb https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
-      sudo apt update && sudo apt install intel-oneapi-mkl-devel -y
+      sudo apt-get update && sudo apt-get install intel-oneapi-mkl-devel -y
       export MDEST=/build/suanpan/parts/suanpan/install/bin/
       mkdir -p $MDEST
       cp /opt/intel/oneapi/compiler/latest/linux/compiler/lib/intel64_lin/libiomp5.so $MDEST

@@ -15,7 +15,6 @@ jobs:
           echo "SP_TIME=suanPan-daily-$(date +''%Y%m%d%H'')" >> $GITHUB_ENV
           wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
           sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
-          rm GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
           echo "deb https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
           wget https://github.com/TLCFEM/vtk-prebuild/releases/download/latest/VTK-8.2.0-linux.tar.gz
           mkdir VTK-build && tar xf VTK-8.2.0-linux.tar.gz -C VTK-build
