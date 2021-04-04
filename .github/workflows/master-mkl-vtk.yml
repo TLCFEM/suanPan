@@ -10,21 +10,19 @@ jobs:
     steps:
       - name: Clone
         uses: actions/checkout@v2
-      - name: Install MKL
+      - name: Install MKL VTK
         run: |
           echo "SP_TIME=suanPan-daily-$(date +''%Y%m%d%H'')" >> $GITHUB_ENV
-          wget http://registrationcenter-download.intel.com/akdlm/irc_nas/tec/16533/l_mkl_2020.1.217.tgz
-          tar -xzf l_mkl_2020.1.217.tgz && cd l_mkl_2020.1.217
-          sed -i 's/decline/accept/g' ./silent.cfg
-          ./install.sh --silent ./silent.cfg
-      - name: Install VTK
-        run: |
+          wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+          sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+          rm GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+          echo "deb https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
           wget https://github.com/TLCFEM/vtk-prebuild/releases/download/latest/VTK-8.2.0-linux.tar.gz
           mkdir VTK-build && tar xf VTK-8.2.0-linux.tar.gz -C VTK-build
       - name: Compile
         run: |
-          sudo apt-get update && sudo env ACCEPT_EULA=Y apt-get upgrade -y -o Dpkg::Options::="--force-overwrite" && sudo apt-get install libglu1-mesa-dev libgl1-mesa-dev freeglut3-dev mesa-common-dev
-          cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=/home/runner/work/suanPan/suanPan/VTK-build/lib/cmake/vtk-8.2/ -DUSE_MKL=ON -DMKLROOT=/opt/intel/compilers_and_libraries/linux/mkl/ .
+          sudo apt-get update && sudo env ACCEPT_EULA=Y apt-get upgrade -y -o Dpkg::Options::="--force-overwrite" && sudo apt-get install libglu1-mesa-dev libgl1-mesa-dev freeglut3-dev mesa-common-dev intel-oneapi-mkl-devel
+          cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=/home/runner/work/suanPan/suanPan/VTK-build/lib/cmake/vtk-8.2/ -DUSE_MKL=ON -DMKLROOT=/opt/intel/oneapi/mkl/latest/ .
           make -j4
       - name: Pack
         run: |
@@ -42,14 +40,14 @@ jobs:
           cp Libs/gcc-linux/libtbbmalloc.so.2 suanPan-linux-mkl-vtk
           cp Libs/gcc-linux/libtbbmalloc_proxy.so suanPan-linux-mkl-vtk
           cp Libs/gcc-linux/libtbbmalloc_proxy.so.2 suanPan-linux-mkl-vtk
-          cp /opt/intel/compilers_and_libraries/linux/lib/intel64/libiomp5.so suanPan-linux-mkl-vtk
-          cp /opt/intel/mkl/lib/intel64/libmkl_core.so suanPan-linux-mkl-vtk
-          cp /opt/intel/mkl/lib/intel64/libmkl_intel_lp64.so suanPan-linux-mkl-vtk
-          cp /opt/intel/mkl/lib/intel64/libmkl_intel_thread.so suanPan-linux-mkl-vtk
-          cp /opt/intel/mkl/lib/intel64/libmkl_def.so suanPan-linux-mkl-vtk
-          cp /opt/intel/mkl/lib/intel64/libmkl_avx512.so suanPan-linux-mkl-vtk
-          cp /opt/intel/mkl/lib/intel64/libmkl_avx2.so suanPan-linux-mkl-vtk
-          cp /opt/intel/mkl/lib/intel64/libmkl_avx.so suanPan-linux-mkl-vtk
+          cp /opt/intel/oneapi/compiler/latest/linux/compiler/lib/intel64_lin/libiomp5.so suanPan-linux-mkl-vtk
+          cp /opt/intel/oneapi/mkl/latest/lib/intel64/libmkl_core.so.1 suanPan-linux-mkl-vtk
+          cp /opt/intel/oneapi/mkl/latest/lib/intel64/libmkl_intel_lp64.so.1 suanPan-linux-mkl-vtk
+          cp /opt/intel/oneapi/mkl/latest/lib/intel64/libmkl_intel_thread.so.1 suanPan-linux-mkl-vtk
+          cp /opt/intel/oneapi/mkl/latest/lib/intel64/libmkl_def.so.1 suanPan-linux-mkl-vtk
+          cp /opt/intel/oneapi/mkl/latest/lib/intel64/libmkl_avx512.so.1 suanPan-linux-mkl-vtk
+          cp /opt/intel/oneapi/mkl/latest/lib/intel64/libmkl_avx2.so.1 suanPan-linux-mkl-vtk
+          cp /opt/intel/oneapi/mkl/latest/lib/intel64/libmkl_avx.so.1 suanPan-linux-mkl-vtk
           tar cvzf suanPan-linux-mkl-vtk.tar.gz suanPan-linux-mkl-vtk
       - name: Upload
         uses: actions/upload-artifact@v1

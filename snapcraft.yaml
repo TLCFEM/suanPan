@@ -24,22 +24,21 @@ parts:
       - wget
       - cpio
     override-build: |
-      wget http://registrationcenter-download.intel.com/akdlm/irc_nas/tec/16533/l_mkl_2020.1.217.tgz
-      tar xzf l_mkl_2020.1.217.tgz && cd l_mkl_2020.1.217
-      sed -i 's/decline/accept/g' ./silent.cfg
-      ./install.sh --silent ./silent.cfg
+      wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+      sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+      echo "deb https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
+      sudo apt update && sudo apt install intel-oneapi-mkl-devel -y
       export MDEST=/build/suanpan/parts/suanpan/install/bin/
       mkdir -p $MDEST
-      export MFROM=/opt/intel/compilers_and_libraries/linux/lib/intel64/
-      cp $MFROM/libiomp5.so $MDEST
-      export MFROM=/opt/intel/mkl/lib/intel64/
-      cp $MFROM/libmkl_core.so $MDEST
-      cp $MFROM/libmkl_intel_lp64.so $MDEST
-      cp $MFROM/libmkl_intel_thread.so $MDEST
-      cp $MFROM/libmkl_def.so $MDEST
-      cp $MFROM/libmkl_avx512.so $MDEST
-      cp $MFROM/libmkl_avx2.so $MDEST
-      cp $MFROM/libmkl_avx.so $MDEST
+      cp /opt/intel/oneapi/compiler/latest/linux/compiler/lib/intel64_lin/libiomp5.so $MDEST
+      export MFROM=/opt/intel/oneapi/mkl/latest/lib/intel64/
+      cp $MFROM/libmkl_core.so.1 $MDEST
+      cp $MFROM/libmkl_intel_lp64.so.1 $MDEST
+      cp $MFROM/libmkl_intel_thread.so.1 $MDEST
+      cp $MFROM/libmkl_def.so.1 $MDEST
+      cp $MFROM/libmkl_avx512.so.1 $MDEST
+      cp $MFROM/libmkl_avx2.so.1 $MDEST
+      cp $MFROM/libmkl_avx.so.1 $MDEST
   vtk:
     plugin: nil
     build-packages:
@@ -70,7 +69,7 @@ parts:
       - -DUSE_EXTERNAL_VTK=ON
       - -DVTK_DIR=/build/suanpan/parts/suanpan/VTK/lib/cmake/vtk-9.0/
       - -DUSE_MKL=ON
-      - -DMKLROOT=/opt/intel/compilers_and_libraries/linux/mkl/
+      - -DMKLROOT=/opt/intel/oneapi/mkl/latest/
     build-environment:
       - CC: gcc-8
       - CXX: g++-8
