@@ -24,10 +24,8 @@ parts:
       - wget
       - cpio
     override-build: |
-      wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
-      sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
-      sudo apt-get update && sudo apt-get install software-properties-common -y && sudo add-apt-repository "deb https://apt.repos.intel.com/oneapi all main"
-      sudo apt-get install intel-oneapi-mkl-devel -y
+      wget https://registrationcenter-download.intel.com/akdlm/irc_nas/17757/l_onemkl_p_2021.2.0.296_offline.sh
+      sudo sh ./l_onemkl_p_2021.2.0.296_offline.sh -s -a --silent --eula accept
       export MDEST=/build/suanpan/parts/suanpan/install/usr/local/bin/
       mkdir -p $MDEST
       cp /opt/intel/oneapi/compiler/latest/linux/compiler/lib/intel64_lin/libiomp5.so $MDEST
