@@ -42,6 +42,18 @@ Recorder::Recorder(const unsigned T, uvec&& B, const OutputType L, const unsigne
 
 Recorder::~Recorder() { suanpan_debug("Recorder %u dtor() called.\n", get_tag()); }
 
+tm Recorder::get_timestamp() {
+	struct tm local_time{};
+#ifdef SUANPAN_MSVC
+	auto current_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+	localtime_s(&local_time, &current_time);
+#else
+	auto current_time = std::time(nullptr);
+	local_time = *std::localtime(&current_time);
+#endif
+	return local_time;
+}
+
 void Recorder::initialize(const shared_ptr<DomainBase>&) {}
 
 void Recorder::set_object_tag(const uvec& T) { object_tag = T; }
@@ -75,12 +87,8 @@ void Recorder::save() {
 
 #ifdef SUANPAN_HDF5
 	if(use_hdf5) {
-		file_name << "-";
-		for(const auto I : object_tag) {
-			file_name << I;
-			if(file_name.str().size() > 40) break;
-		}
-		file_name << ".h5";
+		const auto current_time = get_timestamp();
+		file_name << "-" << std::put_time(&current_time, "%y%m%d%H%S") << ".h5";
 
 		const auto file_id = H5Fcreate(file_name.str().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 

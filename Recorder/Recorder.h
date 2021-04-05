@@ -45,6 +45,8 @@ class Recorder : public Tag {
 protected:
 	const unsigned interval;
 	unsigned counter = 1;
+
+	static tm get_timestamp();
 public:
 	Recorder(unsigned,   // tag
 	         uvec&&,     // object tags
