@@ -66,10 +66,15 @@ void op_fft_real::apply(Mat<std::complex<typename T1::pod_type>>& out, const mtO
 			typename Proxy<T1>::ea_type X = P.get_ea();
 
 			for(uword i = 0; i < N; ++i) { data_mem[i] = out_eT(X[i], in_eT(0)); }
-		} else { if(n_cols == 1) { for(uword i = 0; i < N; ++i) { data_mem[i] = out_eT(P.at(i, 0), in_eT(0)); } } else { for(uword i = 0; i < N; ++i) { data_mem[i] = out_eT(P.at(0, i), in_eT(0)); } } }
+		}
+		else {
+			if(n_cols == 1) { for(uword i = 0; i < N; ++i) { data_mem[i] = out_eT(P.at(i, 0), in_eT(0)); } }
+			else { for(uword i = 0; i < N; ++i) { data_mem[i] = out_eT(P.at(0, i), in_eT(0)); } }
+		}
 
 		worker.run(out.memptr(), data_mem);
-	} else {
+	}
+	else {
 		// process each column seperately
 
 		out.set_size(N_user, n_cols);
@@ -112,7 +117,8 @@ void op_fft_cx::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_fft_cx>&
 
 	const Proxy<T1> P(in.m);
 
-	if(P.is_alias(out) == false) { op_fft_cx::apply_noalias<T1, false>(out, P, in.aux_uword_a, in.aux_uword_b); } else {
+	if(P.is_alias(out) == false) { op_fft_cx::apply_noalias<T1, false>(out, P, in.aux_uword_a, in.aux_uword_b); }
+	else {
 		Mat<eT> tmp;
 
 		op_fft_cx::apply_noalias<T1, false>(tmp, P, in.aux_uword_a, in.aux_uword_b);
@@ -161,12 +167,14 @@ void op_fft_cx::apply_noalias(Mat<typename T1::elem_type>& out, const Proxy<T1>&
 			op_fft_cx::copy_vec(data_mem, P, (std::min)(N_user, N_orig));
 
 			worker.run(out.memptr(), data_mem);
-		} else {
+		}
+		else {
 			const unwrap<typename Proxy<T1>::stored_type> tmp(P.Q);
 
 			worker.run(out.memptr(), tmp.M.memptr());
 		}
-	} else {
+	}
+	else {
 		// process each column seperately
 
 		out.set_size(N_user, n_cols);
@@ -196,7 +204,8 @@ void op_fft_cx::apply_noalias(Mat<typename T1::elem_type>& out, const Proxy<T1>&
 
 				worker.run(out.colptr(col), data_mem);
 			}
-		} else {
+		}
+		else {
 			const unwrap<typename Proxy<T1>::stored_type> tmp(P.Q);
 
 			for(uword col = 0; col < n_cols; ++col) { worker.run(out.colptr(col), tmp.M.colptr(col)); }
@@ -204,7 +213,7 @@ void op_fft_cx::apply_noalias(Mat<typename T1::elem_type>& out, const Proxy<T1>&
 	}
 
 	// correct the scaling for the inverse transform
-	if(inverse == true) {
+	if(inverse) {
 		typedef typename get_pod_type<eT>::result T;
 
 		const T k = T(1) / T(N_user);
@@ -222,7 +231,8 @@ inline
 void op_fft_cx::copy_vec(typename Proxy<T1>::elem_type* dest, const Proxy<T1>& P, const uword N) {
 	arma_extra_debug_sigprint();
 
-	if(is_Mat<typename Proxy<T1>::stored_type>::value == true) { op_fft_cx::copy_vec_unwrap(dest, P, N); } else { op_fft_cx::copy_vec_proxy(dest, P, N); }
+	if(is_Mat<typename Proxy<T1>::stored_type>::value) { op_fft_cx::copy_vec_unwrap(dest, P, N); }
+	else { op_fft_cx::copy_vec_proxy(dest, P, N); }
 }
 
 template<typename T1> arma_hot
@@ -244,7 +254,11 @@ void op_fft_cx::copy_vec_proxy(typename Proxy<T1>::elem_type* dest, const Proxy<
 		typename Proxy<T1>::ea_type X = P.get_ea();
 
 		for(uword i = 0; i < N; ++i) { dest[i] = X[i]; }
-	} else { if(P.get_n_cols() == 1) { for(uword i = 0; i < N; ++i) { dest[i] = P.at(i, 0); } } else { for(uword i = 0; i < N; ++i) { dest[i] = P.at(0, i); } } }
+	}
+	else {
+		if(P.get_n_cols() == 1) { for(uword i = 0; i < N; ++i) { dest[i] = P.at(i, 0); } }
+		else { for(uword i = 0; i < N; ++i) { dest[i] = P.at(0, i); } }
+	}
 }
 
 //
@@ -258,7 +272,8 @@ void op_ifft_cx::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_ifft_cx
 
 	const Proxy<T1> P(in.m);
 
-	if(P.is_alias(out) == false) { op_fft_cx::apply_noalias<T1, true>(out, P, in.aux_uword_a, in.aux_uword_b); } else {
+	if(P.is_alias(out) == false) { op_fft_cx::apply_noalias<T1, true>(out, P, in.aux_uword_a, in.aux_uword_b); }
+	else {
 		Mat<eT> tmp;
 
 		op_fft_cx::apply_noalias<T1, true>(tmp, P, in.aux_uword_a, in.aux_uword_b);

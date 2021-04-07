@@ -45,6 +45,13 @@ public:
 	inline ~subview_cube();
 	inline subview_cube() = delete;
 
+	inline subview_cube(const subview_cube& in);
+	inline subview_cube(subview_cube&& in);
+
+	template<typename op_type> inline void inplace_op(const eT val);
+	template<typename op_type, typename T1> inline void inplace_op(const BaseCube<eT, T1>& x, const char* identifier);
+	template<typename op_type> inline void inplace_op(const subview_cube<eT>& x, const char* identifier);
+
 	inline void operator=(const eT val);
 	inline void operator+=(const eT val);
 	inline void operator-=(const eT val);
@@ -126,7 +133,8 @@ public:
 	arma_inline eT* slice_colptr(const uword in_slice, const uword in_col);
 	arma_inline const eT* slice_colptr(const uword in_slice, const uword in_col) const;
 
-	inline bool check_overlap(const subview_cube& x) const;
+	template<typename eT2> inline bool check_overlap(const subview_cube<eT2>& x) const;
+
 	inline bool check_overlap(const Mat<eT>& x) const;
 
 	class const_iterator;

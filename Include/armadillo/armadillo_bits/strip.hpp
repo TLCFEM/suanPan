@@ -105,6 +105,7 @@ template<typename T1> struct strip_trimat<Op<T1, op_trimat>> {
 	const T1& M;
 
 	static constexpr bool do_trimat = true;
+
 	const bool do_triu;
 	const bool do_tril;
 

@@ -39,7 +39,8 @@ void op_cumsum::apply_noalias(Mat<eT>& out, const Mat<eT>& X, const uword dim) {
 
 				out_mem[row] = acc;
 			}
-		} else {
+		}
+		else {
 			for(uword col = 0; col < n_cols; ++col) {
 				const eT* X_colmem = X.colptr(col);
 				eT* out_colmem = out.colptr(col);
@@ -53,7 +54,8 @@ void op_cumsum::apply_noalias(Mat<eT>& out, const Mat<eT>& X, const uword dim) {
 				}
 			}
 		}
-	} else if(dim == 1) {
+	}
+	else if(dim == 1) {
 		if(n_rows == 1) {
 			const eT* X_mem = X.memptr();
 			eT* out_mem = out.memptr();
@@ -65,7 +67,8 @@ void op_cumsum::apply_noalias(Mat<eT>& out, const Mat<eT>& X, const uword dim) {
 
 				out_mem[col] = acc;
 			}
-		} else {
+		}
+		else {
 			if(n_cols > 0) {
 				arrayops::copy(out.colptr(0), X.colptr(0), n_rows);
 
@@ -99,7 +102,8 @@ void op_cumsum::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_cumsum>&
 		op_cumsum::apply_noalias(tmp, U.M, dim);
 
 		out.steal_mem(tmp);
-	} else { op_cumsum::apply_noalias(out, U.M, dim); }
+	}
+	else { op_cumsum::apply_noalias(out, U.M, dim); }
 }
 
 template<typename T1> inline
@@ -118,7 +122,8 @@ void op_cumsum_vec::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_cums
 		op_cumsum::apply_noalias(tmp, U.M, dim);
 
 		out.steal_mem(tmp);
-	} else { op_cumsum::apply_noalias(out, U.M, dim); }
+	}
+	else { op_cumsum::apply_noalias(out, U.M, dim); }
 }
 
 //! @}

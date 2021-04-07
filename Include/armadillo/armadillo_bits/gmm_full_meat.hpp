@@ -191,7 +191,7 @@ namespace gmm_priv {
 
 		if((status == false) || (storage.n_elem < 2)) {
 			reset();
-			arma_debug_warn("gmm_full::load(): problem with loading or incompatible format");
+			arma_debug_warn_level(3, "gmm_full::load(): problem with loading or incompatible format");
 			return false;
 		}
 
@@ -207,7 +207,7 @@ namespace gmm_priv {
 
 		if((storage.n_elem != (N_gaus + 2)) || (storage_hefts.n_rows != 1) || (storage_hefts.n_cols != N_gaus)) {
 			reset();
-			arma_debug_warn("gmm_full::load(): incompatible format");
+			arma_debug_warn_level(3, "gmm_full::load(): incompatible format");
 			return false;
 		}
 
@@ -222,7 +222,7 @@ namespace gmm_priv {
 
 			if((storage_fcov.n_rows != N_dims) || (storage_fcov.n_cols != N_dims)) {
 				reset();
-				arma_debug_warn("gmm_full::load(): incompatible format");
+				arma_debug_warn_level(3, "gmm_full::load(): incompatible format");
 				return false;
 			}
 
@@ -538,11 +538,11 @@ namespace gmm_priv {
 		const Mat<eT>& X = tmp_X.M;
 
 		if(X.is_empty()) {
-			arma_debug_warn("gmm_full::learn(): given matrix is empty");
+			arma_debug_warn_level(3, "gmm_full::learn(): given matrix is empty");
 			return false;
 		}
 		if(X.is_finite() == false) {
-			arma_debug_warn("gmm_full::learn(): given matrix has non-finite values");
+			arma_debug_warn_level(3, "gmm_full::learn(): given matrix has non-finite values");
 			return false;
 		}
 
@@ -572,18 +572,19 @@ namespace gmm_priv {
 
 		if(seed_mode == keep_existing) {
 			if(means.is_empty()) {
-				arma_debug_warn("gmm_full::learn(): no existing means");
+				arma_debug_warn_level(3, "gmm_full::learn(): no existing means");
 				return false;
 			}
 			if(X.n_rows != means.n_rows) {
-				arma_debug_warn("gmm_full::learn(): dimensionality mismatch");
+				arma_debug_warn_level(3, "gmm_full::learn(): dimensionality mismatch");
 				return false;
 			}
 
 			// TODO: also check for number of vectors?
-		} else {
+		}
+		else {
 			if(X.n_cols < N_gaus) {
-				arma_debug_warn("gmm_full::learn(): number of vectors is less than number of gaussians");
+				arma_debug_warn_level(3, "gmm_full::learn(): number of vectors is less than number of gaussians");
 				return false;
 			}
 
@@ -594,7 +595,8 @@ namespace gmm_priv {
 				get_cout_stream().flush();
 			}
 
-			if(dist_mode == eucl_dist) { generate_initial_means<1>(X, seed_mode); } else if(dist_mode == maha_dist) { generate_initial_means<2>(X, seed_mode); }
+			if(dist_mode == eucl_dist) { generate_initial_means<1>(X, seed_mode); }
+			else if(dist_mode == maha_dist) { generate_initial_means<2>(X, seed_mode); }
 		}
 
 		// k-means
@@ -604,12 +606,13 @@ namespace gmm_priv {
 
 			bool status = false;
 
-			if(dist_mode == eucl_dist) { status = km_iterate<1>(X, km_iter, print_mode); } else if(dist_mode == maha_dist) { status = km_iterate<2>(X, km_iter, print_mode); }
+			if(dist_mode == eucl_dist) { status = km_iterate<1>(X, km_iter, print_mode); }
+			else if(dist_mode == maha_dist) { status = km_iterate<2>(X, km_iter, print_mode); }
 
 			stream_state.restore(get_cout_stream());
 
 			if(status == false) {
-				arma_debug_warn("gmm_full::learn(): k-means algorithm failed; not enough data, or too many gaussians requested");
+				arma_debug_warn_level(3, "gmm_full::learn(): k-means algorithm failed; not enough data, or too many gaussians requested");
 				init(orig);
 				return false;
 			}
@@ -625,7 +628,8 @@ namespace gmm_priv {
 				get_cout_stream().flush();
 			}
 
-			if(dist_mode == eucl_dist) { generate_initial_params<1>(X, var_floor_actual); } else if(dist_mode == maha_dist) { generate_initial_params<2>(X, var_floor_actual); }
+			if(dist_mode == eucl_dist) { generate_initial_params<1>(X, var_floor_actual); }
+			else if(dist_mode == maha_dist) { generate_initial_params<2>(X, var_floor_actual); }
 		}
 
 		// EM algorithm
@@ -638,7 +642,7 @@ namespace gmm_priv {
 			stream_state.restore(get_cout_stream());
 
 			if(status == false) {
-				arma_debug_warn("gmm_full::learn(): EM algorithm failed");
+				arma_debug_warn_level(3, "gmm_full::learn(): EM algorithm failed");
 				init(orig);
 				return false;
 			}
@@ -735,11 +739,12 @@ namespace gmm_priv {
 			eT log_det_val = eT(0);
 			eT log_det_sign = eT(0);
 
-			log_det(log_det_val, log_det_sign, fcov);
+			const bool log_det_status = log_det(log_det_val, log_det_sign, fcov);
 
-			const bool log_det_ok = ((arma_isfinite(log_det_val)) && (log_det_sign > eT(0)));
+			const bool log_det_ok = (log_det_status && (arma_isfinite(log_det_val)) && (log_det_sign > eT(0)));
 
-			if(inv_ok && log_det_ok) { inv_fcov = tmp_inv; } else {
+			if(inv_ok && log_det_ok) { inv_fcov = tmp_inv; }
+			else {
 				// last resort: treat the covariance matrix as diagonal
 
 				inv_fcov.zeros();
@@ -779,7 +784,8 @@ namespace gmm_priv {
 
 				const bool chol_ok = op_chol::apply_direct(tmp_chol, fcov, chol_layout);
 
-				if(chol_ok) { chol_fcov = tmp_chol; } else {
+				if(chol_ok) { chol_fcov = tmp_chol; }
+				else {
 					// last resort: treat the covariance matrix as diagonal
 
 					chol_fcov.zeros();
@@ -823,7 +829,8 @@ namespace gmm_priv {
 			}
 
 			boundaries.at(1, n_threads - 1) = N - 1;
-		} else { boundaries.zeros(); }
+		}
+		else { boundaries.zeros(); }
 
 		// get_cout_stream() << "gmm_full::internal_gen_boundaries(): boundaries: " << '\n' << boundaries << '\n';
 
@@ -848,7 +855,8 @@ namespace gmm_priv {
 			}
 
 			return log_sum;
-		} else { return -Datum<eT>::inf; }
+		}
+		else { return -Datum<eT>::inf; }
 	}
 
 	template<typename eT> inline
@@ -1204,7 +1212,8 @@ namespace gmm_priv {
 			}
 
 			return best_g;
-		} else if(dist_mode == prob_dist) {
+		}
+		else if(dist_mode == prob_dist) {
 			const eT* log_hefts_mem = log_hefts.memptr();
 
 			eT best_p = -Datum<eT>::inf;
@@ -1220,7 +1229,8 @@ namespace gmm_priv {
 			}
 
 			return best_g;
-		} else { arma_debug_check(true, "gmm_full::assign(): unsupported distance mode"); }
+		}
+		else { arma_debug_check(true, "gmm_full::assign(): unsupported distance mode"); }
 
 		return uword(0);
 	}
@@ -1282,7 +1292,8 @@ namespace gmm_priv {
 				}
 			}
 #endif
-		} else if(dist_mode == prob_dist) {
+		}
+		else if(dist_mode == prob_dist) {
 #if defined(ARMA_USE_OPENMP)
       {
       const umat boundaries = internal_gen_boundaries(X_n_cols);
@@ -1338,7 +1349,8 @@ namespace gmm_priv {
 				}
 			}
 #endif
-		} else { arma_debug_check(true, "gmm_full::assign(): unsupported distance mode"); }
+		}
+		else { arma_debug_check(true, "gmm_full::assign(): unsupported distance mode"); }
 	}
 
 	template<typename eT> inline
@@ -1453,7 +1465,8 @@ namespace gmm_priv {
 
 					hist_mem[best_g]++;
 				}
-			} else if(dist_mode == prob_dist) {
+			}
+			else if(dist_mode == prob_dist) {
 				const eT* log_hefts_mem = log_hefts.memptr();
 
 				for(uword i = 0; i < X_n_cols; ++i) {
@@ -1488,12 +1501,14 @@ namespace gmm_priv {
 		if((seed_mode == static_subset) || (seed_mode == random_subset)) {
 			uvec initial_indices;
 
-			if(seed_mode == static_subset) { initial_indices = linspace<uvec>(0, X.n_cols - 1, N_gaus); } else if(seed_mode == random_subset) { initial_indices = randperm<uvec>(X.n_cols, N_gaus); }
+			if(seed_mode == static_subset) { initial_indices = linspace<uvec>(0, X.n_cols - 1, N_gaus); }
+			else if(seed_mode == random_subset) { initial_indices = randperm<uvec>(X.n_cols, N_gaus); }
 
 			// initial_indices.print("initial_indices:");
 
 			access::rw(means) = X.cols(initial_indices);
-		} else if((seed_mode == static_spread) || (seed_mode == random_spread)) {
+		}
+		else if((seed_mode == static_spread) || (seed_mode == random_spread)) {
 			// going through all of the samples can be extremely time consuming;
 			// instead, if there are enough samples, randomly choose samples with probability 0.1
 
@@ -1502,7 +1517,8 @@ namespace gmm_priv {
 
 			uword start_index = 0;
 
-			if(seed_mode == static_spread) { start_index = X.n_cols / 2; } else if(seed_mode == random_spread) { start_index = as_scalar(randi<uvec>(1, distr_param(0, X.n_cols - 1))); }
+			if(seed_mode == static_spread) { start_index = X.n_cols / 2; }
+			else if(seed_mode == random_spread) { start_index = as_scalar(randi<uvec>(1, distr_param(0, X.n_cols - 1))); }
 
 			access::rw(means).col(0) = X.unsafe_col(start_index);
 
@@ -1539,7 +1555,8 @@ namespace gmm_priv {
 						if(dist == eT(0)) {
 							ignore_i = true;
 							break;
-						} else { rs(dist); }
+						}
+						else { rs(dist); }
 					}
 
 					if((rs.mean() >= max_dist) && (ignore_i == false)) {
@@ -1886,7 +1903,8 @@ namespace gmm_priv {
 
 						// recover by using a sample from a known good mean
 						proposed_i = last_indx_mem[live_g_id];
-					} else {
+					}
+					else {
 						// recover by using a randomly seleced sample (last resort)
 						proposed_i = as_scalar(randi<uvec>(1, distr_param(0, X_n_cols - 1)));
 					}
@@ -2126,9 +2144,9 @@ namespace gmm_priv {
 			eT log_det_val = eT(0);
 			eT log_det_sign = eT(0);
 
-			log_det(log_det_val, log_det_sign, acc_fcov);
+			const bool log_det_status = log_det(log_det_val, log_det_sign, acc_fcov);
 
-			const bool log_det_ok = ((arma_isfinite(log_det_val)) && (log_det_sign > eT(0)));
+			const bool log_det_ok = (log_det_status && (arma_isfinite(log_det_val)) && (log_det_sign > eT(0)));
 
 			const bool inv_ok = (log_det_ok) ? bool(auxlib::inv_sympd(mean_outer, acc_fcov)) : bool(false); // mean_outer is used as a junk matrix
 
@@ -2240,7 +2258,9 @@ namespace gmm_priv {
 			for(uword d = 0; d < N_dims; ++d) {
 				eT& var_val = fcov.at(d, d);
 
-				if(var_val < var_floor) { var_val = var_floor; } else if(var_val > var_ceiling) { var_val = var_ceiling; } else if(arma_isnan(var_val)) { var_val = eT(1); }
+				if(var_val < var_floor) { var_val = var_floor; }
+				else if(var_val > var_ceiling) { var_val = var_ceiling; }
+				else if(arma_isnan(var_val)) { var_val = eT(1); }
 			}
 		}
 
@@ -2266,7 +2286,9 @@ namespace gmm_priv {
 		for(uword i = 0; i < N_gaus; ++i) {
 			eT& heft_val = hefts_mem[i];
 
-			if(heft_val < heft_floor) { heft_val = heft_floor; } else if(heft_val > eT(1)) { heft_val = eT(1); } else if(arma_isnan(heft_val)) { heft_val = heft_initial; }
+			if(heft_val < heft_floor) { heft_val = heft_floor; }
+			else if(heft_val > eT(1)) { heft_val = eT(1); }
+			else if(arma_isnan(heft_val)) { heft_val = heft_initial; }
 		}
 
 		const eT heft_sum = accu(hefts);

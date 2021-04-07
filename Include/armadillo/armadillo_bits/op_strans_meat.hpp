@@ -153,8 +153,11 @@ void op_strans::apply_mat_noalias(Mat<eT>& out, const TA& A) {
 
 	out.set_size(A_n_cols, A_n_rows);
 
-	if((TA::is_row) || (TA::is_col) || (A_n_cols == 1) || (A_n_rows == 1)) { arrayops::copy(out.memptr(), A.memptr(), A.n_elem); } else {
-		if((A_n_rows <= 4) && (A_n_rows == A_n_cols)) { op_strans::apply_mat_noalias_tinysq(out, A); } else if((A_n_rows >= 512) && (A_n_cols >= 512)) { op_strans::apply_mat_noalias_large(out, A); } else {
+	if((TA::is_row) || (TA::is_col) || (A_n_cols == 1) || (A_n_rows == 1)) { arrayops::copy(out.memptr(), A.memptr(), A.n_elem); }
+	else {
+		if((A_n_rows <= 4) && (A_n_rows == A_n_cols)) { op_strans::apply_mat_noalias_tinysq(out, A); }
+		else if((A_n_rows >= 512) && (A_n_cols >= 512)) { op_strans::apply_mat_noalias_large(out, A); }
+		else {
 			eT* outptr = out.memptr();
 
 			for(uword k = 0; k < A_n_rows; ++k) {
@@ -215,7 +218,8 @@ void op_strans::apply_mat_inplace(Mat<eT>& out) {
 
 			if((j - 1) < N) { std::swap((*rowptr), (*colptr)); }
 		}
-	} else {
+	}
+	else {
 		Mat<eT> tmp;
 
 		op_strans::apply_mat_noalias(tmp, out);
@@ -229,7 +233,8 @@ inline
 void op_strans::apply_mat(Mat<eT>& out, const TA& A) {
 	arma_extra_debug_sigprint();
 
-	if(&out != &A) { op_strans::apply_mat_noalias(out, A); } else { op_strans::apply_mat_inplace(out); }
+	if(&out != &A) { op_strans::apply_mat_noalias(out, A); }
+	else { op_strans::apply_mat_inplace(out); }
 }
 
 template<typename T1> arma_hot
@@ -266,7 +271,8 @@ void op_strans::apply_proxy(Mat<typename T1::elem_type>& out, const T1& X) {
 			}
 
 			if(i < n_elem) { out_mem[i] = Pea[i]; }
-		} else // aliasing
+		}
+		else // aliasing
 		{
 			Mat<eT> out2(n_cols, n_rows);
 
@@ -289,7 +295,8 @@ void op_strans::apply_proxy(Mat<typename T1::elem_type>& out, const T1& X) {
 
 			out.steal_mem(out2);
 		}
-	} else // general matrix transpose
+	}
+	else // general matrix transpose
 	{
 		if(is_alias == false) {
 			out.set_size(n_cols, n_rows);
@@ -317,7 +324,8 @@ void op_strans::apply_proxy(Mat<typename T1::elem_type>& out, const T1& X) {
 					outptr++;
 				}
 			}
-		} else // aliasing
+		}
+		else // aliasing
 		{
 			Mat<eT> out2(n_cols, n_rows);
 
@@ -360,7 +368,8 @@ void op_strans::apply_direct(Mat<typename T1::elem_type>& out, const T1& X) {
 		const unwrap<T1> U(X);
 
 		op_strans::apply_mat(out, U.M);
-	} else { op_strans::apply_proxy(out, X); }
+	}
+	else { op_strans::apply_proxy(out, X); }
 }
 
 template<typename T1> arma_hot

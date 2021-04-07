@@ -34,65 +34,181 @@ const SpOp<derived, spop_strans> SpBase<elem_type, derived>::st() const { return
 template<typename elem_type, typename derived> arma_cold
 inline
 void SpBase<elem_type, derived>::print(const std::string extra_text) const {
+	arma_extra_debug_sigprint();
+
 	const unwrap_spmat<derived> tmp((*this).get_ref());
 
-	tmp.M.impl_print(extra_text);
+	if(extra_text.length() != 0) {
+		const std::streamsize orig_width = get_cout_stream().width();
+
+		get_cout_stream() << extra_text << '\n';
+
+		get_cout_stream().width(orig_width);
+	}
+
+	arma_ostream::print(get_cout_stream(), tmp.M, true);
 }
 
 template<typename elem_type, typename derived> arma_cold
 inline
 void SpBase<elem_type, derived>::print(std::ostream& user_stream, const std::string extra_text) const {
+	arma_extra_debug_sigprint();
+
 	const unwrap_spmat<derived> tmp((*this).get_ref());
 
-	tmp.M.impl_print(user_stream, extra_text);
+	if(extra_text.length() != 0) {
+		const std::streamsize orig_width = user_stream.width();
+
+		user_stream << extra_text << '\n';
+
+		user_stream.width(orig_width);
+	}
+
+	arma_ostream::print(user_stream, tmp.M, true);
 }
 
 template<typename elem_type, typename derived> arma_cold
 inline
 void SpBase<elem_type, derived>::raw_print(const std::string extra_text) const {
+	arma_extra_debug_sigprint();
+
 	const unwrap_spmat<derived> tmp((*this).get_ref());
 
-	tmp.M.impl_raw_print(extra_text);
+	if(extra_text.length() != 0) {
+		const std::streamsize orig_width = get_cout_stream().width();
+
+		get_cout_stream() << extra_text << '\n';
+
+		get_cout_stream().width(orig_width);
+	}
+
+	arma_ostream::print(get_cout_stream(), tmp.M, false);
 }
 
 template<typename elem_type, typename derived> arma_cold
 inline
 void SpBase<elem_type, derived>::raw_print(std::ostream& user_stream, const std::string extra_text) const {
+	arma_extra_debug_sigprint();
+
 	const unwrap_spmat<derived> tmp((*this).get_ref());
 
-	tmp.M.impl_raw_print(user_stream, extra_text);
+	if(extra_text.length() != 0) {
+		const std::streamsize orig_width = user_stream.width();
+
+		user_stream << extra_text << '\n';
+
+		user_stream.width(orig_width);
+	}
+
+	arma_ostream::print(user_stream, tmp.M, false);
 }
 
 template<typename elem_type, typename derived> arma_cold
 inline
 void SpBase<elem_type, derived>::print_dense(const std::string extra_text) const {
+	arma_extra_debug_sigprint();
+
 	const unwrap_spmat<derived> tmp((*this).get_ref());
 
-	tmp.M.impl_print_dense(extra_text);
+	if(extra_text.length() != 0) {
+		const std::streamsize orig_width = get_cout_stream().width();
+
+		get_cout_stream() << extra_text << '\n';
+
+		get_cout_stream().width(orig_width);
+	}
+
+	arma_ostream::print_dense(get_cout_stream(), tmp.M, true);
 }
 
 template<typename elem_type, typename derived> arma_cold
 inline
 void SpBase<elem_type, derived>::print_dense(std::ostream& user_stream, const std::string extra_text) const {
+	arma_extra_debug_sigprint();
+
 	const unwrap_spmat<derived> tmp((*this).get_ref());
 
-	tmp.M.impl_print_dense(user_stream, extra_text);
+	if(extra_text.length() != 0) {
+		const std::streamsize orig_width = user_stream.width();
+
+		user_stream << extra_text << '\n';
+
+		user_stream.width(orig_width);
+	}
+
+	arma_ostream::print_dense(user_stream, tmp.M, true);
 }
 
 template<typename elem_type, typename derived> arma_cold
 inline
 void SpBase<elem_type, derived>::raw_print_dense(const std::string extra_text) const {
+	arma_extra_debug_sigprint();
+
 	const unwrap_spmat<derived> tmp((*this).get_ref());
 
-	tmp.M.impl_raw_print_dense(extra_text);
+	if(extra_text.length() != 0) {
+		const std::streamsize orig_width = get_cout_stream().width();
+
+		get_cout_stream() << extra_text << '\n';
+
+		get_cout_stream().width(orig_width);
+	}
+
+	arma_ostream::print_dense(get_cout_stream(), tmp.M, false);
 }
 
 template<typename elem_type, typename derived> arma_cold
 inline
 void SpBase<elem_type, derived>::raw_print_dense(std::ostream& user_stream, const std::string extra_text) const {
+	arma_extra_debug_sigprint();
+
 	const unwrap_spmat<derived> tmp((*this).get_ref());
 
-	tmp.M.impl_raw_print_dense(user_stream, extra_text);
+	if(extra_text.length() != 0) {
+		const std::streamsize orig_width = user_stream.width();
+
+		user_stream << extra_text << '\n';
+
+		user_stream.width(orig_width);
+	}
+
+	arma_ostream::print_dense(user_stream, tmp.M, false);
+}
+
+template<typename elem_type, typename derived> arma_cold
+inline
+void SpBase<elem_type, derived>::brief_print(const std::string extra_text) const {
+	arma_extra_debug_sigprint();
+
+	const unwrap_spmat<derived> tmp((*this).get_ref());
+
+	if(extra_text.length() != 0) {
+		const std::streamsize orig_width = get_cout_stream().width();
+
+		get_cout_stream() << extra_text << '\n';
+
+		get_cout_stream().width(orig_width);
+	}
+
+	arma_ostream::brief_print(get_cout_stream(), tmp.M);
+}
+
+template<typename elem_type, typename derived> arma_cold
+inline
+void SpBase<elem_type, derived>::brief_print(std::ostream& user_stream, const std::string extra_text) const {
+	arma_extra_debug_sigprint();
+
+	const unwrap_spmat<derived> tmp((*this).get_ref());
+
+	if(extra_text.length() != 0) {
+		const std::streamsize orig_width = user_stream.width();
+
+		user_stream << extra_text << '\n';
+
+		user_stream.width(orig_width);
+	}
+
+	arma_ostream::brief_print(user_stream, tmp.M);
 }
 
 //
@@ -176,7 +292,8 @@ uword SpBase<elem_type, derived>::index_min() const {
 
 	uword index = 0;
 
-	if(P.get_n_elem() == 0) { arma_debug_check(true, "index_min(): object has no elements"); } else { spop_min::min_with_index(P, index); }
+	if(P.get_n_elem() == 0) { arma_debug_check(true, "index_min(): object has no elements"); }
+	else { spop_min::min_with_index(P, index); }
 
 	return index;
 }
@@ -188,7 +305,8 @@ uword SpBase<elem_type, derived>::index_max() const {
 
 	uword index = 0;
 
-	if(P.get_n_elem() == 0) { arma_debug_check(true, "index_max(): object has no elements"); } else { spop_max::max_with_index(P, index); }
+	if(P.get_n_elem() == 0) { arma_debug_check(true, "index_max(): object has no elements"); }
+	else { spop_max::max_with_index(P, index); }
 
 	return index;
 }
@@ -264,15 +382,16 @@ bool SpBase<elem_type, derived>::is_zero(const typename get_pod_type<elem_type>:
 			const T val_real = access::tmp_real(val);
 			const T val_imag = access::tmp_imag(val);
 
-			if(std::abs(val_real) > tol) { return false; }
-			if(std::abs(val_imag) > tol) { return false; }
+			if(eop_aux::arma_abs(val_real) > tol) { return false; }
+			if(eop_aux::arma_abs(val_imag) > tol) { return false; }
 
 			++it;
 		}
-	} else // not complex
+	}
+	else // not complex
 	{
 		while(it != it_end) {
-			if(std::abs(*it) > tol) { return false; }
+			if(eop_aux::arma_abs(*it) > tol) { return false; }
 
 			++it;
 		}
@@ -406,7 +525,8 @@ bool SpBase<elem_type, derived>::is_finite() const {
 		const unwrap_spmat<typename SpProxy<derived>::stored_type> U(P.Q);
 
 		return U.M.is_finite();
-	} else {
+	}
+	else {
 		typename SpProxy<derived>::const_iterator_type it = P.begin();
 		typename SpProxy<derived>::const_iterator_type it_end = P.end();
 
@@ -430,7 +550,8 @@ bool SpBase<elem_type, derived>::has_inf() const {
 		const unwrap_spmat<typename SpProxy<derived>::stored_type> U(P.Q);
 
 		return U.M.has_inf();
-	} else {
+	}
+	else {
 		typename SpProxy<derived>::const_iterator_type it = P.begin();
 		typename SpProxy<derived>::const_iterator_type it_end = P.end();
 
@@ -454,7 +575,8 @@ bool SpBase<elem_type, derived>::has_nan() const {
 		const unwrap_spmat<typename SpProxy<derived>::stored_type> U(P.Q);
 
 		return U.M.has_nan();
-	} else {
+	}
+	else {
 		typename SpProxy<derived>::const_iterator_type it = P.begin();
 		typename SpProxy<derived>::const_iterator_type it_end = P.end();
 
@@ -468,9 +590,11 @@ bool SpBase<elem_type, derived>::has_nan() const {
 }
 
 template<typename elem_type, typename derived> inline
+arma_warn_unused
 const SpOp<derived, spop_vectorise_col> SpBase<elem_type, derived>::as_col() const { return SpOp<derived, spop_vectorise_col>((*this).get_ref()); }
 
 template<typename elem_type, typename derived> inline
+arma_warn_unused
 const SpOp<derived, spop_vectorise_row> SpBase<elem_type, derived>::as_row() const { return SpOp<derived, spop_vectorise_row>((*this).get_ref()); }
 
 //! @}

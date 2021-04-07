@@ -37,7 +37,7 @@ typename T1::elem_type as_scalar_redirect<N>::apply(const T1& X) {
 	const Proxy<T1> P(X);
 
 	if(P.get_n_elem() != 1) {
-		arma_debug_check(true, "as_scalar(): expression doesn't evaluate to exactly one element");
+		arma_debug_check(true, "as_scalar(): expression must evaluate to exactly one element");
 
 		return Datum<eT>::nan;
 	}
@@ -81,7 +81,8 @@ typename T1::elem_type as_scalar_redirect<2>::apply(const Glue<T1, T2, glue_time
 		const eT val = op_dot::direct_dot(A.n_elem, A.memptr(), B.memptr());
 
 		return (tmp1.do_times || tmp2.do_times) ? (val * tmp1.get_val() * tmp2.get_val()) : val;
-	} else {
+	}
+	else {
 		const Proxy<T1> PA(X.A);
 		const Proxy<T2> PB(X.B);
 
@@ -117,13 +118,14 @@ typename T1::elem_type as_scalar_redirect<3>::apply(const Glue<Glue<T1, T2, glue
 		const Mat<eT> tmp(X);
 
 		if(tmp.n_elem != 1) {
-			arma_debug_check(true, "as_scalar(): expression doesn't evaluate to exactly one element");
+			arma_debug_check(true, "as_scalar(): expression must evaluate to exactly one element");
 
 			return Datum<eT>::nan;
 		}
 
 		return tmp[0];
-	} else {
+	}
+	else {
 		const partial_unwrap<T1> tmp1(X.A.A);
 		const partial_unwrap<T2_stripped_2> tmp2(strip2.M);
 		const partial_unwrap<T3> tmp3(X.B);
@@ -155,7 +157,14 @@ typename T1::elem_type as_scalar_redirect<3>::apply(const Glue<Glue<T1, T2, glue
 				"as_scalar(): incompatible dimensions"
 			);
 
-		if(B_is_vec) { if(tmp2_do_inv) { return val * op_dotext::direct_rowvec_invdiagvec_colvec(A.mem, B, C.mem); } else { return val * op_dot::direct_dot(A.n_elem, A.mem, B.mem, C.mem); } } else { if(tmp2_do_inv) { return val * op_dotext::direct_rowvec_invdiagmat_colvec(A.mem, B, C.mem); } else { return val * op_dotext::direct_rowvec_diagmat_colvec(A.mem, B, C.mem); } }
+		if(B_is_vec) {
+			if(tmp2_do_inv) { return val * op_dotext::direct_rowvec_invdiagvec_colvec(A.mem, B, C.mem); }
+			else { return val * op_dot::direct_dot(A.n_elem, A.mem, B.mem, C.mem); }
+		}
+		else {
+			if(tmp2_do_inv) { return val * op_dotext::direct_rowvec_invdiagmat_colvec(A.mem, B, C.mem); }
+			else { return val * op_dotext::direct_rowvec_diagmat_colvec(A.mem, B, C.mem); }
+		}
 	}
 }
 
@@ -169,7 +178,7 @@ typename T1::elem_type as_scalar_diag(const Base<typename T1::elem_type, T1>& X)
 	const Mat<eT>& A = tmp.M;
 
 	if(A.n_elem != 1) {
-		arma_debug_check(true, "as_scalar(): expression doesn't evaluate to exactly one element");
+		arma_debug_check(true, "as_scalar(): expression must evaluate to exactly one element");
 
 		return Datum<eT>::nan;
 	}
@@ -221,7 +230,8 @@ typename T1::elem_type as_scalar_diag(const Glue<Glue<T1, T2, glue_times_diag>, 
 			"as_scalar(): incompatible dimensions"
 		);
 
-	if(B_is_vec) { return val * op_dot::direct_dot(A.n_elem, A.mem, B.mem, C.mem); } else { return val * op_dotext::direct_rowvec_diagmat_colvec(A.mem, B, C.mem); }
+	if(B_is_vec) { return val * op_dot::direct_dot(A.n_elem, A.mem, B.mem, C.mem); }
+	else { return val * op_dotext::direct_rowvec_diagmat_colvec(A.mem, B, C.mem); }
 }
 
 template<typename T1, typename T2> arma_warn_unused
@@ -236,7 +246,8 @@ typename T1::elem_type as_scalar(const Glue<T1, T2, glue_times>& X, const typena
 		arma_extra_debug_print(arma_str::format("N_mat = %d") % N_mat);
 
 		return as_scalar_redirect<N_mat>::apply(X);
-	} else { return as_scalar_diag(X); }
+	}
+	else { return as_scalar_diag(X); }
 }
 
 template<typename T1> arma_warn_unused
@@ -249,7 +260,7 @@ typename T1::elem_type as_scalar(const Base<typename T1::elem_type, T1>& X) {
 	const Proxy<T1> P(X.get_ref());
 
 	if(P.get_n_elem() != 1) {
-		arma_debug_check(true, "as_scalar(): expression doesn't evaluate to exactly one element");
+		arma_debug_check(true, "as_scalar(): expression must evaluate to exactly one element");
 
 		return Datum<eT>::nan;
 	}
@@ -265,7 +276,7 @@ typename T1::elem_type as_scalar(const Gen<T1, gen_randu>& X) {
 	typedef typename T1::elem_type eT;
 
 	if((X.n_rows != 1) || (X.n_cols != 1)) {
-		arma_debug_check(true, "as_scalar(): expression doesn't evaluate to exactly one element");
+		arma_debug_check(true, "as_scalar(): expression must evaluate to exactly one element");
 
 		return Datum<eT>::nan;
 	}
@@ -281,7 +292,7 @@ typename T1::elem_type as_scalar(const Gen<T1, gen_randn>& X) {
 	typedef typename T1::elem_type eT;
 
 	if((X.n_rows != 1) || (X.n_cols != 1)) {
-		arma_debug_check(true, "as_scalar(): expression doesn't evaluate to exactly one element");
+		arma_debug_check(true, "as_scalar(): expression must evaluate to exactly one element");
 
 		return Datum<eT>::nan;
 	}
@@ -299,7 +310,7 @@ typename T1::elem_type as_scalar(const BaseCube<typename T1::elem_type, T1>& X) 
 	const ProxyCube<T1> P(X.get_ref());
 
 	if(P.get_n_elem() != 1) {
-		arma_debug_check(true, "as_scalar(): expression doesn't evaluate to exactly one element");
+		arma_debug_check(true, "as_scalar(): expression must evaluate to exactly one element");
 
 		return Datum<eT>::nan;
 	}
@@ -320,7 +331,7 @@ typename T1::elem_type as_scalar(const SpBase<typename T1::elem_type, T1>& X) {
 	const SpMat<eT>& A = tmp.M;
 
 	if(A.n_elem != 1) {
-		arma_debug_check(true, "as_scalar(): expression doesn't evaluate to exactly one element");
+		arma_debug_check(true, "as_scalar(): expression must evaluate to exactly one element");
 
 		return Datum<eT>::nan;
 	}

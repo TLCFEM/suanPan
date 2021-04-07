@@ -26,7 +26,8 @@ void op_clamp::apply(Mat<typename T1::elem_type>& out, const mtOp<typename T1::e
 		const unwrap<typename Proxy<T1>::stored_type> U(P.Q);
 
 		op_clamp::apply_direct(out, U.M, in.aux, in.aux_out_eT);
-	} else { op_clamp::apply_proxy_noalias(out, P, in.aux, in.aux_out_eT); }
+	}
+	else { op_clamp::apply_proxy_noalias(out, P, in.aux, in.aux_out_eT); }
 }
 
 template<typename T1> inline
@@ -70,7 +71,8 @@ void op_clamp::apply_proxy_noalias(Mat<typename T1::elem_type>& out, const Proxy
 
 			(*out_mem) = val_i;
 		}
-	} else {
+	}
+	else {
 		for(uword col = 0; col < n_cols; ++col)
 			for(uword row = 0; row < n_rows; ++row) {
 				eT val = P.at(row, col);
@@ -91,7 +93,8 @@ void op_clamp::apply_direct(Mat<eT>& out, const Mat<eT>& X, const eT min_val, co
 		const Proxy<Mat<eT>> P(X);
 
 		op_clamp::apply_proxy_noalias(out, P, min_val, max_val);
-	} else {
+	}
+	else {
 		arma_extra_debug_print("inplace operation");
 
 		const uword N = out.n_elem;
@@ -118,7 +121,8 @@ void op_clamp::apply(Cube<typename T1::elem_type>& out, const mtOpCube<typename 
 		const unwrap_cube<typename ProxyCube<T1>::stored_type> U(P.Q);
 
 		op_clamp::apply_direct(out, U.M, in.aux, in.aux_out_eT);
-	} else { op_clamp::apply_proxy_noalias(out, P, in.aux, in.aux_out_eT); }
+	}
+	else { op_clamp::apply_proxy_noalias(out, P, in.aux, in.aux_out_eT); }
 }
 
 template<typename T1> inline
@@ -163,7 +167,8 @@ void op_clamp::apply_proxy_noalias(Cube<typename T1::elem_type>& out, const Prox
 
 			(*out_mem) = val_i;
 		}
-	} else {
+	}
+	else {
 		for(uword k = 0; k < n_slices; ++k)
 			for(uword j = 0; j < n_cols; ++j)
 				for(uword i = 0; i < n_rows; ++i) {
@@ -185,7 +190,8 @@ void op_clamp::apply_direct(Cube<eT>& out, const Cube<eT>& X, const eT min_val, 
 		const ProxyCube<Cube<eT>> P(X);
 
 		op_clamp::apply_proxy_noalias(out, P, min_val, max_val);
-	} else {
+	}
+	else {
 		arma_extra_debug_print("inplace operation");
 
 		const uword N = out.n_elem;

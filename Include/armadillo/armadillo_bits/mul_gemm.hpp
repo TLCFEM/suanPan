@@ -86,10 +86,14 @@ public:
 				for(uword col_B = 0; col_B < B_n_cols; ++col_B) {
 					const eT acc = op_dot::direct_dot_arma(B_n_rows, A_rowdata, B.colptr(col_B));
 
-					if((use_alpha == false) && (use_beta == false)) { C.at(row_A, col_B) = acc; } else if((use_alpha == true) && (use_beta == false)) { C.at(row_A, col_B) = alpha * acc; } else if((use_alpha == false) && (use_beta == true)) { C.at(row_A, col_B) = acc + beta * C.at(row_A, col_B); } else if((use_alpha == true) && (use_beta == true)) { C.at(row_A, col_B) = alpha * acc + beta * C.at(row_A, col_B); }
+					if((use_alpha == false) && (use_beta == false)) { C.at(row_A, col_B) = acc; }
+					else if((use_alpha == true) && (use_beta == false)) { C.at(row_A, col_B) = alpha * acc; }
+					else if((use_alpha == false) && (use_beta == true)) { C.at(row_A, col_B) = acc + beta * C.at(row_A, col_B); }
+					else if((use_alpha == true) && (use_beta == true)) { C.at(row_A, col_B) = alpha * acc + beta * C.at(row_A, col_B); }
 				}
 			}
-		} else if((do_trans_A == true) && (do_trans_B == false)) {
+		}
+		else if((do_trans_A == true) && (do_trans_B == false)) {
 			for(uword col_A = 0; col_A < A_n_cols; ++col_A) {
 				// col_A is interpreted as row_A when storing the results in matrix C
 
@@ -98,15 +102,20 @@ public:
 				for(uword col_B = 0; col_B < B_n_cols; ++col_B) {
 					const eT acc = op_dot::direct_dot_arma(B_n_rows, A_coldata, B.colptr(col_B));
 
-					if((use_alpha == false) && (use_beta == false)) { C.at(col_A, col_B) = acc; } else if((use_alpha == true) && (use_beta == false)) { C.at(col_A, col_B) = alpha * acc; } else if((use_alpha == false) && (use_beta == true)) { C.at(col_A, col_B) = acc + beta * C.at(col_A, col_B); } else if((use_alpha == true) && (use_beta == true)) { C.at(col_A, col_B) = alpha * acc + beta * C.at(col_A, col_B); }
+					if((use_alpha == false) && (use_beta == false)) { C.at(col_A, col_B) = acc; }
+					else if((use_alpha == true) && (use_beta == false)) { C.at(col_A, col_B) = alpha * acc; }
+					else if((use_alpha == false) && (use_beta == true)) { C.at(col_A, col_B) = acc + beta * C.at(col_A, col_B); }
+					else if((use_alpha == true) && (use_beta == true)) { C.at(col_A, col_B) = alpha * acc + beta * C.at(col_A, col_B); }
 				}
 			}
-		} else if((do_trans_A == false) && (do_trans_B == true)) {
+		}
+		else if((do_trans_A == false) && (do_trans_B == true)) {
 			Mat<eT> BB;
 			op_strans::apply_mat_noalias(BB, B);
 
 			gemm_emul_large<false, false, use_alpha, use_beta>::apply(C, A, BB, alpha, beta);
-		} else if((do_trans_A == true) && (do_trans_B == true)) {
+		}
+		else if((do_trans_A == true) && (do_trans_B == true)) {
 			// mat B_tmp = trans(B);
 			// dgemm_arma<true, false,  use_alpha, use_beta>::apply(C, A, B_tmp, alpha, beta);
 
@@ -122,7 +131,10 @@ public:
 				for(uword col_A = 0; col_A < A_n_cols; ++col_A) {
 					const eT acc = op_dot::direct_dot_arma(A_n_rows, B_rowdata, A.colptr(col_A));
 
-					if((use_alpha == false) && (use_beta == false)) { C.at(col_A, row_B) = acc; } else if((use_alpha == true) && (use_beta == false)) { C.at(col_A, row_B) = alpha * acc; } else if((use_alpha == false) && (use_beta == true)) { C.at(col_A, row_B) = acc + beta * C.at(col_A, row_B); } else if((use_alpha == true) && (use_beta == true)) { C.at(col_A, row_B) = alpha * acc + beta * C.at(col_A, row_B); }
+					if((use_alpha == false) && (use_beta == false)) { C.at(col_A, row_B) = acc; }
+					else if((use_alpha == true) && (use_beta == false)) { C.at(col_A, row_B) = alpha * acc; }
+					else if((use_alpha == false) && (use_beta == true)) { C.at(col_A, row_B) = acc + beta * C.at(col_A, row_B); }
+					else if((use_alpha == true) && (use_beta == true)) { C.at(col_A, row_B) = alpha * acc + beta * C.at(col_A, row_B); }
 				}
 			}
 		}
@@ -195,14 +207,16 @@ public:
 		arma_extra_debug_sigprint();
 
 		if((A.n_rows <= 4) && (A.n_rows == A.n_cols) && (A.n_rows == B.n_rows) && (B.n_rows == B.n_cols) && (is_cx<eT>::no)) {
-			if(do_trans_B == false) { gemm_emul_tinysq<do_trans_A, use_alpha, use_beta>::apply(C, A, B, alpha, beta); } else {
+			if(do_trans_B == false) { gemm_emul_tinysq<do_trans_A, use_alpha, use_beta>::apply(C, A, B, alpha, beta); }
+			else {
 				Mat<eT> BB(B.n_rows, B.n_rows);
 
 				op_strans::apply_mat_noalias_tinysq(BB, B);
 
 				gemm_emul_tinysq<do_trans_A, use_alpha, use_beta>::apply(C, A, BB, alpha, beta);
 			}
-		} else {
+		}
+		else {
 #if defined(ARMA_USE_ATLAS)
         {
         arma_extra_debug_print("atlas::cblas_gemm()");

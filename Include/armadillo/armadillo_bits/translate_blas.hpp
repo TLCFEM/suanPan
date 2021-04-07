@@ -34,13 +34,16 @@ namespace blas {
 			if(is_float<eT>::value) {
 				typedef float T;
 				arma_fortran(arma_sgemv)(transA, m, n, (const T*)alpha, (const T*)A, ldA, (const T*)x, incx, (const T*)beta, (T*)y, incy);
-			} else if(is_double<eT>::value) {
+			}
+			else if(is_double<eT>::value) {
 				typedef double T;
 				arma_fortran(arma_dgemv)(transA, m, n, (const T*)alpha, (const T*)A, ldA, (const T*)x, incx, (const T*)beta, (T*)y, incy);
-			} else if(is_cx_float<eT>::value) {
+			}
+			else if(is_cx_float<eT>::value) {
 				typedef blas_cxf T;
 				arma_fortran(arma_cgemv)(transA, m, n, (const T*)alpha, (const T*)A, ldA, (const T*)x, incx, (const T*)beta, (T*)y, incy);
-			} else if(is_cx_double<eT>::value) {
+			}
+			else if(is_cx_double<eT>::value) {
 				typedef blas_cxd T;
 				arma_fortran(arma_zgemv)(transA, m, n, (const T*)alpha, (const T*)A, ldA, (const T*)x, incx, (const T*)beta, (T*)y, incy);
 			}
@@ -64,13 +67,16 @@ namespace blas {
 			if(is_float<eT>::value) {
 				typedef float T;
 				arma_fortran(arma_sgemm)(transA, transB, m, n, k, (const T*)alpha, (const T*)A, ldA, (const T*)B, ldB, (const T*)beta, (T*)C, ldC);
-			} else if(is_double<eT>::value) {
+			}
+			else if(is_double<eT>::value) {
 				typedef double T;
 				arma_fortran(arma_dgemm)(transA, transB, m, n, k, (const T*)alpha, (const T*)A, ldA, (const T*)B, ldB, (const T*)beta, (T*)C, ldC);
-			} else if(is_cx_float<eT>::value) {
+			}
+			else if(is_cx_float<eT>::value) {
 				typedef blas_cxf T;
 				arma_fortran(arma_cgemm)(transA, transB, m, n, k, (const T*)alpha, (const T*)A, ldA, (const T*)B, ldB, (const T*)beta, (T*)C, ldC);
-			} else if(is_cx_double<eT>::value) {
+			}
+			else if(is_cx_double<eT>::value) {
 				typedef blas_cxd T;
 				arma_fortran(arma_zgemm)(transA, transB, m, n, k, (const T*)alpha, (const T*)A, ldA, (const T*)B, ldB, (const T*)beta, (T*)C, ldC);
 			}
@@ -92,7 +98,8 @@ namespace blas {
 			if(is_float<eT>::value) {
 				typedef float T;
 				arma_fortran(arma_ssyrk)(uplo, transA, n, k, (const T*)alpha, (const T*)A, ldA, (const T*)beta, (T*)C, ldC);
-			} else if(is_double<eT>::value) {
+			}
+			else if(is_double<eT>::value) {
 				typedef double T;
 				arma_fortran(arma_dsyrk)(uplo, transA, n, k, (const T*)alpha, (const T*)A, ldA, (const T*)beta, (T*)C, ldC);
 			}
@@ -115,7 +122,8 @@ namespace blas {
 				typedef float TT;
 				typedef blas_cxf cx_TT;
 				arma_fortran(arma_cherk)(uplo, transA, n, k, (const TT*)alpha, (const cx_TT*)A, ldA, (const TT*)beta, (cx_TT*)C, ldC);
-			} else if(is_double<T>::value) {
+			}
+			else if(is_double<T>::value) {
 				typedef double TT;
 				typedef blas_cxd cx_TT;
 				arma_fortran(arma_zherk)(uplo, transA, n, k, (const TT*)alpha, (const cx_TT*)A, ldA, (const TT*)beta, (cx_TT*)C, ldC);
@@ -157,13 +165,15 @@ namespace blas {
 				return eT(arma_fortran(arma_sdot)(&n, (const T*)x, &inc, (const T*)y, &inc));
 			}
 #endif
-		} else if(is_double<eT>::value) {
+		}
+		else if(is_double<eT>::value) {
 			blas_int n = blas_int(n_elem);
 			blas_int inc = 1;
 
 			typedef double T;
 			return eT(arma_fortran(arma_ddot)(&n, (const T*)x, &inc, (const T*)y, &inc));
-		} else if((is_cx_float<eT>::value) || (is_cx_double<eT>::value)) {
+		}
+		else if((is_cx_float<eT>::value) || (is_cx_double<eT>::value)) {
 			if(n_elem == 0) { return eT(0); }
 
 			// using gemv() workaround due to compatibility issues with cdotu() and zdotu()
@@ -197,7 +207,8 @@ namespace blas {
 
 			typedef float T;
 			return arma_fortran(arma_sasum)(&n, (const T*)x, &inc);
-		} else if(is_double<eT>::value) {
+		}
+		else if(is_double<eT>::value) {
 			blas_int n = blas_int(n_elem);
 			blas_int inc = 1;
 
@@ -218,7 +229,8 @@ namespace blas {
 
 			typedef float T;
 			return arma_fortran(arma_snrm2)(&n, (const T*)x, &inc);
-		} else if(is_double<eT>::value) {
+		}
+		else if(is_double<eT>::value) {
 			blas_int n = blas_int(n_elem);
 			blas_int inc = 1;
 

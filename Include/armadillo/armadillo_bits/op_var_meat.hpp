@@ -49,7 +49,8 @@ void op_var::apply(Mat<typename T1::pod_type>& out, const mtOp<typename T1::pod_
 
 			for(uword col = 0; col < X_n_cols; ++col) { out_mem[col] = op_var::direct_var(X.colptr(col), X_n_rows, norm_type); }
 		}
-	} else if(dim == 1) {
+	}
+	else if(dim == 1) {
 		arma_extra_debug_print("op_var::apply(): dim = 1");
 
 		out.set_size(X_n_rows, (X_n_cols > 0) ? 1 : 0);
@@ -147,7 +148,8 @@ eT op_var::direct_var(const eT* const X, const uword n_elem, const uword norm_ty
 		const eT var_val = (acc2 - acc3 * acc3 / eT(n_elem)) / norm_val;
 
 		return arma_isfinite(var_val) ? var_val : op_var::direct_var_robust(X, n_elem, norm_type);
-	} else { return eT(0); }
+	}
+	else { return eT(0); }
 }
 
 //! find the variance of an array (robust but slow)
@@ -169,7 +171,8 @@ eT op_var::direct_var_robust(const eT* const X, const uword n_elem, const uword 
 		}
 
 		return (norm_type == 0) ? r_var : (eT(n_elem - 1) / eT(n_elem)) * r_var;
-	} else { return eT(0); }
+	}
+	else { return eT(0); }
 }
 
 //! find the variance of an array (version for complex numbers)
@@ -196,7 +199,8 @@ T op_var::direct_var(const std::complex<T>* const X, const uword n_elem, const u
 		const T var_val = (acc2 - std::norm(acc3) / T(n_elem)) / norm_val;
 
 		return arma_isfinite(var_val) ? var_val : op_var::direct_var_robust(X, n_elem, norm_type);
-	} else { return T(0); }
+	}
+	else { return T(0); }
 }
 
 //! find the variance of an array (version for complex numbers) (robust but slow)
@@ -220,7 +224,8 @@ T op_var::direct_var_robust(const std::complex<T>* const X, const uword n_elem, 
 		}
 
 		return (norm_type == 0) ? r_var : (T(n_elem - 1) / T(n_elem)) * r_var;
-	} else { return T(0); }
+	}
+	else { return T(0); }
 }
 
 //! @}

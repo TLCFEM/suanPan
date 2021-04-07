@@ -22,7 +22,8 @@ void spop_diagmat::apply(SpMat<typename T1::elem_type>& out, const SpOp<T1, spop
 
 	typedef typename T1::elem_type eT;
 
-	if(in.is_alias(out) == false) { spop_diagmat::apply_noalias(out, in.m); } else {
+	if(in.is_alias(out) == false) { spop_diagmat::apply_noalias(out, in.m); }
+	else {
 		SpMat<eT> tmp;
 
 		spop_diagmat::apply_noalias(tmp, in.m);
@@ -63,7 +64,8 @@ void spop_diagmat::apply_noalias(SpMat<typename T1::elem_type>& out, const SpBas
 
 				++it;
 			}
-		} else if(P_n_rows == 1) {
+		}
+		else if(P_n_rows == 1) {
 			for(uword i = 0; i < P_n_nz; ++i) {
 				const uword col = it.col();
 
@@ -72,7 +74,8 @@ void spop_diagmat::apply_noalias(SpMat<typename T1::elem_type>& out, const SpBas
 				++it;
 			}
 		}
-	} else // generate a diagonal matrix out of a matrix
+	}
+	else // generate a diagonal matrix out of a matrix
 	{
 		out.zeros(P_n_rows, P_n_cols);
 
@@ -88,7 +91,8 @@ void spop_diagmat::apply_noalias(SpMat<typename T1::elem_type>& out, const SpBas
 
 				if(val != eT(0)) { out.at(i, i) = val; }
 			}
-		} else {
+		}
+		else {
 			if(P_n_nz == 0) { return; }
 
 			typename SpProxy<T1>::const_iterator_type it = P.begin();
@@ -127,8 +131,10 @@ void spop_diagmat::apply_noalias(SpMat<typename T1::elem_type>& out, const SpGlu
 
 		out.zeros(N, N);
 
-		if(A.n_rows == 1) { for(uword i = 0; i < N; ++i) { out.at(i, i) = A.at(0, i) + B.at(0, i); } } else { for(uword i = 0; i < N; ++i) { out.at(i, i) = A.at(i, 0) + B.at(i, 0); } }
-	} else // generate a diagonal matrix out of a matrix
+		if(A.n_rows == 1) { for(uword i = 0; i < N; ++i) { out.at(i, i) = A.at(0, i) + B.at(0, i); } }
+		else { for(uword i = 0; i < N; ++i) { out.at(i, i) = A.at(i, 0) + B.at(i, 0); } }
+	}
+	else // generate a diagonal matrix out of a matrix
 	{
 		SpMat<eT> AA;
 		spop_diagmat::apply_noalias(AA, A);
@@ -161,8 +167,10 @@ void spop_diagmat::apply_noalias(SpMat<typename T1::elem_type>& out, const SpGlu
 
 		out.zeros(N, N);
 
-		if(A.n_rows == 1) { for(uword i = 0; i < N; ++i) { out.at(i, i) = A.at(0, i) - B.at(0, i); } } else { for(uword i = 0; i < N; ++i) { out.at(i, i) = A.at(i, 0) - B.at(i, 0); } }
-	} else // generate a diagonal matrix out of a matrix
+		if(A.n_rows == 1) { for(uword i = 0; i < N; ++i) { out.at(i, i) = A.at(0, i) - B.at(0, i); } }
+		else { for(uword i = 0; i < N; ++i) { out.at(i, i) = A.at(i, 0) - B.at(i, 0); } }
+	}
+	else // generate a diagonal matrix out of a matrix
 	{
 		SpMat<eT> AA;
 		spop_diagmat::apply_noalias(AA, A);
@@ -195,8 +203,10 @@ void spop_diagmat::apply_noalias(SpMat<typename T1::elem_type>& out, const SpGlu
 
 		out.zeros(N, N);
 
-		if(A.n_rows == 1) { for(uword i = 0; i < N; ++i) { out.at(i, i) = A.at(0, i) * B.at(0, i); } } else { for(uword i = 0; i < N; ++i) { out.at(i, i) = A.at(i, 0) * B.at(i, 0); } }
-	} else // generate a diagonal matrix out of a matrix
+		if(A.n_rows == 1) { for(uword i = 0; i < N; ++i) { out.at(i, i) = A.at(0, i) * B.at(0, i); } }
+		else { for(uword i = 0; i < N; ++i) { out.at(i, i) = A.at(i, 0) * B.at(i, 0); } }
+	}
+	else // generate a diagonal matrix out of a matrix
 	{
 		SpMat<eT> AA;
 		spop_diagmat::apply_noalias(AA, A);
@@ -231,7 +241,8 @@ void spop_diagmat::apply_noalias(SpMat<typename T1::elem_type>& out, const SpGlu
 		const SpMat<eT> C = A * B;
 
 		spop_diagmat::apply_noalias(out, C);
-	} else // generate a diagonal matrix out of a matrix
+	}
+	else // generate a diagonal matrix out of a matrix
 	{
 		const uword N = (std::min)(C_n_rows, C_n_cols);
 
@@ -255,7 +266,8 @@ void spop_diagmat::apply_noalias(SpMat<typename T1::elem_type>& out, const SpGlu
 
 				out(k, k) = acc;
 			}
-		} else {
+		}
+		else {
 			const SpMat<eT> C = A * B;
 
 			spop_diagmat::apply_noalias(out, C);
@@ -283,7 +295,8 @@ void spop_diagmat2::apply(SpMat<typename T1::elem_type>& out, const SpOp<T1, spo
 		spop_diagmat2::apply_noalias(tmp, U.M, row_offset, col_offset);
 
 		out.steal_mem(tmp);
-	} else { spop_diagmat2::apply_noalias(out, U.M, row_offset, col_offset); }
+	}
+	else { spop_diagmat2::apply_noalias(out, U.M, row_offset, col_offset); }
 }
 
 template<typename eT> inline
@@ -321,7 +334,8 @@ void spop_diagmat2::apply_noalias(SpMat<eT>& out, const SpMat<eT>& X, const uwor
 
 				++it;
 			}
-		} else if(n_rows == 1) {
+		}
+		else if(n_rows == 1) {
 			for(uword i = 0; i < X_n_nz; ++i) {
 				const uword col = it.col();
 
@@ -330,9 +344,10 @@ void spop_diagmat2::apply_noalias(SpMat<eT>& out, const SpMat<eT>& X, const uwor
 				++it;
 			}
 		}
-	} else // generate a diagonal matrix out of a matrix
+	}
+	else // generate a diagonal matrix out of a matrix
 	{
-		arma_debug_check
+		arma_debug_check_bounds
 			(
 				((row_offset > 0) && (row_offset >= n_rows)) || ((col_offset > 0) && (col_offset >= n_cols)),
 				"diagmat(): requested diagonal out of bounds"

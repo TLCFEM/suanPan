@@ -34,7 +34,8 @@ typename enable_if2<is_real<typename T1::elem_type>::value, bool>::result kmeans
 
 	const bool status = model.kmeans_wrapper(means, data.get_ref(), k, seed_mode, n_iter, print_mode);
 
-	if(status == true) { means = model.means; } else { means.soft_reset(); }
+	if(status) { means = model.means; }
+	else { means.soft_reset(); }
 
 	return status;
 }

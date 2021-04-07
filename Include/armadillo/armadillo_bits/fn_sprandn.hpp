@@ -30,7 +30,8 @@ obj_type sprandn
 	arma_extra_debug_sigprint();
 	arma_ignore(junk);
 
-	if(is_SpCol<obj_type>::value) { arma_debug_check((n_cols != 1), "sprandn(): incompatible size"); } else if(is_SpRow<obj_type>::value) { arma_debug_check((n_rows != 1), "sprandn(): incompatible size"); }
+	if(is_SpCol<obj_type>::value) { arma_debug_check((n_cols != 1), "sprandn(): incompatible size"); }
+	else if(is_SpRow<obj_type>::value) { arma_debug_check((n_rows != 1), "sprandn(): incompatible size"); }
 
 	obj_type out;
 

@@ -13,23 +13,34 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-namespace newarp {
+namespace newarp
+{
 
-	template<typename eT> inline SparseGenMatProd<eT>::SparseGenMatProd(const SpMat<eT>& mat_obj)
-		: op_mat(mat_obj)
-		, n_rows(mat_obj.n_rows)
-		, n_cols(mat_obj.n_cols) { arma_extra_debug_sigprint(); }
 
-	// Perform the matrix-vector multiplication operation \f$y=Ax\f$.
-	// y_out = A * x_in
-	template<typename eT> inline
-	void SparseGenMatProd<eT>::perform_op(eT* x_in, eT* y_out) const {
-		arma_extra_debug_sigprint();
+template<typename eT>
+inline
+SparseGenMatProd<eT>::SparseGenMatProd(const SpMat<eT>& mat_obj)
+  : op_mat(mat_obj)
+  , n_rows(mat_obj.n_rows)
+  , n_cols(mat_obj.n_cols)
+  {
+  arma_extra_debug_sigprint();
+  }
 
-		const Col<eT> x(x_in, n_cols, false, true);
-		Col<eT> y(y_out, n_rows, false, true);
+// Perform the matrix-vector multiplication operation \f$y=Ax\f$.
+// y_out = A * x_in
+template<typename eT>
+inline
+void
+SparseGenMatProd<eT>::perform_op(eT* x_in, eT* y_out) const
+  {
+  arma_extra_debug_sigprint();
+  
+  const Col<eT> x(x_in , n_cols, false, true);
+        Col<eT> y(y_out, n_rows, false, true);
+  
+  y = op_mat * x;
+  }
 
-		y = op_mat * x;
-	}
 
-} // namespace newarp
+}  // namespace newarp

@@ -40,8 +40,7 @@ enable_if2
 	return Glue<T1, T2, glue_mvnrnd>(M.get_ref(), C.get_ref(), N);
 }
 
-template<typename T1, typename T2> arma_warn_unused
-inline
+template<typename T1, typename T2> inline
 typename
 enable_if2
 <
@@ -52,15 +51,14 @@ enable_if2
 	const bool status = glue_mvnrnd::apply_direct(out, M.get_ref(), C.get_ref(), uword(1));
 
 	if(status == false) {
-		arma_debug_warn("mvnrnd(): given covariance matrix is not symmetric positive semi-definite");
-		return false;
+		out.soft_reset();
+		arma_debug_warn_level(3, "mvnrnd(): given covariance matrix is not symmetric positive semi-definite");
 	}
 
-	return true;
+	return status;
 }
 
-template<typename T1, typename T2> arma_warn_unused
-inline
+template<typename T1, typename T2> inline
 typename
 enable_if2
 <
@@ -71,11 +69,11 @@ enable_if2
 	const bool status = glue_mvnrnd::apply_direct(out, M.get_ref(), C.get_ref(), N);
 
 	if(status == false) {
-		arma_debug_warn("mvnrnd(): given covariance matrix is not symmetric positive semi-definite");
-		return false;
+		out.soft_reset();
+		arma_debug_warn_level(3, "mvnrnd(): given covariance matrix is not symmetric positive semi-definite");
 	}
 
-	return true;
+	return status;
 }
 
 //! @}

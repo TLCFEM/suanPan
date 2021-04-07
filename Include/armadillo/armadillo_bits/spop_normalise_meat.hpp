@@ -101,7 +101,8 @@ void spop_normalise::apply_direct(SpMat<eT>& out, const SpMat<eT>& X, const uwor
 		SpMat<eT> tmp(tmp_locs, tmp_vals, X.n_rows, X.n_cols, false, false);
 
 		out.steal_mem(tmp);
-	} else if(dim == 1) {
+	}
+	else if(dim == 1) {
 		podarray<T> norm_vals(X.n_rows);
 		podarray<eT> row_vals(X.n_cols); // worst case scenario
 

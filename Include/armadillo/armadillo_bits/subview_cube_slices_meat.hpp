@@ -45,7 +45,7 @@ void subview_cube_slices<eT, T1>::inplace_rand(const uword rand_mode) {
 	arma_debug_check
 		(
 			((si.is_vec() == false) && (si.is_empty() == false)),
-			"Cube::slices(): given object is not a vector"
+			"Cube::slices(): given object must be a vector"
 		);
 
 	const uword* si_mem = si.memptr();
@@ -54,7 +54,7 @@ void subview_cube_slices<eT, T1>::inplace_rand(const uword rand_mode) {
 	for(uword si_count = 0; si_count < si_n_elem; ++si_count) {
 		const uword i = si_mem[si_count];
 
-		arma_debug_check((i >= m_n_slices), "Cube::slices(): index out of bounds");
+		arma_debug_check_bounds((i >= m_n_slices), "Cube::slices(): index out of bounds");
 
 		eT* m_slice_ptr = m_local.slice_memptr(i);
 
@@ -78,7 +78,7 @@ void subview_cube_slices<eT, T1>::inplace_op(const eT val) {
 	arma_debug_check
 		(
 			((si.is_vec() == false) && (si.is_empty() == false)),
-			"Cube::slices(): given object is not a vector"
+			"Cube::slices(): given object must be a vector"
 		);
 
 	const uword* si_mem = si.memptr();
@@ -87,7 +87,7 @@ void subview_cube_slices<eT, T1>::inplace_op(const eT val) {
 	for(uword si_count = 0; si_count < si_n_elem; ++si_count) {
 		const uword i = si_mem[si_count];
 
-		arma_debug_check((i >= m_n_slices), "Cube::slices(): index out of bounds");
+		arma_debug_check_bounds((i >= m_n_slices), "Cube::slices(): index out of bounds");
 
 		eT* m_slice_ptr = m_local.slice_memptr(i);
 
@@ -114,7 +114,7 @@ void subview_cube_slices<eT, T1>::inplace_op(const BaseCube<eT, expr>& x) {
 	arma_debug_check
 		(
 			((si.is_vec() == false) && (si.is_empty() == false)),
-			"Cube::slices(): given object is not a vector"
+			"Cube::slices(): given object must be a vector"
 		);
 
 	const uword* si_mem = si.memptr();
@@ -128,7 +128,7 @@ void subview_cube_slices<eT, T1>::inplace_op(const BaseCube<eT, expr>& x) {
 	for(uword si_count = 0; si_count < si_n_elem; ++si_count) {
 		const uword i = si_mem[si_count];
 
-		arma_debug_check((i >= m_n_slices), "Cube::slices(): index out of bounds");
+		arma_debug_check_bounds((i >= m_n_slices), "Cube::slices(): index out of bounds");
 
 		eT* m_slice_ptr = m_local.slice_memptr(i);
 		const eT* X_slice_ptr = X.slice_memptr(si_count);
@@ -313,7 +313,7 @@ void subview_cube_slices<eT, T1>::extract(Cube<eT>& out, const subview_cube_slic
 	arma_debug_check
 		(
 			((si.is_vec() == false) && (si.is_empty() == false)),
-			"Cube::slices(): given object is not a vector"
+			"Cube::slices(): given object must be a vector"
 		);
 
 	const uword* si_mem = si.memptr();
@@ -324,7 +324,7 @@ void subview_cube_slices<eT, T1>::extract(Cube<eT>& out, const subview_cube_slic
 	for(uword si_count = 0; si_count < si_n_elem; ++si_count) {
 		const uword i = si_mem[si_count];
 
-		arma_debug_check((i >= m_n_slices), "Cube::slices(): index out of bounds");
+		arma_debug_check_bounds((i >= m_n_slices), "Cube::slices(): index out of bounds");
 
 		eT* out_slice_ptr = out.slice_memptr(si_count);
 		const eT* m_slice_ptr = m_local.slice_memptr(i);

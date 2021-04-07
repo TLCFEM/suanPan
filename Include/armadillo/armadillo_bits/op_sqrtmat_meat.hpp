@@ -30,7 +30,7 @@ void op_sqrtmat::apply(Mat<std::complex<typename T1::elem_type>>& out, const mtO
 
 	const bool status = op_sqrtmat::apply_direct(out, in.m);
 
-	if(status == false) { arma_debug_warn("sqrtmat(): given matrix seems singular; may not have a square root"); }
+	if(status == false) { arma_debug_warn_level(3, "sqrtmat(): given matrix is singular; may not have a square root"); }
 }
 
 template<typename T1> inline
@@ -56,7 +56,8 @@ bool op_sqrtmat::apply_direct(Mat<std::complex<typename T1::elem_type>>& out, co
 			singular = (singular || (val == T(0)));
 
 			out.at(i, i) = std::sqrt(val);
-		} else { out.at(i, i) = std::sqrt(std::complex<T>(val)); }
+		}
+		else { out.at(i, i) = std::sqrt(std::complex<T>(val)); }
 	}
 
 	return (singular) ? false : true;
@@ -77,7 +78,8 @@ bool op_sqrtmat::apply_direct(Mat<std::complex<typename T1::elem_type>>& out, co
 	if(A.n_elem == 0) {
 		out.reset();
 		return true;
-	} else if(A.n_elem == 1) {
+	}
+	else if(A.n_elem == 1) {
 		out.set_size(1, 1);
 		out[0] = std::sqrt(std::complex<in_T>(A[0]));
 		return true;
@@ -91,7 +93,8 @@ bool op_sqrtmat::apply_direct(Mat<std::complex<typename T1::elem_type>>& out, co
 		for(uword i = 0; i < N; ++i) {
 			const in_T val = A.at(i, i);
 
-			if(val >= in_T(0)) { out.at(i, i) = std::sqrt(val); } else { out.at(i, i) = std::sqrt(out_T(val)); }
+			if(val >= in_T(0)) { out.at(i, i) = std::sqrt(val); }
+			else { out.at(i, i) = std::sqrt(out_T(val)); }
 		}
 
 		return true;
@@ -104,6 +107,8 @@ bool op_sqrtmat::apply_direct(Mat<std::complex<typename T1::elem_type>>& out, co
 #endif
 
 	if(try_sympd) {
+		arma_extra_debug_print("op_sqrtmat: attempting sympd optimisation");
+
 		// if matrix A is sympd, all its eigenvalues are positive
 
 		Col<in_T> eigval;
@@ -130,7 +135,7 @@ bool op_sqrtmat::apply_direct(Mat<std::complex<typename T1::elem_type>>& out, co
 			}
 		}
 
-		arma_extra_debug_print("warning: sympd optimisation failed");
+		arma_extra_debug_print("op_sqrtmat: sympd optimisation failed");
 
 		// fallthrough if eigen decomposition failed or an eigenvalue is zero
 	}
@@ -170,7 +175,7 @@ void op_sqrtmat_cx::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_sqrt
 
 	const bool status = op_sqrtmat_cx::apply_direct(out, in.m);
 
-	if(status == false) { arma_debug_warn("sqrtmat(): given matrix seems singular; may not have a square root"); }
+	if(status == false) { arma_debug_warn_level(3, "sqrtmat(): given matrix is singular; may not have a square root"); }
 }
 
 template<typename T1> inline
@@ -189,7 +194,8 @@ bool op_sqrtmat_cx::apply_direct(Mat<typename T1::elem_type>& out, const Op<T1, 
 		status = op_sqrtmat_cx::apply_direct_noalias(tmp, P);
 
 		out.steal_mem(tmp);
-	} else { status = op_sqrtmat_cx::apply_direct_noalias(out, P); }
+	}
+	else { status = op_sqrtmat_cx::apply_direct_noalias(out, P); }
 
 	return status;
 }
@@ -236,7 +242,8 @@ bool op_sqrtmat_cx::apply_direct(Mat<typename T1::elem_type>& out, const Base<ty
 	if(S.n_elem == 0) {
 		out.reset();
 		return true;
-	} else if(S.n_elem == 1) {
+	}
+	else if(S.n_elem == 1) {
 		out.set_size(1, 1);
 		out[0] = std::sqrt(S[0]);
 		return true;
@@ -259,6 +266,8 @@ bool op_sqrtmat_cx::apply_direct(Mat<typename T1::elem_type>& out, const Base<ty
 #endif
 
 	if(try_sympd) {
+		arma_extra_debug_print("op_sqrtmat_cx: attempting sympd optimisation");
+
 		// if matrix S is sympd, all its eigenvalues are positive
 
 		Col<T> eigval;
@@ -285,7 +294,7 @@ bool op_sqrtmat_cx::apply_direct(Mat<typename T1::elem_type>& out, const Base<ty
 			}
 		}
 
-		arma_extra_debug_print("warning: sympd optimisation failed");
+		arma_extra_debug_print("op_sqrtmat_cx: sympd optimisation failed");
 
 		// fallthrough if eigen decomposition failed or an eigenvalue is zero
 	}

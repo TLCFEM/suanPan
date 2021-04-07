@@ -31,7 +31,8 @@ void spglue_join_cols::apply(SpMat<typename T1::elem_type>& out, const SpGlue<T1
 		spglue_join_cols::apply_noalias(tmp, UA.M, UB.M);
 
 		out.steal_mem(tmp);
-	} else { spglue_join_cols::apply_noalias(out, UA.M, UB.M); }
+	}
+	else { spglue_join_cols::apply_noalias(out, UA.M, UB.M); }
 }
 
 template<typename eT> inline
@@ -176,7 +177,8 @@ void spglue_join_rows::apply(SpMat<typename T1::elem_type>& out, const SpGlue<T1
 		spglue_join_rows::apply_noalias(tmp, UA.M, UB.M);
 
 		out.steal_mem(tmp);
-	} else { spglue_join_rows::apply_noalias(out, UA.M, UB.M); }
+	}
+	else { spglue_join_rows::apply_noalias(out, UA.M, UB.M); }
 }
 
 template<typename eT> inline

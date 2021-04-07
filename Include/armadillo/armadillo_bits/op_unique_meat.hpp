@@ -25,7 +25,8 @@ bool op_unique::apply_helper(Mat<typename T1::elem_type>& out, const Proxy<T1>& 
 	const uword n_elem = P.get_n_elem();
 
 	if(n_elem == 0) {
-		if(P_is_row) { out.set_size(1, 0); } else { out.set_size(0, 1); }
+		if(P_is_row) { out.set_size(1, 0); }
+		else { out.set_size(0, 1); }
 
 		return true;
 	}
@@ -57,7 +58,8 @@ bool op_unique::apply_helper(Mat<typename T1::elem_type>& out, const Proxy<T1>& 
 
 			X_mem[i] = val;
 		}
-	} else {
+	}
+	else {
 		const uword n_rows = P.get_n_rows();
 		const uword n_cols = P.get_n_cols();
 
@@ -92,7 +94,8 @@ bool op_unique::apply_helper(Mat<typename T1::elem_type>& out, const Proxy<T1>& 
 		if(diff != eT(0)) { ++N_unique; }
 	}
 
-	if(P_is_row) { out.set_size(1, N_unique); } else { out.set_size(N_unique, 1); }
+	if(P_is_row) { out.set_size(1, N_unique); }
+	else { out.set_size(N_unique, 1); }
 
 	eT* out_mem = out.memptr();
 

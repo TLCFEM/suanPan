@@ -33,7 +33,8 @@ void spop_vectorise_col::apply_direct(SpMat<typename T1::elem_type>& out, const 
 		out = expr;
 
 		out.reshape(out.n_elem, 1);
-	} else {
+	}
+	else {
 		SpMat<eT> tmp = expr;
 
 		tmp.reshape(tmp.n_elem, 1);
@@ -61,7 +62,8 @@ void spop_vectorise_row::apply_direct(SpMat<typename T1::elem_type>& out, const 
 		out = strans(expr);
 
 		out.reshape(1, out.n_elem);
-	} else {
+	}
+	else {
 		SpMat<eT> tmp = strans(expr);
 
 		tmp.reshape(1, tmp.n_elem);
@@ -76,7 +78,8 @@ void spop_vectorise_all::apply(SpMat<typename T1::elem_type>& out, const SpOp<T1
 
 	const uword dim = in.aux_uword_a;
 
-	if(dim == 0) { spop_vectorise_col::apply_direct(out, in.m); } else { spop_vectorise_row::apply_direct(out, in.m); }
+	if(dim == 0) { spop_vectorise_col::apply_direct(out, in.m); }
+	else { spop_vectorise_row::apply_direct(out, in.m); }
 }
 
 //! @}

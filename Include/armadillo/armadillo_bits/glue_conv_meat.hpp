@@ -164,7 +164,7 @@ void glue_conv::apply(Mat<typename T1::elem_type>& out, const Glue<T1, T2, glue_
 	arma_debug_check
 		(
 			(((A.is_vec() == false) && (A.is_empty() == false)) || ((B.is_vec() == false) && (B.is_empty() == false))),
-			"conv(): given object is not a vector"
+			"conv(): given object must be a vector"
 		);
 
 	const bool A_is_col = ((T1::is_col) || (A.n_cols == 1));
@@ -174,7 +174,8 @@ void glue_conv::apply(Mat<typename T1::elem_type>& out, const Glue<T1, T2, glue_
 	if(mode == 0) // full convolution
 	{
 		glue_conv::apply(out, A, B, A_is_col);
-	} else if(mode == 1) // same size as A
+	}
+	else if(mode == 1) // same size as A
 	{
 		Mat<eT> tmp;
 
@@ -184,7 +185,8 @@ void glue_conv::apply(Mat<typename T1::elem_type>& out, const Glue<T1, T2, glue_
 			const uword start = uword(std::floor(double(B.n_elem) / double(2)));
 
 			out = (A_is_col) ? tmp(start, 0, arma::size(A)) : tmp(0, start, arma::size(A));
-		} else { out.zeros(arma::size(A)); }
+		}
+		else { out.zeros(arma::size(A)); }
 	}
 }
 
@@ -263,7 +265,8 @@ void glue_conv2::apply(Mat<typename T1::elem_type>& out, const Glue<T1, T2, glue
 	if(mode == 0) // full convolution
 	{
 		glue_conv2::apply(out, A, B);
-	} else if(mode == 1) // same size as A
+	}
+	else if(mode == 1) // same size as A
 	{
 		Mat<eT> tmp;
 
@@ -274,7 +277,8 @@ void glue_conv2::apply(Mat<typename T1::elem_type>& out, const Glue<T1, T2, glue
 			const uword start_col = uword(std::floor(double(B.n_cols) / double(2)));
 
 			out = tmp(start_row, start_col, arma::size(A));
-		} else { out.zeros(arma::size(A)); }
+		}
+		else { out.zeros(arma::size(A)); }
 	}
 }
 

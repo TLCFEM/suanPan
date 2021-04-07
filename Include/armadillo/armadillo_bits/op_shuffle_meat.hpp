@@ -48,8 +48,10 @@ void op_shuffle::apply_direct(Mat<eT>& out, const Mat<eT>& X, const uword dim) {
 
 			out.copy_size(X);
 
-			if(dim == 0) { for(uword i = 0; i < N; ++i) { out.row(i) = X.row(packet_vec[i].index); } } else { for(uword i = 0; i < N; ++i) { out.col(i) = X.col(packet_vec[i].index); } }
-		} else // in-place shuffle
+			if(dim == 0) { for(uword i = 0; i < N; ++i) { out.row(i) = X.row(packet_vec[i].index); } }
+			else { for(uword i = 0; i < N; ++i) { out.col(i) = X.col(packet_vec[i].index); } }
+		}
+		else // in-place shuffle
 		{
 			arma_extra_debug_print("op_shuffle::apply(): in-place matrix");
 
@@ -69,7 +71,8 @@ void op_shuffle::apply_direct(Mat<eT>& out, const Mat<eT>& X, const uword dim) {
 						packet_vec[j].val = 1;
 					}
 				}
-			} else {
+			}
+			else {
 				for(uword i = 0; i < N; ++i) {
 					if(packet_vec[i].val == 0) {
 						const uword j = packet_vec[i].index;
@@ -81,7 +84,8 @@ void op_shuffle::apply_direct(Mat<eT>& out, const Mat<eT>& X, const uword dim) {
 				}
 			}
 		}
-	} else // we're dealing with a vector
+	}
+	else // we're dealing with a vector
 	{
 		if(is_alias == false) {
 			arma_extra_debug_print("op_shuffle::apply(): vector");
@@ -92,14 +96,18 @@ void op_shuffle::apply_direct(Mat<eT>& out, const Mat<eT>& X, const uword dim) {
 				if(X.n_rows > 1) // i.e. column vector
 				{
 					for(uword i = 0; i < N; ++i) { out[i] = X[packet_vec[i].index]; }
-				} else { out = X; }
-			} else {
+				}
+				else { out = X; }
+			}
+			else {
 				if(X.n_cols > 1) // i.e. row vector
 				{
 					for(uword i = 0; i < N; ++i) { out[i] = X[packet_vec[i].index]; }
-				} else { out = X; }
+				}
+				else { out = X; }
 			}
-		} else // in-place shuffle
+		}
+		else // in-place shuffle
 		{
 			arma_extra_debug_print("op_shuffle::apply(): in-place vector");
 
@@ -122,7 +130,8 @@ void op_shuffle::apply_direct(Mat<eT>& out, const Mat<eT>& X, const uword dim) {
 						}
 					}
 				}
-			} else {
+			}
+			else {
 				if(X.n_cols > 1) // i.e. row vector
 				{
 					for(uword i = 0; i < N; ++i) {

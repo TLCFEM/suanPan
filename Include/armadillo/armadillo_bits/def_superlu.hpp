@@ -36,6 +36,16 @@ extern void arma_wrapper(dgstrs)(superlu::trans_t, superlu::SuperMatrix*, superl
 extern void arma_wrapper(cgstrs)(superlu::trans_t, superlu::SuperMatrix*, superlu::SuperMatrix*, int*, int*, superlu::SuperMatrix*, superlu::SuperLUStat_t*, int*);
 extern void arma_wrapper(zgstrs)(superlu::trans_t, superlu::SuperMatrix*, superlu::SuperMatrix*, int*, int*, superlu::SuperMatrix*, superlu::SuperLUStat_t*, int*);
 
+extern float arma_wrapper(slangs)(char* norm, superlu::SuperMatrix* A);
+extern double arma_wrapper(dlangs)(char* norm, superlu::SuperMatrix* A);
+extern float arma_wrapper(clangs)(char* norm, superlu::SuperMatrix* A);
+extern double arma_wrapper(zlangs)(char* norm, superlu::SuperMatrix* A);
+
+extern void arma_wrapper(sgscon)(char* norm, superlu::SuperMatrix* L, superlu::SuperMatrix* U, float anorm, float* rcond, superlu::SuperLUStat_t* stat, int* info);
+extern void arma_wrapper(dgscon)(char* norm, superlu::SuperMatrix* L, superlu::SuperMatrix* U, double anorm, double* rcond, superlu::SuperLUStat_t* stat, int* info);
+extern void arma_wrapper(cgscon)(char* norm, superlu::SuperMatrix* L, superlu::SuperMatrix* U, float anorm, float* rcond, superlu::SuperLUStat_t* stat, int* info);
+extern void arma_wrapper(zgscon)(char* norm, superlu::SuperMatrix* L, superlu::SuperMatrix* U, double anorm, double* rcond, superlu::SuperLUStat_t* stat, int* info);
+
 extern void arma_wrapper(StatInit)(superlu::SuperLUStat_t*);
 extern void arma_wrapper(StatFree)(superlu::SuperLUStat_t*);
 extern void arma_wrapper(set_default_options)(superlu::superlu_options_t*);

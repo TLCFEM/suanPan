@@ -46,7 +46,8 @@ void glue_cross::apply(Mat<typename T1::elem_type>& out, const Glue<T1, T2, glue
 		out_mem[0] = ay * bz - az * by;
 		out_mem[1] = az * bx - ax * bz;
 		out_mem[2] = ax * by - ay * bx;
-	} else {
+	}
+	else {
 		const bool PA_is_col = Proxy<T1>::is_col ? true : (PA.get_n_cols() == 1);
 		const bool PB_is_col = Proxy<T2>::is_col ? true : (PB.get_n_cols() == 1);
 

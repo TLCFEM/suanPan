@@ -39,11 +39,14 @@ SpValProxy<T1>& SpValProxy<T1>::operator=(const eT rhs) {
 			// The value exists and merely needs to be updated.
 			*val_ptr = rhs;
 			parent.invalidate_cache();
-		} else {
+		}
+
+		else {
 			// The value is nonzero and must be inserted.
 			val_ptr = &parent.insert_element(row, col, rhs);
 		}
-	} else // A zero is being assigned.~
+	}
+	else // A zero is being assigned.~
 	{
 		if(val_ptr) {
 			// The element exists, but we need to remove it, because it is being set to 0.
@@ -65,7 +68,8 @@ SpValProxy<T1>& SpValProxy<T1>::operator+=(const eT rhs) {
 		*val_ptr += rhs;
 		parent.invalidate_cache();
 		check_zero();
-	} else {
+	}
+	else {
 		if(rhs != eT(0)) {
 			// The value does not exist and must be inserted.
 			val_ptr = &parent.insert_element(row, col, rhs);
@@ -82,7 +86,8 @@ SpValProxy<T1>& SpValProxy<T1>::operator-=(const eT rhs) {
 		*val_ptr -= rhs;
 		parent.invalidate_cache();
 		check_zero();
-	} else {
+	}
+	else {
 		if(rhs != eT(0)) {
 			// The value does not exist and must be inserted.
 			val_ptr = &parent.insert_element(row, col, -rhs);
@@ -101,7 +106,8 @@ SpValProxy<T1>& SpValProxy<T1>::operator*=(const eT rhs) {
 			parent.invalidate_cache();
 			check_zero();
 		}
-	} else {
+	}
+	else {
 		if(val_ptr) {
 			// Since we are multiplying by zero, the value can be deleted.
 			parent.delete_element(row, col);
@@ -121,7 +127,8 @@ SpValProxy<T1>& SpValProxy<T1>::operator/=(const eT rhs) {
 			parent.invalidate_cache();
 			check_zero();
 		}
-	} else {
+	}
+	else {
 		if(val_ptr) {
 			*val_ptr /= rhs; // That is where it gets ugly.
 			// Now check if it's 0.
@@ -129,7 +136,9 @@ SpValProxy<T1>& SpValProxy<T1>::operator/=(const eT rhs) {
 				parent.delete_element(row, col);
 				val_ptr = nullptr;
 			}
-		} else {
+		}
+
+		else {
 			eT val = eT(0) / rhs; // This may vary depending on type and implementation.
 
 			if(val != eT(0)) {
@@ -148,7 +157,9 @@ SpValProxy<T1>& SpValProxy<T1>::operator++() {
 		(*val_ptr) += eT(1);
 		parent.invalidate_cache();
 		check_zero();
-	} else { val_ptr = &parent.insert_element(row, col, eT(1)); }
+	}
+
+	else { val_ptr = &parent.insert_element(row, col, eT(1)); }
 
 	return *this;
 }
@@ -159,7 +170,9 @@ SpValProxy<T1>& SpValProxy<T1>::operator--() {
 		(*val_ptr) -= eT(1);
 		parent.invalidate_cache();
 		check_zero();
-	} else { val_ptr = &parent.insert_element(row, col, eT(-1)); }
+	}
+
+	else { val_ptr = &parent.insert_element(row, col, eT(-1)); }
 
 	return *this;
 }
@@ -170,12 +183,15 @@ typename T1::elem_type SpValProxy<T1>::operator++(const int) {
 		(*val_ptr) += eT(1);
 		parent.invalidate_cache();
 		check_zero();
-	} else { val_ptr = &parent.insert_element(row, col, eT(1)); }
+	}
+
+	else { val_ptr = &parent.insert_element(row, col, eT(1)); }
 
 	if(val_ptr) // It may have changed to now be 0.
 	{
 		return *(val_ptr) - eT(1);
-	} else { return eT(0); }
+	}
+	else { return eT(0); }
 }
 
 template<typename T1> arma_inline
@@ -184,12 +200,15 @@ typename T1::elem_type SpValProxy<T1>::operator--(const int) {
 		(*val_ptr) -= eT(1);
 		parent.invalidate_cache();
 		check_zero();
-	} else { val_ptr = &parent.insert_element(row, col, eT(-1)); }
+	}
+
+	else { val_ptr = &parent.insert_element(row, col, eT(-1)); }
 
 	if(val_ptr) // It may have changed to now be 0.
 	{
 		return *(val_ptr) + eT(1);
-	} else { return eT(0); }
+	}
+	else { return eT(0); }
 }
 
 template<typename T1> arma_inline SpValProxy<T1>::operator eT() const { return (val_ptr) ? eT(*val_ptr) : eT(0); }

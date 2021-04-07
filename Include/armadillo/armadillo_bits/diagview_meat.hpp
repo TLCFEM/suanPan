@@ -17,7 +17,7 @@
 //! @{
 
 template<typename eT> inline diagview<eT>::~diagview() {
-	arma_extra_debug_sigprint();
+	arma_extra_debug_sigprint_this(this);
 }
 
 template<typename eT> arma_inline diagview<eT>::diagview(const Mat<eT>& in_m, const uword in_row_offset, const uword in_col_offset, const uword in_len)
@@ -26,7 +26,32 @@ template<typename eT> arma_inline diagview<eT>::diagview(const Mat<eT>& in_m, co
 	, col_offset(in_col_offset)
 	, n_rows(in_len)
 	, n_elem(in_len) {
-	arma_extra_debug_sigprint();
+	arma_extra_debug_sigprint_this(this);
+}
+
+template<typename eT> inline diagview<eT>::diagview(const diagview<eT>& in)
+	: m(in.m)
+	, row_offset(in.row_offset)
+	, col_offset(in.col_offset)
+	, n_rows(in.n_rows)
+	, n_elem(in.n_elem) {
+	arma_extra_debug_sigprint(arma_str::format("this = %x   in = %x") % this % &in);
+}
+
+template<typename eT> inline diagview<eT>::diagview(diagview<eT>&& in)
+	: m(in.m)
+	, row_offset(in.row_offset)
+	, col_offset(in.col_offset)
+	, n_rows(in.n_rows)
+	, n_elem(in.n_elem) {
+	arma_extra_debug_sigprint(arma_str::format("this = %x   in = %x") % this % &in);
+
+	// for paranoia
+
+	access::rw(in.row_offset) = 0;
+	access::rw(in.col_offset) = 0;
+	access::rw(in.n_rows) = 0;
+	access::rw(in.n_elem) = 0;
 }
 
 //! set a diagonal of our matrix using a diagonal from a foreign matrix
@@ -59,7 +84,8 @@ void diagview<eT>::operator=(const diagview<eT>& x) {
 		}
 
 		if(ii < d_n_elem) { d_m.at(ii + d_row_offset, ii + d_col_offset) = x_m.at(ii + x_row_offset, ii + x_col_offset); }
-	} else {
+	}
+	else {
 		const Mat<eT> tmp = x;
 
 		(*this).operator=(tmp);
@@ -159,7 +185,8 @@ void diagview<eT>::operator=(const Base<eT, T1>& o) {
 		}
 
 		if(ii < d_n_elem) { d_m.at(ii + d_row_offset, ii + d_col_offset) = x_mem[ii]; }
-	} else {
+	}
+	else {
 		typename Proxy<T1>::ea_type Pea = P.get_ea();
 
 		uword ii, jj;
@@ -215,7 +242,8 @@ void diagview<eT>::operator+=(const Base<eT, T1>& o) {
 		}
 
 		if(ii < d_n_elem) { d_m.at(ii + d_row_offset, ii + d_col_offset) += x_mem[ii]; }
-	} else {
+	}
+	else {
 		typename Proxy<T1>::ea_type Pea = P.get_ea();
 
 		uword ii, jj;
@@ -271,7 +299,8 @@ void diagview<eT>::operator-=(const Base<eT, T1>& o) {
 		}
 
 		if(ii < d_n_elem) { d_m.at(ii + d_row_offset, ii + d_col_offset) -= x_mem[ii]; }
-	} else {
+	}
+	else {
 		typename Proxy<T1>::ea_type Pea = P.get_ea();
 
 		uword ii, jj;
@@ -327,7 +356,8 @@ void diagview<eT>::operator%=(const Base<eT, T1>& o) {
 		}
 
 		if(ii < d_n_elem) { d_m.at(ii + d_row_offset, ii + d_col_offset) *= x_mem[ii]; }
-	} else {
+	}
+	else {
 		typename Proxy<T1>::ea_type Pea = P.get_ea();
 
 		uword ii, jj;
@@ -383,7 +413,8 @@ void diagview<eT>::operator/=(const Base<eT, T1>& o) {
 		}
 
 		if(ii < d_n_elem) { d_m.at(ii + d_row_offset, ii + d_col_offset) /= x_mem[ii]; }
-	} else {
+	}
+	else {
 		typename Proxy<T1>::ea_type Pea = P.get_ea();
 
 		uword ii, jj;
@@ -552,14 +583,14 @@ eT diagview<eT>::at(const uword ii) const { return m.at(ii + row_offset, ii + co
 
 template<typename eT> arma_inline
 eT& diagview<eT>::operator()(const uword ii) {
-	arma_debug_check((ii >= n_elem), "diagview::operator(): out of bounds");
+	arma_debug_check_bounds((ii >= n_elem), "diagview::operator(): out of bounds");
 
 	return (const_cast<Mat<eT>&>(m)).at(ii + row_offset, ii + col_offset);
 }
 
 template<typename eT> arma_inline
 eT diagview<eT>::operator()(const uword ii) const {
-	arma_debug_check((ii >= n_elem), "diagview::operator(): out of bounds");
+	arma_debug_check_bounds((ii >= n_elem), "diagview::operator(): out of bounds");
 
 	return m.at(ii + row_offset, ii + col_offset);
 }
@@ -572,14 +603,14 @@ eT diagview<eT>::at(const uword row, const uword) const { return m.at(row + row_
 
 template<typename eT> arma_inline
 eT& diagview<eT>::operator()(const uword row, const uword col) {
-	arma_debug_check(((row >= n_elem) || (col > 0)), "diagview::operator(): out of bounds");
+	arma_debug_check_bounds(((row >= n_elem) || (col > 0)), "diagview::operator(): out of bounds");
 
 	return (const_cast<Mat<eT>&>(m)).at(row + row_offset, row + col_offset);
 }
 
 template<typename eT> arma_inline
 eT diagview<eT>::operator()(const uword row, const uword col) const {
-	arma_debug_check(((row >= n_elem) || (col > 0)), "diagview::operator(): out of bounds");
+	arma_debug_check_bounds(((row >= n_elem) || (col > 0)), "diagview::operator(): out of bounds");
 
 	return m.at(row + row_offset, row + col_offset);
 }
@@ -607,7 +638,8 @@ void diagview<eT>::replace(const eT old_val, const eT new_val) {
 
 			val = (arma_isnan(val)) ? new_val : val;
 		}
-	} else {
+	}
+	else {
 		for(uword ii = 0; ii < local_n_elem; ++ii) {
 			eT& val = x.at(ii + row_offset, ii + col_offset);
 

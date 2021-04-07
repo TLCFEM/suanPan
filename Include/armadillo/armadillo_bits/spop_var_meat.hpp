@@ -31,7 +31,8 @@ void spop_var::apply(SpMat<typename T1::pod_type>& out, const mtSpOp<typename T1
 
 	const SpProxy<T1> p(in.m);
 
-	if(p.is_alias(out) == false) { spop_var::apply_noalias(out, p, norm_type, dim); } else {
+	if(p.is_alias(out) == false) { spop_var::apply_noalias(out, p, norm_type, dim); }
+	else {
 		SpMat<out_eT> tmp;
 
 		spop_var::apply_noalias(tmp, p, norm_type, dim);
@@ -76,7 +77,8 @@ void spop_var::apply_noalias
 
 				// in_eT is used just to get the specialization right (complex / noncomplex)
 				out.at(0, col) = spop_var::iterator_var(it, end, n_zero, norm_type, in_eT(0));
-			} else {
+			}
+			else {
 				// We can use direct memory access to calculate the variance.
 				out.at(0, col) = spop_var::direct_var
 				(
@@ -87,7 +89,8 @@ void spop_var::apply_noalias
 				);
 			}
 		}
-	} else if(dim == 1) // find variance in each row
+	}
+	else if(dim == 1) // find variance in each row
 	{
 		arma_extra_debug_print("spop_var::apply_noalias(): dim = 1");
 
@@ -171,7 +174,8 @@ eT spop_var::direct_var
 		const eT var_val = (acc2 - (acc3 * acc3) / eT(N)) / norm_val;
 
 		return var_val;
-	} else if(length == 1 && N > 1) // if N == 1, then variance is zero.
+	}
+	else if(length == 1 && N > 1) // if N == 1, then variance is zero.
 	{
 		const eT mean = X[0] / eT(N);
 		const eT val = mean - X[0];
@@ -183,7 +187,8 @@ eT spop_var::direct_var
 		const eT var_val = (acc2 - (acc3 * acc3) / eT(N)) / norm_val;
 
 		return var_val;
-	} else { return eT(0); }
+	}
+	else { return eT(0); }
 }
 
 template<typename T> inline
@@ -219,7 +224,8 @@ T spop_var::direct_var
 		const T var_val = (acc2 - std::norm(acc3) / T(N)) / norm_val;
 
 		return var_val;
-	} else if(length == 1 && N > 1) // if N == 1, then variance is zero.
+	}
+	else if(length == 1 && N > 1) // if N == 1, then variance is zero.
 	{
 		const eT mean = X[0] / T(N);
 		const eT val = mean - X[0];
@@ -231,7 +237,8 @@ T spop_var::direct_var
 		const T var_val = (acc2 - std::norm(acc3) / T(N)) / norm_val;
 
 		return var_val;
-	} else {
+	}
+	else {
 		return T(0); // All elements are zero
 	}
 }

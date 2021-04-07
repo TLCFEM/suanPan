@@ -31,7 +31,8 @@ void spglue_kron::apply(SpMat<typename T1::elem_type>& out, const SpGlue<T1, T2,
 		spglue_kron::apply_noalias(tmp, UA.M, UB.M);
 
 		out.steal_mem(tmp);
-	} else { spglue_kron::apply_noalias(out, UA.M, UB.M); }
+	}
+	else { spglue_kron::apply_noalias(out, UA.M, UB.M); }
 }
 
 template<typename eT> inline

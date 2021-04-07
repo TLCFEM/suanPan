@@ -138,14 +138,14 @@ eT& podarray<eT>::operator[](const uword i) { return access::rw(mem[i]); }
 
 template<typename eT> arma_inline
 eT podarray<eT>::operator()(const uword i) const {
-	arma_debug_check((i >= n_elem), "podarray::operator(): index out of bounds");
+	arma_debug_check_bounds((i >= n_elem), "podarray::operator(): index out of bounds");
 
 	return mem[i];
 }
 
 template<typename eT> arma_inline
 eT& podarray<eT>::operator()(const uword i) {
-	arma_debug_check((i >= n_elem), "podarray::operator(): index out of bounds");
+	arma_debug_check_bounds((i >= n_elem), "podarray::operator(): index out of bounds");
 
 	return access::rw(mem[i]);
 }
@@ -200,8 +200,7 @@ eT* podarray<eT>::memptr() { return mem; }
 template<typename eT> arma_inline
 const eT* podarray<eT>::memptr() const { return mem; }
 
-template<typename eT> arma_hot
-inline
+template<typename eT> inline
 void podarray<eT>::copy_row(const Mat<eT>& A, const uword row) {
 	const uword cols = A.n_cols;
 

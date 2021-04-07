@@ -30,7 +30,8 @@ void op_trimat::fill_zeros(Mat<eT>& out, const bool upper) {
 
 			arrayops::fill_zeros(&data[i + 1], (N - (i + 1)));
 		}
-	} else {
+	}
+	else {
 		// lower triangular: set all elements above the diagonal to zero
 
 		for(uword i = 1; i < N; ++i) {
@@ -68,7 +69,8 @@ void op_trimat::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_trimat>&
 
 					arrayops::copy(out_data, A_data, i + 1);
 				}
-			} else {
+			}
+			else {
 				// lower triangular: copy the diagonal and the elements below the diagonal
 				for(uword i = 0; i < N; ++i) {
 					const eT* A_data = A.colptr(i);
@@ -78,7 +80,8 @@ void op_trimat::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_trimat>&
 				}
 			}
 		}
-	} else {
+	}
+	else {
 		const Proxy<T1> P(in.m);
 
 		arma_debug_check((P.get_n_rows() != P.get_n_cols()), "trimatu()/trimatl(): given matrix must be square sized");
@@ -88,25 +91,16 @@ void op_trimat::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_trimat>&
 		if(P.is_alias(out)) {
 			Mat<eT> tmp(N, N);
 
-			if(upper) {
-				for(uword j = 0; j < N; ++j)
-					for(uword i = 0; i < (j + 1); ++i) { tmp.at(i, j) = P.at(i, j); }
-			} else {
-				for(uword j = 0; j < N; ++j)
-					for(uword i = j; i < N; ++i) { tmp.at(i, j) = P.at(i, j); }
-			}
+			if(upper) { for(uword j = 0; j < N; ++j) for(uword i = 0; i < (j + 1); ++i) { tmp.at(i, j) = P.at(i, j); } }
+			else { for(uword j = 0; j < N; ++j) for(uword i = j; i < N; ++i) { tmp.at(i, j) = P.at(i, j); } }
 
 			out.steal_mem(tmp);
-		} else {
+		}
+		else {
 			out.set_size(N, N);
 
-			if(upper) {
-				for(uword j = 0; j < N; ++j)
-					for(uword i = 0; i < (j + 1); ++i) { out.at(i, j) = P.at(i, j); }
-			} else {
-				for(uword j = 0; j < N; ++j)
-					for(uword i = j; i < N; ++i) { out.at(i, j) = P.at(i, j); }
-			}
+			if(upper) { for(uword j = 0; j < N; ++j) for(uword i = 0; i < (j + 1); ++i) { out.at(i, j) = P.at(i, j); } }
+			else { for(uword j = 0; j < N; ++j) for(uword i = j; i < N; ++i) { out.at(i, j) = P.at(i, j); } }
 		}
 	}
 
@@ -132,7 +126,7 @@ void op_trimatu_ext::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_tri
 	const uword n_rows = A.n_rows;
 	const uword n_cols = A.n_cols;
 
-	arma_debug_check(((row_offset > 0) && (row_offset >= n_rows)) || ((col_offset > 0) && (col_offset >= n_cols)), "trimatu(): requested diagonal is out of bounds");
+	arma_debug_check_bounds(((row_offset > 0) && (row_offset >= n_rows)) || ((col_offset > 0) && (col_offset >= n_cols)), "trimatu(): requested diagonal is out of bounds");
 
 	if(&out != &A) {
 		out.copy_size(A);
@@ -146,7 +140,8 @@ void op_trimatu_ext::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_tri
 				const uword end_row = i + row_offset;
 
 				for(uword row = 0; row <= end_row; ++row) { out.at(row, col) = A.at(row, col); }
-			} else { if(col < n_cols) { arrayops::copy(out.colptr(col), A.colptr(col), n_rows); } }
+			}
+			else { if(col < n_cols) { arrayops::copy(out.colptr(col), A.colptr(col), n_rows); } }
 		}
 	}
 
@@ -191,7 +186,7 @@ void op_trimatl_ext::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_tri
 	const uword n_rows = A.n_rows;
 	const uword n_cols = A.n_cols;
 
-	arma_debug_check(((row_offset > 0) && (row_offset >= n_rows)) || ((col_offset > 0) && (col_offset >= n_cols)), "trimatl(): requested diagonal is out of bounds");
+	arma_debug_check_bounds(((row_offset > 0) && (row_offset >= n_rows)) || ((col_offset > 0) && (col_offset >= n_cols)), "trimatl(): requested diagonal is out of bounds");
 
 	if(&out != &A) {
 		out.copy_size(A);
@@ -227,7 +222,8 @@ void op_trimatl_ext::fill_zeros(Mat<eT>& out, const uword row_offset, const uwor
 			const uword end_row = i + row_offset;
 
 			for(uword row = 0; row < end_row; ++row) { out.at(row, col) = eT(0); }
-		} else { if(col < n_cols) { arrayops::fill_zeros(out.colptr(col), n_rows); } }
+		}
+		else { if(col < n_cols) { arrayops::fill_zeros(out.colptr(col), n_rows); } }
 	}
 }
 

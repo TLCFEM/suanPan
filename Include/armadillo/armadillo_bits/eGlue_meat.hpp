@@ -49,7 +49,11 @@ typename T1::elem_type eGlue<T1, T2, eglue_type>::operator[](const uword ii) con
 
 	typedef typename T1::elem_type eT;
 
-	if(is_same_type<eglue_type, eglue_plus>::yes) { return P1[ii] + P2[ii]; } else if(is_same_type<eglue_type, eglue_minus>::yes) { return P1[ii] - P2[ii]; } else if(is_same_type<eglue_type, eglue_div>::yes) { return P1[ii] / P2[ii]; } else if(is_same_type<eglue_type, eglue_schur>::yes) { return P1[ii] * P2[ii]; } else return eT(0);
+	if(is_same_type<eglue_type, eglue_plus>::yes) { return P1[ii] + P2[ii]; }
+	else if(is_same_type<eglue_type, eglue_minus>::yes) { return P1[ii] - P2[ii]; }
+	else if(is_same_type<eglue_type, eglue_div>::yes) { return P1[ii] / P2[ii]; }
+	else if(is_same_type<eglue_type, eglue_schur>::yes) { return P1[ii] * P2[ii]; }
+	else return eT(0);
 }
 
 template<typename T1, typename T2, typename eglue_type> arma_inline
@@ -58,7 +62,11 @@ typename T1::elem_type eGlue<T1, T2, eglue_type>::at(const uword row, const uwor
 
 	typedef typename T1::elem_type eT;
 
-	if(is_same_type<eglue_type, eglue_plus>::yes) { return P1.at(row, col) + P2.at(row, col); } else if(is_same_type<eglue_type, eglue_minus>::yes) { return P1.at(row, col) - P2.at(row, col); } else if(is_same_type<eglue_type, eglue_div>::yes) { return P1.at(row, col) / P2.at(row, col); } else if(is_same_type<eglue_type, eglue_schur>::yes) { return P1.at(row, col) * P2.at(row, col); } else return eT(0);
+	if(is_same_type<eglue_type, eglue_plus>::yes) { return P1.at(row, col) + P2.at(row, col); }
+	else if(is_same_type<eglue_type, eglue_minus>::yes) { return P1.at(row, col) - P2.at(row, col); }
+	else if(is_same_type<eglue_type, eglue_div>::yes) { return P1.at(row, col) / P2.at(row, col); }
+	else if(is_same_type<eglue_type, eglue_schur>::yes) { return P1.at(row, col) * P2.at(row, col); }
+	else return eT(0);
 }
 
 template<typename T1, typename T2, typename eglue_type> arma_inline
@@ -67,7 +75,11 @@ typename T1::elem_type eGlue<T1, T2, eglue_type>::at_alt(const uword ii) const {
 
 	typedef typename T1::elem_type eT;
 
-	if(is_same_type<eglue_type, eglue_plus>::yes) { return P1.at_alt(ii) + P2.at_alt(ii); } else if(is_same_type<eglue_type, eglue_minus>::yes) { return P1.at_alt(ii) - P2.at_alt(ii); } else if(is_same_type<eglue_type, eglue_div>::yes) { return P1.at_alt(ii) / P2.at_alt(ii); } else if(is_same_type<eglue_type, eglue_schur>::yes) { return P1.at_alt(ii) * P2.at_alt(ii); } else return eT(0);
+	if(is_same_type<eglue_type, eglue_plus>::yes) { return P1.at_alt(ii) + P2.at_alt(ii); }
+	else if(is_same_type<eglue_type, eglue_minus>::yes) { return P1.at_alt(ii) - P2.at_alt(ii); }
+	else if(is_same_type<eglue_type, eglue_div>::yes) { return P1.at_alt(ii) / P2.at_alt(ii); }
+	else if(is_same_type<eglue_type, eglue_schur>::yes) { return P1.at_alt(ii) * P2.at_alt(ii); }
+	else return eT(0);
 }
 
 //! @}

@@ -24,7 +24,8 @@ void op_chi2rnd::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_chi2rnd
 
 	const Proxy<T1> P(in.m);
 
-	if(P.is_alias(out) == false) { op_chi2rnd::apply_noalias(out, P); } else {
+	if(P.is_alias(out) == false) { op_chi2rnd::apply_noalias(out, P); }
+	else {
 		Mat<eT> tmp;
 
 		op_chi2rnd::apply_noalias(tmp, P);
@@ -54,7 +55,8 @@ void op_chi2rnd::apply_noalias(Mat<typename T1::elem_type>& out, const Proxy<T1>
 		typename Proxy<T1>::ea_type Pea = P.get_ea();
 
 		for(uword i = 0; i < N; ++i) { out_mem[i] = generator(Pea[i]); }
-	} else {
+	}
+	else {
 		for(uword col = 0; col < n_cols; ++col)
 			for(uword row = 0; row < n_rows; ++row) {
 				(*out_mem) = generator(P.at(row, col));
@@ -81,7 +83,8 @@ void op_chi2rnd::fill_constant_df(Mat<eT>& out, const eT df) {
 		eT* out_mem = out.memptr();
 
 		for(uword i = 0; i < N; ++i) { out_mem[i] = eT(distr(motor)); }
-	} else { out.fill(Datum<eT>::nan); }
+	}
+	else { out.fill(Datum<eT>::nan); }
 }
 
 //
@@ -110,7 +113,8 @@ eT op_chi2rnd_varying_df<eT>::operator()(const eT df) {
 		std::chi_squared_distribution<eT> distr(df);
 
 		return eT(distr(motor));
-	} else { return Datum<eT>::nan; }
+	}
+	else { return Datum<eT>::nan; }
 }
 
 //! @}

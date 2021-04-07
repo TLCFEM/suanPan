@@ -32,7 +32,10 @@ typename enable_if2<is_real<typename T1::pod_type>::value, bool>::result orth(Ma
 
 	const bool status = op_orth::apply_direct(out, X.get_ref(), tol);
 
-	if(status == false) { arma_debug_warn("orth(): svd failed"); }
+	if(status == false) {
+		out.soft_reset();
+		arma_debug_warn_level(3, "orth(): svd failed");
+	}
 
 	return status;
 }
@@ -55,7 +58,10 @@ typename enable_if2<is_real<typename T1::pod_type>::value, bool>::result null(Ma
 
 	const bool status = op_null::apply_direct(out, X.get_ref(), tol);
 
-	if(status == false) { arma_debug_warn("null(): svd failed"); }
+	if(status == false) {
+		out.soft_reset();
+		arma_debug_warn_level(3, "null(): svd failed");
+	}
 
 	return status;
 }

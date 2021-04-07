@@ -33,7 +33,8 @@ void spop_scalar_times::apply(SpMat<typename T1::elem_type>& out, const SpOp<T1,
 
 	typedef typename T1::elem_type eT;
 
-	if(in.aux != eT(0)) { out.init_xform(in.m, priv::functor_scalar_times<eT>(in.aux)); } else {
+	if(in.aux != eT(0)) { out.init_xform(in.m, priv::functor_scalar_times<eT>(in.aux)); }
+	else {
 		const SpProxy<T1> P(in.m);
 
 		out.zeros(P.get_n_rows(), P.get_n_cols());
@@ -60,7 +61,8 @@ void spop_cx_scalar_times::apply(SpMat<std::complex<typename T1::pod_type>>& out
 	typedef typename T1::pod_type T;
 	typedef typename std::complex<T> out_eT;
 
-	if(in.aux_out_eT != out_eT(0)) { out.init_xform_mt(in.m, priv::functor_cx_scalar_times<T>(in.aux_out_eT)); } else {
+	if(in.aux_out_eT != out_eT(0)) { out.init_xform_mt(in.m, priv::functor_cx_scalar_times<T>(in.aux_out_eT)); }
+	else {
 		const SpProxy<T1> P(in.m);
 
 		out.zeros(P.get_n_rows(), P.get_n_cols());
@@ -229,7 +231,8 @@ void spop_repelem::apply(SpMat<typename T1::elem_type>& out, const SpOp<T1, spop
 		}
 
 		out = SpMat<eT>(locs, vals, out_n_rows, out_n_cols);
-	} else { out.zeros(out_n_rows, out_n_cols); }
+	}
+	else { out.zeros(out_n_rows, out_n_cols); }
 }
 
 template<typename T1> inline
@@ -331,7 +334,7 @@ void spop_diagvec::apply(SpMat<typename T1::elem_type>& out, const SpOp<T1, spop
 	const uword row_offset = (b > 0) ? a : 0;
 	const uword col_offset = (b == 0) ? a : 0;
 
-	arma_debug_check
+	arma_debug_check_bounds
 		(
 			((row_offset > 0) && (row_offset >= X.n_rows)) || ((col_offset > 0) && (col_offset >= X.n_cols)),
 			"diagvec(): requested diagonal out of bounds"

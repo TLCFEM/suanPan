@@ -17,8 +17,7 @@
 //! @{
 
 //! for two arrays, generic version for non-complex values
-template<typename eT> arma_hot
-arma_inline
+template<typename eT> arma_inline
 typename arma_not_cx<eT>::result op_dot::direct_dot_arma(const uword n_elem, const eT* const A, const eT* const B) {
 	arma_extra_debug_sigprint();
 
@@ -86,7 +85,8 @@ inline
 typename arma_real_only<eT>::result op_dot::direct_dot(const uword n_elem, const eT* const A, const eT* const B) {
 	arma_extra_debug_sigprint();
 
-	if(n_elem <= 32u) { return op_dot::direct_dot_arma(n_elem, A, B); } else {
+	if(n_elem <= 32u) { return op_dot::direct_dot_arma(n_elem, A, B); }
+	else {
 #if defined(ARMA_USE_ATLAS)
       {
       arma_extra_debug_print("atlas::cblas_dot()");
@@ -111,7 +111,8 @@ typename arma_real_only<eT>::result op_dot::direct_dot(const uword n_elem, const
 template<typename eT> inline
 arma_hot
 typename arma_cx_only<eT>::result op_dot::direct_dot(const uword n_elem, const eT* const A, const eT* const B) {
-	if(n_elem <= 16u) { return op_dot::direct_dot_arma(n_elem, A, B); } else {
+	if(n_elem <= 16u) { return op_dot::direct_dot_arma(n_elem, A, B); }
+	else {
 #if defined(ARMA_USE_ATLAS)
       {
       arma_extra_debug_print("atlas::cblas_cx_dot()");
@@ -166,7 +167,8 @@ typename T1::elem_type op_dot::apply(const T1& X, const T2& Y) {
 		arma_debug_check((A.M.n_elem != B.M.n_elem), "dot(): objects must have the same number of elements");
 
 		return op_dot::direct_dot(A.M.n_elem, A.M.memptr(), B.M.memptr());
-	} else {
+	}
+	else {
 		if(is_subview_row<T1>::value && is_subview_row<T2>::value) {
 			typedef typename T1::elem_type eT;
 
@@ -323,7 +325,8 @@ inline
 eT op_cdot::direct_cdot(const uword n_elem, const eT* const A, const eT* const B) {
 	arma_extra_debug_sigprint();
 
-	if(n_elem <= 32u) { return op_cdot::direct_cdot_arma(n_elem, A, B); } else {
+	if(n_elem <= 32u) { return op_cdot::direct_cdot_arma(n_elem, A, B); }
+	else {
 #if defined(ARMA_USE_BLAS)
 		{
 			arma_extra_debug_print("blas::gemv()");
@@ -366,7 +369,8 @@ inline
 typename T1::elem_type op_cdot::apply(const T1& X, const T2& Y) {
 	arma_extra_debug_sigprint();
 
-	if((is_Mat<T1>::value == true) && (is_Mat<T2>::value == true)) { return op_cdot::apply_unwrap(X, Y); } else { return op_cdot::apply_proxy(X, Y); }
+	if(is_Mat<T1>::value && is_Mat<T2>::value) { return op_cdot::apply_unwrap(X, Y); }
+	else { return op_cdot::apply_proxy(X, Y); }
 }
 
 template<typename T1, typename T2> arma_hot
@@ -429,7 +433,8 @@ typename T1::elem_type op_cdot::apply_proxy(const T1& X, const T2& Y) {
 		}
 
 		return std::complex<T>(val_real, val_imag);
-	} else { return op_cdot::apply_unwrap(X, Y); }
+	}
+	else { return op_cdot::apply_unwrap(X, Y); }
 }
 
 template<typename T1, typename T2> arma_hot

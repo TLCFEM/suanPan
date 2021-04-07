@@ -238,8 +238,7 @@ enable_if2
 
 	Mat<eT> result(n_rows, n_cols);
 
-	for(uword col = 0; col < n_cols; ++col)
-		for(uword row = 0; row < n_rows; ++row) { result.at(row, col) = pa.at(row, col) / pb.at(row, col); }
+	for(uword col = 0; col < n_cols; ++col) for(uword row = 0; row < n_rows; ++row) { result.at(row, col) = pa.at(row, col) / pb.at(row, col); }
 
 	return result;
 }

@@ -30,12 +30,12 @@ bool op_any::any_vec_helper(const Base<typename T1::elem_type, T1>& X) {
 		typename Proxy<T1>::ea_type Pea = P.get_ea();
 
 		for(uword i = 0; i < n_elem; ++i) { if(Pea[i] != eT(0)) { return true; } }
-	} else {
+	}
+	else {
 		const uword n_rows = P.get_n_rows();
 		const uword n_cols = P.get_n_cols();
 
-		for(uword col = 0; col < n_cols; ++col)
-			for(uword row = 0; row < n_rows; ++row) { if(P.at(row, col) != eT(0)) { return true; } }
+		for(uword col = 0; col < n_cols; ++col) for(uword row = 0; row < n_rows; ++row) { if(P.at(row, col) != eT(0)) { return true; } }
 	}
 
 	return false;
@@ -48,7 +48,8 @@ bool op_any::any_vec_helper(const subview<eT>& X) {
 	const uword X_n_rows = X.n_rows;
 	const uword X_n_cols = X.n_cols;
 
-	if(X_n_rows == 1) { for(uword col = 0; col < X_n_cols; ++col) { if(X.at(0, col) != eT(0)) { return true; } } } else {
+	if(X_n_rows == 1) { for(uword col = 0; col < X_n_cols; ++col) { if(X.at(0, col) != eT(0)) { return true; } } }
+	else {
 		for(uword col = 0; col < X_n_cols; ++col) {
 			const eT* X_colmem = X.colptr(col);
 
@@ -91,9 +92,19 @@ bool op_any::any_vec_helper
 		for(uword i = 0; i < n_elem; ++i) {
 			const eT tmp = Pea[i];
 
-			if(is_same_type<op_type, op_rel_lt_pre>::yes) { if(val < tmp) { return true; } } else if(is_same_type<op_type, op_rel_lt_post>::yes) { if(tmp < val) { return true; } } else if(is_same_type<op_type, op_rel_gt_pre>::yes) { if(val > tmp) { return true; } } else if(is_same_type<op_type, op_rel_gt_post>::yes) { if(tmp > val) { return true; } } else if(is_same_type<op_type, op_rel_lteq_pre>::yes) { if(val <= tmp) { return true; } } else if(is_same_type<op_type, op_rel_lteq_post>::yes) { if(tmp <= val) { return true; } } else if(is_same_type<op_type, op_rel_gteq_pre>::yes) { if(val >= tmp) { return true; } } else if(is_same_type<op_type, op_rel_gteq_post>::yes) { if(tmp >= val) { return true; } } else if(is_same_type<op_type, op_rel_eq>::yes) { if(tmp == val) { return true; } } else if(is_same_type<op_type, op_rel_noteq>::yes) { if(tmp != val) { return true; } }
+			if(is_same_type<op_type, op_rel_lt_pre>::yes) { if(val < tmp) { return true; } }
+			else if(is_same_type<op_type, op_rel_lt_post>::yes) { if(tmp < val) { return true; } }
+			else if(is_same_type<op_type, op_rel_gt_pre>::yes) { if(val > tmp) { return true; } }
+			else if(is_same_type<op_type, op_rel_gt_post>::yes) { if(tmp > val) { return true; } }
+			else if(is_same_type<op_type, op_rel_lteq_pre>::yes) { if(val <= tmp) { return true; } }
+			else if(is_same_type<op_type, op_rel_lteq_post>::yes) { if(tmp <= val) { return true; } }
+			else if(is_same_type<op_type, op_rel_gteq_pre>::yes) { if(val >= tmp) { return true; } }
+			else if(is_same_type<op_type, op_rel_gteq_post>::yes) { if(tmp >= val) { return true; } }
+			else if(is_same_type<op_type, op_rel_eq>::yes) { if(tmp == val) { return true; } }
+			else if(is_same_type<op_type, op_rel_noteq>::yes) { if(tmp != val) { return true; } }
 		}
-	} else {
+	}
+	else {
 		const uword n_rows = P.get_n_rows();
 		const uword n_cols = P.get_n_cols();
 
@@ -101,7 +112,16 @@ bool op_any::any_vec_helper
 			for(uword row = 0; row < n_rows; ++row) {
 				const eT tmp = P.at(row, col);
 
-				if(is_same_type<op_type, op_rel_lt_pre>::yes) { if(val < tmp) { return true; } } else if(is_same_type<op_type, op_rel_lt_post>::yes) { if(tmp < val) { return true; } } else if(is_same_type<op_type, op_rel_gt_pre>::yes) { if(val > tmp) { return true; } } else if(is_same_type<op_type, op_rel_gt_post>::yes) { if(tmp > val) { return true; } } else if(is_same_type<op_type, op_rel_lteq_pre>::yes) { if(val <= tmp) { return true; } } else if(is_same_type<op_type, op_rel_lteq_post>::yes) { if(tmp <= val) { return true; } } else if(is_same_type<op_type, op_rel_gteq_pre>::yes) { if(val >= tmp) { return true; } } else if(is_same_type<op_type, op_rel_gteq_post>::yes) { if(tmp >= val) { return true; } } else if(is_same_type<op_type, op_rel_eq>::yes) { if(tmp == val) { return true; } } else if(is_same_type<op_type, op_rel_noteq>::yes) { if(tmp != val) { return true; } }
+				if(is_same_type<op_type, op_rel_lt_pre>::yes) { if(val < tmp) { return true; } }
+				else if(is_same_type<op_type, op_rel_lt_post>::yes) { if(tmp < val) { return true; } }
+				else if(is_same_type<op_type, op_rel_gt_pre>::yes) { if(val > tmp) { return true; } }
+				else if(is_same_type<op_type, op_rel_gt_post>::yes) { if(tmp > val) { return true; } }
+				else if(is_same_type<op_type, op_rel_lteq_pre>::yes) { if(val <= tmp) { return true; } }
+				else if(is_same_type<op_type, op_rel_lteq_post>::yes) { if(tmp <= val) { return true; } }
+				else if(is_same_type<op_type, op_rel_gteq_pre>::yes) { if(val >= tmp) { return true; } }
+				else if(is_same_type<op_type, op_rel_gteq_post>::yes) { if(tmp >= val) { return true; } }
+				else if(is_same_type<op_type, op_rel_eq>::yes) { if(tmp == val) { return true; } }
+				else if(is_same_type<op_type, op_rel_noteq>::yes) { if(tmp != val) { return true; } }
 			}
 	}
 
@@ -144,9 +164,17 @@ bool op_any::any_vec_helper
 			const eT1 tmp1 = PA[i];
 			const eT2 tmp2 = PB[i];
 
-			if(is_same_type<glue_type, glue_rel_lt>::yes) { if(tmp1 < tmp2) { return true; } } else if(is_same_type<glue_type, glue_rel_gt>::yes) { if(tmp1 > tmp2) { return true; } } else if(is_same_type<glue_type, glue_rel_lteq>::yes) { if(tmp1 <= tmp2) { return true; } } else if(is_same_type<glue_type, glue_rel_gteq>::yes) { if(tmp1 >= tmp2) { return true; } } else if(is_same_type<glue_type, glue_rel_eq>::yes) { if(tmp1 == tmp2) { return true; } } else if(is_same_type<glue_type, glue_rel_noteq>::yes) { if(tmp1 != tmp2) { return true; } } else if(is_same_type<glue_type, glue_rel_and>::yes) { if(tmp1 && tmp2) { return true; } } else if(is_same_type<glue_type, glue_rel_or>::yes) { if(tmp1 || tmp2) { return true; } }
+			if(is_same_type<glue_type, glue_rel_lt>::yes) { if(tmp1 < tmp2) { return true; } }
+			else if(is_same_type<glue_type, glue_rel_gt>::yes) { if(tmp1 > tmp2) { return true; } }
+			else if(is_same_type<glue_type, glue_rel_lteq>::yes) { if(tmp1 <= tmp2) { return true; } }
+			else if(is_same_type<glue_type, glue_rel_gteq>::yes) { if(tmp1 >= tmp2) { return true; } }
+			else if(is_same_type<glue_type, glue_rel_eq>::yes) { if(tmp1 == tmp2) { return true; } }
+			else if(is_same_type<glue_type, glue_rel_noteq>::yes) { if(tmp1 != tmp2) { return true; } }
+			else if(is_same_type<glue_type, glue_rel_and>::yes) { if(tmp1 && tmp2) { return true; } }
+			else if(is_same_type<glue_type, glue_rel_or>::yes) { if(tmp1 || tmp2) { return true; } }
 		}
-	} else {
+	}
+	else {
 		const uword n_rows = A.get_n_rows();
 		const uword n_cols = A.get_n_cols();
 
@@ -155,7 +183,14 @@ bool op_any::any_vec_helper
 				const eT1 tmp1 = A.at(row, col);
 				const eT2 tmp2 = B.at(row, col);
 
-				if(is_same_type<glue_type, glue_rel_lt>::yes) { if(tmp1 < tmp2) { return true; } } else if(is_same_type<glue_type, glue_rel_gt>::yes) { if(tmp1 > tmp2) { return true; } } else if(is_same_type<glue_type, glue_rel_lteq>::yes) { if(tmp1 <= tmp2) { return true; } } else if(is_same_type<glue_type, glue_rel_gteq>::yes) { if(tmp1 >= tmp2) { return true; } } else if(is_same_type<glue_type, glue_rel_eq>::yes) { if(tmp1 == tmp2) { return true; } } else if(is_same_type<glue_type, glue_rel_noteq>::yes) { if(tmp1 != tmp2) { return true; } } else if(is_same_type<glue_type, glue_rel_and>::yes) { if(tmp1 && tmp2) { return true; } } else if(is_same_type<glue_type, glue_rel_or>::yes) { if(tmp1 || tmp2) { return true; } }
+				if(is_same_type<glue_type, glue_rel_lt>::yes) { if(tmp1 < tmp2) { return true; } }
+				else if(is_same_type<glue_type, glue_rel_gt>::yes) { if(tmp1 > tmp2) { return true; } }
+				else if(is_same_type<glue_type, glue_rel_lteq>::yes) { if(tmp1 <= tmp2) { return true; } }
+				else if(is_same_type<glue_type, glue_rel_gteq>::yes) { if(tmp1 >= tmp2) { return true; } }
+				else if(is_same_type<glue_type, glue_rel_eq>::yes) { if(tmp1 == tmp2) { return true; } }
+				else if(is_same_type<glue_type, glue_rel_noteq>::yes) { if(tmp1 != tmp2) { return true; } }
+				else if(is_same_type<glue_type, glue_rel_and>::yes) { if(tmp1 && tmp2) { return true; } }
+				else if(is_same_type<glue_type, glue_rel_or>::yes) { if(tmp1 || tmp2) { return true; } }
 			}
 	}
 
@@ -197,7 +232,8 @@ void op_any::apply_helper(Mat<uword>& out, const Proxy<T1>& P, const uword dim) 
 					}
 				}
 			}
-		} else {
+		}
+		else {
 			for(uword col = 0; col < n_cols; ++col) {
 				for(uword row = 0; row < n_rows; ++row) {
 					if(P.at(row, col) != eT(0)) {
@@ -207,7 +243,8 @@ void op_any::apply_helper(Mat<uword>& out, const Proxy<T1>& P, const uword dim) 
 				}
 			}
 		}
-	} else {
+	}
+	else {
 		out.zeros(n_rows, 1);
 
 		uword* out_mem = out.memptr();
@@ -220,7 +257,8 @@ void op_any::apply_helper(Mat<uword>& out, const Proxy<T1>& P, const uword dim) 
 
 				for(uword row = 0; row < n_rows; ++row) { if(colmem[row] != eT(0)) { out_mem[row] = uword(1); } }
 			}
-		} else { for(uword col = 0; col < n_cols; ++col) { for(uword row = 0; row < n_rows; ++row) { if(P.at(row, col) != eT(0)) { out_mem[row] = uword(1); } } } }
+		}
+		else { for(uword col = 0; col < n_cols; ++col) { for(uword row = 0; row < n_rows; ++row) { if(P.at(row, col) != eT(0)) { out_mem[row] = uword(1); } } } }
 	}
 }
 
@@ -232,7 +270,8 @@ void op_any::apply(Mat<uword>& out, const mtOp<uword, T1, op_any>& X) {
 
 	const Proxy<T1> P(X.m);
 
-	if(P.is_alias(out) == false) { op_any::apply_helper(out, P, dim); } else {
+	if(P.is_alias(out) == false) { op_any::apply_helper(out, P, dim); }
+	else {
 		Mat<uword> out2;
 
 		op_any::apply_helper(out2, P, dim);

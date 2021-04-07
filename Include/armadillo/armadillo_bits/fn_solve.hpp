@@ -42,7 +42,14 @@ typename enable_if2<is_supported_blas_type<typename T1::elem_type>::value, bool>
 ) {
 	arma_extra_debug_sigprint();
 
-	return glue_solve_gen::apply(out, A.get_ref(), B.get_ref(), opts.flags);
+	const bool status = glue_solve_gen::apply(out, A.get_ref(), B.get_ref(), opts.flags);
+
+	if(status == false) {
+		out.soft_reset();
+		arma_debug_warn_level(3, "solve(): solution not found");
+	}
+
+	return status;
 }
 
 //
@@ -97,7 +104,14 @@ typename enable_if2<is_supported_blas_type<typename T1::elem_type>::value, bool>
 	if(A.aux_uword_a == 0) { flags |= solve_opts::flag_triu; }
 	if(A.aux_uword_a == 1) { flags |= solve_opts::flag_tril; }
 
-	return glue_solve_tri_default::apply(out, A.m, B.get_ref(), flags);
+	const bool status = glue_solve_tri_default::apply(out, A.m, B.get_ref(), flags);
+
+	if(status == false) {
+		out.soft_reset();
+		arma_debug_warn_level(3, "solve(): solution not found");
+	}
+
+	return status;
 }
 
 template<typename T1, typename T2> inline
@@ -115,7 +129,14 @@ typename enable_if2<is_supported_blas_type<typename T1::elem_type>::value, bool>
 	if(A.aux_uword_a == 0) { flags |= solve_opts::flag_triu; }
 	if(A.aux_uword_a == 1) { flags |= solve_opts::flag_tril; }
 
-	return glue_solve_tri::apply(out, A.m, B.get_ref(), flags);
+	const bool status = glue_solve_tri::apply(out, A.m, B.get_ref(), flags);
+
+	if(status == false) {
+		out.soft_reset();
+		arma_debug_warn_level(3, "solve(): solution not found");
+	}
+
+	return status;
 }
 
 //! @}

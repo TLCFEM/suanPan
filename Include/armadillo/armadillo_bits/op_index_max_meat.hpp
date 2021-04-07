@@ -28,7 +28,8 @@ void op_index_max::apply(Mat<uword>& out, const mtOp<uword, T1, op_index_max>& i
 	const quasi_unwrap<T1> U(in.m);
 	const Mat<eT>& X = U.M;
 
-	if(U.is_alias(out) == false) { op_index_max::apply_noalias(out, X, dim); } else {
+	if(U.is_alias(out) == false) { op_index_max::apply_noalias(out, X, dim); }
+	else {
 		Mat<uword> tmp;
 
 		op_index_max::apply_noalias(tmp, X, dim);
@@ -56,7 +57,8 @@ void op_index_max::apply_noalias(Mat<uword>& out, const Mat<eT>& X, const uword 
 		uword* out_mem = out.memptr();
 
 		for(uword col = 0; col < X_n_cols; ++col) { op_max::direct_max(X.colptr(col), X_n_rows, out_mem[col]); }
-	} else if(dim == 1) {
+	}
+	else if(dim == 1) {
 		arma_extra_debug_print("op_index_max::apply(): dim = 1");
 
 		out.zeros(X_n_rows, (X_n_cols > 0) ? 1 : 0);
@@ -72,15 +74,16 @@ void op_index_max::apply_noalias(Mat<uword>& out, const Mat<eT>& X, const uword 
 		if(is_cx<eT>::yes) {
 			const eT* col_mem = X.colptr(0);
 
-			for(uword row = 0; row < X_n_rows; ++row) { tmp_mem[row] = std::abs(col_mem[row]); }
-		} else { arrayops::copy(tmp_mem, (T*)(X.colptr(0)), X_n_rows); }
+			for(uword row = 0; row < X_n_rows; ++row) { tmp_mem[row] = eop_aux::arma_abs(col_mem[row]); }
+		}
+		else { arrayops::copy(tmp_mem, (T*)(X.colptr(0)), X_n_rows); }
 
 		for(uword col = 1; col < X_n_cols; ++col) {
 			const eT* col_mem = X.colptr(col);
 
 			for(uword row = 0; row < X_n_rows; ++row) {
 				T& max_val = tmp_mem[row];
-				T col_val = (is_cx<eT>::yes) ? T(std::abs(col_mem[row])) : T(access::tmp_real(col_mem[row]));
+				T col_val = (is_cx<eT>::yes) ? T(eop_aux::arma_abs(col_mem[row])) : T(access::tmp_real(col_mem[row]));
 
 				if(max_val < col_val) {
 					max_val = col_val;
@@ -101,7 +104,8 @@ void op_index_max::apply(Cube<uword>& out, const mtOpCube<uword, T1, op_index_ma
 
 	const unwrap_cube<T1> U(in.m);
 
-	if(U.is_alias(out) == false) { op_index_max::apply_noalias(out, U.M, dim); } else {
+	if(U.is_alias(out) == false) { op_index_max::apply_noalias(out, U.M, dim); }
+	else {
 		Cube<uword> tmp;
 
 		op_index_max::apply_noalias(tmp, U.M, dim);
@@ -131,7 +135,8 @@ void op_index_max::apply_noalias(Cube<uword>& out, const Cube<eT>& X, const uwor
 
 			for(uword col = 0; col < X_n_cols; ++col) { op_max::direct_max(X.slice_colptr(slice, col), X_n_rows, out_mem[col]); }
 		}
-	} else if(dim == 1) {
+	}
+	else if(dim == 1) {
 		arma_extra_debug_print("op_index_max::apply(): dim = 1");
 
 		out.zeros(X_n_rows, (X_n_cols > 0) ? 1 : 0, X_n_slices);
@@ -160,7 +165,8 @@ void op_index_max::apply_noalias(Cube<uword>& out, const Cube<eT>& X, const uwor
 				}
 			}
 		}
-	} else if(dim == 2) {
+	}
+	else if(dim == 2) {
 		arma_extra_debug_print("op_index_max::apply(): dim = 2");
 
 		out.zeros(X_n_rows, X_n_cols, (X_n_slices > 0) ? 1 : 0);
@@ -212,7 +218,8 @@ void op_index_max::apply_noalias(Cube<uword>& out, const Cube<eT>& X, const uwor
 
 			for(uword col = 0; col < X_n_cols; ++col) { op_max::direct_max(X.slice_colptr(slice, col), X_n_rows, out_mem[col]); }
 		}
-	} else if(dim == 1) {
+	}
+	else if(dim == 1) {
 		arma_extra_debug_print("op_index_max::apply(): dim = 1");
 
 		out.zeros(X_n_rows, (X_n_cols > 0) ? 1 : 0, X_n_slices);
@@ -243,7 +250,8 @@ void op_index_max::apply_noalias(Cube<uword>& out, const Cube<eT>& X, const uwor
 				}
 			}
 		}
-	} else if(dim == 2) {
+	}
+	else if(dim == 2) {
 		arma_extra_debug_print("op_index_max::apply(): dim = 2");
 
 		out.zeros(X_n_rows, X_n_cols, (X_n_slices > 0) ? 1 : 0);
@@ -300,7 +308,8 @@ void op_index_max::apply(Mat<uword>& out, const SpBase<typename T1::elem_type, T
 		uword* out_mem = out.memptr();
 
 		for(uword col = 0; col < X_n_cols; ++col) { out_mem[col] = X.col(col).index_max(); }
-	} else if(dim == 1) {
+	}
+	else if(dim == 1) {
 		arma_extra_debug_print("op_index_max::apply(): dim = 1");
 
 		out.set_size(X_n_rows, (X_n_cols > 0) ? 1 : 0);

@@ -81,7 +81,8 @@ public:
             }
           }
 #endif
-			} else {
+			}
+			else {
 				for(uword row_A = 0; row_A < A_n_rows; ++row_A) {
 					tmp.copy_row(A, row_A);
 
@@ -91,11 +92,15 @@ public:
 						out_eT acc = out_eT(0);
 						for(uword i = 0; i < B_n_rows; ++i) { acc += upgrade_val<in_eT1, in_eT2>::apply(A_rowdata[i]) * upgrade_val<in_eT1, in_eT2>::apply(B_coldata[i]); }
 
-						if((use_alpha == false) && (use_beta == false)) { C.at(row_A, col_B) = acc; } else if((use_alpha == true) && (use_beta == false)) { C.at(row_A, col_B) = alpha * acc; } else if((use_alpha == false) && (use_beta == true)) { C.at(row_A, col_B) = acc + beta * C.at(row_A, col_B); } else if((use_alpha == true) && (use_beta == true)) { C.at(row_A, col_B) = alpha * acc + beta * C.at(row_A, col_B); }
+						if((use_alpha == false) && (use_beta == false)) { C.at(row_A, col_B) = acc; }
+						else if((use_alpha == true) && (use_beta == false)) { C.at(row_A, col_B) = alpha * acc; }
+						else if((use_alpha == false) && (use_beta == true)) { C.at(row_A, col_B) = acc + beta * C.at(row_A, col_B); }
+						else if((use_alpha == true) && (use_beta == true)) { C.at(row_A, col_B) = alpha * acc + beta * C.at(row_A, col_B); }
 					}
 				}
 			}
-		} else if((do_trans_A == true) && (do_trans_B == false)) {
+		}
+		else if((do_trans_A == true) && (do_trans_B == false)) {
 #if defined(ARMA_USE_OPENMP)
       const bool use_mp = (B_n_cols >= 2) && (B.n_elem >= 8192) && (mp_thread_limit::in_parallel() == false);
 #else
@@ -132,7 +137,8 @@ public:
             }
           }
 #endif
-			} else {
+			}
+			else {
 				for(uword col_A = 0; col_A < A_n_cols; ++col_A) {
 					// col_A is interpreted as row_A when storing the results in matrix C
 
@@ -144,17 +150,22 @@ public:
 						out_eT acc = out_eT(0);
 						for(uword i = 0; i < B_n_rows; ++i) { acc += upgrade_val<in_eT1, in_eT2>::apply(A_coldata[i]) * upgrade_val<in_eT1, in_eT2>::apply(B_coldata[i]); }
 
-						if((use_alpha == false) && (use_beta == false)) { C.at(col_A, col_B) = acc; } else if((use_alpha == true) && (use_beta == false)) { C.at(col_A, col_B) = alpha * acc; } else if((use_alpha == false) && (use_beta == true)) { C.at(col_A, col_B) = acc + beta * C.at(col_A, col_B); } else if((use_alpha == true) && (use_beta == true)) { C.at(col_A, col_B) = alpha * acc + beta * C.at(col_A, col_B); }
+						if((use_alpha == false) && (use_beta == false)) { C.at(col_A, col_B) = acc; }
+						else if((use_alpha == true) && (use_beta == false)) { C.at(col_A, col_B) = alpha * acc; }
+						else if((use_alpha == false) && (use_beta == true)) { C.at(col_A, col_B) = acc + beta * C.at(col_A, col_B); }
+						else if((use_alpha == true) && (use_beta == true)) { C.at(col_A, col_B) = alpha * acc + beta * C.at(col_A, col_B); }
 					}
 				}
 			}
-		} else if((do_trans_A == false) && (do_trans_B == true)) {
+		}
+		else if((do_trans_A == false) && (do_trans_B == true)) {
 			Mat<in_eT2> B_tmp;
 
 			op_strans::apply_mat_noalias(B_tmp, B);
 
 			gemm_mixed_large<false, false, use_alpha, use_beta>::apply(C, A, B_tmp, alpha, beta);
-		} else if((do_trans_A == true) && (do_trans_B == true)) {
+		}
+		else if((do_trans_A == true) && (do_trans_B == true)) {
 			// mat B_tmp = trans(B);
 			// dgemm_arma<true, false,  use_alpha, use_beta>::apply(C, A, B_tmp, alpha, beta);
 
@@ -173,7 +184,10 @@ public:
 					out_eT acc = out_eT(0);
 					for(uword i = 0; i < A_n_rows; ++i) { acc += upgrade_val<in_eT1, in_eT2>::apply(B_rowdata[i]) * upgrade_val<in_eT1, in_eT2>::apply(A_coldata[i]); }
 
-					if((use_alpha == false) && (use_beta == false)) { C.at(col_A, row_B) = acc; } else if((use_alpha == true) && (use_beta == false)) { C.at(col_A, row_B) = alpha * acc; } else if((use_alpha == false) && (use_beta == true)) { C.at(col_A, row_B) = acc + beta * C.at(col_A, row_B); } else if((use_alpha == true) && (use_beta == true)) { C.at(col_A, row_B) = alpha * acc + beta * C.at(col_A, row_B); }
+					if((use_alpha == false) && (use_beta == false)) { C.at(col_A, row_B) = acc; }
+					else if((use_alpha == true) && (use_beta == false)) { C.at(col_A, row_B) = alpha * acc; }
+					else if((use_alpha == false) && (use_beta == true)) { C.at(col_A, row_B) = acc + beta * C.at(col_A, row_B); }
+					else if((use_alpha == true) && (use_beta == true)) { C.at(col_A, row_B) = alpha * acc + beta * C.at(col_A, row_B); }
 				}
 			}
 		}
@@ -216,7 +230,8 @@ public:
 			const Mat<in_eT2>& BB = (predo_trans_B == false) ? B : tmp_B;
 
 			gemm_mixed_large<((predo_trans_A) ? false : do_trans_A), ((predo_trans_B) ? false : do_trans_B), use_alpha, use_beta>::apply(C, AA, BB, alpha, beta);
-		} else { gemm_mixed_large<do_trans_A, do_trans_B, use_alpha, use_beta>::apply(C, A, B, alpha, beta); }
+		}
+		else { gemm_mixed_large<do_trans_A, do_trans_B, use_alpha, use_beta>::apply(C, A, B, alpha, beta); }
 	}
 
 };

@@ -32,7 +32,7 @@ typename enable_if2<is_supported_blas_type<typename T1::pod_type>::value, Col<st
 
 	arma_debug_check(((sig != 'n') && (sig != 'b')), "eig_gen(): unknown option");
 
-	if(auxlib::crippled_lapack(expr) && (sig == 'b')) { arma_debug_warn("eig_gen(): 'balance' option ignored due to linking with crippled lapack"); }
+	if(auxlib::crippled_lapack(expr) && (sig == 'b')) { arma_debug_warn_level(1, "eig_gen(): 'balance' option ignored due to linking with crippled lapack"); }
 
 	Col<eT> eigvals;
 	Mat<eT> eigvecs;
@@ -63,7 +63,7 @@ typename enable_if2<is_supported_blas_type<typename T1::pod_type>::value, bool>:
 
 	arma_debug_check(((sig != 'n') && (sig != 'b')), "eig_gen(): unknown option");
 
-	if(auxlib::crippled_lapack(expr) && (sig == 'b')) { arma_debug_warn("eig_gen(): 'balance' option ignored due to linking with crippled lapack"); }
+	if(auxlib::crippled_lapack(expr) && (sig == 'b')) { arma_debug_warn_level(1, "eig_gen(): 'balance' option ignored due to linking with crippled lapack"); }
 
 	Mat<eT> eigvecs;
 
@@ -71,7 +71,7 @@ typename enable_if2<is_supported_blas_type<typename T1::pod_type>::value, bool>:
 
 	if(status == false) {
 		eigvals.soft_reset();
-		arma_debug_warn("eig_gen(): decomposition failed");
+		arma_debug_warn_level(3, "eig_gen(): decomposition failed");
 	}
 
 	return status;
@@ -93,14 +93,14 @@ typename enable_if2<is_supported_blas_type<typename T1::pod_type>::value, bool>:
 
 	arma_debug_check(((sig != 'n') && (sig != 'b')), "eig_gen(): unknown option");
 
-	if(auxlib::crippled_lapack(expr) && (sig == 'b')) { arma_debug_warn("eig_gen(): 'balance' option ignored due to linking with crippled lapack"); }
+	if(auxlib::crippled_lapack(expr) && (sig == 'b')) { arma_debug_warn_level(1, "eig_gen(): 'balance' option ignored due to linking with crippled lapack"); }
 
 	const bool status = (sig == 'b') ? auxlib::eig_gen_balance(eigvals, eigvecs, true, expr.get_ref()) : auxlib::eig_gen(eigvals, eigvecs, true, expr.get_ref());
 
 	if(status == false) {
 		eigvals.soft_reset();
 		eigvecs.soft_reset();
-		arma_debug_warn("eig_gen(): decomposition failed");
+		arma_debug_warn_level(3, "eig_gen(): decomposition failed");
 	}
 
 	return status;
@@ -125,7 +125,7 @@ typename enable_if2<is_supported_blas_type<typename T1::pod_type>::value, bool>:
 
 	arma_debug_check(((sig != 'n') && (sig != 'b')), "eig_gen(): unknown option");
 
-	if(auxlib::crippled_lapack(expr) && (sig == 'b')) { arma_debug_warn("eig_gen(): 'balance' option ignored due to linking with crippled lapack"); }
+	if(auxlib::crippled_lapack(expr) && (sig == 'b')) { arma_debug_warn_level(1, "eig_gen(): 'balance' option ignored due to linking with crippled lapack"); }
 
 	const bool status = (sig == 'b') ? auxlib::eig_gen_twosided_balance(eigvals, leigvecs, reigvecs, expr.get_ref()) : auxlib::eig_gen_twosided(eigvals, leigvecs, reigvecs, expr.get_ref());
 
@@ -133,7 +133,7 @@ typename enable_if2<is_supported_blas_type<typename T1::pod_type>::value, bool>:
 		eigvals.soft_reset();
 		leigvecs.soft_reset();
 		reigvecs.soft_reset();
-		arma_debug_warn("eig_gen(): decomposition failed");
+		arma_debug_warn_level(3, "eig_gen(): decomposition failed");
 	}
 
 	return status;

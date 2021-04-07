@@ -28,12 +28,14 @@ void op_reshape::apply_unwrap(Mat<eT>& out, const Mat<eT>& A, const uword in_n_r
 		if(is_alias == false) {
 			out.set_size(in_n_rows, in_n_cols);
 			arrayops::copy(out.memptr(), A.memptr(), out.n_elem);
-		} else // &out == &A, i.e. inplace reshape
+		}
+		else // &out == &A, i.e. inplace reshape
 		{
 			out.set_size(in_n_rows, in_n_cols);
 			// set_size() doesn't destroy data as long as the number of elements in the matrix remains the same
 		}
-	} else {
+	}
+	else {
 		const unwrap_check<Mat<eT>> B_tmp(A, is_alias);
 		const Mat<eT>& B = B_tmp.M;
 
@@ -66,7 +68,8 @@ void op_reshape::apply_proxy(Mat<typename T1::elem_type>& out, const Proxy<T1>& 
 			typename Proxy<T1>::ea_type Pea = P.get_ea();
 
 			for(uword i = 0; i < in_n_elem; ++i) { out_mem[i] = Pea[i]; }
-		} else {
+		}
+		else {
 			const uword P_n_rows = P.get_n_rows();
 			const uword P_n_cols = P.get_n_cols();
 
@@ -89,14 +92,16 @@ void op_reshape::apply_proxy(Mat<typename T1::elem_type>& out, const Proxy<T1>& 
 				}
 			}
 		}
-	} else {
+	}
+	else {
 		const uword n_elem_to_copy = (std::min)(P.get_n_elem(), in_n_elem);
 
 		if(Proxy<T1>::use_at == false) {
 			typename Proxy<T1>::ea_type Pea = P.get_ea();
 
 			for(uword i = 0; i < n_elem_to_copy; ++i) { out_mem[i] = Pea[i]; }
-		} else {
+		}
+		else {
 			uword i = 0;
 
 			const uword P_n_rows = P.get_n_rows();
@@ -132,7 +137,8 @@ void op_reshape::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_reshape
 		const unwrap<T1> U(in.m);
 
 		op_reshape::apply_unwrap(out, U.M, in_n_rows, in_n_cols);
-	} else {
+	}
+	else {
 		const Proxy<T1> P(in.m);
 
 		if(P.is_alias(out)) {
@@ -141,7 +147,8 @@ void op_reshape::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_reshape
 			op_reshape::apply_proxy(tmp, P, in_n_rows, in_n_cols);
 
 			out.steal_mem(tmp);
-		} else { op_reshape::apply_proxy(out, P, in_n_rows, in_n_cols); }
+		}
+		else { op_reshape::apply_proxy(out, P, in_n_rows, in_n_cols); }
 	}
 }
 
@@ -164,12 +171,14 @@ void op_reshape::apply(Cube<typename T1::elem_type>& out, const OpCube<T1, op_re
 		if(&out != &A) {
 			out.set_size(in_n_rows, in_n_cols, in_n_slices);
 			arrayops::copy(out.memptr(), A.memptr(), out.n_elem);
-		} else // &out == &A, i.e. inplace resize
+		}
+		else // &out == &A, i.e. inplace resize
 		{
 			out.set_size(in_n_rows, in_n_cols, in_n_slices);
 			// set_size() doesn't destroy data as long as the number of elements in the cube remains the same
 		}
-	} else {
+	}
+	else {
 		const unwrap_cube_check<Cube<eT>> B_tmp(A, out);
 		const Cube<eT>& B = B_tmp.M;
 
@@ -195,7 +204,8 @@ void op_reshape_old::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_res
 	const uword in_n_cols = in.aux_uword_b;
 	const uword in_dim = in.aux_uword_c;
 
-	if(in_dim == 0) { out = reshape(in.m, in_n_rows, in_n_cols); } else if(in_dim == 1) {
+	if(in_dim == 0) { out = reshape(in.m, in_n_rows, in_n_cols); }
+	else if(in_dim == 1) {
 		const unwrap<T1> U(in.m);
 
 		out = reshape(strans(U.M), in_n_rows, in_n_cols);

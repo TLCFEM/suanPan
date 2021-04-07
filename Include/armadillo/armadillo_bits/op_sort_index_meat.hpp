@@ -40,7 +40,8 @@ bool arma_sort_index_helper(Mat<uword>& out, const Proxy<T1>& P, const uword sor
 			packet_vec[i].val = val;
 			packet_vec[i].index = i;
 		}
-	} else {
+	}
+	else {
 		const uword n_rows = P.get_n_rows();
 		const uword n_cols = P.get_n_cols();
 
@@ -67,13 +68,16 @@ bool arma_sort_index_helper(Mat<uword>& out, const Proxy<T1>& P, const uword sor
 
 		arma_sort_index_helper_ascend<eT> comparator;
 
-		if(sort_stable == false) { std::sort(packet_vec.begin(), packet_vec.end(), comparator); } else { std::stable_sort(packet_vec.begin(), packet_vec.end(), comparator); }
-	} else {
+		if(sort_stable == false) { std::sort(packet_vec.begin(), packet_vec.end(), comparator); }
+		else { std::stable_sort(packet_vec.begin(), packet_vec.end(), comparator); }
+	}
+	else {
 		// descend
 
 		arma_sort_index_helper_descend<eT> comparator;
 
-		if(sort_stable == false) { std::sort(packet_vec.begin(), packet_vec.end(), comparator); } else { std::stable_sort(packet_vec.begin(), packet_vec.end(), comparator); }
+		if(sort_stable == false) { std::sort(packet_vec.begin(), packet_vec.end(), comparator); }
+		else { std::stable_sort(packet_vec.begin(), packet_vec.end(), comparator); }
 	}
 
 	uword* out_mem = out.memptr();
@@ -111,7 +115,8 @@ void op_sort_index::apply(Mat<uword>& out, const mtOp<uword, T1, op_sort_index>&
 		all_non_nan = op_sort_index::apply_noalias(out2, P, sort_type);
 
 		out.steal_mem(out2);
-	} else { all_non_nan = op_sort_index::apply_noalias(out, P, sort_type); }
+	}
+	else { all_non_nan = op_sort_index::apply_noalias(out, P, sort_type); }
 
 	arma_debug_check((all_non_nan == false), "sort_index(): detected NaN");
 }
@@ -144,7 +149,8 @@ void op_stable_sort_index::apply(Mat<uword>& out, const mtOp<uword, T1, op_stabl
 		all_non_nan = op_stable_sort_index::apply_noalias(out2, P, sort_type);
 
 		out.steal_mem(out2);
-	} else { all_non_nan = op_stable_sort_index::apply_noalias(out, P, sort_type); }
+	}
+	else { all_non_nan = op_stable_sort_index::apply_noalias(out, P, sort_type); }
 
 	arma_debug_check((all_non_nan == false), "stable_sort_index(): detected NaN");
 }

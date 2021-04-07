@@ -30,7 +30,8 @@ void spop_repmat::apply(SpMat<typename T1::elem_type>& out, const SpOp<T1, spop_
 		spop_repmat::apply_noalias(tmp, X.aux_uword_a, X.aux_uword_b, U.M);
 
 		out.steal_mem(tmp);
-	} else { spop_repmat::apply_noalias(out, X.aux_uword_a, X.aux_uword_b, U.M); }
+	}
+	else { spop_repmat::apply_noalias(out, X.aux_uword_a, X.aux_uword_b, U.M); }
 }
 
 template<typename eT> inline

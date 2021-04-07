@@ -297,7 +297,7 @@ eT MapMat<eT>::operator[](const uword index) const {
 template<typename eT> arma_inline
 arma_warn_unused
 MapMat_val<eT> MapMat<eT>::operator()(const uword index) {
-	arma_debug_check((index >= n_elem), "MapMat::operator(): index out of bounds");
+	arma_debug_check_bounds((index >= n_elem), "MapMat::operator(): index out of bounds");
 
 	return MapMat_val<eT>(*this, index);
 }
@@ -305,7 +305,7 @@ MapMat_val<eT> MapMat<eT>::operator()(const uword index) {
 template<typename eT> inline
 arma_warn_unused
 eT MapMat<eT>::operator()(const uword index) const {
-	arma_debug_check((index >= n_elem), "MapMat::operator(): index out of bounds");
+	arma_debug_check_bounds((index >= n_elem), "MapMat::operator(): index out of bounds");
 
 	map_type& map_ref = (*map_ptr);
 
@@ -339,7 +339,7 @@ eT MapMat<eT>::at(const uword in_row, const uword in_col) const {
 template<typename eT> arma_inline
 arma_warn_unused
 MapMat_val<eT> MapMat<eT>::operator()(const uword in_row, const uword in_col) {
-	arma_debug_check(((in_row >= n_rows) || (in_col >= n_cols)), "MapMat::operator(): index out of bounds");
+	arma_debug_check_bounds(((in_row >= n_rows) || (in_col >= n_cols)), "MapMat::operator(): index out of bounds");
 
 	const uword index = (n_rows * in_col) + in_row;
 
@@ -349,7 +349,7 @@ MapMat_val<eT> MapMat<eT>::operator()(const uword in_row, const uword in_col) {
 template<typename eT> inline
 arma_warn_unused
 eT MapMat<eT>::operator()(const uword in_row, const uword in_col) const {
-	arma_debug_check(((in_row >= n_rows) || (in_col >= n_cols)), "MapMat::operator(): index out of bounds");
+	arma_debug_check_bounds(((in_row >= n_rows) || (in_col >= n_cols)), "MapMat::operator(): index out of bounds");
 
 	const uword index = (n_rows * in_col) + in_row;
 
@@ -561,8 +561,10 @@ void MapMat<eT>::set_val(const uword index, const eT& in_val) {
 	if(in_val != eT(0)) {
 		map_type& map_ref = (*map_ptr);
 
-		if((map_ref.empty() == false) && (index > uword(map_ref.crbegin()->first))) { map_ref.emplace_hint(map_ref.cend(), index, in_val); } else { map_ref.operator[](index) = in_val; }
-	} else { (*this).erase_val(index); }
+		if((map_ref.empty() == false) && (index > uword(map_ref.crbegin()->first))) { map_ref.emplace_hint(map_ref.cend(), index, in_val); }
+		else { map_ref.operator[](index) = in_val; }
+	}
+	else { (*this).erase_val(index); }
 }
 
 template<typename eT> inline
@@ -677,7 +679,8 @@ void MapMat_val<eT>::operator*=(const eT in_val) {
 			val *= in_val;
 
 			if(val == eT(0)) { map_ref.erase(it); }
-		} else { map_ref.erase(it); }
+		}
+		else { map_ref.erase(it); }
 	}
 }
 
@@ -696,7 +699,8 @@ void MapMat_val<eT>::operator/=(const eT in_val) {
 		val /= in_val;
 
 		if(val == eT(0)) { map_ref.erase(it); }
-	} else {
+	}
+	else {
 		// silly operation, but included for completness
 
 		const eT val = eT(0) / in_val;
@@ -1068,12 +1072,14 @@ void SpMat_MapMat_val<eT>::mul(const eT in_val) {
 				val *= in_val;
 
 				if(val == eT(0)) { map_ref.erase(it); }
-			} else { map_ref.erase(it); }
+			}
+			else { map_ref.erase(it); }
 
 			s_parent.sync_state = 1;
 
 			access::rw(s_parent.n_nonzero) = m_parent.get_n_nonzero();
-		} else {
+		}
+		else {
 			// element not found, ie. it's zero; zero multiplied by anything is zero, except for nan and inf
 			if(arma_isfinite(in_val) == false) {
 				const eT result = eT(0) * in_val;
@@ -1117,7 +1123,8 @@ void SpMat_MapMat_val<eT>::div(const eT in_val) {
 			s_parent.sync_state = 1;
 
 			access::rw(s_parent.n_nonzero) = m_parent.get_n_nonzero();
-		} else {
+		}
+		else {
 			// element not found, ie. it's zero; zero divided by anything is zero, except for zero and nan
 			if((in_val == eT(0)) || (arma_isnan(in_val))) {
 				const eT result = eT(0) / in_val;

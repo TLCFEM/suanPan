@@ -62,11 +62,13 @@ void glue_hist::apply_noalias(Mat<uword>& out, const Mat<eT>& X, const Mat<eT>& 
 						if(dist < opt_dist) {
 							opt_dist = dist;
 							opt_index = j;
-						} else { break; }
+						}
+						else { break; }
 					}
 
 					out_coldata[opt_index]++;
-				} else {
+				}
+				else {
 					// -inf
 					if(val < eT(0)) { out_coldata[0]++; }
 
@@ -77,7 +79,8 @@ void glue_hist::apply_noalias(Mat<uword>& out, const Mat<eT>& X, const Mat<eT>& 
 				}
 			}
 		}
-	} else if(dim == 1) {
+	}
+	else if(dim == 1) {
 		out.zeros(X_n_rows, C_n_elem);
 
 		if(X_n_rows == 1) {
@@ -99,11 +102,13 @@ void glue_hist::apply_noalias(Mat<uword>& out, const Mat<eT>& X, const Mat<eT>& 
 						if(dist < opt_dist) {
 							opt_dist = dist;
 							opt_index = j;
-						} else { break; }
+						}
+						else { break; }
 					}
 
 					out_mem[opt_index]++;
-				} else {
+				}
+				else {
 					// -inf
 					if(val < eT(0)) { out_mem[0]++; }
 
@@ -113,7 +118,8 @@ void glue_hist::apply_noalias(Mat<uword>& out, const Mat<eT>& X, const Mat<eT>& 
 					// ignore NaN
 				}
 			}
-		} else {
+		}
+		else {
 			for(uword row = 0; row < X_n_rows; ++row) {
 				for(uword col = 0; col < X_n_cols; ++col) {
 					const eT val = X.at(row, col);
@@ -129,11 +135,13 @@ void glue_hist::apply_noalias(Mat<uword>& out, const Mat<eT>& X, const Mat<eT>& 
 							if(dist < opt_dist) {
 								opt_dist = dist;
 								opt_index = j;
-							} else { break; }
+							}
+							else { break; }
 						}
 
 						out.at(row, opt_index)++;
-					} else {
+					}
+					else {
 						// -inf
 						if(val < eT(0)) { out.at(row, 0)++; }
 
@@ -165,7 +173,8 @@ void glue_hist::apply(Mat<uword>& out, const mtGlue<uword, T1, T2, glue_hist>& e
 		glue_hist::apply_noalias(tmp, UA.M, UB.M, dim);
 
 		out.steal_mem(tmp);
-	} else { glue_hist::apply_noalias(out, UA.M, UB.M, dim); }
+	}
+	else { glue_hist::apply_noalias(out, UA.M, UB.M, dim); }
 }
 
 template<typename T1, typename T2> inline
@@ -183,7 +192,8 @@ void glue_hist_default::apply(Mat<uword>& out, const mtGlue<uword, T1, T2, glue_
 		glue_hist::apply_noalias(tmp, UA.M, UB.M, dim);
 
 		out.steal_mem(tmp);
-	} else { glue_hist::apply_noalias(out, UA.M, UB.M, dim); }
+	}
+	else { glue_hist::apply_noalias(out, UA.M, UB.M, dim); }
 }
 
 //! @}

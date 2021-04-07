@@ -22,7 +22,10 @@ void op_roots::apply(Mat<std::complex<typename T1::pod_type>>& out, const mtOp<s
 
 	const bool status = op_roots::apply_direct(out, expr.m);
 
-	if(status == false) { arma_stop_runtime_error("roots(): eigen decomposition failed"); }
+	if(status == false) {
+		out.soft_reset();
+		arma_stop_runtime_error("roots(): eigen decomposition failed");
+	}
 }
 
 template<typename T1> inline
@@ -41,9 +44,8 @@ bool op_roots::apply_direct(Mat<std::complex<typename T1::pod_type>>& out, const
 		status = op_roots::apply_noalias(tmp, U.M);
 
 		out.steal_mem(tmp);
-	} else { status = op_roots::apply_noalias(out, U.M); }
-
-	if(status == false) { out.soft_reset(); }
+	}
+	else { status = op_roots::apply_noalias(out, U.M); }
 
 	return status;
 }
@@ -84,7 +86,8 @@ bool op_roots::apply_noalias(Mat<std::complex<typename get_pod_type<eT>::result>
 			tmp.set_size(1, 1);
 
 			tmp[0] = -Z[1] / Z[0];
-		} else {
+		}
+		else {
 			tmp = diagmat(ones<Col<eT>>(Z.n_elem - 2), -1);
 
 			tmp.row(0) = strans(-Z.subvec(1, Z.n_elem - 1) / Z[0]);
@@ -97,7 +100,8 @@ bool op_roots::apply_noalias(Mat<std::complex<typename get_pod_type<eT>::result>
 		if(status == false) { return false; }
 
 		if(n_tail_zeros > 0) { out.resize(out.n_rows + n_tail_zeros, 1); }
-	} else { out.zeros(n_tail_zeros, 1); }
+	}
+	else { out.zeros(n_tail_zeros, 1); }
 
 	return true;
 }

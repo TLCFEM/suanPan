@@ -13,37 +13,42 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-namespace newarp {
+namespace newarp
+{
 
-	//! Calculate the eigenvalues and eigenvectors of a symmetric tridiagonal matrix.
-	//! This class is a wrapper of the Lapack functions `_steqr`.
-	template<typename eT> class TridiagEigen {
-	private:
+//! Calculate the eigenvalues and eigenvectors of a symmetric tridiagonal matrix.
+//! This class is a wrapper of the Lapack functions `_steqr`.
+template<typename eT>
+class TridiagEigen
+  {
+  private:
 
-		blas_int n;
-		Col<eT> main_diag; // Main diagonal elements of the matrix
-		Col<eT> sub_diag;  // Sub-diagonal elements of the matrix
-		Mat<eT> evecs;     // To store eigenvectors
-		bool computed;
+  blas_int n;
+  Col<eT>  main_diag;  // Main diagonal elements of the matrix
+  Col<eT>  sub_diag;   // Sub-diagonal elements of the matrix
+  Mat<eT>  evecs;      // To store eigenvectors
+  bool     computed;
 
-	public:
 
-		//! Default constructor. Computation can
-		//! be performed later by calling the compute() method.
-		inline TridiagEigen();
+  public:
 
-		//! Constructor to create an object that calculates the eigenvalues
-		//! and eigenvectors of a symmetric tridiagonal matrix `mat_obj`.
-		inline TridiagEigen(const Mat<eT>& mat_obj);
+  //! Default constructor. Computation can
+  //! be performed later by calling the compute() method.
+  inline TridiagEigen();
 
-		//! Compute the eigenvalue decomposition of a symmetric tridiagonal matrix.
-		inline void compute(const Mat<eT>& mat_obj);
+  //! Constructor to create an object that calculates the eigenvalues
+  //! and eigenvectors of a symmetric tridiagonal matrix `mat_obj`.
+  inline TridiagEigen(const Mat<eT>& mat_obj);
 
-		//! Retrieve the eigenvalues.
-		inline Col<eT> eigenvalues();
+  //! Compute the eigenvalue decomposition of a symmetric tridiagonal matrix.
+  inline void compute(const Mat<eT>& mat_obj);
 
-		//! Retrieve the eigenvectors.
-		inline Mat<eT> eigenvectors();
-	};
+  //! Retrieve the eigenvalues.
+  inline Col<eT> eigenvalues();
 
-} // namespace newarp
+  //! Retrieve the eigenvectors.
+  inline Mat<eT> eigenvectors();
+  };
+
+
+}  // namespace newarp

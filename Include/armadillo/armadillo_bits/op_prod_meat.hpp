@@ -30,7 +30,8 @@ void op_prod::apply_noalias(Mat<eT>& out, const Mat<eT>& X, const uword dim) {
 		eT* out_mem = out.memptr();
 
 		for(uword col = 0; col < X_n_cols; ++col) { out_mem[col] = arrayops::product(X.colptr(col), X_n_rows); }
-	} else // traverse across columns (i.e. find the product in each row)
+	}
+	else // traverse across columns (i.e. find the product in each row)
 	{
 		out.ones(X_n_rows, 1);
 
@@ -62,7 +63,8 @@ void op_prod::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_prod>& in)
 		op_prod::apply_noalias(tmp, U.M, dim);
 
 		out.steal_mem(tmp);
-	} else { op_prod::apply_noalias(out, U.M, dim); }
+	}
+	else { op_prod::apply_noalias(out, U.M, dim); }
 }
 
 template<typename eT> inline
@@ -89,7 +91,8 @@ eT op_prod::prod(const subview<eT>& X) {
 		}
 
 		if(i < end_col_p1) { val *= A.at(start_row, i); }
-	} else { for(uword col = 0; col < X_n_cols; ++col) { val *= arrayops::product(X.colptr(col), X_n_rows); } }
+	}
+	else { for(uword col = 0; col < X_n_cols; ++col) { val *= arrayops::product(X.colptr(col), X_n_rows); } }
 
 	return val;
 }
@@ -118,7 +121,8 @@ typename T1::elem_type op_prod::prod(const Base<typename T1::elem_type, T1>& X) 
 		}
 
 		if(i < n_elem) { val *= A[i]; }
-	} else {
+	}
+	else {
 		const uword n_rows = P.get_n_rows();
 		const uword n_cols = P.get_n_cols();
 
@@ -130,7 +134,8 @@ typename T1::elem_type op_prod::prod(const Base<typename T1::elem_type, T1>& X) 
 			}
 
 			if(i < n_cols) { val *= P.at(0, i); }
-		} else {
+		}
+		else {
 			for(uword col = 0; col < n_cols; ++col) {
 				uword i, j;
 				for(i = 0, j = 1; j < n_rows; i += 2, j += 2) {

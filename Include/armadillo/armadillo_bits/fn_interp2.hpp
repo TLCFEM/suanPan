@@ -45,7 +45,8 @@ void interp2_helper_nearest(const Mat<eT>& XG, const Mat<eT>& ZG, const Mat<eT>&
 		if((XI_val < XG_min) || (XI_val > XG_max)) {
 			if(mode == 0) { ZI.row(i).fill(extrap_val); }
 			if(mode == 1) { ZI.col(i).fill(extrap_val); }
-		} else {
+		}
+		else {
 			// XG and XI are guaranteed to be sorted in ascending manner,
 			// so start searching XG from last known optimum position 
 
@@ -56,7 +57,8 @@ void interp2_helper_nearest(const Mat<eT>& XG, const Mat<eT>& ZG, const Mat<eT>&
 				if(err >= best_err) {
 					// error is going up, so we have found the optimum position
 					break;
-				} else {
+				}
+				else {
 					best_err = err;
 					best_j = j; // remember the optimum position
 				}
@@ -96,7 +98,8 @@ void interp2_helper_linear(const Mat<eT>& XG, const Mat<eT>& ZG, const Mat<eT>& 
 		if((XI_val < XG_min) || (XI_val > XG_max)) {
 			if(mode == 0) { ZI.row(i).fill(extrap_val); }
 			if(mode == 1) { ZI.col(i).fill(extrap_val); }
-		} else {
+		}
+		else {
 			// XG and XI are guaranteed to be sorted in ascending manner,
 			// so start searching XG from last known optimum position 
 
@@ -107,7 +110,8 @@ void interp2_helper_linear(const Mat<eT>& XG, const Mat<eT>& ZG, const Mat<eT>& 
 				const eT tmp = XG_mem[j] - XI_val;
 				const eT err = (tmp >= eT(0)) ? tmp : -tmp;
 
-				if(err >= a_best_err) { break; } else {
+				if(err >= a_best_err) { break; }
+				else {
 					a_best_err = err;
 					a_best_j = j;
 				}
@@ -117,7 +121,8 @@ void interp2_helper_linear(const Mat<eT>& XG, const Mat<eT>& ZG, const Mat<eT>& 
 				// a_best_j is to the left of the interpolated position
 
 				b_best_j = ((a_best_j + 1) < NG) ? (a_best_j + 1) : a_best_j;
-			} else {
+			}
+			else {
 				// a_best_j is to the right of the interpolated position
 
 				b_best_j = (a_best_j >= 1) ? (a_best_j - 1) : a_best_j;
@@ -191,17 +196,20 @@ enable_if2<is_real<typename T1::elem_type>::value, void>::result interp2
 		if(sig == 'n') {
 			interp2_helper_nearest(UYG.M, UZG.M, UYI.M, tmp, extrap_val, 0);
 			interp2_helper_nearest(UXG.M, tmp, UXI.M, out, extrap_val, 1);
-		} else if(sig == 'l') {
+		}
+		else if(sig == 'l') {
 			interp2_helper_linear(UYG.M, UZG.M, UYI.M, tmp, extrap_val, 0);
 			interp2_helper_linear(UXG.M, tmp, UXI.M, out, extrap_val, 1);
 		}
 
 		ZI.steal_mem(out);
-	} else {
+	}
+	else {
 		if(sig == 'n') {
 			interp2_helper_nearest(UYG.M, UZG.M, UYI.M, tmp, extrap_val, 0);
 			interp2_helper_nearest(UXG.M, tmp, UXI.M, ZI, extrap_val, 1);
-		} else if(sig == 'l') {
+		}
+		else if(sig == 'l') {
 			interp2_helper_linear(UYG.M, UZG.M, UYI.M, tmp, extrap_val, 0);
 			interp2_helper_linear(UXG.M, tmp, UXI.M, ZI, extrap_val, 1);
 		}

@@ -35,7 +35,8 @@ void internal_regspace_default_delta
 
 	eT* x_mem = x.memptr();
 
-	if(ascend) { for(uword i = 0; i < N; ++i) { x_mem[i] = eT(start + T(i)); } } else { for(uword i = 0; i < N; ++i) { x_mem[i] = eT(start - T(i)); } }
+	if(ascend) { for(uword i = 0; i < N; ++i) { x_mem[i] = eT(start + T(i)); } }
+	else { for(uword i = 0; i < N; ++i) { x_mem[i] = eT(start - T(i)); } }
 }
 
 template<typename eT, typename sT> inline
@@ -65,7 +66,8 @@ typename enable_if2<(is_signed<sT>::value == true), void>::result internal_regsp
 
 	eT* x_mem = x.memptr();
 
-	if(ascend) { for(uword i = 0; i < N; ++i) { x_mem[i] = eT(start + T(i * inc)); } } else { for(uword i = 0; i < N; ++i) { x_mem[i] = eT(start - T(i * inc)); } }
+	if(ascend) { for(uword i = 0; i < N; ++i) { x_mem[i] = eT(start + T(i * inc)); } }
+	else { for(uword i = 0; i < N; ++i) { x_mem[i] = eT(start - T(i * inc)); } }
 }
 
 template<typename eT, typename uT> inline
@@ -95,7 +97,8 @@ typename enable_if2<(is_signed<uT>::value == false), void>::result internal_regs
 
 	eT* x_mem = x.memptr();
 
-	if(ascend) { for(uword i = 0; i < N; ++i) { x_mem[i] = eT(start + T(i * inc)); } } else { for(uword i = 0; i < N; ++i) { x_mem[i] = eT(start - T(i * inc)); } }
+	if(ascend) { for(uword i = 0; i < N; ++i) { x_mem[i] = eT(start + T(i * inc)); } }
+	else { for(uword i = 0; i < N; ++i) { x_mem[i] = eT(start - T(i * inc)); } }
 }
 
 template<typename vec_type, typename sT> inline
@@ -110,7 +113,8 @@ typename enable_if2<is_Mat<vec_type>::value && (is_signed<sT>::value == true), v
 
 	vec_type x;
 
-	if(((delta == sT(+1)) && (start <= end)) || ((delta == sT(-1)) && (start > end))) { internal_regspace_default_delta(x, start, end); } else { internal_regspace_var_delta(x, start, delta, end); }
+	if(((delta == sT(+1)) && (start <= end)) || ((delta == sT(-1)) && (start > end))) { internal_regspace_default_delta(x, start, end); }
+	else { internal_regspace_var_delta(x, start, delta, end); }
 
 	if(x.n_elem == 0) { if(is_Mat_only<vec_type>::value) { x.set_size(1, 0); } }
 
@@ -129,7 +133,8 @@ typename enable_if2<is_Mat<vec_type>::value && (is_signed<uT>::value == false), 
 
 	vec_type x;
 
-	if((delta == uT(+1)) && (start <= end)) { internal_regspace_default_delta(x, start, end); } else { internal_regspace_var_delta(x, start, delta, end); }
+	if((delta == uT(+1)) && (start <= end)) { internal_regspace_default_delta(x, start, end); }
+	else { internal_regspace_var_delta(x, start, delta, end); }
 
 	if(x.n_elem == 0) { if(is_Mat_only<vec_type>::value) { x.set_size(1, 0); } }
 

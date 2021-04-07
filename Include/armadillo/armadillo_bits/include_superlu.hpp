@@ -74,10 +74,10 @@ namespace superlu
   typedef int int_t;
   
   // Include supermatrix.h.  This gives us SuperMatrix.
-// Put it in the slu namespace.
-// For versions of SuperLU I am familiar with, supermatrix.h does not include any other files.
-// Therefore, putting it in the superlu namespace is reasonably safe.
-// This same reasoning is true for superlu_enum_consts.h.
+  // Put it in the slu namespace.
+  // For versions of SuperLU I am familiar with, supermatrix.h does not include any other files.
+  // Therefore, putting it in the superlu namespace is reasonably safe.
+  // This same reasoning is true for superlu_enum_consts.h.
 
 #if defined(ARMA_SUPERLU_INCLUDE_DIR)
     #define ARMA_SLU_STR(x) x

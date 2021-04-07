@@ -107,7 +107,8 @@ void arma_rng_cxx98::randn_dual_val(eT& out1, eT& out2) {
 
 template<typename eT> inline
 void arma_rng_cxx98::randi_fill(eT* mem, const uword N, const int a, const int b) {
-	if((a == 0) && (b == RAND_MAX)) { for(uword i = 0; i < N; ++i) { mem[i] = eT(std::rand()); } } else {
+	if((a == 0) && (b == RAND_MAX)) { for(uword i = 0; i < N; ++i) { mem[i] = eT(std::rand()); } }
+	else {
 		const uword length = uword(b - a + 1);
 
 		const double scale = double(length) / double(randi_max_val());

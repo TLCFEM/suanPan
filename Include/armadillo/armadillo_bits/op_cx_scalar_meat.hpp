@@ -40,7 +40,8 @@ void op_cx_scalar_times::apply
 		const uword n_elem = A.get_n_elem();
 
 		for(uword i = 0; i < n_elem; ++i) { out_mem[i] = A[i] * k; }
-	} else {
+	}
+	else {
 		for(uword col = 0; col < n_cols; ++col)
 			for(uword row = 0; row < n_rows; ++row) {
 				*out_mem = A.at(row, col) * k;
@@ -73,7 +74,8 @@ void op_cx_scalar_plus::apply
 		const uword n_elem = A.get_n_elem();
 
 		for(uword i = 0; i < n_elem; ++i) { out_mem[i] = A[i] + k; }
-	} else {
+	}
+	else {
 		for(uword col = 0; col < n_cols; ++col)
 			for(uword row = 0; row < n_rows; ++row) {
 				*out_mem = A.at(row, col) + k;
@@ -106,7 +108,8 @@ void op_cx_scalar_minus_pre::apply
 		const uword n_elem = A.get_n_elem();
 
 		for(uword i = 0; i < n_elem; ++i) { out_mem[i] = k - A[i]; }
-	} else {
+	}
+	else {
 		for(uword col = 0; col < n_cols; ++col)
 			for(uword row = 0; row < n_rows; ++row) {
 				*out_mem = k - A.at(row, col);
@@ -139,7 +142,8 @@ void op_cx_scalar_minus_post::apply
 		const uword n_elem = A.get_n_elem();
 
 		for(uword i = 0; i < n_elem; ++i) { out_mem[i] = A[i] - k; }
-	} else {
+	}
+	else {
 		for(uword col = 0; col < n_cols; ++col)
 			for(uword row = 0; row < n_rows; ++row) {
 				*out_mem = A.at(row, col) - k;
@@ -172,7 +176,8 @@ void op_cx_scalar_div_pre::apply
 		const uword n_elem = A.get_n_elem();
 
 		for(uword i = 0; i < n_elem; ++i) { out_mem[i] = k / A[i]; }
-	} else {
+	}
+	else {
 		for(uword col = 0; col < n_cols; ++col)
 			for(uword row = 0; row < n_rows; ++row) {
 				*out_mem = k / A.at(row, col);
@@ -205,7 +210,8 @@ void op_cx_scalar_div_post::apply
 		const uword n_elem = A.get_n_elem();
 
 		for(uword i = 0; i < n_elem; ++i) { out_mem[i] = A[i] / k; }
-	} else {
+	}
+	else {
 		for(uword col = 0; col < n_cols; ++col)
 			for(uword row = 0; row < n_rows; ++row) {
 				*out_mem = A.at(row, col) / k;
@@ -240,7 +246,8 @@ void op_cx_scalar_times::apply
 	const uword n_elem = out.n_elem;
 	eT* out_mem = out.memptr();
 
-	if(ProxyCube<T1>::use_at == false) { for(uword i = 0; i < n_elem; ++i) { out_mem[i] = A[i] * k; } } else {
+	if(ProxyCube<T1>::use_at == false) { for(uword i = 0; i < n_elem; ++i) { out_mem[i] = A[i] * k; } }
+	else {
 		for(uword slice = 0; slice < n_slices; ++slice)
 			for(uword col = 0; col < n_cols; ++col)
 				for(uword row = 0; row < n_rows; ++row) {
@@ -272,7 +279,8 @@ void op_cx_scalar_plus::apply
 	const uword n_elem = out.n_elem;
 	eT* out_mem = out.memptr();
 
-	if(ProxyCube<T1>::use_at == false) { for(uword i = 0; i < n_elem; ++i) { out_mem[i] = A[i] + k; } } else {
+	if(ProxyCube<T1>::use_at == false) { for(uword i = 0; i < n_elem; ++i) { out_mem[i] = A[i] + k; } }
+	else {
 		for(uword slice = 0; slice < n_slices; ++slice)
 			for(uword col = 0; col < n_cols; ++col)
 				for(uword row = 0; row < n_rows; ++row) {
@@ -304,7 +312,8 @@ void op_cx_scalar_minus_pre::apply
 	const uword n_elem = out.n_elem;
 	eT* out_mem = out.memptr();
 
-	if(ProxyCube<T1>::use_at == false) { for(uword i = 0; i < n_elem; ++i) { out_mem[i] = k - A[i]; } } else {
+	if(ProxyCube<T1>::use_at == false) { for(uword i = 0; i < n_elem; ++i) { out_mem[i] = k - A[i]; } }
+	else {
 		for(uword slice = 0; slice < n_slices; ++slice)
 			for(uword col = 0; col < n_cols; ++col)
 				for(uword row = 0; row < n_rows; ++row) {
@@ -336,7 +345,8 @@ void op_cx_scalar_minus_post::apply
 	const uword n_elem = out.n_elem;
 	eT* out_mem = out.memptr();
 
-	if(ProxyCube<T1>::use_at == false) { for(uword i = 0; i < n_elem; ++i) { out_mem[i] = A[i] - k; } } else {
+	if(ProxyCube<T1>::use_at == false) { for(uword i = 0; i < n_elem; ++i) { out_mem[i] = A[i] - k; } }
+	else {
 		for(uword slice = 0; slice < n_slices; ++slice)
 			for(uword col = 0; col < n_cols; ++col)
 				for(uword row = 0; row < n_rows; ++row) {
@@ -368,7 +378,8 @@ void op_cx_scalar_div_pre::apply
 	const uword n_elem = out.n_elem;
 	eT* out_mem = out.memptr();
 
-	if(ProxyCube<T1>::use_at == false) { for(uword i = 0; i < n_elem; ++i) { out_mem[i] = k / A[i]; } } else {
+	if(ProxyCube<T1>::use_at == false) { for(uword i = 0; i < n_elem; ++i) { out_mem[i] = k / A[i]; } }
+	else {
 		for(uword slice = 0; slice < n_slices; ++slice)
 			for(uword col = 0; col < n_cols; ++col)
 				for(uword row = 0; row < n_rows; ++row) {
@@ -400,7 +411,8 @@ void op_cx_scalar_div_post::apply
 	const uword n_elem = out.n_elem;
 	eT* out_mem = out.memptr();
 
-	if(ProxyCube<T1>::use_at == false) { for(uword i = 0; i < n_elem; ++i) { out_mem[i] = A[i] / k; } } else {
+	if(ProxyCube<T1>::use_at == false) { for(uword i = 0; i < n_elem; ++i) { out_mem[i] = A[i] / k; } }
+	else {
 		for(uword slice = 0; slice < n_slices; ++slice)
 			for(uword col = 0; col < n_cols; ++col)
 				for(uword row = 0; row < n_rows; ++row) {

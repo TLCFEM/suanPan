@@ -40,20 +40,22 @@ enable_if2
 		x.set_size(1);
 
 		x[0] = eT(end);
-	} else if(num >= 2) {
+	}
+	else if(num >= 2) {
 		x.set_size(num);
 
 		eT* x_mem = x.memptr();
 
 		const uword num_m1 = num - 1;
 
-		if(is_non_integral<T>::value == true) {
+		if(is_non_integral<T>::value) {
 			const T delta = (end - start) / T(num_m1);
 
 			for(uword i = 0; i < num_m1; ++i) { x_mem[i] = eT(start + i * delta); }
 
 			x_mem[num_m1] = eT(end);
-		} else {
+		}
+		else {
 			const double delta = (end >= start) ? double(end - start) / double(num_m1) : -double(start - end) / double(num_m1);
 
 			for(uword i = 0; i < num_m1; ++i) { x_mem[i] = eT(double(start) + i * delta); }
@@ -120,7 +122,8 @@ typename arma_real_only<eT>::result log_add_exp(eT log_a, eT log_b) {
 
 	const eT negdelta = log_b - log_a;
 
-	if((negdelta < Datum<eT>::log_min) || (arma_isfinite(negdelta) == false)) { return log_a; } else { return (log_a + std::log1p(std::exp(negdelta))); }
+	if((negdelta < Datum<eT>::log_min) || (arma_isfinite(negdelta) == false)) { return log_a; }
+	else { return (log_a + std::log1p(std::exp(negdelta))); }
 }
 
 // for compatibility with earlier versions
@@ -238,7 +241,8 @@ typename enable_if2<(is_arma_type<T1>::value && is_same_type<uword, typename T1:
 			out_colptr[0] = row;
 			out_colptr[1] = col;
 		}
-	} else {
+	}
+	else {
 		if(P_n_rows == 1) {
 			for(uword count = 0; count < P_n_cols; ++count) {
 				const uword i = P.at(0, count);
@@ -253,7 +257,8 @@ typename enable_if2<(is_arma_type<T1>::value && is_same_type<uword, typename T1:
 				out_colptr[0] = row;
 				out_colptr[1] = col;
 			}
-		} else if(P_n_cols == 1) {
+		}
+		else if(P_n_cols == 1) {
 			for(uword count = 0; count < P_n_rows; ++count) {
 				const uword i = P.at(count, 0);
 

@@ -16,6 +16,10 @@
 //! \addtogroup SpSubview
 //! @{
 
+template<typename eT> inline SpSubview<eT>::~SpSubview() {
+	arma_extra_debug_sigprint_this(this);
+}
+
 template<typename eT> inline SpSubview<eT>::SpSubview(const SpMat<eT>& in_m, const uword in_row1, const uword in_col1, const uword in_n_rows, const uword in_n_cols)
 	: m(in_m)
 	, aux_row1(in_row1)
@@ -24,7 +28,7 @@ template<typename eT> inline SpSubview<eT>::SpSubview(const SpMat<eT>& in_m, con
 	, n_cols(in_n_cols)
 	, n_elem(in_n_rows * in_n_cols)
 	, n_nonzero(0) {
-	arma_extra_debug_sigprint();
+	arma_extra_debug_sigprint_this(this);
 
 	m.sync_csc();
 
@@ -44,8 +48,35 @@ template<typename eT> inline SpSubview<eT>::SpSubview(const SpMat<eT>& in_m, con
 	access::rw(n_nonzero) = count;
 }
 
-template<typename eT> inline SpSubview<eT>::~SpSubview() {
-	arma_extra_debug_sigprint();
+template<typename eT> inline SpSubview<eT>::SpSubview(const SpSubview<eT>& in)
+	: m(in.m)
+	, aux_row1(in.aux_row1)
+	, aux_col1(in.aux_col1)
+	, n_rows(in.n_rows)
+	, n_cols(in.n_cols)
+	, n_elem(in.n_elem)
+	, n_nonzero(in.n_nonzero) {
+	arma_extra_debug_sigprint(arma_str::format("this = %x   in = %x") % this % &in);
+}
+
+template<typename eT> inline SpSubview<eT>::SpSubview(SpSubview<eT>&& in)
+	: m(in.m)
+	, aux_row1(in.aux_row1)
+	, aux_col1(in.aux_col1)
+	, n_rows(in.n_rows)
+	, n_cols(in.n_cols)
+	, n_elem(in.n_elem)
+	, n_nonzero(in.n_nonzero) {
+	arma_extra_debug_sigprint(arma_str::format("this = %x   in = %x") % this % &in);
+
+	// for paranoia
+
+	access::rw(in.aux_row1) = 0;
+	access::rw(in.aux_col1) = 0;
+	access::rw(in.n_rows) = 0;
+	access::rw(in.n_cols) = 0;
+	access::rw(in.n_elem) = 0;
+	access::rw(in.n_nonzero) = 0;
 }
 
 template<typename eT> inline
@@ -311,19 +342,18 @@ const SpSubview<eT>& SpSubview<eT>::operator%=(const SpBase<eT, T1>& x) {
 	return (*this).operator=((*this) % x.get_ref());
 }
 
-//! If you are using this function, you are probably misguided.
 template<typename eT> template<typename T1> inline
 const SpSubview<eT>& SpSubview<eT>::operator/=(const SpBase<eT, T1>& x) {
 	arma_extra_debug_sigprint();
+
+	// NOTE: use of this function is not advised; it is implemented only for completeness
 
 	SpProxy<T1> p(x.get_ref());
 
 	arma_debug_assert_same_size(n_rows, n_cols, p.get_n_rows(), p.get_n_cols(), "element-wise division");
 
-	if(p.is_alias(m) == false) {
-		for(uword lcol = 0; lcol < n_cols; ++lcol)
-			for(uword lrow = 0; lrow < n_rows; ++lrow) { at(lrow, lcol) /= p.at(lrow, lcol); }
-	} else {
+	if(p.is_alias(m) == false) { for(uword lcol = 0; lcol < n_cols; ++lcol) for(uword lrow = 0; lrow < n_rows; ++lrow) { at(lrow, lcol) /= p.at(lrow, lcol); } }
+	else {
 		const SpMat<eT> tmp(p.Q);
 
 		(*this).operator/=(tmp);
@@ -491,7 +521,8 @@ void SpSubview<eT>::replace(const eT old_val, const eT new_val) {
 				}
 			}
 		}
-	} else {
+	}
+	else {
 		for(uword c = lstart_col; c < lend_col; ++c) {
 			const uword r_start = m.col_ptrs[c];
 			const uword r_end = m.col_ptrs[c + 1];
@@ -523,7 +554,8 @@ void SpSubview<eT>::clean(const typename get_pod_type<eT>::result threshold) {
 
 	tmp.clean(threshold);
 
-	if(is_cx<eT>::yes) { (*this).operator=(tmp); } else if(tmp.n_nonzero != n_nonzero) { (*this).operator=(tmp); }
+	if(is_cx<eT>::yes) { (*this).operator=(tmp); }
+	else if(tmp.n_nonzero != n_nonzero) { (*this).operator=(tmp); }
 }
 
 template<typename eT> inline
@@ -536,7 +568,8 @@ void SpSubview<eT>::fill(const eT val) {
 		tmp.fill(val);
 
 		(*this).operator=(tmp);
-	} else { (*this).zeros(); }
+	}
+	else { (*this).zeros(); }
 }
 
 template<typename eT> inline
@@ -624,7 +657,7 @@ eT SpSubview<eT>::operator[](const uword i) const {
 template<typename eT> arma_hot
 inline
 SpSubview_MapMat_val<eT> SpSubview<eT>::operator()(const uword i) {
-	arma_debug_check((i >= n_elem), "SpSubview::operator(): index out of bounds");
+	arma_debug_check_bounds((i >= n_elem), "SpSubview::operator(): index out of bounds");
 
 	const uword lrow = i % n_rows;
 	const uword lcol = i / n_rows;
@@ -635,7 +668,7 @@ SpSubview_MapMat_val<eT> SpSubview<eT>::operator()(const uword i) {
 template<typename eT> arma_hot
 inline
 eT SpSubview<eT>::operator()(const uword i) const {
-	arma_debug_check((i >= n_elem), "SpSubview::operator(): index out of bounds");
+	arma_debug_check_bounds((i >= n_elem), "SpSubview::operator(): index out of bounds");
 
 	const uword lrow = i % n_rows;
 	const uword lcol = i / n_rows;
@@ -646,7 +679,7 @@ eT SpSubview<eT>::operator()(const uword i) const {
 template<typename eT> arma_hot
 inline
 SpSubview_MapMat_val<eT> SpSubview<eT>::operator()(const uword in_row, const uword in_col) {
-	arma_debug_check((in_row >= n_rows) || (in_col >= n_cols), "SpSubview::operator(): index out of bounds");
+	arma_debug_check_bounds((in_row >= n_rows) || (in_col >= n_cols), "SpSubview::operator(): index out of bounds");
 
 	return (*this).at(in_row, in_col);
 }
@@ -654,7 +687,7 @@ SpSubview_MapMat_val<eT> SpSubview<eT>::operator()(const uword in_row, const uwo
 template<typename eT> arma_hot
 inline
 eT SpSubview<eT>::operator()(const uword in_row, const uword in_col) const {
-	arma_debug_check((in_row >= n_rows) || (in_col >= n_cols), "SpSubview::operator(): index out of bounds");
+	arma_debug_check_bounds((in_row >= n_rows) || (in_col >= n_cols), "SpSubview::operator(): index out of bounds");
 
 	return (*this).at(in_row, in_col);
 }
@@ -689,8 +722,10 @@ template<typename eT> inline
 bool SpSubview<eT>::check_overlap(const SpSubview<eT>& x) const {
 	const subview<eT>& t = *this;
 
-	if(&t.m != &x.m) { return false; } else {
-		if((t.n_elem == 0) || (x.n_elem == 0)) { return false; } else {
+	if(&t.m != &x.m) { return false; }
+	else {
+		if((t.n_elem == 0) || (x.n_elem == 0)) { return false; }
+		else {
 			const uword t_row_start = t.aux_row1;
 			const uword t_row_end_p1 = t_row_start + t.n_rows;
 
@@ -718,7 +753,7 @@ template<typename eT> inline
 SpSubview_row<eT> SpSubview<eT>::row(const uword row_num) {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check(row_num >= n_rows, "SpSubview::row(): out of bounds");
+	arma_debug_check_bounds(row_num >= n_rows, "SpSubview::row(): out of bounds");
 
 	return SpSubview_row<eT>(const_cast<SpMat<eT>&>(m), row_num + aux_row1, aux_col1, n_cols);
 }
@@ -727,7 +762,7 @@ template<typename eT> inline
 const SpSubview_row<eT> SpSubview<eT>::row(const uword row_num) const {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check(row_num >= n_rows, "SpSubview::row(): out of bounds");
+	arma_debug_check_bounds(row_num >= n_rows, "SpSubview::row(): out of bounds");
 
 	return SpSubview_row<eT>(m, row_num + aux_row1, aux_col1, n_cols);
 }
@@ -736,7 +771,7 @@ template<typename eT> inline
 SpSubview_col<eT> SpSubview<eT>::col(const uword col_num) {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check(col_num >= n_cols, "SpSubview::col(): out of bounds");
+	arma_debug_check_bounds(col_num >= n_cols, "SpSubview::col(): out of bounds");
 
 	return SpSubview_col<eT>(const_cast<SpMat<eT>&>(m), col_num + aux_col1, aux_row1, n_rows);
 }
@@ -745,7 +780,7 @@ template<typename eT> inline
 const SpSubview_col<eT> SpSubview<eT>::col(const uword col_num) const {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check(col_num >= n_cols, "SpSubview::col(): out of bounds");
+	arma_debug_check_bounds(col_num >= n_cols, "SpSubview::col(): out of bounds");
 
 	return SpSubview_col<eT>(m, col_num + aux_col1, aux_row1, n_rows);
 }
@@ -754,7 +789,7 @@ template<typename eT> inline
 SpSubview<eT> SpSubview<eT>::rows(const uword in_row1, const uword in_row2) {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check
+	arma_debug_check_bounds
 		(
 			(in_row1 > in_row2) || (in_row2 >= n_rows),
 			"SpSubview::rows(): indices out of bounds or incorrectly used"
@@ -767,7 +802,7 @@ template<typename eT> inline
 const SpSubview<eT> SpSubview<eT>::rows(const uword in_row1, const uword in_row2) const {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check
+	arma_debug_check_bounds
 		(
 			(in_row1 > in_row2) || (in_row2 >= n_rows),
 			"SpSubview::rows(): indices out of bounds or incorrectly used"
@@ -780,7 +815,7 @@ template<typename eT> inline
 SpSubview<eT> SpSubview<eT>::cols(const uword in_col1, const uword in_col2) {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check
+	arma_debug_check_bounds
 		(
 			(in_col1 > in_col2) || (in_col2 >= n_cols),
 			"SpSubview::cols(): indices out of bounds or incorrectly used"
@@ -793,7 +828,7 @@ template<typename eT> inline
 const SpSubview<eT> SpSubview<eT>::cols(const uword in_col1, const uword in_col2) const {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check
+	arma_debug_check_bounds
 		(
 			(in_col1 > in_col2) || (in_col2 >= n_cols),
 			"SpSubview::cols(): indices out of bounds or incorrectly used"
@@ -806,7 +841,7 @@ template<typename eT> inline
 SpSubview<eT> SpSubview<eT>::submat(const uword in_row1, const uword in_col1, const uword in_row2, const uword in_col2) {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check
+	arma_debug_check_bounds
 		(
 			(in_row1 > in_row2) || (in_col1 > in_col2) || (in_row2 >= n_rows) || (in_col2 >= n_cols),
 			"SpSubview::submat(): indices out of bounds or incorrectly used"
@@ -819,7 +854,7 @@ template<typename eT> inline
 const SpSubview<eT> SpSubview<eT>::submat(const uword in_row1, const uword in_col1, const uword in_row2, const uword in_col2) const {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check
+	arma_debug_check_bounds
 		(
 			(in_row1 > in_row2) || (in_col1 > in_col2) || (in_row2 >= n_rows) || (in_col2 >= n_cols),
 			"SpSubview::submat(): indices out of bounds or incorrectly used"
@@ -841,7 +876,7 @@ SpSubview<eT> SpSubview<eT>::submat(const span& row_span, const span& col_span) 
 	const uword in_col1 = col_all ? 0 : col_span.a;
 	const uword in_col2 = col_all ? n_cols : col_span.b;
 
-	arma_debug_check
+	arma_debug_check_bounds
 		(
 			(row_all ? false : ((in_row1 > in_row2) || (in_row2 >= n_rows)))
 			||
@@ -865,7 +900,7 @@ const SpSubview<eT> SpSubview<eT>::submat(const span& row_span, const span& col_
 	const uword in_col1 = col_all ? 0 : col_span.a;
 	const uword in_col2 = col_all ? n_cols - 1 : col_span.b;
 
-	arma_debug_check
+	arma_debug_check_bounds
 		(
 			(row_all ? false : ((in_row1 > in_row2) || (in_row2 >= n_rows)))
 			||

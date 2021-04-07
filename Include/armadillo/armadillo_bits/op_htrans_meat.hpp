@@ -16,8 +16,7 @@
 //! \addtogroup op_htrans
 //! @{
 
-template<typename eT> arma_hot
-arma_inline
+template<typename eT> arma_inline
 void op_htrans::apply_mat_noalias(Mat<eT>& out, const Mat<eT>& A, const typename arma_not_cx<eT>::result* junk) {
 	arma_extra_debug_sigprint();
 	arma_ignore(junk);
@@ -43,7 +42,9 @@ void op_htrans::apply_mat_noalias(Mat<eT>& out, const Mat<eT>& A, const typename
 		eT* out_mem = out.memptr();
 
 		for(uword i = 0; i < n_elem; ++i) { out_mem[i] = std::conj(A_mem[i]); }
-	} else if((A_n_rows >= 512) && (A_n_cols >= 512)) { op_htrans::apply_mat_noalias_large(out, A); } else {
+	}
+	else if((A_n_rows >= 512) && (A_n_cols >= 512)) { op_htrans::apply_mat_noalias_large(out, A); }
+	else {
 		eT* outptr = out.memptr();
 
 		for(uword k = 0; k < A_n_rows; ++k) {
@@ -121,8 +122,7 @@ void op_htrans::apply_mat_noalias_large(Mat<std::complex<T>>& out, const Mat<std
 	op_htrans::block_worker(&Y[n_cols_base + Y_offset], &X[n_rows_base + X_offset], n_rows, n_cols, n_rows_extra, n_cols_extra);
 }
 
-template<typename eT> arma_hot
-arma_inline
+template<typename eT> arma_inline
 void op_htrans::apply_mat_inplace(Mat<eT>& out, const typename arma_not_cx<eT>::result* junk) {
 	arma_extra_debug_sigprint();
 	arma_ignore(junk);
@@ -155,7 +155,8 @@ void op_htrans::apply_mat_inplace(Mat<eT>& out, const typename arma_cx_only<eT>:
 				coldata[row] = val2;
 			}
 		}
-	} else {
+	}
+	else {
 		Mat<eT> tmp;
 
 		op_htrans::apply_mat_noalias(tmp, out);
@@ -164,8 +165,7 @@ void op_htrans::apply_mat_inplace(Mat<eT>& out, const typename arma_cx_only<eT>:
 	}
 }
 
-template<typename eT> arma_hot
-arma_inline
+template<typename eT> arma_inline
 void op_htrans::apply_mat(Mat<eT>& out, const Mat<eT>& A, const typename arma_not_cx<eT>::result* junk) {
 	arma_extra_debug_sigprint();
 	arma_ignore(junk);
@@ -179,7 +179,8 @@ void op_htrans::apply_mat(Mat<eT>& out, const Mat<eT>& A, const typename arma_cx
 	arma_extra_debug_sigprint();
 	arma_ignore(junk);
 
-	if(&out != &A) { op_htrans::apply_mat_noalias(out, A); } else { op_htrans::apply_mat_inplace(out); }
+	if(&out != &A) { op_htrans::apply_mat_noalias(out, A); }
+	else { op_htrans::apply_mat_inplace(out); }
 }
 
 template<typename T1> arma_hot
@@ -207,7 +208,8 @@ void op_htrans::apply_proxy(Mat<typename T1::elem_type>& out, const T1& X) {
 			typename Proxy<T1>::ea_type Pea = P.get_ea();
 
 			for(uword i = 0; i < n_elem; ++i) { out_mem[i] = std::conj(Pea[i]); }
-		} else // aliasing
+		}
+		else // aliasing
 		{
 			Mat<eT> out2(n_cols, n_rows);
 
@@ -221,7 +223,8 @@ void op_htrans::apply_proxy(Mat<typename T1::elem_type>& out, const T1& X) {
 
 			out.steal_mem(out2);
 		}
-	} else {
+	}
+	else {
 		if(is_alias == false) {
 			out.set_size(n_cols, n_rows);
 
@@ -234,7 +237,8 @@ void op_htrans::apply_proxy(Mat<typename T1::elem_type>& out, const T1& X) {
 					outptr++;
 				}
 			}
-		} else // aliasing
+		}
+		else // aliasing
 		{
 			Mat<eT> out2(n_cols, n_rows);
 
@@ -263,7 +267,8 @@ void op_htrans::apply_direct(Mat<typename T1::elem_type>& out, const T1& X) {
 		const unwrap<T1> U(X);
 
 		op_htrans::apply_mat(out, U.M);
-	} else { op_htrans::apply_proxy(out, X); }
+	}
+	else { op_htrans::apply_proxy(out, X); }
 }
 
 template<typename T1> arma_hot

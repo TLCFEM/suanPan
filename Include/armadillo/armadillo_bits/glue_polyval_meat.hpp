@@ -53,7 +53,8 @@ void glue_polyval::apply(Mat<typename T1::elem_type>& out, const Glue<T1, T2, gl
 		Mat<eT> tmp;
 		glue_polyval::apply_noalias(tmp, P, X);
 		out.steal_mem(tmp);
-	} else { glue_polyval::apply_noalias(out, P, X); }
+	}
+	else { glue_polyval::apply_noalias(out, P, X); }
 }
 
 //! @}

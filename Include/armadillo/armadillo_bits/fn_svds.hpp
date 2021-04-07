@@ -57,7 +57,8 @@ bool svds_helper
 			U.eye(A.n_rows, kk);
 			V.eye(A.n_cols, kk);
 		}
-	} else {
+	}
+	else {
 		SpMat<eT> C((A.n_rows + A.n_cols), (A.n_rows + A.n_cols));
 
 		SpMat<eT> B = A / A_max;
@@ -91,7 +92,8 @@ bool svds_helper
 
 		uvec indices = find(eigval > tol2);
 
-		if(indices.n_elem > kk) { indices = indices.subvec(0, kk - 1); } else if(indices.n_elem < kk) {
+		if(indices.n_elem > kk) { indices = indices.subvec(0, kk - 1); }
+		else if(indices.n_elem < kk) {
 			const uvec indices2 = find(abs(eigval) <= tol2);
 
 			const uword N_extra = (std::min)(indices2.n_elem, (kk - indices.n_elem));
@@ -115,7 +117,7 @@ bool svds_helper
 		}
 	}
 
-	if(S.n_elem < k) { arma_debug_warn("svds(): found fewer singular values than specified"); }
+	if(S.n_elem < k) { arma_debug_warn_level(1, "svds(): found fewer singular values than specified"); }
 
 	return true;
 }
@@ -166,7 +168,8 @@ bool svds_helper
 			U.eye(A.n_rows, kk);
 			V.eye(A.n_cols, kk);
 		}
-	} else {
+	}
+	else {
 		SpMat<eT> C((A.n_rows + A.n_cols), (A.n_rows + A.n_cols));
 
 		SpMat<eT> B = A / A_max;
@@ -202,7 +205,8 @@ bool svds_helper
 
 		uvec indices = find(eigval > tol2);
 
-		if(indices.n_elem > kk) { indices = indices.subvec(0, kk - 1); } else if(indices.n_elem < kk) {
+		if(indices.n_elem > kk) { indices = indices.subvec(0, kk - 1); }
+		else if(indices.n_elem < kk) {
 			const uvec indices2 = find(abs(eigval) <= tol2);
 
 			const uword N_extra = (std::min)(indices2.n_elem, (kk - indices.n_elem));
@@ -226,7 +230,7 @@ bool svds_helper
 		}
 	}
 
-	if(S.n_elem < k) { arma_debug_warn("svds(): found fewer singular values than specified"); }
+	if(S.n_elem < k) { arma_debug_warn_level(1, "svds(): found fewer singular values than specified"); }
 
 	return true;
 }
@@ -248,7 +252,7 @@ bool svds
 
 	const bool status = svds_helper(U, S, V, X.get_ref(), k, tol, true);
 
-	if(status == false) { arma_debug_warn("svds(): decomposition failed"); }
+	if(status == false) { arma_debug_warn_level(3, "svds(): decomposition failed"); }
 
 	return status;
 }
@@ -271,7 +275,7 @@ bool svds
 
 	const bool status = svds_helper(U, S, V, X.get_ref(), k, tol, false);
 
-	if(status == false) { arma_debug_warn("svds(): decomposition failed"); }
+	if(status == false) { arma_debug_warn_level(3, "svds(): decomposition failed"); }
 
 	return status;
 }

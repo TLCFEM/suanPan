@@ -64,7 +64,7 @@ bool glue_polyfit::apply_direct(Mat<typename T1::elem_type>& out, const Base<typ
 	arma_debug_check
 		(
 			(((X.is_vec() == false) && (X.is_empty() == false)) || ((Y.is_vec() == false) && (Y.is_empty() == false))),
-			"polyfit(): given object is not a vector"
+			"polyfit(): given object must be a vector"
 		);
 
 	arma_debug_check((X.n_elem != Y.n_elem), "polyfit(): given vectors must have the same number of elements");
@@ -85,7 +85,8 @@ bool glue_polyfit::apply_direct(Mat<typename T1::elem_type>& out, const Base<typ
 		Mat<eT> tmp;
 		status = glue_polyfit::apply_noalias(tmp, X_as_colvec, Y_as_colvec, N);
 		out.steal_mem(tmp);
-	} else { status = glue_polyfit::apply_noalias(out, X_as_colvec, Y_as_colvec, N); }
+	}
+	else { status = glue_polyfit::apply_noalias(out, X_as_colvec, Y_as_colvec, N); }
 
 	return status;
 }

@@ -103,7 +103,8 @@ void spglue_merge::subview_merge(SpSubview<eT>& sv, const SpMat<eT>& B) {
 
 				++x_it;
 				++y_it;
-			} else {
+			}
+			else {
 				if((x_it_col < y_it_col) || ((x_it_col == y_it_col) && (x_it_row < y_it_row))) // if y is closer to the end
 				{
 					const bool x_inside_box = ((x_it_row >= sv_row_start) && (x_it_row <= sv_row_end)) && ((x_it_col >= sv_col_start) && (x_it_col <= sv_col_end));
@@ -111,7 +112,8 @@ void spglue_merge::subview_merge(SpSubview<eT>& sv, const SpMat<eT>& B) {
 					out_val = (x_inside_box) ? eT(0) : (*x_it);
 
 					++x_it;
-				} else {
+				}
+				else {
 					out_val = (*y_it);
 
 					++y_it;
@@ -119,13 +121,15 @@ void spglue_merge::subview_merge(SpSubview<eT>& sv, const SpMat<eT>& B) {
 					use_y_loc = true;
 				}
 			}
-		} else if(x_it_valid) {
+		}
+		else if(x_it_valid) {
 			const bool x_inside_box = ((x_it_row >= sv_row_start) && (x_it_row <= sv_row_end)) && ((x_it_col >= sv_col_start) && (x_it_col <= sv_col_end));
 
 			out_val = (x_inside_box) ? eT(0) : (*x_it);
 
 			++x_it;
-		} else if(y_it_valid) {
+		}
+		else if(y_it_valid) {
 			out_val = (*y_it);
 
 			++y_it;
@@ -259,7 +263,8 @@ void spglue_merge::subview_merge(SpSubview<eT>& sv, const Mat<eT>& B) {
 
 				++x_it;
 				++y_it;
-			} else {
+			}
+			else {
 				if((x_it_col < y_it_col) || ((x_it_col == y_it_col) && (x_it_row < y_it_row))) // if y is closer to the end
 				{
 					const bool x_inside_box = ((x_it_row >= sv_row_start) && (x_it_row <= sv_row_end)) && ((x_it_col >= sv_col_start) && (x_it_col <= sv_col_end));
@@ -267,7 +272,8 @@ void spglue_merge::subview_merge(SpSubview<eT>& sv, const Mat<eT>& B) {
 					out_val = (x_inside_box) ? eT(0) : (*x_it);
 
 					++x_it;
-				} else {
+				}
+				else {
 					out_val = (*y_it);
 
 					++y_it;
@@ -275,13 +281,15 @@ void spglue_merge::subview_merge(SpSubview<eT>& sv, const Mat<eT>& B) {
 					use_y_loc = true;
 				}
 			}
-		} else if(x_it_valid) {
+		}
+		else if(x_it_valid) {
 			const bool x_inside_box = ((x_it_row >= sv_row_start) && (x_it_row <= sv_row_end)) && ((x_it_col >= sv_col_start) && (x_it_col <= sv_col_end));
 
 			out_val = (x_inside_box) ? eT(0) : (*x_it);
 
 			++x_it;
-		} else if(y_it_valid) {
+		}
+		else if(y_it_valid) {
 			out_val = (*y_it);
 
 			++y_it;
@@ -350,13 +358,15 @@ void spglue_merge::symmat_merge(SpMat<eT>& out, const SpMat<eT>& A, const SpMat<
 
 			++x_it;
 			++y_it;
-		} else {
+		}
+		else {
 			if((x_it_col < y_it_col) || ((x_it_col == y_it_col) && (x_it_row < y_it_row))) // if y is closer to the end
 			{
 				out_val = (*x_it);
 
 				++x_it;
-			} else {
+			}
+			else {
 				out_val = (*y_it);
 
 				++y_it;
@@ -421,13 +431,15 @@ void spglue_merge::diagview_merge(SpMat<eT>& out, const SpMat<eT>& A, const SpMa
 
 			++x_it;
 			++y_it;
-		} else {
+		}
+		else {
 			if((x_it_col < y_it_col) || ((x_it_col == y_it_col) && (x_it_row < y_it_row))) // if y is closer to the end
 			{
 				out_val = (*x_it);
 
 				++x_it;
-			} else {
+			}
+			else {
 				out_val = (*y_it);
 
 				++y_it;

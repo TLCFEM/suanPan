@@ -351,7 +351,8 @@ public:
 
 		const cx_type* Y_end = Y + r * m;
 
-		if(m == 1) { for(cx_type* Yi = Y; Yi != Y_end; Yi++, X += stride) { (*Yi) = (*X); } } else {
+		if(m == 1) { for(cx_type* Yi = Y; Yi != Y_end; Yi++, X += stride) { (*Yi) = (*X); } }
+		else {
 			const uword next_stage = stage + 1;
 			const uword next_stride = stride * r;
 

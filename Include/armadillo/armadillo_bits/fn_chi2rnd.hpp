@@ -59,7 +59,8 @@ enable_if2
 >::result chi2rnd(const typename obj_type::elem_type df, const uword n_rows, const uword n_cols) {
 	arma_extra_debug_sigprint();
 
-	if(is_Col<obj_type>::value) { arma_debug_check((n_cols != 1), "chi2rnd(): incompatible size"); } else if(is_Row<obj_type>::value) { arma_debug_check((n_rows != 1), "chi2rnd(): incompatible size"); }
+	if(is_Col<obj_type>::value) { arma_debug_check((n_cols != 1), "chi2rnd(): incompatible size"); }
+	else if(is_Row<obj_type>::value) { arma_debug_check((n_rows != 1), "chi2rnd(): incompatible size"); }
 
 	obj_type out(n_rows, n_cols);
 
@@ -91,7 +92,8 @@ enable_if2
 >::result chi2rnd(const typename obj_type::elem_type df, const uword n_elem) {
 	arma_extra_debug_sigprint();
 
-	if(is_Row<obj_type>::value) { return chi2rnd<obj_type>(df, 1, n_elem); } else { return chi2rnd<obj_type>(df, n_elem, 1); }
+	if(is_Row<obj_type>::value) { return chi2rnd<obj_type>(df, 1, n_elem); }
+	else { return chi2rnd<obj_type>(df, n_elem, 1); }
 }
 
 arma_warn_unused

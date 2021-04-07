@@ -29,7 +29,7 @@ template<> inline
 bool arma_isfinite(double x) { return std::isfinite(x); }
 
 template<typename T> inline
-bool arma_isfinite(const std::complex<T>& x) { return ((arma_isfinite(x.real()) == false) || (arma_isfinite(x.imag()) == false)) ? false : true; }
+bool arma_isfinite(const std::complex<T>& x) { return (arma_isfinite(x.real()) && arma_isfinite(x.imag())); }
 
 //
 // wrappers for isinf
@@ -75,7 +75,7 @@ template<typename eT> constexpr
 typename arma_signed_integral_only<eT>::result arma_sign(const eT x) { return (x > eT(0)) ? eT(+1) : ((x < eT(0)) ? eT(-1) : eT(0)); }
 
 template<typename eT> constexpr
-typename arma_real_only<eT>::result arma_sign(const eT x) { return (x > eT(0)) ? eT(+1) : ((x < eT(0)) ? eT(-1) : eT(0)); }
+typename arma_real_only<eT>::result arma_sign(const eT x) { return (x > eT(0)) ? eT(+1) : ((x < eT(0)) ? eT(-1) : ((x == eT(0)) ? eT(0) : x)); }
 
 template<typename eT> inline
 typename arma_cx_only<eT>::result arma_sign(const eT& x) {

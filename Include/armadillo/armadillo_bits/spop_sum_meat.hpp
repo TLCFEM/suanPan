@@ -53,7 +53,8 @@ void spop_sum::apply(SpMat<typename T1::elem_type>& out, const SpOp<T1, spop_sum
 				acc_mem[it.col()] += (*it);
 				++it;
 			}
-		} else {
+		}
+		else {
 			for(uword col = 0; col < p_n_cols; ++col) {
 				acc_mem[col] = arrayops::accumulate
 				(
@@ -64,7 +65,8 @@ void spop_sum::apply(SpMat<typename T1::elem_type>& out, const SpOp<T1, spop_sum
 		}
 
 		out = acc;
-	} else if(dim == 1) // find the sum in each row
+	}
+	else if(dim == 1) // find the sum in each row
 	{
 		Col<eT> acc(p_n_rows, fill::zeros);
 

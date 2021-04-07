@@ -23,7 +23,8 @@ obj_type speye(const uword n_rows, const uword n_cols, const typename arma_SpMat
 	arma_extra_debug_sigprint();
 	arma_ignore(junk);
 
-	if(is_SpCol<obj_type>::value) { arma_debug_check((n_cols != 1), "speye(): incompatible size"); } else if(is_SpRow<obj_type>::value) { arma_debug_check((n_rows != 1), "speye(): incompatible size"); }
+	if(is_SpCol<obj_type>::value) { arma_debug_check((n_cols != 1), "speye(): incompatible size"); }
+	else if(is_SpRow<obj_type>::value) { arma_debug_check((n_rows != 1), "speye(): incompatible size"); }
 
 	obj_type out;
 

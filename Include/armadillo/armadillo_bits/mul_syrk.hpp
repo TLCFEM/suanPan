@@ -67,8 +67,12 @@ public:
 		if(A_n1 == 1) {
 			const eT acc1 = op_dot::direct_dot(A_n2, A_mem, A_mem);
 
-			if((use_alpha == false) && (use_beta == false)) { C[0] = acc1; } else if((use_alpha == true) && (use_beta == false)) { C[0] = alpha * acc1; } else if((use_alpha == false) && (use_beta == true)) { C[0] = acc1 + beta * C[0]; } else if((use_alpha == true) && (use_beta == true)) { C[0] = alpha * acc1 + beta * C[0]; }
-		} else
+			if((use_alpha == false) && (use_beta == false)) { C[0] = acc1; }
+			else if((use_alpha == true) && (use_beta == false)) { C[0] = alpha * acc1; }
+			else if((use_alpha == false) && (use_beta == true)) { C[0] = acc1 + beta * C[0]; }
+			else if((use_alpha == true) && (use_beta == true)) { C[0] = alpha * acc1 + beta * C[0]; }
+		}
+		else
 			for(uword k = 0; k < A_n1; ++k) {
 				const eT A_k = A_mem[k];
 
@@ -83,7 +87,8 @@ public:
 
 						C.at(i, k) = acc1;
 						C.at(j, k) = acc2;
-					} else if((use_alpha == true) && (use_beta == false)) {
+					}
+					else if((use_alpha == true) && (use_beta == false)) {
 						const eT val1 = alpha * acc1;
 						const eT val2 = alpha * acc2;
 
@@ -92,13 +97,15 @@ public:
 
 						C.at(i, k) = val1;
 						C.at(j, k) = val2;
-					} else if((use_alpha == false) && (use_beta == true)) {
+					}
+					else if((use_alpha == false) && (use_beta == true)) {
 						C.at(k, i) = acc1 + beta * C.at(k, i);
 						C.at(k, j) = acc2 + beta * C.at(k, j);
 
 						if(i != k) { C.at(i, k) = acc1 + beta * C.at(i, k); }
 						C.at(j, k) = acc2 + beta * C.at(j, k);
-					} else if((use_alpha == true) && (use_beta == true)) {
+					}
+					else if((use_alpha == true) && (use_beta == true)) {
 						const eT val1 = alpha * acc1;
 						const eT val2 = alpha * acc2;
 
@@ -116,15 +123,18 @@ public:
 					if((use_alpha == false) && (use_beta == false)) {
 						C.at(k, i) = acc1;
 						C.at(i, k) = acc1;
-					} else if((use_alpha == true) && (use_beta == false)) {
+					}
+					else if((use_alpha == true) && (use_beta == false)) {
 						const eT val1 = alpha * acc1;
 
 						C.at(k, i) = val1;
 						C.at(i, k) = val1;
-					} else if((use_alpha == false) && (use_beta == true)) {
+					}
+					else if((use_alpha == false) && (use_beta == true)) {
 						C.at(k, i) = acc1 + beta * C.at(k, i);
 						if(i != k) { C.at(i, k) = acc1 + beta * C.at(i, k); }
-					} else if((use_alpha == true) && (use_beta == true)) {
+					}
+					else if((use_alpha == true) && (use_beta == true)) {
 						const eT val1 = alpha * acc1;
 
 						C.at(k, i) = val1 + beta * C.at(k, i);
@@ -161,7 +171,8 @@ public:
 			op_strans::apply_mat_noalias(AA, A);
 
 			syrk_emul<true, use_alpha, use_beta>::apply(C, AA, alpha, beta);
-		} else if(do_trans_A == true) {
+		}
+		else if(do_trans_A == true) {
 			const uword A_n_rows = A.n_rows;
 			const uword A_n_cols = A.n_cols;
 
@@ -176,15 +187,18 @@ public:
 					if((use_alpha == false) && (use_beta == false)) {
 						C.at(col_A, k) = acc;
 						C.at(k, col_A) = acc;
-					} else if((use_alpha == true) && (use_beta == false)) {
+					}
+					else if((use_alpha == true) && (use_beta == false)) {
 						const eT val = alpha * acc;
 
 						C.at(col_A, k) = val;
 						C.at(k, col_A) = val;
-					} else if((use_alpha == false) && (use_beta == true)) {
+					}
+					else if((use_alpha == false) && (use_beta == true)) {
 						C.at(col_A, k) = acc + beta * C.at(col_A, k);
 						if(col_A != k) { C.at(k, col_A) = acc + beta * C.at(k, col_A); }
-					} else if((use_alpha == true) && (use_beta == true)) {
+					}
+					else if((use_alpha == true) && (use_beta == true)) {
 						const eT val = alpha * acc;
 
 						C.at(col_A, k) = val + beta * C.at(col_A, k);
@@ -215,7 +229,8 @@ public:
 
 		const uword threshold = (is_cx<eT>::yes ? 16u : 48u);
 
-		if(A.n_elem <= threshold) { syrk_emul<do_trans_A, use_alpha, use_beta>::apply(C, A, alpha, beta); } else {
+		if(A.n_elem <= threshold) { syrk_emul<do_trans_A, use_alpha, use_beta>::apply(C, A, alpha, beta); }
+		else {
 #if defined(ARMA_USE_ATLAS)
         {
         if(use_beta == true)
@@ -305,7 +320,11 @@ public:
 	template<typename eT, typename TA> inline
 	static
 	void apply(Mat<eT>& C, const TA& A, const eT alpha = eT(1), const eT beta = eT(0)) {
-		if(is_cx<eT>::no) { if(A.is_vec()) { syrk_vec<do_trans_A, use_alpha, use_beta>::apply(C, A, alpha, beta); } else { syrk_emul<do_trans_A, use_alpha, use_beta>::apply(C, A, alpha, beta); } } else {
+		if(is_cx<eT>::no) {
+			if(A.is_vec()) { syrk_vec<do_trans_A, use_alpha, use_beta>::apply(C, A, alpha, beta); }
+			else { syrk_emul<do_trans_A, use_alpha, use_beta>::apply(C, A, alpha, beta); }
+		}
+		else {
 			// handling of complex matrix by syrk_emul() is not yet implemented
 			return;
 		}

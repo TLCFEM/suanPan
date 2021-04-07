@@ -227,7 +227,8 @@ namespace band_helper {
 			eT* AB_mem = AB.memptr();
 
 			for(uword i = 0; i < N; ++i) { AB_mem[i] = A.at(i, i); }
-		} else {
+		}
+		else {
 			AB.zeros(); // paranoia
 
 			for(uword j = 0; j < N; ++j) {
@@ -261,7 +262,8 @@ namespace band_helper {
 			const eT* AB_mem = AB.memptr();
 
 			for(uword i = 0; i < N; ++i) { A.at(i, i) = AB_mem[i]; }
-		} else {
+		}
+		else {
 			for(uword j = 0; j < N; ++j) {
 				const uword A_row_start = (j > KU) ? uword(j - KU) : uword(0);
 				const uword A_row_endp1 = (std::min)(N, j + KL + 1);

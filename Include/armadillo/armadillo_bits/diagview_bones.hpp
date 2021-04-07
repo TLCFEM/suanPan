@@ -46,6 +46,9 @@ public:
 	inline ~diagview();
 	inline diagview() = delete;
 
+	inline diagview(const diagview& in);
+	inline diagview(diagview&& in);
+
 	inline void operator=(const diagview& x);
 
 	inline void operator+=(const eT val);

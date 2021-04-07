@@ -17,7 +17,7 @@
 //! @{
 
 template<typename eT> inline subview<eT>::~subview() {
-	arma_extra_debug_sigprint();
+	arma_extra_debug_sigprint_this(this);
 }
 
 template<typename eT> inline subview<eT>::subview(const Mat<eT>& in_m, const uword in_row1, const uword in_col1, const uword in_n_rows, const uword in_n_cols)
@@ -27,18 +27,35 @@ template<typename eT> inline subview<eT>::subview(const Mat<eT>& in_m, const uwo
 	, n_rows(in_n_rows)
 	, n_cols(in_n_cols)
 	, n_elem(in_n_rows * in_n_cols) {
-	arma_extra_debug_sigprint();
+	arma_extra_debug_sigprint_this(this);
 }
 
-template<typename eT> inline
-void subview<eT>::operator=(const eT val) {
-	arma_extra_debug_sigprint();
+template<typename eT> inline subview<eT>::subview(const subview<eT>& in)
+	: m(in.m)
+	, aux_row1(in.aux_row1)
+	, aux_col1(in.aux_col1)
+	, n_rows(in.n_rows)
+	, n_cols(in.n_cols)
+	, n_elem(in.n_elem) {
+	arma_extra_debug_sigprint(arma_str::format("this = %x   in = %x") % this % &in);
+}
 
-	if(n_elem != 1) { arma_debug_assert_same_size(n_rows, n_cols, 1, 1, "copy into submatrix"); }
+template<typename eT> inline subview<eT>::subview(subview<eT>&& in)
+	: m(in.m)
+	, aux_row1(in.aux_row1)
+	, aux_col1(in.aux_col1)
+	, n_rows(in.n_rows)
+	, n_cols(in.n_cols)
+	, n_elem(in.n_elem) {
+	arma_extra_debug_sigprint(arma_str::format("this = %x   in = %x") % this % &in);
 
-	Mat<eT>& X = const_cast<Mat<eT>&>(m);
+	// for paranoia
 
-	X.at(aux_row1, aux_col1) = val;
+	access::rw(in.aux_row1) = 0;
+	access::rw(in.aux_col1) = 0;
+	access::rw(in.n_rows) = 0;
+	access::rw(in.n_cols) = 0;
+	access::rw(in.n_elem) = 0;
 }
 
 template<typename eT> template<typename op_type> inline
@@ -91,7 +108,8 @@ void subview<eT>::inplace_op(const eT val) {
 			if(is_same_type<op_type, op_internal_schur>::yes) { (*Aptr) *= val; }
 			if(is_same_type<op_type, op_internal_div>::yes) { (*Aptr) /= val; }
 		}
-	} else {
+	}
+	else {
 		for(uword ucol = 0; ucol < s_n_cols; ++ucol) {
 			if(is_same_type<op_type, op_internal_plus>::yes) { arrayops::inplace_plus(colptr(ucol), val, s_n_rows); }
 			if(is_same_type<op_type, op_internal_minus>::yes) { arrayops::inplace_minus(colptr(ucol), val, s_n_rows); }
@@ -177,9 +195,11 @@ void subview<eT>::inplace_op(const Base<eT, T1>& in, const char* identifier) {
 				if(is_same_type<op_type, op_internal_schur>::yes) { (*Aptr) *= (*Bptr); }
 				if(is_same_type<op_type, op_internal_div>::yes) { (*Aptr) /= (*Bptr); }
 			}
-		} else // not a row vector
+		}
+		else // not a row vector
 		{
-			if((is_same_type<op_type, op_internal_equ>::yes) && (s.aux_row1 == 0) && (s_n_rows == s.m.n_rows)) { arrayops::copy(s.colptr(0), B.memptr(), s.n_elem); } else {
+			if((is_same_type<op_type, op_internal_equ>::yes) && (s.aux_row1 == 0) && (s_n_rows == s.m.n_rows)) { arrayops::copy(s.colptr(0), B.memptr(), s.n_elem); }
+			else {
 				for(uword ucol = 0; ucol < s_n_cols; ++ucol) {
 					if(is_same_type<op_type, op_internal_equ>::yes) { arrayops::copy(s.colptr(ucol), B.colptr(ucol), s_n_rows); }
 					if(is_same_type<op_type, op_internal_plus>::yes) { arrayops::inplace_plus(s.colptr(ucol), B.colptr(ucol), s_n_rows); }
@@ -189,7 +209,8 @@ void subview<eT>::inplace_op(const Base<eT, T1>& in, const char* identifier) {
 				}
 			}
 		}
-	} else // use the Proxy
+	}
+	else // use the Proxy
 	{
 		if(s_n_rows == 1) {
 			Mat<eT>& A = const_cast<Mat<eT>&>(m);
@@ -245,7 +266,8 @@ void subview<eT>::inplace_op(const Base<eT, T1>& in, const char* identifier) {
 				if(is_same_type<op_type, op_internal_schur>::yes) { (*Aptr) *= (Proxy<T1>::use_at) ? P.at(0, ii) : P[ii]; }
 				if(is_same_type<op_type, op_internal_div>::yes) { (*Aptr) /= (Proxy<T1>::use_at) ? P.at(0, ii) : P[ii]; }
 			}
-		} else // not a row vector
+		}
+		else // not a row vector
 		{
 			if(Proxy<T1>::use_at) {
 				for(uword ucol = 0; ucol < s_n_cols; ++ucol) {
@@ -299,7 +321,8 @@ void subview<eT>::inplace_op(const Base<eT, T1>& in, const char* identifier) {
 						if(is_same_type<op_type, op_internal_div>::yes) { (*s_col_data) /= P.at(ii, ucol); }
 					}
 				}
-			} else {
+			}
+			else {
 				typename Proxy<T1>::ea_type Pea = P.get_ea();
 
 				uword count = 0;
@@ -453,7 +476,8 @@ void subview<eT>::inplace_op(const subview<eT>& x, const char* identifier) {
 			if(is_same_type<op_type, op_internal_schur>::yes) { (*Aptr) *= (*Bptr); }
 			if(is_same_type<op_type, op_internal_div>::yes) { (*Aptr) /= (*Bptr); }
 		}
-	} else {
+	}
+	else {
 		for(uword ucol = 0; ucol < s_n_cols; ++ucol) {
 			if(is_same_type<op_type, op_internal_equ>::yes) { arrayops::copy(s.colptr(ucol), x.colptr(ucol), s_n_rows); }
 			if(is_same_type<op_type, op_internal_plus>::yes) { arrayops::inplace_plus(s.colptr(ucol), x.colptr(ucol), s_n_rows); }
@@ -462,6 +486,17 @@ void subview<eT>::inplace_op(const subview<eT>& x, const char* identifier) {
 			if(is_same_type<op_type, op_internal_div>::yes) { arrayops::inplace_div(s.colptr(ucol), x.colptr(ucol), s_n_rows); }
 		}
 	}
+}
+
+template<typename eT> inline
+void subview<eT>::operator=(const eT val) {
+	arma_extra_debug_sigprint();
+
+	if(n_elem != 1) { arma_debug_assert_same_size(n_rows, n_cols, 1, 1, "copy into submatrix"); }
+
+	Mat<eT>& X = const_cast<Mat<eT>&>(m);
+
+	X.at(aux_row1, aux_col1) = val;
 }
 
 template<typename eT> inline
@@ -681,8 +716,7 @@ void subview<eT>::operator/=(const SpBase<eT, T1>& x) {
 	// This is probably going to fill your subview with a bunch of NaNs,
 	// so I'm not going to bother to implement it fast.
 	// You can have slow NaNs.  They're fine too.
-	for(uword c = 0; c < n_cols; ++c)
-		for(uword r = 0; r < n_rows; ++r) { at(r, c) /= p.at(r, c); }
+	for(uword c = 0; c < n_cols; ++c) for(uword r = 0; r < n_rows; ++r) { at(r, c) /= p.at(r, c); }
 }
 
 template<typename eT> template<typename T1, typename gen_type> inline
@@ -692,6 +726,40 @@ typename enable_if2<is_same_type<typename T1::elem_type, eT>::value, void>::resu
 	arma_debug_assert_same_size(n_rows, n_cols, in.n_rows, in.n_cols, "copy into submatrix");
 
 	in.apply(*this);
+}
+
+template<typename eT> inline
+void subview<eT>::operator=(const std::initializer_list<eT>& list) {
+	arma_extra_debug_sigprint();
+
+	arma_debug_check((is_vec() == false), "copy into submatrix: size mismatch");
+
+	const uword N = uword(list.size());
+
+	if(n_rows == 1) {
+		arma_debug_assert_same_size(1, n_cols, 1, N, "copy into submatrix");
+
+		auto it = list.begin();
+
+		for(uword ii = 0; ii < N; ++ii) {
+			(*this).at(0, ii) = (*it);
+			++it;
+		}
+	}
+	else if(n_cols == 1) {
+		arma_debug_assert_same_size(n_rows, 1, N, 1, "copy into submatrix");
+
+		arrayops::copy((*this).colptr(0), list.begin(), N);
+	}
+}
+
+template<typename eT> inline
+void subview<eT>::operator=(const std::initializer_list<std::initializer_list<eT>>& list) {
+	arma_extra_debug_sigprint();
+
+	const Mat<eT> tmp(list);
+
+	(*this).operator=(tmp);
 }
 
 //! apply a functor to each element
@@ -707,15 +775,15 @@ void subview<eT>::for_each(functor F) {
 		const uword end_col_plus1 = start_col + n_cols;
 
 		for(uword ucol = start_col; ucol < end_col_plus1; ++ucol) { F(X.at(urow, ucol)); }
-	} else {
+	}
+	else {
 		const uword start_col = aux_col1;
 		const uword start_row = aux_row1;
 
 		const uword end_col_plus1 = start_col + n_cols;
 		const uword end_row_plus1 = start_row + n_rows;
 
-		for(uword ucol = start_col; ucol < end_col_plus1; ++ucol)
-			for(uword urow = start_row; urow < end_row_plus1; ++urow) { F(X.at(urow, ucol)); }
+		for(uword ucol = start_col; ucol < end_col_plus1; ++ucol) for(uword urow = start_row; urow < end_row_plus1; ++urow) { F(X.at(urow, ucol)); }
 	}
 }
 
@@ -731,15 +799,15 @@ void subview<eT>::for_each(functor F) const {
 		const uword end_col_plus1 = start_col + n_cols;
 
 		for(uword ucol = start_col; ucol < end_col_plus1; ++ucol) { F(X.at(urow, ucol)); }
-	} else {
+	}
+	else {
 		const uword start_col = aux_col1;
 		const uword start_row = aux_row1;
 
 		const uword end_col_plus1 = start_col + n_cols;
 		const uword end_row_plus1 = start_row + n_rows;
 
-		for(uword ucol = start_col; ucol < end_col_plus1; ++ucol)
-			for(uword urow = start_row; urow < end_row_plus1; ++urow) { F(X.at(urow, ucol)); }
+		for(uword ucol = start_col; ucol < end_col_plus1; ++ucol) for(uword urow = start_row; urow < end_row_plus1; ++urow) { F(X.at(urow, ucol)); }
 	}
 }
 
@@ -756,15 +824,15 @@ void subview<eT>::transform(functor F) {
 		const uword end_col_plus1 = start_col + n_cols;
 
 		for(uword ucol = start_col; ucol < end_col_plus1; ++ucol) { X.at(urow, ucol) = eT(F(X.at(urow, ucol))); }
-	} else {
+	}
+	else {
 		const uword start_col = aux_col1;
 		const uword start_row = aux_row1;
 
 		const uword end_col_plus1 = start_col + n_cols;
 		const uword end_row_plus1 = start_row + n_rows;
 
-		for(uword ucol = start_col; ucol < end_col_plus1; ++ucol)
-			for(uword urow = start_row; urow < end_row_plus1; ++urow) { X.at(urow, ucol) = eT(F(X.at(urow, ucol))); }
+		for(uword ucol = start_col; ucol < end_col_plus1; ++ucol) for(uword urow = start_row; urow < end_row_plus1; ++urow) { X.at(urow, ucol) = eT(F(X.at(urow, ucol))); }
 	}
 }
 
@@ -781,15 +849,15 @@ void subview<eT>::imbue(functor F) {
 		const uword end_col_plus1 = start_col + n_cols;
 
 		for(uword ucol = start_col; ucol < end_col_plus1; ++ucol) { X.at(urow, ucol) = eT(F()); }
-	} else {
+	}
+	else {
 		const uword start_col = aux_col1;
 		const uword start_row = aux_row1;
 
 		const uword end_col_plus1 = start_col + n_cols;
 		const uword end_row_plus1 = start_row + n_rows;
 
-		for(uword ucol = start_col; ucol < end_col_plus1; ++ucol)
-			for(uword urow = start_row; urow < end_row_plus1; ++urow) { X.at(urow, ucol) = eT(F()); }
+		for(uword ucol = start_col; ucol < end_col_plus1; ++ucol) for(uword urow = start_row; urow < end_row_plus1; ++urow) { X.at(urow, ucol) = eT(F()); }
 	}
 }
 
@@ -815,14 +883,16 @@ void subview<eT>::replace(const eT old_val, const eT new_val) {
 
 				Aptr += A_n_rows;
 			}
-		} else {
+		}
+		else {
 			for(uword ucol = 0; ucol < s_n_cols; ++ucol) {
 				(*Aptr) = ((*Aptr) == old_val) ? new_val : (*Aptr);
 
 				Aptr += A_n_rows;
 			}
 		}
-	} else { for(uword ucol = 0; ucol < s_n_cols; ++ucol) { arrayops::replace(s.colptr(ucol), s_n_rows, old_val, new_val); } }
+	}
+	else { for(uword ucol = 0; ucol < s_n_cols; ++ucol) { arrayops::replace(s.colptr(ucol), s_n_rows, old_val, new_val); } }
 }
 
 template<typename eT> inline
@@ -862,7 +932,8 @@ void subview<eT>::fill(const eT val) {
 		}
 
 		if((jj - 1) < s_n_cols) { (*Aptr) = val; }
-	} else {
+	}
+	else {
 		if((s.aux_row1 == 0) && (s_n_rows == s.m.n_rows)) {
 			arrayops::inplace_set(s.colptr(0), val, s.n_elem);
 
@@ -905,7 +976,8 @@ void subview<eT>::randu() {
 	const uword local_n_rows = n_rows;
 	const uword local_n_cols = n_cols;
 
-	if(local_n_rows == 1) { for(uword ii = 0; ii < local_n_cols; ++ii) { at(0, ii) = eT(arma_rng::randu<eT>()); } } else { for(uword ii = 0; ii < local_n_cols; ++ii) { arma_rng::randu<eT>::fill(colptr(ii), local_n_rows); } }
+	if(local_n_rows == 1) { for(uword ii = 0; ii < local_n_cols; ++ii) { at(0, ii) = eT(arma_rng::randu<eT>()); } }
+	else { for(uword ii = 0; ii < local_n_cols; ++ii) { arma_rng::randu<eT>::fill(colptr(ii), local_n_rows); } }
 }
 
 template<typename eT> inline
@@ -915,7 +987,8 @@ void subview<eT>::randn() {
 	const uword local_n_rows = n_rows;
 	const uword local_n_cols = n_cols;
 
-	if(local_n_rows == 1) { for(uword ii = 0; ii < local_n_cols; ++ii) { at(0, ii) = eT(arma_rng::randn<eT>()); } } else { for(uword ii = 0; ii < local_n_cols; ++ii) { arma_rng::randn<eT>::fill(colptr(ii), local_n_rows); } }
+	if(local_n_rows == 1) { for(uword ii = 0; ii < local_n_cols; ++ii) { at(0, ii) = eT(arma_rng::randn<eT>()); } }
+	else { for(uword ii = 0; ii < local_n_cols; ++ii) { arma_rng::randn<eT>::fill(colptr(ii), local_n_rows); } }
 }
 
 template<typename eT> inline
@@ -943,7 +1016,7 @@ eT subview<eT>::operator[](const uword ii) const {
 
 template<typename eT> inline
 eT& subview<eT>::operator()(const uword ii) {
-	arma_debug_check((ii >= n_elem), "subview::operator(): index out of bounds");
+	arma_debug_check_bounds((ii >= n_elem), "subview::operator(): index out of bounds");
 
 	const uword in_col = ii / n_rows;
 	const uword in_row = ii % n_rows;
@@ -955,7 +1028,7 @@ eT& subview<eT>::operator()(const uword ii) {
 
 template<typename eT> inline
 eT subview<eT>::operator()(const uword ii) const {
-	arma_debug_check((ii >= n_elem), "subview::operator(): index out of bounds");
+	arma_debug_check_bounds((ii >= n_elem), "subview::operator(): index out of bounds");
 
 	const uword in_col = ii / n_rows;
 	const uword in_row = ii % n_rows;
@@ -967,7 +1040,7 @@ eT subview<eT>::operator()(const uword ii) const {
 
 template<typename eT> inline
 eT& subview<eT>::operator()(const uword in_row, const uword in_col) {
-	arma_debug_check(((in_row >= n_rows) || (in_col >= n_cols)), "subview::operator(): index out of bounds");
+	arma_debug_check_bounds(((in_row >= n_rows) || (in_col >= n_cols)), "subview::operator(): index out of bounds");
 
 	const uword index = (in_col + aux_col1) * m.n_rows + aux_row1 + in_row;
 
@@ -976,7 +1049,7 @@ eT& subview<eT>::operator()(const uword in_row, const uword in_col) {
 
 template<typename eT> inline
 eT subview<eT>::operator()(const uword in_row, const uword in_col) const {
-	arma_debug_check(((in_row >= n_rows) || (in_col >= n_cols)), "subview::operator(): index out of bounds");
+	arma_debug_check_bounds(((in_row >= n_rows) || (in_col >= n_cols)), "subview::operator(): index out of bounds");
 
 	const uword index = (in_col + aux_col1) * m.n_rows + aux_row1 + in_row;
 
@@ -1134,14 +1207,15 @@ void subview<eT>::extract(Mat<eT>& out, const subview<eT>& in) {
 
 	arma_extra_debug_print(arma_str::format("out.n_rows = %d   out.n_cols = %d    in.m.n_rows = %d  in.m.n_cols = %d") % out.n_rows % out.n_cols % in.m.n_rows % in.m.n_cols);
 
-	if(in.is_vec() == true) {
+	if(in.is_vec()) {
 		if(n_cols == 1) // a column vector
 		{
 			arma_extra_debug_print("subview::extract(): copying col (going across rows)");
 
 			// in.colptr(0) the first column of the subview, taking into account any row offset
 			arrayops::copy(out.memptr(), in.colptr(0), n_rows);
-		} else // a row vector (possibly empty)
+		}
+		else // a row vector (possibly empty)
 		{
 			arma_extra_debug_print("subview::extract(): copying row (going across columns)");
 
@@ -1167,7 +1241,8 @@ void subview<eT>::extract(Mat<eT>& out, const subview<eT>& in) {
 
 			if((j - 1) < n_cols) { (*out_mem) = (*Xptr); }
 		}
-	} else // general submatrix
+	}
+	else // general submatrix
 	{
 		arma_extra_debug_print("subview::extract(): general submatrix");
 
@@ -1209,7 +1284,8 @@ void subview<eT>::plus_inplace(Mat<eT>& out, const subview<eT>& in) {
 		}
 
 		if(i < n_cols) { out_mem[i] += X.at(row, start_col + i); }
-	} else { for(uword col = 0; col < n_cols; ++col) { arrayops::inplace_plus(out.colptr(col), in.colptr(col), n_rows); } }
+	}
+	else { for(uword col = 0; col < n_cols; ++col) { arrayops::inplace_plus(out.colptr(col), in.colptr(col), n_rows); } }
 }
 
 //! X -= Y.submat(...)
@@ -1240,7 +1316,8 @@ void subview<eT>::minus_inplace(Mat<eT>& out, const subview<eT>& in) {
 		}
 
 		if(i < n_cols) { out_mem[i] -= X.at(row, start_col + i); }
-	} else { for(uword col = 0; col < n_cols; ++col) { arrayops::inplace_minus(out.colptr(col), in.colptr(col), n_rows); } }
+	}
+	else { for(uword col = 0; col < n_cols; ++col) { arrayops::inplace_minus(out.colptr(col), in.colptr(col), n_rows); } }
 }
 
 //! X %= Y.submat(...)
@@ -1271,7 +1348,8 @@ void subview<eT>::schur_inplace(Mat<eT>& out, const subview<eT>& in) {
 		}
 
 		if(i < n_cols) { out_mem[i] *= X.at(row, start_col + i); }
-	} else { for(uword col = 0; col < n_cols; ++col) { arrayops::inplace_mul(out.colptr(col), in.colptr(col), n_rows); } }
+	}
+	else { for(uword col = 0; col < n_cols; ++col) { arrayops::inplace_mul(out.colptr(col), in.colptr(col), n_rows); } }
 }
 
 //! X /= Y.submat(...)
@@ -1302,7 +1380,8 @@ void subview<eT>::div_inplace(Mat<eT>& out, const subview<eT>& in) {
 		}
 
 		if(i < n_cols) { out_mem[i] /= X.at(row, start_col + i); }
-	} else { for(uword col = 0; col < n_cols; ++col) { arrayops::inplace_div(out.colptr(col), in.colptr(col), n_rows); } }
+	}
+	else { for(uword col = 0; col < n_cols; ++col) { arrayops::inplace_div(out.colptr(col), in.colptr(col), n_rows); } }
 }
 
 //! creation of subview (row vector)
@@ -1310,7 +1389,7 @@ template<typename eT> inline
 subview_row<eT> subview<eT>::row(const uword row_num) {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check(row_num >= n_rows, "subview::row(): out of bounds");
+	arma_debug_check_bounds(row_num >= n_rows, "subview::row(): out of bounds");
 
 	const uword base_row = aux_row1 + row_num;
 
@@ -1322,7 +1401,7 @@ template<typename eT> inline
 const subview_row<eT> subview<eT>::row(const uword row_num) const {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check(row_num >= n_rows, "subview::row(): out of bounds");
+	arma_debug_check_bounds(row_num >= n_rows, "subview::row(): out of bounds");
 
 	const uword base_row = aux_row1 + row_num;
 
@@ -1344,7 +1423,7 @@ subview_row<eT> subview<eT>::operator()(const uword row_num, const span& col_spa
 	const uword base_col1 = aux_col1 + in_col1;
 	const uword base_row = aux_row1 + row_num;
 
-	arma_debug_check
+	arma_debug_check_bounds
 		(
 			(row_num >= n_rows)
 			||
@@ -1371,7 +1450,7 @@ const subview_row<eT> subview<eT>::operator()(const uword row_num, const span& c
 	const uword base_col1 = aux_col1 + in_col1;
 	const uword base_row = aux_row1 + row_num;
 
-	arma_debug_check
+	arma_debug_check_bounds
 		(
 			(row_num >= n_rows)
 			||
@@ -1388,7 +1467,7 @@ template<typename eT> inline
 subview_col<eT> subview<eT>::col(const uword col_num) {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check(col_num >= n_cols, "subview::col(): out of bounds");
+	arma_debug_check_bounds(col_num >= n_cols, "subview::col(): out of bounds");
 
 	const uword base_col = aux_col1 + col_num;
 
@@ -1400,7 +1479,7 @@ template<typename eT> inline
 const subview_col<eT> subview<eT>::col(const uword col_num) const {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check(col_num >= n_cols, "subview::col(): out of bounds");
+	arma_debug_check_bounds(col_num >= n_cols, "subview::col(): out of bounds");
 
 	const uword base_col = aux_col1 + col_num;
 
@@ -1422,7 +1501,7 @@ subview_col<eT> subview<eT>::operator()(const span& row_span, const uword col_nu
 	const uword base_row1 = aux_row1 + in_row1;
 	const uword base_col = aux_col1 + col_num;
 
-	arma_debug_check
+	arma_debug_check_bounds
 		(
 			(col_num >= n_cols)
 			||
@@ -1449,7 +1528,7 @@ const subview_col<eT> subview<eT>::operator()(const span& row_span, const uword 
 	const uword base_row1 = aux_row1 + in_row1;
 	const uword base_col = aux_col1 + col_num;
 
-	arma_debug_check
+	arma_debug_check_bounds
 		(
 			(col_num >= n_cols)
 			||
@@ -1470,7 +1549,7 @@ template<typename eT> inline
 Col<eT> subview<eT>::unsafe_col(const uword col_num) {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check(col_num >= n_cols, "subview::unsafe_col(): out of bounds");
+	arma_debug_check_bounds(col_num >= n_cols, "subview::unsafe_col(): out of bounds");
 
 	return Col<eT>(colptr(col_num), n_rows, false, true);
 }
@@ -1484,7 +1563,7 @@ template<typename eT> inline
 const Col<eT> subview<eT>::unsafe_col(const uword col_num) const {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check(col_num >= n_cols, "subview::unsafe_col(): out of bounds");
+	arma_debug_check_bounds(col_num >= n_cols, "subview::unsafe_col(): out of bounds");
 
 	return Col<eT>(const_cast<eT*>(colptr(col_num)), n_rows, false, true);
 }
@@ -1494,7 +1573,7 @@ template<typename eT> inline
 subview<eT> subview<eT>::rows(const uword in_row1, const uword in_row2) {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check
+	arma_debug_check_bounds
 		(
 			(in_row1 > in_row2) || (in_row2 >= n_rows),
 			"subview::rows(): indices out of bounds or incorrectly used"
@@ -1511,7 +1590,7 @@ template<typename eT> inline
 const subview<eT> subview<eT>::rows(const uword in_row1, const uword in_row2) const {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check
+	arma_debug_check_bounds
 		(
 			(in_row1 > in_row2) || (in_row2 >= n_rows),
 			"subview::rows(): indices out of bounds or incorrectly used"
@@ -1528,7 +1607,7 @@ template<typename eT> inline
 subview<eT> subview<eT>::cols(const uword in_col1, const uword in_col2) {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check
+	arma_debug_check_bounds
 		(
 			(in_col1 > in_col2) || (in_col2 >= n_cols),
 			"subview::cols(): indices out of bounds or incorrectly used"
@@ -1545,7 +1624,7 @@ template<typename eT> inline
 const subview<eT> subview<eT>::cols(const uword in_col1, const uword in_col2) const {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check
+	arma_debug_check_bounds
 		(
 			(in_col1 > in_col2) || (in_col2 >= n_cols),
 			"subview::cols(): indices out of bounds or incorrectly used"
@@ -1562,7 +1641,7 @@ template<typename eT> inline
 subview<eT> subview<eT>::submat(const uword in_row1, const uword in_col1, const uword in_row2, const uword in_col2) {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check
+	arma_debug_check_bounds
 		(
 			(in_row1 > in_row2) || (in_col1 > in_col2) || (in_row2 >= n_rows) || (in_col2 >= n_cols),
 			"subview::submat(): indices out of bounds or incorrectly used"
@@ -1582,7 +1661,7 @@ template<typename eT> inline
 const subview<eT> subview<eT>::submat(const uword in_row1, const uword in_col1, const uword in_row2, const uword in_col2) const {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check
+	arma_debug_check_bounds
 		(
 			(in_row1 > in_row2) || (in_col1 > in_col2) || (in_row2 >= n_rows) || (in_col2 >= n_cols),
 			"subview::submat(): indices out of bounds or incorrectly used"
@@ -1616,7 +1695,7 @@ subview<eT> subview<eT>::submat(const span& row_span, const span& col_span) {
 	const uword in_col2 = col_span.b;
 	const uword submat_n_cols = col_all ? local_n_cols : in_col2 - in_col1 + 1;
 
-	arma_debug_check
+	arma_debug_check_bounds
 		(
 			(row_all ? false : ((in_row1 > in_row2) || (in_row2 >= local_n_rows)))
 			||
@@ -1650,7 +1729,7 @@ const subview<eT> subview<eT>::submat(const span& row_span, const span& col_span
 	const uword in_col2 = col_span.b;
 	const uword submat_n_cols = col_all ? local_n_cols : in_col2 - in_col1 + 1;
 
-	arma_debug_check
+	arma_debug_check_bounds
 		(
 			(row_all ? false : ((in_row1 > in_row2) || (in_row2 >= local_n_rows)))
 			||
@@ -1814,7 +1893,7 @@ diagview<eT> subview<eT>::diag(const sword in_id) {
 	const uword row_offset = (in_id < 0) ? uword(-in_id) : 0;
 	const uword col_offset = (in_id > 0) ? uword(in_id) : 0;
 
-	arma_debug_check
+	arma_debug_check_bounds
 		(
 			((row_offset > 0) && (row_offset >= n_rows)) || ((col_offset > 0) && (col_offset >= n_cols)),
 			"subview::diag(): requested diagonal out of bounds"
@@ -1836,7 +1915,7 @@ const diagview<eT> subview<eT>::diag(const sword in_id) const {
 	const uword row_offset = uword((in_id < 0) ? -in_id : 0);
 	const uword col_offset = uword((in_id > 0) ? in_id : 0);
 
-	arma_debug_check
+	arma_debug_check_bounds
 		(
 			((row_offset > 0) && (row_offset >= n_rows)) || ((col_offset > 0) && (col_offset >= n_cols)),
 			"subview::diag(): requested diagonal out of bounds"
@@ -1854,7 +1933,7 @@ template<typename eT> inline
 void subview<eT>::swap_rows(const uword in_row1, const uword in_row2) {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check
+	arma_debug_check_bounds
 		(
 			(in_row1 >= n_rows) || (in_row2 >= n_rows),
 			"subview::swap_rows(): out of bounds"
@@ -1879,7 +1958,7 @@ template<typename eT> inline
 void subview<eT>::swap_cols(const uword in_col1, const uword in_col2) {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check
+	arma_debug_check_bounds
 		(
 			(in_col1 >= n_cols) || (in_col2 >= n_cols),
 			"subview::swap_cols(): out of bounds"
@@ -1959,7 +2038,8 @@ typename subview<eT>::iterator& subview<eT>::iterator::operator++() {
 		current_col++;
 
 		current_ptr = &((*M).at(current_row, current_col));
-	} else { current_ptr++; }
+	}
+	else { current_ptr++; }
 
 	return *this;
 }
@@ -2048,7 +2128,8 @@ typename subview<eT>::const_iterator& subview<eT>::const_iterator::operator++() 
 		current_col++;
 
 		current_ptr = &((*M).at(current_row, current_col));
-	} else { current_ptr++; }
+	}
+	else { current_ptr++; }
 
 	return *this;
 }
@@ -2252,6 +2333,20 @@ template<typename eT> inline subview_col<eT>::subview_col(const Mat<eT>& in_m, c
 	arma_extra_debug_sigprint();
 }
 
+template<typename eT> inline subview_col<eT>::subview_col(const subview_col<eT>& in)
+	: subview<eT>(in) // interprets 'subview_col' as 'subview'
+	, colmem(in.colmem) {
+	arma_extra_debug_sigprint();
+}
+
+template<typename eT> inline subview_col<eT>::subview_col(subview_col<eT>&& in)
+	: subview<eT>(std::move(in)) // interprets 'subview_col' as 'subview'
+	, colmem(in.colmem) {
+	arma_extra_debug_sigprint();
+
+	access::rw(in.colmem) = nullptr;
+}
+
 template<typename eT> inline
 void subview_col<eT>::operator=(const subview<eT>& X) {
 	arma_extra_debug_sigprint();
@@ -2264,6 +2359,17 @@ void subview_col<eT>::operator=(const subview_col<eT>& X) {
 	arma_extra_debug_sigprint();
 
 	subview<eT>::operator=(X); // interprets 'subview_col' as 'subview'
+}
+
+template<typename eT> inline
+void subview_col<eT>::operator=(const std::initializer_list<eT>& list) {
+	arma_extra_debug_sigprint();
+
+	const uword N = uword(list.size());
+
+	arma_debug_assert_same_size(subview<eT>::n_rows, subview<eT>::n_cols, N, 1, "copy into submatrix");
+
+	arrayops::copy(access::rwp(colmem), list.begin(), N);
 }
 
 template<typename eT> inline
@@ -2340,28 +2446,28 @@ eT subview_col<eT>::operator[](const uword ii) const { return colmem[ii]; }
 
 template<typename eT> inline
 eT& subview_col<eT>::operator()(const uword ii) {
-	arma_debug_check((ii >= subview<eT>::n_elem), "subview::operator(): index out of bounds");
+	arma_debug_check_bounds((ii >= subview<eT>::n_elem), "subview::operator(): index out of bounds");
 
 	return access::rw(colmem[ii]);
 }
 
 template<typename eT> inline
 eT subview_col<eT>::operator()(const uword ii) const {
-	arma_debug_check((ii >= subview<eT>::n_elem), "subview::operator(): index out of bounds");
+	arma_debug_check_bounds((ii >= subview<eT>::n_elem), "subview::operator(): index out of bounds");
 
 	return colmem[ii];
 }
 
 template<typename eT> inline
 eT& subview_col<eT>::operator()(const uword in_row, const uword in_col) {
-	arma_debug_check(((in_row >= subview<eT>::n_rows) || (in_col > 0)), "subview::operator(): index out of bounds");
+	arma_debug_check_bounds(((in_row >= subview<eT>::n_rows) || (in_col > 0)), "subview::operator(): index out of bounds");
 
 	return access::rw(colmem[in_row]);
 }
 
 template<typename eT> inline
 eT subview_col<eT>::operator()(const uword in_row, const uword in_col) const {
-	arma_debug_check(((in_row >= subview<eT>::n_rows) || (in_col > 0)), "subview::operator(): index out of bounds");
+	arma_debug_check_bounds(((in_row >= subview<eT>::n_rows) || (in_col > 0)), "subview::operator(): index out of bounds");
 
 	return colmem[in_row];
 }
@@ -2382,7 +2488,7 @@ template<typename eT> inline
 subview_col<eT> subview_col<eT>::rows(const uword in_row1, const uword in_row2) {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check(((in_row1 > in_row2) || (in_row2 >= subview<eT>::n_rows)), "subview_col::rows(): indices out of bounds or incorrectly used");
+	arma_debug_check_bounds(((in_row1 > in_row2) || (in_row2 >= subview<eT>::n_rows)), "subview_col::rows(): indices out of bounds or incorrectly used");
 
 	const uword subview_n_rows = in_row2 - in_row1 + 1;
 
@@ -2395,7 +2501,7 @@ template<typename eT> inline
 const subview_col<eT> subview_col<eT>::rows(const uword in_row1, const uword in_row2) const {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check(((in_row1 > in_row2) || (in_row2 >= subview<eT>::n_rows)), "subview_col::rows(): indices out of bounds or incorrectly used");
+	arma_debug_check_bounds(((in_row1 > in_row2) || (in_row2 >= subview<eT>::n_rows)), "subview_col::rows(): indices out of bounds or incorrectly used");
 
 	const uword subview_n_rows = in_row2 - in_row1 + 1;
 
@@ -2408,7 +2514,7 @@ template<typename eT> inline
 subview_col<eT> subview_col<eT>::subvec(const uword in_row1, const uword in_row2) {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check(((in_row1 > in_row2) || (in_row2 >= subview<eT>::n_rows)), "subview_col::subvec(): indices out of bounds or incorrectly used");
+	arma_debug_check_bounds(((in_row1 > in_row2) || (in_row2 >= subview<eT>::n_rows)), "subview_col::subvec(): indices out of bounds or incorrectly used");
 
 	const uword subview_n_rows = in_row2 - in_row1 + 1;
 
@@ -2421,7 +2527,7 @@ template<typename eT> inline
 const subview_col<eT> subview_col<eT>::subvec(const uword in_row1, const uword in_row2) const {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check(((in_row1 > in_row2) || (in_row2 >= subview<eT>::n_rows)), "subview_col::subvec(): indices out of bounds or incorrectly used");
+	arma_debug_check_bounds(((in_row1 > in_row2) || (in_row2 >= subview<eT>::n_rows)), "subview_col::subvec(): indices out of bounds or incorrectly used");
 
 	const uword subview_n_rows = in_row2 - in_row1 + 1;
 
@@ -2436,7 +2542,7 @@ subview_col<eT> subview_col<eT>::subvec(const uword start_row, const SizeMat& s)
 
 	arma_debug_check((s.n_cols != 1), "subview_col::subvec(): given size does not specify a column vector");
 
-	arma_debug_check(((start_row >= subview<eT>::n_rows) || ((start_row + s.n_rows) > subview<eT>::n_rows)), "subview_col::subvec(): size out of bounds");
+	arma_debug_check_bounds(((start_row >= subview<eT>::n_rows) || ((start_row + s.n_rows) > subview<eT>::n_rows)), "subview_col::subvec(): size out of bounds");
 
 	const uword base_row1 = this->aux_row1 + start_row;
 
@@ -2449,7 +2555,7 @@ const subview_col<eT> subview_col<eT>::subvec(const uword start_row, const SizeM
 
 	arma_debug_check((s.n_cols != 1), "subview_col::subvec(): given size does not specify a column vector");
 
-	arma_debug_check(((start_row >= subview<eT>::n_rows) || ((start_row + s.n_rows) > subview<eT>::n_rows)), "subview_col::subvec(): size out of bounds");
+	arma_debug_check_bounds(((start_row >= subview<eT>::n_rows) || ((start_row + s.n_rows) > subview<eT>::n_rows)), "subview_col::subvec(): size out of bounds");
 
 	const uword base_row1 = this->aux_row1 + start_row;
 
@@ -2460,7 +2566,7 @@ template<typename eT> inline
 subview_col<eT> subview_col<eT>::head(const uword N) {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check((N > subview<eT>::n_rows), "subview_col::head(): size out of bounds");
+	arma_debug_check_bounds((N > subview<eT>::n_rows), "subview_col::head(): size out of bounds");
 
 	return subview_col<eT>(this->m, this->aux_col1, this->aux_row1, N);
 }
@@ -2469,7 +2575,7 @@ template<typename eT> inline
 const subview_col<eT> subview_col<eT>::head(const uword N) const {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check((N > subview<eT>::n_rows), "subview_col::head(): size out of bounds");
+	arma_debug_check_bounds((N > subview<eT>::n_rows), "subview_col::head(): size out of bounds");
 
 	return subview_col<eT>(this->m, this->aux_col1, this->aux_row1, N);
 }
@@ -2478,7 +2584,7 @@ template<typename eT> inline
 subview_col<eT> subview_col<eT>::tail(const uword N) {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check((N > subview<eT>::n_rows), "subview_col::tail(): size out of bounds");
+	arma_debug_check_bounds((N > subview<eT>::n_rows), "subview_col::tail(): size out of bounds");
 
 	const uword start_row = subview<eT>::aux_row1 + subview<eT>::n_rows - N;
 
@@ -2489,7 +2595,7 @@ template<typename eT> inline
 const subview_col<eT> subview_col<eT>::tail(const uword N) const {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check((N > subview<eT>::n_rows), "subview_col::tail(): size out of bounds");
+	arma_debug_check_bounds((N > subview<eT>::n_rows), "subview_col::tail(): size out of bounds");
 
 	const uword start_row = subview<eT>::aux_row1 + subview<eT>::n_rows - N;
 
@@ -2534,7 +2640,8 @@ eT subview_col<eT>::min(uword& index_of_min_val) const {
 		index_of_min_val = uword(0);
 
 		return Datum<eT>::nan;
-	} else { return op_min::direct_min(colmem, subview<eT>::n_elem, index_of_min_val); }
+	}
+	else { return op_min::direct_min(colmem, subview<eT>::n_elem, index_of_min_val); }
 }
 
 template<typename eT> inline
@@ -2547,7 +2654,8 @@ eT subview_col<eT>::max(uword& index_of_max_val) const {
 		index_of_max_val = uword(0);
 
 		return Datum<eT>::nan;
-	} else { return op_max::direct_max(colmem, subview<eT>::n_elem, index_of_max_val); }
+	}
+	else { return op_max::direct_max(colmem, subview<eT>::n_elem, index_of_max_val); }
 }
 
 template<typename eT> inline
@@ -2557,7 +2665,8 @@ uword subview_col<eT>::index_min() const {
 
 	uword index = 0;
 
-	if(subview<eT>::n_elem == 0) { arma_debug_check(true, "index_min(): object has no elements"); } else { op_min::direct_min(colmem, subview<eT>::n_elem, index); }
+	if(subview<eT>::n_elem == 0) { arma_debug_check(true, "index_min(): object has no elements"); }
+	else { op_min::direct_min(colmem, subview<eT>::n_elem, index); }
 
 	return index;
 }
@@ -2569,7 +2678,8 @@ uword subview_col<eT>::index_max() const {
 
 	uword index = 0;
 
-	if(subview<eT>::n_elem == 0) { arma_debug_check(true, "index_max(): object has no elements"); } else { op_max::direct_max(colmem, subview<eT>::n_elem, index); }
+	if(subview<eT>::n_elem == 0) { arma_debug_check(true, "index_max(): object has no elements"); }
+	else { op_max::direct_max(colmem, subview<eT>::n_elem, index); }
 
 	return index;
 }
@@ -2585,6 +2695,18 @@ template<typename eT> inline subview_row<eT>::subview_row(const Mat<eT>& in_m, c
 
 template<typename eT> inline subview_row<eT>::subview_row(const Mat<eT>& in_m, const uword in_row, const uword in_col1, const uword in_n_cols)
 	: subview<eT>(in_m, in_row, in_col1, 1, in_n_cols) {
+	arma_extra_debug_sigprint();
+}
+
+template<typename eT> inline subview_row<eT>::subview_row(const subview_row<eT>& in)
+	: subview<eT>(in) // interprets 'subview_row' as 'subview'
+{
+	arma_extra_debug_sigprint();
+}
+
+template<typename eT> inline subview_row<eT>::subview_row(subview_row<eT>&& in)
+	: subview<eT>(std::move(in)) // interprets 'subview_row' as 'subview'
+{
 	arma_extra_debug_sigprint();
 }
 
@@ -2607,6 +2729,22 @@ void subview_row<eT>::operator=(const eT val) {
 	arma_extra_debug_sigprint();
 
 	subview<eT>::operator=(val); // interprets 'subview_row' as 'subview'
+}
+
+template<typename eT> inline
+void subview_row<eT>::operator=(const std::initializer_list<eT>& list) {
+	arma_extra_debug_sigprint();
+
+	const uword N = uword(list.size());
+
+	arma_debug_assert_same_size(subview<eT>::n_rows, subview<eT>::n_cols, 1, N, "copy into submatrix");
+
+	auto it = list.begin();
+
+	for(uword ii = 0; ii < N; ++ii) {
+		(*this).operator[](ii) = (*it);
+		++it;
+	}
 }
 
 template<typename eT> template<typename T1> inline
@@ -2660,7 +2798,7 @@ eT subview_row<eT>::operator[](const uword ii) const {
 
 template<typename eT> inline
 eT& subview_row<eT>::operator()(const uword ii) {
-	arma_debug_check((ii >= subview<eT>::n_elem), "subview::operator(): index out of bounds");
+	arma_debug_check_bounds((ii >= subview<eT>::n_elem), "subview::operator(): index out of bounds");
 
 	const uword index = (ii + (subview<eT>::aux_col1)) * (subview<eT>::m).n_rows + (subview<eT>::aux_row1);
 
@@ -2669,7 +2807,7 @@ eT& subview_row<eT>::operator()(const uword ii) {
 
 template<typename eT> inline
 eT subview_row<eT>::operator()(const uword ii) const {
-	arma_debug_check((ii >= subview<eT>::n_elem), "subview::operator(): index out of bounds");
+	arma_debug_check_bounds((ii >= subview<eT>::n_elem), "subview::operator(): index out of bounds");
 
 	const uword index = (ii + (subview<eT>::aux_col1)) * (subview<eT>::m).n_rows + (subview<eT>::aux_row1);
 
@@ -2678,7 +2816,7 @@ eT subview_row<eT>::operator()(const uword ii) const {
 
 template<typename eT> inline
 eT& subview_row<eT>::operator()(const uword in_row, const uword in_col) {
-	arma_debug_check(((in_row > 0) || (in_col >= subview<eT>::n_cols)), "subview::operator(): index out of bounds");
+	arma_debug_check_bounds(((in_row > 0) || (in_col >= subview<eT>::n_cols)), "subview::operator(): index out of bounds");
 
 	const uword index = (in_col + (subview<eT>::aux_col1)) * (subview<eT>::m).n_rows + (subview<eT>::aux_row1);
 
@@ -2687,7 +2825,7 @@ eT& subview_row<eT>::operator()(const uword in_row, const uword in_col) {
 
 template<typename eT> inline
 eT subview_row<eT>::operator()(const uword in_row, const uword in_col) const {
-	arma_debug_check(((in_row > 0) || (in_col >= subview<eT>::n_cols)), "subview::operator(): index out of bounds");
+	arma_debug_check_bounds(((in_row > 0) || (in_col >= subview<eT>::n_cols)), "subview::operator(): index out of bounds");
 
 	const uword index = (in_col + (subview<eT>::aux_col1)) * (subview<eT>::m).n_rows + (subview<eT>::aux_row1);
 
@@ -2712,7 +2850,7 @@ template<typename eT> inline
 subview_row<eT> subview_row<eT>::cols(const uword in_col1, const uword in_col2) {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check(((in_col1 > in_col2) || (in_col2 >= subview<eT>::n_cols)), "subview_row::cols(): indices out of bounds or incorrectly used");
+	arma_debug_check_bounds(((in_col1 > in_col2) || (in_col2 >= subview<eT>::n_cols)), "subview_row::cols(): indices out of bounds or incorrectly used");
 
 	const uword subview_n_cols = in_col2 - in_col1 + 1;
 
@@ -2725,7 +2863,7 @@ template<typename eT> inline
 const subview_row<eT> subview_row<eT>::cols(const uword in_col1, const uword in_col2) const {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check(((in_col1 > in_col2) || (in_col2 >= subview<eT>::n_cols)), "subview_row::cols(): indices out of bounds or incorrectly used");
+	arma_debug_check_bounds(((in_col1 > in_col2) || (in_col2 >= subview<eT>::n_cols)), "subview_row::cols(): indices out of bounds or incorrectly used");
 
 	const uword subview_n_cols = in_col2 - in_col1 + 1;
 
@@ -2738,7 +2876,7 @@ template<typename eT> inline
 subview_row<eT> subview_row<eT>::subvec(const uword in_col1, const uword in_col2) {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check(((in_col1 > in_col2) || (in_col2 >= subview<eT>::n_cols)), "subview_row::subvec(): indices out of bounds or incorrectly used");
+	arma_debug_check_bounds(((in_col1 > in_col2) || (in_col2 >= subview<eT>::n_cols)), "subview_row::subvec(): indices out of bounds or incorrectly used");
 
 	const uword subview_n_cols = in_col2 - in_col1 + 1;
 
@@ -2751,7 +2889,7 @@ template<typename eT> inline
 const subview_row<eT> subview_row<eT>::subvec(const uword in_col1, const uword in_col2) const {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check(((in_col1 > in_col2) || (in_col2 >= subview<eT>::n_cols)), "subview_row::subvec(): indices out of bounds or incorrectly used");
+	arma_debug_check_bounds(((in_col1 > in_col2) || (in_col2 >= subview<eT>::n_cols)), "subview_row::subvec(): indices out of bounds or incorrectly used");
 
 	const uword subview_n_cols = in_col2 - in_col1 + 1;
 
@@ -2766,7 +2904,7 @@ subview_row<eT> subview_row<eT>::subvec(const uword start_col, const SizeMat& s)
 
 	arma_debug_check((s.n_rows != 1), "subview_row::subvec(): given size does not specify a row vector");
 
-	arma_debug_check(((start_col >= subview<eT>::n_cols) || ((start_col + s.n_cols) > subview<eT>::n_cols)), "subview_row::subvec(): size out of bounds");
+	arma_debug_check_bounds(((start_col >= subview<eT>::n_cols) || ((start_col + s.n_cols) > subview<eT>::n_cols)), "subview_row::subvec(): size out of bounds");
 
 	const uword base_col1 = this->aux_col1 + start_col;
 
@@ -2779,7 +2917,7 @@ const subview_row<eT> subview_row<eT>::subvec(const uword start_col, const SizeM
 
 	arma_debug_check((s.n_rows != 1), "subview_row::subvec(): given size does not specify a row vector");
 
-	arma_debug_check(((start_col >= subview<eT>::n_cols) || ((start_col + s.n_cols) > subview<eT>::n_cols)), "subview_row::subvec(): size out of bounds");
+	arma_debug_check_bounds(((start_col >= subview<eT>::n_cols) || ((start_col + s.n_cols) > subview<eT>::n_cols)), "subview_row::subvec(): size out of bounds");
 
 	const uword base_col1 = this->aux_col1 + start_col;
 
@@ -2790,7 +2928,7 @@ template<typename eT> inline
 subview_row<eT> subview_row<eT>::head(const uword N) {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check((N > subview<eT>::n_cols), "subview_row::head(): size out of bounds");
+	arma_debug_check_bounds((N > subview<eT>::n_cols), "subview_row::head(): size out of bounds");
 
 	return subview_row<eT>(this->m, this->aux_row1, this->aux_col1, N);
 }
@@ -2799,7 +2937,7 @@ template<typename eT> inline
 const subview_row<eT> subview_row<eT>::head(const uword N) const {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check((N > subview<eT>::n_cols), "subview_row::head(): size out of bounds");
+	arma_debug_check_bounds((N > subview<eT>::n_cols), "subview_row::head(): size out of bounds");
 
 	return subview_row<eT>(this->m, this->aux_row1, this->aux_col1, N);
 }
@@ -2808,7 +2946,7 @@ template<typename eT> inline
 subview_row<eT> subview_row<eT>::tail(const uword N) {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check((N > subview<eT>::n_cols), "subview_row::tail(): size out of bounds");
+	arma_debug_check_bounds((N > subview<eT>::n_cols), "subview_row::tail(): size out of bounds");
 
 	const uword start_col = subview<eT>::aux_col1 + subview<eT>::n_cols - N;
 
@@ -2819,7 +2957,7 @@ template<typename eT> inline
 const subview_row<eT> subview_row<eT>::tail(const uword N) const {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check((N > subview<eT>::n_cols), "subview_row::tail(): size out of bounds");
+	arma_debug_check_bounds((N > subview<eT>::n_cols), "subview_row::tail(): size out of bounds");
 
 	const uword start_col = subview<eT>::aux_col1 + subview<eT>::n_cols - N;
 
@@ -2833,7 +2971,8 @@ uword subview_row<eT>::index_min() const {
 
 	uword index = 0;
 
-	if(P.get_n_elem() == 0) { arma_debug_check(true, "index_min(): object has no elements"); } else { op_min::min_with_index(P, index); }
+	if(P.get_n_elem() == 0) { arma_debug_check(true, "index_min(): object has no elements"); }
+	else { op_min::min_with_index(P, index); }
 
 	return index;
 }
@@ -2845,7 +2984,8 @@ uword subview_row<eT>::index_max() const {
 
 	uword index = 0;
 
-	if(P.get_n_elem() == 0) { arma_debug_check(true, "index_max(): object has no elements"); } else { op_max::max_with_index(P, index); }
+	if(P.get_n_elem() == 0) { arma_debug_check(true, "index_max(): object has no elements"); }
+	else { op_max::max_with_index(P, index); }
 
 	return index;
 }

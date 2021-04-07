@@ -61,6 +61,9 @@ public:
 	inline void set_size(const SizeMat& s);
 	inline void set_size(const SizeCube& s);
 
+	inline field(const std::vector<oT>& x);
+	inline field& operator=(const std::vector<oT>& x);
+
 	inline field(const std::initializer_list<oT>& list);
 	inline field& operator=(const std::initializer_list<oT>& list);
 
@@ -93,8 +96,8 @@ public:
 	arma_inline oT& operator()(const uword row, const uword col, const uword slice);
 	arma_inline const oT& operator()(const uword row, const uword col, const uword slice) const;
 
-	arma_deprecated inline field_injector<field> operator<<(const oT& val);
-	arma_deprecated inline field_injector<field> operator<<(const injector_end_of_row<>& x);
+	arma_cold inline field_injector<field> operator<<(const oT& val);
+	arma_cold inline field_injector<field> operator<<(const injector_end_of_row<>& x);
 
 	inline subview_field<oT> row(const uword row_num);
 	inline const subview_field<oT> row(const uword row_num) const;
@@ -172,11 +175,11 @@ public:
 
 	arma_inline arma_warn_unused bool in_range(const uword in_row, const uword in_col, const uword in_slice, const SizeCube& s) const;
 
-	inline arma_cold bool save(const std::string name, const file_type type = arma_binary, const bool print_status = true) const;
-	inline arma_cold bool save(std::ostream& os, const file_type type = arma_binary, const bool print_status = true) const;
+	inline arma_cold bool save(const std::string name, const file_type type = arma_binary) const;
+	inline arma_cold bool save(std::ostream& os, const file_type type = arma_binary) const;
 
-	inline arma_cold bool load(const std::string name, const file_type type = auto_detect, const bool print_status = true);
-	inline arma_cold bool load(std::istream& is, const file_type type = auto_detect, const bool print_status = true);
+	inline arma_cold bool load(const std::string name, const file_type type = auto_detect);
+	inline arma_cold bool load(std::istream& is, const file_type type = auto_detect);
 
 	inline arma_cold bool quiet_save(const std::string name, const file_type type = arma_binary) const;
 	inline arma_cold bool quiet_save(std::ostream& os, const file_type type = arma_binary) const;

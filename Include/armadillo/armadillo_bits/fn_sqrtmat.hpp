@@ -38,7 +38,7 @@ typename enable_if2<(is_supported_blas_type<typename T1::elem_type>::value && is
 
 	const bool status = op_sqrtmat::apply_direct(Y, X.get_ref());
 
-	if(status == false) { arma_debug_warn("sqrtmat(): given matrix seems singular; may not have a square root"); }
+	if(status == false) { arma_debug_warn_level(3, "sqrtmat(): given matrix is singular; may not have a square root"); }
 
 	return status;
 }
@@ -49,7 +49,7 @@ typename enable_if2<(is_supported_blas_type<typename T1::elem_type>::value && is
 
 	const bool status = op_sqrtmat_cx::apply_direct(Y, X.get_ref());
 
-	if(status == false) { arma_debug_warn("sqrtmat(): given matrix seems singular; may not have a square root"); }
+	if(status == false) { arma_debug_warn_level(3, "sqrtmat(): given matrix is singular; may not have a square root"); }
 
 	return status;
 }
@@ -72,7 +72,7 @@ typename enable_if2<is_supported_blas_type<typename T1::elem_type>::value, bool>
 
 	if(status == false) {
 		Y.soft_reset();
-		arma_debug_warn("sqrtmat_sympd(): transformation failed");
+		arma_debug_warn_level(3, "sqrtmat_sympd(): transformation failed");
 	}
 
 	return status;

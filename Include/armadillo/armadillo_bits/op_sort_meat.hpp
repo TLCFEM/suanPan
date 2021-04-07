@@ -24,7 +24,8 @@ void op_sort::direct_sort(eT* X, const uword n_elem, const uword sort_type) {
 		arma_lt_comparator<eT> comparator;
 
 		std::sort(&X[0], &X[n_elem], comparator);
-	} else {
+	}
+	else {
 		arma_gt_comparator<eT> comparator;
 
 		std::sort(&X[0], &X[n_elem], comparator);
@@ -87,7 +88,8 @@ void op_sort::apply_noalias(Mat<eT>& out, const Mat<eT>& X, const uword sort_typ
 		const uword n_cols = out.n_cols;
 
 		for(uword col = 0; col < n_cols; ++col) { op_sort::direct_sort(out.colptr(col), n_rows, sort_type); }
-	} else if(dim == 1) // sort the contents of each row
+	}
+	else if(dim == 1) // sort the contents of each row
 	{
 		if(X.n_rows == 1) // a row vector
 		{
@@ -95,7 +97,8 @@ void op_sort::apply_noalias(Mat<eT>& out, const Mat<eT>& X, const uword sort_typ
 
 			out = X;
 			op_sort::direct_sort(out.memptr(), out.n_elem, sort_type);
-		} else // not a row vector
+		}
+		else // not a row vector
 		{
 			arma_extra_debug_print("op_sort::apply(): dim = 1, generic");
 
@@ -139,7 +142,8 @@ void op_sort::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_sort>& in)
 		op_sort::apply_noalias(tmp, X, sort_type, dim);
 
 		out.steal_mem(tmp);
-	} else { op_sort::apply_noalias(out, X, sort_type, dim); }
+	}
+	else { op_sort::apply_noalias(out, X, sort_type, dim); }
 }
 
 template<typename T1> inline
@@ -169,7 +173,8 @@ void op_sort_vec::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_sort_v
 		arma_lt_comparator<eT> comparator;
 
 		std::sort(start_ptr, endp1_ptr, comparator);
-	} else {
+	}
+	else {
 		arma_gt_comparator<eT> comparator;
 
 		std::sort(start_ptr, endp1_ptr, comparator);

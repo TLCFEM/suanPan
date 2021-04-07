@@ -73,7 +73,8 @@ void spop_max::apply_proxy
 		for(uword col = 0; col < p_n_cols; ++col) { if(count[col] < p_n_rows) { value[col] = (std::max)(value[col], eT(0)); } }
 
 		out = value;
-	} else if(dim == 1) // find the maximum in each row
+	}
+	else if(dim == 1) // find the maximum in each row
 	{
 		Col<eT> value(p_n_rows, fill::zeros);
 		ucolvec count(p_n_rows, fill::zeros);
@@ -115,8 +116,10 @@ typename T1::elem_type spop_max::vector_max
 
 	if(SpProxy<T1>::use_iterator == false) {
 		// direct access of values
-		if(p.get_n_nonzero() == p.get_n_elem()) { return op_max::direct_max(p.get_values(), p.get_n_nonzero()); } else { return std::max(eT(0), op_max::direct_max(p.get_values(), p.get_n_nonzero())); }
-	} else {
+		if(p.get_n_nonzero() == p.get_n_elem()) { return op_max::direct_max(p.get_values(), p.get_n_nonzero()); }
+		else { return std::max(eT(0), op_max::direct_max(p.get_values(), p.get_n_nonzero())); }
+	}
+	else {
 		// use iterator
 		typename SpProxy<T1>::const_iterator_type it = p.begin();
 		typename SpProxy<T1>::const_iterator_type it_end = p.end();
@@ -130,7 +133,8 @@ typename T1::elem_type spop_max::vector_max
 			++it;
 		}
 
-		if(p.get_n_nonzero() == p.get_n_elem()) { return result; } else { return std::max(eT(0), result); }
+		if(p.get_n_nonzero() == p.get_n_elem()) { return result; }
+		else { return std::max(eT(0), result); }
 	}
 }
 
@@ -165,14 +169,16 @@ typename arma_not_cx<typename T1::elem_type>::result spop_max::max(const SpBase<
 
 			++it;
 		}
-	} else {
+	}
+	else {
 		// We can do direct access of the values, row_indices, and col_ptrs.
 		// We don't need the location of the max value, so we can just call out to
 		// other functions...
 		max_val = op_max::direct_max(P.get_values(), n_nonzero);
 	}
 
-	if(n_elem == n_nonzero) { return max_val; } else { return std::max(eT(0), max_val); }
+	if(n_elem == n_nonzero) { return max_val; }
+	else { return std::max(eT(0), max_val); }
 }
 
 template<typename T1> inline
@@ -210,7 +216,8 @@ typename arma_not_cx<typename T1::elem_type>::result spop_max::max_with_index(co
 
 			++it;
 		}
-	} else {
+	}
+	else {
 		// We can do direct access.
 		max_val = op_max::direct_max(P.get_values(), n_nonzero, index_of_max_val);
 
@@ -240,13 +247,16 @@ typename arma_not_cx<typename T1::elem_type>::result spop_max::max_with_index(co
 				if((it.col() == last_col) && (it.row() - last_row > 1)) {
 					index_of_max_val = it.col() * n_rows + last_row + 1;
 					break;
-				} else if((it.col() >= last_col + 1) && (last_row < n_rows - 1)) {
+				}
+				else if((it.col() >= last_col + 1) && (last_row < n_rows - 1)) {
 					index_of_max_val = last_col * n_rows + last_row + 1;
 					break;
-				} else if((it.col() == last_col + 1) && (it.row() > 0)) {
+				}
+				else if((it.col() == last_col + 1) && (it.row() > 0)) {
 					index_of_max_val = it.col() * n_rows;
 					break;
-				} else if(it.col() > last_col + 1) {
+				}
+				else if(it.col() > last_col + 1) {
 					index_of_max_val = (last_col + 1) * n_rows;
 					break;
 				}
@@ -301,7 +311,8 @@ void spop_max::apply_proxy
 		}
 
 		out = rawval;
-	} else if(dim == 1) // find the maximum in each row
+	}
+	else if(dim == 1) // find the maximum in each row
 	{
 		Col<eT> rawval(p_n_rows, fill::zeros);
 		Col<T> absval(p_n_rows, fill::zeros);
@@ -348,13 +359,15 @@ typename T1::elem_type spop_max::vector_max
 
 	if(SpProxy<T1>::use_iterator == false) {
 		// direct access of values
-		if(p.get_n_nonzero() == p.get_n_elem()) { return op_max::direct_max(p.get_values(), p.get_n_nonzero()); } else {
+		if(p.get_n_nonzero() == p.get_n_elem()) { return op_max::direct_max(p.get_values(), p.get_n_nonzero()); }
+		else {
 			const eT val1 = eT(0);
 			const eT val2 = op_max::direct_max(p.get_values(), p.get_n_nonzero());
 
 			return (std::abs(val1) >= std::abs(val2)) ? val1 : val2;
 		}
-	} else {
+	}
+	else {
 		// use iterator
 		typename SpProxy<T1>::const_iterator_type it = p.begin();
 		typename SpProxy<T1>::const_iterator_type it_end = p.end();
@@ -376,7 +389,8 @@ typename T1::elem_type spop_max::vector_max
 			++it;
 		}
 
-		if(p.get_n_nonzero() == p.get_n_elem()) { return best_val_orig; } else {
+		if(p.get_n_nonzero() == p.get_n_elem()) { return best_val_orig; }
+		else {
 			const eT val1 = eT(0);
 
 			return (std::abs(val1) >= best_val_abs) ? val1 : best_val_orig;
@@ -422,7 +436,8 @@ typename arma_cx_only<typename T1::elem_type>::result spop_max::max(const SpBase
 
 			++it;
 		}
-	} else {
+	}
+	else {
 		// We can do direct access of the values, row_indices, and col_ptrs.
 		// We don't need the location of the max value, so we can just call out to
 		// other functions...
@@ -430,7 +445,8 @@ typename arma_cx_only<typename T1::elem_type>::result spop_max::max(const SpBase
 		max_val = std::abs(ret_val);
 	}
 
-	if(n_elem == n_nonzero) { return max_val; } else { return (T(0) > max_val) ? eT(0) : ret_val; }
+	if(n_elem == n_nonzero) { return max_val; }
+	else { return (T(0) > max_val) ? eT(0) : ret_val; }
 }
 
 template<typename T1> inline
@@ -471,7 +487,8 @@ typename arma_cx_only<typename T1::elem_type>::result spop_max::max_with_index(c
 
 			++it;
 		}
-	} else {
+	}
+	else {
 		// We can do direct access.
 		max_val = std::abs(op_max::direct_max(P.get_values(), n_nonzero, index_of_max_val));
 
@@ -501,13 +518,16 @@ typename arma_cx_only<typename T1::elem_type>::result spop_max::max_with_index(c
 				if((it.col() == last_col) && (it.row() - last_row > 1)) {
 					index_of_max_val = it.col() * n_rows + last_row + 1;
 					break;
-				} else if((it.col() >= last_col + 1) && (last_row < n_rows - 1)) {
+				}
+				else if((it.col() >= last_col + 1) && (last_row < n_rows - 1)) {
 					index_of_max_val = last_col * n_rows + last_row + 1;
 					break;
-				} else if((it.col() == last_col + 1) && (it.row() > 0)) {
+				}
+				else if((it.col() == last_col + 1) && (it.row() > 0)) {
 					index_of_max_val = it.col() * n_rows;
 					break;
-				} else if(it.col() > last_col + 1) {
+				}
+				else if(it.col() > last_col + 1) {
 					index_of_max_val = (last_col + 1) * n_rows;
 					break;
 				}

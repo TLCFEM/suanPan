@@ -112,8 +112,8 @@ extern "C"
   herr_t arma_H5Ldelete(hid_t loc_id, const char* name, hid_t lapl_id);
   
   // Wrapper variables that represent the hid_t values for the H5T_NATIVE_*
-// types.  Note that H5T_NATIVE_UCHAR itself is a macro that resolves to about
-// forty other macros, and we definitely don't want to hijack those,
+  // types.  Note that H5T_NATIVE_UCHAR itself is a macro that resolves to about
+  // forty other macros, and we definitely don't want to hijack those,
   // so this is the best way to go about wrapping these...
   extern hid_t arma_H5T_NATIVE_UCHAR;
   extern hid_t arma_H5T_NATIVE_CHAR;
@@ -131,16 +131,16 @@ extern "C"
   }
   
   // Lastly, we have to hijack H5open() and H5check_version(), which are called
-// by some expanded macros of the other H5* functions.  This means we can't
-// create arma_H5open(), because we can't modify those macros.  Instead, we'll
-// create arma::H5open() and arma::H5check_version(), and then issue a using
-// directive so that arma::H5open() and arma::H5check_version() are always
-// called.
-//
-// There is potential danger in the use of a using directive like this, but in
-// this case, I can't think of a better way to solve the problem, and I doubt
-// this will cause problems in any situations that aren't truly bizarre.  And
-// if it does cause problems, the user can #define ARMA_DONT_USE_WRAPPER or
+  // by some expanded macros of the other H5* functions.  This means we can't
+  // create arma_H5open(), because we can't modify those macros.  Instead, we'll
+  // create arma::H5open() and arma::H5check_version(), and then issue a using
+  // directive so that arma::H5open() and arma::H5check_version() are always
+  // called.
+  //
+  // There is potential danger in the use of a using directive like this, but in
+  // this case, I can't think of a better way to solve the problem, and I doubt
+  // this will cause problems in any situations that aren't truly bizarre.  And
+  // if it does cause problems, the user can #define ARMA_DONT_USE_WRAPPER or
   // #undef ARMA_USE_WRAPPER in their Armadillo configuration.
   herr_t H5open();
   herr_t H5check_version(unsigned majnum, unsigned minnum, unsigned relnum);

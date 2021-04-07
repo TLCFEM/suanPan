@@ -28,7 +28,8 @@ void op_range::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_range>& i
 	const quasi_unwrap<T1> U(in.m);
 	const Mat<eT>& X = U.M;
 
-	if(U.is_alias(out) == false) { op_range::apply_noalias(out, X, dim); } else {
+	if(U.is_alias(out) == false) { op_range::apply_noalias(out, X, dim); }
+	else {
 		Mat<eT> tmp;
 
 		op_range::apply_noalias(tmp, X, dim);

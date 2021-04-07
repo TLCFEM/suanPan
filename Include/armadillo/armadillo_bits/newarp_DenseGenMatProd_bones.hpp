@@ -13,22 +13,27 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-namespace newarp {
+namespace newarp
+{
 
-	//! Define matrix operations on existing matrix objects
-	template<typename eT> class DenseGenMatProd {
-	private:
+//! Define matrix operations on existing matrix objects
+template<typename eT>
+class DenseGenMatProd
+  {
+  private:
+  
+  const Mat<eT>& op_mat;
+  
+  
+  public:
+  
+  const uword n_rows;  // number of rows of the underlying matrix
+  const uword n_cols;  // number of columns of the underlying matrix
 
-		const Mat<eT>& op_mat;
+  inline DenseGenMatProd(const Mat<eT>& mat_obj);
 
-	public:
+  inline void perform_op(eT* x_in, eT* y_out) const;
+  };
 
-		const uword n_rows; // number of rows of the underlying matrix
-		const uword n_cols; // number of columns of the underlying matrix
 
-		inline DenseGenMatProd(const Mat<eT>& mat_obj);
-
-		inline void perform_op(eT* x_in, eT* y_out) const;
-	};
-
-} // namespace newarp
+}  // namespace newarp

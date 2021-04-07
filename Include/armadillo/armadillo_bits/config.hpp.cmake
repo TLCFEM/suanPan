@@ -15,6 +15,16 @@
 
 
 
+#if !defined(ARMA_WARN_LEVEL)
+  #define ARMA_WARN_LEVEL 2
+#endif
+//// The level of warning messages printed to ARMA_CERR_STREAM.
+//// Must be an integer >= 0. The default value is 2.
+//// 0 = no warnings
+//// 1 = only critical warnings about arguments and/or data which are likely to lead to incorrect results
+//// 2 = as per level 1, and warnings about poorly conditioned systems (low rcond) detected by solve(), spsolve(), etc
+//// 3 = as per level 2, and warnings about failed decompositions, failed saving/loading, etc
+
 #if !defined(ARMA_USE_LAPACK)
 #cmakedefine ARMA_USE_LAPACK
 //// Comment out the above line if you don't have LAPACK or a high-speed replacement for LAPACK,
@@ -74,6 +84,12 @@
 // #define ARMA_BLAS_LONG_LONG
 //// Uncomment the above line if your BLAS and LAPACK libraries use "long long" instead of "int"
 
+// #define ARMA_BLAS_NOEXCEPT
+//// Uncomment the above line if you require BLAS functions to have the 'noexcept' specification
+
+// #define ARMA_LAPACK_NOEXCEPT
+//// Uncomment the above line if you require LAPACK functions to have the 'noexcept' specification
+
 #define ARMA_USE_FORTRAN_HIDDEN_ARGS
 //// Comment out the above line to call BLAS and LAPACK functions without using so-called "hidden" arguments.
 //// Fortran functions (compiled without a BIND(C) declaration) that have char arguments
@@ -128,7 +144,7 @@
   #define ARMA_OPTIMISE_SYMPD
   //// Comment out the above line if you don't want automatically optimised handling
   //// of symmetric/hermitian positive definite matrices by various functions:
-  //// solve(), inv(), expmat(), logmat(), sqrtmat(), rcond()
+  //// solve(), inv(), pinv(), expmat(), logmat(), sqrtmat(), rcond()
 #endif
 
 #cmakedefine ARMA_USE_HDF5_ALT
@@ -199,6 +215,11 @@
 #if !defined(ARMA_PRINT_ERRORS)
 #define ARMA_PRINT_ERRORS
 //// Comment out the above line if you don't want errors and warnings printed (eg. failed decompositions)
+#endif
+
+#if !defined(ARMA_PRINT_EXCEPTIONS)
+// #define ARMA_PRINT_EXCEPTIONS
+//// see also compiler_setup.hpp
 #endif
 
 #if !defined(ARMA_PRINT_HDF5_ERRORS)
@@ -293,6 +314,10 @@
 
 #if defined(ARMA_DONT_PRINT_ERRORS)
   #undef ARMA_PRINT_ERRORS
+#endif
+
+#if defined(ARMA_DONT_PRINT_EXCEPTIONS)
+  #undef ARMA_PRINT_EXCEPTIONS
 #endif
 
 #if defined(ARMA_DONT_PRINT_HDF5_ERRORS)

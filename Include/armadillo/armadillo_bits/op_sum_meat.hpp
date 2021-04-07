@@ -28,7 +28,8 @@ void op_sum::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_sum>& in) {
 
 	const Proxy<T1> P(in.m);
 
-	if(P.is_alias(out) == false) { op_sum::apply_noalias(out, P, dim); } else {
+	if(P.is_alias(out) == false) { op_sum::apply_noalias(out, P, dim); }
+	else {
 		Mat<eT> tmp;
 
 		op_sum::apply_noalias(tmp, P, dim);
@@ -42,7 +43,8 @@ inline
 void op_sum::apply_noalias(Mat<typename T1::elem_type>& out, const Proxy<T1>& P, const uword dim) {
 	arma_extra_debug_sigprint();
 
-	if(is_Mat<typename Proxy<T1>::stored_type>::value) { op_sum::apply_noalias_unwrap(out, P, dim); } else { op_sum::apply_noalias_proxy(out, P, dim); }
+	if(is_Mat<typename Proxy<T1>::stored_type>::value) { op_sum::apply_noalias_unwrap(out, P, dim); }
+	else { op_sum::apply_noalias_proxy(out, P, dim); }
 }
 
 template<typename T1> arma_hot
@@ -67,7 +69,8 @@ void op_sum::apply_noalias_unwrap(Mat<typename T1::elem_type>& out, const Proxy<
 		eT* out_mem = out.memptr();
 
 		for(uword col = 0; col < X_n_cols; ++col) { out_mem[col] = arrayops::accumulate(X.colptr(col), X_n_rows); }
-	} else {
+	}
+	else {
 		out.zeros(X_n_rows, 1);
 
 		eT* out_mem = out.memptr();
@@ -111,13 +114,13 @@ void op_sum::apply_noalias_proxy(Mat<typename T1::elem_type>& out, const Proxy<T
 
 			out_mem[col] = (val1 + val2);
 		}
-	} else {
+	}
+	else {
 		out.zeros(P_n_rows, 1);
 
 		eT* out_mem = out.memptr();
 
-		for(uword col = 0; col < P_n_cols; ++col)
-			for(uword row = 0; row < P_n_rows; ++row) { out_mem[row] += P.at(row, col); }
+		for(uword col = 0; col < P_n_cols; ++col) for(uword row = 0; row < P_n_rows; ++row) { out_mem[row] += P.at(row, col); }
 	}
 }
 
@@ -205,7 +208,8 @@ void op_sum::apply(Cube<typename T1::elem_type>& out, const OpCube<T1, op_sum>& 
 
 	const ProxyCube<T1> P(in.m);
 
-	if(P.is_alias(out) == false) { op_sum::apply_noalias(out, P, dim); } else {
+	if(P.is_alias(out) == false) { op_sum::apply_noalias(out, P, dim); }
+	else {
 		Cube<eT> tmp;
 
 		op_sum::apply_noalias(tmp, P, dim);
@@ -219,7 +223,8 @@ inline
 void op_sum::apply_noalias(Cube<typename T1::elem_type>& out, const ProxyCube<T1>& P, const uword dim) {
 	arma_extra_debug_sigprint();
 
-	if(is_Cube<typename ProxyCube<T1>::stored_type>::value) { op_sum::apply_noalias_unwrap(out, P, dim); } else { op_sum::apply_noalias_proxy(out, P, dim); }
+	if(is_Cube<typename ProxyCube<T1>::stored_type>::value) { op_sum::apply_noalias_unwrap(out, P, dim); }
+	else { op_sum::apply_noalias_proxy(out, P, dim); }
 }
 
 template<typename T1> arma_hot
@@ -247,7 +252,8 @@ void op_sum::apply_noalias_unwrap(Cube<typename T1::elem_type>& out, const Proxy
 
 			for(uword col = 0; col < X_n_cols; ++col) { out_mem[col] = arrayops::accumulate(X.slice_colptr(slice, col), X_n_rows); }
 		}
-	} else if(dim == 1) {
+	}
+	else if(dim == 1) {
 		out.zeros(X_n_rows, 1, X_n_slices);
 
 		for(uword slice = 0; slice < X_n_slices; ++slice) {
@@ -255,7 +261,8 @@ void op_sum::apply_noalias_unwrap(Cube<typename T1::elem_type>& out, const Proxy
 
 			for(uword col = 0; col < X_n_cols; ++col) { arrayops::inplace_plus(out_mem, X.slice_colptr(slice, col), X_n_rows); }
 		}
-	} else if(dim == 2) {
+	}
+	else if(dim == 2) {
 		out.zeros(X_n_rows, X_n_cols, 1);
 
 		eT* out_mem = out.memptr();
@@ -302,16 +309,17 @@ void op_sum::apply_noalias_proxy(Cube<typename T1::elem_type>& out, const ProxyC
 				out_mem[col] = (val1 + val2);
 			}
 		}
-	} else if(dim == 1) {
+	}
+	else if(dim == 1) {
 		out.zeros(P_n_rows, 1, P_n_slices);
 
 		for(uword slice = 0; slice < P_n_slices; ++slice) {
 			eT* out_mem = out.slice_memptr(slice);
 
-			for(uword col = 0; col < P_n_cols; ++col)
-				for(uword row = 0; row < P_n_rows; ++row) { out_mem[row] += P.at(row, col, slice); }
+			for(uword col = 0; col < P_n_cols; ++col) for(uword row = 0; row < P_n_rows; ++row) { out_mem[row] += P.at(row, col, slice); }
 		}
-	} else if(dim == 2) {
+	}
+	else if(dim == 2) {
 		out.zeros(P_n_rows, P_n_cols, 1);
 
 		for(uword slice = 0; slice < P_n_slices; ++slice) {

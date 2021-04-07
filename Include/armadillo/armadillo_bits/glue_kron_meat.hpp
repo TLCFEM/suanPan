@@ -90,7 +90,8 @@ void glue_kron::apply(Mat<typename T1::elem_type>& out, const Glue<T1, T2, glue_
 	const Mat<eT>& A = A_tmp.M;
 	const Mat<eT>& B = B_tmp.M;
 
-	if((&out != &A) && (&out != &B)) { glue_kron::direct_kron(out, A, B); } else {
+	if((&out != &A) && (&out != &B)) { glue_kron::direct_kron(out, A, B); }
+	else {
 		Mat<eT> tmp;
 
 		glue_kron::direct_kron(tmp, A, B);

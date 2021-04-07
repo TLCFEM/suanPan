@@ -61,13 +61,15 @@ uword n_unique
 
 			++x_it;
 			++y_it;
-		} else {
+		}
+		else {
 			if((x_it.col() < y_it.col()) || ((x_it.col() == y_it.col()) && (x_it.row() < y_it.row()))) // if y is closer to the end
 			{
 				if(op_n_unique_type::eval((*x_it), typename T1::elem_type(0)) != typename T1::elem_type(0)) { ++total_n_nonzero; }
 
 				++x_it;
-			} else // x is closer to the end
+			}
+			else // x is closer to the end
 			{
 				if(op_n_unique_type::eval(typename T1::elem_type(0), (*y_it)) != typename T1::elem_type(0)) { ++total_n_nonzero; }
 

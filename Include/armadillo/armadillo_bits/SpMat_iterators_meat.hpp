@@ -272,7 +272,8 @@ template<typename eT> inline SpMat<eT>::const_row_iterator::const_row_iterator(c
 					cur_actual_pos = col_offset + offset;
 
 					// Increment position portably.
-					if(cur_pos == std::numeric_limits<uword>::max()) { cur_pos = 0; } else { ++cur_pos; }
+					if(cur_pos == std::numeric_limits<uword>::max()) { cur_pos = 0; }
+					else { ++cur_pos; }
 
 					// Do we terminate?
 					if(cur_pos == initial_pos) {
@@ -407,13 +408,15 @@ typename SpMat<eT>::const_row_iterator& SpMat<eT>::const_row_iterator::operator+
 					iterator_base::internal_col = col;
 					actual_pos = col_offset + (pos_ptr - start_ptr);
 					return *this;
-				} else if((*pos_ptr) < next_min_row) {
+				}
+				else if((*pos_ptr) < next_min_row) {
 					// The first element in this column is in a subsequent row, but it's
 					// the minimum row we've seen so far.
 					next_min_row = (*pos_ptr);
 					next_min_col = col;
 					next_actual_pos = col_offset + (pos_ptr - start_ptr);
-				} else if((*pos_ptr) == next_min_row && col < next_min_col) {
+				}
+				else if((*pos_ptr) == next_min_row && col < next_min_col) {
 					// The first element in this column is in a subsequent row that we
 					// already have another element for, but the column index is less so
 					// this element will come first.
@@ -444,13 +447,15 @@ typename SpMat<eT>::const_row_iterator& SpMat<eT>::const_row_iterator::operator+
 					internal_row++;
 					actual_pos = col_offset + (pos_ptr - start_ptr);
 					return *this;
-				} else if((*pos_ptr) < next_min_row) {
+				}
+				else if((*pos_ptr) < next_min_row) {
 					// The first element in this column is in a subsequent row,
 					// but it's the minimum row we've seen so far.
 					next_min_row = (*pos_ptr);
 					next_min_col = col;
 					next_actual_pos = col_offset + (pos_ptr - start_ptr);
-				} else if((*pos_ptr) == next_min_row && col < next_min_col) {
+				}
+				else if((*pos_ptr) == next_min_row && col < next_min_col) {
 					// The first element in this column is in a subsequent row that we
 					// already have another element for, but the column index is less so
 					// this element will come first.
@@ -519,7 +524,8 @@ typename SpMat<eT>::const_row_iterator& SpMat<eT>::const_row_iterator::operator-
 					max_row = *(pos_ptr - 1);
 					max_col = col - 1;
 					next_actual_pos = col_offset + (pos_ptr - 1 - start_ptr);
-				} else if(*(pos_ptr - 1) == max_row && (col - 1) > max_col) {
+				}
+				else if(*(pos_ptr - 1) == max_row && (col - 1) > max_col) {
 					max_col = col - 1;
 					next_actual_pos = col_offset + (pos_ptr - 1 - start_ptr);
 				}
@@ -546,7 +552,8 @@ typename SpMat<eT>::const_row_iterator& SpMat<eT>::const_row_iterator::operator-
 					max_row = *(pos_ptr - 1);
 					max_col = col;
 					next_actual_pos = col_offset + (pos_ptr - 1 - start_ptr);
-				} else if(*(pos_ptr - 1) == max_row && col > max_col) {
+				}
+				else if(*(pos_ptr - 1) == max_row && col > max_col) {
 					max_col = col;
 					next_actual_pos = col_offset + (pos_ptr - 1 - start_ptr);
 				}

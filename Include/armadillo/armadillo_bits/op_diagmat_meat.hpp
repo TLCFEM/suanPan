@@ -33,7 +33,8 @@ void op_diagmat::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_diagmat
 			const Proxy<Mat<eT>> P(A);
 
 			op_diagmat::apply(out, P);
-		} else // we have aliasing
+		}
+		else // we have aliasing
 		{
 			const uword n_rows = out.n_rows;
 			const uword n_cols = out.n_cols;
@@ -49,7 +50,8 @@ void op_diagmat::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_diagmat
 				for(uword i = 0; i < N; ++i) { tmp.at(i, i) = out_mem[i]; }
 
 				out.steal_mem(tmp);
-			} else // create diagonal matrix from matrix
+			}
+			else // create diagonal matrix from matrix
 			{
 				const uword N = (std::min)(n_rows, n_cols);
 
@@ -62,11 +64,13 @@ void op_diagmat::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_diagmat
 						arrayops::fill_zeros(out.colptr(i), n_rows);
 
 						out_ii = val;
-					} else { arrayops::fill_zeros(out.colptr(i), n_rows); }
+					}
+					else { arrayops::fill_zeros(out.colptr(i), n_rows); }
 				}
 			}
 		}
-	} else {
+	}
+	else {
 		const Proxy<T1> P(X.m);
 
 		if(P.is_alias(out)) {
@@ -75,7 +79,8 @@ void op_diagmat::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_diagmat
 			op_diagmat::apply(tmp, P);
 
 			out.steal_mem(tmp);
-		} else { op_diagmat::apply(out, P); }
+		}
+		else { op_diagmat::apply(out, P); }
 	}
 }
 
@@ -101,8 +106,13 @@ void op_diagmat::apply(Mat<typename T1::elem_type>& out, const Proxy<T1>& P) {
 			typename Proxy<T1>::ea_type Pea = P.get_ea();
 
 			for(uword i = 0; i < n_elem; ++i) { out.at(i, i) = Pea[i]; }
-		} else { if(n_rows == 1) { for(uword i = 0; i < n_elem; ++i) { out.at(i, i) = P.at(0, i); } } else { for(uword i = 0; i < n_elem; ++i) { out.at(i, i) = P.at(i, 0); } } }
-	} else // P represents a matrix 
+		}
+		else {
+			if(n_rows == 1) { for(uword i = 0; i < n_elem; ++i) { out.at(i, i) = P.at(0, i); } }
+			else { for(uword i = 0; i < n_elem; ++i) { out.at(i, i) = P.at(i, 0); } }
+		}
+	}
+	else // P represents a matrix 
 	{
 		out.zeros(n_rows, n_cols);
 
@@ -159,7 +169,8 @@ void op_diagmat::apply_times(Mat<typename T1::elem_type>& actual_out, const T1& 
 
 			return;
 		}
-	} else if((partial_unwrap<T1>::do_trans == true) && (partial_unwrap<T2>::do_trans == false)) {
+	}
+	else if((partial_unwrap<T1>::do_trans == true) && (partial_unwrap<T2>::do_trans == false)) {
 		if((A_n_cols == 1) || (B_n_cols == 1)) {
 			arma_extra_debug_print("trans_A = true; trans_B = false; vector result");
 
@@ -173,7 +184,8 @@ void op_diagmat::apply_times(Mat<typename T1::elem_type>& actual_out, const T1& 
 
 			return;
 		}
-	} else if((partial_unwrap<T1>::do_trans == false) && (partial_unwrap<T2>::do_trans == true)) {
+	}
+	else if((partial_unwrap<T1>::do_trans == false) && (partial_unwrap<T2>::do_trans == true)) {
 		if((A_n_rows == 1) || (B_n_rows == 1)) {
 			arma_extra_debug_print("trans_A = false; trans_B = true; vector result");
 
@@ -187,7 +199,8 @@ void op_diagmat::apply_times(Mat<typename T1::elem_type>& actual_out, const T1& 
 
 			return;
 		}
-	} else if((partial_unwrap<T1>::do_trans == true) && (partial_unwrap<T2>::do_trans == true)) {
+	}
+	else if((partial_unwrap<T1>::do_trans == true) && (partial_unwrap<T2>::do_trans == true)) {
 		if((A_n_cols == 1) || (B_n_rows == 1)) {
 			arma_extra_debug_print("trans_A = true; trans_B = true; vector result");
 
@@ -245,7 +258,8 @@ void op_diagmat::apply_times(Mat<typename T1::elem_type>& actual_out, const T1& 
 
 			out.at(k, k) = (use_alpha) ? eT(alpha * acc) : eT(acc);
 		}
-	} else if((partial_unwrap<T1>::do_trans == true) && (partial_unwrap<T2>::do_trans == false)) {
+	}
+	else if((partial_unwrap<T1>::do_trans == true) && (partial_unwrap<T2>::do_trans == false)) {
 		arma_extra_debug_print("trans_A = true; trans_B = false; matrix result");
 
 		out.zeros(A_n_cols, B_n_cols);
@@ -262,7 +276,8 @@ void op_diagmat::apply_times(Mat<typename T1::elem_type>& actual_out, const T1& 
 
 			out.at(k, k) = (use_alpha) ? eT(alpha * acc) : eT(acc);
 		}
-	} else if((partial_unwrap<T1>::do_trans == false) && (partial_unwrap<T2>::do_trans == true)) {
+	}
+	else if((partial_unwrap<T1>::do_trans == false) && (partial_unwrap<T2>::do_trans == true)) {
 		arma_extra_debug_print("trans_A = false; trans_B = true; matrix result");
 
 		out.zeros(A_n_rows, B_n_rows);
@@ -278,7 +293,8 @@ void op_diagmat::apply_times(Mat<typename T1::elem_type>& actual_out, const T1& 
 
 			out.at(k, k) = (use_alpha) ? eT(alpha * acc) : eT(acc);
 		}
-	} else if((partial_unwrap<T1>::do_trans == true) && (partial_unwrap<T2>::do_trans == true)) {
+	}
+	else if((partial_unwrap<T1>::do_trans == true) && (partial_unwrap<T2>::do_trans == true)) {
 		arma_extra_debug_print("trans_A = true; trans_B = true; matrix result");
 
 		out.zeros(A_n_cols, B_n_rows);
@@ -342,7 +358,8 @@ void op_diagmat::apply_times(Mat<typename T1::elem_type>& actual_out, const T1& 
 
 			return;
 		}
-	} else if((partial_unwrap<T1>::do_trans == true) && (partial_unwrap<T2>::do_trans == false)) {
+	}
+	else if((partial_unwrap<T1>::do_trans == true) && (partial_unwrap<T2>::do_trans == false)) {
 		if((A_n_cols == 1) || (B_n_cols == 1)) {
 			arma_extra_debug_print("trans_A = true; trans_B = false; vector result");
 
@@ -356,7 +373,8 @@ void op_diagmat::apply_times(Mat<typename T1::elem_type>& actual_out, const T1& 
 
 			return;
 		}
-	} else if((partial_unwrap<T1>::do_trans == false) && (partial_unwrap<T2>::do_trans == true)) {
+	}
+	else if((partial_unwrap<T1>::do_trans == false) && (partial_unwrap<T2>::do_trans == true)) {
 		if((A_n_rows == 1) || (B_n_rows == 1)) {
 			arma_extra_debug_print("trans_A = false; trans_B = true; vector result");
 
@@ -370,7 +388,8 @@ void op_diagmat::apply_times(Mat<typename T1::elem_type>& actual_out, const T1& 
 
 			return;
 		}
-	} else if((partial_unwrap<T1>::do_trans == true) && (partial_unwrap<T2>::do_trans == true)) {
+	}
+	else if((partial_unwrap<T1>::do_trans == true) && (partial_unwrap<T2>::do_trans == true)) {
 		if((A_n_cols == 1) || (B_n_rows == 1)) {
 			arma_extra_debug_print("trans_A = true; trans_B = true; vector result");
 
@@ -428,7 +447,8 @@ void op_diagmat::apply_times(Mat<typename T1::elem_type>& actual_out, const T1& 
 
 			out.at(k, k) = (use_alpha) ? eT(alpha * acc) : eT(acc);
 		}
-	} else if((partial_unwrap<T1>::do_trans == true) && (partial_unwrap<T2>::do_trans == false)) {
+	}
+	else if((partial_unwrap<T1>::do_trans == true) && (partial_unwrap<T2>::do_trans == false)) {
 		arma_extra_debug_print("trans_A = true; trans_B = false; matrix result");
 
 		out.zeros(A_n_cols, B_n_cols);
@@ -466,7 +486,8 @@ void op_diagmat::apply_times(Mat<typename T1::elem_type>& actual_out, const T1& 
 
 			out.at(k, k) = (use_alpha) ? eT(alpha * acc) : eT(acc);
 		}
-	} else if((partial_unwrap<T1>::do_trans == false) && (partial_unwrap<T2>::do_trans == true)) {
+	}
+	else if((partial_unwrap<T1>::do_trans == false) && (partial_unwrap<T2>::do_trans == true)) {
 		arma_extra_debug_print("trans_A = false; trans_B = true; matrix result");
 
 		out.zeros(A_n_rows, B_n_rows);
@@ -499,7 +520,8 @@ void op_diagmat::apply_times(Mat<typename T1::elem_type>& actual_out, const T1& 
 
 			out.at(k, k) = (use_alpha) ? eT(alpha * acc) : eT(acc);
 		}
-	} else if((partial_unwrap<T1>::do_trans == true) && (partial_unwrap<T2>::do_trans == true)) {
+	}
+	else if((partial_unwrap<T1>::do_trans == true) && (partial_unwrap<T2>::do_trans == true)) {
 		arma_extra_debug_print("trans_A = true; trans_B = true; matrix result");
 
 		out.zeros(A_n_cols, B_n_rows);
@@ -560,7 +582,8 @@ void op_diagmat2::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_diagma
 		op_diagmat2::apply(tmp, P, row_offset, col_offset);
 
 		out.steal_mem(tmp);
-	} else { op_diagmat2::apply(out, P, row_offset, col_offset); }
+	}
+	else { op_diagmat2::apply(out, P, row_offset, col_offset); }
 }
 
 template<typename T1> inline
@@ -587,10 +610,15 @@ void op_diagmat2::apply(Mat<typename T1::elem_type>& out, const Proxy<T1>& P, co
 			typename Proxy<T1>::ea_type Pea = P.get_ea();
 
 			for(uword i = 0; i < n_elem; ++i) { out.at(row_offset + i, col_offset + i) = Pea[i]; }
-		} else { if(n_rows == 1) { for(uword i = 0; i < n_elem; ++i) { out.at(row_offset + i, col_offset + i) = P.at(0, i); } } else { for(uword i = 0; i < n_elem; ++i) { out.at(row_offset + i, col_offset + i) = P.at(i, 0); } } }
-	} else // P represents a matrix 
+		}
+		else {
+			if(n_rows == 1) { for(uword i = 0; i < n_elem; ++i) { out.at(row_offset + i, col_offset + i) = P.at(0, i); } }
+			else { for(uword i = 0; i < n_elem; ++i) { out.at(row_offset + i, col_offset + i) = P.at(i, 0); } }
+		}
+	}
+	else // P represents a matrix 
 	{
-		arma_debug_check
+		arma_debug_check_bounds
 			(
 				((row_offset > 0) && (row_offset >= n_rows)) || ((col_offset > 0) && (col_offset >= n_cols)),
 				"diagmat(): requested diagonal out of bounds"

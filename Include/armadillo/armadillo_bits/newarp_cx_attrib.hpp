@@ -13,21 +13,21 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-namespace newarp {
+namespace newarp
+{
 
-	//! Tiny functions to check attributes of complex numbers
-	struct cx_attrib {
-		template<typename T> arma_inline static
+//! Tiny functions to check attributes of complex numbers
+struct cx_attrib
+  {
+  template<typename T>
+  arma_inline static bool is_real   (const std::complex<T>& v, const T eps) { return (std::abs(v.imag()) <= eps); }
+  
+  template<typename T>
+  arma_inline static bool is_complex(const std::complex<T>& v, const T eps) { return (std::abs(v.imag()) >  eps); }
+  
+  template<typename T>
+  arma_inline static bool is_conj(const std::complex<T>& v1, const std::complex<T>& v2, const T eps)  { return (std::abs(v1 - std::conj(v2)) <= eps); }
+  };
 
-		bool is_real(const std::complex<T>& v, const T eps) { return (std::abs(v.imag()) <= eps); }
 
-		template<typename T> arma_inline static
-
-		bool is_complex(const std::complex<T>& v, const T eps) { return (std::abs(v.imag()) > eps); }
-
-		template<typename T> arma_inline static
-
-		bool is_conj(const std::complex<T>& v1, const std::complex<T>& v2, const T eps) { return (std::abs(v1 - std::conj(v2)) <= eps); }
-	};
-
-} // namespace newarp
+}  // namespace newarp

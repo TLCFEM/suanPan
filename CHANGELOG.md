@@ -5,6 +5,7 @@
 1. add `R2D2` and `R3D2` alias for fixed length constraint
 2. add `MinGap2D` and `MinGap3D` inequality constraints
 3. add `SupportMotion` loads, including `SupportDisplacement`, `SupportVelocity` and `SupportAcceleration`
+4. update `Armadillo` to version 10.4
 
 ## version 1.3
 

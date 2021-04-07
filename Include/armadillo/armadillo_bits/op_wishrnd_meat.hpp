@@ -32,7 +32,10 @@ void op_wishrnd::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_wishrnd
 
 	const bool status = op_wishrnd::apply_direct(out, expr.m, df, mode);
 
-	if(status == false) { arma_stop_runtime_error("wishrnd(): given matrix is not symmetric positive definite"); }
+	if(status == false) {
+		out.soft_reset();
+		arma_stop_runtime_error("wishrnd(): given matrix is not symmetric positive definite");
+	}
 }
 
 template<typename T1> inline
@@ -52,12 +55,11 @@ bool op_wishrnd::apply_direct(Mat<typename T1::elem_type>& out, const Base<typen
 		if(mode == 2) { status = op_wishrnd::apply_noalias_mode2(tmp, U.M, df); }
 
 		out.steal_mem(tmp);
-	} else {
+	}
+	else {
 		if(mode == 1) { status = op_wishrnd::apply_noalias_mode1(out, U.M, df); }
 		if(mode == 2) { status = op_wishrnd::apply_noalias_mode2(out, U.M, df); }
 	}
-
-	if(status == false) { out.soft_reset(); }
 
 	return status;
 }
@@ -106,7 +108,8 @@ bool op_wishrnd::apply_noalias_mode2(Mat<eT>& out, const Mat<eT>& D, const eT df
 		const Mat<eT> tmp = (randn<Mat<eT>>(df_floor, N)) * D;
 
 		out = tmp.t() * tmp;
-	} else {
+	}
+	else {
 		arma_extra_debug_print("standard generator");
 
 		op_chi2rnd_varying_df<eT> chi2rnd_generator;
@@ -140,7 +143,10 @@ void op_iwishrnd::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_iwishr
 
 	const bool status = op_iwishrnd::apply_direct(out, expr.m, df, mode);
 
-	if(status == false) { arma_stop_runtime_error("iwishrnd(): given matrix is not symmetric positive definite and/or df is too low"); }
+	if(status == false) {
+		out.soft_reset();
+		arma_stop_runtime_error("iwishrnd(): given matrix is not symmetric positive definite and/or df is too low");
+	}
 }
 
 template<typename T1> inline
@@ -160,12 +166,11 @@ bool op_iwishrnd::apply_direct(Mat<typename T1::elem_type>& out, const Base<type
 		if(mode == 2) { status = op_iwishrnd::apply_noalias_mode2(tmp, U.M, df); }
 
 		out.steal_mem(tmp);
-	} else {
+	}
+	else {
 		if(mode == 1) { status = op_iwishrnd::apply_noalias_mode1(out, U.M, df); }
 		if(mode == 2) { status = op_iwishrnd::apply_noalias_mode2(out, U.M, df); }
 	}
-
-	if(status == false) { out.soft_reset(); }
 
 	return status;
 }

@@ -94,8 +94,12 @@ public:
 			if(A_n_rows == 1) {
 				const eT acc = op_cdot::direct_cdot(A_n_cols, A_mem, A_mem);
 
-				if((use_alpha == false) && (use_beta == false)) { C[0] = acc; } else if((use_alpha == true) && (use_beta == false)) { C[0] = alpha * acc; } else if((use_alpha == false) && (use_beta == true)) { C[0] = acc + beta * C[0]; } else if((use_alpha == true) && (use_beta == true)) { C[0] = alpha * acc + beta * C[0]; }
-			} else
+				if((use_alpha == false) && (use_beta == false)) { C[0] = acc; }
+				else if((use_alpha == true) && (use_beta == false)) { C[0] = alpha * acc; }
+				else if((use_alpha == false) && (use_beta == true)) { C[0] = acc + beta * C[0]; }
+				else if((use_alpha == true) && (use_beta == true)) { C[0] = alpha * acc + beta * C[0]; }
+			}
+			else
 				for(uword row_A = 0; row_A < A_n_rows; ++row_A) {
 					const eT& A_rowdata = A_mem[row_A];
 
@@ -105,15 +109,18 @@ public:
 						if((use_alpha == false) && (use_beta == false)) {
 							C.at(row_A, k) = acc;
 							if(row_A != k) { C.at(k, row_A) = std::conj(acc); }
-						} else if((use_alpha == true) && (use_beta == false)) {
+						}
+						else if((use_alpha == true) && (use_beta == false)) {
 							const eT val = alpha * acc;
 
 							C.at(row_A, k) = val;
 							if(row_A != k) { C.at(k, row_A) = std::conj(val); }
-						} else if((use_alpha == false) && (use_beta == true)) {
+						}
+						else if((use_alpha == false) && (use_beta == true)) {
 							C.at(row_A, k) = acc + beta * C.at(row_A, k);
 							if(row_A != k) { C.at(k, row_A) = std::conj(acc) + beta * C.at(k, row_A); }
-						} else if((use_alpha == true) && (use_beta == true)) {
+						}
+						else if((use_alpha == true) && (use_beta == true)) {
 							const eT val = alpha * acc;
 
 							C.at(row_A, k) = val + beta * C.at(row_A, k);
@@ -121,12 +128,17 @@ public:
 						}
 					}
 				}
-		} else if(do_trans_A == true) {
+		}
+		else if(do_trans_A == true) {
 			if(A_n_cols == 1) {
 				const eT acc = op_cdot::direct_cdot(A_n_rows, A_mem, A_mem);
 
-				if((use_alpha == false) && (use_beta == false)) { C[0] = acc; } else if((use_alpha == true) && (use_beta == false)) { C[0] = alpha * acc; } else if((use_alpha == false) && (use_beta == true)) { C[0] = acc + beta * C[0]; } else if((use_alpha == true) && (use_beta == true)) { C[0] = alpha * acc + beta * C[0]; }
-			} else
+				if((use_alpha == false) && (use_beta == false)) { C[0] = acc; }
+				else if((use_alpha == true) && (use_beta == false)) { C[0] = alpha * acc; }
+				else if((use_alpha == false) && (use_beta == true)) { C[0] = acc + beta * C[0]; }
+				else if((use_alpha == true) && (use_beta == true)) { C[0] = alpha * acc + beta * C[0]; }
+			}
+			else
 				for(uword col_A = 0; col_A < A_n_cols; ++col_A) {
 					// col_A is interpreted as row_A when storing the results in matrix C
 
@@ -138,15 +150,18 @@ public:
 						if((use_alpha == false) && (use_beta == false)) {
 							C.at(col_A, k) = acc;
 							if(col_A != k) { C.at(k, col_A) = std::conj(acc); }
-						} else if((use_alpha == true) && (use_beta == false)) {
+						}
+						else if((use_alpha == true) && (use_beta == false)) {
 							const eT val = alpha * acc;
 
 							C.at(col_A, k) = val;
 							if(col_A != k) { C.at(k, col_A) = std::conj(val); }
-						} else if((use_alpha == false) && (use_beta == true)) {
+						}
+						else if((use_alpha == false) && (use_beta == true)) {
 							C.at(col_A, k) = acc + beta * C.at(col_A, k);
 							if(col_A != k) { C.at(k, col_A) = std::conj(acc) + beta * C.at(k, col_A); }
-						} else if((use_alpha == true) && (use_beta == true)) {
+						}
+						else if((use_alpha == true) && (use_beta == true)) {
 							const eT val = alpha * acc;
 
 							C.at(col_A, k) = val + beta * C.at(col_A, k);
@@ -185,7 +200,8 @@ public:
 			op_htrans::apply_mat_noalias(AA, A);
 
 			herk_emul<true, use_alpha, use_beta>::apply(C, AA, alpha, beta);
-		} else if(do_trans_A == true) {
+		}
+		else if(do_trans_A == true) {
 			const uword A_n_rows = A.n_rows;
 			const uword A_n_cols = A.n_cols;
 
@@ -200,15 +216,18 @@ public:
 					if((use_alpha == false) && (use_beta == false)) {
 						C.at(col_A, k) = acc;
 						if(col_A != k) { C.at(k, col_A) = std::conj(acc); }
-					} else if((use_alpha == true) && (use_beta == false)) {
+					}
+					else if((use_alpha == true) && (use_beta == false)) {
 						const eT val = alpha * acc;
 
 						C.at(col_A, k) = val;
 						if(col_A != k) { C.at(k, col_A) = std::conj(val); }
-					} else if((use_alpha == false) && (use_beta == true)) {
+					}
+					else if((use_alpha == false) && (use_beta == true)) {
 						C.at(col_A, k) = acc + beta * C.at(col_A, k);
 						if(col_A != k) { C.at(k, col_A) = std::conj(acc) + beta * C.at(k, col_A); }
-					} else if((use_alpha == true) && (use_beta == true)) {
+					}
+					else if((use_alpha == true) && (use_beta == true)) {
 						const eT val = alpha * acc;
 
 						C.at(col_A, k) = val + beta * C.at(col_A, k);
@@ -239,7 +258,8 @@ public:
 			return;
 		}
 
-		if((A.n_elem <= threshold)) { herk_emul<do_trans_A, use_alpha, use_beta>::apply(C, A, alpha, beta); } else {
+		if((A.n_elem <= threshold)) { herk_emul<do_trans_A, use_alpha, use_beta>::apply(C, A, alpha, beta); }
+		else {
 #if defined(ARMA_USE_ATLAS)
         {
         if(use_beta == true)

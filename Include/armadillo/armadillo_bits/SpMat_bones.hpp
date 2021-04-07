@@ -293,18 +293,6 @@ public:
 
 	arma_inline arma_warn_unused bool in_range(const uword in_row, const uword in_col, const SizeMat& s) const;
 
-	arma_cold inline void impl_print(const std::string& extra_text) const;
-	arma_cold inline void impl_print(std::ostream& user_stream, const std::string& extra_text) const;
-
-	arma_cold inline void impl_raw_print(const std::string& extra_text) const;
-	arma_cold inline void impl_raw_print(std::ostream& user_stream, const std::string& extra_text) const;
-
-	arma_cold inline void impl_print_dense(const std::string& extra_text) const;
-	arma_cold inline void impl_print_dense(std::ostream& user_stream, const std::string& extra_text) const;
-
-	arma_cold inline void impl_raw_print_dense(const std::string& extra_text) const;
-	arma_cold inline void impl_raw_print_dense(std::ostream& user_stream, const std::string& extra_text) const;
-
 	template<typename eT2> inline void copy_size(const SpMat<eT2>& m);
 	template<typename eT2> inline void copy_size(const Mat<eT2>& m);
 
@@ -366,13 +354,13 @@ public:
 	// saving and loading
 	// TODO: implement auto_detect for sparse matrices
 
-	inline arma_cold bool save(const std::string name, const file_type type = arma_binary, const bool print_status = true) const;
-	inline arma_cold bool save(const csv_name& spec, const file_type type = csv_ascii, const bool print_status = true) const;
-	inline arma_cold bool save(std::ostream& os, const file_type type = arma_binary, const bool print_status = true) const;
+	inline arma_cold bool save(const std::string name, const file_type type = arma_binary) const;
+	inline arma_cold bool save(const csv_name& spec, const file_type type = csv_ascii) const;
+	inline arma_cold bool save(std::ostream& os, const file_type type = arma_binary) const;
 
-	inline arma_cold bool load(const std::string name, const file_type type = arma_binary, const bool print_status = true);
-	inline arma_cold bool load(const csv_name& spec, const file_type type = csv_ascii, const bool print_status = true);
-	inline arma_cold bool load(std::istream& is, const file_type type = arma_binary, const bool print_status = true);
+	inline arma_cold bool load(const std::string name, const file_type type = arma_binary);
+	inline arma_cold bool load(const csv_name& spec, const file_type type = csv_ascii);
+	inline arma_cold bool load(std::istream& is, const file_type type = arma_binary);
 
 	inline arma_cold bool quiet_save(const std::string name, const file_type type = arma_binary) const;
 	inline arma_cold bool quiet_save(const csv_name& spec, const file_type type = csv_ascii) const;

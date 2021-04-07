@@ -74,9 +74,11 @@ namespace arma_str {
 
 			if(required_size < 0) { break; }
 
-			if(required_size < buffer_size) { if(required_size > 0) { out = buffer; } } else { buffer_size *= 2; }
+			if(required_size < buffer_size) { if(required_size > 0) { out = buffer; } }
+			else { buffer_size *= 2; }
 
-			if(using_local_buffer) { using_local_buffer = false; } else { delete[] buffer; }
+			if(using_local_buffer) { using_local_buffer = false; }
+			else { delete[] buffer; }
 		}
 		while((required_size >= buffer_size));
 
@@ -102,9 +104,11 @@ namespace arma_str {
 
 			if(required_size < 0) { break; }
 
-			if(required_size < buffer_size) { if(required_size > 0) { out = buffer; } } else { buffer_size *= 2; }
+			if(required_size < buffer_size) { if(required_size > 0) { out = buffer; } }
+			else { buffer_size *= 2; }
 
-			if(using_local_buffer) { using_local_buffer = false; } else { delete[] buffer; }
+			if(using_local_buffer) { using_local_buffer = false; }
+			else { delete[] buffer; }
 		}
 		while((required_size >= buffer_size));
 
@@ -130,9 +134,11 @@ namespace arma_str {
 
 			if(required_size < 0) { break; }
 
-			if(required_size < buffer_size) { if(required_size > 0) { out = buffer; } } else { buffer_size *= 2; }
+			if(required_size < buffer_size) { if(required_size > 0) { out = buffer; } }
+			else { buffer_size *= 2; }
 
-			if(using_local_buffer) { using_local_buffer = false; } else { delete[] buffer; }
+			if(using_local_buffer) { using_local_buffer = false; }
+			else { delete[] buffer; }
 		}
 		while((required_size >= buffer_size));
 
@@ -158,9 +164,11 @@ namespace arma_str {
 
 			if(required_size < 0) { break; }
 
-			if(required_size < buffer_size) { if(required_size > 0) { out = buffer; } } else { buffer_size *= 2; }
+			if(required_size < buffer_size) { if(required_size > 0) { out = buffer; } }
+			else { buffer_size *= 2; }
 
-			if(using_local_buffer) { using_local_buffer = false; } else { delete[] buffer; }
+			if(using_local_buffer) { using_local_buffer = false; }
+			else { delete[] buffer; }
 		}
 		while((required_size >= buffer_size));
 
@@ -186,9 +194,11 @@ namespace arma_str {
 
 			if(required_size < 0) { break; }
 
-			if(required_size < buffer_size) { if(required_size > 0) { out = buffer; } } else { buffer_size *= 2; }
+			if(required_size < buffer_size) { if(required_size > 0) { out = buffer; } }
+			else { buffer_size *= 2; }
 
-			if(using_local_buffer) { using_local_buffer = false; } else { delete[] buffer; }
+			if(using_local_buffer) { using_local_buffer = false; }
+			else { delete[] buffer; }
 		}
 		while((required_size >= buffer_size));
 
@@ -214,9 +224,11 @@ namespace arma_str {
 
 			if(required_size < 0) { break; }
 
-			if(required_size < buffer_size) { if(required_size > 0) { out = buffer; } } else { buffer_size *= 2; }
+			if(required_size < buffer_size) { if(required_size > 0) { out = buffer; } }
+			else { buffer_size *= 2; }
 
-			if(using_local_buffer) { using_local_buffer = false; } else { delete[] buffer; }
+			if(using_local_buffer) { using_local_buffer = false; }
+			else { delete[] buffer; }
 		}
 		while((required_size >= buffer_size));
 

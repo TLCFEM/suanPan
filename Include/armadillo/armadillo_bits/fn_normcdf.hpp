@@ -63,7 +63,8 @@ typename enable_if2<(is_real<typename T1::elem_type>::value), void>::result norm
         }
       }
 #endif
-	} else {
+	}
+	else {
 		for(uword i = 0; i < N; ++i) {
 			const eT tmp = (X_ea[i] - M_ea[i]) / (S_ea[i] * (-Datum<eT>::sqrt2));
 

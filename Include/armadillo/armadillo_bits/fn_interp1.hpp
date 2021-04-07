@@ -40,7 +40,8 @@ void interp1_helper_nearest(const Mat<eT>& XG, const Mat<eT>& YG, const Mat<eT>&
 
 		const eT XI_val = XI_mem[i];
 
-		if((XI_val < XG_min) || (XI_val > XG_max)) { YI_mem[i] = extrap_val; } else {
+		if((XI_val < XG_min) || (XI_val > XG_max)) { YI_mem[i] = extrap_val; }
+		else {
 			// XG and XI are guaranteed to be sorted in ascending manner,
 			// so start searching XG from last known optimum position 
 
@@ -51,7 +52,8 @@ void interp1_helper_nearest(const Mat<eT>& XG, const Mat<eT>& YG, const Mat<eT>&
 				if(err >= best_err) {
 					// error is going up, so we have found the optimum position
 					break;
-				} else {
+				}
+				else {
 					best_err = err;
 					best_j = j; // remember the optimum position
 				}
@@ -85,7 +87,8 @@ void interp1_helper_linear(const Mat<eT>& XG, const Mat<eT>& YG, const Mat<eT>& 
 	for(uword i = 0; i < NI; ++i) {
 		const eT XI_val = XI_mem[i];
 
-		if((XI_val < XG_min) || (XI_val > XG_max)) { YI_mem[i] = extrap_val; } else {
+		if((XI_val < XG_min) || (XI_val > XG_max)) { YI_mem[i] = extrap_val; }
+		else {
 			// XG and XI are guaranteed to be sorted in ascending manner,
 			// so start searching XG from last known optimum position 
 
@@ -96,7 +99,8 @@ void interp1_helper_linear(const Mat<eT>& XG, const Mat<eT>& YG, const Mat<eT>& 
 				const eT tmp = XG_mem[j] - XI_val;
 				const eT err = (tmp >= eT(0)) ? tmp : -tmp;
 
-				if(err >= a_best_err) { break; } else {
+				if(err >= a_best_err) { break; }
+				else {
 					a_best_err = err;
 					a_best_j = j;
 				}
@@ -106,7 +110,8 @@ void interp1_helper_linear(const Mat<eT>& XG, const Mat<eT>& YG, const Mat<eT>& 
 				// a_best_j is to the left of the interpolated position
 
 				b_best_j = ((a_best_j + 1) < NG) ? (a_best_j + 1) : a_best_j;
-			} else {
+			}
+			else {
 				// a_best_j is to the right of the interpolated position
 
 				b_best_j = (a_best_j >= 1) ? (a_best_j - 1) : a_best_j;
@@ -203,7 +208,8 @@ void interp1_helper(const Mat<eT>& X, const Mat<eT>& Y, const Mat<eT>& XI, Mat<e
 
 	const Mat<eT>& XI_sorted = (XI_is_sorted) ? XI : XI_tmp;
 
-	if(sig == 10) { interp1_helper_nearest(X_sanitised, Y_sanitised, XI_sorted, YI, extrap_val); } else if(sig == 20) { interp1_helper_linear(X_sanitised, Y_sanitised, XI_sorted, YI, extrap_val); }
+	if(sig == 10) { interp1_helper_nearest(X_sanitised, Y_sanitised, XI_sorted, YI, extrap_val); }
+	else if(sig == 20) { interp1_helper_linear(X_sanitised, Y_sanitised, XI_sorted, YI, extrap_val); }
 
 	if((XI_is_sorted == false) && (YI.n_elem > 0)) {
 		Mat<eT> YI_unsorted;
@@ -268,7 +274,8 @@ enable_if2
 		interp1_helper(X_tmp.M, Y_tmp.M, XI_tmp.M, tmp, sig, extrap_val);
 
 		YI.steal_mem(tmp);
-	} else { interp1_helper(X_tmp.M, Y_tmp.M, XI_tmp.M, YI, sig, extrap_val); }
+	}
+	else { interp1_helper(X_tmp.M, Y_tmp.M, XI_tmp.M, YI, sig, extrap_val); }
 }
 
 //! @}

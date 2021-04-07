@@ -113,7 +113,7 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**MUMPS**](http://mumps.enseeiht.fr/) version 5.2.1
 - [**VTK**](https://vtk.org/) version 8.2
 - [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 11.2
-- [**Armadillo**](http://arma.sourceforge.net/) version 10.1
+- [**Armadillo**](http://arma.sourceforge.net/) version 10.4
 - [**Intel MKL**](https://software.intel.com/en-us/mkl) version 2020
 
 Those libraries may depend on other libraries such as [zlib](https://zlib.net/) and [Szip](https://support.hdfgroup.org/doc_resource/SZIP/). Additional tools may be used by **suanPan**, they are

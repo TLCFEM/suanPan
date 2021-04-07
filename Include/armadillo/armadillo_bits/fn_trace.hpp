@@ -117,7 +117,8 @@ typename enable_if2<is_cx<typename T1::elem_type>::no, typename T1::elem_type>::
 		}
 
 		acc = (acc1 + acc2);
-	} else if((partial_unwrap<T1>::do_trans == true) && (partial_unwrap<T2>::do_trans == false)) {
+	}
+	else if((partial_unwrap<T1>::do_trans == true) && (partial_unwrap<T2>::do_trans == false)) {
 		const uword N = (std::min)(A_n_cols, B_n_cols);
 
 		for(uword k = 0; k < N; ++k) {
@@ -127,14 +128,16 @@ typename enable_if2<is_cx<typename T1::elem_type>::no, typename T1::elem_type>::
 			// condition: A_n_rows = B_n_rows
 			acc += op_dot::direct_dot(A_n_rows, A_colptr, B_colptr);
 		}
-	} else if((partial_unwrap<T1>::do_trans == false) && (partial_unwrap<T2>::do_trans == true)) {
+	}
+	else if((partial_unwrap<T1>::do_trans == false) && (partial_unwrap<T2>::do_trans == true)) {
 		const uword N = (std::min)(A_n_rows, B_n_rows);
 
 		for(uword k = 0; k < N; ++k) {
 			// condition: A_n_cols = B_n_cols
 			for(uword i = 0; i < A_n_cols; ++i) { acc += A.at(k, i) * B.at(k, i); }
 		}
-	} else if((partial_unwrap<T1>::do_trans == true) && (partial_unwrap<T2>::do_trans == true)) {
+	}
+	else if((partial_unwrap<T1>::do_trans == true) && (partial_unwrap<T2>::do_trans == true)) {
 		const uword N = (std::min)(A_n_cols, B_n_rows);
 
 		for(uword k = 0; k < N; ++k) {
@@ -207,7 +210,8 @@ typename enable_if2<is_cx<typename T1::elem_type>::yes, typename T1::elem_type>:
 		}
 
 		acc = std::complex<T>(acc_real, acc_imag);
-	} else if((partial_unwrap<T1>::do_trans == true) && (partial_unwrap<T2>::do_trans == false)) {
+	}
+	else if((partial_unwrap<T1>::do_trans == true) && (partial_unwrap<T2>::do_trans == false)) {
 		const uword N = (std::min)(A_n_cols, B_n_cols);
 
 		T acc_real = T(0);
@@ -239,7 +243,8 @@ typename enable_if2<is_cx<typename T1::elem_type>::yes, typename T1::elem_type>:
 		}
 
 		acc = std::complex<T>(acc_real, acc_imag);
-	} else if((partial_unwrap<T1>::do_trans == false) && (partial_unwrap<T2>::do_trans == true)) {
+	}
+	else if((partial_unwrap<T1>::do_trans == false) && (partial_unwrap<T2>::do_trans == true)) {
 		const uword N = (std::min)(A_n_rows, B_n_rows);
 
 		T acc_real = T(0);
@@ -265,7 +270,8 @@ typename enable_if2<is_cx<typename T1::elem_type>::yes, typename T1::elem_type>:
 		}
 
 		acc = std::complex<T>(acc_real, acc_imag);
-	} else if((partial_unwrap<T1>::do_trans == true) && (partial_unwrap<T2>::do_trans == true)) {
+	}
+	else if((partial_unwrap<T1>::do_trans == true) && (partial_unwrap<T2>::do_trans == true)) {
 		const uword N = (std::min)(A_n_cols, B_n_rows);
 
 		T acc_real = T(0);
@@ -320,7 +326,8 @@ typename T1::elem_type trace(const SpBase<typename T1::elem_type, T1>& expr) {
 		for(uword i = 0; i < N; ++i) {
 			acc += X.at(i, i); // use binary search
 		}
-	} else {
+	}
+	else {
 		typename SpProxy<T1>::const_iterator_type it = P.begin();
 
 		const uword P_n_nz = P.get_n_nonzero();
@@ -427,7 +434,8 @@ typename T1::elem_type trace(const SpGlue<T1, T2, spglue_times>& expr) {
 				++B_it;
 			}
 		}
-	} else {
+	}
+	else {
 		const SpMat<eT> AB = A * B;
 
 		acc = trace(AB);
@@ -473,7 +481,8 @@ typename enable_if2<is_cx<typename T1::elem_type>::no, typename T1::elem_type>::
 				++B_it;
 			}
 		}
-	} else {
+	}
+	else {
 		const SpMat<eT> AtB = A.t() * B;
 
 		acc = trace(AtB);
@@ -520,7 +529,8 @@ typename enable_if2<is_cx<typename T1::elem_type>::yes, typename T1::elem_type>:
 				++B_it;
 			}
 		}
-	} else {
+	}
+	else {
 		const SpMat<eT> AtB = A.t() * B;
 
 		acc = trace(AtB);

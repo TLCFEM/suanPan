@@ -25,7 +25,10 @@ void glue_solve_gen::apply(Mat<typename T1::elem_type>& out, const Glue<T1, T2, 
 
 	const bool status = glue_solve_gen::apply(out, X.A, X.B, X.aux_uword);
 
-	if(status == false) { arma_stop_runtime_error("solve(): solution not found"); }
+	if(status == false) {
+		out.soft_reset();
+		arma_stop_runtime_error("solve(): solution not found");
+	}
 }
 
 template<typename eT, typename T1, typename T2> inline
@@ -96,19 +99,22 @@ bool glue_solve_gen::apply(Mat<eT>& out, const Base<eT, T1>& A_expr, const Base<
 					arma_extra_debug_print("glue_solve_gen::apply(): fast + tridiagonal");
 
 					status = auxlib::solve_tridiag_fast(out, A, B_expr.get_ref());
-				} else {
+				}
+				else {
 					arma_extra_debug_print("glue_solve_gen::apply(): fast + band");
 
 					status = auxlib::solve_band_fast(out, A, KL, KU, B_expr.get_ref());
 				}
-			} else if(is_triu || is_tril) {
+			}
+			else if(is_triu || is_tril) {
 				if(is_triu) { arma_extra_debug_print("glue_solve_gen::apply(): fast + upper triangular matrix"); }
 				if(is_tril) { arma_extra_debug_print("glue_solve_gen::apply(): fast + lower triangular matrix"); }
 
 				const uword layout = (is_triu) ? uword(0) : uword(1);
 
 				status = auxlib::solve_trimat_fast(out, A, B_expr.get_ref(), layout);
-			} else if(try_sympd) {
+			}
+			else if(try_sympd) {
 				arma_extra_debug_print("glue_solve_gen::apply(): fast + try_sympd");
 
 				status = auxlib::solve_sympd_fast(out, A, B_expr.get_ref()); // A is overwritten
@@ -120,12 +126,14 @@ bool glue_solve_gen::apply(Mat<eT>& out, const Base<eT, T1>& A_expr, const Base<
 					A = A_expr.get_ref();
 					status = auxlib::solve_square_fast(out, A, B_expr.get_ref()); // A is overwritten
 				}
-			} else {
+			}
+			else {
 				arma_extra_debug_print("glue_solve_gen::apply(): fast + dense");
 
 				status = auxlib::solve_square_fast(out, A, B_expr.get_ref()); // A is overwritten
 			}
-		} else if(refine || equilibrate) {
+		}
+		else if(refine || equilibrate) {
 			// refine mode: solvers with refinement and with rcond estimate
 
 			arma_extra_debug_print("glue_solve_gen::apply(): refine mode");
@@ -134,7 +142,8 @@ bool glue_solve_gen::apply(Mat<eT>& out, const Base<eT, T1>& A_expr, const Base<
 				arma_extra_debug_print("glue_solve_gen::apply(): refine + band");
 
 				status = auxlib::solve_band_refine(out, rcond, A, KL, KU, B_expr, equilibrate, allow_ugly);
-			} else if(try_sympd) {
+			}
+			else if(try_sympd) {
 				arma_extra_debug_print("glue_solve_gen::apply(): refine + try_sympd");
 
 				status = auxlib::solve_sympd_refine(out, rcond, A, B_expr.get_ref(), equilibrate, allow_ugly); // A is overwritten
@@ -146,12 +155,14 @@ bool glue_solve_gen::apply(Mat<eT>& out, const Base<eT, T1>& A_expr, const Base<
 					A = A_expr.get_ref();
 					status = auxlib::solve_square_refine(out, rcond, A, B_expr.get_ref(), equilibrate, allow_ugly); // A is overwritten
 				}
-			} else {
+			}
+			else {
 				arma_extra_debug_print("glue_solve_gen::apply(): refine + dense");
 
 				status = auxlib::solve_square_refine(out, rcond, A, B_expr, equilibrate, allow_ugly); // A is overwritten
 			}
-		} else {
+		}
+		else {
 			// default mode: solvers without refinement but with rcond estimate
 
 			arma_extra_debug_print("glue_solve_gen::apply(): default mode");
@@ -160,14 +171,16 @@ bool glue_solve_gen::apply(Mat<eT>& out, const Base<eT, T1>& A_expr, const Base<
 				arma_extra_debug_print("glue_solve_gen::apply(): rcond + band");
 
 				status = auxlib::solve_band_rcond(out, rcond, A, KL, KU, B_expr.get_ref(), allow_ugly);
-			} else if(is_triu || is_tril) {
+			}
+			else if(is_triu || is_tril) {
 				if(is_triu) { arma_extra_debug_print("glue_solve_gen::apply(): rcond + upper triangular matrix"); }
 				if(is_tril) { arma_extra_debug_print("glue_solve_gen::apply(): rcond + lower triangular matrix"); }
 
 				const uword layout = (is_triu) ? uword(0) : uword(1);
 
 				status = auxlib::solve_trimat_rcond(out, rcond, A, B_expr.get_ref(), layout, allow_ugly);
-			} else if(try_sympd) {
+			}
+			else if(try_sympd) {
 				status = auxlib::solve_sympd_rcond(out, rcond, A, B_expr.get_ref(), allow_ugly); // A is overwritten
 
 				if(status == false) {
@@ -177,17 +190,19 @@ bool glue_solve_gen::apply(Mat<eT>& out, const Base<eT, T1>& A_expr, const Base<
 					A = A_expr.get_ref();
 					status = auxlib::solve_square_rcond(out, rcond, A, B_expr.get_ref(), allow_ugly); // A is overwritten
 				}
-			} else {
+			}
+			else {
 				status = auxlib::solve_square_rcond(out, rcond, A, B_expr.get_ref(), allow_ugly); // A is overwritten
 			}
 		}
 
-		if((status == true) && (rcond > T(0)) && (rcond < auxlib::epsilon_lapack(A))) { arma_debug_warn("solve(): solution computed, but system seems singular to working precision (rcond: ", rcond, ")"); }
+		if((status == true) && (rcond > T(0)) && (rcond < auxlib::epsilon_lapack(A))) { arma_debug_warn_level(2, "solve(): solution computed, but system is singular to working precision (rcond: ", rcond, ")"); }
 
 		if((status == false) && (no_approx == false)) {
 			arma_extra_debug_print("glue_solve_gen::apply(): solving rank deficient system");
 
-			if(rcond > T(0)) { arma_debug_warn("solve(): system seems singular (rcond: ", rcond, "); attempting approx solution"); } else { arma_debug_warn("solve(): system seems singular; attempting approx solution"); }
+			if(rcond > T(0)) { arma_debug_warn_level(2, "solve(): system is singular (rcond: ", rcond, "); attempting approx solution"); }
+			else { arma_debug_warn_level(2, "solve(): system is singular; attempting approx solution"); }
 
 			// TODO: conditionally recreate A: have a separate state flag which indicates whether A was previously overwritten
 
@@ -195,33 +210,34 @@ bool glue_solve_gen::apply(Mat<eT>& out, const Base<eT, T1>& A_expr, const Base<
 
 			status = auxlib::solve_approx_svd(out, A, B_expr.get_ref()); // A is overwritten
 		}
-	} else {
+	}
+	else {
 		arma_extra_debug_print("glue_solve_gen::apply(): detected non-square system");
 
-		if(equilibrate) { arma_debug_warn("solve(): option 'equilibrate' ignored for non-square matrix"); }
-		if(refine) { arma_debug_warn("solve(): option 'refine' ignored for non-square matrix"); }
-		if(likely_sympd) { arma_debug_warn("solve(): option 'likely_sympd' ignored for non-square matrix"); }
+		if(equilibrate) { arma_debug_warn_level(1, "solve(): option 'equilibrate' ignored for non-square matrix"); }
+		if(refine) { arma_debug_warn_level(1, "solve(): option 'refine' ignored for non-square matrix"); }
+		if(likely_sympd) { arma_debug_warn_level(1, "solve(): option 'likely_sympd' ignored for non-square matrix"); }
 
 		if(fast) {
 			status = auxlib::solve_rect_fast(out, A, B_expr.get_ref()); // A is overwritten
-		} else {
+		}
+		else {
 			status = auxlib::solve_rect_rcond(out, rcond, A, B_expr.get_ref(), allow_ugly); // A is overwritten
 		}
 
-		if((status == true) && (rcond > T(0)) && (rcond < auxlib::epsilon_lapack(A))) { arma_debug_warn("solve(): solution computed, but system seems singular to working precision (rcond: ", rcond, ")"); }
+		if((status == true) && (rcond > T(0)) && (rcond < auxlib::epsilon_lapack(A))) { arma_debug_warn_level(2, "solve(): solution computed, but system is singular to working precision (rcond: ", rcond, ")"); }
 
 		if((status == false) && (no_approx == false)) {
 			arma_extra_debug_print("glue_solve_gen::apply(): solving rank deficient system");
 
-			if(rcond > T(0)) { arma_debug_warn("solve(): system seems singular (rcond: ", rcond, "); attempting approx solution"); } else { arma_debug_warn("solve(): system seems singular; attempting approx solution"); }
+			if(rcond > T(0)) { arma_debug_warn_level(2, "solve(): system is singular (rcond: ", rcond, "); attempting approx solution"); }
+			else { arma_debug_warn_level(2, "solve(): system is singular; attempting approx solution"); }
 
 			A = A_expr.get_ref(); // as A was overwritten
 
 			status = auxlib::solve_approx_svd(out, A, B_expr.get_ref()); // A is overwritten
 		}
 	}
-
-	if(status == false) { out.soft_reset(); }
 
 	return status;
 }
@@ -235,7 +251,10 @@ void glue_solve_tri_default::apply(Mat<typename T1::elem_type>& out, const Glue<
 
 	const bool status = glue_solve_tri_default::apply(out, X.A, X.B, X.aux_uword);
 
-	if(status == false) { arma_stop_runtime_error("solve(): solution not found"); }
+	if(status == false) {
+		out.soft_reset();
+		arma_stop_runtime_error("solve(): solution not found");
+	}
 }
 
 template<typename eT, typename T1, typename T2> inline
@@ -269,19 +288,18 @@ bool glue_solve_tri_default::apply(Mat<eT>& actual_out, const Base<eT, T1>& A_ex
 
 	status = auxlib::solve_trimat_rcond(out, rcond, A, B_expr.get_ref(), layout, allow_ugly); // A is not modified
 
-	if((status == true) && (rcond > T(0)) && (rcond < auxlib::epsilon_lapack(A))) { arma_debug_warn("solve(): solution computed, but system seems singular to working precision (rcond: ", rcond, ")"); }
+	if((status == true) && (rcond > T(0)) && (rcond < auxlib::epsilon_lapack(A))) { arma_debug_warn_level(2, "solve(): solution computed, but system is singular to working precision (rcond: ", rcond, ")"); }
 
 	if(status == false) {
 		arma_extra_debug_print("glue_solve_tri::apply(): solving rank deficient system");
 
-		if(rcond > T(0)) { arma_debug_warn("solve(): system seems singular (rcond: ", rcond, "); attempting approx solution"); } else { arma_debug_warn("solve(): system seems singular; attempting approx solution"); }
+		if(rcond > T(0)) { arma_debug_warn_level(2, "solve(): system is singular (rcond: ", rcond, "); attempting approx solution"); }
+		else { arma_debug_warn_level(2, "solve(): system is singular; attempting approx solution"); }
 
 		Mat<eT> triA = (triu) ? trimatu(A) : trimatl(A); // trimatu() and trimatl() return the same type
 
 		status = auxlib::solve_approx_svd(out, triA, B_expr.get_ref()); // triA is overwritten
 	}
-
-	if(status == false) { out.soft_reset(); }
 
 	if(is_alias) { actual_out.steal_mem(out); }
 
@@ -294,7 +312,10 @@ void glue_solve_tri::apply(Mat<typename T1::elem_type>& out, const Glue<T1, T2, 
 
 	const bool status = glue_solve_tri::apply(out, X.A, X.B, X.aux_uword);
 
-	if(status == false) { arma_stop_runtime_error("solve(): solution not found"); }
+	if(status == false) {
+		out.soft_reset();
+		arma_stop_runtime_error("solve(): solution not found");
+	}
 }
 
 template<typename eT, typename T1, typename T2> inline
@@ -331,7 +352,7 @@ bool glue_solve_tri::apply(Mat<eT>& actual_out, const Base<eT, T1>& A_expr, cons
 		return glue_solve_gen::apply(actual_out, ((triu) ? trimatu(A_expr.get_ref()) : trimatl(A_expr.get_ref())), B_expr, (flags & mask));
 	}
 
-	if(likely_sympd) { arma_debug_warn("solve(): option 'likely_sympd' ignored for triangular matrix"); }
+	if(likely_sympd) { arma_debug_warn_level(1, "solve(): option 'likely_sympd' ignored for triangular matrix"); }
 
 	const quasi_unwrap<T1> U(A_expr.get_ref());
 	const Mat<eT>& A = U.M;
@@ -349,23 +370,23 @@ bool glue_solve_tri::apply(Mat<eT>& actual_out, const Base<eT, T1>& A_expr, cons
 
 	if(fast) {
 		status = auxlib::solve_trimat_fast(out, A, B_expr.get_ref(), layout); // A is not modified
-	} else {
+	}
+	else {
 		status = auxlib::solve_trimat_rcond(out, rcond, A, B_expr.get_ref(), layout, allow_ugly); // A is not modified
 	}
 
-	if((status == true) && (rcond > T(0)) && (rcond < auxlib::epsilon_lapack(A))) { arma_debug_warn("solve(): solution computed, but system seems singular to working precision (rcond: ", rcond, ")"); }
+	if((status == true) && (rcond > T(0)) && (rcond < auxlib::epsilon_lapack(A))) { arma_debug_warn_level(2, "solve(): solution computed, but system is singular to working precision (rcond: ", rcond, ")"); }
 
 	if((status == false) && (no_approx == false)) {
 		arma_extra_debug_print("glue_solve_tri::apply(): solving rank deficient system");
 
-		if(rcond > T(0)) { arma_debug_warn("solve(): system seems singular (rcond: ", rcond, "); attempting approx solution"); } else { arma_debug_warn("solve(): system seems singular; attempting approx solution"); }
+		if(rcond > T(0)) { arma_debug_warn_level(2, "solve(): system is singular (rcond: ", rcond, "); attempting approx solution"); }
+		else { arma_debug_warn_level(2, "solve(): system is singular; attempting approx solution"); }
 
 		Mat<eT> triA = (triu) ? trimatu(A) : trimatl(A); // trimatu() and trimatl() return the same type
 
 		status = auxlib::solve_approx_svd(out, triA, B_expr.get_ref()); // triA is overwritten
 	}
-
-	if(status == false) { out.soft_reset(); }
 
 	if(is_alias) { actual_out.steal_mem(out); }
 

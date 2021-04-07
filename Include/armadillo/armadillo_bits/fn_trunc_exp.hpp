@@ -19,7 +19,10 @@
 template<typename eT> arma_warn_unused
 inline
 static
-typename arma_real_only<eT>::result trunc_exp(const eT x) { if(std::numeric_limits<eT>::is_iec559 && (x >= Datum<eT>::log_max)) { return std::numeric_limits<eT>::max(); } else { return std::exp(x); } }
+typename arma_real_only<eT>::result trunc_exp(const eT x) {
+	if(std::numeric_limits<eT>::is_iec559 && (x >= Datum<eT>::log_max)) { return std::numeric_limits<eT>::max(); }
+	else { return std::exp(x); }
+}
 
 template<typename eT> arma_warn_unused
 inline

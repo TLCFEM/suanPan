@@ -69,7 +69,8 @@ void op_repelem::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_repelem
 		op_repelem::apply_noalias(tmp, U.M, copies_per_row, copies_per_col);
 
 		out.steal_mem(tmp);
-	} else { op_repelem::apply_noalias(out, U.M, copies_per_row, copies_per_col); }
+	}
+	else { op_repelem::apply_noalias(out, U.M, copies_per_row, copies_per_col); }
 }
 
 //! @}

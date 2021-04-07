@@ -36,37 +36,23 @@ typename enable_if2<is_arma_type<T1>::value, typename T1::pod_type>::result norm
 	const bool is_vec = (T1::is_xvec) || (T1::is_row) || (T1::is_col) || (P.get_n_rows() == 1) || (P.get_n_cols() == 1);
 
 	if(is_vec) {
-		switch(k) {
-		case 1:
-			return op_norm::vec_norm_1(P);
-			break;
+		if(k == uword(1)) { return op_norm::vec_norm_1(P); }
+		if(k == uword(2)) { return op_norm::vec_norm_2(P); }
 
-		case 2:
-			return op_norm::vec_norm_2(P);
-			break;
+		arma_debug_check((k == 0), "norm(): k must be greater than zero");
 
-		default: {
-			arma_debug_check((k == 0), "norm(): k must be greater than zero");
-			return op_norm::vec_norm_k(P, int(k));
-		}
-		}
-	} else {
-		switch(k) {
-		case 1:
-			return op_norm::mat_norm_1(P);
-			break;
+		return op_norm::vec_norm_k(P, int(k));
+	}
+	else {
+		const quasi_unwrap<typename Proxy<T1>::stored_type> U(P.Q);
 
-		case 2:
-			return op_norm::mat_norm_2(P);
-			break;
+		if(k == uword(1)) { return op_norm::mat_norm_1(U.M); }
+		if(k == uword(2)) { return op_norm::mat_norm_2(U.M); }
 
-		default:
-			arma_stop_logic_error("norm(): unsupported matrix norm type");
-			return T(0);
-		}
+		arma_stop_logic_error("norm(): unsupported matrix norm type");
 	}
 
-	return T(0); // prevent erroneous compiler warnings
+	return T(0);
 }
 
 template<typename T1> inline
@@ -90,25 +76,25 @@ typename enable_if2<is_arma_type<T1>::value, typename T1::pod_type>::result norm
 	const bool is_vec = (T1::is_xvec) || (T1::is_row) || (T1::is_col) || (P.get_n_rows() == 1) || (P.get_n_cols() == 1);
 
 	if(is_vec) {
-		if((sig == 'i') || (sig == 'I') || (sig == '+')) // max norm
-		{
-			return op_norm::vec_norm_max(P);
-		} else if(sig == '-') // min norm
-		{
-			return op_norm::vec_norm_min(P);
-		} else if((sig == 'f') || (sig == 'F')) { return op_norm::vec_norm_2(P); } else {
-			arma_stop_logic_error("norm(): unsupported vector norm type");
-			return T(0);
-		}
-	} else {
+		if((sig == 'i') || (sig == 'I') || (sig == '+')) { return op_norm::vec_norm_max(P); }
+		if((sig == '-')) { return op_norm::vec_norm_min(P); }
+		if((sig == 'f') || (sig == 'F')) { return op_norm::vec_norm_2(P); }
+
+		arma_stop_logic_error("norm(): unsupported vector norm type");
+	}
+	else {
 		if((sig == 'i') || (sig == 'I') || (sig == '+')) // inf norm
 		{
-			return op_norm::mat_norm_inf(P);
-		} else if((sig == 'f') || (sig == 'F')) { return op_norm::vec_norm_2(P); } else {
-			arma_stop_logic_error("norm(): unsupported matrix norm type");
-			return T(0);
+			const quasi_unwrap<typename Proxy<T1>::stored_type> U(P.Q);
+
+			return op_norm::mat_norm_inf(U.M);
 		}
+		else if((sig == 'f') || (sig == 'F')) { return op_norm::vec_norm_2(P); }
+
+		arma_stop_logic_error("norm(): unsupported matrix norm type");
 	}
+
+	return T(0);
 }
 
 //
@@ -118,7 +104,7 @@ template<typename T1> inline
 arma_warn_unused
 typename enable_if2<is_arma_sparse_type<T1>::value, typename T1::pod_type>::result norm
 (
-	const T1& X,
+	const T1& expr,
 	const uword k = uword(2),
 	const typename arma_real_or_cx_only<typename T1::elem_type>::result* junk = nullptr
 ) {
@@ -128,57 +114,41 @@ typename enable_if2<is_arma_sparse_type<T1>::value, typename T1::pod_type>::resu
 	typedef typename T1::elem_type eT;
 	typedef typename T1::pod_type T;
 
-	const SpProxy<T1> P(X);
+	const unwrap_spmat<T1> U(expr);
+	const SpMat<eT>& X = U.M;
 
-	if(P.get_n_nonzero() == 0) { return T(0); }
+	if(X.n_nonzero == 0) { return T(0); }
 
-	const bool is_vec = (P.get_n_rows() == 1) || (P.get_n_cols() == 1);
+	const bool is_vec = (T1::is_xvec) || (T1::is_row) || (T1::is_col) || (X.n_rows == 1) || (X.n_cols == 1);
 
 	if(is_vec) {
-		const unwrap_spmat<typename SpProxy<T1>::stored_type> tmp(P.Q);
-		const SpMat<eT>& A = tmp.M;
-
 		// create a fake dense vector to allow reuse of code for dense vectors
-		Col<eT> fake_vector(access::rwp(A.values), A.n_nonzero, false);
+		Col<eT> fake_vector(access::rwp(X.values), X.n_nonzero, false);
 
 		const Proxy<Col<eT>> P_fake_vector(fake_vector);
 
-		switch(k) {
-		case 1:
-			return op_norm::vec_norm_1(P_fake_vector);
-			break;
+		if(k == uword(1)) { return op_norm::vec_norm_1(P_fake_vector); }
+		if(k == uword(2)) { return op_norm::vec_norm_2(P_fake_vector); }
 
-		case 2:
-			return op_norm::vec_norm_2(P_fake_vector);
-			break;
+		arma_debug_check((k == 0), "norm(): k must be greater than zero");
 
-		default: {
-			arma_debug_check((k == 0), "norm(): k must be greater than zero");
-			return op_norm::vec_norm_k(P_fake_vector, int(k));
-		}
-		}
-	} else {
-		switch(k) {
-		case 1:
-			return op_norm::mat_norm_1(P);
-			break;
-
-		case 2:
-			return op_norm::mat_norm_2(P);
-			break;
-
-		default:
-			arma_stop_logic_error("norm(): unsupported or unimplemented norm type for sparse matrices");
-			return T(0);
-		}
+		return op_norm::vec_norm_k(P_fake_vector, int(k));
 	}
+	else {
+		if(k == uword(1)) { return spop_norm::mat_norm_1(X); }
+		if(k == uword(2)) { return spop_norm::mat_norm_2(X); }
+
+		arma_stop_logic_error("norm(): unsupported or unimplemented norm type for sparse matrices");
+	}
+
+	return T(0);
 }
 
 template<typename T1> inline
 arma_warn_unused
 typename enable_if2<is_arma_sparse_type<T1>::value, typename T1::pod_type>::result norm
 (
-	const T1& X,
+	const T1& expr,
 	const char* method,
 	const typename arma_real_or_cx_only<typename T1::elem_type>::result* junk = nullptr
 ) {
@@ -188,43 +158,45 @@ typename enable_if2<is_arma_sparse_type<T1>::value, typename T1::pod_type>::resu
 	typedef typename T1::elem_type eT;
 	typedef typename T1::pod_type T;
 
-	const SpProxy<T1> P(X);
+	const unwrap_spmat<T1> U(expr);
+	const SpMat<eT>& X = U.M;
 
-	if(P.get_n_nonzero() == 0) { return T(0); }
-
-	const unwrap_spmat<typename SpProxy<T1>::stored_type> tmp(P.Q);
-	const SpMat<eT>& A = tmp.M;
+	if(X.n_nonzero == 0) { return T(0); }
 
 	// create a fake dense vector to allow reuse of code for dense vectors
-	Col<eT> fake_vector(access::rwp(A.values), A.n_nonzero, false);
+	Col<eT> fake_vector(access::rwp(X.values), X.n_nonzero, false);
 
 	const Proxy<Col<eT>> P_fake_vector(fake_vector);
 
 	const char sig = (method != nullptr) ? method[0] : char(0);
-	const bool is_vec = (P.get_n_rows() == 1) || (P.get_n_cols() == 1); // TODO: (T1::is_row) || (T1::is_col) || ...
+	const bool is_vec = (T1::is_xvec) || (T1::is_row) || (T1::is_col) || (X.n_rows == 1) || (X.n_cols == 1);
 
 	if(is_vec) {
 		if((sig == 'i') || (sig == 'I') || (sig == '+')) // max norm
 		{
 			return op_norm::vec_norm_max(P_fake_vector);
-		} else if(sig == '-') // min norm
+		}
+		else if(sig == '-') // min norm
 		{
 			const T val = op_norm::vec_norm_min(P_fake_vector);
 
-			if(P.get_n_nonzero() < P.get_n_elem()) { return (std::min)(T(0), val); } else { return val; }
-		} else if((sig == 'f') || (sig == 'F')) { return op_norm::vec_norm_2(P_fake_vector); } else {
-			arma_stop_logic_error("norm(): unsupported vector norm type");
-			return T(0);
+			return (X.n_nonzero < X.n_elem) ? T((std::min)(T(0), val)) : T(val);
 		}
-	} else {
+		else if((sig == 'f') || (sig == 'F')) { return op_norm::vec_norm_2(P_fake_vector); }
+
+		arma_stop_logic_error("norm(): unsupported vector norm type");
+	}
+	else {
 		if((sig == 'i') || (sig == 'I') || (sig == '+')) // inf norm
 		{
-			return op_norm::mat_norm_inf(P);
-		} else if((sig == 'f') || (sig == 'F')) { return op_norm::vec_norm_2(P_fake_vector); } else {
-			arma_stop_logic_error("norm(): unsupported matrix norm type");
-			return T(0);
+			return spop_norm::mat_norm_inf(X);
 		}
+		else if((sig == 'f') || (sig == 'F')) { return op_norm::vec_norm_2(P_fake_vector); }
+
+		arma_stop_logic_error("norm(): unsupported matrix norm type");
 	}
+
+	return T(0);
 }
 
 //! @}

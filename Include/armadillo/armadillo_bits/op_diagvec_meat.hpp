@@ -24,7 +24,8 @@ void op_diagvec::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_diagvec
 
 	const Proxy<T1> P(X.m);
 
-	if(P.is_alias(out) == false) { op_diagvec::apply_proxy(out, P); } else {
+	if(P.is_alias(out) == false) { op_diagvec::apply_proxy(out, P); }
+	else {
 		Mat<eT> tmp;
 
 		op_diagvec::apply_proxy(tmp, P);
@@ -131,7 +132,8 @@ void op_diagvec::apply(Mat<typename T1::elem_type>& actual_out, const Op<Glue<T1
 
 			out_mem[k] = (use_alpha) ? eT(alpha * acc) : eT(acc);
 		}
-	} else if((partial_unwrap<T1>::do_trans == true) && (partial_unwrap<T2>::do_trans == false)) {
+	}
+	else if((partial_unwrap<T1>::do_trans == true) && (partial_unwrap<T2>::do_trans == false)) {
 		arma_extra_debug_print("trans_A = true; trans_B = false;");
 
 		const uword N = (std::min)(A_n_cols, B_n_cols);
@@ -150,7 +152,8 @@ void op_diagvec::apply(Mat<typename T1::elem_type>& actual_out, const Op<Glue<T1
 
 			out_mem[k] = (use_alpha) ? eT(alpha * acc) : eT(acc);
 		}
-	} else if((partial_unwrap<T1>::do_trans == false) && (partial_unwrap<T2>::do_trans == true)) {
+	}
+	else if((partial_unwrap<T1>::do_trans == false) && (partial_unwrap<T2>::do_trans == true)) {
 		arma_extra_debug_print("trans_A = false; trans_B = true;");
 
 		const uword N = (std::min)(A_n_rows, B_n_rows);
@@ -168,7 +171,8 @@ void op_diagvec::apply(Mat<typename T1::elem_type>& actual_out, const Op<Glue<T1
 
 			out_mem[k] = (use_alpha) ? eT(alpha * acc) : eT(acc);
 		}
-	} else if((partial_unwrap<T1>::do_trans == true) && (partial_unwrap<T2>::do_trans == true)) {
+	}
+	else if((partial_unwrap<T1>::do_trans == true) && (partial_unwrap<T2>::do_trans == true)) {
 		arma_extra_debug_print("trans_A = true; trans_B = true;");
 
 		const uword N = (std::min)(A_n_cols, B_n_rows);
@@ -265,7 +269,8 @@ void op_diagvec::apply(Mat<typename T1::elem_type>& actual_out, const Op<Glue<T1
 
 			out_mem[k] = (use_alpha) ? eT(alpha * acc) : eT(acc);
 		}
-	} else if((partial_unwrap<T1>::do_trans == true) && (partial_unwrap<T2>::do_trans == false)) {
+	}
+	else if((partial_unwrap<T1>::do_trans == true) && (partial_unwrap<T2>::do_trans == false)) {
 		arma_extra_debug_print("trans_A = true; trans_B = false;");
 
 		const uword N = (std::min)(A_n_cols, B_n_cols);
@@ -305,7 +310,8 @@ void op_diagvec::apply(Mat<typename T1::elem_type>& actual_out, const Op<Glue<T1
 
 			out_mem[k] = (use_alpha) ? eT(alpha * acc) : eT(acc);
 		}
-	} else if((partial_unwrap<T1>::do_trans == false) && (partial_unwrap<T2>::do_trans == true)) {
+	}
+	else if((partial_unwrap<T1>::do_trans == false) && (partial_unwrap<T2>::do_trans == true)) {
 		arma_extra_debug_print("trans_A = false; trans_B = true;");
 
 		const uword N = (std::min)(A_n_rows, B_n_rows);
@@ -340,7 +346,8 @@ void op_diagvec::apply(Mat<typename T1::elem_type>& actual_out, const Op<Glue<T1
 
 			out_mem[k] = (use_alpha) ? eT(alpha * acc) : eT(acc);
 		}
-	} else if((partial_unwrap<T1>::do_trans == true) && (partial_unwrap<T2>::do_trans == true)) {
+	}
+	else if((partial_unwrap<T1>::do_trans == true) && (partial_unwrap<T2>::do_trans == true)) {
 		arma_extra_debug_print("trans_A = true; trans_B = true;");
 
 		const uword N = (std::min)(A_n_cols, B_n_rows);
@@ -400,7 +407,8 @@ void op_diagvec2::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_diagve
 
 	const Proxy<T1> P(X.m);
 
-	if(P.is_alias(out) == false) { op_diagvec2::apply_proxy(out, P, row_offset, col_offset); } else {
+	if(P.is_alias(out) == false) { op_diagvec2::apply_proxy(out, P, row_offset, col_offset); }
+	else {
 		Mat<eT> tmp;
 
 		op_diagvec2::apply_proxy(tmp, P, row_offset, col_offset);
@@ -418,7 +426,7 @@ void op_diagvec2::apply_proxy(Mat<typename T1::elem_type>& out, const Proxy<T1>&
 	const uword n_rows = P.get_n_rows();
 	const uword n_cols = P.get_n_cols();
 
-	arma_debug_check
+	arma_debug_check_bounds
 		(
 			((row_offset > 0) && (row_offset >= n_rows)) || ((col_offset > 0) && (col_offset >= n_cols)),
 			"diagvec(): requested diagonal is out of bounds"

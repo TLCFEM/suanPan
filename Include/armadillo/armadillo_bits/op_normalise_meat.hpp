@@ -36,7 +36,8 @@ void op_normalise_vec::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_n
 		Mat<eT> tmp = U.M / norm_val_b;
 
 		out.steal_mem(tmp);
-	} else { out = U.M / norm_val_b; }
+	}
+	else { out = U.M / norm_val_b; }
 }
 
 template<typename T1> inline
@@ -59,7 +60,8 @@ void op_normalise_mat::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_n
 		op_normalise_mat::apply(out2, U.M, p, dim);
 
 		out.steal_mem(out2);
-	} else { op_normalise_mat::apply(out, U.M, p, dim); }
+	}
+	else { op_normalise_mat::apply(out, U.M, p, dim); }
 }
 
 template<typename eT> inline
@@ -81,7 +83,8 @@ void op_normalise_mat::apply(Mat<eT>& out, const Mat<eT>& A, const uword p, cons
 
 			out.col(i) = A.col(i) / norm_val_b;
 		}
-	} else {
+	}
+	else {
 		const uword n_rows = A.n_rows;
 		const uword n_cols = A.n_cols;
 

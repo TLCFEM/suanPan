@@ -36,12 +36,14 @@ void op_vectorise_col::apply_direct(Mat<typename T1::elem_type>& out, const T1& 
 			// output matrix is the same as the input matrix
 
 			out.set_size(out.n_elem, 1); // set_size() doesn't destroy data as long as the number of elements in the matrix remains the same
-		} else {
+		}
+		else {
 			out.set_size(U.M.n_elem, 1);
 
 			arrayops::copy(out.memptr(), U.M.memptr(), U.M.n_elem);
 		}
-	} else if(is_subview<T1>::value) {
+	}
+	else if(is_subview<T1>::value) {
 		const subview<eT>& sv = reinterpret_cast<const subview<eT>&>(expr);
 
 		if(&out == &(sv.m)) {
@@ -50,8 +52,10 @@ void op_vectorise_col::apply_direct(Mat<typename T1::elem_type>& out, const T1& 
 			op_vectorise_col::apply_subview(tmp, sv);
 
 			out.steal_mem(tmp);
-		} else { op_vectorise_col::apply_subview(out, sv); }
-	} else {
+		}
+		else { op_vectorise_col::apply_subview(out, sv); }
+	}
+	else {
 		const Proxy<T1> P(expr);
 
 		if(P.is_alias(out)) {
@@ -60,7 +64,8 @@ void op_vectorise_col::apply_direct(Mat<typename T1::elem_type>& out, const T1& 
 			op_vectorise_col::apply_proxy(tmp, P);
 
 			out.steal_mem(tmp);
-		} else { op_vectorise_col::apply_proxy(out, P); }
+		}
+		else { op_vectorise_col::apply_proxy(out, P); }
 	}
 }
 
@@ -110,11 +115,13 @@ void op_vectorise_col::apply_proxy(Mat<typename T1::elem_type>& out, const Proxy
 		}
 
 		if(i < N) { outmem[i] = A[i]; }
-	} else {
+	}
+	else {
 		const uword n_rows = P.get_n_rows();
 		const uword n_cols = P.get_n_cols();
 
-		if(n_rows == 1) { for(uword i = 0; i < n_cols; ++i) { outmem[i] = P.at(0, i); } } else {
+		if(n_rows == 1) { for(uword i = 0; i < n_cols; ++i) { outmem[i] = P.at(0, i); } }
+		else {
 			for(uword col = 0; col < n_cols; ++col)
 				for(uword row = 0; row < n_rows; ++row) {
 					*outmem = P.at(row, col);
@@ -145,7 +152,8 @@ void op_vectorise_row::apply_direct(Mat<typename T1::elem_type>& out, const T1& 
 		op_vectorise_row::apply_proxy(tmp, P);
 
 		out.steal_mem(tmp);
-	} else { op_vectorise_row::apply_proxy(out, P); }
+	}
+	else { op_vectorise_row::apply_proxy(out, P); }
 }
 
 template<typename T1> inline
@@ -163,12 +171,14 @@ void op_vectorise_row::apply_proxy(Mat<typename T1::elem_type>& out, const Proxy
 	eT* outmem = out.memptr();
 
 	if(n_cols == 1) {
-		if(is_Mat<typename Proxy<T1>::stored_type>::value == true) {
+		if(is_Mat<typename Proxy<T1>::stored_type>::value) {
 			const unwrap<typename Proxy<T1>::stored_type> tmp(P.Q);
 
 			arrayops::copy(out.memptr(), tmp.M.memptr(), n_elem);
-		} else { for(uword i = 0; i < n_elem; ++i) { outmem[i] = P.at(i, 0); } }
-	} else {
+		}
+		else { for(uword i = 0; i < n_elem; ++i) { outmem[i] = P.at(i, 0); } }
+	}
+	else {
 		for(uword row = 0; row < n_rows; ++row) {
 			uword i, j;
 
@@ -196,7 +206,8 @@ void op_vectorise_all::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_v
 
 	const uword dim = in.aux_uword_a;
 
-	if(dim == 0) { op_vectorise_col::apply_direct(out, in.m); } else { op_vectorise_row::apply_direct(out, in.m); }
+	if(dim == 0) { op_vectorise_col::apply_direct(out, in.m); }
+	else { op_vectorise_row::apply_direct(out, in.m); }
 }
 
 //
@@ -207,7 +218,8 @@ void op_vectorise_cube_col::apply(Mat<typename T1::elem_type>& out, const CubeTo
 
 	typedef typename T1::elem_type eT;
 
-	if(is_same_type<T1, subview_cube<eT>>::yes) { op_vectorise_cube_col::apply_subview(out, reinterpret_cast<const subview_cube<eT>&>(in.m)); } else {
+	if(is_same_type<T1, subview_cube<eT>>::yes) { op_vectorise_cube_col::apply_subview(out, reinterpret_cast<const subview_cube<eT>&>(in.m)); }
+	else {
 		const ProxyCube<T1> P(in.m);
 
 		op_vectorise_cube_col::apply_proxy(out, P);
@@ -244,11 +256,12 @@ void op_vectorise_cube_col::apply_proxy(Mat<typename T1::elem_type>& out, const 
 
 	out.set_size(N, 1);
 
-	if(is_Cube<typename ProxyCube<T1>::stored_type>::value == true) {
+	if(is_Cube<typename ProxyCube<T1>::stored_type>::value) {
 		const unwrap_cube<typename ProxyCube<T1>::stored_type> tmp(P.Q);
 
 		arrayops::copy(out.memptr(), tmp.M.memptr(), N);
-	} else {
+	}
+	else {
 		eT* outmem = out.memptr();
 
 		if(ProxyCube<T1>::use_at == false) {
@@ -265,7 +278,8 @@ void op_vectorise_cube_col::apply_proxy(Mat<typename T1::elem_type>& out, const 
 			}
 
 			if(i < N) { outmem[i] = A[i]; }
-		} else {
+		}
+		else {
 			const uword n_rows = P.get_n_rows();
 			const uword n_cols = P.get_n_cols();
 			const uword n_slices = P.get_n_slices();

@@ -49,7 +49,8 @@ enable_if2
 
 	const bool low_memory = (sig == 'l');
 
-	if((low_memory == false) || (X.n_rows == X.n_cols)) { op_htrans::apply_mat_inplace(X); } else {
+	if((low_memory == false) || (X.n_rows == X.n_cols)) { op_htrans::apply_mat_inplace(X); }
+	else {
 		inplace_strans(X, method);
 
 		X = conj(X);

@@ -20,44 +20,48 @@ template<typename T1> inline
 void op_powmat::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_powmat>& expr) {
 	arma_extra_debug_sigprint();
 
-	typedef typename T1::elem_type eT;
-
 	const uword y = expr.aux_uword_a;
 	const bool y_neg = (expr.aux_uword_b == uword(1));
 
-	if(y_neg) {
-		if(y == uword(1)) {
-			const bool inv_status = inv(out, expr.m);
+	const bool status = op_powmat::apply_direct(out, expr.m, y, y_neg);
 
-			if(inv_status == false) {
-				out.soft_reset();
-				arma_stop_runtime_error("powmat(): matrix inverse failed");
-				return;
-			}
-		} else {
-			Mat<eT> X_inv;
-
-			const bool inv_status = inv(X_inv, expr.m);
-
-			if(inv_status == false) {
-				out.soft_reset();
-				arma_stop_runtime_error("powmat(): matrix inverse failed");
-				return;
-			}
-
-			op_powmat::apply(out, X_inv, y);
-		}
-	} else {
-		const quasi_unwrap<T1> U(expr.m);
-
-		arma_debug_check((U.M.is_square() == false), "powmat(): given matrix must be square sized");
-
-		op_powmat::apply(out, U.M, y);
+	if(status == false) {
+		out.soft_reset();
+		arma_stop_runtime_error("powmat(): transformation failed");
 	}
 }
 
+template<typename T1> inline
+bool op_powmat::apply_direct(Mat<typename T1::elem_type>& out, const Base<typename T1::elem_type, T1>& X, const uword y, const bool y_neg) {
+	arma_extra_debug_sigprint();
+
+	typedef typename T1::elem_type eT;
+
+	if(y_neg) {
+		if(y == uword(1)) { return op_inv::apply_direct(out, X.get_ref(), "powmat()"); }
+		else {
+			Mat<eT> X_inv;
+
+			const bool inv_status = op_inv::apply_direct(X_inv, X.get_ref(), "powmat()");
+
+			if(inv_status == false) { return false; }
+
+			op_powmat::apply_direct_positive(out, X_inv, y);
+		}
+	}
+	else {
+		const quasi_unwrap<T1> U(X.get_ref());
+
+		arma_debug_check((U.M.is_square() == false), "powmat(): given matrix must be square sized");
+
+		op_powmat::apply_direct_positive(out, U.M, y);
+	}
+
+	return true;
+}
+
 template<typename eT> inline
-void op_powmat::apply(Mat<eT>& out, const Mat<eT>& X, const uword y) {
+void op_powmat::apply_direct_positive(Mat<eT>& out, const Mat<eT>& X, const uword y) {
 	arma_extra_debug_sigprint();
 
 	const uword N = X.n_rows;
@@ -79,17 +83,22 @@ void op_powmat::apply(Mat<eT>& out, const Mat<eT>& X, const uword y) {
 		out.zeros(N, N);
 
 		for(uword i = 0; i < N; ++i) { out.at(i, i) = tmp[i]; }
-	} else {
-		if(y == uword(2)) { out = X * X; } else if(y == uword(3)) {
+	}
+	else {
+		if(y == uword(2)) { out = X * X; }
+		else if(y == uword(3)) {
 			const Mat<eT> tmp = X * X;
 			out = X * tmp;
-		} else if(y == uword(4)) {
+		}
+		else if(y == uword(4)) {
 			const Mat<eT> tmp = X * X;
 			out = tmp * tmp;
-		} else if(y == uword(5)) {
+		}
+		else if(y == uword(5)) {
 			const Mat<eT> tmp = X * X;
 			out = X * tmp * tmp;
-		} else {
+		}
+		else {
 			Mat<eT> tmp = X;
 
 			out = X;
@@ -111,21 +120,44 @@ template<typename T1> inline
 void op_powmat_cx::apply(Mat<std::complex<typename T1::pod_type>>& out, const mtOp<std::complex<typename T1::pod_type>, T1, op_powmat_cx>& expr) {
 	arma_extra_debug_sigprint();
 
+	typedef typename T1::pod_type in_T;
+
+	const in_T y = std::real(expr.aux_out_eT);
+
+	const bool status = op_powmat_cx::apply_direct(out, expr.m, y);
+
+	if(status == false) {
+		out.soft_reset();
+		arma_stop_runtime_error("powmat(): transformation failed");
+	}
+}
+
+template<typename T1> inline
+bool op_powmat_cx::apply_direct(Mat<std::complex<typename T1::pod_type>>& out, const Base<typename T1::elem_type, T1>& X, const typename T1::pod_type y) {
+	arma_extra_debug_sigprint();
+
 	typedef typename T1::elem_type in_eT;
 	typedef typename T1::pod_type in_T;
 	typedef std::complex<in_T> out_eT;
 
-	const in_T y = std::real(expr.aux_out_eT);
-
 	if(y == in_T(int(y))) {
-		arma_extra_debug_print("op_powmat_cx::apply(): integer exponent detected; redirecting to op_powmat");
+		arma_extra_debug_print("op_powmat_cx::apply_direct(): integer exponent detected; redirecting to op_powmat");
 
-		out = conv_to<Mat<out_eT>>::from(powmat(expr.m, int(y)));
+		const uword y_val = (y < int(0)) ? uword(-y) : uword(y);
+		const bool y_neg = (y < int(0));
 
-		return;
+		Mat<in_eT> tmp;
+
+		const bool status = op_powmat::apply_direct(tmp, X.get_ref(), y_val, y_neg);
+
+		if(status == false) { return false; }
+
+		out = conv_to<Mat<out_eT>>::from(tmp);
+
+		return true;
 	}
 
-	const quasi_unwrap<T1> U(expr.m);
+	const quasi_unwrap<T1> U(X.get_ref());
 	const Mat<in_eT>& A = U.M;
 
 	arma_debug_check((A.is_square() == false), "powmat(): given matrix must be square sized");
@@ -141,7 +173,7 @@ void op_powmat_cx::apply(Mat<std::complex<typename T1::pod_type>>& out, const mt
 
 		for(uword i = 0; i < N; ++i) { out.at(i, i) = tmp[i]; }
 
-		return;
+		return true;
 	}
 
 #if defined(ARMA_OPTIMISE_SYMPD)
@@ -163,7 +195,7 @@ void op_powmat_cx::apply(Mat<std::complex<typename T1::pod_type>>& out, const mt
 
 			out = conv_to<Mat<out_eT>>::from(eigvec * tmp);
 
-			return;
+			return true;
 		}
 
 		// fallthrough
@@ -190,11 +222,7 @@ void op_powmat_cx::apply(Mat<std::complex<typename T1::pod_type>>& out, const mt
 		}
 	}
 
-	if(powmat_status == false) {
-		out.soft_reset();
-
-		arma_stop_runtime_error("powmat(): transformation failed");
-	}
+	return powmat_status;
 }
 
 //! @}

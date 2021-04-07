@@ -66,9 +66,11 @@ template<typename eT> inline SpSubview<eT>::const_iterator::const_iterator(const
 		const uword row_index = iterator_base::M->m.row_indices[cur_pos + lskip_pos];
 		if(row_index < aux_row) {
 			++lskip_pos; // not valid
-		} else if(row_index < (aux_row + ln_rows)) {
+		}
+		else if(row_index < (aux_row + ln_rows)) {
 			++cur_pos; // valid, in the subview
-		} else {
+		}
+		else {
 			// skip to end of column
 			const uword next_colptr = iterator_base::M->m.col_ptrs[cur_col + aux_col + 1];
 			lskip_pos += (next_colptr - (cur_pos + lskip_pos));
@@ -106,7 +108,9 @@ template<typename eT> inline SpSubview<eT>::const_iterator::const_iterator(const
 	while(cur_col < in_col) {
 		// See if the current position is in the subview.
 		const uword row_index = iterator_base::M->m.row_indices[cur_pos + skip_pos];
-		if(row_index < aux_row) { ++skip_pos; } else if(row_index < (aux_row + ln_rows)) { ++cur_pos; } else {
+		if(row_index < aux_row) { ++skip_pos; }
+		else if(row_index < (aux_row + ln_rows)) { ++cur_pos; }
+		else {
 			// skip to end of column
 			const uword next_colptr = iterator_base::M->m.col_ptrs[cur_col + aux_col + 1];
 			skip_pos += (next_colptr - (cur_pos + skip_pos));
@@ -121,7 +125,8 @@ template<typename eT> inline SpSubview<eT>::const_iterator::const_iterator(const
 		// We have to find the right row index.
 		uword row_index = iterator_base::M->m.row_indices[cur_pos + skip_pos];
 		while((row_index < (in_row + aux_row))) {
-			if(row_index < aux_row) { ++skip_pos; } else { ++cur_pos; }
+			if(row_index < aux_row) { ++skip_pos; }
+			else { ++cur_pos; }
 
 			// Ensure we didn't step forward a column; if we did, we need to stop.
 			while(((skip_pos + cur_pos) >= iterator_base::M->m.col_ptrs[cur_col + aux_col + 1]) && (cur_col < ln_cols)) { ++cur_col; }
@@ -146,9 +151,11 @@ template<typename eT> inline SpSubview<eT>::const_iterator::const_iterator(const
 			break;
 		}
 
-		if(row_index < aux_row) { ++skip_pos; } else if(row_index < (aux_row + ln_rows)) {
+		if(row_index < aux_row) { ++skip_pos; }
+		else if(row_index < (aux_row + ln_rows)) {
 			break; // found
-		} else { skip_pos += (next_colptr - (cur_pos + skip_pos)); }
+		}
+		else { skip_pos += (next_colptr - (cur_pos + skip_pos)); }
 
 		// Did we move any columns?
 		while(((skip_pos + cur_pos) >= iterator_base::M->m.col_ptrs[cur_col + aux_col + 1]) && (cur_col < ln_cols)) { ++cur_col; }
@@ -206,9 +213,11 @@ typename SpSubview<eT>::const_iterator& SpSubview<eT>::const_iterator::operator+
 			break;
 		}
 
-		if(row_index < aux_row) { ++lskip_pos; } else if(row_index < (aux_row + ln_rows)) {
+		if(row_index < aux_row) { ++lskip_pos; }
+		else if(row_index < (aux_row + ln_rows)) {
 			break; // found
-		} else { lskip_pos += (next_colptr - (cur_pos + lskip_pos)); }
+		}
+		else { lskip_pos += (next_colptr - (cur_pos + lskip_pos)); }
 	}
 
 	iterator_base::internal_pos = cur_pos;
@@ -254,9 +263,11 @@ typename SpSubview<eT>::const_iterator& SpSubview<eT>::const_iterator::operator-
 		// Did we move back any columns?
 		while((skip_pos + cur_pos) < iterator_base::M->m.col_ptrs[cur_col + aux_col]) { --cur_col; }
 
-		if(row_index < aux_row) { skip_pos -= (colptr - (cur_pos + skip_pos) + 1); } else if(row_index < (aux_row + ln_rows)) {
+		if(row_index < aux_row) { skip_pos -= (colptr - (cur_pos + skip_pos) + 1); }
+		else if(row_index < (aux_row + ln_rows)) {
 			break; // found
-		} else { --skip_pos; }
+		}
+		else { --skip_pos; }
 	}
 
 	iterator_base::internal_pos = cur_pos;
@@ -550,13 +561,15 @@ typename SpSubview<eT>::const_row_iterator& SpSubview<eT>::const_row_iterator::o
 					iterator_base::internal_col = col;
 					actual_pos = col_offset + (pos_ptr - start_ptr);
 					return *this;
-				} else if((*pos_ptr) < next_min_row + aux_row && (*pos_ptr) < aux_row + iterator_base::M->n_rows) {
+				}
+				else if((*pos_ptr) < next_min_row + aux_row && (*pos_ptr) < aux_row + iterator_base::M->n_rows) {
 					// The first element in this column is in a subsequent row, but it's
 					// the minimum row we've seen so far.
 					next_min_row = (*pos_ptr) - aux_row;
 					next_min_col = col;
 					next_actual_pos = col_offset + (pos_ptr - start_ptr);
-				} else if((*pos_ptr) == next_min_row + aux_row && col < next_min_col && (*pos_ptr) < aux_row + iterator_base::M->n_rows) {
+				}
+				else if((*pos_ptr) == next_min_row + aux_row && col < next_min_col && (*pos_ptr) < aux_row + iterator_base::M->n_rows) {
 					// The first element in this column is in a subsequent row that we
 					// already have another elemnt for, but the column index is less so
 					// this element will come first.
@@ -587,13 +600,15 @@ typename SpSubview<eT>::const_row_iterator& SpSubview<eT>::const_row_iterator::o
 					internal_row++;
 					actual_pos = col_offset + (pos_ptr - start_ptr);
 					return *this;
-				} else if((*pos_ptr) < next_min_row + aux_row && (*pos_ptr) < aux_row + iterator_base::M->n_rows) {
+				}
+				else if((*pos_ptr) < next_min_row + aux_row && (*pos_ptr) < aux_row + iterator_base::M->n_rows) {
 					// The first element in this column is in a subsequent row, but it's
 					// the minimum row we've seen so far.
 					next_min_row = (*pos_ptr) - aux_row;
 					next_min_col = col;
 					next_actual_pos = col_offset + (pos_ptr - start_ptr);
-				} else if((*pos_ptr) == next_min_row + aux_row && col < next_min_col && (*pos_ptr) < aux_row + iterator_base::M->n_rows) {
+				}
+				else if((*pos_ptr) == next_min_row + aux_row && col < next_min_col && (*pos_ptr) < aux_row + iterator_base::M->n_rows) {
 					// We've found a better column.
 					next_min_col = col;
 					next_actual_pos = col_offset + (pos_ptr - start_ptr);
@@ -655,7 +670,8 @@ typename SpSubview<eT>::const_row_iterator& SpSubview<eT>::const_row_iterator::o
 					max_row = *(pos_ptr - 1) - aux_row;
 					max_col = col - 1;
 					next_actual_pos = col_offset + (pos_ptr - 1 - start_ptr);
-				} else if(*(pos_ptr - 1) == max_row + aux_row && (col - 1) >= max_col) {
+				}
+				else if(*(pos_ptr - 1) == max_row + aux_row && (col - 1) >= max_col) {
 					max_col = col - 1;
 					next_actual_pos = col_offset + (pos_ptr - 1 - start_ptr);
 				}
@@ -681,7 +697,8 @@ typename SpSubview<eT>::const_row_iterator& SpSubview<eT>::const_row_iterator::o
 					max_row = *(pos_ptr - 1) - aux_row;
 					max_col = col;
 					next_actual_pos = col_offset + (pos_ptr - 1 - start_ptr);
-				} else if(*(pos_ptr - 1) == max_row + aux_row && col >= max_col) {
+				}
+				else if(*(pos_ptr - 1) == max_row + aux_row && col >= max_col) {
 					max_col = col;
 					next_actual_pos = col_offset + (pos_ptr - 1 - start_ptr);
 				}

@@ -41,7 +41,8 @@ eT op_dotext::direct_rowvec_mat_colvec
 		}
 
 		return op_dot::direct_dot(B.n_cols, tmp.mem, C_mem);
-	} else {
+	}
+	else {
 		podarray<eT> tmp(B.n_rows);
 
 		for(uword row = 0; row < B.n_rows; ++row) {
@@ -80,7 +81,8 @@ eT op_dotext::direct_rowvec_transmat_colvec
 		}
 
 		return op_dot::direct_dot(B.n_rows, tmp.mem, C_mem);
-	} else {
+	}
+	else {
 		podarray<eT> tmp(B.n_cols);
 
 		for(uword col = 0; col < B.n_cols; ++col) {

@@ -25,7 +25,8 @@ void spglue_rel_lt::apply(SpMat<uword>& out, const mtSpGlue<uword, T1, T2, spglu
 
 	const bool is_alias = PA.is_alias(out) || PB.is_alias(out);
 
-	if(is_alias == false) { spglue_rel_lt::apply_noalias(out, PA, PB); } else {
+	if(is_alias == false) { spglue_rel_lt::apply_noalias(out, PA, PB); }
+	else {
 		SpMat<uword> tmp;
 
 		spglue_rel_lt::apply_noalias(tmp, PA, PB);
@@ -72,13 +73,15 @@ void spglue_rel_lt::apply_noalias(SpMat<uword>& out, const SpProxy<T1>& PA, cons
 
 			++x_it;
 			++y_it;
-		} else {
+		}
+		else {
 			if((x_it_col < y_it_col) || ((x_it_col == y_it_col) && (x_it_row < y_it_row))) // if y is closer to the end
 			{
 				out_val = ((*x_it) < eT(0)) ? uword(1) : uword(0);
 
 				++x_it;
-			} else {
+			}
+			else {
 				out_val = (eT(0) < (*y_it)) ? uword(1) : uword(0);
 
 				++y_it;
@@ -109,7 +112,8 @@ void spglue_rel_lt::apply_noalias(SpMat<uword>& out, const SpProxy<T1>& PA, cons
 	for(uword c = 1; c <= out_n_cols; ++c) { col_ptrs[c] += col_ptrs[c - 1]; }
 
 	if(count < max_n_nonzero) {
-		if(count <= (max_n_nonzero / 2)) { out.mem_resize(count); } else {
+		if(count <= (max_n_nonzero / 2)) { out.mem_resize(count); }
+		else {
 			// quick resize without reallocating memory and copying data
 			access::rw(out.n_nonzero) = count;
 			access::rw(out.values[count]) = eT(0);
@@ -129,7 +133,8 @@ void spglue_rel_gt::apply(SpMat<uword>& out, const mtSpGlue<uword, T1, T2, spglu
 
 	const bool is_alias = PA.is_alias(out) || PB.is_alias(out);
 
-	if(is_alias == false) { spglue_rel_gt::apply_noalias(out, PA, PB); } else {
+	if(is_alias == false) { spglue_rel_gt::apply_noalias(out, PA, PB); }
+	else {
 		SpMat<uword> tmp;
 
 		spglue_rel_gt::apply_noalias(tmp, PA, PB);
@@ -176,13 +181,15 @@ void spglue_rel_gt::apply_noalias(SpMat<uword>& out, const SpProxy<T1>& PA, cons
 
 			++x_it;
 			++y_it;
-		} else {
+		}
+		else {
 			if((x_it_col < y_it_col) || ((x_it_col == y_it_col) && (x_it_row < y_it_row))) // if y is closer to the end
 			{
 				out_val = ((*x_it) > eT(0)) ? uword(1) : uword(0);
 
 				++x_it;
-			} else {
+			}
+			else {
 				out_val = (eT(0) > (*y_it)) ? uword(1) : uword(0);
 
 				++y_it;
@@ -213,7 +220,8 @@ void spglue_rel_gt::apply_noalias(SpMat<uword>& out, const SpProxy<T1>& PA, cons
 	for(uword c = 1; c <= out_n_cols; ++c) { col_ptrs[c] += col_ptrs[c - 1]; }
 
 	if(count < max_n_nonzero) {
-		if(count <= (max_n_nonzero / 2)) { out.mem_resize(count); } else {
+		if(count <= (max_n_nonzero / 2)) { out.mem_resize(count); }
+		else {
 			// quick resize without reallocating memory and copying data
 			access::rw(out.n_nonzero) = count;
 			access::rw(out.values[count]) = eT(0);
@@ -233,7 +241,8 @@ void spglue_rel_and::apply(SpMat<uword>& out, const mtSpGlue<uword, T1, T2, spgl
 
 	const bool is_alias = PA.is_alias(out) || PB.is_alias(out);
 
-	if(is_alias == false) { spglue_rel_and::apply_noalias(out, PA, PB); } else {
+	if(is_alias == false) { spglue_rel_and::apply_noalias(out, PA, PB); }
+	else {
 		SpMat<uword> tmp;
 
 		spglue_rel_and::apply_noalias(tmp, PA, PB);
@@ -285,11 +294,13 @@ void spglue_rel_and::apply_noalias(SpMat<uword>& out, const SpProxy<T1>& PA, con
 
 			++x_it;
 			++y_it;
-		} else {
+		}
+		else {
 			if((x_it_col < y_it_col) || ((x_it_col == y_it_col) && (x_it_row < y_it_row))) // if y is closer to the end
 			{
 				++x_it;
-			} else { ++y_it; }
+			}
+			else { ++y_it; }
 		}
 
 		arma_check((count > max_n_nonzero), "internal error: spglue_rel_and::apply_noalias(): count > max_n_nonzero");
@@ -303,7 +314,8 @@ void spglue_rel_and::apply_noalias(SpMat<uword>& out, const SpProxy<T1>& PA, con
 	for(uword c = 1; c <= out_n_cols; ++c) { col_ptrs[c] += col_ptrs[c - 1]; }
 
 	if(count < max_n_nonzero) {
-		if(count <= (max_n_nonzero / 2)) { out.mem_resize(count); } else {
+		if(count <= (max_n_nonzero / 2)) { out.mem_resize(count); }
+		else {
 			// quick resize without reallocating memory and copying data
 			access::rw(out.n_nonzero) = count;
 			access::rw(out.values[count]) = eT(0);
@@ -323,7 +335,8 @@ void spglue_rel_or::apply(SpMat<uword>& out, const mtSpGlue<uword, T1, T2, spglu
 
 	const bool is_alias = PA.is_alias(out) || PB.is_alias(out);
 
-	if(is_alias == false) { spglue_rel_or::apply_noalias(out, PA, PB); } else {
+	if(is_alias == false) { spglue_rel_or::apply_noalias(out, PA, PB); }
+	else {
 		SpMat<uword> tmp;
 
 		spglue_rel_or::apply_noalias(tmp, PA, PB);
@@ -366,11 +379,13 @@ void spglue_rel_or::apply_noalias(SpMat<uword>& out, const SpProxy<T1>& PA, cons
 		if(x_it == y_it) {
 			++x_it;
 			++y_it;
-		} else {
+		}
+		else {
 			if((x_it_col < y_it_col) || ((x_it_col == y_it_col) && (x_it_row < y_it_row))) // if y is closer to the end
 			{
 				++x_it;
-			} else {
+			}
+			else {
 				++y_it;
 
 				use_y_loc = true;
@@ -397,7 +412,8 @@ void spglue_rel_or::apply_noalias(SpMat<uword>& out, const SpProxy<T1>& PA, cons
 	for(uword c = 1; c <= out_n_cols; ++c) { col_ptrs[c] += col_ptrs[c - 1]; }
 
 	if(count < max_n_nonzero) {
-		if(count <= (max_n_nonzero / 2)) { out.mem_resize(count); } else {
+		if(count <= (max_n_nonzero / 2)) { out.mem_resize(count); }
+		else {
 			// quick resize without reallocating memory and copying data
 			access::rw(out.n_nonzero) = count;
 			access::rw(out.values[count]) = eT(0);

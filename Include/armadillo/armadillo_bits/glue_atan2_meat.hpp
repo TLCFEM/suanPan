@@ -29,7 +29,8 @@ void glue_atan2::apply(Mat<typename T1::elem_type>& out, const Glue<T1, T2, glue
 
 	const bool bad_alias = ((Proxy<T1>::has_subview && P1.is_alias(out)) || (Proxy<T2>::has_subview && P2.is_alias(out)));
 
-	if(bad_alias == false) { glue_atan2::apply_noalias(out, P1, P2); } else {
+	if(bad_alias == false) { glue_atan2::apply_noalias(out, P1, P2); }
+	else {
 		Mat<eT> tmp;
 
 		glue_atan2::apply_noalias(tmp, P1, P2);
@@ -70,14 +71,17 @@ void glue_atan2::apply_noalias(Mat<typename T1::elem_type>& out, const Proxy<T1>
           }
         }
 #endif
-		} else { for(uword i = 0; i < n_elem; ++i) { out_mem[i] = std::atan2(eaP1[i], eaP2[i]); } }
-	} else {
+		}
+		else { for(uword i = 0; i < n_elem; ++i) { out_mem[i] = std::atan2(eaP1[i], eaP2[i]); } }
+	}
+	else {
 		if(use_mp) {
 			const unwrap<typename Proxy<T1>::stored_type> U1(P1.Q);
 			const unwrap<typename Proxy<T2>::stored_type> U2(P2.Q);
 
 			out = arma::atan2(U1.M, U2.M);
-		} else {
+		}
+		else {
 			for(uword col = 0; col < n_cols; ++col)
 				for(uword row = 0; row < n_rows; ++row) {
 					*out_mem = std::atan2(P1.at(row, col), P2.at(row, col));
@@ -100,7 +104,8 @@ void glue_atan2::apply(Cube<typename T1::elem_type>& out, const GlueCube<T1, T2,
 
 	const bool bad_alias = ((ProxyCube<T1>::has_subview && P1.is_alias(out)) || (ProxyCube<T2>::has_subview && P2.is_alias(out)));
 
-	if(bad_alias == false) { glue_atan2::apply_noalias(out, P1, P2); } else {
+	if(bad_alias == false) { glue_atan2::apply_noalias(out, P1, P2); }
+	else {
 		Cube<eT> tmp;
 
 		glue_atan2::apply_noalias(tmp, P1, P2);
@@ -142,14 +147,17 @@ void glue_atan2::apply_noalias(Cube<typename T1::elem_type>& out, const ProxyCub
           }
         }
 #endif
-		} else { for(uword i = 0; i < n_elem; ++i) { out_mem[i] = std::atan2(eaP1[i], eaP2[i]); } }
-	} else {
+		}
+		else { for(uword i = 0; i < n_elem; ++i) { out_mem[i] = std::atan2(eaP1[i], eaP2[i]); } }
+	}
+	else {
 		if(use_mp) {
 			const unwrap_cube<typename ProxyCube<T1>::stored_type> U1(P1.Q);
 			const unwrap_cube<typename ProxyCube<T2>::stored_type> U2(P2.Q);
 
 			out = arma::atan2(U1.M, U2.M);
-		} else {
+		}
+		else {
 			for(uword slice = 0; slice < n_slices; ++slice)
 				for(uword col = 0; col < n_cols; ++col)
 					for(uword row = 0; row < n_rows; ++row) {

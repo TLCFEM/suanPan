@@ -50,8 +50,7 @@ void op_sp_plus::apply(SpMat<typename T1::elem_type>& out, const SpToDOp<T1, op_
 	const eT k = in.aux;
 
 	// We have to loop over all the elements.
-	for(uword c = 0; c < n_cols; ++c)
-		for(uword r = 0; r < n_rows; ++r) { out.at(r, c) = proxy.at(r, c) + k; }
+	for(uword c = 0; c < n_cols; ++c) for(uword r = 0; r < n_rows; ++r) { out.at(r, c) = proxy.at(r, c) + k; }
 }
 
 // used for the optimization of sparse % (sparse + scalar)

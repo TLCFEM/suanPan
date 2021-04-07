@@ -50,7 +50,8 @@ void glue_join_cols::apply(Mat<typename T1::elem_type>& out, const Glue<T1, T2, 
 	const Proxy<T1> A(X.A);
 	const Proxy<T2> B(X.B);
 
-	if((A.is_alias(out) == false) && (B.is_alias(out) == false)) { glue_join_cols::apply_noalias(out, A, B); } else {
+	if((A.is_alias(out) == false) && (B.is_alias(out) == false)) { glue_join_cols::apply_noalias(out, A, B); }
+	else {
 		Mat<eT> tmp;
 
 		glue_join_cols::apply_noalias(tmp, A, B);
@@ -195,7 +196,8 @@ void glue_join_rows::apply(Mat<typename T1::elem_type>& out, const Glue<T1, T2, 
 	const Proxy<T1> A(X.A);
 	const Proxy<T2> B(X.B);
 
-	if((A.is_alias(out) == false) && (B.is_alias(out) == false)) { glue_join_rows::apply_noalias(out, A, B); } else {
+	if((A.is_alias(out) == false) && (B.is_alias(out) == false)) { glue_join_rows::apply_noalias(out, A, B); }
+	else {
 		Mat<eT> tmp;
 
 		glue_join_rows::apply_noalias(tmp, A, B);
@@ -334,7 +336,8 @@ void glue_join_slices::apply(Cube<typename T1::elem_type>& out, const GlueCube<T
 
 		out.slices(0, A.n_slices - 1) = A;
 		out.slices(A.n_slices, out.n_slices - 1) = B;
-	} else // we have aliasing
+	}
+	else // we have aliasing
 	{
 		Cube<eT> C(A.n_rows, A.n_cols, A.n_slices + B.n_slices);
 

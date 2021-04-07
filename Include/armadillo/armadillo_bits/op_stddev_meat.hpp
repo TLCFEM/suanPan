@@ -49,7 +49,8 @@ void op_stddev::apply(Mat<typename T1::pod_type>& out, const mtOp<typename T1::p
 
 			for(uword col = 0; col < X_n_cols; ++col) { out_mem[col] = std::sqrt(op_var::direct_var(X.colptr(col), X_n_rows, norm_type)); }
 		}
-	} else if(dim == 1) {
+	}
+	else if(dim == 1) {
 		arma_extra_debug_print("op_stddev::apply(): dim = 1");
 
 		out.set_size(X_n_rows, (X_n_cols > 0) ? 1 : 0);

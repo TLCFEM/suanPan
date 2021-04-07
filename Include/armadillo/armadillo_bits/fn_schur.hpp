@@ -34,7 +34,7 @@ bool schur
 
 	if(status == false) {
 		S.soft_reset();
-		arma_debug_warn("schur(): decomposition failed");
+		arma_debug_warn_level(3, "schur(): decomposition failed");
 	}
 
 	return status;
@@ -83,7 +83,7 @@ bool schur
 	if(status == false) {
 		U.soft_reset();
 		S.soft_reset();
-		arma_debug_warn("schur(): decomposition failed");
+		arma_debug_warn_level(3, "schur(): decomposition failed");
 	}
 
 	return status;

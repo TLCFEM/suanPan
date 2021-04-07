@@ -65,7 +65,8 @@ void spop_symmat_cx::apply(SpMat<typename T1::elem_type>& out, const SpOp<T1, sp
 		const SpMat<eT> B = A.t();
 
 		spglue_merge::symmat_merge(out, A, B);
-	} else {
+	}
+	else {
 		const SpMat<eT> B = A.st();
 
 		spglue_merge::symmat_merge(out, A, B);

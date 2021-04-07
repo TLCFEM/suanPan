@@ -43,7 +43,10 @@ void GenCube<eT, gen_type>::apply(Cube<eT>& out) const {
 	// NOTE: we're assuming that the cube has already been set to the correct size;
 	// this is done by either the Cube contructor or operator=()
 
-	if(is_same_type<gen_type, gen_ones>::yes) { out.ones(); } else if(is_same_type<gen_type, gen_zeros>::yes) { out.zeros(); } else if(is_same_type<gen_type, gen_randu>::yes) { out.randu(); } else if(is_same_type<gen_type, gen_randn>::yes) { out.randn(); }
+	if(is_same_type<gen_type, gen_ones>::yes) { out.ones(); }
+	else if(is_same_type<gen_type, gen_zeros>::yes) { out.zeros(); }
+	else if(is_same_type<gen_type, gen_randu>::yes) { out.randu(); }
+	else if(is_same_type<gen_type, gen_randn>::yes) { out.randn(); }
 }
 
 template<typename eT, typename gen_type> inline
@@ -141,7 +144,10 @@ void GenCube<eT, gen_type>::apply(subview_cube<eT>& out) const {
 	// NOTE: we're assuming that the subcube has the same dimensions as the GenCube object
 	// this is checked by subview_cube::operator=()
 
-	if(is_same_type<gen_type, gen_ones>::yes) { out.ones(); } else if(is_same_type<gen_type, gen_zeros>::yes) { out.zeros(); } else if(is_same_type<gen_type, gen_randu>::yes) { out.randu(); } else if(is_same_type<gen_type, gen_randn>::yes) { out.randn(); }
+	if(is_same_type<gen_type, gen_ones>::yes) { out.ones(); }
+	else if(is_same_type<gen_type, gen_zeros>::yes) { out.zeros(); }
+	else if(is_same_type<gen_type, gen_randu>::yes) { out.randu(); }
+	else if(is_same_type<gen_type, gen_randn>::yes) { out.randn(); }
 }
 
 //! @}

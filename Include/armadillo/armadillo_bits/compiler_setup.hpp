@@ -109,7 +109,7 @@
   #define ARMA_BLAS_SDOT_BUG
   
   // #undef  ARMA_HAVE_POSIX_MEMALIGN
-// NOTE: posix_memalign() is available since macOS 10.6 (late 2009 onwards)
+  // NOTE: posix_memalign() is available since macOS 10.6 (late 2009 onwards)
 #endif
 
 #if defined(__MINGW32__) || defined(__CYGWIN__) || defined(_MSC_VER)
@@ -360,7 +360,7 @@
 #endif
 
 #if ( defined(ARMA_USE_OPENMP) && (!defined(_OPENMP) || (defined(_OPENMP) && (_OPENMP < 201107))) )
-// OpenMP 3.0 required for parallelisation of loops with unsigned integers
+  // OpenMP 3.0 required for parallelisation of loops with unsigned integers
   // OpenMP 3.1 required for atomic read and atomic write
   #undef  ARMA_USE_OPENMP
   #undef  ARMA_PRINT_OPENMP_WARNING
@@ -378,13 +378,18 @@
 
 #if defined(ARMA_USE_OPENMP)
 #if (defined(ARMA_GCC_VERSION) && (ARMA_GCC_VERSION < 50400))
-// due to https://gcc.gnu.org/bugzilla/show_bug.cgi?id=57580
+    // due to https://gcc.gnu.org/bugzilla/show_bug.cgi?id=57580
     // TODO: gcc 4.9.4 is also fixed, so use a more fine-grained gcc version check?
     #undef ARMA_USE_OPENMP
 #if !defined(ARMA_DONT_PRINT_OPENMP_WARNING)
       #pragma message ("WARNING: use of OpenMP disabled due to compiler bug in gcc <= 5.3")
 #endif
 #endif
+#endif
+
+#if ( defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__) )
+#undef  ARMA_PRINT_EXCEPTIONS
+#define ARMA_PRINT_EXCEPTIONS
 #endif
 
 // cleanup

@@ -55,7 +55,8 @@ void op_repmat::apply_noalias(Mat<typename obj::elem_type>& out, const obj& X, c
 					}
 				}
 			}
-		} else {
+		}
+		else {
 			for(uword col_copy = 0; col_copy < copies_per_col; ++col_copy) {
 				const uword out_col_offset = X_n_cols * col_copy;
 
@@ -88,7 +89,8 @@ void op_repmat::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_repmat>&
 		op_repmat::apply_noalias(tmp, U.M, copies_per_row, copies_per_col);
 
 		out.steal_mem(tmp);
-	} else { op_repmat::apply_noalias(out, U.M, copies_per_row, copies_per_col); }
+	}
+	else { op_repmat::apply_noalias(out, U.M, copies_per_row, copies_per_col); }
 }
 
 //! @}

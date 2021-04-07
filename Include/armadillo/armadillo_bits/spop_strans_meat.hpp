@@ -84,7 +84,8 @@ void spop_strans::apply(SpMat<typename T1::elem_type>& out, const SpOp<T1, spop_
 		spop_strans::apply_noalias(tmp, U.M);
 
 		out.steal_mem(tmp);
-	} else { spop_strans::apply_noalias(out, U.M); }
+	}
+	else { spop_strans::apply_noalias(out, U.M); }
 }
 
 //! for transpose of non-complex matrices, redirected from spop_htrans::apply()
@@ -102,7 +103,8 @@ void spop_strans::apply(SpMat<typename T1::elem_type>& out, const SpOp<T1, spop_
 		spop_strans::apply_noalias(tmp, U.M);
 
 		out.steal_mem(tmp);
-	} else { spop_strans::apply_noalias(out, U.M); }
+	}
+	else { spop_strans::apply_noalias(out, U.M); }
 }
 
 //! @}

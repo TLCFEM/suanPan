@@ -43,7 +43,9 @@ void glue_quantile::worker(eTb* out_mem, Col<eTa>& Y, const Mat<eTb>& P) {
 
 		eTb out_val = eTb(0);
 
-		if(P_i < P_min) { out_val = (P_i < eTb(0)) ? eTb(-std::numeric_limits<eTb>::infinity()) : eTb(Y.min()); } else if(P_i > P_max) { out_val = (P_i > eTb(1)) ? eTb(std::numeric_limits<eTb>::infinity()) : eTb(Y.max()); } else {
+		if(P_i < P_min) { out_val = (P_i < eTb(0)) ? eTb(-std::numeric_limits<eTb>::infinity()) : eTb(Y.min()); }
+		else if(P_i > P_max) { out_val = (P_i > eTb(1)) ? eTb(std::numeric_limits<eTb>::infinity()) : eTb(Y.max()); }
+		else {
 			const uword k = uword(std::floor(N * P_i + alpha));
 			const eTb P_k = (eTb(k) - alpha) / N;
 
@@ -92,14 +94,16 @@ void glue_quantile::apply_noalias(Mat<eTb>& out, const Mat<eTa>& X, const Mat<eT
 			arrayops::copy(Y.memptr(), X.memptr(), X_n_rows);
 
 			glue_quantile::worker(out.memptr(), Y, P);
-		} else {
+		}
+		else {
 			for(uword col = 0; col < X_n_cols; ++col) {
 				arrayops::copy(Y.memptr(), X.colptr(col), X_n_rows);
 
 				glue_quantile::worker(out.colptr(col), Y, P);
 			}
 		}
-	} else if(dim == 1) {
+	}
+	else if(dim == 1) {
 		out.set_size(X_n_rows, P_n_elem);
 
 		if(out.is_empty()) { return; }
@@ -110,7 +114,8 @@ void glue_quantile::apply_noalias(Mat<eTb>& out, const Mat<eTa>& X, const Mat<eT
 			arrayops::copy(Y.memptr(), X.memptr(), X_n_cols);
 
 			glue_quantile::worker(out.memptr(), Y, P);
-		} else {
+		}
+		else {
 			Col<eTb> tmp(P_n_elem);
 
 			eTb* tmp_mem = tmp.memptr();
@@ -147,7 +152,8 @@ void glue_quantile::apply(Mat<typename T2::elem_type>& out, const mtGlue<typenam
 		glue_quantile::apply_noalias(tmp, UA.M, UB.M, dim);
 
 		out.steal_mem(tmp);
-	} else { glue_quantile::apply_noalias(out, UA.M, UB.M, dim); }
+	}
+	else { glue_quantile::apply_noalias(out, UA.M, UB.M, dim); }
 }
 
 template<typename T1, typename T2> inline
@@ -167,7 +173,8 @@ void glue_quantile_default::apply(Mat<typename T2::elem_type>& out, const mtGlue
 		glue_quantile::apply_noalias(tmp, UA.M, UB.M, dim);
 
 		out.steal_mem(tmp);
-	} else { glue_quantile::apply_noalias(out, UA.M, UB.M, dim); }
+	}
+	else { glue_quantile::apply_noalias(out, UA.M, UB.M, dim); }
 }
 
 //! @}

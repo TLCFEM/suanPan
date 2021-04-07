@@ -58,7 +58,8 @@ typename T1::elem_type accu_proxy_linear(const Proxy<T1>& P) {
       for(uword i=(n_threads_use*chunk_size); i < n_elem; ++i)  { val += Pea[i]; }
       }
 #endif
-	} else {
+	}
+	else {
 #if defined(__FINITE_MATH_ONLY__) && (__FINITE_MATH_ONLY__ > 0)
       {
       if(P.is_aligned())
@@ -217,7 +218,8 @@ typename T1::elem_type accu_proxy_at(const Proxy<T1>& P) {
 		}
 
 		val = val1 + val2;
-	} else { for(uword col = 0; col < n_cols; ++col) { val += P.at(0, col); } }
+	}
+	else { for(uword col = 0; col < n_cols; ++col) { val += P.at(0, col); } }
 
 	return val;
 }
@@ -287,14 +289,13 @@ uword accu(const mtOp<uword, T1, op_rel_noteq>& X) {
 		const uword n_elem = P.get_n_elem();
 
 		for(uword i = 0; i < n_elem; ++i) { n_nonzero += (A[i] != val) ? uword(1) : uword(0); }
-	} else {
+	}
+	else {
 		const uword P_n_cols = P.get_n_cols();
 		const uword P_n_rows = P.get_n_rows();
 
-		if(P_n_rows == 1) { for(uword col = 0; col < P_n_cols; ++col) { n_nonzero += (P.at(0, col) != val) ? uword(1) : uword(0); } } else {
-			for(uword col = 0; col < P_n_cols; ++col)
-				for(uword row = 0; row < P_n_rows; ++row) { n_nonzero += (P.at(row, col) != val) ? uword(1) : uword(0); }
-		}
+		if(P_n_rows == 1) { for(uword col = 0; col < P_n_cols; ++col) { n_nonzero += (P.at(0, col) != val) ? uword(1) : uword(0); } }
+		else { for(uword col = 0; col < P_n_cols; ++col) for(uword row = 0; row < P_n_rows; ++row) { n_nonzero += (P.at(row, col) != val) ? uword(1) : uword(0); } }
 	}
 
 	return n_nonzero;
@@ -320,14 +321,13 @@ uword accu(const mtOp<uword, T1, op_rel_eq>& X) {
 		const uword n_elem = P.get_n_elem();
 
 		for(uword i = 0; i < n_elem; ++i) { n_nonzero += (A[i] == val) ? uword(1) : uword(0); }
-	} else {
+	}
+	else {
 		const uword P_n_cols = P.get_n_cols();
 		const uword P_n_rows = P.get_n_rows();
 
-		if(P_n_rows == 1) { for(uword col = 0; col < P_n_cols; ++col) { n_nonzero += (P.at(0, col) == val) ? uword(1) : uword(0); } } else {
-			for(uword col = 0; col < P_n_cols; ++col)
-				for(uword row = 0; row < P_n_rows; ++row) { n_nonzero += (P.at(row, col) == val) ? uword(1) : uword(0); }
-		}
+		if(P_n_rows == 1) { for(uword col = 0; col < P_n_cols; ++col) { n_nonzero += (P.at(0, col) == val) ? uword(1) : uword(0); } }
+		else { for(uword col = 0; col < P_n_cols; ++col) for(uword row = 0; row < P_n_rows; ++row) { n_nonzero += (P.at(row, col) == val) ? uword(1) : uword(0); } }
 	}
 
 	return n_nonzero;
@@ -354,14 +354,13 @@ uword accu(const mtGlue<uword, T1, T2, glue_rel_noteq>& X) {
 		const uword n_elem = PA.get_n_elem();
 
 		for(uword i = 0; i < n_elem; ++i) { n_nonzero += (A[i] != B[i]) ? uword(1) : uword(0); }
-	} else {
+	}
+	else {
 		const uword PA_n_cols = PA.get_n_cols();
 		const uword PA_n_rows = PA.get_n_rows();
 
-		if(PA_n_rows == 1) { for(uword col = 0; col < PA_n_cols; ++col) { n_nonzero += (PA.at(0, col) != PB.at(0, col)) ? uword(1) : uword(0); } } else {
-			for(uword col = 0; col < PA_n_cols; ++col)
-				for(uword row = 0; row < PA_n_rows; ++row) { n_nonzero += (PA.at(row, col) != PB.at(row, col)) ? uword(1) : uword(0); }
-		}
+		if(PA_n_rows == 1) { for(uword col = 0; col < PA_n_cols; ++col) { n_nonzero += (PA.at(0, col) != PB.at(0, col)) ? uword(1) : uword(0); } }
+		else { for(uword col = 0; col < PA_n_cols; ++col) for(uword row = 0; row < PA_n_rows; ++row) { n_nonzero += (PA.at(row, col) != PB.at(row, col)) ? uword(1) : uword(0); } }
 	}
 
 	return n_nonzero;
@@ -388,14 +387,13 @@ uword accu(const mtGlue<uword, T1, T2, glue_rel_eq>& X) {
 		const uword n_elem = PA.get_n_elem();
 
 		for(uword i = 0; i < n_elem; ++i) { n_nonzero += (A[i] == B[i]) ? uword(1) : uword(0); }
-	} else {
+	}
+	else {
 		const uword PA_n_cols = PA.get_n_cols();
 		const uword PA_n_rows = PA.get_n_rows();
 
-		if(PA_n_rows == 1) { for(uword col = 0; col < PA_n_cols; ++col) { n_nonzero += (PA.at(0, col) == PB.at(0, col)) ? uword(1) : uword(0); } } else {
-			for(uword col = 0; col < PA_n_cols; ++col)
-				for(uword row = 0; row < PA_n_rows; ++row) { n_nonzero += (PA.at(row, col) == PB.at(row, col)) ? uword(1) : uword(0); }
-		}
+		if(PA_n_rows == 1) { for(uword col = 0; col < PA_n_cols; ++col) { n_nonzero += (PA.at(0, col) == PB.at(0, col)) ? uword(1) : uword(0); } }
+		else { for(uword col = 0; col < PA_n_cols; ++col) for(uword row = 0; row < PA_n_rows; ++row) { n_nonzero += (PA.at(row, col) == PB.at(row, col)) ? uword(1) : uword(0); } }
 	}
 
 	return n_nonzero;
@@ -421,7 +419,9 @@ eT accu(const subview<eT>& X) {
 		const Proxy<sv_type> P(sv);
 
 		val = accu_proxy_linear(P);
-	} else if(X_n_cols == 1) { val = arrayops::accumulate(X.colptr(0), X_n_rows); } else { for(uword col = 0; col < X_n_cols; ++col) { val += arrayops::accumulate(X.colptr(col), X_n_rows); } }
+	}
+	else if(X_n_cols == 1) { val = arrayops::accumulate(X.colptr(0), X_n_rows); }
+	else { for(uword col = 0; col < X_n_cols; ++col) { val += arrayops::accumulate(X.colptr(col), X_n_rows); } }
 
 	return val;
 }
@@ -479,7 +479,8 @@ typename T1::elem_type accu_cube_proxy_linear(const ProxyCube<T1>& P) {
       for(uword i=(n_threads_use*chunk_size); i < n_elem; ++i)  { val += Pea[i]; }
       }
 #endif
-	} else {
+	}
+	else {
 #if defined(__FINITE_MATH_ONLY__) && (__FINITE_MATH_ONLY__ > 0)
       {
       if(P.is_aligned())
@@ -651,7 +652,8 @@ typename T1::elem_type accu(const SpBase<typename T1::elem_type, T1>& expr) {
 	if(SpProxy<T1>::use_iterator == false) {
 		// direct counting
 		return arrayops::accumulate(P.get_values(), P.get_n_nonzero());
-	} else {
+	}
+	else {
 		typename SpProxy<T1>::const_iterator_type it = P.begin();
 
 		const uword P_n_nz = P.get_n_nonzero();
@@ -720,7 +722,8 @@ typename T1::elem_type accu(const SpGlue<T1, T2, spglue_schur>& expr) {
 
 			++x_it;
 			++y_it;
-		} else {
+		}
+		else {
 			const uword x_it_col = x_it.col();
 			const uword x_it_row = x_it.row();
 
@@ -730,7 +733,8 @@ typename T1::elem_type accu(const SpGlue<T1, T2, spglue_schur>& expr) {
 			if((x_it_col < y_it_col) || ((x_it_col == y_it_col) && (x_it_row < y_it_row))) // if y is closer to the end
 			{
 				++x_it;
-			} else // x is closer to the end
+			}
+			else // x is closer to the end
 			{
 				++y_it;
 			}

@@ -24,7 +24,8 @@ obj_type randi(const uword n_rows, const uword n_cols, const distr_param& param 
 
 	typedef typename obj_type::elem_type eT;
 
-	if(is_Col<obj_type>::value) { arma_debug_check((n_cols != 1), "randi(): incompatible size"); } else if(is_Row<obj_type>::value) { arma_debug_check((n_rows != 1), "randi(): incompatible size"); }
+	if(is_Col<obj_type>::value) { arma_debug_check((n_cols != 1), "randi(): incompatible size"); }
+	else if(is_Row<obj_type>::value) { arma_debug_check((n_rows != 1), "randi(): incompatible size"); }
 
 	obj_type out(n_rows, n_cols);
 
@@ -34,10 +35,12 @@ obj_type randi(const uword n_rows, const uword n_cols, const distr_param& param 
 	if(param.state == 0) {
 		a = 0;
 		b = arma_rng::randi<eT>::max_val();
-	} else if(param.state == 1) {
+	}
+	else if(param.state == 1) {
 		a = param.a_int;
 		b = param.b_int;
-	} else {
+	}
+	else {
 		a = int(param.a_double);
 		b = int(param.b_double);
 	}
@@ -65,7 +68,8 @@ obj_type randi(const uword n_elem, const distr_param& param = distr_param(), con
 	arma_ignore(junk1);
 	arma_ignore(junk2);
 
-	if(is_Row<obj_type>::value) { return randi<obj_type>(1, n_elem, param); } else { return randi<obj_type>(n_elem, 1, param); }
+	if(is_Row<obj_type>::value) { return randi<obj_type>(1, n_elem, param); }
+	else { return randi<obj_type>(n_elem, 1, param); }
 }
 
 arma_warn_unused
@@ -129,10 +133,12 @@ cube_type randi(const uword n_rows, const uword n_cols, const uword n_slices, co
 	if(param.state == 0) {
 		a = 0;
 		b = arma_rng::randi<eT>::max_val();
-	} else if(param.state == 1) {
+	}
+	else if(param.state == 1) {
 		a = param.a_int;
 		b = param.b_int;
-	} else {
+	}
+	else {
 		a = int(param.a_double);
 		b = int(param.b_double);
 	}

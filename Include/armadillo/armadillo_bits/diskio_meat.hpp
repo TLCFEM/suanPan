@@ -41,7 +41,22 @@ std::string diskio::gen_txt_header(const Mat<eT>&) {
 
 	char* header = nullptr;
 
-	if(is_u8<eT>::value) { header = const_cast<char*>(ARMA_MAT_TXT_IU001); } else if(is_s8<eT>::value) { header = const_cast<char*>(ARMA_MAT_TXT_IS001); } else if(is_u16<eT>::value) { header = const_cast<char*>(ARMA_MAT_TXT_IU002); } else if(is_s16<eT>::value) { header = const_cast<char*>(ARMA_MAT_TXT_IS002); } else if(is_u32<eT>::value) { header = const_cast<char*>(ARMA_MAT_TXT_IU004); } else if(is_s32<eT>::value) { header = const_cast<char*>(ARMA_MAT_TXT_IS004); } else if(is_u64<eT>::value) { header = const_cast<char*>(ARMA_MAT_TXT_IU008); } else if(is_s64<eT>::value) { header = const_cast<char*>(ARMA_MAT_TXT_IS008); } else if(is_ulng_t_32<eT>::value) { header = const_cast<char*>(ARMA_MAT_TXT_IU004); } else if(is_slng_t_32<eT>::value) { header = const_cast<char*>(ARMA_MAT_TXT_IS004); } else if(is_ulng_t_64<eT>::value) { header = const_cast<char*>(ARMA_MAT_TXT_IU008); } else if(is_slng_t_64<eT>::value) { header = const_cast<char*>(ARMA_MAT_TXT_IS008); } else if(is_float<eT>::value) { header = const_cast<char*>(ARMA_MAT_TXT_FN004); } else if(is_double<eT>::value) { header = const_cast<char*>(ARMA_MAT_TXT_FN008); } else if(is_cx_float<eT>::value) { header = const_cast<char*>(ARMA_MAT_TXT_FC008); } else if(is_cx_double<eT>::value) { header = const_cast<char*>(ARMA_MAT_TXT_FC016); }
+	if(is_u8<eT>::value) { header = const_cast<char*>(ARMA_MAT_TXT_IU001); }
+	else if(is_s8<eT>::value) { header = const_cast<char*>(ARMA_MAT_TXT_IS001); }
+	else if(is_u16<eT>::value) { header = const_cast<char*>(ARMA_MAT_TXT_IU002); }
+	else if(is_s16<eT>::value) { header = const_cast<char*>(ARMA_MAT_TXT_IS002); }
+	else if(is_u32<eT>::value) { header = const_cast<char*>(ARMA_MAT_TXT_IU004); }
+	else if(is_s32<eT>::value) { header = const_cast<char*>(ARMA_MAT_TXT_IS004); }
+	else if(is_u64<eT>::value) { header = const_cast<char*>(ARMA_MAT_TXT_IU008); }
+	else if(is_s64<eT>::value) { header = const_cast<char*>(ARMA_MAT_TXT_IS008); }
+	else if(is_ulng_t_32<eT>::value) { header = const_cast<char*>(ARMA_MAT_TXT_IU004); }
+	else if(is_slng_t_32<eT>::value) { header = const_cast<char*>(ARMA_MAT_TXT_IS004); }
+	else if(is_ulng_t_64<eT>::value) { header = const_cast<char*>(ARMA_MAT_TXT_IU008); }
+	else if(is_slng_t_64<eT>::value) { header = const_cast<char*>(ARMA_MAT_TXT_IS008); }
+	else if(is_float<eT>::value) { header = const_cast<char*>(ARMA_MAT_TXT_FN004); }
+	else if(is_double<eT>::value) { header = const_cast<char*>(ARMA_MAT_TXT_FN008); }
+	else if(is_cx_float<eT>::value) { header = const_cast<char*>(ARMA_MAT_TXT_FC008); }
+	else if(is_cx_double<eT>::value) { header = const_cast<char*>(ARMA_MAT_TXT_FC016); }
 
 	return std::string(header);
 }
@@ -71,7 +86,22 @@ std::string diskio::gen_bin_header(const Mat<eT>&) {
 
 	char* header = nullptr;
 
-	if(is_u8<eT>::value) { header = const_cast<char*>(ARMA_MAT_BIN_IU001); } else if(is_s8<eT>::value) { header = const_cast<char*>(ARMA_MAT_BIN_IS001); } else if(is_u16<eT>::value) { header = const_cast<char*>(ARMA_MAT_BIN_IU002); } else if(is_s16<eT>::value) { header = const_cast<char*>(ARMA_MAT_BIN_IS002); } else if(is_u32<eT>::value) { header = const_cast<char*>(ARMA_MAT_BIN_IU004); } else if(is_s32<eT>::value) { header = const_cast<char*>(ARMA_MAT_BIN_IS004); } else if(is_u64<eT>::value) { header = const_cast<char*>(ARMA_MAT_BIN_IU008); } else if(is_s64<eT>::value) { header = const_cast<char*>(ARMA_MAT_BIN_IS008); } else if(is_ulng_t_32<eT>::value) { header = const_cast<char*>(ARMA_MAT_BIN_IU004); } else if(is_slng_t_32<eT>::value) { header = const_cast<char*>(ARMA_MAT_BIN_IS004); } else if(is_ulng_t_64<eT>::value) { header = const_cast<char*>(ARMA_MAT_BIN_IU008); } else if(is_slng_t_64<eT>::value) { header = const_cast<char*>(ARMA_MAT_BIN_IS008); } else if(is_float<eT>::value) { header = const_cast<char*>(ARMA_MAT_BIN_FN004); } else if(is_double<eT>::value) { header = const_cast<char*>(ARMA_MAT_BIN_FN008); } else if(is_cx_float<eT>::value) { header = const_cast<char*>(ARMA_MAT_BIN_FC008); } else if(is_cx_double<eT>::value) { header = const_cast<char*>(ARMA_MAT_BIN_FC016); }
+	if(is_u8<eT>::value) { header = const_cast<char*>(ARMA_MAT_BIN_IU001); }
+	else if(is_s8<eT>::value) { header = const_cast<char*>(ARMA_MAT_BIN_IS001); }
+	else if(is_u16<eT>::value) { header = const_cast<char*>(ARMA_MAT_BIN_IU002); }
+	else if(is_s16<eT>::value) { header = const_cast<char*>(ARMA_MAT_BIN_IS002); }
+	else if(is_u32<eT>::value) { header = const_cast<char*>(ARMA_MAT_BIN_IU004); }
+	else if(is_s32<eT>::value) { header = const_cast<char*>(ARMA_MAT_BIN_IS004); }
+	else if(is_u64<eT>::value) { header = const_cast<char*>(ARMA_MAT_BIN_IU008); }
+	else if(is_s64<eT>::value) { header = const_cast<char*>(ARMA_MAT_BIN_IS008); }
+	else if(is_ulng_t_32<eT>::value) { header = const_cast<char*>(ARMA_MAT_BIN_IU004); }
+	else if(is_slng_t_32<eT>::value) { header = const_cast<char*>(ARMA_MAT_BIN_IS004); }
+	else if(is_ulng_t_64<eT>::value) { header = const_cast<char*>(ARMA_MAT_BIN_IU008); }
+	else if(is_slng_t_64<eT>::value) { header = const_cast<char*>(ARMA_MAT_BIN_IS008); }
+	else if(is_float<eT>::value) { header = const_cast<char*>(ARMA_MAT_BIN_FN004); }
+	else if(is_double<eT>::value) { header = const_cast<char*>(ARMA_MAT_BIN_FN008); }
+	else if(is_cx_float<eT>::value) { header = const_cast<char*>(ARMA_MAT_BIN_FC008); }
+	else if(is_cx_double<eT>::value) { header = const_cast<char*>(ARMA_MAT_BIN_FC016); }
 
 	return std::string(header);
 }
@@ -101,7 +131,22 @@ std::string diskio::gen_bin_header(const SpMat<eT>&) {
 
 	char* header = nullptr;
 
-	if(is_u8<eT>::value) { header = const_cast<char*>(ARMA_SPM_BIN_IU001); } else if(is_s8<eT>::value) { header = const_cast<char*>(ARMA_SPM_BIN_IS001); } else if(is_u16<eT>::value) { header = const_cast<char*>(ARMA_SPM_BIN_IU002); } else if(is_s16<eT>::value) { header = const_cast<char*>(ARMA_SPM_BIN_IS002); } else if(is_u32<eT>::value) { header = const_cast<char*>(ARMA_SPM_BIN_IU004); } else if(is_s32<eT>::value) { header = const_cast<char*>(ARMA_SPM_BIN_IS004); } else if(is_u64<eT>::value) { header = const_cast<char*>(ARMA_SPM_BIN_IU008); } else if(is_s64<eT>::value) { header = const_cast<char*>(ARMA_SPM_BIN_IS008); } else if(is_ulng_t_32<eT>::value) { header = const_cast<char*>(ARMA_SPM_BIN_IU004); } else if(is_slng_t_32<eT>::value) { header = const_cast<char*>(ARMA_SPM_BIN_IS004); } else if(is_ulng_t_64<eT>::value) { header = const_cast<char*>(ARMA_SPM_BIN_IU008); } else if(is_slng_t_64<eT>::value) { header = const_cast<char*>(ARMA_SPM_BIN_IS008); } else if(is_float<eT>::value) { header = const_cast<char*>(ARMA_SPM_BIN_FN004); } else if(is_double<eT>::value) { header = const_cast<char*>(ARMA_SPM_BIN_FN008); } else if(is_cx_float<eT>::value) { header = const_cast<char*>(ARMA_SPM_BIN_FC008); } else if(is_cx_double<eT>::value) { header = const_cast<char*>(ARMA_SPM_BIN_FC016); }
+	if(is_u8<eT>::value) { header = const_cast<char*>(ARMA_SPM_BIN_IU001); }
+	else if(is_s8<eT>::value) { header = const_cast<char*>(ARMA_SPM_BIN_IS001); }
+	else if(is_u16<eT>::value) { header = const_cast<char*>(ARMA_SPM_BIN_IU002); }
+	else if(is_s16<eT>::value) { header = const_cast<char*>(ARMA_SPM_BIN_IS002); }
+	else if(is_u32<eT>::value) { header = const_cast<char*>(ARMA_SPM_BIN_IU004); }
+	else if(is_s32<eT>::value) { header = const_cast<char*>(ARMA_SPM_BIN_IS004); }
+	else if(is_u64<eT>::value) { header = const_cast<char*>(ARMA_SPM_BIN_IU008); }
+	else if(is_s64<eT>::value) { header = const_cast<char*>(ARMA_SPM_BIN_IS008); }
+	else if(is_ulng_t_32<eT>::value) { header = const_cast<char*>(ARMA_SPM_BIN_IU004); }
+	else if(is_slng_t_32<eT>::value) { header = const_cast<char*>(ARMA_SPM_BIN_IS004); }
+	else if(is_ulng_t_64<eT>::value) { header = const_cast<char*>(ARMA_SPM_BIN_IU008); }
+	else if(is_slng_t_64<eT>::value) { header = const_cast<char*>(ARMA_SPM_BIN_IS008); }
+	else if(is_float<eT>::value) { header = const_cast<char*>(ARMA_SPM_BIN_FN004); }
+	else if(is_double<eT>::value) { header = const_cast<char*>(ARMA_SPM_BIN_FN008); }
+	else if(is_cx_float<eT>::value) { header = const_cast<char*>(ARMA_SPM_BIN_FC008); }
+	else if(is_cx_double<eT>::value) { header = const_cast<char*>(ARMA_SPM_BIN_FC016); }
 
 	return std::string(header);
 }
@@ -131,7 +176,22 @@ std::string diskio::gen_txt_header(const Cube<eT>&) {
 
 	char* header = nullptr;
 
-	if(is_u8<eT>::value) { header = const_cast<char*>(ARMA_CUB_TXT_IU001); } else if(is_s8<eT>::value) { header = const_cast<char*>(ARMA_CUB_TXT_IS001); } else if(is_u16<eT>::value) { header = const_cast<char*>(ARMA_CUB_TXT_IU002); } else if(is_s16<eT>::value) { header = const_cast<char*>(ARMA_CUB_TXT_IS002); } else if(is_u32<eT>::value) { header = const_cast<char*>(ARMA_CUB_TXT_IU004); } else if(is_s32<eT>::value) { header = const_cast<char*>(ARMA_CUB_TXT_IS004); } else if(is_u64<eT>::value) { header = const_cast<char*>(ARMA_CUB_TXT_IU008); } else if(is_s64<eT>::value) { header = const_cast<char*>(ARMA_CUB_TXT_IS008); } else if(is_ulng_t_32<eT>::value) { header = const_cast<char*>(ARMA_CUB_TXT_IU004); } else if(is_slng_t_32<eT>::value) { header = const_cast<char*>(ARMA_CUB_TXT_IS004); } else if(is_ulng_t_64<eT>::value) { header = const_cast<char*>(ARMA_CUB_TXT_IU008); } else if(is_slng_t_64<eT>::value) { header = const_cast<char*>(ARMA_CUB_TXT_IS008); } else if(is_float<eT>::value) { header = const_cast<char*>(ARMA_CUB_TXT_FN004); } else if(is_double<eT>::value) { header = const_cast<char*>(ARMA_CUB_TXT_FN008); } else if(is_cx_float<eT>::value) { header = const_cast<char*>(ARMA_CUB_TXT_FC008); } else if(is_cx_double<eT>::value) { header = const_cast<char*>(ARMA_CUB_TXT_FC016); }
+	if(is_u8<eT>::value) { header = const_cast<char*>(ARMA_CUB_TXT_IU001); }
+	else if(is_s8<eT>::value) { header = const_cast<char*>(ARMA_CUB_TXT_IS001); }
+	else if(is_u16<eT>::value) { header = const_cast<char*>(ARMA_CUB_TXT_IU002); }
+	else if(is_s16<eT>::value) { header = const_cast<char*>(ARMA_CUB_TXT_IS002); }
+	else if(is_u32<eT>::value) { header = const_cast<char*>(ARMA_CUB_TXT_IU004); }
+	else if(is_s32<eT>::value) { header = const_cast<char*>(ARMA_CUB_TXT_IS004); }
+	else if(is_u64<eT>::value) { header = const_cast<char*>(ARMA_CUB_TXT_IU008); }
+	else if(is_s64<eT>::value) { header = const_cast<char*>(ARMA_CUB_TXT_IS008); }
+	else if(is_ulng_t_32<eT>::value) { header = const_cast<char*>(ARMA_CUB_TXT_IU004); }
+	else if(is_slng_t_32<eT>::value) { header = const_cast<char*>(ARMA_CUB_TXT_IS004); }
+	else if(is_ulng_t_64<eT>::value) { header = const_cast<char*>(ARMA_CUB_TXT_IU008); }
+	else if(is_slng_t_64<eT>::value) { header = const_cast<char*>(ARMA_CUB_TXT_IS008); }
+	else if(is_float<eT>::value) { header = const_cast<char*>(ARMA_CUB_TXT_FN004); }
+	else if(is_double<eT>::value) { header = const_cast<char*>(ARMA_CUB_TXT_FN008); }
+	else if(is_cx_float<eT>::value) { header = const_cast<char*>(ARMA_CUB_TXT_FC008); }
+	else if(is_cx_double<eT>::value) { header = const_cast<char*>(ARMA_CUB_TXT_FC016); }
 
 	return std::string(header);
 }
@@ -161,7 +221,22 @@ std::string diskio::gen_bin_header(const Cube<eT>&) {
 
 	char* header = nullptr;
 
-	if(is_u8<eT>::value) { header = const_cast<char*>(ARMA_CUB_BIN_IU001); } else if(is_s8<eT>::value) { header = const_cast<char*>(ARMA_CUB_BIN_IS001); } else if(is_u16<eT>::value) { header = const_cast<char*>(ARMA_CUB_BIN_IU002); } else if(is_s16<eT>::value) { header = const_cast<char*>(ARMA_CUB_BIN_IS002); } else if(is_u32<eT>::value) { header = const_cast<char*>(ARMA_CUB_BIN_IU004); } else if(is_s32<eT>::value) { header = const_cast<char*>(ARMA_CUB_BIN_IS004); } else if(is_u64<eT>::value) { header = const_cast<char*>(ARMA_CUB_BIN_IU008); } else if(is_s64<eT>::value) { header = const_cast<char*>(ARMA_CUB_BIN_IS008); } else if(is_ulng_t_32<eT>::value) { header = const_cast<char*>(ARMA_CUB_BIN_IU004); } else if(is_slng_t_32<eT>::value) { header = const_cast<char*>(ARMA_CUB_BIN_IS004); } else if(is_ulng_t_64<eT>::value) { header = const_cast<char*>(ARMA_CUB_BIN_IU008); } else if(is_slng_t_64<eT>::value) { header = const_cast<char*>(ARMA_CUB_BIN_IS008); } else if(is_float<eT>::value) { header = const_cast<char*>(ARMA_CUB_BIN_FN004); } else if(is_double<eT>::value) { header = const_cast<char*>(ARMA_CUB_BIN_FN008); } else if(is_cx_float<eT>::value) { header = const_cast<char*>(ARMA_CUB_BIN_FC008); } else if(is_cx_double<eT>::value) { header = const_cast<char*>(ARMA_CUB_BIN_FC016); }
+	if(is_u8<eT>::value) { header = const_cast<char*>(ARMA_CUB_BIN_IU001); }
+	else if(is_s8<eT>::value) { header = const_cast<char*>(ARMA_CUB_BIN_IS001); }
+	else if(is_u16<eT>::value) { header = const_cast<char*>(ARMA_CUB_BIN_IU002); }
+	else if(is_s16<eT>::value) { header = const_cast<char*>(ARMA_CUB_BIN_IS002); }
+	else if(is_u32<eT>::value) { header = const_cast<char*>(ARMA_CUB_BIN_IU004); }
+	else if(is_s32<eT>::value) { header = const_cast<char*>(ARMA_CUB_BIN_IS004); }
+	else if(is_u64<eT>::value) { header = const_cast<char*>(ARMA_CUB_BIN_IU008); }
+	else if(is_s64<eT>::value) { header = const_cast<char*>(ARMA_CUB_BIN_IS008); }
+	else if(is_ulng_t_32<eT>::value) { header = const_cast<char*>(ARMA_CUB_BIN_IU004); }
+	else if(is_slng_t_32<eT>::value) { header = const_cast<char*>(ARMA_CUB_BIN_IS004); }
+	else if(is_ulng_t_64<eT>::value) { header = const_cast<char*>(ARMA_CUB_BIN_IU008); }
+	else if(is_slng_t_64<eT>::value) { header = const_cast<char*>(ARMA_CUB_BIN_IS008); }
+	else if(is_float<eT>::value) { header = const_cast<char*>(ARMA_CUB_BIN_FN004); }
+	else if(is_double<eT>::value) { header = const_cast<char*>(ARMA_CUB_BIN_FN008); }
+	else if(is_cx_float<eT>::value) { header = const_cast<char*>(ARMA_CUB_BIN_FC008); }
+	else if(is_cx_double<eT>::value) { header = const_cast<char*>(ARMA_CUB_BIN_FC016); }
 
 	return std::string(header);
 }
@@ -282,7 +357,8 @@ bool diskio::safe_rename(const std::string& old_name, const std::string& new_nam
 	std::fstream f(new_name_c_str, std::fstream::out | std::fstream::app);
 	f.put(' ');
 
-	if(f.good()) { f.close(); } else { return false; }
+	if(f.good()) { f.close(); }
+	else { return false; }
 
 	if(std::remove(new_name_c_str) != 0) { return false; }
 	if(std::rename(old_name.c_str(), new_name_c_str) != 0) { return false; }
@@ -315,7 +391,8 @@ bool diskio::convert_token(eT& val, const std::string& token) {
 			val = neg ? cond_rel<is_signed<eT>::value>::make_neg(Datum<eT>::inf) : Datum<eT>::inf;
 
 			return true;
-		} else if(((sig_a == 'n') || (sig_a == 'N')) && ((sig_b == 'a') || (sig_b == 'A')) && ((sig_c == 'n') || (sig_c == 'N'))) {
+		}
+		else if(((sig_a == 'n') || (sig_a == 'N')) && ((sig_b == 'a') || (sig_b == 'A')) && ((sig_c == 'n') || (sig_c == 'N'))) {
 			val = Datum<eT>::nan;
 
 			return true;
@@ -324,12 +401,14 @@ bool diskio::convert_token(eT& val, const std::string& token) {
 
 	char* endptr = nullptr;
 
-	if(is_real<eT>::value) { val = eT(std::strtod(str, &endptr)); } else {
+	if(is_real<eT>::value) { val = eT(std::strtod(str, &endptr)); }
+	else {
 		if(is_signed<eT>::value) {
 			// signed integer
 
 			val = eT(std::strtoll(str, &endptr, 10));
-		} else {
+		}
+		else {
 			// unsigned integer
 
 			if(str[0] == '-') {
@@ -404,7 +483,8 @@ bool diskio::convert_token(std::complex<T>& val, const std::string& token) {
 		state = diskio::convert_token(val_real, token_real); // use the non-complex version of this function
 
 		val = std::complex<T>(val_real);
-	} else {
+	}
+	else {
 		const std::string token_real(&(str[1]), (comma_loc - 1));
 		const std::string token_imag(&(str[comma_loc + 1]), (Nm1 - 1 - comma_loc));
 
@@ -414,7 +494,7 @@ bool diskio::convert_token(std::complex<T>& val, const std::string& token) {
 		const bool state_real = diskio::convert_token(val_real, token_real);
 		const bool state_imag = diskio::convert_token(val_imag, token_imag);
 
-		state = ((state_real == true) && (state_imag == true));
+		state = (state_real && state_imag);
 
 		val = std::complex<T>(val_real, val_imag);
 	}
@@ -437,7 +517,8 @@ std::streamsize diskio::prepare_stream(std::ostream& f) {
 		// NOTE: for 'float' the optimum settings are f.precision(8) and cell_width = 15
 		// NOTE: however, to avoid introducing errors in case single precision data is loaded as double precision,
 		// NOTE: the same settings must be used for both 'float' and 'double'
-	} else if(is_cx<eT>::value) {
+	}
+	else if(is_cx<eT>::value) {
 		f.unsetf(ios::fixed);
 		f.setf(ios::scientific);
 
@@ -695,6 +776,92 @@ bool diskio::save_csv_ascii(const Mat<std::complex<T>>& x, std::ostream& f) {
 	return save_okay;
 }
 
+template<typename eT> inline
+bool diskio::save_coord_ascii(const Mat<eT>& x, const std::string& final_name) {
+	arma_extra_debug_sigprint();
+
+	const std::string tmp_name = diskio::gen_tmp_name(final_name);
+
+	std::ofstream f(tmp_name.c_str());
+
+	bool save_okay = f.is_open();
+
+	if(save_okay) {
+		save_okay = diskio::save_coord_ascii(x, f);
+
+		f.flush();
+		f.close();
+
+		if(save_okay) { save_okay = diskio::safe_rename(tmp_name, final_name); }
+	}
+
+	return save_okay;
+}
+
+template<typename eT> inline
+bool diskio::save_coord_ascii(const Mat<eT>& x, std::ostream& f) {
+	arma_extra_debug_sigprint();
+
+	const arma_ostream_state stream_state(f);
+
+	diskio::prepare_stream<eT>(f);
+
+	for(uword col = 0; col < x.n_cols; ++col)
+		for(uword row = 0; row < x.n_rows; ++row) {
+			const eT val = x.at(row, col);
+
+			if(val != eT(0)) { f << row << ' ' << col << ' ' << val << '\n'; }
+		}
+
+	// make sure it's possible to figure out the matrix size later
+	if((x.n_rows > 0) && (x.n_cols > 0)) {
+		const uword max_row = (x.n_rows > 0) ? x.n_rows - 1 : 0;
+		const uword max_col = (x.n_cols > 0) ? x.n_cols - 1 : 0;
+
+		if(x.at(max_row, max_col) == eT(0)) { f << max_row << ' ' << max_col << " 0\n"; }
+	}
+
+	const bool save_okay = f.good();
+
+	stream_state.restore(f);
+
+	return save_okay;
+}
+
+template<typename T> inline
+bool diskio::save_coord_ascii(const Mat<std::complex<T>>& x, std::ostream& f) {
+	arma_extra_debug_sigprint();
+
+	typedef typename std::complex<T> eT;
+
+	const arma_ostream_state stream_state(f);
+
+	diskio::prepare_stream<eT>(f);
+
+	const eT eT_zero = eT(0);
+
+	for(uword col = 0; col < x.n_cols; ++col)
+		for(uword row = 0; row < x.n_rows; ++row) {
+			const eT val = x.at(row, col);
+
+			if(val != eT_zero) { f << row << ' ' << col << ' ' << val.real() << ' ' << val.imag() << '\n'; }
+		}
+
+	// make sure it's possible to figure out the matrix size later
+	if((x.n_rows > 0) && (x.n_cols > 0)) {
+		const uword max_row = (x.n_rows > 0) ? x.n_rows - 1 : 0;
+		const uword max_col = (x.n_cols > 0) ? x.n_cols - 1 : 0;
+
+		if(x.at(max_row, max_col) == eT_zero) { f << max_row << ' ' << max_col << " 0 0\n"; }
+	}
+
+	const bool save_okay = f.good();
+
+	stream_state.restore(f);
+
+	return save_okay;
+}
+
 //! Save a matrix in binary format,
 //! with a header that stores the matrix type as well as its dimensions
 template<typename eT> inline
@@ -878,8 +1045,9 @@ bool diskio::save_hdf5_binary(const Mat<eT>& x, const hdf5_name& spec, std::stri
 		if(dataset < 0) {
 			save_okay = false;
 
-			err_msg = "couldn't create dataset in ";
-		} else {
+			err_msg = "couldn't create dataset";
+		}
+		else {
 			save_okay = (arma_H5Dwrite(dataset, datatype, H5S_ALL, H5S_ALL, H5P_DEFAULT, x.mem) >= 0);
 
 			arma_H5Dclose(dataset);
@@ -968,10 +1136,11 @@ bool diskio::load_raw_ascii(Mat<eT>& x, std::istream& f, std::string& err_msg) {
 		if(f_n_cols_found == false) {
 			f_n_cols = line_n_cols;
 			f_n_cols_found = true;
-		} else {
+		}
+		else {
 			if(line_n_cols != f_n_cols) {
 				load_okay = false;
-				err_msg = "inconsistent number of columns in ";
+				err_msg = "inconsistent number of columns";
 			}
 		}
 
@@ -990,7 +1159,7 @@ bool diskio::load_raw_ascii(Mat<eT>& x, std::istream& f, std::string& err_msg) {
 
 				if(diskio::convert_token(x.at(row, col), token) == false) {
 					load_okay = false;
-					err_msg = "couldn't interpret data in ";
+					err_msg = "couldn't interpret data";
 				}
 			}
 	}
@@ -1097,9 +1266,10 @@ bool diskio::load_arma_ascii(Mat<eT>& x, std::istream& f, std::string& err_msg) 
 			}
 
 		load_okay = f.good();
-	} else {
+	}
+	else {
 		load_okay = false;
-		err_msg = "incorrect header in ";
+		err_msg = "incorrect header";
 	}
 
 	// allow automatic conversion of u32/s32 matrices into u64/s64 matrices
@@ -1115,7 +1285,8 @@ bool diskio::load_arma_ascii(Mat<eT>& x, std::istream& f, std::string& err_msg) 
 			load_okay = diskio::load_arma_ascii(tmp, f, junk);
 
 			if(load_okay) { x = conv_to<Mat<eT>>::from(tmp); }
-		} else if((sizeof(eT) == 8) && is_same_type<sword, eT>::yes) {
+		}
+		else if((sizeof(eT) == 8) && is_same_type<sword, eT>::yes) {
 			Mat<s32> tmp;
 			std::string junk;
 
@@ -1168,7 +1339,8 @@ bool diskio::load_csv_ascii(Mat<eT>& x, const std::string& name, std::string& er
 				header_tokens.push_back(token);
 			}
 
-			if(header_n_tokens == uword(0)) { header.reset(); } else {
+			if(header_n_tokens == uword(0)) { header.reset(); }
+			else {
 				header.set_size(1, header_n_tokens);
 
 				for(uword i = 0; i < header_n_tokens; ++i) { header.at(i) = header_tokens[i]; }
@@ -1350,7 +1522,8 @@ bool diskio::load_csv_ascii(Mat<std::complex<T>>& x, std::istream& f, std::strin
 					val_real = (neg) ? -(Datum<T>::inf) : Datum<T>::inf;
 
 					found_val_real = true;
-				} else if(((sig_a == 'n') || (sig_a == 'N')) && ((sig_b == 'a') || (sig_b == 'A')) && ((sig_c == 'n') || (sig_c == 'N'))) {
+				}
+				else if(((sig_a == 'n') || (sig_a == 'N')) && ((sig_b == 'a') || (sig_b == 'A')) && ((sig_c == 'n') || (sig_c == 'N'))) {
 					val_real = Datum<T>::nan;
 
 					found_val_real = true;
@@ -1372,7 +1545,8 @@ bool diskio::load_csv_ascii(Mat<std::complex<T>>& x, std::istream& f, std::strin
 			if(loc_i == std::string::npos) {
 				str_real = token;
 				str_imag.clear();
-			} else {
+			}
+			else {
 				bool found_plus = false;
 				bool found_minus = false;
 
@@ -1383,13 +1557,15 @@ bool diskio::load_csv_ascii(Mat<std::complex<T>>& x, std::istream& f, std::strin
 						const char prev_char = token.at(loc_plus - 1);
 
 						// make sure we're not looking at the sign of the exponent
-						if((prev_char != 'e') && (prev_char != 'E')) { found_plus = true; } else {
+						if((prev_char != 'e') && (prev_char != 'E')) { found_plus = true; }
+						else {
 							// search again, omitting the exponent
 							loc_plus = token.find_last_of('+', loc_plus - 1);
 
 							if(loc_plus != std::string::npos) { found_plus = true; }
 						}
-					} else {
+					}
+					else {
 						// loc_plus == 0, meaning we're at the start of the string
 						found_plus = true;
 					}
@@ -1402,13 +1578,15 @@ bool diskio::load_csv_ascii(Mat<std::complex<T>>& x, std::istream& f, std::strin
 						const char prev_char = token.at(loc_minus - 1);
 
 						// make sure we're not looking at the sign of the exponent
-						if((prev_char != 'e') && (prev_char != 'E')) { found_minus = true; } else {
+						if((prev_char != 'e') && (prev_char != 'E')) { found_minus = true; }
+						else {
 							// search again, omitting the exponent
 							loc_minus = token.find_last_of('-', loc_minus - 1);
 
 							if(loc_minus != std::string::npos) { found_minus = true; }
 						}
-					} else {
+					}
+					else {
 						// loc_minus == 0, meaning we're at the start of the string
 						found_minus = true;
 					}
@@ -1420,18 +1598,23 @@ bool diskio::load_csv_ascii(Mat<std::complex<T>>& x, std::istream& f, std::strin
 						loc_x = ((loc_i - loc_plus) < (loc_i - loc_minus)) ? loc_plus : loc_minus;
 						found_x = true;
 					}
-				} else if(found_plus) {
+				}
+				else if(found_plus) {
 					loc_x = loc_plus;
 					found_x = true;
-				} else if(found_minus) {
+				}
+				else if(found_minus) {
 					loc_x = loc_minus;
 					found_x = true;
 				}
 
 				if(found_x) {
-					if(loc_x > 0) { str_real = token.substr(0, loc_x); } else { str_real.clear(); }
-					if((loc_x + 1) < token.size()) { str_imag = token.substr(loc_x, token.size() - loc_x - 1); } else { str_imag.clear(); }
-				} else {
+					if(loc_x > 0) { str_real = token.substr(0, loc_x); }
+					else { str_real.clear(); }
+					if((loc_x + 1) < token.size()) { str_imag = token.substr(loc_x, token.size() - loc_x - 1); }
+					else { str_imag.clear(); }
+				}
+				else {
 					str_real.clear();
 					str_imag.clear();
 				}
@@ -1449,6 +1632,223 @@ bool diskio::load_csv_ascii(Mat<std::complex<T>>& x, std::istream& f, std::strin
 		}
 
 		++row;
+	}
+
+	return load_okay;
+}
+
+template<typename eT> inline
+bool diskio::load_coord_ascii(Mat<eT>& x, const std::string& name, std::string& err_msg) {
+	arma_extra_debug_sigprint();
+
+	std::fstream f;
+	f.open(name.c_str(), std::fstream::in);
+
+	bool load_okay = f.is_open();
+
+	if(load_okay == false) { return false; }
+
+	if(load_okay) { load_okay = diskio::load_coord_ascii(x, f, err_msg); }
+
+	f.close();
+
+	return load_okay;
+}
+
+//! Load a matrix in CSV text format (human readable)
+template<typename eT> inline
+bool diskio::load_coord_ascii(Mat<eT>& x, std::istream& f, std::string& err_msg) {
+	arma_extra_debug_sigprint();
+
+	bool load_okay = f.good();
+
+	f.clear();
+	const std::fstream::pos_type pos1 = f.tellg();
+
+	// work out the size
+
+	uword f_n_rows = 0;
+	uword f_n_cols = 0;
+
+	bool size_found = false;
+
+	std::string line_string;
+	std::stringstream line_stream;
+
+	std::string token;
+
+	while(f.good() && load_okay) {
+		std::getline(f, line_string);
+
+		if(line_string.size() == 0) { break; }
+
+		line_stream.clear();
+		line_stream.str(line_string);
+
+		uword line_row = 0;
+		uword line_col = 0;
+
+		// a valid line in co-ord format has at least 2 entries
+
+		line_stream >> line_row;
+
+		if(line_stream.good() == false) {
+			load_okay = false;
+			break;
+		}
+
+		line_stream >> line_col;
+
+		size_found = true;
+
+		if(f_n_rows < line_row) { f_n_rows = line_row; }
+		if(f_n_cols < line_col) { f_n_cols = line_col; }
+	}
+
+	// take into account that indices start at 0
+	if(size_found) {
+		++f_n_rows;
+		++f_n_cols;
+	}
+
+	if(load_okay) {
+		f.clear();
+		f.seekg(pos1);
+
+		Mat<eT> tmp;
+
+		try { tmp.zeros(f_n_rows, f_n_cols); }
+		catch(...) {
+			err_msg = "not enough memory";
+			return false;
+		}
+
+		while(f.good()) {
+			std::getline(f, line_string);
+
+			if(line_string.size() == 0) { break; }
+
+			line_stream.clear();
+			line_stream.str(line_string);
+
+			uword line_row = 0;
+			uword line_col = 0;
+
+			line_stream >> line_row;
+			line_stream >> line_col;
+
+			eT val = eT(0);
+
+			line_stream >> token;
+
+			if(line_stream.fail() == false) { diskio::convert_token(val, token); }
+
+			if(val != eT(0)) { tmp(line_row, line_col) = val; }
+		}
+
+		x.steal_mem(tmp);
+	}
+
+	return load_okay;
+}
+
+template<typename T> inline
+bool diskio::load_coord_ascii(Mat<std::complex<T>>& x, std::istream& f, std::string& err_msg) {
+	arma_extra_debug_sigprint();
+
+	bool load_okay = f.good();
+
+	f.clear();
+	const std::fstream::pos_type pos1 = f.tellg();
+
+	// work out the size
+
+	uword f_n_rows = 0;
+	uword f_n_cols = 0;
+
+	bool size_found = false;
+
+	std::string line_string;
+	std::stringstream line_stream;
+
+	std::string token_real;
+	std::string token_imag;
+
+	while(f.good() && load_okay) {
+		std::getline(f, line_string);
+
+		if(line_string.size() == 0) { break; }
+
+		line_stream.clear();
+		line_stream.str(line_string);
+
+		uword line_row = 0;
+		uword line_col = 0;
+
+		// a valid line in co-ord format has at least 2 entries
+
+		line_stream >> line_row;
+
+		if(line_stream.good() == false) {
+			load_okay = false;
+			break;
+		}
+
+		line_stream >> line_col;
+
+		size_found = true;
+
+		if(f_n_rows < line_row) f_n_rows = line_row;
+		if(f_n_cols < line_col) f_n_cols = line_col;
+	}
+
+	// take into account that indices start at 0
+	if(size_found) {
+		++f_n_rows;
+		++f_n_cols;
+	}
+
+	if(load_okay) {
+		f.clear();
+		f.seekg(pos1);
+
+		Mat<std::complex<T>> tmp;
+
+		try { tmp.zeros(f_n_rows, f_n_cols); }
+		catch(...) {
+			err_msg = "not enough memory";
+			return false;
+		}
+
+		while(f.good()) {
+			std::getline(f, line_string);
+
+			if(line_string.size() == 0) { break; }
+
+			line_stream.clear();
+			line_stream.str(line_string);
+
+			uword line_row = 0;
+			uword line_col = 0;
+
+			line_stream >> line_row;
+			line_stream >> line_col;
+
+			T val_real = T(0);
+			T val_imag = T(0);
+
+			line_stream >> token_real;
+
+			if(line_stream.fail() == false) { diskio::convert_token(val_real, token_real); }
+
+			line_stream >> token_imag;
+
+			if(line_stream.fail() == false) { diskio::convert_token(val_imag, token_imag); }
+
+			if((val_real != T(0)) || (val_imag != T(0))) { tmp(line_row, line_col) = std::complex<T>(val_real, val_imag); }
+		}
+
+		x.steal_mem(tmp);
 	}
 
 	return load_okay;
@@ -1497,9 +1897,10 @@ bool diskio::load_arma_binary(Mat<eT>& x, std::istream& f, std::string& err_msg)
 		f.read(reinterpret_cast<char*>(x.memptr()), std::streamsize(x.n_elem * sizeof(eT)));
 
 		load_okay = f.good();
-	} else {
+	}
+	else {
 		load_okay = false;
-		err_msg = "incorrect header in ";
+		err_msg = "incorrect header";
 	}
 
 	// allow automatic conversion of u32/s32 matrices into u64/s64 matrices
@@ -1515,7 +1916,8 @@ bool diskio::load_arma_binary(Mat<eT>& x, std::istream& f, std::string& err_msg)
 			load_okay = diskio::load_arma_binary(tmp, f, junk);
 
 			if(load_okay) { x = conv_to<Mat<eT>>::from(tmp); }
-		} else if((sizeof(eT) == 8) && is_same_type<sword, eT>::yes) {
+		}
+		else if((sizeof(eT) == 8) && is_same_type<sword, eT>::yes) {
 			Mat<s32> tmp;
 			std::string junk;
 
@@ -1602,7 +2004,8 @@ bool diskio::load_pgm_binary(Mat<eT>& x, std::istream& f, std::string& err_msg) 
 						x.at(row, col) = eT(tmp[i]);
 						++i;
 					}
-			} else {
+			}
+			else {
 				const uword n_elem = f_n_cols * f_n_rows;
 				podarray<u16> tmp(n_elem);
 
@@ -1616,15 +2019,17 @@ bool diskio::load_pgm_binary(Mat<eT>& x, std::istream& f, std::string& err_msg) 
 						++i;
 					}
 			}
-		} else {
+		}
+		else {
 			load_okay = false;
-			err_msg = "functionality unimplemented to handle loading ";
+			err_msg = "functionality unimplemented";
 		}
 
 		if(f.good() == false) { load_okay = false; }
-	} else {
+	}
+	else {
 		load_okay = false;
-		err_msg = "unsupported header in ";
+		err_msg = "unsupported header";
 	}
 
 	return load_okay;
@@ -1679,7 +2084,8 @@ bool diskio::load_hdf5_binary(Mat<eT>& x, const hdf5_name& spec, std::string& er
 
 			const bool exact = (spec.dsname.empty() == false);
 
-			if(exact) { searchNames.push_back(spec.dsname); } else {
+			if(exact) { searchNames.push_back(spec.dsname); }
+			else {
 				searchNames.push_back("dataset");
 				searchNames.push_back("value");
 			}
@@ -1697,7 +2103,7 @@ bool diskio::load_hdf5_binary(Mat<eT>& x, const hdf5_name& spec, std::string& er
 
 				// arma_check(query_status < 0, "Mat::load(): cannot get size of HDF5 dataset");
 				if(query_status < 0) {
-					err_msg = "cannot get size of HDF5 dataset in ";
+					err_msg = "cannot get size of HDF5 dataset";
 
 					arma_H5Sclose(filespace);
 					arma_H5Dclose(dataset);
@@ -1720,7 +2126,8 @@ bool diskio::load_hdf5_binary(Mat<eT>& x, const hdf5_name& spec, std::string& er
 					hid_t read_status = arma_H5Dread(dataset, datatype, H5S_ALL, H5S_ALL, H5P_DEFAULT, void_ptr(x.memptr()));
 
 					if(read_status >= 0) { load_okay = true; }
-				} else {
+				}
+				else {
 					// Load into another array and convert its type accordingly.
 					hid_t read_status = hdf5_misc::load_and_convert_hdf5(x.memptr(), dataset, datatype, x.n_elem);
 
@@ -1737,8 +2144,9 @@ bool diskio::load_hdf5_binary(Mat<eT>& x, const hdf5_name& spec, std::string& er
 
 			arma_H5Fclose(fid);
 
-			if(load_okay == false) { err_msg = "unsupported or missing HDF5 data in "; }
-		} else { err_msg = "cannot open file "; }
+			if(load_okay == false) { err_msg = "unsupported or missing HDF5 data"; }
+		}
+		else { err_msg = "cannot open"; }
 
 		return load_okay;
 	}
@@ -1803,7 +2211,10 @@ bool diskio::load_auto_detect(Mat<eT>& x, std::istream& f, std::string& err_msg)
 
 	header_mem[ARMA_MAT_TXT_len] = '\0';
 
-	if(std::strncmp(ARMA_MAT_TXT_str, header_mem, size_t(ARMA_MAT_TXT_len)) == 0) { return load_arma_ascii(x, f, err_msg); } else if(std::strncmp(ARMA_MAT_BIN_str, header_mem, size_t(ARMA_MAT_BIN_len)) == 0) { return load_arma_binary(x, f, err_msg); } else if(std::strncmp(P5_str, header_mem, size_t(P5_len)) == 0) { return load_pgm_binary(x, f, err_msg); } else {
+	if(std::strncmp(ARMA_MAT_TXT_str, header_mem, size_t(ARMA_MAT_TXT_len)) == 0) { return load_arma_ascii(x, f, err_msg); }
+	else if(std::strncmp(ARMA_MAT_BIN_str, header_mem, size_t(ARMA_MAT_BIN_len)) == 0) { return load_arma_binary(x, f, err_msg); }
+	else if(std::strncmp(P5_str, header_mem, size_t(P5_len)) == 0) { return load_pgm_binary(x, f, err_msg); }
+	else {
 		const file_type ft = guess_file_type_internal(f);
 
 		switch(ft) {
@@ -1820,7 +2231,7 @@ bool diskio::load_auto_detect(Mat<eT>& x, std::istream& f, std::string& err_msg)
 			break;
 
 		default:
-			err_msg = "unknown data in ";
+			err_msg = "unknown data";
 			return false;
 		}
 	}
@@ -1910,7 +2321,7 @@ bool diskio::save_csv_ascii(const SpMat<std::complex<T>>& x, std::ostream& f) {
 	arma_ignore(x);
 	arma_ignore(f);
 
-	arma_warn("saving complex sparse matrices as csv_ascii not yet implemented");
+	arma_debug_warn_level(1, "saving complex sparse matrices as csv_ascii not yet implemented");
 
 	return false;
 }
@@ -2082,7 +2493,8 @@ bool diskio::load_csv_ascii(SpMat<eT>& x, const std::string& name, std::string& 
 				header_tokens.push_back(token);
 			}
 
-			if(header_n_tokens == uword(0)) { header.reset(); } else {
+			if(header_n_tokens == uword(0)) { header.reset(); }
+			else {
 				header.set_size(1, header_n_tokens);
 
 				for(uword i = 0; i < header_n_tokens; ++i) { header.at(i) = header_tokens[i]; }
@@ -2183,7 +2595,7 @@ bool diskio::load_csv_ascii(SpMat<std::complex<T>>& x, std::istream& f, std::str
 	arma_ignore(f);
 	arma_ignore(err_msg);
 
-	arma_warn("loading complex sparse matrices as csv_ascii not yet implemented");
+	arma_debug_warn_level(1, "loading complex sparse matrices as csv_ascii not yet implemented");
 
 	return false;
 }
@@ -2493,17 +2905,20 @@ bool diskio::load_arma_binary(SpMat<eT>& x, std::istream& f, std::string& err_ms
 
 					arrayops::convert(access::rwp(x.row_indices), tmp_a.memptr(), x.n_nonzero);
 					arrayops::convert(access::rwp(x.col_ptrs), tmp_b.memptr(), x.n_cols + 1);
-				} else { arma_extra_debug_print("reading integer parts as u32 failed"); }
+				}
+				else { arma_extra_debug_print("reading integer parts as u32 failed"); }
 			}
 		}
 
 		if((check1 == false) || (check2 == false) || (check3 == false)) {
 			load_okay = false;
-			err_msg = "inconsistent data in ";
-		} else { load_okay = f.good(); }
-	} else {
+			err_msg = "inconsistent data";
+		}
+		else { load_okay = f.good(); }
+	}
+	else {
 		load_okay = false;
-		err_msg = "incorrect header in ";
+		err_msg = "incorrect header";
 	}
 
 	return load_okay;
@@ -2765,8 +3180,9 @@ bool diskio::save_hdf5_binary(const Cube<eT>& x, const hdf5_name& spec, std::str
 		if(dataset < 0) {
 			save_okay = false;
 
-			err_msg = "couldn't create dataset in ";
-		} else {
+			err_msg = "couldn't create dataset";
+		}
+		else {
 			save_okay = (arma_H5Dwrite(dataset, datatype, H5S_ALL, H5S_ALL, H5P_DEFAULT, x.mem) >= 0);
 
 			arma_H5Dclose(dataset);
@@ -2808,7 +3224,8 @@ bool diskio::load_raw_ascii(Cube<eT>& x, const std::string& name, std::string& e
 			x.set_size(tmp.n_rows, tmp.n_cols, 1);
 
 			x.slice(0) = tmp;
-		} else { x.reset(); }
+		}
+		else { x.reset(); }
 	}
 
 	return load_okay;
@@ -2828,7 +3245,8 @@ bool diskio::load_raw_ascii(Cube<eT>& x, std::istream& f, std::string& err_msg) 
 			x.set_size(tmp.n_rows, tmp.n_cols, 1);
 
 			x.slice(0) = tmp;
-		} else { x.reset(); }
+		}
+		else { x.reset(); }
 	}
 
 	return load_okay;
@@ -2923,13 +3341,13 @@ bool diskio::load_arma_ascii(Cube<eT>& x, std::istream& f, std::string& err_msg)
 		x.set_size(f_n_rows, f_n_cols, f_n_slices);
 
 		for(uword slice = 0; slice < x.n_slices; ++slice)
-			for(uword row = 0; row < x.n_rows; ++row)
-				for(uword col = 0; col < x.n_cols; ++col) { f >> x.at(row, col, slice); }
+			for(uword row = 0; row < x.n_rows; ++row) for(uword col = 0; col < x.n_cols; ++col) { f >> x.at(row, col, slice); }
 
 		load_okay = f.good();
-	} else {
+	}
+	else {
 		load_okay = false;
-		err_msg = "incorrect header in ";
+		err_msg = "incorrect header";
 	}
 
 	// allow automatic conversion of u32/s32 cubes into u64/s64 cubes
@@ -2945,7 +3363,8 @@ bool diskio::load_arma_ascii(Cube<eT>& x, std::istream& f, std::string& err_msg)
 			load_okay = diskio::load_arma_ascii(tmp, f, junk);
 
 			if(load_okay) { x = conv_to<Cube<eT>>::from(tmp); }
-		} else if((sizeof(eT) == 8) && is_same_type<sword, eT>::yes) {
+		}
+		else if((sizeof(eT) == 8) && is_same_type<sword, eT>::yes) {
 			Cube<s32> tmp;
 			std::string junk;
 
@@ -3006,9 +3425,10 @@ bool diskio::load_arma_binary(Cube<eT>& x, std::istream& f, std::string& err_msg
 		f.read(reinterpret_cast<char*>(x.memptr()), std::streamsize(x.n_elem * sizeof(eT)));
 
 		load_okay = f.good();
-	} else {
+	}
+	else {
 		load_okay = false;
-		err_msg = "incorrect header in ";
+		err_msg = "incorrect header";
 	}
 
 	// allow automatic conversion of u32/s32 cubes into u64/s64 cubes
@@ -3024,7 +3444,8 @@ bool diskio::load_arma_binary(Cube<eT>& x, std::istream& f, std::string& err_msg
 			load_okay = diskio::load_arma_binary(tmp, f, junk);
 
 			if(load_okay) { x = conv_to<Cube<eT>>::from(tmp); }
-		} else if((sizeof(eT) == 8) && is_same_type<sword, eT>::yes) {
+		}
+		else if((sizeof(eT) == 8) && is_same_type<sword, eT>::yes) {
 			Cube<s32> tmp;
 			std::string junk;
 
@@ -3063,7 +3484,8 @@ bool diskio::load_hdf5_binary(Cube<eT>& x, const hdf5_name& spec, std::string& e
 
 			const bool exact = (spec.dsname.empty() == false);
 
-			if(exact) { searchNames.push_back(spec.dsname); } else {
+			if(exact) { searchNames.push_back(spec.dsname); }
+			else {
 				searchNames.push_back("dataset");
 				searchNames.push_back("value");
 			}
@@ -3081,7 +3503,7 @@ bool diskio::load_hdf5_binary(Cube<eT>& x, const hdf5_name& spec, std::string& e
 
 				// arma_check(query_status < 0, "Cube::load(): cannot get size of HDF5 dataset");
 				if(query_status < 0) {
-					err_msg = "cannot get size of HDF5 dataset in ";
+					err_msg = "cannot get size of HDF5 dataset";
 
 					arma_H5Sclose(filespace);
 					arma_H5Dclose(dataset);
@@ -3108,7 +3530,8 @@ bool diskio::load_hdf5_binary(Cube<eT>& x, const hdf5_name& spec, std::string& e
 					hid_t read_status = arma_H5Dread(dataset, datatype, H5S_ALL, H5S_ALL, H5P_DEFAULT, void_ptr(x.memptr()));
 
 					if(read_status >= 0) { load_okay = true; }
-				} else {
+				}
+				else {
 					// Load into another array and convert its type accordingly.
 					hid_t read_status = hdf5_misc::load_and_convert_hdf5(x.memptr(), dataset, datatype, x.n_elem);
 
@@ -3125,8 +3548,9 @@ bool diskio::load_hdf5_binary(Cube<eT>& x, const hdf5_name& spec, std::string& e
 
 			arma_H5Fclose(fid);
 
-			if(load_okay == false) { err_msg = "unsupported or missing HDF5 data in "; }
-		} else { err_msg = "cannot open file "; }
+			if(load_okay == false) { err_msg = "unsupported or missing HDF5 data"; }
+		}
+		else { err_msg = "cannot open"; }
 
 		return load_okay;
 	}
@@ -3191,7 +3615,10 @@ bool diskio::load_auto_detect(Cube<eT>& x, std::istream& f, std::string& err_msg
 
 	header_mem[ARMA_CUB_TXT_len] = '\0';
 
-	if(std::strncmp(ARMA_CUB_TXT_str, header_mem, size_t(ARMA_CUB_TXT_len)) == 0) { return load_arma_ascii(x, f, err_msg); } else if(std::strncmp(ARMA_CUB_BIN_str, header_mem, size_t(ARMA_CUB_BIN_len)) == 0) { return load_arma_binary(x, f, err_msg); } else if(std::strncmp(P6_str, header_mem, size_t(P6_len)) == 0) { return load_ppm_binary(x, f, err_msg); } else {
+	if(std::strncmp(ARMA_CUB_TXT_str, header_mem, size_t(ARMA_CUB_TXT_len)) == 0) { return load_arma_ascii(x, f, err_msg); }
+	else if(std::strncmp(ARMA_CUB_BIN_str, header_mem, size_t(ARMA_CUB_BIN_len)) == 0) { return load_arma_binary(x, f, err_msg); }
+	else if(std::strncmp(P6_str, header_mem, size_t(P6_len)) == 0) { return load_ppm_binary(x, f, err_msg); }
+	else {
 		const file_type ft = guess_file_type_internal(f);
 
 		switch(ft) {
@@ -3208,7 +3635,7 @@ bool diskio::load_auto_detect(Cube<eT>& x, std::istream& f, std::string& err_msg
 			break;
 
 		default:
-			err_msg = "unknown data in ";
+			err_msg = "unknown data";
 			return false;
 		}
 	}
@@ -3250,7 +3677,8 @@ bool diskio::save_arma_binary(const field<T1>& x, std::ostream& f) {
 		f << "ARMA_FLD_BIN" << '\n';
 		f << x.n_rows << '\n';
 		f << x.n_cols << '\n';
-	} else {
+	}
+	else {
 		f << "ARMA_FL3_BIN" << '\n';
 		f << x.n_rows << '\n';
 		f << x.n_cols << '\n';
@@ -3311,7 +3739,8 @@ bool diskio::load_arma_binary(field<T1>& x, std::istream& f, std::string& err_ms
 
 			if(load_okay == false) { break; }
 		}
-	} else if(f_type == "ARMA_FL3_BIN") {
+	}
+	else if(f_type == "ARMA_FL3_BIN") {
 		uword f_n_rows;
 		uword f_n_cols;
 		uword f_n_slices;
@@ -3329,9 +3758,10 @@ bool diskio::load_arma_binary(field<T1>& x, std::istream& f, std::string& err_ms
 
 			if(load_okay == false) { break; }
 		}
-	} else {
+	}
+	else {
 		load_okay = false;
-		err_msg = "unsupported field type in ";
+		err_msg = "unsupported field type";
 	}
 
 	return load_okay;
@@ -3367,7 +3797,8 @@ bool diskio::save_std_string(const field<std::string>& x, std::ostream& f) {
 		for(uword col = 0; col < x.n_cols; ++col) {
 			f << x.at(row, col);
 
-			if(col < x.n_cols - 1) { f << ' '; } else { f << '\n'; }
+			if(col < x.n_cols - 1) { f << ' '; }
+			else { f << '\n'; }
 		}
 
 	return f.good();
@@ -3420,10 +3851,11 @@ bool diskio::load_std_string(field<std::string>& x, std::istream& f, std::string
 		if(f_n_cols_found == false) {
 			f_n_cols = line_n_cols;
 			f_n_cols_found = true;
-		} else {
+		}
+		else {
 			if(line_n_cols != f_n_cols) {
 				load_okay = false;
-				err_msg = "inconsistent number of columns in ";
+				err_msg = "inconsistent number of columns";
 			}
 		}
 
@@ -3437,8 +3869,7 @@ bool diskio::load_std_string(field<std::string>& x, std::istream& f, std::string
 
 		x.set_size(f_n_rows, f_n_cols);
 
-		for(uword row = 0; row < x.n_rows; ++row)
-			for(uword col = 0; col < x.n_cols; ++col) { f >> x.at(row, col); }
+		for(uword row = 0; row < x.n_rows; ++row) for(uword col = 0; col < x.n_cols; ++col) { f >> x.at(row, col); }
 	}
 
 	if(f.good() == false) { load_okay = false; }
@@ -3488,8 +3919,11 @@ bool diskio::load_auto_detect(field<T1>& x, std::istream& f, std::string& err_ms
 
 	const std::string header = raw_header.mem;
 
-	if(ARMA_FLD_BIN == header.substr(0, ARMA_FLD_BIN.length())) { return load_arma_binary(x, f, err_msg); } else if(ARMA_FL3_BIN == header.substr(0, ARMA_FL3_BIN.length())) { return load_arma_binary(x, f, err_msg); } else if(P6 == header.substr(0, P6.length())) { return load_ppm_binary(x, f, err_msg); } else {
-		err_msg = "unsupported header in ";
+	if(ARMA_FLD_BIN == header.substr(0, ARMA_FLD_BIN.length())) { return load_arma_binary(x, f, err_msg); }
+	else if(ARMA_FL3_BIN == header.substr(0, ARMA_FL3_BIN.length())) { return load_arma_binary(x, f, err_msg); }
+	else if(P6 == header.substr(0, P6.length())) { return load_ppm_binary(x, f, err_msg); }
+	else {
+		err_msg = "unsupported header";
 		return false;
 	}
 }
@@ -3540,7 +3974,7 @@ bool diskio::load_ppm_binary(Cube<eT>& x, std::istream& f, std::string& err_msg)
 		f >> f_maxval;
 		f.get();
 
-		if((f_maxval > 0) || (f_maxval <= 65535)) {
+		if((f_maxval > 0) && (f_maxval <= 65535)) {
 			x.set_size(f_n_rows, f_n_cols, 3);
 
 			if(f_maxval <= 255) {
@@ -3561,7 +3995,8 @@ bool diskio::load_ppm_binary(Cube<eT>& x, std::istream& f, std::string& err_msg)
 						x.at(row, col, 2) = eT(tmp[i + 2]);
 						i += 3;
 					}
-			} else {
+			}
+			else {
 				const uword n_elem = 3 * f_n_cols * f_n_rows;
 				podarray<u16> tmp(n_elem);
 
@@ -3577,15 +4012,17 @@ bool diskio::load_ppm_binary(Cube<eT>& x, std::istream& f, std::string& err_msg)
 						i += 3;
 					}
 			}
-		} else {
+		}
+		else {
 			load_okay = false;
-			err_msg = "currently no code available to handle loading ";
+			err_msg = "functionality unimplemented";
 		}
 
 		if(f.good() == false) { load_okay = false; }
-	} else {
+	}
+	else {
 		load_okay = false;
-		err_msg = "unsupported header in ";
+		err_msg = "unsupported header";
 	}
 
 	return load_okay;
@@ -3692,7 +4129,7 @@ bool diskio::load_ppm_binary(field<T1>& x, std::istream& f, std::string& err_msg
 		f >> f_maxval;
 		f.get();
 
-		if((f_maxval > 0) || (f_maxval <= 65535)) {
+		if((f_maxval > 0) && (f_maxval <= 65535)) {
 			x.set_size(3);
 			Mat<eT>& R = x(0);
 			Mat<eT>& G = x(1);
@@ -3721,7 +4158,8 @@ bool diskio::load_ppm_binary(field<T1>& x, std::istream& f, std::string& err_msg
 						i += 3;
 					}
 				}
-			} else {
+			}
+			else {
 				const uword n_elem = 3 * f_n_cols * f_n_rows;
 				podarray<u16> tmp(n_elem);
 
@@ -3737,15 +4175,17 @@ bool diskio::load_ppm_binary(field<T1>& x, std::istream& f, std::string& err_msg
 						i += 3;
 					}
 			}
-		} else {
+		}
+		else {
 			load_okay = false;
-			err_msg = "currently no code available to handle loading ";
+			err_msg = "functionality unimplemented";
 		}
 
 		if(f.good() == false) { load_okay = false; }
-	} else {
+	}
+	else {
 		load_okay = false;
-		err_msg = "unsupported header in ";
+		err_msg = "unsupported header";
 	}
 
 	return load_okay;

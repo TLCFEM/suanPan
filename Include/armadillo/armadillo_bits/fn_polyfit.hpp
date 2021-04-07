@@ -28,7 +28,7 @@ enable_if2
 
 	if(status == false) {
 		out.soft_reset();
-		arma_debug_warn("polyfit(): failed");
+		arma_debug_warn_level(3, "polyfit(): failed");
 	}
 
 	return status;

@@ -68,7 +68,7 @@ void running_stat_vec<obj_type>::operator()(const Base<typename running_stat_vec
 	if(sample.is_empty()) { return; }
 
 	if(sample.is_finite() == false) {
-		arma_debug_warn("running_stat_vec: sample ignored as it has non-finite elements");
+		arma_debug_warn_level(3, "running_stat_vec: sample ignored as it has non-finite elements");
 		return;
 	}
 
@@ -87,7 +87,7 @@ void running_stat_vec<obj_type>::operator()(const Base<std::complex<typename run
 	if(sample.is_empty()) { return; }
 
 	if(sample.is_finite() == false) {
-		arma_debug_warn("running_stat_vec: sample ignored as it has non-finite elements");
+		arma_debug_warn_level(3, "running_stat_vec: sample ignored as it has non-finite elements");
 		return;
 	}
 
@@ -134,14 +134,16 @@ const typename running_stat_vec<obj_type>::return_type2& running_stat_vec<obj_ty
 	const T N = counter.value();
 
 	if(N > T(1)) {
-		if(norm_type == 0) { return r_var; } else {
+		if(norm_type == 0) { return r_var; }
+		else {
 			const T N_minus_1 = counter.value_minus_1();
 
 			r_var_dummy = (N_minus_1 / N) * r_var;
 
 			return r_var_dummy;
 		}
-	} else {
+	}
+	else {
 		r_var_dummy.zeros(r_mean.n_rows, r_mean.n_cols);
 
 		return r_var_dummy;
@@ -157,12 +159,14 @@ typename running_stat_vec<obj_type>::return_type2 running_stat_vec<obj_type>::st
 	const T N = counter.value();
 
 	if(N > T(1)) {
-		if(norm_type == 0) { return sqrt(r_var); } else {
+		if(norm_type == 0) { return sqrt(r_var); }
+		else {
 			const T N_minus_1 = counter.value_minus_1();
 
 			return sqrt((N_minus_1 / N) * r_var);
 		}
-	} else {
+	}
+	else {
 		typedef typename running_stat_vec<obj_type>::return_type2 out_type;
 		return out_type();
 	}
@@ -177,21 +181,24 @@ const Mat<typename running_stat_vec<obj_type>::eT>& running_stat_vec<obj_type>::
 		const T N = counter.value();
 
 		if(N > T(1)) {
-			if(norm_type == 0) { return r_cov; } else {
+			if(norm_type == 0) { return r_cov; }
+			else {
 				const T N_minus_1 = counter.value_minus_1();
 
 				r_cov_dummy = (N_minus_1 / N) * r_cov;
 
 				return r_cov_dummy;
 			}
-		} else {
+		}
+		else {
 			const uword out_size = (std::max)(r_mean.n_rows, r_mean.n_cols);
 
 			r_cov_dummy.zeros(out_size, out_size);
 
 			return r_cov_dummy;
 		}
-	} else {
+	}
+	else {
 		r_cov_dummy.reset();
 
 		return r_cov_dummy;
@@ -267,7 +274,8 @@ void running_stat_vec_aux::update_stats
 
 			tmp1 = sample - x.r_mean;
 
-			if(sample.n_cols == 1) { tmp2 = tmp1 * trans(tmp1); } else { tmp2 = trans(tmp1) * tmp1; }
+			if(sample.n_cols == 1) { tmp2 = tmp1 * trans(tmp1); }
+			else { tmp2 = trans(tmp1) * tmp1; }
 
 			x.r_cov *= (N_minus_1 / N);
 			x.r_cov += tmp2 / N_plus_1;
@@ -287,8 +295,9 @@ void running_stat_vec_aux::update_stats
 
 			r_mean_mem[i] = r_mean_val + (val - r_mean_val) / N_plus_1;
 		}
-	} else {
-		arma_debug_check((sample.is_vec() == false), "running_stat_vec(): given sample is not a vector");
+	}
+	else {
+		arma_debug_check((sample.is_vec() == false), "running_stat_vec(): given sample must be a vector");
 
 		x.r_mean.set_size(sample.n_rows, sample.n_cols);
 
@@ -386,7 +395,8 @@ void running_stat_vec_aux::update_stats
 
 			tmp1 = sample - x.r_mean;
 
-			if(sample.n_cols == 1) { tmp2 = arma::conj(tmp1) * strans(tmp1); } else {
+			if(sample.n_cols == 1) { tmp2 = arma::conj(tmp1) * strans(tmp1); }
+			else {
 				tmp2 = trans(tmp1) * tmp1; //tmp2 = strans(conj(tmp1))*tmp1;
 			}
 
@@ -414,8 +424,9 @@ void running_stat_vec_aux::update_stats
 
 			r_mean_mem[i] = r_mean_val + (val - r_mean_val) / N_plus_1;
 		}
-	} else {
-		arma_debug_check((sample.is_vec() == false), "running_stat_vec(): given sample is not a vector");
+	}
+	else {
+		arma_debug_check((sample.is_vec() == false), "running_stat_vec(): given sample must be a vector");
 
 		x.r_mean.set_size(sample.n_rows, sample.n_cols);
 

@@ -54,7 +54,11 @@ typename T1::elem_type eGlueCube<T1, T2, eglue_type>::operator[](const uword i) 
 
 	typedef typename T1::elem_type eT;
 
-	if(is_same_type<eglue_type, eglue_plus>::yes) { return P1[i] + P2[i]; } else if(is_same_type<eglue_type, eglue_minus>::yes) { return P1[i] - P2[i]; } else if(is_same_type<eglue_type, eglue_div>::yes) { return P1[i] / P2[i]; } else if(is_same_type<eglue_type, eglue_schur>::yes) { return P1[i] * P2[i]; } else return eT(0);
+	if(is_same_type<eglue_type, eglue_plus>::yes) { return P1[i] + P2[i]; }
+	else if(is_same_type<eglue_type, eglue_minus>::yes) { return P1[i] - P2[i]; }
+	else if(is_same_type<eglue_type, eglue_div>::yes) { return P1[i] / P2[i]; }
+	else if(is_same_type<eglue_type, eglue_schur>::yes) { return P1[i] * P2[i]; }
+	else return eT(0);
 }
 
 template<typename T1, typename T2, typename eglue_type> arma_inline
@@ -63,7 +67,11 @@ typename T1::elem_type eGlueCube<T1, T2, eglue_type>::at(const uword row, const 
 
 	typedef typename T1::elem_type eT;
 
-	if(is_same_type<eglue_type, eglue_plus>::yes) { return P1.at(row, col, slice) + P2.at(row, col, slice); } else if(is_same_type<eglue_type, eglue_minus>::yes) { return P1.at(row, col, slice) - P2.at(row, col, slice); } else if(is_same_type<eglue_type, eglue_div>::yes) { return P1.at(row, col, slice) / P2.at(row, col, slice); } else if(is_same_type<eglue_type, eglue_schur>::yes) { return P1.at(row, col, slice) * P2.at(row, col, slice); } else return eT(0);
+	if(is_same_type<eglue_type, eglue_plus>::yes) { return P1.at(row, col, slice) + P2.at(row, col, slice); }
+	else if(is_same_type<eglue_type, eglue_minus>::yes) { return P1.at(row, col, slice) - P2.at(row, col, slice); }
+	else if(is_same_type<eglue_type, eglue_div>::yes) { return P1.at(row, col, slice) / P2.at(row, col, slice); }
+	else if(is_same_type<eglue_type, eglue_schur>::yes) { return P1.at(row, col, slice) * P2.at(row, col, slice); }
+	else return eT(0);
 }
 
 template<typename T1, typename T2, typename eglue_type> arma_inline
@@ -72,7 +80,11 @@ typename T1::elem_type eGlueCube<T1, T2, eglue_type>::at_alt(const uword i) cons
 
 	typedef typename T1::elem_type eT;
 
-	if(is_same_type<eglue_type, eglue_plus>::yes) { return P1.at_alt(i) + P2.at_alt(i); } else if(is_same_type<eglue_type, eglue_minus>::yes) { return P1.at_alt(i) - P2.at_alt(i); } else if(is_same_type<eglue_type, eglue_div>::yes) { return P1.at_alt(i) / P2.at_alt(i); } else if(is_same_type<eglue_type, eglue_schur>::yes) { return P1.at_alt(i) * P2.at_alt(i); } else return eT(0);
+	if(is_same_type<eglue_type, eglue_plus>::yes) { return P1.at_alt(i) + P2.at_alt(i); }
+	else if(is_same_type<eglue_type, eglue_minus>::yes) { return P1.at_alt(i) - P2.at_alt(i); }
+	else if(is_same_type<eglue_type, eglue_div>::yes) { return P1.at_alt(i) / P2.at_alt(i); }
+	else if(is_same_type<eglue_type, eglue_schur>::yes) { return P1.at_alt(i) * P2.at_alt(i); }
+	else return eT(0);
 }
 
 //! @}

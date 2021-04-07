@@ -16,9 +16,16 @@
 //! \addtogroup arrayops
 //! @{
 
-template<typename eT> arma_hot
-arma_inline
-void arrayops::copy(eT* dest, const eT* src, const uword n_elem) { if(is_cx<eT>::no) { if(n_elem <= 9) { arrayops::copy_small(dest, src, n_elem); } else { std::memcpy(dest, src, n_elem * sizeof(eT)); } } else { if(n_elem > 0) { std::memcpy(dest, src, n_elem * sizeof(eT)); } } }
+template<typename eT> arma_inline
+void arrayops::copy(eT* dest, const eT* src, const uword n_elem) {
+	if(dest != src) {
+		if(is_cx<eT>::no) {
+			if(n_elem <= 9) { arrayops::copy_small(dest, src, n_elem); }
+			else { std::memcpy(dest, src, n_elem * sizeof(eT)); }
+		}
+		else { if(n_elem > 0) { std::memcpy(dest, src, n_elem * sizeof(eT)); } }
+	}
+}
 
 template<typename eT> arma_cold
 inline
@@ -59,7 +66,8 @@ template<typename eT> inline
 void arrayops::fill_zeros(eT* dest, const uword n_elem) {
 	typedef typename get_pod_type<eT>::result pod_type;
 
-	if(std::numeric_limits<eT>::is_integer || std::numeric_limits<pod_type>::is_iec559) { if(n_elem > 0) { std::memset((void*)dest, 0, sizeof(eT) * n_elem); } } else { arrayops::inplace_set_simple(dest, eT(0), n_elem); }
+	if(std::numeric_limits<eT>::is_integer || std::numeric_limits<pod_type>::is_iec559) { if(n_elem > 0) { std::memset((void*)dest, 0, sizeof(eT) * n_elem); } }
+	else { arrayops::inplace_set_simple(dest, eT(0), n_elem); }
 }
 
 template<typename eT> arma_hot
@@ -71,7 +79,8 @@ void arrayops::replace(eT* mem, const uword n_elem, const eT old_val, const eT n
 
 			val = (arma_isnan(val)) ? new_val : val;
 		}
-	} else {
+	}
+	else {
 		for(uword i = 0; i < n_elem; ++i) {
 			eT& val = mem[i];
 
@@ -88,7 +97,7 @@ void arrayops::clean(eT* mem, const uword n_elem, const eT abs_limit, const type
 	for(uword i = 0; i < n_elem; ++i) {
 		eT& val = mem[i];
 
-		val = (std::abs(val) <= abs_limit) ? eT(0) : val;
+		val = (eop_aux::arma_abs(val) <= abs_limit) ? eT(0) : val;
 	}
 }
 
@@ -107,12 +116,12 @@ void arrayops::clean(std::complex<T>* mem, const uword n_elem, const T abs_limit
 			val_imag = (std::abs(val_imag) <= abs_limit) ? T(0) : val_imag;
 
 			val = std::complex<T>(T(0), val_imag);
-		} else if(std::abs(val_imag) <= abs_limit) { val = std::complex<T>(val_real, T(0)); }
+		}
+		else if(std::abs(val_imag) <= abs_limit) { val = std::complex<T>(val_real, T(0)); }
 	}
 }
 
-template<typename out_eT, typename in_eT> arma_hot
-arma_inline
+template<typename out_eT, typename in_eT> arma_inline
 void arrayops::convert_cx_scalar
 (
 	out_eT& out,
@@ -126,8 +135,7 @@ void arrayops::convert_cx_scalar
 	out = out_eT(in);
 }
 
-template<typename out_eT, typename in_T> arma_hot
-arma_inline
+template<typename out_eT, typename in_T> arma_inline
 void arrayops::convert_cx_scalar
 (
 	out_eT& out,
@@ -139,8 +147,7 @@ void arrayops::convert_cx_scalar
 	out = out_eT(in.real());
 }
 
-template<typename out_T, typename in_T> arma_hot
-arma_inline
+template<typename out_T, typename in_T> arma_inline
 void arrayops::convert_cx_scalar
 (
 	std::complex<out_T>& out,
@@ -223,13 +230,16 @@ void arrayops::inplace_plus(eT* dest, const eT* src, const uword n_elem) {
 			memory::mark_as_aligned(src);
 
 			arrayops::inplace_plus_base(dest, src, n_elem);
-		} else { arrayops::inplace_plus_base(dest, src, n_elem); }
-	} else {
+		}
+		else { arrayops::inplace_plus_base(dest, src, n_elem); }
+	}
+	else {
 		if(memory::is_aligned(src)) {
 			memory::mark_as_aligned(src);
 
 			arrayops::inplace_plus_base(dest, src, n_elem);
-		} else { arrayops::inplace_plus_base(dest, src, n_elem); }
+		}
+		else { arrayops::inplace_plus_base(dest, src, n_elem); }
 	}
 }
 
@@ -243,13 +253,16 @@ void arrayops::inplace_minus(eT* dest, const eT* src, const uword n_elem) {
 			memory::mark_as_aligned(src);
 
 			arrayops::inplace_minus_base(dest, src, n_elem);
-		} else { arrayops::inplace_minus_base(dest, src, n_elem); }
-	} else {
+		}
+		else { arrayops::inplace_minus_base(dest, src, n_elem); }
+	}
+	else {
 		if(memory::is_aligned(src)) {
 			memory::mark_as_aligned(src);
 
 			arrayops::inplace_minus_base(dest, src, n_elem);
-		} else { arrayops::inplace_minus_base(dest, src, n_elem); }
+		}
+		else { arrayops::inplace_minus_base(dest, src, n_elem); }
 	}
 }
 
@@ -263,13 +276,16 @@ void arrayops::inplace_mul(eT* dest, const eT* src, const uword n_elem) {
 			memory::mark_as_aligned(src);
 
 			arrayops::inplace_mul_base(dest, src, n_elem);
-		} else { arrayops::inplace_mul_base(dest, src, n_elem); }
-	} else {
+		}
+		else { arrayops::inplace_mul_base(dest, src, n_elem); }
+	}
+	else {
 		if(memory::is_aligned(src)) {
 			memory::mark_as_aligned(src);
 
 			arrayops::inplace_mul_base(dest, src, n_elem);
-		} else { arrayops::inplace_mul_base(dest, src, n_elem); }
+		}
+		else { arrayops::inplace_mul_base(dest, src, n_elem); }
 	}
 }
 
@@ -283,13 +299,16 @@ void arrayops::inplace_div(eT* dest, const eT* src, const uword n_elem) {
 			memory::mark_as_aligned(src);
 
 			arrayops::inplace_div_base(dest, src, n_elem);
-		} else { arrayops::inplace_div_base(dest, src, n_elem); }
-	} else {
+		}
+		else { arrayops::inplace_div_base(dest, src, n_elem); }
+	}
+	else {
 		if(memory::is_aligned(src)) {
 			memory::mark_as_aligned(src);
 
 			arrayops::inplace_div_base(dest, src, n_elem);
-		} else { arrayops::inplace_div_base(dest, src, n_elem); }
+		}
+		else { arrayops::inplace_div_base(dest, src, n_elem); }
 	}
 }
 
@@ -407,7 +426,13 @@ void arrayops::inplace_div_base(eT* dest, const eT* src, const uword n_elem) {
 
 template<typename eT> arma_hot
 inline
-void arrayops::inplace_set(eT* dest, const eT val, const uword n_elem) { if(val == eT(0)) { arrayops::fill_zeros(dest, n_elem); } else { if((n_elem <= 9) && (is_cx<eT>::no)) { arrayops::inplace_set_small(dest, val, n_elem); } else { arrayops::inplace_set_simple(dest, val, n_elem); } } }
+void arrayops::inplace_set(eT* dest, const eT val, const uword n_elem) {
+	if(val == eT(0)) { arrayops::fill_zeros(dest, n_elem); }
+	else {
+		if((n_elem <= 9) && (is_cx<eT>::no)) { arrayops::inplace_set_small(dest, val, n_elem); }
+		else { arrayops::inplace_set_simple(dest, val, n_elem); }
+	}
+}
 
 template<typename eT> arma_hot
 inline
@@ -416,7 +441,8 @@ void arrayops::inplace_set_simple(eT* dest, const eT val, const uword n_elem) {
 		memory::mark_as_aligned(dest);
 
 		arrayops::inplace_set_base(dest, val, n_elem);
-	} else { arrayops::inplace_set_base(dest, val, n_elem); }
+	}
+	else { arrayops::inplace_set_base(dest, val, n_elem); }
 }
 
 template<typename eT> arma_hot
@@ -490,7 +516,8 @@ void arrayops::inplace_plus(eT* dest, const eT val, const uword n_elem) {
 		memory::mark_as_aligned(dest);
 
 		arrayops::inplace_plus_base(dest, val, n_elem);
-	} else { arrayops::inplace_plus_base(dest, val, n_elem); }
+	}
+	else { arrayops::inplace_plus_base(dest, val, n_elem); }
 }
 
 template<typename eT> arma_hot
@@ -500,7 +527,8 @@ void arrayops::inplace_minus(eT* dest, const eT val, const uword n_elem) {
 		memory::mark_as_aligned(dest);
 
 		arrayops::inplace_minus_base(dest, val, n_elem);
-	} else { arrayops::inplace_minus_base(dest, val, n_elem); }
+	}
+	else { arrayops::inplace_minus_base(dest, val, n_elem); }
 }
 
 template<typename eT> arma_hot
@@ -510,7 +538,8 @@ void arrayops::inplace_mul(eT* dest, const eT val, const uword n_elem) {
 		memory::mark_as_aligned(dest);
 
 		arrayops::inplace_mul_base(dest, val, n_elem);
-	} else { arrayops::inplace_mul_base(dest, val, n_elem); }
+	}
+	else { arrayops::inplace_mul_base(dest, val, n_elem); }
 }
 
 template<typename eT> arma_hot
@@ -520,7 +549,8 @@ void arrayops::inplace_div(eT* dest, const eT val, const uword n_elem) {
 		memory::mark_as_aligned(dest);
 
 		arrayops::inplace_div_base(dest, val, n_elem);
-	} else { arrayops::inplace_div_base(dest, val, n_elem); }
+	}
+	else { arrayops::inplace_div_base(dest, val, n_elem); }
 }
 
 template<typename eT> arma_hot
@@ -688,7 +718,8 @@ bool arrayops::is_zero(const eT* mem, const uword n_elem, const eT abs_limit, co
 
 	if(n_elem == 0) { return false; }
 
-	if(abs_limit == eT(0)) { for(uword i = 0; i < n_elem; ++i) { if(mem[i] != eT(0)) { return false; } } } else { for(uword i = 0; i < n_elem; ++i) { if(std::abs(mem[i]) > abs_limit) { return false; } } }
+	if(abs_limit == eT(0)) { for(uword i = 0; i < n_elem; ++i) { if(mem[i] != eT(0)) { return false; } } }
+	else { for(uword i = 0; i < n_elem; ++i) { if(eop_aux::arma_abs(mem[i]) > abs_limit) { return false; } } }
 
 	return true;
 }
@@ -707,7 +738,8 @@ bool arrayops::is_zero(const std::complex<T>* mem, const uword n_elem, const T a
 			if(std::real(val) != T(0)) { return false; }
 			if(std::imag(val) != T(0)) { return false; }
 		}
-	} else {
+	}
+	else {
 		for(uword i = 0; i < n_elem; ++i) {
 			const eT& val = mem[i];
 

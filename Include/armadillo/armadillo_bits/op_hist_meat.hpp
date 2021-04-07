@@ -52,15 +52,18 @@ void op_hist::apply_noalias(Mat<uword>& out, const Mat<eT>& A, const uword n_bin
 		if(max_val < val_i) { max_val = val_i; }
 	}
 
+	if(min_val == max_val) {
+		min_val -= (n_bins / 2);
+		max_val += (n_bins / 2);
+	}
+
 	if(arma_isfinite(min_val) == false) { min_val = priv::most_neg<eT>(); }
 	if(arma_isfinite(max_val) == false) { max_val = priv::most_pos<eT>(); }
 
 	Col<eT> c(n_bins);
 	eT* c_mem = c.memptr();
 
-	for(uword ii = 0; ii < n_bins; ++ii) {
-		c_mem[ii] = (0.5 + ii) / double(n_bins); // TODO: may need to be modified for integer matrices
-	}
+	for(uword ii = 0; ii < n_bins; ++ii) { c_mem[ii] = (0.5 + ii) / double(n_bins); }
 
 	c = ((max_val - min_val) * c) + min_val;
 
@@ -77,13 +80,21 @@ void op_hist::apply(Mat<uword>& out, const mtOp<uword, T1, op_hist>& X) {
 
 	const uword dim = (T1::is_xvec) ? uword(U.M.is_rowvec() ? 1 : 0) : uword((T1::is_row) ? 1 : 0);
 
-	if(U.is_alias(out)) {
-		Mat<uword> tmp;
+	if(is_non_integral<typename T1::elem_type>::value) {
+		if(U.is_alias(out)) {
+			Mat<uword> tmp;
 
-		op_hist::apply_noalias(tmp, U.M, n_bins, dim);
+			op_hist::apply_noalias(tmp, U.M, n_bins, dim);
 
-		out.steal_mem(tmp);
-	} else { op_hist::apply_noalias(out, U.M, n_bins, dim); }
+			out.steal_mem(tmp);
+		}
+		else { op_hist::apply_noalias(out, U.M, n_bins, dim); }
+	}
+	else {
+		Mat<double> converted = conv_to<Mat<double>>::from(U.M);
+
+		op_hist::apply_noalias(out, converted, n_bins, dim);
+	}
 }
 
 //! @}

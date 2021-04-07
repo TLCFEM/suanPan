@@ -20,7 +20,7 @@ template<typename eT> inline
 void glue_histc::apply_noalias(Mat<uword>& C, const Mat<eT>& A, const Mat<eT>& B, const uword dim) {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check(((B.is_vec() == false) && (B.is_empty() == false)), "histc(): parameter 'edges' is not a vector");
+	arma_debug_check(((B.is_vec() == false) && (B.is_empty() == false)), "histc(): parameter 'edges' must be a vector");
 
 	const uword A_n_rows = A.n_rows;
 	const uword A_n_cols = A.n_cols;
@@ -55,14 +55,16 @@ void glue_histc::apply_noalias(Mat<uword>& C, const Mat<eT>& A, const Mat<eT>& B
 					if((B_mem[i] <= x) && (x < B_mem[i + 1])) {
 						C_coldata[i]++;
 						break;
-					} else if(B_mem[B_n_elem_m1] == x) {
+					}
+					else if(B_mem[B_n_elem_m1] == x) {
 						C_coldata[B_n_elem_m1]++;
 						break;
 					} // for compatibility with Matlab
 				}
 			}
 		}
-	} else if(dim == uword(1)) {
+	}
+	else if(dim == uword(1)) {
 		C.zeros(A_n_rows, B_n_elem);
 
 		if(A.n_rows == 1) {
@@ -77,13 +79,15 @@ void glue_histc::apply_noalias(Mat<uword>& C, const Mat<eT>& A, const Mat<eT>& B
 					if((B_mem[i] <= x) && (x < B_mem[i + 1])) {
 						C_mem[i]++;
 						break;
-					} else if(B_mem[B_n_elem_m1] == x) {
+					}
+					else if(B_mem[B_n_elem_m1] == x) {
 						C_mem[B_n_elem_m1]++;
 						break;
 					} // for compatibility with Matlab
 				}
 			}
-		} else {
+		}
+		else {
 			for(uword row = 0; row < A_n_rows; ++row)
 				for(uword col = 0; col < A_n_cols; ++col) {
 					const eT x = A.at(row, col);
@@ -92,7 +96,8 @@ void glue_histc::apply_noalias(Mat<uword>& C, const Mat<eT>& A, const Mat<eT>& B
 						if((B_mem[i] <= x) && (x < B_mem[i + 1])) {
 							C.at(row, i)++;
 							break;
-						} else if(B_mem[B_n_elem_m1] == x) {
+						}
+						else if(B_mem[B_n_elem_m1] == x) {
 							C.at(row, B_n_elem_m1)++;
 							break;
 						} // for compatibility with Matlab
@@ -119,7 +124,8 @@ void glue_histc::apply(Mat<uword>& C, const mtGlue<uword, T1, T2, glue_histc>& e
 		glue_histc::apply_noalias(tmp, UA.M, UB.M, dim);
 
 		C.steal_mem(tmp);
-	} else { glue_histc::apply_noalias(C, UA.M, UB.M, dim); }
+	}
+	else { glue_histc::apply_noalias(C, UA.M, UB.M, dim); }
 }
 
 template<typename T1, typename T2> inline
@@ -137,7 +143,8 @@ void glue_histc_default::apply(Mat<uword>& C, const mtGlue<uword, T1, T2, glue_h
 		glue_histc::apply_noalias(tmp, UA.M, UB.M, dim);
 
 		C.steal_mem(tmp);
-	} else { glue_histc::apply_noalias(C, UA.M, UB.M, dim); }
+	}
+	else { glue_histc::apply_noalias(C, UA.M, UB.M, dim); }
 }
 
 //! @}

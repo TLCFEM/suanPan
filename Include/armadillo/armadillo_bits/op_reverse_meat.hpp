@@ -29,8 +29,13 @@ void op_reverse::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_reverse
 	if(is_Mat<typename Proxy<T1>::stored_type>::value || P.is_alias(out)) {
 		const unwrap<typename Proxy<T1>::stored_type> U(P.Q);
 
-		if(dim == 0) { op_flipud::apply_direct(out, U.M); } else if(dim == 1) { op_fliplr::apply_direct(out, U.M); }
-	} else { if(dim == 0) { op_flipud::apply_proxy_noalias(out, P); } else if(dim == 1) { op_fliplr::apply_proxy_noalias(out, P); } }
+		if(dim == 0) { op_flipud::apply_direct(out, U.M); }
+		else if(dim == 1) { op_fliplr::apply_direct(out, U.M); }
+	}
+	else {
+		if(dim == 0) { op_flipud::apply_proxy_noalias(out, P); }
+		else if(dim == 1) { op_fliplr::apply_proxy_noalias(out, P); }
+	}
 }
 
 template<typename T1> inline
@@ -42,8 +47,13 @@ void op_reverse_vec::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_rev
 	if(is_Mat<typename Proxy<T1>::stored_type>::value || P.is_alias(out)) {
 		const unwrap<typename Proxy<T1>::stored_type> U(P.Q);
 
-		if((T1::is_xvec) ? bool(U.M.is_rowvec()) : bool(T1::is_row)) { op_fliplr::apply_direct(out, U.M); } else { op_flipud::apply_direct(out, U.M); }
-	} else { if((T1::is_xvec) ? bool(P.get_n_rows() == 1) : bool(T1::is_row)) { op_fliplr::apply_proxy_noalias(out, P); } else { op_flipud::apply_proxy_noalias(out, P); } }
+		if((T1::is_xvec) ? bool(U.M.is_rowvec()) : bool(T1::is_row)) { op_fliplr::apply_direct(out, U.M); }
+		else { op_flipud::apply_direct(out, U.M); }
+	}
+	else {
+		if((T1::is_xvec) ? bool(P.get_n_rows() == 1) : bool(T1::is_row)) { op_fliplr::apply_proxy_noalias(out, P); }
+		else { op_flipud::apply_proxy_noalias(out, P); }
+	}
 }
 
 //! @}

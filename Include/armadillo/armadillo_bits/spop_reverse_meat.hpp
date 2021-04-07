@@ -51,7 +51,8 @@ void spop_reverse::apply_spmat(SpMat<eT>& out, const SpMat<eT>& X, const uword d
 
 			++it;
 		}
-	} else if(dim == 1) {
+	}
+	else if(dim == 1) {
 		for(uword i = 0; i < N; ++i) {
 			const uword row = it.row();
 			const uword col = it.col();
@@ -116,7 +117,8 @@ void spop_reverse::apply_proxy(SpMat<typename T1::elem_type>& out, const T1& X, 
 
 			++it;
 		}
-	} else if(dim == 1) {
+	}
+	else if(dim == 1) {
 		for(uword i = 0; i < N; ++i) {
 			const uword row = it.row();
 			const uword col = it.col();
@@ -150,7 +152,8 @@ void spop_reverse::apply(SpMat<typename T1::elem_type>& out, const SpOp<T1, spop
 		const unwrap_spmat<T1> tmp(in.m);
 
 		spop_reverse::apply_spmat(out, tmp.M, dim);
-	} else { spop_reverse::apply_proxy(out, in.m, dim); }
+	}
+	else { spop_reverse::apply_proxy(out, in.m, dim); }
 }
 
 //! @}

@@ -27,6 +27,28 @@ typename enable_if2<is_supported_blas_type<typename T1::elem_type>::value, const
 	return Op<T1, op_powmat>(X.get_ref(), aux_a, aux_b);
 }
 
+template<typename T1> inline
+typename enable_if2<is_supported_blas_type<typename T1::elem_type>::value, bool>::result powmat
+(
+	Mat<typename T1::elem_type>& out,
+	const Base<typename T1::elem_type, T1>& X,
+	const int y
+) {
+	arma_extra_debug_sigprint();
+
+	const uword y_val = (y < int(0)) ? uword(-y) : uword(y);
+	const bool y_neg = (y < int(0));
+
+	const bool status = op_powmat::apply_direct(out, X.get_ref(), y_val, y_neg);
+
+	if(status == false) {
+		out.soft_reset();
+		arma_debug_warn_level(3, "powmat(): transformation failed");
+	}
+
+	return status;
+}
+
 template<typename T1> arma_warn_unused
 inline
 typename enable_if2<is_supported_blas_type<typename T1::elem_type>::value, const mtOp<std::complex<typename T1::pod_type>, T1, op_powmat_cx>>::result powmat(const Base<typename T1::elem_type, T1>& X, const double y) {
@@ -40,31 +62,22 @@ typename enable_if2<is_supported_blas_type<typename T1::elem_type>::value, const
 template<typename T1> inline
 typename enable_if2<is_supported_blas_type<typename T1::elem_type>::value, bool>::result powmat
 (
-	Mat<typename T1::elem_type>& out,
-	const Base<typename T1::elem_type, T1>& X,
-	const int y
-) {
-	arma_extra_debug_sigprint();
-
-	try { out = powmat(X, y); }
-	catch(std::runtime_error&) { return false; }
-
-	return true;
-}
-
-template<typename T1> inline
-typename enable_if2<is_supported_blas_type<typename T1::elem_type>::value, bool>::result powmat
-(
 	Mat<std::complex<typename T1::pod_type>>& out,
 	const Base<typename T1::elem_type, T1>& X,
 	const double y
 ) {
 	arma_extra_debug_sigprint();
 
-	try { out = powmat(X, y); }
-	catch(std::runtime_error&) { return false; }
+	typedef typename T1::pod_type T;
 
-	return true;
+	const bool status = op_powmat_cx::apply_direct(out, X.get_ref(), T(y));
+
+	if(status == false) {
+		out.soft_reset();
+		arma_debug_warn_level(3, "powmat(): transformation failed");
+	}
+
+	return status;
 }
 
 //! @}

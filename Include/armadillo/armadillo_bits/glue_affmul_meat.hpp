@@ -27,7 +27,8 @@ void glue_affmul::apply(Mat<typename T1::elem_type>& out, const Glue<T1, T2, glu
 
 	const bool is_alias = (U1.is_alias(out) || U2.is_alias(out));
 
-	if(is_alias == false) { glue_affmul::apply_noalias(out, U1.M, U2.M); } else {
+	if(is_alias == false) { glue_affmul::apply_noalias(out, U1.M, U2.M); }
+	else {
 		Mat<eT> tmp;
 
 		glue_affmul::apply_noalias(tmp, U1.M, U2.M);
@@ -46,7 +47,9 @@ void glue_affmul::apply_noalias(Mat<typename T1::elem_type>& out, const T1& A, c
 
 	arma_debug_check((A_n_cols != B_n_rows + 1), "affmul(): size mismatch");
 
-	if(A_n_rows == A_n_cols) { glue_affmul::apply_noalias_square(out, A, B); } else if(A_n_rows == B_n_rows) { glue_affmul::apply_noalias_rectangle(out, A, B); } else { glue_affmul::apply_noalias_generic(out, A, B); }
+	if(A_n_rows == A_n_cols) { glue_affmul::apply_noalias_square(out, A, B); }
+	else if(A_n_rows == B_n_rows) { glue_affmul::apply_noalias_rectangle(out, A, B); }
+	else { glue_affmul::apply_noalias_generic(out, A, B); }
 }
 
 template<typename T1, typename T2> inline
@@ -84,7 +87,8 @@ void glue_affmul::apply_noalias_square(Mat<typename T1::elem_type>& out, const T
 
 			out_mem[0] = A_mem[0] * x + A_mem[2];
 			out_mem[1] = A_mem[1] * x + A_mem[3];
-		} else
+		}
+		else
 			for(uword col = 0; col < B_n_cols; ++col) {
 				const eT* B_mem = B.colptr(col);
 				eT* out_mem = out.colptr(col);
@@ -109,7 +113,8 @@ void glue_affmul::apply_noalias_square(Mat<typename T1::elem_type>& out, const T
 			out_mem[0] = A_mem[0] * x + A_mem[3] * y + A_mem[6];
 			out_mem[1] = A_mem[1] * x + A_mem[4] * y + A_mem[7];
 			out_mem[2] = A_mem[2] * x + A_mem[5] * y + A_mem[8];
-		} else
+		}
+		else
 			for(uword col = 0; col < B_n_cols; ++col) {
 				const eT* B_mem = B.colptr(col);
 				eT* out_mem = out.colptr(col);
@@ -138,7 +143,8 @@ void glue_affmul::apply_noalias_square(Mat<typename T1::elem_type>& out, const T
 			out_mem[1] = A_mem[1] * x + A_mem[5] * y + A_mem[9] * z + A_mem[13];
 			out_mem[2] = A_mem[2] * x + A_mem[6] * y + A_mem[10] * z + A_mem[14];
 			out_mem[3] = A_mem[3] * x + A_mem[7] * y + A_mem[11] * z + A_mem[15];
-		} else
+		}
+		else
 			for(uword col = 0; col < B_n_cols; ++col) {
 				const eT* B_mem = B.colptr(col);
 				eT* out_mem = out.colptr(col);
@@ -171,7 +177,8 @@ void glue_affmul::apply_noalias_square(Mat<typename T1::elem_type>& out, const T
 			out_mem[2] = A_mem[2] * x + A_mem[7] * y + A_mem[12] * z + A_mem[17] * w + A_mem[22];
 			out_mem[3] = A_mem[3] * x + A_mem[8] * y + A_mem[13] * z + A_mem[18] * w + A_mem[23];
 			out_mem[4] = A_mem[4] * x + A_mem[9] * y + A_mem[14] * z + A_mem[19] * w + A_mem[24];
-		} else
+		}
+		else
 			for(uword col = 0; col < B_n_cols; ++col) {
 				const eT* B_mem = B.colptr(col);
 				eT* out_mem = out.colptr(col);
@@ -200,7 +207,8 @@ void glue_affmul::apply_noalias_square(Mat<typename T1::elem_type>& out, const T
 			tmp_mem[N - 1] = eT(1);
 
 			out = A * tmp;
-		} else {
+		}
+		else {
 			Mat<eT> tmp(N, B_n_cols);
 
 			for(uword col = 0; col < B_n_cols; ++col) {
@@ -249,7 +257,8 @@ void glue_affmul::apply_noalias_rectangle(Mat<typename T1::elem_type>& out, cons
 			const eT x = B_mem[0];
 
 			out_mem[0] = A_mem[0] * x + A_mem[1];
-		} else
+		}
+		else
 			for(uword col = 0; col < B_n_cols; ++col) {
 				const eT* B_mem = B.colptr(col);
 				eT* out_mem = out.colptr(col);
@@ -272,7 +281,8 @@ void glue_affmul::apply_noalias_rectangle(Mat<typename T1::elem_type>& out, cons
 
 			out_mem[0] = A_mem[0] * x + A_mem[2] * y + A_mem[4];
 			out_mem[1] = A_mem[1] * x + A_mem[3] * y + A_mem[5];
-		} else
+		}
+		else
 			for(uword col = 0; col < B_n_cols; ++col) {
 				const eT* B_mem = B.colptr(col);
 				eT* out_mem = out.colptr(col);
@@ -299,7 +309,8 @@ void glue_affmul::apply_noalias_rectangle(Mat<typename T1::elem_type>& out, cons
 			out_mem[0] = A_mem[0] * x + A_mem[3] * y + A_mem[6] * z + A_mem[9];
 			out_mem[1] = A_mem[1] * x + A_mem[4] * y + A_mem[7] * z + A_mem[10];
 			out_mem[2] = A_mem[2] * x + A_mem[5] * y + A_mem[8] * z + A_mem[11];
-		} else
+		}
+		else
 			for(uword col = 0; col < B_n_cols; ++col) {
 				const eT* B_mem = B.colptr(col);
 				eT* out_mem = out.colptr(col);
@@ -330,7 +341,8 @@ void glue_affmul::apply_noalias_rectangle(Mat<typename T1::elem_type>& out, cons
 			out_mem[1] = A_mem[1] * x + A_mem[5] * y + A_mem[9] * z + A_mem[13] * w + A_mem[17];
 			out_mem[2] = A_mem[2] * x + A_mem[6] * y + A_mem[10] * z + A_mem[14] * w + A_mem[18];
 			out_mem[3] = A_mem[3] * x + A_mem[7] * y + A_mem[11] * z + A_mem[15] * w + A_mem[19];
-		} else
+		}
+		else
 			for(uword col = 0; col < B_n_cols; ++col) {
 				const eT* B_mem = B.colptr(col);
 				eT* out_mem = out.colptr(col);
@@ -360,7 +372,8 @@ void glue_affmul::apply_noalias_rectangle(Mat<typename T1::elem_type>& out, cons
 			tmp_mem[A_n_cols - 1] = eT(1);
 
 			out = A * tmp;
-		} else {
+		}
+		else {
 			Mat<eT> tmp(A_n_cols, B_n_cols);
 
 			for(uword col = 0; col < B_n_cols; ++col) {

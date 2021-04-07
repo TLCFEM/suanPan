@@ -57,7 +57,8 @@ void op_cov::apply(Mat<typename T1::elem_type>& out, const Op<Op<T1, op_htrans>,
 		const Mat<eT> tmp = in.m; // force the evaluation of Op<T1,op_htrans>
 
 		out = cov(tmp, norm_type);
-	} else {
+	}
+	else {
 		const unwrap<T1> U(in.m.m);
 		const Mat<eT>& A = U.M;
 

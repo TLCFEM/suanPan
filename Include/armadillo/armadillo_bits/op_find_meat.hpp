@@ -44,7 +44,8 @@ uword op_find::helper
 				++n_nz;
 			}
 		}
-	} else {
+	}
+	else {
 		const uword n_rows = A.get_n_rows();
 		const uword n_cols = A.get_n_cols();
 
@@ -100,15 +101,35 @@ uword op_find::helper
 			bool not_zero_i;
 			bool not_zero_j;
 
-			if(is_same_type<op_type, op_rel_lt_pre>::yes) { not_zero_i = (val < tpi); } else if(is_same_type<op_type, op_rel_lt_post>::yes) { not_zero_i = (tpi < val); } else if(is_same_type<op_type, op_rel_gt_pre>::yes) { not_zero_i = (val > tpi); } else if(is_same_type<op_type, op_rel_gt_post>::yes) { not_zero_i = (tpi > val); } else if(is_same_type<op_type, op_rel_lteq_pre>::yes) { not_zero_i = (val <= tpi); } else if(is_same_type<op_type, op_rel_lteq_post>::yes) { not_zero_i = (tpi <= val); } else if(is_same_type<op_type, op_rel_gteq_pre>::yes) { not_zero_i = (val >= tpi); } else if(is_same_type<op_type, op_rel_gteq_post>::yes) { not_zero_i = (tpi >= val); } else if(is_same_type<op_type, op_rel_eq>::yes) { not_zero_i = (tpi == val); } else if(is_same_type<op_type, op_rel_noteq>::yes) { not_zero_i = (tpi != val); } else { not_zero_i = false; }
+			if(is_same_type<op_type, op_rel_lt_pre>::yes) { not_zero_i = (val < tpi); }
+			else if(is_same_type<op_type, op_rel_lt_post>::yes) { not_zero_i = (tpi < val); }
+			else if(is_same_type<op_type, op_rel_gt_pre>::yes) { not_zero_i = (val > tpi); }
+			else if(is_same_type<op_type, op_rel_gt_post>::yes) { not_zero_i = (tpi > val); }
+			else if(is_same_type<op_type, op_rel_lteq_pre>::yes) { not_zero_i = (val <= tpi); }
+			else if(is_same_type<op_type, op_rel_lteq_post>::yes) { not_zero_i = (tpi <= val); }
+			else if(is_same_type<op_type, op_rel_gteq_pre>::yes) { not_zero_i = (val >= tpi); }
+			else if(is_same_type<op_type, op_rel_gteq_post>::yes) { not_zero_i = (tpi >= val); }
+			else if(is_same_type<op_type, op_rel_eq>::yes) { not_zero_i = (tpi == val); }
+			else if(is_same_type<op_type, op_rel_noteq>::yes) { not_zero_i = (tpi != val); }
+			else { not_zero_i = false; }
 
-			if(is_same_type<op_type, op_rel_lt_pre>::yes) { not_zero_j = (val < tpj); } else if(is_same_type<op_type, op_rel_lt_post>::yes) { not_zero_j = (tpj < val); } else if(is_same_type<op_type, op_rel_gt_pre>::yes) { not_zero_j = (val > tpj); } else if(is_same_type<op_type, op_rel_gt_post>::yes) { not_zero_j = (tpj > val); } else if(is_same_type<op_type, op_rel_lteq_pre>::yes) { not_zero_j = (val <= tpj); } else if(is_same_type<op_type, op_rel_lteq_post>::yes) { not_zero_j = (tpj <= val); } else if(is_same_type<op_type, op_rel_gteq_pre>::yes) { not_zero_j = (val >= tpj); } else if(is_same_type<op_type, op_rel_gteq_post>::yes) { not_zero_j = (tpj >= val); } else if(is_same_type<op_type, op_rel_eq>::yes) { not_zero_j = (tpj == val); } else if(is_same_type<op_type, op_rel_noteq>::yes) { not_zero_j = (tpj != val); } else { not_zero_j = false; }
+			if(is_same_type<op_type, op_rel_lt_pre>::yes) { not_zero_j = (val < tpj); }
+			else if(is_same_type<op_type, op_rel_lt_post>::yes) { not_zero_j = (tpj < val); }
+			else if(is_same_type<op_type, op_rel_gt_pre>::yes) { not_zero_j = (val > tpj); }
+			else if(is_same_type<op_type, op_rel_gt_post>::yes) { not_zero_j = (tpj > val); }
+			else if(is_same_type<op_type, op_rel_lteq_pre>::yes) { not_zero_j = (val <= tpj); }
+			else if(is_same_type<op_type, op_rel_lteq_post>::yes) { not_zero_j = (tpj <= val); }
+			else if(is_same_type<op_type, op_rel_gteq_pre>::yes) { not_zero_j = (val >= tpj); }
+			else if(is_same_type<op_type, op_rel_gteq_post>::yes) { not_zero_j = (tpj >= val); }
+			else if(is_same_type<op_type, op_rel_eq>::yes) { not_zero_j = (tpj == val); }
+			else if(is_same_type<op_type, op_rel_noteq>::yes) { not_zero_j = (tpj != val); }
+			else { not_zero_j = false; }
 
-			if(not_zero_i == true) {
+			if(not_zero_i) {
 				indices_mem[n_nz] = i;
 				++n_nz;
 			}
-			if(not_zero_j == true) {
+			if(not_zero_j) {
 				indices_mem[n_nz] = j;
 				++n_nz;
 			}
@@ -119,14 +140,25 @@ uword op_find::helper
 
 			const eT tmp = PA[i];
 
-			if(is_same_type<op_type, op_rel_lt_pre>::yes) { not_zero = (val < tmp); } else if(is_same_type<op_type, op_rel_lt_post>::yes) { not_zero = (tmp < val); } else if(is_same_type<op_type, op_rel_gt_pre>::yes) { not_zero = (val > tmp); } else if(is_same_type<op_type, op_rel_gt_post>::yes) { not_zero = (tmp > val); } else if(is_same_type<op_type, op_rel_lteq_pre>::yes) { not_zero = (val <= tmp); } else if(is_same_type<op_type, op_rel_lteq_post>::yes) { not_zero = (tmp <= val); } else if(is_same_type<op_type, op_rel_gteq_pre>::yes) { not_zero = (val >= tmp); } else if(is_same_type<op_type, op_rel_gteq_post>::yes) { not_zero = (tmp >= val); } else if(is_same_type<op_type, op_rel_eq>::yes) { not_zero = (tmp == val); } else if(is_same_type<op_type, op_rel_noteq>::yes) { not_zero = (tmp != val); } else { not_zero = false; }
+			if(is_same_type<op_type, op_rel_lt_pre>::yes) { not_zero = (val < tmp); }
+			else if(is_same_type<op_type, op_rel_lt_post>::yes) { not_zero = (tmp < val); }
+			else if(is_same_type<op_type, op_rel_gt_pre>::yes) { not_zero = (val > tmp); }
+			else if(is_same_type<op_type, op_rel_gt_post>::yes) { not_zero = (tmp > val); }
+			else if(is_same_type<op_type, op_rel_lteq_pre>::yes) { not_zero = (val <= tmp); }
+			else if(is_same_type<op_type, op_rel_lteq_post>::yes) { not_zero = (tmp <= val); }
+			else if(is_same_type<op_type, op_rel_gteq_pre>::yes) { not_zero = (val >= tmp); }
+			else if(is_same_type<op_type, op_rel_gteq_post>::yes) { not_zero = (tmp >= val); }
+			else if(is_same_type<op_type, op_rel_eq>::yes) { not_zero = (tmp == val); }
+			else if(is_same_type<op_type, op_rel_noteq>::yes) { not_zero = (tmp != val); }
+			else { not_zero = false; }
 
-			if(not_zero == true) {
+			if(not_zero) {
 				indices_mem[n_nz] = i;
 				++n_nz;
 			}
 		}
-	} else {
+	}
+	else {
 		const uword n_rows = A.get_n_rows();
 		const uword n_cols = A.get_n_cols();
 
@@ -138,9 +170,19 @@ uword op_find::helper
 
 				bool not_zero;
 
-				if(is_same_type<op_type, op_rel_lt_pre>::yes) { not_zero = (val < tmp); } else if(is_same_type<op_type, op_rel_lt_post>::yes) { not_zero = (tmp < val); } else if(is_same_type<op_type, op_rel_gt_pre>::yes) { not_zero = (val > tmp); } else if(is_same_type<op_type, op_rel_gt_post>::yes) { not_zero = (tmp > val); } else if(is_same_type<op_type, op_rel_lteq_pre>::yes) { not_zero = (val <= tmp); } else if(is_same_type<op_type, op_rel_lteq_post>::yes) { not_zero = (tmp <= val); } else if(is_same_type<op_type, op_rel_gteq_pre>::yes) { not_zero = (val >= tmp); } else if(is_same_type<op_type, op_rel_gteq_post>::yes) { not_zero = (tmp >= val); } else if(is_same_type<op_type, op_rel_eq>::yes) { not_zero = (tmp == val); } else if(is_same_type<op_type, op_rel_noteq>::yes) { not_zero = (tmp != val); } else { not_zero = false; }
+				if(is_same_type<op_type, op_rel_lt_pre>::yes) { not_zero = (val < tmp); }
+				else if(is_same_type<op_type, op_rel_lt_post>::yes) { not_zero = (tmp < val); }
+				else if(is_same_type<op_type, op_rel_gt_pre>::yes) { not_zero = (val > tmp); }
+				else if(is_same_type<op_type, op_rel_gt_post>::yes) { not_zero = (tmp > val); }
+				else if(is_same_type<op_type, op_rel_lteq_pre>::yes) { not_zero = (val <= tmp); }
+				else if(is_same_type<op_type, op_rel_lteq_post>::yes) { not_zero = (tmp <= val); }
+				else if(is_same_type<op_type, op_rel_gteq_pre>::yes) { not_zero = (val >= tmp); }
+				else if(is_same_type<op_type, op_rel_gteq_post>::yes) { not_zero = (tmp >= val); }
+				else if(is_same_type<op_type, op_rel_eq>::yes) { not_zero = (tmp == val); }
+				else if(is_same_type<op_type, op_rel_noteq>::yes) { not_zero = (tmp != val); }
+				else { not_zero = false; }
 
-				if(not_zero == true) {
+				if(not_zero) {
 					indices_mem[n_nz] = i;
 					++n_nz;
 				}
@@ -185,14 +227,17 @@ uword op_find::helper
 
 			bool not_zero;
 
-			if(is_same_type<op_type, op_rel_eq>::yes) { not_zero = (tmp == val); } else if(is_same_type<op_type, op_rel_noteq>::yes) { not_zero = (tmp != val); } else { not_zero = false; }
+			if(is_same_type<op_type, op_rel_eq>::yes) { not_zero = (tmp == val); }
+			else if(is_same_type<op_type, op_rel_noteq>::yes) { not_zero = (tmp != val); }
+			else { not_zero = false; }
 
-			if(not_zero == true) {
+			if(not_zero) {
 				indices_mem[n_nz] = i;
 				++n_nz;
 			}
 		}
-	} else {
+	}
+	else {
 		const uword n_rows = A.get_n_rows();
 		const uword n_cols = A.get_n_cols();
 
@@ -204,9 +249,11 @@ uword op_find::helper
 
 				bool not_zero;
 
-				if(is_same_type<op_type, op_rel_eq>::yes) { not_zero = (tmp == val); } else if(is_same_type<op_type, op_rel_noteq>::yes) { not_zero = (tmp != val); } else { not_zero = false; }
+				if(is_same_type<op_type, op_rel_eq>::yes) { not_zero = (tmp == val); }
+				else if(is_same_type<op_type, op_rel_noteq>::yes) { not_zero = (tmp != val); }
+				else { not_zero = false; }
 
-				if(not_zero == true) {
+				if(not_zero) {
 					indices_mem[n_nz] = i;
 					++n_nz;
 				}
@@ -259,9 +306,17 @@ uword op_find::helper
 
 		bool not_zero;
 
-		if(is_same_type<glue_type, glue_rel_lt>::yes) { not_zero = (tmp1 < tmp2); } else if(is_same_type<glue_type, glue_rel_gt>::yes) { not_zero = (tmp1 > tmp2); } else if(is_same_type<glue_type, glue_rel_lteq>::yes) { not_zero = (tmp1 <= tmp2); } else if(is_same_type<glue_type, glue_rel_gteq>::yes) { not_zero = (tmp1 >= tmp2); } else if(is_same_type<glue_type, glue_rel_eq>::yes) { not_zero = (tmp1 == tmp2); } else if(is_same_type<glue_type, glue_rel_noteq>::yes) { not_zero = (tmp1 != tmp2); } else if(is_same_type<glue_type, glue_rel_and>::yes) { not_zero = (tmp1 && tmp2); } else if(is_same_type<glue_type, glue_rel_or>::yes) { not_zero = (tmp1 || tmp2); } else { not_zero = false; }
+		if(is_same_type<glue_type, glue_rel_lt>::yes) { not_zero = (tmp1 < tmp2); }
+		else if(is_same_type<glue_type, glue_rel_gt>::yes) { not_zero = (tmp1 > tmp2); }
+		else if(is_same_type<glue_type, glue_rel_lteq>::yes) { not_zero = (tmp1 <= tmp2); }
+		else if(is_same_type<glue_type, glue_rel_gteq>::yes) { not_zero = (tmp1 >= tmp2); }
+		else if(is_same_type<glue_type, glue_rel_eq>::yes) { not_zero = (tmp1 == tmp2); }
+		else if(is_same_type<glue_type, glue_rel_noteq>::yes) { not_zero = (tmp1 != tmp2); }
+		else if(is_same_type<glue_type, glue_rel_and>::yes) { not_zero = (tmp1 && tmp2); }
+		else if(is_same_type<glue_type, glue_rel_or>::yes) { not_zero = (tmp1 || tmp2); }
+		else { not_zero = false; }
 
-		if(not_zero == true) {
+		if(not_zero) {
 			indices_mem[n_nz] = i;
 			++n_nz;
 		}
@@ -306,14 +361,17 @@ uword op_find::helper
 		for(uword i = 0; i < n_elem; ++i) {
 			bool not_zero;
 
-			if(is_same_type<glue_type, glue_rel_eq>::yes) { not_zero = (PA[i] == PB[i]); } else if(is_same_type<glue_type, glue_rel_noteq>::yes) { not_zero = (PA[i] != PB[i]); } else { not_zero = false; }
+			if(is_same_type<glue_type, glue_rel_eq>::yes) { not_zero = (PA[i] == PB[i]); }
+			else if(is_same_type<glue_type, glue_rel_noteq>::yes) { not_zero = (PA[i] != PB[i]); }
+			else { not_zero = false; }
 
-			if(not_zero == true) {
+			if(not_zero) {
 				indices_mem[n_nz] = i;
 				++n_nz;
 			}
 		}
-	} else {
+	}
+	else {
 		const uword n_rows = A.get_n_rows();
 		const uword n_cols = A.get_n_cols();
 
@@ -323,9 +381,11 @@ uword op_find::helper
 			for(uword row = 0; row < n_rows; ++row) {
 				bool not_zero;
 
-				if(is_same_type<glue_type, glue_rel_eq>::yes) { not_zero = (A.at(row, col) == B.at(row, col)); } else if(is_same_type<glue_type, glue_rel_noteq>::yes) { not_zero = (A.at(row, col) != B.at(row, col)); } else { not_zero = false; }
+				if(is_same_type<glue_type, glue_rel_eq>::yes) { not_zero = (A.at(row, col) == B.at(row, col)); }
+				else if(is_same_type<glue_type, glue_rel_noteq>::yes) { not_zero = (A.at(row, col) != B.at(row, col)); }
+				else { not_zero = false; }
 
-				if(not_zero == true) {
+				if(not_zero) {
 					indices_mem[n_nz] = i;
 					++n_nz;
 				}
@@ -351,11 +411,13 @@ void op_find::apply(Mat<uword>& out, const mtOp<uword, T1, op_find>& X) {
 		if(type == 0) // "first"
 		{
 			out = (k > 0 && k <= n_nz) ? indices.rows(0, k - 1) : indices.rows(0, n_nz - 1);
-		} else // "last"
+		}
+		else // "last"
 		{
 			out = (k > 0 && k <= n_nz) ? indices.rows(n_nz - k, n_nz - 1) : indices.rows(0, n_nz - 1);
 		}
-	} else {
+	}
+	else {
 		out.set_size(0, 1); // empty column vector
 	}
 }
@@ -396,7 +458,8 @@ void op_find_finite::apply(Mat<uword>& out, const mtOp<uword, T1, op_find_finite
 				count++;
 			}
 		}
-	} else {
+	}
+	else {
 		const uword n_rows = P.get_n_rows();
 		const uword n_cols = P.get_n_cols();
 
@@ -438,7 +501,8 @@ void op_find_nonfinite::apply(Mat<uword>& out, const mtOp<uword, T1, op_find_non
 				count++;
 			}
 		}
-	} else {
+	}
+	else {
 		const uword n_rows = P.get_n_rows();
 		const uword n_cols = P.get_n_cols();
 

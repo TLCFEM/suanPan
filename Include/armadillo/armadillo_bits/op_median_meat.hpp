@@ -20,11 +20,12 @@
 //! For each row or for each column, find the median value.
 //! The result is stored in a dense matrix that has either one column or one row.
 //! The dimension, for which the medians are found, is set via the median() function.
-template<typename T1> inline
-void op_median::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_median>& in) {
+template<typename eT, typename T1> inline
+void op_median::apply(Mat<eT>& out, const Op<T1, op_median>& in, const typename arma_not_cx<eT>::result* junk) {
 	arma_extra_debug_sigprint();
+	arma_ignore(junk);
 
-	typedef typename T1::elem_type eT;
+	// typedef typename T1::elem_type eT;
 
 	const uword dim = in.aux_uword_a;
 	arma_debug_check((dim > 1), "median(): parameter 'dim' must be 0 or 1");
@@ -35,7 +36,7 @@ void op_median::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_median>&
 
 	const bool is_alias = P.is_alias(out);
 
-	if((is_Mat<P_stored_type>::value == true) || is_alias) {
+	if(is_Mat<P_stored_type>::value || is_alias) {
 		const unwrap_check<P_stored_type> tmp(P.Q, is_alias);
 
 		const typename unwrap_check<P_stored_type>::stored_type& X = tmp.M;
@@ -58,7 +59,8 @@ void op_median::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_median>&
 					out[col] = op_median::direct_median(tmp_vec);
 				}
 			}
-		} else // in each row
+		}
+		else // in each row
 		{
 			arma_extra_debug_print("op_median::apply(): dim = 1");
 
@@ -74,7 +76,8 @@ void op_median::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_median>&
 				}
 			}
 		}
-	} else {
+	}
+	else {
 		const uword P_n_rows = P.get_n_rows();
 		const uword P_n_cols = P.get_n_cols();
 
@@ -93,7 +96,8 @@ void op_median::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_median>&
 					out[col] = op_median::direct_median(tmp_vec);
 				}
 			}
-		} else // in each row
+		}
+		else // in each row
 		{
 			arma_extra_debug_print("op_median::apply(): dim = 1");
 
@@ -113,11 +117,13 @@ void op_median::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_median>&
 }
 
 //! Implementation for complex numbers
-template<typename T, typename T1> inline
-void op_median::apply(Mat<std::complex<T>>& out, const Op<T1, op_median>& in) {
+template<typename eT, typename T1> inline
+void op_median::apply(Mat<eT>& out, const Op<T1, op_median>& in, const typename arma_cx_only<eT>::result* junk) {
 	arma_extra_debug_sigprint();
+	arma_ignore(junk);
 
-	typedef typename std::complex<T> eT;
+	// typedef typename std::complex<T> eT;
+	typedef typename get_pod_type<eT>::result T;
 
 	arma_type_check(( is_same_type<eT, typename T1::elem_type>::no ));
 
@@ -154,7 +160,8 @@ void op_median::apply(Mat<std::complex<T>>& out, const Op<T1, op_median>& in) {
 				out[col] = op_mean::robust_mean(colmem[index1], colmem[index2]);
 			}
 		}
-	} else if(dim == 1) // in each row
+	}
+	else if(dim == 1) // in each row
 	{
 		arma_extra_debug_print("op_median::apply(): dim = 1");
 
@@ -204,24 +211,28 @@ typename T1::elem_type op_median::median_vec
 
 	std::vector<eT> tmp_vec(n_elem);
 
-	if(is_Mat<P_stored_type>::value == true) {
+	if(is_Mat<P_stored_type>::value) {
 		const unwrap<P_stored_type> tmp(P.Q);
 
 		const typename unwrap<P_stored_type>::stored_type& Y = tmp.M;
 
 		arrayops::copy(&(tmp_vec[0]), Y.memptr(), n_elem);
-	} else {
+	}
+	else {
 		if(Proxy<T1>::use_at == false) {
 			typedef typename Proxy<T1>::ea_type ea_type;
 
 			ea_type A = P.get_ea();
 
 			for(uword i = 0; i < n_elem; ++i) { tmp_vec[i] = A[i]; }
-		} else {
+		}
+		else {
 			const uword n_rows = P.get_n_rows();
 			const uword n_cols = P.get_n_cols();
 
-			if(n_cols == 1) { for(uword row = 0; row < n_rows; ++row) { tmp_vec[row] = P.at(row, 0); } } else if(n_rows == 1) { for(uword col = 0; col < n_cols; ++col) { tmp_vec[col] = P.at(0, col); } } else { arma_stop_logic_error("op_median::median_vec(): expected a vector"); }
+			if(n_cols == 1) { for(uword row = 0; row < n_rows; ++row) { tmp_vec[row] = P.at(row, 0); } }
+			else if(n_rows == 1) { for(uword col = 0; col < n_cols; ++col) { tmp_vec[col] = P.at(0, col); } }
+			else { arma_stop_logic_error("op_median::median_vec(): expected a vector"); }
 		}
 	}
 
@@ -267,7 +278,8 @@ typename T1::elem_type op_median::median_vec
 		op_median::direct_cx_median_index(index1, index2, tmp_vec);
 
 		return op_mean::robust_mean(A[index1], A[index2]);
-	} else {
+	}
+	else {
 		const uword n_rows = P.get_n_rows();
 		const uword n_cols = P.get_n_cols();
 
@@ -282,7 +294,8 @@ typename T1::elem_type op_median::median_vec
 			op_median::direct_cx_median_index(index1, index2, tmp_vec);
 
 			return op_mean::robust_mean(P.at(index1, 0), P.at(index2, 0));
-		} else if(n_rows == 1) {
+		}
+		else if(n_rows == 1) {
 			for(uword col = 0; col < n_cols; ++col) {
 				tmp_vec[col].val = std::abs(P.at(0, col));
 				tmp_vec[col].index = col;
@@ -293,7 +306,8 @@ typename T1::elem_type op_median::median_vec
 			op_median::direct_cx_median_index(index1, index2, tmp_vec);
 
 			return op_mean::robust_mean(P.at(0, index1), P.at(0, index2));
-		} else {
+		}
+		else {
 			arma_stop_logic_error("op_median::median_vec(): expected a vector");
 
 			return eT(0);
@@ -324,7 +338,8 @@ eT op_median::direct_median(std::vector<eT>& X) {
 		const eT val2 = (*(std::max_element(start, pastend)));
 
 		return op_mean::robust_mean(val1, val2);
-	} else // odd number of elements
+	}
+	else // odd number of elements
 	{
 		return (*nth);
 	}
@@ -358,7 +373,8 @@ void op_median::direct_cx_median_index
 		typename std::vector<eT>::iterator pastend = start + half;
 
 		out_index2 = (*(std::max_element(start, pastend))).index;
-	} else // odd number of elements
+	}
+	else // odd number of elements
 	{
 		out_index2 = out_index1;
 	}

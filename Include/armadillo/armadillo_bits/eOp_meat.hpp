@@ -59,7 +59,11 @@ template<typename T1, typename eop_type> arma_inline
 typename T1::elem_type eOp<T1, eop_type>::operator[](const uword ii) const { return eop_core<eop_type>::process(P[ii], aux); }
 
 template<typename T1, typename eop_type> arma_inline
-typename T1::elem_type eOp<T1, eop_type>::at(const uword row, const uword col) const { if(is_row) { return eop_core<eop_type>::process(P.at(0, col), aux); } else if(is_col) { return eop_core<eop_type>::process(P.at(row, 0), aux); } else { return eop_core<eop_type>::process(P.at(row, col), aux); } }
+typename T1::elem_type eOp<T1, eop_type>::at(const uword row, const uword col) const {
+	if(is_row) { return eop_core<eop_type>::process(P.at(0, col), aux); }
+	else if(is_col) { return eop_core<eop_type>::process(P.at(row, 0), aux); }
+	else { return eop_core<eop_type>::process(P.at(row, col), aux); }
+}
 
 template<typename T1, typename eop_type> arma_inline
 typename T1::elem_type eOp<T1, eop_type>::at_alt(const uword ii) const { return eop_core<eop_type>::process(P.at_alt(ii), aux); }

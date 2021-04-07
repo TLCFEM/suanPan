@@ -35,7 +35,7 @@ bool qr
 	if(status == false) {
 		Q.soft_reset();
 		R.soft_reset();
-		arma_debug_warn("qr(): decomposition failed");
+		arma_debug_warn_level(3, "qr(): decomposition failed");
 	}
 
 	return status;
@@ -60,7 +60,7 @@ bool qr_econ
 	if(status == false) {
 		Q.soft_reset();
 		R.soft_reset();
-		arma_debug_warn("qr_econ(): decomposition failed");
+		arma_debug_warn_level(3, "qr_econ(): decomposition failed");
 	}
 
 	return status;
@@ -86,7 +86,8 @@ typename enable_if2<is_supported_blas_type<typename T1::elem_type>::value, bool>
 
 	bool status = false;
 
-	if(sig == 'v') { status = auxlib::qr_pivot(Q, R, P, X); } else if(sig == 'm') {
+	if(sig == 'v') { status = auxlib::qr_pivot(Q, R, P, X); }
+	else if(sig == 'm') {
 		Mat<uword> P_vec;
 
 		status = auxlib::qr_pivot(Q, R, P_vec, X);
@@ -106,7 +107,7 @@ typename enable_if2<is_supported_blas_type<typename T1::elem_type>::value, bool>
 		Q.soft_reset();
 		R.soft_reset();
 		P.soft_reset();
-		arma_debug_warn("qr(): decomposition failed");
+		arma_debug_warn_level(3, "qr(): decomposition failed");
 	}
 
 	return status;

@@ -42,10 +42,12 @@ void internal_randperm_helper(obj_type& x, const uword N, const uword N_keep) {
 			typename std::vector<packet>::iterator pastlast = packet_vec.end();
 
 			std::partial_sort(first, nth, pastlast, comparator);
-		} else { std::sort(packet_vec.begin(), packet_vec.end(), comparator); }
+		}
+		else { std::sort(packet_vec.begin(), packet_vec.end(), comparator); }
 	}
 
-	if(is_Row<obj_type>::value) { x.set_size(1, N_keep); } else { x.set_size(N_keep, 1); }
+	if(is_Row<obj_type>::value) { x.set_size(1, N_keep); }
+	else { x.set_size(N_keep, 1); }
 
 	eT* x_mem = x.memptr();
 

@@ -65,7 +65,7 @@ public:
 	arma_inline eT* memptr();
 	arma_inline const eT* memptr() const;
 
-	arma_hot inline void copy_row(const Mat<eT>& A, const uword row);
+	inline void copy_row(const Mat<eT>& A, const uword row);
 
 protected:
 

@@ -28,7 +28,8 @@ template<typename eT> inline arma_counter<eT>::arma_counter()
 
 template<typename eT> inline
 const arma_counter<eT>& arma_counter<eT>::operator++() {
-	if(i_count < ARMA_MAX_UWORD) { i_count++; } else {
+	if(i_count < ARMA_MAX_UWORD) { i_count++; }
+	else {
 		d_count += eT(ARMA_MAX_UWORD);
 		i_count = 1;
 	}
@@ -49,10 +50,16 @@ template<typename eT> inline
 eT arma_counter<eT>::value() const { return d_count + eT(i_count); }
 
 template<typename eT> inline
-eT arma_counter<eT>::value_plus_1() const { if(i_count < ARMA_MAX_UWORD) { return d_count + eT(i_count + 1); } else { return d_count + eT(ARMA_MAX_UWORD) + eT(1); } }
+eT arma_counter<eT>::value_plus_1() const {
+	if(i_count < ARMA_MAX_UWORD) { return d_count + eT(i_count + 1); }
+	else { return d_count + eT(ARMA_MAX_UWORD) + eT(1); }
+}
 
 template<typename eT> inline
-eT arma_counter<eT>::value_minus_1() const { if(i_count > 0) { return d_count + eT(i_count - 1); } else { return d_count - eT(1); } }
+eT arma_counter<eT>::value_minus_1() const {
+	if(i_count > 0) { return d_count + eT(i_count - 1); }
+	else { return d_count - eT(1); }
+}
 
 //
 
@@ -76,7 +83,7 @@ void running_stat<eT>::operator()(const typename running_stat<eT>::T sample) {
 	arma_extra_debug_sigprint();
 
 	if(arma_isfinite(sample) == false) {
-		arma_debug_warn("running_stat: sample ignored as it is non-finite");
+		arma_debug_warn_level(3, "running_stat: sample ignored as it is non-finite");
 		return;
 	}
 
@@ -89,7 +96,7 @@ void running_stat<eT>::operator()(const std::complex<typename running_stat<eT>::
 	arma_extra_debug_sigprint();
 
 	if(arma_isfinite(sample) == false) {
-		arma_debug_warn("running_stat: sample ignored as it is non-finite");
+		arma_debug_warn_level(3, "running_stat: sample ignored as it is non-finite");
 		return;
 	}
 
@@ -131,11 +138,13 @@ typename running_stat<eT>::T running_stat<eT>::var(const uword norm_type) const 
 	const T N = counter.value();
 
 	if(N > T(1)) {
-		if(norm_type == 0) { return r_var; } else {
+		if(norm_type == 0) { return r_var; }
+		else {
 			const T N_minus_1 = counter.value_minus_1();
 			return (N_minus_1 / N) * r_var;
 		}
-	} else { return T(0); }
+	}
+	else { return T(0); }
 }
 
 //! standard deviation
@@ -204,7 +213,8 @@ void running_stat_aux::update_stats(running_stat<eT>& x, const eT sample, const 
 		x.r_mean = x.r_mean + (sample - x.r_mean) / N_plus_1;
 		//x.r_mean = (N/N_plus_1)*x.r_mean + sample/N_plus_1;
 		//x.r_mean = (x.r_mean + sample/N) * N/N_plus_1;
-	} else {
+	}
+	else {
 		x.r_mean = sample;
 		x.min_val = sample;
 		x.max_val = sample;
@@ -266,7 +276,8 @@ void running_stat_aux::update_stats(running_stat<eT>& x, const eT& sample, const
 		x.r_mean = x.r_mean + (sample - x.r_mean) / N_plus_1;
 		//x.r_mean = (N/N_plus_1)*x.r_mean + sample/N_plus_1;
 		//x.r_mean = (x.r_mean + sample/N) * N/N_plus_1;
-	} else {
+	}
+	else {
 		x.r_mean = sample;
 		x.min_val = sample;
 		x.max_val = sample;

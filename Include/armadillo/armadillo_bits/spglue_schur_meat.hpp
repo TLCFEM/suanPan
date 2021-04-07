@@ -28,7 +28,8 @@ void spglue_schur::apply(SpMat<typename T1::elem_type>& out, const SpGlue<T1, T2
 
 	const bool is_alias = pa.is_alias(out) || pb.is_alias(out);
 
-	if(is_alias == false) { spglue_schur::apply_noalias(out, pa, pb); } else {
+	if(is_alias == false) { spglue_schur::apply_noalias(out, pa, pb); }
+	else {
 		SpMat<eT> tmp;
 
 		spglue_schur::apply_noalias(tmp, pa, pb);
@@ -83,11 +84,13 @@ void spglue_schur::apply_noalias(SpMat<eT>& out, const SpProxy<T1>& pa, const Sp
 
 			++x_it;
 			++y_it;
-		} else {
+		}
+		else {
 			if((x_it_col < y_it_col) || ((x_it_col == y_it_col) && (x_it_row < y_it_row))) // if y is closer to the end
 			{
 				++x_it;
-			} else { ++y_it; }
+			}
+			else { ++y_it; }
 		}
 
 		arma_check((count > max_n_nonzero), "internal error: spglue_schur::apply_noalias(): count > max_n_nonzero");
@@ -101,7 +104,8 @@ void spglue_schur::apply_noalias(SpMat<eT>& out, const SpProxy<T1>& pa, const Sp
 	for(uword c = 1; c <= out_n_cols; ++c) { col_ptrs[c] += col_ptrs[c - 1]; }
 
 	if(count < max_n_nonzero) {
-		if(count <= (max_n_nonzero / 2)) { out.mem_resize(count); } else {
+		if(count <= (max_n_nonzero / 2)) { out.mem_resize(count); }
+		else {
 			// quick resize without reallocating memory and copying data
 			access::rw(out.n_nonzero) = count;
 			access::rw(out.values[count]) = eT(0);
@@ -168,7 +172,8 @@ void spglue_schur_misc::dense_schur_sparse(SpMat<typename T1::elem_type>& out, c
 	for(uword c = 1; c <= out.n_cols; ++c) { access::rw(out.col_ptrs[c]) += out.col_ptrs[c - 1]; }
 
 	if(count < max_n_nonzero) {
-		if(count <= (max_n_nonzero / 2)) { out.mem_resize(count); } else {
+		if(count <= (max_n_nonzero / 2)) { out.mem_resize(count); }
+		else {
 			// quick resize without reallocating memory and copying data
 			access::rw(out.n_nonzero) = count;
 			access::rw(out.values[count]) = eT(0);
@@ -206,7 +211,8 @@ void spglue_schur_mixed::apply(SpMat<typename eT_promoter<T1, T2>::eT>& out, con
 		const SpMat<out_eT>& BB = reinterpret_cast<const SpMat<out_eT>&>(B);
 
 		out = AA % BB;
-	} else if((is_same_type<eT1, out_eT>::yes) && (is_same_type<eT2, out_eT>::no)) {
+	}
+	else if((is_same_type<eT1, out_eT>::yes) && (is_same_type<eT2, out_eT>::no)) {
 		// upgrade T2 
 
 		const unwrap_spmat<T1> UA(expr.A);
@@ -222,7 +228,8 @@ void spglue_schur_mixed::apply(SpMat<typename eT_promoter<T1, T2>::eT>& out, con
 		for(uword i = 0; i < B.n_nonzero; ++i) { access::rw(BB.values[i]) = out_eT(B.values[i]); }
 
 		out = AA % BB;
-	} else {
+	}
+	else {
 		// upgrade T1 and T2
 
 		const unwrap_spmat<T1> UA(expr.A);

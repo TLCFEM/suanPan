@@ -27,7 +27,8 @@ void spglue_times::apply(SpMat<typename T1::elem_type>& out, const SpGlue<T1, T2
 
 	const bool is_alias = (UA.is_alias(out) || UB.is_alias(out));
 
-	if(is_alias == false) { spglue_times::apply_noalias(out, UA.M, UB.M); } else {
+	if(is_alias == false) { spglue_times::apply_noalias(out, UA.M, UB.M); }
+	else {
 		SpMat<eT> tmp;
 
 		spglue_times::apply_noalias(tmp, UA.M, UB.M);
@@ -47,7 +48,8 @@ void spglue_times::apply(SpMat<typename T1::elem_type>& out, const SpGlue<SpOp<T
 
 	const bool is_alias = (UA.is_alias(out) || UB.is_alias(out));
 
-	if(is_alias == false) { spglue_times::apply_noalias(out, UA.M, UB.M); } else {
+	if(is_alias == false) { spglue_times::apply_noalias(out, UA.M, UB.M); }
+	else {
 		SpMat<eT> tmp;
 
 		spglue_times::apply_noalias(tmp, UA.M, UB.M);
@@ -249,7 +251,8 @@ void spglue_times_misc::sparse_times_dense(Mat<typename T1::elem_type>& out, con
 		const SpMat<eT> tmp(y);
 
 		out = x * tmp;
-	} else {
+	}
+	else {
 		const unwrap_spmat<T1> UA(x);
 		const quasi_unwrap<T2> UB(y);
 
@@ -282,14 +285,16 @@ void spglue_times_misc::sparse_times_dense(Mat<typename T1::elem_type>& out, con
 				spglue_times_misc::dense_times_sparse(out, Bt, At);
 
 				op_strans::apply_mat(out, out); // since 'out' is square-sized, this will do an inplace transpose
-			} else {
+			}
+			else {
 				Mat<eT> tmp;
 
 				spglue_times_misc::dense_times_sparse(tmp, Bt, At);
 
 				op_strans::apply_mat(out, tmp);
 			}
-		} else {
+		}
+		else {
 			arma_extra_debug_print("using standard multiplication");
 
 			out.zeros(A_n_rows, B_n_cols);
@@ -320,7 +325,8 @@ void spglue_times_misc::dense_times_sparse(Mat<typename T1::elem_type>& out, con
 		const SpMat<eT> tmp(x);
 
 		out = tmp * y;
-	} else {
+	}
+	else {
 		const quasi_unwrap<T1> UA(x);
 		const unwrap_spmat<T2> UB(y);
 
@@ -363,7 +369,8 @@ void spglue_times_misc::dense_times_sparse(Mat<typename T1::elem_type>& out, con
             }
           }
 #endif
-			} else {
+			}
+			else {
 				arma_extra_debug_print("using standard multiplication");
 
 				typename SpMat<eT>::const_iterator B_it = B.begin();
@@ -414,7 +421,8 @@ void spglue_times_mixed::apply(SpMat<typename eT_promoter<T1, T2>::eT>& out, con
 		const SpMat<out_eT>& BB = reinterpret_cast<const SpMat<out_eT>&>(B);
 
 		out = AA * BB;
-	} else if((is_same_type<eT1, out_eT>::yes) && (is_same_type<eT2, out_eT>::no)) {
+	}
+	else if((is_same_type<eT1, out_eT>::yes) && (is_same_type<eT2, out_eT>::no)) {
 		// upgrade T2 
 
 		const unwrap_spmat<T1> UA(expr.A);
@@ -430,7 +438,8 @@ void spglue_times_mixed::apply(SpMat<typename eT_promoter<T1, T2>::eT>& out, con
 		for(uword i = 0; i < B.n_nonzero; ++i) { access::rw(BB.values[i]) = out_eT(B.values[i]); }
 
 		out = AA * BB;
-	} else {
+	}
+	else {
 		// upgrade T1 and T2
 
 		const unwrap_spmat<T1> UA(expr.A);
@@ -476,7 +485,8 @@ void spglue_times_mixed::sparse_times_dense(Mat<typename promote_type<typename T
 		const Mat<out_eT>& BB = reinterpret_cast<const Mat<out_eT>&>(B);
 
 		spglue_times_misc::sparse_times_dense(out, AA, BB);
-	} else if((is_same_type<eT1, out_eT>::yes) && (is_same_type<eT2, out_eT>::no)) {
+	}
+	else if((is_same_type<eT1, out_eT>::yes) && (is_same_type<eT2, out_eT>::no)) {
 		// upgrade T2 
 
 		const unwrap_spmat<T1> UA(X);
@@ -490,7 +500,8 @@ void spglue_times_mixed::sparse_times_dense(Mat<typename promote_type<typename T
 		const Mat<out_eT> BB = conv_to<Mat<out_eT>>::from(B);
 
 		spglue_times_misc::sparse_times_dense(out, AA, BB);
-	} else {
+	}
+	else {
 		// upgrade T1 and T2
 
 		const unwrap_spmat<T1> UA(X);
@@ -534,7 +545,8 @@ void spglue_times_mixed::dense_times_sparse(Mat<typename promote_type<typename T
 		const SpMat<out_eT>& BB = reinterpret_cast<const SpMat<out_eT>&>(B);
 
 		spglue_times_misc::dense_times_sparse(out, AA, BB);
-	} else if((is_same_type<eT1, out_eT>::yes) && (is_same_type<eT2, out_eT>::no)) {
+	}
+	else if((is_same_type<eT1, out_eT>::yes) && (is_same_type<eT2, out_eT>::no)) {
 		// upgrade T2 
 
 		const quasi_unwrap<T1> UA(X);
@@ -550,7 +562,8 @@ void spglue_times_mixed::dense_times_sparse(Mat<typename promote_type<typename T
 		for(uword i = 0; i < B.n_nonzero; ++i) { access::rw(BB.values[i]) = out_eT(B.values[i]); }
 
 		spglue_times_misc::dense_times_sparse(out, AA, BB);
-	} else {
+	}
+	else {
 		// upgrade T1 and T2
 
 		const quasi_unwrap<T1> UA(X);

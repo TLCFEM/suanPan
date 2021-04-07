@@ -33,7 +33,8 @@ void glue_trapz::apply(Mat<typename T1::elem_type>& out, const Glue<T1, T2, glue
 		glue_trapz::apply_noalias(tmp, UX.M, UY.M, dim);
 
 		out.steal_mem(tmp);
-	} else { glue_trapz::apply_noalias(out, UX.M, UY.M, dim); }
+	}
+	else { glue_trapz::apply_noalias(out, UX.M, UY.M, dim); }
 }
 
 template<typename eT> inline
@@ -46,10 +47,12 @@ void glue_trapz::apply_noalias(Mat<eT>& out, const Mat<eT>& X, const Mat<eT>& Y,
 
 	const uword N = X.n_elem;
 
-	if(dim == 0) { arma_debug_check((N != Y.n_rows), "trapz(): length of X must equal the number of rows in Y when dim=0"); } else if(dim == 1) { arma_debug_check((N != Y.n_cols), "trapz(): length of X must equal the number of columns in Y when dim=1"); }
+	if(dim == 0) { arma_debug_check((N != Y.n_rows), "trapz(): length of X must equal the number of rows in Y when dim=0"); }
+	else if(dim == 1) { arma_debug_check((N != Y.n_cols), "trapz(): length of X must equal the number of columns in Y when dim=1"); }
 
 	if(N <= 1) {
-		if(dim == 0) { out.zeros(1, Y.n_cols); } else if(dim == 1) { out.zeros(Y.n_rows, 1); }
+		if(dim == 0) { out.zeros(1, Y.n_cols); }
+		else if(dim == 1) { out.zeros(Y.n_rows, 1); }
 
 		return;
 	}
@@ -62,7 +65,8 @@ void glue_trapz::apply_noalias(Mat<eT>& out, const Mat<eT>& X, const Mat<eT>& Y,
 		const Row<eT> diff_X_t(const_cast<eT*>(diff_X.memptr()), diff_X.n_elem, false, true);
 
 		out = diff_X_t * (0.5 * (Y.rows(0, N - 2) + Y.rows(1, N - 1)));
-	} else if(dim == 1) { out = (0.5 * (Y.cols(0, N - 2) + Y.cols(1, N - 1))) * diff_X; }
+	}
+	else if(dim == 1) { out = (0.5 * (Y.cols(0, N - 2) + Y.cols(1, N - 1))) * diff_X; }
 }
 
 template<typename T1> inline
@@ -81,7 +85,8 @@ void op_trapz::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_trapz>& i
 		op_trapz::apply_noalias(tmp, UY.M, dim);
 
 		out.steal_mem(tmp);
-	} else { op_trapz::apply_noalias(out, UY.M, dim); }
+	}
+	else { op_trapz::apply_noalias(out, UY.M, dim); }
 }
 
 template<typename eT> inline
@@ -92,15 +97,18 @@ void op_trapz::apply_noalias(Mat<eT>& out, const Mat<eT>& Y, const uword dim) {
 
 	uword N = 0;
 
-	if(dim == 0) { N = Y.n_rows; } else if(dim == 1) { N = Y.n_cols; }
+	if(dim == 0) { N = Y.n_rows; }
+	else if(dim == 1) { N = Y.n_cols; }
 
 	if(N <= 1) {
-		if(dim == 0) { out.zeros(1, Y.n_cols); } else if(dim == 1) { out.zeros(Y.n_rows, 1); }
+		if(dim == 0) { out.zeros(1, Y.n_cols); }
+		else if(dim == 1) { out.zeros(Y.n_rows, 1); }
 
 		return;
 	}
 
-	if(dim == 0) { out = sum((0.5 * (Y.rows(0, N - 2) + Y.rows(1, N - 1))), 0); } else if(dim == 1) { out = sum((0.5 * (Y.cols(0, N - 2) + Y.cols(1, N - 1))), 1); }
+	if(dim == 0) { out = sum((0.5 * (Y.rows(0, N - 2) + Y.rows(1, N - 1))), 0); }
+	else if(dim == 1) { out = sum((0.5 * (Y.cols(0, N - 2) + Y.cols(1, N - 1))), 1); }
 }
 
 //! @}

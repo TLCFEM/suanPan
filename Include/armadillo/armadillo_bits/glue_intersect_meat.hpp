@@ -54,7 +54,8 @@ void glue_intersect::apply(Mat<typename T1::elem_type>& out, uvec& iA, uvec& iB,
 
 		A_uniq = UA.M.elem(A_uniq_indx);
 		B_uniq = UB.M.elem(B_uniq_indx);
-	} else {
+	}
+	else {
 		A_uniq = unique(UA.M);
 		B_uniq = unique(UB.M);
 	}
@@ -72,7 +73,8 @@ void glue_intersect::apply(Mat<typename T1::elem_type>& out, uvec& iA, uvec& iB,
 	if(calc_indx) {
 		C_sorted_indx = stable_sort_index(C);
 		C_sorted = C.elem(C_sorted_indx);
-	} else { C_sorted = sort(C); }
+	}
+	else { C_sorted = sort(C); }
 
 	const eT* C_sorted_mem = C_sorted.memptr();
 
@@ -104,7 +106,8 @@ void glue_intersect::apply(Mat<typename T1::elem_type>& out, uvec& iA, uvec& iB,
 
 		// NOTE: this relies on .elem() not changing the size of the output and not reallocating memory for the output
 		out_alias = C_sorted.elem(ii);
-	} else { out = C_sorted.elem(ii); }
+	}
+	else { out = C_sorted.elem(ii); }
 
 	if(calc_indx) {
 		iA = A_uniq_indx.elem(C_sorted_indx.elem(ii));

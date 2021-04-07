@@ -51,7 +51,8 @@ bool op_logmat::apply_direct(Mat<std::complex<typename T1::elem_type>>& out, con
 	for(uword i = 0; i < N; ++i) {
 		const T val = P[i];
 
-		if(val >= T(0)) { out.at(i, i) = std::log(val); } else { out.at(i, i) = std::log(std::complex<T>(val)); }
+		if(val >= T(0)) { out.at(i, i) = std::log(val); }
+		else { out.at(i, i) = std::log(std::complex<T>(val)); }
 	}
 
 	return true;
@@ -72,7 +73,8 @@ bool op_logmat::apply_direct(Mat<std::complex<typename T1::elem_type>>& out, con
 	if(A.n_elem == 0) {
 		out.reset();
 		return true;
-	} else if(A.n_elem == 1) {
+	}
+	else if(A.n_elem == 1) {
 		out.set_size(1, 1);
 		out[0] = std::log(std::complex<in_T>(A[0]));
 		return true;
@@ -86,7 +88,8 @@ bool op_logmat::apply_direct(Mat<std::complex<typename T1::elem_type>>& out, con
 		for(uword i = 0; i < N; ++i) {
 			const in_T val = A.at(i, i);
 
-			if(val >= in_T(0)) { out.at(i, i) = std::log(val); } else { out.at(i, i) = std::log(out_T(val)); }
+			if(val >= in_T(0)) { out.at(i, i) = std::log(val); }
+			else { out.at(i, i) = std::log(out_T(val)); }
 		}
 
 		return true;
@@ -99,6 +102,8 @@ bool op_logmat::apply_direct(Mat<std::complex<typename T1::elem_type>>& out, con
 #endif
 
 	if(try_sympd) {
+		arma_extra_debug_print("op_logmat: attempting sympd optimisation");
+
 		// if matrix A is sympd, all its eigenvalues are positive
 
 		Col<in_T> eigval;
@@ -125,7 +130,7 @@ bool op_logmat::apply_direct(Mat<std::complex<typename T1::elem_type>>& out, con
 			}
 		}
 
-		arma_extra_debug_print("warning: sympd optimisation failed");
+		arma_extra_debug_print("op_logmat: sympd optimisation failed");
 
 		// fallthrough if eigen decomposition failed or an eigenvalue is zero
 	}
@@ -170,7 +175,8 @@ bool op_logmat_cx::apply_direct(Mat<typename T1::elem_type>& out, const Op<T1, o
 		status = op_logmat_cx::apply_direct_noalias(tmp, P);
 
 		out.steal_mem(tmp);
-	} else { status = op_logmat_cx::apply_direct_noalias(out, P); }
+	}
+	else { status = op_logmat_cx::apply_direct_noalias(out, P); }
 
 	return status;
 }
@@ -204,7 +210,8 @@ bool op_logmat_cx::apply_direct(Mat<typename T1::elem_type>& out, const Base<typ
 	if(S.n_elem == 0) {
 		out.reset();
 		return true;
-	} else if(S.n_elem == 1) {
+	}
+	else if(S.n_elem == 1) {
 		out.set_size(1, 1);
 		out[0] = std::log(S[0]);
 		return true;
@@ -227,6 +234,8 @@ bool op_logmat_cx::apply_direct(Mat<typename T1::elem_type>& out, const Base<typ
 #endif
 
 	if(try_sympd) {
+		arma_extra_debug_print("op_logmat_cx: attempting sympd optimisation");
+
 		// if matrix S is sympd, all its eigenvalues are positive
 
 		Col<T> eigval;
@@ -253,7 +262,7 @@ bool op_logmat_cx::apply_direct(Mat<typename T1::elem_type>& out, const Base<typ
 			}
 		}
 
-		arma_extra_debug_print("warning: sympd optimisation failed");
+		arma_extra_debug_print("op_logmat_cx: sympd optimisation failed");
 
 		// fallthrough if eigen decomposition failed or an eigenvalue is zero
 	}
@@ -328,7 +337,7 @@ bool op_logmat_cx::apply_common(Mat<std::complex<T>>& out, Mat<std::complex<T>>&
 		iter++;
 	}
 
-	if(iter >= n_iters) { arma_debug_warn("logmat(): reached max iterations without full convergence"); }
+	if(iter >= n_iters) { arma_debug_warn_level(2, "logmat(): reached max iterations without full convergence"); }
 
 	S.diag() -= eT(1);
 

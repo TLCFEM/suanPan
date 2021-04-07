@@ -31,7 +31,8 @@ const Gen<obj_type, gen_ones> ones(const uword n_elem, const arma_empty_class ju
 	arma_ignore(junk1);
 	arma_ignore(junk2);
 
-	if(is_Row<obj_type>::value) { return Gen<obj_type, gen_ones>(1, n_elem); } else { return Gen<obj_type, gen_ones>(n_elem, 1); }
+	if(is_Row<obj_type>::value) { return Gen<obj_type, gen_ones>(1, n_elem); }
+	else { return Gen<obj_type, gen_ones>(n_elem, 1); }
 }
 
 arma_warn_unused
@@ -56,7 +57,8 @@ const Gen<obj_type, gen_ones> ones(const uword n_rows, const uword n_cols, const
 	arma_extra_debug_sigprint();
 	arma_ignore(junk);
 
-	if(is_Col<obj_type>::value) { arma_debug_check((n_cols != 1), "ones(): incompatible size"); } else if(is_Row<obj_type>::value) { arma_debug_check((n_rows != 1), "ones(): incompatible size"); }
+	if(is_Col<obj_type>::value) { arma_debug_check((n_cols != 1), "ones(): incompatible size"); }
+	else if(is_Row<obj_type>::value) { arma_debug_check((n_rows != 1), "ones(): incompatible size"); }
 
 	return Gen<obj_type, gen_ones>(n_rows, n_cols);
 }

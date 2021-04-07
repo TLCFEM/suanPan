@@ -28,7 +28,8 @@ void op_max::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_max>& in) {
 	const quasi_unwrap<T1> U(in.m);
 	const Mat<eT>& X = U.M;
 
-	if(U.is_alias(out) == false) { op_max::apply_noalias(out, X, dim); } else {
+	if(U.is_alias(out) == false) { op_max::apply_noalias(out, X, dim); }
+	else {
 		Mat<eT> tmp;
 
 		op_max::apply_noalias(tmp, X, dim);
@@ -55,7 +56,8 @@ void op_max::apply_noalias(Mat<eT>& out, const Mat<eT>& X, const uword dim, cons
 		eT* out_mem = out.memptr();
 
 		for(uword col = 0; col < X_n_cols; ++col) { out_mem[col] = op_max::direct_max(X.colptr(col), X_n_rows); }
-	} else if(dim == 1) {
+	}
+	else if(dim == 1) {
 		arma_extra_debug_print("op_max::apply(): dim = 1");
 
 		out.set_size(X_n_rows, (X_n_cols > 0) ? 1 : 0);
@@ -96,7 +98,8 @@ void op_max::apply_noalias(Mat<eT>& out, const Mat<eT>& X, const uword dim, cons
 		eT* out_mem = out.memptr();
 
 		for(uword col = 0; col < X_n_cols; ++col) { out_mem[col] = op_max::direct_max(X.colptr(col), X_n_rows); }
-	} else if(dim == 1) {
+	}
+	else if(dim == 1) {
 		arma_extra_debug_print("op_max::apply(): dim = 1");
 
 		out.set_size(X_n_rows, (X_n_cols > 0) ? 1 : 0);
@@ -120,7 +123,8 @@ void op_max::apply(Cube<typename T1::elem_type>& out, const OpCube<T1, op_max>& 
 
 	const unwrap_cube<T1> U(in.m);
 
-	if(U.is_alias(out) == false) { op_max::apply_noalias(out, U.M, dim); } else {
+	if(U.is_alias(out) == false) { op_max::apply_noalias(out, U.M, dim); }
+	else {
 		Cube<eT> tmp;
 
 		op_max::apply_noalias(tmp, U.M, dim);
@@ -150,7 +154,8 @@ void op_max::apply_noalias(Cube<eT>& out, const Cube<eT>& X, const uword dim, co
 
 			for(uword col = 0; col < X_n_cols; ++col) { out_mem[col] = op_max::direct_max(X.slice_colptr(slice, col), X_n_rows); }
 		}
-	} else if(dim == 1) {
+	}
+	else if(dim == 1) {
 		arma_extra_debug_print("op_max::apply(): dim = 1");
 
 		out.set_size(X_n_rows, (X_n_cols > 0) ? 1 : 0, X_n_slices);
@@ -172,7 +177,8 @@ void op_max::apply_noalias(Cube<eT>& out, const Cube<eT>& X, const uword dim, co
 				}
 			}
 		}
-	} else if(dim == 2) {
+	}
+	else if(dim == 2) {
 		arma_extra_debug_print("op_max::apply(): dim = 2");
 
 		out.set_size(X_n_rows, X_n_cols, (X_n_slices > 0) ? 1 : 0);
@@ -218,7 +224,8 @@ void op_max::apply_noalias(Cube<eT>& out, const Cube<eT>& X, const uword dim, co
 
 			for(uword col = 0; col < X_n_cols; ++col) { out_mem[col] = op_max::direct_max(X.slice_colptr(slice, col), X_n_rows); }
 		}
-	} else if(dim == 1) {
+	}
+	else if(dim == 1) {
 		arma_extra_debug_print("op_max::apply(): dim = 1");
 
 		out.set_size(X_n_rows, (X_n_cols > 0) ? 1 : 0, X_n_slices);
@@ -232,7 +239,8 @@ void op_max::apply_noalias(Cube<eT>& out, const Cube<eT>& X, const uword dim, co
 
 			for(uword row = 0; row < X_n_rows; ++row) { out_mem[row] = op_max::direct_max(tmp, row); }
 		}
-	} else if(dim == 2) {
+	}
+	else if(dim == 2) {
 		arma_extra_debug_print("op_max::apply(): dim = 2");
 
 		out.set_size(X_n_rows, X_n_cols, (X_n_slices > 0) ? 1 : 0);
@@ -382,7 +390,8 @@ eT op_max::max(const subview<eT>& X) {
 
 			if(tmp_i > max_val) { max_val = tmp_i; }
 		}
-	} else { for(uword col = 0; col < X_n_cols; ++col) { max_val = (std::max)(max_val, op_max::direct_max(X.colptr(col), X_n_rows)); } }
+	}
+	else { for(uword col = 0; col < X_n_cols; ++col) { max_val = (std::max)(max_val, op_max::direct_max(X.colptr(col), X_n_rows)); } }
 
 	return max_val;
 }
@@ -425,7 +434,8 @@ typename arma_not_cx<typename T1::elem_type>::result op_max::max(const Base<type
 
 			if(tmp_i > max_val) { max_val = tmp_i; }
 		}
-	} else {
+	}
+	else {
 		const uword n_rows = P.get_n_rows();
 		const uword n_cols = P.get_n_cols();
 
@@ -444,7 +454,8 @@ typename arma_not_cx<typename T1::elem_type>::result op_max::max(const Base<type
 
 				if(tmp_i > max_val) { max_val = tmp_i; }
 			}
-		} else {
+		}
+		else {
 			for(uword col = 0; col < n_cols; ++col) {
 				uword i, j;
 				for(i = 0, j = 1; j < n_rows; i += 2, j += 2) {
@@ -505,7 +516,8 @@ typename arma_not_cx<typename T1::elem_type>::result op_max::max(const BaseCube<
 
 			if(tmp_i > max_val) { max_val = tmp_i; }
 		}
-	} else {
+	}
+	else {
 		const uword n_rows = P.get_n_rows();
 		const uword n_cols = P.get_n_cols();
 		const uword n_slices = P.get_n_slices();
@@ -552,7 +564,8 @@ typename arma_not_cx<typename T1::elem_type>::result op_max::max_with_index(cons
 				best_index = i;
 			}
 		}
-	} else {
+	}
+	else {
 		const uword n_rows = P.get_n_rows();
 		const uword n_cols = P.get_n_cols();
 
@@ -565,7 +578,8 @@ typename arma_not_cx<typename T1::elem_type>::result op_max::max_with_index(cons
 					best_index = i;
 				}
 			}
-		} else if(n_cols == 1) {
+		}
+		else if(n_cols == 1) {
 			for(uword i = 0; i < n_rows; ++i) {
 				const eT tmp = P.at(i, 0);
 
@@ -574,7 +588,8 @@ typename arma_not_cx<typename T1::elem_type>::result op_max::max_with_index(cons
 					best_index = i;
 				}
 			}
-		} else {
+		}
+		else {
 			uword count = 0;
 
 			for(uword col = 0; col < n_cols; ++col)
@@ -626,7 +641,8 @@ typename arma_not_cx<typename T1::elem_type>::result op_max::max_with_index(cons
 				best_index = i;
 			}
 		}
-	} else {
+	}
+	else {
 		const uword n_rows = P.get_n_rows();
 		const uword n_cols = P.get_n_cols();
 		const uword n_slices = P.get_n_slices();
@@ -754,7 +770,8 @@ std::complex<T> op_max::max(const subview<std::complex<T>>& X) {
 		}
 
 		best_row = start_row;
-	} else {
+	}
+	else {
 		for(uword col = start_col; col < end_col_p1; ++col)
 			for(uword row = start_row; row < end_row_p1; ++row) {
 				const T tmp_val = std::abs(A.at(row, col));
@@ -806,7 +823,8 @@ typename arma_cx_only<typename T1::elem_type>::result op_max::max(const Base<typ
 		}
 
 		return (A[index]);
-	} else {
+	}
+	else {
 		const uword n_rows = P.get_n_rows();
 		const uword n_cols = P.get_n_cols();
 
@@ -822,7 +840,8 @@ typename arma_cx_only<typename T1::elem_type>::result op_max::max(const Base<typ
 					best_col = col;
 				}
 			}
-		} else {
+		}
+		else {
 			for(uword col = 0; col < n_cols; ++col)
 				for(uword row = 0; row < n_rows; ++row) {
 					const T tmp = std::abs(P.at(row, col));
@@ -876,7 +895,8 @@ typename arma_cx_only<typename T1::elem_type>::result op_max::max(const BaseCube
 		}
 
 		return (A[index]);
-	} else {
+	}
+	else {
 		const uword n_rows = P.get_n_rows();
 		const uword n_cols = P.get_n_cols();
 		const uword n_slices = P.get_n_slices();
@@ -935,7 +955,8 @@ typename arma_cx_only<typename T1::elem_type>::result op_max::max_with_index(con
 		index_of_max_val = best_index;
 
 		return (A[best_index]);
-	} else {
+	}
+	else {
 		const uword n_rows = P.get_n_rows();
 		const uword n_cols = P.get_n_cols();
 
@@ -954,7 +975,8 @@ typename arma_cx_only<typename T1::elem_type>::result op_max::max_with_index(con
 			}
 
 			best_index = best_col;
-		} else if(n_cols == 1) {
+		}
+		else if(n_cols == 1) {
 			for(uword row = 0; row < n_rows; ++row) {
 				const T tmp = std::abs(P.at(row, 0));
 
@@ -965,7 +987,8 @@ typename arma_cx_only<typename T1::elem_type>::result op_max::max_with_index(con
 			}
 
 			best_index = best_row;
-		} else {
+		}
+		else {
 			uword count = 0;
 
 			for(uword col = 0; col < n_cols; ++col)
@@ -1027,7 +1050,8 @@ typename arma_cx_only<typename T1::elem_type>::result op_max::max_with_index(con
 		index_of_max_val = best_index;
 
 		return (A[best_index]);
-	} else {
+	}
+	else {
 		const uword n_rows = P.get_n_rows();
 		const uword n_cols = P.get_n_cols();
 		const uword n_slices = P.get_n_slices();

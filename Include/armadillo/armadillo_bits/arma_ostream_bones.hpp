@@ -37,7 +37,7 @@ public:
 	template<typename eT> inline static std::streamsize modify_stream(std::ostream& o, const eT* data, const uword n_elem);
 	template<typename T> inline static std::streamsize modify_stream(std::ostream& o, const std::complex<T>* data, const uword n_elem);
 	template<typename eT> inline static std::streamsize modify_stream(std::ostream& o, typename SpMat<eT>::const_iterator begin, const uword n_elem, const typename arma_not_cx<eT>::result* junk = nullptr);
-	template<typename T> inline static std::streamsize modify_stream(std::ostream& o, typename SpMat<T>::const_iterator begin, const uword n_elem, const typename arma_cx_only<T>::result* junk = nullptr);
+	template<typename eT> inline static std::streamsize modify_stream(std::ostream& o, typename SpMat<eT>::const_iterator begin, const uword n_elem, const typename arma_cx_only<eT>::result* junk = nullptr);
 
 	template<typename eT> inline static void print_elem_zero(std::ostream& o, const bool modify);
 	template<typename eT> inline static void raw_print_elem_zero(std::ostream& o);
@@ -59,6 +59,10 @@ public:
 
 	arma_cold inline static void print(std::ostream& o, const SizeMat& S);
 	arma_cold inline static void print(std::ostream& o, const SizeCube& S);
+
+	template<typename eT> arma_cold inline static void brief_print(std::ostream& o, const Mat<eT>& m, const bool print_size = true);
+	template<typename eT> arma_cold inline static void brief_print(std::ostream& o, const Cube<eT>& m);
+	template<typename eT> arma_cold inline static void brief_print(std::ostream& o, const SpMat<eT>& m);
 };
 
 //! @}

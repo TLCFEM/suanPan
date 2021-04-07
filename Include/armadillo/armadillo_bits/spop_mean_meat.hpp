@@ -27,7 +27,8 @@ void spop_mean::apply(SpMat<typename T1::elem_type>& out, const SpOp<T1, spop_me
 
 	const SpProxy<T1> p(in.m);
 
-	if(p.is_alias(out) == false) { spop_mean::apply_noalias_fast(out, p, dim); } else {
+	if(p.is_alias(out) == false) { spop_mean::apply_noalias_fast(out, p, dim); }
+	else {
 		SpMat<eT> tmp;
 
 		spop_mean::apply_noalias_fast(tmp, p, dim);
@@ -75,7 +76,8 @@ void spop_mean::apply_noalias_fast
 			}
 
 			acc /= T(p_n_rows);
-		} else {
+		}
+		else {
 			for(uword col = 0; col < p_n_cols; ++col) {
 				acc_mem[col] = arrayops::accumulate
 				(
@@ -86,7 +88,8 @@ void spop_mean::apply_noalias_fast
 		}
 
 		out = acc;
-	} else if(dim == 1) // find the mean in each row
+	}
+	else if(dim == 1) // find the mean in each row
 	{
 		Col<eT> acc(p_n_rows, fill::zeros);
 
@@ -140,7 +143,8 @@ void spop_mean::apply_noalias_slow
 				const uword n_zero = p_n_rows - (end.pos() - it.pos());
 
 				out.at(0, col) = spop_mean::iterator_mean(it, end, n_zero, eT(0));
-			} else {
+			}
+			else {
 				out.at(0, col) = spop_mean::direct_mean
 				(
 					&p.get_values()[p.get_col_ptrs()[col]],
@@ -149,7 +153,8 @@ void spop_mean::apply_noalias_slow
 				);
 			}
 		}
-	} else if(dim == 1) // find the mean in each row
+	}
+	else if(dim == 1) // find the mean in each row
 	{
 		arma_extra_debug_print("spop_mean::apply_noalias(): dim = 1");
 
@@ -230,7 +235,8 @@ typename T1::elem_type spop_mean::mean_all(const SpBase<typename T1::elem_type, 
 		typename SpProxy<T1>::const_iterator_type end = p.end();
 
 		return spop_mean::iterator_mean(it, end, p.get_n_elem() - p.get_n_nonzero(), typename T1::elem_type(0));
-	} else // use_iterator == false; that is, we can directly access the values array
+	}
+	else // use_iterator == false; that is, we can directly access the values array
 	{
 		return spop_mean::direct_mean(p.get_values(), p.get_n_nonzero(), p.get_n_elem());
 	}

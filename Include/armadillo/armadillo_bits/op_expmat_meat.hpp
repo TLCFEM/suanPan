@@ -49,7 +49,8 @@ bool op_expmat::apply_direct(Mat<typename T1::elem_type>& out, const Base<typena
 		const uword N = (std::min)(out.n_rows, out.n_cols);
 
 		for(uword i = 0; i < N; ++i) { out.at(i, i) = std::exp(out.at(i, i)); }
-	} else {
+	}
+	else {
 		Mat<eT> A = expr.get_ref();
 
 		arma_debug_check((A.is_square() == false), "expmat(): given matrix must be square sized");
@@ -71,6 +72,8 @@ bool op_expmat::apply_direct(Mat<typename T1::elem_type>& out, const Base<typena
 #endif
 
 		if(try_sympd) {
+			arma_extra_debug_print("op_expmat: attempting sympd optimisation");
+
 			// if matrix A is sympd, all its eigenvalues are positive
 
 			Col<T> eigval;
@@ -86,7 +89,7 @@ bool op_expmat::apply_direct(Mat<typename T1::elem_type>& out, const Base<typena
 				return true;
 			}
 
-			arma_extra_debug_print("warning: sympd optimisation failed");
+			arma_extra_debug_print("op_expmat: sympd optimisation failed");
 
 			// fallthrough if eigen decomposition failed
 		}
@@ -122,7 +125,8 @@ bool op_expmat::apply_direct(Mat<typename T1::elem_type>& out, const Base<typena
 
 			E += c * X;
 
-			if(positive) { D += c * X; } else { D -= c * X; }
+			if(positive) { D += c * X; }
+			else { D -= c * X; }
 
 			positive = (positive) ? false : true;
 		}

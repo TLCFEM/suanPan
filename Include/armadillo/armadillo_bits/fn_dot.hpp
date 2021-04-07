@@ -149,10 +149,12 @@ namespace priv {
 
 				++a_it;
 				++b_it;
-			} else if((a_it.col() < b_it.col()) || ((a_it.col() == b_it.col()) && (a_it.row() < b_it.row()))) {
+			}
+			else if((a_it.col() < b_it.col()) || ((a_it.col() == b_it.col()) && (a_it.row() < b_it.row()))) {
 				// a_it is "behind"
 				++a_it;
-			} else {
+			}
+			else {
 				// b_it is "behind"
 				++b_it;
 			}
@@ -201,8 +203,10 @@ enable_if2
 		if(&A == &B) {
 			// We can do it directly!
 			return op_dot::direct_dot_arma(A.n_nonzero, A.values, A.values);
-		} else { return priv::dot_helper(pa, pb); }
-	} else { return priv::dot_helper(pa, pb); }
+		}
+		else { return priv::dot_helper(pa, pb); }
+	}
+	else { return priv::dot_helper(pa, pb); }
 }
 
 //! dot product of one dense and one sparse object

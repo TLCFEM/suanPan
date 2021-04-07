@@ -63,7 +63,8 @@ void op_diff::apply_noalias(Mat<eT>& out, const Mat<eT>& X, const uword k, const
 
 			out = out(span(0, n_rows - 1), span::all);
 		}
-	} else if(dim == 1) {
+	}
+	else if(dim == 1) {
 		if(n_cols <= k) {
 			out.set_size(n_rows, 0);
 			return;
@@ -83,7 +84,8 @@ void op_diff::apply_noalias(Mat<eT>& out, const Mat<eT>& X, const uword k, const
 
 				out_mem[col] = val1 - val0;
 			}
-		} else {
+		}
+		else {
 			for(uword col = 0; col < n_cols; ++col) {
 				eT* out_col_mem = out.colptr(col);
 
@@ -107,7 +109,8 @@ void op_diff::apply_noalias(Mat<eT>& out, const Mat<eT>& X, const uword k, const
 
 						out_mem[col] = val1 - val0;
 					}
-				} else {
+				}
+				else {
 					for(uword col = 0; col < n_cols; ++col) {
 						eT* col0_mem = out.colptr(col);
 						const eT* col1_mem = out.colptr(col + 1);
@@ -146,7 +149,8 @@ void op_diff::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_diff>& in)
 		op_diff::apply_noalias(tmp, U.M, k, dim);
 
 		out.steal_mem(tmp);
-	} else { op_diff::apply_noalias(out, U.M, k, dim); }
+	}
+	else { op_diff::apply_noalias(out, U.M, k, dim); }
 }
 
 template<typename T1> inline
@@ -172,7 +176,8 @@ void op_diff_vec::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_diff_v
 		op_diff::apply_noalias(tmp, U.M, k, dim);
 
 		out.steal_mem(tmp);
-	} else { op_diff::apply_noalias(out, U.M, k, dim); }
+	}
+	else { op_diff::apply_noalias(out, U.M, k, dim); }
 }
 
 //! @}

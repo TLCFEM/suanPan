@@ -38,7 +38,10 @@ enable_if2
 
 	const bool status = op_roots::apply_direct(out, X.get_ref());
 
-	if(status == false) { arma_debug_warn("roots(): eigen decomposition failed"); }
+	if(status == false) {
+		out.soft_reset();
+		arma_debug_warn_level(3, "roots(): eigen decomposition failed");
+	}
 
 	return status;
 }

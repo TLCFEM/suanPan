@@ -45,7 +45,8 @@ void spdiagview<eT>::operator=(const spdiagview<eT>& x) {
 		const Mat<eT> tmp(x);
 
 		(*this).operator=(tmp);
-	} else {
+	}
+	else {
 		const uword d_n_elem = d.n_elem;
 		const uword d_row_offset = d.row_offset;
 		const uword d_col_offset = d.col_offset;
@@ -164,7 +165,8 @@ void spdiagview<eT>::operator=(const Base<eT, T1>& o) {
 		spglue_merge::diagview_merge(tmp2, d_m, tmp1);
 
 		d_m.steal_mem(tmp2);
-	} else { for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) = x_mem[i]; } }
+	}
+	else { for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) = x_mem[i]; } }
 }
 
 template<typename eT> template<typename T1> inline
@@ -194,7 +196,8 @@ void spdiagview<eT>::operator+=(const Base<eT, T1>& o) {
 		const eT* x_mem = x.memptr();
 
 		for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) += x_mem[i]; }
-	} else {
+	}
+	else {
 		typename Proxy<T1>::ea_type Pea = P.get_ea();
 
 		for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) += Pea[i]; }
@@ -228,7 +231,8 @@ void spdiagview<eT>::operator-=(const Base<eT, T1>& o) {
 		const eT* x_mem = x.memptr();
 
 		for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) -= x_mem[i]; }
-	} else {
+	}
+	else {
 		typename Proxy<T1>::ea_type Pea = P.get_ea();
 
 		for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) -= Pea[i]; }
@@ -262,7 +266,8 @@ void spdiagview<eT>::operator%=(const Base<eT, T1>& o) {
 		const eT* x_mem = x.memptr();
 
 		for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) *= x_mem[i]; }
-	} else {
+	}
+	else {
 		typename Proxy<T1>::ea_type Pea = P.get_ea();
 
 		for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) *= Pea[i]; }
@@ -296,7 +301,8 @@ void spdiagview<eT>::operator/=(const Base<eT, T1>& o) {
 		const eT* x_mem = x.memptr();
 
 		for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) /= x_mem[i]; }
-	} else {
+	}
+	else {
 		typename Proxy<T1>::ea_type Pea = P.get_ea();
 
 		for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) /= Pea[i]; }
@@ -345,8 +351,13 @@ void spdiagview<eT>::operator+=(const SpBase<eT, T1>& o) {
 	if(SpProxy<T1>::use_iterator || P.is_alias(d_m)) {
 		const SpMat<eT> tmp(P.Q);
 
-		if(tmp.n_cols == 1) { for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) += tmp.at(i, 0); } } else if(tmp.n_rows == 1) { for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) += tmp.at(0, i); } }
-	} else { if(P.get_n_cols() == 1) { for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) += P.at(i, 0); } } else if(P.get_n_rows() == 1) { for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) += P.at(0, i); } } }
+		if(tmp.n_cols == 1) { for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) += tmp.at(i, 0); } }
+		else if(tmp.n_rows == 1) { for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) += tmp.at(0, i); } }
+	}
+	else {
+		if(P.get_n_cols() == 1) { for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) += P.at(i, 0); } }
+		else if(P.get_n_rows() == 1) { for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) += P.at(0, i); } }
+	}
 }
 
 template<typename eT> template<typename T1> inline
@@ -372,8 +383,13 @@ void spdiagview<eT>::operator-=(const SpBase<eT, T1>& o) {
 	if(SpProxy<T1>::use_iterator || P.is_alias(d_m)) {
 		const SpMat<eT> tmp(P.Q);
 
-		if(tmp.n_cols == 1) { for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) -= tmp.at(i, 0); } } else if(tmp.n_rows == 1) { for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) -= tmp.at(0, i); } }
-	} else { if(P.get_n_cols() == 1) { for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) -= P.at(i, 0); } } else if(P.get_n_rows() == 1) { for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) -= P.at(0, i); } } }
+		if(tmp.n_cols == 1) { for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) -= tmp.at(i, 0); } }
+		else if(tmp.n_rows == 1) { for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) -= tmp.at(0, i); } }
+	}
+	else {
+		if(P.get_n_cols() == 1) { for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) -= P.at(i, 0); } }
+		else if(P.get_n_rows() == 1) { for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) -= P.at(0, i); } }
+	}
 }
 
 template<typename eT> template<typename T1> inline
@@ -399,8 +415,13 @@ void spdiagview<eT>::operator%=(const SpBase<eT, T1>& o) {
 	if(SpProxy<T1>::use_iterator || P.is_alias(d_m)) {
 		const SpMat<eT> tmp(P.Q);
 
-		if(tmp.n_cols == 1) { for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) *= tmp.at(i, 0); } } else if(tmp.n_rows == 1) { for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) *= tmp.at(0, i); } }
-	} else { if(P.get_n_cols() == 1) { for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) *= P.at(i, 0); } } else if(P.get_n_rows() == 1) { for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) *= P.at(0, i); } } }
+		if(tmp.n_cols == 1) { for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) *= tmp.at(i, 0); } }
+		else if(tmp.n_rows == 1) { for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) *= tmp.at(0, i); } }
+	}
+	else {
+		if(P.get_n_cols() == 1) { for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) *= P.at(i, 0); } }
+		else if(P.get_n_rows() == 1) { for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) *= P.at(0, i); } }
+	}
 }
 
 template<typename eT> template<typename T1> inline
@@ -426,8 +447,13 @@ void spdiagview<eT>::operator/=(const SpBase<eT, T1>& o) {
 	if(SpProxy<T1>::use_iterator || P.is_alias(d_m)) {
 		const SpMat<eT> tmp(P.Q);
 
-		if(tmp.n_cols == 1) { for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) /= tmp.at(i, 0); } } else if(tmp.n_rows == 1) { for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) /= tmp.at(0, i); } }
-	} else { if(P.get_n_cols() == 1) { for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) /= P.at(i, 0); } } else if(P.get_n_rows() == 1) { for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) /= P.at(0, i); } } }
+		if(tmp.n_cols == 1) { for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) /= tmp.at(i, 0); } }
+		else if(tmp.n_rows == 1) { for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) /= tmp.at(0, i); } }
+	}
+	else {
+		if(P.get_n_cols() == 1) { for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) /= P.at(i, 0); } }
+		else if(P.get_n_rows() == 1) { for(uword i = 0; i < d_n_elem; ++i) { d_m.at(i + d_row_offset, i + d_col_offset) /= P.at(0, i); } }
+	}
 }
 
 template<typename eT> inline
@@ -503,14 +529,14 @@ eT spdiagview<eT>::at(const uword i) const { return m.at(i + row_offset, i + col
 
 template<typename eT> inline
 SpMat_MapMat_val<eT> spdiagview<eT>::operator()(const uword i) {
-	arma_debug_check((i >= n_elem), "spdiagview::operator(): out of bounds");
+	arma_debug_check_bounds((i >= n_elem), "spdiagview::operator(): out of bounds");
 
 	return (const_cast<SpMat<eT>&>(m)).at(i + row_offset, i + col_offset);
 }
 
 template<typename eT> inline
 eT spdiagview<eT>::operator()(const uword i) const {
-	arma_debug_check((i >= n_elem), "spdiagview::operator(): out of bounds");
+	arma_debug_check_bounds((i >= n_elem), "spdiagview::operator(): out of bounds");
 
 	return m.at(i + row_offset, i + col_offset);
 }
@@ -523,14 +549,14 @@ eT spdiagview<eT>::at(const uword row, const uword) const { return m.at(row + ro
 
 template<typename eT> inline
 SpMat_MapMat_val<eT> spdiagview<eT>::operator()(const uword row, const uword col) {
-	arma_debug_check(((row >= n_elem) || (col > 0)), "spdiagview::operator(): out of bounds");
+	arma_debug_check_bounds(((row >= n_elem) || (col > 0)), "spdiagview::operator(): out of bounds");
 
 	return (const_cast<SpMat<eT>&>(m)).at(row + row_offset, row + col_offset);
 }
 
 template<typename eT> inline
 eT spdiagview<eT>::operator()(const uword row, const uword col) const {
-	arma_debug_check(((row >= n_elem) || (col > 0)), "spdiagview::operator(): out of bounds");
+	arma_debug_check_bounds(((row >= n_elem) || (col > 0)), "spdiagview::operator(): out of bounds");
 
 	return m.at(row + row_offset, row + col_offset);
 }
@@ -568,7 +594,8 @@ void spdiagview<eT>::fill(const eT val) {
 			access::rw(tmp.row_indices[count]) = uword(0);
 
 			access::rw(m).steal_mem(tmp);
-		} else // val != eT(0)
+		}
+		else // val != eT(0)
 		{
 			SpMat<eT> tmp1;
 
@@ -582,7 +609,8 @@ void spdiagview<eT>::fill(const eT val) {
 
 			access::rw(m).steal_mem(tmp2);
 		}
-	} else {
+	}
+	else {
 		SpMat<eT>& x = const_cast<SpMat<eT>&>(m);
 
 		const uword local_n_elem = n_elem;

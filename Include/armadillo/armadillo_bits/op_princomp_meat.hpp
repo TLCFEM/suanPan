@@ -77,7 +77,8 @@ bool op_princomp::direct_princomp
 
 			const Mat<eT> S = score_out * diagmat(Col<T>(s_tmp));
 			tsquared_out = sum(S % S, 1);
-		} else {
+		}
+		else {
 			// compute the Hotelling's T-squared
 			// TODO: replace with more robust approach
 			const Mat<eT> S = score_out * diagmat(Col<T>(T(1) / s));
@@ -86,7 +87,8 @@ bool op_princomp::direct_princomp
 
 		// compute the eigenvalues of the principal vectors
 		latent_out = s % s;
-	} else // 0 or 1 samples
+	}
+	else // 0 or 1 samples
 	{
 		coeff_out.eye(n_cols, n_cols);
 
@@ -160,7 +162,8 @@ bool op_princomp::direct_princomp
 
 		// compute the eigenvalues of the principal vectors
 		latent_out = s % s;
-	} else // 0 or 1 samples
+	}
+	else // 0 or 1 samples
 	{
 		coeff_out.eye(n_cols, n_cols);
 
@@ -218,7 +221,8 @@ bool op_princomp::direct_princomp
 		{
 			score_out.cols(n_rows - 1, n_cols - 1).zeros();
 		}
-	} else // 0 or 1 samples
+	}
+	else // 0 or 1 samples
 	{
 		coeff_out.eye(n_cols, n_cols);
 		score_out.copy_size(in);
@@ -241,6 +245,7 @@ bool op_princomp::direct_princomp
 	arma_extra_debug_sigprint();
 
 	typedef typename T1::elem_type eT;
+	typedef typename T1::pod_type T;
 
 	const unwrap<T1> Y(X.get_ref());
 	const Mat<eT>& in = Y.M;
@@ -251,12 +256,13 @@ bool op_princomp::direct_princomp
 
 		// singular value decomposition
 		Mat<eT> U;
-		Col<eT> s;
+		Col<T> s;
 
 		const bool svd_ok = (in.n_rows >= in.n_cols) ? svd_econ(U, s, coeff_out, tmp) : svd(U, s, coeff_out, tmp);
 
 		if(svd_ok == false) { return false; }
-	} else { coeff_out.eye(in.n_cols, in.n_cols); }
+	}
+	else { coeff_out.eye(in.n_cols, in.n_cols); }
 
 	return true;
 }
@@ -269,12 +275,7 @@ void op_princomp::apply
 ) {
 	arma_extra_debug_sigprint();
 
-	typedef typename T1::elem_type eT;
-
-	const unwrap_check<T1> tmp(in.m, out);
-	const Mat<eT>& A = tmp.M;
-
-	const bool status = op_princomp::direct_princomp(out, A);
+	const bool status = op_princomp::direct_princomp(out, in.m);
 
 	if(status == false) {
 		out.soft_reset();

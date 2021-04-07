@@ -57,7 +57,7 @@ typename enable_if2<is_supported_blas_type<typename T1::pod_type>::value, bool>:
 
 	if(status == false) {
 		eigvals.soft_reset();
-		arma_debug_warn("eig_pair(): decomposition failed");
+		arma_debug_warn_level(3, "eig_pair(): decomposition failed");
 	}
 
 	return status;
@@ -80,7 +80,7 @@ typename enable_if2<is_supported_blas_type<typename T1::pod_type>::value, bool>:
 	if(status == false) {
 		eigvals.soft_reset();
 		eigvecs.soft_reset();
-		arma_debug_warn("eig_pair(): decomposition failed");
+		arma_debug_warn_level(3, "eig_pair(): decomposition failed");
 	}
 
 	return status;
@@ -107,7 +107,7 @@ typename enable_if2<is_supported_blas_type<typename T1::pod_type>::value, bool>:
 		eigvals.soft_reset();
 		leigvecs.soft_reset();
 		reigvecs.soft_reset();
-		arma_debug_warn("eig_pair(): decomposition failed");
+		arma_debug_warn_level(3, "eig_pair(): decomposition failed");
 	}
 
 	return status;

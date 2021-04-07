@@ -19,25 +19,21 @@
 //! eigenvalues of symmetric real sparse matrix X
 template<typename T1> arma_warn_unused
 inline
-Col<typename T1::pod_type> eigs_sym
+typename enable_if2<is_real<typename T1::elem_type>::value, Col<typename T1::pod_type>>::result eigs_sym
 (
 	const SpBase<typename T1::elem_type, T1>& X,
 	const uword n_eigvals,
 	const char* form = "lm",
-	const eigs_opts opts = eigs_opts(),
-	const typename arma_real_only<typename T1::elem_type>::result* junk = nullptr
+	const eigs_opts opts = eigs_opts()
 ) {
 	arma_extra_debug_sigprint();
-	arma_ignore(junk);
 
 	Mat<typename T1::elem_type> eigvec;
 	Col<typename T1::pod_type> eigval;
 
 	sp_auxlib::form_type form_val = sp_auxlib::interpret_form_str(form);
 
-	typename T1::pod_type sigma = 0.0;
-
-	const bool status = sp_auxlib::eigs_sym(eigval, eigvec, X, n_eigvals, form_val, sigma, opts);
+	const bool status = sp_auxlib::eigs_sym(eigval, eigvec, X, n_eigvals, form_val, opts);
 
 	if(status == false) {
 		eigval.soft_reset();
@@ -50,16 +46,14 @@ Col<typename T1::pod_type> eigs_sym
 //! this form is deprecated; use eigs_sym(X, n_eigvals, form, opts) instead
 template<typename T1> arma_deprecated
 inline
-Col<typename T1::pod_type> eigs_sym
+typename enable_if2<is_real<typename T1::elem_type>::value, Col<typename T1::pod_type>>::result eigs_sym
 (
 	const SpBase<typename T1::elem_type, T1>& X,
 	const uword n_eigvals,
 	const char* form,
-	const typename T1::elem_type tol,
-	const typename arma_real_only<typename T1::elem_type>::result* junk = nullptr
+	const typename T1::elem_type tol
 ) {
 	arma_extra_debug_sigprint();
-	arma_ignore(junk);
 
 	eigs_opts opts;
 	opts.tol = tol;
@@ -69,23 +63,21 @@ Col<typename T1::pod_type> eigs_sym
 
 template<typename T1> arma_warn_unused
 inline
-Col<typename T1::pod_type> eigs_sym
+typename enable_if2<is_real<typename T1::elem_type>::value, Col<typename T1::pod_type>>::result eigs_sym
 (
 	const SpBase<typename T1::elem_type, T1>& X,
 	const uword n_eigvals,
-	const typename T1::pod_type sigma,
-	const eigs_opts opts = eigs_opts(),
-	const typename arma_real_only<typename T1::elem_type>::result* junk = nullptr
+	const double sigma,
+	const eigs_opts opts = eigs_opts()
 ) {
 	arma_extra_debug_sigprint();
-	arma_ignore(junk);
+
+	typedef typename T1::pod_type T;
 
 	Mat<typename T1::elem_type> eigvec;
 	Col<typename T1::pod_type> eigval;
 
-	sp_auxlib::form_type form_val = sp_auxlib::form_sm;
-
-	const bool status = sp_auxlib::eigs_sym(eigval, eigvec, X, n_eigvals, form_val, sigma, opts);
+	const bool status = sp_auxlib::eigs_sym(eigval, eigvec, X, n_eigvals, T(sigma), opts);
 
 	if(status == false) {
 		eigval.soft_reset();
@@ -97,29 +89,25 @@ Col<typename T1::pod_type> eigs_sym
 
 //! eigenvalues of symmetric real sparse matrix X
 template<typename T1> inline
-bool eigs_sym
+typename enable_if2<is_real<typename T1::elem_type>::value, bool>::result eigs_sym
 (
 	Col<typename T1::pod_type>& eigval,
 	const SpBase<typename T1::elem_type, T1>& X,
 	const uword n_eigvals,
 	const char* form = "lm",
-	const eigs_opts opts = eigs_opts(),
-	const typename arma_real_only<typename T1::elem_type>::result* junk = nullptr
+	const eigs_opts opts = eigs_opts()
 ) {
 	arma_extra_debug_sigprint();
-	arma_ignore(junk);
 
 	Mat<typename T1::elem_type> eigvec;
 
 	sp_auxlib::form_type form_val = sp_auxlib::interpret_form_str(form);
 
-	typename T1::pod_type sigma = 0.0;
-
-	const bool status = sp_auxlib::eigs_sym(eigval, eigvec, X, n_eigvals, form_val, sigma, opts);
+	const bool status = sp_auxlib::eigs_sym(eigval, eigvec, X, n_eigvals, form_val, opts);
 
 	if(status == false) {
 		eigval.soft_reset();
-		arma_debug_warn("eigs_sym(): decomposition failed");
+		arma_debug_warn_level(3, "eigs_sym(): decomposition failed");
 	}
 
 	return status;
@@ -128,17 +116,15 @@ bool eigs_sym
 //! this form is deprecated; use eigs_sym(eigval, X, n_eigvals, form, opts) instead
 template<typename T1> arma_deprecated
 inline
-bool eigs_sym
+typename enable_if2<is_real<typename T1::elem_type>::value, bool>::result eigs_sym
 (
 	Col<typename T1::pod_type>& eigval,
 	const SpBase<typename T1::elem_type, T1>& X,
 	const uword n_eigvals,
 	const char* form,
-	const typename T1::elem_type tol,
-	const typename arma_real_only<typename T1::elem_type>::result* junk = nullptr
+	const typename T1::elem_type tol
 ) {
 	arma_extra_debug_sigprint();
-	arma_ignore(junk);
 
 	eigs_opts opts;
 	opts.tol = tol;
@@ -147,27 +133,25 @@ bool eigs_sym
 }
 
 template<typename T1> inline
-bool eigs_sym
+typename enable_if2<is_real<typename T1::elem_type>::value, bool>::result eigs_sym
 (
 	Col<typename T1::pod_type>& eigval,
 	const SpBase<typename T1::elem_type, T1>& X,
 	const uword n_eigvals,
-	const typename T1::pod_type sigma,
-	const eigs_opts opts = eigs_opts(),
-	const typename arma_real_only<typename T1::elem_type>::result* junk = nullptr
+	const double sigma,
+	const eigs_opts opts = eigs_opts()
 ) {
 	arma_extra_debug_sigprint();
-	arma_ignore(junk);
+
+	typedef typename T1::pod_type T;
 
 	Mat<typename T1::elem_type> eigvec;
 
-	sp_auxlib::form_type form_val = sp_auxlib::form_sm;
-
-	const bool status = sp_auxlib::eigs_sym(eigval, eigvec, X, n_eigvals, form_val, sigma, opts);
+	const bool status = sp_auxlib::eigs_sym(eigval, eigvec, X, n_eigvals, T(sigma), opts);
 
 	if(status == false) {
 		eigval.soft_reset();
-		arma_debug_warn("eigs_sym(): decomposition failed");
+		arma_debug_warn_level(3, "eigs_sym(): decomposition failed");
 	}
 
 	return status;
@@ -175,31 +159,27 @@ bool eigs_sym
 
 //! eigenvalues and eigenvectors of symmetric real sparse matrix X
 template<typename T1> inline
-bool eigs_sym
+typename enable_if2<is_real<typename T1::elem_type>::value, bool>::result eigs_sym
 (
 	Col<typename T1::pod_type>& eigval,
 	Mat<typename T1::elem_type>& eigvec,
 	const SpBase<typename T1::elem_type, T1>& X,
 	const uword n_eigvals,
 	const char* form = "lm",
-	const eigs_opts opts = eigs_opts(),
-	const typename arma_real_only<typename T1::elem_type>::result* junk = nullptr
+	const eigs_opts opts = eigs_opts()
 ) {
 	arma_extra_debug_sigprint();
-	arma_ignore(junk);
 
 	arma_debug_check(void_ptr(&eigval) == void_ptr(&eigvec), "eigs_sym(): parameter 'eigval' is an alias of parameter 'eigvec'");
 
 	sp_auxlib::form_type form_val = sp_auxlib::interpret_form_str(form);
 
-	typename T1::pod_type sigma = 0.0;
-
-	const bool status = sp_auxlib::eigs_sym(eigval, eigvec, X, n_eigvals, form_val, sigma, opts);
+	const bool status = sp_auxlib::eigs_sym(eigval, eigvec, X, n_eigvals, form_val, opts);
 
 	if(status == false) {
 		eigval.soft_reset();
 		eigvec.soft_reset();
-		arma_debug_warn("eigs_sym(): decomposition failed");
+		arma_debug_warn_level(3, "eigs_sym(): decomposition failed");
 	}
 
 	return status;
@@ -208,18 +188,16 @@ bool eigs_sym
 //! this form is deprecated; use eigs_sym(eigval, eigvec, X, n_eigvals, form, opts) instead
 template<typename T1> arma_deprecated
 inline
-bool eigs_sym
+typename enable_if2<is_real<typename T1::elem_type>::value, bool>::result eigs_sym
 (
 	Col<typename T1::pod_type>& eigval,
 	Mat<typename T1::elem_type>& eigvec,
 	const SpBase<typename T1::elem_type, T1>& X,
 	const uword n_eigvals,
 	const char* form,
-	const typename T1::elem_type tol,
-	const typename arma_real_only<typename T1::elem_type>::result* junk = nullptr
+	const typename T1::elem_type tol
 ) {
 	arma_extra_debug_sigprint();
-	arma_ignore(junk);
 
 	eigs_opts opts;
 	opts.tol = tol;
@@ -228,29 +206,27 @@ bool eigs_sym
 }
 
 template<typename T1> inline
-bool eigs_sym
+typename enable_if2<is_real<typename T1::elem_type>::value, bool>::result eigs_sym
 (
 	Col<typename T1::pod_type>& eigval,
 	Mat<typename T1::elem_type>& eigvec,
 	const SpBase<typename T1::elem_type, T1>& X,
 	const uword n_eigvals,
-	const typename T1::pod_type sigma,
-	const eigs_opts opts = eigs_opts(),
-	const typename arma_real_only<typename T1::elem_type>::result* junk = nullptr
+	const double sigma,
+	const eigs_opts opts = eigs_opts()
 ) {
 	arma_extra_debug_sigprint();
-	arma_ignore(junk);
+
+	typedef typename T1::pod_type T;
 
 	arma_debug_check(void_ptr(&eigval) == void_ptr(&eigvec), "eigs_sym(): parameter 'eigval' is an alias of parameter 'eigvec'");
 
-	sp_auxlib::form_type form_val = sp_auxlib::form_sm;
-
-	const bool status = sp_auxlib::eigs_sym(eigval, eigvec, X, n_eigvals, form_val, sigma, opts);
+	const bool status = sp_auxlib::eigs_sym(eigval, eigvec, X, n_eigvals, T(sigma), opts);
 
 	if(status == false) {
 		eigval.soft_reset();
 		eigvec.soft_reset();
-		arma_debug_warn("eigs_sym(): decomposition failed");
+		arma_debug_warn_level(3, "eigs_sym(): decomposition failed");
 	}
 
 	return status;

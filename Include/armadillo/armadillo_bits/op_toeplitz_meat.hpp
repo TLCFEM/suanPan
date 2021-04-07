@@ -25,7 +25,7 @@ void op_toeplitz::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_toepli
 	const unwrap_check<T1> tmp(in.m, out);
 	const Mat<eT>& X = tmp.M;
 
-	arma_debug_check(((X.is_vec() == false) && (X.is_empty() == false)), "toeplitz(): given object is not a vector");
+	arma_debug_check(((X.is_vec() == false) && (X.is_empty() == false)), "toeplitz(): given object must be a vector");
 
 	const uword N = X.n_elem;
 	const eT* X_mem = X.memptr();
@@ -54,14 +54,14 @@ void op_toeplitz_c::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_toep
 	const unwrap_check<T1> tmp(in.m, out);
 	const Mat<eT>& X = tmp.M;
 
-	arma_debug_check(((X.is_vec() == false) && (X.is_empty() == false)), "circ_toeplitz(): given object is not a vector");
+	arma_debug_check(((X.is_vec() == false) && (X.is_empty() == false)), "circ_toeplitz(): given object must be a vector");
 
 	const uword N = X.n_elem;
 	const eT* X_mem = X.memptr();
 
 	out.set_size(N, N);
 
-	if(X.is_rowvec() == true) {
+	if(X.is_rowvec()) {
 		for(uword row = 0; row < N; ++row) {
 			uword i;
 
@@ -71,7 +71,8 @@ void op_toeplitz_c::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_toep
 			i = 0;
 			for(uword col = row; col < N; ++col, ++i) { out.at(row, col) = X_mem[i]; }
 		}
-	} else {
+	}
+	else {
 		for(uword col = 0; col < N; ++col) {
 			eT* col_mem = out.colptr(col);
 

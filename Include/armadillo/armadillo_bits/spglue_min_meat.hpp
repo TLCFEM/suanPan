@@ -27,7 +27,8 @@ void spglue_min::apply(SpMat<typename T1::elem_type>& out, const SpGlue<T1, T2, 
 
 	const bool is_alias = pa.is_alias(out) || pb.is_alias(out);
 
-	if(is_alias == false) { spglue_min::apply_noalias(out, pa, pb); } else {
+	if(is_alias == false) { spglue_min::apply_noalias(out, pa, pb); }
+	else {
 		SpMat<eT> tmp;
 
 		spglue_min::apply_noalias(tmp, pa, pb);
@@ -72,13 +73,15 @@ void spglue_min::apply_noalias(SpMat<eT>& out, const SpProxy<T1>& pa, const SpPr
 
 			++x_it;
 			++y_it;
-		} else {
+		}
+		else {
 			if((x_it_col < y_it_col) || ((x_it_col == y_it_col) && (x_it_row < y_it_row))) // if y is closer to the end
 			{
 				out_val = elem_min(eT(*x_it), eT(0));
 
 				++x_it;
-			} else {
+			}
+			else {
 				out_val = elem_min(eT(*y_it), eT(0));
 
 				++y_it;
@@ -109,7 +112,8 @@ void spglue_min::apply_noalias(SpMat<eT>& out, const SpProxy<T1>& pa, const SpPr
 	for(uword c = 1; c <= out_n_cols; ++c) { col_ptrs[c] += col_ptrs[c - 1]; }
 
 	if(count < max_n_nonzero) {
-		if(count <= (max_n_nonzero / 2)) { out.mem_resize(count); } else {
+		if(count <= (max_n_nonzero / 2)) { out.mem_resize(count); }
+		else {
 			// quick resize without reallocating memory and copying data
 			access::rw(out.n_nonzero) = count;
 			access::rw(out.values[count]) = eT(0);
@@ -144,8 +148,7 @@ void spglue_min::dense_sparse_min(Mat<eT>& out, const Base<eT, T1>& X, const SpB
 
 	out.set_size(n_rows, n_cols);
 
-	for(uword c = 0; c < n_cols; ++c)
-		for(uword r = 0; r < n_rows; ++r) { out.at(r, c) = elem_min(pa.at(r, c), pb.at(r, c)); }
+	for(uword c = 0; c < n_cols; ++c) for(uword r = 0; r < n_rows; ++r) { out.at(r, c) = elem_min(pa.at(r, c), pb.at(r, c)); }
 }
 
 // min of non-complex elements

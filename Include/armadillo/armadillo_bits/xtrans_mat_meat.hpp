@@ -33,7 +33,8 @@ void xtrans_mat<eT, do_conj>::extract(Mat<eT>& out) const {
 
 template<typename eT, bool do_conj> inline
 eT xtrans_mat<eT, do_conj>::operator[](const uword ii) const {
-	if(Y.n_elem > 0) { return Y[ii]; } else {
+	if(Y.n_elem > 0) { return Y[ii]; }
+	else {
 		really_do_conj ? op_htrans::apply_mat(Y, X) : op_strans::apply_mat(Y, X);
 		return Y[ii];
 	}

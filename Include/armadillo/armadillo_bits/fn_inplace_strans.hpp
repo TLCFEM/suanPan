@@ -30,7 +30,8 @@ void inplace_strans
 
 	const bool low_memory = (sig == 'l');
 
-	if((low_memory == false) || (X.n_rows == X.n_cols)) { op_strans::apply_mat_inplace(X); } else {
+	if((low_memory == false) || (X.n_rows == X.n_cols)) { op_strans::apply_mat_inplace(X); }
+	else {
 		// in-place algorithm inspired by:
 		// Fred G. Gustavson, Tadeusz Swirszcz.
 		// In-Place Transposition of Rectangular Matrices.

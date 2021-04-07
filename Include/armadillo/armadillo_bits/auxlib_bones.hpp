@@ -20,38 +20,31 @@
 class auxlib {
 public:
 
-	template<const uword row, const uword col> struct pos {
-		static constexpr uword n2 = row + col * 2;
-		static constexpr uword n3 = row + col * 3;
-		static constexpr uword n4 = row + col * 4;
-	};
-
 	//
 	// inv
 
-	template<typename eT> inline static bool inv(Mat<eT>& out, const Mat<eT>& A);
+	template<typename eT> inline static bool inv(Mat<eT>& A);
 
-	template<typename eT> arma_cold inline static bool inv_tiny(Mat<eT>& out, const Mat<eT>& X);
+	template<typename eT> inline static bool inv(Mat<eT>& out, const Mat<eT>& X);
 
-	template<typename eT, typename T1> inline static bool inv_tr(Mat<eT>& out, const Base<eT, T1>& X, const uword layout);
+	template<typename eT> inline static bool inv_tr(Mat<eT>& A, const uword layout);
 
-	template<typename eT, typename T1> inline static bool inv_sympd(Mat<eT>& out, const Base<eT, T1>& X);
+	template<typename eT> inline static bool inv_sympd(Mat<eT>& A);
 
-	template<typename eT> arma_cold inline static bool inv_sympd_tiny(Mat<eT>& out, const Mat<eT>& X);
+	template<typename eT> inline static bool inv_sympd(Mat<eT>& out, const Mat<eT>& X);
 
-	//
-	// det
+	template<typename eT> inline static bool inv_sympd_rcond(Mat<eT>& A, const eT rcond_threshold);
 
-	template<typename eT> inline static eT det(const Mat<eT>& A);
-
-	template<typename eT> arma_cold inline static eT det_tinymat(const Mat<eT>& X, const uword N);
-
-	template<typename eT> inline static eT det_lapack(const Mat<eT>& X);
+	template<typename T> inline static bool inv_sympd_rcond(Mat<std::complex<T>>& A, const T rcond_threshold);
 
 	//
-	// log_det
+	// det and log_det
 
-	template<typename eT, typename T1> inline static bool log_det(eT& out_val, typename get_pod_type<eT>::result& out_sign, const Base<eT, T1>& X);
+	template<typename eT> inline static bool det(eT& out_val, Mat<eT>& A);
+
+	template<typename eT> inline static bool log_det(eT& out_val, typename get_pod_type<eT>::result& out_sign, Mat<eT>& A);
+
+	template<typename eT> inline static bool log_det_sympd(typename get_pod_type<eT>::result& out_val, Mat<eT>& A);
 
 	//
 	// lu
@@ -151,37 +144,29 @@ public:
 	//
 	// svd
 
-	template<typename eT, typename T1> inline static bool svd(Col<eT>& S, const Base<eT, T1>& X, uword& n_rows, uword& n_cols);
+	template<typename eT> inline static bool svd(Col<eT>& S, Mat<eT>& A);
 
-	template<typename T, typename T1> inline static bool svd(Col<T>& S, const Base<std::complex<T>, T1>& X, uword& n_rows, uword& n_cols);
+	template<typename T> inline static bool svd(Col<T>& S, Mat<std::complex<T>>& A);
 
-	template<typename eT, typename T1> inline static bool svd(Col<eT>& S, const Base<eT, T1>& X);
+	template<typename eT> inline static bool svd(Mat<eT>& U, Col<eT>& S, Mat<eT>& V, Mat<eT>& A);
 
-	template<typename T, typename T1> inline static bool svd(Col<T>& S, const Base<std::complex<T>, T1>& X);
+	template<typename T> inline static bool svd(Mat<std::complex<T>>& U, Col<T>& S, Mat<std::complex<T>>& V, Mat<std::complex<T>>& A);
 
-	template<typename eT, typename T1> inline static bool svd(Mat<eT>& U, Col<eT>& S, Mat<eT>& V, const Base<eT, T1>& X);
+	template<typename eT> inline static bool svd_econ(Mat<eT>& U, Col<eT>& S, Mat<eT>& V, Mat<eT>& A, const char mode);
 
-	template<typename T, typename T1> inline static bool svd(Mat<std::complex<T>>& U, Col<T>& S, Mat<std::complex<T>>& V, const Base<std::complex<T>, T1>& X);
+	template<typename T> inline static bool svd_econ(Mat<std::complex<T>>& U, Col<T>& S, Mat<std::complex<T>>& V, Mat<std::complex<T>>& A, const char mode);
 
-	template<typename eT, typename T1> inline static bool svd_econ(Mat<eT>& U, Col<eT>& S, Mat<eT>& V, const Base<eT, T1>& X, const char mode);
+	template<typename eT> inline static bool svd_dc(Col<eT>& S, Mat<eT>& A);
 
-	template<typename T, typename T1> inline static bool svd_econ(Mat<std::complex<T>>& U, Col<T>& S, Mat<std::complex<T>>& V, const Base<std::complex<T>, T1>& X, const char mode);
+	template<typename T> inline static bool svd_dc(Col<T>& S, Mat<std::complex<T>>& A);
 
-	template<typename eT, typename T1> inline static bool svd_dc(Col<eT>& S, const Base<eT, T1>& X, uword& n_rows, uword& n_cols);
+	template<typename eT> inline static bool svd_dc(Mat<eT>& U, Col<eT>& S, Mat<eT>& V, Mat<eT>& A);
 
-	template<typename T, typename T1> inline static bool svd_dc(Col<T>& S, const Base<std::complex<T>, T1>& X, uword& n_rows, uword& n_cols);
+	template<typename T> inline static bool svd_dc(Mat<std::complex<T>>& U, Col<T>& S, Mat<std::complex<T>>& V, Mat<std::complex<T>>& A);
 
-	template<typename eT, typename T1> inline static bool svd_dc(Col<eT>& S, const Base<eT, T1>& X);
+	template<typename eT> inline static bool svd_dc_econ(Mat<eT>& U, Col<eT>& S, Mat<eT>& V, Mat<eT>& A);
 
-	template<typename T, typename T1> inline static bool svd_dc(Col<T>& S, const Base<std::complex<T>, T1>& X);
-
-	template<typename eT, typename T1> inline static bool svd_dc(Mat<eT>& U, Col<eT>& S, Mat<eT>& V, const Base<eT, T1>& X);
-
-	template<typename T, typename T1> inline static bool svd_dc(Mat<std::complex<T>>& U, Col<T>& S, Mat<std::complex<T>>& V, const Base<std::complex<T>, T1>& X);
-
-	template<typename eT, typename T1> inline static bool svd_dc_econ(Mat<eT>& U, Col<eT>& S, Mat<eT>& V, const Base<eT, T1>& X);
-
-	template<typename T, typename T1> inline static bool svd_dc_econ(Mat<std::complex<T>>& U, Col<T>& S, Mat<std::complex<T>>& V, const Base<std::complex<T>, T1>& X);
+	template<typename T> inline static bool svd_dc_econ(Mat<std::complex<T>>& U, Col<T>& S, Mat<std::complex<T>>& V, Mat<std::complex<T>>& A);
 
 	//
 	// solve
@@ -264,7 +249,7 @@ public:
 	template<typename T> inline static bool schur(Mat<std::complex<T>>& U, Mat<std::complex<T>>& S, const bool calc_U = true);
 
 	//
-	// syl (solution of the Sylvester equation AX + XB = C)
+	// solve the Sylvester equation AX + XB = C
 
 	template<typename eT> inline static bool syl(Mat<eT>& X, const Mat<eT>& A, const Mat<eT>& B, const Mat<eT>& C);
 

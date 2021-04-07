@@ -31,7 +31,8 @@ void glue_max::apply(Mat<typename T1::elem_type>& out, const Glue<T1, T2, glue_m
 		glue_max::apply(tmp, PA, PB);
 
 		out.steal_mem(tmp);
-	} else { glue_max::apply(out, PA, PB); }
+	}
+	else { glue_max::apply(out, PA, PB); }
 }
 
 template<typename eT, typename T1, typename T2> inline
@@ -54,7 +55,8 @@ void glue_max::apply(Mat<eT>& out, const Proxy<T1>& PA, const Proxy<T2>& PB) {
 		const uword N = PA.get_n_elem();
 
 		for(uword i = 0; i < N; ++i) { out_mem[i] = (std::max)(A[i], B[i]); }
-	} else {
+	}
+	else {
 		for(uword col = 0; col < n_cols; ++col)
 			for(uword row = 0; row < n_rows; ++row) {
 				*out_mem = (std::max)(PA.at(row, col), PB.at(row, col));
@@ -91,7 +93,8 @@ void glue_max::apply(Mat<std::complex<T>>& out, const Proxy<T1>& PA, const Proxy
 
 			out_mem[i] = (std::abs(A_val) > std::abs(B_val)) ? A_val : B_val;
 		}
-	} else {
+	}
+	else {
 		for(uword col = 0; col < n_cols; ++col)
 			for(uword row = 0; row < n_rows; ++row) {
 				const eT A_val = PA.at(row, col);
@@ -119,7 +122,8 @@ void glue_max::apply(Cube<typename T1::elem_type>& out, const GlueCube<T1, T2, g
 		glue_max::apply(tmp, PA, PB);
 
 		out.steal_mem(tmp);
-	} else { glue_max::apply(out, PA, PB); }
+	}
+	else { glue_max::apply(out, PA, PB); }
 }
 
 template<typename eT, typename T1, typename T2> inline
@@ -143,7 +147,8 @@ void glue_max::apply(Cube<eT>& out, const ProxyCube<T1>& PA, const ProxyCube<T2>
 		const uword N = PA.get_n_elem();
 
 		for(uword i = 0; i < N; ++i) { out_mem[i] = (std::max)(A[i], B[i]); }
-	} else {
+	}
+	else {
 		for(uword slice = 0; slice < n_slices; ++slice)
 			for(uword col = 0; col < n_cols; ++col)
 				for(uword row = 0; row < n_rows; ++row) {
@@ -182,7 +187,8 @@ void glue_max::apply(Cube<std::complex<T>>& out, const ProxyCube<T1>& PA, const 
 
 			out_mem[i] = (std::abs(A_val) > std::abs(B_val)) ? A_val : B_val;
 		}
-	} else {
+	}
+	else {
 		for(uword slice = 0; slice < n_slices; ++slice)
 			for(uword col = 0; col < n_cols; ++col)
 				for(uword row = 0; row < n_rows; ++row) {

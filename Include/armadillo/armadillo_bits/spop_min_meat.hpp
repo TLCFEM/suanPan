@@ -73,7 +73,8 @@ void spop_min::apply_proxy
 		for(uword col = 0; col < p_n_cols; ++col) { if(count[col] < p_n_rows) { value[col] = (std::min)(value[col], eT(0)); } }
 
 		out = value;
-	} else if(dim == 1) // find the minimum in each row
+	}
+	else if(dim == 1) // find the minimum in each row
 	{
 		Col<eT> value(p_n_rows, fill::zeros);
 		ucolvec count(p_n_rows, fill::zeros);
@@ -115,8 +116,10 @@ typename T1::elem_type spop_min::vector_min
 
 	if(SpProxy<T1>::use_iterator == false) {
 		// direct access of values
-		if(p.get_n_nonzero() == p.get_n_elem()) { return op_min::direct_min(p.get_values(), p.get_n_nonzero()); } else { return std::min(eT(0), op_min::direct_min(p.get_values(), p.get_n_nonzero())); }
-	} else {
+		if(p.get_n_nonzero() == p.get_n_elem()) { return op_min::direct_min(p.get_values(), p.get_n_nonzero()); }
+		else { return std::min(eT(0), op_min::direct_min(p.get_values(), p.get_n_nonzero())); }
+	}
+	else {
 		// use iterator
 		typename SpProxy<T1>::const_iterator_type it = p.begin();
 		typename SpProxy<T1>::const_iterator_type it_end = p.end();
@@ -130,7 +133,8 @@ typename T1::elem_type spop_min::vector_min
 			++it;
 		}
 
-		if(p.get_n_nonzero() == p.get_n_elem()) { return result; } else { return std::min(eT(0), result); }
+		if(p.get_n_nonzero() == p.get_n_elem()) { return result; }
+		else { return std::min(eT(0), result); }
 	}
 }
 
@@ -165,14 +169,16 @@ typename arma_not_cx<typename T1::elem_type>::result spop_min::min(const SpBase<
 
 			++it;
 		}
-	} else {
+	}
+	else {
 		// We can do direct access of the values, row_indices, and col_ptrs.
 		// We don't need the location of the min value, so we can just call out to
 		// other functions...
 		min_val = op_min::direct_min(P.get_values(), n_nonzero);
 	}
 
-	if(n_elem == n_nonzero) { return min_val; } else { return std::min(eT(0), min_val); }
+	if(n_elem == n_nonzero) { return min_val; }
+	else { return std::min(eT(0), min_val); }
 }
 
 template<typename T1> inline
@@ -210,7 +216,8 @@ typename arma_not_cx<typename T1::elem_type>::result spop_min::min_with_index(co
 
 			++it;
 		}
-	} else {
+	}
+	else {
 		// We can do direct access.
 		min_val = op_min::direct_min(P.get_values(), n_nonzero, index_of_min_val);
 
@@ -240,13 +247,16 @@ typename arma_not_cx<typename T1::elem_type>::result spop_min::min_with_index(co
 				if((it.col() == last_col) && (it.row() - last_row > 1)) {
 					index_of_min_val = it.col() * n_rows + last_row + 1;
 					break;
-				} else if((it.col() >= last_col + 1) && (last_row < n_rows - 1)) {
+				}
+				else if((it.col() >= last_col + 1) && (last_row < n_rows - 1)) {
 					index_of_min_val = last_col * n_rows + last_row + 1;
 					break;
-				} else if((it.col() == last_col + 1) && (it.row() > 0)) {
+				}
+				else if((it.col() == last_col + 1) && (it.row() > 0)) {
 					index_of_min_val = it.col() * n_rows;
 					break;
-				} else if(it.col() > last_col + 1) {
+				}
+				else if(it.col() > last_col + 1) {
 					index_of_min_val = (last_col + 1) * n_rows;
 					break;
 				}
@@ -296,7 +306,8 @@ void spop_min::apply_proxy
 			if(count[col] == 0) {
 				absval[col] = a;
 				rawval[col] = v;
-			} else {
+			}
+			else {
 				if(a < absval[col]) {
 					absval[col] = a;
 					rawval[col] = v;
@@ -310,7 +321,8 @@ void spop_min::apply_proxy
 		for(uword col = 0; col < p_n_cols; ++col) { if(count[col] < p_n_rows) { if(T(0) < absval[col]) { rawval[col] = eT(0); } } }
 
 		out = rawval;
-	} else if(dim == 1) // find the minimum in each row
+	}
+	else if(dim == 1) // find the minimum in each row
 	{
 		Col<eT> rawval(p_n_rows, fill::zeros);
 		Col<T> absval(p_n_rows, fill::zeros);
@@ -325,7 +337,8 @@ void spop_min::apply_proxy
 			if(count[row] == 0) {
 				absval[row] = a;
 				rawval[row] = v;
-			} else {
+			}
+			else {
 				if(a < absval[row]) {
 					absval[row] = a;
 					rawval[row] = v;
@@ -366,13 +379,15 @@ typename T1::elem_type spop_min::vector_min
 
 	if(SpProxy<T1>::use_iterator == false) {
 		// direct access of values
-		if(p.get_n_nonzero() == p.get_n_elem()) { return op_min::direct_min(p.get_values(), p.get_n_nonzero()); } else {
+		if(p.get_n_nonzero() == p.get_n_elem()) { return op_min::direct_min(p.get_values(), p.get_n_nonzero()); }
+		else {
 			const eT val1 = eT(0);
 			const eT val2 = op_min::direct_min(p.get_values(), p.get_n_nonzero());
 
 			return (std::abs(val1) < std::abs(val2)) ? val1 : val2;
 		}
-	} else {
+	}
+	else {
 		// use iterator
 		typename SpProxy<T1>::const_iterator_type it = p.begin();
 		typename SpProxy<T1>::const_iterator_type it_end = p.end();
@@ -394,7 +409,8 @@ typename T1::elem_type spop_min::vector_min
 			++it;
 		}
 
-		if(p.get_n_nonzero() == p.get_n_elem()) { return best_val_orig; } else {
+		if(p.get_n_nonzero() == p.get_n_elem()) { return best_val_orig; }
+		else {
 			const eT val1 = eT(0);
 
 			return (std::abs(val1) < best_val_abs) ? val1 : best_val_orig;
@@ -440,7 +456,8 @@ typename arma_cx_only<typename T1::elem_type>::result spop_min::min(const SpBase
 
 			++it;
 		}
-	} else {
+	}
+	else {
 		// We can do direct access of the values, row_indices, and col_ptrs.
 		// We don't need the location of the min value, so we can just call out to
 		// other functions...
@@ -448,7 +465,8 @@ typename arma_cx_only<typename T1::elem_type>::result spop_min::min(const SpBase
 		min_val = std::abs(ret_val);
 	}
 
-	if(n_elem == n_nonzero) { return ret_val; } else { return (T(0) < min_val) ? eT(0) : ret_val; }
+	if(n_elem == n_nonzero) { return ret_val; }
+	else { return (T(0) < min_val) ? eT(0) : ret_val; }
 }
 
 template<typename T1> inline
@@ -489,7 +507,8 @@ typename arma_cx_only<typename T1::elem_type>::result spop_min::min_with_index(c
 
 			++it;
 		}
-	} else {
+	}
+	else {
 		// We can do direct access.
 		min_val = std::abs(op_min::direct_min(P.get_values(), n_nonzero, index_of_min_val));
 
@@ -519,13 +538,16 @@ typename arma_cx_only<typename T1::elem_type>::result spop_min::min_with_index(c
 				if((it.col() == last_col) && (it.row() - last_row > 1)) {
 					index_of_min_val = it.col() * n_rows + last_row + 1;
 					break;
-				} else if((it.col() >= last_col + 1) && (last_row < n_rows - 1)) {
+				}
+				else if((it.col() >= last_col + 1) && (last_row < n_rows - 1)) {
 					index_of_min_val = last_col * n_rows + last_row + 1;
 					break;
-				} else if((it.col() == last_col + 1) && (it.row() > 0)) {
+				}
+				else if((it.col() == last_col + 1) && (it.row() > 0)) {
 					index_of_min_val = it.col() * n_rows;
 					break;
-				} else if(it.col() > last_col + 1) {
+				}
+				else if(it.col() > last_col + 1) {
 					index_of_min_val = (last_col + 1) * n_rows;
 					break;
 				}

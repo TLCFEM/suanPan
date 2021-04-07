@@ -38,7 +38,8 @@ void op_real::apply(Mat<typename T1::pod_type>& out, const mtOp<typename T1::pod
 		ea_type A = P.get_ea();
 
 		for(uword i = 0; i < n_elem; ++i) { out_mem[i] = std::real(A[i]); }
-	} else {
+	}
+	else {
 		for(uword col = 0; col < n_cols; ++col)
 			for(uword row = 0; row < n_rows; ++row) {
 				*out_mem = std::real(P.at(row, col));
@@ -70,7 +71,8 @@ void op_real::apply(Cube<typename T1::pod_type>& out, const mtOpCube<typename T1
 		ea_type A = P.get_ea();
 
 		for(uword i = 0; i < n_elem; ++i) { out_mem[i] = std::real(A[i]); }
-	} else {
+	}
+	else {
 		for(uword slice = 0; slice < n_slices; ++slice)
 			for(uword col = 0; col < n_cols; ++col)
 				for(uword row = 0; row < n_rows; ++row) {
@@ -102,7 +104,8 @@ void op_imag::apply(Mat<typename T1::pod_type>& out, const mtOp<typename T1::pod
 		ea_type A = P.get_ea();
 
 		for(uword i = 0; i < n_elem; ++i) { out_mem[i] = std::imag(A[i]); }
-	} else {
+	}
+	else {
 		for(uword col = 0; col < n_cols; ++col)
 			for(uword row = 0; row < n_rows; ++row) {
 				*out_mem = std::imag(P.at(row, col));
@@ -134,7 +137,8 @@ void op_imag::apply(Cube<typename T1::pod_type>& out, const mtOpCube<typename T1
 		ea_type A = P.get_ea();
 
 		for(uword i = 0; i < n_elem; ++i) { out_mem[i] = std::imag(A[i]); }
-	} else {
+	}
+	else {
 		for(uword slice = 0; slice < n_slices; ++slice)
 			for(uword col = 0; col < n_cols; ++col)
 				for(uword row = 0; row < n_rows; ++row) {
@@ -179,7 +183,8 @@ void op_abs::apply(Mat<typename T1::pod_type>& out, const mtOp<typename T1::pod_
 			for(uword i = 0; i < n_elem; ++i) { out_mem[i] = std::abs(A[i]); }
 		}
 #endif
-	} else {
+	}
+	else {
 		for(uword col = 0; col < n_cols; ++col)
 			for(uword row = 0; row < n_rows; ++row) {
 				*out_mem = std::abs(P.at(row, col));
@@ -224,7 +229,8 @@ void op_abs::apply(Cube<typename T1::pod_type>& out, const mtOpCube<typename T1:
 			for(uword i = 0; i < n_elem; ++i) { out_mem[i] = std::abs(A[i]); }
 		}
 #endif
-	} else {
+	}
+	else {
 		for(uword slice = 0; slice < n_slices; ++slice)
 			for(uword col = 0; col < n_cols; ++col)
 				for(uword row = 0; row < n_rows; ++row) {
@@ -257,7 +263,8 @@ void op_arg::apply(Mat<typename T1::pod_type>& out, const mtOp<typename T1::pod_
 		ea_type A = P.get_ea();
 
 		for(uword i = 0; i < n_elem; ++i) { out_mem[i] = arma_arg<eT>::eval(A[i]); }
-	} else {
+	}
+	else {
 		for(uword col = 0; col < n_cols; ++col)
 			for(uword row = 0; row < n_rows; ++row) {
 				*out_mem = arma_arg<eT>::eval(P.at(row, col));
@@ -290,7 +297,8 @@ void op_arg::apply(Cube<typename T1::pod_type>& out, const mtOpCube<typename T1:
 		ea_type A = P.get_ea();
 
 		for(uword i = 0; i < n_elem; ++i) { out_mem[i] = arma_arg<eT>::eval(A[i]); }
-	} else {
+	}
+	else {
 		for(uword slice = 0; slice < n_slices; ++slice)
 			for(uword col = 0; col < n_cols; ++col)
 				for(uword row = 0; row < n_rows; ++row) {

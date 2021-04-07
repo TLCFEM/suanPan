@@ -136,7 +136,7 @@ template<typename eT> inline
 void SpCol<eT>::shed_row(const uword row_num) {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check(row_num >= SpMat<eT>::n_rows, "SpCol::shed_row(): out of bounds");
+	arma_debug_check_bounds(row_num >= SpMat<eT>::n_rows, "SpCol::shed_row(): out of bounds");
 
 	shed_rows(row_num, row_num);
 }
@@ -146,7 +146,7 @@ template<typename eT> inline
 void SpCol<eT>::shed_rows(const uword in_row1, const uword in_row2) {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check
+	arma_debug_check_bounds
 		(
 			(in_row1 > in_row2) || (in_row2 >= SpMat<eT>::n_rows),
 			"SpCol::shed_rows(): indices out of bounds or incorrectly used"
@@ -223,7 +223,7 @@ void SpCol<eT>::shed_rows(const uword in_row1, const uword in_row2) {
 // 
 //   arma_debug_check(set_to_zero == false, "SpCol::insert_rows(): cannot set nonzero values");
 // 
-//   arma_debug_check((row_num > SpMat<eT>::n_rows), "SpCol::insert_rows(): out of bounds");
+//   arma_debug_check_bounds((row_num > SpMat<eT>::n_rows), "SpCol::insert_rows(): out of bounds");
 // 
 //   for(uword row = 0; row < SpMat<eT>::n_rows; ++row)
 //     {
@@ -241,7 +241,7 @@ template<typename eT> inline
 typename SpCol<eT>::row_iterator SpCol<eT>::begin_row(const uword row_num) {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check((row_num >= SpMat<eT>::n_rows), "SpCol::begin_row(): index out of bounds");
+	arma_debug_check_bounds((row_num >= SpMat<eT>::n_rows), "SpCol::begin_row(): index out of bounds");
 
 	SpMat<eT>::sync_csc();
 
@@ -252,7 +252,7 @@ template<typename eT> inline
 typename SpCol<eT>::const_row_iterator SpCol<eT>::begin_row(const uword row_num) const {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check((row_num >= SpMat<eT>::n_rows), "SpCol::begin_row(): index out of bounds");
+	arma_debug_check_bounds((row_num >= SpMat<eT>::n_rows), "SpCol::begin_row(): index out of bounds");
 
 	SpMat<eT>::sync_csc();
 
@@ -263,7 +263,7 @@ template<typename eT> inline
 typename SpCol<eT>::row_iterator SpCol<eT>::end_row(const uword row_num) {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check((row_num >= SpMat<eT>::n_rows), "SpCol::end_row(): index out of bounds");
+	arma_debug_check_bounds((row_num >= SpMat<eT>::n_rows), "SpCol::end_row(): index out of bounds");
 
 	SpMat<eT>::sync_csc();
 
@@ -274,7 +274,7 @@ template<typename eT> inline
 typename SpCol<eT>::const_row_iterator SpCol<eT>::end_row(const uword row_num) const {
 	arma_extra_debug_sigprint();
 
-	arma_debug_check((row_num >= SpMat<eT>::n_rows), "SpCol::end_row(): index out of bounds");
+	arma_debug_check_bounds((row_num >= SpMat<eT>::n_rows), "SpCol::end_row(): index out of bounds");
 
 	SpMat<eT>::sync_csc();
 

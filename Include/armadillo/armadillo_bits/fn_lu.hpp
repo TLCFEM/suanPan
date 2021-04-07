@@ -35,7 +35,7 @@ bool lu
 	if(status == false) {
 		L.soft_reset();
 		U.soft_reset();
-		arma_debug_warn("lu(): decomposition failed");
+		arma_debug_warn_level(3, "lu(): decomposition failed");
 	}
 
 	return status;
@@ -62,7 +62,7 @@ bool lu
 		L.soft_reset();
 		U.soft_reset();
 		P.soft_reset();
-		arma_debug_warn("lu(): decomposition failed");
+		arma_debug_warn_level(3, "lu(): decomposition failed");
 	}
 
 	return status;

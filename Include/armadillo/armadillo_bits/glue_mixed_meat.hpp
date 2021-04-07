@@ -49,7 +49,8 @@ void glue_mixed_times::apply(Mat<typename eT_promoter<T1, T2>::eT>& out, const m
 		out.set_size(out_n_rows, out_n_cols);
 
 		gemm_mixed<do_trans_A, do_trans_B, use_alpha, false>::apply(out, A, B, alpha);
-	} else {
+	}
+	else {
 		Mat<out_eT> tmp(out_n_rows, out_n_cols);
 
 		gemm_mixed<do_trans_A, do_trans_B, use_alpha, false>::apply(tmp, A, B, alpha);
@@ -93,8 +94,10 @@ void glue_mixed_plus::apply(Mat<typename eT_promoter<T1, T2>::eT>& out, const mt
 			memory::mark_as_aligned(out_mem);
 
 			for(uword i = 0; i < n_elem; ++i) { out_mem[i] = upgrade_val<eT1, eT2>::apply(AA[i]) + upgrade_val<eT1, eT2>::apply(BB[i]); }
-		} else { for(uword i = 0; i < n_elem; ++i) { out_mem[i] = upgrade_val<eT1, eT2>::apply(AA[i]) + upgrade_val<eT1, eT2>::apply(BB[i]); } }
-	} else {
+		}
+		else { for(uword i = 0; i < n_elem; ++i) { out_mem[i] = upgrade_val<eT1, eT2>::apply(AA[i]) + upgrade_val<eT1, eT2>::apply(BB[i]); } }
+	}
+	else {
 		for(uword col = 0; col < n_cols; ++col)
 			for(uword row = 0; row < n_rows; ++row) {
 				(*out_mem) = upgrade_val<eT1, eT2>::apply(A.at(row, col)) + upgrade_val<eT1, eT2>::apply(B.at(row, col));
@@ -138,8 +141,10 @@ void glue_mixed_minus::apply(Mat<typename eT_promoter<T1, T2>::eT>& out, const m
 			memory::mark_as_aligned(out_mem);
 
 			for(uword i = 0; i < n_elem; ++i) { out_mem[i] = upgrade_val<eT1, eT2>::apply(AA[i]) - upgrade_val<eT1, eT2>::apply(BB[i]); }
-		} else { for(uword i = 0; i < n_elem; ++i) { out_mem[i] = upgrade_val<eT1, eT2>::apply(AA[i]) - upgrade_val<eT1, eT2>::apply(BB[i]); } }
-	} else {
+		}
+		else { for(uword i = 0; i < n_elem; ++i) { out_mem[i] = upgrade_val<eT1, eT2>::apply(AA[i]) - upgrade_val<eT1, eT2>::apply(BB[i]); } }
+	}
+	else {
 		for(uword col = 0; col < n_cols; ++col)
 			for(uword row = 0; row < n_rows; ++row) {
 				(*out_mem) = upgrade_val<eT1, eT2>::apply(A.at(row, col)) - upgrade_val<eT1, eT2>::apply(B.at(row, col));
@@ -183,8 +188,10 @@ void glue_mixed_div::apply(Mat<typename eT_promoter<T1, T2>::eT>& out, const mtG
 			memory::mark_as_aligned(out_mem);
 
 			for(uword i = 0; i < n_elem; ++i) { out_mem[i] = upgrade_val<eT1, eT2>::apply(AA[i]) / upgrade_val<eT1, eT2>::apply(BB[i]); }
-		} else { for(uword i = 0; i < n_elem; ++i) { out_mem[i] = upgrade_val<eT1, eT2>::apply(AA[i]) / upgrade_val<eT1, eT2>::apply(BB[i]); } }
-	} else {
+		}
+		else { for(uword i = 0; i < n_elem; ++i) { out_mem[i] = upgrade_val<eT1, eT2>::apply(AA[i]) / upgrade_val<eT1, eT2>::apply(BB[i]); } }
+	}
+	else {
 		for(uword col = 0; col < n_cols; ++col)
 			for(uword row = 0; row < n_rows; ++row) {
 				(*out_mem) = upgrade_val<eT1, eT2>::apply(A.at(row, col)) / upgrade_val<eT1, eT2>::apply(B.at(row, col));
@@ -228,8 +235,10 @@ void glue_mixed_schur::apply(Mat<typename eT_promoter<T1, T2>::eT>& out, const m
 			memory::mark_as_aligned(out_mem);
 
 			for(uword i = 0; i < n_elem; ++i) { out_mem[i] = upgrade_val<eT1, eT2>::apply(AA[i]) * upgrade_val<eT1, eT2>::apply(BB[i]); }
-		} else { for(uword i = 0; i < n_elem; ++i) { out_mem[i] = upgrade_val<eT1, eT2>::apply(AA[i]) * upgrade_val<eT1, eT2>::apply(BB[i]); } }
-	} else {
+		}
+		else { for(uword i = 0; i < n_elem; ++i) { out_mem[i] = upgrade_val<eT1, eT2>::apply(AA[i]) * upgrade_val<eT1, eT2>::apply(BB[i]); } }
+	}
+	else {
 		for(uword col = 0; col < n_cols; ++col)
 			for(uword row = 0; row < n_rows; ++row) {
 				(*out_mem) = upgrade_val<eT1, eT2>::apply(A.at(row, col)) * upgrade_val<eT1, eT2>::apply(B.at(row, col));
@@ -275,7 +284,8 @@ void glue_mixed_plus::apply(Cube<typename eT_promoter<T1, T2>::eT>& out, const m
 		typename ProxyCube<T2>::ea_type BB = B.get_ea();
 
 		for(uword i = 0; i < n_elem; ++i) { out_mem[i] = upgrade_val<eT1, eT2>::apply(AA[i]) + upgrade_val<eT1, eT2>::apply(BB[i]); }
-	} else {
+	}
+	else {
 		for(uword slice = 0; slice < n_slices; ++slice)
 			for(uword col = 0; col < n_cols; ++col)
 				for(uword row = 0; row < n_rows; ++row) {
@@ -318,7 +328,8 @@ void glue_mixed_minus::apply(Cube<typename eT_promoter<T1, T2>::eT>& out, const 
 		typename ProxyCube<T2>::ea_type BB = B.get_ea();
 
 		for(uword i = 0; i < n_elem; ++i) { out_mem[i] = upgrade_val<eT1, eT2>::apply(AA[i]) - upgrade_val<eT1, eT2>::apply(BB[i]); }
-	} else {
+	}
+	else {
 		for(uword slice = 0; slice < n_slices; ++slice)
 			for(uword col = 0; col < n_cols; ++col)
 				for(uword row = 0; row < n_rows; ++row) {
@@ -361,7 +372,8 @@ void glue_mixed_div::apply(Cube<typename eT_promoter<T1, T2>::eT>& out, const mt
 		typename ProxyCube<T2>::ea_type BB = B.get_ea();
 
 		for(uword i = 0; i < n_elem; ++i) { out_mem[i] = upgrade_val<eT1, eT2>::apply(AA[i]) / upgrade_val<eT1, eT2>::apply(BB[i]); }
-	} else {
+	}
+	else {
 		for(uword slice = 0; slice < n_slices; ++slice)
 			for(uword col = 0; col < n_cols; ++col)
 				for(uword row = 0; row < n_rows; ++row) {
@@ -404,7 +416,8 @@ void glue_mixed_schur::apply(Cube<typename eT_promoter<T1, T2>::eT>& out, const 
 		typename ProxyCube<T2>::ea_type BB = B.get_ea();
 
 		for(uword i = 0; i < n_elem; ++i) { out_mem[i] = upgrade_val<eT1, eT2>::apply(AA[i]) * upgrade_val<eT1, eT2>::apply(BB[i]); }
-	} else {
+	}
+	else {
 		for(uword slice = 0; slice < n_slices; ++slice)
 			for(uword col = 0; col < n_cols; ++col)
 				for(uword row = 0; row < n_rows; ++row) {

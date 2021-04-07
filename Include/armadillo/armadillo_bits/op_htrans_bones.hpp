@@ -27,7 +27,7 @@ public:
 		static constexpr bool is_xvec = T1::is_xvec;
 	};
 
-	template<typename eT> arma_hot arma_inline static void apply_mat_noalias(Mat<eT>& out, const Mat<eT>& A, const typename arma_not_cx<eT>::result* junk = nullptr);
+	template<typename eT> arma_inline static void apply_mat_noalias(Mat<eT>& out, const Mat<eT>& A, const typename arma_not_cx<eT>::result* junk = nullptr);
 
 	template<typename eT> arma_hot inline static void apply_mat_noalias(Mat<eT>& out, const Mat<eT>& A, const typename arma_cx_only<eT>::result* junk = nullptr);
 
@@ -39,13 +39,13 @@ public:
 
 	//
 
-	template<typename eT> arma_hot arma_inline static void apply_mat_inplace(Mat<eT>& out, const typename arma_not_cx<eT>::result* junk = nullptr);
+	template<typename eT> arma_inline static void apply_mat_inplace(Mat<eT>& out, const typename arma_not_cx<eT>::result* junk = nullptr);
 
 	template<typename eT> arma_hot inline static void apply_mat_inplace(Mat<eT>& out, const typename arma_cx_only<eT>::result* junk = nullptr);
 
 	//
 
-	template<typename eT> arma_hot arma_inline static void apply_mat(Mat<eT>& out, const Mat<eT>& A, const typename arma_not_cx<eT>::result* junk = nullptr);
+	template<typename eT> arma_inline static void apply_mat(Mat<eT>& out, const Mat<eT>& A, const typename arma_not_cx<eT>::result* junk = nullptr);
 
 	template<typename eT> arma_hot inline static void apply_mat(Mat<eT>& out, const Mat<eT>& A, const typename arma_cx_only<eT>::result* junk = nullptr);
 

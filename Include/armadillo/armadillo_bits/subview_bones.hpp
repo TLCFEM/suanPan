@@ -46,6 +46,9 @@ public:
 	inline ~subview();
 	inline subview() = delete;
 
+	inline subview(const subview& in);
+	inline subview(subview&& in);
+
 	template<typename op_type> inline void inplace_op(const eT val);
 	template<typename op_type, typename T1> inline void inplace_op(const Base<eT, T1>& x, const char* identifier);
 	template<typename op_type> inline void inplace_op(const subview<eT>& x, const char* identifier);
@@ -77,6 +80,9 @@ public:
 	template<typename T1> inline void operator/=(const SpBase<eT, T1>& x);
 
 	template<typename T1, typename gen_type> inline typename enable_if2<is_same_type<typename T1::elem_type, eT>::value, void>::result operator=(const Gen<T1, gen_type>& x);
+
+	inline void operator=(const std::initializer_list<eT>& list);
+	inline void operator=(const std::initializer_list<std::initializer_list<eT>>& list);
 
 	inline static void extract(Mat<eT>& out, const subview& in);
 
@@ -341,6 +347,7 @@ public:
 	inline void operator=(const subview<eT>& x);
 	inline void operator=(const subview_col& x);
 	inline void operator=(const eT val);
+	inline void operator=(const std::initializer_list<eT>& list);
 
 	template<typename T1> inline void operator=(const Base<eT, T1>& x);
 
@@ -397,6 +404,9 @@ public:
 	inline arma_warn_unused uword index_min() const;
 	inline arma_warn_unused uword index_max() const;
 
+	inline subview_col(const subview_col& in);
+	inline subview_col(subview_col&& in);
+
 protected:
 
 	inline subview_col(const Mat<eT>& in_m, const uword in_col);
@@ -421,6 +431,7 @@ public:
 	inline void operator=(const subview<eT>& x);
 	inline void operator=(const subview_row& x);
 	inline void operator=(const eT val);
+	inline void operator=(const std::initializer_list<eT>& list);
 
 	template<typename T1> inline void operator=(const Base<eT, T1>& x);
 
@@ -472,6 +483,9 @@ public:
 	inline typename subview<eT>::const_row_iterator end() const;
 	inline typename subview<eT>::const_row_iterator cend() const;
 
+	inline subview_row(const subview_row& in);
+	inline subview_row(subview_row&& in);
+
 protected:
 
 	inline subview_row(const Mat<eT>& in_m, const uword in_row);
@@ -497,6 +511,7 @@ public:
 
 	const uword n_rows; // equal to n_elem
 	const uword n_elem;
+
 	static constexpr uword n_cols = 1;
 
 	inline explicit subview_row_strans(const subview_row<eT>& in_sv_row);
@@ -526,6 +541,7 @@ public:
 
 	const uword n_rows; // equal to n_elem
 	const uword n_elem;
+
 	static constexpr uword n_cols = 1;
 
 	inline explicit subview_row_htrans(const subview_row<eT>& in_sv_row);

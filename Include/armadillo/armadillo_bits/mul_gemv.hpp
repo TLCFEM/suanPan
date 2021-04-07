@@ -29,7 +29,8 @@ public:
 	template<typename eT, const uword i> arma_inline
 	static
 	void assign(eT* y, const eT acc, const eT alpha, const eT beta) {
-		if(use_beta == false) { y[i] = (use_alpha == false) ? acc : alpha * acc; } else {
+		if(use_beta == false) { y[i] = (use_alpha == false) ? acc : alpha * acc; }
+		else {
 			const eT tmp = y[i];
 
 			y[i] = beta * tmp + ((use_alpha == false) ? acc : alpha * acc);
@@ -176,14 +177,22 @@ public:
 			if(A_n_rows == 1) {
 				const eT acc = op_dot::direct_dot_arma(A_n_cols, A.memptr(), x);
 
-				if((use_alpha == false) && (use_beta == false)) { y[0] = acc; } else if((use_alpha == true) && (use_beta == false)) { y[0] = alpha * acc; } else if((use_alpha == false) && (use_beta == true)) { y[0] = acc + beta * y[0]; } else if((use_alpha == true) && (use_beta == true)) { y[0] = alpha * acc + beta * y[0]; }
-			} else
+				if((use_alpha == false) && (use_beta == false)) { y[0] = acc; }
+				else if((use_alpha == true) && (use_beta == false)) { y[0] = alpha * acc; }
+				else if((use_alpha == false) && (use_beta == true)) { y[0] = acc + beta * y[0]; }
+				else if((use_alpha == true) && (use_beta == true)) { y[0] = alpha * acc + beta * y[0]; }
+			}
+			else
 				for(uword row = 0; row < A_n_rows; ++row) {
 					const eT acc = gemv_emul_helper::dot_row_col(A, x, row, A_n_cols);
 
-					if((use_alpha == false) && (use_beta == false)) { y[row] = acc; } else if((use_alpha == true) && (use_beta == false)) { y[row] = alpha * acc; } else if((use_alpha == false) && (use_beta == true)) { y[row] = acc + beta * y[row]; } else if((use_alpha == true) && (use_beta == true)) { y[row] = alpha * acc + beta * y[row]; }
+					if((use_alpha == false) && (use_beta == false)) { y[row] = acc; }
+					else if((use_alpha == true) && (use_beta == false)) { y[row] = alpha * acc; }
+					else if((use_alpha == false) && (use_beta == true)) { y[row] = acc + beta * y[row]; }
+					else if((use_alpha == true) && (use_beta == true)) { y[row] = alpha * acc + beta * y[row]; }
 				}
-		} else if(do_trans_A == true) {
+		}
+		else if(do_trans_A == true) {
 			if(is_cx<eT>::no) {
 				for(uword col = 0; col < A_n_cols; ++col) {
 					// col is interpreted as row when storing the results in 'y'
@@ -198,9 +207,13 @@ public:
 
 					const eT acc = op_dot::direct_dot_arma(A_n_rows, A.colptr(col), x);
 
-					if((use_alpha == false) && (use_beta == false)) { y[col] = acc; } else if((use_alpha == true) && (use_beta == false)) { y[col] = alpha * acc; } else if((use_alpha == false) && (use_beta == true)) { y[col] = acc + beta * y[col]; } else if((use_alpha == true) && (use_beta == true)) { y[col] = alpha * acc + beta * y[col]; }
+					if((use_alpha == false) && (use_beta == false)) { y[col] = acc; }
+					else if((use_alpha == true) && (use_beta == false)) { y[col] = alpha * acc; }
+					else if((use_alpha == false) && (use_beta == true)) { y[col] = acc + beta * y[col]; }
+					else if((use_alpha == true) && (use_beta == true)) { y[col] = alpha * acc + beta * y[col]; }
 				}
-			} else {
+			}
+			else {
 				Mat<eT> AA;
 
 				op_htrans::apply_mat_noalias(AA, A);
@@ -224,7 +237,8 @@ public:
 	void apply_blas_type(eT* y, const TA& A, const eT* x, const eT alpha = eT(1), const eT beta = eT(0)) {
 		arma_extra_debug_sigprint();
 
-		if((A.n_rows <= 4) && (A.n_rows == A.n_cols) && (is_cx<eT>::no)) { gemv_emul_tinysq<do_trans_A, use_alpha, use_beta>::apply(y, A, x, alpha, beta); } else {
+		if((A.n_rows <= 4) && (A.n_rows == A.n_cols) && (is_cx<eT>::no)) { gemv_emul_tinysq<do_trans_A, use_alpha, use_beta>::apply(y, A, x, alpha, beta); }
+		else {
 #if defined(ARMA_USE_ATLAS)
         {
         arma_debug_assert_atlas_size(A);

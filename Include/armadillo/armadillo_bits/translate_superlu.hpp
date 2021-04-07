@@ -22,7 +22,10 @@ namespace superlu {
 	void gssv(superlu_options_t* options, SuperMatrix* A, int* perm_c, int* perm_r, SuperMatrix* L, SuperMatrix* U, SuperMatrix* B, SuperLUStat_t* stat, int* info) {
 		arma_type_check(( is_supported_blas_type<eT>::value == false ));
 
-		if(is_float<eT>::value) { arma_wrapper(sgssv)(options, A, perm_c, perm_r, L, U, B, stat, info); } else if(is_double<eT>::value) { arma_wrapper(dgssv)(options, A, perm_c, perm_r, L, U, B, stat, info); } else if(is_cx_float<eT>::value) { arma_wrapper(cgssv)(options, A, perm_c, perm_r, L, U, B, stat, info); } else if(is_cx_double<eT>::value) { arma_wrapper(zgssv)(options, A, perm_c, perm_r, L, U, B, stat, info); }
+		if(is_float<eT>::value) { arma_wrapper(sgssv)(options, A, perm_c, perm_r, L, U, B, stat, info); }
+		else if(is_double<eT>::value) { arma_wrapper(dgssv)(options, A, perm_c, perm_r, L, U, B, stat, info); }
+		else if(is_cx_float<eT>::value) { arma_wrapper(cgssv)(options, A, perm_c, perm_r, L, U, B, stat, info); }
+		else if(is_cx_double<eT>::value) { arma_wrapper(zgssv)(options, A, perm_c, perm_r, L, U, B, stat, info); }
 	}
 
 	template<typename eT> inline
@@ -44,13 +47,16 @@ namespace superlu {
 		if(is_float<eT>::value) {
 			typedef float T;
 			arma_wrapper(sgssvx)(opts, A, perm_c, perm_r, etree, equed, (T*)R, (T*)C, L, U, work, lwork, B, X, (T*)rpg, (T*)rcond, (T*)ferr, (T*)berr, glu, mu, stat, info);
-		} else if(is_double<eT>::value) {
+		}
+		else if(is_double<eT>::value) {
 			typedef double T;
 			arma_wrapper(dgssvx)(opts, A, perm_c, perm_r, etree, equed, (T*)R, (T*)C, L, U, work, lwork, B, X, (T*)rpg, (T*)rcond, (T*)ferr, (T*)berr, glu, mu, stat, info);
-		} else if(is_cx_float<eT>::value) {
+		}
+		else if(is_cx_float<eT>::value) {
 			typedef float T;
 			arma_wrapper(cgssvx)(opts, A, perm_c, perm_r, etree, equed, (T*)R, (T*)C, L, U, work, lwork, B, X, (T*)rpg, (T*)rcond, (T*)ferr, (T*)berr, glu, mu, stat, info);
-		} else if(is_cx_double<eT>::value) {
+		}
+		else if(is_cx_double<eT>::value) {
 			typedef double T;
 			arma_wrapper(zgssvx)(opts, A, perm_c, perm_r, etree, equed, (T*)R, (T*)C, L, U, work, lwork, B, X, (T*)rpg, (T*)rcond, (T*)ferr, (T*)berr, glu, mu, stat, info);
 		}
@@ -71,13 +77,16 @@ namespace superlu {
 		if(is_float<eT>::value) {
 			typedef float T;
 			arma_wrapper(sgstrf)(options, A, (T)drop_tol, relax, panel_size, etree, work, lwork, perm_c, perm_r, L, U, Glu, stat, info);
-		} else if(is_double<eT>::value) {
+		}
+		else if(is_double<eT>::value) {
 			typedef double T;
 			arma_wrapper(dgstrf)(options, A, (T)drop_tol, relax, panel_size, etree, work, lwork, perm_c, perm_r, L, U, Glu, stat, info);
-		} else if(is_cx_float<eT>::value) {
+		}
+		else if(is_cx_float<eT>::value) {
 			typedef float T;
 			arma_wrapper(cgstrf)(options, A, (T)drop_tol, relax, panel_size, etree, work, lwork, perm_c, perm_r, L, U, Glu, stat, info);
-		} else if(is_cx_double<eT>::value) {
+		}
+		else if(is_cx_double<eT>::value) {
 			typedef double T;
 			arma_wrapper(zgstrf)(options, A, (T)drop_tol, relax, panel_size, etree, work, lwork, perm_c, perm_r, L, U, Glu, stat, info);
 		}
@@ -91,7 +100,46 @@ namespace superlu {
 	) {
 		arma_type_check(( is_supported_blas_type<eT>::value == false ));
 
-		if(is_float<eT>::value) { arma_wrapper(sgstrs)(trans, L, U, perm_c, perm_r, B, stat, info); } else if(is_double<eT>::value) { arma_wrapper(dgstrs)(trans, L, U, perm_c, perm_r, B, stat, info); } else if(is_cx_float<eT>::value) { arma_wrapper(cgstrs)(trans, L, U, perm_c, perm_r, B, stat, info); } else if(is_cx_double<eT>::value) { arma_wrapper(zgstrs)(trans, L, U, perm_c, perm_r, B, stat, info); }
+		if(is_float<eT>::value) { arma_wrapper(sgstrs)(trans, L, U, perm_c, perm_r, B, stat, info); }
+		else if(is_double<eT>::value) { arma_wrapper(dgstrs)(trans, L, U, perm_c, perm_r, B, stat, info); }
+		else if(is_cx_float<eT>::value) { arma_wrapper(cgstrs)(trans, L, U, perm_c, perm_r, B, stat, info); }
+		else if(is_cx_double<eT>::value) { arma_wrapper(zgstrs)(trans, L, U, perm_c, perm_r, B, stat, info); }
+	}
+
+	template<typename eT> inline
+	typename get_pod_type<eT>::result langs(char* norm, superlu::SuperMatrix* A) {
+		arma_type_check(( is_supported_blas_type<eT>::value == false ));
+
+		typedef typename get_pod_type<eT>::result T;
+
+		if(is_float<eT>::value) { return arma_wrapper(slangs)(norm, A); }
+		else if(is_double<eT>::value) { return arma_wrapper(dlangs)(norm, A); }
+		else if(is_cx_float<eT>::value) { return arma_wrapper(clangs)(norm, A); }
+		else if(is_cx_double<eT>::value) { return arma_wrapper(zlangs)(norm, A); }
+
+		return T(0); // to avoid false warnigns from the compiler
+	}
+
+	template<typename eT> inline
+	void gscon(char* norm, superlu::SuperMatrix* L, superlu::SuperMatrix* U, typename get_pod_type<eT>::result anorm, typename get_pod_type<eT>::result* rcond, superlu::SuperLUStat_t* stat, int* info) {
+		arma_type_check(( is_supported_blas_type<eT>::value == false ));
+
+		if(is_float<eT>::value) {
+			typedef float T;
+			arma_wrapper(sgscon)(norm, L, U, (T)anorm, (T*)rcond, stat, info);
+		}
+		else if(is_double<eT>::value) {
+			typedef double T;
+			arma_wrapper(dgscon)(norm, L, U, (T)anorm, (T*)rcond, stat, info);
+		}
+		else if(is_cx_float<eT>::value) {
+			typedef float T;
+			arma_wrapper(cgscon)(norm, L, U, (T)anorm, (T*)rcond, stat, info);
+		}
+		else if(is_cx_double<eT>::value) {
+			typedef double T;
+			arma_wrapper(zgscon)(norm, L, U, (T)anorm, (T*)rcond, stat, info);
+		}
 	}
 
 	inline

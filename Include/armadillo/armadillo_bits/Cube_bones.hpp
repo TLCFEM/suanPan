@@ -282,12 +282,6 @@ public:
 	arma_inline arma_warn_unused eT* slice_colptr(const uword in_slice, const uword in_col);
 	arma_inline arma_warn_unused const eT* slice_colptr(const uword in_slice, const uword in_col) const;
 
-	arma_cold inline void impl_print(const std::string& extra_text) const;
-	arma_cold inline void impl_print(std::ostream& user_stream, const std::string& extra_text) const;
-
-	arma_cold inline void impl_raw_print(const std::string& extra_text) const;
-	arma_cold inline void impl_raw_print(std::ostream& user_stream, const std::string& extra_text) const;
-
 	inline void set_size(const uword in_rows, const uword in_cols, const uword in_slices);
 	inline void set_size(const SizeCube& s);
 
@@ -342,13 +336,13 @@ public:
 	inline eT min(uword& row_of_min_val, uword& col_of_min_val, uword& slice_of_min_val) const;
 	inline eT max(uword& row_of_max_val, uword& col_of_max_val, uword& slice_of_max_val) const;
 
-	inline arma_cold bool save(const std::string name, const file_type type = arma_binary, const bool print_status = true) const;
-	inline arma_cold bool save(const hdf5_name& spec, const file_type type = hdf5_binary, const bool print_status = true) const;
-	inline arma_cold bool save(std::ostream& os, const file_type type = arma_binary, const bool print_status = true) const;
+	inline arma_cold bool save(const std::string name, const file_type type = arma_binary) const;
+	inline arma_cold bool save(const hdf5_name& spec, const file_type type = hdf5_binary) const;
+	inline arma_cold bool save(std::ostream& os, const file_type type = arma_binary) const;
 
-	inline arma_cold bool load(const std::string name, const file_type type = auto_detect, const bool print_status = true);
-	inline arma_cold bool load(const hdf5_name& spec, const file_type type = hdf5_binary, const bool print_status = true);
-	inline arma_cold bool load(std::istream& is, const file_type type = auto_detect, const bool print_status = true);
+	inline arma_cold bool load(const std::string name, const file_type type = auto_detect);
+	inline arma_cold bool load(const hdf5_name& spec, const file_type type = hdf5_binary);
+	inline arma_cold bool load(std::istream& is, const file_type type = auto_detect);
 
 	inline arma_cold bool quiet_save(const std::string name, const file_type type = arma_binary) const;
 	inline arma_cold bool quiet_save(const hdf5_name& spec, const file_type type = hdf5_binary) const;

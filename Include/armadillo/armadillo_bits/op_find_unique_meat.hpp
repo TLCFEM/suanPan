@@ -49,7 +49,8 @@ bool op_find_unique::apply_helper(Mat<uword>& out, const Proxy<T1>& P, const boo
 			packet_vec[i].val = val;
 			packet_vec[i].index = i;
 		}
-	} else {
+	}
+	else {
 		const uword n_rows = P.get_n_rows();
 		const uword n_cols = P.get_n_cols();
 

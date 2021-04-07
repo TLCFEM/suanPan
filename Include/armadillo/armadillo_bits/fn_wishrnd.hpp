@@ -52,15 +52,14 @@ enable_if2
 	const bool status = op_wishrnd::apply_direct(W, S.get_ref(), df, uword(1));
 
 	if(status == false) {
-		arma_debug_warn("wishrnd(): given matrix is not symmetric positive definite");
-		return false;
+		W.soft_reset();
+		arma_debug_warn_level(3, "wishrnd(): given matrix is not symmetric positive definite");
 	}
 
-	return true;
+	return status;
 }
 
-template<typename T1, typename T2> arma_warn_unused
-inline
+template<typename T1, typename T2> inline
 typename
 enable_if2
 <
@@ -69,7 +68,14 @@ enable_if2
 	arma_extra_debug_sigprint();
 	arma_ignore(S);
 
-	return op_wishrnd::apply_direct(W, D.get_ref(), df, uword(2));
+	const bool status = op_wishrnd::apply_direct(W, D.get_ref(), df, uword(2));
+
+	if(status == false) {
+		W.soft_reset();
+		arma_debug_warn_level(3, "wishrnd(): problem with given 'D' matrix");
+	}
+
+	return status;
 }
 
 //
@@ -110,15 +116,14 @@ enable_if2
 	const bool status = op_iwishrnd::apply_direct(W, T.get_ref(), df, uword(1));
 
 	if(status == false) {
-		arma_debug_warn("iwishrnd(): given matrix is not symmetric positive definite and/or df is too low");
-		return false;
+		W.soft_reset();
+		arma_debug_warn_level(3, "iwishrnd(): given matrix is not symmetric positive definite and/or df is too low");
 	}
 
-	return true;
+	return status;
 }
 
-template<typename T1, typename T2> arma_warn_unused
-inline
+template<typename T1, typename T2> inline
 typename
 enable_if2
 <
@@ -127,7 +132,14 @@ enable_if2
 	arma_extra_debug_sigprint();
 	arma_ignore(T);
 
-	return op_iwishrnd::apply_direct(W, Dinv.get_ref(), df, uword(2));
+	const bool status = op_iwishrnd::apply_direct(W, Dinv.get_ref(), df, uword(2));
+
+	if(status == false) {
+		W.soft_reset();
+		arma_debug_warn_level(3, "wishrnd(): problem with given 'Dinv' matrix and/or df is too low");
+	}
+
+	return status;
 }
 
 //! @}

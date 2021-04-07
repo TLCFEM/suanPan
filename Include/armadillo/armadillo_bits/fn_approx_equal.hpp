@@ -24,7 +24,8 @@ bool internal_approx_equal_abs_diff(const eT& x, const eT& y, const typename get
 		if(is_real<T>::value) // also true for eT = std::complex<float> or eT = std::complex<double>
 		{
 			if(arma_isnan(x) || arma_isnan(y) || (eop_aux::arma_abs(x - y) > tol)) { return false; }
-		} else { if(eop_aux::arma_abs((cond_rel<is_cx<eT>::no>::gt(x, y)) ? (x - y) : (y - x)) > tol) { return false; } }
+		}
+		else { if(eop_aux::arma_abs((cond_rel<is_cx<eT>::no>::gt(x, y)) ? (x - y) : (y - x)) > tol) { return false; } }
 	}
 
 	return true;
@@ -46,8 +47,10 @@ bool internal_approx_equal_rel_diff(const eT& a, const eT& b, const typename get
 
 			const T abs_d = eop_aux::arma_abs(a - b);
 
-			if(max_c >= T(1)) { if(abs_d > (tol * max_c)) { return false; } } else { if((abs_d / max_c) > tol) { return false; } }
-		} else {
+			if(max_c >= T(1)) { if(abs_d > (tol * max_c)) { return false; } }
+			else { if((abs_d / max_c) > tol) { return false; } }
+		}
+		else {
 			const T abs_a = eop_aux::arma_abs(a);
 			const T abs_b = eop_aux::arma_abs(b);
 
@@ -98,9 +101,12 @@ bool internal_approx_equal_worker
 			const bool state_abs_diff = (use_abs_diff) ? internal_approx_equal_abs_diff(x, y, abs_tol) : true;
 			const bool state_rel_diff = (use_rel_diff) ? internal_approx_equal_rel_diff(x, y, rel_tol) : true;
 
-			if(use_abs_diff && use_rel_diff) { if((state_abs_diff == false) && (state_rel_diff == false)) { return false; } } else if(use_abs_diff) { if(state_abs_diff == false) { return false; } } else if(use_rel_diff) { if(state_rel_diff == false) { return false; } }
+			if(use_abs_diff && use_rel_diff) { if((state_abs_diff == false) && (state_rel_diff == false)) { return false; } }
+			else if(use_abs_diff) { if(state_abs_diff == false) { return false; } }
+			else if(use_rel_diff) { if(state_rel_diff == false) { return false; } }
 		}
-	} else {
+	}
+	else {
 		const uword n_rows = PA.get_n_rows();
 		const uword n_cols = PA.get_n_cols();
 
@@ -112,7 +118,9 @@ bool internal_approx_equal_worker
 				const bool state_abs_diff = (use_abs_diff) ? internal_approx_equal_abs_diff(x, y, abs_tol) : true;
 				const bool state_rel_diff = (use_rel_diff) ? internal_approx_equal_rel_diff(x, y, rel_tol) : true;
 
-				if(use_abs_diff && use_rel_diff) { if((state_abs_diff == false) && (state_rel_diff == false)) { return false; } } else if(use_abs_diff) { if(state_abs_diff == false) { return false; } } else if(use_rel_diff) { if(state_rel_diff == false) { return false; } }
+				if(use_abs_diff && use_rel_diff) { if((state_abs_diff == false) && (state_rel_diff == false)) { return false; } }
+				else if(use_abs_diff) { if(state_abs_diff == false) { return false; } }
+				else if(use_rel_diff) { if(state_rel_diff == false) { return false; } }
 			}
 	}
 
@@ -155,9 +163,12 @@ bool internal_approx_equal_worker
 			const bool state_abs_diff = (use_abs_diff) ? internal_approx_equal_abs_diff(x, y, abs_tol) : true;
 			const bool state_rel_diff = (use_rel_diff) ? internal_approx_equal_rel_diff(x, y, rel_tol) : true;
 
-			if(use_abs_diff && use_rel_diff) { if((state_abs_diff == false) && (state_rel_diff == false)) { return false; } } else if(use_abs_diff) { if(state_abs_diff == false) { return false; } } else if(use_rel_diff) { if(state_rel_diff == false) { return false; } }
+			if(use_abs_diff && use_rel_diff) { if((state_abs_diff == false) && (state_rel_diff == false)) { return false; } }
+			else if(use_abs_diff) { if(state_abs_diff == false) { return false; } }
+			else if(use_rel_diff) { if(state_rel_diff == false) { return false; } }
 		}
-	} else {
+	}
+	else {
 		const uword n_rows = PA.get_n_rows();
 		const uword n_cols = PA.get_n_cols();
 		const uword n_slices = PA.get_n_slices();
@@ -171,7 +182,9 @@ bool internal_approx_equal_worker
 					const bool state_abs_diff = (use_abs_diff) ? internal_approx_equal_abs_diff(x, y, abs_tol) : true;
 					const bool state_rel_diff = (use_rel_diff) ? internal_approx_equal_rel_diff(x, y, rel_tol) : true;
 
-					if(use_abs_diff && use_rel_diff) { if((state_abs_diff == false) && (state_rel_diff == false)) { return false; } } else if(use_abs_diff) { if(state_abs_diff == false) { return false; } } else if(use_rel_diff) { if(state_rel_diff == false) { return false; } }
+					if(use_abs_diff && use_rel_diff) { if((state_abs_diff == false) && (state_rel_diff == false)) { return false; } }
+					else if(use_abs_diff) { if(state_abs_diff == false) { return false; } }
+					else if(use_rel_diff) { if(state_rel_diff == false) { return false; } }
 				}
 	}
 
@@ -190,7 +203,9 @@ bool internal_approx_equal_handler(const T1& A, const T2& B, const char* method,
 
 	bool status = false;
 
-	if(sig == 'a') { status = internal_approx_equal_worker<true, false>(A, B, abs_tol, T(0)); } else if(sig == 'r') { status = internal_approx_equal_worker<false, true>(A, B, T(0), rel_tol); } else if(sig == 'b') { status = internal_approx_equal_worker<true, true>(A, B, abs_tol, rel_tol); }
+	if(sig == 'a') { status = internal_approx_equal_worker<true, false>(A, B, abs_tol, T(0)); }
+	else if(sig == 'r') { status = internal_approx_equal_worker<false, true>(A, B, T(0), rel_tol); }
+	else if(sig == 'b') { status = internal_approx_equal_worker<true, true>(A, B, abs_tol, rel_tol); }
 
 	return status;
 }
@@ -209,7 +224,8 @@ bool internal_approx_equal_handler(const T1& A, const T2& B, const char* method,
 
 	bool status = false;
 
-	if(sig == 'a') { status = internal_approx_equal_worker<true, false>(A, B, tol, T(0)); } else if(sig == 'r') { status = internal_approx_equal_worker<false, true>(A, B, T(0), tol); }
+	if(sig == 'a') { status = internal_approx_equal_worker<true, false>(A, B, tol, T(0)); }
+	else if(sig == 'r') { status = internal_approx_equal_worker<false, true>(A, B, T(0), tol); }
 
 	return status;
 }

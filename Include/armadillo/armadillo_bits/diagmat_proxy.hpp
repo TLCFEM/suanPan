@@ -32,10 +32,25 @@ public:
 	}
 
 	arma_inline
-	elem_type operator[](const uword i) const { if(Proxy<T1>::use_at == false) { return P_is_vec ? P[i] : P.at(i, i); } else { if(P_is_vec) { return (P_is_col) ? P.at(i, 0) : P.at(0, i); } else { return P.at(i, i); } } }
+	elem_type operator[](const uword i) const {
+		if(Proxy<T1>::use_at == false) { return P_is_vec ? P[i] : P.at(i, i); }
+		else {
+			if(P_is_vec) { return (P_is_col) ? P.at(i, 0) : P.at(0, i); }
+			else { return P.at(i, i); }
+		}
+	}
 
 	arma_inline
-	elem_type at(const uword row, const uword col) const { if(row == col) { if(Proxy<T1>::use_at == false) { return (P_is_vec) ? P[row] : P.at(row, row); } else { if(P_is_vec) { return (P_is_col) ? P.at(row, 0) : P.at(0, row); } else { return P.at(row, row); } } } else { return elem_type(0); } }
+	elem_type at(const uword row, const uword col) const {
+		if(row == col) {
+			if(Proxy<T1>::use_at == false) { return (P_is_vec) ? P[row] : P.at(row, row); }
+			else {
+				if(P_is_vec) { return (P_is_col) ? P.at(row, 0) : P.at(0, row); }
+				else { return P.at(row, row); }
+			}
+		}
+		else { return elem_type(0); }
+	}
 
 	constexpr bool is_alias(const Mat<elem_type>&) const { return false; }
 
@@ -61,7 +76,10 @@ public:
 	elem_type operator[](const uword i) const { return (P_is_vec) ? P[i] : P.at(i, i); }
 
 	arma_inline
-	elem_type at(const uword row, const uword col) const { if(row == col) { return (P_is_vec) ? P[row] : P.at(row, row); } else { return elem_type(0); } }
+	elem_type at(const uword row, const uword col) const {
+		if(row == col) { return (P_is_vec) ? P[row] : P.at(row, row); }
+		else { return elem_type(0); }
+	}
 
 	arma_inline bool is_alias(const Mat<elem_type>& X) const { return (void_ptr(&X) == void_ptr(&P)); }
 

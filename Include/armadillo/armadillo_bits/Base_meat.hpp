@@ -22,33 +22,109 @@ const derived& Base<elem_type, derived>::get_ref() const { return static_cast<co
 template<typename elem_type, typename derived> arma_cold
 inline
 void Base<elem_type, derived>::print(const std::string extra_text) const {
+	arma_extra_debug_sigprint();
+
 	const quasi_unwrap<derived> tmp((*this).get_ref());
 
-	tmp.M.impl_print(extra_text);
+	if(extra_text.length() != 0) {
+		const std::streamsize orig_width = get_cout_stream().width();
+
+		get_cout_stream() << extra_text << '\n';
+
+		get_cout_stream().width(orig_width);
+	}
+
+	arma_ostream::print(get_cout_stream(), tmp.M, true);
 }
 
 template<typename elem_type, typename derived> arma_cold
 inline
 void Base<elem_type, derived>::print(std::ostream& user_stream, const std::string extra_text) const {
+	arma_extra_debug_sigprint();
+
 	const quasi_unwrap<derived> tmp((*this).get_ref());
 
-	tmp.M.impl_print(user_stream, extra_text);
+	if(extra_text.length() != 0) {
+		const std::streamsize orig_width = user_stream.width();
+
+		user_stream << extra_text << '\n';
+
+		user_stream.width(orig_width);
+	}
+
+	arma_ostream::print(user_stream, tmp.M, true);
 }
 
 template<typename elem_type, typename derived> arma_cold
 inline
 void Base<elem_type, derived>::raw_print(const std::string extra_text) const {
+	arma_extra_debug_sigprint();
+
 	const quasi_unwrap<derived> tmp((*this).get_ref());
 
-	tmp.M.impl_raw_print(extra_text);
+	if(extra_text.length() != 0) {
+		const std::streamsize orig_width = get_cout_stream().width();
+
+		get_cout_stream() << extra_text << '\n';
+
+		get_cout_stream().width(orig_width);
+	}
+
+	arma_ostream::print(get_cout_stream(), tmp.M, false);
 }
 
 template<typename elem_type, typename derived> arma_cold
 inline
 void Base<elem_type, derived>::raw_print(std::ostream& user_stream, const std::string extra_text) const {
+	arma_extra_debug_sigprint();
+
 	const quasi_unwrap<derived> tmp((*this).get_ref());
 
-	tmp.M.impl_raw_print(user_stream, extra_text);
+	if(extra_text.length() != 0) {
+		const std::streamsize orig_width = user_stream.width();
+
+		user_stream << extra_text << '\n';
+
+		user_stream.width(orig_width);
+	}
+
+	arma_ostream::print(user_stream, tmp.M, false);
+}
+
+template<typename elem_type, typename derived> arma_cold
+inline
+void Base<elem_type, derived>::brief_print(const std::string extra_text) const {
+	arma_extra_debug_sigprint();
+
+	const quasi_unwrap<derived> tmp((*this).get_ref());
+
+	if(extra_text.length() != 0) {
+		const std::streamsize orig_width = get_cout_stream().width();
+
+		get_cout_stream() << extra_text << '\n';
+
+		get_cout_stream().width(orig_width);
+	}
+
+	arma_ostream::brief_print(get_cout_stream(), tmp.M);
+}
+
+template<typename elem_type, typename derived> arma_cold
+inline
+void Base<elem_type, derived>::brief_print(std::ostream& user_stream, const std::string extra_text) const {
+	arma_extra_debug_sigprint();
+
+	const quasi_unwrap<derived> tmp((*this).get_ref());
+
+	if(extra_text.length() != 0) {
+		const std::streamsize orig_width = user_stream.width();
+
+		user_stream << extra_text << '\n';
+
+		user_stream.width(orig_width);
+	}
+
+	arma_ostream::brief_print(user_stream, tmp.M);
 }
 
 template<typename elem_type, typename derived> inline
@@ -112,7 +188,8 @@ uword Base<elem_type, derived>::index_min() const {
 
 	uword index = 0;
 
-	if(P.get_n_elem() == 0) { arma_debug_check(true, "index_min(): object has no elements"); } else { op_min::min_with_index(P, index); }
+	if(P.get_n_elem() == 0) { arma_debug_check(true, "index_min(): object has no elements"); }
+	else { op_min::min_with_index(P, index); }
 
 	return index;
 }
@@ -124,7 +201,8 @@ uword Base<elem_type, derived>::index_max() const {
 
 	uword index = 0;
 
-	if(P.get_n_elem() == 0) { arma_debug_check(true, "index_max(): object has no elements"); } else { op_max::max_with_index(P, index); }
+	if(P.get_n_elem() == 0) { arma_debug_check(true, "index_max(): object has no elements"); }
+	else { op_max::max_with_index(P, index); }
 
 	return index;
 }
@@ -292,12 +370,13 @@ bool Base<elem_type, derived>::is_zero(const typename get_pod_type<elem_type>::r
 			const T val_real = access::tmp_real(val);
 			const T val_imag = access::tmp_imag(val);
 
-			if(std::abs(val_real) > tol) { return false; }
-			if(std::abs(val_imag) > tol) { return false; }
+			if(eop_aux::arma_abs(val_real) > tol) { return false; }
+			if(eop_aux::arma_abs(val_imag) > tol) { return false; }
 		}
-	} else // not complex
+	}
+	else // not complex
 	{
-		for(uword i = 0; i < n_elem; ++i) { if(std::abs(Pea[i]) > tol) { return false; } }
+		for(uword i = 0; i < n_elem; ++i) { if(eop_aux::arma_abs(Pea[i]) > tol) { return false; } }
 	}
 
 	return true;
@@ -437,12 +516,12 @@ bool Base<elem_type, derived>::is_finite() const {
 		const uword n_elem = P.get_n_elem();
 
 		for(uword i = 0; i < n_elem; ++i) { if(arma_isfinite(Pea[i]) == false) { return false; } }
-	} else {
+	}
+	else {
 		const uword n_rows = P.get_n_rows();
 		const uword n_cols = P.get_n_cols();
 
-		for(uword col = 0; col < n_cols; ++col)
-			for(uword row = 0; row < n_rows; ++row) { if(arma_isfinite(P.at(row, col)) == false) { return false; } }
+		for(uword col = 0; col < n_cols; ++col) for(uword row = 0; row < n_rows; ++row) { if(arma_isfinite(P.at(row, col)) == false) { return false; } }
 	}
 
 	return true;
@@ -467,12 +546,12 @@ bool Base<elem_type, derived>::has_inf() const {
 		const uword n_elem = P.get_n_elem();
 
 		for(uword i = 0; i < n_elem; ++i) { if(arma_isinf(Pea[i])) { return true; } }
-	} else {
+	}
+	else {
 		const uword n_rows = P.get_n_rows();
 		const uword n_cols = P.get_n_cols();
 
-		for(uword col = 0; col < n_cols; ++col)
-			for(uword row = 0; row < n_rows; ++row) { if(arma_isinf(P.at(row, col))) { return true; } }
+		for(uword col = 0; col < n_cols; ++col) for(uword row = 0; row < n_rows; ++row) { if(arma_isinf(P.at(row, col))) { return true; } }
 	}
 
 	return false;
@@ -497,27 +576,30 @@ bool Base<elem_type, derived>::has_nan() const {
 		const uword n_elem = P.get_n_elem();
 
 		for(uword i = 0; i < n_elem; ++i) { if(arma_isnan(Pea[i])) { return true; } }
-	} else {
+	}
+	else {
 		const uword n_rows = P.get_n_rows();
 		const uword n_cols = P.get_n_cols();
 
-		for(uword col = 0; col < n_cols; ++col)
-			for(uword row = 0; row < n_rows; ++row) { if(arma_isnan(P.at(row, col))) { return true; } }
+		for(uword col = 0; col < n_cols; ++col) for(uword row = 0; row < n_rows; ++row) { if(arma_isnan(P.at(row, col))) { return true; } }
 	}
 
 	return false;
 }
 
-template<typename elem_type, typename derived> arma_inline
+template<typename elem_type, typename derived> inline
+arma_warn_unused
 const Op<derived, op_vectorise_col> Base<elem_type, derived>::as_col() const { return Op<derived, op_vectorise_col>((*this).get_ref()); }
 
-template<typename elem_type, typename derived> arma_inline
+template<typename elem_type, typename derived> inline
+arma_warn_unused
 const Op<derived, op_vectorise_row> Base<elem_type, derived>::as_row() const { return Op<derived, op_vectorise_row>((*this).get_ref()); }
 
 //
 // extra functions defined in Base_extra_yes
 
-template<typename elem_type, typename derived> arma_inline
+template<typename elem_type, typename derived> inline
+arma_warn_unused
 const Op<derived, op_inv> Base_extra_yes<elem_type, derived>::i() const { return Op<derived, op_inv>(static_cast<const derived&>(*this)); }
 
 template<typename elem_type, typename derived> inline

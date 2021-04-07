@@ -28,7 +28,10 @@ void glue_mvnrnd_vec::apply(Mat<typename T1::elem_type>& out, const Glue<T1, T2,
 
 	const bool status = glue_mvnrnd::apply_direct(out, expr.A, expr.B, uword(1));
 
-	if(status == false) { arma_stop_runtime_error("mvnrnd(): given covariance matrix is not symmetric positive semi-definite"); }
+	if(status == false) {
+		out.soft_reset();
+		arma_stop_runtime_error("mvnrnd(): given covariance matrix is not symmetric positive semi-definite");
+	}
 }
 
 template<typename T1, typename T2> inline
@@ -37,7 +40,10 @@ void glue_mvnrnd::apply(Mat<typename T1::elem_type>& out, const Glue<T1, T2, glu
 
 	const bool status = glue_mvnrnd::apply_direct(out, expr.A, expr.B, expr.aux_uword);
 
-	if(status == false) { arma_stop_runtime_error("mvnrnd(): given covariance matrix is not symmetric positive semi-definite"); }
+	if(status == false) {
+		out.soft_reset();
+		arma_stop_runtime_error("mvnrnd(): given covariance matrix is not symmetric positive semi-definite");
+	}
 }
 
 template<typename T1, typename T2> inline
@@ -60,11 +66,11 @@ bool glue_mvnrnd::apply_direct(Mat<typename T1::elem_type>& out, const Base<type
 
 	// if(auxlib::rudimentary_sym_check(UC.M) == false)
 	//   {
-	//   arma_debug_warn("mvnrnd(): given matrix is not symmetric");
+	//   arma_debug_warn_level(1, "mvnrnd(): given matrix is not symmetric");
 	//   return false;
 	//   }
 
-	if((arma_config::debug) && (auxlib::rudimentary_sym_check(UC.M) == false)) { arma_debug_warn("mvnrnd(): given matrix is not symmetric"); }
+	if((arma_config::debug) && (auxlib::rudimentary_sym_check(UC.M) == false)) { arma_debug_warn_level(1, "mvnrnd(): given matrix is not symmetric"); }
 
 	bool status = false;
 
@@ -74,9 +80,8 @@ bool glue_mvnrnd::apply_direct(Mat<typename T1::elem_type>& out, const Base<type
 		status = glue_mvnrnd::apply_noalias(tmp, UM.M, UC.M, N);
 
 		out.steal_mem(tmp);
-	} else { status = glue_mvnrnd::apply_noalias(out, UM.M, UC.M, N); }
-
-	if(status == false) { out.soft_reset(); }
+	}
+	else { status = glue_mvnrnd::apply_noalias(out, UM.M, UC.M, N); }
 
 	return status;
 }
@@ -123,7 +128,8 @@ bool glue_mvnrnd::apply_noalias(Mat<eT>& out, const Mat<eT>& M, const Mat<eT>& C
 
 	out = D * randn<Mat<eT>>(M.n_rows, N);
 
-	if(N == 1) { out += M; } else if(N > 1) { out.each_col() += M; }
+	if(N == 1) { out += M; }
+	else if(N > 1) { out.each_col() += M; }
 
 	return true;
 }

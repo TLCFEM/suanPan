@@ -55,7 +55,7 @@ void subview_elem2<eT, T1, T2>::inplace_op(const eT val) {
 		arma_debug_check
 			(
 				(((ri.is_vec() == false) && (ri.is_empty() == false)) || ((ci.is_vec() == false) && (ci.is_empty() == false))),
-				"Mat::elem(): given object is not a vector"
+				"Mat::elem(): given object must be a vector"
 			);
 
 		const uword* ri_mem = ri.memptr();
@@ -67,12 +67,12 @@ void subview_elem2<eT, T1, T2>::inplace_op(const eT val) {
 		for(uword ci_count = 0; ci_count < ci_n_elem; ++ci_count) {
 			const uword col = ci_mem[ci_count];
 
-			arma_debug_check((col >= m_n_cols), "Mat::elem(): index out of bounds");
+			arma_debug_check_bounds((col >= m_n_cols), "Mat::elem(): index out of bounds");
 
 			for(uword ri_count = 0; ri_count < ri_n_elem; ++ri_count) {
 				const uword row = ri_mem[ri_count];
 
-				arma_debug_check((row >= m_n_rows), "Mat::elem(): index out of bounds");
+				arma_debug_check_bounds((row >= m_n_rows), "Mat::elem(): index out of bounds");
 
 				if(is_same_type<op_type, op_internal_equ>::yes) { m_local.at(row, col) = val; }
 				if(is_same_type<op_type, op_internal_plus>::yes) { m_local.at(row, col) += val; }
@@ -81,7 +81,8 @@ void subview_elem2<eT, T1, T2>::inplace_op(const eT val) {
 				if(is_same_type<op_type, op_internal_div>::yes) { m_local.at(row, col) /= val; }
 			}
 		}
-	} else if((all_rows == true) && (all_cols == false)) {
+	}
+	else if((all_rows == true) && (all_cols == false)) {
 		const unwrap_check_mixed<T2> tmp2(base_ci.get_ref(), m_local);
 
 		const umat& ci = tmp2.M;
@@ -89,7 +90,7 @@ void subview_elem2<eT, T1, T2>::inplace_op(const eT val) {
 		arma_debug_check
 			(
 				((ci.is_vec() == false) && (ci.is_empty() == false)),
-				"Mat::elem(): given object is not a vector"
+				"Mat::elem(): given object must be a vector"
 			);
 
 		const uword* ci_mem = ci.memptr();
@@ -98,7 +99,7 @@ void subview_elem2<eT, T1, T2>::inplace_op(const eT val) {
 		for(uword ci_count = 0; ci_count < ci_n_elem; ++ci_count) {
 			const uword col = ci_mem[ci_count];
 
-			arma_debug_check((col >= m_n_cols), "Mat::elem(): index out of bounds");
+			arma_debug_check_bounds((col >= m_n_cols), "Mat::elem(): index out of bounds");
 
 			eT* colptr = m_local.colptr(col);
 
@@ -108,7 +109,8 @@ void subview_elem2<eT, T1, T2>::inplace_op(const eT val) {
 			if(is_same_type<op_type, op_internal_schur>::yes) { arrayops::inplace_mul(colptr, val, m_n_rows); }
 			if(is_same_type<op_type, op_internal_div>::yes) { arrayops::inplace_div(colptr, val, m_n_rows); }
 		}
-	} else if((all_rows == false) && (all_cols == true)) {
+	}
+	else if((all_rows == false) && (all_cols == true)) {
 		const unwrap_check_mixed<T1> tmp1(base_ri.get_ref(), m_local);
 
 		const umat& ri = tmp1.M;
@@ -116,7 +118,7 @@ void subview_elem2<eT, T1, T2>::inplace_op(const eT val) {
 		arma_debug_check
 			(
 				((ri.is_vec() == false) && (ri.is_empty() == false)),
-				"Mat::elem(): given object is not a vector"
+				"Mat::elem(): given object must be a vector"
 			);
 
 		const uword* ri_mem = ri.memptr();
@@ -126,7 +128,7 @@ void subview_elem2<eT, T1, T2>::inplace_op(const eT val) {
 			for(uword ri_count = 0; ri_count < ri_n_elem; ++ri_count) {
 				const uword row = ri_mem[ri_count];
 
-				arma_debug_check((row >= m_n_rows), "Mat::elem(): index out of bounds");
+				arma_debug_check_bounds((row >= m_n_rows), "Mat::elem(): index out of bounds");
 
 				if(is_same_type<op_type, op_internal_equ>::yes) { m_local.at(row, col) = val; }
 				if(is_same_type<op_type, op_internal_plus>::yes) { m_local.at(row, col) += val; }
@@ -160,7 +162,7 @@ void subview_elem2<eT, T1, T2>::inplace_op(const Base<eT, expr>& x) {
 		arma_debug_check
 			(
 				(((ri.is_vec() == false) && (ri.is_empty() == false)) || ((ci.is_vec() == false) && (ci.is_empty() == false))),
-				"Mat::elem(): given object is not a vector"
+				"Mat::elem(): given object must be a vector"
 			);
 
 		const uword* ri_mem = ri.memptr();
@@ -174,12 +176,12 @@ void subview_elem2<eT, T1, T2>::inplace_op(const Base<eT, expr>& x) {
 		for(uword ci_count = 0; ci_count < ci_n_elem; ++ci_count) {
 			const uword col = ci_mem[ci_count];
 
-			arma_debug_check((col >= m_n_cols), "Mat::elem(): index out of bounds");
+			arma_debug_check_bounds((col >= m_n_cols), "Mat::elem(): index out of bounds");
 
 			for(uword ri_count = 0; ri_count < ri_n_elem; ++ri_count) {
 				const uword row = ri_mem[ri_count];
 
-				arma_debug_check((row >= m_n_rows), "Mat::elem(): index out of bounds");
+				arma_debug_check_bounds((row >= m_n_rows), "Mat::elem(): index out of bounds");
 
 				if(is_same_type<op_type, op_internal_equ>::yes) { m_local.at(row, col) = X.at(ri_count, ci_count); }
 				if(is_same_type<op_type, op_internal_plus>::yes) { m_local.at(row, col) += X.at(ri_count, ci_count); }
@@ -188,7 +190,8 @@ void subview_elem2<eT, T1, T2>::inplace_op(const Base<eT, expr>& x) {
 				if(is_same_type<op_type, op_internal_div>::yes) { m_local.at(row, col) /= X.at(ri_count, ci_count); }
 			}
 		}
-	} else if((all_rows == true) && (all_cols == false)) {
+	}
+	else if((all_rows == true) && (all_cols == false)) {
 		const unwrap_check_mixed<T2> tmp2(base_ci.get_ref(), m_local);
 
 		const umat& ci = tmp2.M;
@@ -196,7 +199,7 @@ void subview_elem2<eT, T1, T2>::inplace_op(const Base<eT, expr>& x) {
 		arma_debug_check
 			(
 				((ci.is_vec() == false) && (ci.is_empty() == false)),
-				"Mat::elem(): given object is not a vector"
+				"Mat::elem(): given object must be a vector"
 			);
 
 		const uword* ci_mem = ci.memptr();
@@ -207,7 +210,7 @@ void subview_elem2<eT, T1, T2>::inplace_op(const Base<eT, expr>& x) {
 		for(uword ci_count = 0; ci_count < ci_n_elem; ++ci_count) {
 			const uword col = ci_mem[ci_count];
 
-			arma_debug_check((col >= m_n_cols), "Mat::elem(): index out of bounds");
+			arma_debug_check_bounds((col >= m_n_cols), "Mat::elem(): index out of bounds");
 
 			eT* m_colptr = m_local.colptr(col);
 			const eT* X_colptr = X.colptr(ci_count);
@@ -218,7 +221,8 @@ void subview_elem2<eT, T1, T2>::inplace_op(const Base<eT, expr>& x) {
 			if(is_same_type<op_type, op_internal_schur>::yes) { arrayops::inplace_mul(m_colptr, X_colptr, m_n_rows); }
 			if(is_same_type<op_type, op_internal_div>::yes) { arrayops::inplace_div(m_colptr, X_colptr, m_n_rows); }
 		}
-	} else if((all_rows == false) && (all_cols == true)) {
+	}
+	else if((all_rows == false) && (all_cols == true)) {
 		const unwrap_check_mixed<T1> tmp1(base_ri.get_ref(), m_local);
 
 		const umat& ri = tmp1.M;
@@ -226,7 +230,7 @@ void subview_elem2<eT, T1, T2>::inplace_op(const Base<eT, expr>& x) {
 		arma_debug_check
 			(
 				((ri.is_vec() == false) && (ri.is_empty() == false)),
-				"Mat::elem(): given object is not a vector"
+				"Mat::elem(): given object must be a vector"
 			);
 
 		const uword* ri_mem = ri.memptr();
@@ -238,7 +242,7 @@ void subview_elem2<eT, T1, T2>::inplace_op(const Base<eT, expr>& x) {
 			for(uword ri_count = 0; ri_count < ri_n_elem; ++ri_count) {
 				const uword row = ri_mem[ri_count];
 
-				arma_debug_check((row >= m_n_rows), "Mat::elem(): index out of bounds");
+				arma_debug_check_bounds((row >= m_n_rows), "Mat::elem(): index out of bounds");
 
 				if(is_same_type<op_type, op_internal_equ>::yes) { m_local.at(row, col) = X.at(ri_count, col); }
 				if(is_same_type<op_type, op_internal_plus>::yes) { m_local.at(row, col) += X.at(ri_count, col); }
@@ -489,7 +493,7 @@ void subview_elem2<eT, T1, T2>::extract(Mat<eT>& actual_out, const subview_elem2
 		arma_debug_check
 			(
 				(((ri.is_vec() == false) && (ri.is_empty() == false)) || ((ci.is_vec() == false) && (ci.is_empty() == false))),
-				"Mat::elem(): given object is not a vector"
+				"Mat::elem(): given object must be a vector"
 			);
 
 		const uword* ri_mem = ri.memptr();
@@ -506,18 +510,19 @@ void subview_elem2<eT, T1, T2>::extract(Mat<eT>& actual_out, const subview_elem2
 		for(uword ci_count = 0; ci_count < ci_n_elem; ++ci_count) {
 			const uword col = ci_mem[ci_count];
 
-			arma_debug_check((col >= m_n_cols), "Mat::elem(): index out of bounds");
+			arma_debug_check_bounds((col >= m_n_cols), "Mat::elem(): index out of bounds");
 
 			for(uword ri_count = 0; ri_count < ri_n_elem; ++ri_count) {
 				const uword row = ri_mem[ri_count];
 
-				arma_debug_check((row >= m_n_rows), "Mat::elem(): index out of bounds");
+				arma_debug_check_bounds((row >= m_n_rows), "Mat::elem(): index out of bounds");
 
 				out_mem[out_count] = m_local.at(row, col);
 				++out_count;
 			}
 		}
-	} else if((in.all_rows == true) && (in.all_cols == false)) {
+	}
+	else if((in.all_rows == true) && (in.all_cols == false)) {
 		const unwrap_check_mixed<T2> tmp2(in.base_ci.get_ref(), m_local);
 
 		const umat& ci = tmp2.M;
@@ -525,7 +530,7 @@ void subview_elem2<eT, T1, T2>::extract(Mat<eT>& actual_out, const subview_elem2
 		arma_debug_check
 			(
 				((ci.is_vec() == false) && (ci.is_empty() == false)),
-				"Mat::elem(): given object is not a vector"
+				"Mat::elem(): given object must be a vector"
 			);
 
 		const uword* ci_mem = ci.memptr();
@@ -536,11 +541,12 @@ void subview_elem2<eT, T1, T2>::extract(Mat<eT>& actual_out, const subview_elem2
 		for(uword ci_count = 0; ci_count < ci_n_elem; ++ci_count) {
 			const uword col = ci_mem[ci_count];
 
-			arma_debug_check((col >= m_n_cols), "Mat::elem(): index out of bounds");
+			arma_debug_check_bounds((col >= m_n_cols), "Mat::elem(): index out of bounds");
 
 			arrayops::copy(out.colptr(ci_count), m_local.colptr(col), m_n_rows);
 		}
-	} else if((in.all_rows == false) && (in.all_cols == true)) {
+	}
+	else if((in.all_rows == false) && (in.all_cols == true)) {
 		const unwrap_check_mixed<T1> tmp1(in.base_ri.get_ref(), m_local);
 
 		const umat& ri = tmp1.M;
@@ -548,7 +554,7 @@ void subview_elem2<eT, T1, T2>::extract(Mat<eT>& actual_out, const subview_elem2
 		arma_debug_check
 			(
 				((ri.is_vec() == false) && (ri.is_empty() == false)),
-				"Mat::elem(): given object is not a vector"
+				"Mat::elem(): given object must be a vector"
 			);
 
 		const uword* ri_mem = ri.memptr();
@@ -560,7 +566,7 @@ void subview_elem2<eT, T1, T2>::extract(Mat<eT>& actual_out, const subview_elem2
 			for(uword ri_count = 0; ri_count < ri_n_elem; ++ri_count) {
 				const uword row = ri_mem[ri_count];
 
-				arma_debug_check((row >= m_n_rows), "Mat::elem(): index out of bounds");
+				arma_debug_check_bounds((row >= m_n_rows), "Mat::elem(): index out of bounds");
 
 				out.at(ri_count, col) = m_local.at(row, col);
 			}

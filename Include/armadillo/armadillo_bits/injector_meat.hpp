@@ -32,7 +32,8 @@ void mat_injector_row<eT>::insert(const eT val) const {
 	if(n_cols < A.n_elem) {
 		A[n_cols] = val;
 		++n_cols;
-	} else {
+	}
+	else {
 		B.set_size(2 * A.n_elem);
 
 		arrayops::copy(B.memptr(), A.memptr(), n_cols);
@@ -109,7 +110,7 @@ inline mat_injector<T1>::~mat_injector() {
 
 		const uword max_n_rows = ((*(A[n_rows - 1])).n_cols == 0) ? n_rows - 1 : n_rows;
 
-		if(is_Mat_only<T1>::value == true) {
+		if(is_Mat_only<T1>::value) {
 			X.set_size(max_n_rows, max_n_cols);
 
 			for(uword row = 0; row < max_n_rows; ++row) {
@@ -119,7 +120,8 @@ inline mat_injector<T1>::~mat_injector() {
 
 				for(uword col = n_cols; col < max_n_cols; ++col) { X.at(row, col) = eT(0); }
 			}
-		} else if(is_Row<T1>::value == true) {
+		}
+		else if(is_Row<T1>::value) {
 			arma_debug_check((max_n_rows > 1), "matrix initialisation: incompatible dimensions");
 
 			const uword n_cols = (*(A[0])).n_cols;
@@ -127,7 +129,8 @@ inline mat_injector<T1>::~mat_injector() {
 			X.set_size(1, n_cols);
 
 			arrayops::copy(X.memptr(), (*(A[0])).A.memptr(), n_cols);
-		} else if(is_Col<T1>::value == true) {
+		}
+		else if(is_Col<T1>::value) {
 			const bool is_vec = ((max_n_rows == 1) || (max_n_cols == 1));
 
 			arma_debug_check((is_vec == false), "matrix initialisation: incompatible dimensions");
@@ -277,7 +280,8 @@ void field_injector_row<oT>::insert(const oT& val) const {
 	if(n_cols < A.n_elem) {
 		A[n_cols] = val;
 		++n_cols;
-	} else {
+	}
+	else {
 		B.set_size(2 * A.n_elem);
 
 		for(uword i = 0; i < n_cols; ++i) { B[i] = A[i]; }

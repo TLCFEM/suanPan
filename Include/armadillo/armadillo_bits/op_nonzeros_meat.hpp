@@ -41,7 +41,8 @@ void op_nonzeros::apply_noalias(Mat<typename T1::elem_type>& out, const Proxy<T1
 				++N_nz;
 			}
 		}
-	} else {
+	}
+	else {
 		const uword n_rows = P.get_n_rows();
 		const uword n_cols = P.get_n_cols();
 
@@ -78,7 +79,8 @@ void op_nonzeros::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_nonzer
 		op_nonzeros::apply_noalias(out2, P);
 
 		out.steal_mem(out2);
-	} else { op_nonzeros::apply_noalias(out, P); }
+	}
+	else { op_nonzeros::apply_noalias(out, P); }
 }
 
 template<typename T1> inline
@@ -98,7 +100,8 @@ void op_nonzeros_spmat::apply(Mat<typename T1::elem_type>& out, const SpToDOp<T1
 			const unwrap_spmat<typename SpProxy<T1>::stored_type> U(P.Q);
 
 			arrayops::copy(out.memptr(), U.M.values, N);
-		} else {
+		}
+		else {
 			eT* out_mem = out.memptr();
 
 			typename SpProxy<T1>::const_iterator_type it = P.begin();

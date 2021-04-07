@@ -51,7 +51,8 @@ namespace gmm_priv {
 			const eT old_r_mean = r_mean;
 
 			r_mean = old_r_mean + (X - old_r_mean) / counter;
-		} else { r_mean = X; }
+		}
+		else { r_mean = X; }
 	}
 
 	template<typename eT> inline
@@ -73,7 +74,6 @@ namespace gmm_priv {
 	//
 
 	template<typename eT> arma_inline
-	arma_hot
 	eT distance<eT, uword(1)>::eval(const uword N, const eT* A, const eT* B, const eT*) {
 		eT acc1 = eT(0);
 		eT acc2 = eT(0);
@@ -100,7 +100,6 @@ namespace gmm_priv {
 	}
 
 	template<typename eT> arma_inline
-	arma_hot
 	eT distance<eT, uword(2)>::eval(const uword N, const eT* A, const eT* B, const eT* C) {
 		eT acc1 = eT(0);
 		eT acc2 = eT(0);

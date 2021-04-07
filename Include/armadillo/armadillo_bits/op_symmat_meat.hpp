@@ -42,7 +42,8 @@ void op_symmat::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_symmat>&
 
 				arrayops::copy(out_data, A_data, i + 1);
 			}
-		} else {
+		}
+		else {
 			// lower triangular: copy the diagonal and the elements below the diagonal
 
 			for(uword i = 0; i < N; ++i) {
@@ -62,7 +63,8 @@ void op_symmat::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_symmat>&
 
 			for(uword row = 0; row < col; ++row) { out.at(col, row) = coldata[row]; }
 		}
-	} else {
+	}
+	else {
 		// reflect elements across the diagonal from lower triangle to upper triangle
 
 		for(uword col = 0; col < N; ++col) {
@@ -101,7 +103,8 @@ void op_symmat_cx::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_symma
 
 				arrayops::copy(out_data, A_data, i + 1);
 			}
-		} else {
+		}
+		else {
 			// lower triangular: copy the diagonal and the elements below the diagonal
 
 			for(uword i = 0; i < N; ++i) {
@@ -122,7 +125,8 @@ void op_symmat_cx::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_symma
 
 				for(uword row = 0; row < col; ++row) { out.at(col, row) = std::conj(coldata[row]); }
 			}
-		} else {
+		}
+		else {
 			// reflect elements across the diagonal from lower triangle to upper triangle
 
 			for(uword col = 0; col < N; ++col) {
@@ -131,7 +135,8 @@ void op_symmat_cx::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_symma
 				for(uword row = (col + 1); row < N; ++row) { out.at(col, row) = std::conj(coldata[row]); }
 			}
 		}
-	} else // don't do complex conjugation
+	}
+	else // don't do complex conjugation
 	{
 		if(upper) {
 			// reflect elements across the diagonal from upper triangle to lower triangle
@@ -141,7 +146,8 @@ void op_symmat_cx::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_symma
 
 				for(uword row = 0; row < col; ++row) { out.at(col, row) = coldata[row]; }
 			}
-		} else {
+		}
+		else {
 			// reflect elements across the diagonal from lower triangle to upper triangle
 
 			for(uword col = 0; col < N; ++col) {

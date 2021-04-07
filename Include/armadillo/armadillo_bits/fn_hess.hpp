@@ -36,7 +36,7 @@ bool hess
 
 	if(status == false) {
 		H.soft_reset();
-		arma_debug_warn("hess(): decomposition failed");
+		arma_debug_warn_level(3, "hess(): decomposition failed");
 	}
 
 	return status;
@@ -88,7 +88,10 @@ bool hess
 
 	const bool status = auxlib::hess(H, X.get_ref(), tao);
 
-	if(H.n_rows == 0) { U.reset(); } else if(H.n_rows == 1) { U.ones(1, 1); } else if(H.n_rows == 2) { U.eye(2, 2); } else {
+	if(H.n_rows == 0) { U.reset(); }
+	else if(H.n_rows == 1) { U.ones(1, 1); }
+	else if(H.n_rows == 2) { U.eye(2, 2); }
+	else {
 		U.eye(size(H));
 
 		Col<eT> v;
@@ -112,7 +115,7 @@ bool hess
 	if(status == false) {
 		U.soft_reset();
 		H.soft_reset();
-		arma_debug_warn("hess(): decomposition failed");
+		arma_debug_warn_level(3, "hess(): decomposition failed");
 	}
 
 	return status;

@@ -40,7 +40,7 @@ typename enable_if2<(is_supported_blas_type<typename T1::elem_type>::value && is
 
 	if(status == false) {
 		Y.soft_reset();
-		arma_debug_warn("logmat(): transformation failed");
+		arma_debug_warn_level(3, "logmat(): transformation failed");
 	}
 
 	return status;
@@ -54,7 +54,7 @@ typename enable_if2<(is_supported_blas_type<typename T1::elem_type>::value && is
 
 	if(status == false) {
 		Y.soft_reset();
-		arma_debug_warn("logmat(): transformation failed");
+		arma_debug_warn_level(3, "logmat(): transformation failed");
 	}
 
 	return status;
@@ -78,7 +78,7 @@ typename enable_if2<is_supported_blas_type<typename T1::elem_type>::value, bool>
 
 	if(status == false) {
 		Y.soft_reset();
-		arma_debug_warn("logmat_sympd(): transformation failed");
+		arma_debug_warn_level(3, "logmat_sympd(): transformation failed");
 	}
 
 	return status;
