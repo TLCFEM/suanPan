@@ -51,9 +51,8 @@ void BatheTwoStep::assemble_matrix() {
 
 int BatheTwoStep::update_trial_status() {
 	const auto& D = get_domain().lock();
-	auto& W = D->get_factory();
 
-	if(FLAG::TRAP == step_flag) {
+	if(auto& W = D->get_factory(); FLAG::TRAP == step_flag) {
 		W->update_incre_acceleration(C6 * W->get_incre_displacement() - C4 * W->get_current_velocity() - 2. * W->get_current_acceleration());
 		W->update_incre_velocity(C3 * W->get_incre_displacement() - 2. * W->get_current_velocity());
 	}

@@ -70,16 +70,16 @@ int Converter::process(std::ifstream& input_file, std::ofstream& output_file) {
 }
 
 int Converter::process_amplitude(std::ifstream& input_file, std::ofstream& output_file, const std::string& amplitude_name, const std::string& type) {
-	std::string line;
 
-	if(is_equal(type, "")) {
+	if(std::string line; is_equal(type, "")) {
 		if(std::ofstream amp_out(output_path + amplitude_name); amp_out.is_open()) {
 			amp_out.setf(std::ios::scientific);
 			amp_out << std::setprecision(3);
 			amplitude_pool.emplace(amplitude_name, ++amplitude_tag);
 			output_file << "amplitude Tabular " << amplitude_tag << ' ' << amplitude_name << '\n';
-			double time, value;
 			while(input_file.peek() != '*' && getline(input_file, line)) {
+				double value;
+				double time;
 				auto tmp_str = clean(line);
 				while(get_input(tmp_str, time) && get_input(tmp_str, value)) amp_out << time << '\t' << value << '\n';
 			}
@@ -92,8 +92,8 @@ int Converter::process_amplitude(std::ifstream& input_file, std::ofstream& outpu
 		pool.reserve(5);
 		if(getline(input_file, line)) {
 			auto tmp_str = clean(line);
-			double value;
 			for(auto I = 0; I < 5; ++I) {
+				double value;
 				get_input(tmp_str, value);
 				pool.emplace_back(value);
 			}
@@ -109,8 +109,8 @@ int Converter::process_amplitude(std::ifstream& input_file, std::ofstream& outpu
 		pool.reserve(4);
 		if(getline(input_file, line)) {
 			auto tmp_str = clean(line);
-			double value;
 			for(auto I = 0; I < 4; ++I) {
+				double value;
 				get_input(tmp_str, value);
 				pool.emplace_back(value);
 			}
@@ -130,12 +130,11 @@ int Converter::process_amplitude(std::ifstream& input_file, std::ofstream& outpu
 }
 
 int Converter::process_boundary(std::ifstream& input_file, std::ofstream& output_file, const std::string& amplitude_name, const std::string& type_name) {
-	std::string line;
 
 	std::string commmand_name;
 
 	while(input_file.peek() != '*')
-		if(getline(input_file, line)) {
+		if(std::string line; getline(input_file, line)) {
 			auto tmp_str = clean(line);
 			std::vector<std::string> pool;
 			pool.reserve(4);
@@ -208,14 +207,12 @@ int Converter::process_boundary(std::ifstream& input_file, std::ofstream& output
 }
 
 int Converter::process_cload(std::ifstream& input_file, std::ofstream& output_file, const std::string& amplitude_name) {
-	std::string line;
 
 	while(input_file.peek() != '*')
-		if(getline(input_file, line)) {
+		if(std::string line; getline(input_file, line)) {
 			output_file << "groupcload " << ++load_tag << ' ' << (amplitude_name.empty() ? 0 : amplitude_pool[amplitude_name]) << ' ';
 			auto t_str = clean(line);
-			std::string r_set_tag, dof, value;
-			if(get_input(t_str, r_set_tag) && get_input(t_str, dof) && get_input(t_str, value)) output_file << value << ' ' << dof << ' ' << node_set_pool[r_set_tag];
+			if(std::string r_set_tag, dof, value; get_input(t_str, r_set_tag) && get_input(t_str, dof) && get_input(t_str, value)) output_file << value << ' ' << dof << ' ' << node_set_pool[r_set_tag];
 			output_file << '\n';
 		}
 
@@ -223,12 +220,10 @@ int Converter::process_cload(std::ifstream& input_file, std::ofstream& output_fi
 }
 
 int Converter::process_element(std::ifstream& input_file, std::ofstream& output_file, const std::string& type) const {
-	std::string line;
-
-	unsigned tag;
 
 	while(input_file.peek() != '*')
-		if(getline(input_file, line)) {
+		if(std::string line; getline(input_file, line)) {
+			unsigned tag;
 			auto tmp_str = clean(line);
 			output_file << "element " << type;
 			while(get_input(tmp_str, tag)) output_file << ' ' << tag;
@@ -260,13 +255,11 @@ std::string Converter::extract_element_type(const std::string& line) const {
 }
 
 int Converter::process_node(std::ifstream& input_file, std::ofstream& output_file) const {
-	std::string line;
-
-	unsigned tag;
-	double component;
 
 	while(input_file.peek() != '*')
-		if(getline(input_file, line)) {
+		if(std::string line; getline(input_file, line)) {
+			double component;
+			unsigned tag;
 			auto tmp_str = clean(line);
 			if(!get_input(tmp_str, tag)) return SUANPAN_SUCCESS;
 			output_file << "node " << tag;
@@ -280,25 +273,21 @@ int Converter::process_node(std::ifstream& input_file, std::ofstream& output_fil
 }
 
 int Converter::process_node_set(std::ifstream& input_file, std::ofstream& output_file, const std::string& set_name, const bool generate) {
-	std::string line;
-
 	while(input_file.peek() != '*')
-		if(getline(input_file, line)) {
+		if(std::string line; getline(input_file, line)) {
 			node_set_pool.emplace(set_name, ++set_tag);
 			if(generate) output_file << "generate ";
 			output_file << "nodegroup " << set_tag;
 			if(generate) {
 				auto tmp_str = clean(line);
-				int start;
-				if(get_input(tmp_str, start)) {
+				if(int start; get_input(tmp_str, start)) {
 					output_file << ' ' << start;
-					int end, interval;
-					if(get_input(tmp_str, end) && get_input(tmp_str, interval)) output_file << ' ' << interval << ' ' << end;
+					if(int end, interval; get_input(tmp_str, end) && get_input(tmp_str, interval)) output_file << ' ' << interval << ' ' << end;
 				}
 			}
 			else {
-				int tag;
 				do {
+					int tag;
 					auto tmp_str = clean(line);
 					while(get_input(tmp_str, tag)) output_file << ' ' << tag;
 				}
@@ -313,25 +302,21 @@ int Converter::process_node_set(std::ifstream& input_file, std::ofstream& output
 }
 
 int Converter::process_element_set(std::ifstream& input_file, std::ofstream& output_file, const std::string& set_name, const bool generate) {
-	std::string line;
-
 	while(input_file.peek() != '*')
-		if(getline(input_file, line)) {
+		if(std::string line; getline(input_file, line)) {
 			element_set_pool.emplace(set_name, ++set_tag);
 			if(generate) output_file << "generate ";
 			output_file << "elementgroup " << set_tag;
 			if(generate) {
 				auto tmp_str = clean(line);
-				int start;
-				if(get_input(tmp_str, start)) {
+				if(int start; get_input(tmp_str, start)) {
 					output_file << ' ' << start;
-					int end, interval;
-					if(get_input(tmp_str, end) && get_input(tmp_str, interval)) output_file << ' ' << interval << ' ' << end;
+					if(int end, interval; get_input(tmp_str, end) && get_input(tmp_str, interval)) output_file << ' ' << interval << ' ' << end;
 				}
 			}
 			else {
-				int tag;
 				do {
+					int tag;
 					auto tmp_str = clean(line);
 					while(get_input(tmp_str, tag)) output_file << ' ' << tag;
 				}
@@ -346,11 +331,8 @@ int Converter::process_element_set(std::ifstream& input_file, std::ofstream& out
 }
 
 int Converter::process_step(std::ifstream& input_file, std::ofstream& output_file, const std::string& step_name) {
-	std::string line;
-
-	if(getline(input_file, line)) {
-		auto tmp_str = clean(line);
-		if(is_equal(line.substr(0, 7), "*Static")) {
+	if(std::string line; getline(input_file, line)) {
+		if(auto tmp_str = clean(line); is_equal(line.substr(0, 7), "*Static")) {
 			step_pool.emplace(step_name, ++step_tag);
 			output_file << "step static " << step_tag;
 			if(getline(input_file, line)) {
@@ -360,14 +342,8 @@ int Converter::process_step(std::ifstream& input_file, std::ofstream& output_fil
 				double value;
 				while(get_input(tmp_str, value)) pool.emplace_back(value);
 				output_file << ' ' << pool[1] << "\nset ini_step_size " << pool[0] << '\n';
-				if(2 == pool.size()) {
-					//
-					output_file << "set fixed_step_size true\n";
-				}
-				else if(4 == pool.size()) {
-					//
-					output_file << "set min_step_size " << pool[2] << "\nset max_step_size " << pool[3] << '\n';
-				}
+				if(2 == pool.size()) output_file << "set fixed_step_size true\n";
+				else if(4 == pool.size()) output_file << "set min_step_size " << pool[2] << "\nset max_step_size " << pool[3] << '\n';
 			}
 		}
 		else if(is_equal(line.substr(0, 8), "*Dynamic")) {

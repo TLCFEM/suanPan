@@ -41,7 +41,6 @@ template<typename T> class BandMat final : public MetaMat<T> {
 	const uword m_rows;       // memory block layout
 	podarray<float> s_memory; // float storage used in mixed precision algorithm
 protected:
-
 	unique_ptr<MetaMat<T>> factorize() override;
 public:
 	using MetaMat<T>::IPIV;

@@ -121,9 +121,7 @@ template<typename T> T area::shoelace(const Mat<T>& C) {
 template<typename T> Mat<T> shape::truss(const T int_pts, const unsigned order, const unsigned num_node) {
 	Mat<T> N(1, num_node);
 
-	const auto& X = int_pts;
-
-	if(num_node == 2) {
+	if(const auto& X = int_pts; num_node == 2) {
 		if(order == 0) {
 			N(0, 0) = 1. - X;
 			N(0, 1) = 1. + X;
@@ -188,10 +186,7 @@ template<typename T> Mat<T> shape::triangle(const Col<T>& int_pts, const unsigne
 
 	N.zeros(order + 1, 6);
 
-	const auto& X = int_pts(0);
-	const auto& Y = int_pts(1);
-
-	if(order == 0) {
+	if(const auto &X = int_pts(0), &Y = int_pts(1); order == 0) {
 		N(0, 0) = 1.;
 		N(0, 1) = X;
 		N(0, 2) = Y;
@@ -219,11 +214,8 @@ template<typename T> Mat<T> shape::quad(const Col<T>& int_pts, const unsigned or
 	const auto& X = int_pts(0);
 	const auto& Y = int_pts(1);
 
-	const auto XP = 1. + X, XM = 1. - X, YP = 1. + Y, YM = 1. - Y;
-
-	if(8 == num_node) {
-		const auto XX = X * X, YY = Y * Y, XY = X * Y;
-		if(0 == order) {
+	if(const auto XP = 1. + X, XM = 1. - X, YP = 1. + Y, YM = 1. - Y; 8 == num_node) {
+		if(const auto XX = X * X, YY = Y * Y, XY = X * Y; 0 == order) {
 			N(0, 7) = .5 * XM * (1. - YY);
 			N(0, 6) = .5 * (1. - XX) * YP;
 			N(0, 5) = .5 * XP * (1. - YY);
@@ -381,10 +373,7 @@ template<typename T> Mat<T> shape::cube(const Col<T>& int_pts, const unsigned or
 	}
 
 	if(num_node == 20) {
-		const auto XX = XP * XM;
-		const auto YY = YP * YM;
-		const auto ZZ = ZP * ZM;
-		if(order == 0) {
+		if(const auto XX = XP * XM, YY = YP * YM, ZZ = ZP * ZM; order == 0) {
 			N(0, 0) = .125 * XM * YM * ZM * (-2. - X - Y - Z);
 			N(0, 1) = .125 * XP * YM * ZM * (-2. + X - Y - Z);
 			N(0, 2) = .125 * XP * YP * ZM * (-2. + X + Y - Z);

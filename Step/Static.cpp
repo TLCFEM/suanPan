@@ -88,9 +88,7 @@ int Static::analyze() {
 		}
 		// update incremental and trial time
 		G->update_incre_time(step_time);
-		// call solver
-		auto code = S->analyze();
-		if(SUANPAN_SUCCESS == code) {
+		if(auto code = S->analyze(); SUANPAN_SUCCESS == code) {
 			// success step
 			// commit converged iteration
 			G->commit_status();

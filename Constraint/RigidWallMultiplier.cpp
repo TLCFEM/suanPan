@@ -54,8 +54,7 @@ int RigidWallMultiplier::process(const shared_ptr<DomainBase>& D) {
 		}
 		vec t_c = t_a + t_b;
 		if(!edge_a.empty() && dot(t_c, edge_a) > arma::norm(edge_a) || !edge_b.empty() && dot(t_c, edge_b) > arma::norm(edge_b)) continue;
-		const auto t_pen = dot(t_c, norm);
-		if(t_pen > datum::eps) continue;
+		if(const auto t_pen = dot(t_c, norm); t_pen > datum::eps) continue;
 		++counter;
 		auxiliary_stiffness.resize(W->get_size(), counter);
 		for(auto J = 0llu; J < t_size; ++J) auxiliary_stiffness(t_dof(J), counter - 1) = norm(J);

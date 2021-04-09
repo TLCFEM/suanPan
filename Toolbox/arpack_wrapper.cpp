@@ -111,8 +111,7 @@ int eig_solve(vec& eigval, mat& eigvec, const std::shared_ptr<MetaMat<double>>& 
 	while(99 != IDO) {
 		arma_fortran(arma_dsaupd)(&IDO, &BMAT, &N, WHICH, &NEV, &TOL, RESID.memptr(), &NCV, V.memptr(), &LDV, IPARAM.memptr(), IPNTR.memptr(), WORKD.memptr(), WORKL.memptr(), &LWORKL, &INFO);
 		// ReSharper disable once CppEntityAssignedButNoRead
-		vec Y(WORKD.memptr() + IPNTR[1] - 1, N, false);
-		if(-1 == IDO) {
+		if(vec Y(WORKD.memptr() + IPNTR[1] - 1, N, false); -1 == IDO) {
 			vec X(WORKD.memptr() + IPNTR[0] - 1, N, false);
 			X = K * X;
 			Y = M->solve(X);
@@ -174,10 +173,8 @@ int eig_solve(cx_vec& eigval, cx_mat& eigvec, const std::shared_ptr<MetaMat<doub
 
 	while(99 != IDO) {
 		arma_fortran(arma_dnaupd)(&IDO, &BMAT, &N, WHICH, &NEV, &TOL, RESID.memptr(), &NCV, V.memptr(), &LDV, IPARAM.memptr(), IPNTR.memptr(), WORKD.memptr(), WORKL.memptr(), &LWORKL, &INFO);
-		// ReSharper disable once CppInitializedValueIsAlwaysRewritten
 		// ReSharper disable once CppEntityAssignedButNoRead
-		vec Y(WORKD.memptr() + IPNTR[1] - 1, N, false);
-		if(-1 == IDO) {
+		if(vec Y(WORKD.memptr() + IPNTR[1] - 1, N, false); -1 == IDO) {
 			vec X(WORKD.memptr() + IPNTR[0] - 1, N, false);
 			X = M * X;
 			if(first_solve) {
@@ -258,10 +255,8 @@ int eig_solve(vec& eigval, mat& eigvec, const std::shared_ptr<MetaMat<double>>& 
 
 	while(99 != IDO) {
 		arma_fortran(arma_dsaupd)(&IDO, &BMAT, &N, WHICH, &NEV, &TOL, RESID.memptr(), &NCV, V.memptr(), &LDV, IPARAM.memptr(), IPNTR.memptr(), WORKD.memptr(), WORKL.memptr(), &LWORKL, &INFO);
-		// ReSharper disable once CppInitializedValueIsAlwaysRewritten
 		// ReSharper disable once CppEntityAssignedButNoRead
-		vec Y(WORKD.memptr() + IPNTR[1] - 1, N, false);
-		if(-1 == IDO) {
+		if(vec Y(WORKD.memptr() + IPNTR[1] - 1, N, false); -1 == IDO) {
 			vec X(WORKD.memptr() + IPNTR[0] - 1, N, false);
 			X = K * X;
 			Y = KG->solve(X);
@@ -320,10 +315,8 @@ int eig_solve(cx_vec& eigval, cx_mat& eigvec, const std::shared_ptr<MetaMat<doub
 
 	while(99 != IDO) {
 		arma_fortran(arma_dnaupd)(&IDO, &BMAT, &N, WHICH, &NEV, &TOL, RESID.memptr(), &NCV, V.memptr(), &LDV, IPARAM.memptr(), IPNTR.memptr(), WORKD.memptr(), WORKL.memptr(), &LWORKL, &INFO);
-		// ReSharper disable once CppInitializedValueIsAlwaysRewritten
 		// ReSharper disable once CppEntityAssignedButNoRead
-		vec Y(WORKD.memptr() + IPNTR[1] - 1, N, false);
-		if(-1 == IDO) {
+		if(vec Y(WORKD.memptr() + IPNTR[1] - 1, N, false); -1 == IDO) {
 			vec X(WORKD.memptr() + IPNTR[0] - 1, N, false);
 			X = KG * X;
 			Y = K->solve(X);

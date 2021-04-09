@@ -28,8 +28,7 @@ using std::ofstream;
 using std::string;
 
 void argument_parser(const int argc, char** argv) {
-	string input_file_name, output_file_name;
-	ofstream output_file;
+	string input_file_name;
 	const auto buffer_backup = cout.rdbuf();
 
 	wall_clock T;
@@ -38,6 +37,8 @@ void argument_parser(const int argc, char** argv) {
 	SUANPAN_EXE = argv[0];
 
 	if(argc > 1) {
+		ofstream output_file;
+		string output_file_name;
 		auto strip = false, convert = false;
 
 		for(auto I = 1; I < argc; ++I) {
@@ -89,8 +90,7 @@ void argument_parser(const int argc, char** argv) {
 
 		if(!input_file_name.empty()) {
 			print_header();
-			const auto model = make_shared<Bead>();
-			if(process_file(model, input_file_name.c_str()) != SUANPAN_EXIT) {
+			if(const auto model = make_shared<Bead>(); process_file(model, input_file_name.c_str()) != SUANPAN_EXIT) {
 				if(output_file.is_open()) {
 					cout.rdbuf(buffer_backup);
 					print_header();
@@ -189,8 +189,7 @@ void cli_mode(const shared_ptr<Bead>& model) {
 		suanpan_info("suanPan ~<> ");
 		getline(std::cin, command_line);
 		if(!command_line.empty() && command_line[0] != '#' && command_line[0] != '!') {
-			const auto if_comment = command_line.find('!');
-			if(string::npos != if_comment) command_line.erase(if_comment);
+			if(const auto if_comment = command_line.find('!'); string::npos != if_comment) command_line.erase(if_comment);
 			for(auto& c : command_line) if(',' == c || '\t' == c || '\r' == c || '\n' == c) c = ' ';
 			while(*command_line.crbegin() == ' ') command_line.pop_back();
 			if(*command_line.crbegin() == '\\') {

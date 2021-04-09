@@ -28,11 +28,11 @@ uword LeeNewmarkFull::get_amplifier() const {
 
 	auto n_size = 2llu;
 
-	for(auto& I : damping_mode)
-		if(Type::T0 == I.t) n_size += 5llu;
-		else if(Type::T1 == I.t) n_size += 5llu + 6llu * static_cast<uword>(I.p.front());
-		else if(Type::T2 == I.t) n_size += 4llu + 5llu * static_cast<uword>(.5 * (I.p(0) + I.p(1) - 1.));
-		else if(Type::T3 == I.t) n_size += 9llu;
+	for(const auto& [t, p, zeta, omega] : damping_mode)
+		if(Type::T0 == t) n_size += 5llu;
+		else if(Type::T1 == t) n_size += 5llu + 6llu * static_cast<uword>(p.front());
+		else if(Type::T2 == t) n_size += 4llu + 5llu * static_cast<uword>(.5 * (p(0) + p(1) - 1.));
+		else if(Type::T3 == t) n_size += 9llu;
 
 	return n_size;
 }
@@ -44,11 +44,11 @@ uword LeeNewmarkFull::get_amplifier() const {
 uword LeeNewmarkFull::get_total_size() const {
 	auto n_size = 1llu;
 
-	for(auto& I : damping_mode)
-		if(Type::T0 == I.t) n_size += 1llu;
-		else if(Type::T1 == I.t) n_size += 2llu * static_cast<uword>(I.p.front()) + 1llu;
-		else if(Type::T2 == I.t) n_size += static_cast<uword>(I.p(0) + I.p(1)) + 1llu;
-		else if(Type::T3 == I.t) n_size += 2llu;
+	for(const auto& [t, p, zeta, omega] : damping_mode)
+		if(Type::T0 == t) n_size += 1llu;
+		else if(Type::T1 == t) n_size += 2llu * static_cast<uword>(p.front()) + 1llu;
+		else if(Type::T2 == t) n_size += static_cast<uword>(p(0) + p(1)) + 1llu;
+		else if(Type::T3 == t) n_size += 2llu;
 
 	return n_size * n_block;
 }
@@ -59,14 +59,11 @@ void LeeNewmarkFull::update_stiffness() const {
 	// ! make sure global stiffness only holds unrolled damping matrix when exit
 	stiffness->zeros();
 
-	for(auto& I : damping_mode) {
-		const auto mass_coef = 4. * I.zeta * I.omega * C1;
-		const auto stiffness_coef = 4. * I.zeta / I.omega * C1;
-		if(Type::T0 == I.t) assemble_by_mode_zero(IDX, mass_coef, stiffness_coef);
-		else if(Type::T1 == I.t) assemble_by_mode_one(IDX, mass_coef, stiffness_coef, I.p.front());
-		else if(Type::T2 == I.t) assemble_by_mode_two(IDX, mass_coef, stiffness_coef, I.p(0), I.p(1));
-		else if(Type::T3 == I.t) assemble_by_mode_three(IDX, mass_coef, stiffness_coef, I.p.front());
-	}
+	for(const auto& [t, p, zeta, omega] : damping_mode)
+		if(const auto mass_coef = 4. * zeta * omega * C1, stiffness_coef = 4. * zeta / omega * C1; Type::T0 == t) assemble_by_mode_zero(IDX, mass_coef, stiffness_coef);
+		else if(Type::T1 == t) assemble_by_mode_one(IDX, mass_coef, stiffness_coef, p.front());
+		else if(Type::T2 == t) assemble_by_mode_two(IDX, mass_coef, stiffness_coef, p(0), p(1));
+		else if(Type::T3 == t) assemble_by_mode_three(IDX, mass_coef, stiffness_coef, p.front());
 
 	stiffness->csc_condense();
 }

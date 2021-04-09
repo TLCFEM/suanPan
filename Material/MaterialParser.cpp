@@ -950,8 +950,7 @@ void new_boucwen(unique_ptr<Material>& return_obj, istringstream& command) {
 
 	vector<double> pool;
 	pool.reserve(6);
-	double para;
-	while(!command.eof()) if(get_input(command, para)) pool.emplace_back(para);
+	while(!command.eof()) if(double para; get_input(command, para)) pool.emplace_back(para);
 
 	if(5 == pool.size()) pool.emplace_back(0.);
 
@@ -972,8 +971,8 @@ void new_bwbn(unique_ptr<Material>& return_obj, istringstream& command) {
 
 	vec para_pool(std::initializer_list<double>{2E5, 4E2, 1E-2, 5E-1, 1., 1., 0., 1., 0., 1., 0., 0., 0., 0., 0., 1., 0.});
 
-	double para;
 	for(uword I = 0; I < para_pool.n_elem; ++I) {
+		double para;
 		if(command.eof() || !get_input(command, para)) break;
 		para_pool(I) = para;
 	}
@@ -990,8 +989,8 @@ void new_cdp(unique_ptr<Material>& return_obj, istringstream& command) {
 
 	vec para_pool(std::initializer_list<double>{3E4, .2, 3., 30., 5E-4, 5E-2, .2, 2., .5, .65, .2, 1.16, .5, 2400E-12});
 
-	double para;
 	for(uword I = 0; I < para_pool.n_elem; ++I) {
+		double para;
 		if(command.eof() || !get_input(command, para)) break;
 		para_pool(I) = para;
 	}
@@ -1420,8 +1419,7 @@ void new_expgurson(unique_ptr<Material>& return_obj, istringstream& command) {
 	vec para_pool(std::initializer_list<double>{2E2, .3, .4, .2, 1., 1., 0., 1., 0., 0.});
 
 	auto idx = 0;
-	double para;
-	while(!command.eof() && idx < 10) if(get_input(command, para)) para_pool(idx++) = para;
+	while(!command.eof() && idx < 10) if(double para; get_input(command, para)) para_pool(idx++) = para;
 
 	return_obj = make_unique<ExpGurson>(tag, para_pool(0), para_pool(1), para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6), para_pool(7), para_pool(8), para_pool(9));
 }
@@ -1435,8 +1433,7 @@ void new_expgurson1d(unique_ptr<Material>& return_obj, istringstream& command) {
 	vec para_pool(std::initializer_list<double>{2E2, .3, .4, .2, 1., 1., 0., 1., 0., 0.});
 
 	auto idx = 0;
-	double para;
-	while(!command.eof() && idx < 10) if(get_input(command, para)) para_pool(idx++) = para;
+	while(!command.eof() && idx < 10) if(double para; get_input(command, para)) para_pool(idx++) = para;
 
 	return_obj = make_unique<ExpGurson1D>(tag, para_pool(0), para_pool(1), para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6), para_pool(7), para_pool(8), para_pool(9));
 }
@@ -2021,10 +2018,9 @@ void new_multilinearelastic1d(unique_ptr<Material>& return_obj, istringstream& c
 		return;
 	}
 
-	double para;
 	vector<double> e, s, all;
 	while(!command.eof())
-		if(get_input(command, para)) all.emplace_back(para);
+		if(double para; get_input(command, para)) all.emplace_back(para);
 		else {
 			suanpan_error("new_multilinearelastic1d() requires valid inputs.\n");
 			return;
@@ -2071,8 +2067,8 @@ void new_multilinearj2(unique_ptr<Material>& return_obj, istringstream& command)
 	}
 
 	vector<double> p_strain, p_stress;
-	double c_value;
 	while(!command.eof()) {
+		double c_value;
 		if(!get_input(command, c_value)) {
 			suanpan_error("new_multilinearj2() requires a valid plastic strain.\n");
 			return;
@@ -2108,8 +2104,8 @@ void new_multilinearmises1d(unique_ptr<Material>& return_obj, istringstream& com
 	}
 
 	vector<double> p_strain, p_stress;
-	double c_value;
 	while(!command.eof()) {
+		double c_value;
 		if(!get_input(command, c_value)) {
 			suanpan_error("new_multilinearmises1d() requires a valid plastic strain.\n");
 			return;
@@ -2237,9 +2233,8 @@ void new_parallel(unique_ptr<Material>& return_obj, istringstream& command) {
 		return;
 	}
 
-	uword m_tag;
 	vector<uword> m_pool;
-	while(!command.eof()) if(get_input(command, m_tag)) m_pool.emplace_back(m_tag);
+	while(!command.eof()) if(uword m_tag; get_input(command, m_tag)) m_pool.emplace_back(m_tag);
 
 	return_obj = make_unique<Parallel>(tag, uvec(m_pool));
 }
@@ -2296,8 +2291,8 @@ void new_polyelastic1d(unique_ptr<Material>& return_obj, istringstream& command)
 	}
 
 	vector<double> p_para;
-	double c_value;
 	while(!command.eof()) {
+		double c_value;
 		if(!get_input(command, c_value)) {
 			suanpan_error("new_polyelastic1d() requires valid parameters.\n");
 			return;
@@ -2334,8 +2329,8 @@ void new_polyj2(unique_ptr<Material>& return_obj, istringstream& command) {
 	}
 
 	vector<double> p_para;
-	double c_value;
 	while(!command.eof()) {
+		double c_value;
 		if(!get_input(command, c_value)) {
 			suanpan_error("new_polyj2() requires a valid plastic strain.\n");
 			return;
@@ -2442,9 +2437,8 @@ void new_sequential(unique_ptr<Material>& return_obj, istringstream& command) {
 		return;
 	}
 
-	uword m_tag;
 	vector<uword> m_pool;
-	while(!command.eof()) if(get_input(command, m_tag)) m_pool.emplace_back(m_tag);
+	while(!command.eof()) if(uword m_tag; get_input(command, m_tag)) m_pool.emplace_back(m_tag);
 
 	if(1 == m_pool.size()) {
 		suanpan_error("new_sequential() requires at least two material models.\n");
@@ -2561,8 +2555,7 @@ void new_simplesand(unique_ptr<Material>& return_obj, istringstream& command) {
 	vec pool(std::initializer_list<double>{3E4, .2, .01, .7, 5., 1.25, 1.1, 3.5, 1.915, -130., .02, 2., 0.});
 
 	auto idx = 0;
-	double para;
-	while(!command.eof() && idx < 13) if(get_input(command, para)) pool(idx++) = para;
+	while(!command.eof() && idx < 13) if(double para; get_input(command, para)) pool(idx++) = para;
 
 	return_obj = make_unique<SimpleSand>(tag, pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), pool(6), pool(7), pool(8), pool(9), pool(10), pool(11), pool(12));
 }
@@ -2576,8 +2569,7 @@ void new_steelbrb(unique_ptr<Material>& return_obj, istringstream& command) {
 
 	vector<double> pool;
 	pool.reserve(10);
-	double para;
-	while(!command.eof()) if(get_input(command, para)) pool.emplace_back(para);
+	while(!command.eof()) if(double para; get_input(command, para)) pool.emplace_back(para);
 
 	if(6 == pool.size()) {
 		pool.insert(pool.end(), pool.begin() + 3, pool.begin() + 6);

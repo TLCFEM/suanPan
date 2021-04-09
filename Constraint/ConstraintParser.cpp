@@ -154,11 +154,11 @@ void new_mpc(unique_ptr<Constraint>& return_obj, istringstream& command) {
 		return;
 	}
 
-	uword node, dof;
-	double weight;
 	vector<uword> node_tag, dof_tag;
 	vector<double> weight_tag;
 	while(!command.eof()) {
+		double weight;
+		uword dof, node;
 		if(!get_input(command, node) || !get_input(command, dof) || !get_input(command, weight)) return;
 		node_tag.emplace_back(node);
 		dof_tag.emplace_back(dof);

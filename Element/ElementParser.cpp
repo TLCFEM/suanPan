@@ -1738,9 +1738,9 @@ void new_mvlem(unique_ptr<Element>& return_obj, istringstream& command) {
 
 	vector<double> B, H, R;
 	vector<uword> CT, ST;
-	uword t_tag;
-	double t_value;
 	while(!command.eof()) {
+		double t_value;
+		uword t_tag;
 		if(!get_input(command, t_value)) {
 			suanpan_error("new_mvlem() needs a valid fibre width.\n");
 			return;
@@ -2099,11 +2099,12 @@ void new_tie(unique_ptr<Element>& return_obj, istringstream& command) {
 		return;
 	}
 
-	uword node, dof;
-	double weight;
 	vector<uword> node_tag, dof_tag;
 	vector<double> weight_tag;
 	while(!command.eof()) {
+		double weight;
+		uword dof;
+		uword node;
 		if(!get_input(command, node) || !get_input(command, dof) || !get_input(command, weight)) return;
 		node_tag.emplace_back(node);
 		dof_tag.emplace_back(dof);
@@ -2120,23 +2121,20 @@ void new_patchquad(unique_ptr<Element>& return_obj, istringstream& command) {
 		return;
 	}
 
-	uword node;
 	vector<uword> node_tag;
-	double knot;
 	vector<double> knot_x, knot_y;
 	auto material_tag = -1;
 	auto thickness = 1.;
 
 	while(!command.eof()) {
-		string parameter;
-		if(get_input(command, parameter)) {
+		if(string parameter; get_input(command, parameter)) {
 			ignore_whitespace(command);
-			if(is_equal(parameter, "-node"))
+			if(uword node; is_equal(parameter, "-node"))
 				while(command.peek() != '-' && get_input(command, node)) {
 					node_tag.emplace_back(node);
 					ignore_whitespace(command);
 				}
-			else if(is_equal(parameter, "-knotx"))
+			else if(double knot; is_equal(parameter, "-knotx"))
 				while(command.peek() != '-' && get_input(command, knot)) {
 					knot_x.emplace_back(knot);
 					ignore_whitespace(command);
@@ -2190,22 +2188,19 @@ void new_patchcube(unique_ptr<Element>& return_obj, istringstream& command) {
 		return;
 	}
 
-	uword node;
 	vector<uword> node_tag;
-	double knot;
 	vector<double> knot_x, knot_y, knot_z;
 	auto material_tag = -1;
 
 	while(!command.eof()) {
-		string parameter;
-		if(get_input(command, parameter)) {
+		if(string parameter; get_input(command, parameter)) {
 			ignore_whitespace(command);
-			if(is_equal(parameter, "-node"))
+			if(uword node; is_equal(parameter, "-node"))
 				while(command.peek() != '-' && get_input(command, node)) {
 					node_tag.emplace_back(node);
 					ignore_whitespace(command);
 				}
-			else if(is_equal(parameter, "-knotx"))
+			else if(double knot; is_equal(parameter, "-knotx"))
 				while(command.peek() != '-' && get_input(command, knot)) {
 					knot_x.emplace_back(knot);
 					ignore_whitespace(command);

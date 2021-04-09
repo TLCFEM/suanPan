@@ -50,10 +50,7 @@ int Dynamic::initialize() {
 	if(nullptr == modifier) modifier = make_shared<Newmark>();
 
 	// avoid arc length solver
-	if(nullptr != solver) {
-		const auto& t_solver = *solver;
-		if(typeid(t_solver) == typeid(Ramm)) solver = nullptr;
-	}
+	if(nullptr != solver) if(const auto& t_solver = *solver; typeid(t_solver) == typeid(Ramm)) solver = nullptr;
 
 	// automatically enable displacement controlled solver
 	if(nullptr == solver) {
@@ -67,8 +64,7 @@ int Dynamic::initialize() {
 	}
 
 	const auto& t_solver = *solver;
-	const auto& t_modifier = *modifier;
-	if(typeid(t_solver) == typeid(BFGS) && typeid(t_modifier) == typeid(LeeNewmark) && typeid(t_modifier) == typeid(LeeNewmarkFull)) {
+	if(const auto& t_modifier = *modifier; typeid(t_solver) == typeid(BFGS) && typeid(t_modifier) == typeid(LeeNewmark) && typeid(t_modifier) == typeid(LeeNewmarkFull)) {
 		suanpan_error("currently BFGS solver is not supported by Lee damping model.\n");
 		return SUANPAN_FAIL;
 	}
@@ -108,9 +104,7 @@ int Dynamic::analyze() {
 		}
 		// update incremental and trial time
 		G->update_incre_time(step_time);
-		// call solver
-		const auto code = S->analyze();
-		if(SUANPAN_SUCCESS == code) {
+		if(const auto code = S->analyze(); SUANPAN_SUCCESS == code) {
 			// success step
 			// commit converged iteration
 			G->commit_status();

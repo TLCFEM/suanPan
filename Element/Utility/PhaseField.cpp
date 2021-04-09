@@ -26,7 +26,7 @@ void PhaseField::commit_status(const unique_ptr<Material>& mat_obj) {
 	vec D;
 	mat P;
 
-	if(const vec a_stress = .5 * (mat_obj->get_trial_stress() + mat_obj->get_current_stress()) ; eig_sym(D, P, tensor::stress::to_tensor(a_stress))) {
+	if(const vec a_stress = .5 * (mat_obj->get_trial_stress() + mat_obj->get_current_stress()); eig_sym(D, P, tensor::stress::to_tensor(a_stress))) {
 		vec PD = zeros(D.n_elem), ND = zeros(D.n_elem);
 		for(auto I = 0llu; I < D.n_elem; ++I) (D(I) >= 0. ? PD(I) : ND(I)) = D(I);
 

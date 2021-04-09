@@ -34,9 +34,7 @@ Section3D::Section3D(const unsigned T, const unsigned MT, const double A, vec&& 
 	: Section(T, SectionType::D3, MT, A, std::forward<vec>(E)) {}
 
 int Section3D::update_trial_status(const vec& t_deformation) {
-	const vec incre_deformation = (trial_deformation = t_deformation) - current_deformation;
-
-	if(norm(incre_deformation) <= datum::eps) return SUANPAN_SUCCESS;
+	if(const vec incre_deformation = (trial_deformation = t_deformation) - current_deformation; norm(incre_deformation) <= datum::eps) return SUANPAN_SUCCESS;
 
 	trial_stiffness.zeros();
 	trial_resistance.zeros();

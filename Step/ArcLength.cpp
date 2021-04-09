@@ -34,10 +34,7 @@ int ArcLength::initialize() {
 
 	modifier = make_shared<Integrator>();
 
-	if(nullptr != solver) {
-		const auto& t_solver = *solver;
-		if(typeid(t_solver) != typeid(Ramm)) solver = nullptr;
-	}
+	if(nullptr != solver) if(const auto& t_solver = *solver; typeid(t_solver) != typeid(Ramm)) solver = nullptr;
 
 	if(nullptr == tester) tester = make_shared<AbsIncreDisp>();
 	if(nullptr == solver) solver = make_shared<Ramm>();
@@ -79,8 +76,7 @@ int ArcLength::analyze() {
 			suanpan_warning("analyze() reaches maximum substep number %u.\n", get_max_substep());
 			return SUANPAN_FAIL;
 		}
-		auto code = S->analyze();
-		if(code == SUANPAN_SUCCESS) {
+		if(auto code = S->analyze(); code == SUANPAN_SUCCESS) {
 			G->commit_status();
 			G->record();
 			// if exit is returned, the analysis shall be terminated

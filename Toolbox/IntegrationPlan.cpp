@@ -1254,9 +1254,8 @@ IntegrationPlan::IntegrationPlan(const unsigned intDimension, const unsigned int
 		}
 		}
 	}
-	auto IDX = 0;
 	int_pts = new double*[n_rows];
-	if(intDimension == 1)
+	if(auto IDX = 0; intDimension == 1)
 		for(unsigned i = 0; i < intOrder; ++i) {
 			int_pts[IDX] = new double[n_cols];
 			int_pts[IDX][0] = PTL[i];

@@ -108,8 +108,7 @@ double Step::get_time_left() const { return time_left; }
 void Step::set_ini_step_size(const double T) {
 	if(fabs(ini_step_size - T) < 1E-12) return;
 	ini_step_size = T > time_period ? time_period : T;
-	const auto tmp_iteration = static_cast<int>(floor(time_period / ini_step_size)) + 1;
-	if(tmp_iteration > static_cast<int>(max_substep) && max_substep != 0) set_max_substep(tmp_iteration);
+	if(const auto tmp_iteration = static_cast<int>(floor(time_period / ini_step_size)) + 1; tmp_iteration > static_cast<int>(max_substep) && max_substep != 0) set_max_substep(tmp_iteration);
 }
 
 void Step::set_min_step_size(const double T) { min_step_size = T; }

@@ -16,9 +16,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "Recorder.h"
-#include <iomanip>
 
 #ifdef SUANPAN_HDF5
+#include <iomanip>
 #include <hdf5/hdf5.h>
 #include <hdf5/hdf5_hl.h>
 #endif

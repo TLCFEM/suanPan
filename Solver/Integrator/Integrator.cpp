@@ -84,8 +84,7 @@ void Integrator::assemble_resistance() {
 void Integrator::assemble_matrix() {
 	const auto& D = database.lock();
 	D->assemble_trial_stiffness();
-	auto& W = D->get_factory();
-	if(W->get_nlgeom()) {
+	if(auto& W = D->get_factory(); W->get_nlgeom()) {
 		D->assemble_trial_geometry();
 		W->get_stiffness() += W->get_geometry();
 	}

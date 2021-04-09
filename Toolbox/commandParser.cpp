@@ -219,8 +219,7 @@ int process_file(const shared_ptr<Bead>& model, const char* file_name) {
 	string all_line, command_line;
 	while(!getline(input_file, command_line).fail())
 		if(!command_line.empty() && command_line[0] != '#' && command_line[0] != '!') {
-			const auto if_comment = command_line.find('!');
-			if(string::npos != if_comment) command_line.erase(if_comment);
+			if(const auto if_comment = command_line.find('!'); string::npos != if_comment) command_line.erase(if_comment);
 			for(auto& c : command_line) if(',' == c || '\t' == c || '\r' == c || '\n' == c) c = ' ';
 			while(*command_line.crbegin() == ' ') command_line.pop_back();
 			if(*command_line.crbegin() == '\\') {
@@ -229,8 +228,7 @@ int process_file(const shared_ptr<Bead>& model, const char* file_name) {
 			}
 			else {
 				all_line.append(command_line);
-				istringstream tmp_str(all_line);
-				if(process_command(model, tmp_str) == SUANPAN_EXIT) return SUANPAN_EXIT;
+				if(istringstream tmp_str(all_line); process_command(model, tmp_str) == SUANPAN_EXIT) return SUANPAN_EXIT;
 				all_line.clear();
 			}
 		}
@@ -257,9 +255,7 @@ int create_new_domain(const shared_ptr<Bead>& model, istringstream& command) {
 
 	model->set_current_domain_tag(domain_id);
 
-	auto& tmp_domain = get_domain(model, domain_id);
-
-	if(nullptr != tmp_domain) suanpan_info("create_new_domain() switches to Domain %u.\n", domain_id);
+	if(auto& tmp_domain = get_domain(model, domain_id); nullptr != tmp_domain) suanpan_info("create_new_domain() switches to Domain %u.\n", domain_id);
 	else {
 		tmp_domain = make_shared<Domain>(domain_id);
 		if(nullptr != tmp_domain) suanpan_info("create_new_domain() successfully creates Domain %u.\n", domain_id);
@@ -281,8 +277,7 @@ int disable_object(const shared_ptr<Bead>& model, istringstream& command) {
 		return SUANPAN_SUCCESS;
 	}
 
-	unsigned tag;
-	if(is_equal(object_type, "domain")) while(get_input(command, tag)) model->disable_domain(tag);
+	if(unsigned tag; is_equal(object_type, "domain")) while(get_input(command, tag)) model->disable_domain(tag);
 	else if(is_equal(object_type, "step")) while(get_input(command, tag)) domain->disable_step(tag);
 	else if(is_equal(object_type, "converger")) while(get_input(command, tag)) domain->disable_converger(tag);
 	else if(is_equal(object_type, "constraint")) while(get_input(command, tag)) domain->disable_constraint(tag);
@@ -310,8 +305,7 @@ int enable_object(const shared_ptr<Bead>& model, istringstream& command) {
 		return SUANPAN_SUCCESS;
 	}
 
-	unsigned tag;
-	if(is_equal(object_type, "domain")) while(get_input(command, tag)) model->enable_domain(tag);
+	if(unsigned tag; is_equal(object_type, "domain")) while(get_input(command, tag)) model->enable_domain(tag);
 	else if(is_equal(object_type, "step")) while(get_input(command, tag)) domain->enable_step(tag);
 	else if(is_equal(object_type, "converger")) while(get_input(command, tag)) domain->enable_converger(tag);
 	else if(is_equal(object_type, "constraint")) while(get_input(command, tag)) domain->enable_constraint(tag);
@@ -339,8 +333,7 @@ int erase_object(const shared_ptr<Bead>& model, istringstream& command) {
 		return SUANPAN_SUCCESS;
 	}
 
-	unsigned tag;
-	if(is_equal(object_type, "domain")) while(get_input(command, tag)) model->erase_domain(tag);
+	if(unsigned tag; is_equal(object_type, "domain")) while(get_input(command, tag)) model->erase_domain(tag);
 	else if(is_equal(object_type, "step")) while(get_input(command, tag)) domain->erase_step(tag);
 	else if(is_equal(object_type, "converger")) while(get_input(command, tag)) domain->erase_converger(tag);
 	else if(is_equal(object_type, "constraint")) while(get_input(command, tag)) domain->erase_constraint(tag);
@@ -436,8 +429,7 @@ int suspend_object(const shared_ptr<DomainBase>& domain, istringstream& command)
 
 	const auto& step_tag = domain->get_current_step_tag();
 
-	unsigned tag;
-	if(is_equal(object_type, "constraint")) while(!command.eof() && get_input(command, tag)) { if(domain->find_constraint(tag)) domain->get_constraint(tag)->set_end_step(step_tag); }
+	if(unsigned tag; is_equal(object_type, "constraint")) while(!command.eof() && get_input(command, tag)) { if(domain->find_constraint(tag)) domain->get_constraint(tag)->set_end_step(step_tag); }
 	else if(is_equal(object_type, "load")) while(!command.eof() && get_input(command, tag)) { if(domain->find_load(tag)) domain->get_load(tag)->set_end_step(step_tag); }
 
 	return SUANPAN_SUCCESS;
@@ -455,8 +447,7 @@ int protect_object(const shared_ptr<DomainBase>& domain, istringstream& command)
 		return SUANPAN_SUCCESS;
 	}
 
-	unsigned tag;
-	if(is_equal(object_type, "element")) while(!command.eof() && get_input(command, tag)) { if(domain->find<Element>(tag)) domain->get<Element>(tag)->guard(); }
+	if(unsigned tag; is_equal(object_type, "element")) while(!command.eof() && get_input(command, tag)) { if(domain->find<Element>(tag)) domain->get<Element>(tag)->guard(); }
 	else if(is_equal(object_type, "node")) while(!command.eof() && get_input(command, tag)) { if(domain->find<Node>(tag)) domain->get<Node>(tag)->guard(); }
 
 	return SUANPAN_SUCCESS;
@@ -491,9 +482,7 @@ int create_new_acceleration(const shared_ptr<DomainBase>& domain, istringstream&
 	vector<uword> node_pool;
 	while(get_input(command, node_id)) node_pool.emplace_back(node_id);
 
-	const auto& step_tag = domain->get_current_step_tag();
-
-	if(!domain->insert(make_shared<NodalAcceleration>(load_id, step_tag, magnitude, uvec(node_pool), dof_id, amplitude_id))) suanpan_error("create_new_acceleration() fails to create new load.\n");
+	if(const auto step_tag = domain->get_current_step_tag(); !domain->insert(make_shared<NodalAcceleration>(load_id, step_tag, magnitude, uvec(node_pool), dof_id, amplitude_id))) suanpan_error("create_new_acceleration() fails to create new load.\n");
 
 	return SUANPAN_SUCCESS;
 }
@@ -511,9 +500,7 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& co
 		return SUANPAN_SUCCESS;
 	}
 
-	const auto step_tag = domain->get_current_step_tag();
-
-	if(is_equal(amplitude_type, "Constant")) domain->insert(make_shared<Constant>(tag, step_tag));
+	if(const auto step_tag = domain->get_current_step_tag(); is_equal(amplitude_type, "Constant")) domain->insert(make_shared<Constant>(tag, step_tag));
 	else if(is_equal(amplitude_type, "Ramp")) domain->insert(make_shared<Ramp>(tag, step_tag));
 	else if(is_equal(amplitude_type, "Tabular")) {
 		string file_name;
@@ -597,9 +584,7 @@ int create_new_bc(const shared_ptr<DomainBase>& domain, istringstream& command, 
 
 	const auto bc_type = suanpan::to_lower(dof_id[0]);
 
-	const auto& step_tag = domain->get_current_step_tag();
-
-	if(flag) {
+	if(const auto step_tag = domain->get_current_step_tag(); flag) {
 		if(is_equal(bc_type, 'p')) domain->insert(make_shared<PenaltyBC>(bc_id, step_tag, uvec(node_tag), "PINNED"));
 		else if(is_equal(bc_type, 'e')) domain->insert(make_shared<PenaltyBC>(bc_id, step_tag, uvec(node_tag), "ENCASTRE"));
 		else if(is_equal(bc_type, 'x')) domain->insert(make_shared<PenaltyBC>(bc_id, step_tag, uvec(node_tag), "XSYMM"));
@@ -648,9 +633,7 @@ int create_new_groupbc(const shared_ptr<DomainBase>& domain, istringstream& comm
 
 	const auto bc_type = suanpan::to_lower(dof_id[0]);
 
-	const auto& step_tag = domain->get_current_step_tag();
-
-	if(flag) {
+	if(const auto step_tag = domain->get_current_step_tag(); flag) {
 		if(is_equal(bc_type, 'p')) domain->insert(make_shared<GroupPenaltyBC>(bc_id, step_tag, uvec(group_tag), "PINNED"));
 		else if(is_equal(bc_type, 'e')) domain->insert(make_shared<GroupPenaltyBC>(bc_id, step_tag, uvec(group_tag), "ENCASTRE"));
 		else if(is_equal(bc_type, 'x')) domain->insert(make_shared<GroupPenaltyBC>(bc_id, step_tag, uvec(group_tag), "XSYMM"));
@@ -937,9 +920,7 @@ int create_new_displacement(const shared_ptr<DomainBase>& domain, istringstream&
 	vector<uword> node_tag;
 	while(get_input(command, node)) node_tag.push_back(node);
 
-	const auto& step_tag = domain->get_current_step_tag();
-
-	if(flag) { if(!domain->insert(make_shared<GroupNodalDisplacement>(load_id, step_tag, magnitude, uvec(node_tag), dof_id, amplitude_id))) suanpan_error("create_new_displacement() fails to create new load.\n"); }
+	if(const auto step_tag = domain->get_current_step_tag(); flag) { if(!domain->insert(make_shared<GroupNodalDisplacement>(load_id, step_tag, magnitude, uvec(node_tag), dof_id, amplitude_id))) suanpan_error("create_new_displacement() fails to create new load.\n"); }
 	else { if(!domain->insert(make_shared<NodalDisplacement>(load_id, step_tag, magnitude, uvec(node_tag), dof_id, amplitude_id))) suanpan_error("create_new_displacement() fails to create new load.\n"); }
 
 	return SUANPAN_SUCCESS;
@@ -1094,10 +1075,7 @@ int create_new_generatebypoint(const shared_ptr<DomainBase>& domain, istringstre
 	vector<double> pool;
 	while(!command.eof() && get_input(command, para)) pool.emplace_back(para);
 
-	if(pool.size() % 2 == 0) {
-		const auto size = static_cast<long long>(pool.size()) / 2;
-		if(is_equal(type, "nodegroup") && !domain->insert(make_shared<NodeGroup>(tag, vector<double>(pool.begin(), pool.begin() + size), vector<double>(pool.end() - size, pool.end())))) suanpan_error("create_new_generatebypoint() fails to create new node group.\n");
-	}
+	if(pool.size() % 2 == 0) { if(const auto size = static_cast<long long>(pool.size()) / 2; is_equal(type, "nodegroup") && !domain->insert(make_shared<NodeGroup>(tag, vector(pool.begin(), pool.begin() + size), vector(pool.end() - size, pool.end())))) suanpan_error("create_new_generatebypoint() fails to create new node group.\n"); }
 
 	return SUANPAN_SUCCESS;
 }
@@ -1177,8 +1155,7 @@ int create_new_initial(const shared_ptr<DomainBase>& domain, istringstream& comm
 		}
 
 		vector<double> para;
-		double input;
-		while(!command.eof()) if(get_input(command, input)) para.emplace_back(input);
+		while(!command.eof()) if(double input; get_input(command, input)) para.emplace_back(input);
 
 		if(is_equal("history", state_type) && domain->find_material(mat_tag)) domain->get_material(mat_tag)->set_initial_history(para);
 
@@ -1203,8 +1180,7 @@ int create_new_initial(const shared_ptr<DomainBase>& domain, istringstream& comm
 		t_ref_coor.resize(3);
 
 		while(!command.eof()) {
-			unsigned node_tag;
-			if(get_input(command, node_tag) && domain->find_node(node_tag)) {
+			if(unsigned node_tag; get_input(command, node_tag) && domain->find_node(node_tag)) {
 				auto& t_node = domain->get_node(node_tag);
 				auto t_coor = t_node->get_coordinate();
 				t_coor.resize(3);
@@ -1232,9 +1208,8 @@ int create_new_initial(const shared_ptr<DomainBase>& domain, istringstream& comm
 	}
 
 	if(is_equal("displacement", variable_type) || is_equal("disp", variable_type))
-		while(!command.eof()) {
-			unsigned node_tag;
-			if(get_input(command, node_tag) && domain->find_node(node_tag)) {
+		while(!command.eof())
+			if(unsigned node_tag; get_input(command, node_tag) && domain->find_node(node_tag)) {
 				auto& t_node = domain->get_node(node_tag);
 				auto t_variable = t_node->get_current_displacement();
 				if(t_variable.n_elem < dof_tag) t_variable.resize(dof_tag);
@@ -1245,11 +1220,9 @@ int create_new_initial(const shared_ptr<DomainBase>& domain, istringstream& comm
 				suanpan_error("create_new_initial() needs a valid node tag.\n");
 				return SUANPAN_SUCCESS;
 			}
-		}
 	else if(is_equal("velocity", variable_type) || is_equal("vel", variable_type))
-		while(!command.eof()) {
-			unsigned node_tag;
-			if(get_input(command, node_tag) && domain->find_node(node_tag)) {
+		while(!command.eof())
+			if(unsigned node_tag; get_input(command, node_tag) && domain->find_node(node_tag)) {
 				auto& t_node = domain->get_node(node_tag);
 				auto t_variable = t_node->get_current_velocity();
 				if(t_variable.n_elem < dof_tag) t_variable.resize(dof_tag);
@@ -1260,11 +1233,9 @@ int create_new_initial(const shared_ptr<DomainBase>& domain, istringstream& comm
 				suanpan_error("create_new_initial() needs a valid node tag.\n");
 				return SUANPAN_SUCCESS;
 			}
-		}
 	else if(is_equal("acceleration", variable_type) || is_equal("acc", variable_type))
-		while(!command.eof()) {
-			unsigned node_tag;
-			if(get_input(command, node_tag) && domain->find_node(node_tag)) {
+		while(!command.eof())
+			if(unsigned node_tag; get_input(command, node_tag) && domain->find_node(node_tag)) {
 				auto& t_node = domain->get_node(node_tag);
 				auto t_variable = t_node->get_current_acceleration();
 				if(t_variable.n_elem < dof_tag) t_variable.resize(dof_tag);
@@ -1275,7 +1246,6 @@ int create_new_initial(const shared_ptr<DomainBase>& domain, istringstream& comm
 				suanpan_error("create_new_initial() needs a valid node tag.\n");
 				return SUANPAN_SUCCESS;
 			}
-		}
 
 	return SUANPAN_SUCCESS;
 }
@@ -1347,11 +1317,11 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
 			return SUANPAN_SUCCESS;
 		}
 
-		double t_para;
 		vector<double> damping_coef;
 		vector<double> frequency;
 
 		while(!command.eof()) {
+			double t_para;
 			if(!get_input(command, t_para)) {
 				suanpan_error("create_new_integrator() needs a valid damping coefficient.\n");
 				return SUANPAN_SUCCESS;
@@ -1379,7 +1349,6 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
 
 		vector<LeeNewmarkFull::Mode> modes;
 
-		string type;
 		auto omega = 0., zeta = 0., para_a = .0, para_b = .0;
 
 		auto get_basic_input = [&]() {
@@ -1411,6 +1380,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
 		};
 
 		while(!command.eof()) {
+			string type;
 			if(!get_input(command, type)) {
 				suanpan_error("create_new_integrator() needs a valid type.\n");
 				return SUANPAN_SUCCESS;
@@ -1450,10 +1420,10 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
 			return SUANPAN_SUCCESS;
 		}
 
-		double t_para;
 		vector<double> damping_coef;
 
 		while(!command.eof()) {
+			double t_para;
 			if(!get_input(command, t_para)) {
 				suanpan_error("create_new_integrator() needs a valid damping coefficient.\n");
 				return SUANPAN_SUCCESS;
@@ -1641,11 +1611,11 @@ int create_new_mpc(const shared_ptr<DomainBase>& domain, istringstream& command)
 		return SUANPAN_SUCCESS;
 	}
 
-	uword node, dof;
-	double weight;
 	vector<uword> node_tag, dof_tag;
 	vector<double> weight_tag;
 	while(!command.eof()) {
+		double weight;
+		uword dof, node;
 		if(!get_input(command, node) || !get_input(command, dof) || !get_input(command, weight)) return SUANPAN_SUCCESS;
 		node_tag.emplace_back(node);
 		dof_tag.emplace_back(dof);
@@ -1726,11 +1696,9 @@ int create_new_recorder(const shared_ptr<DomainBase>& domain, istringstream& com
 
 	unsigned inverval = 1;
 
-	while(true) {
-		const auto peek_value = command.peek();
-		if(is_equal(peek_value, '\t') || is_equal(peek_value, ' ')) command.ignore();
+	while(true)
+		if(const auto peek_value = command.peek(); is_equal(peek_value, '\t') || is_equal(peek_value, ' ')) command.ignore();
 		else break;
-	}
 
 	if(is_equal(command.peek(), 'e') || is_equal(command.peek(), 'i')) {
 		string tmp_string;
@@ -1753,9 +1721,7 @@ int create_new_recorder(const shared_ptr<DomainBase>& domain, istringstream& com
 	vector<uword> object_tag;
 	while(!command.eof() && get_input(command, s_object_tag)) object_tag.emplace_back(s_object_tag);
 
-	const auto use_hdf5 = is_equal(file_type[0], 'h');
-
-	if(is_equal(object_type, "Node") && !domain->insert(make_shared<NodeRecorder>(tag, uvec(object_tag), to_list(variable_type.c_str()), inverval, true, use_hdf5))) suanpan_error("create_new_recorder() fails to create a new node recorder.\n");
+	if(const auto use_hdf5 = is_equal(file_type[0], 'h'); is_equal(object_type, "Node") && !domain->insert(make_shared<NodeRecorder>(tag, uvec(object_tag), to_list(variable_type.c_str()), inverval, true, use_hdf5))) suanpan_error("create_new_recorder() fails to create a new node recorder.\n");
 	else if(is_equal(object_type, "GroupNode") && !domain->insert(make_shared<GroupNodeRecorder>(tag, uvec(object_tag), to_list(variable_type.c_str()), inverval, true, use_hdf5))) suanpan_error("create_new_recorder() fails to create a new group node recorder.\n");
 	else if(is_equal(object_type, "Sum") && !domain->insert(make_shared<SumRecorder>(tag, uvec(object_tag), to_list(variable_type.c_str()), inverval, true, use_hdf5))) suanpan_error("create_new_recorder() fails to create a new summation recorder.\n");
 	else if(is_equal(object_type, "GroupSum") && !domain->insert(make_shared<GroupSumRecorder>(tag, uvec(object_tag), to_list(variable_type.c_str()), inverval, true, use_hdf5))) suanpan_error("create_new_recorder() fails to create a new group summation recorder.\n");
@@ -1799,11 +1765,9 @@ int create_new_plainrecorder(const shared_ptr<DomainBase>& domain, istringstream
 
 	unsigned inverval = 1;
 
-	while(true) {
-		const auto peek_value = command.peek();
-		if(is_equal(peek_value, '\t') || is_equal(peek_value, ' ')) command.ignore();
+	while(true)
+		if(const auto peek_value = command.peek(); is_equal(peek_value, '\t') || is_equal(peek_value, ' ')) command.ignore();
 		else break;
-	}
 
 	if(is_equal(command.peek(), 'e') || is_equal(command.peek(), 'i')) {
 		string tmp_string;
@@ -1866,11 +1830,9 @@ int create_new_hdf5recorder(const shared_ptr<DomainBase>& domain, istringstream&
 
 	unsigned inverval = 1;
 
-	while(true) {
-		const auto peek_value = command.peek();
-		if(is_equal(peek_value, '\t') || is_equal(peek_value, ' ')) command.ignore();
+	while(true)
+		if(const auto peek_value = command.peek(); is_equal(peek_value, '\t') || is_equal(peek_value, ' ')) command.ignore();
 		else break;
-	}
 
 	if(is_equal(command.peek(), 'e') || is_equal(command.peek(), 'i')) {
 		string tmp_string;
@@ -2159,9 +2121,7 @@ int create_new_supportmotion(const shared_ptr<DomainBase>& domain, istringstream
 	vector<uword> node_tag;
 	while(get_input(command, node)) node_tag.push_back(node);
 
-	const auto& step_tag = domain->get_current_step_tag();
-
-	if(0 == flag) { if(!domain->insert(make_shared<SupportDisplacement>(load_id, step_tag, magnitude, uvec(node_tag), dof_id, amplitude_id))) suanpan_error("create_new_supportmotion() fails to create new load.\n"); }
+	if(const auto step_tag = domain->get_current_step_tag(); 0 == flag) { if(!domain->insert(make_shared<SupportDisplacement>(load_id, step_tag, magnitude, uvec(node_tag), dof_id, amplitude_id))) suanpan_error("create_new_supportmotion() fails to create new load.\n"); }
 	else if(1 == flag) { if(!domain->insert(make_shared<SupportVelocity>(load_id, step_tag, magnitude, uvec(node_tag), dof_id, amplitude_id))) suanpan_error("create_new_supportmotion() fails to create new load.\n"); }
 	else { if(!domain->insert(make_shared<SupportAcceleration>(load_id, step_tag, magnitude, uvec(node_tag), dof_id, amplitude_id))) suanpan_error("create_new_supportmotion() fails to create new load.\n"); }
 
@@ -2203,9 +2163,7 @@ int test_material1d(const shared_ptr<DomainBase>& domain, istringstream& command
 
 	if(!result.save("RESULT.txt", raw_ascii)) suanpan_error("fail to save file.\n");
 
-	std::ofstream gnuplot("RESULT.plt");
-
-	if(gnuplot.is_open()) {
+	if(std::ofstream gnuplot("RESULT.plt"); gnuplot.is_open()) {
 		gnuplot << "reset\n";
 		gnuplot << "set term tikz size 14cm,10cm\n";
 		gnuplot << "set output \"RESULT.tex\"\n";
@@ -2384,9 +2342,7 @@ int test_material_by_load1d(const shared_ptr<DomainBase>& domain, istringstream&
 
 	if(!result.save("RESULT.txt", raw_ascii)) suanpan_error("fail to save file.\n");
 
-	std::ofstream gnuplot("RESULT.plt");
-
-	if(gnuplot.is_open()) {
+	if(std::ofstream gnuplot("RESULT.plt"); gnuplot.is_open()) {
 		gnuplot << "reset\n";
 		gnuplot << "set term tikz size 14cm,10cm\n";
 		gnuplot << "set output \"RESULT.tex\"\n";
@@ -2560,8 +2516,7 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
 		get_input(command, value) ? tmp_step->set_sparse(is_true(value)) : suanpan_error("set_property() need a valid value.\n");
 	}
 	else if(is_equal(property_id, "system_solver")) {
-		string value;
-		if(!get_input(command, value)) suanpan_error("set_property() need a valid value.\n");
+		if(string value; !get_input(command, value)) suanpan_error("set_property() need a valid value.\n");
 		else if(is_equal(value, "LAPACK")) tmp_step->set_system_solver(SolverType::LAPACK);
 		else if(is_equal(value, "SPIKE")) tmp_step->set_system_solver(SolverType::SPIKE);
 		else if(is_equal(value, "SUPERLU")) tmp_step->set_system_solver(SolverType::SUPERLU);
@@ -2571,8 +2526,7 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
 		else suanpan_error("set_property() need a valid solver id.\n");
 	}
 	else if(is_equal(property_id, "precision")) {
-		string value;
-		if(!get_input(command, value)) suanpan_error("set_property() need a valid value.\n");
+		if(string value; !get_input(command, value)) suanpan_error("set_property() need a valid value.\n");
 		else if(is_equal(value, "DOUBLE")) tmp_step->set_precision(Precision::DOUBLE);
 		else if(is_equal(value, "SINGLE")) tmp_step->set_precision(Precision::SINGLE);
 		else suanpan_error("set_property() need a valid precision.\n");
@@ -2598,10 +2552,8 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
 		get_input(command, max_number) ? tmp_step->set_max_substep(max_number) : suanpan_error("set_property() need a valid value.\n");
 	}
 	else if(is_equal(property_id, "eigen_number")) {
-		unsigned eigen_number;
-		if(get_input(command, eigen_number)) {
-			const auto eigen_step = std::dynamic_pointer_cast<Frequency>(tmp_step);
-			if(nullptr == eigen_step) suanpan_error("set_property() cannot set eigen number for noneigen step.\n");
+		if(unsigned eigen_number; get_input(command, eigen_number)) {
+			if(const auto eigen_step = std::dynamic_pointer_cast<Frequency>(tmp_step); nullptr == eigen_step) suanpan_error("set_property() cannot set eigen number for noneigen step.\n");
 			else eigen_step->set_eigen_number(eigen_number);
 		}
 		else suanpan_error("set_property() need a valid eigen number.\n");
@@ -2633,8 +2585,7 @@ int print_info(const shared_ptr<DomainBase>& domain, istringstream& command) {
 		return SUANPAN_SUCCESS;
 	}
 
-	unsigned tag;
-	if(is_equal(object_type, "node"))
+	if(unsigned tag; is_equal(object_type, "node"))
 		while(get_input(command, tag)) {
 			if(domain->find_node(tag)) {
 				get_node(domain, tag)->print();
