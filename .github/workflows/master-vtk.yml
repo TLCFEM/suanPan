@@ -18,7 +18,7 @@ jobs:
       - name: Golang
         uses: cedrickring/golang-action@1.6.0
         with:
-          args: go build -ldflags="-s -w" Updater/updater.go
+          args: go build Updater/updater.go
       - name: Compile
         run: |
           sudo apt-get update && sudo env ACCEPT_EULA=Y apt-get upgrade -y -o Dpkg::Options::="--force-overwrite" && sudo apt-get install libglu1-mesa-dev libgl1-mesa-dev freeglut3-dev mesa-common-dev
@@ -68,7 +68,7 @@ jobs:
       - name: Golang
         uses: cedrickring/golang-action@1.6.0
         with:
-          args: go build -ldflags="-s -w" Updater/updater.go
+          args: go build Updater/updater.go
       - name: Compile
         run: |
           sudo brew update && sudo brew install glfw3 glew
