@@ -24,7 +24,7 @@ jobs:
         run: |
           mkdir suanPan-linux-openblas
           cp suanPan suanPan-linux-openblas
-          cp Updater/updater suanPan-linux-openblas
+          cp updater suanPan-linux-openblas
           cp README.md suanPan-linux-openblas
           cp CHANGELOG.md suanPan-linux-openblas
           cp LICENSE suanPan-linux-openblas
@@ -70,7 +70,7 @@ jobs:
         run: |
           mkdir suanPan-macos-openblas
           cp suanPan suanPan-macos-openblas
-          cp Updater/updater suanPan-macos-openblas
+          cp updater suanPan-macos-openblas
           cp LICENSE suanPan-macos-openblas
           cp README.md suanPan-macos-openblas
           cp CHANGELOG.md suanPan-macos-openblas

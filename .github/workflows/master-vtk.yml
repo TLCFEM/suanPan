@@ -28,7 +28,7 @@ jobs:
         run: |
           mkdir suanPan-linux-openblas-vtk
           cp suanPan suanPan-linux-openblas-vtk
-          cp Updater/updater suanPan-linux-openblas-vtk
+          cp updater suanPan-linux-openblas-vtk
           cp README.md suanPan-linux-openblas-vtk
           cp CHANGELOG.md suanPan-linux-openblas-vtk
           cp LICENSE suanPan-linux-openblas-vtk
@@ -79,7 +79,7 @@ jobs:
         run: |
           mkdir suanPan-macos-openblas-vtk
           cp suanPan suanPan-macos-openblas-vtk
-          cp Updater/updater suanPan-macos-openblas-vtk
+          cp updater suanPan-macos-openblas-vtk
           cp LICENSE suanPan-macos-openblas-vtk
           cp README.md suanPan-macos-openblas-vtk
           cp CHANGELOG.md suanPan-macos-openblas-vtk

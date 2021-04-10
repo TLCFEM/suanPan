@@ -31,7 +31,7 @@ jobs:
         run: |
           mkdir suanPan-linux-mkl-vtk
           cp suanPan suanPan-linux-mkl-vtk
-          cp Updater/updater suanPan-linux-mkl-vtk
+          cp updater suanPan-linux-mkl-vtk
           cp README.md suanPan-linux-mkl-vtk
           cp CHANGELOG.md suanPan-linux-mkl-vtk
           cp LICENSE suanPan-linux-mkl-vtk
