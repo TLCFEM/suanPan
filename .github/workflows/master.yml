@@ -13,7 +13,7 @@ jobs:
       - name: Golang
         uses: cedrickring/golang-action@1.6.0
         with:
-          args: go build Updater/updater.go
+          args: go build -ldflags="-s -w" Updater/updater.go
       - name: Compile
         run: |
           echo "SP_TIME=suanPan-daily-$(date +''%Y%m%d%H'')" >> $GITHUB_ENV
@@ -59,7 +59,7 @@ jobs:
       - name: Golang
         uses: cedrickring/golang-action@1.6.0
         with:
-          args: go build Updater/updater.go
+          args: go build -ldflags="-s -w" Updater/updater.go
       - name: Compile
         run: |
           echo "SP_TIME=suanPan-daily-$(date +''%Y%m%d%H'')" >> $GITHUB_ENV
