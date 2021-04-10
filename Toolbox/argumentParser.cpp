@@ -36,6 +36,8 @@ void argument_parser(const int argc, char** argv) {
 
 	SUANPAN_EXE = argv[0];
 
+	check_version(SUANPAN_EXE);
+
 	if(argc > 1) {
 		ofstream output_file;
 		string output_file_name;
@@ -178,6 +180,48 @@ void print_helper() {
 	suanpan_info("\t-%-10s  --%-20s%s\n", "f", "file", "process model file");
 	suanpan_info("\t-%-10s  --%-20s%s\n", "o", "output", "set output file for logging");
 	suanpan_info("\n");
+}
+
+void check_version(const char* path_to_executable) {
+	auto updater_module = fs::path(path_to_executable).parent_path();
+
+	updater_module += "\\updater";
+
+#ifdef SUANPAN_WIN
+	updater_module += ".exe";
+#endif
+
+	if(!exists(updater_module)) return;
+
+#ifdef SUANPAN_MSVC
+	_wsystem(updater_module.wstring().c_str());
+#else
+	system(updater_module.string().c_str());
+#endif
+
+	auto version_file = fs::current_path();
+
+	version_file += "\\.latest.version.sp";
+
+	if(!exists(version_file)) return;
+
+	std::ifstream file(version_file);
+	if(std::string line; file.is_open() && std::getline(file, line)) {
+		if(int major, minor, patch = 0; 12 <= line.size()) {
+			major = line.at(9) - 48;
+			minor = line.at(11) - 48;
+			if(14 <= line.size()) patch = line.at(13) - 48;
+			if(major > SUANPAN_MAJOR || minor > SUANPAN_MINOR || patch > SUANPAN_PATCH) suanpan_info("New version %d.%d.%d is available. Please visit GitHub page or update via package managers.\n\n", major, minor, patch);
+		}
+	}
+
+	file.close();
+
+#ifdef SUANPAN_MSVC
+	_wremove(version_file.wstring().c_str());
+#else
+	remove(version_file.string().c_str());
+#endif
 }
 
 void cli_mode(const shared_ptr<Bead>& model) {
