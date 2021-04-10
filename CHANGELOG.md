@@ -6,6 +6,7 @@
 2. add `MinGap2D` and `MinGap3D` inequality constraints
 3. add `SupportMotion` loads, including `SupportDisplacement`, `SupportVelocity` and `SupportAcceleration`
 4. update `Armadillo` to version 10.4
+5. add functionality to check new version
 
 ## version 1.3
 

@@ -15,6 +15,10 @@ jobs:
           echo "SP_TIME=suanPan-daily-$(date +''%Y%m%d%H'')" >> $GITHUB_ENV
           wget https://github.com/TLCFEM/vtk-prebuild/releases/download/latest/VTK-8.2.0-linux.tar.gz
           mkdir VTK-build && tar xf VTK-8.2.0-linux.tar.gz -C VTK-build
+      - name: Golang
+        uses: cedrickring/golang-action@1.6.0
+        with:
+          args: go build Updater/updater.go
       - name: Compile
         run: |
           sudo apt-get update && sudo env ACCEPT_EULA=Y apt-get upgrade -y -o Dpkg::Options::="--force-overwrite" && sudo apt-get install libglu1-mesa-dev libgl1-mesa-dev freeglut3-dev mesa-common-dev
@@ -24,6 +28,7 @@ jobs:
         run: |
           mkdir suanPan-linux-openblas-vtk
           cp suanPan suanPan-linux-openblas-vtk
+          cp Updater/updater suanPan-linux-openblas-vtk
           cp README.md suanPan-linux-openblas-vtk
           cp CHANGELOG.md suanPan-linux-openblas-vtk
           cp LICENSE suanPan-linux-openblas-vtk
@@ -60,6 +65,10 @@ jobs:
           echo "SP_TIME=suanPan-daily-$(date +''%Y%m%d%H'')" >> $GITHUB_ENV
           wget https://github.com/TLCFEM/vtk-prebuild/releases/download/latest/VTK-8.2.0-macos.tar.gz
           mkdir VTK-build && tar xf VTK-8.2.0-macos.tar.gz -C VTK-build
+      - name: Golang
+        uses: cedrickring/golang-action@1.6.0
+        with:
+          args: go build Updater/updater.go
       - name: Compile
         run: |
           sudo brew update && sudo brew install glfw3 glew
@@ -70,6 +79,7 @@ jobs:
         run: |
           mkdir suanPan-macos-openblas-vtk
           cp suanPan suanPan-macos-openblas-vtk
+          cp Updater/updater suanPan-macos-openblas-vtk
           cp LICENSE suanPan-macos-openblas-vtk
           cp README.md suanPan-macos-openblas-vtk
           cp CHANGELOG.md suanPan-macos-openblas-vtk
