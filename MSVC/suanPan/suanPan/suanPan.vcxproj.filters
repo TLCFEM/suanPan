@@ -1198,6 +1198,9 @@
     <ClCompile Include="..\..\..\Load\SupportMotion.cpp">
       <Filter>Load</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Solver\FEAST.cpp">
+      <Filter>Solver</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2286,6 +2289,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Load\SupportMotion.h">
       <Filter>Load</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\FEAST.h">
+      <Filter>Solver</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
