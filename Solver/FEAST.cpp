@@ -43,49 +43,49 @@ int FEAST::analyze() {
 
 	if(StorageScheme::FULL != W->get_storage_scheme()) return eig_solve(get_eigenvalue(W), get_eigenvector(W), stiffness, mass, eigen_num, "SM");
 
-	podarray<int> fpm(64);
+	std::vector fpm(64, 0);
 
-	feastinit_(fpm.mem);
+	feastinit_(fpm.data());
 
 #ifdef SUANPAN_DEBUG
-	fpm(0) = 1;
+	fpm[0] = 1;
 #endif
-	fpm(14) = 1;
+	fpm[14] = 1;
 
 	int N = static_cast<int>(W->get_size());
 
-	podarray<int> output(4);
-	podarray<double> input(4);
-	input(0) = radius; // centre
-	input(1) = 0.;     // centre
-	input(2) = radius; // radius
+	std::vector output(4, 0);
+	std::vector input(4, 0.);
+	input[0] = radius; // centre
+	input[1] = 0.;     // centre
+	input[2] = radius; // radius
 
-	int M = static_cast<int>(eigen_num);
-	const podarray<double> R(M);
-	const podarray<double> E(M);
+	auto M = static_cast<int>(eigen_num);
+	std::vector R(M, 0.);
+	std::vector E(M, 0.);
 	M *= N;
-	const podarray<double> X(M);
+	std::vector X(M, 0.);
 
-	output(1) = eigen_num;
+	output[1] = eigen_num;
 
 	char UPLO = 'F';
 
-	dfeast_sygv_(&UPLO, &N, stiffness->memptr(), &N, mass->memptr(), &N, fpm.mem, &input(3), &output(0), &input(1), &input(2), &output(1), E.mem, X.mem, &output(2), R.mem, &output(3));
+	dfeast_sygv_(&UPLO, &N, stiffness->memptr(), &N, mass->memptr(), &N, fpm.data(), &input[3], &output[0], &input[1], &input[2], &output[1], E.data(), X.data(), &output[2], R.data(), &output[3]);
 
-	if(0 != output(3)) {
-		suanpan_error("error code %d recieved from FEAST solver.\n", output(3));
+	if(0 != output[3]) {
+		suanpan_error("error code %d recieved from FEAST solver.\n", output[3]);
 		return SUANPAN_FAIL;
 	}
 
 	auto& eigval = get_eigenvalue(W);
-	eigval.set_size(output(2));
+	eigval.set_size(output[2]);
 
-	for(uword I = 0; I < eigval.n_elem; ++I) eigval(I) = E(I);
+	for(uword I = 0; I < eigval.n_elem; ++I) eigval(I) = E[I];
 
 	auto& eigvec = get_eigenvector(W);
-	eigvec.resize(N, output(2));
+	eigvec.resize(N, output[2]);
 
-	for(uword I = 0; I < eigvec.n_elem; ++I) eigvec(I) = X(I);
+	for(uword I = 0; I < eigvec.n_elem; ++I) eigvec(I) = X[I];
 
 	return SUANPAN_SUCCESS;
 }

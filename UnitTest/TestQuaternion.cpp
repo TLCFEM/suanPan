@@ -2,8 +2,8 @@
 #include <Toolbox/Quaternion.hpp>
 
 TEST_CASE("Quaternion Basic Function", "[Utility.Quaternion]") {
-	const Quaternion<double> A(2., 3., 4., 5.);
-	const Quaternion<double> B(1., -2., 6., 3.);
+	const Quaternion A(2., 3., 4., 5.);
+	const Quaternion B(1., -2., 6., 3.);
 
 	auto C = A + B;
 

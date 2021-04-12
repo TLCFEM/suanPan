@@ -69,7 +69,7 @@ Rotation3D::Rotation3D(const unsigned T, const unsigned MT, const double I, cons
 	const auto S = sin(.5 * N) / N;
 	const auto C = cos(.5 * N);
 
-	form_transformation(Quaternion<double>(C, I * S, J * S, K * S).to_mat());
+	form_transformation(Quaternion(C, I * S, J * S, K * S).to_mat());
 }
 
 Rotation3D::Rotation3D(const unsigned T, const unsigned MT, mat&& R)

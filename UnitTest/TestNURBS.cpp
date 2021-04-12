@@ -16,7 +16,7 @@ TEST_CASE("BSpline Compute Basis Function", "[IGA.BSpline]") {
 	std::random_device rd;
 	std::mt19937 gen(rd());
 	// ReSharper disable once CppLocalVariableMayBeConst
-	std::uniform_real_distribution<> dis(2.0, 3.0);
+	std::uniform_real_distribution dis(2.0, 3.0);
 
 	const auto B = dis(gen);
 
@@ -195,7 +195,7 @@ TEST_CASE("NURBS Compute Derivative of A Point", "[IGA.NURBS]") {
 
 	std::random_device rd;
 	std::mt19937 gen(rd());
-	std::uniform_real_distribution<> dis(.0, 1.);
+	std::uniform_real_distribution dis(.0, 1.);
 
 	const auto E = dis(gen);
 

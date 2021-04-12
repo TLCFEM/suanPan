@@ -27,7 +27,7 @@ uvec sort_rcm(const vector<uvec>& A, const uvec& E) {
 
 	uvec G = sort_index(E);
 	uvec R(S, fill::zeros);
-	vector<bool> M(S, false);
+	vector M(S, false);
 
 	uword IDXA = 0, IDXB = S - 1, IDXC = S - 1;
 
