@@ -69,7 +69,7 @@ protected:
 	shared_ptr<Integrator> modifier;
 public:
 	explicit Step(unsigned = 0, double = 1.);
-	virtual ~Step();
+	~Step() override;
 
 	virtual int initialize();
 

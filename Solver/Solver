@@ -1,6 +1,7 @@
 #include "Integrator/Integrator"
 
 #include "Arnoldi.h"
+#include "FEAST.h"
 #include "BFGS.h"
 #include "MPDC.h"
 #include "Newton.h"

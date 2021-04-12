@@ -53,7 +53,7 @@ int ArcLength::initialize() {
 	factory->set_analysis_type(AnalysisType::STATICS);
 	factory->set_precision(precision);
 	factory->set_tolerance(tolerance);
-	factory->set_solver(SolverType::SPIKE == system_solver ? SolverType::LAPACK : system_solver); // ! Spike solver has no option to compute determinant
+	factory->set_solver(SolverType::SPIKE == system_solver ? SolverType::LAPACK : system_solver); // ! SPIKE solver has no option to compute determinant
 
 	if(SUANPAN_SUCCESS != t_domain->restart()) return SUANPAN_FAIL;
 

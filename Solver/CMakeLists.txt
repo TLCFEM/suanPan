@@ -8,6 +8,7 @@ include(Integrator/CMakeLists.txt)
 
 add_library(${PROJECT_NAME} STATIC
     Arnoldi.cpp
+    FEAST.cpp
     BFGS.cpp
     MPDC.cpp
     Newton.cpp

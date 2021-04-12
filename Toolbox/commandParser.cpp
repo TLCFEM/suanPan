@@ -1234,7 +1234,7 @@ int create_new_initial(const shared_ptr<DomainBase>& domain, istringstream& comm
 				return SUANPAN_SUCCESS;
 			}
 	else if(is_equal("acceleration", variable_type) || is_equal("acc", variable_type))
-		while(!command.eof())
+		while(!command.eof()) {
 			if(unsigned node_tag; get_input(command, node_tag) && domain->find_node(node_tag)) {
 				auto& t_node = domain->get_node(node_tag);
 				auto t_variable = t_node->get_current_acceleration();
@@ -1246,6 +1246,7 @@ int create_new_initial(const shared_ptr<DomainBase>& domain, istringstream& comm
 				suanpan_error("create_new_initial() needs a valid node tag.\n");
 				return SUANPAN_SUCCESS;
 			}
+		}
 
 	return SUANPAN_SUCCESS;
 }
@@ -1999,6 +2000,16 @@ int create_new_solver(const shared_ptr<DomainBase>& domain, istringstream& comma
 		}
 
 		if(domain->insert(make_shared<Ramm>(tag, arc_length, is_true(fixed_arc_length)))) code = 1;
+	}
+	else if(is_equal(solver_type, "FEAST")) {
+		auto eigen_number = 1;
+
+		if(!command.eof() && !get_input(command, eigen_number)) {
+			suanpan_error("create_new_solver() requires a valid number of frequencies.\n");
+			return SUANPAN_SUCCESS;
+		}
+
+		if(domain->insert(make_shared<FEAST>(tag, eigen_number))) code = 1;
 	}
 	else if(is_equal(solver_type, "DisplacementControl") || is_equal(solver_type, "MPDC")) { if(domain->insert(make_shared<MPDC>(tag))) code = 1; }
 	else suanpan_error("create_new_solver() cannot identify solver type.\n");

@@ -90,13 +90,13 @@ void Step::set_time_perid(const double T) {
 	if(fabs(time_period - T) < 1E-7) return;
 	time_period = T;
 	time_left = time_period;
-	const auto tmp_iteration = static_cast<int>(floor(time_period / ini_step_size)) + 1;
-	if(tmp_iteration <= static_cast<int>(max_substep) || max_substep == 0) return;
-	if(tmp_iteration > static_cast<int>(std::numeric_limits<unsigned>::max())) {
+	const auto t_iteration = static_cast<int>(floor(time_period / ini_step_size)) + 1;
+	if(t_iteration <= static_cast<int>(max_substep) || 0 == max_substep) return;
+	if(t_iteration > static_cast<int>(std::numeric_limits<unsigned>::max())) {
 		suanpan_warning("set_ini_step_size() exceeds limits.\n");
 		set_max_substep(std::numeric_limits<unsigned>::max());
 	}
-	else set_max_substep(tmp_iteration);
+	else set_max_substep(t_iteration);
 }
 
 void Step::set_time_left(const double T) { time_left = T; }
@@ -108,7 +108,7 @@ double Step::get_time_left() const { return time_left; }
 void Step::set_ini_step_size(const double T) {
 	if(fabs(ini_step_size - T) < 1E-12) return;
 	ini_step_size = T > time_period ? time_period : T;
-	if(const auto tmp_iteration = static_cast<int>(floor(time_period / ini_step_size)) + 1; tmp_iteration > static_cast<int>(max_substep) && max_substep != 0) set_max_substep(tmp_iteration);
+	if(const auto t_iteration = static_cast<int>(floor(time_period / ini_step_size)) + 1; t_iteration > static_cast<int>(max_substep) && max_substep != 0) set_max_substep(t_iteration);
 }
 
 void Step::set_min_step_size(const double T) { min_step_size = T; }
