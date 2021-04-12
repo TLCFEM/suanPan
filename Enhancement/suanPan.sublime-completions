@@ -371,6 +371,7 @@
     "FixedNumber",
     "FixedLength2D",
     "FixedLength3D",
+    "FEAST",
     "R2D2",
     "R3D2",
     "MinGap2D",

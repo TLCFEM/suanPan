@@ -41,14 +41,15 @@ int FEAST::analyze() {
 	const auto& stiffness = W->get_stiffness();
 	const auto& mass = W->get_mass();
 
-	const auto scheme = W->get_storage_scheme();
-
-	if(StorageScheme::FULL != scheme) return eig_solve(get_eigenvalue(W), get_eigenvector(W), stiffness, mass, eigen_num, "SM");
+	if(StorageScheme::FULL != W->get_storage_scheme()) return eig_solve(get_eigenvalue(W), get_eigenvector(W), stiffness, mass, eigen_num, "SM");
 
 	podarray<int> fpm(64);
 
 	feastinit_(fpm.mem);
 
+#ifdef SUANPAN_DEBUG
+	fpm(0) = 1;
+#endif
 	fpm(14) = 1;
 
 	int N = static_cast<int>(W->get_size());
@@ -69,7 +70,7 @@ int FEAST::analyze() {
 
 	char UPLO = 'F';
 
-	if(StorageScheme::FULL == scheme) dfeast_sygv_(&UPLO, &N, stiffness->memptr(), &N, mass->memptr(), &N, fpm.mem, &input(3), &output(0), &input(1), &input(2), &output(1), E.mem, X.mem, &output(2), R.mem, &output(3));
+	dfeast_sygv_(&UPLO, &N, stiffness->memptr(), &N, mass->memptr(), &N, fpm.mem, &input(3), &output(0), &input(1), &input(2), &output(1), E.mem, X.mem, &output(2), R.mem, &output(3));
 
 	if(0 != output(3)) {
 		suanpan_error("error code %d recieved from FEAST solver.\n", output(3));
