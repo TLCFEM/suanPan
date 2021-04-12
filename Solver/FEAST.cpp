@@ -46,7 +46,7 @@ int FEAST::analyze() {
 
 	const auto scheme = W->get_storage_scheme();
 
-	if(StorageScheme::SYMMPACK == scheme) return eig_solve(get_eigenvalue(W), get_eigenvector(W), stiffness, mass, eigen_num, "SM");
+	if(StorageScheme::FULL != scheme) return eig_solve(get_eigenvalue(W), get_eigenvector(W), stiffness, mass, eigen_num, "SM");
 
 #ifdef SUANPAN_MKL
 	return eig_solve(get_eigenvalue(W), get_eigenvector(W), stiffness, mass, eigen_num, "SM");
@@ -55,42 +55,40 @@ int FEAST::analyze() {
 
 	feastinit_(fpm.mem);
 
-	fpm(0) = 1;
 	fpm(14) = 1;
 
-	if(StorageScheme::FULL == scheme) {
-		podarray<int> output(4);
-		podarray<double> input(4);
-		input(0) = radius; // centre
-		input(1) = 0.;     // centre
-		input(2) = radius; // radius
+	int N = static_cast<int>(W->get_size());
 
-		int M = 2 * static_cast<int>(eigen_num);
-		const podarray<double> R(M);
-		const podarray<double> E(M);
-		int N = static_cast<int>(W->get_size());
-		M *= N;
-		const podarray<double> X(M);
+	podarray<int> output(4);
+	podarray<double> input(4);
+	input(0) = radius; // centre
+	input(1) = 0.;     // centre
+	input(2) = radius; // radius
 
-		output(1) = eigen_num;
+	int M = 2 * static_cast<int>(eigen_num);
+	const podarray<double> R(M);
+	const podarray<double> E(M);
+	M *= N;
+	const podarray<double> X(M);
 
-		dfeast_gegv_(&N, stiffness->memptr(), &N, mass->memptr(), &N, fpm.mem, &input(3), &output(0), input.mem, &input(2), &output(1), E.mem, X.mem, &output(2), R.mem, &output(3));
+	output(1) = eigen_num;
 
-		if(0 != output(3)) {
-			suanpan_error("error code %d recieved from FEAST solver.\n", output(3));
-			return SUANPAN_FAIL;
-		}
+	if(StorageScheme::FULL == scheme) { dfeast_gegv_(&N, stiffness->memptr(), &N, mass->memptr(), &N, fpm.mem, &input(3), &output(0), input.mem, &input(2), &output(1), E.mem, X.mem, &output(2), R.mem, &output(3)); }
 
-		auto& eigval = get_eigenvalue(W);
-		eigval.set_size(output(2));
-
-		for(uword I = 0; I < eigval.n_elem; ++I) eigval(I) = E(2 * I);
-
-		auto& eigvec = get_eigenvector(W);
-		eigvec.resize(N, output(2));
-
-		for(uword I = 0; I < eigvec.n_elem; ++I) eigvec(I) = X(2 * I);
+	if(0 != output(3)) {
+		suanpan_error("error code %d recieved from FEAST solver.\n", output(3));
+		return SUANPAN_FAIL;
 	}
+
+	auto& eigval = get_eigenvalue(W);
+	eigval.set_size(output(2));
+
+	for(uword I = 0; I < eigval.n_elem; ++I) eigval(I) = E(2 * I);
+
+	auto& eigvec = get_eigenvector(W);
+	eigvec.resize(N, output(2));
+
+	for(uword I = 0; I < eigvec.n_elem; ++I) eigvec(I) = X(2 * I);
 #endif
 
 	return SUANPAN_SUCCESS;

@@ -30,17 +30,7 @@
 #ifndef BANDMATSPIKE_HPP
 #define BANDMATSPIKE_HPP
 
-extern "C" {
-void spikeinit_(int*, int*, int*);
-void dspike_tune_(int*);
-void dspike_gbsv_(int*, int*, int*, int*, int*, double*, int*, double*, int*, int*);
-void dspike_gbtrf_(int*, int*, int*, int*, double*, int*, double*, int*);
-void dspike_gbtrs_(int*, const char*, int*, int*, int*, int*, double*, int*, double*, double*, int*);
-void sspike_tune_(int*);
-void sspike_gbsv_(int*, int*, int*, int*, int*, float*, int*, float*, int*, int*);
-void sspike_gbtrf_(int*, int*, int*, int*, float*, int*, float*, int*);
-void sspike_gbtrs_(int*, const char*, int*, int*, int*, int*, float*, int*, float*, float*, int*);
-}
+#include <feast/spike.h>
 
 template<typename T> class BandMatSpike final : public MetaMat<T> {
 	using MetaMat<T>::TRAN;
