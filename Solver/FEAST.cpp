@@ -20,10 +20,7 @@
 #include <Domain/Factory.hpp>
 #include <Solver/Integrator/Integrator.h>
 #include <Toolbox/arpack_wrapper.h>
-
-#ifndef SUANPAN_MKL
 #include <feast/feast.h>
-#endif
 
 FEAST::FEAST(const unsigned T, const unsigned N, const double R)
 	: Solver(T)
@@ -48,9 +45,6 @@ int FEAST::analyze() {
 
 	if(StorageScheme::FULL != scheme) return eig_solve(get_eigenvalue(W), get_eigenvector(W), stiffness, mass, eigen_num, "SM");
 
-#ifdef SUANPAN_MKL
-	return eig_solve(get_eigenvalue(W), get_eigenvector(W), stiffness, mass, eigen_num, "SM");
-#else
 	podarray<int> fpm(64);
 
 	feastinit_(fpm.mem);
@@ -65,7 +59,7 @@ int FEAST::analyze() {
 	input(1) = 0.;     // centre
 	input(2) = radius; // radius
 
-	int M = 2 * static_cast<int>(eigen_num);
+	int M = static_cast<int>(eigen_num);
 	const podarray<double> R(M);
 	const podarray<double> E(M);
 	M *= N;
@@ -73,7 +67,9 @@ int FEAST::analyze() {
 
 	output(1) = eigen_num;
 
-	if(StorageScheme::FULL == scheme) { dfeast_gegv_(&N, stiffness->memptr(), &N, mass->memptr(), &N, fpm.mem, &input(3), &output(0), input.mem, &input(2), &output(1), E.mem, X.mem, &output(2), R.mem, &output(3)); }
+	char UPLO = 'F';
+
+	if(StorageScheme::FULL == scheme) dfeast_sygv_(&UPLO, &N, stiffness->memptr(), &N, mass->memptr(), &N, fpm.mem, &input(3), &output(0), &input(1), &input(2), &output(1), E.mem, X.mem, &output(2), R.mem, &output(3));
 
 	if(0 != output(3)) {
 		suanpan_error("error code %d recieved from FEAST solver.\n", output(3));
@@ -83,13 +79,12 @@ int FEAST::analyze() {
 	auto& eigval = get_eigenvalue(W);
 	eigval.set_size(output(2));
 
-	for(uword I = 0; I < eigval.n_elem; ++I) eigval(I) = E(2 * I);
+	for(uword I = 0; I < eigval.n_elem; ++I) eigval(I) = E(I);
 
 	auto& eigvec = get_eigenvector(W);
 	eigvec.resize(N, output(2));
 
-	for(uword I = 0; I < eigvec.n_elem; ++I) eigvec(I) = X(2 * I);
-#endif
+	for(uword I = 0; I < eigvec.n_elem; ++I) eigvec(I) = X(I);
 
 	return SUANPAN_SUCCESS;
 }
