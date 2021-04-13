@@ -19,7 +19,7 @@ endif()
 file(GLOB mumps_f "*.F")
 file(GLOB mumps_c "*.c")
 
-add_library(mumps_f_mod OBJECT dfac_b.F dfac_front_LDLT_type1.F dfac_front_LDLT_type2.F dfac_front_LU_type1.F dfac_front_LU_type2.F dfac_front_aux.F dfac_front_type2_aux.F dfac_par_m.F)
+add_library(mumps_f_mod OBJECT dmumps_comm_buffer.F)
 add_library(mumps_f_lib OBJECT ${mumps_f})
 add_library(mumps_c_lib OBJECT ${mumps_c})
 
