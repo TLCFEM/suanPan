@@ -19,7 +19,7 @@ endif()
 file(GLOB mumps_f "*.F")
 file(GLOB mumps_c "*.c")
 
-add_library(mumps_f_mod OBJECT dmumps_comm_buffer.F)
+add_library(mumps_f_mod OBJECT dlr_type.F dmumps_comm_buffer.F)
 add_library(mumps_f_lib OBJECT ${mumps_f})
 add_library(mumps_c_lib OBJECT ${mumps_c})
 
