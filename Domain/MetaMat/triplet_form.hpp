@@ -53,6 +53,8 @@ public:
 	triplet_form& operator=(const triplet_form&);     // copy assignment
 	triplet_form& operator=(triplet_form&&) noexcept; // move assignment
 
+	template<typename in_dt, typename in_it> triplet_form(const triplet_form<in_dt, in_it>&, int);
+
 	[[nodiscard]] const index_t* row_mem() const override;
 	[[nodiscard]] const index_t* col_mem() const override;
 	[[nodiscard]] const data_t* val_mem() const override;
@@ -220,6 +222,29 @@ template<typename data_t, typename index_t> triplet_form<data_t, index_t>& tripl
 	in_mat.row_idx = in_mat.col_idx = nullptr;
 	in_mat.val_idx = nullptr;
 	return *this;
+}
+
+template<typename data_t, typename index_t> template<typename in_dt, typename in_it> triplet_form<data_t, index_t>::triplet_form(const triplet_form<in_dt, in_it>& in_mat, const int base)
+	: sparse_form<data_t, index_t, triplet_form<data_t, index_t>>(in_mat.n_rows, in_mat.n_cols, in_mat.n_elem) {
+	access::rw(c_size) = in_mat.c_size;
+	csc_sorted = in_mat.csc_sorted;
+	csr_sorted = in_mat.csr_sorted;
+
+	triplet_form<data_t, index_t>::init();
+
+#ifdef SUANPAN_MT
+	tbb::parallel_for(static_cast<index_t>(0), in_mat.c_size, [&](const index_t I) {
+		row_idx[I] = index_t(in_mat.row_idx[I]) + base;
+		col_idx[I] = index_t(in_mat.col_idx[I]) + base;
+		val_idx[I] = data_t(in_mat.val_idx[I]);
+	});
+#else
+	for(index_t I = 0; I < in_mat.c_size; ++I) {
+		row_idx[I] = index_t(in_mat.row_idx[I]) + base;
+		col_idx[I] = index_t(in_mat.col_idx[I]) + base;
+		val_idx[I] = data_t(in_mat.val_idx[I]);
+	}
+#endif
 }
 
 template<typename data_t, typename index_t> const index_t* triplet_form<data_t, index_t>::row_mem() const { return row_idx; }
@@ -538,8 +563,7 @@ template<typename data_t, typename index_t> triplet_form<data_t, index_t> triple
 }
 
 template<typename data_t, typename index_t> triplet_form<data_t, index_t>& triplet_form<data_t, index_t>::operator+=(const triplet_form<data_t, index_t>& in_mat) {
-	auto new_size = c_size + in_mat.c_size;
-	if(n_elem < new_size) resize(new_size);
+	if(const auto new_size = c_size + in_mat.c_size; n_elem < new_size) resize(new_size);
 
 	for(index_t I = 0; I < in_mat.c_size; ++I) at(in_mat.row(I), in_mat.col(I)) = in_mat.val(I);
 
@@ -550,8 +574,7 @@ template<typename data_t, typename index_t> triplet_form<data_t, index_t>& tripl
 }
 
 template<typename data_t, typename index_t> triplet_form<data_t, index_t>& triplet_form<data_t, index_t>::operator-=(const triplet_form<data_t, index_t>& in_mat) {
-	auto new_size = c_size + in_mat.c_size;
-	if(n_elem < new_size) resize(new_size);
+	if(const auto new_size = c_size + in_mat.c_size; n_elem < new_size) resize(new_size);
 
 	for(index_t I = 0; I < in_mat.c_size; ++I) at(in_mat.row(I), in_mat.col(I)) = -in_mat.val(I);
 

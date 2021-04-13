@@ -202,6 +202,7 @@ jobs:
           ./suanPan -f ../Example/Solver/CentralDifference.supan > /dev/null
           ./suanPan -f ../Example/Solver/ElementalModal.supan > /dev/null
           ./suanPan -f ../Example/Solver/Frequency.supan > /dev/null
+          ./suanPan -f ../Example/Solver/FEAST.supan > /dev/null
           ./suanPan -f ../Example/Solver/GeneralizedAlpha.supan > /dev/null
           ./suanPan -f ../Example/Solver/Lee.supan > /dev/null
           ./suanPan -f ../Example/Solver/LeeFull.supan > /dev/null
