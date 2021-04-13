@@ -27,6 +27,22 @@ FEAST::FEAST(const unsigned T, const unsigned N, const double R)
 	, eigen_num(N)
 	, radius(R) {}
 
+int FEAST::initialize() {
+	if(SUANPAN_SUCCESS != Solver::initialize()) return SUANPAN_FAIL;
+
+	auto& G = get_integrator();
+	const auto& D = G->get_domain().lock();
+	auto& W = D->get_factory();
+
+	if(const auto scheme = W->get_storage_scheme(); (StorageScheme::BAND == scheme || StorageScheme::BANDSYMM == scheme) && SolverType::SPIKE != W->get_solver()) {
+		suanpan_error("SPIKE solver needs to be used for banded storage.\n");
+
+		return SUANPAN_FAIL;
+	}
+
+	return SUANPAN_SUCCESS;
+}
+
 int FEAST::analyze() {
 	auto& G = get_integrator();
 	const auto& D = G->get_domain().lock();

@@ -36,6 +36,8 @@ class FEAST final : public Solver {
 public:
 	FEAST(unsigned, unsigned, double);
 
+	int initialize() override;
+
 	int analyze() override;
 
 	void print() override;
