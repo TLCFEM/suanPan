@@ -43,8 +43,7 @@ int FEAST::analyze() {
 
 	const auto scheme = W->get_storage_scheme();
 
-	// if(StorageScheme::FULL != scheme) return eig_solve(get_eigenvalue(W), get_eigenvector(W), stiffness, mass, eigen_num, "SM");
-	if(StorageScheme::FULL != scheme && StorageScheme::SPARSE != scheme) return eig_solve(get_eigenvalue(W), get_eigenvector(W), stiffness, mass, eigen_num, "SM");
+	if(StorageScheme::SYMMPACK == scheme) return eig_solve(get_eigenvalue(W), get_eigenvector(W), stiffness, mass, eigen_num, "SM");
 
 	std::vector fpm(64, 0);
 
@@ -79,6 +78,18 @@ int FEAST::analyze() {
 
 		dfeast_scsrgv_(&UPLO, &N, t_stiff.val_idx, t_stiff.row_ptr, t_stiff.col_idx, t_mass.val_idx, t_mass.row_ptr, t_mass.col_idx, fpm.data(), &input[3], &output[0], &input[1], &input[2], &output[1], E.data(), X.data(), &output[2], R.data(), &output[3]);
 	}
+	else if(StorageScheme::BAND == scheme || StorageScheme::BANDSYMM == scheme) {
+		fpm[41] = 0;
+
+		unsigned l, u;
+		W->get_bandwidth(l, u);
+		auto KL = static_cast<int>(l);
+		const auto KU = static_cast<int>(u);
+		auto LD = KL + KU + 1;
+
+		dfeast_sbgv_(&UPLO, &N, &KL, stiffness->memptr(), &LD, &KL, mass->memptr(), &LD, fpm.data(), &input[3], &output[0], &input[1], &input[2], &output[1], E.data(), X.data(), &output[2], R.data(), &output[3]);
+	}
+	else throw;
 
 	if(0 != output[3]) {
 		suanpan_error("error code %d recieved from FEAST solver.\n", output[3]);
