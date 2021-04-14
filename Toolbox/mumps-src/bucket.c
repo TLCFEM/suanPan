@@ -142,7 +142,8 @@ PORD_INT minBucket(bucket_t* bucket) {
 		   return the item with smallest key
 		   --------------------------------- */
 		return (bestitem);
-	} else return (-1);
+	}
+	else return (-1);
 }
 
 /******************************************************************************

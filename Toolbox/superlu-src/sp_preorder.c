@@ -205,7 +205,8 @@ int check_perm(char* what, int n, int* perm) {
 		if(marker[perm[i]] == 1 || perm[i] >= n) {
 			printf("%s: Not a valid PERM[%d] = %d\n", what, i, perm[i]);
 			ABORT("check_perm");
-		} else { marker[perm[i]] = 1; }
+		}
+		else { marker[perm[i]] = 1; }
 	}
 
 	SUPERLU_FREE(marker);

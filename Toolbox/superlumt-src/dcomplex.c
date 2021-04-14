@@ -40,7 +40,8 @@ void z_div(doublecomplex* c, doublecomplex* a, doublecomplex* b) {
 		den = b->i * (1 + ratio * ratio);
 		cr = (a->r * ratio + a->i) / den;
 		ci = (a->i * ratio - a->r) / den;
-	} else {
+	}
+	else {
 		ratio = b->i / b->r;
 		den = b->r * (1 + ratio * ratio);
 		cr = (a->r + a->i * ratio) / den;

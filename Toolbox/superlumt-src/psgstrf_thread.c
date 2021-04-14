@@ -261,7 +261,8 @@ void
 		pdiv = Gstat->procstat[pnum].fcops - pdiv;
 		cp_panel[jcol].pdiv = pdiv;
 #endif
-			} else {
+			}
+			else {
 				/* Regular panel */
 #ifdef PROFILE
 		TIC(t);

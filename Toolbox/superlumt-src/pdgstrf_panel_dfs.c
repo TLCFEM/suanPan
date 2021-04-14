@@ -151,7 +151,8 @@ if (jcol == BADPAN)
 				 *       is not yet available from a preceeding busy column.
 				 */
 				panel_lsub[nextl_col++] = krow; /* krow is indexed into A */
-			} else {
+			}
+			else {
 				/* 
 				 * krow is in U (0 <= kperm < jcol): if its supernode
 				 * representative krep has been explored, update repfnz[*].
@@ -179,7 +180,8 @@ if (jj == BADCOL)
 					/* Representative visited before */
 					if(myfnz > kperm) repfnz_col[krep] = kperm;
 					/* continue; */
-				} else {
+				}
+				else {
 					/* Otherwise, performs dfs starting from krep */
 					parent[krep] = EMPTY;
 					repfnz_col[krep] = kperm;
@@ -190,7 +192,8 @@ if (jj == BADCOL)
 #ifdef PROFILE
 						/*Gstat->procstat[pnum].pruned++;*/
 #endif
-					} else {
+					}
+					else {
 						fsupc = SUPER_FSUPC(supno[krep]);
 						xdfs = xlsub[fsupc] + krep - fsupc + 1;
 						maxdfs = xlsub_end[fsupc];
@@ -223,7 +226,8 @@ if (jj == BADCOL)
 								if(chperm == EMPTY) {
 									/* kchild is in L: place it in L[*,j]. */
 									panel_lsub[nextl_col++] = kchild;
-								} else {
+								}
+								else {
 									/* kchild is in U (0 <= chperm < jcol): 
 									 * chrep = its supernode-rep. If its rep
 									 * has been explored, update its repfnz[*].
@@ -249,7 +253,8 @@ if (jj == BADCOL)
 									if(myfnz != EMPTY) {
 										/* Visited before */
 										if(myfnz > chperm) repfnz_col[chrep] = chperm;
-									} else {
+									}
+									else {
 										/* Cont. dfs at snode-rep of kchild */
 										xplore[krep] = xdfs;
 										xplore[m + krep] = maxdfs;
@@ -263,7 +268,8 @@ if (jj == BADCOL)
 #ifdef PROFILE
 											/*procstat[pnum].pruned++;*/
 #endif
-										} else {
+										}
+										else {
 											fsupc = SUPER_FSUPC(supno[krep]);
 											xdfs = xlsub[fsupc] + krep - fsupc + 1;
 											maxdfs = xlsub_end[fsupc];

@@ -86,7 +86,8 @@ static LU_space_t whichspace; /* 0 - system malloc'd; 1 - user provided */
 void psgstrf_SetupSpace(void* work, int_t lwork) {
 	if(lwork == 0) {
 		whichspace = SYSTEM; /* malloc/free */
-	} else if(lwork > 0) {
+	}
+	else if(lwork > 0) {
 		whichspace = USER; /* user provided space */
 		stack.size = lwork;
 		stack.used = 0;
@@ -126,7 +127,8 @@ void* suser_malloc(int_t bytes, int_t which_end) {
 		if(which_end == HEAD) {
 			buf = (char*)stack.array + stack.top1;
 			stack.top1 += bytes;
-		} else {
+		}
+		else {
 			stack.top2 -= bytes;
 			buf = (char*)stack.array + stack.top2;
 		}
@@ -278,7 +280,8 @@ float psgstrf_MemInit(int_t n, int_t annz, superlumt_options_t* superlumt_option
 		if(Glu->dynamic_snode_bound == YES) {
 			if(FILL_LUSUP < 0) nzlumax = -FILL_LUSUP * annz;
 			else nzlumax = FILL_LUSUP; /* estimate an upper bound */
-		} else {
+		}
+		else {
 			nzlumax = Glu->nzlumax; /* preset as static upper bound */
 		}
 
@@ -286,7 +289,8 @@ float psgstrf_MemInit(int_t n, int_t annz, superlumt_options_t* superlumt_option
 			return (GluIntArray(n) * iword +
 				superlu_sTempSpace(n, panel_size, nprocs)
 				+ (nzlmax + nzumax) * iword + (nzlumax + nzumax) * dword);
-		} else { psgstrf_SetupSpace(work, lwork); }
+		}
+		else { psgstrf_SetupSpace(work, lwork); }
 
 		/* Integer pointers for L\U factors */
 		if(whichspace == SYSTEM) {
@@ -299,7 +303,8 @@ float psgstrf_MemInit(int_t n, int_t annz, superlumt_options_t* superlumt_option
 			xlusup_end = intMalloc(n);
 			xusub = intMalloc(n + 1);
 			xusub_end = intMalloc(n);
-		} else {
+		}
+		else {
 			xsup = (int_t*)suser_malloc((n + 1) * iword, HEAD);
 			xsup_end = (int_t*)suser_malloc((n) * iword, HEAD);
 			supno = (int_t*)suser_malloc((n + 1) * iword, HEAD);
@@ -325,7 +330,8 @@ float psgstrf_MemInit(int_t n, int_t annz, superlumt_options_t* superlumt_option
 				SUPERLU_FREE(ucol);
 				SUPERLU_FREE(lsub);
 				SUPERLU_FREE(usub);
-			} else { suser_free(nzumax * dword + (nzlmax + nzumax) * iword, HEAD); }
+			}
+			else { suser_free(nzumax * dword + (nzlmax + nzumax) * iword, HEAD); }
 			nzumax /= 2; /* reduce request */
 			nzlmax /= 2;
 			if(nzumax < annz / 2) {
@@ -344,7 +350,8 @@ float psgstrf_MemInit(int_t n, int_t annz, superlumt_options_t* superlumt_option
 			fflush(stdout);
 			return (t);
 		}
-	} else {
+	}
+	else {
 		/* refact == YES */
 		Lstore = L->Store;
 		Ustore = U->Store;
@@ -364,7 +371,9 @@ float psgstrf_MemInit(int_t n, int_t annz, superlumt_options_t* superlumt_option
 		if(lwork == -1) {
 			return (GluIntArray(n) * iword + superlu_sTempSpace(n, panel_size, nprocs)
 				+ (nzlmax + nzumax) * iword + (nzlumax + nzumax) * dword);
-		} else if(lwork == 0) { whichspace = SYSTEM; } else {
+		}
+		else if(lwork == 0) { whichspace = SYSTEM; }
+		else {
 			whichspace = USER;
 			stack.size = lwork;
 			stack.top2 = lwork;
@@ -487,7 +496,8 @@ void psgstrf_WorkFree(int_t* iwork, float* dwork, GlobalLU_t* Glu) {
 	if(whichspace == SYSTEM) {
 		SUPERLU_FREE(iwork);
 		SUPERLU_FREE(dwork);
-	} else {
+	}
+	else {
 #if ( MACH==PTHREAD ) /* Use pthread ... */
         pthread_mutex_lock( &stack.lock );
 #elif ( MACH==OPENMP ) /* Use openMP ... */
@@ -599,7 +609,8 @@ void
 
 		if(no_expand != 0) {
 			tries = 0;
-			if(keep_prev) { if(!new_mem) return (NULL); } else {
+			if(keep_prev) { if(!new_mem) return (NULL); }
+			else {
 				while(!new_mem) {
 					if(++tries > 10) return (NULL);
 					alpha = Reduce(alpha);
@@ -607,11 +618,13 @@ void
 					new_mem = (void*)SUPERLU_MALLOC((size_t) new_len * lword);
 				}
 			}
-			if(type == LSUB || type == USUB) { copy_mem_int(len_to_copy, sexpanders[type].mem, new_mem); } else { copy_mem_float(len_to_copy, sexpanders[type].mem, new_mem); }
+			if(type == LSUB || type == USUB) { copy_mem_int(len_to_copy, sexpanders[type].mem, new_mem); }
+			else { copy_mem_float(len_to_copy, sexpanders[type].mem, new_mem); }
 			SUPERLU_FREE(sexpanders[type].mem);
 		}
 		sexpanders[type].mem = (void*)new_mem;
-	} else {
+	}
+	else {
 		/* whichspace == USER */
 		if(no_expand == 0) {
 			new_mem = suser_malloc(new_len * lword, HEAD);
@@ -637,7 +650,8 @@ void
 #endif
 			}
 			sexpanders[type].mem = (void*)new_mem;
-		} else {
+		}
+		else {
 			tries = 0;
 			extra = (new_len - *prev_len) * lword;
 			if(keep_prev) {
@@ -646,7 +660,8 @@ void
 					sexpanders[type].mem = NULL;
 					return NULL;
 				}
-			} else {
+			}
+			else {
 				while(StackFull(extra)) {
 					if(++tries > 10) {
 						new_len = 0;
@@ -822,7 +837,8 @@ int_t sPresetMap(
 #if ( PRNTlevel>=1 )
 	printf(".. Use dynamic alg. to allocate storage for L supernodes.\n");
 #endif
-	} else Glu->dynamic_snode_bound = NO;
+	}
+	else Glu->dynamic_snode_bound = NO;
 
 	Astore = A->Store;
 	asub = Astore->rowind;
@@ -887,7 +903,8 @@ int_t sPresetMap(
 				nextpos += w * SUPERLU_MAX(rs_nrow, colcnt[k]);
 			}
 			w = i - j;
-		} else {
+		}
+		else {
 			/* Column j starts a supernode in H */
 			w = super_bnd[j];
 			if(Glu->dynamic_snode_bound == NO) nextpos += w * colcnt[j];

@@ -181,7 +181,8 @@ int ilu_cdrop_row(
 				d_max = 1.0 / d_max;
 				d_min = 1.0 / d_min;
 				tol = 1.0 / (d_max + (d_min - d_max) * quota / (m - n - r));
-			} else /* by quick select */
+			}
+			else /* by quick select */
 			{
 				int len = m1 - n + 1;
 				scopy_(&len, swork, &i_1, swork2, &i_1);
@@ -269,7 +270,8 @@ int ilu_cdrop_row(
 					cc_mult(&lusup[xlusup_first + j * inc_diag],
 					        &lusup[xlusup_first + j * inc_diag],
 					        &t);
-				} else {
+				}
+				else {
 					cs_mult(
 						&lusup[xlusup_first + j * inc_diag],
 						&lusup[xlusup_first + j * inc_diag],
@@ -282,12 +284,12 @@ int ilu_cdrop_row(
 				}
 				break;
 			case SMILU_2:
-			cs_mult(&lusup[xlusup_first + j * inc_diag],
+				cs_mult(&lusup[xlusup_first + j * inc_diag],
 				        &lusup[xlusup_first + j * inc_diag],
 				        1.0 + c_abs1(&t));
 				break;
 			case SMILU_3:
-			c_add(&t, &t, &one);
+				c_add(&t, &t, &one);
 				cc_mult(&lusup[xlusup_first + j * inc_diag],
 				        &lusup[xlusup_first + j * inc_diag],
 				        &t);

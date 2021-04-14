@@ -72,7 +72,8 @@ void pxgstrf_mark_busy_descends(int_t pnum, int_t jcol, int_t* etree,
 			w = pxgstrf_shared->pan_status[fsupc].size;
 			bcol_reg += w;
 			for(kcol = fsupc; kcol < bcol_reg; ++kcol) lbusy[kcol] = jcol;
-		} else {
+		}
+		else {
 			/* Find leading column "fsupc" in the supernode that
 			   contains column "bcol-1" */
 #if 0

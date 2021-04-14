@@ -59,7 +59,8 @@ float smach(char* cmach) {
 
 	float sfmin, small, rmach;
 
-	if(strncmp(cmach, "E", 1) == 0) { rmach = FLT_EPSILON * 0.5; } else if(strncmp(cmach, "S", 1) == 0) {
+	if(strncmp(cmach, "E", 1) == 0) { rmach = FLT_EPSILON * 0.5; }
+	else if(strncmp(cmach, "S", 1) == 0) {
 		sfmin = FLT_MIN;
 		small = 1. / FLT_MAX;
 		if(small >= sfmin) {
@@ -68,7 +69,15 @@ float smach(char* cmach) {
 			sfmin = small * (FLT_EPSILON * 0.5 + 1.);
 		}
 		rmach = sfmin;
-	} else if(strncmp(cmach, "B", 1) == 0) { rmach = FLT_RADIX; } else if(strncmp(cmach, "P", 1) == 0) { rmach = FLT_EPSILON * 0.5 * FLT_RADIX; } else if(strncmp(cmach, "N", 1) == 0) { rmach = FLT_MANT_DIG; } else if(strncmp(cmach, "R", 1) == 0) { rmach = FLT_ROUNDS; } else if(strncmp(cmach, "M", 1) == 0) { rmach = FLT_MIN_EXP; } else if(strncmp(cmach, "U", 1) == 0) { rmach = FLT_MIN; } else if(strncmp(cmach, "L", 1) == 0) { rmach = FLT_MAX_EXP; } else if(strncmp(cmach, "O", 1) == 0) { rmach = FLT_MAX; }
+	}
+	else if(strncmp(cmach, "B", 1) == 0) { rmach = FLT_RADIX; }
+	else if(strncmp(cmach, "P", 1) == 0) { rmach = FLT_EPSILON * 0.5 * FLT_RADIX; }
+	else if(strncmp(cmach, "N", 1) == 0) { rmach = FLT_MANT_DIG; }
+	else if(strncmp(cmach, "R", 1) == 0) { rmach = FLT_ROUNDS; }
+	else if(strncmp(cmach, "M", 1) == 0) { rmach = FLT_MIN_EXP; }
+	else if(strncmp(cmach, "U", 1) == 0) { rmach = FLT_MIN; }
+	else if(strncmp(cmach, "L", 1) == 0) { rmach = FLT_MAX_EXP; }
+	else if(strncmp(cmach, "O", 1) == 0) { rmach = FLT_MAX; }
 
 	return rmach;
 

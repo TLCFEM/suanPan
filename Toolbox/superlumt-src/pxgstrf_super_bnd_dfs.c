@@ -80,7 +80,8 @@ void pxgstrf_super_bnd_dfs(
 				/* krow is in L */
 				marker[krow] = found;
 				++nrow;
-			} else {
+			}
+			else {
 				/* krow is in U: if its supernode-rep krep has been explored,
 					         skip the search.       */
 				krep = SUPER_REP(supno[kperm]);
@@ -94,7 +95,8 @@ void pxgstrf_super_bnd_dfs(
 						if(SINGLETON(supno[krep])) xdfs = xlsub_end[krep];
 						else xdfs = xlsub[krep];
 						maxdfs = xprune[krep];
-					} else {
+					}
+					else {
 						fsupc = SUPER_FSUPC(supno[krep]);
 						xdfs = xlsub[fsupc] + krep - fsupc + 1;
 						maxdfs = xlsub_end[fsupc];
@@ -113,7 +115,8 @@ void pxgstrf_super_bnd_dfs(
 									/* kchild is in L */
 									marker[kchild] = found;
 									++nrow;
-								} else {
+								}
+								else {
 									/* kchild is in U: 
 									 *   chrep = its supernode-rep. If its rep
 									 *   has been explored, skip the search.
@@ -134,7 +137,8 @@ void pxgstrf_super_bnd_dfs(
 											if(SINGLETON(supno[krep])) xdfs = xlsub_end[krep];
 											else xdfs = xlsub[krep];
 											maxdfs = xprune[krep];
-										} else {
+										}
+										else {
 											fsupc = SUPER_FSUPC(supno[krep]);
 											xdfs = xlsub[fsupc] + krep - fsupc + 1;
 											maxdfs = xlsub_end[fsupc];

@@ -431,7 +431,8 @@ void pdgssvx(int_t nprocs, superlumt_options_t* superlumt_options, SuperMatrix* 
 		*equed = NOEQUIL;
 		rowequ = FALSE;
 		colequ = FALSE;
-	} else {
+	}
+	else {
 		rowequ = (*equed == ROW) || (*equed == BOTH);
 		colequ = (*equed == COL) || (*equed == BOTH);
 		smlnum = dlamch_("Safe minimum");
@@ -521,11 +522,13 @@ void pdgssvx(int_t nprocs, superlumt_options_t* superlumt_options, SuperMatrix* 
 			/* Reverse the transpose argument. */
 			trant = TRANS;
 			notran = 0;
-		} else {
+		}
+		else {
 			trant = NOTRANS;
 			notran = 1;
 		}
-	} else {
+	}
+	else {
 		/* A->Stype == NC */
 		trant = superlumt_options->trans;
 		AA = A;
@@ -551,7 +554,8 @@ void pdgssvx(int_t nprocs, superlumt_options_t* superlumt_options, SuperMatrix* 
 	/* ------------------------------------------------------------
 	   Scale the right hand side.
 	   ------------------------------------------------------------*/
-	if(notran) { if(rowequ) { for(j = 0; j < nrhs; ++j) for(i = 0; i < A->nrow; ++i) { Bmat[i + j * ldb] *= R[i]; } } } else if(colequ) { for(j = 0; j < nrhs; ++j) for(i = 0; i < A->nrow; ++i) { Bmat[i + j * ldb] *= C[i]; } }
+	if(notran) { if(rowequ) { for(j = 0; j < nrhs; ++j) for(i = 0; i < A->nrow; ++i) { Bmat[i + j * ldb] *= R[i]; } } }
+	else if(colequ) { for(j = 0; j < nrhs; ++j) for(i = 0; i < A->nrow; ++i) { Bmat[i + j * ldb] *= C[i]; } }
 
 	/* ------------------------------------------------------------
 	   Perform the LU factorization.
@@ -591,7 +595,8 @@ void pdgssvx(int_t nprocs, superlumt_options_t* superlumt_options, SuperMatrix* 
 			   rank-deficient *info columns of A. */
 			*recip_pivot_growth = dPivotGrowth(*info, AA, perm_c, L, U);
 		}
-	} else {
+	}
+	else {
 
 		/* ------------------------------------------------------------
 		   Compute the reciprocal pivot growth factor *recip_pivot_growth.
@@ -602,7 +607,8 @@ void pdgssvx(int_t nprocs, superlumt_options_t* superlumt_options, SuperMatrix* 
 		   Estimate the reciprocal of the condition number of A.
 		   ------------------------------------------------------------*/
 		t0 = SuperLU_timer_();
-		if(notran) { *(unsigned char*)norm = '1'; } else { *(unsigned char*)norm = 'I'; }
+		if(notran) { *(unsigned char*)norm = '1'; }
+		else { *(unsigned char*)norm = 'I'; }
 		anorm = dlangs(norm, AA);
 		dgscon(norm, L, U, anorm, rcond, info);
 		utime[RCOND] = SuperLU_timer_() - t0;
@@ -631,7 +637,8 @@ void pdgssvx(int_t nprocs, superlumt_options_t* superlumt_options, SuperMatrix* 
 		   Transform the solution matrix X to a solution of the original
 		   system.
 		   ------------------------------------------------------------*/
-		if(notran) { if(colequ) { for(j = 0; j < nrhs; ++j) for(i = 0; i < A->nrow; ++i) { Xmat[i + j * ldx] *= C[i]; } } } else if(rowequ) { for(j = 0; j < nrhs; ++j) for(i = 0; i < A->nrow; ++i) { Xmat[i + j * ldx] *= R[i]; } }
+		if(notran) { if(colequ) { for(j = 0; j < nrhs; ++j) for(i = 0; i < A->nrow; ++i) { Xmat[i + j * ldx] *= C[i]; } } }
+		else if(rowequ) { for(j = 0; j < nrhs; ++j) for(i = 0; i < A->nrow; ++i) { Xmat[i + j * ldx] *= R[i]; } }
 
 		/* Set INFO = A->ncol+1 if the matrix is singular to 
 		   working precision.*/

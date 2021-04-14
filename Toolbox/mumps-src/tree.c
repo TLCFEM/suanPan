@@ -229,7 +229,8 @@ PORD_INT nextPostorder(elimtree_t* T, PORD_INT J) {
 	if(silbings[J] != -1) {
 		J = silbings[J];
 		while(firstchild[J] != -1) J = firstchild[J];
-	} else J = parent[J];
+	}
+	else J = parent[J];
 	return (J);
 }
 
@@ -322,7 +323,8 @@ elimtree_t* setupElimTree(graph_t* G, PORD_INT* perm, PORD_INT* invp) {
 						uf_father[froot] = r;
 						uf_size[r] += uf_size[froot];
 						froot = r;
-					} else {
+					}
+					else {
 						uf_father[r] = froot;
 						uf_size[froot] += uf_size[r];
 					}
@@ -390,7 +392,8 @@ void initFchSilbRoot(elimtree_t* T) {
 		if((pJ = parent[J]) != -1) {
 			silbings[J] = firstchild[pJ];
 			firstchild[pJ] = J;
-		} else {
+		}
+		else {
 			silbings[J] = T->root;
 			T->root = J;
 		}

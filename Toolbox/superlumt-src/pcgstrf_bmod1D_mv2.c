@@ -154,7 +154,8 @@ if (krep == BADCOL && jj == -1) {
 	    utime[FLOAT] += SuperLU_timer_() - f_time;
 #endif
 
-		} else if(segsze <= 3) {
+		}
+		else if(segsze <= 3) {
 
 #ifdef TIMING
 	    f_time = SuperLU_timer_();
@@ -183,7 +184,8 @@ if (krep == BADCOL && jj == -1) {
 		    }
 #endif
 				}
-			} else {
+			}
+			else {
 				ukj2 = dense_col[lsub[krep_ind - 2]];
 				luptr2 = luptr1 - nsupr;
 				cc_mult(&comp_temp, &ukj2, &lusup[luptr2-1]);
@@ -217,7 +219,8 @@ if (krep == BADCOL && jj == -1) {
 #ifdef TIMING
 	    utime[FLOAT] += SuperLU_timer_() - f_time;
 #endif
-		} else {
+		}
+		else {
 			/* segsze >= 4 */
 			if(twocols == 1) {
 				jj2[1] = jj; /* got two columns */
@@ -287,7 +290,8 @@ if (krep == BADCOL && jj == -1) {
 					        tri[0], matvec[0]);
 #endif
 
-				} else if(kfnz2[0] > kfnz2[1]) {
+				}
+				else if(kfnz2[0] > kfnz2[1]) {
 					no_zeros = kfnz2[1] - fsupc;
 					segsze = kfnz2[0] - kfnz2[1];
 					luptr = xlusup[fsupc] + nsupr * no_zeros + nsupc;
@@ -367,7 +371,8 @@ if (krep == BADCOL && jj == -1) {
 					}
 				} /* end for two destination update */
 
-			} else {
+			}
+			else {
 				/* wait for a second column */
 				jj2[0] = jj;
 				twocols = 1;

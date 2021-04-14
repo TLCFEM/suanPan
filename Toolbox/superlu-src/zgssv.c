@@ -184,7 +184,8 @@ void zgssv(superlu_options_t* options, SuperMatrix* A, int* perm_c, int* perm_r,
 		                       Astore->nzval, Astore->colind, Astore->rowptr,
 		                       SLU_NC, A->Dtype, A->Mtype);
 		trans = TRANS;
-	} else { if(A->Stype == SLU_NC) AA = A; }
+	}
+	else { if(A->Stype == SLU_NC) AA = A; }
 
 	t = SuperLU_timer_();
 	/*

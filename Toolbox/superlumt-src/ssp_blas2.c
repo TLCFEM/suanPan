@@ -118,7 +118,7 @@ int_t sp_strsv(char* uplo, char* trans, char* diag, SuperMatrix* L,
 	solve_ops = 0;
 
 	if(!(work = floatCalloc(L->nrow)))
-	SUPERLU_ABORT("Malloc fails for work in sp_strsv().");
+		SUPERLU_ABORT("Malloc fails for work in sp_strsv().");
 
 	if(lsame_(trans, "N")) {
 		/* Form x := inv(A)*x. */
@@ -144,7 +144,8 @@ int_t sp_strsv(char* uplo, char* trans, char* diag, SuperMatrix* L,
 						++luptr;
 						x[irow] -= x[fsupc] * Lval[luptr];
 					}
-				} else {
+				}
+				else {
 #ifdef USE_VENDOR_BLAS
 #if ( MACH==CRAY_PVP )
                     ftcs1 = _cptofcd("L", strlen("L"));
@@ -179,7 +180,8 @@ int_t sp_strsv(char* uplo, char* trans, char* diag, SuperMatrix* L,
 				}
 			} /* for k ... */
 
-		} else {
+		}
+		else {
 			/* Form x := inv(U)*x */
 
 			if(U->nrow == 0) return 0; /* Quick return */
@@ -198,7 +200,8 @@ int_t sp_strsv(char* uplo, char* trans, char* diag, SuperMatrix* L,
 						irow = U_SUB(i);
 						x[irow] -= x[fsupc] * Uval[i];
 					}
-				} else {
+				}
+				else {
 #ifdef USE_VENDOR_BLAS
 #if ( MACH==CRAY_PVP )
                     ftcs1 = _cptofcd("U", strlen("U"));
@@ -226,7 +229,8 @@ int_t sp_strsv(char* uplo, char* trans, char* diag, SuperMatrix* L,
 			} /* for k ... */
 
 		}
-	} else {
+	}
+	else {
 		/* Form x := inv(A')*x */
 
 		if(lsame_(uplo, "L")) {
@@ -266,7 +270,8 @@ int_t sp_strsv(char* uplo, char* trans, char* diag, SuperMatrix* L,
 #endif
 				}
 			}
-		} else {
+		}
+		else {
 			/* Form x := inv(U')*x */
 			if(U->nrow == 0) return 0; /* Quick return */
 
@@ -286,7 +291,8 @@ int_t sp_strsv(char* uplo, char* trans, char* diag, SuperMatrix* L,
 
 				solve_ops += nsupc * (nsupc + 1);
 
-				if(nsupc == 1) { x[fsupc] /= Lval[luptr]; } else {
+				if(nsupc == 1) { x[fsupc] /= Lval[luptr]; }
+				else {
 #ifdef _CRAY
                     ftcs1 = _cptofcd("U", strlen("U"));
                     ftcs2 = _cptofcd("T", strlen("T"));
@@ -397,7 +403,8 @@ int_t sp_sgemv(char* trans, float alpha, SuperMatrix* A, float* x,
 	if(lsame_(trans, "N")) {
 		lenx = A->ncol;
 		leny = A->nrow;
-	} else {
+	}
+	else {
 		lenx = A->nrow;
 		leny = A->ncol;
 	}
@@ -413,7 +420,8 @@ int_t sp_sgemv(char* trans, float alpha, SuperMatrix* A, float* x,
 		if(incy == 1) {
 			if(beta == 0.) for(i = 0; i < leny; ++i) y[i] = 0.;
 			else for(i = 0; i < leny; ++i) y[i] = beta * y[i];
-		} else {
+		}
+		else {
 			iy = ky;
 			if(beta == 0.)
 				for(i = 0; i < leny; ++i) {
@@ -444,8 +452,10 @@ int_t sp_sgemv(char* trans, float alpha, SuperMatrix* A, float* x,
 				}
 				jx += incx;
 			}
-		} else { SUPERLU_ABORT("Not implemented."); }
-	} else {
+		}
+		else { SUPERLU_ABORT("Not implemented."); }
+	}
+	else {
 		/* Form  y := alpha*A'*x + y. */
 		jy = ky;
 		if(incx == 1) {
@@ -458,7 +468,8 @@ int_t sp_sgemv(char* trans, float alpha, SuperMatrix* A, float* x,
 				y[jy] += alpha * temp;
 				jy += incy;
 			}
-		} else { SUPERLU_ABORT("Not implemented."); }
+		}
+		else { SUPERLU_ABORT("Not implemented."); }
 	}
 	return 0;
 } /* sp_sgemv */

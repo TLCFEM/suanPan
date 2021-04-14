@@ -162,7 +162,7 @@ int_t pcgstrf_pivotL(
 
 	c_div(&temp, &one, &lu_col_ptr[nsupc]);
 	for(k = nsupc + 1; k < nsupr; k++)
-	cc_mult(&lu_col_ptr[k], &lu_col_ptr[k], &temp);
+		cc_mult(&lu_col_ptr[k], &lu_col_ptr[k], &temp);
 
 #ifdef CHK_PIVOT
     printf("After cdiv: col %d\n", jcol);

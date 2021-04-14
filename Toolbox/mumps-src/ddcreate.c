@@ -726,7 +726,8 @@ void findIndMultisecs(domdec_t* dd, PORD_INT* msvtxlist, PORD_INT* rep) {
 						vtype[u] = 4;
 						u = next[u];
 						next[ulast] = u; /* remove u from bin */
-					} else               /* failed */
+					}
+					else /* failed */
 					{
 						ulast = u;
 						u = next[u];

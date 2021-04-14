@@ -159,7 +159,8 @@ int ccolumn_bmod(
 					c_sub(&dense[irow], &dense[irow], &comp_temp);
 					luptr++;
 				}
-			} else if(segsze <= 3) {
+			}
+			else if(segsze <= 3) {
 				ukj = dense[lsub[krep_ind]];
 				luptr += nsupr * (nsupc - 1) + nsupc - 1;
 				ukj1 = dense[lsub[krep_ind - 1]];
@@ -179,7 +180,8 @@ int ccolumn_bmod(
 						c_add(&comp_temp, &comp_temp, &comp_temp1);
 						c_sub(&dense[irow], &dense[irow], &comp_temp);
 					}
-				} else {
+				}
+				else {
 					/* Case 3: 3cols-col update */
 					ukj2 = dense[lsub[krep_ind - 2]];
 					luptr2 = luptr1 - nsupr;
@@ -206,7 +208,8 @@ int ccolumn_bmod(
 						c_sub(&dense[irow], &dense[irow], &comp_temp);
 					}
 				}
-			} else {
+			}
+			else {
 				/*
 				 * Case: sup-col update
 				 * Perform a triangular solve and block update,

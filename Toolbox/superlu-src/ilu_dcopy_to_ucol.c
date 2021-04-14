@@ -129,7 +129,8 @@ int ilu_dcopy_to_ucol(
 						usub[nextu] = perm_r[irow];
 						ucol[nextu] = dense[irow];
 						nextu++;
-					} else {
+					}
+					else {
 						switch(milu) {
 						case SMILU_1:
 						case SMILU_2:
@@ -166,7 +167,8 @@ int ilu_dcopy_to_ucol(
 				d_max = 1.0 / d_max;
 				d_min = 1.0 / d_min;
 				tol = 1.0 / (d_max + (d_min - d_max) * quota / m);
-			} else {
+			}
+			else {
 				dcopy_(&m, &ucol[xusub[jcol]], &i_1, work, &i_1);
 				tol = dqselect(m, work, quota);
 #if 0

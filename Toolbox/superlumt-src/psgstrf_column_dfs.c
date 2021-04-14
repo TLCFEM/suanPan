@@ -152,7 +152,8 @@ int_t psgstrf_column_dfs(
 				/* Visited before */
 				if(myfnz > kperm) repfnz[krep] = kperm;
 				/* continue; */
-			} else {
+			}
+			else {
 				/* Otherwise, perform dfs starting at krep */
 				parent[krep] = EMPTY;
 				repfnz[krep] = kperm;
@@ -163,7 +164,8 @@ int_t psgstrf_column_dfs(
 #ifdef PROFILE
 		    Gstat->procstat[pnum].pruned++;
 #endif
-				} else {
+				}
+				else {
 					fsupc = SUPER_FSUPC(supno[krep]);
 					xdfs = xlsub[fsupc] + krep - fsupc + 1;
 					maxdfs = xlsub_end[fsupc];
@@ -191,7 +193,8 @@ int_t psgstrf_column_dfs(
 								++no_lsub;
 								col_lsub[nextl++] = kchild;
 								if(chmark != jcolm1) samesuper = NO;
-							} else {
+							}
+							else {
 								/* kchild is in U: chrep = its supernode
 								 * representative. If its rep has 
 								 * been explored, update its repfnz[*].
@@ -201,7 +204,8 @@ int_t psgstrf_column_dfs(
 								if(myfnz != EMPTY) {
 									/* Visited before */
 									if(myfnz > chperm) repfnz[chrep] = chperm;
-								} else {
+								}
+								else {
 									/* Continue dfs at super-rep of kchild */
 									xplore[krep] = xdfs;
 									xplore[m + krep] = maxdfs;
@@ -215,7 +219,8 @@ int_t psgstrf_column_dfs(
 #ifdef PROFILE
 					Gstat->procstat[pnum].pruned++;
 #endif
-									} else {
+									}
+									else {
 										fsupc = SUPER_FSUPC(supno[krep]);
 										xdfs = xlsub[fsupc] + krep - fsupc + 1;
 										maxdfs = xlsub_end[fsupc];
@@ -310,7 +315,8 @@ int_t psgstrf_column_dfs(
 
 		/* Make a copy in case it is a singleton supernode */
 		for(ifrom = xlsub[jcol]; ifrom < ito; ++ifrom) lsub[k++] = lsub[ifrom];
-	} else {
+	}
+	else {
 		/* Supernode of size > 1: overwrite column jcol-1 */
 		k = xlsub_end[fsupc];
 		xlsub[jcol] = k;

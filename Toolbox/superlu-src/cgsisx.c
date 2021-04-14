@@ -445,7 +445,8 @@ void cgsisx(superlu_options_t* options, SuperMatrix* A, int* perm_c, int* perm_r
 		*(unsigned char*)equed = 'N';
 		rowequ = FALSE;
 		colequ = FALSE;
-	} else {
+	}
+	else {
 		rowequ = strncmp(equed, "R", 1) == 0 || strncmp(equed, "B", 1) == 0;
 		colequ = strncmp(equed, "C", 1) == 0 || strncmp(equed, "B", 1) == 0;
 		smlnum = smach("Safe minimum"); /* lamch_("Safe minimum"); */
@@ -527,11 +528,13 @@ void cgsisx(superlu_options_t* options, SuperMatrix* A, int* perm_c, int* perm_r
 			/* Reverse the transpose argument. */
 			trant = TRANS;
 			notran = 0;
-		} else {
+		}
+		else {
 			trant = NOTRANS;
 			notran = 1;
 		}
-	} else {
+	}
+	else {
 		/* A->Stype == SLU_NC */
 		trant = options->Trans;
 		AA = A;
@@ -548,7 +551,7 @@ void cgsisx(superlu_options_t* options, SuperMatrix* A, int* perm_c, int* perm_r
 		if(mc64) {
 			t0 = SuperLU_timer_();
 			if((perm = intMalloc(n)) == NULL)
-			ABORT("SUPERLU_MALLOC fails for perm[]");
+				ABORT("SUPERLU_MALLOC fails for perm[]");
 
 			info1 = cldperm(5, n, nnz, colptr, rowind, nzval, perm, R, C);
 
@@ -557,7 +560,8 @@ void cgsisx(superlu_options_t* options, SuperMatrix* A, int* perm_c, int* perm_r
 				mc64 = 0;
 				SUPERLU_FREE(perm);
 				perm = NULL;
-			} else {
+			}
+			else {
 				if(equil) {
 					rowequ = colequ = 1;
 					for(i = 0; i < n; i++) {
@@ -631,7 +635,7 @@ void cgsisx(superlu_options_t* options, SuperMatrix* A, int* perm_c, int* perm_r
 			int nnz = Astore->nnz, *rowind = Astore->rowind;
 			int *perm_tmp, *iperm;
 			if((perm_tmp = intMalloc(2 * n)) == NULL)
-			ABORT("SUPERLU_MALLOC fails for perm_tmp[]");
+				ABORT("SUPERLU_MALLOC fails for perm_tmp[]");
 			iperm = perm_tmp + n;
 			for(i = 0; i < n; ++i) perm_tmp[i] = perm_r[perm[i]];
 			for(i = 0; i < n; ++i) {
@@ -657,7 +661,8 @@ void cgsisx(superlu_options_t* options, SuperMatrix* A, int* perm_c, int* perm_r
 	if(options->ConditionNumber) {
 		/* Estimate the reciprocal of the condition number of A. */
 		t0 = SuperLU_timer_();
-		if(notran) { *(unsigned char*)norm = '1'; } else { *(unsigned char*)norm = 'I'; }
+		if(notran) { *(unsigned char*)norm = '1'; }
+		else { *(unsigned char*)norm = 'I'; }
 		anorm = clangs(norm, AA);
 		cgscon(norm, L, U, anorm, rcond, stat, &info1);
 		utime[RCOND] = SuperLU_timer_() - t0;
@@ -673,9 +678,10 @@ void cgsisx(superlu_options_t* options, SuperMatrix* A, int* perm_c, int* perm_r
 			if(rowequ) {
 				for(j = 0; j < nrhs; ++j)
 					for(i = 0; i < n; ++i)
-					cs_mult(&Bmat[i+j*ldb], &Bmat[i+j*ldb], R[i]);
+						cs_mult(&Bmat[i+j*ldb], &Bmat[i+j*ldb], R[i]);
 			}
-		} else if(colequ) { for(j = 0; j < nrhs; ++j) for(i = 0; i < n; ++i) { cs_mult(&Bmat[i+j*ldb], &Bmat[i+j*ldb], C[i]); } }
+		}
+		else if(colequ) { for(j = 0; j < nrhs; ++j) for(i = 0; i < n; ++i) { cs_mult(&Bmat[i+j*ldb], &Bmat[i+j*ldb], C[i]); } }
 
 		/* Compute the solution matrix X. */
 		for(j = 0; j < nrhs; j++) /* Save a copy of the right hand sides */
@@ -687,7 +693,8 @@ void cgsisx(superlu_options_t* options, SuperMatrix* A, int* perm_c, int* perm_r
 
 		/* Transform the solution matrix X to a solution of the original
 		   system. */
-		if(notran) { if(colequ) { for(j = 0; j < nrhs; ++j) for(i = 0; i < n; ++i) { cs_mult(&Xmat[i+j*ldx], &Xmat[i+j*ldx], C[i]); } } } else {
+		if(notran) { if(colequ) { for(j = 0; j < nrhs; ++j) for(i = 0; i < n; ++i) { cs_mult(&Xmat[i+j*ldx], &Xmat[i+j*ldx], C[i]); } } }
+		else {
 			/* transposed system */
 			if(rowequ) { for(j = 0; j < nrhs; ++j) for(i = 0; i < A->nrow; ++i) { cs_mult(&Xmat[i+j*ldx], &Xmat[i+j*ldx], R[i]); } }
 		}

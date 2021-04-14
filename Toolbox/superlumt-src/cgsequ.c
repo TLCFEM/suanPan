@@ -141,7 +141,8 @@ void cgsequ(SuperMatrix* A, float* r, float* c, float* rowcnd,
 				*info = i + 1;
 				return;
 			}
-	} else {
+	}
+	else {
 		/* Invert the scale factors. */
 		for(i = 0; i < A->nrow; ++i) r[i] = 1. / SUPERLU_MIN(SUPERLU_MAX( r[i], smlnum ), bignum);
 		/* Compute ROWCND = min(R(I)) / max(R(I)) */
@@ -174,7 +175,8 @@ void cgsequ(SuperMatrix* A, float* r, float* c, float* rowcnd,
 				*info = A->nrow + j + 1;
 				return;
 			}
-	} else {
+	}
+	else {
 		/* Invert the scale factors. */
 		for(j = 0; j < A->ncol; ++j) c[j] = 1. / SUPERLU_MIN(SUPERLU_MAX( c[j], smlnum ), bignum);
 		/* Compute COLCND = min(C(J)) / max(C(J)) */

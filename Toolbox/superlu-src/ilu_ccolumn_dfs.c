@@ -121,7 +121,8 @@ int ilu_ccolumn_dfs(
 				lsub = Glu->lsub;
 			}
 			if(kmark != jcolm1) jsuper = EMPTY; /* Row index subset testing */
-		} else {
+		}
+		else {
 			/*	krow is in U: if its supernode-rep krep
 			 *	has been explored, update repfnz[*]
 			 */
@@ -132,7 +133,8 @@ int ilu_ccolumn_dfs(
 				/* Visited before */
 				if(myfnz > kperm) repfnz[krep] = kperm;
 				/* continue; */
-			} else {
+			}
+			else {
 				/* Otherwise, perform dfs starting at krep */
 				oldrep = EMPTY;
 				parent[krep] = oldrep;
@@ -164,7 +166,8 @@ int ilu_ccolumn_dfs(
 									lsub = Glu->lsub;
 								}
 								if(chmark != jcolm1) jsuper = EMPTY;
-							} else {
+							}
+							else {
 								/* Case kchild is in U:
 								 *   chrep = its supernode-rep. If its rep has
 								 *   been explored, update its repfnz[*]
@@ -174,7 +177,8 @@ int ilu_ccolumn_dfs(
 								if(myfnz != EMPTY) {
 									/* Visited before */
 									if(myfnz > chperm) repfnz[chrep] = chperm;
-								} else {
+								}
+								else {
 									/* Continue dfs at super-rep of kchild */
 									xplore[krep] = xdfs;
 									oldrep = krep;
@@ -215,7 +219,8 @@ int ilu_ccolumn_dfs(
 	if(jcol == 0) {
 		/* Do nothing for column 0 */
 		nsuper = supno[0] = 0;
-	} else {
+	}
+	else {
 		fsupc = xsup[nsuper];
 		jptr = xlsub[jcol]; /* Not compressed yet */
 		jm1ptr = xlsub[jcolm1];

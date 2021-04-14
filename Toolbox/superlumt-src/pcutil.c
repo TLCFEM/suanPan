@@ -329,7 +329,8 @@ void ccheck_zero_vec(int_t pnum, char* msg, int_t n, complex* vec) {
 	if(nonzero) {
 		printf("(" IFMT ") %s\n", pnum, msg);
 		SUPERLU_ABORT("Not a zero vector.");
-	} else { printf(".. Normal exit ccheck_zero_vec() ..\n"); }
+	}
+	else { printf(".. Normal exit ccheck_zero_vec() ..\n"); }
 }
 
 void cGenXtrue(int_t n, int_t nrhs, complex* x, int_t ldx) {

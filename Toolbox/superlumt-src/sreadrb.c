@@ -113,7 +113,8 @@ static int_t sParseFloatFormat(char* buf, int_t* num, int_t* size) {
 		if(*tmp == 'p' || *tmp == 'P') {
 			++tmp;
 			*num = atoi(tmp); /*sscanf(tmp, "%d", num);*/
-		} else { ++tmp; }
+		}
+		else { ++tmp; }
 	}
 	++tmp;
 	period = tmp;

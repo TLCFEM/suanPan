@@ -105,7 +105,7 @@ void cgscon(char* norm, SuperMatrix* L, SuperMatrix* U,
 	work = complexCalloc(3 * L->nrow);
 
 	if(!work)
-	SUPERLU_ABORT("Malloc fails for work arrays in cgscon.");
+		SUPERLU_ABORT("Malloc fails for work arrays in cgscon.");
 
 	/* Estimate the norm of inv(A). */
 	ainvnm = 0.;
@@ -124,7 +124,8 @@ void cgscon(char* norm, SuperMatrix* L, SuperMatrix* U,
 
 			/* Multiply by inv(U). */
 			sp_ctrsv("Upper", "No transpose", "Non-unit", L, U, &work[0], info);
-		} else {
+		}
+		else {
 
 			/* Multiply by inv(U'). */
 			sp_ctrsv("Upper", "Transpose", "Non-unit", L, U, &work[0], info);

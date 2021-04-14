@@ -88,7 +88,8 @@ double dlamch_(char* cmach) {
 			rnd = 1.;
 			i__1 = 1 - it;
 			eps = pow_di(&base, &i__1) / 2;
-		} else {
+		}
+		else {
 			rnd = 0.;
 			i__1 = 1 - it;
 			eps = pow_di(&base, &i__1);
@@ -106,7 +107,16 @@ double dlamch_(char* cmach) {
 		}
 	}
 
-	if(lsame_(cmach, "E")) { rmach = eps; } else if(lsame_(cmach, "S")) { rmach = sfmin; } else if(lsame_(cmach, "B")) { rmach = base; } else if(lsame_(cmach, "P")) { rmach = prec; } else if(lsame_(cmach, "N")) { rmach = t; } else if(lsame_(cmach, "R")) { rmach = rnd; } else if(lsame_(cmach, "M")) { rmach = emin; } else if(lsame_(cmach, "U")) { rmach = rmin; } else if(lsame_(cmach, "L")) { rmach = emax; } else if(lsame_(cmach, "O")) { rmach = rmax; }
+	if(lsame_(cmach, "E")) { rmach = eps; }
+	else if(lsame_(cmach, "S")) { rmach = sfmin; }
+	else if(lsame_(cmach, "B")) { rmach = base; }
+	else if(lsame_(cmach, "P")) { rmach = prec; }
+	else if(lsame_(cmach, "N")) { rmach = t; }
+	else if(lsame_(cmach, "R")) { rmach = rnd; }
+	else if(lsame_(cmach, "M")) { rmach = emin; }
+	else if(lsame_(cmach, "U")) { rmach = rmin; }
+	else if(lsame_(cmach, "L")) { rmach = emax; }
+	else if(lsame_(cmach, "O")) { rmach = rmax; }
 
 	ret_val = rmach;
 	return ret_val;
@@ -257,7 +267,8 @@ int dlamc1_(int* beta, int* t, int* rnd, int
 		d__2 = -b / 100;
 		f = dlamc3_(&d__1, &d__2);
 		c = dlamc3_(&f, &a);
-		if(c == a) { lrnd = TRUE_; } else { lrnd = FALSE_; }
+		if(c == a) { lrnd = TRUE_; }
+		else { lrnd = FALSE_; }
 		d__1 = b / 2;
 		d__2 = b / 100;
 		f = dlamc3_(&d__1, &d__2);
@@ -513,40 +524,47 @@ int dlamc2_(int* beta, int* t, int* rnd,
 				/*            ( Non twos-complement machines, no gradual under
 				flow;   
 				                e.g.,  VAX ) */
-			} else if(gpmin - ngpmin == 3) {
+			}
+			else if(gpmin - ngpmin == 3) {
 				lemin = ngpmin - 1 + lt;
 				ieee = TRUE_;
 				/*            ( Non twos-complement machines, with gradual und
 				erflow;   
 				                e.g., IEEE standard followers ) */
-			} else {
+			}
+			else {
 				lemin = min(ngpmin, gpmin);
 				/*            ( A guess; no known machine ) */
 				iwarn = TRUE_;
 			}
-		} else if(ngpmin == gpmin && ngnmin == gnmin) {
+		}
+		else if(ngpmin == gpmin && ngnmin == gnmin) {
 			if((i__1 = ngpmin - ngnmin, abs(i__1)) == 1) {
 				lemin = max(ngpmin, ngnmin);
 				/*            ( Twos-complement machines, no gradual underflow
 				;   
 				                e.g., CYBER 205 ) */
-			} else {
+			}
+			else {
 				lemin = min(ngpmin, ngnmin);
 				/*            ( A guess; no known machine ) */
 				iwarn = TRUE_;
 			}
-		} else if((i__1 = ngpmin - ngnmin, abs(i__1)) == 1 && gpmin == gnmin) {
+		}
+		else if((i__1 = ngpmin - ngnmin, abs(i__1)) == 1 && gpmin == gnmin) {
 			if(gpmin - min(ngpmin, ngnmin) == 3) {
 				lemin = max(ngpmin, ngnmin) - 1 + lt;
 				/*            ( Twos-complement machines with gradual underflo
 				w;   
 				                no known machine ) */
-			} else {
+			}
+			else {
 				lemin = min(ngpmin, ngnmin);
 				/*            ( A guess; no known machine ) */
 				iwarn = TRUE_;
 			}
-		} else {
+		}
+		else {
 			/* Computing MIN */
 			i__1 = min(ngpmin, ngnmin), i__1 = min(i__1, gpmin);
 			lemin = min(i__1, gnmin);
@@ -809,7 +827,8 @@ L10:
 		++exbits;
 		goto L10;
 	}
-	if(lexp == -(*emin)) { uexp = lexp; } else {
+	if(lexp == -(*emin)) { uexp = lexp; }
+	else {
 		uexp = try__;
 		++exbits;
 	}
@@ -818,7 +837,8 @@ L10:
 	       than or equal to EMIN. EXBITS is the number of bits needed to   
 	       store the exponent. */
 
-	if(uexp + *emin > -lexp - *emin) { expsum = lexp << 1; } else { expsum = uexp << 1; }
+	if(uexp + *emin > -lexp - *emin) { expsum = lexp << 1; }
+	else { expsum = uexp << 1; }
 
 	/*     EXPSUM is the exponent range, approximately equal to   
 	       EMAX - EMIN + 1 . */

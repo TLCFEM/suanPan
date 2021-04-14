@@ -318,7 +318,8 @@ void scheck_zero_vec(int_t pnum, char* msg, int_t n, float* vec) {
 	if(nonzero) {
 		printf("(" IFMT ") %s\n", pnum, msg);
 		SUPERLU_ABORT("Not a zero vector.");
-	} else { printf(".. Normal exit scheck_zero_vec() ..\n"); }
+	}
+	else { printf(".. Normal exit scheck_zero_vec() ..\n"); }
 }
 
 void sGenXtrue(int_t n, int_t nrhs, float* x, int_t ldx) {

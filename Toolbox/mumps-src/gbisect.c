@@ -458,10 +458,12 @@ void smoothSeparator(gbisect_t* Gbisect, options_t* options) {
 			if((a) && (!b)) {
 				color[x] = WHITE;
 				cwght[WHITE] += vwght[x];
-			} else if((!a) && (b)) {
+			}
+			else if((!a) && (b)) {
 				color[x] = BLACK;
 				cwght[BLACK] += vwght[x];
-			} else {
+			}
+			else {
 				bipartvertex[nX2++] = x;
 				cwght[GRAY] += vwght[x];
 			}
@@ -479,7 +481,8 @@ void smoothSeparator(gbisect_t* Gbisect, options_t* options) {
 		if(cwght[BLACK] >= cwght[WHITE]) {
 			a = smoothBy2Layers(Gbisect, bipartvertex, &nX, BLACK, WHITE);
 			if(!a) a = smoothBy2Layers(Gbisect, bipartvertex, &nX, WHITE, BLACK);
-		} else {
+		}
+		else {
 			a = smoothBy2Layers(Gbisect, bipartvertex, &nX, WHITE, BLACK);
 			if(!a) a = smoothBy2Layers(Gbisect, bipartvertex, &nX, BLACK, WHITE);
 		}

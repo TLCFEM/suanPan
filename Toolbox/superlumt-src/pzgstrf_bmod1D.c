@@ -150,7 +150,8 @@ if (krep == BADCOL && jj == -1) {
 #ifdef TIMING
 	    utime[FLOAT] += SuperLU_timer_() - f_time;
 #endif
-		} else if(segsze <= 3) {
+		}
+		else if(segsze <= 3) {
 #ifdef TIMING
 	    f_time = SuperLU_timer_();
 #endif
@@ -177,7 +178,8 @@ if (krep == BADCOL && jj == -1) {
 		    }
 #endif
 				}
-			} else {
+			}
+			else {
 				ukj2 = dense_col[lsub[krep_ind - 2]];
 				luptr2 = luptr1 - nsupr;
 				zz_mult(&comp_temp, &ukj2, &lusup[luptr2-1]);
@@ -211,7 +213,8 @@ if (krep == BADCOL && jj == -1) {
 #ifdef TIMING
 	    utime[FLOAT] += SuperLU_timer_() - f_time;
 #endif
-		} else {
+		}
+		else {
 			/* segsze >= 4 */
 			/* 
 			 * Perform a triangular solve and matrix-vector update,

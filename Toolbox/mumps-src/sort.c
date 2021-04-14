@@ -119,12 +119,14 @@ void qsortUpInts(PORD_INT n, PORD_INT* array, PORD_INT* stack) {
 				stack[p++] = l;
 				stack[p++] = i - 1;
 				l = i + 1;
-			} else {
+			}
+			else {
 				stack[p++] = i + 1;
 				stack[p++] = r;
 				r = i - 1;
 			}
-		} else {
+		}
+		else {
 			r = stack[--p];
 			l = stack[--p];
 		}
@@ -173,12 +175,14 @@ void qsortUpFloatsWithIntKeys(PORD_INT n, FLOAT* array, PORD_INT* key, PORD_INT*
 				stack[p++] = l;
 				stack[p++] = i - 1;
 				l = i + 1;
-			} else {
+			}
+			else {
 				stack[p++] = i + 1;
 				stack[p++] = r;
 				r = i - 1;
 			}
-		} else {
+		}
+		else {
 			r = stack[--p];
 			l = stack[--p];
 		}

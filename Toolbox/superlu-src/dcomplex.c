@@ -43,7 +43,8 @@ void z_div(doublecomplex* c, doublecomplex* a, doublecomplex* b) {
 		den = b->i * (1 + ratio * ratio);
 		cr = (a->r * ratio + a->i) / den;
 		ci = (a->i * ratio - a->r) / den;
-	} else {
+	}
+	else {
 		ratio = b->i / b->r;
 		den = b->r * (1 + ratio * ratio);
 		cr = (a->r + a->i * ratio) / den;
@@ -107,7 +108,8 @@ doublecomplex z_sgn(doublecomplex* z) {
 	register double t = z_abs(z);
 	register doublecomplex retval;
 
-	if(t == 0.0) { retval.r = 1.0, retval.i = 0.0; } else { retval.r = z->r / t, retval.i = z->i / t; }
+	if(t == 0.0) { retval.r = 1.0, retval.i = 0.0; }
+	else { retval.r = z->r / t, retval.i = z->i / t; }
 
 	return retval;
 }
@@ -123,7 +125,8 @@ doublecomplex z_sqrt(doublecomplex* z) {
 	if(imag == 0.0) {
 		retval.r = sqrt(real);
 		retval.i = 0.0;
-	} else {
+	}
+	else {
 		ci = (sqrt(real * real + imag * imag) - real) / 2.0;
 		ci = sqrt(ci);
 		cr = imag / (2.0 * ci);

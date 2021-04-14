@@ -113,7 +113,8 @@ static int_t cParseFloatFormat(char* buf, int_t* num, int_t* size) {
 		if(*tmp == 'p' || *tmp == 'P') {
 			++tmp;
 			*num = atoi(tmp); /*sscanf(tmp, "%d", num);*/
-		} else { ++tmp; }
+		}
+		else { ++tmp; }
 	}
 	++tmp;
 	period = tmp;
@@ -162,7 +163,8 @@ static int_t cReadValues(FILE* fp, int_t n, complex* destination, int_t perline,
 				/* The value is real part */
 				realpart = atof(&buf[s]);
 				pair = 1;
-			} else {
+			}
+			else {
 				/* The value is imaginary part */
 				destination[i].r = realpart;
 				destination[i++].i = atof(&buf[s]);

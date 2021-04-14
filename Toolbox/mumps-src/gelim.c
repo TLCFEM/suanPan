@@ -393,7 +393,8 @@ void buildElement(gelim_t* Gelim, PORD_INT me) {
 				e = adjncy[mesrcptr++]; /* merge boundary of element e with Lme */
 				p = xadj[e];            /* adjacency list of e starts here */
 				ln = len[e];
-			} else {
+			}
+			else {
 				e = me;       /* merge uncovered variables with Lme */
 				p = mesrcptr; /* variables start here */
 				ln = vlenme;
@@ -516,7 +517,8 @@ void updateAdjncy(gelim_t* Gelim, PORD_INT* reachset, PORD_INT nreach, PORD_INT*
 					adjncy[jfirstolde++] = me;            /* append me at the beg. */
 					tmp[me] = *pflag;
 				}
-			} else                  /* e has not been absorbed, i.e. it is */
+			}
+			else                    /* e has not been absorbed, i.e. it is */
 				if(tmp[e] < *pflag) /* an old element */
 				{
 					adjncy[jdest++] = e;
@@ -545,7 +547,8 @@ void updateAdjncy(gelim_t* Gelim, PORD_INT* reachset, PORD_INT nreach, PORD_INT*
 					adjncy[jfirstolde++] = v;               /* append v at the beg.  */
 					tmp[v] = *pflag;
 				}
-			} else adjncy[jdest++] = v; /* v is still a variable */
+			}
+			else adjncy[jdest++] = v; /* v is still a variable */
 		}
 		elen[u] = jfirstv - jstart;
 		len[u] = jdest - jstart;
@@ -709,7 +712,8 @@ void findIndNodes(gelim_t* Gelim, PORD_INT* reachset, PORD_INT nreach, PORD_INT*
 						score[w] = -2; /* written during next crunch */
 						w = next[w];
 						next[wlast] = w; /* remove w from bin */
-					} else               /* failed */
+					}
+					else /* failed */
 					{
 						wlast = w;
 						w = next[w];
@@ -936,7 +940,8 @@ void updateScore(gelim_t* Gelim, PORD_INT* reachset, PORD_INT nreach, PORD_INT s
 						/* Some buckets have offset nvtx / 2.
 					 * Using MAX_INT - nvtx should then be safe */
 						score[v] = (PORD_INT)(min(scr_dbl, MAX_INT-Gelim->G->nvtx));
-					} else {
+					}
+					else {
 						switch(scoretype) {
 						case AMD:
 							scr = deg;

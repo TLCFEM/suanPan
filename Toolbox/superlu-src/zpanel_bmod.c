@@ -177,7 +177,8 @@ void zpanel_bmod(
 						z_sub(&dense_col[irow], &dense_col[irow], &comp_temp);
 						++luptr;
 					}
-				} else if(segsze <= 3) {
+				}
+				else if(segsze <= 3) {
 					ukj = dense_col[lsub[krep_ind]];
 					ukj1 = dense_col[lsub[krep_ind - 1]];
 					luptr += nsupr * (nsupc - 1) + nsupc - 1;
@@ -196,7 +197,8 @@ void zpanel_bmod(
 							z_add(&comp_temp, &comp_temp, &comp_temp1);
 							z_sub(&dense_col[irow], &dense_col[irow], &comp_temp);
 						}
-					} else {
+					}
+					else {
 						ukj2 = dense_col[lsub[krep_ind - 2]];
 						luptr2 = luptr1 - nsupr;
 						zz_mult(&comp_temp, &ukj2, &lusup[luptr2-1]);
@@ -221,7 +223,8 @@ void zpanel_bmod(
 							z_sub(&dense_col[irow], &dense_col[irow], &comp_temp);
 						}
 					}
-				} else {
+				}
+				else {
 					/* segsze >= 4 */
 
 					/* Copy U[*,j] segment from dense[*] to TriTmp[*], which
@@ -334,7 +337,8 @@ void zpanel_bmod(
 				}
 			} /* for jj ... */
 
-		} else {
+		}
+		else {
 			/* 1-D block modification */
 
 			/* Sequence through each column in the panel */
@@ -360,7 +364,8 @@ void zpanel_bmod(
 						z_sub(&dense_col[irow], &dense_col[irow], &comp_temp);
 						++luptr;
 					}
-				} else if(segsze <= 3) {
+				}
+				else if(segsze <= 3) {
 					ukj = dense_col[lsub[krep_ind]];
 					luptr += nsupr * (nsupc - 1) + nsupc - 1;
 					ukj1 = dense_col[lsub[krep_ind - 1]];
@@ -379,7 +384,8 @@ void zpanel_bmod(
 							z_add(&comp_temp, &comp_temp, &comp_temp1);
 							z_sub(&dense_col[irow], &dense_col[irow], &comp_temp);
 						}
-					} else {
+					}
+					else {
 						ukj2 = dense_col[lsub[krep_ind - 2]];
 						luptr2 = luptr1 - nsupr;
 						zz_mult(&comp_temp, &ukj2, &lusup[luptr2-1]);
@@ -404,7 +410,8 @@ void zpanel_bmod(
 							z_sub(&dense_col[irow], &dense_col[irow], &comp_temp);
 						}
 					}
-				} else {
+				}
+				else {
 					/* segsze >= 4 */
 					/* 
 					 * Perform a triangular solve and block update,

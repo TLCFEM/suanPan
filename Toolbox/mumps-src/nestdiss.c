@@ -131,7 +131,8 @@ void splitNDnode(nestdiss_t* nd, options_t* options, timings_t* cpus) {
 		Gsub = nd->G;                  /* a hack to save time and space */
 		for(u = 0; u < nd->nvint; u++) /* but do not forget the map vector */
 			map[u] = u;
-	} else Gsub = setupSubgraph(nd->G, intvertex, nvint, map);
+	}
+	else Gsub = setupSubgraph(nd->G, intvertex, nvint, map);
 	Gbisect = newGbisect(Gsub);
 
 	/* ---------------------------------
@@ -268,7 +269,8 @@ void freeNDtree(nestdiss_t* ndroot) {
 		{
 			freeNDnode(nd); /* free root of left subtree and goto right */
 			for(nd = parent->childW; nd->childB != NULL; nd = nd->childB);
-		} else /* right subtree of parent visited */
+		}
+		else /* right subtree of parent visited */
 		{
 			freeNDnode(nd); /* free root of right subtree and goto parent */
 			nd = parent;

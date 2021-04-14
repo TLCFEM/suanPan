@@ -307,7 +307,7 @@ void StatAlloc(const int_t n, const int_t nprocs, const int_t panel_size,
 
 	if(!(Gstat->procstat =
 		(procstat_t*)SUPERLU_MALLOC(nprocs*sizeof(procstat_t))))
-	SUPERLU_ABORT("SUPERLU_MALLOC failed for procstat[]");
+		SUPERLU_ABORT("SUPERLU_MALLOC failed for procstat[]");
 
 #if (PRNTlevel==1)
     printf(".. StatAlloc(): n " IFMT ", nprocs " IFMT ", panel_size " IFMT ", relax " IFMT "\n",

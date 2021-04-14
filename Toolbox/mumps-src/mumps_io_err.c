@@ -105,7 +105,8 @@ MUMPS_INT mumps_io_sys_error(MUMPS_INT mumps_errno, const char* desc) {
   mumps_io_protect_err();
 #endif
 	if(err_flag == 0) {
-		if(desc == NULL) { _desc = ""; } else {
+		if(desc == NULL) { _desc = ""; }
+		else {
 			len += (MUMPS_INT)strlen(desc);
 			_desc = desc;
 		}
@@ -125,7 +126,8 @@ MUMPS_INT mumps_io_sys_error(MUMPS_INT mumps_errno, const char* desc) {
 			_err = _strdup(_desc);
 			_err[len] = '\0';
 			sprintf(mumps_err, "%s", _err);
-		} else {
+		}
+		else {
 			_err = _strdup(strerror(errno));
 			_err_len = (MUMPS_INT)strlen(_err);
 			/* We will use sprintf, so make space for the final '\0' ! */
@@ -133,7 +135,8 @@ MUMPS_INT mumps_io_sys_error(MUMPS_INT mumps_errno, const char* desc) {
 				/* truncate _err, not to overtake mumps_err_max_len at the end. */
 				_err[mumps_err_max_len - len - 1] = '\0';
 				len = mumps_err_max_len - 1;
-			} else { len += _err_len; }
+			}
+			else { len += _err_len; }
 			sprintf(mumps_err, "%s: %s", _desc, _err);
 		}
 		free(_err);

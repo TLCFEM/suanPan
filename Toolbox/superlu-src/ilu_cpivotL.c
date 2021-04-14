@@ -119,7 +119,7 @@ int ilu_cpivotL(
 
 		switch(milu) {
 		case SMILU_1:
-		c_add(&temp, &lu_col_ptr[isub], &drop_sum);
+			c_add(&temp, &lu_col_ptr[isub], &drop_sum);
 			rtemp = c_abs1(&temp);
 			break;
 		case SMILU_2:
@@ -188,7 +188,7 @@ int ilu_cpivotL(
 		if(*usepr) {
 			switch(milu) {
 			case SMILU_1:
-			c_add(&temp, &lu_col_ptr[old_pivptr], &drop_sum);
+				c_add(&temp, &lu_col_ptr[old_pivptr], &drop_sum);
 				rtemp = c_abs1(&temp);
 				break;
 			case SMILU_2:
@@ -209,7 +209,7 @@ int ilu_cpivotL(
 				/* diagonal exists */
 				switch(milu) {
 				case SMILU_1:
-				c_add(&temp, &lu_col_ptr[diag], &drop_sum);
+					c_add(&temp, &lu_col_ptr[diag], &drop_sum);
 					rtemp = c_abs1(&temp);
 					break;
 				case SMILU_2:
@@ -230,7 +230,7 @@ int ilu_cpivotL(
 		/* Reset the diagonal */
 		switch(milu) {
 		case SMILU_1:
-		c_add(&lu_col_ptr[pivptr], &lu_col_ptr[pivptr], &drop_sum);
+			c_add(&lu_col_ptr[pivptr], &lu_col_ptr[pivptr], &drop_sum);
 			break;
 		case SMILU_2:
 		case SMILU_3:
@@ -283,7 +283,7 @@ int ilu_cpivotL(
 	ops[FACT] += 10 * (nsupr - nsupc);
 	c_div(&temp, &one, &lu_col_ptr[nsupc]);
 	for(k = nsupc + 1; k < nsupr; k++)
-	cc_mult(&lu_col_ptr[k], &lu_col_ptr[k], &temp);
+		cc_mult(&lu_col_ptr[k], &lu_col_ptr[k], &temp);
 
 	return info;
 }

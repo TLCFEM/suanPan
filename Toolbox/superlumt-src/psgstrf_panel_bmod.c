@@ -172,7 +172,8 @@ if (jcol == BADPAN)
 			               repfnz, panel_lsub, w_lsub_end, spa_marker,
 			               dense, tempv, Glu, Gstat);
 #endif
-		} else {
+		}
+		else {
 			/* 1-D block update */
 #ifdef GEMV2
 	    psgstrf_bmod1D_mv2(pnum, m, w, jcol, fsupc, krep, nsupc, nsupr,
@@ -393,7 +394,8 @@ printf("(%d) psgstrf_panel_bmod[fills] xlsub %d, xlsub_end %d, #lsub[%d] %d\n",
 			               repfnz, panel_lsub, w_lsub_end, spa_marker,
 			               dense, tempv, Glu, Gstat);
 #endif
-		} else {
+		}
+		else {
 			/* 1-D block update */
 #ifdef GEMV2
 	    psgstrf_bmod1D_mv2(pnum, m, w, jcol, fsupc, krep, nsupc, nsupr,

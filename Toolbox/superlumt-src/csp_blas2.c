@@ -120,7 +120,7 @@ int_t sp_ctrsv(char* uplo, char* trans, char* diag, SuperMatrix* L,
 	solve_ops = 0;
 
 	if(!(work = complexCalloc(L->nrow)))
-	SUPERLU_ABORT("Malloc fails for work in sp_ctrsv().");
+		SUPERLU_ABORT("Malloc fails for work in sp_ctrsv().");
 
 	if(lsame_(trans, "N")) {
 		/* Form x := inv(A)*x. */
@@ -148,7 +148,8 @@ int_t sp_ctrsv(char* uplo, char* trans, char* diag, SuperMatrix* L,
 						cc_mult(&comp_zero, &x[fsupc], &Lval[luptr]);
 						c_sub(&x[irow], &x[irow], &comp_zero);
 					}
-				} else {
+				}
+				else {
 #ifdef USE_VENDOR_BLAS
 #if ( MACH==CRAY_PVP )
                     ftcs1 = _cptofcd("L", strlen("L"));
@@ -183,7 +184,8 @@ int_t sp_ctrsv(char* uplo, char* trans, char* diag, SuperMatrix* L,
 				}
 			} /* for k ... */
 
-		} else {
+		}
+		else {
 			/* Form x := inv(U)*x */
 
 			if(U->nrow == 0) return 0; /* Quick return */
@@ -204,7 +206,8 @@ int_t sp_ctrsv(char* uplo, char* trans, char* diag, SuperMatrix* L,
 						cc_mult(&comp_zero, &x[fsupc], &Uval[i]);
 						c_sub(&x[irow], &x[irow], &comp_zero);
 					}
-				} else {
+				}
+				else {
 #ifdef USE_VENDOR_BLAS
 #if ( MACH==CRAY_PVP )
                     ftcs1 = _cptofcd("U", strlen("U"));
@@ -233,7 +236,8 @@ int_t sp_ctrsv(char* uplo, char* trans, char* diag, SuperMatrix* L,
 			} /* for k ... */
 
 		}
-	} else if(lsame_(trans, "T")) {
+	}
+	else if(lsame_(trans, "T")) {
 		/* Form x := inv(A')*x */
 
 		if(lsame_(uplo, "L")) {
@@ -274,7 +278,8 @@ int_t sp_ctrsv(char* uplo, char* trans, char* diag, SuperMatrix* L,
 #endif
 				}
 			}
-		} else {
+		}
+		else {
 			/* Form x := inv(U')*x */
 			if(U->nrow == 0) return 0; /* Quick return */
 
@@ -296,7 +301,8 @@ int_t sp_ctrsv(char* uplo, char* trans, char* diag, SuperMatrix* L,
 				/* 1 c_div costs 10 flops */
 				solve_ops += 4 * nsupc * (nsupc + 1) + 10 * nsupc;
 
-				if(nsupc == 1) { c_div(&x[fsupc], &x[fsupc], &Lval[luptr]); } else {
+				if(nsupc == 1) { c_div(&x[fsupc], &x[fsupc], &Lval[luptr]); }
+				else {
 #ifdef _CRAY
                     ftcs1 = _cptofcd("U", strlen("U"));
                     ftcs2 = _cptofcd("T", strlen("T"));
@@ -310,7 +316,8 @@ int_t sp_ctrsv(char* uplo, char* trans, char* diag, SuperMatrix* L,
 				}
 			} /* for k ... */
 		}
-	} else {
+	}
+	else {
 		/* Form x := conj(inv(A'))*x */
 
 		if(lsame_(uplo, "L")) {
@@ -352,7 +359,8 @@ int_t sp_ctrsv(char* uplo, char* trans, char* diag, SuperMatrix* L,
 #endif
 				}
 			}
-		} else {
+		}
+		else {
 			/* Form x := conj(inv(U'))*x */
 			if(U->nrow == 0) return 0; /* Quick return */
 
@@ -378,7 +386,8 @@ int_t sp_ctrsv(char* uplo, char* trans, char* diag, SuperMatrix* L,
 				if(nsupc == 1) {
 					cc_conj(&temp, &Lval[luptr]);
 					c_div(&x[fsupc], &x[fsupc], &temp);
-				} else {
+				}
+				else {
 #ifdef _CRAY
                     ftcs1 = _cptofcd("U", strlen("U"));
                     ftcs2 = _cptofcd(trans, strlen("T"));
@@ -492,7 +501,8 @@ int_t sp_cgemv(char* trans, complex alpha, SuperMatrix* A, complex* x,
 	if(lsame_(trans, "N")) {
 		lenx = A->ncol;
 		leny = A->nrow;
-	} else {
+	}
+	else {
 		lenx = A->nrow;
 		leny = A->ncol;
 	}
@@ -509,8 +519,9 @@ int_t sp_cgemv(char* trans, complex alpha, SuperMatrix* A, complex* x,
 			if(c_eq(&beta, &comp_zero)) for(i = 0; i < leny; ++i) y[i] = comp_zero;
 			else
 				for(i = 0; i < leny; ++i)
-				cc_mult(&y[i], &beta, &y[i]);
-		} else {
+					cc_mult(&y[i], &beta, &y[i]);
+		}
+		else {
 			iy = ky;
 			if(c_eq(&beta, &comp_zero))
 				for(i = 0; i < leny; ++i) {
@@ -542,8 +553,10 @@ int_t sp_cgemv(char* trans, complex alpha, SuperMatrix* A, complex* x,
 				}
 				jx += incx;
 			}
-		} else { SUPERLU_ABORT("Not implemented."); }
-	} else {
+		}
+		else { SUPERLU_ABORT("Not implemented."); }
+	}
+	else {
 		/* Form  y := alpha*A'*x + y. */
 		jy = ky;
 		if(incx == 1) {
@@ -558,7 +571,8 @@ int_t sp_cgemv(char* trans, complex alpha, SuperMatrix* A, complex* x,
 				c_add(&y[jy], &y[jy], &temp1);
 				jy += incy;
 			}
-		} else { SUPERLU_ABORT("Not implemented."); }
+		}
+		else { SUPERLU_ABORT("Not implemented."); }
 	}
 	return 0;
 } /* sp_cgemv */

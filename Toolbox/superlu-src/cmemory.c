@@ -49,7 +49,8 @@ extern void user_bcopy(char*, char*, int);
 void cSetupSpace(void* work, int lwork, GlobalLU_t* Glu) {
 	if(lwork == 0) {
 		Glu->MemModel = SYSTEM; /* malloc/free */
-	} else if(lwork > 0) {
+	}
+	else if(lwork > 0) {
 		Glu->MemModel = USER; /* user provided space */
 		Glu->stack.used = 0;
 		Glu->stack.top1 = 0;
@@ -67,7 +68,8 @@ void* cuser_malloc(int bytes, int which_end, GlobalLU_t* Glu) {
 	if(which_end == HEAD) {
 		buf = (char*)Glu->stack.array + Glu->stack.top1;
 		Glu->stack.top1 += bytes;
-	} else {
+	}
+	else {
 		Glu->stack.top2 -= bytes;
 		buf = (char*)Glu->stack.array + Glu->stack.top2;
 	}
@@ -77,7 +79,8 @@ void* cuser_malloc(int bytes, int which_end, GlobalLU_t* Glu) {
 }
 
 void cuser_free(int bytes, int which_end, GlobalLU_t* Glu) {
-	if(which_end == HEAD) { Glu->stack.top1 -= bytes; } else { Glu->stack.top2 += bytes; }
+	if(which_end == HEAD) { Glu->stack.top1 -= bytes; }
+	else { Glu->stack.top2 += bytes; }
 	Glu->stack.used -= bytes;
 }
 
@@ -196,7 +199,8 @@ int cLUMemInit(fact_t fact, void* work, int lwork, int m, int n, int annz,
 		if(lwork == -1) {
 			return (GluIntArray(n) * iword + TempSpace(m, panel_size)
 				+ (nzlmax + nzumax) * iword + (nzlumax + nzumax) * dword + n);
-		} else { cSetupSpace(work, lwork, Glu); }
+		}
+		else { cSetupSpace(work, lwork, Glu); }
 
 #if ( PRNTlevel >= 1 )
 	printf("cLUMemInit() called: fill_ratio %.0f, nzlmax %ld, nzumax %ld\n", 
@@ -211,7 +215,8 @@ int cLUMemInit(fact_t fact, void* work, int lwork, int m, int n, int annz,
 			xlsub = intMalloc(n + 1);
 			xlusup = intMalloc(n + 1);
 			xusub = intMalloc(n + 1);
-		} else {
+		}
+		else {
 			xsup = (int*)cuser_malloc((n + 1) * iword, HEAD, Glu);
 			supno = (int*)cuser_malloc((n + 1) * iword, HEAD, Glu);
 			xlsub = (int*)cuser_malloc((n + 1) * iword, HEAD, Glu);
@@ -230,7 +235,8 @@ int cLUMemInit(fact_t fact, void* work, int lwork, int m, int n, int annz,
 				SUPERLU_FREE(ucol);
 				SUPERLU_FREE(lsub);
 				SUPERLU_FREE(usub);
-			} else {
+			}
+			else {
 				cuser_free((nzlumax + nzumax) * dword + (nzlmax + nzumax) * iword,
 				           HEAD, Glu);
 			}
@@ -251,7 +257,8 @@ int cLUMemInit(fact_t fact, void* work, int lwork, int m, int n, int annz,
 			lsub = (int*)cexpand(&nzlmax, LSUB, 0, 0, Glu);
 			usub = (int*)cexpand(&nzumax, USUB, 0, 1, Glu);
 		}
-	} else {
+	}
+	else {
 		/* fact == SamePattern_SameRowPerm */
 		Lstore = L->Store;
 		Ustore = U->Store;
@@ -267,7 +274,9 @@ int cLUMemInit(fact_t fact, void* work, int lwork, int m, int n, int annz,
 		if(lwork == -1) {
 			return (GluIntArray(n) * iword + TempSpace(m, panel_size)
 				+ (nzlmax + nzumax) * iword + (nzlumax + nzumax) * dword + n);
-		} else if(lwork == 0) { Glu->MemModel = SYSTEM; } else {
+		}
+		else if(lwork == 0) { Glu->MemModel = SYSTEM; }
+		else {
 			Glu->MemModel = USER;
 			Glu->stack.top2 = (lwork / 4) * 4; /* must be word-addressable */
 			Glu->stack.size = Glu->stack.top2;
@@ -367,7 +376,8 @@ void cLUWorkFree(int* iwork, complex* dwork, GlobalLU_t* Glu) {
 	if(Glu->MemModel == SYSTEM) {
 		SUPERLU_FREE(iwork);
 		SUPERLU_FREE(dwork);
-	} else {
+	}
+	else {
 		Glu->stack.used -= (Glu->stack.size - Glu->stack.top2);
 		Glu->stack.top2 = Glu->stack.size;
 		/*	cStackCompress(Glu);  */
@@ -460,7 +470,8 @@ void
 	if(Glu->num_expansions == 0 || keep_prev) {
 		/* First time allocate requested */
 		new_len = *prev_len;
-	} else { new_len = alpha * *prev_len; }
+	}
+	else { new_len = alpha * *prev_len; }
 
 	if(type == LSUB || type == USUB) lword = sizeof(int);
 	else lword = sizeof(complex);
@@ -469,7 +480,8 @@ void
 		new_mem = (void*)SUPERLU_MALLOC((size_t)new_len * lword);
 		if(Glu->num_expansions != 0) {
 			tries = 0;
-			if(keep_prev) { if(!new_mem) return (NULL); } else {
+			if(keep_prev) { if(!new_mem) return (NULL); }
+			else {
 				while(!new_mem) {
 					if(++tries > 10) return (NULL);
 					alpha = Reduce(alpha);
@@ -477,11 +489,13 @@ void
 					new_mem = (void*)SUPERLU_MALLOC((size_t)new_len * lword);
 				}
 			}
-			if(type == LSUB || type == USUB) { copy_mem_int(len_to_copy, expanders[type].mem, new_mem); } else { copy_mem_complex(len_to_copy, expanders[type].mem, new_mem); }
+			if(type == LSUB || type == USUB) { copy_mem_int(len_to_copy, expanders[type].mem, new_mem); }
+			else { copy_mem_complex(len_to_copy, expanders[type].mem, new_mem); }
 			SUPERLU_FREE(expanders[type].mem);
 		}
 		expanders[type].mem = (void*)new_mem;
-	} else {
+	}
+	else {
 		/* MemModel == USER */
 		if(Glu->num_expansions == 0) {
 			new_mem = cuser_malloc(new_len * lword, HEAD, Glu);
@@ -497,10 +511,12 @@ void
 				Glu->stack.used += extra;
 			}
 			expanders[type].mem = (void*)new_mem;
-		} else {
+		}
+		else {
 			tries = 0;
 			extra = (new_len - *prev_len) * lword;
-			if(keep_prev) { if(StackFull(extra)) return (NULL); } else {
+			if(keep_prev) { if(StackFull(extra)) return (NULL); }
+			else {
 				while(StackFull(extra)) {
 					if(++tries > 10) return (NULL);
 					alpha = Reduce(alpha);

@@ -89,7 +89,8 @@ elimtree_t* SPACE_ordering(graph_t* G, options_t* options, timings_t* cpus) {
 		if(options[OPTION_MSGLVL] > 0)
 			printf("compressed graph constructed (#nodes %d, #edges %d)\n",
 			       Gc->nvtx, Gc->nedges >> 1);
-	} else {
+	}
+	else {
 		Gc = G;
 		free(vtxmap);
 		if(options[OPTION_MSGLVL] > 0) printf("no compressed graph constructed\n");
@@ -135,7 +136,8 @@ elimtree_t* SPACE_ordering(graph_t* G, options_t* options, timings_t* cpus) {
 		freeElimTree(T);
 		freeGraph(Gc);
 		free(vtxmap);
-	} else T2 = T;
+	}
+	else T2 = T;
 
 	/* --------------------------------------------------
 	   pull back timing results, if vector cpus available

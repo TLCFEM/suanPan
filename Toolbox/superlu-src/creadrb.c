@@ -115,7 +115,8 @@ static int cParseFloatFormat(char* buf, int* num, int* size) {
 		if(*tmp == 'p' || *tmp == 'P') {
 			++tmp;
 			*num = atoi(tmp); /*sscanf(tmp, "%d", num);*/
-		} else { ++tmp; }
+		}
+		else { ++tmp; }
 	}
 	++tmp;
 	period = tmp;
@@ -164,7 +165,8 @@ static int cReadValues(FILE* fp, int n, complex* destination, int perline, int p
 				/* The value is real part */
 				realpart = atof(&buf[s]);
 				pair = 1;
-			} else {
+			}
+			else {
 				/* The value is imaginary part */
 				destination[i].r = realpart;
 				destination[i++].i = atof(&buf[s]);
@@ -195,13 +197,13 @@ static void FormFullA(int n, int* nonz, complex** nzval, int** rowind, int** col
 	al_val = *nzval;
 
 	if(!(marker = (int*)SUPERLU_MALLOC((n+1) * sizeof(int))))
-	ABORT("SUPERLU_MALLOC fails for marker[]");
+		ABORT("SUPERLU_MALLOC fails for marker[]");
 	if(!(t_colptr = (int*)SUPERLU_MALLOC((n+1) * sizeof(int))))
-	ABORT("SUPERLU_MALLOC t_colptr[]");
+		ABORT("SUPERLU_MALLOC t_colptr[]");
 	if(!(t_rowind = (int*)SUPERLU_MALLOC(*nonz * sizeof(int))))
-	ABORT("SUPERLU_MALLOC fails for t_rowind[]");
+		ABORT("SUPERLU_MALLOC fails for t_rowind[]");
 	if(!(t_val = (complex*)SUPERLU_MALLOC(*nonz * sizeof(complex))))
-	ABORT("SUPERLU_MALLOC fails for t_val[]");
+		ABORT("SUPERLU_MALLOC fails for t_val[]");
 
 	/* Get counts of each column of T, and set up column pointers */
 	for(i = 0; i < n; ++i) marker[i] = 0;
@@ -223,11 +225,11 @@ static void FormFullA(int n, int* nonz, complex** nzval, int** rowind, int** col
 
 	new_nnz = *nonz * 2 - n;
 	if(!(a_colptr = (int*)SUPERLU_MALLOC((n+1) * sizeof(int))))
-	ABORT("SUPERLU_MALLOC a_colptr[]");
+		ABORT("SUPERLU_MALLOC a_colptr[]");
 	if(!(a_rowind = (int*)SUPERLU_MALLOC(new_nnz * sizeof(int))))
-	ABORT("SUPERLU_MALLOC fails for a_rowind[]");
+		ABORT("SUPERLU_MALLOC fails for a_rowind[]");
 	if(!(a_val = (complex*)SUPERLU_MALLOC(new_nnz * sizeof(complex))))
-	ABORT("SUPERLU_MALLOC fails for a_val[]");
+		ABORT("SUPERLU_MALLOC fails for a_val[]");
 
 	a_colptr[0] = 0;
 	k = 0;

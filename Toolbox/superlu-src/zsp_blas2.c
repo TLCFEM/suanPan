@@ -131,7 +131,7 @@ int sp_ztrsv(char* uplo, char* trans, char* diag, SuperMatrix* L,
 	solve_ops = 0;
 
 	if(!(work = doublecomplexCalloc(L->nrow)))
-	ABORT("Malloc fails for work in sp_ztrsv().");
+		ABORT("Malloc fails for work in sp_ztrsv().");
 
 	if(strncmp(trans, "N", 1) == 0) {
 		/* Form x := inv(A)*x. */
@@ -159,7 +159,8 @@ int sp_ztrsv(char* uplo, char* trans, char* diag, SuperMatrix* L,
 						zz_mult(&comp_zero, &x[fsupc], &Lval[luptr]);
 						z_sub(&x[irow], &x[irow], &comp_zero);
 					}
-				} else {
+				}
+				else {
 #ifdef USE_VENDOR_BLAS
 #ifdef _CRAY
 		    CTRSV(ftcs1, ftcs2, ftcs3, &nsupc, &Lval[luptr], &nsupr,
@@ -190,7 +191,8 @@ int sp_ztrsv(char* uplo, char* trans, char* diag, SuperMatrix* L,
 				}
 			} /* for k ... */
 
-		} else {
+		}
+		else {
 			/* Form x := inv(U)*x */
 
 			if(U->nrow == 0) return 0; /* Quick return */
@@ -211,7 +213,8 @@ int sp_ztrsv(char* uplo, char* trans, char* diag, SuperMatrix* L,
 						zz_mult(&comp_zero, &x[fsupc], &Uval[i]);
 						z_sub(&x[irow], &x[irow], &comp_zero);
 					}
-				} else {
+				}
+				else {
 #ifdef USE_VENDOR_BLAS
 #ifdef _CRAY
 		    CTRSV(ftcs3, ftcs2, ftcs2, &nsupc, &Lval[luptr], &nsupr,
@@ -237,7 +240,8 @@ int sp_ztrsv(char* uplo, char* trans, char* diag, SuperMatrix* L,
 			} /* for k ... */
 
 		}
-	} else if(strncmp(trans, "T", 1) == 0) {
+	}
+	else if(strncmp(trans, "T", 1) == 0) {
 		/* Form x := inv(A')*x */
 
 		if(strncmp(uplo, "L", 1) == 0) {
@@ -278,7 +282,8 @@ int sp_ztrsv(char* uplo, char* trans, char* diag, SuperMatrix* L,
 #endif
 				}
 			}
-		} else {
+		}
+		else {
 			/* Form x := inv(U')*x */
 			if(U->nrow == 0) return 0; /* Quick return */
 
@@ -300,7 +305,8 @@ int sp_ztrsv(char* uplo, char* trans, char* diag, SuperMatrix* L,
 				/* 1 z_div costs 10 flops */
 				solve_ops += 4 * nsupc * (nsupc + 1) + 10 * nsupc;
 
-				if(nsupc == 1) { z_div(&x[fsupc], &x[fsupc], &Lval[luptr]); } else {
+				if(nsupc == 1) { z_div(&x[fsupc], &x[fsupc], &Lval[luptr]); }
+				else {
 #ifdef _CRAY
                     ftcs1 = _cptofcd("U", strlen("U"));
                     ftcs2 = _cptofcd("T", strlen("T"));
@@ -314,7 +320,8 @@ int sp_ztrsv(char* uplo, char* trans, char* diag, SuperMatrix* L,
 				}
 			} /* for k ... */
 		}
-	} else {
+	}
+	else {
 		/* Form x := conj(inv(A'))*x */
 
 		if(strncmp(uplo, "L", 1) == 0) {
@@ -356,7 +363,8 @@ int sp_ztrsv(char* uplo, char* trans, char* diag, SuperMatrix* L,
 #endif
 				}
 			}
-		} else {
+		}
+		else {
 			/* Form x := conj(inv(U'))*x */
 			if(U->nrow == 0) return 0; /* Quick return */
 
@@ -382,7 +390,8 @@ int sp_ztrsv(char* uplo, char* trans, char* diag, SuperMatrix* L,
 				if(nsupc == 1) {
 					zz_conj(&temp, &Lval[luptr]);
 					z_div(&x[fsupc], &x[fsupc], &temp);
-				} else {
+				}
+				else {
 #ifdef _CRAY
                     ftcs1 = _cptofcd("U", strlen("U"));
                     ftcs2 = _cptofcd(trans, strlen("T"));
@@ -501,7 +510,8 @@ int sp_zgemv(char* trans, doublecomplex alpha, SuperMatrix* A, doublecomplex* x,
 	if(notran) {
 		lenx = A->ncol;
 		leny = A->nrow;
-	} else {
+	}
+	else {
 		lenx = A->nrow;
 		leny = A->ncol;
 	}
@@ -518,8 +528,9 @@ int sp_zgemv(char* trans, doublecomplex alpha, SuperMatrix* A, doublecomplex* x,
 			if(z_eq(&beta, &comp_zero)) for(i = 0; i < leny; ++i) y[i] = comp_zero;
 			else
 				for(i = 0; i < leny; ++i)
-				zz_mult(&y[i], &beta, &y[i]);
-		} else {
+					zz_mult(&y[i], &beta, &y[i]);
+		}
+		else {
 			iy = ky;
 			if(z_eq(&beta, &comp_zero))
 				for(i = 0; i < leny; ++i) {
@@ -551,8 +562,10 @@ int sp_zgemv(char* trans, doublecomplex alpha, SuperMatrix* A, doublecomplex* x,
 				}
 				jx += incx;
 			}
-		} else { ABORT("Not implemented."); }
-	} else if(strncmp(trans, "T", 1) == 0 || strncmp(trans, "t", 1) == 0) {
+		}
+		else { ABORT("Not implemented."); }
+	}
+	else if(strncmp(trans, "T", 1) == 0 || strncmp(trans, "t", 1) == 0) {
 		/* Form  y := alpha*A'*x + y. */
 		jy = ky;
 		if(incx == 1) {
@@ -567,8 +580,10 @@ int sp_zgemv(char* trans, doublecomplex alpha, SuperMatrix* A, doublecomplex* x,
 				z_add(&y[jy], &y[jy], &temp1);
 				jy += incy;
 			}
-		} else { ABORT("Not implemented."); }
-	} else {
+		}
+		else { ABORT("Not implemented."); }
+	}
+	else {
 		/* trans == 'C' or 'c' */
 		/* Form  y := alpha * conj(A) * x + y. */
 		doublecomplex temp2;
@@ -587,7 +602,8 @@ int sp_zgemv(char* trans, doublecomplex alpha, SuperMatrix* A, doublecomplex* x,
 				z_add(&y[jy], &y[jy], &temp1);
 				jy += incy;
 			}
-		} else { ABORT("Not implemented."); }
+		}
+		else { ABORT("Not implemented."); }
 	}
 
 	return 0;

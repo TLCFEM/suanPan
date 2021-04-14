@@ -57,7 +57,8 @@ css_t* newCSS(PORD_INT neqs, PORD_INT nind, PORD_INT owned) {
 	mymalloc(css, 1, css_t);
 	mymalloc(css->xnzl, (neqs+1), PORD_INT);
 	mymalloc(css->xnzlsub, neqs, PORD_INT);
-	if(owned) { mymalloc(css->nzlsub, nind, PORD_INT); } else { css->nzlsub = NULL; }
+	if(owned) { mymalloc(css->nzlsub, nind, PORD_INT); }
+	else { css->nzlsub = NULL; }
 	css->neqs = neqs;
 	css->nind = nind;
 	css->owned = owned;
@@ -116,7 +117,8 @@ css_t* setupCSSFromGraph(graph_t* G, PORD_INT* perm, PORD_INT* invp) {
 		{
 			mrk = marker[mergecol];
 			fast = TRUE;
-		} else {
+		}
+		else {
 			mrk = k;
 			fast = FALSE;
 		}
@@ -141,7 +143,8 @@ css_t* setupCSSFromGraph(graph_t* G, PORD_INT* perm, PORD_INT* invp) {
 		if((fast) && (mergelink[mergecol] == -1)) {
 			xnzlsub[k] = xnzlsub[mergecol] + 1;
 			knz = xnzl[mergecol + 1] - xnzl[mergecol] - 1;
-		} else {
+		}
+		else {
 			for(i = 0; i < knz; i++) marker[indices[i]] = k;
 			while(mergecol != -1) {
 				len = xnzl[mergecol + 1] - xnzl[mergecol];

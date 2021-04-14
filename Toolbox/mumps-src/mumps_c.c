@@ -465,7 +465,8 @@ mumps_c(MUMPS_STRUC_C* mumps_par) {
 		/* has been set by user and was not allocated in mumps */
 		rowsca = mumps_par->rowsca;
 		rowsca_avail = yes;
-	} else {
+	}
+	else {
 		/* Changing the rowsca pointer in C after an earlier call
 		   where rowsca was allocated by mumps is not possible.
 		   FIXME: check if the content of rowsca could still be
@@ -479,7 +480,8 @@ mumps_c(MUMPS_STRUC_C* mumps_par) {
 	{
 		colsca = mumps_par->colsca;
 		colsca_avail = yes;
-	} else {
+	}
+	else {
 		/* Changing the colsca pointer in C after an earlier call
 		   where colsca was allocated by mumps is not possible.
 		   FIXME: check if the content of colsca could still be

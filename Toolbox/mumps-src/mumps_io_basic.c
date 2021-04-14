@@ -237,7 +237,8 @@ MUMPS_INT mumps_io_do_write_block(void* address_block,
 		if((double)(mumps_io_max_file_size - ((mumps_files + type)->mumps_io_current_file)->write_pos) > to_be_written) {
 			write_size = (size_t)to_be_written;
 			already_written = (size_t)to_be_written;
-		} else {
+		}
+		else {
 			write_size = (size_t)((double)(mumps_io_max_file_size - ((mumps_files + type)->mumps_io_current_file)->write_pos));
 			already_written = already_written + (size_t)write_size;
 		}
@@ -337,7 +338,8 @@ MUMPS_INT mumps_io_do_read_block(void* address_block,
       size=(size_t)read_size;
     }
 #else
-		if(read_size + (double)local_offset > (double)mumps_io_max_file_size) { size = ((size_t)mumps_io_max_file_size - (size_t)local_offset) / (size_t)mumps_elementary_data_size; } else { size = (size_t)(read_size / mumps_elementary_data_size); }
+		if(read_size + (double)local_offset > (double)mumps_io_max_file_size) { size = ((size_t)mumps_io_max_file_size - (size_t)local_offset) / (size_t)mumps_elementary_data_size; }
+		else { size = (size_t)(read_size / mumps_elementary_data_size); }
 #endif
 		*ierr = mumps_io_read__(file, loc_addr, size, local_offset, type);
 		if(*ierr < 0) { return *ierr; }
@@ -536,7 +538,8 @@ MUMPS_INT mumps_init_file_name(char* mumps_dir, char* mumps_file,
 		mumps_ooc_file_prefix = (char*)malloc((strlen(SEPARATOR) + strlen(tmp_dir) + strlen(tmp_fname) + strlen(base_name) + 1 + 1) * sizeof(char));
 		if(mumps_ooc_file_prefix == NULL) { return mumps_io_error(-13, "Allocation problem in low-level OOC layer\n"); }
 		sprintf(mumps_ooc_file_prefix, "%s%s%s%s", tmp_dir,SEPARATOR, tmp_fname, base_name);
-	} else {
+	}
+	else {
 #if ! defined( MUMPS_WIN32 )
     sprintf(base_name,"%s%s%d_XXXXXX",SEPARATOR,mumps_base,*_myid);
 #else

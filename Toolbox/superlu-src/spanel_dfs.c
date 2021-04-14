@@ -152,7 +152,8 @@ void spanel_dfs(
 					/* Representative visited before */
 					if(myfnz > kperm) repfnz_col[krep] = kperm;
 					/* continue; */
-				} else {
+				}
+				else {
 					/* Otherwise, perform dfs starting at krep */
 					oldrep = EMPTY;
 					parent[krep] = oldrep;
@@ -194,7 +195,8 @@ void spanel_dfs(
 									if(myfnz != EMPTY) {
 										/* Visited before */
 										if(myfnz > chperm) repfnz_col[chrep] = chperm;
-									} else {
+									}
+									else {
 										/* Cont. dfs at snode-rep of kchild */
 										xplore[krep] = xdfs;
 										oldrep = krep;

@@ -115,7 +115,8 @@ void zlaqgs(SuperMatrix* A, double* r, double* c,
 			}
 			*equed = COL;
 		}
-	} else if(colcnd >= THRESH) {
+	}
+	else if(colcnd >= THRESH) {
 		/* Row scaling, no column scaling */
 		for(j = 0; j < A->ncol; ++j)
 			for(i = Astore->colptr[j]; i < Astore->colptr[j + 1]; ++i) {
@@ -123,7 +124,8 @@ void zlaqgs(SuperMatrix* A, double* r, double* c,
 				zd_mult(&Aval[i], &Aval[i], r[irow]);
 			}
 		*equed = ROW;
-	} else {
+	}
+	else {
 		/* Row and column scaling */
 		for(j = 0; j < A->ncol; ++j) {
 			cj = c[j];

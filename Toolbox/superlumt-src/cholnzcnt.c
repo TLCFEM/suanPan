@@ -176,7 +176,8 @@ int_t cholnzcnt(int_t neqns, int_t* xadj, int_t* adjncy,
 						   ----------------------------------------- */
 						rowcnt[hinbr] = rowcnt[hinbr] +
 							level[lownbr] - level[hinbr];
-					} else {
+					}
+					else {
 						/* -----------------------------------------   
 						   ... OTHERWISE, LCA <-- FIND(PLEAF), WHICH   
 			                               IS THE LEAST COMMON ANCESTOR OF PLEAF   

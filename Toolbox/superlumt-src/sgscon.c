@@ -107,7 +107,7 @@ void sgscon(char* norm, SuperMatrix* L, SuperMatrix* U,
 	iwork = intMalloc(L->nrow);
 
 	if(!work || !iwork)
-	SUPERLU_ABORT("Malloc fails for work arrays in sgscon.");
+		SUPERLU_ABORT("Malloc fails for work arrays in sgscon.");
 
 	/* Estimate the norm of inv(A). */
 	ainvnm = 0.;
@@ -126,7 +126,8 @@ void sgscon(char* norm, SuperMatrix* L, SuperMatrix* U,
 
 			/* Multiply by inv(U). */
 			sp_strsv("Upper", "No transpose", "Non-unit", L, U, &work[0], info);
-		} else {
+		}
+		else {
 
 			/* Multiply by inv(U'). */
 			sp_strsv("Upper", "Transpose", "Non-unit", L, U, &work[0], info);

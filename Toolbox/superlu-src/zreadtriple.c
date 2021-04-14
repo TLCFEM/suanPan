@@ -65,7 +65,8 @@ void zreadtriple(int* m, int* n, int* nonz,
 			if(row[0] == 0 || col[0] == 0) {
 				zero_base = 1;
 				printf("triplet file: row/col indices are zero-based.\n");
-			} else printf("triplet file: row/col indices are one-based.\n");
+			}
+			else printf("triplet file: row/col indices are one-based.\n");
 		}
 
 		if(!zero_base) {
@@ -79,7 +80,8 @@ void zreadtriple(int* m, int* n, int* nonz,
 			fprintf(stderr, "nz %d, (%d, %d) = (%e,%e) out of bound, removed\n",
 			        nz, row[nz], col[nz], val[nz].r, val[nz].i);
 			exit(-1);
-		} else {
+		}
+		else {
 			++xa[col[nz]];
 			++nz;
 		}

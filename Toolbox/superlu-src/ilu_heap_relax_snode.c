@@ -97,7 +97,8 @@ void ilu_heap_relax_snode(
 			relax_end[k] = l; /* Last column is recorded */
 			relax_fsupc[f++] = k;
 			++nsuper_et;
-		} else {
+		}
+		else {
 			for(i = snode_start; i <= j; ++i) {
 				l = inv_post[i];
 				if(descendants[i] == 0) {

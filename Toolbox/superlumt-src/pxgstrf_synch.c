@@ -108,7 +108,8 @@ int_t ParallelInit(int_t n, pxgstrf_relax_t* pxgstrf_relax,
 			w = pxgstrf_relax[rs++].size;
 			panel_type = RELAXED_SNODE;
 			pxgstrf_shared->pan_status[i].state = CANGO;
-		} else {
+		}
+		else {
 			/* Adjust panel_size so that a panel won't overlap with
 			   the next relaxed snode.     */
 #if 0

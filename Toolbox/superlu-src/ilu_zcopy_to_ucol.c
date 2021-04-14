@@ -129,11 +129,12 @@ int ilu_zcopy_to_ucol(
 						usub[nextu] = perm_r[irow];
 						ucol[nextu] = dense[irow];
 						nextu++;
-					} else {
+					}
+					else {
 						switch(milu) {
 						case SMILU_1:
 						case SMILU_2:
-						z_add(sum, sum, &dense[irow]);
+							z_add(sum, sum, &dense[irow]);
 							break;
 						case SMILU_3:
 							/* *sum += fabs(dense[irow]);*/
@@ -166,7 +167,8 @@ int ilu_zcopy_to_ucol(
 				d_max = 1.0 / d_max;
 				d_min = 1.0 / d_min;
 				tol = 1.0 / (d_max + (d_min - d_max) * quota / m);
-			} else {
+			}
+			else {
 				i_1 = xusub[jcol];
 				for(i = 0; i < m; ++i, ++i_1) work[i] = z_abs1(&ucol[i_1]);
 				tol = dqselect(m, work, quota);
@@ -183,7 +185,7 @@ int ilu_zcopy_to_ucol(
 				switch(milu) {
 				case SMILU_1:
 				case SMILU_2:
-				z_add(sum, sum, &ucol[i]);
+					z_add(sum, sum, &ucol[i]);
 					break;
 				case SMILU_3:
 					sum->r += tmp;

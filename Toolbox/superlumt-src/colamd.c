@@ -1304,7 +1304,8 @@ PUBLIC Int SYMAMD_MAIN /* return TRUE if OK, FALSE otherwise */
 				}
 			}
 		}
-	} else {
+	}
+	else {
 		/* Matrix is jumbled.  Do not add duplicates to M.  Unsorted cols OK. */
 		DEBUG0(("symamd: Duplicates in A.\n"));
 		for(i = 0; i < n; i++) { mark[i] = -1; }
@@ -1656,7 +1657,8 @@ PRIVATE Int init_rows_cols /* returns TRUE if OK, or FALSE otherwise */
 				DEBUG1(("colamd: row %d col %d unsorted/duplicate\n",row,col));
 			}
 
-			if(Row[row].shared2.mark != col) { Row[row].length++; } else {
+			if(Row[row].shared2.mark != col) { Row[row].length++; }
+			else {
 				/* this is a repeated entry in the column, */
 				/* it will be removed */
 				Col[col].length--;
@@ -1697,7 +1699,8 @@ PRIVATE Int init_rows_cols /* returns TRUE if OK, or FALSE otherwise */
 				}
 			}
 		}
-	} else {
+	}
+	else {
 		/* if cols not jumbled, we don't need the mark (this is faster) */
 		for(col = 0; col < n_col; col++) {
 			cp = &A[p[col]];
@@ -1821,11 +1824,13 @@ PRIVATE void init_scoring
 	if(knobs[COLAMD_DENSE_ROW] < 0) {
 		/* only remove completely dense rows */
 		dense_row_count = n_col - 1;
-	} else { dense_row_count = DENSE_DEGREE(knobs [COLAMD_DENSE_ROW], n_col); }
+	}
+	else { dense_row_count = DENSE_DEGREE(knobs [COLAMD_DENSE_ROW], n_col); }
 	if(knobs[COLAMD_DENSE_COL] < 0) {
 		/* only remove completely dense columns */
 		dense_col_count = n_row - 1;
-	} else {
+	}
+	else {
 		dense_col_count =
 			DENSE_DEGREE(knobs [COLAMD_DENSE_COL], MIN (n_row, n_col));
 	}
@@ -1877,7 +1882,8 @@ PRIVATE void init_scoring
 			/* kill a dense or empty row */
 			KILL_ROW(r);
 			--n_row2;
-		} else {
+		}
+		else {
 			/* keep track of max degree of remaining rows */
 			max_deg = MAX(max_deg, deg);
 		}
@@ -1919,7 +1925,8 @@ PRIVATE void init_scoring
 			DEBUG2(("Newly null killed: %d\n", c));
 			Col[c].shared2.order = --n_col2;
 			KILL_PRINCIPAL_COL(c);
-		} else {
+		}
+		else {
 			/* set column length and set score */
 			ASSERT(score >= 0) ;
 			ASSERT(score <= n_col) ;
@@ -2212,7 +2219,8 @@ PRIVATE Int find_ordering /* return the number of garbage collections */
 			/* pick the "pivot" row arbitrarily (first row in col) */
 			pivot_row = A[Col[pivot_col].start];
 			DEBUG3(("Pivotal row is %d\n", pivot_row));
-		} else {
+		}
+		else {
 			/* there is no pivot row, since it is of zero length */
 			pivot_row = EMPTY;
 			ASSERT(pivot_row_length == 0) ;
@@ -2266,7 +2274,8 @@ PRIVATE Int find_ordering /* return the number of garbage collections */
 			ASSERT(cur_score >= 0) ;
 			ASSERT(cur_score <= n_col) ;
 			ASSERT(cur_score >= EMPTY) ;
-			if(prev_col == EMPTY) { head[cur_score] = next_col; } else { Col[prev_col].shared4.degree_next = next_col; }
+			if(prev_col == EMPTY) { head[cur_score] = next_col; }
+			else { Col[prev_col].shared4.degree_next = next_col; }
 			if(next_col != EMPTY) { Col[next_col].shared3.prev = prev_col; }
 
 			/* === Scan the column ========================================== */
@@ -2293,7 +2302,8 @@ PRIVATE Int find_ordering /* return the number of garbage collections */
 				if(set_difference == 0 && aggressive) {
 					DEBUG3(("aggressive absorption. Row: %d\n", row));
 					KILL_ROW(row);
-				} else {
+				}
+				else {
 					/* save the new mark */
 					Row[row].shared2.mark = set_difference + tag_mark;
 				}
@@ -2362,7 +2372,8 @@ PRIVATE Int find_ordering /* return the number of garbage collections */
 				Col[col].shared2.order = k;
 				/* increment order count by column thickness */
 				k += Col[col].shared1.thickness;
-			} else {
+			}
+			else {
 				/* === Prepare for supercolumn detection ==================== */
 
 				DEBUG4(("Preparing supercol detection for Col: %d.\n", col));
@@ -2382,7 +2393,8 @@ PRIVATE Int find_ordering /* return the number of garbage collections */
 					/* first column in degree list as head of hash bucket */
 					first_col = Col[head_column].shared3.headhash;
 					Col[head_column].shared3.headhash = col;
-				} else {
+				}
+				else {
 					/* degree list "hash" is empty, use head as hash bucket */
 					first_col = - (head_column + 2);
 					head[hash] = - (col + 2);
@@ -2659,7 +2671,8 @@ PRIVATE void detect_super_cols
 		/* === Get the first column in this hash bucket ===================== */
 
 		head_column = head[hash];
-		if(head_column > EMPTY) { first_col = Col[head_column].shared3.headhash; } else { first_col = - (head_column + 2); }
+		if(head_column > EMPTY) { first_col = Col[head_column].shared3.headhash; }
+		else { first_col = - (head_column + 2); }
 
 		/* === Consider each column in the hash bucket ====================== */
 
@@ -2725,7 +2738,8 @@ PRIVATE void detect_super_cols
 		if(head_column > EMPTY) {
 			/* corresponding degree list "hash" is not empty */
 			Col[head_column].shared3.headhash = EMPTY;
-		} else {
+		}
+		else {
 			/* corresponding degree list "hash" is empty */
 			head[hash] = EMPTY;
 		}
@@ -2800,7 +2814,8 @@ PRIVATE Int garbage_collection /* returns the new value of pfree */
 			 * there are no zero-length live rows.  Kill the row (for the first
 			 * time, or again) just to be safe. */
 			KILL_ROW(r);
-		} else {
+		}
+		else {
 			/* save first column index in Row [r].shared2.first_column */
 			psrc = &A[Row[r].start];
 			Row[r].shared2.first_column = *psrc;
@@ -2905,7 +2920,8 @@ PRIVATE void print_report
 	i2 = stats[COLAMD_INFO2];
 	i3 = stats[COLAMD_INFO3];
 
-	if(stats[COLAMD_STATUS] >= 0) { SUITESPARSE_PRINTF("OK.  "); } else { SUITESPARSE_PRINTF("ERROR.  "); }
+	if(stats[COLAMD_STATUS] >= 0) { SUITESPARSE_PRINTF("OK.  "); }
+	else { SUITESPARSE_PRINTF("ERROR.  "); }
 
 	switch(stats[COLAMD_STATUS]) {
 	case COLAMD_OK_BUT_JUMBLED:

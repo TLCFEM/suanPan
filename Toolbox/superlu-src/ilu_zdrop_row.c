@@ -181,7 +181,8 @@ int ilu_zdrop_row(
 				d_max = 1.0 / d_max;
 				d_min = 1.0 / d_min;
 				tol = 1.0 / (d_max + (d_min - d_max) * quota / (m - n - r));
-			} else /* by quick select */
+			}
+			else /* by quick select */
 			{
 				int len = m1 - n + 1;
 				dcopy_(&len, dwork, &i_1, dwork2, &i_1);
@@ -269,7 +270,8 @@ int ilu_zdrop_row(
 					zz_mult(&lusup[xlusup_first + j * inc_diag],
 					        &lusup[xlusup_first + j * inc_diag],
 					        &t);
-				} else {
+				}
+				else {
 					zd_mult(
 						&lusup[xlusup_first + j * inc_diag],
 						&lusup[xlusup_first + j * inc_diag],
@@ -282,12 +284,12 @@ int ilu_zdrop_row(
 				}
 				break;
 			case SMILU_2:
-			zd_mult(&lusup[xlusup_first + j * inc_diag],
+				zd_mult(&lusup[xlusup_first + j * inc_diag],
 				        &lusup[xlusup_first + j * inc_diag],
 				        1.0 + z_abs1(&t));
 				break;
 			case SMILU_3:
-			z_add(&t, &t, &one);
+				z_add(&t, &t, &one);
 				zz_mult(&lusup[xlusup_first + j * inc_diag],
 				        &lusup[xlusup_first + j * inc_diag],
 				        &t);

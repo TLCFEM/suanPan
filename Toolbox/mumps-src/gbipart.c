@@ -244,7 +244,8 @@ void maximumMatching(gbipart_t* Gbipart, PORD_INT* matching) {
 						if(matching[y] == FREE) {
 							max_level = level[y]; /* note: stack contains only */
 							stack[top++] = y;     /*       nodes form Y        */
-						} else if(level[y] < max_level) {
+						}
+						else if(level[y] < max_level) {
 							x2 = matching[y];
 							level[x2] = level[y] + 1;
 							queue[qtail++] = x2;
@@ -287,7 +288,8 @@ void maximumMatching(gbipart_t* Gbipart, PORD_INT* matching) {
 							marker[y2] = xadj[y2];
 						}
 					}
-				} else top2--;
+				}
+				else top2--;
 			}
 		}
 	}
@@ -433,12 +435,14 @@ void DMviaMatching(gbipart_t* Gbipart, PORD_INT* matching, PORD_INT* dmflag, POR
 		if(matching[x] == FREE) {
 			queue[qtail++] = x;
 			dmflag[x] = SI;
-		} else dmflag[x] = SR;
+		}
+		else dmflag[x] = SR;
 	for(y = nX; y < nX + nY; y++)
 		if(matching[y] == FREE) {
 			queue[qtail++] = y;
 			dmflag[y] = BI;
-		} else dmflag[y] = BR;
+		}
+		else dmflag[y] = BR;
 
 	/* ------------------------------------------------------------------
 	   construct Dulmage-Mendelsohn decomp. starting with SI and BI nodes
@@ -534,12 +538,14 @@ void DMviaFlow(gbipart_t* Gbipart, PORD_INT* flow, PORD_INT* rc, PORD_INT* dmfla
 		if(rc[x] > 0) {
 			queue[qtail++] = x;
 			dmflag[x] = SOURCE;
-		} else dmflag[x] = FREE;
+		}
+		else dmflag[x] = FREE;
 	for(y = nX; y < nX + nY; y++)
 		if(rc[y] > 0) {
 			queue[qtail++] = y;
 			dmflag[y] = SINK;
-		} else dmflag[y] = FREE;
+		}
+		else dmflag[y] = FREE;
 
 	/* --------------------------------------------------------------------
 	   construct Dulmage-Mendelsohn decomp. starting with SOURCE/SINK nodes

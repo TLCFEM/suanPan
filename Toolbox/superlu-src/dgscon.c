@@ -120,7 +120,7 @@ void dgscon(char* norm, SuperMatrix* L, SuperMatrix* U,
 	iwork = intMalloc(L->nrow);
 
 	if(!work || !iwork)
-	ABORT("Malloc fails for work arrays in dgscon.");
+		ABORT("Malloc fails for work arrays in dgscon.");
 
 	/* Estimate the norm of inv(A). */
 	ainvnm = 0.;
@@ -139,7 +139,8 @@ void dgscon(char* norm, SuperMatrix* L, SuperMatrix* U,
 
 			/* Multiply by inv(U). */
 			sp_dtrsv("U", "No trans", "Non-unit", L, U, &work[0], stat, info);
-		} else {
+		}
+		else {
 
 			/* Multiply by inv(U'). */
 			sp_dtrsv("U", "Transpose", "Non-unit", L, U, &work[0], stat, info);

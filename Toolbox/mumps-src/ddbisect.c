@@ -192,7 +192,8 @@ PORD_INT findPseudoPeripheralDomain(domdec_t* dd, PORD_INT domain) {
 		if(level[lastdomain] > nlev) {
 			nlev = level[lastdomain];
 			domain = lastdomain;
-		} else break;
+		}
+		else break;
 	}
 
 	/* -------------------------------
@@ -324,10 +325,12 @@ void constructLevelSep(domdec_t* dd, PORD_INT domain) {
 					{
 						queue[qtail++] = w;
 						vtype[w] = -1;
-					} else if(vtype[w] == -2) /* update (old) domain in queue */
+					}
+					else if(vtype[w] == -2) /* update (old) domain in queue */
 						vtype[w] = -1;
 				}
-			} else if(deltaW[v] == 1) /* color of multisec v remains GRAY for */
+			}
+			else if(deltaW[v] == 1) /* color of multisec v remains GRAY for */
 			{
 				jstart = xadj[v]; /* the last time */
 				jstop = xadj[v + 1];
@@ -697,7 +700,8 @@ OUTER_LOOP_START:
 					{
 						deltaB[u] -= weight;
 						deltaS[u] += weight;
-					} else if(deltaB[v] == 1) /* multisec v will move into W */
+					}
+					else if(deltaB[v] == 1) /* multisec v will move into W */
 					{
 						deltaW[u] += weight;
 						deltaS[u] -= weight;
@@ -720,7 +724,8 @@ OUTER_LOOP_START:
 					{
 						deltaW[u] -= weight;
 						deltaS[u] += weight;
-					} else if(deltaW[v] == 1) /* multisec v will move into B */
+					}
+					else if(deltaW[v] == 1) /* multisec v will move into B */
 					{
 						deltaB[u] += weight;
 						deltaS[u] -= weight;
@@ -770,7 +775,8 @@ INNER_LOOP_START:
 		domain = b_domain;
 		value = b_value;
 		removeBucket(b_bucket, domain);
-	} else {
+	}
+	else {
 		domain = w_domain;
 		value = w_value;
 		removeBucket(w_bucket, domain);
@@ -791,7 +797,8 @@ INNER_LOOP_START:
 	if(tmp_color[domain] == BLACK) {
 		tmp_color[domain] = WHITE;
 		updateB2W(w_bucket, b_bucket, dd, domain, tmp_color, deltaW, deltaB, deltaS);
-	} else if(tmp_color[domain] == WHITE) {
+	}
+	else if(tmp_color[domain] == WHITE) {
 		tmp_color[domain] = BLACK;
 		updateW2B(w_bucket, b_bucket, dd, domain, tmp_color, deltaW, deltaB, deltaS);
 	}
@@ -804,7 +811,8 @@ INNER_LOOP_START:
 		bestglobalvalue = value;
 		bestglobalpos = pos;
 		badflips = 0;
-	} else badflips++;
+	}
+	else badflips++;
 	if(badflips < MAX_BAD_FLIPS) goto INNER_LOOP_START;
 
 INNER_LOOP_END:

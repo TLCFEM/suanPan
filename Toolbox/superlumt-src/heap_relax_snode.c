@@ -47,7 +47,7 @@ void heap_relax_snode(
 	/* The etree may not be postordered, but is always heap-ordered. */
 
 	if(!(iwork = (int_t*)intMalloc(3 * n + 2)))
-	SUPERLU_ABORT("SUPERLU_MALLOC fails for iwork[]");
+		SUPERLU_ABORT("SUPERLU_MALLOC fails for iwork[]");
 	inv_post = iwork + n + 1;
 	et_save = inv_post + n + 1;
 
@@ -91,7 +91,8 @@ void heap_relax_snode(
 	    for (i = snode_start; i <= j; ++i) in_domain[i] = RELAXED_SNODE;
 #endif
 			++nsuper_et;
-		} else {
+		}
+		else {
 			for(i = snode_start; i <= j; ++i) {
 				l = inv_post[i];
 				if(desc[i] == 0) {

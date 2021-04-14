@@ -55,7 +55,8 @@ int lsame_(char* ca, char* cb) {
 	          upper case 'Z'. */
 		if(inta >= 97 && inta <= 122) inta += -32;
 		if(intb >= 97 && intb <= 122) intb += -32;
-	} else if(zcode == 233 || zcode == 169) {
+	}
+	else if(zcode == 233 || zcode == 169) {
 		/* EBCDIC is assumed - ZCODE is the EBCDIC code of either lower or   
 	          upper case 'Z'. */
 		if(inta >= 129 && inta <= 137 || inta >= 145 && inta <= 153 || inta
@@ -64,7 +65,8 @@ int lsame_(char* ca, char* cb) {
 		if(intb >= 129 && intb <= 137 || intb >= 145 && intb <= 153 || intb
 			>= 162 && intb <= 169)
 			intb += 64;
-	} else if(zcode == 218 || zcode == 250) {
+	}
+	else if(zcode == 218 || zcode == 250) {
 		/* ASCII is assumed, on Prime machines - ZCODE is the ASCII code   
 	          plus 128 of either lower or upper case 'Z'. */
 		if(inta >= 225 && inta <= 250) inta += -32;

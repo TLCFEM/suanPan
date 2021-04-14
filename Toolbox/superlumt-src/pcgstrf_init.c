@@ -145,11 +145,11 @@ void pcgstrf_init(int_t nprocs, fact_t fact, trans_t trans, yes_no_t refact,
 	if(refact == NO) {
 		/* First time factorization, need allocation. */
 		if(!(superlumt_options->etree = intMalloc(A->ncol)))
-		SUPERLU_ABORT("Malloc fails for etree[].");
+			SUPERLU_ABORT("Malloc fails for etree[].");
 		if(!(superlumt_options->colcnt_h = intMalloc(A->ncol)))
-		SUPERLU_ABORT("Malloc fails for colcnt_h[].");
+			SUPERLU_ABORT("Malloc fails for colcnt_h[].");
 		if(!(superlumt_options->part_super_h = intMalloc(A->ncol)))
-		SUPERLU_ABORT("Malloc fails for colcnt_h[].");
+			SUPERLU_ABORT("Malloc fails for colcnt_h[].");
 	}
 
 	t = SuperLU_timer_();

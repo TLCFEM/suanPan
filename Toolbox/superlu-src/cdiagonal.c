@@ -99,7 +99,8 @@ int cdominate(int n, NCformat* Astore)
 			if(diag >= 0) {
 				nzval_new[diag + fill].r = s * 3.0;
 				nzval_new[diag + fill].i = 0.0;
-			} else {
+			}
+			else {
 				rowind_new[colptr[i + 1] + fill] = i;
 				nzval_new[colptr[i + 1] + fill].r = s * 3.0;
 				nzval_new[colptr[i + 1] + fill].i = 0.0;
@@ -111,7 +112,8 @@ int cdominate(int n, NCformat* Astore)
 		Astore->rowind = rowind_new;
 		SUPERLU_FREE(nzval);
 		SUPERLU_FREE(rowind);
-	} else {
+	}
+	else {
 		for(i = 0; i < n; i++) {
 			s = 1e-6;
 			diag = -1;

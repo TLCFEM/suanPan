@@ -320,7 +320,8 @@ int_t qrnzcnt(int_t neqns, int_t adjlen, int_t* xadj, int_t* adjncy, int_t* zfdp
 						   ----------------------------------------- */
 						rowcnt[hinbr] = rowcnt[hinbr] +
 							level[lownbr] - level[hinbr];
-					} else {
+					}
+					else {
 						/* -----------------------------------------   
 						   ... OTHERWISE, LCA <-- FIND(PLEAF), WHICH   
 			                               IS THE LEAST COMMON ANCESTOR OF PLEAF   
@@ -367,7 +368,8 @@ int_t qrnzcnt(int_t neqns, int_t adjlen, int_t* xadj, int_t* adjncy, int_t* zfdp
 			if(lownbr != 0) part_super_ata[xsup] = lownbr - xsup;
 			++nsuper;
 			xsup = lownbr;
-		} else {
+		}
+		else {
 			if(parent == ROOT && ifdesc == lownbr) {
 				/* lownbr is a singleton, and begins a new supernode
 				   but is not detected as doing so -- BUG FIX */

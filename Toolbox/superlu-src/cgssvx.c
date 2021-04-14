@@ -394,7 +394,8 @@ void cgssvx(superlu_options_t* options, SuperMatrix* A, int* perm_c, int* perm_r
 		*(unsigned char*)equed = 'N';
 		rowequ = FALSE;
 		colequ = FALSE;
-	} else {
+	}
+	else {
 		rowequ = strncmp(equed, "R", 1) == 0 || strncmp(equed, "B", 1) == 0;
 		colequ = strncmp(equed, "C", 1) == 0 || strncmp(equed, "B", 1) == 0;
 		smlnum = smach("Safe minimum"); /* lamch_("Safe minimum"); */
@@ -489,11 +490,13 @@ printf("dgssvx: Fact=%4d, Trans=%4d, equed=%c\n",
 			/* Reverse the transpose argument. */
 			trant = TRANS;
 			notran = 0;
-		} else {
+		}
+		else {
 			trant = NOTRANS;
 			notran = 1;
 		}
-	} else {
+	}
+	else {
 		/* A->Stype == SLU_NC */
 		trant = options->Trans;
 		AA = A;
@@ -566,7 +569,8 @@ printf("dgssvx: Fact=%4d, Trans=%4d, equed=%c\n",
 	if(options->ConditionNumber) {
 		/* Estimate the reciprocal of the condition number of A. */
 		t0 = SuperLU_timer_();
-		if(notran) { *(unsigned char*)norm = '1'; } else { *(unsigned char*)norm = 'I'; }
+		if(notran) { *(unsigned char*)norm = '1'; }
+		else { *(unsigned char*)norm = 'I'; }
 		anorm = clangs(norm, AA);
 		cgscon(norm, L, U, anorm, rcond, stat, &info1);
 		utime[RCOND] = SuperLU_timer_() - t0;
@@ -578,12 +582,13 @@ printf("dgssvx: Fact=%4d, Trans=%4d, equed=%c\n",
 			if(rowequ) {
 				for(j = 0; j < nrhs; ++j)
 					for(i = 0; i < A->nrow; ++i)
-					cs_mult(&Bmat[i+j*ldb], &Bmat[i+j*ldb], R[i]);
+						cs_mult(&Bmat[i+j*ldb], &Bmat[i+j*ldb], R[i]);
 			}
-		} else if(colequ) {
+		}
+		else if(colequ) {
 			for(j = 0; j < nrhs; ++j)
 				for(i = 0; i < A->nrow; ++i)
-				cs_mult(&Bmat[i+j*ldb], &Bmat[i+j*ldb], C[i]);
+					cs_mult(&Bmat[i+j*ldb], &Bmat[i+j*ldb], C[i]);
 		}
 
 		/* Compute the solution matrix X. */
@@ -600,7 +605,8 @@ printf("dgssvx: Fact=%4d, Trans=%4d, equed=%c\n",
 		if(options->IterRefine != NOREFINE) {
 			cgsrfs(trant, AA, L, U, perm_c, perm_r, equed, R, C, B,
 			       X, ferr, berr, stat, &info1);
-		} else { for(j = 0; j < nrhs; ++j) ferr[j] = berr[j] = 1.0; }
+		}
+		else { for(j = 0; j < nrhs; ++j) ferr[j] = berr[j] = 1.0; }
 		utime[REFINE] = SuperLU_timer_() - t0;
 
 		/* Transform the solution matrix X to a solution of the original system. */
@@ -608,12 +614,13 @@ printf("dgssvx: Fact=%4d, Trans=%4d, equed=%c\n",
 			if(colequ) {
 				for(j = 0; j < nrhs; ++j)
 					for(i = 0; i < A->nrow; ++i)
-					cs_mult(&Xmat[i+j*ldx], &Xmat[i+j*ldx], C[i]);
+						cs_mult(&Xmat[i+j*ldx], &Xmat[i+j*ldx], C[i]);
 			}
-		} else if(rowequ) {
+		}
+		else if(rowequ) {
 			for(j = 0; j < nrhs; ++j)
 				for(i = 0; i < A->nrow; ++i)
-				cs_mult(&Xmat[i+j*ldx], &Xmat[i+j*ldx], R[i]);
+					cs_mult(&Xmat[i+j*ldx], &Xmat[i+j*ldx], R[i]);
 		}
 	} /* end if nrhs > 0 */
 

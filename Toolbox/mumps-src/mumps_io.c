@@ -276,7 +276,8 @@ MUMPS_LOW_LEVEL_WRITE_OOC_C(const MUMPS_INT* strat_IO,
 			mumps_io_error((MUMPS_INT)*ierr, buf);
 			return;
 		}
-	} else {
+	}
+	else {
 		ret_code = mumps_io_do_write_block(address_block, block_size, &type_loc, vaddr, &ierr_loc);
 		*ierr = (MUMPS_INT)ierr_loc;
 		if(ret_code < 0) { *ierr = ret_code; }
@@ -332,7 +333,8 @@ MUMPS_LOW_LEVEL_READ_OOC_C(const MUMPS_INT* strat_IO,
 			mumps_io_error((MUMPS_INT)*ierr, buf);
 			return;
 		}
-	} else {
+	}
+	else {
 		mumps_io_do_read_block(address_block, block_size, &type_loc, vaddr, &ierr_loc);
 		*ierr = (MUMPS_INT)ierr_loc;
 		*request_arg = 1;
@@ -373,7 +375,8 @@ MUMPS_LOW_LEVEL_DIRECT_READ(void* address_block,
 		ierr_loc = mumps_io_do_read_block(address_block, block_size, &type_loc, vaddr, &ierr_loc);
 		*ierr = (MUMPS_INT)ierr_loc;
 		if(*ierr < 0) { return; }
-	} else { }
+	}
+	else { }
 #if ! defined(MUMPS_WIN32)
 # if ! defined(WITHOUT_PTHREAD)
 # endif

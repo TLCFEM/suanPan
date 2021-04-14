@@ -153,7 +153,8 @@ void cgstrs(trans_t trans, SuperMatrix* L, SuperMatrix* U,
 						c_sub(&rhs_work[irow], &rhs_work[irow], &temp_comp);
 					}
 				}
-			} else {
+			}
+			else {
 				luptr = L_NZ_START(fsupc);
 #ifdef USE_VENDOR_BLAS
 #if ( MACH==CRAY_PVP )
@@ -233,7 +234,8 @@ void cgstrs(trans_t trans, SuperMatrix* L, SuperMatrix* U,
 					c_div(&rhs_work[fsupc], &rhs_work[fsupc], &Lval[luptr]);
 					rhs_work += ldb;
 				}
-			} else {
+			}
+			else {
 #ifdef USE_VENDOR_BLAS
 #if ( MACH==CRAY_PVP )
 		ftcs1 = _cptofcd("L", strlen("L"));
@@ -275,7 +277,8 @@ void cgstrs(trans_t trans, SuperMatrix* L, SuperMatrix* U,
 			for(k = 0; k < n; k++) soln[k] = rhs_work[perm_c[k]];
 			for(k = 0; k < n; k++) rhs_work[k] = soln[k];
 		}
-	} else {
+	}
+	else {
 		/* Solve A'*X=B */
 		/* Permute right hand sides to form Pc'*B. */
 		for(i = 0, bptr = 0; i < nrhs; i++, bptr += ldb) {
@@ -292,7 +295,8 @@ void cgstrs(trans_t trans, SuperMatrix* L, SuperMatrix* U,
 				/* Multiply by inv(L'). */
 				sp_ctrsv("L", "T", "U", L, U, &Bmat[k * ldb], info);
 			}
-		} else {
+		}
+		else {
 			/* trans == CONJ */
 			for(k = 0; k < nrhs; ++k) {
 				/* Multiply by conj(inv(U')). */

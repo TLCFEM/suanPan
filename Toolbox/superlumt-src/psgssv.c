@@ -199,7 +199,8 @@ void psgssv(int_t nprocs, SuperMatrix* A, int_t* perm_c, int_t* perm_r,
 		                       Astore->nzval, Astore->colind, Astore->rowptr,
 		                       SLU_NC, A->Dtype, A->Mtype);
 		trans = TRANS;
-	} else if(A->Stype == SLU_NC) AA = A;
+	}
+	else if(A->Stype == SLU_NC) AA = A;
 
 	/* ------------------------------------------------------------
 	   Initialize the option structure superlumt_options using the

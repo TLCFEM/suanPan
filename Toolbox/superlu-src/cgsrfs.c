@@ -228,15 +228,17 @@ void cgsrfs(trans_t trans, SuperMatrix* A, SuperMatrix* L, SuperMatrix* U,
 	rwork = (float*)SUPERLU_MALLOC(A->nrow * sizeof(float));
 	iwork = intMalloc(A->nrow);
 	if(!work || !rwork || !iwork)
-	ABORT("Malloc fails for work/rwork/iwork.");
+		ABORT("Malloc fails for work/rwork/iwork.");
 
 	if(notran) {
 		*(unsigned char*)transc = 'N';
 		transt = TRANS;
-	} else if(trans == TRANS) {
+	}
+	else if(trans == TRANS) {
 		*(unsigned char*)transc = 'T';
 		transt = NOTRANS;
-	} else if(trans == CONJ) {
+	}
+	else if(trans == CONJ) {
 		*(unsigned char*)transc = 'C';
 		transt = NOTRANS;
 	}
@@ -253,7 +255,8 @@ void cgsrfs(trans_t trans, SuperMatrix* A, SuperMatrix* L, SuperMatrix* U,
 
 	/* Compute the number of nonzeros in each row (or column) of A */
 	for(i = 0; i < A->nrow; ++i) iwork[i] = 0;
-	if(notran) { for(k = 0; k < A->ncol; ++k) for(i = Astore->colptr[k]; i < Astore->colptr[k + 1]; ++i) ++iwork[Astore->rowind[i]]; } else { for(k = 0; k < A->ncol; ++k) iwork[k] = Astore->colptr[k + 1] - Astore->colptr[k]; }
+	if(notran) { for(k = 0; k < A->ncol; ++k) for(i = Astore->colptr[k]; i < Astore->colptr[k + 1]; ++i) ++iwork[Astore->rowind[i]]; }
+	else { for(k = 0; k < A->ncol; ++k) iwork[k] = Astore->colptr[k + 1] - Astore->colptr[k]; }
 
 	/* Copy one column of RHS B into Bjcol. */
 	Bjcol.Stype = B->Stype;
@@ -302,7 +305,8 @@ void cgsrfs(trans_t trans, SuperMatrix* A, SuperMatrix* L, SuperMatrix* U,
 					xk = c_abs1(&Xptr[k]);
 					for(i = Astore->colptr[k]; i < Astore->colptr[k + 1]; ++i) rwork[Astore->rowind[i]] += c_abs1(&Aval[i]) * xk;
 				}
-			} else {
+			}
+			else {
 				/* trans = TRANS or CONJ */
 				for(k = 0; k < A->ncol; ++k) {
 					s = 0.;
@@ -315,7 +319,8 @@ void cgsrfs(trans_t trans, SuperMatrix* A, SuperMatrix* L, SuperMatrix* U,
 			}
 			s = 0.;
 			for(i = 0; i < A->nrow; ++i) {
-				if(rwork[i] > safe2) { s = SUPERLU_MAX(s, c_abs1(&work[i]) / rwork[i]); } else if(rwork[i] != 0.0) { s = SUPERLU_MAX(s, (c_abs1(&work[i]) + safe1) / rwork[i]); }
+				if(rwork[i] > safe2) { s = SUPERLU_MAX(s, c_abs1(&work[i]) / rwork[i]); }
+				else if(rwork[i] != 0.0) { s = SUPERLU_MAX(s, (c_abs1(&work[i]) + safe1) / rwork[i]); }
 				/* If rwork[i] is exactly 0.0, then we know the true 
 				   residual also must be exactly 0.0. */
 			}
@@ -340,7 +345,8 @@ void cgsrfs(trans_t trans, SuperMatrix* A, SuperMatrix* L, SuperMatrix* U,
 #endif
 				lstres = berr[j];
 				++count;
-			} else { break; }
+			}
+			else { break; }
 		} /* end while */
 
 		stat->RefineSteps = count;
@@ -372,7 +378,8 @@ void cgsrfs(trans_t trans, SuperMatrix* A, SuperMatrix* L, SuperMatrix* U,
 				xk = c_abs1(&Xptr[k]);
 				for(i = Astore->colptr[k]; i < Astore->colptr[k + 1]; ++i) rwork[Astore->rowind[i]] += c_abs1(&Aval[i]) * xk;
 			}
-		} else {
+		}
+		else {
 			/* trans == TRANS or CONJ */
 			for(k = 0; k < A->ncol; ++k) {
 				s = 0.;
@@ -402,7 +409,8 @@ void cgsrfs(trans_t trans, SuperMatrix* A, SuperMatrix* L, SuperMatrix* U,
 				cgstrs(transt, L, U, perm_c, perm_r, &Bjcol, stat, info);
 
 				for(i = 0; i < A->nrow; ++i) { cs_mult(&work[i], &work[i], rwork[i]); }
-			} else {
+			}
+			else {
 				/* Multiply by (diag(C) or diag(R))*inv(op(A))*diag(W). */
 				for(i = 0; i < A->nrow; ++i) { cs_mult(&work[i], &work[i], rwork[i]); }
 
@@ -416,7 +424,9 @@ void cgsrfs(trans_t trans, SuperMatrix* A, SuperMatrix* L, SuperMatrix* U,
 
 		/* Normalize error. */
 		lstres = 0.;
-		if(notran && colequ) { for(i = 0; i < A->nrow; ++i) lstres = SUPERLU_MAX(lstres, C[i] * c_abs1( &Xptr[i])); } else if(!notran && rowequ) { for(i = 0; i < A->nrow; ++i) lstres = SUPERLU_MAX(lstres, R[i] * c_abs1( &Xptr[i])); } else { for(i = 0; i < A->nrow; ++i) lstres = SUPERLU_MAX(lstres, c_abs1( &Xptr[i])); }
+		if(notran && colequ) { for(i = 0; i < A->nrow; ++i) lstres = SUPERLU_MAX(lstres, C[i] * c_abs1( &Xptr[i])); }
+		else if(!notran && rowequ) { for(i = 0; i < A->nrow; ++i) lstres = SUPERLU_MAX(lstres, R[i] * c_abs1( &Xptr[i])); }
+		else { for(i = 0; i < A->nrow; ++i) lstres = SUPERLU_MAX(lstres, c_abs1( &Xptr[i])); }
 		if(lstres != 0.) ferr[j] /= lstres;
 	} /* for each RHS j ... */
 

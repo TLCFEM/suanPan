@@ -179,7 +179,8 @@ int ilu_ddrop_row(
 				d_max = 1.0 / d_max;
 				d_min = 1.0 / d_min;
 				tol = 1.0 / (d_max + (d_min - d_max) * quota / (m - n - r));
-			} else /* by quick select */
+			}
+			else /* by quick select */
 			{
 				int len = m1 - n + 1;
 				dcopy_(&len, dwork, &i_1, dwork2, &i_1);
@@ -262,7 +263,8 @@ int ilu_ddrop_row(
 
 			switch(milu) {
 			case SMILU_1:
-				if(t != none) { lusup[xlusup_first + j * inc_diag] *= (one + t); } else {
+				if(t != none) { lusup[xlusup_first + j * inc_diag] *= (one + t); }
+				else {
 					lusup[xlusup_first + j * inc_diag] *= *fill_tol;
 #ifdef DEBUG
 			printf("[1] ZERO PIVOT: FILL col %d.\n", first + j);

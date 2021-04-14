@@ -132,7 +132,8 @@ L20:
 			d__1 = 1 / d__1;
 			x[i].r *= d__1;
 			x[i].i *= d__1;
-		} else { x[i] = one; }
+		}
+		else { x[i] = one; }
 	}
 	*kase = 2;
 	jump = 2;
@@ -170,7 +171,8 @@ L90:
 			d__1 = 1 / d__1;
 			x[i].r *= d__1;
 			x[i].i *= d__1;
-		} else { x[i] = one; }
+		}
+		else { x[i] = one; }
 	}
 	*kase = 2;
 	jump = 4;

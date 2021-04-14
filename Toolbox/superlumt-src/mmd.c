@@ -370,7 +370,9 @@ L400:
 	for(j = jstrt; j <= i__1; ++j) {
 		node = adjncy[j];
 		link = -node;
-		if(node < 0) { goto L400; } else if(node == 0) { goto L900; } else { goto L500; }
+		if(node < 0) { goto L400; }
+		else if(node == 0) { goto L900; }
+		else { goto L500; }
 	L500:
 		if(marker[node] >= *tag || dforw[node] < 0) { goto L800; }
 		marker[node] = *tag;
@@ -406,7 +408,9 @@ L1100:
 	for(i = istrt; i <= i__1; ++i) {
 		rnode = adjncy[i];
 		link = -rnode;
-		if(rnode < 0) { goto L1100; } else if(rnode == 0) { goto L1800; } else { goto L1200; }
+		if(rnode < 0) { goto L1100; }
+		else if(rnode == 0) { goto L1800; }
+		else { goto L1200; }
 	L1200:
 		/*                -------------------------------------------- */
 		/*                IF RNODE IS IN THE DEGREE LIST STRUCTURE ... */
@@ -566,7 +570,9 @@ L400:
 	for(i = istrt; i <= i__1; ++i) {
 		enode = adjncy[i];
 		link = -enode;
-		if(enode < 0) { goto L400; } else if(enode == 0) { goto L800; } else { goto L500; }
+		if(enode < 0) { goto L400; }
+		else if(enode == 0) { goto L800; }
+		else { goto L500; }
 
 	L500:
 		if(qsize[enode] == 0) { goto L700; }
@@ -629,7 +635,9 @@ L1000:
 		node = adjncy[i];
 		link = -node;
 		if(node == enode) { goto L1400; }
-		if(node < 0) { goto L1000; } else if(node == 0) { goto L2100; } else { goto L1100; }
+		if(node < 0) { goto L1000; }
+		else if(node == 0) { goto L2100; }
+		else { goto L1100; }
 
 	L1100:
 		if(qsize[node] == 0) { goto L1400; }
@@ -719,7 +727,9 @@ L1600:
 		for(j = jstrt; j <= i__2; ++j) {
 			node = adjncy[j];
 			link = -node;
-			if(node < 0) { goto L1700; } else if(node == 0) { goto L2000; } else { goto L1800; }
+			if(node < 0) { goto L1700; }
+			else if(node == 0) { goto L2000; }
+			else { goto L1800; }
 
 		L1800:
 			if(marker[node] >= *tag) { goto L1900; }

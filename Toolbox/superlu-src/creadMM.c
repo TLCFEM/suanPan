@@ -77,10 +77,12 @@ void creadMM(FILE* fp, int* m, int* n, int* nonz,
 		if(!strcmp(arith, "complex")) {
 			printf("Complex matrix; use zreadMM instead!\n");
 			exit(-1);
-		} else if(!strcmp(arith, "pattern")) {
+		}
+		else if(!strcmp(arith, "pattern")) {
 			printf("Pattern matrix; values are needed!\n");
 			exit(-1);
-		} else {
+		}
+		else {
 			printf("Unknown arithmetic\n");
 			exit(-1);
 		}
@@ -89,7 +91,8 @@ void creadMM(FILE* fp, int* m, int* n, int* nonz,
 	if(strcmp(sym, "general")) {
 		printf("Symmetric matrix: will be expanded\n");
 		expand = 1;
-	} else expand = 0;
+	}
+	else expand = 0;
 
 	/* 2/ Skip comments */
 	while(banner[0] == '%') {
@@ -120,11 +123,11 @@ void creadMM(FILE* fp, int* m, int* n, int* nonz,
 	xa = *colptr;
 
 	if(!(val = (complex*)SUPERLU_MALLOC(new_nonz * sizeof(double))))
-	ABORT("Malloc fails for val[]");
+		ABORT("Malloc fails for val[]");
 	if(!(row = (int_t*)SUPERLU_MALLOC(new_nonz * sizeof(int_t))))
-	ABORT("Malloc fails for row[]");
+		ABORT("Malloc fails for row[]");
 	if(!(col = (int_t*)SUPERLU_MALLOC(new_nonz * sizeof(int_t))))
-	ABORT("Malloc fails for col[]");
+		ABORT("Malloc fails for col[]");
 
 	for(j = 0; j < *n; ++j) xa[j] = 0;
 
@@ -134,7 +137,8 @@ void creadMM(FILE* fp, int* m, int* n, int* nonz,
 			if(row[0] == 0 || col[0] == 0) {
 				zero_base = 1;
 				printf("triplet file: row/col indices are zero-based.\n");
-			} else { printf("triplet file: row/col indices are one-based.\n"); }
+			}
+			else { printf("triplet file: row/col indices are one-based.\n"); }
 
 		if(!zero_base) {
 			/* Change to 0-based indexing. */
@@ -143,7 +147,8 @@ void creadMM(FILE* fp, int* m, int* n, int* nonz,
 		}
 
 		if(row[nz] < 0 || row[nz] >= *m || col[nz] < 0 || col[nz] >= *n
-			/*|| val[nz] == 0.*/) { exit(-1); } else {
+			/*|| val[nz] == 0.*/) { exit(-1); }
+		else {
 			++xa[col[nz]];
 			if(expand) {
 				if(row[nz] != col[nz]) {

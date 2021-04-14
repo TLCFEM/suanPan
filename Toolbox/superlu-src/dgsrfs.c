@@ -228,15 +228,17 @@ void dgsrfs(trans_t trans, SuperMatrix* A, SuperMatrix* L, SuperMatrix* U,
 	rwork = (double*)SUPERLU_MALLOC(A->nrow * sizeof(double));
 	iwork = intMalloc(2 * A->nrow);
 	if(!work || !rwork || !iwork)
-	ABORT("Malloc fails for work/rwork/iwork.");
+		ABORT("Malloc fails for work/rwork/iwork.");
 
 	if(notran) {
 		*(unsigned char*)transc = 'N';
 		transt = TRANS;
-	} else if(trans == TRANS) {
+	}
+	else if(trans == TRANS) {
 		*(unsigned char*)transc = 'T';
 		transt = NOTRANS;
-	} else if(trans == CONJ) {
+	}
+	else if(trans == CONJ) {
 		*(unsigned char*)transc = 'C';
 		transt = NOTRANS;
 	}
@@ -253,7 +255,8 @@ void dgsrfs(trans_t trans, SuperMatrix* A, SuperMatrix* L, SuperMatrix* U,
 
 	/* Compute the number of nonzeros in each row (or column) of A */
 	for(i = 0; i < A->nrow; ++i) iwork[i] = 0;
-	if(notran) { for(k = 0; k < A->ncol; ++k) for(i = Astore->colptr[k]; i < Astore->colptr[k + 1]; ++i) ++iwork[Astore->rowind[i]]; } else { for(k = 0; k < A->ncol; ++k) iwork[k] = Astore->colptr[k + 1] - Astore->colptr[k]; }
+	if(notran) { for(k = 0; k < A->ncol; ++k) for(i = Astore->colptr[k]; i < Astore->colptr[k + 1]; ++i) ++iwork[Astore->rowind[i]]; }
+	else { for(k = 0; k < A->ncol; ++k) iwork[k] = Astore->colptr[k + 1] - Astore->colptr[k]; }
 
 	/* Copy one column of RHS B into Bjcol. */
 	Bjcol.Stype = B->Stype;
@@ -302,7 +305,8 @@ void dgsrfs(trans_t trans, SuperMatrix* A, SuperMatrix* L, SuperMatrix* U,
 					xk = fabs(Xptr[k]);
 					for(i = Astore->colptr[k]; i < Astore->colptr[k + 1]; ++i) rwork[Astore->rowind[i]] += fabs(Aval[i]) * xk;
 				}
-			} else {
+			}
+			else {
 				/* trans = TRANS or CONJ */
 				for(k = 0; k < A->ncol; ++k) {
 					s = 0.;
@@ -315,7 +319,8 @@ void dgsrfs(trans_t trans, SuperMatrix* A, SuperMatrix* L, SuperMatrix* U,
 			}
 			s = 0.;
 			for(i = 0; i < A->nrow; ++i) {
-				if(rwork[i] > safe2) { s = SUPERLU_MAX(s, fabs(work[i]) / rwork[i]); } else if(rwork[i] != 0.0) {
+				if(rwork[i] > safe2) { s = SUPERLU_MAX(s, fabs(work[i]) / rwork[i]); }
+				else if(rwork[i] != 0.0) {
 					/* Adding SAFE1 to the numerator guards against
 					   spuriously zero residuals (underflow). */
 					s = SUPERLU_MAX(s, (safe1 + fabs(work[i])) / rwork[i]);
@@ -344,7 +349,8 @@ void dgsrfs(trans_t trans, SuperMatrix* A, SuperMatrix* L, SuperMatrix* U,
 #endif
 				lstres = berr[j];
 				++count;
-			} else { break; }
+			}
+			else { break; }
 		} /* end while */
 
 		stat->RefineSteps = count;
@@ -376,7 +382,8 @@ void dgsrfs(trans_t trans, SuperMatrix* A, SuperMatrix* L, SuperMatrix* U,
 				xk = fabs(Xptr[k]);
 				for(i = Astore->colptr[k]; i < Astore->colptr[k + 1]; ++i) rwork[Astore->rowind[i]] += fabs(Aval[i]) * xk;
 			}
-		} else {
+		}
+		else {
 			/* trans == TRANS or CONJ */
 			for(k = 0; k < A->ncol; ++k) {
 				s = 0.;
@@ -408,7 +415,8 @@ void dgsrfs(trans_t trans, SuperMatrix* A, SuperMatrix* L, SuperMatrix* U,
 				dgstrs(transt, L, U, perm_c, perm_r, &Bjcol, stat, info);
 
 				for(i = 0; i < A->nrow; ++i) work[i] *= rwork[i];
-			} else {
+			}
+			else {
 				/* Multiply by (diag(C) or diag(R))*inv(op(A))*diag(W). */
 				for(i = 0; i < A->nrow; ++i) work[i] *= rwork[i];
 
@@ -422,7 +430,9 @@ void dgsrfs(trans_t trans, SuperMatrix* A, SuperMatrix* L, SuperMatrix* U,
 
 		/* Normalize error. */
 		lstres = 0.;
-		if(notran && colequ) { for(i = 0; i < A->nrow; ++i) lstres = SUPERLU_MAX(lstres, C[i] * fabs( Xptr[i])); } else if(!notran && rowequ) { for(i = 0; i < A->nrow; ++i) lstres = SUPERLU_MAX(lstres, R[i] * fabs( Xptr[i])); } else { for(i = 0; i < A->nrow; ++i) lstres = SUPERLU_MAX(lstres, fabs( Xptr[i])); }
+		if(notran && colequ) { for(i = 0; i < A->nrow; ++i) lstres = SUPERLU_MAX(lstres, C[i] * fabs( Xptr[i])); }
+		else if(!notran && rowequ) { for(i = 0; i < A->nrow; ++i) lstres = SUPERLU_MAX(lstres, R[i] * fabs( Xptr[i])); }
+		else { for(i = 0; i < A->nrow; ++i) lstres = SUPERLU_MAX(lstres, fabs( Xptr[i])); }
 		if(lstres != 0.) ferr[j] /= lstres;
 	} /* for each RHS j ... */
 

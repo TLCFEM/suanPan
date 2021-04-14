@@ -157,7 +157,8 @@ void pzgstrf_bmod2D_mv2(
 #ifdef TIMING
 	    utime[FLOAT] += SuperLU_timer_() - f_time;
 #endif
-		} else if(segsze <= 3) {
+		}
+		else if(segsze <= 3) {
 			ukj = dense_col[lsub[krep_ind]];
 			ukj1 = dense_col[lsub[krep_ind - 1]];
 			luptr += nsupr * (nsupc - 1) + nsupc - 1;
@@ -184,7 +185,8 @@ void pzgstrf_bmod2D_mv2(
 #ifdef TIMING
 		utime[FLOAT] += SuperLU_timer_() - f_time;
 #endif
-			} else {
+			}
+			else {
 				ukj2 = dense_col[lsub[krep_ind - 2]];
 				luptr2 = luptr1 - nsupr;
 				zz_mult(&comp_temp, &ukj2, &lusup[luptr2-1]);
@@ -218,7 +220,8 @@ void pzgstrf_bmod2D_mv2(
 #ifdef TIMING
 	    utime[FLOAT] += SuperLU_timer_() - f_time;
 #endif
-		} else {
+		}
+		else {
 			/* segsze >= 4 */
 			/* Copy A[*,j] segment from dense[*] to TriTmp[*], which
 			   holds the result of triangular solve.    */
@@ -304,7 +307,8 @@ void pzgstrf_bmod2D_mv2(
 					zmatvec((int_t)nsupr, (int_t)block_nrow, (int_t)segsze, &lusup[luptr],
 					        tri[0], matvec[0]);
 #endif
-				} else if(kfnz2[0] > kfnz2[1]) {
+				}
+				else if(kfnz2[0] > kfnz2[1]) {
 					no_zeros = kfnz2[1] - fsupc;
 					segsze = kfnz2[0] - kfnz2[1];
 					luptr = luptr1 + nsupr * no_zeros;
@@ -345,7 +349,8 @@ void pzgstrf_bmod2D_mv2(
 		utime[FLOAT] += SuperLU_timer_() - f_time;
 #endif
 				/* end for two destination update */
-			} else {
+			}
+			else {
 				/* wait for a second column */
 				jj2[0] = jj;
 				twocols = 1;

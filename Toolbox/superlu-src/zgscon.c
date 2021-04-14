@@ -118,7 +118,7 @@ void zgscon(char* norm, SuperMatrix* L, SuperMatrix* U,
 	work = doublecomplexCalloc(3 * L->nrow);
 
 	if(!work)
-	ABORT("Malloc fails for work arrays in zgscon.");
+		ABORT("Malloc fails for work arrays in zgscon.");
 
 	/* Estimate the norm of inv(A). */
 	ainvnm = 0.;
@@ -137,7 +137,8 @@ void zgscon(char* norm, SuperMatrix* L, SuperMatrix* U,
 
 			/* Multiply by inv(U). */
 			sp_ztrsv("U", "No trans", "Non-unit", L, U, &work[0], stat, info);
-		} else {
+		}
+		else {
 
 			/* Multiply by inv(U'). */
 			sp_ztrsv("U", "Transpose", "Non-unit", L, U, &work[0], stat, info);

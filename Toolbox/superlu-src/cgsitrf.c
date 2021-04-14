@@ -344,7 +344,8 @@ void cgsitrf(superlu_options_t* options, SuperMatrix* A, int relax, int panel_si
 					quota = 0;
 					for(i = first; i <= last; i++) quota += xa_end[i] - xa_begin[i];
 					quota = gamma * quota * (m - first) / m;
-				} else if(drop_rule & DROP_AREA)
+				}
+				else if(drop_rule & DROP_AREA)
 					quota = gamma * nnzAj * (1.0 - 0.5 * (last + 1.0) / m)
 						- nnzLj;
 				else quota = m * n;
@@ -418,7 +419,8 @@ void cgsitrf(superlu_options_t* options, SuperMatrix* A, int relax, int panel_si
 			}
 
 			jcol = kcol + 1;
-		} else {
+		}
+		else {
 			/* Work on one panel of panel_size columns */
 
 			/* Adjust panel_size so that a panel won't overlap with the next
@@ -551,7 +553,8 @@ void cgsitrf(superlu_options_t* options, SuperMatrix* A, int relax, int panel_si
 						quota = 0;
 						for(i = first; i <= last; i++) quota += xa_end[i] - xa_begin[i];
 						quota = gamma * quota * (m - first) / m;
-					} else if(drop_rule & DROP_AREA)
+					}
+					else if(drop_rule & DROP_AREA)
 						quota = gamma * nnzAj * (1.0 - 0.5 * (last + 1.0)
 							/ m) - nnzLj;
 					else quota = m * n;
@@ -616,7 +619,8 @@ void cgsitrf(superlu_options_t* options, SuperMatrix* A, int relax, int panel_si
 		((NCformat*)U->Store)->nzval = (complex*)Glu->ucol;
 		((NCformat*)U->Store)->rowind = Glu->usub;
 		((NCformat*)U->Store)->colptr = Glu->xusub;
-	} else {
+	}
+	else {
 		cCreate_SuperNode_Matrix(L, A->nrow, min_mn, nnzL,
 		                         (complex*)Glu->lusup, Glu->xlusup,
 		                         Glu->lsub, Glu->xlsub, Glu->supno, Glu->xsup,

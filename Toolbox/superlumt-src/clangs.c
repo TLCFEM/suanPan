@@ -71,11 +71,13 @@ float clangs(char* norm, SuperMatrix* A) {
 	Astore = A->Store;
 	Aval = Astore->nzval;
 
-	if(SUPERLU_MIN(A->nrow, A->ncol) == 0) { value = 0.; } else if(lsame_(norm, "M")) {
+	if(SUPERLU_MIN(A->nrow, A->ncol) == 0) { value = 0.; }
+	else if(lsame_(norm, "M")) {
 		/* Find max(abs(A(i,j))). */
 		value = 0.;
 		for(j = 0; j < A->ncol; ++j) for(i = Astore->colptr[j]; i < Astore->colptr[j + 1]; i++) value = SUPERLU_MAX(value, c_abs( &Aval[i]));
-	} else if(lsame_(norm, "O") || *(unsigned char*)norm == '1') {
+	}
+	else if(lsame_(norm, "O") || *(unsigned char*)norm == '1') {
 		/* Find norm1(A). */
 		value = 0.;
 		for(j = 0; j < A->ncol; ++j) {
@@ -83,10 +85,11 @@ float clangs(char* norm, SuperMatrix* A) {
 			for(i = Astore->colptr[j]; i < Astore->colptr[j + 1]; i++) sum += c_abs(&Aval[i]);
 			value = SUPERLU_MAX(value, sum);
 		}
-	} else if(lsame_(norm, "I")) {
+	}
+	else if(lsame_(norm, "I")) {
 		/* Find normI(A). */
 		if(!(rwork = (float*)SUPERLU_MALLOC((size_t) A->nrow * sizeof(float))))
-		SUPERLU_ABORT("SUPERLU_MALLOC fails for rwork.");
+			SUPERLU_ABORT("SUPERLU_MALLOC fails for rwork.");
 		for(i = 0; i < A->nrow; ++i) rwork[i] = 0.;
 		for(j = 0; j < A->ncol; ++j)
 			for(i = Astore->colptr[j]; i < Astore->colptr[j + 1]; i++) {
@@ -97,11 +100,13 @@ float clangs(char* norm, SuperMatrix* A) {
 		for(i = 0; i < A->nrow; ++i) value = SUPERLU_MAX(value, rwork[i]);
 
 		SUPERLU_FREE(rwork);
-	} else if(lsame_(norm, "F") || lsame_(norm, "E")) {
+	}
+	else if(lsame_(norm, "F") || lsame_(norm, "E")) {
 		/* Find normF(A). */
 		SUPERLU_ABORT("Not implemented.");
-	} else
-	SUPERLU_ABORT("Illegal norm specified.");
+	}
+	else
+		SUPERLU_ABORT("Illegal norm specified.");
 
 	return (value);
 

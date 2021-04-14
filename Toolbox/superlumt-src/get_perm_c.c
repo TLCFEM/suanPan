@@ -44,9 +44,9 @@ void get_colamd(
 	COLAMD_set_defaults(knobs);
 
 	if(!(A = (int_t*)SUPERLU_MALLOC(Alen * sizeof(int_t))))
-	SUPERLU_ABORT("Malloc fails for A[]");
+		SUPERLU_ABORT("Malloc fails for A[]");
 	if(!(p = (int_t*)SUPERLU_MALLOC((n+1) * sizeof(int_t))))
-	SUPERLU_ABORT("Malloc fails for p[]");
+		SUPERLU_ABORT("Malloc fails for p[]");
 	for(i = 0; i <= n; ++i) p[i] = colptr[i];
 	for(i = 0; i < nnz; ++i) A[i] = rowind[i];
 
@@ -97,11 +97,11 @@ void getata(
 	int_t *t_colptr, *t_rowind; /* a column oriented form of T = A' */
 
 	if(!(marker = (int_t*)SUPERLU_MALLOC((SUPERLU_MAX(m,n)+1) * sizeof(int_t))))
-	SUPERLU_ABORT("SUPERLU_MALLOC fails for marker[]");
+		SUPERLU_ABORT("SUPERLU_MALLOC fails for marker[]");
 	if(!(t_colptr = (int_t*)SUPERLU_MALLOC((m+1) * sizeof(int_t))))
-	SUPERLU_ABORT("SUPERLU_MALLOC t_colptr[]");
+		SUPERLU_ABORT("SUPERLU_MALLOC t_colptr[]");
 	if(!(t_rowind = (int_t*)SUPERLU_MALLOC(nz * sizeof(int_t))))
-	SUPERLU_ABORT("SUPERLU_MALLOC fails for t_rowind[]");
+		SUPERLU_ABORT("SUPERLU_MALLOC fails for t_rowind[]");
 
 	/* Get counts of each column of T, and set up column pointers */
 	for(i = 0; i < m; ++i) marker[i] = 0;
@@ -158,10 +158,10 @@ void getata(
 
 	/* Allocate storage for A'*A */
 	if(!(*ata_colptr = (int_t*)SUPERLU_MALLOC((n+1) * sizeof(int_t))))
-	SUPERLU_ABORT("SUPERLU_MALLOC fails for ata_colptr[]");
+		SUPERLU_ABORT("SUPERLU_MALLOC fails for ata_colptr[]");
 	if(*atanz) {
 		if(!(*ata_rowind = (int_t*)SUPERLU_MALLOC(*atanz * sizeof(int_t))))
-		SUPERLU_ABORT("SUPERLU_MALLOC fails for ata_rowind[]");
+			SUPERLU_ABORT("SUPERLU_MALLOC fails for ata_rowind[]");
 	}
 	b_colptr = *ata_colptr; /* aliasing */
 	b_rowind = *ata_rowind;
@@ -221,11 +221,11 @@ void at_plus_a(
 	int_t* marker;
 
 	if(!(marker = (int_t*)SUPERLU_MALLOC(n * sizeof(int_t))))
-	SUPERLU_ABORT("SUPERLU_MALLOC fails for marker[]");
+		SUPERLU_ABORT("SUPERLU_MALLOC fails for marker[]");
 	if(!(t_colptr = (int_t*)SUPERLU_MALLOC((n+1) * sizeof(int_t))))
-	SUPERLU_ABORT("SUPERLU_MALLOC fails for t_colptr[]");
+		SUPERLU_ABORT("SUPERLU_MALLOC fails for t_colptr[]");
 	if(!(t_rowind = (int_t*)SUPERLU_MALLOC(nz * sizeof(int_t))))
-	SUPERLU_ABORT("SUPERLU_MALLOC fails t_rowind[]");
+		SUPERLU_ABORT("SUPERLU_MALLOC fails t_rowind[]");
 
 	/* Get counts of each column of T, and set up column pointers */
 	for(i = 0; i < n; ++i) marker[i] = 0;
@@ -283,10 +283,10 @@ void at_plus_a(
 
 	/* Allocate storage for A+A' */
 	if(!(*b_colptr = (int_t*)SUPERLU_MALLOC((n+1) * sizeof(int_t))))
-	SUPERLU_ABORT("SUPERLU_MALLOC fails for b_colptr[]");
+		SUPERLU_ABORT("SUPERLU_MALLOC fails for b_colptr[]");
 	if(*bnz) {
 		if(!(*b_rowind = (int_t*)SUPERLU_MALLOC(*bnz * sizeof(int_t))))
-		SUPERLU_ABORT("SUPERLU_MALLOC fails for b_rowind[]");
+			SUPERLU_ABORT("SUPERLU_MALLOC fails for b_rowind[]");
 	}
 
 	/* Zero the diagonal flag */
@@ -407,7 +407,7 @@ void get_perm_c(int_t ispec, SuperMatrix* A, int_t* perm_c)
 #endif
 		return;
 	default:
-	SUPERLU_ABORT("Invalid ISPEC");
+		SUPERLU_ABORT("Invalid ISPEC");
 	}
 
 	if(bnz != 0) {
@@ -451,7 +451,8 @@ void get_perm_c(int_t ispec, SuperMatrix* A, int_t* perm_c)
 	printf("call GENMMD time = %8.3f\n", t);
 #endif
 
-	} else {
+	}
+	else {
 		/* Empty adjacency structure */
 		for(i = 0; i < n; ++i) perm_c[i] = i;
 	}

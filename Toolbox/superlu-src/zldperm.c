@@ -106,7 +106,7 @@ int zldperm(int_t job, int_t n, int_t nnz, int_t colptr[], int_t adjncy[],
 	if(!(iw = intMalloc(liw))) ABORT("Malloc fails for iw[]");
 	ldw = 3 * n + nnz;
 	if(!(dw = (double*)SUPERLU_MALLOC(ldw * sizeof(double))))
-	ABORT("Malloc fails for dw[]");
+		ABORT("Malloc fails for dw[]");
 
 	/* Increment one to get 1-based indexing. */
 	for(i = 0; i <= n; ++i) ++colptr[i];

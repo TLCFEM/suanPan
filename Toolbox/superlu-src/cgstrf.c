@@ -275,7 +275,8 @@ void cgstrf(superlu_options_t* options, SuperMatrix* A,
 
 	/* Identify relaxed snodes */
 	relax_end = (int*)intMalloc(n);
-	if(options->SymmetricMode == YES) { heap_relax_snode(n, etree, relax, marker, relax_end); } else { relax_snode(n, etree, relax, marker, relax_end); }
+	if(options->SymmetricMode == YES) { heap_relax_snode(n, etree, relax, marker, relax_end); }
+	else { relax_snode(n, etree, relax, marker, relax_end); }
 
 	ifill(perm_r, m, EMPTY);
 	ifill(marker, m * NO_MARKER, EMPTY);
@@ -330,7 +331,8 @@ void cgstrf(superlu_options_t* options, SuperMatrix* A,
 			}
 
 			jcol = icol;
-		} else {
+		}
+		else {
 			/* Work on one panel of panel_size columns */
 
 			/* Adjust panel_size so that a panel won't overlap with the next 
@@ -430,7 +432,8 @@ void cgstrf(superlu_options_t* options, SuperMatrix* A,
 		((NCformat*)U->Store)->nzval = (complex*)Glu->ucol;
 		((NCformat*)U->Store)->rowind = Glu->usub;
 		((NCformat*)U->Store)->colptr = Glu->xusub;
-	} else {
+	}
+	else {
 		cCreate_SuperNode_Matrix(L, A->nrow, min_mn, nnzL,
 		                         (complex*)Glu->lusup, Glu->xlusup,
 		                         Glu->lsub, Glu->xlsub, Glu->supno, Glu->xsup,

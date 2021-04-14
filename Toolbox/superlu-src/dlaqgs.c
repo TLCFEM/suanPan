@@ -122,7 +122,8 @@ void dlaqgs(SuperMatrix* A, double* r, double* c,
 			}
 			*(unsigned char*)equed = 'C';
 		}
-	} else if(colcnd >= THRESH) {
+	}
+	else if(colcnd >= THRESH) {
 		/* Row scaling, no column scaling */
 		for(j = 0; j < A->ncol; ++j)
 			for(i = Astore->colptr[j]; i < Astore->colptr[j + 1]; ++i) {
@@ -130,7 +131,8 @@ void dlaqgs(SuperMatrix* A, double* r, double* c,
 				Aval[i] *= r[irow];
 			}
 		*(unsigned char*)equed = 'R';
-	} else {
+	}
+	else {
 		/* Row and column scaling */
 		for(j = 0; j < A->ncol; ++j) {
 			cj = c[j];

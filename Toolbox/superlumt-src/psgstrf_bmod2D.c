@@ -151,7 +151,8 @@ void psgstrf_bmod2D(
 #ifdef TIMING
 	    utime[FLOAT] += SuperLU_timer_() - f_time;
 #endif
-		} else if(segsze <= 3) {
+		}
+		else if(segsze <= 3) {
 			ukj = dense_col[lsub[krep_ind]];
 			ukj1 = dense_col[lsub[krep_ind - 1]];
 			luptr += nsupr * (nsupc - 1) + nsupc - 1;
@@ -175,7 +176,8 @@ void psgstrf_bmod2D(
 #ifdef TIMING
 		utime[FLOAT] += SuperLU_timer_() - f_time;
 #endif
-			} else {
+			}
+			else {
 				ukj2 = dense_col[lsub[krep_ind - 2]];
 				luptr2 = luptr1 - nsupr;
 				ukj1 -= ukj2 * lusup[luptr2 - 1];
@@ -200,7 +202,8 @@ void psgstrf_bmod2D(
 #ifdef TIMING
 	    utime[FLOAT] += SuperLU_timer_() - f_time;
 #endif
-		} else {
+		}
+		else {
 			/* segsze >= 4 */
 			/* Copy A[*,j] segment from dense[*] to TriTmp[*], which
 			   holds the result of triangular solve.    */

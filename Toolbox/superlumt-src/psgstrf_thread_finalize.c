@@ -88,7 +88,8 @@ void psgstrf_thread_finalize(psgstrf_threadarg_t* psgstrf_threadarg,
 		((SCPformat*)L->Store)->nnz = nnzL;
 		((SCPformat*)L->Store)->nsuper = Glu->supno[n];
 		((NCPformat*)U->Store)->nnz = nnzU;
-	} else {
+	}
+	else {
 		sCreate_SuperNode_Permuted(L, A->nrow, A->ncol, nnzL, Glu->lusup,
 		                           Glu->xlusup, Glu->xlusup_end,
 		                           Glu->lsub, Glu->xlsub, Glu->xlsub_end,

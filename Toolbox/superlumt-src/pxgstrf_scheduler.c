@@ -140,14 +140,16 @@ void pxgstrf_scheduler(const int_t pnum, const int_t n, const int_t* etree,
 #ifdef PROFILE
 	    ++(Gstat->panhows[DADPAN]);
 #endif
-			} else {
+			}
+			else {
 				/* Try to get a panel from the task Q. */
 				while(1) {
 					/*>>if ( (j = Dequeue(taskq, &item)) == EMPTY ) {*/
 					if(taskq->count <= 0) {
 						jcol = EMPTY;
 						break;
-					} else {
+					}
+					else {
 						jcol = taskq->queue[taskq->head++];
 						--taskq->count;
 						if(STATE(jcol) >= CANGO) {
@@ -165,7 +167,8 @@ void pxgstrf_scheduler(const int_t pnum, const int_t n, const int_t* etree,
 					}
 				} /* while */
 			}
-		} else {
+		}
+		else {
 			/*
 			 * jcol was EMPTY; Try to get a panel from the task Q.
 			 */
@@ -174,7 +177,8 @@ void pxgstrf_scheduler(const int_t pnum, const int_t n, const int_t* etree,
 				if(taskq->count <= 0) {
 					jcol = EMPTY;
 					break;
-				} else {
+				}
+				else {
 					jcol = taskq->queue[taskq->head++];
 					--taskq->count;
 					if(STATE(jcol) >= CANGO) {

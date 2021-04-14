@@ -120,7 +120,7 @@ void sp_colorder(SuperMatrix* A, int_t* perm_c, superlumt_options_t* options,
 			c_colbeg = (int_t*)intMalloc(n);
 			c_colend = (int_t*)intMalloc(n);
 			if(!(c_colbeg) || !(c_colend))
-			SUPERLU_ABORT("SUPERLU_MALLOC fails for c_colbeg/c_colend");
+				SUPERLU_ABORT("SUPERLU_MALLOC fails for c_colbeg/c_colend");
 			for(i = 0; i < n; i++) {
 				c_colbeg[perm_c[i]] = b_colptr[i];
 				c_colend[perm_c[i]] = b_colptr[i + 1];
@@ -139,7 +139,8 @@ void sp_colorder(SuperMatrix* A, int_t* perm_c, superlumt_options_t* options,
 
 			SUPERLU_FREE(c_colbeg);
 			SUPERLU_FREE(c_colend);
-		} else {
+		}
+		else {
 			/* Compute the column elimination tree. */
 			sp_coletree(ACstore->colbeg, ACstore->colend, ACstore->rowind,
 			            A->nrow, A->ncol, options->etree);
@@ -218,7 +219,8 @@ void sp_colorder(SuperMatrix* A, int_t* perm_c, superlumt_options_t* options,
 			SUPERLU_FREE(b_colptr);
 			if(bnz)
 				SUPERLU_FREE(b_rowind);
-		} else {
+		}
+		else {
 			/* Determine the row and column counts in the QR factor. */
 			qrnzcnt(n, nnz, Astore->colptr, Astore->rowind, iperm,
 			        invp, perm_c, options->etree, options->colcnt_h, &nlnz,
@@ -289,7 +291,8 @@ int_t dcheck_perm(char* what, int_t n, int_t* perm) {
 		if(marker[perm[i]] == 1 || perm[i] >= n) {
 			printf("%s: Not a valid PERM[" IFMT "] = " IFMT "\n", what, i, perm[i]);
 			SUPERLU_ABORT("Invalid perm.");
-		} else { marker[perm[i]] = 1; }
+		}
+		else { marker[perm[i]] = 1; }
 	}
 
 	return 0;

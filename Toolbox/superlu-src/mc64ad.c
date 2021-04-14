@@ -428,7 +428,8 @@ int_t mc64ad_(int_t* job, int_t* n, int_t* ne, int_t*
 						       info[1], j, i__);
 					}
 					goto L99;
-				} else { iw[i__] = j; }
+				}
+				else { iw[i__] = j; }
 				/* L4: */
 			}
 			/* L6: */
@@ -538,10 +539,12 @@ int_t mc64ad_(int_t* job, int_t* n, int_t* ne, int_t*
 				/* L60: */
 			}
 			dw[(*n << 1) + j] = fact;
-			if(fact != 0.) { fact = log(fact); } else { fact = rinf / *n; }
+			if(fact != 0.) { fact = log(fact); }
+			else { fact = rinf / *n; }
 			i__2 = ip[j + 1] - 1;
 			for(k = ip[j]; k <= i__2; ++k) {
-				if(dw[*n * 3 + k] != 0.) { dw[*n * 3 + k] = fact - log(dw[*n * 3 + k]); } else { dw[*n * 3 + k] = rinf / *n; }
+				if(dw[*n * 3 + k] != 0.) { dw[*n * 3 + k] = fact - log(dw[*n * 3 + k]); }
+				else { dw[*n * 3 + k] = rinf / *n; }
 				/* L70: */
 			}
 			/* L75: */
@@ -553,7 +556,8 @@ int_t mc64ad_(int_t* job, int_t* n, int_t* ne, int_t*
 		if(*num == *n) {
 			i__1 = *n;
 			for(j = 1; j <= i__1; ++j) {
-				if(dw[(*n << 1) + j] != 0.) { dw[*n + j] -= log(dw[(*n << 1) + j]); } else { dw[*n + j] = 0.; }
+				if(dw[(*n << 1) + j] != 0.) { dw[*n + j] -= log(dw[(*n << 1) + j]); }
+				else { dw[*n + j] = 0.; }
 				/* L80: */
 			}
 		}
@@ -711,7 +715,8 @@ int_t mc64bd_(int_t* n, int_t* ne, int_t* ip, int_t*
 				jperm[j] = i__;
 				iperm[i__] = j;
 				++(*num);
-			} else {
+			}
+			else {
 				if(ai <= a0) { goto L30; }
 				a0 = ai;
 				i0 = i__;
@@ -813,13 +818,15 @@ int_t mc64bd_(int_t* n, int_t* ne, int_t* ip, int_t*
 				isp = i__;
 				jsp = j;
 				if(csp >= bv) { goto L160; }
-			} else {
+			}
+			else {
 				d__[i__] = dnew;
 				if(dnew >= bv) {
 					/* Add row I to Q2 */
 					--low;
 					q[low] = i__;
-				} else {
+				}
+				else {
 					/* Add row I to Q, and push it */
 					++qlen;
 					l[i__] = qlen;
@@ -875,7 +882,8 @@ int_t mc64bd_(int_t* n, int_t* ne, int_t* ip, int_t*
 					isp = i__;
 					jsp = j;
 					if(csp >= bv) { goto L160; }
-				} else {
+				}
+				else {
 					di = d__[i__];
 					if(di >= bv || di >= dnew) { goto L155; }
 					d__[i__] = dnew;
@@ -888,7 +896,8 @@ int_t mc64bd_(int_t* n, int_t* ne, int_t* ip, int_t*
 						l[i__] = 0;
 						--low;
 						q[low] = i__;
-					} else {
+					}
+					else {
 						/* Add row I to Q (if necessary); push row I up Q */
 						if(di == -1.) {
 							++qlen;
@@ -965,7 +974,8 @@ int_t mc64bd_(int_t* n, int_t* ne, int_t* ip, int_t*
 		if(iperm[i__] == 0) {
 			++k;
 			pr[k] = i__;
-		} else {
+		}
+		else {
 			j = iperm[i__];
 			jperm[j] = i__;
 		}
@@ -1034,7 +1044,8 @@ int_t mc64dd_(int_t* i__, int_t* n, int_t* q, double
 			/* L10: */
 		}
 		/* End of dummy loop; this point is never reached */
-	} else {
+	}
+	else {
 		i__1 = *n;
 		for(idum = 1; idum <= i__1; ++idum) {
 			if(pos <= 1) { goto L20; }
@@ -1112,7 +1123,8 @@ int_t mc64ed_(int_t* qlen, int_t* n, int_t* q,
 			/* L10: */
 		}
 		/* End of dummy loop; this point is never reached */
-	} else {
+	}
+	else {
 		i__1 = *n;
 		for(idum = 1; idum <= i__1; ++idum) {
 			posk = pos << 1;
@@ -1218,7 +1230,8 @@ int_t mc64fd_(int_t* pos0, int_t* qlen, int_t* n,
 			/* L30: */
 		}
 		/* End of dummy loop; this point is never reached */
-	} else {
+	}
+	else {
 		i__1 = *n;
 		for(idum = 1; idum <= i__1; ++idum) {
 			if(pos <= 1) { goto L34; }
@@ -1348,7 +1361,8 @@ int_t mc64rd_(int_t* n, int_t* ne, int_t* ip, int_t*
 			todo[td] = mid;
 			todo[td - 1] = mid;
 			/*          TODO(TD-1) = FIRST */
-		} else {
+		}
+		else {
 			todo[td + 1] = mid;
 			todo[td] = first;
 			todo[td - 1] = last;
@@ -1376,7 +1390,8 @@ int_t mc64rd_(int_t* n, int_t* ne, int_t* ip, int_t*
 					if(a[s - 1] < ha) {
 						a[s] = a[s - 1];
 						irn[s] = irn[s - 1];
-					} else {
+					}
+					else {
 						a[s] = ha;
 						irn[s] = hi;
 						goto L200;
@@ -1492,7 +1507,8 @@ int_t mc64sd_(int_t* n, int_t* ne, int_t* ip, int_t*
 	if(num != *n) {
 		/* Matrix is structurally singular */
 		bmax = rinf;
-	} else {
+	}
+	else {
 		/* Matrix is structurally nonsingular, NUM=NUMX=N; */
 		/* Set BMAX just above the smallest of all the maximum absolute */
 		/* values of the columns */
@@ -1585,7 +1601,8 @@ int_t mc64sd_(int_t* n, int_t* ne, int_t* ip, int_t*
 					if(lenl[j] == lenh[j]) {
 						w[k] = w[wlen];
 						--wlen;
-					} else { ++k; }
+					}
+					else { ++k; }
 					/* L70: */
 				}
 			L71:
@@ -1596,7 +1613,8 @@ int_t mc64sd_(int_t* n, int_t* ne, int_t* ip, int_t*
 			/* Set mode for next call to MC64U/UD */
 		L81:
 			mod = 1;
-		} else {
+		}
+		else {
 			/* We do not have a maximum matching in IW. */
 			bmax = bval;
 			/* BMIN is the bottleneck value of a maximum matching; */
@@ -1625,7 +1643,8 @@ int_t mc64sd_(int_t* n, int_t* ne, int_t* ip, int_t*
 				if(lenl[j] == lenh[j]) {
 					w[k] = w[wlen];
 					--wlen;
-				} else { ++k; }
+				}
+				else { ++k; }
 				/* L87: */
 			}
 			/* End of dummy loop; this point is never reached */
@@ -1657,7 +1676,8 @@ L99:
 		if(iperm[i__] == 0) {
 			++k;
 			iw[k] = i__;
-		} else {
+		}
+		else {
 			j = iperm[i__];
 			w[j] = i__;
 		}
@@ -1731,7 +1751,8 @@ int_t mc64qd_(int_t* ip, int_t* lenl, int_t* lenh,
 			if(*nval == 0) {
 				split[0] = ha;
 				*nval = 1;
-			} else {
+			}
+			else {
 				/* Check presence of HA in SPLIT */
 				for(s = *nval; s >= 1; --s) {
 					if(split[s - 1] == ha) { goto L15; }
@@ -1822,7 +1843,8 @@ int_t mc64ud_(int_t* id, int_t* mod, int_t* n, int_t*
 		}
 		num1 = *n;
 		num2 = *n;
-	} else {
+	}
+	else {
 		/* Not the first call to MC64U/UD. */
 		/* Re-initialize ARP if entries were deleted since last call to MC64U/UD */
 		if(*mod == 1) {
@@ -2174,7 +2196,8 @@ int_t mc64wd_(int_t* n, int_t* ne, int_t* ip, int_t*
 				csp = dnew;
 				isp = k;
 				jsp = j;
-			} else {
+			}
+			else {
 				if(dnew < dmin__) { dmin__ = dnew; }
 				d__[i__] = dnew;
 				++qlen;
@@ -2198,7 +2221,8 @@ int_t mc64wd_(int_t* n, int_t* ne, int_t* ip, int_t*
 				--low;
 				q[low] = i__;
 				l[i__] = low;
-			} else {
+			}
+			else {
 				++qlen;
 				l[i__] = qlen;
 				mc64dd_(&i__, n, &q[1], &d__[1], &l[1], &c__2);
@@ -2251,7 +2275,8 @@ int_t mc64wd_(int_t* n, int_t* ne, int_t* ip, int_t*
 					csp = dnew;
 					isp = k;
 					jsp = j;
-				} else {
+				}
+				else {
 					/* Row I is matched; do not update D(I) if DNEW is larger */
 					di = d__[i__];
 					if(di <= dnew) { goto L155; }
@@ -2265,7 +2290,8 @@ int_t mc64wd_(int_t* n, int_t* ne, int_t* ip, int_t*
 						--low;
 						q[low] = i__;
 						l[i__] = low;
-					} else {
+					}
+					else {
 						if(l[i__] == 0) {
 							++qlen;
 							l[i__] = qlen;
@@ -2335,7 +2361,8 @@ L1000:
 	i__1 = *n;
 	for(j = 1; j <= i__1; ++j) {
 		k = jperm[j];
-		if(k != 0) { d__[j] = a[k] - u[irn[k]]; } else { d__[j] = 0.; }
+		if(k != 0) { d__[j] = a[k] - u[irn[k]]; }
+		else { d__[j] = 0.; }
 		if(iperm[j] == 0) { u[j] = 0.; }
 		/* L200: */
 	}
@@ -2353,7 +2380,8 @@ L1000:
 		if(iperm[i__] == 0) {
 			++k;
 			out[k] = i__;
-		} else {
+		}
+		else {
 			j = iperm[i__];
 			jperm[j] = i__;
 		}

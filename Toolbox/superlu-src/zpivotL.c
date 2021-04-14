@@ -184,7 +184,7 @@ if ( jcol == MIN_COL ) {
 
 	z_div(&temp, &one, &lu_col_ptr[nsupc]);
 	for(k = nsupc + 1; k < nsupr; k++)
-	zz_mult(&lu_col_ptr[k], &lu_col_ptr[k], &temp);
+		zz_mult(&lu_col_ptr[k], &lu_col_ptr[k], &temp);
 
 	return 0;
 }
