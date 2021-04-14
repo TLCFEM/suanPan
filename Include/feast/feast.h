@@ -165,7 +165,7 @@ void zifeast_scsrpev_(char* UPLO, int* d, int* N, double* sa, int* isa, int* jsa
 void difeast_gcsrpevx_(int* d, int* N, double* sa, int* isa, int* jsa, int* fpm, double* epsout, int* loop, double* Emid, double* r, int* M0, double* lambda, double* q, int* mode, double* res, int* info, double* Zne, double* Wne);
 void difeast_gcsrpev_(int* d, int* N, double* sa, int* isa, int* jsa, int* fpm, double* epsout, int* loop, double* Emid, double* r, int* M0, double* lambda, double* q, int* mode, double* res, int* info);
 
-void feastinitext_(int* fpm);
+void feastinit_(int* fpm);
 void feastinit_driver_(int* fpm, int* N);
 void cfeast_customcontour_(int* fpm2, int* N, int* Nedge, int* Tedge, float* Zedge, float* Zne, float* Wne);
 void zfeast_customcontour_(int* fpm2, int* N, int* Nedge, int* Tedge, double* Zedge, double* Zne, double* Wne);

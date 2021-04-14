@@ -27,7 +27,7 @@ int FEAST::linear_solve(const shared_ptr<LongFactory>& W) const {
 
 	std::vector fpm(64, 0);
 
-	feastinitext_(fpm.data());
+	feastinit_(fpm.data());
 
 #ifdef SUANPAN_DEBUG
 	fpm[0] = 1;
@@ -89,9 +89,10 @@ int FEAST::linear_solve(const shared_ptr<LongFactory>& W) const {
 }
 
 int FEAST::quadratic_solve(const shared_ptr<LongFactory>& W) const {
+	/*
 	std::vector fpm(64, 0);
 
-	feastinitext_(fpm.data());
+	feastinit_(fpm.data());
 
 #ifdef SUANPAN_DEBUG
 	fpm[0] = 1;
@@ -175,7 +176,7 @@ int FEAST::quadratic_solve(const shared_ptr<LongFactory>& W) const {
 	eigvec.resize(N, output[2]);
 
 	for(uword I = 0; I < eigvec.n_elem; ++I) eigvec(I) = X[2 * I];
-
+	*/
 	return SUANPAN_SUCCESS;
 }
 

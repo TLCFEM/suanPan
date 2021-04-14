@@ -1,5 +1,9 @@
 # Changelog
 
+## known issues
+
+1. `MKL` includes outdated `FEAST`, the quadratic eigen problem cannot be handled by external `FEAST` library.
+
 ## version 1.x
 
 1. add `R2D2` and `R3D2` alias for fixed length constraint

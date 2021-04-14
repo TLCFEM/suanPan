@@ -4354,7 +4354,7 @@ if ((it==itmax).and.(dres(1)>eps).and.(dres(it)>eps)) then
 
 
   MW = max(M0/2,1) ! number of wanted eigenvalue
-  call feastinitext(fpm)
+  call feastinit(fpm)
 
   MS=min(10,N) ! (10 is enough for the stochastic search)
   allocate(dE(MS))     
@@ -4425,7 +4425,7 @@ if ((it==itmax).and.(dres(1)>eps).and.(dres(it)>eps)) then
   allocate(dres(MS))   
   allocate(dX(N,MS))
 
-  call feastinitext(fpm)
+  call feastinit(fpm)
   fpm(4)=10  ! 10 iterations max
   fpm(3)=2
   fpm(6)=0 ! cv on trace (let the eigenvalue number the time to stabilize)
@@ -4652,7 +4652,7 @@ if ((it==itmax).and.(dres(1)>eps).and.(dres(it)>eps)) then
 
 
   MW = max(M0/2,1) ! number of wanted eigenvalue
-  call feastinitext(fpm)
+  call feastinit(fpm)
 
   MS=min(10,N) ! (10 is enough for the stochastic search)
   allocate(dE(MS))     
@@ -4724,7 +4724,7 @@ if ((it==itmax).and.(dres(1)>eps).and.(dres(it)>eps)) then
   allocate(dres(MS))   
   allocate(dX(N,MS))
 
-  call feastinitext(fpm)
+  call feastinit(fpm)
   fpm(4)=10  ! 10 iterations max
   fpm(3)=2
   fpm(6)=0 ! cv on trace (let the eigenvalue number the time to stabilize)
@@ -4953,7 +4953,7 @@ end if
 
 !!!!!! Initializing the stochastic search
   MW = max(M0/2,1) ! number of wanted eigenvalue
-  call feastinitext(fpm)
+  call feastinit(fpm)
 
   MS=min(10,N) ! (10 is enough for the stochastic search)
   allocate(dE(MS))     
@@ -5025,7 +5025,7 @@ end if
   allocate(dres(MS))   
   allocate(dX(N,MS))
 
-  call feastinitext(fpm)
+  call feastinit(fpm)
   fpm(4)=10  ! 10 iterations max
   fpm(3)=2
   fpm(6)=0 ! cv on trace (let the eigenvalue number the time to stabilize)
@@ -5257,7 +5257,7 @@ if ((it==itmax).and.(dres(1)>eps).and.(dres(it)>eps)) then
   
 
   MW = max(M0/2,1) ! number of wanted eigenvalue
-  call feastinitext(fpm)
+  call feastinit(fpm)
 
   MS=min(10,N) ! (10 is enough for the stochastic search)
   allocate(dE(MS))     
@@ -5327,7 +5327,7 @@ if ((it==itmax).and.(dres(1)>eps).and.(dres(it)>eps)) then
   allocate(dres(MS))   
   allocate(dX(N,MS))
 
-  call feastinitext(fpm)
+  call feastinit(fpm)
   fpm(4)=10  ! 10 iterations max
   fpm(3)=2
   fpm(6)=0 ! cv on trace (let the eigenvalue number the time to stabilize)
