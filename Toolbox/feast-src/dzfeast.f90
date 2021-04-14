@@ -327,7 +327,7 @@ subroutine dfeast_srcix(ijob,N,Ze,work,workc,Aq,Bq,fpm,epsout,loop,Emin,Emax,M0,
            write(fout,'(A)',advance='no') 'List of input parameters fpm(1:64)-- if different from default'
            write(fout,*)
            allocate(fpm_default(64))
-           call feastinit(fpm_default) ! initialize to -111
+           call feastinitext(fpm_default) ! initialize to -111
            fpm_default(1)=0
            fpm_default(30)=fpm(30) ! name
            fpm_default(14)=fpm(14) ! for special conditional cases
@@ -1689,7 +1689,7 @@ if ((mod(fpm(30),10)==2).or. (mod(fpm(30),10)==3)) then
            write(fout,'(A)',advance='no') 'List of input parameters fpm(1:64)-- if different from default'
            write(fout,*)
            allocate(fpm_default(64))
-           call feastinit(fpm_default) ! initialize to -111
+           call feastinitext(fpm_default) ! initialize to -111
            fpm_default(1)=0
            fpm_default(30)=fpm(30) ! name
            fpm_default(14)=fpm(14) ! for special conditional cases
@@ -3056,7 +3056,7 @@ subroutine zfeast_grcix(ijob,N,Ze,work,workc,zAq,zBq,fpm,epsout,loop,Emid,r,M0,l
            write(fout,'(A)',advance='no') 'List of input parameters fpm(1:64)-- if different from default'
            write(fout,*)
            allocate(fpm_default(64))
-           call feastinit(fpm_default) ! initialize to -111
+           call feastinitext(fpm_default) ! initialize to -111
            fpm_default(1)=0
            fpm_default(30)=fpm(30) ! name
            fpm_default(14)=fpm(14) ! for special conditional cases
@@ -5285,7 +5285,7 @@ subroutine zfeast_grcipevx(ijob,dmax,N,Ze,work,workc,zAq,zBq,fpm,epsout,loop,Emi
            write(fout,'(A)',advance='no') 'List of input parameters fpm(1:64)-- if different from default'
            write(fout,*)
            allocate(fpm_default(64))
-           call feastinit(fpm_default) ! initialize to -111
+           call feastinitext(fpm_default) ! initialize to -111
            fpm_default(1)=0
            fpm_default(30)=fpm(30) ! name
            fpm_default(14)=fpm(14) ! for special conditional cases

@@ -83,7 +83,7 @@
 !111111111111!!!!!! FEASTINIT Routines
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-subroutine feastinit(fpm)
+subroutine feastinitext(fpm)
   !  Purpose
   !  =======
   !
@@ -103,7 +103,7 @@ subroutine feastinit(fpm)
   do i=1,64
      fpm(i)=-111
   enddo
-end subroutine feastinit
+end subroutine feastinitext
 
 
 
@@ -531,7 +531,7 @@ subroutine feastinit_driver(fpm,N)
   integer :: N
   integer :: i
 
-  call feastinit(fpm)
+  call feastinitext(fpm)
 
   if (N>64) then
      fpm(64)=1
@@ -1417,7 +1417,7 @@ subroutine pfeastinit(fpm,NEW_COMM_WORLD,nb_procs3)
 
   n3=nb_procs3 !Rq: cannot change nb_procs3 in argument if needed (think of a number constant)
   
-  call feastinit(fpm)
+  call feastinitext(fpm)
   rank=0
   call MPI_COMM_RANK(NEW_COMM_WORLD,rank,code)
   call MPI_COMM_SIZE(NEW_COMM_WORLD,nb_procs,code)

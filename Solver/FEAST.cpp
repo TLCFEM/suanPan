@@ -27,7 +27,7 @@ int FEAST::linear_solve(const shared_ptr<LongFactory>& W) const {
 
 	std::vector fpm(64, 0);
 
-	feastinit_(fpm.data());
+	feastinitext_(fpm.data());
 
 #ifdef SUANPAN_DEBUG
 	fpm[0] = 1;
@@ -91,7 +91,7 @@ int FEAST::linear_solve(const shared_ptr<LongFactory>& W) const {
 int FEAST::quadratic_solve(const shared_ptr<LongFactory>& W) const {
 	std::vector fpm(64, 0);
 
-	feastinit_(fpm.data());
+	feastinitext_(fpm.data());
 
 #ifdef SUANPAN_DEBUG
 	fpm[0] = 1;
