@@ -259,6 +259,8 @@ int FEAST::analyze() {
 	const auto& D = G->get_domain().lock();
 	auto& W = D->get_factory();
 
+	if(SUANPAN_SUCCESS != G->process_modifier()) return SUANPAN_FAIL;
+
 	D->assemble_trial_mass();
 	D->assemble_trial_stiffness();
 	if(quadratic) D->assemble_trial_damping();
