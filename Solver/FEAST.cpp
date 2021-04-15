@@ -33,12 +33,14 @@ int FEAST::linear_solve(const shared_ptr<LongFactory>& W) const {
 	fpm[0] = 1;
 #endif
 
-	int N = static_cast<int>(W->get_size());
-
 	std::vector output(4, 0);
 	std::vector input(4, 0.);
 	input[1] = 0.;     // centre
 	input[2] = radius; // radius
+
+	output[1] = eigen_num;
+
+	int N = static_cast<int>(W->get_size());
 
 	auto M = static_cast<int>(eigen_num);
 	std::vector R(M, 0.);
@@ -46,14 +48,15 @@ int FEAST::linear_solve(const shared_ptr<LongFactory>& W) const {
 	M *= N;
 	std::vector X(M, 0.);
 
-	output[1] = eigen_num;
-
 	char UPLO = 'F';
 
 	if(const auto scheme = W->get_storage_scheme(); StorageScheme::FULL == scheme) new_dfeast_sygv_(&UPLO, &N, stiffness->memptr(), &N, mass->memptr(), &N, fpm.data(), &input[3], &output[0], &input[1], &input[2], &output[1], E.data(), X.data(), &output[2], R.data(), &output[3]);
 	else if(StorageScheme::SPARSE == scheme) {
-		const csr_form<double, int> t_stiff(stiffness->triplet_mat, 1);
-		const csr_form<double, int> t_mass(mass->triplet_mat, 1);
+		auto fs = std::async([&]() { return csr_form<double, int>(stiffness->triplet_mat, 1); });
+		auto fm = std::async([&]() { return csr_form<double, int>(mass->triplet_mat, 1); });
+
+		const auto t_stiff = fs.get();
+		const auto t_mass = fm.get();
 
 		new_dfeast_scsrgv_(&UPLO, &N, t_stiff.val_idx, t_stiff.row_ptr, t_stiff.col_idx, t_mass.val_idx, t_mass.row_ptr, t_mass.col_idx, fpm.data(), &input[3], &output[0], &input[1], &input[2], &output[1], E.data(), X.data(), &output[2], R.data(), &output[3]);
 	}
@@ -78,12 +81,20 @@ int FEAST::linear_solve(const shared_ptr<LongFactory>& W) const {
 	auto& eigval = get_eigenvalue(W);
 	eigval.set_size(output[2]);
 
+#ifdef SUANPAN_MT
+	tbb::parallel_for(0llu, eigval.n_elem, [&](const uword I) { eigval(I) = E[I]; });
+#else
 	for(uword I = 0; I < eigval.n_elem; ++I) eigval(I) = E[I];
+#endif
 
 	auto& eigvec = get_eigenvector(W);
 	eigvec.resize(N, output[2]);
 
+#ifdef SUANPAN_MT
+	tbb::parallel_for(0llu, eigvec.n_elem, [&](const uword I) { eigvec(I) = X[I]; });
+#else
 	for(uword I = 0; I < eigvec.n_elem; ++I) eigvec(I) = X[I];
+#endif
 
 	return SUANPAN_SUCCESS;
 }
@@ -105,13 +116,13 @@ int FEAST::quadratic_solve(const shared_ptr<LongFactory>& W) const {
 	input[1] = 0.;     // centre
 	input[2] = radius; // radius
 
+	output[1] = eigen_num;
+
 	auto M = 2 * static_cast<int>(eigen_num);
 	std::vector R(M, 0.);
 	std::vector E(M, 0.);
 	M *= 2 * N;
 	std::vector X(M, 0.);
-
-	output[1] = eigen_num;
 
 	int P = 2;
 
@@ -125,39 +136,76 @@ int FEAST::quadratic_solve(const shared_ptr<LongFactory>& W) const {
 
 	if(StorageScheme::SPARSE != W->get_storage_scheme()) {
 		const auto NN = N * N;
-		c_stiff.init(N, N, NN);
-		c_damping.init(N, N, NN);
-		c_mass.init(N, N, NN);
 
-		for(auto I = 0; I < N; ++I)
-			for(auto J = 0; J < N; ++J) {
-				c_stiff.at(I, J) = stiffness->operator()(I, J);
-				c_damping.at(I, J) = damping->operator()(I, J);
-				c_mass.at(I, J) = mass->operator()(I, J);
-			}
+		auto fk = std::async([&]() {
+			c_stiff.init(N, N, NN);
+			for(auto I = 0; I < N; ++I) for(auto J = 0; J < N; ++J) c_stiff.at(I, J) = stiffness->operator()(I, J);
+		});
+		auto fd = std::async([&]() {
+			c_damping.init(N, N, NN);
+			for(auto I = 0; I < N; ++I) for(auto J = 0; J < N; ++J) c_damping.at(I, J) = damping->operator()(I, J);
+		});
+		auto fm = std::async([&]() {
+			c_mass.init(N, N, NN);
+			for(auto I = 0; I < N; ++I) for(auto J = 0; J < N; ++J) c_mass.at(I, J) = mass->operator()(I, J);
+		});
+
+		fk.get();
+		fd.get();
+		fm.get();
 	}
 
-	const csr_form<double, int> t_stiff(c_stiff, 1);
-	const csr_form<double, int> t_damping(c_damping, 1);
-	const csr_form<double, int> t_mass(c_mass, 1);
+	auto fk = std::async([&]() { return csr_form<double, int>(c_stiff, 1); });
+	auto fd = std::async([&]() { return csr_form<double, int>(c_damping, 1); });
+	auto fm = std::async([&]() { return csr_form<double, int>(c_mass, 1); });
 
-	auto n_elem = std::max(std::max(t_stiff.c_size, t_damping.c_size), t_mass.c_size);
+	const auto t_stiff = fk.get();
+	const auto t_damping = fd.get();
+	const auto t_mass = fm.get();
 
-	std::vector A(3llu * n_elem, 0.);
-	std::vector JA(3llu * n_elem, 0);
-	std::vector IA(3llu * N, 0);
+	size_t n_elem1 = std::max(std::max(t_stiff.c_size, t_damping.c_size), t_mass.c_size);
+	size_t n_elem2 = n_elem1 + n_elem1;
+	size_t n_elem3 = n_elem1 + n_elem2;
+	size_t n_size1 = N;
+	size_t n_size2 = n_size1 + n_size1;
+	size_t n_size3 = n_size2 + n_size1;
 
+	std::vector A(n_elem3, 0.);
+	std::vector JA(n_elem3, 0);
+	std::vector IA(n_size3, 0);
+
+#ifdef SUANPAN_MT
+	tbb::parallel_for(0, t_stiff.c_size, [&](const int I) {
+		A[I] = t_stiff.val_idx[I];
+		JA[I] = t_stiff.col_idx[I];
+	});
+	tbb::parallel_for(0, t_damping.c_size, [&](const int I) {
+		A[I + n_elem1] = t_damping.val_idx[I];
+		JA[I + n_elem1] = t_damping.col_idx[I];
+	});
+	tbb::parallel_for(0, t_mass.c_size, [&](const int I) {
+		A[I + n_elem2] = t_mass.val_idx[I];
+		JA[I + n_elem2] = t_mass.col_idx[I];
+	});
+
+	tbb::parallel_for(0, N, [&](const int I) {
+		JA[I] = t_stiff.row_ptr[I];
+		JA[I + n_size1] = t_damping.row_ptr[I];
+		JA[I + n_size2] = t_mass.row_ptr[I];
+	});
+#else
 	std::copy_n(t_stiff.val_idx, t_stiff.c_size, A.data());
-	std::copy_n(t_damping.val_idx, t_damping.c_size, A.data() + n_elem);
-	std::copy_n(t_mass.val_idx, t_mass.c_size, A.data() + 2llu * n_elem);
+	std::copy_n(t_damping.val_idx, t_damping.c_size, A.data() + n_elem1);
+	std::copy_n(t_mass.val_idx, t_mass.c_size, A.data() + n_elem2);
 
 	std::copy_n(t_stiff.col_idx, t_stiff.c_size, JA.data());
-	std::copy_n(t_damping.col_idx, t_damping.c_size, JA.data() + n_elem);
-	std::copy_n(t_mass.col_idx, t_mass.c_size, JA.data() + 2llu * n_elem);
+	std::copy_n(t_damping.col_idx, t_damping.c_size, JA.data() + n_elem1);
+	std::copy_n(t_mass.col_idx, t_mass.c_size, JA.data() + n_elem2);
 
 	std::copy_n(t_stiff.row_ptr, N, IA.data());
-	std::copy_n(t_damping.row_ptr, N, IA.data() + N);
-	std::copy_n(t_mass.row_ptr, N, IA.data() + 2llu * N);
+	std::copy_n(t_damping.row_ptr, N, IA.data() + n_size1);
+	std::copy_n(t_mass.row_ptr, N, IA.data() + n_size2);
+#endif
 
 	new_dfeast_gcsrpev_(&P, &N, A.data(), IA.data(), JA.data(), fpm.data(), &input[3], &output[0], &input[0], &input[2], &output[1], E.data(), X.data(), &output[2], R.data(), &output[3]);
 
