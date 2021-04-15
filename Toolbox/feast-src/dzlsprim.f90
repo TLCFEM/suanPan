@@ -63,6 +63,7 @@
 !dsubmat                            :: extract csr submatrix from csr matrix
 !zsubmat                            :: extract csr submatrix from csr matrix
 
+#include "alias.f90"
 
 
 subroutine daddcsr(N,M,opt,alpha,sa,isa,jsa,beta,sb,isb,jsb,sc,isc,jsc)

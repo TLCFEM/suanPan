@@ -75,6 +75,7 @@
 !!!!11111111111111111111111111111111111111111111111111111111111
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+#include "alias.f90"
 
 subroutine difeast_scsrgvx(UPLO,N,sa,isa,jsa,sb,isb,jsb,fpm,epsout,loop,Emin,Emax,M0,E,X,mode,res,info,Zne,Wne)
   !  Purpose 

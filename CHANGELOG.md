@@ -2,7 +2,7 @@
 
 ## known issues
 
-1. `MKL` includes outdated `FEAST`, the quadratic eigen problem cannot be handled by external `FEAST` library.
+1. `MKL` includes outdated `FEAST`, the external names in `FEAST` library are modified to avoid linking error.
 
 ## version 1.x
 

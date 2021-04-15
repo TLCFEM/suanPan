@@ -63,6 +63,7 @@
 !!!!11111111111111111111111111111111111111111111111111111111111
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+#include "alias.f90"
 
 subroutine dfeast_scsrpevx(UPLO,dmax,N,sa,isa,jsa,fpm,epsout,loop,Emid,r,M0,E,X,mode,res,info,Zne,Wne)
   !  Remark: simple Wrapper to  zfeast_scsrpevx 

@@ -55,6 +55,7 @@
 !!!!11111111111111111111111111111111111111111111111111111111111
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+#include "alias.f90"
 
 subroutine dfeast_sypevx(UPLO,dmax,N,A,LDA,fpm,epsout,loop,Emid,r,M0,E,X,mode,res,info,Zne,Wne)
   !  Purpose 

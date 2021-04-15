@@ -71,6 +71,7 @@
 !!!!11111111111111111111111111111111111111111111111111111111111
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+#include "alias.f90"
 
 subroutine dfeast_sygvx(UPLO,N,A,LDA,B,LDB,fpm,epsout,loop,Emin,Emax,M0,E,X,mode,res,info,Zne,Wne)
   !  Purpose 

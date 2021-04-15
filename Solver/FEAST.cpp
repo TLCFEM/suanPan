@@ -27,7 +27,7 @@ int FEAST::linear_solve(const shared_ptr<LongFactory>& W) const {
 
 	std::vector fpm(64, 0);
 
-	feastinit_(fpm.data());
+	new_feastinit_(fpm.data());
 
 #ifdef SUANPAN_DEBUG
 	fpm[0] = 1;
@@ -50,12 +50,12 @@ int FEAST::linear_solve(const shared_ptr<LongFactory>& W) const {
 
 	char UPLO = 'F';
 
-	if(const auto scheme = W->get_storage_scheme(); StorageScheme::FULL == scheme) dfeast_sygv_(&UPLO, &N, stiffness->memptr(), &N, mass->memptr(), &N, fpm.data(), &input[3], &output[0], &input[1], &input[2], &output[1], E.data(), X.data(), &output[2], R.data(), &output[3]);
+	if(const auto scheme = W->get_storage_scheme(); StorageScheme::FULL == scheme) new_dfeast_sygv_(&UPLO, &N, stiffness->memptr(), &N, mass->memptr(), &N, fpm.data(), &input[3], &output[0], &input[1], &input[2], &output[1], E.data(), X.data(), &output[2], R.data(), &output[3]);
 	else if(StorageScheme::SPARSE == scheme) {
 		const csr_form<double, int> t_stiff(stiffness->triplet_mat, 1);
 		const csr_form<double, int> t_mass(mass->triplet_mat, 1);
 
-		dfeast_scsrgv_(&UPLO, &N, t_stiff.val_idx, t_stiff.row_ptr, t_stiff.col_idx, t_mass.val_idx, t_mass.row_ptr, t_mass.col_idx, fpm.data(), &input[3], &output[0], &input[1], &input[2], &output[1], E.data(), X.data(), &output[2], R.data(), &output[3]);
+		new_dfeast_scsrgv_(&UPLO, &N, t_stiff.val_idx, t_stiff.row_ptr, t_stiff.col_idx, t_mass.val_idx, t_mass.row_ptr, t_mass.col_idx, fpm.data(), &input[3], &output[0], &input[1], &input[2], &output[1], E.data(), X.data(), &output[2], R.data(), &output[3]);
 	}
 	else if(StorageScheme::BAND == scheme || StorageScheme::BANDSYMM == scheme) {
 		fpm[41] = 0;
@@ -66,7 +66,7 @@ int FEAST::linear_solve(const shared_ptr<LongFactory>& W) const {
 		const auto KU = static_cast<int>(u);
 		auto LD = KL + KU + 1;
 
-		dfeast_sbgv_(&UPLO, &N, &KL, stiffness->memptr(), &LD, &KL, mass->memptr(), &LD, fpm.data(), &input[3], &output[0], &input[1], &input[2], &output[1], E.data(), X.data(), &output[2], R.data(), &output[3]);
+		new_dfeast_sbgv_(&UPLO, &N, &KL, stiffness->memptr(), &LD, &KL, mass->memptr(), &LD, fpm.data(), &input[3], &output[0], &input[1], &input[2], &output[1], E.data(), X.data(), &output[2], R.data(), &output[3]);
 	}
 	else throw;
 
@@ -89,10 +89,9 @@ int FEAST::linear_solve(const shared_ptr<LongFactory>& W) const {
 }
 
 int FEAST::quadratic_solve(const shared_ptr<LongFactory>& W) const {
-	/*
 	std::vector fpm(64, 0);
 
-	feastinit_(fpm.data());
+	new_feastinit_(fpm.data());
 
 #ifdef SUANPAN_DEBUG
 	fpm[0] = 1;
@@ -160,7 +159,7 @@ int FEAST::quadratic_solve(const shared_ptr<LongFactory>& W) const {
 	std::copy_n(t_damping.row_ptr, N, IA.data() + N);
 	std::copy_n(t_mass.row_ptr, N, IA.data() + 2llu * N);
 
-	dfeast_gcsrpev_(&P, &N, A.data(), IA.data(), JA.data(), fpm.data(), &input[3], &output[0], &input[0], &input[2], &output[1], E.data(), X.data(), &output[2], R.data(), &output[3]);
+	new_dfeast_gcsrpev_(&P, &N, A.data(), IA.data(), JA.data(), fpm.data(), &input[3], &output[0], &input[0], &input[2], &output[1], E.data(), X.data(), &output[2], R.data(), &output[3]);
 
 	if(0 != output[3]) {
 		suanpan_error("error code %d recieved from FEAST solver.\n", output[3]);
@@ -176,7 +175,7 @@ int FEAST::quadratic_solve(const shared_ptr<LongFactory>& W) const {
 	eigvec.resize(N, output[2]);
 
 	for(uword I = 0; I < eigvec.n_elem; ++I) eigvec(I) = X[2 * I];
-	*/
+
 	return SUANPAN_SUCCESS;
 }
 
