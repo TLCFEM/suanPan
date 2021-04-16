@@ -116,9 +116,7 @@ mat GCMQ::form_transformation(const mat& jacobian) {
 mat GCMQ::form_enhanced_strain(const vec& coor, const int num_enhanced_mode) {
 	mat poly(3, num_enhanced_mode, fill::zeros);
 
-	auto &X = coor(0), &Y = coor(1);
-
-	if(1 == num_enhanced_mode) {
+	if(auto &X = coor(0), &Y = coor(1); 1 == num_enhanced_mode) {
 		poly(0, 0) = 3. * X * X - 1.;
 		poly(1, 0) = 3. * Y * Y - 1.;
 	}

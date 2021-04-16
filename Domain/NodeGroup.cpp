@@ -89,17 +89,11 @@ void NodeGroup::initialize(const shared_ptr<DomainBase>& D) {
 
 			if(0 == size) continue;
 
-			const vec part(access::rwp(rule.mem), size, false, true);
-			const vec m_point(access::rwp(J.mem), size, false, true);
-
-			if(fabs(dot(part, m_point) + rule.back()) <= 1E-8) pond.emplace_back(I->get_tag());
+			if(const vec part(access::rwp(rule.mem), size, false, true), m_point(access::rwp(J.mem), size, false, true); fabs(dot(part, m_point) + rule.back()) <= 1E-8) pond.emplace_back(I->get_tag());
 		}
 	else
 		// generate by polynomial curve fitting
-		for(auto& I : D->get_node_pool()) {
-			auto& J = I->get_coordinate();
-			if(static_cast<int>(J.n_elem) > dof && fabs(as_scalar(polyval(rule, vec{J(dof)}))) <= 1E-12) pond.emplace_back(I->get_tag());
-		}
+		for(auto& I : D->get_node_pool()) if(auto& J = I->get_coordinate(); static_cast<int>(J.n_elem) > dof && fabs(as_scalar(polyval(rule, vec{J(dof)}))) <= 1E-12) pond.emplace_back(I->get_tag());
 
 	std::sort(pond.begin(), pond.end());
 

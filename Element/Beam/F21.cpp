@@ -77,14 +77,13 @@ int F21::update_status() {
 	// initial residual be aware of how to compute it
 	residual_deformation += trial_local_deformation;
 
-	vec incre_deformation;
-
 	unsigned counter = 0;
 	while(true) {
 		trial_local_resistance += solve(trial_local_flexibility, residual_deformation);
 		residual_deformation.zeros();
 		trial_local_flexibility.zeros();
 		for(const auto& I : int_pt) {
+			vec incre_deformation;
 			const vec target_section_resistance = I.B * trial_local_resistance;
 			// compute unbalanced deformation
 			if(!solve(incre_deformation, I.b_section->get_trial_stiffness(), target_section_resistance - I.b_section->get_trial_resistance())) return SUANPAN_FAIL;

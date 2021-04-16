@@ -379,8 +379,7 @@ vector<vec> CP4::record(const OutputType P) {
 		vec B(int_pt.size(), fill::zeros);
 
 		for(size_t I = 0; I < int_pt.size(); ++I) {
-			const auto C = int_pt[I].m_material->record(OutputType::MISES);
-			if(!C.empty()) B(I) = C.cbegin()->at(0);
+			if(const auto C = int_pt[I].m_material->record(OutputType::MISES); !C.empty()) B(I) = C.cbegin()->at(0);
 			A.row(I) = interpolation::linear(int_pt[I].coor);
 		}
 

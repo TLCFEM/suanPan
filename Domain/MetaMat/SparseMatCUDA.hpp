@@ -48,11 +48,7 @@ public:
 	int solve(Mat<T>&, const Mat<T>&) override;
 };
 
-template<typename T> void SparseMatCUDA<T>::cu_destory(cusolverSpHandle_t handle) {
-	const auto solver_info = cusolverSpDestroy(handle);
-
-	if(CUSOLVER_STATUS_SUCCESS != solver_info) suanpan_error("error code %u returned by CUDA.\n", static_cast<unsigned>(solver_info));
-}
+template<typename T> void SparseMatCUDA<T>::cu_destory(const cusolverSpHandle_t handle) { if(const auto solver_info = cusolverSpDestroy(handle); CUSOLVER_STATUS_SUCCESS != solver_info) suanpan_error("error code %u returned by CUDA.\n", static_cast<unsigned>(solver_info)); }
 
 template<typename T> SparseMatCUDA<T>::SparseMatCUDA()
 	: SparseMat<T>() {}

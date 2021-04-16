@@ -52,7 +52,7 @@ public:
 	Rebar3D(Rebar3D&&) = delete;
 	Rebar3D& operator=(const Rebar3D&) = delete;
 	Rebar3D& operator=(Rebar3D&&) = delete;
-	~Rebar3D() = default;
+	~Rebar3D() override = default;
 
 	void initialize(const shared_ptr<DomainBase>&) override;
 

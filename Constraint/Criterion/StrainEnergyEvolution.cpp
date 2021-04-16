@@ -59,8 +59,7 @@ int StrainEnergyEvolution::process(const shared_ptr<DomainBase>& D) {
 #ifdef SUANPAN_MT
 	tbb::parallel_for(0llu, current_energy.n_elem, [&](const uword I) {
 		if(D->find<Element>(I)) {
-			const auto& t_element = D->get<Element>(I);
-			if(!t_element->is_active()) {
+			if(const auto& t_element = D->get<Element>(I); !t_element->is_active()) {
 				current_energy(I) = 0.;
 				state(I) = 0; // disabled
 			}

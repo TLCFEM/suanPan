@@ -36,9 +36,8 @@ void Tabular::initialize(const shared_ptr<DomainBase>& D) {
 		return;
 	}
 
-	mat ext_data;
 	struct stat buffer{};
-	if(stat(file_name.c_str(), &buffer) == 0 && ext_data.load(file_name, raw_ascii)) {
+	if(mat ext_data; stat(file_name.c_str(), &buffer) == 0 && ext_data.load(file_name, raw_ascii)) {
 		if(2 == ext_data.n_cols) {
 			time = ext_data.col(0);
 			magnitude = ext_data.col(1);

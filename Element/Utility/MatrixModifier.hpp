@@ -77,9 +77,8 @@ template<typename T> void suanpan::mass::lumped_scale::apply(Mat<T>& mass, const
 
 template<typename T> void suanpan::damping::rayleigh::apply(const shared_ptr<Element>& element_obj, const T alpha, const T beta, const T zeta) {
 	auto& ele_damping = access::rw(element_obj->get_trial_damping());
-	auto& ele_force = access::rw(element_obj->get_trial_damping_force());
 
-	if(element_obj->if_update_damping()) {
+	if(auto& ele_force = access::rw(element_obj->get_trial_damping_force()); element_obj->if_update_damping()) {
 		mat damping(element_obj->get_total_number(), element_obj->get_total_number(), fill::zeros);
 
 		if(0. != alpha && !element_obj->get_current_mass().is_empty()) damping += alpha * element_obj->get_current_mass();

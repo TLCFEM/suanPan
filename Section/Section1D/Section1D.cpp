@@ -34,9 +34,7 @@ void Section1D::initialize(const shared_ptr<DomainBase>& D) {
 }
 
 int Section1D::update_trial_status(const vec& t_deformation) {
-	const vec incre_deformation = (trial_deformation = t_deformation) - current_deformation;
-
-	if(norm(incre_deformation) <= datum::eps) return SUANPAN_SUCCESS;
+	if(norm((trial_deformation = t_deformation) - current_deformation) <= datum::eps) return SUANPAN_SUCCESS;
 
 	if(s_material->update_trial_status(t_deformation) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 

@@ -80,7 +80,7 @@ public:
 	Section& operator=(const Section&) = delete; // assign forbidden
 	Section& operator=(Section&&) = delete;      // assign forbidden
 
-	virtual ~Section() = default;
+	~Section() override = default;
 
 	virtual void initialize(const shared_ptr<DomainBase>&) = 0;
 
@@ -124,7 +124,7 @@ public:
 	virtual int commit_status() = 0;
 	virtual int reset_status() = 0;
 
-	virtual vector<vec> record(const OutputType);
+	virtual vector<vec> record(OutputType);
 };
 
 namespace suanpan {

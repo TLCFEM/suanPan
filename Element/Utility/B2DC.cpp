@@ -60,7 +60,8 @@ vec B2DC::to_local_vec(const vec& g_vec) const {
 	l_vec(1) = atan((new_cos * t_sin - new_sin * t_cos) / (new_cos * t_cos + new_sin * t_sin));
 
 	t_angle = initial_inclination + g_vec(5);
-	t_sin = sin(t_angle), t_cos = cos(t_angle);
+	t_sin = sin(t_angle);
+	t_cos = cos(t_angle);
 
 	l_vec(2) = atan((new_cos * t_sin - new_sin * t_cos) / (new_cos * t_cos + new_sin * t_sin));
 

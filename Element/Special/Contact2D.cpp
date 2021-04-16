@@ -97,8 +97,7 @@ int Contact2D::update_status() {
 			const auto tn = dot(s, master[I].axis);               // numerator, 1-2-3
 			const auto td = dot(master[I].axis, master[I].axis);  // denominator, 1-2
 			const auto t = tn / td;                               // numerator/denominator ==> ranges from zero to one, 1-2-3
-			const auto u = dot(s, master[I].norm);                // 1-2-3
-			if(u < datum::eps && t <= 1. && t >= 0.) {
+			if(const auto u = dot(s, master[I].norm); u < datum::eps && t <= 1. && t >= 0.) {
 				auto K = c_dof * I;
 				const auto span_a = span(K, K + c_dof - 1);
 				K += c_dof;

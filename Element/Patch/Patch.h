@@ -39,7 +39,7 @@ protected:
 public:
 	explicit Patch(field<vec>&&);
 
-	uvec get_number_of_control_points() const;
+	[[nodiscard]] uvec get_number_of_control_points() const;
 };
 
 class MaterialPatch : public Patch, public MaterialElement {

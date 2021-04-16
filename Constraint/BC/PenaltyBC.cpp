@@ -71,8 +71,6 @@ PenaltyBC::PenaltyBC(const unsigned T, const unsigned S, uvec&& N, const char* T
  * \return 0
  */
 int PenaltyBC::process(const shared_ptr<DomainBase>& D) {
-	const auto max_term = 1E14;
-
 	stiffness.reset();
 	vector<uword> pool;
 	pool.reserve(node_encoding.n_elem * dof_reference.n_elem);
@@ -83,6 +81,7 @@ int PenaltyBC::process(const shared_ptr<DomainBase>& D) {
 			auto& t_dof = t_node->get_reordered_dof();
 			for(const auto& J : dof_reference)
 				if(J <= t_dof.n_elem) {
+					constexpr auto max_term = 1E14;
 					auto& t_idx = t_dof(J - 1);
 					D->insert_restrained_dof(t_idx);
 					++counter;

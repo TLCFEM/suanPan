@@ -34,10 +34,10 @@ class Database : public Tag {
 	shared_ptr<DomainBase> domain = nullptr;
 public:
 	explicit Database(unsigned = 0);
-	virtual ~Database();
+	~Database() override;
 
 	void set_domain(const shared_ptr<DomainBase>& D);
-	const shared_ptr<DomainBase>& get_domain() const;
+	[[nodiscard]] const shared_ptr<DomainBase>& get_domain() const;
 
 	virtual int save() = 0;
 };

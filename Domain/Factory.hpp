@@ -1647,8 +1647,7 @@ template<typename T> void Factory<T>::assemble_stiffness(const SpMat<T>& EK, con
 	const auto& rol_ptr = EK.row_indices;
 	const auto& col_ptr = EK.col_ptrs;
 
-	auto idx = 0;
-	if(storage_type == StorageScheme::SPARSE) {
+	if(auto idx = 0; storage_type == StorageScheme::SPARSE) {
 		while(col_ptr[idx] != EK.n_nonzero) {
 			for(auto I = col_ptr[idx]; I < col_ptr[idx + 1]; ++I) global_stiffness->at(EI(rol_ptr[I]), EI(idx)) = val_ptr[I];
 			++idx;

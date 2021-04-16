@@ -41,9 +41,7 @@ void GlobalStiffnessRecorder::record(const shared_ptr<DomainBase>& D) {
 
 	vec stiffness(S * S, fill::zeros);
 
-	mat g_stiffness(stiffness.memptr(), S, S, false, true);
-
-	if(C.empty()) for(const auto& I : D->get_element_pool()) assemble_stiffness(I->get_current_stiffness(), I->get_dof_encoding(), g_stiffness);
+	if(mat g_stiffness(stiffness.memptr(), S, S, false, true); C.empty()) for(const auto& I : D->get_element_pool()) assemble_stiffness(I->get_current_stiffness(), I->get_dof_encoding(), g_stiffness);
 	else
 		std::for_each(C.begin(), C.end(), [&](const vector<unsigned>& color) {
 			suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {

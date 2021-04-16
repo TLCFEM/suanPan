@@ -79,7 +79,7 @@ public:
 	SectionShell& operator=(const SectionShell&) = delete; // assign forbidden
 	SectionShell& operator=(SectionShell&&) = delete;      // assign forbidden
 
-	virtual ~SectionShell() = default;
+	~SectionShell() override = default;
 
 	virtual void initialize(const shared_ptr<DomainBase>&) = 0;
 

@@ -277,8 +277,7 @@ void CP3::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type
 
 mat CP3::GetData(const OutputType P) {
 	vec t_stress(6, fill::zeros);
-	const auto t_data = m_material->record(P);
-	if(!t_data.empty()) t_stress(uvec{0, 1, 3}) = t_data[0];
+	if(const auto t_data = m_material->record(P); !t_data.empty()) t_stress(uvec{0, 1, 3}) = t_data[0];
 	return repmat(t_stress, 1, m_node);
 }
 

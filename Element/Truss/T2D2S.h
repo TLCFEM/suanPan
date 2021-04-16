@@ -33,7 +33,8 @@
 #define T2D2S_H
 
 #include <Element/SectionElement.h>
-#include <Element/Utility/T2DC.h>
+
+class Orientation;
 
 class T2D2S final : public SectionElement1D {
 	static constexpr unsigned t_node = 2, t_dof = 2, t_size = t_dof * t_node;

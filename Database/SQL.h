@@ -22,8 +22,7 @@
 
 class SQL : public Database {
 public:
-	SQL();
-	~SQL();
+	SQL() = default;
 };
 
 #endif

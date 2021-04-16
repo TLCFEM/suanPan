@@ -764,7 +764,7 @@ int Domain::reorder_dof() {
 	for(unsigned i = 0; i < dof_counter; ++i) /* lgtm [cpp/constant-comparison] */ {
 		uvec t_vec(num_degree(i));
 		unsigned j = 0;
-		for(const auto& k : adjacency[i]) t_vec(j++) = k;
+		for(const auto k : adjacency[i]) t_vec(j++) = k;
 		adjacency_sorted.emplace_back(t_vec(sort_index(num_degree(t_vec))));
 	}
 
@@ -774,9 +774,8 @@ int Domain::reorder_dof() {
 	// get bandwidth
 	auto low_bw = 0, up_bw = 0;
 	for(unsigned i = 0; i < dof_counter; ++i) // lgtm [cpp/constant-comparison]
-		for(const auto& j : adjacency[idx_rcm(i)]) {
-			const auto t_bw = static_cast<int>(idx_sorted(j)) - static_cast<int>(i);
-			if(t_bw > low_bw) low_bw = t_bw;
+		for(const auto j : adjacency[idx_rcm(i)]) {
+			if(const auto t_bw = static_cast<int>(idx_sorted(j)) - static_cast<int>(i); t_bw > low_bw) low_bw = t_bw;
 			else if(t_bw < up_bw) up_bw = t_bw;
 		}
 
@@ -1429,9 +1428,7 @@ int Domain::update_incre_status() const {
 int Domain::update_current_status() const {
 	const auto& analysis_type = factory->get_analysis_type();
 
-	vec c_g_dsp(factory->get_size(), fill::zeros);
-
-	if(analysis_type == AnalysisType::STATICS || analysis_type == AnalysisType::BUCKLE) {
+	if(vec c_g_dsp(factory->get_size(), fill::zeros); analysis_type == AnalysisType::STATICS || analysis_type == AnalysisType::BUCKLE) {
 		for(const auto& I : node_pond.get()) c_g_dsp(I->get_reordered_dof()) = I->get_current_displacement();
 		factory->update_current_displacement(c_g_dsp);
 

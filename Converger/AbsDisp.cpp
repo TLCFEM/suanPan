@@ -29,10 +29,6 @@
 AbsDisp::AbsDisp(const unsigned T, const double E, const unsigned M, const bool P)
 	: Converger(T, E, M, P) {}
 
-/**
- * \brief
- * \return
- */
 bool AbsDisp::is_converged() {
 	set_error(norm(get_domain().lock()->get_factory()->get_incre_displacement()));
 	set_conv_flag(get_tolerance() > get_error());

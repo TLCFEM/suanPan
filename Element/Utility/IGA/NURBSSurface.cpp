@@ -82,13 +82,11 @@ field<mat> NURBSSurface::evaluate_shape_function_derivative(const double u, cons
 
 	for(auto i = 0llu; i <= p; ++i) {
 		const auto uind = uspan + i - p;
-		for(auto j = 0llu; j <= q; ++j) {
-			const auto vind = vspan + j - q;
-			if(!polygon(uind, vind).empty()) {
+		for(auto j = 0llu; j <= q; ++j)
+			if(const auto vind = vspan + j - q; !polygon(uind, vind).empty()) {
 				sum += uders(0, i) * vders(0, j) * polygon(uind, vind).back();
 				for(auto k = 0; k <= du; ++k) for(auto l = 0; l <= dv; ++l) shape(k, l)(uind, vind) = uders(k, i) * vders(l, j) * polygon(uind, vind).back();
 			}
-		}
 	}
 
 	for(auto i = 0ll; i <= du; ++i)
@@ -100,10 +98,7 @@ field<mat> NURBSSurface::evaluate_shape_function_derivative(const double u, cons
 						auto weight_sum = 0.;
 						for(auto m = 0llu; m <= p; ++m) {
 							const auto uind = uspan + m - p;
-							for(auto n = 0llu; n <= q; ++n) {
-								const auto vind = vspan + n - q;
-								if(!polygon(uind, vind).empty()) weight_sum += polygon(uind, vind).back() * uders(k, m) * vders(l, n);
-							}
+							for(auto n = 0llu; n <= q; ++n) if(const auto vind = vspan + n - q; !polygon(uind, vind).empty()) weight_sum += polygon(uind, vind).back() * uders(k, m) * vders(l, n);
 						}
 						t_shape -= binomial_mat(i, k) * binomial_mat(j, l) * weight_sum * shape(i - k, j - l);
 					}

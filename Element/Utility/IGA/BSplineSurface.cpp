@@ -60,10 +60,7 @@ vec BSplineSurface::evaluate_point(const double u, const double v, const field<v
 
 	for(auto k = 0llu; k <= p; ++k) {
 		const auto uind = uspan - p + k;
-		for(auto l = 0llu; l <= q; ++l) {
-			const auto vind = vspan - q + l;
-			if(!polygon(uind, vind).empty()) point += nu(k) * nv(l) * polygon(uind, vind);
-		}
+		for(auto l = 0llu; l <= q; ++l) if(const auto vind = vspan - q + l; !polygon(uind, vind).empty()) point += nu(k) * nv(l) * polygon(uind, vind);
 	}
 
 	return point;
@@ -93,10 +90,7 @@ field<vec> BSplineSurface::evaluate_point_derivative(const double u, const doubl
 		for(auto l = 0; l <= dv; ++l)
 			for(auto r = 0llu; r <= p; ++r) {
 				const auto uind = uspan - p + r;
-				for(auto s = 0llu; s <= q; ++s) {
-					const auto vind = vspan - q + s;
-					if(!polygon(uind, vind).empty()) point(k, l) += nu(k, r) * nv(l, s) * polygon(uind, vind);
-				}
+				for(auto s = 0llu; s <= q; ++s) if(const auto vind = vspan - q + s; !polygon(uind, vind).empty()) point(k, l) += nu(k, r) * nv(l, s) * polygon(uind, vind);
 			}
 
 	return point;

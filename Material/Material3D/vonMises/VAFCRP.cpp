@@ -57,9 +57,9 @@ int VAFCRP::update_trial_status(const vec& t_strain) {
 	auto eta = trial_s;
 	for(unsigned I = 0; I < size; ++I) eta -= vec{&trial_history(1 + 6llu * I), 6, false, true};
 
-	const auto residual = root_three_two * tensor::stress::norm(eta) - std::max(0., yield + hardening * p + saturated * (1. - exp(-m * p)));
+	// const auto residual = root_three_two * tensor::stress::norm(eta) - std::max(0., yield + hardening * p + saturated * (1. - exp(-m * p)));
 
-	if(residual < 0.) return SUANPAN_SUCCESS;
+	if(root_three_two * tensor::stress::norm(eta) < std::max(0., yield + hardening * p + saturated * (1. - exp(-m * p)))) return SUANPAN_SUCCESS;
 
 	vec xi;
 	auto gamma = 0., exp_gamma = 1.;

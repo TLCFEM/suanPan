@@ -28,9 +28,8 @@ void IGA::convert_to_weighted(field<vec>& polygon) {
 
 uword IGA::compute_order(const vec& knot) {
 	const auto b_order = find(knot.min() == knot).eval().n_elem - 1;
-	const auto e_order = find(knot.max() == knot).eval().n_elem - 1;
 
-	if(b_order == e_order) return b_order;
+	if(const auto e_order = find(knot.max() == knot).eval().n_elem - 1; b_order == e_order) return b_order;
 
 	throw std::invalid_argument("inconsistent order detected");
 }
@@ -154,9 +153,10 @@ mat BSpline::evaluate_basis_derivative(const double u, sword n, sword p) const {
 	for(auto j = 0; j <= p; ++j) ders(0, j) = ndu(j, p);
 
 	for(auto r = 0ll; r <= p; ++r) {
-		auto s1 = 0, s2 = 1;
 		a(0, 0) = 1.;
 		for(auto k = 1ll; k <= n; ++k) {
+			auto s1 = 0;
+			auto s2 = 1;
 			const auto rk = r - k, pk = p - k;
 			auto& d = ders(k, r);
 			if(r >= k) d += (a(s2, 0) = a(s1, 0) / ndu(pk + 1, rk)) * ndu(rk, pk);

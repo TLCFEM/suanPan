@@ -91,13 +91,11 @@ field<cube> NURBSVolume::evaluate_shape_function_derivative(const double u, cons
 		const auto uind = uspan + i - p;
 		for(auto j = 0llu; j <= q; ++j) {
 			const auto vind = vspan + j - q;
-			for(auto k = 0llu; k <= r; ++k) {
-				const auto wind = wspan + k - r;
-				if(!polygon(uind, vind, wind).empty()) {
+			for(auto k = 0llu; k <= r; ++k)
+				if(const auto wind = wspan + k - r; !polygon(uind, vind, wind).empty()) {
 					sum += uders(0, i) * vders(0, j) * wders(0, k) * polygon(uind, vind, wind).back();
 					for(auto l = 0; l <= du; ++l) for(auto m = 0; m <= dv; ++m) for(auto n = 0; n <= dw; ++n) shape(l, m, n)(uind, vind, wind) = uders(l, i) * vders(m, j) * wders(n, k) * polygon(uind, vind, wind).back();
 				}
-			}
 		}
 	}
 

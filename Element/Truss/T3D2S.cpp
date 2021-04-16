@@ -18,6 +18,7 @@
 #include "T3D2S.h"
 #include <Domain/DomainBase.h>
 #include <Section/Section.h>
+#include <Element/Utility/T3DC.h>
 
 T3D2S::T3D2S(const unsigned T, uvec&& N, const unsigned M, const bool F, const bool LS)
 	: SectionElement1D(T, t_node, t_dof, std::forward<uvec>(N), uvec{M}, F)

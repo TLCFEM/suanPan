@@ -87,12 +87,9 @@ int Maxwell::update_trial_status(const vec& t_strain, const vec& t_strain_rate) 
 
 	vec solution(3, fill::zeros);
 
-	double error;
-	auto ref_error = 1.;
-
 	counter = 0;
 
-	if(use_matrix) {
+	if(double error, ref_error = 1.; use_matrix) {
 		mat inv_jacobian(3, 3);
 
 		inv_jacobian(0, 2) = -factor_a;

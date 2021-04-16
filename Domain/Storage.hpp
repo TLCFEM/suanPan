@@ -139,7 +139,7 @@ public:
 
 	const vector<shared_ptr<T>>& get() const;
 
-	bool find(unsigned) const;
+	[[nodiscard]] bool find(unsigned) const;
 	bool erase(unsigned);
 	void enable(unsigned);
 	void disable(unsigned);

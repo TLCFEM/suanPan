@@ -54,7 +54,7 @@ public:
 	PlaneStress(PlaneStress&&) = delete;
 	PlaneStress& operator=(const PlaneStress&) = delete;
 	PlaneStress& operator=(PlaneStress&&) = delete;
-	~PlaneStress() = default;
+	~PlaneStress() override = default;
 
 	void initialize(const shared_ptr<DomainBase>&) override;
 

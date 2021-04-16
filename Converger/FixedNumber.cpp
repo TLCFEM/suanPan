@@ -26,10 +26,6 @@
 FixedNumber::FixedNumber(const unsigned T, const unsigned M, const bool P)
 	: Converger(T, 1., M, P) {}
 
-/**
- * \brief
- * \return
- */
 bool FixedNumber::is_converged() {
 	if(is_print()) suanpan_info("iteration counter: %u.\n", ++counter);
 

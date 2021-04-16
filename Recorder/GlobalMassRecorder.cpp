@@ -41,9 +41,7 @@ void GlobalMassRecorder::record(const shared_ptr<DomainBase>& D) {
 
 	vec mass(S * S, fill::zeros);
 
-	mat g_mass(mass.memptr(), S, S, false, true);
-
-	if(C.empty()) for(const auto& I : D->get_element_pool()) assemble_mass(I->get_current_mass(), I->get_dof_encoding(), g_mass);
+	if(mat g_mass(mass.memptr(), S, S, false, true); C.empty()) for(const auto& I : D->get_element_pool()) assemble_mass(I->get_current_mass(), I->get_dof_encoding(), g_mass);
 	else
 		std::for_each(C.begin(), C.end(), [&](const vector<unsigned>& color) {
 			suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {

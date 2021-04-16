@@ -44,7 +44,7 @@ public:
 	IsotropicDamage(IsotropicDamage&&) = delete;
 	IsotropicDamage& operator=(const IsotropicDamage&) = delete;
 	IsotropicDamage& operator=(IsotropicDamage&&) = delete;
-	virtual ~IsotropicDamage() = default;
+	~IsotropicDamage() override = default;
 
 	void initialize(const shared_ptr<DomainBase>&) override;
 

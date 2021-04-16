@@ -56,7 +56,7 @@ public:
 	~Load() override;
 
 	void enable_displacement_control() const;
-	bool if_displacement_control() const;
+	[[nodiscard]] bool if_displacement_control() const;
 
 	[[nodiscard]] const vec& get_trial_load() const;
 	[[nodiscard]] const vec& get_trial_settlement() const;

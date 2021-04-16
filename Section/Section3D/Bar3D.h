@@ -43,7 +43,7 @@ public:
 	Bar3D(Bar3D&&) = delete;                 // move forbidden
 	Bar3D& operator=(const Bar3D&) = delete; // assign forbidden
 	Bar3D& operator=(Bar3D&&) = delete;      // assign forbidden
-	~Bar3D() = default;
+	~Bar3D() override = default;
 
 	void initialize(const shared_ptr<DomainBase>&) override;
 

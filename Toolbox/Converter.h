@@ -18,7 +18,6 @@
 #ifndef CONVERTER_H
 #define CONVERTER_H
 
-#include <fstream>
 #include <unordered_map>
 
 struct Converter {

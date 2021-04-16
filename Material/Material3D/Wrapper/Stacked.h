@@ -42,7 +42,7 @@ public:
 	Stacked(Stacked&&) = delete;
 	Stacked& operator=(const Stacked&) = delete;
 	Stacked& operator=(Stacked&&) = delete;
-	~Stacked() = default;
+	~Stacked() override = default;
 
 	void initialize(const shared_ptr<DomainBase>&) override;
 

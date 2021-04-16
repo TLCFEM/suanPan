@@ -27,9 +27,7 @@
  * \return 0
  */
 int MultiplierBC::process(const shared_ptr<DomainBase>& D) {
-	// for eignevalue problem, only use penalty method
-	auto& t_step = *D->get_current_step();
-	if(typeid(Frequency) == typeid(t_step)) return PenaltyBC::process(D);
+	if(auto& t_step = *D->get_current_step(); typeid(Frequency) == typeid(t_step)) return PenaltyBC::process(D);
 
 	auto& t_matrix = D->get_factory()->get_stiffness();
 

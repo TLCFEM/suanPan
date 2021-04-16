@@ -26,7 +26,7 @@ class HDF final : public Database {
 	hid_t file_id;
 public:
 	explicit HDF(const char*);
-	~HDF();
+	~HDF() override;
 
 	int save() override;
 };

@@ -20,9 +20,7 @@
 double BilinearViscosity::compute_du(double, double) const { return 0.; }
 
 double BilinearViscosity::compute_dv(double, const double strain_rate) const {
-	const auto abs_v = fabs(strain_rate);
-
-	if(abs_v > yield_strain) return hardening;
+	if(const auto abs_v = fabs(strain_rate); abs_v > yield_strain) return hardening;
 
 	return damping;
 }

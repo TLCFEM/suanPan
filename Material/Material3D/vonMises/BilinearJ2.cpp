@@ -59,9 +59,8 @@ int BilinearJ2::update_trial_status(const vec& t_strain) {
 	const auto norm_shifted_stress = tensor::stress::norm(shifted_stress);
 
 	const auto yield_surf = yield_stress + isotropic_modulus * plastic_strain;
-	const auto yield_func = norm_shifted_stress - (yield_surf > 0. ? root_two_third * yield_surf : 0.);
 
-	if(yield_func > 0.) {
+	if(const auto yield_func = norm_shifted_stress - (yield_surf > 0. ? root_two_third * yield_surf : 0.); yield_func > 0.) {
 		const auto tmp_a = double_shear + two_third * (kinematic_modulus + (yield_surf > 0. ? isotropic_modulus : 0.));
 		const auto gamma = yield_func / tmp_a;
 

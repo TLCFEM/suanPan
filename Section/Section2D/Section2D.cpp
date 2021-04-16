@@ -32,9 +32,7 @@ Section2D::Section2D(const unsigned T, const unsigned MT, const double A, const 
 	: Section(T, SectionType::D2, MT, A, vec{EC, 0.}) {}
 
 int Section2D::update_trial_status(const vec& t_deformation) {
-	const vec incre_deformation = (trial_deformation = t_deformation) - current_deformation;
-
-	if(norm(incre_deformation) <= datum::eps) return SUANPAN_SUCCESS;
+	if(norm((trial_deformation = t_deformation) - current_deformation) <= datum::eps) return SUANPAN_SUCCESS;
 
 	trial_stiffness.zeros();
 	trial_resistance.zeros();

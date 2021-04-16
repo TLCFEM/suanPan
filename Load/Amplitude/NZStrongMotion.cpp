@@ -27,8 +27,7 @@ NZStrongMotion::NZStrongMotion(const unsigned T, const char* P, const unsigned S
 
 void NZStrongMotion::initialize(const shared_ptr<DomainBase>& D) {
 	struct stat buffer{};
-	Col<int> data;
-	if(0 != stat(file_name.c_str(), &buffer) || !data.load(file_name, auto_detect)) {
+	if(Col<int> data; 0 != stat(file_name.c_str(), &buffer) || !data.load(file_name, auto_detect)) {
 		suanpan_error("cannot load file %s.\n", file_name.c_str());
 		D->disable_amplitude(get_tag());
 	}

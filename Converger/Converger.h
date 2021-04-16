@@ -59,7 +59,7 @@ public:
 	Converger(Converger&&) = default;
 	Converger& operator=(const Converger&) = delete;
 	Converger& operator=(Converger&&) = delete;
-	virtual ~Converger() = default;
+	~Converger() override = default;
 
 	virtual int initialize();
 

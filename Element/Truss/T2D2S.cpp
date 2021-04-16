@@ -18,6 +18,7 @@
 #include "T2D2S.h"
 #include <Domain/DomainBase.h>
 #include <Section/Section.h>
+#include <Element/Utility/T2DC.h>
 
 T2D2S::T2D2S(const unsigned T, uvec&& N, const unsigned M, const bool F, const bool LS)
 	: SectionElement1D(T, t_node, t_dof, std::forward<uvec>(N), uvec{M}, F)

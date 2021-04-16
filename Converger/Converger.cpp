@@ -21,8 +21,8 @@
 /**
  * \brief the complete constructor.
  * \param T `unique_tag`
- * \param CT `class_tag`
  * \param E `tolerance`
+ * \param M `maximum_iteration`
  * \param P `print_flag`
  */
 Converger::Converger(const unsigned T, const double E, const unsigned M, const bool P)

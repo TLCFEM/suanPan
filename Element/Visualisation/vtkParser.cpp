@@ -173,8 +173,7 @@ void vtk_plot_node_quantity(const shared_ptr<DomainBase>& domain, vtkInfo config
 	std::for_each(t_element_pool.cbegin(), t_element_pool.cend(), [&](const shared_ptr<Element>& t_element) {
 		t_element->SetDeformation(node, config.scale);
 		t_element->GetData(data, to_list(vtk_get_name(config.type)));
-		const auto t_cell = t_element->GetCell();
-		if(nullptr != t_cell) grid->InsertNextCell(t_cell->GetCellType(), t_cell->GetPointIds());
+		if(const auto t_cell = t_element->GetCell(); nullptr != t_cell) grid->InsertNextCell(t_cell->GetCellType(), t_cell->GetPointIds());
 	});
 
 	grid->SetPoints(node);
@@ -239,10 +238,8 @@ void vtk_plot_element_quantity(const shared_ptr<DomainBase>& domain, vtkInfo con
 		t_element->SetDeformation(node, config.scale);
 		auto& t_encoding = t_element->get_node_encoding();
 		counter(t_encoding) += 1.;
-		const auto t_data = t_element->GetData(to_list(vtk_get_name(config.type)));
-		if(!t_data.empty()) tensor.cols(t_encoding) += t_data;
-		const auto t_cell = t_element->GetCell();
-		if(nullptr != t_cell) grid->InsertNextCell(t_cell->GetCellType(), t_cell->GetPointIds());
+		if(const auto t_data = t_element->GetData(to_list(vtk_get_name(config.type))); !t_data.empty()) tensor.cols(t_encoding) += t_data;
+		if(const auto t_cell = t_element->GetCell(); nullptr != t_cell) grid->InsertNextCell(t_cell->GetCellType(), t_cell->GetPointIds());
 	});
 
 	for(unsigned I = 0; I < max_node; ++I)

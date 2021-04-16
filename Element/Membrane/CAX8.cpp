@@ -66,7 +66,8 @@ void CAX8::initialize(const shared_ptr<DomainBase>& D) {
 
 	initial_stiffness.zeros(m_size, m_size);
 
-	int_pt.clear(), int_pt.reserve(plan.n_rows);
+	int_pt.clear();
+	int_pt.reserve(plan.n_rows);
 	for(unsigned I = 0; I < plan.n_rows; ++I) {
 		const auto& X = plan(I, 0);
 		const auto& Y = plan(I, 1);
@@ -81,7 +82,7 @@ void CAX8::initialize(const shared_ptr<DomainBase>& D) {
 
 		auto& c_int_pt = int_pt.back();
 
-		for(auto J = 0, K = 0, L = 1; J < m_node; ++J, K += m_dof, L += m_dof) {
+		for(auto J = 0u, K = 0u, L = 1u; J < m_node; ++J, K += m_dof, L += m_dof) {
 			c_int_pt.strain_mat(0, K) = c_int_pt.strain_mat(3, L) = pn_pxy(0, J);
 			c_int_pt.strain_mat(3, K) = c_int_pt.strain_mat(1, L) = pn_pxy(1, J);
 			c_int_pt.strain_mat(2, K) = n(J) / gx;

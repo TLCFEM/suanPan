@@ -52,7 +52,8 @@ void B31::initialize(const shared_ptr<DomainBase>& D) {
 	const IntegrationPlan plan(1, int_pt_num, IntegrationType::LOBATTO);
 
 	mat local_stiffness(6, 6, fill::zeros);
-	int_pt.clear(), int_pt.reserve(int_pt_num);
+	int_pt.clear();
+	int_pt.reserve(int_pt_num);
 	for(unsigned I = 0; I < int_pt_num; ++I) {
 		int_pt.emplace_back(plan(I, 0), .5 * plan(I, 1), sec_proto->get_copy());
 		int_pt[I].strain_mat(0, 0) = 1.;

@@ -53,9 +53,7 @@ void FrameRecorder::record(const shared_ptr<DomainBase>& D) {
 		const auto group_id = H5Gcreate(file_id, group_name.str().c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
 		for(const auto& I : D->get_element_pool()) {
-			const auto data = I->record(get_variable_type());
-
-			if(!data.empty()) {
+			if(const auto data = I->record(get_variable_type()); !data.empty()) {
 				mat data_to_write(data[0].n_elem, data.size());
 
 				uword idx = 0;

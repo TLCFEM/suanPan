@@ -20,9 +20,7 @@
 podarray<double> TrilinearDegradation::compute_degradation(const double t_strain) const {
 	podarray<double> damage(2);
 
-	const auto abs_e = fabs(t_strain);
-
-	if(abs_e > e_strain) {
+	if(const auto abs_e = fabs(t_strain); abs_e > e_strain) {
 		damage(0) = e_damage;
 		damage(1) = 0.;
 	}

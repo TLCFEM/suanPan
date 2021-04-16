@@ -54,7 +54,8 @@ void F31::initialize(const shared_ptr<DomainBase>& D) {
 	const IntegrationPlan plan(1, int_pt_num, IntegrationType::LOBATTO);
 
 	initial_local_flexibility.zeros(6, 6);
-	int_pt.clear(), int_pt.reserve(int_pt_num);
+	int_pt.clear();
+	int_pt.reserve(int_pt_num);
 	for(unsigned I = 0; I < int_pt_num; ++I) {
 		int_pt.emplace_back(plan(I, 0), .5 * plan(I, 1), sec_proto->get_copy());
 		int_pt[I].strain_mat(0, 0) = 1.;
@@ -93,10 +94,8 @@ int F31::update_status() {
 		trial_local_flexibility.zeros();
 		for(const auto& I : int_pt) {
 			const vec target_section_resistance = I.strain_mat * trial_local_resistance;
-			// compute unbalanced deformation
-			const vec incre_deformation = solve(I.b_section->get_trial_stiffness()(b_span, b_span), target_section_resistance - I.b_section->get_trial_resistance()(b_span));
 			// update status
-			if(I.b_section->update_trial_status(I.b_section->get_trial_deformation() + incre_deformation) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
+			if(const vec incre_deformation = solve(I.b_section->get_trial_stiffness()(b_span, b_span), target_section_resistance - I.b_section->get_trial_resistance()(b_span)); I.b_section->update_trial_status(I.b_section->get_trial_deformation() + incre_deformation) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 			// collect new flexibility and deformation
 			trial_local_flexibility += I.weight * length * I.strain_mat.t() * solve(I.b_section->get_trial_stiffness()(b_span, b_span), I.strain_mat);
 			residual_deformation += I.weight * length * I.strain_mat.t() * solve(I.b_section->get_trial_stiffness()(b_span, b_span), I.b_section->get_trial_resistance()(b_span) - target_section_resistance);

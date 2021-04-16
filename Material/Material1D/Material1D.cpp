@@ -27,11 +27,7 @@ const mat& Material1D::get_trial_stiffness() {
 	// for other cases using secant stiffness first
 	// if still very small keep stiffness as a nonzero small number
 	if(trial_stiffness(0) != 0. && fabs(trial_stiffness(0)) < 1E-8) {
-		const auto denominator = trial_strain(0) - current_strain(0);
-		if(fabs(denominator) > 1E-10) {
-			const auto secant_stiffness = (trial_stress(0) - current_stress(0)) / denominator;
-			if(fabs(secant_stiffness) < fabs(trial_stiffness(0))) trial_stiffness = secant_stiffness;
-		}
+		if(const auto denominator = trial_strain(0) - current_strain(0); fabs(denominator) > 1E-10) if(const auto secant_stiffness = (trial_stress(0) - current_stress(0)) / denominator; fabs(secant_stiffness) < fabs(trial_stiffness(0))) trial_stiffness = secant_stiffness;
 		if(fabs(trial_stiffness(0)) < 1E-8) {
 			const auto stiffness_sign = suanpan::sign(trial_stiffness(0));
 			trial_stiffness(0) = (stiffness_sign == 0. ? 1. : stiffness_sign) * 1E-8;

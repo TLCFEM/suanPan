@@ -31,9 +31,7 @@ int BilinearElastic1D::update_trial_status(const vec& t_strain) {
 
 	if(fabs(incre_strain(0)) <= datum::eps) return SUANPAN_SUCCESS;
 
-	const auto abs_strain = fabs(trial_strain(0));
-
-	if(suanpan::approx_equal(radius, 0.)) { abs_strain > yield_strain ? trial_stress = yield_stress + (abs_strain - yield_strain) * (trial_stiffness = hardening_modulus) : trial_stress = abs_strain * (trial_stiffness = elastic_modulus); }
+	if(const auto abs_strain = fabs(trial_strain(0)); suanpan::approx_equal(radius, 0.)) { abs_strain > yield_strain ? trial_stress = yield_stress + (abs_strain - yield_strain) * (trial_stiffness = hardening_modulus) : trial_stress = abs_strain * (trial_stiffness = elastic_modulus); }
 	else {
 		const auto normal_strain = std::max(datum::eps, abs_strain / yield_strain);
 		const auto factor_a = 1. + pow(normal_strain, radius);

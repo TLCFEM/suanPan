@@ -44,7 +44,7 @@ public:
 	Solver(Solver&&) = default;
 	Solver& operator=(const Solver&) = delete;
 	Solver& operator=(Solver&&) = delete;
-	virtual ~Solver();
+	~Solver() override;
 
 	virtual int initialize();
 

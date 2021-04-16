@@ -40,7 +40,7 @@ public:
 	int analyze() override;
 
 	void set_eigen_number(unsigned) const;
-	unsigned get_eigen_number() const;
+	[[nodiscard]] unsigned get_eigen_number() const;
 };
 
 #endif

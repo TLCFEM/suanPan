@@ -33,7 +33,6 @@
 
 class B2DL : public Orientation {
 protected:
-	double inclination = 0.;
 	mat trans_mat;
 
 	void form_trans_mat(const vec&);

@@ -40,8 +40,7 @@ void Fibre1D::initialize(const shared_ptr<DomainBase>& D) {
 
 	for(uword I = 0; I < fibre_tag.n_elem; ++I)
 		if(D->find_section(fibre_tag(I))) {
-			const auto& t_section = D->get_section(fibre_tag(I));
-			if(SectionType::D1 == t_section->get_section_type()) {
+			if(const auto& t_section = D->get_section(fibre_tag(I)); SectionType::D1 == t_section->get_section_type()) {
 				if(!t_section->is_initialized()) {
 					t_section->Section::initialize(D);
 					t_section->initialize(D);

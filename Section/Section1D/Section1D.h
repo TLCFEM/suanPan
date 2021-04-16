@@ -40,7 +40,7 @@ public:
 	Section1D(Section1D&&) = delete;                 // move forbidden
 	Section1D& operator=(const Section1D&) = delete; // assign forbidden
 	Section1D& operator=(Section1D&&) = delete;      // assign forbidden
-	virtual ~Section1D() = default;
+	~Section1D() override = default;
 
 	void initialize(const shared_ptr<DomainBase>&) override;
 

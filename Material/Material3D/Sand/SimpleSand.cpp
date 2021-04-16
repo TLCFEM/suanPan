@@ -17,7 +17,6 @@
 
 #include "SimpleSand.h"
 #include <Toolbox/tensorToolbox.h>
-#include <Recorder/OutputType.h>
 
 const span SimpleSand::sc(2, 7);
 const span SimpleSand::sd(8, 13);

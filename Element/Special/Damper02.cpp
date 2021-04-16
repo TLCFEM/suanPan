@@ -57,10 +57,7 @@ void Damper02::initialize(const shared_ptr<DomainBase>& D) {
 }
 
 int Damper02::update_status() {
-	const auto t_disp = get_trial_displacement();
-	const auto t_vec = get_trial_velocity();
-
-	if(SUANPAN_SUCCESS != device->update_trial_status(dot(direction_cosine, t_disp(JS) - t_disp(IS)), dot(direction_cosine, t_vec(JS) - t_vec(IS)))) return SUANPAN_FAIL;
+	if(const auto t_disp = get_trial_displacement(), t_vec = get_trial_velocity(); SUANPAN_SUCCESS != device->update_trial_status(dot(direction_cosine, t_disp(JS) - t_disp(IS)), dot(direction_cosine, t_vec(JS) - t_vec(IS)))) return SUANPAN_FAIL;
 
 	trial_resistance.set_size(d_size);
 	trial_resistance(JS) = direction_cosine * device->get_trial_stress();

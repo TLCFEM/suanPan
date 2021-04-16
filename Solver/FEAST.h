@@ -39,8 +39,8 @@ class FEAST final : public Solver {
 	const unsigned eigen_num;
 	const double radius;
 
-	int linear_solve(const shared_ptr<LongFactory>&) const;
-	int quadratic_solve(const shared_ptr<LongFactory>&) const;
+	[[nodiscard]] int linear_solve(const shared_ptr<LongFactory>&) const;
+	[[nodiscard]] int quadratic_solve(const shared_ptr<LongFactory>&) const;
 public:
 	FEAST(unsigned, unsigned, double, bool);
 

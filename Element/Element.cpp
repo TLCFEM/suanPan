@@ -25,10 +25,9 @@
 void Element::update_strain_energy() {
 	if(trial_resistance.is_empty()) return;
 
-	auto idx = 0;
 	auto incre_energy = 0.;
 
-	if(current_resistance.is_empty())
+	if(auto idx = 0; current_resistance.is_empty())
 		for(const auto& I : node_ptr) {
 			auto& t_disp = I.lock()->get_incre_displacement();
 			for(unsigned J = 0; J < num_dof; ++J) incre_energy += t_disp(J) * trial_resistance(idx++);
@@ -62,10 +61,9 @@ void Element::update_kinetic_energy() {
 void Element::update_viscous_energy() {
 	if(trial_damping_force.is_empty()) return;
 
-	auto idx = 0;
 	auto incre_energy = 0.;
 
-	if(current_damping_force.is_empty())
+	if(auto idx = 0; current_damping_force.is_empty())
 		for(const auto& I : node_ptr) {
 			auto& t_disp = I.lock()->get_incre_displacement();
 			for(unsigned J = 0; J < num_dof; ++J) incre_energy += t_disp(J) * trial_damping_force(idx++);
@@ -85,10 +83,9 @@ void Element::update_viscous_energy() {
 void Element::update_complementary_energy() {
 	if(trial_resistance.is_empty()) return;
 
-	auto idx = 0;
 	auto incre_energy = 0.;
 
-	if(current_resistance.is_empty())
+	if(auto idx = 0; current_resistance.is_empty())
 		for(const auto& I : node_ptr) {
 			auto& t_disp = I.lock()->get_trial_displacement();
 			auto& c_disp = I.lock()->get_current_displacement();

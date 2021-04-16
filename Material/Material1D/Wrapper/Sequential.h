@@ -50,7 +50,7 @@ public:
 	Sequential(Sequential&&) = delete;
 	Sequential& operator=(const Sequential&) = delete;
 	Sequential& operator=(Sequential&&) = delete;
-	~Sequential() = default;
+	~Sequential() override = default;
 
 	void initialize(const shared_ptr<DomainBase>&) override;
 

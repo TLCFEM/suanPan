@@ -393,8 +393,7 @@ void new_fibre1d(unique_ptr<Section>& return_obj, istringstream& command) {
 	}
 
 	vector<unsigned> tag_vector;
-	unsigned section_tag;
-	while(!command.eof()) if(get_input(command, section_tag)) tag_vector.emplace_back(section_tag);
+	while(!command.eof()) if(unsigned section_tag; get_input(command, section_tag)) tag_vector.emplace_back(section_tag);
 
 	podarray<unsigned> tag_array(tag_vector.size());
 	for(size_t I = 0; I < tag_vector.size(); ++I) tag_array(I) = tag_vector[I];
@@ -410,8 +409,7 @@ void new_fibre2d(unique_ptr<Section>& return_obj, istringstream& command) {
 	}
 
 	vector<unsigned> tag_vector;
-	unsigned section_tag;
-	while(!command.eof()) if(get_input(command, section_tag)) tag_vector.emplace_back(section_tag);
+	while(!command.eof()) if(unsigned section_tag; get_input(command, section_tag)) tag_vector.emplace_back(section_tag);
 
 	podarray<unsigned> tag_array(tag_vector.size());
 	for(size_t I = 0; I < tag_vector.size(); ++I) tag_array(I) = tag_vector[I];
@@ -427,8 +425,7 @@ void new_fibre3d(unique_ptr<Section>& return_obj, istringstream& command) {
 	}
 
 	vector<unsigned> tag_vector;
-	unsigned section_tag;
-	while(!command.eof()) if(get_input(command, section_tag)) tag_vector.emplace_back(section_tag);
+	while(!command.eof()) if(unsigned section_tag; get_input(command, section_tag)) tag_vector.emplace_back(section_tag);
 
 	podarray<unsigned> tag_array(tag_vector.size());
 	for(size_t I = 0; I < tag_vector.size(); ++I) tag_array(I) = tag_vector[I];

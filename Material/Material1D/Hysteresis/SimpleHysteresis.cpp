@@ -31,16 +31,13 @@ podarray<double> SimpleHysteresis::compute_compression_inner(const double t_stra
 		response(1) = reverse_c_stress / (reverse_c_strain - residual_c_strain);
 		response(0) = response(1) * (t_strain - residual_c_strain);
 	}
+	else if(const auto middle_strain = (1. - middle_point) * residual_t_strain + middle_point * reverse_t_strain; t_strain < middle_strain) {
+		response(1) = middle_point * reverse_t_stress / (middle_strain - residual_c_strain);
+		response(0) = response(1) * (t_strain - residual_c_strain);
+	}
 	else {
-		const auto middle_strain = (1. - middle_point) * residual_t_strain + middle_point * reverse_t_strain;
-		if(t_strain < middle_strain) {
-			response(1) = middle_point * reverse_t_stress / (middle_strain - residual_c_strain);
-			response(0) = response(1) * (t_strain - residual_c_strain);
-		}
-		else {
-			response(1) = reverse_t_stress / (reverse_t_strain - residual_t_strain);
-			response(0) = response(1) * (t_strain - residual_t_strain);
-		}
+		response(1) = reverse_t_stress / (reverse_t_strain - residual_t_strain);
+		response(0) = response(1) * (t_strain - residual_t_strain);
 	}
 
 	return response;
@@ -60,16 +57,13 @@ podarray<double> SimpleHysteresis::compute_tension_inner(const double t_strain) 
 		response(1) = reverse_t_stress / (reverse_t_strain - residual_t_strain);
 		response(0) = response(1) * (t_strain - residual_t_strain);
 	}
+	else if(const auto middle_strain = (1. - middle_point) * residual_c_strain + middle_point * reverse_c_strain; t_strain > middle_strain) {
+		response(1) = middle_point * reverse_c_stress / (middle_strain - residual_t_strain);
+		response(0) = response(1) * (t_strain - residual_t_strain);
+	}
 	else {
-		const auto middle_strain = (1. - middle_point) * residual_c_strain + middle_point * reverse_c_strain;
-		if(t_strain > middle_strain) {
-			response(1) = middle_point * reverse_c_stress / (middle_strain - residual_t_strain);
-			response(0) = response(1) * (t_strain - residual_t_strain);
-		}
-		else {
-			response(1) = reverse_c_stress / (reverse_c_strain - residual_c_strain);
-			response(0) = response(1) * (t_strain - residual_c_strain);
-		}
+		response(1) = reverse_c_stress / (reverse_c_strain - residual_c_strain);
+		response(0) = response(1) * (t_strain - residual_c_strain);
 	}
 
 	return response;

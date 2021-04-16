@@ -46,7 +46,7 @@ class Yeoh final : DataYeoh, public Material3D {
 	static constexpr double five_three = 5. * one_three;
 	static constexpr double eight_nine = two_three * four_three;
 
-	vec compute_derivative(double, double) const;
+	[[nodiscard]] vec compute_derivative(double, double) const;
 public:
 	Yeoh(unsigned,   // tag 
 	     vec&&,      // constants

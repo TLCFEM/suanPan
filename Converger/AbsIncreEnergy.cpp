@@ -29,15 +29,10 @@
 AbsIncreEnergy::AbsIncreEnergy(const unsigned T, const double E, const unsigned M, const bool P)
 	: Converger(T, E, M, P) {}
 
-/**
- * \brief
- * \return
- */
 bool AbsIncreEnergy::is_converged() {
 	const auto& D = get_domain().lock();
-	auto& W = D->get_factory();
 
-	if(W->get_reference_load().is_empty() || W->get_trial_load_factor().is_empty()) set_error(fabs(dot(W->get_ninja(), W->get_trial_load() - W->get_sushi())) / static_cast<double>(W->get_ninja().n_elem));
+	if(auto& W = D->get_factory(); W->get_reference_load().is_empty() || W->get_trial_load_factor().is_empty()) set_error(fabs(dot(W->get_ninja(), W->get_trial_load() - W->get_sushi())) / static_cast<double>(W->get_ninja().n_elem));
 	else set_error(fabs(dot(W->get_ninja(), W->get_reference_load() * W->get_trial_load_factor() + W->get_trial_load() - W->get_sushi())) / static_cast<double>(W->get_ninja().n_elem));
 
 	set_conv_flag(get_tolerance() > get_error());

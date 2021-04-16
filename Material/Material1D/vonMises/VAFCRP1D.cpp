@@ -48,9 +48,7 @@ int VAFCRP1D::update_trial_status(const vec& t_strain) {
 	trial_history = current_history;
 	auto& p = trial_history(size);
 
-	const auto residual = fabs(trial_stress(0) - accu(trial_history.head(size))) - std::max(0., yield + hardening * p + saturated * (1. - exp(-m * p)));
-
-	if(residual < 0.) return SUANPAN_SUCCESS;
+	if(fabs(trial_stress(0) - accu(trial_history.head(size))) < std::max(0., yield + hardening * p + saturated * (1. - exp(-m * p)))) return SUANPAN_SUCCESS;
 
 	auto gamma = 0.;
 	double xi, jacobian, exp_gamma;

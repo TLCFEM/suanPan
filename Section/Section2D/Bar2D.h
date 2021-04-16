@@ -42,7 +42,7 @@ public:
 	Bar2D(Bar2D&&) noexcept = delete;            // move forbidden
 	Bar2D& operator=(const Bar2D&) = delete;     // assign forbidden
 	Bar2D& operator=(Bar2D&&) noexcept = delete; // assign forbidden
-	~Bar2D() = default;
+	~Bar2D() override = default;
 
 	void initialize(const shared_ptr<DomainBase>&) override;
 

@@ -136,9 +136,7 @@ void ExternalModule::new_adapter(unique_ptr<Material>& return_obj, istringstream
 
 	while(!command.eof() && get_input(command, para)) pool.emplace_back(para);
 
-	auto ext_obj = make_unique<ExternalMaterial>(tag, std::move(pool), ext_creator);
-
-	if(ext_obj->validate()) return_obj = std::move(ext_obj);
+	if(auto ext_obj = make_unique<ExternalMaterial>(tag, std::move(pool), ext_creator); ext_obj->validate()) return_obj = std::move(ext_obj);
 }
 
 void ExternalModule::new_adapter(unique_ptr<Section>&, istringstream&) const {}

@@ -30,7 +30,8 @@
 #define T3D2S_H
 
 #include <Element/SectionElement.h>
-#include <Element/Utility/T3DC.h>
+
+class Orientation;
 
 class T3D2S final : public SectionElement1D {
 	static constexpr unsigned t_node = 2, t_dof = 3, t_size = t_dof * t_node;

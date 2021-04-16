@@ -41,9 +41,7 @@ int NonlinearMises1D::update_trial_status(const vec& t_strain) {
 	const auto shifted_stress = trial_stress(0) - back_stress;
 	const auto norm_shifted_stress = fabs(shifted_stress);
 
-	auto yield_func = norm_shifted_stress - std::max(0., compute_k(plastic_strain));
-
-	if(yield_func >= 0.) {
+	if(auto yield_func = norm_shifted_stress - std::max(0., compute_k(plastic_strain)); yield_func >= 0.) {
 		const auto current_h = compute_h(plastic_strain);
 		auto gamma = 0., incre_h = 0., dkdh = 0.;
 		unsigned counter = 0;

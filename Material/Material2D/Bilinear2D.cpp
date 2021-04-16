@@ -48,9 +48,8 @@ unique_ptr<Material> Bilinear2D::get_copy() { return make_unique<Bilinear2D>(*th
 
 int Bilinear2D::update_trial_status(const vec& t_strain) {
 	auto& t_stress = base.get_trial_stress();
-	auto& t_stiffness = base.get_trial_stiffness();
 
-	if(PlaneType::S == plane_type) {
+	if(auto& t_stiffness = base.get_trial_stiffness(); PlaneType::S == plane_type) {
 		incre_strain = t_strain - trial_strain;
 		trial_full_strain(F1) = trial_strain = t_strain;
 

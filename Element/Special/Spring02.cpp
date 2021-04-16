@@ -47,10 +47,7 @@ void Spring02::initialize(const shared_ptr<DomainBase>& D) {
 }
 
 int Spring02::update_status() {
-	const auto t_disp = get_trial_displacement();
-	const auto t_vec = get_trial_velocity();
-
-	if(SUANPAN_SUCCESS != s_material->update_trial_status(dot(direction_cosine, t_disp(JS) - t_disp(IS)), dot(direction_cosine, t_vec(JS) - t_vec(IS)))) return SUANPAN_FAIL;
+	if(const auto t_disp = get_trial_displacement(), t_vec = get_trial_velocity(); SUANPAN_SUCCESS != s_material->update_trial_status(dot(direction_cosine, t_disp(JS) - t_disp(IS)), dot(direction_cosine, t_vec(JS) - t_vec(IS)))) return SUANPAN_FAIL;
 
 	trial_stiffness.set_size(s_size, s_size);
 	trial_stiffness(IS, IS) = direction_cosine * s_material->get_trial_stiffness() * direction_cosine.t();

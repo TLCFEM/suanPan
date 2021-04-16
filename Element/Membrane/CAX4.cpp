@@ -58,7 +58,8 @@ void CAX4::initialize(const shared_ptr<DomainBase>& D) {
 
 	initial_stiffness.zeros(m_size, m_size);
 
-	int_pt.clear(), int_pt.reserve(plan.n_rows);
+	int_pt.clear();
+	int_pt.reserve(plan.n_rows);
 	for(unsigned I = 0; I < plan.n_rows; ++I) {
 		vec t_vec{plan(I, 0), plan(I, 1)};
 		const auto n = shape::quad(t_vec, 0);
