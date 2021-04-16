@@ -105,7 +105,8 @@ sudo apt install libglu1-mesa-dev freeglut3-dev mesa-common-dev
 Additional libraries used in **suanPan** are listed as follows.
 
 - [**ARPACK**](https://www.caam.rice.edu/software/ARPACK/) version 0.96
-- [**SPIKE**](http://www.ecs.umass.edu/~polizzi/spike/index.htm) version 1.0
+- [**SPIKE**](http://www.ecs.umass.edu/~polizzi/spike/) version 1.0
+- [**FEAST**](http://www.ecs.umass.edu/~polizzi/feast/) version 4.0
 - [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 5.2.2 and [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 3.1
 - [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.10
 - [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2020U2
