@@ -139,10 +139,13 @@ void WilsonPenzienNewmark::assemble_resistance() {
 	const auto& D = get_domain().lock();
 	auto& W = D->get_factory();
 
-	D->assemble_resistance();
-	D->assemble_inertial_force();
-	// considier independent viscous device
-	D->assemble_damping_force();
+	auto fa = std::async([&]() { D->assemble_resistance(); });
+	auto fb = std::async([&]() { D->assemble_inertial_force(); });
+	auto fc = std::async([&]() { D->assemble_damping_force(); }); // considier independent viscous device
+
+	fa.get();
+	fb.get();
+	fc.get();
 
 	W->update_trial_damping_force(W->get_trial_damping_force() + theta * (beta % (theta.t() * W->get_trial_velocity())));
 
@@ -153,9 +156,13 @@ void WilsonPenzienNewmark::assemble_matrix() {
 	const auto& D = get_domain().lock();
 	auto& W = D->get_factory();
 
-	D->assemble_trial_stiffness();
-	D->assemble_trial_mass();    // need a constant mass matrix
-	D->assemble_trial_damping(); // the model may have viscous device
+	auto fa = std::async([&]() { D->assemble_trial_stiffness(); });
+	auto fb = std::async([&]() { D->assemble_trial_mass(); });    // need a constant mass matrix
+	auto fc = std::async([&]() { D->assemble_trial_damping(); }); // the model may have viscous device
+
+	fa.get();
+	fb.get();
+	fc.get();
 
 	auto& t_stiff = W->get_stiffness();
 

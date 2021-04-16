@@ -24,9 +24,13 @@ void BatheTwoStep::assemble_resistance() {
 	const auto& D = get_domain().lock();
 	auto& W = D->get_factory();
 
-	D->assemble_resistance();
-	D->assemble_inertial_force();
-	D->assemble_damping_force();
+	auto fa = std::async([&]() { D->assemble_resistance(); });
+	auto fb = std::async([&]() { D->assemble_inertial_force(); });
+	auto fc = std::async([&]() { D->assemble_damping_force(); });
+
+	fa.get();
+	fb.get();
+	fc.get();
 
 	W->set_sushi(W->get_trial_resistance() + W->get_trial_damping_force() + W->get_trial_inertial_force());
 }
@@ -35,9 +39,13 @@ void BatheTwoStep::assemble_matrix() {
 	const auto& D = get_domain().lock();
 	auto& W = D->get_factory();
 
-	D->assemble_trial_stiffness();
-	D->assemble_trial_mass();
-	D->assemble_trial_damping();
+	auto fa = std::async([&]() { D->assemble_trial_stiffness(); });
+	auto fb = std::async([&]() { D->assemble_trial_mass(); });
+	auto fc = std::async([&]() { D->assemble_trial_damping(); });
+
+	fa.get();
+	fb.get();
+	fc.get();
 
 	auto& t_stiff = W->get_stiffness();
 
