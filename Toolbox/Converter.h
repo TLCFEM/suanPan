@@ -19,6 +19,7 @@
 #define CONVERTER_H
 
 #include <unordered_map>
+#include <fstream>
 
 struct Converter {
 	static std::istringstream clean(std::string);
