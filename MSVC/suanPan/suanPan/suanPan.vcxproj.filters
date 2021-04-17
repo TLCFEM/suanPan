@@ -2293,6 +2293,9 @@
     <ClInclude Include="..\..\..\Solver\FEAST.h">
       <Filter>Solver</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Domain\MetaMat\FullMatCUDA.hpp">
+      <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\..\Resource\suanPan.rc" />

@@ -30,7 +30,7 @@
 #ifndef FULLMAT_HPP
 #define FULLMAT_HPP
 
-template<typename T> class FullMat final : public MetaMat<T> {
+template<typename T> class FullMat : public MetaMat<T> {
 protected:
 	unique_ptr<MetaMat<T>> factorize() override;
 

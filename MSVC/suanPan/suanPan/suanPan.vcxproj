@@ -495,6 +495,7 @@
     <ClInclude Include="..\..\..\Domain\MetaMat\csc_form.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\csr_form.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\FullMat.hpp" />
+    <ClInclude Include="..\..\..\Domain\MetaMat\FullMatCUDA.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\MetaMat.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\operator_times.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\SparseMat.hpp" />
