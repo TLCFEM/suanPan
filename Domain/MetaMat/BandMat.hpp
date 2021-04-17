@@ -114,150 +114,33 @@ template<typename T> Mat<T> BandMat<T>::operator*(const Mat<T>& X) {
 	auto INC = 1;
 	T BETA = 0.;
 
+	if(std::is_same<T, float>::value) {
+		using E = float;
 #ifdef SUANPAN_MT
-	tbb::parallel_for(0llu, X.n_cols, [&](const uword I) {
-		if(std::is_same<T, float>::value) {
-			using E = float;
-			arma_fortran(arma_sgbmv)(&TRAN, &M, &N, &KL, &KU, (E*)&ALPHA, (E*)(this->memptr() + l_band), &LDA, (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC);
-		}
-		else if(std::is_same<T, double>::value) {
-			using E = double;
-			arma_fortran(arma_dgbmv)(&TRAN, &M, &N, &KL, &KU, (E*)&ALPHA, (E*)(this->memptr() + l_band), &LDA, (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC);
-		}
-	});
+		tbb::parallel_for(0llu, X.n_cols, [&](const uword I) { arma_fortran(arma_sgbmv)(&TRAN, &M, &N, &KL, &KU, (E*)&ALPHA, (E*)(this->memptr() + l_band), &LDA, (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC); });
 #else
-	for(uword I = 0; I < X.n_cols; ++I)
-		if(std::is_same<T, float>::value) {
-			using E = float;
+		for(uword I = 0; I < X.n_cols; ++I)
 			arma_fortran(arma_sgbmv)(&TRAN, &M, &N, &KL, &KU, (E*)&ALPHA, (E*)(this->memptr() + l_band), &LDA, (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC);
-		}
-		else if(std::is_same<T, double>::value) {
-			using E = double;
-			arma_fortran(arma_dgbmv)(&TRAN, &M, &N, &KL, &KU, (E*)&ALPHA, (E*)(this->memptr() + l_band), &LDA, (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC);
-		}
 #endif
+	}
+	else if(std::is_same<T, double>::value) {
+		using E = double;
+#ifdef SUANPAN_MT
+		tbb::parallel_for(0llu, X.n_cols, [&](const uword I) { arma_fortran(arma_dgbmv)(&TRAN, &M, &N, &KL, &KU, (E*)&ALPHA, (E*)(this->memptr() + l_band), &LDA, (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC); });
+#else
+		for(uword I = 0; I < X.n_cols; ++I)
+			arma_fortran(arma_dgbmv)(&TRAN, &M, &N, &KL, &KU, (E*)&ALPHA, (E*)(this->memptr() + l_band), &LDA, (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC);
+#endif
+	}
 
 	return Y;
 }
 
 template<typename T> int BandMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
-	auto INFO = 0;
-
-	//
-	// double precision
-	//
-	if(Precision::DOUBLE == precision) {
-		if(factored) {
-			suanpan_warning("the matrix is factored.\n");
-			return this->solve_trs(X, B);
-		}
-
-		suanpan_debug([&]() { if(n_rows != n_cols) throw invalid_argument("requires a square matrix"); });
-
-		X = B;
-
-		auto N = static_cast<int>(n_rows);
-		auto KL = static_cast<int>(l_band);
-		auto KU = static_cast<int>(u_band);
-		auto NRHS = static_cast<int>(B.n_cols);
-		auto LDAB = static_cast<int>(m_rows);
-		auto LDB = static_cast<int>(B.n_rows);
-		IPIV.zeros(N);
-
-		if(std::is_same<T, float>::value) {
-			using E = float;
-			arma_fortran(arma_sgbsv)(&N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
-		}
-		else if(std::is_same<T, double>::value) {
-			using E = double;
-			arma_fortran(arma_dgbsv)(&N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
-		}
-
-		if(INFO != 0) suanpan_error("solve() receives error code %u from base driver, the matrix is probably singular.\n", INFO);
-		else factored = true;
-
-		return INFO;
+	if(factored) {
+		suanpan_warning("the matrix is factorized.\n");
+		return this->solve_trs(X, B);
 	}
-
-	//
-	// single precision (mixed precision)
-	//
-
-	s_memory.set_size(this->n_elem);
-
-#ifdef SUANPAN_MT
-	tbb::parallel_for(0llu, this->n_elem, [&](const uword I) { s_memory(I) = static_cast<float>(this->memory[I]); });
-#else
-	for(uword I = 0; I < this->n_elem; ++I) s_memory(I) = static_cast<float>(this->memory[I]);
-#endif
-
-	auto M = static_cast<int>(n_rows);
-	auto N = static_cast<int>(n_cols);
-	auto KL = static_cast<int>(l_band);
-	auto KU = static_cast<int>(u_band);
-	auto LDAB = static_cast<int>(m_rows);
-	IPIV.zeros(N);
-
-	arma_fortran(arma_sgbtrf)(&M, &N, &KL, &KU, s_memory.memptr(), &LDAB, this->IPIV.memptr(), &INFO);
-
-	if(INFO != 0) return INFO;
-
-	factored = true;
-
-	X = arma::zeros(B.n_rows, B.n_cols);
-
-	mat full_residual = B;
-	fmat residual(B.n_rows, B.n_cols);
-#ifdef SUANPAN_MT
-	tbb::parallel_for(0llu, full_residual.n_elem, [&](const uword I) { residual(I) = static_cast<float>(full_residual(I)); });
-#else
-	for(uword I = 0; I < full_residual.n_elem; ++I) residual(I) = static_cast<float>(full_residual(I));
-#endif
-
-	auto multiplier = 1.;
-
-	auto NRHS = static_cast<int>(B.n_cols);
-	auto LDB = static_cast<int>(B.n_rows);
-	auto ALPHA = -1.;
-	auto BETA = 0.;
-	auto INCXY = 1;
-
-	auto counter = 0;
-	while(++counter < 10) {
-		arma_fortran(arma_sgbtrs)(&TRAN, &N, &KL, &KU, &NRHS, s_memory.memptr(), &LDAB, this->IPIV.memptr(), residual.memptr(), &LDB, &INFO);
-		if(0 != INFO) break;
-
-#ifdef SUANPAN_MT
-		tbb::parallel_for(0llu, X.n_elem, [&](const uword I) { X(I) += multiplier * residual(I); });
-#else
-		for(uword I = 0; I < X.n_elem; ++I) X(I) += multiplier * residual(I);
-#endif
-
-		for(uword I = 0; I < B.n_cols; ++I)
-			arma_fortran(arma_dgbmv)(&TRAN, &M, &N, &KL, &KU, &ALPHA, this->memptr() + l_band, &LDAB, X.colptr(I), &INCXY, &BETA, full_residual.colptr(I), &INCXY);
-
-		full_residual += B;
-
-		multiplier = norm(full_residual);
-
-		suanpan_debug("mixed precision algorithm multiplier: %.5E\n", multiplier);
-
-		if(multiplier < tolerance) break;
-
-#ifdef SUANPAN_MT
-		tbb::parallel_for(0llu, full_residual.n_elem, [&](const uword I) { residual(I) = static_cast<float>(full_residual(I) / multiplier); });
-#else
-		for(uword I = 0; I < full_residual.n_elem; ++I) residual(I) = static_cast<float>(full_residual(I) / multiplier);
-#endif
-	}
-
-	return INFO;
-}
-
-template<typename T> int BandMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
-	if(!factored) return this->solve(X, B);
-
-	if(IPIV.is_empty()) return SUANPAN_FAIL;
 
 	suanpan_debug([&]() { if(n_rows != n_cols) throw invalid_argument("requires a square matrix"); });
 
@@ -269,75 +152,98 @@ template<typename T> int BandMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 	auto NRHS = static_cast<int>(B.n_cols);
 	auto LDAB = static_cast<int>(m_rows);
 	auto LDB = static_cast<int>(B.n_rows);
+	IPIV.zeros(N);
 
-	//
-	// double precision
-	//
-	if(Precision::DOUBLE == precision) {
+	factored = true;
+
+	if(std::is_same<T, float>::value) {
+		using E = float;
+
 		X = B;
+		arma_fortran(arma_sgbsv)(&N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
+	}
+	else if(std::is_same<T, double>::value) {
+		using E = double;
 
-		if(std::is_same<T, float>::value) {
-			using E = float;
-			arma_fortran(arma_sgbtrs)(&TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
+		if(Precision::DOUBLE == precision) {
+			X = B;
+			arma_fortran(arma_dgbsv)(&N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
 		}
-		else if(std::is_same<T, double>::value) {
-			using E = double;
+		else {
+			s_memory.set_size(this->n_elem);
+
+#ifdef SUANPAN_MT
+			tbb::parallel_for(0llu, this->n_elem, [&](const uword I) { s_memory(I) = static_cast<float>(this->memory[I]); });
+#else
+			std::transform(this->memptr(), this->memptr() + this->n_elem, s_memory.mem, [](const double I) { return static_cast<float>(I); });
+#endif
+
+			arma_fortran(arma_sgbtrf)(&N, &N, &KL, &KU, s_memory.memptr(), &LDAB, this->IPIV.memptr(), &INFO);
+
+			if(0 == INFO) INFO = solve_trs(X, B);
+		}
+	}
+
+	if(0 != INFO) suanpan_error("solve() receives error code %u from base driver, the matrix is probably singular.\n", INFO);
+
+	return INFO;
+}
+
+template<typename T> int BandMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
+	if(!factored) return this->solve(X, B);
+
+	if(IPIV.is_empty()) return SUANPAN_FAIL;
+
+	auto INFO = 0;
+
+	auto N = static_cast<int>(n_rows);
+	auto KL = static_cast<int>(l_band);
+	auto KU = static_cast<int>(u_band);
+	auto NRHS = static_cast<int>(B.n_cols);
+	auto LDAB = static_cast<int>(m_rows);
+	auto LDB = static_cast<int>(B.n_rows);
+
+	if(std::is_same<T, float>::value) {
+		using E = float;
+
+		X = B;
+		arma_fortran(arma_sgbtrs)(&TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
+	}
+	else if(std::is_same<T, double>::value) {
+		using E = double;
+
+		if(Precision::DOUBLE == precision) {
+			X = B;
 			arma_fortran(arma_dgbtrs)(&TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
 		}
+		else {
+			X = arma::zeros(B.n_rows, B.n_cols);
 
-		if(INFO != 0) suanpan_error("solve() receives error code %u from base driver, the matrix is probably singular.\n", INFO);
+			mat full_residual = B;
 
-		return INFO;
+			auto multiplier = 1.;
+
+			auto counter = 0;
+			while(++counter < 10) {
+				auto residual = conv_to<fmat>::from(full_residual / multiplier);
+
+				arma_fortran(arma_sgbtrs)(&TRAN, &N, &KL, &KU, &NRHS, s_memory.memptr(), &LDAB, this->IPIV.memptr(), residual.memptr(), &LDB, &INFO);
+				if(0 != INFO) break;
+
+				X += multiplier * conv_to<mat>::from(residual);
+
+				full_residual = B - this->operator*(X);
+
+				multiplier = norm(full_residual);
+
+				suanpan_debug("mixed precision algorithm multiplier: %.5E\n", multiplier);
+
+				if(multiplier < tolerance) break;
+			}
+		}
 	}
 
-	//
-	// single precision (mixed precision)
-	//
-
-	X = arma::zeros(B.n_rows, B.n_cols);
-
-	mat full_residual = B;
-	fmat residual(B.n_rows, B.n_cols);
-#ifdef SUANPAN_MT
-	tbb::parallel_for(0llu, full_residual.n_elem, [&](const uword I) { residual(I) = static_cast<float>(full_residual(I)); });
-#else
-	for(uword I = 0; I < full_residual.n_elem; ++I) residual(I) = static_cast<float>(full_residual(I));
-#endif
-
-	auto multiplier = 1.;
-
-	auto ALPHA = -1.;
-	auto BETA = 0.;
-	auto INCXY = 1;
-
-	auto counter = 0;
-	while(++counter < 10) {
-		arma_fortran(arma_sgbtrs)(&TRAN, &N, &KL, &KU, &NRHS, s_memory.memptr(), &LDAB, this->IPIV.memptr(), residual.memptr(), &LDB, &INFO);
-		if(0 != INFO) break;
-
-#ifdef SUANPAN_MT
-		tbb::parallel_for(0llu, X.n_elem, [&](const uword I) { X(I) += multiplier * residual(I); });
-#else
-		for(uword I = 0; I < X.n_elem; ++I) X(I) += multiplier * residual(I);
-#endif
-
-		for(uword I = 0; I < B.n_cols; ++I)
-			arma_fortran(arma_dgbmv)(&TRAN, &N, &N, &KL, &KU, &ALPHA, this->memptr() + l_band, &LDAB, X.colptr(I), &INCXY, &BETA, full_residual.colptr(I), &INCXY);
-
-		full_residual += B;
-
-		multiplier = norm(full_residual);
-
-		suanpan_debug("mixed precision algorithm multiplier: %.5E\n", multiplier);
-
-		if(multiplier < tolerance) break;
-
-#ifdef SUANPAN_MT
-		tbb::parallel_for(0llu, full_residual.n_elem, [&](const uword I) { residual(I) = static_cast<float>(full_residual(I) / multiplier); });
-#else
-		for(uword I = 0; I < full_residual.n_elem; ++I) residual(I) = static_cast<float>(full_residual(I) / multiplier);
-#endif
-	}
+	if(INFO != 0) suanpan_error("solve() receives error code %u from base driver, the matrix is probably singular.\n", INFO);
 
 	return INFO;
 }
