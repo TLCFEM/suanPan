@@ -36,12 +36,6 @@ protected:
 
 	unique_ptr<MetaMat<T>> i() override;
 public:
-	using MetaMat<T>::IPIV;
-	using MetaMat<T>::factored;
-	using MetaMat<T>::n_cols;
-	using MetaMat<T>::n_rows;
-	using MetaMat<T>::memory;
-
 	FullMat();
 	FullMat(uword, uword);
 
@@ -68,8 +62,8 @@ template<typename T> Mat<T> FullMat<T>::operator*(const Mat<T>& B) {
 	Mat<T> C(size(B));
 
 	if(1 == B.n_cols) {
-		auto M = static_cast<int>(n_rows);
-		auto N = static_cast<int>(n_cols);
+		auto M = static_cast<int>(this->n_rows);
+		auto N = static_cast<int>(this->n_cols);
 		T ALPHA = 1.;
 		auto LDA = M;
 		auto INCX = 1;
@@ -86,9 +80,9 @@ template<typename T> Mat<T> FullMat<T>::operator*(const Mat<T>& B) {
 		}
 	}
 	else {
-		auto M = static_cast<int>(n_rows);
+		auto M = static_cast<int>(this->n_rows);
 		auto N = static_cast<int>(B.n_cols);
-		auto K = static_cast<int>(n_cols);
+		auto K = static_cast<int>(this->n_cols);
 		T ALPHA = 1.;
 		auto LDA = M;
 		auto LDB = K;
@@ -109,48 +103,63 @@ template<typename T> Mat<T> FullMat<T>::operator*(const Mat<T>& B) {
 }
 
 template<typename T> int FullMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
-	if(factored) {
+	if(this->factored) {
 		suanpan_debug("the matrix is factored.\n");
 		return this->solve_trs(X, B);
 	}
 
 	auto INFO = 0;
 
-	X = B;
-
-	auto N = static_cast<int>(n_rows);
+	auto N = static_cast<int>(this->n_rows);
 	auto NRHS = static_cast<int>(B.n_cols);
 	auto LDA = N;
 	auto LDB = static_cast<int>(B.n_rows);
-	IPIV.zeros(N);
+	this->IPIV.zeros(N);
 
 	if(std::is_same<T, float>::value) {
 		using E = float;
-		arma_fortran(arma_sgesv)(&N, &NRHS, (E*)this->memptr(), &LDA, IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
+
+		X = B;
+		arma_fortran(arma_sgesv)(&N, &NRHS, (E*)this->memptr(), &LDA, this->IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
+
+		if(0 == INFO) this->factored = true;
 	}
 	else if(std::is_same<T, double>::value) {
 		using E = double;
-		arma_fortran(arma_dgesv)(&N, &NRHS, (E*)this->memptr(), &LDA, IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
+
+		if(Precision::DOUBLE == this->precision) {
+			X = B;
+			arma_fortran(arma_dgesv)(&N, &NRHS, (E*)this->memptr(), &LDA, this->IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
+
+			if(0 == INFO) this->factored = true;
+		}
+		else {
+			podarray<double> WORK(N * NRHS);
+			podarray<float> SWORK(N * (N + NRHS));
+
+			auto ITER = 0;
+
+			X.set_size(size(B));
+			arma_fortran(arma_dsgesv)(&N, &NRHS, (E*)this->memptr(), &LDA, this->IPIV.memptr(), (E*)B.memptr(), &LDB, (E*)X.memptr(), &LDB, WORK.memptr(), SWORK.memptr(), &ITER, &INFO);
+
+			if(0 == INFO && 0 > ITER) this->factored = true;
+		}
 	}
 
-	if(INFO == 0) factored = true;
-	else suanpan_error("solve() receives error code %u from the base driver, the matrix is probably singular.\n", INFO);
+	if(0 != INFO) suanpan_error("solve() receives error code %u from the base driver, the matrix is probably singular.\n", INFO);
 
 	return INFO;
 
 }
 
 template<typename T> int FullMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
-	if(!factored) {
-		suanpan_debug("the matrix is not factored.\n");
-		return this->solve(X, B);
-	}
+	if(!this->factored) return this->solve(X, B);
 
-	if(IPIV.is_empty()) return -1;
+	if(this->IPIV.is_empty()) return -1;
 
 	X = B;
 
-	auto N = static_cast<int>(n_rows);
+	auto N = static_cast<int>(this->n_rows);
 	auto NRHS = static_cast<int>(B.n_cols);
 	auto LDA = N;
 	auto LDB = static_cast<int>(B.n_rows);
@@ -158,11 +167,11 @@ template<typename T> int FullMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 
 	if(std::is_same<T, float>::value) {
 		using E = float;
-		arma_fortran(arma_sgetrs)(const_cast<char*>(&this->TRAN), &N, &NRHS, (E*)this->memptr(), &LDA, IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
+		arma_fortran(arma_sgetrs)(const_cast<char*>(&this->TRAN), &N, &NRHS, (E*)this->memptr(), &LDA, this->IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
 	}
 	else if(std::is_same<T, double>::value) {
 		using E = double;
-		arma_fortran(arma_dgetrs)(const_cast<char*>(&this->TRAN), &N, &NRHS, (E*)this->memptr(), &LDA, IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
+		arma_fortran(arma_dgetrs)(const_cast<char*>(&this->TRAN), &N, &NRHS, (E*)this->memptr(), &LDA, this->IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
 	}
 
 	return INFO;
@@ -171,7 +180,7 @@ template<typename T> int FullMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 template<typename T> unique_ptr<MetaMat<T>> FullMat<T>::factorize() {
 	auto X = make_unique<FullMat<T>>(*this);
 
-	if(factored) {
+	if(this->factored) {
 		suanpan_warning("the matrix is factored.\n");
 		return X;
 	}
