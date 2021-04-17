@@ -40,12 +40,6 @@ template<typename T> class BandSymmMat final : public MetaMat<T> {
 protected:
 	unique_ptr<MetaMat<T>> factorize() override;
 public:
-	using MetaMat<T>::factored;
-	using MetaMat<T>::n_cols;
-	using MetaMat<T>::n_rows;
-	using MetaMat<T>::n_elem;
-	using MetaMat<T>::memory;
-
 	BandSymmMat();
 	BandSymmMat(uword, uword);
 
@@ -81,29 +75,29 @@ template<typename T> unique_ptr<MetaMat<T>> BandSymmMat<T>::make_copy() { return
 template<typename T> void BandSymmMat<T>::unify(const uword idx) {
 #ifdef SUANPAN_MT
 	tbb::parallel_for(0llu, idx, [&](const uword I) { at(idx, I) = 0.; });
-	tbb::parallel_for(static_cast<uword>(idx + 1llu), n_rows, [&](const uword I) { at(I, idx) = 0.; });
+	tbb::parallel_for(static_cast<uword>(idx + 1llu), this->n_rows, [&](const uword I) { at(I, idx) = 0.; });
 #else
 	for(uword I = 0; I < idx; ++I) at(idx, I) = 0.;
-	for(auto I = idx + 1llu; I < n_rows; ++I) at(I, idx) = 0.;
+	for(auto I = idx + 1llu; I < this->n_rows; ++I) at(I, idx) = 0.;
 #endif
 	at(idx, idx) = 1.;
 }
 
 template<typename T> const T& BandSymmMat<T>::operator()(const uword in_row, const uword in_col) const {
 	if(in_row > band + in_col) return bin = 0.;
-	return memory[in_row > in_col ? in_row - in_col + in_col * m_rows : in_col - in_row + in_row * m_rows];
+	return this->memory[in_row > in_col ? in_row - in_col + in_col * m_rows : in_col - in_row + in_row * m_rows];
 }
 
 template<typename T> T& BandSymmMat<T>::at(const uword in_row, const uword in_col) {
 	if(in_row > band + in_col || in_row < in_col) return bin = 0.;
 
-	return access::rw(memory[in_row - in_col + in_col * m_rows]);
+	return access::rw(this->memory[in_row - in_col + in_col * m_rows]);
 }
 
 template<typename T> Mat<T> BandSymmMat<T>::operator*(const Mat<T>& X) {
 	Mat<T> Y(size(X));
 
-	auto N = static_cast<int>(n_cols);
+	auto N = static_cast<int>(this->n_cols);
 	auto K = static_cast<int>(band);
 	T ALPHA = 1.;
 	auto LDA = static_cast<int>(m_rows);
@@ -136,14 +130,14 @@ template<typename T> Mat<T> BandSymmMat<T>::operator*(const Mat<T>& X) {
 }
 
 template<typename T> int BandSymmMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
-	if(factored) {
+	if(this->factored) {
 		suanpan_debug("the matrix is factored.\n");
 		return this->solve_trs(X, B);
 	}
 
 	X = B;
 
-	auto N = static_cast<int>(n_rows);
+	auto N = static_cast<int>(this->n_rows);
 	auto KD = static_cast<int>(band);
 	auto NRHS = static_cast<int>(B.n_cols);
 	auto LDAB = static_cast<int>(m_rows);
@@ -160,20 +154,20 @@ template<typename T> int BandSymmMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
 	}
 
 	if(INFO != 0) suanpan_error("solve() receives error code %u from the base driver, the matrix is probably singular.\n", INFO);
-	else factored = true;
+	else this->factored = true;
 
 	return INFO;
 }
 
 template<typename T> int BandSymmMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
-	if(!factored) {
+	if(!this->factored) {
 		suanpan_debug("the matrix is not factored.\n");
 		return this->solve(X, B);
 	}
 
 	X = B;
 
-	auto N = static_cast<int>(n_rows);
+	auto N = static_cast<int>(this->n_rows);
 	auto KD = static_cast<int>(band);
 	auto NRHS = static_cast<int>(B.n_cols);
 	auto LDAB = static_cast<int>(m_rows);
@@ -197,12 +191,12 @@ template<typename T> int BandSymmMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 template<typename T> unique_ptr<MetaMat<T>> BandSymmMat<T>::factorize() {
 	auto X = make_unique<BandSymmMat<T>>(*this);
 
-	if(factored) {
+	if(this->factored) {
 		suanpan_warning("the matrix is factored.\n");
 		return X;
 	}
 
-	auto N = static_cast<int>(n_rows);
+	auto N = static_cast<int>(this->n_rows);
 	auto KD = static_cast<int>(band);
 	auto LDAB = static_cast<int>(m_rows);
 	auto INFO = 0;

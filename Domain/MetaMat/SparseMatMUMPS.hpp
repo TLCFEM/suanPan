@@ -39,7 +39,6 @@ template<typename T> class SparseMatMUMPS final : public SparseMat<T> {
 	s32_vec l_irn, l_jrn;
 public:
 	using SparseMat<T>::SparseMat;
-	using SparseMat<T>::triplet_mat;
 
 	unique_ptr<MetaMat<T>> make_copy() override;
 
@@ -51,7 +50,7 @@ public:
 template<typename T> unique_ptr<MetaMat<T>> SparseMatMUMPS<T>::make_copy() { return make_unique<SparseMatMUMPS<T>>(*this); }
 
 template<typename T> int SparseMatMUMPS<T>::solve(Mat<T>& out_mat, const Mat<T>& in_mat) {
-	triplet_mat.csc_condense();
+	this->triplet_mat.csc_condense();
 
 	out_mat = in_mat;
 
@@ -61,8 +60,8 @@ template<typename T> int SparseMatMUMPS<T>::solve(Mat<T>& out_mat, const Mat<T>&
 	mumps_job.job = -1;
 	dmumps_c(&mumps_job);
 
-	mumps_job.n = static_cast<int>(triplet_mat.n_rows);
-	mumps_job.nnz = static_cast<int64_t>(triplet_mat.c_size);
+	mumps_job.n = static_cast<int>(this->triplet_mat.n_rows);
+	mumps_job.nnz = static_cast<int64_t>(this->triplet_mat.c_size);
 	mumps_job.nrhs = static_cast<int>(in_mat.n_cols);
 	mumps_job.lrhs = static_cast<int>(in_mat.n_rows);
 
@@ -71,19 +70,19 @@ template<typename T> int SparseMatMUMPS<T>::solve(Mat<T>& out_mat, const Mat<T>&
 
 #ifdef SUANPAN_MT
 	tbb::parallel_for(0, static_cast<int>(mumps_job.nnz), [&](const int I) {
-		l_irn[I] = static_cast<int>(triplet_mat.row_idx[I] + 1);
-		l_jrn[I] = static_cast<int>(triplet_mat.col_idx[I] + 1);
+		l_irn[I] = static_cast<int>(this->triplet_mat.row_idx[I] + 1);
+		l_jrn[I] = static_cast<int>(this->triplet_mat.col_idx[I] + 1);
 	});
 #else
 	for(auto I = 0; I < mumps_job.nnz; ++I) {
-		l_irn[I] = static_cast<int>(triplet_mat.row_idx[I] + 1);
-		l_jrn[I] = static_cast<int>(triplet_mat.col_idx[I] + 1);
+		l_irn[I] = static_cast<int>(this->triplet_mat.row_idx[I] + 1);
+		l_jrn[I] = static_cast<int>(this->triplet_mat.col_idx[I] + 1);
 	}
 #endif
 
 	mumps_job.irn = l_irn.memptr();
 	mumps_job.jcn = l_jrn.memptr();
-	mumps_job.a = triplet_mat.val_idx;
+	mumps_job.a = this->triplet_mat.val_idx;
 	mumps_job.rhs = out_mat.memptr();
 
 	mumps_job.icntl[0] = -1;

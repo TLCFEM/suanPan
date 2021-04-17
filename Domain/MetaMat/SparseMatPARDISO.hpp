@@ -39,7 +39,6 @@
 template<typename T> class SparseMatPARDISO final : public SparseMat<T> {
 public:
 	using SparseMat<T>::SparseMat;
-	using SparseMat<T>::triplet_mat;
 
 	unique_ptr<MetaMat<T>> make_copy() override;
 
@@ -53,7 +52,7 @@ template<typename T> unique_ptr<MetaMat<T>> SparseMatPARDISO<T>::make_copy() { r
 template<typename T> int SparseMatPARDISO<T>::solve(Mat<T>& out_mat, const Mat<T>& in_mat) {
 	out_mat.set_size(size(in_mat));
 
-	csr_form<T, int> csr_mat(triplet_mat);
+	csr_form<T, int> csr_mat(this->triplet_mat);
 
 	auto maxfct = 1;
 	auto mnum = 1;
@@ -80,7 +79,7 @@ template<typename T> int SparseMatPARDISO<T>::solve(Mat<T>& out_mat, const Mat<T
 	return 0 == error ? SUANPAN_SUCCESS : SUANPAN_FAIL;
 }
 
-template<typename T> void SparseMatPARDISO<T>::print() { triplet_mat.print(); }
+template<typename T> void SparseMatPARDISO<T>::print() { this->triplet_mat.print(); }
 
 #endif
 

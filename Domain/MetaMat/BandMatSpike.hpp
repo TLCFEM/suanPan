@@ -46,11 +46,6 @@ template<typename T> class BandMatSpike final : public MetaMat<T> {
 
 	void init_spike();
 public:
-	using MetaMat<T>::memory;
-	using MetaMat<T>::n_rows;
-	using MetaMat<T>::n_cols;
-	using MetaMat<T>::factored;
-
 	BandMatSpike();
 	BandMatSpike(uword, uword, uword);
 
@@ -70,7 +65,7 @@ public:
 template<typename T> T BandMatSpike<T>::bin = 0.;
 
 template<typename T> void BandMatSpike<T>::init_spike() {
-	auto N = static_cast<int>(n_rows);
+	auto N = static_cast<int>(this->n_rows);
 	auto KLU = static_cast<int>(std::max(l_band, u_band));
 
 	spikeinit_(SPIKE.memptr(), &N, &KLU);
@@ -95,20 +90,20 @@ template<typename T> unique_ptr<MetaMat<T>> BandMatSpike<T>::make_copy() { retur
 template<typename T> const T& BandMatSpike<T>::operator()(const uword in_row, const uword in_col) const {
 	if(in_row > in_col + l_band || in_row + u_band < in_col) return bin = 0.;
 
-	return memory[in_row + u_band + in_col * (m_rows - 1)];
+	return this->memory[in_row + u_band + in_col * (m_rows - 1)];
 }
 
 template<typename T> T& BandMatSpike<T>::at(const uword in_row, const uword in_col) {
 	if(in_row > in_col + l_band || in_row + u_band < in_col) return bin = 0.;
 
-	return access::rw(memory[in_row + u_band + in_col * (m_rows - 1)]);
+	return access::rw(this->memory[in_row + u_band + in_col * (m_rows - 1)]);
 }
 
 template<typename T> Mat<T> BandMatSpike<T>::operator*(const Mat<T>& X) {
 	Mat<T> Y(size(X));
 
-	auto M = static_cast<int>(n_rows);
-	auto N = static_cast<int>(n_cols);
+	auto M = static_cast<int>(this->n_rows);
+	auto N = static_cast<int>(this->n_cols);
 	auto KL = static_cast<int>(l_band);
 	auto KU = static_cast<int>(u_band);
 	T ALPHA = 1.;
@@ -146,7 +141,7 @@ template<typename T> int BandMatSpike<T>::solve(Mat<T>& X, const Mat<T>& B) {
 
 	X = B;
 
-	auto N = static_cast<int>(n_rows);
+	auto N = static_cast<int>(this->n_rows);
 	auto KL = static_cast<int>(l_band);
 	auto KU = static_cast<int>(u_band);
 	auto NRHS = static_cast<int>(X.n_cols);
@@ -167,18 +162,18 @@ template<typename T> int BandMatSpike<T>::solve(Mat<T>& X, const Mat<T>& B) {
 		dspike_gbtrs_(SPIKE.memptr(), &TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), (E*)X.memptr(), &LDB);
 	}
 
-	if(INFO == 0) factored = true;
+	if(INFO == 0) this->factored = true;
 	else suanpan_error("solve() receives error code %u from the base driver, the matrix is probably singular.\n", INFO);
 
 	return INFO;
 }
 
 template<typename T> int BandMatSpike<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
-	if(!factored) return solve(X, B);
+	if(!this->factored) return solve(X, B);
 
 	X = B;
 
-	auto N = static_cast<int>(n_rows);
+	auto N = static_cast<int>(this->n_rows);
 	auto KL = static_cast<int>(l_band);
 	auto KU = static_cast<int>(u_band);
 	auto NRHS = static_cast<int>(X.n_cols);

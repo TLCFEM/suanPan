@@ -32,7 +32,6 @@
 template<typename T> class SparseMat : public MetaMat<T> {
 public:
 	using MetaMat<T>::triplet_mat;
-	using MetaMat<T>::solve;
 
 	SparseMat() = default;
 	SparseMat(uword, uword, uword = 0);
@@ -110,7 +109,7 @@ template<typename T> Mat<T> SparseMat<T>::operator*(const Mat<T>& in_mat) { retu
 
 template<typename T> void SparseMat<T>::operator*=(const T scalar) { triplet_mat *= scalar; }
 
-template<typename T> int SparseMat<T>::solve_trs(Mat<T>& out_mat, const Mat<T>& in_mat) { return solve(out_mat, in_mat); }
+template<typename T> int SparseMat<T>::solve_trs(Mat<T>& out_mat, const Mat<T>& in_mat) { return this->solve(out_mat, in_mat); }
 
 template<typename T> int SparseMat<T>::sign_det() const { return 0; }
 

@@ -40,8 +40,8 @@ int Step::initialize() {
 		if(SolverType::LAPACK != system_solver && SolverType::SPIKE != system_solver) system_solver = SolverType::LAPACK;
 	}
 	else if(!symm_mat && !band_mat) {
-		// only LAPACK solvers are supported
-		system_solver = SolverType::LAPACK;
+		// only LAPACK and CUDA solvers are supported
+		if(SolverType::LAPACK != system_solver && SolverType::CUDA != system_solver) system_solver = SolverType::LAPACK;
 	}
 
 	if(converger_tag != 0 && t_domain->find_converger(converger_tag)) tester = t_domain->get_converger(converger_tag);

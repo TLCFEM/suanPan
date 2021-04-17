@@ -66,7 +66,6 @@ template<typename T> class SparseMatSuperLU final : public SparseMat<T> {
 #endif
 public:
 	using SparseMat<T>::SparseMat;
-	using SparseMat<T>::triplet_mat;
 
 	unique_ptr<MetaMat<T>> make_copy() override;
 
@@ -81,7 +80,7 @@ template<typename T> int SparseMatSuperLU<T>::solve(Mat<T>& out_mat, const Mat<T
 #ifdef SUANPAN_SUPERLUMT
 	out_mat = in_mat;
 
-	const csc_form<double, int> csc_mat(triplet_mat);
+	const csc_form<double, int> csc_mat(this->triplet_mat);
 
 	SuperMatrix A, L, U, B;
 
@@ -104,7 +103,7 @@ template<typename T> int SparseMatSuperLU<T>::solve(Mat<T>& out_mat, const Mat<T
 
 	return flag;
 #else
-	csc_form<T, uword> csc_mat(triplet_mat);
+	csc_form<T, uword> csc_mat(this->triplet_mat);
 
 	const uvec row_idx(csc_mat.row_idx, csc_mat.c_size, false, false);
 	const uvec col_ptr(csc_mat.col_ptr, csc_mat.n_cols + 1, false, false);
@@ -114,7 +113,7 @@ template<typename T> int SparseMatSuperLU<T>::solve(Mat<T>& out_mat, const Mat<T
 #endif
 }
 
-template<typename T> void SparseMatSuperLU<T>::print() { triplet_mat.print(); }
+template<typename T> void SparseMatSuperLU<T>::print() { this->triplet_mat.print(); }
 
 #endif
 

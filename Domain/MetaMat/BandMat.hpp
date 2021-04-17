@@ -43,15 +43,6 @@ template<typename T> class BandMat final : public MetaMat<T> {
 protected:
 	unique_ptr<MetaMat<T>> factorize() override;
 public:
-	using MetaMat<T>::IPIV;
-	using MetaMat<T>::factored;
-	using MetaMat<T>::n_cols;
-	using MetaMat<T>::n_rows;
-	using MetaMat<T>::n_elem;
-	using MetaMat<T>::memory;
-	using MetaMat<T>::precision;
-	using MetaMat<T>::tolerance;
-
 	BandMat();
 	BandMat(uword, uword, uword);
 
@@ -90,7 +81,7 @@ template<typename T> const T& BandMat<T>::operator()(const uword in_row, const u
 
 	if(in_row > in_col + l_band || in_row + u_band < in_col) return bin = 0.;
 
-	return memory[in_row + s_band + in_col * (m_rows - 1)];
+	return this->memory[in_row + s_band + in_col * (m_rows - 1)];
 }
 
 template<typename T> T& BandMat<T>::at(const uword in_row, const uword in_col) {
@@ -99,14 +90,14 @@ template<typename T> T& BandMat<T>::at(const uword in_row, const uword in_col) {
 
 	if(in_row > in_col + l_band || in_row + u_band < in_col) return bin = 0.;
 
-	return access::rw(memory[in_row + s_band + in_col * (m_rows - 1)]);
+	return access::rw(this->memory[in_row + s_band + in_col * (m_rows - 1)]);
 }
 
 template<typename T> Mat<T> BandMat<T>::operator*(const Mat<T>& X) {
 	Mat<T> Y(size(X));
 
-	auto M = static_cast<int>(n_rows);
-	auto N = static_cast<int>(n_cols);
+	auto M = static_cast<int>(this->n_rows);
+	auto N = static_cast<int>(this->n_cols);
 	auto KL = static_cast<int>(l_band);
 	auto KU = static_cast<int>(u_band);
 	T ALPHA = 1.;
@@ -137,37 +128,37 @@ template<typename T> Mat<T> BandMat<T>::operator*(const Mat<T>& X) {
 }
 
 template<typename T> int BandMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
-	if(factored) {
+	if(this->factored) {
 		suanpan_warning("the matrix is factorized.\n");
 		return this->solve_trs(X, B);
 	}
 
-	suanpan_debug([&]() { if(n_rows != n_cols) throw invalid_argument("requires a square matrix"); });
+	suanpan_debug([&]() { if(this->n_rows != this->n_cols) throw invalid_argument("requires a square matrix"); });
 
 	auto INFO = 0;
 
-	auto N = static_cast<int>(n_rows);
+	auto N = static_cast<int>(this->n_rows);
 	auto KL = static_cast<int>(l_band);
 	auto KU = static_cast<int>(u_band);
 	auto NRHS = static_cast<int>(B.n_cols);
 	auto LDAB = static_cast<int>(m_rows);
 	auto LDB = static_cast<int>(B.n_rows);
-	IPIV.zeros(N);
+	this->IPIV.zeros(N);
 
-	factored = true;
+	this->factored = true;
 
 	if(std::is_same<T, float>::value) {
 		using E = float;
 
 		X = B;
-		arma_fortran(arma_sgbsv)(&N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
+		arma_fortran(arma_sgbsv)(&N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, this->IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
 	}
 	else if(std::is_same<T, double>::value) {
 		using E = double;
 
-		if(Precision::DOUBLE == precision) {
+		if(Precision::DOUBLE == this->precision) {
 			X = B;
-			arma_fortran(arma_dgbsv)(&N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
+			arma_fortran(arma_dgbsv)(&N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, this->IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
 		}
 		else {
 			s_memory.set_size(this->n_elem);
@@ -190,13 +181,13 @@ template<typename T> int BandMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
 }
 
 template<typename T> int BandMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
-	if(!factored) return this->solve(X, B);
+	if(!this->factored) return this->solve(X, B);
 
-	if(IPIV.is_empty()) return SUANPAN_FAIL;
+	if(this->IPIV.is_empty()) return SUANPAN_FAIL;
 
 	auto INFO = 0;
 
-	auto N = static_cast<int>(n_rows);
+	auto N = static_cast<int>(this->n_rows);
 	auto KL = static_cast<int>(l_band);
 	auto KU = static_cast<int>(u_band);
 	auto NRHS = static_cast<int>(B.n_cols);
@@ -207,14 +198,14 @@ template<typename T> int BandMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 		using E = float;
 
 		X = B;
-		arma_fortran(arma_sgbtrs)(&TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
+		arma_fortran(arma_sgbtrs)(&TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, this->IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
 	}
 	else if(std::is_same<T, double>::value) {
 		using E = double;
 
-		if(Precision::DOUBLE == precision) {
+		if(Precision::DOUBLE == this->precision) {
 			X = B;
-			arma_fortran(arma_dgbtrs)(&TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
+			arma_fortran(arma_dgbtrs)(&TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, this->IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
 		}
 		else {
 			X = arma::zeros(B.n_rows, B.n_cols);
@@ -238,7 +229,7 @@ template<typename T> int BandMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 
 				suanpan_debug("mixed precision algorithm multiplier: %.5E\n", multiplier);
 
-				if(multiplier < tolerance) break;
+				if(multiplier < this->tolerance) break;
 			}
 		}
 	}
@@ -251,15 +242,15 @@ template<typename T> int BandMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 template<typename T> unique_ptr<MetaMat<T>> BandMat<T>::factorize() {
 	auto X = make_unique<BandMat<T>>(*this);
 
-	if(factored) {
+	if(this->factored) {
 		suanpan_warning("the matrix is factored.\n");
 		return X;
 	}
 
-	suanpan_debug([&]() { if(n_rows != n_cols) throw invalid_argument("requires a square matrix"); });
+	suanpan_debug([&]() { if(this->n_rows != this->n_cols) throw invalid_argument("requires a square matrix"); });
 
-	auto M = static_cast<int>(n_rows);
-	auto N = static_cast<int>(n_cols);
+	auto M = static_cast<int>(this->n_rows);
+	auto N = static_cast<int>(this->n_cols);
 	auto KL = static_cast<int>(l_band);
 	auto KU = static_cast<int>(u_band);
 	auto LDAB = static_cast<int>(m_rows);

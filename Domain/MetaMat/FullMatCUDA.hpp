@@ -34,10 +34,11 @@
 
 template<typename T> class FullMatCUDA final : public FullMat<T> {
 public:
-	using FullMat<T>::n_cols;
-	using FullMat<T>::n_rows;
-	using FullMat<T>::memory;
 	using FullMat<T>::FullMat;
+	using FullMat<T>::n_rows;
+	using FullMat<T>::n_cols;
+	using FullMat<T>::n_elem;
+	using FullMat<T>::memory;
 
 	unique_ptr<MetaMat<T>> make_copy() override;
 
@@ -48,17 +49,9 @@ public:
 
 template<typename T> unique_ptr<MetaMat<T>> FullMatCUDA<T>::make_copy() { return make_unique<FullMatCUDA<T>>(*this); }
 
-template<typename T> int FullMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) {
-	int INFO = 0;
+template<typename T> int FullMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) { return FullMat<T>::solve(X, B); }
 
-	return INFO;
-}
-
-template<typename T> int FullMatCUDA<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
-	int INFO = 0;
-
-	return INFO;
-}
+template<typename T> int FullMatCUDA<T>::solve_trs(Mat<T>& X, const Mat<T>& B) { return FullMat<T>::solve_trs(X, B); }
 
 #endif
 
