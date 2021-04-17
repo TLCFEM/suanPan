@@ -37,8 +37,6 @@ template<typename T> class BandSymmMat final : public MetaMat<T> {
 
 	const uword band;
 	const uword m_rows; // memory block layout
-protected:
-	unique_ptr<MetaMat<T>> factorize() override;
 public:
 	BandSymmMat();
 	BandSymmMat(uword, uword);
@@ -75,7 +73,7 @@ template<typename T> unique_ptr<MetaMat<T>> BandSymmMat<T>::make_copy() { return
 template<typename T> void BandSymmMat<T>::unify(const uword idx) {
 #ifdef SUANPAN_MT
 	tbb::parallel_for(0llu, idx, [&](const uword I) { at(idx, I) = 0.; });
-	tbb::parallel_for(static_cast<uword>(idx + 1llu), this->n_rows, [&](const uword I) { at(I, idx) = 0.; });
+	tbb::parallel_for(idx + 1llu, this->n_rows, [&](const uword I) { at(I, idx) = 0.; });
 #else
 	for(uword I = 0; I < idx; ++I) at(idx, I) = 0.;
 	for(auto I = idx + 1llu; I < this->n_rows; ++I) at(I, idx) = 0.;
@@ -130,10 +128,7 @@ template<typename T> Mat<T> BandSymmMat<T>::operator*(const Mat<T>& X) {
 }
 
 template<typename T> int BandSymmMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
-	if(this->factored) {
-		suanpan_debug("the matrix is factored.\n");
-		return this->solve_trs(X, B);
-	}
+	if(this->factored) return this->solve_trs(X, B);
 
 	X = B;
 
@@ -160,10 +155,7 @@ template<typename T> int BandSymmMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
 }
 
 template<typename T> int BandSymmMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
-	if(!this->factored) {
-		suanpan_debug("the matrix is not factored.\n");
-		return this->solve(X, B);
-	}
+	if(!this->factored) return this->solve(X, B);
 
 	X = B;
 
@@ -186,37 +178,6 @@ template<typename T> int BandSymmMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 	if(INFO != 0) suanpan_error("solve() receives error code %u from the base driver, the matrix is probably singular.\n", INFO);
 
 	return INFO;
-}
-
-template<typename T> unique_ptr<MetaMat<T>> BandSymmMat<T>::factorize() {
-	auto X = make_unique<BandSymmMat<T>>(*this);
-
-	if(this->factored) {
-		suanpan_warning("the matrix is factored.\n");
-		return X;
-	}
-
-	auto N = static_cast<int>(this->n_rows);
-	auto KD = static_cast<int>(band);
-	auto LDAB = static_cast<int>(m_rows);
-	auto INFO = 0;
-
-	if(std::is_same<T, float>::value) {
-		using E = float;
-		arma_fortran(arma_spbtrf)(&UPLO, &N, &KD, (E*)X->memptr(), &LDAB, &INFO);
-	}
-	else if(std::is_same<T, double>::value) {
-		using E = double;
-		arma_fortran(arma_dpbtrf)(&UPLO, &N, &KD, (E*)X->memptr(), &LDAB, &INFO);
-	}
-
-	if(INFO != 0) {
-		suanpan_error("factorize() fails.\n");
-		X->reset();
-	}
-	else X->factored = true;
-
-	return X;
 }
 
 #endif

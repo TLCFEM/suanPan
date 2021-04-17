@@ -35,10 +35,6 @@
 template<typename T> class FullMatCUDA final : public FullMat<T> {
 public:
 	using FullMat<T>::FullMat;
-	using FullMat<T>::n_rows;
-	using FullMat<T>::n_cols;
-	using FullMat<T>::n_elem;
-	using FullMat<T>::memory;
 
 	unique_ptr<MetaMat<T>> make_copy() override;
 

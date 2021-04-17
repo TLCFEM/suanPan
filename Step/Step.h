@@ -60,7 +60,7 @@ protected:
 	SolverType system_solver = SolverType::LAPACK;
 	Precision precision = Precision::DOUBLE;
 
-	double tolerance = 1E-14;
+	double tolerance = 1E-12;
 
 	weak_ptr<DomainBase> database;
 	shared_ptr<Factory<double>> factory;

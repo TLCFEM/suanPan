@@ -37,11 +37,6 @@ enum class Precision { SINGLE, DOUBLE };
 template<typename T> class MetaMat {
 protected:
 	static const char TRAN;
-
-	virtual unique_ptr<MetaMat> factorize();
-
-	virtual unique_ptr<MetaMat> i();
-	virtual unique_ptr<MetaMat> inv();
 public:
 	triplet_form<T, uword> triplet_mat;
 
@@ -55,7 +50,7 @@ public:
 
 	Precision precision = Precision::DOUBLE;
 
-	double tolerance = 1E-14;
+	double tolerance = 1E-12;
 
 	MetaMat();
 	MetaMat(uword, uword, uword);
@@ -279,12 +274,6 @@ template<typename T> Mat<T> MetaMat<T>::solve_trs(const SpMat<T>& B) {
 	if(this->solve_trs(X, Mat<T>(B)) != 0) X.reset();
 	return X;
 }
-
-template<typename T> unique_ptr<MetaMat<T>> MetaMat<T>::factorize() { throw invalid_argument("not supported"); }
-
-template<typename T> unique_ptr<MetaMat<T>> MetaMat<T>::i() { throw invalid_argument("not supported"); }
-
-template<typename T> unique_ptr<MetaMat<T>> MetaMat<T>::inv() { return i(); }
 
 template<typename T> int MetaMat<T>::solve_trs(Mat<T>& X, const SpMat<T>& B) { return this->solve_trs(X, Mat<T>(B)); }
 

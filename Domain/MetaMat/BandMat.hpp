@@ -40,8 +40,6 @@ template<typename T> class BandMat final : public MetaMat<T> {
 	const uword s_band;
 	const uword m_rows;       // memory block layout
 	podarray<float> s_memory; // float storage used in mixed precision algorithm
-protected:
-	unique_ptr<MetaMat<T>> factorize() override;
 public:
 	BandMat();
 	BandMat(uword, uword, uword);
@@ -54,6 +52,7 @@ public:
 	Mat<T> operator*(const Mat<T>&) override;
 
 	int solve(Mat<T>&, const Mat<T>&) override;
+
 	int solve_trs(Mat<T>&, const Mat<T>&) override;
 };
 
@@ -76,18 +75,12 @@ template<typename T> BandMat<T>::BandMat(const uword in_size, const uword in_l, 
 template<typename T> unique_ptr<MetaMat<T>> BandMat<T>::make_copy() { return make_unique<BandMat<T>>(*this); }
 
 template<typename T> const T& BandMat<T>::operator()(const uword in_row, const uword in_col) const {
-	// const auto n_bw = static_cast<long long>(in_row) - static_cast<long long>(in_col);
-	// if(n_bw > static_cast<long long>(l_band) || n_bw < -static_cast<long long>(u_band)) return bin = 0.;
-
 	if(in_row > in_col + l_band || in_row + u_band < in_col) return bin = 0.;
 
 	return this->memory[in_row + s_band + in_col * (m_rows - 1)];
 }
 
 template<typename T> T& BandMat<T>::at(const uword in_row, const uword in_col) {
-	// const auto n_bw = static_cast<long long>(in_row) - static_cast<long long>(in_col);
-	// if(n_bw > static_cast<long long>(l_band) || n_bw < -static_cast<long long>(u_band)) return bin = 0.;
-
 	if(in_row > in_col + l_band || in_row + u_band < in_col) return bin = 0.;
 
 	return access::rw(this->memory[in_row + s_band + in_col * (m_rows - 1)]);
@@ -128,10 +121,7 @@ template<typename T> Mat<T> BandMat<T>::operator*(const Mat<T>& X) {
 }
 
 template<typename T> int BandMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
-	if(this->factored) {
-		suanpan_warning("the matrix is factorized.\n");
-		return this->solve_trs(X, B);
-	}
+	if(this->factored) return this->solve_trs(X, B);
 
 	suanpan_debug([&]() { if(this->n_rows != this->n_cols) throw invalid_argument("requires a square matrix"); });
 
@@ -183,8 +173,6 @@ template<typename T> int BandMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
 template<typename T> int BandMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 	if(!this->factored) return this->solve(X, B);
 
-	if(this->IPIV.is_empty()) return SUANPAN_FAIL;
-
 	auto INFO = 0;
 
 	auto N = static_cast<int>(this->n_rows);
@@ -215,17 +203,13 @@ template<typename T> int BandMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 			auto multiplier = 1.;
 
 			auto counter = 0;
-			while(++counter < 10) {
+			while(++counter < 20) {
 				auto residual = conv_to<fmat>::from(full_residual / multiplier);
 
 				arma_fortran(arma_sgbtrs)(&TRAN, &N, &KL, &KU, &NRHS, s_memory.memptr(), &LDAB, this->IPIV.memptr(), residual.memptr(), &LDB, &INFO);
 				if(0 != INFO) break;
 
-				X += multiplier * conv_to<mat>::from(residual);
-
-				full_residual = B - this->operator*(X);
-
-				multiplier = norm(full_residual);
+				multiplier = norm(full_residual = B - this->operator*(X += multiplier * conv_to<mat>::from(residual)));
 
 				suanpan_debug("mixed precision algorithm multiplier: %.5E\n", multiplier);
 
@@ -237,42 +221,6 @@ template<typename T> int BandMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 	if(INFO != 0) suanpan_error("solve() receives error code %u from base driver, the matrix is probably singular.\n", INFO);
 
 	return INFO;
-}
-
-template<typename T> unique_ptr<MetaMat<T>> BandMat<T>::factorize() {
-	auto X = make_unique<BandMat<T>>(*this);
-
-	if(this->factored) {
-		suanpan_warning("the matrix is factored.\n");
-		return X;
-	}
-
-	suanpan_debug([&]() { if(this->n_rows != this->n_cols) throw invalid_argument("requires a square matrix"); });
-
-	auto M = static_cast<int>(this->n_rows);
-	auto N = static_cast<int>(this->n_cols);
-	auto KL = static_cast<int>(l_band);
-	auto KU = static_cast<int>(u_band);
-	auto LDAB = static_cast<int>(m_rows);
-	X->IPIV.zeros(N);
-	auto INFO = 0;
-
-	if(std::is_same<T, float>::value) {
-		using E = float;
-		arma_fortran(arma_sgbtrf)(&M, &N, &KL, &KU, (E*)X->memptr(), &LDAB, X->IPIV.memptr(), &INFO);
-	}
-	else if(std::is_same<T, double>::value) {
-		using E = double;
-		arma_fortran(arma_dgbtrf)(&M, &N, &KL, &KU, (E*)X->memptr(), &LDAB, X->IPIV.memptr(), &INFO);
-	}
-
-	if(INFO != 0) {
-		suanpan_error("factorize() fails.\n");
-		X->reset();
-	}
-	else X->factored = true;
-
-	return X;
 }
 
 #endif

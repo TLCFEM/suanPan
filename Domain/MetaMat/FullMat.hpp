@@ -31,10 +31,6 @@
 #define FULLMAT_HPP
 
 template<typename T> class FullMat : public MetaMat<T> {
-protected:
-	unique_ptr<MetaMat<T>> factorize() override;
-
-	unique_ptr<MetaMat<T>> i() override;
 public:
 	FullMat();
 	FullMat(uword, uword);
@@ -61,13 +57,15 @@ template<typename T> unique_ptr<MetaMat<T>> FullMat<T>::make_copy() { return mak
 template<typename T> Mat<T> FullMat<T>::operator*(const Mat<T>& B) {
 	Mat<T> C(size(B));
 
+	auto M = static_cast<int>(this->n_rows);
+	auto N = static_cast<int>(this->n_cols);
+	auto LDA = M;
+
+	T ALPHA = 1.;
+	T BETA = 0.;
+
 	if(1 == B.n_cols) {
-		auto M = static_cast<int>(this->n_rows);
-		auto N = static_cast<int>(this->n_cols);
-		T ALPHA = 1.;
-		auto LDA = M;
 		auto INCX = 1;
-		T BETA = 0.;
 		auto INCY = 1;
 
 		if(std::is_same<T, float>::value) {
@@ -80,22 +78,17 @@ template<typename T> Mat<T> FullMat<T>::operator*(const Mat<T>& B) {
 		}
 	}
 	else {
-		auto M = static_cast<int>(this->n_rows);
-		auto N = static_cast<int>(B.n_cols);
-		auto K = static_cast<int>(this->n_cols);
-		T ALPHA = 1.;
-		auto LDA = M;
-		auto LDB = K;
-		T BETA = 0.;
+		auto K = static_cast<int>(B.n_cols);
+		auto LDB = N;
 		auto LDC = M;
 
 		if(std::is_same<T, float>::value) {
 			using E = float;
-			arma_fortran(arma_sgemm)(&this->TRAN, &this->TRAN, &M, &N, &K, (E*)&ALPHA, (E*)this->memptr(), &LDA, (E*)B.memptr(), &LDB, (E*)&BETA, (E*)C.memptr(), &LDC);
+			arma_fortran(arma_sgemm)(&this->TRAN, &this->TRAN, &M, &K, &N, (E*)&ALPHA, (E*)this->memptr(), &LDA, (E*)B.memptr(), &LDB, (E*)&BETA, (E*)C.memptr(), &LDC);
 		}
 		else if(std::is_same<T, double>::value) {
 			using E = double;
-			arma_fortran(arma_dgemm)(&this->TRAN, &this->TRAN, &M, &N, &K, (E*)&ALPHA, (E*)this->memptr(), &LDA, (E*)B.memptr(), &LDB, (E*)&BETA, (E*)C.memptr(), &LDC);
+			arma_fortran(arma_dgemm)(&this->TRAN, &this->TRAN, &M, &K, &N, (E*)&ALPHA, (E*)this->memptr(), &LDA, (E*)B.memptr(), &LDB, (E*)&BETA, (E*)C.memptr(), &LDC);
 		}
 	}
 
@@ -103,59 +96,35 @@ template<typename T> Mat<T> FullMat<T>::operator*(const Mat<T>& B) {
 }
 
 template<typename T> int FullMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
-	if(this->factored) {
-		suanpan_debug("the matrix is factored.\n");
-		return this->solve_trs(X, B);
-	}
-
-	auto INFO = 0;
+	if(this->factored) return this->solve_trs(X, B);
 
 	auto N = static_cast<int>(this->n_rows);
 	auto NRHS = static_cast<int>(B.n_cols);
 	auto LDA = N;
 	auto LDB = static_cast<int>(B.n_rows);
+	auto INFO = 0;
+
 	this->IPIV.zeros(N);
+
+	X = B;
 
 	if(std::is_same<T, float>::value) {
 		using E = float;
-
-		X = B;
 		arma_fortran(arma_sgesv)(&N, &NRHS, (E*)this->memptr(), &LDA, this->IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
-
-		if(0 == INFO) this->factored = true;
 	}
 	else if(std::is_same<T, double>::value) {
 		using E = double;
-
-		if(Precision::DOUBLE == this->precision) {
-			X = B;
-			arma_fortran(arma_dgesv)(&N, &NRHS, (E*)this->memptr(), &LDA, this->IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
-
-			if(0 == INFO) this->factored = true;
-		}
-		else {
-			podarray<double> WORK(N * NRHS);
-			podarray<float> SWORK(N * (N + NRHS));
-
-			auto ITER = 0;
-
-			X.set_size(size(B));
-			arma_fortran(arma_dsgesv)(&N, &NRHS, (E*)this->memptr(), &LDA, this->IPIV.memptr(), (E*)B.memptr(), &LDB, (E*)X.memptr(), &LDB, WORK.memptr(), SWORK.memptr(), &ITER, &INFO);
-
-			if(0 == INFO && 0 > ITER) this->factored = true;
-		}
+		arma_fortran(arma_dgesv)(&N, &NRHS, (E*)this->memptr(), &LDA, this->IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
 	}
 
-	if(0 != INFO) suanpan_error("solve() receives error code %u from the base driver, the matrix is probably singular.\n", INFO);
+	if(0 == INFO) this->factored = true;
+	else suanpan_error("solve() receives error code %u from the base driver, the matrix is probably singular.\n", INFO);
 
 	return INFO;
-
 }
 
 template<typename T> int FullMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 	if(!this->factored) return this->solve(X, B);
-
-	if(this->IPIV.is_empty()) return -1;
 
 	X = B;
 
@@ -175,84 +144,6 @@ template<typename T> int FullMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 	}
 
 	return INFO;
-}
-
-template<typename T> unique_ptr<MetaMat<T>> FullMat<T>::factorize() {
-	auto X = make_unique<FullMat<T>>(*this);
-
-	if(this->factored) {
-		suanpan_warning("the matrix is factored.\n");
-		return X;
-	}
-
-	arma_debug_check(X->n_rows != X->n_cols, "i() only accepts sqaure matrix.");
-
-	auto M = static_cast<int>(X->n_rows);
-	auto N = M;
-	auto LDA = M;
-	X->IPIV.zeros(N);
-	auto INFO = 0;
-
-	if(std::is_same<T, float>::value) {
-		using E = float;
-		arma_fortran(arma_sgetrf)(&M, &N, (E*)X->memptr(), &LDA, X->IPIV.memptr(), &INFO);
-	}
-	else if(std::is_same<T, double>::value) {
-		using E = double;
-		arma_fortran(arma_dgetrf)(&M, &N, (E*)X->memptr(), &LDA, X->IPIV.memptr(), &INFO);
-	}
-
-	if(INFO != 0) {
-		suanpan_error("factorize() fails.\n");
-		X->reset();
-	}
-	else X->factored = true;
-
-	return X;
-}
-
-template<typename T> unique_ptr<MetaMat<T>> FullMat<T>::i() {
-	auto X = make_unique<FullMat<T>>(*this);
-
-	arma_debug_check(X->n_rows != X->n_cols, "i() only accepts sqaure matrix.");
-
-	auto M = static_cast<int>(X->n_rows);
-	auto N = M;
-	auto LDA = M;
-	X->IPIV.zeros(N);
-	auto INFO = 0;
-
-	if(std::is_same<T, float>::value) {
-		using E = float;
-		arma_fortran(arma_sgetrf)(&M, &N, (E*)X->memptr(), &LDA, X->IPIV.memptr(), &INFO);
-	}
-	else if(std::is_same<T, double>::value) {
-		using E = double;
-		arma_fortran(arma_dgetrf)(&M, &N, (E*)X->memptr(), &LDA, X->IPIV.memptr(), &INFO);
-	}
-
-	if(INFO != 0) {
-		X->reset();
-		return X;
-	}
-
-	auto LWORK = 8 * M;
-	const auto WORK = new T[LWORK];
-
-	if(std::is_same<T, float>::value) {
-		using E = float;
-		arma_fortran(arma_sgetri)(&N, (E*)X->memptr(), &LDA, X->IPIV.memptr(), (E*)WORK, &LWORK, &INFO);
-	}
-	else if(std::is_same<T, double>::value) {
-		using E = double;
-		arma_fortran(arma_dgetri)(&N, (E*)X->memptr(), &LDA, X->IPIV.memptr(), (E*)WORK, &LWORK, &INFO);
-	}
-
-	delete[] WORK;
-
-	if(INFO != 0) X->reset();
-
-	return X;
 }
 
 template<typename T> void FullMat<T>::save(const char* name) {

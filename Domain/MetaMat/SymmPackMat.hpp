@@ -34,10 +34,6 @@ template<typename T> class SymmPackMat final : public MetaMat<T> {
 	static const char SIDE;
 	static const char UPLO;
 	static T bin;
-protected:
-	unique_ptr<MetaMat<T>> factorize() override;
-
-	unique_ptr<MetaMat<T>> i() override;
 public:
 	SymmPackMat();
 	explicit SymmPackMat(uword);
@@ -159,73 +155,6 @@ template<typename T> int SymmPackMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 	}
 
 	return INFO;
-}
-
-template<typename T> unique_ptr<MetaMat<T>> SymmPackMat<T>::factorize() {
-	auto X = make_unique<SymmPackMat<T>>(*this);
-
-	if(this->factored) {
-		suanpan_warning("them matrix is factored.\n");
-		return X;
-	}
-
-	auto N = static_cast<int>(this->n_rows);
-	auto INFO = 0;
-
-	if(std::is_same<T, float>::value) {
-		using E = float;
-		arma_fortran(arma_spptrf)(&UPLO, &N, (E*)X->memptr(), &INFO);
-	}
-	else if(std::is_same<T, double>::value) {
-		using E = double;
-		arma_fortran(arma_dpptrf)(&UPLO, &N, (E*)X->memptr(), &INFO);
-	}
-
-	if(INFO != 0) {
-		suanpan_error("factorize() fails.\n");
-		X->reset();
-	}
-	else X->factored = true;
-
-	return X;
-}
-
-template<typename T> unique_ptr<MetaMat<T>> SymmPackMat<T>::i() {
-	auto X = make_unique<SymmPackMat<T>>(*this);
-
-	auto N = static_cast<int>(X->n_rows);
-	auto INFO = 0;
-
-	if(std::is_same<T, float>::value) {
-		using E = float;
-		arma_fortran(arma_spptrf)(&X->UPLO, &N, (E*)X->memptr(), &INFO);
-	}
-	else if(std::is_same<T, double>::value) {
-		using E = double;
-		arma_fortran(arma_dpptrf)(&X->UPLO, &N, (E*)X->memptr(), &INFO);
-	}
-
-	if(INFO != 0) {
-		X->reset();
-		return X;
-	}
-
-	const auto WORK = new T[N];
-
-	if(std::is_same<T, float>::value) {
-		using E = float;
-		arma_fortran(arma_spptri)(&X->UPLO, &N, (E*)X->memptr(), (E*)WORK, &INFO);
-	}
-	else if(std::is_same<T, double>::value) {
-		using E = double;
-		arma_fortran(arma_dpptri)(&X->UPLO, &N, (E*)X->memptr(), (E*)WORK, &INFO);
-	}
-
-	if(INFO != 0) X->reset();
-
-	delete[] WORK;
-
-	return X;
 }
 
 #endif

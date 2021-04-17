@@ -137,48 +137,47 @@ template<typename T> Mat<T> BandMatSpike<T>::operator*(const Mat<T>& X) {
 }
 
 template<typename T> int BandMatSpike<T>::solve(Mat<T>& X, const Mat<T>& B) {
-	auto INFO = 0;
+	if(!this->factored) {
+		auto N = static_cast<int>(this->n_rows);
+		auto KL = static_cast<int>(l_band);
+		auto KU = static_cast<int>(u_band);
+		auto LDAB = static_cast<int>(m_rows);
+		const auto KLU = static_cast<uword>(std::max(KL, KU));
+		auto INFO = 0;
 
-	X = B;
+		WORK.zeros(KLU * KLU * SPIKE(9));
 
-	auto N = static_cast<int>(this->n_rows);
-	auto KL = static_cast<int>(l_band);
-	auto KU = static_cast<int>(u_band);
-	auto NRHS = static_cast<int>(X.n_cols);
-	auto LDAB = static_cast<int>(m_rows);
-	auto LDB = static_cast<int>(X.n_rows);
-	const auto KLU = static_cast<uword>(std::max(KL, KU));
+		if(std::is_same<T, float>::value) {
+			using E = float;
+			sspike_gbtrf_(SPIKE.memptr(), &N, &KL, &KU, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), &INFO);
+		}
+		else {
+			using E = double;
+			dspike_gbtrf_(SPIKE.memptr(), &N, &KL, &KU, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), &INFO);
+		}
 
-	WORK.zeros(KLU * KLU * SPIKE(9));
+		if(INFO != 0) {
+			suanpan_error("solve() receives error code %u from the base driver, the matrix is probably singular.\n", INFO);
+			return INFO;
+		}
 
-	if(std::is_same<T, float>::value) {
-		using E = float;
-		sspike_gbtrf_(SPIKE.memptr(), &N, &KL, &KU, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), &INFO);
-		sspike_gbtrs_(SPIKE.memptr(), &TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), (E*)X.memptr(), &LDB);
+		this->factored = true;
 	}
-	else {
-		using E = double;
-		dspike_gbtrf_(SPIKE.memptr(), &N, &KL, &KU, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), &INFO);
-		dspike_gbtrs_(SPIKE.memptr(), &TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), (E*)X.memptr(), &LDB);
-	}
 
-	if(INFO == 0) this->factored = true;
-	else suanpan_error("solve() receives error code %u from the base driver, the matrix is probably singular.\n", INFO);
-
-	return INFO;
+	return solve_trs(X, B);
 }
 
 template<typename T> int BandMatSpike<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 	if(!this->factored) return solve(X, B);
 
-	X = B;
-
 	auto N = static_cast<int>(this->n_rows);
 	auto KL = static_cast<int>(l_band);
 	auto KU = static_cast<int>(u_band);
-	auto NRHS = static_cast<int>(X.n_cols);
+	auto NRHS = static_cast<int>(B.n_cols);
 	auto LDAB = static_cast<int>(m_rows);
-	auto LDB = static_cast<int>(X.n_rows);
+	auto LDB = static_cast<int>(B.n_rows);
+
+	X = B;
 
 	if(std::is_same<T, float>::value) {
 		using E = float;
