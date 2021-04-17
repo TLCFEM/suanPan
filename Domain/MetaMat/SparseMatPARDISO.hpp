@@ -69,6 +69,7 @@ template<typename T> int SparseMatPARDISO<T>::solve(Mat<T>& out_mat, const Mat<T
 	pardisoinit((void*)pt.memptr(), &mtype, iparm.memptr());
 
 	iparm(34) = 1; // zero-based indexing
+	if(std::is_same<T, float>::value) iparm(27) = 1;
 
 	auto phase = 13;
 	pardiso((void*)pt.memptr(), &maxfct, &mnum, &mtype, &phase, &n, (void*)csr_mat.val_idx, csr_mat.row_ptr, csr_mat.col_idx, perm.mem, &nrhs, iparm.memptr(), &msglvl, (void*)in_mat.memptr(), (void*)out_mat.memptr(), &error);

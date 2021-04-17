@@ -111,26 +111,25 @@ template<typename T> Mat<T> BandSymmMat<T>::operator*(const Mat<T>& X) {
 	T BETA = 0.;
 
 #ifdef SUANPAN_MT
-	tbb::parallel_for(0llu, X.n_cols, [&](const uword I) {
-		if(std::is_same<T, float>::value) {
-			using E = float;
-			arma_fortran(arma_ssbmv)(&UPLO, &N, &K, (E*)&ALPHA, (E*)this->memptr(), &LDA, (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC);
-		}
-		else if(std::is_same<T, double>::value) {
-			using E = double;
-			arma_fortran(arma_dsbmv)(&UPLO, &N, &K, (E*)&ALPHA, (E*)this->memptr(), &LDA, (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC);
-		}
-	});
+	if(std::is_same<T, float>::value) {
+		using E = float;
+		tbb::parallel_for(0llu, X.n_cols, [&](const uword I) { arma_fortran(arma_ssbmv)(&UPLO, &N, &K, (E*)&ALPHA, (E*)this->memptr(), &LDA, (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC); });
+	}
+	else if(std::is_same<T, double>::value) {
+		using E = double;
+		tbb::parallel_for(0llu, X.n_cols, [&](const uword I) { arma_fortran(arma_dsbmv)(&UPLO, &N, &K, (E*)&ALPHA, (E*)this->memptr(), &LDA, (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC); });
+	}
 #else
-	for(uword I = 0; I < X.n_cols; ++I)
-		if(std::is_same<T, float>::value) {
-			using E = float;
+	if(std::is_same<T, float>::value) {
+		using E = float;
+		for(uword I = 0; I < X.n_cols; ++I)
 			arma_fortran(arma_ssbmv)(&UPLO, &N, &K, (E*)&ALPHA, (E*)this->memptr(), &LDA, (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC);
-		}
-		else if(std::is_same<T, double>::value) {
-			using E = double;
+	}
+	else if(std::is_same<T, double>::value) {
+		using E = double;
+		for(uword I = 0; I < X.n_cols; ++I)
 			arma_fortran(arma_dsbmv)(&UPLO, &N, &K, (E*)&ALPHA, (E*)this->memptr(), &LDA, (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC);
-		}
+	}
 #endif
 
 	return Y;

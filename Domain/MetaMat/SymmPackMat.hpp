@@ -80,7 +80,7 @@ template<typename T> unique_ptr<MetaMat<T>> SymmPackMat<T>::make_copy() { return
 template<typename T> void SymmPackMat<T>::unify(const uword idx) {
 #ifdef SUANPAN_MT
 	tbb::parallel_for(0llu, idx, [&](const uword I) { at(I, idx) = 0.; });
-	tbb::parallel_for(static_cast<uword>(idx + 1llu), n_rows, [&](const uword I) { at(idx, I) = 0.; });
+	tbb::parallel_for(idx + 1llu, n_rows, [&](const uword I) { at(idx, I) = 0.; });
 #else
 	for(auto I = 0llu; I < idx; ++I) at(I, idx) = 0.;
 	for(auto I = idx + 1llu; I < n_rows; ++I) at(idx, I) = 0.;
