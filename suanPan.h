@@ -42,7 +42,6 @@ constexpr auto SUANPAN_ARCH = 64;
 
 #ifdef SUANPAN_MKL
 #define MKL_DIRECT_CALL
-#define ARMA_USE_MKL_ALLOC
 #endif
 
 #ifdef SUANPAN_HDF5
