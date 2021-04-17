@@ -737,7 +737,12 @@ template<typename T> void Factory<T>::initialize_auxiliary_resistance() {
 template<typename T> void Factory<T>::initialize_mass() {
 	switch(storage_type) {
 	case StorageScheme::FULL:
+#ifdef SUANPAN_CUDA
+		if(SolverType::CUDA == solver) global_mass = make_shared<FullMatCUDA<T>>(n_size, n_size);
+		else global_mass = make_shared<FullMat<T>>(n_size, n_size);
+#else
 		global_mass = make_shared<FullMat<T>>(n_size, n_size);
+#endif
 		break;
 	case StorageScheme::BAND:
 		if(SolverType::SPIKE == solver) global_mass = make_shared<BandMatSpike<T>>(n_size, n_lobw, n_upbw);
@@ -769,7 +774,12 @@ template<typename T> void Factory<T>::initialize_mass() {
 template<typename T> void Factory<T>::initialize_damping() {
 	switch(storage_type) {
 	case StorageScheme::FULL:
+#ifdef SUANPAN_CUDA
+		if(SolverType::CUDA == solver) global_damping = make_shared<FullMatCUDA<T>>(n_size, n_size);
+		else global_damping = make_shared<FullMat<T>>(n_size, n_size);
+#else
 		global_damping = make_shared<FullMat<T>>(n_size, n_size);
+#endif
 		break;
 	case StorageScheme::BAND:
 		if(SolverType::SPIKE == solver) global_damping = make_shared<BandMatSpike<T>>(n_size, n_lobw, n_upbw);
@@ -801,7 +811,12 @@ template<typename T> void Factory<T>::initialize_damping() {
 template<typename T> void Factory<T>::initialize_stiffness() {
 	switch(storage_type) {
 	case StorageScheme::FULL:
+#ifdef SUANPAN_CUDA
+		if(SolverType::CUDA == solver) global_stiffness = make_shared<FullMatCUDA<T>>(n_size, n_size);
+		else global_stiffness = make_shared<FullMat<T>>(n_size, n_size);
+#else
 		global_stiffness = make_shared<FullMat<T>>(n_size, n_size);
+#endif
 		break;
 	case StorageScheme::BAND:
 		if(SolverType::SPIKE == solver) global_stiffness = make_shared<BandMatSpike<T>>(n_size, n_lobw, n_upbw);
@@ -835,7 +850,12 @@ template<typename T> void Factory<T>::initialize_geometry() {
 
 	switch(storage_type) {
 	case StorageScheme::FULL:
+#ifdef SUANPAN_CUDA
+		if(SolverType::CUDA == solver) global_geometry = make_shared<FullMatCUDA<T>>(n_size, n_size);
+		else global_geometry = make_shared<FullMat<T>>(n_size, n_size);
+#else
 		global_geometry = make_shared<FullMat<T>>(n_size, n_size);
+#endif
 		break;
 	case StorageScheme::BAND:
 		if(SolverType::SPIKE == solver) global_geometry = make_shared<BandMatSpike<T>>(n_size, n_lobw, n_upbw);
