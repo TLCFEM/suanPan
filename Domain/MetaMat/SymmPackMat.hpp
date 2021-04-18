@@ -35,9 +35,9 @@ template<typename T> class SymmPackMat final : public MetaMat<T> {
 	static T bin;
 
 	podarray<float> s_memory;
-protected:
-	int solve_trs(Mat<T>&, const Mat<T>&) override;
-	int solve_trs(Mat<T>&, Mat<T>&&) override;
+
+	int solve_trs(Mat<T>&, const Mat<T>&);
+	int solve_trs(Mat<T>&, Mat<T>&&);
 public:
 	SymmPackMat();
 	explicit SymmPackMat(uword);
@@ -107,7 +107,7 @@ template<typename T> Mat<T> SymmPackMat<T>::operator*(const Mat<T>& X) {
 }
 
 template<typename T> int SymmPackMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
-	if(this->factored) return this->solve_trs(X, B);
+	if(this->factored) return solve_trs(X, B);
 
 	auto N = static_cast<int>(this->n_rows);
 	auto NRHS = static_cast<int>(B.n_cols);
@@ -191,7 +191,7 @@ template<typename T> int SymmPackMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 }
 
 template<typename T> int SymmPackMat<T>::solve(Mat<T>& X, Mat<T>&& B) {
-	if(this->factored) return this->solve_trs(X, std::forward<Mat<T>>(B));
+	if(this->factored) return solve_trs(X, std::forward<Mat<T>>(B));
 
 	auto N = static_cast<int>(this->n_rows);
 	auto NRHS = static_cast<int>(B.n_cols);
@@ -215,7 +215,7 @@ template<typename T> int SymmPackMat<T>::solve(Mat<T>& X, Mat<T>&& B) {
 
 		arma_fortran(arma_spptrf)(&UPLO, &N, s_memory.memptr(), &INFO);
 
-		if(0 == INFO) INFO = this->solve_trs(X, std::forward<Mat<T>>(B));
+		if(0 == INFO) INFO = solve_trs(X, std::forward<Mat<T>>(B));
 	}
 
 	if(0 != INFO) suanpan_error("solve() receives error code %u from the base driver, the matrix is probably singular.\n", INFO);

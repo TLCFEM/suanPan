@@ -40,9 +40,9 @@ template<typename T> class BandMat final : public MetaMat<T> {
 	const uword s_band;
 	const uword m_rows;       // memory block layout
 	podarray<float> s_memory; // float storage used in mixed precision algorithm
-protected:
-	int solve_trs(Mat<T>&, const Mat<T>&) override;
-	int solve_trs(Mat<T>&, Mat<T>&&) override;
+
+	int solve_trs(Mat<T>&, const Mat<T>&);
+	int solve_trs(Mat<T>&, Mat<T>&&);
 public:
 	BandMat();
 	BandMat(uword, uword, uword);
@@ -138,7 +138,7 @@ template<typename T> Mat<T> BandMat<T>::operator*(const Mat<T>& X) {
 }
 
 template<typename T> int BandMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
-	if(this->factored) return this->solve_trs(X, B);
+	if(this->factored) return solve_trs(X, B);
 
 	suanpan_debug([&]() { if(this->n_rows != this->n_cols) throw invalid_argument("requires a square matrix"); });
 
@@ -171,7 +171,7 @@ template<typename T> int BandMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
 
 		arma_fortran(arma_sgbtrf)(&N, &N, &KL, &KU, s_memory.memptr(), &LDAB, this->IPIV.memptr(), &INFO);
 
-		if(0 == INFO) INFO = this->solve_trs(X, B);
+		if(0 == INFO) INFO = solve_trs(X, B);
 	}
 
 	if(0 != INFO) suanpan_error("solve() receives error code %u from base driver, the matrix is probably singular.\n", INFO);
@@ -233,7 +233,7 @@ template<typename T> int BandMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 }
 
 template<typename T> int BandMat<T>::solve(Mat<T>& X, Mat<T>&& B) {
-	if(this->factored) return this->solve_trs(X, std::forward<Mat<T>>(B));
+	if(this->factored) return solve_trs(X, std::forward<Mat<T>>(B));
 
 	suanpan_debug([&]() { if(this->n_rows != this->n_cols) throw invalid_argument("requires a square matrix"); });
 
@@ -264,7 +264,7 @@ template<typename T> int BandMat<T>::solve(Mat<T>& X, Mat<T>&& B) {
 
 		arma_fortran(arma_sgbtrf)(&N, &N, &KL, &KU, s_memory.memptr(), &LDAB, this->IPIV.memptr(), &INFO);
 
-		if(0 == INFO) INFO = this->solve_trs(X, std::forward<Mat<T>>(B));
+		if(0 == INFO) INFO = solve_trs(X, std::forward<Mat<T>>(B));
 	}
 
 	if(0 != INFO) suanpan_error("solve() receives error code %u from base driver, the matrix is probably singular.\n", INFO);

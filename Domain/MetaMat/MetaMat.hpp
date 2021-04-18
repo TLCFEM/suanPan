@@ -44,9 +44,6 @@ protected:
 
 	Col<int> IPIV;
 
-	virtual int solve_trs(Mat<T>&, Mat<T>&&);
-	virtual int solve_trs(Mat<T>&, const Mat<T>&);
-
 	podarray<float> to_float();
 public:
 	triplet_form<T, uword> triplet_mat;
@@ -123,10 +120,6 @@ template<typename T> Mat<T> to_mat(const shared_ptr<MetaMat<T>>& in_mat) {
 
 	return out_mat;
 }
-
-template<typename T> int MetaMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) { return this->solve(X, B); }
-
-template<typename T> int MetaMat<T>::solve_trs(Mat<T>& X, Mat<T>&& B) { return this->solve(X, std::forward<Mat<T>>(B)); }
 
 template<typename T> podarray<float> MetaMat<T>::to_float() {
 	podarray<float> s_memory(this->n_elem);

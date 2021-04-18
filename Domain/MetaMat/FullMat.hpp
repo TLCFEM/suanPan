@@ -34,9 +34,9 @@ template<typename T> class FullMat : public MetaMat<T> {
 	static const char TRAN;
 
 	podarray<float> s_memory; // float storage used in mixed precision algorithm
-protected:
-	int solve_trs(Mat<T>&, const Mat<T>&) override;
-	int solve_trs(Mat<T>&, Mat<T>&&) override;
+
+	int solve_trs(Mat<T>&, const Mat<T>&);
+	int solve_trs(Mat<T>&, Mat<T>&&);
 public:
 	FullMat();
 	FullMat(uword, uword);
@@ -123,7 +123,7 @@ template<typename T> Mat<T> FullMat<T>::operator*(const Mat<T>& B) {
 }
 
 template<typename T> int FullMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
-	if(this->factored) return this->solve_trs(X, B);
+	if(this->factored) return solve_trs(X, B);
 
 	auto N = static_cast<int>(this->n_rows);
 	auto NRHS = static_cast<int>(B.n_cols);
@@ -151,7 +151,7 @@ template<typename T> int FullMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
 
 		arma_fortran(arma_sgetrf)(&N, &N, s_memory.memptr(), &N, this->IPIV.memptr(), &INFO);
 
-		if(0 == INFO) INFO = this->solve_trs(X, B);
+		if(0 == INFO) INFO = solve_trs(X, B);
 	}
 
 	if(0 != INFO) suanpan_error("solve() receives error code %u from the base driver, the matrix is probably singular.\n", INFO);
@@ -207,7 +207,7 @@ template<typename T> int FullMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 }
 
 template<typename T> int FullMat<T>::solve(Mat<T>& X, Mat<T>&& B) {
-	if(this->factored) return this->solve_trs(X, std::forward<Mat<T>>(B));
+	if(this->factored) return solve_trs(X, std::forward<Mat<T>>(B));
 
 	auto N = static_cast<int>(this->n_rows);
 	auto NRHS = static_cast<int>(B.n_cols);
@@ -233,7 +233,7 @@ template<typename T> int FullMat<T>::solve(Mat<T>& X, Mat<T>&& B) {
 
 		arma_fortran(arma_sgetrf)(&N, &N, s_memory.memptr(), &N, this->IPIV.memptr(), &INFO);
 
-		if(0 == INFO) INFO = this->solve_trs(X, std::forward<Mat<T>>(B));
+		if(0 == INFO) INFO = solve_trs(X, std::forward<Mat<T>>(B));
 	}
 
 	if(0 != INFO) suanpan_error("solve() receives error code %u from the base driver, the matrix is probably singular.\n", INFO);

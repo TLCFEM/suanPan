@@ -48,9 +48,9 @@ template<typename T> class BandMatSpike final : public MetaMat<T> {
 	podarray<float> SWORK;
 
 	void init_spike();
-protected:
-	int solve_trs(Mat<T>&, const Mat<T>&) override;
-	int solve_trs(Mat<T>&, Mat<T>&&) override;
+
+	int solve_trs(Mat<T>&, const Mat<T>&);
+	int solve_trs(Mat<T>&, Mat<T>&&);
 public:
 	BandMatSpike();
 	BandMatSpike(uword, uword, uword);
@@ -193,7 +193,7 @@ template<typename T> int BandMatSpike<T>::solve(Mat<T>& X, const Mat<T>& B) {
 		this->factored = true;
 	}
 
-	return this->solve_trs(X, B);
+	return solve_trs(X, B);
 }
 
 template<typename T> int BandMatSpike<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
@@ -278,7 +278,7 @@ template<typename T> int BandMatSpike<T>::solve(Mat<T>& X, Mat<T>&& B) {
 		this->factored = true;
 	}
 
-	return this->solve_trs(X, std::forward<Mat<T>>(B));
+	return solve_trs(X, std::forward<Mat<T>>(B));
 }
 
 template<typename T> int BandMatSpike<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
