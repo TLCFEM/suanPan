@@ -58,7 +58,7 @@ int Newton::analyze() {
 			// some constraints may have resistance
 			if(SUANPAN_SUCCESS != G->process_constraint_resistance()) return SUANPAN_FAIL;
 			// call solver
-			flag = G->solve_trs(ninja, G->get_force_residual());
+			flag = G->solve(ninja, G->get_force_residual());
 		}
 		else {
 			// first iteration
@@ -87,7 +87,7 @@ int Newton::analyze() {
 			const auto n_size = W->get_size();
 			auto& border = W->get_auxiliary_stiffness();
 			mat right;
-			if(SUANPAN_SUCCESS != G->solve_trs(right, border)) return SUANPAN_FAIL;
+			if(SUANPAN_SUCCESS != G->solve(right, border)) return SUANPAN_FAIL;
 			auto& aux_lambda = get_auxiliary_lambda(W);
 			if(!solve(aux_lambda, border.t() * right.head_rows(n_size), border.t() * ninja.head_rows(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
 			ninja -= right * aux_lambda;

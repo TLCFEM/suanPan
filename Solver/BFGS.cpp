@@ -76,7 +76,7 @@ int BFGS::analyze() {
 				const auto n_size = W->get_size();
 				auto& border = W->get_auxiliary_stiffness();
 				mat right;
-				if(SUANPAN_SUCCESS != G->solve_trs(right, border)) return SUANPAN_FAIL;
+				if(SUANPAN_SUCCESS != G->solve(right, border)) return SUANPAN_FAIL;
 				if(!solve(aux_lambda, border.t() * right.head_rows(n_size), border.t() * ninja.head_rows(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
 				ninja -= right * aux_lambda;
 			}
@@ -100,13 +100,13 @@ int BFGS::analyze() {
 				ninja -= *alpha.crbegin() * hist_residual[J];
 			}
 			// apply the Hessian from the factorazation in the first iteration
-			ninja = G->solve_trs(ninja);
+			ninja = G->solve(ninja);
 			// deal with mpc
 			if(0 != W->get_mpc()) {
 				const auto n_size = W->get_size();
 				auto& border = W->get_auxiliary_stiffness();
 				mat right;
-				if(SUANPAN_SUCCESS != G->solve_trs(right, border)) return SUANPAN_FAIL;
+				if(SUANPAN_SUCCESS != G->solve(right, border)) return SUANPAN_FAIL;
 				if(!solve(aux_lambda, border.t() * right.head_rows(n_size), border.t() * ninja.head_rows(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
 				ninja -= right * aux_lambda;
 			}

@@ -32,25 +32,29 @@
 #include <Toolbox/debug.h>
 #include <Domain/MetaMat/triplet_form.hpp>
 
-enum class Precision { SINGLE, DOUBLE };
+enum class Precision { MIXED, FULL };
 
 template<typename T> class MetaMat {
 protected:
 	static const char TRAN;
+
+	bool factored = false;
+
+	double tolerance = 1E-12;
+
+	Precision precision = Precision::FULL;
+
+	Col<int> IPIV;
+
+	virtual int solve_trs(Mat<T>&, const Mat<T>&);
 public:
 	triplet_form<T, uword> triplet_mat;
 
-	Col<int> IPIV;
-	bool factored = false;
 	const uword n_rows;
 	const uword n_cols;
 	const uword n_elem;
 
 	const T* const memory = nullptr;
-
-	Precision precision = Precision::DOUBLE;
-
-	double tolerance = 1E-12;
 
 	MetaMat();
 	MetaMat(uword, uword, uword);
@@ -59,6 +63,9 @@ public:
 	MetaMat& operator=(const MetaMat&);
 	MetaMat& operator=(MetaMat&&) noexcept;
 	virtual ~MetaMat();
+
+	void set_tolerance(double);
+	void set_precision(Precision);
 
 	[[nodiscard]] virtual bool is_empty() const;
 	virtual void init();
@@ -86,13 +93,8 @@ public:
 
 	Mat<T> solve(const Mat<T>&);
 	Mat<T> solve(const SpMat<T>&);
-	virtual int solve(Mat<T>&, const Mat<T>&) = 0;
 	int solve(Mat<T>&, const SpMat<T>&);
-
-	Mat<T> solve_trs(const Mat<T>&);
-	Mat<T> solve_trs(const SpMat<T>&);
-	virtual int solve_trs(Mat<T>&, const Mat<T>&) = 0;
-	int solve_trs(Mat<T>&, const SpMat<T>&);
+	virtual int solve(Mat<T>&, const Mat<T>&) = 0;
 
 	[[nodiscard]] virtual int sign_det() const;
 
@@ -121,6 +123,8 @@ template<typename T> Mat<T> to_mat(const shared_ptr<MetaMat<T>>& in_mat) {
 	return out_mat;
 }
 
+template<typename T> int MetaMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) { return solve(X, B); }
+
 template<typename T> MetaMat<T>::MetaMat()
 	: n_rows(0)
 	, n_cols(0)
@@ -136,25 +140,25 @@ template<typename T> MetaMat<T>::MetaMat(const uword in_rows, const uword in_col
 }
 
 template<typename T> MetaMat<T>::MetaMat(const MetaMat& old_mat)
-	: triplet_mat(old_mat.triplet_mat)
-	, factored(old_mat.factored)
+	: factored(old_mat.factored)
+	, tolerance(old_mat.tolerance)
+	, precision(old_mat.precision)
+	, triplet_mat(old_mat.triplet_mat)
 	, n_rows(old_mat.n_rows)
 	, n_cols(old_mat.n_cols)
-	, n_elem(old_mat.n_elem)
-	, precision(old_mat.precision)
-	, tolerance(old_mat.tolerance) {
+	, n_elem(old_mat.n_elem) {
 	MetaMat<T>::init();
 	if(nullptr != old_mat.memptr()) std::copy(old_mat.memptr(), old_mat.memptr() + old_mat.n_elem, MetaMat<T>::memptr());
 }
 
 template<typename T> MetaMat<T>::MetaMat(MetaMat&& old_mat) noexcept
-	: triplet_mat(std::forward<triplet_form<T, uword>>(old_mat.triplet_mat))
-	, factored(old_mat.factored)
+	: factored(old_mat.factored)
+	, tolerance(old_mat.tolerance)
+	, precision(old_mat.precision)
+	, triplet_mat(std::forward<triplet_form<T, uword>>(old_mat.triplet_mat))
 	, n_rows(old_mat.n_rows)
 	, n_cols(old_mat.n_cols)
-	, n_elem(old_mat.n_elem)
-	, precision(old_mat.precision)
-	, tolerance(old_mat.tolerance) {
+	, n_elem(old_mat.n_elem) {
 	access::rw(memory) = old_mat.memory;
 	access::rw(old_mat.memory) = nullptr;
 }
@@ -162,9 +166,9 @@ template<typename T> MetaMat<T>::MetaMat(MetaMat&& old_mat) noexcept
 template<typename T> MetaMat<T>& MetaMat<T>::operator=(const MetaMat& old_mat) {
 	if(&old_mat != this) {
 		factored = old_mat.factored;
-		triplet_mat = old_mat.triplet_mat;
-		precision = old_mat.precision;
 		tolerance = old_mat.tolerance;
+		precision = old_mat.precision;
+		triplet_mat = old_mat.triplet_mat;
 		access::rw(n_rows) = old_mat.n_rows;
 		access::rw(n_cols) = old_mat.n_cols;
 		access::rw(n_elem) = old_mat.n_elem;
@@ -177,9 +181,9 @@ template<typename T> MetaMat<T>& MetaMat<T>::operator=(const MetaMat& old_mat) {
 template<typename T> MetaMat<T>& MetaMat<T>::operator=(MetaMat&& old_mat) noexcept {
 	if(&old_mat != this) {
 		factored = old_mat.factored;
-		triplet_mat = old_mat.triplet_mat;
-		precision = old_mat.precision;
 		tolerance = old_mat.tolerance;
+		precision = old_mat.precision;
+		triplet_mat = old_mat.triplet_mat;
 		access::rw(n_rows) = old_mat.n_rows;
 		access::rw(n_cols) = old_mat.n_cols;
 		access::rw(n_elem) = old_mat.n_elem;
@@ -190,6 +194,10 @@ template<typename T> MetaMat<T>& MetaMat<T>::operator=(MetaMat&& old_mat) noexce
 }
 
 template<typename T> MetaMat<T>::~MetaMat() { if(memory != nullptr) memory::release(access::rw(memory)); }
+
+template<typename T> void MetaMat<T>::set_tolerance(const double TOL) { tolerance = TOL; }
+
+template<typename T> void MetaMat<T>::set_precision(const Precision P) { precision = P; }
 
 template<typename T> bool MetaMat<T>::is_empty() const { return 0 == n_elem; }
 
@@ -257,25 +265,11 @@ template<typename T> Mat<T> MetaMat<T>::solve(const Mat<T>& B) {
 
 template<typename T> Mat<T> MetaMat<T>::solve(const SpMat<T>& B) {
 	Mat<T> X;
-	if(this->solve(X, Mat<T>(B)) != 0) X.reset();
+	if(this->solve(X, B) != 0) X.reset();
 	return X;
 }
 
 template<typename T> int MetaMat<T>::solve(Mat<T>& X, const SpMat<T>& B) { return this->solve(X, Mat<T>(B)); }
-
-template<typename T> Mat<T> MetaMat<T>::solve_trs(const Mat<T>& B) {
-	Mat<T> X;
-	if(this->solve_trs(X, B) != 0) X.reset();
-	return X;
-}
-
-template<typename T> Mat<T> MetaMat<T>::solve_trs(const SpMat<T>& B) {
-	Mat<T> X;
-	if(this->solve_trs(X, Mat<T>(B)) != 0) X.reset();
-	return X;
-}
-
-template<typename T> int MetaMat<T>::solve_trs(Mat<T>& X, const SpMat<T>& B) { return this->solve_trs(X, Mat<T>(B)); }
 
 template<typename T> int MetaMat<T>::sign_det() const {
 	auto det_sign = 1;

@@ -73,8 +73,8 @@ int WilsonPenzienNewmark::solve(mat& X, const mat& B) {
 	mat left, right;
 
 	if(SUANPAN_SUCCESS != Newmark::solve(X, B)) return SUANPAN_FAIL;
-	if(SUANPAN_SUCCESS != Newmark::solve_trs(left, theta)) return SUANPAN_FAIL;
-	if(SUANPAN_SUCCESS != Newmark::solve_trs(right, theta * arma::solve(theta.t() * left + diagmat(1. / C1 / beta), theta.t() * X))) return SUANPAN_FAIL;
+	if(SUANPAN_SUCCESS != Newmark::solve(left, theta)) return SUANPAN_FAIL;
+	if(SUANPAN_SUCCESS != Newmark::solve(right, theta * arma::solve(theta.t() * left + diagmat(1. / C1 / beta), theta.t() * X))) return SUANPAN_FAIL;
 
 	X -= right;
 
@@ -85,32 +85,8 @@ int WilsonPenzienNewmark::solve(mat& X, const sp_mat& B) {
 	mat left, right;
 
 	if(SUANPAN_SUCCESS != Newmark::solve(X, B)) return SUANPAN_FAIL;
-	if(SUANPAN_SUCCESS != Newmark::solve_trs(left, theta)) return SUANPAN_FAIL;
-	if(SUANPAN_SUCCESS != Newmark::solve_trs(right, theta * arma::solve(theta.t() * left + diagmat(1. / C1 / beta), theta.t() * X))) return SUANPAN_FAIL;
-
-	X -= right;
-
-	return SUANPAN_SUCCESS;
-}
-
-int WilsonPenzienNewmark::solve_trs(mat& X, const mat& B) {
-	mat left, right;
-
-	if(SUANPAN_SUCCESS != Newmark::solve_trs(X, B)) return SUANPAN_FAIL;
-	if(SUANPAN_SUCCESS != Newmark::solve_trs(left, theta)) return SUANPAN_FAIL;
-	if(SUANPAN_SUCCESS != Newmark::solve_trs(right, theta * arma::solve(theta.t() * left + diagmat(1. / C1 / beta), theta.t() * X))) return SUANPAN_FAIL;
-
-	X -= right;
-
-	return SUANPAN_SUCCESS;
-}
-
-int WilsonPenzienNewmark::solve_trs(mat& X, const sp_mat& B) {
-	mat left, right;
-
-	if(SUANPAN_SUCCESS != Newmark::solve_trs(X, B)) return SUANPAN_FAIL;
-	if(SUANPAN_SUCCESS != Newmark::solve_trs(left, theta)) return SUANPAN_FAIL;
-	if(SUANPAN_SUCCESS != Newmark::solve_trs(right, theta * arma::solve(theta.t() * left + diagmat(1. / C1 / beta), theta.t() * X))) return SUANPAN_FAIL;
+	if(SUANPAN_SUCCESS != Newmark::solve(left, theta)) return SUANPAN_FAIL;
+	if(SUANPAN_SUCCESS != Newmark::solve(right, theta * arma::solve(theta.t() * left + diagmat(1. / C1 / beta), theta.t() * X))) return SUANPAN_FAIL;
 
 	X -= right;
 

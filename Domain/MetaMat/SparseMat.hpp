@@ -58,8 +58,6 @@ public:
 
 	void operator*=(T) override;
 
-	int solve_trs(Mat<T>&, const Mat<T>&) override;
-
 	[[nodiscard]] int sign_det() const override;
 
 	void csc_condense() override;
@@ -108,8 +106,6 @@ template<typename T> void SparseMat<T>::operator-=(const shared_ptr<MetaMat<T>>&
 template<typename T> Mat<T> SparseMat<T>::operator*(const Mat<T>& in_mat) { return triplet_mat * in_mat; }
 
 template<typename T> void SparseMat<T>::operator*=(const T scalar) { triplet_mat *= scalar; }
-
-template<typename T> int SparseMat<T>::solve_trs(Mat<T>& out_mat, const Mat<T>& in_mat) { return this->solve(out_mat, in_mat); }
 
 template<typename T> int SparseMat<T>::sign_det() const { return 0; }
 

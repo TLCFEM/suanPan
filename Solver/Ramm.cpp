@@ -61,12 +61,12 @@ int Ramm::analyze() {
 		// solve ninja
 		if(SUANPAN_SUCCESS != G->solve(t_ninja, G->get_displacement_residual())) return SUANPAN_FAIL;
 		// solve reference displacement
-		if(SUANPAN_SUCCESS != G->solve_trs(disp_a, W->get_reference_load())) return SUANPAN_FAIL;
+		if(SUANPAN_SUCCESS != G->solve(disp_a, W->get_reference_load())) return SUANPAN_FAIL;
 
 		if(0 != W->get_mpc()) {
 			mat right, kernel;
 			auto& border = W->get_auxiliary_stiffness();
-			if(SUANPAN_SUCCESS != G->solve_trs(right, border)) return SUANPAN_FAIL;
+			if(SUANPAN_SUCCESS != G->solve(right, border)) return SUANPAN_FAIL;
 			auto& aux_lambda = get_auxiliary_lambda(W);
 			if(!solve(aux_lambda, kernel = border.t() * right, border.t() * t_ninja - G->get_auxiliary_residual())) return SUANPAN_FAIL;
 			t_ninja -= right * aux_lambda;

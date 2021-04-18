@@ -46,8 +46,6 @@ public:
 
 	int solve(mat&, const mat&) override;
 	int solve(mat&, const sp_mat&) override;
-	int solve_trs(mat&, const mat&) override;
-	int solve_trs(mat&, const sp_mat&) override;
 
 	void commit_status() override;
 	void clear_status() override;

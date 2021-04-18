@@ -31,6 +31,8 @@
 #define FULLMAT_HPP
 
 template<typename T> class FullMat : public MetaMat<T> {
+protected:
+	int solve_trs(Mat<T>&, const Mat<T>&) override;
 public:
 	FullMat();
 	FullMat(uword, uword);
@@ -40,8 +42,6 @@ public:
 	Mat<T> operator*(const Mat<T>&) override;
 
 	int solve(Mat<T>&, const Mat<T>&) override;
-
-	int solve_trs(Mat<T>&, const Mat<T>&) override;
 
 	void save(const char*) override;
 };
@@ -124,8 +124,6 @@ template<typename T> int FullMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
 }
 
 template<typename T> int FullMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
-	if(!this->factored) return this->solve(X, B);
-
 	X = B;
 
 	auto N = static_cast<int>(this->n_rows);

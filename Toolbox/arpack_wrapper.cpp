@@ -15,6 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ////////////////////////////////////////////////////////////////////////////////
 
+// ReSharper disable CppFunctionalStyleCast
 #include "arpack_wrapper.h"
 
 int eig_solve(cx_vec& eigval, cx_mat& eigvec, const std::shared_ptr<MetaMat<double>>& K, const unsigned num, const char* form) {
@@ -118,7 +119,7 @@ int eig_solve(vec& eigval, mat& eigvec, const std::shared_ptr<MetaMat<double>>& 
 		}
 		else if(1 == IDO) {
 			const vec X(WORKD.memptr() + IPNTR[2] - 1, N, false);
-			Y = M->solve_trs(X);
+			Y = M->solve(X);
 		}
 		else if(2 == IDO) {
 			const vec X(WORKD.memptr() + IPNTR[0] - 1, N, false);
@@ -181,11 +182,11 @@ int eig_solve(cx_vec& eigval, cx_mat& eigvec, const std::shared_ptr<MetaMat<doub
 				Y = K->solve(X);
 				first_solve = false;
 			}
-			else Y = K->solve_trs(X);
+			else Y = K->solve(X);
 		}
 		else if(1 == IDO) {
 			const vec X(WORKD.memptr() + IPNTR[2] - 1, N, false);
-			Y = K->solve_trs(X);
+			Y = K->solve(X);
 		}
 		else if(2 == IDO) {
 			const vec X(WORKD.memptr() + IPNTR[0] - 1, N, false);
@@ -263,7 +264,7 @@ int eig_solve(vec& eigval, mat& eigvec, const std::shared_ptr<MetaMat<double>>& 
 		}
 		else if(1 == IDO) {
 			const vec X(WORKD.memptr() + IPNTR[2] - 1, N, false);
-			Y = KG->solve_trs(X);
+			Y = KG->solve(X);
 		}
 		else if(2 == IDO) {
 			const vec X(WORKD.memptr() + IPNTR[0] - 1, N, false);
@@ -323,7 +324,7 @@ int eig_solve(cx_vec& eigval, cx_mat& eigvec, const std::shared_ptr<MetaMat<doub
 		}
 		else if(1 == IDO) {
 			const vec X(WORKD.memptr() + IPNTR[2] - 1, N, false);
-			Y = K->solve_trs(X);
+			Y = K->solve(X);
 		}
 		else if(2 == IDO) {
 			const vec X(WORKD.memptr() + IPNTR[0] - 1, N, false);

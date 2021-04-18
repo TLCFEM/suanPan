@@ -160,25 +160,9 @@ mat Integrator::solve(const sp_mat& B) {
 	return X;
 }
 
-mat Integrator::solve_trs(const mat& B) {
-	mat X;
-	if(solve_trs(X, B) != SUANPAN_SUCCESS) X.reset();
-	return X;
-}
-
-mat Integrator::solve_trs(const sp_mat& B) {
-	mat X;
-	if(solve_trs(X, B) != SUANPAN_SUCCESS) X.reset();
-	return X;
-}
-
 int Integrator::solve(mat& X, const mat& B) { return database.lock()->get_factory()->get_stiffness()->solve(X, B); }
 
 int Integrator::solve(mat& X, const sp_mat& B) { return database.lock()->get_factory()->get_stiffness()->solve(X, B); }
-
-int Integrator::solve_trs(mat& X, const mat& B) { return database.lock()->get_factory()->get_stiffness()->solve_trs(X, B); }
-
-int Integrator::solve_trs(mat& X, const sp_mat& B) { return database.lock()->get_factory()->get_stiffness()->solve_trs(X, B); }
 
 /**
  * \brief avoid machine error accumulation

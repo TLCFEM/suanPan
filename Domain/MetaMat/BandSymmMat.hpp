@@ -37,6 +37,8 @@ template<typename T> class BandSymmMat final : public MetaMat<T> {
 
 	const uword band;
 	const uword m_rows; // memory block layout
+protected:
+	int solve_trs(Mat<T>&, const Mat<T>&) override;
 public:
 	BandSymmMat();
 	BandSymmMat(uword, uword);
@@ -51,7 +53,6 @@ public:
 	Mat<T> operator*(const Mat<T>&) override;
 
 	int solve(Mat<T>&, const Mat<T>&) override;
-	int solve_trs(Mat<T>&, const Mat<T>&) override;
 };
 
 template<typename T> const char BandSymmMat<T>::UPLO = 'L';
@@ -148,15 +149,13 @@ template<typename T> int BandSymmMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
 		arma_fortran(arma_dpbsv)(&UPLO, &N, &KD, &NRHS, (E*)this->memptr(), &LDAB, (E*)X.memptr(), &LDB, &INFO);
 	}
 
-	if(INFO != 0) suanpan_error("solve() receives error code %u from the base driver, the matrix is probably singular.\n", INFO);
-	else this->factored = true;
+	if(0 == INFO) this->factored = true;
+	else suanpan_error("solve() receives error code %u from the base driver, the matrix is probably singular.\n", INFO);
 
 	return INFO;
 }
 
 template<typename T> int BandSymmMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
-	if(!this->factored) return this->solve(X, B);
-
 	X = B;
 
 	auto N = static_cast<int>(this->n_rows);
@@ -175,7 +174,7 @@ template<typename T> int BandSymmMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 		arma_fortran(arma_dpbtrs)(&UPLO, &N, &KD, &NRHS, (E*)this->memptr(), &LDAB, (E*)X.memptr(), &LDB, &INFO);
 	}
 
-	if(INFO != 0) suanpan_error("solve() receives error code %u from the base driver, the matrix is probably singular.\n", INFO);
+	if(0 != INFO) suanpan_error("solve() receives error code %u from the base driver, the matrix is probably singular.\n", INFO);
 
 	return INFO;
 }

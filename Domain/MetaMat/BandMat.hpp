@@ -40,6 +40,8 @@ template<typename T> class BandMat final : public MetaMat<T> {
 	const uword s_band;
 	const uword m_rows;       // memory block layout
 	podarray<float> s_memory; // float storage used in mixed precision algorithm
+protected:
+	int solve_trs(Mat<T>&, const Mat<T>&) override;
 public:
 	BandMat();
 	BandMat(uword, uword, uword);
@@ -52,8 +54,6 @@ public:
 	Mat<T> operator*(const Mat<T>&) override;
 
 	int solve(Mat<T>&, const Mat<T>&) override;
-
-	int solve_trs(Mat<T>&, const Mat<T>&) override;
 };
 
 template<typename T> T BandMat<T>::bin = 0.;
@@ -146,7 +146,7 @@ template<typename T> int BandMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
 	else if(std::is_same<T, double>::value) {
 		using E = double;
 
-		if(Precision::DOUBLE == this->precision) {
+		if(Precision::FULL == this->precision) {
 			X = B;
 			arma_fortran(arma_dgbsv)(&N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, this->IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
 		}
@@ -171,8 +171,6 @@ template<typename T> int BandMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
 }
 
 template<typename T> int BandMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
-	if(!this->factored) return this->solve(X, B);
-
 	auto INFO = 0;
 
 	auto N = static_cast<int>(this->n_rows);
@@ -191,7 +189,7 @@ template<typename T> int BandMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 	else if(std::is_same<T, double>::value) {
 		using E = double;
 
-		if(Precision::DOUBLE == this->precision) {
+		if(Precision::FULL == this->precision) {
 			X = B;
 			arma_fortran(arma_dgbtrs)(&TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, this->IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
 		}

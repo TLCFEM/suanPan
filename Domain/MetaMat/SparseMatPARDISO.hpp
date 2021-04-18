@@ -49,16 +49,16 @@ public:
 
 template<typename T> unique_ptr<MetaMat<T>> SparseMatPARDISO<T>::make_copy() { return make_unique<SparseMatPARDISO<T>>(*this); }
 
-template<typename T> int SparseMatPARDISO<T>::solve(Mat<T>& out_mat, const Mat<T>& in_mat) {
-	out_mat.set_size(size(in_mat));
+template<typename T> int SparseMatPARDISO<T>::solve(Mat<T>& X, const Mat<T>& B) {
+	X.set_size(size(B));
 
 	csr_form<T, int> csr_mat(this->triplet_mat);
 
 	auto maxfct = 1;
 	auto mnum = 1;
 	auto mtype = 11;
-	auto n = static_cast<int>(in_mat.n_rows);
-	auto nrhs = static_cast<int>(in_mat.n_cols);
+	auto n = static_cast<int>(B.n_rows);
+	auto nrhs = static_cast<int>(B.n_cols);
 	auto msglvl = 0;
 	int error;
 
@@ -71,10 +71,10 @@ template<typename T> int SparseMatPARDISO<T>::solve(Mat<T>& out_mat, const Mat<T
 	if(std::is_same<T, float>::value) iparm(27) = 1;
 
 	auto phase = 13;
-	pardiso((void*)pt.memptr(), &maxfct, &mnum, &mtype, &phase, &n, (void*)csr_mat.val_idx, csr_mat.row_ptr, csr_mat.col_idx, perm.mem, &nrhs, iparm.memptr(), &msglvl, (void*)in_mat.memptr(), (void*)out_mat.memptr(), &error);
+	pardiso((void*)pt.memptr(), &maxfct, &mnum, &mtype, &phase, &n, (void*)csr_mat.val_idx, csr_mat.row_ptr, csr_mat.col_idx, perm.mem, &nrhs, iparm.memptr(), &msglvl, (void*)B.memptr(), (void*)X.memptr(), &error);
 
 	phase = -1;
-	pardiso((void*)pt.memptr(), &maxfct, &mnum, &mtype, &phase, &n, (void*)csr_mat.val_idx, csr_mat.row_ptr, csr_mat.col_idx, perm.mem, &nrhs, iparm.memptr(), &msglvl, (void*)in_mat.memptr(), (void*)out_mat.memptr(), &error);
+	pardiso((void*)pt.memptr(), &maxfct, &mnum, &mtype, &phase, &n, (void*)csr_mat.val_idx, csr_mat.row_ptr, csr_mat.col_idx, perm.mem, &nrhs, iparm.memptr(), &msglvl, (void*)B.memptr(), (void*)X.memptr(), &error);
 
 	return 0 == error ? SUANPAN_SUCCESS : SUANPAN_FAIL;
 }

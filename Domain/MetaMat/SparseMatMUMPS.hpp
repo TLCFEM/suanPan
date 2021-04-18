@@ -49,10 +49,10 @@ public:
 
 template<typename T> unique_ptr<MetaMat<T>> SparseMatMUMPS<T>::make_copy() { return make_unique<SparseMatMUMPS<T>>(*this); }
 
-template<typename T> int SparseMatMUMPS<T>::solve(Mat<T>& out_mat, const Mat<T>& in_mat) {
+template<typename T> int SparseMatMUMPS<T>::solve(Mat<T>& X, const Mat<T>& B) {
 	this->triplet_mat.csc_condense();
 
-	out_mat = in_mat;
+	X = B;
 
 	mumps_job.comm_fortran = -987654;
 	mumps_job.par = 1;
@@ -62,8 +62,8 @@ template<typename T> int SparseMatMUMPS<T>::solve(Mat<T>& out_mat, const Mat<T>&
 
 	mumps_job.n = static_cast<int>(this->triplet_mat.n_rows);
 	mumps_job.nnz = static_cast<int64_t>(this->triplet_mat.c_size);
-	mumps_job.nrhs = static_cast<int>(in_mat.n_cols);
-	mumps_job.lrhs = static_cast<int>(in_mat.n_rows);
+	mumps_job.nrhs = static_cast<int>(B.n_cols);
+	mumps_job.lrhs = static_cast<int>(B.n_rows);
 
 	l_irn.set_size(mumps_job.nnz);
 	l_jrn.set_size(mumps_job.nnz);
@@ -83,7 +83,7 @@ template<typename T> int SparseMatMUMPS<T>::solve(Mat<T>& out_mat, const Mat<T>&
 	mumps_job.irn = l_irn.memptr();
 	mumps_job.jcn = l_jrn.memptr();
 	mumps_job.a = this->triplet_mat.val_idx;
-	mumps_job.rhs = out_mat.memptr();
+	mumps_job.rhs = X.memptr();
 
 	mumps_job.icntl[0] = -1;
 	mumps_job.icntl[1] = -1;

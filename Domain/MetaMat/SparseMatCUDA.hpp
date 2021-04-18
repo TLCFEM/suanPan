@@ -73,17 +73,17 @@ template<typename T> SparseMatCUDA<T>::~SparseMatCUDA() { cu_destory(); }
 
 template<typename T> unique_ptr<MetaMat<T>> SparseMatCUDA<T>::make_copy() { return make_unique<SparseMatCUDA<T>>(*this); }
 
-template<typename T> int SparseMatCUDA<T>::solve(Mat<T>& out_mat, const Mat<T>& in_mat) {
+template<typename T> int SparseMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) {
 	csr_form<T, int> csr_mat(this->triplet_mat);
 
-	out_mat.set_size(size(in_mat));
+	X.set_size(size(B));
 
 	int singularity;
 
 	if(cusolverStatus_t solver_info; std::is_same<T, float>::value) {
 		using E = float;
-		for(auto I = 0; I < in_mat.n_cols; ++I) {
-			solver_info = cusolverSpScsrlsvluHost(handle, csr_mat.n_rows, csr_mat.c_size, descrA, (E*)csr_mat.val_idx, csr_mat.row_ptr, csr_mat.col_idx, (E*)in_mat.colptr(I), this->tolerance, 2, (E*)out_mat.colptr(I), &singularity);
+		for(auto I = 0; I < B.n_cols; ++I) {
+			solver_info = cusolverSpScsrlsvluHost(handle, csr_mat.n_rows, csr_mat.c_size, descrA, (E*)csr_mat.val_idx, csr_mat.row_ptr, csr_mat.col_idx, (E*)B.colptr(I), this->tolerance, 2, (E*)X.colptr(I), &singularity);
 			if(CUSOLVER_STATUS_SUCCESS != solver_info) {
 				suanpan_error("error code %u returned during CUDA solving.\n", static_cast<unsigned>(solver_info));
 				return SUANPAN_FAIL;
@@ -92,8 +92,8 @@ template<typename T> int SparseMatCUDA<T>::solve(Mat<T>& out_mat, const Mat<T>& 
 	}
 	else if(std::is_same<T, double>::value) {
 		using E = double;
-		for(auto I = 0; I < in_mat.n_cols; ++I) {
-			solver_info = cusolverSpDcsrlsvluHost(handle, csr_mat.n_rows, csr_mat.c_size, descrA, (E*)csr_mat.val_idx, csr_mat.row_ptr, csr_mat.col_idx, (E*)in_mat.colptr(I), this->tolerance, 2, (E*)out_mat.colptr(I), &singularity);
+		for(auto I = 0; I < B.n_cols; ++I) {
+			solver_info = cusolverSpDcsrlsvluHost(handle, csr_mat.n_rows, csr_mat.c_size, descrA, (E*)csr_mat.val_idx, csr_mat.row_ptr, csr_mat.col_idx, (E*)B.colptr(I), this->tolerance, 2, (E*)X.colptr(I), &singularity);
 			if(CUSOLVER_STATUS_SUCCESS != solver_info) {
 				suanpan_error("error code %u returned during CUDA solving.\n", static_cast<unsigned>(solver_info));
 				return SUANPAN_FAIL;

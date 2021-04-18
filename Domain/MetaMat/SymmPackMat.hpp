@@ -34,6 +34,8 @@ template<typename T> class SymmPackMat final : public MetaMat<T> {
 	static const char SIDE;
 	static const char UPLO;
 	static T bin;
+protected:
+	int solve_trs(Mat<T>&, const Mat<T>&) override;
 public:
 	SymmPackMat();
 	explicit SymmPackMat(uword);
@@ -48,7 +50,6 @@ public:
 	Mat<T> operator*(const Mat<T>&) override;
 
 	int solve(Mat<T>&, const Mat<T>&) override;
-	int solve_trs(Mat<T>&, const Mat<T>&) override;
 };
 
 template<typename T> const char SymmPackMat<T>::SIDE = 'R';
@@ -105,10 +106,7 @@ template<typename T> Mat<T> SymmPackMat<T>::operator*(const Mat<T>& X) {
 }
 
 template<typename T> int SymmPackMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
-	if(this->factored) {
-		suanpan_warning("the matrix is factored.\n");
-		return this->solve_trs(X, B);
-	}
+	if(this->factored) return this->solve_trs(X, B);
 
 	X = B;
 
@@ -126,18 +124,13 @@ template<typename T> int SymmPackMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
 		arma_fortran(arma_dppsv)(&UPLO, &N, &NRHS, (E*)this->memptr(), (E*)X.memptr(), &LDB, &INFO);
 	}
 
-	if(INFO != 0) suanpan_error("solve() receives error code %u from the base driver, the matrix is probably singular.\n", INFO);
-	else this->factored = true;
+	if(0 == INFO) this->factored = true;
+	else suanpan_error("solve() receives error code %u from the base driver, the matrix is probably singular.\n", INFO);
 
 	return INFO;
 }
 
 template<typename T> int SymmPackMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
-	if(!this->factored) {
-		suanpan_warning("the matrix is not factored.\n");
-		return this->solve(X, B);
-	}
-
 	X = B;
 
 	auto N = static_cast<int>(this->n_rows);

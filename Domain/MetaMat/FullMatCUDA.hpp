@@ -39,15 +39,11 @@ public:
 	unique_ptr<MetaMat<T>> make_copy() override;
 
 	int solve(Mat<T>&, const Mat<T>&) override;
-
-	int solve_trs(Mat<T>&, const Mat<T>&) override;
 };
 
 template<typename T> unique_ptr<MetaMat<T>> FullMatCUDA<T>::make_copy() { return make_unique<FullMatCUDA<T>>(*this); }
 
 template<typename T> int FullMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) { return FullMat<T>::solve(X, B); }
-
-template<typename T> int FullMatCUDA<T>::solve_trs(Mat<T>& X, const Mat<T>& B) { return FullMat<T>::solve_trs(X, B); }
 
 #endif
 

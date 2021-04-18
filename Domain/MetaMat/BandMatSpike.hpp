@@ -45,6 +45,8 @@ template<typename T> class BandMatSpike final : public MetaMat<T> {
 	podarray<int> SPIKE = podarray<int>(64);
 
 	void init_spike();
+protected:
+	int solve_trs(Mat<T>&, const Mat<T>&) override;
 public:
 	BandMatSpike();
 	BandMatSpike(uword, uword, uword);
@@ -57,7 +59,6 @@ public:
 	Mat<T> operator*(const Mat<T>&) override;
 
 	int solve(Mat<T>&, const Mat<T>&) override;
-	int solve_trs(Mat<T>&, const Mat<T>&) override;
 
 	[[nodiscard]] int sign_det() const override;
 };
@@ -168,8 +169,6 @@ template<typename T> int BandMatSpike<T>::solve(Mat<T>& X, const Mat<T>& B) {
 }
 
 template<typename T> int BandMatSpike<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
-	if(!this->factored) return solve(X, B);
-
 	auto N = static_cast<int>(this->n_rows);
 	auto KL = static_cast<int>(l_band);
 	auto KU = static_cast<int>(u_band);
