@@ -31,7 +31,7 @@
 #define BANDMAT_HPP
 
 template<typename T> class BandMat final : public MetaMat<T> {
-	using MetaMat<T>::TRAN;
+	static const char TRAN;
 
 	static T bin;
 
@@ -48,6 +48,8 @@ public:
 
 	unique_ptr<MetaMat<T>> make_copy() override;
 
+	void unify(uword) override;
+
 	const T& operator()(uword, uword) const override;
 	T& at(uword, uword) override;
 
@@ -55,6 +57,8 @@ public:
 
 	int solve(Mat<T>&, const Mat<T>&) override;
 };
+
+template<typename T> const char BandMat<T>::TRAN = 'N';
 
 template<typename T> T BandMat<T>::bin = 0.;
 
@@ -73,6 +77,17 @@ template<typename T> BandMat<T>::BandMat(const uword in_size, const uword in_l, 
 	, m_rows(2 * in_l + in_u + 1) {}
 
 template<typename T> unique_ptr<MetaMat<T>> BandMat<T>::make_copy() { return make_unique<BandMat<T>>(*this); }
+
+template<typename T> void BandMat<T>::unify(const uword idx) {
+#ifdef SUANPAN_MT
+	tbb::parallel_for(std::max(idx, u_band) - u_band, std::min(this->n_rows, idx + l_band + 1), [&](const uword I) { access::rw(this->memory[I + s_band + idx * (m_rows - 1)]) = 0.; });
+	tbb::parallel_for(std::max(idx, l_band) - l_band, std::min(this->n_cols, idx + u_band + 1), [&](const uword I) { access::rw(this->memory[idx + s_band + I * (m_rows - 1)]) = 0.; });
+#else
+	for(auto I = std::max(idx, u_band) - u_band; I < std::min(this->n_rows, idx + l_band + 1); ++I) access::rw(this->memory[I + s_band + idx * (m_rows - 1)]) = 0.;
+	for(auto I = std::max(idx, l_band) - l_band; I < std::min(this->n_cols, idx + u_band + 1); ++I) access::rw(this->memory[idx + s_band + I * (m_rows - 1)]) = 0.;
+#endif
+	access::rw(this->memory[s_band + idx * m_rows]) = 1.;
+}
 
 template<typename T> const T& BandMat<T>::operator()(const uword in_row, const uword in_col) const {
 	if(in_row > in_col + l_band || in_row + u_band < in_col) return bin = 0.;

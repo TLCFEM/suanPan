@@ -31,6 +31,7 @@
 #define FULLMAT_HPP
 
 template<typename T> class FullMat : public MetaMat<T> {
+	static const char TRAN;
 protected:
 	int solve_trs(Mat<T>&, const Mat<T>&) override;
 public:
@@ -39,12 +40,19 @@ public:
 
 	unique_ptr<MetaMat<T>> make_copy() override;
 
+	void unify(uword) override;
+
+	const T& operator()(uword, uword) const override;
+	T& at(uword, uword) override;
+
 	Mat<T> operator*(const Mat<T>&) override;
 
 	int solve(Mat<T>&, const Mat<T>&) override;
 
 	void save(const char*) override;
 };
+
+template<typename T> const char FullMat<T>::TRAN = 'N';
 
 template<typename T> FullMat<T>::FullMat()
 	: MetaMat<T>() {}
@@ -53,6 +61,21 @@ template<typename T> FullMat<T>::FullMat(const uword in_rows, const uword in_col
 	: MetaMat<T>(in_rows, in_cols, in_rows * in_cols) {}
 
 template<typename T> unique_ptr<MetaMat<T>> FullMat<T>::make_copy() { return make_unique<FullMat<T>>(*this); }
+
+template<typename T> void FullMat<T>::unify(const uword idx) {
+#ifdef SUANPAN_MT
+	tbb::parallel_for(0llu, this->n_rows, [&](const uword I) { at(I, idx) = 0.; });
+	tbb::parallel_for(0llu, this->n_cols, [&](const uword I) { at(idx, I) = 0.; });
+#else
+	for(uword I = 0; I < this->n_rows; ++I) at(I, idx) = 0.;
+	for(uword I = 0; I < this->n_cols; ++I) at(idx, I) = 0.;
+#endif
+	at(idx, idx) = 1.;
+}
+
+template<typename T> const T& FullMat<T>::operator()(const uword in_row, const uword in_col) const { return this->memory[in_row + in_col * this->n_rows]; }
+
+template<typename T> T& FullMat<T>::at(const uword in_row, const uword in_col) { return access::rw(this->memory[in_row + in_col * this->n_rows]); }
 
 template<typename T> Mat<T> FullMat<T>::operator*(const Mat<T>& B) {
 	Mat<T> C(size(B));
@@ -70,11 +93,11 @@ template<typename T> Mat<T> FullMat<T>::operator*(const Mat<T>& B) {
 
 		if(std::is_same<T, float>::value) {
 			using E = float;
-			arma_fortran(arma_sgemv)(&this->TRAN, &M, &N, (E*)&ALPHA, (E*)this->memptr(), &LDA, (E*)B.memptr(), &INCX, (E*)&BETA, (E*)C.memptr(), &INCY);
+			arma_fortran(arma_sgemv)(&TRAN, &M, &N, (E*)&ALPHA, (E*)this->memptr(), &LDA, (E*)B.memptr(), &INCX, (E*)&BETA, (E*)C.memptr(), &INCY);
 		}
 		else if(std::is_same<T, double>::value) {
 			using E = double;
-			arma_fortran(arma_dgemv)(&this->TRAN, &M, &N, (E*)&ALPHA, (E*)this->memptr(), &LDA, (E*)B.memptr(), &INCX, (E*)&BETA, (E*)C.memptr(), &INCY);
+			arma_fortran(arma_dgemv)(&TRAN, &M, &N, (E*)&ALPHA, (E*)this->memptr(), &LDA, (E*)B.memptr(), &INCX, (E*)&BETA, (E*)C.memptr(), &INCY);
 		}
 	}
 	else {
@@ -84,11 +107,11 @@ template<typename T> Mat<T> FullMat<T>::operator*(const Mat<T>& B) {
 
 		if(std::is_same<T, float>::value) {
 			using E = float;
-			arma_fortran(arma_sgemm)(&this->TRAN, &this->TRAN, &M, &K, &N, (E*)&ALPHA, (E*)this->memptr(), &LDA, (E*)B.memptr(), &LDB, (E*)&BETA, (E*)C.memptr(), &LDC);
+			arma_fortran(arma_sgemm)(&TRAN, &TRAN, &M, &K, &N, (E*)&ALPHA, (E*)this->memptr(), &LDA, (E*)B.memptr(), &LDB, (E*)&BETA, (E*)C.memptr(), &LDC);
 		}
 		else if(std::is_same<T, double>::value) {
 			using E = double;
-			arma_fortran(arma_dgemm)(&this->TRAN, &this->TRAN, &M, &K, &N, (E*)&ALPHA, (E*)this->memptr(), &LDA, (E*)B.memptr(), &LDB, (E*)&BETA, (E*)C.memptr(), &LDC);
+			arma_fortran(arma_dgemm)(&TRAN, &TRAN, &M, &K, &N, (E*)&ALPHA, (E*)this->memptr(), &LDA, (E*)B.memptr(), &LDB, (E*)&BETA, (E*)C.memptr(), &LDC);
 		}
 	}
 
@@ -100,7 +123,6 @@ template<typename T> int FullMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
 
 	auto N = static_cast<int>(this->n_rows);
 	auto NRHS = static_cast<int>(B.n_cols);
-	auto LDA = N;
 	auto LDB = static_cast<int>(B.n_rows);
 	auto INFO = 0;
 
@@ -110,11 +132,11 @@ template<typename T> int FullMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
 
 	if(std::is_same<T, float>::value) {
 		using E = float;
-		arma_fortran(arma_sgesv)(&N, &NRHS, (E*)this->memptr(), &LDA, this->IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
+		arma_fortran(arma_sgesv)(&N, &NRHS, (E*)this->memptr(), &N, this->IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
 	}
 	else if(std::is_same<T, double>::value) {
 		using E = double;
-		arma_fortran(arma_dgesv)(&N, &NRHS, (E*)this->memptr(), &LDA, this->IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
+		arma_fortran(arma_dgesv)(&N, &NRHS, (E*)this->memptr(), &N, this->IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
 	}
 
 	if(0 == INFO) this->factored = true;
@@ -128,17 +150,16 @@ template<typename T> int FullMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 
 	auto N = static_cast<int>(this->n_rows);
 	auto NRHS = static_cast<int>(B.n_cols);
-	auto LDA = N;
 	auto LDB = static_cast<int>(B.n_rows);
 	auto INFO = 0;
 
 	if(std::is_same<T, float>::value) {
 		using E = float;
-		arma_fortran(arma_sgetrs)(const_cast<char*>(&this->TRAN), &N, &NRHS, (E*)this->memptr(), &LDA, this->IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
+		arma_fortran(arma_sgetrs)(&TRAN, &N, &NRHS, (E*)this->memptr(), &N, this->IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
 	}
 	else if(std::is_same<T, double>::value) {
 		using E = double;
-		arma_fortran(arma_dgetrs)(const_cast<char*>(&this->TRAN), &N, &NRHS, (E*)this->memptr(), &LDA, this->IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
+		arma_fortran(arma_dgetrs)(&TRAN, &N, &NRHS, (E*)this->memptr(), &N, this->IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
 	}
 
 	return INFO;

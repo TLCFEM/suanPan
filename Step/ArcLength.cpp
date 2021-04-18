@@ -44,16 +44,24 @@ int ArcLength::initialize() {
 	solver->set_converger(tester);
 	solver->set_integrator(modifier);
 
-	if(sparse_mat) factory->set_storage_scheme(StorageScheme::SPARSE);
+	if(sparse_mat) {
+		factory->set_storage_scheme(StorageScheme::SPARSE);
+		factory->set_solver(SolverType::MUMPS);
+	}
 	else if(symm_mat && band_mat) factory->set_storage_scheme(StorageScheme::BANDSYMM);
-	else if(!symm_mat && band_mat) factory->set_storage_scheme(StorageScheme::BAND);
+	else if(!symm_mat && band_mat) {
+		factory->set_storage_scheme(StorageScheme::BAND);
+		factory->set_solver(SolverType::LAPACK);
+	}
 	else if(symm_mat && !band_mat) factory->set_storage_scheme(StorageScheme::SYMMPACK);
-	else if(!symm_mat && !band_mat) factory->set_storage_scheme(StorageScheme::FULL);
+	else if(!symm_mat && !band_mat) {
+		factory->set_storage_scheme(StorageScheme::FULL);
+		factory->set_solver(SolverType::LAPACK);
+	}
 
 	factory->set_analysis_type(AnalysisType::STATICS);
 	factory->set_precision(precision);
 	factory->set_tolerance(tolerance);
-	factory->set_solver(SolverType::SPIKE == system_solver ? SolverType::LAPACK : system_solver); // ! SPIKE solver has no option to compute determinant
 
 	if(SUANPAN_SUCCESS != t_domain->restart()) return SUANPAN_FAIL;
 

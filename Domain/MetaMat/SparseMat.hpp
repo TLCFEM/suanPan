@@ -107,7 +107,7 @@ template<typename T> Mat<T> SparseMat<T>::operator*(const Mat<T>& in_mat) { retu
 
 template<typename T> void SparseMat<T>::operator*=(const T scalar) { triplet_mat *= scalar; }
 
-template<typename T> int SparseMat<T>::sign_det() const { return 0; }
+template<typename T> int SparseMat<T>::sign_det() const { throw invalid_argument("not supproted"); }
 
 template<typename T> void SparseMat<T>::csc_condense() { triplet_mat.csc_condense(); }
 

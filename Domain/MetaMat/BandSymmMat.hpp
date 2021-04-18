@@ -65,21 +65,21 @@ template<typename T> BandSymmMat<T>::BandSymmMat()
 	, m_rows(0) {}
 
 template<typename T> BandSymmMat<T>::BandSymmMat(const uword in_size, const uword in_bandwidth)
-	: MetaMat<T>(in_size, in_size, (in_bandwidth + 1llu) * in_size)
+	: MetaMat<T>(in_size, in_size, (in_bandwidth + 1) * in_size)
 	, band(in_bandwidth)
-	, m_rows(in_bandwidth + 1llu) {}
+	, m_rows(in_bandwidth + 1) {}
 
 template<typename T> unique_ptr<MetaMat<T>> BandSymmMat<T>::make_copy() { return make_unique<BandSymmMat<T>>(*this); }
 
 template<typename T> void BandSymmMat<T>::unify(const uword idx) {
 #ifdef SUANPAN_MT
-	tbb::parallel_for(0llu, idx, [&](const uword I) { at(idx, I) = 0.; });
-	tbb::parallel_for(idx + 1llu, this->n_rows, [&](const uword I) { at(I, idx) = 0.; });
+	tbb::parallel_for(std::max(band, idx) - band, idx, [&](const uword I) { access::rw(this->memory[idx - I + I * m_rows]) = 0.; });
+	tbb::parallel_for(idx + 1, std::min(this->n_rows, idx + band + 1), [&](const uword I) { access::rw(this->memory[I - idx + idx * m_rows]) = 0.; });
 #else
-	for(uword I = 0; I < idx; ++I) at(idx, I) = 0.;
-	for(auto I = idx + 1llu; I < this->n_rows; ++I) at(I, idx) = 0.;
+	for(auto I = std::max(band, idx) - band; I < idx; ++I) access::rw(this->memory[idx - I + I * m_rows]) = 0.;
+	for(auto I = idx + 1; I < std::min(this->n_rows, idx + band + 1); ++I) access::rw(this->memory[I - idx + idx * m_rows]) = 0.;
 #endif
-	at(idx, idx) = 1.;
+	access::rw(this->memory[idx * m_rows]) = 1.;
 }
 
 template<typename T> const T& BandSymmMat<T>::operator()(const uword in_row, const uword in_col) const {

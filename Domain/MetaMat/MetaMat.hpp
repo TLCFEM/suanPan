@@ -36,8 +36,6 @@ enum class Precision { MIXED, FULL };
 
 template<typename T> class MetaMat {
 protected:
-	static const char TRAN;
-
 	bool factored = false;
 
 	double tolerance = 1E-12;
@@ -74,12 +72,12 @@ public:
 
 	virtual unique_ptr<MetaMat> make_copy() = 0;
 
-	virtual void unify(uword);
+	virtual void unify(uword) = 0;
 
 	virtual T max() const;
 
-	virtual const T& operator()(uword, uword) const;
-	virtual T& at(uword, uword);
+	virtual const T& operator()(uword, uword) const = 0;
+	virtual T& at(uword, uword) = 0;
 
 	virtual const T* memptr() const;
 	virtual T* memptr();
@@ -104,8 +102,6 @@ public:
 	virtual void csc_condense();
 	virtual void csr_condense();
 };
-
-template<typename T> const char MetaMat<T>::TRAN = 'N';
 
 template<typename T> Mat<T> to_mat(const MetaMat<T>& in_mat) {
 	Mat<T> out_mat(in_mat.n_rows, in_mat.n_cols, fill::zeros);
@@ -220,22 +216,7 @@ template<typename T> void MetaMat<T>::reset() {
 	factored = false;
 }
 
-template<typename T> void MetaMat<T>::unify(const uword idx) {
-#ifdef SUANPAN_MT
-	tbb::parallel_for(static_cast<uword>(0), n_rows, [&](const uword I) { at(I, idx) = 0.; });
-	tbb::parallel_for(static_cast<uword>(0), n_cols, [&](const uword I) { at(idx, I) = 0.; });
-#else
-	for(uword I = 0; I < n_rows; ++I) at(I, idx) = 0.;
-	for(uword I = 0; I < n_cols; ++I) at(idx, I) = 0.;
-#endif
-	at(idx, idx) = 1.;
-}
-
 template<typename T> T MetaMat<T>::max() const { return op_max::direct_max(memptr(), n_elem); }
-
-template<typename T> const T& MetaMat<T>::operator()(const uword in_row, const uword in_col) const { return memory[in_row + in_col * n_rows]; }
-
-template<typename T> T& MetaMat<T>::at(const uword in_row, const uword in_col) { return access::rw(memory[in_row + in_col * n_rows]); }
 
 template<typename T> const T* MetaMat<T>::memptr() const { return memory; }
 

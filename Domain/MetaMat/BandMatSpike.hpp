@@ -33,7 +33,7 @@
 #include <feast/spike.h>
 
 template<typename T> class BandMatSpike final : public MetaMat<T> {
-	using MetaMat<T>::TRAN;
+	static const char TRAN;
 
 	static T bin;
 
@@ -53,6 +53,8 @@ public:
 
 	unique_ptr<MetaMat<T>> make_copy() override;
 
+	void unify(uword) override;
+
 	const T& operator()(uword, uword) const override;
 	T& at(uword, uword) override;
 
@@ -62,6 +64,8 @@ public:
 
 	[[nodiscard]] int sign_det() const override;
 };
+
+template<typename T> const char BandMatSpike<T>::TRAN = 'N';
 
 template<typename T> T BandMatSpike<T>::bin = 0.;
 
@@ -87,6 +91,17 @@ template<typename T> BandMatSpike<T>::BandMatSpike(const uword in_size, const uw
 	, m_rows(in_l + in_u + 1) { init_spike(); }
 
 template<typename T> unique_ptr<MetaMat<T>> BandMatSpike<T>::make_copy() { return make_unique<BandMatSpike<T>>(*this); }
+
+template<typename T> void BandMatSpike<T>::unify(const uword idx) {
+#ifdef SUANPAN_MT
+	tbb::parallel_for(std::max(idx, u_band) - u_band, std::min(this->n_rows, idx + l_band + 1), [&](const uword I) { access::rw(this->memory[I + u_band + idx * (m_rows - 1)]) = 0.; });
+	tbb::parallel_for(std::max(idx, l_band) - l_band, std::min(this->n_cols, idx + u_band + 1), [&](const uword I) { access::rw(this->memory[idx + u_band + I * (m_rows - 1)]) = 0.; });
+#else
+	for(auto I = std::max(idx, u_band) - u_band; I < std::min(this->n_rows, idx + l_band + 1); ++I) access::rw(this->memory[I + u_band + idx * (m_rows - 1)]) = 0.;
+	for(auto I = std::max(idx, l_band) - l_band; I < std::min(this->n_cols, idx + u_band + 1); ++I) access::rw(this->memory[idx + u_band + I * (m_rows - 1)]) = 0.;
+#endif
+	access::rw(this->memory[u_band + idx * m_rows]) = 1.;
+}
 
 template<typename T> const T& BandMatSpike<T>::operator()(const uword in_row, const uword in_col) const {
 	if(in_row > in_col + l_band || in_row + u_band < in_col) return bin = 0.;

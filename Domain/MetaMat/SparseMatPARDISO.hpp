@@ -65,7 +65,7 @@ template<typename T> int SparseMatPARDISO<T>::solve(Mat<T>& X, const Mat<T>& B) 
 	podarray<int> pt(64), iparm(64);
 	const podarray<int> perm(n);
 
-	pardisoinit((void*)pt.memptr(), &mtype, iparm.memptr());
+	pardisoinit(pt.memptr(), &mtype, iparm.memptr());
 
 	iparm(34) = 1; // zero-based indexing
 	if(std::is_same<T, float>::value) iparm(27) = 1;

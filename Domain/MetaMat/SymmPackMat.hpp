@@ -31,7 +31,6 @@
 #define SYMMPACKMAT_HPP
 
 template<typename T> class SymmPackMat final : public MetaMat<T> {
-	static const char SIDE;
 	static const char UPLO;
 	static T bin;
 protected:
@@ -52,8 +51,6 @@ public:
 	int solve(Mat<T>&, const Mat<T>&) override;
 };
 
-template<typename T> const char SymmPackMat<T>::SIDE = 'R';
-
 template<typename T> const char SymmPackMat<T>::UPLO = 'U';
 
 template<typename T> T SymmPackMat<T>::bin = 0.;
@@ -68,13 +65,13 @@ template<typename T> unique_ptr<MetaMat<T>> SymmPackMat<T>::make_copy() { return
 
 template<typename T> void SymmPackMat<T>::unify(const uword idx) {
 #ifdef SUANPAN_MT
-	tbb::parallel_for(0llu, idx, [&](const uword I) { at(I, idx) = 0.; });
-	tbb::parallel_for(idx + 1llu, this->n_rows, [&](const uword I) { at(idx, I) = 0.; });
+	tbb::parallel_for(0llu, idx, [&](const uword I) { access::rw(this->memory[(idx * idx + idx) / 2 + I]) = 0.; });
+	tbb::parallel_for(idx + 1llu, this->n_rows, [&](const uword I) { access::rw(this->memory[(I * I + I) / 2 + idx]) = 0.; });
 #else
-	for(auto I = 0llu; I < idx; ++I) at(I, idx) = 0.;
-	for(auto I = idx + 1llu; I < this->n_rows; ++I) at(idx, I) = 0.;
+	for(auto I = 0llu; I < idx; ++I) access::rw(this->memory[(idx * idx + idx) / 2 + I]) = 0.;
+	for(auto I = idx + 1llu; I < this->n_rows; ++I) access::rw(this->memory[(I * I + I) / 2 + idx]) = 0.;
 #endif
-	at(idx, idx) = 1.;
+	access::rw(this->memory[(idx * idx + 3 * idx) / 2]) = 1.;
 }
 
 template<typename T> const T& SymmPackMat<T>::operator()(const uword in_row, const uword in_col) const { return this->memory[in_col > in_row ? (in_col * in_col + in_col) / 2 + in_row : (in_row * in_row + in_row) / 2 + in_col]; }
