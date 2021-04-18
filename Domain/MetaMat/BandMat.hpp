@@ -42,6 +42,7 @@ template<typename T> class BandMat final : public MetaMat<T> {
 	podarray<float> s_memory; // float storage used in mixed precision algorithm
 protected:
 	int solve_trs(Mat<T>&, const Mat<T>&) override;
+	int solve_trs(Mat<T>&, Mat<T>&&) override;
 public:
 	BandMat();
 	BandMat(uword, uword, uword);
@@ -56,6 +57,7 @@ public:
 	Mat<T> operator*(const Mat<T>&) override;
 
 	int solve(Mat<T>&, const Mat<T>&) override;
+	int solve(Mat<T>&, Mat<T>&&) override;
 };
 
 template<typename T> const char BandMat<T>::TRAN = 'N';
@@ -169,7 +171,7 @@ template<typename T> int BandMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
 
 		arma_fortran(arma_sgbtrf)(&N, &N, &KL, &KU, s_memory.memptr(), &LDAB, this->IPIV.memptr(), &INFO);
 
-		if(0 == INFO) INFO = solve_trs(X, B);
+		if(0 == INFO) INFO = this->solve_trs(X, B);
 	}
 
 	if(0 != INFO) suanpan_error("solve() receives error code %u from base driver, the matrix is probably singular.\n", INFO);
@@ -213,7 +215,11 @@ template<typename T> int BandMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 			arma_fortran(arma_sgbtrs)(&TRAN, &N, &KL, &KU, &NRHS, s_memory.memptr(), &LDAB, this->IPIV.memptr(), residual.memptr(), &LDB, &INFO);
 			if(0 != INFO) break;
 
-			multiplier = norm(full_residual = B - this->operator*(X += multiplier * conv_to<mat>::from(residual)));
+			const auto incre = multiplier * conv_to<mat>::from(residual);
+
+			X += incre;
+
+			multiplier = norm(full_residual -= this->operator*(incre));
 
 			suanpan_debug("mixed precision algorithm multiplier: %.5E\n", multiplier);
 
@@ -226,6 +232,94 @@ template<typename T> int BandMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 	return INFO;
 }
 
+template<typename T> int BandMat<T>::solve(Mat<T>& X, Mat<T>&& B) {
+	if(this->factored) return this->solve_trs(X, std::forward<Mat<T>>(B));
+
+	suanpan_debug([&]() { if(this->n_rows != this->n_cols) throw invalid_argument("requires a square matrix"); });
+
+	auto INFO = 0;
+
+	auto N = static_cast<int>(this->n_rows);
+	auto KL = static_cast<int>(l_band);
+	auto KU = static_cast<int>(u_band);
+	auto NRHS = static_cast<int>(B.n_cols);
+	auto LDAB = static_cast<int>(m_rows);
+	auto LDB = static_cast<int>(B.n_rows);
+	this->IPIV.zeros(N);
+
+	this->factored = true;
+
+	if(std::is_same<T, float>::value) {
+		using E = float;
+		arma_fortran(arma_sgbsv)(&N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, this->IPIV.memptr(), (E*)B.memptr(), &LDB, &INFO);
+		X = std::move(B);
+	}
+	else if(Precision::FULL == this->precision) {
+		using E = double;
+		arma_fortran(arma_dgbsv)(&N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, this->IPIV.memptr(), (E*)B.memptr(), &LDB, &INFO);
+		X = std::move(B);
+	}
+	else {
+		s_memory = this->to_float();
+
+		arma_fortran(arma_sgbtrf)(&N, &N, &KL, &KU, s_memory.memptr(), &LDAB, this->IPIV.memptr(), &INFO);
+
+		if(0 == INFO) INFO = this->solve_trs(X, std::forward<Mat<T>>(B));
+	}
+
+	if(0 != INFO) suanpan_error("solve() receives error code %u from base driver, the matrix is probably singular.\n", INFO);
+
+	return INFO;
+}
+
+template<typename T> int BandMat<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
+	auto INFO = 0;
+
+	auto N = static_cast<int>(this->n_rows);
+	auto KL = static_cast<int>(l_band);
+	auto KU = static_cast<int>(u_band);
+	auto NRHS = static_cast<int>(B.n_cols);
+	auto LDAB = static_cast<int>(m_rows);
+	auto LDB = static_cast<int>(B.n_rows);
+
+	if(std::is_same<T, float>::value) {
+		using E = float;
+		arma_fortran(arma_sgbtrs)(&TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, this->IPIV.memptr(), (E*)B.memptr(), &LDB, &INFO);
+		X = std::move(B);
+	}
+	else if(Precision::FULL == this->precision) {
+		using E = double;
+		arma_fortran(arma_dgbtrs)(&TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, this->IPIV.memptr(), (E*)B.memptr(), &LDB, &INFO);
+		X = std::move(B);
+	}
+	else {
+		X = arma::zeros(B.n_rows, B.n_cols);
+
+		auto multiplier = 1.;
+
+		auto counter = 0;
+		while(++counter < 20) {
+			auto residual = conv_to<fmat>::from(B / multiplier);
+
+			arma_fortran(arma_sgbtrs)(&TRAN, &N, &KL, &KU, &NRHS, s_memory.memptr(), &LDAB, this->IPIV.memptr(), residual.memptr(), &LDB, &INFO);
+			if(0 != INFO) break;
+
+			const auto incre = multiplier * conv_to<mat>::from(residual);
+
+			X += incre;
+
+			multiplier = norm(B -= this->operator*(incre));
+
+			suanpan_debug("mixed precision algorithm multiplier: %.5E\n", multiplier);
+
+			if(multiplier < this->tolerance) break;
+		}
+	}
+
+	if(INFO != 0) suanpan_error("solve() receives error code %u from base driver, the matrix is probably singular.\n", INFO);
+
+	return INFO;
+}
 #endif
 
 //! @}
