@@ -11,9 +11,9 @@ jobs:
       - name: Clone
         uses: actions/checkout@v2
       - name: Golang
-        uses: cedrickring/golang-action@1.6.0
-        with:
-          args: go build Updater/updater.go
+        uses: actions/setup-go@v2
+        run: |
+          go build Updater/updater.go
       - name: Compile
         run: |
           mkdir cmake-build-debug && cd cmake-build-debug
