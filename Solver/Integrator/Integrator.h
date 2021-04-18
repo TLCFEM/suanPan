@@ -94,8 +94,12 @@ public:
 
 	mat solve(const mat&);
 	mat solve(const sp_mat&);
+	mat solve(mat&&);
+	mat solve(sp_mat&&);
 	virtual int solve(mat&, const mat&);
 	virtual int solve(mat&, const sp_mat&);
+	virtual int solve(mat&, mat&&);
+	virtual int solve(mat&, sp_mat&&);
 
 	virtual void erase_machine_error() const;
 

@@ -53,6 +53,10 @@ int LeeNewmarkBase::solve(mat& X, const mat& B) { return stiffness->solve(X, res
 
 int LeeNewmarkBase::solve(mat& X, const sp_mat& B) { return stiffness->solve(X, resize(B, stiffness->n_rows, B.n_cols)); }
 
+int LeeNewmarkBase::solve(mat& X, mat&& B) { return solve(X, B); }
+
+int LeeNewmarkBase::solve(mat& X, sp_mat&& B) { return solve(X, B); }
+
 vec LeeNewmarkBase::get_force_residual() {
 	residual.head_rows(n_block) = Newmark::get_force_residual();
 

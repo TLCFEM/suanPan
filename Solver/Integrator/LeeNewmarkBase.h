@@ -58,6 +58,8 @@ public:
 
 	int solve(mat&, const mat&) final;
 	int solve(mat&, const sp_mat&) final;
+	int solve(mat&, mat&&) final;
+	int solve(mat&, sp_mat&&) final;
 
 	vec get_force_residual() final;
 	vec get_displacement_residual() final;

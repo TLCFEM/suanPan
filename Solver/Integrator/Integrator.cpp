@@ -160,9 +160,25 @@ mat Integrator::solve(const sp_mat& B) {
 	return X;
 }
 
+mat Integrator::solve(mat&& B) {
+	mat X;
+	if(solve(X, std::forward<mat>(B)) != SUANPAN_SUCCESS) X.reset();
+	return X;
+}
+
+mat Integrator::solve(sp_mat&& B) {
+	mat X;
+	if(solve(X, std::forward<sp_mat>(B)) != SUANPAN_SUCCESS) X.reset();
+	return X;
+}
+
 int Integrator::solve(mat& X, const mat& B) { return database.lock()->get_factory()->get_stiffness()->solve(X, B); }
 
 int Integrator::solve(mat& X, const sp_mat& B) { return database.lock()->get_factory()->get_stiffness()->solve(X, B); }
+
+int Integrator::solve(mat& X, mat&& B) { return database.lock()->get_factory()->get_stiffness()->solve(X, std::forward<mat>(B)); }
+
+int Integrator::solve(mat& X, sp_mat&& B) { return database.lock()->get_factory()->get_stiffness()->solve(X, std::forward<sp_mat>(B)); }
 
 /**
  * \brief avoid machine error accumulation
