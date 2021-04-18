@@ -14,7 +14,7 @@ jobs:
         uses: actions/setup-go@v2
       - name: Compile
         run: |
-          go build Updater/updater.go
+          go build Checker/updater.go
           mkdir cmake-build-debug && cd cmake-build-debug
           cmake -DCMAKE_BUILD_TYPE=Debug -DTEST_COVERAGE=ON -DUSE_HDF5=ON ../
           make -j4

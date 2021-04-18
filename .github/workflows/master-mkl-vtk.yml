@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-go@v2
       - name: Compile
         run: |
-          go build Updater/updater.go
+          go build Checker/updater.go
           sudo apt-get update && sudo env ACCEPT_EULA=Y apt-get upgrade -y -o Dpkg::Options::="--force-overwrite" && sudo apt-get install libglu1-mesa-dev libgl1-mesa-dev freeglut3-dev mesa-common-dev intel-oneapi-mkl-devel
           cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=/home/runner/work/suanPan/suanPan/VTK-build/lib/cmake/vtk-8.2/ -DUSE_MKL=ON -DMKLROOT=/opt/intel/oneapi/mkl/latest/ .
           make -j4

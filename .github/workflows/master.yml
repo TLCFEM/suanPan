@@ -14,7 +14,7 @@ jobs:
         uses: actions/setup-go@v2
       - name: Compile
         run: |
-          go build Updater/updater.go
+          go build Checker/updater.go
           echo "SP_TIME=suanPan-daily-$(date +''%Y%m%d%H'')" >> $GITHUB_ENV
           sudo apt-get update && sudo env ACCEPT_EULA=Y apt-get upgrade -y -o Dpkg::Options::="--force-overwrite"
           cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON .
@@ -59,7 +59,7 @@ jobs:
         uses: actions/setup-go@v2
       - name: Compile
         run: |
-          go build Updater/updater.go
+          go build Checker/updater.go
           echo "SP_TIME=suanPan-daily-$(date +''%Y%m%d%H'')" >> $GITHUB_ENV
           export CC=gcc-9 && export CXX=g++-9 && export FC=gfortran-9
           cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON .
