@@ -17,10 +17,9 @@ jobs:
           mkdir VTK-build && tar xf VTK-8.2.0-linux.tar.gz -C VTK-build
       - name: Golang
         uses: actions/setup-go@v2
-        run: |
-          go build Updater/updater.go
       - name: Compile
         run: |
+          go build Updater/updater.go
           sudo apt-get update && sudo env ACCEPT_EULA=Y apt-get upgrade -y -o Dpkg::Options::="--force-overwrite" && sudo apt-get install libglu1-mesa-dev libgl1-mesa-dev freeglut3-dev mesa-common-dev
           cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=/home/runner/work/suanPan/suanPan/VTK-build/lib/cmake/vtk-8.2/ .
           make -j4
@@ -67,10 +66,9 @@ jobs:
           mkdir VTK-build && tar xf VTK-8.2.0-macos.tar.gz -C VTK-build
       - name: Golang
         uses: actions/setup-go@v2
-        run: |
-          go build Updater/updater.go
       - name: Compile
         run: |
+          go build Updater/updater.go
           sudo brew update && sudo brew install glfw3 glew
           export CC=gcc-9 && export CXX=g++-9 && export FC=gfortran-9
           cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=/Users/runner/work/suanPan/suanPan/VTK-build/lib/cmake/vtk-8.2/ .
