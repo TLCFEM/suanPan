@@ -2558,8 +2558,8 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
 	}
 	else if(is_equal(property_id, "precision")) {
 		if(string value; !get_input(command, value)) suanpan_error("set_property() need a valid value.\n");
-		else if(is_equal(value, "DOUBLE")) tmp_step->set_precision(Precision::DOUBLE);
-		else if(is_equal(value, "SINGLE")) tmp_step->set_precision(Precision::SINGLE);
+		else if(is_equal(value, "DOUBLE") || is_equal(value, "FULL")) tmp_step->set_precision(Precision::FULL);
+		else if(is_equal(value, "SINGLE") || is_equal(value, "MIXED")) tmp_step->set_precision(Precision::MIXED);
 		else suanpan_error("set_property() need a valid precision.\n");
 	}
 	else if(is_equal(property_id, "tolerance")) {

@@ -58,7 +58,7 @@ protected:
 	const bool sparse_mat = false;
 
 	SolverType system_solver = SolverType::LAPACK;
-	Precision precision = Precision::DOUBLE;
+	Precision precision = Precision::FULL;
 
 	double tolerance = 1E-12;
 
