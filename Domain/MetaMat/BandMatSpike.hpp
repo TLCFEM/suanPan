@@ -44,6 +44,9 @@ template<typename T> class BandMatSpike final : public MetaMat<T> {
 	podarray<T> WORK;
 	podarray<int> SPIKE = podarray<int>(64);
 
+	podarray<float> s_memory; // float storage used in mixed precision algorithm
+	podarray<float> SWORK;
+
 	void init_spike();
 protected:
 	int solve_trs(Mat<T>&, const Mat<T>&) override;
@@ -161,15 +164,23 @@ template<typename T> int BandMatSpike<T>::solve(Mat<T>& X, const Mat<T>& B) {
 		const auto KLU = static_cast<uword>(std::max(KL, KU));
 		auto INFO = 0;
 
-		WORK.zeros(KLU * KLU * SPIKE(9));
-
 		if(std::is_same<T, float>::value) {
 			using E = float;
+
+			WORK.zeros(KLU * KLU * SPIKE(9));
 			sspike_gbtrf_(SPIKE.memptr(), &N, &KL, &KU, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), &INFO);
 		}
-		else {
+		else if(Precision::FULL == this->precision) {
 			using E = double;
+
+			WORK.zeros(KLU * KLU * SPIKE(9));
 			dspike_gbtrf_(SPIKE.memptr(), &N, &KL, &KU, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), &INFO);
+		}
+		else {
+			s_memory = this->to_float();
+
+			SWORK.zeros(KLU * KLU * SPIKE(9));
+			sspike_gbtrf_(SPIKE.memptr(), &N, &KL, &KU, s_memory.mem, &LDAB, SWORK.memptr(), &INFO);
 		}
 
 		if(INFO != 0) {
@@ -191,15 +202,35 @@ template<typename T> int BandMatSpike<T>::solve_trs(Mat<T>& X, const Mat<T>& B) 
 	auto LDAB = static_cast<int>(m_rows);
 	auto LDB = static_cast<int>(B.n_rows);
 
-	X = B;
-
 	if(std::is_same<T, float>::value) {
 		using E = float;
+		X = B;
 		sspike_gbtrs_(SPIKE.memptr(), &TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), (E*)X.memptr(), &LDB);
 	}
-	else {
+	else if(Precision::FULL == this->precision) {
 		using E = double;
+		X = B;
 		dspike_gbtrs_(SPIKE.memptr(), &TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), (E*)X.memptr(), &LDB);
+	}
+	else {
+		X = arma::zeros(B.n_rows, B.n_cols);
+
+		mat full_residual = B;
+
+		auto multiplier = 1.;
+
+		auto counter = 0;
+		while(++counter < 20) {
+			auto residual = conv_to<fmat>::from(full_residual / multiplier);
+
+			sspike_gbtrs_(SPIKE.memptr(), &TRAN, &N, &KL, &KU, &NRHS, s_memory.memptr(), &LDAB, SWORK.memptr(), residual.memptr(), &LDB);
+
+			multiplier = norm(full_residual = B - this->operator*(X += multiplier * conv_to<mat>::from(residual)));
+
+			suanpan_debug("mixed precision algorithm multiplier: %.5E\n", multiplier);
+
+			if(multiplier < this->tolerance) break;
+		}
 	}
 
 	return SUANPAN_SUCCESS;

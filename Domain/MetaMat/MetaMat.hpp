@@ -45,6 +45,7 @@ protected:
 	Col<int> IPIV;
 
 	virtual int solve_trs(Mat<T>&, const Mat<T>&);
+	podarray<float> to_float();
 public:
 	triplet_form<T, uword> triplet_mat;
 
@@ -120,6 +121,18 @@ template<typename T> Mat<T> to_mat(const shared_ptr<MetaMat<T>>& in_mat) {
 }
 
 template<typename T> int MetaMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) { return solve(X, B); }
+
+template<typename T> podarray<float> MetaMat<T>::to_float() {
+	podarray<float> s_memory(this->n_elem);
+
+#ifdef SUANPAN_MT
+	tbb::parallel_for(0llu, n_elem, [&](const uword I) { s_memory(I) = static_cast<float>(memory[I]); });
+#else
+	std::transform(memory, memory + n_elem, s_memory.mem, [](const double I) { return static_cast<float>(I); });
+#endif
+
+	return s_memory;
+}
 
 template<typename T> MetaMat<T>::MetaMat()
 	: n_rows(0)

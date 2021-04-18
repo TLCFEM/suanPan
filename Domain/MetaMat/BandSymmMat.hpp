@@ -37,6 +37,8 @@ template<typename T> class BandSymmMat final : public MetaMat<T> {
 
 	const uword band;
 	const uword m_rows; // memory block layout
+
+	podarray<float> s_memory;
 protected:
 	int solve_trs(Mat<T>&, const Mat<T>&) override;
 public:
@@ -131,8 +133,6 @@ template<typename T> Mat<T> BandSymmMat<T>::operator*(const Mat<T>& X) {
 template<typename T> int BandSymmMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
 	if(this->factored) return this->solve_trs(X, B);
 
-	X = B;
-
 	auto N = static_cast<int>(this->n_rows);
 	auto KD = static_cast<int>(band);
 	auto NRHS = static_cast<int>(B.n_cols);
@@ -140,24 +140,34 @@ template<typename T> int BandSymmMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
 	auto LDB = static_cast<int>(B.n_rows);
 	auto INFO = 0;
 
+	this->factored = true;
+
 	if(std::is_same<T, float>::value) {
 		using E = float;
+
+		X = B;
 		arma_fortran(arma_spbsv)(&UPLO, &N, &KD, &NRHS, (E*)this->memptr(), &LDAB, (E*)X.memptr(), &LDB, &INFO);
 	}
-	else if(std::is_same<T, double>::value) {
+	else if(Precision::FULL == this->precision) {
 		using E = double;
+
+		X = B;
 		arma_fortran(arma_dpbsv)(&UPLO, &N, &KD, &NRHS, (E*)this->memptr(), &LDAB, (E*)X.memptr(), &LDB, &INFO);
 	}
+	else {
+		s_memory = this->to_float();
 
-	if(0 == INFO) this->factored = true;
-	else suanpan_error("solve() receives error code %u from the base driver, the matrix is probably singular.\n", INFO);
+		arma_fortran(arma_spbtrf)(&UPLO, &N, &KD, s_memory.memptr(), &LDAB, &INFO);
+
+		if(0 == INFO) INFO = solve_trs(X, B);
+	}
+
+	if(0 != INFO) suanpan_error("solve() receives error code %u from the base driver, the matrix is probably singular.\n", INFO);
 
 	return INFO;
 }
 
 template<typename T> int BandSymmMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
-	X = B;
-
 	auto N = static_cast<int>(this->n_rows);
 	auto KD = static_cast<int>(band);
 	auto NRHS = static_cast<int>(B.n_cols);
@@ -167,11 +177,34 @@ template<typename T> int BandSymmMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 
 	if(std::is_same<T, float>::value) {
 		using E = float;
+		X = B;
 		arma_fortran(arma_spbtrs)(&UPLO, &N, &KD, &NRHS, (E*)this->memptr(), &LDAB, (E*)X.memptr(), &LDB, &INFO);
 	}
-	else if(std::is_same<T, double>::value) {
+	else if(Precision::FULL == this->precision) {
 		using E = double;
+		X = B;
 		arma_fortran(arma_dpbtrs)(&UPLO, &N, &KD, &NRHS, (E*)this->memptr(), &LDAB, (E*)X.memptr(), &LDB, &INFO);
+	}
+	else {
+		X = arma::zeros(B.n_rows, B.n_cols);
+
+		mat full_residual = B;
+
+		auto multiplier = 1.;
+
+		auto counter = 0;
+		while(++counter < 20) {
+			auto residual = conv_to<fmat>::from(full_residual / multiplier);
+
+			arma_fortran(arma_spbtrs)(&UPLO, &N, &KD, &NRHS, s_memory.memptr(), &LDAB, residual.memptr(), &LDB, &INFO);
+			if(0 != INFO) break;
+
+			multiplier = norm(full_residual = B - this->operator*(X += multiplier * conv_to<mat>::from(residual)));
+
+			suanpan_debug("mixed precision algorithm multiplier: %.5E\n", multiplier);
+
+			if(multiplier < this->tolerance) break;
+		}
 	}
 
 	if(0 != INFO) suanpan_error("solve() receives error code %u from the base driver, the matrix is probably singular.\n", INFO);

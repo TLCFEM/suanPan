@@ -158,26 +158,18 @@ template<typename T> int BandMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
 		X = B;
 		arma_fortran(arma_sgbsv)(&N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, this->IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
 	}
-	else if(std::is_same<T, double>::value) {
+	else if(Precision::FULL == this->precision) {
 		using E = double;
 
-		if(Precision::FULL == this->precision) {
-			X = B;
-			arma_fortran(arma_dgbsv)(&N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, this->IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
-		}
-		else {
-			s_memory.set_size(this->n_elem);
+		X = B;
+		arma_fortran(arma_dgbsv)(&N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, this->IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
+	}
+	else {
+		s_memory = this->to_float();
 
-#ifdef SUANPAN_MT
-			tbb::parallel_for(0llu, this->n_elem, [&](const uword I) { s_memory(I) = static_cast<float>(this->memory[I]); });
-#else
-			std::transform(this->memptr(), this->memptr() + this->n_elem, s_memory.mem, [](const double I) { return static_cast<float>(I); });
-#endif
+		arma_fortran(arma_sgbtrf)(&N, &N, &KL, &KU, s_memory.memptr(), &LDAB, this->IPIV.memptr(), &INFO);
 
-			arma_fortran(arma_sgbtrf)(&N, &N, &KL, &KU, s_memory.memptr(), &LDAB, this->IPIV.memptr(), &INFO);
-
-			if(0 == INFO) INFO = solve_trs(X, B);
-		}
+		if(0 == INFO) INFO = solve_trs(X, B);
 	}
 
 	if(0 != INFO) suanpan_error("solve() receives error code %u from base driver, the matrix is probably singular.\n", INFO);
@@ -201,33 +193,31 @@ template<typename T> int BandMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 		X = B;
 		arma_fortran(arma_sgbtrs)(&TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, this->IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
 	}
-	else if(std::is_same<T, double>::value) {
+	else if(Precision::FULL == this->precision) {
 		using E = double;
 
-		if(Precision::FULL == this->precision) {
-			X = B;
-			arma_fortran(arma_dgbtrs)(&TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, this->IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
-		}
-		else {
-			X = arma::zeros(B.n_rows, B.n_cols);
+		X = B;
+		arma_fortran(arma_dgbtrs)(&TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, this->IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
+	}
+	else {
+		X = arma::zeros(B.n_rows, B.n_cols);
 
-			mat full_residual = B;
+		mat full_residual = B;
 
-			auto multiplier = 1.;
+		auto multiplier = 1.;
 
-			auto counter = 0;
-			while(++counter < 20) {
-				auto residual = conv_to<fmat>::from(full_residual / multiplier);
+		auto counter = 0;
+		while(++counter < 20) {
+			auto residual = conv_to<fmat>::from(full_residual / multiplier);
 
-				arma_fortran(arma_sgbtrs)(&TRAN, &N, &KL, &KU, &NRHS, s_memory.memptr(), &LDAB, this->IPIV.memptr(), residual.memptr(), &LDB, &INFO);
-				if(0 != INFO) break;
+			arma_fortran(arma_sgbtrs)(&TRAN, &N, &KL, &KU, &NRHS, s_memory.memptr(), &LDAB, this->IPIV.memptr(), residual.memptr(), &LDB, &INFO);
+			if(0 != INFO) break;
 
-				multiplier = norm(full_residual = B - this->operator*(X += multiplier * conv_to<mat>::from(residual)));
+			multiplier = norm(full_residual = B - this->operator*(X += multiplier * conv_to<mat>::from(residual)));
 
-				suanpan_debug("mixed precision algorithm multiplier: %.5E\n", multiplier);
+			suanpan_debug("mixed precision algorithm multiplier: %.5E\n", multiplier);
 
-				if(multiplier < this->tolerance) break;
-			}
+			if(multiplier < this->tolerance) break;
 		}
 	}
 

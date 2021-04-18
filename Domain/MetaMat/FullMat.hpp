@@ -32,6 +32,8 @@
 
 template<typename T> class FullMat : public MetaMat<T> {
 	static const char TRAN;
+
+	podarray<float> s_memory; // float storage used in mixed precision algorithm
 protected:
 	int solve_trs(Mat<T>&, const Mat<T>&) override;
 public:
@@ -128,26 +130,34 @@ template<typename T> int FullMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
 
 	this->IPIV.zeros(N);
 
-	X = B;
+	this->factored = true;
 
 	if(std::is_same<T, float>::value) {
 		using E = float;
+
+		X = B;
 		arma_fortran(arma_sgesv)(&N, &NRHS, (E*)this->memptr(), &N, this->IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
 	}
-	else if(std::is_same<T, double>::value) {
+	else if(Precision::FULL == this->precision) {
 		using E = double;
+
+		X = B;
 		arma_fortran(arma_dgesv)(&N, &NRHS, (E*)this->memptr(), &N, this->IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
 	}
+	else {
+		s_memory = this->to_float();
 
-	if(0 == INFO) this->factored = true;
-	else suanpan_error("solve() receives error code %u from the base driver, the matrix is probably singular.\n", INFO);
+		arma_fortran(arma_sgetrf)(&N, &N, s_memory.memptr(), &N, this->IPIV.memptr(), &INFO);
+
+		if(0 == INFO) INFO = solve_trs(X, B);
+	}
+
+	if(0 != INFO) suanpan_error("solve() receives error code %u from the base driver, the matrix is probably singular.\n", INFO);
 
 	return INFO;
 }
 
 template<typename T> int FullMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
-	X = B;
-
 	auto N = static_cast<int>(this->n_rows);
 	auto NRHS = static_cast<int>(B.n_cols);
 	auto LDB = static_cast<int>(B.n_rows);
@@ -155,11 +165,36 @@ template<typename T> int FullMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 
 	if(std::is_same<T, float>::value) {
 		using E = float;
+
+		X = B;
 		arma_fortran(arma_sgetrs)(&TRAN, &N, &NRHS, (E*)this->memptr(), &N, this->IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
 	}
-	else if(std::is_same<T, double>::value) {
+	else if(Precision::FULL == this->precision) {
 		using E = double;
+
+		X = B;
 		arma_fortran(arma_dgetrs)(&TRAN, &N, &NRHS, (E*)this->memptr(), &N, this->IPIV.memptr(), (E*)X.memptr(), &LDB, &INFO);
+	}
+	else {
+		X = arma::zeros(B.n_rows, B.n_cols);
+
+		mat full_residual = B;
+
+		auto multiplier = 1.;
+
+		auto counter = 0;
+		while(++counter < 20) {
+			auto residual = conv_to<fmat>::from(full_residual / multiplier);
+
+			arma_fortran(arma_sgetrs)(&TRAN, &N, &NRHS, s_memory.memptr(), &N, this->IPIV.memptr(), residual.memptr(), &LDB, &INFO);
+			if(0 != INFO) break;
+
+			multiplier = norm(full_residual = B - this->operator*(X += multiplier * conv_to<mat>::from(residual)));
+
+			suanpan_debug("mixed precision algorithm multiplier: %.5E\n", multiplier);
+
+			if(multiplier < this->tolerance) break;
+		}
 	}
 
 	return INFO;
