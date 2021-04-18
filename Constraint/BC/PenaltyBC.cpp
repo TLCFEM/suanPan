@@ -75,7 +75,7 @@ int PenaltyBC::process(const shared_ptr<DomainBase>& D) {
 	vector<uword> pool;
 	pool.reserve(node_encoding.n_elem * dof_reference.n_elem);
 
-	const auto max_term = multiplier * D->get_factory()->get_stiffness()->max();
+	const auto max_term = std::min(1E12, multiplier * D->get_factory()->get_stiffness()->max());
 
 	auto counter = 0llu;
 	for(const auto& I : node_encoding)

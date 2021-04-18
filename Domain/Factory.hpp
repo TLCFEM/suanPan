@@ -56,7 +56,7 @@ template<typename T> class Factory final {
 	bool nlgeom = false;
 
 	double tolerance = 1E-14;
-	Precision precision = Precision::DOUBLE;
+	Precision precision = Precision::FULL;
 	SolverType solver = SolverType::LAPACK;
 
 	T error = 0.; // error produced by certain solvers
@@ -767,8 +767,8 @@ template<typename T> void Factory<T>::initialize_mass() {
 		break;
 	}
 
-	global_mass->precision = precision;
-	global_mass->tolerance = tolerance;
+	global_mass->set_precision(precision);
+	global_mass->set_tolerance(tolerance);
 }
 
 template<typename T> void Factory<T>::initialize_damping() {
@@ -804,8 +804,8 @@ template<typename T> void Factory<T>::initialize_damping() {
 		break;
 	}
 
-	global_damping->precision = precision;
-	global_damping->tolerance = tolerance;
+	global_damping->set_precision(precision);
+	global_damping->set_tolerance(tolerance);
 }
 
 template<typename T> void Factory<T>::initialize_stiffness() {
@@ -841,8 +841,8 @@ template<typename T> void Factory<T>::initialize_stiffness() {
 		break;
 	}
 
-	global_stiffness->precision = precision;
-	global_stiffness->tolerance = tolerance;
+	global_stiffness->set_precision(precision);
+	global_stiffness->set_tolerance(tolerance);
 }
 
 template<typename T> void Factory<T>::initialize_geometry() {
@@ -880,8 +880,8 @@ template<typename T> void Factory<T>::initialize_geometry() {
 		break;
 	}
 
-	global_geometry->precision = precision;
-	global_geometry->tolerance = tolerance;
+	global_geometry->set_precision(precision);
+	global_geometry->set_tolerance(tolerance);
 }
 
 template<typename T> void Factory<T>::initialize_eigen() {
