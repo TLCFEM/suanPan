@@ -80,7 +80,7 @@ template<typename T> int SparseMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) {
 	if(cusolverStatus_t solver_info; std::is_same<T, float>::value) {
 		using E = float;
 		for(auto I = 0; I < B.n_cols; ++I) {
-			solver_info = cusolverSpScsrlsvluHost(handle, csr_mat.n_rows, csr_mat.c_size, descrA, (E*)csr_mat.val_idx, csr_mat.row_ptr, csr_mat.col_idx, (E*)B.colptr(I), this->tolerance, 2, (E*)X.colptr(I), &singularity);
+			solver_info = cusolverSpScsrlsvluHost(handle, csr_mat.n_rows, csr_mat.n_elem, descrA, (E*)csr_mat.val_idx, csr_mat.row_ptr, csr_mat.col_idx, (E*)B.colptr(I), this->tolerance, 2, (E*)X.colptr(I), &singularity);
 			if(CUSOLVER_STATUS_SUCCESS != solver_info) {
 				suanpan_error("error code %u returned during CUDA solving.\n", static_cast<unsigned>(solver_info));
 				return SUANPAN_FAIL;
@@ -90,7 +90,7 @@ template<typename T> int SparseMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) {
 	else if(std::is_same<T, double>::value) {
 		using E = double;
 		for(auto I = 0; I < B.n_cols; ++I) {
-			solver_info = cusolverSpDcsrlsvluHost(handle, csr_mat.n_rows, csr_mat.c_size, descrA, (E*)csr_mat.val_idx, csr_mat.row_ptr, csr_mat.col_idx, (E*)B.colptr(I), this->tolerance, 2, (E*)X.colptr(I), &singularity);
+			solver_info = cusolverSpDcsrlsvluHost(handle, csr_mat.n_rows, csr_mat.n_elem, descrA, (E*)csr_mat.val_idx, csr_mat.row_ptr, csr_mat.col_idx, (E*)B.colptr(I), this->tolerance, 2, (E*)X.colptr(I), &singularity);
 			if(CUSOLVER_STATUS_SUCCESS != solver_info) {
 				suanpan_error("error code %u returned during CUDA solving.\n", static_cast<unsigned>(solver_info));
 				return SUANPAN_FAIL;

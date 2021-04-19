@@ -34,7 +34,7 @@ public:
 	using sparse_form<data_t, index_t, triplet_form<data_t, index_t>>::n_rows;
 	using sparse_form<data_t, index_t, triplet_form<data_t, index_t>>::n_cols;
 	using sparse_form<data_t, index_t, triplet_form<data_t, index_t>>::n_elem;
-	using sparse_form<data_t, index_t, triplet_form<data_t, index_t>>::c_size;
+	using sparse_form<data_t, index_t, triplet_form<data_t, index_t>>::n_alloc;
 
 	index_t* row_idx = nullptr; // index storage
 	index_t* col_idx = nullptr; // index storage
@@ -72,7 +72,6 @@ public:
 	bool resize(index_t, index_t, index_t) override;
 
 	void print() const override;
-	void spy() override;
 
 	void csr_condense() const;
 	void csc_condense() const;
@@ -115,7 +114,7 @@ public:
 };
 
 template<typename data_t, typename index_t> void triplet_form<data_t, index_t>::condense() const {
-	if(c_size < 2) return;
+	if(n_elem < 2) return;
 
 	auto last_row = row_idx[0], last_col = col_idx[0];
 
@@ -124,7 +123,7 @@ template<typename data_t, typename index_t> void triplet_form<data_t, index_t>::
 
 	index_t max_row = 0, max_col = 0;
 
-	for(index_t I = 0; I < c_size; ++I) {
+	for(index_t I = 0; I < n_elem; ++I) {
 		if(last_row != row_idx[I] || last_col != col_idx[I]) {
 			if(last_sum != 0.) {
 				row_idx[current_pos] = last_row;
@@ -152,17 +151,17 @@ template<typename data_t, typename index_t> void triplet_form<data_t, index_t>::
 
 	access::rw(n_rows) = max_row + 1;
 	access::rw(n_cols) = max_col + 1;
-	access::rw(c_size) = current_pos;
+	access::rw(n_elem) = current_pos;
 }
 
 template<typename data_t, typename index_t> void triplet_form<data_t, index_t>::copy_memory(const index_t size, const index_t* const in_row_idx, const index_t* const in_col_idx, const data_t* const in_val_idx) {
-	if(size > n_elem) resize(size);
+	if(size > n_alloc) resize(size);
 
 	std::copy(in_row_idx, in_row_idx + size, this->row_idx);
 	std::copy(in_col_idx, in_col_idx + size, this->col_idx);
 	std::copy(in_val_idx, in_val_idx + size, this->val_idx);
 
-	access::rw(c_size) = size;
+	access::rw(n_elem) = size;
 }
 
 template<typename data_t, typename index_t> triplet_form<data_t, index_t>::triplet_form(const index_t in_rows, const index_t in_cols, const index_t in_elem, const bool in_csc_sort, const bool in_csr_sort)
@@ -175,11 +174,11 @@ template<typename data_t, typename index_t> triplet_form<data_t, index_t>::tripl
 template<typename data_t, typename index_t> triplet_form<data_t, index_t>::~triplet_form() { triplet_form<data_t, index_t>::reset(); }
 
 template<typename data_t, typename index_t> triplet_form<data_t, index_t>::triplet_form(const triplet_form& in_mat)
-	: sparse_form<data_t, index_t, triplet_form<data_t, index_t>>(in_mat.n_rows, in_mat.n_cols, in_mat.n_elem) {
+	: sparse_form<data_t, index_t, triplet_form<data_t, index_t>>(in_mat.n_rows, in_mat.n_cols, in_mat.n_alloc) {
+	triplet_form<data_t, index_t>::init();
+	triplet_form<data_t, index_t>::copy_memory(in_mat.n_elem, in_mat.row_idx, in_mat.col_idx, in_mat.val_idx);
 	csc_sorted = in_mat.csc_sorted;
 	csr_sorted = in_mat.csr_sorted;
-	triplet_form<data_t, index_t>::init();
-	triplet_form<data_t, index_t>::copy_memory(in_mat.c_size, in_mat.row_idx, in_mat.col_idx, in_mat.val_idx);
 }
 
 template<typename data_t, typename index_t> triplet_form<data_t, index_t>::triplet_form(triplet_form&& in_mat) noexcept {
@@ -187,53 +186,61 @@ template<typename data_t, typename index_t> triplet_form<data_t, index_t>::tripl
 	access::rw(n_rows) = in_mat.n_rows;
 	access::rw(n_cols) = in_mat.n_cols;
 	access::rw(n_elem) = in_mat.n_elem;
-	access::rw(c_size) = in_mat.c_size;
-	csc_sorted = in_mat.csc_sorted;
-	csr_sorted = in_mat.csr_sorted;
+	access::rw(n_alloc) = in_mat.n_alloc;
 	row_idx = in_mat.row_idx;
 	col_idx = in_mat.col_idx;
 	val_idx = in_mat.val_idx;
-	access::rw(in_mat.n_rows) = access::rw(in_mat.n_cols) = access::rw(in_mat.n_elem) = access::rw(in_mat.c_size) = 0;
-	in_mat.row_idx = in_mat.col_idx = nullptr;
+	csc_sorted = in_mat.csc_sorted;
+	csr_sorted = in_mat.csr_sorted;
+	access::rw(in_mat.n_rows) = access::rw(in_mat.n_cols) = access::rw(in_mat.n_alloc) = access::rw(in_mat.n_elem) = 0;
+	in_mat.row_idx = nullptr;
+	in_mat.col_idx = nullptr;
 	in_mat.val_idx = nullptr;
 }
 
 template<typename data_t, typename index_t> triplet_form<data_t, index_t>& triplet_form<data_t, index_t>::operator=(const triplet_form& in_mat) {
-	if(&in_mat != this) {
-		init(in_mat.n_rows, in_mat.n_cols, in_mat.n_elem);
-		copy_memory(in_mat.c_size, in_mat.row_idx, in_mat.col_idx, in_mat.val_idx);
-	}
+	if(this == &in_mat) return *this;
+
+	init(in_mat.n_rows, in_mat.n_cols, in_mat.n_alloc);
+	copy_memory(in_mat.n_elem, in_mat.row_idx, in_mat.col_idx, in_mat.val_idx);
+	csc_sorted = in_mat.csc_sorted;
+	csr_sorted = in_mat.csr_sorted;
 
 	return *this;
 }
 
 template<typename data_t, typename index_t> triplet_form<data_t, index_t>& triplet_form<data_t, index_t>::operator=(triplet_form&& in_mat) noexcept {
+	if(this == &in_mat) return *this;
+
 	triplet_form<data_t, index_t>::reset();
 	access::rw(n_rows) = in_mat.n_rows;
 	access::rw(n_cols) = in_mat.n_cols;
 	access::rw(n_elem) = in_mat.n_elem;
-	access::rw(c_size) = in_mat.c_size;
-	csc_sorted = in_mat.csc_sorted;
-	csr_sorted = in_mat.csr_sorted;
+	access::rw(n_alloc) = in_mat.n_alloc;
 	row_idx = in_mat.row_idx;
 	col_idx = in_mat.col_idx;
 	val_idx = in_mat.val_idx;
-	access::rw(in_mat.n_rows) = access::rw(in_mat.n_cols) = access::rw(in_mat.n_elem) = access::rw(in_mat.c_size) = 0;
-	in_mat.row_idx = in_mat.col_idx = nullptr;
+	csc_sorted = in_mat.csc_sorted;
+	csr_sorted = in_mat.csr_sorted;
+	access::rw(in_mat.n_rows) = access::rw(in_mat.n_cols) = access::rw(in_mat.n_alloc) = access::rw(in_mat.n_elem) = 0;
+	in_mat.row_idx = nullptr;
+	in_mat.col_idx = nullptr;
 	in_mat.val_idx = nullptr;
+
 	return *this;
 }
 
 template<typename data_t, typename index_t> template<typename in_dt, typename in_it> triplet_form<data_t, index_t>::triplet_form(const triplet_form<in_dt, in_it>& in_mat, const int base)
-	: sparse_form<data_t, index_t, triplet_form<data_t, index_t>>(in_mat.n_rows, in_mat.n_cols, in_mat.n_elem) {
-	access::rw(c_size) = in_mat.c_size;
+	: sparse_form<data_t, index_t, triplet_form<data_t, index_t>>(in_mat.n_rows, in_mat.n_cols, in_mat.n_alloc) {
+	triplet_form<data_t, index_t>::init();
+
+	access::rw(n_elem) = in_mat.n_elem;
+
 	csc_sorted = in_mat.csc_sorted;
 	csr_sorted = in_mat.csr_sorted;
 
-	triplet_form<data_t, index_t>::init();
-
 #ifdef SUANPAN_MT
-	tbb::parallel_for(static_cast<index_t>(0), in_mat.c_size, [&](const index_t I) {
+	tbb::parallel_for(static_cast<index_t>(0), in_mat.n_elem, [&](const index_t I) {
 		row_idx[I] = index_t(in_mat.row_idx[I]) + base;
 		col_idx[I] = index_t(in_mat.col_idx[I]) + base;
 		val_idx[I] = data_t(in_mat.val_idx[I]);
@@ -261,19 +268,19 @@ template<typename data_t, typename index_t> void triplet_form<data_t, index_t>::
 }
 
 template<typename data_t, typename index_t> void triplet_form<data_t, index_t>::zeros() const {
-	access::rw(c_size) = 0;
+	access::rw(n_elem) = 0;
 	access::rw(csc_sorted) = false;
 	access::rw(csr_sorted) = false;
 }
 
-template<typename data_t, typename index_t> data_t triplet_form<data_t, index_t>::max() const { return *std::max_element(val_idx, val_idx + c_size); }
+template<typename data_t, typename index_t> data_t triplet_form<data_t, index_t>::max() const { return *std::max_element(val_idx, val_idx + n_elem); }
 
 template<typename data_t, typename index_t> bool triplet_form<data_t, index_t>::init() {
 	reset();
-	if(n_elem == 0) return true;
-	row_idx = new(std::nothrow) index_t[n_elem];
-	col_idx = new(std::nothrow) index_t[n_elem];
-	val_idx = new(std::nothrow) data_t[n_elem];
+	if(n_alloc == 0) return true;
+	row_idx = new(std::nothrow) index_t[n_alloc];
+	col_idx = new(std::nothrow) index_t[n_alloc];
+	val_idx = new(std::nothrow) data_t[n_alloc];
 	if(row_idx == nullptr || col_idx == nullptr || val_idx == nullptr) {
 		reset();
 		return false;
@@ -282,11 +289,11 @@ template<typename data_t, typename index_t> bool triplet_form<data_t, index_t>::
 }
 
 template<typename data_t, typename index_t> bool triplet_form<data_t, index_t>::init(const index_t in_elem) {
-	if(in_elem <= n_elem) {
+	if(in_elem <= n_alloc) {
 		zeros();
 		return true;
 	}
-	access::rw(n_elem) = in_elem;
+	access::rw(n_alloc) = in_elem;
 	return init();
 }
 
@@ -300,9 +307,9 @@ template<typename data_t, typename index_t> bool triplet_form<data_t, index_t>::
 template<typename data_t, typename index_t> bool triplet_form<data_t, index_t>::resize() {
 	const auto copy = *this;
 
-	if(!init(0 == n_elem ? 1 : 2 * n_elem)) return false;
+	if(!init(0 == n_alloc ? 1 : 2 * n_alloc)) return false;
 
-	copy_memory(copy.c_size, copy.row_idx, copy.col_idx, copy.val_idx);
+	copy_memory(copy.n_elem, copy.row_idx, copy.col_idx, copy.val_idx);
 
 	return true;
 }
@@ -310,9 +317,9 @@ template<typename data_t, typename index_t> bool triplet_form<data_t, index_t>::
 template<typename data_t, typename index_t> bool triplet_form<data_t, index_t>::resize(const index_t in_elem) {
 	const auto copy = *this;
 
-	if(in_elem < c_size || !init(in_elem)) return false;
+	if(in_elem < n_elem || !init(in_elem)) return false;
 
-	copy_memory(copy.c_size, copy.row_idx, copy.col_idx, copy.val_idx);
+	copy_memory(copy.n_elem, copy.row_idx, copy.col_idx, copy.val_idx);
 
 	return true;
 }
@@ -320,38 +327,20 @@ template<typename data_t, typename index_t> bool triplet_form<data_t, index_t>::
 template<typename data_t, typename index_t> bool triplet_form<data_t, index_t>::resize(const index_t in_row, const index_t in_col, const index_t in_elem) {
 	const auto copy = *this;
 
-	if(in_row < n_rows || in_col < n_cols || in_elem < c_size || !init(in_row, in_col, in_elem)) return false;
+	if(in_row < n_rows || in_col < n_cols || in_elem < n_elem || !init(in_row, in_col, in_elem)) return false;
 
-	copy_memory(copy.c_size, copy.row_idx, copy.col_idx, copy.val_idx);
+	copy_memory(copy.n_elem, copy.row_idx, copy.col_idx, copy.val_idx);
 
 	return true;
 }
 
 template<typename data_t, typename index_t> void triplet_form<data_t, index_t>::print() const {
-	suanpan_info("A sparse matrix in triplet form with size of %u by %u, the density of %.3f.\n", static_cast<unsigned>(n_rows), static_cast<unsigned>(n_cols), static_cast<double>(c_size) / static_cast<double>(n_rows * n_cols) * 100.);
-	if(c_size > 1000) {
+	suanpan_info("A sparse matrix in triplet form with size of %u by %u, the density of %.3f.\n", static_cast<unsigned>(n_rows), static_cast<unsigned>(n_cols), static_cast<double>(n_elem) / static_cast<double>(n_rows) / static_cast<double>(n_cols) * 100.);
+	if(n_elem > 1000) {
 		suanpan_info("Not going to print all elements as more than 1000 elements exist.\n");
 		return;
 	}
-	for(index_t I = 0; I < c_size; ++I) suanpan_info("(%3u, %3u) ===> %+.4E\n", static_cast<unsigned>(row_idx[I]), static_cast<unsigned>(col_idx[I]), val_idx[I]);
-}
-
-template<typename data_t, typename index_t> void triplet_form<data_t, index_t>::spy() {
-	if(std::max(n_rows, n_cols) > 100) return;
-
-	csr_condense();
-
-	index_t current_pos = 0;
-
-	for(index_t I = 0; I < n_rows; ++I) {
-		for(index_t J = 0; J < n_cols; ++J)
-			if(I == row_idx[current_pos] && J == col_idx[current_pos]) {
-				suanpan_info(" X");
-				++current_pos;
-			}
-			else suanpan_info(" .");
-		suanpan_info("\n");
-	}
+	for(index_t I = 0; I < n_elem; ++I) suanpan_info("(%3u, %3u) ===> %+.4E\n", static_cast<unsigned>(row_idx[I]), static_cast<unsigned>(col_idx[I]), val_idx[I]);
 }
 
 template<typename data_t, typename index_t> void triplet_form<data_t, index_t>::csr_condense() const { if(csr_sort()) condense(); }
@@ -359,11 +348,11 @@ template<typename data_t, typename index_t> void triplet_form<data_t, index_t>::
 template<typename data_t, typename index_t> void triplet_form<data_t, index_t>::csc_condense() const { if(csc_sort()) condense(); }
 
 template<typename data_t, typename index_t> bool triplet_form<data_t, index_t>::csr_sort() const {
-	if(c_size < 2) return true;
+	if(n_elem < 2) return true;
 
-	const auto new_row_idx = new(std::nothrow) index_t[n_elem];
-	const auto new_col_idx = new(std::nothrow) index_t[n_elem];
-	const auto new_val_idx = new(std::nothrow) data_t[n_elem];
+	const auto new_row_idx = new(std::nothrow) index_t[n_alloc];
+	const auto new_col_idx = new(std::nothrow) index_t[n_alloc];
+	const auto new_val_idx = new(std::nothrow) data_t[n_alloc];
 
 	if(new_row_idx == nullptr || new_col_idx == nullptr || new_val_idx == nullptr) {
 		delete[] new_row_idx;
@@ -372,7 +361,7 @@ template<typename data_t, typename index_t> bool triplet_form<data_t, index_t>::
 		return false;
 	}
 
-	std::vector<index_t> index(c_size);
+	std::vector<index_t> index(n_elem);
 	for(index_t I = 0; I < static_cast<index_t>(index.size()); ++I) {
 		new_row_idx[I] = row_idx[I] * n_cols + col_idx[I];
 		index[I] = I;
@@ -381,13 +370,13 @@ template<typename data_t, typename index_t> bool triplet_form<data_t, index_t>::
 	suanpan_sort(index.begin(), index.end(), abs_comparator<index_t>(new_row_idx));
 
 #ifdef SUANPAN_MT
-	tbb::parallel_for(static_cast<index_t>(0), c_size, [&](const index_t I) {
+	tbb::parallel_for(static_cast<index_t>(0), n_elem, [&](const index_t I) {
 		new_row_idx[I] = row_idx[index[I]];
 		new_col_idx[I] = col_idx[index[I]];
 		new_val_idx[I] = val_idx[index[I]];
 	});
 #else
-	for(index_t I = 0; I < c_size; ++I) {
+	for(index_t I = 0; I < n_elem; ++I) {
 		new_row_idx[I] = row_idx[index[I]];
 		new_col_idx[I] = col_idx[index[I]];
 		new_val_idx[I] = val_idx[index[I]];
@@ -399,7 +388,7 @@ template<typename data_t, typename index_t> bool triplet_form<data_t, index_t>::
 	access::rw(row_idx) = new_row_idx;
 	access::rw(col_idx) = new_col_idx;
 	access::rw(val_idx) = new_val_idx;
-	access::rw(c_size) = static_cast<index_t>(index.size());
+	access::rw(n_elem) = static_cast<index_t>(index.size());
 
 	access::rw(csr_sorted) = true;
 
@@ -407,11 +396,11 @@ template<typename data_t, typename index_t> bool triplet_form<data_t, index_t>::
 }
 
 template<typename data_t, typename index_t> bool triplet_form<data_t, index_t>::csc_sort() const {
-	if(c_size < 2) return true;
+	if(n_elem < 2) return true;
 
-	const auto new_row_idx = new(std::nothrow) index_t[n_elem];
-	const auto new_col_idx = new(std::nothrow) index_t[n_elem];
-	const auto new_val_idx = new(std::nothrow) data_t[n_elem];
+	const auto new_row_idx = new(std::nothrow) index_t[n_alloc];
+	const auto new_col_idx = new(std::nothrow) index_t[n_alloc];
+	const auto new_val_idx = new(std::nothrow) data_t[n_alloc];
 
 	if(new_row_idx == nullptr || new_col_idx == nullptr || new_val_idx == nullptr) {
 		delete[] new_row_idx;
@@ -420,7 +409,7 @@ template<typename data_t, typename index_t> bool triplet_form<data_t, index_t>::
 		return false;
 	}
 
-	std::vector<index_t> index(c_size);
+	std::vector<index_t> index(n_elem);
 	for(index_t I = 0; I < index.size(); ++I) {
 		new_row_idx[I] = col_idx[I] * n_rows + row_idx[I];
 		index[I] = I;
@@ -429,13 +418,13 @@ template<typename data_t, typename index_t> bool triplet_form<data_t, index_t>::
 	suanpan_sort(index.begin(), index.end(), abs_comparator<index_t>(new_row_idx));
 
 #ifdef SUANPAN_MT
-	tbb::parallel_for(static_cast<index_t>(0), c_size, [&](const index_t I) {
+	tbb::parallel_for(static_cast<index_t>(0), n_elem, [&](const index_t I) {
 		new_row_idx[I] = row_idx[index[I]];
 		new_col_idx[I] = col_idx[index[I]];
 		new_val_idx[I] = val_idx[index[I]];
 	});
 #else
-	for(index_t I = 0; I < c_size; ++I) {
+	for(index_t I = 0; I < n_elem; ++I) {
 		new_row_idx[I] = row_idx[index[I]];
 		new_col_idx[I] = col_idx[index[I]];
 		new_val_idx[I] = val_idx[index[I]];
@@ -447,7 +436,7 @@ template<typename data_t, typename index_t> bool triplet_form<data_t, index_t>::
 	access::rw(row_idx) = new_row_idx;
 	access::rw(col_idx) = new_col_idx;
 	access::rw(val_idx) = new_val_idx;
-	access::rw(c_size) = static_cast<index_t>(index.size());
+	access::rw(n_elem) = static_cast<index_t>(index.size());
 
 	access::rw(csc_sorted) = true;
 
@@ -455,22 +444,22 @@ template<typename data_t, typename index_t> bool triplet_form<data_t, index_t>::
 }
 
 template<typename data_t, typename index_t> index_t triplet_form<data_t, index_t>::row(const index_t idx) const {
-	if(idx < c_size) return row_idx[idx];
+	if(idx < n_elem) return row_idx[idx];
 	throw invalid_argument("overflows");
 }
 
 template<typename data_t, typename index_t> index_t triplet_form<data_t, index_t>::col(const index_t idx) const {
-	if(idx < c_size) return col_idx[idx];
+	if(idx < n_elem) return col_idx[idx];
 	throw invalid_argument("overflows");
 }
 
 template<typename data_t, typename index_t> data_t triplet_form<data_t, index_t>::val(const index_t idx) const {
-	if(idx < c_size) return val_idx[idx];
+	if(idx < n_elem) return val_idx[idx];
 	throw invalid_argument("overflows");
 }
 
 template<typename data_t, typename index_t> const data_t& triplet_form<data_t, index_t>::operator()(const index_t row, const index_t col) const {
-	for(index_t I = 0; I < c_size; ++I) if(row_idx[I] == row && col_idx[I] == col) return val_idx[I];
+	for(index_t I = 0; I < n_elem; ++I) if(row_idx[I] == row && col_idx[I] == col) return val_idx[I];
 
 	access::rw(bin) = 0.;
 
@@ -482,10 +471,10 @@ template<typename data_t, typename index_t> data_t& triplet_form<data_t, index_t
 
 	if(csr_sorted) csr_sorted = false;
 	if(csc_sorted) csc_sorted = false;
-	if(c_size == n_elem) resize();
-	row_idx[c_size] = row;
-	col_idx[c_size] = col;
-	return val_idx[access::rw(c_size)++];
+	if(n_elem == n_alloc) resize();
+	row_idx[n_elem] = row;
+	col_idx[n_elem] = col;
+	return val_idx[access::rw(n_elem)++];
 }
 
 template<typename data_t, typename index_t> template<typename T2> triplet_form<data_t, index_t> triplet_form<data_t, index_t>::operator*(const T2 scalar) {
@@ -494,13 +483,13 @@ template<typename data_t, typename index_t> template<typename T2> triplet_form<d
 	if(suanpan::approx_equal(1., scalar)) return copy;
 
 #ifdef SUANPAN_MT
-	if(suanpan::approx_equal(-1., scalar)) tbb::parallel_for(static_cast<index_t>(0), copy.c_size, [&](const index_t I) { copy.val_idx[I] = -copy.val_idx[I]; });
-	else if(suanpan::approx_equal(0., scalar)) tbb::parallel_for(static_cast<index_t>(0), copy.c_size, [&](const index_t I) { copy.val_idx[I] = data_t(0.); });
-	else tbb::parallel_for(static_cast<index_t>(0), copy.c_size, [&](const index_t I) { copy.val_idx[I] *= data_t(scalar); });
+	if(suanpan::approx_equal(-1., scalar)) tbb::parallel_for(static_cast<index_t>(0), copy.n_elem, [&](const index_t I) { copy.val_idx[I] = -copy.val_idx[I]; });
+	else if(suanpan::approx_equal(0., scalar)) tbb::parallel_for(static_cast<index_t>(0), copy.n_elem, [&](const index_t I) { copy.val_idx[I] = data_t(0.); });
+	else tbb::parallel_for(static_cast<index_t>(0), copy.n_elem, [&](const index_t I) { copy.val_idx[I] *= data_t(scalar); });
 #else
-	if(suanpan::approx_equal(-1., scalar)) for(auto I = 0; I < copy.c_size; ++I) copy.val_idx[I] = -copy.val_idx[I];
-	else if(suanpan::approx_equal(0., scalar)) for(auto I = 0; I < copy.c_size; ++I) copy.val_idx[I] = data_t(0.);
-	else for(auto I = 0; I < copy.c_size; ++I) copy.val_idx[I] *= data_t(scalar);
+	if(suanpan::approx_equal(-1., scalar)) for(auto I = 0; I < copy.n_elem; ++I) copy.val_idx[I] = -copy.val_idx[I];
+	else if(suanpan::approx_equal(0., scalar)) for(auto I = 0; I < copy.n_elem; ++I) copy.val_idx[I] = data_t(0.);
+	else for(auto I = 0; I < copy.n_elem; ++I) copy.val_idx[I] *= data_t(scalar);
 #endif
 
 	return copy;
@@ -512,11 +501,11 @@ template<typename data_t, typename index_t> template<typename T2> triplet_form<d
 	if(suanpan::approx_equal(1., scalar)) return copy;
 
 #ifdef SUANPAN_MT
-	if(suanpan::approx_equal(-1., scalar)) tbb::parallel_for(static_cast<index_t>(0), copy.c_size, [&](const index_t I) { copy.val_idx[I] = -copy.val_idx[I]; });
-	else tbb::parallel_for(static_cast<index_t>(0), copy.c_size, [&](const index_t I) { copy.val_idx[I] /= data_t(scalar); });
+	if(suanpan::approx_equal(-1., scalar)) tbb::parallel_for(static_cast<index_t>(0), copy.n_elem, [&](const index_t I) { copy.val_idx[I] = -copy.val_idx[I]; });
+	else tbb::parallel_for(static_cast<index_t>(0), copy.n_elem, [&](const index_t I) { copy.val_idx[I] /= data_t(scalar); });
 #else
-	if(suanpan::approx_equal(-1., scalar)) for(auto I = 0; I < copy.c_size; ++I) copy.val_idx[I] = -copy.val_idx[I];
-	else for(auto I = 0; I < copy.c_size; ++I) copy.val_idx[I] /= data_t(scalar);
+	if(suanpan::approx_equal(-1., scalar)) for(auto I = 0; I < copy.n_elem; ++I) copy.val_idx[I] = -copy.val_idx[I];
+	else for(auto I = 0; I < copy.n_elem; ++I) copy.val_idx[I] /= data_t(scalar);
 #endif
 
 	return copy;
@@ -526,13 +515,13 @@ template<typename data_t, typename index_t> template<typename T2> triplet_form<d
 	if(suanpan::approx_equal(1., scalar)) return *this;
 
 #ifdef SUANPAN_MT
-	if(suanpan::approx_equal(-1., scalar)) tbb::parallel_for(static_cast<index_t>(0), c_size, [&](const index_t I) { val_idx[I] = -val_idx[I]; });
+	if(suanpan::approx_equal(-1., scalar)) tbb::parallel_for(static_cast<index_t>(0), n_elem, [&](const index_t I) { val_idx[I] = -val_idx[I]; });
 	else if(suanpan::approx_equal(0., scalar)) triplet_form<data_t, index_t>::zeros();
-	else tbb::parallel_for(static_cast<index_t>(0), c_size, [&](const index_t I) { val_idx[I] *= data_t(scalar); });
+	else tbb::parallel_for(static_cast<index_t>(0), n_elem, [&](const index_t I) { val_idx[I] *= data_t(scalar); });
 #else
-	if(suanpan::approx_equal(-1., scalar)) for(index_t I = 0; I < c_size; ++I) val_idx[I] = -val_idx[I];
+	if(suanpan::approx_equal(-1., scalar)) for(index_t I = 0; I < n_elem; ++I) val_idx[I] = -val_idx[I];
 	else if(suanpan::approx_equal(0., scalar)) triplet_form<data_t, index_t>::zeros();
-	else for(index_t I = 0; I < c_size; ++I) val_idx[I] *= data_t(scalar);
+	else for(index_t I = 0; I < n_elem; ++I) val_idx[I] *= data_t(scalar);
 #endif
 
 	return *this;
@@ -542,11 +531,11 @@ template<typename data_t, typename index_t> template<typename T2> triplet_form<d
 	if(suanpan::approx_equal(1., scalar)) return *this;
 
 #ifdef SUANPAN_MT
-	if(suanpan::approx_equal(-1., scalar)) tbb::parallel_for(static_cast<index_t>(0), c_size, [&](const index_t I) { val_idx[I] = -val_idx[I]; });
-	else tbb::parallel_for(static_cast<index_t>(0), c_size, [&](const index_t I) { val_idx[I] /= data_t(scalar); });
+	if(suanpan::approx_equal(-1., scalar)) tbb::parallel_for(static_cast<index_t>(0), n_elem, [&](const index_t I) { val_idx[I] = -val_idx[I]; });
+	else tbb::parallel_for(static_cast<index_t>(0), n_elem, [&](const index_t I) { val_idx[I] /= data_t(scalar); });
 #else
-	if(suanpan::approx_equal(-1., scalar)) for(auto I = 0; I < c_size; ++I) val_idx[I] = -val_idx[I];
-	else for(auto I = 0; I < c_size; ++I) val_idx[I] /= data_t(scalar);
+	if(suanpan::approx_equal(-1., scalar)) for(auto I = 0; I < n_elem; ++I) val_idx[I] = -val_idx[I];
+	else for(auto I = 0; I < n_elem; ++I) val_idx[I] /= data_t(scalar);
 #endif
 
 	return *this;
@@ -563,9 +552,9 @@ template<typename data_t, typename index_t> triplet_form<data_t, index_t> triple
 }
 
 template<typename data_t, typename index_t> triplet_form<data_t, index_t>& triplet_form<data_t, index_t>::operator+=(const triplet_form<data_t, index_t>& in_mat) {
-	if(const auto new_size = c_size + in_mat.c_size; n_elem < new_size) resize(new_size);
+	if(const auto new_size = n_elem + in_mat.n_elem; n_alloc < new_size) resize(new_size);
 
-	for(index_t I = 0; I < in_mat.c_size; ++I) at(in_mat.row(I), in_mat.col(I)) = in_mat.val(I);
+	for(index_t I = 0; I < in_mat.n_elem; ++I) at(in_mat.row(I), in_mat.col(I)) = in_mat.val(I);
 
 	if(in_mat.n_rows > n_rows) access::rw(n_rows) = in_mat.n_rows;
 	if(in_mat.n_cols > n_cols) access::rw(n_cols) = in_mat.n_cols;
@@ -574,9 +563,9 @@ template<typename data_t, typename index_t> triplet_form<data_t, index_t>& tripl
 }
 
 template<typename data_t, typename index_t> triplet_form<data_t, index_t>& triplet_form<data_t, index_t>::operator-=(const triplet_form<data_t, index_t>& in_mat) {
-	if(const auto new_size = c_size + in_mat.c_size; n_elem < new_size) resize(new_size);
+	if(const auto new_size = n_elem + in_mat.n_elem; n_alloc < new_size) resize(new_size);
 
-	for(index_t I = 0; I < in_mat.c_size; ++I) at(in_mat.row(I), in_mat.col(I)) = -in_mat.val(I);
+	for(index_t I = 0; I < in_mat.n_elem; ++I) at(in_mat.row(I), in_mat.col(I)) = -in_mat.val(I);
 
 	if(in_mat.n_rows > n_rows) access::rw(n_rows) = in_mat.n_rows;
 	if(in_mat.n_cols > n_cols) access::rw(n_cols) = in_mat.n_cols;
@@ -587,12 +576,12 @@ template<typename data_t, typename index_t> triplet_form<data_t, index_t>& tripl
 template<typename data_t, typename index_t> triplet_form<data_t, index_t>::triplet_form(const csc_form<data_t, index_t>& in_mat) { *this = in_mat; }
 
 template<typename data_t, typename index_t> triplet_form<data_t, index_t>& triplet_form<data_t, index_t>::operator=(const csc_form<data_t, index_t>& in_mat) {
-	init(in_mat.n_rows, in_mat.n_cols, in_mat.c_size);
+	init(in_mat.n_rows, in_mat.n_cols, in_mat.n_elem);
 
-	access::rw(c_size) = in_mat.c_size;
+	access::rw(n_elem) = in_mat.n_elem;
 
 	index_t c_idx = 1;
-	for(index_t I = 0; I < in_mat.c_size; ++I) {
+	for(index_t I = 0; I < in_mat.n_elem; ++I) {
 		if(I >= in_mat.col_ptr[c_idx]) ++c_idx;
 		row_idx[I] = in_mat.row_idx[I];
 		col_idx[I] = c_idx - 1;
@@ -619,12 +608,12 @@ template<typename data_t, typename index_t> triplet_form<data_t, index_t>& tripl
 template<typename data_t, typename index_t> triplet_form<data_t, index_t>::triplet_form(const csr_form<data_t, index_t>& in_mat) { *this = in_mat; }
 
 template<typename data_t, typename index_t> triplet_form<data_t, index_t>& triplet_form<data_t, index_t>::operator=(const csr_form<data_t, index_t>& in_mat) {
-	init(in_mat.n_rows, in_mat.n_cols, in_mat.c_size);
+	init(in_mat.n_rows, in_mat.n_cols, in_mat.n_elem);
 
-	access::rw(c_size) = in_mat.c_size;
+	access::rw(n_elem) = in_mat.n_elem;
 
 	index_t c_idx = 1;
-	for(index_t I = 0; I < in_mat.c_size; ++I) {
+	for(index_t I = 0; I < in_mat.n_elem; ++I) {
 		if(I >= in_mat.row_ptr[c_idx]) ++c_idx;
 		row_idx[I] = c_idx - 1;
 		col_idx[I] = in_mat.col_idx[I];
@@ -651,7 +640,7 @@ template<typename data_t, typename index_t> triplet_form<data_t, index_t>& tripl
 template<typename data_t, typename index_t> Mat<data_t> triplet_form<data_t, index_t>::operator*(const Col<data_t>& in_mat) {
 	Mat<data_t> out_mat(in_mat.n_rows, in_mat.n_cols, fill::zeros);
 
-	for(index_t I = 0; I < c_size; ++I) out_mat(row_idx[I]) += val_idx[I] * in_mat(col_idx[I]);
+	for(index_t I = 0; I < n_elem; ++I) out_mat(row_idx[I]) += val_idx[I] * in_mat(col_idx[I]);
 
 	return out_mat;
 }
@@ -659,7 +648,7 @@ template<typename data_t, typename index_t> Mat<data_t> triplet_form<data_t, ind
 template<typename data_t, typename index_t> Mat<data_t> triplet_form<data_t, index_t>::operator*(const Mat<data_t>& in_mat) {
 	Mat<data_t> out_mat(in_mat.n_rows, in_mat.n_cols, fill::zeros);
 
-	for(index_t I = 0; I < c_size; ++I) out_mat.row(row_idx[I]) += val_idx[I] * in_mat.row(col_idx[I]);
+	for(index_t I = 0; I < n_elem; ++I) out_mat.row(row_idx[I]) += val_idx[I] * in_mat.row(col_idx[I]);
 
 	return out_mat;
 }

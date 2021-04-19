@@ -132,9 +132,9 @@ template<typename eT> uvec sort_rcm(const Mat<eT>& MEAT) { return sort_rcm(SpMat
 template<typename dt, typename it> uvec sort_rcm(const triplet_form<dt, it>& triplet_mat) {
 	csc_form<dt, uword> csc_mat(triplet_mat);
 
-	const uvec row_idx(csc_mat.row_idx, csc_mat.c_size, false, false);
+	const uvec row_idx(csc_mat.row_idx, csc_mat.n_elem, false, false);
 	const uvec col_ptr(csc_mat.col_ptr, csc_mat.n_cols + 1, false, false);
-	const Col<dt> val_idx(csc_mat.val_idx, csc_mat.c_size, false, false);
+	const Col<dt> val_idx(csc_mat.val_idx, csc_mat.n_elem, false, false);
 
 	return sort_rcm({row_idx, col_ptr, val_idx, csc_mat.n_rows, csc_mat.n_cols});
 }

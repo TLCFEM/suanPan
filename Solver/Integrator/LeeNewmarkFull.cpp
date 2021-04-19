@@ -96,14 +96,14 @@ void LeeNewmarkFull::assemble_by_mode_zero(uword& current_pos, const double mass
 	auto row = current_mass.row_mem();
 	auto col = current_mass.col_mem();
 	auto val = current_mass.val_mem();
-	for(index_tm J = 0; J < current_mass.c_size; ++J) {
+	for(index_tm J = 0; J < current_mass.n_elem; ++J) {
 		const auto K = row[J], L = col[J], M = K + I, N = L + I;
 		stiffness->at(K, N) = stiffness->at(M, L) = -(stiffness->at(K, L) = stiffness->at(M, N) = mass_coef * val[J]);
 	}
 	row = current_stiffness.row_mem();
 	col = current_stiffness.col_mem();
 	val = current_stiffness.val_mem();
-	for(index_ts J = 0; J < current_stiffness.c_size; ++J) stiffness->at(row[J] + I, col[J] + I) = stiffness_coef * val[J];
+	for(index_ts J = 0; J < current_stiffness.n_elem; ++J) stiffness->at(row[J] + I, col[J] + I) = stiffness_coef * val[J];
 
 	current_pos += n_block;
 }
@@ -127,13 +127,13 @@ void LeeNewmarkFull::assemble_by_mode_one(uword& current_pos, const double mass_
 
 	while(order > 1.5) {
 		// eq. 61 
-		for(index_tm N = 0; N < current_mass.c_size; ++N) {
+		for(index_tm N = 0; N < current_mass.n_elem; ++N) {
 			const auto O = m_row[N], P = m_col[N], Q = O + J, R = P + J;
 			stiffness->at(O + I, R) = stiffness->at(Q, P + I) = mass_coef * m_val[N];
 			stiffness->at(Q, P + K) = stiffness->at(O + K, R) = stiffness->at(O + L, P + M) = stiffness->at(O + M, P + L) = mass_coefs * m_val[N];
 		}
 
-		for(index_ts N = 0; N < current_stiffness.c_size; ++N) {
+		for(index_ts N = 0; N < current_stiffness.n_elem; ++N) {
 			const auto O = s_row[N], P = s_col[N], Q = O + K, R = O + L, S = P + K, T = P + L;
 			stiffness->at(Q, T) = stiffness->at(R, S) = stiffness_coef * s_val[N];
 			stiffness->at(O + J, S) = stiffness->at(Q, P + J) = stiffness->at(R, P + M) = stiffness->at(O + M, T) = stiffness_coefs * s_val[N];
@@ -150,13 +150,13 @@ void LeeNewmarkFull::assemble_by_mode_one(uword& current_pos, const double mass_
 	if(order < .5) assemble_by_mode_zero(current_pos = J, mass_coef, stiffness_coef);
 	else {
 		// eq. 53 
-		for(index_tm N = 0; N < current_mass.c_size; ++N) {
+		for(index_tm N = 0; N < current_mass.n_elem; ++N) {
 			const auto O = m_row[N], P = m_col[N], Q = O + J, R = P + J;
 			stiffness->at(O + L, P + L) = -(stiffness->at(O + I, R) = stiffness->at(Q, P + I) = mass_coef * m_val[N]);
 			stiffness->at(Q, P + K) = stiffness->at(O + K, R) = mass_coefs * m_val[N];
 		}
 
-		for(index_ts N = 0; N < current_stiffness.c_size; ++N) {
+		for(index_ts N = 0; N < current_stiffness.n_elem; ++N) {
 			const auto O = s_row[N], P = s_col[N], Q = O + K, R = P + K, S = O + L, T = P + L;
 			stiffness->at(S, T) = -(stiffness->at(Q, T) = stiffness->at(S, R) = stiffness_coef * s_val[N]);
 			stiffness->at(O + J, R) = stiffness->at(Q, P + J) = stiffness_coefs * s_val[N];
@@ -183,7 +183,7 @@ void LeeNewmarkFull::assemble_by_mode_two(uword& current_pos, double mass_coef, 
 	auto I = current_pos, K = current_pos;
 	auto J = current_pos + n_block * static_cast<uword>(std::max(1., right_order));
 
-	for(index_tm L = 0; L < current_mass.c_size; ++L) {
+	for(index_tm L = 0; L < current_mass.n_elem; ++L) {
 		const auto M = m_row[L], N = m_col[L], O = M + I, P = N + I;
 		stiffness->at(O, N) = stiffness->at(O, N + J) = stiffness->at(M, P) = stiffness->at(M + J, P) = mass_coef * m_val[L];
 	}
@@ -194,12 +194,12 @@ void LeeNewmarkFull::assemble_by_mode_two(uword& current_pos, double mass_coef, 
 		K = current_pos += n_block;
 
 		while(order > 1.5) {
-			for(index_tm L = 0; L < current_mass.c_size; ++L) {
+			for(index_tm L = 0; L < current_mass.n_elem; ++L) {
 				const auto M = m_row[L], N = m_col[L];
 				stiffness->at(N + J, M + K) = stiffness->at(N + K, M + J) = m_coef * m_val[L];
 			}
 
-			for(index_ts L = 0; L < current_stiffness.c_size; ++L) {
+			for(index_ts L = 0; L < current_stiffness.n_elem; ++L) {
 				const auto M = s_row[L], N = s_col[L];
 				stiffness->at(M + I, N + J) = stiffness->at(M + J, N + I) = s_coef * s_val[L];
 			}
@@ -217,11 +217,11 @@ void LeeNewmarkFull::assemble_by_mode_two(uword& current_pos, double mass_coef, 
 
 		if(order > .5) {
 			// eq. 68
-			for(index_tm L = 0; L < current_mass.c_size; ++L) {
+			for(index_tm L = 0; L < current_mass.n_elem; ++L) {
 				const auto M = m_row[L], N = m_col[L];
 				stiffness->at(N + J, M + J) = m_coef * m_val[L];
 			}
-			for(index_ts L = 0; L < current_stiffness.c_size; ++L) {
+			for(index_ts L = 0; L < current_stiffness.n_elem; ++L) {
 				const auto M = s_row[L], N = s_col[L];
 				stiffness->at(M + I, N + J) = stiffness->at(M + J, N + I) = s_coef * s_val[L];
 			}
@@ -229,7 +229,7 @@ void LeeNewmarkFull::assemble_by_mode_two(uword& current_pos, double mass_coef, 
 		}
 		else if(order > -.5) {
 			// eq. 73
-			for(index_ts L = 0; L < current_stiffness.c_size; ++L) {
+			for(index_ts L = 0; L < current_stiffness.n_elem; ++L) {
 				const auto M = s_row[L], N = s_col[L];
 				stiffness->at(M + I, N + I) = -s_coef * s_val[L];
 			}
@@ -237,7 +237,7 @@ void LeeNewmarkFull::assemble_by_mode_two(uword& current_pos, double mass_coef, 
 		}
 		else {
 			// eq. 71
-			for(index_tm L = 0; L < current_mass.c_size; ++L) {
+			for(index_tm L = 0; L < current_mass.n_elem; ++L) {
 				const auto M = m_row[L], N = m_col[L];
 				stiffness->at(N + I, M + I) = -m_coef * m_val[L];
 			}
@@ -265,7 +265,7 @@ void LeeNewmarkFull::assemble_by_mode_three(uword& current_pos, double mass_coef
 	auto row = current_mass.row_mem();
 	auto col = current_mass.col_mem();
 	auto val = current_mass.val_mem();
-	for(index_tm L = 0; L < current_mass.c_size; ++L) {
+	for(index_tm L = 0; L < current_mass.n_elem; ++L) {
 		const auto M = row[L], N = col[L], O = M + I, P = M + J, R = N + I, S = N + J;
 		stiffness->at(O, N) = stiffness->at(M, R) = -(stiffness->at(M, N) = stiffness->at(O, R) = mass_coef * val[L]);
 		stiffness->at(P, S) = mass_coefs * val[L];
@@ -273,7 +273,7 @@ void LeeNewmarkFull::assemble_by_mode_three(uword& current_pos, double mass_coef
 	row = current_stiffness.row_mem();
 	col = current_stiffness.col_mem();
 	val = current_stiffness.val_mem();
-	for(index_ts L = 0; L < current_stiffness.c_size; ++L) {
+	for(index_ts L = 0; L < current_stiffness.n_elem; ++L) {
 		const auto M = row[L], N = col[L], O = M + I, P = M + J, R = N + I, S = N + J;
 		stiffness->at(P, R) = stiffness->at(O, S) = -(stiffness->at(O, R) = stiffness_coef * val[L]);
 		stiffness->at(P, S) = stiffness_coefs * val[L];
@@ -309,7 +309,7 @@ int LeeNewmarkFull::process_constraint() {
 
 	if(first_iteration) {
 		// preallocate memory
-		stiffness->triplet_mat.resize(get_amplifier() * t_stiff.c_size);
+		stiffness->triplet_mat.resize(get_amplifier() * t_stiff.n_elem);
 		stiffness->zeros();
 
 		// ! deal with mass matrix first
@@ -321,7 +321,7 @@ int LeeNewmarkFull::process_constraint() {
 		access::rw(current_mass) = std::move(t_mass);
 
 		// must initialise it since nothing will be checked in if left uninitialised
-		t_mass = triplet_form<double, uword>(n_block, n_block, current_mass.c_size);
+		t_mass = triplet_form<double, uword>(n_block, n_block, current_mass.n_elem);
 
 		// ! now deal with stiffness matrix
 		auto& t_rabbit = access::rw(rabbit);
@@ -330,7 +330,7 @@ int LeeNewmarkFull::process_constraint() {
 		t_rabbit = std::move(t_stiff);
 
 		// preallocate to formulate current stiffness matrix
-		t_stiff = triplet_form<double, uword>(n_block, n_block, t_rabbit.c_size);
+		t_stiff = triplet_form<double, uword>(n_block, n_block, t_rabbit.n_elem);
 
 		D->assemble_current_stiffness();
 		if(SUANPAN_SUCCESS != Integrator::process_constraint()) return SUANPAN_FAIL;
@@ -351,8 +351,8 @@ int LeeNewmarkFull::process_constraint() {
 		const auto& col = stiffness->triplet_mat.col_mem();
 		const auto& val = stiffness->triplet_mat.val_mem();
 
-		t_rabbit = triplet_form<double, uword>(n_block, n_block, t_stiff.c_size);
-		for(decltype(stiffness->triplet_mat)::index_type I = 0; I < stiffness->triplet_mat.c_size; ++I) {
+		t_rabbit = triplet_form<double, uword>(n_block, n_block, t_stiff.n_elem);
+		for(decltype(stiffness->triplet_mat)::index_type I = 0; I < stiffness->triplet_mat.n_elem; ++I) {
 			// quit if current column is beyond the original size of matrix
 			if(col[I] >= n_block) break;
 			// check in left top block of unrolled damping matrix to be used in subsequent iterations
@@ -372,7 +372,7 @@ int LeeNewmarkFull::process_constraint() {
 		const auto& col = stiffness->triplet_mat.col_mem();
 		const auto& val = stiffness->triplet_mat.val_idx;
 
-		for(size_t I = 0; I < stiffness->triplet_mat.c_size; ++I) {
+		for(size_t I = 0; I < stiffness->triplet_mat.n_elem; ++I) {
 			// quit if current column is beyond the original size of matrix
 			if(col[I] >= n_block) break;
 			// erase existing entries if fall in intact stiffness matrix

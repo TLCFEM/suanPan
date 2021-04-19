@@ -27,14 +27,14 @@ void LeeNewmark::update_stiffness() const {
 			auto row = current_mass->triplet_mat.row_mem();
 			auto col = current_mass->triplet_mat.col_mem();
 			auto val = current_mass->triplet_mat.val_mem();
-			for(size_t O = 0; O < current_mass->triplet_mat.c_size; ++O) {
+			for(size_t O = 0; O < current_mass->triplet_mat.n_elem; ++O) {
 				const auto K = row[O], L = col[O], M = K + J, N = L + J;
 				stiffness->at(M, L) = C1 * (stiffness->at(K, N) = -(stiffness->at(M, N) = mass_coef(I) * val[O]));
 			}
 			row = current_stiffness->triplet_mat.row_mem();
 			col = current_stiffness->triplet_mat.col_mem();
 			val = current_stiffness->triplet_mat.val_mem();
-			for(size_t K = 0; K < current_stiffness->triplet_mat.c_size; ++K) stiffness->at(row[K] + J, col[K] + J) = stiffness_coef(I) * val[K];
+			for(size_t K = 0; K < current_stiffness->triplet_mat.n_elem; ++K) stiffness->at(row[K] + J, col[K] + J) = stiffness_coef(I) * val[K];
 		}
 	else
 		for(uword I = 0, J = n_block; I < n_damping; ++I, J += n_block)
@@ -106,7 +106,7 @@ int LeeNewmark::process_constraint() {
 		const auto& col = stiffness->triplet_mat.col_mem();
 		const auto& val = stiffness->triplet_mat.val_idx;
 
-		for(size_t I = 0; I < stiffness->triplet_mat.c_size; ++I) {
+		for(size_t I = 0; I < stiffness->triplet_mat.n_elem; ++I) {
 			// quit if current column is beyond the original size of matrix
 			if(col[I] >= n_block) break;
 			// erase existing entries if fall in intact stiffness matrix

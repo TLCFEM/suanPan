@@ -80,9 +80,9 @@ template<typename T> void SparseMat<T>::unify(const uword idx) {
 
 	const auto t_idx = static_cast<index_t>(idx);
 #ifdef SUANPAN_MT
-	tbb::parallel_for(static_cast<index_t>(0), triplet_mat.c_size, [&](const index_t I) { if(triplet_mat.row_idx[I] == t_idx || triplet_mat.col_idx[I] == t_idx) triplet_mat.val_idx[I] = 0.; });
+	tbb::parallel_for(static_cast<index_t>(0), triplet_mat.n_elem, [&](const index_t I) { if(triplet_mat.row_idx[I] == t_idx || triplet_mat.col_idx[I] == t_idx) triplet_mat.val_idx[I] = 0.; });
 #else
-	for(index_t I = 0; I < triplet_mat.c_size; ++I) if(triplet_mat.row_idx[I] == t_idx || triplet_mat.col_idx[I] == t_idx) triplet_mat.val_idx[I] = 0.;
+	for(index_t I = 0; I < triplet_mat.n_elem; ++I) if(triplet_mat.row_idx[I] == t_idx || triplet_mat.col_idx[I] == t_idx) triplet_mat.val_idx[I] = 0.;
 #endif
 	triplet_mat.at(t_idx, t_idx) = 1.;
 }

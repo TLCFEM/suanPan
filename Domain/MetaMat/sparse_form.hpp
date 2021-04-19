@@ -35,10 +35,10 @@ public:
 	typedef index_t index_type;
 	typedef form_t form_type;
 
-	const index_t n_rows = 0; // number of rows
-	const index_t n_cols = 0; // number of cols
-	const index_t n_elem = 0; // maximum number of elements
-	const index_t c_size = 0; // current number of valid elements
+	const index_t n_rows = 0;  // number of rows
+	const index_t n_cols = 0;  // number of cols
+	const index_t n_elem = 0;  // current number of valid elements
+	const index_t n_alloc = 0; // maximum number of elements
 
 	sparse_form() = default;
 	sparse_form(index_t, index_t, index_t = 0);
@@ -69,21 +69,18 @@ public:
 	virtual bool resize(index_t, index_t, index_t) = 0;
 
 	virtual void print() const;
-	virtual void spy();
 
 	virtual Mat<data_t> operator*(const Col<data_t>&) = 0;
 	virtual Mat<data_t> operator*(const Mat<data_t>&) = 0;
 };
 
-template<typename data_t, typename index_t, typename form_t> sparse_form<data_t, index_t, form_t>::sparse_form(const index_t in_rows, const index_t in_cols, const index_t in_elem)
+template<typename data_t, typename index_t, typename form_t> sparse_form<data_t, index_t, form_t>::sparse_form(const index_t in_rows, const index_t in_cols, const index_t in_alloc)
 	: n_rows(in_rows)
 	, n_cols(in_cols)
-	, n_elem(in_elem) {}
+	, n_alloc(in_alloc) {}
 
-template<typename data_t, typename index_t, typename form_t> bool sparse_form<data_t, index_t, form_t>::is_empty() const { return 0 == c_size; }
+template<typename data_t, typename index_t, typename form_t> bool sparse_form<data_t, index_t, form_t>::is_empty() const { return 0 == n_elem; }
 
 template<typename data_t, typename index_t, typename form_t> void sparse_form<data_t, index_t, form_t>::print() const {}
-
-template<typename data_t, typename index_t, typename form_t> void sparse_form<data_t, index_t, form_t>::spy() { throw invalid_argument("not supported"); }
 
 #endif

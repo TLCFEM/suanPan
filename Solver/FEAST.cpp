@@ -163,7 +163,7 @@ int FEAST::quadratic_solve(const shared_ptr<LongFactory>& W) const {
 	const auto t_damping = fd.get();
 	const auto t_mass = fm.get();
 
-	size_t n_elem1 = std::max(std::max(t_stiff.c_size, t_damping.c_size), t_mass.c_size);
+	size_t n_elem1 = std::max(std::max(t_stiff.n_elem, t_damping.n_elem), t_mass.n_elem);
 	size_t n_elem2 = n_elem1 + n_elem1;
 	size_t n_elem3 = n_elem1 + n_elem2;
 	size_t n_size1 = N;
@@ -175,15 +175,15 @@ int FEAST::quadratic_solve(const shared_ptr<LongFactory>& W) const {
 	std::vector IA(n_size3, 0);
 
 #ifdef SUANPAN_MT
-	tbb::parallel_for(0, t_stiff.c_size, [&](const int I) {
+	tbb::parallel_for(0, t_stiff.n_elem, [&](const int I) {
 		A[I] = t_stiff.val_idx[I];
 		JA[I] = t_stiff.col_idx[I];
 	});
-	tbb::parallel_for(0, t_damping.c_size, [&](const int I) {
+	tbb::parallel_for(0, t_damping.n_elem, [&](const int I) {
 		A[I + n_elem1] = t_damping.val_idx[I];
 		JA[I + n_elem1] = t_damping.col_idx[I];
 	});
-	tbb::parallel_for(0, t_mass.c_size, [&](const int I) {
+	tbb::parallel_for(0, t_mass.n_elem, [&](const int I) {
 		A[I + n_elem2] = t_mass.val_idx[I];
 		JA[I + n_elem2] = t_mass.col_idx[I];
 	});
@@ -194,13 +194,13 @@ int FEAST::quadratic_solve(const shared_ptr<LongFactory>& W) const {
 		JA[I + n_size2] = t_mass.row_ptr[I];
 	});
 #else
-	std::copy_n(t_stiff.val_idx, t_stiff.c_size, A.data());
-	std::copy_n(t_damping.val_idx, t_damping.c_size, A.data() + n_elem1);
-	std::copy_n(t_mass.val_idx, t_mass.c_size, A.data() + n_elem2);
+	std::copy_n(t_stiff.val_idx, t_stiff.n_elem, A.data());
+	std::copy_n(t_damping.val_idx, t_damping.n_elem, A.data() + n_elem1);
+	std::copy_n(t_mass.val_idx, t_mass.n_elem, A.data() + n_elem2);
 
-	std::copy_n(t_stiff.col_idx, t_stiff.c_size, JA.data());
-	std::copy_n(t_damping.col_idx, t_damping.c_size, JA.data() + n_elem1);
-	std::copy_n(t_mass.col_idx, t_mass.c_size, JA.data() + n_elem2);
+	std::copy_n(t_stiff.col_idx, t_stiff.n_elem, JA.data());
+	std::copy_n(t_damping.col_idx, t_damping.n_elem, JA.data() + n_elem1);
+	std::copy_n(t_mass.col_idx, t_mass.n_elem, JA.data() + n_elem2);
 
 	std::copy_n(t_stiff.row_ptr, N, IA.data());
 	std::copy_n(t_damping.row_ptr, N, IA.data() + n_size1);

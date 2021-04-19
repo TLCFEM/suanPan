@@ -84,7 +84,7 @@ template<typename T> int SparseMatSuperLU<T>::solve(Mat<T>& out_mat, const Mat<T
 
 	SuperMatrix A, L, U, B;
 
-	dCreate_CompCol_Matrix(&A, csc_mat.n_rows, csc_mat.n_cols, csc_mat.c_size, csc_mat.val_idx, csc_mat.row_idx, csc_mat.col_ptr, SLU_NC, SLU_D, SLU_GE);
+	dCreate_CompCol_Matrix(&A, csc_mat.n_rows, csc_mat.n_cols, csc_mat.n_elem, csc_mat.val_idx, csc_mat.row_idx, csc_mat.col_ptr, SLU_NC, SLU_D, SLU_GE);
 	dCreate_Dense_Matrix(&B, static_cast<int>(out_mat.n_rows), static_cast<int>(out_mat.n_cols), out_mat.memptr(), static_cast<int>(out_mat.n_rows), SLU_DN, SLU_D, SLU_GE);
 
 	perm_r.set_size(csc_mat.n_rows);
@@ -105,9 +105,9 @@ template<typename T> int SparseMatSuperLU<T>::solve(Mat<T>& out_mat, const Mat<T
 #else
 	csc_form<T, uword> csc_mat(this->triplet_mat);
 
-	const uvec row_idx(csc_mat.row_idx, csc_mat.c_size, false, false);
+	const uvec row_idx(csc_mat.row_idx, csc_mat.n_elem, false, false);
 	const uvec col_ptr(csc_mat.col_ptr, csc_mat.n_cols + 1, false, false);
-	const Col<T> val_idx(csc_mat.val_idx, csc_mat.c_size, false, false);
+	const Col<T> val_idx(csc_mat.val_idx, csc_mat.n_elem, false, false);
 
 	return spsolve(out_mat, SpMat<T>(row_idx, col_ptr, val_idx, csc_mat.n_rows, csc_mat.n_cols), in_mat) ? SUANPAN_SUCCESS : SUANPAN_FAIL;
 #endif
