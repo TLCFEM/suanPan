@@ -105,7 +105,7 @@ template<typename T> DenseMat<T>::DenseMat(const DenseMat& old_mat)
 }
 
 template<typename T> DenseMat<T>::DenseMat(DenseMat&& old_mat) noexcept
-	: MetaMat<T>(std::forward<DenseMat<T>>(old_mat))
+	: MetaMat<T>(std::move(old_mat))
 	, factored(old_mat.factored)
 	, pivot(std::move(old_mat.pivot))
 	, s_memory(std::move(old_mat.s_memory)) {
@@ -114,36 +114,24 @@ template<typename T> DenseMat<T>::DenseMat(DenseMat&& old_mat) noexcept
 }
 
 template<typename T> DenseMat<T>& DenseMat<T>::operator=(const DenseMat& old_mat) {
-	if(&old_mat != this) {
-		factored = old_mat.factored;
-		pivot = old_mat.pivot;
-		s_memory = old_mat.s_memory;
-		this->tolerance = old_mat.tolerance;
-		this->precision = old_mat.precision;
-		this->triplet_mat = old_mat.triplet_mat;
-		access::rw(this->n_rows) = old_mat.n_rows;
-		access::rw(this->n_cols) = old_mat.n_cols;
-		access::rw(this->n_elem) = old_mat.n_elem;
-		init();
-		if(nullptr != old_mat.memory) std::copy(old_mat.memory, old_mat.memory + old_mat.n_elem, memptr());
-	}
+	if(this == &old_mat) return *this;
+	MetaMat<T>::operator=(old_mat);
+	factored = old_mat.factored;
+	pivot = old_mat.pivot;
+	s_memory = old_mat.s_memory;
+	init();
+	if(nullptr != old_mat.memory) std::copy(old_mat.memory, old_mat.memory + old_mat.n_elem, memptr());
 	return *this;
 }
 
 template<typename T> DenseMat<T>& DenseMat<T>::operator=(DenseMat&& old_mat) noexcept {
-	if(&old_mat != this) {
-		factored = old_mat.factored;
-		pivot = std::move(old_mat.pivot);
-		s_memory = std::move(old_mat.s_memory);
-		this->tolerance = old_mat.tolerance;
-		this->precision = old_mat.precision;
-		this->triplet_mat = old_mat.triplet_mat;
-		access::rw(this->n_rows) = old_mat.n_rows;
-		access::rw(this->n_cols) = old_mat.n_cols;
-		access::rw(this->n_elem) = old_mat.n_elem;
-		access::rw(memory) = old_mat.memory;
-		access::rw(old_mat.memory) = nullptr;
-	}
+	if(this == &old_mat) return *this;
+	MetaMat<T>::operator=(std::move(old_mat));
+	factored = old_mat.factored;
+	pivot = std::move(old_mat.pivot);
+	s_memory = std::move(old_mat.s_memory);
+	access::rw(memory) = old_mat.memory;
+	access::rw(old_mat.memory) = nullptr;
 	return *this;
 }
 
