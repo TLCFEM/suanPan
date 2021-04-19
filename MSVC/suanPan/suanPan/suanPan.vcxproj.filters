@@ -2296,6 +2296,9 @@
     <ClInclude Include="..\..\..\Domain\MetaMat\FullMatCUDA.hpp">
       <Filter>Domain\MetaMat</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Domain\MetaMat\DenseMat.hpp">
+      <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\..\Resource\suanPan.rc" />

@@ -32,18 +32,16 @@
 
 #ifdef SUANPAN_CUDA
 
+#include "FullMat.hpp"
+
 template<typename T> class FullMatCUDA final : public FullMat<T> {
 public:
 	using FullMat<T>::FullMat;
 
 	unique_ptr<MetaMat<T>> make_copy() override;
-
-	int solve(Mat<T>&, const Mat<T>&) override;
 };
 
 template<typename T> unique_ptr<MetaMat<T>> FullMatCUDA<T>::make_copy() { return make_unique<FullMatCUDA<T>>(*this); }
-
-template<typename T> int FullMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) { return FullMat<T>::solve(X, B); }
 
 #endif
 

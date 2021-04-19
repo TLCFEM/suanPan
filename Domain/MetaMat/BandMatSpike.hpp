@@ -30,10 +30,11 @@
 #ifndef BANDMATSPIKE_HPP
 #define BANDMATSPIKE_HPP
 
+#include "DenseMat.hpp"
 #include <feast/spike.h>
 
-template<typename T> class BandMatSpike final : public MetaMat<T> {
-	static const char TRAN;
+template<typename T> class BandMatSpike final : public DenseMat<T> {
+	static constexpr char TRAN = 'N';
 
 	static T bin;
 
@@ -41,18 +42,15 @@ template<typename T> class BandMatSpike final : public MetaMat<T> {
 	const uword u_band;
 	const uword m_rows; // memory block layout
 
-	podarray<T> WORK;
 	podarray<int> SPIKE = podarray<int>(64);
-
-	podarray<float> s_memory; // float storage used in mixed precision algorithm
+	podarray<T> WORK;
 	podarray<float> SWORK;
 
 	void init_spike();
 
-	int solve_trs(Mat<T>&, const Mat<T>&);
 	int solve_trs(Mat<T>&, Mat<T>&&);
+	int solve_trs(Mat<T>&, const Mat<T>&);
 public:
-	BandMatSpike();
 	BandMatSpike(uword, uword, uword);
 
 	unique_ptr<MetaMat<T>> make_copy() override;
@@ -64,13 +62,11 @@ public:
 
 	Mat<T> operator*(const Mat<T>&) override;
 
-	int solve(Mat<T>&, const Mat<T>&) override;
 	int solve(Mat<T>&, Mat<T>&&) override;
+	int solve(Mat<T>&, const Mat<T>&) override;
 
 	[[nodiscard]] int sign_det() const override;
 };
-
-template<typename T> const char BandMatSpike<T>::TRAN = 'N';
 
 template<typename T> T BandMatSpike<T>::bin = 0.;
 
@@ -83,53 +79,45 @@ template<typename T> void BandMatSpike<T>::init_spike() {
 	std::is_same<T, float>::value ? sspike_tune_(SPIKE.memptr()) : dspike_tune_(SPIKE.memptr());
 }
 
-template<typename T> BandMatSpike<T>::BandMatSpike()
-	: MetaMat<T>()
-	, l_band(0)
-	, u_band(0)
-	, m_rows(0) {}
-
 template<typename T> BandMatSpike<T>::BandMatSpike(const uword in_size, const uword in_l, const uword in_u)
-	: MetaMat<T>(in_size, in_size, (in_l + in_u + 1) * in_size)
+	: DenseMat<T>(in_size, in_size, (in_l + in_u + 1) * in_size)
 	, l_band(in_l)
 	, u_band(in_u)
 	, m_rows(in_l + in_u + 1) { init_spike(); }
 
-template<typename T> unique_ptr<MetaMat<T>> BandMatSpike<T>::make_copy() { return make_unique<BandMatSpike<T>>(*this); }
+template<typename T> unique_ptr<MetaMat<T>> BandMatSpike<T>::make_copy() { return std::make_unique<BandMatSpike<T>>(*this); }
 
-template<typename T> void BandMatSpike<T>::unify(const uword idx) {
+template<typename T> void BandMatSpike<T>::unify(const uword K) {
 #ifdef SUANPAN_MT
-	tbb::parallel_for(std::max(idx, u_band) - u_band, std::min(this->n_rows, idx + l_band + 1), [&](const uword I) { access::rw(this->memory[I + u_band + idx * (m_rows - 1)]) = 0.; });
-	tbb::parallel_for(std::max(idx, l_band) - l_band, std::min(this->n_cols, idx + u_band + 1), [&](const uword I) { access::rw(this->memory[idx + u_band + I * (m_rows - 1)]) = 0.; });
+	tbb::parallel_for(std::max(K, u_band) - u_band, std::min(this->n_rows, K + l_band + 1), [&](const uword I) { access::rw(this->memory[I + u_band + K * (m_rows - 1)]) = 0.; });
+	tbb::parallel_for(std::max(K, l_band) - l_band, std::min(this->n_cols, K + u_band + 1), [&](const uword I) { access::rw(this->memory[K + u_band + I * (m_rows - 1)]) = 0.; });
 #else
-	for(auto I = std::max(idx, u_band) - u_band; I < std::min(this->n_rows, idx + l_band + 1); ++I) access::rw(this->memory[I + u_band + idx * (m_rows - 1)]) = 0.;
-	for(auto I = std::max(idx, l_band) - l_band; I < std::min(this->n_cols, idx + u_band + 1); ++I) access::rw(this->memory[idx + u_band + I * (m_rows - 1)]) = 0.;
+	for(auto I = std::max(K, u_band) - u_band; I < std::min(this->n_rows, K + l_band + 1); ++I) access::rw(this->memory[I + u_band + K * (m_rows - 1)]) = 0.;
+	for(auto I = std::max(K, l_band) - l_band; I < std::min(this->n_cols, K + u_band + 1); ++I) access::rw(this->memory[K + u_band + I * (m_rows - 1)]) = 0.;
 #endif
-	access::rw(this->memory[u_band + idx * m_rows]) = 1.;
+	access::rw(this->memory[u_band + K * m_rows]) = 1.;
 }
 
 template<typename T> const T& BandMatSpike<T>::operator()(const uword in_row, const uword in_col) const {
 	if(in_row > in_col + l_band || in_row + u_band < in_col) return bin = 0.;
-
 	return this->memory[in_row + u_band + in_col * (m_rows - 1)];
 }
 
 template<typename T> T& BandMatSpike<T>::at(const uword in_row, const uword in_col) {
 	if(in_row > in_col + l_band || in_row + u_band < in_col) return bin = 0.;
-
 	return access::rw(this->memory[in_row + u_band + in_col * (m_rows - 1)]);
 }
 
 template<typename T> Mat<T> BandMatSpike<T>::operator*(const Mat<T>& X) {
-	Mat<T> Y(size(X));
+	Mat<T> Y(arma::size(X));
 
 	auto M = static_cast<int>(this->n_rows);
 	auto N = static_cast<int>(this->n_cols);
 	auto KL = static_cast<int>(l_band);
 	auto KU = static_cast<int>(u_band);
-	T ALPHA = 1.;
 	auto LDA = static_cast<int>(m_rows);
 	auto INC = 1;
+	T ALPHA = 1.;
 	T BETA = 0.;
 
 #ifdef SUANPAN_MT
@@ -163,26 +151,23 @@ template<typename T> int BandMatSpike<T>::solve(Mat<T>& X, const Mat<T>& B) {
 		auto KL = static_cast<int>(l_band);
 		auto KU = static_cast<int>(u_band);
 		auto LDAB = static_cast<int>(m_rows);
-		const auto KLU = static_cast<uword>(std::max(KL, KU));
+		const auto KLU = std::max(l_band, u_band);
 		auto INFO = 0;
 
 		if(std::is_same<T, float>::value) {
 			using E = float;
-
 			WORK.zeros(KLU * KLU * SPIKE(9));
 			sspike_gbtrf_(SPIKE.memptr(), &N, &KL, &KU, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), &INFO);
 		}
 		else if(Precision::FULL == this->precision) {
 			using E = double;
-
 			WORK.zeros(KLU * KLU * SPIKE(9));
 			dspike_gbtrf_(SPIKE.memptr(), &N, &KL, &KU, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), &INFO);
 		}
 		else {
-			s_memory = this->to_float();
-
+			this->s_memory = this->to_float();
 			SWORK.zeros(KLU * KLU * SPIKE(9));
-			sspike_gbtrf_(SPIKE.memptr(), &N, &KL, &KU, s_memory.mem, &LDAB, SWORK.memptr(), &INFO);
+			sspike_gbtrf_(SPIKE.memptr(), &N, &KL, &KU, this->s_memory.mem, &LDAB, SWORK.memptr(), &INFO);
 		}
 
 		if(INFO != 0) {
@@ -193,7 +178,7 @@ template<typename T> int BandMatSpike<T>::solve(Mat<T>& X, const Mat<T>& B) {
 		this->factored = true;
 	}
 
-	return solve_trs(X, B);
+	return this->solve_trs(X, B);
 }
 
 template<typename T> int BandMatSpike<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
@@ -225,15 +210,13 @@ template<typename T> int BandMatSpike<T>::solve_trs(Mat<T>& X, const Mat<T>& B) 
 		while(++counter < 20) {
 			auto residual = conv_to<fmat>::from(full_residual / multiplier);
 
-			sspike_gbtrs_(SPIKE.memptr(), &TRAN, &N, &KL, &KU, &NRHS, s_memory.memptr(), &LDAB, SWORK.memptr(), residual.memptr(), &LDB);
+			sspike_gbtrs_(SPIKE.memptr(), &TRAN, &N, &KL, &KU, &NRHS, this->s_memory.memptr(), &LDAB, SWORK.memptr(), residual.memptr(), &LDB);
 
 			const auto incre = multiplier * conv_to<mat>::from(residual);
 
 			X += incre;
 
-			multiplier = norm(full_residual -= this->operator*(incre));
-
-			suanpan_debug("mixed precision algorithm multiplier: %.5E\n", multiplier);
+			suanpan_debug("mixed precision algorithm multiplier: %.5E\n", multiplier = arma::norm(full_residual -= this->operator*(incre)));
 
 			if(multiplier < this->tolerance) break;
 		}
@@ -248,26 +231,23 @@ template<typename T> int BandMatSpike<T>::solve(Mat<T>& X, Mat<T>&& B) {
 		auto KL = static_cast<int>(l_band);
 		auto KU = static_cast<int>(u_band);
 		auto LDAB = static_cast<int>(m_rows);
-		const auto KLU = static_cast<uword>(std::max(KL, KU));
+		const auto KLU = std::max(l_band, u_band);
 		auto INFO = 0;
 
 		if(std::is_same<T, float>::value) {
 			using E = float;
-
 			WORK.zeros(KLU * KLU * SPIKE(9));
 			sspike_gbtrf_(SPIKE.memptr(), &N, &KL, &KU, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), &INFO);
 		}
 		else if(Precision::FULL == this->precision) {
 			using E = double;
-
 			WORK.zeros(KLU * KLU * SPIKE(9));
 			dspike_gbtrf_(SPIKE.memptr(), &N, &KL, &KU, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), &INFO);
 		}
 		else {
-			s_memory = this->to_float();
-
+			this->s_memory = this->to_float();
 			SWORK.zeros(KLU * KLU * SPIKE(9));
-			sspike_gbtrf_(SPIKE.memptr(), &N, &KL, &KU, s_memory.mem, &LDAB, SWORK.memptr(), &INFO);
+			sspike_gbtrf_(SPIKE.memptr(), &N, &KL, &KU, this->s_memory.mem, &LDAB, SWORK.memptr(), &INFO);
 		}
 
 		if(INFO != 0) {
@@ -278,7 +258,7 @@ template<typename T> int BandMatSpike<T>::solve(Mat<T>& X, Mat<T>&& B) {
 		this->factored = true;
 	}
 
-	return solve_trs(X, std::forward<Mat<T>>(B));
+	return this->solve_trs(X, std::forward<Mat<T>>(B));
 }
 
 template<typename T> int BandMatSpike<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
@@ -308,15 +288,13 @@ template<typename T> int BandMatSpike<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
 		while(++counter < 20) {
 			auto residual = conv_to<fmat>::from(B / multiplier);
 
-			sspike_gbtrs_(SPIKE.memptr(), &TRAN, &N, &KL, &KU, &NRHS, s_memory.memptr(), &LDAB, SWORK.memptr(), residual.memptr(), &LDB);
+			sspike_gbtrs_(SPIKE.memptr(), &TRAN, &N, &KL, &KU, &NRHS, this->s_memory.memptr(), &LDAB, SWORK.memptr(), residual.memptr(), &LDB);
 
 			const auto incre = multiplier * conv_to<mat>::from(residual);
 
 			X += incre;
 
-			multiplier = norm(B -= this->operator*(incre));
-
-			suanpan_debug("mixed precision algorithm multiplier: %.5E\n", multiplier);
+			suanpan_debug("mixed precision algorithm multiplier: %.5E\n", multiplier = arma::norm(B -= this->operator*(incre)));
 
 			if(multiplier < this->tolerance) break;
 		}

@@ -29,6 +29,8 @@
 #ifndef SPARSEMATSUPERLU_HPP
 #define SPARSEMATSUPERLU_HPP
 
+#include "SparseMat.hpp"
+
 #ifdef SUANPAN_SUPERLUMT
 
 extern int SUANPAN_NUM_THREADS;
@@ -70,11 +72,9 @@ public:
 	unique_ptr<MetaMat<T>> make_copy() override;
 
 	int solve(Mat<T>&, const Mat<T>&) override;
-
-	void print() override;
 };
 
-template<typename T> unique_ptr<MetaMat<T>> SparseMatSuperLU<T>::make_copy() { return make_unique<SparseMatSuperLU<T>>(*this); }
+template<typename T> unique_ptr<MetaMat<T>> SparseMatSuperLU<T>::make_copy() { return std::make_unique<SparseMatSuperLU<T>>(*this); }
 
 template<typename T> int SparseMatSuperLU<T>::solve(Mat<T>& out_mat, const Mat<T>& in_mat) {
 #ifdef SUANPAN_SUPERLUMT
@@ -112,8 +112,6 @@ template<typename T> int SparseMatSuperLU<T>::solve(Mat<T>& out_mat, const Mat<T
 	return spsolve(out_mat, SpMat<T>(row_idx, col_ptr, val_idx, csc_mat.n_rows, csc_mat.n_cols), in_mat) ? SUANPAN_SUCCESS : SUANPAN_FAIL;
 #endif
 }
-
-template<typename T> void SparseMatSuperLU<T>::print() { this->triplet_mat.print(); }
 
 #endif
 

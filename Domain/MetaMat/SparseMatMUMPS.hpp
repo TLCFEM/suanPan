@@ -31,6 +31,7 @@
 #ifndef SPARSEMATMUMPS_HPP
 #define SPARSEMATMUMPS_HPP
 
+#include "SparseMat.hpp"
 #include <mumps/dmumps_c.h>
 
 template<typename T> class SparseMatMUMPS final : public SparseMat<T> {
@@ -47,7 +48,7 @@ public:
 	[[nodiscard]] int sign_det() const override;
 };
 
-template<typename T> unique_ptr<MetaMat<T>> SparseMatMUMPS<T>::make_copy() { return make_unique<SparseMatMUMPS<T>>(*this); }
+template<typename T> unique_ptr<MetaMat<T>> SparseMatMUMPS<T>::make_copy() { return std::make_unique<SparseMatMUMPS<T>>(*this); }
 
 template<typename T> int SparseMatMUMPS<T>::solve(Mat<T>& X, const Mat<T>& B) {
 	this->triplet_mat.csc_condense();

@@ -29,27 +29,27 @@
 #ifndef SPARSEMAT_HPP
 #define SPARSEMAT_HPP
 
+#include "MetaMat.hpp"
+
 template<typename T> class SparseMat : public MetaMat<T> {
 public:
 	using MetaMat<T>::triplet_mat;
+	using MetaMat<T>::solve;
 
-	SparseMat() = default;
 	SparseMat(uword, uword, uword = 0);
+
+	[[nodiscard]] bool is_empty() const override;
+	void zeros() override;
 
 	void unify(uword) override;
 
-	[[nodiscard]] bool is_empty() const override;
-
-	void zeros() override;
-	void reset() override;
 	T max() const override;
 
 	const T& operator()(uword, uword) const override;
 	T& at(uword, uword) override;
 
-	const T* memptr() const override { return nullptr; }
-
-	T* memptr() override { throw invalid_argument("not supported"); }
+	const T* memptr() const override;
+	T* memptr() override;
 
 	void operator+=(const shared_ptr<MetaMat<T>>&) override;
 	void operator-=(const shared_ptr<MetaMat<T>>&) override;
@@ -57,6 +57,10 @@ public:
 	Mat<T> operator*(const Mat<T>&) override;
 
 	void operator*=(T) override;
+
+	int solve(Mat<T>&, const SpMat<T>&) override;
+	int solve(Mat<T>&, Mat<T>&&) override;
+	int solve(Mat<T>&, SpMat<T>&&) override;
 
 	[[nodiscard]] int sign_det() const override;
 
@@ -66,6 +70,10 @@ public:
 
 template<typename T> SparseMat<T>::SparseMat(const uword in_row, const uword in_col, const uword in_elem)
 	: MetaMat<T>(in_row, in_col, 0) { triplet_mat.init(in_elem); }
+
+template<typename T> bool SparseMat<T>::is_empty() const { return triplet_mat.is_empty(); }
+
+template<typename T> void SparseMat<T>::zeros() { triplet_mat.zeros(); }
 
 template<typename T> void SparseMat<T>::unify(const uword idx) {
 	using index_t = typename decltype(triplet_mat)::index_type;
@@ -79,25 +87,21 @@ template<typename T> void SparseMat<T>::unify(const uword idx) {
 	triplet_mat.at(t_idx, t_idx) = 1.;
 }
 
-template<typename T> bool SparseMat<T>::is_empty() const { return triplet_mat.is_empty(); }
-
-template<typename T> void SparseMat<T>::zeros() { triplet_mat.zeros(); }
-
-template<typename T> void SparseMat<T>::reset() { triplet_mat.reset(); }
-
 template<typename T> T SparseMat<T>::max() const { return triplet_mat.max(); }
 
 template<typename T> const T& SparseMat<T>::operator()(const uword in_row, const uword in_col) const {
 	using index_t = typename decltype(triplet_mat)::index_type;
-
 	return triplet_mat(static_cast<index_t>(in_row), static_cast<index_t>(in_col));
 }
 
 template<typename T> T& SparseMat<T>::at(const uword in_row, const uword in_col) {
 	using index_t = typename decltype(triplet_mat)::index_type;
-
 	return triplet_mat.at(static_cast<index_t>(in_row), static_cast<index_t>(in_col));
 }
+
+template<typename T> const T* SparseMat<T>::memptr() const { throw invalid_argument("not supproted"); }
+
+template<typename T> T* SparseMat<T>::memptr() { throw invalid_argument("not supproted"); }
 
 template<typename T> void SparseMat<T>::operator+=(const shared_ptr<MetaMat<T>>& in_mat) { triplet_mat += in_mat->triplet_mat; }
 
@@ -106,6 +110,12 @@ template<typename T> void SparseMat<T>::operator-=(const shared_ptr<MetaMat<T>>&
 template<typename T> Mat<T> SparseMat<T>::operator*(const Mat<T>& in_mat) { return triplet_mat * in_mat; }
 
 template<typename T> void SparseMat<T>::operator*=(const T scalar) { triplet_mat *= scalar; }
+
+template<typename T> int SparseMat<T>::solve(Mat<T>& X, const SpMat<T>& B) { return this->solve(X, Mat<T>(B)); }
+
+template<typename T> int SparseMat<T>::solve(Mat<T>& X, Mat<T>&& B) { return this->solve(X, B); }
+
+template<typename T> int SparseMat<T>::solve(Mat<T>& X, SpMat<T>&& B) { return this->solve(X, B); }
 
 template<typename T> int SparseMat<T>::sign_det() const { throw invalid_argument("not supproted"); }
 

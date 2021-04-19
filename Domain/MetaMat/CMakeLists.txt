@@ -5,6 +5,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         Domain/MetaMat/comparator.hpp
         Domain/MetaMat/csc_form.hpp
         Domain/MetaMat/csr_form.hpp
+        Domain/MetaMat/DenseMat.hpp
         Domain/MetaMat/FullMat.hpp
         Domain/MetaMat/FullMatCUDA.hpp
         Domain/MetaMat/MetaMat.hpp

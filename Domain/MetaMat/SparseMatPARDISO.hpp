@@ -34,6 +34,7 @@
 
 #ifdef SUANPAN_MKL
 
+#include "SparseMat.hpp"
 #include <mkl_pardiso.h>
 
 template<typename T> class SparseMatPARDISO final : public SparseMat<T> {
@@ -43,14 +44,12 @@ public:
 	unique_ptr<MetaMat<T>> make_copy() override;
 
 	int solve(Mat<T>&, const Mat<T>&) override;
-
-	void print() override;
 };
 
-template<typename T> unique_ptr<MetaMat<T>> SparseMatPARDISO<T>::make_copy() { return make_unique<SparseMatPARDISO<T>>(*this); }
+template<typename T> unique_ptr<MetaMat<T>> SparseMatPARDISO<T>::make_copy() { return std::make_unique<SparseMatPARDISO<T>>(*this); }
 
 template<typename T> int SparseMatPARDISO<T>::solve(Mat<T>& X, const Mat<T>& B) {
-	X.set_size(size(B));
+	X.set_size(arma::size(B));
 
 	csr_form<T, int> csr_mat(this->triplet_mat);
 
@@ -78,8 +77,6 @@ template<typename T> int SparseMatPARDISO<T>::solve(Mat<T>& X, const Mat<T>& B) 
 
 	return 0 == error ? SUANPAN_SUCCESS : SUANPAN_FAIL;
 }
-
-template<typename T> void SparseMatPARDISO<T>::print() { this->triplet_mat.print(); }
 
 #endif
 

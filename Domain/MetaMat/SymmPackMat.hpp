@@ -30,16 +30,16 @@
 #ifndef SYMMPACKMAT_HPP
 #define SYMMPACKMAT_HPP
 
-template<typename T> class SymmPackMat final : public MetaMat<T> {
-	static const char UPLO;
+#include "DenseMat.hpp"
+
+template<typename T> class SymmPackMat final : public DenseMat<T> {
+	static constexpr char UPLO = 'U';
+
 	static T bin;
 
-	podarray<float> s_memory;
-
-	int solve_trs(Mat<T>&, const Mat<T>&);
 	int solve_trs(Mat<T>&, Mat<T>&&);
+	int solve_trs(Mat<T>&, const Mat<T>&);
 public:
-	SymmPackMat();
 	explicit SymmPackMat(uword);
 
 	unique_ptr<MetaMat<T>> make_copy() override;
@@ -51,31 +51,26 @@ public:
 
 	Mat<T> operator*(const Mat<T>&) override;
 
-	int solve(Mat<T>&, const Mat<T>&) override;
 	int solve(Mat<T>&, Mat<T>&&) override;
+	int solve(Mat<T>&, const Mat<T>&) override;
 };
-
-template<typename T> const char SymmPackMat<T>::UPLO = 'U';
 
 template<typename T> T SymmPackMat<T>::bin = 0.;
 
-template<typename T> SymmPackMat<T>::SymmPackMat()
-	: MetaMat<T>() {}
-
 template<typename T> SymmPackMat<T>::SymmPackMat(const uword in_size)
-	: MetaMat<T>(in_size, in_size, (in_size + 1) * in_size / 2) {}
+	: DenseMat<T>(in_size, in_size, (in_size + 1) * in_size / 2) {}
 
-template<typename T> unique_ptr<MetaMat<T>> SymmPackMat<T>::make_copy() { return make_unique<SymmPackMat<T>>(*this); }
+template<typename T> unique_ptr<MetaMat<T>> SymmPackMat<T>::make_copy() { return std::make_unique<SymmPackMat<T>>(*this); }
 
-template<typename T> void SymmPackMat<T>::unify(const uword idx) {
+template<typename T> void SymmPackMat<T>::unify(const uword K) {
 #ifdef SUANPAN_MT
-	tbb::parallel_for(0llu, idx, [&](const uword I) { access::rw(this->memory[(idx * idx + idx) / 2 + I]) = 0.; });
-	tbb::parallel_for(idx + 1llu, this->n_rows, [&](const uword I) { access::rw(this->memory[(I * I + I) / 2 + idx]) = 0.; });
+	tbb::parallel_for(0llu, K, [&](const uword I) { access::rw(this->memory[(K * K + K) / 2 + I]) = 0.; });
+	tbb::parallel_for(K + 1llu, this->n_rows, [&](const uword I) { access::rw(this->memory[(I * I + I) / 2 + K]) = 0.; });
 #else
-	for(auto I = 0llu; I < idx; ++I) access::rw(this->memory[(idx * idx + idx) / 2 + I]) = 0.;
-	for(auto I = idx + 1llu; I < this->n_rows; ++I) access::rw(this->memory[(I * I + I) / 2 + idx]) = 0.;
+	for(auto I = 0llu; I < K; ++I) access::rw(this->memory[(K * K + K) / 2 + I]) = 0.;
+	for(auto I = K + 1llu; I < this->n_rows; ++I) access::rw(this->memory[(I * I + I) / 2 + K]) = 0.;
 #endif
-	access::rw(this->memory[(idx * idx + 3 * idx) / 2]) = 1.;
+	access::rw(this->memory[(K * K + 3 * K) / 2]) = 1.;
 }
 
 template<typename T> const T& SymmPackMat<T>::operator()(const uword in_row, const uword in_col) const { return this->memory[in_col > in_row ? (in_col * in_col + in_col) / 2 + in_row : (in_row * in_row + in_row) / 2 + in_col]; }
@@ -90,8 +85,8 @@ template<typename T> Mat<T> SymmPackMat<T>::operator*(const Mat<T>& X) {
 	auto Y = X;
 
 	auto N = static_cast<int>(this->n_rows);
-	T ALPHA = 1.;
 	auto INC = 1;
+	T ALPHA = 1.;
 	T BETA = 0.;
 
 	if(std::is_same<T, float>::value) {
@@ -107,7 +102,7 @@ template<typename T> Mat<T> SymmPackMat<T>::operator*(const Mat<T>& X) {
 }
 
 template<typename T> int SymmPackMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
-	if(this->factored) return solve_trs(X, B);
+	if(this->factored) return this->solve_trs(X, B);
 
 	auto N = static_cast<int>(this->n_rows);
 	auto NRHS = static_cast<int>(B.n_cols);
@@ -118,22 +113,18 @@ template<typename T> int SymmPackMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
 
 	if(std::is_same<T, float>::value) {
 		using E = float;
-
 		X = B;
 		arma_fortran(arma_sppsv)(&UPLO, &N, &NRHS, (E*)this->memptr(), (E*)X.memptr(), &LDB, &INFO);
 	}
 	else if(Precision::FULL == this->precision) {
 		using E = double;
-
 		X = B;
 		arma_fortran(arma_dppsv)(&UPLO, &N, &NRHS, (E*)this->memptr(), (E*)X.memptr(), &LDB, &INFO);
 	}
 	else {
-		s_memory = this->to_float();
-
-		arma_fortran(arma_spptrf)(&UPLO, &N, s_memory.memptr(), &INFO);
-
-		if(0 == INFO) INFO = solve_trs(X, B);
+		this->s_memory = this->to_float();
+		arma_fortran(arma_spptrf)(&UPLO, &N, this->s_memory.memptr(), &INFO);
+		if(0 == INFO) INFO = this->solve_trs(X, B);
 	}
 
 	if(0 != INFO) suanpan_error("solve() receives error code %u from the base driver, the matrix is probably singular.\n", INFO);
@@ -149,13 +140,11 @@ template<typename T> int SymmPackMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 
 	if(std::is_same<T, float>::value) {
 		using E = float;
-
 		X = B;
 		arma_fortran(arma_spptrs)(&UPLO, &N, &NRHS, (E*)this->memptr(), (E*)X.memptr(), &LDB, &INFO);
 	}
 	else if(Precision::FULL == this->precision) {
 		using E = double;
-
 		X = B;
 		arma_fortran(arma_dpptrs)(&UPLO, &N, &NRHS, (E*)this->memptr(), (E*)X.memptr(), &LDB, &INFO);
 	}
@@ -170,16 +159,14 @@ template<typename T> int SymmPackMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 		while(++counter < 20) {
 			auto residual = conv_to<fmat>::from(full_residual / multiplier);
 
-			arma_fortran(arma_spptrs)(&UPLO, &N, &NRHS, s_memory.memptr(), residual.memptr(), &LDB, &INFO);
+			arma_fortran(arma_spptrs)(&UPLO, &N, &NRHS, this->s_memory.memptr(), residual.memptr(), &LDB, &INFO);
 			if(0 != INFO) break;
 
 			const auto incre = multiplier * conv_to<mat>::from(residual);
 
 			X += incre;
 
-			multiplier = norm(full_residual -= this->operator*(incre));
-
-			suanpan_debug("mixed precision algorithm multiplier: %.5E\n", multiplier);
+			suanpan_debug("mixed precision algorithm multiplier: %.5E\n", multiplier = norm(full_residual -= this->operator*(incre)));
 
 			if(multiplier < this->tolerance) break;
 		}
@@ -191,7 +178,7 @@ template<typename T> int SymmPackMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 }
 
 template<typename T> int SymmPackMat<T>::solve(Mat<T>& X, Mat<T>&& B) {
-	if(this->factored) return solve_trs(X, std::forward<Mat<T>>(B));
+	if(this->factored) return this->solve_trs(X, std::forward<Mat<T>>(B));
 
 	auto N = static_cast<int>(this->n_rows);
 	auto NRHS = static_cast<int>(B.n_cols);
@@ -211,11 +198,9 @@ template<typename T> int SymmPackMat<T>::solve(Mat<T>& X, Mat<T>&& B) {
 		X = std::move(B);
 	}
 	else {
-		s_memory = this->to_float();
-
-		arma_fortran(arma_spptrf)(&UPLO, &N, s_memory.memptr(), &INFO);
-
-		if(0 == INFO) INFO = solve_trs(X, std::forward<Mat<T>>(B));
+		this->s_memory = this->to_float();
+		arma_fortran(arma_spptrf)(&UPLO, &N, this->s_memory.memptr(), &INFO);
+		if(0 == INFO) INFO = this->solve_trs(X, std::forward<Mat<T>>(B));
 	}
 
 	if(0 != INFO) suanpan_error("solve() receives error code %u from the base driver, the matrix is probably singular.\n", INFO);
@@ -248,16 +233,14 @@ template<typename T> int SymmPackMat<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
 		while(++counter < 20) {
 			auto residual = conv_to<fmat>::from(B / multiplier);
 
-			arma_fortran(arma_spptrs)(&UPLO, &N, &NRHS, s_memory.memptr(), residual.memptr(), &LDB, &INFO);
+			arma_fortran(arma_spptrs)(&UPLO, &N, &NRHS, this->s_memory.memptr(), residual.memptr(), &LDB, &INFO);
 			if(0 != INFO) break;
 
 			const auto incre = multiplier * conv_to<mat>::from(residual);
 
 			X += incre;
 
-			multiplier = norm(B -= this->operator*(incre));
-
-			suanpan_debug("mixed precision algorithm multiplier: %.5E\n", multiplier);
+			suanpan_debug("mixed precision algorithm multiplier: %.5E\n", multiplier = norm(B -= this->operator*(incre)));
 
 			if(multiplier < this->tolerance) break;
 		}

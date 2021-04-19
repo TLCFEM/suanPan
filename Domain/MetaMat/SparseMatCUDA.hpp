@@ -32,8 +32,9 @@
 
 #ifdef SUANPAN_CUDA
 
-#include <cusolverSp.h>
+#include "SparseMat.hpp"
 #include <cusparse.h>
+#include <cusolverSp.h>
 
 template<typename T> class SparseMatCUDA final : public SparseMat<T> {
 	cusolverSpHandle_t handle = nullptr;
@@ -42,7 +43,6 @@ template<typename T> class SparseMatCUDA final : public SparseMat<T> {
 	void cu_create();
 	void cu_destory() const;
 public:
-	SparseMatCUDA();
 	SparseMatCUDA(uword, uword, uword = 0);
 	~SparseMatCUDA() override;
 
@@ -63,20 +63,17 @@ template<typename T> void SparseMatCUDA<T>::cu_destory() const {
 	cusolverSpDestroy(handle);
 }
 
-template<typename T> SparseMatCUDA<T>::SparseMatCUDA()
-	: SparseMat<T>() { cu_create(); }
-
 template<typename T> SparseMatCUDA<T>::SparseMatCUDA(const uword in_row, const uword in_col, const uword in_elem)
 	: SparseMat<T>(in_row, in_col, in_elem) { cu_create(); }
 
 template<typename T> SparseMatCUDA<T>::~SparseMatCUDA() { cu_destory(); }
 
-template<typename T> unique_ptr<MetaMat<T>> SparseMatCUDA<T>::make_copy() { return make_unique<SparseMatCUDA<T>>(*this); }
+template<typename T> unique_ptr<MetaMat<T>> SparseMatCUDA<T>::make_copy() { return std::make_unique<SparseMatCUDA<T>>(*this); }
 
 template<typename T> int SparseMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) {
 	csr_form<T, int> csr_mat(this->triplet_mat);
 
-	X.set_size(size(B));
+	X.set_size(arma::size(B));
 
 	int singularity;
 
