@@ -158,7 +158,7 @@ template<typename data_t, typename index_t> data_t csr_form<data_t, index_t>::ma
 
 template<typename data_t, typename index_t> bool csr_form<data_t, index_t>::init() {
 	reset();
-	row_ptr = new(std::nothrow) index_t[n_rows + 1];
+	row_ptr = new(std::nothrow) index_t[n_rows + index_t(1)];
 	col_idx = new(std::nothrow) index_t[n_elem];
 	val_idx = new(std::nothrow) data_t[n_elem];
 

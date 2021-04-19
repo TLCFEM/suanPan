@@ -71,6 +71,7 @@ public:
 
 	template<typename in_dt, typename in_it> explicit csc_form(triplet_form<in_dt, in_it>&);
 	template<typename in_dt, typename in_it> explicit csc_form(triplet_form<in_dt, in_it>&&);
+	template<typename in_dt, typename in_it> explicit csc_form(triplet_form<in_dt, in_it>&, int);
 	template<typename in_dt, typename in_it> csc_form& operator=(const triplet_form<in_dt, in_it>&);
 
 	explicit csc_form(const csr_form<data_t, index_t>&);
@@ -158,7 +159,7 @@ template<typename data_t, typename index_t> data_t csc_form<data_t, index_t>::ma
 template<typename data_t, typename index_t> bool csc_form<data_t, index_t>::init() {
 	reset();
 	row_idx = new(std::nothrow) index_t[n_elem];
-	col_ptr = new(std::nothrow) index_t[n_cols + 1];
+	col_ptr = new(std::nothrow) index_t[n_cols + index_t(1)];
 	val_idx = new(std::nothrow) data_t[n_elem];
 
 	if(row_idx == nullptr || col_ptr == nullptr || val_idx == nullptr) {
@@ -215,7 +216,7 @@ template<typename data_t, typename index_t> bool csc_form<data_t, index_t>::resi
 }
 
 template<typename data_t, typename index_t> void csc_form<data_t, index_t>::print() const {
-	suanpan_info("A sparse matrix in triplet form with size of %u by %u, the sparsity of %.3f.\n", static_cast<unsigned>(n_rows), static_cast<unsigned>(n_cols), 100. - static_cast<double>(c_size) / static_cast<double>(n_rows * n_cols) * 100.);
+	suanpan_info("A sparse matrix in triplet form with size of %u by %u, the sparsity of %.3f.\n", static_cast<unsigned>(n_rows), static_cast<unsigned>(n_cols), 100. - static_cast<double>(c_size) / static_cast<double>(n_rows) / static_cast<double>(n_cols) * 100.);
 	if(c_size > 1000) {
 		suanpan_info("more than 1000 elements exist.\n");
 		return;
@@ -275,6 +276,26 @@ template<typename data_t, typename index_t> template<typename T2> csc_form<data_
 template<typename data_t, typename index_t> template<typename in_dt, typename in_it> csc_form<data_t, index_t>::csc_form(triplet_form<in_dt, in_it>& old_mat) { *this = old_mat; }
 
 template<typename data_t, typename index_t> template<typename in_dt, typename in_it> csc_form<data_t, index_t>::csc_form(triplet_form<in_dt, in_it>&& old_mat) { *this = old_mat; }
+
+template<typename data_t, typename index_t> template<typename in_dt, typename in_it> csc_form<data_t, index_t>::csc_form(triplet_form<in_dt, in_it>& in_mat, const int base) {
+	in_mat.csc_condense();
+
+	init(index_t(in_mat.n_rows), index_t(in_mat.n_cols), index_t(in_mat.c_size));
+
+	if(0 == in_mat.c_size) return;
+
+	access::rw(c_size) = index_t(in_mat.c_size);
+
+	std::transform(in_mat.row_idx, in_mat.row_idx + in_mat.c_size, row_idx, [&](const in_it I) { return index_t(I) + base; });
+	std::transform(in_mat.val_idx, in_mat.val_idx + in_mat.c_size, val_idx, [](const in_dt I) { return data_t(I); });
+
+	in_it current_pos = 0, current_col = 0;
+	while(current_pos < in_mat.c_size)
+		if(in_mat.col_idx[current_pos] < current_col) ++current_pos;
+		else col_ptr[current_col++] = index_t(current_pos) + base;
+
+	col_ptr[n_cols] = c_size + base;
+}
 
 template<typename data_t, typename index_t> template<typename in_dt, typename in_it> csc_form<data_t, index_t>& csc_form<data_t, index_t>::operator=(const triplet_form<in_dt, in_it>& in_mat) {
 	in_mat.csc_condense();
