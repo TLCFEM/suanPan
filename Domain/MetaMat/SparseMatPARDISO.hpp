@@ -49,7 +49,7 @@ public:
 template<typename T> unique_ptr<MetaMat<T>> SparseMatPARDISO<T>::make_copy() { return std::make_unique<SparseMatPARDISO<T>>(*this); }
 
 template<typename T> int SparseMatPARDISO<T>::solve(Mat<T>& X, const Mat<T>& B) {
-	X.set_size(arma::size(B));
+	X.set_size(B.n_rows, B.n_cols);
 
 	csr_form<T, int> csr_mat(this->triplet_mat);
 
@@ -61,19 +61,23 @@ template<typename T> int SparseMatPARDISO<T>::solve(Mat<T>& X, const Mat<T>& B) 
 	auto msglvl = 0;
 	int error;
 
-	podarray<int> pt(64), iparm(64);
-	const podarray<int> perm(n);
+	void* pt[64];
 
-	pardisoinit(pt.memptr(), &mtype, iparm.memptr());
+	std::vector iparm(64, 0);
 
-	iparm(34) = 1; // zero-based indexing
-	if(std::is_same<T, float>::value) iparm(27) = 1;
+	pardisoinit(pt, &mtype, iparm.data());
 
-	auto phase = 13;
-	pardiso((void*)pt.memptr(), &maxfct, &mnum, &mtype, &phase, &n, (void*)csr_mat.val_idx, csr_mat.row_ptr, csr_mat.col_idx, perm.mem, &nrhs, iparm.memptr(), &msglvl, (void*)B.memptr(), (void*)X.memptr(), &error);
+	iparm[34] = 1; // zero-based indexing
+	if(std::is_same<T, float>::value) iparm[27] = 1;
+
+	auto phase = 12;
+	pardiso(pt, &maxfct, &mnum, &mtype, &phase, &n, (void*)csr_mat.val_idx, csr_mat.row_ptr, csr_mat.col_idx, nullptr, &nrhs, iparm.data(), &msglvl, nullptr, nullptr, &error);
+
+	phase = 33;
+	pardiso(pt, &maxfct, &mnum, &mtype, &phase, &n, (void*)csr_mat.val_idx, csr_mat.row_ptr, csr_mat.col_idx, nullptr, &nrhs, iparm.data(), &msglvl, (void*)B.memptr(), (void*)X.memptr(), &error);
 
 	phase = -1;
-	pardiso((void*)pt.memptr(), &maxfct, &mnum, &mtype, &phase, &n, (void*)csr_mat.val_idx, csr_mat.row_ptr, csr_mat.col_idx, perm.mem, &nrhs, iparm.memptr(), &msglvl, (void*)B.memptr(), (void*)X.memptr(), &error);
+	pardiso(pt, &maxfct, &mnum, &mtype, &phase, &n, nullptr, csr_mat.row_ptr, csr_mat.col_idx, nullptr, &nrhs, iparm.data(), &msglvl, nullptr, nullptr, &error);
 
 	return 0 == error ? SUANPAN_SUCCESS : SUANPAN_FAIL;
 }
