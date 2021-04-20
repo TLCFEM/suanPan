@@ -45,9 +45,9 @@ template<typename T> class SparseMatMUMPS final : public SparseMat<T> {
 public:
 	using SparseMat<T>::SparseMat;
 	SparseMatMUMPS(const SparseMatMUMPS&);
-	SparseMatMUMPS(SparseMatMUMPS&&) noexcept;
-	SparseMatMUMPS& operator=(const SparseMatMUMPS&);
-	SparseMatMUMPS& operator=(SparseMatMUMPS&&) noexcept;
+	SparseMatMUMPS(SparseMatMUMPS&&) noexcept = delete;
+	SparseMatMUMPS& operator=(const SparseMatMUMPS&) = delete;
+	SparseMatMUMPS& operator=(SparseMatMUMPS&&) noexcept = delete;
 	~SparseMatMUMPS() override;
 
 	void zeros() override;
@@ -117,30 +117,6 @@ template<typename T> SparseMatMUMPS<T>::SparseMatMUMPS(const SparseMatMUMPS& oth
 	, mumps_job{0, 1, -1, -987654}
 	, l_irn(other.l_irn)
 	, l_jrn(other.l_jrn) {}
-
-template<typename T> SparseMatMUMPS<T>::SparseMatMUMPS(SparseMatMUMPS&& other) noexcept
-	: SparseMat<T>(std::move(other))
-	, mumps_job{0, 1, -1, -987654}
-	, l_irn(std::move(other.l_irn))
-	, l_jrn(std::move(other.l_jrn)) {}
-
-template<typename T> SparseMatMUMPS<T>& SparseMatMUMPS<T>::operator=(const SparseMatMUMPS& other) {
-	if(this == &other) return *this;
-	SparseMat<T>::operator =(other);
-	l_irn = other.l_irn;
-	l_jrn = other.l_jrn;
-	mumps_job = DMUMPS_STRUC_C{0, 1, -1, -987654};
-	return *this;
-}
-
-template<typename T> SparseMatMUMPS<T>& SparseMatMUMPS<T>::operator=(SparseMatMUMPS&& other) noexcept {
-	if(this == &other) return *this;
-	SparseMat<T>::operator =(std::move(other));
-	l_irn = std::move(other.l_irn);
-	l_jrn = std::move(other.l_jrn);
-	mumps_job = DMUMPS_STRUC_C{0, 1, -1, -987654};
-	return *this;
-}
 
 template<typename T> SparseMatMUMPS<T>::~SparseMatMUMPS() { release(); }
 

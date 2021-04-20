@@ -212,7 +212,7 @@ template<typename T> int BandMatSpike<T>::solve_trs(Mat<T>& X, const Mat<T>& B) 
 
 			sspike_gbtrs_(SPIKE.memptr(), &TRAN, &N, &KL, &KU, &NRHS, this->s_memory.memptr(), &LDAB, SWORK.memptr(), residual.memptr(), &LDB);
 
-			const auto incre = multiplier * conv_to<mat>::from(residual);
+			const vec incre = multiplier * conv_to<mat>::from(residual);
 
 			X += incre;
 
@@ -290,7 +290,7 @@ template<typename T> int BandMatSpike<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
 
 			sspike_gbtrs_(SPIKE.memptr(), &TRAN, &N, &KL, &KU, &NRHS, this->s_memory.memptr(), &LDAB, SWORK.memptr(), residual.memptr(), &LDB);
 
-			const auto incre = multiplier * conv_to<mat>::from(residual);
+			const vec incre = multiplier * conv_to<mat>::from(residual);
 
 			X += incre;
 

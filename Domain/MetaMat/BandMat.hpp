@@ -197,7 +197,7 @@ template<typename T> int BandMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 			arma_fortran(arma_sgbtrs)(&TRAN, &N, &KL, &KU, &NRHS, this->s_memory.memptr(), &LDAB, this->pivot.memptr(), residual.memptr(), &LDB, &INFO);
 			if(0 != INFO) break;
 
-			const auto incre = multiplier * conv_to<mat>::from(residual);
+			const vec incre = multiplier * conv_to<mat>::from(residual);
 
 			X += incre;
 
@@ -281,7 +281,7 @@ template<typename T> int BandMat<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
 			arma_fortran(arma_sgbtrs)(&TRAN, &N, &KL, &KU, &NRHS, this->s_memory.memptr(), &LDAB, this->pivot.memptr(), residual.memptr(), &LDB, &INFO);
 			if(0 != INFO) break;
 
-			const auto incre = multiplier * conv_to<mat>::from(residual);
+			const vec incre = multiplier * conv_to<mat>::from(residual);
 
 			X += incre;
 
