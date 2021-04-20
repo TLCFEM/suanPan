@@ -175,7 +175,7 @@ template<typename T> int FullMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) {
 
 			cudaMemcpy(residual.memptr(), d_x, btye_size, cudaMemcpyDeviceToHost);
 
-			const vec incre = multiplier * conv_to<mat>::from(residual);
+			const mat incre = multiplier * conv_to<mat>::from(residual);
 
 			X += incre;
 

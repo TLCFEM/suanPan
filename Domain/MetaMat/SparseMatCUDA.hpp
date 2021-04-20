@@ -38,12 +38,26 @@
 
 template<typename T> class SparseMatCUDA final : public SparseMat<T> {
 	cusolverSpHandle_t handle = nullptr;
+	cudaStream_t stream = nullptr;
 	cusparseMatDescr_t descrA = nullptr;
 
-	void cu_create();
-	void cu_destory() const;
+	void* d_val_idx;
+	void* d_col_idx;
+	void* d_row_ptr;
+
+	void *d_b, *d_x;
+
+	void acquire();
+	void release() const;
+
+	void device_alloc(size_t, size_t, size_t, size_t);
+	void device_dealloc() const;
 public:
 	SparseMatCUDA(uword, uword, uword = 0);
+	SparseMatCUDA(const SparseMatCUDA&);
+	SparseMatCUDA(SparseMatCUDA&&) noexcept = delete;
+	SparseMatCUDA& operator=(const SparseMatCUDA&) = delete;
+	SparseMatCUDA& operator=(SparseMatCUDA&&) noexcept = delete;
 	~SparseMatCUDA() override;
 
 	unique_ptr<MetaMat<T>> make_copy() override;
@@ -51,52 +65,76 @@ public:
 	int solve(Mat<T>&, const Mat<T>&) override;
 };
 
-template<typename T> void SparseMatCUDA<T>::cu_create() {
+template<typename T> void SparseMatCUDA<T>::acquire() {
 	cusolverSpCreate(&handle);
+	cudaStreamCreate(&stream);
+	cusolverSpSetStream(handle, stream);
 	cusparseCreateMatDescr(&descrA);
-	cusparseSetMatIndexBase(descrA, CUSPARSE_INDEX_BASE_ZERO);
 	cusparseSetMatType(descrA, CUSPARSE_MATRIX_TYPE_GENERAL);
+	cusparseSetMatIndexBase(descrA, CUSPARSE_INDEX_BASE_ZERO);
 }
 
-template<typename T> void SparseMatCUDA<T>::cu_destory() const {
-	cusparseDestroyMatDescr(descrA);
-	cusolverSpDestroy(handle);
+template<typename T> void SparseMatCUDA<T>::release() const {
+	if(handle) cusolverSpDestroy(handle);
+	if(stream) cudaStreamDestroy(stream);
+	if(descrA) cusparseDestroyMatDescr(descrA);
+}
+
+template<typename T> void SparseMatCUDA<T>::device_alloc(const size_t n_val, const size_t n_col, const size_t n_row, const size_t n_rhs) {
+	cudaMalloc(&d_val_idx, n_val);
+	cudaMalloc(&d_col_idx, n_col);
+	cudaMalloc(&d_row_ptr, n_row);
+	cudaMalloc(&d_b, n_rhs);
+	cudaMalloc(&d_x, n_rhs);
+}
+
+template<typename T> void SparseMatCUDA<T>::device_dealloc() const {
+	if(d_val_idx) cudaFree(d_val_idx);
+	if(d_col_idx) cudaFree(d_col_idx);
+	if(d_row_ptr) cudaFree(d_row_ptr);
+	if(d_b) cudaFree(d_b);
+	if(d_x) cudaFree(d_x);
 }
 
 template<typename T> SparseMatCUDA<T>::SparseMatCUDA(const uword in_row, const uword in_col, const uword in_elem)
-	: SparseMat<T>(in_row, in_col, in_elem) { cu_create(); }
+	: SparseMat<T>(in_row, in_col, in_elem) { acquire(); }
 
-template<typename T> SparseMatCUDA<T>::~SparseMatCUDA() { cu_destory(); }
+template<typename T> SparseMatCUDA<T>::SparseMatCUDA(const SparseMatCUDA& other)
+	: SparseMat<T>(other) { acquire(); }
+
+template<typename T> SparseMatCUDA<T>::~SparseMatCUDA() { release(); }
 
 template<typename T> unique_ptr<MetaMat<T>> SparseMatCUDA<T>::make_copy() { return std::make_unique<SparseMatCUDA<T>>(*this); }
 
 template<typename T> int SparseMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) {
 	csr_form<T, int> csr_mat(this->triplet_mat);
 
-	X.set_size(arma::size(B));
+	auto n_val = sizeof(double) * csr_mat.n_elem;
+	auto n_col = sizeof(int) * csr_mat.n_elem;
+	auto n_row = sizeof(int) * (csr_mat.n_rows + 1);
+	auto n_rhs = sizeof(double) * B.n_elem;
+
+	device_alloc(n_val, n_col, n_row, n_rhs);
+
+	cudaMemcpyAsync(d_val_idx, csr_mat.val_idx, n_val, cudaMemcpyHostToDevice, stream);
+	cudaMemcpyAsync(d_col_idx, csr_mat.col_idx, n_col, cudaMemcpyHostToDevice, stream);
+	cudaMemcpyAsync(d_row_ptr, csr_mat.row_ptr, n_row, cudaMemcpyHostToDevice, stream);
+
+	cudaMemcpyAsync(d_b, B.memptr(), n_rhs, cudaMemcpyHostToDevice, stream);
 
 	int singularity;
 
-	if(cusolverStatus_t solver_info; std::is_same<T, float>::value) {
-		using E = float;
-		for(auto I = 0; I < B.n_cols; ++I) {
-			solver_info = cusolverSpScsrlsvluHost(handle, csr_mat.n_rows, csr_mat.n_elem, descrA, (E*)csr_mat.val_idx, csr_mat.row_ptr, csr_mat.col_idx, (E*)B.colptr(I), this->tolerance, 2, (E*)X.colptr(I), &singularity);
-			if(CUSOLVER_STATUS_SUCCESS != solver_info) {
-				suanpan_error("error code %u returned during CUDA solving.\n", static_cast<unsigned>(solver_info));
-				return SUANPAN_FAIL;
-			}
-		}
-	}
-	else if(std::is_same<T, double>::value) {
-		using E = double;
-		for(auto I = 0; I < B.n_cols; ++I) {
-			solver_info = cusolverSpDcsrlsvluHost(handle, csr_mat.n_rows, csr_mat.n_elem, descrA, (E*)csr_mat.val_idx, csr_mat.row_ptr, csr_mat.col_idx, (E*)B.colptr(I), this->tolerance, 2, (E*)X.colptr(I), &singularity);
-			if(CUSOLVER_STATUS_SUCCESS != solver_info) {
-				suanpan_error("error code %u returned during CUDA solving.\n", static_cast<unsigned>(solver_info));
-				return SUANPAN_FAIL;
-			}
-		}
-	}
+	cudaDeviceSynchronize();
+
+	for(auto I = 0; I < B.n_elem; I += B.n_rows) cusolverSpDcsrlsvqr(handle, csr_mat.n_rows, csr_mat.n_elem, descrA, (double*)d_val_idx, (int*)d_row_ptr, (int*)d_col_idx, (double*)d_b + I, this->tolerance, 0, (double*)d_x + I, &singularity);
+
+	cudaDeviceSynchronize();
+
+	X.set_size(arma::size(B));
+
+	cudaMemcpy(X.memptr(), d_x, n_rhs, cudaMemcpyDeviceToHost);
+
+	device_dealloc();
 
 	return SUANPAN_SUCCESS;
 }

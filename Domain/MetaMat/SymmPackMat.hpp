@@ -162,7 +162,7 @@ template<typename T> int SymmPackMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 			arma_fortran(arma_spptrs)(&UPLO, &N, &NRHS, this->s_memory.memptr(), residual.memptr(), &LDB, &INFO);
 			if(0 != INFO) break;
 
-			const vec incre = multiplier * conv_to<mat>::from(residual);
+			const mat incre = multiplier * conv_to<mat>::from(residual);
 
 			X += incre;
 
@@ -236,7 +236,7 @@ template<typename T> int SymmPackMat<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
 			arma_fortran(arma_spptrs)(&UPLO, &N, &NRHS, this->s_memory.memptr(), residual.memptr(), &LDB, &INFO);
 			if(0 != INFO) break;
 
-			const vec incre = multiplier * conv_to<mat>::from(residual);
+			const mat incre = multiplier * conv_to<mat>::from(residual);
 
 			X += incre;
 
