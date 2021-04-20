@@ -90,7 +90,7 @@ if(USE_EXTERNAL_CUDA)
     endif()
     add_definitions(-DSUANPAN_CUDA)
     include_directories(${CUDA_INCLUDE_DIRS})
-    link_libraries(${CUDA_LIBRARIES})
+    link_libraries(${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES} ${CUDA_cusolver_LIBRARY} ${CUDA_cusparse_LIBRARY})
 endif()
 
 set(HAVE_VTK FALSE CACHE INTERNAL "")
