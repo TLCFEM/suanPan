@@ -34,8 +34,6 @@
 template<typename T> class DenseMat : public MetaMat<T> {
 	void init();
 protected:
-	bool factored = false;
-
 	podarray<int> pivot;
 	podarray<float> s_memory; // float storage used in mixed precision algorithm
 
@@ -97,7 +95,6 @@ template<typename T> DenseMat<T>::DenseMat(const uword in_rows, const uword in_c
 
 template<typename T> DenseMat<T>::DenseMat(const DenseMat& old_mat)
 	: MetaMat<T>(old_mat)
-	, factored(old_mat.factored)
 	, pivot(old_mat.pivot)
 	, s_memory(old_mat.s_memory) {
 	init();
@@ -106,7 +103,6 @@ template<typename T> DenseMat<T>::DenseMat(const DenseMat& old_mat)
 
 template<typename T> DenseMat<T>::DenseMat(DenseMat&& old_mat) noexcept
 	: MetaMat<T>(std::move(old_mat))
-	, factored(old_mat.factored)
 	, pivot(std::move(old_mat.pivot))
 	, s_memory(std::move(old_mat.s_memory)) {
 	access::rw(memory) = old_mat.memory;
@@ -116,7 +112,6 @@ template<typename T> DenseMat<T>::DenseMat(DenseMat&& old_mat) noexcept
 template<typename T> DenseMat<T>& DenseMat<T>::operator=(const DenseMat& old_mat) {
 	if(this == &old_mat) return *this;
 	MetaMat<T>::operator=(old_mat);
-	factored = old_mat.factored;
 	pivot = old_mat.pivot;
 	s_memory = old_mat.s_memory;
 	init();
@@ -127,7 +122,6 @@ template<typename T> DenseMat<T>& DenseMat<T>::operator=(const DenseMat& old_mat
 template<typename T> DenseMat<T>& DenseMat<T>::operator=(DenseMat&& old_mat) noexcept {
 	if(this == &old_mat) return *this;
 	MetaMat<T>::operator=(std::move(old_mat));
-	factored = old_mat.factored;
 	pivot = std::move(old_mat.pivot);
 	s_memory = std::move(old_mat.s_memory);
 	access::rw(memory) = old_mat.memory;
@@ -141,7 +135,7 @@ template<typename T> bool DenseMat<T>::is_empty() const { return 0 == this->n_el
 
 template<typename T> void DenseMat<T>::zeros() {
 	arrayops::fill_zeros(memptr(), this->n_elem);
-	factored = false;
+	this->factored = false;
 }
 
 template<typename T> T DenseMat<T>::max() const { return op_max::direct_max(memptr(), this->n_elem); }
@@ -153,13 +147,13 @@ template<typename T> T* DenseMat<T>::memptr() { return const_cast<T*>(memory); }
 template<typename T> void DenseMat<T>::operator+=(const shared_ptr<MetaMat<T>>& M) {
 	if(this->n_rows != M->n_rows || this->n_cols != M->n_cols || this->n_elem != M->n_elem) return;
 	arrayops::inplace_plus(memptr(), M->memptr(), this->n_elem);
-	factored = false;
+	this->factored = false;
 }
 
 template<typename T> void DenseMat<T>::operator-=(const shared_ptr<MetaMat<T>>& M) {
 	if(this->n_rows != M->n_rows || this->n_cols != M->n_cols || this->n_elem != M->n_elem) return;
 	arrayops::inplace_minus(memptr(), M->memptr(), this->n_elem);
-	factored = false;
+	this->factored = false;
 }
 
 template<typename T> void DenseMat<T>::operator*=(const T value) { arrayops::inplace_mul(memptr(), value, this->n_elem); }

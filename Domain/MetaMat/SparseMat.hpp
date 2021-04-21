@@ -73,7 +73,10 @@ template<typename T> SparseMat<T>::SparseMat(const uword in_row, const uword in_
 
 template<typename T> bool SparseMat<T>::is_empty() const { return triplet_mat.is_empty(); }
 
-template<typename T> void SparseMat<T>::zeros() { triplet_mat.zeros(); }
+template<typename T> void SparseMat<T>::zeros() {
+	triplet_mat.zeros();
+	this->factored = false;
+}
 
 template<typename T> void SparseMat<T>::unify(const uword idx) {
 	using index_t = typename decltype(triplet_mat)::index_type;
@@ -103,9 +106,15 @@ template<typename T> const T* SparseMat<T>::memptr() const { throw invalid_argum
 
 template<typename T> T* SparseMat<T>::memptr() { throw invalid_argument("not supproted"); }
 
-template<typename T> void SparseMat<T>::operator+=(const shared_ptr<MetaMat<T>>& in_mat) { triplet_mat += in_mat->triplet_mat; }
+template<typename T> void SparseMat<T>::operator+=(const shared_ptr<MetaMat<T>>& in_mat) {
+	triplet_mat += in_mat->triplet_mat;
+	this->factored = false;
+}
 
-template<typename T> void SparseMat<T>::operator-=(const shared_ptr<MetaMat<T>>& in_mat) { triplet_mat -= in_mat->triplet_mat; }
+template<typename T> void SparseMat<T>::operator-=(const shared_ptr<MetaMat<T>>& in_mat) {
+	triplet_mat -= in_mat->triplet_mat;
+	this->factored = false;
+}
 
 template<typename T> Mat<T> SparseMat<T>::operator*(const Mat<T>& in_mat) { return triplet_mat * in_mat; }
 

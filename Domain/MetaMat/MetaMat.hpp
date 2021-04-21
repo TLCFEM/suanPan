@@ -36,6 +36,8 @@ enum class Precision { MIXED, FULL };
 
 template<typename T> class MetaMat {
 protected:
+	bool factored = false;
+
 	double tolerance = 1E-12;
 
 	Precision precision = Precision::FULL;
@@ -48,9 +50,9 @@ public:
 
 	MetaMat(uword, uword, uword);
 	MetaMat(const MetaMat&) = default;
-	MetaMat(MetaMat&&) noexcept = default;
-	MetaMat& operator=(const MetaMat&) = default;
-	MetaMat& operator=(MetaMat&&) noexcept = default;
+	MetaMat(MetaMat&&) noexcept = delete;
+	MetaMat& operator=(const MetaMat&) = delete;
+	MetaMat& operator=(MetaMat&&) noexcept = delete;
 	virtual ~MetaMat() = default;
 
 	void set_tolerance(double);

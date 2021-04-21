@@ -48,8 +48,6 @@ template<typename T> class SparseMatCUDA final : public SparseMat<T> {
 	void* d_col_idx = nullptr;
 	void* d_row_ptr = nullptr;
 
-	bool factored = false;
-
 	void acquire();
 	void release() const;
 
@@ -62,8 +60,6 @@ public:
 	SparseMatCUDA& operator=(const SparseMatCUDA&) = delete;
 	SparseMatCUDA& operator=(SparseMatCUDA&&) noexcept = delete;
 	~SparseMatCUDA() override;
-
-	void zeros() override;
 
 	unique_ptr<MetaMat<T>> make_copy() override;
 
@@ -108,15 +104,10 @@ template<typename T> SparseMatCUDA<T>::~SparseMatCUDA() {
 	device_dealloc();
 }
 
-template<typename T> void SparseMatCUDA<T>::zeros() {
-	SparseMat<T>::zeros();
-	factored = false;
-}
-
 template<typename T> unique_ptr<MetaMat<T>> SparseMatCUDA<T>::make_copy() { return std::make_unique<SparseMatCUDA<T>>(*this); }
 
 template<typename T> int SparseMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) {
-	if(!factored) {
+	if(!this->factored) {
 		// deallocate memory previously allocated for csr matrix
 		device_dealloc();
 
@@ -151,7 +142,7 @@ template<typename T> int SparseMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) {
 
 		cudaDeviceSynchronize();
 
-		factored = true;
+		this->factored = true;
 	}
 
 	const size_t n_rhs = (std::is_same<T, float>::value || Precision::MIXED == this->precision ? sizeof(float) : sizeof(double)) * B.n_elem;
