@@ -18,8 +18,10 @@
  * @class SparseMatCUDA
  * @brief A SparseMatCUDA class that holds matrices.
  *
+ * The `SparseMatCUDA` class uses CUDA and supports single, double, mixed precision.
+ *
  * @author tlc
- * @date 14/01/2021
+ * @date 21/04/2021
  * @version 0.1.0
  * @file SparseMatCUDA.hpp
  * @addtogroup MetaMat
@@ -33,6 +35,7 @@
 #ifdef SUANPAN_CUDA
 
 #include "SparseMat.hpp"
+#include "csr_form.hpp"
 #include <cusparse.h>
 #include <cusolverSp.h>
 
@@ -41,16 +44,16 @@ template<typename T> class SparseMatCUDA final : public SparseMat<T> {
 	cudaStream_t stream = nullptr;
 	cusparseMatDescr_t descrA = nullptr;
 
-	void* d_val_idx;
-	void* d_col_idx;
-	void* d_row_ptr;
+	void* d_val_idx = nullptr;
+	void* d_col_idx = nullptr;
+	void* d_row_ptr = nullptr;
 
-	void *d_b, *d_x;
+	bool factored = false;
 
 	void acquire();
 	void release() const;
 
-	void device_alloc(size_t, size_t, size_t, size_t);
+	void device_alloc(size_t, size_t);
 	void device_dealloc() const;
 public:
 	SparseMatCUDA(uword, uword, uword = 0);
@@ -59,6 +62,8 @@ public:
 	SparseMatCUDA& operator=(const SparseMatCUDA&) = delete;
 	SparseMatCUDA& operator=(SparseMatCUDA&&) noexcept = delete;
 	~SparseMatCUDA() override;
+
+	void zeros() override;
 
 	unique_ptr<MetaMat<T>> make_copy() override;
 
@@ -72,28 +77,24 @@ template<typename T> void SparseMatCUDA<T>::acquire() {
 	cusparseCreateMatDescr(&descrA);
 	cusparseSetMatType(descrA, CUSPARSE_MATRIX_TYPE_GENERAL);
 	cusparseSetMatIndexBase(descrA, CUSPARSE_INDEX_BASE_ZERO);
+	cudaMalloc(&d_row_ptr, sizeof(int) * (this->n_rows + 1));
 }
 
 template<typename T> void SparseMatCUDA<T>::release() const {
 	if(handle) cusolverSpDestroy(handle);
 	if(stream) cudaStreamDestroy(stream);
 	if(descrA) cusparseDestroyMatDescr(descrA);
+	if(d_row_ptr) cudaFree(d_row_ptr);
 }
 
-template<typename T> void SparseMatCUDA<T>::device_alloc(const size_t n_val, const size_t n_col, const size_t n_row, const size_t n_rhs) {
+template<typename T> void SparseMatCUDA<T>::device_alloc(const size_t n_val, const size_t n_col) {
 	cudaMalloc(&d_val_idx, n_val);
 	cudaMalloc(&d_col_idx, n_col);
-	cudaMalloc(&d_row_ptr, n_row);
-	cudaMalloc(&d_b, n_rhs);
-	cudaMalloc(&d_x, n_rhs);
 }
 
 template<typename T> void SparseMatCUDA<T>::device_dealloc() const {
 	if(d_val_idx) cudaFree(d_val_idx);
 	if(d_col_idx) cudaFree(d_col_idx);
-	if(d_row_ptr) cudaFree(d_row_ptr);
-	if(d_b) cudaFree(d_b);
-	if(d_x) cudaFree(d_x);
 }
 
 template<typename T> SparseMatCUDA<T>::SparseMatCUDA(const uword in_row, const uword in_col, const uword in_elem)
@@ -102,39 +103,123 @@ template<typename T> SparseMatCUDA<T>::SparseMatCUDA(const uword in_row, const u
 template<typename T> SparseMatCUDA<T>::SparseMatCUDA(const SparseMatCUDA& other)
 	: SparseMat<T>(other) { acquire(); }
 
-template<typename T> SparseMatCUDA<T>::~SparseMatCUDA() { release(); }
+template<typename T> SparseMatCUDA<T>::~SparseMatCUDA() {
+	release();
+	device_dealloc();
+}
+
+template<typename T> void SparseMatCUDA<T>::zeros() {
+	SparseMat<T>::zeros();
+	factored = false;
+}
 
 template<typename T> unique_ptr<MetaMat<T>> SparseMatCUDA<T>::make_copy() { return std::make_unique<SparseMatCUDA<T>>(*this); }
 
 template<typename T> int SparseMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) {
-	csr_form<T, int> csr_mat(this->triplet_mat);
+	if(!factored) {
+		// deallocate memory previously allocated for csr matrix
+		device_dealloc();
 
-	auto n_val = sizeof(double) * csr_mat.n_elem;
-	auto n_col = sizeof(int) * csr_mat.n_elem;
-	auto n_row = sizeof(int) * (csr_mat.n_rows + 1);
-	auto n_rhs = sizeof(double) * B.n_elem;
+		if(std::is_same<T, float>::value || Precision::MIXED == this->precision) {
+			// convert to csr form
+			const csr_form<float, int> csr_mat(this->triplet_mat);
 
-	device_alloc(n_val, n_col, n_row, n_rhs);
+			const size_t n_val = sizeof(float) * csr_mat.n_elem;
+			const size_t n_col = sizeof(int) * csr_mat.n_elem;
 
-	cudaMemcpyAsync(d_val_idx, csr_mat.val_idx, n_val, cudaMemcpyHostToDevice, stream);
-	cudaMemcpyAsync(d_col_idx, csr_mat.col_idx, n_col, cudaMemcpyHostToDevice, stream);
-	cudaMemcpyAsync(d_row_ptr, csr_mat.row_ptr, n_row, cudaMemcpyHostToDevice, stream);
+			// allocate memory for value and column
+			device_alloc(n_val, n_col);
 
-	cudaMemcpyAsync(d_b, B.memptr(), n_rhs, cudaMemcpyHostToDevice, stream);
+			cudaMemcpyAsync(d_val_idx, csr_mat.val_idx, n_val, cudaMemcpyHostToDevice, stream);
+			cudaMemcpyAsync(d_col_idx, csr_mat.col_idx, n_col, cudaMemcpyHostToDevice, stream);
+			cudaMemcpyAsync(d_row_ptr, csr_mat.row_ptr, sizeof(int) * (csr_mat.n_rows + 1), cudaMemcpyHostToDevice, stream);
+		}
+		else {
+			// convert to csr form
+			const csr_form<double, int> csr_mat(this->triplet_mat);
+
+			const size_t n_val = sizeof(double) * csr_mat.n_elem;
+			const size_t n_col = sizeof(int) * csr_mat.n_elem;
+
+			// allocate memory for value and column
+			device_alloc(n_val, n_col);
+
+			cudaMemcpyAsync(d_val_idx, csr_mat.val_idx, n_val, cudaMemcpyHostToDevice, stream);
+			cudaMemcpyAsync(d_col_idx, csr_mat.col_idx, n_col, cudaMemcpyHostToDevice, stream);
+			cudaMemcpyAsync(d_row_ptr, csr_mat.row_ptr, sizeof(int) * (csr_mat.n_rows + 1), cudaMemcpyHostToDevice, stream);
+		}
+
+		cudaDeviceSynchronize();
+
+		factored = true;
+	}
+
+	const size_t n_rhs = (std::is_same<T, float>::value || Precision::MIXED == this->precision ? sizeof(float) : sizeof(double)) * B.n_elem;
+
+	void* d_b = nullptr;
+	void* d_x = nullptr;
+
+	cudaMalloc(&d_b, n_rhs);
+	cudaMalloc(&d_x, n_rhs);
 
 	int singularity;
 
-	cudaDeviceSynchronize();
+	if(std::is_same<T, float>::value) {
+		cudaMemcpy(d_b, B.memptr(), n_rhs, cudaMemcpyHostToDevice);
 
-	for(auto I = 0; I < B.n_elem; I += B.n_rows) cusolverSpDcsrlsvqr(handle, csr_mat.n_rows, csr_mat.n_elem, descrA, (double*)d_val_idx, (int*)d_row_ptr, (int*)d_col_idx, (double*)d_b + I, this->tolerance, 0, (double*)d_x + I, &singularity);
+		for(auto I = 0; I < B.n_elem; I += B.n_rows) {
+			cusolverSpScsrlsvqr(handle, this->n_rows, this->triplet_mat.n_elem, descrA, (float*)d_val_idx, (int*)d_row_ptr, (int*)d_col_idx, (float*)d_b + I, this->tolerance, 0, (float*)d_x + I, &singularity);
+			cudaDeviceSynchronize();
+		}
 
-	cudaDeviceSynchronize();
+		X.set_size(arma::size(B));
 
-	X.set_size(arma::size(B));
+		cudaMemcpy(X.memptr(), d_x, n_rhs, cudaMemcpyDeviceToHost);
+	}
+	else if(Precision::FULL == this->precision) {
+		cudaMemcpy(d_b, B.memptr(), n_rhs, cudaMemcpyHostToDevice);
 
-	cudaMemcpy(X.memptr(), d_x, n_rhs, cudaMemcpyDeviceToHost);
+		for(auto I = 0; I < B.n_elem; I += B.n_rows) {
+			cusolverSpDcsrlsvqr(handle, this->n_rows, this->triplet_mat.n_elem, descrA, (double*)d_val_idx, (int*)d_row_ptr, (int*)d_col_idx, (double*)d_b + I, this->tolerance, 0, (double*)d_x + I, &singularity);
+			cudaDeviceSynchronize();
+		}
 
-	device_dealloc();
+		X.set_size(arma::size(B));
+
+		cudaMemcpy(X.memptr(), d_x, n_rhs, cudaMemcpyDeviceToHost);
+	}
+	else {
+		X = arma::zeros(B.n_rows, B.n_cols);
+
+		mat full_residual = B;
+
+		auto multiplier = 1.;
+
+		auto counter = 0;
+		while(++counter < 20) {
+			auto residual = conv_to<fmat>::from(full_residual / multiplier);
+
+			cudaMemcpy(d_b, residual.memptr(), n_rhs, cudaMemcpyHostToDevice);
+
+			for(auto I = 0; I < B.n_elem; I += B.n_rows) {
+				cusolverSpScsrlsvqr(handle, this->n_rows, this->triplet_mat.n_elem, descrA, (float*)d_val_idx, (int*)d_row_ptr, (int*)d_col_idx, (float*)d_b + I, this->tolerance, 0, (float*)d_x + I, &singularity);
+				cudaDeviceSynchronize();
+			}
+
+			cudaMemcpy(residual.memptr(), d_x, n_rhs, cudaMemcpyDeviceToHost);
+
+			const mat incre = multiplier * conv_to<mat>::from(residual);
+
+			X += incre;
+
+			suanpan_debug("mixed precision algorithm multiplier: %.5E\n", multiplier = arma::norm(full_residual -= this->operator*(incre)));
+
+			if(multiplier < this->tolerance) break;
+		}
+	}
+
+	if(d_b) cudaFree(d_b);
+	if(d_x) cudaFree(d_x);
 
 	return SUANPAN_SUCCESS;
 }

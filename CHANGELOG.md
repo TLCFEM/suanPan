@@ -12,6 +12,8 @@
 4. update `Armadillo` to version 10.4
 5. add functionality to check new version
 6. add `FEAST` solver
+7. improve mixed precision solver performance
+8. add `CUDA` solver for dense matrix
 
 ## version 1.3
 
