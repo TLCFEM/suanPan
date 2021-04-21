@@ -26,91 +26,198 @@
  * @{
  */
 
+// ReSharper disable CppCStyleCast
 #ifndef SPARSEMATSUPERLU_HPP
 #define SPARSEMATSUPERLU_HPP
 
 #include "SparseMat.hpp"
-
-#ifdef SUANPAN_SUPERLUMT
-
-extern int SUANPAN_NUM_THREADS;
-
-typedef enum { SLU_NC, SLU_NCP, SLU_NR, SLU_SC, SLU_SCP, SLU_SR, SLU_DN, SLU_NR_loc } Stype_t;
-
-typedef enum { SLU_S, SLU_D, SLU_C, SLU_Z } Dtype_t;
-
-typedef enum { SLU_GE, SLU_TRLU, SLU_TRUU, SLU_TRL, SLU_TRU, SLU_SYL, SLU_SYU, SLU_HEL, SLU_HEU } Mtype_t;
-
-typedef struct {
-	Stype_t Stype;
-	Dtype_t Dtype;
-	Mtype_t Mtype;
-	int nrow;
-	int ncol;
-	void* Store;
-} SuperMatrix;
-
-extern "C" {
-void dCreate_CompCol_Matrix(SuperMatrix*, int, int, int, double*, int*, int*, Stype_t, Dtype_t, Mtype_t);
-void dCreate_Dense_Matrix(SuperMatrix*, int, int, double*, int, Stype_t, Dtype_t, Mtype_t);
-void pdgssv(int, SuperMatrix*, int*, int*, SuperMatrix*, SuperMatrix*, SuperMatrix*, int*);
-void Destroy_SuperMatrix_Store(SuperMatrix*);
-void Destroy_CompCol_NCP(SuperMatrix*);
-void Destroy_SuperNode_SCP(SuperMatrix*);
-void get_perm_c(int, SuperMatrix*, int*);
-}
-
-#endif
+#include "csc_form.hpp"
+#include <superlu-mt/superlu-mt.h>
 
 template<typename T> class SparseMatSuperLU final : public SparseMat<T> {
+	SuperMatrix A{}, L{}, U{};
+
+	superlu_array_wrangler<int> perm_r;
+	superlu_array_wrangler<int> perm_c;
+
+	superlu::superlu_options_t options;
+
+	superlu_stat_wrangler stat;
+
+	void* t_val = nullptr;
+	int* t_row = nullptr;
+	int* t_col = nullptr;
+
+	bool allocated = false;
+
 #ifdef SUANPAN_SUPERLUMT
-	podarray<int> perm_r, perm_c;
+	const int ordering_num = 1;
 #endif
+
+	template<typename ET> void alloc_supermatrix(csc_form<ET, int>&&);
+	void dealloc_supermatrix();
 public:
-	using SparseMat<T>::SparseMat;
+	SparseMatSuperLU(uword, uword, uword = 0);
+	SparseMatSuperLU(const SparseMatSuperLU&);
+	SparseMatSuperLU(SparseMatSuperLU&&) noexcept = delete;
+	SparseMatSuperLU& operator=(const SparseMatSuperLU&) = delete;
+	SparseMatSuperLU& operator=(SparseMatSuperLU&&) noexcept = delete;
+	~SparseMatSuperLU() override;
+
+	void zeros() override;
 
 	unique_ptr<MetaMat<T>> make_copy() override;
 
 	int solve(Mat<T>&, const Mat<T>&) override;
+	int solve_trs(Mat<T>&, const Mat<T>&);
 };
+
+template<typename T> template<typename ET> void SparseMatSuperLU<T>::alloc_supermatrix(csc_form<ET, int>&& in) {
+	t_val = in.val_idx;
+	t_row = in.row_idx;
+	t_col = in.col_ptr;
+
+	in.val_idx = nullptr;
+	in.row_idx = nullptr;
+	in.col_ptr = nullptr;
+
+	if(std::is_same<ET, double>::value) {
+		using E = double;
+		dCreate_CompCol_Matrix(&A, in.n_rows, in.n_cols, in.n_elem, (E*)t_val, t_row, t_col, Stype_t::SLU_NC, Dtype_t::SLU_D, Mtype_t::SLU_GE);
+	}
+	else {
+		using E = float;
+		sCreate_CompCol_Matrix(&A, in.n_rows, in.n_cols, in.n_elem, (E*)t_val, t_row, t_col, Stype_t::SLU_NC, Dtype_t::SLU_S, Mtype_t::SLU_GE);
+	}
+
+	allocated = true;
+}
+
+template<typename T> void SparseMatSuperLU<T>::dealloc_supermatrix() {
+	if(std::is_same<T, float>::value || Precision::MIXED == this->precision) delete[] static_cast<float*>(t_val);
+	else delete[] static_cast<double*>(t_val);
+
+	delete[]t_row;
+	delete[]t_col;
+
+	if(!allocated) return;
+
+	Destroy_SuperMatrix_Store(&A);
+#ifdef SUANPAN_SUPERLUMT
+	Destroy_SuperNode_SCP(&L);
+	Destroy_CompCol_NCP(&U);
+#else
+	Destroy_SuperNode_Matrix(&L);
+	Destroy_CompCol_Matrix(&U);
+#endif
+	allocated = false;
+}
+
+template<typename T> SparseMatSuperLU<T>::SparseMatSuperLU(const uword in_row, const uword in_col, const uword in_elem)
+	: SparseMat<T>(in_row, in_col, in_elem)
+	, perm_r(this->n_rows + 1)
+	, perm_c(this->n_cols + 1) { set_default_options(&options); }
+
+template<typename T> SparseMatSuperLU<T>::SparseMatSuperLU(const SparseMatSuperLU& other)
+	: SparseMat<T>(other)
+	, perm_r(this->n_rows + 1)
+	, perm_c(this->n_cols + 1) { set_default_options(&options); }
+
+template<typename T> SparseMatSuperLU<T>::~SparseMatSuperLU() { dealloc_supermatrix(); }
+
+template<typename T> void SparseMatSuperLU<T>::zeros() {
+	SparseMat<T>::zeros();
+	dealloc_supermatrix();
+}
 
 template<typename T> unique_ptr<MetaMat<T>> SparseMatSuperLU<T>::make_copy() { return std::make_unique<SparseMatSuperLU<T>>(*this); }
 
 template<typename T> int SparseMatSuperLU<T>::solve(Mat<T>& out_mat, const Mat<T>& in_mat) {
+	if(!this->factored) {
+		this->factored = true;
+
+		auto flag = 0;
+
+		if(std::is_same<T, float>::value || Precision::FULL == this->precision) {
+			alloc_supermatrix(csc_form<T, int>(this->triplet_mat));
+
+			out_mat = in_mat;
+
+			superlu_supermatrix_wrangler B;
+			sp_auxlib::wrap_to_supermatrix(B.get_ref(), out_mat);
+
 #ifdef SUANPAN_SUPERLUMT
-	out_mat = in_mat;
+			get_perm_c(ordering_num, &A, perm_c.get_ptr());
+			if(std::is_same<T, float>::value) psgssv(SUANPAN_NUM_THREADS, &A, perm_c.get_ptr(), perm_r.get_ptr(), &L, &U, B.get_ptr(), &flag);
+			else pdgssv(SUANPAN_NUM_THREADS, &A, perm_c.get_ptr(), perm_r.get_ptr(), &L, &U, B.get_ptr(), &flag);
+#else
+			superlu::gssv<T>(&options, &A, perm_c.get_ptr(), perm_r.get_ptr(), &L, &U, B.get_ptr(), stat.get_ptr(), &flag);
+#endif
 
-	const csc_form<double, int> csc_mat(this->triplet_mat);
+			return flag;
+		}
 
-	SuperMatrix A, L, U, B;
+		alloc_supermatrix(csc_form<float, int>(this->triplet_mat));
 
-	dCreate_CompCol_Matrix(&A, csc_mat.n_rows, csc_mat.n_cols, csc_mat.n_elem, csc_mat.val_idx, csc_mat.row_idx, csc_mat.col_ptr, SLU_NC, SLU_D, SLU_GE);
-	dCreate_Dense_Matrix(&B, static_cast<int>(out_mat.n_rows), static_cast<int>(out_mat.n_cols), out_mat.memptr(), static_cast<int>(out_mat.n_rows), SLU_DN, SLU_D, SLU_GE);
+		const fmat f_mat(arma::size(in_mat));
 
-	perm_r.set_size(csc_mat.n_rows);
-	perm_c.set_size(csc_mat.n_cols);
+		superlu_supermatrix_wrangler B;
+		sp_auxlib::wrap_to_supermatrix(B.get_ref(), f_mat);
 
-	get_perm_c(1, &A, perm_c.memptr());
+#ifdef SUANPAN_SUPERLUMT
+		get_perm_c(ordering_num, &A, perm_c.get_ptr());
+		psgssv(SUANPAN_NUM_THREADS, &A, perm_c.get_ptr(), perm_r.get_ptr(), &L, &U, B.get_ptr(), &flag);
+#else
+		superlu::gssv<float>(&options, &A, perm_c.get_ptr(), perm_r.get_ptr(), &L, &U, B.get_ptr(), stat.get_ptr(), &flag);
+#endif
 
+		return 0 == flag ? solve_trs(out_mat, in_mat) : flag;
+	}
+
+	return solve_trs(out_mat, in_mat);
+}
+
+template<typename T> int SparseMatSuperLU<T>::solve_trs(Mat<T>& out_mat, const Mat<T>& in_mat) {
 	auto flag = 0;
 
-	pdgssv(SUANPAN_NUM_THREADS, &A, perm_c.memptr(), perm_r.memptr(), &L, &U, &B, &flag);
+	if(std::is_same<T, float>::value || Precision::FULL == this->precision) {
+		out_mat = in_mat;
 
-	Destroy_SuperMatrix_Store(&A);
-	Destroy_SuperMatrix_Store(&B);
-	Destroy_SuperNode_SCP(&L);
-	Destroy_CompCol_NCP(&U);
+		superlu_supermatrix_wrangler B;
+		sp_auxlib::wrap_to_supermatrix(B.get_ref(), out_mat);
+
+		superlu::gstrs<T>(options.Trans, &L, &U, perm_c.get_ptr(), perm_r.get_ptr(), B.get_ptr(), stat.get_ptr(), &flag);
+
+		return flag;
+	}
+
+	out_mat.zeros(arma::size(in_mat));
+
+	mat full_residual = in_mat;
+
+	auto multiplier = 1.;
+
+	auto counter = 0;
+	while(++counter < 20) {
+		auto residual = conv_to<fmat>::from(full_residual / multiplier);
+
+		superlu_supermatrix_wrangler B;
+		sp_auxlib::wrap_to_supermatrix(B.get_ref(), residual);
+
+		superlu::gstrs<float>(options.Trans, &L, &U, perm_c.get_ptr(), perm_r.get_ptr(), B.get_ptr(), stat.get_ptr(), &flag);
+
+		if(0 != flag) break;
+
+		const mat incre = multiplier * conv_to<mat>::from(residual);
+
+		out_mat += incre;
+
+		suanpan_debug("mixed precision algorithm multiplier: %.5E\n", multiplier = norm(full_residual -= this->operator*(incre)));
+
+		if(multiplier < this->tolerance) break;
+	}
 
 	return flag;
-#else
-	csc_form<T, uword> csc_mat(this->triplet_mat);
-
-	const uvec row_idx(csc_mat.row_idx, csc_mat.n_elem, false, false);
-	const uvec col_ptr(csc_mat.col_ptr, csc_mat.n_cols + 1, false, false);
-	const Col<T> val_idx(csc_mat.val_idx, csc_mat.n_elem, false, false);
-
-	return spsolve(out_mat, SpMat<T>(row_idx, col_ptr, val_idx, csc_mat.n_rows, csc_mat.n_cols), in_mat) ? SUANPAN_SUCCESS : SUANPAN_FAIL;
-#endif
 }
 
 #endif
