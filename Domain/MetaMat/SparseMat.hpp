@@ -88,6 +88,7 @@ template<typename T> void SparseMat<T>::unify(const uword idx) {
 	for(index_t I = 0; I < triplet_mat.n_elem; ++I) if(triplet_mat.row_idx[I] == t_idx || triplet_mat.col_idx[I] == t_idx) triplet_mat.val_idx[I] = 0.;
 #endif
 	triplet_mat.at(t_idx, t_idx) = 1.;
+	this->factored = false;
 }
 
 template<typename T> T SparseMat<T>::max() const { return triplet_mat.max(); }
@@ -98,6 +99,7 @@ template<typename T> const T& SparseMat<T>::operator()(const uword in_row, const
 }
 
 template<typename T> T& SparseMat<T>::at(const uword in_row, const uword in_col) {
+	this->factored = false;
 	using index_t = typename decltype(triplet_mat)::index_type;
 	return triplet_mat.at(static_cast<index_t>(in_row), static_cast<index_t>(in_col));
 }
