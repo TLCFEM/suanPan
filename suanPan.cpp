@@ -41,8 +41,6 @@ int main(int argc, char** argv) {
 	std::cout << "\033[1;32m";
 #endif
 
-	if(check_debugger()) return 0;
-
 	argument_parser(argc, argv);
 
 #ifdef SUANPAN_WIN

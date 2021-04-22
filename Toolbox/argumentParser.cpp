@@ -28,15 +28,17 @@ using std::ofstream;
 using std::string;
 
 void argument_parser(const int argc, char** argv) {
+	if(check_debugger()) return;
+
+	SUANPAN_EXE = argv[0];
+
+	check_version(SUANPAN_EXE);
+
 	string input_file_name;
 	const auto buffer_backup = cout.rdbuf();
 
 	wall_clock T;
 	T.tic();
-
-	SUANPAN_EXE = argv[0];
-
-	check_version(SUANPAN_EXE);
 
 	if(argc > 1) {
 		ofstream output_file;
