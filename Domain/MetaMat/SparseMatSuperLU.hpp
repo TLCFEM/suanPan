@@ -35,18 +35,20 @@
 #include <superlu-mt/superlu-mt.h>
 
 template<typename T> class SparseMatSuperLU final : public SparseMat<T> {
-	SuperMatrix A{}, L{}, U{};
+	SuperMatrix A{}, L{}, U{}, B{};
 
-	superlu_array_wrangler<int> perm_r;
-	superlu_array_wrangler<int> perm_c;
+#ifndef SUANPAN_SUPERLUMT
+	superlu_options_t options;
+#endif
 
-	superlu::superlu_options_t options;
-
-	superlu_stat_wrangler stat;
+	SuperLUStat_t* stat = nullptr;
 
 	void* t_val = nullptr;
 	int* t_row = nullptr;
 	int* t_col = nullptr;
+
+	int* perm_r = nullptr;
+	int* perm_c = nullptr;
 
 	bool allocated = false;
 
@@ -56,6 +58,10 @@ template<typename T> class SparseMatSuperLU final : public SparseMat<T> {
 
 	template<typename ET> void alloc_supermatrix(csc_form<ET, int>&&);
 	void dealloc_supermatrix();
+
+	template<typename ET> void wrap_b(const Mat<ET>& in_mat);
+	template<typename ET> void tri_solve(int&);
+	template<typename ET> void full_solve(int&);
 
 	int solve_trs(Mat<T>&, Mat<T>&&);
 	int solve_trs(Mat<T>&, const Mat<T>&);
@@ -95,6 +101,9 @@ template<typename T> template<typename ET> void SparseMatSuperLU<T>::alloc_super
 		sCreate_CompCol_Matrix(&A, in.n_rows, in.n_cols, in.n_elem, (E*)t_val, t_row, t_col, Stype_t::SLU_NC, Dtype_t::SLU_S, Mtype_t::SLU_GE);
 	}
 
+	perm_r = (int*)superlu_malloc(sizeof(int) * (this->n_rows + 1));
+	perm_c = (int*)superlu_malloc(sizeof(int) * (this->n_cols + 1));
+
 	allocated = true;
 }
 
@@ -115,20 +124,67 @@ template<typename T> void SparseMatSuperLU<T>::dealloc_supermatrix() {
 	Destroy_SuperNode_Matrix(&L);
 	Destroy_CompCol_Matrix(&U);
 #endif
+
+	if(perm_r) superlu_free(perm_r);
+	if(perm_c) superlu_free(perm_c);
+
 	allocated = false;
 }
 
+template<typename T> template<typename ET> void SparseMatSuperLU<T>::wrap_b(const Mat<ET>& in_mat) {
+	if(std::is_same<ET, float>::value) {
+		using E = float;
+		sCreate_Dense_Matrix(&B, (int)in_mat.n_rows, (int)in_mat.n_cols, (E*)in_mat.memptr(), (int)in_mat.n_rows, Stype_t::SLU_DN, Dtype_t::SLU_S, Mtype_t::SLU_GE);
+	}
+	else {
+		using E = double;
+		dCreate_Dense_Matrix(&B, (int)in_mat.n_rows, (int)in_mat.n_cols, (E*)in_mat.memptr(), (int)in_mat.n_rows, Stype_t::SLU_DN, Dtype_t::SLU_D, Mtype_t::SLU_GE);
+	}
+}
+
+template<typename T> template<typename ET> void SparseMatSuperLU<T>::tri_solve(int& flag) {
+#ifdef SUANPAN_SUPERLUMT
+	if(std::is_same<ET, float>::value) sgstrs(NOTRANS, &L, &U, perm_c, perm_r, &B, stat, &flag);
+	else dgstrs(NOTRANS, &L, &U, perm_c, perm_r, &B, stat, &flag);
+#else
+	superlu::gstrs<ET>(options.Trans, &L, &U, perm_c, perm_r, &B, stat, &flag);
+#endif
+
+	Destroy_SuperMatrix_Store(&B);
+}
+
+template<typename T> template<typename ET> void SparseMatSuperLU<T>::full_solve(int& flag) {
+#ifdef SUANPAN_SUPERLUMT
+	get_perm_c(ordering_num, &A, perm_c);
+	if(std::is_same<ET, float>::value) psgssv(SUANPAN_NUM_THREADS, &A, perm_c, perm_r, &L, &U, &B, &flag);
+	else pdgssv(SUANPAN_NUM_THREADS, &A, perm_c, perm_r, &L, &U, &B, &flag);
+#else
+	superlu::gssv<ET>(&options, &A, perm_c, perm_r, &L, &U, &B, stat, &flag);
+#endif
+
+	Destroy_SuperMatrix_Store(&B);
+}
+
 template<typename T> SparseMatSuperLU<T>::SparseMatSuperLU(const uword in_row, const uword in_col, const uword in_elem)
-	: SparseMat<T>(in_row, in_col, in_elem)
-	, perm_r(this->n_rows + 1)
-	, perm_c(this->n_cols + 1) { set_default_options(&options); }
+	: SparseMat<T>(in_row, in_col, in_elem) {
+#ifndef SUANPAN_SUPERLUMT
+	set_default_options(&options);
+#endif
+	StatInit(stat);
+}
 
 template<typename T> SparseMatSuperLU<T>::SparseMatSuperLU(const SparseMatSuperLU& other)
-	: SparseMat<T>(other)
-	, perm_r(this->n_rows + 1)
-	, perm_c(this->n_cols + 1) { set_default_options(&options); }
+	: SparseMat<T>(other) {
+#ifndef SUANPAN_SUPERLUMT
+	set_default_options(&options);
+#endif
+	StatInit(stat);
+}
 
-template<typename T> SparseMatSuperLU<T>::~SparseMatSuperLU() { dealloc_supermatrix(); }
+template<typename T> SparseMatSuperLU<T>::~SparseMatSuperLU() {
+	dealloc_supermatrix();
+	StatFree(stat);
+}
 
 template<typename T> void SparseMatSuperLU<T>::zeros() {
 	SparseMat<T>::zeros();
@@ -149,33 +205,18 @@ template<typename T> int SparseMatSuperLU<T>::solve(Mat<T>& out_mat, const Mat<T
 
 		out_mat = in_mat;
 
-		superlu_supermatrix_wrangler B;
-		sp_auxlib::wrap_to_supermatrix(B.get_ref(), out_mat);
+		wrap_b(out_mat);
 
-#ifdef SUANPAN_SUPERLUMT
-		get_perm_c(ordering_num, &A, perm_c.get_ptr());
-		if(std::is_same<T, float>::value) psgssv(SUANPAN_NUM_THREADS, &A, perm_c.get_ptr(), perm_r.get_ptr(), &L, &U, B.get_ptr(), &flag);
-		else pdgssv(SUANPAN_NUM_THREADS, &A, perm_c.get_ptr(), perm_r.get_ptr(), &L, &U, B.get_ptr(), &flag);
-#else
-		superlu::gssv<T>(&options, &A, perm_c.get_ptr(), perm_r.get_ptr(), &L, &U, B.get_ptr(), stat.get_ptr(), &flag);
-#endif
+		full_solve<T>(flag);
 
 		return flag;
 	}
 
 	alloc_supermatrix(csc_form<float, int>(this->triplet_mat));
 
-	const fmat f_mat(arma::size(in_mat));
+	wrap_b(fmat(arma::size(in_mat)));
 
-	superlu_supermatrix_wrangler B;
-	sp_auxlib::wrap_to_supermatrix(B.get_ref(), f_mat);
-
-#ifdef SUANPAN_SUPERLUMT
-	get_perm_c(ordering_num, &A, perm_c.get_ptr());
-	psgssv(SUANPAN_NUM_THREADS, &A, perm_c.get_ptr(), perm_r.get_ptr(), &L, &U, B.get_ptr(), &flag);
-#else
-	superlu::gssv<float>(&options, &A, perm_c.get_ptr(), perm_r.get_ptr(), &L, &U, B.get_ptr(), stat.get_ptr(), &flag);
-#endif
+	full_solve<float>(flag);
 
 	return 0 == flag ? solve_trs(out_mat, in_mat) : flag;
 }
@@ -186,10 +227,9 @@ template<typename T> int SparseMatSuperLU<T>::solve_trs(Mat<T>& out_mat, const M
 	if(std::is_same<T, float>::value || Precision::FULL == this->precision) {
 		out_mat = in_mat;
 
-		superlu_supermatrix_wrangler B;
-		sp_auxlib::wrap_to_supermatrix(B.get_ref(), out_mat);
+		wrap_b(out_mat);
 
-		superlu::gstrs<T>(options.Trans, &L, &U, perm_c.get_ptr(), perm_r.get_ptr(), B.get_ptr(), stat.get_ptr(), &flag);
+		tri_solve<T>(flag);
 
 		return flag;
 	}
@@ -204,10 +244,9 @@ template<typename T> int SparseMatSuperLU<T>::solve_trs(Mat<T>& out_mat, const M
 	while(++counter < 20) {
 		auto residual = conv_to<fmat>::from(full_residual / multiplier);
 
-		superlu_supermatrix_wrangler B;
-		sp_auxlib::wrap_to_supermatrix(B.get_ref(), residual);
+		wrap_b(residual);
 
-		superlu::gstrs<float>(options.Trans, &L, &U, perm_c.get_ptr(), perm_r.get_ptr(), B.get_ptr(), stat.get_ptr(), &flag);
+		tri_solve<float>(flag);
 
 		if(0 != flag) break;
 
@@ -233,16 +272,9 @@ template<typename T> int SparseMatSuperLU<T>::solve(Mat<T>& out_mat, Mat<T>&& in
 	if(std::is_same<T, float>::value || Precision::FULL == this->precision) {
 		alloc_supermatrix(csc_form<T, int>(this->triplet_mat));
 
-		superlu_supermatrix_wrangler B;
-		sp_auxlib::wrap_to_supermatrix(B.get_ref(), in_mat);
+		wrap_b(in_mat);
 
-#ifdef SUANPAN_SUPERLUMT
-		get_perm_c(ordering_num, &A, perm_c.get_ptr());
-		if(std::is_same<T, float>::value) psgssv(SUANPAN_NUM_THREADS, &A, perm_c.get_ptr(), perm_r.get_ptr(), &L, &U, B.get_ptr(), &flag);
-		else pdgssv(SUANPAN_NUM_THREADS, &A, perm_c.get_ptr(), perm_r.get_ptr(), &L, &U, B.get_ptr(), &flag);
-#else
-		superlu::gssv<T>(&options, &A, perm_c.get_ptr(), perm_r.get_ptr(), &L, &U, B.get_ptr(), stat.get_ptr(), &flag);
-#endif
+		full_solve<T>(flag);
 
 		out_mat = std::move(in_mat);
 
@@ -251,17 +283,9 @@ template<typename T> int SparseMatSuperLU<T>::solve(Mat<T>& out_mat, Mat<T>&& in
 
 	alloc_supermatrix(csc_form<float, int>(this->triplet_mat));
 
-	const fmat f_mat(arma::size(in_mat));
+	wrap_b(fmat(arma::size(in_mat)));
 
-	superlu_supermatrix_wrangler B;
-	sp_auxlib::wrap_to_supermatrix(B.get_ref(), f_mat);
-
-#ifdef SUANPAN_SUPERLUMT
-	get_perm_c(ordering_num, &A, perm_c.get_ptr());
-	psgssv(SUANPAN_NUM_THREADS, &A, perm_c.get_ptr(), perm_r.get_ptr(), &L, &U, B.get_ptr(), &flag);
-#else
-	superlu::gssv<float>(&options, &A, perm_c.get_ptr(), perm_r.get_ptr(), &L, &U, B.get_ptr(), stat.get_ptr(), &flag);
-#endif
+	full_solve<float>(flag);
 
 	return 0 == flag ? solve_trs(out_mat, std::forward<Mat<T>>(in_mat)) : flag;
 }
@@ -270,10 +294,9 @@ template<typename T> int SparseMatSuperLU<T>::solve_trs(Mat<T>& out_mat, Mat<T>&
 	auto flag = 0;
 
 	if(std::is_same<T, float>::value || Precision::FULL == this->precision) {
-		superlu_supermatrix_wrangler B;
-		sp_auxlib::wrap_to_supermatrix(B.get_ref(), in_mat);
+		wrap_b(in_mat);
 
-		superlu::gstrs<T>(options.Trans, &L, &U, perm_c.get_ptr(), perm_r.get_ptr(), B.get_ptr(), stat.get_ptr(), &flag);
+		tri_solve<T>(flag);
 
 		out_mat = std::move(in_mat);
 
@@ -288,10 +311,9 @@ template<typename T> int SparseMatSuperLU<T>::solve_trs(Mat<T>& out_mat, Mat<T>&
 	while(++counter < 20) {
 		auto residual = conv_to<fmat>::from(in_mat / multiplier);
 
-		superlu_supermatrix_wrangler B;
-		sp_auxlib::wrap_to_supermatrix(B.get_ref(), residual);
+		wrap_b(residual);
 
-		superlu::gstrs<float>(options.Trans, &L, &U, perm_c.get_ptr(), perm_r.get_ptr(), B.get_ptr(), stat.get_ptr(), &flag);
+		tri_solve<float>(flag);
 
 		if(0 != flag) break;
 
