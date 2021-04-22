@@ -41,7 +41,7 @@ template<typename T> class SparseMatSuperLU final : public SparseMat<T> {
 	superlu_options_t options;
 #endif
 
-	SuperLUStat_t* stat = nullptr;
+	SuperLUStat_t stat{};
 
 	void* t_val = nullptr;
 	int* t_row = nullptr;
@@ -144,10 +144,10 @@ template<typename T> template<typename ET> void SparseMatSuperLU<T>::wrap_b(cons
 
 template<typename T> template<typename ET> void SparseMatSuperLU<T>::tri_solve(int& flag) {
 #ifdef SUANPAN_SUPERLUMT
-	if(std::is_same<ET, float>::value) sgstrs(NOTRANS, &L, &U, perm_c, perm_r, &B, stat, &flag);
-	else dgstrs(NOTRANS, &L, &U, perm_c, perm_r, &B, stat, &flag);
+	if(std::is_same<ET, float>::value) sgstrs(NOTRANS, &L, &U, perm_c, perm_r, &B, &stat, &flag);
+	else dgstrs(NOTRANS, &L, &U, perm_c, perm_r, &B, &stat, &flag);
 #else
-	superlu::gstrs<ET>(options.Trans, &L, &U, perm_c, perm_r, &B, stat, &flag);
+	superlu::gstrs<ET>(options.Trans, &L, &U, perm_c, perm_r, &B, &stat, &flag);
 #endif
 
 	Destroy_SuperMatrix_Store(&B);
@@ -159,7 +159,7 @@ template<typename T> template<typename ET> void SparseMatSuperLU<T>::full_solve(
 	if(std::is_same<ET, float>::value) psgssv(SUANPAN_NUM_THREADS, &A, perm_c, perm_r, &L, &U, &B, &flag);
 	else pdgssv(SUANPAN_NUM_THREADS, &A, perm_c, perm_r, &L, &U, &B, &flag);
 #else
-	superlu::gssv<ET>(&options, &A, perm_c, perm_r, &L, &U, &B, stat, &flag);
+	superlu::gssv<ET>(&options, &A, perm_c, perm_r, &L, &U, &B, &stat, &flag);
 #endif
 
 	Destroy_SuperMatrix_Store(&B);
@@ -170,7 +170,10 @@ template<typename T> SparseMatSuperLU<T>::SparseMatSuperLU(const uword in_row, c
 #ifndef SUANPAN_SUPERLUMT
 	set_default_options(&options);
 #endif
-	StatInit(stat);
+
+	arrayops::fill_zeros(reinterpret_cast<char*>(&stat), sizeof(SuperLUStat_t));
+
+	StatInit(&stat);
 }
 
 template<typename T> SparseMatSuperLU<T>::SparseMatSuperLU(const SparseMatSuperLU& other)
@@ -178,12 +181,15 @@ template<typename T> SparseMatSuperLU<T>::SparseMatSuperLU(const SparseMatSuperL
 #ifndef SUANPAN_SUPERLUMT
 	set_default_options(&options);
 #endif
-	StatInit(stat);
+
+	arrayops::fill_zeros(reinterpret_cast<char*>(&stat), sizeof(SuperLUStat_t));
+
+	StatInit(&stat);
 }
 
 template<typename T> SparseMatSuperLU<T>::~SparseMatSuperLU() {
 	dealloc_supermatrix();
-	StatFree(stat);
+	StatFree(&stat);
 }
 
 template<typename T> void SparseMatSuperLU<T>::zeros() {
