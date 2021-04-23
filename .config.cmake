@@ -138,7 +138,7 @@ if(COMPILER_IDENTIFIER MATCHES "vs")
     set(CMAKE_CXX_FLAGS "/MP /openmp /EHsc")
     set(CMAKE_C_FLAGS "/MP /openmp /EHsc")
     set(CMAKE_EXE_LINKER_FLAGS "/NODEFAULTLIB:LIBCMT")
-    set(CMAKE_Fortran_FLAGS "/MP /Qopenmp /fpp /names:lowercase /assume:underscore")
+    set(CMAKE_Fortran_FLAGS "/MP /Qopenmp /Qparallel /fpp /names:lowercase /assume:underscore")
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} /libs:dll /threads")
 
     if(USE_AVX512)
