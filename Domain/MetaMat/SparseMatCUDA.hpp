@@ -51,7 +51,7 @@ template<typename T> class SparseMatCUDA final : public SparseMat<T> {
 	void acquire();
 	void release() const;
 
-	void device_alloc(size_t, size_t);
+	template<typename ET> void device_alloc(csr_form<ET, int>&&);
 	void device_dealloc() const;
 public:
 	SparseMatCUDA(uword, uword, uword = 0);
@@ -83,9 +83,18 @@ template<typename T> void SparseMatCUDA<T>::release() const {
 	if(d_row_ptr) cudaFree(d_row_ptr);
 }
 
-template<typename T> void SparseMatCUDA<T>::device_alloc(const size_t n_val, const size_t n_col) {
+template<typename T> template<typename ET> void SparseMatCUDA<T>::device_alloc(csr_form<ET, int>&& csr_mat) {
+	const size_t n_val = sizeof(ET) * csr_mat.n_elem;
+	const size_t n_col = sizeof(int) * csr_mat.n_elem;
+
 	cudaMalloc(&d_val_idx, n_val);
 	cudaMalloc(&d_col_idx, n_col);
+
+	cudaMemcpyAsync(d_val_idx, csr_mat.val_idx, n_val, cudaMemcpyHostToDevice, stream);
+	cudaMemcpyAsync(d_col_idx, csr_mat.col_idx, n_col, cudaMemcpyHostToDevice, stream);
+	cudaMemcpyAsync(d_row_ptr, csr_mat.row_ptr, sizeof(int) * (csr_mat.n_rows + 1), cudaMemcpyHostToDevice, stream);
+
+	cudaDeviceSynchronize();
 }
 
 template<typename T> void SparseMatCUDA<T>::device_dealloc() const {
@@ -111,36 +120,7 @@ template<typename T> int SparseMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) {
 		// deallocate memory previously allocated for csr matrix
 		device_dealloc();
 
-		if(std::is_same<T, float>::value || Precision::MIXED == this->precision) {
-			// convert to csr form
-			const csr_form<float, int> csr_mat(this->triplet_mat);
-
-			const size_t n_val = sizeof(float) * csr_mat.n_elem;
-			const size_t n_col = sizeof(int) * csr_mat.n_elem;
-
-			// allocate memory for value and column
-			device_alloc(n_val, n_col);
-
-			cudaMemcpyAsync(d_val_idx, csr_mat.val_idx, n_val, cudaMemcpyHostToDevice, stream);
-			cudaMemcpyAsync(d_col_idx, csr_mat.col_idx, n_col, cudaMemcpyHostToDevice, stream);
-			cudaMemcpyAsync(d_row_ptr, csr_mat.row_ptr, sizeof(int) * (csr_mat.n_rows + 1), cudaMemcpyHostToDevice, stream);
-		}
-		else {
-			// convert to csr form
-			const csr_form<double, int> csr_mat(this->triplet_mat);
-
-			const size_t n_val = sizeof(double) * csr_mat.n_elem;
-			const size_t n_col = sizeof(int) * csr_mat.n_elem;
-
-			// allocate memory for value and column
-			device_alloc(n_val, n_col);
-
-			cudaMemcpyAsync(d_val_idx, csr_mat.val_idx, n_val, cudaMemcpyHostToDevice, stream);
-			cudaMemcpyAsync(d_col_idx, csr_mat.col_idx, n_col, cudaMemcpyHostToDevice, stream);
-			cudaMemcpyAsync(d_row_ptr, csr_mat.row_ptr, sizeof(int) * (csr_mat.n_rows + 1), cudaMemcpyHostToDevice, stream);
-		}
-
-		cudaDeviceSynchronize();
+		std::is_same<T, float>::value || Precision::MIXED == this->precision ? device_alloc(csr_form<float, int>(this->triplet_mat)) : device_alloc(csr_form<double, int>(this->triplet_mat));
 
 		this->factored = true;
 	}
