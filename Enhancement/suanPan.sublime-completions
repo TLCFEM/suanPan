@@ -1413,6 +1413,7 @@
     "mixed",
     "full",
     "single",
-    "double"
+    "double",
+    "iterative_refinement"
   ]
 }

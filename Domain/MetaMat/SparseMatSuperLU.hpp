@@ -244,10 +244,12 @@ template<typename T> int SparseMatSuperLU<T>::solve_trs(Mat<T>& out_mat, const M
 
 	mat full_residual = in_mat;
 
-	auto multiplier = 1.;
+	auto multiplier = norm(full_residual);
 
-	auto counter = 0;
-	while(++counter < 20) {
+	auto counter = 0u;
+	while(counter++ < this->refinement) {
+		if(multiplier < this->tolerance) break;
+
 		auto residual = conv_to<fmat>::from(full_residual / multiplier);
 
 		wrap_b(residual);
@@ -261,8 +263,6 @@ template<typename T> int SparseMatSuperLU<T>::solve_trs(Mat<T>& out_mat, const M
 		out_mat += incre;
 
 		suanpan_debug("mixed precision algorithm multiplier: %.5E\n", multiplier = norm(full_residual -= this->operator*(incre)));
-
-		if(multiplier < this->tolerance) break;
 	}
 
 	return flag;
@@ -311,10 +311,12 @@ template<typename T> int SparseMatSuperLU<T>::solve_trs(Mat<T>& out_mat, Mat<T>&
 
 	out_mat.zeros(arma::size(in_mat));
 
-	auto multiplier = 1.;
+	auto multiplier = arma::norm(in_mat);
 
-	auto counter = 0;
-	while(++counter < 20) {
+	auto counter = 0u;
+	while(counter++ < this->refinement) {
+		if(multiplier < this->tolerance) break;
+
 		auto residual = conv_to<fmat>::from(in_mat / multiplier);
 
 		wrap_b(residual);
@@ -328,8 +330,6 @@ template<typename T> int SparseMatSuperLU<T>::solve_trs(Mat<T>& out_mat, Mat<T>&
 		out_mat += incre;
 
 		suanpan_debug("mixed precision algorithm multiplier: %.5E\n", multiplier = norm(in_mat -= this->operator*(incre)));
-
-		if(multiplier < this->tolerance) break;
 	}
 
 	return flag;

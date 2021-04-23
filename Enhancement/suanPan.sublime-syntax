@@ -10,7 +10,7 @@ contexts:
       scope: comment.block
     - match: "!.*"
       scope: comment.line
-    - match: '\b(?i)(true|yes|on|t|y|false|no|off|f|n|superlu|mumps|cuda|spike|pardiso|lapack|full|mixed|single|double)\b'
+    - match: '\b(?i)(true|yes|on|t|y|false|no|off|f|n|superlu|mumps|cuda|spike|pardiso|lapack|full|mixed|single|double|iterative_refinement)\b'
       scope: variable
     - match: '^(?i)(acceleration|analyse|analyze|bodyforce|clear|cload|command|converger|criterion|disable|displacement|domain|element|enable|erase|exit|file|fix|fix2|fixedlength2d|fixedlength3d|generate|generatebyplane|generatebypoint|generatebyrule|group|groupbodyforce|groupcload|groupdisplacement|groupmultiplierbc|grouppenaltybc|import|initial|integrator|material|materialtest1d|materialtest2d|materialtest3d|materialtestbyload1d|materialtestbyload2d|materialtestbyload3d|modifier|multiplierbc|node|peek|penaltybc|plot|precheck|protect|pwd|recorder|hdf5recorder|plainrecorder|remove|reset|section|set|solver|step|amplitude|rigidwall|mass|mpc|constraint|nodegroup|elementgroup|save|materialtestwithbase1d|materialtestwithbase2d|materialtestwithbase3d|materialtestbyloadwithbase1d|materialtestbyloadwithbase2d|materialtestbyloadwithbase3d|orientation)\b'
       scope: keyword

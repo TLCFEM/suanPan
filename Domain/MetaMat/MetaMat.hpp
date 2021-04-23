@@ -42,6 +42,8 @@ protected:
 
 	Precision precision = Precision::FULL;
 public:
+	static const unsigned refinement = 1;
+
 	triplet_form<T, uword> triplet_mat;
 
 	const uword n_rows;

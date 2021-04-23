@@ -162,10 +162,12 @@ template<typename T> int SparseMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) {
 
 		mat full_residual = B;
 
-		auto multiplier = 1.;
+		auto multiplier = norm(full_residual);
 
-		auto counter = 0;
-		while(++counter < 20) {
+		auto counter = 0u;
+		while(counter++ < this->refinement) {
+			if(multiplier < this->tolerance) break;
+
 			auto residual = conv_to<fmat>::from(full_residual / multiplier);
 
 			cudaMemcpyAsync(d_b, residual.memptr(), n_rhs, cudaMemcpyHostToDevice, stream);
@@ -181,8 +183,6 @@ template<typename T> int SparseMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) {
 			X += incre;
 
 			suanpan_debug("mixed precision algorithm multiplier: %.5E\n", multiplier = arma::norm(full_residual -= this->operator*(incre)));
-
-			if(multiplier < this->tolerance) break;
 		}
 	}
 

@@ -2546,6 +2546,10 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
 		string value;
 		get_input(command, value) ? tmp_step->set_sparse(is_true(value)) : suanpan_error("set_property() need a valid value.\n");
 	}
+	else if(is_equal(property_id, "iterative_refinement")) {
+		if(unsigned value; get_input(command, value)) access::rw(MetaMat<double>::refinement) = std::max(1u, value);
+		else suanpan_error("set_property() need a valid value.\n");
+	}
 	else if(is_equal(property_id, "system_solver")) {
 		if(string value; !get_input(command, value)) suanpan_error("set_property() need a valid value.\n");
 		else if(is_equal(value, "LAPACK")) tmp_step->set_system_solver(SolverType::LAPACK);

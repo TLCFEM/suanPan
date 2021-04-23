@@ -162,10 +162,12 @@ template<typename T> int FullMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 
 		mat full_residual = B;
 
-		auto multiplier = 1.;
+		auto multiplier = norm(full_residual);
 
-		auto counter = 0;
-		while(++counter < 20) {
+		auto counter = 0u;
+		while(counter++ < this->refinement) {
+			if(multiplier < this->tolerance) break;
+
 			auto residual = conv_to<fmat>::from(full_residual / multiplier);
 
 			arma_fortran(arma_sgetrs)(&TRAN, &N, &NRHS, this->s_memory.memptr(), &N, this->pivot.memptr(), residual.memptr(), &LDB, &INFO);
@@ -176,8 +178,6 @@ template<typename T> int FullMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 			X += incre;
 
 			suanpan_debug("mixed precision algorithm multiplier: %.5E\n", multiplier = arma::norm(full_residual -= this->operator*(incre)));
-
-			if(multiplier < this->tolerance) break;
 		}
 	}
 
@@ -236,10 +236,12 @@ template<typename T> int FullMat<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
 	else {
 		X = arma::zeros(B.n_rows, B.n_cols);
 
-		auto multiplier = 1.;
+		auto multiplier = arma::norm(B);
 
-		auto counter = 0;
-		while(++counter < 20) {
+		auto counter = 0u;
+		while(counter++ < this->refinement) {
+			if(multiplier < this->tolerance) break;
+
 			auto residual = conv_to<fmat>::from(B / multiplier);
 
 			arma_fortran(arma_sgetrs)(&TRAN, &N, &NRHS, this->s_memory.memptr(), &N, this->pivot.memptr(), residual.memptr(), &LDB, &INFO);
@@ -250,8 +252,6 @@ template<typename T> int FullMat<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
 			X += incre;
 
 			suanpan_debug("mixed precision algorithm multiplier: %.5E\n", multiplier = arma::norm(B -= this->operator*(incre)));
-
-			if(multiplier < this->tolerance) break;
 		}
 	}
 
