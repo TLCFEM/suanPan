@@ -9,8 +9,8 @@ material Elastic2D 1 1500 .25 1E-4
 
 element PatchQuad 1 -node 1 2 4 3 -material 1 -thickness 1 -knotx 0 0 1 1 -knoty 0 0 1 1
 
-fix 1 1 1
-fix 2 2 1 2
+fix2 1 1 1
+fix2 2 2 1 2
 
 cload 1 0 1 2 3 4
 

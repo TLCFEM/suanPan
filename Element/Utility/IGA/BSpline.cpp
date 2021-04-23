@@ -153,10 +153,13 @@ mat BSpline::evaluate_basis_derivative(const double u, sword n, sword p) const {
 	for(auto j = 0; j <= p; ++j) ders(0, j) = ndu(j, p);
 
 	for(auto r = 0ll; r <= p; ++r) {
+		// do not optimise due to swap
+		// ReSharper disable once CppTooWideScope
+		auto s1 = 0;
+		// ReSharper disable once CppTooWideScope
+		auto s2 = 1;
 		a(0, 0) = 1.;
 		for(auto k = 1ll; k <= n; ++k) {
-			auto s1 = 0;
-			auto s2 = 1;
 			const auto rk = r - k, pk = p - k;
 			auto& d = ders(k, r);
 			if(r >= k) d += (a(s2, 0) = a(s1, 0) / ndu(pk + 1, rk)) * ndu(rk, pk);
