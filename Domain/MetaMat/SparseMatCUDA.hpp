@@ -136,28 +136,26 @@ template<typename T> int SparseMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) {
 	int singularity;
 
 	if(std::is_same<T, float>::value) {
-		cudaMemcpy(d_b, B.memptr(), n_rhs, cudaMemcpyHostToDevice);
+		cudaMemcpyAsync(d_b, B.memptr(), n_rhs, cudaMemcpyHostToDevice, stream);
 
-		for(auto I = 0; I < B.n_elem; I += B.n_rows) {
-			cusolverSpScsrlsvqr(handle, this->n_rows, this->triplet_mat.n_elem, descrA, (float*)d_val_idx, (int*)d_row_ptr, (int*)d_col_idx, (float*)d_b + I, this->tolerance, 0, (float*)d_x + I, &singularity);
-			cudaDeviceSynchronize();
-		}
+		for(auto I = 0; I < B.n_elem; I += B.n_rows) { cusolverSpScsrlsvqr(handle, this->n_rows, this->triplet_mat.n_elem, descrA, (float*)d_val_idx, (int*)d_row_ptr, (int*)d_col_idx, (float*)d_b + I, this->tolerance, 0, (float*)d_x + I, &singularity); }
 
 		X.set_size(arma::size(B));
 
-		cudaMemcpy(X.memptr(), d_x, n_rhs, cudaMemcpyDeviceToHost);
+		cudaMemcpyAsync(X.memptr(), d_x, n_rhs, cudaMemcpyDeviceToHost, stream);
+
+		cudaDeviceSynchronize();
 	}
 	else if(Precision::FULL == this->precision) {
-		cudaMemcpy(d_b, B.memptr(), n_rhs, cudaMemcpyHostToDevice);
+		cudaMemcpyAsync(d_b, B.memptr(), n_rhs, cudaMemcpyHostToDevice, stream);
 
-		for(auto I = 0; I < B.n_elem; I += B.n_rows) {
-			cusolverSpDcsrlsvqr(handle, this->n_rows, this->triplet_mat.n_elem, descrA, (double*)d_val_idx, (int*)d_row_ptr, (int*)d_col_idx, (double*)d_b + I, this->tolerance, 0, (double*)d_x + I, &singularity);
-			cudaDeviceSynchronize();
-		}
+		for(auto I = 0; I < B.n_elem; I += B.n_rows) { cusolverSpDcsrlsvqr(handle, this->n_rows, this->triplet_mat.n_elem, descrA, (double*)d_val_idx, (int*)d_row_ptr, (int*)d_col_idx, (double*)d_b + I, this->tolerance, 0, (double*)d_x + I, &singularity); }
 
 		X.set_size(arma::size(B));
 
-		cudaMemcpy(X.memptr(), d_x, n_rhs, cudaMemcpyDeviceToHost);
+		cudaMemcpyAsync(X.memptr(), d_x, n_rhs, cudaMemcpyDeviceToHost, stream);
+
+		cudaDeviceSynchronize();
 	}
 	else {
 		X = arma::zeros(B.n_rows, B.n_cols);
@@ -170,14 +168,13 @@ template<typename T> int SparseMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) {
 		while(++counter < 20) {
 			auto residual = conv_to<fmat>::from(full_residual / multiplier);
 
-			cudaMemcpy(d_b, residual.memptr(), n_rhs, cudaMemcpyHostToDevice);
+			cudaMemcpyAsync(d_b, residual.memptr(), n_rhs, cudaMemcpyHostToDevice, stream);
 
-			for(auto I = 0; I < B.n_elem; I += B.n_rows) {
-				cusolverSpScsrlsvqr(handle, this->n_rows, this->triplet_mat.n_elem, descrA, (float*)d_val_idx, (int*)d_row_ptr, (int*)d_col_idx, (float*)d_b + I, this->tolerance, 0, (float*)d_x + I, &singularity);
-				cudaDeviceSynchronize();
-			}
+			for(auto I = 0; I < B.n_elem; I += B.n_rows) { cusolverSpScsrlsvqr(handle, this->n_rows, this->triplet_mat.n_elem, descrA, (float*)d_val_idx, (int*)d_row_ptr, (int*)d_col_idx, (float*)d_b + I, this->tolerance, 0, (float*)d_x + I, &singularity); }
 
-			cudaMemcpy(residual.memptr(), d_x, n_rhs, cudaMemcpyDeviceToHost);
+			cudaMemcpyAsync(residual.memptr(), d_x, n_rhs, cudaMemcpyDeviceToHost, stream);
+
+			cudaDeviceSynchronize();
 
 			const mat incre = multiplier * conv_to<mat>::from(residual);
 

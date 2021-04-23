@@ -113,13 +113,8 @@ template<typename T> int FullMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) {
 	if(std::is_same<T, float>::value) {
 		// pure float
 		if(!this->factored) {
-			cudaMemcpy(d_A, this->memptr(), sizeof(float) * this->n_elem, cudaMemcpyHostToDevice);
-
+			cudaMemcpyAsync(d_A, this->memptr(), sizeof(float) * this->n_elem, cudaMemcpyHostToDevice, stream);
 			cusolverDnSgetrf(handle, this->n_rows, this->n_cols, (float*)d_A, this->n_rows, (float*)buffer, ipiv, info);
-
-			int h_info = 0;
-			cudaMemcpy(&h_info, info, sizeof(int), cudaMemcpyDeviceToHost);
-			if(0 != h_info) return h_info;
 
 			this->factored = true;
 		}
@@ -128,13 +123,14 @@ template<typename T> int FullMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) {
 
 		void* d_x = nullptr;
 		cudaMalloc(&d_x, btye_size);
-		cudaMemcpy(d_x, B.memptr(), btye_size, cudaMemcpyHostToDevice);
+		cudaMemcpyAsync(d_x, B.memptr(), btye_size, cudaMemcpyHostToDevice, stream);
 		cusolverDnSgetrs(handle, CUBLAS_OP_N, this->n_rows, B.n_cols, (float*)d_A, this->n_rows, ipiv, (float*)d_x, this->n_rows, info);
-		cudaDeviceSynchronize();
 
 		X.set_size(arma::size(B));
 
-		cudaMemcpy(X.memptr(), d_x, btye_size, cudaMemcpyDeviceToHost);
+		cudaMemcpyAsync(X.memptr(), d_x, btye_size, cudaMemcpyDeviceToHost, stream);
+
+		cudaDeviceSynchronize();
 
 		if(d_x) cudaFree(d_x);
 	}
@@ -143,13 +139,8 @@ template<typename T> int FullMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) {
 		if(!this->factored) {
 			this->s_memory = this->to_float();
 
-			cudaMemcpy(d_A, this->s_memory.memptr(), sizeof(float) * this->s_memory.n_elem, cudaMemcpyHostToDevice);
-
+			cudaMemcpyAsync(d_A, this->s_memory.memptr(), sizeof(float) * this->s_memory.n_elem, cudaMemcpyHostToDevice, stream);
 			cusolverDnSgetrf(handle, this->n_rows, this->n_cols, (float*)d_A, this->n_rows, (float*)buffer, ipiv, info);
-
-			int h_info = 0;
-			cudaMemcpy(&h_info, info, sizeof(int), cudaMemcpyDeviceToHost);
-			if(0 != h_info) return h_info;
 
 			this->factored = true;
 		}
@@ -169,11 +160,11 @@ template<typename T> int FullMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) {
 		while(++counter < 20) {
 			auto residual = conv_to<fmat>::from(full_residual / multiplier);
 
-			cudaMemcpy(d_x, residual.memptr(), btye_size, cudaMemcpyHostToDevice);
+			cudaMemcpyAsync(d_x, residual.memptr(), btye_size, cudaMemcpyHostToDevice, stream);
 			cusolverDnSgetrs(handle, CUBLAS_OP_N, this->n_rows, B.n_cols, (float*)d_A, this->n_rows, ipiv, (float*)d_x, this->n_rows, info);
-			cudaDeviceSynchronize();
+			cudaMemcpyAsync(residual.memptr(), d_x, btye_size, cudaMemcpyDeviceToHost, stream);
 
-			cudaMemcpy(residual.memptr(), d_x, btye_size, cudaMemcpyDeviceToHost);
+			cudaDeviceSynchronize();
 
 			const mat incre = multiplier * conv_to<mat>::from(residual);
 
@@ -189,13 +180,8 @@ template<typename T> int FullMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) {
 	else {
 		// pure double
 		if(!this->factored) {
-			cudaMemcpy(d_A, this->memptr(), sizeof(double) * this->n_elem, cudaMemcpyHostToDevice);
-
+			cudaMemcpyAsync(d_A, this->memptr(), sizeof(double) * this->n_elem, cudaMemcpyHostToDevice, stream);
 			cusolverDnDgetrf(handle, this->n_rows, this->n_cols, (double*)d_A, this->n_rows, (double*)buffer, ipiv, info);
-
-			int h_info = 0;
-			cudaMemcpy(&h_info, info, sizeof(int), cudaMemcpyDeviceToHost);
-			if(0 != h_info) return h_info;
 
 			this->factored = true;
 		}
@@ -204,13 +190,14 @@ template<typename T> int FullMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) {
 
 		void* d_x = nullptr;
 		cudaMalloc(&d_x, btye_size);
-		cudaMemcpy(d_x, B.memptr(), btye_size, cudaMemcpyHostToDevice);
+		cudaMemcpyAsync(d_x, B.memptr(), btye_size, cudaMemcpyHostToDevice, stream);
 		cusolverDnDgetrs(handle, CUBLAS_OP_N, this->n_rows, B.n_cols, (double*)d_A, this->n_rows, ipiv, (double*)d_x, this->n_rows, info);
-		cudaDeviceSynchronize();
 
 		X.set_size(arma::size(B));
 
-		cudaMemcpy(X.memptr(), d_x, btye_size, cudaMemcpyDeviceToHost);
+		cudaMemcpyAsync(X.memptr(), d_x, btye_size, cudaMemcpyDeviceToHost, stream);
+
+		cudaDeviceSynchronize();
 
 		if(d_x) cudaFree(d_x);
 	}
