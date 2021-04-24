@@ -187,10 +187,10 @@ void print_helper() {
 void check_version(const char* path_to_executable) {
 	auto updater_module = fs::path(path_to_executable).parent_path();
 
-	updater_module += "\\updater";
-
 #ifdef SUANPAN_WIN
-	updater_module += ".exe";
+	updater_module += "\\updater.exe";
+#else
+	updater_module += "/updater";
 #endif
 
 	if(!exists(updater_module)) return;
