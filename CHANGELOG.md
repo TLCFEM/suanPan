@@ -4,7 +4,7 @@
 
 1. `MKL` includes outdated `FEAST`, the external names in `FEAST` library are modified to avoid linking error.
 
-## version 1.x
+## version 1.4
 
 1. add `R2D2` and `R3D2` alias for fixed length constraint
 2. add `MinGap2D` and `MinGap3D` inequality constraints
