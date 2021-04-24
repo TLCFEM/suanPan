@@ -33,13 +33,11 @@
 #ifdef SUANPAN_CUDA
 
 #include "FullMat.hpp"
-#include <cublas_v2.h>
 #include <cusolverDn.h>
 #include <cuda_runtime.h>
 
 template<typename T> class FullMatCUDA final : public FullMat<T> {
 	cusolverDnHandle_t handle = nullptr;
-	cublasHandle_t cublasHandle = nullptr;
 	cudaStream_t stream = nullptr;
 
 	int* info = nullptr;
@@ -65,10 +63,8 @@ public:
 
 template<typename T> void FullMatCUDA<T>::acquire() {
 	cusolverDnCreate(&handle);
-	cublasCreate_v2(&cublasHandle);
 	cudaStreamCreate(&stream);
 	cusolverDnSetStream(handle, stream);
-	cublasSetStream_v2(cublasHandle, stream);
 
 	cudaMalloc(&info, sizeof(int));
 	cudaMemset(info, 0, sizeof(int));
@@ -88,7 +84,6 @@ template<typename T> void FullMatCUDA<T>::acquire() {
 
 template<typename T> void FullMatCUDA<T>::release() const {
 	if(handle) cusolverDnDestroy(handle);
-	if(cublasHandle) cublasDestroy_v2(cublasHandle);
 	if(stream) cudaStreamDestroy(stream);
 
 	if(info) cudaFree(info);
