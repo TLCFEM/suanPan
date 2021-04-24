@@ -38,6 +38,12 @@
 #include <mkl_pardiso.h>
 
 template<typename T> class SparseMatPARDISO final : public SparseMat<T> {
+	int maxfct = 1;
+	int mnum = 1;
+	int mtype = 1;
+	int msglvl = 0;
+
+	void* pt[64];
 public:
 	using SparseMat<T>::SparseMat;
 
@@ -53,15 +59,9 @@ template<typename T> int SparseMatPARDISO<T>::solve(Mat<T>& X, const Mat<T>& B) 
 
 	csr_form<T, int> csr_mat(this->triplet_mat);
 
-	auto maxfct = 1;
-	auto mnum = 1;
-	auto mtype = 11;
 	auto n = static_cast<int>(B.n_rows);
 	auto nrhs = static_cast<int>(B.n_cols);
-	auto msglvl = 0;
 	int error;
-
-	void* pt[64];
 
 	std::vector iparm(64, 0);
 
