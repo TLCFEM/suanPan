@@ -33,7 +33,7 @@ int Step::initialize() {
 
 	if(sparse_mat) {
 		// LAPACK and SPIKE are for dense only
-		if(SolverType::LAPACK == system_solver || SolverType::SPIKE == system_solver) system_solver = SolverType::SUPERLU;
+		if(SolverType::LAPACK == system_solver || SolverType::SPIKE == system_solver) system_solver = SolverType::MUMPS;
 	}
 	else if(!symm_mat && band_mat) {
 		// only LAPACK and SPIKE are supported
