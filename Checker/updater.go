@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -9,6 +10,8 @@ import (
 )
 
 func main() {
+	fmt.Printf("Checking new version, delete file updater if not wanted.\n")
+
 	url := "https://github.com/TLCFEM/suanPan/releases"
 
 	client := &http.Client{
