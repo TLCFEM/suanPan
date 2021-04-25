@@ -1322,7 +1322,7 @@ void Domain::assemble_trial_stiffness() const {
 void Domain::assemble_initial_geometry() const {
 	if(!factory->get_nlgeom()) return;
 	factory->clear_geometry();
-	if(factory->get_storage_scheme() == StorageScheme::SPARSE) { for(const auto& I : element_pond.get()) if(I->is_nlgeom()) factory->assemble_geometry(I->get_initial_geometry(), I->get_dof_encoding()); }
+	if(color_map.empty() || factory->get_storage_scheme() == StorageScheme::SPARSE) { for(const auto& I : element_pond.get()) if(I->is_nlgeom()) factory->assemble_geometry(I->get_initial_geometry(), I->get_dof_encoding()); }
 	else
 		for_each(color_map.begin(), color_map.end(), [&](const vector<unsigned>& color) {
 			suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
@@ -1337,7 +1337,7 @@ void Domain::assemble_initial_geometry() const {
 void Domain::assemble_current_geometry() const {
 	if(!factory->get_nlgeom()) return;
 	factory->clear_geometry();
-	if(factory->get_storage_scheme() == StorageScheme::SPARSE) { for(const auto& I : element_pond.get()) if(I->is_nlgeom()) factory->assemble_geometry(I->get_current_geometry(), I->get_dof_encoding()); }
+	if(color_map.empty() || factory->get_storage_scheme() == StorageScheme::SPARSE) { for(const auto& I : element_pond.get()) if(I->is_nlgeom()) factory->assemble_geometry(I->get_current_geometry(), I->get_dof_encoding()); }
 	else
 		for_each(color_map.begin(), color_map.end(), [&](const vector<unsigned>& color) {
 			suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
@@ -1352,7 +1352,7 @@ void Domain::assemble_current_geometry() const {
 void Domain::assemble_trial_geometry() const {
 	if(!factory->get_nlgeom()) return;
 	factory->clear_geometry();
-	if(factory->get_storage_scheme() == StorageScheme::SPARSE) { for(const auto& I : element_pond.get()) if(I->is_nlgeom()) factory->assemble_geometry(I->get_trial_geometry(), I->get_dof_encoding()); }
+	if(color_map.empty() || factory->get_storage_scheme() == StorageScheme::SPARSE) { for(const auto& I : element_pond.get()) if(I->is_nlgeom()) factory->assemble_geometry(I->get_trial_geometry(), I->get_dof_encoding()); }
 	else
 		for_each(color_map.begin(), color_map.end(), [&](const vector<unsigned>& color) {
 			suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
