@@ -1641,53 +1641,27 @@ template<typename T> void Factory<T>::assemble_inertial_force(const Mat<T>& ER, 
 
 template<typename T> void Factory<T>::assemble_mass(const Mat<T>& EM, const uvec& EI) {
 	if(EM.is_empty()) return;
-
-	if(storage_type == StorageScheme::SPARSE) for(unsigned I = 0; I < EI.n_elem; ++I) for(unsigned J = 0; J < EI.n_elem; ++J) global_mass->at(EI(J), EI(I)) = EM(J, I);
-	else for(unsigned I = 0; I < EI.n_elem; ++I) for(unsigned J = 0; J < EI.n_elem; ++J) global_mass->at(EI(J), EI(I)) += EM(J, I);
+	for(unsigned I = 0; I < EI.n_elem; ++I) for(unsigned J = 0; J < EI.n_elem; ++J) global_mass->at(EI(J), EI(I)) += EM(J, I);
 }
 
 template<typename T> void Factory<T>::assemble_damping(const Mat<T>& EC, const uvec& EI) {
 	if(EC.is_empty()) return;
-
-	if(storage_type == StorageScheme::SPARSE) for(unsigned I = 0; I < EI.n_elem; ++I) for(unsigned J = 0; J < EI.n_elem; ++J) global_damping->at(EI(J), EI(I)) = EC(J, I);
-	else for(unsigned I = 0; I < EI.n_elem; ++I) for(unsigned J = 0; J < EI.n_elem; ++J) global_damping->at(EI(J), EI(I)) += EC(J, I);
+	for(unsigned I = 0; I < EI.n_elem; ++I) for(unsigned J = 0; J < EI.n_elem; ++J) global_damping->at(EI(J), EI(I)) += EC(J, I);
 }
 
 template<typename T> void Factory<T>::assemble_stiffness(const Mat<T>& EK, const uvec& EI) {
 	if(EK.is_empty()) return;
-
-	if(storage_type == StorageScheme::SPARSE) for(unsigned I = 0; I < EI.n_elem; ++I) for(unsigned J = 0; J < EI.n_elem; ++J) global_stiffness->at(EI(J), EI(I)) = EK(J, I);
-	else for(unsigned I = 0; I < EI.n_elem; ++I) for(unsigned J = 0; J < EI.n_elem; ++J) global_stiffness->at(EI(J), EI(I)) += EK(J, I);
+	for(unsigned I = 0; I < EI.n_elem; ++I) for(unsigned J = 0; J < EI.n_elem; ++J) global_stiffness->at(EI(J), EI(I)) += EK(J, I);
 }
 
 template<typename T> void Factory<T>::assemble_geometry(const Mat<T>& EG, const uvec& EI) {
 	if(EG.is_empty() || !nlgeom) return;
-
-	if(storage_type == StorageScheme::SPARSE) for(unsigned I = 0; I < EI.n_elem; ++I) for(unsigned J = 0; J < EI.n_elem; ++J) global_geometry->at(EI(J), EI(I)) = EG(J, I);
-	else for(unsigned I = 0; I < EI.n_elem; ++I) for(unsigned J = 0; J < EI.n_elem; ++J) global_geometry->at(EI(J), EI(I)) += EG(J, I);
+	for(unsigned I = 0; I < EI.n_elem; ++I) for(unsigned J = 0; J < EI.n_elem; ++J) global_geometry->at(EI(J), EI(I)) += EG(J, I);
 }
 
 template<typename T> void Factory<T>::assemble_stiffness(const SpMat<T>& EK, const uvec& EI) {
 	if(EK.is_empty()) return;
-
-	EK.sync();
-
-	const auto& val_ptr = EK.values;
-	const auto& rol_ptr = EK.row_indices;
-	const auto& col_ptr = EK.col_ptrs;
-
-	if(auto idx = 0; storage_type == StorageScheme::SPARSE) {
-		while(col_ptr[idx] != EK.n_nonzero) {
-			for(auto I = col_ptr[idx]; I < col_ptr[idx + 1]; ++I) global_stiffness->at(EI(rol_ptr[I]), EI(idx)) = val_ptr[I];
-			++idx;
-		}
-	}
-	else {
-		while(col_ptr[idx] != EK.n_nonzero) {
-			for(auto I = col_ptr[idx]; I < col_ptr[idx + 1]; ++I) global_stiffness->at(EI(rol_ptr[I]), EI(idx)) += val_ptr[I];
-			++idx;
-		}
-	}
+	for(auto I = EK.begin(); I != EK.end(); ++I) global_stiffness->at(EI(I.row()), EI(I.col())) += *I;
 }
 
 template<typename T> void Factory<T>::print() const { suanpan_info("This is a Factory object with size of %u.\n", n_size); }

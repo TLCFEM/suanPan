@@ -467,14 +467,14 @@ template<typename data_t, typename index_t> const data_t& triplet_form<data_t, i
 }
 
 template<typename data_t, typename index_t> data_t& triplet_form<data_t, index_t>::at(const index_t row, const index_t col) {
-	if(row >= n_rows || col >= n_cols) return access::rw(bin);
+	if(row >= n_rows || col >= n_cols) return access::rw(bin) = 0.;
 
 	if(csr_sorted) csr_sorted = false;
 	if(csc_sorted) csc_sorted = false;
 	if(n_elem == n_alloc) resize();
 	row_idx[n_elem] = row;
 	col_idx[n_elem] = col;
-	return val_idx[access::rw(n_elem)++];
+	return val_idx[access::rw(n_elem)++] = 0.;
 }
 
 template<typename data_t, typename index_t> template<typename T2> triplet_form<data_t, index_t> triplet_form<data_t, index_t>::operator*(const T2 scalar) {

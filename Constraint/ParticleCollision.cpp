@@ -67,22 +67,15 @@ void ParticleCollision::apply_contact(const shared_ptr<DomainBase>& D, const sha
 	auto& W = D->get_factory();
 	auto& t_stiff = W->get_stiffness();
 
-	if(const mat d_norm = (compute_df(diff_norm) - force / diff_norm) * diff_pos * diff_pos.t() + force / diff_norm * eye(num_dof, num_dof); StorageScheme::SPARSE == W->get_storage_scheme())
-		for(auto K = 0u; K < num_dof; ++K)
-			for(auto L = 0u; L < num_dof; ++L) {
-				t_stiff->at(dof_i(K), dof_i(L)) = -d_norm(K, L);
-				t_stiff->at(dof_j(K), dof_j(L)) = -d_norm(K, L);
-				t_stiff->at(dof_i(K), dof_j(L)) = d_norm(K, L);
-				t_stiff->at(dof_j(K), dof_i(L)) = d_norm(K, L);
-			}
-	else
-		for(auto K = 0u; K < num_dof; ++K)
-			for(auto L = 0u; L < num_dof; ++L) {
-				t_stiff->at(dof_i(K), dof_i(L)) -= d_norm(K, L);
-				t_stiff->at(dof_j(K), dof_j(L)) -= d_norm(K, L);
-				t_stiff->at(dof_i(K), dof_j(L)) += d_norm(K, L);
-				t_stiff->at(dof_j(K), dof_i(L)) += d_norm(K, L);
-			}
+	const mat d_norm = (compute_df(diff_norm) - force / diff_norm) * diff_pos * diff_pos.t() + force / diff_norm * eye(num_dof, num_dof);
+
+	for(auto L = 0u; L < num_dof; ++L)
+		for(auto K = 0u; K < num_dof; ++K) {
+			t_stiff->at(dof_i(K), dof_i(L)) -= d_norm(K, L);
+			t_stiff->at(dof_j(K), dof_j(L)) -= d_norm(K, L);
+			t_stiff->at(dof_i(K), dof_j(L)) += d_norm(K, L);
+			t_stiff->at(dof_j(K), dof_i(L)) += d_norm(K, L);
+		}
 }
 
 int ParticleCollision::process(const shared_ptr<DomainBase>& D) { return process_meta(D, true); }
