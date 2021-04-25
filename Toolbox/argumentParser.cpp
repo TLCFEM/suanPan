@@ -162,6 +162,9 @@ void print_version() {
 #else
 	suanpan_info("    The linear algebra support is provided by Armadillo. http://arma.sourceforge.net/\n");
 #endif
+#ifdef SUANPAN_CUDA
+	suanpan_info("    The GPCPU solvers are provided by CUDA. https://developer.nvidia.com/about-cuda\n");
+#endif
 #ifdef SUANPAN_MT
 	suanpan_info("    The parallelisation support is implemented via TBB library. https://github.com/oneapi-src/oneTBB\n");
 #endif
