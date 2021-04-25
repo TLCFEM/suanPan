@@ -60,8 +60,6 @@ int ArcLength::initialize() {
 	}
 
 	factory->set_analysis_type(AnalysisType::STATICS);
-	factory->set_precision(precision);
-	factory->set_tolerance(tolerance);
 
 	if(SUANPAN_SUCCESS != t_domain->restart()) return SUANPAN_FAIL;
 

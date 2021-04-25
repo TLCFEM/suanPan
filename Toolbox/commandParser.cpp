@@ -2518,7 +2518,7 @@ int test_material_by_load_with_base3d(const shared_ptr<DomainBase>& domain, istr
 int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
 	if(domain->get_current_step_tag() == 0) return SUANPAN_SUCCESS;
 
-	const auto& tmp_step = domain->get_current_step();
+	const auto& t_step = domain->get_current_step();
 
 	string property_id;
 	if(!get_input(command, property_id)) {
@@ -2532,60 +2532,63 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
 	}
 	else if(is_equal(property_id, "fixed_step_size")) {
 		string value;
-		get_input(command, value) ? tmp_step->set_fixed_step_size(is_true(value)) : suanpan_error("set_property() need a valid value.\n");
+		get_input(command, value) ? t_step->set_fixed_step_size(is_true(value)) : suanpan_error("set_property() need a valid value.\n");
 	}
 	else if(is_equal(property_id, "symm_mat")) {
 		string value;
-		get_input(command, value) ? tmp_step->set_symm(is_true(value)) : suanpan_error("set_property() need a valid value.\n");
+		get_input(command, value) ? t_step->set_symm(is_true(value)) : suanpan_error("set_property() need a valid value.\n");
 	}
 	else if(is_equal(property_id, "band_mat")) {
 		string value;
-		get_input(command, value) ? tmp_step->set_band(is_true(value)) : suanpan_error("set_property() need a valid value.\n");
+		get_input(command, value) ? t_step->set_band(is_true(value)) : suanpan_error("set_property() need a valid value.\n");
 	}
 	else if(is_equal(property_id, "sparse_mat")) {
 		string value;
-		get_input(command, value) ? tmp_step->set_sparse(is_true(value)) : suanpan_error("set_property() need a valid value.\n");
+		get_input(command, value) ? t_step->set_sparse(is_true(value)) : suanpan_error("set_property() need a valid value.\n");
 	}
-	else if(is_equal(property_id, "iterative_refinement")) { if(unsigned value; !get_input(command, value)) suanpan_error("set_property() need a valid value.\n"); }
+	else if(is_equal(property_id, "iterative_refinement")) {
+		if(unsigned value; get_input(command, value)) t_step->set_refinement(value);
+		else suanpan_error("set_property() need a valid value.\n");
+	}
 	else if(is_equal(property_id, "system_solver")) {
 		if(string value; !get_input(command, value)) suanpan_error("set_property() need a valid value.\n");
-		else if(is_equal(value, "LAPACK")) tmp_step->set_system_solver(SolverType::LAPACK);
-		else if(is_equal(value, "SPIKE")) tmp_step->set_system_solver(SolverType::SPIKE);
-		else if(is_equal(value, "SUPERLU")) tmp_step->set_system_solver(SolverType::SUPERLU);
-		else if(is_equal(value, "MUMPS")) tmp_step->set_system_solver(SolverType::MUMPS);
-		else if(is_equal(value, "CUDA")) tmp_step->set_system_solver(SolverType::CUDA);
-		else if(is_equal(value, "PARDISO")) tmp_step->set_system_solver(SolverType::PARDISO);
+		else if(is_equal(value, "LAPACK")) t_step->set_system_solver(SolverType::LAPACK);
+		else if(is_equal(value, "SPIKE")) t_step->set_system_solver(SolverType::SPIKE);
+		else if(is_equal(value, "SUPERLU")) t_step->set_system_solver(SolverType::SUPERLU);
+		else if(is_equal(value, "MUMPS")) t_step->set_system_solver(SolverType::MUMPS);
+		else if(is_equal(value, "CUDA")) t_step->set_system_solver(SolverType::CUDA);
+		else if(is_equal(value, "PARDISO")) t_step->set_system_solver(SolverType::PARDISO);
 		else suanpan_error("set_property() need a valid solver id.\n");
 	}
 	else if(is_equal(property_id, "precision")) {
 		if(string value; !get_input(command, value)) suanpan_error("set_property() need a valid value.\n");
-		else if(is_equal(value, "DOUBLE") || is_equal(value, "FULL")) tmp_step->set_precision(Precision::FULL);
-		else if(is_equal(value, "SINGLE") || is_equal(value, "MIXED")) tmp_step->set_precision(Precision::MIXED);
+		else if(is_equal(value, "DOUBLE") || is_equal(value, "FULL")) t_step->set_precision(Precision::FULL);
+		else if(is_equal(value, "SINGLE") || is_equal(value, "MIXED")) t_step->set_precision(Precision::MIXED);
 		else suanpan_error("set_property() need a valid precision.\n");
 	}
 	else if(is_equal(property_id, "tolerance")) {
 		double value;
-		get_input(command, value) ? tmp_step->set_tolerance(value) : suanpan_error("set_property() need a valid value.\n");
+		get_input(command, value) ? t_step->set_tolerance(value) : suanpan_error("set_property() need a valid value.\n");
 	}
 	else if(is_equal(property_id, "ini_step_size")) {
 		double step_time;
-		get_input(command, step_time) ? tmp_step->set_ini_step_size(step_time) : suanpan_error("set_property() need a valid value.\n");
+		get_input(command, step_time) ? t_step->set_ini_step_size(step_time) : suanpan_error("set_property() need a valid value.\n");
 	}
 	else if(is_equal(property_id, "min_step_size")) {
 		double step_time;
-		get_input(command, step_time) ? tmp_step->set_min_step_size(step_time) : suanpan_error("set_property() need a valid value.\n");
+		get_input(command, step_time) ? t_step->set_min_step_size(step_time) : suanpan_error("set_property() need a valid value.\n");
 	}
 	else if(is_equal(property_id, "max_step_size")) {
 		double step_time;
-		get_input(command, step_time) ? tmp_step->set_max_step_size(step_time) : suanpan_error("set_property() need a valid value.\n");
+		get_input(command, step_time) ? t_step->set_max_step_size(step_time) : suanpan_error("set_property() need a valid value.\n");
 	}
 	else if(is_equal(property_id, "max_iteration")) {
 		unsigned max_number;
-		get_input(command, max_number) ? tmp_step->set_max_substep(max_number) : suanpan_error("set_property() need a valid value.\n");
+		get_input(command, max_number) ? t_step->set_max_substep(max_number) : suanpan_error("set_property() need a valid value.\n");
 	}
 	else if(is_equal(property_id, "eigen_number")) {
 		if(unsigned eigen_number; get_input(command, eigen_number)) {
-			if(const auto eigen_step = std::dynamic_pointer_cast<Frequency>(tmp_step); nullptr == eigen_step) suanpan_error("set_property() cannot set eigen number for noneigen step.\n");
+			if(const auto eigen_step = std::dynamic_pointer_cast<Frequency>(t_step); nullptr == eigen_step) suanpan_error("set_property() cannot set eigen number for noneigen step.\n");
 			else eigen_step->set_eigen_number(eigen_number);
 		}
 		else suanpan_error("set_property() need a valid eigen number.\n");

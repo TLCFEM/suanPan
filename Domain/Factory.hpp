@@ -58,6 +58,7 @@ template<typename T> class Factory final {
 	double tolerance = 1E-14;
 	Precision precision = Precision::FULL;
 	SolverType solver = SolverType::LAPACK;
+	unsigned refinement = 10;
 
 	T error = 0.; // error produced by certain solvers
 
@@ -155,6 +156,8 @@ public:
 
 	void set_solver(SolverType);
 	[[nodiscard]] SolverType get_solver() const;
+
+	void set_refinement(unsigned);
 
 	void set_analysis_type(const AnalysisType&);
 	[[nodiscard]] const AnalysisType& get_analysis_type() const;
@@ -571,6 +574,8 @@ template<typename T> void Factory<T>::set_solver(const SolverType E) { solver = 
 
 template<typename T> SolverType Factory<T>::get_solver() const { return solver; }
 
+template<typename T> void Factory<T>::set_refinement(const unsigned R) { refinement = R; }
+
 template<typename T> void Factory<T>::set_analysis_type(const AnalysisType& AT) {
 	if(analysis_type == AT) return;
 	analysis_type = AT;
@@ -769,6 +774,7 @@ template<typename T> void Factory<T>::initialize_mass() {
 
 	global_mass->set_precision(precision);
 	global_mass->set_tolerance(tolerance);
+	global_mass->set_refinement(refinement);
 }
 
 template<typename T> void Factory<T>::initialize_damping() {
@@ -806,6 +812,7 @@ template<typename T> void Factory<T>::initialize_damping() {
 
 	global_damping->set_precision(precision);
 	global_damping->set_tolerance(tolerance);
+	global_damping->set_refinement(refinement);
 }
 
 template<typename T> void Factory<T>::initialize_stiffness() {
@@ -843,6 +850,7 @@ template<typename T> void Factory<T>::initialize_stiffness() {
 
 	global_stiffness->set_precision(precision);
 	global_stiffness->set_tolerance(tolerance);
+	global_stiffness->set_refinement(refinement);
 }
 
 template<typename T> void Factory<T>::initialize_geometry() {
@@ -882,6 +890,7 @@ template<typename T> void Factory<T>::initialize_geometry() {
 
 	global_geometry->set_precision(precision);
 	global_geometry->set_tolerance(tolerance);
+	global_geometry->set_refinement(refinement);
 }
 
 template<typename T> void Factory<T>::initialize_eigen() {

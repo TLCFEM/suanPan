@@ -46,9 +46,6 @@ int Buckle::initialize() {
 	else if(!symm_mat && !band_mat) factory->set_storage_scheme(StorageScheme::FULL);
 
 	factory->set_analysis_type(AnalysisType::BUCKLE);
-	factory->set_precision(precision);
-	factory->set_tolerance(tolerance);
-	factory->set_solver(system_solver);
 
 	return t_domain->restart();
 }

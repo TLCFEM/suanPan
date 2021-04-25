@@ -57,6 +57,11 @@ int Step::initialize() {
 
 	factory = t_domain->get_factory();
 
+	factory->set_precision(precision);
+	factory->set_tolerance(tolerance);
+	factory->set_solver(system_solver);
+	factory->set_refinement(refinement);
+
 	return 0;
 }
 
@@ -122,6 +127,8 @@ void Step::set_system_solver(const SolverType P) { system_solver = P; }
 void Step::set_precision(const Precision P) { precision = P; }
 
 void Step::set_tolerance(const double T) { tolerance = T; }
+
+void Step::set_refinement(const unsigned T) { refinement = T; }
 
 double Step::get_ini_step_size() const { return ini_step_size; }
 

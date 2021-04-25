@@ -38,9 +38,6 @@ int Dynamic::initialize() {
 	else if(!symm_mat && !band_mat) factory->set_storage_scheme(StorageScheme::FULL);
 
 	factory->set_analysis_type(AnalysisType::DYNAMICS);
-	factory->set_precision(precision);
-	factory->set_tolerance(tolerance);
-	factory->set_solver(system_solver);
 
 	const auto& t_domain = database.lock();
 

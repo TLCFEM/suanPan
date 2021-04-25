@@ -38,12 +38,12 @@ template<typename T> class MetaMat {
 protected:
 	bool factored = false;
 
-	double tolerance = 1E-12;
+	double tolerance = 1E-13;
 
 	Precision precision = Precision::FULL;
-public:
-	static const unsigned refinement = 1;
 
+	unsigned refinement = 10;
+public:
 	triplet_form<T, uword> triplet_mat;
 
 	const uword n_rows;
@@ -59,6 +59,7 @@ public:
 
 	void set_tolerance(double);
 	void set_precision(Precision);
+	void set_refinement(unsigned);
 
 	[[nodiscard]] virtual bool is_empty() const = 0;
 	virtual void zeros() = 0;
@@ -117,6 +118,8 @@ template<typename T> MetaMat<T>::MetaMat(const uword in_rows, const uword in_col
 template<typename T> void MetaMat<T>::set_tolerance(const double TOL) { tolerance = TOL; }
 
 template<typename T> void MetaMat<T>::set_precision(const Precision P) { precision = P; }
+
+template<typename T> void MetaMat<T>::set_refinement(const unsigned R) { refinement = R; }
 
 template<typename T> Mat<T> MetaMat<T>::solve(const Mat<T>& B) {
 	Mat<T> X;
