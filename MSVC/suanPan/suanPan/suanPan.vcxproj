@@ -199,6 +199,7 @@
     <ClCompile Include="..\..\..\Element\Shell\SGCMS.cpp" />
     <ClCompile Include="..\..\..\Element\Shell\ShellBase.cpp" />
     <ClCompile Include="..\..\..\Element\Special\Contact2D.cpp" />
+    <ClCompile Include="..\..\..\Element\Special\Contact3D.cpp" />
     <ClCompile Include="..\..\..\Element\Special\Damper01.cpp" />
     <ClCompile Include="..\..\..\Element\Special\Damper02.cpp" />
     <ClCompile Include="..\..\..\Element\Special\Embedded2D.cpp" />
@@ -568,6 +569,7 @@
     <ClInclude Include="..\..\..\Element\Shell\SGCMS.h" />
     <ClInclude Include="..\..\..\Element\Shell\ShellBase.h" />
     <ClInclude Include="..\..\..\Element\Special\Contact2D.h" />
+    <ClInclude Include="..\..\..\Element\Special\Contact3D.h" />
     <ClInclude Include="..\..\..\Element\Special\Damper01.h" />
     <ClInclude Include="..\..\..\Element\Special\Damper02.h" />
     <ClInclude Include="..\..\..\Element\Special\Embedded2D.h" />

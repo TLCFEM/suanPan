@@ -48,6 +48,7 @@ int create_new_element(const shared_ptr<DomainBase>& domain, istringstream& comm
 	else if(is_equal(element_id, "CIN3D8")) new_cin3d8(new_element, command);
 	else if(is_equal(element_id, "CINP4")) new_cinp4(new_element, command);
 	else if(is_equal(element_id, "Contact2D")) new_contact2d(new_element, command);
+	else if(is_equal(element_id, "Contact3D")) new_contact3d(new_element, command);
 	else if(is_equal(element_id, "CP3")) new_cp3(new_element, command);
 	else if(is_equal(element_id, "CP4")) new_cp4(new_element, command);
 	else if(is_equal(element_id, "CP4I")) new_cp4i(new_element, command);
@@ -501,6 +502,32 @@ void new_contact2d(unique_ptr<Element>& return_obj, istringstream& command) {
 	}
 
 	return_obj = make_unique<Contact2D>(tag, master_tag, slave_tag, alpha);
+}
+
+void new_contact3d(unique_ptr<Element>& return_obj, istringstream& command) {
+	unsigned tag;
+	if(!get_input(command, tag)) {
+		suanpan_error("new_contact3d() needs a tag.\n");
+		return;
+	}
+
+	unsigned master_tag, slave_tag;
+	if(!get_input(command, master_tag)) {
+		suanpan_error("new_contact3d() needs valid master group tag.\n");
+		return;
+	}
+	if(!get_input(command, slave_tag)) {
+		suanpan_error("new_contact3d() needs valid slave group tag.\n");
+		return;
+	}
+
+	auto alpha = 1E6;
+	if(!get_optional_input(command, alpha)) {
+		suanpan_error("new_contact3d() needs valid multiplier.\n");
+		return;
+	}
+
+	return_obj = make_unique<Contact3D>(tag, master_tag, slave_tag, alpha);
 }
 
 void new_cp3(unique_ptr<Element>& return_obj, istringstream& command) {

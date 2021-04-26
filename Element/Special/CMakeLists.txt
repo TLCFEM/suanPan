@@ -1,5 +1,6 @@
 set(Special
     Special/Contact2D.cpp
+    Special/Contact3D.cpp
     Special/Damper01.cpp
     Special/Damper02.cpp
     Special/Embedded2D.cpp

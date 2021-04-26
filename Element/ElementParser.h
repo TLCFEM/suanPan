@@ -38,6 +38,7 @@ void new_cax8(unique_ptr<Element>&, istringstream&);
 void new_cin3d8(unique_ptr<Element>&, istringstream&);
 void new_cinp4(unique_ptr<Element>&, istringstream&);
 void new_contact2d(unique_ptr<Element>&, istringstream&);
+void new_contact3d(unique_ptr<Element>&, istringstream&);
 void new_cp3(unique_ptr<Element>&, istringstream&);
 void new_cp4(unique_ptr<Element>&, istringstream&);
 void new_cp4i(unique_ptr<Element>&, istringstream&);

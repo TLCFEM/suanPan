@@ -1201,6 +1201,9 @@
     <ClCompile Include="..\..\..\Solver\FEAST.cpp">
       <Filter>Solver</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Element\Special\Contact3D.cpp">
+      <Filter>Element\Special</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2298,6 +2301,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Domain\MetaMat\DenseMat.hpp">
       <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Special\Contact3D.h">
+      <Filter>Element\Special</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
