@@ -67,7 +67,7 @@ The binaries, which are compiled with Intel MKL and VTK, are available on [Choco
 
 4. It is recommended to use a modern terminal such as [Windows Terminal](https://github.com/microsoft/terminal) and [Fluent Terminal](https://github.com/felixse/FluentTerminal) for better output display.
 
-It is also possible to use `[Scoop](https://scoop.sh/)` to install the package.
+It is also possible to use [Scoop](https://scoop.sh/) to install the package.
 
 ```ps
 scoop install https://raw.githubusercontent.com/TLCFEM/suanPan/dev/Enhancement/suanpan.json
