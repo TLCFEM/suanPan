@@ -4,6 +4,10 @@
 
 1. `MKL` includes outdated `FEAST`, the external names in `FEAST` library are modified to avoid linking error.
 
+## version 1.x
+
+1. add `scoop` support
+
 ## version 1.4
 
 1. add `R2D2` and `R3D2` alias for fixed length constraint
