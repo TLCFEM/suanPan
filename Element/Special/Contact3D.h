@@ -18,7 +18,7 @@
  * @class Contact3D
  * @brief A Contact3D class.
  *
- * The Contact3D class.
+ * The Contact3D class defines node to triangular facet contact via penalty function.
  *
  * @author tlc
  * @date 29/04/2021
@@ -35,17 +35,19 @@
 #include <array>
 
 class Contact3D final : public Element {
-	struct MasterFacet {
-		std::array<weak_ptr<Node>, 3> node;
-		std::array<vec, 3> position;
-		std::array<vec,3> edge_norm;
-		vec facet_norm;
-	};
-
-	struct SlaveNode {
+	struct ContactNode {
 		weak_ptr<Node> node;
 		vec position;
+		uvec local_span;
 	};
+
+	struct MasterFacet {
+		std::array<ContactNode, 3> node;
+		std::array<vec, 3> edge_outer_norm;
+		vec facet_outer_norm;
+	};
+
+	typedef ContactNode SlaveNode;
 
 	static constexpr unsigned c_dof = 3;
 
@@ -57,6 +59,7 @@ class Contact3D final : public Element {
 	const double alpha;
 
 	void update_position();
+	void check_contact(const MasterFacet&, const SlaveNode&);
 public:
 	Contact3D(unsigned, unsigned, unsigned, double = 1E8);
 
