@@ -50,34 +50,14 @@ Contact2D::Contact2D(const unsigned T, const unsigned M, const unsigned S, const
 	, alpha(P) {}
 
 void Contact2D::initialize(const shared_ptr<DomainBase>& D) {
-	if(!D->find<Group>(master_tag) || !D->find<Group>(slave_tag)) {
-		suanpan_error("Contact2D: cannot find the given groups for element %u.\n", get_tag());
-		D->disable_element(get_tag());
-		return;
-	}
-
 	const auto& m_pool = D->get<Group>(master_tag)->get_pool();
 	master.reserve(m_pool.n_elem);
-	for(auto& I : m_pool) {
-		if(!D->find<Node>(I)) {
-			suanpan_error("Contact2D: invalid Node %llu detected, now disable element %u and return.", I, get_tag());
-			D->disable_element(get_tag());
-			return;
-		}
-		master.emplace_back(MasterNode{D->get<Node>(I), {}, {}, {}});
-	}
+	for(auto& I : m_pool) master.emplace_back(MasterNode{D->get<Node>(I), {}, {}, {}});
 	master.shrink_to_fit();
 
 	const auto& s_pool = D->get<Group>(slave_tag)->get_pool();
 	slave.reserve(s_pool.n_elem);
-	for(auto& I : s_pool) {
-		if(!D->find<Node>(I)) {
-			suanpan_error("Contact2D: invalid Node %llu detected, now disable element %u and return.", I, get_tag());
-			D->disable_element(get_tag());
-			return;
-		}
-		slave.emplace_back(SlaveNode{D->get<Node>(I), {}});
-	}
+	for(auto& I : s_pool) slave.emplace_back(SlaveNode{D->get<Node>(I), {}});
 	slave.shrink_to_fit();
 }
 
@@ -108,13 +88,13 @@ int Contact2D::update_status() {
 
 				const mat dn = rotation / sqrt(td) - master[I].norm * master[I].axis.t() / td;
 
-				rowvec pupc = master[I].norm.t();
-				rowvec pupb = s.t() * dn;
-				rowvec pupa = -pupb - pupc;
+				const rowvec pupc = master[I].norm.t();
+				const rowvec pupb = s.t() * dn;
+				const rowvec pupa = -pupb - pupc;
 
-				rowvec plpc = u * master[I].axis.t() / td;
-				rowvec plpb = u / td * s.t() - 2. * t * plpc;
-				rowvec plpa = -plpb - plpc;
+				const rowvec plpc = u * master[I].axis.t() / td;
+				const rowvec plpb = u / td * s.t() - 2. * t * plpc;
+				const rowvec plpa = -plpb - plpc;
 
 				trial_stiffness(span_a, span_a) += alpha * (master[I].norm * (plpa + (t - 1.) * pupa) - (t - 1.) * u * dn);
 				trial_stiffness(span_a, span_b) += alpha * (master[I].norm * (plpb + (t - 1.) * pupb) + (t - 1.) * u * dn);
