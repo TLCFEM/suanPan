@@ -348,7 +348,12 @@ void Element::initialize_base(const shared_ptr<DomainBase>& D) {
 	if(use_group) {
 		vector<const uvec*> pool;
 		pool.reserve(node_encoding.n_elem);
-		for(auto I : node_encoding) if(D->find<Group>(I)) pool.emplace_back(&D->get<Group>(I)->get_pool());
+		for(auto I : node_encoding)
+			if(D->find<Group>(I)) pool.emplace_back(&D->get<Group>(I)->get_pool());
+			else {
+				D->disable_element(get_tag());
+				return;
+			}
 
 		uword counter = 0;
 		for(auto& I : pool) counter += I->size();
