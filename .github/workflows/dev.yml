@@ -52,6 +52,7 @@ jobs:
           ./suanPan -f ../Example/Element/CIN3D8.supan > /dev/null
           ./suanPan -f ../Example/Element/CINP4.supan > /dev/null
           ./suanPan -f ../Example/Element/Contact2D.supan > /dev/null
+          ./suanPan -f ../Example/Element/Contact3D.supan > /dev/null
           ./suanPan -f ../Example/Element/CP3.supan > /dev/null
           ./suanPan -f ../Example/Element/CP3NL.supan > /dev/null
           ./suanPan -f ../Example/Element/CP4.supan > /dev/null

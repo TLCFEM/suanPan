@@ -326,6 +326,7 @@
     "ConcreteTsai",
     "Constant",
     "Contact2D",
+    "Contact3D",
     "Cosine",
     "CoulumbFriction",
     "CUDA",

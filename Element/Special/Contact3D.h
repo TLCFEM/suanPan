@@ -35,19 +35,24 @@
 #include <array>
 
 class Contact3D final : public Element {
-	struct ContactNode {
+	struct SlaveNode {
 		weak_ptr<Node> node;
-		vec position;
 		uvec local_span;
+		vec position;
+	};
+
+	struct MasterNode {
+		weak_ptr<Node> node;
+		uvec local_span;
+		vec position;
+		vec outer_norm;
 	};
 
 	struct MasterFacet {
-		std::array<ContactNode, 3> node;
-		std::array<vec, 3> edge_outer_norm;
+		std::array<MasterNode, 3> node;
 		vec facet_outer_norm;
+		double facet_area;
 	};
-
-	typedef ContactNode SlaveNode;
 
 	static constexpr unsigned c_dof = 3;
 
