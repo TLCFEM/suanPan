@@ -7,6 +7,7 @@
 ## version 1.x
 
 1. add `scoop` support
+2. add `Contact3D` 3D node-triangular facet contact element
 
 ## version 1.4
 
