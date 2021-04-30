@@ -79,7 +79,7 @@ void Contact3D::check_contact(const MasterFacet& m, const SlaveNode& s) {
 
 	const vec n = h / m.facet_area;
 
-	const vec resistance = pen * m.facet_outer_norm;
+	vec resistance = pen * m.facet_outer_norm;
 
 	trial_resistance(s.local_span) += resistance;
 	trial_resistance(m.node[i].local_span) += n(i) * resistance;
@@ -107,27 +107,36 @@ void Contact3D::check_contact(const MasterFacet& m, const SlaveNode& s) {
 	const mat drdj = dra * dfndj;
 	const mat drdk = dra * dfndk;
 
+	const rowvec si_fn = s_i.t() * skew_fn;
+	const rowvec sj_fn = s_j.t() * skew_fn;
+	const rowvec sk_fn = s_k.t() * skew_fn;
+
+	const rowvec si_skew = s_i.t() * skew_edge_k;
+	const rowvec sj_skew = s_j.t() * skew_edge_i;
+	const rowvec sk_skew = s_k.t() * skew_edge_j;
+
 	h /= m.facet_area;
+	resistance /= m.facet_area;
 
 	trial_stiffness(s.local_span, s.local_span) += drds;
 	trial_stiffness(s.local_span, m.node[i].local_span) += drdi;
 	trial_stiffness(s.local_span, m.node[j].local_span) += drdj;
 	trial_stiffness(s.local_span, m.node[k].local_span) += drdk;
 
-	trial_stiffness(m.node[i].local_span, s.local_span) += n(i) * drds + resistance * m.node[i].outer_norm.t() / m.facet_area;
-	trial_stiffness(m.node[i].local_span, m.node[i].local_span) += n(i) * drdi + resistance * (s_j.t() * skew_edge_i * dfndi - h(i) * dadi) / m.facet_area;
-	trial_stiffness(m.node[i].local_span, m.node[j].local_span) += n(i) * drdj + resistance * (s_j.t() * (skew_edge_i * dfndj + skew_fn) - m.node[i].outer_norm.t() - h(i) * dadj) / m.facet_area;
-	trial_stiffness(m.node[i].local_span, m.node[k].local_span) += n(i) * drdk + resistance * (s_j.t() * (skew_edge_i * dfndk - skew_fn) - h(i) * dadk) / m.facet_area;
+	trial_stiffness(m.node[i].local_span, s.local_span) += n(i) * drds + resistance * m.node[i].outer_norm.t();
+	trial_stiffness(m.node[i].local_span, m.node[i].local_span) += n(i) * drdi + resistance * (sj_skew * dfndi - h(i) * dadi);
+	trial_stiffness(m.node[i].local_span, m.node[j].local_span) += n(i) * drdj + resistance * (sj_skew * dfndj + sj_fn - m.node[i].outer_norm.t() - h(i) * dadj);
+	trial_stiffness(m.node[i].local_span, m.node[k].local_span) += n(i) * drdk + resistance * (sj_skew * dfndk - sj_fn - h(i) * dadk);
 
-	trial_stiffness(m.node[j].local_span, s.local_span) += n(j) * drds + resistance * m.node[j].outer_norm.t() / m.facet_area;
-	trial_stiffness(m.node[j].local_span, m.node[i].local_span) += n(j) * drdi + resistance * (s_k.t() * (skew_edge_j * dfndi - skew_fn) - h(j) * dadi) / m.facet_area;
-	trial_stiffness(m.node[j].local_span, m.node[j].local_span) += n(j) * drdj + resistance * (s_k.t() * skew_edge_j * dfndj - h(j) * dadj) / m.facet_area;
-	trial_stiffness(m.node[j].local_span, m.node[k].local_span) += n(j) * drdk + resistance * (s_k.t() * (skew_edge_j * dfndk + skew_fn) - m.node[j].outer_norm.t() - h(j) * dadk) / m.facet_area;
+	trial_stiffness(m.node[j].local_span, s.local_span) += n(j) * drds + resistance * m.node[j].outer_norm.t();
+	trial_stiffness(m.node[j].local_span, m.node[i].local_span) += n(j) * drdi + resistance * (sk_skew * dfndi - sk_fn - h(j) * dadi);
+	trial_stiffness(m.node[j].local_span, m.node[j].local_span) += n(j) * drdj + resistance * (sk_skew * dfndj - h(j) * dadj);
+	trial_stiffness(m.node[j].local_span, m.node[k].local_span) += n(j) * drdk + resistance * (sk_skew * dfndk + sk_fn - m.node[j].outer_norm.t() - h(j) * dadk);
 
-	trial_stiffness(m.node[k].local_span, s.local_span) += n(k) * drds + resistance * m.node[k].outer_norm.t() / m.facet_area;
-	trial_stiffness(m.node[k].local_span, m.node[i].local_span) += n(k) * drdi + resistance * (s_i.t() * (skew_edge_k * dfndi + skew_fn) - m.node[k].outer_norm.t() - h(k) * dadi) / m.facet_area;
-	trial_stiffness(m.node[k].local_span, m.node[j].local_span) += n(k) * drdj + resistance * (s_i.t() * (skew_edge_k * dfndj - skew_fn) - h(k) * dadj) / m.facet_area;
-	trial_stiffness(m.node[k].local_span, m.node[k].local_span) += n(k) * drdk + resistance * (s_i.t() * skew_edge_k * dfndk - h(k) * dadk) / m.facet_area;
+	trial_stiffness(m.node[k].local_span, s.local_span) += n(k) * drds + resistance * m.node[k].outer_norm.t();
+	trial_stiffness(m.node[k].local_span, m.node[i].local_span) += n(k) * drdi + resistance * (si_skew * dfndi + si_fn - m.node[k].outer_norm.t() - h(k) * dadi);
+	trial_stiffness(m.node[k].local_span, m.node[j].local_span) += n(k) * drdj + resistance * (si_skew * dfndj - si_fn - h(k) * dadj);
+	trial_stiffness(m.node[k].local_span, m.node[k].local_span) += n(k) * drdk + resistance * (si_skew * dfndk - h(k) * dadk);
 }
 
 Contact3D::Contact3D(const unsigned T, const unsigned M, const unsigned S, const double P)
