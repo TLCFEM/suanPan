@@ -73,24 +73,18 @@ void ShellBase::direction_cosine() {
 mat ShellBase::get_local_coordinate() const {
 	mat l_coordinate = get_coordinate(3).t();
 	l_coordinate = trans_mat.t() * (l_coordinate - repmat(l_coordinate.col(0), 1, l_coordinate.n_cols));
-	if(norm(l_coordinate.row(2)) > 1E-6) suanpan_warning("non-planar shell geomtry detected.\n");
+	if(norm(l_coordinate.row(2)) > 1E-6) suanpan_warning("non-planar shell geometry detected.\n");
 	return l_coordinate.rows(0, 1).t();
 }
 
 vec& ShellBase::transform_from_local_to_global(vec& resistance) const {
-	for(auto I = 0llu, J = 2llu; I < resistance.n_elem; I += 3llu, J += 3llu) {
-		const span t_span(I, J);
-		resistance(t_span) = trans_mat * resistance(t_span);
-	}
+	for(auto I = 0llu, J = 2llu; I < resistance.n_elem; I += 3llu, J += 3llu) resistance.rows(I, J) = trans_mat * resistance.rows(I, J);
 
 	return resistance;
 }
 
 vec& ShellBase::transform_from_global_to_local(vec& displacement) const {
-	for(auto I = 0llu, J = 2llu; I < displacement.n_elem; I += 3llu, J += 3llu) {
-		const span t_span(I, J);
-		displacement(t_span) = trans_mat.t() * displacement(t_span);
-	}
+	for(auto I = 0llu, J = 2llu; I < displacement.n_elem; I += 3llu, J += 3llu) displacement.rows(I, J) = trans_mat.t() * displacement.rows(I, J);
 
 	return displacement;
 }

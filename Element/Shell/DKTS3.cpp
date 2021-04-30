@@ -181,7 +181,7 @@ void DKTS3::initialize(const shared_ptr<DomainBase>& D) {
 }
 
 int DKTS3::update_status() {
-	// seperate displacement vector
+	// separate displacement vector
 	const auto t_disp = transform_from_global_to_local(get_trial_displacement());
 	vec m_disp(9), p_disp(9);
 	for(unsigned I = 0, J = 0; I < s_size; I += s_dof, J += 3) {
