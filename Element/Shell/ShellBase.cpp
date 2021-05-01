@@ -71,10 +71,11 @@ void ShellBase::direction_cosine() {
 }
 
 mat ShellBase::get_local_coordinate() const {
-	mat l_coordinate = get_coordinate(3).t();
-	l_coordinate = trans_mat.t() * (l_coordinate - repmat(l_coordinate.col(0), 1, l_coordinate.n_cols));
-	if(norm(l_coordinate.row(2)) > 1E-6) suanpan_warning("non-planar shell geometry detected.\n");
-	return l_coordinate.rows(0, 1).t();
+	// mat l_coordinate = get_coordinate(3).t();
+	// l_coordinate = trans_mat.t() * (l_coordinate - repmat(l_coordinate.col(0), 1, l_coordinate.n_cols));
+	// if(norm(l_coordinate.row(2)) > 1E-6) suanpan_warning("non-planar shell geometry detected.\n");
+	// return l_coordinate.rows(0, 1).t();
+	return (get_coordinate(3) * trans_mat).eval().cols(0, 1);
 }
 
 vec& ShellBase::transform_from_local_to_global(vec& resistance) const {
