@@ -31,15 +31,15 @@ int MPC::initialize(const shared_ptr<DomainBase>& D) {
 
 	auxiliary_stiffness.zeros(W->get_size(), num_size);
 
-	for(uword I = 0; I < node_encoding.n_elem; ++I) {
+	for(auto I = 0llu; I < node_encoding.n_elem; ++I) {
 		auto& t_node = D->get<Node>(node_encoding(I));
-		if(nullptr == t_node || !t_node->is_active() || t_node->get_reordered_dof().n_elem <= dof_reference(I)) {
+		if(nullptr == t_node || !t_node->is_active() || t_node->get_reordered_dof().n_elem < dof_reference(I)) {
 			auxiliary_stiffness.reset();
 			D->disable_constraint(get_tag());
 			return SUANPAN_SUCCESS;
 		}
 		auto& t_dof = t_node->get_reordered_dof();
-		auxiliary_stiffness(t_dof(dof_reference(I) - 1)) = weight_pool(I);
+		auxiliary_stiffness(t_dof(dof_reference(I))) = weight_pool(I);
 	}
 
 	return Constraint::initialize(D);

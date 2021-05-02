@@ -37,8 +37,8 @@ int MultiplierBC::process(const shared_ptr<DomainBase>& D) {
 		if(auto& t_node = D->get<Node>(I); nullptr != t_node && t_node->is_active()) {
 			auto& t_dof = t_node->get_reordered_dof();
 			for(const auto J : dof_reference)
-				if(J <= t_dof.n_elem) {
-					const auto& t_idx = t_dof(J - 1);
+				if(J < t_dof.n_elem) {
+					const auto& t_idx = t_dof(J);
 					D->insert_restrained_dof(t_idx);
 					t_stiff->unify(t_idx);
 					// if(nullptr != t_damping) t_damping->unify(t_idx);

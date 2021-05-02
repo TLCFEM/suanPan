@@ -38,9 +38,9 @@ int NodalForce::process(const shared_ptr<DomainBase>& D) {
 		if(auto& t_node = D->get<Node>(I); nullptr != t_node && t_node->is_active()) {
 			auto& t_dof = t_node->get_reordered_dof();
 			for(const auto J : dof_reference)
-				if(J <= t_dof.n_elem) {
-					trial_load(t_dof(J - 1)) += final_load;
-					D->insert_loaded_dof(t_dof(J - 1));
+				if(J < t_dof.n_elem) {
+					trial_load(t_dof(J)) += final_load;
+					D->insert_loaded_dof(t_dof(J));
 				}
 		}
 

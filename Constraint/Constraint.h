@@ -39,7 +39,7 @@ protected:
 
 	unsigned num_size; // size of multiplier
 
-	uvec dof_encoding; /**< DoF encoding */
+	uvec dof_encoding; // DoF encoding
 
 	vec trial_lambda = zeros(num_size);
 	vec current_lambda = zeros(num_size);

@@ -40,7 +40,7 @@ int FixedLength::initialize(const shared_ptr<DomainBase>& D) {
 	node_i = D->get<Node>(node_encoding(0));
 	node_j = D->get<Node>(node_encoding(1));
 
-	dof_encoding = join_cols(node_i.lock()->get_reordered_dof()(dof_reference - 1), node_j.lock()->get_reordered_dof()(dof_reference - 1));
+	dof_encoding = join_cols(node_i.lock()->get_reordered_dof()(dof_reference), node_j.lock()->get_reordered_dof()(dof_reference));
 
 	current_resistance = trial_resistance.zeros(num_size);
 

@@ -46,8 +46,8 @@ protected:
 
 	const unsigned amplitude_tag;
 
-	uvec node_encoding; /**< node encoding */
-	uvec dof_reference; /**< DoF reference */
+	uvec node_encoding; // node encoding
+	uvec dof_reference; // reference DoF ZERO based
 
 	shared_ptr<Amplitude> magnitude;
 public:

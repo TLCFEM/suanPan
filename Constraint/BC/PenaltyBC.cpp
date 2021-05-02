@@ -63,6 +63,8 @@ PenaltyBC::PenaltyBC(const unsigned T, const unsigned S, uvec&& N, const char* T
 	else if(is_equal(TP[0], '4')) dof_reference = uvec{4};
 	else if(is_equal(TP[0], '5')) dof_reference = uvec{5};
 	else if(is_equal(TP[0], '6')) dof_reference = uvec{6};
+
+	dof_reference -= 1;
 }
 
 /**
@@ -82,8 +84,8 @@ int PenaltyBC::process(const shared_ptr<DomainBase>& D) {
 		if(auto& t_node = D->get<Node>(I); nullptr != t_node && t_node->is_active()) {
 			auto& t_dof = t_node->get_reordered_dof();
 			for(const auto J : dof_reference)
-				if(J <= t_dof.n_elem) {
-					auto& t_idx = t_dof(J - 1);
+				if(J < t_dof.n_elem) {
+					auto& t_idx = t_dof(J);
 					D->insert_restrained_dof(t_idx);
 					++counter;
 					stiffness.resize(counter, counter);

@@ -25,7 +25,7 @@ ConditionalModifier::ConditionalModifier(const unsigned T, const unsigned ST, co
 	, start_step(std::max(1u, ST))
 	, amplitude_tag(AT)
 	, node_encoding(std::forward<uvec>(N))
-	, dof_reference(std::forward<uvec>(D)) {}
+	, dof_reference(std::forward<uvec>(D) - 1) {}
 
 int ConditionalModifier::initialize(const shared_ptr<DomainBase>& D) {
 	if(!validate_step(D)) return SUANPAN_SUCCESS;
