@@ -11,3 +11,4 @@
 #include "RigidWallMultiplier.h"
 #include "RigidWallPenalty.h"
 #include "FixedLength.h"
+#include "NodeLine.h"

@@ -34,11 +34,10 @@
 
 #include <Constraint/Constraint.h>
 
-class Node;
-
 class FixedLength : public Constraint {
 	const bool inequal;
 	const double min_gap;
+
 	vec coor;
 public:
 	FixedLength(unsigned, unsigned, unsigned, unsigned, uvec&&);

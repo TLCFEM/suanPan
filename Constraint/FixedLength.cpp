@@ -71,7 +71,7 @@ int FixedLength::process(const shared_ptr<DomainBase>& D) {
 		auxiliary_resistance += t_disp(I) * (2. * coor(I) + t_disp(I));
 	}
 
-	stiffness.zeros(2 * n_dof, 2 * n_dof);
+	stiffness.zeros(dof_encoding.n_elem, dof_encoding.n_elem);
 	const auto t_factor = 2. * trial_lambda(0);
 	for(auto I = 0llu; I < n_dof; ++I) stiffness(I + n_dof, I) = stiffness(I, I + n_dof) = -(stiffness(I, I) = stiffness(I + n_dof, I + n_dof) = t_factor);
 

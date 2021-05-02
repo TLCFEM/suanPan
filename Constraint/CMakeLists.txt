@@ -9,6 +9,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         Constraint/RigidWallMultiplier.cpp
         Constraint/RigidWallPenalty.cpp
         Constraint/FixedLength.cpp
+        Constraint/NodeLine.cpp
         )
 
 add_subdirectory(BC)

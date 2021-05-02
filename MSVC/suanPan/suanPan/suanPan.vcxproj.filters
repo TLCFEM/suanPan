@@ -1204,6 +1204,9 @@
     <ClCompile Include="..\..\..\Element\Special\Contact3D.cpp">
       <Filter>Element\Special</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\NodeLine.cpp">
+      <Filter>Constraint</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2304,6 +2307,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Element\Special\Contact3D.h">
       <Filter>Element\Special</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\NodeLine.h">
+      <Filter>Constraint</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

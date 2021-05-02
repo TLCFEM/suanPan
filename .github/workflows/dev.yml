@@ -181,6 +181,7 @@ jobs:
           ./suanPan -f ../Example/Other/Collision.supan > /dev/null
           ./suanPan -f ../Example/Other/Embed2D.supan > /dev/null
           ./suanPan -f ../Example/Other/FixedLength.supan > /dev/null
+          ./suanPan -f ../Example/Other/NodeLine.supan > /dev/null
           ./suanPan -f ../Example/Other/MinGap2D.supan > /dev/null
           ./suanPan -f ../Example/Other/Group.supan > /dev/null
           ./suanPan -f ../Example/Other/GroupBodyForce.supan > /dev/null

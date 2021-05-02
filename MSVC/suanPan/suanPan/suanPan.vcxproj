@@ -113,6 +113,7 @@
     <ClCompile Include="..\..\..\Constraint\Embed2D.cpp" />
     <ClCompile Include="..\..\..\Constraint\FixedLength.cpp" />
     <ClCompile Include="..\..\..\Constraint\MPC.cpp" />
+    <ClCompile Include="..\..\..\Constraint\NodeLine.cpp" />
     <ClCompile Include="..\..\..\Constraint\ParticleCollision.cpp" />
     <ClCompile Include="..\..\..\Constraint\ParticleCollision2D.cpp" />
     <ClCompile Include="..\..\..\Constraint\ParticleCollision3D.cpp" />
@@ -461,6 +462,7 @@
     <ClInclude Include="..\..\..\Constraint\Embed2D.h" />
     <ClInclude Include="..\..\..\Constraint\FixedLength.h" />
     <ClInclude Include="..\..\..\Constraint\MPC.h" />
+    <ClInclude Include="..\..\..\Constraint\NodeLine.h" />
     <ClInclude Include="..\..\..\Constraint\ParticleCollision.h" />
     <ClInclude Include="..\..\..\Constraint\ParticleCollision2D.h" />
     <ClInclude Include="..\..\..\Constraint\ParticleCollision3D.h" />
