@@ -75,7 +75,7 @@ int FixedLength::process(const shared_ptr<DomainBase>& D) {
 	const auto t_factor = 2. * trial_lambda(0);
 	for(auto I = 0llu; I < n_dof; ++I) stiffness(I + n_dof, I) = stiffness(I, I + n_dof) = -(stiffness(I, I) = stiffness(I + n_dof, I + n_dof) = t_factor);
 
-	trial_resistance = current_resistance + auxiliary_stiffness * (trial_lambda - current_lambda);
+	trial_resistance = auxiliary_stiffness * trial_lambda;
 
 	return SUANPAN_SUCCESS;
 }
