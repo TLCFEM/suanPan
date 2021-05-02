@@ -7,8 +7,8 @@ node 4 0 1
 
 element CP4 1 1 2 3 4 1 1
 
-fix 1 1 1
-fix 2 2 1 2
+fix2 1 1 1
+fix2 2 2 1 2
 
 generate elementgroup 1 1 1 1
 
@@ -29,7 +29,7 @@ analyze
 # Displacement:
 #   -4.0000e-05            0
 # Resistance:
-#    2.1429e-09  -5.0000e-01
+#    3.5293e-18  -5.0000e-01
 peek node 2
 
 peek element 1

@@ -10,7 +10,7 @@ material Elastic1D 1 10
 element EB21 1 1 2 12 1 1 0
 element EB21 2 3 4 12 1 1 0
 
-fix 1 P 1 4
+fix2 1 P 1 4
 
 constraint MinGap2D 2 2 3 .8
 
@@ -30,14 +30,14 @@ analyze
 # Displacement:
 #         0  -0.2667  -0.4000
 # Resistance:
-#             0  -8.0000e+00   3.9968e-13
+#         0  -8.0000        0
 # 
 # Node 3:
 #    1.0000  -1.0000
 # Displacement:
 #         0  -0.0667   0.1000
 # Resistance:
-#             0  -2.0000e+00  -3.9968e-13
+#         0  -2.0000        0
 peek node 2 3
 
 peek element 1
