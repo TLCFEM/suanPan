@@ -33,7 +33,7 @@ int NodalForce::process(const shared_ptr<DomainBase>& D) {
 
 	const auto active_dof = get_nodal_active_dof(D);
 
-	trial_load(active_dof) += pattern * magnitude->get_amplitude(W->get_trial_time());
+	trial_load(active_dof).fill(pattern * magnitude->get_amplitude(W->get_trial_time()));
 
 	for(const auto I : active_dof) D->insert_loaded_dof(I);
 

@@ -54,14 +54,35 @@ protected:
 
 	shared_ptr<Amplitude> magnitude;
 
+	/**
+	 * \brief Generate active DoF vector from assigned nodes.
+	 * \return vector of active DoFs
+	 */
 	uvec get_nodal_active_dof(const shared_ptr<DomainBase>&);
+	/**
+	 * \brief Generate active DoF vector from all nodes in the model.
+	 * \return vector of active DoFs
+	 */
 	uvec get_all_nodal_active_dof(const shared_ptr<DomainBase>&);
 public:
 	ConditionalModifier(unsigned, unsigned, unsigned, uvec&&, uvec&&);
 
 	virtual int initialize(const shared_ptr<DomainBase>&);
 
+	/**
+	 * \brief  This method provides all necessary pieces of typical constraints/loads
+	 * required, including additional blocks in original global stiffness, border matrix
+	 * resistance of multiplier, external loads.
+	 * \return success flag
+	 */
 	virtual int process(const shared_ptr<DomainBase>&) = 0;
+	/**
+	 * \brief For some algorithms, the global stiffness is formed only once in each substep.
+	 * After calling solver, the storage may contain factorization. It is not correct to modify it
+	 * in those algorithms. This method should provide updated constraint/load resistance but must not
+	 * touch global stiffness.
+	 * \return success flag
+	 */
 	virtual int process_resistance(const shared_ptr<DomainBase>&);
 
 	[[nodiscard]] const uvec& get_node_encoding() const;
@@ -76,6 +97,11 @@ public:
 	void set_end_step(unsigned);
 	[[nodiscard]] unsigned get_end_step() const;
 
+	/**
+	 * \brief Some constraints may modify global stiffness matrix so that it needs to be treated as an element
+	 * which may affect bandwidth of banded storage. By calling this method, the RCM reordering algorithm will
+	 * take this constraint into consideration. Make sure it is called in the constructor.
+	 */
 	void set_connected(bool) const;
 	[[nodiscard]] bool is_connected() const;
 
