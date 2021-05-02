@@ -25,8 +25,6 @@ Constraint::Constraint(const unsigned T, const unsigned ST, const unsigned AT, u
 
 Constraint::~Constraint() { suanpan_debug("Constraint %u dtor() called.\n", get_tag()); }
 
-const uvec& Constraint::get_dof_encoding() const { return dof_encoding; }
-
 const sp_vec& Constraint::get_trial_resistance() const { return trial_resistance; }
 
 const sp_vec& Constraint::get_current_resistance() const { return current_resistance; }

@@ -32,6 +32,7 @@
 #include <Constraint/Constraint.h>
 
 class MPC final : public Constraint {
+	const uvec dof_pool;
 	const vec weight_pool;
 	const double psudo_load;
 public:

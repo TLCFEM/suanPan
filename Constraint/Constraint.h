@@ -39,8 +39,6 @@ protected:
 
 	unsigned num_size; // size of multiplier
 
-	uvec dof_encoding; // DoF encoding
-
 	vec trial_lambda = zeros(num_size);
 	vec current_lambda = zeros(num_size);
 
@@ -67,8 +65,6 @@ public:
 	Constraint& operator=(Constraint&&) = delete;      // assign forbidden
 
 	~Constraint() override;
-
-	const uvec& get_dof_encoding() const;
 
 	const sp_vec& get_trial_resistance() const;
 	const sp_vec& get_current_resistance() const;

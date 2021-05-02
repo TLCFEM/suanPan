@@ -18,7 +18,6 @@
 #include "PenaltyBC.h"
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Domain/Node.h>
 #include <Toolbox/utility.h>
 
 /**
@@ -73,28 +72,13 @@ PenaltyBC::PenaltyBC(const unsigned T, const unsigned S, uvec&& N, const char* T
  * \return 0
  */
 int PenaltyBC::process(const shared_ptr<DomainBase>& D) {
-	stiffness.reset();
-	vector<uword> pool;
-	pool.reserve(node_encoding.n_elem * dof_reference.n_elem);
+	dof_encoding = get_nodal_active_dof(D);
 
-	const auto max_term = std::min(1E12, multiplier * D->get_factory()->get_stiffness()->max());
+	stiffness.zeros(dof_encoding.n_elem, dof_encoding.n_elem);
 
-	auto counter = 0llu;
-	for(const auto& I : node_encoding)
-		if(auto& t_node = D->get<Node>(I); nullptr != t_node && t_node->is_active()) {
-			auto& t_dof = t_node->get_reordered_dof();
-			for(const auto J : dof_reference)
-				if(J < t_dof.n_elem) {
-					auto& t_idx = t_dof(J);
-					D->insert_restrained_dof(t_idx);
-					++counter;
-					stiffness.resize(counter, counter);
-					stiffness(counter - 1, counter - 1) = max_term;
-					pool.emplace_back(t_idx);
-				}
-		}
+	stiffness.diag().fill(std::min(1E12, multiplier * D->get_factory()->get_stiffness()->max()));
 
-	dof_encoding = pool;
+	for(const auto I : dof_encoding) D->insert_restrained_dof(I);
 
 	return SUANPAN_SUCCESS;
 }

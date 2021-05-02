@@ -18,7 +18,6 @@
 #include "SupportMotion.h"
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Domain/Node.h>
 #include <Load/Amplitude/Amplitude.h>
 #include <Solver/Integrator/Integrator.h>
 #include <Step/Step.h>
@@ -40,18 +39,13 @@ int SupportMotion::initialize(const shared_ptr<DomainBase>& D) {
 
 	vector<uword> r_dof, e_dof;
 
-	for(auto I : W->get_reference_dof()) r_dof.emplace_back(I);
+	for(const auto I : W->get_reference_dof()) r_dof.emplace_back(I);
 
-	for(auto I : node_encoding)
-		if(auto& t_node = D->get<Node>(I); t_node != nullptr && t_node->is_active()) {
-			auto& t_dof = t_node->get_reordered_dof();
-			for(const auto J : dof_reference)
-				if(J < t_dof.n_elem) {
-					e_dof.emplace_back(t_dof(J));
-					if(find(r_dof.begin(), r_dof.end(), e_dof.back()) == r_dof.end()) r_dof.emplace_back(e_dof.back());
-					else suanpan_warning("more than one displacement loads are applied on node %llu DoF %llu.\n", I, J);
-				}
-		}
+	for(const auto I : get_nodal_active_dof(D)) {
+		e_dof.emplace_back(I);
+		if(r_dof.end() == find(r_dof.begin(), r_dof.end(), e_dof.back())) r_dof.emplace_back(e_dof.back());
+		else suanpan_warning("more than one displacement load are applied on the same DoF.\n");
+	}
 
 	encoding = e_dof;
 

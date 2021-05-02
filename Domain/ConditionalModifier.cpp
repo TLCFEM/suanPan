@@ -19,6 +19,32 @@
 #include <Domain/DomainBase.h>
 #include <Load/Amplitude/Ramp.h>
 #include <Step/Step.h>
+#include <Domain/Node.h>
+
+uvec ConditionalModifier::get_nodal_active_dof(const shared_ptr<DomainBase>& D) {
+	std::vector<uword> active_dof;
+	active_dof.reserve(node_encoding.n_elem * dof_reference.n_elem);
+
+	for(const auto I : node_encoding)
+		if(auto& t_node = D->get<Node>(I); nullptr != t_node && t_node->is_active()) {
+			auto& t_dof = t_node->get_reordered_dof();
+			for(const auto J : dof_reference) if(J < t_dof.n_elem) active_dof.emplace_back(t_dof(J));
+		}
+
+	return active_dof;
+}
+
+uvec ConditionalModifier::get_all_nodal_active_dof(const shared_ptr<DomainBase>& D) {
+	std::vector<uword> active_dof;
+	active_dof.reserve(D->get_node() * dof_reference.n_elem);
+
+	for(const auto& I : D->get_node_pool()) {
+		auto& t_dof = I->get_reordered_dof();
+		for(const auto J : dof_reference) if(J < t_dof.n_elem) active_dof.emplace_back(t_dof(J));
+	}
+
+	return active_dof;
+}
 
 ConditionalModifier::ConditionalModifier(const unsigned T, const unsigned ST, const unsigned AT, uvec&& N, uvec&& D)
 	: Tag(T)
@@ -53,6 +79,8 @@ int ConditionalModifier::initialize(const shared_ptr<DomainBase>& D) {
 int ConditionalModifier::process_resistance(const shared_ptr<DomainBase>& D) { return process(D); }
 
 const uvec& ConditionalModifier::get_node_encoding() const { return node_encoding; }
+
+const uvec& ConditionalModifier::get_dof_encoding() const { return dof_encoding; }
 
 void ConditionalModifier::set_initialized(const bool B) const { access::rw(initialized) = B; }
 

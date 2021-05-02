@@ -18,7 +18,6 @@
 #include "MultiplierBC.h"
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Domain/Node.h>
 #include <Step/Frequency.h>
 
 /**
@@ -30,21 +29,11 @@ int MultiplierBC::process(const shared_ptr<DomainBase>& D) {
 	if(auto& t_step = *D->get_current_step(); typeid(Frequency) == typeid(t_step)) return PenaltyBC::process(D);
 
 	auto& t_stiff = D->get_factory()->get_stiffness();
-	// auto& t_damping = D->get_factory()->get_damping();
-	// auto& t_mass = D->get_factory()->get_mass();
 
-	for(const auto& I : node_encoding)
-		if(auto& t_node = D->get<Node>(I); nullptr != t_node && t_node->is_active()) {
-			auto& t_dof = t_node->get_reordered_dof();
-			for(const auto J : dof_reference)
-				if(J < t_dof.n_elem) {
-					const auto& t_idx = t_dof(J);
-					D->insert_restrained_dof(t_idx);
-					t_stiff->unify(t_idx);
-					// if(nullptr != t_damping) t_damping->unify(t_idx);
-					// if(nullptr != t_mass) t_mass->unify(t_idx);
-				}
-		}
+	for(const auto I : get_nodal_active_dof(D)) {
+		D->insert_restrained_dof(I);
+		t_stiff->unify(I);
+	}
 
 	return SUANPAN_SUCCESS;
 }

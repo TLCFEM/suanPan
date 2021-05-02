@@ -20,6 +20,8 @@
  *
  * The ConditionalModifier class.
  *
+ * TODO: update node/element tags from groups need to be done in each iteration
+ *
  * @author tlc
  * @date 07/03/2021
  * @version 0.1.0
@@ -46,10 +48,14 @@ protected:
 
 	const unsigned amplitude_tag;
 
-	uvec node_encoding; // node encoding
+	uvec node_encoding; // node/element encoding
 	uvec dof_reference; // reference DoF ZERO based
+	uvec dof_encoding;  // DoF encoding
 
 	shared_ptr<Amplitude> magnitude;
+
+	uvec get_nodal_active_dof(const shared_ptr<DomainBase>&);
+	uvec get_all_nodal_active_dof(const shared_ptr<DomainBase>&);
 public:
 	ConditionalModifier(unsigned, unsigned, unsigned, uvec&&, uvec&&);
 
@@ -59,6 +65,7 @@ public:
 	virtual int process_resistance(const shared_ptr<DomainBase>&);
 
 	[[nodiscard]] const uvec& get_node_encoding() const;
+	[[nodiscard]] const uvec& get_dof_encoding() const;
 
 	void set_initialized(bool) const;
 	[[nodiscard]] bool is_initialized() const;

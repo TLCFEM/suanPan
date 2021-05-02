@@ -31,16 +31,14 @@ FixedLength::FixedLength(const unsigned T, const unsigned S, const unsigned A, c
 	, min_gap(M * M) { set_connected(true); }
 
 int FixedLength::initialize(const shared_ptr<DomainBase>& D) {
-	for(auto I = 0llu; I < node_encoding.n_elem; ++I)
-		if(auto& t_node = D->get<Node>(node_encoding(I)); nullptr == t_node || !t_node->is_active() || t_node->get_reordered_dof().n_elem < dof_reference.n_elem) {
-			D->disable_constraint(get_tag());
-			return SUANPAN_SUCCESS;
-		}
+	dof_encoding = get_nodal_active_dof(D);
 
-	node_i = D->get<Node>(node_encoding(0));
-	node_j = D->get<Node>(node_encoding(1));
+	if(dof_encoding.n_elem != node_encoding.n_elem * dof_reference.n_elem) {
+		D->disable_constraint(get_tag());
+		return SUANPAN_SUCCESS;
+	}
 
-	dof_encoding = join_cols(node_i.lock()->get_reordered_dof()(dof_reference), node_j.lock()->get_reordered_dof()(dof_reference));
+	coor = resize(D->get<Node>(node_encoding(1))->get_coordinate(), dof_reference.n_elem, 1) - resize(D->get<Node>(node_encoding(0))->get_coordinate(), dof_reference.n_elem, 1);
 
 	current_resistance = trial_resistance.zeros(num_size);
 
@@ -48,17 +46,14 @@ int FixedLength::initialize(const shared_ptr<DomainBase>& D) {
 }
 
 int FixedLength::process(const shared_ptr<DomainBase>& D) {
-	const auto& node_ptr_i = node_i.lock();
-	const auto& node_ptr_j = node_j.lock();
-
-	const auto n_dof = dof_reference.n_elem;
-
-	vec coor = resize(node_ptr_j->get_coordinate(), n_dof, 1) - resize(node_ptr_i->get_coordinate(), n_dof, 1);
-	vec t_disp = node_ptr_j->get_trial_displacement().head(n_dof) - node_ptr_i->get_trial_displacement().head(n_dof);
-	uvec dof_i = dof_encoding.head(n_dof);
-	uvec dof_j = dof_encoding.tail(n_dof);
-
 	auto& W = D->get_factory();
+
+	const auto& n_dof = dof_reference.n_elem;
+
+	const uvec dof_i = dof_encoding.head(n_dof);
+	const uvec dof_j = dof_encoding.tail(n_dof);
+
+	const vec t_disp = W->get_trial_displacement()(dof_j) - W->get_trial_displacement()(dof_i);
 
 	if(inequal) {
 		if(accu(square(coor + t_disp)) > min_gap + datum::eps) {

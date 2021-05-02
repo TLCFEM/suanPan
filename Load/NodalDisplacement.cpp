@@ -18,7 +18,6 @@
 #include "NodalDisplacement.h"
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Domain/Node.h>
 #include <Load/Amplitude/Amplitude.h>
 
 NodalDisplacement::NodalDisplacement(const unsigned T, const unsigned ST, const double L, uvec&& N, const unsigned D, const unsigned AT)
@@ -38,17 +37,11 @@ int NodalDisplacement::initialize(const shared_ptr<DomainBase>& D) {
 
 	vector<uword> r_dof;
 
-	for(auto I : W->get_reference_dof()) r_dof.emplace_back(I);
+	for(const auto I : W->get_reference_dof()) r_dof.emplace_back(I);
 
-	for(auto I : node_encoding)
-		if(auto& t_node = D->get<Node>(I); t_node != nullptr && t_node->is_active()) {
-			auto& t_dof = t_node->get_reordered_dof();
-			for(const auto J : dof_reference)
-				if(J < t_dof.n_elem) {
-					if(const auto& tt_dof = t_dof(J); find(r_dof.begin(), r_dof.end(), tt_dof) == r_dof.end()) r_dof.emplace_back(tt_dof);
-					else suanpan_warning("more than one displacement loads are applied on node %llu DoF %llu.\n", I, J);
-				}
-		}
+	for(const auto I : get_nodal_active_dof(D))
+		if(r_dof.end() == find(r_dof.begin(), r_dof.end(), I)) r_dof.emplace_back(I);
+		else suanpan_warning("more than one displacement loads are applied on the same DoF.\n");
 
 	W->set_reference_dof(uvec(r_dof));
 	W->set_reference_size(static_cast<unsigned>(r_dof.size()));
@@ -59,15 +52,9 @@ int NodalDisplacement::initialize(const shared_ptr<DomainBase>& D) {
 int NodalDisplacement::process(const shared_ptr<DomainBase>& D) {
 	const auto& W = D->get_factory();
 
-	const auto final_settlement = pattern * magnitude->get_amplitude(W->get_trial_time());
-
 	trial_settlement.zeros(W->get_size());
 
-	for(const auto& I : node_encoding)
-		if(auto& t_node = D->get<Node>(I); nullptr != t_node && t_node->is_active()) {
-			auto& t_dof = t_node->get_reordered_dof();
-			for(const auto J : dof_reference) if(J < t_dof.n_elem) trial_settlement(t_dof(J)) = final_settlement;
-		}
+	trial_settlement(get_nodal_active_dof(D)).fill(pattern * magnitude->get_amplitude(W->get_trial_time()));
 
 	return SUANPAN_SUCCESS;
 }

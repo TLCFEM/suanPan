@@ -18,7 +18,6 @@
 #include "NodalAcceleration.h"
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Domain/Node.h>
 #include <Load/Amplitude/Amplitude.h>
 
 NodalAcceleration::NodalAcceleration(const unsigned T, const unsigned ST, const double L, const unsigned DT, const unsigned AT)
@@ -37,17 +36,7 @@ int NodalAcceleration::process(const shared_ptr<DomainBase>& D) {
 
 	if(nullptr == W->get_mass()) return SUANPAN_SUCCESS;
 
-	if(node_encoding.is_empty())
-		for(const auto& I : D->get_node_pool()) {
-			auto& t_dof = I->get_reordered_dof();
-			for(const auto J : dof_reference) if(J < t_dof.n_elem) trial_load(t_dof(J)) = 1.;
-		}
-	else
-		for(const auto& I : node_encoding)
-			if(auto& t_node = D->get<Node>(I); nullptr != t_node && t_node->is_active()) {
-				auto& t_dof = t_node->get_reordered_dof();
-				for(const auto J : dof_reference) if(J < t_dof.n_elem) trial_load(t_dof(J)) = 1.;
-			}
+	trial_load(node_encoding.is_empty() ? get_all_nodal_active_dof(D) : get_nodal_active_dof(D)).fill(1.);
 
 	trial_load = W->get_mass() * trial_load * pattern * magnitude->get_amplitude(W->get_trial_time());
 

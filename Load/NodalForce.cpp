@@ -18,7 +18,6 @@
 #include "NodalForce.h"
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Domain/Node.h>
 #include <Load/Amplitude/Amplitude.h>
 
 NodalForce::NodalForce(const unsigned T, const unsigned S, const double L, uvec&& N, const unsigned D, const unsigned AT)
@@ -30,19 +29,13 @@ NodalForce::NodalForce(const unsigned T, const unsigned S, const double L, uvec&
 int NodalForce::process(const shared_ptr<DomainBase>& D) {
 	const auto& W = D->get_factory();
 
-	const auto final_load = pattern * magnitude->get_amplitude(W->get_trial_time());
-
 	trial_load.zeros(W->get_size());
 
-	for(const auto& I : node_encoding)
-		if(auto& t_node = D->get<Node>(I); nullptr != t_node && t_node->is_active()) {
-			auto& t_dof = t_node->get_reordered_dof();
-			for(const auto J : dof_reference)
-				if(J < t_dof.n_elem) {
-					trial_load(t_dof(J)) += final_load;
-					D->insert_loaded_dof(t_dof(J));
-				}
-		}
+	const auto active_dof = get_nodal_active_dof(D);
+
+	trial_load(active_dof) += pattern * magnitude->get_amplitude(W->get_trial_time());
+
+	for(const auto I : active_dof) D->insert_loaded_dof(I);
 
 	return SUANPAN_SUCCESS;
 }

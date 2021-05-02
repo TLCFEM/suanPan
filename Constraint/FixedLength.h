@@ -39,8 +39,7 @@ class Node;
 class FixedLength : public Constraint {
 	const bool inequal;
 	const double min_gap;
-
-	weak_ptr<Node> node_i, node_j;
+	vec coor;
 public:
 	FixedLength(unsigned, unsigned, unsigned, unsigned, uvec&&);
 	FixedLength(unsigned, unsigned, unsigned, unsigned, double, uvec&&);
