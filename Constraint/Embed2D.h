@@ -33,6 +33,8 @@
 
 class Embed2D final : public Constraint {
 	static constexpr unsigned max_iteration = 20;
+
+	const unsigned element_tag;
 public:
 	Embed2D(unsigned, unsigned, unsigned, unsigned);
 

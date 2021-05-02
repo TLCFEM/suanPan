@@ -43,7 +43,7 @@ int NodalDisplacement::initialize(const shared_ptr<DomainBase>& D) {
 	for(auto I : node_encoding)
 		if(auto& t_node = D->get<Node>(I); t_node != nullptr && t_node->is_active()) {
 			auto& t_dof = t_node->get_reordered_dof();
-			for(auto J : dof_reference)
+			for(const auto J : dof_reference)
 				if(J <= t_dof.n_elem) {
 					if(const auto& tt_dof = t_dof(J - 1); find(r_dof.begin(), r_dof.end(), tt_dof) == r_dof.end()) r_dof.emplace_back(tt_dof);
 					else suanpan_warning("more than one displacement loads are applied on node %llu DoF %llu.\n", I, J);
@@ -66,7 +66,7 @@ int NodalDisplacement::process(const shared_ptr<DomainBase>& D) {
 	for(const auto& I : node_encoding)
 		if(auto& t_node = D->get<Node>(I); nullptr != t_node && t_node->is_active()) {
 			auto& t_dof = t_node->get_reordered_dof();
-			for(const auto& J : dof_reference) if(J <= t_dof.n_elem) trial_settlement(t_dof(J - 1)) = final_settlement;
+			for(const auto J : dof_reference) if(J <= t_dof.n_elem) trial_settlement(t_dof(J - 1)) = final_settlement;
 		}
 
 	return SUANPAN_SUCCESS;

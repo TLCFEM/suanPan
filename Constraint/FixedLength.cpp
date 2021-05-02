@@ -21,29 +21,26 @@
 #include <Domain/Node.h>
 
 FixedLength::FixedLength(const unsigned T, const unsigned S, const unsigned A, const unsigned D, uvec&& N)
-	: Constraint(T, S, A, std::forward<uvec>(N), {D}, 1)
+	: Constraint(T, S, A, std::forward<uvec>(N), 2 == D ? uvec{1, 2} : uvec{1, 2, 3}, 1)
 	, inequal(false)
 	, min_gap(0.) { set_connected(true); }
 
 FixedLength::FixedLength(const unsigned T, const unsigned S, const unsigned A, const unsigned D, const double M, uvec&& N)
-	: Constraint(T, S, A, std::forward<uvec>(N), {D}, 1)
+	: Constraint(T, S, A, std::forward<uvec>(N), 2 == D ? uvec{1, 2} : uvec{1, 2, 3}, 1)
 	, inequal(true)
 	, min_gap(M * M) { set_connected(true); }
 
 int FixedLength::initialize(const shared_ptr<DomainBase>& D) {
-	for(uword I = 0; I < node_encoding.n_elem; ++I) {
-		if(auto& t_node = D->get<Node>(node_encoding(I)); nullptr == t_node || !t_node->is_active() || t_node->get_reordered_dof().n_elem < dof_reference(0)) {
+	for(auto I = 0llu; I < node_encoding.n_elem; ++I)
+		if(auto& t_node = D->get<Node>(node_encoding(I)); nullptr == t_node || !t_node->is_active() || t_node->get_reordered_dof().n_elem < dof_reference.n_elem) {
 			D->disable_constraint(get_tag());
 			return SUANPAN_SUCCESS;
 		}
-	}
 
 	node_i = D->get<Node>(node_encoding(0));
 	node_j = D->get<Node>(node_encoding(1));
 
-	const auto& n_dof = dof_reference(0);
-
-	dof_encoding = join_cols(node_i.lock()->get_reordered_dof().head(n_dof), node_j.lock()->get_reordered_dof().head(n_dof));
+	dof_encoding = join_cols(node_i.lock()->get_reordered_dof()(dof_reference - 1), node_j.lock()->get_reordered_dof()(dof_reference - 1));
 
 	current_resistance = trial_resistance.zeros(num_size);
 
@@ -54,12 +51,12 @@ int FixedLength::process(const shared_ptr<DomainBase>& D) {
 	const auto& node_ptr_i = node_i.lock();
 	const auto& node_ptr_j = node_j.lock();
 
-	const auto& n_dof = dof_reference(0);
+	const auto n_dof = dof_reference.n_elem;
 
 	vec coor = resize(node_ptr_j->get_coordinate(), n_dof, 1) - resize(node_ptr_i->get_coordinate(), n_dof, 1);
 	vec t_disp = node_ptr_j->get_trial_displacement().head(n_dof) - node_ptr_i->get_trial_displacement().head(n_dof);
-	uvec dof_i = node_ptr_i->get_reordered_dof().head(n_dof);
-	uvec dof_j = node_ptr_j->get_reordered_dof().head(n_dof);
+	uvec dof_i = dof_encoding.head(n_dof);
+	uvec dof_j = dof_encoding.tail(n_dof);
 
 	auto& W = D->get_factory();
 

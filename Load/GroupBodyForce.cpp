@@ -17,7 +17,6 @@
 
 #include "GroupBodyForce.h"
 #include <Domain/DomainBase.h>
-#include <Domain/Factory.hpp>
 #include <Domain/Group.h>
 
 void GroupBodyForce::update_element_tag(const shared_ptr<DomainBase>& D) {

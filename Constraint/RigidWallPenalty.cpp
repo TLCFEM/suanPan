@@ -24,7 +24,7 @@ RigidWallPenalty::RigidWallPenalty(const unsigned T, const unsigned S, const uns
 	: Constraint(T, S, A, {}, {}, 0)
 	, alpha(F)
 	, origin(std::forward<vec>(O))
-	, norm(normalise(N)) {}
+	, outer_norm(normalise(N)) {}
 
 RigidWallPenalty::RigidWallPenalty(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double F)
 	: Constraint(T, S, A, {}, {}, 0)
@@ -32,14 +32,11 @@ RigidWallPenalty::RigidWallPenalty(const unsigned T, const unsigned S, const uns
 	, edge_a(E1 - O)
 	, edge_b(E2 - O)
 	, origin(std::forward<vec>(O))
-	, norm(normalise(cross(E1, E2))) {}
+	, outer_norm(normalise(cross(E1, E2)))
+	, length_a(norm(edge_a))
+	, length_b(norm(edge_b)) {}
 
 int RigidWallPenalty::initialize(const shared_ptr<DomainBase>& D) {
-	if(origin.n_elem != norm.n_elem || !edge_a.empty() && edge_a.n_elem != norm.n_elem || !edge_b.empty() && edge_b.n_elem != norm.n_elem) {
-		D->disable_constraint(get_tag());
-		return SUANPAN_SUCCESS;
-	}
-
 	current_resistance = trial_resistance.zeros(D->get_factory()->get_size());
 
 	return Constraint::initialize(D);
@@ -58,19 +55,19 @@ int RigidWallPenalty::process(const shared_ptr<DomainBase>& D) {
 	for(const auto& I : D->get_node_pool()) {
 		auto& t_coor = I->get_coordinate();
 		auto& t_disp = I->get_trial_displacement();
-		const auto t_size = std::min(norm.n_elem, std::min(t_coor.n_elem, t_disp.n_elem));
+		const auto t_size = std::min(outer_norm.n_elem, std::min(t_coor.n_elem, t_disp.n_elem));
 		vec t_pos = -origin;
 		for(auto J = 0llu; J < t_size; ++J) t_pos(J) += t_coor(J) + t_disp(J);
-		if(!edge_a.empty() && dot(t_pos, edge_a) > arma::norm(edge_a) || !edge_b.empty() && dot(t_pos, edge_b) > arma::norm(edge_b)) continue;
-		const auto t_pen = dot(t_pos, norm);
+		if(!edge_a.empty() && dot(t_pos, edge_a) > length_a || !edge_b.empty() && dot(t_pos, edge_b) > length_b) continue;
+		const auto t_pen = dot(t_pos, outer_norm);
 		if(t_pen > datum::eps) continue;
 		const auto next_counter = counter + t_size;
 		stiffness.resize(next_counter, next_counter);
-		stiffness.submat(counter, counter, size(t_size, t_size)) = factor * norm.head(t_size) * norm.head(t_size).t();
+		stiffness.submat(counter, counter, size(t_size, t_size)) = factor * outer_norm.head(t_size) * outer_norm.head(t_size).t();
 		auto& t_dof = I->get_reordered_dof();
 		for(auto J = 0llu; J < t_size; ++J) {
 			pool.emplace_back(t_dof(J));
-			trial_resistance(t_dof(J)) += factor * t_pen * norm(J);
+			trial_resistance(t_dof(J)) += factor * t_pen * outer_norm(J);
 		}
 		counter = next_counter;
 	}

@@ -22,7 +22,7 @@
 
 ConditionalModifier::ConditionalModifier(const unsigned T, const unsigned ST, const unsigned AT, uvec&& N, uvec&& D)
 	: Tag(T)
-	, start_step(0 == ST ? 1 : ST)
+	, start_step(std::max(1u, ST))
 	, amplitude_tag(AT)
 	, node_encoding(std::forward<uvec>(N))
 	, dof_reference(std::forward<uvec>(D)) {}

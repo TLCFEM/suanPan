@@ -23,11 +23,12 @@
 #include <Toolbox/shapeFunction.h>
 
 Embed2D::Embed2D(const unsigned T, const unsigned S, const unsigned ET, const unsigned NT)
-	: Constraint(T, S, 0, {NT}, {ET}, 2) {}
+	: Constraint(T, S, 0, {NT}, {}, 2)
+	, element_tag(ET) {}
 
 int Embed2D::initialize(const shared_ptr<DomainBase>& D) {
 	auto& t_node = D->get<Node>(node_encoding(0));
-	auto& t_element = D->get<Element>(dof_reference(0));
+	auto& t_element = D->get<Element>(element_tag);
 
 	if(nullptr == t_node || nullptr == t_element || !t_node->is_active() || !t_element->is_active() || 4 != t_element->get_node_number()) {
 		D->disable_constraint(get_tag());

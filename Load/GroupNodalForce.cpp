@@ -38,5 +38,5 @@ GroupNodalForce::GroupNodalForce(const unsigned T, const unsigned S, const doubl
 int GroupNodalForce::initialize(const shared_ptr<DomainBase>& D) {
 	update_node_tag(D);
 
-	return Load::initialize(D);
+	return NodalForce::initialize(D);
 }

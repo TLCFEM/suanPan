@@ -45,7 +45,7 @@ int SupportMotion::initialize(const shared_ptr<DomainBase>& D) {
 	for(auto I : node_encoding)
 		if(auto& t_node = D->get<Node>(I); t_node != nullptr && t_node->is_active()) {
 			auto& t_dof = t_node->get_reordered_dof();
-			for(auto J : dof_reference)
+			for(const auto J : dof_reference)
 				if(J <= t_dof.n_elem) {
 					e_dof.emplace_back(t_dof(J - 1));
 					if(find(r_dof.begin(), r_dof.end(), e_dof.back()) == r_dof.end()) r_dof.emplace_back(e_dof.back());

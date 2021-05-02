@@ -81,7 +81,7 @@ int PenaltyBC::process(const shared_ptr<DomainBase>& D) {
 	for(const auto& I : node_encoding)
 		if(auto& t_node = D->get<Node>(I); nullptr != t_node && t_node->is_active()) {
 			auto& t_dof = t_node->get_reordered_dof();
-			for(const auto& J : dof_reference)
+			for(const auto J : dof_reference)
 				if(J <= t_dof.n_elem) {
 					auto& t_idx = t_dof(J - 1);
 					D->insert_restrained_dof(t_idx);

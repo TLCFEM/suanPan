@@ -35,7 +35,8 @@ class RigidWallPenalty : public Constraint {
 	const double alpha;
 protected:
 	const vec edge_a, edge_b;
-	const vec origin, norm;
+	const vec origin, outer_norm;
+	const double length_a = 0., length_b = 0.;
 public:
 	RigidWallPenalty(unsigned, unsigned, unsigned, vec&&, vec&&, double);
 	RigidWallPenalty(unsigned, unsigned, unsigned, vec&&, vec&&, vec&&, double);
