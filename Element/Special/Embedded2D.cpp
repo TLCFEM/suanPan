@@ -25,9 +25,6 @@ Embedded2D::Embedded2D(const unsigned T, const unsigned ET, const unsigned NT, c
 	, alpha(P) {}
 
 void Embedded2D::initialize(const shared_ptr<DomainBase>& D) {
-	idx_x = linspace<uvec>(e_dof, e_dof * static_cast<uword>(host_size), host_size);
-	idx_y = idx_x + 1;
-
 	host_element = D->get<Element>(host_tag);
 
 	if(nullptr == host_element || !host_element->is_active()) {
@@ -36,6 +33,9 @@ void Embedded2D::initialize(const shared_ptr<DomainBase>& D) {
 	}
 
 	access::rw(host_size) = host_element->get_node_number();
+
+	idx_x = linspace<uvec>(e_dof, e_dof * static_cast<uword>(host_size), host_size);
+	idx_y = idx_x + 1;
 
 	const auto o_coor = get_coordinate(e_dof);
 	const mat t_coor = o_coor.tail_rows(host_size);
@@ -60,7 +60,7 @@ int Embedded2D::update_status() {
 
 	const vec reaction = alpha * (t_disp.head(2) - reshape(t_disp.tail(t_disp.n_elem - 2), e_dof, host_size) * iso_n.t());
 
-	trial_resistance.set_size(get_total_number());
+	trial_resistance.zeros(get_total_number());
 	trial_stiffness.zeros(get_total_number(), get_total_number());
 
 	trial_resistance.head(2) = -reaction;
