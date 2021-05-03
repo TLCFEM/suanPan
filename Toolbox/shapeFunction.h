@@ -57,7 +57,7 @@ namespace shape {
 	template<typename T> Mat<T> truss(T int_pts, unsigned order = 0, unsigned num_node = 2);
 	template<typename T> Col<T> beam(T int_pts, unsigned order, double length);
 	template<typename T> Mat<T> triangle(const Col<T>& int_pts, unsigned order);
-	template<typename T> Mat<T> quad(const Col<T>& int_pts, unsigned order, unsigned num_node = 4);
+	template<typename T> Mat<T> quad(const Mat<T>& int_pts, unsigned order, unsigned num_node = 4);
 	template<typename T> Mat<T> cube(const Col<T>& int_pts, unsigned order, unsigned num_node = 8);
 
 	namespace plate {
@@ -203,7 +203,7 @@ template<typename T> Mat<T> shape::triangle(const Col<T>& int_pts, const unsigne
 	return N;
 }
 
-template<typename T> Mat<T> shape::quad(const Col<T>& int_pts, const unsigned order, const unsigned num_node) {
+template<typename T> Mat<T> shape::quad(const Mat<T>& int_pts, const unsigned order, const unsigned num_node) {
 	Mat<T> N;
 
 	if(order != 0 && order != 1) throw invalid_argument("order needs to be either 0 or 1");

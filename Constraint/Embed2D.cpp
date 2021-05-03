@@ -20,7 +20,6 @@
 #include <Domain/Factory.hpp>
 #include <Domain/Node.h>
 #include <Element/Element.h>
-#include <Toolbox/shapeFunction.h>
 
 Embed2D::Embed2D(const unsigned T, const unsigned S, const unsigned ET, const unsigned NT)
 	: Constraint(T, S, 0, {NT}, {}, 2)
@@ -30,16 +29,16 @@ int Embed2D::initialize(const shared_ptr<DomainBase>& D) {
 	auto& t_node = D->get<Node>(node_encoding(0));
 	auto& t_element = D->get<Element>(element_tag);
 
-	if(nullptr == t_node || nullptr == t_element || !t_node->is_active() || !t_element->is_active() || 4 != t_element->get_node_number()) {
+	if(nullptr == t_node || nullptr == t_element || !t_node->is_active() || !t_element->is_active()) {
 		D->disable_constraint(get_tag());
 		return SUANPAN_FAIL;
 	}
 
-	const auto t_coor = get_coordinate(t_element.get(), 2);
+	const auto t_coor = get_coordinate(t_element.get(), num_size);
 
-	const vec n_coor = t_node->get_coordinate().head(2);
+	const vec n_coor = t_node->get_coordinate().head(num_size);
 
-	vec t_para = zeros(2);
+	vec t_para = zeros(num_size);
 
 	rowvec n;
 
@@ -50,7 +49,7 @@ int Embed2D::initialize(const shared_ptr<DomainBase>& D) {
 			return SUANPAN_FAIL;
 		}
 
-		const vec incre = solve((shape::quad(t_para, 1, 4) * t_coor).t(), n_coor - ((n = shape::quad(t_para, 0, 4)) * t_coor).t());
+		const vec incre = solve((t_element->compute_shape_function(t_para, 1) * t_coor).t(), n_coor - ((n = t_element->compute_shape_function(t_para, 0)) * t_coor).t());
 		if(norm(incre) < 1E-14) break;
 		t_para += incre;
 	}

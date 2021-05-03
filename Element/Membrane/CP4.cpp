@@ -242,7 +242,7 @@ void CP4::initialize(const shared_ptr<DomainBase>& D) {
 	int_pt.reserve(plan.n_rows);
 	for(unsigned I = 0; I < plan.n_rows; ++I) {
 		vec t_vec{plan(I, 0), plan(I, 1)};
-		const auto pn = shape::quad(t_vec, 1);
+		const auto pn = compute_shape_function(t_vec, 1);
 		const mat jacob = pn * ele_coor;
 		int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob), material_proto->get_copy(), solve(jacob, pn));
 
@@ -369,6 +369,8 @@ int CP4::reset_status() {
 	for(const auto& I : int_pt) code += I.m_material->reset_status();
 	return code;
 }
+
+mat CP4::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order); }
 
 vector<vec> CP4::record(const OutputType P) {
 	vector<vec> output;

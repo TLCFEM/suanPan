@@ -160,6 +160,8 @@ public:
 	[[nodiscard]] virtual double get_kinetic_energy() const = 0;
 
 	[[nodiscard]] virtual double get_characteristic_length() const = 0;
+
+	[[nodiscard]] virtual mat compute_shape_function(const mat&, unsigned) const = 0;
 };
 
 #endif

@@ -74,6 +74,8 @@ public:
 	int clear_status() override;
 	int reset_status() override;
 
+	mat compute_shape_function(const mat&, unsigned) const override;
+
 	vector<vec> record(OutputType) override;
 
 	void print() override;

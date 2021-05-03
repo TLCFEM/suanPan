@@ -237,6 +237,8 @@ public:
 	[[nodiscard]] double get_kinetic_energy() const override;
 
 	[[nodiscard]] double get_characteristic_length() const override;
+
+	[[nodiscard]] mat compute_shape_function(const mat&, unsigned) const override;
 };
 
 #endif

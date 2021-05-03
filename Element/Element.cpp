@@ -603,6 +603,8 @@ double Element::get_kinetic_energy() const { return kinetic_energy; }
 
 double Element::get_characteristic_length() const { return characteristic_length; }
 
+mat Element::compute_shape_function(const mat&, unsigned) const { return {}; }
+
 void ConstantMass(ElementData* E) {
 	E->update_mass = false;
 	E->current_mass = mat(E->initial_mass.memptr(), E->initial_mass.n_rows, E->initial_mass.n_cols, false, true);
