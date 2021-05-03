@@ -41,8 +41,8 @@ class Embedded2D final : public Element {
 	const unsigned host_size = 0;
 	const double alpha;
 	const rowvec iso_n;
-	const vec weight_x;
-	const vec weight_y;
+
+	uvec idx_x, idx_y;
 
 	shared_ptr<Element> host_element;
 public:

@@ -18,7 +18,6 @@
 #include "Embedded2D.h"
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Toolbox/shapeFunction.h>
 
 Embedded2D::Embedded2D(const unsigned T, const unsigned ET, const unsigned NT, const double P)
 	: Element(T, e_dof, ET, NT)
@@ -26,6 +25,9 @@ Embedded2D::Embedded2D(const unsigned T, const unsigned ET, const unsigned NT, c
 	, alpha(P) {}
 
 void Embedded2D::initialize(const shared_ptr<DomainBase>& D) {
+	idx_x = linspace<uvec>(e_dof, e_dof * static_cast<uword>(host_size), host_size);
+	idx_y = idx_x + 1;
+
 	host_element = D->get<Element>(host_tag);
 
 	if(nullptr == host_element || !host_element->is_active()) {
@@ -35,45 +37,22 @@ void Embedded2D::initialize(const shared_ptr<DomainBase>& D) {
 
 	access::rw(host_size) = host_element->get_node_number();
 
-	if(4 != host_size) {
-		D->disable_element(get_tag());
-		return;
-	}
-
-	const auto o_coor = get_coordinate(2);
+	const auto o_coor = get_coordinate(e_dof);
 	const mat t_coor = o_coor.tail_rows(host_size);
 	const vec n_coor = o_coor.row(0).t();
 
-	vec t_para = zeros(2);
+	vec t_para = zeros(e_dof);
 
 	auto& n = access::rw(iso_n);
 
 	unsigned counter = 0;
 	while(++counter <= max_iteration) {
-		const vec incre = solve((shape::quad(t_para, 1, 4) * t_coor).t(), n_coor - ((n = shape::quad(t_para, 0, 4)) * t_coor).t());
+		const vec incre = solve((host_element->compute_shape_function(t_para, 1) * t_coor).t(), n_coor - ((n = host_element->compute_shape_function(t_para, 0)) * t_coor).t());
 		if(norm(incre) < 1E-14) break;
 		t_para += incre;
 	}
 
 	if(max_iteration == counter) D->disable_element(get_tag());
-
-	const auto mean_x = mean(t_coor.col(0));
-	const auto mean_y = mean(t_coor.col(1));
-
-	mat jacobian(2, host_size);
-	jacobian.row(0).fill(1.);
-	jacobian.row(1) = (t_coor.col(0) - mean_x).t();
-
-	vec right(2);
-	right(0) = 1.;
-	right(1) = n_coor(0) - mean_x;
-
-	access::rw(weight_y) = solve(jacobian, right);
-
-	jacobian.row(1) = (t_coor.col(1) - mean_y).t();
-	right(1) = n_coor(1) - mean_y;
-
-	access::rw(weight_x) = solve(jacobian, right);
 }
 
 int Embedded2D::update_status() {
@@ -84,22 +63,19 @@ int Embedded2D::update_status() {
 	trial_resistance.set_size(get_total_number());
 	trial_stiffness.zeros(get_total_number(), get_total_number());
 
-	const auto idx_x = linspace<uvec>(2llu, 2llu + e_dof * (host_size - 1llu), host_size);
-	const auto idx_y = linspace<uvec>(3llu, 3llu + e_dof * (host_size - 1llu), host_size);
-
 	trial_resistance.head(2) = -reaction;
-	trial_resistance(idx_x) = weight_x * reaction(0);
-	trial_resistance(idx_y) = weight_y * reaction(1);
+	trial_resistance(idx_x) = iso_n.t() * reaction(0);
+	trial_resistance(idx_y) = iso_n.t() * reaction(1);
 
 	trial_stiffness(0, 0) = -alpha;
 	trial_stiffness(uvec{0}, idx_x) = alpha * iso_n;
-	trial_stiffness(idx_x, uvec{0}) = alpha * weight_x;
-	trial_stiffness(idx_x, idx_x) = -alpha * weight_x * iso_n;
+	trial_stiffness(idx_x, uvec{0}) = alpha * iso_n.t();
+	trial_stiffness(idx_x, idx_x) = -alpha * iso_n.t() * iso_n;
 
 	trial_stiffness(1, 1) = -alpha;
 	trial_stiffness(uvec{1}, idx_y) = alpha * iso_n;
-	trial_stiffness(idx_y, uvec{1}) = alpha * weight_y;
-	trial_stiffness(idx_y, idx_y) = -alpha * weight_y * iso_n;
+	trial_stiffness(idx_y, uvec{1}) = alpha * iso_n.t();
+	trial_stiffness(idx_y, idx_y) = -alpha * iso_n.t() * iso_n;
 
 	return SUANPAN_SUCCESS;
 }
