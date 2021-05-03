@@ -12,3 +12,4 @@
 #include "RigidWallPenalty.h"
 #include "FixedLength.h"
 #include "NodeLine.h"
+#include "NodeFacet.h"

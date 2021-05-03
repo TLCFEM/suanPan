@@ -8,7 +8,7 @@
 
 1. add `scoop` support
 2. add `Contact3D` 3D node-triangular facet contact element
-3. add `NodeLine` contact constraint
+3. add `NodeLine` and `NodeFacet` contact constraint
 
 ## version 1.4
 

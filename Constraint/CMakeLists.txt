@@ -10,6 +10,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         Constraint/RigidWallPenalty.cpp
         Constraint/FixedLength.cpp
         Constraint/NodeLine.cpp
+        Constraint/NodeFacet.cpp
         )
 
 add_subdirectory(BC)

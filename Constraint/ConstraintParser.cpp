@@ -35,6 +35,7 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, istringstream& c
 	else if(is_equal(constraint_id, "MinimumGap3D") || is_equal(constraint_id, "MinGap3D")) new_minimumgap(new_constraint, command, 3);
 	else if(is_equal(constraint_id, "MPC")) new_mpc(new_constraint, command);
 	else if(is_equal(constraint_id, "NodeLine")) new_nodeline(new_constraint, command);
+	else if(is_equal(constraint_id, "NodeFacet")) new_nodefacet(new_constraint, command);
 	else if(is_equal(constraint_id, "ParticleCollision2D")) new_particlecollision2d(new_constraint, command);
 	else if(is_equal(constraint_id, "ParticleCollision3D")) new_particlecollision3d(new_constraint, command);
 	else if(is_equal(constraint_id, "RigidWallMultiplier")) new_rigidwall(new_constraint, command, false, false);
@@ -185,6 +186,24 @@ void new_nodeline(unique_ptr<Constraint>& return_obj, istringstream& command) {
 		}
 
 	return_obj = make_unique<NodeLine>(tag, 0, 0, std::move(node_tag));
+}
+
+void new_nodefacet(unique_ptr<Constraint>& return_obj, istringstream& command) {
+	unsigned tag;
+	if(!get_input(command, tag)) {
+		suanpan_error("new_nodefacet() needs a valid tag.\n");
+		return;
+	}
+
+	uvec node_tag(4);
+
+	for(auto I = 0llu; I < node_tag.n_elem; ++I)
+		if(!get_input(command, node_tag(I))) {
+			suanpan_error("new_nodefacet() needs a valid node tag.\n");
+			return;
+		}
+
+	return_obj = make_unique<NodeFacet>(tag, 0, 0, std::move(node_tag));
 }
 
 void new_particlecollision2d(unique_ptr<Constraint>& return_obj, istringstream& command) {

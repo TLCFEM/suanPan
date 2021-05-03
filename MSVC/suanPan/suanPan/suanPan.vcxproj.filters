@@ -1207,6 +1207,9 @@
     <ClCompile Include="..\..\..\Constraint\NodeLine.cpp">
       <Filter>Constraint</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\NodeFacet.cpp">
+      <Filter>Constraint</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2309,6 +2312,9 @@
       <Filter>Element\Special</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Constraint\NodeLine.h">
+      <Filter>Constraint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\NodeFacet.h">
       <Filter>Constraint</Filter>
     </ClInclude>
   </ItemGroup>
