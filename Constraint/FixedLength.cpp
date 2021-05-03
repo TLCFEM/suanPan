@@ -40,8 +40,6 @@ int FixedLength::initialize(const shared_ptr<DomainBase>& D) {
 
 	coor = resize(D->get<Node>(node_encoding(1))->get_coordinate(), dof_reference.n_elem, 1) - resize(D->get<Node>(node_encoding(0))->get_coordinate(), dof_reference.n_elem, 1);
 
-	current_resistance = trial_resistance.zeros(num_size);
-
 	return Constraint::initialize(D);
 }
 
@@ -56,10 +54,8 @@ int FixedLength::process(const shared_ptr<DomainBase>& D) {
 	const vec t_disp = W->get_trial_displacement()(dof_j) - W->get_trial_displacement()(dof_i);
 
 	if(inequal) {
-		if(accu(square(coor + t_disp)) > min_gap + datum::eps) {
-			set_multiplier_size(0);
-			return SUANPAN_SUCCESS;
-		}
+		if(0 == num_size && accu(square(coor + t_disp)) > min_gap + datum::eps) return SUANPAN_SUCCESS;
+
 		set_multiplier_size(1);
 		auxiliary_load = min_gap - dot(coor, coor);
 	}
@@ -75,7 +71,7 @@ int FixedLength::process(const shared_ptr<DomainBase>& D) {
 	const auto t_factor = 2. * trial_lambda(0);
 	for(auto I = 0llu; I < n_dof; ++I) stiffness(I + n_dof, I) = stiffness(I, I + n_dof) = -(stiffness(I, I) = stiffness(I + n_dof, I + n_dof) = t_factor);
 
-	trial_resistance = auxiliary_stiffness * trial_lambda;
+	resistance = auxiliary_stiffness * trial_lambda;
 
 	return SUANPAN_SUCCESS;
 }
@@ -84,17 +80,17 @@ void FixedLength::update_status(const vec& i_lambda) { trial_lambda += i_lambda;
 
 void FixedLength::commit_status() {
 	current_lambda = trial_lambda;
-	current_resistance = trial_resistance;
+	resistance.reset();
 }
 
 void FixedLength::clear_status() {
 	current_lambda = trial_lambda.zeros();
-	current_resistance = trial_resistance.zeros();
+	resistance.reset();
 }
 
 void FixedLength::reset_status() {
 	trial_lambda = current_lambda;
-	trial_resistance = current_resistance;
+	resistance.reset();
 }
 
 MinimumGap::MinimumGap(const unsigned T, const unsigned S, const unsigned A, const unsigned D, const double M, uvec&& N)

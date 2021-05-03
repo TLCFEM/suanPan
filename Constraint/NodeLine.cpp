@@ -44,8 +44,6 @@ int NodeLine::initialize(const shared_ptr<DomainBase>& D) {
 		return SUANPAN_SUCCESS;
 	}
 
-	set_multiplier_size(0);
-
 	return Constraint::initialize(D);
 }
 
@@ -60,9 +58,9 @@ int NodeLine::process(const shared_ptr<DomainBase>& D) {
 
 	if(const auto t = dot(position, axis); 0 == num_size && (pen > 0. || t < 0. || t > norm(axis))) return SUANPAN_SUCCESS;
 
-	const span span_i(0, 1), span_j(2, 3), span_k(4, 5);
-
 	set_multiplier_size(1);
+
+	const span span_i(0, 1), span_j(2, 3), span_k(4, 5);
 
 	auxiliary_stiffness.zeros(D->get_factory()->get_size(), num_size);
 	auxiliary_resistance = pen;
@@ -83,7 +81,7 @@ int NodeLine::process(const shared_ptr<DomainBase>& D) {
 	stiffness(span_i, span_j) = stiffness(span_k, span_i) = -(stiffness(span_k, span_j) = factor);
 	stiffness(span_i, span_k) = stiffness(span_j, span_i) = -(stiffness(span_j, span_k) = factor.t());
 
-	trial_resistance = auxiliary_stiffness * trial_lambda;
+	resistance = auxiliary_stiffness * trial_lambda;
 
 	return SUANPAN_SUCCESS;
 }
@@ -92,18 +90,15 @@ void NodeLine::update_status(const vec& i_lambda) { trial_lambda += i_lambda; }
 
 void NodeLine::commit_status() {
 	current_lambda = trial_lambda;
-	current_resistance = trial_resistance;
 	set_multiplier_size(0);
 }
 
 void NodeLine::clear_status() {
 	current_lambda = trial_lambda.zeros();
-	current_resistance = trial_resistance.zeros();
 	set_multiplier_size(0);
 }
 
 void NodeLine::reset_status() {
 	trial_lambda = current_lambda;
-	trial_resistance = current_resistance;
 	set_multiplier_size(0);
 }

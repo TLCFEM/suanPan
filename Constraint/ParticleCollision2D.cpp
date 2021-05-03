@@ -41,7 +41,7 @@ int ParticleCollision2D::process_meta(const shared_ptr<DomainBase>& D, const boo
 
 	suanpan_sort(list.begin(), list.end(), [](const CellList& a, const CellList& b) { return a.x < b.x || a.x == b.x && a.y < b.y ? true : false; });
 
-	trial_resistance.zeros();
+	resistance.zeros(W->get_size());
 
 	for(auto I = list.cbegin(); I != list.cend(); ++I)
 		for(auto J = I + 1; J != list.cend(); ++J) {

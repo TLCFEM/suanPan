@@ -41,8 +41,6 @@ public:
 	RigidWallPenalty(unsigned, unsigned, unsigned, vec&&, vec&&, double);
 	RigidWallPenalty(unsigned, unsigned, unsigned, vec&&, vec&&, vec&&, double);
 
-	int initialize(const shared_ptr<DomainBase>&) override;
-
 	int process(const shared_ptr<DomainBase>&) override;
 
 	void commit_status() override;

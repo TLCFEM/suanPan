@@ -36,19 +36,13 @@ RigidWallPenalty::RigidWallPenalty(const unsigned T, const unsigned S, const uns
 	, length_a(norm(edge_a))
 	, length_b(norm(edge_b)) {}
 
-int RigidWallPenalty::initialize(const shared_ptr<DomainBase>& D) {
-	current_resistance = trial_resistance.zeros(D->get_factory()->get_size());
-
-	return Constraint::initialize(D);
-}
-
 int RigidWallPenalty::process(const shared_ptr<DomainBase>& D) {
 	auto& W = D->get_factory();
 
 	const auto factor = alpha * pow(W->get_incre_time(), -2.);
 
 	stiffness.reset();
-	trial_resistance.zeros();
+	resistance.zeros(W->get_size());
 	vector<uword> pool;
 
 	auto counter = 0llu;
@@ -67,7 +61,7 @@ int RigidWallPenalty::process(const shared_ptr<DomainBase>& D) {
 		auto& t_dof = I->get_reordered_dof();
 		for(auto J = 0llu; J < t_size; ++J) {
 			pool.emplace_back(t_dof(J));
-			trial_resistance(t_dof(J)) += factor * t_pen * outer_norm(J);
+			resistance(t_dof(J)) += factor * t_pen * outer_norm(J);
 		}
 		counter = next_counter;
 	}
@@ -77,8 +71,8 @@ int RigidWallPenalty::process(const shared_ptr<DomainBase>& D) {
 	return SUANPAN_SUCCESS;
 }
 
-void RigidWallPenalty::commit_status() { current_resistance = trial_resistance; }
+void RigidWallPenalty::commit_status() { resistance.reset(); }
 
-void RigidWallPenalty::clear_status() { current_resistance = trial_resistance.zeros(); }
+void RigidWallPenalty::clear_status() { resistance.reset(); }
 
-void RigidWallPenalty::reset_status() { trial_resistance = current_resistance; }
+void RigidWallPenalty::reset_status() { resistance.reset(); }

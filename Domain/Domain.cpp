@@ -1050,7 +1050,7 @@ int Domain::process_constraint(const bool full) {
 	for(auto& I : constraint_pond.get()) {
 		if(!I->is_initialized()) continue;
 		code += std::invoke(process_handler, I, shared_from_this());
-		if(!I->get_trial_resistance().empty()) constraint_resistance += I->get_trial_resistance();
+		if(!I->get_resistance().empty()) constraint_resistance += I->get_resistance();
 		counter += I->get_multiplier_size();
 	}
 

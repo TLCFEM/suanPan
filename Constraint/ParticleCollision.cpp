@@ -41,8 +41,6 @@ int ParticleCollision::initialize(const shared_ptr<DomainBase>& D) {
 		return SUANPAN_FAIL;
 	}
 
-	current_resistance = trial_resistance.zeros(D->get_factory()->get_size());
-
 	return Constraint::initialize(D);
 }
 
@@ -58,8 +56,8 @@ void ParticleCollision::apply_contact(const shared_ptr<DomainBase>& D, const sha
 	const auto force = compute_f(diff_norm);
 
 	for(auto I = 0llu; I < diff_pos.n_elem; ++I) {
-		trial_resistance(dof_i(I)) += force * diff_pos(I);
-		trial_resistance(dof_j(I)) -= force * diff_pos(I);
+		resistance(dof_i(I)) += force * diff_pos(I);
+		resistance(dof_j(I)) -= force * diff_pos(I);
 	}
 
 	if(!full) return;

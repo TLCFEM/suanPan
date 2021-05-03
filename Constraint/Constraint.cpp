@@ -25,9 +25,7 @@ Constraint::Constraint(const unsigned T, const unsigned ST, const unsigned AT, u
 
 Constraint::~Constraint() { suanpan_debug("Constraint %u dtor() called.\n", get_tag()); }
 
-const sp_vec& Constraint::get_trial_resistance() const { return trial_resistance; }
-
-const sp_vec& Constraint::get_current_resistance() const { return current_resistance; }
+const sp_vec& Constraint::get_resistance() const { return resistance; }
 
 const vec& Constraint::get_auxiliary_resistance() const { return auxiliary_resistance; }
 
@@ -37,7 +35,11 @@ const sp_mat& Constraint::get_stiffness() const { return stiffness; }
 
 const vec& Constraint::get_auxiliary_load() const { return auxiliary_load; }
 
-void Constraint::set_multiplier_size(const unsigned S) { num_size = S; }
+void Constraint::set_multiplier_size(const unsigned S) {
+	num_size = S;
+	stiffness.reset();
+	resistance.reset();
+}
 
 unsigned Constraint::get_multiplier_size() const { return num_size; }
 

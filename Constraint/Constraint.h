@@ -42,8 +42,7 @@ protected:
 	vec trial_lambda = zeros(num_size);
 	vec current_lambda = zeros(num_size);
 
-	sp_vec trial_resistance;
-	sp_vec current_resistance;
+	sp_vec resistance;
 	sp_mat stiffness;
 
 	vec auxiliary_resistance;
@@ -66,8 +65,7 @@ public:
 
 	~Constraint() override;
 
-	const sp_vec& get_trial_resistance() const;
-	const sp_vec& get_current_resistance() const;
+	const sp_vec& get_resistance() const;
 	const sp_mat& get_stiffness() const;
 
 	const vec& get_auxiliary_resistance() const;
