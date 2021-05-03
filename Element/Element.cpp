@@ -367,20 +367,18 @@ void Element::initialize_base(const shared_ptr<DomainBase>& D) {
 
 	// embedded elements use other elements
 	if(0 != use_other) {
-		if(D->find<Element>(use_other)) {
-			unsigned size = 1;
-			const auto& t_element = D->get<Element>(use_other);
-			size += t_element->get_node_number();
-			access::rw(num_node) = size;
-
-			auto& n_encoding = access::rw(node_encoding);
-			n_encoding.resize(size);
-			n_encoding.tail(size - 1llu) = t_element->get_node_encoding();
-		}
-		else {
+		if(!D->find<Element>(use_other)) {
 			D->disable_element(get_tag());
 			return;
 		}
+		unsigned size = 1;
+		const auto& t_element = D->get<Element>(use_other);
+		size += t_element->get_node_number();
+		access::rw(num_node) = size;
+
+		auto& n_encoding = access::rw(node_encoding);
+		n_encoding.resize(size);
+		n_encoding.tail(size - 1llu) = t_element->get_node_encoding();
 	}
 
 	// first initiliazation
