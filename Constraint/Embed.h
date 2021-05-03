@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class Embed2D
- * @brief A Embed2D class.
+ * @class Embed
+ * @brief A Embed class.
  *
  * @author tlc
  * @date 12/08/2020
  * @version 0.1.0
- * @file Embed2D.h
+ * @file Embed.h
  * @addtogroup Constraint
  * @{
  */
@@ -31,16 +31,31 @@
 
 #include <Constraint/Constraint.h>
 
-class Embed2D final : public Constraint {
+class Embed : public Constraint {
 	static constexpr unsigned max_iteration = 20;
 
 	const unsigned element_tag;
 public:
-	Embed2D(unsigned, unsigned, unsigned, unsigned);
+	Embed(unsigned, // unique constraint tag
+	      unsigned, // step tag
+	      unsigned, // element tag
+	      unsigned, // node tag
+	      unsigned  // dimension
+	);
 
 	int initialize(const shared_ptr<DomainBase>&) override;
 
 	int process(const shared_ptr<DomainBase>&) override;
+};
+
+class Embed2D final : public Embed {
+public:
+	Embed2D(unsigned, unsigned, unsigned, unsigned);
+};
+
+class Embed3D final : public Embed {
+public:
+	Embed3D(unsigned, unsigned, unsigned, unsigned);
 };
 
 #endif

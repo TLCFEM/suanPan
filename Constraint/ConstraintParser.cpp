@@ -28,7 +28,8 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, istringstream& c
 
 	unique_ptr<Constraint> new_constraint = nullptr;
 
-	if(is_equal(constraint_id, "Embed2D")) new_embed2d(new_constraint, command);
+	if(is_equal(constraint_id, "Embed2D")) new_embed(new_constraint, command, 2);
+	else if(is_equal(constraint_id, "Embed3D")) new_embed(new_constraint, command, 3);
 	else if(is_equal(constraint_id, "FixedLength2D") || is_equal(constraint_id, "R2D2")) new_fixedlength(new_constraint, command, 2);
 	else if(is_equal(constraint_id, "FixedLength3D") || is_equal(constraint_id, "R3D2")) new_fixedlength(new_constraint, command, 3);
 	else if(is_equal(constraint_id, "MinimumGap2D") || is_equal(constraint_id, "MinGap2D")) new_minimumgap(new_constraint, command, 2);
@@ -115,26 +116,27 @@ void new_minimumgap(unique_ptr<Constraint>& return_obj, istringstream& command, 
 	return_obj = make_unique<MinimumGap>(tag, 0, 0, dof, gap, uvec{node_i, node_j});
 }
 
-void new_embed2d(unique_ptr<Constraint>& return_obj, istringstream& command) {
+void new_embed(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dof) {
 	unsigned tag;
 	if(!get_input(command, tag)) {
-		suanpan_error("new_embed2d() needs a valid tag.\n");
+		suanpan_error("new_embed() needs a valid tag.\n");
 		return;
 	}
 
 	unsigned element_tag;
 	if(!get_input(command, element_tag)) {
-		suanpan_error("new_embed2d() needs a valid element tag.\n");
+		suanpan_error("new_embed() needs a valid element tag.\n");
 		return;
 	}
 
 	unsigned node_tag;
 	if(!get_input(command, node_tag)) {
-		suanpan_error("new_embed2d() needs a valid node tag.\n");
+		suanpan_error("new_embed() needs a valid node tag.\n");
 		return;
 	}
 
-	return_obj = make_unique<Embed2D>(tag, 0, element_tag, node_tag);
+	if(2 == dof) return_obj = make_unique<Embed2D>(tag, 0, element_tag, node_tag);
+	else return_obj = make_unique<Embed3D>(tag, 0, element_tag, node_tag);
 }
 
 void new_mpc(unique_ptr<Constraint>& return_obj, istringstream& command) {

@@ -1,7 +1,7 @@
 target_sources(${PROJECT_NAME} PRIVATE
         Constraint/Constraint.cpp
         Constraint/ConstraintParser.cpp
-        Constraint/Embed2D.cpp
+        Constraint/Embed.cpp
         Constraint/MPC.cpp
         Constraint/ParticleCollision.cpp
         Constraint/ParticleCollision2D.cpp

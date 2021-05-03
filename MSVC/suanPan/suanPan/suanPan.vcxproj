@@ -110,7 +110,7 @@
     <ClCompile Include="..\..\..\Constraint\Criterion\MinResistance.cpp" />
     <ClCompile Include="..\..\..\Constraint\Criterion\NodeBasedCriterion.cpp" />
     <ClCompile Include="..\..\..\Constraint\Criterion\StrainEnergyEvolution.cpp" />
-    <ClCompile Include="..\..\..\Constraint\Embed2D.cpp" />
+    <ClCompile Include="..\..\..\Constraint\Embed.cpp" />
     <ClCompile Include="..\..\..\Constraint\FixedLength.cpp" />
     <ClCompile Include="..\..\..\Constraint\MPC.cpp" />
     <ClCompile Include="..\..\..\Constraint\NodeFacet.cpp" />
@@ -460,7 +460,7 @@
     <ClInclude Include="..\..\..\Constraint\Criterion\MinResistance.h" />
     <ClInclude Include="..\..\..\Constraint\Criterion\NodeBasedCriterion.h" />
     <ClInclude Include="..\..\..\Constraint\Criterion\StrainEnergyEvolution.h" />
-    <ClInclude Include="..\..\..\Constraint\Embed2D.h" />
+    <ClInclude Include="..\..\..\Constraint\Embed.h" />
     <ClInclude Include="..\..\..\Constraint\FixedLength.h" />
     <ClInclude Include="..\..\..\Constraint\MPC.h" />
     <ClInclude Include="..\..\..\Constraint\NodeFacet.h" />

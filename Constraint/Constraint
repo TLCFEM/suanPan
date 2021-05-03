@@ -3,7 +3,7 @@
 
 #include "Constraint.h"
 #include "ConstraintParser.h"
-#include "Embed2D.h"
+#include "Embed.h"
 #include "MPC.h"
 #include "ParticleCollision.h"
 #include "ParticleCollision2D.h"

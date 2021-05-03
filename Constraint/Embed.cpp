@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include "Embed2D.h"
+#include "Embed.h"
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Domain/Node.h>
 #include <Element/Element.h>
 
-Embed2D::Embed2D(const unsigned T, const unsigned S, const unsigned ET, const unsigned NT)
-	: Constraint(T, S, 0, {NT}, {}, 2)
+Embed::Embed(const unsigned T, const unsigned S, const unsigned ET, const unsigned NT, const unsigned D)
+	: Constraint(T, S, 0, {NT}, {}, D)
 	, element_tag(ET) {}
 
-int Embed2D::initialize(const shared_ptr<DomainBase>& D) {
+int Embed::initialize(const shared_ptr<DomainBase>& D) {
 	auto& t_node = D->get<Node>(node_encoding(0));
 	auto& t_element = D->get<Element>(element_tag);
 
@@ -67,8 +67,14 @@ int Embed2D::initialize(const shared_ptr<DomainBase>& D) {
 	return Constraint::initialize(D);
 }
 
-int Embed2D::process(const shared_ptr<DomainBase>& D) {
+int Embed::process(const shared_ptr<DomainBase>& D) {
 	auxiliary_resistance = auxiliary_stiffness.t() * D->get_factory()->get_trial_displacement();
 
 	return SUANPAN_SUCCESS;
 }
+
+Embed2D::Embed2D(const unsigned T, const unsigned S, const unsigned ET, const unsigned NT)
+	: Embed(T, S, ET, NT, 2) {}
+
+Embed3D::Embed3D(const unsigned T, const unsigned S, const unsigned ET, const unsigned NT)
+	: Embed(T, S, ET, NT, 3) {}

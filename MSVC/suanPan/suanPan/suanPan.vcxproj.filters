@@ -210,7 +210,7 @@
     <ClCompile Include="..\..\..\Constraint\ConstraintParser.cpp">
       <Filter>Constraint</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Constraint\Embed2D.cpp">
+    <ClCompile Include="..\..\..\Constraint\Embed.cpp">
       <Filter>Constraint</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Constraint\MPC.cpp">
@@ -1254,7 +1254,7 @@
     <ClInclude Include="..\..\..\Constraint\ConstraintParser.h">
       <Filter>Constraint</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Constraint\Embed2D.h">
+    <ClInclude Include="..\..\..\Constraint\Embed.h">
       <Filter>Constraint</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Constraint\MPC.h">
