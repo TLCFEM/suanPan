@@ -27,7 +27,7 @@ Embedded2D::Embedded2D(const unsigned T, const unsigned ET, const unsigned NT, c
 void Embedded2D::initialize(const shared_ptr<DomainBase>& D) {
 	host_element = D->get<Element>(host_tag);
 
-	if(nullptr == host_element || !host_element->is_active()) {
+	if(nullptr == host_element || !host_element->is_active() || host_element->compute_shape_function(zeros(e_dof, 1), 0).empty()) {
 		D->disable_element(get_tag());
 		return;
 	}

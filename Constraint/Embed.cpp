@@ -29,7 +29,7 @@ int Embed::initialize(const shared_ptr<DomainBase>& D) {
 	auto& t_node = D->get<Node>(node_encoding(0));
 	auto& t_element = D->get<Element>(element_tag);
 
-	if(nullptr == t_node || nullptr == t_element || !t_node->is_active() || !t_element->is_active()) {
+	if(nullptr == t_node || nullptr == t_element || !t_node->is_active() || !t_element->is_active() || t_element->compute_shape_function(zeros(num_size, 1), 0).is_empty()) {
 		D->disable_constraint(get_tag());
 		return SUANPAN_FAIL;
 	}
