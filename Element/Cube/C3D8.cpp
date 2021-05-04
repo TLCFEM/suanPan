@@ -48,7 +48,7 @@ void C3D8::initialize(const shared_ptr<DomainBase>& D) {
 
 	if(hourglass_control) {
 		hourglass.zeros(c_size, c_size);
-		const auto pn = shape::cube(vec{0., 0., 0.}, 1);
+		const auto pn = compute_shape_function(vec{0., 0., 0.}, 1);
 		const mat pn_pxy = solve(pn * ele_coor, pn).t();
 		auto gamma = h_mode;
 		for(auto I = 0; I < 3; ++I) for(auto J = 0; J < 4; ++J) gamma(J) -= dot(h_mode(J), ele_coor.col(I)) * pn_pxy.col(I);
@@ -63,7 +63,7 @@ void C3D8::initialize(const shared_ptr<DomainBase>& D) {
 	int_pt.reserve(plan.n_rows);
 	for(unsigned I = 0; I < plan.n_rows; ++I) {
 		vec t_vec{plan(I, 0), plan(I, 1), plan(I, 2)};
-		const auto pn = shape::cube(t_vec, 1);
+		const auto pn = compute_shape_function(t_vec, 1);
 		const mat jacob = pn * ele_coor;
 		int_pt.emplace_back(std::move(t_vec), plan(I, 3) * det(jacob), material_proto->get_copy(), solve(jacob, pn));
 
@@ -80,7 +80,7 @@ void C3D8::initialize(const shared_ptr<DomainBase>& D) {
 	if(const auto t_density = material_proto->get_parameter(ParameterType::DENSITY); t_density > 0.) {
 		initial_mass.zeros(c_size, c_size);
 		for(const auto& I : int_pt) {
-			const auto n_int = shape::cube(I.coor, 0);
+			const auto n_int = compute_shape_function(I.coor, 0);
 			const auto t_factor = t_density * I.weight;
 			for(auto J = 0u, L = 0u; J < c_node; ++J, L += c_dof) for(auto K = J, M = L; K < c_node; ++K, M += c_dof) initial_mass(L, M) += t_factor * n_int(J) * n_int(K);
 		}
@@ -192,6 +192,8 @@ int C3D8::reset_status() {
 	for(const auto& I : int_pt) code += I.c_material->reset_status();
 	return code;
 }
+
+mat C3D8::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::cube(coordinate, order, c_node); }
 
 vector<vec> C3D8::record(const OutputType T) {
 	vector<vec> data;

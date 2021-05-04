@@ -58,7 +58,7 @@ namespace shape {
 	template<typename T> Col<T> beam(T int_pts, unsigned order, double length);
 	template<typename T> Mat<T> triangle(const Col<T>& int_pts, unsigned order);
 	template<typename T> Mat<T> quad(const Mat<T>& int_pts, unsigned order, unsigned num_node = 4);
-	template<typename T> Mat<T> cube(const Col<T>& int_pts, unsigned order, unsigned num_node = 8);
+	template<typename T> Mat<T> cube(const Mat<T>& int_pts, unsigned order, unsigned num_node = 8);
 
 	namespace plate {
 		template<typename T> Mat<T> triangle(const Col<T>& int_pts, unsigned order, unsigned num_node, const Mat<T>& nodes);
@@ -312,7 +312,7 @@ template<typename T> Mat<T> shape::quad(const Mat<T>& int_pts, const unsigned or
 	return N;
 }
 
-template<typename T> Mat<T> shape::cube(const Col<T>& int_pts, const unsigned order, const unsigned num_node) {
+template<typename T> Mat<T> shape::cube(const Mat<T>& int_pts, const unsigned order, const unsigned num_node) {
 	Mat<T> N;
 
 	if(order == 0) N.zeros(1, num_node);

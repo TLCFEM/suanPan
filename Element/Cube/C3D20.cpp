@@ -48,7 +48,7 @@ void C3D20::initialize(const shared_ptr<DomainBase>& D) {
 	int_pt.reserve(plan.n_rows);
 	for(unsigned I = 0; I < plan.n_rows; ++I) {
 		vec t_vec{plan(I, 0), plan(I, 1), plan(I, 2)};
-		const auto pn = shape::cube(t_vec, 1, c_node);
+		const auto pn = compute_shape_function(t_vec, 1);
 		const mat jacob = pn * ele_coor;
 		int_pt.emplace_back(std::move(t_vec), plan(I, 3) * det(jacob), material_proto->get_copy(), solve(jacob, pn));
 
@@ -65,7 +65,7 @@ void C3D20::initialize(const shared_ptr<DomainBase>& D) {
 	if(const auto t_density = material_proto->get_parameter(ParameterType::DENSITY); t_density > 0.) {
 		initial_mass.zeros(c_size, c_size);
 		for(const auto& I : int_pt) {
-			const auto n_int = shape::cube(I.coor, 0, c_node);
+			const auto n_int = compute_shape_function(I.coor, 0);
 			const auto t_factor = t_density * I.weight;
 			for(auto J = 0u, L = 0u; J < c_node; ++J, L += c_dof) for(auto K = J, M = L; K < c_node; ++K, M += c_dof) initial_mass(L, M) += t_factor * n_int(J) * n_int(K);
 		}
@@ -78,7 +78,7 @@ void C3D20::initialize(const shared_ptr<DomainBase>& D) {
 
 	body_force.zeros(c_size, c_dof);
 	for(const auto& I : int_pt) {
-		const mat n_int = I.weight * shape::cube(I.coor, 0, c_node);
+		const mat n_int = I.weight * compute_shape_function(I.coor, 0);
 		for(auto J = 0u, L = 0u; J < c_node; ++J, L += c_dof) for(auto K = 0llu; K < c_dof; ++K) body_force(L + K, K) += n_int(J);
 	}
 }
@@ -172,6 +172,8 @@ int C3D20::reset_status() {
 	for(const auto& I : int_pt) code += I.c_material->reset_status();
 	return code;
 }
+
+mat C3D20::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::cube(coordinate, order, c_node); }
 
 vector<vec> C3D20::record(const OutputType T) {
 	vector<vec> data;
