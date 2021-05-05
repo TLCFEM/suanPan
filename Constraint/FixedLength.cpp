@@ -21,14 +21,7 @@
 #include <Domain/Node.h>
 
 FixedLength::FixedLength(const unsigned T, const unsigned S, const unsigned A, const unsigned D, uvec&& N)
-	: Constraint(T, S, A, std::forward<uvec>(N), 2 == D ? uvec{1, 2} : uvec{1, 2, 3}, 1)
-	, inequal(false)
-	, min_gap(0.) { set_connected(true); }
-
-FixedLength::FixedLength(const unsigned T, const unsigned S, const unsigned A, const unsigned D, const double M, uvec&& N)
-	: Constraint(T, S, A, std::forward<uvec>(N), 2 == D ? uvec{1, 2} : uvec{1, 2, 3}, 1)
-	, inequal(true)
-	, min_gap(M * M) { set_connected(true); }
+	: Constraint(T, S, A, std::forward<uvec>(N), 2 == D ? uvec{1, 2} : uvec{1, 2, 3}, 1) { set_connected(true); }
 
 int FixedLength::initialize(const shared_ptr<DomainBase>& D) {
 	dof_encoding = get_nodal_active_dof(D);
@@ -39,6 +32,8 @@ int FixedLength::initialize(const shared_ptr<DomainBase>& D) {
 	}
 
 	coor = resize(D->get<Node>(node_encoding(1))->get_coordinate(), dof_reference.n_elem, 1) - resize(D->get<Node>(node_encoding(0))->get_coordinate(), dof_reference.n_elem, 1);
+
+	set_multiplier_size(0);
 
 	return Constraint::initialize(D);
 }
@@ -53,12 +48,23 @@ int FixedLength::process(const shared_ptr<DomainBase>& D) {
 
 	const vec t_disp = W->get_trial_displacement()(dof_j) - W->get_trial_displacement()(dof_i);
 
-	if(inequal) {
-		if(0 == num_size && accu(square(coor + t_disp)) > min_gap + datum::eps) return SUANPAN_SUCCESS;
+	if(const auto t_gap = accu(square(coor + t_disp)); min_bound && max_bound) {
+		if(0 == num_size && t_gap > min_gap && t_gap < max_gap) return SUANPAN_SUCCESS;
 
-		set_multiplier_size(1);
+		auxiliary_load = (2. * std::sqrt(t_gap) < std::sqrt(min_gap) + std::sqrt(max_gap) ? min_gap : max_gap) - dot(coor, coor);
+	}
+	else if(min_bound && !max_bound) {
+		if(0 == num_size && t_gap > min_gap) return SUANPAN_SUCCESS;
+
 		auxiliary_load = min_gap - dot(coor, coor);
 	}
+	else if(!min_bound && max_bound) {
+		if(0 == num_size && t_gap < max_gap) return SUANPAN_SUCCESS;
+
+		auxiliary_load = max_gap - dot(coor, coor);
+	}
+
+	set_multiplier_size(1);
 
 	auxiliary_stiffness.zeros(W->get_size(), num_size);
 	auxiliary_resistance = 0.;
@@ -80,18 +86,27 @@ void FixedLength::update_status(const vec& i_lambda) { trial_lambda += i_lambda;
 
 void FixedLength::commit_status() {
 	current_lambda = trial_lambda;
-	resistance.reset();
+	set_multiplier_size(0);
 }
 
 void FixedLength::clear_status() {
 	current_lambda = trial_lambda.zeros();
-	resistance.reset();
+	set_multiplier_size(0);
 }
 
 void FixedLength::reset_status() {
 	trial_lambda = current_lambda;
-	resistance.reset();
+	set_multiplier_size(0);
 }
 
 MinimumGap::MinimumGap(const unsigned T, const unsigned S, const unsigned A, const unsigned D, const double M, uvec&& N)
-	: FixedLength(T, S, A, D, M, std::forward<uvec>(N)) {}
+	: FixedLength(T, S, A, D, std::forward<uvec>(N)) {
+	access::rw(min_bound) = true;
+	access::rw(min_gap) = M * M;
+}
+
+MaximumGap::MaximumGap(const unsigned T, const unsigned S, const unsigned A, const unsigned D, const double M, uvec&& N)
+	: FixedLength(T, S, A, D, std::forward<uvec>(N)) {
+	access::rw(max_bound) = true;
+	access::rw(max_gap) = M * M;
+}

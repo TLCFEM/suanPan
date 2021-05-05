@@ -9,6 +9,7 @@
 1. add `scoop` support
 2. add `Contact3D` 3D node-triangular facet contact element
 3. add `NodeLine` and `NodeFacet` contact constraint
+4. add `MaxGap2D` and `MaxGap3D` constraint
 
 ## version 1.4
 
