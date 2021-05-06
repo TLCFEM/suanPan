@@ -59,7 +59,7 @@ void new_dkt3(unique_ptr<Element>&, istringstream&);
 void new_dkt4(unique_ptr<Element>&, istringstream&);
 void new_dkts3(unique_ptr<Element>&, istringstream&);
 void new_eb21(unique_ptr<Element>&, istringstream&);
-void new_embedded2d(unique_ptr<Element>&, istringstream&);
+void new_embedded(unique_ptr<Element>&, istringstream&, unsigned);
 void new_f21(unique_ptr<Element>&, istringstream&);
 void new_f21h(unique_ptr<Element>&, istringstream&);
 void new_f31(unique_ptr<Element>&, istringstream&);

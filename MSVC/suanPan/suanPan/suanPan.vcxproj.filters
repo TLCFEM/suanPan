@@ -456,9 +456,6 @@
     <ClCompile Include="..\..\..\Element\Special\Damper02.cpp">
       <Filter>Element\Special</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Element\Special\Embedded2D.cpp">
-      <Filter>Element\Special</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Element\Special\Joint.cpp">
       <Filter>Element\Special</Filter>
     </ClCompile>
@@ -1210,6 +1207,9 @@
     <ClCompile Include="..\..\..\Constraint\NodeFacet.cpp">
       <Filter>Constraint</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Element\Special\Embedded.cpp">
+      <Filter>Element\Special</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -1549,9 +1549,6 @@
       <Filter>Element\Special</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Element\Special\Damper02.h">
-      <Filter>Element\Special</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Element\Special\Embedded2D.h">
       <Filter>Element\Special</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Element\Special\Joint.h">
@@ -2316,6 +2313,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Constraint\NodeFacet.h">
       <Filter>Constraint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Special\Embedded.h">
+      <Filter>Element\Special</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

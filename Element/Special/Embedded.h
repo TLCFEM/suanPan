@@ -15,38 +15,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class Embedded2D
- * @brief A Embedded2D class.
+ * @class Embedded
+ * @brief A Embedded class.
  *
- * The Embedded2D class.
+ * The Embedded class.
  *
  * @author tlc
  * @date 12/08/2020
  * @version 0.1.0
- * @file Embedded2D.h
+ * @file Embedded.h
  * @addtogroup Constraint
  * @{
  */
 
-#ifndef EMBEDDED2D_H
-#define EMBEDDED2D_H
+#ifndef EMBEDDED_H
+#define EMBEDDED_H
 
 #include <Element/Element.h>
 
-class Embedded2D final : public Element {
-	static constexpr unsigned e_dof = 2;
+class Embedded : public Element {
 	static constexpr unsigned max_iteration = 20;
 
+	const unsigned e_dof;
 	const unsigned host_tag;
 	const unsigned host_size = 0;
 	const double alpha;
 	const rowvec iso_n;
 
-	uvec idx_x, idx_y;
+	std::vector<uvec> idx;
 
 	shared_ptr<Element> host_element;
 public:
-	Embedded2D(unsigned, unsigned, unsigned, double = 1E6);
+	Embedded(unsigned, unsigned, unsigned, unsigned, double);
 
 	void initialize(const shared_ptr<DomainBase>&) override;
 
@@ -55,6 +55,16 @@ public:
 	int clear_status() override;
 	int commit_status() override;
 	int reset_status() override;
+};
+
+class Embedded2D final : public Embedded {
+public:
+	Embedded2D(unsigned, unsigned, unsigned, double = 1E6);
+};
+
+class Embedded3D final : public Embedded {
+public:
+	Embedded3D(unsigned, unsigned, unsigned, double = 1E6);
 };
 
 #endif

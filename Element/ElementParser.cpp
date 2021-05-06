@@ -69,7 +69,8 @@ int create_new_element(const shared_ptr<DomainBase>& domain, istringstream& comm
 	else if(is_equal(element_id, "DKT3")) new_dkt3(new_element, command);
 	else if(is_equal(element_id, "DKT4")) new_dkt4(new_element, command);
 	else if(is_equal(element_id, "DKTS3")) new_dkts3(new_element, command);
-	else if(is_equal(element_id, "Embedded2D")) new_embedded2d(new_element, command);
+	else if(is_equal(element_id, "Embedded2D")) new_embedded(new_element, command, 2);
+	else if(is_equal(element_id, "Embedded3D")) new_embedded(new_element, command, 3);
 	else if(is_equal(element_id, "EB21")) new_eb21(new_element, command);
 	else if(is_equal(element_id, "F21")) new_f21(new_element, command);
 	else if(is_equal(element_id, "F21H")) new_f21h(new_element, command);
@@ -1239,32 +1240,33 @@ void new_dkts3(unique_ptr<Element>& return_obj, istringstream& command) {
 	return_obj = make_unique<DKTS3>(tag, std::move(node_tag), material_tag, thickness, num_ip);
 }
 
-void new_embedded2d(unique_ptr<Element>& return_obj, istringstream& command) {
+void new_embedded(unique_ptr<Element>& return_obj, istringstream& command, const unsigned dof) {
 	unsigned tag;
 	if(!get_input(command, tag)) {
-		suanpan_error("new_embedded2d() needs a valid tag.\n");
+		suanpan_error("new_embedded() needs a valid tag.\n");
 		return;
 	}
 
 	unsigned element_tag;
 	if(!get_input(command, element_tag)) {
-		suanpan_error("new_embedded2d() needs a valid element tag.\n");
+		suanpan_error("new_embedded() needs a valid element tag.\n");
 		return;
 	}
 
 	unsigned node_tag;
 	if(!get_input(command, node_tag)) {
-		suanpan_error("new_embedded2d() needs a valid node tag.\n");
+		suanpan_error("new_embedded() needs a valid node tag.\n");
 		return;
 	}
 
 	auto alpha = 1E4;
 	if(!get_optional_input(command, alpha)) {
-		suanpan_error("new_embedded2d() needs a valid alpha.\n");
+		suanpan_error("new_embedded() needs a valid alpha.\n");
 		return;
 	}
 
-	return_obj = make_unique<Embedded2D>(tag, element_tag, node_tag, alpha);
+	if(2 == dof) return_obj = make_unique<Embedded2D>(tag, element_tag, node_tag, alpha);
+	else return_obj = make_unique<Embedded3D>(tag, element_tag, node_tag, alpha);
 }
 
 void new_eb21(unique_ptr<Element>& return_obj, istringstream& command) {

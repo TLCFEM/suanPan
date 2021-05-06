@@ -204,7 +204,7 @@
     <ClCompile Include="..\..\..\Element\Special\Contact3D.cpp" />
     <ClCompile Include="..\..\..\Element\Special\Damper01.cpp" />
     <ClCompile Include="..\..\..\Element\Special\Damper02.cpp" />
-    <ClCompile Include="..\..\..\Element\Special\Embedded2D.cpp" />
+    <ClCompile Include="..\..\..\Element\Special\Embedded.cpp" />
     <ClCompile Include="..\..\..\Element\Special\Joint.cpp" />
     <ClCompile Include="..\..\..\Element\Special\Mass.cpp" />
     <ClCompile Include="..\..\..\Element\Special\SingleSection2D.cpp" />
@@ -576,7 +576,7 @@
     <ClInclude Include="..\..\..\Element\Special\Contact3D.h" />
     <ClInclude Include="..\..\..\Element\Special\Damper01.h" />
     <ClInclude Include="..\..\..\Element\Special\Damper02.h" />
-    <ClInclude Include="..\..\..\Element\Special\Embedded2D.h" />
+    <ClInclude Include="..\..\..\Element\Special\Embedded.h" />
     <ClInclude Include="..\..\..\Element\Special\Joint.h" />
     <ClInclude Include="..\..\..\Element\Special\Mass.h" />
     <ClInclude Include="..\..\..\Element\Special\SingleSection2D.h" />

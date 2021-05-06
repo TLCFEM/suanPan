@@ -2,7 +2,7 @@
 #include "Contact3D.h"
 #include "Damper01.h"
 #include "Damper02.h"
-#include "Embedded2D.h"
+#include "Embedded.h"
 #include "Joint.h"
 #include "Mass.h"
 #include "SingleSection2D.h"

@@ -3,7 +3,7 @@ set(Special
     Special/Contact3D.cpp
     Special/Damper01.cpp
     Special/Damper02.cpp
-    Special/Embedded2D.cpp
+    Special/Embedded.cpp
     Special/Joint.cpp
     Special/Mass.cpp
     Special/SingleSection2D.cpp
