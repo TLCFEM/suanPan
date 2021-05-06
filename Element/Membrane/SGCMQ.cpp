@@ -123,7 +123,7 @@ void SGCMQ::form_mass(const double t_density, const mat& diff_coor) {
 
 	initial_mass.zeros(m_size, m_size);
 	for(const auto& I : int_pt) {
-		const auto n_int = shape::quad(I.coor, 0);
+		const auto n_int = compute_shape_function(I.coor, 0);
 		const auto t_factor = t_density * I.factor;
 		for(auto J = 0u, L = 0u; J < m_node; ++J, L += m_dof) for(auto K = J, M = L; K < m_node; ++K, M += m_dof) initial_mass(L, M) += t_factor * n_int(J) * n_int(K);
 	}
@@ -142,7 +142,7 @@ void SGCMQ::form_mass(const double t_density, const mat& diff_coor) {
 void SGCMQ::form_body_force(const mat& diff_coor) {
 	body_force.zeros(m_size, m_dof);
 	for(const auto& I : int_pt) {
-		const mat n_translation = I.factor * shape::quad(I.coor, 0);
+		const mat n_translation = I.factor * compute_shape_function(I.coor, 0);
 		const mat n_drilling = I.factor * form_drilling_n(I.coor, diff_coor);
 		for(auto J = 0u, L = 0u; J < m_node; ++J, L += m_dof) {
 			for(auto K = 0llu; K < 2llu; ++K) body_force(L + K, K) += n_translation(J);
@@ -181,7 +181,7 @@ void SGCMQ::initialize(const shared_ptr<DomainBase>& D) {
 		const auto &X = plan(I, 0), &Y = plan(I, 1);
 
 		vec t_vec{X, Y};
-		const auto pn = shape::quad(t_vec, 1);
+		const auto pn = compute_shape_function(t_vec, 1);
 		const mat jacob = pn * ele_coor;
 		int_pt.emplace_back(std::move(t_vec), det(jacob) * plan(I, 2) * thickness, mat_proto->get_copy());
 
@@ -237,6 +237,8 @@ int SGCMQ::reset_status() {
 	for(const auto& I : int_pt) code += I.m_material->reset_status();
 	return code;
 }
+
+mat SGCMQ::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
 vector<vec> SGCMQ::record(const OutputType T) {
 	vector<vec> data;

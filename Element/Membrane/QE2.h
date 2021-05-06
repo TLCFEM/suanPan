@@ -80,6 +80,8 @@ public:
 	int commit_status() override;
 	int reset_status() override;
 
+	[[nodiscard]] mat compute_shape_function(const mat&, unsigned) const override;
+
 	vector<vec> record(OutputType) override;
 
 	void print() override;

@@ -167,7 +167,7 @@ void GCMQ::initialize(const shared_ptr<DomainBase>& D) {
 		const auto &X = plan(I, 0), &Y = plan(I, 1);
 
 		vec t_vec{X, Y};
-		const auto pn = shape::quad(t_vec, 1);
+		const auto pn = compute_shape_function(t_vec, 1);
 		const mat jacob = pn * ele_coor;
 		int_pt.emplace_back(std::move(t_vec), det(jacob) * plan(I, 2) * thickness, material_proto->get_copy());
 
@@ -276,6 +276,8 @@ int GCMQ::reset_status() {
 
 	return SGCMQ::reset_status();
 }
+
+mat GCMQ::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
 vector<vec> GCMQ::record(const OutputType T) {
 	vector<vec> data;

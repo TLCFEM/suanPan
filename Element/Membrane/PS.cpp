@@ -72,7 +72,7 @@ void PS::initialize(const shared_ptr<DomainBase>& D) {
 	int_pt.reserve(plan.n_rows);
 	for(unsigned I = 0; I < plan.n_rows; ++I) {
 		vec t_vec{plan(I, 0), plan(I, 1)};
-		const auto pn = shape::quad(t_vec, 1);
+		const auto pn = compute_shape_function(t_vec, 1);
 		const mat jacob = pn * ele_coor;
 		int_pt.emplace_back(std::move(t_vec), thickness * plan(I, 2) * det(jacob), material_proto->get_copy());
 
@@ -102,7 +102,7 @@ void PS::initialize(const shared_ptr<DomainBase>& D) {
 	if(const auto t_density = material_proto->get_parameter(ParameterType::DENSITY); t_density > 0.) {
 		initial_mass.zeros(m_size, m_size);
 		for(const auto& I : int_pt) {
-			const auto n_int = shape::quad(I.coor, 0);
+			const auto n_int = compute_shape_function(I.coor, 0);
 			const auto t_factor = t_density * I.weight;
 			for(auto J = 0u, L = 0u; J < m_node; ++J, L += m_dof) for(auto K = J, M = L; K < m_node; ++K, M += m_dof) initial_mass(L, M) += t_factor * n_int(J) * n_int(K);
 		}
@@ -115,7 +115,7 @@ void PS::initialize(const shared_ptr<DomainBase>& D) {
 
 	body_force.zeros(m_size, m_dof);
 	for(const auto& I : int_pt) {
-		const mat n_int = I.weight * shape::quad(I.coor, 0);
+		const mat n_int = I.weight * compute_shape_function(I.coor, 0);
 		for(auto J = 0u, L = 0u; J < m_node; ++J, L += m_dof) for(auto K = 0llu; K < m_dof; ++K) body_force(L + K, K) += n_int(J);
 	}
 }
@@ -151,6 +151,8 @@ int PS::reset_status() {
 	for(const auto& I : int_pt) code += I.m_material->reset_status();
 	return code;
 }
+
+mat PS::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
 vector<vec> PS::record(const OutputType P) {
 	vector<vec> output;

@@ -184,7 +184,7 @@ template<typename T> Mat<T> shape::triangle(const Col<T>& int_pts, const unsigne
 
 	if(order != 0 && order != 1) throw invalid_argument("order needs to be either 0 or 1");
 
-	N.zeros(order + 1, 6);
+	N.zeros(order + 1llu, 6);
 
 	if(const auto &X = int_pts(0), &Y = int_pts(1); order == 0) {
 		N(0, 0) = 1.;
