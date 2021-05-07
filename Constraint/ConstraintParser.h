@@ -26,6 +26,7 @@ void new_embed(unique_ptr<Constraint>&, istringstream&, unsigned);
 void new_fixedlength(unique_ptr<Constraint>&, istringstream&, unsigned);
 void new_minimumgap(unique_ptr<Constraint>&, istringstream&, unsigned);
 void new_maximumgap(unique_ptr<Constraint>&, istringstream&, unsigned);
+void new_sleeve(unique_ptr<Constraint>&, istringstream&, unsigned);
 void new_mpc(unique_ptr<Constraint>&, istringstream&);
 void new_particlecollision2d(unique_ptr<Constraint>&, istringstream&);
 void new_particlecollision3d(unique_ptr<Constraint>&, istringstream&);

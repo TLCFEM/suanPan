@@ -40,7 +40,7 @@ protected:
 	const bool min_bound = false, max_bound = false;
 	const double min_gap = 0., max_gap = 0.;
 public:
-	FixedLength(unsigned, unsigned, unsigned, unsigned, uvec&&);
+	FixedLength(unsigned, unsigned, unsigned, uvec&&);
 
 	int initialize(const shared_ptr<DomainBase>&) override;
 
@@ -54,12 +54,17 @@ public:
 
 class MinimumGap final : public FixedLength {
 public:
-	MinimumGap(unsigned, unsigned, unsigned, unsigned, double, uvec&&);
+	MinimumGap(unsigned, unsigned, unsigned, double, uvec&&);
 };
 
 class MaximumGap final : public FixedLength {
 public:
-	MaximumGap(unsigned, unsigned, unsigned, unsigned, double, uvec&&);
+	MaximumGap(unsigned, unsigned, unsigned, double, uvec&&);
+};
+
+class Sleeve final : public FixedLength {
+public:
+	Sleeve(unsigned, unsigned, unsigned, double, double, uvec&&);
 };
 
 #endif

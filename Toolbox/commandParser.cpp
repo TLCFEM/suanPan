@@ -1129,7 +1129,7 @@ int create_new_fixedlength(const shared_ptr<DomainBase>& domain, istringstream& 
 		return SUANPAN_SUCCESS;
 	}
 
-	domain->insert(make_unique<FixedLength>(tag, domain->get_current_step_tag(), 0, dof, uvec{node_i, node_j}));
+	domain->insert(make_unique<FixedLength>(tag, domain->get_current_step_tag(), dof, uvec{node_i, node_j}));
 
 	return SUANPAN_SUCCESS;
 }

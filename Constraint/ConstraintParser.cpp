@@ -36,6 +36,8 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, istringstream& c
 	else if(is_equal(constraint_id, "MinimumGap3D") || is_equal(constraint_id, "MinGap3D")) new_minimumgap(new_constraint, command, 3);
 	else if(is_equal(constraint_id, "MaximumGap2D") || is_equal(constraint_id, "MaxGap2D")) new_maximumgap(new_constraint, command, 2);
 	else if(is_equal(constraint_id, "MaximumGap3D") || is_equal(constraint_id, "MaxGap3D")) new_maximumgap(new_constraint, command, 3);
+	else if(is_equal(constraint_id, "Sleeve2D")) new_sleeve(new_constraint, command, 2);
+	else if(is_equal(constraint_id, "Sleeve3D")) new_sleeve(new_constraint, command, 3);
 	else if(is_equal(constraint_id, "MPC")) new_mpc(new_constraint, command);
 	else if(is_equal(constraint_id, "NodeLine")) new_nodeline(new_constraint, command);
 	else if(is_equal(constraint_id, "NodeFacet")) new_nodefacet(new_constraint, command);
@@ -93,7 +95,7 @@ void new_fixedlength(unique_ptr<Constraint>& return_obj, istringstream& command,
 		return;
 	}
 
-	return_obj = make_unique<FixedLength>(tag, 0, 0, dof, uvec{node_i, node_j});
+	return_obj = make_unique<FixedLength>(tag, 0, dof, uvec{node_i, node_j});
 }
 
 void new_minimumgap(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dof) {
@@ -115,7 +117,7 @@ void new_minimumgap(unique_ptr<Constraint>& return_obj, istringstream& command, 
 		return;
 	}
 
-	return_obj = make_unique<MinimumGap>(tag, 0, 0, dof, gap, uvec{node_i, node_j});
+	return_obj = make_unique<MinimumGap>(tag, 0, dof, gap, uvec{node_i, node_j});
 }
 
 void new_maximumgap(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dof) {
@@ -137,7 +139,33 @@ void new_maximumgap(unique_ptr<Constraint>& return_obj, istringstream& command, 
 		return;
 	}
 
-	return_obj = make_unique<MaximumGap>(tag, 0, 0, dof, gap, uvec{node_i, node_j});
+	return_obj = make_unique<MaximumGap>(tag, 0, dof, gap, uvec{node_i, node_j});
+}
+
+void new_sleeve(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dof) {
+	unsigned tag;
+	if(!get_input(command, tag)) {
+		suanpan_error("new_sleeve() needs a valid tag.\n");
+		return;
+	}
+
+	uword node_i, node_j;
+	if(!get_input(command, node_i) || !get_input(command, node_j)) {
+		suanpan_error("new_sleeve() needs two node tags.\n");
+		return;
+	}
+
+	double min_gap, max_gap;
+	if(!get_input(command, min_gap)) {
+		suanpan_error("new_sleeve() needs a valid minimum gap.\n");
+		return;
+	}
+	if(!get_input(command, max_gap)) {
+		suanpan_error("new_sleeve() needs a valid maximum gap.\n");
+		return;
+	}
+
+	return_obj = make_unique<Sleeve>(tag, 0, dof, min_gap, max_gap, uvec{node_i, node_j});
 }
 
 void new_embed(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dof) {

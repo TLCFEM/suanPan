@@ -93,7 +93,7 @@ Advanced users can compile the program from source by themselves in order to ena
 
 On Windows, to add file associations with `.sp` and `.supan` files, please run the `AddAssociation.bat` file with admin privilege. [Sublime Text](https://www.sublimetext.com/) autocompletion and syntax highlighting files are also provided. Please check the `Enhancement` folder.
 
-On Linux, since CI/CD uses `GCC 9.3.0`, thus it may be required to update/install GCC version 9 or above.
+On Linux, since CI/CD uses `GCC 9.3.0`, it may be required to update/install GCC version 9 or above.
 
 ```bash
 sudo apt install gcc-9 g++-9 gfortran-9 libomp5
