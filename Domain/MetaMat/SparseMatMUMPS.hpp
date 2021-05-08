@@ -123,7 +123,7 @@ template<typename T> SparseMatBaseMUMPS<T>::SparseMatBaseMUMPS(const uword in_ro
 template<typename T> SparseMatBaseMUMPS<T>::SparseMatBaseMUMPS(const SparseMatBaseMUMPS& other)
 	: SparseMat<T>(other)
 	, sym(other.sym)
-	, mumps_job{0, 1, -1, -987654}
+	, mumps_job{other.sym, 1, -1, -987654}
 	, l_irn(other.l_irn)
 	, l_jrn(other.l_jrn) {}
 
@@ -184,7 +184,7 @@ public:
 };
 
 template<typename T> SparseSymmMatMUMPS<T>::SparseSymmMatMUMPS(const uword in_row, const uword in_col, const uword in_elem)
-	: SparseMatBaseMUMPS<T>(in_row, in_col, in_elem, 2) {}
+	: SparseMatBaseMUMPS<T>(in_row, in_col, in_elem, 0) {}
 
 template<typename T> unique_ptr<MetaMat<T>> SparseSymmMatMUMPS<T>::make_copy() { return std::make_unique<SparseSymmMatMUMPS<T>>(*this); }
 
