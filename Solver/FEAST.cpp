@@ -51,7 +51,7 @@ int FEAST::linear_solve(const shared_ptr<LongFactory>& W) const {
 	char UPLO = 'F';
 
 	if(const auto scheme = W->get_storage_scheme(); StorageScheme::FULL == scheme) new_dfeast_sygv_(&UPLO, &N, stiffness->memptr(), &N, mass->memptr(), &N, fpm.data(), &input[3], &output[0], &input[1], &input[2], &output[1], E.data(), X.data(), &output[2], R.data(), &output[3]);
-	else if(StorageScheme::SPARSE == scheme) {
+	else if(StorageScheme::SPARSE == scheme || StorageScheme::SPARSESYMM == scheme) {
 		auto fs = std::async([&]() { return csr_form<double, int>(stiffness->triplet_mat, 1); });
 		auto fm = std::async([&]() { return csr_form<double, int>(mass->triplet_mat, 1); });
 
@@ -134,7 +134,7 @@ int FEAST::quadratic_solve(const shared_ptr<LongFactory>& W) const {
 	auto& c_damping = damping->triplet_mat;
 	auto& c_mass = mass->triplet_mat;
 
-	if(StorageScheme::SPARSE != W->get_storage_scheme()) {
+	if(const auto t_scheme = W->get_storage_scheme(); StorageScheme::SPARSE != t_scheme && StorageScheme::SPARSESYMM != t_scheme) {
 		const auto NN = N * N;
 
 		auto fk = std::async([&]() {

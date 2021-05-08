@@ -45,7 +45,7 @@ int ArcLength::initialize() {
 	solver->set_integrator(modifier);
 
 	if(sparse_mat) {
-		factory->set_storage_scheme(StorageScheme::SPARSE);
+		factory->set_storage_scheme(symm_mat ? StorageScheme::SPARSESYMM : StorageScheme::SPARSE);
 		factory->set_solver(SolverType::MUMPS);
 	}
 	else if(symm_mat && band_mat) factory->set_storage_scheme(StorageScheme::BANDSYMM);

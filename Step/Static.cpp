@@ -28,7 +28,7 @@ Static::Static(const unsigned T, const double P)
 	: Step(T, P) {}
 
 int Static::initialize() {
-	if(sparse_mat) factory->set_storage_scheme(StorageScheme::SPARSE);
+	if(sparse_mat) factory->set_storage_scheme(symm_mat ? StorageScheme::SPARSESYMM : StorageScheme::SPARSE);
 	else if(symm_mat && band_mat) factory->set_storage_scheme(StorageScheme::BANDSYMM);
 	else if(!symm_mat && band_mat) factory->set_storage_scheme(StorageScheme::BAND);
 	else if(symm_mat && !band_mat) factory->set_storage_scheme(StorageScheme::SYMMPACK);

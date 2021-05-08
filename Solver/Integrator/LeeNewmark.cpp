@@ -22,7 +22,7 @@
 uword LeeNewmark::get_total_size() const { return n_damping * n_block + n_block; }
 
 void LeeNewmark::update_stiffness() const {
-	if(StorageScheme::SPARSE == factory->get_storage_scheme())
+	if(const auto t_scheme = factory->get_storage_scheme(); StorageScheme::SPARSE == t_scheme || StorageScheme::SPARSESYMM == t_scheme)
 		for(uword I = 0, J = n_block; I < n_damping; ++I, J += n_block) {
 			auto row = current_mass->triplet_mat.row_mem();
 			auto col = current_mass->triplet_mat.col_mem();
@@ -119,7 +119,7 @@ int LeeNewmark::process_constraint() {
 	t_stiff->csc_condense();
 
 	// check in tangent stiffness
-	if(StorageScheme::SPARSE == factory->get_storage_scheme()) stiffness->triplet_mat += t_stiff->triplet_mat;
+	if(const auto t_scheme = factory->get_storage_scheme(); StorageScheme::SPARSE == t_scheme || StorageScheme::SPARSESYMM == t_scheme) stiffness->triplet_mat += t_stiff->triplet_mat;
 	else for(unsigned I = 0; I < n_block; ++I) for(unsigned J = 0; J < n_block; ++J) if(const auto t_val = t_stiff->operator()(I, J); !suanpan::approx_equal(0., t_val)) stiffness->at(I, J) = t_val;
 
 	if(first_iteration) {

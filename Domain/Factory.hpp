@@ -37,7 +37,7 @@
 
 enum class AnalysisType { NONE, DISP, EIGEN, BUCKLE, STATICS, DYNAMICS };
 
-enum class StorageScheme { FULL, BAND, BANDSYMM, SYMMPACK, SPARSE };
+enum class StorageScheme { FULL, BAND, BANDSYMM, SYMMPACK, SPARSE, SPARSESYMM };
 
 enum class SolverType { LAPACK, SPIKE, SUPERLU, MUMPS, CUDA, PARDISO };
 
@@ -159,11 +159,11 @@ public:
 
 	void set_refinement(unsigned);
 
-	void set_analysis_type(const AnalysisType&);
-	[[nodiscard]] const AnalysisType& get_analysis_type() const;
+	void set_analysis_type(AnalysisType);
+	[[nodiscard]] AnalysisType get_analysis_type() const;
 
-	void set_storage_scheme(const StorageScheme&);
-	[[nodiscard]] const StorageScheme& get_storage_scheme() const;
+	void set_storage_scheme(StorageScheme);
+	[[nodiscard]] StorageScheme get_storage_scheme() const;
 
 	void set_bandwidth(unsigned, unsigned);
 	void get_bandwidth(unsigned&, unsigned&) const;
@@ -576,21 +576,21 @@ template<typename T> SolverType Factory<T>::get_solver() const { return solver; 
 
 template<typename T> void Factory<T>::set_refinement(const unsigned R) { refinement = R; }
 
-template<typename T> void Factory<T>::set_analysis_type(const AnalysisType& AT) {
+template<typename T> void Factory<T>::set_analysis_type(const AnalysisType AT) {
 	if(analysis_type == AT) return;
 	analysis_type = AT;
 	access::rw(initialized) = false;
 }
 
-template<typename T> const AnalysisType& Factory<T>::get_analysis_type() const { return analysis_type; }
+template<typename T> AnalysisType Factory<T>::get_analysis_type() const { return analysis_type; }
 
-template<typename T> void Factory<T>::set_storage_scheme(const StorageScheme& SS) {
+template<typename T> void Factory<T>::set_storage_scheme(const StorageScheme SS) {
 	if(storage_type == SS) return;
 	storage_type = SS;
 	access::rw(initialized) = false;
 }
 
-template<typename T> const StorageScheme& Factory<T>::get_storage_scheme() const { return storage_type; }
+template<typename T> StorageScheme Factory<T>::get_storage_scheme() const { return storage_type; }
 
 template<typename T> void Factory<T>::set_bandwidth(const unsigned L, const unsigned U) {
 	if(n_lobw == L && n_upbw == U) return;
@@ -770,6 +770,9 @@ template<typename T> void Factory<T>::initialize_mass() {
 #endif
 		else global_mass = make_shared<SparseMatSuperLU<T>>(n_size, n_size, n_elem);
 		break;
+	case StorageScheme::SPARSESYMM:
+		global_mass = make_shared<SparseSymmMatMUMPS<T>>(n_size, n_size, n_elem);
+		break;
 	}
 
 	global_mass->set_precision(precision);
@@ -808,6 +811,9 @@ template<typename T> void Factory<T>::initialize_damping() {
 #endif
 		else global_damping = make_shared<SparseMatSuperLU<T>>(n_size, n_size, n_elem);
 		break;
+	case StorageScheme::SPARSESYMM:
+		global_damping = make_shared<SparseSymmMatMUMPS<T>>(n_size, n_size, n_elem);
+		break;
 	}
 
 	global_damping->set_precision(precision);
@@ -845,6 +851,9 @@ template<typename T> void Factory<T>::initialize_stiffness() {
 		else if(SolverType::CUDA == solver) global_stiffness = make_shared<SparseMatCUDA<T>>(n_size, n_size, n_elem);
 #endif
 		else global_stiffness = make_shared<SparseMatSuperLU<T>>(n_size, n_size, n_elem);
+		break;
+	case StorageScheme::SPARSESYMM:
+		global_stiffness = make_shared<SparseSymmMatMUMPS<T>>(n_size, n_size, n_elem);
 		break;
 	}
 
@@ -885,6 +894,9 @@ template<typename T> void Factory<T>::initialize_geometry() {
 		else if(SolverType::CUDA == solver) global_geometry = make_shared<SparseMatCUDA<T>>(n_size, n_size, n_elem);
 #endif
 		else global_geometry = make_shared<SparseMatSuperLU<T>>(n_size, n_size, n_elem);
+		break;
+	case StorageScheme::SPARSESYMM:
+		global_geometry = make_shared<SparseSymmMatMUMPS<T>>(n_size, n_size, n_elem);
 		break;
 	}
 

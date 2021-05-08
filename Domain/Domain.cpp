@@ -810,7 +810,7 @@ int Domain::assign_color() {
 	}
 
 	// count how many entries in the sparse form and preallocate memory
-	if(StorageScheme::SPARSE == factory->get_storage_scheme()) {
+	if(const auto t_scheme = factory->get_storage_scheme(); StorageScheme::SPARSE == t_scheme || StorageScheme::SPARSESYMM == t_scheme) {
 		uword matrix_entry = 0;
 		for(const auto& t_element : element_pond.get()) matrix_entry += static_cast<uword>(t_element->get_total_number()) * t_element->get_total_number();
 		suanpan_debug("The model has %llu entries.\n", matrix_entry);
@@ -1195,7 +1195,7 @@ void Domain::assemble_inertial_force() const {
 
 void Domain::assemble_initial_mass() const {
 	factory->clear_mass();
-	if(color_map.empty() || factory->get_storage_scheme() == StorageScheme::SPARSE) for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_initial_mass(), I->get_dof_encoding());
+	if(const auto t_scheme = factory->get_storage_scheme(); color_map.empty() || StorageScheme::SPARSE == t_scheme || StorageScheme::SPARSESYMM == t_scheme) for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_initial_mass(), I->get_dof_encoding());
 	else
 		for_each(color_map.begin(), color_map.end(), [&](const vector<unsigned>& color) {
 			suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
@@ -1209,7 +1209,7 @@ void Domain::assemble_initial_mass() const {
 
 void Domain::assemble_current_mass() const {
 	factory->clear_mass();
-	if(color_map.empty() || factory->get_storage_scheme() == StorageScheme::SPARSE) for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_current_mass(), I->get_dof_encoding());
+	if(const auto t_scheme = factory->get_storage_scheme(); color_map.empty() || StorageScheme::SPARSE == t_scheme || StorageScheme::SPARSESYMM == t_scheme) for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_current_mass(), I->get_dof_encoding());
 	else
 		for_each(color_map.begin(), color_map.end(), [&](const vector<unsigned>& color) {
 			suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
@@ -1223,7 +1223,7 @@ void Domain::assemble_current_mass() const {
 
 void Domain::assemble_trial_mass() const {
 	factory->clear_mass();
-	if(color_map.empty() || factory->get_storage_scheme() == StorageScheme::SPARSE) for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_trial_mass(), I->get_dof_encoding());
+	if(const auto t_scheme = factory->get_storage_scheme(); color_map.empty() || StorageScheme::SPARSE == t_scheme || StorageScheme::SPARSESYMM == t_scheme) for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_trial_mass(), I->get_dof_encoding());
 	else
 		for_each(color_map.begin(), color_map.end(), [&](const vector<unsigned>& color) {
 			suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
@@ -1237,7 +1237,7 @@ void Domain::assemble_trial_mass() const {
 
 void Domain::assemble_initial_damping() const {
 	factory->clear_damping();
-	if(color_map.empty() || factory->get_storage_scheme() == StorageScheme::SPARSE) for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_initial_damping(), I->get_dof_encoding());
+	if(const auto t_scheme = factory->get_storage_scheme(); color_map.empty() || StorageScheme::SPARSE == t_scheme || StorageScheme::SPARSESYMM == t_scheme) for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_initial_damping(), I->get_dof_encoding());
 	else
 		for_each(color_map.begin(), color_map.end(), [&](const vector<unsigned>& color) {
 			suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
@@ -1251,7 +1251,7 @@ void Domain::assemble_initial_damping() const {
 
 void Domain::assemble_current_damping() const {
 	factory->clear_damping();
-	if(color_map.empty() || factory->get_storage_scheme() == StorageScheme::SPARSE) for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_current_damping(), I->get_dof_encoding());
+	if(const auto t_scheme = factory->get_storage_scheme(); color_map.empty() || StorageScheme::SPARSE == t_scheme || StorageScheme::SPARSESYMM == t_scheme) for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_current_damping(), I->get_dof_encoding());
 	else
 		for_each(color_map.begin(), color_map.end(), [&](const vector<unsigned>& color) {
 			suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
@@ -1265,7 +1265,7 @@ void Domain::assemble_current_damping() const {
 
 void Domain::assemble_trial_damping() const {
 	factory->clear_damping();
-	if(color_map.empty() || factory->get_storage_scheme() == StorageScheme::SPARSE) for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_trial_damping(), I->get_dof_encoding());
+	if(const auto t_scheme = factory->get_storage_scheme(); color_map.empty() || StorageScheme::SPARSE == t_scheme || StorageScheme::SPARSESYMM == t_scheme) for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_trial_damping(), I->get_dof_encoding());
 	else
 		for_each(color_map.begin(), color_map.end(), [&](const vector<unsigned>& color) {
 			suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
@@ -1279,7 +1279,7 @@ void Domain::assemble_trial_damping() const {
 
 void Domain::assemble_initial_stiffness() const {
 	factory->clear_stiffness();
-	if(color_map.empty() || factory->get_storage_scheme() == StorageScheme::SPARSE) for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_initial_stiffness(), I->get_dof_encoding());
+	if(const auto t_scheme = factory->get_storage_scheme(); color_map.empty() || StorageScheme::SPARSE == t_scheme || StorageScheme::SPARSESYMM == t_scheme) for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_initial_stiffness(), I->get_dof_encoding());
 	else
 		for_each(color_map.begin(), color_map.end(), [&](const vector<unsigned>& color) {
 			suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
@@ -1293,7 +1293,7 @@ void Domain::assemble_initial_stiffness() const {
 
 void Domain::assemble_current_stiffness() const {
 	factory->clear_stiffness();
-	if(color_map.empty() || factory->get_storage_scheme() == StorageScheme::SPARSE) for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_current_stiffness(), I->get_dof_encoding());
+	if(const auto t_scheme = factory->get_storage_scheme(); color_map.empty() || StorageScheme::SPARSE == t_scheme || StorageScheme::SPARSESYMM == t_scheme) for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_current_stiffness(), I->get_dof_encoding());
 	else
 		for_each(color_map.begin(), color_map.end(), [&](const vector<unsigned>& color) {
 			suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
@@ -1307,7 +1307,7 @@ void Domain::assemble_current_stiffness() const {
 
 void Domain::assemble_trial_stiffness() const {
 	factory->clear_stiffness();
-	if(color_map.empty() || factory->get_storage_scheme() == StorageScheme::SPARSE) for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_trial_stiffness(), I->get_dof_encoding());
+	if(const auto t_scheme = factory->get_storage_scheme(); color_map.empty() || StorageScheme::SPARSE == t_scheme || StorageScheme::SPARSESYMM == t_scheme) for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_trial_stiffness(), I->get_dof_encoding());
 	else
 		for_each(color_map.begin(), color_map.end(), [&](const vector<unsigned>& color) {
 			suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
@@ -1322,7 +1322,7 @@ void Domain::assemble_trial_stiffness() const {
 void Domain::assemble_initial_geometry() const {
 	if(!factory->get_nlgeom()) return;
 	factory->clear_geometry();
-	if(color_map.empty() || factory->get_storage_scheme() == StorageScheme::SPARSE) { for(const auto& I : element_pond.get()) if(I->is_nlgeom()) factory->assemble_geometry(I->get_initial_geometry(), I->get_dof_encoding()); }
+	if(const auto t_scheme = factory->get_storage_scheme(); color_map.empty() || StorageScheme::SPARSE == t_scheme || StorageScheme::SPARSESYMM == t_scheme) { for(const auto& I : element_pond.get()) if(I->is_nlgeom()) factory->assemble_geometry(I->get_initial_geometry(), I->get_dof_encoding()); }
 	else
 		for_each(color_map.begin(), color_map.end(), [&](const vector<unsigned>& color) {
 			suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
@@ -1337,7 +1337,7 @@ void Domain::assemble_initial_geometry() const {
 void Domain::assemble_current_geometry() const {
 	if(!factory->get_nlgeom()) return;
 	factory->clear_geometry();
-	if(color_map.empty() || factory->get_storage_scheme() == StorageScheme::SPARSE) { for(const auto& I : element_pond.get()) if(I->is_nlgeom()) factory->assemble_geometry(I->get_current_geometry(), I->get_dof_encoding()); }
+	if(const auto t_scheme = factory->get_storage_scheme(); color_map.empty() || StorageScheme::SPARSE == t_scheme || StorageScheme::SPARSESYMM == t_scheme) { for(const auto& I : element_pond.get()) if(I->is_nlgeom()) factory->assemble_geometry(I->get_current_geometry(), I->get_dof_encoding()); }
 	else
 		for_each(color_map.begin(), color_map.end(), [&](const vector<unsigned>& color) {
 			suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
@@ -1352,7 +1352,7 @@ void Domain::assemble_current_geometry() const {
 void Domain::assemble_trial_geometry() const {
 	if(!factory->get_nlgeom()) return;
 	factory->clear_geometry();
-	if(color_map.empty() || factory->get_storage_scheme() == StorageScheme::SPARSE) { for(const auto& I : element_pond.get()) if(I->is_nlgeom()) factory->assemble_geometry(I->get_trial_geometry(), I->get_dof_encoding()); }
+	if(const auto t_scheme = factory->get_storage_scheme(); color_map.empty() || StorageScheme::SPARSE == t_scheme || StorageScheme::SPARSESYMM == t_scheme) { for(const auto& I : element_pond.get()) if(I->is_nlgeom()) factory->assemble_geometry(I->get_trial_geometry(), I->get_dof_encoding()); }
 	else
 		for_each(color_map.begin(), color_map.end(), [&](const vector<unsigned>& color) {
 			suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {

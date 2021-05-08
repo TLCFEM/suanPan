@@ -26,7 +26,7 @@ Frequency::Frequency(const unsigned T, const unsigned N)
 	, eigen_number(N) {}
 
 int Frequency::initialize() {
-	if(sparse_mat) factory->set_storage_scheme(StorageScheme::SPARSE);
+	if(sparse_mat) factory->set_storage_scheme(symm_mat ? StorageScheme::SPARSESYMM : StorageScheme::SPARSE);
 	else if(symm_mat && band_mat) factory->set_storage_scheme(StorageScheme::BANDSYMM);
 	else if(!symm_mat && band_mat) factory->set_storage_scheme(StorageScheme::BAND);
 	else if(symm_mat && !band_mat) factory->set_storage_scheme(StorageScheme::SYMMPACK);

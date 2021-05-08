@@ -34,8 +34,10 @@
 #include "SparseMat.hpp"
 #include <mumps/dmumps_c.h>
 
-template<typename T> class SparseMatMUMPS final : public SparseMat<T> {
-	DMUMPS_STRUC_C mumps_job{0, 1, -1, -987654};
+template<typename T> class SparseMatBaseMUMPS : public SparseMat<T> {
+	const int sym = 0;
+
+	DMUMPS_STRUC_C mumps_job{sym, 1, -1, -987654};
 
 	s32_vec l_irn, l_jrn;
 
@@ -43,16 +45,14 @@ template<typename T> class SparseMatMUMPS final : public SparseMat<T> {
 	void dealloc();
 	void run();
 public:
-	using SparseMat<T>::SparseMat;
-	SparseMatMUMPS(const SparseMatMUMPS&);
-	SparseMatMUMPS(SparseMatMUMPS&&) noexcept = delete;
-	SparseMatMUMPS& operator=(const SparseMatMUMPS&) = delete;
-	SparseMatMUMPS& operator=(SparseMatMUMPS&&) noexcept = delete;
-	~SparseMatMUMPS() override;
+	SparseMatBaseMUMPS(uword, uword, uword, int);
+	SparseMatBaseMUMPS(const SparseMatBaseMUMPS&);
+	SparseMatBaseMUMPS(SparseMatBaseMUMPS&&) noexcept = delete;
+	SparseMatBaseMUMPS& operator=(const SparseMatBaseMUMPS&) = delete;
+	SparseMatBaseMUMPS& operator=(SparseMatBaseMUMPS&&) noexcept = delete;
+	~SparseMatBaseMUMPS() override;
 
 	void zeros() override;
-
-	unique_ptr<MetaMat<T>> make_copy() override;
 
 	int solve(Mat<T>&, Mat<T>&&) override;
 	int solve(Mat<T>&, const Mat<T>&) override;
@@ -60,7 +60,7 @@ public:
 	[[nodiscard]] int sign_det() const override;
 };
 
-template<typename T> void SparseMatMUMPS<T>::alloc() {
+template<typename T> void SparseMatBaseMUMPS<T>::alloc() {
 	if(this->factored) return;
 
 	dealloc();
@@ -105,33 +105,36 @@ template<typename T> void SparseMatMUMPS<T>::alloc() {
 	dmumps_c(&mumps_job);
 }
 
-template<typename T> void SparseMatMUMPS<T>::dealloc() {
+template<typename T> void SparseMatBaseMUMPS<T>::dealloc() {
 	if(3 != mumps_job.job) return;
 	mumps_job.job = -2;
 	dmumps_c(&mumps_job);
 }
 
-template<typename T> void SparseMatMUMPS<T>::run() {
+template<typename T> void SparseMatBaseMUMPS<T>::run() {
 	mumps_job.job = 3;
 	dmumps_c(&mumps_job);
 }
 
-template<typename T> SparseMatMUMPS<T>::SparseMatMUMPS(const SparseMatMUMPS& other)
+template<typename T> SparseMatBaseMUMPS<T>::SparseMatBaseMUMPS(const uword in_row, const uword in_col, const uword in_elem, const int in_sym)
+	: SparseMat<T>(in_row, in_col, in_elem)
+	, sym(in_sym) {}
+
+template<typename T> SparseMatBaseMUMPS<T>::SparseMatBaseMUMPS(const SparseMatBaseMUMPS& other)
 	: SparseMat<T>(other)
+	, sym(other.sym)
 	, mumps_job{0, 1, -1, -987654}
 	, l_irn(other.l_irn)
 	, l_jrn(other.l_jrn) {}
 
-template<typename T> SparseMatMUMPS<T>::~SparseMatMUMPS() { dealloc(); }
+template<typename T> SparseMatBaseMUMPS<T>::~SparseMatBaseMUMPS() { dealloc(); }
 
-template<typename T> void SparseMatMUMPS<T>::zeros() {
+template<typename T> void SparseMatBaseMUMPS<T>::zeros() {
 	SparseMat<T>::zeros();
 	dealloc();
 }
 
-template<typename T> unique_ptr<MetaMat<T>> SparseMatMUMPS<T>::make_copy() { return std::make_unique<SparseMatMUMPS<T>>(*this); }
-
-template<typename T> int SparseMatMUMPS<T>::solve(Mat<T>& X, Mat<T>&& B) {
+template<typename T> int SparseMatBaseMUMPS<T>::solve(Mat<T>& X, Mat<T>&& B) {
 	alloc();
 
 	mumps_job.rhs = B.memptr();
@@ -145,7 +148,7 @@ template<typename T> int SparseMatMUMPS<T>::solve(Mat<T>& X, Mat<T>&& B) {
 	return mumps_job.info[0];
 }
 
-template<typename T> int SparseMatMUMPS<T>::solve(Mat<T>& X, const Mat<T>& B) {
+template<typename T> int SparseMatBaseMUMPS<T>::solve(Mat<T>& X, const Mat<T>& B) {
 	alloc();
 
 	X = B;
@@ -159,7 +162,31 @@ template<typename T> int SparseMatMUMPS<T>::solve(Mat<T>& X, const Mat<T>& B) {
 	return mumps_job.info[0];
 }
 
-template<typename T> int SparseMatMUMPS<T>::sign_det() const { return mumps_job.rinfog[11] < 0. ? -1 : 1; }
+template<typename T> int SparseMatBaseMUMPS<T>::sign_det() const { return mumps_job.rinfog[11] < 0. ? -1 : 1; }
+
+template<typename T> class SparseMatMUMPS final : public SparseMatBaseMUMPS<T> {
+public:
+	SparseMatMUMPS(uword, uword, uword = 0);
+
+	unique_ptr<MetaMat<T>> make_copy() override;
+};
+
+template<typename T> SparseMatMUMPS<T>::SparseMatMUMPS(const uword in_row, const uword in_col, const uword in_elem)
+	: SparseMatBaseMUMPS<T>(in_row, in_col, in_elem, 0) {}
+
+template<typename T> unique_ptr<MetaMat<T>> SparseMatMUMPS<T>::make_copy() { return std::make_unique<SparseMatMUMPS<T>>(*this); }
+
+template<typename T> class SparseSymmMatMUMPS final : public SparseMatBaseMUMPS<T> {
+public:
+	SparseSymmMatMUMPS(uword, uword, uword = 0);
+
+	unique_ptr<MetaMat<T>> make_copy() override;
+};
+
+template<typename T> SparseSymmMatMUMPS<T>::SparseSymmMatMUMPS(const uword in_row, const uword in_col, const uword in_elem)
+	: SparseMatBaseMUMPS<T>(in_row, in_col, in_elem, 2) {}
+
+template<typename T> unique_ptr<MetaMat<T>> SparseSymmMatMUMPS<T>::make_copy() { return std::make_unique<SparseSymmMatMUMPS<T>>(*this); }
 
 #endif
 

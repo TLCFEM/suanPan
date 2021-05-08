@@ -289,7 +289,7 @@ LeeNewmarkFull::LeeNewmarkFull(const unsigned T, std::vector<Mode>&& M, const do
 int LeeNewmarkFull::initialize() {
 	if(SUANPAN_SUCCESS != LeeNewmarkBase::initialize()) return SUANPAN_FAIL;
 
-	if(StorageScheme::SPARSE != factory->get_storage_scheme()) {
+	if(const auto t_scheme = factory->get_storage_scheme(); StorageScheme::SPARSE != t_scheme && StorageScheme::SPARSESYMM != t_scheme) {
 		suanpan_error("please use command `set sparse_mat true` to enable sparse storage.\n");
 		return SUANPAN_FAIL;
 	}
