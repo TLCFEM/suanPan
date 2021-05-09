@@ -9,7 +9,8 @@
 1. add `scoop` support
 2. add `Contact3D` 3D node-triangular facet contact element
 3. add `NodeLine` and `NodeFacet` contact constraint
-4. add `MaxGap2D` and `MaxGap3D` constraint
+4. add `Sleeve2D`, `Sleeve3D`, `MaxGap2D` and `MaxGap3D` constraint
+5. update `OpenBLAS` to version 0.3.15
 
 ## version 1.4
 

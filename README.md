@@ -113,7 +113,7 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**SPIKE**](http://www.ecs.umass.edu/~polizzi/spike/) version 1.0
 - [**FEAST**](http://www.ecs.umass.edu/~polizzi/feast/) version 4.0
 - [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 5.2.2 and [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 3.1
-- [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.10
+- [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.15
 - [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2020U2
 - [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 1.10.6
 - [**MUMPS**](http://mumps.enseeiht.fr/) version 5.2.1
