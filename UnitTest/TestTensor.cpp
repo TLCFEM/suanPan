@@ -8,7 +8,7 @@ TEST_CASE("Invariant", "[Utility.Tensor]") {
 	REQUIRE(Approx(2100) == tensor::stress::invariant2(A));
 	REQUIRE(Approx(-28000) == tensor::stress::invariant3(A));
 
-	const auto B = eig_sym(tensor::stress::to_tensor(A));
+	const auto B = eig_sym(tensor::stress::to_tensor(A)).eval();
 
 	REQUIRE(Approx(40) == tensor::stress::invariant1(B));
 	REQUIRE(Approx(2100) == tensor::stress::invariant2(B));
@@ -20,7 +20,7 @@ TEST_CASE("Lode Angle", "[Utility.Tensor]") {
 
 	const auto B = tensor::stress::to_tensor(tensor::dev(A));
 
-	REQUIRE(tensor::stress::lode(eig_sym(B / sqrt(accu(square(B))))) == Approx(tensor::stress::lode(A)));
+	REQUIRE(tensor::stress::lode(eig_sym(B / sqrt(accu(square(B)))).eval()) == Approx(tensor::stress::lode(A)));
 }
 
 TEST_CASE("Norm of Stress", "[Utility.Tensor]") {
