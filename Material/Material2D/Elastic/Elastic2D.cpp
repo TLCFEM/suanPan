@@ -37,6 +37,20 @@ void Elastic2D::initialize(const shared_ptr<DomainBase>&) {
 	ConstantStiffness(this);
 }
 
+void Elastic2D::initialize_couple(const shared_ptr<DomainBase>&) {
+	if(characteristic_length < 0.) {
+		characteristic_length = 1.;
+		suanpan_error("characteristic length is not set, use unity by default.\n");
+	}
+
+	initial_couple_stiffness = -8. * characteristic_length * characteristic_length * elastic_modulus / (2. + 2. * poissons_ratio) * eye(2, 2);
+
+	trial_curvature = current_curvature.zeros(2);
+	trial_couple_stress = current_couple_stress.zeros(2);
+
+	ConstantCoupleStiffness(this);
+}
+
 double Elastic2D::get_parameter(const ParameterType P) const {
 	if(ParameterType::PLANETYPE == P) return static_cast<double>(plane_type);
 	if(ParameterType::DENSITY == P) return density;
@@ -53,21 +67,32 @@ int Elastic2D::update_trial_status(const vec& t_strain) {
 	return SUANPAN_SUCCESS;
 }
 
+int Elastic2D::update_couple_trial_status(const vec& t_curvature) {
+	trial_couple_stress = trial_couple_stiffness * (trial_curvature = t_curvature);
+	return SUANPAN_SUCCESS;
+}
+
 int Elastic2D::clear_status() {
 	current_strain.zeros();
 	current_stress.zeros();
+	current_curvature.zeros();
+	current_couple_stress.zeros();
 	return reset_status();
 }
 
 int Elastic2D::commit_status() {
 	current_strain = trial_strain;
 	current_stress = trial_stress;
+	current_curvature = trial_curvature;
+	current_couple_stress = trial_couple_stress;
 	return SUANPAN_SUCCESS;
 }
 
 int Elastic2D::reset_status() {
 	trial_strain = current_strain;
 	trial_stress = current_stress;
+	trial_curvature = current_curvature;
+	trial_couple_stress = current_couple_stress;
 	return SUANPAN_SUCCESS;
 }
 
