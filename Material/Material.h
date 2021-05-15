@@ -40,7 +40,8 @@ using std::vector;
 
 struct MaterialData {
 	const double tolerance = 1E-14;
-	const double density = 0.; // density
+	const double density = 0.;
+	double characteristic_length = -1.;
 	const MaterialType material_type = MaterialType::D0;
 
 	vec current_strain;      // current status
@@ -76,6 +77,19 @@ struct MaterialData {
 	mat initial_inertial; // inertial matrix
 	mat current_inertial; // inertial matrix
 	mat trial_inertial;   // inertial matrix
+
+	vec current_curvature;
+	vec current_couple_stress;
+
+	vec trial_curvature;
+	vec trial_couple_stress;
+
+	vec incre_curvature;
+	vec incre_couple_stress;
+
+	mat initial_couple_stiffness; // stiffness matrix
+	mat current_couple_stiffness; // stiffness matrix
+	mat trial_couple_stiffness;   // stiffness matrix
 };
 
 class Material : protected MaterialData, public Tag {
@@ -85,6 +99,7 @@ class Material : protected MaterialData, public Tag {
 	friend void ConstantStiffness(MaterialData*);
 	friend void ConstantDamping(MaterialData*);
 	friend void ConstantInertial(MaterialData*);
+	friend void ConstantCoupleStiffness(MaterialData*);
 	friend void PureWrapper(MaterialData*);
 public:
 	explicit Material(unsigned = 0,                    // tag
@@ -99,6 +114,7 @@ public:
 	~Material() override;
 
 	virtual void initialize(const shared_ptr<DomainBase>&) = 0;
+	virtual void initialize_couple(const shared_ptr<DomainBase>&);
 
 	virtual void initialize_history(unsigned);
 	virtual void set_initial_history(const vec&);
@@ -107,6 +123,9 @@ public:
 	void set_symmetric(bool) const;
 	[[nodiscard]] bool is_initialized() const;
 	[[nodiscard]] bool is_symmetric() const;
+
+	void set_characteristic_length(double);
+	[[nodiscard]] double get_characteristic_length() const;
 
 	[[nodiscard]] MaterialType get_material_type() const;
 
@@ -135,6 +154,16 @@ public:
 	[[nodiscard]] virtual const mat& get_initial_damping() const;
 	[[nodiscard]] virtual const mat& get_initial_inertial() const;
 
+	virtual const vec& get_trial_curvature();
+	virtual const vec& get_trial_couple_stress();
+	virtual const mat& get_trial_couple_stiffness();
+
+	virtual const vec& get_current_curvature();
+	virtual const vec& get_current_couple_stress();
+	virtual const mat& get_current_couple_stiffness();
+
+	[[nodiscard]] virtual const mat& get_initial_couple_stiffness() const;
+
 	virtual unique_ptr<Material> get_copy() = 0;
 
 	int update_incre_status(double);
@@ -150,6 +179,20 @@ public:
 	virtual int update_trial_status(const vec&);
 	virtual int update_trial_status(const vec&, const vec&);
 	virtual int update_trial_status(const vec&, const vec&, const vec&);
+
+	int update_couple_incre_status(double);
+	int update_couple_incre_status(double, double);
+	int update_couple_incre_status(double, double, double);
+	int update_couple_trial_status(double);
+	int update_couple_trial_status(double, double);
+	int update_couple_trial_status(double, double, double);
+
+	virtual int update_couple_incre_status(const vec&);
+	virtual int update_couple_incre_status(const vec&, const vec&);
+	virtual int update_couple_incre_status(const vec&, const vec&, const vec&);
+	virtual int update_couple_trial_status(const vec&);
+	virtual int update_couple_trial_status(const vec&, const vec&);
+	virtual int update_couple_trial_status(const vec&, const vec&, const vec&);
 
 	virtual int clear_status() = 0;
 	virtual int commit_status() = 0;
