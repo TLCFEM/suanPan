@@ -1210,6 +1210,9 @@
     <ClCompile Include="..\..\..\Element\Special\Embedded.cpp">
       <Filter>Element\Special</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Element\Membrane\CSMT.cpp">
+      <Filter>Element\Membrane</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2316,6 +2319,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Element\Special\Embedded.h">
       <Filter>Element\Special</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Membrane\CSMT.h">
+      <Filter>Element\Membrane</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

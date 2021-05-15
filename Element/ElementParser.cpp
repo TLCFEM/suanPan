@@ -60,6 +60,7 @@ int create_new_element(const shared_ptr<DomainBase>& domain, istringstream& comm
 	else if(is_equal(element_id, "CPE8")) new_cpe8(new_element, command);
 	else if(is_equal(element_id, "CPE8R")) new_cpe8r(new_element, command);
 	else if(is_equal(element_id, "CPS8")) new_cp8(new_element, command);
+	else if(is_equal(element_id, "CSMT")) new_csmt(new_element, command);
 	else if(is_equal(element_id, "Damper01")) new_damper01(new_element, command);
 	else if(is_equal(element_id, "Damper02")) new_damper02(new_element, command);
 	else if(is_equal(element_id, "DC3D4")) new_dc3d4(new_element, command);
@@ -917,6 +918,32 @@ void new_cin3d8(unique_ptr<Element>& return_obj, istringstream& command) {
 	}
 
 	return_obj = make_unique<CIN3D8>(tag, std::move(node_tag), material_tag);
+}
+
+void new_csmt(unique_ptr<Element>& return_obj, istringstream& command) {
+	unsigned tag;
+	if(!get_input(command, tag)) {
+		suanpan_error("new_csmt() needs a tag.\n");
+		return;
+	}
+
+	uvec node_tag(3);
+	for(auto& I : node_tag)
+		if(!get_input(command, I)) {
+			suanpan_error("new_csmt() needs three valid nodes.\n");
+			return;
+		}
+
+	unsigned material_tag;
+	if(!get_input(command, material_tag)) {
+		suanpan_error("new_csmt() needs a valid material tag.\n");
+		return;
+	}
+
+	auto thickness = 1.;
+	if(!get_optional_input(command, thickness)) suanpan_debug("new_csmt() assumes thickness to be unit.\n");
+
+	return_obj = make_unique<CSMT>(tag, std::move(node_tag), material_tag, thickness);
 }
 
 void new_damper01(unique_ptr<Element>& return_obj, istringstream& command) {

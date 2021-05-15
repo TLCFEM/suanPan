@@ -18,4 +18,5 @@ set(Membrane
     Membrane/PS.cpp
     Membrane/QE2.cpp
     Membrane/SGCMQ.cpp
+    Membrane/CSMT.cpp
     )
