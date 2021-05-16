@@ -21,79 +21,108 @@
 #include <Toolbox/utility.h>
 #include <Toolbox/tensorToolbox.h>
 
-CSMT::CSMT(const unsigned T, uvec&& NT, const unsigned MT, const double TH)
+CSMT::IntegrationPoint::IntegrationPoint(rowvec&& C, const double W, unique_ptr<Material>&& M)
+	: coor(std::forward<rowvec>(C))
+	, weight(W)
+	, m_material(std::forward<unique_ptr<Material>>(M)) {}
+
+CSMT::CSMT(const unsigned T, uvec&& NT, const unsigned MT, const double TH, const double L)
 	: MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(NT), uvec{MT}, false)
-	, thickness(TH) {}
+	, thickness(TH) { access::rw(characteristic_length) = L; }
 
 void CSMT::initialize(const shared_ptr<DomainBase>& D) {
 	auto& material_proto = D->get<Material>(material_tag(0));
 
 	if(suanpan::approx_equal(static_cast<double>(PlaneType::E), material_proto->get_parameter(ParameterType::PLANETYPE))) suanpan::hacker(thickness) = 1.;
 
-	m_material = material_proto->get_copy();
-
 	mat ele_coor(m_node, m_node);
 	ele_coor.col(0).fill(1.);
 	ele_coor.cols(1, 2) = get_coordinate(2);
 
 	access::rw(area) = .5 * det(ele_coor);
-	access::rw(characteristic_length) = sqrt(area);
-
-	m_material->set_characteristic_length(characteristic_length);
-	m_material->initialize_couple(D);
+	if(characteristic_length < 0.) access::rw(characteristic_length) = sqrt(area);
 
 	const mat inv_coor = inv(ele_coor);
-	const rowvec n = mean(ele_coor) * inv_coor;
-	const mat pn_pxy = inv_coor.rows(1, 2);
+	// const mat pn_pxy = inv_coor.rows(1, 2);
 	/* partial derivatives of shape functions
+	 * should be constant for constant strain triangle
 	 * [ pn1px pn2px pn3px ]
 	 * [ pn1py pn2py pn3py ]
 	 */
 
-	mat phi_q(1, 3, fill::zeros), phi_s(2, 6, fill::zeros);
 	mat l_p(3, 6, fill::zeros), j_p(1, 6, fill::zeros), j_q(2, 3, fill::zeros);
 
-	const mat phi_r = eye(2, 2), phi_a = eye(3, 3), phi_b = inv(m_material->get_initial_stiffness());
+	const auto& j_s = j_p;
 
 	for(unsigned J = 0, K = 0, L = 1; J < m_node; ++J, K += 2, L += 2) {
 		// \mathbold{L}\mathbold{\phi}_\mathbold{u}
-		l_p(0, K) = l_p(2, L) = pn_pxy(0, J);
-		l_p(2, K) = l_p(1, L) = pn_pxy(1, J);
+		// l_p(0, K) = l_p(2, L) = pn_pxy(0, J);
+		// l_p(2, K) = l_p(1, L) = pn_pxy(1, J);
 
 		// \mathbold{J}\mathbold{\phi}_\mathbold{u}
-		j_p(0, K) = -pn_pxy(1, J);
-		j_p(0, L) = pn_pxy(0, J);
-
-		// \mathbold{\phi}_\mathbold{\theta}
-		phi_q(0, J) = n(J);
+		// j_p(0, K) = -pn_pxy(1, J);
+		// j_p(0, L) = pn_pxy(0, J);
 
 		// \mathbold{J}\mathbold{\phi}_\mathbold{\theta}
-		j_q(0, J) = pn_pxy(1, J);
-		j_q(1, J) = -pn_pxy(0, J);
-
-		// \mathbold{\phi}_\mathbold{\mu}
-		phi_s(0, K) = n(J);
-		phi_s(1, L) = n(J);
+		// j_q(0, J) = pn_pxy(1, J);
+		// j_q(1, J) = -pn_pxy(0, J);
 
 		// \mathbold{J}\mathbold{\phi}_\mathbold{\mu}
 		// j_s(0, K) = -pn_pxy(1, J);
 		// j_s(0, L) = pn_pxy(0, J);
+
+		j_q(1, J) = -(j_p(0, L) = l_p(0, K) = l_p(2, L) = inv_coor(1, J));
+		j_p(0, K) = -(j_q(0, J) = l_p(2, K) = l_p(1, L) = inv_coor(2, J));
 	}
 
 	j_p *= .5;
 	j_q *= .5;
 
-	const auto& j_s = j_p;
+	const mat phi_a = eye(3, 3), phi_b = inv(material_proto->get_initial_stiffness());
 
 	const auto t_factor = area * thickness;
 
-	const mat E1 = t_factor * phi_r.t() * m_material->get_initial_couple_stiffness() * phi_r;
-	const mat E2 = t_factor * phi_b.t() * m_material->get_initial_stiffness() * phi_b;
+	const mat E2 = t_factor * phi_b.t() * material_proto->get_initial_stiffness() * phi_b;
 	const mat H1 = -2. * t_factor * j_p.t() * j_s;
 	const mat H2 = t_factor * l_p.t() * phi_a;
-	const mat H3 = 2. * t_factor * (phi_q.t() * j_s - j_q.t() * phi_s);
-	const mat H4 = -2. * t_factor * phi_r.t() * phi_s;
 	const mat H5 = t_factor * phi_b.t() * phi_a;
+
+	int_pt.clear();
+	int_pt.reserve(3);
+	int_pt.emplace_back(mean(ele_coor.rows(uvec{1, 2})), t_factor / 3., material_proto->get_copy());
+	int_pt.emplace_back(mean(ele_coor.rows(uvec{2, 0})), t_factor / 3., material_proto->get_copy());
+	int_pt.emplace_back(mean(ele_coor.rows(uvec{0, 1})), t_factor / 3., material_proto->get_copy());
+
+	mat E1(6, 6, fill::zeros), H3(3, 6, fill::zeros), H4(6, 6, fill::zeros);
+
+	for(auto& I : int_pt) {
+		I.m_material->set_characteristic_length(characteristic_length);
+		I.m_material->initialize_couple(D);
+
+		const rowvec n = I.coor * inv_coor;
+
+		mat phi_s(2, 6, fill::zeros);
+
+		const auto& phi_q = n;
+		const auto& phi_r = phi_s;
+
+		for(unsigned J = 0, K = 0, L = 1; J < m_node; ++J, K += 2, L += 2)
+			// \mathbold{\phi}_\mathbold{\theta}
+			// phi_q(0, J) = n(J);
+
+			// \mathbold{\phi}_\mathbold{\mu}
+			// phi_s(0, K) = n(J);
+			// phi_s(1, L) = n(J);
+
+			phi_s(0, K) = phi_s(1, L) = n(J);
+
+		E1 += I.weight * phi_r.t() * I.m_material->get_initial_couple_stiffness() * phi_r;
+		H3 += 2. * I.weight * (phi_q.t() * j_s - j_q.t() * phi_s);
+		H4 -= 2. * I.weight * phi_r.t() * phi_s;
+
+		I.b1 = phi_b;
+		I.b2 = I.b3 = phi_r;
+	}
 
 	const mat T1 = solve(H5.t(), H2.t());
 	const mat T2 = solve(H4.t(), H1.t());
@@ -107,36 +136,64 @@ void CSMT::initialize(const shared_ptr<DomainBase>& D) {
 
 	trial_stiffness = current_stiffness = initial_stiffness;
 
-	if(const auto t_density = area * thickness * m_material->get_parameter(ParameterType::DENSITY); t_density > 0.) {
-		initial_mass.zeros(m_size, m_size);
-		for(auto I = 0u, K = 0u; I < m_node; ++I, K += m_dof) for(auto J = I, L = K; J < m_node; ++J, L += m_dof) initial_mass(K, L) += t_density * n(I) * n(J);
-		for(auto I = 0u, K = 1u; I < m_size; I += m_dof, K += m_dof) {
-			initial_mass(K, K) = initial_mass(I, I);
-			for(auto J = I + m_dof, L = K + m_dof; J < m_size; J += m_dof, L += m_dof) initial_mass(J, I) = initial_mass(K, L) = initial_mass(L, K) = initial_mass(I, J);
-		}
-		ConstantMass(this);
+	for(auto& I : int_pt) {
+		I.b1 *= T1;
+		I.b2 *= T2;
+		I.b3 *= T3;
 	}
 }
 
 int CSMT::update_status() {
-	trial_resistance = trial_stiffness * get_trial_displacement();
+	const auto t_disp = get_trial_displacement();
+
+	trial_stiffness.zeros(m_size, m_size);
+	trial_resistance.zeros(m_size);
+
+	for(auto& I : int_pt) {
+		if(SUANPAN_SUCCESS != I.m_material->update_trial_status(I.b1 * t_disp(t_dof))) return SUANPAN_FAIL;
+		if(SUANPAN_SUCCESS != I.m_material->update_couple_trial_status(I.b2 * t_disp(t_dof) + I.b3 * t_disp(r_dof))) return SUANPAN_FAIL;
+
+		trial_stiffness(t_dof, t_dof) += I.weight * I.b1.t() * I.m_material->get_trial_stiffness() * I.b1 + I.weight * I.b2.t() * I.m_material->get_trial_couple_stiffness() * I.b2;
+		trial_stiffness(t_dof, r_dof) += I.weight * I.b2.t() * I.m_material->get_trial_couple_stiffness() * I.b3;
+		trial_stiffness(r_dof, t_dof) += I.weight * I.b3.t() * I.m_material->get_trial_couple_stiffness() * I.b2;
+		trial_stiffness(r_dof, r_dof) += I.weight * I.b3.t() * I.m_material->get_trial_couple_stiffness() * I.b3;
+
+		trial_resistance(t_dof) += I.weight * I.b1.t() * I.m_material->get_trial_stress() + I.weight * I.b2.t() * I.m_material->get_trial_couple_stress();
+		trial_resistance(r_dof) += I.weight * I.b3.t() * I.m_material->get_trial_couple_stress();
+	}
 
 	return SUANPAN_SUCCESS;
 }
 
-int CSMT::commit_status() { return m_material->commit_status(); }
+int CSMT::commit_status() {
+	auto code = 0;
+	for(const auto& I : int_pt) code += I.m_material->commit_status();
+	return code;
+}
 
-int CSMT::clear_status() { return m_material->clear_status(); }
+int CSMT::clear_status() {
+	auto code = 0;
+	for(const auto& I : int_pt) code += I.m_material->clear_status();
+	return code;
+}
 
-int CSMT::reset_status() { return m_material->reset_status(); }
+int CSMT::reset_status() {
+	auto code = 0;
+	for(const auto& I : int_pt) code += I.m_material->reset_status();
+	return code;
+}
 
-vector<vec> CSMT::record(const OutputType T) { return m_material->record(T); }
+vector<vec> CSMT::record(const OutputType T) {
+	vector<vec> data;
+	for(const auto& I : int_pt) for(const auto& J : I.m_material->record(T)) data.emplace_back(J);
+	return data;
+}
 
 void CSMT::print() {
 	suanpan_info("CSMT element.\n");
 	if(!is_initialized()) return;
-	suanpan_info("Material model response:\n");
-	m_material->print();
+	suanpan_info("Material models:\n");
+	for(const auto& I : int_pt) I.m_material->print();
 }
 
 #ifdef SUANPAN_VTK
@@ -159,12 +216,6 @@ void CSMT::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType typ
 	else if(OutputType::U == type) t_disp.rows(0, 1) = reshape(get_current_displacement(), m_dof, m_node);
 
 	for(unsigned I = 0; I < m_node; ++I) arrays->SetTuple(node_encoding(I), t_disp.colptr(I));
-}
-
-mat CSMT::GetData(const OutputType P) {
-	vec t_stress(6, fill::zeros);
-	if(const auto t_data = m_material->record(P); !t_data.empty()) t_stress(uvec{0, 1, 3}) = t_data[0];
-	return repmat(t_stress, 1, m_node);
 }
 
 void CSMT::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {

@@ -37,14 +37,20 @@ class CSMT final : public MaterialElement2D {
 	const uvec t_dof{0, 1, 3, 4, 6, 7};
 	const uvec r_dof{2, 5, 8};
 
+	struct IntegrationPoint final {
+		rowvec coor;
+		double weight = 0.;
+		unique_ptr<Material> m_material;
+		mat b1, b2, b3;
+		IntegrationPoint(rowvec&&, double, unique_ptr<Material>&&);
+	};
+
 	const double thickness; // thickness
 	const double area = 0.; // area
 
-	mat strain_mat;
-
-	unique_ptr<Material> m_material; // store material model
+	vector<IntegrationPoint> int_pt;
 public:
-	CSMT(unsigned, uvec&&, unsigned, double = 1.);
+	CSMT(unsigned, uvec&&, unsigned, double = 1., double = -1.);
 
 	void initialize(const shared_ptr<DomainBase>&) override;
 
@@ -61,7 +67,6 @@ public:
 #ifdef SUANPAN_VTK
 	void Setup() override;
 	void GetData(vtkSmartPointer<vtkDoubleArray>&, OutputType) override;
-	mat GetData(OutputType) override;
 	void SetDeformation(vtkSmartPointer<vtkPoints>&, double) override;
 #endif
 };

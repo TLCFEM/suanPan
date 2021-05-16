@@ -943,7 +943,10 @@ void new_csmt(unique_ptr<Element>& return_obj, istringstream& command) {
 	auto thickness = 1.;
 	if(!get_optional_input(command, thickness)) suanpan_debug("new_csmt() assumes thickness to be unit.\n");
 
-	return_obj = make_unique<CSMT>(tag, std::move(node_tag), material_tag, thickness);
+	auto length = -1.;
+	if(!get_optional_input(command, length)) suanpan_debug("new_csmt() assumes length to be area.\n");
+
+	return_obj = make_unique<CSMT>(tag, std::move(node_tag), material_tag, thickness, length);
 }
 
 void new_damper01(unique_ptr<Element>& return_obj, istringstream& command) {
