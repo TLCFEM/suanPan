@@ -4,7 +4,7 @@
     <ShowAllFiles>false</ShowAllFiles>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>-t</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-ctest</LocalDebuggerCommandArguments>
     <LocalDebuggerWorkingDirectory>..\..\..\Example</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>

@@ -50,6 +50,7 @@ void new_cp8(unique_ptr<Element>&, istringstream&);
 void new_cpe8(unique_ptr<Element>&, istringstream&);
 void new_cpe8r(unique_ptr<Element>&, istringstream&);
 void new_csmt(unique_ptr<Element>&, istringstream&);
+void new_csmq(unique_ptr<Element>&, istringstream&);
 void new_damper01(unique_ptr<Element>&, istringstream&);
 void new_damper02(unique_ptr<Element>&, istringstream&);
 void new_dc3d4(unique_ptr<Element>&, istringstream&);

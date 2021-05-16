@@ -61,6 +61,7 @@ int create_new_element(const shared_ptr<DomainBase>& domain, istringstream& comm
 	else if(is_equal(element_id, "CPE8R")) new_cpe8r(new_element, command);
 	else if(is_equal(element_id, "CPS8")) new_cp8(new_element, command);
 	else if(is_equal(element_id, "CSMT")) new_csmt(new_element, command);
+	else if(is_equal(element_id, "CSMQ")) new_csmq(new_element, command);
 	else if(is_equal(element_id, "Damper01")) new_damper01(new_element, command);
 	else if(is_equal(element_id, "Damper02")) new_damper02(new_element, command);
 	else if(is_equal(element_id, "DC3D4")) new_dc3d4(new_element, command);
@@ -947,6 +948,35 @@ void new_csmt(unique_ptr<Element>& return_obj, istringstream& command) {
 	if(!get_optional_input(command, length)) suanpan_debug("new_csmt() assumes length to be area.\n");
 
 	return_obj = make_unique<CSMT>(tag, std::move(node_tag), material_tag, thickness, length);
+}
+
+void new_csmq(unique_ptr<Element>& return_obj, istringstream& command) {
+	unsigned tag;
+	if(!get_input(command, tag)) {
+		suanpan_error("new_csmq() needs a tag.\n");
+		return;
+	}
+
+	uvec node_tag(4);
+	for(auto& I : node_tag)
+		if(!get_input(command, I)) {
+			suanpan_error("new_csmq() needs four valid nodes.\n");
+			return;
+		}
+
+	unsigned material_tag;
+	if(!get_input(command, material_tag)) {
+		suanpan_error("new_csmq() needs a valid material tag.\n");
+		return;
+	}
+
+	auto thickness = 1.;
+	if(!get_optional_input(command, thickness)) suanpan_debug("new_csmq() assumes thickness to be unit.\n");
+
+	auto length = -1.;
+	if(!get_optional_input(command, length)) suanpan_debug("new_csmq() assumes length to be area.\n");
+
+	return_obj = make_unique<CSMQ>(tag, std::move(node_tag), material_tag, thickness, length);
 }
 
 void new_damper01(unique_ptr<Element>& return_obj, istringstream& command) {

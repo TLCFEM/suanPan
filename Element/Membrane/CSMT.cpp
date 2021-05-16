@@ -149,7 +149,7 @@ int CSMT::update_status() {
 	trial_stiffness.zeros(m_size, m_size);
 	trial_resistance.zeros(m_size);
 
-	for(auto& I : int_pt) {
+	for(const auto& I : int_pt) {
 		if(SUANPAN_SUCCESS != I.m_material->update_trial_status(I.b1 * t_disp(t_dof))) return SUANPAN_FAIL;
 		if(SUANPAN_SUCCESS != I.m_material->update_couple_trial_status(I.b2 * t_disp(t_dof) + I.b3 * t_disp(r_dof))) return SUANPAN_FAIL;
 
