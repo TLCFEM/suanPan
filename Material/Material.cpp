@@ -54,9 +54,13 @@ void Material::set_initialized(const bool F) const { access::rw(initialized) = F
 
 void Material::set_symmetric(const bool F) const { access::rw(symmetric) = F; }
 
+void Material::set_support_couple(const bool F) const { access::rw(support_couple) = F; }
+
 bool Material::is_initialized() const { return initialized; }
 
 bool Material::is_symmetric() const { return symmetric; }
+
+bool Material::is_support_couple() const { return support_couple; }
 
 void Material::set_characteristic_length(const double L) { characteristic_length = std::max(datum::eps, L); }
 

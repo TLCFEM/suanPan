@@ -95,6 +95,7 @@ struct MaterialData {
 class Material : protected MaterialData, public Tag {
 	const bool initialized = false;
 	const bool symmetric = false;
+	const bool support_couple = false;
 
 	friend void ConstantStiffness(MaterialData*);
 	friend void ConstantDamping(MaterialData*);
@@ -121,8 +122,10 @@ public:
 
 	void set_initialized(bool) const;
 	void set_symmetric(bool) const;
+	void set_support_couple(bool) const;
 	[[nodiscard]] bool is_initialized() const;
 	[[nodiscard]] bool is_symmetric() const;
+	[[nodiscard]] bool is_support_couple() const;
 
 	void set_characteristic_length(double);
 	[[nodiscard]] double get_characteristic_length() const;

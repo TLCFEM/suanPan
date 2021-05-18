@@ -22,7 +22,7 @@
 Elastic2D::Elastic2D(const unsigned T, const double E, const double P, const double R, const PlaneType PT)
 	: Material2D(T, PT, R)
 	, elastic_modulus(E)
-	, poissons_ratio(P) {}
+	, poissons_ratio(P) { set_support_couple(true); }
 
 void Elastic2D::initialize(const shared_ptr<DomainBase>&) {
 	const auto EE = plane_type == PlaneType::S ? elastic_modulus : elastic_modulus / (1. - poissons_ratio * poissons_ratio);

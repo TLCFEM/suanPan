@@ -28,7 +28,7 @@ Bilinear2D::Bilinear2D(const unsigned T, const double E, const double V, const d
 	: Material2D(T, M, D)
 	, elastic_modulus(E)
 	, poissons_ratio(V)
-	, base(0, E, V, Y, H, B, D) {}
+	, base(0, E, V, Y, H, B, D) { set_support_couple(true); }
 
 void Bilinear2D::initialize(const shared_ptr<DomainBase>&) {
 	base.Material::initialize(nullptr);
@@ -37,6 +37,20 @@ void Bilinear2D::initialize(const shared_ptr<DomainBase>&) {
 	trial_full_strain = current_full_strain.zeros(6);
 
 	trial_stiffness = current_stiffness = initial_stiffness = form_stiffness(base.get_initial_stiffness());
+}
+
+void Bilinear2D::initialize_couple(const shared_ptr<DomainBase>&) {
+	if(characteristic_length < 0.) {
+		characteristic_length = 1.;
+		suanpan_error("characteristic length is not set, use unity by default.\n");
+	}
+
+	initial_couple_stiffness = -8. * characteristic_length * characteristic_length * elastic_modulus / (2. + 2. * poissons_ratio) * eye(2, 2);
+
+	trial_curvature = current_curvature.zeros(2);
+	trial_couple_stress = current_couple_stress.zeros(2);
+
+	ConstantCoupleStiffness(this);
 }
 
 double Bilinear2D::get_parameter(const ParameterType T) const {
@@ -73,6 +87,11 @@ int Bilinear2D::update_trial_status(const vec& t_strain) {
 	return SUANPAN_SUCCESS;
 }
 
+int Bilinear2D::update_couple_trial_status(const vec& t_curvature) {
+	trial_couple_stress = trial_couple_stiffness * (trial_curvature = t_curvature);
+	return SUANPAN_SUCCESS;
+}
+
 int Bilinear2D::clear_status() {
 	current_strain.zeros();
 	current_stress.zeros();
@@ -81,6 +100,11 @@ int Bilinear2D::clear_status() {
 	trial_stress.zeros();
 	trial_full_strain.zeros();
 	trial_stiffness = current_stiffness = initial_stiffness;
+
+	current_curvature.zeros();
+	current_couple_stress.zeros();
+	trial_curvature.zeros();
+	trial_couple_stress.zeros();
 
 	return base.clear_status();
 }
@@ -91,6 +115,9 @@ int Bilinear2D::commit_status() {
 	current_full_strain = trial_full_strain;
 	current_stiffness = trial_stiffness;
 
+	current_curvature = trial_curvature;
+	current_couple_stress = trial_couple_stress;
+
 	return base.commit_status();
 }
 
@@ -99,6 +126,9 @@ int Bilinear2D::reset_status() {
 	trial_stress = current_stress;
 	trial_full_strain = current_full_strain;
 	trial_stiffness = current_stiffness;
+
+	trial_curvature = current_curvature;
+	trial_couple_stress = current_couple_stress;
 
 	return base.reset_status();
 }

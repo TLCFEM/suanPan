@@ -55,12 +55,14 @@ public:
 	);
 
 	void initialize(const shared_ptr<DomainBase>&) override;
+	void initialize_couple(const shared_ptr<DomainBase>&) override;
 
 	[[nodiscard]] double get_parameter(ParameterType) const override;
 
 	unique_ptr<Material> get_copy() override;
 
 	int update_trial_status(const vec&) override;
+	int update_couple_trial_status(const vec&) override;
 
 	int clear_status() override;
 	int commit_status() override;

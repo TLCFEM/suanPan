@@ -33,6 +33,12 @@ CSMT::CSMT(const unsigned T, uvec&& NT, const unsigned MT, const double TH, cons
 void CSMT::initialize(const shared_ptr<DomainBase>& D) {
 	auto& material_proto = D->get<Material>(material_tag(0));
 
+	if(!material_proto->is_support_couple()) {
+		suanpan_error("the attached material model needs to support couple stress.\n");
+		D->disable_element(get_tag());
+		return;
+	}
+
 	if(suanpan::approx_equal(static_cast<double>(PlaneType::E), material_proto->get_parameter(ParameterType::PLANETYPE))) suanpan::hacker(thickness) = 1.;
 
 	mat ele_coor(m_node, m_node);
