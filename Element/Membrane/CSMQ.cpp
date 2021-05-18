@@ -95,7 +95,7 @@ void CSMQ::initialize(const shared_ptr<DomainBase>& D) {
 		H1 -= 2. * t_factor * j_p.t() * j_s;
 		H2 += t_factor * l_p.t() * phi_a;
 		H3 += 2. * t_factor * (phi_q.t() * j_s - j_q.t() * phi_s);
-		H4 -= 2. * t_factor * phi_r.t() * phi_s;
+		H4 += t_factor * phi_r.t() * phi_s;
 		H5 += t_factor * phi_b.t() * phi_a;
 
 		c_pt.b1 = phi_b;

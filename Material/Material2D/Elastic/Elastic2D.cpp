@@ -43,7 +43,7 @@ void Elastic2D::initialize_couple(const shared_ptr<DomainBase>&) {
 		suanpan_error("characteristic length is not set, use unity by default.\n");
 	}
 
-	initial_couple_stiffness = -8. * characteristic_length * characteristic_length * elastic_modulus / (2. + 2. * poissons_ratio) * eye(2, 2);
+	initial_couple_stiffness = 2. * characteristic_length * characteristic_length * elastic_modulus / (1. + poissons_ratio) * eye(2, 2);
 
 	trial_curvature = current_curvature.zeros(2);
 	trial_couple_stress = current_couple_stress.zeros(2);

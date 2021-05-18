@@ -124,7 +124,7 @@ void CSMT::initialize(const shared_ptr<DomainBase>& D) {
 
 		E1 += I.weight * phi_r.t() * I.m_material->get_initial_couple_stiffness() * phi_r;
 		H3 += 2. * I.weight * (phi_q.t() * j_s - j_q.t() * phi_s);
-		H4 -= 2. * I.weight * phi_r.t() * phi_s;
+		H4 += I.weight * phi_r.t() * phi_s;
 
 		I.b1 = phi_b;
 		I.b2 = I.b3 = phi_r;
