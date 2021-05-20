@@ -1210,10 +1210,10 @@
     <ClCompile Include="..\..\..\Element\Special\Embedded.cpp">
       <Filter>Element\Special</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Element\Membrane\CSMT.cpp">
+    <ClCompile Include="..\..\..\Element\Membrane\CSMT3.cpp">
       <Filter>Element\Membrane</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Element\Membrane\CSMQ.cpp">
+    <ClCompile Include="..\..\..\Element\Membrane\CSMQ4.cpp">
       <Filter>Element\Membrane</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2323,10 +2323,10 @@
     <ClInclude Include="..\..\..\Element\Special\Embedded.h">
       <Filter>Element\Special</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Element\Membrane\CSMT.h">
+    <ClInclude Include="..\..\..\Element\Membrane\CSMT3.h">
       <Filter>Element\Membrane</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Element\Membrane\CSMQ.h">
+    <ClInclude Include="..\..\..\Element\Membrane\CSMQ4.h">
       <Filter>Element\Membrane</Filter>
     </ClInclude>
   </ItemGroup>

@@ -15,22 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include "CSMT.h"
+#include "CSMT3.h"
 #include <Domain/DomainBase.h>
 #include <Material/Material2D/Material2D.h>
 #include <Toolbox/utility.h>
 #include <Toolbox/tensorToolbox.h>
 
-CSMT::IntegrationPoint::IntegrationPoint(rowvec&& C, const double W, unique_ptr<Material>&& M)
+CSMT3::IntegrationPoint::IntegrationPoint(rowvec&& C, const double W, unique_ptr<Material>&& M)
 	: coor(std::forward<rowvec>(C))
 	, weight(W)
 	, m_material(std::forward<unique_ptr<Material>>(M)) {}
 
-CSMT::CSMT(const unsigned T, uvec&& NT, const unsigned MT, const double TH, const double L)
+CSMT3::CSMT3(const unsigned T, uvec&& NT, const unsigned MT, const double TH, const double L)
 	: MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(NT), uvec{MT}, false)
 	, thickness(TH) { access::rw(characteristic_length) = L; }
 
-void CSMT::initialize(const shared_ptr<DomainBase>& D) {
+void CSMT3::initialize(const shared_ptr<DomainBase>& D) {
 	auto& material_proto = D->get<Material>(material_tag(0));
 
 	if(!material_proto->is_support_couple()) {
@@ -149,7 +149,7 @@ void CSMT::initialize(const shared_ptr<DomainBase>& D) {
 	}
 }
 
-int CSMT::update_status() {
+int CSMT3::update_status() {
 	const auto t_disp = get_trial_displacement();
 
 	trial_stiffness.zeros(m_size, m_size);
@@ -171,32 +171,32 @@ int CSMT::update_status() {
 	return SUANPAN_SUCCESS;
 }
 
-int CSMT::commit_status() {
+int CSMT3::commit_status() {
 	auto code = 0;
 	for(const auto& I : int_pt) code += I.m_material->commit_status();
 	return code;
 }
 
-int CSMT::clear_status() {
+int CSMT3::clear_status() {
 	auto code = 0;
 	for(const auto& I : int_pt) code += I.m_material->clear_status();
 	return code;
 }
 
-int CSMT::reset_status() {
+int CSMT3::reset_status() {
 	auto code = 0;
 	for(const auto& I : int_pt) code += I.m_material->reset_status();
 	return code;
 }
 
-vector<vec> CSMT::record(const OutputType T) {
+vector<vec> CSMT3::record(const OutputType T) {
 	vector<vec> data;
 	for(const auto& I : int_pt) for(const auto& J : I.m_material->record(T)) data.emplace_back(J);
 	return data;
 }
 
-void CSMT::print() {
-	suanpan_info("CSMT element.\n");
+void CSMT3::print() {
+	suanpan_info("CSMT3 element.\n");
 	if(!is_initialized()) return;
 	suanpan_info("Material models:\n");
 	for(const auto& I : int_pt) I.m_material->print();
@@ -205,7 +205,7 @@ void CSMT::print() {
 #ifdef SUANPAN_VTK
 #include <vtkTriangle.h>
 
-void CSMT::Setup() {
+void CSMT3::Setup() {
 	vtk_cell = vtkSmartPointer<vtkTriangle>::New();
 	const auto ele_coor = get_coordinate(2);
 	for(unsigned I = 0; I < m_node; ++I) {
@@ -214,7 +214,7 @@ void CSMT::Setup() {
 	}
 }
 
-void CSMT::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
+void CSMT3::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
 	mat t_disp(6, m_node, fill::zeros);
 
 	if(OutputType::A == type) t_disp.rows(0, 1) = reshape(get_current_acceleration(), m_dof, m_node);
@@ -224,7 +224,7 @@ void CSMT::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType typ
 	for(unsigned I = 0; I < m_node; ++I) arrays->SetTuple(node_encoding(I), t_disp.colptr(I));
 }
 
-void CSMT::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
+void CSMT3::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
 	const mat ele_disp = get_coordinate(2) + amplifier * reshape(get_current_displacement(), m_dof, m_node).eval().head_rows(2).t();
 	for(unsigned I = 0; I < m_node; ++I) nodes->SetPoint(node_encoding(I), ele_disp(I, 0), ele_disp(I, 1), 0.);
 }

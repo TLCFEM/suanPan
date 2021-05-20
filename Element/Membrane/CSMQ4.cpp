@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include "CSMQ.h"
+#include "CSMQ4.h"
 #include <Domain/DomainBase.h>
 #include <Material/Material2D/Material2D.h>
 #include <Toolbox/IntegrationPlan.h>
@@ -23,16 +23,16 @@
 #include <Toolbox/utility.h>
 #include <Recorder/OutputType.h>
 
-CSMQ::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M)
+CSMQ4::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M)
 	: coor(std::forward<vec>(C))
 	, weight(W)
 	, m_material(std::forward<unique_ptr<Material>>(M)) {}
 
-CSMQ::CSMQ(const unsigned T, uvec&& N, const unsigned M, const double TH, const double L)
+CSMQ4::CSMQ4(const unsigned T, uvec&& N, const unsigned M, const double TH, const double L)
 	: MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, false)
 	, thickness(TH) { access::rw(characteristic_length) = L; }
 
-void CSMQ::initialize(const shared_ptr<DomainBase>& D) {
+void CSMQ4::initialize(const shared_ptr<DomainBase>& D) {
 	auto& material_proto = D->get<Material>(material_tag(0));
 
 	if(!material_proto->is_support_couple()) {
@@ -141,7 +141,7 @@ void CSMQ::initialize(const shared_ptr<DomainBase>& D) {
 	}
 }
 
-int CSMQ::update_status() {
+int CSMQ4::update_status() {
 	const auto t_disp = get_trial_displacement();
 
 	trial_stiffness.zeros(m_size, m_size);
@@ -163,27 +163,27 @@ int CSMQ::update_status() {
 	return SUANPAN_SUCCESS;
 }
 
-int CSMQ::commit_status() {
+int CSMQ4::commit_status() {
 	auto code = 0;
 	for(const auto& I : int_pt) code += I.m_material->commit_status();
 	return code;
 }
 
-int CSMQ::clear_status() {
+int CSMQ4::clear_status() {
 	auto code = 0;
 	for(const auto& I : int_pt) code += I.m_material->clear_status();
 	return code;
 }
 
-int CSMQ::reset_status() {
+int CSMQ4::reset_status() {
 	auto code = 0;
 	for(const auto& I : int_pt) code += I.m_material->reset_status();
 	return code;
 }
 
-mat CSMQ::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
+mat CSMQ4::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
-vector<vec> CSMQ::record(const OutputType P) {
+vector<vec> CSMQ4::record(const OutputType P) {
 	vector<vec> output;
 	output.reserve(int_pt.size());
 
@@ -209,8 +209,8 @@ vector<vec> CSMQ::record(const OutputType P) {
 	return output;
 }
 
-void CSMQ::print() {
-	suanpan_info("Element %u is a four-node membrane element (CSMQ).\n", get_tag());
+void CSMQ4::print() {
+	suanpan_info("Element %u is a four-node membrane element (CSMQ4).\n", get_tag());
 	suanpan_info("The nodes connected are:\n");
 	node_encoding.t().print();
 	if(!is_initialized()) return;
@@ -225,7 +225,7 @@ void CSMQ::print() {
 #ifdef SUANPAN_VTK
 #include <vtkQuad.h>
 
-void CSMQ::Setup() {
+void CSMQ4::Setup() {
 	vtk_cell = vtkSmartPointer<vtkQuad>::New();
 	const auto ele_coor = get_coordinate(2);
 	for(unsigned I = 0; I < m_node; ++I) {
@@ -234,7 +234,7 @@ void CSMQ::Setup() {
 	}
 }
 
-void CSMQ::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
+void CSMQ4::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
 	mat t_disp(6, m_node, fill::zeros);
 
 	if(OutputType::A == type) t_disp.rows(0, 1) = reshape(get_current_acceleration(), m_dof, m_node).eval().head_rows(2);
@@ -244,7 +244,7 @@ void CSMQ::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType typ
 	for(unsigned I = 0; I < m_node; ++I) arrays->SetTuple(node_encoding(I), t_disp.colptr(I));
 }
 
-mat CSMQ::GetData(const OutputType P) {
+mat CSMQ4::GetData(const OutputType P) {
 	mat A(int_pt.size(), 4);
 	mat B(int_pt.size(), 6, fill::zeros);
 
@@ -263,7 +263,7 @@ mat CSMQ::GetData(const OutputType P) {
 	return (data * solve(A, B)).t();
 }
 
-void CSMQ::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
+void CSMQ4::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
 	const mat ele_disp = get_coordinate(2) + amplifier * reshape(get_current_displacement(), m_dof, m_node).t().eval().head_cols(2);
 	for(unsigned I = 0; I < m_node; ++I) nodes->SetPoint(node_encoding(I), ele_disp(I, 0), ele_disp(I, 1), 0.);
 }

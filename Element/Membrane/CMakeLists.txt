@@ -18,6 +18,6 @@ set(Membrane
     Membrane/PS.cpp
     Membrane/QE2.cpp
     Membrane/SGCMQ.cpp
-    Membrane/CSMT.cpp
-    Membrane/CSMQ.cpp
+    Membrane/CSMT3.cpp
+    Membrane/CSMQ4.cpp
     )

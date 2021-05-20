@@ -15,47 +15,42 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class CSMQ
- * @brief The CSMQ class.
- * 
+ * @class CSMT3
+ * @brief The CSMT3 class.
  * @author tlc
- * @date 17/05/2021
+ * @date 13/05/2021
  * @version 0.1.0
- * @file CSMQ.h
+ * @file CSMT3.h
  * @addtogroup Membrane
  * @ingroup Element
  * @{
  */
 
-#ifndef CSMQ_H
-#define CSMQ_H
+#ifndef CSMT3_H
+#define CSMT3_H
 
 #include <Element/MaterialElement.h>
 
-class CSMQ final : public MaterialElement2D {
+class CSMT3 final : public MaterialElement2D {
+	static constexpr unsigned m_node = 3, m_dof = 3, m_size = m_dof * m_node;
+
+	const uvec t_dof{0, 1, 3, 4, 6, 7};
+	const uvec r_dof{2, 5, 8};
+
 	struct IntegrationPoint final {
-		vec coor;
-		double weight;
+		rowvec coor;
+		double weight = 0.;
 		unique_ptr<Material> m_material;
 		mat b1, b2, b3;
-		IntegrationPoint(vec&&, double, unique_ptr<Material>&&);
+		IntegrationPoint(rowvec&&, double, unique_ptr<Material>&&);
 	};
 
-	static constexpr unsigned m_node = 4, m_dof = 3, m_size = m_dof * m_node;
-
-	inline static const uvec t_dof{0, 1, 3, 4, 6, 7, 9, 10};
-	inline static const uvec r_dof{2, 5, 8, 11};
-
-	const double thickness;
+	const double thickness; // thickness
+	const double area = 0.; // area
 
 	vector<IntegrationPoint> int_pt;
 public:
-	CSMQ(unsigned,    // tag
-	     uvec&&,      // node tag
-	     unsigned,    // material tag
-	     double = 1., // thickness
-	     double = -1. // length
-	);
+	CSMT3(unsigned, uvec&&, unsigned, double = 1., double = -1.);
 
 	void initialize(const shared_ptr<DomainBase>&) override;
 
@@ -65,8 +60,6 @@ public:
 	int clear_status() override;
 	int reset_status() override;
 
-	[[nodiscard]] mat compute_shape_function(const mat&, unsigned) const override;
-
 	vector<vec> record(OutputType) override;
 
 	void print() override;
@@ -74,7 +67,6 @@ public:
 #ifdef SUANPAN_VTK
 	void Setup() override;
 	void GetData(vtkSmartPointer<vtkDoubleArray>&, OutputType) override;
-	mat GetData(OutputType) override;
 	void SetDeformation(vtkSmartPointer<vtkPoints>&, double) override;
 #endif
 };
