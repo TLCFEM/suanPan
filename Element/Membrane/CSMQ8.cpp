@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include "CSMQ4.h"
+#include "CSMQ8.h"
 #include <Domain/DomainBase.h>
 #include <Material/Material2D/Material2D.h>
 #include <Toolbox/IntegrationPlan.h>
@@ -23,16 +23,16 @@
 #include <Toolbox/utility.h>
 #include <Recorder/OutputType.h>
 
-CSMQ4::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M)
+CSMQ8::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M)
 	: coor(std::forward<vec>(C))
 	, weight(W)
 	, m_material(std::forward<unique_ptr<Material>>(M)) {}
 
-CSMQ4::CSMQ4(const unsigned T, uvec&& N, const unsigned M, const double TH, const double L)
+CSMQ8::CSMQ8(const unsigned T, uvec&& N, const unsigned M, const double TH, const double L)
 	: MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, false)
 	, thickness(TH) { access::rw(characteristic_length) = L; }
 
-void CSMQ4::initialize(const shared_ptr<DomainBase>& D) {
+void CSMQ8::initialize(const shared_ptr<DomainBase>& D) {
 	auto& material_proto = D->get<Material>(material_tag(0));
 
 	if(!material_proto->is_support_couple()) {
@@ -47,9 +47,9 @@ void CSMQ4::initialize(const shared_ptr<DomainBase>& D) {
 
 	if(characteristic_length < 0.) access::rw(characteristic_length) = sqrt(area::shoelace(ele_coor));
 
-	const IntegrationPlan plan(2, 2, IntegrationType::GAUSS);
+	const IntegrationPlan plan(2, 3, IntegrationType::GAUSS);
 
-	mat E1(8, 8, fill::zeros), E2(7, 7, fill::zeros), H1(8, 8, fill::zeros), H2(8, 7, fill::zeros), H3(4, 8, fill::zeros), H4(8, 8, fill::zeros), H5(7, 7, fill::zeros);
+	mat E1(16, 16, fill::zeros), E2(11, 11, fill::zeros), H1(16, 16, fill::zeros), H2(16, 11, fill::zeros), H3(8, 16, fill::zeros), H4(16, 16, fill::zeros), H5(11, 11, fill::zeros);
 
 	int_pt.clear();
 	int_pt.reserve(plan.n_rows);
@@ -65,7 +65,7 @@ void CSMQ4::initialize(const shared_ptr<DomainBase>& D) {
 		c_pt.m_material->set_characteristic_length(characteristic_length);
 		c_pt.m_material->initialize_couple(D);
 
-		mat phi_s(2, 8, fill::zeros), l_p(3, 8, fill::zeros), j_p(1, 8, fill::zeros), j_q(2, 4, fill::zeros);
+		mat phi_s(2, 16, fill::zeros), l_p(3, 16, fill::zeros), j_p(1, 16, fill::zeros), j_q(2, 8, fill::zeros);
 
 		const auto& phi_q = n;
 		const auto& phi_r = phi_s;
@@ -83,7 +83,7 @@ void CSMQ4::initialize(const shared_ptr<DomainBase>& D) {
 
 		const auto location = (n * ele_coor).eval();
 
-		const mat phi_a = shape::stress7(location(0), location(1));
+		const mat phi_a = shape::stress11(location(0), location(1));
 		const mat phi_b = solve(c_pt.m_material->get_initial_stiffness(), phi_a);
 
 		const auto t_factor = c_pt.weight * thickness;
@@ -139,7 +139,7 @@ void CSMQ4::initialize(const shared_ptr<DomainBase>& D) {
 	}
 }
 
-int CSMQ4::update_status() {
+int CSMQ8::update_status() {
 	const auto t_disp = get_trial_displacement();
 
 	trial_stiffness.zeros(m_size, m_size);
@@ -161,54 +161,37 @@ int CSMQ4::update_status() {
 	return SUANPAN_SUCCESS;
 }
 
-int CSMQ4::commit_status() {
+int CSMQ8::commit_status() {
 	auto code = 0;
 	for(const auto& I : int_pt) code += I.m_material->commit_status();
 	return code;
 }
 
-int CSMQ4::clear_status() {
+int CSMQ8::clear_status() {
 	auto code = 0;
 	for(const auto& I : int_pt) code += I.m_material->clear_status();
 	return code;
 }
 
-int CSMQ4::reset_status() {
+int CSMQ8::reset_status() {
 	auto code = 0;
 	for(const auto& I : int_pt) code += I.m_material->reset_status();
 	return code;
 }
 
-mat CSMQ4::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
+mat CSMQ8::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
-vector<vec> CSMQ4::record(const OutputType P) {
+vector<vec> CSMQ8::record(const OutputType P) {
 	vector<vec> output;
 	output.reserve(int_pt.size());
 
-	if(P == OutputType::NMISES) {
-		mat A(int_pt.size(), 4);
-		vec B(int_pt.size(), fill::zeros);
-
-		for(size_t I = 0; I < int_pt.size(); ++I) {
-			if(const auto C = int_pt[I].m_material->record(OutputType::MISES); !C.empty()) B(I) = C.cbegin()->at(0);
-			A.row(I) = interpolation::linear(int_pt[I].coor);
-		}
-
-		const vec X = solve(A, B);
-
-		output.emplace_back(vec{dot(interpolation::linear(-1., -1.), X)});
-		output.emplace_back(vec{dot(interpolation::linear(1., -1.), X)});
-		output.emplace_back(vec{dot(interpolation::linear(1., 1.), X)});
-		output.emplace_back(vec{dot(interpolation::linear(-1., 1.), X)});
-		output.emplace_back(vec{dot(interpolation::linear(0., 0.), X)});
-	}
-	else for(const auto& I : int_pt) for(const auto& J : I.m_material->record(P)) output.emplace_back(J);
+	for(const auto& I : int_pt) for(const auto& J : I.m_material->record(P)) output.emplace_back(J);
 
 	return output;
 }
 
-void CSMQ4::print() {
-	suanpan_info("Element %u is a four-node membrane element (CSMQ4).\n", get_tag());
+void CSMQ8::print() {
+	suanpan_info("Element %u is a eight-node membrane element (CSMQ8).\n", get_tag());
 	suanpan_info("The nodes connected are:\n");
 	node_encoding.t().print();
 	if(!is_initialized()) return;
@@ -223,7 +206,7 @@ void CSMQ4::print() {
 #ifdef SUANPAN_VTK
 #include <vtkQuad.h>
 
-void CSMQ4::Setup() {
+void CSMQ8::Setup() {
 	vtk_cell = vtkSmartPointer<vtkQuad>::New();
 	const auto ele_coor = get_coordinate(2);
 	for(unsigned I = 0; I < m_node; ++I) {
@@ -232,36 +215,40 @@ void CSMQ4::Setup() {
 	}
 }
 
-void CSMQ4::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
+void CSMQ8::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
 	mat t_disp(6, m_node, fill::zeros);
 
-	if(OutputType::A == type) t_disp.rows(0, 1) = reshape(get_current_acceleration(), m_dof, m_node).eval().head_rows(2);
-	else if(OutputType::V == type) t_disp.rows(0, 1) = reshape(get_current_velocity(), m_dof, m_node).eval().head_rows(2);
-	else if(OutputType::U == type) t_disp.rows(0, 1) = reshape(get_current_displacement(), m_dof, m_node).eval().head_rows(2);
+	if(OutputType::A == type) t_disp.head_rows(2) = reshape(get_current_acceleration(), m_dof, m_node).eval().head_rows(2);
+	else if(OutputType::V == type) t_disp.head_rows(2) = reshape(get_current_velocity(), m_dof, m_node).eval().head_rows(2);
+	else if(OutputType::U == type) t_disp.head_rows(2) = reshape(get_current_displacement(), m_dof, m_node).eval().head_rows(2);
 
 	for(unsigned I = 0; I < m_node; ++I) arrays->SetTuple(node_encoding(I), t_disp.colptr(I));
 }
 
-mat CSMQ4::GetData(const OutputType P) {
-	mat A(int_pt.size(), 4);
+mat CSMQ8::GetData(const OutputType P) {
+	mat A(int_pt.size(), 9);
 	mat B(int_pt.size(), 6, fill::zeros);
 
 	for(size_t I = 0; I < int_pt.size(); ++I) {
 		if(const auto C = int_pt[I].m_material->record(P); !C.empty()) B(I, 0, size(C[0])) = C[0];
-		A.row(I) = interpolation::linear(int_pt[I].coor);
+		A.row(I) = interpolation::quadratic(int_pt[I].coor);
 	}
 
-	mat data(m_node, 4);
+	mat data(m_node, 9);
 
-	data.row(0) = interpolation::linear(-1., -1.);
-	data.row(1) = interpolation::linear(1., -1.);
-	data.row(2) = interpolation::linear(1., 1.);
-	data.row(3) = interpolation::linear(-1., 1.);
+	data.row(0) = interpolation::quadratic(-1., -1.);
+	data.row(1) = interpolation::quadratic(1., -1.);
+	data.row(2) = interpolation::quadratic(1., 1.);
+	data.row(3) = interpolation::quadratic(-1., 1.);
+	data.row(4) = interpolation::quadratic(0., -1.);
+	data.row(5) = interpolation::quadratic(1., 0.);
+	data.row(6) = interpolation::quadratic(0., 1.);
+	data.row(7) = interpolation::quadratic(-1., 0.);
 
 	return (data * solve(A, B)).t();
 }
 
-void CSMQ4::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
+void CSMQ8::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
 	const mat ele_disp = get_coordinate(2) + amplifier * reshape(get_current_displacement(), m_dof, m_node).t().eval().head_cols(2);
 	for(unsigned I = 0; I < m_node; ++I) nodes->SetPoint(node_encoding(I), ele_disp(I, 0), ele_disp(I, 1), 0.);
 }
