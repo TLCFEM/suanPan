@@ -163,19 +163,19 @@ int CSMQ8::update_status() {
 
 int CSMQ8::commit_status() {
 	auto code = 0;
-	for(const auto& I : int_pt) code += I.m_material->commit_status();
+	for(const auto& I : int_pt) code += I.m_material->commit_status() + I.m_material->commit_couple_status();
 	return code;
 }
 
 int CSMQ8::clear_status() {
 	auto code = 0;
-	for(const auto& I : int_pt) code += I.m_material->clear_status();
+	for(const auto& I : int_pt) code += I.m_material->clear_status() + I.m_material->clear_couple_status();
 	return code;
 }
 
 int CSMQ8::reset_status() {
 	auto code = 0;
-	for(const auto& I : int_pt) code += I.m_material->reset_status();
+	for(const auto& I : int_pt) code += I.m_material->reset_status() + I.m_material->reset_couple_status();
 	return code;
 }
 

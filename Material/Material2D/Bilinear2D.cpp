@@ -87,24 +87,11 @@ int Bilinear2D::update_trial_status(const vec& t_strain) {
 	return SUANPAN_SUCCESS;
 }
 
-int Bilinear2D::update_couple_trial_status(const vec& t_curvature) {
-	trial_couple_stress = trial_couple_stiffness * (trial_curvature = t_curvature);
-	return SUANPAN_SUCCESS;
-}
-
 int Bilinear2D::clear_status() {
-	current_strain.zeros();
-	current_stress.zeros();
-	current_full_strain.zeros();
-	trial_strain.zeros();
-	trial_stress.zeros();
-	trial_full_strain.zeros();
+	current_strain = trial_strain.zeros();
+	current_stress = trial_stress.zeros();
+	current_full_strain = trial_full_strain.zeros();
 	trial_stiffness = current_stiffness = initial_stiffness;
-
-	current_curvature.zeros();
-	current_couple_stress.zeros();
-	trial_curvature.zeros();
-	trial_couple_stress.zeros();
 
 	return base.clear_status();
 }
@@ -115,9 +102,6 @@ int Bilinear2D::commit_status() {
 	current_full_strain = trial_full_strain;
 	current_stiffness = trial_stiffness;
 
-	current_curvature = trial_curvature;
-	current_couple_stress = trial_couple_stress;
-
 	return base.commit_status();
 }
 
@@ -126,9 +110,6 @@ int Bilinear2D::reset_status() {
 	trial_stress = current_stress;
 	trial_full_strain = current_full_strain;
 	trial_stiffness = current_stiffness;
-
-	trial_curvature = current_curvature;
-	trial_couple_stress = current_couple_stress;
 
 	return base.reset_status();
 }

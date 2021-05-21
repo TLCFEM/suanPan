@@ -38,10 +38,26 @@ enum class OutputType;
 
 using std::vector;
 
+struct CoupleMaterialData {
+	double characteristic_length = -1.;
+
+	vec current_curvature;
+	vec current_couple_stress;
+
+	vec trial_curvature;
+	vec trial_couple_stress;
+
+	vec incre_curvature;
+	vec incre_couple_stress;
+
+	mat initial_couple_stiffness; // stiffness matrix
+	mat current_couple_stiffness; // stiffness matrix
+	mat trial_couple_stiffness;   // stiffness matrix
+};
+
 struct MaterialData {
 	const double tolerance = 1E-14;
 	const double density = 0.;
-	double characteristic_length = -1.;
 	const MaterialType material_type = MaterialType::D0;
 
 	vec current_strain;      // current status
@@ -77,22 +93,9 @@ struct MaterialData {
 	mat initial_inertial; // inertial matrix
 	mat current_inertial; // inertial matrix
 	mat trial_inertial;   // inertial matrix
-
-	vec current_curvature;
-	vec current_couple_stress;
-
-	vec trial_curvature;
-	vec trial_couple_stress;
-
-	vec incre_curvature;
-	vec incre_couple_stress;
-
-	mat initial_couple_stiffness; // stiffness matrix
-	mat current_couple_stiffness; // stiffness matrix
-	mat trial_couple_stiffness;   // stiffness matrix
 };
 
-class Material : protected MaterialData, public Tag {
+class Material : protected MaterialData, protected CoupleMaterialData, public Tag {
 	const bool initialized = false;
 	const bool symmetric = false;
 	const bool support_couple = false;
@@ -100,8 +103,8 @@ class Material : protected MaterialData, public Tag {
 	friend void ConstantStiffness(MaterialData*);
 	friend void ConstantDamping(MaterialData*);
 	friend void ConstantInertial(MaterialData*);
-	friend void ConstantCoupleStiffness(MaterialData*);
-	friend void PureWrapper(MaterialData*);
+	friend void ConstantCoupleStiffness(CoupleMaterialData*);
+	friend void PureWrapper(Material*);
 public:
 	explicit Material(unsigned = 0,                    // tag
 	                  MaterialType = MaterialType::D0, // material type
@@ -200,6 +203,10 @@ public:
 	virtual int clear_status() = 0;
 	virtual int commit_status() = 0;
 	virtual int reset_status() = 0;
+
+	virtual int clear_couple_status();
+	virtual int commit_couple_status();
+	virtual int reset_couple_status();
 
 	virtual vector<vec> record(OutputType);
 };

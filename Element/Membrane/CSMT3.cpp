@@ -173,19 +173,19 @@ int CSMT3::update_status() {
 
 int CSMT3::commit_status() {
 	auto code = 0;
-	for(const auto& I : int_pt) code += I.m_material->commit_status();
+	for(const auto& I : int_pt) code += I.m_material->commit_status() + I.m_material->clear_couple_status();
 	return code;
 }
 
 int CSMT3::clear_status() {
 	auto code = 0;
-	for(const auto& I : int_pt) code += I.m_material->clear_status();
+	for(const auto& I : int_pt) code += I.m_material->clear_status() + I.m_material->clear_couple_status();
 	return code;
 }
 
 int CSMT3::reset_status() {
 	auto code = 0;
-	for(const auto& I : int_pt) code += I.m_material->reset_status();
+	for(const auto& I : int_pt) code += I.m_material->reset_status() + I.m_material->reset_couple_status();
 	return code;
 }
 

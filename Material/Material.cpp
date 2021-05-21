@@ -18,7 +18,8 @@
 #include "Material.h"
 
 Material::Material(const unsigned T, const MaterialType MT, const double D)
-	: MaterialData{1E-14, fabs(D), -1., MT, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}}
+	: MaterialData{1E-14, fabs(D), MT, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}}
+	, CoupleMaterialData{-1., {}, {}, {}, {}, {}, {}, {}, {}, {}}
 	, Tag(T) { suanpan_debug("Material %u ctor() called.\n", T); }
 
 Material::~Material() { suanpan_debug("Material %u dtor() called.\n", get_tag()); }
@@ -181,7 +182,10 @@ int Material::update_couple_incre_status(const vec& i_curvature, const vec&) { r
 
 int Material::update_couple_incre_status(const vec& i_curvature, const vec&, const vec&) { return update_couple_trial_status(current_curvature + i_curvature); }
 
-int Material::update_couple_trial_status(const vec&) { throw invalid_argument("hidden method update_couple_trial_status() called"); }
+int Material::update_couple_trial_status(const vec& t_curvature) {
+	trial_couple_stress = trial_couple_stiffness * (trial_curvature = t_curvature);
+	return SUANPAN_SUCCESS;
+}
 
 int Material::update_couple_trial_status(const vec& t_curvature, const vec&) { return update_couple_trial_status(t_curvature); }
 
@@ -253,6 +257,34 @@ int Material::reset_status() {
 	return SUANPAN_SUCCESS;
 }
 
+int Material::clear_couple_status() {
+	if(!current_curvature.is_empty()) current_curvature.zeros();
+	if(!current_couple_stress.is_empty()) current_couple_stress.zeros();
+
+	if(!trial_curvature.is_empty()) trial_curvature.zeros();
+	if(!trial_couple_stress.is_empty()) trial_couple_stress.zeros();
+
+	if(!initial_couple_stiffness.is_empty()) trial_couple_stiffness = current_couple_stiffness = initial_couple_stiffness;
+
+	return SUANPAN_SUCCESS;
+}
+
+int Material::commit_couple_status() {
+	if(!trial_curvature.is_empty()) current_curvature = trial_curvature;
+	if(!trial_couple_stress.is_empty()) current_couple_stress = trial_couple_stress;
+	if(!trial_couple_stiffness.is_empty()) current_couple_stiffness = trial_couple_stiffness;
+
+	return SUANPAN_SUCCESS;
+}
+
+int Material::reset_couple_status() {
+	if(!trial_curvature.is_empty()) trial_curvature = current_curvature;
+	if(!trial_couple_stress.is_empty()) trial_couple_stress = current_couple_stress;
+	if(!trial_couple_stiffness.is_empty()) trial_couple_stiffness = current_couple_stiffness;
+
+	return SUANPAN_SUCCESS;
+}
+
 vector<vec> Material::record(const OutputType) { return {}; }
 
 void ConstantStiffness(MaterialData* M) {
@@ -270,12 +302,12 @@ void ConstantInertial(MaterialData* M) {
 	M->trial_inertial = mat(M->initial_inertial.memptr(), M->initial_inertial.n_rows, M->initial_inertial.n_cols, false, true);
 }
 
-void ConstantCoupleStiffness(MaterialData* M) {
+void ConstantCoupleStiffness(CoupleMaterialData* M) {
 	M->current_couple_stiffness = mat(M->initial_couple_stiffness.memptr(), M->initial_couple_stiffness.n_rows, M->initial_couple_stiffness.n_cols, false, true);
 	M->trial_couple_stiffness = mat(M->initial_couple_stiffness.memptr(), M->initial_couple_stiffness.n_rows, M->initial_couple_stiffness.n_cols, false, true);
 }
 
-void PureWrapper(MaterialData* M) {
+void PureWrapper(Material* M) {
 	M->current_strain.reset();
 	M->current_strain_rate.reset();
 	M->current_strain_acc.reset();
