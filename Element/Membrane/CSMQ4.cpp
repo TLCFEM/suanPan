@@ -49,7 +49,10 @@ void CSMQ4::initialize(const shared_ptr<DomainBase>& D) {
 
 	const IntegrationPlan plan(2, 2, IntegrationType::GAUSS);
 
-	mat E1(8, 8, fill::zeros), E2(7, 7, fill::zeros), H1(8, 8, fill::zeros), H2(8, 7, fill::zeros), H3(4, 8, fill::zeros), H4(8, 8, fill::zeros), H5(7, 7, fill::zeros);
+	const auto& t_size = t_dof.n_elem;
+	const auto& r_size = r_dof.n_elem;
+
+	mat E1(t_size, t_size, fill::zeros), E2(7, 7, fill::zeros), H1(t_size, t_size, fill::zeros), H2(t_size, 7, fill::zeros), H3(r_size, t_size, fill::zeros), H4(t_size, t_size, fill::zeros), H5(7, 7, fill::zeros);
 
 	int_pt.clear();
 	int_pt.reserve(plan.n_rows);
@@ -65,7 +68,7 @@ void CSMQ4::initialize(const shared_ptr<DomainBase>& D) {
 		c_pt.m_material->set_characteristic_length(characteristic_length);
 		c_pt.m_material->initialize_couple(D);
 
-		mat phi_s(2, 8, fill::zeros), l_p(3, 8, fill::zeros), j_p(1, 8, fill::zeros), j_q(2, 4, fill::zeros);
+		mat phi_s(2, t_size, fill::zeros), l_p(3, t_size, fill::zeros), j_p(1, t_size, fill::zeros), j_q(2, r_size, fill::zeros);
 
 		const auto& phi_q = n;
 		const auto& phi_r = phi_s;

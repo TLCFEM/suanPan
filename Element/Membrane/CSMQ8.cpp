@@ -49,7 +49,10 @@ void CSMQ8::initialize(const shared_ptr<DomainBase>& D) {
 
 	const IntegrationPlan plan(2, 3, IntegrationType::GAUSS);
 
-	mat E1(16, 16, fill::zeros), E2(11, 11, fill::zeros), H1(16, 16, fill::zeros), H2(16, 11, fill::zeros), H3(8, 16, fill::zeros), H4(16, 16, fill::zeros), H5(11, 11, fill::zeros);
+	const auto& t_size = t_dof.n_elem;
+	const auto& r_size = r_dof.n_elem;
+
+	mat E1(t_size, t_size, fill::zeros), E2(11, 11, fill::zeros), H1(t_size, t_size, fill::zeros), H2(t_size, 11, fill::zeros), H3(r_size, t_size, fill::zeros), H4(t_size, t_size, fill::zeros), H5(11, 11, fill::zeros);
 
 	int_pt.clear();
 	int_pt.reserve(plan.n_rows);
@@ -65,7 +68,7 @@ void CSMQ8::initialize(const shared_ptr<DomainBase>& D) {
 		c_pt.m_material->set_characteristic_length(characteristic_length);
 		c_pt.m_material->initialize_couple(D);
 
-		mat phi_s(2, 16, fill::zeros), l_p(3, 16, fill::zeros), j_p(1, 16, fill::zeros), j_q(2, 8, fill::zeros);
+		mat phi_s(2, t_size, fill::zeros), l_p(3, t_size, fill::zeros), j_p(1, t_size, fill::zeros), j_q(2, r_size, fill::zeros);
 
 		const auto& phi_q = n;
 		const auto& phi_r = phi_s;
@@ -204,10 +207,10 @@ void CSMQ8::print() {
 }
 
 #ifdef SUANPAN_VTK
-#include <vtkQuad.h>
+#include <vtkQuadraticQuad.h>
 
 void CSMQ8::Setup() {
-	vtk_cell = vtkSmartPointer<vtkQuad>::New();
+	vtk_cell = vtkSmartPointer<vtkQuadraticQuad>::New();
 	const auto ele_coor = get_coordinate(2);
 	for(unsigned I = 0; I < m_node; ++I) {
 		vtk_cell->GetPointIds()->SetId(I, node_encoding(I));

@@ -56,7 +56,10 @@ void CSMT3::initialize(const shared_ptr<DomainBase>& D) {
 	 * [ pn1py pn2py pn3py ]
 	 */
 
-	mat l_p(3, 6, fill::zeros), j_p(1, 6, fill::zeros), j_q(2, 3, fill::zeros);
+	const auto& t_size = t_dof.n_elem;
+	const auto& r_size = r_dof.n_elem;
+
+	mat l_p(3, t_size, fill::zeros), j_p(1, t_size, fill::zeros), j_q(2, r_size, fill::zeros);
 
 	const auto& j_s = j_p;
 
@@ -99,7 +102,7 @@ void CSMT3::initialize(const shared_ptr<DomainBase>& D) {
 	int_pt.emplace_back(mean(ele_coor.rows(uvec{2, 0})), t_factor / 3., material_proto->get_copy());
 	int_pt.emplace_back(mean(ele_coor.rows(uvec{0, 1})), t_factor / 3., material_proto->get_copy());
 
-	mat E1(6, 6, fill::zeros), H3(3, 6, fill::zeros), H4(6, 6, fill::zeros);
+	mat E1(t_size, t_size, fill::zeros), H3(r_size, t_size, fill::zeros), H4(t_size, t_size, fill::zeros);
 
 	for(auto& I : int_pt) {
 		I.m_material->set_characteristic_length(characteristic_length);
@@ -107,7 +110,7 @@ void CSMT3::initialize(const shared_ptr<DomainBase>& D) {
 
 		const rowvec n = I.coor * inv_coor;
 
-		mat phi_s(2, 6, fill::zeros);
+		mat phi_s(2, t_size, fill::zeros);
 
 		const auto& phi_q = n;
 		const auto& phi_r = phi_s;
