@@ -1219,6 +1219,9 @@
     <ClCompile Include="..\..\..\Element\Membrane\CSMQ8.cpp">
       <Filter>Element\Membrane</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Element\Membrane\CSMQ7.cpp">
+      <Filter>Element\Membrane</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2333,6 +2336,9 @@
       <Filter>Element\Membrane</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Element\Membrane\CSMQ8.h">
+      <Filter>Element\Membrane</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Membrane\CSMQ7.h">
       <Filter>Element\Membrane</Filter>
     </ClInclude>
   </ItemGroup>

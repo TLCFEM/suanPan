@@ -20,5 +20,6 @@ set(Membrane
     Membrane/SGCMQ.cpp
     Membrane/CSMT3.cpp
     Membrane/CSMQ4.cpp
+    Membrane/CSMQ7.cpp
     Membrane/CSMQ8.cpp
     )

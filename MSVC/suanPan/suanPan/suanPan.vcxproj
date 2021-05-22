@@ -178,6 +178,7 @@
     <ClCompile Include="..\..\..\Element\Membrane\CP7.cpp" />
     <ClCompile Include="..\..\..\Element\Membrane\CP8.cpp" />
     <ClCompile Include="..\..\..\Element\Membrane\CSMQ4.cpp" />
+    <ClCompile Include="..\..\..\Element\Membrane\CSMQ7.cpp" />
     <ClCompile Include="..\..\..\Element\Membrane\CSMQ8.cpp" />
     <ClCompile Include="..\..\..\Element\Membrane\CSMT3.cpp" />
     <ClCompile Include="..\..\..\Element\Membrane\DCP3.cpp" />
@@ -553,6 +554,7 @@
     <ClInclude Include="..\..\..\Element\Membrane\CP7.h" />
     <ClInclude Include="..\..\..\Element\Membrane\CP8.h" />
     <ClInclude Include="..\..\..\Element\Membrane\CSMQ4.h" />
+    <ClInclude Include="..\..\..\Element\Membrane\CSMQ7.h" />
     <ClInclude Include="..\..\..\Element\Membrane\CSMQ8.h" />
     <ClInclude Include="..\..\..\Element\Membrane\CSMT3.h" />
     <ClInclude Include="..\..\..\Element\Membrane\DCP3.h" />

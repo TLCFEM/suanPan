@@ -19,4 +19,5 @@
 #include "SGCMQ.h"
 #include "CSMT3.h"
 #include "CSMQ4.h"
+#include "CSMQ7.h"
 #include "CSMQ8.h"
