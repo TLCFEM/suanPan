@@ -4,13 +4,14 @@
 
 1. `MKL` includes outdated `FEAST`, the external names in `FEAST` library are modified to avoid linking error.
 
-## version 1.x
+## version 1.5
 
 1. add `scoop` support
 2. add `Contact3D` 3D node-triangular facet contact element
 3. add `NodeLine` and `NodeFacet` contact constraint
 4. add `Sleeve2D`, `Sleeve3D`, `MaxGap2D` and `MaxGap3D` constraint
 5. update `OpenBLAS` to version 0.3.15
+6. update `Material` class to accommodate couple stress related quantities
 
 ## version 1.4
 
