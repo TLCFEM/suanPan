@@ -19,7 +19,7 @@
 #define SUANPAN_H
 
 constexpr auto SUANPAN_MAJOR = 1;
-constexpr auto SUANPAN_MINOR = 5;
+constexpr auto SUANPAN_MINOR = 6;
 constexpr auto SUANPAN_PATCH = 0;
 constexpr auto SUANPAN_CODE = "     Acrux";
 constexpr auto SUANPAN_ARCH = 64;

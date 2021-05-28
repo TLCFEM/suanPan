@@ -4,6 +4,8 @@
 
 1. `MKL` includes outdated `FEAST`, the external names in `FEAST` library are modified to avoid linking error.
 
+## version 1.x
+
 ## version 1.5
 
 1. add `scoop` support
