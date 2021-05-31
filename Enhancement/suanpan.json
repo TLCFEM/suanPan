@@ -1,23 +1,31 @@
 {
-   "version":"1.4",
-   "url":"https://github.com/TLCFEM/suanPan/releases/download/suanPan-v1.4/suanPan-win-mkl-vtk.zip",
-   "hash":"4c2b3459465aff46bb32dd02dba3a81dbde0c6b99f182372676f7949177e70e3",
-   "bin":"suanPan.exe",
-   "homepage":"https://tlcfem.github.io/suanPan/",
-   "description":"An Open Source, Parallel and Heterogeneous Finite Element Analysis Framework",
-   "license":"GPL-3.0-or-later",
-   "notes":[
-      "Please ensure Microsoft Visual C++ Redistributable for Visual Studio 2019 is installed.",
-      "You can also find and run AddAssociation.bat to configure file association and Sublime Text 3 syntax support."
-   ],
-   "checkver":{
-      "url":"https://github.com/TLCFEM/suanPan/releases",
-      "regex":"suanPan-v([0-9]\\.[0-9]\\.?[0-9]?)"
-   },
-   "autoupdate":{
-      "url":"https://github.com/TLCFEM/suanPan/releases/download/suanPan-v$version/suanPan-win-mkl-vtk.zip",
-      "hash":{
-         "url":"https://github.com/TLCFEM/suanPan/releases/download/suanPan-v$version/suanPan-win-mkl-vtk.sha256"
-      }
-   }
+    "version": "1.5",
+    "homepage": "https://tlcfem.github.io/suanPan/",
+    "description": "Parallel and heterogeneous finite element analysis framework",
+    "license": "GPL-3.0-only",
+    "notes": "You can run \"$dir\\AddAssociation.bat\" with admin privilege to configure file association and Sublime Text syntax support.",
+    "suggest": {
+        "vcredist2019": "vcredist2019"
+    },
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/TLCFEM/suanPan/releases/download/suanPan-v1.5/suanPan-win-mkl-vtk.zip",
+            "hash": "de9f1f1ed3d3d9c92e5c3c875cd22c028ea73b4426c08cc5797f4417a8d16cb5"
+        }
+    },
+    "bin": "suanPan.exe",
+    "checkver": {
+        "github": "https://github.com/TLCFEM/suanPan",
+        "regex": "download/suanPan-v([\\d.]+)/"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/TLCFEM/suanPan/releases/download/suanPan-v$version/suanPan-win-mkl-vtk.zip"
+            }
+        },
+        "hash": {
+            "url": "$baseurl/suanPan-win-mkl-vtk.sha256"
+        }
+    }
 }
