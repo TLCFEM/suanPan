@@ -2676,6 +2676,15 @@ int print_info(const shared_ptr<DomainBase>& domain, istringstream& command) {
 				suanpan_info("\n");
 			}
 		}
+	else if(is_equal(object_type, "nodegroup"))
+		while(get_input(command, tag)) {
+			if(domain->find_group(tag))
+				for(const auto t_node : get_group(domain, tag)->get_pool())
+					if(domain->find<Node>(t_node)) {
+						get_node(domain, static_cast<unsigned>(t_node))->print();
+						suanpan_info("\n");
+					}
+		}
 	else if(is_equal(object_type, "amplitude"))
 		while(get_input(command, tag)) {
 			if(domain->find_amplitude(tag)) {
