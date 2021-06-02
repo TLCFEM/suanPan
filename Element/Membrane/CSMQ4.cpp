@@ -52,7 +52,7 @@ void CSMQ4::initialize(const shared_ptr<DomainBase>& D) {
 	const auto& t_size = t_dof.n_elem;
 	const auto& r_size = r_dof.n_elem;
 
-	mat E1(t_size, t_size, fill::zeros), E2(7, 7, fill::zeros), H1(t_size, t_size, fill::zeros), H2(t_size, 7, fill::zeros), H3(r_size, t_size, fill::zeros), H4(t_size, t_size, fill::zeros), H5(7, 7, fill::zeros);
+	mat E1(t_size, t_size, fill::zeros), E2(9, 9, fill::zeros), H1(t_size, t_size, fill::zeros), H2(t_size, 9, fill::zeros), H3(r_size, t_size, fill::zeros), H4(t_size, t_size, fill::zeros), H5(9, 9, fill::zeros);
 
 	int_pt.clear();
 	int_pt.reserve(plan.n_rows);
@@ -86,7 +86,7 @@ void CSMQ4::initialize(const shared_ptr<DomainBase>& D) {
 
 		const auto location = (n * ele_coor).eval();
 
-		const mat phi_a = shape::stress7(location(0), location(1));
+		const mat phi_a = shape::linear_stress(location(0), location(1));
 		const mat phi_b = solve(c_pt.m_material->get_initial_stiffness(), phi_a);
 
 		const auto t_factor = c_pt.weight * thickness;

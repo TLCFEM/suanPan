@@ -100,6 +100,8 @@ namespace shape {
 	inline mat strain7(const vec& C, double V);
 	inline mat strain9(const vec& C, double V);
 	inline mat strain11(const vec& C, double V);
+
+	template<typename T> Mat<T> linear_stress(T X, T Y);
 } // namespace shape
 
 template<typename T> T area::triangle(const Mat<T>& EC) { return .5 * (EC(0, 0) * (EC(1, 1) - EC(2, 1)) + EC(1, 0) * (EC(2, 1) - EC(0, 1)) + EC(2, 0) * (EC(0, 1) - EC(1, 1))); }
@@ -265,7 +267,7 @@ template<typename T> Mat<T> shape::quad(const Mat<T>& int_pts, const unsigned or
 			N(0, 0) = -(N(0, 1) = YM);
 		}
 		N *= .25;
-		if(5 <= num_node)
+		if(5 <= num_node) {
 			if(0 == order) {
 				N(0, 4) = .25 * (1. - X * X) * (1. - Y);
 				N(0, 0) -= .5 * N(0, 4);
@@ -279,7 +281,8 @@ template<typename T> Mat<T> shape::quad(const Mat<T>& int_pts, const unsigned or
 				N(1, 0) -= .5 * N(1, 4);
 				N(1, 1) -= .5 * N(1, 4);
 			}
-		if(6 <= num_node)
+		}
+		if(6 <= num_node) {
 			if(0 == order) {
 				N(0, 5) = .25 * (1. - Y * Y) * (1. + X);
 				N(0, 1) -= .5 * N(0, 5);
@@ -293,7 +296,8 @@ template<typename T> Mat<T> shape::quad(const Mat<T>& int_pts, const unsigned or
 				N(1, 1) -= .5 * N(1, 5);
 				N(1, 2) -= .5 * N(1, 5);
 			}
-		if(7 <= num_node)
+		}
+		if(7 <= num_node) {
 			if(0 == order) {
 				N(0, 6) = .25 * (1. - X * X) * (1. + Y);
 				N(0, 2) -= .5 * N(0, 6);
@@ -307,6 +311,7 @@ template<typename T> Mat<T> shape::quad(const Mat<T>& int_pts, const unsigned or
 				N(1, 2) -= .5 * N(1, 6);
 				N(1, 3) -= .5 * N(1, 6);
 			}
+		}
 	}
 
 	return N;
@@ -576,6 +581,14 @@ template<typename T> Mat<T> shape::strain7(const Col<T>& C, const T V) { return 
 template<typename T> Mat<T> shape::strain9(const Col<T>& C, const T V) { return strain(C, V, 9); }
 
 template<typename T> Mat<T> shape::strain11(const Col<T>& C, const T V) { return strain(C, V, 11); }
+
+template<typename T> Mat<T> shape::linear_stress(T X, T Y) {
+	Mat<T> N = eye(3, 9);
+	N.cols(3, 5) = X * eye(3, 3);
+	N.cols(6, 8) = Y * eye(3, 3);
+
+	return N;
+}
 
 template<typename T> Mat<T> shape::plate::triangle(const Col<T>& int_pts, const unsigned order, const unsigned num_node, const Mat<T>& nodes) {
 	suanpan_debug([&]() { if(order > 1 || (num_node != 3 && num_node != 6) || (nodes.n_cols != 2) || nodes.n_rows < 3) throw invalid_argument("not supported"); });
