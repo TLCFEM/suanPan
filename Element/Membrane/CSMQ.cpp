@@ -264,6 +264,8 @@ void CSMQ::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplif
 	for(unsigned I = 0; I < 4; ++I) nodes->SetPoint(node_encoding(I), ele_disp(I, 0), ele_disp(I, 1), 0.);
 }
 
+#endif
+
 CSMQ5::CSMQ5(const unsigned T, uvec&& N, const unsigned M, const double TH, const double L)
 	: CSMQ(T, std::forward<uvec>(N), M, 5, TH, L) {}
 
@@ -284,5 +286,3 @@ CSMQ7::CSMQ7(const unsigned T, uvec&& N, const unsigned M, const double TH, cons
 const uvec& CSMQ7::get_translation_dof() { return t_dof; }
 
 const uvec& CSMQ7::get_rotation_dof() { return r_dof; }
-
-#endif
