@@ -11,6 +11,10 @@ set(Membrane
     Membrane/CP6.cpp
     Membrane/CP7.cpp
     Membrane/CP8.cpp
+    Membrane/CSMQ.cpp
+    Membrane/CSMQ4.cpp
+    Membrane/CSMQ8.cpp
+    Membrane/CSMT3.cpp
     Membrane/DCP3.cpp
     Membrane/DCP4.cpp
     Membrane/GCMQ.cpp
@@ -18,8 +22,4 @@ set(Membrane
     Membrane/PS.cpp
     Membrane/QE2.cpp
     Membrane/SGCMQ.cpp
-    Membrane/CSMT3.cpp
-    Membrane/CSMQ4.cpp
-    Membrane/CSMQ7.cpp
-    Membrane/CSMQ8.cpp
     )

@@ -15,24 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class CSMQ7
- * @brief The CSMQ7 class.
+ * @class CSMQ
+ * @brief The CSMQ class.
  * 
  * @author tlc
- * @date 22/05/2021
+ * @date 02/06/2021
  * @version 0.1.0
- * @file CSMQ7.h
+ * @file CSMQ.h
  * @addtogroup Membrane
  * @ingroup Element
  * @{
  */
 
-#ifndef CSMQ7_H
-#define CSMQ7_H
+#ifndef CSMQ_H
+#define CSMQ_H
 
 #include <Element/MaterialElement.h>
 
-class CSMQ7 final : public MaterialElement2D {
+class CSMQ : public MaterialElement2D {
 	struct IntegrationPoint final {
 		vec coor;
 		double weight;
@@ -41,20 +41,25 @@ class CSMQ7 final : public MaterialElement2D {
 		IntegrationPoint(vec&&, double, unique_ptr<Material>&&);
 	};
 
-	static constexpr unsigned m_node = 7, m_dof = 3, m_size = m_dof * m_node;
+	static constexpr unsigned m_dof = 3;
 
-	inline static const uvec t_dof{0, 1, 3, 4, 6, 7, 9, 10, 12, 13, 15, 16, 18, 19};
-	inline static const uvec r_dof{2, 5, 8, 11, 14, 17, 20};
+	const unsigned m_node;
+
+	const unsigned m_size = m_dof * m_node;
 
 	const double thickness;
 
 	vector<IntegrationPoint> int_pt;
+
+	virtual const uvec& get_translation_dof() = 0;
+	virtual const uvec& get_rotation_dof() = 0;
 public:
-	CSMQ7(unsigned,    // tag
-	      uvec&&,      // node tag
-	      unsigned,    // material tag
-	      double = 1., // thickness
-	      double = -1. // length
+	CSMQ(unsigned,    // tag
+	     uvec&&,      // node tag
+	     unsigned,    // material tag
+	     unsigned,    // number of nodes
+	     double = 1., // thickness
+	     double = -1. // length
 	);
 
 	void initialize(const shared_ptr<DomainBase>&) override;
@@ -77,6 +82,51 @@ public:
 	mat GetData(OutputType) override;
 	void SetDeformation(vtkSmartPointer<vtkPoints>&, double) override;
 #endif
+};
+
+class CSMQ5 final : public CSMQ {
+	inline static const uvec t_dof{0, 1, 3, 4, 6, 7, 9, 10, 12, 13};
+	inline static const uvec r_dof{2, 5, 8, 11, 14};
+
+	const uvec& get_translation_dof() override;
+	const uvec& get_rotation_dof() override;
+public:
+	CSMQ5(unsigned,    // tag
+	      uvec&&,      // node tag
+	      unsigned,    // material tag
+	      double = 1., // thickness
+	      double = -1. // length
+	);
+};
+
+class CSMQ6 final : public CSMQ {
+	inline static const uvec t_dof{0, 1, 3, 4, 6, 7, 9, 10, 12, 13, 15, 16};
+	inline static const uvec r_dof{2, 5, 8, 11, 14, 17};
+
+	const uvec& get_translation_dof() override;
+	const uvec& get_rotation_dof() override;
+public:
+	CSMQ6(unsigned,    // tag
+	      uvec&&,      // node tag
+	      unsigned,    // material tag
+	      double = 1., // thickness
+	      double = -1. // length
+	);
+};
+
+class CSMQ7 final : public CSMQ {
+	inline static const uvec t_dof{0, 1, 3, 4, 6, 7, 9, 10, 12, 13, 15, 16, 18, 19};
+	inline static const uvec r_dof{2, 5, 8, 11, 14, 17, 20};
+
+	const uvec& get_translation_dof() override;
+	const uvec& get_rotation_dof() override;
+public:
+	CSMQ7(unsigned,    // tag
+	      uvec&&,      // node tag
+	      unsigned,    // material tag
+	      double = 1., // thickness
+	      double = -1. // length
+	);
 };
 
 #endif

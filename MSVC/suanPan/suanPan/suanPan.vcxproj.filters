@@ -1219,7 +1219,7 @@
     <ClCompile Include="..\..\..\Element\Membrane\CSMQ8.cpp">
       <Filter>Element\Membrane</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Element\Membrane\CSMQ7.cpp">
+    <ClCompile Include="..\..\..\Element\Membrane\CSMQ.cpp">
       <Filter>Element\Membrane</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2338,7 +2338,7 @@
     <ClInclude Include="..\..\..\Element\Membrane\CSMQ8.h">
       <Filter>Element\Membrane</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Element\Membrane\CSMQ7.h">
+    <ClInclude Include="..\..\..\Element\Membrane\CSMQ.h">
       <Filter>Element\Membrane</Filter>
     </ClInclude>
   </ItemGroup>

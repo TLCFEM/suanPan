@@ -62,6 +62,8 @@ int create_new_element(const shared_ptr<DomainBase>& domain, istringstream& comm
 	else if(is_equal(element_id, "CPS8")) new_cp8(new_element, command);
 	else if(is_equal(element_id, "CSMT3")) new_csmt3(new_element, command);
 	else if(is_equal(element_id, "CSMQ4")) new_csmq(new_element, command, 4);
+	else if(is_equal(element_id, "CSMQ5")) new_csmq(new_element, command, 5);
+	else if(is_equal(element_id, "CSMQ6")) new_csmq(new_element, command, 6);
 	else if(is_equal(element_id, "CSMQ7")) new_csmq(new_element, command, 7);
 	else if(is_equal(element_id, "CSMQ8")) new_csmq(new_element, command, 8);
 	else if(is_equal(element_id, "Damper01")) new_damper01(new_element, command);
@@ -979,6 +981,8 @@ void new_csmq(unique_ptr<Element>& return_obj, istringstream& command, const uns
 	if(!get_optional_input(command, length)) suanpan_debug("new_csmq() assumes length to be area.\n");
 
 	if(4 == size) return_obj = make_unique<CSMQ4>(tag, std::move(node_tag), material_tag, thickness, length);
+	else if(5 == size) return_obj = make_unique<CSMQ5>(tag, std::move(node_tag), material_tag, thickness, length);
+	else if(6 == size) return_obj = make_unique<CSMQ6>(tag, std::move(node_tag), material_tag, thickness, length);
 	else if(7 == size) return_obj = make_unique<CSMQ7>(tag, std::move(node_tag), material_tag, thickness, length);
 	else if(8 == size) return_obj = make_unique<CSMQ8>(tag, std::move(node_tag), material_tag, thickness, length);
 }

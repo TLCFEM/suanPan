@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include "CSMQ7.h"
+#include "CSMQ.h"
 #include <Domain/DomainBase.h>
 #include <Material/Material2D/Material2D.h>
 #include <Toolbox/IntegrationPlan.h>
@@ -23,16 +23,17 @@
 #include <Toolbox/utility.h>
 #include <Recorder/OutputType.h>
 
-CSMQ7::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M)
+CSMQ::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M)
 	: coor(std::forward<vec>(C))
 	, weight(W)
 	, m_material(std::forward<unique_ptr<Material>>(M)) {}
 
-CSMQ7::CSMQ7(const unsigned T, uvec&& N, const unsigned M, const double TH, const double L)
-	: MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, false)
+CSMQ::CSMQ(const unsigned T, uvec&& N, const unsigned M, const unsigned NN, const double TH, const double L)
+	: MaterialElement2D(T, NN, m_dof, std::forward<uvec>(N), uvec{M}, false)
+	, m_node(NN)
 	, thickness(TH) { access::rw(characteristic_length) = L; }
 
-void CSMQ7::initialize(const shared_ptr<DomainBase>& D) {
+void CSMQ::initialize(const shared_ptr<DomainBase>& D) {
 	auto& material_proto = D->get<Material>(material_tag(0));
 
 	if(!material_proto->is_support_couple()) {
@@ -49,10 +50,14 @@ void CSMQ7::initialize(const shared_ptr<DomainBase>& D) {
 
 	const IntegrationPlan plan(2, 3, IntegrationType::GAUSS);
 
+	const auto& t_dof = get_translation_dof();
+	const auto& r_dof = get_rotation_dof();
+
 	const auto& t_size = t_dof.n_elem;
 	const auto& r_size = r_dof.n_elem;
+	const auto s_size = 11u;
 
-	mat E1(t_size, t_size, fill::zeros), E2(11, 11, fill::zeros), H1(t_size, t_size, fill::zeros), H2(t_size, 11, fill::zeros), H3(r_size, t_size, fill::zeros), H4(t_size, t_size, fill::zeros), H5(11, 11, fill::zeros);
+	mat E1(t_size, t_size, fill::zeros), E2(s_size, s_size, fill::zeros), H1(t_size, t_size, fill::zeros), H2(t_size, s_size, fill::zeros), H3(r_size, t_size, fill::zeros), H4(t_size, t_size, fill::zeros), H5(s_size, s_size, fill::zeros);
 
 	int_pt.clear();
 	int_pt.reserve(plan.n_rows);
@@ -142,8 +147,11 @@ void CSMQ7::initialize(const shared_ptr<DomainBase>& D) {
 	}
 }
 
-int CSMQ7::update_status() {
+int CSMQ::update_status() {
 	const auto t_disp = get_trial_displacement();
+
+	const auto& t_dof = get_translation_dof();
+	const auto& r_dof = get_rotation_dof();
 
 	trial_stiffness.zeros(m_size, m_size);
 	trial_resistance.zeros(m_size);
@@ -164,27 +172,27 @@ int CSMQ7::update_status() {
 	return SUANPAN_SUCCESS;
 }
 
-int CSMQ7::commit_status() {
+int CSMQ::commit_status() {
 	auto code = 0;
 	for(const auto& I : int_pt) code += I.m_material->commit_status() + I.m_material->commit_couple_status();
 	return code;
 }
 
-int CSMQ7::clear_status() {
+int CSMQ::clear_status() {
 	auto code = 0;
 	for(const auto& I : int_pt) code += I.m_material->clear_status() + I.m_material->clear_couple_status();
 	return code;
 }
 
-int CSMQ7::reset_status() {
+int CSMQ::reset_status() {
 	auto code = 0;
 	for(const auto& I : int_pt) code += I.m_material->reset_status() + I.m_material->reset_couple_status();
 	return code;
 }
 
-mat CSMQ7::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
+mat CSMQ::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
-vector<vec> CSMQ7::record(const OutputType P) {
+vector<vec> CSMQ::record(const OutputType P) {
 	vector<vec> output;
 	output.reserve(int_pt.size());
 
@@ -193,8 +201,8 @@ vector<vec> CSMQ7::record(const OutputType P) {
 	return output;
 }
 
-void CSMQ7::print() {
-	suanpan_info("Element %u is a eight-node membrane element (CSMQ7).\n", get_tag());
+void CSMQ::print() {
+	suanpan_info("Element %u is a membrane element (CSMQ) with %u nodes.\n", get_tag(), m_node);
 	suanpan_info("The nodes connected are:\n");
 	node_encoding.t().print();
 	if(!is_initialized()) return;
@@ -209,7 +217,7 @@ void CSMQ7::print() {
 #ifdef SUANPAN_VTK
 #include <vtkQuad.h>
 
-void CSMQ7::Setup() {
+void CSMQ::Setup() {
 	vtk_cell = vtkSmartPointer<vtkQuad>::New();
 	const auto ele_coor = get_coordinate(2);
 	for(unsigned I = 0; I < 4; ++I) {
@@ -218,7 +226,7 @@ void CSMQ7::Setup() {
 	}
 }
 
-void CSMQ7::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
+void CSMQ::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
 	mat t_disp(6, m_node, fill::zeros);
 
 	if(OutputType::A == type) t_disp.head_rows(2) = reshape(get_current_acceleration(), m_dof, m_node).eval().head_rows(2);
@@ -228,7 +236,7 @@ void CSMQ7::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType ty
 	for(unsigned I = 0; I < 4; ++I) arrays->SetTuple(node_encoding(I), t_disp.colptr(I));
 }
 
-mat CSMQ7::GetData(const OutputType P) {
+mat CSMQ::GetData(const OutputType P) {
 	mat A(int_pt.size(), 9);
 	mat B(int_pt.size(), 6, fill::zeros);
 
@@ -251,9 +259,30 @@ mat CSMQ7::GetData(const OutputType P) {
 	return (data * solve(A, B)).t();
 }
 
-void CSMQ7::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
+void CSMQ::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
 	const mat ele_disp = get_coordinate(2) + amplifier * reshape(get_current_displacement(), m_dof, m_node).t().eval().head_cols(2);
 	for(unsigned I = 0; I < 4; ++I) nodes->SetPoint(node_encoding(I), ele_disp(I, 0), ele_disp(I, 1), 0.);
 }
+
+CSMQ5::CSMQ5(const unsigned T, uvec&& N, const unsigned M, const double TH, const double L)
+	: CSMQ(T, std::forward<uvec>(N), M, 5, TH, L) {}
+
+const uvec& CSMQ5::get_translation_dof() { return t_dof; }
+
+const uvec& CSMQ5::get_rotation_dof() { return r_dof; }
+
+CSMQ6::CSMQ6(const unsigned T, uvec&& N, const unsigned M, const double TH, const double L)
+	: CSMQ(T, std::forward<uvec>(N), M, 6, TH, L) {}
+
+const uvec& CSMQ6::get_translation_dof() { return t_dof; }
+
+const uvec& CSMQ6::get_rotation_dof() { return r_dof; }
+
+CSMQ7::CSMQ7(const unsigned T, uvec&& N, const unsigned M, const double TH, const double L)
+	: CSMQ(T, std::forward<uvec>(N), M, 7, TH, L) {}
+
+const uvec& CSMQ7::get_translation_dof() { return t_dof; }
+
+const uvec& CSMQ7::get_rotation_dof() { return r_dof; }
 
 #endif
