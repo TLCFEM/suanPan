@@ -1,0 +1,7 @@
+Please make sure Microsoft Visual C++ Redistributable for Visual Studio 2019 is installed.
+
+Please visit https://suanpan-manual.readthedocs.io/ for user manual and examples.
+
+For Windows, please use a modern terminal such as Windows Terminal and Fluent Terminal for better output display.
+
+Please find and execute AddAssociation.bat to add Sublime Text auto completion and syntax support.
