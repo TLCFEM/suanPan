@@ -201,9 +201,13 @@ void check_version(const char* path_to_executable) {
 	int error;
 
 #ifdef SUANPAN_MSVC
-	error = _wsystem(updater_module.wstring().c_str());
+	std::wstringstream command;
+	command << L"\"" << updater_module << L"\"";
+	error = _wsystem(command.str().c_str());
 #else
-	error = system(updater_module.string().c_str());
+	std::stringstream command;
+	command << "\"" << updater_module << "\"";
+	error = system(command.str().c_str());
 #endif
 
 	if(0 != error) return;
