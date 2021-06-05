@@ -79,7 +79,7 @@ Linux users are recommended to obtain the binaries via snap. The snap supports v
 
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/suanpan)
 
-[![asciicast](https://asciinema.org/a/341345.svg)](https://asciinema.org/a/341345)
+[![asciicast](https://asciinema.org/a/418407.svg)](https://asciinema.org/a/418407)
 
 ### Other Platforms
 
