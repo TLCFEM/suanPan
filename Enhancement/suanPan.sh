@@ -10,7 +10,7 @@ if [[ "$#" == 1 ]] && [[ "$1" == "--create-link" ]]; then
 			mkdir $TARGET
 		fi
 		ln -s $CPATH/suanPan.sh $TARGET/suanpan
-		echo $TARGET/suanpan is successfully created.
+		echo "$TARGET/suanpan is successfully created."
 		INSTALLED = false
 		STDIR="$HOME/.config/sublime-text-3/Packages/User"
 		if [[ -d $STDIR ]]; then
@@ -24,10 +24,10 @@ if [[ "$#" == 1 ]] && [[ "$1" == "--create-link" ]]; then
 		if [[ "$INSTALLED" = true ]]; then
 			echo {\"cmd\":[\"suanpan\"\,\"-f\"\,\"\$file\"]\,\"selector\":\"source.supan\"\,\"file_patterns\":[\"*.supan\"\,\"*.sp\"]} > suanPan.sublime-build
 			cp suanPan.sublime* $STDIR
-			echo Sublime Text installed, configuration files are copied to default folder $STDIR.
+			echo "Sublime Text installed, configuration files are copied to default folder $STDIR."
 		fi
 	else
-		echo $TARGET/suanpan exists, please manually delete it and run again.
+		echo "$TARGET/suanpan exists, please manually delete it and run again."
 	fi
 else
 	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CPATH
