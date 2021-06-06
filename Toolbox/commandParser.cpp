@@ -183,6 +183,8 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
 		return SUANPAN_SUCCESS;
 	}
 
+	if(is_equal(command_id, "terminal")) return execute_command(command);
+
 	if(is_equal(command_id, "version")) print_version();
 	else suanpan_error("command not found.\n");
 
@@ -2775,4 +2777,16 @@ int print_command() {
 	suanpan_info(format, "version", "print version information");
 
 	return SUANPAN_SUCCESS;
+}
+
+int execute_command(istringstream& command) {
+#ifdef SUANPAN_MSVC
+	std::wstringstream terminal_command;
+	terminal_command << L"\"" << command.str().substr(command.tellg()).c_str() << L"\"";
+	return _wsystem(terminal_command.str().c_str());
+#else
+	std::stringstream terminal_command;
+	terminal_command << "\"" << command.str().substr(command.tellg()).c_str() << "\"";
+	return system(terminal_command.str().c_str());
+#endif
 }

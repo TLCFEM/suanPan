@@ -88,5 +88,6 @@ int set_property(const shared_ptr<DomainBase>&, istringstream&);
 int print_info(const shared_ptr<DomainBase>&, istringstream&);
 
 int print_command();
+int execute_command(istringstream&);
 
 #endif

@@ -198,19 +198,7 @@ void check_version(const char* path_to_executable) {
 
 	if(!exists(updater_module)) return;
 
-	int error;
-
-#ifdef SUANPAN_MSVC
-	std::wstringstream command;
-	command << L"\"" << updater_module << L"\"";
-	error = _wsystem(command.str().c_str());
-#else
-	std::stringstream command;
-	command << "\"" << updater_module << "\"";
-	error = system(command.str().c_str());
-#endif
-
-	if(0 != error) return;
+	if(auto terminal = istringstream(updater_module.string()); 0 != execute_command(terminal)) return;
 
 	auto version_file = fs::current_path();
 
