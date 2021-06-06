@@ -108,13 +108,13 @@ void Recorder::save() {
 				for(const auto& J : s_data_pool[I]) for(unsigned K = 0; K < J.n_elem; ++K) data_to_write(idx1++, I + 1) = J[K];
 			}
 
-			hsize_t dimention[2] = {data_to_write.n_cols, data_to_write.n_rows};
+			hsize_t dimension[2] = {data_to_write.n_cols, data_to_write.n_rows};
 
 			ostringstream dataset_name;
 			dataset_name << origin_name.c_str();
 			dataset_name << object_tag(idx2++);
 
-			H5LTmake_dataset(group_id, dataset_name.str().c_str(), 2, dimention, H5T_NATIVE_DOUBLE, data_to_write.mem);
+			H5LTmake_dataset(group_id, dataset_name.str().c_str(), 2, dimension, H5T_NATIVE_DOUBLE, data_to_write.mem);
 		}
 
 		H5Gclose(group_id);
