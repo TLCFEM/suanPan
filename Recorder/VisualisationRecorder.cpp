@@ -41,11 +41,9 @@ void VisualisationRecorder::record(const shared_ptr<DomainBase>& D) {
 
 	ostringstream file_name;
 
-	if(!SUANPAN_OUTPUT.empty()) file_name << SUANPAN_OUTPUT << "/";
+	if(!SUANPAN_OUTPUT.empty()) file_name << SUANPAN_OUTPUT << '/';
 
 	file_name << to_char(get_variable_type()) << '-' << std::setw(width) << std::setfill('0') << ++total_counter << ".vtk";
-
-	std::cout << file_name.str() << '\n';
 
 	config.file_name = file_name.str();
 

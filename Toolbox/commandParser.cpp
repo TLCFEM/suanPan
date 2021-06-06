@@ -184,7 +184,10 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
 		return SUANPAN_SUCCESS;
 	}
 
-	if(is_equal(command_id, "terminal")) return execute_command(command);
+	if(is_equal(command_id, "terminal")) {
+		execute_command(command);
+		return SUANPAN_SUCCESS;
+	}
 
 	if(is_equal(command_id, "version")) print_version();
 	else suanpan_error("command not found.\n");
