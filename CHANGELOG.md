@@ -6,6 +6,8 @@
 
 ## version 1.x
 
+1. add `terminal` command and `output_folder` setting
+
 ## version 1.5
 
 1. add `scoop` support
