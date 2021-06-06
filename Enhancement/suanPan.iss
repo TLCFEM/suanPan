@@ -22,7 +22,7 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={autopf}\{#MyAppName}
+DefaultDirName={autopf64}\{#MyAppName}
 ChangesAssociations=yes
 DisableProgramGroupPage=yes
 LicenseFile=.\LICENSE.txt
@@ -36,12 +36,15 @@ SetupIconFile=..\Resource\supan.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
+ArchitecturesInstallIn64BitMode=x64
+ArchitecturesAllowed=x64
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
-Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
+Name: "updater"; Description: "Include updater.exe"
 
 [Files]
 Source: "{#StoragePath}{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
@@ -53,7 +56,7 @@ Source: "{#StoragePath}svml_dispmd.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StoragePath}tbb.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StoragePath}tbbmalloc.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StoragePath}tbbmalloc_proxy.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#StoragePath}updater.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#StoragePath}updater.exe"; DestDir: "{app}"; Flags: ignoreversion; Tasks: updater
 Source: "{#StoragePath}VC_redist.x64.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: ".\AddAssociation.bat"; DestDir: "{app}"; Flags: ignoreversion
 Source: ".\suanPan.sublime-completions"; DestDir: "{app}"; Flags: ignoreversion

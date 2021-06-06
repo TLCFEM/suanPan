@@ -1419,6 +1419,7 @@
     "supportacceleration",
     "symm_mat",
     "system_solver",
+	"terminal",
     "tolerance",
     "type",
     "undeformed",

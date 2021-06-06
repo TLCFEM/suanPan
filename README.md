@@ -53,23 +53,21 @@ The binaries, which are compiled with Intel MKL and VTK, are available on [Choco
 
 1. Follow the [instructions](https://chocolatey.org/install) to install Chocolatey.
 
-2. Make sure the [Microsoft Visual C++ Redistributable for Visual Studio 2019](https://aka.ms/vs/16/release/vc_redist.x64.exe) is installed. Alternatively, install it via Chocolatey.
-
-    ```
-    choco install vcredist140
-    ```
-
-3. Use the following command to install `suanPan`.
+2. Use the following command to install `suanPan`.
 
     ```
     choco install suanpan
     ```
 
-4. It is recommended to use a modern terminal such as [Windows Terminal](https://github.com/microsoft/terminal) and [Fluent Terminal](https://github.com/felixse/FluentTerminal) for better output display.
+3. It is recommended to use a modern terminal such as [Windows Terminal](https://github.com/microsoft/terminal) and [Fluent Terminal](https://github.com/felixse/FluentTerminal) for better output display.
+
+[![asciicast](https://asciinema.org/a/418539.svg)](https://asciinema.org/a/418539)
 
 It is also possible to use [Scoop](https://scoop.sh/) to install the package.
 
 ```ps
+Set-ExecutionPolicy RemoteSigned -scope CurrentUser
+iwr -useb get.scoop.sh | iex
 scoop install https://raw.githubusercontent.com/TLCFEM/suanPan/dev/Enhancement/suanpan.json
 ```
 
