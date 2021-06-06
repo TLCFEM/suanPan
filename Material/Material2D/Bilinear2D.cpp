@@ -142,6 +142,7 @@ vector<vec> Bilinear2D::record(const OutputType P) {
 		output.emplace_back(trial_mises);
 	}
 	else if(P == OutputType::EEEQ) output.emplace_back(vec{sqrt(2. / 3.) * tensor::strain::norm(current_full_strain)});
+	else if(P == OutputType::PEEQ) return base.record(P);
 	else return Material2D::record(P);
 
 	return output;

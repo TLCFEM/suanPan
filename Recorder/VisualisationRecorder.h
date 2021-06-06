@@ -42,7 +42,7 @@ class VisualisationRecorder final : public Recorder {
 #ifdef SUANPAN_VTK
 	vtkInfo config;
 
-	void (* funtion_handler)(const shared_ptr<DomainBase>&, vtkInfo) = nullptr;
+	void (* function_handler)(const shared_ptr<DomainBase>&, vtkInfo) = nullptr;
 #endif
 public:
 	VisualisationRecorder(unsigned,   // tag

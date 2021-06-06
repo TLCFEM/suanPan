@@ -26,8 +26,8 @@ VisualisationRecorder::VisualisationRecorder(const unsigned T, const OutputType 
 	config.type = get_variable_type();
 	config.scale = S;
 
-	if(const auto t_name = vtk_get_name(config.type); 'U' == t_name[0] || 'V' == t_name[0] || 'A' == t_name[0]) funtion_handler = &vtk_plot_node_quantity;
-	else funtion_handler = &vtk_plot_element_quantity;
+	if(const auto t_name = vtk_get_name(config.type); 'U' == t_name[0] || 'V' == t_name[0] || 'A' == t_name[0]) function_handler = &vtk_plot_node_quantity;
+	else function_handler = &vtk_plot_element_quantity;
 #endif
 }
 
@@ -42,7 +42,7 @@ void VisualisationRecorder::record(const shared_ptr<DomainBase>& D) {
 
 	config.file_name = file_name.str();
 
-	(*funtion_handler)(D, config);
+	(*function_handler)(D, config);
 #endif
 }
 
