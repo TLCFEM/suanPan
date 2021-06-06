@@ -23,6 +23,7 @@ using std::string;
 using std::vector;
 
 extern int SUANPAN_NUM_THREADS;
+extern string SUANPAN_OUTPUT;
 
 int process_command(const shared_ptr<Bead>& model, istringstream& command) {
 	if(nullptr == model) return SUANPAN_SUCCESS;
@@ -2518,15 +2519,34 @@ int test_material_by_load_with_base3d(const shared_ptr<DomainBase>& domain, istr
 }
 
 int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
-	if(domain->get_current_step_tag() == 0) return SUANPAN_SUCCESS;
-
-	const auto& t_step = domain->get_current_step();
-
 	string property_id;
 	if(!get_input(command, property_id)) {
 		suanpan_error("set_property() need a property type.\n");
 		return SUANPAN_SUCCESS;
 	}
+
+	if(is_equal(property_id, "output_folder")) {
+		if(string value; get_input(command, value)) SUANPAN_OUTPUT = value;
+		else suanpan_error("set_property() need a valid value.\n");
+
+		return SUANPAN_SUCCESS;
+	}
+	if(is_equal(property_id, "num_threads")) {
+		if(int value; get_input(command, value)) SUANPAN_NUM_THREADS = value;
+		else suanpan_error("set_property() need a valid value.\n");
+
+		return SUANPAN_SUCCESS;
+	}
+	if(is_equal(property_id, "screen_output")) {
+		if(string value; get_input(command, value)) SUANPAN_PRINT = is_true(value);
+		else suanpan_error("set_property() need a valid value.\n");
+
+		return SUANPAN_SUCCESS;
+	}
+
+	if(domain->get_current_step_tag() == 0) return SUANPAN_SUCCESS;
+
+	const auto& t_step = domain->get_current_step();
 
 	if(is_equal(property_id, "color_model")) {
 		string value;
@@ -2602,14 +2622,6 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
 	else if(is_equal(property_id, "load_multiplier")) {
 		double value;
 		get_input(command, value) ? set_load_multiplier(value) : suanpan_error("set_property() need a valid value.\n");
-	}
-	else if(is_equal(property_id, "num_threads")) {
-		if(int value; get_input(command, value)) SUANPAN_NUM_THREADS = value;
-		else suanpan_error("set_property() need a valid value.\n");
-	}
-	else if(is_equal(property_id, "screen_output")) {
-		if(string value; get_input(command, value)) SUANPAN_PRINT = is_true(value);
-		else suanpan_error("set_property() need a valid value.\n");
 	}
 
 	return SUANPAN_SUCCESS;
@@ -2699,6 +2711,7 @@ int print_info(const shared_ptr<DomainBase>& domain, istringstream& command) {
 		domain->get_factory()->get_eigenvalue().print();
 		suanpan_info("\n");
 	}
+	else if(is_equal(object_type, "output_folder")) suanpan_info("%s\n", SUANPAN_OUTPUT.c_str());
 
 	return SUANPAN_SUCCESS;
 }

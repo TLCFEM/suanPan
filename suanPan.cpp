@@ -27,6 +27,7 @@ BOOL WIN_EVENT(DWORD) { return TRUE; }
 bool SUANPAN_PRINT = true;
 const char* SUANPAN_EXE = "";
 int SUANPAN_NUM_THREADS = 4;
+string SUANPAN_OUTPUT = "";
 
 // ReSharper disable once CppParameterMayBeConst
 int main(int argc, char** argv) {

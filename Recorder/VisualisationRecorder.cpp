@@ -18,6 +18,8 @@
 #include "VisualisationRecorder.h"
 #include <Domain/DomainBase.h>
 
+extern string SUANPAN_OUTPUT;
+
 VisualisationRecorder::VisualisationRecorder(const unsigned T, const OutputType L, const unsigned I, const unsigned W, const double S)
 	: Recorder(T, {}, L, I, false, false)
 	, width(W) {
@@ -38,7 +40,12 @@ void VisualisationRecorder::record(const shared_ptr<DomainBase>& D) {
 	counter = 1;
 
 	ostringstream file_name;
+
+	if(!SUANPAN_OUTPUT.empty()) file_name << SUANPAN_OUTPUT << "/";
+
 	file_name << to_char(get_variable_type()) << '-' << std::setw(width) << std::setfill('0') << ++total_counter << ".vtk";
+
+	std::cout << file_name.str() << '\n';
 
 	config.file_name = file_name.str();
 
