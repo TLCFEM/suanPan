@@ -24,24 +24,22 @@ parts:
       - wget
       - cpio
     override-build: |
-      wget https://registrationcenter-download.intel.com/akdlm/irc_nas/17769/l_BaseKit_p_2021.2.0.2883_offline.sh
-      sudo bash l_BaseKit_p_2021.2.0.2883_offline.sh -s -a --silent --eula accept
+      wget http://registrationcenter-download.intel.com/akdlm/irc_nas/tec/16533/l_mkl_2020.1.217.tgz
+      tar xzf l_mkl_2020.1.217.tgz && cd l_mkl_2020.1.217
+      sed -i 's/decline/accept/g' ./silent.cfg
+      ./install.sh --silent ./silent.cfg
       export MDEST=/build/suanpan/parts/suanpan/install/bin/
       mkdir -p $MDEST
-      export MFROM=/opt/intel/oneapi/compiler/latest/linux/compiler/lib/intel64_lin/
+      export MFROM=/opt/intel/compilers_and_libraries/linux/lib/intel64/
       cp $MFROM/libiomp5.so $MDEST
-      export MFROM=/opt/intel/oneapi/mkl/latest/lib/intel64/
-      cp $MFROM/libmkl_core.so.1 $MDEST
-      cp $MFROM/libmkl_intel_lp64.so.1 $MDEST
-      cp $MFROM/libmkl_intel_thread.so.1 $MDEST
-      cp $MFROM/libmkl_def.so.1 $MDEST
-      cp $MFROM/libmkl_avx512.so.1 $MDEST
-      cp $MFROM/libmkl_avx2.so.1 $MDEST
-      cp $MFROM/libmkl_avx.so.1 $MDEST
-      cd $MDEST
-      ln -s libmkl_core.so.1 libmkl_core.so
-      ln -s libmkl_intel_lp64.so.1 libmkl_intel_lp64.so
-      ln -s libmkl_intel_thread.so.1 libmkl_intel_thread.so
+      export MFROM=/opt/intel/mkl/lib/intel64/
+      cp $MFROM/libmkl_core.so $MDEST
+      cp $MFROM/libmkl_intel_lp64.so $MDEST
+      cp $MFROM/libmkl_intel_thread.so $MDEST
+      cp $MFROM/libmkl_def.so $MDEST
+      cp $MFROM/libmkl_avx512.so $MDEST
+      cp $MFROM/libmkl_avx2.so $MDEST
+      cp $MFROM/libmkl_avx.so $MDEST
   vtk:
     plugin: nil
     build-packages:
@@ -72,7 +70,7 @@ parts:
       - -DUSE_EXTERNAL_VTK=ON
       - -DVTK_DIR=/build/suanpan/parts/suanpan/VTK/lib/cmake/vtk-9.0/
       - -DUSE_MKL=ON
-      - -DMKLROOT=/opt/intel/oneapi/mkl/latest/
+      - -DMKLROOT=/opt/intel/compilers_and_libraries/linux/mkl/
     build-environment:
       - CC: gcc-8
       - CXX: g++-8

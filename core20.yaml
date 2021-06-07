@@ -1,6 +1,6 @@
 name: suanpan
 base: core20
-version: "1.4"
+version: "1.6"
 summary: An Open Source, Parallel and Heterogeneous Finite Element Analysis Framework
 description: |
   [**suanPan**](https://tlcfem.github.io/suanPan/) is a finite element method (FEM) simulation platform for applications in fields such as solid mechanics and civil/structural/seismic engineering. The name **suanPan** (in some places such as suffix it is also abbreviated as **suPan**) comes from the term *Suan Pan* (算盤), which is [Chinese abacus](https://en.wikipedia.org/wiki/Suanpan). **suanPan** is written in modern high quality C++ code and is targeted to provide an efficient, concise, flexible and reliable FEM simulation platform.
@@ -50,10 +50,8 @@ parts:
       - freeglut3-dev
       - mesa-common-dev
     override-build: |
-      wget https://www.vtk.org/files/release/9.0/VTK-9.0.1.tar.gz
-      tar xzf VTK-9.0.1.tar.gz && mkdir VTK-build && cd VTK-build
-      cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=/build/suanpan/parts/suanpan/VTK/ ../VTK-9.0.1
-      make install -j4
+      wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-8.2.0-linux.tar.gz
+      tar xzf VTK-8.2.0-linux.tar.gz
   suanpan:
     after:
       - mkl
@@ -65,7 +63,7 @@ parts:
       - -DBUILD_MULTITHREAD=ON
       - -DUSE_HDF5=ON
       - -DUSE_EXTERNAL_VTK=ON
-      - -DVTK_DIR=/build/suanpan/parts/suanpan/VTK/lib/cmake/vtk-9.0/
+      - -DVTK_DIR=/build/suanpan/parts/vtk/VTK-8.2.0-linux/lib/cmake/vtk-9.0/
       - -DUSE_MKL=ON
       - -DMKLROOT=/opt/intel/oneapi/mkl/latest/
     build-environment:
