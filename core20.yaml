@@ -18,30 +18,18 @@ apps:
       - wayland
       - unity7
 parts:
-  mkl:
+  libs:
     plugin: nil
     build-packages:
       - wget
     override-build: |
       wget https://registrationcenter-download.intel.com/akdlm/irc_nas/17757/l_onemkl_p_2021.2.0.296_offline.sh
       sudo sh ./l_onemkl_p_2021.2.0.296_offline.sh -s -a --silent --eula accept
-  vtk:
-    plugin: nil
-    build-packages:
-      - wget
-      - gcc-9
-      - g++-9
-      - gfortran-9
-      - libglu1-mesa-dev
-      - freeglut3-dev
-      - mesa-common-dev
-    override-build: |
       wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-8.2.0-linux.tar.gz
       tar xzf VTK-8.2.0-linux.tar.gz
   suanpan:
     after:
-      - mkl
-      - vtk
+      - libs
     source: https://github.com/TLCFEM/suanPan.git
     plugin: cmake
     cmake-parameters:
@@ -49,18 +37,14 @@ parts:
       - -DBUILD_MULTITHREAD=ON
       - -DUSE_HDF5=ON
       - -DUSE_EXTERNAL_VTK=ON
-      - -DVTK_DIR=/root/parts/vtk/build/lib/cmake/vtk-8.2/
+      - -DVTK_DIR=/root/parts/libs/build/lib/cmake/vtk-8.2/
       - -DUSE_MKL=ON
       - -DMKLROOT=/opt/intel/oneapi/mkl/latest/
       - -DCMAKE_INSTALL_PREFIX=
-    build-environment:
-      - CC: gcc-9
-      - CXX: g++-9
-      - FC: gfortran-9
     build-packages:
-      - gcc-9
-      - g++-9
-      - gfortran-9
+      - gcc
+      - g++
+      - gfortran
     stage-packages:
       - libgfortran5
       - libgl1
@@ -74,7 +58,8 @@ parts:
       - libxcb1
       - libxdmcp6
       - libxt6
-  library:
+      - libomp5
+  complete:
     after:
       - suanpan
     plugin: nil
