@@ -26,7 +26,7 @@ parts:
     override-build: |
       wget https://registrationcenter-download.intel.com/akdlm/irc_nas/17757/l_onemkl_p_2021.2.0.296_offline.sh
       sudo sh ./l_onemkl_p_2021.2.0.296_offline.sh -s -a --silent --eula accept
-      export MDEST=/build/suanpan/parts/suanpan/install/usr/local/bin/
+      export MDEST=/root/parts/suanpan/install/usr/local/bin/
       mkdir -p $MDEST
       cp /opt/intel/oneapi/compiler/latest/linux/compiler/lib/intel64_lin/libiomp5.so $MDEST
       export MFROM=/opt/intel/oneapi/mkl/latest/lib/intel64/
@@ -63,7 +63,7 @@ parts:
       - -DBUILD_MULTITHREAD=ON
       - -DUSE_HDF5=ON
       - -DUSE_EXTERNAL_VTK=ON
-      - -DVTK_DIR=/build/suanpan/parts/vtk/VTK-8.2.0-linux/lib/cmake/vtk-9.0/
+      - -DVTK_DIR=/root/parts/vtk/build/lib/cmake/vtk-8.2/
       - -DUSE_MKL=ON
       - -DMKLROOT=/opt/intel/oneapi/mkl/latest/
     build-environment:
