@@ -93,7 +93,7 @@ void Recorder::save() {
 #ifdef SUANPAN_HDF5
 	if(use_hdf5) {
 		const auto current_time = get_timestamp();
-		file_name << "-" << std::put_time(&current_time, "%y%m%d%H%S") << ".h5";
+		file_name << "-" << std::put_time(&current_time, "%y%m%d%H%M%S") << ".h5";
 
 		const auto file_id = H5Fcreate(file_name.str().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
