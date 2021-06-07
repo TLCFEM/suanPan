@@ -10,7 +10,7 @@ architectures:
   - build-on: amd64
 apps:
   suanpan:
-    command: usr/local/bin/suanPan
+    command: bin/suanPan
     plugs:
       - home
       - desktop
@@ -22,27 +22,13 @@ parts:
     plugin: nil
     build-packages:
       - wget
-      - cpio
     override-build: |
       wget https://registrationcenter-download.intel.com/akdlm/irc_nas/17757/l_onemkl_p_2021.2.0.296_offline.sh
       sudo sh ./l_onemkl_p_2021.2.0.296_offline.sh -s -a --silent --eula accept
-      export MDEST=/root/parts/suanpan/install/usr/local/bin/
-      mkdir -p $MDEST
-      cp /opt/intel/oneapi/compiler/latest/linux/compiler/lib/intel64_lin/libiomp5.so $MDEST
-      export MFROM=/opt/intel/oneapi/mkl/latest/lib/intel64/
-      cp $MFROM/libmkl_core.so.1 $MDEST
-      cp $MFROM/libmkl_intel_lp64.so.1 $MDEST
-      cp $MFROM/libmkl_intel_thread.so.1 $MDEST
-      cp $MFROM/libmkl_def.so.1 $MDEST
-      cp $MFROM/libmkl_avx512.so.1 $MDEST
-      cp $MFROM/libmkl_avx2.so.1 $MDEST
-      cp $MFROM/libmkl_avx.so.1 $MDEST
   vtk:
     plugin: nil
     build-packages:
       - wget
-      - cpio
-      - cmake
       - gcc-9
       - g++-9
       - gfortran-9
@@ -66,6 +52,7 @@ parts:
       - -DVTK_DIR=/root/parts/vtk/build/lib/cmake/vtk-8.2/
       - -DUSE_MKL=ON
       - -DMKLROOT=/opt/intel/oneapi/mkl/latest/
+      - -DCMAKE_INSTALL_PREFIX=
     build-environment:
       - CC: gcc-9
       - CXX: g++-9
@@ -76,12 +63,31 @@ parts:
       - gfortran-9
     stage-packages:
       - libgfortran5
-      - libgomp1
-      - libquadmath0
+      - libgl1
       - libglvnd0
       - libglx0
-      - libopengl0
+      - libice6
+      - libquadmath0
+      - libsm6
       - libx11-6
       - libxau6
       - libxcb1
       - libxdmcp6
+      - libxt6
+  library:
+    after:
+      - suanpan
+    plugin: nil
+    build-packages:
+      - cpio
+    override-build: |
+      export MDEST=/root/stage/bin/
+      cp /opt/intel/oneapi/compiler/latest/linux/compiler/lib/intel64_lin/libiomp5.so $MDEST
+      export MFROM=/opt/intel/oneapi/mkl/latest/lib/intel64
+      cp $MFROM/libmkl_core.so.1 $MDEST
+      cp $MFROM/libmkl_intel_lp64.so.1 $MDEST
+      cp $MFROM/libmkl_intel_thread.so.1 $MDEST
+      cp $MFROM/libmkl_def.so.1 $MDEST
+      cp $MFROM/libmkl_avx512.so.1 $MDEST
+      cp $MFROM/libmkl_avx2.so.1 $MDEST
+      cp $MFROM/libmkl_avx.so.1 $MDEST
