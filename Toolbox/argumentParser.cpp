@@ -202,7 +202,11 @@ void check_version(const char* path_to_executable) {
 
 	auto version_file = fs::current_path();
 
+#ifdef SUANPAN_WIN
 	version_file += "\\.latest.version.sp";
+#else
+	version_file += "/.latest.version.sp";
+#endif
 
 	if(!exists(version_file)) return;
 
