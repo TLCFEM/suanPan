@@ -11,14 +11,14 @@ if [[ "$#" == 1 ]] && [[ "$1" == "--create-link" ]]; then
 		fi
 		ln -s $CPATH/suanPan.sh $TARGET/suanpan
 		echo "$TARGET/suanpan is successfully created."
-		INSTALLED = false
+		INSTALLED=false
 		STDIR="$HOME/.config/sublime-text-3/Packages/User"
 		if [[ -d $STDIR ]]; then
-			INSTALLED = true
+			INSTALLED=true
 		else
 			STDIR="$HOME/.config/sublime-text/Packages/User"
 			if [[ -d $STDIR ]]; then
-				INSTALLED = true
+				INSTALLED=true
 			fi
 		fi
 		if [[ "$INSTALLED" = true ]]; then
