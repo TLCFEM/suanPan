@@ -198,7 +198,7 @@ void check_version(const char* path_to_executable) {
 
 	if(!exists(updater_module)) return;
 
-	if(auto terminal = istringstream(updater_module.string()); 0 != execute_command(terminal)) return;
+	if(auto terminal = istringstream("\"" + updater_module.string() + "\""); 0 != execute_command(terminal)) return;
 
 	auto version_file = fs::current_path();
 

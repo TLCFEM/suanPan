@@ -2798,11 +2798,11 @@ int print_command() {
 int execute_command(istringstream& command) {
 #ifdef SUANPAN_MSVC
 	std::wstringstream terminal_command;
-	terminal_command << L"\"" << command.str().substr(command.tellg()).c_str() << L"\"";
+	terminal_command << command.str().substr(command.tellg()).c_str();
 	return _wsystem(terminal_command.str().c_str());
 #else
 	std::stringstream terminal_command;
-	terminal_command << "\"" << command.str().substr(command.tellg()).c_str() << "\"";
+	terminal_command << command.str().substr(command.tellg()).c_str();
 	return system(terminal_command.str().c_str());
 #endif
 }
