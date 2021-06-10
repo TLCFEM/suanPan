@@ -33,6 +33,7 @@ void argument_parser(int, char**);
 void print_header();
 void print_version();
 void print_helper();
+void qrcode();
 void check_version(const char*);
 
 void cli_mode(const shared_ptr<Bead>&);

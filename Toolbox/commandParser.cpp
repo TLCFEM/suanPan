@@ -118,6 +118,11 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
 	if(is_equal(command_id, "materialtestbyload3d")) return test_material_by_load3d(domain, command);
 	if(is_equal(command_id, "materialtestbyloadwithbase3d")) return test_material_by_load_with_base3d(domain, command);
 
+	if(is_equal(command_id, "qrcode")) {
+		qrcode();
+		return SUANPAN_SUCCESS;
+	}
+
 	if(is_equal(command_id, "plot")) return vtk_parser(domain, command);
 
 	if(is_equal(command_id, "peek")) return print_info(domain, command);
