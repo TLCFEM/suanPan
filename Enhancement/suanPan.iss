@@ -9,7 +9,7 @@
 #define MyAppAssocName MyAppName + " Model"
 #define MyAppAssocExt ".sp"
 #define MyAppAssocKey StringChange(MyAppAssocName, " ", "") + MyAppAssocExt
-#define StoragePath "C:\Users\tlcfe\Downloads\suanPan-win-mkl-vtk\"
+#define StoragePath "..\..\suanPan-win-mkl-vtk\"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -47,11 +47,10 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "updater"; Description: "Include updater.exe"
 
 [Files]
-Source: "{#StoragePath}{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\suanPan-vs\Release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StoragePath}libifcoremd.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StoragePath}libiomp5md.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StoragePath}libmmd.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#StoragePath}suanPan.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StoragePath}svml_dispmd.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StoragePath}tbb.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StoragePath}tbbmalloc.dll"; DestDir: "{app}"; Flags: ignoreversion
