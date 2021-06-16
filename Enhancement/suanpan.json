@@ -4,9 +4,6 @@
     "description": "Parallel and heterogeneous finite element analysis framework",
     "license": "GPL-3.0-only",
     "notes": "You can run \"$dir\\AddAssociation.bat\" with admin privilege to configure file association and Sublime Text syntax support.",
-    "suggest": {
-        "vcredist2019": "vcredist2019"
-    },
     "architecture": {
         "64bit": {
             "url": "https://github.com/TLCFEM/suanPan/releases/download/suanPan-v1.5/suanPan-win-mkl-vtk.zip",
