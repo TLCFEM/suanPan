@@ -121,7 +121,7 @@ void print_header() {
 	suanpan_info("|  \\__/ |__| |    |__X |  |    all rights reserved |\n");
 	suanpan_info("|                           10.5281/zenodo.1285221 |\n");
 	suanpan_info("+--------------------------------------------------+\n");
-#if 1
+#ifdef SUANPAN_WIN
 	suanpan_info("|  https://github.com/TLCFEM/suanPan               |\n");
 	suanpan_info("|  https://github.com/TLCFEM/suanPan-manual        |\n");
 	suanpan_info("+--------------------------------------------------+\n");
