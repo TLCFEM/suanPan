@@ -45,6 +45,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
 Name: "updater"; Description: "Include updater.exe"
+Name: "vcredist"; Description: "Include Microsoft Visual C++ Redistributable *.dll"
 
 [Files]
 Source: "..\..\suanPan-vs\Release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
@@ -56,9 +57,9 @@ Source: "{#StoragePath}tbb.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StoragePath}tbbmalloc.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StoragePath}tbbmalloc_proxy.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StoragePath}updater.exe"; DestDir: "{app}"; Flags: ignoreversion; Tasks: updater
-Source: "{#StoragePath}msvcp140.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#StoragePath}vcruntime140.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#StoragePath}vcruntime140_1.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#StoragePath}msvcp140.dll"; DestDir: "{app}"; Flags: ignoreversion; Tasks: vcredist
+Source: "{#StoragePath}vcruntime140.dll"; DestDir: "{app}"; Flags: ignoreversion; Tasks: vcredist
+Source: "{#StoragePath}vcruntime140_1.dll"; DestDir: "{app}"; Flags: ignoreversion; Tasks: vcredist
 Source: ".\AddAssociation.bat"; DestDir: "{app}"; Flags: ignoreversion
 Source: ".\suanPan.sublime-completions"; DestDir: "{app}"; Flags: ignoreversion
 Source: ".\suanPan.sublime-syntax"; DestDir: "{app}"; Flags: ignoreversion
