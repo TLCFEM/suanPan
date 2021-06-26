@@ -4,9 +4,10 @@
 
 1. `MKL` includes outdated `FEAST`, the external names in `FEAST` library are modified to avoid linking error.
 
-## version 1.x
+## version 1.6
 
 1. add `terminal` command and `output_folder` setting
+2. some minor updates
 
 ## version 1.5
 
