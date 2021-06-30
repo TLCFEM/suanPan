@@ -7,4 +7,6 @@ target_sources(${PROJECT_NAME} PRIVATE
         Constraint/Criterion/MinResistance.cpp
         Constraint/Criterion/NodeBasedCriterion.cpp
         Constraint/Criterion/StrainEnergyEvolution.cpp
+        Constraint/Criterion/ComplementaryEnergyEvolution.cpp
+        Constraint/Criterion/EnergyEvolution.cpp
         )

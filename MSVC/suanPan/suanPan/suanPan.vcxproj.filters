@@ -1222,6 +1222,12 @@
     <ClCompile Include="..\..\..\Element\Membrane\CSMQ.cpp">
       <Filter>Element\Membrane</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\Criterion\ComplementaryEnergyEvolution.cpp">
+      <Filter>Constraint\Criterion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\Criterion\EnergyEvolution.cpp">
+      <Filter>Constraint\Criterion</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2340,6 +2346,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Element\Membrane\CSMQ.h">
       <Filter>Element\Membrane</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\Criterion\ComplementaryEnergyEvolution.h">
+      <Filter>Constraint\Criterion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\Criterion\EnergyEvolution.h">
+      <Filter>Constraint\Criterion</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

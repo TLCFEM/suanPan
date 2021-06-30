@@ -234,6 +234,7 @@ public:
 	vector<vec> record(OutputType) override;
 
 	[[nodiscard]] double get_strain_energy() const override;
+	[[nodiscard]] double get_complementary_energy() const override;
 	[[nodiscard]] double get_kinetic_energy() const override;
 
 	[[nodiscard]] double get_characteristic_length() const override;

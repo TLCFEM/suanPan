@@ -1533,9 +1533,9 @@ void Domain::save(string file_name) {
 	for(const auto& t_node : get_node_pool()) {
 		const auto data = t_node->save();
 
-		hsize_t dimention[2] = {data.n_rows, data.n_cols};
+		hsize_t dimension[2] = {data.n_rows, data.n_cols};
 
-		H5LTmake_dataset(group_id, std::to_string(t_node->get_tag()).c_str(), 2, dimention, H5T_NATIVE_DOUBLE, data.mem);
+		H5LTmake_dataset(group_id, std::to_string(t_node->get_tag()).c_str(), 2, dimension, H5T_NATIVE_DOUBLE, data.mem);
 	}
 
 	H5Gclose(group_id);

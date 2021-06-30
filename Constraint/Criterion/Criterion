@@ -7,3 +7,5 @@
 #include "MinResistance.h"
 #include "NodeBasedCriterion.h"
 #include "StrainEnergyEvolution.h"
+#include "ComplementaryEnergyEvolution.h"
+#include "EnergyEvolution.h"

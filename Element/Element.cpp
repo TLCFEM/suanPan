@@ -381,7 +381,7 @@ void Element::initialize_base(const shared_ptr<DomainBase>& D) {
 		n_encoding.tail(size - 1llu) = t_element->get_node_encoding();
 	}
 
-	// first initiliazation
+	// first initialization
 	access::rw(num_size) = num_node * num_dof;
 
 	if(0 == num_size) {
@@ -549,7 +549,7 @@ int Element::clear_status() {
 	if(!trial_inertial_force.is_empty()) trial_inertial_force.zeros();
 	if(!current_inertial_force.is_empty()) current_inertial_force.zeros();
 
-	// do not clear node pointer here, it will be cleared in global initialsation
+	// do not clear node pointer here, it will be cleared in global initialization
 	// node_ptr.clear();
 
 	strain_energy = 0.;
@@ -596,6 +596,8 @@ const vec& Element::update_traction(const vec& load_factor) { return traction.is
 vector<vec> Element::record(const OutputType) { return {}; }
 
 double Element::get_strain_energy() const { return strain_energy; }
+
+double Element::get_complementary_energy() const { return complementary_energy; }
 
 double Element::get_kinetic_energy() const { return kinetic_energy; }
 

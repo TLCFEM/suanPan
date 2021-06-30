@@ -15,35 +15,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class StrainEnergyEvolution
- * @brief A StrainEnergyEvolution class.
+ * @class ComplementaryEnergyEvolution
+ * @brief A ComplementaryEnergyEvolution class.
  *
- * The StrainEnergyEvolution class.
+ * The ComplementaryEnergyEvolution class.
  *
  * @author tlc
- * @date 13/09/2020
+ * @date 30/06/2021
  * @version 0.1.0
- * @file StrainEnergyEvolution.h
+ * @file ComplementaryEnergyEvolution.h
  * @addtogroup Criterion
  * @{
  */
 
-#ifndef STRAINENERGYEVOLUTION_H
-#define STRAINENERGYEVOLUTION_H
+#ifndef COMPLEMENTARYENERGYEVOLUTION_H
+#define COMPLEMENTARYENERGYEVOLUTION_H
 
 #include "EnergyEvolution.h"
 
-class StrainEnergyEvolution final : public EnergyEvolution {
+class ComplementaryEnergyEvolution final : public EnergyEvolution {
 public:
-	StrainEnergyEvolution(unsigned,      // tag
-	                      unsigned,      // step tag
-	                      unsigned,      // incre level
-	                      unsigned,      // final level
-	                      double = 1.,   // centre weight
-	                      unsigned = 2,  // propagation iteration
-	                      unsigned = 10, // reactivation ratio
-	                      double = .5,   // propagation weight
-	                      double = 1E-5  // tolerance
+	ComplementaryEnergyEvolution(unsigned,      // tag
+	                             unsigned,      // step tag
+	                             unsigned,      // incre level
+	                             unsigned,      // final level
+	                             double = 1.,   // centre weight
+	                             unsigned = 2,  // propagation iteration
+	                             unsigned = 10, // reactivation ratio
+	                             double = .5,   // propagation weight
+	                             double = 1E-5  // tolerance
 	);
 };
 

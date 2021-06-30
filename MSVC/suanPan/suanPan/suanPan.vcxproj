@@ -102,7 +102,9 @@
     <ClCompile Include="..\..\..\Constraint\BC\PenaltyBC.cpp" />
     <ClCompile Include="..\..\..\Constraint\Constraint.cpp" />
     <ClCompile Include="..\..\..\Constraint\ConstraintParser.cpp" />
+    <ClCompile Include="..\..\..\Constraint\Criterion\ComplementaryEnergyEvolution.cpp" />
     <ClCompile Include="..\..\..\Constraint\Criterion\Criterion.cpp" />
+    <ClCompile Include="..\..\..\Constraint\Criterion\EnergyEvolution.cpp" />
     <ClCompile Include="..\..\..\Constraint\Criterion\MaxDisplacement.cpp" />
     <ClCompile Include="..\..\..\Constraint\Criterion\MaxHistory.cpp" />
     <ClCompile Include="..\..\..\Constraint\Criterion\MaxResistance.cpp" />
@@ -456,7 +458,9 @@
     <ClInclude Include="..\..\..\Constraint\BC\PenaltyBC.h" />
     <ClInclude Include="..\..\..\Constraint\Constraint.h" />
     <ClInclude Include="..\..\..\Constraint\ConstraintParser.h" />
+    <ClInclude Include="..\..\..\Constraint\Criterion\ComplementaryEnergyEvolution.h" />
     <ClInclude Include="..\..\..\Constraint\Criterion\Criterion.h" />
+    <ClInclude Include="..\..\..\Constraint\Criterion\EnergyEvolution.h" />
     <ClInclude Include="..\..\..\Constraint\Criterion\MaxDisplacement.h" />
     <ClInclude Include="..\..\..\Constraint\Criterion\MaxHistory.h" />
     <ClInclude Include="..\..\..\Constraint\Criterion\MaxResistance.h" />

@@ -157,6 +157,7 @@ public:
 	virtual vector<vec> record(OutputType) = 0;
 
 	[[nodiscard]] virtual double get_strain_energy() const = 0;
+	[[nodiscard]] virtual double get_complementary_energy() const = 0;
 	[[nodiscard]] virtual double get_kinetic_energy() const = 0;
 
 	[[nodiscard]] virtual double get_characteristic_length() const = 0;

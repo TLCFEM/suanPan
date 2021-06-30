@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include "StrainEnergyEvolution.h"
+#include "ComplementaryEnergyEvolution.h"
 #include <Element/Element.h>
 
-StrainEnergyEvolution::StrainEnergyEvolution(const unsigned T, const unsigned ST, const unsigned IN, const unsigned FL, const double WT, const unsigned IT, const unsigned RR, const double PW, const double TL)
-	: EnergyEvolution(T, ST, IN, FL, WT, IT, RR, PW, TL) { get_energy = std::mem_fn(&Element::get_strain_energy); }
+ComplementaryEnergyEvolution::ComplementaryEnergyEvolution(const unsigned T, const unsigned ST, const unsigned IN, const unsigned FL, const double WT, const unsigned IT, const unsigned RR, const double PW, const double TL)
+	: EnergyEvolution(T, ST, IN, FL, WT, IT, RR, PW, TL) { get_energy = std::mem_fn(&Element::get_complementary_energy); }
