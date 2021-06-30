@@ -36,6 +36,8 @@ class ISection2D : public Section2D {
 	const double bottom_flange_width, bottom_flange_thickness;
 	const double web_height, web_thickness;
 
+	double radius_gyration_strong = 0.;
+
 	const unsigned int_pt_num;
 public:
 	ISection2D(unsigned,     // tag

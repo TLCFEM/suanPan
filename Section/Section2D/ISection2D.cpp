@@ -49,9 +49,16 @@ void ISection2D::initialize(const shared_ptr<DomainBase>& D) {
 	const auto web_area = web_height * web_thickness;
 	const auto b_flange_area = bottom_flange_width * bottom_flange_thickness;
 	const auto t_flange_area = top_flange_width * top_flange_thickness;
-	auto total_q = .5 * bottom_flange_thickness * b_flange_area;
-	total_q += (.5 * web_height + bottom_flange_thickness) * web_area;
-	total_q += (.5 * top_flange_thickness + bottom_flange_thickness + web_height) * t_flange_area;
+	auto factor = .5 * bottom_flange_thickness;
+	auto total_q = factor * b_flange_area;
+	radius_gyration_strong = factor * factor * b_flange_area;
+	factor = .5 * web_height + bottom_flange_thickness;
+	total_q += factor * web_area;
+	radius_gyration_strong += factor * factor * web_area;
+	factor = .5 * top_flange_thickness + bottom_flange_thickness + web_height;
+	total_q += factor * t_flange_area;
+	radius_gyration_strong += factor * factor * t_flange_area;
+	radius_gyration_strong = sqrt(radius_gyration_strong / area);
 
 	access::rw(eccentricity) += total_q / area;
 
@@ -80,7 +87,7 @@ void ISection2D::initialize(const shared_ptr<DomainBase>& D) {
 unique_ptr<Section> ISection2D::get_copy() { return make_unique<ISection2D>(*this); }
 
 void ISection2D::print() {
-	suanpan_info("A I-shape section with following inetgeration points.\n");
+	suanpan_info("A I-shape section with following integration points.\n");
 	auto J = 1;
 	for(const auto& I : int_pt) {
 		suanpan_info("IP %u: %.4E.\n", J++, I.coor);
