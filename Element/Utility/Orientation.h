@@ -64,7 +64,7 @@ public:
 
 	[[nodiscard]] double get_length() const;
 	[[nodiscard]] double get_inclination() const;
-	[[nodiscard]] const mat& get_tranformation() const;
+	[[nodiscard]] const mat& get_transformation() const;
 
 	virtual unique_ptr<Orientation> get_copy() = 0;
 
@@ -88,14 +88,14 @@ public:
 	/**
 	 * \brief transform anything from global to local system
 	 *        e.g., disp -> disp, vel -> vel, acc -> acc,
-	 *        not appilcable to conversion such as disp -> strain
+	 *        not applicable to conversion such as disp -> strain
 	 * \return variable in local system
 	 */
 	[[nodiscard]] virtual vec to_local_vec(const vec&) const = 0;
 	/**
 	 * \brief transform anything from local to global system
 	 *        e.g., disp -> disp, vel -> vel, acc -> acc,
-	 *        not appilcable to conversion such as disp -> strain
+	 *        not applicable to conversion such as disp -> strain
 	 * \return variable in global system
 	 */
 	[[nodiscard]] virtual vec to_global_vec(const vec&) const = 0;

@@ -55,7 +55,7 @@ public:
 	    uvec&&,       // node tags
 	    unsigned,     // section tag
 	    unsigned = 6, // integration points
-	    bool = false  // nonliear geometry switch
+	    bool = false  // nonlinear geometry switch
 	);
 
 	void initialize(const shared_ptr<DomainBase>&) override;

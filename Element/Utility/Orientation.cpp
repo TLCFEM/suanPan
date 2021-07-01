@@ -35,7 +35,7 @@ double Orientation::get_length() const { return length; }
 
 double Orientation::get_inclination() const { return inclination; }
 
-const mat& Orientation::get_tranformation() const { return direction_cosine; }
+const mat& Orientation::get_transformation() const { return direction_cosine; }
 
 void Orientation::update_status() {
 	check_element_ptr();
