@@ -1,19 +1,36 @@
-\documentclass[11pt,fleqn,3p]{elsarticle}
-\usepackage{amsmath,amsfonts,amssymb,mathpazo,indentfirst}
+\documentclass[11pt,fleqn]{article}
+\usepackage{amsmath,amsfonts,amssymb,mathpazo}
+\usepackage[margin=25mm]{geometry}
 \newcommand*{\md}[1]{\mathrm{d}#1}
 \newcommand*{\mT}{\mathrm{T}}
 \newcommand*{\tr}[1]{\mathrm{tr}~#1}
 \newcommand*{\dev}[1]{\mathrm{dev}~#1}
 \newcommand*{\ddfrac}[2]{\dfrac{\md#1}{\md#2}}
 \newcommand*{\pfrac}[2]{\dfrac{\partial#1}{\partial#2}}
-\title{SimpleSand Model}\date{}\author{tlc}
-\begin{document}\pagestyle{empty}
+\title{SimpleSand Model}\date{\today}\author{tlc}\setlength\parindent{0pt}\setlength{\parskip}{1em}
+\begin{document}\pagestyle{empty}\maketitle
+This sand model is a hybrid of some existing models with significant simplifications. Users should not expect this model to give accurate results.
+
+Compared to other models for geomaterials, this model is more like a preliminary model just like the bilinear hardening J2 model compared to other models for metals.
+
+Since the elastic part is assumed to be linear, the return mapping implicit algorithm is used to obtain consistent tangent operator.
+\section{Elasticity}
+The strain increment is decomposed into elastic and plastic parts,
+\begin{gather*}
+\Delta\mathbold{\varepsilon}=\Delta\mathbold{\varepsilon}^e+\Delta\mathbold{\varepsilon}^p.
+\end{gather*}
+The stress increment is then
+\begin{gather*}
+\Delta\mathbold{\sigma}=\mathbold{E}\left(\Delta\mathbold{\varepsilon}-\Delta\mathbold{\varepsilon}^p\right).
+\end{gather*}
 \section{Yield Function}
 A wedge-like function is chosen to be the yield surface.
 \begin{gather*}
 F=\big|\mathbold{s}+p\mathbold{\alpha}\big|+mp=\big|\mathbold{\eta}\big|+mp,
 \end{gather*}
 where $\mathbold{s}=\dev{\mathbold{\sigma}}$ is the deviatoric stress, $p=\dfrac{1}{3}\tr{\mathbold{\sigma}}$ is the hydrostatic stress, $\alpha$ is the so called back stress ratio and $m$ characterises the size of the wedge. For simplicity, $m$ is assumed to be a constant in this model.
+
+Please note when hydrostatic stress $p$ is positive, this yield function would not work properly. Please make sure the model is confined.
 \section{Flow Rule}
 A non-associated plastic flow is used, the corresponding flow rule is defined as follows.
 \begin{gather*}
