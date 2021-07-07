@@ -1,5 +1,5 @@
 \documentclass[11pt,fleqn]{article}
-\usepackage{amsmath,amsfonts,amssymb,mathpazo}
+\usepackage{amsmath,amsfonts,amssymb,mathpazo,hyperref}
 \usepackage[margin=25mm]{geometry}
 \newcommand*{\md}[1]{\mathrm{d}#1}
 \newcommand*{\mT}{\mathrm{T}}
@@ -14,6 +14,8 @@ This sand model is a hybrid of some existing models with significant simplificat
 Compared to other models for geomaterials, this model is more like a preliminary model just like the bilinear hardening J2 model compared to other models for metals.
 
 Since the elastic part is assumed to be linear, the return mapping implicit algorithm is used to obtain consistent tangent operator.
+
+The state parameter is taken from \href{https://doi.org/10.1016/j.cma.2005.08.020}{10.1016/j.cma.2005.08.020}. Other parts are mostly taken from \href{https://doi.org/10.1061/(ASCE)0733-9399(2004)130:6(622)}{10.1061/(ASCE)0733-9399(2004)130:6(622)}. The Lode angle dependency is removed. The fabric effect is removed.
 \section{Elasticity}
 The strain increment is decomposed into elastic and plastic parts,
 \begin{gather*}
@@ -29,25 +31,23 @@ A wedge-like function is chosen to be the yield surface.
 F=\big|\mathbold{s}+p\mathbold{\alpha}\big|+mp=\big|\mathbold{\eta}\big|+mp,
 \end{gather*}
 where $\mathbold{s}=\dev{\mathbold{\sigma}}$ is the deviatoric stress, $p=\dfrac{1}{3}\tr{\mathbold{\sigma}}$ is the hydrostatic stress, $\alpha$ is the so called back stress ratio and $m$ characterises the size of the wedge. For simplicity, $m$ is assumed to be a constant in this model.
-
-Please note when hydrostatic stress $p$ is positive, this yield function would not work properly. Please make sure the model is confined.
 \section{Flow Rule}
 A non-associated plastic flow is used, the corresponding flow rule is defined as follows.
 \begin{gather*}
-\Delta\mathbold{\varepsilon}^p=\gamma\left(\mathbold{n}+\dfrac{1}{3}A\left(\alpha^d-\mathbold{\alpha}:\mathbold{n}\right)\mathbold{I}\right),
+\Delta\mathbold{\varepsilon}^p=\gamma\left(\mathbold{n}+\dfrac{1}{3}A\left(\alpha^d-m-\mathbold{\alpha}:\mathbold{n}\right)\mathbold{I}\right),
 \end{gather*}
-where $D=A\left(\alpha^d-\mathbold{\alpha}:\mathbold{n}\right)$ is the dilatancy parameter, $A$ is a model constant, it can also be defined as a function of current state.
+where $D=A\left(\alpha^d-m-\mathbold{\alpha}:\mathbold{n}\right)$ is the dilatancy parameter, $A$ is a model constant, it can also be defined as a function of current state.
 
 Again for simplicity, the linear elasticity is applied, hence the following expressions hold.
 \begin{gather*}
 \mathbold{s}=\mathbold{s}^{tr}-2G\gamma\mathbold{n},\qquad
-p=p^{tr}-KA\gamma\left(\alpha^d-\mathbold{\alpha}:\mathbold{n}\right).
+p=p^{tr}-KA\gamma\left(\alpha^d-m-\mathbold{\alpha}:\mathbold{n}\right).
 \end{gather*}
 A hyper-elastic response can also be applied. However, in that case, the $G$ and $K$ would be zero for zero hydrostatic pressure.
 \section{Hardening Rule}
-The evolution rate of the back stress ratio $\mathbold{\alpha}$ is defined in terms of a proper distance measure from the bounding surface, Here, such a distance measure is chosen to be $\alpha^b\mathbold{n}-h\mathbold{\alpha}$, where $h$ is a model constant. Thus,
+The evolution rate of the back stress ratio $\mathbold{\alpha}$ is defined in terms of a proper distance measure from the bounding surface, Here, such a distance measure is chosen to be $h\left(\left(\alpha^b-m\right)\mathbold{n}-\mathbold{\alpha}\right)$, where $h$ is a model constant. Thus,
 \begin{gather*}
-\Delta\mathbold{\alpha}=\gamma{}\left(\alpha^b\mathbold{n}-h\mathbold{\alpha}\right).
+\Delta\mathbold{\alpha}=\gamma{}h\left(\left(\alpha^b-m\right)\mathbold{n}-\mathbold{\alpha}\right).
 \end{gather*}
 Essentially, this is similar to the Armstrong--Frederick type kinematic hardening rule.
 \section{Critical State}
@@ -99,44 +99,44 @@ In summary, there are four residual equations.
 \begin{gather*}
 \mathbold{R}=\left\{\begin{array}{l}
 |\mathbold{\eta}|+mp,\\[3mm]
-p-p^{tr}+KA\gamma\left(\alpha^d-\mathbold{\alpha}:\mathbold{n}\right),\\[3mm]
+p-p^{tr}+KA\gamma\left(\alpha^d-m-\mathbold{\alpha}:\mathbold{n}\right),\\[3mm]
 \mathbold{s}-\mathbold{s}^{tr}+2G\gamma\mathbold{n},\\[3mm]
-\mathbold{\alpha}_n+\gamma{}\alpha^b\mathbold{n}-\left(\gamma{}h+1\right)\mathbold{\alpha}.
+\mathbold{\alpha}_n+\gamma{}h\left(\alpha^b-m\right)\mathbold{n}-\left(\gamma{}h+1\right)\mathbold{\alpha}.
 \end{array}\right.
 \end{gather*}
 
 By defined $\mathbold{x}=\begin{bmatrix}\gamma&p&\mathbold{s}&\mathbold{\alpha}\end{bmatrix}^\mT$, the local Jacobian can be derived as
-\begin{small}
+\begin{footnotesize}
 \begin{gather*}
 \pfrac{\mathbold{R}}{\mathbold{x}}=
 \begin{bmatrix}
-	0                                                      & \mathbold{\alpha}:\mathbold{n}+m                                                     & \mathbold{n}:\mathbf{I}                                       & p\mathbold{n}:\mathbf{I}                                                                                \\[4mm]
-	KA\left(\alpha^d-\mathbold{\alpha}:\mathbold{n}\right) & 1+KA\gamma\left(\pfrac{\alpha^d}{p}-\mathbold{\alpha}:\pfrac{\mathbold{n}}{p}\right) & -KA\gamma\mathbold{\alpha}:\pfrac{\mathbold{n}}{\mathbold{s}} & -KA\gamma\left(\mathbf{I}:\mathbold{n}+\mathbold{\alpha}:\pfrac{\mathbold{n}}{\mathbold{\alpha}}\right) \\[4mm]
-	2G\mathbold{n}                                         & 2G\gamma\pfrac{\mathbold{n}}{p}                                                      & \mathbf{I}+2G\gamma\pfrac{\mathbold{n}}{\mathbold{s}}         & 2G\gamma\pfrac{\mathbold{n}}{\mathbold{\alpha}}                                                         \\[4mm]
-	\alpha^b\mathbold{n}-h\mathbold{\alpha}                & \gamma\left(\pfrac{\alpha^b}{p}\mathbold{n}+\alpha^b\pfrac{\mathbold{n}}{p}\right)   & \gamma\alpha^b\pfrac{\mathbold{n}}{\mathbold{s}}              & \gamma\alpha^b\pfrac{\mathbold{n}}{\mathbold{\alpha}}-\left(\gamma{}h+1\right)\mathbf{I}
+	0                                                      & \mathbold{\alpha}:\mathbold{n}+m                                                      & \mathbold{n}:\mathbf{I}                                       & p\mathbold{n}:\mathbf{I}                                                                                \\[4mm]
+	KA\left(\alpha^d-m-\mathbold{\alpha}:\mathbold{n}\right) & 1+KA\gamma\left(\pfrac{\alpha^d}{p}-\mathbold{\alpha}:\pfrac{\mathbold{n}}{p}\right)  & -KA\gamma\mathbold{\alpha}:\pfrac{\mathbold{n}}{\mathbold{s}} & -KA\gamma\left(\mathbf{I}:\mathbold{n}+\mathbold{\alpha}:\pfrac{\mathbold{n}}{\mathbold{\alpha}}\right) \\[4mm]
+	2G\mathbold{n}                                         & 2G\gamma\pfrac{\mathbold{n}}{p}                                                       & \mathbf{I}+2G\gamma\pfrac{\mathbold{n}}{\mathbold{s}}         & 2G\gamma\pfrac{\mathbold{n}}{\mathbold{\alpha}}                                                         \\[4mm]
+	h\left(\alpha^b-m\right)\mathbold{n}-h\mathbold{\alpha}               & \gamma{}h\left(\pfrac{\alpha^b}{p}\mathbold{n}+\left(\alpha^b-m\right)\pfrac{\mathbold{n}}{p}\right) & \gamma{}h\left(\alpha^b-m\right)\pfrac{\mathbold{n}}{\mathbold{s}}           & \gamma{}h\left(\alpha^b-m\right)\pfrac{\mathbold{n}}{\mathbold{\alpha}}-\left(\gamma{}h+1\right)\mathbf{I}
 \end{bmatrix}.
 \end{gather*}
-\end{small}
+\end{footnotesize}
 In the explicit form, it is
-\begin{scriptsize}
+\begin{tiny}
 \begin{gather*}
 \begin{bmatrix}
-	0                                                      & \mathbold{\alpha}:\mathbold{n}+m                                                                                                                                                  & \mathbold{n}:\mathbf{I}                                                                                                                   & p\mathbold{n}:\mathbf{I}                                                                                                                                             \\[4mm]
-	KA\left(\alpha^d-\mathbold{\alpha}:\mathbold{n}\right) & 1+KA\gamma\left(\pfrac{\alpha^d}{p}-\dfrac{\mathbold{\alpha}:\mathbold{\alpha}-\left(\mathbold{n}:\mathbold{\alpha}\right)^2}{|\mathbold{\eta}|}\right)                           & \dfrac{KA\gamma}{|\mathbold{\eta}|}\left(\left(\mathbold{\alpha}:\mathbold{n}\right)\cdot\mathbold{n}-\mathbold{\alpha}\right):\mathbf{I} & KA\gamma\left(\mathbold{n}+\dfrac{p}{|\mathbold{\eta}|}\left(\left(\mathbold{\alpha}:\mathbold{n}\right)\cdot\mathbold{n}-\mathbold{\alpha}\right)\right):\mathbf{I} \\[4mm]
-	2G\mathbold{n}                                         & \dfrac{2G\gamma}{|\mathbold{\eta}|}\left(\mathbold{\alpha}-\left(\mathbold{n}:\mathbold{\alpha}\right)\cdot\mathbold{n}\right)                                                    & \mathbf{I}+\dfrac{2G\gamma}{|\mathbold{\eta}|}\left(\mathbf{I}-\mathbold{n}\otimes\left(\mathbold{n}:\mathbf{I}\right)\right)             & \dfrac{2G\gamma{}p}{|\mathbold{\eta}|}\left(\mathbf{I}-\mathbold{n}\otimes\left(\mathbold{n}:\mathbf{I}\right)\right)                                                \\[4mm]
-	\alpha^b\mathbold{n}-h\mathbold{\alpha}                & \gamma\left(\pfrac{\alpha^b}{p}\mathbold{n}+\dfrac{\alpha^b}{|\mathbold{\eta}|}\left(\mathbold{\alpha}-\left(\mathbold{n}:\mathbold{\alpha}\right)\cdot\mathbold{n}\right)\right) & \dfrac{\gamma\alpha^b}{|\mathbold{\eta}|}\left(\mathbf{I}-\mathbold{n}\otimes\left(\mathbold{n}:\mathbf{I}\right)\right)                  & \dfrac{\gamma\alpha^bp}{|\mathbold{\eta}|}\left(\mathbf{I}-\mathbold{n}\otimes\left(\mathbold{n}:\mathbf{I}\right)\right)-\left(\gamma{}h+1\right)\mathbf{I}
+	0                                                      & \mathbold{\alpha}:\mathbold{n}+m                                                                                                                                                     & \mathbold{n}:\mathbf{I}                                                                                                                   & p\mathbold{n}:\mathbf{I}                                                                                                                                             \\[4mm]
+	KA\left(\alpha^d-m-\mathbold{\alpha}:\mathbold{n}\right) & 1+KA\gamma\left(\pfrac{\alpha^d}{p}-\dfrac{\mathbold{\alpha}:\mathbold{\alpha}-\left(\mathbold{n}:\mathbold{\alpha}\right)^2}{|\mathbold{\eta}|}\right)                              & \dfrac{KA\gamma}{|\mathbold{\eta}|}\left(\left(\mathbold{\alpha}:\mathbold{n}\right)\cdot\mathbold{n}-\mathbold{\alpha}\right):\mathbf{I} & KA\gamma\left(\mathbold{n}+\dfrac{p}{|\mathbold{\eta}|}\left(\left(\mathbold{\alpha}:\mathbold{n}\right)\cdot\mathbold{n}-\mathbold{\alpha}\right)\right):\mathbf{I} \\[4mm]
+	2G\mathbold{n}                                         & \dfrac{2G\gamma}{|\mathbold{\eta}|}\left(\mathbold{\alpha}-\left(\mathbold{n}:\mathbold{\alpha}\right)\cdot\mathbold{n}\right)                                                       & \mathbf{I}+\dfrac{2G\gamma}{|\mathbold{\eta}|}\left(\mathbf{I}-\mathbold{n}\otimes\left(\mathbold{n}:\mathbf{I}\right)\right)             & \dfrac{2G\gamma{}p}{|\mathbold{\eta}|}\left(\mathbf{I}-\mathbold{n}\otimes\left(\mathbold{n}:\mathbf{I}\right)\right)                                                \\[4mm]
+	h\left(\alpha^b-m\right)\mathbold{n}-h\mathbold{\alpha}               & \gamma{}h\left(\pfrac{\alpha^b}{p}\mathbold{n}+\dfrac{\alpha^b-m}{|\mathbold{\eta}|}\left(\mathbold{\alpha}-\left(\mathbold{n}:\mathbold{\alpha}\right)\cdot\mathbold{n}\right)\right) & \dfrac{\gamma{}h\left(\alpha^b-m\right)}{|\mathbold{\eta}|}\left(\mathbf{I}-\mathbold{n}\otimes\left(\mathbold{n}:\mathbf{I}\right)\right)               & \dfrac{\gamma{}h\left(\alpha^b-m\right)p}{|\mathbold{\eta}|}\left(\mathbf{I}-\mathbold{n}\otimes\left(\mathbold{n}:\mathbf{I}\right)\right)-\left(\gamma{}h+1\right)\mathbf{I}
 \end{bmatrix}.
 \end{gather*}
-\end{scriptsize}
+\end{tiny}
 \section{Consistent Tangent Stiffness}
 Accordingly,
 \begin{gather*}
 \pfrac{\mathbold{R}}{\mathbold{\varepsilon}^{tr}}=
 \begin{bmatrix}
-	0                                                    \\[3mm]
-	\left(KA\gamma\alpha^dn^dv_0-K\right)\mathbold{I}    \\[3mm]
-	-2G\mathbf{I}_{d}                                    \\[3mm]
-	-\alpha^bn^bv_0\gamma\mathbold{n}\otimes\mathbold{I}
+	0                                                       \\[3mm]
+	\left(KA\gamma\alpha^dn^dv_0-K\right)\mathbold{I}       \\[3mm]
+	-2G\mathbf{I}_{d}                                       \\[3mm]
+	-\alpha^bn^bv_0\gamma{}h\mathbold{n}\otimes\mathbold{I}
 \end{bmatrix}.
 \end{gather*}
 Thus,

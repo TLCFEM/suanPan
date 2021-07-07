@@ -23,7 +23,7 @@ const span SimpleSand::sd(8, 13);
 const mat SimpleSand::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 SimpleSand::SimpleSand(const unsigned T, const double E, const double V, const double M, const double A, const double H, const double AC, const double NB, const double ND, const double VC, const double PC, const double LC, const double V0, const double R)
-	: DataSimpleSand{E, V, fabs(M), fabs(A), H, AC, fabs(NB), fabs(ND), fabs(VC), -fabs(PC), fabs(LC), fabs(V0)}
+	: DataSimpleSand{E, V, fabs(M), -fabs(A), H, AC, fabs(NB), fabs(ND), fabs(VC), -fabs(PC), fabs(LC), fabs(V0)}
 	, Material3D(T, R) { access::rw(tolerance) = 1E-12; }
 
 void SimpleSand::initialize(const shared_ptr<DomainBase>&) {
@@ -85,34 +85,35 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
 		const auto state = state_const + lc * log(p / pc);
 		alpha_d = ac * exp(nd * state);
 		alpha_b = ac * exp(-nb * state);
+		const auto alpha_d_m = alpha_d - m;
+		const auto alpha_b_m = alpha_b - m;
 		const vec unit_n = n % tensor::stress::norm_weight;
 		const vec unit_alpha = alpha % tensor::stress::norm_weight;
 		const auto alpha_n = dot(unit_alpha, n);
 
-		residual(sb) = p - trial_p + bulk * a * gamma * (alpha_n - alpha_d);
+		residual(sb) = p - trial_p + bulk * a * gamma * (alpha_d_m - alpha_n);
 		residual(sc) = s - trial_s + double_shear * gamma * n;
-		residual(sd) = current_alpha + gamma * alpha_b * n - (gamma * h + 1.) * alpha;
-
-		jacobian(sb, sa) = bulk * a * (alpha_n - alpha_d);
-		jacobian(sc, sa) = double_shear * n;
-		jacobian(sd, sa) = alpha_b * n - h * alpha;
+		residual(sd) = current_alpha + gamma * h * alpha_b_m * n - (gamma * h + 1.) * alpha;
 
 		jacobian(sa, sb) = m + alpha_n;
-		jacobian(sb, sb) = 1. + bulk * a * gamma * ((dot(alpha, unit_alpha) - alpha_n * alpha_n) / norm_eta - alpha_d * nd * lc / p);
-		jacobian(sc, sb) = double_shear * gamma / norm_eta * (alpha - alpha_n * n);
-		jacobian(sd, sb) = gamma * alpha_b / norm_eta * alpha - gamma * alpha_b * (alpha_n / norm_eta + nb * lc / p) * n;
-
 		jacobian(sa, sc) = unit_n.t();
-		jacobian(sb, sc) = bulk * a * gamma / norm_eta * (unit_alpha.t() - alpha_n * unit_n.t());
-		jacobian(sc, sc) = double_shear * gamma / norm_eta * eye(6, 6) - double_shear * gamma / norm_eta * n * unit_n.t();
-		jacobian(sd, sc) = gamma * alpha_b / norm_eta * eye(6, 6) - gamma * alpha_b / norm_eta * n * unit_n.t();
-
 		jacobian(sa, sd) = p * unit_n.t();
-		jacobian(sb, sd) = bulk * a * gamma / norm_eta * ((norm_eta - p * alpha_n) * unit_n.t() + p * unit_alpha.t());
-		jacobian(sc, sd) = jacobian(sc, sc) * p;
-		jacobian(sd, sd) = jacobian(sd, sc) * p - (gamma * h + 1.) * eye(6, 6);
 
+		jacobian(sb, sa) = bulk * a * (alpha_d_m - alpha_n);
+		jacobian(sb, sb) = 1. + bulk * a * gamma * (alpha_d * nd * lc / p - (dot(alpha, unit_alpha) - alpha_n * alpha_n) / norm_eta);
+		jacobian(sb, sc) = bulk * a * gamma / norm_eta * (alpha_n * unit_n.t() - unit_alpha.t());
+		jacobian(sb, sd) = bulk * a * gamma / norm_eta * ((p * alpha_n - norm_eta) * unit_n.t() - p * unit_alpha.t());
+
+		jacobian(sc, sa) = double_shear * n;
+		jacobian(sc, sb) = double_shear * gamma / norm_eta * (alpha - alpha_n * n);
+		jacobian(sc, sc) = double_shear * gamma / norm_eta * eye(6, 6) - double_shear * gamma / norm_eta * n * unit_n.t();
+		jacobian(sc, sd) = jacobian(sc, sc) * p;
 		jacobian(sc, sc) += eye(6, 6);
+
+		jacobian(sd, sa) = h * alpha_b_m * n - h * alpha;
+		jacobian(sd, sb) = gamma * h * alpha_b_m / norm_eta * alpha - gamma * h * (alpha_b_m * alpha_n / norm_eta + alpha_b * nb * lc / p) * n;
+		jacobian(sd, sc) = gamma * h * alpha_b_m / norm_eta * eye(6, 6) - gamma * h * alpha_b_m / norm_eta * n * unit_n.t();
+		jacobian(sd, sd) = jacobian(sd, sc) * p - (gamma * h + 1.) * eye(6, 6);
 
 		if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
@@ -133,9 +134,9 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
 	mat left(14, 6), right;
 
 	left.row(sa).zeros();
-	left.row(sb) = (bulk + bulk * a * gamma * alpha_d * nd * v0) * tensor::unit_tensor2.t();
+	left.row(sb) = (bulk - bulk * a * gamma * alpha_d * nd * v0) * tensor::unit_tensor2.t();
 	left.rows(sc) = double_shear * unit_dev_tensor;
-	left.rows(sd) = alpha_b * nb * v0 * gamma * n * tensor::unit_tensor2.t();
+	left.rows(sd) = alpha_b * nb * v0 * gamma * h * n * tensor::unit_tensor2.t();
 
 	if(!solve(right, jacobian, left)) return SUANPAN_FAIL;
 

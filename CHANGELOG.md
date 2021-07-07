@@ -4,6 +4,10 @@
 
 1. `MKL` includes outdated `FEAST`, the external names in `FEAST` library are modified to avoid linking error.
 
+## version 1.x
+
+1. revise `SimpleSand` model
+
 ## version 1.6
 
 1. add `terminal` command and `output_folder` setting
