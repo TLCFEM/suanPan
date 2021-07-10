@@ -72,7 +72,7 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
 	unsigned counter = 0;
 
 	while(true) {
-		if(++counter == max_iteration) return SUANPAN_FAIL;
+		if(max_iteration == ++counter) return SUANPAN_FAIL;
 
 		const vec eta = s + p * alpha;
 		const auto norm_eta = tensor::stress::norm(eta);

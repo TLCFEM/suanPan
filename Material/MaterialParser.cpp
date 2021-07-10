@@ -2552,7 +2552,8 @@ void new_simplesand(unique_ptr<Material>& return_obj, istringstream& command) {
 		suanpan_error("new_simplesand() requires a valid tag.\n");
 		return;
 	}
-	vec pool(std::initializer_list<double>{3E4, .2, .01, .7, 5., 1.25, 1.1, 3.5, 1.915, -130., .02, 2., 0.});
+
+	vec pool(std::initializer_list<double>{10E4, .2, .01, -.7, 5., 1.25, 1.1, 3.5, 1.915, -130., .02, 2., 0.});
 
 	auto idx = 0;
 	while(!command.eof() && idx < 13) if(double para; get_input(command, para)) pool(idx++) = para;
