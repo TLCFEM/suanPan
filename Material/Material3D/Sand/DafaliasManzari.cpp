@@ -68,7 +68,7 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
 	double g, pgpe, pgpp;
 
-	vec residual(7), incre;
+	vec residual(7, fill::none), incre;
 	mat jacobian(7, 7, fill::eye);
 
 	auto counter = 0u;
@@ -87,8 +87,7 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 		}
 		else {
 			g = gi;
-			pgpe = 0.;
-			pgpp = 0.;
+			pgpe = pgpp = 0.;
 		}
 
 		residual(sa) = p - current_p - pr * g * incre_ev;
@@ -118,7 +117,7 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 	if(norm_eta + m * p < 0.) {
 		trial_stress = s + p * tensor::unit_tensor2;
 
-		mat left(7, 6), right;
+		mat left(7, 6, fill::none), right;
 
 		left.row(sa) = pr * (incre_ev * pgpe + g) * tensor::unit_tensor2.t();
 		left.rows(sb) = 2. * pgpe * incre_ed * tensor::unit_tensor2.t() + 2. * g * unit_dev_tensor;
@@ -140,6 +139,10 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
 	residual.set_size(20);
 	jacobian.set_size(20, 20);
+	jacobian(si, si) = 0.;
+	jacobian(si, sm).zeros();
+	jacobian(sk, sm).zeros();
+	jacobian(sl, sm).zeros();
 
 	counter = 0u;
 
@@ -177,6 +180,8 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 		pabpe = -nb * ab;
 		const auto padpp = padpe * ppsipp;
 		const auto pabpp = pabpe * ppsipp;
+		padpe *= 1. + e0;
+		pabpe *= 1. + e0;
 
 		eta = s + p * alpha;
 		norm_eta = tensor::stress::norm(eta);
@@ -187,13 +192,8 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 		const auto alpha_n = dot(n, unit_alpha);
 		aabmn = alpha - adm * n;
 
-		const auto& etap = alpha_n;
-		const auto& etas = unit_n;
-		const vec etaa = p * etas;
-
 		const vec np = (alpha - alpha_n * n) / norm_eta;
 		const mat ns = (eye(6, 6) - n * unit_n.t()) / norm_eta;
-		const mat na = p * ns;
 
 		const vec unit_z = z % tensor::stress::norm_weight;
 		const auto zn = dot(n, unit_z);
@@ -203,22 +203,21 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 		double pdpp;
 		rowvec pdps, pdpa, pdpz;
 		if(zn > 0.) {
-			const auto term_a = a * (adm - alpha_n);
-			const auto term_b = a * (1. + zn);
+			const auto term_a = a * (1. + zn);
+
+			pdpe = term_a * padpe;
+			pdpp = term_a * padpp + dot(d * unit_z - term_a * unit_alpha, np);
+			pdps = (d * unit_z - term_a * unit_alpha).t() * ns;
+			pdpa = p * pdps - term_a * unit_n.t();
+			pdpz = d * unit_n.t();
 
 			d *= 1. + zn;
-
-			pdpe = term_b * padpe * (1. + e0);
-			pdpp = term_a * dot(unit_z, np) + term_b * (padpp - dot(unit_alpha, np));
-			pdps = term_a * unit_z.t() * ns - term_b * unit_alpha.t() * ns;
-			pdpa = term_a * unit_z.t() * na - term_b * (unit_alpha.t() * na + unit_n.t());
-			pdpz = term_a * unit_n.t();
 		}
 		else {
-			pdpe = a * padpe * (1. + e0);
+			pdpe = a * padpe;
 			pdpp = a * (padpp - dot(unit_alpha, np));
 			pdps = -a * unit_alpha.t() * ns;
-			pdpa = -a * (unit_alpha.t() * na + unit_n.t());
+			pdpa = p * pdps - a * unit_n.t();
 			pdpz.zeros(6);
 		}
 
@@ -231,50 +230,52 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 		residual(sj) = p - current_p + pr * g * (gamma * d - incre_ev);
 		residual(sk) = s - current_s + 2. * g * (gamma * n - incre_ed);
 		residual(sl) = alpha - current_alpha + gamma * b0 * aabmn;
+		residual(sm) = z - current_z;
 
-		jacobian(si, si) = 0.;
-		jacobian(si, sj) = etap + m;
-		jacobian(si, sk) = etas.t();
-		jacobian(si, sl) = etaa.t();
-		jacobian(si, sm).zeros();
+		jacobian(si, sj) = alpha_n + m;
+		jacobian(si, sk) = unit_n.t();
+		jacobian(si, sl) = p * unit_n.t();
 
+		const auto gk = gamma * pr * g;
 		jacobian(sj, si) = d * pr * g;
-		jacobian(sj, sj) = 1. + pr * pgpp * (gamma * d - incre_ev) + pr * g * gamma * pdpp;
-		jacobian(sj, sk) = gamma * pr * g * pdps;
-		jacobian(sj, sl) = gamma * pr * g * pdpa;
-		jacobian(sj, sm) = gamma * pr * g * pdpz;
+		jacobian(sj, sj) = 1. + pr * pgpp * (gamma * d - incre_ev) + gk * pdpp;
+		jacobian(sj, sk) = gk * pdps;
+		jacobian(sj, sl) = gk * pdpa;
+		jacobian(sj, sm) = gk * pdpz;
 
 		jacobian(sk, si) = 2. * g * n;
 		jacobian(sk, sj) = 2. * pgpp * (gamma * n - incre_ed) + 2. * g * gamma * np;
-		jacobian(sk, sk) = eye(6, 6) + 2. * g * gamma * ns;
-		jacobian(sk, sl) = 2. * g * gamma * na;
-		jacobian(sk, sm).zeros();
+		jacobian(sk, sk) = 2. * g * gamma * ns;
+		jacobian(sk, sl) = p * jacobian(sk, sk);
+		jacobian(sk, sk) += eye(6, 6);
 
 		jacobian(sl, si) = b0 * aabmn;
 		jacobian(sl, sj) = gamma * pb0pp * aabmn - gamma * b0 * (pabpp * n + abm * np);
 		jacobian(sl, sk) = -gamma * b0 * abm * ns;
-		jacobian(sl, sl) = (1. + gamma * b0) * eye(6, 6) - gamma * b0 * abm * na;
-		jacobian(sl, sm).zeros();
+		jacobian(sl, sl) = (1. + gamma * b0) * eye(6, 6) + p * jacobian(sl, sk);
+
+		jacobian(sm, sm) = eye(6, 6);
 
 		if(d > 0.) {
-			residual(sm) = (1. + cz * gamma * d) * z - current_z + cz * gamma * zm * n;
+			const auto factor_a = cz * gamma;
+			const auto factor_b = factor_a * d;
+			const auto factor_c = factor_b * zm;
 
 			zz = zm * n + z;
 
+			residual(sm) += factor_b * zz;
+
 			jacobian(sm, si) = cz * d * zz;
-			jacobian(sm, sj) = cz * gamma * pdpp * zz + cz * gamma * d * zm * np;
-			jacobian(sm, sk) = cz * gamma * zz * pdps + cz * gamma * d * zm * ns;
-			jacobian(sm, sl) = cz * gamma * zz * pdpa + cz * gamma * d * zm * na;
-			jacobian(sm, sm) = (1. + cz * gamma * d) * eye(6, 6) + cz * gamma * zz * pdpz;
+			jacobian(sm, sj) = factor_a * pdpp * zz + factor_c * np;
+			jacobian(sm, sk) = factor_a * zz * pdps + factor_c * ns;
+			jacobian(sm, sl) = factor_a * zz * pdpa + factor_c * p * ns;
+			jacobian(sm, sm) += factor_b * eye(6, 6) + factor_a * zz * pdpz;
 		}
 		else {
-			residual(sm) = z - current_z;
-
 			jacobian(sm, si).zeros();
 			jacobian(sm, sj).zeros();
 			jacobian(sm, sk).zeros();
 			jacobian(sm, sl).zeros();
-			jacobian(sm, sm) = eye(6, 6);
 		}
 
 		if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
@@ -293,16 +294,16 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
 	trial_stress = s + p * tensor::unit_tensor2;
 
-	mat left(20, 6), right;
+	mat left(20, 6, fill::none), right;
 
 	left.row(si).zeros();
-	left.row(sj) = pr * pgpe * (gamma * d - incre_ev) * tensor::stress::norm_weight.t() + pr * g * (gamma * pdpe - 1.) * tensor::stress::norm_weight.t();
-	left.rows(sk) = 2. * pgpe * (gamma * n - incre_ed) * tensor::stress::norm_weight.t() - 2. * g * unit_dev_tensor;
-	left.rows(sl) = gamma * aabmn * pb0pe * tensor::stress::norm_weight.t() - gamma * b0 * n * pabpe * (1. + e0) * tensor::stress::norm_weight.t();
+	left.row(sj) = pr * (pgpe * (incre_ev - gamma * d) + g - g * gamma * pdpe) * tensor::stress::norm_weight.t();
+	left.rows(sk) = 2. * g * unit_dev_tensor + 2. * pgpe * (incre_ed - gamma * n) * tensor::stress::norm_weight.t();
+	left.rows(sl) = gamma * (b0 * pabpe * n - pb0pe * aabmn) * tensor::stress::norm_weight.t();
 
-	d > 0. ? left.rows(sm) = cz * gamma * zz * pdpe * tensor::stress::norm_weight.t() : left.rows(sm).zeros();
+	d > 0. ? left.rows(sm) = -cz * gamma * zz * pdpe * tensor::stress::norm_weight.t() : left.rows(sm).zeros();
 
-	if(!solve(right, jacobian, -left)) return SUANPAN_FAIL;
+	if(!solve(right, jacobian, left)) return SUANPAN_FAIL;
 
 	trial_stiffness = right.rows(sk) + tensor::unit_tensor2 * right.row(sj);
 
