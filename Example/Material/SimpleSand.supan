@@ -41,7 +41,7 @@ analyze
 # Displacement:
 #         0        0  -1.0000
 # Resistance:
-#   -5.0688e+03  -5.0688e+03  -5.4155e+03
+#   -1.6930e+04  -1.6930e+04  -2.1902e+04
 peek node 10
 
 reset
