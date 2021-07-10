@@ -50,6 +50,7 @@ void new_concreteexp(unique_ptr<Material>&, istringstream&);
 void new_concretetable(unique_ptr<Material>&, istringstream&);
 void new_concretetsai(unique_ptr<Material>&, istringstream&);
 void new_coulumbfriction(unique_ptr<Material>&, istringstream&);
+void new_dafaliasmanzari(unique_ptr<Material>&, istringstream&);
 void new_elastic1d(unique_ptr<Material>&, istringstream&);
 void new_elastic2d(unique_ptr<Material>&, istringstream&);
 void new_expcc(unique_ptr<Material>&, istringstream&);

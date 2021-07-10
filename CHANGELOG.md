@@ -7,6 +7,7 @@
 ## version 1.x
 
 1. revise `SimpleSand` model
+2. add `DafaliasManzari` sand model
 
 ## version 1.6
 

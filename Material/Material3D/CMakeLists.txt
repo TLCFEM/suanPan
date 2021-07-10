@@ -25,6 +25,7 @@ set(M3D
 	Material3D/Hoffman/NonlinearHoffman.cpp
 	Material3D/Material3D.cpp
 	Material3D/Sand/SimpleSand.cpp
+	Material3D/Sand/DafaliasManzari.cpp
 	Material3D/vonMises/ArmstrongFrederick.cpp
 	Material3D/vonMises/BilinearJ2.cpp
 	Material3D/vonMises/BilinearPeric.cpp

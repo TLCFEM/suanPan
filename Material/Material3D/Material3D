@@ -24,6 +24,7 @@
 #include "Hoffman/NonlinearHoffman.h"
 #include "Material3D.h"
 #include "Sand/SimpleSand.h"
+#include "Sand/DafaliasManzari.h"
 #include "vonMises/ArmstrongFrederick.h"
 #include "vonMises/BilinearJ2.h"
 #include "vonMises/BilinearPeric.h"

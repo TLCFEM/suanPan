@@ -134,6 +134,7 @@ jobs:
           ./suanPan -f ../Example/Material/ConcreteExp.supan > /dev/null
           ./suanPan -f ../Example/Material/ConcreteTable.supan > /dev/null
           ./suanPan -f ../Example/Material/ConcreteTsai.supan > /dev/null
+          ./suanPan -f ../Example/Material/DafaliasManzari.supan > /dev/null
           ./suanPan -f ../Example/Material/Dhakal.supan > /dev/null
           ./suanPan -f ../Example/Material/DP.supan > /dev/null
           ./suanPan -f ../Example/Material/Elastic2D.supan > /dev/null

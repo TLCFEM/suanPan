@@ -1228,6 +1228,9 @@
     <ClCompile Include="..\..\..\Constraint\Criterion\EnergyEvolution.cpp">
       <Filter>Constraint\Criterion</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Sand\DafaliasManzari.cpp">
+      <Filter>Material\Material3D\Sand</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2352,6 +2355,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Constraint\Criterion\EnergyEvolution.h">
       <Filter>Constraint\Criterion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Sand\DafaliasManzari.h">
+      <Filter>Material\Material3D\Sand</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
