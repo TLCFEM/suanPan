@@ -184,8 +184,9 @@ Hence,
 \section{Fabric Effect}
 The fabric tensor changes when $\Delta\varepsilon^p_v$ is positive,
 \begin{gather}
-\Delta\mathbold{z}=-c_z\left\langle\Delta\varepsilon^p_v\right\rangle\left(z_m\mathbold{n}+\mathbold{z}\right)=-c_z\gamma\left\langle{}D\right\rangle\left(z_m\mathbold{n}+\mathbold{z}\right).
+\Delta\mathbold{z}=c_z\left\langle\Delta\varepsilon^p_v\right\rangle\left(z_m\mathbold{n}-\mathbold{z}\right)=c_z\gamma\left\langle{}D\right\rangle\left(z_m\mathbold{n}-\mathbold{z}\right).
 \end{gather}
+The sign is flipped1 compared to the original definition for consistency with other parts.
 \section{Residual}
 The are five local residual equations.
 \begin{gather}
@@ -194,7 +195,7 @@ The are five local residual equations.
 p-p_n+K\left(\gamma{}D-\Delta\varepsilon_v\right),\\[2mm]
 \mathbold{s}-\mathbold{s}_n+2G\left(\gamma\mathbold{n}-\Delta\mathbold{e}\right),\\[2mm]
 \mathbold{\alpha}-\mathbold{\alpha}_n+\gamma{}h\left(\mathbold{\alpha}-\left(\alpha^b-m\right)\mathbold{n}\right),\\[2mm]
-\mathbold{z}-\mathbold{z}_n+c_z\gamma{}\left\langle{}D\right\rangle\left(z_m\mathbold{n}+\mathbold{z}\right).
+\mathbold{z}-\mathbold{z}_n+c_z\gamma{}\left\langle{}D\right\rangle\left(\mathbold{z}-z_m\mathbold{n}\right).
 \end{array}
 \right.
 \end{gather}
@@ -224,9 +225,9 @@ h\left(\mathbold{\alpha}-\alpha^{bm}\mathbold{n}\right)&
 \left(1+\gamma{}h\right)\mathbf{I}+\gamma\left(\mathbold{\alpha}-\alpha^{bm}\mathbold{n}\right)\pfrac{h}{\mathbold{\alpha}}-\gamma{}h\alpha^{bm}n_a&
 \cdot\\[8mm]
 c_z\left\langle{}D\right\rangle{}\mathbold{z}_z&
-c_z\gamma{}\pfrac{\left\langle{}D\right\rangle}{p}\mathbold{z}_z+c_z\gamma{}\left\langle{}D\right\rangle{}z_m{}n_p&
-c_z\gamma{}\mathbold{z}_z\pfrac{\left\langle{}D\right\rangle}{\mathbold{s}}+c_z\gamma{}\left\langle{}D\right\rangle{}z_mn_s&
-c_z\gamma{}\mathbold{z}_z\pfrac{\left\langle{}D\right\rangle}{\mathbold{\alpha}}+c_z\gamma{}\left\langle{}D\right\rangle{}z_mn_\alpha&
+c_z\gamma{}\pfrac{\left\langle{}D\right\rangle}{p}\mathbold{z}_z-c_z\gamma{}\left\langle{}D\right\rangle{}z_m{}n_p&
+c_z\gamma{}\mathbold{z}_z\pfrac{\left\langle{}D\right\rangle}{\mathbold{s}}-c_z\gamma{}\left\langle{}D\right\rangle{}z_mn_s&
+c_z\gamma{}\mathbold{z}_z\pfrac{\left\langle{}D\right\rangle}{\mathbold{\alpha}}-c_z\gamma{}\left\langle{}D\right\rangle{}z_mn_\alpha&
 \left(1+c_z\gamma{}\left\langle{}D\right\rangle\right)\mathbf{I}+c_z\gamma{}\mathbold{z}_z\pfrac{\left\langle{}D\right\rangle}{\mathbold{z}}
 \end{bmatrix}.
 \end{gather*}
@@ -234,14 +235,14 @@ c_z\gamma{}\mathbold{z}_z\pfrac{\left\langle{}D\right\rangle}{\mathbold{\alpha}}
 In which,
 \begin{gather}
 \alpha^{bm}=\alpha^b-m,\\
-\mathbold{z}_z=z_m\mathbold{n}+\mathbold{z}.
+\mathbold{z}_z=\mathbold{z}-z_m\mathbold{n}.
 \end{gather}
 \section{Consistent Tangent Operator}
 \begin{align}
 \pfrac{R_2}{\mathbold{\varepsilon}^{tr}}&=\pfrac{K}{\mathbold{\varepsilon}^{tr}}\left(\gamma{}D-\Delta\varepsilon_v\right)+K\left(\gamma{}\pfrac{D}{\mathbold{\varepsilon}^{tr}}-I\right),\\[2mm]
 \pfrac{R_3}{\mathbold{\varepsilon}^{tr}}&=2\pfrac{G}{\mathbold{\varepsilon}^{tr}}\left(\gamma\mathbold{n}-\Delta\mathbold{e}\right)-2GI_d,\\[2mm]
 \pfrac{R_4}{\mathbold{\varepsilon}^{tr}}&=\gamma{}\left(\mathbold{\alpha}-\alpha^{bm}\mathbold{n}\right)\pfrac{h}{\mathbold{\varepsilon}^{tr}}-\gamma{}h\mathbold{n}\pfrac{\alpha^b}{\mathbold{\varepsilon}^{tr}},\\[2mm]
-\pfrac{R_5}{\mathbold{\varepsilon}^{tr}}&=c_z\gamma{}\left(z_m\mathbold{n}+\mathbold{z}\right)\pfrac{\left\langle{}D\right\rangle}{\mathbold{\varepsilon}^{tr}}.
+\pfrac{R_5}{\mathbold{\varepsilon}^{tr}}&=c_z\gamma{}\mathbold{z}_z\pfrac{\left\langle{}D\right\rangle}{\mathbold{\varepsilon}^{tr}}.
 \end{align}
 
 Then,

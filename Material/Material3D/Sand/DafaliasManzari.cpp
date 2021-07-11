@@ -280,14 +280,14 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 			const auto factor_b = factor_a * d;
 			const auto factor_c = factor_b * zm;
 
-			zz = zm * n + z;
+			zz = z - zm * n;
 
 			residual(sm) += factor_b * zz;
 
 			jacobian(sm, si) = cz * d * zz;
-			jacobian(sm, sj) = factor_a * pdpp * zz + factor_c * np;
-			jacobian(sm, sk) = factor_a * zz * pdps + factor_c * ns;
-			jacobian(sm, sl) = factor_a * zz * pdpa + factor_c * p * ns;
+			jacobian(sm, sj) = factor_a * pdpp * zz - factor_c * np;
+			jacobian(sm, sk) = factor_a * zz * pdps - factor_c * ns;
+			jacobian(sm, sl) = factor_a * zz * pdpa - factor_c * p * ns;
 			jacobian(sm, sm) += factor_b * eye(6, 6) + factor_a * zz * pdpz;
 		}
 		else {
