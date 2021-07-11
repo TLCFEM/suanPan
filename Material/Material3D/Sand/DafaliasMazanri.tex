@@ -162,8 +162,10 @@ The evolution rate of the back stress ratio $\mathbold{\alpha}$ is defined in te
 \end{gather}
 where $h$ controls the hardening rate,
 \begin{gather}
-h=b_0.
+h=b_0\exp\left(h_1\left(\mathbold{\alpha}_{in}:\mathbold{n}-\mathbold{\alpha}:\mathbold{n}\right)\right).
 \end{gather}
+The constant $\mathbold{\alpha}_{in}$ is updated whenever load reversal occurs.
+
 The parameter $b_0$ is defined as a function of current state,
 \begin{gather}
 b_0=G_0h_0\left(1-c_he\right)\sqrt{\dfrac{p_{at}}{p}}.
@@ -171,15 +173,18 @@ b_0=G_0h_0\left(1-c_he\right)\sqrt{\dfrac{p_{at}}{p}}.
 The derivatives are
 \begin{gather}
 \pfrac{b_0}{e}=-G_0h_0c_h\sqrt{\dfrac{p_{at}}{p}},\qquad
-\pfrac{b_0}{p}=-G_0h_0\left(1-c_he\right)\dfrac{\sqrt{pp_{at}}}{2p^2}.
+\pfrac{b_0}{p}=-G_0h_0\left(1-c_he\right)\dfrac{\sqrt{pp_{at}}}{2p^2}=-\dfrac{b_0}{2p}.
 \end{gather}
+Hence,
+\begin{align}
+\pfrac{h}{p}&=\pfrac{b_0}{p}\exp\left(h_1\left(\mathbold{\alpha}_{in}:\mathbold{n}-\mathbold{\alpha}:\mathbold{n}\right)\right),\\
+\pfrac{h}{\mathbold{s}}&=hh_1\left(\mathbold{\alpha}_{in}-\mathbold{\alpha}\right):n_s,\\
+\pfrac{h}{\mathbold{\alpha}}&=hh_1\left(\left(\mathbold{\alpha}_{in}-\mathbold{\alpha}\right):n_a-\mathbold{n}:\mathbf{I}\right).
+\end{align}
 \section{Fabric Effect}
 The fabric tensor changes when $\Delta\varepsilon^p_v$ is positive,
 \begin{gather}
-\Delta\mathbold{z}=\left\{\begin{array}{ll}
--c_z\Delta\varepsilon^p_v\left(z_m\mathbold{n}+\mathbold{z}\right),&\Delta\varepsilon^p_v>0,\\
-0,&\Delta\varepsilon^p_v\leqslant0.
-\end{array}\right.
+\Delta\mathbold{z}=-c_z\left\langle\Delta\varepsilon^p_v\right\rangle\left(z_m\mathbold{n}+\mathbold{z}\right)=-c_z\gamma\left\langle{}D\right\rangle\left(z_m\mathbold{n}+\mathbold{z}\right).
 \end{gather}
 \section{Residual}
 The are five local residual equations.
@@ -188,18 +193,16 @@ The are five local residual equations.
 \big|\mathbold{\eta}\big|+mp,\\[2mm]
 p-p_n+K\left(\gamma{}D-\Delta\varepsilon_v\right),\\[2mm]
 \mathbold{s}-\mathbold{s}_n+2G\left(\gamma\mathbold{n}-\Delta\mathbold{e}\right),\\[2mm]
-\mathbold{\alpha}-\mathbold{\alpha}_n+\gamma{}b_0\left(\mathbold{\alpha}-\left(\alpha^b-m\right)\mathbold{n}\right),\\[2mm]
+\mathbold{\alpha}-\mathbold{\alpha}_n+\gamma{}h\left(\mathbold{\alpha}-\left(\alpha^b-m\right)\mathbold{n}\right),\\[2mm]
 \mathbold{z}-\mathbold{z}_n+c_z\gamma{}\left\langle{}D\right\rangle\left(z_m\mathbold{n}+\mathbold{z}\right).
 \end{array}
 \right.
 \end{gather}
 \section{Local Iteration}
 By choosing $\mathbold{x}=\begin{bmatrix}\gamma&p&\mathbold{s}&\mathbold{\alpha}&\mathbold{z}\end{bmatrix}^\mT$, the Jacobian consists of the entries that can be listed as follows.
-
-
 \begin{tiny}
-\begin{gather}
-\mathbold{J}=\begin{bmatrix}
+\begin{gather*}
+\begin{bmatrix}
 \cdot&
 \eta_p+m&
 \eta_s&
@@ -215,10 +218,10 @@ DK&
 \mathbf{I}+2G\gamma{}n_s&
 2G\gamma{}n_\alpha&
 \cdot\\[8mm]
-b_0\left(\mathbold{\alpha}-\alpha^{bm}\mathbold{n}\right)&
-\gamma{}\pfrac{b_0}{p}\left(\mathbold{\alpha}-\alpha^{bm}\mathbold{n}\right)-\gamma{}b_0\left(\pfrac{\alpha^b}{p}\mathbold{n}+\alpha^{bm}n_p\right)&
--\gamma{}b_0\alpha^{bm}n_s&
-\left(1+\gamma{}b_0\right)\mathbf{I}-\gamma{}b_0\alpha^{bm}n_\alpha&
+h\left(\mathbold{\alpha}-\alpha^{bm}\mathbold{n}\right)&
+\gamma{}\pfrac{h}{p}\left(\mathbold{\alpha}-\alpha^{bm}\mathbold{n}\right)-\gamma{}h\left(\pfrac{\alpha^b}{p}\mathbold{n}+\alpha^{bm}n_p\right)&
+\gamma\left(\mathbold{\alpha}-\alpha^{bm}\mathbold{n}\right)\pfrac{h}{\mathbold{s}}-\gamma{}h\alpha^{bm}n_s&
+\left(1+\gamma{}h\right)\mathbf{I}+\gamma\left(\mathbold{\alpha}-\alpha^{bm}\mathbold{n}\right)\pfrac{h}{\mathbold{\alpha}}-\gamma{}h\alpha^{bm}n_a&
 \cdot\\[8mm]
 c_z\left\langle{}D\right\rangle{}\mathbold{z}_z&
 c_z\gamma{}\pfrac{\left\langle{}D\right\rangle}{p}\mathbold{z}_z+c_z\gamma{}\left\langle{}D\right\rangle{}z_m{}n_p&
@@ -226,20 +229,20 @@ c_z\gamma{}\mathbold{z}_z\pfrac{\left\langle{}D\right\rangle}{\mathbold{s}}+c_z\
 c_z\gamma{}\mathbold{z}_z\pfrac{\left\langle{}D\right\rangle}{\mathbold{\alpha}}+c_z\gamma{}\left\langle{}D\right\rangle{}z_mn_\alpha&
 \left(1+c_z\gamma{}\left\langle{}D\right\rangle\right)\mathbf{I}+c_z\gamma{}\mathbold{z}_z\pfrac{\left\langle{}D\right\rangle}{\mathbold{z}}
 \end{bmatrix}.
-\end{gather}
+\end{gather*}
 \end{tiny}
 In which,
 \begin{gather}
-\alpha^{bm}=\alpha_b-m,\\
+\alpha^{bm}=\alpha^b-m,\\
 \mathbold{z}_z=z_m\mathbold{n}+\mathbold{z}.
 \end{gather}
 \section{Consistent Tangent Operator}
-\begin{gather}
-\pfrac{R_2}{\mathbold{\varepsilon}^{tr}}=\pfrac{K}{\mathbold{\varepsilon}^{tr}}\left(\gamma{}D-\Delta\varepsilon_v\right)+K\left(\gamma{}\pfrac{D}{\mathbold{\varepsilon}^{tr}}-I\right),\\
-\pfrac{R_3}{\mathbold{\varepsilon}^{tr}}=2\pfrac{G}{\mathbold{\varepsilon}^{tr}}\left(\gamma\mathbold{n}-\Delta\mathbold{e}\right)-2GI_d,\\
-\pfrac{R_4}{\mathbold{\varepsilon}^{tr}}=\gamma{}\left(\mathbold{\alpha}-\left(\alpha^b-m\right)\mathbold{n}\right)\pfrac{b_0}{\mathbold{\varepsilon}^{tr}}-\gamma{}b_0\mathbold{n}\pfrac{\alpha^b}{\mathbold{\varepsilon}^{tr}},\\
-\pfrac{R_5}{\mathbold{\varepsilon}^{tr}}=c_z\gamma{}\left(z_m\mathbold{n}+\mathbold{z}\right)\pfrac{\left\langle{}D\right\rangle}{\mathbold{\varepsilon}^{tr}}.
-\end{gather}
+\begin{align}
+\pfrac{R_2}{\mathbold{\varepsilon}^{tr}}&=\pfrac{K}{\mathbold{\varepsilon}^{tr}}\left(\gamma{}D-\Delta\varepsilon_v\right)+K\left(\gamma{}\pfrac{D}{\mathbold{\varepsilon}^{tr}}-I\right),\\[2mm]
+\pfrac{R_3}{\mathbold{\varepsilon}^{tr}}&=2\pfrac{G}{\mathbold{\varepsilon}^{tr}}\left(\gamma\mathbold{n}-\Delta\mathbold{e}\right)-2GI_d,\\[2mm]
+\pfrac{R_4}{\mathbold{\varepsilon}^{tr}}&=\gamma{}\left(\mathbold{\alpha}-\alpha^{bm}\mathbold{n}\right)\pfrac{h}{\mathbold{\varepsilon}^{tr}}-\gamma{}h\mathbold{n}\pfrac{\alpha^b}{\mathbold{\varepsilon}^{tr}},\\[2mm]
+\pfrac{R_5}{\mathbold{\varepsilon}^{tr}}&=c_z\gamma{}\left(z_m\mathbold{n}+\mathbold{z}\right)\pfrac{\left\langle{}D\right\rangle}{\mathbold{\varepsilon}^{tr}}.
+\end{align}
 
 Then,
 \begin{gather}

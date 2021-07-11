@@ -1576,12 +1576,12 @@ void new_dafaliasmanzari(unique_ptr<Material>& return_obj, istringstream& comman
 		return;
 	}
 
-	vec p(std::initializer_list<double>{125., .05, 1.25, .02, .9, .7, .01, 7., .9, 1.1, -.7, 3.5, 4., 6E2, -130., .2, 0.});
+	vec p(std::initializer_list<double>{125., .05, 1.25, .02, .9, .7, .01, 7., .1, .9, 1.1, -.7, 3.5, 4., 6E2, -130., .2, 0.});
 
 	auto idx = 0;
-	while(!command.eof() && idx < 17) if(double para; get_input(command, para)) p(idx++) = para;
+	while(!command.eof() && idx < 18) if(double para; get_input(command, para)) p(idx++) = para;
 
-	return_obj = make_unique<DafaliasManzari>(tag, p(0), p(1), p(2), p(3), p(4), p(5), p(6), p(7), p(8), p(9), p(10), p(11), p(12), p(13), p(14), p(15), p(16));
+	return_obj = make_unique<DafaliasManzari>(tag, p(0), p(1), p(2), p(3), p(4), p(5), p(6), p(7), p(8), p(9), p(10), p(11), p(12), p(13), p(14), p(15), p(16), p(17));
 }
 
 void new_flag01(unique_ptr<Material>& return_obj, istringstream& command) {

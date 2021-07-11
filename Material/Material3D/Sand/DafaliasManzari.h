@@ -40,6 +40,7 @@ struct DataDafaliasManzari {
 	const double xi = .7;
 	const double m = .01;
 	const double h0 = 7.;
+	const double h1 = .1;
 	const double ch = .9;
 	const double nb = 1.1;
 	const double a = -.7;
@@ -69,6 +70,7 @@ public:
 	                double,     // xi
 	                double,     // m
 	                double,     // h0
+	                double,     // h1
 	                double,     // ch
 	                double,     // nb
 	                double,     // a
