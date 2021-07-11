@@ -101,7 +101,7 @@ The bounding surface is defined as
 
 The corresponding derivatives are
 \begin{gather}
-\pfrac{\alpha^d}{\psi}=n^d\alpha_d,\qquad\pfrac{\alpha^b}{\psi}=-n^b\alpha_b.
+\pfrac{\alpha^d}{\psi}=n^d\alpha^d,\qquad\pfrac{\alpha^b}{\psi}=-n^b\alpha_b.
 \end{gather}
 \section{Yield Function}
 A wedge-like function is chosen to be the yield surface.
@@ -137,20 +137,20 @@ A non-associated plastic flow is used, the corresponding flow rule is defined as
 \end{gather}
 where $D$ is the dilatancy parameter.
 \begin{gather}
-D=A_d\left(\alpha_d-m-\mathbold{\alpha}:\mathbold{n}\right)=A_0\left(1+\left\langle\mathbold{z}:\mathbold{n}\right\rangle\right)\left(\alpha_d-m-\mathbold{\alpha}:\mathbold{n}\right).
+D=A_d\left(\alpha^d-m-\mathbold{\alpha}:\mathbold{n}\right)=A_0\left(1+\left\langle\mathbold{z}:\mathbold{n}\right\rangle\right)\left(\alpha^d-m-\mathbold{\alpha}:\mathbold{n}\right).
 \end{gather}
 
 For $\mathbold{z}:\mathbold{n}\geqslant0$,
 \begin{align}
-\pfrac{D}{p}&=A_0\left(\alpha_d-m-\mathbold{\alpha}:\mathbold{n}\right)\left(\mathbold{z}:n_p\right)+A_0\left(1+\mathbold{z}:\mathbold{n}\right)\left(\pfrac{\alpha_d}{p}-\mathbold{\alpha}:n_p\right),\\
-\pfrac{D}{\mathbold{s}}&=A_0\left(\alpha_d-m-\mathbold{\alpha}:\mathbold{n}\right)\left(\mathbold{z}:n_s\right)-A_0\left(1+\mathbold{z}:\mathbold{n}\right)\left(\mathbold{\alpha}:n_s\right),\\
-\pfrac{D}{\mathbold{\alpha}}&=A_0\left(\alpha_d-m-\mathbold{\alpha}:\mathbold{n}\right)\left(\mathbold{z}:n_\alpha\right)-A_0\left(1+\mathbold{z}:\mathbold{n}\right)\left(\mathbold{\alpha}:n_\alpha+\mathbold{n}:\mathbf{I}\right),\\
-\pfrac{D}{\mathbold{z}}&=A_0\left(\alpha_d-m-\mathbold{\alpha}:\mathbold{n}\right)\left(\mathbold{n}:\mathbf{I}\right).
+\pfrac{D}{p}&=A_0\left(\alpha^d-m-\mathbold{\alpha}:\mathbold{n}\right)\left(\mathbold{z}:n_p\right)+A_0\left(1+\mathbold{z}:\mathbold{n}\right)\left(\pfrac{\alpha^d}{p}-\mathbold{\alpha}:n_p\right),\\
+\pfrac{D}{\mathbold{s}}&=A_0\left(\alpha^d-m-\mathbold{\alpha}:\mathbold{n}\right)\left(\mathbold{z}:n_s\right)-A_0\left(1+\mathbold{z}:\mathbold{n}\right)\left(\mathbold{\alpha}:n_s\right),\\
+\pfrac{D}{\mathbold{\alpha}}&=A_0\left(\alpha^d-m-\mathbold{\alpha}:\mathbold{n}\right)\left(\mathbold{z}:n_\alpha\right)-A_0\left(1+\mathbold{z}:\mathbold{n}\right)\left(\mathbold{\alpha}:n_\alpha+\mathbold{n}:\mathbf{I}\right),\\
+\pfrac{D}{\mathbold{z}}&=A_0\left(\alpha^d-m-\mathbold{\alpha}:\mathbold{n}\right)\left(\mathbold{n}:\mathbf{I}\right).
 \end{align}
 
 For $\mathbold{z}:\mathbold{n}<0$,
 \begin{align}
-\pfrac{D}{p}&=A_0\left(\pfrac{\alpha_d}{p}-\mathbold{\alpha}:n_p\right),\\
+\pfrac{D}{p}&=A_0\left(\pfrac{\alpha^d}{p}-\mathbold{\alpha}:n_p\right),\\
 \pfrac{D}{\mathbold{s}}&=-A_0\left(\mathbold{\alpha}:n_s\right),\\
 \pfrac{D}{\mathbold{\alpha}}&=-A_0\left(\mathbold{\alpha}:n_\alpha+\mathbold{n}:\mathbf{I}\right),\\
 \pfrac{D}{\mathbold{z}}&=\mathbold{0}.

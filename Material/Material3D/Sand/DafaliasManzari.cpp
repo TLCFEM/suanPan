@@ -149,7 +149,7 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
 	vec n, zz, aabmn;
 	auto gamma = 0.;
-	double padpe, pabpe, d, pdpe, h, phpe;
+	double pabpe, d, pdpe, h, phpe;
 	auto update_ini_alpha = false;
 
 	while(true) {
@@ -178,7 +178,7 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 		const auto adm = ad - m;
 		const auto abm = ab - m;
 
-		padpe = nd * ad;
+		auto padpe = nd * ad;
 		pabpe = -nb * ab;
 		const auto padpp = padpe * ppsipp;
 		const auto pabpp = pabpe * ppsipp;
