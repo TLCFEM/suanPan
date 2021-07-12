@@ -27,7 +27,7 @@ const span DafaliasManzari::sm(14, 19);
 const mat DafaliasManzari::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 DafaliasManzari::DafaliasManzari(const unsigned T, const double G0, const double NU, const double AC, const double LC, const double E0, const double XI, const double M, const double H0, const double H1, const double CH, const double NB, const double A, const double ND, const double ZM, const double CZ, const double PC, const double GR, const double R)
-	: DataDafaliasManzari{fabs(G0), fabs(NU), fabs(AC), fabs(LC), fabs(E0), fabs(XI), fabs(M), fabs(H0), fabs(H1), fabs(CH), fabs(NB), -fabs(A), fabs(ND), fabs(ZM), fabs(CZ), -fabs(PC), fabs(GR)}
+	: DataDafaliasManzari{fabs(G0), fabs(NU), fabs(AC), fabs(LC), fabs(E0), fabs(XI), fabs(M), fabs(H0), fabs(H1), fabs(CH), fabs(NB), A, fabs(ND), fabs(ZM), fabs(CZ), -fabs(PC), fabs(GR)}
 	, Material3D(T, R) { access::rw(tolerance) = 1E-12; }
 
 void DafaliasManzari::initialize(const shared_ptr<DomainBase>&) {
@@ -124,7 +124,10 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
 		if(!solve(right, jacobian, left)) return SUANPAN_FAIL;
 
-		trial_stiffness = right.rows(sb) + tensor::unit_tensor2 * right.row(sa);
+		trial_stiffness = right.rows(sb);
+		trial_stiffness.row(0) += right.row(sa);
+		trial_stiffness.row(1) += right.row(sa);
+		trial_stiffness.row(2) += right.row(sa);
 
 		return SUANPAN_SUCCESS;
 	}
@@ -155,23 +158,27 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 	while(true) {
 		if(max_iteration == ++counter) return SUANPAN_FAIL;
 
-		auto sqrt_term = shear_modulus * sqrt(std::max(datum::eps, pc * p));
+		// shear modulus
 
-		g = sqrt_term * v_term_a;
+		auto tmp_term = shear_modulus * sqrt(std::max(datum::eps, pc * p));
+		g = tmp_term * v_term_a;
 
 		if(g > gi) {
-			pgpe = sqrt_term * v_term_b;
+			pgpe = tmp_term * v_term_b;
 			pgpp = .5 * g / p;
 		}
 		else {
 			g = gi;
-			pgpe = 0.;
-			pgpp = 0.;
+			pgpe = pgpp = 0.;
 		}
 
-		const auto power_term = lc * pow(std::max(datum::eps, p / pc), xi);
-		const auto psi = void_ratio - e0 + power_term;
-		const auto ppsipp = xi * power_term / p;
+		// state parameter
+
+		tmp_term = lc * pow(std::max(datum::eps, p / pc), xi);
+		const auto psi = void_ratio - e0 + tmp_term;
+		const auto ppsipp = xi * tmp_term / p;
+
+		// surface
 
 		const auto ad = ac * exp(nd * psi);
 		const auto ab = ac * exp(-nb * psi);
@@ -185,6 +192,8 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 		padpe *= 1. + e0;
 		pabpe *= 1. + e0;
 
+		// yield function
+
 		eta = s + p * alpha;
 		norm_eta = tensor::stress::norm(eta);
 
@@ -192,10 +201,12 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 		const vec unit_n = n % tensor::stress::norm_weight;
 		const vec unit_alpha = alpha % tensor::stress::norm_weight;
 		const auto alpha_n = dot(n, unit_alpha);
-		aabmn = alpha - adm * n;
+		aabmn = alpha - abm * n;
 
 		const vec np = (alpha - alpha_n * n) / norm_eta;
 		const mat ns = (eye(6, 6) - n * unit_n.t()) / norm_eta;
+
+		// dilatancy
 
 		const vec unit_z = z % tensor::stress::norm_weight;
 		const auto zn = dot(n, unit_z);
@@ -223,27 +234,31 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 			pdpz.zeros(6);
 		}
 
-		sqrt_term = shear_modulus * h0 * sqrt(std::max(datum::eps, pc / p));
-		const auto b0 = sqrt_term * (1. - ch * void_ratio);
-		const auto pb0pe = -ch * sqrt_term * (1. + e0);
+		// hardening
+
+		tmp_term = shear_modulus * h0 * sqrt(std::max(datum::eps, pc / p));
+		const auto b0 = tmp_term * (1. - ch * void_ratio);
+		const auto pb0pe = -ch * tmp_term * (1. + e0);
 		const auto pb0pp = -.5 * b0 / p;
 
 		update_ini_alpha = false;
 		vec diff_alpha = (ini_alpha - alpha) % tensor::stress::norm_weight;
-		sqrt_term = exp(h1 * dot(diff_alpha, n));
+		tmp_term = exp(h1 * dot(diff_alpha, n));
 
-		if(sqrt_term > 1.) {
+		if(tmp_term > 1.) {
 			update_ini_alpha = true;
 			diff_alpha = (current_alpha - alpha) % tensor::stress::norm_weight;
-			sqrt_term = exp(h1 * dot(diff_alpha, n));
+			tmp_term = exp(h1 * dot(diff_alpha, n));
 		}
 
-		h = sqrt_term * b0;
+		h = tmp_term * b0;
 
-		phpe = sqrt_term * pb0pe;
-		const auto phpp = sqrt_term * pb0pp;
+		phpe = tmp_term * pb0pe;
+		const auto phpp = tmp_term * pb0pp;
 		const rowvec phps = h * h1 * diff_alpha.t() * ns;
 		const rowvec phpa = p * phps - h * h1 * unit_n.t();
+
+		// local iteration
 
 		residual(si) = norm_eta + m * p;
 		residual(sj) = p - current_p + pr * g * (gamma * d - incre_ev);
@@ -253,7 +268,7 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
 		jacobian(si, sj) = alpha_n + m;
 		jacobian(si, sk) = unit_n.t();
-		jacobian(si, sl) = p * unit_n.t();
+		jacobian(si, sl) = p * jacobian(si, sk);
 
 		const auto gk = gamma * pr * g;
 		jacobian(sj, si) = d * pr * g;
@@ -320,11 +335,15 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 	left.rows(sk) = 2. * g * unit_dev_tensor + 2. * pgpe * (incre_ed - gamma * n) * tensor::stress::norm_weight.t();
 	left.rows(sl) = (gamma * h * n * pabpe - gamma * aabmn * phpe) * tensor::stress::norm_weight.t();
 
-	d > 0. ? left.rows(sm) = -cz * gamma * zz * pdpe * tensor::stress::norm_weight.t() : left.rows(sm).zeros();
+	if(d > 0.) left.rows(sm) = -cz * gamma * pdpe * zz * tensor::stress::norm_weight.t();
+	else left.rows(sm).zeros();
 
 	if(!solve(right, jacobian, left)) return SUANPAN_FAIL;
 
-	trial_stiffness = right.rows(sk) + tensor::unit_tensor2 * right.row(sj);
+	trial_stiffness = right.rows(sk);
+	trial_stiffness.row(0) += right.row(sj);
+	trial_stiffness.row(1) += right.row(sj);
+	trial_stiffness.row(2) += right.row(sj);
 
 	if(update_ini_alpha) ini_alpha = current_alpha;
 
