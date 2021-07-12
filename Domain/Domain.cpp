@@ -967,7 +967,8 @@ int Domain::initialize() {
 int Domain::initialize_load() {
 	auto code = 0;
 
-	suanpan_for_each(load_pond.cbegin(), load_pond.cend(), [&](const std::pair<unsigned, shared_ptr<Load>>& t_load) { code += t_load.second->initialize(shared_from_this()); });
+	// cannot use parallel for due to potential racing in reference dof
+	std::for_each(load_pond.cbegin(), load_pond.cend(), [&](const std::pair<unsigned, shared_ptr<Load>>& t_load) { code += t_load.second->initialize(shared_from_this()); });
 
 	load_pond.update();
 
@@ -977,7 +978,7 @@ int Domain::initialize_load() {
 int Domain::initialize_constraint() {
 	auto code = 0;
 
-	suanpan_for_each(constraint_pond.cbegin(), constraint_pond.cend(), [&](const std::pair<unsigned, shared_ptr<Constraint>>& t_constraint) { code += t_constraint.second->initialize(shared_from_this()); });
+	std::for_each(constraint_pond.cbegin(), constraint_pond.cend(), [&](const std::pair<unsigned, shared_ptr<Constraint>>& t_constraint) { code += t_constraint.second->initialize(shared_from_this()); });
 
 	constraint_pond.update();
 

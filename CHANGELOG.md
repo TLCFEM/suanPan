@@ -8,6 +8,7 @@
 
 1. revise `SimpleSand` model
 2. add `DafaliasManzari` sand model
+3. bugfix: potential racing in initialising reference dof, change to serial initialisation
 
 ## version 1.6
 
