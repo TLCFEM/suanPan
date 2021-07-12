@@ -43,10 +43,11 @@ int NonlinearMises1D::update_trial_status(const vec& t_strain) {
 
 	if(auto yield_func = norm_shifted_stress - std::max(0., compute_k(plastic_strain)); yield_func >= 0.) {
 		const auto current_h = compute_h(plastic_strain);
-		auto gamma = 0., incre_h = 0., dkdh = 0.;
-		unsigned counter = 0;
+		auto gamma = 0., incre_h = 0.;
+		double dkdh;
+		auto counter = 0u;
 		while(true) {
-			if(++counter == max_iteration) {
+			if(max_iteration == ++counter) {
 				suanpan_error("NonlinearMises1D cannot converge in %u iterations.\n", max_iteration);
 				return SUANPAN_FAIL;
 			}

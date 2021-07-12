@@ -1,8 +1,8 @@
 set(M3D
-	Material3D/CamClay/BilinearCC.cpp
-	Material3D/CamClay/ExpCC.cpp
-	Material3D/CamClay/NonlinearCamClay.cpp
-	Material3D/CamClay/ParabolicCC.cpp
+	Material3D/Clay/CamClay/BilinearCC.cpp
+	Material3D/Clay/CamClay/ExpCC.cpp
+	Material3D/Clay/CamClay/NonlinearCamClay.cpp
+	Material3D/Clay/CamClay/ParabolicCC.cpp
 	Material3D/Concrete/CDP.cpp
 	Material3D/Concrete/NonlinearCDP.cpp
 	Material3D/Concrete/Rebar3D.cpp
