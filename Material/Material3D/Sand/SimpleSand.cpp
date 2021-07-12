@@ -23,7 +23,7 @@ const span SimpleSand::sd(8, 13);
 const mat SimpleSand::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 SimpleSand::SimpleSand(const unsigned T, const double E, const double V, const double M, const double A, const double H, const double AC, const double NB, const double ND, const double VC, const double PC, const double LC, const double V0, const double R)
-	: DataSimpleSand{E, V, fabs(M), -fabs(A), H, AC, fabs(NB), fabs(ND), fabs(VC), -fabs(PC), fabs(LC), fabs(V0)}
+	: DataSimpleSand{E, V, fabs(M), A, H, AC, fabs(NB), fabs(ND), fabs(VC), -fabs(PC), fabs(LC), fabs(V0)}
 	, Material3D(T, R) { access::rw(tolerance) = 1E-12; }
 
 void SimpleSand::initialize(const shared_ptr<DomainBase>&) {
@@ -47,21 +47,21 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
 
 	if(norm(incre_strain) <= tolerance) return SUANPAN_SUCCESS;
 
-	trial_stress = current_stress + (trial_stiffness = initial_stiffness) * incre_strain;
-
 	trial_history = current_history;
 	const vec current_alpha(&current_history(0), 6, false, true);
 	vec alpha(&trial_history(0), 6, false, true);
 
-	auto trial_s = tensor::dev(trial_stress);
-	auto trial_p = tensor::mean(trial_stress);
+	const auto state_const = v0 - vc + v0 * tensor::trace(trial_strain);
+
+	trial_stress = current_stress + (trial_stiffness = initial_stiffness) * incre_strain;
+
+	const auto trial_s = tensor::dev(trial_stress);
+	const auto trial_p = tensor::mean(trial_stress);
 	auto s = trial_s;
 	auto p = trial_p;
 
-	const auto state_const = v0 - vc + v0 * tensor::trace(trial_strain);
-
-	mat jacobian(14, 14);
-	vec residual(14), incre;
+	mat jacobian(14, 14, fill::none);
+	vec residual(14, fill::none), incre;
 
 	jacobian(sa, sa) = 0.;
 
@@ -69,7 +69,7 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
 	double alpha_d, alpha_b;
 	auto gamma = 0., ref_error = 1.;
 
-	unsigned counter = 0;
+	auto counter = 0u;
 
 	while(true) {
 		if(max_iteration == ++counter) return SUANPAN_FAIL;
@@ -80,7 +80,7 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
 
 		residual(sa) = norm_eta + m * p;
 
-		if(1 == counter && residual(0) < 0.) return SUANPAN_SUCCESS;
+		if(1 == counter && residual(sa) < 0.) return SUANPAN_SUCCESS;
 
 		const auto state = state_const + lc * log(p / pc);
 		alpha_d = ac * exp(nd * state);
@@ -97,23 +97,23 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
 
 		jacobian(sa, sb) = m + alpha_n;
 		jacobian(sa, sc) = unit_n.t();
-		jacobian(sa, sd) = p * unit_n.t();
+		jacobian(sa, sd) = p * jacobian(sa, sc);
 
 		jacobian(sb, sa) = bulk * a * (alpha_d_m - alpha_n);
 		jacobian(sb, sb) = 1. + bulk * a * gamma * (alpha_d * nd * lc / p - (dot(alpha, unit_alpha) - alpha_n * alpha_n) / norm_eta);
 		jacobian(sb, sc) = bulk * a * gamma / norm_eta * (alpha_n * unit_n.t() - unit_alpha.t());
-		jacobian(sb, sd) = bulk * a * gamma / norm_eta * ((p * alpha_n - norm_eta) * unit_n.t() - p * unit_alpha.t());
+		jacobian(sb, sd) = p * jacobian(sb, sc) - bulk * a * gamma * unit_n.t();
 
 		jacobian(sc, sa) = double_shear * n;
 		jacobian(sc, sb) = double_shear * gamma / norm_eta * (alpha - alpha_n * n);
 		jacobian(sc, sc) = double_shear * gamma / norm_eta * eye(6, 6) - double_shear * gamma / norm_eta * n * unit_n.t();
-		jacobian(sc, sd) = jacobian(sc, sc) * p;
+		jacobian(sc, sd) = p * jacobian(sc, sc);
 		jacobian(sc, sc) += eye(6, 6);
 
 		jacobian(sd, sa) = h * alpha_b_m * n - h * alpha;
 		jacobian(sd, sb) = gamma * h * alpha_b_m / norm_eta * alpha - gamma * h * (alpha_b_m * alpha_n / norm_eta + alpha_b * nb * lc / p) * n;
 		jacobian(sd, sc) = gamma * h * alpha_b_m / norm_eta * eye(6, 6) - gamma * h * alpha_b_m / norm_eta * n * unit_n.t();
-		jacobian(sd, sd) = jacobian(sd, sc) * p - (gamma * h + 1.) * eye(6, 6);
+		jacobian(sd, sd) = p * jacobian(sd, sc) - (gamma * h + 1.) * eye(6, 6);
 
 		if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
@@ -121,7 +121,7 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
 
 		if(1 == counter) ref_error = std::max(1., error);
 		suanpan_debug("SimpleSand local iteration error: %.5E.\n", error /= ref_error);
-		if(error <= tolerance && norm(incre) <= tolerance) break;
+		if(error <= tolerance || norm(incre) <= tolerance) break;
 
 		gamma -= incre(sa);
 		p -= incre(sb);
@@ -131,7 +131,7 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
 
 	trial_stress = s + p * tensor::unit_tensor2;
 
-	mat left(14, 6), right;
+	mat left(14, 6, fill::none), right;
 
 	left.row(sa).zeros();
 	left.row(sb) = (bulk - bulk * a * gamma * alpha_d * nd * v0) * tensor::unit_tensor2.t();

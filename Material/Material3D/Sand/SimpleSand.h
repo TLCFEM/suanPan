@@ -17,9 +17,11 @@
 /**
  * @class SimpleSand
  * @brief The SimpleSand class.
+ *
+ * verified and approved by tlc @ 12/07/2021
  * 
  * @author tlc
- * @date 29/01/2020
+ * @date 12/07/2021
  * @version 0.1.0
  * @file SimpleSand.h
  * @addtogroup Material-3D
@@ -35,7 +37,7 @@ struct DataSimpleSand {
 	const double elastic_modulus; // elastic modulus
 	const double poissons_ratio;  // poisson's ratio
 	const double m = .01;
-	const double a = .7;
+	const double a = -.7;
 	const double h = 5.;
 	const double ac = 1.25;
 	const double nb = 1.1;
@@ -53,8 +55,8 @@ class SimpleSand final : DataSimpleSand, public Material3D {
 	static constexpr uword sa = 0, sb = 1;
 	static const span sc, sd;
 
-	const double shear = elastic_modulus / (2. + 2. * poissons_ratio);   // shear modulus
-	const double double_shear = elastic_modulus / (1. + poissons_ratio); // double shear
+	const double shear = elastic_modulus / (2. + 2. * poissons_ratio); // shear modulus
+	const double double_shear = 2. * shear;                            // double shear
 	const double bulk = elastic_modulus / (3. - 6. * poissons_ratio);
 public:
 	SimpleSand(unsigned,   // tag
