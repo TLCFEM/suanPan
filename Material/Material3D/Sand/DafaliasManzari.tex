@@ -1,7 +1,5 @@
 \documentclass[11pt,a4paper]{article}
-\usepackage{amsmath}
-\usepackage{amsfonts}
-\usepackage{amssymb,mathpazo,lscape}
+\usepackage{amsmath,amsfonts,amssymb,mathpazo,lscape}
 \usepackage[margin=25mm]{geometry}
 \newcommand*{\md}[1]{\mathrm{d}#1}
 \newcommand*{\mT}{\mathrm{T}}
@@ -9,7 +7,6 @@
 \newcommand*{\dev}[1]{\mathrm{dev}~#1}
 \newcommand*{\ddfrac}[2]{\dfrac{\md#1}{\md#2}}
 \newcommand*{\pfrac}[2]{\dfrac{\partial#1}{\partial#2}}
-%opening
 \title{Dafalias--Manzari Sand Model}
 \author{tlc}
 \setlength\parindent{0pt}\setlength{\parskip}{1em}
@@ -74,7 +71,7 @@ p-p_n-K\Delta\varepsilon_v,\\
 The Jacobian can be expressed as
 \begin{gather}
 \mathbold{J}=\begin{bmatrix}
-1-\Delta\varepsilon_v\dfrac{2}{3}\dfrac{1+\nu}{1-2\nu}\pfrac{G}{p}&\mathbold{0}\\[4mm]
+1-\Delta\varepsilon_v\dfrac{2+2\nu}{3-6\nu}\pfrac{G}{p}&\mathbold{0}\\[4mm]
 -2\Delta{}\mathbold{e}\pfrac{G}{p}&\mathbf{I}
 \end{bmatrix}.
 \end{gather}
@@ -155,6 +152,8 @@ For $\mathbold{z}:\mathbold{n}<0$,
 \pfrac{D}{\mathbold{\alpha}}&=-A_0\left(\mathbold{\alpha}:n_\alpha+\mathbold{n}:\mathbf{I}\right),\\
 \pfrac{D}{\mathbold{z}}&=\mathbold{0}.
 \end{align}
+
+Note due to the change of sign convention, a negative $D$ leads to contractive response. Thus, $A_0$ often needs to be negative.
 \section{Hardening Rule}
 The evolution rate of the back stress ratio $\mathbold{\alpha}$ is defined in terms of a proper distance measure from the bounding surface,
 \begin{gather}
@@ -186,7 +185,7 @@ The fabric tensor changes when $\Delta\varepsilon^p_v$ is positive,
 \begin{gather}
 \Delta\mathbold{z}=c_z\left\langle\Delta\varepsilon^p_v\right\rangle\left(z_m\mathbold{n}-\mathbold{z}\right)=c_z\gamma\left\langle{}D\right\rangle\left(z_m\mathbold{n}-\mathbold{z}\right).
 \end{gather}
-The sign is flipped1 compared to the original definition for consistency with other parts.
+The sign is flipped compared to the original definition for consistency with other parts.
 \section{Residual}
 The are five local residual equations.
 \begin{gather}
