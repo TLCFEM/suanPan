@@ -19,7 +19,7 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
-vec ParticleCollision::get_postion(const shared_ptr<Node>& node) const {
+vec ParticleCollision::get_position(const shared_ptr<Node>& node) const {
 	vec pos(num_dof, fill::zeros);
 
 	auto& coor = node->get_coordinate();
@@ -48,7 +48,7 @@ void ParticleCollision::apply_contact(const shared_ptr<DomainBase>& D, const sha
 	const auto& dof_i = node_i->get_reordered_dof();
 	const auto& dof_j = node_j->get_reordered_dof();
 
-	vec diff_pos = get_postion(node_j) - get_postion(node_i);
+	vec diff_pos = get_position(node_j) - get_position(node_i);
 	const auto diff_norm = norm(diff_pos);
 
 	diff_pos /= diff_norm;

@@ -38,7 +38,7 @@ int ParticleCollision3D::process_meta(const shared_ptr<DomainBase>& D, const boo
 	decltype(list.size()) counter = 0;
 	for(auto& I : node_pool) {
 		if(norm(I->get_trial_velocity()) * W->get_incre_time() > space) suanpan_warning("the maximum particle speed seems to be too large, please decrease time increment.\n");
-		const auto new_pos = get_postion(I);
+		const auto new_pos = get_position(I);
 		list[counter].x = static_cast<int>(floor(new_pos(0) / space));
 		list[counter].y = static_cast<int>(floor(new_pos(1) / space));
 		list[counter].z = static_cast<int>(floor(new_pos(2) / space));
