@@ -106,9 +106,6 @@
     <Filter Include="Material\Material3D">
       <UniqueIdentifier>{a6d1eced-dc79-4d8a-8fff-35561da4d616}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Material\Material3D\CamClay">
-      <UniqueIdentifier>{57346d38-fa91-4b83-b970-c3a8d49e1c9e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Material\Material3D\Concrete">
       <UniqueIdentifier>{eced40c9-e78c-44c8-8f97-9c9834b8762b}</UniqueIdentifier>
     </Filter>
@@ -165,6 +162,12 @@
     </Filter>
     <Filter Include="UnitTest">
       <UniqueIdentifier>{03aa814f-b4a8-4b97-9941-9ac56e416da9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material\Material3D\Clay">
+      <UniqueIdentifier>{556c8483-725c-4046-bd1c-87407775e812}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material\Material3D\Clay\CamClay">
+      <UniqueIdentifier>{57346d38-fa91-4b83-b970-c3a8d49e1c9e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -801,18 +804,6 @@
     <ClCompile Include="..\..\..\Material\Material3D\Material3D.cpp">
       <Filter>Material\Material3D</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Material\Material3D\CamClay\BilinearCC.cpp">
-      <Filter>Material\Material3D\CamClay</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Material\Material3D\CamClay\ExpCC.cpp">
-      <Filter>Material\Material3D\CamClay</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Material\Material3D\CamClay\NonlinearCamClay.cpp">
-      <Filter>Material\Material3D\CamClay</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Material\Material3D\CamClay\ParabolicCC.cpp">
-      <Filter>Material\Material3D\CamClay</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Material\Material3D\Concrete\CDP.cpp">
       <Filter>Material\Material3D\Concrete</Filter>
     </ClCompile>
@@ -1230,6 +1221,18 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Material\Material3D\Sand\DafaliasManzari.cpp">
       <Filter>Material\Material3D\Sand</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Clay\CamClay\BilinearCC.cpp">
+      <Filter>Material\Material3D\Clay\CamClay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Clay\CamClay\ExpCC.cpp">
+      <Filter>Material\Material3D\Clay\CamClay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Clay\CamClay\NonlinearCamClay.cpp">
+      <Filter>Material\Material3D\Clay\CamClay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Clay\CamClay\ParabolicCC.cpp">
+      <Filter>Material\Material3D\Clay\CamClay</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1923,18 +1926,6 @@
     <ClInclude Include="..\..\..\Material\Material3D\Material3D.h">
       <Filter>Material\Material3D</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Material\Material3D\CamClay\BilinearCC.h">
-      <Filter>Material\Material3D\CamClay</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Material\Material3D\CamClay\ExpCC.h">
-      <Filter>Material\Material3D\CamClay</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Material\Material3D\CamClay\NonlinearCamClay.h">
-      <Filter>Material\Material3D\CamClay</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Material\Material3D\CamClay\ParabolicCC.h">
-      <Filter>Material\Material3D\CamClay</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Material\Material3D\Concrete\CDP.h">
       <Filter>Material\Material3D\Concrete</Filter>
     </ClInclude>
@@ -2358,6 +2349,18 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material3D\Sand\DafaliasManzari.h">
       <Filter>Material\Material3D\Sand</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Clay\CamClay\BilinearCC.h">
+      <Filter>Material\Material3D\Clay\CamClay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Clay\CamClay\ExpCC.h">
+      <Filter>Material\Material3D\Clay\CamClay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Clay\CamClay\NonlinearCamClay.h">
+      <Filter>Material\Material3D\Clay\CamClay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Clay\CamClay\ParabolicCC.h">
+      <Filter>Material\Material3D\Clay\CamClay</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

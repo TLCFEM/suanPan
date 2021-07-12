@@ -1,0 +1,242 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb,mathpazo,lscape}
+\usepackage[margin=25mm]{geometry}
+\newcommand*{\md}[1]{\mathrm{d}#1}
+\newcommand*{\mT}{\mathrm{T}}
+\newcommand*{\tr}[1]{\mathrm{tr}~#1}
+\newcommand*{\dev}[1]{\mathrm{dev}~#1}
+\newcommand*{\ddfrac}[2]{\dfrac{\md#1}{\md#2}}
+\newcommand*{\pfrac}[2]{\dfrac{\partial#1}{\partial#2}}
+%opening
+\title{SANICLAY Model}
+\author{tlc}
+\setlength\parindent{0pt}\setlength{\parskip}{1em}
+\begin{document}
+\maketitle
+The implementation details of the SANICLAY model are documented. Compared to the original model, the Lode angle dependency is removed. Some constants are omitted.
+
+The continuum mechanics convention (tension positive) is adopted for consistency.
+\section{Hyperelasticity}
+The hyperelastic response is defined as
+\begin{gather}
+K=-p\dfrac{1+e_0}{\kappa},\qquad
+G=\dfrac{3-6\nu}{2+2\nu}K.
+\end{gather}
+The corresponding derivatives are
+\begin{gather}
+\pfrac{K}{p}=-1.
+\end{gather}
+
+The strain increment can be decomposed into elastic and plastic parts.
+\begin{gather}
+\mathbold{\varepsilon}^{tr}=\mathbold{\varepsilon}_n+\Delta\mathbold{\varepsilon}=\mathbold{\varepsilon}_n+\Delta\mathbold{\varepsilon}^{e}+\Delta\mathbold{\varepsilon}^{p}.
+\end{gather}
+As such, the stress increment can be expressed accordingly,
+\begin{gather}
+\mathbold{\sigma}=\mathbold{\sigma}_n+\Delta\mathbold{\sigma}=\mathbold{\sigma}_n+2G\left(\Delta{}\mathbold{e}-\Delta{}\mathbold{e}^{p}\right)+K\left(\Delta\varepsilon_v-\Delta\varepsilon_v^p\right)\mathbold{I}.
+\end{gather}
+
+In derivatoric and spherical components,
+\begin{gather}
+\mathbold{\sigma}=\mathbold{s}+p\mathbold{I},\\
+p=p_n+K\left(\Delta\varepsilon_v-\Delta\varepsilon_v^p\right),\\
+\mathbold{s}=\mathbold{s}_n+2G\left(\Delta{}\mathbold{e}-\Delta{}\mathbold{e}^{p}\right),
+\end{gather}
+with
+\begin{gather}
+\Delta\mathbold{\varepsilon}=\Delta{}\mathbold{e}+\dfrac{1}{3}\Delta\varepsilon_v\mathbold{I},
+\end{gather}
+where $\mathbold{s}=\dev{\mathbold{\sigma}}$ is the deviatoric stress, $p=\dfrac{1}{3}\tr{\mathbold{\sigma}}$ is the hydrostatic stress.
+\section{Elastic Response}
+The trial state shall be computed assuming there is no plasticity. In which case,
+\begin{gather}
+p=p_n+K\Delta\varepsilon_v,\\
+\mathbold{s}=\mathbold{s}_n+2G\Delta{}\mathbold{e}.
+\end{gather}
+
+For hydrostatic stress $p$,
+\begin{gather}
+p=p_n-p\dfrac{1+e_0}{\kappa}\Delta\varepsilon_v,\qquad
+\left(1+\dfrac{1+e_0}{\kappa}\Delta\varepsilon_v\right)p=p_n,\qquad
+p=\dfrac{1}{1+\dfrac{1+e_0}{\kappa}\Delta\varepsilon_v}p_n.
+\end{gather}
+This leads to
+\begin{gather}
+\mathbold{s}=\mathbold{s}_n-2\dfrac{3-6\nu}{2+2\nu}\dfrac{1+e_0}{\kappa}p\Delta{}\mathbold{e}.
+\end{gather}
+\section{Critical State}
+The critical state parameter is chosen as
+\begin{gather}
+\psi=e-e_0+\lambda_c\left(\dfrac{p}{p_{at}}\right)^\xi.
+\end{gather}
+The derivatives are
+\begin{gather}
+\pfrac{\psi}{e}=1,\qquad
+\pfrac{\psi}{p}=\lambda_c\xi\left(\dfrac{p}{p_{at}}\right)^{\xi-1}\dfrac{1}{p_{at}}.
+\end{gather}
+
+The dilatancy surface is defined as
+\begin{gather}
+\alpha^d=\alpha^c\exp\left(n^d\psi\right).
+\end{gather}
+
+The bounding surface is defined as
+\begin{gather}
+\alpha^b=\alpha^c\exp\left(-n^b\psi\right).
+\end{gather}
+
+The corresponding derivatives are
+\begin{gather}
+\pfrac{\alpha^d}{\psi}=n^d\alpha^d,\qquad\pfrac{\alpha^b}{\psi}=-n^b\alpha_b.
+\end{gather}
+\section{Yield Function}
+A wedge-like function is chosen to be the yield surface.
+\begin{gather}
+F=\big|\mathbold{s}+p\mathbold{\alpha}\big|+mp=\big|\mathbold{\eta}\big|+mp,
+\end{gather}
+where $\alpha$ is the so called back stress ratio and $m$ characterises the size of the wedge. For simplicity, $m$ is assumed to be a constant in this model.
+
+By denoting $\mathbold{\eta}=\mathbold{s}+p\mathbold{\alpha}$, the directional unit tensor is defined as
+\begin{gather}
+\mathbold{n}=\dfrac{\mathbold{\eta}}{\big|\mathbold{\eta}\big|}.
+\end{gather}
+
+According to tensor algebra, the following expressions can be derived.
+\begin{gather*}
+\pfrac{|\mathbold{\eta}|}{}=\mathbold{n}:\pfrac{\mathbold{\eta}}{},\qquad
+\pfrac{\mathbold{n}}{}=\dfrac{1}{|\mathbold{\eta}|}\left(\pfrac{\mathbold{\eta}}{}-\mathbold{n}\otimes\left(\mathbold{n}:\pfrac{\mathbold{\eta}}{}\right)\right).
+\end{gather*}
+Hence,
+\begin{gather*}
+\pfrac{|\mathbold{\eta}|}{p}=\eta_p=\mathbold{n}:\mathbold{\alpha},\qquad
+\pfrac{\mathbold{n}}{p}=n_p=\dfrac{1}{|\mathbold{\eta}|}\left(\mathbold{\alpha}-\left(\mathbold{n}:\mathbold{\alpha}\right)\mathbold{n}\right),\\
+\pfrac{|\mathbold{\eta}|}{\mathbold{s}}=\eta_s=\mathbold{n}:\mathbf{I},\qquad
+\pfrac{\mathbold{n}}{\mathbold{s}}=n_s=\dfrac{1}{|\mathbold{\eta}|}\left(\mathbf{I}-\mathbold{n}\otimes\left(\mathbold{n}:\mathbf{I}\right)\right),\\
+\pfrac{|\mathbold{\eta}|}{\mathbold{\alpha}}=\eta_\alpha=p\mathbold{n}:\mathbf{I},\qquad
+\pfrac{\mathbold{n}}{\mathbold{\alpha}}=n_\alpha=\dfrac{p}{|\mathbold{\eta}|}\left(\mathbf{I}-\mathbold{n}\otimes\left(\mathbold{n}:\mathbf{I}\right)\right).
+\end{gather*}
+
+\section{Flow Rule}
+A non-associated plastic flow is used, the corresponding flow rule is defined as follows.
+\begin{gather}
+\Delta\mathbold{\varepsilon}^p=\gamma\left(\mathbold{n}+\dfrac{1}{3}D\mathbold{I}\right),
+\end{gather}
+where $D$ is the dilatancy parameter.
+\begin{gather}
+D=A_d\left(\alpha^d-m-\mathbold{\alpha}:\mathbold{n}\right)=A_0\left(1+\left\langle\mathbold{z}:\mathbold{n}\right\rangle\right)\left(\alpha^d-m-\mathbold{\alpha}:\mathbold{n}\right).
+\end{gather}
+
+For $\mathbold{z}:\mathbold{n}\geqslant0$,
+\begin{align}
+\pfrac{D}{p}&=A_0\left(\alpha^d-m-\mathbold{\alpha}:\mathbold{n}\right)\left(\mathbold{z}:n_p\right)+A_0\left(1+\mathbold{z}:\mathbold{n}\right)\left(\pfrac{\alpha^d}{p}-\mathbold{\alpha}:n_p\right),\\
+\pfrac{D}{\mathbold{s}}&=A_0\left(\alpha^d-m-\mathbold{\alpha}:\mathbold{n}\right)\left(\mathbold{z}:n_s\right)-A_0\left(1+\mathbold{z}:\mathbold{n}\right)\left(\mathbold{\alpha}:n_s\right),\\
+\pfrac{D}{\mathbold{\alpha}}&=A_0\left(\alpha^d-m-\mathbold{\alpha}:\mathbold{n}\right)\left(\mathbold{z}:n_\alpha\right)-A_0\left(1+\mathbold{z}:\mathbold{n}\right)\left(\mathbold{\alpha}:n_\alpha+\mathbold{n}:\mathbf{I}\right),\\
+\pfrac{D}{\mathbold{z}}&=A_0\left(\alpha^d-m-\mathbold{\alpha}:\mathbold{n}\right)\left(\mathbold{n}:\mathbf{I}\right).
+\end{align}
+
+For $\mathbold{z}:\mathbold{n}<0$,
+\begin{align}
+\pfrac{D}{p}&=A_0\left(\pfrac{\alpha^d}{p}-\mathbold{\alpha}:n_p\right),\\
+\pfrac{D}{\mathbold{s}}&=-A_0\left(\mathbold{\alpha}:n_s\right),\\
+\pfrac{D}{\mathbold{\alpha}}&=-A_0\left(\mathbold{\alpha}:n_\alpha+\mathbold{n}:\mathbf{I}\right),\\
+\pfrac{D}{\mathbold{z}}&=\mathbold{0}.
+\end{align}
+\section{Hardening Rule}
+The evolution rate of the back stress ratio $\mathbold{\alpha}$ is defined in terms of a proper distance measure from the bounding surface,
+\begin{gather}
+\Delta\mathbold{\alpha}=\gamma{}h\left(\left(\alpha^b-m\right)\mathbold{n}-\mathbold{\alpha}\right),
+\end{gather}
+where $h$ controls the hardening rate,
+\begin{gather}
+h=b_0\exp\left(h_1\left(\mathbold{\alpha}_{in}:\mathbold{n}-\mathbold{\alpha}:\mathbold{n}\right)\right).
+\end{gather}
+The constant $\mathbold{\alpha}_{in}$ is updated whenever load reversal occurs.
+
+The parameter $b_0$ is defined as a function of current state,
+\begin{gather}
+b_0=G_0h_0\left(1-c_he\right)\sqrt{\dfrac{p_{at}}{p}}.
+\end{gather}
+The derivatives are
+\begin{gather}
+\pfrac{b_0}{e}=-G_0h_0c_h\sqrt{\dfrac{p_{at}}{p}},\qquad
+\pfrac{b_0}{p}=-G_0h_0\left(1-c_he\right)\dfrac{\sqrt{pp_{at}}}{2p^2}=-\dfrac{b_0}{2p}.
+\end{gather}
+Hence,
+\begin{align}
+\pfrac{h}{p}&=\pfrac{b_0}{p}\exp\left(h_1\left(\mathbold{\alpha}_{in}:\mathbold{n}-\mathbold{\alpha}:\mathbold{n}\right)\right),\\
+\pfrac{h}{\mathbold{s}}&=hh_1\left(\mathbold{\alpha}_{in}-\mathbold{\alpha}\right):n_s,\\
+\pfrac{h}{\mathbold{\alpha}}&=hh_1\left(\left(\mathbold{\alpha}_{in}-\mathbold{\alpha}\right):n_a-\mathbold{n}:\mathbf{I}\right).
+\end{align}
+\section{Fabric Effect}
+The fabric tensor changes when $\Delta\varepsilon^p_v$ is positive,
+\begin{gather}
+\Delta\mathbold{z}=c_z\left\langle\Delta\varepsilon^p_v\right\rangle\left(z_m\mathbold{n}-\mathbold{z}\right)=c_z\gamma\left\langle{}D\right\rangle\left(z_m\mathbold{n}-\mathbold{z}\right).
+\end{gather}
+The sign is flipped1 compared to the original definition for consistency with other parts.
+\section{Residual}
+The are five local residual equations.
+\begin{gather}
+\mathbold{R}=\left\{\begin{array}{ll}
+\big|\mathbold{\eta}\big|+mp,\\[2mm]
+p-p_n+K\left(\gamma{}D-\Delta\varepsilon_v\right),\\[2mm]
+\mathbold{s}-\mathbold{s}_n+2G\left(\gamma\mathbold{n}-\Delta\mathbold{e}\right),\\[2mm]
+\mathbold{\alpha}-\mathbold{\alpha}_n+\gamma{}h\left(\mathbold{\alpha}-\left(\alpha^b-m\right)\mathbold{n}\right),\\[2mm]
+\mathbold{z}-\mathbold{z}_n+c_z\gamma{}\left\langle{}D\right\rangle\left(\mathbold{z}-z_m\mathbold{n}\right).
+\end{array}
+\right.
+\end{gather}
+\section{Local Iteration}
+By choosing $\mathbold{x}=\begin{bmatrix}\gamma&p&\mathbold{s}&\mathbold{\alpha}&\mathbold{z}\end{bmatrix}^\mT$, the Jacobian consists of the entries that can be listed as follows.
+\begin{tiny}
+\begin{gather*}
+\begin{bmatrix}
+\cdot&
+\eta_p+m&
+\eta_s&
+\eta_\alpha&
+\cdot\\[8mm]
+DK&
+1+\pfrac{K}{p}\left(\gamma{}D-\Delta\varepsilon_v\right)+K\gamma\pfrac{D}{p}&
+\gamma{}K\pfrac{D}{\mathbold{s}}&
+\gamma{}K\pfrac{D}{\mathbold{\alpha}}&
+\gamma{}K\pfrac{D}{\mathbold{z}}\\[8mm]
+2G\mathbold{n}&
+2\pfrac{G}{p}\left(\gamma\mathbold{n}-\Delta\mathbold{e}\right)+2G\gamma{}n_p&
+\mathbf{I}+2G\gamma{}n_s&
+2G\gamma{}n_\alpha&
+\cdot\\[8mm]
+h\left(\mathbold{\alpha}-\alpha^{bm}\mathbold{n}\right)&
+\gamma{}\pfrac{h}{p}\left(\mathbold{\alpha}-\alpha^{bm}\mathbold{n}\right)-\gamma{}h\left(\pfrac{\alpha^b}{p}\mathbold{n}+\alpha^{bm}n_p\right)&
+\gamma\left(\mathbold{\alpha}-\alpha^{bm}\mathbold{n}\right)\pfrac{h}{\mathbold{s}}-\gamma{}h\alpha^{bm}n_s&
+\left(1+\gamma{}h\right)\mathbf{I}+\gamma\left(\mathbold{\alpha}-\alpha^{bm}\mathbold{n}\right)\pfrac{h}{\mathbold{\alpha}}-\gamma{}h\alpha^{bm}n_a&
+\cdot\\[8mm]
+c_z\left\langle{}D\right\rangle{}\mathbold{z}_z&
+c_z\gamma{}\pfrac{\left\langle{}D\right\rangle}{p}\mathbold{z}_z-c_z\gamma{}\left\langle{}D\right\rangle{}z_m{}n_p&
+c_z\gamma{}\mathbold{z}_z\pfrac{\left\langle{}D\right\rangle}{\mathbold{s}}-c_z\gamma{}\left\langle{}D\right\rangle{}z_mn_s&
+c_z\gamma{}\mathbold{z}_z\pfrac{\left\langle{}D\right\rangle}{\mathbold{\alpha}}-c_z\gamma{}\left\langle{}D\right\rangle{}z_mn_\alpha&
+\left(1+c_z\gamma{}\left\langle{}D\right\rangle\right)\mathbf{I}+c_z\gamma{}\mathbold{z}_z\pfrac{\left\langle{}D\right\rangle}{\mathbold{z}}
+\end{bmatrix}.
+\end{gather*}
+\end{tiny}
+In which,
+\begin{gather}
+\alpha^{bm}=\alpha^b-m,\\
+\mathbold{z}_z=\mathbold{z}-z_m\mathbold{n}.
+\end{gather}
+\section{Consistent Tangent Operator}
+\begin{align}
+\pfrac{R_2}{\mathbold{\varepsilon}^{tr}}&=\pfrac{K}{\mathbold{\varepsilon}^{tr}}\left(\gamma{}D-\Delta\varepsilon_v\right)+K\left(\gamma{}\pfrac{D}{\mathbold{\varepsilon}^{tr}}-I\right),\\[2mm]
+\pfrac{R_3}{\mathbold{\varepsilon}^{tr}}&=2\pfrac{G}{\mathbold{\varepsilon}^{tr}}\left(\gamma\mathbold{n}-\Delta\mathbold{e}\right)-2GI_d,\\[2mm]
+\pfrac{R_4}{\mathbold{\varepsilon}^{tr}}&=\gamma{}\left(\mathbold{\alpha}-\alpha^{bm}\mathbold{n}\right)\pfrac{h}{\mathbold{\varepsilon}^{tr}}-\gamma{}h\mathbold{n}\pfrac{\alpha^b}{\mathbold{\varepsilon}^{tr}},\\[2mm]
+\pfrac{R_5}{\mathbold{\varepsilon}^{tr}}&=c_z\gamma{}\mathbold{z}_z\pfrac{\left\langle{}D\right\rangle}{\mathbold{\varepsilon}^{tr}}.
+\end{align}
+
+Then,
+\begin{gather}
+\pfrac{\mathbold{x}}{\mathbold{\varepsilon}^{tr}}=-\mathbold{J}^{-1}\pfrac{\mathbold{R}}{\mathbold{\varepsilon}^{tr}}.
+\end{gather}
+
+Due to $\mathbold{\sigma}=\mathbold{s}+pI$, the stiffness can be assembled accordingly.
+\end{document}
