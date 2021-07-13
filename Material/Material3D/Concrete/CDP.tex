@@ -1,13 +1,16 @@
-\documentclass[10pt,fleqn,3p]{elsarticle}
-\usepackage{amsmath,amsfonts,amssymb,mathpazo,indentfirst}
+\documentclass[11pt,fleqn]{article}
+\usepackage{amsmath,amsfonts,amssymb,mathpazo,indentfirst,hyperref}
+\usepackage[margin=25mm]{geometry}
 \newcommand*{\md}[1]{\mathrm{d}#1}
 \newcommand*{\mT}{\mathrm{T}}
 \newcommand*{\tr}[1]{\mathrm{tr}#1}
 \newcommand*{\ddfrac}[2]{\dfrac{\md#1}{\md#2}}
 \newcommand*{\pfrac}[2]{\dfrac{\partial#1}{\partial#2}}
-\title{CDP Model}\date{}\author{tlc}
-\begin{document}\pagestyle{empty}
-This is a brief summary of the CDP model implemented in \texttt{suanPan}. For detailed theories, readers are recommended to check the original literature.
+\title{CDP Model}\author{tlc}
+\setlength{\parindent}{0pt}
+\begin{document}
+\maketitle
+This is a brief summary of the CDP model implemented in \texttt{suanPan}. For detailed theories, readers are recommended to check the original literature \href{https://doi.org/10.1061/(ASCE)0733-9399(1998)124:8(892)}{10.1061/(ASCE)0733-9399(1998)124:8(892)}.
 \section{Yield Function}
 The yield function is defined as
 \begin{gather}
@@ -80,11 +83,11 @@ The corresponding derivatives are
 \section{Residual}
 The yield function and the damage evolutions are three local equations shall be satisfied.
 \begin{gather}
-R\left\{
+R=\left\{
 \begin{array}{l}
-\alpha{}I_1^{tr}-9K\alpha\alpha_p\Delta\lambda+\sqrt{\dfrac{3}{2}}\left(|s^{tr}|-2G\Delta\lambda\right)+\beta\left<\sigma_1^{tr}-\Delta\lambda\left(2Gn_1+3K\alpha_p\right)\right>+\left(1-\alpha\right)\bar{f}_c=0,\\
-\kappa^t_n+r\dfrac{f_t}{g_t}(n_1+\alpha_p)\Delta\lambda-\kappa^t=0,\\
-\kappa^c_n+(1-r)\dfrac{f_c}{g_c}(n_3+\alpha_p)\Delta\lambda-\kappa^c=0.
+\alpha{}I_1^{tr}-9K\alpha\alpha_p\Delta\lambda+\sqrt{\dfrac{3}{2}}\left(|s^{tr}|-2G\Delta\lambda\right)+\beta\left<\sigma_1^{tr}-\Delta\lambda\left(2Gn_1+3K\alpha_p\right)\right>+\left(1-\alpha\right)\bar{f}_c,\\[4mm]
+\kappa^t_n+r\dfrac{f_t}{g_t}(n_1+\alpha_p)\Delta\lambda-\kappa^t,\\[4mm]
+\kappa^c_n+(1-r)\dfrac{f_c}{g_c}(n_3+\alpha_p)\Delta\lambda-\kappa^c.
 \end{array}
 \right.
 \end{gather}
@@ -92,6 +95,7 @@ R\left\{
 By choosing $x=\begin{bmatrix}
 \Delta\lambda&\kappa_t&\kappa_c
 \end{bmatrix}^\mT$ as independent variables and assuming $n=\dfrac{s^{tr}}{|s^{tr}|}$ that is a function of $\varepsilon^{tr}$ only thus does not contain $\Delta\lambda$, the Jacobian can be computed as
+\begin{small}
 \begin{gather*}
 J=\begin{bmatrix}
 -9K\alpha\alpha_p-\sqrt{6}G-\beta\left(2Gn_1+3K\alpha_p\right)H(\sigma_1)&\left\langle\sigma_1\right\rangle\pfrac{\beta}{\kappa_t}&(1-\alpha)\bar{f}_c'+\left\langle\sigma_1\right\rangle\pfrac{\beta}{\kappa_c}\\[4mm]
@@ -99,6 +103,7 @@ f_t\dfrac{n_1+\alpha_p}{g_t}(r+\Delta\lambda\pfrac{r}{\Delta\lambda})&r\Delta\la
 f_c\dfrac{n_3+\alpha_p}{g_c}(1-r-\Delta\lambda\pfrac{r}{\Delta\lambda})&\cdot&(1-r)\Delta\lambda\dfrac{n_3+\alpha_p}{g_c}f_c'-1
 \end{bmatrix},
 \end{gather*}
+\end{small}
 where
 \begin{gather*}
 \pfrac{\beta}{\kappa_t}=(1-\alpha)\dfrac{\bar{f}_c}{\bar{f}_t^2}\bar{f}_t',\qquad\pfrac{\beta}{\kappa_c}=(\alpha-1)\dfrac{1}{\bar{f}_t}\bar{f}_c'.
@@ -124,8 +129,8 @@ Taking derivatives with regard to trial strain of the residual equations gives
 \begin{gather}
 \pfrac{R}{\varepsilon^{tr}}=\left\{
 \begin{array}{l}
-3K\alpha{}I+\sqrt{6}Gn+\beta\ddfrac{\hat\sigma}{\bar\sigma}_t\pfrac{\bar\sigma}{\varepsilon^{tr}}H(\sigma),\\
-\dfrac{f_t}{g_t}\Delta\lambda\left(r\ddfrac{\hat\sigma}{\bar\sigma}_t\ddfrac{n}{e}+\left(n_1+\alpha_p\right)r'\ddfrac{\hat\sigma}{\bar\sigma}\pfrac{\bar\sigma}{\varepsilon^{tr}}\right),\\
+3K\alpha{}I+\sqrt{6}Gn+\beta\ddfrac{\hat\sigma}{\bar\sigma}_t\pfrac{\bar\sigma}{\varepsilon^{tr}}H(\sigma),\\[4mm]
+\dfrac{f_t}{g_t}\Delta\lambda\left(r\ddfrac{\hat\sigma}{\bar\sigma}_t\ddfrac{n}{e}+\left(n_1+\alpha_p\right)r'\ddfrac{\hat\sigma}{\bar\sigma}\pfrac{\bar\sigma}{\varepsilon^{tr}}\right),\\[4mm]
 \dfrac{f_c}{g_c}\Delta\lambda\left(\left(1-r\right)\ddfrac{\hat\sigma}{\bar\sigma}_c\ddfrac{n}{e}-\left(n_3+\alpha_p\right)r'\ddfrac{\hat\sigma}{\bar\sigma}\pfrac{\bar\sigma}{\varepsilon^{tr}}\right).
 \end{array}
 \right.
