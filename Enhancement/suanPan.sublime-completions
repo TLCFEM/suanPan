@@ -1375,6 +1375,8 @@
     "materialtestbyload3d",
     "materialtestbyloadwithbase3d",
     "materialtestwithbase3d",
+    "materialtestbystrainhistory",
+    "materialtestbystresshistory",
     "max_iteration",
     "max_step_size",
     "min_step_size",

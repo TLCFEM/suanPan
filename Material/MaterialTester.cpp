@@ -17,25 +17,31 @@
 
 #include "MaterialTester.h"
 
-mat material_tester(const shared_ptr<Material>& obj, const vector<unsigned>& idx, const vec& incre) {
+bool initialise_material(const shared_ptr<Material>& obj, const uword size) {
 	if(!obj->is_initialized()) {
 		obj->Material::initialize(nullptr);
 		obj->initialize(nullptr);
 		obj->set_initialized(true);
 	}
 
-	if(obj->get_material_type() == MaterialType::D1 && incre.n_elem != 1) {
-		suanpan_error("the tester cannot be appiled to the given material model.\n");
-		return {};
+	if(obj->get_material_type() == MaterialType::D1 && 1 != size) {
+		suanpan_error("the tester cannot be applied to the given material model.\n");
+		return false;
 	}
-	if(obj->get_material_type() == MaterialType::D2 && incre.n_elem != 3) {
-		suanpan_error("the tester cannot be appiled to the given material model.\n");
-		return {};
+	if(obj->get_material_type() == MaterialType::D2 && 3 != size) {
+		suanpan_error("the tester cannot be applied to the given material model.\n");
+		return false;
 	}
-	if(obj->get_material_type() == MaterialType::D3 && incre.n_elem != 6) {
-		suanpan_error("the tester cannot be appiled to the given material model.\n");
-		return {};
+	if(obj->get_material_type() == MaterialType::D3 && 6 != size) {
+		suanpan_error("the tester cannot be applied to the given material model.\n");
+		return false;
 	}
+
+	return true;
+}
+
+mat material_tester(const shared_ptr<Material>& obj, const vector<unsigned>& idx, const vec& incre) {
+	if(!initialise_material(obj, incre.n_elem)) return {};
 
 	unsigned total_size = 1;
 	for(const auto& I : idx) total_size += I;
@@ -71,24 +77,7 @@ mat material_tester(const shared_ptr<Material>& obj, const vector<unsigned>& idx
 }
 
 mat material_tester(const shared_ptr<Material>& obj, const vector<unsigned>& idx, const vec& incre, const vec& base) {
-	if(!obj->is_initialized()) {
-		obj->Material::initialize(nullptr);
-		obj->initialize(nullptr);
-		obj->set_initialized(true);
-	}
-
-	if(obj->get_material_type() == MaterialType::D1 && incre.n_elem != 1) {
-		suanpan_error("the tester cannot be appiled to the given material model.\n");
-		return {};
-	}
-	if(obj->get_material_type() == MaterialType::D2 && incre.n_elem != 3) {
-		suanpan_error("the tester cannot be appiled to the given material model.\n");
-		return {};
-	}
-	if(obj->get_material_type() == MaterialType::D3 && incre.n_elem != 6) {
-		suanpan_error("the tester cannot be appiled to the given material model.\n");
-		return {};
-	}
+	if(!initialise_material(obj, incre.n_elem)) return {};
 
 	unsigned total_size = 2;
 	for(const auto& I : idx) total_size += I;
@@ -131,24 +120,7 @@ mat material_tester(const shared_ptr<Material>& obj, const vector<unsigned>& idx
 }
 
 mat material_tester_by_load(const shared_ptr<Material>& obj, const vector<unsigned>& idx, const vec& incre) {
-	if(!obj->is_initialized()) {
-		obj->Material::initialize(nullptr);
-		obj->initialize(nullptr);
-		obj->set_initialized(true);
-	}
-
-	if(obj->get_material_type() == MaterialType::D1 && incre.n_elem != 1) {
-		suanpan_error("the tester cannot be appiled to the given material model.\n");
-		return {};
-	}
-	if(obj->get_material_type() == MaterialType::D2 && incre.n_elem != 3) {
-		suanpan_error("the tester cannot be appiled to the given material model.\n");
-		return {};
-	}
-	if(obj->get_material_type() == MaterialType::D3 && incre.n_elem != 6) {
-		suanpan_error("the tester cannot be appiled to the given material model.\n");
-		return {};
-	}
+	if(!initialise_material(obj, incre.n_elem)) return {};
 
 	unsigned total_size = 1;
 	for(const auto& I : idx) total_size += I;
@@ -197,24 +169,7 @@ mat material_tester_by_load(const shared_ptr<Material>& obj, const vector<unsign
 }
 
 mat material_tester_by_load(const shared_ptr<Material>& obj, const vector<unsigned>& idx, const vec& incre, const vec& base) {
-	if(!obj->is_initialized()) {
-		obj->Material::initialize(nullptr);
-		obj->initialize(nullptr);
-		obj->set_initialized(true);
-	}
-
-	if(obj->get_material_type() == MaterialType::D1 && incre.n_elem != 1) {
-		suanpan_error("the tester cannot be appiled to the given material model.\n");
-		return {};
-	}
-	if(obj->get_material_type() == MaterialType::D2 && incre.n_elem != 3) {
-		suanpan_error("the tester cannot be appiled to the given material model.\n");
-		return {};
-	}
-	if(obj->get_material_type() == MaterialType::D3 && incre.n_elem != 6) {
-		suanpan_error("the tester cannot be appiled to the given material model.\n");
-		return {};
-	}
+	if(!initialise_material(obj, incre.n_elem)) return {};
 
 	unsigned total_size = 2;
 	for(const auto& I : idx) total_size += I;
@@ -256,7 +211,7 @@ mat material_tester_by_load(const shared_ptr<Material>& obj, const vector<unsign
 					const vec incre_strain = solve(obj->get_trial_stiffness(), total_load - obj->get_trial_stress());
 					const auto error = norm(incre_strain);
 					suanpan_info("local iteration error: %.5E.\n", error);
-					if(error < 1E-12) break;
+					if(error <= 1E-12) break;
 					if(++counter == 10 || obj->update_trial_status(obj->get_trial_strain() + incre_strain) != SUANPAN_SUCCESS) {
 						info = SUANPAN_FAIL;
 						break;
@@ -270,6 +225,62 @@ mat material_tester_by_load(const shared_ptr<Material>& obj, const vector<unsign
 			if(SUANPAN_FAIL == info) break;
 			incre_load = -incre_load;
 		}
+
+	obj->print();
+	obj->reset_status();
+	obj->clear_status();
+
+	return response;
+}
+
+mat material_tester_by_strain_history(const shared_ptr<Material>& obj, const mat& history) {
+	if(!initialise_material(obj, history.n_cols)) return {};
+
+	mat response(size(history));
+
+	for(auto I = 0llu; I < history.n_elem; ++I) {
+		if(SUANPAN_SUCCESS != obj->update_trial_status(history.row(I).t())) break;
+		obj->commit_status();
+		response.row(I) = obj->get_current_stress();
+	}
+
+	obj->print();
+	obj->reset_status();
+	obj->clear_status();
+
+	return response;
+}
+
+mat material_tester_by_stress_history(const shared_ptr<Material>& obj, const mat& history) {
+	if(!initialise_material(obj, history.n_cols)) return {};
+
+	mat response(size(history));
+
+	for(auto I = 0llu; I < history.n_elem; ++I) {
+		auto counter = 0;
+		auto flag = false;
+		auto strain = obj->get_current_strain();
+		while(true) {
+			if(20 == ++counter) {
+				flag = true;
+				break;
+			}
+			const vec incre_strain = solve(obj->get_trial_stiffness(), history.row(I).t() - obj->get_trial_stress());
+			const auto error = norm(incre_strain);
+			suanpan_info("local iteration error: %.5E.\n", error);
+			if(error <= 1E-12) break;
+			strain += incre_strain;
+			if(SUANPAN_SUCCESS != obj->update_trial_status(strain)) {
+				flag = true;
+				break;
+			}
+		}
+
+		if(flag) break;
+
+		obj->commit_status();
+		response.row(I) = obj->get_current_strain();
+	}
 
 	obj->print();
 	obj->reset_status();

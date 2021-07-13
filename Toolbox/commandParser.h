@@ -82,6 +82,8 @@ int test_material_by_load1d(const shared_ptr<DomainBase>&, istringstream&);
 int test_material_by_load2d(const shared_ptr<DomainBase>&, istringstream&);
 int test_material_by_load3d(const shared_ptr<DomainBase>&, istringstream&);
 int test_material_by_load_with_base3d(const shared_ptr<DomainBase>&, istringstream&);
+int test_material_by_strain_history(const shared_ptr<DomainBase>&, istringstream&);
+int test_material_by_stress_history(const shared_ptr<DomainBase>&, istringstream&);
 
 int set_property(const shared_ptr<DomainBase>&, istringstream&);
 

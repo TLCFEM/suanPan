@@ -117,6 +117,8 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
 	if(is_equal(command_id, "materialtestbyload2d")) return test_material_by_load2d(domain, command);
 	if(is_equal(command_id, "materialtestbyload3d")) return test_material_by_load3d(domain, command);
 	if(is_equal(command_id, "materialtestbyloadwithbase3d")) return test_material_by_load_with_base3d(domain, command);
+	if(is_equal(command_id, "materialtestbystrainhistory")) return test_material_by_strain_history(domain, command);
+	if(is_equal(command_id, "materialtestbystresshistory")) return test_material_by_stress_history(domain, command);
 
 	if(is_equal(command_id, "qrcode")) {
 		qrcode();
@@ -2522,6 +2524,76 @@ int test_material_by_load_with_base3d(const shared_ptr<DomainBase>& domain, istr
 #endif
 
 	if(!result.save("RESULT.txt", raw_ascii)) suanpan_error("fail to save file.\n");
+
+	return SUANPAN_SUCCESS;
+}
+
+int test_material_by_strain_history(const shared_ptr<DomainBase>& domain, istringstream& command) {
+	unsigned material_tag;
+	if(!get_input(command, material_tag)) {
+		suanpan_error("test_material_by_strain_history() needs a valid material tag.\n");
+		return SUANPAN_SUCCESS;
+	}
+
+	string history_file;
+	if(!get_input(command, history_file)) {
+		suanpan_error("test_material_by_strain_history() needs a valid history file name.\n");
+		return SUANPAN_SUCCESS;
+	}
+
+	mat strain_history;
+	if(!strain_history.load(history_file) || !domain->find_material(material_tag)) return SUANPAN_SUCCESS;
+
+	auto& material_proto = domain->get_material(material_tag);
+
+	if(!material_proto->is_initialized()) {
+		material_proto->Material::initialize(domain);
+		material_proto->initialize(domain);
+		material_proto->set_initialized(true);
+	}
+
+	const auto result = material_tester_by_strain_history(material_proto->get_copy(), strain_history);
+
+#ifdef SUANPAN_HDF5
+	if(!result.save("RESULT.h5", hdf5_binary_trans)) suanpan_error("fail to save file.\n");
+#else
+	if(!result.save("RESULT.txt", raw_ascii)) suanpan_error("fail to save file.\n");
+#endif
+
+	return SUANPAN_SUCCESS;
+}
+
+int test_material_by_stress_history(const shared_ptr<DomainBase>& domain, istringstream& command) {
+	unsigned material_tag;
+	if(!get_input(command, material_tag)) {
+		suanpan_error("test_material_by_stress_history() needs a valid material tag.\n");
+		return SUANPAN_SUCCESS;
+	}
+
+	string history_file;
+	if(!get_input(command, history_file)) {
+		suanpan_error("test_material_by_stress_history() needs a valid history file name.\n");
+		return SUANPAN_SUCCESS;
+	}
+
+	mat stress_history;
+	if(!stress_history.load(history_file) || !domain->find_material(material_tag)) return SUANPAN_SUCCESS;
+
+	auto& material_proto = domain->get_material(material_tag);
+
+	if(!material_proto->is_initialized()) {
+		material_proto->Material::initialize(domain);
+		material_proto->initialize(domain);
+		material_proto->set_initialized(true);
+	}
+
+	const auto result = material_tester_by_stress_history(material_proto->get_copy(), stress_history);
+
+#ifdef SUANPAN_HDF5
+	if(!result.save("RESULT.h5", hdf5_binary_trans)) suanpan_error("fail to save file.\n");
+#else
+	if(!result.save("RESULT.txt", raw_ascii)) suanpan_error("fail to save file.\n");
+#endif
 
 	return SUANPAN_SUCCESS;
 }

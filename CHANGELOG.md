@@ -8,7 +8,8 @@
 
 1. revise `SimpleSand` model
 2. add `DafaliasManzari` sand model
-3. bugfix: potential racing in initialising reference dof, change to serial initialisation
+3. add `materialtestbystrainhistory` and `materialtestbystresshistory` utility functions
+4. bugfix: potential racing in initialising reference dof, change to serial initialisation
 
 ## version 1.6
 
