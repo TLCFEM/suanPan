@@ -1,0 +1,38 @@
+# A TEST MODEL FOR MULTILINEAR1D MATERIAL
+
+node 1 0 0
+node 2 4 0
+
+material MultilinearMises1D 1 50000 1. 0. 100 5E-3 200 1E-2 250 2E-2 260
+
+element T2D2 1 1 2 1 10
+
+fix 1 1 1
+fix 2 2 1 2
+
+step static 1
+set fixed_step_size 1
+set ini_step_size 1E-1
+set symm_mat 0
+
+hdf5recorder 1 Node RF1 2
+
+displacement 1 0 1E-1 1 2
+
+converger RelIncreDisp 1 1E-10 10 1
+
+analyze
+
+# Node 2:
+#    4.0000        0
+# Displacement:
+#    0.1000        0
+# Resistance:
+#    2.5980e+03            0
+peek node 2
+
+peek element 1
+
+reset
+clear
+exit

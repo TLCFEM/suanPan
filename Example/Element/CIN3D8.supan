@@ -1,0 +1,54 @@
+# A TEST MODEL FOR C3D8R MATERIAL
+
+node 1 .5 -.5 -.5
+node 2 .5 .5 -.5
+node 3 -.5 .5 -.5
+node 4 -.5 -.5 -.5
+node 5 .5 -.5 .5
+node 6 .5 .5 .5
+node 7 -.5 .5 .5
+node 8 -.5 -.5 .5
+node 9 .5 -.5 1.5
+node 10 .5 .5 1.5
+node 11 -.5 .5 1.5
+node 12 -.5 -.5 1.5
+node 13 .5 -.5 2.5
+node 14 .5 .5 2.5
+node 15 -.5 .5 2.5
+node 16 -.5 -.5 2.5
+
+material Elastic3D 1 1E3 .2 1E-8
+
+element C3D8 1 1 2 3 4 5 6 7 8 1 G
+element C3D8 2 5 6 7 8 9 10 11 12 1 G
+element CIN3D8 3 9 10 11 12 13 14 15 16 1
+
+fix 1 P 13 14 15 16
+
+recorder 1 hdf5 Element E 3
+recorder 2 hdf5 Element S 3
+
+displacement 1 0 .5 3 1 2 3 4
+
+step static 1
+set fixed_step_size 1
+set ini_step_size 2E-1
+set symm_mat 0
+
+converger RelIncreDisp 1 1E-8 50 1
+
+analyze
+
+peek element 3
+
+# Node 1:
+#    0.5000  -0.5000  -0.5000
+# Displacement:
+#    0.0188  -0.0188   0.5000
+# Resistance:
+#    2.8950e-15  -1.9344e-15   4.7108e+01
+peek node 1
+
+reset
+clear
+exit

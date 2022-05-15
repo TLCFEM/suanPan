@@ -1,0 +1,46 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=20mm]{geometry}
+\usepackage{mathpazo,amsmath,amsfonts,amssymb,hyperref}
+\hypersetup{colorlinks}
+\begin{document}
+A leag-frog style algorithm is implemented. Please see the reference \href{https://doi.org/10.1016/j.compstruc.2006.09.004}{doi:10.1016/j.compstruc.2006.09.004}
+\section*{The First Step}
+The first step is computed by using the Trapezoidal rule. Thus
+\begin{gather}
+v_{n+1}=v_n+\dfrac{\Delta{}t}{2}\left(a_n+a_{n+1}\right),\\
+u_{n+1}=u_n+\dfrac{\Delta{}t}{2}\left(v_n+v_{n+1}\right).
+\end{gather}
+Then,
+\begin{gather}
+u_{n+1}=u_n+\dfrac{\Delta{}t}{2}\left(v_n+v_n+\dfrac{\Delta{}t}{2}\left(a_n+a_{n+1}\right)\right),\qquad
+\Delta{}u=\Delta{}tv_n+\dfrac{\Delta{}t^2}{4}a_n+\dfrac{\Delta{}t^2}{4}a_{n+1}.
+\end{gather}
+One could obtain
+\begin{gather}
+a_{n+1}=\dfrac{4}{\Delta{}t^2}\Delta{}u-\dfrac{4}{\Delta{}t}v_n-a_n,\qquad
+\Delta{}a=\dfrac{4}{\Delta{}t^2}\Delta{}u-\dfrac{4}{\Delta{}t}v_n-2a_n,\\
+v_{n+1}=\dfrac{2}{\Delta{}t}\Delta{}u-v_n,\qquad
+\Delta{}v=\dfrac{2}{\Delta{}t}\Delta{}u-2v_n.
+\end{gather}
+
+The effective stiffness is then
+\begin{gather}
+\bar{K}=K+\dfrac{2}{\Delta{}t}C+\dfrac{4}{\Delta{}t^2}M.
+\end{gather}
+\section*{The Second Step}
+The second step is computed by using the backward Euler method. Thus
+\begin{gather}
+v_{n+2}=\dfrac{1}{2\Delta{}t}u_n-\dfrac{2}{\Delta{}t}u_{n+1}+\dfrac{3}{2\Delta{}t}u_{n+2},\\
+a_{n+2}=\dfrac{1}{2\Delta{}t}v_n-\dfrac{2}{\Delta{}t}v_{n+1}+\dfrac{3}{2\Delta{}t}v_{n+2}.
+\end{gather}
+Hence,
+\begin{gather}
+v_{n+2}=\dfrac{1}{2\Delta{}t}u_n-\dfrac{1}{2\Delta{}t}u_{n+1}+\dfrac{3}{2\Delta{}t}\Delta{}u,\\
+a_{n+2}=\dfrac{1}{2\Delta{}t}v_n-\dfrac{2}{\Delta{}t}v_{n+1}+\dfrac{3}{2\Delta{}t}v_{n+2}.
+\end{gather}
+
+The effective stiffness is then
+\begin{gather}
+\bar{K}=K+\dfrac{3}{2\Delta{}t}C+\dfrac{9}{4\Delta{}t^2}M.
+\end{gather}
+\end{document}

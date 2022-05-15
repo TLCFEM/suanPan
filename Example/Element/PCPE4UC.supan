@@ -1,0 +1,47 @@
+# A TEST MODEL FOR PCPE4UC ELEMENT
+
+node 1 0 0
+node 2 2 0
+
+node 3 2 2
+node 4 0 2
+
+material Elastic2D 1 1500 .25 1E-4 1
+material Fluid 2 1000 1E-4
+
+element PCPE4UC 1 1 2 3 4 1 2 1. .8
+
+fix 1 1 1 2 3 4
+fix 2 2 1 2
+
+displacement 1 0 -.2 2 3 4
+
+recorder 1 hdf5 Element PP 1
+
+step static 1
+set fixed_step_size true
+
+analyze
+
+# Node 3:
+#    2.0000   2.0000
+# Displacement:
+#         0  -0.2000
+# Resistance:
+#   -1.6000e+02  -2.8000e+02
+# 
+# Node 4:
+#         0   2.0000
+# Displacement:
+#         0  -0.2000
+# Resistance:
+#    1.6000e+02  -2.8000e+02
+peek node 3 4
+
+peek element 1
+
+# save recorder 1
+
+reset
+clear
+exit

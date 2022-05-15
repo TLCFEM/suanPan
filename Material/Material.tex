@@ -1,0 +1,93 @@
+% !TeX document-id = {33e0076e-ba36-423a-b385-5e5f28867e83}
+% !TEX TS-program = xelatex
+\documentclass[11pt]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{fontspec-xetex}
+\usepackage{listings}
+\usepackage[colorlinks]{hyperref}
+\usepackage[numbers,sort&compress]{natbib}
+\bibliographystyle{dcu}
+\lstset{frame=single,breaklines,basicstyle=\ttfamily}
+\setmainfont{texgyrepagella-regular.otf}
+\setmonofont{SourceCodePro-Regular.ttf}
+\begin{document}
+\section{What Does A Material Model Do?}
+\texttt{Material} is the most elementary component in FEM. No matter what element is used, the global response has to be computed from the local material model, although such a process can be as complex as in beam/shell elements (global structure -> local element -> section -> integration point). The task of a proper \texttt{Material} model is very simple: compute response according to given excitation. The response here could be force, stress, stiffness and so on. The excitation could be displacement, strain, velocity, strain rate and other variables. First let's have a look at member variables of the \texttt{Material} class.
+\begin{lstlisting}[language=C++]
+private:
+	const bool initialized = false;
+	const bool symmetric = false;
+protected:
+	double density = 0.; // density
+
+	vec current_strain;      // current status
+	vec current_strain_rate; // current status
+	vec current_stress;      // current status
+	vec current_stress_rate; // current status
+	vec current_history;     // current status
+
+	vec trial_strain;      // trial status
+	vec trial_strain_rate; // trial status
+	vec trial_stress;      // trial status
+	vec trial_stress_rate; // trial status
+	vec trial_history;     // trial status
+
+	vec incre_strain;      // incremental status
+	vec incre_strain_rate; // incremental status
+	vec incre_stress;      // incremental status
+	vec incre_stress_rate; // incremental status
+
+	mat initial_stiffness; // stiffness matrix
+	mat current_stiffness; // stiffness matrix
+	mat trial_stiffness;   // stiffness matrix
+
+	mat initial_damping; // damping matrix
+	mat current_damping; // damping matrix
+	mat trial_damping;   // damping matrix
+\end{lstlisting}
+
+As some material models may depend on others, such as wrappers, we separate object initialization from construction. So a flag is required to indicate if object is initialized and \texttt{initialized} serves for this purpose. Meanwhile, some models may produce asymmetric stiffness matrix, for example, a classic plasticity model using a non-associated flow rule, we here use \texttt{symmetric} to describe this attribute so that by testing it, program knows how to choose proper storage. \texttt{density} is stored for computation of mass related quantities.
+
+Since for each sub-step, convergence is not guaranteed, if trial status fails, we need to be able to recover to the last converged status. This means we need to manage two statuses at the same time, here they are called the current and trial status. The difference between those is called the incremental status. The variable names are pretty self-explanatory. Although here quite a lot variables, not all will be used in all material models. Leaving those uninitialized is totally fine if the derived class decides to manage its own data independently.
+
+To date, there are two 1D concrete material models available, Concrete01 and Concrete02.
+
+Concrete01 is a general model that provides various choices of both backbones but the unloading/reloading rules are relatively simple. Concrete02 is a modification of the Chang \& Mander's model. The original CM model gives a non-linear, rule-governed unloading/reloading behaviour which is quite appealing, however, its stability is REALLY a giant issue. Concrete02 model improves this aspect and provides a similar response.
+\section{Concrete01}
+Concrete01 is a simple 1D material model that describes basic concrete response.
+\begin{lstlisting}
+material Concrete01 1 30 3 tsai linear false true 1E-2 2400E-12
+material Concrete01 {1} {2} {3} [4] [5] [6] [7] [8] [9]
+# {1} integer -> material model tag
+# {2}  double -> maximum compression strength
+# {3}  double -> maximum tension strength
+# [4]  string -> compression backbone type
+# [5]  string -> tension backbone type
+# [6]    bool -> true to suppress residual strain
+# [7]    bool -> false to suppress tension reponse
+# [8]  double -> specific mode one fracture energy
+# [9]  double -> material density
+\end{lstlisting}
+
+Optional compression backbone types include: 1) thorenfeldt \citep{Thorenfeldt1987}, 2) popovics \citep{Popovics1973}, 3) tsai \citep{Tsai1988} and 4) kps \citep{Scott1980}.
+
+Optional tension backbone types include: 1) linear, 2) exponential \citep{Belarbi1994} and 3) tsai \citep{Tsai1988}.
+
+The Concrete01 model uses straight lines for unloading response. Furthermore, it assumes no tension residual strain and optional compression residual strain, hence the tension unloading branch always passes through the origin.
+\section{Concrete22}
+Concrete22 is a 2D material model that describes in-plane response of concrete using a fixed angle assumption and constant shear retention factor.
+\begin{lstlisting}
+material Concrete22 {1} {2} [3] [4] [5] [6] [7] [8] [9] [10]
+#  {1} integer -> material model tag
+#  {2}  double -> maximum compression strength
+#  [3]  string -> compression backbone type
+#  [4]  double -> shear retention factor
+#  [5]    bool -> true to suppress residual strain
+#  [6]  string -> tension backbone type
+#  [7]  double -> specific mode one fracture energy
+#  [8]    bool -> true to consider biaxial Poisson's effect
+#  [9]    bool -> true to consider biaxial stiffness degradation
+# [10]  double -> material density
+\end{lstlisting}
+\bibliography{Material}
+\end{document}

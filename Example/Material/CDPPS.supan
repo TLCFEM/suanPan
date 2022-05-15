@@ -1,0 +1,64 @@
+# A TEST MODEL FOR CDPPS MATERIAL
+
+node 1 0 0
+node 2 1 0
+node 3 1 1
+node 4 0 1
+
+material CDP 2 3E4 .2 4. 40. 2E-3 4E-1 .2 4. .4 .8 .2 1.16 .2 2400E-12
+material PlaneStress 1 2
+
+element CP4 1 1 2 3 4 1 1
+
+fix 1 1 1
+fix 2 2 1 2
+
+displacement 1 0 -3E-3 1 3 4
+displacement 2 0 -3E-2 2 3 4
+
+hdf5recorder 1 Element DT 1
+hdf5recorder 2 Element DC 1
+hdf5recorder 3 Element KAPPAT 1
+hdf5recorder 4 Element KAPPAC 1
+hdf5recorder 5 Element PE 1
+hdf5recorder 6 Element PE11 1
+hdf5recorder 7 Element PE22 1
+hdf5recorder 8 Element PE33 1
+hdf5recorder 9 Element E 1
+hdf5recorder 10 Element E11 1
+hdf5recorder 11 Element E22 1
+hdf5recorder 12 Element E33 1
+hdf5recorder 13 Element S 1
+hdf5recorder 14 Element S11 1
+hdf5recorder 15 Element S22 1
+hdf5recorder 16 Element S33 1
+
+step static 1 1
+set fixed_step_size 1
+set ini_step_size 5E-3
+set symm_mat 0
+
+converger RelIncreDisp 1 1E-10 20 1
+
+analyze
+
+peek element 1
+
+# Node 3:
+#    1.0000   1.0000
+# Displacement:
+#   -0.0030  -0.0300
+# Resistance:
+#   -0.1119  -0.1542
+# 
+# Node 4:
+#         0   1.0000
+# Displacement:
+#   -0.0030  -0.0300
+# Resistance:
+#    0.0693  -0.2005
+peek node 3 4
+
+reset
+clear
+exit

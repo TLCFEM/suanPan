@@ -1,0 +1,18 @@
+example
+
+set output_folder result/a/b
+set output_folder result
+set output_folder result/a
+set output_folder another_result/a
+
+peek 	output_folder
+
+peek,output_folder
+
+set output_folder $pwd
+
+peek ,output_folder
+
+pwd
+
+exit

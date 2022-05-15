@@ -1,0 +1,44 @@
+# A TEST MODEL FOR WILSONPENZIEN
+
+node 1 0 0
+node 2 1 0
+
+material Elastic1D 1 10 .01
+
+element EB21 1 1 2 12 1 1
+element Mass 2 2 1 2
+
+fix 1 P 1
+
+hdf5recorder 1 Node U2 2
+
+step static 1 1
+set ini_step_size .1
+
+displacement 1 0 1 2 2
+
+converger AbsIncreDisp 1 1E-8 3 1
+
+step dynamic 2 6
+set ini_step_size .02
+set fixed_step_size 1
+
+integrator WilsonPenzienNewmark 1 .25 .5 .05 .05
+
+converger RelIncreDisp 2 1E-10 3 1
+
+analyze
+
+# Node 2:
+#    1.0000        0
+# Displacement:
+#   -2.2334e-19   1.3646e-01   2.0368e-01
+# Resistance:
+#   -2.6801e-17   4.1541e+00  -4.0213e-02
+# Velocity:
+#   -6.9977e-20  -8.2125e-01  -1.5051e+00
+# Acceleration:
+#    3.9755e-16  -3.4511e+00   1.4432e+01
+peek node 2
+
+exit

@@ -1,0 +1,49 @@
+# A TEST MODEL FOR F31 ELEMENT
+
+node 1 0 0 0
+node 2 10 0 0
+
+orientation B3DL 1 0. 1. 0.
+
+material MPF 1 1E2 2E-1 .02
+# material Elastic1D 1 10
+
+section Rectangle3D 2 12 1 1
+section Bar3D 3 100 1
+section Fibre3D 1 2 3
+
+element F31 1 1 2 1 1
+
+fix2 1 E 1
+
+cload 1 0 1 2 2
+
+hdf5recorder 1 Element S 1
+hdf5recorder 2 Element E 1
+hdf5recorder 3 Element PE 1
+hdf5recorder 4 Node U 2
+
+step static 1
+set ini_step_size 1E-1
+set fixed_step_size true
+
+converger RelIncreDisp 1 1E-10 5 1
+
+analyze
+
+# Node 2:
+# Coordinate:
+# 10.0000 0 0
+# Displacement:
+# 0 0.3899 0 0 0 0.0469
+# Resistance:
+# 0 1.0000e+00 0 0 0 -3.8095e-12
+peek node 2
+
+peek element 1
+
+# save recorder 1 2 3 4
+
+reset
+clear
+exit

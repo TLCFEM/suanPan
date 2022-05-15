@@ -1,0 +1,8 @@
+---
+exclude_paths:
+  - '*.yml'
+  - '*.yml'
+  - '*.md'
+  - '**/*.css'
+  - 'Toolbox/**/*'
+  - 'Include/**/*'

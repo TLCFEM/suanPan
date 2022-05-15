@@ -1,0 +1,38 @@
+# A TEST MODEL FOR B21 ELEMENT
+
+node 1 0 0
+node 2 1 0
+
+material Elastic1D 1 10 1E-4
+
+section Rectangle2D 1 12 1 1
+
+element B21 1 1 2 1 6 1
+# element EB21 1 1 2 12 1 1 1
+
+fix 1 P 1
+
+# cload 1 0 10 2 2
+lineudl2d 2 0 10 2 1 2
+
+recorder 1 hdf5 Element E 1
+recorder 2 hdf5 Element S 1
+recorder 3 hdf5 Element PE 1
+
+step static 1 1
+set ini_step_size .1
+set fixed_step_size true
+
+converger RelIncreDisp 1 1E-8 5 1
+
+analyze
+
+# -0.0270 0.3272 0.4865 cload
+# -0.0069 -0.1659 -0.2483 lineudl2d
+peek node 2
+
+peek element 1
+
+reset
+clear
+exit

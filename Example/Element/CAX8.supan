@@ -1,0 +1,53 @@
+node 1 0 0
+node 2 1 0
+node 3 2 0
+node 4 0 1
+node 6 2 1
+node 7 0 2
+node 8 1 2
+node 9 2 2
+
+node 5 1 1
+
+material AxisymmetricElastic 1 12 .1 1E-4
+material Elastic3D 2 12 .1
+material Axisymmetric 3 2
+
+element CAX8 1 1 3 9 7 2 6 8 4 3
+
+fix2 1 1 1 4 7
+fix2 2 2 1 2 3
+
+displacement 1 0 -.2 2 7 8 9
+
+step static 1
+
+analyze
+
+peek element 1
+
+# Node 3:
+#    2.0000        0
+# Displacement:
+#    0.0200        0
+# Resistance:
+#   -5.7953e-17   5.0265e+00
+# 
+# Node 6:
+#    2.0000   1.0000
+# Displacement:
+#    0.0200  -0.1000
+# Resistance:
+#   -5.7096e-18  -8.8818e-16
+# 
+# Node 9:
+#    2.0000   2.0000
+# Displacement:
+#    0.0200  -0.2000
+# Resistance:
+#   -3.9183e-16  -5.0265e+00
+peek node 3 6 9
+
+reset
+clear
+exit

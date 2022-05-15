@@ -1,0 +1,239 @@
+# A TEST MODEL FOR CP6 ELEMENT
+
+node 1 0 0
+node 2 .25 0
+node 3 .5 0
+node 4 .75 0
+node 5 1 0
+node 6 1.25 0
+node 7 1.5 0
+node 8 1.75 0
+node 9 2 0
+node 10 0 .25
+node 11 .25 .25
+node 12 .5 .25
+node 13 .75 .25
+node 14 1 .25
+node 15 1.25 .25
+node 16 1.5 .25
+node 17 1.75 .25
+node 18 2 .25
+node 19 0 .5
+node 20 .25 .5
+node 21 .5 .5
+node 22 .75 .5
+node 23 1 .5
+node 24 1.25 .5
+node 25 1.5 .5
+node 26 1.75 .5
+node 27 2 .5
+node 28 0 .75
+node 29 .25 .75
+node 30 .5 .75
+node 31 .75 .75
+node 32 1 .75
+node 33 1.25 .75
+node 34 1.5 .75
+node 35 1.75 .75
+node 36 2 .75
+node 37 0 1
+node 38 .25 1
+node 39 .5 1
+node 40 .75 1
+node 41 1 1
+node 42 1.25 1
+node 43 1.5 1
+node 44 1.75 1
+node 45 2 1
+node 46 .125 0
+node 47 .25 .125
+node 48 .125 .125
+node 49 .125 .25
+node 50 0 .125
+node 51 .375 0
+node 52 .5 .125
+node 53 .375 .125
+node 54 .375 .25
+node 55 .625 0
+node 56 .75 .125
+node 57 .625 .125
+node 58 .625 .25
+node 59 .875 0
+node 60 1 .125
+node 61 .875 .125
+node 62 .875 .25
+node 63 1.125 0
+node 64 1.25 .125
+node 65 1.125 .125
+node 66 1.125 .25
+node 67 1.375 0
+node 68 1.5 .125
+node 69 1.375 .125
+node 70 1.375 .25
+node 71 1.625 0
+node 72 1.75 .125
+node 73 1.625 .125
+node 74 1.625 .25
+node 75 1.875 0
+node 76 2 .125
+node 77 1.875 .125
+node 78 1.875 .25
+node 79 .25 .375
+node 80 .125 .375
+node 81 .125 .5
+node 82 0 .375
+node 83 .5 .375
+node 84 .375 .375
+node 85 .375 .5
+node 86 .75 .375
+node 87 .625 .375
+node 88 .625 .5
+node 89 1 .375
+node 90 .875 .375
+node 91 .875 .5
+node 92 1.25 .375
+node 93 1.125 .375
+node 94 1.125 .5
+node 95 1.5 .375
+node 96 1.375 .375
+node 97 1.375 .5
+node 98 1.75 .375
+node 99 1.625 .375
+node 100 1.625 .5
+node 101 2 .375
+node 102 1.875 .375
+node 103 1.875 .5
+node 104 .25 .625
+node 105 .125 .625
+node 106 .125 .75
+node 107 0 .625
+node 108 .5 .625
+node 109 .375 .625
+node 110 .375 .75
+node 111 .75 .625
+node 112 .625 .625
+node 113 .625 .75
+node 114 1 .625
+node 115 .875 .625
+node 116 .875 .75
+node 117 1.25 .625
+node 118 1.125 .625
+node 119 1.125 .75
+node 120 1.5 .625
+node 121 1.375 .625
+node 122 1.375 .75
+node 123 1.75 .625
+node 124 1.625 .625
+node 125 1.625 .75
+node 126 2 .625
+node 127 1.875 .625
+node 128 1.875 .75
+node 129 .25 .875
+node 130 .125 .875
+node 131 .125 1
+node 132 0 .875
+node 133 .5 .875
+node 134 .375 .875
+node 135 .375 1
+node 136 .75 .875
+node 137 .625 .875
+node 138 .625 1
+node 139 1 .875
+node 140 .875 .875
+node 141 .875 1
+node 142 1.25 .875
+node 143 1.125 .875
+node 144 1.125 1
+node 145 1.5 .875
+node 146 1.375 .875
+node 147 1.375 1
+node 148 1.75 .875
+node 149 1.625 .875
+node 150 1.625 1
+node 151 2 .875
+node 152 1.875 .875
+node 153 1.875 1
+
+element CP6 1 1 2 11 46 47 48 1 1
+element CP6 2 11 10 1 49 50 48 1 1
+element CP6 3 2 3 12 51 52 53 1 1
+element CP6 4 12 11 2 54 47 53 1 1
+element CP6 5 3 4 13 55 56 57 1 1
+element CP6 6 13 12 3 58 52 57 1 1
+element CP6 7 4 5 14 59 60 61 1 1
+element CP6 8 14 13 4 62 56 61 1 1
+element CP6 9 5 6 15 63 64 65 1 1
+element CP6 10 15 14 5 66 60 65 1 1
+element CP6 11 6 7 16 67 68 69 1 1
+element CP6 12 16 15 6 70 64 69 1 1
+element CP6 13 7 8 17 71 72 73 1 1
+element CP6 14 17 16 7 74 68 73 1 1
+element CP6 15 8 9 18 75 76 77 1 1
+element CP6 16 18 17 8 78 72 77 1 1
+element CP6 17 10 11 20 49 79 80 1 1
+element CP6 18 20 19 10 81 82 80 1 1
+element CP6 19 11 12 21 54 83 84 1 1
+element CP6 20 21 20 11 85 79 84 1 1
+element CP6 21 12 13 22 58 86 87 1 1
+element CP6 22 22 21 12 88 83 87 1 1
+element CP6 23 13 14 23 62 89 90 1 1
+element CP6 24 23 22 13 91 86 90 1 1
+element CP6 25 14 15 24 66 92 93 1 1
+element CP6 26 24 23 14 94 89 93 1 1
+element CP6 27 15 16 25 70 95 96 1 1
+element CP6 28 25 24 15 97 92 96 1 1
+element CP6 29 16 17 26 74 98 99 1 1
+element CP6 30 26 25 16 100 95 99 1 1
+element CP6 31 17 18 27 78 101 102 1 1
+element CP6 32 27 26 17 103 98 102 1 1
+element CP6 33 19 20 29 81 104 105 1 1
+element CP6 34 29 28 19 106 107 105 1 1
+element CP6 35 20 21 30 85 108 109 1 1
+element CP6 36 30 29 20 110 104 109 1 1
+element CP6 37 21 22 31 88 111 112 1 1
+element CP6 38 31 30 21 113 108 112 1 1
+element CP6 39 22 23 32 91 114 115 1 1
+element CP6 40 32 31 22 116 111 115 1 1
+element CP6 41 23 24 33 94 117 118 1 1
+element CP6 42 33 32 23 119 114 118 1 1
+element CP6 43 24 25 34 97 120 121 1 1
+element CP6 44 34 33 24 122 117 121 1 1
+element CP6 45 25 26 35 100 123 124 1 1
+element CP6 46 35 34 25 125 120 124 1 1
+element CP6 47 26 27 36 103 126 127 1 1
+element CP6 48 36 35 26 128 123 127 1 1
+element CP6 49 28 29 38 106 129 130 1 1
+element CP6 50 38 37 28 131 132 130 1 1
+element CP6 51 29 30 39 110 133 134 1 1
+element CP6 52 39 38 29 135 129 134 1 1
+element CP6 53 30 31 40 113 136 137 1 1
+element CP6 54 40 39 30 138 133 137 1 1
+element CP6 55 31 32 41 116 139 140 1 1
+element CP6 56 41 40 31 141 136 140 1 1
+element CP6 57 32 33 42 119 142 143 1 1
+element CP6 58 42 41 32 144 139 143 1 1
+element CP6 59 33 34 43 122 145 146 1 1
+element CP6 60 43 42 33 147 142 146 1 1
+element CP6 61 34 35 44 125 148 149 1 1
+element CP6 62 44 43 34 150 145 149 1 1
+element CP6 63 35 36 45 128 151 152 1 1
+element CP6 64 45 44 35 153 148 152 1 1
+
+material Elastic2D 1 100 .2 1E-4
+
+fix 1 P 1 10 19 28 37 50 82 107 132
+
+cload 1 0 1 2 9 45
+
+step static 1
+
+analyze
+
+# 0.2606 0.7864
+peek node 9
+
+peek element 1
+
+reset
+clear
+exit

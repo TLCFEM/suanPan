@@ -1,0 +1,35 @@
+# A TEST MODEL FOR B21H ELEMENT
+
+node 1 0 0
+node 2 1 0
+
+material MPF 1 10 .2 .05
+
+section Rectangle2D 1 12 1 1
+
+element B21H 1 1 2 1 5
+
+fix 1 P 1
+
+cload 1 0 1 2 2
+
+recorder 1 hdf5 Element E 1
+recorder 2 hdf5 Element S 1
+recorder 3 hdf5 Element PE 1
+
+step static 1 1
+set ini_step_size .1
+set fixed_step_size true
+
+converger RelIncreDisp 1 1E-8 5 1
+
+analyze
+
+# -3.6624E-19 1.0233E-01 1.4156E-01
+peek node 2
+
+peek element 1
+
+reset
+clear
+exit

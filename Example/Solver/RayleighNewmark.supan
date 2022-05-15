@@ -1,0 +1,47 @@
+# A TEST MODEL FOR NEWMARK INTEGRATOR
+
+node 1 0 0
+node 2 0 1
+
+material Elastic1D 1 100 .1
+
+element EB21 1 1 2 10 1 1 false
+
+mass 2 2 10 1
+
+fix 1 P 1
+
+amplitude Tabular 1 EZ
+
+acceleration 2 1 .2 1 2
+
+hdf5recorder 1 Node U 2
+
+step dynamic 1 30
+set ini_step_size .02
+set fixed_step_size 1
+set sparse_mat 1
+
+integrator RayleighNewmark 1 .25 .5 .05 .05 .0 .0
+
+converger RelIncreDisp 1 1E-10 10 1
+
+analyze
+
+# Node 2:
+#         0   1.0000
+# Displacement:
+#   -4.9125e-07            0   7.3550e-07
+# Resistance:
+#   -1.4820e-04            0  -5.4887e-07
+# Velocity:
+#   -6.1240e-06            0   9.1689e-06
+# Acceleration:
+#    2.3678e-05            0  -3.5452e-05
+peek node 2
+
+peek integrator 1
+
+# save recorder 1
+
+exit

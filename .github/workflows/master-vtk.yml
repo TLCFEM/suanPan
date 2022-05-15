@@ -1,0 +1,108 @@
+name: Release With VTK
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+jobs:
+  linux-openblas-vtk:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Clone
+        uses: actions/checkout@v2
+      - name: Install VTK
+        run: |
+          echo "SP_TIME=daily-$(date +''%Y%m%d%H'')" >> $GITHUB_ENV
+          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.1.0-linux.tar.gz
+          tar xf VTK-9.1.0-linux.tar.gz
+      - name: Golang
+        uses: actions/setup-go@v2
+      - name: Compile
+        run: |
+          export CC=gcc-10 && export CXX=g++-10 && export FC=gfortran-10
+          go build Checker/updater.go
+          sudo apt-get update && sudo apt-get install mesa-common-dev mesa-utils freeglut3-dev libglvnd-dev
+          cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.1/ -DCMAKE_INSTALL_PREFIX=suanPan-linux-openblas-vtk .
+          make install -j4
+      - name: Pack
+        run: |
+          cp updater suanPan-linux-openblas-vtk/bin
+          tar cvzf suanPan-linux-openblas-vtk.tar.gz suanPan-linux-openblas-vtk
+          export LD_LIBRARY_PATH=/home/runner/work/suanPan/suanPan/suanPan-linux-openblas-vtk/lib
+          ./suanPan-linux-openblas-vtk/bin/suanPan -v
+      - name: Release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: suanPan-linux-openblas-vtk.tar.gz
+          asset_name: suanPan-linux-openblas-vtk.tar.gz
+          tag: ${{ env.SP_TIME }}
+          prerelease: true
+          overwrite: true
+  macos-openblas-vtk:
+    runs-on: macos-11
+    steps:
+      - name: Clone
+        uses: actions/checkout@v2
+      - name: Install VTK
+        run: |
+          echo "SP_TIME=daily-$(date +''%Y%m%d%H'')" >> $GITHUB_ENV
+          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.1.0-macos.tar.gz
+          tar xf VTK-9.1.0-macos.tar.gz
+      - name: Golang
+        uses: actions/setup-go@v2
+      - name: Compile
+        run: |
+          export CC=/usr/local/opt/llvm/bin/clang && export CXX=/usr/local/opt/llvm/bin/clang++ && export FC=gfortran-10
+          go build Checker/updater.go
+          brew install llvm glfw glew libomp
+          cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.1/ -DCMAKE_INSTALL_PREFIX=suanPan-macos-openblas-vtk .
+          make install -j4
+      - name: Pack
+        run: |
+          cp updater suanPan-macos-openblas-vtk/bin
+          tar czf suanPan-macos-openblas-vtk.tar.gz suanPan-macos-openblas-vtk
+          export DYLD_LIBRARY_PATH=/Users/runner/work/suanPan/suanPan/suanPan-macos-openblas-vtk/lib/
+          cd suanPan-macos-openblas-vtk/bin
+          ./suanPan -v
+      - name: Release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: suanPan-macos-openblas-vtk.tar.gz
+          asset_name: suanPan-macos-openblas-vtk.tar.gz
+          tag: ${{ env.SP_TIME }}
+          prerelease: true
+          overwrite: true
+  windows-openblas-vtk:
+    runs-on: windows-2022
+    steps:
+      - name: Clone
+        uses: actions/checkout@v2
+      - name: Install VTK
+        run: |
+          echo ("SP_TIME=daily-"+(get-date -format "yyyyMMddHH")) >> $env:GITHUB_ENV
+          C:/msys64/usr/bin/wget.exe https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.1.0-win.7z
+          7z x VTK-9.1.0-win.7z
+      - name: Golang
+        uses: actions/setup-go@v2
+      - name: Compile
+        run: |
+          go build Checker/updater.go
+          cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=D:/a/suanPan/suanPan/lib/cmake/vtk-9.1/ -DCMAKE_INSTALL_PREFIX=suanPan-win-openblas-vtk .
+          cmake --build . --target INSTALL --config Release
+      - name: Pack
+        run: |
+          cp updater.exe suanPan-win-openblas-vtk/bin
+          cd suanPan-win-openblas-vtk/bin
+          7z a ../../suanPan-win-openblas-vtk.7z ./*
+          ./suanPan.exe -v
+      - name: Release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: suanPan-win-openblas-vtk.7z
+          asset_name: suanPan-win-openblas-vtk.7z
+          tag: ${{ env.SP_TIME }}
+          prerelease: true
+          overwrite: true

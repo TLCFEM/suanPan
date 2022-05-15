@@ -1,0 +1,45 @@
+# A TEST MODEL FOR ORTHOTROPICELASTIC3D MATERAIL
+
+node 1 5 -5 -5
+node 2 5 5 -5
+node 3 -5 5 -5
+node 4 -5 -5 -5
+node 5 5 -5 5
+node 6 5 5 5
+node 7 -5 5 5
+node 8 -5 -5 5
+
+material OrthotropicElastic3D 2 1E4 1E4 1E4 1E4 1E4 1E4 .3 .3 .3
+material Rotation3D 1 2 .2156 2.4581 3.245
+
+element C3D8 1 1 2 3 4 5 6 7 8 1
+
+fix 1 1 1 2 5 6
+fix 2 2 1 4 5 8
+fix 3 3 1 2 3 4
+
+displacement 1 0 -.002 3 5 6 7 8
+# displacement 2 0 .005 2 5 6 7 8
+
+hdf5recorder 1 Node RF 7
+
+step static 1
+set fixed_step_size 1
+set ini_step_size 1E-2
+set symm_mat 0
+
+converger AbsIncreDisp 1 1E-14 50 1
+
+analyze
+
+peek element 1
+
+# Resistance:
+#  -2.0264e+01  -5.1203e-01  -1.0316e+02
+peek node 5
+
+# save recorder 1
+
+reset
+clear
+exit

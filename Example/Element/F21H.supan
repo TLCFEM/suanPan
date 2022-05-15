@@ -1,0 +1,41 @@
+# A TEST MODEL FOR F21H ELEMENT
+
+node 1 0 0
+node 2 10 0
+
+material MPF 1 1E3 3 .02
+
+section Rectangle2D 1 12 1 1 12
+
+element F21H 1 1 2 1 .2
+
+fix2 1 P 1
+
+cload 1 0 1 2 2
+
+recorder 1 hdf5 Element E 1
+recorder 2 hdf5 Element S 1
+recorder 3 hdf5 Element PE 1
+
+step static 1 1
+set ini_step_size .1
+set fixed_step_size true
+
+converger RelIncreDisp 1 1E-10 10 1
+
+analyze
+
+# Node 2:
+# Coordinate:
+# 10.0000 0
+# Displacement:
+# 3.6751e-18 1.2676e+00 1.4342e-01
+# Resistance:
+# -6.0158e-16 1.0000e+00 5.5777e-15
+peek node 2
+
+peek element 1
+
+reset
+clear
+exit

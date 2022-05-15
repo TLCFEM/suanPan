@@ -1,0 +1,119 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="SRC">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\bucket.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\ddbisect.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\ddcreate.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\dmumps_gpu.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\elapse.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\gbipart.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\gbisect.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\gelim.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\graph.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\interface.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\minpriority.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\mpic.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\multisector.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_c.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_common.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_config_file_C.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_io.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_io_basic.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_io_err.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_io_thread.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_metis.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_metis_int.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_metis64.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_numa.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_pord.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_save_restore_C.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_scotch.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_scotch_int.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_scotch64.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_size.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_thread.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_thread_affinity.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\nestdiss.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\sort.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\symbfac.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\tree.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,34 @@
+# A TEST MODEL FOR MVLEM ELEMENT
+
+node 1 0 0
+node 2 1 0
+node 3 2 0
+
+material ConcreteTsai 1 30. 2. 2. 2. 2. 2. .2 2E-3 1E-4
+material MPF 2 2E5 400 .02
+material Elastic1D 3 2E6
+
+element MVLEM 1 1 2 3 .4 .2 1 .02 1 2 .2 1 .02 1 2 .2 1 .02 1 2 .2 1 .02 1 2 .2 1 .02 1 2
+element MVLEM 2 2 3 3 .4 .2 1 .02 1 2 .2 1 .02 1 2 .2 1 .02 1 2 .2 1 .02 1 2 .2 1 .02 1 2
+
+fix 1 P 1
+
+step static 1
+set ini_step_size 2E-1
+set fixed_step_size 1
+set symm_mat false
+
+displacement 1 0 2E-2 2 3
+
+converger RelIncreDisp 1 1E-10 10 1
+
+analyze
+
+# 0.0040 0.0200 0.0134
+peek node 3
+
+peek element 1
+
+reset
+clear
+exit

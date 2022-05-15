@@ -1,0 +1,524 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="SRC">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dgsrfs.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dgsequ.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dgscon.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dcomplex.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dclock.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\csp_blas3.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\csp_blas2.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\creadrb.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\creadhb.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\cpivotgrowth.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\colamd.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\cmyblas2.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\claqgs.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\clangs.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\clacon.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\cholnzcnt.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\cgstrs.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\cgsrfs.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\cgsequ.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\cgscon.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\await.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\zsp_blas3.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\zsp_blas2.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\zreadrb.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\zreadhb.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\zpivotgrowth.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\zmyblas2.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\zlaqgs.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\zlangs.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\zlacon.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\zgstrs.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\zgsrfs.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\zgsequ.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\zgscon.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\xerbla.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\util.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\superlu_timer.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\ssp_blas3.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\ssp_blas2.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\sreadrb.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\sreadhb.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\spivotgrowth.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\sp_ienv.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\sp_colorder.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\sp_coletree.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\smyblas2.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\slaqgs.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\slangs.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\slamch.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\slacon.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\sgstrs.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\sgsrfs.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\sgsequ.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\sgscon.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\scsum1.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\scomplex.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\qrnzcnt.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzutil.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzmemory.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf_thread_init.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf_thread_finalize.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf_thread.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf_snode_dfs.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf_snode_bmod.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf_pivotL.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf_panel_dfs.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf_panel_bmod.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf_init.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf_factor_snode.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf_copy_to_ucol.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf_column_dfs.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf_column_bmod.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf_bmod2D_mv2.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf_bmod2D.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf_bmod1D_mv2.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf_bmod1D.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgssvx.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgssv.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pxgstrf_synch.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pxgstrf_super_bnd_dfs.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pxgstrf_scheduler.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pxgstrf_relax_snode.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pxgstrf_pruneL.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pxgstrf_mark_busy_descends.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pxgstrf_finalize.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psutil.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psmemory.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf_thread_init.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf_thread_finalize.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf_thread.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf_snode_dfs.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf_snode_bmod.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf_pivotL.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf_panel_dfs.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf_panel_bmod.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf_init.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf_factor_snode.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf_copy_to_ucol.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf_column_dfs.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf_column_bmod.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf_bmod2D_mv2.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf_bmod2D.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf_bmod1D_mv2.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf_bmod1D.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgssvx.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgssv.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pmemory.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdutil.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdmemory.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf_thread_init.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf_thread_finalize.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf_thread.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf_snode_dfs.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf_snode_bmod.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf_pivotL.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf_panel_dfs.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf_panel_bmod.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf_init.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf_factor_snode.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf_copy_to_ucol.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf_column_dfs.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf_column_bmod.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf_bmod2D_mv2.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf_bmod2D.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf_bmod1D_mv2.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf_bmod1D.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgssvx.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgssv.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcutil.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcmemory.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf_thread_init.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf_thread_finalize.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf_thread.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf_snode_dfs.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf_snode_bmod.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf_pivotL.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf_panel_dfs.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf_panel_bmod.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf_init.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf_factor_snode.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf_copy_to_ucol.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf_column_dfs.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf_column_bmod.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf_bmod2D_mv2.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf_bmod2D.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf_bmod1D_mv2.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf_bmod1D.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgssvx.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgssv.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\mmd.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\lsame.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\izmax1.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\icmax1.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\heap_relax_snode.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\get_perm_c.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dzsum1.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dsp_blas3.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dsp_blas2.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dreadrb.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dreadhb.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dpivotgrowth.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dmyblas2.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dlaqgs.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dlangs.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dlamch.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dlacon.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dgstrs.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

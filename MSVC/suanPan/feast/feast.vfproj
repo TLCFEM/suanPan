@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VisualStudioProject ProjectType="typeStaticLibrary" ProjectCreator="Intel Fortran" Keyword="Static Library" Version="11.0" ProjectIdGuid="{245BA1FE-5C90-492F-B308-65A6C0068A69}">
+	<Platforms>
+		<Platform Name="x64"/></Platforms>
+	<Configurations>
+		<Configuration Name="Release|x64" OutputDirectory="..\..\$(ConfigurationName)\Libs\" ConfigurationType="typeStaticLibrary">
+				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" MultiProcessorCompilation="true" Optimization="optimizeFull" Parallelization="true" Preprocess="preprocessYes" PreprocessorDefinitions="MKL" EnableEnhancedInstructionSet="codeArchAVX" OpenMP="OpenMPParallelCode" ExternalNameInterpretation="extNameLowerCase" ExternalNameUnderscore="true" RuntimeLibrary="rtMultiThreadedDLL"/>
+				<Tool Name="VFLibrarianTool"/>
+				<Tool Name="VFResourceCompilerTool"/>
+				<Tool Name="VFMidlTool" SuppressStartupBanner="true" TargetEnvironment="midlTargetAMD64"/>
+				<Tool Name="VFCustomBuildTool"/>
+				<Tool Name="VFPreLinkEventTool"/>
+				<Tool Name="VFPreBuildEventTool"/>
+				<Tool Name="VFPostBuildEventTool"/></Configuration></Configurations>
+	<Files>
+		<Filter Name="SRC" Filter="f90;for;f;fpp;ftn;def;odl;idl">
+		<File RelativePath="..\..\..\Toolbox\feast-src\spike-src\cpivul.f"/>
+		<File RelativePath="..\..\..\Toolbox\feast-src\spike-src\cspike_smp.f90"/>
+		<File RelativePath="..\..\..\Toolbox\feast-src\spike-src\cspike_smp.fpp"/>
+		<File RelativePath="..\..\..\Toolbox\feast-src\spike-src\dpivul.f"/>
+		<File RelativePath="..\..\..\Toolbox\feast-src\spike-src\dspike_smp.f90"/>
+		<File RelativePath="..\..\..\Toolbox\feast-src\spike-src\dspike_smp.fpp"/>
+		<File RelativePath="..\..\..\Toolbox\feast-src\dzfeast.f90"/>
+		<File RelativePath="..\..\..\Toolbox\feast-src\dzfeast_banded.f90"/>
+		<File RelativePath="..\..\..\Toolbox\feast-src\dzfeast_dense.f90"/>
+		<File RelativePath="..\..\..\Toolbox\feast-src\dzfeast_pev_dense.f90"/>
+		<File RelativePath="..\..\..\Toolbox\feast-src\dzfeast_pev_sparse.f90"/>
+		<File RelativePath="..\..\..\Toolbox\feast-src\dzfeast_sparse.f90"/>
+		<File RelativePath="..\..\..\Toolbox\feast-src\dzifeast_pev_sparse.f90"/>
+		<File RelativePath="..\..\..\Toolbox\feast-src\dzifeast_sparse.f90"/>
+		<File RelativePath="..\..\..\Toolbox\feast-src\spike-src\dzlbprim.f90"/>
+		<File RelativePath="..\..\..\Toolbox\feast-src\dzlsprim.f90"/>
+		<File RelativePath="..\..\..\Toolbox\feast-src\spike-src\f90_functions_wrapper.f90"/>
+		<File RelativePath="..\..\..\Toolbox\feast-src\spike-src\f90_noruntime_interface.fi"/>
+		<File RelativePath="..\..\..\Toolbox\feast-src\feast_aux.f90"/>
+		<File RelativePath="..\..\..\Toolbox\feast-src\feast_tools.f90"/>
+		<File RelativePath="..\..\..\Toolbox\feast-src\libnum.f90"/>
+		<File RelativePath="..\..\..\Toolbox\feast-src\spike-src\sclbprim.f90"/>
+		<File RelativePath="..\..\..\Toolbox\feast-src\sclsprim.f90"/>
+		<File RelativePath="..\..\..\Toolbox\feast-src\spike-src\spike_smp_utilities.f90"/>
+		<File RelativePath="..\..\..\Toolbox\feast-src\spike-src\spivul.f"/>
+		<File RelativePath="..\..\..\Toolbox\feast-src\spike-src\sspike_smp.f90"/>
+		<File RelativePath="..\..\..\Toolbox\feast-src\spike-src\sspike_smp.fpp"/>
+		<File RelativePath="..\..\..\Toolbox\feast-src\spike-src\Xpivul.f"/>
+		<File RelativePath="..\..\..\Toolbox\feast-src\spike-src\Xspike_smp.f90"/>
+		<File RelativePath="..\..\..\Toolbox\feast-src\spike-src\Xspike_smp.fpp"/>
+		<File RelativePath="..\..\..\Toolbox\feast-src\spike-src\zpivul.f"/>
+		<File RelativePath="..\..\..\Toolbox\feast-src\spike-src\zspike_smp.f90"/>
+		<File RelativePath="..\..\..\Toolbox\feast-src\spike-src\zspike_smp.fpp"/></Filter></Files>
+	<Globals/></VisualStudioProject>

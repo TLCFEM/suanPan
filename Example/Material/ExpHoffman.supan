@@ -1,0 +1,45 @@
+# A TEST MODEL FOR EXPHOFFMAN MATERAIL
+
+node 1 5 -5 -5
+node 2 5 5 -5
+node 3 -5 5 -5
+node 4 -5 -5 -5
+node 5 5 -5 5
+node 6 5 5 5
+node 7 -5 5 5
+node 8 -5 -5 5
+
+material ExpHoffman 1 1E5 1E5 1E5 1E5 1E5 1E5 .3 .3 .3 400 300 400 300 250 200 200 200 200 2 4
+
+element C3D8 1 1 2 3 4 5 6 7 8 1 G
+
+fix2 1 P 1 2 3 4
+
+displacement 2 0 .2 2 5 6 7 8
+
+hdf5recorder 1 Node RF 7
+
+step static 1
+set fixed_step_size 1
+set ini_step_size 1E-1
+set symm_mat 0
+
+converger RelIncreDisp 1 1E-14 50 1
+
+analyze
+
+peek element 1
+
+# Node 5:
+#    5.0000  -5.0000   5.0000
+# Displacement:
+#   -0.0264   0.2000   0.0621
+# Resistance:
+#    2.7689e-12   5.6473e+03  -4.9205e-13
+peek node 5
+
+# save recorder 1
+
+reset
+clear
+exit

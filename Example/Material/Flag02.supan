@@ -1,0 +1,5 @@
+material Flag02 3 1000 10 3 .1 20 5 -.1
+
+materialTest1D 3 1E-3 20 2 7 5 10 20 10 50 10 5 20 10 12 25 40
+
+exit

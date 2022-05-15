@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{9f5ed868-5056-4b24-bafe-4236cbd8de26}</ProjectGuid>
+    <RootNamespace>superlumt</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>..\..\$(Configuration)\Libs\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>..\..\$(Configuration)\Libs\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>PRNTlevel=0;Add_;__OPENMP;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <OpenMPSupport>true</OpenMPSupport>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <PreprocessorDefinitions>PRNTlevel=0;Add_;__OPENMP;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <OpenMPSupport>true</OpenMPSupport>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\await.c">
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Disabled</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\cgscon.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\cgsequ.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\cgsrfs.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\cgstrs.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\cholnzcnt.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\clacon.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\clangs.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\claqgs.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\cmyblas2.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\colamd.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\cpivotgrowth.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\creadhb.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\creadrb.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\csp_blas2.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\csp_blas3.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dclock.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dcomplex.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dgscon.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dgsequ.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dgsrfs.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dgstrs.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dlacon.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dlamch.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dlangs.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dlaqgs.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dmyblas2.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dpivotgrowth.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dreadhb.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dreadrb.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dsp_blas2.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dsp_blas3.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dzsum1.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\get_perm_c.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\heap_relax_snode.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\icmax1.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\izmax1.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\lsame.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\mmd.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgssv.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgssvx.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf_bmod1D.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf_bmod1D_mv2.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf_bmod2D.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf_bmod2D_mv2.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf_column_bmod.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf_column_dfs.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf_copy_to_ucol.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf_factor_snode.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf_init.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf_panel_bmod.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf_panel_dfs.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf_pivotL.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf_snode_bmod.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf_snode_dfs.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf_thread.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf_thread_finalize.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcgstrf_thread_init.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcmemory.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pcutil.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgssv.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgssvx.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf_bmod1D.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf_bmod1D_mv2.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf_bmod2D.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf_bmod2D_mv2.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf_column_bmod.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf_column_dfs.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf_copy_to_ucol.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf_factor_snode.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf_init.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf_panel_bmod.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf_panel_dfs.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf_pivotL.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf_snode_bmod.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf_snode_dfs.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf_thread.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf_thread_finalize.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdgstrf_thread_init.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdmemory.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pdutil.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pmemory.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgssv.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgssvx.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf_bmod1D.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf_bmod1D_mv2.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf_bmod2D.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf_bmod2D_mv2.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf_column_bmod.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf_column_dfs.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf_copy_to_ucol.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf_factor_snode.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf_init.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf_panel_bmod.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf_panel_dfs.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf_pivotL.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf_snode_bmod.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf_snode_dfs.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf_thread.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf_thread_finalize.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psgstrf_thread_init.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psmemory.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\psutil.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pxgstrf_finalize.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pxgstrf_mark_busy_descends.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pxgstrf_pruneL.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pxgstrf_relax_snode.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pxgstrf_scheduler.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pxgstrf_super_bnd_dfs.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pxgstrf_synch.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgssv.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgssvx.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf_bmod1D.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf_bmod1D_mv2.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf_bmod2D.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf_bmod2D_mv2.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf_column_bmod.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf_column_dfs.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf_copy_to_ucol.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf_factor_snode.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf_init.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf_panel_bmod.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf_panel_dfs.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf_pivotL.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf_snode_bmod.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf_snode_dfs.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf_thread.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf_thread_finalize.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzgstrf_thread_init.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzmemory.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\pzutil.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\qrnzcnt.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\scomplex.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\scsum1.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\sgscon.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\sgsequ.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\sgsrfs.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\sgstrs.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\slacon.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\slamch.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\slangs.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\slaqgs.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\smyblas2.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\spivotgrowth.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\sp_coletree.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\sp_colorder.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\sp_ienv.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\sreadhb.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\sreadrb.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\ssp_blas2.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\ssp_blas3.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\superlu_timer.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\util.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\xerbla.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\zgscon.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\zgsequ.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\zgsrfs.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\zgstrs.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\zlacon.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\zlangs.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\zlaqgs.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\zmyblas2.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\zpivotgrowth.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\zreadhb.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\zreadrb.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\zsp_blas2.c" />
+    <ClCompile Include="..\..\..\Toolbox\superlumt-src\zsp_blas3.c" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,77 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=20mm]{geometry}
+\usepackage{mathpazo,amsmath,amsfonts,amssymb}
+\begin{document}
+The generalized alpha method assumes that the displacement $d$ and the velocity $v$ are integrated as such,
+\begin{gather}\label{EQ1}
+d_{n+1}=d_n+\Delta{}tv_n+\Delta{}t^2\left(\left(\dfrac{1}{2}-\beta\right)a_n+\beta{}a_{n+1}\right),\\
+v_{n+1}=v_n+\Delta{}t\left(1-\gamma\right)a_n+\Delta{}t\gamma{}a_{n+1},
+\end{gather}
+where $\beta$ and $\gamma$ are two parameters. From \eqref{EQ1}, the acceleration $a_{n+1}$ can be expressed as
+\begin{gather}
+a_{n+1}=\dfrac{1}{\beta\Delta{}t^2}d_{n+1}-\dfrac{1}{\beta\Delta{}t^2}d_n-\dfrac{1}{\beta\Delta{}t}v_n+\left(1-\dfrac{1}{2\beta}\right)a_n.
+\end{gather}
+
+The EOM is expressed at somewhere between $t_n$ and $t_{n+1}$.
+\begin{gather}
+Ma_{n+1-\alpha_m}+Cv_{n+1-\alpha_f}+Kd_{n+1-\alpha_f}=F,
+\end{gather}
+which can also be explicitly shown as
+\begin{gather}
+M\left(\left(1-\alpha_m\right)a_{n+1}+\alpha_ma_n\right)+C\left(\left(1-\alpha_f\right)v_{n+1}+\alpha_fv_n\right)+K\left(\left(1-\alpha_f\right)d_{n+1}+\alpha_fd_n\right)=F,
+\end{gather}
+where $\alpha_m$ and $\alpha_f$ are two additional parameters.
+
+By substituting $v_{n+1}$ and $a_{n+1}$ into the EOM, one arrives
+\begin{multline}
+M\left(1-\alpha_m\right)\left(\dfrac{1}{\beta\Delta{}t^2}d_{n+1}-\dfrac{1}{\beta\Delta{}t^2}d_n-\dfrac{1}{\beta\Delta{}t}v_n+\left(1-\dfrac{1}{2\beta}\right)a_n\right)+\\C\left(1-\alpha_f\right)\Delta{}t\gamma{}\left(\dfrac{1}{\beta\Delta{}t^2}d_{n+1}-\dfrac{1}{\beta\Delta{}t^2}d_n-\dfrac{1}{\beta\Delta{}t}v_n+\left(1-\dfrac{1}{2\beta}\right)a_n\right)+\\
+C\left(1-\alpha_f\right)\left(v_n+\Delta{}t\left(1-\gamma\right)a_n\right)+K\left(1-\alpha_f\right)d_{n+1}+M\alpha_ma_n+C\alpha_fv_n+K\alpha_fd_n=F.
+\end{multline}
+
+After some rearrangements, the EOM can be expressed as
+\begin{multline}
+\left(\left(1-\alpha_f\right)K+\dfrac{1-\alpha_m}{\beta\Delta{}t^2}M+\left(1-\alpha_f\right)\dfrac{\gamma{}}{\beta\Delta{}t}C\right)d_{n+1}\\
+=F+M\left(\dfrac{1-\alpha_m}{\beta\Delta{}t^2}d_n+\dfrac{1-\alpha_m}{\beta\Delta{}t}v_n+\left(\dfrac{1-\alpha_m}{2\beta}-1\right)a_n\right)-K\alpha_fd_n\\
++C\left(\left(1-\alpha_f\right)\dfrac{\gamma{}}{\beta\Delta{}t}d_n+\left(\gamma\dfrac{1-\alpha_f}{\beta}-1\right)v_n+\left(1-\alpha_f\right)\Delta{}t\left(\dfrac{\gamma}{2\beta}-1\right)a_n\right)
+\end{multline}
+
+By denoting some constants as
+\begin{gather*}
+C_0=\dfrac{1-\alpha_m}{\beta\Delta{}t^2},\quad
+C_1=\left(1-\alpha_f\right)\dfrac{\gamma{}}{\beta\Delta{}t},\quad
+C_2=\dfrac{1-\alpha_m}{\beta\Delta{}t},\quad
+C_3=\dfrac{1-\alpha_m}{2\beta}-1,\quad
+C_4=\gamma\dfrac{1-\alpha_f}{\beta}-1,\\
+C_5=\left(1-\alpha_f\right)\Delta{}t\left(\dfrac{\gamma}{2\beta}-1\right),\quad
+C_6=\Delta{}t-\Delta{}t\gamma,\quad
+C_7=\Delta{}t\gamma{},\quad
+C_8=1-\alpha_f,\quad
+C_9=\alpha_f,\\
+C_{10}=\dfrac{1}{\beta\Delta{}t^2},\quad
+C_{11}=-\dfrac{1}{\beta\Delta{}t},\quad
+C_{12}=1-\dfrac{1}{2\beta},
+\end{gather*}
+the EOM can be simplified as
+\begin{gather}
+\left(C_8K+C_0M+C_1C\right)d_{n+1}=F-KC_9d_n+M\left(C_0d_n+C_2v_n+C_3a_n\right)+C\left(C_1d_n+C_4v_n+C_5a_n\right).
+\end{gather}
+
+Hence the equivalent stiffness and resistance can be written as
+\begin{gather}
+\bar{K}=C_8K+C_0M+C_1C,\\
+\bar{R}=F+M\left(C_0d_n+C_2v_n+C_3a_n\right)+C\left(C_1d_n+C_4v_n+C_5a_n\right)-KC_9d_n,
+\end{gather}
+so that
+\begin{gather}
+\bar{K}d_{n+1}=\bar{R}.
+\end{gather}
+
+After solving the displacement $d_{n+1}$, the acceleration $a_{n+1}$ can be recovered as
+\begin{gather}
+a_{n+1}=C_{10}d_{n+1}-C_{10}d_n+C_{11}v_n+C_{12}a_n,
+\end{gather}
+and further the velocity $v_{n+1}$
+\begin{gather}
+v_{n+1}=v_n+C_6a_n+C_7a_{n+1}.
+\end{gather}
+\end{document}

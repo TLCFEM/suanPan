@@ -1,0 +1,27 @@
+material Elastic1D 1 1200
+section Rectangle2D 1 1 1 1
+
+node 1 0 0
+node 2 2 0
+node 3 4 0
+node 4 6 0
+node 5 8 0
+node 6 10 0
+
+element B21 1 1 2 1 6 1
+element B21 2 2 3 1 6 1
+element B21 3 3 4 1 6 1
+element B21 4 4 5 1 6 1
+element B21 5 5 6 1 6 1
+
+fix 1 P 1
+
+cload 1 0 -1E-2 1 6
+
+step buckle 1
+set symm_mat 0
+
+# buckling load multiplier: 2.48778147E+02.
+analyze
+
+exit

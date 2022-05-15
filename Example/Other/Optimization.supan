@@ -1,0 +1,862 @@
+node 1 0 0
+node 2 0.5 0
+node 3 1 0
+node 4 1.5 0
+node 5 2 0
+node 6 2.5 0
+node 7 3 0
+node 8 3.5 0
+node 9 4 0
+node 10 4.5 0
+node 11 5 0
+node 12 5.5 0
+node 13 6 0
+node 14 6.5 0
+node 15 7 0
+node 16 7.5 0
+node 17 8 0
+node 18 8.5 0
+node 19 9 0
+node 20 9.5 0
+node 21 10 0
+node 22 0 0.5
+node 23 0.5 0.5
+node 24 1 0.5
+node 25 1.5 0.5
+node 26 2 0.5
+node 27 2.5 0.5
+node 28 3 0.5
+node 29 3.5 0.5
+node 30 4 0.5
+node 31 4.5 0.5
+node 32 5 0.5
+node 33 5.5 0.5
+node 34 6 0.5
+node 35 6.5 0.5
+node 36 7 0.5
+node 37 7.5 0.5
+node 38 8 0.5
+node 39 8.5 0.5
+node 40 9 0.5
+node 41 9.5 0.5
+node 42 10 0.5
+node 43 0 1
+node 44 0.5 1
+node 45 1 1
+node 46 1.5 1
+node 47 2 1
+node 48 2.5 1
+node 49 3 1
+node 50 3.5 1
+node 51 4 1
+node 52 4.5 1
+node 53 5 1
+node 54 5.5 1
+node 55 6 1
+node 56 6.5 1
+node 57 7 1
+node 58 7.5 1
+node 59 8 1
+node 60 8.5 1
+node 61 9 1
+node 62 9.5 1
+node 63 10 1
+node 64 0 1.5
+node 65 0.5 1.5
+node 66 1 1.5
+node 67 1.5 1.5
+node 68 2 1.5
+node 69 2.5 1.5
+node 70 3 1.5
+node 71 3.5 1.5
+node 72 4 1.5
+node 73 4.5 1.5
+node 74 5 1.5
+node 75 5.5 1.5
+node 76 6 1.5
+node 77 6.5 1.5
+node 78 7 1.5
+node 79 7.5 1.5
+node 80 8 1.5
+node 81 8.5 1.5
+node 82 9 1.5
+node 83 9.5 1.5
+node 84 10 1.5
+node 85 0 2
+node 86 0.5 2
+node 87 1 2
+node 88 1.5 2
+node 89 2 2
+node 90 2.5 2
+node 91 3 2
+node 92 3.5 2
+node 93 4 2
+node 94 4.5 2
+node 95 5 2
+node 96 5.5 2
+node 97 6 2
+node 98 6.5 2
+node 99 7 2
+node 100 7.5 2
+node 101 8 2
+node 102 8.5 2
+node 103 9 2
+node 104 9.5 2
+node 105 10 2
+node 106 0 2.5
+node 107 0.5 2.5
+node 108 1 2.5
+node 109 1.5 2.5
+node 110 2 2.5
+node 111 2.5 2.5
+node 112 3 2.5
+node 113 3.5 2.5
+node 114 4 2.5
+node 115 4.5 2.5
+node 116 5 2.5
+node 117 5.5 2.5
+node 118 6 2.5
+node 119 6.5 2.5
+node 120 7 2.5
+node 121 7.5 2.5
+node 122 8 2.5
+node 123 8.5 2.5
+node 124 9 2.5
+node 125 9.5 2.5
+node 126 10 2.5
+node 127 0 3
+node 128 0.5 3
+node 129 1 3
+node 130 1.5 3
+node 131 2 3
+node 132 2.5 3
+node 133 3 3
+node 134 3.5 3
+node 135 4 3
+node 136 4.5 3
+node 137 5 3
+node 138 5.5 3
+node 139 6 3
+node 140 6.5 3
+node 141 7 3
+node 142 7.5 3
+node 143 8 3
+node 144 8.5 3
+node 145 9 3
+node 146 9.5 3
+node 147 10 3
+node 148 0 3.5
+node 149 0.5 3.5
+node 150 1 3.5
+node 151 1.5 3.5
+node 152 2 3.5
+node 153 2.5 3.5
+node 154 3 3.5
+node 155 3.5 3.5
+node 156 4 3.5
+node 157 4.5 3.5
+node 158 5 3.5
+node 159 5.5 3.5
+node 160 6 3.5
+node 161 6.5 3.5
+node 162 7 3.5
+node 163 7.5 3.5
+node 164 8 3.5
+node 165 8.5 3.5
+node 166 9 3.5
+node 167 9.5 3.5
+node 168 10 3.5
+node 169 0 4
+node 170 0.5 4
+node 171 1 4
+node 172 1.5 4
+node 173 2 4
+node 174 2.5 4
+node 175 3 4
+node 176 3.5 4
+node 177 4 4
+node 178 4.5 4
+node 179 5 4
+node 180 5.5 4
+node 181 6 4
+node 182 6.5 4
+node 183 7 4
+node 184 7.5 4
+node 185 8 4
+node 186 8.5 4
+node 187 9 4
+node 188 9.5 4
+node 189 10 4
+node 190 0 4.5
+node 191 0.5 4.5
+node 192 1 4.5
+node 193 1.5 4.5
+node 194 2 4.5
+node 195 2.5 4.5
+node 196 3 4.5
+node 197 3.5 4.5
+node 198 4 4.5
+node 199 4.5 4.5
+node 200 5 4.5
+node 201 5.5 4.5
+node 202 6 4.5
+node 203 6.5 4.5
+node 204 7 4.5
+node 205 7.5 4.5
+node 206 8 4.5
+node 207 8.5 4.5
+node 208 9 4.5
+node 209 9.5 4.5
+node 210 10 4.5
+node 211 0 5
+node 212 0.5 5
+node 213 1 5
+node 214 1.5 5
+node 215 2 5
+node 216 2.5 5
+node 217 3 5
+node 218 3.5 5
+node 219 4 5
+node 220 4.5 5
+node 221 5 5
+node 222 5.5 5
+node 223 6 5
+node 224 6.5 5
+node 225 7 5
+node 226 7.5 5
+node 227 8 5
+node 228 8.5 5
+node 229 9 5
+node 230 9.5 5
+node 231 10 5
+node 232 0 5.5
+node 233 0.5 5.5
+node 234 1 5.5
+node 235 1.5 5.5
+node 236 2 5.5
+node 237 2.5 5.5
+node 238 3 5.5
+node 239 3.5 5.5
+node 240 4 5.5
+node 241 4.5 5.5
+node 242 5 5.5
+node 243 5.5 5.5
+node 244 6 5.5
+node 245 6.5 5.5
+node 246 7 5.5
+node 247 7.5 5.5
+node 248 8 5.5
+node 249 8.5 5.5
+node 250 9 5.5
+node 251 9.5 5.5
+node 252 10 5.5
+node 253 0 6
+node 254 0.5 6
+node 255 1 6
+node 256 1.5 6
+node 257 2 6
+node 258 2.5 6
+node 259 3 6
+node 260 3.5 6
+node 261 4 6
+node 262 4.5 6
+node 263 5 6
+node 264 5.5 6
+node 265 6 6
+node 266 6.5 6
+node 267 7 6
+node 268 7.5 6
+node 269 8 6
+node 270 8.5 6
+node 271 9 6
+node 272 9.5 6
+node 273 10 6
+node 274 0 6.5
+node 275 0.5 6.5
+node 276 1 6.5
+node 277 1.5 6.5
+node 278 2 6.5
+node 279 2.5 6.5
+node 280 3 6.5
+node 281 3.5 6.5
+node 282 4 6.5
+node 283 4.5 6.5
+node 284 5 6.5
+node 285 5.5 6.5
+node 286 6 6.5
+node 287 6.5 6.5
+node 288 7 6.5
+node 289 7.5 6.5
+node 290 8 6.5
+node 291 8.5 6.5
+node 292 9 6.5
+node 293 9.5 6.5
+node 294 10 6.5
+node 295 0 7
+node 296 0.5 7
+node 297 1 7
+node 298 1.5 7
+node 299 2 7
+node 300 2.5 7
+node 301 3 7
+node 302 3.5 7
+node 303 4 7
+node 304 4.5 7
+node 305 5 7
+node 306 5.5 7
+node 307 6 7
+node 308 6.5 7
+node 309 7 7
+node 310 7.5 7
+node 311 8 7
+node 312 8.5 7
+node 313 9 7
+node 314 9.5 7
+node 315 10 7
+node 316 0 7.5
+node 317 0.5 7.5
+node 318 1 7.5
+node 319 1.5 7.5
+node 320 2 7.5
+node 321 2.5 7.5
+node 322 3 7.5
+node 323 3.5 7.5
+node 324 4 7.5
+node 325 4.5 7.5
+node 326 5 7.5
+node 327 5.5 7.5
+node 328 6 7.5
+node 329 6.5 7.5
+node 330 7 7.5
+node 331 7.5 7.5
+node 332 8 7.5
+node 333 8.5 7.5
+node 334 9 7.5
+node 335 9.5 7.5
+node 336 10 7.5
+node 337 0 8
+node 338 0.5 8
+node 339 1 8
+node 340 1.5 8
+node 341 2 8
+node 342 2.5 8
+node 343 3 8
+node 344 3.5 8
+node 345 4 8
+node 346 4.5 8
+node 347 5 8
+node 348 5.5 8
+node 349 6 8
+node 350 6.5 8
+node 351 7 8
+node 352 7.5 8
+node 353 8 8
+node 354 8.5 8
+node 355 9 8
+node 356 9.5 8
+node 357 10 8
+node 358 0 8.5
+node 359 0.5 8.5
+node 360 1 8.5
+node 361 1.5 8.5
+node 362 2 8.5
+node 363 2.5 8.5
+node 364 3 8.5
+node 365 3.5 8.5
+node 366 4 8.5
+node 367 4.5 8.5
+node 368 5 8.5
+node 369 5.5 8.5
+node 370 6 8.5
+node 371 6.5 8.5
+node 372 7 8.5
+node 373 7.5 8.5
+node 374 8 8.5
+node 375 8.5 8.5
+node 376 9 8.5
+node 377 9.5 8.5
+node 378 10 8.5
+node 379 0 9
+node 380 0.5 9
+node 381 1 9
+node 382 1.5 9
+node 383 2 9
+node 384 2.5 9
+node 385 3 9
+node 386 3.5 9
+node 387 4 9
+node 388 4.5 9
+node 389 5 9
+node 390 5.5 9
+node 391 6 9
+node 392 6.5 9
+node 393 7 9
+node 394 7.5 9
+node 395 8 9
+node 396 8.5 9
+node 397 9 9
+node 398 9.5 9
+node 399 10 9
+node 400 0 9.5
+node 401 0.5 9.5
+node 402 1 9.5
+node 403 1.5 9.5
+node 404 2 9.5
+node 405 2.5 9.5
+node 406 3 9.5
+node 407 3.5 9.5
+node 408 4 9.5
+node 409 4.5 9.5
+node 410 5 9.5
+node 411 5.5 9.5
+node 412 6 9.5
+node 413 6.5 9.5
+node 414 7 9.5
+node 415 7.5 9.5
+node 416 8 9.5
+node 417 8.5 9.5
+node 418 9 9.5
+node 419 9.5 9.5
+node 420 10 9.5
+node 421 0 10
+node 422 0.5 10
+node 423 1 10
+node 424 1.5 10
+node 425 2 10
+node 426 2.5 10
+node 427 3 10
+node 428 3.5 10
+node 429 4 10
+node 430 4.5 10
+node 431 5 10
+node 432 5.5 10
+node 433 6 10
+node 434 6.5 10
+node 435 7 10
+node 436 7.5 10
+node 437 8 10
+node 438 8.5 10
+node 439 9 10
+node 440 9.5 10
+node 441 10 10
+
+element CP4 1 1 2 23 22 1 1
+element CP4 2 2 3 24 23 1 1
+element CP4 3 3 4 25 24 1 1
+element CP4 4 4 5 26 25 1 1
+element CP4 5 5 6 27 26 1 1
+element CP4 6 6 7 28 27 1 1
+element CP4 7 7 8 29 28 1 1
+element CP4 8 8 9 30 29 1 1
+element CP4 9 9 10 31 30 1 1
+element CP4 10 10 11 32 31 1 1
+element CP4 11 11 12 33 32 1 1
+element CP4 12 12 13 34 33 1 1
+element CP4 13 13 14 35 34 1 1
+element CP4 14 14 15 36 35 1 1
+element CP4 15 15 16 37 36 1 1
+element CP4 16 16 17 38 37 1 1
+element CP4 17 17 18 39 38 1 1
+element CP4 18 18 19 40 39 1 1
+element CP4 19 19 20 41 40 1 1
+element CP4 20 20 21 42 41 1 1
+element CP4 21 22 23 44 43 1 1
+element CP4 22 23 24 45 44 1 1
+element CP4 23 24 25 46 45 1 1
+element CP4 24 25 26 47 46 1 1
+element CP4 25 26 27 48 47 1 1
+element CP4 26 27 28 49 48 1 1
+element CP4 27 28 29 50 49 1 1
+element CP4 28 29 30 51 50 1 1
+element CP4 29 30 31 52 51 1 1
+element CP4 30 31 32 53 52 1 1
+element CP4 31 32 33 54 53 1 1
+element CP4 32 33 34 55 54 1 1
+element CP4 33 34 35 56 55 1 1
+element CP4 34 35 36 57 56 1 1
+element CP4 35 36 37 58 57 1 1
+element CP4 36 37 38 59 58 1 1
+element CP4 37 38 39 60 59 1 1
+element CP4 38 39 40 61 60 1 1
+element CP4 39 40 41 62 61 1 1
+element CP4 40 41 42 63 62 1 1
+element CP4 41 43 44 65 64 1 1
+element CP4 42 44 45 66 65 1 1
+element CP4 43 45 46 67 66 1 1
+element CP4 44 46 47 68 67 1 1
+element CP4 45 47 48 69 68 1 1
+element CP4 46 48 49 70 69 1 1
+element CP4 47 49 50 71 70 1 1
+element CP4 48 50 51 72 71 1 1
+element CP4 49 51 52 73 72 1 1
+element CP4 50 52 53 74 73 1 1
+element CP4 51 53 54 75 74 1 1
+element CP4 52 54 55 76 75 1 1
+element CP4 53 55 56 77 76 1 1
+element CP4 54 56 57 78 77 1 1
+element CP4 55 57 58 79 78 1 1
+element CP4 56 58 59 80 79 1 1
+element CP4 57 59 60 81 80 1 1
+element CP4 58 60 61 82 81 1 1
+element CP4 59 61 62 83 82 1 1
+element CP4 60 62 63 84 83 1 1
+element CP4 61 64 65 86 85 1 1
+element CP4 62 65 66 87 86 1 1
+element CP4 63 66 67 88 87 1 1
+element CP4 64 67 68 89 88 1 1
+element CP4 65 68 69 90 89 1 1
+element CP4 66 69 70 91 90 1 1
+element CP4 67 70 71 92 91 1 1
+element CP4 68 71 72 93 92 1 1
+element CP4 69 72 73 94 93 1 1
+element CP4 70 73 74 95 94 1 1
+element CP4 71 74 75 96 95 1 1
+element CP4 72 75 76 97 96 1 1
+element CP4 73 76 77 98 97 1 1
+element CP4 74 77 78 99 98 1 1
+element CP4 75 78 79 100 99 1 1
+element CP4 76 79 80 101 100 1 1
+element CP4 77 80 81 102 101 1 1
+element CP4 78 81 82 103 102 1 1
+element CP4 79 82 83 104 103 1 1
+element CP4 80 83 84 105 104 1 1
+element CP4 81 85 86 107 106 1 1
+element CP4 82 86 87 108 107 1 1
+element CP4 83 87 88 109 108 1 1
+element CP4 84 88 89 110 109 1 1
+element CP4 85 89 90 111 110 1 1
+element CP4 86 90 91 112 111 1 1
+element CP4 87 91 92 113 112 1 1
+element CP4 88 92 93 114 113 1 1
+element CP4 89 93 94 115 114 1 1
+element CP4 90 94 95 116 115 1 1
+element CP4 91 95 96 117 116 1 1
+element CP4 92 96 97 118 117 1 1
+element CP4 93 97 98 119 118 1 1
+element CP4 94 98 99 120 119 1 1
+element CP4 95 99 100 121 120 1 1
+element CP4 96 100 101 122 121 1 1
+element CP4 97 101 102 123 122 1 1
+element CP4 98 102 103 124 123 1 1
+element CP4 99 103 104 125 124 1 1
+element CP4 100 104 105 126 125 1 1
+element CP4 101 106 107 128 127 1 1
+element CP4 102 107 108 129 128 1 1
+element CP4 103 108 109 130 129 1 1
+element CP4 104 109 110 131 130 1 1
+element CP4 105 110 111 132 131 1 1
+element CP4 106 111 112 133 132 1 1
+element CP4 107 112 113 134 133 1 1
+element CP4 108 113 114 135 134 1 1
+element CP4 109 114 115 136 135 1 1
+element CP4 110 115 116 137 136 1 1
+element CP4 111 116 117 138 137 1 1
+element CP4 112 117 118 139 138 1 1
+element CP4 113 118 119 140 139 1 1
+element CP4 114 119 120 141 140 1 1
+element CP4 115 120 121 142 141 1 1
+element CP4 116 121 122 143 142 1 1
+element CP4 117 122 123 144 143 1 1
+element CP4 118 123 124 145 144 1 1
+element CP4 119 124 125 146 145 1 1
+element CP4 120 125 126 147 146 1 1
+element CP4 121 127 128 149 148 1 1
+element CP4 122 128 129 150 149 1 1
+element CP4 123 129 130 151 150 1 1
+element CP4 124 130 131 152 151 1 1
+element CP4 125 131 132 153 152 1 1
+element CP4 126 132 133 154 153 1 1
+element CP4 127 133 134 155 154 1 1
+element CP4 128 134 135 156 155 1 1
+element CP4 129 135 136 157 156 1 1
+element CP4 130 136 137 158 157 1 1
+element CP4 131 137 138 159 158 1 1
+element CP4 132 138 139 160 159 1 1
+element CP4 133 139 140 161 160 1 1
+element CP4 134 140 141 162 161 1 1
+element CP4 135 141 142 163 162 1 1
+element CP4 136 142 143 164 163 1 1
+element CP4 137 143 144 165 164 1 1
+element CP4 138 144 145 166 165 1 1
+element CP4 139 145 146 167 166 1 1
+element CP4 140 146 147 168 167 1 1
+element CP4 141 148 149 170 169 1 1
+element CP4 142 149 150 171 170 1 1
+element CP4 143 150 151 172 171 1 1
+element CP4 144 151 152 173 172 1 1
+element CP4 145 152 153 174 173 1 1
+element CP4 146 153 154 175 174 1 1
+element CP4 147 154 155 176 175 1 1
+element CP4 148 155 156 177 176 1 1
+element CP4 149 156 157 178 177 1 1
+element CP4 150 157 158 179 178 1 1
+element CP4 151 158 159 180 179 1 1
+element CP4 152 159 160 181 180 1 1
+element CP4 153 160 161 182 181 1 1
+element CP4 154 161 162 183 182 1 1
+element CP4 155 162 163 184 183 1 1
+element CP4 156 163 164 185 184 1 1
+element CP4 157 164 165 186 185 1 1
+element CP4 158 165 166 187 186 1 1
+element CP4 159 166 167 188 187 1 1
+element CP4 160 167 168 189 188 1 1
+element CP4 161 169 170 191 190 1 1
+element CP4 162 170 171 192 191 1 1
+element CP4 163 171 172 193 192 1 1
+element CP4 164 172 173 194 193 1 1
+element CP4 165 173 174 195 194 1 1
+element CP4 166 174 175 196 195 1 1
+element CP4 167 175 176 197 196 1 1
+element CP4 168 176 177 198 197 1 1
+element CP4 169 177 178 199 198 1 1
+element CP4 170 178 179 200 199 1 1
+element CP4 171 179 180 201 200 1 1
+element CP4 172 180 181 202 201 1 1
+element CP4 173 181 182 203 202 1 1
+element CP4 174 182 183 204 203 1 1
+element CP4 175 183 184 205 204 1 1
+element CP4 176 184 185 206 205 1 1
+element CP4 177 185 186 207 206 1 1
+element CP4 178 186 187 208 207 1 1
+element CP4 179 187 188 209 208 1 1
+element CP4 180 188 189 210 209 1 1
+element CP4 181 190 191 212 211 1 1
+element CP4 182 191 192 213 212 1 1
+element CP4 183 192 193 214 213 1 1
+element CP4 184 193 194 215 214 1 1
+element CP4 185 194 195 216 215 1 1
+element CP4 186 195 196 217 216 1 1
+element CP4 187 196 197 218 217 1 1
+element CP4 188 197 198 219 218 1 1
+element CP4 189 198 199 220 219 1 1
+element CP4 190 199 200 221 220 1 1
+element CP4 191 200 201 222 221 1 1
+element CP4 192 201 202 223 222 1 1
+element CP4 193 202 203 224 223 1 1
+element CP4 194 203 204 225 224 1 1
+element CP4 195 204 205 226 225 1 1
+element CP4 196 205 206 227 226 1 1
+element CP4 197 206 207 228 227 1 1
+element CP4 198 207 208 229 228 1 1
+element CP4 199 208 209 230 229 1 1
+element CP4 200 209 210 231 230 1 1
+element CP4 201 211 212 233 232 1 1
+element CP4 202 212 213 234 233 1 1
+element CP4 203 213 214 235 234 1 1
+element CP4 204 214 215 236 235 1 1
+element CP4 205 215 216 237 236 1 1
+element CP4 206 216 217 238 237 1 1
+element CP4 207 217 218 239 238 1 1
+element CP4 208 218 219 240 239 1 1
+element CP4 209 219 220 241 240 1 1
+element CP4 210 220 221 242 241 1 1
+element CP4 211 221 222 243 242 1 1
+element CP4 212 222 223 244 243 1 1
+element CP4 213 223 224 245 244 1 1
+element CP4 214 224 225 246 245 1 1
+element CP4 215 225 226 247 246 1 1
+element CP4 216 226 227 248 247 1 1
+element CP4 217 227 228 249 248 1 1
+element CP4 218 228 229 250 249 1 1
+element CP4 219 229 230 251 250 1 1
+element CP4 220 230 231 252 251 1 1
+element CP4 221 232 233 254 253 1 1
+element CP4 222 233 234 255 254 1 1
+element CP4 223 234 235 256 255 1 1
+element CP4 224 235 236 257 256 1 1
+element CP4 225 236 237 258 257 1 1
+element CP4 226 237 238 259 258 1 1
+element CP4 227 238 239 260 259 1 1
+element CP4 228 239 240 261 260 1 1
+element CP4 229 240 241 262 261 1 1
+element CP4 230 241 242 263 262 1 1
+element CP4 231 242 243 264 263 1 1
+element CP4 232 243 244 265 264 1 1
+element CP4 233 244 245 266 265 1 1
+element CP4 234 245 246 267 266 1 1
+element CP4 235 246 247 268 267 1 1
+element CP4 236 247 248 269 268 1 1
+element CP4 237 248 249 270 269 1 1
+element CP4 238 249 250 271 270 1 1
+element CP4 239 250 251 272 271 1 1
+element CP4 240 251 252 273 272 1 1
+element CP4 241 253 254 275 274 1 1
+element CP4 242 254 255 276 275 1 1
+element CP4 243 255 256 277 276 1 1
+element CP4 244 256 257 278 277 1 1
+element CP4 245 257 258 279 278 1 1
+element CP4 246 258 259 280 279 1 1
+element CP4 247 259 260 281 280 1 1
+element CP4 248 260 261 282 281 1 1
+element CP4 249 261 262 283 282 1 1
+element CP4 250 262 263 284 283 1 1
+element CP4 251 263 264 285 284 1 1
+element CP4 252 264 265 286 285 1 1
+element CP4 253 265 266 287 286 1 1
+element CP4 254 266 267 288 287 1 1
+element CP4 255 267 268 289 288 1 1
+element CP4 256 268 269 290 289 1 1
+element CP4 257 269 270 291 290 1 1
+element CP4 258 270 271 292 291 1 1
+element CP4 259 271 272 293 292 1 1
+element CP4 260 272 273 294 293 1 1
+element CP4 261 274 275 296 295 1 1
+element CP4 262 275 276 297 296 1 1
+element CP4 263 276 277 298 297 1 1
+element CP4 264 277 278 299 298 1 1
+element CP4 265 278 279 300 299 1 1
+element CP4 266 279 280 301 300 1 1
+element CP4 267 280 281 302 301 1 1
+element CP4 268 281 282 303 302 1 1
+element CP4 269 282 283 304 303 1 1
+element CP4 270 283 284 305 304 1 1
+element CP4 271 284 285 306 305 1 1
+element CP4 272 285 286 307 306 1 1
+element CP4 273 286 287 308 307 1 1
+element CP4 274 287 288 309 308 1 1
+element CP4 275 288 289 310 309 1 1
+element CP4 276 289 290 311 310 1 1
+element CP4 277 290 291 312 311 1 1
+element CP4 278 291 292 313 312 1 1
+element CP4 279 292 293 314 313 1 1
+element CP4 280 293 294 315 314 1 1
+element CP4 281 295 296 317 316 1 1
+element CP4 282 296 297 318 317 1 1
+element CP4 283 297 298 319 318 1 1
+element CP4 284 298 299 320 319 1 1
+element CP4 285 299 300 321 320 1 1
+element CP4 286 300 301 322 321 1 1
+element CP4 287 301 302 323 322 1 1
+element CP4 288 302 303 324 323 1 1
+element CP4 289 303 304 325 324 1 1
+element CP4 290 304 305 326 325 1 1
+element CP4 291 305 306 327 326 1 1
+element CP4 292 306 307 328 327 1 1
+element CP4 293 307 308 329 328 1 1
+element CP4 294 308 309 330 329 1 1
+element CP4 295 309 310 331 330 1 1
+element CP4 296 310 311 332 331 1 1
+element CP4 297 311 312 333 332 1 1
+element CP4 298 312 313 334 333 1 1
+element CP4 299 313 314 335 334 1 1
+element CP4 300 314 315 336 335 1 1
+element CP4 301 316 317 338 337 1 1
+element CP4 302 317 318 339 338 1 1
+element CP4 303 318 319 340 339 1 1
+element CP4 304 319 320 341 340 1 1
+element CP4 305 320 321 342 341 1 1
+element CP4 306 321 322 343 342 1 1
+element CP4 307 322 323 344 343 1 1
+element CP4 308 323 324 345 344 1 1
+element CP4 309 324 325 346 345 1 1
+element CP4 310 325 326 347 346 1 1
+element CP4 311 326 327 348 347 1 1
+element CP4 312 327 328 349 348 1 1
+element CP4 313 328 329 350 349 1 1
+element CP4 314 329 330 351 350 1 1
+element CP4 315 330 331 352 351 1 1
+element CP4 316 331 332 353 352 1 1
+element CP4 317 332 333 354 353 1 1
+element CP4 318 333 334 355 354 1 1
+element CP4 319 334 335 356 355 1 1
+element CP4 320 335 336 357 356 1 1
+element CP4 321 337 338 359 358 1 1
+element CP4 322 338 339 360 359 1 1
+element CP4 323 339 340 361 360 1 1
+element CP4 324 340 341 362 361 1 1
+element CP4 325 341 342 363 362 1 1
+element CP4 326 342 343 364 363 1 1
+element CP4 327 343 344 365 364 1 1
+element CP4 328 344 345 366 365 1 1
+element CP4 329 345 346 367 366 1 1
+element CP4 330 346 347 368 367 1 1
+element CP4 331 347 348 369 368 1 1
+element CP4 332 348 349 370 369 1 1
+element CP4 333 349 350 371 370 1 1
+element CP4 334 350 351 372 371 1 1
+element CP4 335 351 352 373 372 1 1
+element CP4 336 352 353 374 373 1 1
+element CP4 337 353 354 375 374 1 1
+element CP4 338 354 355 376 375 1 1
+element CP4 339 355 356 377 376 1 1
+element CP4 340 356 357 378 377 1 1
+element CP4 341 358 359 380 379 1 1
+element CP4 342 359 360 381 380 1 1
+element CP4 343 360 361 382 381 1 1
+element CP4 344 361 362 383 382 1 1
+element CP4 345 362 363 384 383 1 1
+element CP4 346 363 364 385 384 1 1
+element CP4 347 364 365 386 385 1 1
+element CP4 348 365 366 387 386 1 1
+element CP4 349 366 367 388 387 1 1
+element CP4 350 367 368 389 388 1 1
+element CP4 351 368 369 390 389 1 1
+element CP4 352 369 370 391 390 1 1
+element CP4 353 370 371 392 391 1 1
+element CP4 354 371 372 393 392 1 1
+element CP4 355 372 373 394 393 1 1
+element CP4 356 373 374 395 394 1 1
+element CP4 357 374 375 396 395 1 1
+element CP4 358 375 376 397 396 1 1
+element CP4 359 376 377 398 397 1 1
+element CP4 360 377 378 399 398 1 1
+element CP4 361 379 380 401 400 1 1
+element CP4 362 380 381 402 401 1 1
+element CP4 363 381 382 403 402 1 1
+element CP4 364 382 383 404 403 1 1
+element CP4 365 383 384 405 404 1 1
+element CP4 366 384 385 406 405 1 1
+element CP4 367 385 386 407 406 1 1
+element CP4 368 386 387 408 407 1 1
+element CP4 369 387 388 409 408 1 1
+element CP4 370 388 389 410 409 1 1
+element CP4 371 389 390 411 410 1 1
+element CP4 372 390 391 412 411 1 1
+element CP4 373 391 392 413 412 1 1
+element CP4 374 392 393 414 413 1 1
+element CP4 375 393 394 415 414 1 1
+element CP4 376 394 395 416 415 1 1
+element CP4 377 395 396 417 416 1 1
+element CP4 378 396 397 418 417 1 1
+element CP4 379 397 398 419 418 1 1
+element CP4 380 398 399 420 419 1 1
+element CP4 381 400 401 422 421 1 1
+element CP4 382 401 402 423 422 1 1
+element CP4 383 402 403 424 423 1 1
+element CP4 384 403 404 425 424 1 1
+element CP4 385 404 405 426 425 1 1
+element CP4 386 405 406 427 426 1 1
+element CP4 387 406 407 428 427 1 1
+element CP4 388 407 408 429 428 1 1
+element CP4 389 408 409 430 429 1 1
+element CP4 390 409 410 431 430 1 1
+element CP4 391 410 411 432 431 1 1
+element CP4 392 411 412 433 432 1 1
+element CP4 393 412 413 434 433 1 1
+element CP4 394 413 414 435 434 1 1
+element CP4 395 414 415 436 435 1 1
+element CP4 396 415 416 437 436 1 1
+element CP4 397 416 417 438 437 1 1
+element CP4 398 417 418 439 438 1 1
+element CP4 399 418 419 440 439 1 1
+element CP4 400 419 420 441 440 1 1
+
+material Elastic2D 1 1E3 .2
+
+generatebyrule nodegroup 1 1 1. 0.
+
+groupmultiplierbc 1 P 1
+
+cload 1 0 -1 2 441 420
+
+hdf5recorder 1 Visualisation S22 width 2
+
+step Optimization 1
+set ini_step_size 1
+set fixed_step_size 1
+
+criterion StrainEnergyEvolution 1 2 70 2 2 20
+
+analyze
+
+exit

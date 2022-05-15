@@ -1,0 +1,40 @@
+node 1 0 0
+node 2 .5 0
+node 3 .5 .5
+node 4 0 .5
+
+material Elastic2D 1 12 .1 1E-4
+
+element CP3 1 1 2 3 1 1
+element CP3 2 1 3 4 1 1
+
+fix 1 1 1 4
+fix 2 2 1
+
+cload 1 0 1 2 2 3
+
+step static 1
+set symm_mat 1
+set band_mat 0
+set sparse_mat 0
+
+analyze
+
+# Node 2:
+# 0.5000 0
+# Displacement:
+# 0.1498 0.6417
+# Resistance:
+# 7.5862E-09 1.0000E+00
+# 
+# Node 3:
+# 0.5000 0.5000
+# Displacement:
+# -0.1665 0.6081
+# Resistance:
+# -6.2069E-09 1.0000E+00
+peek node 2 3
+
+reset
+clear
+exit

@@ -1,0 +1,44 @@
+# A TEST MODEL FOR GSSSS INTEGRATOR
+
+node 1 0 0
+node 2 0 1
+
+material Elastic1D 1 100 .1
+
+element EB21 1 1 2 10 1 1 0
+
+mass 2 2 10 1
+
+fix 1 P 1
+
+modifier Rayleigh 3 .2 .002 .0 .0
+
+amplitude Tabular 1 EZ
+
+acceleration 2 1 .2 1 2
+
+step dynamic 1 25
+set ini_step_size .05
+set fixed_step_size 1
+
+integrator GSSSSU0 1 .5 .6 .9
+
+converger RelIncreDisp 1 1E-4 4 1
+
+analyze
+
+# Node 2:
+#         0   1.0000
+# Displacement:
+#    0.0130        0  -0.0195
+# Resistance:
+#    4.3305        0   0.0160
+# Velocity:
+#   -0.0917        0   0.1373
+# Acceleration:
+#   -0.3770        0   0.5645
+peek node 2
+
+peek integrator 1
+
+exit

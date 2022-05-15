@@ -1,0 +1,14 @@
+set(Special
+        Special/Contact2D.cpp
+        Special/Contact3D.cpp
+        Special/Damper01.cpp
+        Special/Damper02.cpp
+        Special/Embedded.cpp
+        Special/Joint.cpp
+        Special/Mass.cpp
+        Special/SingleSection2D.cpp
+        Special/SingleSection3D.cpp
+        Special/Spring01.cpp
+        Special/Spring02.cpp
+        Special/Tie.cpp
+        )

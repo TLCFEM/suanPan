@@ -1,0 +1,107 @@
+\documentclass[10pt,fleqn,3p]{elsarticle}
+\usepackage{amsmath,amsfonts,amssymb,mathpazo,indentfirst}
+\newcommand*{\md}[1]{\mathrm{d}#1}
+\newcommand*{\tr}[1]{\mathrm{tr}#1}
+\newcommand*{\ddfrac}[2]{\dfrac{\md#1}{\md#2}}
+\newcommand*{\pfrac}[2]{\dfrac{\partial#1}{\partial#2}}
+\begin{document}\pagestyle{empty}
+\section{Basics}
+The two-scalar formulation depends on hydrostatic stress $p$ and von Mises equivalent stress $q$.
+\begin{gather}
+p=\dfrac{\tr{\sigma}}{3}=\dfrac{I_1}{3},\qquad{}q=\sqrt{3J_2}=\sqrt{\dfrac{3}{2}s:s}=\sqrt{\dfrac{3}{2}}|s|.
+\end{gather}
+\section{Yield Function}
+The yield function is defined as
+\begin{gather}
+F=\dfrac{\left(p-p_t+a\right)^2}{b^2}+\dfrac{q^2}{M^2}-a^2,
+\end{gather}
+where $p_t\geqslant0$ is the tensile yield strength, $b=1$ if $p_e\geqslant0$ and $b=\beta$ if $p_e<0$ with $p_e=p-p_t+a$ denotes relative stress to the origin of ellipse, $\beta$ is a constant that controls the shape of negative-wards half of yielding ellipse, $M$ is the ratio between two radii of yielding ellipse.
+\section{Flow Rule}
+The associative plasticity is assumed so that
+\begin{gather}
+\Delta\varepsilon^p=\Delta\gamma\pfrac{F}{\sigma}=\Delta\gamma\left(\dfrac{2p_e}{3b^2}I+\dfrac{3}{M^2}s\right)
+\end{gather}
+via the following relationship
+\begin{gather*}
+\ddfrac{q^2}{\sigma}=\dfrac{3}{2}\ddfrac{\left(s:s\right)}{\sigma}=\dfrac{3}{2}\left(\ddfrac{s}{\sigma}:s+s:\ddfrac{s}{\sigma}\right)=3s.
+\end{gather*}
+Accordingly,
+\begin{gather}
+\Delta\varepsilon^p_v=\Delta\gamma\dfrac{2p_e}{b^2},\qquad\Delta\varepsilon^p_d=\Delta\gamma\dfrac{3}{M^2}s,
+\end{gather}
+where $\Delta\varepsilon^p_v=\tr{\Delta\varepsilon^p}$ is the volumetric strain scalar and $\Delta\varepsilon^p_d$ is the deviatoric strain tensor.
+\section{Hardening Rule}
+The hardening variable $\alpha$ is defined as the volumetric strain $\varepsilon^p_v$ so that
+\begin{gather}
+\alpha=\varepsilon^p_v.
+\end{gather}
+The corresponding incremental form is then
+\begin{gather}
+\alpha-\alpha_n=\Delta\alpha=\Delta\varepsilon^p_v=\Delta\gamma\dfrac{2p_e}{b^2},\\
+\alpha-\alpha_n-\Delta\gamma\dfrac{2p_e}{b^2}=0.
+\end{gather}
+The hardening rule is then defined as a function of $\alpha$,
+\begin{gather}
+a=a\left(\alpha\right)\geqslant0.
+\end{gather}
+\section{Residual}
+By using the elastic relationship,
+\begin{gather}
+s=2G\varepsilon^e_d=2G\left(\varepsilon^{tr}_d-\Delta\varepsilon^p_d\right)=s^{tr}-\Delta\gamma\dfrac{6G}{M^2}s,\\
+p=K\varepsilon^e_v=K\left(\varepsilon^{tr}_v-\Delta\varepsilon^p_v\right)=p^{tr}-K\left(\alpha-\alpha_n\right).
+\end{gather}
+Hence,
+\begin{gather}
+s=\dfrac{M^2}{M^2+6G\Delta\gamma}s^{tr},\qquad
+q=\dfrac{M^2}{M^2+6G\Delta\gamma}q^{tr}.
+\end{gather}
+
+The governing residual equations for independent variables $x=\begin{bmatrix}\Delta\gamma&\alpha\end{bmatrix}^\mathrm{T}$ can be expressed as
+\begin{gather}
+R=\left\{\begin{array}{l}
+\dfrac{p_e^2}{b^2}+\dfrac{q^2}{M^2}-a^2=0,\\[4mm]
+\alpha-\alpha_n-\Delta\gamma\dfrac{2}{b^2}p_e=0.
+\end{array}\right.
+\end{gather}
+where $p_e=p^{tr}-K\alpha+K\alpha_n-p_t+a$ and $q=\dfrac{M^2}{M^2+6G\Delta\gamma}q^{tr}$.
+\section{Local Iteration}
+The Jacobian can be formed accordingly.
+\begin{gather}
+J=\ddfrac{R}{x}=\begin{bmatrix}
+\dfrac{-12GM^2q^{tr,2}}{(M^2+6G\Delta\gamma)^3}&\dfrac{2}{b^2}p_e(a'-K)-2aa'\\[4mm]
+-\dfrac{2}{b^2}p_e&1-\Delta\gamma\dfrac{2}{b^2}(a'-K)
+\end{bmatrix}.
+\end{gather}
+\section{Tangent Stiffness}
+At local iteration, $\varepsilon^{tr}$ is fixed and $R$ is iterated out. Noting that in the global iteration, $\varepsilon^{tr}$ is also a variable that changes. If local iteration is converged, then $R=0$, so
+\begin{gather}
+\ddfrac{R}{\varepsilon^{tr}}=\pfrac{R}{\varepsilon^{tr}}+\pfrac{R}{x}\ddfrac{x}{\varepsilon^{tr}}=0,
+\end{gather}
+consequently,
+\begin{gather}
+\ddfrac{x}{\varepsilon^{tr}}=
+\begin{bmatrix}
+\ddfrac{\Delta\gamma}{\varepsilon^{tr}}\\[4mm]\ddfrac{\alpha}{\varepsilon^{tr}}
+\end{bmatrix}
+=-\left(\pfrac{R}{x}\right)^{-1}\pfrac{R}{\varepsilon^{tr}}=-J^{-1}\pfrac{R}{\varepsilon^{tr}}.
+\end{gather}
+
+Taking derivatives about $\varepsilon^{tr}$ gives
+\begin{gather}
+\pfrac{R}{\varepsilon^{tr}}=\begin{bmatrix}
+\dfrac{2p_eK}{b^2}I+\dfrac{6G}{M^2+6G\Delta\gamma}s\\[4mm]
+\dfrac{-2\Delta\gamma{}K}{b^2}I
+\end{bmatrix}
+\end{gather}
+
+The stress can be expressed as
+\begin{gather}
+\sigma=s+pI=\dfrac{M^2}{M^2+6G\Delta\gamma}s^{tr}+\left(p^{tr}-K\left(\alpha-\alpha_n\right)\right)I.
+\end{gather}
+Direct differentiation gives
+\begin{gather}
+\ddfrac{\sigma}{\varepsilon}=\dfrac{M^2}{M^2+6G\Delta\gamma}\ddfrac{s^{tr}}{\varepsilon}+s^{tr}\otimes\ddfrac{\dfrac{M^2}{M^2+6G\Delta\gamma}}{\varepsilon}+I\otimes\ddfrac{\left(p^{tr}-K\left(\alpha-\alpha_n\right)\right)}{\varepsilon}\\
+\ddfrac{\sigma}{\varepsilon}=\dfrac{2GM^2}{M^2+6G\Delta\gamma}I_d+KI\otimes{}I-KI\otimes\ddfrac{\alpha}{\varepsilon}-\dfrac{6GM^2}{\left(M^2+6G\Delta\gamma\right)^2}s^{tr}\otimes\ddfrac{\Delta\gamma}{\varepsilon},\\
+\ddfrac{\sigma}{\varepsilon}=D^e-\dfrac{12G^2\Delta\gamma}{M^2+6G\Delta\gamma}I_d-KI\otimes\ddfrac{\alpha}{\varepsilon}-\dfrac{6G}{M^2+6G\Delta\gamma}s\otimes\ddfrac{\Delta\gamma}{\varepsilon}.
+\end{gather}
+\end{document}

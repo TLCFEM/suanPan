@@ -1,0 +1,179 @@
+# A TEST MODEL FOR CP8 ELEMENT
+
+node 1 0 0
+node 2 0 1.25
+node 3 0 2.5
+node 4 0 3.75
+node 5 0 5
+node 6 0 6.25
+node 7 0 7.5
+node 8 0 8.75
+node 9 0 10
+node 10 1.25 0
+node 11 1.25 2.5
+node 12 1.25 5
+node 13 1.25 7.5
+node 14 1.25 10
+node 15 2.5 0
+node 16 2.5 1.25
+node 17 2.5 2.5
+node 18 2.5 3.75
+node 19 2.5 5
+node 20 2.5 6.25
+node 21 2.5 7.5
+node 22 2.5 8.75
+node 23 2.5 10
+node 24 3.75 0
+node 25 3.75 2.5
+node 26 3.75 5
+node 27 3.75 7.5
+node 28 3.75 10
+node 29 5 0
+node 30 5 1.25
+node 31 5 2.5
+node 32 5 3.75
+node 33 5 5
+node 34 5 6.25
+node 35 5 7.5
+node 36 5 8.75
+node 37 5 10
+node 38 6.25 0
+node 39 6.25 2.5
+node 40 6.25 5
+node 41 6.25 7.5
+node 42 6.25 10
+node 43 7.5 0
+node 44 7.5 1.25
+node 45 7.5 2.5
+node 46 7.5 3.75
+node 47 7.5 5
+node 48 7.5 6.25
+node 49 7.5 7.5
+node 50 7.5 8.75
+node 51 7.5 10
+node 52 8.75 0
+node 53 8.75 2.5
+node 54 8.75 5
+node 55 8.75 7.5
+node 56 8.75 10
+node 57 10 0
+node 58 10 1.25
+node 59 10 2.5
+node 60 10 3.75
+node 61 10 5
+node 62 10 6.25
+node 63 10 7.5
+node 64 10 8.75
+node 65 10 10
+node 66 11.25 0
+node 67 11.25 2.5
+node 68 11.25 5
+node 69 11.25 7.5
+node 70 11.25 10
+node 71 12.5 0
+node 72 12.5 1.25
+node 73 12.5 2.5
+node 74 12.5 3.75
+node 75 12.5 5
+node 76 12.5 6.25
+node 77 12.5 7.5
+node 78 12.5 8.75
+node 79 12.5 10
+node 80 13.75 0
+node 81 13.75 2.5
+node 82 13.75 5
+node 83 13.75 7.5
+node 84 13.75 10
+node 85 15 0
+node 86 15 1.25
+node 87 15 2.5
+node 88 15 3.75
+node 89 15 5
+node 90 15 6.25
+node 91 15 7.5
+node 92 15 8.75
+node 93 15 10
+node 94 16.25 0
+node 95 16.25 2.5
+node 96 16.25 5
+node 97 16.25 7.5
+node 98 16.25 10
+node 99 17.5 0
+node 100 17.5 1.25
+node 101 17.5 2.5
+node 102 17.5 3.75
+node 103 17.5 5
+node 104 17.5 6.25
+node 105 17.5 7.5
+node 106 17.5 8.75
+node 107 17.5 10
+node 108 18.75 0
+node 109 18.75 2.5
+node 110 18.75 5
+node 111 18.75 7.5
+node 112 18.75 10
+node 113 20 0
+node 114 20 1.25
+node 115 20 2.5
+node 116 20 3.75
+node 117 20 5
+node 118 20 6.25
+node 119 20 7.5
+node 120 20 8.75
+node 121 20 10
+
+element CP8 1 1 15 17 3 10 16 11 2 1 1 1 1
+element CP8 2 3 17 19 5 11 18 12 4 1 1 1 1
+element CP8 3 5 19 21 7 12 20 13 6 1 1 1 1
+element CP8 4 7 21 23 9 13 22 14 8 1 1 1 1
+element CP8 5 15 29 31 17 24 30 25 16 1 1 1 1
+element CP8 6 17 31 33 19 25 32 26 18 1 1 1 1
+element CP8 7 19 33 35 21 26 34 27 20 1 1 1 1
+element CP8 8 21 35 37 23 27 36 28 22 1 1 1 1
+element CP8 9 29 43 45 31 38 44 39 30 1 1 1 1
+element CP8 10 31 45 47 33 39 46 40 32 1 1 1 1
+element CP8 11 33 47 49 35 40 48 41 34 1 1 1 1
+element CP8 12 35 49 51 37 41 50 42 36 1 1 1 1
+element CP8 13 43 57 59 45 52 58 53 44 1 1 1 1
+element CP8 14 45 59 61 47 53 60 54 46 1 1 1 1
+element CP8 15 47 61 63 49 54 62 55 48 1 1 1 1
+element CP8 16 49 63 65 51 55 64 56 50 1 1 1 1
+element CP8 17 57 71 73 59 66 72 67 58 1 1 1 1
+element CP8 18 59 73 75 61 67 74 68 60 1 1 1 1
+element CP8 19 61 75 77 63 68 76 69 62 1 1 1 1
+element CP8 20 63 77 79 65 69 78 70 64 1 1 1 1
+element CP8 21 71 85 87 73 80 86 81 72 1 1 1 1
+element CP8 22 73 87 89 75 81 88 82 74 1 1 1 1
+element CP8 23 75 89 91 77 82 90 83 76 1 1 1 1
+element CP8 24 77 91 93 79 83 92 84 78 1 1 1 1
+element CP8 25 85 99 101 87 94 100 95 86 1 1 1 1
+element CP8 26 87 101 103 89 95 102 96 88 1 1 1 1
+element CP8 27 89 103 105 91 96 104 97 90 1 1 1 1
+element CP8 28 91 105 107 93 97 106 98 92 1 1 1 1
+element CP8 29 99 113 115 101 108 114 109 100 1 1 1 1
+element CP8 30 101 115 117 103 109 116 110 102 1 1 1 1
+element CP8 31 103 117 119 105 110 118 111 104 1 1 1 1
+element CP8 32 105 119 121 107 111 120 112 106 1 1 1 1
+
+material Elastic2D 1 100 .2 1E-4
+
+fix 1 P 1 2 3 4 5 6 7 8 9
+
+cload 1 0 2 2 121 119 117 115 113
+
+step static 1
+set fixed_step_size 1
+set ini_step_size .25
+
+converger RelIncreDisp 1 1E-10 7 1
+
+analyze
+
+# -0.3972 3.6628
+peek node 117
+
+peek element 1
+
+reset
+clear
+exit

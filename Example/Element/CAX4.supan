@@ -1,0 +1,62 @@
+node 1 0 0
+node 2 1 0
+node 3 2 0
+node 4 0 1
+node 6 2 1
+node 7 0 2
+node 8 1 2
+node 9 2 2
+
+node 5 .5 .8
+
+material BilinearCC 1 2E3 .3 .3 1.2 .4 .7 200
+material Axisymmetric 3 1
+
+element CAX4 1 1 2 5 4 3
+element CAX4 2 2 3 6 5 3
+element CAX4 3 4 5 8 7 3
+element CAX4 4 5 6 9 8 3
+
+fix 1 1 1 4 7
+fix 2 2 1 2 3
+
+displacement 1 0 -5E-3 2 7 8 9
+
+hdf5recorder 1 Element S 1 2 3 4
+
+step static 1
+set fixed_step_size 1
+set ini_step_size 2E-1
+set symm_mat 0
+
+converger RelIncreDisp 1 1E-10 20 1
+
+analyze
+
+# Node 3:
+#    2.0000        0
+# Displacement:
+#    0.0024        0
+# Resistance:
+#   -6.0779e-08   4.5099e+00
+# 
+# Node 6:
+#    2.0000   1.0000
+# Displacement:
+#    0.0024  -0.0025
+# Resistance:
+#   -4.6574e-08  -6.0838e-08
+# 
+# Node 9:
+#    2.0000   2.0000
+# Displacement:
+#    0.0024  -0.0050
+# Resistance:
+#    1.7420e-15  -4.5099e+00
+peek node 3 6 9
+
+peek element 1
+
+reset
+clear
+exit

@@ -1,0 +1,2558 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Constraint">
+      <UniqueIdentifier>{2319a38c-547b-4f6c-8853-a5d93b9abd67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Constraint\BC">
+      <UniqueIdentifier>{646eca21-97d8-4efc-b1e5-869fa75c997a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Constraint\Criterion">
+      <UniqueIdentifier>{924e01ed-13db-412b-bbdb-986acc1a9464}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Converger">
+      <UniqueIdentifier>{f149cbd1-29ed-492e-8e39-1e6622eed8da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Database">
+      <UniqueIdentifier>{5aaba568-3557-4ba5-ac74-46681519f6e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Domain">
+      <UniqueIdentifier>{a91118a1-0b7b-4421-b5df-1b82eebe0fe3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Domain\MetaMat">
+      <UniqueIdentifier>{b9805064-adaa-4184-ad19-ea97a5fbe57b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Element">
+      <UniqueIdentifier>{a8fb2efb-13ff-4863-bd42-742fe1b8d41d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Element\Beam">
+      <UniqueIdentifier>{4ef3e931-55f4-4821-9f3a-cf5b7c678c64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Element\Cube">
+      <UniqueIdentifier>{a0085675-27f5-47de-a205-6e3f22cd0d90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Element\Membrane">
+      <UniqueIdentifier>{527000a6-2cbe-4113-ab83-b5147efa6f63}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Element\Modifier">
+      <UniqueIdentifier>{d0fe164f-74d8-47aa-a240-ecdbb7e06514}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Element\Patch">
+      <UniqueIdentifier>{cc58feb7-c64c-41ad-be3b-51e2b7e3588f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Element\Plate">
+      <UniqueIdentifier>{b3698d2a-7fdd-4318-8c0f-90a7f345d2d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Element\Shell">
+      <UniqueIdentifier>{70756fc3-eb8e-47de-8bea-80a691503ee7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Element\Truss">
+      <UniqueIdentifier>{48599ab0-9d03-4762-b7d8-aa1a599d307c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Element\Utility">
+      <UniqueIdentifier>{3176393f-b5f6-4d9d-b393-dc9868075a67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Element\Visualisation">
+      <UniqueIdentifier>{cb465d5f-9ee7-439b-8114-44162b62bfe6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Element\Special">
+      <UniqueIdentifier>{ac13c010-0b1a-447c-9f0e-9ad2092d0229}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Element\Utility\IGA">
+      <UniqueIdentifier>{68cb3685-4128-40e5-8994-f6f36729419c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Load">
+      <UniqueIdentifier>{928d9ae2-7221-4eed-92e9-92abbf1671b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Load\Amplitude">
+      <UniqueIdentifier>{faebae76-8647-4340-a0fc-b49357bb608b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material">
+      <UniqueIdentifier>{d68257db-71ab-4645-a5f3-a5a946888b05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material\Material1D">
+      <UniqueIdentifier>{b674d966-4968-481d-af12-d51661e7aa4e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material\Material1D\Concrete">
+      <UniqueIdentifier>{1f939bea-da67-422c-a41b-5e5c0782dd08}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material\Material1D\Degradation">
+      <UniqueIdentifier>{5a55348d-8984-4519-9ae7-bfeda766ad85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material\Material1D\Elastic">
+      <UniqueIdentifier>{20a5ea0a-6ec8-42d1-b142-c8c3cf9a2677}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material\Material1D\Hysteresis">
+      <UniqueIdentifier>{9b096581-743b-4581-aa6c-c3c88cd1570f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material\Material1D\Viscosity">
+      <UniqueIdentifier>{862fb3a1-7dff-4d33-b910-3d1fbe9a1b38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material\Material1D\vonMises">
+      <UniqueIdentifier>{753e94ff-7e15-4a58-a8d1-0dc64c22429a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material\Material1D\Wrapper">
+      <UniqueIdentifier>{0f852aba-45b2-4e19-be6b-112c490eaa5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material\Material2D">
+      <UniqueIdentifier>{f6d466f4-7f3d-4213-b8ad-7c67a27a1e84}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material\Material2D\Elastic">
+      <UniqueIdentifier>{61546cf7-3e97-4929-bc60-49da9292dc5e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material\Material2D\Wrapper">
+      <UniqueIdentifier>{22d2ebcf-139a-4e57-9771-392cfdb6fdc2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material\Material3D">
+      <UniqueIdentifier>{a6d1eced-dc79-4d8a-8fff-35561da4d616}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material\Material3D\Concrete">
+      <UniqueIdentifier>{eced40c9-e78c-44c8-8f97-9c9834b8762b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material\Material3D\Damage">
+      <UniqueIdentifier>{59c3aaf6-1022-41b2-b29a-4c237347f8e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material\Material3D\DruckerPrager">
+      <UniqueIdentifier>{9fb63129-ab6c-4a05-a8ad-0e4822130bae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material\Material3D\Elastic">
+      <UniqueIdentifier>{ceec96be-d607-45aa-9f40-26b1357e4990}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material\Material3D\Hoffman">
+      <UniqueIdentifier>{e5fd9cc9-f250-4a5c-a9ff-0e63d8549c17}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material\Material3D\Sand">
+      <UniqueIdentifier>{c9be22ba-5986-46a9-b751-0295415571d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material\Material3D\vonMises">
+      <UniqueIdentifier>{6c658624-2dcb-43b8-b7b1-a29bf0c60679}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material\Material3D\Wrapper">
+      <UniqueIdentifier>{45f8534a-df11-4585-9eee-c2ecabf91714}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Recorder">
+      <UniqueIdentifier>{746a2666-97c7-4d61-be4f-89881e0534a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Section">
+      <UniqueIdentifier>{e22f8d0b-1abe-497b-9c15-eedd8dd887dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Section\Section1D">
+      <UniqueIdentifier>{956767f6-310d-420b-a4ab-436fbcc11c99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Section\Section2D">
+      <UniqueIdentifier>{13e603c4-3031-49e6-904e-2cc8b13c6d4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Section\Section3D">
+      <UniqueIdentifier>{d0b4fb4f-9a86-4962-9023-0ae771e67900}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Section\SectionShell">
+      <UniqueIdentifier>{5ce5d011-5cef-42fc-8c8d-c6b5faf8c7bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Solver">
+      <UniqueIdentifier>{6be10c2a-4308-4cce-89ec-9479e7b4879e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Solver\Integrator">
+      <UniqueIdentifier>{744ceba6-2c07-43c4-82ff-f6b889f50be8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Step">
+      <UniqueIdentifier>{906d0c68-8e82-41c8-bedb-19c15c4239c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Toolbox">
+      <UniqueIdentifier>{bcf2f097-c8b8-4a37-9885-c6d5c6dd7406}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UnitTest">
+      <UniqueIdentifier>{03aa814f-b4a8-4b97-9941-9ac56e416da9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material\Material3D\Clay">
+      <UniqueIdentifier>{556c8483-725c-4046-bd1c-87407775e812}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material\Material3D\Clay\CamClay">
+      <UniqueIdentifier>{57346d38-fa91-4b83-b970-c3a8d49e1c9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Element\Membrane\CSM">
+      <UniqueIdentifier>{7bc94694-b8ae-47b7-bc44-98acec5d0d60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Element\Membrane\PFM">
+      <UniqueIdentifier>{8110e345-1b23-4455-a412-f57a94ac0464}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material\Special">
+      <UniqueIdentifier>{05741bad-1b22-4125-a759-747a246e9989}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Element\Membrane\Plane">
+      <UniqueIdentifier>{ead647cf-4dfa-4e74-8f2e-a530d34c3640}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Element\Membrane\Mixed">
+      <UniqueIdentifier>{a6bf7f0f-8a5d-4af1-a75a-839ea689b85a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Element\Membrane\Drilling">
+      <UniqueIdentifier>{cae4ff08-938a-4934-bcdc-2e051634bf78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Element\Membrane\Axisymmetric">
+      <UniqueIdentifier>{c1087494-a094-49ca-90e6-0f4e1ca9683d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Element\Membrane\Infinite">
+      <UniqueIdentifier>{d76f50de-99ca-4020-9232-443c4131ca75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Element\Membrane\Porous">
+      <UniqueIdentifier>{fc08d632-2790-4a12-9a3f-a38b37dd981a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Section\SectionNM">
+      <UniqueIdentifier>{931b39fd-1d80-41a3-a54f-a229a4d5fb25}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Constraint\BC\GroupMultiplierBC.cpp">
+      <Filter>Constraint\BC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\BC\GroupPenaltyBC.cpp">
+      <Filter>Constraint\BC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\BC\MultiplierBC.cpp">
+      <Filter>Constraint\BC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\BC\PenaltyBC.cpp">
+      <Filter>Constraint\BC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\Criterion\Criterion.cpp">
+      <Filter>Constraint\Criterion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\Criterion\MaxDisplacement.cpp">
+      <Filter>Constraint\Criterion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\Criterion\MaxHistory.cpp">
+      <Filter>Constraint\Criterion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\Criterion\MaxResistance.cpp">
+      <Filter>Constraint\Criterion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\Criterion\MinDisplacement.cpp">
+      <Filter>Constraint\Criterion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\Criterion\MinResistance.cpp">
+      <Filter>Constraint\Criterion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\Criterion\NodeBasedCriterion.cpp">
+      <Filter>Constraint\Criterion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\Criterion\StrainEnergyEvolution.cpp">
+      <Filter>Constraint\Criterion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\Constraint.cpp">
+      <Filter>Constraint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\ConstraintParser.cpp">
+      <Filter>Constraint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\Embed.cpp">
+      <Filter>Constraint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\MPC.cpp">
+      <Filter>Constraint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\ParticleCollision.cpp">
+      <Filter>Constraint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\ParticleCollision2D.cpp">
+      <Filter>Constraint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\ParticleCollision3D.cpp">
+      <Filter>Constraint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\RigidWallMultiplier.cpp">
+      <Filter>Constraint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\RigidWallPenalty.cpp">
+      <Filter>Constraint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Converger\AbsDisp.cpp">
+      <Filter>Converger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Converger\AbsError.cpp">
+      <Filter>Converger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Converger\AbsIncreDisp.cpp">
+      <Filter>Converger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Converger\AbsIncreEnergy.cpp">
+      <Filter>Converger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Converger\AbsResidual.cpp">
+      <Filter>Converger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Converger\Converger.cpp">
+      <Filter>Converger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Converger\FixedNumber.cpp">
+      <Filter>Converger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Converger\RelDisp.cpp">
+      <Filter>Converger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Converger\RelError.cpp">
+      <Filter>Converger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Converger\RelIncreDisp.cpp">
+      <Filter>Converger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Converger\RelIncreEnergy.cpp">
+      <Filter>Converger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Converger\RelResidual.cpp">
+      <Filter>Converger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Database\Database.cpp">
+      <Filter>Database</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Database\HDF.cpp">
+      <Filter>Database</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Domain\Domain.cpp">
+      <Filter>Domain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Domain\DomainBase.cpp">
+      <Filter>Domain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Domain\ElementGroup.cpp">
+      <Filter>Domain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Domain\ExternalModule.cpp">
+      <Filter>Domain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Domain\Group.cpp">
+      <Filter>Domain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Domain\GroupGroup.cpp">
+      <Filter>Domain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Domain\Node.cpp">
+      <Filter>Domain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Domain\NodeGroup.cpp">
+      <Filter>Domain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Domain\Tag.cpp">
+      <Filter>Domain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Beam\B21.cpp">
+      <Filter>Element\Beam</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Beam\B21E.cpp">
+      <Filter>Element\Beam</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Beam\B21H.cpp">
+      <Filter>Element\Beam</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Beam\B31.cpp">
+      <Filter>Element\Beam</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Beam\EB21.cpp">
+      <Filter>Element\Beam</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Beam\F21.cpp">
+      <Filter>Element\Beam</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Beam\F21H.cpp">
+      <Filter>Element\Beam</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Beam\F31.cpp">
+      <Filter>Element\Beam</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Beam\MVLEM.cpp">
+      <Filter>Element\Beam</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Cube\C3D4.cpp">
+      <Filter>Element\Cube</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Cube\C3D8.cpp">
+      <Filter>Element\Cube</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Cube\C3D8I.cpp">
+      <Filter>Element\Cube</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Cube\C3D20.cpp">
+      <Filter>Element\Cube</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Cube\CIN3D8.cpp">
+      <Filter>Element\Cube</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Cube\DC3D4.cpp">
+      <Filter>Element\Cube</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Cube\DC3D8.cpp">
+      <Filter>Element\Cube</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Modifier\ElementalModal.cpp">
+      <Filter>Element\Modifier</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Modifier\LumpedScale.cpp">
+      <Filter>Element\Modifier</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Modifier\LumpedSimple.cpp">
+      <Filter>Element\Modifier</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Modifier\Modifier.cpp">
+      <Filter>Element\Modifier</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Modifier\Rayleigh.cpp">
+      <Filter>Element\Modifier</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Patch\Patch.cpp">
+      <Filter>Element\Patch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Patch\PatchCube.cpp">
+      <Filter>Element\Patch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Patch\PatchQuad.cpp">
+      <Filter>Element\Patch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Plate\DKT3.cpp">
+      <Filter>Element\Plate</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Plate\DKT4.cpp">
+      <Filter>Element\Plate</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Plate\Mindlin.cpp">
+      <Filter>Element\Plate</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Shell\DKTS3.cpp">
+      <Filter>Element\Shell</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Shell\S4.cpp">
+      <Filter>Element\Shell</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Shell\SGCMS.cpp">
+      <Filter>Element\Shell</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Shell\ShellBase.cpp">
+      <Filter>Element\Shell</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Special\Contact2D.cpp">
+      <Filter>Element\Special</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Special\Damper01.cpp">
+      <Filter>Element\Special</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Special\Damper02.cpp">
+      <Filter>Element\Special</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Special\Joint.cpp">
+      <Filter>Element\Special</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Special\Mass.cpp">
+      <Filter>Element\Special</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Special\SingleSection2D.cpp">
+      <Filter>Element\Special</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Special\SingleSection3D.cpp">
+      <Filter>Element\Special</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Special\Spring01.cpp">
+      <Filter>Element\Special</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Special\Spring02.cpp">
+      <Filter>Element\Special</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Special\Tie.cpp">
+      <Filter>Element\Special</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Truss\T2D2.cpp">
+      <Filter>Element\Truss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Truss\T2D2S.cpp">
+      <Filter>Element\Truss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Truss\T3D2.cpp">
+      <Filter>Element\Truss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Truss\T3D2S.cpp">
+      <Filter>Element\Truss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Utility\IGA\BSplineSurface.cpp">
+      <Filter>Element\Utility\IGA</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Utility\IGA\BSplineVolume.cpp">
+      <Filter>Element\Utility\IGA</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Utility\IGA\NURBS.cpp">
+      <Filter>Element\Utility\IGA</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Utility\IGA\NURBSSurface.cpp">
+      <Filter>Element\Utility\IGA</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Utility\IGA\NURBSVolume.cpp">
+      <Filter>Element\Utility\IGA</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Utility\IGA\BSpline.cpp">
+      <Filter>Element\Utility\IGA</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Utility\B2DC.cpp">
+      <Filter>Element\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Utility\B2DL.cpp">
+      <Filter>Element\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Utility\B3DL.cpp">
+      <Filter>Element\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Utility\Orientation.cpp">
+      <Filter>Element\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Utility\PhaseField.cpp">
+      <Filter>Element\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Utility\T2DC.cpp">
+      <Filter>Element\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Utility\T2DL.cpp">
+      <Filter>Element\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Utility\T3DC.cpp">
+      <Filter>Element\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Utility\T3DL.cpp">
+      <Filter>Element\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Visualisation\vtkBase.cpp">
+      <Filter>Element\Visualisation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Visualisation\vtkParser.cpp">
+      <Filter>Element\Visualisation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Element.cpp">
+      <Filter>Element</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\ElementParser.cpp">
+      <Filter>Element</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\ElementTemplate.cpp">
+      <Filter>Element</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\MaterialElement.cpp">
+      <Filter>Element</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\SectionElement.cpp">
+      <Filter>Element</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Load\BodyForce.cpp">
+      <Filter>Load</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Load\GroupBodyForce.cpp">
+      <Filter>Load</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Load\GroupNodalDisplacement.cpp">
+      <Filter>Load</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Load\GroupNodalForce.cpp">
+      <Filter>Load</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Load\Load.cpp">
+      <Filter>Load</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Load\NodalAcceleration.cpp">
+      <Filter>Load</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Load\NodalDisplacement.cpp">
+      <Filter>Load</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Load\NodalForce.cpp">
+      <Filter>Load</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Load\Amplitude\Amplitude.cpp">
+      <Filter>Load\Amplitude</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Load\Amplitude\Combine.cpp">
+      <Filter>Load\Amplitude</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Load\Amplitude\Constant.cpp">
+      <Filter>Load\Amplitude</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Load\Amplitude\Cosine.cpp">
+      <Filter>Load\Amplitude</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Load\Amplitude\Decay.cpp">
+      <Filter>Load\Amplitude</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Load\Amplitude\Linear.cpp">
+      <Filter>Load\Amplitude</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Load\Amplitude\Modulated.cpp">
+      <Filter>Load\Amplitude</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Load\Amplitude\NZStrongMotion.cpp">
+      <Filter>Load\Amplitude</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Load\Amplitude\Ramp.cpp">
+      <Filter>Load\Amplitude</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Load\Amplitude\Sine.cpp">
+      <Filter>Load\Amplitude</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Load\Amplitude\Tabular.cpp">
+      <Filter>Load\Amplitude</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Material1D.cpp">
+      <Filter>Material\Material1D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Concrete\ConcreteCM.cpp">
+      <Filter>Material\Material1D\Concrete</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Concrete\ConcreteExp.cpp">
+      <Filter>Material\Material1D\Concrete</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Concrete\ConcreteTable.cpp">
+      <Filter>Material\Material1D\Concrete</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Concrete\ConcreteTsai.cpp">
+      <Filter>Material\Material1D\Concrete</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Degradation\Degradation.cpp">
+      <Filter>Material\Material1D\Degradation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Degradation\Dhakal.cpp">
+      <Filter>Material\Material1D\Degradation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Degradation\TrilinearDegradation.cpp">
+      <Filter>Material\Material1D\Degradation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Elastic\BilinearElastic1D.cpp">
+      <Filter>Material\Material1D\Elastic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Elastic\Elastic1D.cpp">
+      <Filter>Material\Material1D\Elastic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Elastic\MultilinearElastic1D.cpp">
+      <Filter>Material\Material1D\Elastic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Elastic\PolyElastic1D.cpp">
+      <Filter>Material\Material1D\Elastic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\AFC.cpp">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\BilinearOO.cpp">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\BilinearPO.cpp">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\BoucWen.cpp">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\BWBN.cpp">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\CoulombFriction.cpp">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\Flag.cpp">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\Gap01.cpp">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\MPF.cpp">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\MultilinearOO.cpp">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\MultilinearPO.cpp">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\OriginOriented.cpp">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\PeakOriented.cpp">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\RambergOsgood.cpp">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\SimpleHysteresis.cpp">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\SlipLock.cpp">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\SteelBRB.cpp">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\Trivial.cpp">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Viscosity\BilinearViscosity.cpp">
+      <Filter>Material\Material1D\Viscosity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Viscosity\Maxwell.cpp">
+      <Filter>Material\Material1D\Viscosity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Viscosity\NonlinearViscosity.cpp">
+      <Filter>Material\Material1D\Viscosity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Viscosity\Viscosity01.cpp">
+      <Filter>Material\Material1D\Viscosity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Viscosity\Viscosity02.cpp">
+      <Filter>Material\Material1D\Viscosity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\vonMises\ArmstrongFrederick1D.cpp">
+      <Filter>Material\Material1D\vonMises</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\vonMises\Bilinear1D.cpp">
+      <Filter>Material\Material1D\vonMises</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\vonMises\BilinearMises1D.cpp">
+      <Filter>Material\Material1D\vonMises</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\vonMises\ExpGurson1D.cpp">
+      <Filter>Material\Material1D\vonMises</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\vonMises\ExpMises1D.cpp">
+      <Filter>Material\Material1D\vonMises</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\vonMises\MultilinearMises1D.cpp">
+      <Filter>Material\Material1D\vonMises</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\vonMises\NonlinearGurson1D.cpp">
+      <Filter>Material\Material1D\vonMises</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\vonMises\NonlinearMises1D.cpp">
+      <Filter>Material\Material1D\vonMises</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\vonMises\VAFCRP1D.cpp">
+      <Filter>Material\Material1D\vonMises</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Wrapper\Parallel.cpp">
+      <Filter>Material\Material1D\Wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Wrapper\Sequential.cpp">
+      <Filter>Material\Material1D\Wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Wrapper\Uniaxial.cpp">
+      <Filter>Material\Material1D\Wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material2D\Elastic\AxisymmetricElastic.cpp">
+      <Filter>Material\Material2D\Elastic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material2D\Elastic\Elastic2D.cpp">
+      <Filter>Material\Material2D\Elastic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material2D\Wrapper\Axisymmetric.cpp">
+      <Filter>Material\Material2D\Wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material2D\Wrapper\Laminated.cpp">
+      <Filter>Material\Material2D\Wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material2D\Wrapper\PlaneStrain.cpp">
+      <Filter>Material\Material2D\Wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material2D\Wrapper\PlaneStress.cpp">
+      <Filter>Material\Material2D\Wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material2D\Wrapper\Rotation2D.cpp">
+      <Filter>Material\Material2D\Wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material2D\Bilinear2D.cpp">
+      <Filter>Material\Material2D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material2D\Concrete21.cpp">
+      <Filter>Material\Material2D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material2D\Concrete22.cpp">
+      <Filter>Material\Material2D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material2D\Material2D.cpp">
+      <Filter>Material\Material2D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material.cpp">
+      <Filter>Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\MaterialParser.cpp">
+      <Filter>Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\MaterialTemplate.cpp">
+      <Filter>Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\MaterialTester.cpp">
+      <Filter>Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Material3D.cpp">
+      <Filter>Material\Material3D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Concrete\CDP.cpp">
+      <Filter>Material\Material3D\Concrete</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Concrete\NonlinearCDP.cpp">
+      <Filter>Material\Material3D\Concrete</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Concrete\Rebar3D.cpp">
+      <Filter>Material\Material3D\Concrete</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Concrete\TableCDP.cpp">
+      <Filter>Material\Material3D\Concrete</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Damage\IsotropicDamage.cpp">
+      <Filter>Material\Material3D\Damage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Damage\LinearDamage.cpp">
+      <Filter>Material\Material3D\Damage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\DruckerPrager\BilinearDP.cpp">
+      <Filter>Material\Material3D\DruckerPrager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\DruckerPrager\ExpDP.cpp">
+      <Filter>Material\Material3D\DruckerPrager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\DruckerPrager\NonlinearDruckerPrager.cpp">
+      <Filter>Material\Material3D\DruckerPrager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Elastic\BlatzKo.cpp">
+      <Filter>Material\Material3D\Elastic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Elastic\IsotropicElastic3D.cpp">
+      <Filter>Material\Material3D\Elastic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Elastic\IsotropicNonlinearElastic3D.cpp">
+      <Filter>Material\Material3D\Elastic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Elastic\MooneyRivlin.cpp">
+      <Filter>Material\Material3D\Elastic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Elastic\NLE3D01.cpp">
+      <Filter>Material\Material3D\Elastic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Elastic\OrthotropicElastic3D.cpp">
+      <Filter>Material\Material3D\Elastic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Elastic\Yeoh.cpp">
+      <Filter>Material\Material3D\Elastic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Hoffman\BilinearHoffman.cpp">
+      <Filter>Material\Material3D\Hoffman</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Hoffman\ExpHoffman.cpp">
+      <Filter>Material\Material3D\Hoffman</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Hoffman\NonlinearHill.cpp">
+      <Filter>Material\Material3D\Hoffman</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Hoffman\NonlinearHoffman.cpp">
+      <Filter>Material\Material3D\Hoffman</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Sand\SimpleSand.cpp">
+      <Filter>Material\Material3D\Sand</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\vonMises\ArmstrongFrederick.cpp">
+      <Filter>Material\Material3D\vonMises</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\vonMises\BilinearJ2.cpp">
+      <Filter>Material\Material3D\vonMises</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\vonMises\BilinearPeric.cpp">
+      <Filter>Material\Material3D\vonMises</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\vonMises\ExpGurson.cpp">
+      <Filter>Material\Material3D\vonMises</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\vonMises\ExpJ2.cpp">
+      <Filter>Material\Material3D\vonMises</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\vonMises\MultilinearJ2.cpp">
+      <Filter>Material\Material3D\vonMises</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\vonMises\NonlinearGurson.cpp">
+      <Filter>Material\Material3D\vonMises</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\vonMises\NonlinearJ2.cpp">
+      <Filter>Material\Material3D\vonMises</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\vonMises\NonlinearPeric.cpp">
+      <Filter>Material\Material3D\vonMises</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\vonMises\PolyJ2.cpp">
+      <Filter>Material\Material3D\vonMises</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\vonMises\TableGurson.cpp">
+      <Filter>Material\Material3D\vonMises</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\vonMises\VAFCRP.cpp">
+      <Filter>Material\Material3D\vonMises</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Wrapper\Rotation3D.cpp">
+      <Filter>Material\Material3D\Wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Wrapper\Stacked.cpp">
+      <Filter>Material\Material3D\Wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Wrapper\Substepping.cpp">
+      <Filter>Material\Material3D\Wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Recorder\EigenRecorder.cpp">
+      <Filter>Recorder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Recorder\ElementRecorder.cpp">
+      <Filter>Recorder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Recorder\FrameRecorder.cpp">
+      <Filter>Recorder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Recorder\GlobalMassRecorder.cpp">
+      <Filter>Recorder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Recorder\GlobalRecorder.cpp">
+      <Filter>Recorder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Recorder\GlobalStiffnessRecorder.cpp">
+      <Filter>Recorder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Recorder\GroupElementRecorder.cpp">
+      <Filter>Recorder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Recorder\GroupNodeRecorder.cpp">
+      <Filter>Recorder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Recorder\GroupSumRecorder.cpp">
+      <Filter>Recorder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Recorder\NodeRecorder.cpp">
+      <Filter>Recorder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Recorder\OutputType.cpp">
+      <Filter>Recorder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Recorder\Recorder.cpp">
+      <Filter>Recorder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Recorder\SumRecorder.cpp">
+      <Filter>Recorder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Recorder\VisualisationRecorder.cpp">
+      <Filter>Recorder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\Section.cpp">
+      <Filter>Section</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionParser.cpp">
+      <Filter>Section</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionShell\Homogeneous.cpp">
+      <Filter>Section\SectionShell</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionShell\SectionShell.cpp">
+      <Filter>Section\SectionShell</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\Section1D\Circle1D.cpp">
+      <Filter>Section\Section1D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\Section1D\Fibre1D.cpp">
+      <Filter>Section\Section1D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\Section1D\Rectangle1D.cpp">
+      <Filter>Section\Section1D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\Section1D\Section1D.cpp">
+      <Filter>Section\Section1D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\Section1D\TrussSection.cpp">
+      <Filter>Section\Section1D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\Section2D\Bar2D.cpp">
+      <Filter>Section\Section2D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\Section2D\Box2D.cpp">
+      <Filter>Section\Section2D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\Section2D\Circle2D.cpp">
+      <Filter>Section\Section2D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\Section2D\CircularHollow2D.cpp">
+      <Filter>Section\Section2D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\Section2D\Fibre2D.cpp">
+      <Filter>Section\Section2D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\Section2D\HSection2D.cpp">
+      <Filter>Section\Section2D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\Section2D\ISection2D.cpp">
+      <Filter>Section\Section2D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\Section2D\Rectangle2D.cpp">
+      <Filter>Section\Section2D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\Section2D\Section2D.cpp">
+      <Filter>Section\Section2D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\Section2D\TSection2D.cpp">
+      <Filter>Section\Section2D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\Section3D\Bar3D.cpp">
+      <Filter>Section\Section3D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\Section3D\Box3D.cpp">
+      <Filter>Section\Section3D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\Section3D\Circle3D.cpp">
+      <Filter>Section\Section3D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\Section3D\CircularHollow3D.cpp">
+      <Filter>Section\Section3D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\Section3D\Fibre3D.cpp">
+      <Filter>Section\Section3D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\Section3D\ISection3D.cpp">
+      <Filter>Section\Section3D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\Section3D\Rectangle3D.cpp">
+      <Filter>Section\Section3D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\Section3D\Section3D.cpp">
+      <Filter>Section\Section3D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\Section3D\TSection3D.cpp">
+      <Filter>Section\Section3D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Arnoldi.cpp">
+      <Filter>Solver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\BFGS.cpp">
+      <Filter>Solver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\MPDC.cpp">
+      <Filter>Solver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Newton.cpp">
+      <Filter>Solver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Ramm.cpp">
+      <Filter>Solver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Solver.cpp">
+      <Filter>Solver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\BatheTwoStep.cpp">
+      <Filter>Solver\Integrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\GeneralizedAlpha.cpp">
+      <Filter>Solver\Integrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\Integrator.cpp">
+      <Filter>Solver\Integrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\LeeNewmark.cpp">
+      <Filter>Solver\Integrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\LeeNewmarkBase.cpp">
+      <Filter>Solver\Integrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\LeeNewmarkFull.cpp">
+      <Filter>Solver\Integrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\Newmark.cpp">
+      <Filter>Solver\Integrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\RayleighNewmark.cpp">
+      <Filter>Solver\Integrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\WilsonPenzienNewmark.cpp">
+      <Filter>Solver\Integrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Step\ArcLength.cpp">
+      <Filter>Step</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Step\Bead.cpp">
+      <Filter>Step</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Step\Buckle.cpp">
+      <Filter>Step</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Step\Dynamic.cpp">
+      <Filter>Step</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Step\Frequency.cpp">
+      <Filter>Step</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Step\Optimization.cpp">
+      <Filter>Step</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Step\Static.cpp">
+      <Filter>Step</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Step\Step.cpp">
+      <Filter>Step</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\argumentParser.cpp">
+      <Filter>Toolbox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\arpack_wrapper.cpp">
+      <Filter>Toolbox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\commandParser.cpp">
+      <Filter>Toolbox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\Converter.cpp">
+      <Filter>Toolbox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\print.cpp">
+      <Filter>Toolbox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\IntegrationPlan.cpp">
+      <Filter>Toolbox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\sort_color.cpp">
+      <Filter>Toolbox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\sort_rcm.cpp">
+      <Filter>Toolbox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\tensorToolbox.cpp">
+      <Filter>Toolbox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\utility.cpp">
+      <Filter>Toolbox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\CatchTest.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestMode.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestQuaternion.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestShape.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestTensor.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestUtility.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\suanPan.cpp" />
+    <ClCompile Include="..\..\..\UnitTest\TestNURBS.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Viscosity\Kelvin.cpp">
+      <Filter>Material\Material1D\Viscosity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\ExternalMaterial.cpp">
+      <Filter>Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Recorder\AmplitudeRecorder.cpp">
+      <Filter>Recorder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material2D\Wrapper\Rebar2D.cpp">
+      <Filter>Material\Material2D\Wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Domain\ConditionalModifier.cpp">
+      <Filter>Domain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\FixedLength.cpp">
+      <Filter>Constraint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Load\SupportMotion.cpp">
+      <Filter>Load</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\FEAST.cpp">
+      <Filter>Solver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Special\Contact3D.cpp">
+      <Filter>Element\Special</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\NodeLine.cpp">
+      <Filter>Constraint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\NodeFacet.cpp">
+      <Filter>Constraint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Special\Embedded.cpp">
+      <Filter>Element\Special</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\Criterion\ComplementaryEnergyEvolution.cpp">
+      <Filter>Constraint\Criterion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\Criterion\EnergyEvolution.cpp">
+      <Filter>Constraint\Criterion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Sand\DafaliasManzari.cpp">
+      <Filter>Material\Material3D\Sand</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Clay\CamClay\BilinearCC.cpp">
+      <Filter>Material\Material3D\Clay\CamClay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Clay\CamClay\ExpCC.cpp">
+      <Filter>Material\Material3D\Clay\CamClay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Clay\CamClay\NonlinearCamClay.cpp">
+      <Filter>Material\Material3D\Clay\CamClay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Clay\CamClay\ParabolicCC.cpp">
+      <Filter>Material\Material3D\Clay\CamClay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Concrete\CDPM2.cpp">
+      <Filter>Material\Material3D\Concrete</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Membrane\CSM\CSMQ4.cpp">
+      <Filter>Element\Membrane\CSM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Membrane\CSM\CSMQ8.cpp">
+      <Filter>Element\Membrane\CSM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Membrane\CSM\CSMT3.cpp">
+      <Filter>Element\Membrane\CSM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Membrane\CSM\CSMQ.cpp">
+      <Filter>Element\Membrane\CSM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Membrane\CSM\CSMT6.cpp">
+      <Filter>Element\Membrane\CSM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Membrane\PFM\DCP3.cpp">
+      <Filter>Element\Membrane\PFM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Membrane\PFM\DCP4.cpp">
+      <Filter>Element\Membrane\PFM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Load\LineUDL.cpp">
+      <Filter>Load</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Special\Fluid.cpp">
+      <Filter>Material\Special</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Membrane\Axisymmetric\CAX3.cpp">
+      <Filter>Element\Membrane\Axisymmetric</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Membrane\Axisymmetric\CAX4.cpp">
+      <Filter>Element\Membrane\Axisymmetric</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Membrane\Axisymmetric\CAX8.cpp">
+      <Filter>Element\Membrane\Axisymmetric</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Membrane\Drilling\Allman.cpp">
+      <Filter>Element\Membrane\Drilling</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Membrane\Drilling\GCMQ.cpp">
+      <Filter>Element\Membrane\Drilling</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Membrane\Drilling\GQ12.cpp">
+      <Filter>Element\Membrane\Drilling</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Membrane\Drilling\SGCMQ.cpp">
+      <Filter>Element\Membrane\Drilling</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Membrane\Mixed\PS.cpp">
+      <Filter>Element\Membrane\Mixed</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Membrane\Mixed\QE2.cpp">
+      <Filter>Element\Membrane\Mixed</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Membrane\Plane\CP3.cpp">
+      <Filter>Element\Membrane\Plane</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Membrane\Plane\CP4.cpp">
+      <Filter>Element\Membrane\Plane</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Membrane\Plane\CP4I.cpp">
+      <Filter>Element\Membrane\Plane</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Membrane\Plane\CP5.cpp">
+      <Filter>Element\Membrane\Plane</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Membrane\Plane\CP6.cpp">
+      <Filter>Element\Membrane\Plane</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Membrane\Plane\CP7.cpp">
+      <Filter>Element\Membrane\Plane</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Membrane\Plane\CP8.cpp">
+      <Filter>Element\Membrane\Plane</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Membrane\Infinite\CINP4.cpp">
+      <Filter>Element\Membrane\Infinite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Membrane\Porous\PCPE4DC.cpp">
+      <Filter>Element\Membrane\Porous</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Membrane\Porous\PCPE8DC.cpp">
+      <Filter>Element\Membrane\Porous</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Membrane\Porous\PCPE4UC.cpp">
+      <Filter>Element\Membrane\Porous</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Membrane\Porous\PCPE8UC.cpp">
+      <Filter>Element\Membrane\Porous</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Beam\NMB31.cpp">
+      <Filter>Element\Beam</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionNM\NM3D1.cpp">
+      <Filter>Section\SectionNM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionNM\SectionNM3D.cpp">
+      <Filter>Section\SectionNM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionNM\NM2D1.cpp">
+      <Filter>Section\SectionNM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionNM\SectionNM2D.cpp">
+      <Filter>Section\SectionNM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Beam\NMB21.cpp">
+      <Filter>Element\Beam</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionNM\NM3D2.cpp">
+      <Filter>Section\SectionNM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionNM\SectionNM.cpp">
+      <Filter>Section\SectionNM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionNM\NonlinearNM2D.cpp">
+      <Filter>Section\SectionNM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionNM\NM2D2.cpp">
+      <Filter>Section\SectionNM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionNM\NonlinearNM3D.cpp">
+      <Filter>Section\SectionNM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Utility\B3DC.cpp">
+      <Filter>Element\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Converger\LogicConverger.cpp">
+      <Filter>Converger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestString.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestMatrix.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\Criterion\LogicCriterion.cpp">
+      <Filter>Constraint\Criterion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\GSSSS.cpp">
+      <Filter>Solver\Integrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestColoring.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Domain\DomainHelper.cpp">
+      <Filter>Domain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Domain\DomainState.cpp">
+      <Filter>Domain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestIntegration.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\sync_ostream.cpp">
+      <Filter>Toolbox</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
+      <Filter>Constraint\BC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\BC\GroupPenaltyBC.h">
+      <Filter>Constraint\BC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\BC\MultiplierBC.h">
+      <Filter>Constraint\BC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\BC\PenaltyBC.h">
+      <Filter>Constraint\BC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\Criterion\Criterion.h">
+      <Filter>Constraint\Criterion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\Criterion\MaxDisplacement.h">
+      <Filter>Constraint\Criterion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\Criterion\MaxHistory.h">
+      <Filter>Constraint\Criterion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\Criterion\MaxResistance.h">
+      <Filter>Constraint\Criterion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\Criterion\MinDisplacement.h">
+      <Filter>Constraint\Criterion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\Criterion\MinResistance.h">
+      <Filter>Constraint\Criterion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\Criterion\NodeBasedCriterion.h">
+      <Filter>Constraint\Criterion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\Criterion\StrainEnergyEvolution.h">
+      <Filter>Constraint\Criterion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\Constraint.h">
+      <Filter>Constraint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\ConstraintParser.h">
+      <Filter>Constraint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\Embed.h">
+      <Filter>Constraint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\MPC.h">
+      <Filter>Constraint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\ParticleCollision.h">
+      <Filter>Constraint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\ParticleCollision2D.h">
+      <Filter>Constraint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\ParticleCollision3D.h">
+      <Filter>Constraint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\RigidWallMultiplier.h">
+      <Filter>Constraint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\RigidWallPenalty.h">
+      <Filter>Constraint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Converger\AbsDisp.h">
+      <Filter>Converger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Converger\AbsError.h">
+      <Filter>Converger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Converger\AbsIncreDisp.h">
+      <Filter>Converger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Converger\AbsIncreEnergy.h">
+      <Filter>Converger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Converger\AbsResidual.h">
+      <Filter>Converger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Converger\Converger.h">
+      <Filter>Converger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Converger\FixedNumber.h">
+      <Filter>Converger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Converger\RelDisp.h">
+      <Filter>Converger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Converger\RelError.h">
+      <Filter>Converger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Converger\RelIncreDisp.h">
+      <Filter>Converger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Converger\RelIncreEnergy.h">
+      <Filter>Converger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Converger\RelResidual.h">
+      <Filter>Converger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Database\Database.h">
+      <Filter>Database</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Database\HDF.h">
+      <Filter>Database</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\Domain.h">
+      <Filter>Domain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\DomainBase.h">
+      <Filter>Domain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\ElementGroup.h">
+      <Filter>Domain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\ExternalModule.h">
+      <Filter>Domain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\Factory.hpp">
+      <Filter>Domain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\Group.h">
+      <Filter>Domain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\GroupGroup.h">
+      <Filter>Domain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\Node.h">
+      <Filter>Domain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\NodeGroup.h">
+      <Filter>Domain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\Storage.hpp">
+      <Filter>Domain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\Tag.h">
+      <Filter>Domain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\MetaMat\BandMat.hpp">
+      <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\MetaMat\BandMatSpike.hpp">
+      <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\MetaMat\BandSymmMat.hpp">
+      <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\MetaMat\csc_form.hpp">
+      <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\MetaMat\csr_form.hpp">
+      <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\MetaMat\FullMat.hpp">
+      <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\MetaMat\MetaMat.hpp">
+      <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\MetaMat\operator_times.hpp">
+      <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\MetaMat\SparseMat.hpp">
+      <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\MetaMat\SparseMatMUMPS.hpp">
+      <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\MetaMat\SparseMatSuperLU.hpp">
+      <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\MetaMat\SymmPackMat.hpp">
+      <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\MetaMat\triplet_form.hpp">
+      <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Beam\B21.h">
+      <Filter>Element\Beam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Beam\B21E.h">
+      <Filter>Element\Beam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Beam\B21H.h">
+      <Filter>Element\Beam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Beam\B31.h">
+      <Filter>Element\Beam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Beam\EB21.h">
+      <Filter>Element\Beam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Beam\F21.h">
+      <Filter>Element\Beam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Beam\F21H.h">
+      <Filter>Element\Beam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Beam\F31.h">
+      <Filter>Element\Beam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Beam\MVLEM.h">
+      <Filter>Element\Beam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Cube\C3D4.h">
+      <Filter>Element\Cube</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Cube\C3D8.h">
+      <Filter>Element\Cube</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Cube\C3D8I.h">
+      <Filter>Element\Cube</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Cube\C3D20.h">
+      <Filter>Element\Cube</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Cube\CIN3D8.h">
+      <Filter>Element\Cube</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Cube\DC3D4.h">
+      <Filter>Element\Cube</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Cube\DC3D8.h">
+      <Filter>Element\Cube</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Modifier\ElementalModal.h">
+      <Filter>Element\Modifier</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Modifier\LumpedScale.h">
+      <Filter>Element\Modifier</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Modifier\LumpedSimple.h">
+      <Filter>Element\Modifier</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Modifier\Modifier.h">
+      <Filter>Element\Modifier</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Modifier\Rayleigh.h">
+      <Filter>Element\Modifier</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Patch\Patch.h">
+      <Filter>Element\Patch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Patch\PatchCube.h">
+      <Filter>Element\Patch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Patch\PatchQuad.h">
+      <Filter>Element\Patch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Plate\DKT3.h">
+      <Filter>Element\Plate</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Plate\DKT4.h">
+      <Filter>Element\Plate</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Plate\Mindlin.h">
+      <Filter>Element\Plate</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Shell\DKTS3.h">
+      <Filter>Element\Shell</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Shell\S4.h">
+      <Filter>Element\Shell</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Shell\SGCMS.h">
+      <Filter>Element\Shell</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Shell\ShellBase.h">
+      <Filter>Element\Shell</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Special\Contact2D.h">
+      <Filter>Element\Special</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Special\Damper01.h">
+      <Filter>Element\Special</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Special\Damper02.h">
+      <Filter>Element\Special</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Special\Joint.h">
+      <Filter>Element\Special</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Special\Mass.h">
+      <Filter>Element\Special</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Special\SingleSection2D.h">
+      <Filter>Element\Special</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Special\SingleSection3D.h">
+      <Filter>Element\Special</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Special\Spring01.h">
+      <Filter>Element\Special</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Special\Spring02.h">
+      <Filter>Element\Special</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Special\Tie.h">
+      <Filter>Element\Special</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Truss\T2D2.h">
+      <Filter>Element\Truss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Truss\T2D2S.h">
+      <Filter>Element\Truss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Truss\T3D2.h">
+      <Filter>Element\Truss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Truss\T3D2S.h">
+      <Filter>Element\Truss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Utility\IGA\BSplineSurface.h">
+      <Filter>Element\Utility\IGA</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Utility\IGA\BSplineVolume.h">
+      <Filter>Element\Utility\IGA</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Utility\IGA\NURBS.h">
+      <Filter>Element\Utility\IGA</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Utility\IGA\NURBSSurface.h">
+      <Filter>Element\Utility\IGA</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Utility\IGA\NURBSVolume.h">
+      <Filter>Element\Utility\IGA</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Utility\IGA\BSpline.h">
+      <Filter>Element\Utility\IGA</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Utility\B2DC.h">
+      <Filter>Element\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Utility\B2DL.h">
+      <Filter>Element\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Utility\B3DL.h">
+      <Filter>Element\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Utility\MatrixModifier.hpp">
+      <Filter>Element\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Utility\Orientation.h">
+      <Filter>Element\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Utility\PhaseField.h">
+      <Filter>Element\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Utility\T2DC.h">
+      <Filter>Element\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Utility\T2DL.h">
+      <Filter>Element\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Utility\T3DC.h">
+      <Filter>Element\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Utility\T3DL.h">
+      <Filter>Element\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Visualisation\vtkBase.h">
+      <Filter>Element\Visualisation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Visualisation\vtkParser.h">
+      <Filter>Element\Visualisation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Element.h">
+      <Filter>Element</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\ElementBase.h">
+      <Filter>Element</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\ElementParser.h">
+      <Filter>Element</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\ElementTemplate.h">
+      <Filter>Element</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\MaterialElement.h">
+      <Filter>Element</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\SectionElement.h">
+      <Filter>Element</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Load\BodyForce.h">
+      <Filter>Load</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Load\GroupBodyForce.h">
+      <Filter>Load</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Load\GroupNodalDisplacement.h">
+      <Filter>Load</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Load\GroupNodalForce.h">
+      <Filter>Load</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Load\Load.h">
+      <Filter>Load</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Load\NodalAcceleration.h">
+      <Filter>Load</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Load\NodalDisplacement.h">
+      <Filter>Load</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Load\NodalForce.h">
+      <Filter>Load</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Load\Amplitude\Amplitude.h">
+      <Filter>Load\Amplitude</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Load\Amplitude\Combine.h">
+      <Filter>Load\Amplitude</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Load\Amplitude\Constant.h">
+      <Filter>Load\Amplitude</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Load\Amplitude\Cosine.h">
+      <Filter>Load\Amplitude</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Load\Amplitude\Decay.h">
+      <Filter>Load\Amplitude</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Load\Amplitude\Linear.h">
+      <Filter>Load\Amplitude</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Load\Amplitude\Modulated.h">
+      <Filter>Load\Amplitude</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Load\Amplitude\NZStrongMotion.h">
+      <Filter>Load\Amplitude</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Load\Amplitude\Ramp.h">
+      <Filter>Load\Amplitude</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Load\Amplitude\Sine.h">
+      <Filter>Load\Amplitude</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Load\Amplitude\Tabular.h">
+      <Filter>Load\Amplitude</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Material1D.h">
+      <Filter>Material\Material1D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Concrete\ConcreteCM.h">
+      <Filter>Material\Material1D\Concrete</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Concrete\ConcreteExp.h">
+      <Filter>Material\Material1D\Concrete</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Concrete\ConcreteTable.h">
+      <Filter>Material\Material1D\Concrete</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Concrete\ConcreteTsai.h">
+      <Filter>Material\Material1D\Concrete</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Degradation\Degradation.h">
+      <Filter>Material\Material1D\Degradation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Degradation\Dhakal.h">
+      <Filter>Material\Material1D\Degradation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Degradation\TrilinearDegradation.h">
+      <Filter>Material\Material1D\Degradation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Elastic\BilinearElastic1D.h">
+      <Filter>Material\Material1D\Elastic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Elastic\Elastic1D.h">
+      <Filter>Material\Material1D\Elastic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Elastic\MultilinearElastic1D.h">
+      <Filter>Material\Material1D\Elastic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Elastic\PolyElastic1D.h">
+      <Filter>Material\Material1D\Elastic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\AFC.h">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\BilinearOO.h">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\BilinearPO.h">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\BoucWen.h">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\BWBN.h">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\CoulombFriction.h">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\Flag.h">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\Gap01.h">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\MPF.h">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\MultilinearOO.h">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\MultilinearPO.h">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\OriginOriented.h">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\PeakOriented.h">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\RambergOsgood.h">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\SimpleHysteresis.h">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\SlipLock.h">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\SteelBRB.h">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\Trivial.h">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Viscosity\BilinearViscosity.h">
+      <Filter>Material\Material1D\Viscosity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Viscosity\Maxwell.h">
+      <Filter>Material\Material1D\Viscosity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Viscosity\NonlinearViscosity.h">
+      <Filter>Material\Material1D\Viscosity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Viscosity\Viscosity01.h">
+      <Filter>Material\Material1D\Viscosity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Viscosity\Viscosity02.h">
+      <Filter>Material\Material1D\Viscosity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\vonMises\ArmstrongFrederick1D.h">
+      <Filter>Material\Material1D\vonMises</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\vonMises\Bilinear1D.h">
+      <Filter>Material\Material1D\vonMises</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\vonMises\BilinearMises1D.h">
+      <Filter>Material\Material1D\vonMises</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\vonMises\ExpGurson1D.h">
+      <Filter>Material\Material1D\vonMises</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\vonMises\ExpMises1D.h">
+      <Filter>Material\Material1D\vonMises</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\vonMises\MultilinearMises1D.h">
+      <Filter>Material\Material1D\vonMises</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\vonMises\NonlinearGurson1D.h">
+      <Filter>Material\Material1D\vonMises</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\vonMises\NonlinearMises1D.h">
+      <Filter>Material\Material1D\vonMises</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\vonMises\VAFCRP1D.h">
+      <Filter>Material\Material1D\vonMises</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Wrapper\Parallel.h">
+      <Filter>Material\Material1D\Wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Wrapper\Sequential.h">
+      <Filter>Material\Material1D\Wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Wrapper\Uniaxial.h">
+      <Filter>Material\Material1D\Wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material2D\Elastic\AxisymmetricElastic.h">
+      <Filter>Material\Material2D\Elastic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material2D\Elastic\Elastic2D.h">
+      <Filter>Material\Material2D\Elastic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material2D\Wrapper\Axisymmetric.h">
+      <Filter>Material\Material2D\Wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material2D\Wrapper\Laminated.h">
+      <Filter>Material\Material2D\Wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material2D\Wrapper\PlaneStrain.h">
+      <Filter>Material\Material2D\Wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material2D\Wrapper\PlaneStress.h">
+      <Filter>Material\Material2D\Wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material2D\Wrapper\Rotation2D.h">
+      <Filter>Material\Material2D\Wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material2D\Bilinear2D.h">
+      <Filter>Material\Material2D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material2D\Concrete21.h">
+      <Filter>Material\Material2D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material2D\Concrete22.h">
+      <Filter>Material\Material2D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material2D\Material2D.h">
+      <Filter>Material\Material2D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material.h">
+      <Filter>Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\MaterialParser.h">
+      <Filter>Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\MaterialTemplate.h">
+      <Filter>Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\MaterialTester.h">
+      <Filter>Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Material3D.h">
+      <Filter>Material\Material3D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Concrete\CDP.h">
+      <Filter>Material\Material3D\Concrete</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Concrete\NonlinearCDP.h">
+      <Filter>Material\Material3D\Concrete</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Concrete\Rebar3D.h">
+      <Filter>Material\Material3D\Concrete</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Concrete\TableCDP.h">
+      <Filter>Material\Material3D\Concrete</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Damage\IsotropicDamage.h">
+      <Filter>Material\Material3D\Damage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Damage\LinearDamage.h">
+      <Filter>Material\Material3D\Damage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\DruckerPrager\BilinearDP.h">
+      <Filter>Material\Material3D\DruckerPrager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\DruckerPrager\ExpDP.h">
+      <Filter>Material\Material3D\DruckerPrager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\DruckerPrager\NonlinearDruckerPrager.h">
+      <Filter>Material\Material3D\DruckerPrager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Elastic\BlatzKo.h">
+      <Filter>Material\Material3D\Elastic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Elastic\IsotropicElastic3D.h">
+      <Filter>Material\Material3D\Elastic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Elastic\IsotropicNonlinearElastic3D.h">
+      <Filter>Material\Material3D\Elastic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Elastic\MooneyRivlin.h">
+      <Filter>Material\Material3D\Elastic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Elastic\NLE3D01.h">
+      <Filter>Material\Material3D\Elastic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Elastic\OrthotropicElastic3D.h">
+      <Filter>Material\Material3D\Elastic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Elastic\Yeoh.h">
+      <Filter>Material\Material3D\Elastic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Hoffman\BilinearHoffman.h">
+      <Filter>Material\Material3D\Hoffman</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Hoffman\ExpHoffman.h">
+      <Filter>Material\Material3D\Hoffman</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Hoffman\NonlinearHill.h">
+      <Filter>Material\Material3D\Hoffman</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Hoffman\NonlinearHoffman.h">
+      <Filter>Material\Material3D\Hoffman</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Sand\SimpleSand.h">
+      <Filter>Material\Material3D\Sand</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\vonMises\ArmstrongFrederick.h">
+      <Filter>Material\Material3D\vonMises</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\vonMises\BilinearJ2.h">
+      <Filter>Material\Material3D\vonMises</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\vonMises\BilinearPeric.h">
+      <Filter>Material\Material3D\vonMises</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\vonMises\ExpGurson.h">
+      <Filter>Material\Material3D\vonMises</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\vonMises\ExpJ2.h">
+      <Filter>Material\Material3D\vonMises</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\vonMises\MultilinearJ2.h">
+      <Filter>Material\Material3D\vonMises</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\vonMises\NonlinearGurson.h">
+      <Filter>Material\Material3D\vonMises</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\vonMises\NonlinearJ2.h">
+      <Filter>Material\Material3D\vonMises</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\vonMises\NonlinearPeric.h">
+      <Filter>Material\Material3D\vonMises</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\vonMises\PolyJ2.h">
+      <Filter>Material\Material3D\vonMises</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\vonMises\TableGurson.h">
+      <Filter>Material\Material3D\vonMises</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\vonMises\VAFCRP.h">
+      <Filter>Material\Material3D\vonMises</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Wrapper\Rotation3D.h">
+      <Filter>Material\Material3D\Wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Wrapper\Stacked.h">
+      <Filter>Material\Material3D\Wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Wrapper\Substepping.h">
+      <Filter>Material\Material3D\Wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Recorder\EigenRecorder.h">
+      <Filter>Recorder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Recorder\ElementRecorder.h">
+      <Filter>Recorder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Recorder\FrameRecorder.h">
+      <Filter>Recorder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Recorder\GlobalMassRecorder.h">
+      <Filter>Recorder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Recorder\GlobalRecorder.h">
+      <Filter>Recorder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Recorder\GlobalStiffnessRecorder.h">
+      <Filter>Recorder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Recorder\GroupElementRecorder.h">
+      <Filter>Recorder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Recorder\GroupNodeRecorder.h">
+      <Filter>Recorder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Recorder\GroupSumRecorder.h">
+      <Filter>Recorder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Recorder\NodeRecorder.h">
+      <Filter>Recorder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Recorder\OutputType.h">
+      <Filter>Recorder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Recorder\Recorder.h">
+      <Filter>Recorder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Recorder\SumRecorder.h">
+      <Filter>Recorder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Recorder\VisualisationRecorder.h">
+      <Filter>Recorder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\ParameterType.h">
+      <Filter>Section</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\Section.h">
+      <Filter>Section</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionParser.h">
+      <Filter>Section</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionShell\Homogeneous.h">
+      <Filter>Section\SectionShell</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionShell\SectionShell.h">
+      <Filter>Section\SectionShell</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\Section1D\Circle1D.h">
+      <Filter>Section\Section1D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\Section1D\Fibre1D.h">
+      <Filter>Section\Section1D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\Section1D\Rectangle1D.h">
+      <Filter>Section\Section1D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\Section1D\Section1D.h">
+      <Filter>Section\Section1D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\Section1D\TrussSection.h">
+      <Filter>Section\Section1D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\Section2D\Bar2D.h">
+      <Filter>Section\Section2D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\Section2D\Box2D.h">
+      <Filter>Section\Section2D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\Section2D\Circle2D.h">
+      <Filter>Section\Section2D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\Section2D\CircularHollow2D.h">
+      <Filter>Section\Section2D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\Section2D\Fibre2D.h">
+      <Filter>Section\Section2D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\Section2D\HSection2D.h">
+      <Filter>Section\Section2D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\Section2D\ISection2D.h">
+      <Filter>Section\Section2D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\Section2D\Rectangle2D.h">
+      <Filter>Section\Section2D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\Section2D\Section2D.h">
+      <Filter>Section\Section2D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\Section2D\TSection2D.h">
+      <Filter>Section\Section2D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\Section3D\CircularHollow3D.h">
+      <Filter>Section\Section3D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\Section3D\Fibre3D.h">
+      <Filter>Section\Section3D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\Section3D\ISection3D.h">
+      <Filter>Section\Section3D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\Section3D\Rectangle3D.h">
+      <Filter>Section\Section3D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\Section3D\Section3D.h">
+      <Filter>Section\Section3D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\Section3D\TSection3D.h">
+      <Filter>Section\Section3D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\Section3D\Bar3D.h">
+      <Filter>Section\Section3D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\Section3D\Box3D.h">
+      <Filter>Section\Section3D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\Section3D\Circle3D.h">
+      <Filter>Section\Section3D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Arnoldi.h">
+      <Filter>Solver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\BFGS.h">
+      <Filter>Solver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\MPDC.h">
+      <Filter>Solver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Newton.h">
+      <Filter>Solver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Ramm.h">
+      <Filter>Solver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Solver.h">
+      <Filter>Solver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\BatheTwoStep.h">
+      <Filter>Solver\Integrator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\GeneralizedAlpha.h">
+      <Filter>Solver\Integrator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\Integrator.h">
+      <Filter>Solver\Integrator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\LeeNewmark.h">
+      <Filter>Solver\Integrator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\LeeNewmarkBase.h">
+      <Filter>Solver\Integrator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\LeeNewmarkFull.h">
+      <Filter>Solver\Integrator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\Newmark.h">
+      <Filter>Solver\Integrator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\RayleighNewmark.h">
+      <Filter>Solver\Integrator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\WilsonPenzienNewmark.h">
+      <Filter>Solver\Integrator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Step\ArcLength.h">
+      <Filter>Step</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Step\Bead.h">
+      <Filter>Step</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Step\Buckle.h">
+      <Filter>Step</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Step\Dynamic.h">
+      <Filter>Step</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Step\Frequency.h">
+      <Filter>Step</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Step\Optimization.h">
+      <Filter>Step</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Step\Static.h">
+      <Filter>Step</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Step\Step.h">
+      <Filter>Step</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\argumentParser.h">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\arpack_wrapper.h">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\commandParser.h">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\Converter.h">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\print.h">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\IntegrationPlan.h">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\Quaternion.hpp">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\shapeFunction.h">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\sort_color.h">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\sort_rcm.h">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\tensorToolbox.h">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\utility.h">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UnitTest\CatchTest.h">
+      <Filter>UnitTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\suanPan.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Viscosity\Kelvin.h">
+      <Filter>Material\Material1D\Viscosity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\ExternalMaterial.h">
+      <Filter>Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\ExternalMaterialData.h">
+      <Filter>Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\MetaMat\SparseMatCUDA.hpp">
+      <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Recorder\AmplitudeRecorder.h">
+      <Filter>Recorder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\MetaMat\SparseMatPARDISO.hpp">
+      <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material2D\Wrapper\Rebar2D.h">
+      <Filter>Material\Material2D\Wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\ConditionalModifier.h">
+      <Filter>Domain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\FixedLength.h">
+      <Filter>Constraint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Load\SupportMotion.h">
+      <Filter>Load</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\FEAST.h">
+      <Filter>Solver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\MetaMat\FullMatCUDA.hpp">
+      <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\MetaMat\DenseMat.hpp">
+      <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Special\Contact3D.h">
+      <Filter>Element\Special</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\NodeLine.h">
+      <Filter>Constraint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\NodeFacet.h">
+      <Filter>Constraint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Special\Embedded.h">
+      <Filter>Element\Special</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\Criterion\ComplementaryEnergyEvolution.h">
+      <Filter>Constraint\Criterion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\Criterion\EnergyEvolution.h">
+      <Filter>Constraint\Criterion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Sand\DafaliasManzari.h">
+      <Filter>Material\Material3D\Sand</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Clay\CamClay\BilinearCC.h">
+      <Filter>Material\Material3D\Clay\CamClay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Clay\CamClay\ExpCC.h">
+      <Filter>Material\Material3D\Clay\CamClay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Clay\CamClay\NonlinearCamClay.h">
+      <Filter>Material\Material3D\Clay\CamClay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Clay\CamClay\ParabolicCC.h">
+      <Filter>Material\Material3D\Clay\CamClay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Concrete\CDPM2.h">
+      <Filter>Material\Material3D\Concrete</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Membrane\CSM\CSMQ4.h">
+      <Filter>Element\Membrane\CSM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Membrane\CSM\CSMQ8.h">
+      <Filter>Element\Membrane\CSM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Membrane\CSM\CSMT3.h">
+      <Filter>Element\Membrane\CSM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Membrane\CSM\CSMQ.h">
+      <Filter>Element\Membrane\CSM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Membrane\CSM\CSMT6.h">
+      <Filter>Element\Membrane\CSM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Membrane\PFM\DCP3.h">
+      <Filter>Element\Membrane\PFM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Membrane\PFM\DCP4.h">
+      <Filter>Element\Membrane\PFM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\MetaMat\SparseMatFGMRES.hpp">
+      <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Load\LineUDL.h">
+      <Filter>Load</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Special\Fluid.h">
+      <Filter>Material\Special</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Membrane\Axisymmetric\CAX3.h">
+      <Filter>Element\Membrane\Axisymmetric</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Membrane\Axisymmetric\CAX4.h">
+      <Filter>Element\Membrane\Axisymmetric</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Membrane\Axisymmetric\CAX8.h">
+      <Filter>Element\Membrane\Axisymmetric</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Membrane\Drilling\Allman.h">
+      <Filter>Element\Membrane\Drilling</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Membrane\Drilling\GCMQ.h">
+      <Filter>Element\Membrane\Drilling</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Membrane\Drilling\GQ12.h">
+      <Filter>Element\Membrane\Drilling</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Membrane\Drilling\SGCMQ.h">
+      <Filter>Element\Membrane\Drilling</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Membrane\Mixed\PS.h">
+      <Filter>Element\Membrane\Mixed</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Membrane\Mixed\QE2.h">
+      <Filter>Element\Membrane\Mixed</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Membrane\Plane\CP3.h">
+      <Filter>Element\Membrane\Plane</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Membrane\Plane\CP4.h">
+      <Filter>Element\Membrane\Plane</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Membrane\Plane\CP4I.h">
+      <Filter>Element\Membrane\Plane</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Membrane\Plane\CP5.h">
+      <Filter>Element\Membrane\Plane</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Membrane\Plane\CP6.h">
+      <Filter>Element\Membrane\Plane</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Membrane\Plane\CP7.h">
+      <Filter>Element\Membrane\Plane</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Membrane\Plane\CP8.h">
+      <Filter>Element\Membrane\Plane</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Membrane\Infinite\CINP4.h">
+      <Filter>Element\Membrane\Infinite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Membrane\Porous\PCPE4DC.h">
+      <Filter>Element\Membrane\Porous</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Membrane\Porous\PCPE8DC.h">
+      <Filter>Element\Membrane\Porous</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Membrane\Porous\PCPE4UC.h">
+      <Filter>Element\Membrane\Porous</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Membrane\Porous\PCPE8UC.h">
+      <Filter>Element\Membrane\Porous</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Beam\NMB31.h">
+      <Filter>Element\Beam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionNM\NM3D1.h">
+      <Filter>Section\SectionNM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionNM\SectionNM3D.h">
+      <Filter>Section\SectionNM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionNM\SectionNM2D.h">
+      <Filter>Section\SectionNM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionNM\NM2D1.h">
+      <Filter>Section\SectionNM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Beam\NMB21.h">
+      <Filter>Element\Beam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionNM\NM3D2.h">
+      <Filter>Section\SectionNM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionNM\SectionNM.h">
+      <Filter>Section\SectionNM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionNM\NonlinearNM2D.h">
+      <Filter>Section\SectionNM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionNM\NM2D2.h">
+      <Filter>Section\SectionNM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionNM\NonlinearNM3D.h">
+      <Filter>Section\SectionNM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Utility\B3DC.h">
+      <Filter>Element\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Converger\LogicConverger.h">
+      <Filter>Converger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\Criterion\LogicCriterion.h">
+      <Filter>Constraint\Criterion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\GSSSS.h">
+      <Filter>Solver\Integrator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\thread_pool.hpp">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\FactoryHelper.hpp">
+      <Filter>Domain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\sync_ostream.h">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\Resource\suanPan.rc" />
+  </ItemGroup>
+</Project>

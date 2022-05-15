@@ -1,0 +1,892 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{1ac2c10b-9ddd-4178-82a4-70c309c305bf}</ProjectGuid>
+    <RootNamespace>suanPan</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <UseInteloneMKL>Parallel</UseInteloneMKL>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>..\..\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>..\..\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>../../..;../../../Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>../../../Libs/gcc-win;../../$(Configuration)/Libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libfext.lib;metis.lib;superlu.lib;libopenblas.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>SUANPAN_MT;SUANPAN_HDF5;SUANPAN_VTK;SUANPAN_MKL;SUANPAN_CUDA;NDEBUG;_CONSOLE;_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>../../..;../../../Include;../../../Include/hdf5;../../../Include/hdf5-vs;$(VTK_INC);$(CUDA_PATH)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>../../../Libs/vs;../../$(Configuration)/Libs;$(VTK_LIB);$(CUDA_PATH)/lib/x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>cusparse.lib;cusolver.lib;cublas.lib;cudart.lib;amd.lib;arpack.lib;metis.lib;mumps_c.lib;mumps_f.lib;feast.lib;spmm.lib;superlu.lib;libhdf5.lib;libhdf5_hl.lib;opengl32.lib;wsock32.lib;psapi.lib;dbghelp.lib;vtkChartsCore-9.1.lib;vtkCommonColor-9.1.lib;vtkCommonComputationalGeometry-9.1.lib;vtkCommonCore-9.1.lib;vtkCommonDataModel-9.1.lib;vtkCommonExecutionModel-9.1.lib;vtkCommonMath-9.1.lib;vtkCommonMisc-9.1.lib;vtkCommonSystem-9.1.lib;vtkCommonTransforms-9.1.lib;vtkDICOMParser-9.1.lib;vtkDomainsChemistry-9.1.lib;vtkDomainsChemistryOpenGL2-9.1.lib;vtkFiltersAMR-9.1.lib;vtkFiltersCore-9.1.lib;vtkFiltersExtraction-9.1.lib;vtkFiltersFlowPaths-9.1.lib;vtkFiltersGeneral-9.1.lib;vtkFiltersGeneric-9.1.lib;vtkFiltersGeometry-9.1.lib;vtkFiltersHybrid-9.1.lib;vtkFiltersHyperTree-9.1.lib;vtkFiltersImaging-9.1.lib;vtkFiltersModeling-9.1.lib;vtkFiltersParallel-9.1.lib;vtkFiltersParallelImaging-9.1.lib;vtkFiltersPoints-9.1.lib;vtkFiltersProgrammable-9.1.lib;vtkFiltersSMP-9.1.lib;vtkFiltersSelection-9.1.lib;vtkFiltersSources-9.1.lib;vtkFiltersStatistics-9.1.lib;vtkFiltersTexture-9.1.lib;vtkFiltersTopology-9.1.lib;vtkFiltersVerdict-9.1.lib;vtkGeovisCore-9.1.lib;vtkIOAMR-9.1.lib;vtkIOAsynchronous-9.1.lib;vtkIOCGNSReader-9.1.lib;vtkIOCONVERGECFD-9.1.lib;vtkIOChemistry-9.1.lib;vtkIOCityGML-9.1.lib;vtkIOCore-9.1.lib;vtkIOEnSight-9.1.lib;vtkIOExodus-9.1.lib;vtkIOExport-9.1.lib;vtkIOExportGL2PS-9.1.lib;vtkIOExportPDF-9.1.lib;vtkIOGeometry-9.1.lib;vtkIOHDF-9.1.lib;vtkIOIOSS-9.1.lib;vtkIOImage-9.1.lib;vtkIOImport-9.1.lib;vtkIOInfovis-9.1.lib;vtkIOLSDyna-9.1.lib;vtkIOLegacy-9.1.lib;vtkIOMINC-9.1.lib;vtkIOMotionFX-9.1.lib;vtkIOMovie-9.1.lib;vtkIONetCDF-9.1.lib;vtkIOOggTheora-9.1.lib;vtkIOPLY-9.1.lib;vtkIOParallel-9.1.lib;vtkIOParallelXML-9.1.lib;vtkIOSQL-9.1.lib;vtkIOSegY-9.1.lib;vtkIOTecplotTable-9.1.lib;vtkIOVeraOut-9.1.lib;vtkIOVideo-9.1.lib;vtkIOXML-9.1.lib;vtkIOXMLParser-9.1.lib;vtkImagingColor-9.1.lib;vtkImagingCore-9.1.lib;vtkImagingFourier-9.1.lib;vtkImagingGeneral-9.1.lib;vtkImagingHybrid-9.1.lib;vtkImagingMath-9.1.lib;vtkImagingMorphological-9.1.lib;vtkImagingSources-9.1.lib;vtkImagingStatistics-9.1.lib;vtkImagingStencil-9.1.lib;vtkInfovisCore-9.1.lib;vtkInfovisLayout-9.1.lib;vtkInteractionImage-9.1.lib;vtkInteractionStyle-9.1.lib;vtkInteractionWidgets-9.1.lib;vtkParallelCore-9.1.lib;vtkParallelDIY-9.1.lib;vtkRenderingAnnotation-9.1.lib;vtkRenderingContext2D-9.1.lib;vtkRenderingContextOpenGL2-9.1.lib;vtkRenderingCore-9.1.lib;vtkRenderingFreeType-9.1.lib;vtkRenderingGL2PSOpenGL2-9.1.lib;vtkRenderingImage-9.1.lib;vtkRenderingLOD-9.1.lib;vtkRenderingLabel-9.1.lib;vtkRenderingOpenGL2-9.1.lib;vtkRenderingSceneGraph-9.1.lib;vtkRenderingUI-9.1.lib;vtkRenderingVolume-9.1.lib;vtkRenderingVolumeOpenGL2-9.1.lib;vtkRenderingVtkJS-9.1.lib;vtkTestingRendering-9.1.lib;vtkViewsContext2D-9.1.lib;vtkViewsCore-9.1.lib;vtkViewsInfovis-9.1.lib;vtkWrappingTools-9.1.lib;vtkcgns-9.1.lib;vtkdoubleconversion-9.1.lib;vtkexodusII-9.1.lib;vtkexpat-9.1.lib;vtkfmt-9.1.lib;vtkfreetype-9.1.lib;vtkgl2ps-9.1.lib;vtkglew-9.1.lib;vtkhdf5-9.1.lib;vtkhdf5_hl-9.1.lib;vtkioss-9.1.lib;vtkjpeg-9.1.lib;vtkjsoncpp-9.1.lib;vtkkissfft-9.1.lib;vtklibharu-9.1.lib;vtklibproj-9.1.lib;vtklibxml2-9.1.lib;vtkloguru-9.1.lib;vtklz4-9.1.lib;vtklzma-9.1.lib;vtkmetaio-9.1.lib;vtknetcdf-9.1.lib;vtkogg-9.1.lib;vtkpng-9.1.lib;vtkpugixml-9.1.lib;vtksqlite-9.1.lib;vtksys-9.1.lib;vtktheora-9.1.lib;vtktiff-9.1.lib;vtkverdict-9.1.lib;vtkzlib-9.1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Constraint\BC\GroupMultiplierBC.cpp" />
+    <ClCompile Include="..\..\..\Constraint\BC\GroupPenaltyBC.cpp" />
+    <ClCompile Include="..\..\..\Constraint\BC\MultiplierBC.cpp" />
+    <ClCompile Include="..\..\..\Constraint\BC\PenaltyBC.cpp" />
+    <ClCompile Include="..\..\..\Constraint\Constraint.cpp" />
+    <ClCompile Include="..\..\..\Constraint\ConstraintParser.cpp" />
+    <ClCompile Include="..\..\..\Constraint\Criterion\ComplementaryEnergyEvolution.cpp" />
+    <ClCompile Include="..\..\..\Constraint\Criterion\Criterion.cpp" />
+    <ClCompile Include="..\..\..\Constraint\Criterion\EnergyEvolution.cpp" />
+    <ClCompile Include="..\..\..\Constraint\Criterion\LogicCriterion.cpp" />
+    <ClCompile Include="..\..\..\Constraint\Criterion\MaxDisplacement.cpp" />
+    <ClCompile Include="..\..\..\Constraint\Criterion\MaxHistory.cpp" />
+    <ClCompile Include="..\..\..\Constraint\Criterion\MaxResistance.cpp" />
+    <ClCompile Include="..\..\..\Constraint\Criterion\MinDisplacement.cpp" />
+    <ClCompile Include="..\..\..\Constraint\Criterion\MinResistance.cpp" />
+    <ClCompile Include="..\..\..\Constraint\Criterion\NodeBasedCriterion.cpp" />
+    <ClCompile Include="..\..\..\Constraint\Criterion\StrainEnergyEvolution.cpp" />
+    <ClCompile Include="..\..\..\Constraint\Embed.cpp" />
+    <ClCompile Include="..\..\..\Constraint\FixedLength.cpp" />
+    <ClCompile Include="..\..\..\Constraint\MPC.cpp" />
+    <ClCompile Include="..\..\..\Constraint\NodeFacet.cpp" />
+    <ClCompile Include="..\..\..\Constraint\NodeLine.cpp" />
+    <ClCompile Include="..\..\..\Constraint\ParticleCollision.cpp" />
+    <ClCompile Include="..\..\..\Constraint\ParticleCollision2D.cpp" />
+    <ClCompile Include="..\..\..\Constraint\ParticleCollision3D.cpp" />
+    <ClCompile Include="..\..\..\Constraint\RigidWallMultiplier.cpp" />
+    <ClCompile Include="..\..\..\Constraint\RigidWallPenalty.cpp" />
+    <ClCompile Include="..\..\..\Converger\AbsDisp.cpp" />
+    <ClCompile Include="..\..\..\Converger\AbsError.cpp" />
+    <ClCompile Include="..\..\..\Converger\AbsIncreDisp.cpp" />
+    <ClCompile Include="..\..\..\Converger\AbsIncreEnergy.cpp" />
+    <ClCompile Include="..\..\..\Converger\AbsResidual.cpp" />
+    <ClCompile Include="..\..\..\Converger\Converger.cpp" />
+    <ClCompile Include="..\..\..\Converger\FixedNumber.cpp" />
+    <ClCompile Include="..\..\..\Converger\LogicConverger.cpp" />
+    <ClCompile Include="..\..\..\Converger\RelDisp.cpp" />
+    <ClCompile Include="..\..\..\Converger\RelError.cpp" />
+    <ClCompile Include="..\..\..\Converger\RelIncreDisp.cpp" />
+    <ClCompile Include="..\..\..\Converger\RelIncreEnergy.cpp" />
+    <ClCompile Include="..\..\..\Converger\RelResidual.cpp" />
+    <ClCompile Include="..\..\..\Database\Database.cpp" />
+    <ClCompile Include="..\..\..\Database\HDF.cpp" />
+    <ClCompile Include="..\..\..\Domain\ConditionalModifier.cpp" />
+    <ClCompile Include="..\..\..\Domain\Domain.cpp" />
+    <ClCompile Include="..\..\..\Domain\DomainBase.cpp" />
+    <ClCompile Include="..\..\..\Domain\DomainHelper.cpp" />
+    <ClCompile Include="..\..\..\Domain\DomainState.cpp" />
+    <ClCompile Include="..\..\..\Domain\ElementGroup.cpp" />
+    <ClCompile Include="..\..\..\Domain\ExternalModule.cpp" />
+    <ClCompile Include="..\..\..\Domain\Group.cpp" />
+    <ClCompile Include="..\..\..\Domain\GroupGroup.cpp" />
+    <ClCompile Include="..\..\..\Domain\Node.cpp" />
+    <ClCompile Include="..\..\..\Domain\NodeGroup.cpp" />
+    <ClCompile Include="..\..\..\Domain\Tag.cpp" />
+    <ClCompile Include="..\..\..\Element\Beam\B21.cpp" />
+    <ClCompile Include="..\..\..\Element\Beam\B21E.cpp" />
+    <ClCompile Include="..\..\..\Element\Beam\B21H.cpp" />
+    <ClCompile Include="..\..\..\Element\Beam\B31.cpp" />
+    <ClCompile Include="..\..\..\Element\Beam\EB21.cpp" />
+    <ClCompile Include="..\..\..\Element\Beam\F21.cpp" />
+    <ClCompile Include="..\..\..\Element\Beam\F21H.cpp" />
+    <ClCompile Include="..\..\..\Element\Beam\F31.cpp" />
+    <ClCompile Include="..\..\..\Element\Beam\MVLEM.cpp" />
+    <ClCompile Include="..\..\..\Element\Beam\NMB21.cpp" />
+    <ClCompile Include="..\..\..\Element\Beam\NMB31.cpp" />
+    <ClCompile Include="..\..\..\Element\Cube\C3D20.cpp" />
+    <ClCompile Include="..\..\..\Element\Cube\C3D4.cpp" />
+    <ClCompile Include="..\..\..\Element\Cube\C3D8.cpp" />
+    <ClCompile Include="..\..\..\Element\Cube\C3D8I.cpp" />
+    <ClCompile Include="..\..\..\Element\Cube\CIN3D8.cpp" />
+    <ClCompile Include="..\..\..\Element\Cube\DC3D4.cpp" />
+    <ClCompile Include="..\..\..\Element\Cube\DC3D8.cpp" />
+    <ClCompile Include="..\..\..\Element\Element.cpp" />
+    <ClCompile Include="..\..\..\Element\ElementParser.cpp" />
+    <ClCompile Include="..\..\..\Element\ElementTemplate.cpp" />
+    <ClCompile Include="..\..\..\Element\MaterialElement.cpp" />
+    <ClCompile Include="..\..\..\Element\Membrane\Axisymmetric\CAX3.cpp" />
+    <ClCompile Include="..\..\..\Element\Membrane\Axisymmetric\CAX4.cpp" />
+    <ClCompile Include="..\..\..\Element\Membrane\Axisymmetric\CAX8.cpp" />
+    <ClCompile Include="..\..\..\Element\Membrane\CSM\CSMQ.cpp" />
+    <ClCompile Include="..\..\..\Element\Membrane\CSM\CSMQ4.cpp" />
+    <ClCompile Include="..\..\..\Element\Membrane\CSM\CSMQ8.cpp" />
+    <ClCompile Include="..\..\..\Element\Membrane\CSM\CSMT3.cpp" />
+    <ClCompile Include="..\..\..\Element\Membrane\CSM\CSMT6.cpp" />
+    <ClCompile Include="..\..\..\Element\Membrane\Drilling\Allman.cpp" />
+    <ClCompile Include="..\..\..\Element\Membrane\Drilling\GCMQ.cpp" />
+    <ClCompile Include="..\..\..\Element\Membrane\Drilling\GQ12.cpp" />
+    <ClCompile Include="..\..\..\Element\Membrane\Drilling\SGCMQ.cpp" />
+    <ClCompile Include="..\..\..\Element\Membrane\Infinite\CINP4.cpp" />
+    <ClCompile Include="..\..\..\Element\Membrane\Mixed\PS.cpp" />
+    <ClCompile Include="..\..\..\Element\Membrane\Mixed\QE2.cpp" />
+    <ClCompile Include="..\..\..\Element\Membrane\PFM\DCP3.cpp" />
+    <ClCompile Include="..\..\..\Element\Membrane\PFM\DCP4.cpp" />
+    <ClCompile Include="..\..\..\Element\Membrane\Plane\CP3.cpp" />
+    <ClCompile Include="..\..\..\Element\Membrane\Plane\CP4.cpp" />
+    <ClCompile Include="..\..\..\Element\Membrane\Plane\CP4I.cpp" />
+    <ClCompile Include="..\..\..\Element\Membrane\Plane\CP5.cpp" />
+    <ClCompile Include="..\..\..\Element\Membrane\Plane\CP6.cpp" />
+    <ClCompile Include="..\..\..\Element\Membrane\Plane\CP7.cpp" />
+    <ClCompile Include="..\..\..\Element\Membrane\Plane\CP8.cpp" />
+    <ClCompile Include="..\..\..\Element\Membrane\Porous\PCPE4DC.cpp" />
+    <ClCompile Include="..\..\..\Element\Membrane\Porous\PCPE4UC.cpp" />
+    <ClCompile Include="..\..\..\Element\Membrane\Porous\PCPE8DC.cpp" />
+    <ClCompile Include="..\..\..\Element\Membrane\Porous\PCPE8UC.cpp" />
+    <ClCompile Include="..\..\..\Element\Modifier\ElementalModal.cpp" />
+    <ClCompile Include="..\..\..\Element\Modifier\LumpedScale.cpp" />
+    <ClCompile Include="..\..\..\Element\Modifier\LumpedSimple.cpp" />
+    <ClCompile Include="..\..\..\Element\Modifier\Modifier.cpp" />
+    <ClCompile Include="..\..\..\Element\Modifier\Rayleigh.cpp" />
+    <ClCompile Include="..\..\..\Element\Patch\Patch.cpp" />
+    <ClCompile Include="..\..\..\Element\Patch\PatchCube.cpp" />
+    <ClCompile Include="..\..\..\Element\Patch\PatchQuad.cpp" />
+    <ClCompile Include="..\..\..\Element\Plate\DKT3.cpp" />
+    <ClCompile Include="..\..\..\Element\Plate\DKT4.cpp" />
+    <ClCompile Include="..\..\..\Element\Plate\Mindlin.cpp" />
+    <ClCompile Include="..\..\..\Element\SectionElement.cpp" />
+    <ClCompile Include="..\..\..\Element\Shell\DKTS3.cpp" />
+    <ClCompile Include="..\..\..\Element\Shell\S4.cpp" />
+    <ClCompile Include="..\..\..\Element\Shell\SGCMS.cpp" />
+    <ClCompile Include="..\..\..\Element\Shell\ShellBase.cpp" />
+    <ClCompile Include="..\..\..\Element\Special\Contact2D.cpp" />
+    <ClCompile Include="..\..\..\Element\Special\Contact3D.cpp" />
+    <ClCompile Include="..\..\..\Element\Special\Damper01.cpp" />
+    <ClCompile Include="..\..\..\Element\Special\Damper02.cpp" />
+    <ClCompile Include="..\..\..\Element\Special\Embedded.cpp" />
+    <ClCompile Include="..\..\..\Element\Special\Joint.cpp" />
+    <ClCompile Include="..\..\..\Element\Special\Mass.cpp" />
+    <ClCompile Include="..\..\..\Element\Special\SingleSection2D.cpp" />
+    <ClCompile Include="..\..\..\Element\Special\SingleSection3D.cpp" />
+    <ClCompile Include="..\..\..\Element\Special\Spring01.cpp" />
+    <ClCompile Include="..\..\..\Element\Special\Spring02.cpp" />
+    <ClCompile Include="..\..\..\Element\Special\Tie.cpp" />
+    <ClCompile Include="..\..\..\Element\Truss\T2D2.cpp" />
+    <ClCompile Include="..\..\..\Element\Truss\T2D2S.cpp" />
+    <ClCompile Include="..\..\..\Element\Truss\T3D2.cpp" />
+    <ClCompile Include="..\..\..\Element\Truss\T3D2S.cpp" />
+    <ClCompile Include="..\..\..\Element\Utility\B2DC.cpp" />
+    <ClCompile Include="..\..\..\Element\Utility\B2DL.cpp" />
+    <ClCompile Include="..\..\..\Element\Utility\B3DC.cpp" />
+    <ClCompile Include="..\..\..\Element\Utility\B3DL.cpp" />
+    <ClCompile Include="..\..\..\Element\Utility\IGA\BSpline.cpp" />
+    <ClCompile Include="..\..\..\Element\Utility\IGA\BSplineSurface.cpp" />
+    <ClCompile Include="..\..\..\Element\Utility\IGA\BSplineVolume.cpp" />
+    <ClCompile Include="..\..\..\Element\Utility\IGA\NURBS.cpp" />
+    <ClCompile Include="..\..\..\Element\Utility\IGA\NURBSSurface.cpp" />
+    <ClCompile Include="..\..\..\Element\Utility\IGA\NURBSVolume.cpp" />
+    <ClCompile Include="..\..\..\Element\Utility\Orientation.cpp" />
+    <ClCompile Include="..\..\..\Element\Utility\PhaseField.cpp" />
+    <ClCompile Include="..\..\..\Element\Utility\T2DC.cpp" />
+    <ClCompile Include="..\..\..\Element\Utility\T2DL.cpp" />
+    <ClCompile Include="..\..\..\Element\Utility\T3DC.cpp" />
+    <ClCompile Include="..\..\..\Element\Utility\T3DL.cpp" />
+    <ClCompile Include="..\..\..\Element\Visualisation\vtkBase.cpp" />
+    <ClCompile Include="..\..\..\Element\Visualisation\vtkParser.cpp" />
+    <ClCompile Include="..\..\..\Load\Amplitude\Amplitude.cpp" />
+    <ClCompile Include="..\..\..\Load\Amplitude\Combine.cpp" />
+    <ClCompile Include="..\..\..\Load\Amplitude\Constant.cpp" />
+    <ClCompile Include="..\..\..\Load\Amplitude\Cosine.cpp" />
+    <ClCompile Include="..\..\..\Load\Amplitude\Decay.cpp" />
+    <ClCompile Include="..\..\..\Load\Amplitude\Linear.cpp" />
+    <ClCompile Include="..\..\..\Load\Amplitude\Modulated.cpp" />
+    <ClCompile Include="..\..\..\Load\Amplitude\NZStrongMotion.cpp" />
+    <ClCompile Include="..\..\..\Load\Amplitude\Ramp.cpp" />
+    <ClCompile Include="..\..\..\Load\Amplitude\Sine.cpp" />
+    <ClCompile Include="..\..\..\Load\Amplitude\Tabular.cpp" />
+    <ClCompile Include="..\..\..\Load\BodyForce.cpp" />
+    <ClCompile Include="..\..\..\Load\GroupBodyForce.cpp" />
+    <ClCompile Include="..\..\..\Load\GroupNodalDisplacement.cpp" />
+    <ClCompile Include="..\..\..\Load\GroupNodalForce.cpp" />
+    <ClCompile Include="..\..\..\Load\LineUDL.cpp" />
+    <ClCompile Include="..\..\..\Load\Load.cpp" />
+    <ClCompile Include="..\..\..\Load\NodalAcceleration.cpp" />
+    <ClCompile Include="..\..\..\Load\NodalDisplacement.cpp" />
+    <ClCompile Include="..\..\..\Load\NodalForce.cpp" />
+    <ClCompile Include="..\..\..\Load\SupportMotion.cpp" />
+    <ClCompile Include="..\..\..\Material\ExternalMaterial.cpp" />
+    <ClCompile Include="..\..\..\Material\Material.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Concrete\ConcreteCM.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Concrete\ConcreteExp.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Concrete\ConcreteTable.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Concrete\ConcreteTsai.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Degradation\Degradation.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Degradation\Dhakal.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Degradation\TrilinearDegradation.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Elastic\BilinearElastic1D.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Elastic\Elastic1D.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Elastic\MultilinearElastic1D.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Elastic\PolyElastic1D.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\AFC.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\BilinearOO.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\BilinearPO.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\BoucWen.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\BWBN.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\CoulombFriction.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\Flag.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\Gap01.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\MPF.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\MultilinearOO.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\MultilinearPO.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\OriginOriented.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\PeakOriented.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\RambergOsgood.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\SimpleHysteresis.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\SlipLock.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\SteelBRB.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\Trivial.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Material1D.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Viscosity\BilinearViscosity.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Viscosity\Kelvin.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Viscosity\Maxwell.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Viscosity\NonlinearViscosity.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Viscosity\Viscosity01.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Viscosity\Viscosity02.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\vonMises\ArmstrongFrederick1D.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\vonMises\Bilinear1D.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\vonMises\BilinearMises1D.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\vonMises\ExpGurson1D.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\vonMises\ExpMises1D.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\vonMises\MultilinearMises1D.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\vonMises\NonlinearGurson1D.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\vonMises\NonlinearMises1D.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\vonMises\VAFCRP1D.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Wrapper\Parallel.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Wrapper\Sequential.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Wrapper\Uniaxial.cpp" />
+    <ClCompile Include="..\..\..\Material\Material2D\Bilinear2D.cpp" />
+    <ClCompile Include="..\..\..\Material\Material2D\Concrete21.cpp" />
+    <ClCompile Include="..\..\..\Material\Material2D\Concrete22.cpp" />
+    <ClCompile Include="..\..\..\Material\Material2D\Elastic\AxisymmetricElastic.cpp" />
+    <ClCompile Include="..\..\..\Material\Material2D\Elastic\Elastic2D.cpp" />
+    <ClCompile Include="..\..\..\Material\Material2D\Material2D.cpp" />
+    <ClCompile Include="..\..\..\Material\Material2D\Wrapper\Axisymmetric.cpp" />
+    <ClCompile Include="..\..\..\Material\Material2D\Wrapper\Laminated.cpp" />
+    <ClCompile Include="..\..\..\Material\Material2D\Wrapper\PlaneStrain.cpp" />
+    <ClCompile Include="..\..\..\Material\Material2D\Wrapper\PlaneStress.cpp" />
+    <ClCompile Include="..\..\..\Material\Material2D\Wrapper\Rebar2D.cpp" />
+    <ClCompile Include="..\..\..\Material\Material2D\Wrapper\Rotation2D.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Clay\CamClay\BilinearCC.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Clay\CamClay\ExpCC.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Clay\CamClay\NonlinearCamClay.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Clay\CamClay\ParabolicCC.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Concrete\CDP.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Concrete\CDPM2.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Concrete\NonlinearCDP.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Concrete\Rebar3D.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Concrete\TableCDP.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Damage\IsotropicDamage.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Damage\LinearDamage.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\DruckerPrager\BilinearDP.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\DruckerPrager\ExpDP.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\DruckerPrager\NonlinearDruckerPrager.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Elastic\BlatzKo.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Elastic\IsotropicElastic3D.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Elastic\IsotropicNonlinearElastic3D.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Elastic\MooneyRivlin.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Elastic\NLE3D01.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Elastic\OrthotropicElastic3D.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Elastic\Yeoh.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Hoffman\BilinearHoffman.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Hoffman\ExpHoffman.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Hoffman\NonlinearHill.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Hoffman\NonlinearHoffman.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Material3D.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Sand\DafaliasManzari.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Sand\SimpleSand.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\vonMises\ArmstrongFrederick.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\vonMises\BilinearJ2.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\vonMises\BilinearPeric.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\vonMises\ExpGurson.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\vonMises\ExpJ2.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\vonMises\MultilinearJ2.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\vonMises\NonlinearGurson.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\vonMises\NonlinearJ2.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\vonMises\NonlinearPeric.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\vonMises\PolyJ2.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\vonMises\TableGurson.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\vonMises\VAFCRP.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Wrapper\Rotation3D.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Wrapper\Stacked.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Wrapper\Substepping.cpp" />
+    <ClCompile Include="..\..\..\Material\MaterialParser.cpp" />
+    <ClCompile Include="..\..\..\Material\MaterialTemplate.cpp" />
+    <ClCompile Include="..\..\..\Material\MaterialTester.cpp" />
+    <ClCompile Include="..\..\..\Material\Special\Fluid.cpp" />
+    <ClCompile Include="..\..\..\Recorder\AmplitudeRecorder.cpp" />
+    <ClCompile Include="..\..\..\Recorder\EigenRecorder.cpp" />
+    <ClCompile Include="..\..\..\Recorder\ElementRecorder.cpp" />
+    <ClCompile Include="..\..\..\Recorder\FrameRecorder.cpp" />
+    <ClCompile Include="..\..\..\Recorder\GlobalMassRecorder.cpp" />
+    <ClCompile Include="..\..\..\Recorder\GlobalRecorder.cpp" />
+    <ClCompile Include="..\..\..\Recorder\GlobalStiffnessRecorder.cpp" />
+    <ClCompile Include="..\..\..\Recorder\GroupElementRecorder.cpp" />
+    <ClCompile Include="..\..\..\Recorder\GroupNodeRecorder.cpp" />
+    <ClCompile Include="..\..\..\Recorder\GroupSumRecorder.cpp" />
+    <ClCompile Include="..\..\..\Recorder\NodeRecorder.cpp" />
+    <ClCompile Include="..\..\..\Recorder\OutputType.cpp" />
+    <ClCompile Include="..\..\..\Recorder\Recorder.cpp" />
+    <ClCompile Include="..\..\..\Recorder\SumRecorder.cpp" />
+    <ClCompile Include="..\..\..\Recorder\VisualisationRecorder.cpp" />
+    <ClCompile Include="..\..\..\Section\Section.cpp" />
+    <ClCompile Include="..\..\..\Section\Section1D\Circle1D.cpp" />
+    <ClCompile Include="..\..\..\Section\Section1D\Fibre1D.cpp" />
+    <ClCompile Include="..\..\..\Section\Section1D\Rectangle1D.cpp" />
+    <ClCompile Include="..\..\..\Section\Section1D\Section1D.cpp" />
+    <ClCompile Include="..\..\..\Section\Section1D\TrussSection.cpp" />
+    <ClCompile Include="..\..\..\Section\Section2D\Bar2D.cpp" />
+    <ClCompile Include="..\..\..\Section\Section2D\Box2D.cpp" />
+    <ClCompile Include="..\..\..\Section\Section2D\Circle2D.cpp" />
+    <ClCompile Include="..\..\..\Section\Section2D\CircularHollow2D.cpp" />
+    <ClCompile Include="..\..\..\Section\Section2D\Fibre2D.cpp" />
+    <ClCompile Include="..\..\..\Section\Section2D\HSection2D.cpp" />
+    <ClCompile Include="..\..\..\Section\Section2D\ISection2D.cpp" />
+    <ClCompile Include="..\..\..\Section\Section2D\Rectangle2D.cpp" />
+    <ClCompile Include="..\..\..\Section\Section2D\Section2D.cpp" />
+    <ClCompile Include="..\..\..\Section\Section2D\TSection2D.cpp" />
+    <ClCompile Include="..\..\..\Section\Section3D\Bar3D.cpp" />
+    <ClCompile Include="..\..\..\Section\Section3D\Box3D.cpp" />
+    <ClCompile Include="..\..\..\Section\Section3D\Circle3D.cpp" />
+    <ClCompile Include="..\..\..\Section\Section3D\CircularHollow3D.cpp" />
+    <ClCompile Include="..\..\..\Section\Section3D\Fibre3D.cpp" />
+    <ClCompile Include="..\..\..\Section\Section3D\ISection3D.cpp" />
+    <ClCompile Include="..\..\..\Section\Section3D\Rectangle3D.cpp" />
+    <ClCompile Include="..\..\..\Section\Section3D\Section3D.cpp" />
+    <ClCompile Include="..\..\..\Section\Section3D\TSection3D.cpp" />
+    <ClCompile Include="..\..\..\Section\SectionNM\NM2D1.cpp" />
+    <ClCompile Include="..\..\..\Section\SectionNM\NM2D2.cpp" />
+    <ClCompile Include="..\..\..\Section\SectionNM\NonlinearNM2D.cpp" />
+    <ClCompile Include="..\..\..\Section\SectionNM\NM3D1.cpp" />
+    <ClCompile Include="..\..\..\Section\SectionNM\NM3D2.cpp" />
+    <ClCompile Include="..\..\..\Section\SectionNM\NonlinearNM3D.cpp" />
+    <ClCompile Include="..\..\..\Section\SectionNM\SectionNM.cpp" />
+    <ClCompile Include="..\..\..\Section\SectionNM\SectionNM2D.cpp" />
+    <ClCompile Include="..\..\..\Section\SectionNM\SectionNM3D.cpp" />
+    <ClCompile Include="..\..\..\Section\SectionParser.cpp" />
+    <ClCompile Include="..\..\..\Section\SectionShell\Homogeneous.cpp" />
+    <ClCompile Include="..\..\..\Section\SectionShell\SectionShell.cpp" />
+    <ClCompile Include="..\..\..\Solver\Arnoldi.cpp" />
+    <ClCompile Include="..\..\..\Solver\BFGS.cpp" />
+    <ClCompile Include="..\..\..\Solver\FEAST.cpp" />
+    <ClCompile Include="..\..\..\Solver\Integrator\BatheTwoStep.cpp" />
+    <ClCompile Include="..\..\..\Solver\Integrator\GeneralizedAlpha.cpp" />
+    <ClCompile Include="..\..\..\Solver\Integrator\GSSSS.cpp" />
+    <ClCompile Include="..\..\..\Solver\Integrator\Integrator.cpp" />
+    <ClCompile Include="..\..\..\Solver\Integrator\LeeNewmark.cpp" />
+    <ClCompile Include="..\..\..\Solver\Integrator\LeeNewmarkBase.cpp" />
+    <ClCompile Include="..\..\..\Solver\Integrator\LeeNewmarkFull.cpp" />
+    <ClCompile Include="..\..\..\Solver\Integrator\Newmark.cpp" />
+    <ClCompile Include="..\..\..\Solver\Integrator\RayleighNewmark.cpp" />
+    <ClCompile Include="..\..\..\Solver\Integrator\WilsonPenzienNewmark.cpp" />
+    <ClCompile Include="..\..\..\Solver\MPDC.cpp" />
+    <ClCompile Include="..\..\..\Solver\Newton.cpp" />
+    <ClCompile Include="..\..\..\Solver\Ramm.cpp" />
+    <ClCompile Include="..\..\..\Solver\Solver.cpp" />
+    <ClCompile Include="..\..\..\Step\ArcLength.cpp" />
+    <ClCompile Include="..\..\..\Step\Bead.cpp" />
+    <ClCompile Include="..\..\..\Step\Buckle.cpp" />
+    <ClCompile Include="..\..\..\Step\Dynamic.cpp" />
+    <ClCompile Include="..\..\..\Step\Frequency.cpp" />
+    <ClCompile Include="..\..\..\Step\Optimization.cpp" />
+    <ClCompile Include="..\..\..\Step\Static.cpp" />
+    <ClCompile Include="..\..\..\Step\Step.cpp" />
+    <ClCompile Include="..\..\..\suanPan.cpp" />
+    <ClCompile Include="..\..\..\Toolbox\argumentParser.cpp" />
+    <ClCompile Include="..\..\..\Toolbox\arpack_wrapper.cpp" />
+    <ClCompile Include="..\..\..\Toolbox\commandParser.cpp" />
+    <ClCompile Include="..\..\..\Toolbox\Converter.cpp" />
+    <ClCompile Include="..\..\..\Toolbox\print.cpp" />
+    <ClCompile Include="..\..\..\Toolbox\IntegrationPlan.cpp" />
+    <ClCompile Include="..\..\..\Toolbox\sort_color.cpp" />
+    <ClCompile Include="..\..\..\Toolbox\sort_rcm.cpp" />
+    <ClCompile Include="..\..\..\Toolbox\sync_ostream.cpp" />
+    <ClCompile Include="..\..\..\Toolbox\tensorToolbox.cpp" />
+    <ClCompile Include="..\..\..\Toolbox\utility.cpp" />
+    <ClCompile Include="..\..\..\UnitTest\CatchTest.cpp" />
+    <ClCompile Include="..\..\..\UnitTest\TestColoring.cpp" />
+    <ClCompile Include="..\..\..\UnitTest\TestIntegration.cpp" />
+    <ClCompile Include="..\..\..\UnitTest\TestMatrix.cpp" />
+    <ClCompile Include="..\..\..\UnitTest\TestNURBS.cpp" />
+    <ClCompile Include="..\..\..\UnitTest\TestMode.cpp" />
+    <ClCompile Include="..\..\..\UnitTest\TestQuaternion.cpp" />
+    <ClCompile Include="..\..\..\UnitTest\TestShape.cpp" />
+    <ClCompile Include="..\..\..\UnitTest\TestString.cpp" />
+    <ClCompile Include="..\..\..\UnitTest\TestTensor.cpp" />
+    <ClCompile Include="..\..\..\UnitTest\TestUtility.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h" />
+    <ClInclude Include="..\..\..\Constraint\BC\GroupPenaltyBC.h" />
+    <ClInclude Include="..\..\..\Constraint\BC\MultiplierBC.h" />
+    <ClInclude Include="..\..\..\Constraint\BC\PenaltyBC.h" />
+    <ClInclude Include="..\..\..\Constraint\Constraint.h" />
+    <ClInclude Include="..\..\..\Constraint\ConstraintParser.h" />
+    <ClInclude Include="..\..\..\Constraint\Criterion\ComplementaryEnergyEvolution.h" />
+    <ClInclude Include="..\..\..\Constraint\Criterion\Criterion.h" />
+    <ClInclude Include="..\..\..\Constraint\Criterion\EnergyEvolution.h" />
+    <ClInclude Include="..\..\..\Constraint\Criterion\LogicCriterion.h" />
+    <ClInclude Include="..\..\..\Constraint\Criterion\MaxDisplacement.h" />
+    <ClInclude Include="..\..\..\Constraint\Criterion\MaxHistory.h" />
+    <ClInclude Include="..\..\..\Constraint\Criterion\MaxResistance.h" />
+    <ClInclude Include="..\..\..\Constraint\Criterion\MinDisplacement.h" />
+    <ClInclude Include="..\..\..\Constraint\Criterion\MinResistance.h" />
+    <ClInclude Include="..\..\..\Constraint\Criterion\NodeBasedCriterion.h" />
+    <ClInclude Include="..\..\..\Constraint\Criterion\StrainEnergyEvolution.h" />
+    <ClInclude Include="..\..\..\Constraint\Embed.h" />
+    <ClInclude Include="..\..\..\Constraint\FixedLength.h" />
+    <ClInclude Include="..\..\..\Constraint\MPC.h" />
+    <ClInclude Include="..\..\..\Constraint\NodeFacet.h" />
+    <ClInclude Include="..\..\..\Constraint\NodeLine.h" />
+    <ClInclude Include="..\..\..\Constraint\ParticleCollision.h" />
+    <ClInclude Include="..\..\..\Constraint\ParticleCollision2D.h" />
+    <ClInclude Include="..\..\..\Constraint\ParticleCollision3D.h" />
+    <ClInclude Include="..\..\..\Constraint\RigidWallMultiplier.h" />
+    <ClInclude Include="..\..\..\Constraint\RigidWallPenalty.h" />
+    <ClInclude Include="..\..\..\Converger\AbsDisp.h" />
+    <ClInclude Include="..\..\..\Converger\AbsError.h" />
+    <ClInclude Include="..\..\..\Converger\AbsIncreDisp.h" />
+    <ClInclude Include="..\..\..\Converger\AbsIncreEnergy.h" />
+    <ClInclude Include="..\..\..\Converger\AbsResidual.h" />
+    <ClInclude Include="..\..\..\Converger\Converger.h" />
+    <ClInclude Include="..\..\..\Converger\FixedNumber.h" />
+    <ClInclude Include="..\..\..\Converger\LogicConverger.h" />
+    <ClInclude Include="..\..\..\Converger\RelDisp.h" />
+    <ClInclude Include="..\..\..\Converger\RelError.h" />
+    <ClInclude Include="..\..\..\Converger\RelIncreDisp.h" />
+    <ClInclude Include="..\..\..\Converger\RelIncreEnergy.h" />
+    <ClInclude Include="..\..\..\Converger\RelResidual.h" />
+    <ClInclude Include="..\..\..\Database\Database.h" />
+    <ClInclude Include="..\..\..\Database\HDF.h" />
+    <ClInclude Include="..\..\..\Domain\ConditionalModifier.h" />
+    <ClInclude Include="..\..\..\Domain\Domain.h" />
+    <ClInclude Include="..\..\..\Domain\DomainBase.h" />
+    <ClInclude Include="..\..\..\Domain\ElementGroup.h" />
+    <ClInclude Include="..\..\..\Domain\ExternalModule.h" />
+    <ClInclude Include="..\..\..\Domain\Factory.hpp" />
+    <ClInclude Include="..\..\..\Domain\FactoryHelper.hpp" />
+    <ClInclude Include="..\..\..\Domain\Group.h" />
+    <ClInclude Include="..\..\..\Domain\GroupGroup.h" />
+    <ClInclude Include="..\..\..\Domain\MetaMat\BandMat.hpp" />
+    <ClInclude Include="..\..\..\Domain\MetaMat\BandMatSpike.hpp" />
+    <ClInclude Include="..\..\..\Domain\MetaMat\BandSymmMat.hpp" />
+    <ClInclude Include="..\..\..\Domain\MetaMat\csc_form.hpp" />
+    <ClInclude Include="..\..\..\Domain\MetaMat\csr_form.hpp" />
+    <ClInclude Include="..\..\..\Domain\MetaMat\DenseMat.hpp" />
+    <ClInclude Include="..\..\..\Domain\MetaMat\FullMat.hpp" />
+    <ClInclude Include="..\..\..\Domain\MetaMat\FullMatCUDA.hpp" />
+    <ClInclude Include="..\..\..\Domain\MetaMat\MetaMat.hpp" />
+    <ClInclude Include="..\..\..\Domain\MetaMat\operator_times.hpp" />
+    <ClInclude Include="..\..\..\Domain\MetaMat\SparseMat.hpp" />
+    <ClInclude Include="..\..\..\Domain\MetaMat\SparseMatCUDA.hpp" />
+    <ClInclude Include="..\..\..\Domain\MetaMat\SparseMatFGMRES.hpp" />
+    <ClInclude Include="..\..\..\Domain\MetaMat\SparseMatMUMPS.hpp" />
+    <ClInclude Include="..\..\..\Domain\MetaMat\SparseMatPARDISO.hpp" />
+    <ClInclude Include="..\..\..\Domain\MetaMat\SparseMatSuperLU.hpp" />
+    <ClInclude Include="..\..\..\Domain\MetaMat\SymmPackMat.hpp" />
+    <ClInclude Include="..\..\..\Domain\MetaMat\triplet_form.hpp" />
+    <ClInclude Include="..\..\..\Domain\Node.h" />
+    <ClInclude Include="..\..\..\Domain\NodeGroup.h" />
+    <ClInclude Include="..\..\..\Domain\Storage.hpp" />
+    <ClInclude Include="..\..\..\Domain\Tag.h" />
+    <ClInclude Include="..\..\..\Element\Beam\B21.h" />
+    <ClInclude Include="..\..\..\Element\Beam\B21E.h" />
+    <ClInclude Include="..\..\..\Element\Beam\B21H.h" />
+    <ClInclude Include="..\..\..\Element\Beam\B31.h" />
+    <ClInclude Include="..\..\..\Element\Beam\EB21.h" />
+    <ClInclude Include="..\..\..\Element\Beam\F21.h" />
+    <ClInclude Include="..\..\..\Element\Beam\F21H.h" />
+    <ClInclude Include="..\..\..\Element\Beam\F31.h" />
+    <ClInclude Include="..\..\..\Element\Beam\MVLEM.h" />
+    <ClInclude Include="..\..\..\Element\Beam\NMB21.h" />
+    <ClInclude Include="..\..\..\Element\Beam\NMB31.h" />
+    <ClInclude Include="..\..\..\Element\Cube\C3D20.h" />
+    <ClInclude Include="..\..\..\Element\Cube\C3D4.h" />
+    <ClInclude Include="..\..\..\Element\Cube\C3D8.h" />
+    <ClInclude Include="..\..\..\Element\Cube\C3D8I.h" />
+    <ClInclude Include="..\..\..\Element\Cube\CIN3D8.h" />
+    <ClInclude Include="..\..\..\Element\Cube\DC3D4.h" />
+    <ClInclude Include="..\..\..\Element\Cube\DC3D8.h" />
+    <ClInclude Include="..\..\..\Element\Element.h" />
+    <ClInclude Include="..\..\..\Element\ElementBase.h" />
+    <ClInclude Include="..\..\..\Element\ElementParser.h" />
+    <ClInclude Include="..\..\..\Element\ElementTemplate.h" />
+    <ClInclude Include="..\..\..\Element\MaterialElement.h" />
+    <ClInclude Include="..\..\..\Element\Membrane\Axisymmetric\CAX3.h" />
+    <ClInclude Include="..\..\..\Element\Membrane\Axisymmetric\CAX4.h" />
+    <ClInclude Include="..\..\..\Element\Membrane\Axisymmetric\CAX8.h" />
+    <ClInclude Include="..\..\..\Element\Membrane\CSM\CSMQ.h" />
+    <ClInclude Include="..\..\..\Element\Membrane\CSM\CSMQ4.h" />
+    <ClInclude Include="..\..\..\Element\Membrane\CSM\CSMQ8.h" />
+    <ClInclude Include="..\..\..\Element\Membrane\CSM\CSMT3.h" />
+    <ClInclude Include="..\..\..\Element\Membrane\CSM\CSMT6.h" />
+    <ClInclude Include="..\..\..\Element\Membrane\Drilling\Allman.h" />
+    <ClInclude Include="..\..\..\Element\Membrane\Drilling\GCMQ.h" />
+    <ClInclude Include="..\..\..\Element\Membrane\Drilling\GQ12.h" />
+    <ClInclude Include="..\..\..\Element\Membrane\Drilling\SGCMQ.h" />
+    <ClInclude Include="..\..\..\Element\Membrane\Infinite\CINP4.h" />
+    <ClInclude Include="..\..\..\Element\Membrane\Mixed\PS.h" />
+    <ClInclude Include="..\..\..\Element\Membrane\Mixed\QE2.h" />
+    <ClInclude Include="..\..\..\Element\Membrane\PFM\DCP3.h" />
+    <ClInclude Include="..\..\..\Element\Membrane\PFM\DCP4.h" />
+    <ClInclude Include="..\..\..\Element\Membrane\Plane\CP3.h" />
+    <ClInclude Include="..\..\..\Element\Membrane\Plane\CP4.h" />
+    <ClInclude Include="..\..\..\Element\Membrane\Plane\CP4I.h" />
+    <ClInclude Include="..\..\..\Element\Membrane\Plane\CP5.h" />
+    <ClInclude Include="..\..\..\Element\Membrane\Plane\CP6.h" />
+    <ClInclude Include="..\..\..\Element\Membrane\Plane\CP7.h" />
+    <ClInclude Include="..\..\..\Element\Membrane\Plane\CP8.h" />
+    <ClInclude Include="..\..\..\Element\Membrane\Porous\PCPE4DC.h" />
+    <ClInclude Include="..\..\..\Element\Membrane\Porous\PCPE4UC.h" />
+    <ClInclude Include="..\..\..\Element\Membrane\Porous\PCPE8DC.h" />
+    <ClInclude Include="..\..\..\Element\Membrane\Porous\PCPE8UC.h" />
+    <ClInclude Include="..\..\..\Element\Modifier\ElementalModal.h" />
+    <ClInclude Include="..\..\..\Element\Modifier\LumpedScale.h" />
+    <ClInclude Include="..\..\..\Element\Modifier\LumpedSimple.h" />
+    <ClInclude Include="..\..\..\Element\Modifier\Modifier.h" />
+    <ClInclude Include="..\..\..\Element\Modifier\Rayleigh.h" />
+    <ClInclude Include="..\..\..\Element\Patch\Patch.h" />
+    <ClInclude Include="..\..\..\Element\Patch\PatchCube.h" />
+    <ClInclude Include="..\..\..\Element\Patch\PatchQuad.h" />
+    <ClInclude Include="..\..\..\Element\Plate\DKT3.h" />
+    <ClInclude Include="..\..\..\Element\Plate\DKT4.h" />
+    <ClInclude Include="..\..\..\Element\Plate\Mindlin.h" />
+    <ClInclude Include="..\..\..\Element\SectionElement.h" />
+    <ClInclude Include="..\..\..\Element\Shell\DKTS3.h" />
+    <ClInclude Include="..\..\..\Element\Shell\S4.h" />
+    <ClInclude Include="..\..\..\Element\Shell\SGCMS.h" />
+    <ClInclude Include="..\..\..\Element\Shell\ShellBase.h" />
+    <ClInclude Include="..\..\..\Element\Special\Contact2D.h" />
+    <ClInclude Include="..\..\..\Element\Special\Contact3D.h" />
+    <ClInclude Include="..\..\..\Element\Special\Damper01.h" />
+    <ClInclude Include="..\..\..\Element\Special\Damper02.h" />
+    <ClInclude Include="..\..\..\Element\Special\Embedded.h" />
+    <ClInclude Include="..\..\..\Element\Special\Joint.h" />
+    <ClInclude Include="..\..\..\Element\Special\Mass.h" />
+    <ClInclude Include="..\..\..\Element\Special\SingleSection2D.h" />
+    <ClInclude Include="..\..\..\Element\Special\SingleSection3D.h" />
+    <ClInclude Include="..\..\..\Element\Special\Spring01.h" />
+    <ClInclude Include="..\..\..\Element\Special\Spring02.h" />
+    <ClInclude Include="..\..\..\Element\Special\Tie.h" />
+    <ClInclude Include="..\..\..\Element\Truss\T2D2.h" />
+    <ClInclude Include="..\..\..\Element\Truss\T2D2S.h" />
+    <ClInclude Include="..\..\..\Element\Truss\T3D2.h" />
+    <ClInclude Include="..\..\..\Element\Truss\T3D2S.h" />
+    <ClInclude Include="..\..\..\Element\Utility\B2DC.h" />
+    <ClInclude Include="..\..\..\Element\Utility\B2DL.h" />
+    <ClInclude Include="..\..\..\Element\Utility\B3DC.h" />
+    <ClInclude Include="..\..\..\Element\Utility\B3DL.h" />
+    <ClInclude Include="..\..\..\Element\Utility\IGA\BSpline.h" />
+    <ClInclude Include="..\..\..\Element\Utility\IGA\BSplineSurface.h" />
+    <ClInclude Include="..\..\..\Element\Utility\IGA\BSplineVolume.h" />
+    <ClInclude Include="..\..\..\Element\Utility\IGA\NURBS.h" />
+    <ClInclude Include="..\..\..\Element\Utility\IGA\NURBSSurface.h" />
+    <ClInclude Include="..\..\..\Element\Utility\IGA\NURBSVolume.h" />
+    <ClInclude Include="..\..\..\Element\Utility\MatrixModifier.hpp" />
+    <ClInclude Include="..\..\..\Element\Utility\Orientation.h" />
+    <ClInclude Include="..\..\..\Element\Utility\PhaseField.h" />
+    <ClInclude Include="..\..\..\Element\Utility\T2DC.h" />
+    <ClInclude Include="..\..\..\Element\Utility\T2DL.h" />
+    <ClInclude Include="..\..\..\Element\Utility\T3DC.h" />
+    <ClInclude Include="..\..\..\Element\Utility\T3DL.h" />
+    <ClInclude Include="..\..\..\Element\Visualisation\vtkBase.h" />
+    <ClInclude Include="..\..\..\Element\Visualisation\vtkParser.h" />
+    <ClInclude Include="..\..\..\Load\Amplitude\Amplitude.h" />
+    <ClInclude Include="..\..\..\Load\Amplitude\Combine.h" />
+    <ClInclude Include="..\..\..\Load\Amplitude\Constant.h" />
+    <ClInclude Include="..\..\..\Load\Amplitude\Cosine.h" />
+    <ClInclude Include="..\..\..\Load\Amplitude\Decay.h" />
+    <ClInclude Include="..\..\..\Load\Amplitude\Linear.h" />
+    <ClInclude Include="..\..\..\Load\Amplitude\Modulated.h" />
+    <ClInclude Include="..\..\..\Load\Amplitude\NZStrongMotion.h" />
+    <ClInclude Include="..\..\..\Load\Amplitude\Ramp.h" />
+    <ClInclude Include="..\..\..\Load\Amplitude\Sine.h" />
+    <ClInclude Include="..\..\..\Load\Amplitude\Tabular.h" />
+    <ClInclude Include="..\..\..\Load\BodyForce.h" />
+    <ClInclude Include="..\..\..\Load\GroupBodyForce.h" />
+    <ClInclude Include="..\..\..\Load\GroupNodalDisplacement.h" />
+    <ClInclude Include="..\..\..\Load\GroupNodalForce.h" />
+    <ClInclude Include="..\..\..\Load\LineUDL.h" />
+    <ClInclude Include="..\..\..\Load\Load.h" />
+    <ClInclude Include="..\..\..\Load\NodalAcceleration.h" />
+    <ClInclude Include="..\..\..\Load\NodalDisplacement.h" />
+    <ClInclude Include="..\..\..\Load\NodalForce.h" />
+    <ClInclude Include="..\..\..\Load\SupportMotion.h" />
+    <ClInclude Include="..\..\..\Material\ExternalMaterial.h" />
+    <ClInclude Include="..\..\..\Material\ExternalMaterialData.h" />
+    <ClInclude Include="..\..\..\Material\Material.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Concrete\ConcreteCM.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Concrete\ConcreteExp.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Concrete\ConcreteTable.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Concrete\ConcreteTsai.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Degradation\Degradation.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Degradation\Dhakal.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Degradation\TrilinearDegradation.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Elastic\BilinearElastic1D.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Elastic\Elastic1D.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Elastic\MultilinearElastic1D.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Elastic\PolyElastic1D.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\AFC.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\BilinearOO.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\BilinearPO.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\BoucWen.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\BWBN.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\CoulombFriction.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\Flag.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\Gap01.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\MPF.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\MultilinearOO.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\MultilinearPO.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\OriginOriented.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\PeakOriented.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\RambergOsgood.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\SimpleHysteresis.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\SlipLock.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\SteelBRB.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\Trivial.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Material1D.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Viscosity\BilinearViscosity.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Viscosity\Kelvin.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Viscosity\Maxwell.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Viscosity\NonlinearViscosity.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Viscosity\Viscosity01.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Viscosity\Viscosity02.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\vonMises\ArmstrongFrederick1D.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\vonMises\Bilinear1D.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\vonMises\BilinearMises1D.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\vonMises\ExpGurson1D.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\vonMises\ExpMises1D.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\vonMises\MultilinearMises1D.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\vonMises\NonlinearGurson1D.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\vonMises\NonlinearMises1D.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\vonMises\VAFCRP1D.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Wrapper\Parallel.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Wrapper\Sequential.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Wrapper\Uniaxial.h" />
+    <ClInclude Include="..\..\..\Material\Material2D\Bilinear2D.h" />
+    <ClInclude Include="..\..\..\Material\Material2D\Concrete21.h" />
+    <ClInclude Include="..\..\..\Material\Material2D\Concrete22.h" />
+    <ClInclude Include="..\..\..\Material\Material2D\Elastic\AxisymmetricElastic.h" />
+    <ClInclude Include="..\..\..\Material\Material2D\Elastic\Elastic2D.h" />
+    <ClInclude Include="..\..\..\Material\Material2D\Material2D.h" />
+    <ClInclude Include="..\..\..\Material\Material2D\Wrapper\Axisymmetric.h" />
+    <ClInclude Include="..\..\..\Material\Material2D\Wrapper\Laminated.h" />
+    <ClInclude Include="..\..\..\Material\Material2D\Wrapper\PlaneStrain.h" />
+    <ClInclude Include="..\..\..\Material\Material2D\Wrapper\PlaneStress.h" />
+    <ClInclude Include="..\..\..\Material\Material2D\Wrapper\Rebar2D.h" />
+    <ClInclude Include="..\..\..\Material\Material2D\Wrapper\Rotation2D.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Clay\CamClay\BilinearCC.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Clay\CamClay\ExpCC.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Clay\CamClay\NonlinearCamClay.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Clay\CamClay\ParabolicCC.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Concrete\CDP.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Concrete\CDPM2.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Concrete\NonlinearCDP.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Concrete\Rebar3D.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Concrete\TableCDP.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Damage\IsotropicDamage.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Damage\LinearDamage.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\DruckerPrager\BilinearDP.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\DruckerPrager\ExpDP.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\DruckerPrager\NonlinearDruckerPrager.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Elastic\BlatzKo.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Elastic\IsotropicElastic3D.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Elastic\IsotropicNonlinearElastic3D.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Elastic\MooneyRivlin.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Elastic\NLE3D01.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Elastic\OrthotropicElastic3D.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Elastic\Yeoh.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Hoffman\BilinearHoffman.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Hoffman\ExpHoffman.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Hoffman\NonlinearHill.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Hoffman\NonlinearHoffman.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Material3D.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Sand\DafaliasManzari.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Sand\SimpleSand.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\vonMises\ArmstrongFrederick.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\vonMises\BilinearJ2.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\vonMises\BilinearPeric.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\vonMises\ExpGurson.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\vonMises\ExpJ2.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\vonMises\MultilinearJ2.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\vonMises\NonlinearGurson.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\vonMises\NonlinearJ2.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\vonMises\NonlinearPeric.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\vonMises\PolyJ2.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\vonMises\TableGurson.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\vonMises\VAFCRP.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Wrapper\Rotation3D.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Wrapper\Stacked.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Wrapper\Substepping.h" />
+    <ClInclude Include="..\..\..\Material\MaterialParser.h" />
+    <ClInclude Include="..\..\..\Material\MaterialTemplate.h" />
+    <ClInclude Include="..\..\..\Material\MaterialTester.h" />
+    <ClInclude Include="..\..\..\Material\Special\Fluid.h" />
+    <ClInclude Include="..\..\..\Recorder\AmplitudeRecorder.h" />
+    <ClInclude Include="..\..\..\Recorder\EigenRecorder.h" />
+    <ClInclude Include="..\..\..\Recorder\ElementRecorder.h" />
+    <ClInclude Include="..\..\..\Recorder\FrameRecorder.h" />
+    <ClInclude Include="..\..\..\Recorder\GlobalMassRecorder.h" />
+    <ClInclude Include="..\..\..\Recorder\GlobalRecorder.h" />
+    <ClInclude Include="..\..\..\Recorder\GlobalStiffnessRecorder.h" />
+    <ClInclude Include="..\..\..\Recorder\GroupElementRecorder.h" />
+    <ClInclude Include="..\..\..\Recorder\GroupNodeRecorder.h" />
+    <ClInclude Include="..\..\..\Recorder\GroupSumRecorder.h" />
+    <ClInclude Include="..\..\..\Recorder\NodeRecorder.h" />
+    <ClInclude Include="..\..\..\Recorder\OutputType.h" />
+    <ClInclude Include="..\..\..\Recorder\Recorder.h" />
+    <ClInclude Include="..\..\..\Recorder\SumRecorder.h" />
+    <ClInclude Include="..\..\..\Recorder\VisualisationRecorder.h" />
+    <ClInclude Include="..\..\..\Section\ParameterType.h" />
+    <ClInclude Include="..\..\..\Section\Section.h" />
+    <ClInclude Include="..\..\..\Section\Section1D\Circle1D.h" />
+    <ClInclude Include="..\..\..\Section\Section1D\Fibre1D.h" />
+    <ClInclude Include="..\..\..\Section\Section1D\Rectangle1D.h" />
+    <ClInclude Include="..\..\..\Section\Section1D\Section1D.h" />
+    <ClInclude Include="..\..\..\Section\Section1D\TrussSection.h" />
+    <ClInclude Include="..\..\..\Section\Section2D\Bar2D.h" />
+    <ClInclude Include="..\..\..\Section\Section2D\Box2D.h" />
+    <ClInclude Include="..\..\..\Section\Section2D\Circle2D.h" />
+    <ClInclude Include="..\..\..\Section\Section2D\CircularHollow2D.h" />
+    <ClInclude Include="..\..\..\Section\Section2D\Fibre2D.h" />
+    <ClInclude Include="..\..\..\Section\Section2D\HSection2D.h" />
+    <ClInclude Include="..\..\..\Section\Section2D\ISection2D.h" />
+    <ClInclude Include="..\..\..\Section\Section2D\Rectangle2D.h" />
+    <ClInclude Include="..\..\..\Section\Section2D\Section2D.h" />
+    <ClInclude Include="..\..\..\Section\Section2D\TSection2D.h" />
+    <ClInclude Include="..\..\..\Section\Section3D\Bar3D.h" />
+    <ClInclude Include="..\..\..\Section\Section3D\Box3D.h" />
+    <ClInclude Include="..\..\..\Section\Section3D\Circle3D.h" />
+    <ClInclude Include="..\..\..\Section\Section3D\CircularHollow3D.h" />
+    <ClInclude Include="..\..\..\Section\Section3D\Fibre3D.h" />
+    <ClInclude Include="..\..\..\Section\Section3D\ISection3D.h" />
+    <ClInclude Include="..\..\..\Section\Section3D\Rectangle3D.h" />
+    <ClInclude Include="..\..\..\Section\Section3D\Section3D.h" />
+    <ClInclude Include="..\..\..\Section\Section3D\TSection3D.h" />
+    <ClInclude Include="..\..\..\Section\SectionNM\NM2D1.h" />
+    <ClInclude Include="..\..\..\Section\SectionNM\NM2D2.h" />
+    <ClInclude Include="..\..\..\Section\SectionNM\NonlinearNM2D.h" />
+    <ClInclude Include="..\..\..\Section\SectionNM\NM3D1.h" />
+    <ClInclude Include="..\..\..\Section\SectionNM\NM3D2.h" />
+    <ClInclude Include="..\..\..\Section\SectionNM\NonlinearNM3D.h" />
+    <ClInclude Include="..\..\..\Section\SectionNM\SectionNM.h" />
+    <ClInclude Include="..\..\..\Section\SectionNM\SectionNM2D.h" />
+    <ClInclude Include="..\..\..\Section\SectionNM\SectionNM3D.h" />
+    <ClInclude Include="..\..\..\Section\SectionParser.h" />
+    <ClInclude Include="..\..\..\Section\SectionShell\Homogeneous.h" />
+    <ClInclude Include="..\..\..\Section\SectionShell\SectionShell.h" />
+    <ClInclude Include="..\..\..\Solver\Arnoldi.h" />
+    <ClInclude Include="..\..\..\Solver\BFGS.h" />
+    <ClInclude Include="..\..\..\Solver\FEAST.h" />
+    <ClInclude Include="..\..\..\Solver\Integrator\BatheTwoStep.h" />
+    <ClInclude Include="..\..\..\Solver\Integrator\GeneralizedAlpha.h" />
+    <ClInclude Include="..\..\..\Solver\Integrator\GSSSS.h" />
+    <ClInclude Include="..\..\..\Solver\Integrator\Integrator.h" />
+    <ClInclude Include="..\..\..\Solver\Integrator\LeeNewmark.h" />
+    <ClInclude Include="..\..\..\Solver\Integrator\LeeNewmarkBase.h" />
+    <ClInclude Include="..\..\..\Solver\Integrator\LeeNewmarkFull.h" />
+    <ClInclude Include="..\..\..\Solver\Integrator\Newmark.h" />
+    <ClInclude Include="..\..\..\Solver\Integrator\RayleighNewmark.h" />
+    <ClInclude Include="..\..\..\Solver\Integrator\WilsonPenzienNewmark.h" />
+    <ClInclude Include="..\..\..\Solver\MPDC.h" />
+    <ClInclude Include="..\..\..\Solver\Newton.h" />
+    <ClInclude Include="..\..\..\Solver\Ramm.h" />
+    <ClInclude Include="..\..\..\Solver\Solver.h" />
+    <ClInclude Include="..\..\..\Step\ArcLength.h" />
+    <ClInclude Include="..\..\..\Step\Bead.h" />
+    <ClInclude Include="..\..\..\Step\Buckle.h" />
+    <ClInclude Include="..\..\..\Step\Dynamic.h" />
+    <ClInclude Include="..\..\..\Step\Frequency.h" />
+    <ClInclude Include="..\..\..\Step\Optimization.h" />
+    <ClInclude Include="..\..\..\Step\Static.h" />
+    <ClInclude Include="..\..\..\Step\Step.h" />
+    <ClInclude Include="..\..\..\suanPan.h" />
+    <ClInclude Include="..\..\..\Toolbox\argumentParser.h" />
+    <ClInclude Include="..\..\..\Toolbox\arpack_wrapper.h" />
+    <ClInclude Include="..\..\..\Toolbox\commandParser.h" />
+    <ClInclude Include="..\..\..\Toolbox\Converter.h" />
+    <ClInclude Include="..\..\..\Toolbox\print.h" />
+    <ClInclude Include="..\..\..\Toolbox\IntegrationPlan.h" />
+    <ClInclude Include="..\..\..\Toolbox\Quaternion.hpp" />
+    <ClInclude Include="..\..\..\Toolbox\shapeFunction.h" />
+    <ClInclude Include="..\..\..\Toolbox\sort_color.h" />
+    <ClInclude Include="..\..\..\Toolbox\sort_rcm.h" />
+    <ClInclude Include="..\..\..\Toolbox\sync_ostream.h" />
+    <ClInclude Include="..\..\..\Toolbox\tensorToolbox.h" />
+    <ClInclude Include="..\..\..\Toolbox\thread_pool.hpp" />
+    <ClInclude Include="..\..\..\Toolbox\utility.h" />
+    <ClInclude Include="..\..\..\UnitTest\CatchTest.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\Resource\suanPan.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,48 @@
+# A TEST MODEL FOR BLATZKO MATERIAL
+
+node 1 .5 -.5 -.5
+node 2 .5 .5 -.5
+node 3 -.5 .5 -.5
+node 4 -.5 -.5 -.5
+node 5 .5 -.5 .5
+node 6 .5 .5 .5
+node 7 -.5 .5 .5
+node 8 -.5 -.5 .5
+
+material BlatzKo 1 1E7 .2
+
+element C3D8 1 1 2 3 4 5 6 7 8 1 G 1
+
+fix 1 1 1 2 5 6
+fix 2 2 1 4 5 8
+fix 3 3 1 2 3 4
+
+hdf5recorder 1 Node U3 6
+hdf5recorder 2 Node RF3 6
+
+displacement 1 0 4 3 5 6 7 8
+
+step static 1
+set fixed_step_size 1
+set ini_step_size 1E-1
+set symm_mat 0
+
+converger RelIncreDisp 1 1E-10 50 1
+
+analyze
+
+peek element 1
+
+# save recorder 1 2
+
+# Node 5:
+#    0.5000  -0.5000   0.5000
+# Displacement:
+#         0        0   4.0000
+# Resistance:
+#    5.1327e-02  -5.1327e-02   5.0989e+06
+peek node 5 6 7 8
+
+reset
+clear
+exit

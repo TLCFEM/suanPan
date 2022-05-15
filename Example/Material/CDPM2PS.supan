@@ -1,0 +1,48 @@
+# A TEST MODEL FOR CDPM2PS MATERIAL
+
+node 1 0 0
+node 2 1 0
+node 3 1 1
+node 4 0 1
+
+material CDPM2ANISO 2
+material PlaneStress 1 2
+
+element CP4 1 1 2 3 4 1 1
+
+fix 1 1 1 2
+fix 2 2 1 2
+
+hdf5recorder 1 Node RF1 3 4
+
+displacement 1 0 -8E-4 1 3 4
+
+step static 1 1
+set fixed_step_size 1
+set ini_step_size 1E-2
+set symm_mat 0
+
+converger RelIncreDisp 1 1E-10 20 1
+
+analyze
+
+# save recorder 1
+
+# Node 3:
+#    1.0000   1.0000
+# Displacement:
+#   -0.0008   0.0009
+# Resistance:
+#   -2.4842e-01  -1.3184e-16
+# 
+# Node 4:
+#         0   1.0000
+# Displacement:
+#   -0.0008  -0.0002
+# Resistance:
+#   -5.2314e-01  -6.9389e-18
+peek node 3 4
+
+reset
+clear
+exit

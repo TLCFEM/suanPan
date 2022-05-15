@@ -1,0 +1,39 @@
+node 1 0 0
+node 2 1 0
+node 3 1 1
+node 4 0 1
+
+material AxisymmetricElastic 1 12 .1 1E-4
+
+element CAX3 1 1 2 3 1
+element CAX3 2 1 3 4 1
+
+fix2 1 1 1 4
+fix2 2 2 1
+
+cload 1 0 1 1 2 3
+
+step static 1
+
+analyze
+
+# Node 2:
+#    1.0000        0
+# Displacement:
+#    2.3873e-02  -1.3401e-18
+# Resistance:
+#    1.0000e+00  -2.9066e-17
+# 
+# Node 3:
+#    1.0000   1.0000
+# Displacement:
+#    0.0239  -0.0053
+# Resistance:
+#    1.0000e+00   2.4111e-17
+peek node 2 3
+
+peek element 1
+
+reset
+clear
+exit

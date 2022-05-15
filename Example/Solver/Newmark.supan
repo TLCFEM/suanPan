@@ -1,0 +1,51 @@
+# A TEST MODEL FOR NEWMARK INTEGRATOR
+
+node 1 0 0
+node 2 0 1
+
+material MPF 1 100 5 .1 20. 18.5 .15 .01 7. true false .1
+
+section Rectangle2D 1 12 1 1
+
+element B21 1 1 2 1 6 1
+
+mass 2 2 10 1
+
+fix 1 P 1
+
+amplitude Tabular 1 EZ
+# amplitude Decay 1 10 20
+# amplitude Modulated 1 1 2 3 4 5
+# amplitude Sine 1 10 2
+
+acceleration 2 1 .2 1 2
+
+modifier LumpedScale 1 1
+modifier LumpedSimple 2 2
+modifier Rayleigh 3 .2 .002 .0 .0
+
+step dynamic 1 25
+set ini_step_size 5E-2
+set fixed_step_size true
+
+integrator Newmark 1
+
+converger RelIncreDisp 1 1E-10 4 1
+
+analyze
+
+# Node 2:
+#         0   1.0000
+# Displacement:
+#   -0.0325   0.0372   0.0258
+# Resistance:
+#   -2.1849  -0.0045   0.0009
+# Velocity:
+#   -0.0444  -0.0010   0.0642
+# Acceleration:
+#    0.2173   0.0041  -0.3138
+peek node 2
+
+peek integrator 1
+
+exit

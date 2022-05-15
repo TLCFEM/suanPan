@@ -1,0 +1,37 @@
+# A TEST MODEL FOR ELASTIC1D AND BILINEARELASTIC1D MATERIAL
+
+node 1 0 0
+node 2 4 0
+node 3 0 -3
+
+material Elastic1D 1 100
+material BilinearElastic1D 2 100 5 .2
+
+element T2D2 1 1 2 1 10
+element T2D2 2 3 2 2 10
+
+fix 1 P 1 3
+
+step static 1
+set band_mat false
+set symm_mat true
+
+cload 1 0 100 2 2
+
+converger RelIncreDisp 1 1E-4 10 1
+
+analyze
+
+# Node 2:
+#    4.0000        0
+# Displacement:
+#   -0.5333   5.9889
+# Resistance:
+#    1.3333e-06   1.0000e+02
+peek node 2
+
+peek element 1 2
+
+reset
+clear
+exit

@@ -1,0 +1,42 @@
+# A TEST MODEL FOR PATCHQUAD ELEMENT
+
+node 1 0 0 1
+node 2 .5 0 1
+node 3 .75 1 1
+node 4 0 1 1
+
+material Elastic2D 1 1500 .25 1E-4
+
+element PatchQuad 1 -node 1 2 4 3 -material 1 -thickness 1 -knotx 0 0 1 1 -knoty 0 0 1 1
+
+fix2 1 1 1
+fix2 2 2 1 2
+
+cload 1 0 1 2 3 4
+
+step static 1
+
+converger RelIncreDisp 1 1E-10 10 1
+
+analyze
+
+# Node 3:
+#    0.7500   1.0000   1.0000
+# Displacement:
+#   -0.0019   0.0033
+# Resistance:
+#    1.3922e-09   1.0000e+00
+# 
+# Node 4:
+#         0   1.0000   1.0000
+# Displacement:
+#   -0.0015   0.0014
+# Resistance:
+#   -4.3968e-09   1.0000e+00
+peek node 3 4
+
+peek element 1
+
+reset
+clear
+exit

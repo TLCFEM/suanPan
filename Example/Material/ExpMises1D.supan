@@ -1,0 +1,37 @@
+# A TEST MODEL FOR EXPMISES1D MATERIAL
+
+node 1 0 0
+node 2 4 0
+
+material ExpMises1D 1 500 5 5 100 .02
+
+element T2D2 1 1 2 1 10
+
+fix 1 2 1 2
+fix 2 1 1
+
+step static 1
+set fixed_step_size 1
+set ini_step_size 1E-1
+set symm_mat 0
+set band_mat 0
+
+displacement 1 0 1 1 2
+
+converger AbsIncreDisp 1 1E-10 10 1
+
+analyze
+
+peek element 1
+
+# Node 2:
+#    4.0000        0
+# Displacement:
+#    1.0000        0
+# Resistance:
+#    1.2255e+02            0
+peek node 2
+
+reset
+clear
+exit

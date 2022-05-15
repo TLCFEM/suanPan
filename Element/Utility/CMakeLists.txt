@@ -1,0 +1,18 @@
+set(Utility
+        Utility/B2DC.cpp
+        Utility/B2DL.cpp
+        Utility/B3DC.cpp
+        Utility/B3DL.cpp
+        Utility/IGA/BSpline.cpp
+        Utility/IGA/BSplineSurface.cpp
+        Utility/IGA/BSplineVolume.cpp
+        Utility/IGA/NURBS.cpp
+        Utility/IGA/NURBSSurface.cpp
+        Utility/IGA/NURBSVolume.cpp
+        Utility/Orientation.cpp
+        Utility/PhaseField.cpp
+        Utility/T2DC.cpp
+        Utility/T2DL.cpp
+        Utility/T3DC.cpp
+        Utility/T3DL.cpp
+        )

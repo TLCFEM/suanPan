@@ -1,0 +1,52 @@
+node 1 0 0 0
+node 2 4 0 0
+node 3 4 1 0
+node 4 0 1 0
+node 5 1 0 0
+node 6 2 0 0
+node 7 3 0 0
+node 8 3 1 0
+node 9 2 1 0
+node 10 1 1 0
+
+element CP4 1 1 5 10 4 1 1
+element CP4 2 5 6 9 10 1 1
+element CP4 3 6 7 8 9 1 1
+element CINP4 4 8 7 2 3 1 1
+
+material Elastic2D 1 1000 .2
+
+fix 1 1 2 3
+fix 2 2 1 2 3 4 5 6 7 8 9 10
+
+cload 1 0 1 1 1 4
+
+# hdf5recorder 1 element S22 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128
+# hdf5recorder 2 element S11 241 242 243 244 245 246 247 248 249 250 251 252 253 254 255 256
+
+step static 1
+
+analyze
+
+save recorder 1 2
+
+# Node 1:
+#         0        0        0
+# Displacement:
+#    0.0071        0
+# Resistance:
+#    1.0000   0.2000
+# 
+# Node 4:
+#         0   1.0000        0
+# Displacement:
+#    0.0071        0
+# Resistance:
+#    1.0000  -0.2000
+peek node 1 4
+
+peek element 4
+
+reset
+clear
+exit

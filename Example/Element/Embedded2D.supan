@@ -1,0 +1,40 @@
+# A TEST MODEL FOR CP4 ELEMENT
+
+node 1 0 0
+node 2 1 0
+node 3 1 1
+node 4 0 1
+node 5 2 0
+node 6 3 0
+node 7 3 1
+node 8 2 1
+node 9 .5 .5
+node 10 2.5 .5
+
+material Elastic2D 1 5000 .0
+material Elastic1D 2 1000
+
+element CP4 1 1 2 3 4 1 1
+element CP4 2 5 6 7 8 1 1
+element T2D2 3 9 10 2 1
+element Embedded2D 4 1 9 1E6
+element Embedded2D 5 2 10 1E6
+
+fix 1 1 1 4
+fix 2 2 1 2 5 6
+
+cload 1 0 1 1 6 7
+
+step static 1
+set fixed_step_size true
+set ini_step_size 1E0
+
+converger RelIncreDisp 1 1E-10 50 1
+
+analyze
+
+peek node 9 10 2 3 6 7
+
+reset
+clear
+exit

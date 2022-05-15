@@ -1,0 +1,56 @@
+# A TEST MODEL FOR MAXWELL MODEL
+
+node 1 0 0
+node 2 1 0
+
+material Elastic1D 1 1E2
+material Viscosity02 2 .9 1E2 1E2 1E2 1E2 1E3 1E3 1E3
+
+element T2D2 1 1 2 1 10
+element Damper02 2 1 2 2 1 true 0 .5
+element Damper02 4 1 2 2 1 false 0 .5
+
+mass 3 2 10 1
+
+fix2 1 P 1
+fix2 2 2 2
+
+hdf5recorder 1 Node U 2
+hdf5recorder 2 Node RF 2
+hdf5recorder 3 Node V 2
+hdf5recorder 4 Element SD 2
+hdf5recorder 5 Element ED 2
+hdf5recorder 6 Element SS 2
+hdf5recorder 7 Element ES 2
+
+amplitude Sine 1 1 2
+
+acceleration 2 1 .1 1
+
+step dynamic 1 10
+set ini_step_size 5E-2
+set fixed_step_size true
+
+integrator Newmark 1
+
+converger RelIncreDisp 1 1E-10 10 1
+
+analyze
+
+# Node 2:
+#    1.0000        0
+# Displacement:
+#   -0.0001        0
+# Resistance:
+#   -0.0093        0
+# Velocity:
+#    0.0124        0
+# Acceleration:
+#    0.0009        0
+peek node 2
+
+# save recorder 1 2 3 4 5 6 7
+
+reset
+clear
+exit

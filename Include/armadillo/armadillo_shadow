@@ -1,0 +1,32 @@
+#include "armadillo_exts/def_lapack.hpp"
+
+//#include "armadillo_exts/BdOp_bones.hpp"
+//#include "armadillo_exts/SmOp_bones.hpp"
+
+//#include "armadillo_exts/BandMat_bones.hpp"
+//#include "armadillo_exts/SymmMat_bones.hpp"
+
+//#include "armadillo_exts/glue_solve_bones.hpp"
+//#include "armadillo_exts/glue_times_bones.hpp"
+
+//#include "armadillo_exts/traits.hpp"
+
+//#include "armadillo_exts/BdOp_meat.hpp"
+//#include "armadillo_exts/SmOp_meat.hpp"
+
+//#include "armadillo_exts/BandMat_meat.hpp"
+//#include "armadillo_exts/SymmMat_meat.hpp"
+
+//#include "armadillo_exts/glue_solve_meat.hpp"
+//#include "armadillo_exts/glue_times_meat.hpp"
+
+//#include "armadillo_exts/smop_inv_bones.hpp"
+//#include "armadillo_exts/smop_inv_meat.hpp"
+
+//#include "armadillo_exts/debug.hpp"
+//#include "armadillo_exts/typedef_mat.hpp"
+
+//#include "armadillo_exts/operator_times.hpp"
+
+//#include "armadillo_exts/fn_inv.hpp"
+//#include "armadillo_exts/fn_solve.hpp"

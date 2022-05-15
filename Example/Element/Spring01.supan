@@ -1,0 +1,36 @@
+# A TEST MODEL FOR SPRING01 MATERIAL
+
+node 1 0 0
+node 2 4 0
+node 3 6 0
+
+material Elastic1D 1 100
+
+element Spring01 1 1 2 1
+element Spring01 2 3 2 1
+
+fix 1 P 1
+fix 2 2 2 3
+
+step static 1
+set ini_step_size .1
+
+cload 1 0 100 1 3
+
+converger RelIncreDisp 1 1E-8 10 1
+
+analyze
+
+# Node 3:
+#    6.0000        0
+# Displacement:
+#    2.0000        0
+# Resistance:
+#    1.0000e+02            0
+peek node 3
+
+peek element 1
+
+reset
+clear
+exit

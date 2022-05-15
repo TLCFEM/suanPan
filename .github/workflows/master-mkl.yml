@@ -1,0 +1,43 @@
+name: Release With MKL
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+jobs:
+  linux-mkl:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Clone
+        uses: actions/checkout@v2
+      - name: Install MKL
+        run: |
+          echo "SP_TIME=daily-$(date +''%Y%m%d%H'')" >> $GITHUB_ENV
+          wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+          sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+          echo "deb https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
+      - name: Golang
+        uses: actions/setup-go@v2
+      - name: Compile
+        run: |
+          export CC=gcc-10 && export CXX=g++-10 && export FC=gfortran-10
+          go build Checker/updater.go
+          sudo apt-get update && sudo apt-get install intel-oneapi-mkl-devel
+          cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_MKL=ON -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DUSE_INTEL_OPENMP=OFF -DLINK_DYNAMIC_MKL=OFF -DCMAKE_INSTALL_PREFIX=suanPan-linux-mkl .
+          make install -j4
+      - name: Pack
+        run: |
+          cp updater suanPan-linux-mkl/bin
+          tar czf suanPan-linux-mkl.tar.gz suanPan-linux-mkl
+          export LD_LIBRARY_PATH=/home/runner/work/suanPan/suanPan/suanPan-linux-mkl/lib
+          cd suanPan-linux-mkl/bin
+          ./suanPan -v
+      - name: Release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: suanPan-linux-mkl.tar.gz
+          asset_name: suanPan-linux-mkl.tar.gz
+          tag: ${{ env.SP_TIME }}
+          prerelease: true
+          overwrite: true

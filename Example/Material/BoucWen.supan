@@ -1,0 +1,5 @@
+material BoucWen 1 2E4 200. .01 1E-2 1.
+
+materialTest1D 1 1E-3 100 200 300 400 200
+
+exit

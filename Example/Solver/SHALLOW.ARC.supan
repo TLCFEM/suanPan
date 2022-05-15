@@ -1,0 +1,73 @@
+# SHALLOW ARC BUCKLING
+
+node 1 10.00000000 0.000000000
+node 2 9.01135921 0.189489931
+node 3 8.01913738 0.359236211
+node 4 7.02372932 0.509171426
+node 5 6.02553082 0.639235914
+node 6 5.02493763 0.749378085
+node 7 4.02234840 0.839554191
+node 8 3.01816058 0.909728289
+node 9 2.01277351 0.959872603
+node 10 1.00658667 0.989967167
+node 11 0.00000000 1.000000000
+node 12 -1.00658667 0.989967167
+node 13 -2.01277351 0.959872603
+node 14 -3.01816058 0.909728289
+node 15 -4.02234840 0.839554191
+node 16 -5.02493763 0.749378085
+node 17 -6.02553082 0.639235914
+node 18 -7.02372932 0.509171426
+node 19 -8.01913738 0.359236211
+node 20 -9.01135921 0.189489931
+node 21 -10.00000000 0.000000000
+
+material Elastic1D 1 10000
+
+element EB21 1 1 2 100 1 1 1
+element EB21 2 2 3 100 1 1 1
+element EB21 3 3 4 100 1 1 1
+element EB21 4 4 5 100 1 1 1
+element EB21 5 5 6 100 1 1 1
+element EB21 6 6 7 100 1 1 1
+element EB21 7 7 8 100 1 1 1
+element EB21 8 8 9 100 1 1 1
+element EB21 9 9 10 100 1 1 1
+element EB21 10 10 11 100 1 1 1
+element EB21 11 11 12 100 1 1 1
+element EB21 12 12 13 100 1 1 1
+element EB21 13 13 14 100 1 1 1
+element EB21 14 14 15 100 1 1 1
+element EB21 15 15 16 100 1 1 1
+element EB21 16 16 17 100 1 1 1
+element EB21 17 17 18 100 1 1 1
+element EB21 18 18 19 100 1 1 1
+element EB21 19 19 20 100 1 1 1
+element EB21 20 20 21 100 1 1 1
+
+fix 1 1 1 21
+fix 2 2 1 21
+
+recorder 1 hdf5 Node U 7
+# recorder 2 hdf5 Node RF1 7
+
+step arclength 1 7 2 -300
+set symm_mat false
+
+criterion MinDisplacement 1 7 2 -1.8
+
+converger RelIncreDisp 1 1E-4 4 1
+
+analyze
+
+# Node 7:
+#    4.0223   0.8396
+# Displacement:
+#    0.0168  -1.8050   0.1679
+# Resistance:
+#   -1.4197e-10  -1.8196e+02  -2.2510e-11
+peek node 7
+
+# save recorder 1
+
+exit

@@ -1,0 +1,59 @@
+# A TEST MODEL FOR GCMQ ELEME
+
+node 1 0 0
+node 2 2 0
+node 3 4 0
+node 4 6 0
+node 5 8 0
+node 6 10 0
+
+node 7 0 2
+node 8 2 2
+node 9 4 2
+node 10 5 2
+node 11 6 2
+node 12 10 2
+
+material Elastic2D 1 1500 .25 1E-4
+
+element SGCMQG 1 1 2 8 7 1 1
+element SGCMQG 2 2 3 9 8 1 1
+element SGCMQG 3 3 4 10 9 1 1
+element SGCMQG 4 4 5 11 10 1 1
+element SGCMQG 5 5 6 12 11 1 1
+
+fix 1 1 1 7
+fix 2 2 1
+fix 3 3 1 7
+
+cload 1 0 1000 1 6
+cload 2 0 -1000 1 12
+
+recorder 1 hdf5 Element S 1
+recorder 2 hdf5 Element S11 1
+recorder 3 hdf5 Element S22 1
+recorder 4 hdf5 Element S12 1
+recorder 5 hdf5 Element SINT 1
+recorder 6 hdf5 Element E 1
+recorder 7 hdf5 Element E11 1
+recorder 8 hdf5 Element E22 1
+recorder 9 hdf5 Element E12 1
+recorder 10 hdf5 Element EINT 1
+recorder 11 hdf5 Element AXIAL 1
+recorder 12 hdf5 Element SHEAR 1
+recorder 13 hdf5 Element MOMENT 1
+recorder 14 hdf5 Element RESULTANT 1
+recorder 15 hdf5 Element NMISES 1
+
+step static 1
+
+analyze
+
+# 19.8423 98.9687 17.4600
+peek node 6
+
+peek element 1
+
+reset
+clear
+exit

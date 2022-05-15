@@ -1,0 +1,58 @@
+include(CheckFunctionExists)
+include(CheckIncludeFile)
+
+set(GKlib_COPTS "")
+set(GKlib_COPTIONS "")
+
+add_compile_definitions(NDEBUG)
+add_compile_definitions(NDEBUG2)
+add_compile_definitions(__OPENMP__)
+add_compile_definitions(USE_GKREGEX)
+
+if (MSVC)
+    add_compile_definitions(WIN32)
+    add_compile_definitions(MSC)
+    add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
+    set(GKlib_COPTIONS "${GKlib_COPTIONS} /W0")
+elseif (MINGW)
+else ()
+    add_compile_definitions(LINUX)
+    add_compile_definitions(_FILE_OFFSET_BITS=64)
+endif (MSVC)
+
+if (CYGWIN)
+    add_compile_definitions(CYGWIN)
+endif (CYGWIN)
+
+if (CMAKE_COMPILER_IS_GNUCC)
+    set(GKlib_COPTIONS "${GKlib_COPTIONS} -w -fno-strict-aliasing -pedantic")
+elseif (${CMAKE_C_COMPILER_ID} MATCHES "Sun")
+    set(GKlib_COPTIONS "${GKlib_COPTIONS} -xc99")
+endif (CMAKE_COMPILER_IS_GNUCC)
+
+check_include_file(execinfo.h HAVE_EXECINFO_H)
+if (HAVE_EXECINFO_H)
+    add_compile_definitions(HAVE_EXECINFO_H)
+endif (HAVE_EXECINFO_H)
+
+check_function_exists(getline HAVE_GETLINE)
+if (HAVE_GETLINE)
+    add_compile_definitions(HAVE_GETLINE)
+endif (HAVE_GETLINE)
+
+if (MSVC)
+    set(GKlib_COPTIONS "${GKlib_COPTIONS} /D__thread=__declspec(thread)")
+else ()
+    if ("${HAVE_THREADLOCALSTORAGE}" MATCHES "^${HAVE_THREADLOCALSTORAGE}$")
+        get_filename_component(abs . ABSOLUTE)
+        try_compile(HAVE_THREADLOCALSTORAGE ${CMAKE_BINARY_DIR} ${abs}/gklib/conf/check_thread_storage.c)
+        unset(abs)
+    endif ()
+    if (NOT HAVE_THREADLOCALSTORAGE)
+        add_compile_definitions(__thread=)
+    endif ()
+endif ()
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${GKlib_COPTIONS} ${GKlib_COPTS}")
+
+file(GLOB GK_SRC gklib/*.c)

@@ -1,0 +1,44 @@
+# A TEST MODEL FOR MOONEYRIVLIN MATERIAL
+
+node 1 0 0 0
+node 2 1 0 0
+node 3 1 1 0
+node 4 0 1 0
+node 5 0 0 1
+node 6 1 0 1
+node 7 1 1 1
+node 8 0 1 1
+
+material MooneyRivlin 1 1E7 80 20
+
+element C3D8 1 1 2 3 4 5 6 7 8 1 G 1
+
+fix2 1 1 1 4 5 8
+fix2 2 2 1 2 5 6
+fix2 3 3 1 2 3 4
+
+displacement 1 0 -1 1 2 3
+displacement 2 0 1 1 6 7
+
+step static 1
+set fixed_step_size 1
+set ini_step_size 5E-3
+set symm_mat 0
+
+converger RelIncreDisp 1 1E-12 50 1
+
+analyze
+
+peek element 1
+
+# Node 3:
+#    1.0000   1.0000        0
+# Displacement:
+#   -1.0000   0.7514        0
+# Resistance:
+#   -3.6345e+02  -3.9355e-10   2.3739e+02
+peek node 3
+
+reset
+clear
+exit

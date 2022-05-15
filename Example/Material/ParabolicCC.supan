@@ -1,0 +1,39 @@
+# A TEST MODEL FOR PARABOLIC MATERIAL
+
+node 1 5 -5 -5
+node 2 5 5 -5
+node 3 -5 5 -5
+node 4 -5 -5 -5
+node 5 5 -5 5
+node 6 5 5 5
+node 7 -5 5 5
+node 8 -5 -5 5
+
+material ParabolicCC 1 1E6 .4 .8 .8 20. 100. 2E7
+
+element C3D8 1 1 2 3 4 5 6 7 8 1 G
+
+fix2 1 1 1 2 3 4 5 6 7 8
+fix2 2 2 1 2 3 4 5 6 7 8
+fix2 3 3 1 2 3 4
+
+displacement 1 0 -2E-2 3 5 6 7 8
+
+hdf5recorder 1 Node RF 1 2 3 4
+
+step static 1
+set fixed_step_size 1
+set ini_step_size 1E-2
+set symm_mat 0
+
+converger AbsIncreDisp 1 1E-13 10 1
+
+analyze
+
+# Resistance:
+#   -5.8435e+03   5.8435e+03  -7.7404e+03
+peek node 5 6 7 8
+
+reset
+clear
+exit

@@ -1,0 +1,183 @@
+# A TEST MODEL FOR CP4 ELEMENT WITH NONLINEAR GEOMETRY
+
+node 1 0 0
+node 2 0 .25
+node 3 0 .5
+node 4 0 .75
+node 5 0 1
+node 6 .25 0
+node 7 .25 .25
+node 8 .25 .5
+node 9 .25 .75
+node 10 .25 1
+node 11 .5 0
+node 12 .5 .25
+node 13 .5 .5
+node 14 .5 .75
+node 15 .5 1
+node 16 .75 0
+node 17 .75 .25
+node 18 .75 .5
+node 19 .75 .75
+node 20 .75 1
+node 21 1 0
+node 22 1 .25
+node 23 1 .5
+node 24 1 .75
+node 25 1 1
+node 26 1.25 0
+node 27 1.25 .25
+node 28 1.25 .5
+node 29 1.25 .75
+node 30 1.25 1
+node 31 1.5 0
+node 32 1.5 .25
+node 33 1.5 .5
+node 34 1.5 .75
+node 35 1.5 1
+node 36 1.75 0
+node 37 1.75 .25
+node 38 1.75 .5
+node 39 1.75 .75
+node 40 1.75 1
+node 41 2 0
+node 42 2 .25
+node 43 2 .5
+node 44 2 .75
+node 45 2 1
+node 46 2.25 0
+node 47 2.25 .25
+node 48 2.25 .5
+node 49 2.25 .75
+node 50 2.25 1
+node 51 2.5 0
+node 52 2.5 .25
+node 53 2.5 .5
+node 54 2.5 .75
+node 55 2.5 1
+node 56 2.75 0
+node 57 2.75 .25
+node 58 2.75 .5
+node 59 2.75 .75
+node 60 2.75 1
+node 61 3 0
+node 62 3 .25
+node 63 3 .5
+node 64 3 .75
+node 65 3 1
+node 66 3.25 0
+node 67 3.25 .25
+node 68 3.25 .5
+node 69 3.25 .75
+node 70 3.25 1
+node 71 3.5 0
+node 72 3.5 .25
+node 73 3.5 .5
+node 74 3.5 .75
+node 75 3.5 1
+node 76 3.75 0
+node 77 3.75 .25
+node 78 3.75 .5
+node 79 3.75 .75
+node 80 3.75 1
+node 81 4 0
+node 82 4 .25
+node 83 4 .5
+node 84 4 .75
+node 85 4 1
+
+element CP4 1 1 6 7 2 1 1 0 1
+element CP4 2 2 7 8 3 1 1 0 1
+element CP4 3 3 8 9 4 1 1 0 1
+element CP4 4 4 9 10 5 1 1 0 1
+element CP4 5 6 11 12 7 1 1 0 1
+element CP4 6 7 12 13 8 1 1 0 1
+element CP4 7 8 13 14 9 1 1 0 1
+element CP4 8 9 14 15 10 1 1 0 1
+element CP4 9 11 16 17 12 1 1 0 1
+element CP4 10 12 17 18 13 1 1 0 1
+element CP4 11 13 18 19 14 1 1 0 1
+element CP4 12 14 19 20 15 1 1 0 1
+element CP4 13 16 21 22 17 1 1 0 1
+element CP4 14 17 22 23 18 1 1 0 1
+element CP4 15 18 23 24 19 1 1 0 1
+element CP4 16 19 24 25 20 1 1 0 1
+element CP4 17 21 26 27 22 1 1 0 1
+element CP4 18 22 27 28 23 1 1 0 1
+element CP4 19 23 28 29 24 1 1 0 1
+element CP4 20 24 29 30 25 1 1 0 1
+element CP4 21 26 31 32 27 1 1 0 1
+element CP4 22 27 32 33 28 1 1 0 1
+element CP4 23 28 33 34 29 1 1 0 1
+element CP4 24 29 34 35 30 1 1 0 1
+element CP4 25 31 36 37 32 1 1 0 1
+element CP4 26 32 37 38 33 1 1 0 1
+element CP4 27 33 38 39 34 1 1 0 1
+element CP4 28 34 39 40 35 1 1 0 1
+element CP4 29 36 41 42 37 1 1 0 1
+element CP4 30 37 42 43 38 1 1 0 1
+element CP4 31 38 43 44 39 1 1 0 1
+element CP4 32 39 44 45 40 1 1 0 1
+element CP4 33 41 46 47 42 1 1 0 1
+element CP4 34 42 47 48 43 1 1 0 1
+element CP4 35 43 48 49 44 1 1 0 1
+element CP4 36 44 49 50 45 1 1 0 1
+element CP4 37 46 51 52 47 1 1 0 1
+element CP4 38 47 52 53 48 1 1 0 1
+element CP4 39 48 53 54 49 1 1 0 1
+element CP4 40 49 54 55 50 1 1 0 1
+element CP4 41 51 56 57 52 1 1 0 1
+element CP4 42 52 57 58 53 1 1 0 1
+element CP4 43 53 58 59 54 1 1 0 1
+element CP4 44 54 59 60 55 1 1 0 1
+element CP4 45 56 61 62 57 1 1 0 1
+element CP4 46 57 62 63 58 1 1 0 1
+element CP4 47 58 63 64 59 1 1 0 1
+element CP4 48 59 64 65 60 1 1 0 1
+element CP4 49 61 66 67 62 1 1 0 1
+element CP4 50 62 67 68 63 1 1 0 1
+element CP4 51 63 68 69 64 1 1 0 1
+element CP4 52 64 69 70 65 1 1 0 1
+element CP4 53 66 71 72 67 1 1 0 1
+element CP4 54 67 72 73 68 1 1 0 1
+element CP4 55 68 73 74 69 1 1 0 1
+element CP4 56 69 74 75 70 1 1 0 1
+element CP4 57 71 76 77 72 1 1 0 1
+element CP4 58 72 77 78 73 1 1 0 1
+element CP4 59 73 78 79 74 1 1 0 1
+element CP4 60 74 79 80 75 1 1 0 1
+element CP4 61 76 81 82 77 1 1 0 1
+element CP4 62 77 82 83 78 1 1 0 1
+element CP4 63 78 83 84 79 1 1 0 1
+element CP4 64 79 84 85 80 1 1 0 1
+
+material Elastic2D 1 1000 .2
+
+fix2 1 P 1 2 3 4 5
+
+cload 1 0 1 2 84 83 82
+cload 2 0 .5 2 85 81
+
+recorder 1 hdf5 Node U 83
+
+step static 1
+set fixed_step_size 1
+set ini_step_size 1E-1
+
+converger RelIncreDisp 1 1E-12 10 1
+
+analyze
+
+# Node 83:
+#    4.0000   0.5000
+# Displacement:
+#   -0.1456   0.9790
+# Resistance:
+#    1.6098e-14   1.0000e+00
+peek node 83
+
+peek element 1
+
+reset
+clear
+exit

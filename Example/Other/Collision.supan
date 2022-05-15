@@ -1,0 +1,74 @@
+node 1 -3.803 -0.8832
+mass 1 1 1 1 2
+initial velocity -0.5782 1 1
+initial velocity 0.9351 2 1
+
+node 2 1.758 2.253
+mass 2 2 1 1 2
+initial velocity 0.2641 1 2
+initial velocity -0.7498 2 2
+
+node 3 -2.4 -0.892
+mass 3 3 1 1 2
+initial velocity 0.06164 1 3
+initial velocity 0.7329 2 3
+
+node 4 -1.384 0.01535
+mass 4 4 1 1 2
+initial velocity -0.2446 1 4
+initial velocity -0.3986 2 4
+
+node 5 -3.917 -0.009666
+mass 5 5 1 1 2
+initial velocity -0.4586 1 5
+initial velocity -0.2641 2 5
+
+node 6 -1.702 2.334
+mass 6 6 1 1 2
+initial velocity -0.4467 1 6
+initial velocity 0.09449 2 6
+
+node 7 2.324 -3.85
+mass 7 7 1 1 2
+initial velocity 0.6105 1 7
+initial velocity -0.9382 2 7
+
+node 8 4.271 -4.316
+mass 8 8 1 1 2
+initial velocity -0.3514 1 8
+initial velocity -0.8544 2 8
+
+node 9 -0.5432 -0.07441
+mass 9 9 1 1 2
+initial velocity 0.3681 1 9
+initial velocity -0.2855 2 9
+
+node 10 3.32 -2.262
+mass 10 10 1 1 2
+initial velocity 0.1627 1 10
+initial velocity -0.3111 2 10
+
+hdf5recorder 1 Global KE
+# hdf5recorder 2 Visualisation U every 20 width 4
+
+particlecollision2d 1 2.
+
+rigidwall 2 5 0 0 -1 0 0 1E0
+rigidwall 3 0 5 0 0 -1 0 1E0
+rigidwall 4 -5 0 0 1 0 0 1E0
+rigidwall 5 0 -5 0 0 1 0 1E0
+
+step dynamic 1 200
+set ini_step_size 2E-2
+set fixed_step_size 1
+set band_mat false
+set symm_mat false
+
+converger RelIncreDisp 1 1E-11 10 1
+
+analyze
+
+# save recorder 1
+
+exit
+

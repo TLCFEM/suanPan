@@ -1,0 +1,143 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[tmargin=20mm,lmargin=10mm,rmargin=10mm,bmargin=30mm]{geometry}
+\usepackage{amsmath,amsfonts,amssymb,mathpazo,hyperref}
+\begin{document}
+\small\pagestyle{empty}
+The following derivation is based on this paper. \href{https://doi.org/10.1002/nme.1620151205}{https://doi.org/10.1002/nme.1620151205}
+\begin{gather}
+\begin{bmatrix}\beta_x^4\\\beta_x^5\\\beta_x^6\end{bmatrix}=
+\begin{bmatrix}
+c_4&&\\
+&c_5&\\
+&&c_6
+\end{bmatrix}\begin{bmatrix}
+\beta_n^4\\\beta_n^5\\\beta_n^6
+\end{bmatrix}-\begin{bmatrix}
+s_4&&\\
+&s_5&\\
+&&s_6
+\end{bmatrix}\begin{bmatrix}
+\beta_s^4\\\beta_s^5\\\beta_s^6
+\end{bmatrix},\quad
+\begin{bmatrix}\beta_y^4\\\beta_y^5\\\beta_y^6\end{bmatrix}=\begin{bmatrix}
+s_4&&\\
+&s_5&\\
+&&s_6
+\end{bmatrix}\begin{bmatrix}
+\beta_n^4\\\beta_n^5\\\beta_n^6
+\end{bmatrix}+\begin{bmatrix}
+c_4&&\\
+&c_5&\\
+&&c_6
+\end{bmatrix}\begin{bmatrix}
+\beta_s^4\\\beta_s^5\\\beta_s^6
+\end{bmatrix},\\
+\begin{bmatrix}
+\beta_n^4\\\beta_n^5\\\beta_n^6
+\end{bmatrix}=\dfrac{1}{2}\begin{bmatrix}
+1&1&&&&\\
+&&1&1&&\\
+&&&&1&1
+\end{bmatrix}\begin{bmatrix}
+\beta_{n,4}^1\\\beta_{n,4}^2\\\beta_{n,5}^2\\\beta_{n,5}^3\\\beta_{n,6}^3\\\beta_{n,6}^1
+\end{bmatrix},\quad
+\begin{bmatrix}
+\beta_{n,4}^1\\\beta_{n,4}^2\\\beta_{n,5}^2\\\beta_{n,5}^3\\\beta_{n,6}^3\\\beta_{n,6}^1
+\end{bmatrix}=\begin{bmatrix}
+c_4&&\\
+&c_4&\\
+&c_5&\\
+&&c_5\\
+&&c_6\\
+c_6&&\\
+\end{bmatrix}\begin{bmatrix}
+\beta_x^1\\\beta_x^2\\\beta_x^3
+\end{bmatrix}+\begin{bmatrix}
+s_4&&\\
+&s_4&\\
+&s_5&\\
+&&s_5\\
+&&s_6\\
+s_6&&\\
+\end{bmatrix}\begin{bmatrix}
+\beta_y^1\\\beta_y^2\\\beta_y^3
+\end{bmatrix},\\
+\begin{bmatrix}
+\beta_x^1\\\beta_x^2\\\beta_x^3
+\end{bmatrix}=\begin{bmatrix}
+\theta_y^1\\\theta_y^2\\\theta_y^3
+\end{bmatrix}=
+\begin{bmatrix}
+	\cdot & \cdot & 1     & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot \\
+	\cdot & \cdot & \cdot & \cdot & \cdot & 1     & \cdot & \cdot & \cdot \\
+	\cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & 1
+\end{bmatrix}\begin{bmatrix}
+w^1\\\theta_x^1\\\theta_y^1\\w^2\\\theta_x^2\\\theta_y^2\\w^3\\\theta_x^3\\\theta_y^3
+\end{bmatrix},\quad
+\begin{bmatrix}
+\beta_y^1\\\beta_y^2\\\beta_y^3
+\end{bmatrix}=\begin{bmatrix}
+-\theta_x^1\\-\theta_x^2\\-\theta_x^3
+\end{bmatrix}=
+-\begin{bmatrix}
+	\cdot & 1     & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot \\
+	\cdot & \cdot & \cdot & \cdot & 1     & \cdot & \cdot & \cdot & \cdot \\
+	\cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & 1     & \cdot
+\end{bmatrix}\begin{bmatrix}
+w^1\\\theta_x^1\\\theta_y^1\\w^2\\\theta_x^2\\\theta_y^2\\w^3\\\theta_x^3\\\theta_y^3
+\end{bmatrix},\\
+\begin{bmatrix}
+\beta_s^4\\\beta_s^5\\\beta_s^6
+\end{bmatrix}=-\begin{bmatrix}
+w_s^4\\w_s^5\\w_s^6
+\end{bmatrix}=\dfrac{3}{2}\begin{bmatrix}
+\dfrac{1}{l_4}&-\dfrac{1}{l_4}&\\
+&\dfrac{1}{l_5}&-\dfrac{1}{l_5}\\
+-\dfrac{1}{l_6}&&\dfrac{1}{l_6}
+\end{bmatrix}\begin{bmatrix}
+w^1\\w^2\\w^3
+\end{bmatrix}+\dfrac{1}{4}\begin{bmatrix}
+1&1&&&&\\
+&&1&1&&\\
+&&&&1&1
+\end{bmatrix}\begin{bmatrix}
+w_{s,4}^1\\w_{s,4}^2\\w_{s,5}^2\\w_{s,5}^3\\w_{s,6}^3\\w_{s,6}^1
+\end{bmatrix},\\
+\begin{bmatrix}
+w_{s,4}^1\\w_{s,4}^2\\w_{s,5}^2\\w_{s,5}^3\\w_{s,6}^3\\w_{s,6}^1
+\end{bmatrix}=
+\begin{bmatrix}
+	\cdot & c_4   & s_4   & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot \\
+	\cdot & \cdot & \cdot & \cdot & c_4   & s_4   & \cdot & \cdot & \cdot \\
+	\cdot & \cdot & \cdot & \cdot & c_5   & s_5   & \cdot & \cdot & \cdot \\
+	\cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & c_5   & s_5   \\
+	\cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & c_6   & s_6   \\
+	\cdot & c_6   & s_6   & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot
+\end{bmatrix}
+\begin{bmatrix}
+w^1\\\theta_x^1\\\theta_y^1\\w^2\\\theta_x^2\\\theta_y^2\\w^3\\\theta_x^3\\\theta_y^3
+\end{bmatrix},
+\end{gather}
+\begin{gather}
+H_x=
+\begin{bmatrix}
+	0                   & 0                   & 1                                     & 0                   & 0                   & 0                                     & 0                   & 0                   & 0                                     \\
+	0                   & 0                   & 0                                     & 0                   & 0                   & 1                                     & 0                   & 0                   & 0                                     \\
+	0                   & 0                   & 0                                     & 0                   & 0                   & 0                                     & 0                   & 0                   & 1                                     \\
+	-\dfrac{3s_4}{2l_4} & -\dfrac{3c_4s_4}{4} & \dfrac{{c_4}^2}{2}-\dfrac{{s_4}^2}{4} & \dfrac{3s_4}{2l_4}  & -\dfrac{3c_4s_4}{4} & \dfrac{{c_4}^2}{2}-\dfrac{{s_4}^2}{4} & 0                   & 0                   & 0                                     \\
+	0                   & 0                   & 0                                     & -\dfrac{3s_5}{2l_5} & -\dfrac{3c_5s_5}{4} & \dfrac{{c_5}^2}{2}-\dfrac{{s_5}^2}{4} & \dfrac{3s_5}{2l_5}  & -\dfrac{3c_5s_5}{4} & \dfrac{{c_5}^2}{2}-\dfrac{{s_5}^2}{4} \\
+	\dfrac{3s_6}{2l_6}  & -\dfrac{3c_6s_6}{4} & \dfrac{{c_6}^2}{2}-\dfrac{{s_6}^2}{4} & 0                   & 0                   & 0                                     & -\dfrac{3s_6}{2l_6} & -\dfrac{3c_6s_6}{4} & \dfrac{{c_6}^2}{2}-\dfrac{{s_6}^2}{4}
+\end{bmatrix}
+\end{gather}
+\begin{gather}
+H_y=
+\begin{bmatrix}
+	0                   & -1                                    & 0                  & 0                   & 0                                     & 0                  & 0                   & 0                                     & 0                  \\
+	0                   & 0                                     & 0                  & 0                   & -1                                    & 0                  & 0                   & 0                                     & 0                  \\
+	0                   & 0                                     & 0                  & 0                   & 0                                     & 0                  & 0                   & -1                                    & 0                  \\
+	\dfrac{3c_4}{2l_4}  & \dfrac{{c_4}^2}{4}-\dfrac{{s_4}^2}{2} & \dfrac{3c_4s_4}{4} & -\dfrac{3c_4}{2l_4} & \dfrac{{c_4}^2}{4}-\dfrac{{s_4}^2}{2} & \dfrac{3c_4s_4}{4} & 0                   & 0                                     & 0                  \\
+	0                   & 0                                     & 0                  & \dfrac{3c_5}{2l_5}  & \dfrac{{c_5}^2}{4}-\dfrac{{s_5}^2}{2} & \dfrac{3c_5s_5}{4} & -\dfrac{3c_5}{2l_5} & \dfrac{{c_5}^2}{4}-\dfrac{{s_5}^2}{2} & \dfrac{3c_5s_5}{4} \\
+	-\dfrac{3c_6}{2l_6} & \dfrac{{c_6}^2}{4}-\dfrac{{s_6}^2}{2} & \dfrac{3c_6s_6}{4} & 0                   & 0                                     & 0                  & \dfrac{3c_6}{2l_6}  & \dfrac{{c_6}^2}{4}-\dfrac{{s_6}^2}{2} & \dfrac{3c_6s_6}{4}
+\end{bmatrix}
+\end{gather}
+\end{document}

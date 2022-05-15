@@ -1,0 +1,36 @@
+# A TEST MODEL FOR MPF MATERIAL
+
+node 1 0 0
+node 2 4 0
+node 3 0 -3
+
+material MPF 1 100 5 .1
+material MPF 2 100 5 .1 20. 18.5 .15 .01 7. true
+
+element T2D2 1 1 2 1 10
+element T2D2 2 3 2 2 10
+
+fix 1 P 1 3
+
+step static 1
+set ini_step_size .1
+
+cload 1 0 80 2 2
+
+converger RelIncreDisp 1 1E-8 10 1
+
+analyze
+
+# Node 2:
+#    4.0000        0
+# Displacement:
+#    -2.4667   10.6500
+# Resistance:
+#    1.0667e-06   8.0000e+01
+peek node 2
+
+peek element 1 2
+
+reset
+clear
+exit

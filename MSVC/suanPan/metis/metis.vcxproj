@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{31EA0BFE-5ADF-4CA5-808F-C3AB41E4AFE0}</ProjectGuid>
+    <RootNamespace>metis</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>..\..\$(Configuration)\Libs\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>..\..\$(Configuration)\Libs\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;NDEBUG2;__OPENMP__;USE_GKREGEX;WIN32;MSC;_CRT_SECURE_NO_WARNINGS;__thread=__declspec(thread);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <OpenMPSupport>true</OpenMPSupport>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>..\..\..\Toolbox\metis-src\src;..\..\..\Toolbox\metis-src\gklib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <PreprocessorDefinitions>__OPENMP__;USE_GKREGEX;WIN32;MSC;_CRT_SECURE_NO_WARNINGS;__thread=__declspec(thread);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <OpenMPSupport>true</OpenMPSupport>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>..\..\..\Toolbox\metis-src\src;..\..\..\Toolbox\metis-src\gklib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Toolbox\metis-src\gklib\b64.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\gklib\blas.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\gklib\csr.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\gklib\error.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\gklib\evaluate.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\gklib\fkvkselect.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\gklib\fs.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\gklib\getopt.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\gklib\gkregex.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\gklib\gkgraph.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\gklib\htable.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\gklib\io.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\gklib\itemsets.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\gklib\mcore.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\gklib\memory.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\gklib\omp.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\gklib\pdb.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\gklib\pqueue.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\gklib\random.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\gklib\rw.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\gklib\seq.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\gklib\sort.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\gklib\string.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\gklib\timers.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\gklib\tokenizer.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\gklib\gkutil.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\auxapi.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\balance.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\bucketsort.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\checkgraph.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\coarsen.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\compress.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\contig.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\debug.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\fm.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\fortran.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\frename.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\gklib.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\graph.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\initpart.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\kmetis.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\kwayfm.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\kwayrefine.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\mcutil.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\mesh.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\meshpart.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\minconn.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\mincover.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\mmd.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\ometis.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\options.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\parmetis.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\pmetis.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\refine.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\separator.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\sfm.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\srefine.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\stat.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\timing.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\util.c" />
+    <ClCompile Include="..\..\..\Toolbox\metis-src\src\wspace.c" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

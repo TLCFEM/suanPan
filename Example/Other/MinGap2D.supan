@@ -1,0 +1,47 @@
+# A TEST MODEL FOR MINGAP2D
+
+node 1 0 0
+node 2 1 0
+node 3 1 -1
+node 4 2 -1
+
+material Elastic1D 1 10
+
+element EB21 1 1 2 12 1 1 0
+element EB21 2 3 4 12 1 1 0
+
+fix2 1 P 1 4
+
+constraint MinGap2D 2 2 3 .8
+
+cload 1 0 -10 2 2
+
+step static 1 1
+set ini_step_size 1E-1
+set fixed_step_size true
+set symm_mat false
+
+converger RelIncreDisp 1 1E-10 10 1
+
+analyze
+
+# Node 2:
+#    1.0000        0
+# Displacement:
+#         0  -0.2667  -0.4000
+# Resistance:
+#         0  -8.0000        0
+# 
+# Node 3:
+#    1.0000  -1.0000
+# Displacement:
+#         0  -0.0667   0.1000
+# Resistance:
+#         0  -2.0000        0
+peek node 2 3
+
+peek element 1
+
+reset
+clear
+exit

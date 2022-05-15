@@ -1,0 +1,88 @@
+# A TEST MODEL FOR CDP MATERIAL
+
+node 1 5 -5 0
+node 2 5 5 0
+node 3 -5 5 0
+node 4 -5 -5 0
+node 5 5 -5 10
+node 6 5 5 10
+node 7 -5 5 10
+node 8 -5 -5 10
+node 9 5 -5 20
+node 10 5 5 20
+node 11 -5 5 20
+node 12 -5 -5 20
+
+material MPF 4 2E5 200 .02
+material CDP 1 3.17E4 .18 3.48 27.6 1E-2 1E-1 .4 3. .6 .8 .23 1.16 .4 2400E-12
+material Rebar3D 2 4 4 4 .02 .02 .02
+material Stacked 5 1 2
+
+element C3D8 1 1 2 3 4 5 6 7 8 5 G
+element C3D8 2 5 6 7 8 9 10 11 12 5 G
+
+recorder 1 hdf5 Element DT 1
+recorder 2 hdf5 Element DC 1
+recorder 3 hdf5 Element KAPPAT 1
+recorder 4 hdf5 Element KAPPAC 1
+recorder 5 hdf5 Element PE 1
+recorder 6 hdf5 Element PE11 1
+recorder 7 hdf5 Element PE22 1
+recorder 8 hdf5 Element PE33 1
+recorder 9 hdf5 Element E 1
+recorder 10 hdf5 Element E11 1
+recorder 11 hdf5 Element E22 1
+recorder 12 hdf5 Element E33 1
+recorder 13 hdf5 Element S 1
+recorder 14 hdf5 Element S11 1
+recorder 15 hdf5 Element S22 1
+recorder 16 hdf5 Element S33 1
+recorder 17 hdf5 Frame U
+
+fix 1 1 1 2 5 6 9 10
+fix 2 2 1 4 5 8 9 12
+fix 3 3 1 2 3 4
+
+displacement 1 0 -.05 3 9 10 11 12
+
+step static 1
+set fixed_step_size 1
+set ini_step_size 1E-1
+set symm_mat 0
+
+converger RelIncreDisp 1 1E-12 10 1
+
+analyze
+
+# Node 9:
+#     5.0000   -5.0000   20.0000
+# Displacement:
+#         0        0  -0.0500
+# Resistance:
+#   -8.9425e-14   7.8143e-14  -9.1689e+02
+# 
+# Node 10:
+#     5.0000    5.0000   20.0000
+# Displacement:
+#         0   0.0135  -0.0500
+# Resistance:
+#    8.9725e-14   2.1507e-13  -9.1689e+02
+# 
+# Node 11:
+#    -5.0000    5.0000   20.0000
+# Displacement:
+#   -0.0135   0.0135  -0.0500
+# Resistance:
+#    1.5641e-14  -9.8162e-15  -9.1689e+02
+# 
+# Node 12:
+#    -5.0000   -5.0000   20.0000
+# Displacement:
+#   -0.0135        0  -0.0500
+# Resistance:
+#   -4.4123e-14   4.3377e-14  -9.1689e+02
+peek node 9 10 11 12
+
+reset
+clear
+exit

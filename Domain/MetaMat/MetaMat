@@ -1,0 +1,23 @@
+#include "MetaMat.hpp"
+
+#include "DenseMat.hpp"
+#include "SparseMat.hpp"
+
+#include "BandMat.hpp"
+#include "BandMatSpike.hpp"
+#include "BandSymmMat.hpp"
+#include "FullMat.hpp"
+#include "FullMatCUDA.hpp"
+#include "SparseMatCUDA.hpp"
+#include "SparseMatFGMRES.hpp"
+#include "SparseMatMUMPS.hpp"
+#include "SparseMatPARDISO.hpp"
+#include "SparseMatSuperLU.hpp"
+#include "SymmPackMat.hpp"
+
+// my sparse implementation
+#include "csc_form.hpp"
+#include "csr_form.hpp"
+#include "triplet_form.hpp"
+
+#include "operator_times.hpp"

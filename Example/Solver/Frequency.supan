@@ -1,0 +1,25 @@
+# A TEST MODEL FOR EIGEN SOLVER
+
+node 1 0 0
+node 2 0 1
+
+material Elastic1D 1 100 0
+
+element EB21 1 1 2 10 1 1 0
+
+mass 2 2 10 1
+
+fix 1 P 1
+
+recorder 1 hdf5 Eigen
+
+step frequency 1 1
+set band_mat 0
+
+analyze
+
+# Eigenvalues:
+#    30.0000
+peek eigenvalue
+
+exit

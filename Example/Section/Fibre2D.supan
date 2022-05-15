@@ -1,0 +1,52 @@
+# A TEST MODEL FOR FIBRE2D SECTION
+
+node 1 0 0
+
+material ConcreteTsai 1 30. 2. 2. 2. 2. 2. .2 2E-3 1E-4
+material MPF 2 2E5 400 .01
+
+section Rectangle2D 2 300 500 1 9
+section Bar2D 3 1200 2 230
+section Bar2D 4 1200 2 -230
+section Circle2D 5 10 2
+section NZ2D 165.1X3.0CHS 6 1
+section Box2D 7 10 10 .5 1
+section CircularHollow2D 8 40. 4. 2
+section TSection2D 9 200 25 100 25 1 6
+section EU2D HEM100 10 1
+section US2D W44X290 11 2
+
+section Fibre2D 1 2 3 4 5 6 7 8 9 10 11
+
+element SingleSection2D 1 1 1
+
+# fix 1 1 1
+
+displacement 1 0 1E-4 2 1
+
+# hdf5recorder 1 Node RF 1
+
+step static 1 1
+set ini_step_size .02
+set fixed_step_size 1
+set symm_mat 0
+
+converger RelIncreDisp 1 1E-10 20 1
+
+analyze
+
+# Node 1:
+#         0        0
+# Displacement:
+#    1.4815e-02   1.0000e-04
+# Resistance:
+#    1.7817e-06   3.6439e+08
+peek node 1
+
+peek element 1
+
+# save recorder 1
+
+reset
+clear
+exit

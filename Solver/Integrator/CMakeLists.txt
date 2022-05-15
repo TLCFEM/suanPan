@@ -1,0 +1,12 @@
+set(Integrator
+        Integrator/BatheTwoStep.cpp
+        Integrator/GeneralizedAlpha.cpp
+        Integrator/GSSSS.cpp
+        Integrator/Integrator.cpp
+        Integrator/LeeNewmark.cpp
+        Integrator/LeeNewmarkBase.cpp
+        Integrator/LeeNewmarkFull.cpp
+        Integrator/Newmark.cpp
+        Integrator/RayleighNewmark.cpp
+        Integrator/WilsonPenzienNewmark.cpp
+        )

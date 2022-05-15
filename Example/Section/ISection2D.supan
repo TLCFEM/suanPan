@@ -1,0 +1,40 @@
+# A TEST MODEL FOR ISECTION2D SECTION
+
+node 1 0 0
+
+material Bilinear1D 1 2E3 10 .01
+
+section ISection2D 1 200 25 100 25 150 25 1 6
+
+element SingleSection2D 1 1 1
+
+# fix 1 1 1
+
+displacement 1 0 3E-4 2 1
+
+# hdf5recorder 1 Node RF 1
+
+step static 1 1
+set ini_step_size .02
+set fixed_step_size 1
+set symm_mat 0
+
+converger RelIncreDisp 1 1E-10 20 1
+
+analyze
+
+# Node 1:
+#         0        0
+# Displacement:
+#   -0.0140   0.0003
+# Resistance:
+#   -1.0914e-11   7.6590e+06
+peek node 1
+
+peek element 1
+
+# save recorder 1
+
+reset
+clear
+exit

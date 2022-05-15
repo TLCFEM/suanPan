@@ -1,0 +1,70 @@
+# A TEST MODEL FOR MINDLIN ELEMENT
+
+node 1 0 0
+node 2 1 0
+node 3 1 1
+node 4 0 1
+node 5 0.25 0
+node 6 0.5 0
+node 7 0.75 0
+node 8 1 0.25
+node 9 1 0.5
+node 10 1 0.75
+node 11 0.75 1
+node 12 0.5 1
+node 13 0.25 1
+node 14 0 0.75
+node 15 0 0.5
+node 16 0 0.25
+node 17 0.25 0.25
+node 18 0.25 0.5
+node 19 0.25 0.75
+node 20 0.5 0.25
+node 21 0.5 0.5
+node 22 0.5 0.75
+node 23 0.75 0.25
+node 24 0.75 0.5
+node 25 0.75 0.75
+
+material Elastic2D 1 12000000 .0
+
+element Mindlin 1 1 5 17 16 1 .01 3
+element Mindlin 2 16 17 18 15 1 .01 3
+element Mindlin 3 15 18 19 14 1 .01 3
+element Mindlin 4 14 19 13 4 1 .01 3
+element Mindlin 5 5 6 20 17 1 .01 3
+element Mindlin 6 17 20 21 18 1 .01 3
+element Mindlin 7 18 21 22 19 1 .01 3
+element Mindlin 8 19 22 12 13 1 .01 3
+element Mindlin 9 6 7 23 20 1 .01 3
+element Mindlin 10 20 23 24 21 1 .01 3
+element Mindlin 11 21 24 25 22 1 .01 3
+element Mindlin 12 22 25 11 12 1 .01 3
+element Mindlin 13 7 2 8 23 1 .01 3
+element Mindlin 14 23 8 9 24 1 .01 3
+element Mindlin 15 24 9 10 25 1 .01 3
+element Mindlin 16 25 10 3 11 1 .01 3
+
+fix 1 1 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+fix 2 2 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+fix 3 3 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+
+cload 1 0 -1 1 21
+
+step static 1
+set ini_step_size .1
+set fixed_step_size 1
+set symm_mat 0
+
+converger RelIncreDisp 1 1E-10 2 1
+
+analyze
+
+# -4.8212E-03 1.7488E-16 -4.3886E-17
+peek node 21
+
+peek element 1
+
+reset
+clear
+exit

@@ -1,0 +1,11 @@
+#include "Section2D.h"
+
+#include "Bar2D.h"
+#include "Box2D.h"
+#include "Circle2D.h"
+#include "CircularHollow2D.h"
+#include "Fibre2D.h"
+#include "HSection2D.h"
+#include "ISection2D.h"
+#include "Rectangle2D.h"
+#include "TSection2D.h"

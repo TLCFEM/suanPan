@@ -1,0 +1,40 @@
+# A TEST MODEL FOR TSECTION3D SECTION
+
+node 1 0 0 0
+
+material Bilinear1D 1 2E3 10 .01
+
+section TSection3D 1 200 25 100 25 1 6
+
+element SingleSection3D 1 1 1
+
+# fix 1 1 1
+
+displacement 1 0 3E-4 2 1
+
+# hdf5recorder 1 Node RF 1
+
+step static 1 1
+set ini_step_size 1E-1
+set fixed_step_size 1
+set symm_mat 0
+
+converger RelIncreDisp 1 1E-10 20 1
+
+analyze
+
+# Node 1:
+#         0        0        0
+# Displacement:
+#   -1.6307e-02   3.0000e-04   1.4665e-21
+# Resistance:
+#    6.8212e-12   1.5923e+06   5.8208e-11
+peek node 1
+
+peek element 1
+
+# save recorder 1
+
+reset
+clear
+exit

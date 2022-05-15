@@ -1,0 +1,14 @@
+set(M2D
+        Material2D/Bilinear2D.cpp
+        Material2D/Concrete21.cpp
+        Material2D/Concrete22.cpp
+        Material2D/Elastic/AxisymmetricElastic.cpp
+        Material2D/Elastic/Elastic2D.cpp
+        Material2D/Material2D.cpp
+        Material2D/Wrapper/Axisymmetric.cpp
+        Material2D/Wrapper/Laminated.cpp
+        Material2D/Wrapper/PlaneStrain.cpp
+        Material2D/Wrapper/PlaneStress.cpp
+        Material2D/Wrapper/Rebar2D.cpp
+        Material2D/Wrapper/Rotation2D.cpp
+        )

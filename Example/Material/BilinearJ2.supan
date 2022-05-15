@@ -1,0 +1,127 @@
+# A TEST MODEL FOR BILINEARJ2 MATERIAL
+
+node 1 0 20 5
+node 2 0 20 0
+node 3 0 0 0
+node 4 0 0 5
+node 5 10 20 0
+node 6 10 0 0
+node 7 10 0 5
+node 8 10 20 5
+node 9 0 30 5
+node 10 0 30 0
+node 11 30 20 5
+node 12 30 30 5
+node 13 30 30 0
+node 14 30 20 0
+node 15 0 15 0
+node 16 0 10 0
+node 17 0 5 0
+node 18 0 5 5
+node 19 0 10 5
+node 20 0 15 5
+node 21 10 5 0
+node 22 10 10 0
+node 23 10 15 0
+node 24 10 15 5
+node 25 10 10 5
+node 26 10 5 5
+node 27 5 0 5
+node 28 5 20 5
+node 29 5 0 0
+node 30 5 20 0
+node 31 0 25 5
+node 32 0 25 0
+node 33 30 25 5
+node 34 30 25 0
+node 35 5 30 0
+node 36 10 30 0
+node 37 15 30 0
+node 38 20 30 0
+node 39 25 30 0
+node 40 25 20 0
+node 41 20 20 0
+node 42 15 20 0
+node 43 25 30 5
+node 44 20 30 5
+node 45 15 30 5
+node 46 10 30 5
+node 47 5 30 5
+node 48 15 20 5
+node 49 20 20 5
+node 50 25 20 5
+node 51 5 15 5
+node 52 5 10 5
+node 53 5 5 5
+node 54 5 15 0
+node 55 5 10 0
+node 56 5 5 0
+node 57 5 25 0
+node 58 10 25 0
+node 59 15 25 0
+node 60 20 25 0
+node 61 25 25 0
+node 62 5 25 5
+node 63 10 25 5
+node 64 15 25 5
+node 65 20 25 5
+node 66 25 25 5
+
+element C3D8 1 28 30 54 51 1 2 15 20 1
+element C3D8 2 51 54 55 52 20 15 16 19 1
+element C3D8 3 52 55 56 53 19 16 17 18 1
+element C3D8 4 53 56 29 27 18 17 3 4 1
+element C3D8 5 8 5 23 24 28 30 54 51 1
+element C3D8 6 24 23 22 25 51 54 55 52 1
+element C3D8 7 25 22 21 26 52 55 56 53 1
+element C3D8 8 26 21 6 7 53 56 29 27 1
+element C3D8 9 30 28 62 57 2 1 31 32 1
+element C3D8 10 57 62 47 35 32 31 9 10 1
+element C3D8 11 5 8 63 58 30 28 62 57 1
+element C3D8 12 58 63 46 36 57 62 47 35 1
+element C3D8 13 42 48 64 59 5 8 63 58 1
+element C3D8 14 59 64 45 37 58 63 46 36 1
+element C3D8 15 41 49 65 60 42 48 64 59 1
+element C3D8 16 60 65 44 38 59 64 45 37 1
+element C3D8 17 40 50 66 61 41 49 65 60 1
+element C3D8 18 61 66 43 39 60 65 44 38 1
+element C3D8 19 14 11 33 34 40 50 66 61 1
+element C3D8 20 34 33 12 13 61 66 43 39 1
+
+material BilinearJ2 1 5000 .2 4 .05
+
+hdf5recorder 1 Element S 1
+hdf5recorder 2 Element S11 1
+hdf5recorder 3 Element S22 1
+hdf5recorder 4 Element S33 1
+hdf5recorder 5 Element S12 1
+hdf5recorder 6 Element S23 1
+hdf5recorder 7 Element S13 1
+hdf5recorder 8 Element PE 1
+hdf5recorder 9 Element E 1
+hdf5recorder 10 Element E11 1
+hdf5recorder 11 Element E22 1
+hdf5recorder 12 Element E33 1
+hdf5recorder 13 Element E12 1
+hdf5recorder 14 Element E23 1
+hdf5recorder 15 Element E13 1
+
+fix 1 P 3 4 6 7 27 29
+
+displacement 1 0 1 3 12
+
+step static 1
+set ini_step_size .1
+set fixed_step_size true
+set symm_mat 0
+
+converger RelIncreDisp 1 1E-10 40 1
+
+analyze
+
+# -0.0754 -0.0437 1.0000
+peek node 12
+
+peek element 1
+
+exit

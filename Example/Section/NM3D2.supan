@@ -1,0 +1,57 @@
+# A TEST MODEL FOR NM3D2 SECTION
+
+node 1 0 0 0
+node 2 1 0 0
+node 3 1 2 0
+
+orientation B3DL 1 0. 0. 1.
+
+section NM3D2 1 10 200 400 1E2 1E2 1E2 1. .05 .08 0.
+element NMB31 1 1 2 1 1
+element NMB31 2 2 3 1 1
+
+fix2 1 E 1
+
+displacement 1 0 .6 3 3
+
+recorder 1 hdf5 Element E 1
+recorder 2 hdf5 Element S 1
+recorder 3 hdf5 Element PE 1
+
+step static 1
+set ini_step_size 1E-1
+set fixed_step_size true
+
+converger RelIncreDisp 1 1E-12 20 1
+
+analyze
+
+# Node 1:
+# 0 0 0
+# Displacement:
+# 0 0 0 0 0 0
+# Resistance:
+# 0 0 -5.3240e+01 1.0648e+02 5.3240e+01 0
+# 
+# Node 2:
+# 1.0000 0 0
+# Displacement:
+# 0 0 4.4367e-02 -6.6550e-05 -6.6550e-02 0
+# Resistance:
+# 0 0 2.1316e-14 -2.8422e-14 1.3323e-15 0
+# 
+# Node 3:
+# 1.0000 2.0000 0
+# Displacement:
+# 0 0 0.6000 -0.3666 -0.0666 0
+# Resistance:
+# 0 0 5.3240e+01 -8.8313e-15 0 0
+peek node 1 2 3
+
+peek element 1 2
+
+# save recorder 2
+
+reset
+clear
+exit

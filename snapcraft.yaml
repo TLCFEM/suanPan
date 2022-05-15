@@ -1,0 +1,82 @@
+name: suanpan
+base: core20
+confinement: strict
+contact: tlcfem@gmail.com
+donation: https://ko-fi.com/suanpan
+grade: stable
+icon: Resource/suanPan-ua.svg
+issues: https://github.com/TLCFEM/suanPan/issues
+license: GPL-3.0
+source-code: https://github.com/TLCFEM/suanPan
+summary: An Open Source, Parallel and Heterogeneous Finite Element Analysis Framework
+version: "2.3"
+website: https://bit.ly/suanpan-doc
+description: |
+  [**suanPan**](https://github.com/TLCFEM/suanPan) is a finite element method (FEM) simulation platform for applications
+  in fields such as solid mechanics and civil/structural/seismic engineering. The name **suanPan** comes from the term 
+  *Suan Pan* (算盤), which is [Chinese abacus](https://en.wikipedia.org/wiki/Suanpan). **suanPan** is written in modern 
+  high quality C++ code and is targeted to provide an efficient, concise, flexible and reliable FEM simulation platform.
+architectures:
+  - build-on: amd64
+apps:
+  suanpan:
+    command: bin/suanPan
+    environment:
+      LIBGL_DRIVERS_PATH: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/dri
+    plugs:
+      - home
+      - desktop
+      - desktop-legacy
+      - wayland
+      - unity7
+      - opengl
+parts:
+  suanpan:
+    source: https://github.com/TLCFEM/suanPan.git
+    plugin: cmake
+    cmake-parameters:
+      - -DCMAKE_INSTALL_PREFIX=
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DBUILD_MULTITHREAD=ON
+      - -DUSE_HDF5=ON
+      - -DUSE_EXTERNAL_VTK=ON
+      - -DVTK_DIR=$SNAPCRAFT_PART_BUILD/lib/cmake/vtk-9.1/
+      - -DUSE_MKL=ON
+      - -DMKLROOT=/opt/intel/oneapi/mkl/latest
+      - -DUSE_INTEL_OPENMP=OFF
+      - -DLINK_DYNAMIC_MKL=OFF
+      - -DCMAKE_C_COMPILER=gcc-10
+      - -DCMAKE_CXX_COMPILER=g++-10
+      - -DCMAKE_Fortran_COMPILER=gfortran-10
+    build-packages:
+      - gcc-10
+      - g++-10
+      - gfortran-10
+      - wget
+      - mesa-common-dev
+      - mesa-utils
+      - freeglut3-dev
+      - libglvnd-dev
+    override-build: |
+      wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.1.0-linux.tar.gz
+      tar xf VTK-9.1.0-linux.tar.gz
+
+      wget -q https://registrationcenter-download.intel.com/akdlm/irc_nas/18721/l_onemkl_p_2022.1.0.223_offline.sh
+      sh ./l_onemkl_p_2022.1.0.223_offline.sh -a --silent --eula accept
+      
+      snapcraftctl build
+    stage-packages:
+      - libgfortran5
+      - libgl1
+      - libglx0
+      - libgomp1
+      - libice6
+      - libquadmath0
+      - libsm6
+      - libx11-6
+      - libxt6
+      - libglvnd0
+      - libopengl0
+      - libxau6
+      - libxcb1
+      - libxdmcp6

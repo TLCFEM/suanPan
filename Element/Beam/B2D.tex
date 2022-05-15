@@ -1,0 +1,209 @@
+\documentclass[11pt]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{amsmath,amsfonts,amssymb,siunitx}
+\begin{document}
+\section{2D Beam Elements}
+\subsection{Geometry}
+\subsubsection{Translational Part}
+In a 2D scenario, a beam member connects two points $N_1(x_1,y_1)$ and $N_2(x_2,y_2)$. The initial member length $L_0$ is simply
+\begin{gather}
+L_0=\sqrt{(y_2-y_1)^2+(x_2-x_1)^2}.
+\end{gather}
+Now give an arbitrary deformation $\mathbf{v}$ denoted as
+\begin{gather}
+\mathbf{v}=\begin{bmatrix}
+\Delta{}x_1&\Delta{}y_1&\Delta{}\theta_1&\Delta{}x_2&\Delta{}y_1&\Delta{}\theta_2
+\end{bmatrix}^\mathrm{T}.
+\end{gather}
+The new locations of two end nodes are now $N'_1(X_1=x_1+\Delta{}x_1,Y_1=y_1+\Delta{}y_1)$ and $N'_2(X_2=x_2+\Delta{}x_2,Y_2=y_2+\Delta{}y_2)$. The new member length $L$ is
+\begin{gather}
+L=\sqrt{(y_2-y_1+\Delta{}y_2-\Delta{}y_1)^2+(x_2-x_1+\Delta{}x_2-\Delta{}x_1)^2}.
+\end{gather}
+The corresponding axial deformation $u$ is
+\begin{gather}
+u=L-L_0.
+\end{gather}
+Taking the first derivative gives
+\begin{gather}
+\dfrac{\mathrm{d}u}{\mathrm{d}\mathbf{v}}=\dfrac{\mathrm{d}L}{\mathrm{d}\mathbf{v}}=\dfrac{1}{L}\begin{bmatrix}
+X_1-X_2\\Y_1-Y_2\\0\\X_2-X_1\\Y_2-Y_1\\0
+\end{bmatrix}=\begin{bmatrix}
+-c\\-s\\0\\c\\s\\0
+\end{bmatrix}
+\end{gather}
+so that
+\begin{gather}
+\dfrac{\mathrm{d}u}{\mathrm{d}\mathbf{v}}\otimes\dfrac{\mathrm{d}u}{\mathrm{d}\mathbf{v}}=\begin{bmatrix}
+	c^2   & cs    & \cdot & -c^2  & -cs   & \cdot \\
+	cs    & s^2   & \cdot & -cs   & -s^2  & \cdot \\
+	\cdot & \cdot & \cdot & \cdot & \cdot & \cdot \\
+	-c^2  & -cs   & \cdot & c^2   & cs    & \cdot \\
+	-cs   & -s^2  & \cdot & cs    & s^2   & \cdot \\
+	\cdot & \cdot & \cdot & \cdot & \cdot & \cdot
+\end{bmatrix}.
+\end{gather}
+The second derivative of $u$ is
+\begin{gather}
+\dfrac{\mathrm{d}^2u}{\mathrm{d}\mathbf{v}^2}=\dfrac{1}{L}\left(\begin{bmatrix}
+	1     & \cdot & \cdot & -1    & \cdot & \cdot \\
+	\cdot & 1     & \cdot & \cdot & -1    & \cdot \\
+	\cdot & \cdot & \cdot & \cdot & \cdot & \cdot \\
+	-1    & \cdot & \cdot & 1     & \cdot & \cdot \\
+	\cdot & -1    &       & \cdot & 1     & \cdot \\
+	\cdot & \cdot & \cdot & \cdot & \cdot & \cdot
+\end{bmatrix}-
+\begin{bmatrix}
+	c^2   & cs    & \cdot & -c^2  & -cs   & \cdot \\
+	cs    & s^2   & \cdot & -cs   & -s^2  & \cdot \\
+	\cdot & \cdot & \cdot & \cdot & \cdot & \cdot \\
+	-c^2  & -cs   & \cdot & c^2   & cs    & \cdot \\
+	-cs   & -s^2  & \cdot & cs    & s^2   & \cdot \\
+	\cdot & \cdot & \cdot & \cdot & \cdot & \cdot
+\end{bmatrix}\right),
+\end{gather}
+which is equivalent to
+\begin{gather}
+\dfrac{\mathrm{d}^2u}{\mathrm{d}\mathbf{v}^2}=\dfrac{1}{L}
+\begin{bmatrix}
+	s^2   & -cs   & \cdot & -s^2  & cs    & \cdot \\
+	-cs   & c^2   & \cdot & cs    & -c^2  & \cdot \\
+	\cdot & \cdot & \cdot & \cdot & \cdot & \cdot \\
+	-s^2  & cs    & \cdot & s^2   & -cs   & \cdot \\
+	cs    & -c^2  & \cdot & -cs   & c^2   & \cdot \\
+	\cdot & \cdot & \cdot & \cdot & \cdot & \cdot
+\end{bmatrix}.
+\end{gather}
+The translational part is identical to truss elements with additional two irrelevant variables (end rotations).
+\subsubsection{Rotational Part}
+The initial inclination $\beta_0$ is
+\begin{gather}
+\beta_0=\mathrm{arctan2}\left(y_2-y_1,x_2-x_1\right).
+\end{gather}
+With the given $\mathbf{v}$, the new inclination $\beta$ is
+\begin{gather}
+\beta=\mathrm{arctan2}\left(y_2-y_1+\Delta{}y_2-\Delta{}y_1,x_2-x_1+\Delta{}x_2-\Delta{}x_1\right),
+\end{gather}
+or equivalently,
+\begin{gather}
+\beta=\mathrm{arctan2}\left(Y_2-Y_1,X_2-X_1\right),
+\end{gather}
+The rotational deformation is evaluated in the deformed configuration, so that instead of $\Delta{}\theta_1$ and $\Delta{}\theta_2$, following terms should be used for computation.
+\begin{gather}
+\Theta_1=\Delta{}\theta_1+\beta_0-\beta=\beta_1-\beta,\\
+\Theta_2=\Delta{}\theta_2+\beta_0-\beta=\beta_2-\beta.
+\end{gather}
+For arbitrarily large deformation, $\Theta_1$ and $\Theta_2$ are computed using trig functions.
+\begin{gather}
+\tan\Theta_1=\dfrac{\sin\Theta_1}{\cos\Theta_1}=\dfrac{\sin\beta_1\cos\beta-\cos\beta_1\sin\beta}{\cos\beta_1\cos\beta+\sin\beta_1\sin\beta},\\
+\tan\Theta_2=\dfrac{\sin\Theta_2}{\cos\Theta_2}=\dfrac{\sin\beta_2\cos\beta-\cos\beta_2\sin\beta}{\cos\beta_2\cos\beta+\sin\beta_2\sin\beta},
+\end{gather}
+so that
+\begin{gather}
+\Theta_1=\mathrm{arctan2}\left(\sin\beta_1\cos\beta-\cos\beta_1\sin\beta,\cos\beta_1\cos\beta+\sin\beta_1\sin\beta\right),\\
+\Theta_2=\mathrm{arctan2}\left(\sin\beta_2\cos\beta-\cos\beta_2\sin\beta,\cos\beta_2\cos\beta+\sin\beta_2\sin\beta\right).
+\end{gather}
+Now via taking the derivative with respect to $\mathbf{v}$, one can obtain
+\begin{gather}
+\dfrac{\mathrm{d}\Theta_1}{\mathrm{d}\mathbf{v}}=\dfrac{\mathrm{d}\Delta{}\theta_1}{\mathrm{d}\mathbf{v}}-\dfrac{\mathrm{d}\beta}{\mathrm{d}\mathbf{v}}=
+\dfrac{\mathrm{d}\Delta{}\theta_1}{\mathrm{d}\mathbf{v}}-\dfrac{\left(X_2-X_1\right)^2}{L^2}\dfrac{\mathrm{d}}{\mathrm{d}\mathbf{v}}\left(\dfrac{Y_2-Y_1}{X_2-X_1}\right),\\
+\dfrac{\mathrm{d}\Theta_2}{\mathrm{d}\mathbf{v}}=\dfrac{\mathrm{d}\Delta{}\theta_2}{\mathrm{d}\mathbf{v}}-\dfrac{\mathrm{d}\beta}{\mathrm{d}\mathbf{v}}=
+\dfrac{\mathrm{d}\Delta{}\theta_2}{\mathrm{d}\mathbf{v}}-\dfrac{\left(X_2-X_1\right)^2}{L^2}\dfrac{\mathrm{d}}{\mathrm{d}\mathbf{v}}\left(\dfrac{Y_2-Y_1}{X_2-X_1}\right).
+\end{gather}
+In explicit form, they are
+\begin{gather}
+\dfrac{\mathrm{d}\Theta_1}{\mathrm{d}\mathbf{v}}=\begin{bmatrix}
+0\\0\\1\\0\\0\\0
+\end{bmatrix}-\dfrac{1}{L^2}\begin{bmatrix}
+Y_2-Y_1\\X_1-X_2\\0\\Y_1-Y_2\\X_2-X_1\\0
+\end{bmatrix}=\dfrac{1}{L}\begin{bmatrix}
+-s\\c\\L\\s\\-c\\0
+\end{bmatrix},\quad
+\dfrac{\mathrm{d}\Theta_2}{\mathrm{d}\mathbf{v}}=\begin{bmatrix}
+0\\0\\0\\0\\0\\1
+\end{bmatrix}-\dfrac{1}{L^2}\begin{bmatrix}
+Y_2-Y_1\\X_1-X_2\\0\\Y_1-Y_2\\X_2-X_1\\0
+\end{bmatrix}=\dfrac{1}{L}\begin{bmatrix}
+-s\\c\\0\\s\\-c\\L
+\end{bmatrix}.
+\end{gather}
+The second derivatives can be computed accordingly.
+\begin{gather}
+\dfrac{\mathrm{d}^2\Theta_1}{\mathrm{d}\mathbf{v}^2}=\dfrac{\mathrm{d}^2\Theta_2}{\mathrm{d}\mathbf{v}^2}=\dfrac{2}{L^2}\begin{bmatrix}
+s\\-c\\0\\-s\\c\\0
+\end{bmatrix}\otimes\begin{bmatrix}
+-c\\-s\\0\\c\\s\\0
+\end{bmatrix}+
+\dfrac{1}{L^2}\begin{bmatrix}
+	0  & 1  & 0 & 0  & -1 & 0 \\
+	-1 & 0  & 0 & 1  & 0  & 0 \\
+	0  & 0  & 0 & 0  & 0  & 0 \\
+	0  & -1 & 0 & 0  & 1  & 0 \\
+	1  & 0  & 0 & -1 & 0  & 0 \\
+	0  & 0  & 0 & 0  & 0  & 0
+\end{bmatrix}.
+\end{gather}
+Reorganizing gives
+\begin{gather}
+\dfrac{\mathrm{d}^2\Theta_1}{\mathrm{d}\mathbf{v}^2}=\dfrac{\mathrm{d}^2\Theta_2}{\mathrm{d}\mathbf{v}^2}=\dfrac{1}{L^2}\begin{bmatrix}
+	-2cs      & c^2 - s^2 & 0 & 2cs       & s^2 - c^2 & 0 \\
+	c^2 - s^2 & 2cs       & 0 & s^2 - c^2 & -2cs      & 0 \\
+	0         & 0         & 0 & 0         & 0         & 0 \\
+	2cs       & s^2 - c^2 & 0 & -2cs      & c^2 - s^2 & 0 \\
+	s^2 - c^2 & -2cs      & 0 & c^2 - s^2 & 2cs       & 0 \\
+	0         & 0         & 0 & 0         & 0         & 0
+\end{bmatrix}.
+\end{gather} 
+\subsection{Potential Energy}
+The total potential energy in a given deformed beam can be expressed as
+\begin{gather}
+U=\int{}N~\mathrm{d}u+\int{}M_1~\mathrm{d}\Theta_1+\int{}M_2~\mathrm{d}\Theta_2.
+\end{gather}
+\subsection{Force}
+By taking the first derivative of above potential energy $U$ with respect to global displacement vector $\mathbf{v}$, the global resistance $\mathbf{f}$ can be obtained.
+\begin{gather}
+\mathbf{f}=\dfrac{\mathrm{d}U}{\mathrm{d}\mathbf{v}}=\dfrac{\mathrm{d}U}{\mathrm{d}u}\dfrac{\mathrm{d}u}{\mathrm{d}\mathbf{v}}+\dfrac{\mathrm{d}U}{\mathrm{d}\Theta_1}\dfrac{\mathrm{d}\Theta_1}{\mathrm{d}\mathbf{v}}+\dfrac{\mathrm{d}U}{\mathrm{d}\Theta_2}\dfrac{\mathrm{d}\Theta_2}{\mathrm{d}\mathbf{v}}=N\dfrac{\mathrm{d}u}{\mathrm{d}\mathbf{v}}+M_1\dfrac{\mathrm{d}\Theta_1}{\mathrm{d}\mathbf{v}}+M_2\dfrac{\mathrm{d}\Theta_2}{\mathrm{d}\mathbf{v}}.
+\end{gather}
+The global force can also be expressed as
+\begin{gather}
+\mathbf{f}=\mathbf{B}_l^\mathrm{T}\mathbf{f}_l=\begin{bmatrix}
+\dfrac{\mathrm{d}u}{\mathrm{d}\mathbf{v}}&\dfrac{\mathrm{d}\Theta_1}{\mathrm{d}\mathbf{v}}&\dfrac{\mathrm{d}\Theta_2}{\mathrm{d}\mathbf{v}}
+\end{bmatrix}\cdot\begin{bmatrix}
+N\\M_1\\M_2
+\end{bmatrix}.
+\end{gather}
+The explicit form of $\mathbf{B}_l$ is
+\begin{gather}
+\mathbf{B}_l=
+\begin{bmatrix}
+	-c   & -s  & 0 & c   & s    & 0 \\
+	-s/L & c/L & 1 & s/L & -c/L & 0 \\
+	-s/L & c/L & 0 & s/L & -c/L & 1
+\end{bmatrix}.
+\end{gather}
+Accordingly, the local deformation $\mathbf{v}_l$ shall be denoted as
+\begin{gather}
+\mathrm{d}\mathbf{v}_l=\begin{bmatrix}
+u&\Theta_1&\Theta_2
+\end{bmatrix}^\mathrm{T}=\mathbf{B}_l\mathrm{d}\mathbf{v}.
+\end{gather}
+\subsection{Stiffness}
+The consistent stiffness matrix shall be computed by taking the derivative of $\mathbf{f}$ with respect to global deformation $\mathbf{v}$.
+\begin{gather}
+\mathbf{K}=
+\dfrac{\mathrm{d}}{\mathrm{d}\mathbf{v}}\left(\mathbf{B}_l^\mathrm{T}\mathbf{f}_l\right)=
+\dfrac{\mathrm{d}\mathbf{B}_l^\mathrm{T}}{\mathrm{d}\mathbf{v}}\mathbf{f}_l+
+\mathbf{B}_l^\mathrm{T}\dfrac{\mathrm{d}\mathbf{f}_l}{\mathrm{d}\mathbf{v}_l}\mathbf{B}_l,
+\end{gather}
+in which
+\begin{gather}
+\dfrac{\mathrm{d}\mathbf{B}_l^\mathrm{T}}{\mathrm{d}\mathbf{v}}\mathbf{f}_l=
+\sum\dfrac{\mathrm{d}\mathbf{B}_l^{i,\mathrm{T}}}{\mathrm{d}\mathbf{v}}f_l^{i}=
+N\dfrac{\mathrm{d}\mathbf{B}_l^{1,\mathrm{T}}}{\mathrm{d}\mathbf{v}}+
+M_1\dfrac{\mathrm{d}\mathbf{B}_l^{2,\mathrm{T}}}{\mathrm{d}\mathbf{v}}+
+M_2\dfrac{\mathrm{d}\mathbf{B}_l^{3,\mathrm{T}}}{\mathrm{d}\mathbf{v}}=
+N\dfrac{\mathrm{d}^2u}{\mathrm{d}\mathbf{v}^2}+
+M_1\dfrac{\mathrm{d}^2\Theta_1}{\mathrm{d}\mathbf{v}^2}+
+M_2\dfrac{\mathrm{d}^2\Theta_2}{\mathrm{d}\mathbf{v}^2}.
+\end{gather}
+The above stiffness is consistent with the element level geometry nonlinearity.
+\end{document}

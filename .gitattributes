@@ -1,0 +1,26 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Custom for Visual Studio
+*.cs diff=csharp
+
+# Standard to msysgit
+*.doc diff=astextplain
+*.DOC diff=astextplain
+*.docx diff=astextplain
+*.DOCX diff=astextplain
+*.dot diff=astextplain
+*.DOT diff=astextplain
+*.pdf diff=astextplain
+*.PDF diff=astextplain
+*.rtf diff=astextplain
+*.RTF diff=astextplain
+
+Include/* linguist-vendored
+Toolbox/amd-src/* linguist-vendored
+Toolbox/arpack-src/* linguist-vendored
+Toolbox/feast-src/* linguist-vendored
+Toolbox/metis-src/* linguist-vendored
+Toolbox/mumps-src/* linguist-vendored
+Toolbox/superlu-src/* linguist-vendored
+Toolbox/superlumt-src/* linguist-vendored

@@ -1,0 +1,171 @@
+\documentclass[11pt]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{amsmath,amsfonts,amssymb,siunitx}
+\begin{document}
+\section{T2D2 and T3D2}
+\subsection{Geometry}
+In a 2D scenario, a truss member connects two points $N_1(x_1,y_1)$ and $N_2(x_2,y_2)$. The initial member length $L_0$ is simply
+\begin{gather}
+L_0=\sqrt{(y_2-y_1)^2+(x_2-x_1)^2}.
+\end{gather}
+Now give an arbitrary deformation $\mathbf{v}$ denoted as
+\begin{gather}
+\mathbf{v}=\begin{bmatrix}
+\Delta{}x_1&\Delta{}y_1&\Delta{}x_2&\Delta{}y_2
+\end{bmatrix}^\mathrm{T}.
+\end{gather}
+The new locations of two end nodes are now $N'_1(X_1=x_1+\Delta{}x_1,Y_1=y_1+\Delta{}y_1)$ and $N'_2(X_2=x_2+\Delta{}x_2,Y_2=y_2+\Delta{}y_2)$. The new member length $L$ is
+\begin{gather}
+L=\sqrt{(y_2-y_1+\Delta{}y_2-\Delta{}y_1)^2+(x_2-x_1+\Delta{}x_2-\Delta{}x_1)^2}.
+\end{gather}
+The corresponding axial deformation $u$ is
+\begin{gather}
+u=L-L_0.
+\end{gather}
+Taking the first derivative gives
+\begin{gather}
+\dfrac{\mathrm{d}u}{\mathrm{d}\mathbf{v}}=\dfrac{\mathrm{d}L}{\mathrm{d}\mathbf{v}}=\dfrac{1}{L}\begin{bmatrix}
+X_1-X_2\\Y_1-Y_2\\X_2-X_1\\Y_2-Y_1
+\end{bmatrix}=\begin{bmatrix}
+-c\\-s\\c\\s
+\end{bmatrix}
+\end{gather}
+so that
+\begin{gather}
+\dfrac{\mathrm{d}u}{\mathrm{d}\mathbf{v}}\dfrac{\mathrm{d}u}{\mathrm{d}\mathbf{v}}=\begin{bmatrix}
+	c^2  & cs   & -c^2 & -cs  \\
+	cs   & s^2  & -cs  & -s^2 \\
+	-c^2 & -cs  & c^2  & cs   \\
+	-cs  & -s^2 & cs   & s^2
+\end{bmatrix}.
+\end{gather}
+The second derivative of $u$ is
+\begin{gather}
+\dfrac{\mathrm{d}^2u}{\mathrm{d}\mathbf{v}^2}=\dfrac{1}{L}\left(\begin{bmatrix}
+	1  &    & -1 &    \\
+	   & 1  &    & -1 \\
+	-1 &    & 1  &    \\
+	   & -1 &    & 1
+\end{bmatrix}-\begin{bmatrix}
+	c^2  & cs   & -c^2 & -cs  \\
+	cs   & s^2  & -cs  & -s^2 \\
+	-c^2 & -cs  & c^2  & cs   \\
+	-cs  & -s^2 & cs   & s^2
+\end{bmatrix}\right).
+\end{gather}
+Knowing that for 2D cases, $c^2+s^2=1$ holds, so
+\begin{gather*}
+\dfrac{\mathrm{d}^2u}{\mathrm{d}\mathbf{v}^2}=\dfrac{1}{L}\begin{bmatrix}
+	s^2  & -cs  & -s^2 & cs   \\
+	-cs  & c^2  & cs   & -c^2 \\
+	-s^2 & cs   & s^2  & -cs  \\
+	cs   & -c^2 & -cs  & c^2
+\end{bmatrix}.
+\end{gather*}
+For linear geometry, since the deformation $u$ is evaluated in the undeformed configuration,
+\begin{gather}
+u=\dfrac{1}{L_0}\begin{bmatrix}
+x_1-x_2\\y_1-y_2\\x_2-x_1\\y_2-y_1
+\end{bmatrix}\cdot\mathbf{v}=\begin{bmatrix}
+-c\\-s\\c\\s
+\end{bmatrix}\cdot\begin{bmatrix}
+\Delta{}x_1\\\Delta{}y_1\\\Delta{}x_2\\\Delta{}y_2
+\end{bmatrix}.
+\end{gather}
+Note in this case, the direction cosines are computed with initial nodal coordinates. The derivatives are
+\begin{gather}
+\dfrac{\mathrm{d}u}{\mathrm{d}\mathbf{v}}=\dfrac{1}{L_0}\begin{bmatrix}
+x_1-x_2\\y_1-y_2\\x_2-x_1\\y_2-y_1
+\end{bmatrix},\qquad\dfrac{\mathrm{d}^2u}{\mathrm{d}\mathbf{v}^2}=\mathbf{0}.
+\end{gather}
+For spatial truss members, above matrices can be expanded accordingly.
+\subsection{Potential Energy}
+The total potential energy in a given deformed spring can be expressed as
+\begin{gather}
+U=\int{}F(u)~\mathrm{d}u,
+\end{gather}
+where $u$ is axial displacement and $F(u)$ is axial resistance. If by integration $F(u)$ can be obtained from stress $\sigma(\varepsilon)$ that is in general a function of strain $\varepsilon(u)$ that is further a function of displacement $u$, then
+\begin{gather}
+U=\iint\sigma(\varepsilon(u))~\mathrm{d}A~\mathrm{d}u.
+\end{gather}
+For a truss element, it can be simplified to
+\begin{gather}
+U=\int{}A(u)\sigma(u)~\mathrm{d}u,
+\end{gather}
+where $A(u)$ is cross section area.
+\subsection{Force}
+By taking the first derivative of above potential energy $U$ with respect to global displacement vector $\mathbf{v}$, the global resistance $\mathbf{f}$ can be obtained.
+\begin{gather}
+\mathbf{f}=\dfrac{\mathrm{d}U}{\mathrm{d}\mathbf{v}}=\dfrac{\mathrm{d}U}{\mathrm{d}u}\dfrac{\mathrm{d}u}{\mathrm{d}\mathbf{v}}=A(u)\sigma(u)\dfrac{\mathrm{d}u}{\mathrm{d}\mathbf{v}}.
+\end{gather}
+\subsection{Stiffness}
+By further taking the derivative of $\mathbf{f}$, the global stiffness $\mathbf{K}$ can be obtained as
+\begin{gather}
+\mathbf{K}=\dfrac{\mathrm{d}\mathbf{f}}{\mathrm{d}\mathbf{v}}=\left(\dfrac{\mathrm{d}A(u)}{\mathrm{d}u}\sigma(u)+A(u)\dfrac{\mathrm{d}\sigma(u)}{\mathrm{d}u}\right)\dfrac{\mathrm{d}u}{\mathrm{d}\mathbf{v}}\dfrac{\mathrm{d}u}{\mathrm{d}\mathbf{v}}+A(u)\sigma(u)\dfrac{\mathrm{d}^2u}{\mathrm{d}\mathbf{v}^2}.
+\end{gather}
+The material law is often defined as
+\begin{gather}
+\dfrac{\mathrm{d}\sigma(u)}{\mathrm{d}u}=\dfrac{\mathrm{d}\sigma}{\mathrm{d}\varepsilon}\dfrac{\mathrm{d}\varepsilon(u)}{\mathrm{d}u}=E(\varepsilon(u))\dfrac{\mathrm{d}\varepsilon(u)}{\mathrm{d}u},
+\end{gather}
+where $E(\varepsilon(u))$ is tangent for given deformation. Hence $\mathbf{K}$ is
+\begin{gather}
+\mathbf{K}=\left(\dfrac{\mathrm{d}A(u)}{\mathrm{d}u}\sigma(u)+A(u)E(\varepsilon(u))\dfrac{\mathrm{d}\varepsilon(u)}{\mathrm{d}u}\right)\dfrac{\mathrm{d}u}{\mathrm{d}\mathbf{v}}\dfrac{\mathrm{d}u}{\mathrm{d}\mathbf{v}}+A(u)\sigma(u)\dfrac{\mathrm{d}^2u}{\mathrm{d}\mathbf{v}^2}.
+\end{gather}
+\subsection{Linear Truss}
+The simplest case would be a linear elastic truss member with an initial length $L_0$ in linear geometry where $A=A_0$ and $E=E_0$ are constants and engineering strain is used so that $A'=0$ and $\varepsilon'=1/L_0$. For such a scenario,
+\begin{gather}
+\mathbf{K}=\dfrac{E_0A_0}{L_0}\dfrac{\mathrm{d}u}{\mathrm{d}\mathbf{v}}\dfrac{\mathrm{d}u}{\mathrm{d}\mathbf{v}}.
+\end{gather}
+Readers must be familiar with the term $k=\dfrac{E_0A_0}{L_0}$ which is known as the axial stiffness that is introduced in Material Mechanics \num{101}.
+\subsection{Constant Area and Engineering Strain}
+Similar to the previous case but here the nonlinear material and geometry are considered. In this case, the stiffness is
+\begin{gather}
+\mathbf{K}=\dfrac{E(u)A_0}{L_0}\dfrac{\mathrm{d}u}{\mathrm{d}\mathbf{v}}\dfrac{\mathrm{d}u}{\mathrm{d}\mathbf{v}}+A_0\sigma(u)\dfrac{\mathrm{d}^2u}{\mathrm{d}\mathbf{v}^2}.
+\end{gather}
+\subsection{Constant Volume and Nonlinear Strains}
+A slightly more complicated case involves both variadic cross section area and nonlinear strain measures.
+
+By denoting the deformed length as $L=L_0+u$, the logarithmic strain $\varepsilon_l$ can be expressed as
+\begin{gather}
+\varepsilon_l(u)=\ln\dfrac{L}{L_0}=\ln\left(1+\dfrac{u}{L_0}\right).
+\end{gather}
+Apart from $\varepsilon_l$, the Green strain $\varepsilon_g$ can be used,
+\begin{gather}
+\varepsilon_g(u)=\dfrac{1}{2}\left(\dfrac{L^2}{L_0^2}-1\right)=\dfrac{u^2}{2L_0^2}+\dfrac{u}{L_0}.
+\end{gather}
+If necessary, the Almansi strain $\varepsilon_a$ can also be used as a proper measure,
+\begin{gather}
+\varepsilon_a(u)=\dfrac{1}{2}\left(1-\dfrac{L_0^2}{L^2}\right)=\dfrac{u}{L}-\dfrac{u^2}{2L^2}.
+\end{gather}
+For all above three cases, the corresponding derivatives are
+\begin{gather}
+\dfrac{\mathrm{d}\varepsilon_l}{\mathrm{d}u}=\dfrac{1}{L},\qquad\dfrac{\mathrm{d}\varepsilon_g}{\mathrm{d}u}=\dfrac{L}{L_0^2},\qquad\dfrac{\mathrm{d}\varepsilon_a}{\mathrm{d}u}=\dfrac{L_0^2}{L^3}.
+\end{gather}
+
+By assuming Poisson's ratio to be \num{0.5}, that is, truss volume is a constant, then cross section area $A(u)$ for any given deformation $u$ can be expressed as
+\begin{gather}
+A(u)=\dfrac{A_0L_0}{L}=\dfrac{A_0L_0}{L_0+u}.
+\end{gather}
+Accordingly,
+\begin{gather}
+\dfrac{\mathrm{d}A(u)}{\mathrm{d}u}=-\dfrac{A_0L_0}{L^2}.
+\end{gather}
+
+For illustration, here the logarithmic strain $\varepsilon_l$ is used. The stiffness $\mathbf{K}$ could be rewritten as
+\begin{gather}
+\mathbf{K}=\dfrac{A_0L_0}{L^2}\left(E(u)-\sigma(u)\right)\dfrac{\mathrm{d}u}{\mathrm{d}\mathbf{v}}\dfrac{\mathrm{d}u}{\mathrm{d}\mathbf{v}}+\dfrac{A_0L_0}{L}\sigma(u)\dfrac{\mathrm{d}^2u}{\mathrm{d}\mathbf{v}^2}.
+\end{gather}
+In this case, the linear part $\mathbf{K}_l$ is
+\begin{gather}
+\mathbf{K}_l=\dfrac{A_0L_0}{L^2}\left(E(u)-\sigma(u)\right)\dfrac{\mathrm{d}u}{\mathrm{d}\mathbf{v}}\dfrac{\mathrm{d}u}{\mathrm{d}\mathbf{v}},
+\end{gather}
+and the geometry stiffness $\mathbf{K}_g$ is
+\begin{gather}
+\mathbf{K}_g=\dfrac{A_0L_0}{L}\sigma(u)\dfrac{\mathrm{d}^2u}{\mathrm{d}\mathbf{v}^2}
+\end{gather}
+so that
+\begin{gather}
+\mathbf{K}=\mathbf{K}_l+\mathbf{K}_g.
+\end{gather}
+For other combinations, $\mathbf{K}$ can be derived in a similar fashion.
+\end{document}

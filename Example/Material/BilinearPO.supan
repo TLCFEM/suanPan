@@ -1,0 +1,5 @@
+material BilinearPO 1 100 .02 .03 .05 .02
+
+materialTest1D 1 1E-3 100 200 200
+
+exit

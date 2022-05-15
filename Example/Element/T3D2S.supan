@@ -1,0 +1,40 @@
+# A TEST MODEL FOR T3D2 ELEMENT
+
+node 1 0 0 0
+node 2 1 0 0
+node 3 0 1 0
+node 4 0 0 1
+
+material MPF 1 1000 3 .4
+
+section Rectangle1D 1 1 1 1
+section Circle1D 2 1 1
+section TrussSection 3 1 1
+section Fibre1D 4 1 2 3
+
+element T3D2S 1 1 4 4 0 1
+element T3D2S 2 2 4 4 1 0
+element T3D2S 3 3 4 4 1 1
+
+fix 1 1 1 2 3
+fix 2 2 1 2 3
+fix 3 3 1 2 3
+
+step static 1
+set ini_step_size 1
+set symm_mat 0
+
+cload 1 0 10 2 4
+
+converger RelIncreDisp 1 1E-10 10 1
+
+analyze
+
+#   0.0020   0.0075   0.0020
+peek node 4
+
+peek element 1
+
+reset
+clear
+exit

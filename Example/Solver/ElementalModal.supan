@@ -1,0 +1,45 @@
+# A TEST MODEL FOR WILSONPENZIEN
+
+node 1 0 0
+node 2 1 0
+
+material Elastic1D 1 10 .2
+
+element EB21 1 1 2 12 1 1
+
+fix 1 P 1
+
+hdf5recorder 1 Node U2 2
+
+modifier ElementalModal 1 1E4 4E-5 1
+
+step static 1 1
+set ini_step_size .1
+
+displacement 1 0 1 2 2
+
+converger AbsIncreDisp 1 1E-8 3 1
+
+step dynamic 2 4
+set ini_step_size .01
+set fixed_step_size 1
+
+integrator Newmark 1 .25 .5
+
+converger RelIncreDisp 2 1E-10 3 1
+
+analyze
+
+# Node 2:
+#    1.0000        0
+# Displacement:
+#         0  -0.5387  -0.7480
+# Resistance:
+#          0  -19.7634    2.4017
+# Velocity:
+#         0   2.1988   2.9521
+# Acceleration:
+#          0   27.5128   38.2263
+peek node 2
+
+exit

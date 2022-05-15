@@ -1,0 +1,114 @@
+\documentclass[10pt,fleqn,3p]{elsarticle}
+\usepackage{amsmath,amsfonts,amssymb,mathpazo}
+\newcommand*{\md}[1]{\mathrm{d}#1}
+\newcommand*{\ramp}[1]{\left\langle#1\right\rangle}
+\newcommand*{\mT}{\mathrm{T}}
+\newcommand*{\tr}[1]{\mathrm{tr}~#1}
+\newcommand*{\dev}[1]{\mathrm{dev}~#1}
+\newcommand*{\ddfrac}[2]{\dfrac{\md#1}{\md#2}}
+\newcommand*{\pfrac}[2]{\dfrac{\partial#1}{\partial#2}}
+\title{Gurson Model}\date{}\author{tlc}
+\begin{document}\pagestyle{empty}
+This document outlines the algorithm used in the Gurson porous model.
+\section{Basics}
+The two-scalar formulation depends on hydrostatic stress $p$ and von Mises equivalent stress $q$.
+\begin{gather*}
+\sigma=s+pI,
+\end{gather*}
+where
+\begin{gather*}
+s=\dev{\sigma},\qquad{}p=\dfrac{\tr{\sigma}}{3}=\dfrac{I_1}{3},\qquad{}q=\sqrt{3J_2}=\sqrt{\dfrac{3}{2}s:s}=\sqrt{\dfrac{3}{2}}|s|.
+\end{gather*}
+The following expression would be useful in the derivation of the corresponding terms.
+\begin{gather*}
+\ddfrac{q^2}{\sigma}=\dfrac{3}{2}\ddfrac{\left(s:s\right)}{\sigma}=\dfrac{3}{2}\left(\ddfrac{s}{\sigma}:s+s:\ddfrac{s}{\sigma}\right)=3s.
+\end{gather*}
+\section{Yield Function}
+The yield function is chosen to be
+\begin{gather*}
+F=q^2+2q_1f\sigma_y^2\cosh\left(\dfrac{3}{2}\dfrac{q_2p}{\sigma_y}\right)-\sigma_y^2\left(q_3f^2+1\right)=0,
+\end{gather*}
+where $\sigma_y$ is a function of the equivalent plastic strain $\varepsilon^p_m$, $f$ is the volume fraction, the remaining $q_1$, $q_2$ and $q_3$ are material constants.
+\section{Flow Rule}
+The associated flow rule is used.
+\begin{gather*}
+\Delta\varepsilon^p=\Delta\gamma\pfrac{F}{\sigma}=\Delta\gamma\left(\pfrac{F}{q^2}\ddfrac{q^2}{\sigma}+\pfrac{F}{p}\ddfrac{p}{\sigma}\right)=\Delta\gamma\left(\pfrac{F}{q^2}3s+\pfrac{F}{p}\dfrac{1}{3}I\right)=\Delta\gamma\left(3s+q_1q_2f\sigma_y\sinh{}I\right).
+\end{gather*}
+By using the elastic relationship,
+\begin{gather*}
+s=2G\varepsilon^e_d=2G\left(\varepsilon^{tr}_d-\Delta\varepsilon^p_d\right)=s^{tr}-\Delta\gamma6Gs,\qquad
+s=\dfrac{1}{1+6G\Delta\gamma}s^{tr},\qquad
+q=\dfrac{1}{1+6G\Delta\gamma}q^{tr},\\
+p=K\varepsilon^e_v=K\left(\varepsilon^{tr}_v-\Delta\varepsilon^p_v\right)=p^{tr}-\Delta\gamma3Kq_1q_2f\sigma_y\sinh.
+\end{gather*}
+Since $q$ can be explicitly expressed as a function of $\Delta\gamma$, one could obtain
+\begin{gather*}
+\ddfrac{q}{\Delta\gamma}=\dfrac{-6Gq^{tr}}{\left(1+6G\Delta\gamma\right)^2}=\dfrac{-6Gq}{1+6G\Delta\gamma}.
+\end{gather*}
+However, $p$ is implicitly related to other variables, it can be treated as an independent variable.
+\section{Hardening Rule}
+The equivalent plastic strain $\varepsilon^p_m$ evolves based on the following expression.
+\begin{gather*}
+\left(1-f\right)\sigma_y\Delta\varepsilon^p_m=\sigma:\Delta\varepsilon^p=2\Delta\gamma\left(\dfrac{q^{tr}}{1+6G\Delta\gamma}\right)^2+3q_1q_2p\Delta\gamma{}f\sigma_y\sinh.
+\end{gather*}
+The change of volume fraction $f$ is governed by the following equation.
+\begin{gather*}
+\Delta{}f=\Delta{}f_g+\Delta{}f_n,
+\end{gather*}
+where
+\begin{gather*}
+\Delta{}f_g=\left(1-f\right)\Delta\varepsilon^p_v=\left(1-f\right)\dfrac{p_{tr}-p}{K},\qquad
+\Delta{}f_n=A_N\Delta\varepsilon^p_m=A_N\left(\varepsilon^p_m-\varepsilon^p_{m,k}\right),
+\end{gather*}
+with $A_N=\dfrac{f_N}{s_N\sqrt{2\pi}}\exp\left(-\dfrac{1}{2}\left(\dfrac{\varepsilon^p_m-\varepsilon_N}{s_N}\right)^2\right)$. The corresponding derivative is
+\begin{gather*}
+\ddfrac{A_N}{\varepsilon^p_m}=A_N\dfrac{\varepsilon_N-\varepsilon^p_m}{s_N^2}.
+\end{gather*}
+\section{Residual}
+The variables $\Delta\gamma$, $\varepsilon^p_m$, $f$ and $p$ are chosen to be the independent variables. The corresponding residual equations are
+\begin{gather}
+R=\begin{Bmatrix}
+F\\E\\V\\P
+\end{Bmatrix}=\left\{\begin{array}{l}
+\left(\dfrac{q^{tr}}{1+6G\Delta\gamma}\right)^2+2q_1f\sigma_y^2\cosh-\sigma_y^2\left(q_3f^2+1\right)=0,\\
+\left(1-f\right)\sigma_y\left(\varepsilon^p_m-\varepsilon^p_{m,k}\right)-2\Delta\gamma\left(\dfrac{q^{tr}}{1+6G\Delta\gamma}\right)^2+\dfrac{p^2-pp^{tr}}{K}=0,\\
+f-f_k+\left(1-f\right)\left(\dfrac{p-p^{tr}}{K}\right)-A_N\left(\varepsilon^p_m-\varepsilon^p_{m,k}\right)=0,\\[4mm]
+p-p^{tr}+3Kq_1q_2\Delta\gamma{}f\sigma_y\sinh=0.
+\end{array}\right.
+\end{gather}
+The Jacobian can be computed via the partial derivatives with $T=3Kq_1q_2$,
+\begin{gather*}
+\pfrac{F}{\Delta\gamma}=\dfrac{-12Gq^2}{1+6G\Delta\gamma},\qquad
+\pfrac{F}{\varepsilon^p_m}=\left(4q_1f\sigma_y\cosh-3q_1q_2fp\sinh-2\sigma_y\left(q_3f^2+1\right)\right)\sigma_y',\\
+\pfrac{F}{f}=2\sigma_y^2\left(q_1\cosh-q_3f\right),\qquad
+\pfrac{F}{p}=3q_1q_2f\sigma_y\sinh,\\
+\pfrac{E}{\Delta\gamma}=-2q^2\dfrac{1-6G\Delta\gamma}{1+6G\Delta\gamma},\qquad
+\pfrac{E}{\varepsilon^p_m}=\left(1-f\right)\left(\sigma_y'\left(\varepsilon^p_m-\varepsilon^p_{m,k}\right)+\sigma_y\right),\\
+\pfrac{E}{f}=-\sigma_y\left(\varepsilon^p_m-\varepsilon^p_{m,k}\right),\qquad
+\pfrac{E}{p}=\dfrac{2p-p^{tr}}{K},\\
+\pfrac{V}{\Delta\gamma}=0,\qquad
+\pfrac{V}{\varepsilon^p_m}=A_N\dfrac{\varepsilon^p_m-\varepsilon_N}{s_N^2}\left(\varepsilon^p_m-\varepsilon^p_{m,k}\right)-A_N,\qquad
+\pfrac{V}{f}=1-\dfrac{p-p^{tr}}{K},\qquad
+\pfrac{V}{p}=\dfrac{1-f}{K},\\
+\pfrac{P}{\Delta\gamma}=Tf\sigma_y\sinh,\qquad
+\pfrac{P}{\varepsilon^p_m}=T\Delta\gamma{}f\left(\sinh-\dfrac{3}{2}\dfrac{q_2p}{\sigma_y}\cosh\right)\sigma_y',\\
+\pfrac{P}{f}=T\Delta\gamma{}\sigma_y\sinh,\qquad
+\pfrac{P}{p}=1+\dfrac{3}{2}Tq_2\Delta\gamma{}f\cosh.
+\end{gather*}
+The corresponding derivatives about the trial strain $\varepsilon^{tr}$ are
+\begin{gather*}
+\pfrac{F}{\varepsilon^{tr}}=\dfrac{6G}{1+6G\Delta\gamma}s,\qquad
+\pfrac{E}{\varepsilon^{tr}}=-2\Delta\gamma\dfrac{6G}{1+6G\Delta\gamma}s-pI,\qquad
+\pfrac{V}{\varepsilon^{tr}}=\left(f-1\right)I,\qquad
+\pfrac{P}{\varepsilon^{tr}}=-KI.
+\end{gather*}
+\section{Consistent Tangent Stiffness}
+The stress update can be expressed as
+\begin{gather*}
+\sigma=\dfrac{1}{1+6G\Delta\gamma}s^{tr}+qI,
+\end{gather*}
+then
+\begin{gather*}
+\ddfrac{\sigma}{\varepsilon^{tr}}=\dfrac{2G}{1+6G\Delta\gamma}I_d-s^{tr}\dfrac{6G}{\left(1+6G\Delta\gamma\right)^2}\ddfrac{\Delta\gamma}{\varepsilon^{tr}}+I\ddfrac{p}{\varepsilon^{tr}}.
+\end{gather*}
+\end{document}

@@ -1,0 +1,70 @@
+# A TEST MODEL FOR VAFCRP MATERIAL
+
+node 1 5 -5 0
+node 2 5 5 0
+node 3 -5 5 0
+node 4 -5 -5 0
+node 5 5 -5 10
+node 6 5 5 10
+node 7 -5 5 10
+node 8 -5 -5 10
+node 9 5 -5 20
+node 10 5 5 20
+node 11 -5 5 20
+node 12 -5 -5 20
+
+material VAFCRP 1 2E5 .2 4E2 1E2 2E2 5E2 1. 1. 1E3 1E2
+
+element C3D8 1 1 2 3 4 5 6 7 8 1 G
+element C3D8 2 5 6 7 8 9 10 11 12 1 G
+
+recorder 1 hdf5 Element E 1
+recorder 2 hdf5 Element S 1
+
+fix2 1 1 1 2 5 6 9 10
+fix2 2 2 1 4 5 8 9 12
+fix2 3 3 1 2 3 4
+
+displacement 1 0 .5 3 9 10 11 12
+
+step static 1
+set fixed_step_size 1
+set ini_step_size 1E-2
+set symm_mat 0
+
+converger RelIncreDisp 1 1E-12 10 1
+
+analyze
+
+# Node 9:
+#     5.0000   -5.0000   20.0000
+# Displacement:
+#         0        0   0.5000
+# Resistance:
+#    1.0651e-13  -4.8376e-13   1.3199e+04
+# 
+# Node 10:
+#     5.0000    5.0000   20.0000
+# Displacement:
+#         0  -0.1171   0.5000
+# Resistance:
+#    4.1362e-12  -1.1330e-13   1.3199e+04
+# 
+# Node 11:
+#    -5.0000    5.0000   20.0000
+# Displacement:
+#    0.1171  -0.1171   0.5000
+# Resistance:
+#   -4.2658e-13   2.0193e-12   1.3199e+04
+# 
+# Node 12:
+#    -5.0000   -5.0000   20.0000
+# Displacement:
+#    0.1171        0   0.5000
+# Resistance:
+#    2.8548e-12  -1.4391e-12   1.3199e+04
+peek node 9 10 11 12
+
+reset
+clear
+exit

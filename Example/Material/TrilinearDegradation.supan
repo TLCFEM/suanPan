@@ -1,0 +1,5 @@
+material MPF 1 1000 5 .1
+material TrilinearDegradation 2 1 1E-2 6E-2 .1
+materialTest1D 2 -1E-4 200 50 150 380 30 50 450 470 500
+
+exit

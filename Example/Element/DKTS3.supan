@@ -1,0 +1,344 @@
+node 1 0.5 0.0 0.0
+node 2 0.5 0.5 0.0
+node 3 0.0 0.5 0.0
+node 4 0.0 0.0 0.0
+node 5 0.5 1.0 0.0
+node 6 0.0 1.0 0.0
+node 7 1.0 0.5 0.0
+node 8 1.0 1.0 0.0
+node 9 1.0 0.0 0.0
+node 10 0.5 0.1 0.0
+node 11 0.5 0.2 0.0
+node 12 0.5 0.3 0.0
+node 13 0.5 0.4 0.0
+node 14 0.4 0.5 0.0
+node 15 0.3 0.5 0.0
+node 16 0.2 0.5 0.0
+node 17 0.1 0.5 0.0
+node 18 0.0 0.4 0.0
+node 19 0.0 0.3 0.0
+node 20 0.0 0.2 0.0
+node 21 0.0 0.1 0.0
+node 22 0.1 0.0 0.0
+node 23 0.2 0.0 0.0
+node 24 0.3 0.0 0.0
+node 25 0.4 0.0 0.0
+node 26 0.5 0.6 0.0
+node 27 0.5 0.7 0.0
+node 28 0.5 0.8 0.0
+node 29 0.5 0.9 0.0
+node 30 0.4 1.0 0.0
+node 31 0.3 1.0 0.0
+node 32 0.2 1.0 0.0
+node 33 0.1 1.0 0.0
+node 34 0.0 0.9 0.0
+node 35 0.0 0.8 0.0
+node 36 0.0 0.7 0.0
+node 37 0.0 0.6 0.0
+node 38 0.6 0.5 0.0
+node 39 0.7 0.5 0.0
+node 40 0.8 0.5 0.0
+node 41 0.9 0.5 0.0
+node 42 1.0 0.6 0.0
+node 43 1.0 0.7 0.0
+node 44 1.0 0.8 0.0
+node 45 1.0 0.9 0.0
+node 46 0.9 1.0 0.0
+node 47 0.8 1.0 0.0
+node 48 0.7 1.0 0.0
+node 49 0.6 1.0 0.0
+node 50 0.6 0.0 0.0
+node 51 0.7 0.0 0.0
+node 52 0.8 0.0 0.0
+node 53 0.9 0.0 0.0
+node 54 1.0 0.1 0.0
+node 55 1.0 0.2 0.0
+node 56 1.0 0.3 0.0
+node 57 1.0 0.4 0.0
+node 58 0.4 0.1 0.0
+node 59 0.4 0.2 0.0
+node 60 0.4 0.3 0.0
+node 61 0.4 0.4 0.0
+node 62 0.3 0.1 0.0
+node 63 0.3 0.2 0.0
+node 64 0.3 0.3 0.0
+node 65 0.3 0.4 0.0
+node 66 0.2 0.1 0.0
+node 67 0.2 0.2 0.0
+node 68 0.2 0.3 0.0
+node 69 0.2 0.4 0.0
+node 70 0.1 0.1 0.0
+node 71 0.1 0.2 0.0
+node 72 0.1 0.3 0.0
+node 73 0.1 0.4 0.0
+node 74 0.4 0.6 0.0
+node 75 0.4 0.7 0.0
+node 76 0.4 0.8 0.0
+node 77 0.4 0.9 0.0
+node 78 0.3 0.6 0.0
+node 79 0.3 0.7 0.0
+node 80 0.3 0.8 0.0
+node 81 0.3 0.9 0.0
+node 82 0.2 0.6 0.0
+node 83 0.2 0.7 0.0
+node 84 0.2 0.8 0.0
+node 85 0.2 0.9 0.0
+node 86 0.1 0.6 0.0
+node 87 0.1 0.7 0.0
+node 88 0.1 0.8 0.0
+node 89 0.1 0.9 0.0
+node 90 0.6 0.9 0.0
+node 91 0.6 0.8 0.0
+node 92 0.6 0.7 0.0
+node 93 0.6 0.6 0.0
+node 94 0.7 0.9 0.0
+node 95 0.7 0.8 0.0
+node 96 0.7 0.7 0.0
+node 97 0.7 0.6 0.0
+node 98 0.8 0.9 0.0
+node 99 0.8 0.8 0.0
+node 100 0.8 0.7 0.0
+node 101 0.8 0.6 0.0
+node 102 0.9 0.9 0.0
+node 103 0.9 0.8 0.0
+node 104 0.9 0.7 0.0
+node 105 0.9 0.6 0.0
+node 106 0.6 0.4 0.0
+node 107 0.6 0.3 0.0
+node 108 0.6 0.2 0.0
+node 109 0.6 0.1 0.0
+node 110 0.7 0.4 0.0
+node 111 0.7 0.3 0.0
+node 112 0.7 0.2 0.0
+node 113 0.7 0.1 0.0
+node 114 0.8 0.4 0.0
+node 115 0.8 0.3 0.0
+node 116 0.8 0.2 0.0
+node 117 0.8 0.1 0.0
+node 118 0.9 0.4 0.0
+node 119 0.9 0.3 0.0
+node 120 0.9 0.2 0.0
+node 121 0.9 0.1 0.0
+
+material Elastic2D 1 12000000 .0
+
+element DKTS3 1 1 10 58 1 0.01
+element DKTS3 2 58 25 1 1 0.01
+element DKTS3 3 10 11 59 1 0.01
+element DKTS3 4 59 58 10 1 0.01
+element DKTS3 5 11 12 60 1 0.01
+element DKTS3 6 60 59 11 1 0.01
+element DKTS3 7 12 13 61 1 0.01
+element DKTS3 8 61 60 12 1 0.01
+element DKTS3 9 13 2 14 1 0.01
+element DKTS3 10 14 61 13 1 0.01
+element DKTS3 11 25 58 62 1 0.01
+element DKTS3 12 62 24 25 1 0.01
+element DKTS3 13 58 59 63 1 0.01
+element DKTS3 14 63 62 58 1 0.01
+element DKTS3 15 59 60 64 1 0.01
+element DKTS3 16 64 63 59 1 0.01
+element DKTS3 17 60 61 65 1 0.01
+element DKTS3 18 65 64 60 1 0.01
+element DKTS3 19 61 14 15 1 0.01
+element DKTS3 20 15 65 61 1 0.01
+element DKTS3 21 24 62 66 1 0.01
+element DKTS3 22 66 23 24 1 0.01
+element DKTS3 23 62 63 67 1 0.01
+element DKTS3 24 67 66 62 1 0.01
+element DKTS3 25 63 64 68 1 0.01
+element DKTS3 26 68 67 63 1 0.01
+element DKTS3 27 64 65 69 1 0.01
+element DKTS3 28 69 68 64 1 0.01
+element DKTS3 29 65 15 16 1 0.01
+element DKTS3 30 16 69 65 1 0.01
+element DKTS3 31 23 66 70 1 0.01
+element DKTS3 32 70 22 23 1 0.01
+element DKTS3 33 66 67 71 1 0.01
+element DKTS3 34 71 70 66 1 0.01
+element DKTS3 35 67 68 72 1 0.01
+element DKTS3 36 72 71 67 1 0.01
+element DKTS3 37 68 69 73 1 0.01
+element DKTS3 38 73 72 68 1 0.01
+element DKTS3 39 69 16 17 1 0.01
+element DKTS3 40 17 73 69 1 0.01
+element DKTS3 41 22 70 21 1 0.01
+element DKTS3 42 21 4 22 1 0.01
+element DKTS3 43 70 71 20 1 0.01
+element DKTS3 44 20 21 70 1 0.01
+element DKTS3 45 71 72 19 1 0.01
+element DKTS3 46 19 20 71 1 0.01
+element DKTS3 47 72 73 18 1 0.01
+element DKTS3 48 18 19 72 1 0.01
+element DKTS3 49 73 17 3 1 0.01
+element DKTS3 50 3 18 73 1 0.01
+element DKTS3 51 2 26 74 1 0.01
+element DKTS3 52 74 14 2 1 0.01
+element DKTS3 53 26 27 75 1 0.01
+element DKTS3 54 75 74 26 1 0.01
+element DKTS3 55 27 28 76 1 0.01
+element DKTS3 56 76 75 27 1 0.01
+element DKTS3 57 28 29 77 1 0.01
+element DKTS3 58 77 76 28 1 0.01
+element DKTS3 59 29 5 30 1 0.01
+element DKTS3 60 30 77 29 1 0.01
+element DKTS3 61 14 74 78 1 0.01
+element DKTS3 62 78 15 14 1 0.01
+element DKTS3 63 74 75 79 1 0.01
+element DKTS3 64 79 78 74 1 0.01
+element DKTS3 65 75 76 80 1 0.01
+element DKTS3 66 80 79 75 1 0.01
+element DKTS3 67 76 77 81 1 0.01
+element DKTS3 68 81 80 76 1 0.01
+element DKTS3 69 77 30 31 1 0.01
+element DKTS3 70 31 81 77 1 0.01
+element DKTS3 71 15 78 82 1 0.01
+element DKTS3 72 82 16 15 1 0.01
+element DKTS3 73 78 79 83 1 0.01
+element DKTS3 74 83 82 78 1 0.01
+element DKTS3 75 79 80 84 1 0.01
+element DKTS3 76 84 83 79 1 0.01
+element DKTS3 77 80 81 85 1 0.01
+element DKTS3 78 85 84 80 1 0.01
+element DKTS3 79 81 31 32 1 0.01
+element DKTS3 80 32 85 81 1 0.01
+element DKTS3 81 16 82 86 1 0.01
+element DKTS3 82 86 17 16 1 0.01
+element DKTS3 83 82 83 87 1 0.01
+element DKTS3 84 87 86 82 1 0.01
+element DKTS3 85 83 84 88 1 0.01
+element DKTS3 86 88 87 83 1 0.01
+element DKTS3 87 84 85 89 1 0.01
+element DKTS3 88 89 88 84 1 0.01
+element DKTS3 89 85 32 33 1 0.01
+element DKTS3 90 33 89 85 1 0.01
+element DKTS3 91 17 86 37 1 0.01
+element DKTS3 92 37 3 17 1 0.01
+element DKTS3 93 86 87 36 1 0.01
+element DKTS3 94 36 37 86 1 0.01
+element DKTS3 95 87 88 35 1 0.01
+element DKTS3 96 35 36 87 1 0.01
+element DKTS3 97 88 89 34 1 0.01
+element DKTS3 98 34 35 88 1 0.01
+element DKTS3 99 89 33 6 1 0.01
+element DKTS3 100 6 34 89 1 0.01
+element DKTS3 101 5 29 90 1 0.01
+element DKTS3 102 90 49 5 1 0.01
+element DKTS3 103 29 28 91 1 0.01
+element DKTS3 104 91 90 29 1 0.01
+element DKTS3 105 28 27 92 1 0.01
+element DKTS3 106 92 91 28 1 0.01
+element DKTS3 107 27 26 93 1 0.01
+element DKTS3 108 93 92 27 1 0.01
+element DKTS3 109 26 2 38 1 0.01
+element DKTS3 110 38 93 26 1 0.01
+element DKTS3 111 49 90 94 1 0.01
+element DKTS3 112 94 48 49 1 0.01
+element DKTS3 113 90 91 95 1 0.01
+element DKTS3 114 95 94 90 1 0.01
+element DKTS3 115 91 92 96 1 0.01
+element DKTS3 116 96 95 91 1 0.01
+element DKTS3 117 92 93 97 1 0.01
+element DKTS3 118 97 96 92 1 0.01
+element DKTS3 119 93 38 39 1 0.01
+element DKTS3 120 39 97 93 1 0.01
+element DKTS3 121 48 94 98 1 0.01
+element DKTS3 122 98 47 48 1 0.01
+element DKTS3 123 94 95 99 1 0.01
+element DKTS3 124 99 98 94 1 0.01
+element DKTS3 125 95 96 100 1 0.01
+element DKTS3 126 100 99 95 1 0.01
+element DKTS3 127 96 97 101 1 0.01
+element DKTS3 128 101 100 96 1 0.01
+element DKTS3 129 97 39 40 1 0.01
+element DKTS3 130 40 101 97 1 0.01
+element DKTS3 131 47 98 102 1 0.01
+element DKTS3 132 102 46 47 1 0.01
+element DKTS3 133 98 99 103 1 0.01
+element DKTS3 134 103 102 98 1 0.01
+element DKTS3 135 99 100 104 1 0.01
+element DKTS3 136 104 103 99 1 0.01
+element DKTS3 137 100 101 105 1 0.01
+element DKTS3 138 105 104 100 1 0.01
+element DKTS3 139 101 40 41 1 0.01
+element DKTS3 140 41 105 101 1 0.01
+element DKTS3 141 46 102 45 1 0.01
+element DKTS3 142 45 8 46 1 0.01
+element DKTS3 143 102 103 44 1 0.01
+element DKTS3 144 44 45 102 1 0.01
+element DKTS3 145 103 104 43 1 0.01
+element DKTS3 146 43 44 103 1 0.01
+element DKTS3 147 104 105 42 1 0.01
+element DKTS3 148 42 43 104 1 0.01
+element DKTS3 149 105 41 7 1 0.01
+element DKTS3 150 7 42 105 1 0.01
+element DKTS3 151 2 13 106 1 0.01
+element DKTS3 152 106 38 2 1 0.01
+element DKTS3 153 13 12 107 1 0.01
+element DKTS3 154 107 106 13 1 0.01
+element DKTS3 155 12 11 108 1 0.01
+element DKTS3 156 108 107 12 1 0.01
+element DKTS3 157 11 10 109 1 0.01
+element DKTS3 158 109 108 11 1 0.01
+element DKTS3 159 10 1 50 1 0.01
+element DKTS3 160 50 109 10 1 0.01
+element DKTS3 161 38 106 110 1 0.01
+element DKTS3 162 110 39 38 1 0.01
+element DKTS3 163 106 107 111 1 0.01
+element DKTS3 164 111 110 106 1 0.01
+element DKTS3 165 107 108 112 1 0.01
+element DKTS3 166 112 111 107 1 0.01
+element DKTS3 167 108 109 113 1 0.01
+element DKTS3 168 113 112 108 1 0.01
+element DKTS3 169 109 50 51 1 0.01
+element DKTS3 170 51 113 109 1 0.01
+element DKTS3 171 39 110 114 1 0.01
+element DKTS3 172 114 40 39 1 0.01
+element DKTS3 173 110 111 115 1 0.01
+element DKTS3 174 115 114 110 1 0.01
+element DKTS3 175 111 112 116 1 0.01
+element DKTS3 176 116 115 111 1 0.01
+element DKTS3 177 112 113 117 1 0.01
+element DKTS3 178 117 116 112 1 0.01
+element DKTS3 179 113 51 52 1 0.01
+element DKTS3 180 52 117 113 1 0.01
+element DKTS3 181 40 114 118 1 0.01
+element DKTS3 182 118 41 40 1 0.01
+element DKTS3 183 114 115 119 1 0.01
+element DKTS3 184 119 118 114 1 0.01
+element DKTS3 185 115 116 120 1 0.01
+element DKTS3 186 120 119 115 1 0.01
+element DKTS3 187 116 117 121 1 0.01
+element DKTS3 188 121 120 116 1 0.01
+element DKTS3 189 117 52 53 1 0.01
+element DKTS3 190 53 121 117 1 0.01
+element DKTS3 191 41 118 57 1 0.01
+element DKTS3 192 57 7 41 1 0.01
+element DKTS3 193 118 119 56 1 0.01
+element DKTS3 194 56 57 118 1 0.01
+element DKTS3 195 119 120 55 1 0.01
+element DKTS3 196 55 56 119 1 0.01
+element DKTS3 197 120 121 54 1 0.01
+element DKTS3 198 54 55 120 1 0.01
+element DKTS3 199 121 53 9 1 0.01
+element DKTS3 200 9 54 121 1 0.01
+
+fix 1 E 6 34 35 36 37 3 18 19 20 21 4 22 23 24 25 1 50 51 52 53 9 54 55 56 57 7 42 43 44 45 8 46 47 48 49 5 30 31 32 33
+
+cload 1 0 1 3 2
+
+step static 1
+
+analyze
+
+# Node 2:
+#    0.5000   0.5000        0
+# Displacement:
+#    5.7269e-03  -4.6327e-17  -1.1161e-17
+# Resistance:
+#    1.0000e+00   2.2547e-15   3.5388e-16
+peek node 2
+
+reset
+clear
+exit

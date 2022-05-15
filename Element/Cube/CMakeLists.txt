@@ -1,0 +1,9 @@
+set(Cube
+        Cube/C3D20.cpp
+        Cube/C3D4.cpp
+        Cube/C3D8.cpp
+        Cube/C3D8I.cpp
+        Cube/CIN3D8.cpp
+        Cube/DC3D4.cpp
+        Cube/DC3D8.cpp
+        )

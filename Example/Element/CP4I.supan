@@ -1,0 +1,56 @@
+# A TEST MODEL FOR CP4I ELEMENT
+
+node 1 0 0
+node 2 2 0
+node 3 4 0
+node 4 6 0
+node 5 8 0
+node 6 10 0
+
+node 7 0 2
+node 8 2 2
+node 9 4 2
+node 10 6 2
+node 11 8 2
+node 12 10 2
+
+material Elastic2D 1 1500 .25 1E-4
+
+element CP4I 1 1 2 8 7 1 1
+element CP4I 2 2 3 9 8 1 1
+element CP4I 3 3 4 10 9 1 1
+element CP4I 4 4 5 11 10 1 1
+element CP4I 5 5 6 12 11 1 1
+
+fix 1 1 1 7
+fix 2 2 1
+
+cload 1 0 150 2 6 12
+cload 2 0 -150 2 7
+
+hdf5recorder 1 Element S 1 2 3 4 5
+
+step static 1
+
+analyze
+
+# Node 6:
+# 10.0000 0
+# Displacement:
+# 1.5000E+01 1.0150E+02
+# Resistance:
+# 6.3345E-12 1.5000E+02
+# 
+# Node 12:
+# 10.0000 2.0000
+# Displacement:
+# -1.5000E+01 1.0150E+02
+# Resistance:
+# -6.3380E-12 1.5000E+02
+peek node 6 12
+
+peek element 1
+
+reset
+clear
+exit

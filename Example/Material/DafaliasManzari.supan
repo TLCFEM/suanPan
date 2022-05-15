@@ -1,0 +1,35 @@
+# A TEST MODEL FOR DAFALIASMANZARI MATERIAL
+
+node 1 5 -5 0
+node 2 5 5 0
+node 3 -5 5 0
+node 4 -5 -5 0
+node 5 5 -5 10
+node 6 5 5 10
+node 7 -5 5 10
+node 8 -5 -5 10
+
+material DafaliasManzari 1
+
+element C3D8 1 1 2 3 4 5 6 7 8 1 G
+
+recorder 2 hdf5 Element S 1
+
+fix 1 1 1 2 3 4 5 6 7 8
+fix 2 2 1 2 3 4 5 6 7 8
+fix 3 3 1 2 3 4
+
+displacement 1 0 -.02 3 5 6 7 8
+
+step static 1
+set fixed_step_size 1
+set ini_step_size 1E-2
+set symm_mat 0
+
+converger RelIncreDisp 1 1E-12 10 1
+
+analyze
+
+reset
+clear
+exit

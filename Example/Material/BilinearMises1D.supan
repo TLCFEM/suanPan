@@ -1,0 +1,35 @@
+# A TEST MODEL FOR BILINEARMISES1D MATERIAL
+
+node 1 0 0
+node 2 4 0
+
+material BilinearMises1D 1 100 5 -.1
+
+element T2D2 1 1 2 1 10
+
+fix 1 2 1 2
+fix 2 1 1
+
+step static 1
+set fixed_step_size 1
+set ini_step_size 1E-2
+set symm_mat 0
+set band_mat 0
+
+displacement 1 0 1 1 2
+
+converger AbsIncreDisp 1 1E-10 10 1
+
+analyze
+
+# Node 2:
+#    4.0000        0
+# Displacement:
+#    1.0000        0
+# Resistance:
+#    30.0000         0
+peek node 2
+
+reset
+clear
+exit

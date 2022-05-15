@@ -1,0 +1,38 @@
+# A TEST MODEL FOR ARMSTRONGFREDERICK1D MATERIAL
+
+node 1 0 0
+node 2 4 0
+node 3 0 -3
+
+material ArmstrongFrederick1D 1 2E5 4E2 1E2 2E2 5E2 1E3 1E2
+
+element T2D2 1 1 2 1 10
+element T2D2 2 3 2 1 10
+
+hdf5recorder 1 Element PEEQ 1
+hdf5recorder 2 Element E 1
+
+fix 1 P 1 3
+
+displacement 1 0 1 2 2
+
+step static 1
+set fixed_step_size 1
+set ini_step_size .01
+set symm_mat 0
+
+converger RelIncreDisp 1 1E-10 10 1
+
+analyze
+
+# Node 2:
+#    4.0000        0
+# Displacement:
+#   -0.0109   1.0000
+# Resistance:
+#    4.2649e-05   3.1987e+03
+peek node 2
+
+reset
+clear
+exit

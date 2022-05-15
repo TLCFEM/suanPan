@@ -1,0 +1,55 @@
+# A TEST MODEL FOR GQ12 ELEMENT
+
+node 1 0 0
+node 2 1 0
+node 3 2 0
+node 4 4 0
+node 5 7 0
+node 6 10 0
+
+node 7 0 2
+node 8 2 2
+node 9 4 2
+node 10 5 2
+node 11 6 2
+node 12 10 2
+
+material Elastic2D 1 1500 .25 1E-4
+
+element GQ12 1 1 2 8 7 1 1
+element GQ12 2 2 3 9 8 1 1
+element GQ12 3 3 4 10 9 1 1
+element GQ12 4 4 5 11 10 1 1
+element GQ12 5 5 6 12 11 1 1
+
+fix 1 1 1 7
+fix 2 2 1
+fix 3 3 1 7
+
+cload 1 0 150 2 6 12
+cload 2 0 -150 2 7
+
+step static 1
+
+analyze
+
+# Node 6:
+# 10.0000 0
+# Displacement:
+# 14.3632 97.4565 11.8044
+# Resistance:
+# 3.8511E-12 1.5000E+02 6.7359E-12
+# 
+# Node 12:
+# 10.0000 2.0000
+# Displacement:
+# -14.5369 97.9538 12.3253
+# Resistance:
+# -8.8107E-13 1.5000E+02 -8.4945E-12
+peek node 6 12
+
+peek element 1
+
+reset
+clear
+exit

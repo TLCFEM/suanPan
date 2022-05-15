@@ -1,0 +1,37 @@
+# A TEST MODEL FOR BODYFORCE MATERIAL
+
+node 1 0 0
+node 2 1 0
+node 3 1 1
+node 4 0 1
+
+element CP4 1 1 2 3 4 1 1
+
+fix2 1 1 1
+fix2 2 2 1 2
+
+bodyforce 1 0 2 2 1
+
+material Elastic2D 1 5000 .2
+
+step static 1
+set ini_step_size .1
+set fixed_step_size true
+
+converger RelIncreDisp 1 1E-10 10 1
+
+analyze
+
+# Node 2:
+#    1.0000        0
+# Displacement:
+#   -4.0000e-05            0
+# Resistance:
+#    3.5293e-18  -5.0000e-01
+peek node 2
+
+peek element 1
+
+reset
+clear
+exit

@@ -1,0 +1,35 @@
+# A TEST MODEL FOR SINGLESECTION ELEMENT
+
+node 1 0 0
+
+material Bilinear1D 1 10 .8 .02
+
+section Rectangle2D 1 12 1 1
+
+element SingleSection2D 1 1 1
+
+cload 1 0 3 2 1
+
+hdf5recorder 1 Node U 1
+
+step static 1 1
+set ini_step_size .1
+set fixed_step_size 1
+
+converger RelIncreDisp 1 1E-8 10 1
+
+analyze
+
+peek element 1
+
+# Node 1:
+#         0        0
+# Displacement:
+#    4.9538e-16   3.0060e+00
+# Resistance:
+#    4.4409e-16   3.0000e+00
+peek node 1
+
+reset
+clear
+exit

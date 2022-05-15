@@ -1,0 +1,75 @@
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Windows Installer files
+*.aps
+*.cab
+*.h5
+*.msi
+*.msm
+*.msp
+*.u2d
+/.idea/*
+/.vscode/*
+/build/*
+/Checker/.idea/*
+/cmake-build*/*
+/Document/*
+/MSVC/Debug/*
+/MSVC/Release/*
+/MSVC/suanPan/.vs/*
+/MSVC/suanPan/amd/x64/*
+/MSVC/suanPan/arpack/x64/*
+/MSVC/suanPan/ElementExample/x64/*
+/MSVC/suanPan/feast/x64/*
+/MSVC/suanPan/MaterialExample/x64/*
+/MSVC/suanPan/ModifierExample/x64/*
+/MSVC/suanPan/ModuleBundle/x64/*
+/MSVC/suanPan/metis/x64/*
+/MSVC/suanPan/mumps_c/x64/*
+/MSVC/suanPan/mumps_f/x64/*
+/MSVC/suanPan/SectionExample/x64/*
+/MSVC/suanPan/spmm/x64/*
+/MSVC/suanPan/suanPan/x64/*
+/MSVC/suanPan/superlu/x64/*
+/MSVC/suanPan/superlumt/x64/*
+venv
+
+# Windows shortcuts
+*.lnk
+
+# =========================
+# Operating System Files
+# =========================
+
+# OSX
+# =========================
+
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk

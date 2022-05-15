@@ -1,0 +1,39 @@
+name: Dev
+on:
+  push:
+    branches: [ dev ]
+  pull_request:
+    branches: [ dev ]
+jobs:
+  linux-dev:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Clone
+        uses: actions/checkout@v2
+      - name: Golang
+        uses: actions/setup-go@v2
+      - name: Compile
+        run: |
+          go build Checker/updater.go
+          mkdir cmake-build-debug && cd cmake-build-debug
+          cmake -DCMAKE_BUILD_TYPE=Debug -DTEST_COVERAGE=ON -DUSE_HDF5=ON ../
+          make -j4
+          chmod +x ../Script/Coverage.sh
+          ../Script/Coverage.sh .
+          for SRC in `find . | egrep '\.o'`; do gcov -n $SRC > /dev/null; done
+          bash <(curl -s https://codecov.io/bash)
+  macos-dev:
+    runs-on: macos-11
+    steps:
+      - name: Clone
+        uses: actions/checkout@v2
+      - name: Golang
+        uses: actions/setup-go@v2
+      - name: Compile
+        run: |
+          export CC=gcc-10 && export CXX=g++-10 && export FC=gfortran-10
+          go build Checker/updater.go
+          brew install libomp
+          cmake -DCMAKE_BUILD_TYPE=Debug -DUSE_HDF5=ON .
+          make -j4
+          ./suanPan -v

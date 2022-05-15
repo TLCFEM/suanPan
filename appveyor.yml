@@ -1,0 +1,19 @@
+version: "0.0.{build}"
+branches:
+  only:
+    - master
+skip_tags: true
+max_jobs: 8
+image: Visual Studio 2022
+configuration: Debug
+platform: x64
+clone_depth: 1
+init:
+  - ps: '$env:SP_TAG=''daily-''+(get-date -format "yyyyMMddHH")'
+nuget:
+  account_feed: true
+  project_feed: true
+  disable_publish_on_pr: true
+build:
+  parallel: true
+  verbosity: minimal

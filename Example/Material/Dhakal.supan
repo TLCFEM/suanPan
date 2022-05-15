@@ -1,0 +1,5 @@
+material MPF 1 1000 5 .1
+material Dhakal 2 1 5E-3 5
+materialTest1D 2 -1E-4 200 50 150 380 30 50 450 470 500
+
+exit

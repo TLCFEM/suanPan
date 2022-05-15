@@ -1,0 +1,99 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=20mm]{geometry}
+\usepackage{mathpazo,amsmath,amsfonts,amssymb}
+\newcommand*{\md}[1]{\mathrm{d}#1}
+\newcommand*{\pfrac}[2]{\dfrac{\partial#1}{\partial#2}}
+\newcommand*{\ddfrac}[2]{\dfrac{\md#1}{\md#2}}
+\title{Armstrong--Frederick Steel Model}
+\author{Theodore Chang}
+\date{}\pagestyle{empty}
+\begin{document}
+\noindent{}This document introduces the implementation of the Armstrong--Frederick Steel Model.
+\section{Yield Function}
+A von Mises yielding function is used.
+\begin{gather}
+F=\sqrt{\dfrac{3}{2}}\Big|\eta\Big|-k,
+\end{gather}
+in which $\eta=s-\beta$ is the shifted stress, $s$ is the stress deviator, $\beta$ is the back stress and $k$ is the isotropic hardening stress.
+\section{Flow Rule}
+The associated plasticity flow is adopted. The plastic strain rate is then
+\begin{gather}
+\md{\varepsilon^p}=\gamma\pfrac{F}{\sigma}=\sqrt{\dfrac{3}{2}}\gamma{}n,
+\end{gather}
+where $n=\dfrac{\eta}{\Big|\eta\Big|}$. The corresponding accumulated plastic strain rate is
+\begin{gather}
+\md{p}=\sqrt{\dfrac{2}{3}\md{\varepsilon^p}:\md{\varepsilon^p}}=\gamma.
+\end{gather}
+\section{Hardening Rules}
+An exponential function with a linear component is used for isotropic hardening stress.
+\begin{gather}
+k=\sigma_y+k_lp+k_s-k_se^{-mp}.
+\end{gather}
+The corresponding derivative is
+\begin{gather}
+\ddfrac{k}{\gamma}=k_l+k_sme^{-mp}.
+\end{gather}
+The rate form of back stress $\displaystyle\beta=\sum\beta^i$ is defined as
+\begin{gather*}
+\md{\beta^i}=\sqrt{\dfrac{2}{3}}a^i\md{\varepsilon^p}-b^i\beta^i\md{p}.
+\end{gather*}
+In terms of $\gamma$, it is $\md{\beta^i}=a^i\gamma{}n-b^i\gamma\beta^i$. The incremental form is thus
+\begin{gather}
+\beta^i=\beta_n^i+a^i\gamma{}n-b^i\gamma\beta^i,\qquad
+\beta^i=\dfrac{\beta_n^i+a^i\gamma{}n}{1+b^i\gamma}.
+\end{gather}
+\section{Incremental Form}
+The shifted stress can be computed as
+\begin{gather}
+\eta=s-\beta=2GI_d\left(\varepsilon^{tr}-\varepsilon^p_n-\sqrt{\dfrac{3}{2}}\gamma{}n\right)-\beta=s^{tr}-\sqrt{6}G\gamma{}n-\sum\dfrac{\beta_n^i+a^i\gamma{}n}{1+b^i\gamma}
+\end{gather}
+with $s^{tr}=2GI_d\left(\varepsilon^{tr}-\varepsilon^p_n\right)$. Hence,
+\begin{gather*}
+\Big|\eta\Big|n+\sqrt{6}G\gamma{}n+\sum\dfrac{a^i\gamma}{1+b^i\gamma}n=s^{tr}-\sum\dfrac{\beta_n^i}{1+b^i\gamma},\qquad
+\Big|\eta\Big|+\sqrt{6}G\gamma+\sum\dfrac{a^i\gamma}{1+b^i\gamma}=\Big|s^{tr}-\sum\dfrac{\beta_n^i}{1+b^i\gamma}\Big|.
+\end{gather*}
+Eventually,
+\begin{gather}
+\Big|\eta\Big|=\Big|s^{tr}-\sum\dfrac{\beta_n^i}{1+b^i\gamma}\Big|-\sqrt{6}G\gamma-\sum\dfrac{a^i\gamma}{1+b^i\gamma}.
+\end{gather}
+Then $\eta$ can be expressed as,
+\begin{gather*}
+\eta=\dfrac{\Big|s^{tr}-\sum\dfrac{\beta_n^i}{1+b^i\gamma}\Big|-\sqrt{6}G\gamma-\sum\dfrac{a^i\gamma}{1+b^i\gamma}}{\Big|s^{tr}-\sum\dfrac{\beta_n^i}{1+b^i\gamma}\Big|}\left(s^{tr}-\sum\dfrac{\beta_n^i}{1+b^i\gamma}\right).
+\end{gather*}
+It is equivalent to
+\begin{gather*}
+\eta=\left(\Big|s^{tr}-\sum\dfrac{\beta_n^i}{1+b^i\gamma}\Big|-\sqrt{6}G\gamma-\sum\dfrac{a^i\gamma}{1+b^i\gamma}\right)u.
+\end{gather*}
+It is easy to see that $n=u$ with $\displaystyle{}u=\dfrac{s^{tr}-\sum\dfrac{\beta_n^i}{1+b^i\gamma}}{\Big|s^{tr}-\sum\dfrac{\beta_n^i}{1+b^i\gamma}\Big|}$. The derivatives of $u$ are
+\begin{gather}
+\pfrac{u}{\gamma}=\dfrac{1}{\Big|s^{tr}-\sum\dfrac{\beta_n^i}{1+b^i\gamma}\Big|}\sum\dfrac{b^i}{(1+b^i\gamma)^2}\left(\beta_n^i-u:\beta_n^iu\right),\qquad
+\pfrac{u}{\varepsilon^{tr}}=\dfrac{1}{\Big|s^{tr}-\sum\dfrac{\beta_n^i}{1+b^i\gamma}\Big|}2G\left(I_d-u\otimes{}u\right).
+\end{gather}
+\section{Scalar Equation Iteration}
+The yield function is then
+\begin{gather}
+F=\sqrt{\dfrac{3}{2}}\left(\Big|s^{tr}-\sum\dfrac{\beta_n^i}{1+b^i\gamma}\Big|-\sqrt{6}G\gamma-\sum\dfrac{a^i\gamma}{1+b^i\gamma}\right)-\left(\sigma_y+k_l\left(p_n+\gamma\right)+k_s\left(1-e^{-m\left(p_n+\gamma\right)}\right)\right).
+\end{gather}
+The corresponding derivative is then
+\begin{gather}
+\pfrac{F}{\gamma}=\sqrt{\dfrac{3}{2}}\sum\dfrac{b^iu:\beta_n^i-a^i}{(1+b^i\gamma)^2}-3G-k_l-k_sme^{-m\left(p_n+\gamma\right)},\qquad
+\pfrac{F}{\varepsilon^{tr}}=\sqrt{6}Gu:I_d=\sqrt{6}Gu.
+\end{gather}
+Note $u:I_d=u$ since $u$ is a deviator.
+\section{Consistent Tangent Stiffness}
+For stiffness, $\varepsilon^{tr}$ is now varying, then
+\begin{gather}
+\pfrac{F}{\varepsilon^{tr}}+\pfrac{F}{\gamma}\ddfrac{\gamma}{\varepsilon^{tr}}=0,\qquad\ddfrac{\gamma}{\varepsilon^{tr}}=-\left(\pfrac{F}{\gamma}\right)^{-1}\pfrac{F}{\varepsilon^{tr}}.
+\end{gather}
+Since the stress can be written as
+\begin{gather}
+\sigma=E(\varepsilon^{tr}-\varepsilon^p)=E(\varepsilon^{tr}-\varepsilon^p_n-\Delta\varepsilon^p)=E(\varepsilon^{tr}-\varepsilon^p_n)-\sqrt{6}G\gamma{}u.
+\end{gather}
+The derivative is
+\begin{gather}
+\begin{split}
+\ddfrac{\sigma}{\varepsilon^{tr}}&=E-\sqrt{6}G\left(\gamma\pfrac{u}{\varepsilon^{tr}}+\left(u+\gamma\pfrac{u}{\gamma}\right)\ddfrac{\gamma}{\varepsilon^{tr}}\right)\\
+&=E-\sqrt{6}G\gamma\pfrac{u}{\varepsilon^{tr}}+6G^2\left(u+\gamma\pfrac{u}{\gamma}\right)\left(\pfrac{F}{\gamma}\right)^{-1}u.
+\end{split}
+\end{gather}
+\end{document}

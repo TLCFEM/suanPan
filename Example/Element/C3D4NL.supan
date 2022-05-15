@@ -1,0 +1,69 @@
+# A TEST MODEL FOR C3D4 ELEMENT
+
+node 1 0 0 1
+node 2 0 0 0
+node 3 0 1 1
+node 4 0 1 0
+node 5 1 0 1
+node 6 1 0 0
+node 7 1 1 1
+node 8 1 1 0
+node 9 0 0.5 0.5
+node 10 1 0.5 0.5
+node 11 0.5 0 0.5
+node 12 0.5 1 0.5
+node 13 0.5 0.5 0
+node 14 0.5 0.5 1
+
+element C3D4 180 14 9 12 11 1 1
+element C3D4 181 12 9 13 11 1 1
+element C3D4 186 12 14 11 10 1 1
+element C3D4 188 13 12 11 10 1 1
+element C3D4 166 3 1 9 14 1 1
+element C3D4 167 5 1 14 11 1 1
+element C3D4 168 4 8 12 13 1 1
+element C3D4 169 2 4 9 13 1 1
+element C3D4 170 3 7 14 12 1 1
+element C3D4 171 8 7 12 10 1 1
+element C3D4 172 4 3 9 12 1 1
+element C3D4 174 11 5 6 10 1 1
+element C3D4 176 7 5 14 10 1 1
+element C3D4 177 2 13 11 6 1 1
+element C3D4 178 1 2 9 11 1 1
+element C3D4 184 8 13 6 10 1 1
+element C3D4 165 9 4 12 13 1 1
+element C3D4 173 9 3 14 12 1 1
+element C3D4 175 9 2 13 11 1 1
+element C3D4 179 1 9 14 11 1 1
+element C3D4 182 7 14 12 10 1 1
+element C3D4 183 8 12 13 10 1 1
+element C3D4 185 14 5 11 10 1 1
+element C3D4 187 13 11 6 10 1 1
+
+material Elastic3D 1 1000 .2 1E-4
+
+fix2 1 1 1 2 3 4 9
+fix2 2 2 3 7 4 8 12
+fix2 3 3 2 4 6 8 13
+
+displacement 1 0 .2 3 1 3 5 7 14
+
+step static 1
+set fixed_step_size 1
+set ini_step_size .2
+
+converger RelIncreDisp 1 1E-12 7 1
+
+analyze
+
+# Node 14:
+#    0.5000   0.5000   1.0000
+# Displacement:
+#   -0.0225   0.0225   0.2000
+# Resistance:
+#    1.6725e-15  -7.0979e-16   8.8000e+01
+peek node 14
+
+reset
+clear
+exit

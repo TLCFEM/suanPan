@@ -1,0 +1,39 @@
+# A TEST MODEL FOR DAMPER02
+
+node 1 0 0
+node 2 1 0
+
+material Elastic1D 1 20
+material Viscosity02 2 .6 1E1 1E1 1E1 1E1 2E2 2E2 1E3
+
+element T2D2 1 1 2 1 1
+element Damper02 2 1 2 2 1
+# element Damper01 3 1 2 2
+
+element Mass 3 2 1 1
+
+fix 1 1 1
+fix 2 2 1 2
+
+amplitude Sine 2 1 1
+amplitude Linear 3 10
+amplitude Combine 1 2 3
+
+# acceleration 2 1 1 1 2
+displacement 2 1 1 1 2
+
+step dynamic 1 20
+set ini_step_size .01
+set fixed_step_size 1
+
+integrator Newmark 1
+
+converger RelIncreDisp 1 1E-8 4 1
+
+analyze
+
+peek element 2 3
+
+reset
+clear
+exit

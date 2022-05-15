@@ -1,0 +1,17 @@
+coverage:
+  range: 70..80
+  round: nearest
+  precision: 4
+ignore:
+  - "**/*Parser.cpp"
+  - "Developer"
+  - "Include"
+  - "MSVC"
+  - "Toolbox/amd-src"
+  - "Toolbox/arpack-src"
+  - "Toolbox/feast-src"
+  - "Toolbox/lapack-ext"
+  - "Toolbox/metis-src"
+  - "Toolbox/mumps-src"
+  - "Toolbox/superlu-src"
+  - "Toolbox/superlumt-src"

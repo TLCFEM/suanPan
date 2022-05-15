@@ -1,0 +1,64 @@
+\documentclass[10pt,fleqn,1p]{elsarticle}
+\usepackage{amsmath,amsfonts,amssymb,mathpazo,indentfirst}
+\newcommand*{\md}[1]{\mathrm{d}#1}
+\newcommand*{\mT}{\mathrm{T}}
+\newcommand*{\tr}[1]{\mathrm{tr}#1}
+\newcommand*{\ddfrac}[2]{\dfrac{\md#1}{\md#2}}
+\newcommand*{\pfrac}[2]{\dfrac{\partial#1}{\partial#2}}
+\title{Contact2D Implementation}\date{}\author{tlc}
+\begin{document}\pagestyle{empty}
+The Contact2D element defines node--line contact interaction.
+
+The master line is defined by two points with coordinates $r_1$ and $r_2$. The slave node is located at $r_3$.
+
+The axis of master line can be expressed as
+\begin{gather}
+l=r_2-r_1.
+\end{gather}
+Then the outer norm is defined by rotating $n_l$, which is the normalised $l$, by $\pi/2$, which can be expressed as
+\begin{gather}
+n=Tn_l=T\dfrac{l}{|l|},
+\end{gather}
+where $T$ is the constant rotation/transformation matrix. The explicit form is
+\begin{gather*}
+T=\begin{bmatrix}
+0&-1\\1&0
+\end{bmatrix}.
+\end{gather*}
+The derivative of outer norm is
+\begin{gather}
+\ddfrac{n}{l}=\dfrac{1}{|l|}\left(T-n\otimes{}n_l\right).
+\end{gather}
+
+Define the vector $s=r_3-r_1$ to be the difference between slave node and the starting node of master line, then the contact is activated when the following conditions are met.
+\begin{gather}
+u=s\cdot{}n\leqslant0,\qquad{}t=\dfrac{t_u}{t_d}=\dfrac{s\cdot{}l}{l\cdot{}l}\in[0,~1].
+\end{gather}
+The penetration $u$ is used to define the contact resistance. For slave node,
+\begin{gather}
+F_3=\alpha{}un.
+\end{gather}
+According to moment equilibrium, the resistance on master nodes are
+\begin{gather}
+F_2=-\alpha{}tun,\\
+F_1=\alpha\left(t-1\right)un.
+\end{gather}
+
+Some derivatives are useful.
+\begin{gather}
+\pfrac{u}{r_1}=-n^\mT-s^\mT\ddfrac{n}{l},\quad
+\pfrac{u}{r_2}=s^\mT\ddfrac{n}{l},\quad
+\pfrac{u}{r_3}=n^\mT,\\
+\pfrac{t_u}{r_1}=-s^\mT-l^\mT,\quad
+\pfrac{t_u}{r_2}=s^\mT,\quad
+\pfrac{t_u}{r_3}=l^\mT,\\
+\pfrac{t_d}{r_1}=-2l^\mT,\quad
+\pfrac{t_d}{r_2}=2l^\mT.
+\end{gather}
+
+Hence,
+\begin{gather}
+\pfrac{t}{r_i}=\dfrac{t_d\pfrac{t_u}{r_i}-t_u\pfrac{t_d}{r_i}}{t_d^2},
+\end{gather}
+where $i$ ranges from $1$ to $3$.
+\end{document}

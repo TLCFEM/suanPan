@@ -1,0 +1,68 @@
+# A TEST MODEL FOR B21 ELEMENT
+
+node 1 0 0
+node 2 1 0
+
+material Elastic1D 1 10 1E-4
+
+section Rectangle2D 1 12 1 1 4
+section Rectangle2D 2 12 1 1 5
+section Rectangle2D 3 12 1 1 6
+section Rectangle2D 4 12 1 1 7
+section Rectangle2D 5 12 1 1 8
+section Rectangle2D 6 12 1 1 9
+section Rectangle2D 7 12 1 1 10
+section Rectangle2D 8 12 1 1 11
+section Rectangle2D 9 12 1 1 12
+section Rectangle2D 10 12 1 1 13
+section Rectangle2D 11 12 1 1 14
+section Rectangle2D 12 12 1 1 15
+section Rectangle2D 13 12 1 1 16
+section Rectangle2D 14 12 1 1 17
+section Rectangle2D 15 12 1 1 18
+section Rectangle2D 16 12 1 1 19
+section Rectangle2D 17 12 1 1 20
+
+element B21 1 1 2 1 5 1
+element B21 2 1 2 1 6 1
+element B21 3 1 2 1 7 1
+element B21 4 1 2 1 8 1
+element B21 5 1 2 1 9 1
+element B21 6 1 2 1 10 1
+element B21 7 1 2 1 11 1
+element B21 8 1 2 1 12 1
+element B21 9 1 2 1 13 1
+element B21 10 1 2 1 14 1
+element B21 11 1 2 1 15 1
+element B21 12 1 2 1 16 1
+element B21 13 1 2 1 17 1
+element B21 14 1 2 1 18 1
+element B21 15 1 2 1 19 1
+element B21 16 1 2 1 20 1
+element B21 17 1 2 1 4 1
+# element EB21 1 1 2 12 1 1 1
+
+fix 1 P 1
+
+cload 1 0 100 2 2
+
+recorder 1 hdf5 Element E 1
+recorder 2 hdf5 Element S 1
+recorder 3 hdf5 Element PE 1
+
+step static 1 1
+set ini_step_size .1
+set fixed_step_size true
+
+converger RelIncreDisp 1 1E-8 5 1
+
+analyze
+
+#  -0.0095   0.1948   0.2913
+peek node 2
+
+peek element 1
+
+reset
+clear
+exit

@@ -1,0 +1,63 @@
+# A TEST MODEL FOR ARCLENGTH SOLVER
+
+node 1 0 0
+node 2 0 1
+node 3 0 2
+node 4 0 3
+node 5 0 4
+node 6 0 5
+node 7 0 6
+node 8 0 7
+node 9 0 8
+node 10 1 8
+node 11 2 8
+node 12 3 8
+node 13 4 8
+node 14 5 8
+node 15 6 8
+node 16 7 8
+node 17 8 8
+
+material Elastic1D 1 1000
+
+element EB21 1 1 2 1000 1 1 1
+element EB21 2 2 3 1000 1 1 1
+element EB21 3 3 4 1000 1 1 1
+element EB21 4 4 5 1000 1 1 1
+element EB21 5 5 6 1000 1 1 1
+element EB21 6 6 7 1000 1 1 1
+element EB21 7 7 8 1000 1 1 1
+element EB21 8 8 9 1000 1 1 1
+element EB21 9 9 10 1000 1 1 1
+element EB21 10 10 11 1000 1 1 1
+element EB21 11 11 12 1000 1 1 1
+element EB21 12 12 13 1000 1 1 1
+element EB21 13 13 14 1000 1 1 1
+element EB21 14 14 15 1000 1 1 1
+element EB21 15 15 16 1000 1 1 1
+element EB21 16 16 17 1000 1 1 1
+
+fix 1 1 1 17
+fix 2 2 1 17
+
+# recorder 1 hdf5 Node U 11
+
+step arclength 1 11 2 -20
+
+criterion MinDisplacement 1 11 2 -5.5
+
+converger RelIncreDisp 1 1E-8 5 1
+
+analyze
+
+# Node 11:
+#    2.0000   8.0000
+# Displacement:
+#    5.9350  -5.5107   0.6801
+# Resistance:
+#    1.4495e-10  -1.0647e+01   3.9790e-13
+peek node 11
+
+# save recorder 1
+
+exit
