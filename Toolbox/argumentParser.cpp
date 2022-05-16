@@ -35,7 +35,7 @@ using std::ifstream;
 using std::ofstream;
 
 constexpr auto SUANPAN_MAJOR = 2;
-constexpr auto SUANPAN_MINOR = 3;
+constexpr auto SUANPAN_MINOR = 4;
 constexpr auto SUANPAN_PATCH = 0;
 constexpr auto SUANPAN_CODE = "Betelgeuse";
 constexpr auto SUANPAN_ARCH = 64;
