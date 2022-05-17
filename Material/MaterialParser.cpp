@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 // ReSharper disable CppClangTidyCppcoreguidelinesInitVariables
+#include "MaterialParser.h"
 #include <Domain/DomainBase.h>
 #include <Domain/ExternalModule.h>
 #include <Material/Material>
@@ -3043,8 +3044,433 @@ void new_yeoh(unique_ptr<Material>& return_obj, istringstream& command) {
     const auto t_size = pool.size();
     const auto h_size = t_size / 2;
 
-    auto A0 = vector<double>(pool.begin(), pool.begin() + h_size);
-    auto A1 = vector<double>(pool.begin() + h_size, pool.begin() + 2 * h_size);
+    auto A0 = vector(pool.begin(), pool.begin() + h_size);
+    auto A1 = vector(pool.begin() + h_size, pool.begin() + 2 * h_size);
 
     return_obj = make_unique<Yeoh>(tag, std::move(A0), std::move(A1), t_size % 2 == 0 ? 0. : pool.back());
+}
+
+int test_material1d(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned material_tag;
+    if(!get_input(command, material_tag)) {
+        suanpan_error("test_material1d() needs a valid material tag.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    double incre;
+    if(!get_input(command, incre)) {
+        suanpan_error("test_material1d() needs a valid step size.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    vector<unsigned> load_step;
+    int step;
+    while(get_input(command, step)) load_step.push_back(step < 0 ? static_cast<unsigned>(-step) : static_cast<unsigned>(step));
+
+    if(!domain->find_material(material_tag)) return SUANPAN_SUCCESS;
+
+    auto& material_proto = domain->get_material(material_tag);
+
+    if(!material_proto->is_initialized()) {
+        material_proto->initialize_base(domain);
+        material_proto->initialize(domain);
+        material_proto->set_initialized(true);
+    }
+
+    const auto result = material_tester(material_proto->get_copy(), load_step, {incre});
+
+#ifdef SUANPAN_HDF5
+    if(!result.save("RESULT.h5", hdf5_binary_trans)) suanpan_error("fail to save file.\n");
+#endif
+
+    if(!result.save("RESULT.txt", raw_ascii)) suanpan_error("fail to save file.\n");
+
+    if(std::ofstream gnuplot("RESULT.plt"); gnuplot.is_open()) {
+        gnuplot << "reset\n";
+        gnuplot << "set term tikz size 14cm,10cm\n";
+        gnuplot << "set output \"RESULT.tex\"\n";
+        gnuplot << "unset key\n";
+        gnuplot << "set xrange [*:*]\n";
+        gnuplot << "set yrange [*:*]\n";
+        gnuplot << "set xlabel \"input\"\n";
+        gnuplot << "set ylabel \"output\"\n";
+        gnuplot << "set grid\n";
+        gnuplot << "plot \"RESULT.txt\" u 1:2 w l lw 2\n";
+        gnuplot << "set output\n";
+
+        gnuplot.close();
+    }
+
+    return SUANPAN_SUCCESS;
+}
+
+int test_material2d(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned material_tag;
+    if(!get_input(command, material_tag)) {
+        suanpan_error("test_material2d() needs a valid material tag.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    vec incre(3);
+    for(auto& I : incre) {
+        if(!get_input(command, I)) {
+            suanpan_error("test_material2d() needs a valid step size.\n");
+            return SUANPAN_SUCCESS;
+        }
+    }
+
+    vector<unsigned> load_step;
+    int step;
+    while(get_input(command, step)) load_step.push_back(step < 0 ? static_cast<unsigned>(-step) : static_cast<unsigned>(step));
+
+    if(!domain->find_material(material_tag)) return SUANPAN_SUCCESS;
+
+    auto& material_proto = domain->get_material(material_tag);
+
+    if(!material_proto->is_initialized()) {
+        material_proto->initialize_base(domain);
+        material_proto->initialize(domain);
+        material_proto->set_initialized(true);
+    }
+
+    const auto result = material_tester(material_proto->get_copy(), load_step, incre);
+
+#ifdef SUANPAN_HDF5
+    if(!result.save("RESULT.h5", hdf5_binary_trans)) suanpan_error("fail to save file.\n");
+#endif
+
+    if(!result.save("RESULT.txt", raw_ascii)) suanpan_error("fail to save file.\n");
+
+    return SUANPAN_SUCCESS;
+}
+
+int test_material3d(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned material_tag;
+    if(!get_input(command, material_tag)) {
+        suanpan_error("test_material3d() needs a valid material tag.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    vec incre(6);
+    for(auto& I : incre)
+        if(!get_input(command, I)) {
+            suanpan_error("test_material3d() needs a valid step size.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+    vector<unsigned> load_step;
+    int step;
+    while(get_input(command, step)) load_step.push_back(step < 0 ? static_cast<unsigned>(-step) : static_cast<unsigned>(step));
+
+    if(!domain->find_material(material_tag)) return SUANPAN_SUCCESS;
+
+    auto& material_proto = domain->get_material(material_tag);
+
+    if(!material_proto->is_initialized()) {
+        material_proto->initialize_base(domain);
+        material_proto->initialize(domain);
+        material_proto->set_initialized(true);
+    }
+
+    const auto result = material_tester(material_proto->get_copy(), load_step, incre);
+
+#ifdef SUANPAN_HDF5
+    if(!result.save("RESULT.h5", hdf5_binary_trans)) suanpan_error("fail to save file.\n");
+#endif
+
+    if(!result.save("RESULT.txt", raw_ascii)) suanpan_error("fail to save file.\n");
+
+    return SUANPAN_SUCCESS;
+}
+
+int test_material_with_base3d(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned material_tag;
+    if(!get_input(command, material_tag)) {
+        suanpan_error("test_material3dwithbase() needs a valid material tag.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    vec base(6);
+    for(auto& I : base)
+        if(!get_input(command, I)) {
+            suanpan_error("test_material3dwithbase() needs a valid step size.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+    vec incre(6);
+    for(auto& I : incre)
+        if(!get_input(command, I)) {
+            suanpan_error("test_material3dwithbase() needs a valid step size.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+    vector<unsigned> load_step;
+    int step;
+    while(get_input(command, step)) load_step.push_back(step < 0 ? static_cast<unsigned>(-step) : static_cast<unsigned>(step));
+
+    if(!domain->find_material(material_tag)) return SUANPAN_SUCCESS;
+
+    auto& material_proto = domain->get_material(material_tag);
+
+    if(!material_proto->is_initialized()) {
+        material_proto->initialize_base(domain);
+        material_proto->initialize(domain);
+        material_proto->set_initialized(true);
+    }
+
+    const auto result = material_tester(material_proto->get_copy(), load_step, incre, base);
+
+#ifdef SUANPAN_HDF5
+    if(!result.save("RESULT.h5", hdf5_binary_trans)) suanpan_error("fail to save file.\n");
+#endif
+
+    if(!result.save("RESULT.txt", raw_ascii)) suanpan_error("fail to save file.\n");
+
+    return SUANPAN_SUCCESS;
+}
+
+int test_material_by_load1d(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned material_tag;
+    if(!get_input(command, material_tag)) {
+        suanpan_error("test_material1d() needs a valid material tag.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    double incre;
+    if(!get_input(command, incre)) {
+        suanpan_error("test_material1d() needs a valid step size.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    vector<unsigned> load_step;
+    int step;
+    while(get_input(command, step)) load_step.push_back(step < 0 ? static_cast<unsigned>(-step) : static_cast<unsigned>(step));
+
+    if(!domain->find_material(material_tag)) return SUANPAN_SUCCESS;
+
+    auto& material_proto = domain->get_material(material_tag);
+
+    if(!material_proto->is_initialized()) {
+        material_proto->initialize_base(domain);
+        material_proto->initialize(domain);
+        material_proto->set_initialized(true);
+    }
+
+    const auto result = material_tester_by_load(material_proto->get_copy(), load_step, {incre});
+
+#ifdef SUANPAN_HDF5
+    if(!result.save("RESULT.h5", hdf5_binary_trans)) suanpan_error("fail to save file.\n");
+#endif
+
+    if(!result.save("RESULT.txt", raw_ascii)) suanpan_error("fail to save file.\n");
+
+    if(std::ofstream gnuplot("RESULT.plt"); gnuplot.is_open()) {
+        gnuplot << "reset\n";
+        gnuplot << "set term tikz size 14cm,10cm\n";
+        gnuplot << "set output \"RESULT.tex\"\n";
+        gnuplot << "unset key\n";
+        gnuplot << "set xrange [*:*]\n";
+        gnuplot << "set yrange [*:*]\n";
+        gnuplot << "set xlabel \"input\"\n";
+        gnuplot << "set ylabel \"output\"\n";
+        gnuplot << "set grid\n";
+        gnuplot << "plot \"RESULT.txt\" u 1:2 w l lw 2\n";
+        gnuplot << "set output\n";
+    }
+
+    return SUANPAN_SUCCESS;
+}
+
+int test_material_by_load2d(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned material_tag;
+    if(!get_input(command, material_tag)) {
+        suanpan_error("test_material2d() needs a valid material tag.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    vec incre(3);
+    for(auto& I : incre)
+        if(!get_input(command, I)) {
+            suanpan_error("test_material2d() needs a valid step size.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+    vector<unsigned> load_step;
+    int step;
+    while(get_input(command, step)) load_step.push_back(step < 0 ? static_cast<unsigned>(-step) : static_cast<unsigned>(step));
+
+    if(!domain->find_material(material_tag)) return SUANPAN_SUCCESS;
+
+    auto& material_proto = domain->get_material(material_tag);
+
+    if(!material_proto->is_initialized()) {
+        material_proto->initialize_base(domain);
+        material_proto->initialize(domain);
+        material_proto->set_initialized(true);
+    }
+
+    const auto result = material_tester_by_load(material_proto->get_copy(), load_step, incre);
+
+#ifdef SUANPAN_HDF5
+    if(!result.save("RESULT.h5", hdf5_binary_trans)) suanpan_error("fail to save file.\n");
+#endif
+
+    if(!result.save("RESULT.txt", raw_ascii)) suanpan_error("fail to save file.\n");
+
+    return SUANPAN_SUCCESS;
+}
+
+int test_material_by_load3d(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned material_tag;
+    if(!get_input(command, material_tag)) {
+        suanpan_error("test_material3d() needs a valid material tag.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    vec incre(6);
+    for(auto& I : incre)
+        if(!get_input(command, I)) {
+            suanpan_error("test_material3d() needs a valid step size.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+    vector<unsigned> load_step;
+    int step;
+    while(get_input(command, step)) load_step.push_back(step < 0 ? static_cast<unsigned>(-step) : static_cast<unsigned>(step));
+
+    if(!domain->find_material(material_tag)) return SUANPAN_SUCCESS;
+
+    auto& material_proto = domain->get_material(material_tag);
+
+    if(!material_proto->is_initialized()) {
+        material_proto->initialize_base(domain);
+        material_proto->initialize(domain);
+        material_proto->set_initialized(true);
+    }
+
+    const auto result = material_tester_by_load(material_proto->get_copy(), load_step, incre);
+
+#ifdef SUANPAN_HDF5
+    if(!result.save("RESULT.h5", hdf5_binary_trans)) suanpan_error("fail to save file.\n");
+#endif
+
+    if(!result.save("RESULT.txt", raw_ascii)) suanpan_error("fail to save file.\n");
+
+    return SUANPAN_SUCCESS;
+}
+
+int test_material_by_load_with_base3d(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned material_tag;
+    if(!get_input(command, material_tag)) {
+        suanpan_error("test_material3dwithbase() needs a valid material tag.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    vec base(6);
+    for(auto& I : base)
+        if(!get_input(command, I)) {
+            suanpan_error("test_material3dwithbase() needs a valid step size.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+    vec incre(6);
+    for(auto& I : incre)
+        if(!get_input(command, I)) {
+            suanpan_error("test_material3dwithbase() needs a valid step size.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+    vector<unsigned> load_step;
+    int step;
+    while(get_input(command, step)) load_step.push_back(step < 0 ? static_cast<unsigned>(-step) : static_cast<unsigned>(step));
+
+    if(!domain->find_material(material_tag)) return SUANPAN_SUCCESS;
+
+    auto& material_proto = domain->get_material(material_tag);
+
+    if(!material_proto->is_initialized()) {
+        material_proto->initialize_base(domain);
+        material_proto->initialize(domain);
+        material_proto->set_initialized(true);
+    }
+
+    const auto result = material_tester_by_load(material_proto->get_copy(), load_step, incre, base);
+
+#ifdef SUANPAN_HDF5
+    if(!result.save("RESULT.h5", hdf5_binary_trans)) suanpan_error("fail to save file.\n");
+#endif
+
+    if(!result.save("RESULT.txt", raw_ascii)) suanpan_error("fail to save file.\n");
+
+    return SUANPAN_SUCCESS;
+}
+
+int test_material_by_strain_history(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned material_tag;
+    if(!get_input(command, material_tag)) {
+        suanpan_error("test_material_by_strain_history() needs a valid material tag.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    string history_file;
+    if(!get_input(command, history_file)) {
+        suanpan_error("test_material_by_strain_history() needs a valid history file name.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    mat strain_history;
+    if(!strain_history.load(history_file) || !domain->find_material(material_tag)) return SUANPAN_SUCCESS;
+
+    auto& material_proto = domain->get_material(material_tag);
+
+    if(!material_proto->is_initialized()) {
+        material_proto->initialize_base(domain);
+        material_proto->initialize(domain);
+        material_proto->set_initialized(true);
+    }
+
+    const auto result = material_tester_by_strain_history(material_proto->get_copy(), strain_history);
+
+#ifdef SUANPAN_HDF5
+    if(!result.save("RESULT.h5", hdf5_binary_trans)) suanpan_error("fail to save file.\n");
+#else
+    if(!result.save("RESULT.txt", raw_ascii)) suanpan_error("fail to save file.\n");
+#endif
+
+    return SUANPAN_SUCCESS;
+}
+
+int test_material_by_stress_history(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned material_tag;
+    if(!get_input(command, material_tag)) {
+        suanpan_error("test_material_by_stress_history() needs a valid material tag.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    string history_file;
+    if(!get_input(command, history_file)) {
+        suanpan_error("test_material_by_stress_history() needs a valid history file name.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    mat stress_history;
+    if(!stress_history.load(history_file) || !domain->find_material(material_tag)) return SUANPAN_SUCCESS;
+
+    auto& material_proto = domain->get_material(material_tag);
+
+    if(!material_proto->is_initialized()) {
+        material_proto->initialize_base(domain);
+        material_proto->initialize(domain);
+        material_proto->set_initialized(true);
+    }
+
+    const auto result = material_tester_by_stress_history(material_proto->get_copy(), stress_history);
+
+#ifdef SUANPAN_HDF5
+    if(!result.save("RESULT.h5", hdf5_binary_trans)) suanpan_error("fail to save file.\n");
+#else
+    if(!result.save("RESULT.txt", raw_ascii)) suanpan_error("fail to save file.\n");
+#endif
+
+    return SUANPAN_SUCCESS;
 }

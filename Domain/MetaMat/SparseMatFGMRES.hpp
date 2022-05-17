@@ -34,6 +34,7 @@
 
 #include <mkl_rci.h>
 #include <mkl_spblas.h>
+#include "csr_form.hpp"
 #include "SparseMat.hpp"
 
 template<sp_d T> class SparseMatBaseFGMRES : public SparseMat<T> {

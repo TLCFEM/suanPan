@@ -20,6 +20,9 @@
 
 #include <suanPan.h>
 
+class Element;
+class DomainBase;
+
 int create_new_element(const shared_ptr<DomainBase>&, istringstream&);
 
 void new_allman(unique_ptr<Element>&, istringstream&);
@@ -99,5 +102,9 @@ void new_tie(unique_ptr<Element>&, istringstream&);
 // IGA patches
 void new_patchquad(unique_ptr<Element>&, istringstream&);
 void new_patchcube(unique_ptr<Element>&, istringstream&);
+
+int create_new_mass(const shared_ptr<DomainBase>&, istringstream&);
+int create_new_modifier(const shared_ptr<DomainBase>&, istringstream&);
+int create_new_orientation(const shared_ptr<DomainBase>&, istringstream&);
 
 #endif

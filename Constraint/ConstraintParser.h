@@ -20,6 +20,9 @@
 
 #include <suanPan.h>
 
+class Constraint;
+class DomainBase;
+
 int create_new_constraint(const shared_ptr<DomainBase>&, istringstream&);
 
 void new_embed(unique_ptr<Constraint>&, istringstream&, unsigned);
@@ -34,5 +37,15 @@ void new_rigidwall(unique_ptr<Constraint>&, istringstream&, bool, bool);
 void new_bc(unique_ptr<Constraint>&, istringstream&, bool, bool);
 void new_nodeline(unique_ptr<Constraint>&, istringstream&);
 void new_nodefacet(unique_ptr<Constraint>&, istringstream&);
+
+int create_new_bc(const shared_ptr<DomainBase>&, istringstream&, bool);
+int create_new_groupbc(const shared_ptr<DomainBase>&, istringstream&, bool);
+int create_new_fixedlength(const shared_ptr<DomainBase>&, istringstream&, unsigned);
+int create_new_mpc(const shared_ptr<DomainBase>&, istringstream&);
+int create_new_particlecollision2d(const shared_ptr<DomainBase>&, istringstream&);
+int create_new_particlecollision3d(const shared_ptr<DomainBase>&, istringstream&);
+int create_new_rigidwall(const shared_ptr<DomainBase>&, istringstream&, bool, bool);
+
+int create_new_criterion(const shared_ptr<DomainBase>&, istringstream&);
 
 #endif

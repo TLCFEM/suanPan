@@ -10,11 +10,11 @@ include(Material3D/CMakeLists.txt)
 include(Special/CMakeLists.txt)
 
 add_library(${PROJECT_NAME} STATIC
-        Material.cpp
-        MaterialTemplate.cpp
-        MaterialParser.cpp
-        MaterialTester.cpp
         ExternalMaterial.cpp
+        Material.cpp
+        MaterialParser.cpp
+        MaterialTemplate.cpp
+        MaterialTester.cpp
         ${M1D}
         ${M2D}
         ${M3D}

@@ -20,6 +20,9 @@
 
 #include <suanPan.h>
 
+class Material;
+class DomainBase;
+
 int create_new_material(const shared_ptr<DomainBase>&, istringstream&);
 
 void new_afc01(unique_ptr<Material>&, istringstream&);
@@ -114,5 +117,16 @@ void new_substepping(unique_ptr<Material>&, istringstream&);
 // degradation
 void new_trilineardegradation(unique_ptr<Material>&, istringstream&);
 void new_dhakal(unique_ptr<Material>&, istringstream&);
+
+int test_material1d(const shared_ptr<DomainBase>&, istringstream&);
+int test_material2d(const shared_ptr<DomainBase>&, istringstream&);
+int test_material3d(const shared_ptr<DomainBase>&, istringstream&);
+int test_material_with_base3d(const shared_ptr<DomainBase>&, istringstream&);
+int test_material_by_load1d(const shared_ptr<DomainBase>&, istringstream&);
+int test_material_by_load2d(const shared_ptr<DomainBase>&, istringstream&);
+int test_material_by_load3d(const shared_ptr<DomainBase>&, istringstream&);
+int test_material_by_load_with_base3d(const shared_ptr<DomainBase>&, istringstream&);
+int test_material_by_strain_history(const shared_ptr<DomainBase>&, istringstream&);
+int test_material_by_stress_history(const shared_ptr<DomainBase>&, istringstream&);
 
 #endif
