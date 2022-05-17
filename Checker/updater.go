@@ -69,12 +69,7 @@ func main() {
 func downloadLatestVersion(versionString string) error {
 	cos := runtime.GOOS
 
-	supported := false
-	if cos == "windows" || cos == "linux" || cos == "darwin" {
-		supported = true
-	}
-
-	if !supported {
+	if cos != "windows" && cos != "linux" && cos != "darwin" {
 		return nil
 	}
 
@@ -104,8 +99,9 @@ func downloadLatestVersion(versionString string) error {
 		fmt.Printf("    [2] suanPan-win-openblas-vtk.7z (Portable Archive)\n")
 	} else if cos == "linux" {
 		fmt.Printf("    [0] suanPan-linux-mkl-vtk.tar.gz (Portable Archive)\n")
-		fmt.Printf("    [1] suanPan-linux-openblas-vtk.tar.gz (Portable Archive)\n")
-		fmt.Printf("    [2] suanPan-linux-openblas.tar.gz (Portable Archive)\n")
+		fmt.Printf("    [1] suanPan-linux-mkl.tar.gz (Portable Archive)\n")
+		fmt.Printf("    [2] suanPan-linux-openblas-vtk.tar.gz (Portable Archive)\n")
+		fmt.Printf("    [3] suanPan-linux-openblas.tar.gz (Portable Archive)\n")
 	} else if cos == "darwin" {
 		fmt.Printf("    [0] suanPan-macos-openblas-vtk.tar.gz (Portable Archive)\n")
 		fmt.Printf("    [1] suanPan-macos-openblas.tar.gz (Portable Archive)\n")
@@ -132,8 +128,10 @@ func downloadLatestVersion(versionString string) error {
 		if 0 == downloadOption {
 			fileName = "suanPan-linux-mkl-vtk.tar.gz"
 		} else if 1 == downloadOption {
-			fileName = "suanPan-linux-openblas-vtk.tar.gz"
+			fileName = "suanPan-linux-mkl.tar.gz"
 		} else if 2 == downloadOption {
+			fileName = "suanPan-linux-openblas-vtk.tar.gz"
+		} else if 3 == downloadOption {
 			fileName = "suanPan-linux-openblas.tar.gz"
 		}
 	} else if cos == "darwin" {
