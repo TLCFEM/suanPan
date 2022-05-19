@@ -7,6 +7,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         TestQuaternion.cpp
         TestShape.cpp
         TestString.cpp
+        TestSorting.cpp
         TestTensor.cpp
         TestUtility.cpp
         TestIntegration.cpp
