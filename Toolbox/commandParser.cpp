@@ -55,7 +55,7 @@ using std::ifstream;
 using std::string;
 using std::vector;
 
-int SUANPAN_NUM_THREADS = 10;
+int SUANPAN_NUM_THREADS = int(std::thread::hardware_concurrency());
 fs::path SUANPAN_OUTPUT = fs::current_path();
 
 int process_command(const shared_ptr<Bead>& model, istringstream& command) {
@@ -237,21 +237,7 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     }
 
     if(is_equal(command_id, "terminal")) {
-#ifdef SUANPAN_WIN
-        const auto handle = GetStdHandle(STD_OUTPUT_HANDLE);
-        CONSOLE_SCREEN_BUFFER_INFO info;
-        GetConsoleScreenBufferInfo(handle, &info);
-        const auto current_attribute = info.wAttributes;
-#endif
-
         execute_command(command);
-
-#ifdef SUANPAN_WIN
-        SetConsoleTextAttribute(handle, current_attribute);
-#else
-        SUANPAN_SYNC_COUT << FOREGROUND_GREEN;
-#endif
-
         return SUANPAN_SUCCESS;
     }
 
@@ -1153,6 +1139,7 @@ int print_command() {
     suanpan_info(format, "element", "define element");
     suanpan_info(format, "elementgroup", "define group containing element tags");
     suanpan_info(format, "enable", "enable objects");
+    suanpan_info(format, "example", "establish adn execute a minimum example");
     suanpan_info(format, "exit/quit", "exit program");
     suanpan_info(format, "file/load", "load external files");
     suanpan_info(format, "finiterigidwall", "define rigid wall constraint with finite dimensions");
@@ -1195,6 +1182,7 @@ int print_command() {
     suanpan_info(format, "precheck", "check the model without analyse");
     suanpan_info(format, "protect", "protect objects from being disabled");
     suanpan_info(format, "pwd", "print/change current working folder");
+    suanpan_info(format, "qrcode", "print a qr code");
     suanpan_info(format, "recorder", "define recorder");
     suanpan_info(format, "reset", "reset model to the previously converged state");
     suanpan_info(format, "rigidwall", "define rigid wall constraint with infinite dimensions");
@@ -1205,19 +1193,35 @@ int print_command() {
     suanpan_info(format, "step", "define step");
     suanpan_info(format, "summary", "print summary for the current domain");
     suanpan_info(format, "suspend", "suspend object in current step");
+    suanpan_info(format, "terminal", "execute command in terminal");
     suanpan_info(format, "version", "print version information");
 
     return SUANPAN_SUCCESS;
 }
 
 int execute_command(istringstream& command) {
+#ifdef SUANPAN_WIN
+    const auto handle = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO info;
+    GetConsoleScreenBufferInfo(handle, &info);
+    const auto current_attribute = info.wAttributes;
+#endif
+
 #ifdef SUANPAN_MSVC
     std::wstringstream terminal_command;
     terminal_command << command.str().substr(command.tellg()).c_str();
-    return _wsystem(terminal_command.str().c_str());
+    const auto code = _wsystem(terminal_command.str().c_str());
 #else
     std::stringstream terminal_command;
     terminal_command << command.str().substr(command.tellg()).c_str();
-    return system(terminal_command.str().c_str());
+    const auto code = system(terminal_command.str().c_str());
 #endif
+
+#ifdef SUANPAN_WIN
+    SetConsoleTextAttribute(handle, current_attribute);
+#else
+    SUANPAN_SYNC_COUT << FOREGROUND_GREEN;
+#endif
+
+    return code;
 }
