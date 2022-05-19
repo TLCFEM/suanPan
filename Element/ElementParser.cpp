@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+#include "ElementParser.h"
 #include <Domain/DomainBase.h>
 #include <Domain/ExternalModule.h>
 #include <Element/Element>
@@ -2583,4 +2584,171 @@ void new_patchcube(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     return_obj = make_unique<PatchCube>(tag, std::move(knot_x), std::move(knot_y), std::move(knot_z), std::move(node_tag), static_cast<unsigned>(material_tag));
+}
+
+int create_new_mass(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("create_new_mass() needs a valid tag.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    unsigned node;
+    if(!get_input(command, node)) {
+        suanpan_error("create_new_mass() needs one valid node.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    double magnitude;
+    if(!get_input(command, magnitude)) {
+        suanpan_error("create_new_mass() needs a valid magnitude.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    unsigned dof;
+    vector<uword> dof_tag;
+    while(get_input(command, dof)) dof_tag.push_back(dof);
+
+    domain->insert(make_shared<Mass>(tag, node, magnitude, uvec(dof_tag)));
+
+    return SUANPAN_SUCCESS;
+}
+
+int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    string modifier_type;
+    if(!get_input(command, modifier_type)) {
+        suanpan_error("create_new_modifier() needs a valid modifier type.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    unique_ptr<Modifier> new_modifier = nullptr;
+
+    if(is_equal(modifier_type, "LumpedSimple")) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("create_new_modifier() needs a valid tag.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        vector<uword> element_tag;
+        unsigned e_tag;
+        while(!command.eof() && get_input(command, e_tag)) element_tag.emplace_back(e_tag);
+
+        new_modifier = make_unique<LumpedSimple>(tag, uvec(element_tag));
+    }
+    else if(is_equal(modifier_type, "LumpedScale")) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("create_new_modifier() needs a valid tag.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        vector<uword> element_tag;
+        unsigned e_tag;
+        while(!command.eof() && get_input(command, e_tag)) element_tag.emplace_back(e_tag);
+
+        new_modifier = make_unique<LumpedScale>(tag, uvec(element_tag));
+    }
+    else if(is_equal(modifier_type, "Rayleigh")) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("create_new_modifier() needs a valid tag.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        double a, b, c, d;
+        if(!get_input(command, a)) {
+            suanpan_error("create_new_modifier() needs four valid numbers.\n");
+            return SUANPAN_SUCCESS;
+        }
+        if(!get_input(command, b)) {
+            suanpan_error("create_new_modifier() needs four valid numbers.\n");
+            return SUANPAN_SUCCESS;
+        }
+        if(!get_input(command, c)) {
+            suanpan_error("create_new_modifier() needs four valid numbers.\n");
+            return SUANPAN_SUCCESS;
+        }
+        if(!get_input(command, d)) {
+            suanpan_error("create_new_modifier() needs four valid numbers.\n");
+            return SUANPAN_SUCCESS;
+        }
+        vector<uword> element_tag;
+        unsigned e_tag;
+        while(!command.eof() && get_input(command, e_tag)) element_tag.emplace_back(e_tag);
+
+        new_modifier = make_unique<Rayleigh>(tag, a, b, c, d, uvec(element_tag));
+    }
+    else if(is_equal(modifier_type, "ElementalModal")) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("create_new_modifier() needs a valid tag.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        double a, b;
+        if(!get_input(command, a)) {
+            suanpan_error("create_new_modifier() needs two valid numbers.\n");
+            return SUANPAN_SUCCESS;
+        }
+        if(!get_input(command, b)) {
+            suanpan_error("create_new_modifier() needs two valid numbers.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        vector<uword> element_tag;
+        unsigned e_tag;
+        while(!command.eof() && get_input(command, e_tag)) element_tag.emplace_back(e_tag);
+
+        new_modifier = make_unique<ElementalModal>(tag, a, b, uvec(element_tag));
+    }
+    else {
+        // check if the library is already loaded
+        auto code = false;
+        for(const auto& I : domain->get_external_module_pool())
+            if(is_equal(I->library_name, modifier_type) || I->locate_cpp_module(modifier_type)) {
+                code = true;
+                break;
+            }
+
+        // not loaded then try load it
+        if(!code && domain->insert(make_shared<ExternalModule>(modifier_type))) code = true;
+
+        // if loaded find corresponding function
+        if(code)
+            for(const auto& I : domain->get_external_module_pool()) {
+                if(I->locate_cpp_module(modifier_type)) I->new_object(new_modifier, command);
+                if(new_modifier != nullptr) break;
+            }
+    }
+
+    if(nullptr == new_modifier || !domain->insert(std::move(new_modifier))) suanpan_error("create_new_modifier() fails to create new modifier.\n");
+
+    return SUANPAN_SUCCESS;
+}
+
+int create_new_orientation(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    string file_type;
+    if(!get_input(command, file_type)) {
+        suanpan_error("create_new_orientation() needs a valid type.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("create_new_orientation() needs a valid tag.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    vec xyz(3);
+    for(auto& I : xyz)
+        if(!get_input(command, I)) {
+            suanpan_error("create_new_orientation() needs a vector.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+    if(is_equal(file_type, "B3DL")) domain->insert(make_shared<B3DL>(tag, std::move(xyz)));
+    else if(is_equal(file_type, "B3DC")) domain->insert(make_shared<B3DC>(tag, std::move(xyz)));
+
+    return SUANPAN_SUCCESS;
 }

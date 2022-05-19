@@ -5,6 +5,5 @@
 
 #include "ExternalMaterial.h"
 #include "Material.h"
-#include "MaterialParser.h"
 #include "MaterialTemplate.h"
 #include "MaterialTester.h"

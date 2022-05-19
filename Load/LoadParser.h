@@ -15,34 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include "sort_rcm.h"
+#ifndef LOADPARSER_H
+#define LOADPARSER_H
 
-uvec sort_rcm(const vector<uvec>& A, const uvec& E) {
-#ifdef SUANPAN_DEBUG
-    wall_clock TM;
-    TM.tic();
+#include <suanPan.h>
+
+class DomainBase;
+
+int create_new_acceleration(const shared_ptr<DomainBase>&, istringstream&);
+int create_new_amplitude(const shared_ptr<DomainBase>&, istringstream&);
+int create_new_bodyforce(const shared_ptr<DomainBase>&, istringstream&, bool);
+int create_new_cload(const shared_ptr<DomainBase>&, istringstream&, bool = false);
+int create_new_lineudl(const shared_ptr<DomainBase>&, istringstream&, unsigned);
+int create_new_displacement(const shared_ptr<DomainBase>&, istringstream&, bool = false);
+int create_new_supportmotion(const shared_ptr<DomainBase>&, istringstream&, unsigned);
+
 #endif
-
-    const auto S = E.n_elem;
-
-    uvec G = sort_index(E);
-    uvec R(S, fill::zeros);
-    vector M(S, false);
-
-    uword IDXA = 0, IDXB = S - 1, IDXC = S - 1;
-
-    while(true) {
-        if(IDXB == IDXC) {
-            while(IDXA < S && M[G(IDXA)]) ++IDXA;
-            if(IDXA == S) break;
-            M[R(IDXC--) = G(IDXA++)] = true;
-        }
-        for(const auto& IDX : A[R(IDXB--)]) if(!M[IDX]) M[R(IDXC--) = IDX] = true;
-    }
-
-#ifdef SUANPAN_DEBUG
-    suanpan_debug("RCM algorithm takes %.5E seconds.\n", TM.toc());
-#endif
-
-    return R;
-}

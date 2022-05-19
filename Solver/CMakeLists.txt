@@ -14,6 +14,7 @@ add_library(${PROJECT_NAME} STATIC
         Newton.cpp
         Ramm.cpp
         Solver.cpp
+        SolverParser.cpp
         ${Integrator}
         )
 

@@ -12,6 +12,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         NodeRecorder.cpp
         OutputType.cpp
         Recorder.cpp
+        RecorderParser.cpp
         SumRecorder.cpp
         VisualisationRecorder.cpp
         )

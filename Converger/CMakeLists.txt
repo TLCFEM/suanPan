@@ -5,17 +5,18 @@ project(Converger)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../Libs)
 
 add_library(${PROJECT_NAME} STATIC
-        Converger.cpp
         AbsDisp.cpp
         AbsError.cpp
         AbsIncreDisp.cpp
         AbsIncreEnergy.cpp
         AbsResidual.cpp
+        Converger.cpp
+        ConvergerParser.cpp
+        FixedNumber.cpp
+        LogicConverger.cpp
         RelDisp.cpp
         RelError.cpp
         RelIncreDisp.cpp
         RelIncreEnergy.cpp
         RelResidual.cpp
-        FixedNumber.cpp
-        LogicConverger.cpp
         )

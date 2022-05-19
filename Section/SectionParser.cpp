@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+#include "SectionParser.h"
 #include <Domain/DomainBase.h>
 #include <Domain/ExternalModule.h>
 #include <Section/Section>

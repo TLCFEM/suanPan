@@ -2,7 +2,6 @@
 #include "Criterion/Criterion"
 
 #include "Constraint.h"
-#include "ConstraintParser.h"
 #include "Embed.h"
 #include "FixedLength.h"
 #include "MPC.h"

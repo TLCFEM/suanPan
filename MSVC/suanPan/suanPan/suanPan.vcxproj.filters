@@ -1351,6 +1351,21 @@
     <ClCompile Include="..\..\..\Toolbox\sync_ostream.cpp">
       <Filter>Toolbox</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Recorder\RecorderParser.cpp">
+      <Filter>Recorder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\SolverParser.cpp">
+      <Filter>Solver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Load\LoadParser.cpp">
+      <Filter>Load</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Converger\ConvergerParser.cpp">
+      <Filter>Converger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Step\StepParser.cpp">
+      <Filter>Step</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2550,6 +2565,21 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Toolbox\sync_ostream.h">
       <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Recorder\RecorderParser.h">
+      <Filter>Recorder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\SolverParser.h">
+      <Filter>Solver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Load\LoadParser.h">
+      <Filter>Load</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Converger\ConvergerParser.h">
+      <Filter>Converger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Step\StepParser.h">
+      <Filter>Step</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

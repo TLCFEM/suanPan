@@ -129,6 +129,7 @@
     <ClCompile Include="..\..\..\Converger\AbsIncreEnergy.cpp" />
     <ClCompile Include="..\..\..\Converger\AbsResidual.cpp" />
     <ClCompile Include="..\..\..\Converger\Converger.cpp" />
+    <ClCompile Include="..\..\..\Converger\ConvergerParser.cpp" />
     <ClCompile Include="..\..\..\Converger\FixedNumber.cpp" />
     <ClCompile Include="..\..\..\Converger\LogicConverger.cpp" />
     <ClCompile Include="..\..\..\Converger\RelDisp.cpp" />
@@ -267,6 +268,7 @@
     <ClCompile Include="..\..\..\Load\GroupNodalForce.cpp" />
     <ClCompile Include="..\..\..\Load\LineUDL.cpp" />
     <ClCompile Include="..\..\..\Load\Load.cpp" />
+    <ClCompile Include="..\..\..\Load\LoadParser.cpp" />
     <ClCompile Include="..\..\..\Load\NodalAcceleration.cpp" />
     <ClCompile Include="..\..\..\Load\NodalDisplacement.cpp" />
     <ClCompile Include="..\..\..\Load\NodalForce.cpp" />
@@ -393,6 +395,7 @@
     <ClCompile Include="..\..\..\Recorder\NodeRecorder.cpp" />
     <ClCompile Include="..\..\..\Recorder\OutputType.cpp" />
     <ClCompile Include="..\..\..\Recorder\Recorder.cpp" />
+    <ClCompile Include="..\..\..\Recorder\RecorderParser.cpp" />
     <ClCompile Include="..\..\..\Recorder\SumRecorder.cpp" />
     <ClCompile Include="..\..\..\Recorder\VisualisationRecorder.cpp" />
     <ClCompile Include="..\..\..\Section\Section.cpp" />
@@ -449,6 +452,7 @@
     <ClCompile Include="..\..\..\Solver\Newton.cpp" />
     <ClCompile Include="..\..\..\Solver\Ramm.cpp" />
     <ClCompile Include="..\..\..\Solver\Solver.cpp" />
+    <ClCompile Include="..\..\..\Solver\SolverParser.cpp" />
     <ClCompile Include="..\..\..\Step\ArcLength.cpp" />
     <ClCompile Include="..\..\..\Step\Bead.cpp" />
     <ClCompile Include="..\..\..\Step\Buckle.cpp" />
@@ -457,6 +461,7 @@
     <ClCompile Include="..\..\..\Step\Optimization.cpp" />
     <ClCompile Include="..\..\..\Step\Static.cpp" />
     <ClCompile Include="..\..\..\Step\Step.cpp" />
+    <ClCompile Include="..\..\..\Step\StepParser.cpp" />
     <ClCompile Include="..\..\..\suanPan.cpp" />
     <ClCompile Include="..\..\..\Toolbox\argumentParser.cpp" />
     <ClCompile Include="..\..\..\Toolbox\arpack_wrapper.cpp" />
@@ -515,6 +520,7 @@
     <ClInclude Include="..\..\..\Converger\AbsIncreEnergy.h" />
     <ClInclude Include="..\..\..\Converger\AbsResidual.h" />
     <ClInclude Include="..\..\..\Converger\Converger.h" />
+    <ClInclude Include="..\..\..\Converger\ConvergerParser.h" />
     <ClInclude Include="..\..\..\Converger\FixedNumber.h" />
     <ClInclude Include="..\..\..\Converger\LogicConverger.h" />
     <ClInclude Include="..\..\..\Converger\RelDisp.h" />
@@ -674,6 +680,7 @@
     <ClInclude Include="..\..\..\Load\GroupNodalForce.h" />
     <ClInclude Include="..\..\..\Load\LineUDL.h" />
     <ClInclude Include="..\..\..\Load\Load.h" />
+    <ClInclude Include="..\..\..\Load\LoadParser.h" />
     <ClInclude Include="..\..\..\Load\NodalAcceleration.h" />
     <ClInclude Include="..\..\..\Load\NodalDisplacement.h" />
     <ClInclude Include="..\..\..\Load\NodalForce.h" />
@@ -801,6 +808,7 @@
     <ClInclude Include="..\..\..\Recorder\NodeRecorder.h" />
     <ClInclude Include="..\..\..\Recorder\OutputType.h" />
     <ClInclude Include="..\..\..\Recorder\Recorder.h" />
+    <ClInclude Include="..\..\..\Recorder\RecorderParser.h" />
     <ClInclude Include="..\..\..\Recorder\SumRecorder.h" />
     <ClInclude Include="..\..\..\Recorder\VisualisationRecorder.h" />
     <ClInclude Include="..\..\..\Section\ParameterType.h" />
@@ -858,6 +866,7 @@
     <ClInclude Include="..\..\..\Solver\Newton.h" />
     <ClInclude Include="..\..\..\Solver\Ramm.h" />
     <ClInclude Include="..\..\..\Solver\Solver.h" />
+    <ClInclude Include="..\..\..\Solver\SolverParser.h" />
     <ClInclude Include="..\..\..\Step\ArcLength.h" />
     <ClInclude Include="..\..\..\Step\Bead.h" />
     <ClInclude Include="..\..\..\Step\Buckle.h" />
@@ -866,6 +875,7 @@
     <ClInclude Include="..\..\..\Step\Optimization.h" />
     <ClInclude Include="..\..\..\Step\Static.h" />
     <ClInclude Include="..\..\..\Step\Step.h" />
+    <ClInclude Include="..\..\..\Step\StepParser.h" />
     <ClInclude Include="..\..\..\suanPan.h" />
     <ClInclude Include="..\..\..\Toolbox\argumentParser.h" />
     <ClInclude Include="..\..\..\Toolbox\arpack_wrapper.h" />
