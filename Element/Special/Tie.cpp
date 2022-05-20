@@ -20,7 +20,7 @@
 #include <Domain/Factory.hpp>
 
 Tie::Tie(const unsigned T, uvec&& N, uvec&& D, vec&& W, const double L, const double P)
-    : Element(T, static_cast<unsigned>(N.size()), static_cast<unsigned>(D.max()), std::forward<uvec>(N))
+    : Element(T, static_cast<unsigned>(N.size()), static_cast<unsigned>(D.max()), std::forward<uvec>(N), {})
     , dof_pool(std::forward<uvec>(D))
     , weight_pool(std::forward<vec>(W))
     , pseudo_load(L)

@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "GlobalRecorder.h"
+#include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Element/Element.h>
@@ -27,6 +28,12 @@ void GlobalRecorder::record(const shared_ptr<DomainBase>& D) {
     if(1 != interval && counter++ != interval) return;
 
     counter = 1;
+
+    auto get_momentum_component = [&](const DOF C) {
+        auto momentum = 0.;
+        for(auto& I : D->get_pool<Element>()) momentum += I->get_momentum_component(C);
+        return momentum;
+    };
 
     if(OutputType::KE == get_variable_type()) {
         auto kinetic_energy = 0.;
@@ -48,6 +55,12 @@ void GlobalRecorder::record(const shared_ptr<DomainBase>& D) {
         for(auto& I : D->get_pool<Element>()) momentum += accu(I->get_momentum());
         insert({{momentum, D->get_factory()->get_momentum()}}, 0);
     }
+    else if(OutputType::MMX == get_variable_type()) insert({{get_momentum_component(DOF::X)}}, 0);
+    else if(OutputType::MMY == get_variable_type()) insert({{get_momentum_component(DOF::Y)}}, 0);
+    else if(OutputType::MMZ == get_variable_type()) insert({{get_momentum_component(DOF::Z)}}, 0);
+    else if(OutputType::MMRX == get_variable_type()) insert({{get_momentum_component(DOF::RX)}}, 0);
+    else if(OutputType::MMRY == get_variable_type()) insert({{get_momentum_component(DOF::RY)}}, 0);
+    else if(OutputType::MMRZ == get_variable_type()) insert({{get_momentum_component(DOF::RZ)}}, 0);
     else insert({{.0, .0}}, 0);
 
     if(if_record_time()) insert(D->get_factory()->get_current_time());

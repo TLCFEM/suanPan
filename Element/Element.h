@@ -32,7 +32,6 @@
 
 enum class MaterialType : unsigned;
 enum class SectionType : unsigned;
-enum class DOF : unsigned short;
 
 struct DataElement {
     const uvec node_encoding; // node encoding
@@ -136,10 +135,11 @@ protected:
     [[nodiscard]] vector<shared_ptr<Section>> get_section(const shared_ptr<DomainBase>&) const override;
 
 public:
-    Element(unsigned, // tag
-            unsigned, // number of nodes
-            unsigned, // number of dofs
-            uvec&&    // node encoding
+    Element(unsigned,     // tag
+            unsigned,     // number of nodes
+            unsigned,     // number of dofs
+            uvec&&,       // node encoding
+            vector<DOF>&& // dof identifier
     );
     Element(unsigned,     // tag
             unsigned,     // number of nodes
@@ -247,6 +247,7 @@ public:
     [[nodiscard]] double get_kinetic_energy() const override;
     [[nodiscard]] double get_viscous_energy() const override;
     [[nodiscard]] const vec& get_momentum() const override;
+    [[nodiscard]] double get_momentum_component(DOF) const override;
 
     [[nodiscard]] double get_characteristic_length() const override;
 

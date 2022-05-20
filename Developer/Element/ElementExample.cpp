@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "ElementExample.h"
+#include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Material/Material.h>
 #include <Toolbox/utility.h>
@@ -51,7 +52,7 @@ SUANPAN_EXPORT void new_elementexample(unique_ptr<Element>& return_obj, std::ist
 }
 
 ElementExample::ElementExample(const unsigned T, uvec&& NT, const unsigned MT, const double TH)
-    : Element(T, m_node, m_dof, std::forward<uvec>(NT), uvec{MT}, false, MaterialType::D2, {})
+    : Element(T, m_node, m_dof, std::forward<uvec>(NT), uvec{MT}, false, MaterialType::D2, {DOF::X,DOF::Y})
     , thickness(TH) {}
 
 int ElementExample::initialize(const shared_ptr<DomainBase>& D) {

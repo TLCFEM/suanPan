@@ -19,6 +19,7 @@
 #define UTILITY_H
 
 #include <suanPan.h>
+#include <concepts>
 
 template<sp_i IT, typename F> void suanpan_for(const IT start, const IT end, F&& FN) {
 #ifdef SUANPAN_MT
@@ -82,6 +83,12 @@ bool is_equal(const string&, const string&);
 bool if_contain(const string&, const char*);
 bool if_contain(const string&, const string&);
 bool if_contain(string&&, string&&);
+
+template<std::equality_comparable T> std::pair<bool, std::int64_t> if_contain(const std::vector<T>& container, const T target) {
+    auto position = std::find(container.begin(), container.end(), target);
+
+    return {position != container.end(), position - container.begin()};
+}
 
 bool is_true(const char*);
 bool is_false(const char*);

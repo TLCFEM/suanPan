@@ -22,6 +22,7 @@
 #include <Domain/Node.h>
 #include <Material/Material.h>
 #include <Section/Section.h>
+#include <Toolbox/utility.h>
 
 void Element::update_strain_energy() {
     if(trial_resistance.is_empty()) return;
@@ -246,8 +247,8 @@ vector<shared_ptr<Section>> Element::get_section(const shared_ptr<DomainBase>& D
     return section_pool;
 }
 
-Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT)
-    : Element(T, NN, ND, std::forward<uvec>(NT), {}, false, MaterialType::D0, {}) {}
+Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, vector<DOF>&& DI)
+    : Element(T, NN, ND, std::forward<uvec>(NT), {}, false, MaterialType::D0, std::forward<vector<DOF>>(DI)) {}
 
 Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& MT, const bool F, const MaterialType MTP, vector<DOF>&& DI)
     : DataElement{std::forward<uvec>(NT), std::forward<uvec>(MT), uvec{}, F, true, true, true, true, {}}
@@ -256,7 +257,10 @@ Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& 
     , num_dof(ND)
     , mat_type(MTP)
     , sec_type(SectionType::D0)
-    , dof_identifier(std::forward<vector<DOF>>(DI)) { suanpan_debug("Element %u ctor() called.\n", T); }
+    , dof_identifier(std::forward<vector<DOF>>(DI)) {
+    suanpan_debug("Element %u ctor() called.\n", T);
+    suanpan_debug([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw invalid_argument("size of dof identifier must meet number of dofs"); });
+}
 
 Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& ST, const bool F, const SectionType STP, vector<DOF>&& DI)
     : DataElement{std::forward<uvec>(NT), uvec{}, std::forward<uvec>(ST), F, true, true, true, true, {}}
@@ -265,7 +269,10 @@ Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& 
     , num_dof(ND)
     , mat_type(MaterialType::D0)
     , sec_type(STP)
-    , dof_identifier(std::forward<vector<DOF>>(DI)) { suanpan_debug("Element %u ctor() called.\n", T); }
+    , dof_identifier(std::forward<vector<DOF>>(DI)) {
+    suanpan_debug("Element %u ctor() called.\n", T);
+    suanpan_debug([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw invalid_argument("size of dof identifier must meet number of dofs"); });
+}
 
 // for contact elements that use node groups
 Element::Element(const unsigned T, const unsigned ND, uvec&& GT)
@@ -552,6 +559,17 @@ double Element::get_kinetic_energy() const { return kinetic_energy; }
 double Element::get_viscous_energy() const { return viscous_energy; }
 
 const vec& Element::get_momentum() const { return momentum; }
+
+double Element::get_momentum_component(const DOF D) const {
+    auto [flag, position] = if_contain(dof_identifier, D);
+
+    if(!flag || momentum.empty()) return 0.;
+
+    auto momentum_component = 0.;
+    for(auto I = 0u; I < num_node; ++I, position += num_dof) momentum_component += momentum(position);
+
+    return momentum_component;
+}
 
 double Element::get_characteristic_length() const { return characteristic_length; }
 
