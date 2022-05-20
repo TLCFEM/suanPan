@@ -61,13 +61,9 @@ void NodeRecorder::record(const shared_ptr<DomainBase>& D) {
             if(!t_node->is_active()) continue;
             const auto& t_dof = t_node->get_reordered_dof();
             const auto& t_dof_identifier = t_node->get_dof_identifier();
+            const auto& t_momentum = D->get_factory()->get_momentum();
             const auto [flag, position] = if_contain(t_dof_identifier, DI);
-            auto momentum = 0.;
-            if(flag) {
-                const auto& t_momentum = D->get_factory()->get_momentum();
-                momentum = t_momentum(t_dof(flag));
-            }
-            insert({{momentum}}, I);
+            insert({{(flag && t_momentum.n_elem > t_dof(position) ? t_momentum(t_dof(position)) : 0.)}}, I);
         }
     };
 

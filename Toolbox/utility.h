@@ -87,7 +87,7 @@ bool if_contain(string&&, string&&);
 template<std::equality_comparable T> std::pair<bool, std::int64_t> if_contain(const std::vector<T>& container, const T target) {
     auto position = std::find(container.begin(), container.end(), target);
 
-    return {position != container.end(), position - container.begin()};
+    return {position != container.end() && container.size() > 0, position - container.begin()};
 }
 
 bool is_true(const char*);
