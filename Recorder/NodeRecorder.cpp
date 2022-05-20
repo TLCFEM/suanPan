@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "NodeRecorder.h"
+#include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Domain/Node.h>
@@ -54,6 +55,22 @@ void NodeRecorder::record(const shared_ptr<DomainBase>& D) {
         }
     };
 
+    auto get_momentum_component = [&](const DOF DI) {
+        for(unsigned I = 0; I < obj_tag.n_elem; ++I) {
+            const auto& t_node = D->get<Node>(obj_tag(I));
+            if(!t_node->is_active()) continue;
+            const auto& t_dof = t_node->get_reordered_dof();
+            const auto& t_dof_identifier = t_node->get_dof_identifier();
+            const auto [flag, position] = if_contain(t_dof_identifier, DI);
+            auto momentum = 0.;
+            if(flag) {
+                const auto& t_momentum = D->get_factory()->get_momentum();
+                momentum = t_momentum(t_dof(flag));
+            }
+            insert({{momentum}}, I);
+        }
+    };
+
     if(OutputType::GDF == get_variable_type()) {
         auto& damping_force = D->get_factory()->get_current_damping_force();
         if(damping_force.empty()) return;
@@ -78,6 +95,12 @@ void NodeRecorder::record(const shared_ptr<DomainBase>& D) {
     else if(OutputType::GIF4 == get_variable_type() || OutputType::GIM1 == get_variable_type()) insert_inertial_force(3);
     else if(OutputType::GIF5 == get_variable_type() || OutputType::GIM2 == get_variable_type()) insert_inertial_force(4);
     else if(OutputType::GIF6 == get_variable_type() || OutputType::GIM3 == get_variable_type()) insert_inertial_force(5);
+    else if(OutputType::MMX == get_variable_type()) get_momentum_component(DOF::X);
+    else if(OutputType::MMY == get_variable_type()) get_momentum_component(DOF::Y);
+    else if(OutputType::MMZ == get_variable_type()) get_momentum_component(DOF::Z);
+    else if(OutputType::MMRX == get_variable_type()) get_momentum_component(DOF::RX);
+    else if(OutputType::MMRY == get_variable_type()) get_momentum_component(DOF::RY);
+    else if(OutputType::MMRZ == get_variable_type()) get_momentum_component(DOF::RZ);
     else for(unsigned I = 0; I < obj_tag.n_elem; ++I) if(const auto& t_node = D->get<Node>(obj_tag(I)); t_node->is_active()) insert(t_node->record(get_variable_type()), I);
 
     if(if_record_time()) insert(D->get_factory()->get_current_time());
