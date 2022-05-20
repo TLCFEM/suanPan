@@ -1,3 +1,5 @@
+# A TEST MODEL FOR MOMENTUM
+
 node 1 0 0
 node 2 0 -2
 node 3 0 -3
@@ -38,6 +40,6 @@ converger RelIncreDisp 1 1E-10 10 1
 
 analyze
 
-save recorder 1 2 3 4 5
+# save recorder 1 2 3 4 5
 
 exit
