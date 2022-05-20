@@ -82,7 +82,7 @@ struct DataElement {
     double kinetic_energy = 0.;
     double viscous_energy = 0.;
     double complementary_energy = 0.;
-    double momentum = 0.;
+    vec momentum;
 
     const double characteristic_length = 1.;
 };
@@ -141,13 +141,14 @@ public:
             unsigned, // number of dofs
             uvec&&    // node encoding
     );
-    Element(unsigned,    // tag
-            unsigned,    // number of nodes
-            unsigned,    // number of dofs
-            uvec&&,      // node encoding
-            uvec&&,      // material tags
-            bool,        // nonlinear geometry switch
-            MaterialType // material type for internal check
+    Element(unsigned,     // tag
+            unsigned,     // number of nodes
+            unsigned,     // number of dofs
+            uvec&&,       // node encoding
+            uvec&&,       // material tags
+            bool,         // nonlinear geometry switch
+            MaterialType, // material type for internal check
+            vector<DOF>&& // dof identifier
     );
     Element(unsigned,   // tag
             unsigned,   // number of nodes
@@ -244,7 +245,7 @@ public:
     [[nodiscard]] double get_complementary_energy() const override;
     [[nodiscard]] double get_kinetic_energy() const override;
     [[nodiscard]] double get_viscous_energy() const override;
-    [[nodiscard]] double get_momentum() const override;
+    [[nodiscard]] const vec& get_momentum() const override;
 
     [[nodiscard]] double get_characteristic_length() const override;
 

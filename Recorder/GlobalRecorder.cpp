@@ -45,7 +45,7 @@ void GlobalRecorder::record(const shared_ptr<DomainBase>& D) {
     }
     else if(OutputType::MM == get_variable_type()) {
         auto momentum = 0.;
-        for(auto& I : D->get_pool<Element>()) momentum += I->get_momentum();
+        for(auto& I : D->get_pool<Element>()) momentum += accu(I->get_momentum());
         insert({{momentum, D->get_factory()->get_momentum()}}, 0);
     }
     else insert({{.0, .0}}, 0);

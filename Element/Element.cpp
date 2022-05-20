@@ -56,7 +56,7 @@ void Element::update_momentum() {
 
     const vec t_velocity = get_trial_velocity();
 
-    momentum = accu(trial_mass * t_velocity);
+    momentum = trial_mass * t_velocity;
 }
 
 /**
@@ -247,15 +247,16 @@ vector<shared_ptr<Section>> Element::get_section(const shared_ptr<DomainBase>& D
 }
 
 Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT)
-    : Element(T, NN, ND, std::forward<uvec>(NT), {}, false, MaterialType::D0) {}
+    : Element(T, NN, ND, std::forward<uvec>(NT), {}, false, MaterialType::D0, {}) {}
 
-Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& MT, const bool F, const MaterialType MTP)
+Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& MT, const bool F, const MaterialType MTP, vector<DOF>&& DI)
     : DataElement{std::forward<uvec>(NT), std::forward<uvec>(MT), uvec{}, F, true, true, true, true, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}}
     , ElementBase(T)
     , num_node(NN)
     , num_dof(ND)
     , mat_type(MTP)
-    , sec_type(SectionType::D0) { suanpan_debug("Element %u ctor() called.\n", T); }
+    , sec_type(SectionType::D0)
+    , dof_identifier(std::forward<vector<DOF>>(DI)) { suanpan_debug("Element %u ctor() called.\n", T); }
 
 Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& ST, const bool F, const SectionType STP)
     : DataElement{std::forward<uvec>(NT), uvec{}, std::forward<uvec>(ST), F, true, true, true, true, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}}
@@ -499,7 +500,7 @@ int Element::clear_status() {
     kinetic_energy = 0.;
     viscous_energy = 0.;
     complementary_energy = 0.;
-    momentum = 0.;
+    momentum.zeros();
 
     set_initialized(false);
 
@@ -550,7 +551,7 @@ double Element::get_kinetic_energy() const { return kinetic_energy; }
 
 double Element::get_viscous_energy() const { return viscous_energy; }
 
-double Element::get_momentum() const { return momentum; }
+const vec& Element::get_momentum() const { return momentum; }
 
 double Element::get_characteristic_length() const { return characteristic_length; }
 

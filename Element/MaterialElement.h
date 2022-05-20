@@ -32,46 +32,48 @@
 
 class MaterialElement : public Element {
 public:
-    explicit MaterialElement(unsigned,    // tag
-                             unsigned,    // number of nodes
-                             unsigned,    // number of dofs
-                             uvec&&,      // node encoding
-                             uvec&&,      // material tags
-                             bool,        // nonlinear geometry switch
-                             MaterialType // material type
+    MaterialElement(unsigned,     // tag
+                    unsigned,     // number of nodes
+                    unsigned,     // number of dofs
+                    uvec&&,       // node encoding
+                    uvec&&,       // material tags
+                    bool,         // nonlinear geometry switch
+                    MaterialType, // material type
+                    vector<DOF>&& // dof identifier
     );
 };
 
 class MaterialElement1D : public MaterialElement {
 public:
-    explicit MaterialElement1D(unsigned, // tag
-                               unsigned, // number of nodes
-                               unsigned, // number of dofs
-                               uvec&&,   // node encoding
-                               uvec&&,   // material tags
-                               bool      // nonlinear geometry switch
+    MaterialElement1D(unsigned,          // tag
+                      unsigned,          // number of nodes
+                      unsigned,          // number of dofs
+                      uvec&&,            // node encoding
+                      uvec&&,            // material tags
+                      bool,              // nonlinear geometry switch
+                      vector<DOF>&& = {} // dof identifier
     );
 };
 
 class MaterialElement2D : public MaterialElement {
 public:
-    explicit MaterialElement2D(unsigned, // tag
-                               unsigned, // number of nodes
-                               unsigned, // number of dofs
-                               uvec&&,   // node encoding
-                               uvec&&,   // material tags
-                               bool      // nonlinear geometry switch
+    MaterialElement2D(unsigned, // tag
+                      unsigned, // number of nodes
+                      unsigned, // number of dofs
+                      uvec&&,   // node encoding
+                      uvec&&,   // material tags
+                      bool      // nonlinear geometry switch
     );
 };
 
 class MaterialElement3D : public MaterialElement {
 public:
-    explicit MaterialElement3D(unsigned = 0, // tag
-                               unsigned = 0, // number of nodes
-                               unsigned = 0, // number of dofs
-                               uvec&& = {},  // node encoding
-                               uvec&& = {},  // material tags
-                               bool = false  // nonlinear geometry switch
+    MaterialElement3D(unsigned, // tag
+                      unsigned, // number of nodes
+                      unsigned, // number of dofs
+                      uvec&&,   // node encoding
+                      uvec&&,   // material tags
+                      bool      // nonlinear geometry switch
     );
 };
 

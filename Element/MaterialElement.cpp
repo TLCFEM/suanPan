@@ -18,14 +18,14 @@
 #include "MaterialElement.h"
 #include <Material/Material.h>
 
-MaterialElement::MaterialElement(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& MT, const bool F, const MaterialType MTP)
-    : Element(T, NN, ND, std::forward<uvec>(NT), std::forward<uvec>(MT), F, MTP) {}
+MaterialElement::MaterialElement(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& MT, const bool F, const MaterialType MTP, vector<DOF>&& DI)
+    : Element(T, NN, ND, std::forward<uvec>(NT), std::forward<uvec>(MT), F, MTP, std::forward<vector<DOF>>(DI)) {}
 
-MaterialElement1D::MaterialElement1D(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& MT, const bool F)
-    : MaterialElement(T, NN, ND, std::forward<uvec>(NT), std::forward<uvec>(MT), F, MaterialType::D1) {}
+MaterialElement1D::MaterialElement1D(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& MT, const bool F, vector<DOF>&& DI)
+    : MaterialElement(T, NN, ND, std::forward<uvec>(NT), std::forward<uvec>(MT), F, MaterialType::D1, std::forward<vector<DOF>>(DI)) {}
 
 MaterialElement2D::MaterialElement2D(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& MT, const bool F)
-    : MaterialElement(T, NN, ND, std::forward<uvec>(NT), std::forward<uvec>(MT), F, MaterialType::D2) {}
+    : MaterialElement(T, NN, ND, std::forward<uvec>(NT), std::forward<uvec>(MT), F, MaterialType::D2, {}) {}
 
 MaterialElement3D::MaterialElement3D(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& MT, const bool F)
-    : MaterialElement(T, NN, ND, std::forward<uvec>(NT), std::forward<uvec>(MT), F, MaterialType::D3) {}
+    : MaterialElement(T, NN, ND, std::forward<uvec>(NT), std::forward<uvec>(MT), F, MaterialType::D3, {}) {}
