@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "C3D8.h"
+#include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Material/Material3D/Material3D.h>
 #include <Recorder/OutputType.h>
@@ -33,7 +34,7 @@ C3D8::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Mat
     , strain_mat(6, c_size, fill::zeros) {}
 
 C3D8::C3D8(const unsigned T, uvec&& N, const unsigned M, const char R, const bool F)
-    : MaterialElement3D(T, c_node, c_dof, std::forward<uvec>(N), uvec{M}, F)
+    : MaterialElement3D(T, c_node, c_dof, std::forward<uvec>(N), uvec{M}, F, {DOF::X, DOF::Y, DOF::Z})
     , int_scheme(R)
     , hourglass_control('R' == R) {}
 

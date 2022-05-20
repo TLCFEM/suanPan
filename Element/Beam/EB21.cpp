@@ -16,13 +16,14 @@
  ******************************************************************************/
 
 #include "EB21.h"
+#include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Element/Utility/B2DC.h>
 #include <Material/Material1D/Material1D.h>
 #include <Recorder/OutputType.h>
 
 EB21::EB21(const unsigned T, uvec&& N, const double A, const double I, const unsigned M, const bool F)
-    : MaterialElement1D(T, b_node, b_dof, std::forward<uvec>(N), uvec{M}, F)
+    : MaterialElement1D(T, b_node, b_dof, std::forward<uvec>(N), uvec{M}, F, {DOF::X, DOF::Y, DOF::RZ})
     , area(A)
     , moment_inertia(I)
     , b_trans(F ? make_unique<B2DC>() : make_unique<B2DL>()) {}

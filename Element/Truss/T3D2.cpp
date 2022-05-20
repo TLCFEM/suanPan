@@ -16,11 +16,12 @@
  ******************************************************************************/
 
 #include "T3D2.h"
+#include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Material/Material1D/Material1D.h>
 
 T3D2::T3D2(const unsigned T, uvec&& N, const unsigned M, const double A, const bool F, const bool UA, const bool LS)
-    : MaterialElement1D(T, t_node, t_dof, std::forward<uvec>(N), uvec{M}, F)
+    : MaterialElement1D(T, t_node, t_dof, std::forward<uvec>(N), uvec{M}, F, {DOF::X, DOF::Y, DOF::Z})
     , area(A)
     , t_trans(F ? make_unique<T3DC>() : make_unique<T3DL>())
     , update_area(UA)

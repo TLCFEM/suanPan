@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "C3D4.h"
+#include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Material/Material3D/Material3D.h>
 #include <Recorder/OutputType.h>
@@ -23,7 +24,7 @@
 #include <Toolbox/tensorToolbox.h>
 
 C3D4::C3D4(const unsigned T, uvec&& N, const unsigned M, const bool F)
-    : MaterialElement3D(T, c_node, c_dof, std::forward<uvec>(N), uvec{M}, F) {}
+    : MaterialElement3D(T, c_node, c_dof, std::forward<uvec>(N), uvec{M}, F, {DOF::X, DOF::Y, DOF::Z}) {}
 
 int C3D4::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));

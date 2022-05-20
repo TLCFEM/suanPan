@@ -16,12 +16,13 @@
  ******************************************************************************/
 
 #include "NMB31.h"
+#include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Element/Utility/B3DL.h>
 #include <Section/Section.h>
 
 NMB31::NMB31(const unsigned T, uvec&& N, const unsigned S, const unsigned O, const bool F)
-    : SectionNMElement3D(T, b_node, b_dof, std::forward<uvec>(N), uvec{S}, F)
+    : SectionNMElement3D(T, b_node, b_dof, std::forward<uvec>(N), uvec{S}, F, {DOF::X, DOF::Y, DOF::Z, DOF::RX, DOF::RY, DOF::RZ})
     , orientation_tag(O) {}
 
 int NMB31::initialize(const shared_ptr<DomainBase>& D) {

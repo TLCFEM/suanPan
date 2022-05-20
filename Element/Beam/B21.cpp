@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "B21.h"
+#include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Element/Utility/B2DC.h>
 #include <Section/Section.h>
@@ -28,7 +29,7 @@ B21::IntegrationPoint::IntegrationPoint(const double C, const double W, unique_p
     , strain_mat(2, 3, fill::zeros) {}
 
 B21::B21(const unsigned T, uvec&& N, const unsigned S, const unsigned P, const bool F)
-    : SectionElement2D(T, b_node, b_dof, std::forward<uvec>(N), uvec{S}, F)
+    : SectionElement2D(T, b_node, b_dof, std::forward<uvec>(N), uvec{S}, F, {DOF::X, DOF::Y, DOF::RZ})
     , int_pt_num(P > 20 ? 20 : P)
     , b_trans(F ? make_unique<B2DC>() : make_unique<B2DL>()) {}
 

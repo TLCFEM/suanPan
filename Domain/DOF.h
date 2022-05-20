@@ -34,6 +34,7 @@ enum class DOF : unsigned short {
     RX, // rotation in x direction
     RY, // rotation in y direction
     RZ, // rotation in z direction
+    DMG, //damage
     P,  // pressure
     T   // temperature
 };

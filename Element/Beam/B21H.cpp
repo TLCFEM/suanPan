@@ -16,7 +16,7 @@
  ******************************************************************************/
 
 #include "B21H.h"
-
+#include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Section/Section.h>
 #include <Toolbox/IntegrationPlan.h>
@@ -28,7 +28,7 @@ B21H::IntegrationPoint::IntegrationPoint(const double C, const double W, unique_
     , strain_mat(2, 3, fill::zeros) {}
 
 B21H::B21H(const unsigned T, uvec&& N, const unsigned S, const double L, const bool F)
-    : SectionElement2D(T, b_node, b_dof, std::forward<uvec>(N), uvec{S}, F)
+    : SectionElement2D(T, b_node, b_dof, std::forward<uvec>(N), uvec{S}, F, {DOF::X, DOF::Y, DOF::RZ})
     , hinge_length(L > .5 ? .5 : L)
     , b_trans(F ? make_unique<B2DC>() : make_unique<B2DL>()) {}
 

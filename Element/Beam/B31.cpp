@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "B31.h"
+#include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Section/Section.h>
 #include <Toolbox/IntegrationPlan.h>
@@ -29,7 +30,7 @@ B31::IntegrationPoint::IntegrationPoint(const double C, const double W, unique_p
     , strain_mat(3, 6, fill::zeros) {}
 
 B31::B31(const unsigned T, uvec&& N, const unsigned S, const unsigned O, const unsigned P, const bool F)
-    : SectionElement3D(T, b_node, b_dof, std::forward<uvec>(N), uvec{S}, F)
+    : SectionElement3D(T, b_node, b_dof, std::forward<uvec>(N), uvec{S}, F, {DOF::X, DOF::Y, DOF::Z, DOF::RX, DOF::RY, DOF::RZ})
     , orientation_tag(O)
     , int_pt_num(P > 20 ? 20 : P) {}
 
