@@ -44,6 +44,7 @@ using std::vector;
 
 class DomainBase;
 enum class OutputType;
+enum class DOF : unsigned short;
 
 struct NodeData {
     unsigned num_dof = 0; // number of DoFs
@@ -78,6 +79,10 @@ struct NodeData {
 class Node final : protected NodeData, public Tag {
     bool initialized = false;
 
+    std::mutex node_mutex;
+
+    vector<DOF> dof_identifier;
+
 public:
     explicit Node(unsigned = 0);
     Node(unsigned, vec&&);
@@ -96,6 +101,9 @@ public:
 
     void set_dof_number(unsigned);
     [[nodiscard]] unsigned get_dof_number() const;
+
+    void set_dof_identifier(const vector<DOF>&);
+    [[nodiscard]] const vector<DOF>& get_dof_identifier() const;
 
     void set_original_dof(unsigned&);
     void set_original_dof(const uvec&);

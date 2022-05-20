@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Element.h"
+#include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Domain/Group.h>
 #include <Domain/Node.h>
@@ -391,6 +392,9 @@ void Element::update_dof_encoding() {
         auto& node_dof = tmp_ptr.lock()->get_reordered_dof();
         for(unsigned i = 0; i < num_dof; ++i) dof_encoding(idx++) = node_dof(i);
     }
+
+    if(!dof_identifier.empty())
+        for(const auto& tmp_ptr : node_ptr) tmp_ptr.lock()->set_dof_identifier(dof_identifier);
 }
 
 bool Element::if_update_mass() const { return update_mass; }

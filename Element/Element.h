@@ -32,6 +32,7 @@
 
 enum class MaterialType : unsigned;
 enum class SectionType : unsigned;
+enum class DOF : unsigned short;
 
 struct DataElement {
     const uvec node_encoding; // node encoding
@@ -98,6 +99,8 @@ class Element : protected DataElement, public ElementBase {
 
     const MaterialType mat_type;
     const SectionType sec_type;
+
+    vector<DOF> dof_identifier;
 
     friend void ConstantMass(DataElement*);
     friend void ConstantDamping(DataElement*);
