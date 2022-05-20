@@ -20,15 +20,15 @@
 
 Mass::Mass(const unsigned T, const unsigned NT, const double MA, uvec&& DT)
     : Element(T, 1, static_cast<unsigned>(DT.max()), uvec{NT}, [&] {
-        vector<DOF> DI;
+        vector DI(DT.max(), DOF::NONE);
 
         for(const auto I : DT)
-            if(1 == I) DI.emplace_back(DOF::X);
-            else if(2 == I) DI.emplace_back(DOF::Y);
-            else if(3 == I) DI.emplace_back(DOF::Z);
-            else if(4 == I) DI.emplace_back(DOF::RX);
-            else if(5 == I) DI.emplace_back(DOF::RY);
-            else if(6 == I) DI.emplace_back(DOF::RZ);
+            if(1 == I) DI[0] = DOF::X;
+            else if(2 == I) DI[1] = DOF::Y;
+            else if(3 == I) DI[2] = DOF::Z;
+            else if(4 == I) DI[3] = DOF::RX;
+            else if(5 == I) DI[4] = DOF::RY;
+            else if(6 == I) DI[5] = DOF::RZ;
 
         return DI;
     }())
