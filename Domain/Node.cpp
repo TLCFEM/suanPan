@@ -115,11 +115,10 @@ unsigned Node::get_dof_number() const { return num_dof; }
 void Node::set_dof_identifier(const vector<DOF>& D) {
     std::scoped_lock node_lock{node_mutex};
 
-    if(dof_identifier.empty())
-        dof_identifier = vector(num_dof, DOF::NONE);
+    if(dof_identifier.empty()) dof_identifier = vector(num_dof, DOF::NONE);
 
     for(size_t I = 0; I < D.size(); ++I) {
-        suanpan_debug([&]() {if(dof_identifier[I]!= DOF::NONE && D[I]!=dof_identifier[I])suanpan_warning("inconsistent DoF for Node %u detected, which is likely an error, please double check the model.\n",get_tag()); });
+        suanpan_debug([&]() { if(dof_identifier[I] != DOF::NONE && D[I] != dof_identifier[I]) suanpan_warning("inconsistent DoF for Node %u detected, which is likely an error, please double check the model.\n", get_tag()); });
         dof_identifier[I] = D[I];
     }
 }

@@ -24,8 +24,8 @@ MaterialElement::MaterialElement(const unsigned T, const unsigned NN, const unsi
 MaterialElement1D::MaterialElement1D(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& MT, const bool F, vector<DOF>&& DI)
     : MaterialElement(T, NN, ND, std::forward<uvec>(NT), std::forward<uvec>(MT), F, MaterialType::D1, std::forward<vector<DOF>>(DI)) {}
 
-MaterialElement2D::MaterialElement2D(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& MT, const bool F)
-    : MaterialElement(T, NN, ND, std::forward<uvec>(NT), std::forward<uvec>(MT), F, MaterialType::D2, {}) {}
+MaterialElement2D::MaterialElement2D(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& MT, const bool F, vector<DOF>&& DI)
+    : MaterialElement(T, NN, ND, std::forward<uvec>(NT), std::forward<uvec>(MT), F, MaterialType::D2, std::forward<vector<DOF>>(DI)) {}
 
-MaterialElement3D::MaterialElement3D(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& MT, const bool F)
-    : MaterialElement(T, NN, ND, std::forward<uvec>(NT), std::forward<uvec>(MT), F, MaterialType::D3, {}) {}
+MaterialElement3D::MaterialElement3D(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& MT, const bool F, vector<DOF>&& DI)
+    : MaterialElement(T, NN, ND, std::forward<uvec>(NT), std::forward<uvec>(MT), F, MaterialType::D3, std::forward<vector<DOF>>(DI)) {}

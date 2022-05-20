@@ -48,41 +48,41 @@ struct DataElement {
 
     uvec dof_encoding; // DoF encoding vector
 
-    mat initial_mass;      // mass matrix
-    mat initial_damping;   // damping matrix
-    mat initial_stiffness; // stiffness matrix
-    mat initial_geometry;  // geometry matrix
+    mat initial_mass{};      // mass matrix
+    mat initial_damping{};   // damping matrix
+    mat initial_stiffness{}; // stiffness matrix
+    mat initial_geometry{};  // geometry matrix
 
-    mat trial_mass;      // mass matrix
-    mat trial_damping;   // damping matrix
-    mat trial_stiffness; // stiffness matrix
-    mat trial_geometry;  // geometry matrix
+    mat trial_mass{};      // mass matrix
+    mat trial_damping{};   // damping matrix
+    mat trial_stiffness{}; // stiffness matrix
+    mat trial_geometry{};  // geometry matrix
 
-    mat current_mass;      // mass matrix
-    mat current_damping;   // damping matrix
-    mat current_stiffness; // stiffness matrix
-    mat current_geometry;  // geometry matrix
+    mat current_mass{};      // mass matrix
+    mat current_damping{};   // damping matrix
+    mat current_stiffness{}; // stiffness matrix
+    mat current_geometry{};  // geometry matrix
 
-    vec trial_resistance;       // resistance vector
-    vec current_resistance;     // resistance vector
-    vec trial_damping_force;    // damping force
-    vec current_damping_force;  // damping force
-    vec trial_inertial_force;   // inertial force
-    vec current_inertial_force; // inertial force
+    vec trial_resistance{};       // resistance vector
+    vec current_resistance{};     // resistance vector
+    vec trial_damping_force{};    // damping force
+    vec current_damping_force{};  // damping force
+    vec trial_inertial_force{};   // inertial force
+    vec current_inertial_force{}; // inertial force
 
-    vec trial_body_force;
-    vec current_body_force;
-    vec trial_traction;
-    vec current_traction;
+    vec trial_body_force{};
+    vec current_body_force{};
+    vec trial_traction{};
+    vec current_traction{};
 
-    mat body_force;
-    mat traction;
+    mat body_force{};
+    mat traction{};
 
     double strain_energy = 0.;
     double kinetic_energy = 0.;
     double viscous_energy = 0.;
     double complementary_energy = 0.;
-    vec momentum;
+    vec momentum{};
 
     const double characteristic_length = 1.;
 };
@@ -150,13 +150,14 @@ public:
             MaterialType, // material type for internal check
             vector<DOF>&& // dof identifier
     );
-    Element(unsigned,   // tag
-            unsigned,   // number of nodes
-            unsigned,   // number of dofs
-            uvec&&,     // node encoding
-            uvec&&,     // section tags
-            bool,       // nonlinear geometry switch
-            SectionType // section type for internal check
+    Element(unsigned,     // tag
+            unsigned,     // number of nodes
+            unsigned,     // number of dofs
+            uvec&&,       // node encoding
+            uvec&&,       // section tags
+            bool,         // nonlinear geometry switch
+            SectionType,  // section type for internal check
+            vector<DOF>&& // dof identifier
     );
     Element(unsigned, // tag
             unsigned, // number of dofs

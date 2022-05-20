@@ -250,7 +250,7 @@ Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& 
     : Element(T, NN, ND, std::forward<uvec>(NT), {}, false, MaterialType::D0, {}) {}
 
 Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& MT, const bool F, const MaterialType MTP, vector<DOF>&& DI)
-    : DataElement{std::forward<uvec>(NT), std::forward<uvec>(MT), uvec{}, F, true, true, true, true, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}}
+    : DataElement{std::forward<uvec>(NT), std::forward<uvec>(MT), uvec{}, F, true, true, true, true, {}}
     , ElementBase(T)
     , num_node(NN)
     , num_dof(ND)
@@ -258,17 +258,18 @@ Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& 
     , sec_type(SectionType::D0)
     , dof_identifier(std::forward<vector<DOF>>(DI)) { suanpan_debug("Element %u ctor() called.\n", T); }
 
-Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& ST, const bool F, const SectionType STP)
-    : DataElement{std::forward<uvec>(NT), uvec{}, std::forward<uvec>(ST), F, true, true, true, true, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}}
+Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& ST, const bool F, const SectionType STP, vector<DOF>&& DI)
+    : DataElement{std::forward<uvec>(NT), uvec{}, std::forward<uvec>(ST), F, true, true, true, true, {}}
     , ElementBase(T)
     , num_node(NN)
     , num_dof(ND)
     , mat_type(MaterialType::D0)
-    , sec_type(STP) { suanpan_debug("Element %u ctor() called.\n", T); }
+    , sec_type(STP)
+    , dof_identifier(std::forward<vector<DOF>>(DI)) { suanpan_debug("Element %u ctor() called.\n", T); }
 
 // for contact elements that use node groups
 Element::Element(const unsigned T, const unsigned ND, uvec&& GT)
-    : DataElement{std::forward<uvec>(GT), {}, {}, false, true, true, true, true, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}}
+    : DataElement{std::forward<uvec>(GT), {}, {}, false, true, true, true, true, {}}
     , ElementBase(T)
     , num_node(static_cast<unsigned>(-1))
     , num_dof(ND)
@@ -278,7 +279,7 @@ Element::Element(const unsigned T, const unsigned ND, uvec&& GT)
 
 // for elements that use other elements
 Element::Element(const unsigned T, const unsigned ND, const unsigned ET, const unsigned NT)
-    : DataElement{{NT}, {}, {}, false, true, true, true, true, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}}
+    : DataElement{{NT}, {}, {}, false, true, true, true, true, {}}
     , ElementBase(T)
     , num_node(static_cast<unsigned>(-1))
     , num_dof(ND)
@@ -394,8 +395,7 @@ void Element::update_dof_encoding() {
         for(unsigned i = 0; i < num_dof; ++i) dof_encoding(idx++) = node_dof(i);
     }
 
-    if(!dof_identifier.empty())
-        for(const auto& tmp_ptr : node_ptr) tmp_ptr.lock()->set_dof_identifier(dof_identifier);
+    if(!dof_identifier.empty()) for(const auto& tmp_ptr : node_ptr) tmp_ptr.lock()->set_dof_identifier(dof_identifier);
 }
 
 bool Element::if_update_mass() const { return update_mass; }

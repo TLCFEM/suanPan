@@ -57,23 +57,25 @@ public:
 
 class MaterialElement2D : public MaterialElement {
 public:
-    MaterialElement2D(unsigned, // tag
-                      unsigned, // number of nodes
-                      unsigned, // number of dofs
-                      uvec&&,   // node encoding
-                      uvec&&,   // material tags
-                      bool      // nonlinear geometry switch
+    MaterialElement2D(unsigned,          // tag
+                      unsigned,          // number of nodes
+                      unsigned,          // number of dofs
+                      uvec&&,            // node encoding
+                      uvec&&,            // material tags
+                      bool,              // nonlinear geometry switch
+                      vector<DOF>&& = {} // dof identifier
     );
 };
 
 class MaterialElement3D : public MaterialElement {
 public:
-    MaterialElement3D(unsigned, // tag
-                      unsigned, // number of nodes
-                      unsigned, // number of dofs
-                      uvec&&,   // node encoding
-                      uvec&&,   // material tags
-                      bool      // nonlinear geometry switch
+    MaterialElement3D(unsigned,          // tag
+                      unsigned,          // number of nodes
+                      unsigned,          // number of dofs
+                      uvec&&,            // node encoding
+                      uvec&&,            // material tags
+                      bool,              // nonlinear geometry switch
+                      vector<DOF>&& = {} // dof identifier
     );
 };
 
