@@ -27,7 +27,7 @@ MVLEM::Fibre::Fibre(const double B, const double H, const double R)
     , s_area(B * H * R) {}
 
 MVLEM::MVLEM(const unsigned T, uvec&& NT, const vector<double>& B, const vector<double>& H, const vector<double>& R, uvec&& CRT, uvec&& STT, const unsigned SST, const double CH)
-    : MaterialElement1D(T, b_node, b_dof, std::forward<uvec>(NT), join_cols(CRT, STT), false, {DOF::X, DOF::Y, DOF::RZ})
+    : MaterialElement1D(T, b_node, b_dof, std::forward<uvec>(NT), join_cols(CRT, STT), false, {DOF::U1, DOF::U2, DOF::UR3})
     , shear_height(CH)
     , shear_spring_tag(SST) {
     axial_spring.clear();

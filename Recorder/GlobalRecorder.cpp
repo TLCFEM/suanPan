@@ -55,12 +55,12 @@ void GlobalRecorder::record(const shared_ptr<DomainBase>& D) {
         for(auto& I : D->get_pool<Element>()) momentum += accu(I->get_momentum());
         insert({{momentum, accu(D->get_factory()->get_momentum())}}, 0);
     }
-    else if(OutputType::MMX == get_variable_type()) insert({{get_momentum_component(DOF::X)}}, 0);
-    else if(OutputType::MMY == get_variable_type()) insert({{get_momentum_component(DOF::Y)}}, 0);
-    else if(OutputType::MMZ == get_variable_type()) insert({{get_momentum_component(DOF::Z)}}, 0);
-    else if(OutputType::MMRX == get_variable_type()) insert({{get_momentum_component(DOF::RX)}}, 0);
-    else if(OutputType::MMRY == get_variable_type()) insert({{get_momentum_component(DOF::RY)}}, 0);
-    else if(OutputType::MMRZ == get_variable_type()) insert({{get_momentum_component(DOF::RZ)}}, 0);
+    else if(OutputType::MMX == get_variable_type()) insert({{get_momentum_component(DOF::U1)}}, 0);
+    else if(OutputType::MMY == get_variable_type()) insert({{get_momentum_component(DOF::U2)}}, 0);
+    else if(OutputType::MMZ == get_variable_type()) insert({{get_momentum_component(DOF::U3)}}, 0);
+    else if(OutputType::MMRX == get_variable_type()) insert({{get_momentum_component(DOF::UR1)}}, 0);
+    else if(OutputType::MMRY == get_variable_type()) insert({{get_momentum_component(DOF::UR2)}}, 0);
+    else if(OutputType::MMRZ == get_variable_type()) insert({{get_momentum_component(DOF::UR3)}}, 0);
     else insert({{.0, .0}}, 0);
 
     if(if_record_time()) insert(D->get_factory()->get_current_time());

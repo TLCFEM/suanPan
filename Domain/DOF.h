@@ -28,15 +28,23 @@
 
 enum class DOF : unsigned short {
     NONE,
-    X,  // displacement in x direction
-    Y,  // displacement in y direction
-    Z,  // displacement in z direction
-    RX, // rotation in x direction
-    RY, // rotation in y direction
-    RZ, // rotation in z direction
-    DMG, //damage
-    P,  // pressure
-    T   // temperature
+    U1,
+    // displacement in x direction
+    U2,
+    // displacement in y direction
+    U3,
+    // displacement in z direction
+    UR1,
+    // rotation in x direction
+    UR2,
+    // rotation in y direction
+    UR3,
+    // rotation in z direction
+    DMG,
+    //damage
+    P,
+    // pressure
+    T // temperature
 };
 
 #endif // DOF_H

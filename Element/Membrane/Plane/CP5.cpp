@@ -33,7 +33,7 @@ CP5::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Mate
     , strain_mat(3, m_size, fill::zeros) {}
 
 CP5::CP5(const unsigned T, uvec&& N, const unsigned M, const double TH, const bool F)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, F, {DOF::X, DOF::Y})
+    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, F, {DOF::U1, DOF::U2})
     , thickness(TH) {}
 
 int CP5::initialize(const shared_ptr<DomainBase>& D) {

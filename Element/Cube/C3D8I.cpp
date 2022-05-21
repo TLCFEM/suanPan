@@ -32,7 +32,7 @@ C3D8I::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Ma
     , B2(6, 9, fill::zeros) {}
 
 C3D8I::C3D8I(const unsigned T, uvec&& N, const unsigned M)
-    : MaterialElement3D(T, c_node, c_dof, std::forward<uvec>(N), uvec{M}, false, {DOF::X, DOF::Y, DOF::Z}) {}
+    : MaterialElement3D(T, c_node, c_dof, std::forward<uvec>(N), uvec{M}, false, {DOF::U1, DOF::U2, DOF::U3}) {}
 
 int C3D8I::initialize(const shared_ptr<DomainBase>& D) {
     auto& mat_proto = D->get<Material>(material_tag(0));

@@ -263,7 +263,7 @@ void CINP4::stack_stiffness(mat& K, const mat& D, const mat& N, const double F) 
 }
 
 CINP4::CINP4(const unsigned T, uvec&& N, const unsigned M, const double TH)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, false, {DOF::X, DOF::Y})
+    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, false, {DOF::U1, DOF::U2})
     , thickness(TH) {}
 
 int CINP4::initialize(const shared_ptr<DomainBase>& D) {

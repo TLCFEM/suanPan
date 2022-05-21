@@ -91,12 +91,12 @@ void NodeRecorder::record(const shared_ptr<DomainBase>& D) {
     else if(OutputType::GIF4 == get_variable_type() || OutputType::GIM1 == get_variable_type()) insert_inertial_force(3);
     else if(OutputType::GIF5 == get_variable_type() || OutputType::GIM2 == get_variable_type()) insert_inertial_force(4);
     else if(OutputType::GIF6 == get_variable_type() || OutputType::GIM3 == get_variable_type()) insert_inertial_force(5);
-    else if(OutputType::MMX == get_variable_type()) get_momentum_component(DOF::X);
-    else if(OutputType::MMY == get_variable_type()) get_momentum_component(DOF::Y);
-    else if(OutputType::MMZ == get_variable_type()) get_momentum_component(DOF::Z);
-    else if(OutputType::MMRX == get_variable_type()) get_momentum_component(DOF::RX);
-    else if(OutputType::MMRY == get_variable_type()) get_momentum_component(DOF::RY);
-    else if(OutputType::MMRZ == get_variable_type()) get_momentum_component(DOF::RZ);
+    else if(OutputType::MMX == get_variable_type()) get_momentum_component(DOF::U1);
+    else if(OutputType::MMY == get_variable_type()) get_momentum_component(DOF::U2);
+    else if(OutputType::MMZ == get_variable_type()) get_momentum_component(DOF::U3);
+    else if(OutputType::MMRX == get_variable_type()) get_momentum_component(DOF::UR1);
+    else if(OutputType::MMRY == get_variable_type()) get_momentum_component(DOF::UR2);
+    else if(OutputType::MMRZ == get_variable_type()) get_momentum_component(DOF::UR3);
     else for(unsigned I = 0; I < obj_tag.n_elem; ++I) if(const auto& t_node = D->get<Node>(obj_tag(I)); t_node->is_active()) insert(t_node->record(get_variable_type()), I);
 
     if(if_record_time()) insert(D->get_factory()->get_current_time());

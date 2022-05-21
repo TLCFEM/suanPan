@@ -28,7 +28,7 @@ F21::IntegrationPoint::IntegrationPoint(const double C, const double W, unique_p
     , B(2, 3, fill::zeros) {}
 
 F21::F21(const unsigned T, uvec&& N, const unsigned S, const unsigned P, const bool F)
-    : SectionElement2D(T, b_node, b_dof, std::forward<uvec>(N), uvec{S}, F, {DOF::X, DOF::Y, DOF::RZ})
+    : SectionElement2D(T, b_node, b_dof, std::forward<uvec>(N), uvec{S}, F, {DOF::U1, DOF::U2, DOF::UR3})
     , int_pt_num(P > 20 ? 20 : P)
     , b_trans(F ? make_unique<B2DC>() : make_unique<B2DL>()) {}
 

@@ -2581,6 +2581,9 @@
     <ClInclude Include="..\..\..\Step\StepParser.h">
       <Filter>Step</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Domain\DOF.h">
+      <Filter>Domain</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\..\Resource\suanPan.rc" />

@@ -22,7 +22,7 @@
 #include <Section/Section.h>
 
 NMB31::NMB31(const unsigned T, uvec&& N, const unsigned S, const unsigned O, const bool F)
-    : SectionNMElement3D(T, b_node, b_dof, std::forward<uvec>(N), uvec{S}, F, {DOF::X, DOF::Y, DOF::Z, DOF::RX, DOF::RY, DOF::RZ})
+    : SectionNMElement3D(T, b_node, b_dof, std::forward<uvec>(N), uvec{S}, F, {DOF::U1, DOF::U2, DOF::U3, DOF::UR1, DOF::UR2, DOF::UR3})
     , orientation_tag(O) {}
 
 int NMB31::initialize(const shared_ptr<DomainBase>& D) {
