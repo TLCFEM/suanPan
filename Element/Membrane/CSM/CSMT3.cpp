@@ -16,10 +16,8 @@
  ******************************************************************************/
 
 #include "CSMT3.h"
-#include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Material/Material2D/Material2D.h>
-#include <Toolbox/tensorToolbox.h>
 #include <Toolbox/utility.h>
 
 CSMT3::IntegrationPoint::IntegrationPoint(rowvec&& C, const double W, unique_ptr<Material>&& M)

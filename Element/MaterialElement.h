@@ -29,6 +29,7 @@
 #define MATERIALELEMENT_H
 
 #include <Element/Element.h>
+#include <Domain/DOF.h>
 
 class MaterialElement : public Element {
 public:
@@ -45,13 +46,13 @@ public:
 
 class MaterialElement1D : public MaterialElement {
 public:
-    MaterialElement1D(unsigned,          // tag
-                      unsigned,          // number of nodes
-                      unsigned,          // number of dofs
-                      uvec&&,            // node encoding
-                      uvec&&,            // material tags
-                      bool,              // nonlinear geometry switch
-                      vector<DOF>&& = {} // dof identifier
+    MaterialElement1D(unsigned,     // tag
+                      unsigned,     // number of nodes
+                      unsigned,     // number of dofs
+                      uvec&&,       // node encoding
+                      uvec&&,       // material tags
+                      bool,         // nonlinear geometry switch
+                      vector<DOF>&& // dof identifier
     );
 };
 
@@ -69,13 +70,13 @@ public:
 
 class MaterialElement3D : public MaterialElement {
 public:
-    MaterialElement3D(unsigned,          // tag
-                      unsigned,          // number of nodes
-                      unsigned,          // number of dofs
-                      uvec&&,            // node encoding
-                      uvec&&,            // material tags
-                      bool,              // nonlinear geometry switch
-                      vector<DOF>&& = {} // dof identifier
+    MaterialElement3D(unsigned,                                   // tag
+                      unsigned,                                   // number of nodes
+                      unsigned,                                   // number of dofs
+                      uvec&&,                                     // node encoding
+                      uvec&&,                                     // material tags
+                      bool,                                       // nonlinear geometry switch
+                      vector<DOF>&& = {DOF::U1, DOF::U2, DOF::U3} // dof identifier
     );
 };
 

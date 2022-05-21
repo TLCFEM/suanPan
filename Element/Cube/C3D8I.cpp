@@ -16,7 +16,6 @@
  ******************************************************************************/
 
 #include "C3D8I.h"
-#include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Material/Material3D/Material3D.h>
 #include <Recorder/OutputType.h>
@@ -32,7 +31,7 @@ C3D8I::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Ma
     , B2(6, 9, fill::zeros) {}
 
 C3D8I::C3D8I(const unsigned T, uvec&& N, const unsigned M)
-    : MaterialElement3D(T, c_node, c_dof, std::forward<uvec>(N), uvec{M}, false, {DOF::U1, DOF::U2, DOF::U3}) {}
+    : MaterialElement3D(T, c_node, c_dof, std::forward<uvec>(N), uvec{M}, false) {}
 
 int C3D8I::initialize(const shared_ptr<DomainBase>& D) {
     auto& mat_proto = D->get<Material>(material_tag(0));

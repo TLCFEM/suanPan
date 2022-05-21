@@ -23,7 +23,7 @@ uvec Damper02::IS{0, 1};
 uvec Damper02::JS{2, 3};
 
 Damper02::Damper02(const unsigned T, uvec&& NT, const unsigned DT, const unsigned ST, const bool UM, const unsigned PC, const double BT)
-    : MaterialElement1D(T, d_node, d_dof, std::forward<uvec>(NT), {}, false)
+    : MaterialElement1D(T, d_node, d_dof, std::forward<uvec>(NT), {}, false, {DOF::U1, DOF::U2})
     , device(make_unique<Maxwell>(0, DT, ST, UM, PC, BT)) {}
 
 int Damper02::initialize(const shared_ptr<DomainBase>& D) {

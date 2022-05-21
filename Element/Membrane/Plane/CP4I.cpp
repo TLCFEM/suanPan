@@ -16,7 +16,6 @@
  ******************************************************************************/
 
 #include "CP4I.h"
-#include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Material/Material2D/Material2D.h>
 #include <Toolbox/IntegrationPlan.h>

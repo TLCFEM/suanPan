@@ -16,7 +16,6 @@
  ******************************************************************************/
 
 #include "CSMQ.h"
-#include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Material/Material2D/Material2D.h>
 #include <Recorder/OutputType.h>

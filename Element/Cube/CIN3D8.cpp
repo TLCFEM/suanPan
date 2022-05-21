@@ -16,7 +16,6 @@
  ******************************************************************************/
 
 #include "CIN3D8.h"
-#include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Material/Material3D/Material3D.h>
 #include <Recorder/OutputType.h>
@@ -141,7 +140,7 @@ mat CIN3D8::compute_dn(const vec& C) {
 }
 
 CIN3D8::CIN3D8(const unsigned T, uvec&& N, const unsigned M)
-    : MaterialElement3D(T, c_node, c_dof, std::forward<uvec>(N), uvec{M}, false, {DOF::U1, DOF::U2, DOF::U3}) {}
+    : MaterialElement3D(T, c_node, c_dof, std::forward<uvec>(N), uvec{M}, false) {}
 
 int CIN3D8::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));

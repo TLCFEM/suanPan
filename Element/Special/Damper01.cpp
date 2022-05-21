@@ -23,7 +23,7 @@ uvec Damper01::IS{0, 1};
 uvec Damper01::JS{2, 3};
 
 Damper01::Damper01(const unsigned T, uvec&& NT, const unsigned D)
-    : MaterialElement1D(T, d_node, d_dof, std::forward<uvec>(NT), uvec{D}, false) {}
+    : MaterialElement1D(T, d_node, d_dof, std::forward<uvec>(NT), uvec{D}, false, {DOF::U1, DOF::U2}) {}
 
 int Damper01::initialize(const shared_ptr<DomainBase>& D) {
     damper = D->get<Material>(material_tag(0))->get_copy();

@@ -16,7 +16,6 @@
  ******************************************************************************/
 
 #include "C3D20.h"
-#include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Material/Material3D/Material3D.h>
 #include <Toolbox/IntegrationPlan.h>
@@ -31,7 +30,7 @@ C3D20::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Ma
     , strain_mat(6, c_size, fill::zeros) {}
 
 C3D20::C3D20(const unsigned T, uvec&& N, const unsigned M, const bool R, const bool F)
-    : MaterialElement3D(T, c_node, c_dof, std::forward<uvec>(N), uvec{M}, F, {DOF::U1, DOF::U2, DOF::U3})
+    : MaterialElement3D(T, c_node, c_dof, std::forward<uvec>(N), uvec{M}, F)
     , reduced_scheme(R) {}
 
 int C3D20::initialize(const shared_ptr<DomainBase>& D) {

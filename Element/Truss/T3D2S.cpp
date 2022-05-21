@@ -16,7 +16,6 @@
  ******************************************************************************/
 
 #include "T3D2S.h"
-#include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Element/Utility/T3DC.h>
 #include <Section/Section.h>

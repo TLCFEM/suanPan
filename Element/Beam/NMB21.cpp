@@ -16,13 +16,12 @@
  ******************************************************************************/
 
 #include "NMB21.h"
-#include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Element/Utility/B2DC.h>
 #include <Section/Section.h>
 
 NMB21::NMB21(const unsigned T, uvec&& N, const unsigned S, const bool R)
-    : SectionNMElement2D(T, b_node, b_dof, std::forward<uvec>(N), uvec{S}, R, {DOF::U1, DOF::U2, DOF::UR3})
+    : SectionNMElement2D(T, b_node, b_dof, std::forward<uvec>(N), uvec{S}, R)
     , b_trans(R ? make_unique<B2DC>() : make_unique<B2DL>()) {}
 
 int NMB21::initialize(const shared_ptr<DomainBase>& D) {
