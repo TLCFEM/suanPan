@@ -88,22 +88,14 @@ void clear(ExternalMaterialData* data, int* info) {
 void validate(ExternalMaterialData* data, int* info) { *info = 0 == data->constant_size ? -1 : 0; }
 
 SUANPAN_EXPORT void elasticexternal_handler(ExternalMaterialData* data, int* info) {
-    if(ALLOCATE == *info)
-        allocate_material(data, info);
-    else if(DEALLOCATE == *info)
-        deallocate_material(data, info);
-    else if(STATIC_UPDATE == *info)
-        static_update(data, info);
-    else if(DYNAMIC_UPDATE == *info)
-        dynamic_update(data, info);
-    else if(COMMIT == *info)
-        commit(data, info);
-    else if(RESET == *info)
-        reset(data, info);
-    else if(CLEAR == *info)
-        clear(data, info);
-    else if(VALIDATE == *info)
-        validate(data, info);
+    if(ALLOCATE == *info) allocate_material(data, info);
+    else if(DEALLOCATE == *info) deallocate_material(data, info);
+    else if(STATIC_UPDATE == *info) static_update(data, info);
+    else if(DYNAMIC_UPDATE == *info) dynamic_update(data, info);
+    else if(COMMIT == *info) commit(data, info);
+    else if(RESET == *info) reset(data, info);
+    else if(CLEAR == *info) clear(data, info);
+    else if(VALIDATE == *info) validate(data, info);
     else {
         suanpan_error("unknown flag received.\n");
         *info = -1;
