@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "PS.h"
+#include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Material/Material2D/Material2D.h>
 #include <Toolbox/IntegrationPlan.h>
@@ -46,7 +47,7 @@ mat PS::form_transformation(const mat& jacobian) {
 }
 
 PS::PS(const unsigned T, uvec&& N, const unsigned M, const double TH)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, false)
+    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, false, {DOF::X, DOF::Y})
     , thickness(TH) {}
 
 int PS::initialize(const shared_ptr<DomainBase>& D) {

@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "SGCMQ.h"
+#include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Material/Material2D/Material2D.h>
 #include <Recorder/OutputType.h>
@@ -152,7 +153,7 @@ void SGCMQ::form_body_force(const mat& diff_coor) {
 }
 
 SGCMQ::SGCMQ(const unsigned T, uvec&& N, const unsigned M, const double TH, const char IP)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, false)
+    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, false, {DOF::X, DOF::Y, DOF::RZ})
     , thickness(TH)
     , scheme(IP) {}
 

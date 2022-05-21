@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "CP6.h"
+#include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Domain/Node.h>
 #include <Material/Material2D/Material2D.h>
@@ -31,7 +32,7 @@ CP6::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Mate
     , strain_mat(3, m_size, fill::zeros) {}
 
 CP6::CP6(const unsigned T, uvec&& NT, const unsigned MT, const double TH, const bool R)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(NT), uvec{MT}, R)
+    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(NT), uvec{MT}, R, {DOF::X, DOF::Y})
     , thickness(TH) {}
 
 int CP6::initialize(const shared_ptr<DomainBase>& D) {

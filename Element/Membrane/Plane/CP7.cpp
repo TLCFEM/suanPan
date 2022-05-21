@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "CP7.h"
+#include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Domain/Node.h>
 #include <Material/Material2D/Material2D.h>
@@ -32,7 +33,7 @@ CP7::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Mate
     , strain_mat(3, m_size, fill::zeros) {}
 
 CP7::CP7(const unsigned T, uvec&& N, const unsigned M, const double TH, const bool F)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, F)
+    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, F, {DOF::X, DOF::Y})
     , thickness(TH) {}
 
 int CP7::initialize(const shared_ptr<DomainBase>& D) {

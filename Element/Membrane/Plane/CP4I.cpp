@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "CP4I.h"
+#include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Material/Material2D/Material2D.h>
 #include <Toolbox/IntegrationPlan.h>
@@ -235,7 +236,7 @@ void CP4I::stack_stiffness_incompatible(mat& K, const mat& D, const mat& N, cons
 }
 
 CP4I::CP4I(const unsigned T, uvec&& N, const unsigned M, const double TH)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, false)
+    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, false, {DOF::X, DOF::Y})
     , thickness(TH) {}
 
 int CP4I::initialize(const shared_ptr<DomainBase>& D) {

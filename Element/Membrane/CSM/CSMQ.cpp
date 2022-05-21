@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "CSMQ.h"
+#include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Material/Material2D/Material2D.h>
 #include <Recorder/OutputType.h>
@@ -29,7 +30,7 @@ CSMQ::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Mat
     , m_material(std::forward<unique_ptr<Material>>(M)) {}
 
 CSMQ::CSMQ(const unsigned T, uvec&& N, const unsigned M, const unsigned NN, const double TH, const double L)
-    : MaterialElement2D(T, NN, m_dof, std::forward<uvec>(N), uvec{M}, false)
+    : MaterialElement2D(T, NN, m_dof, std::forward<uvec>(N), uvec{M}, false, {DOF::X, DOF::Y, DOF::RZ})
     , m_node(NN)
     , thickness(TH) { access::rw(characteristic_length) = L; }
 

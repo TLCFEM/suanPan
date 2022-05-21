@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "CSMT3.h"
+#include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Material/Material2D/Material2D.h>
 #include <Toolbox/tensorToolbox.h>
@@ -27,7 +28,7 @@ CSMT3::IntegrationPoint::IntegrationPoint(rowvec&& C, const double W, unique_ptr
     , m_material(std::forward<unique_ptr<Material>>(M)) {}
 
 CSMT3::CSMT3(const unsigned T, uvec&& NT, const unsigned MT, const double TH, const double L)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(NT), uvec{MT}, false)
+    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(NT), uvec{MT}, false, {DOF::X, DOF::Y, DOF::RZ})
     , thickness(TH) { access::rw(characteristic_length) = L; }
 
 int CSMT3::initialize(const shared_ptr<DomainBase>& D) {

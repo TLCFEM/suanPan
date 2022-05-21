@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Allman.h"
+#include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Material/Material2D/Material2D.h>
 #include <Toolbox/shapeFunction.h>
@@ -73,7 +74,7 @@ field<mat> Allman::form_transform(const mat& C) {
 }
 
 Allman::Allman(const unsigned T, uvec&& NT, const unsigned MT, const double TH)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(NT), uvec{MT}, false)
+    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(NT), uvec{MT}, false, {DOF::X, DOF::Y, DOF::RZ})
     , thickness(TH) {}
 
 int Allman::initialize(const shared_ptr<DomainBase>& D) {

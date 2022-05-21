@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "QE2.h"
+#include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Material/Material2D/Material2D.h>
 #include <Recorder/OutputType.h>
@@ -40,7 +41,7 @@ QE2::IntegrationPoint::IntegrationPoint(vec&& C, const double F, unique_ptr<Mate
 vec QE2::form_stress_mode(const double X, const double Y) { return vec{0., X, Y, X * Y}; }
 
 QE2::QE2(const unsigned T, uvec&& N, const unsigned M, const double TH)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, false)
+    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, false, {DOF::X, DOF::Y})
     , thickness(TH) {}
 
 int QE2::initialize(const shared_ptr<DomainBase>& D) {
