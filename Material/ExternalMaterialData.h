@@ -29,6 +29,17 @@
 #ifndef EXTERNALMATERIALDATA_H
 #define EXTERNALMATERIALDATA_H
 
+enum ExternalMaterialOp {
+    ALLOCATE = 0,       // allocate memory, initialise variables based on parameters defined by users
+    DEALLOCATE = 1,     // deallocate memory that is previously allocated in operation *info=ALLOCATE
+    STATIC_UPDATE = 2,  // update material state based on new trial strain only
+    DYNAMIC_UPDATE = 3, // update material state based on new trial strain and new trial strain rate
+    COMMIT = 4,         // commit trial state to current state
+    RESET = 5,          // reset trial state to current state
+    CLEAR = 6,          // clear both current and trial state to zero
+    VALIDATE = 7        // validate if the model parameters are legal
+};
+
 struct ExternalMaterialData {
     unsigned size = 0;          // indicate the dimension of material
     unsigned constant_size = 0; // indicate the number of constants
