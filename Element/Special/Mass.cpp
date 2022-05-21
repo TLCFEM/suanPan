@@ -16,7 +16,6 @@
  ******************************************************************************/
 
 #include "Mass.h"
-#include <Domain/DOF.h>
 
 Mass::Mass(const unsigned T, const unsigned NT, const double MA, uvec&& DT)
     : Element(T, 1, static_cast<unsigned>(DT.max()), uvec{NT}, [&] {
