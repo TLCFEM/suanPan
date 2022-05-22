@@ -35,22 +35,22 @@ jobs:
           rm suanPan-linux-mkl-vtk/bin/CHANGELOG.md
           rm suanPan-linux-mkl-vtk/bin/LICENSE
           rm suanPan-linux-mkl-vtk/bin/README.md
-          mkdir suanpan_2.4_amd64 && cd suanpan_2.4_amd64
+          mkdir suanPan_2.4_amd64 && cd suanPan_2.4_amd64
           mkdir -p usr/local/bin
           mkdir -p usr/lib
           cp -r ../suanPan-linux-mkl-vtk/bin/* usr/local/bin
           cp -r ../suanPan-linux-mkl-vtk/lib/* usr/lib
           mkdir DEBIAN
           tee > DEBIAN/control << EOF
-          Package: suanpan
+          Package: suanPan
           Version: 2.4
           Architecture: amd64
           Maintainer: Theodore Chang <tlcfem@gmail.com>
           Description: An Open Source, Parallel and Heterogeneous Finite Element Analysis Framework.
-          Depends: libgfortran5, libgomp1, libglx0
+          Depends: libstdc++6, libglvnd0, libgfortran5, libgomp1
           EOF
           cd ..
-          dpkg-deb --build --root-owner-group suanpan_2.4_amd64
+          dpkg-deb --build --root-owner-group suanPan_2.4_amd64
           export LD_LIBRARY_PATH=/home/runner/work/suanPan/suanPan/suanPan-linux-mkl-vtk/lib
           cd suanPan-linux-mkl-vtk/bin
           ./suanPan -v
@@ -67,8 +67,8 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: suanpan_2.4_amd64.deb
-          asset_name: suanpan_2.4_amd64.deb
+          file: suanPan_2.4_amd64.deb
+          asset_name: suanPan_2.4_amd64.deb
           tag: ${{ env.SP_TIME }}
           prerelease: true
           overwrite: true
