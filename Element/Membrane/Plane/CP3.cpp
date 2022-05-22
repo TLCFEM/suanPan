@@ -144,7 +144,7 @@ void CP3::stack_stiffness(mat& K, const mat& D, const mat& N, const double F) {
 }
 
 CP3::CP3(const unsigned T, uvec&& NT, const unsigned MT, const double TH, const bool R)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(NT), uvec{MT}, R)
+    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(NT), uvec{MT}, R, {DOF::U1, DOF::U2})
     , thickness(TH) {}
 
 int CP3::initialize(const shared_ptr<DomainBase>& D) {

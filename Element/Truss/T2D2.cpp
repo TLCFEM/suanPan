@@ -20,7 +20,7 @@
 #include <Material/Material1D/Material1D.h>
 
 T2D2::T2D2(const unsigned T, uvec&& N, const unsigned M, const double A, const bool F, const bool UA, const bool LS)
-    : MaterialElement1D(T, t_node, t_dof, std::forward<uvec>(N), uvec{M}, F)
+    : MaterialElement1D(T, t_node, t_dof, std::forward<uvec>(N), uvec{M}, F, {DOF::U1, DOF::U2})
     , area(A)
     , t_trans(F ? make_unique<T2DC>() : make_unique<T2DL>())
     , update_area(UA)

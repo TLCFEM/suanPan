@@ -23,7 +23,7 @@ uvec Spring02::IS{0, 1};
 uvec Spring02::JS{2, 3};
 
 Spring02::Spring02(const unsigned T, uvec&& NT, const unsigned MT)
-    : MaterialElement1D(T, s_node, s_dof, std::forward<uvec>(NT), uvec{MT}, false) {}
+    : MaterialElement1D(T, s_node, s_dof, std::forward<uvec>(NT), uvec{MT}, false, {DOF::U1, DOF::U2}) {}
 
 int Spring02::initialize(const shared_ptr<DomainBase>& D) {
     s_material = suanpan::make_copy(D->get<Material>(material_tag(0)));

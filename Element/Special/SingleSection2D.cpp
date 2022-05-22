@@ -20,7 +20,7 @@
 #include <Section/Section.h>
 
 SingleSection2D::SingleSection2D(const unsigned T, const unsigned NT, const unsigned ST)
-    : SectionElement2D(T, s_node, s_dof, uvec{NT}, uvec{ST}, false) {}
+    : SectionElement2D(T, s_node, s_dof, uvec{NT}, uvec{ST}, false, {}) {}
 
 int SingleSection2D::initialize(const shared_ptr<DomainBase>& D) {
     s_section = suanpan::make_copy(D->get<Section>(section_tag(0)));

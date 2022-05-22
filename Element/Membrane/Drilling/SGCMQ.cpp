@@ -152,7 +152,7 @@ void SGCMQ::form_body_force(const mat& diff_coor) {
 }
 
 SGCMQ::SGCMQ(const unsigned T, uvec&& N, const unsigned M, const double TH, const char IP)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, false)
+    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, false, {DOF::U1, DOF::U2, DOF::UR3})
     , thickness(TH)
     , scheme(IP) {}
 

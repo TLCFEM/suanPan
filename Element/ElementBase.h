@@ -36,6 +36,7 @@ class DomainBase;
 class Material;
 class Section;
 enum class OutputType;
+enum class DOF : unsigned short;
 
 using std::array;
 using std::vector;
@@ -163,7 +164,8 @@ public:
     [[nodiscard]] virtual double get_complementary_energy() const = 0;
     [[nodiscard]] virtual double get_kinetic_energy() const = 0;
     [[nodiscard]] virtual double get_viscous_energy() const = 0;
-    [[nodiscard]] virtual double get_momentum() const = 0;
+    [[nodiscard]] virtual const vec& get_momentum() const = 0;
+    [[nodiscard]] virtual double get_momentum_component(DOF) const = 0;
 
     [[nodiscard]] virtual double get_characteristic_length() const = 0;
 

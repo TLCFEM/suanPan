@@ -369,6 +369,18 @@ const char* to_char(const OutputType& L) {
         return "VE";
     case OutputType::MM:
         return "MOMENTUM";
+    case OutputType::MMX:
+        return "MOMENTUMX";
+    case OutputType::MMY:
+        return "MOMENTUMY";
+    case OutputType::MMZ:
+        return "MOMENTUMZ";
+    case OutputType::MMRX:
+        return "MOMENTUMRZ";
+    case OutputType::MMRY:
+        return "MOMENTUMRY";
+    case OutputType::MMRZ:
+        return "MOMENTUMRZ";
 
     case OutputType::HIST:
         return "HIST";
@@ -566,6 +578,12 @@ OutputType to_list(const char* L) {
     if(is_equal(L, "KE")) return OutputType::KE;
     if(is_equal(L, "VE")) return OutputType::VE;
     if(is_equal(L, "MOMENTUM")) return OutputType::MM;
+    if(is_equal(L, "MOMENTUMX")) return OutputType::MMX;
+    if(is_equal(L, "MOMENTUMY")) return OutputType::MMY;
+    if(is_equal(L, "MOMENTUMZ")) return OutputType::MMZ;
+    if(is_equal(L, "MOMENTUMRX")) return OutputType::MMRX;
+    if(is_equal(L, "MOMENTUMRY")) return OutputType::MMRY;
+    if(is_equal(L, "MOMENTUMRZ")) return OutputType::MMRZ;
 
     if(is_equal(L, "HIST")) return OutputType::HIST;
     if(is_equal(L, "AMP")) return OutputType::AMP;

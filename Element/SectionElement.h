@@ -29,71 +29,78 @@
 #define SECTIONELEMENT_H
 
 #include <Element/Element.h>
+#include <Domain/DOF.h>
 
 class SectionElement : public Element {
 public:
-    explicit SectionElement(unsigned,   // tag
-                            unsigned,   // number of nodes
-                            unsigned,   // number of dofs
-                            uvec&&,     // node encoding
-                            uvec&&,     // section tags
-                            bool,       // nonlinear geometry switch
-                            SectionType // section type
+    SectionElement(unsigned,     // tag
+                   unsigned,     // number of nodes
+                   unsigned,     // number of dofs
+                   uvec&&,       // node encoding
+                   uvec&&,       // section tags
+                   bool,         // nonlinear geometry switch
+                   SectionType,  // section type
+                   vector<DOF>&& // dof identifier
     );
 };
 
 class SectionElement1D : public SectionElement {
 public:
-    explicit SectionElement1D(unsigned, // tag
-                              unsigned, // number of nodes
-                              unsigned, // number of dofs
-                              uvec&&,   // node encoding
-                              uvec&&,   // section tags
-                              bool      // nonlinear geometry switch
+    SectionElement1D(unsigned,     // tag
+                     unsigned,     // number of nodes
+                     unsigned,     // number of dofs
+                     uvec&&,       // node encoding
+                     uvec&&,       // section tags
+                     bool,         // nonlinear geometry switch
+                     vector<DOF>&& // dof identifier
     );
 };
 
 class SectionElement2D : public SectionElement {
 public:
-    explicit SectionElement2D(unsigned, // tag
-                              unsigned, // number of nodes
-                              unsigned, // number of dofs
-                              uvec&&,   // node encoding
-                              uvec&&,   // section tags
-                              bool      // nonlinear geometry switch
+    SectionElement2D(unsigned,                                    // tag
+                     unsigned,                                    // number of nodes
+                     unsigned,                                    // number of dofs
+                     uvec&&,                                      // node encoding
+                     uvec&&,                                      // section tags
+                     bool,                                        // nonlinear geometry switch
+                     vector<DOF>&& = {DOF::U1, DOF::U2, DOF::UR3} // dof identifier
     );
 };
 
 class SectionElement3D : public SectionElement {
 public:
-    explicit SectionElement3D(unsigned, // tag
-                              unsigned, // number of nodes
-                              unsigned, // number of dofs
-                              uvec&&,   // node encoding
-                              uvec&&,   // section tags
-                              bool      // nonlinear geometry switch
+    SectionElement3D(unsigned,                                                                 // tag
+                     unsigned,                                                                 // number of nodes
+                     unsigned,                                                                 // number of dofs
+                     uvec&&,                                                                   // node encoding
+                     uvec&&,                                                                   // section tags
+                     bool,                                                                     // nonlinear geometry switch
+                     vector<DOF>&& = {DOF::U1, DOF::U2, DOF::U3, DOF::UR1, DOF::UR2, DOF::UR3} // dof identifier
     );
 };
 
 class SectionNMElement2D : public SectionElement {
 public:
-    explicit SectionNMElement2D(unsigned, // tag
-                                unsigned, // number of nodes
-                                unsigned, // number of dofs
-                                uvec&&,   // node encoding
-                                uvec&&,   // section tags
-                                bool      // nonlinear geometry switch
+    SectionNMElement2D(unsigned,                                    // tag
+                       unsigned,                                    // number of nodes
+                       unsigned,                                    // number of dofs
+                       uvec&&,                                      // node encoding
+                       uvec&&,                                      // section tags
+                       bool,                                        // nonlinear geometry switch
+                       vector<DOF>&& = {DOF::U1, DOF::U2, DOF::UR3} // dof identifier
     );
 };
 
 class SectionNMElement3D : public SectionElement {
 public:
-    explicit SectionNMElement3D(unsigned, // tag
-                                unsigned, // number of nodes
-                                unsigned, // number of dofs
-                                uvec&&,   // node encoding
-                                uvec&&,   // section tags
-                                bool      // nonlinear geometry switch
+    SectionNMElement3D(unsigned,                                                                 // tag
+                       unsigned,                                                                 // number of nodes
+                       unsigned,                                                                 // number of dofs
+                       uvec&&,                                                                   // node encoding
+                       uvec&&,                                                                   // section tags
+                       bool,                                                                     // nonlinear geometry switch
+                       vector<DOF>&& = {DOF::U1, DOF::U2, DOF::U3, DOF::UR1, DOF::UR2, DOF::UR3} // dof identifier
     );
 };
 

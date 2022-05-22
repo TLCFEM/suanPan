@@ -39,7 +39,8 @@ int main(int argc, char** argv) {
     SUANPAN_SYNC_COUT << FOREGROUND_GREEN;
 #endif
 
-    argument_parser(argc, argv);
+    try { argument_parser(argc, argv); }
+    catch(const std::exception& e) { suanpan_fatal("some unexpected error happens: %s, please file a bug report via https://github.com/TLCFEM/suanPan/issues.\n", e.what()); }
 
 #ifdef SUANPAN_WIN
     SetConsoleTextAttribute(handle, current_attribute);

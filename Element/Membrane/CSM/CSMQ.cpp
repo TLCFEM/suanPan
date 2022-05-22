@@ -29,7 +29,7 @@ CSMQ::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Mat
     , m_material(std::forward<unique_ptr<Material>>(M)) {}
 
 CSMQ::CSMQ(const unsigned T, uvec&& N, const unsigned M, const unsigned NN, const double TH, const double L)
-    : MaterialElement2D(T, NN, m_dof, std::forward<uvec>(N), uvec{M}, false)
+    : MaterialElement2D(T, NN, m_dof, std::forward<uvec>(N), uvec{M}, false, {DOF::U1, DOF::U2, DOF::UR3})
     , m_node(NN)
     , thickness(TH) { access::rw(characteristic_length) = L; }
 

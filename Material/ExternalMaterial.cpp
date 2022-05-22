@@ -32,7 +32,7 @@ ExternalMaterial::ExternalMaterial(const unsigned T, vector<double>&& P, void* H
     data.constant = constant.data();
     data.constant_size = static_cast<unsigned>(constant.size());
 
-    auto info = 0;
+    int info = ALLOCATE;
 
     cooker(&data, &info);
 
@@ -47,7 +47,7 @@ ExternalMaterial::ExternalMaterial(const ExternalMaterial& old_obj)
     data.constant = constant.data();
     data.constant_size = static_cast<unsigned>(constant.size());
 
-    auto info = 0;
+    int info = ALLOCATE;
 
     cooker(&data, &info);
 
@@ -56,13 +56,13 @@ ExternalMaterial::ExternalMaterial(const ExternalMaterial& old_obj)
 }
 
 ExternalMaterial::~ExternalMaterial() {
-    auto info = 1;
+    int info = DEALLOCATE;
 
     cooker(&data, &info);
 }
 
 bool ExternalMaterial::validate() {
-    auto info = 7;
+    int info = VALIDATE;
 
     cooker(&data, &info);
 
@@ -104,7 +104,7 @@ int ExternalMaterial::update_trial_status(const vec& t_strain) {
 
     trial_strain = t_strain;
 
-    auto info = 2;
+    int info = STATIC_UPDATE;
 
     cooker(&data, &info);
 
@@ -117,7 +117,7 @@ int ExternalMaterial::update_trial_status(const vec& t_strain, const vec& t_stra
     trial_strain = t_strain;
     trial_strain_rate = t_strain_rate;
 
-    auto info = 3;
+    int info = DYNAMIC_UPDATE;
 
     cooker(&data, &info);
 
@@ -125,7 +125,7 @@ int ExternalMaterial::update_trial_status(const vec& t_strain, const vec& t_stra
 }
 
 int ExternalMaterial::commit_status() {
-    auto info = 4;
+    int info = COMMIT;
 
     cooker(&data, &info);
 
@@ -133,7 +133,7 @@ int ExternalMaterial::commit_status() {
 }
 
 int ExternalMaterial::reset_status() {
-    auto info = 5;
+    int info = RESET;
 
     cooker(&data, &info);
 
@@ -141,7 +141,7 @@ int ExternalMaterial::reset_status() {
 }
 
 int ExternalMaterial::clear_status() {
-    auto info = 6;
+    int info = CLEAR;
 
     cooker(&data, &info);
 

@@ -73,7 +73,7 @@ field<mat> Allman::form_transform(const mat& C) {
 }
 
 Allman::Allman(const unsigned T, uvec&& NT, const unsigned MT, const double TH)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(NT), uvec{MT}, false)
+    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(NT), uvec{MT}, false, {DOF::U1, DOF::U2, DOF::UR3})
     , thickness(TH) {}
 
 int Allman::initialize(const shared_ptr<DomainBase>& D) {

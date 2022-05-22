@@ -107,7 +107,7 @@ template<sp_d T> class Factory final {
     T kinetic_energy = 0.;
     T viscous_energy = 0.;
     T complementary_energy = 0.;
-    T momentum = 0.;
+    Col<T> momentum;
 
     Col<T> trial_load_factor;    // global trial load factor
     Col<T> trial_load;           // global trial load vector
@@ -319,7 +319,7 @@ public:
     T get_kinetic_energy();
     T get_viscous_energy();
     T get_complementary_energy();
-    T get_momentum();
+    const Col<T>& get_momentum();
 
     const T& get_trial_time() const;
     const Col<T>& get_trial_load_factor() const;
@@ -940,7 +940,7 @@ template<sp_d T> T Factory<T>::get_viscous_energy() { return viscous_energy; }
 
 template<sp_d T> T Factory<T>::get_complementary_energy() { return complementary_energy; }
 
-template<sp_d T> T Factory<T>::get_momentum() { return momentum; }
+template<sp_d T> const Col<T>& Factory<T>::get_momentum() { return momentum; }
 
 template<sp_d T> const T& Factory<T>::get_trial_time() const { return trial_time; }
 
@@ -1212,7 +1212,7 @@ template<sp_d T> void Factory<T>::commit_energy() {
     auto ke = std::async([&] { if(!trial_inertial_force.empty() && !trial_velocity.empty()) kinetic_energy = .5 * dot(global_mass * trial_velocity, trial_velocity); });
     auto ve = std::async([&] { if(!trial_damping_force.empty() && !incre_displacement.empty()) viscous_energy += .5 * dot(trial_damping_force + current_damping_force, incre_displacement); });
     auto ce = std::async([&] { if(!trial_displacement.empty() && !incre_resistance.empty()) complementary_energy += .5 * dot(trial_displacement + current_displacement, incre_resistance); });
-    auto mm = std::async([&] { if(!trial_inertial_force.empty() && !trial_velocity.empty()) momentum = accu(global_mass * trial_velocity); });
+    auto mm = std::async([&] { if(!trial_inertial_force.empty() && !trial_velocity.empty()) momentum = global_mass * trial_velocity; });
 
     se.get();
     ke.get();
@@ -1226,7 +1226,7 @@ template<sp_d T> void Factory<T>::clear_energy() {
     kinetic_energy = 0.;
     viscous_energy = 0.;
     complementary_energy = 0.;
-    momentum = 0.;
+    momentum.zeros();
 }
 
 template<sp_d T> void Factory<T>::commit_status() {

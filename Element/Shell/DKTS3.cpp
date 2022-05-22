@@ -124,7 +124,7 @@ field<mat> DKTS3::form_transform(const mat& C) {
 }
 
 DKTS3::DKTS3(const unsigned T, uvec&& N, const unsigned M, const double TH, const unsigned IP)
-    : ShellBase(T, s_node, s_dof, std::forward<uvec>(N), uvec{M}, false)
+    : ShellBase(T, s_node, s_dof, std::forward<uvec>(N), uvec{M}, false, {DOF::U1, DOF::U2, DOF::U3, DOF::UR1, DOF::UR2, DOF::UR3})
     , thickness(TH)
     , num_ip(IP > 20 ? 20 : IP) {}
 

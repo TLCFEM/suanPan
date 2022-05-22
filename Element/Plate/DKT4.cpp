@@ -92,7 +92,7 @@ field<mat> DKT4::form_transform(const mat& C) {
 }
 
 DKT4::DKT4(const unsigned T, uvec&& NT, const unsigned MT, const double TH, const unsigned IPN)
-    : MaterialElement2D(T, p_node, p_dof, std::forward<uvec>(NT), uvec{MT}, false)
+    : MaterialElement2D(T, p_node, p_dof, std::forward<uvec>(NT), uvec{MT}, false, {DOF::U1, DOF::U2, DOF::UR3})
     , thickness(TH)
     , num_section_ip(IPN) {}
 
