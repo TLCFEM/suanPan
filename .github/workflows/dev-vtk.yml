@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: [ dev ]
 jobs:
-  linux-openblas-vtk-dev:
+  ubuntu-openblas-vtk-dev:
     runs-on: ubuntu-22.04
     steps:
       - name: Clone
@@ -31,7 +31,7 @@ jobs:
         with:
           name: suanPan-2.4.0-1.x86_64.deb
           path: suanPan-2.4.0-1.x86_64.deb
-  fedora-openblas-vtk-dev:
+  fedora-mkl-vtk-dev:
     runs-on: ubuntu-20.04
     container: fedora:35
     steps:
