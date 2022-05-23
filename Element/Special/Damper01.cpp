@@ -19,18 +19,18 @@
 #include <Domain/DomainBase.h>
 #include <Material/Material1D/Material1D.h>
 
-uvec Damper01::IS{0, 1};
-uvec Damper01::JS{2, 3};
-
-Damper01::Damper01(const unsigned T, uvec&& NT, const unsigned D)
-    : MaterialElement1D(T, d_node, d_dof, std::forward<uvec>(NT), uvec{D}, false, {DOF::U1, DOF::U2}) {}
+Damper01::Damper01(const unsigned T, uvec&& NT, const unsigned D, const unsigned DIM)
+    : MaterialElement1D(T, d_node, 3 == DIM ? 3 : 2, std::forward<uvec>(NT), uvec{D}, false, 3 == DIM ? vector{DOF::U1, DOF::U2, DOF::U3} : vector{DOF::U1, DOF::U2})
+    , d_dof(3 == DIM ? 3 : 2)
+    , IS(3 == d_dof ? uvec{0, 1, 2} : uvec{0, 1})
+    , JS(3 == d_dof ? uvec{3, 4, 5} : uvec{2, 3}) {}
 
 int Damper01::initialize(const shared_ptr<DomainBase>& D) {
     damper = D->get<Material>(material_tag(0))->get_copy();
 
-    const mat coord = get_coordinate(d_dof).t();
+    const mat coord = get_coordinate(d_dof);
 
-    access::rw(direction_cosine) = normalise(coord.col(1) - coord.col(0));
+    access::rw(direction_cosine) = normalise(coord.row(1) - coord.row(0)).t();
 
     const auto t_disp = get_current_displacement();
     const auto t_vec = get_current_velocity();
