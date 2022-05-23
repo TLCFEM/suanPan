@@ -373,6 +373,7 @@ int enable_object(const shared_ptr<Bead>& model, istringstream& command) {
     else if(is_equal(object_type, "node")) while(get_input(command, tag)) domain->enable_node(tag);
     else if(is_equal(object_type, "recorder")) while(get_input(command, tag)) domain->enable_recorder(tag);
     else if(is_equal(object_type, "modifier")) while(get_input(command, tag)) domain->enable_modifier(tag);
+    else if(is_equal(object_type, "all")) domain->enable_all();
     else if(is_equal(object_type, "print")) SUANPAN_PRINT = true;
 
     return SUANPAN_SUCCESS;

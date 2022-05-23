@@ -72,6 +72,8 @@ disable step 1
 enable step 1
 erase step 1
 
+enable all
+
 reset
 clear
 exit
