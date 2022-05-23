@@ -50,6 +50,7 @@ jobs:
           mv oneAPI.repo /etc/yum.repos.d/
           dnf upgrade --refresh -y
           dnf install libglvnd-devel gcc g++ gfortran rpm-build rpm-devel rpmdevtools cmake wget intel-oneapi-mkl-devel git -y
+          git config --global --add safe.directory /__w/suanPan/suanPan
       - name: Clone
         uses: actions/checkout@v2
       - name: Install MKL VTK
