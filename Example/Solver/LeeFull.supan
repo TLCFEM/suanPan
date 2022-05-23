@@ -66,4 +66,6 @@ peek node 2
 
 peek integrator 1
 
+reset
+clear
 exit
