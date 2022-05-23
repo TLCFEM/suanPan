@@ -7,6 +7,11 @@ if [ ! $? ]; then
   exit
 fi
 
+if [ ! -d ".git" ]; then
+  echo "Not a git repository, can't set revision."
+  exit
+fi
+
 if [ -f "./suanPan.cpp" ]; then
   file_path="./Toolbox/revision.h"
 elif [ -f "../suanPan.cpp" ]; then

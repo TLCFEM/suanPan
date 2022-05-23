@@ -76,9 +76,7 @@ jobs:
     runs-on: ubuntu-20.04
     container: fedora:35
     steps:
-      - name: Clone
-        uses: actions/checkout@v2
-      - name: Install MKL VTK
+      - name: Setup
         run: |
           tee > oneAPI.repo << EOF
           [oneAPI]
@@ -93,6 +91,10 @@ jobs:
           mv oneAPI.repo /etc/yum.repos.d/
           dnf upgrade --refresh -y
           dnf install libglvnd-devel gcc g++ gfortran rpm-build rpm-devel rpmdevtools cmake wget intel-oneapi-mkl-devel git -y
+      - name: Clone
+        uses: actions/checkout@v2
+      - name: Install MKL VTK
+        run: |
           wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.1.0-linux.tar.gz
           tar xf VTK-9.1.0-linux.tar.gz
       - name: Compile
