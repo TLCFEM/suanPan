@@ -232,7 +232,9 @@ template<sp_d T> int SparseMatSuperLU<T>::solve(Mat<T>& out_mat, const Mat<T>& i
 
     alloc_supermatrix(csc_form<float, int>(this->triplet_mat));
 
-    wrap_b(fmat(arma::size(in_mat)));
+    const fmat f_mat(arma::size(in_mat), arma::fill::none);
+
+    wrap_b(f_mat);
 
     full_solve<float>(flag);
 
@@ -301,7 +303,9 @@ template<sp_d T> int SparseMatSuperLU<T>::solve(Mat<T>& out_mat, Mat<T>&& in_mat
 
     alloc_supermatrix(csc_form<float, int>(this->triplet_mat));
 
-    wrap_b(fmat(arma::size(in_mat)));
+    const fmat f_mat(arma::size(in_mat), arma::fill::none);
+
+    wrap_b(f_mat);
 
     full_solve<float>(flag);
 
