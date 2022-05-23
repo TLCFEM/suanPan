@@ -31,6 +31,25 @@ jobs:
         with:
           name: suanPan-2.4.0-1.x86_64.deb
           path: suanPan-2.4.0-1.x86_64.deb
+  fedora-openblas-vtk-dev:
+    runs-on: ubuntu-20.04
+    container: fedora:35
+    steps:
+      - name: Clone
+        uses: actions/checkout@v2
+      - name: Install VTK
+        run: |
+          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.1.0-linux.tar.gz
+          tar xf VTK-9.1.0-linux.tar.gz
+      - name: Compile
+        run: |
+          dnf update -y && dnf install libglvnd-devel gcc g++ gfortran rpm-build rpm-devel rpmdevtools cmake
+          cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.1/ .
+          make package -j4
+      - uses: actions/upload-artifact@v3
+        with:
+          name: suanPan-2.4.0-1.x86_64.rpm
+          path: suanPan-2.4.0-1.x86_64.rpm
   macos-openblas-vtk-dev:
     runs-on: macos-11
     steps:
