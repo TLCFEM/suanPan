@@ -342,13 +342,25 @@
       "trigger":"Damper01",
       "contents":"element Damper01 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, material tag of associated viscosity material",
       "kind":"type",
-      "details":"Viscous Damper"
+      "details":"2D Viscous Damper"
+    },
+    {
+      "trigger":"Damper03",
+      "contents":"element Damper03 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, material tag of associated viscosity material",
+      "kind":"type",
+      "details":"3D Viscous Damper"
     },
     {
       "trigger":"Damper02",
       "contents":"element Damper02 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:[6]} ${7:[7]} ${8:[8]}\n# (1) int, unique tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, damper tag\n# (5) int, spring tag\n# [6] bool string, if to use matrix in iteration, default: true\n# [7] int, the maximum delay number, default: 0\n# [8] double, beta, default: 0.5",
       "kind":"type",
-      "details":"Maxwell Model"
+      "details":"2D Maxwell Model"
+    },
+    {
+      "trigger":"Damper04",
+      "contents":"element Damper04 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:[6]} ${7:[7]} ${8:[8]}\n# (1) int, unique tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, damper tag\n# (5) int, spring tag\n# [6] bool string, if to use matrix in iteration, default: true\n# [7] int, the maximum delay number, default: 0\n# [8] double, beta, default: 0.5",
+      "kind":"type",
+      "details":"3D Maxwell Model"
     },
     {
       "trigger":"Embedded2D",

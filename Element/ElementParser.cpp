@@ -74,8 +74,10 @@ int create_new_element(const shared_ptr<DomainBase>& domain, istringstream& comm
     else if(is_equal(element_id, "CSMQ6")) new_csmq(new_element, command, 6);
     else if(is_equal(element_id, "CSMQ7")) new_csmq(new_element, command, 7);
     else if(is_equal(element_id, "CSMQ8")) new_csmq(new_element, command, 8);
-    else if(is_equal(element_id, "Damper01")) new_damper01(new_element, command);
-    else if(is_equal(element_id, "Damper02")) new_damper02(new_element, command);
+    else if(is_equal(element_id, "Damper01")) new_damper01(new_element, command, 2);
+    else if(is_equal(element_id, "Damper02")) new_damper02(new_element, command, 2);
+    else if(is_equal(element_id, "Damper03")) new_damper01(new_element, command, 3);
+    else if(is_equal(element_id, "Damper04")) new_damper02(new_element, command, 3);
     else if(is_equal(element_id, "DC3D4")) new_dc3d4(new_element, command);
     else if(is_equal(element_id, "DC3D8")) new_dc3d8(new_element, command);
     else if(is_equal(element_id, "DCP3")) new_dcp3(new_element, command);
@@ -1133,7 +1135,7 @@ void new_csmq(unique_ptr<Element>& return_obj, istringstream& command, const uns
     else if(8 == size) return_obj = make_unique<CSMQ8>(tag, std::move(node_tag), material_tag, thickness, length);
 }
 
-void new_damper01(unique_ptr<Element>& return_obj, istringstream& command) {
+void new_damper01(unique_ptr<Element>& return_obj, istringstream& command, const unsigned dimension) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("new_damper01() needs a valid tag.\n");
@@ -1153,10 +1155,10 @@ void new_damper01(unique_ptr<Element>& return_obj, istringstream& command) {
         return;
     }
 
-    return_obj = make_unique<Damper01>(tag, std::move(node_tag), damper_tag);
+    return_obj = make_unique<Damper01>(tag, std::move(node_tag), damper_tag, dimension);
 }
 
-void new_damper02(unique_ptr<Element>& return_obj, istringstream& command) {
+void new_damper02(unique_ptr<Element>& return_obj, istringstream& command, const unsigned dimension) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("new_damper02() needs a valid tag.\n");
@@ -1200,7 +1202,7 @@ void new_damper02(unique_ptr<Element>& return_obj, istringstream& command) {
         return;
     }
 
-    return_obj = make_unique<Damper02>(tag, std::move(node_tag), damper_tag, spring_tag, is_true(use_matrix), proceed, beta);
+    return_obj = make_unique<Damper02>(tag, std::move(node_tag), damper_tag, spring_tag, is_true(use_matrix), proceed, beta, dimension);
 }
 
 void new_dc3d4(unique_ptr<Element>& return_obj, istringstream& command) {
