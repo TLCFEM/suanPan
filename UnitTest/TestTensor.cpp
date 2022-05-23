@@ -72,4 +72,22 @@ TEST_CASE("Basic Quantites", "[Utility.Tensor]") {
 
     REQUIRE(Approx(B) == C);
     REQUIRE(Approx(D) == E);
+
+    REQUIRE(norm(strain::to_green(eye(3, 3))) == Approx(0));
+
+    REQUIRE(norm(transform::compute_jacobian_nominal_to_principal(strain::to_green(eye(2, 2)))) == Approx(0));
+
+    for(auto I = 0; I < 1000; ++I) {
+        vec F(6, fill::randn);
+
+        REQUIRE(norm(strain::to_voigt(strain::to_tensor(F)) - F) <= 1E-13);
+        REQUIRE(norm(stress::to_voigt(stress::to_tensor(F)) - F) <= 1E-13);
+
+        F = randn(3);
+
+        REQUIRE(norm(strain::to_voigt(strain::to_tensor(F)) - F) <= 1E-13);
+        REQUIRE(norm(stress::to_voigt(stress::to_tensor(F)) - F) <= 1E-13);
+    }
+
+    transform::compute_jacobian_principal_to_nominal(randn(2, 2));
 }

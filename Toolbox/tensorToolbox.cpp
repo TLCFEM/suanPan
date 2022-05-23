@@ -350,8 +350,8 @@ vec tensor::stress::to_voigt(const mat& in_stress) {
         out_stress(1) = in_stress(4);
         out_stress(2) = in_stress(8);
         out_stress(3) = in_stress(1);
-        out_stress(4) = in_stress(2);
-        out_stress(5) = in_stress(5);
+        out_stress(4) = in_stress(5);
+        out_stress(5) = in_stress(2);
 
         return out_stress;
     }
