@@ -1,0 +1,77 @@
+# A TEST MODEL FOR OBJECT HANDLING
+
+amplitude Sine 2 1 1
+disable amplitude 2
+enable amplitude 2
+erase amplitude 2
+
+constraint FixedLength2D 2 2 3
+disable constraint 2
+enable constraint 2
+erase constraint 2
+
+node 1 0 0
+erase node 1
+
+nodegroup 1 3 4 16 72 73 85 141 142 154
+disable group 1
+enable group 1
+erase group 1
+
+material Elastic1D 1 10
+disable material 1
+enable material 1
+erase material 1
+
+modifier Rayleigh 3 .2 .002 .0 .0
+disable modifier 3
+enable modifier 3
+erase modifier 3
+
+orientation B3DC 1 .1 -.3 1.
+disable orientation 1
+enable orientation 1
+erase orientation 1
+
+hdf5recorder 1 Element S 1
+disable recorder 1
+enable recorder 1
+erase recorder 1
+
+section Rectangle3D 2 12 1 1
+disable section 2
+enable section 2
+erase section 2
+
+step static 1 1
+set ini_step_size 1E-1
+set fixed_step_size true
+set symm_mat false
+
+solver Newton 1
+disable solver 1
+enable solver 1
+erase solver 1
+
+converger RelIncreDisp 1 1E-10 10 1
+disable converger 1
+enable converger 1
+erase converger 1
+
+integrator BatheTwoStep 1
+disable integrator 1
+enable integrator 1
+erase integrator 1
+
+criterion MinDisplacement 1 11 2 -5.5
+disable criterion 1
+enable criterion 1
+erase criterion 1
+
+disable step 1
+enable step 1
+erase step 1
+
+reset
+clear
+exit
