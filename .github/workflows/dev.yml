@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: [ dev ]
 jobs:
-  linux-dev:
+  ubuntu-dev:
     runs-on: ubuntu-22.04
     steps:
       - name: Clone

@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: [ master ]
 jobs:
-  linux-mkl:
+  ubuntu-mkl:
     runs-on: ubuntu-20.04
     steps:
       - name: Clone

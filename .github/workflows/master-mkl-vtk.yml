@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: [ master ]
 jobs:
-  linux-mkl-vtk:
+  ubuntu-mkl-vtk:
     runs-on: ubuntu-20.04
     steps:
       - name: Clone
@@ -24,7 +24,7 @@ jobs:
         run: |
           export CC=gcc-10 && export CXX=g++-10 && export FC=gfortran-10
           go build Checker/updater.go
-          sudo apt-get update && sudo apt-get install mesa-common-dev mesa-utils freeglut3-dev libglvnd-dev intel-oneapi-mkl-devel
+          sudo apt-get update && sudo apt-get install mesa-common-dev mesa-utils freeglut3-dev libglvnd-dev intel-oneapi-mkl-devel dpkg-dev
           cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.1/ -DUSE_MKL=ON -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DUSE_INTEL_OPENMP=OFF -DLINK_DYNAMIC_MKL=OFF -DCMAKE_INSTALL_PREFIX=suanPan-linux-mkl-vtk .
           make install -j4
       - name: Pack
@@ -35,22 +35,22 @@ jobs:
           rm suanPan-linux-mkl-vtk/bin/CHANGELOG.md
           rm suanPan-linux-mkl-vtk/bin/LICENSE
           rm suanPan-linux-mkl-vtk/bin/README.md
-          mkdir suanpan_2.4_amd64 && cd suanpan_2.4_amd64
+          mkdir suanPan_2.4_amd64 && cd suanPan_2.4_amd64
           mkdir -p usr/local/bin
           mkdir -p usr/lib
           cp -r ../suanPan-linux-mkl-vtk/bin/* usr/local/bin
           cp -r ../suanPan-linux-mkl-vtk/lib/* usr/lib
           mkdir DEBIAN
           tee > DEBIAN/control << EOF
-          Package: suanpan
+          Package: suanPan
           Version: 2.4
           Architecture: amd64
           Maintainer: Theodore Chang <tlcfem@gmail.com>
           Description: An Open Source, Parallel and Heterogeneous Finite Element Analysis Framework.
-          Depends: libgfortran5, libgomp1, libglx0
+          Depends: libstdc++6, libglvnd0, libgfortran5, libgomp1
           EOF
           cd ..
-          dpkg-deb --build --root-owner-group suanpan_2.4_amd64
+          dpkg-deb --build --root-owner-group suanPan_2.4_amd64
           export LD_LIBRARY_PATH=/home/runner/work/suanPan/suanPan/suanPan-linux-mkl-vtk/lib
           cd suanPan-linux-mkl-vtk/bin
           ./suanPan -v
@@ -67,8 +67,50 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: suanpan_2.4_amd64.deb
-          asset_name: suanpan_2.4_amd64.deb
+          file: suanPan_2.4_amd64.deb
+          asset_name: suanPan_2.4_amd64.deb
+          tag: ${{ env.SP_TIME }}
+          prerelease: true
+          overwrite: true
+  fedora-mkl-vtk:
+    runs-on: ubuntu-20.04
+    container: fedora:35
+    steps:
+      - name: Setup
+        run: |
+          tee > oneAPI.repo << EOF
+          [oneAPI]
+          name=Intel oneAPI repository
+          baseurl=https://yum.repos.intel.com/oneapi
+          enabled=1
+          gpgcheck=1
+          repo_gpgcheck=1
+          gpgkey=https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+          EOF
+          mv oneAPI.repo /etc/yum.repos.d/
+          dnf upgrade --refresh -y
+          dnf install libglvnd-devel gcc g++ gfortran rpm-build rpm-devel rpmdevtools cmake wget intel-oneapi-mkl-devel git -y
+          git config --global --add safe.directory /__w/suanPan/suanPan
+      - name: Clone
+        uses: actions/checkout@v2
+      - name: Install MKL VTK
+        run: |
+          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.1.0-linux.tar.gz
+          tar xf VTK-9.1.0-linux.tar.gz
+      - name: Compile
+        run: |
+          cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.1/ -DUSE_MKL=ON -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DUSE_INTEL_OPENMP=OFF -DLINK_DYNAMIC_MKL=OFF .
+          make package -j4
+      - name: Test
+        run: |
+          dnf install ./suanPan-2.4.0-1.x86_64.rpm -y
+          suanPan -v
+      - name: RPM
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: suanPan-2.4.0-1.x86_64.rpm
+          asset_name: suanPan-2.4.0-1.x86_64.rpm
           tag: ${{ env.SP_TIME }}
           prerelease: true
           overwrite: true
