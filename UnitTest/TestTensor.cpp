@@ -71,5 +71,5 @@ TEST_CASE("Basic Quantites", "[Utility.Tensor]") {
     const auto B = stress::norm(A), C = stress::norm(vec(A)), D = strain::norm(A), E = strain::norm(vec(A));
 
     REQUIRE(Approx(B) == C);
-    REQUIRE(Approx(D) == D);
+    REQUIRE(Approx(D) == E);
 }
