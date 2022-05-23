@@ -99,7 +99,7 @@ int LineUDL3D::process(const shared_ptr<DomainBase>& D) {
             D->insert_loaded_dof(dof_j(0));
         }
         else if(1llu == dof_reference(0)) {
-            trial_load(dof_i(1)) = trial_load(dof_j(1)) = -.5 * norm(diff_coor(uvec{1, 2})) * ref_load;
+            trial_load(dof_i(1)) = trial_load(dof_j(1)) = -.5 * norm(diff_coor(uvec{0, 2})) * ref_load;
             D->insert_loaded_dof(dof_i(1));
             D->insert_loaded_dof(dof_j(1));
         }
