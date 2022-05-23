@@ -39,7 +39,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Install VTK
         run: |
-          dnf upgrade --refresh && dnf install libglvnd-devel gcc g++ gfortran rpm-build rpm-devel rpmdevtools cmake wget
+          dnf upgrade --refresh && dnf install libglvnd-devel gcc g++ gfortran rpm-build rpm-devel rpmdevtools cmake wget -y
           wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.1.0-linux.tar.gz
           tar xf VTK-9.1.0-linux.tar.gz
       - name: Compile
