@@ -21,6 +21,9 @@ else
   exit
 fi
 
+# sleep random time to avoid git conflict in parallel execution
+sleep .$((((RANDOM % 10)) + 1))s
+
 git_rev=$(git rev-parse --short=8 HEAD)
 
 echo "constexpr auto SUANPAN_REVISION = \"$git_rev\";" >$file_path
