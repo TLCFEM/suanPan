@@ -105,7 +105,7 @@ jobs:
         run: |
           dnf install ./suanPan-2.4.0-1.x86_64.rpm -y
           suanPan -v
-      - name: Release
+      - name: RPM
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
