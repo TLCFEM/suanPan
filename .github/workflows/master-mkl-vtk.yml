@@ -72,3 +72,43 @@ jobs:
           tag: ${{ env.SP_TIME }}
           prerelease: true
           overwrite: true
+  fedora-mkl-vtk:
+    runs-on: ubuntu-20.04
+    container: fedora:35
+    steps:
+      - name: Clone
+        uses: actions/checkout@v2
+      - name: Install MKL VTK
+        run: |
+          tee > oneAPI.repo << EOF
+          [oneAPI]
+          name=Intel oneAPI repository
+          baseurl=https://yum.repos.intel.com/oneapi
+          enabled=1
+          gpgcheck=1
+          repo_gpgcheck=1
+          gpgkey=https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+          EOF
+          
+          mv oneAPI.repo /etc/yum.repos.d/
+          dnf upgrade --refresh -y
+          dnf install libglvnd-devel gcc g++ gfortran rpm-build rpm-devel rpmdevtools cmake wget intel-oneapi-mkl-devel -y
+          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.1.0-linux.tar.gz
+          tar xf VTK-9.1.0-linux.tar.gz
+      - name: Compile
+        run: |
+          cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.1/ -DUSE_MKL=ON -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DUSE_INTEL_OPENMP=OFF -DLINK_DYNAMIC_MKL=OFF .
+          make package -j4
+      - name: Test
+        run: |
+          dnf install ./suanPan-2.4.0-1.x86_64.rpm -y
+          suanPan -v
+      - name: Release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: suanPan-2.4.0-1.x86_64.rpm
+          asset_name: suanPan-2.4.0-1.x86_64.rpm
+          tag: ${{ env.SP_TIME }}
+          prerelease: true
+          overwrite: true
