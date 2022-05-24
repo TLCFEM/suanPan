@@ -48,7 +48,7 @@ template<typename MT, std::invocable T> void test_mat_solve(MT& A, const vec& D,
     REQUIRE(norm(E - D) < 1E-5);
 }
 
-template<typename MT, std::invocable T> void benchmark_mat_solve(string&& title, MT& A, const vec& C, const vec& E, T clear_mat) {
+template<typename MT, std::invocable T> void benchmark_mat_solve(string&& title, MT& A, const vec& C, const vec& E, T&& clear_mat) {
     vec D;
 
     BENCHMARK((title + " Full").c_str()) {
