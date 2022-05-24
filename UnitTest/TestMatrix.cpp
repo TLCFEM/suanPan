@@ -1,7 +1,7 @@
 #include <Domain/MetaMat/MetaMat>
 #include "CatchHeader.h"
 
-template<typename T> void test_mat_solve(MetaMat<double>& A, const vec& D, const vec& C, T clear_mat) {
+template<typename MT, std::invocable T> void test_mat_solve(MT& A, const vec& D, const vec& C, T clear_mat) {
     vec E(C.n_elem);
 
     clear_mat();
@@ -48,6 +48,53 @@ template<typename T> void test_mat_solve(MetaMat<double>& A, const vec& D, const
     REQUIRE(norm(E - D) < 1E-5);
 }
 
+template<typename MT, std::invocable T> void benchmark_mat_solve(string&& title, MT& A, const vec& C, const vec& E, T clear_mat) {
+    vec D;
+
+    BENCHMARK((title + " Full").c_str()) {
+        clear_mat();
+        A.solve(D, C);
+        REQUIRE(norm(E - D) < 1E-12);
+    };
+
+    A.set_precision(Precision::MIXED);
+
+    BENCHMARK((title + " Mixed").c_str()) {
+        clear_mat();
+        A.solve(D, C);
+        REQUIRE(norm(E - D) < 1E-12);
+    };
+}
+
+template<typename T> void benchmark_mat_setup(const int I) {
+    sp_mat B = sprandu(I, I, .01);
+    B = B + B.t() + speye(I, I) * 1E1;
+    const vec C = randu<vec>(I);
+
+    auto A = T(I, I);
+
+    string title;
+
+    if(std::is_same_v<SparseMatSuperLU<double>, T>) title = "SuperLU ";
+    else if(std::is_same_v<FullMatCUDA<double>, T>) title = "Full CUDA ";
+    else if(std::is_same_v<SparseMatCUDA<double>, T>) title = "Sparse CUDA ";
+
+    benchmark_mat_solve(std::move(title += std::to_string(I)), A, C, spsolve(B, C), [&] {
+        A.zeros();
+        for(auto J = B.begin(); J != B.end(); ++J) A.at(J.row(), J.col()) = *J;
+    });
+}
+
+TEST_CASE("Mixed Precision", "[Matrix.Benchmark]") {
+    for(auto I = 32; I < 1024; I *= 2) {
+        benchmark_mat_setup<SparseMatSuperLU<double>>(I);
+#ifdef SUANPAN_CUDA
+        benchmark_mat_setup<FullMatCUDA<double>>(I);
+        benchmark_mat_setup<SparseMatCUDA<double>>(I);
+#endif
+    }
+}
+
 TEST_CASE("FullMat", "[Matrix.Dense]") {
     for(auto I = 0; I < 100; ++I) {
         const auto N = randi<uword>(distr_param(100, 200));
@@ -57,7 +104,7 @@ TEST_CASE("FullMat", "[Matrix.Dense]") {
 
         const mat B = randu<mat>(N, N);
 
-        auto clear_mat = [&]() {
+        auto clear_mat = [&] {
             A.zeros();
             for(auto i = 0llu; i < N; ++i) for(auto j = 0llu; j < N; ++j) A.at(i, j) = B(i, j);
         };
