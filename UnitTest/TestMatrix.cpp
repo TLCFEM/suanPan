@@ -76,8 +76,10 @@ template<typename T> void benchmark_mat_setup(const int I) {
     string title;
 
     if(std::is_same_v<SparseMatSuperLU<double>, T>) title = "SuperLU ";
+#ifdef SUANPAN_CUDA
     else if(std::is_same_v<FullMatCUDA<double>, T>) title = "Full CUDA ";
     else if(std::is_same_v<SparseMatCUDA<double>, T>) title = "Sparse CUDA ";
+#endif
 
     benchmark_mat_solve(std::move(title += std::to_string(I)), A, C, spsolve(B, C), [&] {
         A.zeros();
