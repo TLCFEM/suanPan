@@ -11,6 +11,8 @@ enable constraint 2
 erase constraint 2
 
 node 1 0 0
+disable node 1
+enable node 1
 erase node 1
 
 nodegroup 1 3 4 16 72 73 85 141 142 154
@@ -43,6 +45,11 @@ disable section 2
 enable section 2
 erase section 2
 
+cload 4 0 1 1 1
+disable load 4
+enable load 4
+erase load 4
+
 step static 1 1
 set ini_step_size 1E-1
 set fixed_step_size true
@@ -74,6 +81,8 @@ enable step 1
 erase step 1
 
 enable all
+
+summary
 
 reset
 clear
