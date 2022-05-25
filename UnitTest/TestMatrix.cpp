@@ -2,59 +2,64 @@
 #include "CatchHeader.h"
 
 template<typename MT, std::invocable T> void test_mat_solve(MT& A, const vec& D, const vec& C, T clear_mat) {
+    constexpr double tol = 1E-12;
+
     vec E(C.n_elem);
 
     clear_mat();
 
     // full solve
     A.solve(E, C);
-    REQUIRE(norm(E - D) < 1E-10);
+    REQUIRE(norm(E - D) < tol);
 
     // factored solve
     A.solve(E, C);
-    REQUIRE(norm(E - D) < 1E-10);
+    REQUIRE(norm(E - D) < tol);
 
     clear_mat();
 
     // r-value full solve
     A.solve(E, mat(C));
-    REQUIRE(norm(E - D) < 1E-10);
+    REQUIRE(norm(E - D) < tol);
 
     // r-value factored solve
     A.solve(E, mat(C));
-    REQUIRE(norm(E - D) < 1E-10);
+    REQUIRE(norm(E - D) < tol);
 
     // mixed precision
     A.set_precision(Precision::MIXED);
+    A.set_tolerance(1E-18);
 
     clear_mat();
 
     // full solve
     A.solve(E, C);
-    REQUIRE(norm(E - D) < 1E-5);
+    REQUIRE(norm(E - D) < tol);
 
     // factored solve
     A.solve(E, C);
-    REQUIRE(norm(E - D) < 1E-5);
+    REQUIRE(norm(E - D) < tol);
 
     clear_mat();
 
     // r-value full solve
     A.solve(E, mat(C));
-    REQUIRE(norm(E - D) < 1E-5);
+    REQUIRE(norm(E - D) < tol);
 
     // r-value factored solve
     A.solve(E, mat(C));
-    REQUIRE(norm(E - D) < 1E-5);
+    REQUIRE(norm(E - D) < tol);
 }
 
 template<typename MT, std::invocable T> void benchmark_mat_solve(string&& title, MT& A, const vec& C, const vec& E, T&& clear_mat) {
+    constexpr double tol = 1E-12;
+
     vec D;
 
     BENCHMARK((title + " Full").c_str()) {
         clear_mat();
         A.solve(D, C);
-        REQUIRE(norm(E - D) < 1E-12);
+        REQUIRE(norm(E - D) < tol);
     };
 
     A.set_precision(Precision::MIXED);
@@ -62,7 +67,7 @@ template<typename MT, std::invocable T> void benchmark_mat_solve(string&& title,
     BENCHMARK((title + " Mixed").c_str()) {
         clear_mat();
         A.solve(D, C);
-        REQUIRE(norm(E - D) < 1E-12);
+        REQUIRE(norm(E - D) < tol);
     };
 }
 
@@ -76,6 +81,7 @@ template<typename T> void benchmark_mat_setup(const int I) {
     string title;
 
     if(std::is_same_v<SparseMatSuperLU<double>, T>) title = "SuperLU ";
+    else if(std::is_same_v<FullMat<double>, T>) title = "Full ";
 #ifdef SUANPAN_CUDA
     else if(std::is_same_v<FullMatCUDA<double>, T>) title = "Full CUDA ";
     else if(std::is_same_v<SparseMatCUDA<double>, T>) title = "Sparse CUDA ";
@@ -90,6 +96,7 @@ template<typename T> void benchmark_mat_setup(const int I) {
 TEST_CASE("Mixed Precision", "[Matrix.Benchmark]") {
     for(auto I = 32; I < 1024; I *= 2) {
         benchmark_mat_setup<SparseMatSuperLU<double>>(I);
+        benchmark_mat_setup<FullMat<double>>(I);
 #ifdef SUANPAN_CUDA
         benchmark_mat_setup<FullMatCUDA<double>>(I);
         benchmark_mat_setup<SparseMatCUDA<double>>(I);
@@ -104,7 +111,7 @@ TEST_CASE("FullMat", "[Matrix.Dense]") {
         REQUIRE(A.n_rows == N);
         REQUIRE(A.n_cols == N);
 
-        const mat B = randu<mat>(N, N);
+        const mat B = randu<mat>(N, N) + eye(N, N) * 1E1;
 
         auto clear_mat = [&] {
             A.zeros();
@@ -128,7 +135,7 @@ TEST_CASE("SymmPackMat", "[Matrix.Dense]") {
         auto A = SymmPackMat<double>(N);
         REQUIRE(A.n_rows == N);
 
-        mat B = diagmat(randu<vec>(N)) + eye(N, N);
+        mat B = diagmat(randu<vec>(N)) + eye(N, N) * 1E1;
 
         auto clear_mat = [&] {
             A.zeros();
