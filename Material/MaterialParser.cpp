@@ -2689,54 +2689,32 @@ void new_tablecdp(unique_ptr<Material>& return_obj, istringstream& command) {
     double para;
     while(!command.eof() && idx < 2) if(get_input(command, para)) para_pool(idx++) = para;
 
-    string table_name;
-
     mat c_table, t_table, dc_table, dt_table;
 
-    struct stat buffer{};
+    auto check_file = [&](mat& table) {
+        string table_name;
 
-    if(!get_input(command, table_name)) {
-        suanpan_error("new_tablecdp() requires a valid parameter.\n");
-        return;
-    }
-    if(stat(table_name.c_str(), &buffer) != 0 || !c_table.load(table_name, raw_ascii) || c_table.n_cols < 2) {
-        suanpan_error("new_tablecdp() cannot load file %s.\n", table_name.c_str());
-        return;
-    }
+        if(!get_input(command, table_name)) {
+            suanpan_error("new_tablecdp() requires a valid parameter.\n");
+            return false;
+        }
+        if(std::error_code code; !fs::exists(table_name, code) || !table.load(table_name, raw_ascii) || table.n_cols < 2) {
+            suanpan_error("new_tablecdp() cannot load file %s.\n", table_name.c_str());
+            return false;
+        }
+        if(0. != table(0)) {
+            suanpan_error("new_tablecdp() detects nonzero first plastic strain.\n");
+            return false;
+        }
+        return true;
+    };
 
-    if(!get_input(command, table_name)) {
-        suanpan_error("new_tablecdp() requires a valid parameter.\n");
-        return;
-    }
-    if(stat(table_name.c_str(), &buffer) != 0 || !t_table.load(table_name, raw_ascii) || t_table.n_cols < 2) {
-        suanpan_error("new_tablecdp() cannot load file %s.\n", table_name.c_str());
-        return;
-    }
+    if(!check_file(c_table)) return;
+    if(!check_file(t_table)) return;
+    if(!check_file(dc_table)) return;
+    if(!check_file(dt_table)) return;
 
-    if(!get_input(command, table_name)) {
-        suanpan_error("new_tablecdp() requires a valid parameter.\n");
-        return;
-    }
-    if(stat(table_name.c_str(), &buffer) != 0 || !dc_table.load(table_name, raw_ascii) || dc_table.n_cols < 2) {
-        suanpan_error("new_tablecdp() cannot load file %s.\n", table_name.c_str());
-        return;
-    }
-
-    if(!get_input(command, table_name)) {
-        suanpan_error("new_tablecdp() requires a valid parameter.\n");
-        return;
-    }
-    if(stat(table_name.c_str(), &buffer) != 0 || !dt_table.load(table_name, raw_ascii) || dt_table.n_cols < 2) {
-        suanpan_error("new_tablecdp() cannot load file %s.\n", table_name.c_str());
-        return;
-    }
-
-    if(0. != c_table(0) || 0. != t_table(0) || 0. != dc_table(0) || 0. != dt_table(0)) {
-        suanpan_error("new_tablecdp() detects nonzero first plastic strain.\n");
-        return;
-    }
-
-    while(!command.eof() && idx < 4) if(get_input(command, para)) para_pool(idx++) = para;
+    while(!command.eof() && idx < 6) if(get_input(command, para)) para_pool(idx++) = para;
 
     return_obj = make_unique<TableCDP>(tag, para_pool(0), para_pool(1), std::move(t_table), std::move(c_table), std::move(dt_table), std::move(dc_table), para_pool(2), para_pool(3), para_pool(4), para_pool(5));
 }
@@ -3041,7 +3019,7 @@ void new_yeoh(unique_ptr<Material>& return_obj, istringstream& command) {
 
     while(!command.eof() && get_input(command, para)) pool.emplace_back(para);
 
-    const auto t_size = pool.size();
+    const auto t_size = static_cast<long long>(pool.size());
     const auto h_size = t_size / 2;
 
     auto A0 = vector(pool.begin(), pool.begin() + h_size);
