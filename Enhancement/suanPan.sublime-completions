@@ -2060,11 +2060,14 @@
       "details":""
     },
     {
-      "trigger":[
-        "GeneralisedAlpha",
-        "GeneralizedAlpha"
-      ],
-      "contents":"integrator GeneralisedAlpha ${1:(1)} ${2:[2]}\n# (1) int, unique tag\n# [2] double, spectral radius at infinite frequency, default: 0.5\n\nintegrator GeneralisedAlpha {1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique tag\n# (2) double, \\alpha_f\n# (3) double, \\alpha_m",
+      "trigger":"GeneralizedAlpha,
+      "contents":"integrator GeneralisedAlpha ${1:(1)} ${2:[2]}\n# (1) int, unique tag\n# [2] double, spectral radius at infinite frequency, default: 0.5\n\nintegrator GeneralisedAlpha ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique tag\n# (2) double, \\alpha_f\n# (3) double, \\alpha_m",
+      "kind":"type",
+      "details":""
+    },
+    {
+      "trigger":"GeneralisedAlpha",
+      "contents":"integrator GeneralisedAlpha ${1:(1)} ${2:[2]}\n# (1) int, unique tag\n# [2] double, spectral radius at infinite frequency, default: 0.5\n\nintegrator GeneralisedAlpha ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique tag\n# (2) double, \\alpha_f\n# (3) double, \\alpha_m",
       "kind":"type",
       "details":""
     },
