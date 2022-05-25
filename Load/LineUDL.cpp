@@ -26,20 +26,11 @@ LineUDL::LineUDL(const unsigned T, const unsigned S, const double L, uvec&& N, c
     , dimension(D) {}
 
 int LineUDL::initialize(const shared_ptr<DomainBase>& D) {
-    if(SUANPAN_SUCCESS != Load::initialize(D)) return SUANPAN_FAIL;
+    if(node_encoding.n_elem % 2 != 0) return SUANPAN_FAIL;
 
-    if(node_encoding.n_elem % 2 != 0) {
-        D->disable_load(get_tag());
-        return SUANPAN_SUCCESS;
-    }
+    for(const auto I : node_encoding) if(const auto& t_node = D->get<Node>(I); t_node->get_reordered_dof().size() < dimension || t_node->get_coordinate().size() < dimension) return SUANPAN_FAIL;
 
-    for(const auto I : node_encoding)
-        if(const auto& t_node = D->get<Node>(I); t_node->get_reordered_dof().size() < dimension || t_node->get_coordinate().size() < dimension) {
-            D->disable_load(get_tag());
-            return SUANPAN_SUCCESS;
-        }
-
-    return SUANPAN_SUCCESS;
+    return Load::initialize(D);
 }
 
 LineUDL2D::LineUDL2D(const unsigned T, const unsigned S, const double L, uvec&& N, const unsigned DT, const unsigned AT)
