@@ -16,7 +16,6 @@
  ******************************************************************************/
 
 #include "ConditionalModifier.h"
-#include <ranges>
 #include <Domain/DomainBase.h>
 #include <Domain/Node.h>
 #include <Load/Amplitude/Ramp.h>
@@ -62,7 +61,7 @@ int ConditionalModifier::initialize(const shared_ptr<DomainBase>& D) {
     }
 
     auto start_time = 0.;
-    for(const auto& t_step : D->get_step_pool() | std::views::values) {
+    for(const auto& [t_tag, t_step] : D->get_step_pool()) {
         if(t_step->get_tag() >= start_step) break;
         start_time += t_step->get_time_period();
     }

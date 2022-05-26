@@ -37,7 +37,6 @@
 #include <Toolbox/sort_color.h>
 #include <Toolbox/sort_rcm.h>
 #include <numeric>
-#include <ranges>
 
 #ifdef SUANPAN_HDF5
 #include <hdf5/hdf5.h>
@@ -706,7 +705,7 @@ const vector<vector<unsigned>>& Domain::get_color_map() const { return color_map
  */
 vector<vector<uword>> Domain::get_node_connectivity() {
     unsigned max_tag = 0;
-    for(const auto& t_tag : node_pond | std::views::keys) if(t_tag > max_tag) max_tag = t_tag;
+    for(const auto& [t_tag , t_node] : node_pond) if(t_tag > max_tag) max_tag = t_tag;
 
     vector node_connectivity(++max_tag, vector<uword>{});
 
@@ -723,7 +722,7 @@ vector<vector<uword>> Domain::get_node_connectivity() {
  */
 vector<uvec> Domain::get_element_connectivity() {
     unsigned max_tag = 0;
-    for(const auto& t_tag : element_pond | std::views::keys) if(t_tag > max_tag) max_tag = t_tag;
+    for(const auto& [t_tag, t_element] : element_pond) if(t_tag > max_tag) max_tag = t_tag;
 
     vector element_connectivity(++max_tag, uvec{});
 
@@ -752,7 +751,7 @@ int Domain::reorder_dof() {
     });
 
     // for nonlinear constraint
-    for(const auto& t_constraint : constraint_pond | std::views::values) {
+    for(const auto& [t_tag, t_constraint] : constraint_pond) {
         if(!t_constraint->is_connected()) continue;
         vector<uword> t_encoding;
         for(auto& I : t_constraint->get_node_encoding()) if(find<Node>(I)) for(auto& J : get<Node>(I)->get_reordered_dof()) t_encoding.emplace_back(J);
