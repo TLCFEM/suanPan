@@ -27,9 +27,9 @@ step dynamic 1 1E-1
 set ini_step_size 5E-2
 set fixed_step_size true
 
-integrator GeneralisedAlpha 1 .4 .2
-
 converger RelIncreDisp 1 1E-10 4 1
+
+integrator GeneralisedAlpha 1 .4 .2
 
 summary
 
@@ -45,5 +45,18 @@ disable load 2
 analyze
 
 peek node 1 2
+
+clear
+
+integrator GSSSSU0 2 .4 .2 .6
+
+analyze
+
+clear
+
+disable load 3
+enable load 2
+
+analyze
 
 exit
