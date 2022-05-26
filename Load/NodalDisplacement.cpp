@@ -36,7 +36,7 @@ int NodalDisplacement::initialize(const shared_ptr<DomainBase>& D) {
     for(const auto I : W->get_reference_dof()) r_dof.emplace_back(I);
 
     for(const auto I : get_nodal_active_dof(D))
-        if(r_dof.end() == std::ranges::find(r_dof, I)) r_dof.emplace_back(I);
+        if(!if_contain(r_dof, I).first) r_dof.emplace_back(I);
         else suanpan_warning("more than one displacement loads are applied on the same DoF.\n");
 
     W->set_reference_dof(uvec(r_dof));

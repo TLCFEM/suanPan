@@ -39,7 +39,7 @@ int SupportMotion::initialize(const shared_ptr<DomainBase>& D) {
 
     for(const auto I : get_nodal_active_dof(D)) {
         e_dof.emplace_back(I);
-        if(r_dof.end() == std::ranges::find(r_dof, e_dof.back())) r_dof.emplace_back(e_dof.back());
+        if(!if_contain(r_dof, e_dof.back()).first) r_dof.emplace_back(e_dof.back());
         else suanpan_warning("more than one displacement load are applied on the same DoF.\n");
     }
 
