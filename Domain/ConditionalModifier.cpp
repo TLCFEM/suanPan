@@ -54,13 +54,11 @@ ConditionalModifier::ConditionalModifier(const unsigned T, const unsigned ST, co
     , dof_reference(std::forward<uvec>(D) - 1) {}
 
 int ConditionalModifier::initialize(const shared_ptr<DomainBase>& D) {
-    if(!validate_step(D)) return SUANPAN_SUCCESS;
-
-    0 == amplitude_tag ? magnitude = make_shared<Ramp>(0) : magnitude = D->get<Amplitude>(amplitude_tag);
-
-    if(nullptr != magnitude && !magnitude->is_active()) magnitude = nullptr;
-
-    if(nullptr == magnitude) magnitude = make_shared<Amplitude>();
+    if(0 == amplitude_tag) magnitude = make_shared<Ramp>(0);
+    else {
+        magnitude = D->get<Amplitude>(amplitude_tag);
+        if(nullptr == magnitude || !magnitude->is_active()) magnitude = make_shared<Ramp>(0);
+    }
 
     auto start_time = 0.;
     for(const auto& [t_tag, t_step] : D->get_step_pool()) {
@@ -110,6 +108,6 @@ void ConditionalModifier::update_status(const vec&) {}
 
 void ConditionalModifier::commit_status() {}
 
-void ConditionalModifier::clear_status() {}
+void ConditionalModifier::clear_status() { set_initialized(false); }
 
 void ConditionalModifier::reset_status() {}

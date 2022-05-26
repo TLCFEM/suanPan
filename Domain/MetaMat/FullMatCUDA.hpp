@@ -73,12 +73,12 @@ template<sp_d T> void FullMatCUDA<T>::acquire() {
 
     if(int bufferSize = 0; std::is_same_v<T, float> || Precision::MIXED == this->precision) {
         cudaMalloc(&d_A, sizeof(float) * this->n_elem);
-        cusolverDnSgetrf_bufferSize(handle, this->n_rows, this->n_cols, (float*)d_A, this->n_elem, &bufferSize);
+        cusolverDnSgetrf_bufferSize(handle, int(this->n_rows), int(this->n_cols), (float*)d_A, int(this->n_elem), &bufferSize);
         cudaMalloc(&buffer, sizeof(float) * bufferSize);
     }
     else {
         cudaMalloc(&d_A, sizeof(double) * this->n_elem);
-        cusolverDnDgetrf_bufferSize(handle, this->n_rows, this->n_cols, (double*)d_A, this->n_elem, &bufferSize);
+        cusolverDnDgetrf_bufferSize(handle, int(this->n_rows), int(this->n_cols), (double*)d_A, int(this->n_elem), &bufferSize);
         cudaMalloc(&buffer, sizeof(double) * bufferSize);
     }
 }
@@ -110,7 +110,7 @@ template<sp_d T> int FullMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) {
         // pure float
         if(!this->factored) {
             cudaMemcpyAsync(d_A, this->memptr(), sizeof(float) * this->n_elem, cudaMemcpyHostToDevice, stream);
-            cusolverDnSgetrf(handle, this->n_rows, this->n_cols, (float*)d_A, this->n_rows, (float*)buffer, ipiv, info);
+            cusolverDnSgetrf(handle, int(this->n_rows), int(this->n_cols), (float*)d_A, int(this->n_rows), (float*)buffer, ipiv, info);
 
             this->factored = true;
         }
@@ -120,7 +120,7 @@ template<sp_d T> int FullMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) {
         void* d_x = nullptr;
         cudaMalloc(&d_x, byte_size);
         cudaMemcpyAsync(d_x, B.memptr(), byte_size, cudaMemcpyHostToDevice, stream);
-        cusolverDnSgetrs(handle, CUBLAS_OP_N, this->n_rows, B.n_cols, (float*)d_A, this->n_rows, ipiv, (float*)d_x, this->n_rows, info);
+        cusolverDnSgetrs(handle, CUBLAS_OP_N, int(this->n_rows), int(B.n_cols), (float*)d_A, int(this->n_rows), ipiv, (float*)d_x, int(this->n_rows), info);
 
         X.set_size(arma::size(B));
 
@@ -136,7 +136,7 @@ template<sp_d T> int FullMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) {
             this->s_memory = this->to_float();
 
             cudaMemcpyAsync(d_A, this->s_memory.memptr(), sizeof(float) * this->s_memory.n_elem, cudaMemcpyHostToDevice, stream);
-            cusolverDnSgetrf(handle, this->n_rows, this->n_cols, (float*)d_A, this->n_rows, (float*)buffer, ipiv, info);
+            cusolverDnSgetrf(handle, int(this->n_rows), int(this->n_cols), (float*)d_A, int(this->n_rows), (float*)buffer, ipiv, info);
 
             this->factored = true;
         }
@@ -150,7 +150,7 @@ template<sp_d T> int FullMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) {
 
         mat full_residual = B;
 
-        auto multiplier = arma::norm(full_residual);
+        auto multiplier = norm(full_residual);
 
         auto counter = 0u;
         while(counter++ < this->refinement) {
@@ -159,7 +159,7 @@ template<sp_d T> int FullMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) {
             auto residual = conv_to<fmat>::from(full_residual / multiplier);
 
             cudaMemcpyAsync(d_x, residual.memptr(), byte_size, cudaMemcpyHostToDevice, stream);
-            cusolverDnSgetrs(handle, CUBLAS_OP_N, this->n_rows, B.n_cols, (float*)d_A, this->n_rows, ipiv, (float*)d_x, this->n_rows, info);
+            cusolverDnSgetrs(handle, CUBLAS_OP_N, int(this->n_rows), int(B.n_cols), (float*)d_A, int(this->n_rows), ipiv, (float*)d_x, int(this->n_rows), info);
             cudaMemcpyAsync(residual.memptr(), d_x, byte_size, cudaMemcpyDeviceToHost, stream);
 
             cudaDeviceSynchronize();
@@ -177,7 +177,7 @@ template<sp_d T> int FullMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) {
         // pure double
         if(!this->factored) {
             cudaMemcpyAsync(d_A, this->memptr(), sizeof(double) * this->n_elem, cudaMemcpyHostToDevice, stream);
-            cusolverDnDgetrf(handle, this->n_rows, this->n_cols, (double*)d_A, this->n_rows, (double*)buffer, ipiv, info);
+            cusolverDnDgetrf(handle, int(this->n_rows), int(this->n_cols), (double*)d_A, int(this->n_rows), (double*)buffer, ipiv, info);
 
             this->factored = true;
         }
@@ -187,7 +187,7 @@ template<sp_d T> int FullMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) {
         void* d_x = nullptr;
         cudaMalloc(&d_x, byte_size);
         cudaMemcpyAsync(d_x, B.memptr(), byte_size, cudaMemcpyHostToDevice, stream);
-        cusolverDnDgetrs(handle, CUBLAS_OP_N, this->n_rows, B.n_cols, (double*)d_A, this->n_rows, ipiv, (double*)d_x, this->n_rows, info);
+        cusolverDnDgetrs(handle, CUBLAS_OP_N, int(this->n_rows), int(B.n_cols), (double*)d_A, int(this->n_rows), ipiv, (double*)d_x, int(this->n_rows), info);
 
         X.set_size(arma::size(B));
 

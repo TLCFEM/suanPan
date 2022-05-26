@@ -29,10 +29,7 @@ int Embed::initialize(const shared_ptr<DomainBase>& D) {
     auto& t_node = D->get<Node>(node_encoding(0));
     auto& t_element = D->get<Element>(element_tag);
 
-    if(nullptr == t_node || nullptr == t_element || !t_node->is_active() || !t_element->is_active() || t_element->compute_shape_function(zeros(num_size, 1), 0).is_empty()) {
-        D->disable_constraint(get_tag());
-        return SUANPAN_FAIL;
-    }
+    if(nullptr == t_node || nullptr == t_element || !t_node->is_active() || !t_element->is_active() || t_element->compute_shape_function(zeros(num_size, 1), 0).is_empty()) return SUANPAN_FAIL;
 
     const auto t_coor = get_coordinate(t_element.get(), num_size);
 
@@ -44,10 +41,7 @@ int Embed::initialize(const shared_ptr<DomainBase>& D) {
 
     unsigned counter = 0;
     while(true) {
-        if(max_iteration == ++counter) {
-            D->disable_constraint(get_tag());
-            return SUANPAN_FAIL;
-        }
+        if(max_iteration == ++counter) return SUANPAN_FAIL;
 
         const vec incre = solve((t_element->compute_shape_function(t_para, 1) * t_coor).t(), n_coor - ((n = t_element->compute_shape_function(t_para, 0)) * t_coor).t());
         if(norm(incre) < 1E-14) break;

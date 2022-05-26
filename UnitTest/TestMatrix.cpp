@@ -1,75 +1,107 @@
 #include <Domain/MetaMat/MetaMat>
 #include "CatchHeader.h"
 
-template<typename T> void test_dense_mat_solve(MetaMat<double>& A, const vec& D, const vec& C, T clear_mat) {
+template<typename MT, std::invocable T> void test_mat_solve(MT& A, const vec& D, const vec& C, T clear_mat) {
+    constexpr double tol = 1E-12;
+
     vec E(C.n_elem);
 
     clear_mat();
 
     // full solve
     A.solve(E, C);
-    REQUIRE(norm(E - D) < 1E-10);
+    REQUIRE(norm(E - D) < tol);
 
     // factored solve
     A.solve(E, C);
-    REQUIRE(norm(E - D) < 1E-10);
+    REQUIRE(norm(E - D) < tol);
 
     clear_mat();
 
     // r-value full solve
     A.solve(E, mat(C));
-    REQUIRE(norm(E - D) < 1E-10);
+    REQUIRE(norm(E - D) < tol);
 
     // r-value factored solve
     A.solve(E, mat(C));
-    REQUIRE(norm(E - D) < 1E-10);
+    REQUIRE(norm(E - D) < tol);
 
     // mixed precision
     A.set_precision(Precision::MIXED);
+    A.set_tolerance(1E-18);
 
     clear_mat();
 
     // full solve
     A.solve(E, C);
-    REQUIRE(norm(E - D) < 1E-5);
+    REQUIRE(norm(E - D) < tol);
 
     // factored solve
     A.solve(E, C);
-    REQUIRE(norm(E - D) < 1E-5);
+    REQUIRE(norm(E - D) < tol);
 
     clear_mat();
 
     // r-value full solve
     A.solve(E, mat(C));
-    REQUIRE(norm(E - D) < 1E-5);
+    REQUIRE(norm(E - D) < tol);
 
     // r-value factored solve
     A.solve(E, mat(C));
-    REQUIRE(norm(E - D) < 1E-5);
+    REQUIRE(norm(E - D) < tol);
 }
 
-template<typename T> void test_sparse_mat_solve(MetaMat<double>& A, const vec& D, const vec& C, T clear_mat) {
-    vec E(C.n_elem);
+template<typename MT, std::invocable T> void benchmark_mat_solve(string&& title, MT& A, const vec& C, const vec& E, T&& clear_mat) {
+    constexpr double tol = 1E-12;
 
-    clear_mat();
+    vec D;
 
-    // full solve
-    A.solve(E, C);
-    REQUIRE(norm(E - D) < 1E-10);
+    BENCHMARK((title + " Full").c_str()) {
+        clear_mat();
+        A.solve(D, C);
+        REQUIRE(norm(E - D) < tol);
+    };
 
-    // factored solve
-    A.solve(E, C);
-    REQUIRE(norm(E - D) < 1E-10);
+    A.set_precision(Precision::MIXED);
 
-    clear_mat();
+    BENCHMARK((title + " Mixed").c_str()) {
+        clear_mat();
+        A.solve(D, C);
+        REQUIRE(norm(E - D) < tol);
+    };
+}
 
-    // r-value full solve
-    A.solve(E, mat(C));
-    REQUIRE(norm(E - D) < 1E-10);
+template<typename T> void benchmark_mat_setup(const int I) {
+    sp_mat B = sprandu(I, I, .01);
+    B = B + B.t() + speye(I, I) * 1E1;
+    const vec C = randu<vec>(I);
 
-    // r-value factored solve
-    A.solve(E, mat(C));
-    REQUIRE(norm(E - D) < 1E-10);
+    auto A = T(I, I);
+
+    string title;
+
+    if(std::is_same_v<SparseMatSuperLU<double>, T>) title = "SuperLU ";
+    else if(std::is_same_v<FullMat<double>, T>) title = "Full ";
+#ifdef SUANPAN_CUDA
+    else if(std::is_same_v<FullMatCUDA<double>, T>) title = "Full CUDA ";
+    else if(std::is_same_v<SparseMatCUDA<double>, T>) title = "Sparse CUDA ";
+#endif
+
+    benchmark_mat_solve(std::move(title += std::to_string(I)), A, C, spsolve(B, C), [&] {
+        A.zeros();
+        for(auto J = B.begin(); J != B.end(); ++J) A.at(J.row(), J.col()) = *J;
+    });
+}
+
+TEST_CASE("Mixed Precision", "[Matrix.Benchmark]") {
+    for(auto I = 32; I < 1024; I *= 2) {
+        benchmark_mat_setup<SparseMatSuperLU<double>>(I);
+        benchmark_mat_setup<FullMat<double>>(I);
+#ifdef SUANPAN_CUDA
+        benchmark_mat_setup<FullMatCUDA<double>>(I);
+        benchmark_mat_setup<SparseMatCUDA<double>>(I);
+#endif
+    }
 }
 
 TEST_CASE("FullMat", "[Matrix.Dense]") {
@@ -79,31 +111,7 @@ TEST_CASE("FullMat", "[Matrix.Dense]") {
         REQUIRE(A.n_rows == N);
         REQUIRE(A.n_cols == N);
 
-        const mat B = randu<mat>(N, N);
-
-        auto clear_mat = [&]() {
-            A.zeros();
-            for(auto i = 0llu; i < N; ++i) for(auto j = 0llu; j < N; ++j) A.at(i, j) = B(i, j);
-        };
-
-        const vec C = randu<vec>(N);
-
-        clear_mat();
-
-        REQUIRE(norm(A * C - B * C) < 1E-12);
-        REQUIRE(norm(A * B - B * B) < 1E-12);
-
-        test_dense_mat_solve(A, solve(B, C), C, clear_mat);
-    }
-}
-
-TEST_CASE("SymmPackMat", "[Matrix.Dense]") {
-    for(auto I = 0; I < 100; ++I) {
-        const auto N = randi<uword>(distr_param(100, 200));
-        auto A = SymmPackMat<double>(N);
-        REQUIRE(A.n_rows == N);
-
-        mat B = diagmat(randu<vec>(N)) + eye(N, N);
+        const mat B = randu<mat>(N, N) + eye(N, N) * 1E1;
 
         auto clear_mat = [&] {
             A.zeros();
@@ -117,7 +125,31 @@ TEST_CASE("SymmPackMat", "[Matrix.Dense]") {
         REQUIRE(norm(A * C - B * C) < 1E-12);
         REQUIRE(norm(A * B - B * B) < 1E-12);
 
-        test_dense_mat_solve(A, solve(B, C), C, clear_mat);
+        test_mat_solve(A, solve(B, C), C, clear_mat);
+    }
+}
+
+TEST_CASE("SymmPackMat", "[Matrix.Dense]") {
+    for(auto I = 0; I < 100; ++I) {
+        const auto N = randi<uword>(distr_param(100, 200));
+        auto A = SymmPackMat<double>(N);
+        REQUIRE(A.n_rows == N);
+
+        mat B = diagmat(randu<vec>(N)) + eye(N, N) * 1E1;
+
+        auto clear_mat = [&] {
+            A.zeros();
+            for(auto i = 0llu; i < N; ++i) for(auto j = 0llu; j < N; ++j) A.at(i, j) = B(i, j);
+        };
+
+        const vec C = randu<vec>(N);
+
+        clear_mat();
+
+        REQUIRE(norm(A * C - B * C) < 1E-12);
+        REQUIRE(norm(A * B - B * B) < 1E-12);
+
+        test_mat_solve(A, solve(B, C), C, clear_mat);
     }
 }
 
@@ -145,7 +177,7 @@ TEST_CASE("BandMat", "[Matrix.Dense]") {
         REQUIRE(norm(A * C - B * C) < 1E-12);
         REQUIRE(norm(A * B - B * B) < 1E-12);
 
-        test_dense_mat_solve(A, solve(B, C), C, clear_mat);
+        test_mat_solve(A, solve(B, C), C, clear_mat);
     }
 }
 
@@ -173,7 +205,7 @@ TEST_CASE("BandMatSpike", "[Matrix.Dense]") {
         REQUIRE(norm(A * C - B * C) < 1E-12);
         REQUIRE(norm(A * B - B * B) < 1E-12);
 
-        test_dense_mat_solve(A, solve(B, C), C, clear_mat);
+        test_mat_solve(A, solve(B, C), C, clear_mat);
     }
 }
 
@@ -202,7 +234,7 @@ TEST_CASE("BandSymmMat", "[Matrix.Dense]") {
         REQUIRE(norm(A * C - B * C) < 1E-12);
         REQUIRE(norm(A * B - B * B) < 1E-12);
 
-        test_dense_mat_solve(A, solve(B, C), C, clear_mat);
+        test_mat_solve(A, solve(B, C), C, clear_mat);
     }
 }
 
@@ -226,7 +258,7 @@ TEST_CASE("SparseMatSuperLU", "[Matrix.Sparse]") {
 
         REQUIRE(norm(A * C - B * C) < 1E-12);
 
-        test_sparse_mat_solve(A, spsolve(B, C), C, clear_mat);
+        test_mat_solve(A, spsolve(B, C), C, clear_mat);
     }
 }
 
@@ -250,7 +282,7 @@ TEST_CASE("SparseMatMUMPS", "[Matrix.Sparse]") {
 
         REQUIRE(norm(A * C - B * C) < 1E-12);
 
-        test_sparse_mat_solve(A, spsolve(B, C), C, clear_mat);
+        test_mat_solve(A, spsolve(B, C), C, clear_mat);
     }
 }
 
@@ -275,7 +307,7 @@ TEST_CASE("SparseMatPARDISO", "[Matrix.Sparse]") {
 
         REQUIRE(norm(A * C - B * C) < 1E-12);
 
-        test_sparse_mat_solve(A, spsolve(B, C), C, clear_mat);
+        test_mat_solve(A, spsolve(B, C), C, clear_mat);
     }
 }
 #endif
@@ -301,7 +333,7 @@ TEST_CASE("SparseMatCUDA", "[Matrix.Sparse]") {
 
         REQUIRE(norm(A * C - B * C) < 1E-12);
 
-        test_sparse_mat_solve(A, spsolve(B, C), C, clear_mat);
+        test_mat_solve(A, spsolve(B, C), C, clear_mat);
     }
 }
 #endif

@@ -19,7 +19,6 @@
 #include <cstdint>
 #include <functional>
 #include <future>
-#include <iostream>
 #include <memory>
 #include <mutex>
 #include <queue>
@@ -159,23 +158,6 @@ public:
             sleep_or_yield();
         }
     }
-};
-
-class synced_stream {
-    mutable std::mutex stream_mutex = {};
-
-    std::ostream& out_stream;
-
-public:
-    explicit synced_stream(std::ostream& _out_stream = std::cout)
-        : out_stream(_out_stream) {}
-
-    template<typename... T> void print(const T&... items) {
-        const std::scoped_lock lock(stream_mutex);
-        (out_stream << ... << items);
-    }
-
-    template<typename... T> void println(const T&... items) { print(items..., '\n'); }
 };
 
 #endif

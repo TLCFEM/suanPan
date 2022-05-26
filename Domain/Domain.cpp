@@ -705,7 +705,7 @@ const vector<vector<unsigned>>& Domain::get_color_map() const { return color_map
  */
 vector<vector<uword>> Domain::get_node_connectivity() {
     unsigned max_tag = 0;
-    for(const auto& [t_tag, t_node] : node_pond) if(t_tag > max_tag) max_tag = t_tag;
+    for(const auto& [t_tag , t_node] : node_pond) if(t_tag > max_tag) max_tag = t_tag;
 
     vector node_connectivity(++max_tag, vector<uword>{});
 
@@ -825,7 +825,7 @@ int Domain::assign_color() {
     // count how many entries in the sparse form and preallocate memory
     if(is_sparse()) {
         auto& t_element_pool = element_pond.get();
-        factory->set_entry(std::transform_reduce(t_element_pool.cbegin(), t_element_pool.cend(), 1000llu, std::plus<>(), [](const shared_ptr<Element>& t_element) { return t_element->get_total_number() * t_element->get_total_number(); }));
+        factory->set_entry(std::transform_reduce(t_element_pool.cbegin(), t_element_pool.cend(), 1000llu, std::plus(), [](const shared_ptr<Element>& t_element) { return t_element->get_total_number() * t_element->get_total_number(); }));
     }
 
     return SUANPAN_SUCCESS;
@@ -995,24 +995,20 @@ int Domain::initialize() {
 }
 
 int Domain::initialize_load() {
-    auto code = 0;
-
     // cannot use parallel for due to potential racing in reference dof
-    std::ranges::for_each(load_pond, [&](const std::pair<unsigned, shared_ptr<Load>>& t_load) { code += t_load.second->initialize(shared_from_this()); });
+    std::ranges::for_each(load_pond, [&](const std::pair<unsigned, shared_ptr<Load>>& t_load) { if(t_load.second->validate_step(shared_from_this()) && !t_load.second->is_initialized() && SUANPAN_FAIL == t_load.second->initialize(shared_from_this())) disable_load(t_load.first); });
 
     load_pond.update();
 
-    return code;
+    return SUANPAN_SUCCESS;
 }
 
 int Domain::initialize_constraint() {
-    auto code = 0;
-
-    std::ranges::for_each(constraint_pond, [&](const std::pair<unsigned, shared_ptr<Constraint>>& t_constraint) { code += t_constraint.second->initialize(shared_from_this()); });
+    std::ranges::for_each(constraint_pond, [&](const std::pair<unsigned, shared_ptr<Constraint>>& t_constraint) { if(t_constraint.second->validate_step(shared_from_this()) && !t_constraint.second->is_initialized() && SUANPAN_FAIL == t_constraint.second->initialize(shared_from_this())) disable_constraint(t_constraint.first); });
 
     constraint_pond.update();
 
-    return code;
+    return SUANPAN_SUCCESS;
 }
 
 int Domain::initialize_reference() {

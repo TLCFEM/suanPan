@@ -39,10 +39,7 @@ NodeLine::NodeLine(const unsigned T, const unsigned S, const unsigned A, uvec&& 
 int NodeLine::initialize(const shared_ptr<DomainBase>& D) {
     dof_encoding = get_nodal_active_dof(D);
 
-    if(dof_encoding.n_elem != node_encoding.n_elem * dof_reference.n_elem) {
-        D->disable_constraint(get_tag());
-        return SUANPAN_SUCCESS;
-    }
+    if(dof_encoding.n_elem != node_encoding.n_elem * dof_reference.n_elem) return SUANPAN_FAIL;
 
     return Constraint::initialize(D);
 }

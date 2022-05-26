@@ -36,8 +36,7 @@ int MPC::initialize(const shared_ptr<DomainBase>& D) {
         auto& t_node = D->get<Node>(node_encoding(I));
         if(nullptr == t_node || !t_node->is_active() || t_node->get_reordered_dof().n_elem < dof_pool(I)) {
             auxiliary_stiffness.reset();
-            D->disable_constraint(get_tag());
-            return SUANPAN_SUCCESS;
+            return SUANPAN_FAIL;
         }
         auto& t_dof = t_node->get_reordered_dof();
         auxiliary_stiffness(t_dof(dof_pool(I))) = weight_pool(I);
