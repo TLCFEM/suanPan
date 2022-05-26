@@ -33,6 +33,8 @@ integrator GeneralisedAlpha 1 .4 .2
 
 summary
 
+precheck
+
 analyze
 
 peek node 1 2
