@@ -66,6 +66,7 @@ void ParticleCollision::apply_contact(const shared_ptr<DomainBase>& D, const sha
 
     const mat d_norm = (compute_df(diff_norm) - force / diff_norm) * diff_pos * diff_pos.t() + force / diff_norm * eye(num_dof, num_dof);
 
+    std::scoped_lock stiffness_lock(W->get_stiffness_mutex());
     for(auto L = 0u; L < num_dof; ++L)
         for(auto K = 0u; K < num_dof; ++K) {
             t_stiff->at(dof_i(K), dof_i(L)) -= d_norm(K, L);

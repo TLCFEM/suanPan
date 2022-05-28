@@ -31,10 +31,22 @@ int MultiplierBC::process(const shared_ptr<DomainBase>& D) {
 
     for(const auto I : dof_encoding) D->insert_restrained_dof(I);
 
-    if(auto& t_stiff = W->get_stiffness(); nullptr != t_stiff) for(const auto I : dof_encoding) t_stiff->unify(I);
-    if(auto& t_mass = W->get_mass(); nullptr != t_mass) for(const auto I : dof_encoding) t_mass->nullify(I);
-    if(auto& t_damping = W->get_damping(); nullptr != t_damping) for(const auto I : dof_encoding) t_damping->nullify(I);
-    if(auto& t_geometry = W->get_geometry(); nullptr != t_geometry) for(const auto I : dof_encoding) t_geometry->nullify(I);
+    if(auto& t_stiff = W->get_stiffness(); nullptr != t_stiff) {
+        std::scoped_lock lock(W->get_stiffness_mutex());
+        for(const auto I : dof_encoding) t_stiff->unify(I);
+    }
+    if(auto& t_mass = W->get_mass(); nullptr != t_mass) {
+        std::scoped_lock lock(W->get_mass_mutex());
+        for(const auto I : dof_encoding) t_mass->nullify(I);
+    }
+    if(auto& t_damping = W->get_damping(); nullptr != t_damping) {
+        std::scoped_lock lock(W->get_damping_mutex());
+        for(const auto I : dof_encoding) t_damping->nullify(I);
+    }
+    if(auto& t_geometry = W->get_geometry(); nullptr != t_geometry) {
+        std::scoped_lock lock(W->get_geometry_mutex());
+        for(const auto I : dof_encoding) t_geometry->nullify(I);
+    }
 
     return SUANPAN_SUCCESS;
 }
