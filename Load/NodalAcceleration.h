@@ -35,11 +35,11 @@
 
 class NodalAcceleration final : public Load {
 public:
-    explicit NodalAcceleration(unsigned = 0, // tag
-                               unsigned = 0, // step tag
-                               double = 0.,  // magnitude
-                               unsigned = 0, // dof tag
-                               unsigned = 0  // amplitude tag
+    NodalAcceleration(unsigned, // tag
+                      unsigned, // step tag
+                      double,   // magnitude
+                      unsigned, // dof tag
+                      unsigned  // amplitude tag
     );
     NodalAcceleration(unsigned,    // tag
                       unsigned,    // step tag

@@ -72,7 +72,7 @@ PenaltyBC::PenaltyBC(const unsigned T, const unsigned S, uvec&& N, const char* T
 int PenaltyBC::process(const shared_ptr<DomainBase>& D) {
     dof_encoding = get_nodal_active_dof(D);
 
-    for(const auto I : dof_encoding) D->insert_restrained_dof(I);
+    D->insert_restrained_dof(dof_encoding);
 
     stiffness.zeros(dof_encoding.n_elem, dof_encoding.n_elem);
 
@@ -82,7 +82,7 @@ int PenaltyBC::process(const shared_ptr<DomainBase>& D) {
 }
 
 int PenaltyBC::process_resistance(const shared_ptr<DomainBase>& D) {
-    for(const auto I : get_nodal_active_dof(D)) D->insert_restrained_dof(I);
+    D->insert_restrained_dof(get_nodal_active_dof(D));
 
     return SUANPAN_SUCCESS;
 }

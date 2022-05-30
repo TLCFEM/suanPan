@@ -33,6 +33,7 @@
 
 #include <future>
 #include "MetaMat/operator_times.hpp"
+#include "Toolbox/container.h"
 
 enum class AnalysisType {
     NONE,
@@ -86,7 +87,7 @@ template<sp_d T> class Factory final {
     Col<T> ninja; // the result from A*X=B
     Col<T> sushi; // modified right-hand side B
 
-    uvec reference_dof;
+    suanpan_set reference_dof;
     SpMat<T> reference_load;
 
     uvec auxiliary_encoding;      // for constraints using multiplier method
@@ -206,8 +207,11 @@ public:
     void set_reference_size(unsigned);
     [[nodiscard]] unsigned get_reference_size() const;
 
-    void set_reference_dof(const uvec&);
-    [[nodiscard]] const uvec& get_reference_dof() const;
+    void set_reference_dof(const suanpan_set&);
+    [[nodiscard]] const suanpan_set& get_reference_dof() const;
+
+    void update_reference_size() { n_rfld = unsigned(reference_dof.size()); }
+    void update_reference_dof(const uvec& S) { reference_dof.insert(S.cbegin(), S.cend()); }
 
     void set_error(const T&);
     const T& get_error() const;
@@ -657,16 +661,16 @@ template<sp_d T> void Factory<T>::set_reference_size(const unsigned S) {
 
 template<sp_d T> unsigned Factory<T>::get_reference_size() const { return n_rfld; }
 
-template<sp_d T> void Factory<T>::set_reference_dof(const uvec& D) { reference_dof = D; }
+template<sp_d T> void Factory<T>::set_reference_dof(const suanpan_set& D) { reference_dof = D; }
 
-template<sp_d T> const uvec& Factory<T>::get_reference_dof() const { return reference_dof; }
+template<sp_d T> const suanpan_set& Factory<T>::get_reference_dof() const { return reference_dof; }
 
 template<sp_d T> void Factory<T>::set_error(const T& E) { error = E; }
 
 template<sp_d T> const T& Factory<T>::get_error() const { return error; }
 
 template<sp_d T> int Factory<T>::initialize() {
-    reference_dof.reset(); // clear reference dof vector in every step
+    reference_dof.clear(); // clear reference dof vector in every step
 
     if(initialized || n_size == 0) return 0;
 

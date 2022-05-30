@@ -38,12 +38,12 @@ protected:
     uvec encoding;
 
 public:
-    explicit SupportMotion(unsigned = 0, // tag
-                           unsigned = 0, // step tag
-                           double = 0.,  // magnitude
-                           uvec&& = {},  // node tags
-                           unsigned = 0, // dof tag
-                           unsigned = 0  // amplitude tag
+    SupportMotion(unsigned, // tag
+                  unsigned, // step tag
+                  double,   // magnitude
+                  uvec&&,   // node tags
+                  unsigned, // dof tag
+                  unsigned  // amplitude tag
     );
     SupportMotion(unsigned,    // tag
                   unsigned,    // step tag
@@ -77,6 +77,6 @@ public:
     int process(const shared_ptr<DomainBase>&) override;
 };
 
-#endif // DISPLACEMENTLOAD_H
+#endif // SUPPORTMOTION_H
 
 //! @}

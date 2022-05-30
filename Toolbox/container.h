@@ -15,24 +15,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @fn sort_color
- * @brief A four color sorting algorithm.
  * @author tlc
- * @date 22/02/2020
- * @version 0.1.2
- * @file sort_color.h
+ * @date 30/05/2022
+ * @version 0.1.0
+ * @file container.h
  * @addtogroup Utility
  * @{
  */
 
-#ifndef COLOR_H
-#define COLOR_H
+#ifndef CONTAINER_H
+#define CONTAINER_H
 
-#include "container.h"
+#include <suanPan.h>
 
-auto sort_color_metis(suanpan_register&, int, char);
-vector<vector<unsigned>> sort_color_wp(const suanpan_register&);
-vector<vector<unsigned>> sort_color_mis(const suanpan_register&);
+using std::vector;
+
+#ifdef SUANPAN_MT
+#include <tbb/concurrent_set.h>
+#include <tbb/concurrent_unordered_set.h>
+using suanpan_set = tbb::concurrent_set<unsigned, std::less<>>;
+using suanpan_unordered_set = tbb::concurrent_unordered_set<uword>;
+#else
+#include <set>
+#include <unordered_set>
+using suanpan_set = std::set<unsigned, std::less<>>;
+using suanpan_unordered_set = std::unordered_set<uword>;
+#endif
+
+using suanpan_register = vector<suanpan_set>;
 
 #endif
 

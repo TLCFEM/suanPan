@@ -29,7 +29,7 @@ int MultiplierBC::process(const shared_ptr<DomainBase>& D) {
 
     dof_encoding = get_nodal_active_dof(D);
 
-    for(const auto I : dof_encoding) D->insert_restrained_dof(I);
+    D->insert_restrained_dof(dof_encoding);
 
     if(auto& t_stiff = W->get_stiffness(); nullptr != t_stiff) {
         std::scoped_lock lock(W->get_stiffness_mutex());
@@ -52,7 +52,7 @@ int MultiplierBC::process(const shared_ptr<DomainBase>& D) {
 }
 
 int MultiplierBC::process_resistance(const shared_ptr<DomainBase>& D) {
-    for(const auto I : get_nodal_active_dof(D)) D->insert_restrained_dof(I);
+    D->insert_restrained_dof(get_nodal_active_dof(D));
 
     return SUANPAN_SUCCESS;
 }

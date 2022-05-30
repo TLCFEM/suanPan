@@ -30,23 +30,8 @@ SupportMotion::SupportMotion(const unsigned T, const unsigned ST, const double L
 
 int SupportMotion::initialize(const shared_ptr<DomainBase>& D) {
     set_end_step(start_step + 1);
-
-    const auto& W = D->get_factory();
-
-    vector<uword> r_dof, e_dof;
-
-    for(const auto I : W->get_reference_dof()) r_dof.emplace_back(I);
-
-    for(const auto I : get_nodal_active_dof(D)) {
-        e_dof.emplace_back(I);
-        if(!if_contain(r_dof, e_dof.back()).first) r_dof.emplace_back(e_dof.back());
-        else suanpan_warning("more than one displacement load are applied on the same DoF.\n");
-    }
-
-    encoding = e_dof;
-
-    W->set_reference_dof(uvec(r_dof));
-    W->set_reference_size(static_cast<unsigned>(r_dof.size()));
+    
+    D->get_factory()->update_reference_dof(encoding = get_nodal_active_dof(D));
 
     return Load::initialize(D);
 }

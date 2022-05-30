@@ -676,17 +676,23 @@ const shared_ptr<Integrator>& Domain::get_current_integrator() const { return ge
 
 const shared_ptr<Solver>& Domain::get_current_solver() const { return get_solver(current_solver_tag); }
 
+void Domain::insert_loaded_dof(const uvec& T) { loaded_dofs.insert(T.cbegin(), T.cend()); }
+
+void Domain::insert_restrained_dof(const uvec& T) { restrained_dofs.insert(T.cbegin(), T.cend()); }
+
+void Domain::insert_constrained_dof(const uvec& T) { constrained_dofs.insert(T.cbegin(), T.cend()); }
+
 void Domain::insert_loaded_dof(const uword T) { loaded_dofs.insert(T); }
 
 void Domain::insert_restrained_dof(const uword T) { restrained_dofs.insert(T); }
 
 void Domain::insert_constrained_dof(const uword T) { constrained_dofs.insert(T); }
 
-const unordered_set<uword>& Domain::get_loaded_dof() const { return loaded_dofs; }
+const suanpan_unordered_set& Domain::get_loaded_dof() const { return loaded_dofs; }
 
-const unordered_set<uword>& Domain::get_restrained_dof() const { return restrained_dofs; }
+const suanpan_unordered_set& Domain::get_restrained_dof() const { return restrained_dofs; }
 
-const unordered_set<uword>& Domain::get_constrained_dof() const { return constrained_dofs; }
+const suanpan_unordered_set& Domain::get_constrained_dof() const { return constrained_dofs; }
 
 bool Domain::is_updated() const { return updated.load(); }
 
@@ -995,10 +1001,10 @@ int Domain::initialize() {
 }
 
 int Domain::initialize_load() {
-    // cannot use parallel for due to potential racing in reference dof
-    std::ranges::for_each(load_pond, [&](const std::pair<unsigned, shared_ptr<Load>>& t_load) { if(t_load.second->validate_step(shared_from_this()) && !t_load.second->is_initialized() && SUANPAN_FAIL == t_load.second->initialize(shared_from_this())) disable_load(t_load.first); });
-
+    suanpan_for_each(load_pond.cbegin(), load_pond.cend(), [&](const std::pair<unsigned, shared_ptr<Load>>& t_load) { if(t_load.second->validate_step(shared_from_this()) && !t_load.second->is_initialized() && SUANPAN_FAIL == t_load.second->initialize(shared_from_this())) disable_load(t_load.first); });
     load_pond.update();
+
+    factory->update_reference_size();
 
     return SUANPAN_SUCCESS;
 }
@@ -1014,7 +1020,7 @@ int Domain::initialize_constraint() {
 int Domain::initialize_reference() {
     // used in displacement controlled algorithm
     // need to initialize it for updating of load factor
-    auto& ref_dof = factory->get_reference_dof();
+    const auto ref_dof = to_uvec(factory->get_reference_dof());
 
     if(ref_dof.is_empty()) return SUANPAN_SUCCESS;
 

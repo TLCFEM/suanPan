@@ -29,13 +29,13 @@ NodalForce::NodalForce(const unsigned T, const unsigned S, const double L, uvec&
 int NodalForce::process(const shared_ptr<DomainBase>& D) {
     const auto& W = D->get_factory();
 
-    trial_load.zeros(W->get_size());
-
     const auto active_dof = get_nodal_active_dof(D);
 
-    trial_load(active_dof).fill(pattern * magnitude->get_amplitude(W->get_trial_time()));
+    D->insert_loaded_dof(active_dof);
 
-    for(const auto I : active_dof) D->insert_loaded_dof(I);
+    trial_load.zeros(W->get_size());
+
+    trial_load(active_dof).fill(pattern * magnitude->get_amplitude(W->get_trial_time()));
 
     return SUANPAN_SUCCESS;
 }
