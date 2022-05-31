@@ -6,7 +6,6 @@
 #include "commandParser.h"
 #include "print.h"
 #include "shapeFunction.h"
-#include "sort_color.h"
 #include "sort_rcm.h"
 #include "sync_ostream.h"
 #include "tensorToolbox.h"

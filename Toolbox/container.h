@@ -33,16 +33,22 @@ using std::vector;
 #ifdef SUANPAN_MT
 #include <tbb/concurrent_set.h>
 #include <tbb/concurrent_unordered_set.h>
-using suanpan_set = tbb::concurrent_set<unsigned, std::less<>>;
-using suanpan_unordered_set = tbb::concurrent_unordered_set<uword>;
+
+namespace suanpan {
+    template<typename T> using set = tbb::concurrent_set<T>;
+    template<typename T> using unordered_set = tbb::concurrent_unordered_set<T>;
+    template<typename T> using graph = vector<set<T>>;
+}
 #else
 #include <set>
 #include <unordered_set>
-using suanpan_set = std::set<unsigned, std::less<>>;
-using suanpan_unordered_set = std::unordered_set<uword>;
-#endif
 
-using suanpan_register = vector<suanpan_set>;
+namespace suanpan {
+    template<typename T> using set = std::set<T>;
+    template<typename T> using unordered_set = std::unordered_set<T>;
+    template<typename T> using graph = vector<set<T>>;
+}
+#endif
 
 #endif
 

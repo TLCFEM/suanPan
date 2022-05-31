@@ -30,7 +30,7 @@ SupportMotion::SupportMotion(const unsigned T, const unsigned ST, const double L
 
 int SupportMotion::initialize(const shared_ptr<DomainBase>& D) {
     set_end_step(start_step + 1);
-    
+
     D->get_factory()->update_reference_dof(encoding = get_nodal_active_dof(D));
 
     return Load::initialize(D);

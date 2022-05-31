@@ -32,6 +32,7 @@
 #define FACTORY_HPP
 
 #include <future>
+
 #include "MetaMat/operator_times.hpp"
 #include "Toolbox/container.h"
 
@@ -87,7 +88,7 @@ template<sp_d T> class Factory final {
     Col<T> ninja; // the result from A*X=B
     Col<T> sushi; // modified right-hand side B
 
-    suanpan_set reference_dof;
+    suanpan::set<uword> reference_dof;
     SpMat<T> reference_load;
 
     uvec auxiliary_encoding;      // for constraints using multiplier method
@@ -204,14 +205,13 @@ public:
     void set_bandwidth(unsigned, unsigned);
     void get_bandwidth(unsigned&, unsigned&) const;
 
+    void update_reference_size();
     void set_reference_size(unsigned);
     [[nodiscard]] unsigned get_reference_size() const;
 
-    void set_reference_dof(const suanpan_set&);
-    [[nodiscard]] const suanpan_set& get_reference_dof() const;
-
-    void update_reference_size() { n_rfld = unsigned(reference_dof.size()); }
-    void update_reference_dof(const uvec& S) { reference_dof.insert(S.cbegin(), S.cend()); }
+    void update_reference_dof(const uvec&);
+    void set_reference_dof(const suanpan::set<uword>&);
+    [[nodiscard]] const suanpan::set<uword>& get_reference_dof() const;
 
     void set_error(const T&);
     const T& get_error() const;
@@ -431,7 +431,7 @@ public:
     template<sp_d T1> friend Col<T1>& get_ninja(const shared_ptr<Factory<T1>>&);
     template<sp_d T1> friend Col<T1>& get_sushi(const shared_ptr<Factory<T1>>&);
 
-    template<sp_d T1> friend uvec& get_reference_dof(const shared_ptr<Factory<T1>>&);
+    template<sp_d T1> friend suanpan::set<uword>& get_reference_dof(const shared_ptr<Factory<T1>>&);
     template<sp_d T1> friend SpMat<T1>& get_reference_load(const shared_ptr<Factory<T1>>&);
 
     template<sp_d T1> friend uvec& get_auxiliary_encoding(const shared_ptr<Factory<T1>>&);
@@ -654,6 +654,8 @@ template<sp_d T> void Factory<T>::get_bandwidth(unsigned& L, unsigned& U) const 
     U = n_upbw;
 }
 
+template<sp_d T> void Factory<T>::update_reference_size() { n_rfld = static_cast<unsigned>(reference_dof.size()); }
+
 template<sp_d T> void Factory<T>::set_reference_size(const unsigned S) {
     if(S == n_rfld) return;
     n_rfld = S;
@@ -661,9 +663,11 @@ template<sp_d T> void Factory<T>::set_reference_size(const unsigned S) {
 
 template<sp_d T> unsigned Factory<T>::get_reference_size() const { return n_rfld; }
 
-template<sp_d T> void Factory<T>::set_reference_dof(const suanpan_set& D) { reference_dof = D; }
+template<sp_d T> void Factory<T>::update_reference_dof(const uvec& S) { reference_dof.insert(S.cbegin(), S.cend()); }
 
-template<sp_d T> const suanpan_set& Factory<T>::get_reference_dof() const { return reference_dof; }
+template<sp_d T> void Factory<T>::set_reference_dof(const suanpan::set<uword>& D) { reference_dof = D; }
+
+template<sp_d T> const suanpan::set<uword>& Factory<T>::get_reference_dof() const { return reference_dof; }
 
 template<sp_d T> void Factory<T>::set_error(const T& E) { error = E; }
 

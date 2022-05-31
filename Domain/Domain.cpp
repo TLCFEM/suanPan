@@ -34,7 +34,7 @@
 #include <Solver/Integrator/Integrator.h>
 #include <Solver/Solver.h>
 #include <Step/Step.h>
-#include <Toolbox/sort_color.h>
+#include <Toolbox/sort_color.hpp>
 #include <Toolbox/sort_rcm.h>
 #include <numeric>
 
@@ -688,11 +688,11 @@ void Domain::insert_restrained_dof(const uword T) { restrained_dofs.insert(T); }
 
 void Domain::insert_constrained_dof(const uword T) { constrained_dofs.insert(T); }
 
-const suanpan_unordered_set& Domain::get_loaded_dof() const { return loaded_dofs; }
+const suanpan::unordered_set<uword>& Domain::get_loaded_dof() const { return loaded_dofs; }
 
-const suanpan_unordered_set& Domain::get_restrained_dof() const { return restrained_dofs; }
+const suanpan::unordered_set<uword>& Domain::get_restrained_dof() const { return restrained_dofs; }
 
-const suanpan_unordered_set& Domain::get_constrained_dof() const { return constrained_dofs; }
+const suanpan::unordered_set<uword>& Domain::get_constrained_dof() const { return constrained_dofs; }
 
 bool Domain::is_updated() const { return updated.load(); }
 
@@ -801,7 +801,7 @@ int Domain::reorder_dof() {
 int Domain::assign_color() {
     // deal with k-coloring optimization
     if(ColorMethod::OFF != color_model) {
-        const auto color_algorithm = ColorMethod::WP == color_model ? sort_color_wp : sort_color_mis;
+        const auto color_algorithm = ColorMethod::WP == color_model ? sort_color_wp<unsigned> : sort_color_mis<unsigned>;
 
         auto node_tag = 0llu;
         std::unordered_map<uword, uword> node_map; // old_tag -> new_tag
@@ -817,7 +817,7 @@ int Domain::assign_color() {
             element_tag++;
         }
 
-        suanpan_register element_register(element_tag);
+        suanpan::graph<unsigned> element_register(element_tag);
 
         suanpan_for_each(node_register.begin(), node_register.end(), [&](const vector<unsigned>& node) { for(const auto I : node) for(const auto J : node) element_register[I].insert(J); });
 
@@ -875,7 +875,7 @@ int Domain::initialize() {
     suanpan_for_each(amplitude_pond.cbegin(), amplitude_pond.cend(), [&](const std::pair<unsigned, shared_ptr<Amplitude>>& t_amplitude) { t_amplitude.second->initialize(shared_from_this()); });
     amplitude_pond.update();
 
-    suanpan_set remove_list;
+    suanpan::set<unsigned> remove_list;
 
     remove_list.clear();
     suanpan_for_each(material_pond.cbegin(), material_pond.cend(), [&](const std::pair<unsigned, shared_ptr<Material>>& t_material) {
@@ -1010,7 +1010,7 @@ int Domain::initialize_load() {
 }
 
 int Domain::initialize_constraint() {
-    std::ranges::for_each(constraint_pond, [&](const std::pair<unsigned, shared_ptr<Constraint>>& t_constraint) { if(t_constraint.second->validate_step(shared_from_this()) && !t_constraint.second->is_initialized() && SUANPAN_FAIL == t_constraint.second->initialize(shared_from_this())) disable_constraint(t_constraint.first); });
+    suanpan_for_each(constraint_pond.cbegin(), constraint_pond.cend(), [&](const std::pair<unsigned, shared_ptr<Constraint>>& t_constraint) { if(t_constraint.second->validate_step(shared_from_this()) && !t_constraint.second->is_initialized() && SUANPAN_FAIL == t_constraint.second->initialize(shared_from_this())) disable_constraint(t_constraint.first); });
 
     constraint_pond.update();
 

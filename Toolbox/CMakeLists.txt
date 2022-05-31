@@ -5,7 +5,6 @@ target_sources(${PROJECT_NAME} PRIVATE
         Converter.cpp
         IntegrationPlan.cpp
         print.cpp
-        sort_color.cpp
         sort_rcm.cpp
         sync_ostream.cpp
         tensorToolbox.cpp

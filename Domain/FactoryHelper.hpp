@@ -80,7 +80,7 @@ template<sp_d T> Col<T>& get_ninja(const shared_ptr<Factory<T>>& W) { return W->
 
 template<sp_d T> Col<T>& get_sushi(const shared_ptr<Factory<T>>& W) { return W->sushi; }
 
-template<sp_d T> uvec& get_reference_dof(const shared_ptr<Factory<T>>& W) { return W->reference_dof; }
+template<sp_d T> suanpan::set<uword>& get_reference_dof(const shared_ptr<Factory<T>>& W) { return W->reference_dof; }
 
 template<sp_d T> SpMat<T>& get_reference_load(const shared_ptr<Factory<T>>& W) { return W->reference_load; }
 
@@ -190,10 +190,10 @@ template<sp_d T> Col<T>& get_eigenvalue(const shared_ptr<Factory<T>>& W) { retur
 
 template<sp_d T> Mat<T>& get_eigenvector(const shared_ptr<Factory<T>>& W) { return W->eigenvector; }
 
-inline uvec to_uvec(const suanpan_set& in) {
+template<sp_i T> uvec to_uvec(const suanpan::set<T>& in) {
     uvec out(in.size(), fill::none);
     auto I = 0llu;
-    for(const auto J : in) out(I++) = J;
+    for(const auto J : in) out(I++) = static_cast<uword>(J);
     return out;
 }
 

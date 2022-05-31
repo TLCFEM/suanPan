@@ -35,9 +35,9 @@
 #ifndef DOMAINBASE_H
 #define DOMAINBASE_H
 
+#include <future>
 #include <Domain/Tag.h>
 #include <Toolbox/container.h>
-#include <future>
 
 using std::future;
 using std::map;
@@ -301,9 +301,9 @@ public:
     virtual void insert_restrained_dof(uword) = 0;
     virtual void insert_constrained_dof(uword) = 0;
 
-    [[nodiscard]] virtual const suanpan_unordered_set& get_loaded_dof() const = 0;
-    [[nodiscard]] virtual const suanpan_unordered_set& get_restrained_dof() const = 0;
-    [[nodiscard]] virtual const suanpan_unordered_set& get_constrained_dof() const = 0;
+    [[nodiscard]] virtual const suanpan::unordered_set<uword>& get_loaded_dof() const = 0;
+    [[nodiscard]] virtual const suanpan::unordered_set<uword>& get_restrained_dof() const = 0;
+    [[nodiscard]] virtual const suanpan::unordered_set<uword>& get_constrained_dof() const = 0;
 
     [[nodiscard]] virtual bool is_updated() const = 0;
     [[nodiscard]] virtual bool is_sparse() const = 0;
