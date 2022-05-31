@@ -38,6 +38,7 @@ NodeFacet::NodeFacet(const unsigned T, const unsigned S, const unsigned A, uvec&
 int NodeFacet::initialize(const shared_ptr<DomainBase>& D) {
     dof_encoding = get_nodal_active_dof(D);
 
+    // need to check if sizes conform since the method does not emit error flag
     if(dof_encoding.n_elem != node_encoding.n_elem * dof_reference.n_elem) return SUANPAN_FAIL;
 
     set_multiplier_size(0);

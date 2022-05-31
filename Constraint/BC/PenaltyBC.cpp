@@ -80,6 +80,7 @@ int PenaltyBC::process(const shared_ptr<DomainBase>& D) {
 }
 
 int PenaltyBC::process_resistance(const shared_ptr<DomainBase>& D) {
+    // this ensures all restrained DoFs have zero displacement in modified Newton methods
     D->insert_restrained_dof(dof_encoding);
 
     return SUANPAN_SUCCESS;

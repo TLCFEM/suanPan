@@ -27,6 +27,8 @@
 int MultiplierBC::process(const shared_ptr<DomainBase>& D) {
     auto& W = D->get_factory();
 
+    // record restrained DoFs to erase machine error
+    // the container used is concurrently safe
     D->insert_restrained_dof(dof_encoding = get_nodal_active_dof(D));
 
     if(auto& t_stiff = W->get_stiffness(); nullptr != t_stiff) {

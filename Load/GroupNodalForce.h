@@ -33,18 +33,14 @@
 
 #include "NodalForce.h"
 
-class GroupNodalForce final : public NodalForce {
-    const uvec groups;
-
-    void update_node_tag(const shared_ptr<DomainBase>&);
-
+class GroupNodalForce final : protected GroupLoad, public NodalForce {
 public:
-    explicit GroupNodalForce(unsigned = 0, // tag
-                             unsigned = 0, // start step tag
-                             double = 0.,  // magnitude
-                             uvec&& = {},  // group tags
-                             unsigned = 0, // dof tag
-                             unsigned = 0  // amplitude tag
+    GroupNodalForce(unsigned, // tag
+                    unsigned, // start step tag
+                    double,   // magnitude
+                    uvec&&,   // group tags
+                    unsigned, // dof tag
+                    unsigned  // amplitude tag
     );
     GroupNodalForce(unsigned,    // tag
                     unsigned,    // start step tag

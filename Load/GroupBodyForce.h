@@ -33,18 +33,14 @@
 
 #include "BodyForce.h"
 
-class GroupBodyForce final : public BodyForce {
-    const uvec groups;
-
-    void update_element_tag(const shared_ptr<DomainBase>&);
-
+class GroupBodyForce final : protected GroupLoad, public BodyForce {
 public:
-    explicit GroupBodyForce(unsigned = 0, // tag
-                            unsigned = 0, // start step tag
-                            double = 0.,  // magnitude
-                            uvec&& = {},  // element tags
-                            unsigned = 0, // dof tag
-                            unsigned = 0  // amplitude tag
+    GroupBodyForce(unsigned, // tag
+                   unsigned, // start step tag
+                   double,   // magnitude
+                   uvec&&,   // element tags
+                   unsigned, // dof tag
+                   unsigned  // amplitude tag
     );
     GroupBodyForce(unsigned,    // tag
                    unsigned,    // start step tag

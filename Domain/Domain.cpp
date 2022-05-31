@@ -1011,7 +1011,6 @@ int Domain::initialize_load() {
 
 int Domain::initialize_constraint() {
     suanpan_for_each(constraint_pond.cbegin(), constraint_pond.cend(), [&](const std::pair<unsigned, shared_ptr<Constraint>>& t_constraint) { if(t_constraint.second->validate_step(shared_from_this()) && !t_constraint.second->is_initialized() && SUANPAN_FAIL == t_constraint.second->initialize(shared_from_this())) disable_constraint(t_constraint.first); });
-
     constraint_pond.update();
 
     return SUANPAN_SUCCESS;

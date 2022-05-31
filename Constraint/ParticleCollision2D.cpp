@@ -28,16 +28,18 @@ int ParticleCollision2D::process_meta(const shared_ptr<DomainBase>& D, const boo
 
     auto& node_pool = D->get_node_pool();
 
-    list = std::vector<CellList>(node_pool.size());
+    auto node_size = node_pool.size();
 
-    decltype(list.size()) counter = 0;
-    for(auto& I : node_pool) {
-        if(norm(I->get_trial_velocity()) * W->get_incre_time() > space) suanpan_warning("the maximum particle speed seems to be too large, please decrease time increment.\n");
-        const auto new_pos = get_position(I);
-        list[counter].y = static_cast<int>(floor(new_pos(1) / space));
-        list[counter].x = static_cast<int>(floor(new_pos(0) / space));
-        list[counter++].tag = I->get_tag();
-    }
+    list = std::vector<CellList>(node_size);
+
+    suanpan_for(static_cast<decltype(node_size)>(0), node_size, [&](const decltype(node_size) I) {
+        const auto& t_node = node_pool[I];
+        if(norm(t_node->get_trial_velocity()) * W->get_incre_time() > space) suanpan_warning("the speed of Node %u seems to be too large, please decrease time step size.\n", t_node->get_tag());
+        const auto new_pos = get_position(t_node);
+        list[I].y = static_cast<int>(floor(new_pos(1) / space));
+        list[I].x = static_cast<int>(floor(new_pos(0) / space));
+        list[I].tag = t_node->get_tag();
+    });
 
     suanpan_sort(list.begin(), list.end(), [](const CellList& a, const CellList& b) { return a.x < b.x || a.x == b.x && a.y < b.y; });
 

@@ -190,13 +190,6 @@ template<sp_d T> Col<T>& get_eigenvalue(const shared_ptr<Factory<T>>& W) { retur
 
 template<sp_d T> Mat<T>& get_eigenvector(const shared_ptr<Factory<T>>& W) { return W->eigenvector; }
 
-template<sp_i T> uvec to_uvec(const suanpan::set<T>& in) {
-    uvec out(in.size(), fill::none);
-    auto I = 0llu;
-    for(const auto J : in) out(I++) = static_cast<uword>(J);
-    return out;
-}
-
 #endif // FACTORY_HELPER_HPP
 
 //! @}

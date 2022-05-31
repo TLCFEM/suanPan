@@ -26,6 +26,7 @@ FixedLength::FixedLength(const unsigned T, const unsigned S, const unsigned D, u
 int FixedLength::initialize(const shared_ptr<DomainBase>& D) {
     dof_encoding = get_nodal_active_dof(D);
 
+    // need to check if sizes conform since the method does not emit error flag
     if(dof_encoding.n_elem != node_encoding.n_elem * dof_reference.n_elem) return SUANPAN_FAIL;
 
     coor = resize(D->get<Node>(node_encoding(1))->get_coordinate(), dof_reference.n_elem, 1) - resize(D->get<Node>(node_encoding(0))->get_coordinate(), dof_reference.n_elem, 1);

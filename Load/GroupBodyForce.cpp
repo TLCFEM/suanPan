@@ -17,26 +17,17 @@
 
 #include "GroupBodyForce.h"
 #include <Domain/DomainBase.h>
-#include <Domain/Group.h>
-
-void GroupBodyForce::update_element_tag(const shared_ptr<DomainBase>& D) {
-    vector<uword> tag;
-
-    for(auto& I : groups) if(D->find<Group>(I)) for(auto& J : D->get<Group>(I)->get_pool()) tag.emplace_back(J);
-
-    node_encoding = unique(uvec(tag));
-}
 
 GroupBodyForce::GroupBodyForce(const unsigned T, const unsigned S, const double L, uvec&& N, const unsigned D, const unsigned AT)
-    : BodyForce(T, S, L, {}, D, AT)
-    , groups(std::forward<uvec>(N)) {}
+    : GroupLoad(std::forward<uvec>(N))
+    , BodyForce(T, S, L, {}, D, AT) {}
 
 GroupBodyForce::GroupBodyForce(const unsigned T, const unsigned S, const double L, uvec&& N, uvec&& D, const unsigned AT)
-    : BodyForce(T, S, L, {}, std::forward<uvec>(D), AT)
-    , groups(std::forward<uvec>(N)) {}
+    : GroupLoad(std::forward<uvec>(N))
+    , BodyForce(T, S, L, {}, std::forward<uvec>(D), AT) {}
 
 int GroupBodyForce::initialize(const shared_ptr<DomainBase>& D) {
-    update_element_tag(D);
+    node_encoding = update_object_tag(D);
 
     return BodyForce::initialize(D);
 }
