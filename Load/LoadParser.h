@@ -18,16 +18,16 @@
 #ifndef LOADPARSER_H
 #define LOADPARSER_H
 
-#include <suanPan.h>
+#include <memory>
 
 class DomainBase;
 
-int create_new_acceleration(const shared_ptr<DomainBase>&, istringstream&);
-int create_new_amplitude(const shared_ptr<DomainBase>&, istringstream&);
-int create_new_bodyforce(const shared_ptr<DomainBase>&, istringstream&, bool);
-int create_new_cload(const shared_ptr<DomainBase>&, istringstream&, bool = false);
-int create_new_lineudl(const shared_ptr<DomainBase>&, istringstream&, unsigned);
-int create_new_displacement(const shared_ptr<DomainBase>&, istringstream&, bool = false);
-int create_new_supportmotion(const shared_ptr<DomainBase>&, istringstream&, unsigned);
+int create_new_acceleration(const std::shared_ptr<DomainBase>&, std::istringstream&);
+int create_new_amplitude(const std::shared_ptr<DomainBase>&, std::istringstream&);
+int create_new_bodyforce(const std::shared_ptr<DomainBase>&, std::istringstream&, bool);
+int create_new_cload(const std::shared_ptr<DomainBase>&, std::istringstream&, bool = false);
+int create_new_lineudl(const std::shared_ptr<DomainBase>&, std::istringstream&, unsigned);
+int create_new_displacement(const std::shared_ptr<DomainBase>&, std::istringstream&, bool = false);
+int create_new_supportmotion(const std::shared_ptr<DomainBase>&, std::istringstream&, unsigned);
 
 #endif

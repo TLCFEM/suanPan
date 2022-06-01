@@ -30,19 +30,10 @@
 
 void argument_parser(int, char**);
 
-void print_header();
 void print_version();
 void print_helper();
-void qrcode();
-void check_version(const char*);
 
 void cli_mode(const shared_ptr<Bead>&);
-
-void strip_mode(const string&, const string&);
-
-void convert_mode(const string&, const string&);
-
-bool check_debugger();
 
 extern void test_mode();
 

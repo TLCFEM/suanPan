@@ -18,34 +18,20 @@
 #ifndef CONSTRAINTPARSER_H
 #define CONSTRAINTPARSER_H
 
-#include <suanPan.h>
+#include <memory>
 
-class Constraint;
 class DomainBase;
 
-int create_new_constraint(const shared_ptr<DomainBase>&, istringstream&);
+int create_new_constraint(const std::shared_ptr<DomainBase>&, std::istringstream&);
 
-void new_embed(unique_ptr<Constraint>&, istringstream&, unsigned);
-void new_fixedlength(unique_ptr<Constraint>&, istringstream&, unsigned);
-void new_minimumgap(unique_ptr<Constraint>&, istringstream&, unsigned);
-void new_maximumgap(unique_ptr<Constraint>&, istringstream&, unsigned);
-void new_sleeve(unique_ptr<Constraint>&, istringstream&, unsigned);
-void new_mpc(unique_ptr<Constraint>&, istringstream&);
-void new_particlecollision2d(unique_ptr<Constraint>&, istringstream&);
-void new_particlecollision3d(unique_ptr<Constraint>&, istringstream&);
-void new_rigidwall(unique_ptr<Constraint>&, istringstream&, bool, bool);
-void new_bc(unique_ptr<Constraint>&, istringstream&, bool, bool);
-void new_nodeline(unique_ptr<Constraint>&, istringstream&);
-void new_nodefacet(unique_ptr<Constraint>&, istringstream&);
+int create_new_bc(const std::shared_ptr<DomainBase>&, std::istringstream&, bool);
+int create_new_groupbc(const std::shared_ptr<DomainBase>&, std::istringstream&, bool);
+int create_new_fixedlength(const std::shared_ptr<DomainBase>&, std::istringstream&, unsigned);
+int create_new_mpc(const std::shared_ptr<DomainBase>&, std::istringstream&);
+int create_new_particlecollision2d(const std::shared_ptr<DomainBase>&, std::istringstream&);
+int create_new_particlecollision3d(const std::shared_ptr<DomainBase>&, std::istringstream&);
+int create_new_rigidwall(const std::shared_ptr<DomainBase>&, std::istringstream&, bool, bool);
 
-int create_new_bc(const shared_ptr<DomainBase>&, istringstream&, bool);
-int create_new_groupbc(const shared_ptr<DomainBase>&, istringstream&, bool);
-int create_new_fixedlength(const shared_ptr<DomainBase>&, istringstream&, unsigned);
-int create_new_mpc(const shared_ptr<DomainBase>&, istringstream&);
-int create_new_particlecollision2d(const shared_ptr<DomainBase>&, istringstream&);
-int create_new_particlecollision3d(const shared_ptr<DomainBase>&, istringstream&);
-int create_new_rigidwall(const shared_ptr<DomainBase>&, istringstream&, bool, bool);
-
-int create_new_criterion(const shared_ptr<DomainBase>&, istringstream&);
+int create_new_criterion(const std::shared_ptr<DomainBase>&, std::istringstream&);
 
 #endif

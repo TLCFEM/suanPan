@@ -18,62 +18,10 @@
 #ifndef SECTIONPARSER_H
 #define SECTIONPARSER_H
 
-#include <suanPan.h>
+#include <memory>
 
-using std::istringstream;
-
-class Section;
 class DomainBase;
 
-int create_new_section(const shared_ptr<DomainBase>&, istringstream&);
-
-// 1D
-void new_circle1d(unique_ptr<Section>&, istringstream&);
-void new_fibre1d(unique_ptr<Section>&, istringstream&);
-void new_rectangle1d(unique_ptr<Section>&, istringstream&);
-void new_trusssection(unique_ptr<Section>&, istringstream&);
-
-// 2D
-void new_bar2d(unique_ptr<Section>&, istringstream&);
-void new_box2d(unique_ptr<Section>&, istringstream&);
-void new_circle2d(unique_ptr<Section>&, istringstream&);
-void new_circularhollow2D(unique_ptr<Section>&, istringstream&);
-void new_fibre2d(unique_ptr<Section>&, istringstream&);
-void new_hsection2d(unique_ptr<Section>&, istringstream&);
-void new_isection2d(unique_ptr<Section>&, istringstream&);
-void new_rectangle2d(unique_ptr<Section>&, istringstream&);
-void new_tsection2d(unique_ptr<Section>&, istringstream&);
-
-void new_nz2d(unique_ptr<Section>&, istringstream&);
-void new_us2d(unique_ptr<Section>&, istringstream&);
-void new_eu2d(unique_ptr<Section>&, istringstream&);
-
-// 3D
-void new_bar3d(unique_ptr<Section>&, istringstream&);
-void new_box3d(unique_ptr<Section>&, istringstream&);
-void new_circle3d(unique_ptr<Section>&, istringstream&);
-void new_circularhollow3D(unique_ptr<Section>&, istringstream&);
-void new_fibre3d(unique_ptr<Section>&, istringstream&);
-void new_isection3d(unique_ptr<Section>&, istringstream&);
-void new_rectangle3d(unique_ptr<Section>&, istringstream&);
-void new_tsection3d(unique_ptr<Section>&, istringstream&);
-
-void new_nz3d(unique_ptr<Section>&, istringstream&);
-void new_us3d(unique_ptr<Section>&, istringstream&);
-void new_eu3d(unique_ptr<Section>&, istringstream&);
-
-// NM
-void new_nm2d1(unique_ptr<Section>&, istringstream&);
-void new_nm2d2(unique_ptr<Section>&, istringstream&);
-void new_nm3d1(unique_ptr<Section>&, istringstream&);
-void new_nm3d2(unique_ptr<Section>&, istringstream&);
-
-vec euisection(const string&);
-vec nzchsection(const string&);
-vec nzisection(const string&);
-vec nzrhsection(const string&);
-vec nzshsection(const string&);
-vec usisection(const string&);
-vec ustsection(const string&);
+int create_new_section(const std::shared_ptr<DomainBase>&, std::istringstream&);
 
 #endif
