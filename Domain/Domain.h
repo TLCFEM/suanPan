@@ -69,9 +69,9 @@ class Domain final : public DomainBase, public std::enable_shared_from_this<Doma
     SectionStorage section_pond;
     SolverStorage solver_pond;
 
-    unordered_set<uword> constrained_dofs; /**< data storage */
-    unordered_set<uword> loaded_dofs;      /**< data storage */
-    unordered_set<uword> restrained_dofs;  /**< data storage */
+    suanpan::unordered_set<uword> constrained_dofs; /**< data storage */
+    suanpan::unordered_set<uword> loaded_dofs;      /**< data storage */
+    suanpan::unordered_set<uword> restrained_dofs;  /**< data storage */
 
     vector<vector<unsigned>> color_map;
 
@@ -288,13 +288,17 @@ public:
     const shared_ptr<Integrator>& get_current_integrator() const override;
     const shared_ptr<Solver>& get_current_solver() const override;
 
+    void insert_loaded_dof(const uvec&) override;
+    void insert_restrained_dof(const uvec&) override;
+    void insert_constrained_dof(const uvec&) override;
+
     void insert_loaded_dof(uword) override;
     void insert_restrained_dof(uword) override;
     void insert_constrained_dof(uword) override;
 
-    const unordered_set<uword>& get_loaded_dof() const override;
-    const unordered_set<uword>& get_restrained_dof() const override;
-    const unordered_set<uword>& get_constrained_dof() const override;
+    const suanpan::unordered_set<uword>& get_loaded_dof() const override;
+    const suanpan::unordered_set<uword>& get_restrained_dof() const override;
+    const suanpan::unordered_set<uword>& get_constrained_dof() const override;
 
     bool is_updated() const override;
     bool is_sparse() const override;

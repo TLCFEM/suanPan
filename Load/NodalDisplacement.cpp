@@ -29,18 +29,7 @@ NodalDisplacement::NodalDisplacement(const unsigned T, const unsigned ST, const 
 int NodalDisplacement::initialize(const shared_ptr<DomainBase>& D) {
     set_end_step(start_step + 1);
 
-    const auto& W = D->get_factory();
-
-    vector<uword> r_dof;
-
-    for(const auto I : W->get_reference_dof()) r_dof.emplace_back(I);
-
-    for(const auto I : get_nodal_active_dof(D))
-        if(!if_contain(r_dof, I).first) r_dof.emplace_back(I);
-        else suanpan_warning("more than one displacement loads are applied on the same DoF.\n");
-
-    W->set_reference_dof(uvec(r_dof));
-    W->set_reference_size(static_cast<unsigned>(r_dof.size()));
+    D->get_factory()->update_reference_dof(encoding = get_nodal_active_dof(D));
 
     return Load::initialize(D);
 }
@@ -50,7 +39,7 @@ int NodalDisplacement::process(const shared_ptr<DomainBase>& D) {
 
     trial_settlement.zeros(W->get_size());
 
-    trial_settlement(get_nodal_active_dof(D)).fill(pattern * magnitude->get_amplitude(W->get_trial_time()));
+    trial_settlement(encoding).fill(pattern * magnitude->get_amplitude(W->get_trial_time()));
 
     return SUANPAN_SUCCESS;
 }

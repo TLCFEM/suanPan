@@ -33,18 +33,14 @@
 
 #include "NodalDisplacement.h"
 
-class GroupNodalDisplacement final : public NodalDisplacement {
-    const uvec groups;
-
-    void update_node_tag(const shared_ptr<DomainBase>&);
-
+class GroupNodalDisplacement final : protected GroupLoad, public NodalDisplacement {
 public:
-    explicit GroupNodalDisplacement(unsigned = 0, // tag
-                                    unsigned = 0, // step tag
-                                    double = 0.,  // magnitude
-                                    uvec&& = {},  // group tags
-                                    unsigned = 0, // dof tag
-                                    unsigned = 0  // amplitude tag
+    GroupNodalDisplacement(unsigned, // tag
+                           unsigned, // step tag
+                           double,   // magnitude
+                           uvec&&,   // group tags
+                           unsigned, // dof tag
+                           unsigned  // amplitude tag
     );
     GroupNodalDisplacement(unsigned,    // tag
                            unsigned,    // step tag
@@ -57,6 +53,6 @@ public:
     int initialize(const shared_ptr<DomainBase>&) override;
 };
 
-#endif // DISPLACEMENTLOAD_H
+#endif // GROUPNODALDISPLACEMENT_H
 
 //! @}

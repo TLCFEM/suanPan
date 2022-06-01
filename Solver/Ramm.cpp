@@ -15,7 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-// ReSharper disable CppRedundantParentheses
 #include "Ramm.h"
 #include <Converger/Converger.h>
 #include <Domain/DomainBase.h>

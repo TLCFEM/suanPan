@@ -32,7 +32,9 @@
 #define FACTORY_HPP
 
 #include <future>
+
 #include "MetaMat/operator_times.hpp"
+#include "Toolbox/container.h"
 
 enum class AnalysisType {
     NONE,
@@ -86,7 +88,7 @@ template<sp_d T> class Factory final {
     Col<T> ninja; // the result from A*X=B
     Col<T> sushi; // modified right-hand side B
 
-    uvec reference_dof;
+    suanpan::set<uword> reference_dof;
     SpMat<T> reference_load;
 
     uvec auxiliary_encoding;      // for constraints using multiplier method
@@ -153,6 +155,8 @@ template<sp_d T> class Factory final {
     Col<T> pre_acceleration;   // global previous acceleration vector
     Col<T> pre_temperature;    // global previous temperature vector
 
+    std::vector<std::mutex> global_mutex = std::vector<std::mutex>(10);
+
     shared_ptr<MetaMat<T>> global_mass = nullptr;      // global mass matrix
     shared_ptr<MetaMat<T>> global_damping = nullptr;   // global damping matrix
     shared_ptr<MetaMat<T>> global_stiffness = nullptr; // global stiffness matrix
@@ -201,11 +205,13 @@ public:
     void set_bandwidth(unsigned, unsigned);
     void get_bandwidth(unsigned&, unsigned&) const;
 
+    void update_reference_size();
     void set_reference_size(unsigned);
     [[nodiscard]] unsigned get_reference_size() const;
 
-    void set_reference_dof(const uvec&);
-    [[nodiscard]] const uvec& get_reference_dof() const;
+    void update_reference_dof(const uvec&);
+    void set_reference_dof(const suanpan::set<uword>&);
+    [[nodiscard]] const suanpan::set<uword>& get_reference_dof() const;
 
     void set_error(const T&);
     const T& get_error() const;
@@ -374,6 +380,11 @@ public:
     const shared_ptr<MetaMat<T>>& get_stiffness() const;
     const shared_ptr<MetaMat<T>>& get_geometry() const;
 
+    std::mutex& get_mass_mutex();
+    std::mutex& get_damping_mutex();
+    std::mutex& get_stiffness_mutex();
+    std::mutex& get_geometry_mutex();
+
     const Col<T>& get_eigenvalue() const;
     const Mat<T>& get_eigenvector() const;
 
@@ -420,7 +431,7 @@ public:
     template<sp_d T1> friend Col<T1>& get_ninja(const shared_ptr<Factory<T1>>&);
     template<sp_d T1> friend Col<T1>& get_sushi(const shared_ptr<Factory<T1>>&);
 
-    template<sp_d T1> friend uvec& get_reference_dof(const shared_ptr<Factory<T1>>&);
+    template<sp_d T1> friend suanpan::set<uword>& get_reference_dof(const shared_ptr<Factory<T1>>&);
     template<sp_d T1> friend SpMat<T1>& get_reference_load(const shared_ptr<Factory<T1>>&);
 
     template<sp_d T1> friend uvec& get_auxiliary_encoding(const shared_ptr<Factory<T1>>&);
@@ -643,6 +654,8 @@ template<sp_d T> void Factory<T>::get_bandwidth(unsigned& L, unsigned& U) const 
     U = n_upbw;
 }
 
+template<sp_d T> void Factory<T>::update_reference_size() { n_rfld = static_cast<unsigned>(reference_dof.size()); }
+
 template<sp_d T> void Factory<T>::set_reference_size(const unsigned S) {
     if(S == n_rfld) return;
     n_rfld = S;
@@ -650,16 +663,18 @@ template<sp_d T> void Factory<T>::set_reference_size(const unsigned S) {
 
 template<sp_d T> unsigned Factory<T>::get_reference_size() const { return n_rfld; }
 
-template<sp_d T> void Factory<T>::set_reference_dof(const uvec& D) { reference_dof = D; }
+template<sp_d T> void Factory<T>::update_reference_dof(const uvec& S) { reference_dof.insert(S.cbegin(), S.cend()); }
 
-template<sp_d T> const uvec& Factory<T>::get_reference_dof() const { return reference_dof; }
+template<sp_d T> void Factory<T>::set_reference_dof(const suanpan::set<uword>& D) { reference_dof = D; }
+
+template<sp_d T> const suanpan::set<uword>& Factory<T>::get_reference_dof() const { return reference_dof; }
 
 template<sp_d T> void Factory<T>::set_error(const T& E) { error = E; }
 
 template<sp_d T> const T& Factory<T>::get_error() const { return error; }
 
 template<sp_d T> int Factory<T>::initialize() {
-    reference_dof.reset(); // clear reference dof vector in every step
+    reference_dof.clear(); // clear reference dof vector in every step
 
     if(initialized || n_size == 0) return 0;
 
@@ -1037,6 +1052,14 @@ template<sp_d T> const shared_ptr<MetaMat<T>>& Factory<T>::get_damping() const {
 template<sp_d T> const shared_ptr<MetaMat<T>>& Factory<T>::get_stiffness() const { return global_stiffness; }
 
 template<sp_d T> const shared_ptr<MetaMat<T>>& Factory<T>::get_geometry() const { return global_geometry; }
+
+template<sp_d T> std::mutex& Factory<T>::get_mass_mutex() { return global_mutex.at(0); }
+
+template<sp_d T> std::mutex& Factory<T>::get_damping_mutex() { return global_mutex.at(1); }
+
+template<sp_d T> std::mutex& Factory<T>::get_stiffness_mutex() { return global_mutex.at(2); }
+
+template<sp_d T> std::mutex& Factory<T>::get_geometry_mutex() { return global_mutex.at(3); }
 
 template<sp_d T> const Col<T>& Factory<T>::get_eigenvalue() const { return eigenvalue; }
 

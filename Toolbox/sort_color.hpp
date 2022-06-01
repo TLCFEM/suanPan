@@ -14,23 +14,36 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @fn sort_color
+ * @brief A color sorting algorithm.
+ * @author tlc
+ * @date 22/02/2022
+ * @version 0.1.2
+ * @file sort_color.hpp
+ * @addtogroup Utility
+ * @{
+ */
 
 // ReSharper disable IdentifierTypo
-#include "sort_color.h"
-#include <set>
-#include "metis/metis.h"
-#include "utility.h"
+#ifndef SORT_COLOR_HPP
+#define SORT_COLOR_HPP
 
-auto sort_color_metis(suanpan_register& element_register, const int num_color, const char method) {
+#include <set>
+#include "container.h"
+#include "utility.h"
+#include "metis/metis.h"
+
+template<typename T> auto sort_color_metis(suanpan::graph<T>& element_register, const int num_color, const char method) {
 #ifdef SUANPAN_DEBUG
-    wall_clock T;
-    T.tic();
+    wall_clock timer;
+    timer.tic();
 #endif
 
     const auto element_size = element_register.size();
 
     std::atomic num_edges = 0llu;
-    suanpan_for_each(element_register.begin(), element_register.end(), [&](const suanpan_set& element) { num_edges += element.size(); });
+    suanpan_for_each(element_register.begin(), element_register.end(), [&](const suanpan::set<T>& element) { num_edges += element.size(); });
 
     vector<idx_t> xadj;
     xadj.reserve(element_size + 1llu);
@@ -65,16 +78,16 @@ auto sort_color_metis(suanpan_register& element_register, const int num_color, c
     else METIS_PartGraphRecursive(&nvtxs, &ncon, xadj.data(), adjncy.data(), nullptr, vsize, nullptr, &nparts, tpwgts, ubvec, options, &edgecut, part.data());
 
 #ifdef SUANPAN_DEBUG
-    suanpan_debug("Coloring algorithm takes %.5E seconds.\n", T.toc());
+    suanpan_debug("Coloring algorithm takes %.5E seconds.\n", timer.toc());
 #endif
 
     return part;
 }
 
-vector<vector<unsigned>> sort_color_wp(const suanpan_register& node_register) {
+template<typename T> vector<vector<T>> sort_color_wp(const suanpan::graph<T>& node_register) {
 #ifdef SUANPAN_DEBUG
-    wall_clock T;
-    T.tic();
+    wall_clock timer;
+    timer.tic();
 #endif
 
     const auto num_node = node_register.size();
@@ -83,12 +96,12 @@ vector<vector<unsigned>> sort_color_wp(const suanpan_register& node_register) {
 
     suanpan_for(static_cast<size_t>(0), node_register.size(), [&](const size_t I) { weight(I) = node_register[I].size(); });
 
-    auto comparator = [&](const unsigned A, const unsigned B) { return weight[A] > weight[B]; };
+    auto comparator = [&](const T A, const T B) { return weight[A] > weight[B]; };
 
-    std::multiset<unsigned, decltype(comparator)> degree(comparator);
-    for(auto I = 0u; I < num_node; ++I) degree.insert(I);
+    std::multiset<T, decltype(comparator)> degree(comparator);
+    for(T I = 0; I < num_node; ++I) degree.insert(I);
 
-    vector<vector<unsigned>> color_map;
+    vector<vector<T>> color_map;
 
     while(!degree.empty()) {
         color_map.emplace_back();
@@ -116,16 +129,16 @@ vector<vector<unsigned>> sort_color_wp(const suanpan_register& node_register) {
     color_map.shrink_to_fit();
 
 #ifdef SUANPAN_DEBUG
-    suanpan_debug("Coloring algorithm takes %.5E seconds.\n", T.toc());
+    suanpan_debug("Coloring algorithm takes %.5E seconds.\n", timer.toc());
 #endif
 
     return color_map;
 }
 
-vector<vector<unsigned>> sort_color_mis(const suanpan_register& node_register) {
+template<typename T> vector<vector<T>> sort_color_mis(const suanpan::graph<T>& node_register) {
 #ifdef SUANPAN_DEBUG
-    wall_clock T;
-    T.tic();
+    wall_clock timer;
+    timer.tic();
 #endif
 
     const auto num_node = node_register.size();
@@ -137,12 +150,12 @@ vector<vector<unsigned>> sort_color_mis(const suanpan_register& node_register) {
     uword counter = num_node;
     for(const auto I : sort_index(weight, "descend").eval()) weight[I] = --counter;
 
-    auto comparator = [&](const unsigned A, const unsigned B) { return weight[A] > weight[B]; };
+    auto comparator = [&](const T A, const T B) { return weight[A] > weight[B]; };
 
-    std::multiset<unsigned, decltype(comparator)> degree(comparator);
-    for(auto I = 0u; I < num_node; ++I) degree.insert(I);
+    std::multiset<T, decltype(comparator)> degree(comparator);
+    for(T I = 0; I < num_node; ++I) degree.insert(I);
 
-    vector<vector<unsigned>> color_map;
+    vector<vector<T>> color_map;
 
     while(!degree.empty()) {
         color_map.emplace_back();
@@ -162,8 +175,12 @@ vector<vector<unsigned>> sort_color_mis(const suanpan_register& node_register) {
     color_map.shrink_to_fit();
 
 #ifdef SUANPAN_DEBUG
-    suanpan_debug("Coloring algorithm takes %.5E seconds.\n", T.toc());
+    suanpan_debug("Coloring algorithm takes %.5E seconds.\n", timer.toc());
 #endif
 
     return color_map;
 }
+
+#endif
+
+//! @}

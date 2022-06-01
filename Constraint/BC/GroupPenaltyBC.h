@@ -41,7 +41,7 @@
 
 class GroupPenaltyBC : public MultiplierBC {
 protected:
-    uvec groups;
+    const uvec groups;
 
     void update_node_tag(const shared_ptr<DomainBase>&);
 

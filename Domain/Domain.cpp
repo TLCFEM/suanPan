@@ -34,7 +34,7 @@
 #include <Solver/Integrator/Integrator.h>
 #include <Solver/Solver.h>
 #include <Step/Step.h>
-#include <Toolbox/sort_color.h>
+#include <Toolbox/sort_color.hpp>
 #include <Toolbox/sort_rcm.h>
 #include <numeric>
 
@@ -676,17 +676,23 @@ const shared_ptr<Integrator>& Domain::get_current_integrator() const { return ge
 
 const shared_ptr<Solver>& Domain::get_current_solver() const { return get_solver(current_solver_tag); }
 
+void Domain::insert_loaded_dof(const uvec& T) { loaded_dofs.insert(T.cbegin(), T.cend()); }
+
+void Domain::insert_restrained_dof(const uvec& T) { restrained_dofs.insert(T.cbegin(), T.cend()); }
+
+void Domain::insert_constrained_dof(const uvec& T) { constrained_dofs.insert(T.cbegin(), T.cend()); }
+
 void Domain::insert_loaded_dof(const uword T) { loaded_dofs.insert(T); }
 
 void Domain::insert_restrained_dof(const uword T) { restrained_dofs.insert(T); }
 
 void Domain::insert_constrained_dof(const uword T) { constrained_dofs.insert(T); }
 
-const unordered_set<uword>& Domain::get_loaded_dof() const { return loaded_dofs; }
+const suanpan::unordered_set<uword>& Domain::get_loaded_dof() const { return loaded_dofs; }
 
-const unordered_set<uword>& Domain::get_restrained_dof() const { return restrained_dofs; }
+const suanpan::unordered_set<uword>& Domain::get_restrained_dof() const { return restrained_dofs; }
 
-const unordered_set<uword>& Domain::get_constrained_dof() const { return constrained_dofs; }
+const suanpan::unordered_set<uword>& Domain::get_constrained_dof() const { return constrained_dofs; }
 
 bool Domain::is_updated() const { return updated.load(); }
 
@@ -795,7 +801,7 @@ int Domain::reorder_dof() {
 int Domain::assign_color() {
     // deal with k-coloring optimization
     if(ColorMethod::OFF != color_model) {
-        const auto color_algorithm = ColorMethod::WP == color_model ? sort_color_wp : sort_color_mis;
+        const auto color_algorithm = ColorMethod::WP == color_model ? sort_color_wp<unsigned> : sort_color_mis<unsigned>;
 
         auto node_tag = 0llu;
         std::unordered_map<uword, uword> node_map; // old_tag -> new_tag
@@ -811,7 +817,7 @@ int Domain::assign_color() {
             element_tag++;
         }
 
-        suanpan_register element_register(element_tag);
+        suanpan::graph<unsigned> element_register(element_tag);
 
         suanpan_for_each(node_register.begin(), node_register.end(), [&](const vector<unsigned>& node) { for(const auto I : node) for(const auto J : node) element_register[I].insert(J); });
 
@@ -869,7 +875,7 @@ int Domain::initialize() {
     suanpan_for_each(amplitude_pond.cbegin(), amplitude_pond.cend(), [&](const std::pair<unsigned, shared_ptr<Amplitude>>& t_amplitude) { t_amplitude.second->initialize(shared_from_this()); });
     amplitude_pond.update();
 
-    suanpan_set remove_list;
+    suanpan::set<unsigned> remove_list;
 
     remove_list.clear();
     suanpan_for_each(material_pond.cbegin(), material_pond.cend(), [&](const std::pair<unsigned, shared_ptr<Material>>& t_material) {
@@ -995,17 +1001,16 @@ int Domain::initialize() {
 }
 
 int Domain::initialize_load() {
-    // cannot use parallel for due to potential racing in reference dof
-    std::ranges::for_each(load_pond, [&](const std::pair<unsigned, shared_ptr<Load>>& t_load) { if(t_load.second->validate_step(shared_from_this()) && !t_load.second->is_initialized() && SUANPAN_FAIL == t_load.second->initialize(shared_from_this())) disable_load(t_load.first); });
-
+    suanpan_for_each(load_pond.cbegin(), load_pond.cend(), [&](const std::pair<unsigned, shared_ptr<Load>>& t_load) { if(t_load.second->validate_step(shared_from_this()) && !t_load.second->is_initialized() && SUANPAN_FAIL == t_load.second->initialize(shared_from_this())) disable_load(t_load.first); });
     load_pond.update();
+
+    factory->update_reference_size();
 
     return SUANPAN_SUCCESS;
 }
 
 int Domain::initialize_constraint() {
-    std::ranges::for_each(constraint_pond, [&](const std::pair<unsigned, shared_ptr<Constraint>>& t_constraint) { if(t_constraint.second->validate_step(shared_from_this()) && !t_constraint.second->is_initialized() && SUANPAN_FAIL == t_constraint.second->initialize(shared_from_this())) disable_constraint(t_constraint.first); });
-
+    suanpan_for_each(constraint_pond.cbegin(), constraint_pond.cend(), [&](const std::pair<unsigned, shared_ptr<Constraint>>& t_constraint) { if(t_constraint.second->validate_step(shared_from_this()) && !t_constraint.second->is_initialized() && SUANPAN_FAIL == t_constraint.second->initialize(shared_from_this())) disable_constraint(t_constraint.first); });
     constraint_pond.update();
 
     return SUANPAN_SUCCESS;
@@ -1014,7 +1019,7 @@ int Domain::initialize_constraint() {
 int Domain::initialize_reference() {
     // used in displacement controlled algorithm
     // need to initialize it for updating of load factor
-    auto& ref_dof = factory->get_reference_dof();
+    const auto ref_dof = to_uvec(factory->get_reference_dof());
 
     if(ref_dof.is_empty()) return SUANPAN_SUCCESS;
 

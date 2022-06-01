@@ -34,13 +34,16 @@
 #include <Load/Load.h>
 
 class NodalDisplacement : public Load {
+protected:
+    uvec encoding;
+
 public:
-    explicit NodalDisplacement(unsigned = 0, // tag
-                               unsigned = 0, // step tag
-                               double = 0.,  // magnitude
-                               uvec&& = {},  // node tags
-                               unsigned = 0, // dof tag
-                               unsigned = 0  // amplitude tag
+    NodalDisplacement(unsigned, // tag
+                      unsigned, // step tag
+                      double,   // magnitude
+                      uvec&&,   // node tags
+                      unsigned, // dof tag
+                      unsigned  // amplitude tag
     );
     NodalDisplacement(unsigned,    // tag
                       unsigned,    // step tag
@@ -55,6 +58,6 @@ public:
     int process(const shared_ptr<DomainBase>&) override;
 };
 
-#endif // DISPLACEMENTLOAD_H
+#endif // NODALDISPLACEMENT_H
 
 //! @}

@@ -23,7 +23,7 @@ int MPDC::analyze() {
     // uvec load_ref_idx = find(load_ref);
     // for(auto I = 0; I < load_ref_idx.n_elem; ++I) load_ref_idx(I) -= I * load_ref.n_rows;
 
-    auto& idx = W->get_reference_dof();
+    const auto idx = to_uvec(W->get_reference_dof());
 
     mat disp_a;
 

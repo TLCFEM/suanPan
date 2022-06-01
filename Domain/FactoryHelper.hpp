@@ -80,7 +80,7 @@ template<sp_d T> Col<T>& get_ninja(const shared_ptr<Factory<T>>& W) { return W->
 
 template<sp_d T> Col<T>& get_sushi(const shared_ptr<Factory<T>>& W) { return W->sushi; }
 
-template<sp_d T> uvec& get_reference_dof(const shared_ptr<Factory<T>>& W) { return W->reference_dof; }
+template<sp_d T> suanpan::set<uword>& get_reference_dof(const shared_ptr<Factory<T>>& W) { return W->reference_dof; }
 
 template<sp_d T> SpMat<T>& get_reference_load(const shared_ptr<Factory<T>>& W) { return W->reference_load; }
 

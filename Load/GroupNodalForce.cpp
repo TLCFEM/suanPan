@@ -17,26 +17,17 @@
 
 #include "GroupNodalForce.h"
 #include <Domain/DomainBase.h>
-#include <Domain/Group.h>
-
-void GroupNodalForce::update_node_tag(const shared_ptr<DomainBase>& D) {
-    vector<uword> tag;
-
-    for(auto& I : groups) if(D->find<Group>(I)) for(auto& J : D->get<Group>(I)->get_pool()) tag.emplace_back(J);
-
-    node_encoding = unique(uvec(tag));
-}
 
 GroupNodalForce::GroupNodalForce(const unsigned T, const unsigned S, const double L, uvec&& N, const unsigned D, const unsigned AT)
-    : NodalForce(T, S, L, uvec{}, uvec{D}, AT)
-    , groups(std::forward<uvec>(N)) {}
+    : GroupLoad(std::forward<uvec>(N))
+    , NodalForce(T, S, L, uvec{}, uvec{D}, AT) {}
 
 GroupNodalForce::GroupNodalForce(const unsigned T, const unsigned S, const double L, uvec&& N, uvec&& D, const unsigned AT)
-    : NodalForce(T, S, L, uvec{}, std::forward<uvec>(D), AT)
-    , groups(std::forward<uvec>(N)) {}
+    : GroupLoad(std::forward<uvec>(N))
+    , NodalForce(T, S, L, uvec{}, std::forward<uvec>(D), AT) {}
 
 int GroupNodalForce::initialize(const shared_ptr<DomainBase>& D) {
-    update_node_tag(D);
+    node_encoding = update_object_tag(D);
 
     return NodalForce::initialize(D);
 }

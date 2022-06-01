@@ -35,14 +35,12 @@
 #ifndef DOMAINBASE_H
 #define DOMAINBASE_H
 
-#include <Domain/Tag.h>
 #include <future>
-#include <unordered_set>
+#include <Domain/Tag.h>
+#include <Toolbox/container.h>
 
 using std::future;
 using std::map;
-using std::unordered_set;
-using std::vector;
 
 template<sp_d T> class Factory;
 class Amplitude;
@@ -295,13 +293,17 @@ public:
     [[nodiscard]] virtual const shared_ptr<Integrator>& get_current_integrator() const = 0;
     [[nodiscard]] virtual const shared_ptr<Solver>& get_current_solver() const = 0;
 
+    virtual void insert_loaded_dof(const uvec&) = 0;
+    virtual void insert_restrained_dof(const uvec&) = 0;
+    virtual void insert_constrained_dof(const uvec&) = 0;
+
     virtual void insert_loaded_dof(uword) = 0;
     virtual void insert_restrained_dof(uword) = 0;
     virtual void insert_constrained_dof(uword) = 0;
 
-    [[nodiscard]] virtual const unordered_set<uword>& get_loaded_dof() const = 0;
-    [[nodiscard]] virtual const unordered_set<uword>& get_restrained_dof() const = 0;
-    [[nodiscard]] virtual const unordered_set<uword>& get_constrained_dof() const = 0;
+    [[nodiscard]] virtual const suanpan::unordered_set<uword>& get_loaded_dof() const = 0;
+    [[nodiscard]] virtual const suanpan::unordered_set<uword>& get_restrained_dof() const = 0;
+    [[nodiscard]] virtual const suanpan::unordered_set<uword>& get_constrained_dof() const = 0;
 
     [[nodiscard]] virtual bool is_updated() const = 0;
     [[nodiscard]] virtual bool is_sparse() const = 0;

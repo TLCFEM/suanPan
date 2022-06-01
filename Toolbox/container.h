@@ -15,34 +15,54 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @fn sort_color
- * @brief A four color sorting algorithm.
  * @author tlc
- * @date 22/02/2020
- * @version 0.1.2
- * @file sort_color.h
+ * @date 30/05/2022
+ * @version 0.1.0
+ * @file container.h
  * @addtogroup Utility
  * @{
  */
 
-#ifndef COLOR_H
-#define COLOR_H
+#ifndef CONTAINER_H
+#define CONTAINER_H
 
 #include <suanPan.h>
 
 using std::vector;
+
 #ifdef SUANPAN_MT
 #include <tbb/concurrent_set.h>
-using suanpan_set = tbb::concurrent_set<unsigned, std::less<>>;
+#include <tbb/concurrent_unordered_set.h>
+
+namespace suanpan {
+    template<typename T> using set = tbb::concurrent_set<T>;
+    template<typename T> using unordered_set = tbb::concurrent_unordered_set<T>;
+    template<typename T> using graph = vector<set<T>>;
+}
 #else
 #include <set>
-using suanpan_set = std::set<unsigned, std::less<>>;
-#endif
-using suanpan_register = vector<suanpan_set>;
+#include <unordered_set>
 
-auto sort_color_metis(suanpan_register&, int, char);
-vector<vector<unsigned>> sort_color_wp(const suanpan_register&);
-vector<vector<unsigned>> sort_color_mis(const suanpan_register&);
+namespace suanpan {
+    template<typename T> using set = std::set<T>;
+    template<typename T> using unordered_set = std::unordered_set<T>;
+    template<typename T> using graph = vector<set<T>>;
+}
+#endif
+
+template<sp_i T> uvec to_uvec(const suanpan::set<T>& in) {
+    uvec out(in.size(), fill::none);
+    auto I = 0llu;
+    for(const auto J : in) out(I++) = static_cast<uword>(J);
+    return out;
+}
+
+template<sp_i T> uvec to_uvec(const suanpan::unordered_set<T>& in) {
+    uvec out(in.size(), fill::none);
+    auto I = 0llu;
+    for(const auto J : in) out(I++) = static_cast<uword>(J);
+    return out;
+}
 
 #endif
 

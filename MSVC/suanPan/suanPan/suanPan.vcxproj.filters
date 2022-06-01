@@ -1101,9 +1101,6 @@
     <ClCompile Include="..\..\..\Toolbox\IntegrationPlan.cpp">
       <Filter>Toolbox</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\sort_color.cpp">
-      <Filter>Toolbox</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\sort_rcm.cpp">
       <Filter>Toolbox</Filter>
     </ClCompile>
@@ -2328,7 +2325,7 @@
     <ClInclude Include="..\..\..\Toolbox\shapeFunction.h">
       <Filter>Toolbox</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Toolbox\sort_color.h">
+    <ClInclude Include="..\..\..\Toolbox\sort_color.hpp">
       <Filter>Toolbox</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Toolbox\sort_rcm.h">
@@ -2583,6 +2580,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Domain\DOF.h">
       <Filter>Domain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\container.h">
+      <Filter>Toolbox</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

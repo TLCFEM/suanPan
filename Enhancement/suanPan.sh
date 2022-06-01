@@ -45,7 +45,7 @@ if [[ $# == 1 ]] && [[ $1 == "--create-link" ]]; then
 
   # install the files
   if [[ $INSTALLED == true ]]; then
-    echo "{\"cmd\":[\"suanpan\"\,\"-f\"\,\"\$file\"]\,\"selector\":\"source.supan\"\,\"file_patterns\":[\"*.supan\"\,\"*.sp\"]}" >suanPan.sublime-build
+    echo "{\"cmd\":[\"suanpan\",\"-f\",\"\$file\"],\"selector\":\"source.supan\",\"file_patterns\":[\"*.supan\",\"*.sp\"]}" >suanPan.sublime-build
     cp suanPan.sublime* "$ST_DIR"
     echo "Sublime Text installed, configuration files are copied to default folder $ST_DIR."
     echo ""
