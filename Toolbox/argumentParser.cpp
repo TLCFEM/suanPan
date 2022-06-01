@@ -44,6 +44,128 @@ bool SUANPAN_PRINT = true;
 bool SUANPAN_VERBOSE = false;
 const char* SUANPAN_EXE = "";
 
+bool check_debugger() {
+#ifdef SUANPAN_DEBUG
+    return false;
+#endif
+#ifdef SUANPAN_WIN
+    if(IsDebuggerPresent()) exit(EXIT_SUCCESS);
+
+    BOOL FLAG = false;
+    if(CheckRemoteDebuggerPresent(GetCurrentProcess(), &FLAG) && FLAG) std::swap(access::rw(datum::eps), access::rw(datum::pi));
+
+    CONTEXT CTX{};
+    CTX.ContextFlags = CONTEXT_DEBUG_REGISTERS;
+    if(GetThreadContext(GetCurrentThread(), &CTX) && (CTX.Dr0 != 0 || CTX.Dr1 != 0 || CTX.Dr2 != 0 || CTX.Dr3 != 0)) exit(EXIT_SUCCESS);
+
+#elif defined(SUANPAN_UNIX)
+#endif
+    return false;
+}
+
+void check_version(const char* path_to_executable) {
+    auto updater_module = fs::path(path_to_executable).parent_path();
+
+#ifdef SUANPAN_WIN
+    updater_module.append("updater.exe");
+#else
+    updater_module.append("updater");
+#endif
+
+    if(!exists(updater_module)) return;
+
+    auto terminal = istringstream("\"" + updater_module.string() + "\" " + std::to_string(100 * SUANPAN_MAJOR + 10 * SUANPAN_MINOR + SUANPAN_PATCH));
+
+    execute_command(terminal);
+}
+
+void strip_mode(const string& input_file_name, const string& output_file_name) {
+    ifstream input_file(input_file_name);
+
+    if(!input_file.is_open()) {
+        suanpan_error("fail to open %s.\n", input_file_name.c_str());
+        return;
+    }
+
+    ofstream output_file(output_file_name);
+
+    if(!output_file.is_open()) {
+        suanpan_error("fail to open %s.\n", output_file_name.c_str());
+        return;
+    }
+
+    output_file.setf(std::ios::scientific);
+    output_file << std::setprecision(3);
+
+    string line;
+
+    while(std::getline(input_file, line)) {
+        if(line.empty() || if_contain(line, "**")) continue;
+
+        for(auto& I : line) I = static_cast<char>(std::tolower(static_cast<int>(I)));
+
+        output_file << line << '\n';
+    }
+}
+
+void convert_mode(const string& input_file_name, const string& output_file_name) {
+    ifstream input_file(input_file_name);
+
+    if(!input_file.is_open()) {
+        suanpan_error("fail to open %s.\n", input_file_name.c_str());
+        return;
+    }
+
+    ofstream output_file(output_file_name);
+
+    if(!output_file.is_open()) {
+        suanpan_error("fail to open %s.\n", output_file_name.c_str());
+        return;
+    }
+
+    const auto pos = output_file_name.find_last_of('/');
+
+    Converter abaqus_converter(string::npos == pos ? "" : output_file_name.substr(0, pos + 1));
+
+    abaqus_converter.process(input_file, output_file);
+}
+
+void print_header() {
+    suanpan_info("+--------------------------------------------------+\n");
+    suanpan_info("|   __        __         suanPan is an open source |\n");
+    suanpan_info("|  /  \\      |  \\           FEM framework (%u-bit) |\n", SUANPAN_ARCH);
+    suanpan_info("|  \\__       |__/  __   __      %s (%u.%u.%u) |\n", SUANPAN_CODE, SUANPAN_MAJOR, SUANPAN_MINOR, SUANPAN_PATCH);
+    suanpan_info("|     \\ |  | |    |  \\ |  |      by tlc @ %s |\n", SUANPAN_REVISION);
+    suanpan_info("|  \\__/ |__| |    |__X |  |    all rights reserved |\n");
+    suanpan_info("|                           10.5281/zenodo.1285221 |\n");
+    suanpan_info("+--------------------------------------------------+\n");
+#ifdef SUANPAN_WIN
+    suanpan_info("|  https://github.com/TLCFEM/suanPan               |\n");
+    suanpan_info("|  https://github.com/TLCFEM/suanPan-manual        |\n");
+    suanpan_info("+--------------------------------------------------+\n");
+    suanpan_info("|  https://gitter.im/suanPan-dev/community         |\n");
+#else
+    vector<const char8_t*> POOL;
+    POOL.reserve(10);
+    POOL.emplace_back(u8"\U0001F308");
+    POOL.emplace_back(u8"\U0001F30F");
+    POOL.emplace_back(u8"\U0001F3A7");
+    POOL.emplace_back(u8"\U0001F3B1");
+    POOL.emplace_back(u8"\U0001F479");
+    POOL.emplace_back(u8"\U0001F4BB");
+    POOL.emplace_back(u8"\U0001F50B");
+    POOL.emplace_back(u8"\U0001F514");
+    POOL.emplace_back(u8"\U0001F680");
+    POOL.emplace_back(u8"\U0001F9E9");
+    arma_rng::set_seed_random();
+    suanpan_info("|  %-5shttps://github.com/TLCFEM/suanPan            |\n", u8"\U0001F9EE");
+    suanpan_info("|  %-5shttps://github.com/TLCFEM/suanPan-manual     |\n", u8"\U0001F4DA");
+    suanpan_info("+--------------------------------------------------+\n");
+    suanpan_info("|  %-5shttps://gitter.im/suanPan-dev/community      |\n", POOL[randi() % POOL.size()]);
+#endif
+    suanpan_info("+--------------------------------------------------+\n\n");
+}
+
 void argument_parser(const int argc, char** argv) {
     if(check_debugger()) return;
 
@@ -130,42 +252,6 @@ void argument_parser(const int argc, char** argv) {
     suanpan_info("\nTime Wasted: %.4F Seconds.\n", T.toc());
 }
 
-void print_header() {
-    suanpan_info("+--------------------------------------------------+\n");
-    suanpan_info("|   __        __         suanPan is an open source |\n");
-    suanpan_info("|  /  \\      |  \\           FEM framework (%u-bit) |\n", SUANPAN_ARCH);
-    suanpan_info("|  \\__       |__/  __   __      %s (%u.%u.%u) |\n", SUANPAN_CODE, SUANPAN_MAJOR, SUANPAN_MINOR, SUANPAN_PATCH);
-    suanpan_info("|     \\ |  | |    |  \\ |  |      by tlc @ %s |\n", SUANPAN_REVISION);
-    suanpan_info("|  \\__/ |__| |    |__X |  |    all rights reserved |\n");
-    suanpan_info("|                           10.5281/zenodo.1285221 |\n");
-    suanpan_info("+--------------------------------------------------+\n");
-#ifdef SUANPAN_WIN
-    suanpan_info("|  https://github.com/TLCFEM/suanPan               |\n");
-    suanpan_info("|  https://github.com/TLCFEM/suanPan-manual        |\n");
-    suanpan_info("+--------------------------------------------------+\n");
-    suanpan_info("|  https://gitter.im/suanPan-dev/community         |\n");
-#else
-    vector<const char8_t*> POOL;
-    POOL.reserve(10);
-    POOL.emplace_back(u8"\U0001F308");
-    POOL.emplace_back(u8"\U0001F30F");
-    POOL.emplace_back(u8"\U0001F3A7");
-    POOL.emplace_back(u8"\U0001F3B1");
-    POOL.emplace_back(u8"\U0001F479");
-    POOL.emplace_back(u8"\U0001F4BB");
-    POOL.emplace_back(u8"\U0001F50B");
-    POOL.emplace_back(u8"\U0001F514");
-    POOL.emplace_back(u8"\U0001F680");
-    POOL.emplace_back(u8"\U0001F9E9");
-    arma_rng::set_seed_random();
-    suanpan_info("|  %-5shttps://github.com/TLCFEM/suanPan            |\n", u8"\U0001F9EE");
-    suanpan_info("|  %-5shttps://github.com/TLCFEM/suanPan-manual     |\n", u8"\U0001F4DA");
-    suanpan_info("+--------------------------------------------------+\n");
-    suanpan_info("|  %-5shttps://gitter.im/suanPan-dev/community      |\n", POOL[randi() % POOL.size()]);
-#endif
-    suanpan_info("+--------------------------------------------------+\n\n");
-}
-
 void print_version() {
     suanpan_info("Copyright (C) 2017-2022 Theodore Chang\n\n");
     suanpan_info("This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.\n\n");
@@ -205,33 +291,6 @@ void print_helper() {
     suanpan_info("\n");
 }
 
-void qrcode() {
-    for(char encode[] = "SLLLLLLLWWWLWWWLWWWLWWWLLLLLLLSFWLLLWFWLUWLWUWLWWFFFWFWLLLWFSFWFFFWFWWFWWFFWWFUFUWWFWFFFWFSFLLLLLFWLWFUFWFUFUFULWFLLLLLFSLLLWLLLLFWWULWWULUUFFLLWWWLWWSULUUFFLWWULFFULFFWWUFLFWLULLFSLUUFWULFWUFLUUFLFFFUULLUULWFLSLUFULULLWUUUWLUULLWUUUFWLFWLFSLFLLLLLWLFWULWWLFFULFUFLWFWFLSLWLWWULLFWLFFULWUFFWWFULLUULFSLULFUFLFFFFLUUFULFUFFFFFFUWUWSLLLLLLLWFLUUWLUWFUUFFWLWFLUFFSFWLLLWFWFFWULWWUWFUWFLLLFUWWLSFWFFFWFWLFWFFULUFULLUWWFFLUUFSFLLLLLFWFFFLUUFLFFUFFFWLFWWFL"; const auto I : encode)
-        if(I == 'S') suanpan_info("\n            ");
-        else if(I == 'W') suanpan_info(" ");
-        else if(I == 'F') suanpan_info("%s", u8"\u2588");
-        else if(I == 'L') suanpan_info("%s", u8"\u2584");
-        else if(I == 'U') suanpan_info("%s", u8"\u2580");
-
-    suanpan_info("\n\n");
-}
-
-void check_version(const char* path_to_executable) {
-    auto updater_module = fs::path(path_to_executable).parent_path();
-
-#ifdef SUANPAN_WIN
-    updater_module.append("updater.exe");
-#else
-    updater_module.append("updater");
-#endif
-
-    if(!exists(updater_module)) return;
-
-    auto terminal = istringstream("\"" + updater_module.string() + "\" " + std::to_string(100 * SUANPAN_MAJOR + 10 * SUANPAN_MINOR + SUANPAN_PATCH));
-
-    execute_command(terminal);
-}
-
 void cli_mode(const shared_ptr<Bead>& model) {
 #ifdef SUANPAN_WIN
     // ReSharper disable once CppDeprecatedEntity
@@ -266,74 +325,4 @@ void cli_mode(const shared_ptr<Bead>& model) {
             }
         }
     }
-}
-
-void strip_mode(const string& input_file_name, const string& output_file_name) {
-    ifstream input_file(input_file_name);
-
-    if(!input_file.is_open()) {
-        suanpan_error("fail to open %s.\n", input_file_name.c_str());
-        return;
-    }
-
-    ofstream output_file(output_file_name);
-
-    if(!output_file.is_open()) {
-        suanpan_error("fail to open %s.\n", output_file_name.c_str());
-        return;
-    }
-
-    output_file.setf(std::ios::scientific);
-    output_file << std::setprecision(3);
-
-    string line;
-
-    while(std::getline(input_file, line)) {
-        if(line.empty() || if_contain(line, "**")) continue;
-
-        for(auto& I : line) I = static_cast<char>(std::tolower(static_cast<int>(I)));
-
-        output_file << line << '\n';
-    }
-}
-
-void convert_mode(const string& input_file_name, const string& output_file_name) {
-    ifstream input_file(input_file_name);
-
-    if(!input_file.is_open()) {
-        suanpan_error("fail to open %s.\n", input_file_name.c_str());
-        return;
-    }
-
-    ofstream output_file(output_file_name);
-
-    if(!output_file.is_open()) {
-        suanpan_error("fail to open %s.\n", output_file_name.c_str());
-        return;
-    }
-
-    const auto pos = output_file_name.find_last_of('/');
-
-    Converter abaqus_converter(string::npos == pos ? "" : output_file_name.substr(0, pos + 1));
-
-    abaqus_converter.process(input_file, output_file);
-}
-
-bool check_debugger() {
-#ifdef SUANPAN_DEBUG
-    return false;
-#endif
-#ifdef SUANPAN_WIN
-    if(IsDebuggerPresent()) exit(EXIT_SUCCESS);
-
-    BOOL FLAG = false;
-    if(CheckRemoteDebuggerPresent(GetCurrentProcess(), &FLAG) && FLAG) std::swap(access::rw(datum::eps), access::rw(datum::pi));
-
-    CONTEXT CTX{};
-    CTX.ContextFlags = CONTEXT_DEBUG_REGISTERS;
-    if(GetThreadContext(GetCurrentThread(), &CTX) && (CTX.Dr0 != 0 || CTX.Dr1 != 0 || CTX.Dr2 != 0 || CTX.Dr3 != 0)) exit(EXIT_SUCCESS);
-
-#elif defined(SUANPAN_UNIX)
-#endif
-    return false;
 }

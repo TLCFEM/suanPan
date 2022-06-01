@@ -18,12 +18,12 @@
 #ifndef RECORDERPARSER_H
 #define RECORDERPARSER_H
 
-#include <suanPan.h>
+#include <memory>
 
 class DomainBase;
 
-int create_new_recorder(const shared_ptr<DomainBase>&, istringstream&);
-int create_new_plainrecorder(const shared_ptr<DomainBase>&, istringstream&);
-int create_new_hdf5recorder(const shared_ptr<DomainBase>&, istringstream&);
+int create_new_recorder(const std::shared_ptr<DomainBase>&, std::istringstream&);
+int create_new_plainrecorder(const std::shared_ptr<DomainBase>&, std::istringstream&);
+int create_new_hdf5recorder(const std::shared_ptr<DomainBase>&, std::istringstream&);
 
 #endif

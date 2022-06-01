@@ -18,11 +18,11 @@
 #ifndef SOLVERPARSER_H
 #define SOLVERPARSER_H
 
-#include <suanPan.h>
+#include <memory>
 
 class DomainBase;
 
-int create_new_integrator(const shared_ptr<DomainBase>&, istringstream&);
-int create_new_solver(const shared_ptr<DomainBase>&, istringstream&);
+int create_new_integrator(const std::shared_ptr<DomainBase>&, std::istringstream&);
+int create_new_solver(const std::shared_ptr<DomainBase>&, std::istringstream&);
 
 #endif

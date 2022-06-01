@@ -55,8 +55,19 @@ using std::ifstream;
 using std::string;
 using std::vector;
 
-int SUANPAN_NUM_THREADS = int(std::thread::hardware_concurrency());
+int SUANPAN_NUM_THREADS = static_cast<int>(std::thread::hardware_concurrency());
 fs::path SUANPAN_OUTPUT = fs::current_path();
+
+void qrcode() {
+    for(char encode[] = "SLLLLLLLWWWLWWWLWWWLWWWLLLLLLLSFWLLLWFWLUWLWUWLWWFFFWFWLLLWFSFWFFFWFWWFWWFFWWFUFUWWFWFFFWFSFLLLLLFWLWFUFWFUFUFULWFLLLLLFSLLLWLLLLFWWULWWULUUFFLLWWWLWWSULUUFFLWWULFFULFFWWUFLFWLULLFSLUUFWULFWUFLUUFLFFFUULLUULWFLSLUFULULLWUUUWLUULLWUUUFWLFWLFSLFLLLLLWLFWULWWLFFULFUFLWFWFLSLWLWWULLFWLFFULWUFFWWFULLUULFSLULFUFLFFFFLUUFULFUFFFFFFUWUWSLLLLLLLWFLUUWLUWFUUFFWLWFLUFFSFWLLLWFWFFWULWWUWFUWFLLLFUWWLSFWFFFWFWLFWFFULUFULLUWWFFLUUFSFLLLLLFWFFFLUUFLFFUFFFWLFWWFL"; const auto I : encode)
+        if(I == 'S') suanpan_info("\n            ");
+        else if(I == 'W') suanpan_info(" ");
+        else if(I == 'F') suanpan_info("%s", u8"\u2588");
+        else if(I == 'L') suanpan_info("%s", u8"\u2584");
+        else if(I == 'U') suanpan_info("%s", u8"\u2580");
+
+    suanpan_info("\n\n");
+}
 
 int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     if(nullptr == model) return SUANPAN_SUCCESS;

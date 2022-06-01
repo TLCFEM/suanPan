@@ -21,47 +21,6 @@
 #include <Domain/ExternalModule.h>
 #include <Recorder/OutputType.h>
 
-int create_new_constraint(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    string constraint_id;
-    if(!get_input(command, constraint_id)) {
-        suanpan_error("create_new_constraint() needs constraint type.\n");
-        return 0;
-    }
-
-    unique_ptr<Constraint> new_constraint = nullptr;
-
-    if(is_equal(constraint_id, "Embed2D")) new_embed(new_constraint, command, 2);
-    else if(is_equal(constraint_id, "Embed3D")) new_embed(new_constraint, command, 3);
-    else if(is_equal(constraint_id, "FixedLength2D") || is_equal(constraint_id, "R2D2")) new_fixedlength(new_constraint, command, 2);
-    else if(is_equal(constraint_id, "FixedLength3D") || is_equal(constraint_id, "R3D2")) new_fixedlength(new_constraint, command, 3);
-    else if(is_equal(constraint_id, "MinimumGap2D") || is_equal(constraint_id, "MinGap2D")) new_minimumgap(new_constraint, command, 2);
-    else if(is_equal(constraint_id, "MinimumGap3D") || is_equal(constraint_id, "MinGap3D")) new_minimumgap(new_constraint, command, 3);
-    else if(is_equal(constraint_id, "MaximumGap2D") || is_equal(constraint_id, "MaxGap2D")) new_maximumgap(new_constraint, command, 2);
-    else if(is_equal(constraint_id, "MaximumGap3D") || is_equal(constraint_id, "MaxGap3D")) new_maximumgap(new_constraint, command, 3);
-    else if(is_equal(constraint_id, "Sleeve2D")) new_sleeve(new_constraint, command, 2);
-    else if(is_equal(constraint_id, "Sleeve3D")) new_sleeve(new_constraint, command, 3);
-    else if(is_equal(constraint_id, "MPC")) new_mpc(new_constraint, command);
-    else if(is_equal(constraint_id, "NodeLine")) new_nodeline(new_constraint, command);
-    else if(is_equal(constraint_id, "NodeFacet")) new_nodefacet(new_constraint, command);
-    else if(is_equal(constraint_id, "ParticleCollision2D")) new_particlecollision2d(new_constraint, command);
-    else if(is_equal(constraint_id, "ParticleCollision3D")) new_particlecollision3d(new_constraint, command);
-    else if(is_equal(constraint_id, "RigidWallMultiplier")) new_rigidwall(new_constraint, command, false, false);
-    else if(is_equal(constraint_id, "RigidWallPenalty")) new_rigidwall(new_constraint, command, false, true);
-    else if(is_equal(constraint_id, "FiniteRigidWallMultiplier")) new_rigidwall(new_constraint, command, true, false);
-    else if(is_equal(constraint_id, "FiniteRigidWallPenalty")) new_rigidwall(new_constraint, command, true, true);
-    else if(is_equal(constraint_id, "PenaltyBC")) new_bc(new_constraint, command, true, false);
-    else if(is_equal(constraint_id, "GroupPenaltyBC")) new_bc(new_constraint, command, true, true);
-    else if(is_equal(constraint_id, "MultiplierBC")) new_bc(new_constraint, command, false, false);
-    else if(is_equal(constraint_id, "GroupMultiplierBC")) new_bc(new_constraint, command, false, true);
-    else load::object(new_constraint, domain, constraint_id, command);
-
-    if(new_constraint != nullptr) new_constraint->set_start_step(domain->get_current_step_tag());
-
-    if(new_constraint == nullptr || !domain->insert(std::move(new_constraint))) suanpan_error("create_new_constraint() fails to create new constraint.\n");
-
-    return 0;
-}
-
 void new_bc(unique_ptr<Constraint>& return_obj, istringstream& command, const bool penalty, const bool group) {
     unsigned bc_id;
     if(!get_input(command, bc_id)) {
@@ -664,4 +623,45 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, istringstream& co
     else if(is_equal(criterion_type, "MinResistance")) domain->insert(make_shared<MinResistance>(tag, step_tag, node, dof, limit));
 
     return SUANPAN_SUCCESS;
+}
+
+int create_new_constraint(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    string constraint_id;
+    if(!get_input(command, constraint_id)) {
+        suanpan_error("create_new_constraint() needs constraint type.\n");
+        return 0;
+    }
+
+    unique_ptr<Constraint> new_constraint = nullptr;
+
+    if(is_equal(constraint_id, "Embed2D")) new_embed(new_constraint, command, 2);
+    else if(is_equal(constraint_id, "Embed3D")) new_embed(new_constraint, command, 3);
+    else if(is_equal(constraint_id, "FixedLength2D") || is_equal(constraint_id, "R2D2")) new_fixedlength(new_constraint, command, 2);
+    else if(is_equal(constraint_id, "FixedLength3D") || is_equal(constraint_id, "R3D2")) new_fixedlength(new_constraint, command, 3);
+    else if(is_equal(constraint_id, "MinimumGap2D") || is_equal(constraint_id, "MinGap2D")) new_minimumgap(new_constraint, command, 2);
+    else if(is_equal(constraint_id, "MinimumGap3D") || is_equal(constraint_id, "MinGap3D")) new_minimumgap(new_constraint, command, 3);
+    else if(is_equal(constraint_id, "MaximumGap2D") || is_equal(constraint_id, "MaxGap2D")) new_maximumgap(new_constraint, command, 2);
+    else if(is_equal(constraint_id, "MaximumGap3D") || is_equal(constraint_id, "MaxGap3D")) new_maximumgap(new_constraint, command, 3);
+    else if(is_equal(constraint_id, "Sleeve2D")) new_sleeve(new_constraint, command, 2);
+    else if(is_equal(constraint_id, "Sleeve3D")) new_sleeve(new_constraint, command, 3);
+    else if(is_equal(constraint_id, "MPC")) new_mpc(new_constraint, command);
+    else if(is_equal(constraint_id, "NodeLine")) new_nodeline(new_constraint, command);
+    else if(is_equal(constraint_id, "NodeFacet")) new_nodefacet(new_constraint, command);
+    else if(is_equal(constraint_id, "ParticleCollision2D")) new_particlecollision2d(new_constraint, command);
+    else if(is_equal(constraint_id, "ParticleCollision3D")) new_particlecollision3d(new_constraint, command);
+    else if(is_equal(constraint_id, "RigidWallMultiplier")) new_rigidwall(new_constraint, command, false, false);
+    else if(is_equal(constraint_id, "RigidWallPenalty")) new_rigidwall(new_constraint, command, false, true);
+    else if(is_equal(constraint_id, "FiniteRigidWallMultiplier")) new_rigidwall(new_constraint, command, true, false);
+    else if(is_equal(constraint_id, "FiniteRigidWallPenalty")) new_rigidwall(new_constraint, command, true, true);
+    else if(is_equal(constraint_id, "PenaltyBC")) new_bc(new_constraint, command, true, false);
+    else if(is_equal(constraint_id, "GroupPenaltyBC")) new_bc(new_constraint, command, true, true);
+    else if(is_equal(constraint_id, "MultiplierBC")) new_bc(new_constraint, command, false, false);
+    else if(is_equal(constraint_id, "GroupMultiplierBC")) new_bc(new_constraint, command, false, true);
+    else load::object(new_constraint, domain, constraint_id, command);
+
+    if(new_constraint != nullptr) new_constraint->set_start_step(domain->get_current_step_tag());
+
+    if(new_constraint == nullptr || !domain->insert(std::move(new_constraint))) suanpan_error("create_new_constraint() fails to create new constraint.\n");
+
+    return 0;
 }
