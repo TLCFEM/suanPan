@@ -29,7 +29,7 @@
 #ifndef NODEGROUP_H
 #define NODEGROUP_H
 
-#include <Domain/Group.h>
+#include "Group.h"
 
 class NodeGroup final : public Group {
     const int dof;

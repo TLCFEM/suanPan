@@ -18,7 +18,7 @@
 #include "Contact3D.h"
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Domain/Group.h>
+#include <Domain/Group/Group.h>
 #include <Domain/Node.h>
 #include <Toolbox/tensorToolbox.h>
 

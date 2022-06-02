@@ -58,7 +58,7 @@
     <ClCompile Include="..\..\..\Developer\Element\ElementExample.cpp" />
     <ClCompile Include="..\..\..\Developer\Material\MaterialExample.cpp" />
     <ClCompile Include="..\..\..\Developer\Section\SectionExample.cpp" />
-    <ClCompile Include="..\..\..\Domain\Group.cpp" />
+    <ClCompile Include="..\..\..\Domain\Group\Group.cpp" />
     <ClCompile Include="..\..\..\Domain\Node.cpp" />
     <ClCompile Include="..\..\..\Domain\Tag.cpp" />
     <ClCompile Include="..\..\..\Element\Element.cpp" />

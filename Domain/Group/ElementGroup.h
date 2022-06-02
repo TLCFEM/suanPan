@@ -29,7 +29,7 @@
 #ifndef ELEMENTGROUP_H
 #define ELEMENTGROUP_H
 
-#include <Domain/Group.h>
+#include "Group.h"
 
 class DomainBase;
 

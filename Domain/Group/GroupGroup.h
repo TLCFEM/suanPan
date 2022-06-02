@@ -29,7 +29,7 @@
 #ifndef GROUPGROUP_H
 #define GROUPGROUP_H
 
-#include <Domain/Group.h>
+#include "Group.h"
 
 class GroupGroup final : public Group {
     const uvec group_tag;

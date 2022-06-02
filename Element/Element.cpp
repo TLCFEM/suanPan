@@ -18,7 +18,7 @@
 #include "Element.h"
 #include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
-#include <Domain/Group.h>
+#include <Domain/Group/Group.h>
 #include <Domain/Node.h>
 #include <Material/Material.h>
 #include <Section/Section.h>
