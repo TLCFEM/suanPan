@@ -17,7 +17,7 @@
 
 #include "GroupNodeRecorder.h"
 #include <Domain/DomainBase.h>
-#include <Domain/Group.h>
+#include <Domain/Group/Group.h>
 
 void GroupNodeRecorder::update_tag(const shared_ptr<DomainBase>& D) {
     vector<uword> tag;

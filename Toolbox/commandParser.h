@@ -26,7 +26,6 @@ class DomainBase;
 int process_command(const shared_ptr<Bead>&, istringstream&);
 
 int process_file(const shared_ptr<Bead>&, const char*);
-int process_file(const shared_ptr<Bead>&, istringstream&);
 
 int run_example();
 

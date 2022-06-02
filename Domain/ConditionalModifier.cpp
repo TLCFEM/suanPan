@@ -85,7 +85,7 @@ void ConditionalModifier::set_initialized(const bool B) const { access::rw(initi
 bool ConditionalModifier::is_initialized() const { return initialized; }
 
 void ConditionalModifier::set_start_step(const unsigned ST) {
-    start_step = ST;
+    start_step = std::max(1u, ST);
     if(end_step <= start_step) end_step = start_step + 1;
 }
 

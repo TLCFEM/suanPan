@@ -22,12 +22,8 @@
 
 class DomainBase;
 
-int create_new_acceleration(const std::shared_ptr<DomainBase>&, std::istringstream&);
 int create_new_amplitude(const std::shared_ptr<DomainBase>&, std::istringstream&);
-int create_new_bodyforce(const std::shared_ptr<DomainBase>&, std::istringstream&, bool);
-int create_new_cload(const std::shared_ptr<DomainBase>&, std::istringstream&, bool = false);
-int create_new_lineudl(const std::shared_ptr<DomainBase>&, std::istringstream&, unsigned);
-int create_new_displacement(const std::shared_ptr<DomainBase>&, std::istringstream&, bool = false);
-int create_new_supportmotion(const std::shared_ptr<DomainBase>&, std::istringstream&, unsigned);
+
+int create_new_load(const std::shared_ptr<DomainBase>&, std::istringstream&);
 
 #endif

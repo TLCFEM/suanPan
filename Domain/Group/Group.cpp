@@ -14,39 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-/**
- * @class NodeGroup
- * @brief The NodeGroup class.
- *
- * @author tlc
- * @date 21/05/2020
- * @version 0.1.0
- * @file NodeGroup.h
- * @addtoNodeGroup Domain
- * @{
- */
 
-#ifndef NODEGROUP_H
-#define NODEGROUP_H
+#include "Group.h"
 
-#include <Domain/Group.h>
+Group::Group(const unsigned T)
+    : Tag(T) { suanpan_debug("Group %u ctor() called.\n", get_tag()); }
 
-class NodeGroup final : public Group {
-    const int dof;
+Group::Group(const unsigned T, uvec&& R)
+    : Tag(T)
+    , pool(std::forward<uvec>(R)) { suanpan_debug("Group %u ctor() called.\n", get_tag()); }
 
-    const vec rule;
+Group::~Group() { suanpan_debug("Group %u dtor() called.\n", get_tag()); }
 
-    const vec s_node, e_node;
+void Group::initialize(const shared_ptr<DomainBase>&) {}
 
-public:
-    NodeGroup(unsigned, int, vec&&);
-    NodeGroup(unsigned, uvec&&);
-    NodeGroup(unsigned, vec&&, vec&&);
-    NodeGroup(unsigned, vec&&);
+const uvec& Group::get_pool() const { return pool; }
 
-    void initialize(const shared_ptr<DomainBase>&) override;
-};
-
-#endif
-
-//! @}
+void Group::print() {
+    suanpan_info("A Group object with tag %u contains the following tags:\n", get_tag());
+    pool.t().print();
+}

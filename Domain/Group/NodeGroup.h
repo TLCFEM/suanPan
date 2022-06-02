@@ -15,27 +15,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class GroupGroup
- * @brief The GroupGroup class.
+ * @class NodeGroup
+ * @brief The NodeGroup class.
  *
  * @author tlc
- * @date 30/06/2020
+ * @date 21/05/2020
  * @version 0.1.0
- * @file GroupGroup.h
- * @addtoGroupGroup Domain
+ * @file NodeGroup.h
+ * @addtoNodeGroup Domain
  * @{
  */
 
-#ifndef GROUPGROUP_H
-#define GROUPGROUP_H
+#ifndef NODEGROUP_H
+#define NODEGROUP_H
 
-#include <Domain/Group.h>
+#include "Group.h"
 
-class GroupGroup final : public Group {
-    const uvec group_tag;
+class NodeGroup final : public Group {
+    const int dof;
+
+    const vec rule;
+
+    const vec s_node, e_node;
 
 public:
-    GroupGroup(unsigned, uvec&&);
+    NodeGroup(unsigned, int, vec&&);
+    NodeGroup(unsigned, uvec&&);
+    NodeGroup(unsigned, vec&&, vec&&);
+    NodeGroup(unsigned, vec&&);
 
     void initialize(const shared_ptr<DomainBase>&) override;
 };

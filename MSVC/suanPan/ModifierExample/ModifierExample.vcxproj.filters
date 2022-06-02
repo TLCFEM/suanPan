@@ -14,9 +14,6 @@
     <ClCompile Include="..\..\..\Developer\Modifier\ModifierExample.cpp">
       <Filter>SRC</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Domain\Group.cpp">
-      <Filter>DEPEND</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Domain\Node.cpp">
       <Filter>DEPEND</Filter>
     </ClCompile>
@@ -36,6 +33,9 @@
       <Filter>DEPEND</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\print.cpp">
+      <Filter>DEPEND</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Domain\Group\Group.cpp">
       <Filter>DEPEND</Filter>
     </ClCompile>
   </ItemGroup>

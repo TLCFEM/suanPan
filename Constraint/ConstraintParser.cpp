@@ -24,23 +24,28 @@
 void new_bc(unique_ptr<Constraint>& return_obj, istringstream& command, const bool penalty, const bool group) {
     unsigned bc_id;
     if(!get_input(command, bc_id)) {
-        suanpan_error("new_bc() needs bc tag.\n");
+        suanpan_error("new_bc() needs a valid tag.\n");
         return;
     }
 
     string dof_id;
     if(!get_input(command, dof_id)) {
-        suanpan_error("new_bc() needs valid DoFs.\n");
+        suanpan_error("new_bc() needs a valid DoF identifier.\n");
         return;
     }
 
-    uword node;
-    vector<uword> node_tag;
-    while(get_input(command, node)) node_tag.push_back(node);
-
     const auto bc_type = suanpan::to_lower(dof_id[0]);
 
-    penalty ? group ? return_obj = make_unique<GroupPenaltyBC>(bc_id, 0, uvec(node_tag), bc_type) : return_obj = make_unique<PenaltyBC>(bc_id, 0, uvec(node_tag), bc_type) : group ? return_obj = make_unique<GroupMultiplierBC>(bc_id, 0, uvec(node_tag), bc_type) : return_obj = make_unique<MultiplierBC>(bc_id, 0, uvec(node_tag), bc_type);
+    if(!is_equal(bc_type, 'p') && !is_equal(bc_type, 'e') && !is_equal(bc_type, 'x') && !is_equal(bc_type, 'y') && !is_equal(bc_type, 'z') && !is_equal(bc_type, '1') && !is_equal(bc_type, '2') && !is_equal(bc_type, '3') && !is_equal(bc_type, '4') && !is_equal(bc_type, '5') && !is_equal(bc_type, '6')) {
+        suanpan_error("new_bc() needs a valid DoF identifier.\n");
+        return;
+    }
+
+    uword obj;
+    vector<uword> obj_tag;
+    while(get_input(command, obj)) obj_tag.push_back(obj);
+
+    penalty ? group ? return_obj = make_unique<GroupPenaltyBC>(bc_id, 0, uvec(obj_tag), bc_type) : return_obj = make_unique<PenaltyBC>(bc_id, 0, uvec(obj_tag), bc_type) : group ? return_obj = make_unique<GroupMultiplierBC>(bc_id, 0, uvec(obj_tag), bc_type) : return_obj = make_unique<MultiplierBC>(bc_id, 0, uvec(obj_tag), bc_type);
 }
 
 void new_fixedlength(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dof) {
@@ -285,229 +290,6 @@ void new_rigidwall(unique_ptr<Constraint>& return_obj, istringstream& command, c
     return_obj = finite ? penalty ? make_unique<RigidWallPenalty>(tag, 0, 0, std::move(origin), std::move(norm), std::move(edge), alpha) : make_unique<RigidWallMultiplier>(tag, 0, 0, std::move(origin), std::move(norm), std::move(edge), alpha) : penalty ? make_unique<RigidWallPenalty>(tag, 0, 0, std::move(origin), std::move(norm), alpha) : make_unique<RigidWallMultiplier>(tag, 0, 0, std::move(origin), std::move(norm), alpha);
 }
 
-int create_new_bc(const shared_ptr<DomainBase>& domain, istringstream& command, const bool flag) {
-    unsigned bc_id;
-    if(!get_input(command, bc_id)) {
-        suanpan_error("create_new_bc() needs bc tag.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    string dof_id;
-    if(!get_input(command, dof_id)) {
-        suanpan_error("create_new_bc() needs valid DoFs.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    uword node;
-    vector<uword> node_tag;
-    while(get_input(command, node)) node_tag.push_back(node);
-
-    const auto bc_type = suanpan::to_lower(dof_id[0]);
-
-    if(const auto step_tag = domain->get_current_step_tag(); flag) {
-        if(is_equal(bc_type, 'p')) domain->insert(make_shared<PenaltyBC>(bc_id, step_tag, uvec(node_tag), "PINNED"));
-        else if(is_equal(bc_type, 'e')) domain->insert(make_shared<PenaltyBC>(bc_id, step_tag, uvec(node_tag), "ENCASTRE"));
-        else if(is_equal(bc_type, 'x')) domain->insert(make_shared<PenaltyBC>(bc_id, step_tag, uvec(node_tag), "XSYMM"));
-        else if(is_equal(bc_type, 'y')) domain->insert(make_shared<PenaltyBC>(bc_id, step_tag, uvec(node_tag), "YSYMM"));
-        else if(is_equal(bc_type, 'z')) domain->insert(make_shared<PenaltyBC>(bc_id, step_tag, uvec(node_tag), "ZSYMM"));
-        else if(is_equal(bc_type, '1')) domain->insert(make_shared<PenaltyBC>(bc_id, step_tag, uvec(node_tag), 1));
-        else if(is_equal(bc_type, '2')) domain->insert(make_shared<PenaltyBC>(bc_id, step_tag, uvec(node_tag), 2));
-        else if(is_equal(bc_type, '3')) domain->insert(make_shared<PenaltyBC>(bc_id, step_tag, uvec(node_tag), 3));
-        else if(is_equal(bc_type, '4')) domain->insert(make_shared<PenaltyBC>(bc_id, step_tag, uvec(node_tag), 4));
-        else if(is_equal(bc_type, '5')) domain->insert(make_shared<PenaltyBC>(bc_id, step_tag, uvec(node_tag), 5));
-        else if(is_equal(bc_type, '6')) domain->insert(make_shared<PenaltyBC>(bc_id, step_tag, uvec(node_tag), 6));
-    }
-    else {
-        if(is_equal(bc_type, 'p')) domain->insert(make_shared<MultiplierBC>(bc_id, step_tag, uvec(node_tag), "PINNED"));
-        else if(is_equal(bc_type, 'e')) domain->insert(make_shared<MultiplierBC>(bc_id, step_tag, uvec(node_tag), "ENCASTRE"));
-        else if(is_equal(bc_type, 'x')) domain->insert(make_shared<MultiplierBC>(bc_id, step_tag, uvec(node_tag), "XSYMM"));
-        else if(is_equal(bc_type, 'y')) domain->insert(make_shared<MultiplierBC>(bc_id, step_tag, uvec(node_tag), "YSYMM"));
-        else if(is_equal(bc_type, 'z')) domain->insert(make_shared<MultiplierBC>(bc_id, step_tag, uvec(node_tag), "ZSYMM"));
-        else if(is_equal(bc_type, '1')) domain->insert(make_shared<MultiplierBC>(bc_id, step_tag, uvec(node_tag), 1));
-        else if(is_equal(bc_type, '2')) domain->insert(make_shared<MultiplierBC>(bc_id, step_tag, uvec(node_tag), 2));
-        else if(is_equal(bc_type, '3')) domain->insert(make_shared<MultiplierBC>(bc_id, step_tag, uvec(node_tag), 3));
-        else if(is_equal(bc_type, '4')) domain->insert(make_shared<MultiplierBC>(bc_id, step_tag, uvec(node_tag), 4));
-        else if(is_equal(bc_type, '5')) domain->insert(make_shared<MultiplierBC>(bc_id, step_tag, uvec(node_tag), 5));
-        else if(is_equal(bc_type, '6')) domain->insert(make_shared<MultiplierBC>(bc_id, step_tag, uvec(node_tag), 6));
-    }
-
-    return SUANPAN_SUCCESS;
-}
-
-int create_new_groupbc(const shared_ptr<DomainBase>& domain, istringstream& command, const bool flag) {
-    unsigned bc_id;
-    if(!get_input(command, bc_id)) {
-        suanpan_error("create_new_groupbc() needs bc tag.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    string dof_id;
-    if(!get_input(command, dof_id)) {
-        suanpan_error("create_new_groupbc() needs valid DoFs.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    uword group;
-    vector<uword> group_tag;
-    while(get_input(command, group)) group_tag.push_back(group);
-
-    const auto bc_type = suanpan::to_lower(dof_id[0]);
-
-    if(const auto step_tag = domain->get_current_step_tag(); flag) {
-        if(is_equal(bc_type, 'p')) domain->insert(make_shared<GroupPenaltyBC>(bc_id, step_tag, uvec(group_tag), "PINNED"));
-        else if(is_equal(bc_type, 'e')) domain->insert(make_shared<GroupPenaltyBC>(bc_id, step_tag, uvec(group_tag), "ENCASTRE"));
-        else if(is_equal(bc_type, 'x')) domain->insert(make_shared<GroupPenaltyBC>(bc_id, step_tag, uvec(group_tag), "XSYMM"));
-        else if(is_equal(bc_type, 'y')) domain->insert(make_shared<GroupPenaltyBC>(bc_id, step_tag, uvec(group_tag), "YSYMM"));
-        else if(is_equal(bc_type, 'z')) domain->insert(make_shared<GroupPenaltyBC>(bc_id, step_tag, uvec(group_tag), "ZSYMM"));
-        else if(is_equal(bc_type, '1')) domain->insert(make_shared<GroupPenaltyBC>(bc_id, step_tag, uvec(group_tag), 1));
-        else if(is_equal(bc_type, '2')) domain->insert(make_shared<GroupPenaltyBC>(bc_id, step_tag, uvec(group_tag), 2));
-        else if(is_equal(bc_type, '3')) domain->insert(make_shared<GroupPenaltyBC>(bc_id, step_tag, uvec(group_tag), 3));
-        else if(is_equal(bc_type, '4')) domain->insert(make_shared<GroupPenaltyBC>(bc_id, step_tag, uvec(group_tag), 4));
-        else if(is_equal(bc_type, '5')) domain->insert(make_shared<GroupPenaltyBC>(bc_id, step_tag, uvec(group_tag), 5));
-        else if(is_equal(bc_type, '6')) domain->insert(make_shared<GroupPenaltyBC>(bc_id, step_tag, uvec(group_tag), 6));
-    }
-    else {
-        if(is_equal(bc_type, 'p')) domain->insert(make_shared<GroupMultiplierBC>(bc_id, step_tag, uvec(group_tag), "PINNED"));
-        else if(is_equal(bc_type, 'e')) domain->insert(make_shared<GroupMultiplierBC>(bc_id, step_tag, uvec(group_tag), "ENCASTRE"));
-        else if(is_equal(bc_type, 'x')) domain->insert(make_shared<GroupMultiplierBC>(bc_id, step_tag, uvec(group_tag), "XSYMM"));
-        else if(is_equal(bc_type, 'y')) domain->insert(make_shared<GroupMultiplierBC>(bc_id, step_tag, uvec(group_tag), "YSYMM"));
-        else if(is_equal(bc_type, 'z')) domain->insert(make_shared<GroupMultiplierBC>(bc_id, step_tag, uvec(group_tag), "ZSYMM"));
-        else if(is_equal(bc_type, '1')) domain->insert(make_shared<GroupMultiplierBC>(bc_id, step_tag, uvec(group_tag), 1));
-        else if(is_equal(bc_type, '2')) domain->insert(make_shared<GroupMultiplierBC>(bc_id, step_tag, uvec(group_tag), 2));
-        else if(is_equal(bc_type, '3')) domain->insert(make_shared<GroupMultiplierBC>(bc_id, step_tag, uvec(group_tag), 3));
-        else if(is_equal(bc_type, '4')) domain->insert(make_shared<GroupMultiplierBC>(bc_id, step_tag, uvec(group_tag), 4));
-        else if(is_equal(bc_type, '5')) domain->insert(make_shared<GroupMultiplierBC>(bc_id, step_tag, uvec(group_tag), 5));
-        else if(is_equal(bc_type, '6')) domain->insert(make_shared<GroupMultiplierBC>(bc_id, step_tag, uvec(group_tag), 6));
-    }
-
-    return SUANPAN_SUCCESS;
-}
-
-int create_new_fixedlength(const shared_ptr<DomainBase>& domain, istringstream& command, const unsigned dof) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("create_new_fixedlength() needs a valid tag.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    uword node_i, node_j;
-    if(!get_input(command, node_i) || !get_input(command, node_j)) {
-        suanpan_error("create_new_fixedlength() needs two node tags.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    domain->insert(make_unique<FixedLength>(tag, domain->get_current_step_tag(), dof, uvec{node_i, node_j}));
-
-    return SUANPAN_SUCCESS;
-}
-
-int create_new_mpc(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("create_new_mpc() needs a valid tag.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    unsigned amplitude;
-    if(!get_input(command, amplitude)) {
-        suanpan_error("create_new_mpc() needs a valid amplitude tag.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    double magnitude;
-    if(!get_input(command, magnitude)) {
-        suanpan_error("create_new_mpc() needs a valid magnitude.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    vector<uword> node_tag, dof_tag;
-    vector<double> weight_tag;
-    while(!command.eof()) {
-        double weight;
-        uword dof, node;
-        if(!get_input(command, node) || !get_input(command, dof) || !get_input(command, weight)) return SUANPAN_SUCCESS;
-        node_tag.emplace_back(node);
-        dof_tag.emplace_back(dof);
-        weight_tag.emplace_back(weight);
-    }
-
-    domain->insert(make_shared<MPC>(tag, domain->get_current_step_tag(), amplitude, uvec(node_tag), uvec(dof_tag), vec(weight_tag), magnitude));
-
-    return SUANPAN_SUCCESS;
-}
-
-int create_new_particlecollision2d(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("create_new_particlecollision2d() needs a valid tag.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    auto space = 1.;
-    if(!command.eof() && !get_input(command, space)) {
-        suanpan_error("create_new_particlecollision2d() needs a valid spacing.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    auto alpha = 1.;
-    if(!command.eof() && !get_input(command, alpha)) {
-        suanpan_error("create_new_particlecollision2d() needs a valid multiplier.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    domain->insert(make_shared<ParticleCollision2D>(tag, domain->get_current_step_tag(), space, alpha));
-
-    return SUANPAN_SUCCESS;
-}
-
-int create_new_particlecollision3d(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("create_new_particlecollision3d() needs a valid tag.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    auto space = 1.;
-    if(!command.eof() && !get_input(command, space)) {
-        suanpan_error("create_new_particlecollision3d() needs a valid spacing.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    auto alpha = 1.;
-    if(!command.eof() && !get_input(command, alpha)) {
-        suanpan_error("create_new_particlecollision3d() needs a valid multiplier.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    domain->insert(make_shared<ParticleCollision3D>(tag, domain->get_current_step_tag(), space, alpha));
-
-    return SUANPAN_SUCCESS;
-}
-
-int create_new_rigidwall(const shared_ptr<DomainBase>& domain, istringstream& command, const bool finite, const bool penalty) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("create_new_rigidwall() needs a valid tag.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    vec origin(3), norm(3), edge(3);
-    for(auto& I : origin) if(!get_input(command, I)) return SUANPAN_SUCCESS;
-    for(auto& I : norm) if(!get_input(command, I)) return SUANPAN_SUCCESS;
-
-    if(finite) for(auto& I : edge) if(!get_input(command, I)) return SUANPAN_SUCCESS;
-
-    auto alpha = 1.;
-    if(!command.eof() && !get_input(command, alpha)) {
-        suanpan_error("create_new_rigidwall() needs a valid multiplier.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    domain->insert(finite ? penalty ? make_shared<RigidWallPenalty>(tag, domain->get_current_step_tag(), 0, std::move(origin), std::move(norm), std::move(edge), alpha) : make_shared<RigidWallMultiplier>(tag, domain->get_current_step_tag(), 0, std::move(origin), std::move(norm), std::move(edge), alpha) : penalty ? make_shared<RigidWallPenalty>(tag, domain->get_current_step_tag(), 0, std::move(origin), std::move(norm), alpha) : make_shared<RigidWallMultiplier>(tag, domain->get_current_step_tag(), 0, std::move(origin), std::move(norm), alpha));
-
-    return SUANPAN_SUCCESS;
-}
-
 int create_new_criterion(const shared_ptr<DomainBase>& domain, istringstream& command) {
     const auto& step_tag = domain->get_current_step_tag();
     if(0 == step_tag) {
@@ -629,7 +411,7 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, istringstream& c
     string constraint_id;
     if(!get_input(command, constraint_id)) {
         suanpan_error("create_new_constraint() needs constraint type.\n");
-        return 0;
+        return SUANPAN_SUCCESS;
     }
 
     unique_ptr<Constraint> new_constraint = nullptr;
@@ -650,12 +432,12 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, istringstream& c
     else if(is_equal(constraint_id, "ParticleCollision2D")) new_particlecollision2d(new_constraint, command);
     else if(is_equal(constraint_id, "ParticleCollision3D")) new_particlecollision3d(new_constraint, command);
     else if(is_equal(constraint_id, "RigidWallMultiplier")) new_rigidwall(new_constraint, command, false, false);
-    else if(is_equal(constraint_id, "RigidWallPenalty")) new_rigidwall(new_constraint, command, false, true);
+    else if(is_equal(constraint_id, "RigidWall") || is_equal(constraint_id, "RigidWallPenalty")) new_rigidwall(new_constraint, command, false, true);
     else if(is_equal(constraint_id, "FiniteRigidWallMultiplier")) new_rigidwall(new_constraint, command, true, false);
-    else if(is_equal(constraint_id, "FiniteRigidWallPenalty")) new_rigidwall(new_constraint, command, true, true);
-    else if(is_equal(constraint_id, "PenaltyBC")) new_bc(new_constraint, command, true, false);
+    else if(is_equal(constraint_id, "FiniteRigidWall") || is_equal(constraint_id, "FiniteRigidWallPenalty")) new_rigidwall(new_constraint, command, true, true);
+    else if(is_equal(constraint_id, "Fix") || is_equal(constraint_id, "PenaltyBC")) new_bc(new_constraint, command, true, false);
     else if(is_equal(constraint_id, "GroupPenaltyBC")) new_bc(new_constraint, command, true, true);
-    else if(is_equal(constraint_id, "MultiplierBC")) new_bc(new_constraint, command, false, false);
+    else if(is_equal(constraint_id, "Fix2") || is_equal(constraint_id, "MultiplierBC")) new_bc(new_constraint, command, false, false);
     else if(is_equal(constraint_id, "GroupMultiplierBC")) new_bc(new_constraint, command, false, true);
     else load::object(new_constraint, domain, constraint_id, command);
 
@@ -663,5 +445,5 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, istringstream& c
 
     if(new_constraint == nullptr || !domain->insert(std::move(new_constraint))) suanpan_error("create_new_constraint() fails to create new constraint.\n");
 
-    return 0;
+    return SUANPAN_SUCCESS;
 }

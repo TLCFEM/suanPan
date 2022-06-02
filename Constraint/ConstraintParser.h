@@ -24,14 +24,6 @@ class DomainBase;
 
 int create_new_constraint(const std::shared_ptr<DomainBase>&, std::istringstream&);
 
-int create_new_bc(const std::shared_ptr<DomainBase>&, std::istringstream&, bool);
-int create_new_groupbc(const std::shared_ptr<DomainBase>&, std::istringstream&, bool);
-int create_new_fixedlength(const std::shared_ptr<DomainBase>&, std::istringstream&, unsigned);
-int create_new_mpc(const std::shared_ptr<DomainBase>&, std::istringstream&);
-int create_new_particlecollision2d(const std::shared_ptr<DomainBase>&, std::istringstream&);
-int create_new_particlecollision3d(const std::shared_ptr<DomainBase>&, std::istringstream&);
-int create_new_rigidwall(const std::shared_ptr<DomainBase>&, std::istringstream&, bool, bool);
-
 int create_new_criterion(const std::shared_ptr<DomainBase>&, std::istringstream&);
 
 #endif

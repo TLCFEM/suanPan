@@ -14,29 +14,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @class ElementGroup
+ * @brief The ElementGroup class.
+ *
+ * @author tlc
+ * @date 21/05/2020
+ * @version 0.1.0
+ * @file ElementGroup.h
+ * @addto Domain
+ * @{
+ */
 
-#include "GroupElementRecorder.h"
-#include <Domain/DomainBase.h>
-#include <Domain/Group/Group.h>
+#ifndef ELEMENTGROUP_H
+#define ELEMENTGROUP_H
 
-void GroupElementRecorder::update_tag(const shared_ptr<DomainBase>& D) {
-    vector<uword> tag;
+#include "Group.h"
 
-    for(auto& I : groups) if(D->find<Group>(I)) for(auto& J : D->get<Group>(I)->get_pool()) tag.emplace_back(J);
+class DomainBase;
 
-    set_object_tag(unique(uvec(tag)));
+class ElementGroup final : public Group {
+public:
+    ElementGroup(unsigned, uvec&&);
 
-    access::rw(get_data_pool()).resize(get_object_tag().n_elem);
-}
+    void initialize(const shared_ptr<DomainBase>&) override;
 
-GroupElementRecorder::GroupElementRecorder(const unsigned T, uvec&& B, const OutputType L, const unsigned I, const bool R, const bool H)
-    : ElementRecorder(T, {}, L, I, R, H)
-    , groups(std::forward<uvec>(B)) {}
+    void print() override;
+};
 
-void GroupElementRecorder::initialize(const shared_ptr<DomainBase>& D) {
-    update_tag(D);
+#endif
 
-    ElementRecorder::initialize(D);
-}
-
-void GroupElementRecorder::print() { suanpan_info("An Element Recorder based on groups.\n"); }
+//! @}

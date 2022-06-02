@@ -18,7 +18,7 @@
 #include "Contact2D.h"
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Domain/Group.h>
+#include <Domain/Group/Group.h>
 #include <Domain/Node.h>
 
 const mat Contact2D::rotation{{0., -1.}, {1., 0.}};

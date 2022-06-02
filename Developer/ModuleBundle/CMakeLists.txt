@@ -30,7 +30,7 @@ link_libraries(suanPan)
 add_library(${PROJECT_NAME} SHARED
         ../../Domain/Node.cpp
         ../../Domain/Tag.cpp
-        ../../Domain/Group.cpp
+        ../../Domain/Group/Group.cpp
         ../../Element/Element.cpp
         ../../Material/Material.cpp
         ../../Section/Section.cpp

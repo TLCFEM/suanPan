@@ -15,31 +15,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class ElementGroup
- * @brief The ElementGroup class.
+ * @class GroupGroup
+ * @brief The GroupGroup class.
  *
  * @author tlc
- * @date 21/05/2020
+ * @date 30/06/2020
  * @version 0.1.0
- * @file ElementGroup.h
- * @addto Domain
+ * @file GroupGroup.h
+ * @addtoGroupGroup Domain
  * @{
  */
 
-#ifndef ELEMENTGROUP_H
-#define ELEMENTGROUP_H
+#ifndef GROUPGROUP_H
+#define GROUPGROUP_H
 
-#include <Domain/Group.h>
+#include "Group.h"
 
-class DomainBase;
+class GroupGroup final : public Group {
+    const uvec group_tag;
 
-class ElementGroup final : public Group {
 public:
-    ElementGroup(unsigned, uvec&&);
+    GroupGroup(unsigned, uvec&&);
 
     void initialize(const shared_ptr<DomainBase>&) override;
-
-    void print() override;
 };
 
 #endif

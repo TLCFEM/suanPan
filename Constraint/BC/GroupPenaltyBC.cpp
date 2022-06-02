@@ -17,7 +17,7 @@
 
 #include "GroupPenaltyBC.h"
 #include <Domain/DomainBase.h>
-#include <Domain/Group.h>
+#include <Domain/Group/Group.h>
 
 void GroupPenaltyBC::update_node_tag(const shared_ptr<DomainBase>& D) {
     vector<uword> tag;
@@ -27,15 +27,11 @@ void GroupPenaltyBC::update_node_tag(const shared_ptr<DomainBase>& D) {
     node_encoding = unique(uvec(tag));
 }
 
-GroupPenaltyBC::GroupPenaltyBC(const unsigned T, const unsigned S, uvec&& N, const unsigned D)
-    : MultiplierBC(T, S, uvec{}, D)
-    , groups(std::forward<uvec>(N)) {}
-
 GroupPenaltyBC::GroupPenaltyBC(const unsigned T, const unsigned S, uvec&& N, uvec&& D)
     : MultiplierBC(T, S, uvec{}, std::forward<uvec>(D))
     , groups(std::forward<uvec>(N)) {}
 
-GroupPenaltyBC::GroupPenaltyBC(const unsigned T, const unsigned S, uvec&& N, const char* TP)
+GroupPenaltyBC::GroupPenaltyBC(const unsigned T, const unsigned S, uvec&& N, const char TP)
     : MultiplierBC(T, S, uvec{}, TP)
     , groups(std::forward<uvec>(N)) {}
 

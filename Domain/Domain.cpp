@@ -21,7 +21,7 @@
 #include <Converger/Converger.h>
 #include <Database/Database.h>
 #include <Domain/FactoryHelper.hpp>
-#include <Domain/Group.h>
+#include <Domain/Group/Group.h>
 #include <Domain/Node.h>
 #include <Element/Element.h>
 #include <Element/Modifier/Modifier.h>

@@ -199,6 +199,9 @@
     <Filter Include="Section\SectionNM">
       <UniqueIdentifier>{931b39fd-1d80-41a3-a54f-a229a4d5fb25}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Domain\Group">
+      <UniqueIdentifier>{ea4086e5-ad87-4755-905a-5f572935c34d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Constraint\BC\GroupMultiplierBC.cpp">
@@ -312,22 +315,10 @@
     <ClCompile Include="..\..\..\Domain\DomainBase.cpp">
       <Filter>Domain</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Domain\ElementGroup.cpp">
-      <Filter>Domain</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Domain\ExternalModule.cpp">
       <Filter>Domain</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Domain\Group.cpp">
-      <Filter>Domain</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Domain\GroupGroup.cpp">
-      <Filter>Domain</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Domain\Node.cpp">
-      <Filter>Domain</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Domain\NodeGroup.cpp">
       <Filter>Domain</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Domain\Tag.cpp">
@@ -1363,6 +1354,18 @@
     <ClCompile Include="..\..\..\Step\StepParser.cpp">
       <Filter>Step</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Domain\Group\ElementGroup.cpp">
+      <Filter>Domain\Group</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Domain\Group\Group.cpp">
+      <Filter>Domain\Group</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Domain\Group\GroupGroup.cpp">
+      <Filter>Domain\Group</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Domain\Group\NodeGroup.cpp">
+      <Filter>Domain\Group</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -1476,25 +1479,13 @@
     <ClInclude Include="..\..\..\Domain\DomainBase.h">
       <Filter>Domain</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Domain\ElementGroup.h">
-      <Filter>Domain</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Domain\ExternalModule.h">
       <Filter>Domain</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Domain\Factory.hpp">
       <Filter>Domain</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Domain\Group.h">
-      <Filter>Domain</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Domain\GroupGroup.h">
-      <Filter>Domain</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Domain\Node.h">
-      <Filter>Domain</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Domain\NodeGroup.h">
       <Filter>Domain</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Domain\Storage.hpp">
@@ -2583,6 +2574,18 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Toolbox\container.h">
       <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\Group\ElementGroup.h">
+      <Filter>Domain\Group</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\Group\Group.h">
+      <Filter>Domain\Group</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\Group\GroupGroup.h">
+      <Filter>Domain\Group</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\Group\NodeGroup.h">
+      <Filter>Domain\Group</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
