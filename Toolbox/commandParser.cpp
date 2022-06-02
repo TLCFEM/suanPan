@@ -75,11 +75,17 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     string command_id;
     if(!get_input(command, command_id)) return SUANPAN_SUCCESS;
 
-    if(is_equal(command_id, "exit")) return SUANPAN_EXIT;
-    if(is_equal(command_id, "quit")) return SUANPAN_EXIT;
+    if(is_equal(command_id, "exit") || is_equal(command_id, "quit")) return SUANPAN_EXIT;
 
-    if(is_equal(command_id, "file")) return process_file(model, command);
-    if(is_equal(command_id, "load")) return process_file(model, command);
+    if(is_equal(command_id, "file")) {
+        string file_name;
+        if(!get_input(command, file_name)) {
+            suanpan_error("process_file() needs a file name.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        return process_file(model, file_name.c_str());
+    }
 
     if(is_equal(command_id, "domain")) return create_new_domain(model, command);
 
@@ -96,38 +102,16 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     if(is_equal(command_id, "list")) return list_object(domain, command);
     if(is_equal(command_id, "suspend")) return suspend_object(domain, command);
     if(is_equal(command_id, "protect")) return protect_object(domain, command);
-    if(is_equal(command_id, "acceleration")) return create_new_acceleration(domain, command);
-    if(is_equal(command_id, "amplitude")) return create_new_amplitude(domain, command);
-    if(is_equal(command_id, "bodyforce")) return create_new_bodyforce(domain, command, false);
-    if(is_equal(command_id, "cload")) return create_new_cload(domain, command);
-    if(is_equal(command_id, "lineudl2d")) return create_new_lineudl(domain, command, 2);
-    if(is_equal(command_id, "lineudl3d")) return create_new_lineudl(domain, command, 3);
     if(is_equal(command_id, "converger")) return create_new_converger(domain, command);
     if(is_equal(command_id, "constraint")) return create_new_constraint(domain, command);
     if(is_equal(command_id, "criterion")) return create_new_criterion(domain, command);
-    if(is_equal(command_id, "disp")) return create_new_displacement(domain, command);
-    if(is_equal(command_id, "displacement")) return create_new_displacement(domain, command);
-    if(is_equal(command_id, "dispload")) return create_new_displacement(domain, command);
     if(is_equal(command_id, "element")) return create_new_element(domain, command);
     if(is_equal(command_id, "elementgroup")) return create_new_elementgroup(domain, command);
-    if(is_equal(command_id, "finiterigidwall")) return create_new_rigidwall(domain, command, true, true);
-    if(is_equal(command_id, "finiterigidwallmultiplier")) return create_new_rigidwall(domain, command, true, false);
-    if(is_equal(command_id, "fix")) return create_new_bc(domain, command, true);
-    if(is_equal(command_id, "fix2")) return create_new_bc(domain, command, false);
-    if(is_equal(command_id, "fixedlength2d")) return create_new_fixedlength(domain, command, 2);
-    if(is_equal(command_id, "fixedlength3d")) return create_new_fixedlength(domain, command, 3);
     if(is_equal(command_id, "generate")) return create_new_generate(domain, command);
     if(is_equal(command_id, "generatebyrule")) return create_new_generatebyrule(domain, command);
     if(is_equal(command_id, "generatebypoint")) return create_new_generatebypoint(domain, command);
     if(is_equal(command_id, "generatebyplane")) return create_new_generatebyplane(domain, command);
-    if(is_equal(command_id, "groupbodyforce")) return create_new_bodyforce(domain, command, true);
-    if(is_equal(command_id, "groupcload")) return create_new_cload(domain, command, true);
-    if(is_equal(command_id, "groupdisp")) return create_new_displacement(domain, command, true);
-    if(is_equal(command_id, "groupdisplacement")) return create_new_displacement(domain, command, true);
-    if(is_equal(command_id, "groupdispload")) return create_new_displacement(domain, command, true);
     if(is_equal(command_id, "groupgroup")) return create_new_groupgroup(domain, command);
-    if(is_equal(command_id, "groupmultiplierbc")) return create_new_groupbc(domain, command, false);
-    if(is_equal(command_id, "grouppenaltybc")) return create_new_groupbc(domain, command, true);
     if(is_equal(command_id, "hdf5recorder")) return create_new_hdf5recorder(domain, command);
     if(is_equal(command_id, "import")) return create_new_external_module(domain, command);
     if(is_equal(command_id, "initial")) return create_new_initial(domain, command);
@@ -135,25 +119,54 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     if(is_equal(command_id, "mass")) return create_new_mass(domain, command);
     if(is_equal(command_id, "material")) return create_new_material(domain, command);
     if(is_equal(command_id, "modifier")) return create_new_modifier(domain, command);
-    if(is_equal(command_id, "mpc")) return create_new_mpc(domain, command);
-    if(is_equal(command_id, "multiplierbc")) return create_new_bc(domain, command, false);
     if(is_equal(command_id, "node")) return create_new_node(domain, command);
     if(is_equal(command_id, "nodegroup")) return create_new_nodegroup(domain, command);
     if(is_equal(command_id, "orientation")) return create_new_orientation(domain, command);
-    if(is_equal(command_id, "particlecollision2d")) return create_new_particlecollision2d(domain, command);
-    if(is_equal(command_id, "particlecollision3d")) return create_new_particlecollision3d(domain, command);
-    if(is_equal(command_id, "penaltybc")) return create_new_bc(domain, command, true);
     if(is_equal(command_id, "plainrecorder")) return create_new_plainrecorder(domain, command);
     if(is_equal(command_id, "recorder")) return create_new_recorder(domain, command);
-    if(is_equal(command_id, "rigidwall")) return create_new_rigidwall(domain, command, false, true);
-    if(is_equal(command_id, "rigidwallmultiplier")) return create_new_rigidwall(domain, command, false, false);
     if(is_equal(command_id, "section")) return create_new_section(domain, command);
     if(is_equal(command_id, "solver")) return create_new_solver(domain, command);
     if(is_equal(command_id, "step")) return create_new_step(domain, command);
+    if(is_equal(command_id, "set")) return set_property(domain, command);
+
+    if(is_equal(command_id, "acceleration")) return create_new_acceleration(domain, command);
+    if(is_equal(command_id, "amplitude")) return create_new_amplitude(domain, command);
+    if(is_equal(command_id, "bodyforce")) return create_new_bodyforce(domain, command, false);
+    if(is_equal(command_id, "groupbodyforce")) return create_new_bodyforce(domain, command, true);
+    if(is_equal(command_id, "cload")) return create_new_cload(domain, command);
+    if(is_equal(command_id, "groupcload")) return create_new_cload(domain, command, true);
+    if(is_equal(command_id, "lineudl2d")) return create_new_lineudl(domain, command, 2);
+    if(is_equal(command_id, "lineudl3d")) return create_new_lineudl(domain, command, 3);
+    if(is_equal(command_id, "disp")) return create_new_displacement(domain, command);
+    if(is_equal(command_id, "displacement")) return create_new_displacement(domain, command);
+    if(is_equal(command_id, "dispload")) return create_new_displacement(domain, command);
+    if(is_equal(command_id, "groupdisp")) return create_new_displacement(domain, command, true);
+    if(is_equal(command_id, "groupdisplacement")) return create_new_displacement(domain, command, true);
+    if(is_equal(command_id, "groupdispload")) return create_new_displacement(domain, command, true);
     if(is_equal(command_id, "supportdisplacement")) return create_new_supportmotion(domain, command, 0);
     if(is_equal(command_id, "supportvelocity")) return create_new_supportmotion(domain, command, 1);
     if(is_equal(command_id, "supportacceleration")) return create_new_supportmotion(domain, command, 2);
-    if(is_equal(command_id, "set")) return set_property(domain, command);
+
+    auto constraint_handler = [&] {
+        command.seekg(0);
+        return create_new_constraint(domain, command);
+    };
+
+    if(is_equal(command_id, "fix")) return constraint_handler();
+    if(is_equal(command_id, "penaltybc")) return constraint_handler();
+    if(is_equal(command_id, "grouppenaltybc")) return constraint_handler();
+    if(is_equal(command_id, "fix2")) return constraint_handler();
+    if(is_equal(command_id, "multiplierbc")) return constraint_handler();
+    if(is_equal(command_id, "groupmultiplierbc")) return constraint_handler();
+    if(is_equal(command_id, "fixedlength2d")) return constraint_handler();
+    if(is_equal(command_id, "fixedlength3d")) return constraint_handler();
+    if(is_equal(command_id, "particlecollision2d")) return constraint_handler();
+    if(is_equal(command_id, "particlecollision3d")) return constraint_handler();
+    if(is_equal(command_id, "finiterigidwall")) return constraint_handler();
+    if(is_equal(command_id, "finiterigidwallmultiplier")) return constraint_handler();
+    if(is_equal(command_id, "rigidwall")) return constraint_handler();
+    if(is_equal(command_id, "rigidwallmultiplier")) return constraint_handler();
+    if(is_equal(command_id, "mpc")) return constraint_handler();
 
     if(is_equal(command_id, "materialtest1d")) return test_material1d(domain, command);
     if(is_equal(command_id, "materialtest2d")) return test_material2d(domain, command);
@@ -181,12 +194,7 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
 
     if(is_equal(command_id, "precheck")) return model->precheck();
 
-    if(is_equal(command_id, "analyze")) {
-        const auto code = model->analyze();
-        suanpan_info("\n");
-        return code;
-    }
-    if(is_equal(command_id, "analyse")) {
+    if(is_equal(command_id, "analyze") || is_equal(command_id, "analyse")) {
         const auto code = model->analyze();
         suanpan_info("\n");
         return code;
@@ -303,16 +311,6 @@ int process_file(const shared_ptr<Bead>& model, const char* file_name) {
         }
 
     return SUANPAN_SUCCESS;
-}
-
-int process_file(const shared_ptr<Bead>& model, istringstream& command) {
-    string file_name;
-    if(!get_input(command, file_name)) {
-        suanpan_error("process_file() needs a file name.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    return process_file(model, file_name.c_str());
 }
 
 int create_new_domain(const shared_ptr<Bead>& model, istringstream& command) {
