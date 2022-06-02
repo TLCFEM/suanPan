@@ -46,9 +46,8 @@ protected:
     void update_node_tag(const shared_ptr<DomainBase>&);
 
 public:
-    explicit GroupPenaltyBC(unsigned = 0, unsigned = 0, uvec&& = {}, unsigned = 0);
     GroupPenaltyBC(unsigned, unsigned, uvec&&, uvec&&);
-    GroupPenaltyBC(unsigned, unsigned, uvec&&, const char*);
+    GroupPenaltyBC(unsigned, unsigned, uvec&&, char);
 
     int initialize(const shared_ptr<DomainBase>&) override;
 
