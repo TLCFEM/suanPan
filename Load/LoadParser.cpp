@@ -17,41 +17,202 @@
 
 #include "LoadParser.h"
 #include <Domain/DomainBase.h>
+#include <Domain/ExternalModule.h>
 #include <Load/Load>
 #include <Toolbox/utility.h>
 
-int create_new_acceleration(const shared_ptr<DomainBase>& domain, istringstream& command) {
+void new_acceleration(unique_ptr<Load>& return_obj, istringstream& command) {
     unsigned load_id;
     if(!get_input(command, load_id)) {
-        suanpan_error("create_new_acceleration() needs a tag.\n");
-        return SUANPAN_SUCCESS;
+        suanpan_error("new_acceleration() needs a tag.\n");
+        return;
     }
 
     unsigned amplitude_id;
     if(!get_input(command, amplitude_id)) {
-        suanpan_error("create_new_acceleration() needs a valid amplitude tag.\n");
-        return SUANPAN_SUCCESS;
+        suanpan_error("new_acceleration() needs a valid amplitude tag.\n");
+        return;
     }
 
     double magnitude;
     if(!get_input(command, magnitude)) {
-        suanpan_error("create_new_acceleration() needs load magnitude.\n");
-        return SUANPAN_SUCCESS;
+        suanpan_error("new_acceleration() needs load magnitude.\n");
+        return;
     }
 
     unsigned dof_id;
     if(!get_input(command, dof_id)) {
-        suanpan_error("create_new_acceleration() needs dof.\n");
-        return SUANPAN_SUCCESS;
+        suanpan_error("new_acceleration() needs dof.\n");
+        return;
     }
 
     uword node_id;
     vector<uword> node_pool;
     while(get_input(command, node_id)) node_pool.emplace_back(node_id);
 
-    if(const auto step_tag = domain->get_current_step_tag(); !domain->insert(make_shared<NodalAcceleration>(load_id, step_tag, magnitude, uvec(node_pool), dof_id, amplitude_id))) suanpan_error("create_new_acceleration() fails to create new load.\n");
+    return_obj = make_unique<NodalAcceleration>(load_id, 0, magnitude, uvec(node_pool), dof_id, amplitude_id);
+}
 
-    return SUANPAN_SUCCESS;
+void new_bodyforce(unique_ptr<Load>& return_obj, istringstream& command, const bool flag) {
+    unsigned load_id;
+    if(!get_input(command, load_id)) {
+        suanpan_error("new_bodyforce() needs a tag.\n");
+        return;
+    }
+
+    unsigned amplitude_id;
+    if(!get_input(command, amplitude_id)) {
+        suanpan_error("new_bodyforce() needs a valid amplitude tag.\n");
+        return;
+    }
+
+    double magnitude;
+    if(!get_input(command, magnitude)) {
+        suanpan_error("new_bodyforce() needs load magnitude.\n");
+        return;
+    }
+
+    unsigned dof_id;
+    if(!get_input(command, dof_id)) {
+        suanpan_error("new_bodyforce() needs a valid DoF.\n");
+        return;
+    }
+
+    unsigned element;
+    vector<uword> element_tag;
+    while(get_input(command, element)) element_tag.push_back(element);
+
+    flag ? return_obj = make_unique<GroupBodyForce>(load_id, 0, magnitude, uvec(element_tag), dof_id, amplitude_id) : return_obj = make_unique<BodyForce>(load_id, 0, magnitude, uvec(element_tag), dof_id, amplitude_id);
+}
+
+void new_cload(unique_ptr<Load>& return_obj, istringstream& command, const bool flag) {
+    unsigned load_id;
+    if(!get_input(command, load_id)) {
+        suanpan_error("new_cload() needs a tag.\n");
+        return;
+    }
+
+    unsigned amplitude_id;
+    if(!get_input(command, amplitude_id)) {
+        suanpan_error("new_cload() needs a valid amplitude tag.\n");
+        return;
+    }
+
+    double magnitude;
+    if(!get_input(command, magnitude)) {
+        suanpan_error("new_cload() needs load magnitude.\n");
+        return;
+    }
+
+    unsigned dof_id;
+    if(!get_input(command, dof_id)) {
+        suanpan_error("new_cload() needs a valid DoF.\n");
+        return;
+    }
+
+    unsigned node;
+    vector<uword> node_tag;
+    while(get_input(command, node)) node_tag.push_back(node);
+
+    flag ? return_obj = make_unique<GroupNodalForce>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id) : return_obj = make_unique<NodalForce>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id);
+}
+
+void new_lineudl(unique_ptr<Load>& return_obj, istringstream& command, const unsigned dimension) {
+    unsigned load_id;
+    if(!get_input(command, load_id)) {
+        suanpan_error("new_lineudl() needs a tag.\n");
+        return;
+    }
+
+    unsigned amplitude_id;
+    if(!get_input(command, amplitude_id)) {
+        suanpan_error("new_lineudl() needs a valid amplitude tag.\n");
+        return;
+    }
+
+    double magnitude;
+    if(!get_input(command, magnitude)) {
+        suanpan_error("new_lineudl() needs load magnitude.\n");
+        return;
+    }
+
+    unsigned dof_id;
+    if(!get_input(command, dof_id)) {
+        suanpan_error("new_lineudl() needs a valid DoF.\n");
+        return;
+    }
+
+    unsigned node;
+    vector<uword> node_tag;
+    while(get_input(command, node)) node_tag.push_back(node);
+
+    2 == dimension ? return_obj = make_unique<LineUDL2D>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id) : return_obj = make_unique<LineUDL3D>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id);
+}
+
+void new_displacement(unique_ptr<Load>& return_obj, istringstream& command, const bool flag) {
+    unsigned load_id;
+    if(!get_input(command, load_id)) {
+        suanpan_error("new_displacement() needs a tag.\n");
+        return;
+    }
+
+    unsigned amplitude_id;
+    if(!get_input(command, amplitude_id)) {
+        suanpan_error("new_displacement() needs a valid amplitude tag.\n");
+        return;
+    }
+
+    double magnitude;
+    if(!get_input(command, magnitude)) {
+        suanpan_error("new_displacement() needs load magnitude.\n");
+        return;
+    }
+
+    unsigned dof_id;
+    if(!get_input(command, dof_id)) {
+        suanpan_error("new_displacement() needs a valid DoF.\n");
+        return;
+    }
+
+    unsigned node;
+    vector<uword> node_tag;
+    while(get_input(command, node)) node_tag.push_back(node);
+
+    flag ? return_obj = make_unique<GroupNodalDisplacement>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id) : return_obj = make_unique<NodalDisplacement>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id);
+}
+
+void new_supportmotion(unique_ptr<Load>& return_obj, istringstream& command, const unsigned flag) {
+    unsigned load_id;
+    if(!get_input(command, load_id)) {
+        suanpan_error("new_supportmotion() needs a tag.\n");
+        return;
+    }
+
+    unsigned amplitude_id;
+    if(!get_input(command, amplitude_id)) {
+        suanpan_error("new_supportmotion() needs a valid amplitude tag.\n");
+        return;
+    }
+
+    double magnitude;
+    if(!get_input(command, magnitude)) {
+        suanpan_error("new_supportmotion() needs load magnitude.\n");
+        return;
+    }
+
+    unsigned dof_id;
+    if(!get_input(command, dof_id)) {
+        suanpan_error("new_supportmotion() needs a valid DoF.\n");
+        return;
+    }
+
+    unsigned node;
+    vector<uword> node_tag;
+    while(get_input(command, node)) node_tag.push_back(node);
+
+    if(0 == flag) return_obj = make_unique<SupportDisplacement>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id);
+    else if(1 == flag) return_obj = make_unique<SupportVelocity>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id);
+    else return_obj = make_unique<SupportAcceleration>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id);
 }
 
 int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& command) {
@@ -132,178 +293,32 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& co
     return SUANPAN_SUCCESS;
 }
 
-int create_new_bodyforce(const shared_ptr<DomainBase>& domain, istringstream& command, const bool flag) {
-    unsigned load_id;
+int create_new_load(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    string load_id;
     if(!get_input(command, load_id)) {
-        suanpan_error("create_new_bodyforce() needs a tag.\n");
+        suanpan_error("create_new_load() needs load type.\n");
         return SUANPAN_SUCCESS;
     }
 
-    unsigned amplitude_id;
-    if(!get_input(command, amplitude_id)) {
-        suanpan_error("create_new_bodyforce() needs a valid amplitude tag.\n");
-        return SUANPAN_SUCCESS;
-    }
+    unique_ptr<Load> new_load = nullptr;
 
-    double magnitude;
-    if(!get_input(command, magnitude)) {
-        suanpan_error("create_new_bodyforce() needs load magnitude.\n");
-        return SUANPAN_SUCCESS;
-    }
+    if(is_equal(load_id, "Acceleration")) new_acceleration(new_load, command);
+    else if(is_equal(load_id, "BodyForce")) new_bodyforce(new_load, command, false);
+    else if(is_equal(load_id, "GroupBodyForce")) new_bodyforce(new_load, command, true);
+    else if(is_equal(load_id, "Cload")) new_cload(new_load, command, false);
+    else if(is_equal(load_id, "GroupCload")) new_cload(new_load, command, true);
+    else if(is_equal(load_id, "LineUDL2D")) new_lineudl(new_load, command, 2);
+    else if(is_equal(load_id, "LineUDL3D")) new_lineudl(new_load, command, 3);
+    else if(is_equal(load_id, "Disp") || is_equal(load_id, "Displacement") || is_equal(load_id, "DispLoad")) new_displacement(new_load, command, false);
+    else if(is_equal(load_id, "GroupDisp") || is_equal(load_id, "GroupDisplacement") || is_equal(load_id, "GroupDispLoad")) new_displacement(new_load, command, true);
+    else if(is_equal(load_id, "SupportDisplacement")) new_supportmotion(new_load, command, 0);
+    else if(is_equal(load_id, "SupportVelocity")) new_supportmotion(new_load, command, 1);
+    else if(is_equal(load_id, "SupportAcceleration")) new_supportmotion(new_load, command, 2);
+    else load::object(new_load, domain, load_id, command);
 
-    unsigned dof_id;
-    if(!get_input(command, dof_id)) {
-        suanpan_error("create_new_bodyforce() needs a valid DoF.\n");
-        return SUANPAN_SUCCESS;
-    }
+    if(new_load != nullptr) new_load->set_start_step(domain->get_current_step_tag());
 
-    unsigned element;
-    vector<uword> element_tag;
-    while(get_input(command, element)) element_tag.push_back(element);
-
-    if(flag) { if(!domain->insert(make_shared<GroupBodyForce>(load_id, domain->get_current_step_tag(), magnitude, uvec(element_tag), dof_id, amplitude_id))) suanpan_error("create_new_bodyforce() fails to create new load.\n"); }
-    else if(!domain->insert(make_shared<BodyForce>(load_id, domain->get_current_step_tag(), magnitude, uvec(element_tag), dof_id, amplitude_id))) suanpan_error("create_new_bodyforce() fails to create new load.\n");
-
-    return SUANPAN_SUCCESS;
-}
-
-int create_new_cload(const shared_ptr<DomainBase>& domain, istringstream& command, const bool flag) {
-    unsigned load_id;
-    if(!get_input(command, load_id)) {
-        suanpan_error("create_new_cload() needs a tag.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    unsigned amplitude_id;
-    if(!get_input(command, amplitude_id)) {
-        suanpan_error("create_new_cload() needs a valid amplitude tag.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    double magnitude;
-    if(!get_input(command, magnitude)) {
-        suanpan_error("create_new_cload() needs load magnitude.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    unsigned dof_id;
-    if(!get_input(command, dof_id)) {
-        suanpan_error("create_new_cload() needs a valid DoF.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    unsigned node;
-    vector<uword> node_tag;
-    while(get_input(command, node)) node_tag.push_back(node);
-
-    if(flag) { if(!domain->insert(make_shared<GroupNodalForce>(load_id, domain->get_current_step_tag(), magnitude, uvec(node_tag), dof_id, amplitude_id))) suanpan_error("create_new_cload() fails to create new load.\n"); }
-    else { if(!domain->insert(make_shared<NodalForce>(load_id, domain->get_current_step_tag(), magnitude, uvec(node_tag), dof_id, amplitude_id))) suanpan_error("create_new_cload() fails to create new load.\n"); }
-
-    return SUANPAN_SUCCESS;
-}
-
-int create_new_lineudl(const shared_ptr<DomainBase>& domain, istringstream& command, const unsigned dimension) {
-    unsigned load_id;
-    if(!get_input(command, load_id)) {
-        suanpan_error("create_new_lineudl() needs a tag.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    unsigned amplitude_id;
-    if(!get_input(command, amplitude_id)) {
-        suanpan_error("create_new_lineudl() needs a valid amplitude tag.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    double magnitude;
-    if(!get_input(command, magnitude)) {
-        suanpan_error("create_new_lineudl() needs load magnitude.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    unsigned dof_id;
-    if(!get_input(command, dof_id)) {
-        suanpan_error("create_new_lineudl() needs a valid DoF.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    unsigned node;
-    vector<uword> node_tag;
-    while(get_input(command, node)) node_tag.push_back(node);
-
-    if(2 == dimension) { if(!domain->insert(make_shared<LineUDL2D>(load_id, domain->get_current_step_tag(), magnitude, uvec(node_tag), dof_id, amplitude_id))) suanpan_error("create_new_lineudl() fails to create new load.\n"); }
-    else { if(!domain->insert(make_shared<LineUDL3D>(load_id, domain->get_current_step_tag(), magnitude, uvec(node_tag), dof_id, amplitude_id))) suanpan_error("create_new_lineudl() fails to create new load.\n"); }
-
-    return SUANPAN_SUCCESS;
-}
-
-int create_new_displacement(const shared_ptr<DomainBase>& domain, istringstream& command, const bool flag) {
-    unsigned load_id;
-    if(!get_input(command, load_id)) {
-        suanpan_error("create_new_displacement() needs a tag.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    unsigned amplitude_id;
-    if(!get_input(command, amplitude_id)) {
-        suanpan_error("create_new_displacement() needs a valid amplitude tag.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    double magnitude;
-    if(!get_input(command, magnitude)) {
-        suanpan_error("create_new_displacement() needs load magnitude.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    unsigned dof_id;
-    if(!get_input(command, dof_id)) {
-        suanpan_error("create_new_displacement() needs a valid DoF.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    unsigned node;
-    vector<uword> node_tag;
-    while(get_input(command, node)) node_tag.push_back(node);
-
-    if(const auto step_tag = domain->get_current_step_tag(); flag) { if(!domain->insert(make_shared<GroupNodalDisplacement>(load_id, step_tag, magnitude, uvec(node_tag), dof_id, amplitude_id))) suanpan_error("create_new_displacement() fails to create new load.\n"); }
-    else { if(!domain->insert(make_shared<NodalDisplacement>(load_id, step_tag, magnitude, uvec(node_tag), dof_id, amplitude_id))) suanpan_error("create_new_displacement() fails to create new load.\n"); }
-
-    return SUANPAN_SUCCESS;
-}
-
-int create_new_supportmotion(const shared_ptr<DomainBase>& domain, istringstream& command, const unsigned flag) {
-    unsigned load_id;
-    if(!get_input(command, load_id)) {
-        suanpan_error("create_new_supportmotion() needs a tag.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    unsigned amplitude_id;
-    if(!get_input(command, amplitude_id)) {
-        suanpan_error("create_new_supportmotion() needs a valid amplitude tag.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    double magnitude;
-    if(!get_input(command, magnitude)) {
-        suanpan_error("create_new_supportmotion() needs load magnitude.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    unsigned dof_id;
-    if(!get_input(command, dof_id)) {
-        suanpan_error("create_new_supportmotion() needs a valid DoF.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    unsigned node;
-    vector<uword> node_tag;
-    while(get_input(command, node)) node_tag.push_back(node);
-
-    if(const auto step_tag = domain->get_current_step_tag(); 0 == flag) { if(!domain->insert(make_shared<SupportDisplacement>(load_id, step_tag, magnitude, uvec(node_tag), dof_id, amplitude_id))) suanpan_error("create_new_supportmotion() fails to create new load.\n"); }
-    else if(1 == flag) { if(!domain->insert(make_shared<SupportVelocity>(load_id, step_tag, magnitude, uvec(node_tag), dof_id, amplitude_id))) suanpan_error("create_new_supportmotion() fails to create new load.\n"); }
-    else { if(!domain->insert(make_shared<SupportAcceleration>(load_id, step_tag, magnitude, uvec(node_tag), dof_id, amplitude_id))) suanpan_error("create_new_supportmotion() fails to create new load.\n"); }
+    if(new_load == nullptr || !domain->insert(std::move(new_load))) suanpan_error("create_new_load() fails to create new load.\n");
 
     return SUANPAN_SUCCESS;
 }

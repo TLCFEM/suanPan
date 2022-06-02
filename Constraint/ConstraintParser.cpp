@@ -411,7 +411,7 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, istringstream& c
     string constraint_id;
     if(!get_input(command, constraint_id)) {
         suanpan_error("create_new_constraint() needs constraint type.\n");
-        return 0;
+        return SUANPAN_SUCCESS;
     }
 
     unique_ptr<Constraint> new_constraint = nullptr;
@@ -445,5 +445,5 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, istringstream& c
 
     if(new_constraint == nullptr || !domain->insert(std::move(new_constraint))) suanpan_error("create_new_constraint() fails to create new constraint.\n");
 
-    return 0;
+    return SUANPAN_SUCCESS;
 }

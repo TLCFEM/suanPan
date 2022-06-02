@@ -15,7 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-// ReSharper disable CppClangTidyCppcoreguidelinesInitVariables
+// ReSharper disable StringLiteralTypo
+// ReSharper disable IdentifierTypo
 #include "commandParser.h"
 #include <thread>
 #include <Constraint/ConstraintParser.h>
@@ -102,50 +103,58 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     if(is_equal(command_id, "list")) return list_object(domain, command);
     if(is_equal(command_id, "suspend")) return suspend_object(domain, command);
     if(is_equal(command_id, "protect")) return protect_object(domain, command);
+    if(is_equal(command_id, "set")) return set_property(domain, command);
+
+    if(is_equal(command_id, "amplitude")) return create_new_amplitude(domain, command);
     if(is_equal(command_id, "converger")) return create_new_converger(domain, command);
     if(is_equal(command_id, "constraint")) return create_new_constraint(domain, command);
     if(is_equal(command_id, "criterion")) return create_new_criterion(domain, command);
     if(is_equal(command_id, "element")) return create_new_element(domain, command);
-    if(is_equal(command_id, "elementgroup")) return create_new_elementgroup(domain, command);
-    if(is_equal(command_id, "generate")) return create_new_generate(domain, command);
-    if(is_equal(command_id, "generatebyrule")) return create_new_generatebyrule(domain, command);
-    if(is_equal(command_id, "generatebypoint")) return create_new_generatebypoint(domain, command);
-    if(is_equal(command_id, "generatebyplane")) return create_new_generatebyplane(domain, command);
-    if(is_equal(command_id, "groupgroup")) return create_new_groupgroup(domain, command);
     if(is_equal(command_id, "hdf5recorder")) return create_new_hdf5recorder(domain, command);
     if(is_equal(command_id, "import")) return create_new_external_module(domain, command);
     if(is_equal(command_id, "initial")) return create_new_initial(domain, command);
     if(is_equal(command_id, "integrator")) return create_new_integrator(domain, command);
+    if(is_equal(command_id, "load")) return create_new_load(domain, command);
     if(is_equal(command_id, "mass")) return create_new_mass(domain, command);
     if(is_equal(command_id, "material")) return create_new_material(domain, command);
     if(is_equal(command_id, "modifier")) return create_new_modifier(domain, command);
     if(is_equal(command_id, "node")) return create_new_node(domain, command);
-    if(is_equal(command_id, "nodegroup")) return create_new_nodegroup(domain, command);
     if(is_equal(command_id, "orientation")) return create_new_orientation(domain, command);
     if(is_equal(command_id, "plainrecorder")) return create_new_plainrecorder(domain, command);
     if(is_equal(command_id, "recorder")) return create_new_recorder(domain, command);
     if(is_equal(command_id, "section")) return create_new_section(domain, command);
     if(is_equal(command_id, "solver")) return create_new_solver(domain, command);
     if(is_equal(command_id, "step")) return create_new_step(domain, command);
-    if(is_equal(command_id, "set")) return set_property(domain, command);
 
-    if(is_equal(command_id, "acceleration")) return create_new_acceleration(domain, command);
-    if(is_equal(command_id, "amplitude")) return create_new_amplitude(domain, command);
-    if(is_equal(command_id, "bodyforce")) return create_new_bodyforce(domain, command, false);
-    if(is_equal(command_id, "groupbodyforce")) return create_new_bodyforce(domain, command, true);
-    if(is_equal(command_id, "cload")) return create_new_cload(domain, command);
-    if(is_equal(command_id, "groupcload")) return create_new_cload(domain, command, true);
-    if(is_equal(command_id, "lineudl2d")) return create_new_lineudl(domain, command, 2);
-    if(is_equal(command_id, "lineudl3d")) return create_new_lineudl(domain, command, 3);
-    if(is_equal(command_id, "disp")) return create_new_displacement(domain, command);
-    if(is_equal(command_id, "displacement")) return create_new_displacement(domain, command);
-    if(is_equal(command_id, "dispload")) return create_new_displacement(domain, command);
-    if(is_equal(command_id, "groupdisp")) return create_new_displacement(domain, command, true);
-    if(is_equal(command_id, "groupdisplacement")) return create_new_displacement(domain, command, true);
-    if(is_equal(command_id, "groupdispload")) return create_new_displacement(domain, command, true);
-    if(is_equal(command_id, "supportdisplacement")) return create_new_supportmotion(domain, command, 0);
-    if(is_equal(command_id, "supportvelocity")) return create_new_supportmotion(domain, command, 1);
-    if(is_equal(command_id, "supportacceleration")) return create_new_supportmotion(domain, command, 2);
+    if(is_equal(command_id, "nodegroup")) return create_new_nodegroup(domain, command);
+    if(is_equal(command_id, "elementgroup")) return create_new_elementgroup(domain, command);
+    if(is_equal(command_id, "groupgroup")) return create_new_groupgroup(domain, command);
+    if(is_equal(command_id, "generate")) return create_new_generate(domain, command);
+    if(is_equal(command_id, "generatebyrule")) return create_new_generatebyrule(domain, command);
+    if(is_equal(command_id, "generatebypoint")) return create_new_generatebypoint(domain, command);
+    if(is_equal(command_id, "generatebyplane")) return create_new_generatebyplane(domain, command);
+
+    auto load_handler = [&] {
+        command.seekg(0);
+        return create_new_load(domain, command);
+    };
+
+    if(is_equal(command_id, "acceleration")) return load_handler();
+    if(is_equal(command_id, "bodyforce")) return load_handler();
+    if(is_equal(command_id, "groupbodyforce")) return load_handler();
+    if(is_equal(command_id, "cload")) return load_handler();
+    if(is_equal(command_id, "groupcload")) return load_handler();
+    if(is_equal(command_id, "lineudl2d")) return load_handler();
+    if(is_equal(command_id, "lineudl3d")) return load_handler();
+    if(is_equal(command_id, "disp")) return load_handler();
+    if(is_equal(command_id, "displacement")) return load_handler();
+    if(is_equal(command_id, "dispload")) return load_handler();
+    if(is_equal(command_id, "groupdisp")) return load_handler();
+    if(is_equal(command_id, "groupdisplacement")) return load_handler();
+    if(is_equal(command_id, "groupdispload")) return load_handler();
+    if(is_equal(command_id, "supportdisplacement")) return load_handler();
+    if(is_equal(command_id, "supportvelocity")) return load_handler();
+    if(is_equal(command_id, "supportacceleration")) return load_handler();
 
     auto constraint_handler = [&] {
         command.seekg(0);
@@ -1172,7 +1181,7 @@ int print_command() {
     suanpan_info(format, "enable", "enable objects");
     suanpan_info(format, "example", "establish adn execute a minimum example");
     suanpan_info(format, "exit/quit", "exit program");
-    suanpan_info(format, "file/load", "load external files");
+    suanpan_info(format, "file", "load external files");
     suanpan_info(format, "finiterigidwall", "define rigid wall constraint with finite dimensions");
     suanpan_info(format, "fix/penaltybc", "define boundary conditions by penalty method");
     suanpan_info(format, "fix2/multiplierbc", "define boundary conditions by multiplier method");
