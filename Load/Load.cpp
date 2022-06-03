@@ -43,7 +43,7 @@ GroupLoad::GroupLoad(uvec&& N)
 uvec GroupLoad::update_object_tag(const shared_ptr<DomainBase>& D) const {
     suanpan::unordered_set<uword> tag;
 
-    for(auto& I : groups) {
+    for(const auto I : groups) {
         const auto& t_group = D->get<Group>(I);
         if(nullptr == t_group) continue;
         const auto& t_pool = t_group->get_pool();

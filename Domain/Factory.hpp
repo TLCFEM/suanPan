@@ -155,12 +155,12 @@ template<sp_d T> class Factory final {
     Col<T> pre_acceleration;   // global previous acceleration vector
     Col<T> pre_temperature;    // global previous temperature vector
 
-    std::vector<std::mutex> global_mutex = std::vector<std::mutex>(10);
-
     shared_ptr<MetaMat<T>> global_mass = nullptr;      // global mass matrix
     shared_ptr<MetaMat<T>> global_damping = nullptr;   // global damping matrix
     shared_ptr<MetaMat<T>> global_stiffness = nullptr; // global stiffness matrix
     shared_ptr<MetaMat<T>> global_geometry = nullptr;  // global geometry matrix
+
+    std::vector<std::mutex> global_mutex = std::vector<std::mutex>(20);
 
     Col<T> eigenvalue; // eigenvalues
 
@@ -379,6 +379,16 @@ public:
     const shared_ptr<MetaMat<T>>& get_damping() const;
     const shared_ptr<MetaMat<T>>& get_stiffness() const;
     const shared_ptr<MetaMat<T>>& get_geometry() const;
+
+    std::mutex& get_auxiliary_encoding_mutex() const;
+    std::mutex& get_auxiliary_resistance_mutex() const;
+    std::mutex& get_auxiliary_load_mutex() const;
+    std::mutex& get_auxiliary_stiffness_mutex() const;
+
+    std::mutex& get_trial_constraint_resistance_mutex();
+
+    std::mutex& get_trial_load_mutex();
+    std::mutex& get_trial_settlement_mutex();
 
     std::mutex& get_mass_mutex();
     std::mutex& get_damping_mutex();
@@ -1052,13 +1062,27 @@ template<sp_d T> const shared_ptr<MetaMat<T>>& Factory<T>::get_stiffness() const
 
 template<sp_d T> const shared_ptr<MetaMat<T>>& Factory<T>::get_geometry() const { return global_geometry; }
 
-template<sp_d T> std::mutex& Factory<T>::get_mass_mutex() { return global_mutex.at(0); }
+template<sp_d T> std::mutex& Factory<T>::get_auxiliary_encoding_mutex() const { return global_mutex.at(0); }
 
-template<sp_d T> std::mutex& Factory<T>::get_damping_mutex() { return global_mutex.at(1); }
+template<sp_d T> std::mutex& Factory<T>::get_auxiliary_resistance_mutex() const { return global_mutex.at(1); }
 
-template<sp_d T> std::mutex& Factory<T>::get_stiffness_mutex() { return global_mutex.at(2); }
+template<sp_d T> std::mutex& Factory<T>::get_auxiliary_load_mutex() const { return global_mutex.at(2); }
 
-template<sp_d T> std::mutex& Factory<T>::get_geometry_mutex() { return global_mutex.at(3); }
+template<sp_d T> std::mutex& Factory<T>::get_auxiliary_stiffness_mutex() const { return global_mutex.at(3); }
+
+template<sp_d T> std::mutex& Factory<T>::get_trial_constraint_resistance_mutex() { return global_mutex.at(4); }
+
+template<sp_d T> std::mutex& Factory<T>::get_trial_load_mutex() { return global_mutex.at(5); }
+
+template<sp_d T> std::mutex& Factory<T>::get_trial_settlement_mutex() { return global_mutex.at(6); }
+
+template<sp_d T> std::mutex& Factory<T>::get_mass_mutex() { return global_mutex.at(7); }
+
+template<sp_d T> std::mutex& Factory<T>::get_damping_mutex() { return global_mutex.at(8); }
+
+template<sp_d T> std::mutex& Factory<T>::get_stiffness_mutex() { return global_mutex.at(9); }
+
+template<sp_d T> std::mutex& Factory<T>::get_geometry_mutex() { return global_mutex.at(10); }
 
 template<sp_d T> const Col<T>& Factory<T>::get_eigenvalue() const { return eigenvalue; }
 

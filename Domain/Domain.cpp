@@ -676,16 +676,34 @@ const shared_ptr<Integrator>& Domain::get_current_integrator() const { return ge
 
 const shared_ptr<Solver>& Domain::get_current_solver() const { return get_solver(current_solver_tag); }
 
+/**
+ * \brief concurrently safe insertion method
+ */
 void Domain::insert_loaded_dof(const uvec& T) { loaded_dofs.insert(T.cbegin(), T.cend()); }
 
+/**
+ * \brief concurrently safe insertion method
+ */
 void Domain::insert_restrained_dof(const uvec& T) { restrained_dofs.insert(T.cbegin(), T.cend()); }
 
+/**
+ * \brief concurrently safe insertion method
+ */
 void Domain::insert_constrained_dof(const uvec& T) { constrained_dofs.insert(T.cbegin(), T.cend()); }
 
+/**
+ * \brief concurrently safe insertion method
+ */
 void Domain::insert_loaded_dof(const uword T) { loaded_dofs.insert(T); }
 
+/**
+ * \brief concurrently safe insertion method
+ */
 void Domain::insert_restrained_dof(const uword T) { restrained_dofs.insert(T); }
 
+/**
+ * \brief concurrently safe insertion method
+ */
 void Domain::insert_constrained_dof(const uword T) { constrained_dofs.insert(T); }
 
 const suanpan::unordered_set<uword>& Domain::get_loaded_dof() const { return loaded_dofs; }
@@ -1039,24 +1057,32 @@ int Domain::initialize_reference() {
 int Domain::process_load(const bool full) {
     loaded_dofs.clear();
 
-    auto& t_load = get_trial_load(factory);
-    if(!t_load.empty()) t_load.zeros();
+    auto& trial_load = get_trial_load(factory);
+    if(!trial_load.empty()) trial_load.zeros();
 
-    auto& t_settlement = get_trial_settlement(factory);
-    if(!t_settlement.empty()) t_settlement.zeros();
+    auto& trial_settlement = get_trial_settlement(factory);
+    if(!trial_settlement.empty()) trial_settlement.zeros();
 
     const auto process_handler = full ? std::mem_fn(&Load::process) : std::mem_fn(&Load::process_resistance);
 
-    auto code = 0;
-    for(auto& I : load_pond.get()) {
-        if(!I->is_initialized()) continue;
-        code += std::invoke(process_handler, I, shared_from_this());
-        if(!I->get_trial_load().empty()) t_load += I->get_trial_load();
-        if(!I->get_trial_settlement().empty()) t_settlement += I->get_trial_settlement();
-    }
+    std::atomic_int code = 0;
 
-    factory->update_trial_load(t_load);
-    factory->update_trial_settlement(t_settlement);
+    auto& t_load_pool = load_pond.get();
+    suanpan_for_each(t_load_pool.cbegin(), t_load_pool.cend(), [&](const shared_ptr<Load>& t_load) {
+        if(!t_load->is_initialized()) return;
+        code += std::invoke(process_handler, t_load, shared_from_this());
+        if(!t_load->get_trial_load().empty()) {
+            std::scoped_lock trial_load_lock(factory->get_trial_load_mutex());
+            trial_load += t_load->get_trial_load();
+        }
+        if(!t_load->get_trial_settlement().empty()) {
+            std::scoped_lock trial_settlement_lock(factory->get_trial_settlement_mutex());
+            trial_settlement += t_load->get_trial_settlement();
+        }
+    });
+
+    factory->update_trial_load(trial_load);
+    factory->update_trial_settlement(trial_settlement);
 
     return code;
 }
@@ -1078,14 +1104,19 @@ int Domain::process_constraint(const bool full) {
 
     const auto process_handler = full ? std::mem_fn(&Constraint::process) : std::mem_fn(&Constraint::process_resistance);
 
-    auto code = 0;
-    auto counter = 0u;
-    for(auto& I : constraint_pond.get()) {
-        if(!I->is_initialized()) continue;
-        code += std::invoke(process_handler, I, shared_from_this());
-        if(!I->get_resistance().empty()) constraint_resistance += I->get_resistance();
-        counter += I->get_multiplier_size();
-    }
+    std::atomic_int code = 0;
+    std::atomic_uint32_t counter = 0;
+    auto& t_constraint_pool = constraint_pond.get();
+    suanpan_for_each(t_constraint_pool.cbegin(), t_constraint_pool.cend(), [&](const shared_ptr<Constraint>& t_constraint) {
+        if(!t_constraint->is_initialized()) return;
+
+        code += std::invoke(process_handler, t_constraint, shared_from_this());
+        counter += t_constraint->get_multiplier_size();
+        if(!t_constraint->get_resistance().empty()) {
+            std::scoped_lock constraint_resistance_lock(factory->get_trial_constraint_resistance_mutex());
+            constraint_resistance += t_constraint->get_resistance();
+        }
+    });
 
     factory->set_mpc(counter);
 
@@ -1096,8 +1127,8 @@ int Domain::process_constraint(const bool full) {
     auto& t_load = get_auxiliary_load(factory);
     auto& t_stiffness = get_auxiliary_stiffness(factory);
 
-    counter = 0u;
-    for(auto& I : constraint_pond.get()) {
+    counter = 0;
+    for(auto& I : t_constraint_pool) {
         const auto m_size = I->get_multiplier_size();
         if(!I->is_initialized() || 0 == m_size) continue;
         const auto e_size = counter + m_size - 1;

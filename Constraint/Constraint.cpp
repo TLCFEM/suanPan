@@ -35,6 +35,12 @@ const sp_mat& Constraint::get_stiffness() const { return stiffness; }
 
 const vec& Constraint::get_auxiliary_load() const { return auxiliary_load; }
 
+/**
+ * \brief At the beginning of each sub-step, it is assumed that constraints are not active (constraining conditions are not satisfied).
+ * The `process(const shared_ptr<DomainBase>&)` checks the constraining conditions for each iteration, and activates the multiplier(s)
+ * if conditions are met. The activation will be valid for all subsequent iterations in the same sub-step to avoid numerical instability.
+ * \param S number of multipliers
+ */
 void Constraint::set_multiplier_size(const unsigned S) {
     num_size = S;
     stiffness.reset();

@@ -293,12 +293,30 @@ public:
     [[nodiscard]] virtual const shared_ptr<Integrator>& get_current_integrator() const = 0;
     [[nodiscard]] virtual const shared_ptr<Solver>& get_current_solver() const = 0;
 
+    /**
+     * \brief concurrently safe insertion method
+     */
     virtual void insert_loaded_dof(const uvec&) = 0;
+    /**
+     * \brief concurrently safe insertion method
+     */
     virtual void insert_restrained_dof(const uvec&) = 0;
+    /**
+     * \brief concurrently safe insertion method
+     */
     virtual void insert_constrained_dof(const uvec&) = 0;
 
+    /**
+     * \brief concurrently safe insertion method
+     */
     virtual void insert_loaded_dof(uword) = 0;
+    /**
+     * \brief concurrently safe insertion method
+     */
     virtual void insert_restrained_dof(uword) = 0;
+    /**
+     * \brief concurrently safe insertion method
+     */
     virtual void insert_constrained_dof(uword) = 0;
 
     [[nodiscard]] virtual const suanpan::unordered_set<uword>& get_loaded_dof() const = 0;
