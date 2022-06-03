@@ -380,10 +380,10 @@ public:
     const shared_ptr<MetaMat<T>>& get_stiffness() const;
     const shared_ptr<MetaMat<T>>& get_geometry() const;
 
-    std::mutex& get_auxiliary_encoding_mutex() const;
-    std::mutex& get_auxiliary_resistance_mutex() const;
-    std::mutex& get_auxiliary_load_mutex() const;
-    std::mutex& get_auxiliary_stiffness_mutex() const;
+    std::mutex& get_auxiliary_encoding_mutex();
+    std::mutex& get_auxiliary_resistance_mutex();
+    std::mutex& get_auxiliary_load_mutex();
+    std::mutex& get_auxiliary_stiffness_mutex();
 
     std::mutex& get_trial_constraint_resistance_mutex();
 
@@ -1062,13 +1062,13 @@ template<sp_d T> const shared_ptr<MetaMat<T>>& Factory<T>::get_stiffness() const
 
 template<sp_d T> const shared_ptr<MetaMat<T>>& Factory<T>::get_geometry() const { return global_geometry; }
 
-template<sp_d T> std::mutex& Factory<T>::get_auxiliary_encoding_mutex() const { return global_mutex.at(0); }
+template<sp_d T> std::mutex& Factory<T>::get_auxiliary_encoding_mutex() { return global_mutex.at(0); }
 
-template<sp_d T> std::mutex& Factory<T>::get_auxiliary_resistance_mutex() const { return global_mutex.at(1); }
+template<sp_d T> std::mutex& Factory<T>::get_auxiliary_resistance_mutex() { return global_mutex.at(1); }
 
-template<sp_d T> std::mutex& Factory<T>::get_auxiliary_load_mutex() const { return global_mutex.at(2); }
+template<sp_d T> std::mutex& Factory<T>::get_auxiliary_load_mutex() { return global_mutex.at(2); }
 
-template<sp_d T> std::mutex& Factory<T>::get_auxiliary_stiffness_mutex() const { return global_mutex.at(3); }
+template<sp_d T> std::mutex& Factory<T>::get_auxiliary_stiffness_mutex() { return global_mutex.at(3); }
 
 template<sp_d T> std::mutex& Factory<T>::get_trial_constraint_resistance_mutex() { return global_mutex.at(4); }
 
