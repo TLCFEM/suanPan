@@ -228,7 +228,7 @@ int FEAST::analyze() {
     D->assemble_trial_stiffness();
     if(quadratic) D->assemble_trial_damping();
 
-    if(SUANPAN_SUCCESS != G->process_load()) return SUANPAN_FAIL;
+    // if(SUANPAN_SUCCESS != G->process_load()) return SUANPAN_FAIL;
     if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
 
     return quadratic ? quadratic_solve(W) : linear_solve(W);
