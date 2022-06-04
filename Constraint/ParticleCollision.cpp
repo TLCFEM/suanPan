@@ -53,10 +53,12 @@ void ParticleCollision::apply_contact(const shared_ptr<DomainBase>& D, const sha
     diff_pos /= diff_norm;
 
     const auto force = compute_f(diff_norm);
-
-    for(auto I = 0llu; I < diff_pos.n_elem; ++I) {
-        resistance(dof_i(I)) += force * diff_pos(I);
-        resistance(dof_j(I)) -= force * diff_pos(I);
+    {
+        std::scoped_lock resistance_lock(resistance_mutex);
+        for(auto I = 0llu; I < diff_pos.n_elem; ++I) {
+            resistance(dof_i(I)) += force * diff_pos(I);
+            resistance(dof_j(I)) -= force * diff_pos(I);
+        }
     }
 
     if(!full) return;
