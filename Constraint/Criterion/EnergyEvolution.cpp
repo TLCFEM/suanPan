@@ -20,11 +20,11 @@
 #include <Element/Element.h>
 #include <Step/Step.h>
 
-EnergyEvolution::EnergyEvolution(const unsigned T, const unsigned ST, const unsigned IN, const unsigned FL, const double WT, const unsigned IT, const unsigned RR, const double PW, const double TL)
+EnergyEvolution::EnergyEvolution(const unsigned T, const unsigned ST, const unsigned IL, const unsigned FL, const double WT, const unsigned IT, const unsigned RR, const double PW, const double TL)
     : Criterion(T, ST)
     , iteration(IT)
     , reactive_ratio(RR)
-    , incre_level(IN)
+    , incre_level(IL)
     , final_level(FL)
     , weight(WT)
     , propagation_weight(PW)
