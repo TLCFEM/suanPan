@@ -36,7 +36,7 @@
 
 class Load : public ConditionalModifier {
 protected:
-    static const double multiplier;
+    static double multiplier;
 
     const bool mpdc_flag = false;
 

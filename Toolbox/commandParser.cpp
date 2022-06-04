@@ -922,17 +922,40 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
         return SUANPAN_SUCCESS;
     }
 
-    if(domain->get_current_step_tag() == 0) return SUANPAN_SUCCESS;
-
-    const auto& t_step = domain->get_current_step();
-
     if(is_equal(property_id, "color_model")) {
         if(string value; !get_input(command, value)) suanpan_error("set_property() need a valid value.\n");
         else if(is_equal("WP", value)) domain->set_color_model(ColorMethod::WP);
         else if(is_equal("MIS", value)) domain->set_color_model(ColorMethod::MIS);
         else domain->set_color_model(ColorMethod::OFF);
+
+        return SUANPAN_SUCCESS;
     }
-    else if(is_equal(property_id, "fixed_step_size")) {
+    if(is_equal(property_id, "constraint_multiplier")) {
+        double value;
+        get_input(command, value) ? set_constraint_multiplier(value) : suanpan_error("set_property() need a valid value.\n");
+
+        return SUANPAN_SUCCESS;
+    }
+    if(is_equal(property_id, "load_multiplier")) {
+        double value;
+        get_input(command, value) ? set_load_multiplier(value) : suanpan_error("set_property() need a valid value.\n");
+
+        return SUANPAN_SUCCESS;
+    }
+#ifdef SUANPAN_MKL
+    if(is_equal(property_id, "fgmres_tolerance")) {
+        double value;
+        get_input(command, value) ? set_fgmres_tolerance(value) : suanpan_error("set_property() need a valid value.\n");
+
+        return SUANPAN_SUCCESS;
+    }
+#endif
+
+    if(domain->get_current_step_tag() == 0) return SUANPAN_SUCCESS;
+
+    const auto& t_step = domain->get_current_step();
+
+    if(is_equal(property_id, "fixed_step_size")) {
         string value;
         get_input(command, value) ? t_step->set_fixed_step_size(is_true(value)) : suanpan_error("set_property() need a valid value.\n");
     }
@@ -1000,20 +1023,6 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
         }
         else suanpan_error("set_property() need a valid eigen number.\n");
     }
-    else if(is_equal(property_id, "constraint_multiplier")) {
-        double value;
-        get_input(command, value) ? set_constraint_multiplier(value) : suanpan_error("set_property() need a valid value.\n");
-    }
-    else if(is_equal(property_id, "load_multiplier")) {
-        double value;
-        get_input(command, value) ? set_load_multiplier(value) : suanpan_error("set_property() need a valid value.\n");
-    }
-#ifdef SUANPAN_MKL
-    else if(is_equal(property_id, "fgmres_tolerance")) {
-        double value;
-        get_input(command, value) ? set_fgmres_tolerance(value) : suanpan_error("set_property() need a valid value.\n");
-    }
-#endif
 
     return SUANPAN_SUCCESS;
 }

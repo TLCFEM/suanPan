@@ -17,7 +17,7 @@
 
 #include "Constraint.h"
 
-constexpr double Constraint::multiplier = 1E8;
+double Constraint::multiplier = 1E8;
 
 Constraint::Constraint(const unsigned T, const unsigned ST, const unsigned AT, uvec&& N, uvec&& D, const unsigned S)
     : ConditionalModifier(T, ST, AT, std::forward<uvec>(N), std::forward<uvec>(D))
@@ -49,4 +49,4 @@ void Constraint::set_multiplier_size(const unsigned S) {
 
 unsigned Constraint::get_multiplier_size() const { return num_size; }
 
-void set_constraint_multiplier(const double M) { access::rw(Constraint::multiplier) = M; }
+void set_constraint_multiplier(const double M) { Constraint::multiplier = M; }

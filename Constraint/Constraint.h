@@ -35,7 +35,7 @@
 
 class Constraint : public ConditionalModifier {
 protected:
-    static const double multiplier;
+    static double multiplier;
 
     unsigned num_size; // size of multiplier
 
