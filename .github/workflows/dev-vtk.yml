@@ -21,7 +21,7 @@ jobs:
           go build Checker/updater.go
           sudo apt-get update && sudo apt-get install mesa-common-dev mesa-utils freeglut3-dev libglvnd-dev dpkg-dev xz-utils
           cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.1/ -DCMAKE_INSTALL_PREFIX=suanPan-linux-openblas-vtk .
-          make install -j4
+          make install -j"$(nproc)"
           make package
       - name: Test
         run: |
@@ -59,7 +59,7 @@ jobs:
       - name: Compile
         run: |
           cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.1/ -DUSE_MKL=ON -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DUSE_INTEL_OPENMP=OFF -DLINK_DYNAMIC_MKL=OFF .
-          make package -j4
+          make package -j"$(nproc)"
       - name: Test
         run: |
           dnf install ./suanPan-2.4.0-1.x86_64.rpm -y

@@ -368,6 +368,7 @@ public:
     int update_incre_status() const override;
     int update_trial_status() const override;
 
+    void stage_status() override;
     void commit_status() const override;
     void clear_status() override;
     void reset_status() const override;

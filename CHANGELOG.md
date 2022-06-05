@@ -7,6 +7,8 @@
 
 ## version 2.4
 
+1. add `RestitutionWall` constraint
+
 ## version 2.3
 
 1. update `Armadillo` to version 11.0

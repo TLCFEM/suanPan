@@ -1366,6 +1366,9 @@
     <ClCompile Include="..\..\..\Domain\Group\NodeGroup.cpp">
       <Filter>Domain\Group</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\RestitutionWallPenalty.cpp">
+      <Filter>Constraint</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2586,6 +2589,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Domain\Group\NodeGroup.h">
       <Filter>Domain\Group</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\RestitutionWallPenalty.h">
+      <Filter>Constraint</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

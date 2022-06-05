@@ -23,7 +23,7 @@ jobs:
           go build Checker/updater.go
           sudo apt-get update && sudo apt-get install mesa-common-dev mesa-utils freeglut3-dev libglvnd-dev
           cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.1/ -DCMAKE_INSTALL_PREFIX=suanPan-linux-openblas-vtk .
-          make install -j4
+          make install -j"$(nproc)"
       - name: Pack
         run: |
           cp updater suanPan-linux-openblas-vtk/bin

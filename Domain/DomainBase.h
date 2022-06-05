@@ -383,6 +383,7 @@ public:
     [[nodiscard]] virtual int update_incre_status() const = 0;
     [[nodiscard]] virtual int update_trial_status() const = 0;
 
+    virtual void stage_status() = 0;
     virtual void commit_status() const = 0;
     virtual void clear_status() = 0;
     virtual void reset_status() const = 0;

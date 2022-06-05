@@ -229,6 +229,13 @@ int Integrator::solve(mat& X, sp_mat&& B) { return database.lock()->get_factory(
  */
 void Integrator::erase_machine_error() const { database.lock()->erase_machine_error(); }
 
+void Integrator::stage_and_commit_status() {
+    stage_status();
+    commit_status();
+}
+
+void Integrator::stage_status() { database.lock()->stage_status(); }
+
 void Integrator::commit_status() {
     database.lock()->commit_status();
     update_compatibility();

@@ -347,6 +347,12 @@ int Domain::update_current_status() const {
     return SUANPAN_SUCCESS;
 }
 
+void Domain::stage_status() {
+    auto& t_constraint_pool = constraint_pond.get();
+
+    suanpan_for_each(t_constraint_pool.cbegin(), t_constraint_pool.cend(), [&](const shared_ptr<Constraint>& t_constraint) { t_constraint->stage(shared_from_this()); });
+}
+
 void Domain::commit_status() const {
     factory->commit_status();
 

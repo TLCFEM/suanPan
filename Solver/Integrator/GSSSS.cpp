@@ -129,7 +129,7 @@ int GSSSS::update_trial_status() {
     return D->update_trial_status();
 }
 
-void GSSSS::commit_status() {
+void GSSSS::stage_status() {
     const auto& D = get_domain().lock();
     auto& W = D->get_factory();
 
@@ -141,7 +141,7 @@ void GSSSS::commit_status() {
     // need to sync with elements and nodes
     [[maybe_unused]] const auto code = D->update_trial_status();
 
-    Integrator::commit_status();
+    Integrator::stage_status();
 }
 
 void GSSSS::update_parameter(const double NT) {
