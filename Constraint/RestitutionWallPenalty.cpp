@@ -41,7 +41,7 @@ int RestitutionWallPenalty::process(const shared_ptr<DomainBase>& D) {
         const auto t_size = std::min(outer_norm.n_elem, std::min(t_coor.n_elem, t_disp.n_elem));
         vec t_pos = -origin;
         for(auto J = 0llu; J < t_size; ++J) t_pos(J) += t_coor(J) + t_disp(J);
-        if(!edge_a.empty() && dot(t_pos, edge_a) > length_a || !edge_b.empty() && dot(t_pos, edge_b) > length_b || dot(t_pos, outer_norm) > datum::eps) return;
+        if(!edge_a.empty() && dot(t_pos, edge_a) > length_a || !edge_b.empty() && dot(t_pos, edge_b) > length_b || dot(t_pos, outer_norm) > -datum::eps) return;
         node_pool.insert(t_node);
     });
 
