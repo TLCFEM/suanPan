@@ -73,6 +73,8 @@ class Domain final : public DomainBase, public std::enable_shared_from_this<Doma
     suanpan::unordered_set<uword> loaded_dofs;      /**< data storage */
     suanpan::unordered_set<uword> restrained_dofs;  /**< data storage */
 
+    suanpan::unordered_set<unsigned> nodes_to_reset_acceleration; /**< data storage */
+
     vector<vector<unsigned>> color_map;
 
 public:
@@ -299,6 +301,8 @@ public:
     const suanpan::unordered_set<uword>& get_loaded_dof() const override;
     const suanpan::unordered_set<uword>& get_restrained_dof() const override;
     const suanpan::unordered_set<uword>& get_constrained_dof() const override;
+
+    void register_node_to_reset_acceleration(unsigned) override;
 
     bool is_updated() const override;
     bool is_sparse() const override;

@@ -348,6 +348,15 @@ int Domain::update_current_status() const {
 }
 
 void Domain::commit_status() const {
+    auto& trial_acceleration = get_trial_acceleration(factory);
+    for(const auto I : nodes_to_reset_acceleration) {
+        auto& t_node = get_node(I);
+        if(!t_node) continue;
+        trial_acceleration(t_node->get_reordered_dof()) = t_node->get_current_acceleration();
+        t_node->update_trial_acceleration(t_node->get_current_acceleration());
+    }
+    access::rw(nodes_to_reset_acceleration).clear();
+
     factory->commit_status();
 
     auto& t_node_pool = node_pond.get();

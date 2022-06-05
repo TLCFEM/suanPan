@@ -15,33 +15,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class RigidWallPenalty
- * @brief A RigidWall class.
+ * @class RestitutionWallPenalty
+ * @brief A RestitutionWallPenalty class.
  *
  * @author tlc
- * @date 15/07/2020
+ * @date 04/06/2022
  * @version 0.1.0
- * @file RigidWallPenalty.h
+ * @file RestitutionWallPenalty.h
  * @addtogroup Constraint
  * @{
  */
 
-#ifndef RIGIDWALLPENALTY_H
-#define RIGIDWALLPENALTY_H
+#ifndef RESTITUTIONWALLPENALTY_H
+#define RESTITUTIONWALLPENALTY_H
 
-#include "Constraint.h"
+#include "RigidWallPenalty.h"
+#include "Toolbox/container.h"
 
-class RigidWallPenalty : public Constraint {
-protected:
-    const double alpha;
+class Node;
 
-    const vec edge_a, edge_b;
-    const vec origin, outer_norm;
-    const double length_a = 0., length_b = 0.;
+class RestitutionWallPenalty final : public RigidWallPenalty {
+    suanpan::set<shared_ptr<Node>> node_pool;
+
+    const double restitution_coefficient = 1.;
 
 public:
-    RigidWallPenalty(unsigned, unsigned, unsigned, vec&&, vec&&, double);
-    RigidWallPenalty(unsigned, unsigned, unsigned, vec&&, vec&&, vec&&, double);
+    RestitutionWallPenalty(unsigned, unsigned, unsigned, vec&&, vec&&, double, double);
+    RestitutionWallPenalty(unsigned, unsigned, unsigned, vec&&, vec&&, vec&&, double, double);
 
     int process(const shared_ptr<DomainBase>&) override;
 

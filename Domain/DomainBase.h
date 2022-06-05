@@ -323,6 +323,8 @@ public:
     [[nodiscard]] virtual const suanpan::unordered_set<uword>& get_restrained_dof() const = 0;
     [[nodiscard]] virtual const suanpan::unordered_set<uword>& get_constrained_dof() const = 0;
 
+    virtual void register_node_to_reset_acceleration(unsigned) = 0;
+
     [[nodiscard]] virtual bool is_updated() const = 0;
     [[nodiscard]] virtual bool is_sparse() const = 0;
 
