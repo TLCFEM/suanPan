@@ -1061,6 +1061,8 @@
     "finiterigidwall",
     "finiterigidwallmultiplier",
     "finiterigidwallpenalty",
+    "finiterestitutionwall",
+    "finiterestitutionwallpenalty",
     "fix",
     "fix2",
     "fixed_step_size",
