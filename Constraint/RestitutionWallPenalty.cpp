@@ -17,7 +17,7 @@
 
 #include "RestitutionWallPenalty.h"
 #include <Domain/DomainBase.h>
-#include <Domain/Factory.hpp>
+#include <Domain/FactoryHelper.hpp>
 #include <Domain/Node.h>
 #include <Solver/Integrator/Integrator.h>
 #include <Step/Step.h>
@@ -43,7 +43,6 @@ int RestitutionWallPenalty::process(const shared_ptr<DomainBase>& D) {
         for(auto J = 0llu; J < t_size; ++J) t_pos(J) += t_coor(J) + t_disp(J);
         if(!edge_a.empty() && dot(t_pos, edge_a) > length_a || !edge_b.empty() && dot(t_pos, edge_b) > length_b || dot(t_pos, outer_norm) > datum::eps) return;
         node_pool.insert(t_node);
-        D->register_node_to_reset_acceleration(t_node->get_tag());
     });
 
     if(node_pool.empty()) return SUANPAN_SUCCESS;
@@ -57,21 +56,42 @@ int RestitutionWallPenalty::process(const shared_ptr<DomainBase>& D) {
     pool.reserve(3llu * node_pool.size());
 
     resistance.zeros(W->get_size());
+    auto counter = 0llu;
     for(const auto& I : node_pool) {
         auto& t_dof = I->get_reordered_dof();
-        auto& t_vel = I->get_current_velocity();
+        auto& t_vel = I->get_trial_velocity();
         const auto t_size = t_vel.n_elem;
-        const vec diff_vel = (-1. - restitution_coefficient) * dot(t_vel, outer_norm.head(t_size)) * outer_norm.head(t_size);
-        const vec diff_disp = I->get_trial_displacement() - G->from_incre_velocity(diff_vel, t_dof);
+        const vec norm = outer_norm.head(t_size);
+        const vec target_vel = t_vel - dot(t_vel + restitution_coefficient * I->get_current_velocity(), norm) * norm;
+        const vec diff_disp = I->get_trial_displacement() - G->from_total_velocity(target_vel, t_dof);
+        const auto next_counter = counter + t_size;
+        stiffness.resize(next_counter, next_counter);
+        stiffness.submat(counter, counter, size(t_size, t_size)) = factor * norm * norm.t();
         for(auto J = 0llu; J < t_size; ++J) {
             pool.emplace_back(t_dof(J));
             resistance(t_dof(J)) += factor * diff_disp(J);
         }
+        counter = next_counter;
     }
 
     dof_encoding = pool;
 
-    stiffness = speye(dof_encoding.n_elem, dof_encoding.n_elem) * factor;
+    return SUANPAN_SUCCESS;
+}
+
+int RestitutionWallPenalty::stage(const shared_ptr<DomainBase>& D) {
+    auto& W = D->get_factory();
+
+    auto trial_acceleration = get_trial_acceleration(W);
+    for(const auto& I : node_pool) {
+        auto& t_acceleration = I->get_trial_acceleration();
+        const vec norm = outer_norm.head(t_acceleration.n_elem);
+        const vec corrected_acceleration = t_acceleration - dot(I->get_incre_acceleration(), norm) * norm;
+        I->update_trial_acceleration(corrected_acceleration);
+        trial_acceleration(I->get_reordered_dof()) = corrected_acceleration;
+    }
+
+    W->update_trial_acceleration(trial_acceleration);
 
     return SUANPAN_SUCCESS;
 }

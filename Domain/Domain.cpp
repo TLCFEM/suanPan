@@ -712,8 +712,6 @@ const suanpan::unordered_set<uword>& Domain::get_restrained_dof() const { return
 
 const suanpan::unordered_set<uword>& Domain::get_constrained_dof() const { return constrained_dofs; }
 
-void Domain::register_node_to_reset_acceleration(const unsigned T) { nodes_to_reset_acceleration.insert(T); }
-
 bool Domain::is_updated() const { return updated.load(); }
 
 bool Domain::is_sparse() const { return factory->is_sparse(); }

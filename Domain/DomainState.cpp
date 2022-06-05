@@ -348,14 +348,9 @@ int Domain::update_current_status() const {
 }
 
 void Domain::stage_status() {
-    auto& trial_acceleration = get_trial_acceleration(factory);
-    for(const auto I : nodes_to_reset_acceleration) {
-        auto& t_node = get_node(I);
-        if(!t_node) continue;
-        trial_acceleration(t_node->get_reordered_dof()) = t_node->get_current_acceleration();
-        t_node->update_trial_acceleration(t_node->get_current_acceleration());
-    }
-    nodes_to_reset_acceleration.clear();
+    auto& t_constraint_pool = constraint_pond.get();
+
+    suanpan_for_each(t_constraint_pool.cbegin(), t_constraint_pool.cend(), [&](const shared_ptr<Constraint>& t_constraint) { t_constraint->stage(shared_from_this()); });
 }
 
 void Domain::commit_status() const {
