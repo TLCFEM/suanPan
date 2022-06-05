@@ -290,7 +290,7 @@ void new_rigidwall(unique_ptr<Constraint>& return_obj, istringstream& command, c
     return_obj = finite ? penalty ? make_unique<RigidWallPenalty>(tag, 0, 0, std::move(origin), std::move(norm), std::move(edge), alpha) : make_unique<RigidWallMultiplier>(tag, 0, 0, std::move(origin), std::move(norm), std::move(edge), alpha) : penalty ? make_unique<RigidWallPenalty>(tag, 0, 0, std::move(origin), std::move(norm), alpha) : make_unique<RigidWallMultiplier>(tag, 0, 0, std::move(origin), std::move(norm), alpha);
 }
 
-void new_restitutionwall(unique_ptr<Constraint>& return_obj, istringstream& command, const bool finite, const bool penalty) {
+void new_restitutionwall(unique_ptr<Constraint>& return_obj, istringstream& command, const bool finite) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("new_restitutionwall() needs a valid tag.\n");
@@ -463,7 +463,8 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, istringstream& c
     else if(is_equal(constraint_id, "RigidWall") || is_equal(constraint_id, "RigidWallPenalty")) new_rigidwall(new_constraint, command, false, true);
     else if(is_equal(constraint_id, "FiniteRigidWallMultiplier")) new_rigidwall(new_constraint, command, true, false);
     else if(is_equal(constraint_id, "FiniteRigidWall") || is_equal(constraint_id, "FiniteRigidWallPenalty")) new_rigidwall(new_constraint, command, true, true);
-    else if(is_equal(constraint_id, "RestitutionWall") || is_equal(constraint_id, "RestitutionWallPenalty")) new_restitutionwall(new_constraint, command, false, true);
+    else if(is_equal(constraint_id, "RestitutionWall") || is_equal(constraint_id, "RestitutionWallPenalty")) new_restitutionwall(new_constraint, command, false);
+    else if(is_equal(constraint_id, "FiniteRestitutionWall") || is_equal(constraint_id, "FiniteRestitutionWallPenalty")) new_restitutionwall(new_constraint, command, false);
     else if(is_equal(constraint_id, "Fix") || is_equal(constraint_id, "PenaltyBC")) new_bc(new_constraint, command, true, false);
     else if(is_equal(constraint_id, "GroupPenaltyBC")) new_bc(new_constraint, command, true, true);
     else if(is_equal(constraint_id, "Fix2") || is_equal(constraint_id, "MultiplierBC")) new_bc(new_constraint, command, false, false);
