@@ -121,6 +121,7 @@
     <ClCompile Include="..\..\..\Constraint\ParticleCollision.cpp" />
     <ClCompile Include="..\..\..\Constraint\ParticleCollision2D.cpp" />
     <ClCompile Include="..\..\..\Constraint\ParticleCollision3D.cpp" />
+    <ClCompile Include="..\..\..\Constraint\RestitutionWallPenalty.cpp" />
     <ClCompile Include="..\..\..\Constraint\RigidWallMultiplier.cpp" />
     <ClCompile Include="..\..\..\Constraint\RigidWallPenalty.cpp" />
     <ClCompile Include="..\..\..\Converger\AbsDisp.cpp" />
@@ -511,6 +512,7 @@
     <ClInclude Include="..\..\..\Constraint\ParticleCollision.h" />
     <ClInclude Include="..\..\..\Constraint\ParticleCollision2D.h" />
     <ClInclude Include="..\..\..\Constraint\ParticleCollision3D.h" />
+    <ClInclude Include="..\..\..\Constraint\RestitutionWallPenalty.h" />
     <ClInclude Include="..\..\..\Constraint\RigidWallMultiplier.h" />
     <ClInclude Include="..\..\..\Constraint\RigidWallPenalty.h" />
     <ClInclude Include="..\..\..\Converger\AbsDisp.h" />

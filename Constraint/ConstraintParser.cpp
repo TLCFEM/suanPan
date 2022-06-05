@@ -287,8 +287,7 @@ void new_rigidwall(unique_ptr<Constraint>& return_obj, istringstream& command, c
         return;
     }
 
-    return_obj = finite ? penalty ? make_unique<RigidWallPenalty>(tag, 0, 0, std::move(origin), std::move(norm), std::move(edge), alpha) : make_unique<RigidWallMultiplier>(tag, 0, 0, std::move(origin), std::move(norm), std::move(edge), alpha) : penalty ? make_unique<RigidWallPenalty>(tag, 0, 0, std::move(origin), std::move(norm), alpha)
-                                                                                                                                                                                                                                                             : make_unique<RigidWallMultiplier>(tag, 0, 0, std::move(origin), std::move(norm), alpha);
+    return_obj = finite ? penalty ? make_unique<RigidWallPenalty>(tag, 0, 0, std::move(origin), std::move(norm), std::move(edge), alpha) : make_unique<RigidWallMultiplier>(tag, 0, 0, std::move(origin), std::move(norm), std::move(edge), alpha) : penalty ? make_unique<RigidWallPenalty>(tag, 0, 0, std::move(origin), std::move(norm), alpha) : make_unique<RigidWallMultiplier>(tag, 0, 0, std::move(origin), std::move(norm), alpha);
 }
 
 void new_restitutionwall(unique_ptr<Constraint>& return_obj, istringstream& command, const bool finite, const bool penalty) {
@@ -299,14 +298,10 @@ void new_restitutionwall(unique_ptr<Constraint>& return_obj, istringstream& comm
     }
 
     vec origin(3), norm(3), edge(3);
-    for(auto& I : origin)
-        if(!get_input(command, I)) return;
-    for(auto& I : norm)
-        if(!get_input(command, I)) return;
+    for(auto& I : origin) if(!get_input(command, I)) return;
+    for(auto& I : norm) if(!get_input(command, I)) return;
 
-    if(finite)
-        for(auto& I : edge)
-            if(!get_input(command, I)) return;
+    if(finite) for(auto& I : edge) if(!get_input(command, I)) return;
 
     auto restitution = 1.;
     if(!command.eof() && !get_input(command, restitution)) {
@@ -467,20 +462,13 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, istringstream& c
     else if(is_equal(constraint_id, "RigidWallMultiplier")) new_rigidwall(new_constraint, command, false, false);
     else if(is_equal(constraint_id, "RigidWall") || is_equal(constraint_id, "RigidWallPenalty")) new_rigidwall(new_constraint, command, false, true);
     else if(is_equal(constraint_id, "FiniteRigidWallMultiplier")) new_rigidwall(new_constraint, command, true, false);
-    else if(is_equal(constraint_id, "FiniteRigidWall") || is_equal(constraint_id, "FiniteRigidWallPenalty"))
-        new_rigidwall(new_constraint, command, true, true);
-    else if(is_equal(constraint_id, "RestitutionWallPenalty"))
-        new_restitutionwall(new_constraint, command, false, true);
-    else if(is_equal(constraint_id, "Fix") || is_equal(constraint_id, "PenaltyBC"))
-        new_bc(new_constraint, command, true, false);
-    else if(is_equal(constraint_id, "GroupPenaltyBC"))
-        new_bc(new_constraint, command, true, true);
-    else if(is_equal(constraint_id, "Fix2") || is_equal(constraint_id, "MultiplierBC"))
-        new_bc(new_constraint, command, false, false);
-    else if(is_equal(constraint_id, "GroupMultiplierBC"))
-        new_bc(new_constraint, command, false, true);
-    else
-        load::object(new_constraint, domain, constraint_id, command);
+    else if(is_equal(constraint_id, "FiniteRigidWall") || is_equal(constraint_id, "FiniteRigidWallPenalty")) new_rigidwall(new_constraint, command, true, true);
+    else if(is_equal(constraint_id, "RestitutionWall") || is_equal(constraint_id, "RestitutionWallPenalty")) new_restitutionwall(new_constraint, command, false, true);
+    else if(is_equal(constraint_id, "Fix") || is_equal(constraint_id, "PenaltyBC")) new_bc(new_constraint, command, true, false);
+    else if(is_equal(constraint_id, "GroupPenaltyBC")) new_bc(new_constraint, command, true, true);
+    else if(is_equal(constraint_id, "Fix2") || is_equal(constraint_id, "MultiplierBC")) new_bc(new_constraint, command, false, false);
+    else if(is_equal(constraint_id, "GroupMultiplierBC")) new_bc(new_constraint, command, false, true);
+    else load::object(new_constraint, domain, constraint_id, command);
 
     if(new_constraint != nullptr) new_constraint->set_start_step(domain->get_current_step_tag());
 

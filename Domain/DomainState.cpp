@@ -347,7 +347,7 @@ int Domain::update_current_status() const {
     return SUANPAN_SUCCESS;
 }
 
-void Domain::commit_status() const {
+void Domain::stage_status() {
     auto& trial_acceleration = get_trial_acceleration(factory);
     for(const auto I : nodes_to_reset_acceleration) {
         auto& t_node = get_node(I);
@@ -355,8 +355,10 @@ void Domain::commit_status() const {
         trial_acceleration(t_node->get_reordered_dof()) = t_node->get_current_acceleration();
         t_node->update_trial_acceleration(t_node->get_current_acceleration());
     }
-    access::rw(nodes_to_reset_acceleration).clear();
+    nodes_to_reset_acceleration.clear();
+}
 
+void Domain::commit_status() const {
     factory->commit_status();
 
     auto& t_node_pool = node_pond.get();

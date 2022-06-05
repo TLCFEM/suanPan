@@ -175,6 +175,7 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     if(is_equal(command_id, "finiterigidwallmultiplier")) return constraint_handler();
     if(is_equal(command_id, "rigidwall") || is_equal(command_id, "rigidwallpenalty")) return constraint_handler();
     if(is_equal(command_id, "rigidwallmultiplier")) return constraint_handler();
+    if(is_equal(command_id, "restitutionwall") || is_equal(command_id, "restitutionwallpenalty")) return constraint_handler();
     if(is_equal(command_id, "mpc")) return constraint_handler();
 
     if(is_equal(command_id, "materialtest1d")) return test_material1d(domain, command);

@@ -78,7 +78,7 @@ int ArcLength::analyze() {
             return SUANPAN_FAIL;
         }
         if(auto code = S->analyze(); code == SUANPAN_SUCCESS) {
-            G->commit_status();
+            G->stage_and_commit_status();
             G->record();
             // if exit is returned, the analysis shall be terminated
             code = G->process_criterion();

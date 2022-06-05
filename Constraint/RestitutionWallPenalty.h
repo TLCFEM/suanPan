@@ -37,7 +37,7 @@ class Node;
 class RestitutionWallPenalty final : public RigidWallPenalty {
     suanpan::set<shared_ptr<Node>> node_pool;
 
-    const double restitution_coefficient = 1.;
+    const double restitution_coefficient;
 
 public:
     RestitutionWallPenalty(unsigned, unsigned, unsigned, vec&&, vec&&, double, double);

@@ -22,13 +22,13 @@
 #include <Solver/Integrator/Integrator.h>
 #include <Step/Step.h>
 
-
 RestitutionWallPenalty::RestitutionWallPenalty(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& N, const double RC, const double F)
-    : RigidWallPenalty(T, S, A, std::forward<vec>(O), std::forward<vec>(N), F), restitution_coefficient(std::max(0.,std::min(1.,RC))) {}
+    : RigidWallPenalty(T, S, A, std::forward<vec>(O), std::forward<vec>(N), F)
+    , restitution_coefficient(std::max(0., std::min(1., RC))) {}
 
-
-RestitutionWallPenalty::RestitutionWallPenalty(const unsigned T, const unsigned S, const unsigned A, vec&& O,  vec&& E1, vec&& E2, const double RC, const double F)
-    : RigidWallPenalty(T, S, A, std::forward<vec>(O), std::forward<vec>(E1),std::forward<vec>(E2), F), restitution_coefficient(std::max(0.,std::min(1.,RC))) {}
+RestitutionWallPenalty::RestitutionWallPenalty(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double RC, const double F)
+    : RigidWallPenalty(T, S, A, std::forward<vec>(O), std::forward<vec>(E1), std::forward<vec>(E2), F)
+    , restitution_coefficient(std::max(0., std::min(1., RC))) {}
 
 int RestitutionWallPenalty::process(const shared_ptr<DomainBase>& D) {
     resistance.reset();
@@ -76,14 +76,8 @@ int RestitutionWallPenalty::process(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-void RestitutionWallPenalty::commit_status() {
-    node_pool.clear();
-}
+void RestitutionWallPenalty::commit_status() { node_pool.clear(); }
 
-void RestitutionWallPenalty::clear_status() {
-    node_pool.clear();
-}
+void RestitutionWallPenalty::clear_status() { node_pool.clear(); }
 
-void RestitutionWallPenalty::reset_status() {
-    node_pool.clear();
-}
+void RestitutionWallPenalty::reset_status() { node_pool.clear(); }
