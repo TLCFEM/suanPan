@@ -41,7 +41,7 @@ int RestitutionWallPenalty::process(const shared_ptr<DomainBase>& D) {
         const auto t_size = std::min(outer_norm.n_elem, std::min(t_coor.n_elem, t_disp.n_elem));
         vec t_pos = -origin;
         for(auto J = 0llu; J < t_size; ++J) t_pos(J) += t_coor(J) + t_disp(J);
-        if(!edge_a.empty() && dot(t_pos, edge_a) > length_a || !edge_b.empty() && dot(t_pos, edge_b) > length_b || dot(t_pos, outer_norm) > -datum::eps) return;
+        if(!edge_a.empty() && dot(t_pos, edge_a) > length_a || !edge_b.empty() && dot(t_pos, edge_b) > length_b || dot(t_pos, outer_norm) > 0.) return;
         node_pool.insert(t_node);
     });
 
@@ -59,10 +59,12 @@ int RestitutionWallPenalty::process(const shared_ptr<DomainBase>& D) {
     auto counter = 0llu;
     for(const auto& I : node_pool) {
         auto& t_dof = I->get_reordered_dof();
-        auto& t_vel = I->get_trial_velocity();
-        const auto t_size = t_vel.n_elem;
+        const auto t_size = t_dof.n_elem;
         const vec norm = outer_norm.head(t_size);
-        const vec target_vel = t_vel - dot(t_vel + restitution_coefficient * I->get_current_velocity(), norm) * norm;
+        auto& t_vel = I->get_trial_velocity();
+        auto& c_vel = I->get_current_velocity();
+        if(dot(c_vel, norm) > 0.) continue;
+        const vec target_vel = t_vel - dot(t_vel + restitution_coefficient * c_vel, norm) * norm;
         const vec diff_disp = I->get_trial_displacement() - G->from_total_velocity(target_vel, t_dof);
         const auto next_counter = counter + t_size;
         stiffness.resize(next_counter, next_counter);
