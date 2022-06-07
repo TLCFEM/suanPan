@@ -30,7 +30,7 @@ RestitutionWallPenalty::RestitutionWallPenalty(const unsigned T, const unsigned 
     , restitution_coefficient(std::max(0., std::min(1., RC))) {}
 
 int RestitutionWallPenalty::initialize(const shared_ptr<DomainBase>& D) {
-    if(AnalysisType::DYNAMICS == D->get_factory()->get_analysis_type()) {
+    if(AnalysisType::DYNAMICS != D->get_factory()->get_analysis_type()) {
         suanpan_error("restitution rigid wall constraint can only be applied in dynamic analysis.\n");
         return SUANPAN_FAIL;
     }
