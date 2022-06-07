@@ -42,6 +42,8 @@ public:
     RestitutionWallPenalty(unsigned, unsigned, unsigned, vec&&, vec&&, double, double, unsigned);
     RestitutionWallPenalty(unsigned, unsigned, unsigned, vec&&, vec&&, vec&&, double, double, unsigned);
 
+    int initialize(const shared_ptr<DomainBase>&) override;
+
     int process(const shared_ptr<DomainBase>&) override;
 
     int stage(const shared_ptr<DomainBase>&) override;

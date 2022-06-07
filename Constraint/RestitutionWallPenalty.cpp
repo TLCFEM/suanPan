@@ -29,6 +29,15 @@ RestitutionWallPenalty::RestitutionWallPenalty(const unsigned T, const unsigned 
     : RigidWallPenalty(T, S, A, std::forward<vec>(O), std::forward<vec>(E1), std::forward<vec>(E2), F, NS)
     , restitution_coefficient(std::max(0., std::min(1., RC))) {}
 
+int RestitutionWallPenalty::initialize(const shared_ptr<DomainBase>& D) {
+    if(AnalysisType::DYNAMICS == D->get_factory()->get_analysis_type()) {
+        suanpan_error("restitution rigid wall constraint can only be applied in dynamic analysis.\n");
+        return SUANPAN_FAIL;
+    }
+
+    return RigidWallPenalty::initialize(D);
+}
+
 int RestitutionWallPenalty::process(const shared_ptr<DomainBase>& D) {
     resistance.reset();
     stiffness.reset();
