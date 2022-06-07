@@ -18,16 +18,12 @@
 #include "ParticleCollision.h"
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
+#include <Domain/NodeHelper.hpp>
 
 vec ParticleCollision::get_position(const shared_ptr<Node>& node) const {
-    vec pos(num_dof, fill::zeros);
+    if(2 == num_dof) return get_trial_position<DOF::U1, DOF::U2>(node);
 
-    auto& coor = node->get_coordinate();
-    auto& t_disp = node->get_trial_displacement();
-
-    for(auto K = 0llu; K < std::min(static_cast<uword>(num_dof), std::min(coor.n_elem, t_disp.n_elem)); ++K) pos(K) = coor(K) + t_disp(K);
-
-    return pos;
+    return get_trial_position<DOF::U1, DOF::U2, DOF::U3>(node);
 }
 
 ParticleCollision::ParticleCollision(const unsigned T, const unsigned S, const unsigned D)

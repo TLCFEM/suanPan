@@ -29,7 +29,7 @@
 #ifndef EMBED2D_H
 #define EMBED2D_H
 
-#include <Constraint/Constraint.h>
+#include "Constraint.h"
 
 class Embed : public Constraint {
     static constexpr unsigned max_iteration = 20;

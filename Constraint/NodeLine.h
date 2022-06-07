@@ -31,7 +31,7 @@
 #ifndef NODELINE_H
 #define NODELINE_H
 
-#include <Constraint/Constraint.h>
+#include "Constraint.h"
 
 class NodeLine final : public Constraint {
     static const mat rotation;

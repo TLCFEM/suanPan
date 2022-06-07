@@ -18,6 +18,7 @@
 #include "ParticleCollision2D.h"
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
+#include <Domain/Node.h>
 
 double ParticleCollision2D::compute_f(const double distance) const { return distance >= space ? 0. : -alpha * log(distance / space); }
 
@@ -55,16 +56,6 @@ int ParticleCollision2D::process_meta(const shared_ptr<DomainBase>& D, const boo
             apply_contact(D, D->get<Node>(list[I].tag), D->get<Node>(list[J].tag), full);
         }
     });
-
-    //for(auto I = list.cbegin(); I != list.cend(); ++I)
-    //    for(auto J = I + 1; J != list.cend(); ++J) {
-    //        const auto diff_x = J->x - I->x;
-    //        if(diff_x > 1) break;
-    //        const auto diff_y = J->y - I->y;
-    //        if(diff_x == 1 && diff_y > 1) break;
-    //        if(abs(diff_y) > 1) continue;
-    //        apply_contact(D, D->get<Node>(I->tag), D->get<Node>(J->tag), full);
-    //    }
 
     return SUANPAN_SUCCESS;
 }
