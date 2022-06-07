@@ -2593,6 +2593,9 @@
     <ClInclude Include="..\..\..\Constraint\RestitutionWallPenalty.h">
       <Filter>Constraint</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Domain\NodeHelper.hpp">
+      <Filter>Domain</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\..\Resource\suanPan.rc" />

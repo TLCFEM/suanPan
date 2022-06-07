@@ -18,16 +18,16 @@
 #include "RestitutionWallPenalty.h"
 #include <Domain/DomainBase.h>
 #include <Domain/FactoryHelper.hpp>
-#include <Domain/Node.h>
+#include <Domain/NodeHelper.hpp>
 #include <Solver/Integrator/Integrator.h>
 #include <Step/Step.h>
 
-RestitutionWallPenalty::RestitutionWallPenalty(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& N, const double RC, const double F)
-    : RigidWallPenalty(T, S, A, std::forward<vec>(O), std::forward<vec>(N), F)
+RestitutionWallPenalty::RestitutionWallPenalty(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& N, const double RC, const double F, const unsigned NS)
+    : RigidWallPenalty(T, S, A, std::forward<vec>(O), std::forward<vec>(N), F, NS)
     , restitution_coefficient(std::max(0., std::min(1., RC))) {}
 
-RestitutionWallPenalty::RestitutionWallPenalty(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double RC, const double F)
-    : RigidWallPenalty(T, S, A, std::forward<vec>(O), std::forward<vec>(E1), std::forward<vec>(E2), F)
+RestitutionWallPenalty::RestitutionWallPenalty(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double RC, const double F, const unsigned NS)
+    : RigidWallPenalty(T, S, A, std::forward<vec>(O), std::forward<vec>(E1), std::forward<vec>(E2), F, NS)
     , restitution_coefficient(std::max(0., std::min(1., RC))) {}
 
 int RestitutionWallPenalty::process(const shared_ptr<DomainBase>& D) {
@@ -36,12 +36,11 @@ int RestitutionWallPenalty::process(const shared_ptr<DomainBase>& D) {
 
     const auto& t_node_pool = D->get_node_pool();
     suanpan_for_each(t_node_pool.cbegin(), t_node_pool.cend(), [&](const shared_ptr<Node>& t_node) {
-        auto& t_coor = t_node->get_coordinate();
-        auto& t_disp = t_node->get_trial_displacement();
-        const auto t_size = std::min(outer_norm.n_elem, std::min(t_coor.n_elem, t_disp.n_elem));
-        vec t_pos = -origin;
-        for(auto J = 0llu; J < t_size; ++J) t_pos(J) += t_coor(J) + t_disp(J);
-        if(!edge_a.empty() && dot(t_pos, edge_a) > length_a || !edge_b.empty() && dot(t_pos, edge_b) > length_b || dot(t_pos, outer_norm) > 0.) return;
+        if(!checker_handler(t_node)) return;
+        const vec t_pos = trial_position_handler(t_node) - origin;
+        if(!edge_a.empty()) if(const auto projection = dot(t_pos, edge_a); projection > length_a || projection < 0.) return;
+        if(!edge_b.empty()) if(const auto projection = dot(t_pos, edge_b); projection > length_b || projection < 0.) return;
+        if(dot(t_pos, outer_norm) > 0.) return;
         node_pool.insert(t_node);
     });
 
@@ -53,23 +52,21 @@ int RestitutionWallPenalty::process(const shared_ptr<DomainBase>& D) {
     const auto factor = alpha * pow(W->get_incre_time(), -2.);
 
     vector<uword> pool;
-    pool.reserve(3llu * node_pool.size());
+    pool.reserve(n_dim * node_pool.size());
 
     resistance.zeros(W->get_size());
     auto counter = 0llu;
     for(const auto& I : node_pool) {
+        if(dot(current_velocity_handler(I), outer_norm) > 0.) continue;
+        const auto c_vel = current_velocity_handler(I);
+        if(dot(c_vel, outer_norm) > 0.) continue;
         auto& t_dof = I->get_reordered_dof();
-        const auto t_size = t_dof.n_elem;
-        const vec norm = outer_norm.head(t_size);
-        auto& t_vel = I->get_trial_velocity();
-        auto& c_vel = I->get_current_velocity();
-        if(dot(c_vel, norm) > 0.) continue;
-        const vec target_vel = t_vel - dot(t_vel + restitution_coefficient * c_vel, norm) * norm;
-        const vec diff_disp = I->get_trial_displacement() - G->from_total_velocity(target_vel, t_dof);
-        const auto next_counter = counter + t_size;
+        const auto t_vel = trial_velocity_handler(I);
+        const vec diff_disp = trial_displacement_handler(I) - G->from_total_velocity(t_vel - dot(t_vel + restitution_coefficient * c_vel, outer_norm) * outer_norm, t_dof.head(n_dim));
+        const auto next_counter = counter + n_dim;
         stiffness.resize(next_counter, next_counter);
-        stiffness.submat(counter, counter, size(t_size, t_size)) = factor * norm * norm.t();
-        for(auto J = 0llu; J < t_size; ++J) {
+        stiffness.submat(counter, counter, size(n_dim, n_dim)) = factor * outer_norm * outer_norm.t();
+        for(auto J = 0llu; J < n_dim; ++J) {
             pool.emplace_back(t_dof(J));
             resistance(t_dof(J)) += factor * diff_disp(J);
         }
@@ -86,11 +83,10 @@ int RestitutionWallPenalty::stage(const shared_ptr<DomainBase>& D) {
 
     auto trial_acceleration = get_trial_acceleration(W);
     for(const auto& I : node_pool) {
-        auto& t_acceleration = I->get_trial_acceleration();
-        const vec norm = outer_norm.head(t_acceleration.n_elem);
-        const vec corrected_acceleration = t_acceleration - dot(I->get_incre_acceleration(), norm) * norm;
-        I->update_trial_acceleration(corrected_acceleration);
-        trial_acceleration(I->get_reordered_dof()) = corrected_acceleration;
+        auto t_acceleration = I->get_trial_acceleration();
+        t_acceleration.head(n_dim) = trial_acceleration_handler(I) - dot(incre_acceleration_handler(I), outer_norm) * outer_norm;
+        I->update_trial_acceleration(t_acceleration);
+        trial_acceleration(I->get_reordered_dof()) = t_acceleration;
     }
 
     W->update_trial_acceleration(trial_acceleration);
@@ -103,3 +99,23 @@ void RestitutionWallPenalty::commit_status() { node_pool.clear(); }
 void RestitutionWallPenalty::clear_status() { node_pool.clear(); }
 
 void RestitutionWallPenalty::reset_status() { node_pool.clear(); }
+
+RestitutionWallPenalty1D::RestitutionWallPenalty1D(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& N, const double RC, const double F)
+    : RestitutionWallPenalty(T, S, A, resize(O, 1, 1), resize(N, 1, 1), RC, F, 1) { set_handler<DOF::U1>(); }
+
+RestitutionWallPenalty2D::RestitutionWallPenalty2D(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& N, const double RC, const double F)
+    : RestitutionWallPenalty(T, S, A, resize(O, 2, 1), resize(N, 2, 1), RC, F, 2) { set_handler<DOF::U1, DOF::U2>(); }
+
+RestitutionWallPenalty2D::RestitutionWallPenalty2D(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double RC, const double F)
+    : RestitutionWallPenalty(T, S, A, resize(O, 2, 1), resize(E1, 3, 1), resize(E2, 3, 1), RC, F, 2) {
+    set_handler<DOF::U1, DOF::U2>();
+    access::rw(outer_norm).resize(2);
+    access::rw(edge_a).resize(2);
+    access::rw(edge_b).reset();
+}
+
+RestitutionWallPenalty3D::RestitutionWallPenalty3D(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& N, const double RC, const double F)
+    : RestitutionWallPenalty(T, S, A, resize(O, 3, 1), resize(N, 3, 1), RC, F, 3) { set_handler<DOF::U1, DOF::U2, DOF::U3>(); }
+
+RestitutionWallPenalty3D::RestitutionWallPenalty3D(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double RC, const double F)
+    : RestitutionWallPenalty(T, S, A, resize(O, 3, 1), resize(E1, 3, 1), resize(E2, 3, 1), RC, F, 3) { set_handler<DOF::U1, DOF::U2, DOF::U3>(); }

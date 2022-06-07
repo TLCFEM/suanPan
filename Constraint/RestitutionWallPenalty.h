@@ -34,14 +34,13 @@
 
 class Node;
 
-class RestitutionWallPenalty final : public RigidWallPenalty {
+class RestitutionWallPenalty : public RigidWallPenalty {
     suanpan::set<shared_ptr<Node>> node_pool;
 
     const double restitution_coefficient;
-
 public:
-    RestitutionWallPenalty(unsigned, unsigned, unsigned, vec&&, vec&&, double, double);
-    RestitutionWallPenalty(unsigned, unsigned, unsigned, vec&&, vec&&, vec&&, double, double);
+    RestitutionWallPenalty(unsigned, unsigned, unsigned, vec&&, vec&&, double, double, unsigned);
+    RestitutionWallPenalty(unsigned, unsigned, unsigned, vec&&, vec&&, vec&&, double, double, unsigned);
 
     int process(const shared_ptr<DomainBase>&) override;
 
@@ -50,6 +49,23 @@ public:
     void commit_status() override;
     void clear_status() override;
     void reset_status() override;
+};
+
+class RestitutionWallPenalty1D final : public RestitutionWallPenalty {
+public:
+    RestitutionWallPenalty1D(unsigned, unsigned, unsigned, vec&&, vec&&, double, double);
+};
+
+class RestitutionWallPenalty2D final : public RestitutionWallPenalty {
+public:
+    RestitutionWallPenalty2D(unsigned, unsigned, unsigned, vec&&, vec&&, double, double);
+    RestitutionWallPenalty2D(unsigned, unsigned, unsigned, vec&&, vec&&, vec&&, double, double);
+};
+
+class RestitutionWallPenalty3D final : public RestitutionWallPenalty {
+public:
+    RestitutionWallPenalty3D(unsigned, unsigned, unsigned, vec&&, vec&&, double, double);
+    RestitutionWallPenalty3D(unsigned, unsigned, unsigned, vec&&, vec&&, vec&&, double, double);
 };
 
 #endif

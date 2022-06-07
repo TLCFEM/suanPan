@@ -30,24 +30,53 @@
 #define RIGIDWALLPENALTY_H
 
 #include "Constraint.h"
+#include <Domain/NodeHelper.hpp>
 
 class RigidWallPenalty : public Constraint {
 protected:
+    template<DOF...D> void set_handler() { throw std::logic_error("not implemented"); }
+
+    const unsigned n_dim;
+
     const double alpha;
 
     const vec edge_a, edge_b;
     const vec origin, outer_norm;
     const double length_a = 0., length_b = 0.;
 
+    bool (*checker_handler)(const shared_ptr<Node>&) = nullptr;
+    Col<double> (*current_velocity_handler)(const shared_ptr<Node>&) = nullptr;
+    Col<double> (*incre_acceleration_handler)(const shared_ptr<Node>&) = nullptr;
+    Col<double> (*trial_position_handler)(const shared_ptr<Node>&) = nullptr;
+    Col<double> (*trial_displacement_handler)(const shared_ptr<Node>&) = nullptr;
+    Col<double> (*trial_velocity_handler)(const shared_ptr<Node>&) = nullptr;
+    Col<double> (*trial_acceleration_handler)(const shared_ptr<Node>&) = nullptr;
 public:
-    RigidWallPenalty(unsigned, unsigned, unsigned, vec&&, vec&&, double);
-    RigidWallPenalty(unsigned, unsigned, unsigned, vec&&, vec&&, vec&&, double);
+    RigidWallPenalty(unsigned, unsigned, unsigned, vec&&, vec&&, double, unsigned);
+    RigidWallPenalty(unsigned, unsigned, unsigned, vec&&, vec&&, vec&&, double, unsigned);
 
     int process(const shared_ptr<DomainBase>&) override;
 
     void commit_status() override;
     void clear_status() override;
     void reset_status() override;
+};
+
+class RigidWallPenalty1D final : public RigidWallPenalty {
+public:
+    RigidWallPenalty1D(unsigned, unsigned, unsigned, vec&&, vec&&, double);
+};
+
+class RigidWallPenalty2D final : public RigidWallPenalty {
+public:
+    RigidWallPenalty2D(unsigned, unsigned, unsigned, vec&&, vec&&, double);
+    RigidWallPenalty2D(unsigned, unsigned, unsigned, vec&&, vec&&, vec&&, double);
+};
+
+class RigidWallPenalty3D final : public RigidWallPenalty {
+public:
+    RigidWallPenalty3D(unsigned, unsigned, unsigned, vec&&, vec&&, double);
+    RigidWallPenalty3D(unsigned, unsigned, unsigned, vec&&, vec&&, vec&&, double);
 };
 
 #endif

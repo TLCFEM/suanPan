@@ -42,24 +42,18 @@ int RigidWallMultiplier::process(const shared_ptr<DomainBase>& D) {
     // multiplier method
     auto counter = 0llu;
     for(const auto& I : D->get_node_pool()) {
-        auto& t_dof = I->get_reordered_dof();
-        auto& t_coor = I->get_coordinate();
-        auto& t_disp = I->get_trial_displacement();
-        const auto t_size = std::min(std::min(t_coor.n_elem, t_disp.n_elem), outer_norm.n_elem);
-        vec t_a = -origin;
-        vec t_b = zeros(size(t_a));
-        for(auto J = 0llu; J < t_size; ++J) {
-            t_a(J) += t_coor(J);
-            t_b(J) = t_disp(J);
-        }
-        const vec t_c = t_a + t_b;
-        if(!edge_a.empty() && dot(t_c, edge_a) > norm(edge_a) || !edge_b.empty() && dot(t_c, edge_b) > norm(edge_b)) continue;
-        if(const auto t_pen = dot(t_c, outer_norm); t_pen > datum::eps) continue;
+        if(!checker_handler(I)) continue;
+        const auto t_pos = trial_position_handler(I) - origin;
+        if(!edge_a.empty()) if(const auto projection = dot(t_pos, edge_a); projection > length_a || projection < 0.) continue;
+        if(!edge_b.empty()) if(const auto projection = dot(t_pos, edge_b); projection > length_b || projection < 0.) continue;
+        if(const auto t_pen = dot(t_pos, outer_norm); t_pen > datum::eps) continue;
         ++counter;
         auxiliary_stiffness.resize(W->get_size(), counter);
-        for(auto J = 0llu; J < t_size; ++J) auxiliary_stiffness(t_dof(J), counter - 1) = outer_norm(J);
-        t_resistance.emplace_back(dot(t_b, outer_norm));
-        t_load.emplace_back(-dot(t_a, outer_norm));
+        auto& t_dof = I->get_reordered_dof();
+        for(auto J = 0llu; J < n_dim; ++J) auxiliary_stiffness(t_dof(J), counter - 1) = outer_norm(J);
+        const auto t_disp = trial_displacement_handler(I);
+        t_resistance.emplace_back(dot(t_disp, outer_norm));
+        t_load.emplace_back(-dot(t_pos - t_disp, outer_norm));
     }
 
     auxiliary_resistance = t_resistance;
@@ -69,3 +63,23 @@ int RigidWallMultiplier::process(const shared_ptr<DomainBase>& D) {
 
     return SUANPAN_SUCCESS;
 }
+
+RigidWallMultiplier1D::RigidWallMultiplier1D(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& N, const double F)
+    : RigidWallMultiplier(T, S, A, resize(O, 1, 1), resize(N, 1, 1), F, 1) { set_handler<DOF::U1>(); }
+
+RigidWallMultiplier2D::RigidWallMultiplier2D(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& N, const double F)
+    : RigidWallMultiplier(T, S, A, resize(O, 2, 1), resize(N, 2, 1), F, 2) { set_handler<DOF::U1, DOF::U2>(); }
+
+RigidWallMultiplier2D::RigidWallMultiplier2D(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double F)
+    : RigidWallMultiplier(T, S, A, resize(O, 2, 1), resize(E1, 3, 1), resize(E2, 3, 1), F, 2) {
+    set_handler<DOF::U1, DOF::U2>();
+    access::rw(outer_norm).resize(2);
+    access::rw(edge_a).resize(2);
+    access::rw(edge_b).reset();
+}
+
+RigidWallMultiplier3D::RigidWallMultiplier3D(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& N, const double F)
+    : RigidWallMultiplier(T, S, A, resize(O, 3, 1), resize(N, 3, 1), F, 3) { set_handler<DOF::U1, DOF::U2, DOF::U3>(); }
+
+RigidWallMultiplier3D::RigidWallMultiplier3D(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double F)
+    : RigidWallMultiplier(T, S, A, resize(O, 3, 1), resize(E1, 3, 1), resize(E2, 3, 1), F, 3) { set_handler<DOF::U1, DOF::U2, DOF::U3>(); }
