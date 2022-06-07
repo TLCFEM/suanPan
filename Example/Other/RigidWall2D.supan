@@ -12,7 +12,7 @@ acceleration 1 1 -1 2 1
 
 initial acceleration -1 2 1
 
-constraint rigidwall 1 0 0 0 0 1 0 .1
+constraint rigidwall 1 0 0 0 1 .1
 
 step dynamic 1 8
 set ini_step_size 1E-3
