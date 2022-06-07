@@ -29,7 +29,7 @@
 #ifndef MPC_H
 #define MPC_H
 
-#include <Constraint/Constraint.h>
+#include "Constraint.h"
 
 class MPC final : public Constraint {
     const uvec dof_pool;

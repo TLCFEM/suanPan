@@ -18,17 +18,15 @@
 #include "NodeLine.h"
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Domain/Node.h>
+#include <Domain/NodeHelper.hpp>
 
 const mat NodeLine::rotation{{0., -1.}, {1., 0.}};
 
 std::vector<vec> NodeLine::get_position(const shared_ptr<DomainBase>& D) {
-    std::vector position(node_encoding.n_elem, vec());
+    std::vector<vec> position;
+    position.reserve(node_encoding.n_elem);
 
-    for(auto I = 0llu; I < node_encoding.n_elem; ++I) {
-        auto& t_node = D->get<Node>(node_encoding(I));
-        position[I] = resize(t_node->get_coordinate(), 2, 1) + resize(t_node->get_trial_displacement(), 2, 1);
-    }
+    for(const auto I : node_encoding) position.emplace_back(get_trial_position<DOF::U1, DOF::U2>(D->get<Node>(I)));
 
     return position;
 }

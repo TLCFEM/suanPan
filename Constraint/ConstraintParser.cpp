@@ -224,48 +224,26 @@ void new_nodefacet(unique_ptr<Constraint>& return_obj, istringstream& command) {
     return_obj = make_unique<NodeFacet>(tag, 0, 0, std::move(node_tag));
 }
 
-void new_particlecollision2d(unique_ptr<Constraint>& return_obj, istringstream& command) {
+void new_particlecollision(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dim) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("new_particlecollision2d() needs a valid tag.\n");
+        suanpan_error("new_particlecollision() needs a valid tag.\n");
         return;
     }
 
     auto space = 1.;
     if(!command.eof() && !get_input(command, space)) {
-        suanpan_error("new_particlecollision2d() needs a valid spacing.\n");
+        suanpan_error("new_particlecollision() needs a valid spacing.\n");
         return;
     }
 
     auto alpha = 1.;
     if(!command.eof() && !get_input(command, alpha)) {
-        suanpan_error("new_particlecollision2d() needs a valid multiplier.\n");
+        suanpan_error("new_particlecollision() needs a valid multiplier.\n");
         return;
     }
 
-    return_obj = make_unique<ParticleCollision2D>(tag, 0, space, alpha);
-}
-
-void new_particlecollision3d(unique_ptr<Constraint>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("new_particlecollision3d() needs a valid tag.\n");
-        return;
-    }
-
-    auto space = 1.;
-    if(!command.eof() && !get_input(command, space)) {
-        suanpan_error("new_particlecollision3d() needs a valid spacing.\n");
-        return;
-    }
-
-    auto alpha = 1.;
-    if(!command.eof() && !get_input(command, alpha)) {
-        suanpan_error("new_particlecollision3d() needs a valid multiplier.\n");
-        return;
-    }
-
-    return_obj = make_unique<ParticleCollision3D>(tag, 0, space, alpha);
+    2 == dim ? return_obj = make_unique<ParticleCollision2D>(tag, 0, space, alpha) : return_obj = make_unique<ParticleCollision3D>(tag, 0, space, alpha);
 }
 
 void new_rigidwall(unique_ptr<Constraint>& return_obj, istringstream& command, const bool finite, const bool penalty) {
@@ -275,19 +253,68 @@ void new_rigidwall(unique_ptr<Constraint>& return_obj, istringstream& command, c
         return;
     }
 
-    vec origin(3), norm(3), edge(3);
-    for(auto& I : origin) if(!get_input(command, I)) return;
-    for(auto& I : norm) if(!get_input(command, I)) return;
+    vector<double> p;
+    double para;
+    while(!command.eof() && get_input(command, para)) p.emplace_back(para);
 
-    if(finite) for(auto& I : edge) if(!get_input(command, I)) return;
-
-    auto alpha = 1.;
-    if(!command.eof() && !get_input(command, alpha)) {
-        suanpan_error("new_rigidwall() needs a valid multiplier.\n");
-        return;
+    switch(p.size()) {
+    case 2:
+        // 1D origin norm
+        if(penalty) return_obj = make_unique<RigidWallPenalty1D>(tag, 0, 0, vec{p[0]}, vec{p[1]}, 1E4);
+        else return_obj = make_unique<RigidWallMultiplier1D>(tag, 0, 0, vec{p[0]}, vec{p[1]}, 1E4);
+        break;
+    case 3:
+        // 1D origin norm multiplier
+        if(penalty) return_obj = make_unique<RigidWallPenalty1D>(tag, 0, 0, vec{p[0]}, vec{p[1]}, p[2]);
+        else return_obj = make_unique<RigidWallMultiplier1D>(tag, 0, 0, vec{p[0]}, vec{p[1]}, p[2]);
+        break;
+    case 4:
+        if(finite) {
+            // 2D origin edge
+            if(penalty) return_obj = make_unique<RigidWallPenalty2D>(tag, 0, 0, vec{p[0], p[1]}, vec{p[2], p[3], 0.}, vec{0., 0., 1.}, 1E4);
+            else return_obj = make_unique<RigidWallMultiplier2D>(tag, 0, 0, vec{p[0], p[1]}, vec{p[2], p[3], 0.}, vec{0., 0., 1.}, 1E4);
+        }
+        else {
+            // 2D origin norm
+            if(penalty) return_obj = make_unique<RigidWallPenalty2D>(tag, 0, 0, vec{p[0], p[1]}, normalise(vec{p[2], p[3]}), 1E4);
+            else return_obj = make_unique<RigidWallMultiplier2D>(tag, 0, 0, vec{p[0], p[1]}, normalise(vec{p[2], p[3]}), 1E4);
+        }
+        break;
+    case 5:
+        if(finite) {
+            // 2D origin edge multiplier
+            if(penalty) return_obj = make_unique<RigidWallPenalty2D>(tag, 0, 0, vec{p[0], p[1]}, vec{p[2], p[3], 0.}, vec{0., 0., 1.}, p[4]);
+            else return_obj = make_unique<RigidWallMultiplier2D>(tag, 0, 0, vec{p[0], p[1]}, vec{p[2], p[3], 0.}, vec{0., 0., 1.}, p[4]);
+        }
+        else {
+            // 2D origin norm multiplier
+            if(penalty) return_obj = make_unique<RigidWallPenalty2D>(tag, 0, 0, vec{p[0], p[1]}, normalise(vec{p[2], p[3]}), p[4]);
+            else return_obj = make_unique<RigidWallMultiplier2D>(tag, 0, 0, vec{p[0], p[1]}, normalise(vec{p[2], p[3]}), p[4]);
+        }
+        break;
+    case 6:
+        // 3D origin norm
+        if(penalty) return_obj = make_unique<RigidWallPenalty3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, normalise(vec{p[3], p[4], p[5]}), 1E4);
+        else return_obj = make_unique<RigidWallMultiplier3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, normalise(vec{p[3], p[4], p[5]}), 1E4);
+        break;
+    case 7:
+        // 3D origin norm multiplier
+        if(penalty) return_obj = make_unique<RigidWallPenalty3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, normalise(vec{p[3], p[4], p[5]}), p[6]);
+        else return_obj = make_unique<RigidWallMultiplier3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, normalise(vec{p[3], p[4], p[5]}), p[6]);
+        break;
+    case 9:
+        // 3D origin edge edge
+        if(penalty) return_obj = make_unique<RigidWallPenalty3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, vec{p[3], p[4], p[5]}, vec{p[6], p[7], p[8]}, 1E4);
+        else return_obj = make_unique<RigidWallMultiplier3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, vec{p[3], p[4], p[5]}, vec{p[6], p[7], p[8]}, 1E4);
+        break;
+    case 10:
+        // 3D origin edge edge multiplier
+        if(penalty) return_obj = make_unique<RigidWallPenalty3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, vec{p[3], p[4], p[5]}, vec{p[6], p[7], p[8]}, p[9]);
+        else return_obj = make_unique<RigidWallMultiplier3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, vec{p[3], p[4], p[5]}, vec{p[6], p[7], p[8]}, p[9]);
+        break;
+    default:
+        suanpan_error("new_rigidwall() requires valid number of parameters.\n");
     }
-
-    return_obj = finite ? penalty ? make_unique<RigidWallPenalty>(tag, 0, 0, std::move(origin), std::move(norm), std::move(edge), alpha) : make_unique<RigidWallMultiplier>(tag, 0, 0, std::move(origin), std::move(norm), std::move(edge), alpha) : penalty ? make_unique<RigidWallPenalty>(tag, 0, 0, std::move(origin), std::move(norm), alpha) : make_unique<RigidWallMultiplier>(tag, 0, 0, std::move(origin), std::move(norm), alpha);
 }
 
 void new_restitutionwall(unique_ptr<Constraint>& return_obj, istringstream& command, const bool finite) {
@@ -297,25 +324,54 @@ void new_restitutionwall(unique_ptr<Constraint>& return_obj, istringstream& comm
         return;
     }
 
-    vec origin(3), norm(3), edge(3);
-    for(auto& I : origin) if(!get_input(command, I)) return;
-    for(auto& I : norm) if(!get_input(command, I)) return;
+    vector<double> p;
+    double para;
+    while(!command.eof() && get_input(command, para)) p.emplace_back(para);
 
-    if(finite) for(auto& I : edge) if(!get_input(command, I)) return;
-
-    auto restitution = 1.;
-    if(!command.eof() && !get_input(command, restitution)) {
-        suanpan_error("new_restitutionwall() needs a valid restitution coefficient.\n");
-        return;
+    switch(p.size()) {
+    case 3:
+        // 1D origin norm restitution
+        return_obj = make_unique<RestitutionWallPenalty1D>(tag, 0, 0, vec{p[0]}, vec{p[1]}, p[2], 1E4);
+        break;
+    case 4:
+        // 1D origin norm restitution multiplier
+        return_obj = make_unique<RestitutionWallPenalty1D>(tag, 0, 0, vec{p[0]}, vec{p[1]}, p[2], p[3]);
+        break;
+    case 5:
+        if(finite)
+            // 2D origin edge restitution
+            return_obj = make_unique<RestitutionWallPenalty2D>(tag, 0, 0, vec{p[0], p[1]}, vec{p[2], p[3], 0.}, vec{0., 0., 1.}, p[4], 1E4);
+        else
+            // 2D origin norm restitution
+            return_obj = make_unique<RestitutionWallPenalty2D>(tag, 0, 0, vec{p[0], p[1]}, normalise(vec{p[2], p[3]}), p[4], 1E4);
+        break;
+    case 6:
+        if(finite)
+            // 2D origin edge restitution multiplier
+            return_obj = make_unique<RestitutionWallPenalty2D>(tag, 0, 0, vec{p[0], p[1]}, vec{p[2], p[3], 0.}, vec{0., 0., 1.}, p[4], p[5]);
+        else
+            // 2D origin norm restitution multiplier
+            return_obj = make_unique<RestitutionWallPenalty2D>(tag, 0, 0, vec{p[0], p[1]}, normalise(vec{p[2], p[3]}), p[4], p[5]);
+        break;
+    case 7:
+        // 3D origin norm restitution
+        return_obj = make_unique<RestitutionWallPenalty3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, normalise(vec{p[3], p[4], p[5]}), p[6], 1E4);
+        break;
+    case 8:
+        // 3D origin norm restitution multiplier
+        return_obj = make_unique<RestitutionWallPenalty3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, normalise(vec{p[3], p[4], p[5]}), p[6], p[7]);
+        break;
+    case 10:
+        // 3D origin edge edge restitution
+        return_obj = make_unique<RestitutionWallPenalty3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, vec{p[3], p[4], p[5]}, vec{p[6], p[7], p[8]}, p[9], 1E4);
+        break;
+    case 11:
+        // 3D origin edge edge restitution multiplier
+        return_obj = make_unique<RestitutionWallPenalty3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, vec{p[3], p[4], p[5]}, vec{p[6], p[7], p[8]}, p[9], p[10]);
+        break;
+    default:
+        suanpan_error("new_restitutionwall() requires valid number of parameters.\n");
     }
-
-    auto alpha = 1E1;
-    if(!command.eof() && !get_input(command, alpha)) {
-        suanpan_error("new_restitutionwall() needs a valid multiplier.\n");
-        return;
-    }
-
-    return_obj = finite ? make_unique<RestitutionWallPenalty>(tag, 0, 0, std::move(origin), std::move(norm), std::move(edge), restitution, alpha) : make_unique<RestitutionWallPenalty>(tag, 0, 0, std::move(origin), std::move(norm), restitution, alpha);
 }
 
 int create_new_criterion(const shared_ptr<DomainBase>& domain, istringstream& command) {
@@ -457,8 +513,8 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, istringstream& c
     else if(is_equal(constraint_id, "MPC")) new_mpc(new_constraint, command);
     else if(is_equal(constraint_id, "NodeLine")) new_nodeline(new_constraint, command);
     else if(is_equal(constraint_id, "NodeFacet")) new_nodefacet(new_constraint, command);
-    else if(is_equal(constraint_id, "ParticleCollision2D")) new_particlecollision2d(new_constraint, command);
-    else if(is_equal(constraint_id, "ParticleCollision3D")) new_particlecollision3d(new_constraint, command);
+    else if(is_equal(constraint_id, "ParticleCollision2D")) new_particlecollision(new_constraint, command, 2);
+    else if(is_equal(constraint_id, "ParticleCollision3D")) new_particlecollision(new_constraint, command, 3);
     else if(is_equal(constraint_id, "RigidWallMultiplier")) new_rigidwall(new_constraint, command, false, false);
     else if(is_equal(constraint_id, "RigidWall") || is_equal(constraint_id, "RigidWallPenalty")) new_rigidwall(new_constraint, command, false, true);
     else if(is_equal(constraint_id, "FiniteRigidWallMultiplier")) new_rigidwall(new_constraint, command, true, false);

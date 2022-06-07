@@ -34,11 +34,11 @@ int MPC::initialize(const shared_ptr<DomainBase>& D) {
 
     for(auto I = 0llu; I < node_encoding.n_elem; ++I) {
         auto& t_node = D->get<Node>(node_encoding(I));
-        if(nullptr == t_node || !t_node->is_active() || t_node->get_reordered_dof().n_elem < dof_pool(I)) {
+        auto& t_dof = t_node->get_reordered_dof();
+        if(nullptr == t_node || !t_node->is_active() || t_dof.n_elem < dof_pool(I)) {
             auxiliary_stiffness.reset();
             return SUANPAN_FAIL;
         }
-        auto& t_dof = t_node->get_reordered_dof();
         auxiliary_stiffness(t_dof(dof_pool(I))) = weight_pool(I);
     }
 

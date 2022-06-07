@@ -32,7 +32,7 @@
 #ifndef FIXEDLENGTH_H
 #define FIXEDLENGTH_H
 
-#include <Constraint/Constraint.h>
+#include "Constraint.h"
 
 class FixedLength : public Constraint {
     vec coor;

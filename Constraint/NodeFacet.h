@@ -31,7 +31,7 @@
 #ifndef NODEFACET_H
 #define NODEFACET_H
 
-#include <Constraint/Constraint.h>
+#include "Constraint.h"
 
 class NodeFacet final : public Constraint {
     std::vector<vec> get_position(const shared_ptr<DomainBase>&);
