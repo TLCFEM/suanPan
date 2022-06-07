@@ -21,29 +21,29 @@
 #include "DOF.h"
 #include "Node.h"
 
-template<DOF...D> bool check_dof_definition(const shared_ptr<Node>&) { throw std::logic_error("not implemented"); }
+template<DOF... D> bool check_dof_definition(const shared_ptr<Node>&) { throw std::logic_error("not implemented"); }
 
-template<DOF...D> vec get_current_position(const shared_ptr<Node>&) { throw std::logic_error("not implemented"); }
+template<DOF... D> vec get_current_position(const shared_ptr<Node>&) { throw std::logic_error("not implemented"); }
 
-template<DOF...D> vec get_trial_position(const shared_ptr<Node>&) { throw std::logic_error("not implemented"); }
+template<DOF... D> vec get_trial_position(const shared_ptr<Node>&) { throw std::logic_error("not implemented"); }
 
-template<DOF...D> vec get_current_displacement(const shared_ptr<Node>&) { throw std::logic_error("not implemented"); }
+template<DOF... D> vec get_current_displacement(const shared_ptr<Node>&) { throw std::logic_error("not implemented"); }
 
-template<DOF...D> vec get_current_velocity(const shared_ptr<Node>&) { throw std::logic_error("not implemented"); }
+template<DOF... D> vec get_current_velocity(const shared_ptr<Node>&) { throw std::logic_error("not implemented"); }
 
-template<DOF...D> vec get_current_acceleration(const shared_ptr<Node>&) { throw std::logic_error("not implemented"); }
+template<DOF... D> vec get_current_acceleration(const shared_ptr<Node>&) { throw std::logic_error("not implemented"); }
 
-template<DOF...D> vec get_trial_displacement(const shared_ptr<Node>&) { throw std::logic_error("not implemented"); }
+template<DOF... D> vec get_trial_displacement(const shared_ptr<Node>&) { throw std::logic_error("not implemented"); }
 
-template<DOF...D> vec get_trial_velocity(const shared_ptr<Node>&) { throw std::logic_error("not implemented"); }
+template<DOF... D> vec get_trial_velocity(const shared_ptr<Node>&) { throw std::logic_error("not implemented"); }
 
-template<DOF...D> vec get_trial_acceleration(const shared_ptr<Node>&) { throw std::logic_error("not implemented"); }
+template<DOF... D> vec get_trial_acceleration(const shared_ptr<Node>&) { throw std::logic_error("not implemented"); }
 
-template<DOF...D> vec get_incre_displacement(const shared_ptr<Node>&) { throw std::logic_error("not implemented"); }
+template<DOF... D> vec get_incre_displacement(const shared_ptr<Node>&) { throw std::logic_error("not implemented"); }
 
-template<DOF...D> vec get_incre_velocity(const shared_ptr<Node>&) { throw std::logic_error("not implemented"); }
+template<DOF... D> vec get_incre_velocity(const shared_ptr<Node>&) { throw std::logic_error("not implemented"); }
 
-template<DOF...D> vec get_incre_acceleration(const shared_ptr<Node>&) { throw std::logic_error("not implemented"); }
+template<DOF... D> vec get_incre_acceleration(const shared_ptr<Node>&) { throw std::logic_error("not implemented"); }
 
 template<> inline bool check_dof_definition<DOF::U1>(const shared_ptr<Node>& t_node) {
     auto& t_dof = t_node->get_dof_identifier();

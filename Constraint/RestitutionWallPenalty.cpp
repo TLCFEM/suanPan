@@ -18,7 +18,6 @@
 #include "RestitutionWallPenalty.h"
 #include <Domain/DomainBase.h>
 #include <Domain/FactoryHelper.hpp>
-#include <Domain/NodeHelper.hpp>
 #include <Solver/Integrator/Integrator.h>
 #include <Step/Step.h>
 

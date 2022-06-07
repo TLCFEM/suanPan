@@ -18,7 +18,6 @@
 #include "RigidWallMultiplier.h"
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Domain/Node.h>
 
 int RigidWallMultiplier::initialize(const shared_ptr<DomainBase>& D) {
     // for dynamic analysis, velocity and acceleration shall be changed

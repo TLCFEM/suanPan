@@ -30,7 +30,7 @@
 #define RESTITUTIONWALLPENALTY_H
 
 #include "RigidWallPenalty.h"
-#include "Toolbox/container.h"
+#include <Toolbox/container.h>
 
 class Node;
 

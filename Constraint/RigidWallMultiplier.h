@@ -29,7 +29,7 @@
 #ifndef RIGIDWALLMULTIPLIER_H
 #define RIGIDWALLMULTIPLIER_H
 
-#include "Constraint/RigidWallPenalty.h"
+#include "RigidWallPenalty.h"
 
 class RigidWallMultiplier : public RigidWallPenalty {
     const bool use_penalty = false;
