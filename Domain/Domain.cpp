@@ -38,11 +38,6 @@
 #include <Toolbox/sort_rcm.h>
 #include <numeric>
 
-#ifdef SUANPAN_HDF5
-#include <hdf5/hdf5.h>
-#include <hdf5/hdf5_hl.h>
-#endif
-
 Domain::Domain(const unsigned T)
     : DomainBase(T)
     , factory(make_shared<Factory<double>>()) {}
@@ -1205,25 +1200,4 @@ void Domain::assemble_load_stiffness() {}
 
 void Domain::assemble_constraint_stiffness() { for(auto& I : get_constraint_pool()) if(I->is_initialized() && !I->get_stiffness().empty()) factory->assemble_stiffness(I->get_stiffness(), I->get_dof_encoding()); }
 
-void Domain::save(string file_name) {
-#ifdef SUANPAN_HDF5
-    if(string::npos == file_name.find(".h5") && string::npos == file_name.find(".H5")) file_name += ".h5";
-
-    const auto file_id = H5Fcreate(file_name.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-
-    const string group_name = "/Node";
-
-    const auto group_id = H5Gcreate(file_id, group_name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-
-    for(const auto& t_node : get_node_pool()) {
-        const auto data = t_node->save();
-
-        const hsize_t dimension[2] = {data.n_rows, data.n_cols};
-
-        H5LTmake_dataset(group_id, std::to_string(t_node->get_tag()).c_str(), 2, dimension, H5T_NATIVE_DOUBLE, data.mem);
-    }
-
-    H5Gclose(group_id);
-    H5Fclose(file_id);
-#endif
-}
+void Domain::save(string) {}

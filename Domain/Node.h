@@ -196,9 +196,6 @@ public:
 
     [[nodiscard]] vector<vec> record(OutputType) const;
 
-    [[nodiscard]] vec save() const;
-    void load(const vec&);
-
     void print() override;
 };
 
