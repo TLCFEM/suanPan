@@ -37,6 +37,7 @@
 #include <Toolbox/sort_color.hpp>
 #include <Toolbox/sort_rcm.h>
 #include <numeric>
+#include <array>
 
 Domain::Domain(const unsigned T)
     : DomainBase(T)
@@ -759,11 +760,7 @@ int Domain::reorder_dof() {
 
     // RCM optimization
     // collect connectivity
-#ifdef SUANPAN_MT
-    vector<concurrent_unordered_set<uword>> adjacency(dof_counter);
-#else
-    vector<unordered_set<uword>> adjacency(dof_counter);
-#endif
+    vector<suanpan::unordered_set<uword>> adjacency(dof_counter);
     suanpan_for_each(element_pond.get().cbegin(), element_pond.get().cend(), [&](const shared_ptr<Element>& t_element) {
         t_element->update_dof_encoding();
         for(auto& t_encoding = t_element->get_dof_encoding(); const auto& I : t_encoding) for(const auto& J : t_encoding) adjacency[I].insert(J);
@@ -1065,7 +1062,11 @@ int Domain::process_load(const bool full) {
     auto& t_load_pool = load_pond.get();
     suanpan_for_each(t_load_pool.cbegin(), t_load_pool.cend(), [&](const shared_ptr<Load>& t_load) {
         if(!t_load->is_initialized()) return;
+#ifdef SUANPAN_MT
+        oneapi::tbb::this_task_arena::isolate([&] { code += std::invoke(process_handler, t_load, shared_from_this()); });
+#else
         code += std::invoke(process_handler, t_load, shared_from_this());
+#endif
         if(!t_load->get_trial_load().empty()) {
             std::scoped_lock trial_load_lock(factory->get_trial_load_mutex());
             trial_load += t_load->get_trial_load();
@@ -1099,14 +1100,23 @@ int Domain::process_constraint(const bool full) {
 
     const auto process_handler = full ? std::mem_fn(&Constraint::process) : std::mem_fn(&Constraint::process_resistance);
 
+    // constraint, start index, size
+    suanpan::vector<std::pair<shared_ptr<Constraint>, std::array<unsigned, 2>>> constraint_register;
+
     std::atomic_int code = 0;
     std::atomic_uint32_t counter = 0;
     auto& t_constraint_pool = constraint_pond.get();
     suanpan_for_each(t_constraint_pool.cbegin(), t_constraint_pool.cend(), [&](const shared_ptr<Constraint>& t_constraint) {
         if(!t_constraint->is_initialized()) return;
-
+#ifdef SUANPAN_MT
+        oneapi::tbb::this_task_arena::isolate([&] { code += std::invoke(process_handler, t_constraint, shared_from_this()); });
+#else
         code += std::invoke(process_handler, t_constraint, shared_from_this());
-        counter += t_constraint->get_multiplier_size();
+#endif
+        if(const auto multiplier_size = t_constraint->get_multiplier_size(); multiplier_size > 0) {
+            counter += multiplier_size;
+            constraint_register.emplace_back(t_constraint, std::array{0u, multiplier_size});
+        }
         if(!t_constraint->get_resistance().empty()) {
             std::scoped_lock constraint_resistance_lock(factory->get_trial_constraint_resistance_mutex());
             constraint_resistance += t_constraint->get_resistance();
@@ -1117,22 +1127,32 @@ int Domain::process_constraint(const bool full) {
 
     if(0 == counter) return code;
 
+    counter = 0;
+    auto previous_it = constraint_register.begin(), current_it = constraint_register.begin();
+    while(constraint_register.end() != ++current_it) {
+        current_it->second[0] = counter += previous_it->second[1];
+        ++previous_it;
+    }
+
     auto& t_encoding = get_auxiliary_encoding(factory);
     auto& t_resistance = get_auxiliary_resistance(factory);
     auto& t_load = get_auxiliary_load(factory);
     auto& t_stiffness = get_auxiliary_stiffness(factory);
 
-    counter = 0;
-    for(auto& I : t_constraint_pool) {
-        const auto m_size = I->get_multiplier_size();
-        if(!I->is_initialized() || 0 == m_size) continue;
-        const auto e_size = counter + m_size - 1;
-        t_encoding.subvec(counter, e_size).fill(I->get_tag());
-        if(!I->get_auxiliary_resistance().empty()) t_resistance.subvec(counter, e_size) = I->get_auxiliary_resistance();
-        if(!I->get_auxiliary_load().empty()) t_load.subvec(counter, e_size) = I->get_auxiliary_load();
-        if(!I->get_auxiliary_stiffness().empty()) t_stiffness.cols(counter, e_size) = I->get_auxiliary_stiffness();
-        counter += m_size;
-    }
+    suanpan_for_each(constraint_register.begin(), constraint_register.end(), [&](const std::pair<shared_ptr<Constraint>, std::array<unsigned, 2>>& t_register) {
+        const auto& t_constraint = t_register.first;
+        const auto start = t_register.second[0];
+        const auto end = start + t_register.second[1] - 1;
+
+        // no need to lock vector filling operations
+        t_encoding.subvec(start, end).fill(t_constraint->get_tag());
+        if(!t_constraint->get_auxiliary_resistance().empty()) t_resistance.subvec(start, end) = t_constraint->get_auxiliary_resistance();
+        if(!t_constraint->get_auxiliary_load().empty()) t_load.subvec(start, end) = t_constraint->get_auxiliary_load();
+        if(!t_constraint->get_auxiliary_stiffness().empty()) {
+            std::scoped_lock auxiliary_stiffness_lock(factory->get_auxiliary_stiffness_mutex());
+            t_stiffness.cols(start, end) = t_constraint->get_auxiliary_stiffness();
+        }
+    });
 
     return code;
 }
