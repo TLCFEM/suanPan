@@ -1,4 +1,4 @@
-# A TEST MODEL FOR DP MATERAIL
+# A TEST MODEL FOR DP MATERIAL
 
 node 1 5 -5 -5
 node 2 5 5 -5
@@ -12,7 +12,7 @@ node 8 -5 -5 5
 material BilinearDP 1 1E4 .3 .355 .355 .974 .5 100
 
 element C3D8 1 1 2 3 4 5 6 7 8 1
-element C3D8 2 1 2 3 4 5 6 7 8 2
+element C3D8 2 1 2 3 4 5 6 7 8 1
 
 fix 1 1 1 2 5 6
 fix 2 2 1 4 5 8
@@ -34,11 +34,12 @@ analyze
 # peek element 1
 
 # Node 5:
+# Coordinate:
 #    5.0000  -5.0000   5.0000
 # Displacement:
 #         0        0  -0.2000
 # Resistance:
-#   -2.8153e-06   2.8153e-06  -2.4081e+02
+#   -3.9787e-13   6.2223e-13  -4.8162e+02
 peek node 5
 
 # save recorder 1

@@ -118,7 +118,7 @@ void Node::set_dof_identifier(const vector<DOF>& D) {
     if(dof_identifier.empty()) dof_identifier = vector(num_dof, DOF::NONE);
 
     for(size_t I = 0; I < D.size(); ++I) {
-        if(dof_identifier[I] != DOF::NONE && D[I] != dof_identifier[I]) suanpan_warning("inconsistent DoF assignment for Node %u detected, which is likely an error, please double check the model.\n", get_tag());
+        if(dof_identifier[I] != DOF::NONE && D[I] != DOF::NONE && D[I] != dof_identifier[I]) suanpan_warning("inconsistent DoF assignment for Node %u detected, which is likely an error, please double check the model.\n", get_tag());
         dof_identifier[I] = D[I];
     }
 }
