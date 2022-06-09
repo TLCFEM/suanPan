@@ -38,7 +38,7 @@ using std::vector;
 namespace suanpan {
     template<typename T> using set = tbb::concurrent_set<T>;
     template<typename T> using vector = tbb::concurrent_vector<T>;
-    template<typename T> using unordered_set = tbb::concurrent_unordered_set<T>;
+    template<typename T> using unordered_set = tbb::concurrent_unordered_set<T, std::hash<T>>;
     template<typename T, typename D> using unordered_map = tbb::concurrent_unordered_map<T, D, std::hash<T>>;
     template<typename T> using graph = vector<set<T>>;
 }
