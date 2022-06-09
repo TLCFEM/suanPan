@@ -1142,7 +1142,7 @@ int Domain::process_constraint(const bool full) {
     suanpan_for_each(constraint_register.begin(), constraint_register.end(), [&](const std::pair<shared_ptr<Constraint>, std::array<unsigned, 2>>& t_register) {
         const auto& t_constraint = t_register.first;
         const auto start = t_register.second[0];
-        const auto end = t_register.second[1] - 1;
+        const auto end = start + t_register.second[1] - 1;
 
         // no need to lock vector filling operations
         t_encoding.subvec(start, end).fill(t_constraint->get_tag());
