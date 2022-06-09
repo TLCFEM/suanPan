@@ -27,23 +27,7 @@
 #ifndef STORAGE_H
 #define STORAGE_H
 
-#include <suanPan.h>
-
-#ifdef SUANPAN_MT
-#include <tbb/concurrent_unordered_map.h>
-#include <tbb/concurrent_unordered_set.h>
-
-using tbb::concurrent_unordered_map;
-using tbb::concurrent_unordered_set;
-#else
-#include <unordered_map>
-#include <unordered_set>
-
-using std::unordered_map;
-using std::unordered_set;
-#endif
-
-using std::vector;
+#include <Toolbox/container.h>
 
 class Amplitude;
 class Constraint;
@@ -109,19 +93,12 @@ template<typename T> class Storage : public std::enable_shared_from_this<Storage
 
     const shared_ptr<T> empty = nullptr;
 
-#ifdef SUANPAN_MT
-    using const_iterator = typename concurrent_unordered_map<unsigned, shared_ptr<T>, std::hash<unsigned>>::const_iterator;
-    using iterator = typename concurrent_unordered_map<unsigned, shared_ptr<T>, std::hash<unsigned>>::iterator;
+    using const_iterator = typename suanpan::unordered_map<unsigned, shared_ptr<T>>::const_iterator;
+    using iterator = typename suanpan::unordered_map<unsigned, shared_ptr<T>>::iterator;
 
-    concurrent_unordered_set<unsigned, std::hash<unsigned>> bait;                /**< data storage */
-    concurrent_unordered_map<unsigned, shared_ptr<T>, std::hash<unsigned>> pond; /**< data storage */
-#else
-    using const_iterator = typename unordered_map<unsigned, shared_ptr<T>>::const_iterator;
-    using iterator = typename unordered_map<unsigned, shared_ptr<T>>::iterator;
+    suanpan::unordered_set<unsigned> bait;                /**< data storage */
+    suanpan::unordered_map<unsigned, shared_ptr<T>> pond; /**< data storage */
 
-    unordered_set<unsigned> bait;                /**< data storage */
-    unordered_map<unsigned, shared_ptr<T>> pond; /**< data storage */
-#endif
 public:
     typedef T object_type;
 
