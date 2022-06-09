@@ -1062,7 +1062,13 @@ int Domain::process_load(const bool full) {
     auto& t_load_pool = load_pond.get();
     suanpan_for_each(t_load_pool.cbegin(), t_load_pool.cend(), [&](const shared_ptr<Load>& t_load) {
         if(!t_load->is_initialized()) return;
+#ifdef SUANPAN_MT
+        oneapi::tbb::this_task_arena::isolate([&] {
+            code += std::invoke(process_handler, t_load, shared_from_this());
+        });
+#else
         code += std::invoke(process_handler, t_load, shared_from_this());
+#endif
         if(!t_load->get_trial_load().empty()) {
             std::scoped_lock trial_load_lock(factory->get_trial_load_mutex());
             trial_load += t_load->get_trial_load();
@@ -1104,8 +1110,13 @@ int Domain::process_constraint(const bool full) {
     auto& t_constraint_pool = constraint_pond.get();
     suanpan_for_each(t_constraint_pool.cbegin(), t_constraint_pool.cend(), [&](const shared_ptr<Constraint>& t_constraint) {
         if(!t_constraint->is_initialized()) return;
-
+#ifdef SUANPAN_MT
+        oneapi::tbb::this_task_arena::isolate([&] {
+            code += std::invoke(process_handler, t_constraint, shared_from_this());
+        });
+#else
         code += std::invoke(process_handler, t_constraint, shared_from_this());
+#endif
         if(const auto multiplier_size = t_constraint->get_multiplier_size(); multiplier_size > 0) {
             counter += multiplier_size;
             constraint_register.emplace_back(t_constraint, std::array{0u, multiplier_size});
