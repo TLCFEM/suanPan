@@ -1063,9 +1063,7 @@ int Domain::process_load(const bool full) {
     suanpan_for_each(t_load_pool.cbegin(), t_load_pool.cend(), [&](const shared_ptr<Load>& t_load) {
         if(!t_load->is_initialized()) return;
 #ifdef SUANPAN_MT
-        oneapi::tbb::this_task_arena::isolate([&] {
-            code += std::invoke(process_handler, t_load, shared_from_this());
-        });
+        oneapi::tbb::this_task_arena::isolate([&] { code += std::invoke(process_handler, t_load, shared_from_this()); });
 #else
         code += std::invoke(process_handler, t_load, shared_from_this());
 #endif
@@ -1111,9 +1109,7 @@ int Domain::process_constraint(const bool full) {
     suanpan_for_each(t_constraint_pool.cbegin(), t_constraint_pool.cend(), [&](const shared_ptr<Constraint>& t_constraint) {
         if(!t_constraint->is_initialized()) return;
 #ifdef SUANPAN_MT
-        oneapi::tbb::this_task_arena::isolate([&] {
-            code += std::invoke(process_handler, t_constraint, shared_from_this());
-        });
+        oneapi::tbb::this_task_arena::isolate([&] { code += std::invoke(process_handler, t_constraint, shared_from_this()); });
 #else
         code += std::invoke(process_handler, t_constraint, shared_from_this());
 #endif
