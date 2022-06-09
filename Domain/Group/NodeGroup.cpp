@@ -43,7 +43,7 @@ void NodeGroup::initialize(const shared_ptr<DomainBase>& D) {
     // generate by direct assignment
     if(-1 == dof) return;
 
-    vector<uword> pond;
+    std::vector<uword> pond;
 
     // generate by two points
     if(-2 == dof)

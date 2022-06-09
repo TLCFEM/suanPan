@@ -28,8 +28,6 @@
 
 #include <suanPan.h>
 
-using std::vector;
-
 #ifdef SUANPAN_MT
 #include <tbb/concurrent_set.h>
 #include <tbb/concurrent_unordered_set.h>

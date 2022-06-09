@@ -33,7 +33,7 @@
 
 class EigenRecorder final : public Recorder {
     vec eigen_value;
-    vector<std::map<unsigned, vec>> eigen_pool;
+    std::vector<std::map<unsigned, vec>> eigen_pool;
 
 public:
     explicit EigenRecorder(unsigned = 0, bool = true);

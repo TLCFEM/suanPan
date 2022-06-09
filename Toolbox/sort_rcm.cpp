@@ -17,7 +17,7 @@
 
 #include "sort_rcm.h"
 
-uvec sort_rcm(const vector<uvec>& A, const uvec& E) {
+uvec sort_rcm(const std::vector<uvec>& A, const uvec& E) {
 #ifdef SUANPAN_DEBUG
     wall_clock TM;
     TM.tic();
@@ -27,7 +27,7 @@ uvec sort_rcm(const vector<uvec>& A, const uvec& E) {
 
     uvec G = sort_index(E);
     uvec R(S, fill::zeros);
-    vector M(S, false);
+    std::vector M(S, false);
 
     uword IDXA = 0, IDXB = S - 1, IDXC = S - 1;
 

@@ -40,7 +40,7 @@ int EnergyEvolution::initialize(const shared_ptr<DomainBase>& D) {
 
     for(decltype(element_pool.size()) element = 0; element < element_pool.size(); ++element) for(const auto connected_node : element_pool[element]) for(const auto connected_element : node_pool[connected_node]) if(element != connected_element) map[element].emplace_back(connected_element);
 
-    suanpan_for_each(map.begin(), map.end(), [](vector<uword>& element) { suanpan::unique(element); });
+    suanpan_for_each(map.begin(), map.end(), [](std::vector<uword>& element) { suanpan::unique(element); });
 
     energy.zeros(map.size());
 

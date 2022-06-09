@@ -45,10 +45,10 @@ template<typename T> auto sort_color_metis(suanpan::graph<T>& element_register, 
     std::atomic num_edges = 0llu;
     suanpan_for_each(element_register.begin(), element_register.end(), [&](const suanpan::set<T>& element) { num_edges += element.size(); });
 
-    vector<idx_t> xadj;
+    std::vector<idx_t> xadj;
     xadj.reserve(element_size + 1llu);
     xadj.emplace_back(0);
-    vector<idx_t> adjncy;
+    std::vector<idx_t> adjncy;
     adjncy.reserve(num_edges);
 
     for(const auto& element : element_register) {
@@ -61,7 +61,7 @@ template<typename T> auto sort_color_metis(suanpan::graph<T>& element_register, 
     auto nparts = static_cast<idx_t>(num_color);
     idx_t edgecut = 0;
 
-    vector<int> part(nvtxs);
+    std::vector<int> part(nvtxs);
 
     idx_t* vsize = nullptr;
     real_t* tpwgts = nullptr;
@@ -84,7 +84,7 @@ template<typename T> auto sort_color_metis(suanpan::graph<T>& element_register, 
     return part;
 }
 
-template<typename T> vector<vector<T>> sort_color_wp(const suanpan::graph<T>& node_register) {
+template<typename T> std::vector<std::vector<T>> sort_color_wp(const suanpan::graph<T>& node_register) {
 #ifdef SUANPAN_DEBUG
     wall_clock timer;
     timer.tic();
@@ -101,7 +101,7 @@ template<typename T> vector<vector<T>> sort_color_wp(const suanpan::graph<T>& no
     std::multiset<T, decltype(comparator)> degree(comparator);
     for(T I = 0; I < num_node; ++I) degree.insert(I);
 
-    vector<vector<T>> color_map;
+    std::vector<std::vector<T>> color_map;
 
     while(!degree.empty()) {
         color_map.emplace_back();
@@ -135,7 +135,7 @@ template<typename T> vector<vector<T>> sort_color_wp(const suanpan::graph<T>& no
     return color_map;
 }
 
-template<typename T> vector<vector<T>> sort_color_mis(const suanpan::graph<T>& node_register) {
+template<typename T> std::vector<std::vector<T>> sort_color_mis(const suanpan::graph<T>& node_register) {
 #ifdef SUANPAN_DEBUG
     wall_clock timer;
     timer.tic();
@@ -155,7 +155,7 @@ template<typename T> vector<vector<T>> sort_color_mis(const suanpan::graph<T>& n
     std::multiset<T, decltype(comparator)> degree(comparator);
     for(T I = 0; I < num_node; ++I) degree.insert(I);
 
-    vector<vector<T>> color_map;
+    std::vector<std::vector<T>> color_map;
 
     while(!degree.empty()) {
         color_map.emplace_back();

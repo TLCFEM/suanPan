@@ -99,7 +99,7 @@ class Element : protected DataElement, public ElementBase {
     const MaterialType mat_type;
     const SectionType sec_type;
 
-    vector<DOF> dof_identifier;
+    std::vector<DOF> dof_identifier;
 
     friend void ConstantMass(DataElement*);
     friend void ConstantDamping(DataElement*);
@@ -113,7 +113,7 @@ class Element : protected DataElement, public ElementBase {
     void update_momentum() override;
 
 protected:
-    vector<weak_ptr<Node>> node_ptr; // node pointers
+    std::vector<weak_ptr<Node>> node_ptr; // node pointers
 
     [[nodiscard]] mat get_coordinate(unsigned) const override;
 
@@ -131,33 +131,33 @@ protected:
     [[nodiscard]] vec get_node_trial_resistance() const override;
     [[nodiscard]] vec get_node_current_resistance() const override;
 
-    [[nodiscard]] vector<shared_ptr<Material>> get_material(const shared_ptr<DomainBase>&) const override;
-    [[nodiscard]] vector<shared_ptr<Section>> get_section(const shared_ptr<DomainBase>&) const override;
+    [[nodiscard]] std::vector<shared_ptr<Material>> get_material(const shared_ptr<DomainBase>&) const override;
+    [[nodiscard]] std::vector<shared_ptr<Section>> get_section(const shared_ptr<DomainBase>&) const override;
 
 public:
-    Element(unsigned,     // tag
-            unsigned,     // number of nodes
-            unsigned,     // number of dofs
-            uvec&&,       // node encoding
-            vector<DOF>&& // dof identifier
+    Element(unsigned,          // tag
+            unsigned,          // number of nodes
+            unsigned,          // number of dofs
+            uvec&&,            // node encoding
+            std::vector<DOF>&& // dof identifier
     );
-    Element(unsigned,     // tag
-            unsigned,     // number of nodes
-            unsigned,     // number of dofs
-            uvec&&,       // node encoding
-            uvec&&,       // material tags
-            bool,         // nonlinear geometry switch
-            MaterialType, // material type for internal check
-            vector<DOF>&& // dof identifier
+    Element(unsigned,          // tag
+            unsigned,          // number of nodes
+            unsigned,          // number of dofs
+            uvec&&,            // node encoding
+            uvec&&,            // material tags
+            bool,              // nonlinear geometry switch
+            MaterialType,      // material type for internal check
+            std::vector<DOF>&& // dof identifier
     );
-    Element(unsigned,     // tag
-            unsigned,     // number of nodes
-            unsigned,     // number of dofs
-            uvec&&,       // node encoding
-            uvec&&,       // section tags
-            bool,         // nonlinear geometry switch
-            SectionType,  // section type for internal check
-            vector<DOF>&& // dof identifier
+    Element(unsigned,          // tag
+            unsigned,          // number of nodes
+            unsigned,          // number of dofs
+            uvec&&,            // node encoding
+            uvec&&,            // section tags
+            bool,              // nonlinear geometry switch
+            SectionType,       // section type for internal check
+            std::vector<DOF>&& // dof identifier
     );
     Element(unsigned, // tag
             unsigned, // number of dofs
@@ -201,7 +201,7 @@ public:
     [[nodiscard]] unsigned get_total_number() const override;
 
     void clear_node_ptr() override;
-    [[nodiscard]] const vector<weak_ptr<Node>>& get_node_ptr() const override;
+    [[nodiscard]] const std::vector<weak_ptr<Node>>& get_node_ptr() const override;
 
     [[nodiscard]] const vec& get_trial_resistance() const override;
     [[nodiscard]] const vec& get_current_resistance() const override;
@@ -240,7 +240,7 @@ public:
     const vec& update_body_force(const vec&) override;
     const vec& update_traction(const vec&) override;
 
-    vector<vec> record(OutputType) override;
+    std::vector<vec> record(OutputType) override;
 
     [[nodiscard]] double get_strain_energy() const override;
     [[nodiscard]] double get_complementary_energy() const override;

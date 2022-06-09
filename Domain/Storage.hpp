@@ -89,7 +89,7 @@ template<> inline const char* StorageType<Solver>() { return "Solver"; }
 template<typename T> class Storage : public std::enable_shared_from_this<Storage<T>> {
     const char* type = StorageType<object_type>();
 
-    vector<shared_ptr<T>> fish; /**< data storage */
+    std::vector<shared_ptr<T>> fish; /**< data storage */
 
     const shared_ptr<T> empty = nullptr;
 
@@ -118,7 +118,7 @@ public:
     shared_ptr<T>& operator[](unsigned);
     const shared_ptr<T>& at(unsigned) const;
 
-    const vector<shared_ptr<T>>& get() const;
+    const std::vector<shared_ptr<T>>& get() const;
 
     [[nodiscard]] bool find(unsigned) const;
     bool erase(unsigned);
@@ -155,7 +155,7 @@ template<typename T> shared_ptr<T>& Storage<T>::operator[](const unsigned L) { r
 
 template<typename T> const shared_ptr<T>& Storage<T>::at(const unsigned L) const { return pond.contains(L) ? pond.at(L) : empty; }
 
-template<typename T> const vector<shared_ptr<T>>& Storage<T>::get() const { return fish; }
+template<typename T> const std::vector<shared_ptr<T>>& Storage<T>::get() const { return fish; }
 
 template<typename T> bool Storage<T>::find(const unsigned L) const { return pond.contains(L); }
 

@@ -59,7 +59,7 @@ int RestitutionWallPenalty::process(const shared_ptr<DomainBase>& D) {
 
     const auto factor = alpha * pow(W->get_incre_time(), -2.);
 
-    vector<uword> pool;
+    std::vector<uword> pool;
     pool.reserve(n_dim * node_pool.size());
 
     resistance.zeros(W->get_size());

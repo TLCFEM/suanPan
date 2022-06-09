@@ -24,9 +24,9 @@ MaterialType ExternalMaterial::get_type(const ExternalMaterialData& D) {
     return MaterialType::D0;
 }
 
-ExternalMaterial::ExternalMaterial(const unsigned T, vector<double>&& P, void* H)
+ExternalMaterial::ExternalMaterial(const unsigned T, std::vector<double>&& P, void* H)
     : Material(T, MaterialType::D0, 0.)
-    , constant(std::forward<vector<double>>(P))
+    , constant(std::forward<std::vector<double>>(P))
     // ReSharper disable once CppFunctionalStyleCast
     , cooker(Interface(H)) {
     data.constant = constant.data();
@@ -148,4 +148,4 @@ int ExternalMaterial::clear_status() {
     return info;
 }
 
-vector<vec> ExternalMaterial::record(OutputType) { return {}; }
+std::vector<vec> ExternalMaterial::record(OutputType) { return {}; }

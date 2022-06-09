@@ -31,8 +31,8 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Storage.hpp>
 
-using ExternalModuleQueue = vector<shared_ptr<ExternalModule>>;
-using ThreadQueue = vector<shared_ptr<future<void>>>;
+using ExternalModuleQueue = std::vector<shared_ptr<ExternalModule>>;
+using ThreadQueue = std::vector<shared_ptr<future<void>>>;
 
 class Domain final : public DomainBase, public std::enable_shared_from_this<Domain> {
     std::atomic_bool updated = false;
@@ -73,7 +73,7 @@ class Domain final : public DomainBase, public std::enable_shared_from_this<Doma
     suanpan::unordered_set<uword> loaded_dofs;      /**< data storage */
     suanpan::unordered_set<uword> restrained_dofs;  /**< data storage */
 
-    vector<vector<unsigned>> color_map;
+    std::vector<std::vector<unsigned>> color_map;
 
 public:
     explicit Domain(unsigned = 0);
@@ -304,9 +304,9 @@ public:
     bool is_sparse() const override;
 
     void set_color_model(ColorMethod) override;
-    const vector<vector<unsigned>>& get_color_map() const override;
-    vector<vector<uword>> get_node_connectivity() override;
-    vector<uvec> get_element_connectivity() override;
+    const std::vector<std::vector<unsigned>>& get_color_map() const override;
+    std::vector<std::vector<uword>> get_node_connectivity() override;
+    std::vector<uvec> get_element_connectivity() override;
 
     int reorder_dof() override;
     int assign_color() override;

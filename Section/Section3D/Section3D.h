@@ -31,6 +31,8 @@
 
 #include <Section/Section.h>
 
+using std::vector;
+
 class Section3D : public Section {
 protected:
     struct IntegrationPoint {

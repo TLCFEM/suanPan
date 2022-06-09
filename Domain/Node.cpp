@@ -112,10 +112,10 @@ void Node::set_dof_number(const unsigned D) {
 
 unsigned Node::get_dof_number() const { return num_dof; }
 
-void Node::set_dof_identifier(const vector<DOF>& D) {
+void Node::set_dof_identifier(const std::vector<DOF>& D) {
     std::scoped_lock node_lock{node_mutex};
 
-    if(dof_identifier.empty()) dof_identifier = vector(num_dof, DOF::NONE);
+    if(dof_identifier.empty()) dof_identifier = std::vector(num_dof, DOF::NONE);
 
     for(size_t I = 0; I < D.size(); ++I) {
         if(DOF::NONE == D[I]) continue;
@@ -124,7 +124,7 @@ void Node::set_dof_identifier(const vector<DOF>& D) {
     }
 }
 
-const vector<DOF>& Node::get_dof_identifier() const { return dof_identifier; }
+const std::vector<DOF>& Node::get_dof_identifier() const { return dof_identifier; }
 
 void Node::set_original_dof(unsigned& F) {
     if(!is_active()) return;
@@ -491,8 +491,8 @@ void Node::clear_status() {
     set_initialized(false);
 }
 
-vector<vec> Node::record(const OutputType L) const {
-    vector<vec> data;
+std::vector<vec> Node::record(const OutputType L) const {
+    std::vector<vec> data;
 
     if(L == OutputType::RF) data.push_back(current_resistance);
     else if(L == OutputType::DF) data.push_back(current_damping_force);

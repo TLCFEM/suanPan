@@ -20,7 +20,7 @@
 
 Mass::Mass(const unsigned T, const unsigned NT, const double MA, uvec&& DT)
     : Element(T, 1, static_cast<unsigned>(DT.max()), uvec{NT}, [&] {
-        vector DI(DT.max(), DOF::NONE);
+        std::vector DI(DT.max(), DOF::NONE);
 
         for(const auto I : DT)
             if(1 == I) DI[0] = DOF::U1;

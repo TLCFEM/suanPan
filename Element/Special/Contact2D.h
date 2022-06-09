@@ -52,8 +52,8 @@ class Contact2D final : public Element {
 
     const unsigned master_tag, slave_tag;
 
-    vector<MasterNode> master;
-    vector<SlaveNode> slave;
+    std::vector<MasterNode> master;
+    std::vector<SlaveNode> slave;
 
     const double alpha;
 

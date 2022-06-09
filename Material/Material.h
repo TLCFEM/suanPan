@@ -42,8 +42,6 @@ enum class MaterialType : unsigned {
 class DomainBase;
 enum class OutputType;
 
-using std::vector;
-
 struct DataCoupleMaterial {
     double characteristic_length = -1.;
 
@@ -217,7 +215,7 @@ public:
     virtual int commit_couple_status();
     virtual int reset_couple_status();
 
-    virtual vector<vec> record(OutputType);
+    virtual std::vector<vec> record(OutputType);
 };
 
 namespace suanpan {

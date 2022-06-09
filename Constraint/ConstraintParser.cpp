@@ -42,7 +42,7 @@ void new_bc(unique_ptr<Constraint>& return_obj, istringstream& command, const bo
     }
 
     uword obj;
-    vector<uword> obj_tag;
+    std::vector<uword> obj_tag;
     while(get_input(command, obj)) obj_tag.push_back(obj);
 
     penalty ? group ? return_obj = make_unique<GroupPenaltyBC>(bc_id, 0, uvec(obj_tag), bc_type) : return_obj = make_unique<PenaltyBC>(bc_id, 0, uvec(obj_tag), bc_type) : group ? return_obj = make_unique<GroupMultiplierBC>(bc_id, 0, uvec(obj_tag), bc_type) : return_obj = make_unique<MultiplierBC>(bc_id, 0, uvec(obj_tag), bc_type);
@@ -176,8 +176,8 @@ void new_mpc(unique_ptr<Constraint>& return_obj, istringstream& command) {
         return;
     }
 
-    vector<uword> node_tag, dof_tag;
-    vector<double> weight_tag;
+    std::vector<uword> node_tag, dof_tag;
+    std::vector<double> weight_tag;
     while(!command.eof()) {
         double weight;
         uword dof, node;
@@ -253,7 +253,7 @@ void new_rigidwall(unique_ptr<Constraint>& return_obj, istringstream& command, c
         return;
     }
 
-    vector<double> p;
+    std::vector<double> p;
     double para;
     while(!command.eof() && get_input(command, para)) p.emplace_back(para);
 
@@ -324,7 +324,7 @@ void new_restitutionwall(unique_ptr<Constraint>& return_obj, istringstream& comm
         return;
     }
 
-    vector<double> p;
+    std::vector<double> p;
     double para;
     while(!command.eof() && get_input(command, para)) p.emplace_back(para);
 
