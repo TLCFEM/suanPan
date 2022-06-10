@@ -334,7 +334,7 @@ if (CMAKE_SYSTEM_NAME MATCHES "Linux")
     file(READ "/etc/os-release" DISTRO_INFO)
     string(REGEX MATCH "fedora|ubuntu" DIST ${DISTRO_INFO})
 
-    if (DIST)
+    if (DIST OR BUILD_PACKAGE)
         if ((DIST STREQUAL "ubuntu") OR (BUILD_PACKAGE MATCHES "DEB"))
             message(STATUS "Build DEB Package For Distribution: ${DIST}")
             set(CPACK_GENERATOR "DEB")
