@@ -812,7 +812,12 @@ int Domain::assign_color() {
     if(ColorMethod::OFF != color_model) {
         const auto color_algorithm = ColorMethod::WP == color_model ? sort_color_wp<unsigned> : sort_color_mis<unsigned>;
 
-        const auto [element_map, element_register] = get_element_connectivity(false);
+        std::vector<unsigned> element_map;
+        suanpan::graph<unsigned> element_register;
+
+        // Clang 13.0.1 does not allow capture structured bindings
+        // ReSharper disable once CppReplaceTieWithStructuredBinding
+        std::tie(element_map, element_register) = get_element_connectivity(false);
 
         color_map = color_algorithm(element_register);
 
