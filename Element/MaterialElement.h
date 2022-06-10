@@ -31,6 +31,9 @@
 #include <Element/Element.h>
 #include <Domain/DOF.h>
 
+using std::array;
+using std::vector;
+
 class MaterialElement : public Element {
 public:
     MaterialElement(unsigned,     // tag

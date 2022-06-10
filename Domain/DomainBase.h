@@ -40,7 +40,6 @@
 #include <Toolbox/container.h>
 
 using std::future;
-using std::map;
 
 template<sp_d T> class Factory;
 class Amplitude;
@@ -62,23 +61,23 @@ class Section;
 class Solver;
 class Step;
 
-using AmplitudeQueue = vector<shared_ptr<Amplitude>>;
-using ConstraintQueue = vector<shared_ptr<Constraint>>;
-using ConvergerQueue = vector<shared_ptr<Converger>>;
-using CriterionQueue = vector<shared_ptr<Criterion>>;
-using DatabaseQueue = vector<shared_ptr<Database>>;
-using ElementQueue = vector<shared_ptr<Element>>;
-using GroupQueue = vector<shared_ptr<Group>>;
-using IntegratorQueue = vector<shared_ptr<Integrator>>;
-using LoadQueue = vector<shared_ptr<Load>>;
-using MaterialQueue = vector<shared_ptr<Material>>;
-using ModifierQueue = vector<shared_ptr<Modifier>>;
-using NodeQueue = vector<shared_ptr<Node>>;
-using OrientationQueue = vector<shared_ptr<Orientation>>;
-using RecorderQueue = vector<shared_ptr<Recorder>>;
-using SectionQueue = vector<shared_ptr<Section>>;
-using SolverQueue = vector<shared_ptr<Solver>>;
-using StepQueue = map<unsigned, shared_ptr<Step>>;
+using AmplitudeQueue = std::vector<shared_ptr<Amplitude>>;
+using ConstraintQueue = std::vector<shared_ptr<Constraint>>;
+using ConvergerQueue = std::vector<shared_ptr<Converger>>;
+using CriterionQueue = std::vector<shared_ptr<Criterion>>;
+using DatabaseQueue = std::vector<shared_ptr<Database>>;
+using ElementQueue = std::vector<shared_ptr<Element>>;
+using GroupQueue = std::vector<shared_ptr<Group>>;
+using IntegratorQueue = std::vector<shared_ptr<Integrator>>;
+using LoadQueue = std::vector<shared_ptr<Load>>;
+using MaterialQueue = std::vector<shared_ptr<Material>>;
+using ModifierQueue = std::vector<shared_ptr<Modifier>>;
+using NodeQueue = std::vector<shared_ptr<Node>>;
+using OrientationQueue = std::vector<shared_ptr<Orientation>>;
+using RecorderQueue = std::vector<shared_ptr<Recorder>>;
+using SectionQueue = std::vector<shared_ptr<Section>>;
+using SolverQueue = std::vector<shared_ptr<Solver>>;
+using StepQueue = std::map<unsigned, shared_ptr<Step>>;
 
 using LongFactory = Factory<double>;
 
@@ -105,7 +104,7 @@ public:
     virtual void wait() = 0;
 
     virtual bool insert(const shared_ptr<ExternalModule>&) = 0;
-    [[nodiscard]] virtual const vector<shared_ptr<ExternalModule>>& get_external_module_pool() const = 0;
+    [[nodiscard]] virtual const std::vector<shared_ptr<ExternalModule>>& get_external_module_pool() const = 0;
 
     virtual bool insert(const shared_ptr<Amplitude>&) = 0;
     virtual bool insert(const shared_ptr<Constraint>&) = 0;
@@ -182,7 +181,7 @@ public:
 
     template<typename T> const shared_ptr<T>& get(unsigned);
     template<typename T> const shared_ptr<T>& get(uword);
-    template<typename T> vector<shared_ptr<T>> get(const uvec&);
+    template<typename T> std::vector<shared_ptr<T>> get(const uvec&);
     [[nodiscard]] virtual const shared_ptr<Amplitude>& get_amplitude(unsigned) const = 0;
     [[nodiscard]] virtual const shared_ptr<Constraint>& get_constraint(unsigned) const = 0;
     [[nodiscard]] virtual const shared_ptr<Converger>& get_converger(unsigned) const = 0;
@@ -201,7 +200,7 @@ public:
     [[nodiscard]] virtual const shared_ptr<Solver>& get_solver(unsigned) const = 0;
     [[nodiscard]] virtual const shared_ptr<Step>& get_step(unsigned) const = 0;
 
-    template<typename T> const vector<shared_ptr<T>>& get_pool();
+    template<typename T> const std::vector<shared_ptr<T>>& get_pool();
     [[nodiscard]] virtual const AmplitudeQueue& get_amplitude_pool() const = 0;
     [[nodiscard]] virtual const ConstraintQueue& get_constraint_pool() const = 0;
     [[nodiscard]] virtual const ConvergerQueue& get_converger_pool() const = 0;
@@ -327,9 +326,8 @@ public:
     [[nodiscard]] virtual bool is_sparse() const = 0;
 
     virtual void set_color_model(ColorMethod) = 0;
-    [[nodiscard]] virtual const vector<vector<unsigned>>& get_color_map() const = 0;
-    [[nodiscard]] virtual vector<vector<uword>> get_node_connectivity() = 0;
-    [[nodiscard]] virtual vector<uvec> get_element_connectivity() = 0;
+    [[nodiscard]] virtual const std::vector<std::vector<unsigned>>& get_color_map() const = 0;
+    [[nodiscard]] virtual std::pair<std::vector<unsigned>, suanpan::graph<unsigned>> get_element_connectivity(bool) = 0;
 
     virtual int reorder_dof() = 0;
     virtual int assign_color() = 0;
@@ -431,8 +429,8 @@ template<typename T> const shared_ptr<T>& DomainBase::get(unsigned) { throw inva
 
 template<typename T> const shared_ptr<T>& DomainBase::get(uword) { throw invalid_argument("unsupported"); }
 
-template<typename T> vector<shared_ptr<T>> DomainBase::get(const uvec& P) {
-    vector<shared_ptr<T>> output;
+template<typename T> std::vector<shared_ptr<T>> DomainBase::get(const uvec& P) {
+    std::vector<shared_ptr<T>> output;
     output.reserve(P.n_elem);
 
     for(auto I : P) output.emplace_back(get<T>(I));
@@ -508,39 +506,39 @@ template<> inline const shared_ptr<Solver>& DomainBase::get<Solver>(const unsign
 
 template<> inline const shared_ptr<Step>& DomainBase::get<Step>(const unsigned T) { return get_step(T); }
 
-template<typename T> const vector<shared_ptr<T>>& DomainBase::get_pool() { throw invalid_argument("unsupported"); }
+template<typename T> const std::vector<shared_ptr<T>>& DomainBase::get_pool() { throw invalid_argument("unsupported"); }
 
-template<> inline const vector<shared_ptr<Amplitude>>& DomainBase::get_pool<Amplitude>() { return get_amplitude_pool(); }
+template<> inline const std::vector<shared_ptr<Amplitude>>& DomainBase::get_pool<Amplitude>() { return get_amplitude_pool(); }
 
-template<> inline const vector<shared_ptr<Constraint>>& DomainBase::get_pool<Constraint>() { return get_constraint_pool(); }
+template<> inline const std::vector<shared_ptr<Constraint>>& DomainBase::get_pool<Constraint>() { return get_constraint_pool(); }
 
-template<> inline const vector<shared_ptr<Converger>>& DomainBase::get_pool<Converger>() { return get_converger_pool(); }
+template<> inline const std::vector<shared_ptr<Converger>>& DomainBase::get_pool<Converger>() { return get_converger_pool(); }
 
-template<> inline const vector<shared_ptr<Criterion>>& DomainBase::get_pool<Criterion>() { return get_criterion_pool(); }
+template<> inline const std::vector<shared_ptr<Criterion>>& DomainBase::get_pool<Criterion>() { return get_criterion_pool(); }
 
-template<> inline const vector<shared_ptr<Database>>& DomainBase::get_pool<Database>() { return get_database_pool(); }
+template<> inline const std::vector<shared_ptr<Database>>& DomainBase::get_pool<Database>() { return get_database_pool(); }
 
-template<> inline const vector<shared_ptr<Element>>& DomainBase::get_pool<Element>() { return get_element_pool(); }
+template<> inline const std::vector<shared_ptr<Element>>& DomainBase::get_pool<Element>() { return get_element_pool(); }
 
-template<> inline const vector<shared_ptr<Group>>& DomainBase::get_pool<Group>() { return get_group_pool(); }
+template<> inline const std::vector<shared_ptr<Group>>& DomainBase::get_pool<Group>() { return get_group_pool(); }
 
-template<> inline const vector<shared_ptr<Integrator>>& DomainBase::get_pool<Integrator>() { return get_integrator_pool(); }
+template<> inline const std::vector<shared_ptr<Integrator>>& DomainBase::get_pool<Integrator>() { return get_integrator_pool(); }
 
-template<> inline const vector<shared_ptr<Load>>& DomainBase::get_pool<Load>() { return get_load_pool(); }
+template<> inline const std::vector<shared_ptr<Load>>& DomainBase::get_pool<Load>() { return get_load_pool(); }
 
-template<> inline const vector<shared_ptr<Material>>& DomainBase::get_pool<Material>() { return get_material_pool(); }
+template<> inline const std::vector<shared_ptr<Material>>& DomainBase::get_pool<Material>() { return get_material_pool(); }
 
-template<> inline const vector<shared_ptr<Modifier>>& DomainBase::get_pool<Modifier>() { return get_modifier_pool(); }
+template<> inline const std::vector<shared_ptr<Modifier>>& DomainBase::get_pool<Modifier>() { return get_modifier_pool(); }
 
-template<> inline const vector<shared_ptr<Node>>& DomainBase::get_pool<Node>() { return get_node_pool(); }
+template<> inline const std::vector<shared_ptr<Node>>& DomainBase::get_pool<Node>() { return get_node_pool(); }
 
-template<> inline const vector<shared_ptr<Orientation>>& DomainBase::get_pool<Orientation>() { return get_orientation_pool(); }
+template<> inline const std::vector<shared_ptr<Orientation>>& DomainBase::get_pool<Orientation>() { return get_orientation_pool(); }
 
-template<> inline const vector<shared_ptr<Recorder>>& DomainBase::get_pool<Recorder>() { return get_recorder_pool(); }
+template<> inline const std::vector<shared_ptr<Recorder>>& DomainBase::get_pool<Recorder>() { return get_recorder_pool(); }
 
-template<> inline const vector<shared_ptr<Section>>& DomainBase::get_pool<Section>() { return get_section_pool(); }
+template<> inline const std::vector<shared_ptr<Section>>& DomainBase::get_pool<Section>() { return get_section_pool(); }
 
-template<> inline const vector<shared_ptr<Solver>>& DomainBase::get_pool<Solver>() { return get_solver_pool(); }
+template<> inline const std::vector<shared_ptr<Solver>>& DomainBase::get_pool<Solver>() { return get_solver_pool(); }
 
 template<typename T> size_t DomainBase::get() { throw invalid_argument("unsupported"); }
 

@@ -38,7 +38,7 @@ void EigenRecorder::record(const shared_ptr<DomainBase>& D) {
     eigen_value = W->get_eigenvalue();
     const auto& eig_vector = W->get_eigenvector();
 
-    eigen_pool = vector<std::map<unsigned, vec>>(eigen_value.n_elem);
+    eigen_pool = std::vector<std::map<unsigned, vec>>(eigen_value.n_elem);
 
     const auto& node_pool = D->get_node_pool();
 

@@ -20,7 +20,7 @@
 #include <Domain/Group/Group.h>
 
 void GroupElementRecorder::update_tag(const shared_ptr<DomainBase>& D) {
-    vector<uword> tag;
+    std::vector<uword> tag;
 
     for(auto& I : groups) if(D->find<Group>(I)) for(auto& J : D->get<Group>(I)->get_pool()) tag.emplace_back(J);
 

@@ -24,7 +24,7 @@ GroupGroup::GroupGroup(const unsigned T, uvec&& GT)
 
 void GroupGroup::initialize(const shared_ptr<DomainBase>& D) {
     uword size = 0;
-    vector<const uvec*> ocean;
+    std::vector<const uvec*> ocean;
     ocean.reserve(group_tag.n_elem);
     for(const auto I : group_tag)
         if(D->find<Group>(I)) {
@@ -34,7 +34,7 @@ void GroupGroup::initialize(const shared_ptr<DomainBase>& D) {
             size += ocean.back()->size();
         }
 
-    vector<uword> pond;
+    std::vector<uword> pond;
     pond.reserve(size);
 
     for(const auto& I : ocean) for(auto J : *I) pond.emplace_back(J);

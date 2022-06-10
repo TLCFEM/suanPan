@@ -32,15 +32,7 @@ EnergyEvolution::EnergyEvolution(const unsigned T, const unsigned ST, const unsi
     , get_energy(nullptr) {}
 
 int EnergyEvolution::initialize(const shared_ptr<DomainBase>& D) {
-    const auto node_pool = D->get_node_connectivity();
-    auto element_pool = D->get_element_connectivity();
-
-    map.clear();
-    map.resize(element_pool.size(), std::vector<uword>{});
-
-    for(decltype(element_pool.size()) element = 0; element < element_pool.size(); ++element) for(const auto connected_node : element_pool[element]) for(const auto connected_element : node_pool[connected_node]) if(element != connected_element) map[element].emplace_back(connected_element);
-
-    suanpan_for_each(map.begin(), map.end(), [](vector<uword>& element) { suanpan::unique(element); });
+    std::tie(index, map) = D->get_element_connectivity(true);
 
     energy.zeros(map.size());
 
@@ -57,19 +49,17 @@ int EnergyEvolution::process(const shared_ptr<DomainBase>& D) {
     Col<int> state(map.size());
 
     suanpan_for(0llu, current_energy.n_elem, [&](const uword I) {
-        if(D->find<Element>(I)) {
-            if(const auto& t_element = D->get<Element>(I); !t_element->is_active()) {
-                current_energy(I) = 0.;
-                state(I) = 0; // disabled
-            }
-            else {
-                current_energy(I) = get_energy(t_element.get()) / t_element->get_characteristic_length();
-                state(I) = 1; // enabled
-            }
-        }
-        else {
+        if(!D->find<Element>(index[I])) {
             current_energy(I) = 0.;
             state(I) = -1; // not defined
+        }
+        else if(const auto& t_element = D->get<Element>(index[I]); !t_element->is_active()) {
+            current_energy(I) = 0.;
+            state(I) = 0; // disabled
+        }
+        else {
+            current_energy(I) = get_energy(t_element.get()) / t_element->get_characteristic_length();
+            state(I) = 1; // enabled
         }
     });
 
@@ -82,11 +72,11 @@ int EnergyEvolution::process(const shared_ptr<DomainBase>& D) {
     unsigned counter = 0;
     while(counter++ != iteration) {
         const auto previous_energy = current_energy;
-        current_energy *= weight;
+        current_energy *= weight - 1.;
 
         suanpan_for(0llu, current_energy.n_elem, [&](const uword I) {
             for(const auto J : map[I]) current_energy(I) += previous_energy(J);
-            current_energy(I) /= static_cast<double>(map[I].size()) + weight;
+            current_energy(I) /= static_cast<double>(map[I].size()) + weight - 1.;
         });
     }
 
@@ -99,14 +89,14 @@ int EnergyEvolution::process(const shared_ptr<DomainBase>& D) {
 
     sorted_list = disabled_list(sorted_list.tail(reactive_ratio * disabled_list.n_elem / 100));
     suanpan_for_each(sorted_list.cbegin(), sorted_list.cend(), [&](const uword I) {
-        D->enable_element(static_cast<unsigned>(I));
+        D->enable_element(index[I]);
         state(I) = 1;
     });
 
     const uvec enabled_list = find(state == 1);
     sorted_list = sort_index(energy(enabled_list));
     sorted_list = enabled_list(sorted_list.head(enabled_list.n_elem - std::min((100 - current_level) * current_energy.n_elem / 100, enabled_list.n_elem)));
-    suanpan_for_each(sorted_list.cbegin(), sorted_list.cend(), [&](const uword I) { D->disable_element(static_cast<unsigned>(I)); });
+    suanpan_for_each(sorted_list.cbegin(), sorted_list.cend(), [&](const uword I) { D->disable_element(index[I]); });
 
     if(D->is_updated() && current_level == final_level) return SUANPAN_EXIT;
 

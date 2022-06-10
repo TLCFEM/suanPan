@@ -31,6 +31,8 @@
 
 #include <Material/Material.h>
 
+using std::vector;
+
 class Material1D : public Material {
 public:
     Material1D(unsigned, // tag

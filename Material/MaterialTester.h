@@ -31,10 +31,10 @@
 #include <Material/Material.h>
 
 bool initialise_material(const shared_ptr<Material>&, uword);
-mat material_tester(const shared_ptr<Material>&, const vector<unsigned>&, const vec&);
-mat material_tester(const shared_ptr<Material>&, const vector<unsigned>&, const vec&, const vec&);
-mat material_tester_by_load(const shared_ptr<Material>&, const vector<unsigned>&, const vec&);
-mat material_tester_by_load(const shared_ptr<Material>&, const vector<unsigned>&, const vec&, const vec&);
+mat material_tester(const shared_ptr<Material>&, const std::vector<unsigned>&, const vec&);
+mat material_tester(const shared_ptr<Material>&, const std::vector<unsigned>&, const vec&, const vec&);
+mat material_tester_by_load(const shared_ptr<Material>&, const std::vector<unsigned>&, const vec&);
+mat material_tester_by_load(const shared_ptr<Material>&, const std::vector<unsigned>&, const vec&, const vec&);
 mat material_tester_by_strain_history(const shared_ptr<Material>&, const mat&);
 mat material_tester_by_stress_history(const shared_ptr<Material>&, const mat&);
 

@@ -31,6 +31,8 @@
 
 #include <Section/Section.h>
 
+using std::vector;
+
 class Section1D : public Section {
 protected:
     unique_ptr<Material> s_material;

@@ -29,7 +29,7 @@ auto small_graph(const unsigned long long N, const double D) {
     return graph;
 }
 
-auto color_graph(const unsigned long long N, const double D, vector<vector<unsigned>> (&algorithm)(const suanpan::graph<unsigned>&)) {
+auto color_graph(const unsigned long long N, const double D, std::vector<std::vector<unsigned>> (&algorithm)(const suanpan::graph<unsigned>&)) {
     const auto graph = small_graph(N, D);
 
     const auto color_map = algorithm(graph);

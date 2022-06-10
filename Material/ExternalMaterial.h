@@ -58,16 +58,16 @@ class ExternalMaterial final : public Material {
 
     using Interface = void (*)(ExternalMaterialData*, int*);
 
-    vector<double> constant;
+    std::vector<double> constant;
 
     Interface cooker;
 
     ExternalMaterialData data;
 
 public:
-    ExternalMaterial(unsigned,         // unique material tag
-                     vector<double>&&, // parameter pool
-                     void*             // handler pointer
+    ExternalMaterial(unsigned,              // unique material tag
+                     std::vector<double>&&, // parameter pool
+                     void*                  // handler pointer
     );
     ExternalMaterial(const ExternalMaterial&);
     ExternalMaterial(ExternalMaterial&&) noexcept = delete;
@@ -91,7 +91,7 @@ public:
     int reset_status() override;
     int clear_status() override;
 
-    vector<vec> record(OutputType) override;
+    std::vector<vec> record(OutputType) override;
 };
 
 #endif

@@ -235,41 +235,41 @@ vec Element::get_node_current_resistance() const {
     return node_current_resistance;
 }
 
-vector<shared_ptr<Material>> Element::get_material(const shared_ptr<DomainBase>& D) const {
-    vector<shared_ptr<Material>> material_pool;
+std::vector<shared_ptr<Material>> Element::get_material(const shared_ptr<DomainBase>& D) const {
+    std::vector<shared_ptr<Material>> material_pool;
     for(const auto& I : material_tag) material_pool.emplace_back(D->find<Material>(I) ? D->get<Material>(I) : nullptr);
     return material_pool;
 }
 
-vector<shared_ptr<Section>> Element::get_section(const shared_ptr<DomainBase>& D) const {
-    vector<shared_ptr<Section>> section_pool;
+std::vector<shared_ptr<Section>> Element::get_section(const shared_ptr<DomainBase>& D) const {
+    std::vector<shared_ptr<Section>> section_pool;
     for(const auto& I : section_tag) section_pool.emplace_back(D->find<Section>(I) ? D->get<Section>(I) : nullptr);
     return section_pool;
 }
 
-Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, vector<DOF>&& DI)
-    : Element(T, NN, ND, std::forward<uvec>(NT), {}, false, MaterialType::D0, std::forward<vector<DOF>>(DI)) {}
+Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, std::vector<DOF>&& DI)
+    : Element(T, NN, ND, std::forward<uvec>(NT), {}, false, MaterialType::D0, std::forward<std::vector<DOF>>(DI)) {}
 
-Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& MT, const bool F, const MaterialType MTP, vector<DOF>&& DI)
+Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& MT, const bool F, const MaterialType MTP, std::vector<DOF>&& DI)
     : DataElement{std::forward<uvec>(NT), std::forward<uvec>(MT), uvec{}, F, true, true, true, true, {}}
     , ElementBase(T)
     , num_node(NN)
     , num_dof(ND)
     , mat_type(MTP)
     , sec_type(SectionType::D0)
-    , dof_identifier(std::forward<vector<DOF>>(DI)) {
+    , dof_identifier(std::forward<std::vector<DOF>>(DI)) {
     suanpan_debug("Element %u ctor() called.\n", T);
     suanpan_debug([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw invalid_argument("size of dof identifier must meet number of dofs"); });
 }
 
-Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& ST, const bool F, const SectionType STP, vector<DOF>&& DI)
+Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& ST, const bool F, const SectionType STP, std::vector<DOF>&& DI)
     : DataElement{std::forward<uvec>(NT), uvec{}, std::forward<uvec>(ST), F, true, true, true, true, {}}
     , ElementBase(T)
     , num_node(NN)
     , num_dof(ND)
     , mat_type(MaterialType::D0)
     , sec_type(STP)
-    , dof_identifier(std::forward<vector<DOF>>(DI)) {
+    , dof_identifier(std::forward<std::vector<DOF>>(DI)) {
     suanpan_debug("Element %u ctor() called.\n", T);
     suanpan_debug([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw invalid_argument("size of dof identifier must meet number of dofs"); });
 }
@@ -305,7 +305,7 @@ int Element::initialize_base(const shared_ptr<DomainBase>& D) {
 
     // use node group instead of node
     if(use_group) {
-        vector<const uvec*> pool;
+        std::vector<const uvec*> pool;
         pool.reserve(node_encoding.n_elem);
         for(const auto I : node_encoding)
             if(D->find<Group>(I)) pool.emplace_back(&D->get<Group>(I)->get_pool());
@@ -429,7 +429,7 @@ unsigned Element::get_total_number() const { return num_size; }
 
 void Element::clear_node_ptr() { node_ptr.clear(); }
 
-const vector<weak_ptr<Node>>& Element::get_node_ptr() const { return node_ptr; }
+const std::vector<weak_ptr<Node>>& Element::get_node_ptr() const { return node_ptr; }
 
 const vec& Element::get_trial_resistance() const { return trial_resistance; }
 
@@ -548,7 +548,7 @@ const vec& Element::update_body_force(const vec& load_factor) { return body_forc
 
 const vec& Element::update_traction(const vec& load_factor) { return traction.is_empty() ? trial_traction : trial_traction = traction * load_factor; }
 
-vector<vec> Element::record(const OutputType) { return {}; }
+std::vector<vec> Element::record(const OutputType) { return {}; }
 
 double Element::get_strain_energy() const { return strain_energy; }
 

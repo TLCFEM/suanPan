@@ -38,7 +38,7 @@ void SumRecorder::record(const shared_ptr<DomainBase>& D) {
 
     auto& obj_tag = get_object_tag();
 
-    vector<vec> data{{0.}};
+    std::vector<vec> data{{0.}};
     for(auto I = 0; I < static_cast<int>(obj_tag.n_elem); ++I) if(const auto t_data = D->get<Node>(obj_tag(I))->record(get_variable_type()); !t_data.empty() && !t_data.cbegin()->empty()) data[0] += t_data[0];
     insert(data, 0);
 

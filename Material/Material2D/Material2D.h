@@ -38,6 +38,8 @@
 
 #include <Material/Material.h>
 
+using std::vector;
+
 enum class PlaneType : unsigned {
     S = 1,
     E = 2,

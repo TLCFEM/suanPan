@@ -44,7 +44,7 @@ int RigidWallPenalty::process(const shared_ptr<DomainBase>& D) {
 
     stiffness.reset();
     resistance.zeros(W->get_size());
-    vector<uword> pool;
+    std::vector<uword> pool;
 
     auto counter = 0llu;
     for(const auto& I : D->get_node_pool()) {

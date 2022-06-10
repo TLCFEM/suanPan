@@ -58,8 +58,8 @@ class Contact3D final : public Element {
 
     const unsigned master_tag, slave_tag;
 
-    vector<MasterFacet> master;
-    vector<SlaveNode> slave;
+    std::vector<MasterFacet> master;
+    std::vector<SlaveNode> slave;
 
     const double alpha;
 

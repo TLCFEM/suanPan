@@ -130,7 +130,7 @@ void ExternalModule::new_adapter(unique_ptr<Material>& return_obj, istringstream
         return;
     }
 
-    vector<double> pool;
+    std::vector<double> pool;
 
     double para;
 

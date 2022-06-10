@@ -145,7 +145,7 @@ void print_header() {
     suanpan_info("+--------------------------------------------------+\n");
     suanpan_info("|  https://gitter.im/suanPan-dev/community         |\n");
 #else
-    vector<const char8_t*> POOL;
+    std::vector<const char8_t*> POOL;
     POOL.reserve(10);
     POOL.emplace_back(u8"\U0001F308");
     POOL.emplace_back(u8"\U0001F30F");

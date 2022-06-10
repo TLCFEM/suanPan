@@ -40,7 +40,7 @@ bool initialise_material(const shared_ptr<Material>& obj, const uword size) {
     return true;
 }
 
-mat material_tester(const shared_ptr<Material>& obj, const vector<unsigned>& idx, const vec& incre) {
+mat material_tester(const shared_ptr<Material>& obj, const std::vector<unsigned>& idx, const vec& incre) {
     if(!initialise_material(obj, incre.n_elem)) return {};
 
     unsigned total_size = 1;
@@ -76,7 +76,7 @@ mat material_tester(const shared_ptr<Material>& obj, const vector<unsigned>& idx
     return response;
 }
 
-mat material_tester(const shared_ptr<Material>& obj, const vector<unsigned>& idx, const vec& incre, const vec& base) {
+mat material_tester(const shared_ptr<Material>& obj, const std::vector<unsigned>& idx, const vec& incre, const vec& base) {
     if(!initialise_material(obj, incre.n_elem)) return {};
 
     unsigned total_size = 2;
@@ -119,7 +119,7 @@ mat material_tester(const shared_ptr<Material>& obj, const vector<unsigned>& idx
     return response;
 }
 
-mat material_tester_by_load(const shared_ptr<Material>& obj, const vector<unsigned>& idx, const vec& incre) {
+mat material_tester_by_load(const shared_ptr<Material>& obj, const std::vector<unsigned>& idx, const vec& incre) {
     if(!initialise_material(obj, incre.n_elem)) return {};
 
     unsigned total_size = 1;
@@ -168,7 +168,7 @@ mat material_tester_by_load(const shared_ptr<Material>& obj, const vector<unsign
     return response;
 }
 
-mat material_tester_by_load(const shared_ptr<Material>& obj, const vector<unsigned>& idx, const vec& incre, const vec& base) {
+mat material_tester_by_load(const shared_ptr<Material>& obj, const std::vector<unsigned>& idx, const vec& incre, const vec& base) {
     if(!initialise_material(obj, incre.n_elem)) return {};
 
     unsigned total_size = 2;

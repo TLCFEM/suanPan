@@ -74,7 +74,7 @@ int create_new_recorder(const shared_ptr<DomainBase>& domain, istringstream& com
     }
 
     unsigned s_object_tag;
-    vector<uword> object_tag;
+    std::vector<uword> object_tag;
     while(!command.eof() && get_input(command, s_object_tag)) object_tag.emplace_back(s_object_tag);
 
     if(const auto use_hdf5 = is_equal(file_type[0], 'h'); is_equal(object_type, "Node") && !domain->insert(make_shared<NodeRecorder>(tag, uvec(object_tag), to_list(variable_type.c_str()), interval, true, use_hdf5))) suanpan_error("create_new_recorder() fails to create a new node recorder.\n");
@@ -139,7 +139,7 @@ int create_new_plainrecorder(const shared_ptr<DomainBase>& domain, istringstream
     }
 
     unsigned s_object_tag;
-    vector<uword> object_tag;
+    std::vector<uword> object_tag;
     while(!command.eof() && get_input(command, s_object_tag)) object_tag.emplace_back(s_object_tag);
 
     if(is_equal(object_type, "Node") && !domain->insert(make_shared<NodeRecorder>(tag, uvec(object_tag), to_list(variable_type.c_str()), interval, true, false))) suanpan_error("create_new_plainrecorder() fails to create a new node recorder.\n");
@@ -222,7 +222,7 @@ int create_new_hdf5recorder(const shared_ptr<DomainBase>& domain, istringstream&
     }
 
     uword s_object_tag = 0;
-    vector<uword> object_tag;
+    std::vector<uword> object_tag;
     while(!command.eof() && get_input(command, s_object_tag)) object_tag.emplace_back(s_object_tag);
 
     if(is_equal(object_type, "Node") && !domain->insert(make_shared<NodeRecorder>(tag, uvec(object_tag), to_list(variable_type.c_str()), interval, true, true))) suanpan_error("create_new_hdf5recorder() fails to create a new node recorder.\n");

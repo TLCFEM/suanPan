@@ -25,6 +25,8 @@
 #include <sys/stat.h>
 #endif
 
+using std::vector;
+
 void new_afc01(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {

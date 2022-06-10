@@ -36,7 +36,7 @@ int RigidWallMultiplier::process(const shared_ptr<DomainBase>& D) {
     auto& W = D->get_factory();
 
     auxiliary_stiffness.reset();
-    vector<double> t_resistance, t_load;
+    std::vector<double> t_resistance, t_load;
 
     // multiplier method
     auto counter = 0llu;

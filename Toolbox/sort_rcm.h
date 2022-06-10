@@ -42,9 +42,7 @@
 
 #include <Domain/MetaMat/triplet_form.hpp>
 
-using std::vector;
-
-uvec sort_rcm(const vector<uvec>&, const uvec&);
+uvec sort_rcm(const std::vector<uvec>&, const uvec&);
 
 template<typename eT> uvec sort_rcm(const SpMat<eT>& MEAT) {
 #ifdef SUANPAN_DEBUG
@@ -62,7 +60,7 @@ template<typename eT> uvec sort_rcm(const SpMat<eT>& MEAT) {
     uvec E(S, fill::none);
     suanpan_for(0llu, S, [&](const uword I) { E(I) = MEAT.col(I).n_nonzero; });
 
-    vector<uvec> A(S);
+    std::vector<uvec> A(S);
     suanpan_for(0llu, S, [&](const uword K) {
         unsigned J = 0;
         uvec IDX(E(K));
@@ -74,7 +72,7 @@ template<typename eT> uvec sort_rcm(const SpMat<eT>& MEAT) {
     uvec G = sort_index(E);
 
     //! Now define the mask vector to indicate if one node is numbered or not.
-    vector<bool> M(S, false);
+    std::vector<bool> M(S, false);
     //! Define the new order vector.
     uvec R(S, fill::zeros);
 
