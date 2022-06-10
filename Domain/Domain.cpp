@@ -719,36 +719,31 @@ void Domain::set_color_model(const ColorMethod B) {
 
 const std::vector<std::vector<unsigned>>& Domain::get_color_map() const { return color_map; }
 
-/**
- * \brief list of connected element tags for each node
- * \return list
- */
-std::vector<std::vector<uword>> Domain::get_node_connectivity() {
-    unsigned max_tag = 0;
-    for(const auto& [t_tag , t_node] : node_pond) if(t_tag > max_tag) max_tag = t_tag;
+std::pair<std::vector<unsigned>, suanpan::graph<unsigned>> Domain::get_element_connectivity(const bool all_elements) {
+    // node tag <--> pool of connected elements
+    suanpan::unordered_map<uword, suanpan::unordered_set<unsigned>> node_register;
 
-    std::vector node_connectivity(++max_tag, std::vector<uword>{});
+    // element tag mapping
+    std::vector<unsigned> element_map; // new_idx -> old_tag
+    element_map.reserve(element_pond.size());
 
-    for(const auto& [t_tag, t_element] : element_pond) for(const auto t_node : t_element->get_node_encoding()) node_connectivity[t_node].emplace_back(t_tag);
+    auto element_tag = 0u;
 
-    suanpan_for_each(node_connectivity.begin(), node_connectivity.end(), [](std::vector<uword>& t_node) { suanpan::unique(t_node); });
+    auto populate = [&](const shared_ptr<Element>& t_element) {
+        element_map.emplace_back(t_element->get_tag());
+        const auto& t_encoding = t_element->get_node_encoding();
+        suanpan_for_each(t_encoding.cbegin(), t_encoding.cend(), [&](const uword t_node) { node_register[t_node].insert(element_tag); });
+        element_tag++;
+    };
 
-    return node_connectivity;
-}
+    if(all_elements) for(auto& [t_tag, t_element] : element_pond) populate(t_element);
+    else for(auto& t_element : element_pond.get()) populate(t_element);
 
-/**
- * \brief list of connected node tags for each element
- * \return list
- */
-std::vector<uvec> Domain::get_element_connectivity() {
-    unsigned max_tag = 0;
-    for(const auto& [t_tag, t_element] : element_pond) if(t_tag > max_tag) max_tag = t_tag;
+    suanpan::graph<unsigned> element_register(element_tag);
 
-    std::vector element_connectivity(++max_tag, uvec{});
+    suanpan_for_each(node_register.begin(), node_register.end(), [&](const std::pair<uword, suanpan::unordered_set<unsigned>>& t_node) { for(const auto& t_element = t_node.second; const auto I : t_element) element_register[I].insert(t_element.cbegin(), t_element.cend()); });
 
-    suanpan_for_each(element_pond.cbegin(), element_pond.cend(), [&](const std::pair<unsigned, shared_ptr<Element>>& t_element) { element_connectivity[t_element.first] = t_element.second->get_node_encoding(); });
-
-    return element_connectivity;
+    return std::make_pair(std::move(element_map), std::move(element_register));
 }
 
 int Domain::reorder_dof() {
@@ -817,23 +812,7 @@ int Domain::assign_color() {
     if(ColorMethod::OFF != color_model) {
         const auto color_algorithm = ColorMethod::WP == color_model ? sort_color_wp<unsigned> : sort_color_mis<unsigned>;
 
-        auto node_tag = 0llu;
-        std::unordered_map<uword, uword> node_map; // old_tag -> new_tag
-        for(auto& t_node : node_pond.get()) node_map[t_node->get_tag()] = node_tag++;
-
-        auto element_tag = 0u;
-        std::vector<unsigned> element_map; // new_idx -> old_tag
-        element_map.reserve(element_pond.get().size());
-        std::vector<std::vector<unsigned>> node_register(node_tag);
-        for(auto& t_element : element_pond.get()) {
-            element_map.emplace_back(t_element->get_tag());
-            for(const auto t_node : t_element->get_node_encoding()) node_register[node_map.at(t_node)].emplace_back(element_tag);
-            element_tag++;
-        }
-
-        suanpan::graph<unsigned> element_register(element_tag);
-
-        suanpan_for_each(node_register.begin(), node_register.end(), [&](const std::vector<unsigned>& node) { for(const auto I : node)  element_register[I].insert(node.cbegin(), node.cend()); });
+        const auto [element_map, element_register] = get_element_connectivity(false);
 
         color_map = color_algorithm(element_register);
 

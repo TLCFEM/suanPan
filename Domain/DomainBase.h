@@ -327,8 +327,7 @@ public:
 
     virtual void set_color_model(ColorMethod) = 0;
     [[nodiscard]] virtual const std::vector<std::vector<unsigned>>& get_color_map() const = 0;
-    [[nodiscard]] virtual std::vector<std::vector<uword>> get_node_connectivity() = 0;
-    [[nodiscard]] virtual std::vector<uvec> get_element_connectivity() = 0;
+    [[nodiscard]] virtual std::pair<std::vector<unsigned>, suanpan::graph<unsigned>> get_element_connectivity(bool) = 0;
 
     virtual int reorder_dof() = 0;
     virtual int assign_color() = 0;

@@ -32,6 +32,7 @@
 #define ENERGYEVOLUTION_H
 
 #include <Constraint/Criterion/Criterion.h>
+#include <Toolbox/container.h>
 
 class Element;
 
@@ -44,7 +45,8 @@ class EnergyEvolution : public Criterion {
 
     const double tolerance;
 
-    std::vector<std::vector<uword>> map;
+    suanpan::graph<unsigned> map;
+    std::vector<unsigned> index;
 
     unsigned current_level = incre_level;
 

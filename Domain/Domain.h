@@ -305,8 +305,7 @@ public:
 
     void set_color_model(ColorMethod) override;
     const std::vector<std::vector<unsigned>>& get_color_map() const override;
-    std::vector<std::vector<uword>> get_node_connectivity() override;
-    std::vector<uvec> get_element_connectivity() override;
+    std::pair<std::vector<unsigned>, suanpan::graph<unsigned>> get_element_connectivity(bool) override;
 
     int reorder_dof() override;
     int assign_color() override;
