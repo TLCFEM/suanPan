@@ -1,4 +1,4 @@
-FROM fedora:35
+FROM almalinux:9
 
 RUN dnf upgrade --refresh -y && dnf install -y libglvnd-devel gcc g++ gfortran rpm-build rpm-devel rpmdevtools cmake wget git
 
