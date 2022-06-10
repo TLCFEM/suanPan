@@ -28,7 +28,7 @@ SUANPAN_EXPORT void new_elementexample(unique_ptr<Element>& return_obj, std::ist
         return;
     }
 
-    vector<uword> node_tag(3);
+    std::vector<uword> node_tag(3);
     for(auto& I : node_tag)
         if(!get_input(command, I)) {
             suanpan_error("new_elementexample() needs 3 nodes.\n");
