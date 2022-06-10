@@ -763,20 +763,24 @@ int Domain::reorder_dof() {
     std::vector<suanpan::unordered_set<uword>> adjacency(dof_counter);
     suanpan_for_each(element_pond.get().cbegin(), element_pond.get().cend(), [&](const shared_ptr<Element>& t_element) {
         t_element->update_dof_encoding();
-        for(auto& t_encoding = t_element->get_dof_encoding(); const auto& I : t_encoding) for(const auto& J : t_encoding) adjacency[I].insert(J);
+        for(auto& t_encoding = t_element->get_dof_encoding(); const auto I : t_encoding) adjacency[I].insert(t_encoding.cbegin(), t_encoding.cend());
     });
 
     // for nonlinear constraint
     for(const auto& [t_tag, t_constraint] : constraint_pond) {
         if(!t_constraint->is_connected()) continue;
-        std::vector<uword> t_encoding;
-        for(auto& I : t_constraint->get_node_encoding()) if(find<Node>(I)) for(auto& J : get<Node>(I)->get_reordered_dof()) t_encoding.emplace_back(J);
-        for(const auto& I : t_encoding) for(const auto& J : t_encoding) adjacency[I].insert(J);
+        std::set<uword> t_encoding;
+        for(const auto i : t_constraint->get_node_encoding())
+            if(find<Node>(i)) {
+                const auto& t_dof = get<Node>(i)->get_reordered_dof();
+                t_encoding.insert(t_dof.cbegin(), t_dof.cend());
+            }
+        for(const auto I : t_encoding) adjacency[I].insert(t_encoding.cbegin(), t_encoding.cend());
     }
 
     // count number of degree
     uvec num_degree(dof_counter);
-    suanpan_for(0u, dof_counter, [&](const unsigned I) { num_degree(I) = adjacency[I].size(); });
+    suanpan_for(0u, dof_counter, [&](const unsigned i) { num_degree(i) = adjacency[i].size(); });
 
     // sort each column according to its degree
     std::vector<uvec> adjacency_sorted(dof_counter);
@@ -829,7 +833,7 @@ int Domain::assign_color() {
 
         suanpan::graph<unsigned> element_register(element_tag);
 
-        suanpan_for_each(node_register.begin(), node_register.end(), [&](const std::vector<unsigned>& node) { for(const auto I : node) for(const auto J : node) element_register[I].insert(J); });
+        suanpan_for_each(node_register.begin(), node_register.end(), [&](const std::vector<unsigned>& node) { for(const auto I : node)  element_register[I].insert(node.cbegin(), node.cend()); });
 
         color_map = color_algorithm(element_register);
 
