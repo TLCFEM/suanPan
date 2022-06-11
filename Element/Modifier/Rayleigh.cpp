@@ -25,7 +25,7 @@ Rayleigh::Rayleigh(const unsigned T, const double A, const double B, const doubl
     , d(D) {}
 
 int Rayleigh::update_status() {
-    suanpan_for_each(element_pool.cbegin(), element_pool.cend(), [&](const weak_ptr<Element>& ele_ptr) {
+    suanpan::for_all(element_pool, [&](const weak_ptr<Element>& ele_ptr) {
         if(const auto t_ptr = ele_ptr.lock(); nullptr != t_ptr && t_ptr->if_update_damping()) {
             mat t_damping(t_ptr->get_total_number(), t_ptr->get_total_number(), fill::zeros);
             if(a != 0. && !t_ptr->get_current_mass().empty()) t_damping += a * t_ptr->get_current_mass();

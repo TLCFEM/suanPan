@@ -42,8 +42,7 @@ int RestitutionWallPenalty::process(const shared_ptr<DomainBase>& D) {
     resistance.reset();
     stiffness.reset();
 
-    const auto& t_node_pool = D->get_node_pool();
-    suanpan_for_each(t_node_pool.cbegin(), t_node_pool.cend(), [&](const shared_ptr<Node>& t_node) {
+    suanpan::for_all(D->get_node_pool(), [&](const shared_ptr<Node>& t_node) {
         if(!checker_handler(t_node)) return;
         const vec t_pos = trial_position_handler(t_node) - origin;
         if(!edge_a.empty()) if(const auto projection = dot(t_pos, edge_a); projection > length_a || projection < 0.) return;
