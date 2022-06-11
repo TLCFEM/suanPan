@@ -27,7 +27,7 @@ void Domain::update_current_resistance() const {
     if(color_map.empty()) for(const auto& I : element_pond.get()) factory->assemble_resistance(I->get_current_resistance(), I->get_dof_encoding());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
-            suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
+            suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
                 factory->assemble_resistance(I->get_current_resistance(), I->get_dof_encoding());
             });
@@ -41,7 +41,7 @@ void Domain::update_current_damping_force() const {
     if(color_map.empty()) for(const auto& I : element_pond.get()) factory->assemble_damping_force(I->get_current_damping_force(), I->get_dof_encoding());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
-            suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
+            suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
                 factory->assemble_damping_force(I->get_current_damping_force(), I->get_dof_encoding());
             });
@@ -54,7 +54,7 @@ void Domain::update_current_inertial_force() const {
     if(color_map.empty()) for(const auto& I : element_pond.get()) factory->assemble_inertial_force(I->get_current_inertial_force(), I->get_dof_encoding());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
-            suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
+            suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
                 factory->assemble_inertial_force(I->get_current_inertial_force(), I->get_dof_encoding());
             });
@@ -67,14 +67,13 @@ void Domain::assemble_resistance() const {
     if(color_map.empty()) for(const auto& I : element_pond.get()) factory->assemble_resistance(I->get_trial_resistance(), I->get_dof_encoding());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
-            suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
+            suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
                 factory->assemble_resistance(I->get_trial_resistance(), I->get_dof_encoding());
             });
         });
 
-    auto& t_node_pool = node_pond.get();
-    suanpan_for_each(t_node_pool.cbegin(), t_node_pool.cend(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_resistance(trial_resistance(t_node->get_reordered_dof())); });
+    suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_resistance(trial_resistance(t_node->get_reordered_dof())); });
 }
 
 void Domain::assemble_damping_force() const {
@@ -82,14 +81,13 @@ void Domain::assemble_damping_force() const {
     if(color_map.empty()) for(const auto& I : element_pond.get()) factory->assemble_damping_force(I->get_trial_damping_force(), I->get_dof_encoding());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
-            suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
+            suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
                 factory->assemble_damping_force(I->get_trial_damping_force(), I->get_dof_encoding());
             });
         });
 
-    auto& t_node_pool = node_pond.get();
-    suanpan_for_each(t_node_pool.cbegin(), t_node_pool.cend(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_damping_force(trial_damping_force(t_node->get_reordered_dof())); });
+    suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_damping_force(trial_damping_force(t_node->get_reordered_dof())); });
 }
 
 void Domain::assemble_inertial_force() const {
@@ -97,14 +95,13 @@ void Domain::assemble_inertial_force() const {
     if(color_map.empty()) for(const auto& I : element_pond.get()) factory->assemble_inertial_force(I->get_trial_inertial_force(), I->get_dof_encoding());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
-            suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
+            suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
                 factory->assemble_inertial_force(I->get_trial_inertial_force(), I->get_dof_encoding());
             });
         });
 
-    auto& t_node_pool = node_pond.get();
-    suanpan_for_each(t_node_pool.cbegin(), t_node_pool.cend(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_inertial_force(trial_inertial_force(t_node->get_reordered_dof())); });
+    suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_inertial_force(trial_inertial_force(t_node->get_reordered_dof())); });
 }
 
 void Domain::assemble_initial_mass() const {
@@ -112,7 +109,7 @@ void Domain::assemble_initial_mass() const {
     if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_initial_mass(), I->get_dof_encoding());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
-            suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
+            suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
                 factory->assemble_mass(I->get_initial_mass(), I->get_dof_encoding());
             });
@@ -126,7 +123,7 @@ void Domain::assemble_current_mass() const {
     if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_current_mass(), I->get_dof_encoding());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
-            suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
+            suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
                 factory->assemble_mass(I->get_current_mass(), I->get_dof_encoding());
             });
@@ -140,7 +137,7 @@ void Domain::assemble_trial_mass() const {
     if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_trial_mass(), I->get_dof_encoding());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
-            suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
+            suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
                 factory->assemble_mass(I->get_trial_mass(), I->get_dof_encoding());
             });
@@ -154,7 +151,7 @@ void Domain::assemble_initial_damping() const {
     if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_initial_damping(), I->get_dof_encoding());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
-            suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
+            suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
                 factory->assemble_damping(I->get_initial_damping(), I->get_dof_encoding());
             });
@@ -168,7 +165,7 @@ void Domain::assemble_current_damping() const {
     if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_current_damping(), I->get_dof_encoding());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
-            suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
+            suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
                 factory->assemble_damping(I->get_current_damping(), I->get_dof_encoding());
             });
@@ -182,7 +179,7 @@ void Domain::assemble_trial_damping() const {
     if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_trial_damping(), I->get_dof_encoding());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
-            suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
+            suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
                 factory->assemble_damping(I->get_trial_damping(), I->get_dof_encoding());
             });
@@ -196,7 +193,7 @@ void Domain::assemble_initial_stiffness() const {
     if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_initial_stiffness(), I->get_dof_encoding());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
-            suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
+            suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
                 factory->assemble_stiffness(I->get_initial_stiffness(), I->get_dof_encoding());
             });
@@ -210,7 +207,7 @@ void Domain::assemble_current_stiffness() const {
     if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_current_stiffness(), I->get_dof_encoding());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
-            suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
+            suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
                 factory->assemble_stiffness(I->get_current_stiffness(), I->get_dof_encoding());
             });
@@ -224,7 +221,7 @@ void Domain::assemble_trial_stiffness() const {
     if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_trial_stiffness(), I->get_dof_encoding());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
-            suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
+            suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
                 factory->assemble_stiffness(I->get_trial_stiffness(), I->get_dof_encoding());
             });
@@ -239,7 +236,7 @@ void Domain::assemble_initial_geometry() const {
     if(color_map.empty() || is_sparse()) { for(const auto& I : element_pond.get()) if(I->is_nlgeom()) factory->assemble_geometry(I->get_initial_geometry(), I->get_dof_encoding()); }
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
-            suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
+            suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
                 factory->assemble_geometry(I->get_initial_geometry(), I->get_dof_encoding());
             });
@@ -254,7 +251,7 @@ void Domain::assemble_current_geometry() const {
     if(color_map.empty() || is_sparse()) { for(const auto& I : element_pond.get()) if(I->is_nlgeom()) factory->assemble_geometry(I->get_current_geometry(), I->get_dof_encoding()); }
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
-            suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
+            suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
                 factory->assemble_geometry(I->get_current_geometry(), I->get_dof_encoding());
             });
@@ -269,7 +266,7 @@ void Domain::assemble_trial_geometry() const {
     if(color_map.empty() || is_sparse()) { for(const auto& I : element_pond.get()) if(I->is_nlgeom()) factory->assemble_geometry(I->get_trial_geometry(), I->get_dof_encoding()); }
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
-            suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
+            suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
                 factory->assemble_geometry(I->get_trial_geometry(), I->get_dof_encoding());
             });
@@ -283,16 +280,11 @@ int Domain::update_trial_status() const {
     auto& trial_velocity = factory->get_trial_velocity();
     auto& trial_acceleration = factory->get_trial_acceleration();
 
-    auto& t_node_pool = node_pond.get();
-    auto& t_element_pool = element_pond.get();
-
-    if(AnalysisType::DYNAMICS == factory->get_analysis_type())
-        suanpan_for_each(t_node_pool.cbegin(), t_node_pool.cend(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_status(trial_displacement, trial_velocity, trial_acceleration); });
-    else
-        suanpan_for_each(t_node_pool.cbegin(), t_node_pool.cend(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_status(trial_displacement); });
+    if(AnalysisType::DYNAMICS == factory->get_analysis_type()) suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_status(trial_displacement, trial_velocity, trial_acceleration); });
+    else suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_status(trial_displacement); });
 
     auto code = 0;
-    suanpan_for_each(t_element_pool.cbegin(), t_element_pool.cend(), [&](const shared_ptr<Element>& t_element) { code += t_element->update_status(); });
+    suanpan::for_all(element_pond.get(), [&](const shared_ptr<Element>& t_element) { code += t_element->update_status(); });
 
     return code;
 }
@@ -302,16 +294,11 @@ int Domain::update_incre_status() const {
     auto& incre_velocity = factory->get_incre_velocity();
     auto& incre_acceleration = factory->get_incre_acceleration();
 
-    auto& t_node_pool = node_pond.get();
-    auto& t_element_pool = element_pond.get();
-
-    if(AnalysisType::DYNAMICS == factory->get_analysis_type())
-        suanpan_for_each(t_node_pool.cbegin(), t_node_pool.cend(), [&](const shared_ptr<Node>& t_node) { t_node->update_incre_status(incre_displacement, incre_velocity, incre_acceleration); });
-    else
-        suanpan_for_each(t_node_pool.cbegin(), t_node_pool.cend(), [&](const shared_ptr<Node>& t_node) { t_node->update_incre_status(incre_displacement); });
+    if(AnalysisType::DYNAMICS == factory->get_analysis_type()) suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_incre_status(incre_displacement, incre_velocity, incre_acceleration); });
+    else suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_incre_status(incre_displacement); });
 
     auto code = 0;
-    suanpan_for_each(t_element_pool.cbegin(), t_element_pool.cend(), [&](const shared_ptr<Element>& t_element) { code += t_element->update_status(); });
+    suanpan::for_all(element_pond.get(), [&](const shared_ptr<Element>& t_element) { code += t_element->update_status(); });
 
     return code;
 }
@@ -347,28 +334,19 @@ int Domain::update_current_status() const {
     return SUANPAN_SUCCESS;
 }
 
-void Domain::stage_status() {
-    auto& t_constraint_pool = constraint_pond.get();
-
-    suanpan_for_each(t_constraint_pool.cbegin(), t_constraint_pool.cend(), [&](const shared_ptr<Constraint>& t_constraint) { t_constraint->stage(shared_from_this()); });
-}
+void Domain::stage_status() { suanpan::for_all(constraint_pond.get(), [&](const shared_ptr<Constraint>& t_constraint) { t_constraint->stage(shared_from_this()); }); }
 
 void Domain::commit_status() const {
     factory->commit_status();
 
-    auto& t_node_pool = node_pond.get();
-    auto& t_element_pool = element_pond.get();
-    auto& t_load_pool = load_pond.get();
-    auto& t_constraint_pool = constraint_pond.get();
-
     // element comes before node to account for strain energy update
-    suanpan_for_each(t_element_pool.cbegin(), t_element_pool.cend(), [](const shared_ptr<Element>& t_element) {
+    suanpan::for_all(element_pond.get(), [](const shared_ptr<Element>& t_element) {
         t_element->Element::commit_status();
         t_element->commit_status();
     });
-    suanpan_for_each(t_node_pool.cbegin(), t_node_pool.cend(), [](const shared_ptr<Node>& t_node) { t_node->commit_status(); });
-    suanpan_for_each(t_load_pool.cbegin(), t_load_pool.cend(), [](const shared_ptr<Load>& t_load) { t_load->commit_status(); });
-    suanpan_for_each(t_constraint_pool.cbegin(), t_constraint_pool.cend(), [](const shared_ptr<Constraint>& t_constraint) { t_constraint->commit_status(); });
+    suanpan::for_all(node_pond.get(), [](const shared_ptr<Node>& t_node) { t_node->commit_status(); });
+    suanpan::for_all(load_pond.get(), [](const shared_ptr<Load>& t_load) { t_load->commit_status(); });
+    suanpan::for_all(constraint_pond.get(), [](const shared_ptr<Constraint>& t_constraint) { t_constraint->commit_status(); });
 }
 
 void Domain::clear_status() {
@@ -384,35 +362,25 @@ void Domain::clear_status() {
 
     factory->clear_status();
 
-    auto& t_node_pool = node_pond.get();
-    auto& t_element_pool = element_pond.get();
-    auto& t_load_pool = load_pond.get();
-    auto& t_constraint_pool = constraint_pond.get();
-
     // element comes before node to account for strain energy update
-    suanpan_for_each(t_element_pool.cbegin(), t_element_pool.cend(), [](const shared_ptr<Element>& t_element) {
+    suanpan::for_all(element_pond.get(), [](const shared_ptr<Element>& t_element) {
         t_element->Element::clear_status();
         t_element->clear_status();
     });
-    suanpan_for_each(t_node_pool.cbegin(), t_node_pool.cend(), [](const shared_ptr<Node>& t_node) { t_node->clear_status(); });
-    suanpan_for_each(t_load_pool.cbegin(), t_load_pool.cend(), [](const shared_ptr<Load>& t_load) { t_load->clear_status(); });
-    suanpan_for_each(t_constraint_pool.cbegin(), t_constraint_pool.cend(), [](const shared_ptr<Constraint>& t_constraint) { t_constraint->clear_status(); });
+    suanpan::for_all(node_pond.get(), [](const shared_ptr<Node>& t_node) { t_node->clear_status(); });
+    suanpan::for_all(load_pond.get(), [](const shared_ptr<Load>& t_load) { t_load->clear_status(); });
+    suanpan::for_all(constraint_pond.get(), [](const shared_ptr<Constraint>& t_constraint) { t_constraint->clear_status(); });
 }
 
 void Domain::reset_status() const {
     factory->reset_status();
 
-    auto& t_node_pool = node_pond.get();
-    auto& t_element_pool = element_pond.get();
-    auto& t_load_pool = load_pond.get();
-    auto& t_constraint_pool = constraint_pond.get();
-
     // element comes before node to account for strain energy update
-    suanpan_for_each(t_element_pool.cbegin(), t_element_pool.cend(), [](const shared_ptr<Element>& t_element) {
+    suanpan::for_all(element_pond.get(), [](const shared_ptr<Element>& t_element) {
         t_element->Element::reset_status();
         t_element->reset_status();
     });
-    suanpan_for_each(t_node_pool.cbegin(), t_node_pool.cend(), [](const shared_ptr<Node>& t_node) { t_node->reset_status(); });
-    suanpan_for_each(t_load_pool.cbegin(), t_load_pool.cend(), [](const shared_ptr<Load>& t_load) { t_load->reset_status(); });
-    suanpan_for_each(t_constraint_pool.cbegin(), t_constraint_pool.cend(), [](const shared_ptr<Constraint>& t_constraint) { t_constraint->reset_status(); });
+    suanpan::for_all(node_pond.get(), [](const shared_ptr<Node>& t_node) { t_node->reset_status(); });
+    suanpan::for_all(load_pond.get(), [](const shared_ptr<Load>& t_load) { t_load->reset_status(); });
+    suanpan::for_all(constraint_pond.get(), [](const shared_ptr<Constraint>& t_constraint) { t_constraint->reset_status(); });
 }

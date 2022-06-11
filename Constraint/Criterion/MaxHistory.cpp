@@ -27,9 +27,7 @@ MaxHistory::MaxHistory(const unsigned T, const unsigned ST, const OutputType HT,
 unique_ptr<Criterion> MaxHistory::get_copy() { return make_unique<MaxHistory>(*this); }
 
 int MaxHistory::process(const shared_ptr<DomainBase>& D) {
-    const auto& t_element_pool = D->get_element_pool();
-
-    suanpan_for_each(t_element_pool.cbegin(), t_element_pool.cend(), [&](const shared_ptr<Element>& t_element) {
+    suanpan::for_all(D->get_element_pool(), [&](const shared_ptr<Element>& t_element) {
         for(auto& I : t_element->record(history_type))
             for(const auto& J : I)
                 if(J > max_history) {

@@ -43,7 +43,7 @@ template<typename T> auto sort_color_metis(suanpan::graph<T>& element_register, 
     const auto element_size = element_register.size();
 
     std::atomic num_edges = 0llu;
-    suanpan_for_each(element_register.begin(), element_register.end(), [&](const suanpan::set<T>& element) { num_edges += element.size(); });
+    suanpan::for_all(element_register, [&](const suanpan::set<T>& element) { num_edges += element.size(); });
 
     std::vector<idx_t> xadj;
     xadj.reserve(element_size + 1llu);
