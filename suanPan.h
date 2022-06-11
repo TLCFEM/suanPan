@@ -232,7 +232,9 @@ template<class T> concept sp_d = std::is_floating_point_v<T>;
 template<class T> concept sp_i = std::is_integral_v<T>;
 
 namespace suanpan {
-    template<class IN, class FN> void for_all(IN& from, FN&& func) { return suanpan_for_each(from.begin(), from.end(), std::forward<FN>(func)); }
+    template<class IN, class FN> void for_all(IN& from, FN&& func) {
+        suanpan_for_each(from.begin(), from.end(), std::forward<FN>(func));
+    }
 }
 
 #ifdef SUANPAN_CLANG
