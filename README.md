@@ -185,6 +185,7 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**Intel oneAPI Math Kernel
   Library**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2022.0.3
 - [**Catch2**](https://github.com/catchorg/Catch2) version 2.13.9
+- [**thread_pool**] abridged version of [`thread-pool`](https://github.com/bshoshany/thread-pool)
 
 Those libraries may depend on other libraries such as [zlib](https://zlib.net/)
 and [Szip](https://support.hdfgroup.org/doc_resource/SZIP/). Additional tools may be used by **suanPan**, they are

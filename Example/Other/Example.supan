@@ -15,4 +15,6 @@ peek ,output_folder
 
 pwd
 
+benchmark
+
 exit

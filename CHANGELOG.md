@@ -7,7 +7,11 @@
 
 ## version 2.4
 
-1. add `RestitutionWall` constraint
+1. add `RestitutionWall` constraint which conserves momentum and energy
+2. add `benchmark` command to benchmark platform
+3. constraints and loads are processes in a fully parallelized manner
+4. add 3D viscous damper `Damper03` and `Damper04`
+5. bugfixes
 
 ## version 2.3
 
