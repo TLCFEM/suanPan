@@ -18,7 +18,6 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable IdentifierTypo
 #include "commandParser.h"
-#include <thread>
 #include <Constraint/ConstraintParser.h>
 #include <Converger/ConvergerParser.h>
 #include <Element/ElementParser.h>
@@ -28,26 +27,28 @@
 #include <Section/SectionParser.h>
 #include <Solver/SolverParser.h>
 #include <Step/StepParser.h>
-#include "argumentParser.h"
+#include <thread>
 #include "Constraint/Constraint.h"
 #include "Converger/Converger.h"
 #include "Domain/Domain.h"
 #include "Domain/ExternalModule.h"
-#include "Domain/Node.h"
 #include "Domain/Group/ElementGroup.h"
 #include "Domain/Group/GroupGroup.h"
 #include "Domain/Group/NodeGroup.h"
 #include "Domain/MetaMat/SparseMatFGMRES.hpp"
+#include "Domain/Node.h"
 #include "Element/Element.h"
 #include "Element/Visualisation/vtkParser.h"
-#include "Load/Load.h"
 #include "Load/Amplitude/Amplitude.h"
+#include "Load/Load.h"
 #include "Material/Material.h"
 #include "Recorder/Recorder.h"
-#include "Solver/Solver.h"
 #include "Solver/Integrator/Integrator.h"
+#include "Solver/Solver.h"
 #include "Step/Bead.h"
 #include "Step/Frequency.h"
+#include "argumentParser.h"
+#include "thread_pool.hpp"
 #ifdef SUANPAN_WIN
 #include <Windows.h>
 #endif
@@ -68,6 +69,39 @@ void qrcode() {
         else if(I == 'U') suanpan_info("%s", u8"\u2580");
 
     suanpan_info("\n\n");
+}
+
+int benchmark() {
+    constexpr auto N = 100;
+
+    thread_pool pool(1);
+
+    const auto start = std::chrono::high_resolution_clock::now();
+
+    for(auto I = 1; I <= N; ++I) {
+        pool.push_task([I] {
+            SUANPAN_SYNC_COUT << '[';
+            const auto length = static_cast<int>(50. * I / N);
+            for(auto J = 0; J < length; ++J) SUANPAN_SYNC_COUT << '=';
+            for(auto J = length; J < 50; ++J) SUANPAN_SYNC_COUT << '-';
+            SUANPAN_SYNC_COUT << "]\r";
+            SUANPAN_SYNC_COUT.flush();
+        });
+        const mat A = mat(2560, 2560, fill::randu) + eye(2560, 2560);
+        const vec b(2560, fill::randu);
+        vec x = solve(A, b);
+        x(randi<uvec>(1, distr_param(0, 2000))).fill(I);
+    }
+
+    const auto end = std::chrono::high_resolution_clock::now();
+
+    const auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+
+    pool.wait_for_tasks();
+
+    suanpan_info("\nCurrent platform rates (higher is better): %.2f.\n", 1E9 / duration.count());
+
+    return SUANPAN_SUCCESS;
 }
 
 int process_command(const shared_ptr<Bead>& model, istringstream& command) {
@@ -230,6 +264,8 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
         print_helper();
         return SUANPAN_SUCCESS;
     }
+
+    if(is_equal(command_id, "benchmark")) return benchmark();
 
     if(is_equal(command_id, "clear")) {
         domain->wait();
@@ -1178,6 +1214,7 @@ int print_command() {
     suanpan_info(format, "acceleration", "define acceleration");
     suanpan_info(format, "amplitude", "define amplitude");
     suanpan_info(format, "analyze/analyse", "analyse the model");
+    suanpan_info(format, "benchmark", "benchmark the platform for comparison");
     suanpan_info(format, "clear", "clear model");
     suanpan_info(format, "cload", "define concentrated load");
     suanpan_info(format, "command", "list all commands");
