@@ -130,12 +130,12 @@ A few flavors are available:
 Advanced users can compile the program from source by themselves in order to enable GPU based solvers which require
 available [CUDA](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) library.
 
-Since CI/CD uses `GCC 11.2.0` (on Linux) and `Clang 13.0.1` (on MacOS), it may be required to update/install
+Since CI/CD uses `GCC 10.3.0` (on Linux) and `Clang 13.0.1` (on MacOS), it may be required to update/install
 proper `libstdc++` (or `libc++`) version. The easiest way is to install the same compiler. For example, on Ubuntu,
 
 ```bash
 # Ubuntu
-sudo apt install gcc-11 g++-11 gfortran-11 libomp5
+sudo apt install gcc-10 g++-10 gfortran-10 libomp5
 ```
 
 For VTK enabled versions, it may be necessary to install OpenGL.
@@ -171,21 +171,19 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**ARPACK**](https://www.caam.rice.edu/software/ARPACK/) version 0.96
 - [**SPIKE**](http://www.spike-solver.org/) version 1.0
 - [**FEAST**](http://www.feast-solver.org/) version 4.0
-- [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 5.3.0 and [**SuperLU
-  MT**](https://portal.nersc.gov/project/sparse/superlu/) version 3.1
+- [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 5.3.0 and [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 3.1
 - [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.15
 - [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2021.5.0
 - [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 1.10.6
 - [**MUMPS**](http://mumps.enseeiht.fr/) version 5.2.1
 - [**METIS**](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview) version 5.1.0
 - [**VTK**](https://vtk.org/) version 9.1
-- [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 11.6
+- [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 11.7
 - [**Armadillo**](http://arma.sourceforge.net/) version 11.0
 - [**ensmallen**](https://ensmallen.org/) version 2.19.0
-- [**Intel oneAPI Math Kernel
-  Library**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2022.0.3
+- [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2022.1.0
 - [**Catch2**](https://github.com/catchorg/Catch2) version 2.13.9
-- [**thread_pool**] abridged version of [`thread-pool`](https://github.com/bshoshany/thread-pool)
+- **thread_pool** abridged version of [`thread-pool`](https://github.com/bshoshany/thread-pool)
 
 Those libraries may depend on other libraries such as [zlib](https://zlib.net/)
 and [Szip](https://support.hdfgroup.org/doc_resource/SZIP/). Additional tools may be used by **suanPan**, they are
