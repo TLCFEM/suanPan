@@ -76,6 +76,9 @@ int benchmark() {
 
     thread_pool pool(1);
 
+    const mat A = mat(2560, 2560, fill::randu) + eye(2560, 2560);
+    const vec b(2560, fill::randu);
+
     const auto start = std::chrono::high_resolution_clock::now();
 
     for(auto I = 1; I <= N; ++I) {
@@ -87,10 +90,8 @@ int benchmark() {
             SUANPAN_SYNC_COUT << "]\r";
             SUANPAN_SYNC_COUT.flush();
         });
-        const mat A = mat(2560, 2560, fill::randu) + eye(2560, 2560);
-        const vec b(2560, fill::randu);
         vec x = solve(A, b);
-        x(randi<uvec>(1, distr_param(0, 2000))).fill(I);
+        x(randi<uvec>(1, distr_param(0, 2559))).fill(I);
     }
 
     const auto end = std::chrono::high_resolution_clock::now();
@@ -99,7 +100,7 @@ int benchmark() {
 
     pool.wait_for_tasks();
 
-    suanpan_info("\nCurrent platform rates (higher is better): %.2f.\n", 1E9 / duration.count());
+    suanpan_info("\nCurrent platform rates (higher is better): %.2f.\n", 1E9 / static_cast<double>(duration.count()));
 
     return SUANPAN_SUCCESS;
 }
