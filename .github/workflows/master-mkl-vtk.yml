@@ -34,7 +34,7 @@ jobs:
           tar czf suanPan-linux-mkl-vtk.tar.gz suanPan-linux-mkl-vtk
       - name: Test
         run: |
-          apt install ./suanPan-2.4.0-1.x86_64.deb -y
+          sudo apt-get install ./suanPan-2.4.0-1.x86_64.deb -y
           suanPan -v
           export LD_LIBRARY_PATH=/home/runner/work/suanPan/suanPan/suanPan-linux-mkl-vtk/lib
           cd suanPan-linux-mkl-vtk/bin
@@ -63,6 +63,7 @@ jobs:
     steps:
       - name: Setup
         run: |
+          echo "SP_TIME=daily-$(date +''%Y%m%d%H'')" >> $GITHUB_ENV
           tee > oneAPI.repo << EOF
           [oneAPI]
           name=Intel oneAPI repository

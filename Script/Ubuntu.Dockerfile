@@ -7,14 +7,14 @@ RUN apt-get update && apt-get install -y locales && rm -rf /var/lib/apt/lists/* 
 
 ENV LANG en_US.utf8
 
-RUN apt-get update -y && apt-get upgrade -y && apt-get install -y wget gnupg
+RUN apt-get update -y && apt-get install -y wget gnupg
 
 RUN wget -q https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
 RUN apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
 RUN echo "deb https://apt.repos.intel.com/oneapi all main" | tee /etc/apt/sources.list.d/oneAPI.list
 RUN rm GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
 
-RUN apt-get update -y && apt-get upgrade -y && apt-get install -y gcc-10 g++-10 gfortran-10 cmake git intel-oneapi-mkl-devel libxt-dev freeglut3-dev libxcursor-dev file dpkg-dev
+RUN apt-get update -y && apt-get install -y gcc-10 g++-10 gfortran-10 cmake git intel-oneapi-mkl-devel libxt-dev freeglut3-dev libxcursor-dev file dpkg-dev
 
 RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 --slave /usr/bin/g++ g++ /usr/bin/g++-10 --slave /usr/bin/gfortran gfortran /usr/bin/gfortran-10 --slave /usr/bin/gcov gcov /usr/bin/gcov-10
 
