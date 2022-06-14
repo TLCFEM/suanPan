@@ -35,6 +35,8 @@ analyze
 #   -6.2069e-09   1.0000e+00  -2.1839e-09
 peek node 2 3
 
+peek element 1
+
 reset
 clear
 exit

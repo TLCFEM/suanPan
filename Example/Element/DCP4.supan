@@ -2156,9 +2156,9 @@ converger RelIncreDisp 1 1E-10 20 1
 
 analyze
 
+peek element 1
+
 reset
 clear
-
-peek element 1
 
 exit

@@ -64,6 +64,7 @@ recorder 22 hdf5 Element EP1 1
 recorder 23 hdf5 Element EP2 1
 recorder 24 hdf5 Element PE 1
 recorder 25 hdf5 Element PEP 1
+recorder 26 hdf5 Element PEEQ 1
 
 step static 1
 

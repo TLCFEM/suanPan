@@ -37,7 +37,7 @@ analyze
 #   -7.1054e-14   8.2438e+06  -2.9363e-12
 peek node 1
 
-peek element 1
+peek element 1 2 3 4
 
 # save recorder 1
 

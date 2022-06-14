@@ -18,7 +18,7 @@ displacement 1 0 -.2 2 3 4
 
 recorder 1 hdf5 Element PP 1
 recorder 2 hdf5 Element S 1
-recorder 3 hdf5 Element MISES 1
+recorder 3 hdf5 Element NMISES 1
 
 step static 1
 set fixed_step_size true
