@@ -7,6 +7,8 @@ element SGCMS 1 1 2 3 4 1 .01
 
 material Elastic2D 1 500 .0
 
+recorder 1 plain Element S 1
+
 fix 1 E 1 2
 
 cload 1 0 -1 2 3

@@ -9,6 +9,8 @@ material Elastic1D 1 100
 element Spring01 1 1 2 1
 element Spring01 2 3 2 1
 
+plainrecorder 1 Element S 1
+
 fix 1 P 1
 fix 2 2 2 3
 

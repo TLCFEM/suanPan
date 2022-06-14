@@ -166,6 +166,9 @@ element DCP3 98 59 65 64 1 .01 3.
 element DCP3 99 59 60 65 1 .01 3.
 element DCP3 100 60 66 65 1 .01 3.
 
+recorder 1 plain Element DAMAGE 1
+recorder 2 plain Element S 1
+
 material Elastic3D 2 2E5 .3
 material PlaneStress 1 2
 

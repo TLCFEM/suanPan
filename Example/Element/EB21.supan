@@ -12,6 +12,9 @@ element EB21 2 3 4 12 1 1 0
 
 element Tie 3 0.1 1E6 2 2 1. 3 2 -1.
 
+recorder 1 plain Element S 1
+recorder 2 plain Element E 1
+
 fix 1 P 1 4
 
 cload 1 0 10 2 2

@@ -2121,6 +2121,10 @@ element	DCP4	1022	1095	1096	188	189	1	5 5 50
 element	DCP4	1023	1096	1097	187	188	1	5 5 50
 element	DCP4	1024	1097	186	13	187	1	5 5 50
 
+recorder 1 plain Element NMISES 1
+recorder 2 plain Element DAMAGE 1
+recorder 3 plain Element S 1
+
 material PlaneStress 1 2
 material Elastic3D 2 2E5 .3 .01
 

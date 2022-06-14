@@ -110,4 +110,6 @@ peek node 12
 
 peek element 1
 
+reset
+clear
 exit

@@ -16,6 +16,8 @@ element T3D2S 1 1 4 4 0 1
 element T3D2S 2 2 4 4 1 0
 element T3D2S 3 3 4 4 1 1
 
+recorder 1 plain Element S 1
+
 fix 1 1 1 2 3
 fix 2 2 1 2 3
 fix 3 3 1 2 3
