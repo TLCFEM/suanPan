@@ -69,6 +69,13 @@ jobs:
         with:
           name: suanPan-2.4.0-1.x86_64.rpm
           path: suanPan-2.4.0-1.x86_64.rpm
+      - name: COPR
+        run: |
+          trap 'rm -f ./copr-config' EXIT && echo "$COPR_TOKEN_CONFIG" > ./copr-config
+          python3 -m pip install copr-cli
+          copr-cli --config ./copr-config build --nowait tlcfem/suanPan suanPan*.rpm
+        env:
+          COPR_TOKEN_CONFIG: ${{ secrets.COPR_TOKEN_CONFIG }}
   macos-openblas-vtk-dev:
     runs-on: macos-11
     steps:
