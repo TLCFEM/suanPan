@@ -56,6 +56,14 @@ recorder 14 hdf5 Element RESULTANT 1
 recorder 15 hdf5 Element MISES 1
 recorder 16 hdf5 Element K 1
 recorder 17 hdf5 Element M 1
+recorder 18 hdf5 Element SP 1
+recorder 19 hdf5 Element SP1 1
+recorder 20 hdf5 Element SP2 1
+recorder 21 hdf5 Element EP 1
+recorder 22 hdf5 Element EP1 1
+recorder 23 hdf5 Element EP2 1
+recorder 24 hdf5 Element PE 1
+recorder 25 hdf5 Element PEP 1
 
 step static 1
 

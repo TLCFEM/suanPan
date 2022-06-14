@@ -61,4 +61,6 @@ analyze
 
 peek node 10 2 3 6
 
+reset
+clear
 exit

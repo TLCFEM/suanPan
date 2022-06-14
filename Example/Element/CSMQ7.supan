@@ -13,6 +13,8 @@ material Elastic2D 1 1500 .25 1E-4
 element CSMQ7 1 1 2 3 4 5 6 7 1 1 1E-2
 element CSMQ7 2 1 2 3 4 5 6 7 1 1 1E-2
 
+recorder 2 plain Element S 1
+
 fix2 1 1 2 3 6
 fix2 2 2 2
 
