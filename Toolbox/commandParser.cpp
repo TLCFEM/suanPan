@@ -72,12 +72,13 @@ void qrcode() {
 }
 
 int benchmark() {
-    constexpr auto N = 100;
+    constexpr auto N = 50;
+    constexpr auto M = 5120;
 
     thread_pool pool(1);
 
-    const mat A = mat(2560, 2560, fill::randu) + eye(2560, 2560);
-    const vec b(2560, fill::randu);
+    const mat A = mat(M, M, fill::randu) + eye(M, M);
+    const vec b(M, fill::randu);
 
     const auto start = std::chrono::high_resolution_clock::now();
 
@@ -91,7 +92,7 @@ int benchmark() {
             SUANPAN_SYNC_COUT.flush();
         });
         vec x = solve(A, b);
-        x(randi<uvec>(1, distr_param(0, 2559))).fill(I);
+        x(randi<uvec>(1, distr_param(0, M - 1))).fill(I);
     }
 
     const auto end = std::chrono::high_resolution_clock::now();
