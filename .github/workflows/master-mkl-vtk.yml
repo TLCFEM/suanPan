@@ -34,7 +34,7 @@ jobs:
           tar czf suanPan-linux-mkl-vtk.tar.gz suanPan-linux-mkl-vtk
       - name: Test
         run: |
-          sudo apt-get install ./suanPan-2.4.0-1.x86_64.deb -y
+          sudo apt-get install ./suanPan-2.5.0-1.x86_64.deb -y
           suanPan -v
           export LD_LIBRARY_PATH=/home/runner/work/suanPan/suanPan/suanPan-linux-mkl-vtk/lib
           cd suanPan-linux-mkl-vtk/bin
@@ -52,8 +52,8 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: suanPan-2.4.0-1.x86_64.deb
-          asset_name: suanPan-2.4.0-1.x86_64.deb
+          file: suanPan-2.5.0-1.x86_64.deb
+          asset_name: suanPan-2.5.0-1.x86_64.deb
           tag: ${{ env.SP_TIME }}
           prerelease: true
           overwrite: true
@@ -89,14 +89,14 @@ jobs:
           make package -j"$(nproc)"
       - name: Test
         run: |
-          dnf install ./suanPan-2.4.0-1.x86_64.rpm -y
+          dnf install ./suanPan-2.5.0-1.x86_64.rpm -y
           suanPan -v
       - name: RPM
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: suanPan-2.4.0-1.x86_64.rpm
-          asset_name: suanPan-2.4.0-1.x86_64.rpm
+          file: suanPan-2.5.0-1.x86_64.rpm
+          asset_name: suanPan-2.5.0-1.x86_64.rpm
           tag: ${{ env.SP_TIME }}
           prerelease: true
           overwrite: true
