@@ -14,39 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-/**
- * @class NodeGroup
- * @brief The NodeGroup class.
- *
- * @author tlc
- * @date 21/05/2020
- * @version 0.1.0
- * @file NodeGroup.h
- * @addtoNodeGroup Domain
- * @{
- */
 
-#ifndef NODEGROUP_H
-#define NODEGROUP_H
+#ifndef RECORDERPARSER_H
+#define RECORDERPARSER_H
 
-#include <Domain/Group.h>
+#include <memory>
 
-class NodeGroup final : public Group {
-    const int dof;
+class DomainBase;
 
-    const vec rule;
-
-    const vec s_node, e_node;
-
-public:
-    NodeGroup(unsigned, int, vec&&);
-    NodeGroup(unsigned, uvec&&);
-    NodeGroup(unsigned, vec&&, vec&&);
-    NodeGroup(unsigned, vec&&);
-
-    void initialize(const shared_ptr<DomainBase>&) override;
-};
+int create_new_recorder(const std::shared_ptr<DomainBase>&, std::istringstream&);
+int create_new_plainrecorder(const std::shared_ptr<DomainBase>&, std::istringstream&);
+int create_new_hdf5recorder(const std::shared_ptr<DomainBase>&, std::istringstream&);
 
 #endif
-
-//! @}

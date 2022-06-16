@@ -18,17 +18,15 @@
 #include "NodeLine.h"
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Domain/Node.h>
+#include <Domain/NodeHelper.hpp>
 
 const mat NodeLine::rotation{{0., -1.}, {1., 0.}};
 
 std::vector<vec> NodeLine::get_position(const shared_ptr<DomainBase>& D) {
-    std::vector position(node_encoding.n_elem, vec());
+    std::vector<vec> position;
+    position.reserve(node_encoding.n_elem);
 
-    for(auto I = 0llu; I < node_encoding.n_elem; ++I) {
-        auto& t_node = D->get<Node>(node_encoding(I));
-        position[I] = resize(t_node->get_coordinate(), 2, 1) + resize(t_node->get_trial_displacement(), 2, 1);
-    }
+    for(const auto I : node_encoding) position.emplace_back(get_trial_position<DOF::U1, DOF::U2>(D->get<Node>(I)));
 
     return position;
 }
@@ -39,10 +37,8 @@ NodeLine::NodeLine(const unsigned T, const unsigned S, const unsigned A, uvec&& 
 int NodeLine::initialize(const shared_ptr<DomainBase>& D) {
     dof_encoding = get_nodal_active_dof(D);
 
-    if(dof_encoding.n_elem != node_encoding.n_elem * dof_reference.n_elem) {
-        D->disable_constraint(get_tag());
-        return SUANPAN_SUCCESS;
-    }
+    // need to check if sizes conform since the method does not emit error flag
+    if(dof_encoding.n_elem != node_encoding.n_elem * dof_reference.n_elem) return SUANPAN_FAIL;
 
     return Constraint::initialize(D);
 }

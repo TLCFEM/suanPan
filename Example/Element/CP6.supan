@@ -219,6 +219,8 @@ element CP6 62 44 43 34 150 145 149 1 1
 element CP6 63 35 36 45 128 151 152 1 1
 element CP6 64 45 44 35 153 148 152 1 1
 
+recorder 1 hdf5 Element S 1
+
 material Elastic2D 1 100 .2 1E-4
 
 fix 1 P 1 10 19 28 37 50 82 107 132

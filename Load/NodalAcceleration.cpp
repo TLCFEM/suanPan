@@ -30,11 +30,13 @@ NodalAcceleration::NodalAcceleration(const unsigned T, const unsigned ST, const 
     : Load(T, ST, AT, std::forward<uvec>(NT), uvec{DT}, L) {}
 
 int NodalAcceleration::process(const shared_ptr<DomainBase>& D) {
-    const auto& W = D->get_factory();
+    auto& W = D->get_factory();
 
-    trial_load.zeros(W->get_size());
+    trial_load.reset();
 
     if(nullptr == W->get_mass()) return SUANPAN_SUCCESS;
+
+    trial_load.zeros(W->get_size());
 
     trial_load(node_encoding.is_empty() ? get_all_nodal_active_dof(D) : get_nodal_active_dof(D)).fill(1.);
 

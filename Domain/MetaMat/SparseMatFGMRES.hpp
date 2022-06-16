@@ -34,10 +34,11 @@
 
 #include <mkl_rci.h>
 #include <mkl_spblas.h>
+#include "csr_form.hpp"
 #include "SparseMat.hpp"
 
 template<sp_d T> class SparseMatBaseFGMRES : public SparseMat<T> {
-    static const double tolerance;
+    static double tolerance;
 
     const matrix_descr descr;
 
@@ -58,9 +59,9 @@ public:
     int solve(Mat<T>&, const Mat<T>&) override;
 };
 
-template<sp_d T> const double SparseMatBaseFGMRES<T>::tolerance = 1E-4;
+template<sp_d T> double SparseMatBaseFGMRES<T>::tolerance = 1E-4;
 
-inline void set_fgmres_tolerance(const double T) { access::rw(SparseMatBaseFGMRES<double>::tolerance) = T; }
+inline void set_fgmres_tolerance(const double T) { SparseMatBaseFGMRES<double>::tolerance = T; }
 
 template<sp_d T> SparseMatBaseFGMRES<T>::SparseMatBaseFGMRES(const uword in_row, const uword in_col, const uword in_elem, const bool in_sym)
     : SparseMat<T>(in_row, in_col, in_elem)

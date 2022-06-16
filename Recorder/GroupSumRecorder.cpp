@@ -17,10 +17,10 @@
 
 #include "GroupSumRecorder.h"
 #include <Domain/DomainBase.h>
-#include <Domain/Group.h>
+#include <Domain/Group/Group.h>
 
 void GroupSumRecorder::update_tag(const shared_ptr<DomainBase>& D) {
-    vector<uword> tag;
+    std::vector<uword> tag;
 
     for(auto& I : groups) if(D->find_group(static_cast<unsigned>(I))) for(auto& J : D->get_group(static_cast<unsigned>(I))->get_pool()) tag.emplace_back(J);
 

@@ -16,9 +16,22 @@
  ******************************************************************************/
 
 #include "Mass.h"
+#include <Domain/DOF.h>
 
 Mass::Mass(const unsigned T, const unsigned NT, const double MA, uvec&& DT)
-    : Element(T, 1, static_cast<unsigned>(DT.max()), uvec{NT})
+    : Element(T, 1, static_cast<unsigned>(DT.max()), uvec{NT}, [&] {
+        std::vector DI(DT.max(), DOF::NONE);
+
+        for(const auto I : DT)
+            if(1 == I) DI[0] = DOF::U1;
+            else if(2 == I) DI[1] = DOF::U2;
+            else if(3 == I) DI[2] = DOF::U3;
+            else if(4 == I) DI[3] = DOF::UR1;
+            else if(5 == I) DI[4] = DOF::UR2;
+            else if(6 == I) DI[5] = DOF::UR3;
+
+        return DI;
+    }())
     , magnitude(MA)
     , dof_label(DT - 1) {}
 

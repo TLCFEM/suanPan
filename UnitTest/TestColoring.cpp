@@ -1,8 +1,8 @@
-#include <Toolbox/sort_color.h>
+#include <Toolbox/sort_color.hpp>
 #include "CatchHeader.h"
 
 auto tiny_graph() {
-    suanpan_register graph;
+    suanpan::graph<unsigned> graph;
     graph.emplace_back(std::initializer_list<unsigned>{4, 2, 1, 0});
     graph.emplace_back(std::initializer_list<unsigned>{0, 2, 3, 1});
     graph.emplace_back(std::initializer_list<unsigned>{4, 3, 1, 0, 2});
@@ -10,11 +10,12 @@ auto tiny_graph() {
     graph.emplace_back(std::initializer_list<unsigned>{0, 2, 5, 4});
     graph.emplace_back(std::initializer_list<unsigned>{4, 3, 6, 5});
     graph.emplace_back(std::initializer_list<unsigned>{5, 3, 6});
+
     return graph;
 }
 
 auto small_graph(const unsigned long long N, const double D) {
-    suanpan_register graph(N);
+    suanpan::graph<unsigned> graph(N);
 
     for(auto I = 0u; I < N; ++I) graph[I].insert(I);
 
@@ -28,8 +29,8 @@ auto small_graph(const unsigned long long N, const double D) {
     return graph;
 }
 
-auto color_graph(const unsigned long long N, const double D, vector<vector<unsigned>> (&algorithm)(const suanpan_register&)) {
-    auto graph = small_graph(N, D);
+auto color_graph(const unsigned long long N, const double D, std::vector<std::vector<unsigned>> (&algorithm)(const suanpan::graph<unsigned>&)) {
+    const auto graph = small_graph(N, D);
 
     const auto color_map = algorithm(graph);
 
@@ -47,7 +48,7 @@ auto color_graph(const unsigned long long N, const double D, vector<vector<unsig
 }
 
 TEST_CASE("Coloring Basic", "[Utility.Coloring]") {
-    auto graph = tiny_graph();
+    const auto graph = tiny_graph();
 
     auto color_map = sort_color_wp(graph);
 

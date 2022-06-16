@@ -32,13 +32,11 @@
 
 class DomainBase;
 
-using std::vector;
-
 class Recorder : public Tag {
     uvec object_tag;
     OutputType variable_type;
-    vector<double> time_pool;              // recorded data
-    vector<vector<vector<vec>>> data_pool; // recorded data
+    std::vector<double> time_pool;                        // recorded data
+    std::vector<std::vector<std::vector<vec>>> data_pool; // recorded data
 
     const bool record_time;
     const bool use_hdf5;
@@ -73,10 +71,10 @@ public:
     [[nodiscard]] bool if_record_time() const;
 
     void insert(double);
-    void insert(const vector<vec>&, unsigned);
+    void insert(const std::vector<vec>&, unsigned);
 
-    [[nodiscard]] const vector<vector<vector<vec>>>& get_data_pool() const;
-    [[nodiscard]] const vector<double>& get_time_pool() const;
+    [[nodiscard]] const std::vector<std::vector<std::vector<vec>>>& get_data_pool() const;
+    [[nodiscard]] const std::vector<double>& get_time_pool() const;
 
     virtual void record(const shared_ptr<DomainBase>&) = 0;
 

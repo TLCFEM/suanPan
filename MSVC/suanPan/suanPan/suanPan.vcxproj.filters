@@ -199,6 +199,9 @@
     <Filter Include="Section\SectionNM">
       <UniqueIdentifier>{931b39fd-1d80-41a3-a54f-a229a4d5fb25}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Domain\Group">
+      <UniqueIdentifier>{ea4086e5-ad87-4755-905a-5f572935c34d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Constraint\BC\GroupMultiplierBC.cpp">
@@ -312,22 +315,10 @@
     <ClCompile Include="..\..\..\Domain\DomainBase.cpp">
       <Filter>Domain</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Domain\ElementGroup.cpp">
-      <Filter>Domain</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Domain\ExternalModule.cpp">
       <Filter>Domain</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Domain\Group.cpp">
-      <Filter>Domain</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Domain\GroupGroup.cpp">
-      <Filter>Domain</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Domain\Node.cpp">
-      <Filter>Domain</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Domain\NodeGroup.cpp">
       <Filter>Domain</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Domain\Tag.cpp">
@@ -1101,9 +1092,6 @@
     <ClCompile Include="..\..\..\Toolbox\IntegrationPlan.cpp">
       <Filter>Toolbox</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\sort_color.cpp">
-      <Filter>Toolbox</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\sort_rcm.cpp">
       <Filter>Toolbox</Filter>
     </ClCompile>
@@ -1351,6 +1339,36 @@
     <ClCompile Include="..\..\..\Toolbox\sync_ostream.cpp">
       <Filter>Toolbox</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Recorder\RecorderParser.cpp">
+      <Filter>Recorder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\SolverParser.cpp">
+      <Filter>Solver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Load\LoadParser.cpp">
+      <Filter>Load</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Converger\ConvergerParser.cpp">
+      <Filter>Converger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Step\StepParser.cpp">
+      <Filter>Step</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Domain\Group\ElementGroup.cpp">
+      <Filter>Domain\Group</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Domain\Group\Group.cpp">
+      <Filter>Domain\Group</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Domain\Group\GroupGroup.cpp">
+      <Filter>Domain\Group</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Domain\Group\NodeGroup.cpp">
+      <Filter>Domain\Group</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\RestitutionWallPenalty.cpp">
+      <Filter>Constraint</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -1464,25 +1482,13 @@
     <ClInclude Include="..\..\..\Domain\DomainBase.h">
       <Filter>Domain</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Domain\ElementGroup.h">
-      <Filter>Domain</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Domain\ExternalModule.h">
       <Filter>Domain</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Domain\Factory.hpp">
       <Filter>Domain</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Domain\Group.h">
-      <Filter>Domain</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Domain\GroupGroup.h">
-      <Filter>Domain</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Domain\Node.h">
-      <Filter>Domain</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Domain\NodeGroup.h">
       <Filter>Domain</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Domain\Storage.hpp">
@@ -2313,7 +2319,7 @@
     <ClInclude Include="..\..\..\Toolbox\shapeFunction.h">
       <Filter>Toolbox</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Toolbox\sort_color.h">
+    <ClInclude Include="..\..\..\Toolbox\sort_color.hpp">
       <Filter>Toolbox</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Toolbox\sort_rcm.h">
@@ -2550,6 +2556,45 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Toolbox\sync_ostream.h">
       <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Recorder\RecorderParser.h">
+      <Filter>Recorder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\SolverParser.h">
+      <Filter>Solver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Load\LoadParser.h">
+      <Filter>Load</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Converger\ConvergerParser.h">
+      <Filter>Converger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Step\StepParser.h">
+      <Filter>Step</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\DOF.h">
+      <Filter>Domain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\container.h">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\Group\ElementGroup.h">
+      <Filter>Domain\Group</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\Group\Group.h">
+      <Filter>Domain\Group</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\Group\GroupGroup.h">
+      <Filter>Domain\Group</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\Group\NodeGroup.h">
+      <Filter>Domain\Group</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\RestitutionWallPenalty.h">
+      <Filter>Constraint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\NodeHelper.hpp">
+      <Filter>Domain</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

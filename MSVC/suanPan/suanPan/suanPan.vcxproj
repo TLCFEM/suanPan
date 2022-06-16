@@ -121,6 +121,7 @@
     <ClCompile Include="..\..\..\Constraint\ParticleCollision.cpp" />
     <ClCompile Include="..\..\..\Constraint\ParticleCollision2D.cpp" />
     <ClCompile Include="..\..\..\Constraint\ParticleCollision3D.cpp" />
+    <ClCompile Include="..\..\..\Constraint\RestitutionWallPenalty.cpp" />
     <ClCompile Include="..\..\..\Constraint\RigidWallMultiplier.cpp" />
     <ClCompile Include="..\..\..\Constraint\RigidWallPenalty.cpp" />
     <ClCompile Include="..\..\..\Converger\AbsDisp.cpp" />
@@ -129,6 +130,7 @@
     <ClCompile Include="..\..\..\Converger\AbsIncreEnergy.cpp" />
     <ClCompile Include="..\..\..\Converger\AbsResidual.cpp" />
     <ClCompile Include="..\..\..\Converger\Converger.cpp" />
+    <ClCompile Include="..\..\..\Converger\ConvergerParser.cpp" />
     <ClCompile Include="..\..\..\Converger\FixedNumber.cpp" />
     <ClCompile Include="..\..\..\Converger\LogicConverger.cpp" />
     <ClCompile Include="..\..\..\Converger\RelDisp.cpp" />
@@ -143,12 +145,12 @@
     <ClCompile Include="..\..\..\Domain\DomainBase.cpp" />
     <ClCompile Include="..\..\..\Domain\DomainHelper.cpp" />
     <ClCompile Include="..\..\..\Domain\DomainState.cpp" />
-    <ClCompile Include="..\..\..\Domain\ElementGroup.cpp" />
     <ClCompile Include="..\..\..\Domain\ExternalModule.cpp" />
-    <ClCompile Include="..\..\..\Domain\Group.cpp" />
-    <ClCompile Include="..\..\..\Domain\GroupGroup.cpp" />
+    <ClCompile Include="..\..\..\Domain\Group\ElementGroup.cpp" />
+    <ClCompile Include="..\..\..\Domain\Group\Group.cpp" />
+    <ClCompile Include="..\..\..\Domain\Group\GroupGroup.cpp" />
+    <ClCompile Include="..\..\..\Domain\Group\NodeGroup.cpp" />
     <ClCompile Include="..\..\..\Domain\Node.cpp" />
-    <ClCompile Include="..\..\..\Domain\NodeGroup.cpp" />
     <ClCompile Include="..\..\..\Domain\Tag.cpp" />
     <ClCompile Include="..\..\..\Element\Beam\B21.cpp" />
     <ClCompile Include="..\..\..\Element\Beam\B21E.cpp" />
@@ -267,6 +269,7 @@
     <ClCompile Include="..\..\..\Load\GroupNodalForce.cpp" />
     <ClCompile Include="..\..\..\Load\LineUDL.cpp" />
     <ClCompile Include="..\..\..\Load\Load.cpp" />
+    <ClCompile Include="..\..\..\Load\LoadParser.cpp" />
     <ClCompile Include="..\..\..\Load\NodalAcceleration.cpp" />
     <ClCompile Include="..\..\..\Load\NodalDisplacement.cpp" />
     <ClCompile Include="..\..\..\Load\NodalForce.cpp" />
@@ -393,6 +396,7 @@
     <ClCompile Include="..\..\..\Recorder\NodeRecorder.cpp" />
     <ClCompile Include="..\..\..\Recorder\OutputType.cpp" />
     <ClCompile Include="..\..\..\Recorder\Recorder.cpp" />
+    <ClCompile Include="..\..\..\Recorder\RecorderParser.cpp" />
     <ClCompile Include="..\..\..\Recorder\SumRecorder.cpp" />
     <ClCompile Include="..\..\..\Recorder\VisualisationRecorder.cpp" />
     <ClCompile Include="..\..\..\Section\Section.cpp" />
@@ -449,6 +453,7 @@
     <ClCompile Include="..\..\..\Solver\Newton.cpp" />
     <ClCompile Include="..\..\..\Solver\Ramm.cpp" />
     <ClCompile Include="..\..\..\Solver\Solver.cpp" />
+    <ClCompile Include="..\..\..\Solver\SolverParser.cpp" />
     <ClCompile Include="..\..\..\Step\ArcLength.cpp" />
     <ClCompile Include="..\..\..\Step\Bead.cpp" />
     <ClCompile Include="..\..\..\Step\Buckle.cpp" />
@@ -457,6 +462,7 @@
     <ClCompile Include="..\..\..\Step\Optimization.cpp" />
     <ClCompile Include="..\..\..\Step\Static.cpp" />
     <ClCompile Include="..\..\..\Step\Step.cpp" />
+    <ClCompile Include="..\..\..\Step\StepParser.cpp" />
     <ClCompile Include="..\..\..\suanPan.cpp" />
     <ClCompile Include="..\..\..\Toolbox\argumentParser.cpp" />
     <ClCompile Include="..\..\..\Toolbox\arpack_wrapper.cpp" />
@@ -464,7 +470,6 @@
     <ClCompile Include="..\..\..\Toolbox\Converter.cpp" />
     <ClCompile Include="..\..\..\Toolbox\print.cpp" />
     <ClCompile Include="..\..\..\Toolbox\IntegrationPlan.cpp" />
-    <ClCompile Include="..\..\..\Toolbox\sort_color.cpp" />
     <ClCompile Include="..\..\..\Toolbox\sort_rcm.cpp" />
     <ClCompile Include="..\..\..\Toolbox\sync_ostream.cpp" />
     <ClCompile Include="..\..\..\Toolbox\tensorToolbox.cpp" />
@@ -507,6 +512,7 @@
     <ClInclude Include="..\..\..\Constraint\ParticleCollision.h" />
     <ClInclude Include="..\..\..\Constraint\ParticleCollision2D.h" />
     <ClInclude Include="..\..\..\Constraint\ParticleCollision3D.h" />
+    <ClInclude Include="..\..\..\Constraint\RestitutionWallPenalty.h" />
     <ClInclude Include="..\..\..\Constraint\RigidWallMultiplier.h" />
     <ClInclude Include="..\..\..\Constraint\RigidWallPenalty.h" />
     <ClInclude Include="..\..\..\Converger\AbsDisp.h" />
@@ -515,6 +521,7 @@
     <ClInclude Include="..\..\..\Converger\AbsIncreEnergy.h" />
     <ClInclude Include="..\..\..\Converger\AbsResidual.h" />
     <ClInclude Include="..\..\..\Converger\Converger.h" />
+    <ClInclude Include="..\..\..\Converger\ConvergerParser.h" />
     <ClInclude Include="..\..\..\Converger\FixedNumber.h" />
     <ClInclude Include="..\..\..\Converger\LogicConverger.h" />
     <ClInclude Include="..\..\..\Converger\RelDisp.h" />
@@ -525,14 +532,16 @@
     <ClInclude Include="..\..\..\Database\Database.h" />
     <ClInclude Include="..\..\..\Database\HDF.h" />
     <ClInclude Include="..\..\..\Domain\ConditionalModifier.h" />
+    <ClInclude Include="..\..\..\Domain\DOF.h" />
     <ClInclude Include="..\..\..\Domain\Domain.h" />
     <ClInclude Include="..\..\..\Domain\DomainBase.h" />
-    <ClInclude Include="..\..\..\Domain\ElementGroup.h" />
     <ClInclude Include="..\..\..\Domain\ExternalModule.h" />
     <ClInclude Include="..\..\..\Domain\Factory.hpp" />
     <ClInclude Include="..\..\..\Domain\FactoryHelper.hpp" />
-    <ClInclude Include="..\..\..\Domain\Group.h" />
-    <ClInclude Include="..\..\..\Domain\GroupGroup.h" />
+    <ClInclude Include="..\..\..\Domain\Group\ElementGroup.h" />
+    <ClInclude Include="..\..\..\Domain\Group\Group.h" />
+    <ClInclude Include="..\..\..\Domain\Group\GroupGroup.h" />
+    <ClInclude Include="..\..\..\Domain\Group\NodeGroup.h" />
     <ClInclude Include="..\..\..\Domain\MetaMat\BandMat.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\BandMatSpike.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\BandSymmMat.hpp" />
@@ -552,7 +561,7 @@
     <ClInclude Include="..\..\..\Domain\MetaMat\SymmPackMat.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\triplet_form.hpp" />
     <ClInclude Include="..\..\..\Domain\Node.h" />
-    <ClInclude Include="..\..\..\Domain\NodeGroup.h" />
+    <ClInclude Include="..\..\..\Domain\NodeHelper.hpp" />
     <ClInclude Include="..\..\..\Domain\Storage.hpp" />
     <ClInclude Include="..\..\..\Domain\Tag.h" />
     <ClInclude Include="..\..\..\Element\Beam\B21.h" />
@@ -674,6 +683,7 @@
     <ClInclude Include="..\..\..\Load\GroupNodalForce.h" />
     <ClInclude Include="..\..\..\Load\LineUDL.h" />
     <ClInclude Include="..\..\..\Load\Load.h" />
+    <ClInclude Include="..\..\..\Load\LoadParser.h" />
     <ClInclude Include="..\..\..\Load\NodalAcceleration.h" />
     <ClInclude Include="..\..\..\Load\NodalDisplacement.h" />
     <ClInclude Include="..\..\..\Load\NodalForce.h" />
@@ -801,6 +811,7 @@
     <ClInclude Include="..\..\..\Recorder\NodeRecorder.h" />
     <ClInclude Include="..\..\..\Recorder\OutputType.h" />
     <ClInclude Include="..\..\..\Recorder\Recorder.h" />
+    <ClInclude Include="..\..\..\Recorder\RecorderParser.h" />
     <ClInclude Include="..\..\..\Recorder\SumRecorder.h" />
     <ClInclude Include="..\..\..\Recorder\VisualisationRecorder.h" />
     <ClInclude Include="..\..\..\Section\ParameterType.h" />
@@ -858,6 +869,7 @@
     <ClInclude Include="..\..\..\Solver\Newton.h" />
     <ClInclude Include="..\..\..\Solver\Ramm.h" />
     <ClInclude Include="..\..\..\Solver\Solver.h" />
+    <ClInclude Include="..\..\..\Solver\SolverParser.h" />
     <ClInclude Include="..\..\..\Step\ArcLength.h" />
     <ClInclude Include="..\..\..\Step\Bead.h" />
     <ClInclude Include="..\..\..\Step\Buckle.h" />
@@ -866,16 +878,18 @@
     <ClInclude Include="..\..\..\Step\Optimization.h" />
     <ClInclude Include="..\..\..\Step\Static.h" />
     <ClInclude Include="..\..\..\Step\Step.h" />
+    <ClInclude Include="..\..\..\Step\StepParser.h" />
     <ClInclude Include="..\..\..\suanPan.h" />
     <ClInclude Include="..\..\..\Toolbox\argumentParser.h" />
     <ClInclude Include="..\..\..\Toolbox\arpack_wrapper.h" />
     <ClInclude Include="..\..\..\Toolbox\commandParser.h" />
+    <ClInclude Include="..\..\..\Toolbox\container.h" />
     <ClInclude Include="..\..\..\Toolbox\Converter.h" />
     <ClInclude Include="..\..\..\Toolbox\print.h" />
     <ClInclude Include="..\..\..\Toolbox\IntegrationPlan.h" />
     <ClInclude Include="..\..\..\Toolbox\Quaternion.hpp" />
     <ClInclude Include="..\..\..\Toolbox\shapeFunction.h" />
-    <ClInclude Include="..\..\..\Toolbox\sort_color.h" />
+    <ClInclude Include="..\..\..\Toolbox\sort_color.hpp" />
     <ClInclude Include="..\..\..\Toolbox\sort_rcm.h" />
     <ClInclude Include="..\..\..\Toolbox\sync_ostream.h" />
     <ClInclude Include="..\..\..\Toolbox\tensorToolbox.h" />

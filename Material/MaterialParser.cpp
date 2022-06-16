@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 // ReSharper disable CppClangTidyCppcoreguidelinesInitVariables
+#include "MaterialParser.h"
 #include <Domain/DomainBase.h>
 #include <Domain/ExternalModule.h>
 #include <Material/Material>
@@ -24,118 +25,7 @@
 #include <sys/stat.h>
 #endif
 
-int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    string material_id;
-    if(!get_input(command, material_id)) {
-        suanpan_error("create_new_material() needs a tag.\n");
-        return 0;
-    }
-
-    unique_ptr<Material> new_material = nullptr;
-
-    if(is_equal(material_id, "AFC01")) new_afc01(new_material, command);
-    else if(is_equal(material_id, "AFC")) new_afc01(new_material, command);
-    else if(is_equal(material_id, "AFC02")) new_afc02(new_material, command);
-    else if(is_equal(material_id, "AFCS")) new_afc02(new_material, command);
-    else if(is_equal(material_id, "AFC03")) new_afc03(new_material, command);
-    else if(is_equal(material_id, "AFCN")) new_afc03(new_material, command);
-    else if(is_equal(material_id, "ArmstrongFrederick")) new_armstrongfrederick(new_material, command);
-    else if(is_equal(material_id, "ArmstrongFrederick1D")) new_armstrongfrederick1d(new_material, command);
-    else if(is_equal(material_id, "Axisymmetric")) new_axisymmetric(new_material, command);
-    else if(is_equal(material_id, "AxisymmetricElastic")) new_axisymmetricelastic(new_material, command);
-    else if(is_equal(material_id, "Bilinear1D")) new_bilinear1d(new_material, command);
-    else if(is_equal(material_id, "Bilinear2D")) new_bilinear2d(new_material, command);
-    else if(is_equal(material_id, "BilinearCC")) new_bilinearcc(new_material, command);
-    else if(is_equal(material_id, "BilinearDP")) new_bilineardp(new_material, command);
-    else if(is_equal(material_id, "BilinearElastic1D")) new_bilinearelastic1d(new_material, command);
-    else if(is_equal(material_id, "BilinearHoffman")) new_bilinearhoffman(new_material, command);
-    else if(is_equal(material_id, "BilinearJ2")) new_bilinearj2(new_material, command);
-    else if(is_equal(material_id, "BilinearMises1D")) new_bilinearmises1d(new_material, command);
-    else if(is_equal(material_id, "BilinearOO")) new_bilinearoo(new_material, command);
-    else if(is_equal(material_id, "BilinearPO")) new_bilinearpo(new_material, command);
-    else if(is_equal(material_id, "BilinearPeric")) new_bilinearperic(new_material, command);
-    else if(is_equal(material_id, "BlatzKo")) new_blatzko(new_material, command);
-    else if(is_equal(material_id, "BoucWen")) new_boucwen(new_material, command);
-    else if(is_equal(material_id, "BWBN")) new_bwbn(new_material, command);
-    else if(is_equal(material_id, "CDP")) new_cdp(new_material, command);
-    else if(is_equal(material_id, "CDPM2")) new_cdpm2(new_material, command, 1);
-    else if(is_equal(material_id, "CDPM2NO")) new_cdpm2(new_material, command, 0);
-    else if(is_equal(material_id, "CDPM2ISO")) new_cdpm2(new_material, command, 1);
-    else if(is_equal(material_id, "CDPM2ANISO")) new_cdpm2(new_material, command, 2);
-    else if(is_equal(material_id, "Concrete21")) new_concrete21(new_material, command);
-    else if(is_equal(material_id, "Concrete22")) new_concrete22(new_material, command);
-    else if(is_equal(material_id, "ConcreteCM")) new_concretecm(new_material, command);
-    else if(is_equal(material_id, "ConcreteExp")) new_concreteexp(new_material, command);
-    else if(is_equal(material_id, "ConcreteTable")) new_concretetable(new_material, command);
-    else if(is_equal(material_id, "ConcreteTsai")) new_concretetsai(new_material, command);
-    else if(is_equal(material_id, "CoulombFriction")) new_coulombfriction(new_material, command);
-    else if(is_equal(material_id, "Dhakal")) new_dhakal(new_material, command);
-    else if(is_equal(material_id, "DafaliasManzari")) new_dafaliasmanzari(new_material, command);
-    else if(is_equal(material_id, "Elastic1D")) new_elastic1d(new_material, command);
-    else if(is_equal(material_id, "Elastic2D")) new_elastic2d(new_material, command);
-    else if(is_equal(material_id, "Elastic3D")) new_isotropicelastic3d(new_material, command);
-    else if(is_equal(material_id, "ExpCC")) new_expcc(new_material, command);
-    else if(is_equal(material_id, "ExpDP")) new_expdp(new_material, command);
-    else if(is_equal(material_id, "ExpGurson")) new_expgurson(new_material, command);
-    else if(is_equal(material_id, "ExpGurson1D")) new_expgurson1d(new_material, command);
-    else if(is_equal(material_id, "ExpHoffman")) new_exphoffman(new_material, command);
-    else if(is_equal(material_id, "ExpJ2")) new_expj2(new_material, command);
-    else if(is_equal(material_id, "ExpMises1D")) new_expmises1d(new_material, command);
-    else if(is_equal(material_id, "Flag01")) new_flag01(new_material, command);
-    else if(is_equal(material_id, "Flag02")) new_flag02(new_material, command);
-    else if(is_equal(material_id, "Fluid")) new_fluid(new_material, command);
-    else if(is_equal(material_id, "Gap01")) new_gap01(new_material, command);
-    else if(is_equal(material_id, "IsotropicElastic3D")) new_isotropicelastic3d(new_material, command);
-    else if(is_equal(material_id, "Kelvin")) new_kelvin(new_material, command);
-    else if(is_equal(material_id, "Laminated")) new_laminated(new_material, command);
-    else if(is_equal(material_id, "LinearDamage")) new_lineardamage(new_material, command);
-    else if(is_equal(material_id, "Maxwell")) new_maxwell(new_material, command);
-    else if(is_equal(material_id, "MooneyRivlin")) new_mooneyrivlin(new_material, command);
-    else if(is_equal(material_id, "MPF")) new_mpf(new_material, command);
-    else if(is_equal(material_id, "MultilinearOO")) new_multilinearoo(new_material, command);
-    else if(is_equal(material_id, "MultilinearPO")) new_multilinearpo(new_material, command);
-    else if(is_equal(material_id, "MultilinearElastic1D")) new_multilinearelastic1d(new_material, command);
-    else if(is_equal(material_id, "MultilinearJ2")) new_multilinearj2(new_material, command);
-    else if(is_equal(material_id, "MultilinearMises1D")) new_multilinearmises1d(new_material, command);
-    else if(is_equal(material_id, "NLE1D01")) new_nle1d01(new_material, command);
-    else if(is_equal(material_id, "NLE3D01")) new_nle3d01(new_material, command);
-    else if(is_equal(material_id, "OrthotropicElastic3D")) new_orthotropicelastic3d(new_material, command);
-    else if(is_equal(material_id, "ParabolicCC")) new_paraboliccc(new_material, command);
-    else if(is_equal(material_id, "Parallel")) new_parallel(new_material, command);
-    else if(is_equal(material_id, "PlaneStrain")) new_planestrain(new_material, command, 0);
-    else if(is_equal(material_id, "PlaneStress")) new_planestress(new_material, command);
-    else if(is_equal(material_id, "PlaneSymmetric13")) new_planestrain(new_material, command, 1);
-    else if(is_equal(material_id, "PlaneSymmetric23")) new_planestrain(new_material, command, 2);
-    else if(is_equal(material_id, "PolyElastic1D")) new_polyelastic1d(new_material, command);
-    else if(is_equal(material_id, "PolyJ2")) new_polyj2(new_material, command);
-    else if(is_equal(material_id, "RambergOsgood")) new_rambergosgood(new_material, command);
-    else if(is_equal(material_id, "Rebar2D")) new_rebar2d(new_material, command);
-    else if(is_equal(material_id, "Rebar3D")) new_rebar3d(new_material, command);
-    else if(is_equal(material_id, "Rotation2D")) new_rotation2d(new_material, command);
-    else if(is_equal(material_id, "Rotation3D")) new_rotation3d(new_material, command);
-    else if(is_equal(material_id, "Sequential")) new_sequential(new_material, command);
-    else if(is_equal(material_id, "SlipLock")) new_sliplock(new_material, command);
-    else if(is_equal(material_id, "SimpleSand")) new_simplesand(new_material, command);
-    else if(is_equal(material_id, "Stacked")) new_stacked(new_material, command);
-    else if(is_equal(material_id, "SteelBRB")) new_steelbrb(new_material, command);
-    else if(is_equal(material_id, "Substepping")) new_substepping(new_material, command);
-    else if(is_equal(material_id, "TableCDP")) new_tablecdp(new_material, command);
-    else if(is_equal(material_id, "TableGurson")) new_tablegurson(new_material, command);
-    else if(is_equal(material_id, "TrilinearDegradation")) new_trilineardegradation(new_material, command);
-    else if(is_equal(material_id, "Trivial")) new_trivial(new_material, command);
-    else if(is_equal(material_id, "Uniaxial")) new_uniaxial(new_material, command);
-    else if(is_equal(material_id, "VAFCRP")) new_vafcrp(new_material, command);
-    else if(is_equal(material_id, "VAFCRP1D")) new_vafcrp1d(new_material, command);
-    else if(is_equal(material_id, "Viscosity01")) new_viscosity01(new_material, command);
-    else if(is_equal(material_id, "Viscosity02")) new_viscosity02(new_material, command);
-    else if(is_equal(material_id, "BilinearViscosity")) new_bilinearviscosity(new_material, command);
-    else if(is_equal(material_id, "Yeoh")) new_yeoh(new_material, command);
-    else load::object(new_material, domain, material_id, command);
-
-    if(nullptr == new_material || !domain->insert(std::move(new_material))) suanpan_debug("create_new_material() fails to insert new material.\n");
-
-    return 0;
-}
+using std::vector;
 
 void new_afc01(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
@@ -2688,54 +2578,32 @@ void new_tablecdp(unique_ptr<Material>& return_obj, istringstream& command) {
     double para;
     while(!command.eof() && idx < 2) if(get_input(command, para)) para_pool(idx++) = para;
 
-    string table_name;
-
     mat c_table, t_table, dc_table, dt_table;
 
-    struct stat buffer{};
+    auto check_file = [&](mat& table) {
+        string table_name;
 
-    if(!get_input(command, table_name)) {
-        suanpan_error("new_tablecdp() requires a valid parameter.\n");
-        return;
-    }
-    if(stat(table_name.c_str(), &buffer) != 0 || !c_table.load(table_name, raw_ascii) || c_table.n_cols < 2) {
-        suanpan_error("new_tablecdp() cannot load file %s.\n", table_name.c_str());
-        return;
-    }
+        if(!get_input(command, table_name)) {
+            suanpan_error("new_tablecdp() requires a valid parameter.\n");
+            return false;
+        }
+        if(std::error_code code; !fs::exists(table_name, code) || !table.load(table_name, raw_ascii) || table.n_cols < 2) {
+            suanpan_error("new_tablecdp() cannot load file %s.\n", table_name.c_str());
+            return false;
+        }
+        if(0. != table(0)) {
+            suanpan_error("new_tablecdp() detects nonzero first plastic strain.\n");
+            return false;
+        }
+        return true;
+    };
 
-    if(!get_input(command, table_name)) {
-        suanpan_error("new_tablecdp() requires a valid parameter.\n");
-        return;
-    }
-    if(stat(table_name.c_str(), &buffer) != 0 || !t_table.load(table_name, raw_ascii) || t_table.n_cols < 2) {
-        suanpan_error("new_tablecdp() cannot load file %s.\n", table_name.c_str());
-        return;
-    }
+    if(!check_file(c_table)) return;
+    if(!check_file(t_table)) return;
+    if(!check_file(dc_table)) return;
+    if(!check_file(dt_table)) return;
 
-    if(!get_input(command, table_name)) {
-        suanpan_error("new_tablecdp() requires a valid parameter.\n");
-        return;
-    }
-    if(stat(table_name.c_str(), &buffer) != 0 || !dc_table.load(table_name, raw_ascii) || dc_table.n_cols < 2) {
-        suanpan_error("new_tablecdp() cannot load file %s.\n", table_name.c_str());
-        return;
-    }
-
-    if(!get_input(command, table_name)) {
-        suanpan_error("new_tablecdp() requires a valid parameter.\n");
-        return;
-    }
-    if(stat(table_name.c_str(), &buffer) != 0 || !dt_table.load(table_name, raw_ascii) || dt_table.n_cols < 2) {
-        suanpan_error("new_tablecdp() cannot load file %s.\n", table_name.c_str());
-        return;
-    }
-
-    if(0. != c_table(0) || 0. != t_table(0) || 0. != dc_table(0) || 0. != dt_table(0)) {
-        suanpan_error("new_tablecdp() detects nonzero first plastic strain.\n");
-        return;
-    }
-
-    while(!command.eof() && idx < 4) if(get_input(command, para)) para_pool(idx++) = para;
+    while(!command.eof() && idx < 6) if(get_input(command, para)) para_pool(idx++) = para;
 
     return_obj = make_unique<TableCDP>(tag, para_pool(0), para_pool(1), std::move(t_table), std::move(c_table), std::move(dt_table), std::move(dc_table), para_pool(2), para_pool(3), para_pool(4), para_pool(5));
 }
@@ -3040,11 +2908,549 @@ void new_yeoh(unique_ptr<Material>& return_obj, istringstream& command) {
 
     while(!command.eof() && get_input(command, para)) pool.emplace_back(para);
 
-    const auto t_size = pool.size();
+    const auto t_size = static_cast<long long>(pool.size());
     const auto h_size = t_size / 2;
 
-    auto A0 = vector<double>(pool.begin(), pool.begin() + h_size);
-    auto A1 = vector<double>(pool.begin() + h_size, pool.begin() + 2 * h_size);
+    auto A0 = vector(pool.begin(), pool.begin() + h_size);
+    auto A1 = vector(pool.begin() + h_size, pool.begin() + 2 * h_size);
 
     return_obj = make_unique<Yeoh>(tag, std::move(A0), std::move(A1), t_size % 2 == 0 ? 0. : pool.back());
+}
+
+int test_material1d(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned material_tag;
+    if(!get_input(command, material_tag)) {
+        suanpan_error("test_material1d() needs a valid material tag.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    double incre;
+    if(!get_input(command, incre)) {
+        suanpan_error("test_material1d() needs a valid step size.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    vector<unsigned> load_step;
+    int step;
+    while(get_input(command, step)) load_step.push_back(step < 0 ? static_cast<unsigned>(-step) : static_cast<unsigned>(step));
+
+    if(!domain->find_material(material_tag)) return SUANPAN_SUCCESS;
+
+    auto& material_proto = domain->get_material(material_tag);
+
+    if(!material_proto->is_initialized()) {
+        material_proto->initialize_base(domain);
+        material_proto->initialize(domain);
+        material_proto->set_initialized(true);
+    }
+
+    const auto result = material_tester(material_proto->get_copy(), load_step, {incre});
+
+#ifdef SUANPAN_HDF5
+    if(!result.save("RESULT.h5", hdf5_binary_trans)) suanpan_error("fail to save file.\n");
+#endif
+
+    if(!result.save("RESULT.txt", raw_ascii)) suanpan_error("fail to save file.\n");
+
+    if(std::ofstream gnuplot("RESULT.plt"); gnuplot.is_open()) {
+        gnuplot << "reset\n";
+        gnuplot << "set term tikz size 14cm,10cm\n";
+        gnuplot << "set output \"RESULT.tex\"\n";
+        gnuplot << "unset key\n";
+        gnuplot << "set xrange [*:*]\n";
+        gnuplot << "set yrange [*:*]\n";
+        gnuplot << "set xlabel \"input\"\n";
+        gnuplot << "set ylabel \"output\"\n";
+        gnuplot << "set grid\n";
+        gnuplot << "plot \"RESULT.txt\" u 1:2 w l lw 2\n";
+        gnuplot << "set output\n";
+
+        gnuplot.close();
+    }
+
+    return SUANPAN_SUCCESS;
+}
+
+int test_material2d(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned material_tag;
+    if(!get_input(command, material_tag)) {
+        suanpan_error("test_material2d() needs a valid material tag.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    vec incre(3);
+    for(auto& I : incre) {
+        if(!get_input(command, I)) {
+            suanpan_error("test_material2d() needs a valid step size.\n");
+            return SUANPAN_SUCCESS;
+        }
+    }
+
+    vector<unsigned> load_step;
+    int step;
+    while(get_input(command, step)) load_step.push_back(step < 0 ? static_cast<unsigned>(-step) : static_cast<unsigned>(step));
+
+    if(!domain->find_material(material_tag)) return SUANPAN_SUCCESS;
+
+    auto& material_proto = domain->get_material(material_tag);
+
+    if(!material_proto->is_initialized()) {
+        material_proto->initialize_base(domain);
+        material_proto->initialize(domain);
+        material_proto->set_initialized(true);
+    }
+
+    const auto result = material_tester(material_proto->get_copy(), load_step, incre);
+
+#ifdef SUANPAN_HDF5
+    if(!result.save("RESULT.h5", hdf5_binary_trans)) suanpan_error("fail to save file.\n");
+#endif
+
+    if(!result.save("RESULT.txt", raw_ascii)) suanpan_error("fail to save file.\n");
+
+    return SUANPAN_SUCCESS;
+}
+
+int test_material3d(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned material_tag;
+    if(!get_input(command, material_tag)) {
+        suanpan_error("test_material3d() needs a valid material tag.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    vec incre(6);
+    for(auto& I : incre)
+        if(!get_input(command, I)) {
+            suanpan_error("test_material3d() needs a valid step size.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+    vector<unsigned> load_step;
+    int step;
+    while(get_input(command, step)) load_step.push_back(step < 0 ? static_cast<unsigned>(-step) : static_cast<unsigned>(step));
+
+    if(!domain->find_material(material_tag)) return SUANPAN_SUCCESS;
+
+    auto& material_proto = domain->get_material(material_tag);
+
+    if(!material_proto->is_initialized()) {
+        material_proto->initialize_base(domain);
+        material_proto->initialize(domain);
+        material_proto->set_initialized(true);
+    }
+
+    const auto result = material_tester(material_proto->get_copy(), load_step, incre);
+
+#ifdef SUANPAN_HDF5
+    if(!result.save("RESULT.h5", hdf5_binary_trans)) suanpan_error("fail to save file.\n");
+#endif
+
+    if(!result.save("RESULT.txt", raw_ascii)) suanpan_error("fail to save file.\n");
+
+    return SUANPAN_SUCCESS;
+}
+
+int test_material_with_base3d(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned material_tag;
+    if(!get_input(command, material_tag)) {
+        suanpan_error("test_material3dwithbase() needs a valid material tag.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    vec base(6);
+    for(auto& I : base)
+        if(!get_input(command, I)) {
+            suanpan_error("test_material3dwithbase() needs a valid step size.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+    vec incre(6);
+    for(auto& I : incre)
+        if(!get_input(command, I)) {
+            suanpan_error("test_material3dwithbase() needs a valid step size.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+    vector<unsigned> load_step;
+    int step;
+    while(get_input(command, step)) load_step.push_back(step < 0 ? static_cast<unsigned>(-step) : static_cast<unsigned>(step));
+
+    if(!domain->find_material(material_tag)) return SUANPAN_SUCCESS;
+
+    auto& material_proto = domain->get_material(material_tag);
+
+    if(!material_proto->is_initialized()) {
+        material_proto->initialize_base(domain);
+        material_proto->initialize(domain);
+        material_proto->set_initialized(true);
+    }
+
+    const auto result = material_tester(material_proto->get_copy(), load_step, incre, base);
+
+#ifdef SUANPAN_HDF5
+    if(!result.save("RESULT.h5", hdf5_binary_trans)) suanpan_error("fail to save file.\n");
+#endif
+
+    if(!result.save("RESULT.txt", raw_ascii)) suanpan_error("fail to save file.\n");
+
+    return SUANPAN_SUCCESS;
+}
+
+int test_material_by_load1d(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned material_tag;
+    if(!get_input(command, material_tag)) {
+        suanpan_error("test_material1d() needs a valid material tag.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    double incre;
+    if(!get_input(command, incre)) {
+        suanpan_error("test_material1d() needs a valid step size.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    vector<unsigned> load_step;
+    int step;
+    while(get_input(command, step)) load_step.push_back(step < 0 ? static_cast<unsigned>(-step) : static_cast<unsigned>(step));
+
+    if(!domain->find_material(material_tag)) return SUANPAN_SUCCESS;
+
+    auto& material_proto = domain->get_material(material_tag);
+
+    if(!material_proto->is_initialized()) {
+        material_proto->initialize_base(domain);
+        material_proto->initialize(domain);
+        material_proto->set_initialized(true);
+    }
+
+    const auto result = material_tester_by_load(material_proto->get_copy(), load_step, {incre});
+
+#ifdef SUANPAN_HDF5
+    if(!result.save("RESULT.h5", hdf5_binary_trans)) suanpan_error("fail to save file.\n");
+#endif
+
+    if(!result.save("RESULT.txt", raw_ascii)) suanpan_error("fail to save file.\n");
+
+    if(std::ofstream gnuplot("RESULT.plt"); gnuplot.is_open()) {
+        gnuplot << "reset\n";
+        gnuplot << "set term tikz size 14cm,10cm\n";
+        gnuplot << "set output \"RESULT.tex\"\n";
+        gnuplot << "unset key\n";
+        gnuplot << "set xrange [*:*]\n";
+        gnuplot << "set yrange [*:*]\n";
+        gnuplot << "set xlabel \"input\"\n";
+        gnuplot << "set ylabel \"output\"\n";
+        gnuplot << "set grid\n";
+        gnuplot << "plot \"RESULT.txt\" u 1:2 w l lw 2\n";
+        gnuplot << "set output\n";
+    }
+
+    return SUANPAN_SUCCESS;
+}
+
+int test_material_by_load2d(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned material_tag;
+    if(!get_input(command, material_tag)) {
+        suanpan_error("test_material2d() needs a valid material tag.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    vec incre(3);
+    for(auto& I : incre)
+        if(!get_input(command, I)) {
+            suanpan_error("test_material2d() needs a valid step size.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+    vector<unsigned> load_step;
+    int step;
+    while(get_input(command, step)) load_step.push_back(step < 0 ? static_cast<unsigned>(-step) : static_cast<unsigned>(step));
+
+    if(!domain->find_material(material_tag)) return SUANPAN_SUCCESS;
+
+    auto& material_proto = domain->get_material(material_tag);
+
+    if(!material_proto->is_initialized()) {
+        material_proto->initialize_base(domain);
+        material_proto->initialize(domain);
+        material_proto->set_initialized(true);
+    }
+
+    const auto result = material_tester_by_load(material_proto->get_copy(), load_step, incre);
+
+#ifdef SUANPAN_HDF5
+    if(!result.save("RESULT.h5", hdf5_binary_trans)) suanpan_error("fail to save file.\n");
+#endif
+
+    if(!result.save("RESULT.txt", raw_ascii)) suanpan_error("fail to save file.\n");
+
+    return SUANPAN_SUCCESS;
+}
+
+int test_material_by_load3d(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned material_tag;
+    if(!get_input(command, material_tag)) {
+        suanpan_error("test_material3d() needs a valid material tag.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    vec incre(6);
+    for(auto& I : incre)
+        if(!get_input(command, I)) {
+            suanpan_error("test_material3d() needs a valid step size.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+    vector<unsigned> load_step;
+    int step;
+    while(get_input(command, step)) load_step.push_back(step < 0 ? static_cast<unsigned>(-step) : static_cast<unsigned>(step));
+
+    if(!domain->find_material(material_tag)) return SUANPAN_SUCCESS;
+
+    auto& material_proto = domain->get_material(material_tag);
+
+    if(!material_proto->is_initialized()) {
+        material_proto->initialize_base(domain);
+        material_proto->initialize(domain);
+        material_proto->set_initialized(true);
+    }
+
+    const auto result = material_tester_by_load(material_proto->get_copy(), load_step, incre);
+
+#ifdef SUANPAN_HDF5
+    if(!result.save("RESULT.h5", hdf5_binary_trans)) suanpan_error("fail to save file.\n");
+#endif
+
+    if(!result.save("RESULT.txt", raw_ascii)) suanpan_error("fail to save file.\n");
+
+    return SUANPAN_SUCCESS;
+}
+
+int test_material_by_load_with_base3d(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned material_tag;
+    if(!get_input(command, material_tag)) {
+        suanpan_error("test_material3dwithbase() needs a valid material tag.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    vec base(6);
+    for(auto& I : base)
+        if(!get_input(command, I)) {
+            suanpan_error("test_material3dwithbase() needs a valid step size.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+    vec incre(6);
+    for(auto& I : incre)
+        if(!get_input(command, I)) {
+            suanpan_error("test_material3dwithbase() needs a valid step size.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+    vector<unsigned> load_step;
+    int step;
+    while(get_input(command, step)) load_step.push_back(step < 0 ? static_cast<unsigned>(-step) : static_cast<unsigned>(step));
+
+    if(!domain->find_material(material_tag)) return SUANPAN_SUCCESS;
+
+    auto& material_proto = domain->get_material(material_tag);
+
+    if(!material_proto->is_initialized()) {
+        material_proto->initialize_base(domain);
+        material_proto->initialize(domain);
+        material_proto->set_initialized(true);
+    }
+
+    const auto result = material_tester_by_load(material_proto->get_copy(), load_step, incre, base);
+
+#ifdef SUANPAN_HDF5
+    if(!result.save("RESULT.h5", hdf5_binary_trans)) suanpan_error("fail to save file.\n");
+#endif
+
+    if(!result.save("RESULT.txt", raw_ascii)) suanpan_error("fail to save file.\n");
+
+    return SUANPAN_SUCCESS;
+}
+
+int test_material_by_strain_history(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned material_tag;
+    if(!get_input(command, material_tag)) {
+        suanpan_error("test_material_by_strain_history() needs a valid material tag.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    string history_file;
+    if(!get_input(command, history_file)) {
+        suanpan_error("test_material_by_strain_history() needs a valid history file name.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    mat strain_history;
+    if(!strain_history.load(history_file) || !domain->find_material(material_tag)) return SUANPAN_SUCCESS;
+
+    auto& material_proto = domain->get_material(material_tag);
+
+    if(!material_proto->is_initialized()) {
+        material_proto->initialize_base(domain);
+        material_proto->initialize(domain);
+        material_proto->set_initialized(true);
+    }
+
+    const auto result = material_tester_by_strain_history(material_proto->get_copy(), strain_history);
+
+#ifdef SUANPAN_HDF5
+    if(!result.save("RESULT.h5", hdf5_binary_trans)) suanpan_error("fail to save file.\n");
+#else
+    if(!result.save("RESULT.txt", raw_ascii)) suanpan_error("fail to save file.\n");
+#endif
+
+    return SUANPAN_SUCCESS;
+}
+
+int test_material_by_stress_history(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned material_tag;
+    if(!get_input(command, material_tag)) {
+        suanpan_error("test_material_by_stress_history() needs a valid material tag.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    string history_file;
+    if(!get_input(command, history_file)) {
+        suanpan_error("test_material_by_stress_history() needs a valid history file name.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    mat stress_history;
+    if(!stress_history.load(history_file) || !domain->find_material(material_tag)) return SUANPAN_SUCCESS;
+
+    auto& material_proto = domain->get_material(material_tag);
+
+    if(!material_proto->is_initialized()) {
+        material_proto->initialize_base(domain);
+        material_proto->initialize(domain);
+        material_proto->set_initialized(true);
+    }
+
+    const auto result = material_tester_by_stress_history(material_proto->get_copy(), stress_history);
+
+#ifdef SUANPAN_HDF5
+    if(!result.save("RESULT.h5", hdf5_binary_trans)) suanpan_error("fail to save file.\n");
+#else
+    if(!result.save("RESULT.txt", raw_ascii)) suanpan_error("fail to save file.\n");
+#endif
+
+    return SUANPAN_SUCCESS;
+}
+
+int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    string material_id;
+    if(!get_input(command, material_id)) {
+        suanpan_error("create_new_material() needs a tag.\n");
+        return 0;
+    }
+
+    unique_ptr<Material> new_material = nullptr;
+
+    if(is_equal(material_id, "AFC01")) new_afc01(new_material, command);
+    else if(is_equal(material_id, "AFC")) new_afc01(new_material, command);
+    else if(is_equal(material_id, "AFC02")) new_afc02(new_material, command);
+    else if(is_equal(material_id, "AFCS")) new_afc02(new_material, command);
+    else if(is_equal(material_id, "AFC03")) new_afc03(new_material, command);
+    else if(is_equal(material_id, "AFCN")) new_afc03(new_material, command);
+    else if(is_equal(material_id, "ArmstrongFrederick")) new_armstrongfrederick(new_material, command);
+    else if(is_equal(material_id, "ArmstrongFrederick1D")) new_armstrongfrederick1d(new_material, command);
+    else if(is_equal(material_id, "Axisymmetric")) new_axisymmetric(new_material, command);
+    else if(is_equal(material_id, "AxisymmetricElastic")) new_axisymmetricelastic(new_material, command);
+    else if(is_equal(material_id, "Bilinear1D")) new_bilinear1d(new_material, command);
+    else if(is_equal(material_id, "Bilinear2D")) new_bilinear2d(new_material, command);
+    else if(is_equal(material_id, "BilinearCC")) new_bilinearcc(new_material, command);
+    else if(is_equal(material_id, "BilinearDP")) new_bilineardp(new_material, command);
+    else if(is_equal(material_id, "BilinearElastic1D")) new_bilinearelastic1d(new_material, command);
+    else if(is_equal(material_id, "BilinearHoffman")) new_bilinearhoffman(new_material, command);
+    else if(is_equal(material_id, "BilinearJ2")) new_bilinearj2(new_material, command);
+    else if(is_equal(material_id, "BilinearMises1D")) new_bilinearmises1d(new_material, command);
+    else if(is_equal(material_id, "BilinearOO")) new_bilinearoo(new_material, command);
+    else if(is_equal(material_id, "BilinearPO")) new_bilinearpo(new_material, command);
+    else if(is_equal(material_id, "BilinearPeric")) new_bilinearperic(new_material, command);
+    else if(is_equal(material_id, "BlatzKo")) new_blatzko(new_material, command);
+    else if(is_equal(material_id, "BoucWen")) new_boucwen(new_material, command);
+    else if(is_equal(material_id, "BWBN")) new_bwbn(new_material, command);
+    else if(is_equal(material_id, "CDP")) new_cdp(new_material, command);
+    else if(is_equal(material_id, "CDPM2")) new_cdpm2(new_material, command, 1);
+    else if(is_equal(material_id, "CDPM2NO")) new_cdpm2(new_material, command, 0);
+    else if(is_equal(material_id, "CDPM2ISO")) new_cdpm2(new_material, command, 1);
+    else if(is_equal(material_id, "CDPM2ANISO")) new_cdpm2(new_material, command, 2);
+    else if(is_equal(material_id, "Concrete21")) new_concrete21(new_material, command);
+    else if(is_equal(material_id, "Concrete22")) new_concrete22(new_material, command);
+    else if(is_equal(material_id, "ConcreteCM")) new_concretecm(new_material, command);
+    else if(is_equal(material_id, "ConcreteExp")) new_concreteexp(new_material, command);
+    else if(is_equal(material_id, "ConcreteTable")) new_concretetable(new_material, command);
+    else if(is_equal(material_id, "ConcreteTsai")) new_concretetsai(new_material, command);
+    else if(is_equal(material_id, "CoulombFriction")) new_coulombfriction(new_material, command);
+    else if(is_equal(material_id, "Dhakal")) new_dhakal(new_material, command);
+    else if(is_equal(material_id, "DafaliasManzari")) new_dafaliasmanzari(new_material, command);
+    else if(is_equal(material_id, "Elastic1D")) new_elastic1d(new_material, command);
+    else if(is_equal(material_id, "Elastic2D")) new_elastic2d(new_material, command);
+    else if(is_equal(material_id, "Elastic3D")) new_isotropicelastic3d(new_material, command);
+    else if(is_equal(material_id, "ExpCC")) new_expcc(new_material, command);
+    else if(is_equal(material_id, "ExpDP")) new_expdp(new_material, command);
+    else if(is_equal(material_id, "ExpGurson")) new_expgurson(new_material, command);
+    else if(is_equal(material_id, "ExpGurson1D")) new_expgurson1d(new_material, command);
+    else if(is_equal(material_id, "ExpHoffman")) new_exphoffman(new_material, command);
+    else if(is_equal(material_id, "ExpJ2")) new_expj2(new_material, command);
+    else if(is_equal(material_id, "ExpMises1D")) new_expmises1d(new_material, command);
+    else if(is_equal(material_id, "Flag01")) new_flag01(new_material, command);
+    else if(is_equal(material_id, "Flag02")) new_flag02(new_material, command);
+    else if(is_equal(material_id, "Fluid")) new_fluid(new_material, command);
+    else if(is_equal(material_id, "Gap01")) new_gap01(new_material, command);
+    else if(is_equal(material_id, "IsotropicElastic3D")) new_isotropicelastic3d(new_material, command);
+    else if(is_equal(material_id, "Kelvin")) new_kelvin(new_material, command);
+    else if(is_equal(material_id, "Laminated")) new_laminated(new_material, command);
+    else if(is_equal(material_id, "LinearDamage")) new_lineardamage(new_material, command);
+    else if(is_equal(material_id, "Maxwell")) new_maxwell(new_material, command);
+    else if(is_equal(material_id, "MooneyRivlin")) new_mooneyrivlin(new_material, command);
+    else if(is_equal(material_id, "MPF")) new_mpf(new_material, command);
+    else if(is_equal(material_id, "MultilinearOO")) new_multilinearoo(new_material, command);
+    else if(is_equal(material_id, "MultilinearPO")) new_multilinearpo(new_material, command);
+    else if(is_equal(material_id, "MultilinearElastic1D")) new_multilinearelastic1d(new_material, command);
+    else if(is_equal(material_id, "MultilinearJ2")) new_multilinearj2(new_material, command);
+    else if(is_equal(material_id, "MultilinearMises1D")) new_multilinearmises1d(new_material, command);
+    else if(is_equal(material_id, "NLE1D01")) new_nle1d01(new_material, command);
+    else if(is_equal(material_id, "NLE3D01")) new_nle3d01(new_material, command);
+    else if(is_equal(material_id, "OrthotropicElastic3D")) new_orthotropicelastic3d(new_material, command);
+    else if(is_equal(material_id, "ParabolicCC")) new_paraboliccc(new_material, command);
+    else if(is_equal(material_id, "Parallel")) new_parallel(new_material, command);
+    else if(is_equal(material_id, "PlaneStrain")) new_planestrain(new_material, command, 0);
+    else if(is_equal(material_id, "PlaneStress")) new_planestress(new_material, command);
+    else if(is_equal(material_id, "PlaneSymmetric13")) new_planestrain(new_material, command, 1);
+    else if(is_equal(material_id, "PlaneSymmetric23")) new_planestrain(new_material, command, 2);
+    else if(is_equal(material_id, "PolyElastic1D")) new_polyelastic1d(new_material, command);
+    else if(is_equal(material_id, "PolyJ2")) new_polyj2(new_material, command);
+    else if(is_equal(material_id, "RambergOsgood")) new_rambergosgood(new_material, command);
+    else if(is_equal(material_id, "Rebar2D")) new_rebar2d(new_material, command);
+    else if(is_equal(material_id, "Rebar3D")) new_rebar3d(new_material, command);
+    else if(is_equal(material_id, "Rotation2D")) new_rotation2d(new_material, command);
+    else if(is_equal(material_id, "Rotation3D")) new_rotation3d(new_material, command);
+    else if(is_equal(material_id, "Sequential")) new_sequential(new_material, command);
+    else if(is_equal(material_id, "SlipLock")) new_sliplock(new_material, command);
+    else if(is_equal(material_id, "SimpleSand")) new_simplesand(new_material, command);
+    else if(is_equal(material_id, "Stacked")) new_stacked(new_material, command);
+    else if(is_equal(material_id, "SteelBRB")) new_steelbrb(new_material, command);
+    else if(is_equal(material_id, "Substepping")) new_substepping(new_material, command);
+    else if(is_equal(material_id, "TableCDP")) new_tablecdp(new_material, command);
+    else if(is_equal(material_id, "TableGurson")) new_tablegurson(new_material, command);
+    else if(is_equal(material_id, "TrilinearDegradation")) new_trilineardegradation(new_material, command);
+    else if(is_equal(material_id, "Trivial")) new_trivial(new_material, command);
+    else if(is_equal(material_id, "Uniaxial")) new_uniaxial(new_material, command);
+    else if(is_equal(material_id, "VAFCRP")) new_vafcrp(new_material, command);
+    else if(is_equal(material_id, "VAFCRP1D")) new_vafcrp1d(new_material, command);
+    else if(is_equal(material_id, "Viscosity01")) new_viscosity01(new_material, command);
+    else if(is_equal(material_id, "Viscosity02")) new_viscosity02(new_material, command);
+    else if(is_equal(material_id, "BilinearViscosity")) new_bilinearviscosity(new_material, command);
+    else if(is_equal(material_id, "Yeoh")) new_yeoh(new_material, command);
+    else load::object(new_material, domain, material_id, command);
+
+    if(nullptr == new_material || !domain->insert(std::move(new_material))) suanpan_debug("create_new_material() fails to insert new material.\n");
+
+    return 0;
 }

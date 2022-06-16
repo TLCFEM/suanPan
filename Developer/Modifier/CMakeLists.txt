@@ -25,7 +25,7 @@ link_libraries(suanPan)
 
 add_library(${PROJECT_NAME} SHARED
         ModifierExample.cpp
-        ../../Domain/Group.cpp
+        ../../Domain/Group/Group.cpp
         ../../Domain/Node.cpp
         ../../Domain/Tag.cpp
         ../../Element/Element.cpp

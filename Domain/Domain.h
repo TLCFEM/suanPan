@@ -31,8 +31,8 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Storage.hpp>
 
-using ExternalModuleQueue = vector<shared_ptr<ExternalModule>>;
-using ThreadQueue = vector<shared_ptr<future<void>>>;
+using ExternalModuleQueue = std::vector<shared_ptr<ExternalModule>>;
+using ThreadQueue = std::vector<shared_ptr<future<void>>>;
 
 class Domain final : public DomainBase, public std::enable_shared_from_this<Domain> {
     std::atomic_bool updated = false;
@@ -69,11 +69,11 @@ class Domain final : public DomainBase, public std::enable_shared_from_this<Doma
     SectionStorage section_pond;
     SolverStorage solver_pond;
 
-    unordered_set<uword> constrained_dofs; /**< data storage */
-    unordered_set<uword> loaded_dofs;      /**< data storage */
-    unordered_set<uword> restrained_dofs;  /**< data storage */
+    suanpan::unordered_set<uword> constrained_dofs; /**< data storage */
+    suanpan::unordered_set<uword> loaded_dofs;      /**< data storage */
+    suanpan::unordered_set<uword> restrained_dofs;  /**< data storage */
 
-    vector<vector<unsigned>> color_map;
+    std::vector<std::vector<unsigned>> color_map;
 
 public:
     explicit Domain(unsigned = 0);
@@ -288,21 +288,24 @@ public:
     const shared_ptr<Integrator>& get_current_integrator() const override;
     const shared_ptr<Solver>& get_current_solver() const override;
 
+    void insert_loaded_dof(const uvec&) override;
+    void insert_restrained_dof(const uvec&) override;
+    void insert_constrained_dof(const uvec&) override;
+
     void insert_loaded_dof(uword) override;
     void insert_restrained_dof(uword) override;
     void insert_constrained_dof(uword) override;
 
-    const unordered_set<uword>& get_loaded_dof() const override;
-    const unordered_set<uword>& get_restrained_dof() const override;
-    const unordered_set<uword>& get_constrained_dof() const override;
+    const suanpan::unordered_set<uword>& get_loaded_dof() const override;
+    const suanpan::unordered_set<uword>& get_restrained_dof() const override;
+    const suanpan::unordered_set<uword>& get_constrained_dof() const override;
 
     bool is_updated() const override;
     bool is_sparse() const override;
 
     void set_color_model(ColorMethod) override;
-    const vector<vector<unsigned>>& get_color_map() const override;
-    vector<vector<uword>> get_node_connectivity() override;
-    vector<uvec> get_element_connectivity() override;
+    const std::vector<std::vector<unsigned>>& get_color_map() const override;
+    std::pair<std::vector<unsigned>, suanpan::graph<unsigned>> get_element_connectivity(bool) override;
 
     int reorder_dof() override;
     int assign_color() override;
@@ -364,6 +367,7 @@ public:
     int update_incre_status() const override;
     int update_trial_status() const override;
 
+    void stage_status() override;
     void commit_status() const override;
     void clear_status() override;
     void reset_status() const override;

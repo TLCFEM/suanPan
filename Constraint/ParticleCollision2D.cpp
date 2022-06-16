@@ -18,6 +18,7 @@
 #include "ParticleCollision2D.h"
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
+#include <Domain/Node.h>
 
 double ParticleCollision2D::compute_f(const double distance) const { return distance >= space ? 0. : -alpha * log(distance / space); }
 
@@ -28,30 +29,33 @@ int ParticleCollision2D::process_meta(const shared_ptr<DomainBase>& D, const boo
 
     auto& node_pool = D->get_node_pool();
 
-    list = std::vector<CellList>(node_pool.size());
+    auto node_size = node_pool.size();
 
-    decltype(list.size()) counter = 0;
-    for(auto& I : node_pool) {
-        if(norm(I->get_trial_velocity()) * W->get_incre_time() > space) suanpan_warning("the maximum particle speed seems to be too large, please decrease time increment.\n");
-        const auto new_pos = get_position(I);
-        list[counter].y = static_cast<int>(floor(new_pos(1) / space));
-        list[counter].x = static_cast<int>(floor(new_pos(0) / space));
-        list[counter++].tag = I->get_tag();
-    }
+    list = std::vector<CellList>(node_size);
 
-    suanpan_sort(list.begin(), list.end(), [](const CellList& a, const CellList& b) { return a.x < b.x || a.x == b.x && a.y < b.y ? true : false; });
+    suanpan_for(static_cast<decltype(node_size)>(0), node_size, [&](const decltype(node_size) I) {
+        const auto& t_node = node_pool[I];
+        if(norm(t_node->get_trial_velocity()) * W->get_incre_time() > space) suanpan_warning("the speed of Node %u seems to be too large, please decrease time step size.\n", t_node->get_tag());
+        const auto new_pos = get_position(t_node);
+        list[I].y = static_cast<int>(floor(new_pos(1) / space));
+        list[I].x = static_cast<int>(floor(new_pos(0) / space));
+        list[I].tag = t_node->get_tag();
+    });
+
+    suanpan_sort(list.begin(), list.end(), [](const CellList& a, const CellList& b) { return a.x < b.x || a.x == b.x && a.y < b.y; });
 
     resistance.zeros(W->get_size());
 
-    for(auto I = list.cbegin(); I != list.cend(); ++I)
-        for(auto J = I + 1; J != list.cend(); ++J) {
-            const auto diff_x = J->x - I->x;
+    suanpan_for(static_cast<decltype(node_size)>(0), node_size, [&](const decltype(node_size) I) {
+        for(auto J = I + 1; J < node_size; ++J) {
+            const auto diff_x = list[J].x - list[I].x;
             if(diff_x > 1) break;
-            const auto diff_y = J->y - I->y;
+            const auto diff_y = list[J].y - list[I].y;
             if(diff_x == 1 && diff_y > 1) break;
             if(abs(diff_y) > 1) continue;
-            apply_contact(D, D->get<Node>(I->tag), D->get<Node>(J->tag), full);
+            apply_contact(D, D->get<Node>(list[I].tag), D->get<Node>(list[J].tag), full);
         }
+    });
 
     return SUANPAN_SUCCESS;
 }

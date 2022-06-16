@@ -21,7 +21,7 @@
 #include <Section/Section.h>
 
 T3D2S::T3D2S(const unsigned T, uvec&& N, const unsigned M, const bool F, const bool LS)
-    : SectionElement1D(T, t_node, t_dof, std::forward<uvec>(N), uvec{M}, F)
+    : SectionElement1D(T, t_node, t_dof, std::forward<uvec>(N), uvec{M}, F, {DOF::U1, DOF::U2, DOF::U3})
     , t_trans(F ? make_unique<T3DC>() : make_unique<T3DL>())
     , log_strain(LS) {}
 

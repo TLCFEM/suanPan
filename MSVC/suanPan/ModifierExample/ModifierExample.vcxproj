@@ -56,7 +56,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Developer\Modifier\ModifierExample.cpp" />
-    <ClCompile Include="..\..\..\Domain\Group.cpp" />
+    <ClCompile Include="..\..\..\Domain\Group\Group.cpp" />
     <ClCompile Include="..\..\..\Domain\Node.cpp" />
     <ClCompile Include="..\..\..\Domain\Tag.cpp" />
     <ClCompile Include="..\..\..\Element\Element.cpp" />

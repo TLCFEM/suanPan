@@ -19,7 +19,7 @@
 #include <Element/Utility/MatrixModifier.hpp>
 
 int LumpedSimple::update_status() {
-    suanpan_for_each(element_pool.cbegin(), element_pool.cend(), [&](const weak_ptr<Element>& ele_ptr) { if(const auto t_ptr = ele_ptr.lock(); nullptr != t_ptr && t_ptr->if_update_mass() && !t_ptr->get_trial_mass().empty()) suanpan::mass::lumped_simple::apply(access::rw(t_ptr->get_trial_mass())); });
+    suanpan::for_all(element_pool, [&](const weak_ptr<Element>& ele_ptr) { if(const auto t_ptr = ele_ptr.lock(); nullptr != t_ptr && t_ptr->if_update_mass() && !t_ptr->get_trial_mass().empty()) suanpan::mass::lumped_simple::apply(access::rw(t_ptr->get_trial_mass())); });
 
     return SUANPAN_SUCCESS;
 }

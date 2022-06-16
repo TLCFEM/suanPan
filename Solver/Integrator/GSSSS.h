@@ -60,7 +60,7 @@ public:
 
     int update_trial_status() override;
 
-    void commit_status() override;
+    void stage_status() override;
 
     void update_parameter(double) override;
     void update_compatibility() const override;

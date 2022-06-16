@@ -29,30 +29,11 @@ SupportMotion::SupportMotion(const unsigned T, const unsigned ST, const double L
     : Load(T, ST, AT, std::forward<uvec>(N), std::forward<uvec>(D), L) { enable_displacement_control(); }
 
 int SupportMotion::initialize(const shared_ptr<DomainBase>& D) {
-    if(initialized) return SUANPAN_SUCCESS;
-
-    if(SUANPAN_SUCCESS != Load::initialize(D)) return SUANPAN_FAIL;
-
     set_end_step(start_step + 1);
 
-    const auto& W = D->get_factory();
+    D->get_factory()->update_reference_dof(encoding = get_nodal_active_dof(D));
 
-    vector<uword> r_dof, e_dof;
-
-    for(const auto I : W->get_reference_dof()) r_dof.emplace_back(I);
-
-    for(const auto I : get_nodal_active_dof(D)) {
-        e_dof.emplace_back(I);
-        if(r_dof.end() == find(r_dof.begin(), r_dof.end(), e_dof.back())) r_dof.emplace_back(e_dof.back());
-        else suanpan_warning("more than one displacement load are applied on the same DoF.\n");
-    }
-
-    encoding = e_dof;
-
-    W->set_reference_dof(uvec(r_dof));
-    W->set_reference_size(static_cast<unsigned>(r_dof.size()));
-
-    return SUANPAN_SUCCESS;
+    return Load::initialize(D);
 }
 
 int SupportDisplacement::process(const shared_ptr<DomainBase>& D) {

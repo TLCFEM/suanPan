@@ -35,7 +35,7 @@ DCP4::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Mat
     , b_mat(3, 8, fill::zeros) {}
 
 DCP4::DCP4(const unsigned T, uvec&& N, const unsigned M, const double CL, const double RR, const double TH)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, false)
+    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, false, {DOF::U1, DOF::U2, DOF::DMG})
     , release_rate(RR)
     , thickness(TH) { access::rw(characteristic_length) = CL; }
 

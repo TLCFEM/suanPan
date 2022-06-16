@@ -29,11 +29,14 @@
 #ifndef PARTICLECOLLISION_H
 #define PARTICLECOLLISION_H
 
-#include <Constraint/Constraint.h>
-#include <Domain/Node.h>
+#include "Constraint.h"
+
+class Node;
 
 class ParticleCollision : public Constraint {
     const unsigned num_dof;
+
+    std::mutex resistance_mutex;
 
     /**
      * \brief The force between two particles is assumed to be a function of distance.

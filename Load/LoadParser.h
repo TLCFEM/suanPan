@@ -14,34 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-/**
- * @class ElementGroup
- * @brief The ElementGroup class.
- *
- * @author tlc
- * @date 21/05/2020
- * @version 0.1.0
- * @file ElementGroup.h
- * @addto Domain
- * @{
- */
 
-#ifndef ELEMENTGROUP_H
-#define ELEMENTGROUP_H
+#ifndef LOADPARSER_H
+#define LOADPARSER_H
 
-#include <Domain/Group.h>
+#include <memory>
 
 class DomainBase;
 
-class ElementGroup final : public Group {
-public:
-    ElementGroup(unsigned, uvec&&);
+int create_new_amplitude(const std::shared_ptr<DomainBase>&, std::istringstream&);
 
-    void initialize(const shared_ptr<DomainBase>&) override;
-
-    void print() override;
-};
+int create_new_load(const std::shared_ptr<DomainBase>&, std::istringstream&);
 
 #endif
-
-//! @}

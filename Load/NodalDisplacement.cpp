@@ -27,26 +27,11 @@ NodalDisplacement::NodalDisplacement(const unsigned T, const unsigned ST, const 
     : Load(T, ST, AT, std::forward<uvec>(N), std::forward<uvec>(D), L) { enable_displacement_control(); }
 
 int NodalDisplacement::initialize(const shared_ptr<DomainBase>& D) {
-    if(initialized) return SUANPAN_SUCCESS;
-
-    if(SUANPAN_SUCCESS != Load::initialize(D)) return SUANPAN_FAIL;
-
     set_end_step(start_step + 1);
 
-    const auto& W = D->get_factory();
+    D->get_factory()->update_reference_dof(encoding = get_nodal_active_dof(D));
 
-    vector<uword> r_dof;
-
-    for(const auto I : W->get_reference_dof()) r_dof.emplace_back(I);
-
-    for(const auto I : get_nodal_active_dof(D))
-        if(r_dof.end() == find(r_dof.begin(), r_dof.end(), I)) r_dof.emplace_back(I);
-        else suanpan_warning("more than one displacement loads are applied on the same DoF.\n");
-
-    W->set_reference_dof(uvec(r_dof));
-    W->set_reference_size(static_cast<unsigned>(r_dof.size()));
-
-    return SUANPAN_SUCCESS;
+    return Load::initialize(D);
 }
 
 int NodalDisplacement::process(const shared_ptr<DomainBase>& D) {
@@ -54,7 +39,7 @@ int NodalDisplacement::process(const shared_ptr<DomainBase>& D) {
 
     trial_settlement.zeros(W->get_size());
 
-    trial_settlement(get_nodal_active_dof(D)).fill(pattern * magnitude->get_amplitude(W->get_trial_time()));
+    trial_settlement(encoding).fill(pattern * magnitude->get_amplitude(W->get_trial_time()));
 
     return SUANPAN_SUCCESS;
 }

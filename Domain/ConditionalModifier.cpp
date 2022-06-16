@@ -54,13 +54,11 @@ ConditionalModifier::ConditionalModifier(const unsigned T, const unsigned ST, co
     , dof_reference(std::forward<uvec>(D) - 1) {}
 
 int ConditionalModifier::initialize(const shared_ptr<DomainBase>& D) {
-    if(!validate_step(D)) return SUANPAN_SUCCESS;
-
-    0 == amplitude_tag ? magnitude = make_shared<Ramp>(0) : magnitude = D->get<Amplitude>(amplitude_tag);
-
-    if(nullptr != magnitude && !magnitude->is_active()) magnitude = nullptr;
-
-    if(nullptr == magnitude) magnitude = make_shared<Amplitude>();
+    if(0 == amplitude_tag) magnitude = make_shared<Ramp>(0);
+    else {
+        magnitude = D->get<Amplitude>(amplitude_tag);
+        if(nullptr == magnitude || !magnitude->is_active()) magnitude = make_shared<Ramp>(0);
+    }
 
     auto start_time = 0.;
     for(const auto& [t_tag, t_step] : D->get_step_pool()) {
@@ -78,6 +76,8 @@ int ConditionalModifier::initialize(const shared_ptr<DomainBase>& D) {
 
 int ConditionalModifier::process_resistance(const shared_ptr<DomainBase>& D) { return process(D); }
 
+int ConditionalModifier::stage(const shared_ptr<DomainBase>&) { return SUANPAN_SUCCESS; }
+
 const uvec& ConditionalModifier::get_node_encoding() const { return node_encoding; }
 
 const uvec& ConditionalModifier::get_dof_encoding() const { return dof_encoding; }
@@ -87,7 +87,7 @@ void ConditionalModifier::set_initialized(const bool B) const { access::rw(initi
 bool ConditionalModifier::is_initialized() const { return initialized; }
 
 void ConditionalModifier::set_start_step(const unsigned ST) {
-    start_step = ST;
+    start_step = std::max(1u, ST);
     if(end_step <= start_step) end_step = start_step + 1;
 }
 
@@ -110,6 +110,6 @@ void ConditionalModifier::update_status(const vec&) {}
 
 void ConditionalModifier::commit_status() {}
 
-void ConditionalModifier::clear_status() {}
+void ConditionalModifier::clear_status() { set_initialized(false); }
 
 void ConditionalModifier::reset_status() {}

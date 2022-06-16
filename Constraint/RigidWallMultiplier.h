@@ -29,9 +29,9 @@
 #ifndef RIGIDWALLMULTIPLIER_H
 #define RIGIDWALLMULTIPLIER_H
 
-#include "Constraint/RigidWallPenalty.h"
+#include "RigidWallPenalty.h"
 
-class RigidWallMultiplier final : public RigidWallPenalty {
+class RigidWallMultiplier : public RigidWallPenalty {
     const bool use_penalty = false;
 
 public:
@@ -40,6 +40,23 @@ public:
     int initialize(const shared_ptr<DomainBase>&) override;
 
     int process(const shared_ptr<DomainBase>&) override;
+};
+
+class RigidWallMultiplier1D final : public RigidWallMultiplier {
+public:
+    RigidWallMultiplier1D(unsigned, unsigned, unsigned, vec&&, vec&&, double);
+};
+
+class RigidWallMultiplier2D final : public RigidWallMultiplier {
+public:
+    RigidWallMultiplier2D(unsigned, unsigned, unsigned, vec&&, vec&&, double);
+    RigidWallMultiplier2D(unsigned, unsigned, unsigned, vec&&, vec&&, vec&&, double);
+};
+
+class RigidWallMultiplier3D final : public RigidWallMultiplier {
+public:
+    RigidWallMultiplier3D(unsigned, unsigned, unsigned, vec&&, vec&&, double);
+    RigidWallMultiplier3D(unsigned, unsigned, unsigned, vec&&, vec&&, vec&&, double);
 };
 
 #endif

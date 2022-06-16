@@ -45,7 +45,7 @@ if [[ $# == 1 ]] && [[ $1 == "--create-link" ]]; then
 
   # install the files
   if [[ $INSTALLED == true ]]; then
-    echo "{\"cmd\":[\"suanpan\"\,\"-f\"\,\"\$file\"]\,\"selector\":\"source.supan\"\,\"file_patterns\":[\"*.supan\"\,\"*.sp\"]}" >suanPan.sublime-build
+    echo "{\"cmd\":[\"suanpan\",\"-f\",\"\$file\"],\"selector\":\"source.supan\",\"file_patterns\":[\"*.supan\",\"*.sp\"]}" >suanPan.sublime-build
     cp suanPan.sublime* "$ST_DIR"
     echo "Sublime Text installed, configuration files are copied to default folder $ST_DIR."
     echo ""
@@ -57,7 +57,7 @@ if [[ $# == 1 ]] && [[ $1 == "--create-link" ]]; then
   fi
 
   # desktop file
-  echo -e "[Desktop Entry]\nExec=suanpan\nVersion=2.0\nType=Application\nIcon=$CURRENT_PATH\suanPan.svg\nCategories=Science\nName=suanPan\nTerminal=true\n" >"$TARGET_PATH/../share/applications/suanPan.desktop"
+  echo -e "[Desktop Entry]\nExec=suanpan\nVersion=2.0\nType=Application\nIcon=$CURRENT_PATH/suanPan-ua.svg\nCategories=Science\nName=suanPan\nTerminal=true\n" >"$TARGET_PATH/../share/applications/suanPan.desktop"
   echo "$HOME/.local/share/applications/suanPan.desktop is successfully created."
 else
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CURRENT_PATH/../lib

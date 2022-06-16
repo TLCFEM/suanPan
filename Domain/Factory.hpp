@@ -32,7 +32,9 @@
 #define FACTORY_HPP
 
 #include <future>
+
 #include "MetaMat/operator_times.hpp"
+#include "Toolbox/container.h"
 
 enum class AnalysisType {
     NONE,
@@ -86,7 +88,7 @@ template<sp_d T> class Factory final {
     Col<T> ninja; // the result from A*X=B
     Col<T> sushi; // modified right-hand side B
 
-    uvec reference_dof;
+    suanpan::set<uword> reference_dof;
     SpMat<T> reference_load;
 
     uvec auxiliary_encoding;      // for constraints using multiplier method
@@ -107,7 +109,7 @@ template<sp_d T> class Factory final {
     T kinetic_energy = 0.;
     T viscous_energy = 0.;
     T complementary_energy = 0.;
-    T momentum = 0.;
+    Col<T> momentum;
 
     Col<T> trial_load_factor;    // global trial load factor
     Col<T> trial_load;           // global trial load vector
@@ -158,6 +160,8 @@ template<sp_d T> class Factory final {
     shared_ptr<MetaMat<T>> global_stiffness = nullptr; // global stiffness matrix
     shared_ptr<MetaMat<T>> global_geometry = nullptr;  // global geometry matrix
 
+    std::vector<std::mutex> global_mutex = std::vector<std::mutex>(20);
+
     Col<T> eigenvalue; // eigenvalues
 
     Mat<T> eigenvector; // eigenvectors
@@ -201,11 +205,13 @@ public:
     void set_bandwidth(unsigned, unsigned);
     void get_bandwidth(unsigned&, unsigned&) const;
 
+    void update_reference_size();
     void set_reference_size(unsigned);
     [[nodiscard]] unsigned get_reference_size() const;
 
-    void set_reference_dof(const uvec&);
-    [[nodiscard]] const uvec& get_reference_dof() const;
+    void update_reference_dof(const uvec&);
+    void set_reference_dof(const suanpan::set<uword>&);
+    [[nodiscard]] const suanpan::set<uword>& get_reference_dof() const;
 
     void set_error(const T&);
     const T& get_error() const;
@@ -319,7 +325,7 @@ public:
     T get_kinetic_energy();
     T get_viscous_energy();
     T get_complementary_energy();
-    T get_momentum();
+    const Col<T>& get_momentum();
 
     const T& get_trial_time() const;
     const Col<T>& get_trial_load_factor() const;
@@ -374,6 +380,21 @@ public:
     const shared_ptr<MetaMat<T>>& get_stiffness() const;
     const shared_ptr<MetaMat<T>>& get_geometry() const;
 
+    std::mutex& get_auxiliary_encoding_mutex();
+    std::mutex& get_auxiliary_resistance_mutex();
+    std::mutex& get_auxiliary_load_mutex();
+    std::mutex& get_auxiliary_stiffness_mutex();
+
+    std::mutex& get_trial_constraint_resistance_mutex();
+
+    std::mutex& get_trial_load_mutex();
+    std::mutex& get_trial_settlement_mutex();
+
+    std::mutex& get_mass_mutex();
+    std::mutex& get_damping_mutex();
+    std::mutex& get_stiffness_mutex();
+    std::mutex& get_geometry_mutex();
+
     const Col<T>& get_eigenvalue() const;
     const Mat<T>& get_eigenvector() const;
 
@@ -420,7 +441,7 @@ public:
     template<sp_d T1> friend Col<T1>& get_ninja(const shared_ptr<Factory<T1>>&);
     template<sp_d T1> friend Col<T1>& get_sushi(const shared_ptr<Factory<T1>>&);
 
-    template<sp_d T1> friend uvec& get_reference_dof(const shared_ptr<Factory<T1>>&);
+    template<sp_d T1> friend suanpan::set<uword>& get_reference_dof(const shared_ptr<Factory<T1>>&);
     template<sp_d T1> friend SpMat<T1>& get_reference_load(const shared_ptr<Factory<T1>>&);
 
     template<sp_d T1> friend uvec& get_auxiliary_encoding(const shared_ptr<Factory<T1>>&);
@@ -643,6 +664,8 @@ template<sp_d T> void Factory<T>::get_bandwidth(unsigned& L, unsigned& U) const 
     U = n_upbw;
 }
 
+template<sp_d T> void Factory<T>::update_reference_size() { n_rfld = static_cast<unsigned>(reference_dof.size()); }
+
 template<sp_d T> void Factory<T>::set_reference_size(const unsigned S) {
     if(S == n_rfld) return;
     n_rfld = S;
@@ -650,16 +673,18 @@ template<sp_d T> void Factory<T>::set_reference_size(const unsigned S) {
 
 template<sp_d T> unsigned Factory<T>::get_reference_size() const { return n_rfld; }
 
-template<sp_d T> void Factory<T>::set_reference_dof(const uvec& D) { reference_dof = D; }
+template<sp_d T> void Factory<T>::update_reference_dof(const uvec& S) { reference_dof.insert(S.cbegin(), S.cend()); }
 
-template<sp_d T> const uvec& Factory<T>::get_reference_dof() const { return reference_dof; }
+template<sp_d T> void Factory<T>::set_reference_dof(const suanpan::set<uword>& D) { reference_dof = D; }
+
+template<sp_d T> const suanpan::set<uword>& Factory<T>::get_reference_dof() const { return reference_dof; }
 
 template<sp_d T> void Factory<T>::set_error(const T& E) { error = E; }
 
 template<sp_d T> const T& Factory<T>::get_error() const { return error; }
 
 template<sp_d T> int Factory<T>::initialize() {
-    reference_dof.reset(); // clear reference dof vector in every step
+    reference_dof.clear(); // clear reference dof vector in every step
 
     if(initialized || n_size == 0) return 0;
 
@@ -673,7 +698,6 @@ template<sp_d T> int Factory<T>::initialize() {
         initialize_displacement();
         break;
     case AnalysisType::EIGEN:
-        initialize_load();
         initialize_mass();
         initialize_stiffness();
         initialize_eigen();
@@ -940,7 +964,7 @@ template<sp_d T> T Factory<T>::get_viscous_energy() { return viscous_energy; }
 
 template<sp_d T> T Factory<T>::get_complementary_energy() { return complementary_energy; }
 
-template<sp_d T> T Factory<T>::get_momentum() { return momentum; }
+template<sp_d T> const Col<T>& Factory<T>::get_momentum() { return momentum; }
 
 template<sp_d T> const T& Factory<T>::get_trial_time() const { return trial_time; }
 
@@ -1037,6 +1061,28 @@ template<sp_d T> const shared_ptr<MetaMat<T>>& Factory<T>::get_damping() const {
 template<sp_d T> const shared_ptr<MetaMat<T>>& Factory<T>::get_stiffness() const { return global_stiffness; }
 
 template<sp_d T> const shared_ptr<MetaMat<T>>& Factory<T>::get_geometry() const { return global_geometry; }
+
+template<sp_d T> std::mutex& Factory<T>::get_auxiliary_encoding_mutex() { return global_mutex.at(0); }
+
+template<sp_d T> std::mutex& Factory<T>::get_auxiliary_resistance_mutex() { return global_mutex.at(1); }
+
+template<sp_d T> std::mutex& Factory<T>::get_auxiliary_load_mutex() { return global_mutex.at(2); }
+
+template<sp_d T> std::mutex& Factory<T>::get_auxiliary_stiffness_mutex() { return global_mutex.at(3); }
+
+template<sp_d T> std::mutex& Factory<T>::get_trial_constraint_resistance_mutex() { return global_mutex.at(4); }
+
+template<sp_d T> std::mutex& Factory<T>::get_trial_load_mutex() { return global_mutex.at(5); }
+
+template<sp_d T> std::mutex& Factory<T>::get_trial_settlement_mutex() { return global_mutex.at(6); }
+
+template<sp_d T> std::mutex& Factory<T>::get_mass_mutex() { return global_mutex.at(7); }
+
+template<sp_d T> std::mutex& Factory<T>::get_damping_mutex() { return global_mutex.at(8); }
+
+template<sp_d T> std::mutex& Factory<T>::get_stiffness_mutex() { return global_mutex.at(9); }
+
+template<sp_d T> std::mutex& Factory<T>::get_geometry_mutex() { return global_mutex.at(10); }
 
 template<sp_d T> const Col<T>& Factory<T>::get_eigenvalue() const { return eigenvalue; }
 
@@ -1212,7 +1258,7 @@ template<sp_d T> void Factory<T>::commit_energy() {
     auto ke = std::async([&] { if(!trial_inertial_force.empty() && !trial_velocity.empty()) kinetic_energy = .5 * dot(global_mass * trial_velocity, trial_velocity); });
     auto ve = std::async([&] { if(!trial_damping_force.empty() && !incre_displacement.empty()) viscous_energy += .5 * dot(trial_damping_force + current_damping_force, incre_displacement); });
     auto ce = std::async([&] { if(!trial_displacement.empty() && !incre_resistance.empty()) complementary_energy += .5 * dot(trial_displacement + current_displacement, incre_resistance); });
-    auto mm = std::async([&] { if(!trial_inertial_force.empty() && !trial_velocity.empty()) momentum = accu(global_mass * trial_velocity); });
+    auto mm = std::async([&] { if(!trial_inertial_force.empty() && !trial_velocity.empty()) momentum = global_mass * trial_velocity; });
 
     se.get();
     ke.get();
@@ -1226,7 +1272,7 @@ template<sp_d T> void Factory<T>::clear_energy() {
     kinetic_energy = 0.;
     viscous_energy = 0.;
     complementary_energy = 0.;
-    momentum = 0.;
+    momentum.zeros();
 }
 
 template<sp_d T> void Factory<T>::commit_status() {

@@ -19,6 +19,10 @@ element C3D8 1 1 2 3 4 5 6 7 8 1 G
 element C3D8 2 5 6 7 8 9 10 11 12 1 G
 
 hdf5recorder 1 Node RF3 9
+hdf5recorder 2 Element KAPPAP 1
+hdf5recorder 3 Element DT 1
+hdf5recorder 4 Element DC 1
+hdf5recorder 5 Element S 1
 
 fix 1 1 1 2 5 6 9 10
 fix 2 2 1 4 5 8 9 12
@@ -35,6 +39,8 @@ set symm_mat 0
 converger RelIncreDisp 1 1E-10 10 1
 
 analyze
+
+peek element 1
 
 # peek node 9 10 11 12
 

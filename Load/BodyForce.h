@@ -35,12 +35,12 @@
 
 class BodyForce : public Load {
 public:
-    explicit BodyForce(unsigned = 0, // tag
-                       unsigned = 0, // start step tag
-                       double = 0.,  // magnitude
-                       uvec&& = {},  // element tags
-                       unsigned = 0, // dof tag
-                       unsigned = 0  // amplitude tag
+    BodyForce(unsigned, // tag
+              unsigned, // start step tag
+              double,   // magnitude
+              uvec&&,   // element tags
+              unsigned, // dof tag
+              unsigned  // amplitude tag
     );
     BodyForce(unsigned,    // tag
               unsigned,    // start step tag

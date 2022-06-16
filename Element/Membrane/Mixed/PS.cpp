@@ -46,7 +46,7 @@ mat PS::form_transformation(const mat& jacobian) {
 }
 
 PS::PS(const unsigned T, uvec&& N, const unsigned M, const double TH)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, false)
+    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, false, {DOF::U1, DOF::U2})
     , thickness(TH) {}
 
 int PS::initialize(const shared_ptr<DomainBase>& D) {

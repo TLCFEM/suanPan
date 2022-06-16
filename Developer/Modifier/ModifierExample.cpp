@@ -35,7 +35,7 @@ SUANPAN_EXPORT void new_modifierexample(unique_ptr<Modifier>& return_obj, istrin
         return;
     }
 
-    vector<uword> element_tag;
+    std::vector<uword> element_tag;
     unsigned e_tag;
     while(!command.eof()) if(get_input(command, e_tag)) element_tag.emplace_back(e_tag);
 

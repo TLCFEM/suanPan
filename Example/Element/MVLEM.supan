@@ -11,6 +11,9 @@ material Elastic1D 3 2E6
 element MVLEM 1 1 2 3 .4 .2 1 .02 1 2 .2 1 .02 1 2 .2 1 .02 1 2 .2 1 .02 1 2 .2 1 .02 1 2
 element MVLEM 2 2 3 3 .4 .2 1 .02 1 2 .2 1 .02 1 2 .2 1 .02 1 2 .2 1 .02 1 2 .2 1 .02 1 2
 
+recorder 1 plain Element S 1
+recorder 2 plain Element E 1
+
 fix 1 P 1
 
 step static 1

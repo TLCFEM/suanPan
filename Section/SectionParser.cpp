@@ -15,57 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+#include "SectionParser.h"
 #include <Domain/DomainBase.h>
 #include <Domain/ExternalModule.h>
 #include <Section/Section>
 #include <Toolbox/utility.h>
-
-int create_new_section(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    string section_id;
-    if(!get_input(command, section_id)) {
-        suanpan_error("create_new_section() needs a section type.\n");
-        return 0;
-    }
-
-    unique_ptr<Section> new_section = nullptr;
-
-    if(is_equal(section_id, "Bar2D")) new_bar2d(new_section, command);
-    else if(is_equal(section_id, "Bar3D")) new_bar3d(new_section, command);
-    else if(is_equal(section_id, "Box2D")) new_box2d(new_section, command);
-    else if(is_equal(section_id, "Box3D")) new_box3d(new_section, command);
-    else if(is_equal(section_id, "Circle1D")) new_circle1d(new_section, command);
-    else if(is_equal(section_id, "Circle2D")) new_circle2d(new_section, command);
-    else if(is_equal(section_id, "Circle3D")) new_circle3d(new_section, command);
-    else if(is_equal(section_id, "CircularHollow2D")) new_circularhollow2D(new_section, command);
-    else if(is_equal(section_id, "CircularHollow3D")) new_circularhollow3D(new_section, command);
-    else if(is_equal(section_id, "Fibre1D")) new_fibre1d(new_section, command);
-    else if(is_equal(section_id, "Fibre2D")) new_fibre2d(new_section, command);
-    else if(is_equal(section_id, "Fibre3D")) new_fibre3d(new_section, command);
-    else if(is_equal(section_id, "HSection2D")) new_hsection2d(new_section, command);
-    else if(is_equal(section_id, "ISection2D")) new_isection2d(new_section, command);
-    else if(is_equal(section_id, "ISection3D")) new_isection3d(new_section, command);
-    else if(is_equal(section_id, "Rectangle1D")) new_rectangle1d(new_section, command);
-    else if(is_equal(section_id, "Rectangle2D")) new_rectangle2d(new_section, command);
-    else if(is_equal(section_id, "Rectangle3D")) new_rectangle3d(new_section, command);
-    else if(is_equal(section_id, "TrussSection")) new_trusssection(new_section, command);
-    else if(is_equal(section_id, "TSection2D")) new_tsection2d(new_section, command);
-    else if(is_equal(section_id, "TSection3D")) new_tsection3d(new_section, command);
-    else if(is_equal(section_id, "NM2D1")) new_nm2d1(new_section, command);
-    else if(is_equal(section_id, "NM2D2")) new_nm2d2(new_section, command);
-    else if(is_equal(section_id, "NM3D1")) new_nm3d1(new_section, command);
-    else if(is_equal(section_id, "NM3D2")) new_nm3d2(new_section, command);
-    else if(is_equal(section_id, "EU2D")) new_eu2d(new_section, command);
-    else if(is_equal(section_id, "EU3D")) new_eu3d(new_section, command);
-    else if(is_equal(section_id, "NZ2D")) new_nz2d(new_section, command);
-    else if(is_equal(section_id, "NZ3D")) new_nz3d(new_section, command);
-    else if(is_equal(section_id, "US2D")) new_us2d(new_section, command);
-    else if(is_equal(section_id, "US3D")) new_us3d(new_section, command);
-    else load::object(new_section, domain, section_id, command);
-
-    if(new_section == nullptr || !domain->insert(std::move(new_section))) suanpan_debug("create_new_section() fails to insert new section.\n");
-
-    return 0;
-}
 
 void new_bar2d(unique_ptr<Section>& return_obj, istringstream& command) {
     unsigned tag;
@@ -819,362 +773,6 @@ void new_nm3d2(unique_ptr<Section>& return_obj, istringstream& command) {
     }
 
     return_obj = make_unique<NM3D2>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), std::move(para_set));
-}
-
-void new_eu2d(unique_ptr<Section>& return_obj, istringstream& command) {
-    string type;
-    if(!get_input(command, type)) {
-        suanpan_error("new_eu2d() requires a valid designation.\n");
-        return;
-    }
-
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("new_eu2d() requires a valid tag.\n");
-        return;
-    }
-
-    unsigned material_id;
-    if(!get_input(command, material_id)) {
-        suanpan_error("new_eu2d() requires a material tag.\n");
-        return;
-    }
-
-    auto scale = 1.;
-    if(!command.eof() && !get_input(command, scale)) {
-        suanpan_error("new_eu2d() requires a valid scale.\n");
-        return;
-    }
-
-    unsigned int_pt = 6;
-    if(!command.eof() && !get_input(command, int_pt)) {
-        suanpan_error("new_eu2d() requires a number of integration points.\n");
-        return;
-    }
-
-    auto eccentricity = 0.;
-    if(!command.eof() && !get_input(command, eccentricity)) {
-        suanpan_error("new_eu2d() requires a valid eccentricity.\n");
-        return;
-    }
-
-    const auto dim = euisection(type);
-
-    if(dim.is_empty()) {
-        suanpan_error("new_eu2d() cannot identify section type.\n");
-        return;
-    }
-
-    return_obj = make_unique<ISection2D>(tag, scale * dim, material_id, int_pt, eccentricity);
-}
-
-void new_eu3d(unique_ptr<Section>& return_obj, istringstream& command) {
-    string type;
-    if(!get_input(command, type)) {
-        suanpan_error("new_eu3d() requires a valid designation.\n");
-        return;
-    }
-
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("new_eu3d() requires a valid tag.\n");
-        return;
-    }
-
-    unsigned material_id;
-    if(!get_input(command, material_id)) {
-        suanpan_error("new_eu3d() requires a material tag.\n");
-        return;
-    }
-
-    auto scale = 1.;
-    if(!command.eof() && !get_input(command, scale)) {
-        suanpan_error("new_eu3d() requires a valid scale.\n");
-        return;
-    }
-
-    unsigned int_pt = 6;
-    if(!command.eof() && !get_input(command, int_pt)) {
-        suanpan_error("new_eu3d() requires a number of integration points.\n");
-        return;
-    }
-
-    auto eccentricity_y = 0.;
-    if(!command.eof() && !get_input(command, eccentricity_y)) {
-        suanpan_error("new_eu3d() requires a valid eccentricity.\n");
-        return;
-    }
-
-    auto eccentricity_z = 0.;
-    if(!command.eof() && !get_input(command, eccentricity_z)) {
-        suanpan_error("new_eu3d() requires a valid eccentricity.\n");
-        return;
-    }
-
-    const auto dim = euisection(type);
-
-    if(dim.is_empty()) {
-        suanpan_error("new_eu3d() cannot identify section type.\n");
-        return;
-    }
-
-    return_obj = make_unique<ISection3D>(tag, scale * dim, material_id, int_pt, vec{eccentricity_y, eccentricity_z});
-}
-
-void new_nz2d(unique_ptr<Section>& return_obj, istringstream& command) {
-    string type;
-    if(!get_input(command, type)) {
-        suanpan_error("new_nz2d() requires a valid designation.\n");
-        return;
-    }
-
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("new_nz2d() requires a valid tag.\n");
-        return;
-    }
-
-    unsigned material_id;
-    if(!get_input(command, material_id)) {
-        suanpan_error("new_nz2d() requires a material tag.\n");
-        return;
-    }
-
-    auto scale = 1.;
-    if(!command.eof() && !get_input(command, scale)) {
-        suanpan_error("new_nz2d() requires a valid scale.\n");
-        return;
-    }
-
-    unsigned int_pt = 6;
-    if(!command.eof() && !get_input(command, int_pt)) {
-        suanpan_error("new_nz2d() requires a number of integration points.\n");
-        return;
-    }
-
-    auto eccentricity = 0.;
-    if(!command.eof() && !get_input(command, eccentricity)) {
-        suanpan_error("new_nz2d() requires a valid eccentricity.\n");
-        return;
-    }
-
-    auto dim = nzisection(type);
-
-    if(!dim.is_empty()) {
-        return_obj = make_unique<ISection2D>(tag, scale * dim, material_id, int_pt, eccentricity);
-        return;
-    }
-
-    dim = nzchsection(type);
-
-    if(!dim.is_empty()) {
-        return_obj = make_unique<CircularHollow2D>(tag, scale * dim, material_id, int_pt, eccentricity);
-        return;
-    }
-
-    dim = nzrhsection(type);
-
-    if(!dim.is_empty()) {
-        return_obj = make_unique<Box2D>(tag, scale * dim, material_id, int_pt, eccentricity);
-        return;
-    }
-
-    dim = nzshsection(type);
-
-    if(!dim.is_empty()) {
-        return_obj = make_unique<Box2D>(tag, scale * dim, material_id, int_pt, eccentricity);
-        return;
-    }
-
-    suanpan_error("new_nz2d() cannot identify section type.\n");
-}
-
-void new_nz3d(unique_ptr<Section>& return_obj, istringstream& command) {
-    string type;
-    if(!get_input(command, type)) {
-        suanpan_error("new_nz3d() requires a valid designation.\n");
-        return;
-    }
-
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("new_nz3d() requires a valid tag.\n");
-        return;
-    }
-
-    unsigned material_id;
-    if(!get_input(command, material_id)) {
-        suanpan_error("new_nz3d() requires a material tag.\n");
-        return;
-    }
-
-    auto scale = 1.;
-    if(!command.eof() && !get_input(command, scale)) {
-        suanpan_error("new_nz2d() requires a valid scale.\n");
-        return;
-    }
-
-    unsigned int_pt = 6;
-    if(!command.eof() && !get_input(command, int_pt)) {
-        suanpan_error("new_nz3d() requires a number of integration points.\n");
-        return;
-    }
-
-    auto eccentricity_y = 0.;
-    if(!command.eof() && !get_input(command, eccentricity_y)) {
-        suanpan_error("new_nz3d() requires a valid eccentricity.\n");
-        return;
-    }
-
-    auto eccentricity_z = 0.;
-    if(!command.eof() && !get_input(command, eccentricity_z)) {
-        suanpan_error("new_nz3d() requires a valid eccentricity.\n");
-        return;
-    }
-
-    auto dim = nzisection(type);
-
-    if(!dim.is_empty()) {
-        return_obj = make_unique<ISection3D>(tag, scale * dim, material_id, int_pt, vec{eccentricity_y, eccentricity_z});
-        return;
-    }
-
-    dim = nzchsection(type);
-
-    if(!dim.is_empty()) {
-        return_obj = make_unique<CircularHollow3D>(tag, scale * dim, material_id, int_pt, vec{eccentricity_y, eccentricity_z});
-        return;
-    }
-
-    dim = nzrhsection(type);
-
-    if(!dim.is_empty()) {
-        return_obj = make_unique<Box3D>(tag, scale * dim, material_id, int_pt, vec{eccentricity_y, eccentricity_z});
-        return;
-    }
-
-    dim = nzshsection(type);
-
-    if(!dim.is_empty()) {
-        return_obj = make_unique<Box3D>(tag, scale * dim, material_id, int_pt, vec{eccentricity_y, eccentricity_z});
-        return;
-    }
-
-    suanpan_error("new_nz3d() cannot identify section type.\n");
-}
-
-void new_us2d(unique_ptr<Section>& return_obj, istringstream& command) {
-    string type;
-    if(!get_input(command, type)) {
-        suanpan_error("new_us2d() requires a valid designation.\n");
-        return;
-    }
-
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("new_us2d() requires a valid tag.\n");
-        return;
-    }
-
-    unsigned material_id;
-    if(!get_input(command, material_id)) {
-        suanpan_error("new_us2d() requires a material tag.\n");
-        return;
-    }
-
-    auto scale = 1.;
-    if(!command.eof() && !get_input(command, scale)) {
-        suanpan_error("new_us2d() requires a valid scale.\n");
-        return;
-    }
-
-    unsigned int_pt = 6;
-    if(!command.eof() && !get_input(command, int_pt)) {
-        suanpan_error("new_us2d() requires a number of integration points.\n");
-        return;
-    }
-
-    auto eccentricity = 0.;
-    if(!command.eof() && !get_input(command, eccentricity)) {
-        suanpan_error("new_us2d() requires a valid eccentricity.\n");
-        return;
-    }
-
-    auto dim = usisection(type);
-
-    if(!dim.is_empty()) {
-        return_obj = make_unique<ISection2D>(tag, scale * dim, material_id, int_pt, eccentricity);
-        return;
-    }
-
-    dim = ustsection(type);
-
-    if(!dim.is_empty()) {
-        return_obj = make_unique<TSection2D>(tag, scale * dim, material_id, int_pt, eccentricity);
-        return;
-    }
-
-    suanpan_error("new_us2d() cannot identify section type.\n");
-}
-
-void new_us3d(unique_ptr<Section>& return_obj, istringstream& command) {
-    string type;
-    if(!get_input(command, type)) {
-        suanpan_error("new_us3d() requires a valid designation.\n");
-        return;
-    }
-
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("new_us3d() requires a valid tag.\n");
-        return;
-    }
-
-    unsigned material_id;
-    if(!get_input(command, material_id)) {
-        suanpan_error("new_us3d() requires a material tag.\n");
-        return;
-    }
-
-    auto scale = 1.;
-    if(!command.eof() && !get_input(command, scale)) {
-        suanpan_error("new_us3d() requires a valid scale.\n");
-        return;
-    }
-
-    unsigned int_pt = 6;
-    if(!command.eof() && !get_input(command, int_pt)) {
-        suanpan_error("new_us3d() requires a number of integration points.\n");
-        return;
-    }
-
-    auto eccentricity_y = 0.;
-    if(!command.eof() && !get_input(command, eccentricity_y)) {
-        suanpan_error("new_us3d() requires a valid eccentricity.\n");
-        return;
-    }
-
-    auto eccentricity_z = 0.;
-    if(!command.eof() && !get_input(command, eccentricity_z)) {
-        suanpan_error("new_us3d() requires a valid eccentricity.\n");
-        return;
-    }
-
-    auto dim = usisection(type);
-
-    if(!dim.is_empty()) {
-        return_obj = make_unique<ISection3D>(tag, scale * dim, material_id, int_pt, vec{eccentricity_y, eccentricity_z});
-        return;
-    }
-
-    dim = ustsection(type);
-
-    if(!dim.is_empty()) {
-        return_obj = make_unique<TSection3D>(tag, scale * dim, material_id, int_pt, vec{eccentricity_y, eccentricity_z});
-        return;
-    }
-
-    suanpan_error("new_us3d() cannot identify section type.\n");
 }
 
 vec euisection(const string& type) {
@@ -2207,4 +1805,407 @@ vec ustsection(const string& type) {
     if(is_equal(type, "ST1.5X3.75")) return {2.51, 0.260, 1.24, 0.349};
     if(is_equal(type, "ST1.5X2.85")) return {2.33, 0.260, 1.24, 0.170};
     return {};
+}
+
+void new_eu2d(unique_ptr<Section>& return_obj, istringstream& command) {
+    string type;
+    if(!get_input(command, type)) {
+        suanpan_error("new_eu2d() requires a valid designation.\n");
+        return;
+    }
+
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("new_eu2d() requires a valid tag.\n");
+        return;
+    }
+
+    unsigned material_id;
+    if(!get_input(command, material_id)) {
+        suanpan_error("new_eu2d() requires a material tag.\n");
+        return;
+    }
+
+    auto scale = 1.;
+    if(!command.eof() && !get_input(command, scale)) {
+        suanpan_error("new_eu2d() requires a valid scale.\n");
+        return;
+    }
+
+    unsigned int_pt = 6;
+    if(!command.eof() && !get_input(command, int_pt)) {
+        suanpan_error("new_eu2d() requires a number of integration points.\n");
+        return;
+    }
+
+    auto eccentricity = 0.;
+    if(!command.eof() && !get_input(command, eccentricity)) {
+        suanpan_error("new_eu2d() requires a valid eccentricity.\n");
+        return;
+    }
+
+    const auto dim = euisection(type);
+
+    if(dim.is_empty()) {
+        suanpan_error("new_eu2d() cannot identify section type.\n");
+        return;
+    }
+
+    return_obj = make_unique<ISection2D>(tag, scale * dim, material_id, int_pt, eccentricity);
+}
+
+void new_eu3d(unique_ptr<Section>& return_obj, istringstream& command) {
+    string type;
+    if(!get_input(command, type)) {
+        suanpan_error("new_eu3d() requires a valid designation.\n");
+        return;
+    }
+
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("new_eu3d() requires a valid tag.\n");
+        return;
+    }
+
+    unsigned material_id;
+    if(!get_input(command, material_id)) {
+        suanpan_error("new_eu3d() requires a material tag.\n");
+        return;
+    }
+
+    auto scale = 1.;
+    if(!command.eof() && !get_input(command, scale)) {
+        suanpan_error("new_eu3d() requires a valid scale.\n");
+        return;
+    }
+
+    unsigned int_pt = 6;
+    if(!command.eof() && !get_input(command, int_pt)) {
+        suanpan_error("new_eu3d() requires a number of integration points.\n");
+        return;
+    }
+
+    auto eccentricity_y = 0.;
+    if(!command.eof() && !get_input(command, eccentricity_y)) {
+        suanpan_error("new_eu3d() requires a valid eccentricity.\n");
+        return;
+    }
+
+    auto eccentricity_z = 0.;
+    if(!command.eof() && !get_input(command, eccentricity_z)) {
+        suanpan_error("new_eu3d() requires a valid eccentricity.\n");
+        return;
+    }
+
+    const auto dim = euisection(type);
+
+    if(dim.is_empty()) {
+        suanpan_error("new_eu3d() cannot identify section type.\n");
+        return;
+    }
+
+    return_obj = make_unique<ISection3D>(tag, scale * dim, material_id, int_pt, vec{eccentricity_y, eccentricity_z});
+}
+
+void new_nz2d(unique_ptr<Section>& return_obj, istringstream& command) {
+    string type;
+    if(!get_input(command, type)) {
+        suanpan_error("new_nz2d() requires a valid designation.\n");
+        return;
+    }
+
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("new_nz2d() requires a valid tag.\n");
+        return;
+    }
+
+    unsigned material_id;
+    if(!get_input(command, material_id)) {
+        suanpan_error("new_nz2d() requires a material tag.\n");
+        return;
+    }
+
+    auto scale = 1.;
+    if(!command.eof() && !get_input(command, scale)) {
+        suanpan_error("new_nz2d() requires a valid scale.\n");
+        return;
+    }
+
+    unsigned int_pt = 6;
+    if(!command.eof() && !get_input(command, int_pt)) {
+        suanpan_error("new_nz2d() requires a number of integration points.\n");
+        return;
+    }
+
+    auto eccentricity = 0.;
+    if(!command.eof() && !get_input(command, eccentricity)) {
+        suanpan_error("new_nz2d() requires a valid eccentricity.\n");
+        return;
+    }
+
+    auto dim = nzisection(type);
+
+    if(!dim.is_empty()) {
+        return_obj = make_unique<ISection2D>(tag, scale * dim, material_id, int_pt, eccentricity);
+        return;
+    }
+
+    dim = nzchsection(type);
+
+    if(!dim.is_empty()) {
+        return_obj = make_unique<CircularHollow2D>(tag, scale * dim, material_id, int_pt, eccentricity);
+        return;
+    }
+
+    dim = nzrhsection(type);
+
+    if(!dim.is_empty()) {
+        return_obj = make_unique<Box2D>(tag, scale * dim, material_id, int_pt, eccentricity);
+        return;
+    }
+
+    dim = nzshsection(type);
+
+    if(!dim.is_empty()) {
+        return_obj = make_unique<Box2D>(tag, scale * dim, material_id, int_pt, eccentricity);
+        return;
+    }
+
+    suanpan_error("new_nz2d() cannot identify section type.\n");
+}
+
+void new_nz3d(unique_ptr<Section>& return_obj, istringstream& command) {
+    string type;
+    if(!get_input(command, type)) {
+        suanpan_error("new_nz3d() requires a valid designation.\n");
+        return;
+    }
+
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("new_nz3d() requires a valid tag.\n");
+        return;
+    }
+
+    unsigned material_id;
+    if(!get_input(command, material_id)) {
+        suanpan_error("new_nz3d() requires a material tag.\n");
+        return;
+    }
+
+    auto scale = 1.;
+    if(!command.eof() && !get_input(command, scale)) {
+        suanpan_error("new_nz2d() requires a valid scale.\n");
+        return;
+    }
+
+    unsigned int_pt = 6;
+    if(!command.eof() && !get_input(command, int_pt)) {
+        suanpan_error("new_nz3d() requires a number of integration points.\n");
+        return;
+    }
+
+    auto eccentricity_y = 0.;
+    if(!command.eof() && !get_input(command, eccentricity_y)) {
+        suanpan_error("new_nz3d() requires a valid eccentricity.\n");
+        return;
+    }
+
+    auto eccentricity_z = 0.;
+    if(!command.eof() && !get_input(command, eccentricity_z)) {
+        suanpan_error("new_nz3d() requires a valid eccentricity.\n");
+        return;
+    }
+
+    auto dim = nzisection(type);
+
+    if(!dim.is_empty()) {
+        return_obj = make_unique<ISection3D>(tag, scale * dim, material_id, int_pt, vec{eccentricity_y, eccentricity_z});
+        return;
+    }
+
+    dim = nzchsection(type);
+
+    if(!dim.is_empty()) {
+        return_obj = make_unique<CircularHollow3D>(tag, scale * dim, material_id, int_pt, vec{eccentricity_y, eccentricity_z});
+        return;
+    }
+
+    dim = nzrhsection(type);
+
+    if(!dim.is_empty()) {
+        return_obj = make_unique<Box3D>(tag, scale * dim, material_id, int_pt, vec{eccentricity_y, eccentricity_z});
+        return;
+    }
+
+    dim = nzshsection(type);
+
+    if(!dim.is_empty()) {
+        return_obj = make_unique<Box3D>(tag, scale * dim, material_id, int_pt, vec{eccentricity_y, eccentricity_z});
+        return;
+    }
+
+    suanpan_error("new_nz3d() cannot identify section type.\n");
+}
+
+void new_us2d(unique_ptr<Section>& return_obj, istringstream& command) {
+    string type;
+    if(!get_input(command, type)) {
+        suanpan_error("new_us2d() requires a valid designation.\n");
+        return;
+    }
+
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("new_us2d() requires a valid tag.\n");
+        return;
+    }
+
+    unsigned material_id;
+    if(!get_input(command, material_id)) {
+        suanpan_error("new_us2d() requires a material tag.\n");
+        return;
+    }
+
+    auto scale = 1.;
+    if(!command.eof() && !get_input(command, scale)) {
+        suanpan_error("new_us2d() requires a valid scale.\n");
+        return;
+    }
+
+    unsigned int_pt = 6;
+    if(!command.eof() && !get_input(command, int_pt)) {
+        suanpan_error("new_us2d() requires a number of integration points.\n");
+        return;
+    }
+
+    auto eccentricity = 0.;
+    if(!command.eof() && !get_input(command, eccentricity)) {
+        suanpan_error("new_us2d() requires a valid eccentricity.\n");
+        return;
+    }
+
+    auto dim = usisection(type);
+
+    if(!dim.is_empty()) {
+        return_obj = make_unique<ISection2D>(tag, scale * dim, material_id, int_pt, eccentricity);
+        return;
+    }
+
+    dim = ustsection(type);
+
+    if(!dim.is_empty()) {
+        return_obj = make_unique<TSection2D>(tag, scale * dim, material_id, int_pt, eccentricity);
+        return;
+    }
+
+    suanpan_error("new_us2d() cannot identify section type.\n");
+}
+
+void new_us3d(unique_ptr<Section>& return_obj, istringstream& command) {
+    string type;
+    if(!get_input(command, type)) {
+        suanpan_error("new_us3d() requires a valid designation.\n");
+        return;
+    }
+
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("new_us3d() requires a valid tag.\n");
+        return;
+    }
+
+    unsigned material_id;
+    if(!get_input(command, material_id)) {
+        suanpan_error("new_us3d() requires a material tag.\n");
+        return;
+    }
+
+    auto scale = 1.;
+    if(!command.eof() && !get_input(command, scale)) {
+        suanpan_error("new_us3d() requires a valid scale.\n");
+        return;
+    }
+
+    unsigned int_pt = 6;
+    if(!command.eof() && !get_input(command, int_pt)) {
+        suanpan_error("new_us3d() requires a number of integration points.\n");
+        return;
+    }
+
+    auto eccentricity_y = 0.;
+    if(!command.eof() && !get_input(command, eccentricity_y)) {
+        suanpan_error("new_us3d() requires a valid eccentricity.\n");
+        return;
+    }
+
+    auto eccentricity_z = 0.;
+    if(!command.eof() && !get_input(command, eccentricity_z)) {
+        suanpan_error("new_us3d() requires a valid eccentricity.\n");
+        return;
+    }
+
+    auto dim = usisection(type);
+
+    if(!dim.is_empty()) {
+        return_obj = make_unique<ISection3D>(tag, scale * dim, material_id, int_pt, vec{eccentricity_y, eccentricity_z});
+        return;
+    }
+
+    dim = ustsection(type);
+
+    if(!dim.is_empty()) {
+        return_obj = make_unique<TSection3D>(tag, scale * dim, material_id, int_pt, vec{eccentricity_y, eccentricity_z});
+        return;
+    }
+
+    suanpan_error("new_us3d() cannot identify section type.\n");
+}
+
+int create_new_section(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    string section_id;
+    if(!get_input(command, section_id)) {
+        suanpan_error("create_new_section() needs a section type.\n");
+        return 0;
+    }
+
+    unique_ptr<Section> new_section = nullptr;
+
+    if(is_equal(section_id, "Bar2D")) new_bar2d(new_section, command);
+    else if(is_equal(section_id, "Bar3D")) new_bar3d(new_section, command);
+    else if(is_equal(section_id, "Box2D")) new_box2d(new_section, command);
+    else if(is_equal(section_id, "Box3D")) new_box3d(new_section, command);
+    else if(is_equal(section_id, "Circle1D")) new_circle1d(new_section, command);
+    else if(is_equal(section_id, "Circle2D")) new_circle2d(new_section, command);
+    else if(is_equal(section_id, "Circle3D")) new_circle3d(new_section, command);
+    else if(is_equal(section_id, "CircularHollow2D")) new_circularhollow2D(new_section, command);
+    else if(is_equal(section_id, "CircularHollow3D")) new_circularhollow3D(new_section, command);
+    else if(is_equal(section_id, "Fibre1D")) new_fibre1d(new_section, command);
+    else if(is_equal(section_id, "Fibre2D")) new_fibre2d(new_section, command);
+    else if(is_equal(section_id, "Fibre3D")) new_fibre3d(new_section, command);
+    else if(is_equal(section_id, "HSection2D")) new_hsection2d(new_section, command);
+    else if(is_equal(section_id, "ISection2D")) new_isection2d(new_section, command);
+    else if(is_equal(section_id, "ISection3D")) new_isection3d(new_section, command);
+    else if(is_equal(section_id, "Rectangle1D")) new_rectangle1d(new_section, command);
+    else if(is_equal(section_id, "Rectangle2D")) new_rectangle2d(new_section, command);
+    else if(is_equal(section_id, "Rectangle3D")) new_rectangle3d(new_section, command);
+    else if(is_equal(section_id, "TrussSection")) new_trusssection(new_section, command);
+    else if(is_equal(section_id, "TSection2D")) new_tsection2d(new_section, command);
+    else if(is_equal(section_id, "TSection3D")) new_tsection3d(new_section, command);
+    else if(is_equal(section_id, "NM2D1")) new_nm2d1(new_section, command);
+    else if(is_equal(section_id, "NM2D2")) new_nm2d2(new_section, command);
+    else if(is_equal(section_id, "NM3D1")) new_nm3d1(new_section, command);
+    else if(is_equal(section_id, "NM3D2")) new_nm3d2(new_section, command);
+    else if(is_equal(section_id, "EU2D")) new_eu2d(new_section, command);
+    else if(is_equal(section_id, "EU3D")) new_eu3d(new_section, command);
+    else if(is_equal(section_id, "NZ2D")) new_nz2d(new_section, command);
+    else if(is_equal(section_id, "NZ3D")) new_nz3d(new_section, command);
+    else if(is_equal(section_id, "US2D")) new_us2d(new_section, command);
+    else if(is_equal(section_id, "US3D")) new_us3d(new_section, command);
+    else load::object(new_section, domain, section_id, command);
+
+    if(new_section == nullptr || !domain->insert(std::move(new_section))) suanpan_debug("create_new_section() fails to insert new section.\n");
+
+    return 0;
 }

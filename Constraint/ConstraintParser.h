@@ -18,21 +18,12 @@
 #ifndef CONSTRAINTPARSER_H
 #define CONSTRAINTPARSER_H
 
-#include <suanPan.h>
+#include <memory>
 
-int create_new_constraint(const shared_ptr<DomainBase>&, istringstream&);
+class DomainBase;
 
-void new_embed(unique_ptr<Constraint>&, istringstream&, unsigned);
-void new_fixedlength(unique_ptr<Constraint>&, istringstream&, unsigned);
-void new_minimumgap(unique_ptr<Constraint>&, istringstream&, unsigned);
-void new_maximumgap(unique_ptr<Constraint>&, istringstream&, unsigned);
-void new_sleeve(unique_ptr<Constraint>&, istringstream&, unsigned);
-void new_mpc(unique_ptr<Constraint>&, istringstream&);
-void new_particlecollision2d(unique_ptr<Constraint>&, istringstream&);
-void new_particlecollision3d(unique_ptr<Constraint>&, istringstream&);
-void new_rigidwall(unique_ptr<Constraint>&, istringstream&, bool, bool);
-void new_bc(unique_ptr<Constraint>&, istringstream&, bool, bool);
-void new_nodeline(unique_ptr<Constraint>&, istringstream&);
-void new_nodefacet(unique_ptr<Constraint>&, istringstream&);
+int create_new_constraint(const std::shared_ptr<DomainBase>&, std::istringstream&);
+
+int create_new_criterion(const std::shared_ptr<DomainBase>&, std::istringstream&);
 
 #endif

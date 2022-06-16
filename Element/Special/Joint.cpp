@@ -20,7 +20,7 @@
 #include <Material/Material.h>
 
 Joint::Joint(const unsigned T, uvec&& NT, uvec&& MT)
-    : MaterialElement1D(T, j_node, static_cast<unsigned>(MT.n_elem), std::forward<uvec>(NT), std::forward<uvec>(MT), false)
+    : MaterialElement1D(T, j_node, static_cast<unsigned>(MT.n_elem), std::forward<uvec>(NT), std::forward<uvec>(MT), false, {})
     , j_dof(Element::get_dof_number()) {}
 
 int Joint::initialize(const shared_ptr<DomainBase>& D) {

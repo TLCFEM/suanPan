@@ -31,8 +31,6 @@
 
 #include <Load/Amplitude/Amplitude.h>
 
-using std::vector;
-
 class Linear final : public Amplitude {
     const double slope;
 

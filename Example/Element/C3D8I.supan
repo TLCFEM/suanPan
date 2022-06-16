@@ -96,6 +96,7 @@ displacement 1 0 1 3 12
 
 recorder 1 hdf5 Element E 1
 recorder 2 hdf5 Element S 1
+recorder 3 hdf5 Element PEEQ 3
 
 step static 1
 set fixed_step_size 1

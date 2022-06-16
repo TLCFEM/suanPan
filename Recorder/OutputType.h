@@ -242,6 +242,12 @@ enum class OutputType {
     VE,
     // momentum
     MM,
+    MMX,
+    MMY,
+    MMZ,
+    MMRX,
+    MMRY,
+    MMRZ,
 
     // history variable
     HIST,

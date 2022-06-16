@@ -39,7 +39,7 @@ S4::IntegrationPoint::IntegrationPoint(vec&& C)
     , BP(3, s_size / 2, fill::zeros) {}
 
 S4::S4(const unsigned T, uvec&& N, const unsigned M, const double TH)
-    : ShellBase(T, s_node, s_dof, std::forward<uvec>(N), uvec{M}, false)
+    : ShellBase(T, s_node, s_dof, std::forward<uvec>(N), uvec{M}, false, {DOF::U1, DOF::U2, DOF::U3, DOF::UR1, DOF::UR2, DOF::UR3})
     , thickness(TH) {}
 
 int S4::initialize(const shared_ptr<DomainBase>& D) {

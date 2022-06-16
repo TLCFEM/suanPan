@@ -66,7 +66,12 @@ protected:
     uvec get_all_nodal_active_dof(const shared_ptr<DomainBase>&);
 
 public:
-    ConditionalModifier(unsigned, unsigned, unsigned, uvec&&, uvec&&);
+    ConditionalModifier(unsigned, // tag
+                        unsigned, // step tag
+                        unsigned, // amplitude tag
+                        uvec&&,   // node tag
+                        uvec&&    // dof tag
+    );
 
     virtual int initialize(const shared_ptr<DomainBase>&);
 
@@ -85,6 +90,13 @@ public:
      * \return success flag
      */
     virtual int process_resistance(const shared_ptr<DomainBase>&);
+
+    /**
+     * \brief Some algorithms needs to manually modify some variables after solving. Typical example is the
+     * predictor--corrector type algorithms. This method is called before committing trial status to perform
+     * necessary operations.
+     */
+    virtual int stage(const shared_ptr<DomainBase>&);
 
     [[nodiscard]] const uvec& get_node_encoding() const;
     [[nodiscard]] const uvec& get_dof_encoding() const;

@@ -31,6 +31,8 @@
 
 #include <Section/Section.h>
 
+using std::vector;
+
 struct DataSectionNM {
     vec initial_history;
     vec current_history;

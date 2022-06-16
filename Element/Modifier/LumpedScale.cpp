@@ -18,7 +18,7 @@
 #include "LumpedScale.h"
 
 int LumpedScale::update_status() {
-    suanpan_for_each(element_pool.cbegin(), element_pool.cend(), [&](const weak_ptr<Element>& ele_ptr) {
+    suanpan::for_all(element_pool, [&](const weak_ptr<Element>& ele_ptr) {
         if(const auto t_ptr = ele_ptr.lock()) {
             if(const auto& t_mass = t_ptr->get_trial_mass(); !t_mass.empty() && t_ptr->if_update_mass()) {
                 const auto num_dof = t_ptr->get_dof_number();

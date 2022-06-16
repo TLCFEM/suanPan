@@ -288,7 +288,7 @@ int Material::reset_couple_status() {
     return SUANPAN_SUCCESS;
 }
 
-vector<vec> Material::record(const OutputType) { return {}; }
+std::vector<vec> Material::record(const OutputType) { return {}; }
 
 void ConstantStiffness(DataMaterial* M) {
     M->current_stiffness = mat(M->initial_stiffness.memptr(), M->initial_stiffness.n_rows, M->initial_stiffness.n_cols, false, true);

@@ -35,12 +35,12 @@
 
 class NodalForce : public Load {
 public:
-    explicit NodalForce(unsigned = 0, // tag
-                        unsigned = 0, // start step tag
-                        double = 0.,  // magnitude
-                        uvec&& = {},  // node tags
-                        unsigned = 0, // dof tag
-                        unsigned = 0  // amplitude tag
+    NodalForce(unsigned, // tag
+               unsigned, // start step tag
+               double,   // magnitude
+               uvec&&,   // node tags
+               unsigned, // dof tag
+               unsigned  // amplitude tag
     );
     NodalForce(unsigned,    // tag
                unsigned,    // start step tag

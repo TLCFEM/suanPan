@@ -34,9 +34,12 @@
 #include <Element/MaterialElement.h>
 
 class Damper01 final : public MaterialElement1D {
-    static constexpr unsigned d_node = 2, d_dof = 2, d_size = d_dof * d_node;
+    static constexpr unsigned d_node = 2;
 
-    static uvec IS, JS;
+    const unsigned d_dof;
+    const unsigned d_size = d_dof * d_node;
+
+    const uvec IS, JS;
 
     const vec direction_cosine;
 
@@ -45,7 +48,8 @@ class Damper01 final : public MaterialElement1D {
 public:
     Damper01(unsigned, // tag
              uvec&&,   // node tag
-             unsigned  // damper tag
+             unsigned, // damper tag
+             unsigned  // dimension
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

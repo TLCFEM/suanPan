@@ -36,7 +36,7 @@
 
 class Load : public ConditionalModifier {
 protected:
-    static const double multiplier;
+    static double multiplier;
 
     const bool mpdc_flag = false;
 
@@ -48,7 +48,13 @@ protected:
     friend void set_load_multiplier(double);
 
 public:
-    explicit Load(unsigned = 0, unsigned = 0, unsigned = 0, uvec&& = {}, uvec&& = {}, double = 0.);
+    Load(unsigned, // tag
+         unsigned, // step tag
+         unsigned, // amplitude tag
+         uvec&&,   // node tag
+         uvec&&,   // dof tag
+         double    // nominal magnitude
+    );
     Load(const Load&) = delete;            // copy forbidden
     Load(Load&&) = delete;                 // move forbidden
     Load& operator=(const Load&) = delete; // assign forbidden
@@ -64,6 +70,16 @@ public:
 };
 
 void set_load_multiplier(double);
+
+class GroupLoad {
+    const uvec groups;
+
+protected:
+    [[nodiscard]] uvec update_object_tag(const shared_ptr<DomainBase>&) const;
+
+public:
+    explicit GroupLoad(uvec&&);
+};
 
 #endif
 

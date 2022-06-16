@@ -117,9 +117,7 @@ void BatheTwoStep::update_compatibility() const {
     auto& trial_vel = W->get_trial_velocity();
     auto& trial_acc = W->get_trial_acceleration();
 
-    auto& t_node_pool = D->get_node_pool();
-
-    suanpan_for_each(t_node_pool.cbegin(), t_node_pool.cend(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_status(trial_dsp, trial_vel, trial_acc); });
+    suanpan::for_all(D->get_node_pool(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_status(trial_dsp, trial_vel, trial_acc); });
 }
 
 vec BatheTwoStep::from_incre_velocity(const vec& incre_velocity, const uvec& encoding) {

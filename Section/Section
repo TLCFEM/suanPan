@@ -6,6 +6,5 @@
 
 #include "ParameterType.h"
 #include "Section.h"
-#include "SectionParser.h"
 
 #include <Material/Material.h>

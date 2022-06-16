@@ -15,112 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+#include "ElementParser.h"
 #include <Domain/DomainBase.h>
 #include <Domain/ExternalModule.h>
 #include <Element/Element>
 #include <Toolbox/utility.h>
 
 using std::vector;
-
-int create_new_element(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    string element_id;
-    if(!get_input(command, element_id)) {
-        suanpan_error("create_new_element() needs element type.\n");
-        return 0;
-    }
-
-    unique_ptr<Element> new_element = nullptr;
-
-    if(is_equal(element_id, "Allman")) new_allman(new_element, command);
-    else if(is_equal(element_id, "B21")) new_b21(new_element, command);
-    else if(is_equal(element_id, "B21EL")) new_b21e(new_element, command, 1);
-    else if(is_equal(element_id, "B21EH")) new_b21e(new_element, command, 2);
-    else if(is_equal(element_id, "B21H")) new_b21h(new_element, command);
-    else if(is_equal(element_id, "B31")) new_b31(new_element, command);
-    else if(is_equal(element_id, "NMB21")) new_nmb21(new_element, command);
-    else if(is_equal(element_id, "NMB31")) new_nmb31(new_element, command);
-    else if(is_equal(element_id, "C3D20")) new_c3d20(new_element, command);
-    else if(is_equal(element_id, "C3D4")) new_c3d4(new_element, command);
-    else if(is_equal(element_id, "C3D8")) new_c3d8(new_element, command);
-    else if(is_equal(element_id, "C3D8R")) new_c3d8r(new_element, command);
-    else if(is_equal(element_id, "C3D8I")) new_c3d8i(new_element, command);
-    else if(is_equal(element_id, "CAX3")) new_cax3(new_element, command);
-    else if(is_equal(element_id, "CAX4")) new_cax4(new_element, command);
-    else if(is_equal(element_id, "CAX8")) new_cax8(new_element, command);
-    else if(is_equal(element_id, "CIN3D8")) new_cin3d8(new_element, command);
-    else if(is_equal(element_id, "CINP4")) new_cinp4(new_element, command);
-    else if(is_equal(element_id, "Contact2D")) new_contact2d(new_element, command);
-    else if(is_equal(element_id, "Contact3D")) new_contact3d(new_element, command);
-    else if(is_equal(element_id, "CP3")) new_cp3(new_element, command);
-    else if(is_equal(element_id, "CP4")) new_cp4(new_element, command);
-    else if(is_equal(element_id, "PCPE4DC")) new_pcpedc(new_element, command, 4);
-    else if(is_equal(element_id, "PCPE8DC")) new_pcpedc(new_element, command, 8);
-    else if(is_equal(element_id, "PCPE4UC")) new_pcpeuc(new_element, command, 4);
-    else if(is_equal(element_id, "PCPE8UC")) new_pcpeuc(new_element, command, 8);
-    else if(is_equal(element_id, "CP4I")) new_cp4i(new_element, command);
-    else if(is_equal(element_id, "CP4R")) new_cp4r(new_element, command);
-    else if(is_equal(element_id, "CP5")) new_cp5(new_element, command);
-    else if(is_equal(element_id, "CP6")) new_cp6(new_element, command);
-    else if(is_equal(element_id, "CP7")) new_cp7(new_element, command);
-    else if(is_equal(element_id, "CP8")) new_cp8(new_element, command);
-    else if(is_equal(element_id, "CPE8")) new_cpe8(new_element, command);
-    else if(is_equal(element_id, "CPE8R")) new_cpe8r(new_element, command);
-    else if(is_equal(element_id, "CPS8")) new_cp8(new_element, command);
-    else if(is_equal(element_id, "CSMT3")) new_csmt3(new_element, command);
-    else if(is_equal(element_id, "CSMT6")) new_csmt6(new_element, command);
-    else if(is_equal(element_id, "CSMQ4")) new_csmq(new_element, command, 4);
-    else if(is_equal(element_id, "CSMQ5")) new_csmq(new_element, command, 5);
-    else if(is_equal(element_id, "CSMQ6")) new_csmq(new_element, command, 6);
-    else if(is_equal(element_id, "CSMQ7")) new_csmq(new_element, command, 7);
-    else if(is_equal(element_id, "CSMQ8")) new_csmq(new_element, command, 8);
-    else if(is_equal(element_id, "Damper01")) new_damper01(new_element, command);
-    else if(is_equal(element_id, "Damper02")) new_damper02(new_element, command);
-    else if(is_equal(element_id, "DC3D4")) new_dc3d4(new_element, command);
-    else if(is_equal(element_id, "DC3D8")) new_dc3d8(new_element, command);
-    else if(is_equal(element_id, "DCP3")) new_dcp3(new_element, command);
-    else if(is_equal(element_id, "DCP4")) new_dcp4(new_element, command);
-    else if(is_equal(element_id, "DKT3")) new_dkt3(new_element, command);
-    else if(is_equal(element_id, "DKT4")) new_dkt4(new_element, command);
-    else if(is_equal(element_id, "DKTS3")) new_dkts3(new_element, command);
-    else if(is_equal(element_id, "Embedded2D")) new_embedded(new_element, command, 2);
-    else if(is_equal(element_id, "Embedded3D")) new_embedded(new_element, command, 3);
-    else if(is_equal(element_id, "EB21")) new_eb21(new_element, command);
-    else if(is_equal(element_id, "F21")) new_f21(new_element, command);
-    else if(is_equal(element_id, "F21H")) new_f21h(new_element, command);
-    else if(is_equal(element_id, "F31")) new_f31(new_element, command);
-    else if(is_equal(element_id, "GCMQ")) new_gcmq(new_element, command);
-    else if(is_equal(element_id, "GCMQG")) new_gcmqg(new_element, command);
-    else if(is_equal(element_id, "GCMQI")) new_gcmqi(new_element, command);
-    else if(is_equal(element_id, "GCMQL")) new_gcmql(new_element, command);
-    else if(is_equal(element_id, "GQ12")) new_gq12(new_element, command);
-    else if(is_equal(element_id, "Joint")) new_joint(new_element, command);
-    else if(is_equal(element_id, "Mass")) new_mass(new_element, command);
-    else if(is_equal(element_id, "Mindlin")) new_mindlin(new_element, command);
-    else if(is_equal(element_id, "MVLEM")) new_mvlem(new_element, command);
-    else if(is_equal(element_id, "PS")) new_ps(new_element, command);
-    else if(is_equal(element_id, "QE2")) new_qe2(new_element, command);
-    else if(is_equal(element_id, "S4")) new_s4(new_element, command);
-    else if(is_equal(element_id, "SGCMQG")) new_sgcmqg(new_element, command);
-    else if(is_equal(element_id, "SGCMQI")) new_sgcmqi(new_element, command);
-    else if(is_equal(element_id, "SGCMQL")) new_sgcmql(new_element, command);
-    else if(is_equal(element_id, "SGCMS")) new_sgcms(new_element, command);
-    else if(is_equal(element_id, "SingleSection2D")) new_singlesection2d(new_element, command);
-    else if(is_equal(element_id, "SingleSection3D")) new_singlesection3d(new_element, command);
-    else if(is_equal(element_id, "Spring01")) new_spring01(new_element, command);
-    else if(is_equal(element_id, "Spring02")) new_spring02(new_element, command);
-    else if(is_equal(element_id, "T2D2")) new_t2d2(new_element, command);
-    else if(is_equal(element_id, "T2D2S")) new_t2d2s(new_element, command);
-    else if(is_equal(element_id, "T3D2")) new_t3d2(new_element, command);
-    else if(is_equal(element_id, "T3D2S")) new_t3d2s(new_element, command);
-    else if(is_equal(element_id, "Tie")) new_tie(new_element, command);
-    else if(is_equal(element_id, "PatchQuad")) new_patchquad(new_element, command);
-    else if(is_equal(element_id, "PatchCube")) new_patchcube(new_element, command);
-    else load::object(new_element, domain, element_id, command);
-
-    if(new_element == nullptr || !domain->insert(std::move(new_element))) suanpan_error("create_new_element() fails to create new element.\n");
-
-    return 0;
-}
 
 void new_allman(unique_ptr<Element>& return_obj, istringstream& command) {
     unsigned tag;
@@ -1132,7 +1033,7 @@ void new_csmq(unique_ptr<Element>& return_obj, istringstream& command, const uns
     else if(8 == size) return_obj = make_unique<CSMQ8>(tag, std::move(node_tag), material_tag, thickness, length);
 }
 
-void new_damper01(unique_ptr<Element>& return_obj, istringstream& command) {
+void new_damper01(unique_ptr<Element>& return_obj, istringstream& command, const unsigned dimension) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("new_damper01() needs a valid tag.\n");
@@ -1152,10 +1053,10 @@ void new_damper01(unique_ptr<Element>& return_obj, istringstream& command) {
         return;
     }
 
-    return_obj = make_unique<Damper01>(tag, std::move(node_tag), damper_tag);
+    return_obj = make_unique<Damper01>(tag, std::move(node_tag), damper_tag, dimension);
 }
 
-void new_damper02(unique_ptr<Element>& return_obj, istringstream& command) {
+void new_damper02(unique_ptr<Element>& return_obj, istringstream& command, const unsigned dimension) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("new_damper02() needs a valid tag.\n");
@@ -1199,7 +1100,7 @@ void new_damper02(unique_ptr<Element>& return_obj, istringstream& command) {
         return;
     }
 
-    return_obj = make_unique<Damper02>(tag, std::move(node_tag), damper_tag, spring_tag, is_true(use_matrix), proceed, beta);
+    return_obj = make_unique<Damper02>(tag, std::move(node_tag), damper_tag, spring_tag, is_true(use_matrix), proceed, beta, dimension);
 }
 
 void new_dc3d4(unique_ptr<Element>& return_obj, istringstream& command) {
@@ -2583,4 +2484,273 @@ void new_patchcube(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     return_obj = make_unique<PatchCube>(tag, std::move(knot_x), std::move(knot_y), std::move(knot_z), std::move(node_tag), static_cast<unsigned>(material_tag));
+}
+
+int create_new_mass(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("create_new_mass() needs a valid tag.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    unsigned node;
+    if(!get_input(command, node)) {
+        suanpan_error("create_new_mass() needs one valid node.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    double magnitude;
+    if(!get_input(command, magnitude)) {
+        suanpan_error("create_new_mass() needs a valid magnitude.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    unsigned dof;
+    vector<uword> dof_tag;
+    while(get_input(command, dof)) dof_tag.push_back(dof);
+
+    domain->insert(make_shared<Mass>(tag, node, magnitude, uvec(dof_tag)));
+
+    return SUANPAN_SUCCESS;
+}
+
+int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    string modifier_type;
+    if(!get_input(command, modifier_type)) {
+        suanpan_error("create_new_modifier() needs a valid modifier type.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    unique_ptr<Modifier> new_modifier = nullptr;
+
+    if(is_equal(modifier_type, "LumpedSimple")) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("create_new_modifier() needs a valid tag.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        vector<uword> element_tag;
+        unsigned e_tag;
+        while(!command.eof() && get_input(command, e_tag)) element_tag.emplace_back(e_tag);
+
+        new_modifier = make_unique<LumpedSimple>(tag, uvec(element_tag));
+    }
+    else if(is_equal(modifier_type, "LumpedScale")) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("create_new_modifier() needs a valid tag.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        vector<uword> element_tag;
+        unsigned e_tag;
+        while(!command.eof() && get_input(command, e_tag)) element_tag.emplace_back(e_tag);
+
+        new_modifier = make_unique<LumpedScale>(tag, uvec(element_tag));
+    }
+    else if(is_equal(modifier_type, "Rayleigh")) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("create_new_modifier() needs a valid tag.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        double a, b, c, d;
+        if(!get_input(command, a)) {
+            suanpan_error("create_new_modifier() needs four valid numbers.\n");
+            return SUANPAN_SUCCESS;
+        }
+        if(!get_input(command, b)) {
+            suanpan_error("create_new_modifier() needs four valid numbers.\n");
+            return SUANPAN_SUCCESS;
+        }
+        if(!get_input(command, c)) {
+            suanpan_error("create_new_modifier() needs four valid numbers.\n");
+            return SUANPAN_SUCCESS;
+        }
+        if(!get_input(command, d)) {
+            suanpan_error("create_new_modifier() needs four valid numbers.\n");
+            return SUANPAN_SUCCESS;
+        }
+        vector<uword> element_tag;
+        unsigned e_tag;
+        while(!command.eof() && get_input(command, e_tag)) element_tag.emplace_back(e_tag);
+
+        new_modifier = make_unique<Rayleigh>(tag, a, b, c, d, uvec(element_tag));
+    }
+    else if(is_equal(modifier_type, "ElementalModal")) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("create_new_modifier() needs a valid tag.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        double a, b;
+        if(!get_input(command, a)) {
+            suanpan_error("create_new_modifier() needs two valid numbers.\n");
+            return SUANPAN_SUCCESS;
+        }
+        if(!get_input(command, b)) {
+            suanpan_error("create_new_modifier() needs two valid numbers.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        vector<uword> element_tag;
+        unsigned e_tag;
+        while(!command.eof() && get_input(command, e_tag)) element_tag.emplace_back(e_tag);
+
+        new_modifier = make_unique<ElementalModal>(tag, a, b, uvec(element_tag));
+    }
+    else {
+        // check if the library is already loaded
+        auto code = false;
+        for(const auto& I : domain->get_external_module_pool())
+            if(is_equal(I->library_name, modifier_type) || I->locate_cpp_module(modifier_type)) {
+                code = true;
+                break;
+            }
+
+        // not loaded then try load it
+        if(!code && domain->insert(make_shared<ExternalModule>(modifier_type))) code = true;
+
+        // if loaded find corresponding function
+        if(code)
+            for(const auto& I : domain->get_external_module_pool()) {
+                if(I->locate_cpp_module(modifier_type)) I->new_object(new_modifier, command);
+                if(new_modifier != nullptr) break;
+            }
+    }
+
+    if(nullptr == new_modifier || !domain->insert(std::move(new_modifier))) suanpan_error("create_new_modifier() fails to create new modifier.\n");
+
+    return SUANPAN_SUCCESS;
+}
+
+int create_new_orientation(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    string file_type;
+    if(!get_input(command, file_type)) {
+        suanpan_error("create_new_orientation() needs a valid type.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("create_new_orientation() needs a valid tag.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    vec xyz(3);
+    for(auto& I : xyz)
+        if(!get_input(command, I)) {
+            suanpan_error("create_new_orientation() needs a vector.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+    if(is_equal(file_type, "B3DL")) domain->insert(make_shared<B3DL>(tag, std::move(xyz)));
+    else if(is_equal(file_type, "B3DC")) domain->insert(make_shared<B3DC>(tag, std::move(xyz)));
+
+    return SUANPAN_SUCCESS;
+}
+
+int create_new_element(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    string element_id;
+    if(!get_input(command, element_id)) {
+        suanpan_error("create_new_element() needs element type.\n");
+        return 0;
+    }
+
+    unique_ptr<Element> new_element = nullptr;
+
+    if(is_equal(element_id, "Allman")) new_allman(new_element, command);
+    else if(is_equal(element_id, "B21")) new_b21(new_element, command);
+    else if(is_equal(element_id, "B21EL")) new_b21e(new_element, command, 1);
+    else if(is_equal(element_id, "B21EH")) new_b21e(new_element, command, 2);
+    else if(is_equal(element_id, "B21H")) new_b21h(new_element, command);
+    else if(is_equal(element_id, "B31")) new_b31(new_element, command);
+    else if(is_equal(element_id, "NMB21")) new_nmb21(new_element, command);
+    else if(is_equal(element_id, "NMB31")) new_nmb31(new_element, command);
+    else if(is_equal(element_id, "C3D20")) new_c3d20(new_element, command);
+    else if(is_equal(element_id, "C3D4")) new_c3d4(new_element, command);
+    else if(is_equal(element_id, "C3D8")) new_c3d8(new_element, command);
+    else if(is_equal(element_id, "C3D8R")) new_c3d8r(new_element, command);
+    else if(is_equal(element_id, "C3D8I")) new_c3d8i(new_element, command);
+    else if(is_equal(element_id, "CAX3")) new_cax3(new_element, command);
+    else if(is_equal(element_id, "CAX4")) new_cax4(new_element, command);
+    else if(is_equal(element_id, "CAX8")) new_cax8(new_element, command);
+    else if(is_equal(element_id, "CIN3D8")) new_cin3d8(new_element, command);
+    else if(is_equal(element_id, "CINP4")) new_cinp4(new_element, command);
+    else if(is_equal(element_id, "Contact2D")) new_contact2d(new_element, command);
+    else if(is_equal(element_id, "Contact3D")) new_contact3d(new_element, command);
+    else if(is_equal(element_id, "CP3")) new_cp3(new_element, command);
+    else if(is_equal(element_id, "CP4")) new_cp4(new_element, command);
+    else if(is_equal(element_id, "PCPE4DC")) new_pcpedc(new_element, command, 4);
+    else if(is_equal(element_id, "PCPE8DC")) new_pcpedc(new_element, command, 8);
+    else if(is_equal(element_id, "PCPE4UC")) new_pcpeuc(new_element, command, 4);
+    else if(is_equal(element_id, "PCPE8UC")) new_pcpeuc(new_element, command, 8);
+    else if(is_equal(element_id, "CP4I")) new_cp4i(new_element, command);
+    else if(is_equal(element_id, "CP4R")) new_cp4r(new_element, command);
+    else if(is_equal(element_id, "CP5")) new_cp5(new_element, command);
+    else if(is_equal(element_id, "CP6")) new_cp6(new_element, command);
+    else if(is_equal(element_id, "CP7")) new_cp7(new_element, command);
+    else if(is_equal(element_id, "CP8")) new_cp8(new_element, command);
+    else if(is_equal(element_id, "CPE8")) new_cpe8(new_element, command);
+    else if(is_equal(element_id, "CPE8R")) new_cpe8r(new_element, command);
+    else if(is_equal(element_id, "CPS8")) new_cp8(new_element, command);
+    else if(is_equal(element_id, "CSMT3")) new_csmt3(new_element, command);
+    else if(is_equal(element_id, "CSMT6")) new_csmt6(new_element, command);
+    else if(is_equal(element_id, "CSMQ4")) new_csmq(new_element, command, 4);
+    else if(is_equal(element_id, "CSMQ5")) new_csmq(new_element, command, 5);
+    else if(is_equal(element_id, "CSMQ6")) new_csmq(new_element, command, 6);
+    else if(is_equal(element_id, "CSMQ7")) new_csmq(new_element, command, 7);
+    else if(is_equal(element_id, "CSMQ8")) new_csmq(new_element, command, 8);
+    else if(is_equal(element_id, "Damper01")) new_damper01(new_element, command, 2);
+    else if(is_equal(element_id, "Damper02")) new_damper02(new_element, command, 2);
+    else if(is_equal(element_id, "Damper03")) new_damper01(new_element, command, 3);
+    else if(is_equal(element_id, "Damper04")) new_damper02(new_element, command, 3);
+    else if(is_equal(element_id, "DC3D4")) new_dc3d4(new_element, command);
+    else if(is_equal(element_id, "DC3D8")) new_dc3d8(new_element, command);
+    else if(is_equal(element_id, "DCP3")) new_dcp3(new_element, command);
+    else if(is_equal(element_id, "DCP4")) new_dcp4(new_element, command);
+    else if(is_equal(element_id, "DKT3")) new_dkt3(new_element, command);
+    else if(is_equal(element_id, "DKT4")) new_dkt4(new_element, command);
+    else if(is_equal(element_id, "DKTS3")) new_dkts3(new_element, command);
+    else if(is_equal(element_id, "Embedded2D")) new_embedded(new_element, command, 2);
+    else if(is_equal(element_id, "Embedded3D")) new_embedded(new_element, command, 3);
+    else if(is_equal(element_id, "EB21")) new_eb21(new_element, command);
+    else if(is_equal(element_id, "F21")) new_f21(new_element, command);
+    else if(is_equal(element_id, "F21H")) new_f21h(new_element, command);
+    else if(is_equal(element_id, "F31")) new_f31(new_element, command);
+    else if(is_equal(element_id, "GCMQ")) new_gcmq(new_element, command);
+    else if(is_equal(element_id, "GCMQG")) new_gcmqg(new_element, command);
+    else if(is_equal(element_id, "GCMQI")) new_gcmqi(new_element, command);
+    else if(is_equal(element_id, "GCMQL")) new_gcmql(new_element, command);
+    else if(is_equal(element_id, "GQ12")) new_gq12(new_element, command);
+    else if(is_equal(element_id, "Joint")) new_joint(new_element, command);
+    else if(is_equal(element_id, "Mass")) new_mass(new_element, command);
+    else if(is_equal(element_id, "Mindlin")) new_mindlin(new_element, command);
+    else if(is_equal(element_id, "MVLEM")) new_mvlem(new_element, command);
+    else if(is_equal(element_id, "PS")) new_ps(new_element, command);
+    else if(is_equal(element_id, "QE2")) new_qe2(new_element, command);
+    else if(is_equal(element_id, "S4")) new_s4(new_element, command);
+    else if(is_equal(element_id, "SGCMQG")) new_sgcmqg(new_element, command);
+    else if(is_equal(element_id, "SGCMQI")) new_sgcmqi(new_element, command);
+    else if(is_equal(element_id, "SGCMQL")) new_sgcmql(new_element, command);
+    else if(is_equal(element_id, "SGCMS")) new_sgcms(new_element, command);
+    else if(is_equal(element_id, "SingleSection2D")) new_singlesection2d(new_element, command);
+    else if(is_equal(element_id, "SingleSection3D")) new_singlesection3d(new_element, command);
+    else if(is_equal(element_id, "Spring01")) new_spring01(new_element, command);
+    else if(is_equal(element_id, "Spring02")) new_spring02(new_element, command);
+    else if(is_equal(element_id, "T2D2")) new_t2d2(new_element, command);
+    else if(is_equal(element_id, "T2D2S")) new_t2d2s(new_element, command);
+    else if(is_equal(element_id, "T3D2")) new_t3d2(new_element, command);
+    else if(is_equal(element_id, "T3D2S")) new_t3d2s(new_element, command);
+    else if(is_equal(element_id, "Tie")) new_tie(new_element, command);
+    else if(is_equal(element_id, "PatchQuad")) new_patchquad(new_element, command);
+    else if(is_equal(element_id, "PatchCube")) new_patchcube(new_element, command);
+    else load::object(new_element, domain, element_id, command);
+
+    if(new_element == nullptr || !domain->insert(std::move(new_element))) suanpan_error("create_new_element() fails to create new element.\n");
+
+    return 0;
 }

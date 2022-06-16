@@ -35,7 +35,7 @@ uvec Patch::get_number_of_control_points() const {
 
 MaterialPatch::MaterialPatch(const unsigned T, const unsigned ND, uvec&& NT, uvec&& MT, field<vec>&& KP, const bool R, const MaterialType MTP)
     : Patch(std::forward<field<vec>>(KP))
-    , MaterialElement(T, static_cast<unsigned>(NT.size()), ND, std::forward<uvec>(NT), std::forward<uvec>(MT), R, MTP) {}
+    , MaterialElement(T, static_cast<unsigned>(NT.size()), ND, std::forward<uvec>(NT), std::forward<uvec>(MT), R, MTP, {}) {}
 
 MaterialPatch2D::MaterialPatch2D(const unsigned T, const unsigned ND, uvec&& NT, uvec&& MT, field<vec>&& KP, const bool R)
     : MaterialPatch(T, ND, std::forward<uvec>(NT), std::forward<uvec>(MT), std::forward<field<vec>>(KP), R, MaterialType::D2) {}
@@ -45,7 +45,7 @@ MaterialPatch3D::MaterialPatch3D(const unsigned T, const unsigned ND, uvec&& NT,
 
 SectionPatch::SectionPatch(const unsigned T, const unsigned ND, uvec&& NT, uvec&& ST, field<vec>&& KP, const bool R, const SectionType STP)
     : Patch(std::forward<field<vec>>(KP))
-    , SectionElement(T, static_cast<unsigned>(NT.size()), ND, std::forward<uvec>(NT), std::forward<uvec>(ST), R, STP) {}
+    , SectionElement(T, static_cast<unsigned>(NT.size()), ND, std::forward<uvec>(NT), std::forward<uvec>(ST), R, STP, {}) {}
 
 SectionPatch2D::SectionPatch2D(const unsigned T, const unsigned ND, uvec&& NT, uvec&& ST, field<vec>&& KP, const bool R)
     : SectionPatch(T, ND, std::forward<uvec>(NT), std::forward<uvec>(ST), std::forward<field<vec>>(KP), R, SectionType::D2) {}

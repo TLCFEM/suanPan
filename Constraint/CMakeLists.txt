@@ -2,15 +2,16 @@ target_sources(${PROJECT_NAME} PRIVATE
         Constraint.cpp
         ConstraintParser.cpp
         Embed.cpp
+        FixedLength.cpp
         MPC.cpp
+        NodeFacet.cpp
+        NodeLine.cpp
         ParticleCollision.cpp
         ParticleCollision2D.cpp
         ParticleCollision3D.cpp
+        RestitutionWallPenalty.cpp
         RigidWallMultiplier.cpp
         RigidWallPenalty.cpp
-        FixedLength.cpp
-        NodeLine.cpp
-        NodeFacet.cpp
         )
 
 add_subdirectory(BC)

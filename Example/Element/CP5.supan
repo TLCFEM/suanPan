@@ -11,6 +11,8 @@ material Elastic2D 1 1500 .25 1E-4
 element CP5 1 1 2 3 4 5 1 1
 element CP5 2 1 2 3 4 5 1 1 1
 
+recorder 1 hdf5 Element S 1
+
 fix 1 1 1
 fix 2 2 1 2 5
 

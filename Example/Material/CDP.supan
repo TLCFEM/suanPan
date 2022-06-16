@@ -83,6 +83,8 @@ analyze
 #   -4.4123e-14   4.3377e-14  -9.1689e+02
 peek node 9 10 11 12
 
+peek element 1
+
 reset
 clear
 exit

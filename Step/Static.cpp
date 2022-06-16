@@ -91,7 +91,7 @@ int Static::analyze() {
         if(auto code = S->analyze(); SUANPAN_SUCCESS == code) {
             // success step
             // commit converged iteration
-            G->commit_status();
+            G->stage_and_commit_status();
             // record response
             G->record();
             // eat current increment

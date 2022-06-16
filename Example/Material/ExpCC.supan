@@ -38,6 +38,8 @@ analyze
 #   -6.8585e-12  -6.4791e-12  -1.5084e+04
 peek node 6
 
+peek element 1
+
 # save recorder 1
 
 reset

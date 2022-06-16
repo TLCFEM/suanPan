@@ -19,7 +19,7 @@
  * @brief A ExternalMaterialData class.
  *
  * @author tlc
- * @date 15/01/2021
+ * @date 21/05/2022
  * @version 0.1.0
  * @file ExternalMaterialData.h
  * @addtogroup Material
@@ -28,6 +28,25 @@
 
 #ifndef EXTERNALMATERIALDATA_H
 #define EXTERNALMATERIALDATA_H
+
+enum ExternalMaterialOp {
+    /*allocate memory, initialise variables based on parameters defined by users*/
+    ALLOCATE = 0,
+    /*deallocate memory that is previously allocated in operation *info=ALLOCATE*/
+    DEALLOCATE = 1,
+    /*update material state based on new trial strain only*/
+    STATIC_UPDATE = 2,
+    /*update material state based on new trial strain and new trial strain rate*/
+    DYNAMIC_UPDATE = 3,
+    /*commit trial state to current state*/
+    COMMIT = 4,
+    /*reset trial state to current state*/
+    RESET = 5,
+    /*clear both current and trial state to zero*/
+    CLEAR = 6,
+    /*validate if the model parameters are legal*/
+    VALIDATE = 7
+};
 
 struct ExternalMaterialData {
     unsigned size = 0;          // indicate the dimension of material

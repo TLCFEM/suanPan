@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: [ master ]
 jobs:
-  linux-mkl:
+  ubuntu-mkl:
     runs-on: ubuntu-20.04
     steps:
       - name: Clone
@@ -24,7 +24,7 @@ jobs:
           go build Checker/updater.go
           sudo apt-get update && sudo apt-get install intel-oneapi-mkl-devel
           cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_MKL=ON -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DUSE_INTEL_OPENMP=OFF -DLINK_DYNAMIC_MKL=OFF -DCMAKE_INSTALL_PREFIX=suanPan-linux-mkl .
-          make install -j4
+          make install -j"$(nproc)"
       - name: Pack
         run: |
           cp updater suanPan-linux-mkl/bin

@@ -108,6 +108,9 @@ public:
 
     virtual void erase_machine_error() const;
 
+    virtual void stage_and_commit_status();
+
+    virtual void stage_status();
     virtual void commit_status();
     virtual void clear_status();
     virtual void reset_status();

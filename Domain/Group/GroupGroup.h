@@ -14,30 +14,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @class GroupGroup
+ * @brief The GroupGroup class.
+ *
+ * @author tlc
+ * @date 30/06/2020
+ * @version 0.1.0
+ * @file GroupGroup.h
+ * @addtoGroupGroup Domain
+ * @{
+ */
 
-#include "GroupGroup.h"
-#include <Domain/DomainBase.h>
-#include <Toolbox/utility.h>
+#ifndef GROUPGROUP_H
+#define GROUPGROUP_H
 
-GroupGroup::GroupGroup(const unsigned T, uvec&& GT)
-    : Group(T, std::forward<uvec>(GT)) {}
+#include "Group.h"
 
-void GroupGroup::initialize(const shared_ptr<DomainBase>& D) {
-    uword size = 0;
-    vector<const uvec*> ocean;
-    ocean.reserve(group_tag.n_elem);
-    for(const auto I : group_tag)
-        if(D->find<Group>(I)) {
-            auto& t_group = D->get<Group>(I);
-            t_group->initialize(D);
-            ocean.emplace_back(&t_group->get_pool());
-            size += ocean.back()->size();
-        }
+class GroupGroup final : public Group {
+    const uvec group_tag;
 
-    vector<uword> pond;
-    pond.reserve(size);
+public:
+    GroupGroup(unsigned, uvec&&);
 
-    for(const auto& I : ocean) for(auto J : *I) pond.emplace_back(J);
+    void initialize(const shared_ptr<DomainBase>&) override;
+};
 
-    pool = suanpan::unique(pond);
-}
+#endif
+
+//! @}

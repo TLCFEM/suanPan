@@ -43,8 +43,8 @@ void GlobalStiffnessRecorder::record(const shared_ptr<DomainBase>& D) {
 
     if(mat g_stiffness(stiffness.memptr(), S, S, false, true); C.empty()) for(const auto& I : D->get_element_pool()) assemble_stiffness(I->get_current_stiffness(), I->get_dof_encoding(), g_stiffness);
     else
-        std::ranges::for_each(C, [&](const vector<unsigned>& color) {
-            suanpan_for_each(color.begin(), color.end(), [&](const unsigned tag) {
+        std::ranges::for_each(C, [&](const std::vector<unsigned>& color) {
+            suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = D->get<Element>(tag);
                 assemble_stiffness(I->get_current_stiffness(), I->get_dof_encoding(), g_stiffness);
             });

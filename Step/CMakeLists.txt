@@ -7,4 +7,5 @@ target_sources(${PROJECT_NAME} PRIVATE
         Optimization.cpp
         Static.cpp
         Step.cpp
+        StepParser.cpp
         )

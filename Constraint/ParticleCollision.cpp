@@ -18,16 +18,12 @@
 #include "ParticleCollision.h"
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
+#include <Domain/NodeHelper.hpp>
 
 vec ParticleCollision::get_position(const shared_ptr<Node>& node) const {
-    vec pos(num_dof, fill::zeros);
+    if(2 == num_dof) return get_trial_position<DOF::U1, DOF::U2>(node);
 
-    auto& coor = node->get_coordinate();
-    auto& t_disp = node->get_trial_displacement();
-
-    for(auto K = 0llu; K < std::min(static_cast<uword>(num_dof), std::min(coor.n_elem, t_disp.n_elem)); ++K) pos(K) = coor(K) + t_disp(K);
-
-    return pos;
+    return get_trial_position<DOF::U1, DOF::U2, DOF::U3>(node);
 }
 
 ParticleCollision::ParticleCollision(const unsigned T, const unsigned S, const unsigned D)
@@ -37,7 +33,6 @@ ParticleCollision::ParticleCollision(const unsigned T, const unsigned S, const u
 int ParticleCollision::initialize(const shared_ptr<DomainBase>& D) {
     if(const auto t_scheme = D->get_factory()->get_storage_scheme(); StorageScheme::FULL != t_scheme && StorageScheme::SPARSE != t_scheme && StorageScheme::SPARSESYMM != t_scheme) {
         suanpan_warning("DEM requires full/sparse matrix storage scheme.\n");
-        D->disable_constraint(get_tag());
         return SUANPAN_FAIL;
     }
 
@@ -54,10 +49,12 @@ void ParticleCollision::apply_contact(const shared_ptr<DomainBase>& D, const sha
     diff_pos /= diff_norm;
 
     const auto force = compute_f(diff_norm);
-
-    for(auto I = 0llu; I < diff_pos.n_elem; ++I) {
-        resistance(dof_i(I)) += force * diff_pos(I);
-        resistance(dof_j(I)) -= force * diff_pos(I);
+    {
+        std::scoped_lock resistance_lock(resistance_mutex);
+        for(auto I = 0llu; I < diff_pos.n_elem; ++I) {
+            resistance(dof_i(I)) += force * diff_pos(I);
+            resistance(dof_j(I)) -= force * diff_pos(I);
+        }
     }
 
     if(!full) return;
@@ -67,6 +64,7 @@ void ParticleCollision::apply_contact(const shared_ptr<DomainBase>& D, const sha
 
     const mat d_norm = (compute_df(diff_norm) - force / diff_norm) * diff_pos * diff_pos.t() + force / diff_norm * eye(num_dof, num_dof);
 
+    std::scoped_lock stiffness_lock(W->get_stiffness_mutex());
     for(auto L = 0u; L < num_dof; ++L)
         for(auto K = 0u; K < num_dof; ++K) {
             t_stiff->at(dof_i(K), dof_i(L)) -= d_norm(K, L);

@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: [ master ]
 jobs:
-  linux-openblas:
+  ubuntu-openblas:
     runs-on: ubuntu-20.04
     steps:
       - name: Clone
@@ -18,7 +18,7 @@ jobs:
           go build Checker/updater.go
           echo "SP_TIME=daily-$(date +''%Y%m%d%H'')" >> $GITHUB_ENV
           cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DCMAKE_INSTALL_PREFIX=suanPan-linux-openblas .
-          make install -j4
+          make install -j"$(nproc)"
       - name: Pack
         run: |
           cp updater suanPan-linux-openblas/bin

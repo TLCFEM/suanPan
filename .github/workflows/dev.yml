@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: [ dev ]
 jobs:
-  linux-dev:
+  ubuntu-dev:
     runs-on: ubuntu-22.04
     steps:
       - name: Clone
@@ -17,7 +17,7 @@ jobs:
           go build Checker/updater.go
           mkdir cmake-build-debug && cd cmake-build-debug
           cmake -DCMAKE_BUILD_TYPE=Debug -DTEST_COVERAGE=ON -DUSE_HDF5=ON ../
-          make -j4
+          make -j"$(nproc)"
           chmod +x ../Script/Coverage.sh
           ../Script/Coverage.sh .
           for SRC in `find . | egrep '\.o'`; do gcov -n $SRC > /dev/null; done

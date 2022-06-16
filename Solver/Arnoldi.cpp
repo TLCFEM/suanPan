@@ -44,7 +44,7 @@ int Arnoldi::analyze() {
     D->assemble_trial_mass();
     D->assemble_trial_stiffness();
 
-    if(SUANPAN_SUCCESS != G->process_load()) return SUANPAN_FAIL;
+    // if(SUANPAN_SUCCESS != G->process_load()) return SUANPAN_FAIL;
     if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
 
     return eig_solve(get_eigenvalue(W), get_eigenvector(W), W->get_stiffness(), W->get_mass(), eigen_num, "SM");

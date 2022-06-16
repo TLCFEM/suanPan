@@ -47,41 +47,41 @@ struct DataElement {
 
     uvec dof_encoding; // DoF encoding vector
 
-    mat initial_mass;      // mass matrix
-    mat initial_damping;   // damping matrix
-    mat initial_stiffness; // stiffness matrix
-    mat initial_geometry;  // geometry matrix
+    mat initial_mass{};      // mass matrix
+    mat initial_damping{};   // damping matrix
+    mat initial_stiffness{}; // stiffness matrix
+    mat initial_geometry{};  // geometry matrix
 
-    mat trial_mass;      // mass matrix
-    mat trial_damping;   // damping matrix
-    mat trial_stiffness; // stiffness matrix
-    mat trial_geometry;  // geometry matrix
+    mat trial_mass{};      // mass matrix
+    mat trial_damping{};   // damping matrix
+    mat trial_stiffness{}; // stiffness matrix
+    mat trial_geometry{};  // geometry matrix
 
-    mat current_mass;      // mass matrix
-    mat current_damping;   // damping matrix
-    mat current_stiffness; // stiffness matrix
-    mat current_geometry;  // geometry matrix
+    mat current_mass{};      // mass matrix
+    mat current_damping{};   // damping matrix
+    mat current_stiffness{}; // stiffness matrix
+    mat current_geometry{};  // geometry matrix
 
-    vec trial_resistance;       // resistance vector
-    vec current_resistance;     // resistance vector
-    vec trial_damping_force;    // damping force
-    vec current_damping_force;  // damping force
-    vec trial_inertial_force;   // inertial force
-    vec current_inertial_force; // inertial force
+    vec trial_resistance{};       // resistance vector
+    vec current_resistance{};     // resistance vector
+    vec trial_damping_force{};    // damping force
+    vec current_damping_force{};  // damping force
+    vec trial_inertial_force{};   // inertial force
+    vec current_inertial_force{}; // inertial force
 
-    vec trial_body_force;
-    vec current_body_force;
-    vec trial_traction;
-    vec current_traction;
+    vec trial_body_force{};
+    vec current_body_force{};
+    vec trial_traction{};
+    vec current_traction{};
 
-    mat body_force;
-    mat traction;
+    mat body_force{};
+    mat traction{};
 
     double strain_energy = 0.;
     double kinetic_energy = 0.;
     double viscous_energy = 0.;
     double complementary_energy = 0.;
-    double momentum = 0.;
+    vec momentum{};
 
     const double characteristic_length = 1.;
 };
@@ -99,6 +99,8 @@ class Element : protected DataElement, public ElementBase {
     const MaterialType mat_type;
     const SectionType sec_type;
 
+    std::vector<DOF> dof_identifier;
+
     friend void ConstantMass(DataElement*);
     friend void ConstantDamping(DataElement*);
     friend void ConstantStiffness(DataElement*);
@@ -111,7 +113,7 @@ class Element : protected DataElement, public ElementBase {
     void update_momentum() override;
 
 protected:
-    vector<weak_ptr<Node>> node_ptr; // node pointers
+    std::vector<weak_ptr<Node>> node_ptr; // node pointers
 
     [[nodiscard]] mat get_coordinate(unsigned) const override;
 
@@ -129,30 +131,33 @@ protected:
     [[nodiscard]] vec get_node_trial_resistance() const override;
     [[nodiscard]] vec get_node_current_resistance() const override;
 
-    [[nodiscard]] vector<shared_ptr<Material>> get_material(const shared_ptr<DomainBase>&) const override;
-    [[nodiscard]] vector<shared_ptr<Section>> get_section(const shared_ptr<DomainBase>&) const override;
+    [[nodiscard]] std::vector<shared_ptr<Material>> get_material(const shared_ptr<DomainBase>&) const override;
+    [[nodiscard]] std::vector<shared_ptr<Section>> get_section(const shared_ptr<DomainBase>&) const override;
 
 public:
-    Element(unsigned, // tag
-            unsigned, // number of nodes
-            unsigned, // number of dofs
-            uvec&&    // node encoding
+    Element(unsigned,          // tag
+            unsigned,          // number of nodes
+            unsigned,          // number of dofs
+            uvec&&,            // node encoding
+            std::vector<DOF>&& // dof identifier
     );
-    Element(unsigned,    // tag
-            unsigned,    // number of nodes
-            unsigned,    // number of dofs
-            uvec&&,      // node encoding
-            uvec&&,      // material tags
-            bool,        // nonlinear geometry switch
-            MaterialType // material type for internal check
+    Element(unsigned,          // tag
+            unsigned,          // number of nodes
+            unsigned,          // number of dofs
+            uvec&&,            // node encoding
+            uvec&&,            // material tags
+            bool,              // nonlinear geometry switch
+            MaterialType,      // material type for internal check
+            std::vector<DOF>&& // dof identifier
     );
-    Element(unsigned,   // tag
-            unsigned,   // number of nodes
-            unsigned,   // number of dofs
-            uvec&&,     // node encoding
-            uvec&&,     // section tags
-            bool,       // nonlinear geometry switch
-            SectionType // section type for internal check
+    Element(unsigned,          // tag
+            unsigned,          // number of nodes
+            unsigned,          // number of dofs
+            uvec&&,            // node encoding
+            uvec&&,            // section tags
+            bool,              // nonlinear geometry switch
+            SectionType,       // section type for internal check
+            std::vector<DOF>&& // dof identifier
     );
     Element(unsigned, // tag
             unsigned, // number of dofs
@@ -196,7 +201,7 @@ public:
     [[nodiscard]] unsigned get_total_number() const override;
 
     void clear_node_ptr() override;
-    [[nodiscard]] const vector<weak_ptr<Node>>& get_node_ptr() const override;
+    [[nodiscard]] const std::vector<weak_ptr<Node>>& get_node_ptr() const override;
 
     [[nodiscard]] const vec& get_trial_resistance() const override;
     [[nodiscard]] const vec& get_current_resistance() const override;
@@ -235,13 +240,14 @@ public:
     const vec& update_body_force(const vec&) override;
     const vec& update_traction(const vec&) override;
 
-    vector<vec> record(OutputType) override;
+    std::vector<vec> record(OutputType) override;
 
     [[nodiscard]] double get_strain_energy() const override;
     [[nodiscard]] double get_complementary_energy() const override;
     [[nodiscard]] double get_kinetic_energy() const override;
     [[nodiscard]] double get_viscous_energy() const override;
-    [[nodiscard]] double get_momentum() const override;
+    [[nodiscard]] const vec& get_momentum() const override;
+    [[nodiscard]] double get_momentum_component(DOF) const override;
 
     [[nodiscard]] double get_characteristic_length() const override;
 

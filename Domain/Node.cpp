@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Node.h"
+#include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Recorder/OutputType.h>
 #include <Toolbox/utility.h>
@@ -110,6 +111,20 @@ void Node::set_dof_number(const unsigned D) {
 }
 
 unsigned Node::get_dof_number() const { return num_dof; }
+
+void Node::set_dof_identifier(const std::vector<DOF>& D) {
+    std::scoped_lock node_lock{node_mutex};
+
+    if(dof_identifier.empty()) dof_identifier = std::vector(num_dof, DOF::NONE);
+
+    for(size_t I = 0; I < D.size(); ++I) {
+        if(DOF::NONE == D[I]) continue;
+        if(DOF::NONE != dof_identifier[I] && D[I] != dof_identifier[I]) suanpan_warning("inconsistent DoF assignment for Node %u detected, which is likely an error, please double check the model.\n", get_tag());
+        dof_identifier[I] = D[I];
+    }
+}
+
+const std::vector<DOF>& Node::get_dof_identifier() const { return dof_identifier; }
 
 void Node::set_original_dof(unsigned& F) {
     if(!is_active()) return;
@@ -476,8 +491,8 @@ void Node::clear_status() {
     set_initialized(false);
 }
 
-vector<vec> Node::record(const OutputType L) const {
-    vector<vec> data;
+std::vector<vec> Node::record(const OutputType L) const {
+    std::vector<vec> data;
 
     if(L == OutputType::RF) data.push_back(current_resistance);
     else if(L == OutputType::DF) data.push_back(current_damping_force);
@@ -523,84 +538,6 @@ vector<vec> Node::record(const OutputType L) const {
     else if(L == OutputType::IM3 && current_inertial_force.n_elem >= 6) data.emplace_back(vec{current_inertial_force(5)});
 
     return data;
-}
-
-vec Node::save() const {
-    auto size = coordinate.size();
-    size += 2 * original_dof.size();
-    size += current_resistance.size();
-    size += current_displacement.size();
-    size += current_velocity.size();
-    size += current_acceleration.size();
-
-    vec data(size + 10);
-
-    data(0) = is_active();
-    data(1) = get_tag();
-    data(2) = initialized;
-    data(3) = num_dof;
-    data(4) = static_cast<double>(coordinate.size());
-    data(5) = static_cast<double>(original_dof.size());
-    data(6) = static_cast<double>(current_resistance.size());
-    data(7) = static_cast<double>(current_displacement.size());
-    data(8) = static_cast<double>(current_velocity.size());
-    data(9) = static_cast<double>(current_acceleration.size());
-
-    uword s_pos = 10, e_pos = s_pos + coordinate.size() - 1;
-    if(!coordinate.empty()) data(span(s_pos, e_pos)) = coordinate;
-
-    s_pos = e_pos + 1;
-    e_pos = s_pos + original_dof.size() - 1;
-    if(!original_dof.empty()) data(span(s_pos, e_pos)) = conv_to<vec>::from(original_dof);
-    s_pos = e_pos + 1;
-    e_pos = s_pos + reordered_dof.size() - 1;
-    if(!reordered_dof.empty()) data(span(s_pos, e_pos)) = conv_to<vec>::from(reordered_dof);
-
-    s_pos = e_pos + 1;
-    e_pos = s_pos + current_resistance.size() - 1;
-    if(!current_resistance.empty()) data(span(s_pos, e_pos)) = current_resistance;
-    s_pos = e_pos + 1;
-    e_pos = s_pos + current_displacement.size() - 1;
-    if(!current_displacement.empty()) data(span(s_pos, e_pos)) = current_displacement;
-    s_pos = e_pos + 1;
-    e_pos = s_pos + current_velocity.size() - 1;
-    if(!current_velocity.empty()) data(span(s_pos, e_pos)) = current_velocity;
-    s_pos = e_pos + 1;
-    e_pos = s_pos + current_acceleration.size() - 1;
-    if(!current_acceleration.empty()) data(span(s_pos, e_pos)) = current_acceleration;
-
-    return data;
-}
-
-void Node::load(const vec& data) {
-    static_cast<bool>(data(0)) ? enable() : disable();
-    set_tag(static_cast<unsigned>(data(1)));
-
-    initialized = static_cast<bool>(data(2));
-    num_dof = static_cast<unsigned>(data(3));
-
-    uword s_pos = 10, e_pos = s_pos + static_cast<uword>(data(4)) - 1;
-    if(0. != data(4)) coordinate = data(span(s_pos, e_pos));
-
-    s_pos = e_pos + 1;
-    e_pos = s_pos + static_cast<uword>(data(5)) - 1;
-    if(0. != data(5)) original_dof = conv_to<uvec>::from(data(span(s_pos, e_pos)));
-    s_pos = e_pos + 1;
-    e_pos = s_pos + static_cast<uword>(data(5)) - 1;
-    if(0. != data(5)) reordered_dof = conv_to<uvec>::from(data(span(s_pos, e_pos)));
-
-    s_pos = e_pos + 1;
-    e_pos = s_pos + static_cast<uword>(data(6)) - 1;
-    if(0. != data(6)) current_resistance = data(span(s_pos, e_pos));
-    s_pos = e_pos + 1;
-    e_pos = s_pos + static_cast<uword>(data(7)) - 1;
-    if(0. != data(7)) current_displacement = data(span(s_pos, e_pos));
-    s_pos = e_pos + 1;
-    e_pos = s_pos + static_cast<uword>(data(8)) - 1;
-    if(0. != data(8)) current_velocity = data(span(s_pos, e_pos));
-    s_pos = e_pos + 1;
-    e_pos = s_pos + static_cast<uword>(data(9)) - 1;
-    if(0. != data(9)) current_acceleration = data(span(s_pos, e_pos));
 }
 
 void Node::print() {

@@ -155,6 +155,8 @@ element CP8 30 101 115 117 103 109 116 110 102 1 1
 element CP8 31 103 117 119 105 110 118 111 104 1 1
 element CP8 32 105 119 121 107 111 120 112 106 1 1
 
+recorder 1 hdf5 Element S 1
+
 material Elastic2D 1 100 .2 1E-4
 
 fix 1 P 1 2 3 4 5 6 7 8 9

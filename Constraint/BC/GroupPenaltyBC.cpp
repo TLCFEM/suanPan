@@ -17,30 +17,27 @@
 
 #include "GroupPenaltyBC.h"
 #include <Domain/DomainBase.h>
-#include <Domain/Group.h>
-
-void GroupPenaltyBC::update_node_tag(const shared_ptr<DomainBase>& D) {
-    vector<uword> tag;
-
-    for(const auto& I : groups) if(D->find<Group>(I)) for(auto& J : D->get<Group>(I)->get_pool()) tag.emplace_back(J);
-
-    node_encoding = unique(uvec(tag));
-}
-
-GroupPenaltyBC::GroupPenaltyBC(const unsigned T, const unsigned S, uvec&& N, const unsigned D)
-    : MultiplierBC(T, S, uvec{}, D)
-    , groups(std::forward<uvec>(N)) {}
+#include <Domain/Group/Group.h>
 
 GroupPenaltyBC::GroupPenaltyBC(const unsigned T, const unsigned S, uvec&& N, uvec&& D)
     : MultiplierBC(T, S, uvec{}, std::forward<uvec>(D))
     , groups(std::forward<uvec>(N)) {}
 
-GroupPenaltyBC::GroupPenaltyBC(const unsigned T, const unsigned S, uvec&& N, const char* TP)
+GroupPenaltyBC::GroupPenaltyBC(const unsigned T, const unsigned S, uvec&& N, const char TP)
     : MultiplierBC(T, S, uvec{}, TP)
     , groups(std::forward<uvec>(N)) {}
 
 int GroupPenaltyBC::initialize(const shared_ptr<DomainBase>& D) {
-    update_node_tag(D);
+    suanpan::unordered_set<uword> tag;
+
+    for(const auto I : groups) {
+        const auto& t_group = D->get<Group>(I);
+        if(nullptr == t_group) continue;
+        const auto& t_pool = t_group->get_pool();
+        tag.insert(t_pool.cbegin(), t_pool.cend());
+    }
+
+    node_encoding = to_uvec(tag);
 
     return MultiplierBC::initialize(D);
 }

@@ -30,6 +30,7 @@ cload 2 0 -150 2 7
 
 recorder 1 hdf5 Element E 1
 recorder 2 hdf5 Element S 1
+recorder 3 hdf5 Element PEEQ 1
 
 step static 1
 

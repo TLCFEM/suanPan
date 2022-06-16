@@ -26,20 +26,11 @@ LineUDL::LineUDL(const unsigned T, const unsigned S, const double L, uvec&& N, c
     , dimension(D) {}
 
 int LineUDL::initialize(const shared_ptr<DomainBase>& D) {
-    if(SUANPAN_SUCCESS != Load::initialize(D)) return SUANPAN_FAIL;
+    if(node_encoding.n_elem % 2 != 0) return SUANPAN_FAIL;
 
-    if(node_encoding.n_elem % 2 != 0) {
-        D->disable_load(get_tag());
-        return SUANPAN_SUCCESS;
-    }
+    for(const auto I : node_encoding) if(const auto& t_node = D->get<Node>(I); t_node->get_reordered_dof().size() < dimension || t_node->get_coordinate().size() < dimension) return SUANPAN_FAIL;
 
-    for(const auto I : node_encoding)
-        if(const auto& t_node = D->get<Node>(I); t_node->get_reordered_dof().size() < dimension || t_node->get_coordinate().size() < dimension) {
-            D->disable_load(get_tag());
-            return SUANPAN_SUCCESS;
-        }
-
-    return SUANPAN_SUCCESS;
+    return Load::initialize(D);
 }
 
 LineUDL2D::LineUDL2D(const unsigned T, const unsigned S, const double L, uvec&& N, const unsigned DT, const unsigned AT)
@@ -99,7 +90,7 @@ int LineUDL3D::process(const shared_ptr<DomainBase>& D) {
             D->insert_loaded_dof(dof_j(0));
         }
         else if(1llu == dof_reference(0)) {
-            trial_load(dof_i(1)) = trial_load(dof_j(1)) = -.5 * norm(diff_coor(uvec{1, 2})) * ref_load;
+            trial_load(dof_i(1)) = trial_load(dof_j(1)) = -.5 * norm(diff_coor(uvec{0, 2})) * ref_load;
             D->insert_loaded_dof(dof_i(1));
             D->insert_loaded_dof(dof_j(1));
         }

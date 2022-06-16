@@ -4,6 +4,8 @@ include_directories(Include/metis)
 
 set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Debug Release RelWithDebInfo MinSizeRel")
 
+set(BUILD_PACKAGE "" CACHE STRING "DEB OR RPM")
+
 option(BUILD_DLL_EXAMPLE "BUILD DYNAMIC LIBRARY EXAMPLE" OFF)
 option(BUILD_MULTITHREAD "BUILD MULTI THREADED VERSION" OFF)
 option(BUILD_SHARED "LINK ALL SHARED LIBRARY" OFF)
@@ -212,8 +214,13 @@ else ()
         link_libraries(gcov)
     endif ()
 
-    if ((CMAKE_CXX_COMPILER_ID MATCHES "GNU") AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS "9.0.0"))
-        link_libraries(stdc++fs) # for <filesystem>
+    if (CMAKE_BUILD_TYPE MATCHES "Debug")
+        option(USE_ASAN "USE ADDRESS SANITIZER" OFF)
+        if (USE_ASAN)
+            message(STATUS "Using the address sanitizer with flags: -fsanitize=address,leak,undefined")
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address,leak,undefined")
+            set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address,leak,undefined")
+        endif ()
     endif ()
 
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -cpp -fopenmp -w")

@@ -19,19 +19,19 @@
 #include <Domain/DomainBase.h>
 #include <Material/Material1D/Viscosity/Maxwell.h>
 
-uvec Damper02::IS{0, 1};
-uvec Damper02::JS{2, 3};
-
-Damper02::Damper02(const unsigned T, uvec&& NT, const unsigned DT, const unsigned ST, const bool UM, const unsigned PC, const double BT)
-    : MaterialElement1D(T, d_node, d_dof, std::forward<uvec>(NT), {}, false)
+Damper02::Damper02(const unsigned T, uvec&& NT, const unsigned DT, const unsigned ST, const bool UM, const unsigned PC, const double BT, const unsigned DIM)
+    : MaterialElement1D(T, d_node, 3 == DIM ? 3 : 2, std::forward<uvec>(NT), {}, false, 3 == DIM ? vector{DOF::U1, DOF::U2, DOF::U3} : vector{DOF::U1, DOF::U2})
+    , d_dof(3 == DIM ? 3 : 2)
+    , IS(3 == d_dof ? uvec{0, 1, 2} : uvec{0, 1})
+    , JS(3 == d_dof ? uvec{3, 4, 5} : uvec{2, 3})
     , device(make_unique<Maxwell>(0, DT, ST, UM, PC, BT)) {}
 
 int Damper02::initialize(const shared_ptr<DomainBase>& D) {
     if(SUANPAN_SUCCESS != device->initialize_base(D) || SUANPAN_SUCCESS != device->initialize(D)) return SUANPAN_FAIL;
 
-    const mat coord = get_coordinate(d_dof).t();
+    const mat coord = get_coordinate(d_dof);
 
-    access::rw(direction_cosine) = normalise(coord.col(1) - coord.col(0));
+    access::rw(direction_cosine) = normalise(coord.row(1) - coord.row(0)).t();
 
     const auto t_disp = get_current_displacement();
     const auto t_vec = get_current_velocity();

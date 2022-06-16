@@ -21,16 +21,6 @@
 #include <Toolbox/utility.h>
 
 /**
- * \brief default constructor.
- * \param T `unique_tag`
- * \param S `start_step`
- * \param N `nodes`
- * \param D `dofs`
- */
-PenaltyBC::PenaltyBC(const unsigned T, const unsigned S, uvec&& N, const unsigned D)
-    : Constraint(T, S, 0, std::forward<uvec>(N), {D}, 0) {}
-
-/**
  * \brief the constructor uses DoF vector.
  * \param T `unique_tag`
  * \param S `start_step`
@@ -47,19 +37,19 @@ PenaltyBC::PenaltyBC(const unsigned T, const unsigned S, uvec&& N, uvec&& D)
  * \param N `nodes`
  * \param TP PenaltyBC TYPE
  */
-PenaltyBC::PenaltyBC(const unsigned T, const unsigned S, uvec&& N, const char* TP)
+PenaltyBC::PenaltyBC(const unsigned T, const unsigned S, uvec&& N, const char TP)
     : Constraint(T, S, 0, std::forward<uvec>(N), {}, 0) {
-    if(is_equal(TP[0], 'X')) dof_reference = uvec{1, 5, 6};
-    else if(is_equal(TP[0], 'Y')) dof_reference = uvec{2, 4, 6};
-    else if(is_equal(TP[0], 'Z')) dof_reference = uvec{3, 4, 5};
-    else if(is_equal(TP[0], 'E')) dof_reference = uvec{1, 2, 3, 4, 5, 6};
-    else if(is_equal(TP[0], 'P')) dof_reference = uvec{1, 2, 3};
-    else if(is_equal(TP[0], '1')) dof_reference = uvec{1};
-    else if(is_equal(TP[0], '2')) dof_reference = uvec{2};
-    else if(is_equal(TP[0], '3')) dof_reference = uvec{3};
-    else if(is_equal(TP[0], '4')) dof_reference = uvec{4};
-    else if(is_equal(TP[0], '5')) dof_reference = uvec{5};
-    else if(is_equal(TP[0], '6')) dof_reference = uvec{6};
+    if(is_equal(TP, 'X')) dof_reference = uvec{1, 5, 6};
+    else if(is_equal(TP, 'Y')) dof_reference = uvec{2, 4, 6};
+    else if(is_equal(TP, 'Z')) dof_reference = uvec{3, 4, 5};
+    else if(is_equal(TP, 'E')) dof_reference = uvec{1, 2, 3, 4, 5, 6};
+    else if(is_equal(TP, 'P')) dof_reference = uvec{1, 2, 3};
+    else if(is_equal(TP, '1')) dof_reference = uvec{1};
+    else if(is_equal(TP, '2')) dof_reference = uvec{2};
+    else if(is_equal(TP, '3')) dof_reference = uvec{3};
+    else if(is_equal(TP, '4')) dof_reference = uvec{4};
+    else if(is_equal(TP, '5')) dof_reference = uvec{5};
+    else if(is_equal(TP, '6')) dof_reference = uvec{6};
 
     dof_reference -= 1;
 }
@@ -70,9 +60,7 @@ PenaltyBC::PenaltyBC(const unsigned T, const unsigned S, uvec&& N, const char* T
  * \return 0
  */
 int PenaltyBC::process(const shared_ptr<DomainBase>& D) {
-    dof_encoding = get_nodal_active_dof(D);
-
-    for(const auto I : dof_encoding) D->insert_restrained_dof(I);
+    D->insert_restrained_dof(dof_encoding = get_nodal_active_dof(D));
 
     stiffness.zeros(dof_encoding.n_elem, dof_encoding.n_elem);
 
@@ -82,7 +70,8 @@ int PenaltyBC::process(const shared_ptr<DomainBase>& D) {
 }
 
 int PenaltyBC::process_resistance(const shared_ptr<DomainBase>& D) {
-    for(const auto I : get_nodal_active_dof(D)) D->insert_restrained_dof(I);
+    // this ensures all restrained DoFs have zero displacement in modified Newton methods
+    D->insert_restrained_dof(dof_encoding);
 
     return SUANPAN_SUCCESS;
 }

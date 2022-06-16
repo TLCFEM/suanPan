@@ -14,32 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-/**
- * @class GroupGroup
- * @brief The GroupGroup class.
- *
- * @author tlc
- * @date 30/06/2020
- * @version 0.1.0
- * @file GroupGroup.h
- * @addtoGroupGroup Domain
- * @{
- */
 
-#ifndef GROUPGROUP_H
-#define GROUPGROUP_H
+#ifndef SOLVERPARSER_H
+#define SOLVERPARSER_H
 
-#include <Domain/Group.h>
+#include <memory>
 
-class GroupGroup final : public Group {
-    const uvec group_tag;
+class DomainBase;
 
-public:
-    GroupGroup(unsigned, uvec&&);
-
-    void initialize(const shared_ptr<DomainBase>&) override;
-};
+int create_new_integrator(const std::shared_ptr<DomainBase>&, std::istringstream&);
+int create_new_solver(const std::shared_ptr<DomainBase>&, std::istringstream&);
 
 #endif
-
-//! @}

@@ -40,10 +40,9 @@
 
 #include <Domain/Tag.h>
 
-using std::vector;
-
 class DomainBase;
 enum class OutputType;
+enum class DOF : unsigned short;
 
 struct NodeData {
     unsigned num_dof = 0; // number of DoFs
@@ -78,6 +77,10 @@ struct NodeData {
 class Node final : protected NodeData, public Tag {
     bool initialized = false;
 
+    std::mutex node_mutex;
+
+    std::vector<DOF> dof_identifier;
+
 public:
     explicit Node(unsigned = 0);
     Node(unsigned, vec&&);
@@ -96,6 +99,9 @@ public:
 
     void set_dof_number(unsigned);
     [[nodiscard]] unsigned get_dof_number() const;
+
+    void set_dof_identifier(const std::vector<DOF>&);
+    [[nodiscard]] const std::vector<DOF>& get_dof_identifier() const;
 
     void set_original_dof(unsigned&);
     void set_original_dof(const uvec&);
@@ -186,10 +192,7 @@ public:
     void reset_status();
     void clear_status();
 
-    [[nodiscard]] vector<vec> record(OutputType) const;
-
-    [[nodiscard]] vec save() const;
-    void load(const vec&);
+    [[nodiscard]] std::vector<vec> record(OutputType) const;
 
     void print() override;
 };

@@ -36,9 +36,7 @@ class DomainBase;
 class Material;
 class Section;
 enum class OutputType;
-
-using std::array;
-using std::vector;
+enum class DOF : unsigned short;
 
 class ElementBase : public Tag, public vtkBase {
     virtual void update_strain_energy() = 0;
@@ -76,8 +74,8 @@ protected:
     [[nodiscard]] virtual vec get_node_trial_resistance() const = 0;
     [[nodiscard]] virtual vec get_node_current_resistance() const = 0;
 
-    [[nodiscard]] virtual vector<shared_ptr<Material>> get_material(const shared_ptr<DomainBase>&) const = 0;
-    [[nodiscard]] virtual vector<shared_ptr<Section>> get_section(const shared_ptr<DomainBase>&) const = 0;
+    [[nodiscard]] virtual std::vector<shared_ptr<Material>> get_material(const shared_ptr<DomainBase>&) const = 0;
+    [[nodiscard]] virtual std::vector<shared_ptr<Section>> get_section(const shared_ptr<DomainBase>&) const = 0;
 
 public:
     explicit ElementBase(const unsigned T)
@@ -117,7 +115,7 @@ public:
     [[nodiscard]] virtual unsigned get_total_number() const = 0;
 
     virtual void clear_node_ptr() = 0;
-    [[nodiscard]] virtual const vector<weak_ptr<Node>>& get_node_ptr() const = 0;
+    [[nodiscard]] virtual const std::vector<weak_ptr<Node>>& get_node_ptr() const = 0;
 
     [[nodiscard]] virtual const vec& get_trial_resistance() const = 0;
     [[nodiscard]] virtual const vec& get_current_resistance() const = 0;
@@ -157,13 +155,14 @@ public:
     virtual const vec& update_body_force(const vec&) = 0;
     virtual const vec& update_traction(const vec&) = 0;
 
-    virtual vector<vec> record(OutputType) = 0;
+    virtual std::vector<vec> record(OutputType) = 0;
 
     [[nodiscard]] virtual double get_strain_energy() const = 0;
     [[nodiscard]] virtual double get_complementary_energy() const = 0;
     [[nodiscard]] virtual double get_kinetic_energy() const = 0;
     [[nodiscard]] virtual double get_viscous_energy() const = 0;
-    [[nodiscard]] virtual double get_momentum() const = 0;
+    [[nodiscard]] virtual const vec& get_momentum() const = 0;
+    [[nodiscard]] virtual double get_momentum_component(DOF) const = 0;
 
     [[nodiscard]] virtual double get_characteristic_length() const = 0;
 

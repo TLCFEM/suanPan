@@ -1,19 +1,19 @@
 target_sources(${PROJECT_NAME} PRIVATE
+        ConditionalModifier.cpp
         Domain.cpp
         DomainBase.cpp
         DomainHelper.cpp
         DomainState.cpp
-        ElementGroup.cpp
         ExternalModule.cpp
-        FactoryHelper.hpp
         Factory.hpp
-        Group.cpp
-        GroupGroup.cpp
+        FactoryHelper.hpp
+        Group/ElementGroup.cpp
+        Group/Group.cpp
+        Group/GroupGroup.cpp
+        Group/NodeGroup.cpp
         Node.cpp
-        NodeGroup.cpp
         Storage.hpp
         Tag.cpp
-        ConditionalModifier.cpp
         )
 
 add_subdirectory(MetaMat)

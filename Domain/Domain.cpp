@@ -21,7 +21,7 @@
 #include <Converger/Converger.h>
 #include <Database/Database.h>
 #include <Domain/FactoryHelper.hpp>
-#include <Domain/Group.h>
+#include <Domain/Group/Group.h>
 #include <Domain/Node.h>
 #include <Element/Element.h>
 #include <Element/Modifier/Modifier.h>
@@ -34,14 +34,10 @@
 #include <Solver/Integrator/Integrator.h>
 #include <Solver/Solver.h>
 #include <Step/Step.h>
-#include <Toolbox/sort_color.h>
+#include <Toolbox/sort_color.hpp>
 #include <Toolbox/sort_rcm.h>
 #include <numeric>
-
-#ifdef SUANPAN_HDF5
-#include <hdf5/hdf5.h>
-#include <hdf5/hdf5_hl.h>
-#endif
+#include <array>
 
 Domain::Domain(const unsigned T)
     : DomainBase(T)
@@ -676,17 +672,41 @@ const shared_ptr<Integrator>& Domain::get_current_integrator() const { return ge
 
 const shared_ptr<Solver>& Domain::get_current_solver() const { return get_solver(current_solver_tag); }
 
+/**
+ * \brief concurrently safe insertion method
+ */
+void Domain::insert_loaded_dof(const uvec& T) { loaded_dofs.insert(T.cbegin(), T.cend()); }
+
+/**
+ * \brief concurrently safe insertion method
+ */
+void Domain::insert_restrained_dof(const uvec& T) { restrained_dofs.insert(T.cbegin(), T.cend()); }
+
+/**
+ * \brief concurrently safe insertion method
+ */
+void Domain::insert_constrained_dof(const uvec& T) { constrained_dofs.insert(T.cbegin(), T.cend()); }
+
+/**
+ * \brief concurrently safe insertion method
+ */
 void Domain::insert_loaded_dof(const uword T) { loaded_dofs.insert(T); }
 
+/**
+ * \brief concurrently safe insertion method
+ */
 void Domain::insert_restrained_dof(const uword T) { restrained_dofs.insert(T); }
 
+/**
+ * \brief concurrently safe insertion method
+ */
 void Domain::insert_constrained_dof(const uword T) { constrained_dofs.insert(T); }
 
-const unordered_set<uword>& Domain::get_loaded_dof() const { return loaded_dofs; }
+const suanpan::unordered_set<uword>& Domain::get_loaded_dof() const { return loaded_dofs; }
 
-const unordered_set<uword>& Domain::get_restrained_dof() const { return restrained_dofs; }
+const suanpan::unordered_set<uword>& Domain::get_restrained_dof() const { return restrained_dofs; }
 
-const unordered_set<uword>& Domain::get_constrained_dof() const { return constrained_dofs; }
+const suanpan::unordered_set<uword>& Domain::get_constrained_dof() const { return constrained_dofs; }
 
 bool Domain::is_updated() const { return updated.load(); }
 
@@ -697,38 +717,32 @@ void Domain::set_color_model(const ColorMethod B) {
     color_map.clear();
 }
 
-const vector<vector<unsigned>>& Domain::get_color_map() const { return color_map; }
+const std::vector<std::vector<unsigned>>& Domain::get_color_map() const { return color_map; }
 
-/**
- * \brief list of connected element tags for each node
- * \return list
- */
-vector<vector<uword>> Domain::get_node_connectivity() {
-    unsigned max_tag = 0;
-    for(const auto& [t_tag, t_node] : node_pond) if(t_tag > max_tag) max_tag = t_tag;
+std::pair<std::vector<unsigned>, suanpan::graph<unsigned>> Domain::get_element_connectivity(const bool all_elements) {
+    // node tag <--> pool of connected elements
+    suanpan::unordered_map<uword, suanpan::unordered_set<unsigned>> node_register;
 
-    vector node_connectivity(++max_tag, vector<uword>{});
+    // element tag mapping
+    std::vector<unsigned> element_map; // new_idx -> old_tag
+    element_map.reserve(element_pond.size());
 
-    for(const auto& [t_tag, t_element] : element_pond) for(const auto t_node : t_element->get_node_encoding()) node_connectivity[t_node].emplace_back(t_tag);
+    auto element_tag = 0u;
 
-    suanpan_for_each(node_connectivity.begin(), node_connectivity.end(), [](vector<uword>& t_node) { suanpan::unique(t_node); });
+    auto populate = [&](const shared_ptr<Element>& t_element) {
+        element_map.emplace_back(t_element->get_tag());
+        suanpan::for_all(t_element->get_node_encoding(), [&](const uword t_node) { node_register[t_node].insert(element_tag); });
+        element_tag++;
+    };
 
-    return node_connectivity;
-}
+    if(all_elements) for(auto& [t_tag, t_element] : element_pond) populate(t_element);
+    else for(auto& t_element : element_pond.get()) populate(t_element);
 
-/**
- * \brief list of connected node tags for each element
- * \return list
- */
-vector<uvec> Domain::get_element_connectivity() {
-    unsigned max_tag = 0;
-    for(const auto& [t_tag, t_element] : element_pond) if(t_tag > max_tag) max_tag = t_tag;
+    suanpan::graph<unsigned> element_register(element_tag);
 
-    vector element_connectivity(++max_tag, uvec{});
+    suanpan::for_all(node_register, [&](const std::pair<uword, suanpan::unordered_set<unsigned>>& t_node) { for(const auto& t_element = t_node.second; const auto I : t_element) element_register[I].insert(t_element.cbegin(), t_element.cend()); });
 
-    suanpan_for_each(element_pond.cbegin(), element_pond.cend(), [&](const std::pair<unsigned, shared_ptr<Element>>& t_element) { element_connectivity[t_element.first] = t_element.second->get_node_encoding(); });
-
-    return element_connectivity;
+    return std::make_pair(std::move(element_map), std::move(element_register));
 }
 
 int Domain::reorder_dof() {
@@ -740,30 +754,30 @@ int Domain::reorder_dof() {
 
     // RCM optimization
     // collect connectivity
-#ifdef SUANPAN_MT
-    vector<concurrent_unordered_set<uword>> adjacency(dof_counter);
-#else
-    vector<unordered_set<uword>> adjacency(dof_counter);
-#endif
-    suanpan_for_each(element_pond.get().cbegin(), element_pond.get().cend(), [&](const shared_ptr<Element>& t_element) {
+    std::vector<suanpan::unordered_set<uword>> adjacency(dof_counter);
+    suanpan::for_all(element_pond.get(), [&](const shared_ptr<Element>& t_element) {
         t_element->update_dof_encoding();
-        for(auto& t_encoding = t_element->get_dof_encoding(); const auto& I : t_encoding) for(const auto& J : t_encoding) adjacency[I].insert(J);
+        for(auto& t_encoding = t_element->get_dof_encoding(); const auto I : t_encoding) adjacency[I].insert(t_encoding.cbegin(), t_encoding.cend());
     });
 
     // for nonlinear constraint
     for(const auto& [t_tag, t_constraint] : constraint_pond) {
         if(!t_constraint->is_connected()) continue;
-        vector<uword> t_encoding;
-        for(auto& I : t_constraint->get_node_encoding()) if(find<Node>(I)) for(auto& J : get<Node>(I)->get_reordered_dof()) t_encoding.emplace_back(J);
-        for(const auto& I : t_encoding) for(const auto& J : t_encoding) adjacency[I].insert(J);
+        std::set<uword> t_encoding;
+        for(const auto i : t_constraint->get_node_encoding())
+            if(find<Node>(i)) {
+                const auto& t_dof = get<Node>(i)->get_reordered_dof();
+                t_encoding.insert(t_dof.cbegin(), t_dof.cend());
+            }
+        for(const auto I : t_encoding) adjacency[I].insert(t_encoding.cbegin(), t_encoding.cend());
     }
 
     // count number of degree
     uvec num_degree(dof_counter);
-    suanpan_for(0u, dof_counter, [&](const unsigned I) { num_degree(I) = adjacency[I].size(); });
+    suanpan_for(0u, dof_counter, [&](const unsigned i) { num_degree(i) = adjacency[i].size(); });
 
     // sort each column according to its degree
-    vector<uvec> adjacency_sorted(dof_counter);
+    std::vector<uvec> adjacency_sorted(dof_counter);
     suanpan_for(0u, dof_counter, [&](const unsigned i) {
         uvec t_vec(num_degree(i));
         unsigned j = 0;
@@ -783,8 +797,7 @@ int Domain::reorder_dof() {
         }
 
     // assign new labels to active nodes
-    auto& t_node_pond = node_pond.get();
-    suanpan_for_each(t_node_pond.cbegin(), t_node_pond.cend(), [&](const shared_ptr<Node>& t_node) { t_node->set_reordered_dof(idx_sorted(t_node->get_original_dof())); });
+    suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->set_reordered_dof(idx_sorted(t_node->get_original_dof())); });
 
     factory->set_size(dof_counter);
     factory->set_bandwidth(static_cast<unsigned>(low_bw), static_cast<unsigned>(-up_bw));
@@ -795,29 +808,18 @@ int Domain::reorder_dof() {
 int Domain::assign_color() {
     // deal with k-coloring optimization
     if(ColorMethod::OFF != color_model) {
-        const auto color_algorithm = ColorMethod::WP == color_model ? sort_color_wp : sort_color_mis;
+        const auto color_algorithm = ColorMethod::WP == color_model ? sort_color_wp<unsigned> : sort_color_mis<unsigned>;
 
-        auto node_tag = 0llu;
-        std::unordered_map<uword, uword> node_map; // old_tag -> new_tag
-        for(auto& t_node : node_pond.get()) node_map[t_node->get_tag()] = node_tag++;
+        std::vector<unsigned> element_map;
+        suanpan::graph<unsigned> element_register;
 
-        auto element_tag = 0u;
-        vector<unsigned> element_map; // new_idx -> old_tag
-        element_map.reserve(element_pond.get().size());
-        vector<vector<unsigned>> node_register(node_tag);
-        for(auto& t_element : element_pond.get()) {
-            element_map.emplace_back(t_element->get_tag());
-            for(const auto t_node : t_element->get_node_encoding()) node_register[node_map.at(t_node)].emplace_back(element_tag);
-            element_tag++;
-        }
-
-        suanpan_register element_register(element_tag);
-
-        suanpan_for_each(node_register.begin(), node_register.end(), [&](const vector<unsigned>& node) { for(const auto I : node) for(const auto J : node) element_register[I].insert(J); });
+        // Clang 13.0.1 does not allow capture structured bindings
+        // ReSharper disable once CppReplaceTieWithStructuredBinding
+        std::tie(element_map, element_register) = get_element_connectivity(false);
 
         color_map = color_algorithm(element_register);
 
-        suanpan_for_each(color_map.begin(), color_map.end(), [&](vector<unsigned>& color) { std::ranges::transform(color, color.begin(), [&](const unsigned element) { return element_map[element]; }); });
+        suanpan::for_all(color_map, [&](std::vector<unsigned>& color) { std::ranges::transform(color, color.begin(), [&](const unsigned element) { return element_map[element]; }); });
 
         suanpan_debug("The model is colored by %llu colors.\n", color_map.size());
     }
@@ -825,7 +827,7 @@ int Domain::assign_color() {
     // count how many entries in the sparse form and preallocate memory
     if(is_sparse()) {
         auto& t_element_pool = element_pond.get();
-        factory->set_entry(std::transform_reduce(t_element_pool.cbegin(), t_element_pool.cend(), 1000llu, std::plus<>(), [](const shared_ptr<Element>& t_element) { return t_element->get_total_number() * t_element->get_total_number(); }));
+        factory->set_entry(std::transform_reduce(t_element_pool.cbegin(), t_element_pool.cend(), 1000llu, std::plus(), [](const shared_ptr<Element>& t_element) { return t_element->get_total_number() * t_element->get_total_number(); }));
     }
 
     return SUANPAN_SUCCESS;
@@ -862,17 +864,17 @@ int Domain::initialize() {
     solver_pond.update();
 
     // for restart analysis
-    suanpan_for_each(load_pond.cbegin(), load_pond.cend(), [&](const std::pair<unsigned, shared_ptr<Load>>& t_load) { t_load.second->set_initialized(false); });
-    suanpan_for_each(constraint_pond.cbegin(), constraint_pond.cend(), [&](const std::pair<unsigned, shared_ptr<Constraint>>& t_constraint) { t_constraint.second->set_initialized(false); });
+    suanpan::for_all(load_pond, [&](const std::pair<unsigned, shared_ptr<Load>>& t_load) { t_load.second->set_initialized(false); });
+    suanpan::for_all(constraint_pond, [&](const std::pair<unsigned, shared_ptr<Constraint>>& t_constraint) { t_constraint.second->set_initialized(false); });
 
     // amplitude should be updated before load
-    suanpan_for_each(amplitude_pond.cbegin(), amplitude_pond.cend(), [&](const std::pair<unsigned, shared_ptr<Amplitude>>& t_amplitude) { t_amplitude.second->initialize(shared_from_this()); });
+    suanpan::for_all(amplitude_pond, [&](const std::pair<unsigned, shared_ptr<Amplitude>>& t_amplitude) { t_amplitude.second->initialize(shared_from_this()); });
     amplitude_pond.update();
 
-    suanpan_set remove_list;
+    suanpan::set<unsigned> remove_list;
 
     remove_list.clear();
-    suanpan_for_each(material_pond.cbegin(), material_pond.cend(), [&](const std::pair<unsigned, shared_ptr<Material>>& t_material) {
+    suanpan::for_all(material_pond, [&](const std::pair<unsigned, shared_ptr<Material>>& t_material) {
         if(t_material.second->is_initialized() || !t_material.second->is_active()) return;
 
         // if fail to initialize, the material is invalid, remove it from the model
@@ -888,7 +890,7 @@ int Domain::initialize() {
     material_pond.update();
 
     remove_list.clear();
-    suanpan_for_each(section_pond.cbegin(), section_pond.cend(), [&](const std::pair<unsigned, shared_ptr<Section>>& t_section) {
+    suanpan::for_all(section_pond, [&](const std::pair<unsigned, shared_ptr<Section>>& t_section) {
         if(t_section.second->is_initialized() || !t_section.second->is_active()) return;
 
         // if fail to initialize, the section is invalid, remove it from the model
@@ -904,7 +906,7 @@ int Domain::initialize() {
     section_pond.update();
 
     // set dof number to zero before first initialisation of elements
-    suanpan_for_each(node_pond.cbegin(), node_pond.cend(), [](const std::pair<unsigned, shared_ptr<Node>>& t_node) {
+    suanpan::for_all(node_pond, [](const std::pair<unsigned, shared_ptr<Node>>& t_node) {
         // for restart analysis that may reassign dof
         t_node.second->set_initialized(false);
         t_node.second->set_dof_number(0);
@@ -912,12 +914,12 @@ int Domain::initialize() {
     node_pond.update();
 
     // groups reply on nodes
-    suanpan_for_each(group_pond.cbegin(), group_pond.cend(), [&](const std::pair<unsigned, shared_ptr<Group>>& t_group) { t_group.second->initialize(shared_from_this()); });
+    suanpan::for_all(group_pond, [&](const std::pair<unsigned, shared_ptr<Group>>& t_group) { t_group.second->initialize(shared_from_this()); });
     group_pond.update();
 
     // element may reply on groups
     remove_list.clear();
-    suanpan_for_each(element_pond.cbegin(), element_pond.cend(), [&](const std::pair<unsigned, shared_ptr<Element>>& t_element) {
+    suanpan::for_all(element_pond, [&](const std::pair<unsigned, shared_ptr<Element>>& t_element) {
         if(!t_element.second->is_active()) return;
         // clear node pointer array to enable initialisation
         t_element.second->clear_node_ptr();
@@ -930,7 +932,7 @@ int Domain::initialize() {
     element_pond.update();
 
     // initialise nodal variables with proper number of DoFs
-    suanpan_for_each(node_pond.cbegin(), node_pond.cend(), [&](const std::pair<unsigned, shared_ptr<Node>>& t_node) { t_node.second->initialize(shared_from_this()); });
+    suanpan::for_all(node_pond, [&](const std::pair<unsigned, shared_ptr<Node>>& t_node) { t_node.second->initialize(shared_from_this()); });
     node_pond.update();
 
     // order matters between element base initialization and derived method call
@@ -941,8 +943,7 @@ int Domain::initialize() {
     remove_list.clear();
     auto nlgeom = false;
     // initialize derived elements
-    auto& t_element_pond = element_pond.get();
-    suanpan_for_each(t_element_pond.cbegin(), t_element_pond.cend(), [&](const shared_ptr<Element>& t_element) {
+    suanpan::for_all(element_pond.get(), [&](const shared_ptr<Element>& t_element) {
         if(t_element->is_initialized()) {
             // model changed due to addition/deletion of elements, etc.
             // the element itself is not modified, just update dof encoding
@@ -968,7 +969,7 @@ int Domain::initialize() {
     });
     for(const auto I : remove_list) erase_element(I);
     element_pond.update();
-    if(t_element_pond.empty()) {
+    if(element_pond.get().empty()) {
         suanpan_warning("no active element.\n");
         return SUANPAN_FAIL;
     }
@@ -977,17 +978,17 @@ int Domain::initialize() {
     factory->set_nlgeom(nlgeom);
 
     // initialize modifier based on updated element pool
-    suanpan_for_each(modifier_pond.cbegin(), modifier_pond.cend(), [&](const std::pair<unsigned, shared_ptr<Modifier>>& t_modifier) { t_modifier.second->initialize(shared_from_this()); });
+    suanpan::for_all(modifier_pond, [&](const std::pair<unsigned, shared_ptr<Modifier>>& t_modifier) { t_modifier.second->initialize(shared_from_this()); });
     modifier_pond.update();
     // sort to ensure lower performs first
     if(auto& t_modifier_pool = access::rw(modifier_pond.get()); t_modifier_pool.size() > 1)
         suanpan_sort(t_modifier_pool.begin(), t_modifier_pool.end(), [&](const shared_ptr<Modifier>& a, const shared_ptr<Modifier>& b) { return a->get_tag() < b->get_tag(); });
 
     // recorder may depend on groups, nodes, elements, etc.
-    suanpan_for_each(recorder_pond.cbegin(), recorder_pond.cend(), [&](const std::pair<unsigned, shared_ptr<Recorder>>& t_recorder) { t_recorder.second->initialize(shared_from_this()); });
+    suanpan::for_all(recorder_pond, [&](const std::pair<unsigned, shared_ptr<Recorder>>& t_recorder) { t_recorder.second->initialize(shared_from_this()); });
     recorder_pond.update();
 
-    suanpan_for_each(criterion_pond.cbegin(), criterion_pond.cend(), [&](const std::pair<unsigned, shared_ptr<Criterion>>& t_criterion) { t_criterion.second->initialize(shared_from_this()); });
+    suanpan::for_all(criterion_pond, [&](const std::pair<unsigned, shared_ptr<Criterion>>& t_criterion) { t_criterion.second->initialize(shared_from_this()); });
     criterion_pond.update();
 
     // element initialization may change the status of the domain
@@ -995,30 +996,25 @@ int Domain::initialize() {
 }
 
 int Domain::initialize_load() {
-    auto code = 0;
-
-    // cannot use parallel for due to potential racing in reference dof
-    std::ranges::for_each(load_pond, [&](const std::pair<unsigned, shared_ptr<Load>>& t_load) { code += t_load.second->initialize(shared_from_this()); });
-
+    suanpan::for_all(load_pond, [&](const std::pair<unsigned, shared_ptr<Load>>& t_load) { if(t_load.second->validate_step(shared_from_this()) && !t_load.second->is_initialized() && SUANPAN_FAIL == t_load.second->initialize(shared_from_this())) disable_load(t_load.first); });
     load_pond.update();
 
-    return code;
+    factory->update_reference_size();
+
+    return SUANPAN_SUCCESS;
 }
 
 int Domain::initialize_constraint() {
-    auto code = 0;
-
-    std::ranges::for_each(constraint_pond, [&](const std::pair<unsigned, shared_ptr<Constraint>>& t_constraint) { code += t_constraint.second->initialize(shared_from_this()); });
-
+    suanpan::for_all(constraint_pond, [&](const std::pair<unsigned, shared_ptr<Constraint>>& t_constraint) { if(t_constraint.second->validate_step(shared_from_this()) && !t_constraint.second->is_initialized() && SUANPAN_FAIL == t_constraint.second->initialize(shared_from_this())) disable_constraint(t_constraint.first); });
     constraint_pond.update();
 
-    return code;
+    return SUANPAN_SUCCESS;
 }
 
 int Domain::initialize_reference() {
     // used in displacement controlled algorithm
     // need to initialize it for updating of load factor
-    auto& ref_dof = factory->get_reference_dof();
+    const auto ref_dof = to_uvec(factory->get_reference_dof());
 
     if(ref_dof.is_empty()) return SUANPAN_SUCCESS;
 
@@ -1038,24 +1034,35 @@ int Domain::initialize_reference() {
 int Domain::process_load(const bool full) {
     loaded_dofs.clear();
 
-    auto& t_load = get_trial_load(factory);
-    if(!t_load.empty()) t_load.zeros();
+    auto& trial_load = get_trial_load(factory);
+    if(!trial_load.empty()) trial_load.zeros();
 
-    auto& t_settlement = get_trial_settlement(factory);
-    if(!t_settlement.empty()) t_settlement.zeros();
+    auto& trial_settlement = get_trial_settlement(factory);
+    if(!trial_settlement.empty()) trial_settlement.zeros();
 
     const auto process_handler = full ? std::mem_fn(&Load::process) : std::mem_fn(&Load::process_resistance);
 
-    auto code = 0;
-    for(auto& I : load_pond.get()) {
-        if(!I->is_initialized()) continue;
-        code += std::invoke(process_handler, I, shared_from_this());
-        if(!I->get_trial_load().empty()) t_load += I->get_trial_load();
-        if(!I->get_trial_settlement().empty()) t_settlement += I->get_trial_settlement();
-    }
+    std::atomic_int code = 0;
 
-    factory->update_trial_load(t_load);
-    factory->update_trial_settlement(t_settlement);
+    suanpan::for_all(load_pond.get(), [&](const shared_ptr<Load>& t_load) {
+        if(!t_load->is_initialized()) return;
+#ifdef SUANPAN_MT
+        oneapi::tbb::this_task_arena::isolate([&] { code += std::invoke(process_handler, t_load, shared_from_this()); });
+#else
+        code += std::invoke(process_handler, t_load, shared_from_this());
+#endif
+        if(!t_load->get_trial_load().empty()) {
+            std::scoped_lock trial_load_lock(factory->get_trial_load_mutex());
+            trial_load += t_load->get_trial_load();
+        }
+        if(!t_load->get_trial_settlement().empty()) {
+            std::scoped_lock trial_settlement_lock(factory->get_trial_settlement_mutex());
+            trial_settlement += t_load->get_trial_settlement();
+        }
+    });
+
+    factory->update_trial_load(trial_load);
+    factory->update_trial_settlement(trial_settlement);
 
     return code;
 }
@@ -1077,35 +1084,58 @@ int Domain::process_constraint(const bool full) {
 
     const auto process_handler = full ? std::mem_fn(&Constraint::process) : std::mem_fn(&Constraint::process_resistance);
 
-    auto code = 0;
-    auto counter = 0u;
-    for(auto& I : constraint_pond.get()) {
-        if(!I->is_initialized()) continue;
-        code += std::invoke(process_handler, I, shared_from_this());
-        if(!I->get_resistance().empty()) constraint_resistance += I->get_resistance();
-        counter += I->get_multiplier_size();
-    }
+    // constraint, start index, size
+    suanpan::vector<std::pair<shared_ptr<Constraint>, std::array<unsigned, 2>>> constraint_register;
+
+    std::atomic_int code = 0;
+    std::atomic_uint32_t counter = 0;
+    suanpan::for_all(constraint_pond.get(), [&](const shared_ptr<Constraint>& t_constraint) {
+        if(!t_constraint->is_initialized()) return;
+#ifdef SUANPAN_MT
+        oneapi::tbb::this_task_arena::isolate([&] { code += std::invoke(process_handler, t_constraint, shared_from_this()); });
+#else
+        code += std::invoke(process_handler, t_constraint, shared_from_this());
+#endif
+        if(const auto multiplier_size = t_constraint->get_multiplier_size(); multiplier_size > 0) {
+            counter += multiplier_size;
+            constraint_register.emplace_back(t_constraint, std::array{0u, multiplier_size});
+        }
+        if(!t_constraint->get_resistance().empty()) {
+            std::scoped_lock constraint_resistance_lock(factory->get_trial_constraint_resistance_mutex());
+            constraint_resistance += t_constraint->get_resistance();
+        }
+    });
 
     factory->set_mpc(counter);
 
     if(0 == counter) return code;
+
+    counter = 0;
+    auto previous_it = constraint_register.begin(), current_it = constraint_register.begin();
+    while(constraint_register.end() != ++current_it) {
+        current_it->second[0] = counter += previous_it->second[1];
+        ++previous_it;
+    }
 
     auto& t_encoding = get_auxiliary_encoding(factory);
     auto& t_resistance = get_auxiliary_resistance(factory);
     auto& t_load = get_auxiliary_load(factory);
     auto& t_stiffness = get_auxiliary_stiffness(factory);
 
-    counter = 0u;
-    for(auto& I : constraint_pond.get()) {
-        const auto m_size = I->get_multiplier_size();
-        if(!I->is_initialized() || 0 == m_size) continue;
-        const auto e_size = counter + m_size - 1;
-        t_encoding.subvec(counter, e_size).fill(I->get_tag());
-        if(!I->get_auxiliary_resistance().empty()) t_resistance.subvec(counter, e_size) = I->get_auxiliary_resistance();
-        if(!I->get_auxiliary_load().empty()) t_load.subvec(counter, e_size) = I->get_auxiliary_load();
-        if(!I->get_auxiliary_stiffness().empty()) t_stiffness.cols(counter, e_size) = I->get_auxiliary_stiffness();
-        counter += m_size;
-    }
+    suanpan::for_all(constraint_register, [&](const std::pair<shared_ptr<Constraint>, std::array<unsigned, 2>>& t_register) {
+        const auto& t_constraint = t_register.first;
+        const auto start = t_register.second[0];
+        const auto end = start + t_register.second[1] - 1;
+
+        // no need to lock vector filling operations
+        t_encoding.subvec(start, end).fill(t_constraint->get_tag());
+        if(!t_constraint->get_auxiliary_resistance().empty()) t_resistance.subvec(start, end) = t_constraint->get_auxiliary_resistance();
+        if(!t_constraint->get_auxiliary_load().empty()) t_load.subvec(start, end) = t_constraint->get_auxiliary_load();
+        if(!t_constraint->get_auxiliary_stiffness().empty()) {
+            std::scoped_lock auxiliary_stiffness_lock(factory->get_auxiliary_stiffness_mutex());
+            t_stiffness.cols(start, end) = t_constraint->get_auxiliary_stiffness();
+        }
+    });
 
     return code;
 }
@@ -1123,10 +1153,7 @@ int Domain::process_modifier() {
     return code;
 }
 
-void Domain::record() {
-    auto& t_recorder_pool = recorder_pond.get();
-    suanpan_for_each(t_recorder_pool.cbegin(), t_recorder_pool.cend(), [&](const shared_ptr<Recorder>& t_recorder) { t_recorder->record(shared_from_this()); });
-}
+void Domain::record() { suanpan::for_all(recorder_pond.get(), [&](const shared_ptr<Recorder>& t_recorder) { t_recorder->record(shared_from_this()); }); }
 
 void Domain::enable_all() {
     updated = false;
@@ -1152,7 +1179,7 @@ void Domain::summary() const {
 
 void Domain::erase_machine_error() const {
     auto& t_ninja = get_ninja(factory);
-    for(const auto& I : restrained_dofs) t_ninja(I) = 0.;
+    suanpan::for_all(restrained_dofs, [&](const uword I) { t_ninja(I) = 0.; });
 }
 
 void Domain::update_load() {}
@@ -1173,25 +1200,4 @@ void Domain::assemble_load_stiffness() {}
 
 void Domain::assemble_constraint_stiffness() { for(auto& I : get_constraint_pool()) if(I->is_initialized() && !I->get_stiffness().empty()) factory->assemble_stiffness(I->get_stiffness(), I->get_dof_encoding()); }
 
-void Domain::save(string file_name) {
-#ifdef SUANPAN_HDF5
-    if(string::npos == file_name.find(".h5") && string::npos == file_name.find(".H5")) file_name += ".h5";
-
-    const auto file_id = H5Fcreate(file_name.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-
-    const string group_name = "/Node";
-
-    const auto group_id = H5Gcreate(file_id, group_name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-
-    for(const auto& t_node : get_node_pool()) {
-        const auto data = t_node->save();
-
-        const hsize_t dimension[2] = {data.n_rows, data.n_cols};
-
-        H5LTmake_dataset(group_id, std::to_string(t_node->get_tag()).c_str(), 2, dimension, H5T_NATIVE_DOUBLE, data.mem);
-    }
-
-    H5Gclose(group_id);
-    H5Fclose(file_id);
-#endif
-}
+void Domain::save(string) {}

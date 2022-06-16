@@ -31,15 +31,13 @@
 #include <Domain/Tag.h>
 #include <Element/Element.h>
 
-using std::vector;
-
 class DomainBase;
 
 class Modifier : public Tag {
     uvec element_tag;
 
 protected:
-    vector<weak_ptr<Element>> element_pool;
+    std::vector<weak_ptr<Element>> element_pool;
 
 public:
     explicit Modifier(unsigned = 0, // tag
