@@ -85,20 +85,11 @@ mat NM3D2::compute_ddf(const vec& s) const {
 }
 
 NM3D2::NM3D2(const unsigned T, const double EEA, const double EEIS, const double EEIW, const double NP, const double MSP, const double MWP, const double CC, const double HH, const double KK, const double LD, mat&& PS)
-    : NonlinearNM3D(T, EEA, EEIS, EEIW, KK, LD)
+    : NonlinearNM(T, EEA, EEIS, EEIW, KK, LD)
     , para_set(PS.empty() ? mat{{1.15, 2., 0., 0.}, {1., 0., 2., 0.}, {1., 0., 0., 4.}, {3.67, 2., 2., 0.}, {3., 6., 0., 2.}, {4.65, 0., 4., 2.}} : std::forward<mat>(PS))
     , yield_force{NP, MSP, MWP}
     , c(CC)
-    , h(HH)
-    , k(KK) {}
-
-int NM3D2::initialize(const shared_ptr<DomainBase>& D) {
-    if(SUANPAN_SUCCESS != NonlinearNM3D::initialize(D)) return SUANPAN_FAIL;
-
-    initialize_weight(yield_force, k);
-
-    return SUANPAN_SUCCESS;
-}
+    , h(HH) {}
 
 unique_ptr<Section> NM3D2::get_copy() { return make_unique<NM3D2>(*this); }
 

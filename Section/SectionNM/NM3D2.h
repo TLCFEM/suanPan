@@ -29,12 +29,12 @@
 #ifndef NM3D2_H
 #define NM3D2_H
 
-#include <Section/SectionNM/NonlinearNM3D.h>
+#include "NonlinearNM.h"
 
-class NM3D2 final : public NonlinearNM3D {
+class NM3D2 final : public NonlinearNM {
     const mat para_set;
     const vec yield_force;
-    const double c, h, k;
+    const double c, h;
 
     [[nodiscard]] double evaluate(double, double, double, const mat&) const;
     [[nodiscard]] static vec differentiate(const mat&, uword, uword);
@@ -59,8 +59,6 @@ public:
           double,   // k
           double,   // linear density
           mat&& = {});
-
-    int initialize(const shared_ptr<DomainBase>&) override;
 
     unique_ptr<Section> get_copy() override;
 

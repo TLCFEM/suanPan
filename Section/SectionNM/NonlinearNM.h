@@ -15,52 +15,65 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class NonlinearNM2D
- * @brief A NonlinearNM2D class.
+ * @class NonlinearNM
+ * @brief A NonlinearNM class.
  * @author tlc
- * @date 28/11/2021
+ * @date 22/06/2022
  * @version 0.1.0
- * @file NonlinearNM2D.h
+ * @file NonlinearNM.h
  * @addtogroup Section-NM
  * @ingroup Section
  * @{
  */
 
-#ifndef NONLINEARNM2D_H
-#define NONLINEARNM2D_H
+#ifndef NONLINEARNM_H
+#define NONLINEARNM_H
 
-#include "SectionNM2D.h"
+#include "SectionNM.h"
 
-class NonlinearNM2D : public SectionNM2D {
+struct DataNonlinearNM {
+    const double EA, EIS, EIW, kinematic_modulus;
+};
+
+class NonlinearNM : protected DataNonlinearNM, public SectionNM {
     static constexpr unsigned max_iteration = 20;
-    static const uvec sai, saj, sbi, sbj, sa, sb;
 
     const bool has_kinematic;
 
-    const unsigned local_size = has_kinematic ? 8u : 5u;
+    const uvec si, sj, sa, sb, sc;
 
-    const uvec si{local_size - 2llu}, sj{local_size - 1llu};
+    const unsigned n_size; // nodal dof size
+    const unsigned j_size; // jacobian size
+    const unsigned g_size = 2 * j_size;
 
-    const span spa = span(0llu, local_size - 2llu);
+    const vec elastic_diag, border;
+    const mat ti, tj, rabbit;
 
-    mat plastic_weight, kin_weight;
-
-    [[nodiscard]] virtual double compute_h(double) const = 0;
-    [[nodiscard]] virtual double compute_dh(double) const = 0;
+    [[nodiscard]] virtual double compute_h(double) const;
+    [[nodiscard]] virtual double compute_dh(double) const;
 
     [[nodiscard]] virtual double compute_f(const vec&) const = 0;
     [[nodiscard]] virtual vec compute_df(const vec&) const = 0;
     [[nodiscard]] virtual mat compute_ddf(const vec&) const = 0;
 
-protected:
-    void initialize_weight(const vec&, double);
+    bool update_nodal_quantity(mat&, vec&, double, const vec&, const vec&, double, const vec&, const vec&) const;
 
 public:
-    NonlinearNM2D(unsigned, // tag
-                  double,
-                  double,
-                  double,
-                  double);
+    NonlinearNM(unsigned, // tag
+                double,   // axial rigidity
+                double,   // flexural rigidity
+                double,   // kinematic hardening modulus
+                double    // linear density
+    );
+    NonlinearNM(unsigned, // tag
+                double,   // axial rigidity
+                double,   // flexural rigidity
+                double,   // flexural rigidity
+                double,   // kinematic hardening modulus
+                double    // linear density
+    );
+
+    int initialize(const shared_ptr<DomainBase>&) override;
 
     int update_trial_status(const vec&) override;
 

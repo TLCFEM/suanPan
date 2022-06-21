@@ -1279,13 +1279,7 @@
     <ClCompile Include="..\..\..\Section\SectionNM\NM3D1.cpp">
       <Filter>Section\SectionNM</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Section\SectionNM\SectionNM3D.cpp">
-      <Filter>Section\SectionNM</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Section\SectionNM\NM2D1.cpp">
-      <Filter>Section\SectionNM</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Section\SectionNM\SectionNM2D.cpp">
       <Filter>Section\SectionNM</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Element\Beam\NMB21.cpp">
@@ -1297,13 +1291,7 @@
     <ClCompile Include="..\..\..\Section\SectionNM\SectionNM.cpp">
       <Filter>Section\SectionNM</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Section\SectionNM\NonlinearNM2D.cpp">
-      <Filter>Section\SectionNM</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Section\SectionNM\NM2D2.cpp">
-      <Filter>Section\SectionNM</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Section\SectionNM\NonlinearNM3D.cpp">
       <Filter>Section\SectionNM</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Element\Utility\B3DC.cpp">
@@ -1368,6 +1356,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Constraint\RestitutionWallPenalty.cpp">
       <Filter>Constraint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionNM\NonlinearNM.cpp">
+      <Filter>Section\SectionNM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionNM\SectionNM2D.cpp">
+      <Filter>Section\SectionNM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionNM\SectionNM3D.cpp">
+      <Filter>Section\SectionNM</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2509,12 +2506,6 @@
     <ClInclude Include="..\..\..\Section\SectionNM\NM3D1.h">
       <Filter>Section\SectionNM</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Section\SectionNM\SectionNM3D.h">
-      <Filter>Section\SectionNM</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Section\SectionNM\SectionNM2D.h">
-      <Filter>Section\SectionNM</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Section\SectionNM\NM2D1.h">
       <Filter>Section\SectionNM</Filter>
     </ClInclude>
@@ -2527,13 +2518,7 @@
     <ClInclude Include="..\..\..\Section\SectionNM\SectionNM.h">
       <Filter>Section\SectionNM</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Section\SectionNM\NonlinearNM2D.h">
-      <Filter>Section\SectionNM</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Section\SectionNM\NM2D2.h">
-      <Filter>Section\SectionNM</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Section\SectionNM\NonlinearNM3D.h">
       <Filter>Section\SectionNM</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Element\Utility\B3DC.h">
@@ -2595,6 +2580,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Domain\NodeHelper.hpp">
       <Filter>Domain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionNM\NonlinearNM.h">
+      <Filter>Section\SectionNM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionNM\SectionNM2D.h">
+      <Filter>Section\SectionNM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionNM\SectionNM3D.h">
+      <Filter>Section\SectionNM</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
