@@ -20,35 +20,30 @@
 #include <Recorder/OutputType.h>
 #include <Toolbox/utility.h>
 
-double NonlinearNM::compute_h(double) const { return 0.; }
-
-double NonlinearNM::compute_dh(double) const { return 0.; }
-
 bool NonlinearNM::update_nodal_quantity(mat& jacobian, vec& residual, const double gm, const vec& q, const vec& b, const double alpha, const vec& trial_q, const vec& bn) const {
     jacobian = eye(j_size, j_size);
     residual = zeros(j_size);
 
     const vec s = q - b;
-    const auto f = compute_f(s);
-    const auto h = compute_h(alpha);
+    const auto f = compute_f(s, alpha);
 
-    if(gm <= datum::eps && f < h) return false;
+    if(gm <= datum::eps && f < 0.) return false;
 
-    const auto g = compute_df(s);
+    const auto g = compute_df(s, alpha);
     const double n = norm(g);
     const vec z = g / n;
 
     const vec ez = diagmat(elastic_diag) * z;
-    const mat gedz = gm / n * (diagmat(elastic_diag) - diagmat(elastic_diag) * z * z.t()) * compute_ddf(s);
+    const mat gedz = gm / n * (diagmat(elastic_diag) - diagmat(elastic_diag) * z * z.t()) * compute_ddf(s, alpha);
 
     residual(sa) = q - trial_q + gm * ez;
-    residual(sc).fill(f - h);
+    residual(sc).fill(f);
 
     jacobian(sa, sa) += gedz;
     jacobian(sa, sc) += ez;
 
     jacobian(sc, sa) = g.t();
-    jacobian(sc, sc).fill(-compute_dh(alpha));
+    jacobian(sc, sc).fill(compute_dh(s, alpha));
 
     if(has_kinematic) {
         residual(sb) = b - bn - kinematic_modulus * gm * ez;

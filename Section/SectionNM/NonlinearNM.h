@@ -49,12 +49,10 @@ class NonlinearNM : protected DataNonlinearNM, public SectionNM {
     const vec elastic_diag, border;
     const mat ti, tj, rabbit;
 
-    [[nodiscard]] virtual double compute_h(double) const;
-    [[nodiscard]] virtual double compute_dh(double) const;
-
-    [[nodiscard]] virtual double compute_f(const vec&) const = 0;
-    [[nodiscard]] virtual vec compute_df(const vec&) const = 0;
-    [[nodiscard]] virtual mat compute_ddf(const vec&) const = 0;
+    [[nodiscard]] virtual double compute_f(const vec&, double) const = 0;
+    [[nodiscard]] virtual double compute_dh(const vec&, double) const =0;
+    [[nodiscard]] virtual vec compute_df(const vec&, double) const = 0;
+    [[nodiscard]] virtual mat compute_ddf(const vec&, double) const = 0;
 
     bool update_nodal_quantity(mat&, vec&, double, const vec&, const vec&, double, const vec&, const vec&) const;
 

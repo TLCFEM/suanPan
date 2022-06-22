@@ -39,12 +39,10 @@ class NM3D2 final : public NonlinearNM {
     [[nodiscard]] double evaluate(double, double, double, const mat&) const;
     [[nodiscard]] static vec differentiate(const mat&, uword, uword);
 
-    [[nodiscard]] double compute_h(double) const override;
-    [[nodiscard]] double compute_dh(double) const override;
-
-    [[nodiscard]] double compute_f(const vec&) const override;
-    [[nodiscard]] vec compute_df(const vec&) const override;
-    [[nodiscard]] mat compute_ddf(const vec&) const override;
+    [[nodiscard]] double compute_f(const vec&, double) const override;
+    [[nodiscard]] double compute_dh(const vec&, double) const override;
+    [[nodiscard]] vec compute_df(const vec&, double) const override;
+    [[nodiscard]] mat compute_ddf(const vec&, double) const override;
 
 public:
     NM3D2(unsigned, // tag
