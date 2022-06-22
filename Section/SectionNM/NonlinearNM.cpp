@@ -233,23 +233,17 @@ int NonlinearNM::update_trial_status(const vec& t_deformation) {
         alphaj -= incre(sc(0) + j_size);
     }
 
-    auto consistent = [&] {
+    if(const mat right = [&] {
         const mat ra = solve(jacobian, rabbit);
         const vec rb = solve(jacobian, border);
         return (ra - rb * border.t() * ra / dot(rb, border)).eval();
-    };
-
-    if(SectionType::NM2D == section_type) {
+    }(); SectionType::NM2D == section_type) {
         trial_resistance = ti * qi + tj * qj;
-
-        const mat right = consistent();
 
         trial_stiffness = ti * right.rows(sa) + tj * right.rows(sa + j_size);
     }
     else {
         trial_resistance.head(5) = ti * qi + tj * qj;
-
-        const mat right = consistent();
 
         trial_stiffness(0, 0, size(5, 5)) = ti * right.rows(sa) + tj * right.rows(sa + j_size);
     }
