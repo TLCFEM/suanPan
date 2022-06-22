@@ -181,10 +181,10 @@ int NonlinearNM::update_trial_status(const vec& t_deformation) {
 
     vec betai(&trial_history(0), n_size, false, true);
     vec betaj(&trial_history(n_size), n_size, false, true);
-    auto& alphai = trial_history(2llu * n_size + 1);
-    auto& alphaj = trial_history(2llu * n_size + 2);
-    auto& flagi = trial_history(2llu * n_size + 3);
-    auto& flagj = trial_history(2llu * n_size + 4);
+    auto& alphai = trial_history(2llu * n_size);
+    auto& alphaj = trial_history(2llu * n_size + 1);
+    auto& flagi = trial_history(2llu * n_size + 2);
+    auto& flagj = trial_history(2llu * n_size + 3);
 
     vec qi = trial_resistance(si);
     vec qj = trial_resistance(sj);
@@ -236,7 +236,7 @@ int NonlinearNM::update_trial_status(const vec& t_deformation) {
     auto consistent = [&] {
         const mat ra = solve(jacobian, rabbit);
         const vec rb = solve(jacobian, border);
-        return ra - rb * border.t() * ra / dot(rb, border);
+        return (ra - rb * border.t() * ra / dot(rb, border)).eval();
     };
 
     if(SectionType::NM2D == section_type) {
