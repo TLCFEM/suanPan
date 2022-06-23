@@ -33,6 +33,7 @@
 
 struct DataNonlinearNM {
     const double EA, EIS, EIW, kinematic_modulus;
+    const vec yield_force;
 };
 
 class NonlinearNM : protected DataNonlinearNM, public SectionNM {
@@ -50,7 +51,7 @@ class NonlinearNM : protected DataNonlinearNM, public SectionNM {
     const mat ti, tj, rabbit;
 
     [[nodiscard]] virtual double compute_f(const vec&, double) const = 0;
-    [[nodiscard]] virtual double compute_dh(const vec&, double) const =0;
+    [[nodiscard]] virtual double compute_dh(const vec&, double) const = 0;
     [[nodiscard]] virtual vec compute_df(const vec&, double) const = 0;
     [[nodiscard]] virtual mat compute_ddf(const vec&, double) const = 0;
 
@@ -61,14 +62,16 @@ public:
                 double,   // axial rigidity
                 double,   // flexural rigidity
                 double,   // kinematic hardening modulus
-                double    // linear density
+                double,   // linear density
+                vec&&
     );
     NonlinearNM(unsigned, // tag
                 double,   // axial rigidity
                 double,   // flexural rigidity
                 double,   // flexural rigidity
                 double,   // kinematic hardening modulus
-                double    // linear density
+                double,   // linear density
+                vec&&
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

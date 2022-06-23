@@ -33,7 +33,6 @@
 
 class NM3D2 final : public NonlinearNM {
     const mat para_set;
-    const vec yield_force;
     const double c, h;
 
     [[nodiscard]] double evaluate(double, double, double, const mat&) const;

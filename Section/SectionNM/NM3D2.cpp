@@ -42,11 +42,11 @@ vec NM3D2::differentiate(const mat& weight, uword location, const uword order) {
 }
 
 double NM3D2::compute_f(const vec& s, const double alpha) const {
-    const vec iso_force = yield_force * std::max(datum::eps, 1. + h * alpha);
+    const auto iso_factor = std::max(datum::eps, 1. + h * alpha);
 
-    const auto p = s(0) / iso_force(0);
-    const auto ms = s(1) / iso_force(1);
-    const auto mw = s(2) / iso_force(2);
+    const auto p = s(0) / iso_factor;
+    const auto ms = s(1) / iso_factor;
+    const auto mw = s(2) / iso_factor;
 
     auto f = -c;
     for(auto I = 0llu; I < para_set.n_rows; ++I) f += evaluate(p, ms, mw, para_set.row(I));
@@ -56,39 +56,38 @@ double NM3D2::compute_f(const vec& s, const double alpha) const {
 
 double NM3D2::compute_dh(const vec& s, const double alpha) const {
     const auto iso_factor = std::max(datum::eps, 1. + h * alpha);
-    const vec iso_force = yield_force * iso_factor;
 
-    const auto p = s(0) / iso_force(0);
-    const auto ms = s(1) / iso_force(1);
-    const auto mw = s(2) / iso_force(2);
+    const auto p = s(0) / iso_factor;
+    const auto ms = s(1) / iso_factor;
+    const auto mw = s(2) / iso_factor;
 
     vec df(3, fill::zeros);
 
     for(auto I = 0llu; I < para_set.n_rows; ++I) for(auto J = 0llu; J < df.n_elem; ++J) df(J) += evaluate(p, ms, mw, differentiate(para_set.row(I), J, 1));
 
-    return dot(df, -h * pow(iso_factor, -2.) * s / yield_force);
+    return -h * pow(iso_factor, -2.) * dot(df, s);
 }
 
 vec NM3D2::compute_df(const vec& s, const double alpha) const {
-    const vec iso_force = yield_force * std::max(datum::eps, 1. + h * alpha);
+    const auto iso_factor = std::max(datum::eps, 1. + h * alpha);
 
-    const auto p = s(0) / iso_force(0);
-    const auto ms = s(1) / iso_force(1);
-    const auto mw = s(2) / iso_force(2);
+    const auto p = s(0) / iso_factor;
+    const auto ms = s(1) / iso_factor;
+    const auto mw = s(2) / iso_factor;
 
     vec df(3, fill::zeros);
 
     for(auto I = 0llu; I < para_set.n_rows; ++I) for(auto J = 0llu; J < df.n_elem; ++J) df(J) += evaluate(p, ms, mw, differentiate(para_set.row(I), J, 1));
 
-    return df / iso_force;
+    return df / iso_factor;
 }
 
 mat NM3D2::compute_ddf(const vec& s, const double alpha) const {
-    const vec iso_force = yield_force * std::max(datum::eps, 1. + h * alpha);
+    const auto iso_factor = std::max(datum::eps, 1. + h * alpha);
 
-    const auto p = s(0) / iso_force(0);
-    const auto ms = s(1) / iso_force(1);
-    const auto mw = s(2) / iso_force(2);
+    const auto p = s(0) / iso_factor;
+    const auto ms = s(1) / iso_factor;
+    const auto mw = s(2) / iso_factor;
 
     mat ddf(3, 3, fill::zeros);
 
@@ -98,13 +97,12 @@ mat NM3D2::compute_ddf(const vec& s, const double alpha) const {
             for(auto K = 0llu; K < ddf.n_cols; ++K) ddf(J, K) += evaluate(p, ms, mw, differentiate(dfj, K, 1));
         }
 
-    return ddf / (iso_force * iso_force.t());
+    return ddf * pow(iso_factor, -2.);
 }
 
 NM3D2::NM3D2(const unsigned T, const double EEA, const double EEIS, const double EEIW, const double NP, const double MSP, const double MWP, const double CC, const double HH, const double KK, const double LD, mat&& PS)
-    : NonlinearNM(T, EEA, EEIS, EEIW, KK, LD)
+    : NonlinearNM(T, EEA, EEIS, EEIW, KK, LD, vec{NP, MSP, MWP})
     , para_set(PS.empty() ? mat{{1.15, 2., 0., 0.}, {1., 0., 2., 0.}, {1., 0., 0., 4.}, {3.67, 2., 2., 0.}, {3., 6., 0., 2.}, {4.65, 0., 4., 2.}} : std::forward<mat>(PS))
-    , yield_force{NP, MSP, MWP}
     , c(CC)
     , h(HH) {}
 

@@ -33,26 +33,25 @@ bool NonlinearNM::update_nodal_quantity(mat& jacobian, vec& residual, const doub
     const double n = norm(g);
     const vec z = g / n;
 
-    const vec ez = diagmat(elastic_diag) * z;
-    const mat gedz = gm / n * (diagmat(elastic_diag) - diagmat(elastic_diag) * z * z.t()) * compute_ddf(s, alpha);
+    const mat gdz = gm / n * (eye(n_size, n_size) - z * z.t()) * compute_ddf(s, alpha);
 
-    residual(sa) = q - trial_q + gm * ez;
+    residual(sa) = q - trial_q + gm * z;
     residual(sc).fill(f);
 
-    jacobian(sa, sa) += gedz;
-    jacobian(sa, sc) += ez;
+    jacobian(sa, sa) += gdz;
+    jacobian(sa, sc) += z;
 
     jacobian(sc, sa) = g.t();
     jacobian(sc, sc).fill(compute_dh(s, alpha));
 
     if(has_kinematic) {
-        residual(sb) = b - bn - kinematic_modulus * gm * ez;
+        residual(sb) = b - bn - kinematic_modulus * gm * z;
 
-        jacobian(sa, sb) -= gedz;
+        jacobian(sa, sb) -= gdz;
 
-        jacobian(sb, sa) -= kinematic_modulus * gedz;
-        jacobian(sb, sb) += kinematic_modulus * gedz;
-        jacobian(sb, sc) -= kinematic_modulus * ez;
+        jacobian(sb, sa) -= kinematic_modulus * gdz;
+        jacobian(sb, sb) += kinematic_modulus * gdz;
+        jacobian(sb, sc) -= kinematic_modulus * z;
 
         jacobian(sc, sb) = -g.t();
     }
@@ -60,8 +59,8 @@ bool NonlinearNM::update_nodal_quantity(mat& jacobian, vec& residual, const doub
     return true;
 }
 
-NonlinearNM::NonlinearNM(const unsigned T, const double EEA, const double EEIS, const double KK, const double LD)
-    : DataNonlinearNM{EEA, EEIS, 0., KK}
+NonlinearNM::NonlinearNM(const unsigned T, const double EEA, const double EEIS, const double KK, const double LD, vec&& YF)
+    : DataNonlinearNM{EEA, EEIS, 0., KK, std::forward<vec>(YF)}
     , SectionNM(T, SectionType::NM2D)
     , has_kinematic(!suanpan::approx_equal(kinematic_modulus, 0.))
     , si{0, 1}
@@ -96,14 +95,14 @@ NonlinearNM::NonlinearNM(const unsigned T, const double EEA, const double EEIS, 
 
         mat left(g_size, 3, fill::zeros);
 
-        left.rows(sa) = diagmat(elastic_diag) * ti.t() * scale;
-        left.rows(sa + j_size) = diagmat(elastic_diag) * tj.t() * scale;
+        left.rows(sa) = diagmat(elastic_diag / yield_force) * ti.t() * scale;
+        left.rows(sa + j_size) = diagmat(elastic_diag / yield_force) * tj.t() * scale;
 
         return left;
     }()) { access::rw(linear_density) = LD; }
 
-NonlinearNM::NonlinearNM(const unsigned T, const double EEA, const double EEIS, const double EEIW, const double KK, const double LD)
-    : DataNonlinearNM{EEA, EEIS, EEIW, KK}
+NonlinearNM::NonlinearNM(const unsigned T, const double EEA, const double EEIS, const double EEIW, const double KK, const double LD, vec&& YF)
+    : DataNonlinearNM{EEA, EEIS, EEIW, KK, std::forward<vec>(YF)}
     , SectionNM(T, SectionType::NM3D)
     , has_kinematic(!suanpan::approx_equal(kinematic_modulus, 0.))
     , si{0, 1, 3}
@@ -138,8 +137,8 @@ NonlinearNM::NonlinearNM(const unsigned T, const double EEA, const double EEIS, 
 
         mat left(g_size, 5, fill::zeros);
 
-        left.rows(sa) = diagmat(elastic_diag) * ti.t() * scale;
-        left.rows(sa + j_size) = diagmat(elastic_diag) * tj.t() * scale;
+        left.rows(sa) = diagmat(elastic_diag / yield_force) * ti.t() * scale;
+        left.rows(sa + j_size) = diagmat(elastic_diag / yield_force) * tj.t() * scale;
 
         return left;
     }()) { access::rw(linear_density) = LD; }
@@ -173,8 +172,6 @@ int NonlinearNM::update_trial_status(const vec& t_deformation) {
 
     if(norm(incre_deformation) <= datum::eps) return SUANPAN_SUCCESS;
 
-    trial_resistance = current_resistance + (trial_stiffness = initial_stiffness) * incre_deformation;
-
     trial_history = current_history;
     const vec current_betai(&current_history(0), n_size, false, true);
     const vec current_betaj(&current_history(n_size), n_size, false, true);
@@ -186,8 +183,13 @@ int NonlinearNM::update_trial_status(const vec& t_deformation) {
     auto& flagi = trial_history(2llu * n_size + 2);
     auto& flagj = trial_history(2llu * n_size + 3);
 
-    vec qi = trial_resistance(si);
-    vec qj = trial_resistance(sj);
+    trial_resistance = current_resistance + initial_stiffness * incre_deformation;
+
+    const vec trial_qi = trial_resistance(si) / yield_force;
+    const vec trial_qj = trial_resistance(sj) / yield_force;
+
+    vec qi = trial_qi;
+    vec qj = trial_qj;
 
     mat jacobian(g_size, g_size, fill::zeros);
     vec residual(g_size), gamma(2, fill::zeros);
@@ -203,17 +205,15 @@ int NonlinearNM::update_trial_status(const vec& t_deformation) {
         mat t_jacobian;
         vec t_residual;
 
-        if(update_nodal_quantity(t_jacobian, t_residual, gamma(0), qi, betai, alphai, trial_resistance(si), current_betai)) flagi = 1.;
+        if(update_nodal_quantity(t_jacobian, t_residual, gamma(0), qi, betai, alphai, trial_qi, current_betai)) flagi = 1.;
         jacobian(0, 0, size(j_size, j_size)) = t_jacobian;
         residual.head(j_size) = t_residual;
 
-        if(update_nodal_quantity(t_jacobian, t_residual, gamma(1), qj, betaj, alphaj, trial_resistance(sj), current_betaj)) flagj = 1.;
+        if(update_nodal_quantity(t_jacobian, t_residual, gamma(1), qj, betaj, alphaj, trial_qj, current_betaj)) flagj = 1.;
         jacobian(j_size, j_size, size(j_size, j_size)) = t_jacobian;
         residual.tail(j_size) = t_residual;
 
-        const vec ra = solve(jacobian, residual);
-        const vec rb = solve(jacobian, border);
-
+        const vec ra = solve(jacobian, residual), rb = solve(jacobian, border);
         const vec incre = ra - dot(border, ra) / dot(border, rb) * rb;
 
         auto error = norm(residual);
@@ -236,16 +236,16 @@ int NonlinearNM::update_trial_status(const vec& t_deformation) {
     if(const mat right = [&] {
         const mat ra = solve(jacobian, rabbit);
         const vec rb = solve(jacobian, border);
-        return (ra - rb * border.t() * ra / dot(rb, border)).eval();
+        return mat(ra - rb * border.t() * ra / dot(rb, border));
     }(); SectionType::NM2D == section_type) {
-        trial_resistance = ti * qi + tj * qj;
+        trial_resistance = ti * (yield_force % qi) + tj * (yield_force % qj);
 
-        trial_stiffness = ti * right.rows(sa) + tj * right.rows(sa + j_size);
+        trial_stiffness = ti * diagmat(yield_force) * right.rows(sa) + tj * diagmat(yield_force) * right.rows(sa + j_size);
     }
     else {
-        trial_resistance.head(5) = ti * qi + tj * qj;
+        trial_resistance.head(5) = ti * (yield_force % qi) + tj * (yield_force % qj);
 
-        trial_stiffness(0, 0, size(5, 5)) = ti * right.rows(sa) + tj * right.rows(sa + j_size);
+        trial_stiffness(0, 0, size(5, 5)) = ti * diagmat(yield_force) * right.rows(sa) + tj * diagmat(yield_force) * right.rows(sa + j_size);
     }
 
     return SUANPAN_SUCCESS;
