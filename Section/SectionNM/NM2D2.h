@@ -29,22 +29,19 @@
 #ifndef NM2D2_H
 #define NM2D2_H
 
-#include "NonlinearNM2D.h"
+#include "NonlinearNM.h"
 
-class NM2D2 final : public NonlinearNM2D {
+class NM2D2 final : public NonlinearNM {
     const mat para_set;
-    const vec yield_force;
-    const double c, h, k;
+    const double c, h;
 
     [[nodiscard]] double evaluate(double, double, const mat&) const;
     [[nodiscard]] static vec differentiate(const mat&, uword, uword);
 
-    [[nodiscard]] double compute_h(double) const override;
-    [[nodiscard]] double compute_dh(double) const override;
-
-    [[nodiscard]] double compute_f(const vec&) const override;
-    [[nodiscard]] vec compute_df(const vec&) const override;
-    [[nodiscard]] mat compute_ddf(const vec&) const override;
+    [[nodiscard]] double compute_f(const vec&, double) const override;
+    [[nodiscard]] double compute_dh(const vec&, double) const override;
+    [[nodiscard]] vec compute_df(const vec&, double) const override;
+    [[nodiscard]] mat compute_ddf(const vec&, double) const override;
 
 public:
     NM2D2(unsigned, // tag
@@ -57,8 +54,6 @@ public:
           double,   // k
           double,   // linear density
           mat&& = {});
-
-    int initialize(const shared_ptr<DomainBase>&) override;
 
     unique_ptr<Section> get_copy() override;
 

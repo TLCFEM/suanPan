@@ -40,34 +40,49 @@ vec NM2D2::differentiate(const mat& weight, uword location, const uword order) {
     return weight_out;
 }
 
-double NM2D2::compute_h(const double alpha) const { return std::max(0., c + h * alpha); }
+double NM2D2::compute_f(const vec& s, const double alpha) const {
+    const auto iso_factor = std::max(datum::eps, 1. + h * alpha);
 
-double NM2D2::compute_dh(const double alpha) const { return (c + h * alpha > 0.) * h; }
+    const auto p = s(0) / iso_factor;
+    const auto ms = s(1) / iso_factor;
 
-double NM2D2::compute_f(const vec& s) const {
-    const auto p = s(0) / yield_force(0);
-    const auto ms = s(1) / yield_force(1);
-
-    auto f = 0.;
+    auto f = -c;
     for(auto I = 0llu; I < para_set.n_rows; ++I) f += evaluate(p, ms, para_set.row(I));
 
     return f;
 }
 
-vec NM2D2::compute_df(const vec& s) const {
-    const auto p = s(0) / yield_force(0);
-    const auto ms = s(1) / yield_force(1);
+double NM2D2::compute_dh(const vec& s, const double alpha) const {
+    const auto iso_factor = std::max(datum::eps, 1. + h * alpha);
+
+    const auto p = s(0) / iso_factor;
+    const auto ms = s(1) / iso_factor;
 
     vec df(2, fill::zeros);
 
     for(auto I = 0llu; I < para_set.n_rows; ++I) for(auto J = 0llu; J < df.n_elem; ++J) df(J) += evaluate(p, ms, differentiate(para_set.row(I), J, 1));
 
-    return df / yield_force;
+    return -h * pow(iso_factor, -2.) * dot(df, s);
 }
 
-mat NM2D2::compute_ddf(const vec& s) const {
-    const auto p = s(0) / yield_force(0);
-    const auto ms = s(1) / yield_force(1);
+vec NM2D2::compute_df(const vec& s, const double alpha) const {
+    const auto iso_factor = std::max(datum::eps, 1. + h * alpha);
+
+    const auto p = s(0) / iso_factor;
+    const auto ms = s(1) / iso_factor;
+
+    vec df(2, fill::zeros);
+
+    for(auto I = 0llu; I < para_set.n_rows; ++I) for(auto J = 0llu; J < df.n_elem; ++J) df(J) += evaluate(p, ms, differentiate(para_set.row(I), J, 1));
+
+    return df / iso_factor;
+}
+
+mat NM2D2::compute_ddf(const vec& s, const double alpha) const {
+    const auto iso_factor = std::max(datum::eps, 1. + h * alpha);
+
+    const auto p = s(0) / iso_factor;
+    const auto ms = s(1) / iso_factor;
 
     mat ddf(2, 2, fill::zeros);
 
@@ -77,24 +92,14 @@ mat NM2D2::compute_ddf(const vec& s) const {
             for(auto K = 0llu; K < ddf.n_cols; ++K) ddf(J, K) += evaluate(p, ms, differentiate(dfj, K, 1));
         }
 
-    return ddf / (yield_force * yield_force.t());
+    return ddf * pow(iso_factor, -2.);
 }
 
 NM2D2::NM2D2(const unsigned T, const double EEA, const double EEIS, const double NP, const double MSP, const double CC, const double HH, const double KK, const double LD, mat&& PS)
-    : NonlinearNM2D(T, EEA, EEIS, KK, LD)
+    : NonlinearNM(T, EEA, EEIS, KK, LD, vec{NP, MSP})
     , para_set(PS.empty() ? mat{{1.15, 2., 0.}, {1., 0., 2.}, {3.67, 2., 2.}} : std::forward<mat>(PS))
-    , yield_force{NP, MSP}
     , c(CC)
-    , h(HH)
-    , k(KK) {}
-
-int NM2D2::initialize(const shared_ptr<DomainBase>& D) {
-    if(SUANPAN_SUCCESS != NonlinearNM2D::initialize(D)) return SUANPAN_FAIL;
-
-    initialize_weight(yield_force, k);
-
-    return SUANPAN_SUCCESS;
-}
+    , h(HH) {}
 
 unique_ptr<Section> NM2D2::get_copy() { return make_unique<NM2D2>(*this); }
 
