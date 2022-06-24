@@ -144,21 +144,18 @@ NonlinearNM::NonlinearNM(const unsigned T, const double EEA, const double EEIS, 
     }()) { access::rw(linear_density) = LD; }
 
 int NonlinearNM::initialize(const shared_ptr<DomainBase>&) {
-    if(SectionType::NM2D == section_type) {
-        initial_stiffness.zeros(3, 3);
-
-        initial_stiffness(1, 1) = initial_stiffness(2, 2) = 2. * (initial_stiffness(1, 2) = initial_stiffness(2, 1) = 2. * EIS);
-    }
+    if(SectionType::NM2D == section_type) initial_stiffness.zeros(3, 3);
     else {
         initial_stiffness.zeros(6, 6);
 
         initial_stiffness(5, 5) = 1E3 * EA;
 
-        initial_stiffness(1, 1) = initial_stiffness(2, 2) = 2. * (initial_stiffness(1, 2) = initial_stiffness(2, 1) = 2. * EIS);
         initial_stiffness(3, 3) = initial_stiffness(4, 4) = 2. * (initial_stiffness(3, 4) = initial_stiffness(4, 3) = 2. * EIW);
     }
 
     initial_stiffness(0, 0) = EA;
+
+    initial_stiffness(1, 1) = initial_stiffness(2, 2) = 2. * (initial_stiffness(1, 2) = initial_stiffness(2, 1) = 2. * EIS);
 
     trial_stiffness = current_stiffness = initial_stiffness;
 
