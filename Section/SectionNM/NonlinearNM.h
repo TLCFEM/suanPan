@@ -32,36 +32,44 @@
 #include "SectionNM.h"
 
 struct DataNonlinearNM {
-    const double EA, EIS, EIW, kinematic_modulus;
+    const double EA, EIS, EIW;
     const vec yield_force;
 };
 
 class NonlinearNM : protected DataNonlinearNM, public SectionNM {
     static constexpr unsigned max_iteration = 20;
 
+    const uvec si, sj;
+
+    const vec elastic_diag;
+    const mat ti, tj;
+
+    virtual bool update_nodal_quantity(mat&, vec&, double, const vec&, const vec&, double, const vec&, const vec&) const = 0;
+
+protected:
     const bool has_kinematic;
 
-    const uvec si, sj, sa, sb, sc;
+    const uvec sa, sb, sc;
 
     const unsigned n_size; // nodal dof size
     const unsigned j_size; // jacobian size
     const unsigned g_size = 2 * j_size;
 
-    const vec elastic_diag, border;
-    const mat ti, tj, rabbit;
+    const vec border;
+    const mat rabbit;
+
+    [[nodiscard]] virtual double compute_h(double) const = 0;
+    [[nodiscard]] virtual double compute_dh(double) const = 0;
 
     [[nodiscard]] virtual double compute_f(const vec&, double) const = 0;
-    [[nodiscard]] virtual double compute_dh(const vec&, double) const = 0;
     [[nodiscard]] virtual vec compute_df(const vec&, double) const = 0;
     [[nodiscard]] virtual mat compute_ddf(const vec&, double) const = 0;
-
-    bool update_nodal_quantity(mat&, vec&, double, const vec&, const vec&, double, const vec&, const vec&) const;
 
 public:
     NonlinearNM(unsigned, // tag
                 double,   // axial rigidity
                 double,   // flexural rigidity
-                double,   // kinematic hardening modulus
+                bool,     // kinematic hardening modulus
                 double,   // linear density
                 vec&&
     );
@@ -69,7 +77,7 @@ public:
                 double,   // axial rigidity
                 double,   // flexural rigidity
                 double,   // flexural rigidity
-                double,   // kinematic hardening modulus
+                bool,     // kinematic hardening modulus
                 double,   // linear density
                 vec&&
     );

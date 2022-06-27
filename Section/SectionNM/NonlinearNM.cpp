@@ -18,64 +18,13 @@
 // ReSharper disable IdentifierTypo
 #include "NonlinearNM.h"
 #include <Recorder/OutputType.h>
-#include <Toolbox/utility.h>
 
-bool NonlinearNM::update_nodal_quantity(mat& jacobian, vec& residual, const double gm, const vec& q, const vec& b, const double alpha, const vec& trial_q, const vec& bn) const {
-    jacobian = eye(j_size, j_size);
-    residual = zeros(j_size);
-
-    const vec s = q - b;
-    const auto f = compute_f(s, alpha);
-
-    if(gm <= datum::eps && f < 0.) return false;
-
-    const auto g = compute_df(s, alpha);
-    const double n = norm(g);
-    const vec z = g / n;
-
-    const mat gdz = gm / n * (eye(n_size, n_size) - z * z.t()) * compute_ddf(s, alpha);
-
-    residual(sa) = q - trial_q + gm * z;
-    residual(sc).fill(f);
-
-    jacobian(sa, sa) += gdz;
-    jacobian(sa, sc) += z;
-
-    jacobian(sc, sa) = g.t();
-    jacobian(sc, sc).fill(compute_dh(s, alpha));
-
-    if(has_kinematic) {
-        residual(sb) = b - bn - kinematic_modulus * gm * z;
-
-        jacobian(sa, sb) -= gdz;
-
-        jacobian(sb, sa) -= kinematic_modulus * gdz;
-        jacobian(sb, sb) += kinematic_modulus * gdz;
-        jacobian(sb, sc) -= kinematic_modulus * z;
-
-        jacobian(sc, sb) = -g.t();
-    }
-
-    return true;
-}
-
-NonlinearNM::NonlinearNM(const unsigned T, const double EEA, const double EEIS, const double KK, const double LD, vec&& YF)
-    : DataNonlinearNM{EEA, EEIS, 0., KK, std::forward<vec>(YF)}
+NonlinearNM::NonlinearNM(const unsigned T, const double EEA, const double EEIS, const bool KK, const double LD, vec&& YF)
+    : DataNonlinearNM{EEA, EEIS, 0., std::forward<vec>(YF)}
     , SectionNM(T, SectionType::NM2D)
-    , has_kinematic(!suanpan::approx_equal(kinematic_modulus, 0.))
     , si{0, 1}
     , sj{0, 2}
-    , sa{0, 1}
-    , sb{2, 3}
-    , sc{has_kinematic ? 4u : 2u}
-    , n_size(2)
-    , j_size(has_kinematic ? 5 : 3)
     , elastic_diag{EA, EIS}
-    , border([&] {
-        mat t_border = zeros(g_size);
-        t_border(j_size) = -(t_border(0) = 1.);
-        return t_border;
-    }())
     , ti([] {
         mat transi(3, 2, fill::zeros);
         transi(0, 0) = .5;
@@ -87,6 +36,17 @@ NonlinearNM::NonlinearNM(const unsigned T, const double EEA, const double EEIS, 
         transj(0, 0) = .5;
         transj(2, 1) = 1.;
         return transj;
+    }())
+    , has_kinematic(KK)
+    , sa{0, 1}
+    , sb{2, 3}
+    , sc{has_kinematic ? 4u : 2u}
+    , n_size(2)
+    , j_size(has_kinematic ? 5 : 3)
+    , border([&] {
+        mat t_border = zeros(g_size);
+        t_border(j_size) = -(t_border(0) = 1.);
+        return t_border;
     }())
     , rabbit([&] {
         mat scale(3, 3, fill::zeros);
@@ -101,23 +61,12 @@ NonlinearNM::NonlinearNM(const unsigned T, const double EEA, const double EEIS, 
         return left;
     }()) { access::rw(linear_density) = LD; }
 
-NonlinearNM::NonlinearNM(const unsigned T, const double EEA, const double EEIS, const double EEIW, const double KK, const double LD, vec&& YF)
-    : DataNonlinearNM{EEA, EEIS, EEIW, KK, std::forward<vec>(YF)}
+NonlinearNM::NonlinearNM(const unsigned T, const double EEA, const double EEIS, const double EEIW, const bool KK, const double LD, vec&& YF)
+    : DataNonlinearNM{EEA, EEIS, EEIW, std::forward<vec>(YF)}
     , SectionNM(T, SectionType::NM3D)
-    , has_kinematic(!suanpan::approx_equal(kinematic_modulus, 0.))
     , si{0, 1, 3}
     , sj{0, 2, 4}
-    , sa{0, 1, 2}
-    , sb{3, 4, 5}
-    , sc{has_kinematic ? 6u : 3u}
-    , n_size(3)
-    , j_size(has_kinematic ? 7 : 4)
     , elastic_diag{EA, EIS, EIW}
-    , border([&] {
-        mat t_border = zeros(g_size);
-        t_border(j_size) = -(t_border(0) = 1.);
-        return t_border;
-    }())
     , ti([] {
         mat transi(5, 3, fill::zeros);
         transi(0, 0) = .5;
@@ -129,6 +78,17 @@ NonlinearNM::NonlinearNM(const unsigned T, const double EEA, const double EEIS, 
         transj(0, 0) = .5;
         transj(2, 1) = transj(4, 2) = 1.;
         return transj;
+    }())
+    , has_kinematic(KK)
+    , sa{0, 1, 2}
+    , sb{3, 4, 5}
+    , sc{has_kinematic ? 6u : 3u}
+    , n_size(3)
+    , j_size(has_kinematic ? 7 : 4)
+    , border([&] {
+        mat t_border = zeros(g_size);
+        t_border(j_size) = -(t_border(0) = 1.);
+        return t_border;
     }())
     , rabbit([&] {
         mat scale(5, 5, fill::zeros);

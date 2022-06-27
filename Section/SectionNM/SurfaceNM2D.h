@@ -15,44 +15,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class NM2D2
- * @brief A NM2D2 class.
+ * @class SurfaceNM2D
+ * @brief A SurfaceNM2D class.
  * @author tlc
- * @date 30/11/2021
+ * @date 22/06/2022
  * @version 0.1.0
- * @file NM2D2.h
+ * @file SurfaceNM2D.h
  * @addtogroup Section-NM
  * @ingroup Section
  * @{
  */
 
-#ifndef NM2D2_H
-#define NM2D2_H
+#ifndef SURFACENM2D_H
+#define SURFACENM2D_H
 
-#include "SurfaceNM2D.h"
-#include "LinearHardeningNM.h"
+#include <suanPan.h>
 
-class NM2D2 final : protected SurfaceNM2D, public LinearHardeningNM {
+class SurfaceNM2D {
+    const mat para_set;
+    const double c;
+
+    [[nodiscard]] double evaluate(double, double, const mat&) const;
+    [[nodiscard]] static vec differentiate(const mat&, uword, uword);
+
 protected:
-    [[nodiscard]] double compute_f(const vec&, double) const override;
-    [[nodiscard]] vec compute_df(const vec&, double) const override;
-    [[nodiscard]] mat compute_ddf(const vec&, double) const override;
+    [[nodiscard]] double compute_sf(const vec&, double) const;
+    [[nodiscard]] vec compute_dsf(const vec&, double) const;
+    [[nodiscard]] mat compute_ddsf(const vec&, double) const;
 
 public:
-    NM2D2(unsigned, // tag
-          double,   // EA
-          double,   // EIS
-          double,   // NP
-          double,   // MP
-          double,   // c
-          double,   // h
-          double,   // k
-          double,   // linear density
-          mat&& = {});
-
-    unique_ptr<Section> get_copy() override;
-
-    void print() override;
+    explicit SurfaceNM2D(double, // c
+                         mat&& = {});
 };
 
 #endif

@@ -34,6 +34,8 @@ analyze
 # 2.0000 0
 # Displacement:
 # 0 0.3000 0.2250
+# Resistance:
+# 0 5.7190e+01 -3.5527e-15
 peek node 1 2
 
 peek element 1

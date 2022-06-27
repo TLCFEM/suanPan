@@ -424,6 +424,7 @@
     <ClCompile Include="..\..\..\Section\Section3D\Rectangle3D.cpp" />
     <ClCompile Include="..\..\..\Section\Section3D\Section3D.cpp" />
     <ClCompile Include="..\..\..\Section\Section3D\TSection3D.cpp" />
+    <ClCompile Include="..\..\..\Section\SectionNM\LinearHardeningNM.cpp" />
     <ClCompile Include="..\..\..\Section\SectionNM\NM2D1.cpp" />
     <ClCompile Include="..\..\..\Section\SectionNM\NM2D2.cpp" />
     <ClCompile Include="..\..\..\Section\SectionNM\NonlinearNM.cpp" />
@@ -432,6 +433,8 @@
     <ClCompile Include="..\..\..\Section\SectionNM\SectionNM.cpp" />
     <ClCompile Include="..\..\..\Section\SectionNM\SectionNM2D.cpp" />
     <ClCompile Include="..\..\..\Section\SectionNM\SectionNM3D.cpp" />
+    <ClCompile Include="..\..\..\Section\SectionNM\SurfaceNM2D.cpp" />
+    <ClCompile Include="..\..\..\Section\SectionNM\SurfaceNM3D.cpp" />
     <ClCompile Include="..\..\..\Section\SectionParser.cpp" />
     <ClCompile Include="..\..\..\Section\SectionShell\Homogeneous.cpp" />
     <ClCompile Include="..\..\..\Section\SectionShell\SectionShell.cpp" />
@@ -839,6 +842,7 @@
     <ClInclude Include="..\..\..\Section\Section3D\Rectangle3D.h" />
     <ClInclude Include="..\..\..\Section\Section3D\Section3D.h" />
     <ClInclude Include="..\..\..\Section\Section3D\TSection3D.h" />
+    <ClInclude Include="..\..\..\Section\SectionNM\LinearHardeningNM.h" />
     <ClInclude Include="..\..\..\Section\SectionNM\NM2D1.h" />
     <ClInclude Include="..\..\..\Section\SectionNM\NM2D2.h" />
     <ClInclude Include="..\..\..\Section\SectionNM\NonlinearNM.h" />
@@ -847,6 +851,8 @@
     <ClInclude Include="..\..\..\Section\SectionNM\SectionNM.h" />
     <ClInclude Include="..\..\..\Section\SectionNM\SectionNM2D.h" />
     <ClInclude Include="..\..\..\Section\SectionNM\SectionNM3D.h" />
+    <ClInclude Include="..\..\..\Section\SectionNM\SurfaceNM2D.h" />
+    <ClInclude Include="..\..\..\Section\SectionNM\SurfaceNM3D.h" />
     <ClInclude Include="..\..\..\Section\SectionParser.h" />
     <ClInclude Include="..\..\..\Section\SectionShell\Homogeneous.h" />
     <ClInclude Include="..\..\..\Section\SectionShell\SectionShell.h" />

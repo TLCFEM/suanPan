@@ -29,17 +29,12 @@
 #ifndef NM3D2_H
 #define NM3D2_H
 
-#include "NonlinearNM.h"
+#include "SurfaceNM3D.h"
+#include "LinearHardeningNM.h"
 
-class NM3D2 final : public NonlinearNM {
-    const mat para_set;
-    const double c, h;
-
-    [[nodiscard]] double evaluate(double, double, double, const mat&) const;
-    [[nodiscard]] static vec differentiate(const mat&, uword, uword);
-
+class NM3D2 final : protected SurfaceNM3D, public LinearHardeningNM {
+protected:
     [[nodiscard]] double compute_f(const vec&, double) const override;
-    [[nodiscard]] double compute_dh(const vec&, double) const override;
     [[nodiscard]] vec compute_df(const vec&, double) const override;
     [[nodiscard]] mat compute_ddf(const vec&, double) const override;
 

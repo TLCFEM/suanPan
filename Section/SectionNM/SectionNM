@@ -2,6 +2,7 @@
 #include "SectionNM2D.h"
 #include "SectionNM3D.h"
 #include "NonlinearNM.h"
+#include "LinearHardeningNM.h"
 
 #include "NM2D1.h"
 #include "NM2D2.h"
