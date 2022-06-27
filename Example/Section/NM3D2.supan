@@ -19,7 +19,7 @@ recorder 2 hdf5 Element S 1
 recorder 3 hdf5 Element PE 1
 
 step static 1
-set ini_step_size 1E-1
+set ini_step_size 1E-2
 set fixed_step_size true
 
 converger RelIncreDisp 1 1E-12 20 1

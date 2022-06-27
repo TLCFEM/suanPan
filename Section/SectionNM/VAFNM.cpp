@@ -31,17 +31,19 @@ bool VAFNM::update_nodal_quantity(mat& jacobian, vec& residual, const double gm,
     const auto g = compute_df(s, h);
     const double n = norm(g);
     const vec z = g / n;
+    const auto dh = -compute_dh(alpha) / h;
 
     const mat gdz = gm / n * (eye(n_size, n_size) - z * z.t()) * compute_ddf(s, h);
+    const vec gdzdh = gdz * s * dh;
 
     residual(sa) = q - trial_q + gm * z;
     residual(sc).fill(f);
 
     jacobian(sa, sa) += gdz;
-    jacobian(sa, sc) += z;
+    jacobian(sa, sc) += z + gdzdh;
 
     jacobian(sc, sa) = g.t();
-    jacobian(sc, sc).fill(-compute_dh(alpha) / h * dot(g, s));
+    jacobian(sc, sc).fill(dh * dot(g, s));
 
     if(has_kinematic) {
         jacobian(sa, sb) -= gdz;
@@ -51,7 +53,7 @@ bool VAFNM::update_nodal_quantity(mat& jacobian, vec& residual, const double gm,
 
         jacobian(sb, sa) -= kin_modulus * gdz;
         jacobian(sb, sb) += kin_modulus * gdz + kin_base * gm * eye(n_size, n_size);
-        jacobian(sb, sc) += kin_base * b - kin_modulus * z;
+        jacobian(sb, sc) += kin_base * b - kin_modulus * (z + gdzdh);
     }
 
     return true;
