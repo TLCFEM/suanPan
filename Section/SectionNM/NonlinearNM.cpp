@@ -155,7 +155,7 @@ int NonlinearNM::update_trial_status(const vec& t_deformation) {
     auto ref_error = 1.;
     while(true) {
         if(max_iteration == ++counter) {
-            suanpan_error("NonlinearNM2D cannot converge within %u iterations.\n", max_iteration);
+            suanpan_error("NonlinearNM cannot converge within %u iterations.\n", max_iteration);
             return SUANPAN_FAIL;
         }
 
@@ -175,7 +175,7 @@ int NonlinearNM::update_trial_status(const vec& t_deformation) {
 
         auto error = norm(residual);
         if(1 == counter) ref_error = std::max(1., error);
-        suanpan_debug("NonlinearNM2D local iteration error: %.5E.\n", error /= ref_error);
+        suanpan_debug("NonlinearNM local iteration error: %.5E.\n", error /= ref_error);
         if(error <= tolerance && norm(incre) <= tolerance) break;
 
         qi -= incre(sa);

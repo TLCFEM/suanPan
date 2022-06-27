@@ -44,15 +44,14 @@ bool LinearHardeningNM::update_nodal_quantity(mat& jacobian, vec& residual, cons
     jacobian(sc, sc).fill(-compute_dh(alpha) / h * dot(g, s));
 
     if(has_kinematic) {
-        residual(sb) = b - bn - kinematic_modulus * gm * z;
-
         jacobian(sa, sb) -= gdz;
+        jacobian(sc, sb) = -g.t();
+
+        residual(sb) = b - bn - kinematic_modulus * gm * z;
 
         jacobian(sb, sa) -= kinematic_modulus * gdz;
         jacobian(sb, sb) += kinematic_modulus * gdz;
         jacobian(sb, sc) -= kinematic_modulus * z;
-
-        jacobian(sc, sb) = -g.t();
     }
 
     return true;
