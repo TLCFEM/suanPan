@@ -710,6 +710,8 @@
       "kind":"type",
       "details":"N-M Interaction Elastic Section"
     },
+    "NM2D3",
+    "NM3D3",
     "1000WB215",
     "1000WB258",
     "1000WB296",

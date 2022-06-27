@@ -757,7 +757,7 @@ void new_nm3d(unique_ptr<Section>& return_obj, istringstream& command, const uns
         return;
     }
 
-    vec P(10);
+    vec P(size);
     for(auto& I : P)
         if(!get_input(command, I)) {
             suanpan_error("new_nm3d() requires a valid parameter.\n");
