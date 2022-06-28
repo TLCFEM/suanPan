@@ -34,13 +34,13 @@ bool LinearHardeningNM::update_nodal_quantity(mat& jacobian, vec& residual, cons
     const auto dh = -compute_dh(alpha) / h;
 
     const mat gdz = gm / n * (eye(n_size, n_size) - z * z.t()) * compute_ddf(s, h);
-    const vec gdzdh = gdz * s * dh;
+    const vec dgzdg = gdz * s * dh + z;
 
     residual(sa) = q - trial_q + gm * z;
     residual(sc).fill(f);
 
     jacobian(sa, sa) += gdz;
-    jacobian(sa, sc) += z + gdzdh;
+    jacobian(sa, sc) += dgzdg;
 
     jacobian(sc, sa) = g.t();
     jacobian(sc, sc).fill(dh * dot(g, s));
@@ -53,7 +53,7 @@ bool LinearHardeningNM::update_nodal_quantity(mat& jacobian, vec& residual, cons
 
         jacobian(sb, sa) -= kinematic_modulus * gdz;
         jacobian(sb, sb) += kinematic_modulus * gdz;
-        jacobian(sb, sc) -= kinematic_modulus * (z + gdzdh);
+        jacobian(sb, sc) -= kinematic_modulus * dgzdg;
     }
 
     return true;
