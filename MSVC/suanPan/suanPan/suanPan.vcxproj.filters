@@ -1384,6 +1384,9 @@
     <ClCompile Include="..\..\..\Section\SectionNM\NM3D3.cpp">
       <Filter>Section\SectionNM</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestSurfaceNM.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">

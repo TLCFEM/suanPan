@@ -34,7 +34,7 @@ vec SurfaceNM3D::differentiate(const mat& weight, uword location, const uword or
 
     weight_out(location) = weight(location) - static_cast<double>(order);
 
-    if(weight_out(location) < 0.) weight_out.zeros();
+    if(static_cast<int>(weight_out(location)) < 0) weight_out.zeros();
     else for(auto I = static_cast<uword>(weight(location)); I > static_cast<uword>(weight_out(location)); --I) weight_out(0) *= static_cast<double>(I);
 
     return weight_out;

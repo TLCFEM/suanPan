@@ -488,6 +488,7 @@
     <ClCompile Include="..\..\..\UnitTest\TestQuaternion.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestShape.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestString.cpp" />
+    <ClCompile Include="..\..\..\UnitTest\TestSurfaceNM.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestTensor.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestUtility.cpp" />
   </ItemGroup>

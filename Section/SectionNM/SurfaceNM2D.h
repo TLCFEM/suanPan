@@ -38,14 +38,13 @@ class SurfaceNM2D {
     [[nodiscard]] double evaluate(double, double, const mat&) const;
     [[nodiscard]] static vec differentiate(const mat&, uword, uword);
 
-protected:
-    [[nodiscard]] double compute_sf(const vec&, double) const;
-    [[nodiscard]] vec compute_dsf(const vec&, double) const;
-    [[nodiscard]] mat compute_ddsf(const vec&, double) const;
-
 public:
     explicit SurfaceNM2D(double, // c
                          mat&& = {});
+
+    [[nodiscard]] double compute_sf(const vec&, double) const;
+    [[nodiscard]] vec compute_dsf(const vec&, double) const;
+    [[nodiscard]] mat compute_ddsf(const vec&, double) const;
 };
 
 #endif
