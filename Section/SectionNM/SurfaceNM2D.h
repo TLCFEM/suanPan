@@ -35,7 +35,7 @@ class SurfaceNM2D {
     const mat para_set;
     const double c;
 
-    [[nodiscard]] double evaluate(double, double, const mat&) const;
+    [[nodiscard]] static double evaluate(double, double, const mat&);
     [[nodiscard]] static vec differentiate(const mat&, uword, uword);
 
 public:

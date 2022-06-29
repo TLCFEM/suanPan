@@ -17,11 +17,11 @@
 
 #include "SurfaceNM2D.h"
 
-double SurfaceNM2D::evaluate(const double p, const double ms, const mat& weight) const {
+double SurfaceNM2D::evaluate(const double p, const double ms, const mat& weight) {
     double value = weight(0);
 
-    if(weight(1) > 0.) value *= pow(p, weight(1));
-    if(weight(2) > 0.) value *= pow(ms, weight(2));
+    if(static_cast<int>(weight(1)) > 0) value *= pow(p, weight(1));
+    if(static_cast<int>(weight(2)) > 0) value *= pow(ms, weight(2));
 
     return value;
 }

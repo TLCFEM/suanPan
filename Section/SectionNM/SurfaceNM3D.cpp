@@ -17,12 +17,12 @@
 
 #include "SurfaceNM3D.h"
 
-double SurfaceNM3D::evaluate(const double p, const double ms, const double mw, const mat& weight) const {
+double SurfaceNM3D::evaluate(const double p, const double ms, const double mw, const mat& weight) {
     double value = weight(0);
 
-    if(weight(1) > 0.) value *= pow(p, weight(1));
-    if(weight(2) > 0.) value *= pow(ms, weight(2));
-    if(weight(3) > 0.) value *= pow(mw, weight(3));
+    if(static_cast<int>(weight(1)) > 0) value *= pow(p, weight(1));
+    if(static_cast<int>(weight(2)) > 0) value *= pow(ms, weight(2));
+    if(static_cast<int>(weight(3)) > 0) value *= pow(mw, weight(3));
 
     return value;
 }
