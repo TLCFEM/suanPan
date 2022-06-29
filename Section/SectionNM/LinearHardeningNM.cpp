@@ -31,10 +31,10 @@ bool LinearHardeningNM::update_nodal_quantity(mat& jacobian, vec& residual, cons
     const auto g = compute_df(s, h);
     const double n = norm(g);
     const vec z = g / n;
-    const auto dh = -compute_dh(alpha) / h;
+    const vec dh = -s % compute_dh(alpha) / h;
 
     const mat gdz = gm / n * (eye(n_size, n_size) - z * z.t()) * compute_ddf(s, h);
-    const vec dgzdg = gdz * s * dh + z;
+    const vec dgzdg = gdz * dh + z;
 
     residual(sa) = gm * z;
     residual(sc).fill(f);
@@ -43,7 +43,7 @@ bool LinearHardeningNM::update_nodal_quantity(mat& jacobian, vec& residual, cons
     jacobian(sa, sc) = dgzdg;
 
     jacobian(sc, sa) = g.t();
-    jacobian(sc, sc).fill(dh * dot(g, s));
+    jacobian(sc, sc).fill(dot(g, dh));
 
     if(has_kinematic) {
         jacobian(sa, sb) = -gdz;
@@ -59,9 +59,23 @@ bool LinearHardeningNM::update_nodal_quantity(mat& jacobian, vec& residual, cons
     return true;
 }
 
-double LinearHardeningNM::compute_h(const double alpha) const { return std::max(datum::eps, 1. + isotropic_modulus * alpha); }
+vec LinearHardeningNM::compute_h(const double alpha) const {
+    vec h(n_size, fill::value(std::max(datum::eps, 1. + isotropic_modulus * alpha)));
 
-double LinearHardeningNM::compute_dh(const double alpha) const { return suanpan::approx_equal(compute_h(alpha), datum::eps) ? 0. : isotropic_modulus; }
+    h(0) = std::max(datum::eps, 1. + 2. * isotropic_modulus * alpha);
+
+    return h;
+}
+
+vec LinearHardeningNM::compute_dh(const double alpha) const {
+    auto dh = compute_h(alpha);
+
+    dh(0) = suanpan::approx_equal(dh(0), datum::eps) ? 0. : 2. * isotropic_modulus;
+
+    for(auto I = 1u; I < n_size; ++I) dh(I) = suanpan::approx_equal(dh(I), datum::eps) ? 0. : isotropic_modulus;
+
+    return dh;
+}
 
 LinearHardeningNM::LinearHardeningNM(const unsigned T, const double EEA, const double EEIS, const double HH, const double KK, const double LD, vec&& YF)
     : NonlinearNM(T, EEA, EEIS, !suanpan::approx_equal(KK, 0.), LD, std::forward<vec>(YF))

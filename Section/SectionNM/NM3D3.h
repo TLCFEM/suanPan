@@ -34,9 +34,9 @@
 
 class NM3D3 final : protected SurfaceNM3D, public VAFNM {
 protected:
-    [[nodiscard]] double compute_f(const vec&, double) const override;
-    [[nodiscard]] vec compute_df(const vec&, double) const override;
-    [[nodiscard]] mat compute_ddf(const vec&, double) const override;
+    [[nodiscard]] double compute_f(const vec&, const vec&) const override;
+    [[nodiscard]] vec compute_df(const vec&, const vec&) const override;
+    [[nodiscard]] mat compute_ddf(const vec&, const vec&) const override;
 
 public:
     NM3D3(unsigned, // tag

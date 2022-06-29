@@ -40,10 +40,10 @@ vec SurfaceNM3D::differentiate(const mat& weight, uword location, const uword or
     return weight_out;
 }
 
-double SurfaceNM3D::compute_sf(const vec& s, const double h) const {
-    const auto p = s(0) / h;
-    const auto ms = s(1) / h;
-    const auto mw = s(2) / h;
+double SurfaceNM3D::compute_sf(const vec& s, const vec& h) const {
+    const auto p = s(0) / h(0);
+    const auto ms = s(1) / h(1);
+    const auto mw = s(2) / h(2);
 
     auto f = -c;
     for(auto I = 0llu; I < para_set.n_rows; ++I) f += evaluate(p, ms, mw, para_set.row(I));
@@ -51,10 +51,10 @@ double SurfaceNM3D::compute_sf(const vec& s, const double h) const {
     return f;
 }
 
-vec SurfaceNM3D::compute_dsf(const vec& s, const double h) const {
-    const auto p = s(0) / h;
-    const auto ms = s(1) / h;
-    const auto mw = s(2) / h;
+vec SurfaceNM3D::compute_dsf(const vec& s, const vec& h) const {
+    const auto p = s(0) / h(0);
+    const auto ms = s(1) / h(1);
+    const auto mw = s(2) / h(2);
 
     vec df(3, fill::zeros);
 
@@ -63,10 +63,10 @@ vec SurfaceNM3D::compute_dsf(const vec& s, const double h) const {
     return df / h;
 }
 
-mat SurfaceNM3D::compute_ddsf(const vec& s, const double h) const {
-    const auto p = s(0) / h;
-    const auto ms = s(1) / h;
-    const auto mw = s(2) / h;
+mat SurfaceNM3D::compute_ddsf(const vec& s, const vec& h) const {
+    const auto p = s(0) / h(0);
+    const auto ms = s(1) / h(1);
+    const auto mw = s(2) / h(2);
 
     mat ddf(3, 3, fill::zeros);
 
@@ -76,7 +76,7 @@ mat SurfaceNM3D::compute_ddsf(const vec& s, const double h) const {
             for(auto K = 0llu; K < ddf.n_cols; ++K) ddf(J, K) += evaluate(p, ms, mw, differentiate(dfj, K, 1));
         }
 
-    return ddf * pow(h, -2.);
+    return ddf / (h * h.t());
 }
 
 SurfaceNM3D::SurfaceNM3D(const double CC, mat&& PS)

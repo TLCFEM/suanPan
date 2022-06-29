@@ -38,8 +38,8 @@ class LinearHardeningNM : public NonlinearNM {
     bool update_nodal_quantity(mat&, vec&, double, const vec&, const vec&, double) const override;
 
 protected:
-    [[nodiscard]] double compute_h(double) const override;
-    [[nodiscard]] double compute_dh(double) const override;
+    [[nodiscard]] vec compute_h(double) const override;
+    [[nodiscard]] vec compute_dh(double) const override;
 
 public:
     LinearHardeningNM(unsigned, // tag

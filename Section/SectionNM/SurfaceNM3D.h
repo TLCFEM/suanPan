@@ -42,9 +42,9 @@ public:
     explicit SurfaceNM3D(double, // c
                          mat&& = {});
 
-    [[nodiscard]] double compute_sf(const vec&, double) const;
-    [[nodiscard]] vec compute_dsf(const vec&, double) const;
-    [[nodiscard]] mat compute_ddsf(const vec&, double) const;
+    [[nodiscard]] double compute_sf(const vec&, const vec&) const;
+    [[nodiscard]] vec compute_dsf(const vec&, const vec&) const;
+    [[nodiscard]] mat compute_ddsf(const vec&, const vec&) const;
 };
 
 #endif

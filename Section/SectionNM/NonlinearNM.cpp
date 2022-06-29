@@ -190,6 +190,7 @@ int NonlinearNM::update_trial_status(const vec& t_deformation) {
 
 vector<vec> NonlinearNM::record(const OutputType P) {
     if(P == OutputType::YF) return {current_history.tail(2)};
+    if(P == OutputType::HIST) return {current_history};
 
     return Section::record(P);
 }

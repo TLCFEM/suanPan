@@ -17,11 +17,11 @@
 
 #include "NM2D3.h"
 
-double NM2D3::compute_f(const vec& s, const double h) const { return compute_sf(s, h); }
+double NM2D3::compute_f(const vec& s, const vec& h) const { return compute_sf(s, h); }
 
-vec NM2D3::compute_df(const vec& s, const double h) const { return compute_dsf(s, h); }
+vec NM2D3::compute_df(const vec& s, const vec& h) const { return compute_dsf(s, h); }
 
-mat NM2D3::compute_ddf(const vec& s, const double h) const { return compute_ddsf(s, h); }
+mat NM2D3::compute_ddf(const vec& s, const vec& h) const { return compute_ddsf(s, h); }
 
 NM2D3::NM2D3(const unsigned T, const double EEA, const double EEIS, const double NP, const double MSP, const double CC, const double HH, const double HS, const double HD, const double KK, const double KB, const double LD, mat&& PS)
     : SurfaceNM2D(CC, std::forward<mat>(PS))
