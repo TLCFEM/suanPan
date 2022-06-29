@@ -18,15 +18,15 @@
 #include "LinearHardeningNM.h"
 #include <Toolbox/utility.h>
 
-bool LinearHardeningNM::update_nodal_quantity(mat& jacobian, vec& residual, const double gm, const vec& q, const vec& b, const double alpha, const vec& trial_q, const vec& bn) const {
-    jacobian = eye(j_size, j_size);
-    residual = zeros(j_size);
-
+bool LinearHardeningNM::update_nodal_quantity(mat& jacobian, vec& residual, const double gm, const vec& q, const vec& b, const double alpha) const {
     const vec s = q - b;
     const auto h = compute_h(alpha);
     const auto f = compute_f(s, h);
 
     if(gm <= datum::eps && f < 0.) return false;
+
+    jacobian.set_size(j_size, j_size);
+    residual.set_size(j_size);
 
     const auto g = compute_df(s, h);
     const double n = norm(g);
@@ -36,24 +36,24 @@ bool LinearHardeningNM::update_nodal_quantity(mat& jacobian, vec& residual, cons
     const mat gdz = gm / n * (eye(n_size, n_size) - z * z.t()) * compute_ddf(s, h);
     const vec dgzdg = gdz * s * dh + z;
 
-    residual(sa) = q - trial_q + gm * z;
+    residual(sa) = gm * z;
     residual(sc).fill(f);
 
-    jacobian(sa, sa) += gdz;
-    jacobian(sa, sc) += dgzdg;
+    jacobian(sa, sa) = gdz;
+    jacobian(sa, sc) = dgzdg;
 
     jacobian(sc, sa) = g.t();
     jacobian(sc, sc).fill(dh * dot(g, s));
 
     if(has_kinematic) {
-        jacobian(sa, sb) -= gdz;
+        jacobian(sa, sb) = -gdz;
         jacobian(sc, sb) = -g.t();
 
-        residual(sb) = b - bn - kinematic_modulus * gm * z;
+        residual(sb) = -kinematic_modulus * gm * z;
 
-        jacobian(sb, sa) -= kinematic_modulus * gdz;
-        jacobian(sb, sb) += kinematic_modulus * gdz;
-        jacobian(sb, sc) -= kinematic_modulus * dgzdg;
+        jacobian(sb, sa) = -kinematic_modulus * gdz;
+        jacobian(sb, sb) = kinematic_modulus * gdz;
+        jacobian(sb, sc) = -kinematic_modulus * dgzdg;
     }
 
     return true;

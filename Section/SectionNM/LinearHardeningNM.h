@@ -35,7 +35,7 @@ class LinearHardeningNM : public NonlinearNM {
     const double isotropic_modulus;
     const double kinematic_modulus;
 
-    bool update_nodal_quantity(mat&, vec&, double, const vec&, const vec&, double, const vec&, const vec&) const override;
+    bool update_nodal_quantity(mat&, vec&, double, const vec&, const vec&, double) const override;
 
 protected:
     [[nodiscard]] double compute_h(double) const override;

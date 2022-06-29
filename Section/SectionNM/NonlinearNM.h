@@ -39,12 +39,15 @@ struct DataNonlinearNM {
 class NonlinearNM : protected DataNonlinearNM, public SectionNM {
     static constexpr unsigned max_iteration = 20;
 
-    const uvec si, sj;
+    const vec yield_diag;
 
-    const vec elastic_diag;
     const mat ti, tj;
 
-    virtual bool update_nodal_quantity(mat&, vec&, double, const vec&, const vec&, double, const vec&, const vec&) const = 0;
+    const uvec si, sj, gi, gj, ga, gb, gc;
+
+    const unsigned g_size; // global jacobian size
+
+    virtual bool update_nodal_quantity(mat&, vec&, double, const vec&, const vec&, double) const = 0;
 
 protected:
     const bool has_kinematic;
@@ -53,10 +56,6 @@ protected:
 
     const unsigned n_size; // nodal dof size
     const unsigned j_size; // jacobian size
-    const unsigned g_size = 2 * j_size;
-
-    const vec border;
-    const mat rabbit;
 
     [[nodiscard]] virtual double compute_h(double) const = 0;
     [[nodiscard]] virtual double compute_dh(double) const = 0;
