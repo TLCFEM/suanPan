@@ -82,7 +82,7 @@ jobs:
         uses: actions/setup-go@v2
       - name: Compile
         run: |
-          export CC=$(brew --prefix llvm)/bin/clang && export CXX=$(brew --prefix llvm)/bin/clang++ && export FC=gfortran-10
+          export CC=$(brew --prefix llvm@13)/bin/clang && export CXX=$(brew --prefix llvm@13)/bin/clang++ && export FC=gfortran-10
           go build Checker/updater.go
           brew install llvm glfw glew libomp
           cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.1/ -DCMAKE_INSTALL_PREFIX=suanPan-macos-openblas-vtk .
