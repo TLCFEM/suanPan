@@ -32,7 +32,7 @@ analyze
 # Displacement:
 # 0 0 0 0 0 0
 # Resistance:
-# 0 0 -6.9069e+01 1.3814e+02 6.9069e+01 0
+# 0 0 -6.9073e+01 1.3815e+02 6.9073e+01 0
 # 
 # Node 2:
 # Coordinate:
@@ -40,7 +40,7 @@ analyze
 # Displacement:
 # 0 0 0.0576 -0.0138 -0.0863 0
 # Resistance:
-# 0 0 2.8422e-14 0 4.8850e-15 0
+# 0 0 1.4211e-14 -2.8422e-14 -1.1213e-14 0
 # 
 # Node 3:
 # Coordinate:
@@ -48,7 +48,7 @@ analyze
 # Displacement:
 # 0 0 0.6000 -0.3999 -0.0863 0
 # Resistance:
-# 0 0 6.9069e+01 -4.0856e-14 0 0
+# 0 0 6.9073e+01 -4.3743e-14 0 0
 peek node 1 2 3
 
 peek element 1 2
