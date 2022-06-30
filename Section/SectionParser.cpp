@@ -706,17 +706,17 @@ void new_nm2d1(unique_ptr<Section>& return_obj, istringstream& command) {
     return_obj = make_unique<NM2D1>(tag, P(0), P(1), P(2));
 }
 
-void new_nm2d2(unique_ptr<Section>& return_obj, istringstream& command) {
+void new_nm2d(unique_ptr<Section>& return_obj, istringstream& command, const unsigned size) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("new_nm2d2() requires a valid tag.\n");
+        suanpan_error("new_nm2d() requires a valid tag.\n");
         return;
     }
 
-    vec P(8);
+    vec P(size);
     for(auto& I : P)
         if(!get_input(command, I)) {
-            suanpan_error("new_nm2d2() requires a valid parameter.\n");
+            suanpan_error("new_nm2d() requires a valid parameter.\n");
             return;
         }
 
@@ -725,11 +725,12 @@ void new_nm2d2(unique_ptr<Section>& return_obj, istringstream& command) {
     while(!command.eof()) if(get_input(command, para)) para_set.emplace_back(para);
 
     if(para_set.size() % 3 != 0) {
-        suanpan_error("new_nm2d2() requires proper parameter set.\n");
+        suanpan_error("new_nm2d() requires proper parameter set.\n");
         return;
     }
 
-    return_obj = make_unique<NM2D2>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), std::move(para_set));
+    if(8 == size) return_obj = make_unique<NM2D2>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), std::move(para_set));
+    else if(11 == size) return_obj = make_unique<NM2D3>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), P(10), std::move(para_set));
 }
 
 void new_nm3d1(unique_ptr<Section>& return_obj, istringstream& command) {
@@ -749,17 +750,17 @@ void new_nm3d1(unique_ptr<Section>& return_obj, istringstream& command) {
     return_obj = make_unique<NM3D1>(tag, P(0), P(1), P(2), P(3));
 }
 
-void new_nm3d2(unique_ptr<Section>& return_obj, istringstream& command) {
+void new_nm3d(unique_ptr<Section>& return_obj, istringstream& command, const unsigned size) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("new_nm3d2() requires a valid tag.\n");
+        suanpan_error("new_nm3d() requires a valid tag.\n");
         return;
     }
 
-    vec P(10);
+    vec P(size);
     for(auto& I : P)
         if(!get_input(command, I)) {
-            suanpan_error("new_nm3d2() requires a valid parameter.\n");
+            suanpan_error("new_nm3d() requires a valid parameter.\n");
             return;
         }
 
@@ -768,11 +769,12 @@ void new_nm3d2(unique_ptr<Section>& return_obj, istringstream& command) {
     while(!command.eof()) if(get_input(command, para)) para_set.emplace_back(para);
 
     if(para_set.size() % 4 != 0) {
-        suanpan_error("new_nm3d2() requires proper parameter set.\n");
+        suanpan_error("new_nm3d() requires proper parameter set.\n");
         return;
     }
 
-    return_obj = make_unique<NM3D2>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), std::move(para_set));
+    if(10 == size) return_obj = make_unique<NM3D2>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), std::move(para_set));
+    else if(13 == size) return_obj = make_unique<NM3D3>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), P(10), P(11), P(12), std::move(para_set));
 }
 
 vec euisection(const string& type) {
@@ -2194,9 +2196,11 @@ int create_new_section(const shared_ptr<DomainBase>& domain, istringstream& comm
     else if(is_equal(section_id, "TSection2D")) new_tsection2d(new_section, command);
     else if(is_equal(section_id, "TSection3D")) new_tsection3d(new_section, command);
     else if(is_equal(section_id, "NM2D1")) new_nm2d1(new_section, command);
-    else if(is_equal(section_id, "NM2D2")) new_nm2d2(new_section, command);
+    else if(is_equal(section_id, "NM2D2")) new_nm2d(new_section, command, 8);
+    else if(is_equal(section_id, "NM2D3")) new_nm2d(new_section, command, 11);
     else if(is_equal(section_id, "NM3D1")) new_nm3d1(new_section, command);
-    else if(is_equal(section_id, "NM3D2")) new_nm3d2(new_section, command);
+    else if(is_equal(section_id, "NM3D2")) new_nm3d(new_section, command, 10);
+    else if(is_equal(section_id, "NM3D3")) new_nm3d(new_section, command, 13);
     else if(is_equal(section_id, "EU2D")) new_eu2d(new_section, command);
     else if(is_equal(section_id, "EU3D")) new_eu3d(new_section, command);
     else if(is_equal(section_id, "NZ2D")) new_nz2d(new_section, command);

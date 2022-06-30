@@ -15,46 +15,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class NM3D2
- * @brief A NM3D2 class.
+ * @class SurfaceNM2D
+ * @brief A SurfaceNM2D class.
  * @author tlc
- * @date 26/11/2021
+ * @date 22/06/2022
  * @version 0.1.0
- * @file NM3D2.h
+ * @file SurfaceNM2D.h
  * @addtogroup Section-NM
  * @ingroup Section
  * @{
  */
 
-#ifndef NM3D2_H
-#define NM3D2_H
+#ifndef SURFACENM2D_H
+#define SURFACENM2D_H
 
-#include "SurfaceNM3D.h"
-#include "LinearHardeningNM.h"
+#include <suanPan.h>
 
-class NM3D2 final : protected SurfaceNM3D, public LinearHardeningNM {
-protected:
-    [[nodiscard]] double compute_f(const vec&, const vec&) const override;
-    [[nodiscard]] vec compute_df(const vec&, const vec&) const override;
-    [[nodiscard]] mat compute_ddf(const vec&, const vec&) const override;
+class SurfaceNM2D {
+    const mat para_set;
+    const double c;
+
+    [[nodiscard]] static double evaluate(double, double, const mat&);
+    [[nodiscard]] static vec differentiate(const mat&, uword, uword);
 
 public:
-    NM3D2(unsigned, // tag
-          double,   // EA
-          double,   // EIS
-          double,   // EIW
-          double,   // NP
-          double,   // MPS
-          double,   // MPW
-          double,   // c
-          double,   // h
-          double,   // k
-          double,   // linear density
-          mat&& = {});
+    explicit SurfaceNM2D(double, // c
+                         mat&& = {});
 
-    unique_ptr<Section> get_copy() override;
-
-    void print() override;
+    [[nodiscard]] double compute_sf(const vec&, const vec&) const;
+    [[nodiscard]] vec compute_dsf(const vec&, const vec&) const;
+    [[nodiscard]] mat compute_ddsf(const vec&, const vec&) const;
 };
 
 #endif

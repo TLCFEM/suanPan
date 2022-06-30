@@ -1366,6 +1366,27 @@
     <ClCompile Include="..\..\..\Section\SectionNM\SectionNM3D.cpp">
       <Filter>Section\SectionNM</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionNM\SurfaceNM2D.cpp">
+      <Filter>Section\SectionNM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionNM\SurfaceNM3D.cpp">
+      <Filter>Section\SectionNM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionNM\LinearHardeningNM.cpp">
+      <Filter>Section\SectionNM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionNM\VAFNM.cpp">
+      <Filter>Section\SectionNM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionNM\NM2D3.cpp">
+      <Filter>Section\SectionNM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionNM\NM3D3.cpp">
+      <Filter>Section\SectionNM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestSurfaceNM.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2588,6 +2609,24 @@
       <Filter>Section\SectionNM</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Section\SectionNM\SectionNM3D.h">
+      <Filter>Section\SectionNM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionNM\SurfaceNM2D.h">
+      <Filter>Section\SectionNM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionNM\SurfaceNM3D.h">
+      <Filter>Section\SectionNM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionNM\LinearHardeningNM.h">
+      <Filter>Section\SectionNM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionNM\VAFNM.h">
+      <Filter>Section\SectionNM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionNM\NM2D3.h">
+      <Filter>Section\SectionNM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionNM\NM3D3.h">
       <Filter>Section\SectionNM</Filter>
     </ClInclude>
   </ItemGroup>

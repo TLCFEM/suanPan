@@ -11,4 +11,5 @@ target_sources(${PROJECT_NAME} PRIVATE
         TestTensor.cpp
         TestUtility.cpp
         TestIntegration.cpp
+        TestSurfaceNM.cpp
         )

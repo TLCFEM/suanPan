@@ -15,31 +15,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class NM3D2
- * @brief A NM3D2 class.
+ * @class NM3D3
+ * @brief A NM3D3 class.
  * @author tlc
  * @date 26/11/2021
  * @version 0.1.0
- * @file NM3D2.h
+ * @file NM3D3.h
  * @addtogroup Section-NM
  * @ingroup Section
  * @{
  */
 
-#ifndef NM3D2_H
-#define NM3D2_H
+#ifndef NM3D3_H
+#define NM3D3_H
 
 #include "SurfaceNM3D.h"
-#include "LinearHardeningNM.h"
+#include "VAFNM.h"
 
-class NM3D2 final : protected SurfaceNM3D, public LinearHardeningNM {
+class NM3D3 final : protected SurfaceNM3D, public VAFNM {
 protected:
     [[nodiscard]] double compute_f(const vec&, const vec&) const override;
     [[nodiscard]] vec compute_df(const vec&, const vec&) const override;
     [[nodiscard]] mat compute_ddf(const vec&, const vec&) const override;
 
 public:
-    NM3D2(unsigned, // tag
+    NM3D3(unsigned, // tag
           double,   // EA
           double,   // EIS
           double,   // EIW
@@ -48,6 +48,9 @@ public:
           double,   // MPW
           double,   // c
           double,   // h
+          double,   // h
+          double,   // h
+          double,   // k
           double,   // k
           double,   // linear density
           mat&& = {});

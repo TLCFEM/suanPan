@@ -15,22 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include "NM2D2.h"
+#include "NM3D3.h"
 
-double NM2D2::compute_f(const vec& s, const vec& h) const { return compute_sf(s, h); }
+double NM3D3::compute_f(const vec& s, const vec& h) const { return compute_sf(s, h); }
 
-vec NM2D2::compute_df(const vec& s, const vec& h) const { return compute_dsf(s, h); }
+vec NM3D3::compute_df(const vec& s, const vec& h) const { return compute_dsf(s, h); }
 
-mat NM2D2::compute_ddf(const vec& s, const vec& h) const { return compute_ddsf(s, h); }
+mat NM3D3::compute_ddf(const vec& s, const vec& h) const { return compute_ddsf(s, h); }
 
-NM2D2::NM2D2(const unsigned T, const double EEA, const double EEIS, const double NP, const double MSP, const double CC, const double HH, const double KK, const double LD, mat&& PS)
-    : SurfaceNM2D(CC, std::forward<mat>(PS))
-    , LinearHardeningNM(T, EEA, EEIS, HH, KK, LD, vec{NP, MSP}) {}
+NM3D3::NM3D3(const unsigned T, const double EEA, const double EEIS, const double EEIW, const double NP, const double MSP, const double MWP, const double CC, const double HH, const double HS, const double HD, const double KK, const double KB, const double LD, mat&& PS)
+    : SurfaceNM3D(CC, std::forward<mat>(PS))
+    , VAFNM(T, EEA, EEIS, EEIW, HH, HS, HD, KK, KB, LD, vec{NP, MSP, MWP}) {}
 
-unique_ptr<Section> NM2D2::get_copy() { return make_unique<NM2D2>(*this); }
+unique_ptr<Section> NM3D3::get_copy() { return make_unique<NM3D3>(*this); }
 
-void NM2D2::print() {
+void NM3D3::print() {
     suanpan_info("A N-M based section. doi: 10.1007/978-94-007-6573-3_3\n");
-    current_deformation.t().print("Local Deformation:");
-    current_resistance.t().print("Local Resistance:");
+    current_deformation.head(5).t().print("Local Deformation:");
+    current_resistance.head(5).t().print("Local Resistance:");
 }

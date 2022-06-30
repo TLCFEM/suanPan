@@ -1,9 +1,9 @@
-# A TEST MODEL FOR NM2D2 SECTION
+# A TEST MODEL FOR NM2D3 SECTION
 
 node 1 0 0
 node 2 2 0
 
-section NM2D2 1 10 1E3 1E2 1E2 1. .05 .08 0.
+section NM2D3 1 10 1E3 1E2 1E2 1. .05 1.3 2 .08 1. 0.
 element NMB21 1 1 2 1
 
 recorder 1 hdf5 Element S 1
@@ -27,7 +27,7 @@ analyze
 # Displacement:
 # 0 0 0
 # Resistance:
-# 0 -5.7190e+01 -1.1438e+02
+# 0 -9.0527e+01 -1.8105e+02
 # 
 # Node 2:
 # Coordinate:
@@ -35,7 +35,7 @@ analyze
 # Displacement:
 # 0 0.3000 0.2250
 # Resistance:
-# 0 5.7190e+01 2.2204e-16
+# 0 9.0527e+01 2.2204e-16
 peek node 1 2
 
 peek element 1
