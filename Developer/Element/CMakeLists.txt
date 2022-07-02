@@ -4,7 +4,7 @@ project(ElementExample CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_definitions(-DSUANPAN_DLL)
+add_compile_definitions(SUANPAN_DLL)
 
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../../Libs)
 
