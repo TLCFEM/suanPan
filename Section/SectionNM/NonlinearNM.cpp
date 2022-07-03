@@ -35,20 +35,17 @@ NonlinearNM::NonlinearNM(const unsigned T, const double EEA, const double EEIS, 
         transj(2, 1) = 1.;
         return transj;
     }())
+    , has_kinematic(KK)
+    , n_size(2)
+    , g_size(has_kinematic ? 12 : 9)
     , si{0, 1}
     , sj{0, 2}
-    , gi(KK ? uvec{0, 1, 3, 4, 6} : uvec{0, 1, 3})
-    , gj(KK ? uvec{0, 2, 3, 5, 7} : uvec{0, 2, 4})
     , ga{0, 1, 2}
-    , gb{3, 4, 5}
-    , gc(KK ? uvec{6, 7} : uvec{3, 4})
-    , g_size(KK ? 8 : 5)
-    , has_kinematic(KK)
-    , sa{0, 1}
-    , sb{2, 3}
-    , sc{has_kinematic ? 4u : 2u}
-    , n_size(2)
-    , j_size(has_kinematic ? 5 : 3) { access::rw(linear_density) = LD; }
+    , gc{3, 4, 5}
+    , gd{6}
+    , ge{7}
+    , gf{8}
+    , gb(has_kinematic ? uvec{9, 10, 11} : uvec{}) { access::rw(linear_density) = LD; }
 
 NonlinearNM::NonlinearNM(const unsigned T, const double EEA, const double EEIS, const double EEIW, const bool KK, const double LD, vec&& YF)
     : DataNonlinearNM{EEA, EEIS, EEIW, std::forward<vec>(YF)}
@@ -66,20 +63,17 @@ NonlinearNM::NonlinearNM(const unsigned T, const double EEA, const double EEIS, 
         transj(2, 1) = transj(4, 2) = 1.;
         return transj;
     }())
+    , has_kinematic(KK)
+    , n_size(3)
+    , g_size(has_kinematic ? 18 : 13)
     , si{0, 1, 3}
     , sj{0, 2, 4}
-    , gi(KK ? uvec{0, 1, 3, 5, 6, 8, 10} : uvec{0, 1, 3, 5})
-    , gj(KK ? uvec{0, 2, 4, 5, 7, 9, 11} : uvec{0, 2, 4, 6})
     , ga{0, 1, 2, 3, 4}
-    , gb{5, 6, 7, 8, 9}
-    , gc(KK ? uvec{10, 11} : uvec{5, 6})
-    , g_size(KK ? 12 : 7)
-    , has_kinematic(KK)
-    , sa{0, 1, 2}
-    , sb{3, 4, 5}
-    , sc{has_kinematic ? 6u : 3u}
-    , n_size(3)
-    , j_size(has_kinematic ? 7 : 4) { access::rw(linear_density) = LD; }
+    , gc{5, 6, 7, 8, 9}
+    , gd{10}
+    , ge{11}
+    , gf{12}
+    , gb(has_kinematic ? uvec{13, 14, 15, 16, 17} : uvec{}) { access::rw(linear_density) = LD; }
 
 int NonlinearNM::initialize(const shared_ptr<DomainBase>&) {
     if(SectionType::NM2D == section_type) initial_stiffness.zeros(3, 3);
@@ -97,7 +91,7 @@ int NonlinearNM::initialize(const shared_ptr<DomainBase>&) {
 
     trial_stiffness = current_stiffness = initial_stiffness;
 
-    initialize_history(2 * n_size + 3);
+    initialize_history(d_size + 3);
 
     return SUANPAN_SUCCESS;
 }
@@ -107,21 +101,43 @@ int NonlinearNM::update_trial_status(const vec& t_deformation) {
 
     if(norm(incre_deformation) <= datum::eps) return SUANPAN_SUCCESS;
 
+    return SUANPAN_SUCCESS;
+
     trial_history = current_history;
-    const vec current_beta(&current_history(0), 2llu * n_size - 1, false, true);
+    const vec current_beta(&current_history(0), d_size - 1, false, true);
+    const vec bni = current_beta(si);
+    const vec bnj = current_beta(sj);
+    const auto& ani = current_history(d_size - 1);
+    const auto& anj = current_history(d_size);
 
-    vec beta(&trial_history(0), 2llu * n_size - 1, false, true);
-    vec alpha(&trial_history(2llu * n_size - 1), 2, false, true);
-    auto& flagi = trial_history(2llu * n_size + 1);
-    auto& flagj = trial_history(2llu * n_size + 2);
+    vec beta(&trial_history(0), d_size - 1, false, true);
+    auto& alphai = trial_history(d_size - 1);
+    auto& alphaj = trial_history(d_size);
+    auto& flagi = trial_history(d_size + 1);
+    auto& flagj = trial_history(d_size + 2);
 
-    trial_resistance = current_resistance + initial_stiffness * incre_deformation;
+    trial_resistance = current_resistance + (trial_stiffness = initial_stiffness) * incre_deformation;
 
-    const vec trial_q = ti * (trial_resistance(si) / yield_force) + tj * (trial_resistance(sj) / yield_force);
+    const vec trial_q = trial_resistance / yield_diag;
+
+    auto compute_nm_surface = [&](const vec& q, const vec& beta, const double alpha) {
+        return compute_f(q - beta, compute_h(alpha));
+    };
+
+    const auto fi = compute_nm_surface(trial_q(si), beta(si), alphai);
+    const auto fj = compute_nm_surface(trial_q(sj), beta(sj), alphaj);
+
+    if(fi < 0. && fj < 0.) return SUANPAN_SUCCESS;
+
     vec q = trial_q;
 
     mat jacobian;
-    vec residual(g_size, fill::none), gamma(2, fill::zeros);
+    vec residual(g_size, fill::none), e(d_size - 1, fill::zeros);
+    auto gamma = 0.;
+
+    auto compute_yield_function = [](const double fi, const double fj) {
+        return std::max(0., fi) + std::max(0., fj);
+    };
 
     auto counter = 0u;
     auto ref_error = 1.;
@@ -133,27 +149,14 @@ int NonlinearNM::update_trial_status(const vec& t_deformation) {
 
         jacobian.eye(g_size, g_size);
 
-        residual(ga) = q - trial_q;
-        if(has_kinematic) residual(gb) = beta - current_beta;
-        residual(gc).fill(0.);
+        vec z(d_size - 1, fill::zeros);
 
-        mat t_jacobian;
-        vec t_residual;
-
-        if(update_nodal_quantity(t_jacobian, t_residual, gamma(0), q(si), beta(si), alpha(0))) {
-            flagi = 1.;
-
-            jacobian(gc(0), gc(0)) = 0.;
-            jacobian(gi, gi) += t_jacobian;
-            residual(gi) += t_residual;
-        }
-        if(update_nodal_quantity(t_jacobian, t_residual, gamma(1), q(sj), beta(sj), alpha(1))) {
-            flagj = 1.;
-
-            jacobian(gc(1), gc(1)) = 0.;
-            jacobian(gj, gj) += t_jacobian;
-            residual(gj) += t_residual;
-        }
+        residual(ga) = q - trial_q + e;
+        if(has_kinematic) residual(gb) = beta - current_beta - e;
+        residual(gc) = e - gamma * z;
+        residual(gd).fill(alphai - gamma * norm(ti * z));
+        residual(ge).fill(alphaj - gamma * norm(tj * z));
+        residual(gf).fill(compute_yield_function(fi, fj));
 
         const vec incre = solve(jacobian, residual);
 
@@ -164,8 +167,10 @@ int NonlinearNM::update_trial_status(const vec& t_deformation) {
 
         q -= incre(ga);
         if(has_kinematic) beta -= incre(gb);
-        gamma -= incre(gc);
-        alpha -= incre(gc);
+        e -= incre(gc);
+        alphai -= incre(gd(0));
+        alphaj -= incre(ge(0));
+        gamma -= incre(gf(0));
     }
 
     if(SectionType::NM2D == section_type) {

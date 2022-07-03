@@ -43,20 +43,15 @@ class NonlinearNM : protected DataNonlinearNM, public SectionNM {
 
     const mat ti, tj;
 
-    const uvec si, sj, gi, gj, ga, gb, gc;
-
-    const unsigned g_size; // global jacobian size
-
-    virtual bool update_nodal_quantity(mat&, vec&, double, const vec&, const vec&, double) const = 0;
-
-protected:
     const bool has_kinematic;
 
-    const uvec sa, sb, sc;
+    const unsigned n_size;                 // nodal dof size
+    const unsigned d_size = 2llu * n_size; // nodal dof size
+    const unsigned g_size;                 // global jacobian size
 
-    const unsigned n_size; // nodal dof size
-    const unsigned j_size; // jacobian size
+    const uvec si, sj, ga, gb, gc, gd, ge, gf;
 
+protected:
     [[nodiscard]] virtual vec compute_h(double) const = 0;
     [[nodiscard]] virtual vec compute_dh(double) const = 0;
 
