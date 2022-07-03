@@ -21,7 +21,6 @@
 int LinearHardeningNM::compute_local_integration(vec& q, mat& jacobian, const bool yield_flagi, const bool yield_flagj) {
     trial_history = current_history;
     const vec current_beta(&current_history(0), d_size, false, true);
-    const vec bni = current_beta(ni), bnj = current_beta(nj);
     const auto &ani = current_history(d_size), &anj = current_history(d_size + 1llu);
 
     vec beta(&trial_history(0), d_size, false, true);
@@ -32,7 +31,7 @@ int LinearHardeningNM::compute_local_integration(vec& q, mat& jacobian, const bo
     flagi = yield_flagi;
     flagj = yield_flagj;
 
-    const vec trial_q = q = trial_resistance / yield_diag;
+    const vec trial_q = q = trial_resistance.head(d_size) / yield_diag;
 
     vec e(d_size, fill::zeros);
     auto gamma = 0.;
@@ -53,7 +52,7 @@ int LinearHardeningNM::compute_local_integration(vec& q, mat& jacobian, const bo
         residual(gf).fill(0.);
 
         if(yield_flagi) {
-            const vec si = q(ni) - bni, hi = compute_h(ai);
+            const vec si = q(ni) - beta(ni), hi = compute_h(ai);
             residual(gf) += std::max(0., compute_f(si, hi));
 
             const vec g = compute_df(si, hi);
@@ -66,7 +65,7 @@ int LinearHardeningNM::compute_local_integration(vec& q, mat& jacobian, const bo
         }
 
         if(yield_flagj) {
-            const vec sj = q(nj) - bnj, hj = compute_h(aj);
+            const vec sj = q(nj) - beta(nj), hj = compute_h(aj);
             residual(gf) += std::max(0., compute_f(sj, hj));
 
             const vec g = compute_df(sj, hj);

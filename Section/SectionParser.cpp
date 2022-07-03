@@ -352,7 +352,12 @@ void new_fibre1d(unique_ptr<Section>& return_obj, istringstream& command) {
     }
 
     vector<uword> tag_vector;
-    while(!command.eof()) if(uword section_tag; get_input(command, section_tag)) tag_vector.emplace_back(section_tag);
+    while(!command.eof())
+        if(uword section_tag; get_input(command, section_tag)) tag_vector.emplace_back(section_tag);
+        else {
+            suanpan_error("new_fibre1d() requires a valid parameter.\n");
+            return;
+        }
 
     return_obj = make_unique<Fibre1D>(tag, std::move(tag_vector));
 }
@@ -365,7 +370,12 @@ void new_fibre2d(unique_ptr<Section>& return_obj, istringstream& command) {
     }
 
     vector<uword> tag_vector;
-    while(!command.eof()) if(uword section_tag; get_input(command, section_tag)) tag_vector.emplace_back(section_tag);
+    while(!command.eof())
+        if(uword section_tag; get_input(command, section_tag)) tag_vector.emplace_back(section_tag);
+        else {
+            suanpan_error("new_fibre2d() requires a valid parameter.\n");
+            return;
+        }
 
     return_obj = make_unique<Fibre2D>(tag, std::move(tag_vector));
 }
@@ -378,7 +388,12 @@ void new_fibre3d(unique_ptr<Section>& return_obj, istringstream& command) {
     }
 
     vector<uword> tag_vector;
-    while(!command.eof()) if(uword section_tag; get_input(command, section_tag)) tag_vector.emplace_back(section_tag);
+    while(!command.eof())
+        if(uword section_tag; get_input(command, section_tag)) tag_vector.emplace_back(section_tag);
+        else {
+            suanpan_error("new_fibre3d() requires a valid parameter.\n");
+            return;
+        }
 
     return_obj = make_unique<Fibre3D>(tag, std::move(tag_vector));
 }
@@ -722,7 +737,7 @@ void new_nm2d(unique_ptr<Section>& return_obj, istringstream& command, const uns
 
     vector<double> para_set;
     double para;
-    while(!command.eof()) if(get_input(command, para)) para_set.emplace_back(para);
+    while(!command.eof() && get_input(command, para)) para_set.emplace_back(para);
 
     if(para_set.size() % 3 != 0) {
         suanpan_error("new_nm2d() requires proper parameter set.\n");
@@ -770,7 +785,7 @@ void new_nm3d(unique_ptr<Section>& return_obj, istringstream& command, const uns
 
     vector<double> para_set;
     double para;
-    while(!command.eof()) if(get_input(command, para)) para_set.emplace_back(para);
+    while(!command.eof() && get_input(command, para)) para_set.emplace_back(para);
 
     if(para_set.size() % 4 != 0) {
         suanpan_error("new_nm3d() requires proper parameter set.\n");

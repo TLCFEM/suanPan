@@ -99,7 +99,7 @@ int NonlinearNM::update_trial_status(const vec& t_deformation) {
 
     trial_resistance = current_resistance + (trial_stiffness = initial_stiffness) * incre_deformation;
 
-    const vec trial_q = trial_resistance / yield_diag;
+    const vec trial_q = trial_resistance.head(d_size) / yield_diag;
 
     const vec current_beta(&current_history(0), d_size, false, true);
     const vec bni = current_beta(ni), bnj = current_beta(nj);
