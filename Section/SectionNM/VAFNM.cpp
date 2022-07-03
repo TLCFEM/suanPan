@@ -21,14 +21,11 @@
 int VAFNM::compute_local_integration(vec& q, mat& jacobian, const bool yield_flagi, const bool yield_flagj) {
     trial_history = current_history;
     const vec current_beta(&current_history(0), d_size, false, true);
-    const vec bni = current_beta(ni);
-    const vec bnj = current_beta(nj);
-    const auto& ani = current_history(d_size);
-    const auto& anj = current_history(d_size + 1llu);
+    const vec bni = current_beta(ni), bnj = current_beta(nj);
+    const auto &ani = current_history(d_size), &anj = current_history(d_size + 1llu);
 
     vec beta(&trial_history(0), d_size, false, true);
-    auto& ai = trial_history(d_size);
-    auto& aj = trial_history(d_size + 1llu);
+    auto &ai = trial_history(d_size), &aj = trial_history(d_size + 1llu);
     auto& flagi = trial_history(d_size + 2llu); // yield flag
     auto& flagj = trial_history(d_size + 3llu); // yield flag
 
@@ -56,7 +53,7 @@ int VAFNM::compute_local_integration(vec& q, mat& jacobian, const bool yield_fla
         residual(gf).fill(0.);
 
         if(yield_flagi) {
-            const vec si = q(ni) - beta(ni), hi = compute_h(ai);
+            const vec si = q(ni) - bni, hi = compute_h(ai);
             residual(gf) += std::max(0., compute_f(si, hi));
 
             const vec g = compute_df(si, hi);
@@ -69,7 +66,7 @@ int VAFNM::compute_local_integration(vec& q, mat& jacobian, const bool yield_fla
         }
 
         if(yield_flagj) {
-            const vec sj = q(nj) - beta(nj), hj = compute_h(aj);
+            const vec sj = q(nj) - bnj, hj = compute_h(aj);
             residual(gf) += std::max(0., compute_f(sj, hj));
 
             const vec g = compute_df(sj, hj);
