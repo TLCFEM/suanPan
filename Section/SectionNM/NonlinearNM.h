@@ -37,6 +37,9 @@ struct DataNonlinearNM {
 };
 
 class NonlinearNM : protected DataNonlinearNM, public SectionNM {
+    [[nodiscard]] virtual int compute_local_integration(vec&, mat&, bool, bool) = 0;
+
+protected:
     static constexpr unsigned max_iteration = 20;
 
     const vec yield_diag;
@@ -45,13 +48,12 @@ class NonlinearNM : protected DataNonlinearNM, public SectionNM {
 
     const bool has_kinematic;
 
-    const unsigned n_size;                 // nodal dof size
-    const unsigned d_size = 2llu * n_size; // nodal dof size
-    const unsigned g_size;                 // global jacobian size
+    const unsigned n_size;                        // nodal dof size
+    const unsigned d_size = 2llu * n_size - 1llu; // element dof size
+    const unsigned g_size;                        // global jacobian size
 
-    const uvec si, sj, ga, gb, gc, gd, ge, gf;
+    const uvec ni, nj, ga, gb, gc, gd, ge, gf;
 
-protected:
     [[nodiscard]] virtual vec compute_h(double) const = 0;
     [[nodiscard]] virtual vec compute_dh(double) const = 0;
 

@@ -729,8 +729,12 @@ void new_nm2d(unique_ptr<Section>& return_obj, istringstream& command, const uns
         return;
     }
 
-    if(8 == size) return_obj = make_unique<NM2D2>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), std::move(para_set));
-    else if(11 == size) return_obj = make_unique<NM2D3>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), P(10), std::move(para_set));
+    mat poly_set(para_set);
+    poly_set.reshape(3, poly_set.n_elem / 3);
+    inplace_trans(poly_set);
+
+    if(8 == size) return_obj = make_unique<NM2D2>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), std::move(poly_set));
+    else if(11 == size) return_obj = make_unique<NM2D3>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), P(10), std::move(poly_set));
 }
 
 void new_nm3d1(unique_ptr<Section>& return_obj, istringstream& command) {
@@ -773,8 +777,12 @@ void new_nm3d(unique_ptr<Section>& return_obj, istringstream& command, const uns
         return;
     }
 
-    if(10 == size) return_obj = make_unique<NM3D2>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), std::move(para_set));
-    else if(13 == size) return_obj = make_unique<NM3D3>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), P(10), P(11), P(12), std::move(para_set));
+    mat poly_set(para_set);
+    poly_set.reshape(4, poly_set.n_elem / 4);
+    inplace_trans(poly_set);
+
+    if(10 == size) return_obj = make_unique<NM3D2>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), std::move(poly_set));
+    else if(13 == size) return_obj = make_unique<NM3D3>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), P(10), P(11), P(12), std::move(poly_set));
 }
 
 vec euisection(const string& type) {
