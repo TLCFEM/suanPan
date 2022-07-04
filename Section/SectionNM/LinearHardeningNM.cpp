@@ -33,7 +33,7 @@ int LinearHardeningNM::compute_local_integration(vec& q, mat& jacobian, const bo
 
     const vec trial_q = q = trial_resistance.head(d_size) / yield_diag;
 
-    vec e(d_size, fill::zeros);
+    vec e(d_size, fill::value(datum::eps * datum::eps));
     auto gamma = 0.;
 
     auto counter = 0u;
