@@ -352,7 +352,12 @@ void new_fibre1d(unique_ptr<Section>& return_obj, istringstream& command) {
     }
 
     vector<uword> tag_vector;
-    while(!command.eof()) if(uword section_tag; get_input(command, section_tag)) tag_vector.emplace_back(section_tag);
+    while(!command.eof())
+        if(uword section_tag; get_input(command, section_tag)) tag_vector.emplace_back(section_tag);
+        else {
+            suanpan_error("new_fibre1d() requires a valid parameter.\n");
+            return;
+        }
 
     return_obj = make_unique<Fibre1D>(tag, std::move(tag_vector));
 }
@@ -365,7 +370,12 @@ void new_fibre2d(unique_ptr<Section>& return_obj, istringstream& command) {
     }
 
     vector<uword> tag_vector;
-    while(!command.eof()) if(uword section_tag; get_input(command, section_tag)) tag_vector.emplace_back(section_tag);
+    while(!command.eof())
+        if(uword section_tag; get_input(command, section_tag)) tag_vector.emplace_back(section_tag);
+        else {
+            suanpan_error("new_fibre2d() requires a valid parameter.\n");
+            return;
+        }
 
     return_obj = make_unique<Fibre2D>(tag, std::move(tag_vector));
 }
@@ -378,7 +388,12 @@ void new_fibre3d(unique_ptr<Section>& return_obj, istringstream& command) {
     }
 
     vector<uword> tag_vector;
-    while(!command.eof()) if(uword section_tag; get_input(command, section_tag)) tag_vector.emplace_back(section_tag);
+    while(!command.eof())
+        if(uword section_tag; get_input(command, section_tag)) tag_vector.emplace_back(section_tag);
+        else {
+            suanpan_error("new_fibre3d() requires a valid parameter.\n");
+            return;
+        }
 
     return_obj = make_unique<Fibre3D>(tag, std::move(tag_vector));
 }
@@ -722,15 +737,19 @@ void new_nm2d(unique_ptr<Section>& return_obj, istringstream& command, const uns
 
     vector<double> para_set;
     double para;
-    while(!command.eof()) if(get_input(command, para)) para_set.emplace_back(para);
+    while(!command.eof() && get_input(command, para)) para_set.emplace_back(para);
 
     if(para_set.size() % 3 != 0) {
         suanpan_error("new_nm2d() requires proper parameter set.\n");
         return;
     }
 
-    if(8 == size) return_obj = make_unique<NM2D2>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), std::move(para_set));
-    else if(11 == size) return_obj = make_unique<NM2D3>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), P(10), std::move(para_set));
+    mat poly_set(para_set);
+    poly_set.reshape(3, poly_set.n_elem / 3);
+    inplace_trans(poly_set);
+
+    if(8 == size) return_obj = make_unique<NM2D2>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), std::move(poly_set));
+    else if(11 == size) return_obj = make_unique<NM2D3>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), P(10), std::move(poly_set));
 }
 
 void new_nm3d1(unique_ptr<Section>& return_obj, istringstream& command) {
@@ -766,15 +785,19 @@ void new_nm3d(unique_ptr<Section>& return_obj, istringstream& command, const uns
 
     vector<double> para_set;
     double para;
-    while(!command.eof()) if(get_input(command, para)) para_set.emplace_back(para);
+    while(!command.eof() && get_input(command, para)) para_set.emplace_back(para);
 
     if(para_set.size() % 4 != 0) {
         suanpan_error("new_nm3d() requires proper parameter set.\n");
         return;
     }
 
-    if(10 == size) return_obj = make_unique<NM3D2>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), std::move(para_set));
-    else if(13 == size) return_obj = make_unique<NM3D3>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), P(10), P(11), P(12), std::move(para_set));
+    mat poly_set(para_set);
+    poly_set.reshape(4, poly_set.n_elem / 4);
+    inplace_trans(poly_set);
+
+    if(10 == size) return_obj = make_unique<NM3D2>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), std::move(poly_set));
+    else if(13 == size) return_obj = make_unique<NM3D3>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), P(10), P(11), P(12), std::move(poly_set));
 }
 
 vec euisection(const string& type) {

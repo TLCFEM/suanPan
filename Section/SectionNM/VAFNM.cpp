@@ -18,60 +18,114 @@
 #include "VAFNM.h"
 #include <Toolbox/utility.h>
 
-bool VAFNM::update_nodal_quantity(mat& jacobian, vec& residual, const double gm, const vec& q, const vec& b, const double alpha) const {
-    const vec s = q - b;
-    const auto h = compute_h(alpha);
-    const auto f = compute_f(s, h);
+int VAFNM::compute_local_integration(vec& q, mat& jacobian, const bool yield_flagi, const bool yield_flagj) {
+    trial_history = current_history;
+    const vec current_beta(&current_history(0), d_size, false, true);
+    const auto &ani = current_history(d_size), &anj = current_history(d_size + 1llu);
 
-    if(gm <= datum::eps && f < 0.) return false;
+    vec beta(&trial_history(0), d_size, false, true);
+    auto &ai = trial_history(d_size), &aj = trial_history(d_size + 1llu);
+    auto& flagi = trial_history(d_size + 2llu); // yield flag
+    auto& flagj = trial_history(d_size + 3llu); // yield flag
 
-    jacobian.set_size(j_size, j_size);
-    residual.set_size(j_size);
+    flagi = yield_flagi;
+    flagj = yield_flagj;
 
-    const auto g = compute_df(s, h);
-    const double n = norm(g);
-    const vec z = g / n;
-    const vec dh = -s % compute_dh(alpha) / h;
+    const vec trial_q = q = trial_resistance.head(d_size) / yield_diag;
 
-    const mat gdz = gm / n * (eye(n_size, n_size) - z * z.t()) * compute_ddf(s, h);
-    const vec dgzdg = gdz * dh + z;
+    vec e(d_size, fill::zeros);
+    auto gamma = 0.;
 
-    residual(sa) = gm * z;
-    residual(sc).fill(f);
+    auto counter = 0u;
+    auto ref_error = 1.;
+    while(true) {
+        if(max_iteration == ++counter) {
+            suanpan_error("VAFNM cannot converge within %u iterations.\n", max_iteration);
+            return SUANPAN_FAIL;
+        }
 
-    jacobian(sa, sa) = gdz;
-    jacobian(sa, sc) = dgzdg;
+        vec z(d_size, fill::zeros);
+        mat pzpq(d_size, d_size, fill::zeros);
+        vec residual(g_size, fill::none);
 
-    jacobian(sc, sa) = g.t();
-    jacobian(sc, sc).fill(dot(g, dh));
+        jacobian.eye(g_size, g_size);
+        residual(gf).fill(0.);
 
-    if(has_kinematic) {
-        jacobian(sa, sb) = -gdz;
-        jacobian(sc, sb) = -g.t();
+        if(yield_flagi) {
+            const vec si = q(ni) - beta(ni), hi = compute_h(ai);
+            residual(gf) += std::max(0., compute_f(si, hi));
 
-        residual(sb) = kin_base * gm * b - kin_modulus * gm * z;
+            const vec g = compute_df(si, hi);
+            const vec dh = -si % compute_dh(ai) / hi;
+            const mat dg = ti * compute_ddf(si, hi);
+            z += ti * g;
+            pzpq += dg * ti.t();
+            jacobian(gc, gd) = -gamma * dg * dh;
+            jacobian(gf, gd).fill(dot(g, dh));
+        }
 
-        jacobian(sb, sa) = -kin_modulus * gdz;
-        jacobian(sb, sb) = kin_modulus * gdz + kin_base * gm * eye(n_size, n_size);
-        jacobian(sb, sc) = kin_base * b - kin_modulus * dgzdg;
+        if(yield_flagj) {
+            const vec sj = q(nj) - beta(nj), hj = compute_h(aj);
+            residual(gf) += std::max(0., compute_f(sj, hj));
+
+            const vec g = compute_df(sj, hj);
+            const vec dh = -sj % compute_dh(aj) / hj;
+            const mat dg = tj * compute_ddf(sj, hj);
+            z += tj * g;
+            pzpq += dg * tj.t();
+            jacobian(gc, ge) = -gamma * dg * dh;
+            jacobian(gf, ge).fill(dot(g, dh));
+        }
+
+        const vec tie = ti.t() * e, tje = tj.t() * e;
+
+        jacobian(ga, gc) = eye(d_size, d_size);
+
+        jacobian(gc, ga) = -gamma * pzpq;
+        jacobian(gc, gf) = -z;
+
+        jacobian(gd, gc) = -normalise(tie).t() * ti.t();
+
+        jacobian(ge, gc) = -normalise(tje).t() * tj.t();
+
+        jacobian(gf, ga) = z.t();
+        jacobian(gf, gf).fill(0.);
+
+        residual(ga) = q - trial_q + e;
+        residual(gc) = e - gamma * z;
+        residual(gd).fill(ai - ani - norm(tie));
+        residual(ge).fill(aj - anj - norm(tje));
+
+        if(has_kinematic) {
+            const auto norm_e = kin_base * norm(e);
+            jacobian(gb, gb) += norm_e * eye(d_size, d_size);
+            jacobian(gb, gc) = kin_base * beta * normalise(e).t() - kin_modulus * eye(d_size, d_size);
+
+            jacobian(gc, gb) = gamma * pzpq;
+            jacobian(gf, gb) = -z.t();
+
+            residual(gb) = (1. + norm_e) * beta - current_beta - kin_modulus * e;
+        }
+
+        const vec incre = solve(jacobian, residual);
+
+        auto error = norm(residual);
+        if(1 == counter) ref_error = std::max(1., error);
+        suanpan_debug("VAFNM local iteration error: %.5E.\n", error /= ref_error);
+        if(norm(incre) <= tolerance && error <= tolerance) return SUANPAN_SUCCESS;
+
+        q -= incre(ga);
+        if(has_kinematic) beta -= incre(gb);
+        e -= incre(gc);
+        ai -= incre(gd(0));
+        aj -= incre(ge(0));
+        gamma -= incre(gf(0));
     }
-
-    return true;
 }
 
-vec VAFNM::compute_h(const double alpha) const {
-    vec h(n_size, fill::value(std::max(datum::eps, 1. + iso_modulus * alpha + iso_saturation - iso_saturation * exp(-iso_decay * alpha))));
+vec VAFNM::compute_h(const double alpha) const { return {n_size, fill::value(std::max(datum::eps, 1. + iso_modulus * alpha + iso_saturation - iso_saturation * exp(-iso_decay * alpha)))}; }
 
-    return h;
-}
-
-vec VAFNM::compute_dh(const double alpha) const {
-    auto dh = compute_h(alpha);
-
-    dh.transform([&](const double h) { return suanpan::approx_equal(h, datum::eps) ? 0. : iso_modulus + iso_saturation * iso_decay * exp(-iso_decay * alpha); });
-
-    return dh;
-}
+vec VAFNM::compute_dh(const double alpha) const { return compute_h(alpha).transform([&](const double h) { return suanpan::approx_equal(h, datum::eps) ? 0. : iso_modulus + iso_saturation * iso_decay * exp(-iso_decay * alpha); }); }
 
 VAFNM::VAFNM(const unsigned T, const double EEA, const double EEIS, const double HH, const double HS, const double HD, const double KK, const double KB, const double LD, vec&& YF)
     : NonlinearNM(T, EEA, EEIS, !suanpan::approx_equal(KK, 0.) || !suanpan::approx_equal(KB, 0.), LD, std::forward<vec>(YF))

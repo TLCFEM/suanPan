@@ -38,7 +38,7 @@ class VAFNM : public NonlinearNM {
     const double iso_saturation, iso_decay;
     const double kin_base;
 
-    bool update_nodal_quantity(mat&, vec&, double, const vec&, const vec&, double) const override;
+    [[nodiscard]] int compute_local_integration(vec&, mat&, bool, bool) override;
 
 protected:
     [[nodiscard]] vec compute_h(double) const override;

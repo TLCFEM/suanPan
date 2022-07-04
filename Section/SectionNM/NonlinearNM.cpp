@@ -25,30 +25,25 @@ NonlinearNM::NonlinearNM(const unsigned T, const double EEA, const double EEIS, 
     , yield_diag{yield_force(0), yield_force(1), yield_force(1)}
     , ti([] {
         mat transi(3, 2, fill::zeros);
-        transi(0, 0) = .5;
-        transi(1, 1) = 1.;
+        transi(0, 0) = transi(1, 1) = 1.;
         return transi;
     }())
     , tj([] {
         mat transj(3, 2, fill::zeros);
-        transj(0, 0) = .5;
-        transj(2, 1) = 1.;
+        transj(0, 0) = transj(2, 1) = 1.;
         return transj;
     }())
-    , si{0, 1}
-    , sj{0, 2}
-    , gi(KK ? uvec{0, 1, 3, 4, 6} : uvec{0, 1, 3})
-    , gj(KK ? uvec{0, 2, 3, 5, 7} : uvec{0, 2, 4})
-    , ga{0, 1, 2}
-    , gb{3, 4, 5}
-    , gc(KK ? uvec{6, 7} : uvec{3, 4})
-    , g_size(KK ? 8 : 5)
     , has_kinematic(KK)
-    , sa{0, 1}
-    , sb{2, 3}
-    , sc{has_kinematic ? 4u : 2u}
     , n_size(2)
-    , j_size(has_kinematic ? 5 : 3) { access::rw(linear_density) = LD; }
+    , g_size(has_kinematic ? 12 : 9)
+    , ni{0, 1}
+    , nj{0, 2}
+    , ga{0, 1, 2}
+    , gb(has_kinematic ? uvec{9, 10, 11} : uvec{})
+    , gc{3, 4, 5}
+    , gd{6}
+    , ge{7}
+    , gf{8} { access::rw(linear_density) = LD; }
 
 NonlinearNM::NonlinearNM(const unsigned T, const double EEA, const double EEIS, const double EEIW, const bool KK, const double LD, vec&& YF)
     : DataNonlinearNM{EEA, EEIS, EEIW, std::forward<vec>(YF)}
@@ -56,30 +51,25 @@ NonlinearNM::NonlinearNM(const unsigned T, const double EEA, const double EEIS, 
     , yield_diag{yield_force(0), yield_force(1), yield_force(1), yield_force(2), yield_force(2)}
     , ti([] {
         mat transi(5, 3, fill::zeros);
-        transi(0, 0) = .5;
-        transi(1, 1) = transi(3, 2) = 1.;
+        transi(0, 0) = transi(1, 1) = transi(3, 2) = 1.;
         return transi;
     }())
     , tj([] {
         mat transj(5, 3, fill::zeros);
-        transj(0, 0) = .5;
-        transj(2, 1) = transj(4, 2) = 1.;
+        transj(0, 0) = transj(2, 1) = transj(4, 2) = 1.;
         return transj;
     }())
-    , si{0, 1, 3}
-    , sj{0, 2, 4}
-    , gi(KK ? uvec{0, 1, 3, 5, 6, 8, 10} : uvec{0, 1, 3, 5})
-    , gj(KK ? uvec{0, 2, 4, 5, 7, 9, 11} : uvec{0, 2, 4, 6})
-    , ga{0, 1, 2, 3, 4}
-    , gb{5, 6, 7, 8, 9}
-    , gc(KK ? uvec{10, 11} : uvec{5, 6})
-    , g_size(KK ? 12 : 7)
     , has_kinematic(KK)
-    , sa{0, 1, 2}
-    , sb{3, 4, 5}
-    , sc{has_kinematic ? 6u : 3u}
     , n_size(3)
-    , j_size(has_kinematic ? 7 : 4) { access::rw(linear_density) = LD; }
+    , g_size(has_kinematic ? 18 : 13)
+    , ni{0, 1, 3}
+    , nj{0, 2, 4}
+    , ga{0, 1, 2, 3, 4}
+    , gb(has_kinematic ? uvec{13, 14, 15, 16, 17} : uvec{})
+    , gc{5, 6, 7, 8, 9}
+    , gd{10}
+    , ge{11}
+    , gf{12} { access::rw(linear_density) = LD; }
 
 int NonlinearNM::initialize(const shared_ptr<DomainBase>&) {
     if(SectionType::NM2D == section_type) initial_stiffness.zeros(3, 3);
@@ -97,7 +87,7 @@ int NonlinearNM::initialize(const shared_ptr<DomainBase>&) {
 
     trial_stiffness = current_stiffness = initial_stiffness;
 
-    initialize_history(2 * n_size + 3);
+    initialize_history(d_size + 4);
 
     return SUANPAN_SUCCESS;
 }
@@ -107,66 +97,23 @@ int NonlinearNM::update_trial_status(const vec& t_deformation) {
 
     if(norm(incre_deformation) <= datum::eps) return SUANPAN_SUCCESS;
 
-    trial_history = current_history;
-    const vec current_beta(&current_history(0), 2llu * n_size - 1, false, true);
+    trial_resistance = current_resistance + (trial_stiffness = initial_stiffness) * incre_deformation;
 
-    vec beta(&trial_history(0), 2llu * n_size - 1, false, true);
-    vec alpha(&trial_history(2llu * n_size - 1), 2, false, true);
-    auto& flagi = trial_history(2llu * n_size + 1);
-    auto& flagj = trial_history(2llu * n_size + 2);
+    const vec trial_q = trial_resistance.head(d_size) / yield_diag;
 
-    trial_resistance = current_resistance + initial_stiffness * incre_deformation;
+    const vec current_beta(&current_history(0), d_size, false, true);
+    const vec bni = current_beta(ni), bnj = current_beta(nj);
+    const auto &ani = current_history(d_size), &anj = current_history(d_size + 1llu);
 
-    const vec trial_q = ti * (trial_resistance(si) / yield_force) + tj * (trial_resistance(sj) / yield_force);
-    vec q = trial_q;
+    const auto fi = compute_f(trial_q(ni) - bni, compute_h(ani));
+    const auto fj = compute_f(trial_q(nj) - bnj, compute_h(anj));
 
+    if(fi < 0. && fj < 0.) return SUANPAN_SUCCESS;
+
+    vec q;
     mat jacobian;
-    vec residual(g_size, fill::none), gamma(2, fill::zeros);
 
-    auto counter = 0u;
-    auto ref_error = 1.;
-    while(true) {
-        if(max_iteration == ++counter) {
-            suanpan_error("NonlinearNM cannot converge within %u iterations.\n", max_iteration);
-            return SUANPAN_FAIL;
-        }
-
-        jacobian.eye(g_size, g_size);
-
-        residual(ga) = q - trial_q;
-        if(has_kinematic) residual(gb) = beta - current_beta;
-        residual(gc).fill(0.);
-
-        mat t_jacobian;
-        vec t_residual;
-
-        if(update_nodal_quantity(t_jacobian, t_residual, gamma(0), q(si), beta(si), alpha(0))) {
-            flagi = 1.;
-
-            jacobian(gc(0), gc(0)) = 0.;
-            jacobian(gi, gi) += t_jacobian;
-            residual(gi) += t_residual;
-        }
-        if(update_nodal_quantity(t_jacobian, t_residual, gamma(1), q(sj), beta(sj), alpha(1))) {
-            flagj = 1.;
-
-            jacobian(gc(1), gc(1)) = 0.;
-            jacobian(gj, gj) += t_jacobian;
-            residual(gj) += t_residual;
-        }
-
-        const vec incre = solve(jacobian, residual);
-
-        auto error = norm(residual);
-        if(1 == counter) ref_error = std::max(1., error);
-        suanpan_debug("NonlinearNM local iteration error: %.5E.\n", error /= ref_error);
-        if(norm(incre) <= tolerance && error <= tolerance) break;
-
-        q -= incre(ga);
-        if(has_kinematic) beta -= incre(gb);
-        gamma -= incre(gc);
-        alpha -= incre(gc);
-    }
+    if(SUANPAN_SUCCESS != compute_local_integration(q, jacobian, fi >= 0., fj >= 0.)) return SUANPAN_FAIL;
 
     if(SectionType::NM2D == section_type) {
         trial_resistance = yield_diag % q;
