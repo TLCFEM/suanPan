@@ -52,7 +52,7 @@ protected:
     const unsigned d_size = 2llu * n_size - 1llu; // element dof size
     const unsigned g_size;                        // global jacobian size
 
-    const uvec ni, nj, ga, gb, gc, gd, ge, gf;
+    const uvec ni, nj, ga, gb, gc, gd, ge;
 
     [[nodiscard]] virtual vec compute_h(double) const = 0;
     [[nodiscard]] virtual vec compute_dh(double) const = 0;

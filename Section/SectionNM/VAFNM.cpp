@@ -33,7 +33,6 @@ int VAFNM::compute_local_integration(vec& q, mat& jacobian, const bool yield_fla
 
     const vec trial_q = q = trial_resistance.head(d_size) / yield_diag;
 
-    vec e(d_size, fill::value(datum::eps * datum::eps));
     auto gamma = 0.;
 
     auto counter = 0u;
@@ -46,66 +45,90 @@ int VAFNM::compute_local_integration(vec& q, mat& jacobian, const bool yield_fla
 
         vec z(d_size, fill::zeros);
         mat pzpq(d_size, d_size, fill::zeros);
+        vec pzpai(d_size, fill::zeros);
+        vec pzpaj(d_size, fill::zeros);
         vec residual(g_size, fill::none);
 
         jacobian.eye(g_size, g_size);
-        residual(gf).fill(0.);
+        residual(ge).fill(0.);
 
         if(yield_flagi) {
             const vec si = q(ni) - beta(ni), hi = compute_h(ai);
-            residual(gf) += std::max(0., compute_f(si, hi));
+            residual(ge) += std::max(0., compute_f(si, hi));
 
             const vec g = compute_df(si, hi);
             const vec dh = -si % compute_dh(ai) / hi;
             const mat dg = ti * compute_ddf(si, hi);
-            z += ti * g;
+            z(ni) += g;
             pzpq += dg * ti.t();
-            jacobian(gc, gd) = -gamma * dg * dh;
-            jacobian(gf, gd).fill(dot(g, dh));
+            pzpai = dg * dh;
+            jacobian(ge, gc).fill(dot(g, dh));
         }
 
         if(yield_flagj) {
             const vec sj = q(nj) - beta(nj), hj = compute_h(aj);
-            residual(gf) += std::max(0., compute_f(sj, hj));
+            residual(ge) += std::max(0., compute_f(sj, hj));
 
             const vec g = compute_df(sj, hj);
             const vec dh = -sj % compute_dh(aj) / hj;
             const mat dg = tj * compute_ddf(sj, hj);
-            z += tj * g;
+            z(nj) += g;
             pzpq += dg * tj.t();
-            jacobian(gc, ge) = -gamma * dg * dh;
-            jacobian(gf, ge).fill(dot(g, dh));
+            pzpaj = dg * dh;
+            jacobian(ge, gd).fill(dot(g, dh));
         }
 
-        const vec tie = ti.t() * e, tje = tj.t() * e;
+        const auto norm_z = norm(z);
+        const vec m = normalise(z);
+        const mat tmp_a = kin_base * gamma * beta * m.t();
+        const rowvec tzi = gamma * (ti * normalise(z(ni))).t();
+        const rowvec tzj = gamma * (tj * normalise(z(nj))).t();
+        const auto norm_zi = norm(z(ni));
+        const auto norm_zj = norm(z(nj));
 
-        jacobian(ga, gc) = eye(d_size, d_size);
+        residual(ga) = q - trial_q + gamma * z;
+        residual(gc).fill(ai - ani - gamma * norm_zi);
+        residual(gd).fill(aj - anj - gamma * norm_zj);
 
-        jacobian(gc, ga) = -gamma * pzpq;
-        jacobian(gc, gf) = -z;
+        jacobian(gc, ga) = -tzi * pzpq;
+        jacobian(gc, gc) -= tzi * pzpai;
+        jacobian(gc, gd) = -tzi * pzpaj;
+        jacobian(gc, ge).fill(-norm_zi);
 
-        jacobian(gd, gc) = -normalise(tie).t() * ti.t();
+        jacobian(gd, ga) = -tzj * pzpq;
+        jacobian(gd, gc) = -tzj * pzpai;
+        jacobian(gd, gd) -= tzj * pzpaj;
+        jacobian(gd, ge).fill(-norm_zj);
 
-        jacobian(ge, gc) = -normalise(tje).t() * tj.t();
+        jacobian(ge, ga) = z.t();
+        jacobian(ge, ge).fill(0.);
 
-        jacobian(gf, ga) = z.t();
-        jacobian(gf, gf).fill(0.);
+        mat dedx(d_size, g_size, fill::zeros);
 
-        residual(ga) = q - trial_q + e;
-        residual(gc) = e - gamma * z;
-        residual(gd).fill(ai - ani - norm(tie));
-        residual(ge).fill(aj - anj - norm(tje));
+        dedx.cols(ga) = gamma * pzpq;
+        dedx.cols(gc) = gamma * pzpai;
+        dedx.cols(gd) = gamma * pzpaj;
+        dedx.cols(ge) = z;
 
         if(has_kinematic) {
-            const auto norm_e = kin_base * norm(e);
-            jacobian(gb, gb) += norm_e * eye(d_size, d_size);
-            jacobian(gb, gc) = kin_base * beta * normalise(e).t() - kin_modulus * eye(d_size, d_size);
+            residual(gb) = (1. + kin_base * gamma * norm_z) * beta - current_beta - kin_modulus * gamma * z;
 
-            jacobian(gc, gb) = gamma * pzpq;
-            jacobian(gf, gb) = -z.t();
+            jacobian(gb, ga) = tmp_a * pzpq;
+            jacobian(gb, gb) += kin_base * gamma * norm_z * eye(d_size, d_size) - tmp_a * pzpq;
+            jacobian(gb, gc) = tmp_a * pzpai;
+            jacobian(gb, gd) = tmp_a * pzpaj;
+            jacobian(gb, ge) = kin_base * norm_z * beta;
 
-            residual(gb) = (1. + norm_e) * beta - current_beta - kin_modulus * e;
+            jacobian(gc, gb) = tzi * pzpq;
+            jacobian(gd, gb) = tzj * pzpq;
+            jacobian(ge, gb) = -z.t();
+
+            dedx.cols(gb) = -gamma * pzpq;
+
+            jacobian.rows(gb) -= kin_modulus * dedx;
         }
+
+        jacobian.rows(ga) += dedx;
 
         const vec incre = solve(jacobian, residual);
 
@@ -116,10 +139,9 @@ int VAFNM::compute_local_integration(vec& q, mat& jacobian, const bool yield_fla
 
         q -= incre(ga);
         if(has_kinematic) beta -= incre(gb);
-        e -= incre(gc);
-        ai -= incre(gd(0));
-        aj -= incre(ge(0));
-        gamma -= incre(gf(0));
+        ai -= incre(gc(0));
+        aj -= incre(gd(0));
+        gamma -= incre(ge(0));
     }
 }
 

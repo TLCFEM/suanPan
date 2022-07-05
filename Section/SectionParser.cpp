@@ -704,23 +704,6 @@ void new_tsection3d(unique_ptr<Section>& return_obj, istringstream& command) {
     return_obj = make_unique<TSection3D>(tag, std::move(dim), material_id, int_pt, vec{eccentricity_y, eccentricity_z});
 }
 
-void new_nm2d1(unique_ptr<Section>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("new_nm2d1() requires a valid tag.\n");
-        return;
-    }
-
-    vec P(3);
-    for(auto& I : P)
-        if(!get_input(command, I)) {
-            suanpan_error("new_nm2d1() requires a valid parameter.\n");
-            return;
-        }
-
-    return_obj = make_unique<NM2D1>(tag, P(0), P(1), P(2));
-}
-
 void new_nm2d(unique_ptr<Section>& return_obj, istringstream& command, const unsigned size) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -734,6 +717,11 @@ void new_nm2d(unique_ptr<Section>& return_obj, istringstream& command, const uns
             suanpan_error("new_nm2d() requires a valid parameter.\n");
             return;
         }
+
+    if(3 == size) {
+        return_obj = make_unique<NM2D1>(tag, P(0), P(1), P(2));
+        return;
+    }
 
     vector<double> para_set;
     double para;
@@ -752,23 +740,6 @@ void new_nm2d(unique_ptr<Section>& return_obj, istringstream& command, const uns
     else if(11 == size) return_obj = make_unique<NM2D3>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), P(10), std::move(poly_set));
 }
 
-void new_nm3d1(unique_ptr<Section>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("new_nm3d1() requires a valid tag.\n");
-        return;
-    }
-
-    vec P(4);
-    for(auto& I : P)
-        if(!get_input(command, I)) {
-            suanpan_error("new_nm3d1() requires a valid parameter.\n");
-            return;
-        }
-
-    return_obj = make_unique<NM3D1>(tag, P(0), P(1), P(2), P(3));
-}
-
 void new_nm3d(unique_ptr<Section>& return_obj, istringstream& command, const unsigned size) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -782,6 +753,11 @@ void new_nm3d(unique_ptr<Section>& return_obj, istringstream& command, const uns
             suanpan_error("new_nm3d() requires a valid parameter.\n");
             return;
         }
+
+    if(4 == size) {
+        return_obj = make_unique<NM3D1>(tag, P(0), P(1), P(2), P(3));
+        return;
+    }
 
     vector<double> para_set;
     double para;
@@ -2218,10 +2194,10 @@ int create_new_section(const shared_ptr<DomainBase>& domain, istringstream& comm
     else if(is_equal(section_id, "TrussSection")) new_trusssection(new_section, command);
     else if(is_equal(section_id, "TSection2D")) new_tsection2d(new_section, command);
     else if(is_equal(section_id, "TSection3D")) new_tsection3d(new_section, command);
-    else if(is_equal(section_id, "NM2D1")) new_nm2d1(new_section, command);
+    else if(is_equal(section_id, "NM2D1")) new_nm2d(new_section, command, 3);
     else if(is_equal(section_id, "NM2D2")) new_nm2d(new_section, command, 8);
     else if(is_equal(section_id, "NM2D3")) new_nm2d(new_section, command, 11);
-    else if(is_equal(section_id, "NM3D1")) new_nm3d1(new_section, command);
+    else if(is_equal(section_id, "NM3D1")) new_nm3d(new_section, command, 4);
     else if(is_equal(section_id, "NM3D2")) new_nm3d(new_section, command, 10);
     else if(is_equal(section_id, "NM3D3")) new_nm3d(new_section, command, 13);
     else if(is_equal(section_id, "EU2D")) new_eu2d(new_section, command);
