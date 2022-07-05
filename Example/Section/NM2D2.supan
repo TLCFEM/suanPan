@@ -13,7 +13,7 @@ fix2 1 P 1
 displacement 1 0 .3 2 2
 
 step static 1 1
-set ini_step_size 1E-2
+set ini_step_size 1E-1
 set fixed_step_size true
 set symm_mat false
 

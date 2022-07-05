@@ -35,15 +35,14 @@ NonlinearNM::NonlinearNM(const unsigned T, const double EEA, const double EEIS, 
     }())
     , has_kinematic(KK)
     , n_size(2)
-    , g_size(has_kinematic ? 12 : 9)
+    , g_size(has_kinematic ? 9 : 6)
     , ni{0, 1}
     , nj{0, 2}
     , ga{0, 1, 2}
-    , gb(has_kinematic ? uvec{9, 10, 11} : uvec{})
-    , gc{3, 4, 5}
-    , gd{6}
-    , ge{7}
-    , gf{8} { access::rw(linear_density) = LD; }
+    , gb(has_kinematic ? uvec{6, 7, 8} : uvec{})
+    , gc{3}
+    , gd{4}
+    , ge{5} { access::rw(linear_density) = LD; }
 
 NonlinearNM::NonlinearNM(const unsigned T, const double EEA, const double EEIS, const double EEIW, const bool KK, const double LD, vec&& YF)
     : DataNonlinearNM{EEA, EEIS, EEIW, std::forward<vec>(YF)}
@@ -61,15 +60,14 @@ NonlinearNM::NonlinearNM(const unsigned T, const double EEA, const double EEIS, 
     }())
     , has_kinematic(KK)
     , n_size(3)
-    , g_size(has_kinematic ? 18 : 13)
+    , g_size(has_kinematic ? 13 : 8)
     , ni{0, 1, 3}
     , nj{0, 2, 4}
     , ga{0, 1, 2, 3, 4}
-    , gb(has_kinematic ? uvec{13, 14, 15, 16, 17} : uvec{})
-    , gc{5, 6, 7, 8, 9}
-    , gd{10}
-    , ge{11}
-    , gf{12} { access::rw(linear_density) = LD; }
+    , gb(has_kinematic ? uvec{8, 9, 10, 11, 12} : uvec{})
+    , gc{5}
+    , gd{6}
+    , ge{7} { access::rw(linear_density) = LD; }
 
 int NonlinearNM::initialize(const shared_ptr<DomainBase>&) {
     if(SectionType::NM2D == section_type) initial_stiffness.zeros(3, 3);
