@@ -78,7 +78,6 @@ int LinearHardeningNM::compute_local_integration(vec& q, mat& jacobian, const bo
             jacobian(ge, gd).fill(dot(g, dh));
         }
 
-        const vec m = normalise(z);
         const rowvec tzi = gamma * (ti * normalise(z(ni))).t();
         const rowvec tzj = gamma * (tj * normalise(z(nj))).t();
         const auto norm_zi = norm(z(ni));
