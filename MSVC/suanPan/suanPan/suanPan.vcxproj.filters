@@ -1387,6 +1387,15 @@
     <ClCompile Include="..\..\..\UnitTest\TestSurfaceNM.cpp">
       <Filter>UnitTest</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionNM\BoundingNM.cpp">
+      <Filter>Section\SectionNM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionNM\NM2D4.cpp">
+      <Filter>Section\SectionNM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionNM\NM3D4.cpp">
+      <Filter>Section\SectionNM</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2627,6 +2636,15 @@
       <Filter>Section\SectionNM</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Section\SectionNM\NM3D3.h">
+      <Filter>Section\SectionNM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionNM\BoundingNM.h">
+      <Filter>Section\SectionNM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionNM\NM2D4.h">
+      <Filter>Section\SectionNM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionNM\NM3D4.h">
       <Filter>Section\SectionNM</Filter>
     </ClInclude>
   </ItemGroup>
