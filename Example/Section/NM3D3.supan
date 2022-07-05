@@ -19,7 +19,7 @@ recorder 2 hdf5 Element S 1
 recorder 3 hdf5 Element PE 1
 
 step static 1
-set ini_step_size 1E-2
+set ini_step_size 1E-1
 set fixed_step_size true
 
 converger RelIncreDisp 1 1E-12 20 1
@@ -32,7 +32,7 @@ analyze
 # Displacement:
 # 0 0 0 0 0 0
 # Resistance:
-# 0 0 -6.9073e+01 1.3815e+02 6.9073e+01 0
+# 0 0 -6.9069e+01 1.3814e+02 6.9069e+01 0
 # 
 # Node 2:
 # Coordinate:
@@ -40,7 +40,7 @@ analyze
 # Displacement:
 # 0 0 0.0576 -0.0138 -0.0863 0
 # Resistance:
-# 0 0 1.4211e-14 0 5.6621e-15 0
+# 0 0 1.4211e-14 -2.8422e-14 -4.4409e-15 0
 # 
 # Node 3:
 # Coordinate:
@@ -48,7 +48,7 @@ analyze
 # Displacement:
 # 0 0 0.6000 -0.3999 -0.0863 0
 # Resistance:
-# 0 0 6.9073e+01 -2.1538e-14 0 0
+# 0 0 6.9069e+01 -4.0856e-14 0 0
 peek node 1 2 3
 
 peek element 1 2

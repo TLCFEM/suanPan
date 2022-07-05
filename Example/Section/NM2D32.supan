@@ -14,7 +14,7 @@ fix2 2 3 2
 displacement 1 0 .3 2 2
 
 step static 1 1
-set ini_step_size 1E-2
+set ini_step_size 1E-1
 set fixed_step_size true
 set symm_mat false
 
@@ -28,7 +28,7 @@ analyze
 # Displacement:
 # 0 0 0
 # Resistance:
-# 0 -2.4356e+02 -2.4356e+02
+# 0 -2.4341e+02 -2.4341e+02
 # 
 # Node 2:
 # Coordinate:
@@ -36,7 +36,7 @@ analyze
 # Displacement:
 # 0 0.3000 0
 # Resistance:
-# 0 2.4356e+02 -2.4356e+02
+# 0 2.4341e+02 -2.4341e+02
 peek node 1 2
 
 peek element 1
