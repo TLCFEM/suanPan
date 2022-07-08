@@ -25,8 +25,7 @@ int LinearHardeningNM::compute_local_integration(vec& q, mat& jacobian, const bo
 
     vec beta(&trial_history(0), d_size, false, true);
     auto &ai = trial_history(d_size), &aj = trial_history(d_size + 1llu);
-    auto& flagi = trial_history(d_size + 2llu); // yield flag
-    auto& flagj = trial_history(d_size + 3llu); // yield flag
+    auto &flagi = trial_history(d_size + 2llu), &flagj = trial_history(d_size + 3llu); // yield flag
 
     flagi = yield_flagi;
     flagj = yield_flagj;
@@ -78,8 +77,12 @@ int LinearHardeningNM::compute_local_integration(vec& q, mat& jacobian, const bo
             jacobian(ge, gd).fill(dot(g, dh));
         }
 
-        const rowvec tzi = gamma * (ti * normalise(z(ni))).t();
-        const rowvec tzj = gamma * (tj * normalise(z(nj))).t();
+        if(1 == counter) {
+            gamma = residual(ge(0)) / dot(z, z);
+            q = trial_q - gamma * z;
+            continue;
+        }
+
         const auto norm_zi = norm(z(ni));
         const auto norm_zj = norm(z(nj));
 
@@ -87,46 +90,39 @@ int LinearHardeningNM::compute_local_integration(vec& q, mat& jacobian, const bo
         residual(gc).fill(ai - ani - gamma * norm_zi);
         residual(gd).fill(aj - anj - gamma * norm_zj);
 
-        jacobian(gc, ga) = -tzi * pzpq;
-        jacobian(gc, gc) -= tzi * pzpai;
-        jacobian(gc, gd) = -tzi * pzpaj;
+        jacobian(ga, ge) = z;
         jacobian(gc, ge).fill(-norm_zi);
-
-        jacobian(gd, ga) = -tzj * pzpq;
-        jacobian(gd, gc) = -tzj * pzpai;
-        jacobian(gd, gd) -= tzj * pzpaj;
         jacobian(gd, ge).fill(-norm_zj);
-
         jacobian(ge, ga) = z.t();
         jacobian(ge, ge).fill(0.);
 
-        mat dedx(d_size, g_size, fill::none);
+        mat prpz(g_size, d_size, fill::zeros), dzdx(d_size, g_size, fill::zeros);
 
-        dedx.cols(ga) = gamma * pzpq;
-        dedx.cols(gc) = gamma * pzpai;
-        dedx.cols(gd) = gamma * pzpaj;
-        dedx.cols(ge) = z;
+        prpz.rows(ga) = gamma * eye(d_size, d_size);
+        prpz.rows(gc) = -gamma * (ti * normalise(z(ni))).t();
+        prpz.rows(gd) = -gamma * (tj * normalise(z(nj))).t();
+
+        dzdx.cols(ga) = pzpq;
+        dzdx.cols(gc) = pzpai;
+        dzdx.cols(gd) = pzpaj;
 
         if(has_kinematic) {
             residual(gb) = beta - current_beta - kinematic_modulus * gamma * z;
 
-            jacobian(gc, gb) = tzi * pzpq;
-            jacobian(gd, gb) = tzj * pzpq;
+            jacobian(gb, ge) = -kinematic_modulus * z;
             jacobian(ge, gb) = -z.t();
 
-            dedx.cols(gb) = -gamma * pzpq;
+            prpz.rows(gb) = -kinematic_modulus * gamma * eye(d_size, d_size);
 
-            jacobian.rows(gb) -= kinematic_modulus * dedx;
+            dzdx.cols(gb) = -pzpq;
         }
 
-        jacobian.rows(ga) += dedx;
+        const vec incre = solve(jacobian += prpz * dzdx, residual);
 
-        const vec incre = solve(jacobian, residual);
-
-        auto error = norm(incre);
-        if(1 == counter) ref_error = std::max(1., error);
+        auto error = norm(residual);
+        if(2 == counter) ref_error = std::max(1., error);
         suanpan_debug("LinearHardeningNM local iteration error: %.5E.\n", error /= ref_error);
-        if(norm(residual) <= tolerance && error <= tolerance) return SUANPAN_SUCCESS;
+        if(norm(incre) <= tolerance && error <= tolerance) return SUANPAN_SUCCESS;
 
         q -= incre(ga);
         if(has_kinematic) beta -= incre(gb);
