@@ -54,7 +54,7 @@ int LinearHardeningNM::compute_local_integration(vec& q, mat& jacobian, const bo
 
         if(yield_flagi) {
             const vec si = q(ni) - beta(ni), hi = compute_h(ai);
-            residual(ge) += std::max(0., compute_f(si, hi));
+            residual(ge) += compute_f(si, hi);
 
             const vec g = compute_df(si, hi);
             const vec dh = -si % compute_dh(ai) / hi;
@@ -67,7 +67,7 @@ int LinearHardeningNM::compute_local_integration(vec& q, mat& jacobian, const bo
 
         if(yield_flagj) {
             const vec sj = q(nj) - beta(nj), hj = compute_h(aj);
-            residual(ge) += std::max(0., compute_f(sj, hj));
+            residual(ge) += compute_f(sj, hj);
 
             const vec g = compute_df(sj, hj);
             const vec dh = -sj % compute_dh(aj) / hj;
@@ -124,7 +124,7 @@ int LinearHardeningNM::compute_local_integration(vec& q, mat& jacobian, const bo
         const vec incre = solve(jacobian, residual);
 
         auto error = norm(incre);
-        if(1 == counter) ref_error = error;
+        if(1 == counter) ref_error = std::max(1., error);
         suanpan_debug("LinearHardeningNM local iteration error: %.5E.\n", error /= ref_error);
         if(norm(residual) <= tolerance && error <= tolerance) return SUANPAN_SUCCESS;
 
