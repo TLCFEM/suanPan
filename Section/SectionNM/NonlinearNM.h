@@ -37,7 +37,7 @@ struct DataNonlinearNM {
 };
 
 class NonlinearNM : protected DataNonlinearNM, public SectionNM {
-    [[nodiscard]] virtual int compute_local_integration(vec&, mat&, bool, bool) = 0;
+    [[nodiscard]] virtual int compute_local_integration(vec&, mat&) = 0;
 
 protected:
     static constexpr unsigned max_iteration = 20;

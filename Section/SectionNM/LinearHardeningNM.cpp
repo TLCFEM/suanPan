@@ -18,7 +18,7 @@
 #include "LinearHardeningNM.h"
 #include <Toolbox/utility.h>
 
-int LinearHardeningNM::compute_local_integration(vec& q, mat& jacobian, const bool yield_flagi, const bool yield_flagj) {
+int LinearHardeningNM::compute_local_integration(vec& q, mat& jacobian) {
     trial_history = current_history;
     const vec current_beta(&current_history(0), d_size, false, true);
     const auto &ani = current_history(d_size), &anj = current_history(d_size + 1llu);
@@ -27,10 +27,10 @@ int LinearHardeningNM::compute_local_integration(vec& q, mat& jacobian, const bo
     auto &ai = trial_history(d_size), &aj = trial_history(d_size + 1llu);
     auto &flagi = trial_history(d_size + 2llu), &flagj = trial_history(d_size + 3llu); // yield flag
 
-    flagi = yield_flagi;
-    flagj = yield_flagj;
-
     const vec trial_q = q = trial_resistance.head(d_size) / yield_diag;
+
+    flagi = 0.;
+    flagj = 0.;
 
     auto gamma = 0.;
 
@@ -51,30 +51,36 @@ int LinearHardeningNM::compute_local_integration(vec& q, mat& jacobian, const bo
         jacobian.eye(g_size, g_size);
         residual(ge).fill(0.);
 
-        if(yield_flagi) {
+        {
             const vec si = q(ni) - beta(ni), hi = compute_h(ai);
-            residual(ge) += compute_f(si, hi);
+            if(const auto fi = compute_f(si, hi); fi > 0. || static_cast<bool>(flagi)) {
+                flagi = 1.;
+                residual(ge) += fi;
 
-            const vec g = compute_df(si, hi);
-            const vec dh = -si % compute_dh(ai) / hi;
-            const mat dg = ti * compute_ddf(si, hi);
-            z(ni) += g;
-            pzpq += dg * ti.t();
-            pzpai = dg * dh;
-            jacobian(ge, gc).fill(dot(g, dh));
+                const vec g = compute_df(si, hi);
+                const vec dh = -si % compute_dh(ai) / hi;
+                const mat dg = ti * compute_ddf(si, hi);
+                z(ni) += g;
+                pzpq += dg * ti.t();
+                pzpai = dg * dh;
+                jacobian(ge, gc).fill(dot(g, dh));
+            }
         }
 
-        if(yield_flagj) {
+        {
             const vec sj = q(nj) - beta(nj), hj = compute_h(aj);
-            residual(ge) += compute_f(sj, hj);
+            if(const auto fj = compute_f(sj, hj); fj > 0. || static_cast<bool>(flagj)) {
+                flagj = 1.;
+                residual(ge) += fj;
 
-            const vec g = compute_df(sj, hj);
-            const vec dh = -sj % compute_dh(aj) / hj;
-            const mat dg = tj * compute_ddf(sj, hj);
-            z(nj) += g;
-            pzpq += dg * tj.t();
-            pzpaj = dg * dh;
-            jacobian(ge, gd).fill(dot(g, dh));
+                const vec g = compute_df(sj, hj);
+                const vec dh = -sj % compute_dh(aj) / hj;
+                const mat dg = tj * compute_ddf(sj, hj);
+                z(nj) += g;
+                pzpq += dg * tj.t();
+                pzpaj = dg * dh;
+                jacobian(ge, gd).fill(dot(g, dh));
+            }
         }
 
         if(1 == counter) {
