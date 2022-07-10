@@ -83,39 +83,44 @@ int LinearHardeningNM::compute_local_integration(vec& q, mat& jacobian) {
             }
         }
 
+        const vec m = normalise(z);
+
+        const auto norm_mi = norm(m(ni));
+        const auto norm_mj = norm(m(nj));
+
         if(1 == counter) {
-            gamma = residual(ge(0)) / dot(z, z);
-            q = trial_q - gamma * z;
+            gamma = residual(ge(0)) / dot(z, m);
+            q -= gamma * m;
+            if(has_kinematic) beta += kinematic_modulus * gamma * m;
+            ai += gamma * norm_mi;
+            aj += gamma * norm_mj;
             continue;
         }
 
-        const auto norm_zi = norm(z(ni));
-        const auto norm_zj = norm(z(nj));
+        residual(ga) = q - trial_q + gamma * m;
+        residual(gc).fill(ai - ani - gamma * norm_mi);
+        residual(gd).fill(aj - anj - gamma * norm_mj);
 
-        residual(ga) = q - trial_q + gamma * z;
-        residual(gc).fill(ai - ani - gamma * norm_zi);
-        residual(gd).fill(aj - anj - gamma * norm_zj);
-
-        jacobian(ga, ge) = z;
-        jacobian(gc, ge).fill(-norm_zi);
-        jacobian(gd, ge).fill(-norm_zj);
+        jacobian(ga, ge) = m;
+        jacobian(gc, ge).fill(-norm_mi);
+        jacobian(gd, ge).fill(-norm_mj);
         jacobian(ge, ga) = z.t();
         jacobian(ge, ge).fill(0.);
 
         mat prpz(g_size, d_size, fill::zeros), dzdx(d_size, g_size, fill::zeros);
 
         prpz.rows(ga) = gamma * eye(d_size, d_size);
-        prpz.rows(gc) = -gamma * (ti * normalise(z(ni))).t();
-        prpz.rows(gd) = -gamma * (tj * normalise(z(nj))).t();
+        prpz.rows(gc) = -gamma * (ti * normalise(m(ni))).t();
+        prpz.rows(gd) = -gamma * (tj * normalise(m(nj))).t();
 
         dzdx.cols(ga) = pzpq;
         dzdx.cols(gc) = pzpai;
         dzdx.cols(gd) = pzpaj;
 
         if(has_kinematic) {
-            residual(gb) = beta - current_beta - kinematic_modulus * gamma * z;
+            residual(gb) = beta - current_beta - kinematic_modulus * gamma * m;
 
-            jacobian(gb, ge) = -kinematic_modulus * z;
+            jacobian(gb, ge) = -kinematic_modulus * m;
             jacobian(ge, gb) = -z.t();
 
             prpz.rows(gb) = -kinematic_modulus * gamma * eye(d_size, d_size);
@@ -123,7 +128,7 @@ int LinearHardeningNM::compute_local_integration(vec& q, mat& jacobian) {
             dzdx.cols(gb) = -pzpq;
         }
 
-        const vec incre = solve(jacobian += prpz * dzdx, residual);
+        const vec incre = solve(jacobian += prpz * (eye(d_size, d_size) - m * m.t()) / norm(z) * dzdx, residual);
 
         auto error = norm(residual);
         if(2 == counter) ref_error = std::max(1., error);
