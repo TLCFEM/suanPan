@@ -103,15 +103,12 @@ int NonlinearNM::update_trial_status(const vec& t_deformation) {
     const vec bni = current_beta(ni), bnj = current_beta(nj);
     const auto &ani = current_history(d_size), &anj = current_history(d_size + 1llu);
 
-    const auto fi = compute_f(trial_q(ni) - bni, compute_h(ani));
-    const auto fj = compute_f(trial_q(nj) - bnj, compute_h(anj));
-
-    if(fi <= 0. && fj <= 0.) return SUANPAN_SUCCESS;
+    if(compute_f(trial_q(ni) - bni, compute_h(ani)) <= 0. && compute_f(trial_q(nj) - bnj, compute_h(anj)) <= 0.) return SUANPAN_SUCCESS;
 
     vec q;
     mat jacobian;
 
-    if(SUANPAN_SUCCESS != compute_local_integration(q, jacobian, fi > 0., fj > 0.)) return SUANPAN_FAIL;
+    if(SUANPAN_SUCCESS != compute_local_integration(q, jacobian)) return SUANPAN_FAIL;
 
     if(SectionType::NM2D == section_type) {
         trial_resistance = yield_diag % q;
