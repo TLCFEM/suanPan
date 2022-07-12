@@ -5,6 +5,11 @@
 1. `MKL` includes outdated `FEAST`, the external names in `FEAST` library are modified to avoid linking error.
 2. `OpenBLAS` causes SEG FAULT with version 0.3.20
 
+## version 2.5
+
+1. reformulate NM sections
+2. add couple stress membranes `CST3`, `CST6`, `CSM4-8`
+
 ## version 2.4
 
 1. add `RestitutionWall` constraint which conserves momentum and energy
