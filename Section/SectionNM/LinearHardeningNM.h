@@ -59,7 +59,6 @@ public:
                       double,   // linear density
                       vec&&
     );
-
 };
 
 #endif
