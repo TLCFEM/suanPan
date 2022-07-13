@@ -1,4 +1,4 @@
-# A TEST MODEL FOR MODIFIEDNEWTON MATERIAL
+# A TEST MODEL FOR BFGS MATERIAL
 
 node 1 0 0
 node 2 4 0
@@ -19,7 +19,7 @@ set fixed_step_size 1
 
 cload 1 0 100 2 2
 
-converger RelIncreDisp 1 1E-4 50 1
+converger RelIncreDisp 1 1E-8 50 1
 
 analyze
 

@@ -79,7 +79,7 @@ template<Differentiable F> int LBFGS::optimize(F& func, vec& x) {
     hist_residual.clear();
     hist_factor.clear();
 
-    const mat jacobian = inv(func.evaluate_jacobian(x));
+    mat jacobian = inv(func.evaluate_jacobian(x));
 
     vec ninja;
     const auto ref_magnitude = norm(x);
@@ -88,20 +88,22 @@ template<Differentiable F> int LBFGS::optimize(F& func, vec& x) {
     auto counter = 0u;
     while(true) {
         const auto residual = func.evaluate_residual(x);
+        suanpan_debug("LBFGS local iteration counter: %u.\n", counter);
 
         if(0 == counter) {
-            // commit current residual
-            hist_residual.emplace_back(residual);
             // solve the system and commit current displacement increment
-            ninja = jacobian * hist_residual.back();
+            ninja = jacobian * residual;
         }
         else {
             // clear temporary factor container
             alpha.clear();
+            alpha.reserve(hist_ninja.size());
             // commit current residual
-            hist_residual.emplace_back(residual);
+            hist_residual.back() += residual;
+            // commit current factor after obtaining ninja and residual
+            hist_factor.emplace_back(dot(hist_ninja.back(), hist_residual.back()));
             // copy current residual to ninja
-            ninja = hist_residual.back();
+            ninja = residual;
             // perform two-step recursive loop
             // right side loop
             for(auto J = static_cast<int>(hist_factor.size()) - 1; J >= 0; --J) {
@@ -111,14 +113,14 @@ template<Differentiable F> int LBFGS::optimize(F& func, vec& x) {
                 ninja -= alpha.back() * hist_residual[J];
             }
             // apply the Hessian from the factorization in the first iteration
-            ninja = jacobian * ninja;
+            ninja *= dot(hist_residual.back(), hist_ninja.back()) / dot(hist_residual.back(), hist_residual.back());
             // left side loop
             for(size_t I = 0, J = hist_factor.size() - 1; I < hist_factor.size(); ++I, --J) ninja += (alpha[J] - dot(hist_residual[I], ninja) / hist_factor[I]) * hist_ninja[I];
         }
+
         // commit current displacement increment
-        hist_ninja.emplace_back(ninja);
-        // commit current factor after obtaining ninja and residual
-        hist_factor.emplace_back(dot(hist_ninja.back(), hist_residual.back()));
+        hist_ninja.emplace_back(-ninja);
+        hist_residual.emplace_back(-residual);
 
         const auto error = norm(ninja);
         const auto ref_error = error / ref_magnitude;
@@ -126,7 +128,7 @@ template<Differentiable F> int LBFGS::optimize(F& func, vec& x) {
         if(error <= abs_tol && ref_error <= rel_tol) return SUANPAN_SUCCESS;
         if(++counter > max_iteration) return SUANPAN_FAIL;
 
-        // check if the maximum record number is hit (L-LBFGS)
+        // check if the maximum record number is hit (LBFGS)
         if(counter > max_hist) {
             hist_ninja.pop_front();
             hist_residual.pop_front();
@@ -139,9 +141,9 @@ template<Differentiable F> int LBFGS::optimize(F& func, vec& x) {
 
 class Quadratic {
 public:
-    vec evaluate_residual(const vec& x) const { return square(x) - 1.; }
+    [[nodiscard]] vec evaluate_residual(const vec& x) const { return square(x) - 1.; }
 
-    mat evaluate_jacobian(const vec& x) const { return diagmat(2. * x); }
+    [[nodiscard]] mat evaluate_jacobian(const vec& x) const { return diagmat(2. * x); }
 };
 
 #endif

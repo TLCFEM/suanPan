@@ -42,11 +42,23 @@ int BFGS::analyze() {
     auto& ninja = get_ninja(W);
     // lambda alias
     auto& aux_lambda = get_auxiliary_lambda(W);
+    vec residual;
 
     // clear container
     hist_ninja.clear();
     hist_residual.clear();
     hist_factor.clear();
+
+    auto adjust_for_mpc = [&] {
+        if(0 == W->get_mpc()) return SUANPAN_SUCCESS;
+        const auto n_size = W->get_size();
+        auto& border = W->get_auxiliary_stiffness();
+        mat right;
+        if(SUANPAN_SUCCESS != G->solve(right, border)) return SUANPAN_FAIL;
+        if(!solve(aux_lambda, border.t() * right.head_rows(n_size), border.t() * ninja.head_rows(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
+        ninja -= right * aux_lambda;
+        return SUANPAN_SUCCESS;
+    };
 
     while(true) {
         // process modifiers
@@ -60,19 +72,10 @@ int BFGS::analyze() {
             // process loads and constraints
             if(SUANPAN_SUCCESS != G->process_load()) return SUANPAN_FAIL;
             if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
-            // commit current residual
-            hist_residual.emplace_back(G->get_force_residual());
             // solve the system and commit current displacement increment
-            if(SUANPAN_SUCCESS != G->solve(ninja, hist_residual.back())) return SUANPAN_FAIL;
+            if(SUANPAN_SUCCESS != G->solve(ninja, residual = G->get_force_residual())) return SUANPAN_FAIL;
             // deal with mpc
-            if(0 != W->get_mpc()) {
-                const auto n_size = W->get_size();
-                auto& border = W->get_auxiliary_stiffness();
-                mat right;
-                if(SUANPAN_SUCCESS != G->solve(right, border)) return SUANPAN_FAIL;
-                if(!solve(aux_lambda, border.t() * right.head_rows(n_size), border.t() * ninja.head_rows(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
-                ninja -= right * aux_lambda;
-            }
+            if(SUANPAN_SUCCESS != adjust_for_mpc()) return SUANPAN_FAIL;
         }
         else {
             // process resistance of loads and constraints
@@ -80,13 +83,16 @@ int BFGS::analyze() {
             if(SUANPAN_SUCCESS != G->process_constraint_resistance()) return SUANPAN_FAIL;
             // clear temporary factor container
             alpha.clear();
-            // commit current residual
-            hist_residual.emplace_back(G->get_force_residual());
+            alpha.reserve(hist_ninja.size());
+            // complete residual increment
+            hist_residual.back() -= residual = G->get_force_residual();
+            // commit current factor after obtaining residual
+            hist_factor.emplace_back(dot(hist_ninja.back(), hist_residual.back()));
             // copy current residual to ninja
-            ninja = hist_residual.back();
+            ninja = residual;
             // perform two-step recursive loop
             // right side loop
-            for(size_t I = 0, J = hist_factor.size() - 1; I < hist_factor.size(); ++I, --J) {
+            for(auto J = static_cast<int>(hist_factor.size()) - 1; J >= 0; --J) {
                 // compute and commit alpha
                 alpha.emplace_back(dot(hist_ninja[J], ninja) / hist_factor[J]);
                 // update ninja
@@ -95,21 +101,14 @@ int BFGS::analyze() {
             // apply the Hessian from the factorization in the first iteration
             ninja = G->solve(ninja);
             // deal with mpc
-            if(0 != W->get_mpc()) {
-                const auto n_size = W->get_size();
-                auto& border = W->get_auxiliary_stiffness();
-                mat right;
-                if(SUANPAN_SUCCESS != G->solve(right, border)) return SUANPAN_FAIL;
-                if(!solve(aux_lambda, border.t() * right.head_rows(n_size), border.t() * ninja.head_rows(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
-                ninja -= right * aux_lambda;
-            }
+            if(SUANPAN_SUCCESS != adjust_for_mpc()) return SUANPAN_FAIL;
             // left side loop
             for(size_t I = 0, J = hist_factor.size() - 1; I < hist_factor.size(); ++I, --J) ninja += (alpha[J] - dot(hist_residual[I], ninja) / hist_factor[I]) * hist_ninja[I];
         }
+
         // commit current displacement increment
-        hist_ninja.emplace_back(ninja);
-        // commit current factor after obtaining ninja and residual
-        hist_factor.emplace_back(dot(hist_ninja.back(), hist_residual.back()));
+        hist_ninja.emplace_back(ninja);       // complete
+        hist_residual.emplace_back(residual); // part of residual increment
 
         // avoid machine error accumulation
         G->erase_machine_error();
