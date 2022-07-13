@@ -79,8 +79,6 @@ template<Differentiable F> int LBFGS::optimize(F& func, vec& x) {
     hist_residual.clear();
     hist_factor.clear();
 
-    mat jacobian = inv(func.evaluate_jacobian(x));
-
     vec ninja;
     const auto ref_magnitude = norm(x);
 
@@ -88,12 +86,8 @@ template<Differentiable F> int LBFGS::optimize(F& func, vec& x) {
     auto counter = 0u;
     while(true) {
         const auto residual = func.evaluate_residual(x);
-        suanpan_debug("LBFGS local iteration counter: %u.\n", counter);
 
-        if(0 == counter) {
-            // solve the system and commit current displacement increment
-            ninja = jacobian * residual;
-        }
+        if(0 == counter) ninja = solve(func.evaluate_jacobian(x), residual);
         else {
             // clear temporary factor container
             alpha.clear();
