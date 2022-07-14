@@ -47,11 +47,13 @@
 using std::deque;
 using std::vector;
 
+#ifndef SUANPAN_CLANG
 template<typename T> concept Differentiable = requires(T t, const vec& x)
 {
     t.evaluate_residual(x);
     t.evaluate_jacobian(x);
 };
+#endif
 
 class LBFGS final {
     deque<vec> hist_ninja, hist_residual;
@@ -70,68 +72,70 @@ public:
         , abs_tol(AT)
         , rel_tol(RT) {}
 
-    template<Differentiable F> int optimize(F&, vec&);
-};
+#ifndef SUANPAN_CLANG
+    template<Differentiable F> int optimize(F& func, vec& x) {
+#else
+    template<typename F> int optimize(F& func, vec& x) {
+#endif
+        // clear container
+        hist_ninja.clear();
+        hist_residual.clear();
+        hist_factor.clear();
 
-template<Differentiable F> int LBFGS::optimize(F& func, vec& x) {
-    // clear container
-    hist_ninja.clear();
-    hist_residual.clear();
-    hist_factor.clear();
+        vec ninja;
+        const auto ref_magnitude = norm(x);
 
-    vec ninja;
-    const auto ref_magnitude = norm(x);
+        // iteration counter
+        auto counter = 0u;
+        while(true) {
+            const auto residual = func.evaluate_residual(x);
 
-    // iteration counter
-    auto counter = 0u;
-    while(true) {
-        const auto residual = func.evaluate_residual(x);
-
-        if(0 == counter) ninja = solve(func.evaluate_jacobian(x), residual);
-        else {
-            // clear temporary factor container
-            alpha.clear();
-            alpha.reserve(hist_ninja.size());
-            // commit current residual
-            hist_residual.back() += residual;
-            // commit current factor after obtaining ninja and residual
-            hist_factor.emplace_back(dot(hist_ninja.back(), hist_residual.back()));
-            // copy current residual to ninja
-            ninja = residual;
-            // perform two-step recursive loop
-            // right side loop
-            for(auto J = static_cast<int>(hist_factor.size()) - 1; J >= 0; --J) {
-                // compute and commit alpha
-                alpha.emplace_back(dot(hist_ninja[J], ninja) / hist_factor[J]);
-                // update ninja
-                ninja -= alpha.back() * hist_residual[J];
+            if(0 == counter) ninja = solve(func.evaluate_jacobian(x), residual);
+            else {
+                // clear temporary factor container
+                alpha.clear();
+                alpha.reserve(hist_ninja.size());
+                // commit current residual
+                hist_residual.back() += residual;
+                // commit current factor after obtaining ninja and residual
+                hist_factor.emplace_back(dot(hist_ninja.back(), hist_residual.back()));
+                // copy current residual to ninja
+                ninja = residual;
+                // perform two-step recursive loop
+                // right side loop
+                for(auto J = static_cast<int>(hist_factor.size()) - 1; J >= 0; --J) {
+                    // compute and commit alpha
+                    alpha.emplace_back(dot(hist_ninja[J], ninja) / hist_factor[J]);
+                    // update ninja
+                    ninja -= alpha.back() * hist_residual[J];
+                }
+                // apply the Hessian from the factorization in the first iteration
+                ninja *= dot(hist_residual.back(), hist_ninja.back()) / dot(hist_residual.back(), hist_residual.back());
+                // left side loop
+                for(size_t I = 0, J = hist_factor.size() - 1; I < hist_factor.size(); ++I, --J) ninja += (alpha[J] - dot(hist_residual[I], ninja) / hist_factor[I]) * hist_ninja[I];
             }
-            // apply the Hessian from the factorization in the first iteration
-            ninja *= dot(hist_residual.back(), hist_ninja.back()) / dot(hist_residual.back(), hist_residual.back());
-            // left side loop
-            for(size_t I = 0, J = hist_factor.size() - 1; I < hist_factor.size(); ++I, --J) ninja += (alpha[J] - dot(hist_residual[I], ninja) / hist_factor[I]) * hist_ninja[I];
+
+            // commit current displacement increment
+            hist_ninja.emplace_back(-ninja);
+            hist_residual.emplace_back(-residual);
+
+            const auto error = norm(ninja);
+            const auto ref_error = error / ref_magnitude;
+            suanpan_debug("LBFGS local iteration error: %.5E.\n", ref_error);
+            if(error <= abs_tol && ref_error <= rel_tol) return SUANPAN_SUCCESS;
+            if(++counter > max_iteration) return SUANPAN_FAIL;
+
+            // check if the maximum record number is hit (LBFGS)
+            if(counter > max_hist) {
+                hist_ninja.pop_front();
+                hist_residual.pop_front();
+                hist_factor.pop_front();
+            }
+
+            x -= ninja;
         }
-
-        // commit current displacement increment
-        hist_ninja.emplace_back(-ninja);
-        hist_residual.emplace_back(-residual);
-
-        const auto error = norm(ninja);
-        const auto ref_error = error / ref_magnitude;
-        suanpan_debug("LBFGS local iteration error: %.5E.\n", ref_error);
-        if(error <= abs_tol && ref_error <= rel_tol) return SUANPAN_SUCCESS;
-        if(++counter > max_iteration) return SUANPAN_FAIL;
-
-        // check if the maximum record number is hit (LBFGS)
-        if(counter > max_hist) {
-            hist_ninja.pop_front();
-            hist_residual.pop_front();
-            hist_factor.pop_front();
-        }
-
-        x -= ninja;
     }
-}
+};
 
 class Quadratic {
 public:
