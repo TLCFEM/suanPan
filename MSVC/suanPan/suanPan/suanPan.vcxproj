@@ -480,6 +480,7 @@
     <ClCompile Include="..\..\..\Toolbox\tensorToolbox.cpp" />
     <ClCompile Include="..\..\..\Toolbox\utility.cpp" />
     <ClCompile Include="..\..\..\UnitTest\CatchTest.cpp" />
+    <ClCompile Include="..\..\..\UnitTest\TestBFGS.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestColoring.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestIntegration.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestMatrix.cpp" />
@@ -896,6 +897,7 @@
     <ClInclude Include="..\..\..\Toolbox\commandParser.h" />
     <ClInclude Include="..\..\..\Toolbox\container.h" />
     <ClInclude Include="..\..\..\Toolbox\Converter.h" />
+    <ClInclude Include="..\..\..\Toolbox\LBFGS.hpp" />
     <ClInclude Include="..\..\..\Toolbox\print.h" />
     <ClInclude Include="..\..\..\Toolbox\IntegrationPlan.h" />
     <ClInclude Include="..\..\..\Toolbox\Quaternion.hpp" />

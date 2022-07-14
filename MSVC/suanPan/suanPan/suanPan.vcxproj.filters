@@ -1387,6 +1387,9 @@
     <ClCompile Include="..\..\..\UnitTest\TestSurfaceNM.cpp">
       <Filter>UnitTest</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestBFGS.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2628,6 +2631,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Section\SectionNM\NM3D3.h">
       <Filter>Section\SectionNM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\LBFGS.hpp">
+      <Filter>Toolbox</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
