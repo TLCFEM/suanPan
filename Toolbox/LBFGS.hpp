@@ -47,13 +47,11 @@
 using std::deque;
 using std::vector;
 
-#ifndef SUANPAN_CLANG
 template<typename T> concept Differentiable = requires(T t, const vec& x)
 {
     t.evaluate_residual(x);
     t.evaluate_jacobian(x);
 };
-#endif
 
 class LBFGS final {
     deque<vec> hist_ninja, hist_residual;
@@ -72,11 +70,7 @@ public:
         , abs_tol(AT)
         , rel_tol(RT) {}
 
-#ifndef SUANPAN_CLANG
     template<Differentiable F> int optimize(F& func, vec& x) {
-#else
-    template<typename F> int optimize(F& func, vec& x) {
-#endif
         // clear container
         hist_ninja.clear();
         hist_residual.clear();
