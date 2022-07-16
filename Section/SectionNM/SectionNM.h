@@ -41,7 +41,7 @@ struct DataSectionNM {
 
 class SectionNM : protected DataSectionNM, public Section {
 public:
-    const double tolerance = 1E-14;
+    const double tolerance = 1E-13;
 
     using Section::Section;
 
