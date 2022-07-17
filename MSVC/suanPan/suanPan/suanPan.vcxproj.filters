@@ -1387,7 +1387,7 @@
     <ClCompile Include="..\..\..\UnitTest\TestSurfaceNM.cpp">
       <Filter>UnitTest</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\UnitTest\TestBFGS.cpp">
+    <ClCompile Include="..\..\..\UnitTest\TestSolver.cpp">
       <Filter>UnitTest</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2633,6 +2633,15 @@
       <Filter>Section\SectionNM</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Toolbox\LBFGS.hpp">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\GMRES.hpp">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\BiCGSTAB.hpp">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\Preconditioner.hpp">
       <Filter>Toolbox</Filter>
     </ClInclude>
   </ItemGroup>
