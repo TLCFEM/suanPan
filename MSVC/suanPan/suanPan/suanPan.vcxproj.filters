@@ -2644,6 +2644,9 @@
     <ClInclude Include="..\..\..\Toolbox\Preconditioner.hpp">
       <Filter>Toolbox</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\UnitTest\TestSolver.h">
+      <Filter>UnitTest</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\..\Resource\suanPan.rc" />

@@ -21,7 +21,7 @@
 #include <Toolbox/utility.h>
 #include "Preconditioner.hpp"
 
-template<class Operator, IsPreconditioner Preconditioner, sp_d data_t> int GMRES(const Operator& A, Col<data_t>& x, const Col<data_t>& b, const Preconditioner& conditioner, const int m, int& max_iteration, data_t& tolerance) {
+template<sp_d data_t, CanEvaluate<data_t> System, IsPreconditioner<data_t> Preconditioner> int GMRES(const System& system, Col<data_t>& x, const Col<data_t>& b, const Preconditioner& conditioner, const int m, int& max_iteration, data_t& tolerance) {
     constexpr auto ZERO = data_t(0);
     constexpr auto ONE = data_t(1);
 
@@ -62,7 +62,7 @@ template<class Operator, IsPreconditioner Preconditioner, sp_d data_t> int GMRES
     if(suanpan::approx_equal(norm_b, ZERO)) norm_b = ONE;
 
     auto stop_criterion = [&] {
-        residual = (beta = arma::norm(r = conditioner.apply(b - A * x))) / norm_b;
+        residual = (beta = arma::norm(r = conditioner.apply(b - system.evaluate(x)))) / norm_b;
         suanpan_debug("GMRES solver local residual: %.4e.\n", residual);
         if(residual > tolerance) return SUANPAN_FAIL;
         tolerance = residual;
@@ -91,7 +91,7 @@ template<class Operator, IsPreconditioner Preconditioner, sp_d data_t> int GMRES
         s(0) = beta;
 
         for(auto i = 0, j = 1; i < m && counter <= max_iteration; ++i, ++j, ++counter) {
-            auto w = conditioner.apply(A * v.col(i));
+            auto w = conditioner.apply(system.evaluate(v.col(i)));
             for(auto k = 0; k <= i; ++k) w -= (hessenberg(k, i) = arma::dot(w, v.col(k))) * v.col(k);
             v.col(j) = w / (hessenberg(j, i) = arma::norm(w));
 

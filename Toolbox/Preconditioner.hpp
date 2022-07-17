@@ -20,15 +20,8 @@
 
 #include <suanPan.h>
 
-template<typename T> concept IsPreconditioner = requires(T t, const vec& x) { t.apply(x); };
+template<typename T, typename data_t> concept IsPreconditioner = requires(T t, const Col<data_t>& x) { t.apply(x); };
 
-template<sp_d data_t> class DiagonalPreconditioner {
-    vec diag_reciprocal;
-public:
-    explicit DiagonalPreconditioner(const Mat<data_t>& in_mat)
-        : diag_reciprocal(1. / in_mat.diag()) {}
-
-    [[nodiscard]] Col<data_t> apply(const Col<data_t>& in) const { return diag_reciprocal % in; }
-};
+template<typename T, typename data_t> concept CanEvaluate = requires(T t, const Col<data_t>& x) { t.evaluate(x); };
 
 #endif

@@ -21,7 +21,7 @@
 #include <Toolbox/utility.h>
 #include "Preconditioner.hpp"
 
-template<class Matrix, IsPreconditioner Preconditioner, sp_d data_t> int BiCGSTAB(const Matrix& A, Col<data_t>& x, const Col<data_t>& b, const Preconditioner& conditioner, int& max_iteration, data_t& tolerance) {
+template<sp_d data_t, CanEvaluate<data_t> System, IsPreconditioner<data_t> Preconditioner> int BiCGSTAB(const System& system, Col<data_t>& x, const Col<data_t>& b, const Preconditioner& conditioner, int& max_iteration, data_t& tolerance) {
     constexpr auto ZERO = data_t(0);
     constexpr auto ONE = data_t(1);
 
@@ -30,7 +30,7 @@ template<class Matrix, IsPreconditioner Preconditioner, sp_d data_t> int BiCGSTA
 
     if(x.empty()) x = conditioner.apply(b);
 
-    Col<data_t> r = b - A * x;
+    Col<data_t> r = b - system.evaluate(x);
     const auto initial_r = r;
 
     data_t residual = arma::norm(r) / norm_b;
@@ -56,7 +56,7 @@ template<class Matrix, IsPreconditioner Preconditioner, sp_d data_t> int BiCGSTA
         else p = r + rho / pre_rho * alpha / omega * (p - omega * v);
 
         const auto phat = conditioner.apply(p);
-        v = A * phat;
+        v = system.evaluate(phat);
         alpha = rho / arma::dot(initial_r, v);
         const Col<data_t> s = r - alpha * v;
 
@@ -69,7 +69,7 @@ template<class Matrix, IsPreconditioner Preconditioner, sp_d data_t> int BiCGSTA
         }
 
         const auto shat = conditioner.apply(s);
-        const Col<data_t> t = A * shat;
+        const Col<data_t> t = system.evaluate(shat);
         omega = arma::dot(t, s) / arma::dot(t, t);
         x += alpha * phat + omega * shat;
         r = s - omega * t;

@@ -1,6 +1,7 @@
-#include <Toolbox/LBFGS.hpp>
-#include <Toolbox/GMRES.hpp>
+#include "TestSolver.h"
 #include <Toolbox/BiCGSTAB.hpp>
+#include <Toolbox/GMRES.hpp>
+#include <Toolbox/LBFGS.hpp>
 #include "CatchHeader.h"
 
 TEST_CASE("LBFGS Solver", "[Utility.Solver]") {
@@ -17,34 +18,34 @@ TEST_CASE("LBFGS Solver", "[Utility.Solver]") {
 TEST_CASE("GMRES Solver", "[Utility.Solver]") {
     constexpr auto N = 100;
     for(auto I = 0; I < N; ++I) {
-        constexpr int m = 40;
-        const mat A = randu(N, N) + 10 * eye(N, N);
+        constexpr int m = 10;
+        System A(mat(randu(N, N) + 10 * eye(N, N)));
         const vec b(N, fill::randu);
         vec x;
 
-        DiagonalPreconditioner preconditioner(A);
+        DiagonalPreconditioner preconditioner(A.A);
 
         int max_iteration = 200;
         double tolerance = 1E-10;
         GMRES(A, x, b, preconditioner, m, max_iteration, tolerance);
 
-        REQUIRE(norm(solve(A, b) - x) <= 1E2 * N * tolerance);
+        REQUIRE(norm(solve(A.A, b) - x) <= 1E2 * N * tolerance);
     }
 }
 
 TEST_CASE("BiCGSTAB Solver", "[Utility.Solver]") {
     constexpr auto N = 100;
     for(auto I = 0; I < N; ++I) {
-        const mat A = randu(N, N) + 10 * eye(N, N);
+        System A(mat(randu(N, N) + 10 * eye(N, N)));
         const vec b(N, fill::randu);
         vec x;
 
-        DiagonalPreconditioner preconditioner(A);
+        DiagonalPreconditioner preconditioner(A.A);
 
         int max_iteration = 500;
         double tolerance = 1E-10;
         BiCGSTAB(A, x, b, preconditioner, max_iteration, tolerance);
 
-        REQUIRE(norm(solve(A, b) - x) <= 1E3 * N * tolerance);
+        REQUIRE(norm(solve(A.A, b) - x) <= 1E3 * N * tolerance);
     }
 }
