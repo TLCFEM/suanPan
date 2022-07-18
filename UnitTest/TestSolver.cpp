@@ -3,6 +3,8 @@
 #include <Toolbox/GMRES.hpp>
 #include <Toolbox/LBFGS.hpp>
 #include "CatchHeader.h"
+#include "Domain/MetaMat/BandMat.hpp"
+#include "Domain/MetaMat/SparseMatSuperLU.hpp"
 
 TEST_CASE("LBFGS Solver", "[Utility.Solver]") {
     Quadratic function;
@@ -23,7 +25,7 @@ TEST_CASE("GMRES Solver", "[Utility.Solver]") {
         const vec b(N, fill::randu);
         vec x;
 
-        DiagonalPreconditioner preconditioner(A.A);
+        Jacobi preconditioner(A.A);
 
         int max_iteration = 200;
         double tolerance = 1E-10;
@@ -40,12 +42,75 @@ TEST_CASE("BiCGSTAB Solver", "[Utility.Solver]") {
         const vec b(N, fill::randu);
         vec x;
 
-        DiagonalPreconditioner preconditioner(A.A);
+        Jacobi preconditioner(A.A);
 
         int max_iteration = 500;
         double tolerance = 1E-10;
         BiCGSTAB(A, x, b, preconditioner, max_iteration, tolerance);
 
         REQUIRE(norm(solve(A.A, b) - x) <= 1E3 * N * tolerance);
+    }
+}
+
+TEST_CASE("Iterative Solver Sparse", "[Matrix.Solver]") {
+    for(auto I = 0; I < 100; ++I) {
+        constexpr int m = 10;
+        const auto N = randi<uword>(distr_param(100, 200));
+        auto A = SparseMatSuperLU<double>(N, N);
+        REQUIRE(A.n_rows == N);
+        REQUIRE(A.n_cols == N);
+
+        sp_mat B = sprandu(N, N, .01) + speye(N, N) * 1E1;
+
+        const vec C = randu<vec>(N);
+        vec x;
+
+        A.zeros();
+        for(auto J = B.begin(); J != B.end(); ++J) A.at(J.row(), J.col()) = *J;
+
+        int max_iteration = 500;
+        double tolerance = 1E-10;
+        BiCGSTAB(A, x, C, Jacobi(A), max_iteration, tolerance);
+
+        REQUIRE(norm(spsolve(B, C) - x) <= 1E1 * tolerance);
+
+        x.reset();
+        max_iteration = 500;
+        GMRES(A, x, C, Jacobi(A), m, max_iteration, tolerance);
+
+        REQUIRE(norm(spsolve(B, C) - x) <= 1E1 * tolerance);
+    }
+}
+
+TEST_CASE("Iterative Solver Dense", "[Matrix.Solver]") {
+    for(auto I = 0; I < 100; ++I) {
+        constexpr int m = 10;
+        const auto N = randi<uword>(distr_param(100, 200));
+        auto A = BandMat<double>(N, N, 3);
+        REQUIRE(A.n_rows == N);
+        REQUIRE(A.n_cols == N);
+
+        mat B = randu(N, N) + eye(N, N) * 1E1;
+
+        const vec C = randu<vec>(N);
+        vec x;
+
+        A.zeros();
+        for(auto i = 0llu; i < N; ++i)
+            for(auto j = 0llu; j < N; ++j)
+                if(std::abs(static_cast<int>(i) - static_cast<int>(j)) <= 3) A.at(i, j) = B(i, j);
+                else B(i, j) = 0.;
+
+        int max_iteration = 500;
+        double tolerance = 1E-10;
+        BiCGSTAB(A, x, C, Jacobi(A), max_iteration, tolerance);
+
+        REQUIRE(norm(solve(B, C) - x) <= 1E1 * tolerance);
+
+        x.reset();
+        max_iteration = 500;
+        GMRES(A, x, C, Jacobi(A), m, max_iteration, tolerance);
+
+        REQUIRE(norm(solve(B, C) - x) <= 1E1 * tolerance);
     }
 }

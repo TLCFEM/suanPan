@@ -74,6 +74,7 @@ public:
     virtual void nullify(uword) = 0;
 
     [[nodiscard]] virtual T max() const = 0;
+    [[nodiscard]] virtual Col<T> diag() = 0;
 
     virtual const T& operator()(uword, uword) const = 0;
     virtual T& at(uword, uword) = 0;
@@ -87,7 +88,7 @@ public:
     virtual void operator+=(const triplet_form<T, uword>&) = 0;
     virtual void operator-=(const triplet_form<T, uword>&) = 0;
 
-    virtual Mat<T> operator*(const Mat<T>&) = 0;
+    virtual Mat<T> operator*(const Mat<T>&) const = 0;
 
     virtual void operator*=(T) = 0;
 
@@ -107,6 +108,8 @@ public:
 
     virtual void csc_condense();
     virtual void csr_condense();
+
+    [[nodiscard]] Col<T> evaluate(const Col<T>&) const;
 };
 
 template<sp_d T> MetaMat<T>::MetaMat(const uword in_rows, const uword in_cols, const uword in_elem)
@@ -158,6 +161,8 @@ template<sp_d T> void MetaMat<T>::save(const char* name) { if(!to_mat(*this).sav
 template<sp_d T> void MetaMat<T>::csc_condense() {}
 
 template<sp_d T> void MetaMat<T>::csr_condense() {}
+
+template<sp_d T> Col<T> MetaMat<T>::evaluate(const Col<T>& x) const { return this->operator*(x); }
 
 template<sp_d T> Mat<T> to_mat(const MetaMat<T>& in_mat) {
     Mat<T> out_mat(in_mat.n_rows, in_mat.n_cols);

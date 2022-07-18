@@ -54,7 +54,7 @@ public:
     const T& operator()(uword, uword) const override;
     T& at(uword, uword) override;
 
-    Mat<T> operator*(const Mat<T>&) override;
+    Mat<T> operator*(const Mat<T>&) const override;
 
     int solve(Mat<T>&, Mat<T>&&) override;
     int solve(Mat<T>&, const Mat<T>&) override;
@@ -92,7 +92,7 @@ template<sp_d T> T& BandSymmMat<T>::at(const uword in_row, const uword in_col) {
     return access::rw(this->memory[in_row - in_col + in_col * m_rows]);
 }
 
-template<sp_d T> Mat<T> BandSymmMat<T>::operator*(const Mat<T>& X) {
+template<sp_d T> Mat<T> BandSymmMat<T>::operator*(const Mat<T>& X) const {
     Mat<T> Y(arma::size(X));
 
     const auto N = static_cast<int>(this->n_cols);

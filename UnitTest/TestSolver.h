@@ -16,13 +16,13 @@ struct NonlinearSystem {
     [[nodiscard]] vec evaluate(const vec& x) const { return square(x); }
 };
 
-template<sp_d data_t> class DiagonalPreconditioner {
+template<typename Container> class Jacobi {
     vec diag_reciprocal;
 public:
-    explicit DiagonalPreconditioner(const Mat<data_t>& in_mat)
+    explicit Jacobi(Container& in_mat)
         : diag_reciprocal(1. / in_mat.diag()) {}
 
-    [[nodiscard]] Col<data_t> apply(const Col<data_t>& in) const { return diag_reciprocal % in; }
+    [[nodiscard]] vec apply(const vec& in) const { return diag_reciprocal % in; }
 };
 
 #endif // TESTSOLVER_H

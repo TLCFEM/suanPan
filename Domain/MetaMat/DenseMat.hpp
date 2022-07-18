@@ -55,7 +55,8 @@ public:
     [[nodiscard]] bool is_empty() const override;
     void zeros() override;
 
-    T max() const override;
+    [[nodiscard]] T max() const override;
+    [[nodiscard]] Col<T> diag() override;
 
     const T* memptr() const override;
     T* memptr() override;
@@ -136,6 +137,17 @@ template<sp_d T> void DenseMat<T>::zeros() {
 }
 
 template<sp_d T> T DenseMat<T>::max() const { return op_max::direct_max(memptr(), this->n_elem); }
+
+template<sp_d T> Col<T> DenseMat<T>::diag() {
+    Col<T> diag_vec(std::min(this->n_rows, this->n_cols), fill::none);
+
+    suanpan_for(0llu, diag_vec.n_elem, [&](const uword I) {
+        const auto t_factor = this->operator()(I, I);
+        diag_vec(I) = suanpan::approx_equal(t_factor, T(0)) ? T(1) : t_factor;
+    });
+
+    return diag_vec;
+}
 
 template<sp_d T> const T* DenseMat<T>::memptr() const { return memory; }
 

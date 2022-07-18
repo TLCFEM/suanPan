@@ -50,7 +50,7 @@ public:
 
     T& at(uword, uword) override;
 
-    Mat<T> operator*(const Mat<T>&) override;
+    Mat<T> operator*(const Mat<T>&) const override;
 
     int solve(Mat<T>&, Mat<T>&&) override;
     int solve(Mat<T>&, const Mat<T>&) override;
@@ -80,7 +80,7 @@ template<sp_d T> T& FullMat<T>::at(const uword in_row, const uword in_col) {
     return access::rw(this->memory[in_row + in_col * this->n_rows]);
 }
 
-template<sp_d T> Mat<T> FullMat<T>::operator*(const Mat<T>& B) {
+template<sp_d T> Mat<T> FullMat<T>::operator*(const Mat<T>& B) const {
     Mat<T> C(arma::size(B));
 
     const auto M = static_cast<int>(this->n_rows);

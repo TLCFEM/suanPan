@@ -51,7 +51,7 @@ public:
     const T& operator()(uword, uword) const override;
     T& at(uword, uword) override;
 
-    Mat<T> operator*(const Mat<T>&) override;
+    Mat<T> operator*(const Mat<T>&) const override;
 
     int solve(Mat<T>&, Mat<T>&&) override;
     int solve(Mat<T>&, const Mat<T>&) override;
@@ -86,7 +86,7 @@ template<sp_d T> T& SymmPackMat<T>::at(const uword in_row, const uword in_col) {
 
 template<const char S, const char T, sp_d T1> Mat<T1> spmm(const SymmPackMat<T1>& A, const Mat<T1>& B);
 
-template<sp_d T> Mat<T> SymmPackMat<T>::operator*(const Mat<T>& X) {
+template<sp_d T> Mat<T> SymmPackMat<T>::operator*(const Mat<T>& X) const {
     if(!X.is_colvec()) return spmm<'R', 'N'>(*this, X);
 
     auto Y = X;

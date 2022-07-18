@@ -20,8 +20,8 @@
 
 #include <suanPan.h>
 
-template<typename T, typename data_t> concept IsPreconditioner = requires(T t, const Col<data_t>& x) { t.apply(x); };
+template<typename T, typename data_t> concept IsPreconditioner = requires(T t, const Col<data_t>& x) { { t.apply(x) } -> std::convertible_to<Col<data_t>>; };
 
-template<typename T, typename data_t> concept CanEvaluate = requires(T t, const Col<data_t>& x) { t.evaluate(x); };
+template<typename T, typename data_t> concept CanEvaluate = requires(T t, const Col<data_t>& x) { { t.evaluate(x) } -> std::convertible_to<Col<data_t>>; };
 
 #endif
