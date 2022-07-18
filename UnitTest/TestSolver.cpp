@@ -24,7 +24,7 @@ TEST_CASE("GMRES Solver", "[Utility.Solver]") {
         const vec b(N, fill::randu);
         vec x;
 
-        SolverSetting setting{20, 500, 1E-10};
+        SolverSetting<double> setting{20, 500, 1E-10};
 
         GMRES(A, x, b, Jacobi(A.A), setting);
 
@@ -39,7 +39,7 @@ TEST_CASE("BiCGSTAB Solver", "[Utility.Solver]") {
         const vec b(N, fill::randu);
         vec x;
 
-        SolverSetting setting{20, 500, 1E-10};
+        SolverSetting<double> setting{20, 500, 1E-10};
 
         BiCGSTAB(A, x, b, Jacobi(A.A), setting);
 
@@ -62,7 +62,7 @@ TEST_CASE("Iterative Solver Sparse", "[Matrix.Solver]") {
         A.zeros();
         for(auto J = B.begin(); J != B.end(); ++J) A.at(J.row(), J.col()) = *J;
 
-        SolverSetting setting{20, 500, 1E-10};
+        SolverSetting<double> setting{20, 500, 1E-10};
 
         BiCGSTAB(A, x, C, Jacobi(A), setting);
 
@@ -94,7 +94,7 @@ TEST_CASE("Iterative Solver Dense", "[Matrix.Solver]") {
                 if(std::abs(static_cast<int>(i) - static_cast<int>(j)) <= 3) A.at(i, j) = B(i, j);
                 else B(i, j) = 0.;
 
-        SolverSetting setting{20, 500, 1E-10};
+        SolverSetting<double> setting{20, 500, 1E-10};
 
         BiCGSTAB(A, x, C, Jacobi(A), setting);
 
