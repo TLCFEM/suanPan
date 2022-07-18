@@ -19,7 +19,6 @@ TEST_CASE("LBFGS Solver", "[Utility.Solver]") {
 TEST_CASE("GMRES Solver", "[Utility.Solver]") {
     constexpr auto N = 100;
     for(auto I = 0; I < N; ++I) {
-        constexpr int m = 10;
         System A(mat(randu(N, N) + 10 * eye(N, N)));
         const vec b(N, fill::randu);
         vec x;
