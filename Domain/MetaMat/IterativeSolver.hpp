@@ -83,7 +83,7 @@ template<sp_d data_t, CanEvaluate<data_t> System, IsPreconditioner<data_t> Preco
 
         for(auto i = k; i >= 0; --i) {
             y(i) /= hessenberg(i, i);
-            for(auto j = i - 1; j >= 0; --j) y(j) -= hessenberg(j, i) * y(i);
+            y.head(i) -= hessenberg.col(i).head(i) * y(i);
         }
 
         return v.head_cols(k + 1llu) * y;
