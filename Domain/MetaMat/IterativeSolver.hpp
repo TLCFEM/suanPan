@@ -26,8 +26,8 @@ template<typename T, typename data_t> concept IsPreconditioner = requires(T t, c
 template<typename T, typename data_t> concept CanEvaluate = requires(T t, const Col<data_t>& x) { { t.evaluate(x) } -> std::convertible_to<Col<data_t>>; };
 
 template<sp_d data_t, CanEvaluate<data_t> System, IsPreconditioner<data_t> Preconditioner> int GMRES(const System& system, Col<data_t>& x, const Col<data_t>& b, const Preconditioner& conditioner, SolverSetting<data_t>& setting) {
-    constexpr auto ZERO = data_t(0);
-    constexpr auto ONE = data_t(1);
+    constexpr sp_d auto ZERO = data_t(0);
+    constexpr sp_d auto ONE = data_t(1);
 
     auto generate_rotation = [](const data_t dx, const data_t dy, data_t& cs, data_t& sn) -> void {
         if(suanpan::approx_equal(dy, ZERO)) {
@@ -124,8 +124,8 @@ template<sp_d data_t, CanEvaluate<data_t> System, IsPreconditioner<data_t> Preco
 }
 
 template<sp_d data_t, CanEvaluate<data_t> System, IsPreconditioner<data_t> Preconditioner> int BiCGSTAB(const System& system, Col<data_t>& x, const Col<data_t>& b, const Preconditioner& conditioner, SolverSetting<data_t>& setting) {
-    constexpr auto ZERO = data_t(0);
-    constexpr auto ONE = data_t(1);
+    constexpr sp_d auto ZERO = data_t(0);
+    constexpr sp_d auto ONE = data_t(1);
 
     data_t norm_b = arma::norm(b);
     if(suanpan::approx_equal(norm_b, ZERO)) norm_b = ONE;
@@ -143,7 +143,7 @@ template<sp_d data_t, CanEvaluate<data_t> System, IsPreconditioner<data_t> Preco
         return 0;
     }
 
-    auto pre_rho = ZERO, alpha = ZERO, omega = ZERO;
+    sp_d auto pre_rho = ZERO, alpha = ZERO, omega = ZERO;
     Col<data_t> v, p;
 
     for(auto i = 1; i <= setting.max_iteration; ++i) {
