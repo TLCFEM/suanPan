@@ -982,14 +982,6 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
 
         return SUANPAN_SUCCESS;
     }
-#ifdef SUANPAN_MKL
-    if(is_equal(property_id, "fgmres_tolerance")) {
-        double value;
-        get_input(command, value) ? set_fgmres_tolerance(value) : suanpan_error("set_property() need a valid value.\n");
-
-        return SUANPAN_SUCCESS;
-    }
-#endif
 
     if(domain->get_current_step_tag() == 0) return SUANPAN_SUCCESS;
 
@@ -1040,6 +1032,12 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
         double value;
         get_input(command, value) ? t_step->set_tolerance(value) : suanpan_error("set_property() need a valid value.\n");
     }
+#ifdef SUANPAN_MKL
+    else if(is_equal(property_id, "fgmres_tolerance")) {
+        double value;
+        get_input(command, value) ? t_step->set_tolerance(value) : suanpan_error("set_property() need a valid value.\n");
+    }
+#endif
     else if(is_equal(property_id, "ini_step_size")) {
         double step_time;
         get_input(command, step_time) ? t_step->set_ini_step_size(step_time) : suanpan_error("set_property() need a valid value.\n");

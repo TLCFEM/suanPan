@@ -1,9 +1,8 @@
 #include "TestSolver.h"
-#include <Toolbox/BiCGSTAB.hpp>
-#include <Toolbox/GMRES.hpp>
 #include <Toolbox/LBFGS.hpp>
 #include "CatchHeader.h"
 #include "Domain/MetaMat/BandMat.hpp"
+#include "Domain/MetaMat/IterativeSolver.hpp"
 #include "Domain/MetaMat/SparseMatSuperLU.hpp"
 
 TEST_CASE("LBFGS Solver", "[Utility.Solver]") {
@@ -27,11 +26,11 @@ TEST_CASE("GMRES Solver", "[Utility.Solver]") {
 
         Jacobi preconditioner(A.A);
 
-        int max_iteration = 200;
-        double tolerance = 1E-10;
-        GMRES(A, x, b, preconditioner, m, max_iteration, tolerance);
+        SolverSetting setting{20, 500, 1E-10};
 
-        REQUIRE(norm(solve(A.A, b) - x) <= 1E2 * N * tolerance);
+        GMRES(A, x, b, preconditioner, setting);
+
+        REQUIRE(norm(solve(A.A, b) - x) <= 1E2 * N * setting.tolerance);
     }
 }
 
@@ -44,11 +43,11 @@ TEST_CASE("BiCGSTAB Solver", "[Utility.Solver]") {
 
         Jacobi preconditioner(A.A);
 
-        int max_iteration = 500;
-        double tolerance = 1E-10;
-        BiCGSTAB(A, x, b, preconditioner, max_iteration, tolerance);
+        SolverSetting setting{20, 500, 1E-10};
 
-        REQUIRE(norm(solve(A.A, b) - x) <= 1E3 * N * tolerance);
+        BiCGSTAB(A, x, b, preconditioner, setting);
+
+        REQUIRE(norm(solve(A.A, b) - x) <= 1E3 * N * setting.tolerance);
     }
 }
 
@@ -68,17 +67,17 @@ TEST_CASE("Iterative Solver Sparse", "[Matrix.Solver]") {
         A.zeros();
         for(auto J = B.begin(); J != B.end(); ++J) A.at(J.row(), J.col()) = *J;
 
-        int max_iteration = 500;
-        double tolerance = 1E-10;
-        BiCGSTAB(A, x, C, Jacobi(A), max_iteration, tolerance);
+        SolverSetting setting{20, 500, 1E-10};
 
-        REQUIRE(norm(spsolve(B, C) - x) <= 1E1 * tolerance);
+        BiCGSTAB(A, x, C, Jacobi(A), setting);
+
+        REQUIRE(norm(spsolve(B, C) - x) <= 1E1 * setting.tolerance);
 
         x.reset();
-        max_iteration = 500;
-        GMRES(A, x, C, Jacobi(A), m, max_iteration, tolerance);
+        setting.max_iteration = 500;
+        GMRES(A, x, C, Jacobi(A), setting);
 
-        REQUIRE(norm(spsolve(B, C) - x) <= 1E1 * tolerance);
+        REQUIRE(norm(spsolve(B, C) - x) <= 1E1 * setting.tolerance);
     }
 }
 
@@ -101,16 +100,16 @@ TEST_CASE("Iterative Solver Dense", "[Matrix.Solver]") {
                 if(std::abs(static_cast<int>(i) - static_cast<int>(j)) <= 3) A.at(i, j) = B(i, j);
                 else B(i, j) = 0.;
 
-        int max_iteration = 500;
-        double tolerance = 1E-10;
-        BiCGSTAB(A, x, C, Jacobi(A), max_iteration, tolerance);
+        SolverSetting setting{20, 500, 1E-10};
 
-        REQUIRE(norm(solve(B, C) - x) <= 1E1 * tolerance);
+        BiCGSTAB(A, x, C, Jacobi(A), setting);
+
+        REQUIRE(norm(solve(B, C) - x) <= 1E1 * setting.tolerance);
 
         x.reset();
-        max_iteration = 500;
-        GMRES(A, x, C, Jacobi(A), m, max_iteration, tolerance);
+        setting.max_iteration = 500;
+        GMRES(A, x, C, Jacobi(A), setting);
 
-        REQUIRE(norm(solve(B, C) - x) <= 1E1 * tolerance);
+        REQUIRE(norm(solve(B, C) - x) <= 1E1 * setting.tolerance);
     }
 }

@@ -35,13 +35,13 @@ int LeeNewmarkBase::initialize() {
 
     trial_internal = current_internal = residual.zeros(n_size);
 
-    if(SolverType::MUMPS == factory->get_solver()) stiffness = make_unique<SparseMatMUMPS<double>>(n_size, n_size);
+    if(SolverType::MUMPS == factory->get_solver_type()) stiffness = make_unique<SparseMatMUMPS<double>>(n_size, n_size);
 #ifdef SUANPAN_MKL
-    else if(SolverType::PARDISO == factory->get_solver()) stiffness = make_unique<SparseMatPARDISO<double>>(n_size, n_size);
-    else if(SolverType::FGMRES == factory->get_solver()) stiffness = make_unique<SparseMatFGMRES<double>>(n_size, n_size);
+    else if(SolverType::PARDISO == factory->get_solver_type()) stiffness = make_unique<SparseMatPARDISO<double>>(n_size, n_size);
+    else if(SolverType::FGMRES == factory->get_solver_type()) stiffness = make_unique<SparseMatFGMRES<double>>(n_size, n_size);
 #endif
 #ifdef SUANPAN_CUDA
-    else if(SolverType::CUDA == factory->get_solver()) stiffness = make_unique<SparseMatCUDA<double>>(n_size, n_size);
+    else if(SolverType::CUDA == factory->get_solver_type()) stiffness = make_unique<SparseMatCUDA<double>>(n_size, n_size);
 #endif
     else stiffness = make_unique<SparseMatSuperLU<double>>(n_size, n_size);
 

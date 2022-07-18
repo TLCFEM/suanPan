@@ -30,21 +30,13 @@
 #define METAMAT_HPP
 
 #include "triplet_form.hpp"
-
-enum class Precision {
-    MIXED,
-    FULL
-};
+#include "SolverSetting.hpp"
 
 template<sp_d T> class MetaMat {
 protected:
     bool factored = false;
 
-    double tolerance = 1E-13;
-
-    Precision precision = Precision::FULL;
-
-    unsigned refinement = 10;
+    SolverSetting<T> setting{};
 
 public:
     triplet_form<T, uword> triplet_mat;
@@ -60,9 +52,9 @@ public:
     MetaMat& operator=(MetaMat&&) noexcept = delete;
     virtual ~MetaMat() = default;
 
-    void set_tolerance(double);
-    void set_precision(Precision);
-    void set_refinement(unsigned);
+    void set_solver_setting(const SolverSetting<T>&);
+    [[nodiscard]] SolverSetting<T>& get_solver_setting();
+
     void set_factored(bool);
 
     [[nodiscard]] virtual bool is_empty() const = 0;
@@ -118,11 +110,9 @@ template<sp_d T> MetaMat<T>::MetaMat(const uword in_rows, const uword in_cols, c
     , n_cols(in_cols)
     , n_elem(in_elem) {}
 
-template<sp_d T> void MetaMat<T>::set_tolerance(const double TOL) { tolerance = TOL; }
+template<sp_d T> void MetaMat<T>::set_solver_setting(const SolverSetting<T>& SS) { setting = SS; }
 
-template<sp_d T> void MetaMat<T>::set_precision(const Precision P) { precision = P; }
-
-template<sp_d T> void MetaMat<T>::set_refinement(const unsigned R) { refinement = R; }
+template<sp_d T> SolverSetting<T>& MetaMat<T>::get_solver_setting() { return setting; }
 
 template<sp_d T> void MetaMat<T>::set_factored(const bool F) { factored = F; }
 

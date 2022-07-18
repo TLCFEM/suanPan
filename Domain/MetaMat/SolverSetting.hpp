@@ -15,13 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#ifndef PRECONDITIONER_HPP
-#define PRECONDITIONER_HPP
+#ifndef SOLVERSETTING_HPP
+#define SOLVERSETTING_HPP
 
 #include <suanPan.h>
 
-template<typename T, typename data_t> concept IsPreconditioner = requires(T t, const Col<data_t>& x) { { t.apply(x) } -> std::convertible_to<Col<data_t>>; };
+enum class Precision {
+    MIXED,
+    FULL
+};
 
-template<typename T, typename data_t> concept CanEvaluate = requires(T t, const Col<data_t>& x) { { t.evaluate(x) } -> std::convertible_to<Col<data_t>>; };
+template<sp_d data_t> struct SolverSetting {
+    int restart = 20;
+    int max_iteration = 200;
+    data_t tolerance = 1E-14;
+    unsigned iterative_refinement = 5;
+    Precision precision = Precision::FULL;
+};
 
 #endif

@@ -131,7 +131,7 @@ template<sp_d T> int FullMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
         X = B;
         arma_fortran(arma_sgesv)(&N, &NRHS, (E*)this->memptr(), &N, this->pivot.memptr(), (E*)X.memptr(), &LDB, &INFO);
     }
-    else if(Precision::FULL == this->precision) {
+    else if(Precision::FULL == this->setting.precision) {
         using E = double;
         X = B;
         arma_fortran(arma_dgesv)(&N, &NRHS, (E*)this->memptr(), &N, this->pivot.memptr(), (E*)X.memptr(), &LDB, &INFO);
@@ -158,7 +158,7 @@ template<sp_d T> int FullMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
         X = B;
         arma_fortran(arma_sgetrs)(&TRAN, &N, &NRHS, (E*)this->memptr(), &N, this->pivot.memptr(), (E*)X.memptr(), &LDB, &INFO);
     }
-    else if(Precision::FULL == this->precision) {
+    else if(Precision::FULL == this->setting.precision) {
         using E = double;
         X = B;
         arma_fortran(arma_dgetrs)(&TRAN, &N, &NRHS, (E*)this->memptr(), &N, this->pivot.memptr(), (E*)X.memptr(), &LDB, &INFO);
@@ -171,8 +171,8 @@ template<sp_d T> int FullMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
         auto multiplier = norm(full_residual);
 
         auto counter = 0u;
-        while(counter++ < this->refinement) {
-            if(multiplier < this->tolerance) break;
+        while(counter++ < this->setting.iterative_refinement) {
+            if(multiplier < this->setting.tolerance) break;
 
             auto residual = conv_to<fmat>::from(full_residual / multiplier);
 
@@ -207,7 +207,7 @@ template<sp_d T> int FullMat<T>::solve(Mat<T>& X, Mat<T>&& B) {
         arma_fortran(arma_sgesv)(&N, &NRHS, (E*)this->memptr(), &N, this->pivot.memptr(), (E*)B.memptr(), &LDB, &INFO);
         X = std::move(B);
     }
-    else if(Precision::FULL == this->precision) {
+    else if(Precision::FULL == this->setting.precision) {
         using E = double;
         arma_fortran(arma_dgesv)(&N, &NRHS, (E*)this->memptr(), &N, this->pivot.memptr(), (E*)B.memptr(), &LDB, &INFO);
         X = std::move(B);
@@ -234,7 +234,7 @@ template<sp_d T> int FullMat<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
         arma_fortran(arma_sgetrs)(&TRAN, &N, &NRHS, (E*)this->memptr(), &N, this->pivot.memptr(), (E*)B.memptr(), &LDB, &INFO);
         X = std::move(B);
     }
-    else if(Precision::FULL == this->precision) {
+    else if(Precision::FULL == this->setting.precision) {
         using E = double;
         arma_fortran(arma_dgetrs)(&TRAN, &N, &NRHS, (E*)this->memptr(), &N, this->pivot.memptr(), (E*)B.memptr(), &LDB, &INFO);
         X = std::move(B);
@@ -245,8 +245,8 @@ template<sp_d T> int FullMat<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
         auto multiplier = arma::norm(B);
 
         auto counter = 0u;
-        while(counter++ < this->refinement) {
-            if(multiplier < this->tolerance) break;
+        while(counter++ < this->setting.iterative_refinement) {
+            if(multiplier < this->setting.tolerance) break;
 
             auto residual = conv_to<fmat>::from(B / multiplier);
 

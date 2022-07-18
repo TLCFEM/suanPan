@@ -93,7 +93,7 @@ template<sp_d T> template<sp_d ET> void SparseMatSuperLU<T>::alloc_supermatrix(c
     t_row = (int*)superlu_malloc(t_size);
     memcpy(t_row, (void*)in.row_mem(), t_size);
 
-    t_size = sizeof(int) * (in.n_cols + 1);
+    t_size = sizeof(int) * (in.n_cols + 1llu);
     t_col = (int*)superlu_malloc(t_size);
     memcpy(t_col, (void*)in.col_mem(), t_size);
 
@@ -218,7 +218,7 @@ template<sp_d T> int SparseMatSuperLU<T>::solve(Mat<T>& out_mat, const Mat<T>& i
 
     auto flag = 0;
 
-    if(std::is_same_v<T, float> || Precision::FULL == this->precision) {
+    if(std::is_same_v<T, float> || Precision::FULL == this->setting.precision) {
         alloc_supermatrix(csc_form<T, int>(this->triplet_mat));
 
         out_mat = in_mat;
@@ -232,7 +232,7 @@ template<sp_d T> int SparseMatSuperLU<T>::solve(Mat<T>& out_mat, const Mat<T>& i
 
     alloc_supermatrix(csc_form<float, int>(this->triplet_mat));
 
-    const fmat f_mat(arma::size(in_mat), arma::fill::none);
+    const fmat f_mat(arma::size(in_mat), fill::none);
 
     wrap_b(f_mat);
 
@@ -244,7 +244,7 @@ template<sp_d T> int SparseMatSuperLU<T>::solve(Mat<T>& out_mat, const Mat<T>& i
 template<sp_d T> int SparseMatSuperLU<T>::solve_trs(Mat<T>& out_mat, const Mat<T>& in_mat) {
     auto flag = 0;
 
-    if(std::is_same_v<T, float> || Precision::FULL == this->precision) {
+    if(std::is_same_v<T, float> || Precision::FULL == this->setting.precision) {
         out_mat = in_mat;
 
         wrap_b(out_mat);
@@ -261,8 +261,8 @@ template<sp_d T> int SparseMatSuperLU<T>::solve_trs(Mat<T>& out_mat, const Mat<T
     auto multiplier = norm(full_residual);
 
     auto counter = 0u;
-    while(counter++ < this->refinement) {
-        if(multiplier < this->tolerance) break;
+    while(counter++ < this->setting.iterative_refinement) {
+        if(multiplier < this->setting.tolerance) break;
 
         auto residual = conv_to<fmat>::from(full_residual / multiplier);
 
@@ -289,7 +289,7 @@ template<sp_d T> int SparseMatSuperLU<T>::solve(Mat<T>& out_mat, Mat<T>&& in_mat
 
     auto flag = 0;
 
-    if(std::is_same_v<T, float> || Precision::FULL == this->precision) {
+    if(std::is_same_v<T, float> || Precision::FULL == this->setting.precision) {
         alloc_supermatrix(csc_form<T, int>(this->triplet_mat));
 
         wrap_b(in_mat);
@@ -303,7 +303,7 @@ template<sp_d T> int SparseMatSuperLU<T>::solve(Mat<T>& out_mat, Mat<T>&& in_mat
 
     alloc_supermatrix(csc_form<float, int>(this->triplet_mat));
 
-    const fmat f_mat(arma::size(in_mat), arma::fill::none);
+    const fmat f_mat(arma::size(in_mat), fill::none);
 
     wrap_b(f_mat);
 
@@ -315,7 +315,7 @@ template<sp_d T> int SparseMatSuperLU<T>::solve(Mat<T>& out_mat, Mat<T>&& in_mat
 template<sp_d T> int SparseMatSuperLU<T>::solve_trs(Mat<T>& out_mat, Mat<T>&& in_mat) {
     auto flag = 0;
 
-    if(std::is_same_v<T, float> || Precision::FULL == this->precision) {
+    if(std::is_same_v<T, float> || Precision::FULL == this->setting.precision) {
         wrap_b(in_mat);
 
         tri_solve<T>(flag);
@@ -330,8 +330,8 @@ template<sp_d T> int SparseMatSuperLU<T>::solve_trs(Mat<T>& out_mat, Mat<T>&& in
     auto multiplier = arma::norm(in_mat);
 
     auto counter = 0u;
-    while(counter++ < this->refinement) {
-        if(multiplier < this->tolerance) break;
+    while(counter++ < this->setting.iterative_refinement) {
+        if(multiplier < this->setting.tolerance) break;
 
         auto residual = conv_to<fmat>::from(in_mat / multiplier);
 

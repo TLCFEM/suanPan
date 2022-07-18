@@ -38,15 +38,11 @@
 #include "SparseMat.hpp"
 
 template<sp_d T> class SparseMatBaseFGMRES : public SparseMat<T> {
-    static double tolerance;
-
     const matrix_descr descr;
 
     podarray<int> ipar;
     podarray<double> dpar;
     podarray<double> work;
-
-    friend void set_fgmres_tolerance(double);
 
 public:
     SparseMatBaseFGMRES(uword, uword, uword, bool);
@@ -58,10 +54,6 @@ public:
 
     int solve(Mat<T>&, const Mat<T>&) override;
 };
-
-template<sp_d T> double SparseMatBaseFGMRES<T>::tolerance = 1E-4;
-
-inline void set_fgmres_tolerance(const double T) { SparseMatBaseFGMRES<double>::tolerance = T; }
 
 template<sp_d T> SparseMatBaseFGMRES<T>::SparseMatBaseFGMRES(const uword in_row, const uword in_col, const uword in_elem, const bool in_sym)
     : SparseMat<T>(in_row, in_col, in_elem)
@@ -91,7 +83,7 @@ template<sp_d T> int SparseMatBaseFGMRES<T>::solve(Mat<T>& X, const Mat<T>& B) {
         ipar[8] = 1;
         ipar[9] = 0;
         ipar[11] = 1;
-        dpar[0] = tolerance;
+        dpar[0] = this->setting.tolerance;
 
         dfgmres_check(&N, (double*)X.colptr(I), (double*)B.colptr(I), &request, ipar.memptr(), dpar.memptr(), work.memptr());
         if(request == -1100) return request;

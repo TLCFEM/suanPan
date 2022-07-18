@@ -2635,17 +2635,17 @@
     <ClInclude Include="..\..\..\Toolbox\LBFGS.hpp">
       <Filter>Toolbox</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Toolbox\GMRES.hpp">
-      <Filter>Toolbox</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Toolbox\BiCGSTAB.hpp">
-      <Filter>Toolbox</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Toolbox\Preconditioner.hpp">
+    <ClInclude Include="..\..\..\Toolbox\IterativeSolver.hpp">
       <Filter>Toolbox</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\UnitTest\TestSolver.h">
       <Filter>UnitTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\MetaMat\SolverSetting.hpp">
+      <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\MetaMat\IterativeSolver.hpp">
+      <Filter>Domain\MetaMat</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

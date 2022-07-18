@@ -71,7 +71,7 @@ template<sp_d T> void FullMatCUDA<T>::acquire() {
     cudaMemset(info, 0, sizeof(int));
     cudaMalloc(&ipiv, sizeof(int) * this->n_rows);
 
-    if(int bufferSize = 0; std::is_same_v<T, float> || Precision::MIXED == this->precision) {
+    if(int bufferSize = 0; std::is_same_v<T, float> || Precision::MIXED == this->setting.precision) {
         cudaMalloc(&d_A, sizeof(float) * this->n_elem);
         cusolverDnSgetrf_bufferSize(handle, int(this->n_rows), int(this->n_cols), (float*)d_A, int(this->n_elem), &bufferSize);
         cudaMalloc(&buffer, sizeof(float) * bufferSize);
@@ -130,7 +130,7 @@ template<sp_d T> int FullMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) {
 
         if(d_x) cudaFree(d_x);
     }
-    else if(Precision::MIXED == this->precision) {
+    else if(Precision::MIXED == this->setting.precision) {
         // mixed precision
         if(!this->factored) {
             this->s_memory = this->to_float();
@@ -153,8 +153,8 @@ template<sp_d T> int FullMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) {
         auto multiplier = norm(full_residual);
 
         auto counter = 0u;
-        while(counter++ < this->refinement) {
-            if(multiplier < this->tolerance) break;
+        while(counter++ < this->setting.iterative_refinement) {
+            if(multiplier < this->setting.tolerance) break;
 
             auto residual = conv_to<fmat>::from(full_residual / multiplier);
 

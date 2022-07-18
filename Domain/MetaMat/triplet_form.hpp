@@ -268,9 +268,9 @@ public:
     triplet_form<data_t, index_t>& operator+=(const triplet_form<data_t, index_t>&);
     triplet_form<data_t, index_t>& operator-=(const triplet_form<data_t, index_t>&);
 
-    triplet_form<data_t, index_t> diagonal() const;
-    triplet_form<data_t, index_t> strictly_upper() const;
-    triplet_form<data_t, index_t> strictly_lower() const;
+    [[nodiscard]] triplet_form<data_t, index_t> diagonal() const;
+    [[nodiscard]] triplet_form<data_t, index_t> strictly_upper() const;
+    [[nodiscard]] triplet_form<data_t, index_t> strictly_lower() const;
 };
 
 template<sp_d data_t, sp_i index_t> void triplet_form<data_t, index_t>::condense(const bool full) {
