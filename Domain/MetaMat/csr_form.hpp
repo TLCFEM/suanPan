@@ -77,12 +77,12 @@ public:
 
     void print() const;
 
-    template<sp_d T2> csr_form<data_t, index_t> operator*(const T2 scalar) {
+    template<sp_d T2> csr_form<data_t, index_t> operator*(const T2 scalar) const {
         csr_form<data_t, index_t> copy = *this;
         return copy *= scalar;
     }
 
-    template<sp_d T2> csr_form<data_t, index_t> operator/(const T2 scalar) {
+    template<sp_d T2> csr_form<data_t, index_t> operator/(const T2 scalar) const {
         csr_form<data_t, index_t> copy = *this;
         return copy /= scalar;
     }
@@ -106,7 +106,7 @@ public:
         return access::rw(bin) = data_t(0);
     }
 
-    Mat<data_t> operator*(const Col<data_t>& in_mat) {
+    Mat<data_t> operator*(const Col<data_t>& in_mat) const {
         Mat<data_t> out_mat = arma::zeros<Mat<data_t>>(in_mat.n_rows, 1);
 
         suanpan_for(index_t(0), n_rows, [&](const index_t I) { for(auto J = row_ptr[I]; J < row_ptr[I + 1]; ++J) out_mat(I) += val_idx[J] * in_mat(col_idx[J]); });
@@ -114,7 +114,7 @@ public:
         return out_mat;
     }
 
-    Mat<data_t> operator*(const Mat<data_t>& in_mat) {
+    Mat<data_t> operator*(const Mat<data_t>& in_mat) const {
         Mat<data_t> out_mat = arma::zeros<Mat<data_t>>(in_mat.n_rows, in_mat.n_cols);
 
         suanpan_for(index_t(0), n_rows, [&](const index_t I) { for(auto J = row_ptr[I]; J < row_ptr[I + 1]; ++J) out_mat.row(I) += val_idx[J] * in_mat.row(col_idx[J]); });

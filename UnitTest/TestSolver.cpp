@@ -24,11 +24,9 @@ TEST_CASE("GMRES Solver", "[Utility.Solver]") {
         const vec b(N, fill::randu);
         vec x;
 
-        Jacobi preconditioner(A.A);
-
         SolverSetting setting{20, 500, 1E-10};
 
-        GMRES(A, x, b, preconditioner, setting);
+        GMRES(A, x, b, Jacobi(A.A), setting);
 
         REQUIRE(norm(solve(A.A, b) - x) <= 1E2 * N * setting.tolerance);
     }
@@ -41,11 +39,9 @@ TEST_CASE("BiCGSTAB Solver", "[Utility.Solver]") {
         const vec b(N, fill::randu);
         vec x;
 
-        Jacobi preconditioner(A.A);
-
         SolverSetting setting{20, 500, 1E-10};
 
-        BiCGSTAB(A, x, b, preconditioner, setting);
+        BiCGSTAB(A, x, b, Jacobi(A.A), setting);
 
         REQUIRE(norm(solve(A.A, b) - x) <= 1E3 * N * setting.tolerance);
     }
@@ -53,7 +49,6 @@ TEST_CASE("BiCGSTAB Solver", "[Utility.Solver]") {
 
 TEST_CASE("Iterative Solver Sparse", "[Matrix.Solver]") {
     for(auto I = 0; I < 100; ++I) {
-        constexpr int m = 10;
         const auto N = randi<uword>(distr_param(100, 200));
         auto A = SparseMatSuperLU<double>(N, N);
         REQUIRE(A.n_rows == N);
@@ -83,7 +78,6 @@ TEST_CASE("Iterative Solver Sparse", "[Matrix.Solver]") {
 
 TEST_CASE("Iterative Solver Dense", "[Matrix.Solver]") {
     for(auto I = 0; I < 100; ++I) {
-        constexpr int m = 10;
         const auto N = randi<uword>(distr_param(100, 200));
         auto A = BandMat<double>(N, N, 3);
         REQUIRE(A.n_rows == N);

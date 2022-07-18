@@ -33,8 +33,8 @@
 
 #include <future>
 
-#include "MetaMat/operator_times.hpp"
-#include "Toolbox/container.h"
+#include <Domain/MetaMat/operator_times.hpp>
+#include <Toolbox/container.h>
 
 enum class AnalysisType {
     NONE,
