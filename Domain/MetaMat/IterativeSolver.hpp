@@ -34,6 +34,15 @@ public:
     [[nodiscard]] vec apply(const vec& in) const { return diag_reciprocal % in; }
 };
 
+template<sp_d data_t> class SimpleJacobi {
+    const Col<data_t> diag_reciprocal;
+public:
+    explicit SimpleJacobi(Col<data_t>&& in_diag)
+        : diag_reciprocal(1. / in_diag.replace(0., 1.)) {}
+
+    [[nodiscard]] vec apply(const vec& in) const { return diag_reciprocal % in; }
+};
+
 template<sp_d data_t, CanEvaluate<data_t> System, IsPreconditioner<data_t> Preconditioner> int GMRES(const System& system, Col<data_t>& x, const Col<data_t>& b, const Preconditioner& conditioner, SolverSetting<data_t>& setting) {
     constexpr sp_d auto ZERO = data_t(0);
     constexpr sp_d auto ONE = data_t(1);

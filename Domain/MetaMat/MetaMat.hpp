@@ -157,7 +157,7 @@ template<sp_d T> void MetaMat<T>::csr_condense() {}
 template<sp_d T> int MetaMat<T>::iterative_solve(Mat<T>& X, const Mat<T>& B) {
     X = B;
 
-    Jacobi preconditioner(*this);
+    SimpleJacobi<T> preconditioner(this->diag());
 
     std::atomic_int code = 0;
 
