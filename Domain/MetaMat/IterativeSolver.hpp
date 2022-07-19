@@ -23,7 +23,7 @@
 
 template<typename T, typename data_t> concept IsPreconditioner = requires(T t, const Col<data_t>& x) { { t.apply(x) } -> std::convertible_to<Col<data_t>>; };
 
-template<typename T, typename data_t> concept CanEvaluate = requires(T t, const Col<data_t>& x) { { t.evaluate(x) } -> std::convertible_to<Col<data_t>>; };
+template<typename T, typename data_t> concept CanEvaluate = requires(T t, const Col<data_t>& x) { { t.evaluate(x) } -> std::convertible_to<Col<data_t>> ; };
 
 template<typename Container> class Jacobi {
     const vec diag_reciprocal;
@@ -43,7 +43,7 @@ public:
     [[nodiscard]] vec apply(const vec& in) const { return diag_reciprocal % in; }
 };
 
-template<sp_d data_t, CanEvaluate<data_t> System, IsPreconditioner<data_t> Preconditioner> int GMRES(const System& system, Col<data_t>& x, const Col<data_t>& b, const Preconditioner& conditioner, SolverSetting<data_t>& setting) {
+template<sp_d data_t, CanEvaluate<data_t> System, IsPreconditioner<data_t> Preconditioner> int GMRES(const System* system, Col<data_t>& x, const Col<data_t>& b, const Preconditioner& conditioner, SolverSetting<data_t>& setting) {
     constexpr sp_d auto ZERO = data_t(0);
     constexpr sp_d auto ONE = data_t(1);
 
@@ -84,7 +84,7 @@ template<sp_d data_t, CanEvaluate<data_t> System, IsPreconditioner<data_t> Preco
     if(suanpan::approx_equal(norm_b, ZERO)) norm_b = ONE;
 
     auto stop_criterion = [&] {
-        residual = (beta = arma::norm(r = conditioner.apply(b - system.evaluate(x)))) / norm_b;
+        residual = (beta = arma::norm(r = conditioner.apply(b - system->evaluate(x)))) / norm_b;
         suanpan_debug("GMRES solver local residual: %.4e.\n", residual);
         if(residual > setting.tolerance) return SUANPAN_FAIL;
         setting.tolerance = residual;
@@ -113,7 +113,7 @@ template<sp_d data_t, CanEvaluate<data_t> System, IsPreconditioner<data_t> Preco
         s(0) = beta;
 
         for(auto i = 0, j = 1; i < setting.restart && counter <= setting.max_iteration; ++i, ++j, ++counter) {
-            auto w = conditioner.apply(system.evaluate(v.col(i)));
+            auto w = conditioner.apply(system->evaluate(v.col(i)));
             for(auto k = 0; k <= i; ++k) w -= (hessenberg(k, i) = arma::dot(w, v.col(k))) * v.col(k);
             v.col(j) = w / (hessenberg(j, i) = arma::norm(w));
 
@@ -141,7 +141,7 @@ template<sp_d data_t, CanEvaluate<data_t> System, IsPreconditioner<data_t> Preco
     return SUANPAN_FAIL;
 }
 
-template<sp_d data_t, CanEvaluate<data_t> System, IsPreconditioner<data_t> Preconditioner> int BiCGSTAB(const System& system, Col<data_t>& x, const Col<data_t>& b, const Preconditioner& conditioner, SolverSetting<data_t>& setting) {
+template<sp_d data_t, CanEvaluate<data_t> System, IsPreconditioner<data_t> Preconditioner> int BiCGSTAB(const System* system, Col<data_t>& x, const Col<data_t>& b, const Preconditioner& conditioner, SolverSetting<data_t>& setting) {
     constexpr sp_d auto ZERO = data_t(0);
     constexpr sp_d auto ONE = data_t(1);
 
@@ -150,7 +150,7 @@ template<sp_d data_t, CanEvaluate<data_t> System, IsPreconditioner<data_t> Preco
 
     if(x.empty()) x = conditioner.apply(b);
 
-    Col<data_t> r = b - system.evaluate(x);
+    Col<data_t> r = b - system->evaluate(x);
     const auto initial_r = r;
 
     data_t residual = arma::norm(r) / norm_b;
@@ -176,7 +176,7 @@ template<sp_d data_t, CanEvaluate<data_t> System, IsPreconditioner<data_t> Preco
         else p = r + rho / pre_rho * alpha / omega * (p - omega * v);
 
         const auto phat = conditioner.apply(p);
-        v = system.evaluate(phat);
+        v = system->evaluate(phat);
         alpha = rho / arma::dot(initial_r, v);
         const Col<data_t> s = r - alpha * v;
 
@@ -189,7 +189,7 @@ template<sp_d data_t, CanEvaluate<data_t> System, IsPreconditioner<data_t> Preco
         }
 
         const auto shat = conditioner.apply(s);
-        const Col<data_t> t = system.evaluate(shat);
+        const Col<data_t> t = system->evaluate(shat);
         omega = arma::dot(t, s) / arma::dot(t, t);
         x += alpha * phat + omega * shat;
         r = s - omega * t;

@@ -25,7 +25,7 @@ TEST_CASE("GMRES Solver", "[Utility.Solver]") {
 
         SolverSetting<double> setting{20, 500, 1E-10};
 
-        GMRES(A, x, b, Jacobi(A.A), setting);
+        GMRES(&A, x, b, Jacobi(A.A), setting);
 
         REQUIRE(norm(solve(A.A, b) - x) <= 1E2 * N * setting.tolerance);
     }
@@ -40,7 +40,7 @@ TEST_CASE("BiCGSTAB Solver", "[Utility.Solver]") {
 
         SolverSetting<double> setting{20, 500, 1E-10};
 
-        BiCGSTAB(A, x, b, Jacobi(A.A), setting);
+        BiCGSTAB(&A, x, b, Jacobi(A.A), setting);
 
         REQUIRE(norm(solve(A.A, b) - x) <= 1E3 * N * setting.tolerance);
     }
@@ -63,13 +63,13 @@ TEST_CASE("Iterative Solver Sparse", "[Matrix.Solver]") {
 
         SolverSetting<double> setting{20, 500, 1E-10};
 
-        BiCGSTAB(A, x, C, Jacobi(A), setting);
+        BiCGSTAB(&A, x, C, Jacobi(A), setting);
 
         REQUIRE(norm(spsolve(B, C) - x) <= 1E1 * setting.tolerance);
 
         x.reset();
         setting.max_iteration = 500;
-        GMRES(A, x, C, Jacobi(A), setting);
+        GMRES(&A, x, C, Jacobi(A), setting);
 
         REQUIRE(norm(spsolve(B, C) - x) <= 1E1 * setting.tolerance);
     }

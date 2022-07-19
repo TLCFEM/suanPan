@@ -166,14 +166,14 @@ template<sp_d T> int MetaMat<T>::iterative_solve(Mat<T>& X, const Mat<T>& B) {
             Col<T> sub_x(X.colptr(I), X.n_rows, false, true);
             const Col<T> sub_b(B.colptr(I), B.n_rows);
             auto col_setting = setting;
-            code += GMRES(*this, sub_x, sub_b, preconditioner, col_setting);
+            code += GMRES(this, sub_x, sub_b, preconditioner, col_setting);
         });
     else if(IterativeSolver::BICGSTAB == setting.iterative_solver)
         suanpan_for(0llu, B.n_cols, [&](const uword I) {
             Col<T> sub_x(X.colptr(I), X.n_rows, false, true);
             const Col<T> sub_b(B.colptr(I), B.n_rows);
             auto col_setting = setting;
-            code += BiCGSTAB(*this, sub_x, sub_b, preconditioner, col_setting);
+            code += BiCGSTAB(this, sub_x, sub_b, preconditioner, col_setting);
         });
     else throw invalid_argument("no proper iterative solver assigned but somehow iterative solving is called");
 
