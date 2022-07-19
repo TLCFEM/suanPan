@@ -25,12 +25,19 @@ enum class Precision {
     FULL
 };
 
+enum class IterativeSolver {
+    BICGSTAB,
+    GMRES,
+    NONE
+};
+
 template<sp_d data_t> struct SolverSetting {
     int restart = 20;
     int max_iteration = 200;
     data_t tolerance = std::is_same_v<data_t, float> ? 1E-7 : 1E-14;
     unsigned iterative_refinement = 5;
     Precision precision = Precision::FULL;
+    IterativeSolver iterative_solver = IterativeSolver::NONE;
 };
 
 #endif

@@ -94,14 +94,17 @@ TEST_CASE("Iterative Solver Dense", "[Matrix.Solver]") {
                 else B(i, j) = 0.;
 
         SolverSetting<double> setting{20, 500, 1E-10};
+        setting.iterative_solver = IterativeSolver::BICGSTAB;
 
-        BiCGSTAB(A, x, C, Jacobi(A), setting);
+        A.set_solver_setting(setting);
+        A.iterative_solve(x, C);
 
         REQUIRE(norm(solve(B, C) - x) <= 1E1 * setting.tolerance);
 
-        x.reset();
-        setting.max_iteration = 500;
-        GMRES(A, x, C, Jacobi(A), setting);
+        setting.iterative_solver = IterativeSolver::GMRES;
+
+        A.set_solver_setting(setting);
+        A.iterative_solve(x, C);
 
         REQUIRE(norm(solve(B, C) - x) <= 1E1 * setting.tolerance);
     }

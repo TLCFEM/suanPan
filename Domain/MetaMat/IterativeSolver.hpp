@@ -25,6 +25,15 @@ template<typename T, typename data_t> concept IsPreconditioner = requires(T t, c
 
 template<typename T, typename data_t> concept CanEvaluate = requires(T t, const Col<data_t>& x) { { t.evaluate(x) } -> std::convertible_to<Col<data_t>>; };
 
+template<typename Container> class Jacobi {
+    const vec diag_reciprocal;
+public:
+    explicit Jacobi(const Container& in_mat)
+        : diag_reciprocal(1. / vec(in_mat.diag()).replace(0., 1.)) {}
+
+    [[nodiscard]] vec apply(const vec& in) const { return diag_reciprocal % in; }
+};
+
 template<sp_d data_t, CanEvaluate<data_t> System, IsPreconditioner<data_t> Preconditioner> int GMRES(const System& system, Col<data_t>& x, const Col<data_t>& b, const Preconditioner& conditioner, SolverSetting<data_t>& setting) {
     constexpr sp_d auto ZERO = data_t(0);
     constexpr sp_d auto ONE = data_t(1);

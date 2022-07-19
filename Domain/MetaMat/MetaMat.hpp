@@ -30,7 +30,7 @@
 #define METAMAT_HPP
 
 #include "triplet_form.hpp"
-#include "SolverSetting.hpp"
+#include "IterativeSolver.hpp"
 
 template<sp_d T> class MetaMat {
 protected:
@@ -101,6 +101,8 @@ public:
     virtual void csc_condense();
     virtual void csr_condense();
 
+    int iterative_solve(Mat<T>&, const Mat<T>&);
+
     [[nodiscard]] Col<T> evaluate(const Col<T>&) const;
 };
 
@@ -152,7 +154,33 @@ template<sp_d T> void MetaMat<T>::csc_condense() {}
 
 template<sp_d T> void MetaMat<T>::csr_condense() {}
 
-template<sp_d T> Col<T> MetaMat<T>::evaluate(const Col<T>& x) const { return this->operator*(x); }
+template<sp_d T> int MetaMat<T>::iterative_solve(Mat<T>& X, const Mat<T>& B) {
+    X = B;
+
+    Jacobi preconditioner(*this);
+
+    std::atomic_int code = 0;
+
+    if(IterativeSolver::GMRES == setting.iterative_solver)
+        suanpan_for(0llu, B.n_cols, [&](const uword I) {
+            Col<T> sub_x(X.colptr(I), X.n_rows, false, true);
+            const Col<T> sub_b(B.colptr(I), B.n_rows);
+            auto col_setting = setting;
+            code += GMRES(*this, sub_x, sub_b, preconditioner, col_setting);
+        });
+    else if(IterativeSolver::BICGSTAB == setting.iterative_solver)
+        suanpan_for(0llu, B.n_cols, [&](const uword I) {
+            Col<T> sub_x(X.colptr(I), X.n_rows, false, true);
+            const Col<T> sub_b(B.colptr(I), B.n_rows);
+            auto col_setting = setting;
+            code += BiCGSTAB(*this, sub_x, sub_b, preconditioner, col_setting);
+        });
+    else throw invalid_argument("no proper iterative solver assigned but somehow iterative solving is called");
+
+    return 0 == code ? SUANPAN_SUCCESS : SUANPAN_FAIL;
+}
+
+template<sp_d T> Col<T> MetaMat<T>::evaluate(const Col<T>& X) const { return this->operator*(X); }
 
 template<sp_d T> Mat<T> to_mat(const MetaMat<T>& in_mat) {
     Mat<T> out_mat(in_mat.n_rows, in_mat.n_cols);
