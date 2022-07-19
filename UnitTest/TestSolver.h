@@ -17,12 +17,19 @@ struct NonlinearSystem {
 };
 
 template<typename Container> class Jacobi {
-    vec diag_reciprocal;
+    const vec diag_reciprocal;
 public:
-    explicit Jacobi(Container& in_mat)
-        : diag_reciprocal(1. / in_mat.diag()) {}
+    explicit Jacobi(const Container& in_mat)
+        : diag_reciprocal(1. / vec(in_mat.diag()).replace(0., 1.)) {}
 
     [[nodiscard]] vec apply(const vec& in) const { return diag_reciprocal % in; }
+};
+
+class Quadratic {
+public:
+    [[nodiscard]] vec evaluate_residual(const vec& x) const { return square(x) - 1.; }
+
+    [[nodiscard]] mat evaluate_jacobian(const vec& x) const { return diagmat(2. * x); }
 };
 
 #endif // TESTSOLVER_H

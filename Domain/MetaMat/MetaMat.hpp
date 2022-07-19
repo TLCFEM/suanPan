@@ -66,7 +66,7 @@ public:
     virtual void nullify(uword) = 0;
 
     [[nodiscard]] virtual T max() const = 0;
-    [[nodiscard]] virtual Col<T> diag() = 0;
+    [[nodiscard]] virtual Col<T> diag() const = 0;
 
     virtual const T& operator()(uword, uword) const = 0;
     virtual T& at(uword, uword) = 0;

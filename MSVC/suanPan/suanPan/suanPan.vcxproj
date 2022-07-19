@@ -900,7 +900,6 @@
     <ClInclude Include="..\..\..\Toolbox\container.h" />
     <ClInclude Include="..\..\..\Toolbox\Converter.h" />
     <ClInclude Include="..\..\..\Toolbox\LBFGS.hpp" />
-    <ClInclude Include="..\..\..\Toolbox\IterativeSolver.hpp" />
     <ClInclude Include="..\..\..\Toolbox\print.h" />
     <ClInclude Include="..\..\..\Toolbox\IntegrationPlan.h" />
     <ClInclude Include="..\..\..\Toolbox\Quaternion.hpp" />

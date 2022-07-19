@@ -45,7 +45,7 @@ public:
     void nullify(uword) override;
 
     [[nodiscard]] T max() const override;
-    [[nodiscard]] Col<T> diag() override;
+    [[nodiscard]] Col<T> diag() const override;
 
     const T& operator()(uword, uword) const override;
     T& at(uword, uword) override;
@@ -96,13 +96,11 @@ template<sp_d T> void SparseMat<T>::nullify(const uword idx) {
 
 template<sp_d T> T SparseMat<T>::max() const { return triplet_mat.max(); }
 
-template<sp_d T> Col<T> SparseMat<T>::diag() {
+template<sp_d T> Col<T> SparseMat<T>::diag() const {
     using index_t = typename decltype(triplet_mat)::index_type;
 
-    this->csc_condense();
-
-    Col<T> diag_vec(std::min(this->n_rows, this->n_cols), fill::ones);
-    suanpan_for(static_cast<index_t>(0), triplet_mat.n_elem, [&](const index_t I) { if(triplet_mat.row(I) == triplet_mat.col(I)) diag_vec(triplet_mat.row(I)) = triplet_mat.val_mem()[I]; });
+    Col<T> diag_vec(std::min(this->n_rows, this->n_cols), fill::zeros);
+    for(index_t I = 0; I < triplet_mat.n_elem; ++I) if(triplet_mat.row(I) == triplet_mat.col(I)) diag_vec(triplet_mat.row(I)) += triplet_mat.val_mem()[I];
 
     return diag_vec;
 }

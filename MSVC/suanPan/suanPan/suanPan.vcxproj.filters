@@ -2635,9 +2635,6 @@
     <ClInclude Include="..\..\..\Toolbox\LBFGS.hpp">
       <Filter>Toolbox</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Toolbox\IterativeSolver.hpp">
-      <Filter>Toolbox</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\UnitTest\TestSolver.h">
       <Filter>UnitTest</Filter>
     </ClInclude>
