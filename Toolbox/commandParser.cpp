@@ -1020,6 +1020,9 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
         else if(is_equal(value, "PARDISO")) t_step->set_system_solver(SolverType::PARDISO);
         else if(is_equal(value, "FGMRES")) t_step->set_system_solver(SolverType::FGMRES);
 #endif
+        else if(is_equal(value, "GMRES")) t_step->set_system_solver(IterativeSolver::GMRES);
+        else if(is_equal(value, "BICGSTAB")) t_step->set_system_solver(IterativeSolver::BICGSTAB);
+        else if(is_equal(value, "NONE")) t_step->set_system_solver(IterativeSolver::NONE);
         else suanpan_error("set_property() need a valid solver id.\n");
     }
     else if(is_equal(property_id, "precision")) {

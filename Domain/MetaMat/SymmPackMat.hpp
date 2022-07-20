@@ -53,8 +53,8 @@ public:
 
     Mat<T> operator*(const Mat<T>&) const override;
 
-    int solve(Mat<T>&, Mat<T>&&) override;
-    int solve(Mat<T>&, const Mat<T>&) override;
+    int direct_solve(Mat<T>&, Mat<T>&&) override;
+    int direct_solve(Mat<T>&, const Mat<T>&) override;
 };
 
 template<sp_d T> T SymmPackMat<T>::bin = 0.;
@@ -108,7 +108,7 @@ template<sp_d T> Mat<T> SymmPackMat<T>::operator*(const Mat<T>& X) const {
     return Y;
 }
 
-template<sp_d T> int SymmPackMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
+template<sp_d T> int SymmPackMat<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
     if(this->factored) return this->solve_trs(X, B);
 
     const auto N = static_cast<int>(this->n_rows);
@@ -184,7 +184,7 @@ template<sp_d T> int SymmPackMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
     return INFO;
 }
 
-template<sp_d T> int SymmPackMat<T>::solve(Mat<T>& X, Mat<T>&& B) {
+template<sp_d T> int SymmPackMat<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
     if(this->factored) return this->solve_trs(X, std::forward<Mat<T>>(B));
 
     const auto N = static_cast<int>(this->n_rows);

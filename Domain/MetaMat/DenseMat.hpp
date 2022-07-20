@@ -43,7 +43,7 @@ protected:
     const T* const memory = nullptr;
 
 public:
-    using MetaMat<T>::solve;
+    using MetaMat<T>::direct_solve;
 
     DenseMat(uword, uword, uword);
     DenseMat(const DenseMat&);
@@ -189,6 +189,7 @@ template<sp_d T> void DenseMat<T>::operator-=(const triplet_form<T, uword>& M) {
 template<sp_d T> void DenseMat<T>::operator*=(const T value) { arrayops::inplace_mul(memptr(), value, this->n_elem); }
 
 template<sp_d T> int DenseMat<T>::sign_det() const {
+    if(IterativeSolver::NONE != this->setting.iterative_solver) throw invalid_argument("analysis requires the sign of determinant but iterative solver does not support it");
     auto det_sign = 1;
     for(unsigned I = 0; I < pivot.n_elem; ++I) if((this->operator()(I, I) < 0.) ^ (static_cast<int>(I) + 1 != pivot(I))) det_sign = -det_sign;
     return det_sign;

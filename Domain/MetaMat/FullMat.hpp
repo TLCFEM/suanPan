@@ -52,8 +52,8 @@ public:
 
     Mat<T> operator*(const Mat<T>&) const override;
 
-    int solve(Mat<T>&, Mat<T>&&) override;
-    int solve(Mat<T>&, const Mat<T>&) override;
+    int direct_solve(Mat<T>&, Mat<T>&&) override;
+    int direct_solve(Mat<T>&, const Mat<T>&) override;
 };
 
 template<sp_d T> FullMat<T>::FullMat(const uword in_rows, const uword in_cols)
@@ -116,7 +116,7 @@ template<sp_d T> Mat<T> FullMat<T>::operator*(const Mat<T>& B) const {
     return C;
 }
 
-template<sp_d T> int FullMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
+template<sp_d T> int FullMat<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
     if(this->factored) return this->solve_trs(X, B);
 
     auto N = static_cast<int>(this->n_rows);
@@ -190,7 +190,7 @@ template<sp_d T> int FullMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
     return INFO;
 }
 
-template<sp_d T> int FullMat<T>::solve(Mat<T>& X, Mat<T>&& B) {
+template<sp_d T> int FullMat<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
     if(this->factored) return this->solve_trs(X, std::forward<Mat<T>>(B));
 
     auto N = static_cast<int>(this->n_rows);

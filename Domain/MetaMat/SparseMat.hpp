@@ -34,7 +34,7 @@
 template<sp_d T> class SparseMat : public MetaMat<T> {
 public:
     using MetaMat<T>::triplet_mat;
-    using MetaMat<T>::solve;
+    using MetaMat<T>::direct_solve;
 
     SparseMat(uword, uword, uword = 0);
 

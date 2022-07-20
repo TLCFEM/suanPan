@@ -109,6 +109,7 @@ public:
     void set_max_step_size(double);
     void set_max_substep(unsigned);
     void set_system_solver(SolverType);
+    void set_system_solver(IterativeSolver);
     void set_precision(Precision);
     void set_tolerance(double);
     void set_refinement(unsigned);
@@ -117,9 +118,6 @@ public:
     [[nodiscard]] double get_min_step_size() const;
     [[nodiscard]] double get_max_step_size() const;
     [[nodiscard]] unsigned get_max_substep() const;
-    [[nodiscard]] SolverType get_system_solver() const;
-    [[nodiscard]] Precision get_precision() const;
-    [[nodiscard]] double get_tolerance() const;
 
     [[nodiscard]] bool is_fixed_step_size() const;
     void set_fixed_step_size(bool);

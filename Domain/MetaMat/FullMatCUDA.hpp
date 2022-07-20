@@ -58,8 +58,8 @@ public:
 
     unique_ptr<MetaMat<T>> make_copy() override;
 
-    int solve(Mat<T>&, Mat<T>&&) override;
-    int solve(Mat<T>&, const Mat<T>&) override;
+    int direct_solve(Mat<T>&, Mat<T>&&) override;
+    int direct_solve(Mat<T>&, const Mat<T>&) override;
 };
 
 template<sp_d T> void FullMatCUDA<T>::acquire() {
@@ -103,9 +103,9 @@ template<sp_d T> FullMatCUDA<T>::~FullMatCUDA() { release(); }
 
 template<sp_d T> unique_ptr<MetaMat<T>> FullMatCUDA<T>::make_copy() { return make_unique<FullMatCUDA<T>>(*this); }
 
-template<sp_d T> int FullMatCUDA<T>::solve(Mat<T>& X, Mat<T>&& B) { return solve(X, B); }
+template<sp_d T> int FullMatCUDA<T>::direct_solve(Mat<T>& X, Mat<T>&& B) { return direct_solve(X, B); }
 
-template<sp_d T> int FullMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) {
+template<sp_d T> int FullMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
     if(std::is_same_v<T, float>) {
         // pure float
         if(!this->factored) {

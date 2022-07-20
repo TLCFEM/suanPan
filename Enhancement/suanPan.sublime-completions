@@ -1312,6 +1312,8 @@
     "multiplierbc",
     "MultiplierBC",
     "MUMPS",
+    "GMRES",
+    "BICGSTAB",
     "mute",
     "NLE3D01",
     "nobar",

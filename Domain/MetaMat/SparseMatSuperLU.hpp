@@ -78,8 +78,8 @@ public:
 
     unique_ptr<MetaMat<T>> make_copy() override;
 
-    int solve(Mat<T>&, Mat<T>&&) override;
-    int solve(Mat<T>&, const Mat<T>&) override;
+    int direct_solve(Mat<T>&, Mat<T>&&) override;
+    int direct_solve(Mat<T>&, const Mat<T>&) override;
 };
 
 template<sp_d T> template<sp_d ET> void SparseMatSuperLU<T>::alloc_supermatrix(csc_form<ET, int>&& in) {
@@ -211,7 +211,7 @@ template<sp_d T> void SparseMatSuperLU<T>::zeros() {
 
 template<sp_d T> unique_ptr<MetaMat<T>> SparseMatSuperLU<T>::make_copy() { return std::make_unique<SparseMatSuperLU<T>>(*this); }
 
-template<sp_d T> int SparseMatSuperLU<T>::solve(Mat<T>& out_mat, const Mat<T>& in_mat) {
+template<sp_d T> int SparseMatSuperLU<T>::direct_solve(Mat<T>& out_mat, const Mat<T>& in_mat) {
     if(this->factored) return solve_trs(out_mat, in_mat);
 
     this->factored = true;
@@ -282,7 +282,7 @@ template<sp_d T> int SparseMatSuperLU<T>::solve_trs(Mat<T>& out_mat, const Mat<T
     return flag;
 }
 
-template<sp_d T> int SparseMatSuperLU<T>::solve(Mat<T>& out_mat, Mat<T>&& in_mat) {
+template<sp_d T> int SparseMatSuperLU<T>::direct_solve(Mat<T>& out_mat, Mat<T>&& in_mat) {
     if(this->factored) return solve_trs(out_mat, std::forward<Mat<T>>(in_mat));
 
     this->factored = true;

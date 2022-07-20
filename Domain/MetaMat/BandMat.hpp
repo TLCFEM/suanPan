@@ -58,8 +58,8 @@ public:
 
     Mat<T> operator*(const Mat<T>&) const override;
 
-    int solve(Mat<T>&, Mat<T>&&) override;
-    int solve(Mat<T>&, const Mat<T>&) override;
+    int direct_solve(Mat<T>&, Mat<T>&&) override;
+    int direct_solve(Mat<T>&, const Mat<T>&) override;
 };
 
 template<sp_d T> T BandMat<T>::bin = 0.;
@@ -120,7 +120,7 @@ template<sp_d T> Mat<T> BandMat<T>::operator*(const Mat<T>& X) const {
     return Y;
 }
 
-template<sp_d T> int BandMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
+template<sp_d T> int BandMat<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
     if(this->factored) return this->solve_trs(X, B);
 
     suanpan_debug([&] { if(this->n_rows != this->n_cols) throw invalid_argument("requires a square matrix"); });
@@ -206,7 +206,7 @@ template<sp_d T> int BandMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
     return INFO;
 }
 
-template<sp_d T> int BandMat<T>::solve(Mat<T>& X, Mat<T>&& B) {
+template<sp_d T> int BandMat<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
     if(this->factored) return this->solve_trs(X, std::forward<Mat<T>>(B));
 
     suanpan_debug([&] { if(this->n_rows != this->n_cols) throw invalid_argument("requires a square matrix"); });

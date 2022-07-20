@@ -64,7 +64,7 @@ public:
 
     unique_ptr<MetaMat<T>> make_copy() override;
 
-    int solve(Mat<T>&, const Mat<T>&) override;
+    int direct_solve(Mat<T>&, const Mat<T>&) override;
 };
 
 template<sp_d T> void SparseMatCUDA<T>::acquire() {
@@ -116,7 +116,7 @@ template<sp_d T> SparseMatCUDA<T>::~SparseMatCUDA() {
 
 template<sp_d T> unique_ptr<MetaMat<T>> SparseMatCUDA<T>::make_copy() { return std::make_unique<SparseMatCUDA<T>>(*this); }
 
-template<sp_d T> int SparseMatCUDA<T>::solve(Mat<T>& X, const Mat<T>& B) {
+template<sp_d T> int SparseMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
     if(!this->factored) {
         // deallocate memory previously allocated for csr matrix
         device_dealloc();

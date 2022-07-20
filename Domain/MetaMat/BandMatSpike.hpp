@@ -64,8 +64,8 @@ public:
 
     Mat<T> operator*(const Mat<T>&) const override;
 
-    int solve(Mat<T>&, Mat<T>&&) override;
-    int solve(Mat<T>&, const Mat<T>&) override;
+    int direct_solve(Mat<T>&, Mat<T>&&) override;
+    int direct_solve(Mat<T>&, const Mat<T>&) override;
 
     [[nodiscard]] int sign_det() const override;
 };
@@ -136,7 +136,7 @@ template<sp_d T> Mat<T> BandMatSpike<T>::operator*(const Mat<T>& X) const {
     return Y;
 }
 
-template<sp_d T> int BandMatSpike<T>::solve(Mat<T>& X, const Mat<T>& B) {
+template<sp_d T> int BandMatSpike<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
     if(!this->factored) {
         auto N = static_cast<int>(this->n_rows);
         auto KL = static_cast<int>(l_band);
@@ -216,7 +216,7 @@ template<sp_d T> int BandMatSpike<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
     return SUANPAN_SUCCESS;
 }
 
-template<sp_d T> int BandMatSpike<T>::solve(Mat<T>& X, Mat<T>&& B) {
+template<sp_d T> int BandMatSpike<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
     if(!this->factored) {
         auto N = static_cast<int>(this->n_rows);
         auto KL = static_cast<int>(l_band);
