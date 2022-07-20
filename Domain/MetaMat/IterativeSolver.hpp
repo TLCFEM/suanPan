@@ -27,10 +27,12 @@ class Jacobi final : public Preconditioner {
     const vec diag_reciprocal;
 public:
     template<typename Container> explicit Jacobi(const Container& in_mat)
-        : diag_reciprocal(1. / vec(in_mat.diag()).replace(0., 1.)) {}
+        : Preconditioner()
+        , diag_reciprocal(1. / vec(in_mat.diag()).replace(0., 1.)) {}
 
     explicit Jacobi(vec&& in_diag)
-        : diag_reciprocal(1. / in_diag.replace(0., 1.)) {}
+        : Preconditioner()
+        , diag_reciprocal(1. / in_diag.replace(0., 1.)) {}
 
     [[nodiscard]] vec apply(const vec& in) const override {
         vec out = in;

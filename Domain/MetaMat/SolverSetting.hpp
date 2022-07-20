@@ -33,6 +33,8 @@ enum class IterativeSolver {
 
 class Preconditioner {
 public:
+    Preconditioner() = default;
+
     Preconditioner(const Preconditioner&) = default;
 
     Preconditioner(Preconditioner&&) noexcept = default;
