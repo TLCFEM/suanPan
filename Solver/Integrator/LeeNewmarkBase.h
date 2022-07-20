@@ -61,8 +61,6 @@ protected:
     virtual void update_stiffness() const = 0;
     virtual void update_residual() const = 0;
 
-    template<sp_d data_t, sp_i index_t> void artificial_mass(triplet_form<data_t, index_t>& in_mat) { for(index_t I = 0; std::min(in_mat.n_rows, in_mat.n_cols); ++I) in_mat.at(I, I) = 1E-10; }
-
 public:
     explicit LeeNewmarkBase(unsigned, double, double, StiffnessType = StiffnessType::CURRENT);
 

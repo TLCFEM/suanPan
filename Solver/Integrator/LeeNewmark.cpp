@@ -90,7 +90,7 @@ int LeeNewmark::process_constraint() {
         // assuming mass does not change
         // otherwise swap and assemble
         current_mass = factory->get_mass()->make_copy();
-        if(if_iterative) artificial_mass(current_mass->triplet_mat);
+        if(if_iterative) for(uword I = 0llu; std::min(current_mass->n_rows, current_mass->n_cols); ++I) current_mass->at(I, I) += 1E-10;
     }
     else {
         // if not first iteration

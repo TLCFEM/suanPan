@@ -363,7 +363,7 @@ int LeeNewmarkFull::process_constraint() {
         // otherwise, directly make a copy
         auto f_mass = std::async([&] {
             auto& t_mass = factory->get_mass()->triplet_mat;
-            if(if_iterative) artificial_mass(t_mass);
+            if(if_iterative) for(uword I = 0llu; std::min(t_mass.n_rows, t_mass.n_cols); ++I) t_mass.at(I, I) += 1E-10;
             t_mass.csc_condense();
             access::rw(current_mass) = t_mass;
         });
