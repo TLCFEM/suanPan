@@ -28,7 +28,7 @@ TEST_CASE("GMRES Solver", "[Utility.Solver]") {
 
         GMRES(&A, x, b, setting);
 
-        REQUIRE(norm(solve(A.A, b) - x) <= 1E2 * N * setting.tolerance);
+        REQUIRE(norm(solve(A.A, b) - x) <= 1E1 * setting.tolerance);
     }
 }
 
@@ -44,7 +44,7 @@ TEST_CASE("BiCGSTAB Solver", "[Utility.Solver]") {
 
         BiCGSTAB(&A, x, b, setting);
 
-        REQUIRE(norm(solve(A.A, b) - x) <= 1E2 * N * setting.tolerance);
+        REQUIRE(norm(solve(A.A, b) - x) <= 1E1 * setting.tolerance);
     }
 }
 
@@ -55,7 +55,7 @@ TEST_CASE("Iterative Solver Sparse", "[Matrix.Solver]") {
         REQUIRE(A.n_rows == N);
         REQUIRE(A.n_cols == N);
 
-        sp_mat B = sprandu(N, N, .01) + speye(N, N) * 1E1;
+        sp_mat B = sprandu(N, N, .02) + speye(N, N) * 1E1;
 
         const vec C = randu<vec>(N);
         vec x;
@@ -68,13 +68,13 @@ TEST_CASE("Iterative Solver Sparse", "[Matrix.Solver]") {
 
         BiCGSTAB(&A, x, C, setting);
 
-        REQUIRE(norm(spsolve(B, C) - x) <= 1E2 * setting.tolerance);
+        REQUIRE(norm(spsolve(B, C) - x) <= 1E-12);
 
         x.reset();
         setting.max_iteration = 500;
         GMRES(&A, x, C, setting);
 
-        REQUIRE(norm(spsolve(B, C) - x) <= 1E2 * setting.tolerance);
+        REQUIRE(norm(spsolve(B, C) - x) <= 1E-12);
     }
 }
 
@@ -102,13 +102,13 @@ TEST_CASE("Iterative Solver Dense", "[Matrix.Solver]") {
         A.set_solver_setting(setting);
         A.iterative_solve(x, C);
 
-        REQUIRE(norm(solve(B, C) - x) <= 1E2 * setting.tolerance);
+        REQUIRE(norm(solve(B, C) - x) <= 1E1 * setting.tolerance);
 
         setting.iterative_solver = IterativeSolver::GMRES;
 
         A.set_solver_setting(setting);
         A.iterative_solve(x, C);
 
-        REQUIRE(norm(solve(B, C) - x) <= 1E2 * setting.tolerance);
+        REQUIRE(norm(solve(B, C) - x) <= 1E1 * setting.tolerance);
     }
 }
