@@ -90,7 +90,10 @@ int LeeNewmark::process_constraint() {
         // assuming mass does not change
         // otherwise swap and assemble
         current_mass = factory->get_mass()->make_copy();
-        if(if_iterative) for(uword I = 0llu; std::min(current_mass->n_rows, current_mass->n_cols); ++I) current_mass->at(I, I) += 1E-10;
+        if(if_iterative) {
+            const auto current_mass_max = current_mass->max() * 1E-10;
+            for(uword I = 0llu; I < std::min(current_mass->n_rows, current_mass->n_cols); ++I) current_mass->at(I, I) += current_mass_max;
+        }
     }
     else {
         // if not first iteration
