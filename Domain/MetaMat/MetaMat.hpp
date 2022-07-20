@@ -31,6 +31,7 @@
 
 #include "triplet_form.hpp"
 #include "IterativeSolver.hpp"
+#include "Preconditioner/Jacobi.h"
 
 template<typename T, typename U> concept ArmaContainer = std::is_floating_point_v<U> && (std::is_convertible_v<T, Mat<U>> || std::is_convertible_v<T, SpMat<U>>) ;
 

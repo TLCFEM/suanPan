@@ -14,21 +14,40 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @class Jacobi
+ * @brief A Jacobi class.
+ *
+ * @author tlc
+ * @date 21/07/2022
+ * @version 0.1.0
+ * @file Jacobi.h
+ * @addtogroup Preconditioner
+ * @{
+ */
 
-#include "SolverSetting.hpp"
+#ifndef JACOBI_H
+#define JACOBI_H
 
-Preconditioner& Preconditioner::operator=(const Preconditioner&) { return *this; }
+#include "Preconditioner.h"
 
-Jacobi::Jacobi(vec&& in_diag)
-    : Preconditioner()
-    , diag_reciprocal(1. / in_diag.replace(0., in_diag.max())) {}
+class Jacobi final : public Preconditioner {
+    const vec diag_reciprocal;
+public:
+    template<typename Container> explicit Jacobi(const Container& in_mat)
+        : Preconditioner()
+        , diag_reciprocal([&] {
+            vec t_diag = in_mat.diag();
+            return 1. / t_diag.replace(0., t_diag.max());
+        }()) {}
 
-vec Jacobi::apply(const vec& in) const {
-    vec out = in;
+    explicit Jacobi(vec&&);
 
-    for(auto I = 0llu; I < in.n_elem; I += diag_reciprocal.n_elem) out.subvec(I, size(diag_reciprocal)) %= diag_reciprocal;
+    [[nodiscard]] vec apply(const vec&) const override;
 
-    return out;
-}
+    [[nodiscard]] unique_ptr<Preconditioner> get_copy() const override;
+};
 
-unique_ptr<Preconditioner> Jacobi::get_copy() const { return make_unique<Jacobi>(*this); }
+#endif
+
+//! @}

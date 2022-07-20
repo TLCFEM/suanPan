@@ -18,7 +18,7 @@
 #ifndef SOLVERSETTING_HPP
 #define SOLVERSETTING_HPP
 
-#include <suanPan.h>
+#include "Preconditioner/Preconditioner.h"
 
 enum class Precision {
     MIXED,
@@ -29,36 +29,6 @@ enum class IterativeSolver {
     BICGSTAB,
     GMRES,
     NONE
-};
-
-class Preconditioner {
-public:
-    Preconditioner() = default;
-    Preconditioner(const Preconditioner&) = default;
-    Preconditioner(Preconditioner&&) noexcept = default;
-    Preconditioner& operator=(const Preconditioner&);
-    Preconditioner& operator=(Preconditioner&&) noexcept = default;
-    virtual ~Preconditioner() = default;
-
-    [[nodiscard]] virtual vec apply(const vec&) const = 0;
-    [[nodiscard]] virtual unique_ptr<Preconditioner> get_copy() const = 0;
-};
-
-class Jacobi final : public Preconditioner {
-    const vec diag_reciprocal;
-public:
-    template<typename Container> explicit Jacobi(const Container& in_mat)
-        : Preconditioner()
-        , diag_reciprocal([&] {
-            vec t_diag = in_mat.diag();
-            return 1. / t_diag.replace(0., t_diag.max());
-        }()) {}
-
-    explicit Jacobi(vec&&);
-
-    [[nodiscard]] vec apply(const vec&) const override;
-
-    [[nodiscard]] unique_ptr<Preconditioner> get_copy() const override;
 };
 
 template<sp_d data_t> struct SolverSetting {
