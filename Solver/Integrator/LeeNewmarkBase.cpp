@@ -45,8 +45,6 @@ int LeeNewmarkBase::initialize() {
 #endif
     else stiffness = make_unique<SparseMatSuperLU<double>>(n_size, n_size);
 
-    stiffness->set_solver_setting(factory->get_solver_setting());
-
     return SUANPAN_SUCCESS;
 }
 
@@ -60,9 +58,15 @@ int LeeNewmarkBase::update_internal(const mat& t_internal) {
     return SUANPAN_SUCCESS;
 }
 
-int LeeNewmarkBase::solve(mat& X, const mat& B) { return stiffness->solve(X, resize(B, stiffness->n_rows, B.n_cols)); }
+int LeeNewmarkBase::solve(mat& X, const mat& B) {
+    stiffness->set_solver_setting(factory->get_solver_setting());
+    return stiffness->solve(X, resize(B, stiffness->n_rows, B.n_cols));
+}
 
-int LeeNewmarkBase::solve(mat& X, const sp_mat& B) { return stiffness->solve(X, resize(B, stiffness->n_rows, B.n_cols)); }
+int LeeNewmarkBase::solve(mat& X, const sp_mat& B) {
+    stiffness->set_solver_setting(factory->get_solver_setting());
+    return stiffness->solve(X, resize(B, stiffness->n_rows, B.n_cols));
+}
 
 int LeeNewmarkBase::solve(mat& X, mat&& B) { return solve(X, B); }
 

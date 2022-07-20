@@ -36,10 +36,7 @@ class Jacobi final : public Preconditioner {
 public:
     template<typename Container> explicit Jacobi(const Container& in_mat)
         : Preconditioner()
-        , diag_reciprocal([&] {
-            vec t_diag = in_mat.diag();
-            return 1. / t_diag.replace(0., t_diag.max());
-        }()) {}
+        , diag_reciprocal(1. / vec(in_mat.diag()).replace(0., 1E4)) {}
 
     explicit Jacobi(vec&&);
 

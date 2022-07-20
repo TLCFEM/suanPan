@@ -19,7 +19,7 @@
 
 Jacobi::Jacobi(vec&& in_diag)
     : Preconditioner()
-    , diag_reciprocal(1. / in_diag.replace(0., in_diag.max())) {}
+    , diag_reciprocal(1. / in_diag.replace(0., 1E4)) {}
 
 vec Jacobi::apply(const vec& in) const {
     vec out = in;
