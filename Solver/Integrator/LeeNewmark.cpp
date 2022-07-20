@@ -33,7 +33,7 @@ void LeeNewmark::update_stiffness() const {
                 const auto M = K + J;
                 for(unsigned L = 0; L < n_block; ++L) {
                     const auto N = L + J;
-                    auto t_val = current_mass->operator()(K, L);
+                    sp_d auto t_val = current_mass->operator()(K, L);
                     if(!suanpan::approx_equal(0., t_val)) stiffness->at(M, L) = C1 * (stiffness->at(K, N) = -(stiffness->at(M, N) = mass_coef(I) * t_val));
                     t_val = current_stiffness->operator()(K, L);
                     if(!suanpan::approx_equal(0., t_val)) stiffness->at(M, N) = stiffness_coef(I) * t_val;
@@ -90,6 +90,10 @@ int LeeNewmark::process_constraint() {
         // assuming mass does not change
         // otherwise swap and assemble
         current_mass = factory->get_mass()->make_copy();
+        if(if_iterative) {
+            const auto current_mass_max = current_mass->max() * 1E-10;
+            for(uword I = 0llu; I < std::min(current_mass->n_rows, current_mass->n_cols); ++I) current_mass->at(I, I) += current_mass_max;
+        }
     }
     else {
         // if not first iteration

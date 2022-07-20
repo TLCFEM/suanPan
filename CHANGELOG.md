@@ -9,6 +9,7 @@
 
 1. reformulate NM sections
 2. add couple stress membranes `CST3`, `CST6`, `CSM4-8`
+3. add universal iterative solvers `BiCGSTAB` and `GMRES`
 
 ## version 2.4
 

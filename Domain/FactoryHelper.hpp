@@ -61,9 +61,7 @@ template<sp_d T> unique_ptr<MetaMat<T>> get_basic_container(const Factory<T>* co
 template<sp_d T> unique_ptr<MetaMat<T>> get_matrix_container(const Factory<T>* const W) {
     auto global_mat = get_basic_container(W);
 
-    global_mat->set_precision(W->precision);
-    global_mat->set_tolerance(W->tolerance);
-    global_mat->set_refinement(W->refinement);
+    global_mat->set_solver_setting(W->setting);
 
     return global_mat;
 }

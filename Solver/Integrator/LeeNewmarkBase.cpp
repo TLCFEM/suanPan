@@ -35,15 +35,17 @@ int LeeNewmarkBase::initialize() {
 
     trial_internal = current_internal = residual.zeros(n_size);
 
-    if(SolverType::MUMPS == factory->get_solver()) stiffness = make_unique<SparseMatMUMPS<double>>(n_size, n_size);
+    if(SolverType::MUMPS == factory->get_solver_type()) stiffness = make_unique<SparseMatMUMPS<double>>(n_size, n_size);
 #ifdef SUANPAN_MKL
-    else if(SolverType::PARDISO == factory->get_solver()) stiffness = make_unique<SparseMatPARDISO<double>>(n_size, n_size);
-    else if(SolverType::FGMRES == factory->get_solver()) stiffness = make_unique<SparseMatFGMRES<double>>(n_size, n_size);
+    else if(SolverType::PARDISO == factory->get_solver_type()) stiffness = make_unique<SparseMatPARDISO<double>>(n_size, n_size);
+    else if(SolverType::FGMRES == factory->get_solver_type()) stiffness = make_unique<SparseMatFGMRES<double>>(n_size, n_size);
 #endif
 #ifdef SUANPAN_CUDA
-    else if(SolverType::CUDA == factory->get_solver()) stiffness = make_unique<SparseMatCUDA<double>>(n_size, n_size);
+    else if(SolverType::CUDA == factory->get_solver_type()) stiffness = make_unique<SparseMatCUDA<double>>(n_size, n_size);
 #endif
     else stiffness = make_unique<SparseMatSuperLU<double>>(n_size, n_size);
+
+    if_iterative = factory->get_solver_setting().iterative_solver != IterativeSolver::NONE;
 
     return SUANPAN_SUCCESS;
 }
@@ -58,9 +60,15 @@ int LeeNewmarkBase::update_internal(const mat& t_internal) {
     return SUANPAN_SUCCESS;
 }
 
-int LeeNewmarkBase::solve(mat& X, const mat& B) { return stiffness->solve(X, resize(B, stiffness->n_rows, B.n_cols)); }
+int LeeNewmarkBase::solve(mat& X, const mat& B) {
+    stiffness->set_solver_setting(factory->get_solver_setting());
+    return stiffness->solve(X, resize(B, stiffness->n_rows, B.n_cols));
+}
 
-int LeeNewmarkBase::solve(mat& X, const sp_mat& B) { return stiffness->solve(X, resize(B, stiffness->n_rows, B.n_cols)); }
+int LeeNewmarkBase::solve(mat& X, const sp_mat& B) {
+    stiffness->set_solver_setting(factory->get_solver_setting());
+    return stiffness->solve(X, resize(B, stiffness->n_rows, B.n_cols));
+}
 
 int LeeNewmarkBase::solve(mat& X, mat&& B) { return solve(X, B); }
 

@@ -1,20 +1,3 @@
 target_sources(${PROJECT_NAME} PRIVATE
-        BandMat.hpp
-        BandMatSpike.hpp
-        BandSymmMat.hpp
-        csc_form.hpp
-        csr_form.hpp
-        DenseMat.hpp
-        FullMat.hpp
-        FullMatCUDA.hpp
-        MetaMat.hpp
-        operator_times.hpp
-        SparseMat.hpp
-        SparseMatCUDA.hpp
-        SparseMatMUMPS.hpp
-        SparseMatPARDISO.hpp
-        SparseMatFGMRES.hpp
-        SparseMatSuperLU.hpp
-        SymmPackMat.hpp
-        triplet_form.hpp
+        Preconditioner/Jacobi.cpp
         )

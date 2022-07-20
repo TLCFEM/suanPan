@@ -150,6 +150,7 @@
     <ClCompile Include="..\..\..\Domain\Group\Group.cpp" />
     <ClCompile Include="..\..\..\Domain\Group\GroupGroup.cpp" />
     <ClCompile Include="..\..\..\Domain\Group\NodeGroup.cpp" />
+    <ClCompile Include="..\..\..\Domain\MetaMat\Preconditioner\Jacobi.cpp" />
     <ClCompile Include="..\..\..\Domain\Node.cpp" />
     <ClCompile Include="..\..\..\Domain\Tag.cpp" />
     <ClCompile Include="..\..\..\Element\Beam\B21.cpp" />
@@ -480,7 +481,7 @@
     <ClCompile Include="..\..\..\Toolbox\tensorToolbox.cpp" />
     <ClCompile Include="..\..\..\Toolbox\utility.cpp" />
     <ClCompile Include="..\..\..\UnitTest\CatchTest.cpp" />
-    <ClCompile Include="..\..\..\UnitTest\TestBFGS.cpp" />
+    <ClCompile Include="..\..\..\UnitTest\TestSolver.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestColoring.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestIntegration.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestMatrix.cpp" />
@@ -557,8 +558,12 @@
     <ClInclude Include="..\..\..\Domain\MetaMat\DenseMat.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\FullMat.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\FullMatCUDA.hpp" />
+    <ClInclude Include="..\..\..\Domain\MetaMat\IterativeSolver.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\MetaMat.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\operator_times.hpp" />
+    <ClInclude Include="..\..\..\Domain\MetaMat\Preconditioner\Jacobi.h" />
+    <ClInclude Include="..\..\..\Domain\MetaMat\Preconditioner\Preconditioner.h" />
+    <ClInclude Include="..\..\..\Domain\MetaMat\SolverSetting.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\SparseMat.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\SparseMatCUDA.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\SparseMatFGMRES.hpp" />
@@ -909,6 +914,7 @@
     <ClInclude Include="..\..\..\Toolbox\thread_pool.hpp" />
     <ClInclude Include="..\..\..\Toolbox\utility.h" />
     <ClInclude Include="..\..\..\UnitTest\CatchTest.h" />
+    <ClInclude Include="..\..\..\UnitTest\TestSolver.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\..\Resource\suanPan.rc" />

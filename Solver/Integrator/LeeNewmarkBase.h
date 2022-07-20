@@ -48,6 +48,8 @@ protected:
 
     bool first_iteration = true;
 
+    bool if_iterative = false;
+
     vec current_internal, trial_internal, residual;
 
     unique_ptr<MetaMat<double>> stiffness = nullptr;

@@ -234,7 +234,7 @@ public:
         for(size_t I = 0; I < scalar.size(); ++I) assemble(in_mat, row_shift[I], col_shift[I], scalar[I]);
     }
 
-    Mat<data_t> operator*(const Col<data_t>& in_mat) {
+    Mat<data_t> operator*(const Col<data_t>& in_mat) const {
         Mat<data_t> out_mat(in_mat.n_rows, in_mat.n_cols, fill::zeros);
 
         for(index_t I = 0; I < n_elem; ++I) out_mat(row_idx[I]) += val_idx[I] * in_mat(col_idx[I]);
@@ -242,7 +242,7 @@ public:
         return out_mat;
     }
 
-    Mat<data_t> operator*(const Mat<data_t>& in_mat) {
+    Mat<data_t> operator*(const Mat<data_t>& in_mat) const {
         Mat<data_t> out_mat(in_mat.n_rows, in_mat.n_cols, fill::zeros);
 
         for(index_t I = 0; I < n_elem; ++I) out_mat.row(row_idx[I]) += val_idx[I] * in_mat.row(col_idx[I]);
@@ -250,17 +250,17 @@ public:
         return out_mat;
     }
 
-    template<sp_d T2> triplet_form<data_t, index_t> operator*(T2);
-    template<sp_d T2> triplet_form<data_t, index_t> operator/(T2);
+    template<sp_d T2> triplet_form<data_t, index_t> operator*(T2) const;
+    template<sp_d T2> triplet_form<data_t, index_t> operator/(T2) const;
     template<sp_d T2> triplet_form<data_t, index_t>& operator*=(T2);
     template<sp_d T2> triplet_form<data_t, index_t>& operator/=(T2);
 
-    triplet_form<data_t, index_t> operator+(const triplet_form<data_t, index_t>& in_mat) {
+    triplet_form<data_t, index_t> operator+(const triplet_form<data_t, index_t>& in_mat) const {
         triplet_form<data_t, index_t> copy = *this;
         return copy += in_mat;
     }
 
-    triplet_form<data_t, index_t> operator-(const triplet_form<data_t, index_t>& in_mat) {
+    triplet_form<data_t, index_t> operator-(const triplet_form<data_t, index_t>& in_mat) const {
         triplet_form<data_t, index_t> copy = *this;
         return copy -= in_mat;
     }
@@ -268,9 +268,10 @@ public:
     triplet_form<data_t, index_t>& operator+=(const triplet_form<data_t, index_t>&);
     triplet_form<data_t, index_t>& operator-=(const triplet_form<data_t, index_t>&);
 
-    triplet_form<data_t, index_t> diagonal();
-    triplet_form<data_t, index_t> strictly_upper();
-    triplet_form<data_t, index_t> strictly_lower();
+    [[nodiscard]] Col<data_t> diag() const;
+    [[nodiscard]] triplet_form<data_t, index_t> diagonal() const;
+    [[nodiscard]] triplet_form<data_t, index_t> strictly_upper() const;
+    [[nodiscard]] triplet_form<data_t, index_t> strictly_lower() const;
 };
 
 template<sp_d data_t, sp_i index_t> void triplet_form<data_t, index_t>::condense(const bool full) {
@@ -481,7 +482,7 @@ template<sp_d data_t, sp_i index_t> template<sp_d in_dt, sp_i in_it> void triple
     access::rw(n_elem) = t_elem;
 }
 
-template<sp_d data_t, sp_i index_t> template<sp_d T2> triplet_form<data_t, index_t> triplet_form<data_t, index_t>::operator*(const T2 scalar) {
+template<sp_d data_t, sp_i index_t> template<sp_d T2> triplet_form<data_t, index_t> triplet_form<data_t, index_t>::operator*(const T2 scalar) const {
     if(suanpan::approx_equal(T2(0), scalar)) return triplet_form<data_t, index_t>(n_rows, n_cols);
 
     triplet_form<data_t, index_t> copy = *this;
@@ -496,7 +497,7 @@ template<sp_d data_t, sp_i index_t> template<sp_d T2> triplet_form<data_t, index
     return copy;
 }
 
-template<sp_d data_t, sp_i index_t> template<sp_d T2> triplet_form<data_t, index_t> triplet_form<data_t, index_t>::operator/(const T2 scalar) {
+template<sp_d data_t, sp_i index_t> template<sp_d T2> triplet_form<data_t, index_t> triplet_form<data_t, index_t>::operator/(const T2 scalar) const {
     triplet_form<data_t, index_t> copy = *this;
 
     if(suanpan::approx_equal(T2(1), scalar)) return copy;
@@ -564,7 +565,13 @@ template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t>& triplet_form<
     return *this;
 }
 
-template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> triplet_form<data_t, index_t>::diagonal() {
+template<sp_d data_t, sp_i index_t> Col<data_t> triplet_form<data_t, index_t>::diag() const {
+    Col<data_t> diag_vec(std::min(n_rows, n_cols), fill::zeros);
+    for(index_t I = 0; I < n_elem; ++I) if(row(I) == col(I)) diag_vec(row(I)) += val(I);
+    return diag_vec;
+}
+
+template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> triplet_form<data_t, index_t>::diagonal() const {
     auto out_mat = *this;
 
     suanpan_for(index_t(0), out_mat.n_elem, [&](const index_t I) { out_mat.val_idx[I] *= out_mat.row(I) == out_mat.col(I); });
@@ -572,7 +579,7 @@ template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> triplet_form<d
     return out_mat;
 }
 
-template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> triplet_form<data_t, index_t>::strictly_upper() {
+template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> triplet_form<data_t, index_t>::strictly_upper() const {
     auto out_mat = *this;
 
     suanpan_for(index_t(0), out_mat.n_elem, [&](const index_t I) { out_mat.val_idx[I] *= out_mat.row(I) < out_mat.col(I); });
@@ -580,7 +587,7 @@ template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> triplet_form<d
     return out_mat;
 }
 
-template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> triplet_form<data_t, index_t>::strictly_lower() {
+template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> triplet_form<data_t, index_t>::strictly_lower() const {
     auto out_mat = *this;
 
     suanpan_for(index_t(0), out_mat.n_elem, [&](const index_t I) { out_mat.val_idx[I] *= out_mat.col(I) < out_mat.row(I); });

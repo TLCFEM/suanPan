@@ -1,6 +1,5 @@
 target_sources(${PROJECT_NAME} PRIVATE
         CatchTest.cpp
-        TestBFGS.cpp
         TestColoring.cpp
         TestIntegration.cpp
         TestMatrix.cpp
@@ -8,6 +7,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         TestNURBS.cpp
         TestQuaternion.cpp
         TestShape.cpp
+        TestSolver.cpp
         TestSorting.cpp
         TestString.cpp
         TestSurfaceNM.cpp

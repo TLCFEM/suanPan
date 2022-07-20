@@ -27,8 +27,8 @@ template<typename MT, std::invocable T> void test_mat_solve(MT& A, const vec& D,
     REQUIRE(norm(E - D) < tol);
 
     // mixed precision
-    A.set_precision(Precision::MIXED);
-    A.set_tolerance(1E-18);
+    A.get_solver_setting().precision = Precision::MIXED;
+    A.get_solver_setting().tolerance = 1E-18;
 
     clear_mat();
 
@@ -62,7 +62,7 @@ template<typename MT, std::invocable T> void benchmark_mat_solve(string&& title,
         REQUIRE(norm(E - D) < tol);
     };
 
-    A.set_precision(Precision::MIXED);
+    A.get_solver_setting().precision = Precision::MIXED;
 
     BENCHMARK((title + " Mixed").c_str()) {
         clear_mat();

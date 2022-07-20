@@ -45,10 +45,7 @@ class Step : public Tag {
     double min_step_size = 1E-8;        // minimum step size
     double ini_step_size = time_period; // initial step size
 
-    double tolerance = 1E-12;
-
     unsigned max_substep = 1000; // maximum increment number
-    unsigned refinement = 10;
 
     bool fixed_step_size = false; // auto-stepping
 
@@ -62,7 +59,7 @@ protected:
     const bool sparse_mat = false;
 
     SolverType system_solver = SolverType::LAPACK;
-    Precision precision = Precision::FULL;
+    SolverSetting<double> setting{};
 
     weak_ptr<DomainBase> database;
     shared_ptr<Factory<double>> factory;
@@ -112,6 +109,7 @@ public:
     void set_max_step_size(double);
     void set_max_substep(unsigned);
     void set_system_solver(SolverType);
+    void set_system_solver(IterativeSolver);
     void set_precision(Precision);
     void set_tolerance(double);
     void set_refinement(unsigned);
@@ -120,9 +118,6 @@ public:
     [[nodiscard]] double get_min_step_size() const;
     [[nodiscard]] double get_max_step_size() const;
     [[nodiscard]] unsigned get_max_substep() const;
-    [[nodiscard]] SolverType get_system_solver() const;
-    [[nodiscard]] Precision get_precision() const;
-    [[nodiscard]] double get_tolerance() const;
 
     [[nodiscard]] bool is_fixed_step_size() const;
     void set_fixed_step_size(bool);
