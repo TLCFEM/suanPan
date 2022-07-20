@@ -23,28 +23,6 @@
 
 template<typename T, typename data_t> concept HasEvaluate = requires(T* t, const Col<data_t>& x) { { t->evaluate(x) } -> std::convertible_to<Col<data_t>> ; };
 
-class Jacobi final : public Preconditioner {
-    const vec diag_reciprocal;
-public:
-    template<typename Container> explicit Jacobi(const Container& in_mat)
-        : Preconditioner()
-        , diag_reciprocal(1. / vec(in_mat.diag()).replace(0., 1.)) {}
-
-    explicit Jacobi(vec&& in_diag)
-        : Preconditioner()
-        , diag_reciprocal(1. / in_diag.replace(0., 1.)) {}
-
-    [[nodiscard]] vec apply(const vec& in) const override {
-        vec out = in;
-
-        for(auto I = 0llu; I < in.n_elem; I += diag_reciprocal.n_elem) out.subvec(I, size(diag_reciprocal)) %= diag_reciprocal;
-
-        return out;
-    }
-
-    [[nodiscard]] unique_ptr<Preconditioner> get_copy() const override { return make_unique<Jacobi>(*this); }
-};
-
 template<sp_d data_t, HasEvaluate<data_t> System> int GMRES(const System* system, Col<data_t>& x, const Col<data_t>& b, SolverSetting<data_t>& setting) {
     constexpr sp_d auto ZERO = data_t(0);
     constexpr sp_d auto ONE = data_t(1);

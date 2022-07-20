@@ -150,6 +150,7 @@
     <ClCompile Include="..\..\..\Domain\Group\Group.cpp" />
     <ClCompile Include="..\..\..\Domain\Group\GroupGroup.cpp" />
     <ClCompile Include="..\..\..\Domain\Group\NodeGroup.cpp" />
+    <ClCompile Include="..\..\..\Domain\MetaMat\Preconditioner.cpp" />
     <ClCompile Include="..\..\..\Domain\Node.cpp" />
     <ClCompile Include="..\..\..\Domain\Tag.cpp" />
     <ClCompile Include="..\..\..\Element\Beam\B21.cpp" />

@@ -1390,6 +1390,9 @@
     <ClCompile Include="..\..\..\UnitTest\TestSolver.cpp">
       <Filter>UnitTest</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Domain\MetaMat\Preconditioner.cpp">
+      <Filter>Domain\MetaMat</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">

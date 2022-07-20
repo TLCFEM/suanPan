@@ -17,4 +17,5 @@ target_sources(${PROJECT_NAME} PRIVATE
         SparseMatSuperLU.hpp
         SymmPackMat.hpp
         triplet_form.hpp
+        Preconditioner.cpp
         )
