@@ -185,7 +185,7 @@ public:
     [[nodiscard]] SolverType get_solver_type() const;
 
     void set_solver_setting(const SolverSetting<double>&);
-    [[nodiscard]] SolverSetting<double> get_solver_setting() const;
+    [[nodiscard]] const SolverSetting<double>& get_solver_setting() const;
 
     void set_analysis_type(AnalysisType);
     [[nodiscard]] AnalysisType get_analysis_type() const;
@@ -618,7 +618,7 @@ template<sp_d T> SolverType Factory<T>::get_solver_type() const { return solver;
 
 template<sp_d T> void Factory<T>::set_solver_setting(const SolverSetting<double>& SS) { setting = SS; }
 
-template<sp_d T> SolverSetting<double> Factory<T>::get_solver_setting() const { return setting; }
+template<sp_d T> const SolverSetting<double>& Factory<T>::get_solver_setting() const { return setting; }
 
 template<sp_d T> void Factory<T>::set_analysis_type(const AnalysisType AT) {
     if(AT == analysis_type) return;
