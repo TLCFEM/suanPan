@@ -33,7 +33,7 @@ void LeeNewmark::update_stiffness() const {
                 const auto M = K + J;
                 for(unsigned L = 0; L < n_block; ++L) {
                     const auto N = L + J;
-                    auto t_val = current_mass->operator()(K, L);
+                    sp_d auto t_val = current_mass->operator()(K, L);
                     if(!suanpan::approx_equal(0., t_val)) stiffness->at(M, L) = C1 * (stiffness->at(K, N) = -(stiffness->at(M, N) = mass_coef(I) * t_val));
                     t_val = current_stiffness->operator()(K, L);
                     if(!suanpan::approx_equal(0., t_val)) stiffness->at(M, N) = stiffness_coef(I) * t_val;

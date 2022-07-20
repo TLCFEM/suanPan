@@ -59,8 +59,8 @@ int GSSSS::process_load() {
     const auto& D = get_domain().lock();
     auto& W = D->get_factory();
 
-    const auto current_time = W->get_current_time();
-    const auto trial_time = W->get_trial_time();
+    const sp_d auto current_time = W->get_current_time();
+    const sp_d auto trial_time = W->get_trial_time();
 
     W->update_trial_time((1. - W1) * current_time + W1 * trial_time);
 
@@ -75,8 +75,8 @@ int GSSSS::process_constraint() {
     const auto& D = get_domain().lock();
     auto& W = D->get_factory();
 
-    const auto current_time = W->get_current_time();
-    const auto trial_time = W->get_trial_time();
+    const sp_d auto current_time = W->get_current_time();
+    const sp_d auto trial_time = W->get_trial_time();
 
     W->update_trial_time((1. - W1) * current_time + W1 * trial_time);
 
@@ -91,8 +91,8 @@ int GSSSS::process_load_resistance() {
     const auto& D = get_domain().lock();
     auto& W = D->get_factory();
 
-    const auto current_time = W->get_current_time();
-    const auto trial_time = W->get_trial_time();
+    const sp_d auto current_time = W->get_current_time();
+    const sp_d auto trial_time = W->get_trial_time();
 
     W->update_trial_time((1. - W1) * current_time + W1 * trial_time);
 
@@ -107,8 +107,8 @@ int GSSSS::process_constraint_resistance() {
     const auto& D = get_domain().lock();
     auto& W = D->get_factory();
 
-    const auto current_time = W->get_current_time();
-    const auto trial_time = W->get_trial_time();
+    const sp_d auto current_time = W->get_current_time();
+    const sp_d auto trial_time = W->get_trial_time();
 
     W->update_trial_time((1. - W1) * current_time + W1 * trial_time);
 
