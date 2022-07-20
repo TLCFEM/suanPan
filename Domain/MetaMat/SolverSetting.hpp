@@ -40,7 +40,7 @@ template<sp_d data_t> struct SolverSetting {
     IterativeSolver iterative_solver = IterativeSolver::NONE;
     unique_ptr<Preconditioner> preconditioner = nullptr;
 
-    SolverSetting() {}
+    SolverSetting() = default;
 
     SolverSetting(const SolverSetting& other)
         : restart(other.restart)
