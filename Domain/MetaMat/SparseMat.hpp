@@ -98,14 +98,7 @@ template<sp_d T> void SparseMat<T>::nullify(const uword idx) {
 
 template<sp_d T> T SparseMat<T>::max() const { return triplet_mat.max(); }
 
-template<sp_d T> Col<T> SparseMat<T>::diag() const {
-    using index_t = typename decltype(triplet_mat)::index_type;
-
-    Col<T> diag_vec(std::min(this->n_rows, this->n_cols), fill::zeros);
-    for(index_t I = 0; I < triplet_mat.n_elem; ++I) if(triplet_mat.row(I) == triplet_mat.col(I)) diag_vec(triplet_mat.row(I)) += triplet_mat.val_mem()[I];
-
-    return diag_vec;
-}
+template<sp_d T> Col<T> SparseMat<T>::diag() const { return triplet_mat.diag(); }
 
 template<sp_d T> const T& SparseMat<T>::operator()(const uword in_row, const uword in_col) const {
     using index_t = typename decltype(triplet_mat)::index_type;
