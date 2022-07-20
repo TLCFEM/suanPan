@@ -128,7 +128,10 @@ void Step::set_max_step_size(const double T) { max_step_size = T; }
 
 void Step::set_max_substep(const unsigned M) { max_substep = M; }
 
-void Step::set_system_solver(const SolverType P) { system_solver = P; }
+void Step::set_system_solver(const SolverType P) {
+    system_solver = P;
+    setting.iterative_solver = IterativeSolver::NONE;
+}
 
 void Step::set_system_solver(const IterativeSolver P) { setting.iterative_solver = P; }
 

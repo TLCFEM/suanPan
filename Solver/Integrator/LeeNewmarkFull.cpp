@@ -501,6 +501,8 @@ int LeeNewmarkFull::process_constraint() {
         stiffness += t_stiff;
     }
 
+    stiffness->get_solver_setting().preconditioner = make_unique<Jacobi>(current_stiffness.diag());
+
     return SUANPAN_SUCCESS;
 }
 

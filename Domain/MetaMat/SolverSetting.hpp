@@ -31,6 +31,25 @@ enum class IterativeSolver {
     NONE
 };
 
+class Preconditioner {
+public:
+    Preconditioner(const Preconditioner&) = default;
+
+    Preconditioner(Preconditioner&&) noexcept = default;
+
+    Preconditioner& operator=(const Preconditioner& other) {
+        if(this == &other) return *this;
+        return *this;
+    }
+
+    Preconditioner& operator=(Preconditioner&&) noexcept = default;
+
+    virtual ~Preconditioner() = default;
+
+    [[nodiscard]] virtual vec apply(const vec&) const = 0;
+    [[nodiscard]] virtual unique_ptr<Preconditioner> get_copy() const = 0;
+};
+
 template<sp_d data_t> struct SolverSetting {
     int restart = 20;
     int max_iteration = 200;
@@ -38,6 +57,36 @@ template<sp_d data_t> struct SolverSetting {
     unsigned iterative_refinement = 5;
     Precision precision = Precision::FULL;
     IterativeSolver iterative_solver = IterativeSolver::NONE;
+    unique_ptr<Preconditioner> preconditioner = nullptr;
+
+    SolverSetting() {}
+
+    SolverSetting(const SolverSetting& other)
+        : restart(other.restart)
+        , max_iteration(other.max_iteration)
+        , tolerance(other.tolerance)
+        , iterative_refinement(other.iterative_refinement)
+        , precision(other.precision)
+        , iterative_solver(other.iterative_solver)
+        , preconditioner(other.preconditioner ? other.preconditioner->get_copy() : nullptr) {}
+
+    SolverSetting(SolverSetting&&) noexcept = delete;
+
+    SolverSetting& operator=(const SolverSetting& other) {
+        if(this == &other) return *this;
+        restart = other.restart;
+        max_iteration = other.max_iteration;
+        tolerance = other.tolerance;
+        iterative_refinement = other.iterative_refinement;
+        precision = other.precision;
+        iterative_solver = other.iterative_solver;
+        preconditioner = other.preconditioner ? other.preconditioner->get_copy() : nullptr;
+        return *this;
+    }
+
+    SolverSetting& operator=(SolverSetting&&) noexcept = delete;
+
+    ~SolverSetting() = default;
 };
 
 #endif

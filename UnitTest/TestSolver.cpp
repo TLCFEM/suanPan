@@ -23,9 +23,10 @@ TEST_CASE("GMRES Solver", "[Utility.Solver]") {
         const vec b(N, fill::randu);
         vec x;
 
-        SolverSetting<double> setting{20, 500, 1E-10};
+        SolverSetting<double> setting;
+        setting.preconditioner = std::make_unique<Jacobi>(A.A);
 
-        GMRES(&A, x, b, Jacobi(A.A), setting);
+        GMRES(&A, x, b, setting);
 
         REQUIRE(norm(solve(A.A, b) - x) <= 1E2 * N * setting.tolerance);
     }
@@ -38,9 +39,10 @@ TEST_CASE("BiCGSTAB Solver", "[Utility.Solver]") {
         const vec b(N, fill::randu);
         vec x;
 
-        SolverSetting<double> setting{20, 500, 1E-10};
+        SolverSetting<double> setting;
+        setting.preconditioner = std::make_unique<Jacobi>(A.A);
 
-        BiCGSTAB(&A, x, b, Jacobi(A.A), setting);
+        BiCGSTAB(&A, x, b, setting);
 
         REQUIRE(norm(solve(A.A, b) - x) <= 1E3 * N * setting.tolerance);
     }
@@ -61,15 +63,16 @@ TEST_CASE("Iterative Solver Sparse", "[Matrix.Solver]") {
         A.zeros();
         for(auto J = B.begin(); J != B.end(); ++J) A.at(J.row(), J.col()) = *J;
 
-        SolverSetting<double> setting{20, 500, 1E-10};
+        SolverSetting<double> setting;
+        setting.preconditioner = std::make_unique<Jacobi>(A);
 
-        BiCGSTAB(&A, x, C, Jacobi(A), setting);
+        BiCGSTAB(&A, x, C, setting);
 
         REQUIRE(norm(spsolve(B, C) - x) <= 1E1 * setting.tolerance);
 
         x.reset();
         setting.max_iteration = 500;
-        GMRES(&A, x, C, Jacobi(A), setting);
+        GMRES(&A, x, C, setting);
 
         REQUIRE(norm(spsolve(B, C) - x) <= 1E1 * setting.tolerance);
     }
@@ -93,7 +96,7 @@ TEST_CASE("Iterative Solver Dense", "[Matrix.Solver]") {
                 if(std::abs(static_cast<int>(i) - static_cast<int>(j)) <= 3) A.at(i, j) = B(i, j);
                 else B(i, j) = 0.;
 
-        SolverSetting<double> setting{20, 500, 1E-10};
+        SolverSetting<double> setting;
         setting.iterative_solver = IterativeSolver::BICGSTAB;
 
         A.set_solver_setting(setting);

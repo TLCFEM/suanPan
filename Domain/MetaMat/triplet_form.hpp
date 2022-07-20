@@ -268,6 +268,7 @@ public:
     triplet_form<data_t, index_t>& operator+=(const triplet_form<data_t, index_t>&);
     triplet_form<data_t, index_t>& operator-=(const triplet_form<data_t, index_t>&);
 
+    [[nodiscard]] Col<data_t> diag() const;
     [[nodiscard]] triplet_form<data_t, index_t> diagonal() const;
     [[nodiscard]] triplet_form<data_t, index_t> strictly_upper() const;
     [[nodiscard]] triplet_form<data_t, index_t> strictly_lower() const;
@@ -562,6 +563,13 @@ template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t>& triplet_form<
     access::rw(n_elem) = t_elem;
 
     return *this;
+}
+
+template<sp_d data_t, sp_i index_t> Col<data_t> triplet_form<data_t, index_t>::diag() const {
+    Col<data_t> diag_vec(std::min(n_rows, n_cols), fill::zeros);
+    for(index_t I = 0; I < n_elem; ++I) if(row(I) == col(I)) diag_vec(row(I)) += val(I);
+
+    return diag_vec;
 }
 
 template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> triplet_form<data_t, index_t>::diagonal() const {
