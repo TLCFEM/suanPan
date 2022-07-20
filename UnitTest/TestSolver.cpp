@@ -28,7 +28,7 @@ TEST_CASE("GMRES Solver", "[Utility.Solver]") {
 
         GMRES(&A, x, b, setting);
 
-        REQUIRE(norm(solve(A.A, b) - x) <= 1E1 * setting.tolerance);
+        REQUIRE(norm(solve(A.A, b) - x) <= 1E-12);
     }
 }
 
@@ -44,7 +44,7 @@ TEST_CASE("BiCGSTAB Solver", "[Utility.Solver]") {
 
         BiCGSTAB(&A, x, b, setting);
 
-        REQUIRE(norm(solve(A.A, b) - x) <= 1E1 * setting.tolerance);
+        REQUIRE(norm(solve(A.A, b) - x) <= 1E-12);
     }
 }
 
