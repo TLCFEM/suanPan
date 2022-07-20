@@ -136,7 +136,7 @@ template<sp_d T> void DenseMat<T>::zeros() {
     this->factored = false;
 }
 
-template<sp_d T> T DenseMat<T>::max() const { return this->diag().max(); }
+template<sp_d T> T DenseMat<T>::max() const { return op_max::direct_max(memptr(), this->n_elem); }
 
 template<sp_d T> Col<T> DenseMat<T>::diag() const {
     Col<T> diag_vec(std::min(this->n_rows, this->n_cols), fill::none);
