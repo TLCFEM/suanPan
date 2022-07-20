@@ -90,6 +90,7 @@ int LeeNewmark::process_constraint() {
         // assuming mass does not change
         // otherwise swap and assemble
         current_mass = factory->get_mass()->make_copy();
+        if(if_iterative) artificial_mass(current_mass->triplet_mat);
     }
     else {
         // if not first iteration

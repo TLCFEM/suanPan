@@ -323,10 +323,7 @@ LeeNewmarkFull::LeeNewmarkFull(const unsigned T, std::vector<Mode>&& M, const do
 int LeeNewmarkFull::initialize() {
     if(SUANPAN_SUCCESS != LeeNewmarkBase::initialize()) return SUANPAN_FAIL;
 
-    if(factory->get_solver_setting().iterative_solver != IterativeSolver::NONE) {
-        suanpan_error("iterative solvers are not supported, please consider LeeNewmark.\n");
-        return SUANPAN_FAIL;
-    }
+    if(if_iterative) suanpan_info("iterative solver is used, artificial mass will be added to mass matrix.\n");
 
     if(factory->is_sparse()) return SUANPAN_SUCCESS;
 
@@ -366,6 +363,7 @@ int LeeNewmarkFull::process_constraint() {
         // otherwise, directly make a copy
         auto f_mass = std::async([&] {
             auto& t_mass = factory->get_mass()->triplet_mat;
+            if(if_iterative) artificial_mass(t_mass);
             t_mass.csc_condense();
             access::rw(current_mass) = t_mass;
         });

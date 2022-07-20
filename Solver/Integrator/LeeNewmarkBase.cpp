@@ -45,6 +45,8 @@ int LeeNewmarkBase::initialize() {
 #endif
     else stiffness = make_unique<SparseMatSuperLU<double>>(n_size, n_size);
 
+    if_iterative = factory->get_solver_setting().iterative_solver != IterativeSolver::NONE;
+
     return SUANPAN_SUCCESS;
 }
 
