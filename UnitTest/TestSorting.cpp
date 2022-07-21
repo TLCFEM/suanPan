@@ -20,11 +20,23 @@
 
 TEST_CASE("RCM", "[Utility.Sorting]") {
     constexpr auto N = 200;
-    
+
     for(auto I = 0; I < 4; ++I) {
         sp_mat B = sprandu(N, N, .01);
         sp_mat A = B + B.t();
 
-        BENCHMARK("RCM") { return sort_rcm(A); };
+        auto C = mat(A);
+
+        BENCHMARK("RCM Dense") { return sort_rcm(C); };
+
+        triplet_form<double, uword> triplet_mat(N, N);
+
+        for(auto J = A.begin(); J != A.end(); ++J) triplet_mat.at(J.row(), J.col()) = *J;
+
+        BENCHMARK("RCM Triplet") { return sort_rcm(triplet_mat); };
+
+        csc_form<double, uword> csc_mat(triplet_mat);
+
+        BENCHMARK("RCM CSC") { return sort_rcm(csc_mat); };
     }
 }

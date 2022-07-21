@@ -66,7 +66,7 @@ TEST_CASE("Rotation of Strain", "[Utility.Tensor]") {
     REQUIRE(Approx(.02) == tensor::strain::norm(strain));
 }
 
-TEST_CASE("Basic Quantites", "[Utility.Tensor]") {
+TEST_CASE("Basic Quantities", "[Utility.Tensor]") {
     const vec A = dev(dev(unit_symmetric_tensor4())).diag();
     const auto B = stress::norm(A), C = stress::norm(vec(A)), D = strain::norm(A), E = strain::norm(vec(A));
 
