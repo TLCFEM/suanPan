@@ -1396,6 +1396,9 @@
     <ClCompile Include="..\..\..\Domain\MetaMat\Preconditioner\Jacobi.cpp">
       <Filter>Domain\MetaMat\Preconditioner</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestSorting.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">

@@ -70,6 +70,12 @@ public:
 
     [[nodiscard]] data_t* val_mem() { return val_idx.get(); }
 
+    index_t row(const index_t I) const { return row_idx[I]; }
+
+    index_t col(const index_t I) const { return col_ptr[I]; }
+
+    data_t val(const index_t I) const { return val_idx[I]; }
+
     [[nodiscard]] data_t max() const {
         if(0 == n_elem) return data_t(0);
         return *std::max_element(val_idx.get(), val_idx.get() + n_elem);

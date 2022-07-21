@@ -41,6 +41,7 @@
 #define RCM_H
 
 #include <Domain/MetaMat/triplet_form.hpp>
+#include <Domain/MetaMat/csc_form.hpp>
 
 uvec sort_rcm(const std::vector<uvec>&, const uvec&);
 
@@ -122,14 +123,26 @@ template<typename eT> uvec sort_rcm(const SpMat<eT>& MEAT) {
 
 template<typename eT> uvec sort_rcm(const Mat<eT>& MEAT) { return sort_rcm(SpMat<eT>(MEAT)); }
 
-template<typename dt, typename it> uvec sort_rcm(const triplet_form<dt, it>& triplet_mat) {
+template<typename dt> uvec sort_rcm(const csc_form<dt, uword>& csc_mat) {
+    //! Get the size of the square matrix.
+    auto S = csc_mat.n_cols;
+
+    //! Collect the number of degree of each node.
+    uvec E(S, fill::none);
+    suanpan_for(0llu, S, [&](const uword I) { E(I) = csc_mat.col(I + 1) - csc_mat.col(I); });
+    std::vector<uvec> A(S);
+    suanpan_for(0llu, S, [&](const uword I) {
+        const uvec IDX(csc_mat.row_mem() + csc_mat.col(I), E(I));
+        A[I] = IDX(sort_index(E(IDX)));
+    });
+
+    return sort_rcm(A, E);
+}
+
+template<typename dt, typename it> uvec sort_rcm(triplet_form<dt, it>& triplet_mat) {
     csc_form<dt, uword> csc_mat(triplet_mat);
 
-    const uvec row_idx(csc_mat.row_idx, csc_mat.n_elem, false, false);
-    const uvec col_ptr(csc_mat.col_ptr, csc_mat.n_cols + 1, false, false);
-    const Col<dt> val_idx(csc_mat.val_idx, csc_mat.n_elem, false, false);
-
-    return sort_rcm({row_idx, col_ptr, val_idx, csc_mat.n_rows, csc_mat.n_cols});
+    return sort_rcm(csc_mat);
 }
 
 #endif
