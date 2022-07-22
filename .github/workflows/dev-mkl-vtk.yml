@@ -52,7 +52,7 @@ jobs:
           EOF
           mv oneAPI.repo /etc/yum.repos.d/
           dnf upgrade --refresh -y
-          dnf install libglvnd-devel gcc g++ gfortran rpm-build rpm-devel rpmdevtools cmake wget intel-oneapi-mkl-devel intel-oneapi-compiler-dpcpp-cpp intel-oneapi-compiler-fortran git -y
+          dnf install libglvnd-devel gcc g++ gfortran rpm-build rpm-devel rpmdevtools cmake wget intel-oneapi-mkl-devel intel-oneapi-compiler-dpcpp-cpp intel-oneapi-compiler-fortran git procps -y
           git config --global --add safe.directory /__w/suanPan/suanPan
       - name: Clone
         uses: actions/checkout@v2
