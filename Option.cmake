@@ -4,6 +4,8 @@ include_directories(Include/metis)
 
 set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Debug Release RelWithDebInfo MinSizeRel")
 
+message("CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+
 set(BUILD_PACKAGE "" CACHE STRING "DEB OR RPM")
 
 option(BUILD_DLL_EXAMPLE "BUILD DYNAMIC LIBRARY EXAMPLE" OFF)
@@ -189,15 +191,13 @@ else ()
         set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fPIC")
     endif ()
 
-    if (COMPILER_IDENTIFIER MATCHES "clang")
-        link_libraries(stdc++)
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffp-model=precise")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffp-model=precise")
-    endif ()
-
     link_libraries(dl pthread gfortran quadmath)
 
-    if (COMPILER_IDENTIFIER MATCHES "clang-mac")
+    if (CMAKE_CXX_COMPILER_ID MATCHES "IntelLLVM")
+        link_libraries(stdc++)
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffp-model=precise -fexceptions -fiopenmp")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffp-model=precise -fexceptions -fiopenmp")
+    elseif (COMPILER_IDENTIFIER MATCHES "clang-mac")
         include_directories("/usr/local/include" "/usr/local/opt/llvm/include")
         link_directories("/usr/local/lib" "/usr/local/opt/llvm/lib")
         link_libraries(omp)
