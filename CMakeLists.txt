@@ -173,7 +173,16 @@ install(FILES
         Resource/suanPan-ua.svg
         Resource/suanPan.svg
         DESTINATION bin)
-if (COMPILER_IDENTIFIER MATCHES "linux")
+if (COMPILER_IDENTIFIER MATCHES "(linux|mac)")
+    set(DECOR ".")
+    set(SUFFIX "")
+    if (COMPILER_IDENTIFIER MATCHES "linux")
+        set(DECOR ".so")
+        set(SUFFIX "")
+    elseif (COMPILER_IDENTIFIER MATCHES "mac")
+        set(DECOR "")
+        set(SUFFIX ".dylib")
+    endif ()
     install(PROGRAMS Enhancement/suanPan.sh DESTINATION bin)
     if (BUILD_MULTITHREAD)
         file(GLOB TBB_FILES Libs/${SP_EXTERNAL_LIB_PATH}/libtbb*)
@@ -181,39 +190,40 @@ if (COMPILER_IDENTIFIER MATCHES "linux")
     endif ()
     if (USE_MKL AND MKLROOT MATCHES "(oneapi|oneAPI)")
         if (LINK_DYNAMIC_MKL)
-            file(GLOB MKL_FILES ${MKLROOT}/lib/intel64/libmkl_core.so*)
+            file(GLOB MKL_FILES ${MKLROOT}/lib/intel64/libmkl_core${DECOR}*${SUFFIX})
             install(PROGRAMS ${MKL_FILES} DESTINATION lib)
-            file(GLOB MKL_FILES ${MKLROOT}/lib/intel64/libmkl_intel_lp64.so*)
+            file(GLOB MKL_FILES ${MKLROOT}/lib/intel64/libmkl_intel_lp64${DECOR}*${SUFFIX})
             install(PROGRAMS ${MKL_FILES} DESTINATION lib)
-            file(GLOB MKL_FILES ${MKLROOT}/lib/intel64/libmkl_def.so*)
+            file(GLOB MKL_FILES ${MKLROOT}/lib/intel64/libmkl_def${DECOR}*${SUFFIX})
             install(PROGRAMS ${MKL_FILES} DESTINATION lib)
-            file(GLOB MKL_FILES ${MKLROOT}/lib/intel64/libmkl_avx.so*)
+            file(GLOB MKL_FILES ${MKLROOT}/lib/intel64/libmkl_avx${DECOR}*${SUFFIX})
             install(PROGRAMS ${MKL_FILES} DESTINATION lib)
-            file(GLOB MKL_FILES ${MKLROOT}/lib/intel64/libmkl_avx2.so*)
+            file(GLOB MKL_FILES ${MKLROOT}/lib/intel64/libmkl_avx2${DECOR}*${SUFFIX})
             install(PROGRAMS ${MKL_FILES} DESTINATION lib)
-            file(GLOB MKL_FILES ${MKLROOT}/lib/intel64/libmkl_avx512.so*)
+            file(GLOB MKL_FILES ${MKLROOT}/lib/intel64/libmkl_avx512${DECOR}*${SUFFIX})
             install(PROGRAMS ${MKL_FILES} DESTINATION lib)
             if (USE_INTEL_OPENMP)
-                file(GLOB MKL_FILES ${MKLROOT}/lib/intel64/libmkl_intel_thread.so*)
+                file(GLOB MKL_FILES ${MKLROOT}/lib/intel64/libmkl_intel_thread${DECOR}*${SUFFIX})
                 install(PROGRAMS ${MKL_FILES} DESTINATION lib)
             else ()
-                file(GLOB MKL_FILES ${MKLROOT}/lib/intel64/libmkl_gnu_thread.so*)
+                file(GLOB MKL_FILES ${MKLROOT}/lib/intel64/libmkl_gnu_thread${DECOR}*${SUFFIX})
                 install(PROGRAMS ${MKL_FILES} DESTINATION lib)
             endif ()
         endif ()
         if (USE_INTEL_OPENMP)
-            install(PROGRAMS ${IOMPPATH}/libiomp5.so DESTINATION lib)
+            file(GLOB MKL_FILES ${IOMPPATH}/libiomp5${DECOR}*${SUFFIX})
+            install(PROGRAMS ${MKL_FILES} DESTINATION lib)
         endif ()
     endif ()
     if (CMAKE_CXX_COMPILER_ID MATCHES "IntelLLVM")
         set(ONEAPI_LIB $ENV{ONEAPI_ROOT}/compiler/latest/linux/compiler/lib/intel64_lin)
         file(GLOB ONEAPI_FILES
-                ${ONEAPI_LIB}/libifcoremt.so*
-                ${ONEAPI_LIB}/libifport.so*
-                ${ONEAPI_LIB}/libimf.so*
-                ${ONEAPI_LIB}/libintlc.so*
-                ${ONEAPI_LIB}/libiomp5.so*
-                ${ONEAPI_LIB}/libsvml.so*
+                ${ONEAPI_LIB}/libifcoremt${DECOR}*${SUFFIX}
+                ${ONEAPI_LIB}/libifport${DECOR}*${SUFFIX}
+                ${ONEAPI_LIB}/libimf${DECOR}*${SUFFIX}
+                ${ONEAPI_LIB}/libintlc${DECOR}*${SUFFIX}
+                ${ONEAPI_LIB}/libiomp5${DECOR}*${SUFFIX}
+                ${ONEAPI_LIB}/libsvml${DECOR}*${SUFFIX}
                 )
         install(PROGRAMS ${ONEAPI_FILES} DESTINATION lib)
     endif ()
