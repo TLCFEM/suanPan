@@ -173,7 +173,7 @@ install(FILES
         Resource/suanPan-ua.svg
         Resource/suanPan.svg
         DESTINATION bin)
-if (COMPILER_IDENTIFIER MATCHES "gcc")
+if (COMPILER_IDENTIFIER MATCHES "linux")
     install(PROGRAMS Enhancement/suanPan.sh DESTINATION bin)
     if (BUILD_MULTITHREAD)
         file(GLOB TBB_FILES Libs/${SP_EXTERNAL_LIB_PATH}/libtbb*)
@@ -204,6 +204,18 @@ if (COMPILER_IDENTIFIER MATCHES "gcc")
         if (USE_INTEL_OPENMP)
             install(PROGRAMS ${IOMPPATH}/libiomp5.so DESTINATION lib)
         endif ()
+    endif ()
+    if (CMAKE_CXX_COMPILER_ID MATCHES "IntelLLVM")
+        set(ONEAPI_LIB $ENV{ONEAPI_ROOT}/compiler/latest/linux/compiler/lib/intel64_lin)
+        file(GLOB ONEAPI_FILES
+                ${ONEAPI_LIB}/libifcoremt.so*
+                ${ONEAPI_LIB}/libifport.so*
+                ${ONEAPI_LIB}/libimf.so*
+                ${ONEAPI_LIB}/libintlc.so*
+                ${ONEAPI_LIB}/libiomp5.so*
+                ${ONEAPI_LIB}/libsvml.so*
+                )
+        install(PROGRAMS ${ONEAPI_FILES} DESTINATION lib)
     endif ()
 elseif (COMPILER_IDENTIFIER MATCHES "win")
     install(FILES Enhancement/AddAssociation.bat DESTINATION bin)
