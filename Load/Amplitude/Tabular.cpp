@@ -17,9 +17,6 @@
 
 #include "Tabular.h"
 #include <Domain/DomainBase.h>
-#ifdef SUANPAN_GCC
-#include <sys/stat.h>
-#endif
 
 Tabular::Tabular(const unsigned T, vec&& TI, vec&& M, const unsigned ST)
     : Amplitude(T, ST)
@@ -36,8 +33,7 @@ void Tabular::initialize(const shared_ptr<DomainBase>& D) {
         return;
     }
 
-    struct stat buffer{};
-    if(mat ext_data; stat(file_name.c_str(), &buffer) == 0 && ext_data.load(file_name, raw_ascii)) {
+    if(mat ext_data; fs::exists(file_name) && ext_data.load(file_name, raw_ascii)) {
         if(2 == ext_data.n_cols) {
             time = ext_data.col(0);
             magnitude = ext_data.col(1);

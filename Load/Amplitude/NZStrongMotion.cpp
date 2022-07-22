@@ -17,17 +17,13 @@
 
 #include "NZStrongMotion.h"
 #include <Domain/DomainBase.h>
-#ifdef SUANPAN_GCC
-#include <sys/stat.h>
-#endif
 
 NZStrongMotion::NZStrongMotion(const unsigned T, const char* P, const unsigned ST)
     : Amplitude(T, ST)
     , file_name(P) {}
 
 void NZStrongMotion::initialize(const shared_ptr<DomainBase>& D) {
-    struct stat buffer{};
-    if(Col<int> data; 0 != stat(file_name.c_str(), &buffer) || !data.load(file_name, auto_detect)) {
+    if(Col<int> data; !fs::exists(file_name) || !data.load(file_name, auto_detect)) {
         suanpan_error("cannot load file %s.\n", file_name.c_str());
         D->disable_amplitude(get_tag());
     }

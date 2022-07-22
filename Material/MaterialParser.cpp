@@ -21,9 +21,6 @@
 #include <Domain/ExternalModule.h>
 #include <Material/Material>
 #include <Toolbox/utility.h>
-#ifdef SUANPAN_GCC
-#include <sys/stat.h>
-#endif
 
 using std::vector;
 
@@ -1072,13 +1069,11 @@ void new_concretetable(unique_ptr<Material>& return_obj, istringstream& command)
         return;
     }
 
-    struct stat buffer{};
-
-    if(stat(t_name.c_str(), &buffer) != 0 || !t_table.load(t_name, raw_ascii) || t_table.n_cols != 2) {
+    if(!fs::exists(t_name) || !t_table.load(t_name, raw_ascii) || t_table.n_cols != 2) {
         suanpan_error("new_concretetable() cannot load file %s.\n", t_name.c_str());
         return;
     }
-    if(stat(c_name.c_str(), &buffer) != 0 || !c_table.load(c_name, raw_ascii) || c_table.n_cols != 2) {
+    if(!fs::exists(c_name) || !c_table.load(c_name, raw_ascii) || c_table.n_cols != 2) {
         suanpan_error("new_concretetable() cannot load file %s.\n", c_name.c_str());
         return;
     }
@@ -2628,9 +2623,7 @@ void new_tablegurson(unique_ptr<Material>& return_obj, istringstream& command) {
 
     mat hardening_table;
 
-    struct stat buffer{};
-
-    if(stat(table_name.c_str(), &buffer) != 0 || !hardening_table.load(table_name, auto_detect) || hardening_table.n_cols < 2) {
+    if(!fs::exists(table_name) || !hardening_table.load(table_name, auto_detect) || hardening_table.n_cols < 2) {
         suanpan_error("new_tablegurson() cannot load file %s.\n", table_name.c_str());
         return;
     }

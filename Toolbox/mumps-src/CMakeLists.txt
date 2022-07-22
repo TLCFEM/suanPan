@@ -13,10 +13,10 @@ add_compile_definitions(MUMPS_ARITH=MUMPS_ARITH_d)
 
 include(../../Driver.cmake)
 
-if ((CMAKE_C_COMPILER_ID MATCHES "GNU") OR (CMAKE_C_COMPILER_ID MATCHES "Clang")) # GNU GCC COMPILER
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
-else () # MSVC COMPILER
+if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W0")
+else ()
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
 endif ()
 
 file(GLOB mumps_f "*.F")
