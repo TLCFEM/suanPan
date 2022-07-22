@@ -1,21 +1,20 @@
 C
-C  This file is part of MUMPS 5.5.1, released
-C  on Tue Jul 12 13:17:24 UTC 2022
+C  This file is part of MUMPS 5.2.1, released
+C  on Fri Jun 14 14:46:05 UTC 2019
 C
 C
-C  Copyright 1991-2022 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license 
-C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
-C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
+C  released under the CeCILL-C license:
+C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
 C
       SUBROUTINE DMUMPS_PROCESS_DESC_BANDE( MYID, BUFR, LBUFR, 
      &     LBUFR_BYTES,
      &     IWPOS, IWPOSCB,
      &     IPTRLU, LRLU, LRLUS,
-     &     N, IW, LIW, A, LA, SLAVEF, PROCNODE_STEPS, DAD,
+     &     TNBPROCFILS, N, IW, LIW, A, LA, SLAVEF, PROCNODE_STEPS, DAD,
      &     PTRIST, PTRAST, STEP, PIMASTER, PAMASTER, COMP,
      &     KEEP,KEEP8, DKEEP, ITLOC, RHS_MUMPS, ISTEP_TO_INIV2,
 #if ! defined(NO_FDM_DESCBAND)
@@ -45,7 +44,7 @@ C
       INTEGER(8) :: PTRAST(KEEP(28))
       INTEGER PTRIST(KEEP(28)), STEP(N), 
      & PIMASTER(KEEP(28)), 
-     & ITLOC( N + KEEP(253) )
+     & TNBPROCFILS( KEEP(28) ), ITLOC( N + KEEP(253) )
       DOUBLE PRECISION :: RHS_MUMPS(KEEP(255))
       INTEGER :: ISTEP_TO_INIV2(KEEP(71))
 #if ! defined(NO_FDM_DESCBAND)
@@ -53,7 +52,7 @@ C
 #endif
       INTEGER COMP, IFLAG, IERROR
       INTEGER INODE, NBPROCFILS, NCOL, NROW, NASS, NSLAVES
-      INTEGER NSLAVES_HDR, NFRONT
+      INTEGER NSLAVES_RECU, NFRONT
       INTEGER LREQ
       INTEGER :: IBUFR
       INTEGER(8) :: LREQCB
@@ -69,20 +68,16 @@ C
       INTEGER :: LRSTATUS
       INTEGER :: ESTIM_NFS4FATHER_ATSON
       LOGICAL :: LR_ACTIVATED, COMPRESS_CB
-      DOUBLE PRECISION, POINTER, DIMENSION(:) :: DYNAMIC_CB
-      INTEGER(8) :: TMP_ADDRESS
-      INTEGER :: allocok
       INODE = BUFR( 2 )
       NBPROCFILS = BUFR( 3 )
-      NROW        = BUFR( 4 )
-      NCOL        = BUFR( 5 )
-      NASS        = BUFR( 6 )
-      NFRONT      = BUFR( 7 )
-      NSLAVES_HDR = BUFR( 8 )
-      NSLAVES     = BUFR( 9 )
-      LRSTATUS    = BUFR(10 )
-      ESTIM_NFS4FATHER_ATSON = BUFR(11)
-      IBUFR    = 12
+      NROW = BUFR( 4 )
+      NCOL = BUFR( 5 )
+      NASS = BUFR( 6 )
+      NFRONT = BUFR( 7 )
+      NSLAVES_RECU = BUFR( 8 )
+      LRSTATUS =  BUFR( 9 )
+      ESTIM_NFS4FATHER_ATSON = BUFR(10)
+      IBUFR    = 11
 #if ! defined(NO_FDM_DESCBAND)
       IWHANDLER_LOC = IWHANDLER_IN
       IF ((IWHANDLER_IN .LE. 0) .AND.
@@ -107,64 +102,22 @@ C
       END IF
       CALL DMUMPS_LOAD_UPDATE(1,.TRUE.,FLOP1, KEEP,KEEP8)
       IF ( KEEP(50) .eq. 0 ) THEN
-        NSLAVES = NSLAVES_HDR + XTRA_SLAVES_UNSYM
+        NSLAVES = NSLAVES_RECU + XTRA_SLAVES_UNSYM
       ELSE
-        NSLAVES = NSLAVES_HDR + XTRA_SLAVES_SYM   
+        NSLAVES = NSLAVES_RECU + XTRA_SLAVES_SYM   
       END IF
       LREQ   = NROW + NCOL + 6 + NSLAVES + KEEP(IXSZ)
       LREQCB = int(NCOL,8) * int(NROW,8)
-      IF ( LREQCB .GT. LRLUS .AND. KEEP(101) .EQ. 0 .AND.
-     &     KEEP8(73) + LREQCB .LE. KEEP8(75) ) THEN
-        CALL DMUMPS_ALLOC_CB(.FALSE., 0_8, .FALSE.,.TRUE.,
-     &       MYID,N, KEEP, KEEP8, DKEEP, IW, LIW, A, LA,
-     &       LRLU, IPTRLU,IWPOS,IWPOSCB, SLAVEF, PROCNODE_STEPS, DAD,
-     &       PTRIST,PTRAST, STEP, PIMASTER,PAMASTER,
-     &       LREQ, 0_8, 
-     &       INODE, S_ACTIVE, .TRUE.,
-     &       COMP, LRLUS, KEEP8(67), IFLAG, IERROR
+      CALL DMUMPS_ALLOC_CB(.FALSE., 0_8, .FALSE.,.TRUE.,
+     &   MYID,N, KEEP, KEEP8, DKEEP, IW, LIW, A, LA,
+     &   LRLU, IPTRLU,IWPOS,IWPOSCB, SLAVEF, PROCNODE_STEPS, DAD,
+     &   PTRIST,PTRAST, STEP, PIMASTER,PAMASTER,
+     &   LREQ, LREQCB, INODE, S_ACTIVE, .TRUE.,
+     &   COMP, LRLUS, IFLAG, IERROR
      &     )
-        IF ( IFLAG .LT. 0 ) RETURN
-#if defined(MUMPS_ALLOC_FROM_C)
-        CALL MUMPS_MALLOC_C( TMP_ADDRESS,
-     &      LREQCB * int(KEEP(35),8) )
-        IF (TMP_ADDRESS .EQ. 0_8) THEN
-          allocok=1 
-        ELSE 
-          allocok=0
-        ENDIF
-#else
-        ALLOCATE(DYNAMIC_CB(LREQCB), stat=allocok)
-#endif
-        IF (allocok .GT. 0) THEN
-          CALL DMUMPS_FREE_BLOCK_CB_STATIC( .FALSE., MYID, N,
-     &    IWPOSCB + 1, IW, LIW, LRLU, LRLUS, IPTRLU, IWPOSCB,
-     &    LA, KEEP, KEEP8, .FALSE. )
-        ELSE
-          CALL MUMPS_DM_FAC_UPD_DYN_MEMCNTS( LREQCB,
-     &    KEEP(405).EQ.1, 
-     &    KEEP8, IFLAG, IERROR,
-     &    .TRUE., 
-     &    .FALSE. ) 
-#if ! defined(MUMPS_ALLOC_FROM_C)
-          CALL MUMPS_ADDR_C( DYNAMIC_CB(1), TMP_ADDRESS )
-#endif
-          CALL MUMPS_STOREI8(LREQCB, IW(IWPOSCB+1+XXD))
-          PTRIST(STEP(INODE)) = IWPOSCB + 1
-          PTRAST(STEP(INODE)) = TMP_ADDRESS
-        ENDIF
-      ENDIF
-      IF ( PTRIST(STEP(INODE)) .EQ. 0 ) THEN
-        CALL DMUMPS_ALLOC_CB(.FALSE., 0_8, .FALSE.,.TRUE.,
-     &     MYID,N, KEEP, KEEP8, DKEEP, IW, LIW, A, LA,
-     &     LRLU, IPTRLU,IWPOS,IWPOSCB, SLAVEF, PROCNODE_STEPS, DAD,
-     &     PTRIST,PTRAST, STEP, PIMASTER,PAMASTER,
-     &     LREQ, LREQCB, INODE, S_ACTIVE, .TRUE.,
-     &     COMP, LRLUS, KEEP8(67), IFLAG, IERROR
-     &     )
-        IF ( IFLAG .LT. 0 ) RETURN
-        PTRIST(STEP(INODE)) = IWPOSCB + 1
-        PTRAST(STEP(INODE)) = IPTRLU  + 1_8
-      ENDIF
+      IF ( IFLAG .LT. 0 ) RETURN
+      PTRIST(STEP(INODE)) = IWPOSCB + 1
+      PTRAST(STEP(INODE)) = IPTRLU  + 1_8
 #     if ! defined(NO_FDM_DESCBAND)
  555  CONTINUE
 #     endif
@@ -184,11 +137,11 @@ C
       IW( IWPOSCB + 6+KEEP(IXSZ) ) = NSLAVES
       IW( IWPOSCB + 7+KEEP(IXSZ)+NSLAVES : 
      &           IWPOSCB + 6+KEEP(IXSZ)+NSLAVES + NROW + NCOL )
-     &= BUFR( IBUFR + NSLAVES_HDR :
-     &        IBUFR + NSLAVES_HDR + NROW + NCOL - 1 )
+     &= BUFR( IBUFR + NSLAVES_RECU :
+     &        IBUFR + NSLAVES_RECU + NROW + NCOL - 1 )
       IF ( KEEP(50) .eq. 0 ) THEN
         IW( IWPOSCB + 7+KEEP(IXSZ) ) = S_ROOTBAND_INIT
-        IF (NSLAVES_HDR.GT.0) THEN
+        IF (NSLAVES_RECU.GT.0) THEN
           write(6,*) " Internal error in DMUMPS_PROCESS_DESC_BANDE "
           CALL MUMPS_ABORT()
         ENDIF
@@ -197,10 +150,13 @@ C
         IW( IWPOSCB + 8+KEEP(IXSZ) ) = NFRONT
         IW( IWPOSCB + 9+KEEP(IXSZ) ) = S_ROOTBAND_INIT
         IW( IWPOSCB + 7+XTRA_SLAVES_SYM+KEEP(IXSZ):
-     &      IWPOSCB + 6+XTRA_SLAVES_SYM+KEEP(IXSZ)+NSLAVES_HDR ) =
-     &       BUFR( IBUFR: IBUFR - 1 + NSLAVES_HDR )
+     &      IWPOSCB + 6+XTRA_SLAVES_SYM+KEEP(IXSZ)+NSLAVES_RECU ) =
+     &       BUFR( IBUFR: IBUFR - 1 + NSLAVES_RECU )
       END IF
+      TNBPROCFILS(STEP( INODE )) = NBPROCFILS
+#     if ! defined(NO_XXNBPR)
       IW(IWPOSCB+1+XXNBPR)=NBPROCFILS
+#     endif
       IW(IWPOSCB+1+XXLR)=LRSTATUS
       COMPRESS_CB    = ((LRSTATUS.EQ.1).OR.
      &                  (LRSTATUS.EQ.3))
@@ -239,7 +195,7 @@ C
      &    LRLU, LRLUS, N, IW, LIW, A, LA, PTRIST,
      &    PTLUST, PTRFAC,
      &    PTRAST, STEP, PIMASTER, PAMASTER, NSTK_S, COMP,
-     &    IFLAG, IERROR, COMM, PERM,
+     &    IFLAG, IERROR, COMM, NBPROCFILS,
      &    IPOOL, LPOOL, LEAF, NBFIN, MYID, SLAVEF,
      &
      &    root, OPASSW, OPELIW, ITLOC, RHS_MUMPS,
@@ -279,7 +235,7 @@ C
      & PIMASTER(KEEP(28))
       INTEGER COMP
       INTEGER NSTK_S(KEEP(28)), PROCNODE_STEPS( KEEP(28) )
-      INTEGER PERM(N)
+      INTEGER NBPROCFILS( KEEP(28) )
       INTEGER IFLAG, IERROR, COMM
       INTEGER LPOOL, LEAF
       INTEGER IPOOL( LPOOL )
@@ -309,7 +265,7 @@ C
       INTEGER MUMPS_PROCNODE
       EXTERNAL MUMPS_PROCNODE
       SRC_DESCBAND = MUMPS_PROCNODE( PROCNODE_STEPS(STEP(INODE)),
-     &           KEEP(199) )
+     &           SLAVEF )
 #     if ! defined(NO_FDM_DESCBAND)
       IF (MUMPS_FDBD_IS_DESCBAND_STORED( INODE, IWHANDLER )) THEN 
         CALL MUMPS_FDBD_RETRIEVE_DESCBAND(IWHANDLER, DESCBAND_STRUC)
@@ -318,7 +274,7 @@ C
      &       LBUFR_BYTES,
      &       IWPOS, IWPOSCB,
      &       IPTRLU, LRLU, LRLUS,
-     &       N, IW, LIW, A, LA, SLAVEF, PROCNODE_STEPS, DAD,
+     &       NBPROCFILS, N, IW, LIW, A, LA, SLAVEF, PROCNODE_STEPS, DAD,
      &       PTRIST, PTRAST, STEP, PIMASTER, PAMASTER, COMP,
      &       KEEP, KEEP8, DKEEP, ITLOC, RHS_MUMPS, ISTEP_TO_INIV2,
      &       IWHANDLER,
@@ -347,7 +303,7 @@ C
      &    PTLUST, PTRFAC,
      &    PTRAST, STEP, PIMASTER, PAMASTER, NSTK_S, COMP,
      &    IFLAG, IERROR, COMM,
-     &    PERM, IPOOL, LPOOL, LEAF,
+     &    NBPROCFILS, IPOOL, LPOOL, LEAF,
      &    NBFIN, MYID, SLAVEF,
      &    root, OPASSW, OPELIW, ITLOC, RHS_MUMPS,
      &    FILS, DAD, PTRARW, PTRAIW,

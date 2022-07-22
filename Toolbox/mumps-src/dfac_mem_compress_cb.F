@@ -1,15 +1,14 @@
 C
-C  This file is part of MUMPS 5.5.1, released
-C  on Tue Jul 12 13:17:24 UTC 2022
+C  This file is part of MUMPS 5.2.1, released
+C  on Fri Jun 14 14:46:05 UTC 2019
 C
 C
-C  Copyright 1991-2022 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license 
-C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
-C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
+C  released under the CeCILL-C license:
+C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
 C
       SUBROUTINE DMUMPS_SIZEFREEINREC(IW,LREC,SIZE_FREE,XSIZE)
       IMPLICIT NONE
@@ -112,24 +111,23 @@ C
       ENDIF
       RETURN
       END SUBROUTINE DMUMPS_RSHIFT
-      SUBROUTINE DMUMPS_COMPRE_NEW(N,KEEP,IW,LIW,A,LA,
+      SUBROUTINE DMUMPS_COMPRE_NEW(N,KEEP28,IW,LIW,A,LA,
      &       LRLU,IPTRLU,IWPOS,
      &       IWPOSCB,PTRIST,PTRAST,STEP,PIMASTER,PAMASTER,
-     &       LRLUS,XSIZE, COMP, ACC_TIME, MYID,
+     &       KEEP216,LRLUS,XSIZE, COMP, ACC_TIME, MYID,
      &       SLAVEF, PROCNODE_STEPS, DAD)
       USE DMUMPS_DYNAMIC_MEMORY_M, ONLY: DMUMPS_DM_PAMASTERORPTRAST
       IMPLICIT NONE
-      INTEGER, INTENT(in)      :: N, LIW, XSIZE
-      INTEGER, INTENT(in)      :: KEEP(500)
+      INTEGER, INTENT(in)   :: N, LIW, KEEP28, KEEP216, XSIZE
       INTEGER(8), INTENT(in)   :: LA
       INTEGER(8), INTENT(inout):: LRLU, IPTRLU, LRLUS
       INTEGER, INTENT(inout)   :: IWPOSCB
       INTEGER :: IWPOS
-      INTEGER(8), INTENT(inout) :: PTRAST(KEEP(28)), PAMASTER(KEEP(28))
-      INTEGER, INTENT(inout) :: IW(LIW),PTRIST(KEEP(28)),
-     &                          PIMASTER(KEEP(28))
+      INTEGER(8), INTENT(inout) :: PTRAST(KEEP28), PAMASTER(KEEP28)
+      INTEGER, INTENT(inout) :: IW(LIW),PTRIST(KEEP28),
+     &                          PIMASTER(KEEP28)
       INTEGER, INTENT(in)    :: STEP(N), SLAVEF
-      INTEGER, INTENT(in)    :: PROCNODE_STEPS(KEEP(28)), DAD(KEEP(28))
+      INTEGER, INTENT(in)    :: PROCNODE_STEPS(KEEP28), DAD(KEEP28)
       DOUBLE PRECISION, INTENT(inout) :: A(LA)
       INTEGER, INTENT(inout) :: COMP
       DOUBLE PRECISION, INTENT(inout)    :: ACC_TIME
@@ -153,8 +151,8 @@ C
       LOGICAL, EXTERNAL :: DMUMPS_ISBAND
       EXTERNAL MPI_WTIME
       DOUBLE PRECISION MPI_WTIME
-      DOUBLE PRECISION TIME_STRT, TIME_COMP
-      TIME_STRT = MPI_WTIME()
+      DOUBLE PRECISION TIME_REF, TIME_COMP
+      TIME_REF = MPI_WTIME()
       ISIZE2SHIFT=0
       RSIZE2SHIFT=0_8
       ICURRENT  = LIW-XSIZE+1
@@ -169,7 +167,7 @@ C
   10     CONTINUE
          CALL DMUMPS_CAN_RECORD_BE_COMPRESSED(
      &        RECORD_CAN_BE_COMPRESSED,
-     &        IW(NEXT), XSIZE, KEEP(216))
+     &        IW(NEXT), XSIZE, KEEP216)
          IF ( .NOT. RECORD_CAN_BE_COMPRESSED ) THEN
             CALL DMUMPS_MOVETONEXTRECORD(IW,LIW,
      &           IXXP, ICURRENT, NEXT, RCURRENT, ISIZE2SHIFT)
@@ -182,10 +180,12 @@ C
               RBEGCONTIG=RCURRENT+RCURRENT_SIZE-1_8
             ENDIF
             INODE=IW(ICURRENT+XXN)
+#if ! defined(NODYNAMICCB)
             IF ( DYN_SIZE .EQ. 0_8 ) THEN
+#endif
               IF (RSIZE2SHIFT .NE. 0_8) THEN
                 CALL DMUMPS_DM_PAMASTERORPTRAST( N, SLAVEF, MYID,
-     &          KEEP(28), KEEP(199),
+     &          KEEP28,
      &          INODE, IW(ICURRENT+XXS),
      &          IW(ICURRENT+XXD:ICURRENT+XXD+1), STEP,
      &          DAD, PROCNODE_STEPS, RCURRENT, PAMASTER, PTRAST,
@@ -198,7 +198,9 @@ C
      &            PAMASTER(STEP(INODE))+RSIZE2SHIFT
                 ENDIF
               ENDIF
+#if ! defined(NODYNAMICCB)
             ENDIF
+#endif
             IF (ISIZE2SHIFT .NE. 0) THEN
                 IF (PTRIST(STEP(INODE)).EQ.ICURRENT)
      &            PTRIST(STEP(INODE))=
@@ -228,7 +230,7 @@ C
   30     CONTINUE
          IF (NEXT.EQ. TOP_OF_STACK) GOTO 100
          CALL DMUMPS_CAN_RECORD_BE_COMPRESSED(
-     &        RECORD_CAN_BE_COMPRESSED, IW(NEXT), XSIZE, KEEP(216))
+     &        RECORD_CAN_BE_COMPRESSED, IW(NEXT), XSIZE, KEEP216)
          IF ( STATE_NEXT .NE. S_FREE .AND.
      &        RECORD_CAN_BE_COMPRESSED ) THEN
            IF (RBEGCONTIG > 0_8) GOTO 25
@@ -337,7 +339,7 @@ C
       LRLU    = LRLU    + RSIZE2SHIFT
       IPTRLU  = IPTRLU  + RSIZE2SHIFT
  120  CONTINUE
-      TIME_COMP = MPI_WTIME() - TIME_STRT
+      TIME_COMP = MPI_WTIME() - TIME_REF
       ACC_TIME = ACC_TIME + TIME_COMP
       RETURN
       END SUBROUTINE DMUMPS_COMPRE_NEW
@@ -425,14 +427,14 @@ C
       RETURN
       END SUBROUTINE DMUMPS_MAKECBCONTIG
       SUBROUTINE DMUMPS_GET_SIZE_NEEDED(
-     &       SIZEI_NEEDED, SIZER_NEEDED, SKIP_TOP_STACK,
-     &       KEEP, KEEP8,
-     &       N,IW,LIW,A,LA,
+     &       SIZEI_NEEDED, SIZER_NEEDED, SKIP_TOP_STACK, 
+     &       KEEP, KEEP8,  
+     &       N,KEEP28,IW,LIW,A,LA,
      &       LRLU,IPTRLU,IWPOS,
      &       IWPOSCB,PTRIST,PTRAST,STEP,PIMASTER,PAMASTER,
-     &       LRLUS,XSIZE, COMP, ACC_TIME, MYID,
+     &       KEEP216,LRLUS,XSIZE, COMP, ACC_TIME, MYID,
      &       SLAVEF, PROCNODE_STEPS, DAD, 
-     &       IFLAG, IERROR
+     &       IFLAG, IERROR  
      &       )
 #if ! defined(NODYNAMICCB)
       USE DMUMPS_DYNAMIC_MEMORY_M, ONLY: DMUMPS_DM_CBSTATIC2DYNAMIC
@@ -443,16 +445,16 @@ C
       LOGICAL, INTENT(in)      :: SKIP_TOP_STACK
       INTEGER,   INTENT(in)    :: KEEP(500)
       INTEGER(8), INTENT(inout):: KEEP8(150)
-      INTEGER, INTENT(in)      :: N, LIW, XSIZE
+      INTEGER, INTENT(in)      :: N, LIW, KEEP28, KEEP216, XSIZE
       INTEGER(8), INTENT(in)   :: LA
       INTEGER(8), INTENT(inout):: LRLU, IPTRLU, LRLUS
       INTEGER, INTENT(inout)   :: IWPOSCB
       INTEGER, INTENT(inout)   :: IWPOS
-      INTEGER(8), INTENT(inout) :: PTRAST(KEEP(28)), PAMASTER(KEEP(28))
-      INTEGER, INTENT(inout) :: IW(LIW),PTRIST(KEEP(28)),
-     &                          PIMASTER(KEEP(28))
+      INTEGER(8), INTENT(inout) :: PTRAST(KEEP28), PAMASTER(KEEP28)
+      INTEGER, INTENT(inout) :: IW(LIW),PTRIST(KEEP28),
+     &                          PIMASTER(KEEP28)
       INTEGER, INTENT(in)    :: STEP(N), SLAVEF 
-      INTEGER, INTENT(in)    :: PROCNODE_STEPS(KEEP(28)), DAD(KEEP(28))
+      INTEGER, INTENT(in)    :: PROCNODE_STEPS(KEEP28), DAD(KEEP28)
       DOUBLE PRECISION, INTENT(inout) :: A(LA)
       INTEGER, INTENT(inout) :: COMP
       DOUBLE PRECISION, INTENT(inout)    :: ACC_TIME
@@ -461,10 +463,10 @@ C
       LOGICAL DMUMPS_COMPRE_NEW_CALLED
       DMUMPS_COMPRE_NEW_CALLED = .FALSE.
       IF (IWPOSCB-IWPOS+1 .LT. SIZEI_NEEDED) THEN
-          CALL DMUMPS_COMPRE_NEW(N,KEEP,IW,LIW,A,LA,
+          CALL DMUMPS_COMPRE_NEW(N,KEEP28,IW,LIW,A,LA,
      &       LRLU,IPTRLU,IWPOS,
      &       IWPOSCB,PTRIST,PTRAST,STEP,PIMASTER,PAMASTER,
-     &       LRLUS,XSIZE, COMP, ACC_TIME, MYID,
+     &       KEEP216,LRLUS,XSIZE, COMP, ACC_TIME, MYID,
      &       SLAVEF, PROCNODE_STEPS, DAD)
          IF ( LRLU .NE. LRLUS ) THEN
             WRITE(*,*) 'Internal error 1 in DMUMPS_GET_SIZE_NEEDED ',
@@ -485,10 +487,10 @@ C
      &     (LRLUS.GE.SIZER_NEEDED).AND.
      &     (LRLU.NE.LRLUS)
      &    ) THEN
-            CALL DMUMPS_COMPRE_NEW(N,KEEP,IW,LIW,A,LA,
+            CALL DMUMPS_COMPRE_NEW(N,KEEP28,IW,LIW,A,LA,
      &       LRLU,IPTRLU,IWPOS,
      &       IWPOSCB,PTRIST,PTRAST,STEP,PIMASTER,PAMASTER,
-     &       LRLUS,XSIZE, COMP, ACC_TIME, MYID,
+     &       KEEP216,LRLUS,XSIZE, COMP, ACC_TIME, MYID,
      &       SLAVEF, PROCNODE_STEPS, DAD)
              DMUMPS_COMPRE_NEW_CALLED = .TRUE.
             IF ( LRLU .NE. LRLUS ) THEN
@@ -503,10 +505,10 @@ C
       IF (LRLUS.LT.SIZER_NEEDED) THEN
 #if ! defined(NODYNAMICCB)
           IF (.NOT. DMUMPS_COMPRE_NEW_CALLED) THEN
-            CALL DMUMPS_COMPRE_NEW(N,KEEP,IW,LIW,A,LA,
+            CALL DMUMPS_COMPRE_NEW(N,KEEP28,IW,LIW,A,LA,
      &       LRLU,IPTRLU,IWPOS,
      &       IWPOSCB,PTRIST,PTRAST,STEP,PIMASTER,PAMASTER,
-     &       LRLUS,XSIZE, COMP, ACC_TIME, MYID,
+     &       KEEP216,LRLUS,XSIZE, COMP, ACC_TIME, MYID,
      &       SLAVEF, PROCNODE_STEPS, DAD)
             IF ( LRLU .NE. LRLUS ) THEN
               WRITE(*,*) 'Internal error 2 ',
@@ -517,7 +519,7 @@ C
               GOTO 500
             END IF
           ENDIF
-          CALL DMUMPS_DM_CBSTATIC2DYNAMIC(KEEP(141),
+          CALL DMUMPS_DM_CBSTATIC2DYNAMIC(
      &           SIZER_NEEDED, SKIP_TOP_STACK, 
      &           MYID, N, SLAVEF,
      &           KEEP, KEEP8,
@@ -527,10 +529,10 @@ C
      &           PROCNODE_STEPS, DAD, IFLAG, IERROR)
           IF (IFLAG.LT.0) GOTO 500
           IF (LRLU.LT.SIZER_NEEDED) THEN 
-            CALL DMUMPS_COMPRE_NEW(N,KEEP,IW,LIW,A,LA,
+            CALL DMUMPS_COMPRE_NEW(N,KEEP28,IW,LIW,A,LA,
      &       LRLU,IPTRLU,IWPOS,
      &       IWPOSCB,PTRIST,PTRAST,STEP,PIMASTER,PAMASTER,
-     &       LRLUS,XSIZE, COMP, ACC_TIME, MYID,
+     &       KEEP216,LRLUS,XSIZE, COMP, ACC_TIME, MYID,
      &       SLAVEF, PROCNODE_STEPS, DAD)
             IF ( LRLU .NE. LRLUS ) THEN
               WRITE(*,*) 'Internal error 4 ',

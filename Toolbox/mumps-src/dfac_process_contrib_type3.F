@@ -1,25 +1,22 @@
 C
-C  This file is part of MUMPS 5.5.1, released
-C  on Tue Jul 12 13:17:24 UTC 2022
+C  This file is part of MUMPS 5.2.1, released
+C  on Fri Jun 14 14:46:05 UTC 2019
 C
 C
-C  Copyright 1991-2022 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license 
-C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
-C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
+C  released under the CeCILL-C license:
+C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
 C
       SUBROUTINE DMUMPS_PROCESS_CONTRIB_TYPE3(BUFR,LBUFR,
      &     LBUFR_BYTES,
      &     root, N, IW, LIW, A, LA,
-     &     LRLU, IPTRLU, IWPOS, IWPOSCB,
+     &     NBPROCFILS, LRLU, IPTRLU, IWPOS, IWPOSCB,
      &     PTRIST, PTLUST, PTRFAC, PTRAST, STEP, PIMASTER, PAMASTER,
      &     COMP, LRLUS, IPOOL, LPOOL, LEAF,
-     &     FILS, DAD, MYID,
-     &     LPTRAR, NELT, FRTPTR, FRTELT,
-     &     PTRAIW, PTRARW, INTARR, DBLARR,
+     &     FILS, DAD, MYID, PTRAIW, PTRARW, INTARR, DBLARR,
      &     KEEP, KEEP8, DKEEP, IFLAG, IERROR, COMM, COMM_LOAD,
      &     ITLOC, RHS_MUMPS,
      &     ND,PROCNODE_STEPS, SLAVEF, OPASSW )
@@ -44,16 +41,14 @@ C
       INTEGER PTLUST(KEEP(28))
       INTEGER STEP(N), PIMASTER(KEEP(28)), ITLOC( N+KEEP(253) )
       DOUBLE PRECISION :: RHS_MUMPS(KEEP(255))
-      INTEGER BUFR( LBUFR_BYTES )
+      INTEGER BUFR( LBUFR_BYTES ), NBPROCFILS( KEEP(28) )
       INTEGER IW( LIW )
       INTEGER ND(KEEP(28)), PROCNODE_STEPS(KEEP(28))
       INTEGER SLAVEF
       DOUBLE PRECISION A( LA )
-      INTEGER  MYID
+      INTEGER   MYID
       INTEGER FILS( N ), DAD(KEEP(28))
-      INTEGER LPTRAR, NELT
-      INTEGER FRTPTR( N+1 ), FRTELT( NELT )
-      INTEGER(8), INTENT(IN) :: PTRAIW( LPTRAR ), PTRARW( LPTRAR )
+      INTEGER(8), INTENT(IN) :: PTRAIW(N), PTRARW( N )
       INTEGER INTARR(KEEP8(27))
       DOUBLE PRECISION DBLARR(KEEP8(26))
       DOUBLE PRECISION OPASSW
@@ -101,16 +96,21 @@ C
           IF (NBROWS_ALREADY_SENT + NBROWS_PACKET .EQ. NSUBSET_ROW
      &       - NSUPROW .OR.  NSUBSET_ROW - NSUPROW.EQ.0 .OR.
      &       NSUBSET_COL_EFF .EQ. 0)THEN
+            NBPROCFILS(STEP(IROOT)) = NBPROCFILS(STEP(IROOT))-1
+#if ! defined(NO_XXNBPR)
             KEEP(121) = KEEP(121) - 1
+            CALL CHECK_EQUAL(NBPROCFILS(STEP(IROOT)),KEEP(121))
             IF ( KEEP(121) .eq. 0 ) THEN
+#else
+            IF ( NBPROCFILS( STEP(IROOT) ) .eq. 0 ) THEN
+#endif
               IF (KEEP(201).EQ.1) THEN 
                  CALL DMUMPS_OOC_FORCE_WRT_BUF_PANEL(IERR)
               ELSEIF (KEEP(201).EQ.2) THEN 
                  CALL DMUMPS_FORCE_WRITE_BUF(IERR)              
               ENDIF
               CALL DMUMPS_INSERT_POOL_N( N, IPOOL, LPOOL,
-     &             PROCNODE_STEPS, SLAVEF, KEEP(199),
-     &             KEEP(28), KEEP(76),
+     &             PROCNODE_STEPS, SLAVEF, KEEP(28), KEEP(76),
      &             KEEP(80), KEEP(47),
      &             STEP, IROOT + N)
               IF (KEEP(47) .GE. 3) THEN
@@ -126,18 +126,24 @@ C
      &       NSUBSET_ROW - NSUPROW .OR.
      &        NSUBSET_ROW - NSUPROW.EQ.0 .OR.
      &        NSUBSET_COL_EFF .EQ. 0)THEN
+             NBPROCFILS(STEP( IROOT ) ) = -1
+#if ! defined(NO_XXNBPR)
              KEEP(121)=-1
+#endif
            ENDIF
-           CALL DMUMPS_ROOT_ALLOC_STATIC( root, IROOT, N,
+           IF (KEEP(60) == 0) THEN
+            CALL DMUMPS_ROOT_ALLOC_STATIC( root, IROOT, N,
      &                IW, LIW, A, LA,
      &                FILS, DAD, MYID, SLAVEF, PROCNODE_STEPS,
-     &                LPTRAR, NELT, FRTPTR, FRTELT,
      &                PTRAIW, PTRARW, INTARR, DBLARR,
      &                LRLU, IPTRLU,
      &                IWPOS, IWPOSCB, PTRIST, PTRAST,
      &                STEP, PIMASTER, PAMASTER, ITLOC, RHS_MUMPS,
      &                COMP, LRLUS, IFLAG, KEEP,KEEP8,DKEEP,IERROR )
             IF ( IFLAG .LT. 0 ) RETURN
+           ELSE
+             PTRIST(STEP(IROOT)) = -55555
+           ENDIF
         END IF
       IF (KEEP(60) .EQ.0) THEN
         IF ( PTRIST(STEP(IROOT)) .GE. 0 ) THEN
@@ -172,7 +178,7 @@ C
      &     LRLU, IPTRLU, IWPOS, IWPOSCB, SLAVEF, PROCNODE_STEPS, DAD,
      &     PTRIST, PTRAST, STEP, PIMASTER, PAMASTER,
      &     LREQI, LREQA, -1234, S_NOTFREE, .FALSE.,
-     &     COMP, LRLUS, KEEP8(67), IFLAG, IERROR
+     &     COMP, LRLUS, IFLAG, IERROR
      &          )
          IF ( IFLAG .LT. 0 ) RETURN
          CALL MPI_UNPACK( BUFR, LBUFR_BYTES, POSITION,
@@ -212,7 +218,7 @@ C
      &     LRLU, IPTRLU, IWPOS, IWPOSCB, SLAVEF, PROCNODE_STEPS, DAD,
      &     PTRIST, PTRAST, STEP, PIMASTER, PAMASTER,
      &     LREQI, LREQA, -1234, S_NOTFREE, .FALSE.,
-     &     COMP, LRLUS, KEEP8(67), IFLAG, IERROR
+     &     COMP, LRLUS, IFLAG, IERROR
      &          )
           IF ( IFLAG .LT. 0 ) RETURN
           CALL MPI_UNPACK( BUFR, LBUFR_BYTES, POSITION,

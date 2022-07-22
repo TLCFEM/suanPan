@@ -1,31 +1,15 @@
 C
-C  This file is part of MUMPS 5.5.1, released
-C  on Tue Jul 12 13:17:24 UTC 2022
+C  This file is part of MUMPS 5.2.1, released
+C  on Fri Jun 14 14:46:05 UTC 2019
 C
 C
-C  Copyright 1991-2022 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license 
-C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
-C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
+C  released under the CeCILL-C license:
+C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
 C
-      MODULE MUMPS_TPS_M
-      TYPE MUMPS_TPS_T
-          INTEGER :: LIW, LPOOL, LEAF, IOLDPS
-          INTEGER(8) :: LA, POSFAC, LRLU, LRLUS, LRLUSM, IPTRLU, POSELT
-          INTEGER :: INODE, IFATH, IFLAG, IERROR, CURRENT_TASK
-          INTEGER :: JOBASS, ETATASS
-          INTEGER :: MAXFRW, NOFFW, NPVW, NELVAW, NMAXNPIV
-          INTEGER :: TYPE, TYPEF
-          INTEGER :: COMP
-          INTEGER :: IWPOS, IWPOSCB
-          LOGICAL AVOID_DELAYED
-          DOUBLE PRECISION :: OPASSW, OPELIW
-          INTEGER, DIMENSION(:), POINTER :: IW, ITLOC
-      END TYPE MUMPS_TPS_T
-      END MODULE MUMPS_TPS_M
       SUBROUTINE MUMPS_TPS_M_RETURN()
       RETURN
       END SUBROUTINE MUMPS_TPS_M_RETURN

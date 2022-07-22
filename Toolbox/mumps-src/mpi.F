@@ -1,22 +1,21 @@
 C
-C  This file is part of MUMPS 5.5.1, released
-C  on Tue Jul 12 13:17:24 UTC 2022
+C  This file is part of MUMPS 5.2.1, released
+C  on Fri Jun 14 14:46:05 UTC 2019
 C
 C
-C  Copyright 1991-2022 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license 
-C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
-C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
+C  released under the CeCILL-C license:
+C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
 C
-C*******************************************************************
+C******************************************************************
 C
-C  This file contains stub MPI/BLACS/ScaLAPACK library functions for
+C  This file contains dummy MPI/BLACS/ScaLAPACK libraries to allow
 C  linking/running MUMPS on a platform where MPI is not installed.
 C
-C*******************************************************************
+C******************************************************************
 C
 C MPI
 C
@@ -328,15 +327,6 @@ C***********************************************************************
       IERR = 0
       RETURN
       END SUBROUTINE MPI_GROUP_SIZE
-C***********************************************************************
-      SUBROUTINE MPI_INIT_THREAD(MPI_THREAD_REQ, THREAD_SUPPORT, IERR)
-      IMPLICIT NONE
-      INCLUDE 'mpif.h'
-      INTEGER IERR, MPI_THREAD_REQ, THREAD_SUPPORT
-      IERR = 0
-      THREAD_SUPPORT=MPI_THREAD_REQ
-      RETURN
-      END SUBROUTINE MPI_INIT_THREAD
 C***********************************************************************
       SUBROUTINE MPI_INIT(IERR)
       IMPLICIT NONE
@@ -699,40 +689,30 @@ C     DOUBLE COMPLEX S(N),R(N)
       END
       LOGICAL FUNCTION MUMPS_IS_IN_PLACE( SENDBUF, CNT )
       INTEGER SENDBUF(*), CNT
+      LOGICAL, EXTERNAL :: MUMPS_CHECK_EQUAL
       INCLUDE 'mpif.h'
-      INTEGER :: I
-C     Check address using C code
+C     Instead of checking the address, we modify the value
+C     of MPI_IN_PLACE, to check if SENDBUF = MPI_IN_PLACE.
       MUMPS_IS_IN_PLACE = .FALSE.
       IF ( CNT .GT. 0 ) THEN
-        CALL MUMPS_CHECKADDREQUAL(SENDBUF(1), MPI_IN_PLACE, I)
-        IF (I .EQ. 1) THEN
-          MUMPS_IS_IN_PLACE = .TRUE.
+        MPI_IN_PLACE = -1
+        IF (SENDBUF(1) .EQ. MPI_IN_PLACE) THEN
+          MPI_IN_PLACE = -9876543
+          IF (MUMPS_CHECK_EQUAL(SENDBUF(1), MPI_IN_PLACE)) THEN
+            MUMPS_IS_IN_PLACE = .TRUE.
+          ENDIF
         ENDIF
       ENDIF
-C Begin old code which requires the MPI_IN_PLACE
-C variable to have the F2003 attribute VOLATILE
-C     IF ( CNT .GT. 0 ) THEN
-C       MPI_IN_PLACE = -1
-C       IF (SENDBUF(1) .EQ. MPI_IN_PLACE) THEN
-C         MPI_IN_PLACE = -9876543
-C         IF (MUMPS_CHECK_EQUAL(SENDBUF(1), MPI_IN_PLACE)) THEN
-C           MUMPS_IS_IN_PLACE = .TRUE.
-C         ENDIF
-C       ENDIF
-C     ENDIF
-C End old code
       RETURN
       END FUNCTION MUMPS_IS_IN_PLACE
-C Begin old code
-C     LOGICAL FUNCTION MUMPS_CHECK_EQUAL(I,J)
-C     INTEGER :: I,J
-C     IF (I.EQ.J) THEN
-C       MUMPS_CHECK_EQUAL = .TRUE. 
-C     ELSE
-C       MUMPS_CHECK_EQUAL = .FALSE. 
-C     ENDIF
-C     END FUNCTION MUMPS_CHECK_EQUAL
-C End old code
+      LOGICAL FUNCTION MUMPS_CHECK_EQUAL(I,J)
+      INTEGER :: I,J
+      IF (I.EQ.J) THEN
+        MUMPS_CHECK_EQUAL = .TRUE. 
+      ELSE
+        MUMPS_CHECK_EQUAL = .FALSE. 
+      ENDIF
+      END FUNCTION MUMPS_CHECK_EQUAL
 
 
 

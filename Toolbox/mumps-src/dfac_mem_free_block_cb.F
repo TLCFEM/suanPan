@@ -1,15 +1,14 @@
 C
-C  This file is part of MUMPS 5.5.1, released
-C  on Tue Jul 12 13:17:24 UTC 2022
+C  This file is part of MUMPS 5.2.1, released
+C  on Fri Jun 14 14:46:05 UTC 2019
 C
 C
-C  Copyright 1991-2022 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license 
-C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
-C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
+C  released under the CeCILL-C license:
+C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
 C
       SUBROUTINE DMUMPS_FREE_BLOCK_CB_STATIC(
      &       SSARBR, MYID, N, IPOSBLOCK,
@@ -17,7 +16,6 @@ C
      &       LRLU, LRLUS, IPTRLU,
      &       IWPOSCB, LA, KEEP, KEEP8, IN_PLACE_STATS
      &     )
-!$    USE OMP_LIB
       USE DMUMPS_LOAD
       IMPLICIT NONE
       INTEGER IPOSBLOCK,
@@ -49,14 +47,8 @@ C
         SIZFR_BLOCK_EFF = SIZFR_BLOCK - SIZEHOLE
       ENDIF
       IF (.NOT. IN_PLACE_STATS) THEN
-         LRLUS   = LRLUS + SIZFR_BLOCK_EFF
-         IF (KEEP(405) .EQ. 0) THEN
+           LRLUS   = LRLUS + SIZFR_BLOCK_EFF
            KEEP8(69) = KEEP8(69) - SIZFR_BLOCK_EFF
-         ELSE
-!$OMP      ATOMIC UPDATE
-           KEEP8(69) = KEEP8(69) - SIZFR_BLOCK_EFF
-!$OMP      END ATOMIC
-         ENDIF
       ENDIF
       IF ( IPOSBLOCK .eq. IWPOSCB + 1 ) THEN
          IPTRLU  = IPTRLU  + SIZFR_BLOCK

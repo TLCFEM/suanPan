@@ -1,16 +1,15 @@
 /*
  *
- *  This file is part of MUMPS 5.5.1, released
- *  on Tue Jul 12 13:17:24 UTC 2022
+ *  This file is part of MUMPS 5.2.1, released
+ *  on Fri Jun 14 14:46:05 UTC 2019
  *
  *
- *  Copyright 1991-2022 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+ *  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
  *  Mumps Technologies, University of Bordeaux.
  *
  *  This version of MUMPS is provided to you free of charge. It is
- *  released under the CeCILL-C license
- *  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
- *  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
+ *  released under the CeCILL-C license:
+ *  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
  *
  */
 #ifdef INTSIZE64
@@ -20,8 +19,8 @@
 #define LIBSEQ_INT int
 #endif
 
-#if !defined(LIBSEQ_CALL)
-#if defined(_WIN32) && !defined(__MINGW32__)
+#if ! defined(LIBSEQ_CALL)
+#if defined(_WIN32) && ! defined(__MINGW32__)
 /* Choose between next lines or modify according
  * to your Windows calling conventions:
    #define LIBSEQ_CALL
@@ -42,9 +41,11 @@
 extern "C" {
 #endif
 
-/* This is the minimum to have the C interface to MUMPS work with the
- * C example provided. Other stub functions of the MPI standard may be
- * added if needed. */
+/* This is the minimum to have the C interface of MUMPS work.
+ * Most of the time, users who need this file have no call to MPI functions in
+ * their own code. Hence it is not worth declaring all MPI functions here.
+ * However if some users come to request some more stub functions of the MPI
+ * standards, we may add them. But it is not worth doing it until then. */
 
 typedef LIBSEQ_INT MPI_Comm; /* Simple type for MPI communicator */
 static MPI_Comm MPI_COMM_WORLD = (MPI_Comm)0;
@@ -52,13 +53,6 @@ static MPI_Comm MPI_COMM_WORLD = (MPI_Comm)0;
 LIBSEQ_INT LIBSEQ_CALL MPI_Init(LIBSEQ_INT* pargc, char*** pargv);
 LIBSEQ_INT LIBSEQ_CALL MPI_Comm_rank(LIBSEQ_INT comm, LIBSEQ_INT* rank);
 LIBSEQ_INT LIBSEQ_CALL MPI_Finalize(void);
-
-/* For MPI_IS_IN_PLACE tests */
-void LIBSEQ_CALL MUMPS_CHECKADDREQUAL(char* a, char* b, LIBSEQ_INT* i);
-void LIBSEQ_CALL MUMPS_CHECKADDREQUAL_(char* a, char* b, LIBSEQ_INT* i);
-void LIBSEQ_CALL mumps_checkaddrequal(char* a, char* b, LIBSEQ_INT* i);
-void LIBSEQ_CALL mumps_checkaddrequal_(char* a, char* b, LIBSEQ_INT* i);
-double LIBSEQ_CALL MPI_Wtime();
 
 #ifdef __cplusplus
 }

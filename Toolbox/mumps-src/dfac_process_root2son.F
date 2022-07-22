@@ -1,15 +1,14 @@
 C
-C  This file is part of MUMPS 5.5.1, released
-C  on Tue Jul 12 13:17:24 UTC 2022
+C  This file is part of MUMPS 5.2.1, released
+C  on Fri Jun 14 14:46:05 UTC 2019
 C
 C
-C  Copyright 1991-2022 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license 
-C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
-C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
+C  released under the CeCILL-C license:
+C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
 C
       RECURSIVE SUBROUTINE 
      &    DMUMPS_PROCESS_ROOT2SON( COMM_LOAD, ASS_IRECV, 
@@ -21,7 +20,7 @@ C
      &    PTLUST_S, PTRFAC,
      &    PTRAST, STEP, PIMASTER, PAMASTER, NSTK_S, COMP,
      &    IFLAG, IERROR, COMM,
-     &    PERM, IPOOL, LPOOL, LEAF, NBFIN, MYID, SLAVEF,
+     &    NBPROCFILS, IPOOL, LPOOL, LEAF, NBFIN, MYID, SLAVEF,
      &
      &    OPASSW, OPELIW, ITLOC, RHS_MUMPS,
      &    FILS, DAD, PTRARW, PTRAIW,
@@ -54,7 +53,7 @@ C
       INTEGER STEP(N), PIMASTER(KEEP(28))
       INTEGER COMP
       INTEGER NSTK_S( KEEP(28) ), PROCNODE_STEPS( KEEP(28) )
-      INTEGER PERM(N)
+      INTEGER NBPROCFILS(KEEP(28))
       INTEGER IFLAG, IERROR, COMM
       INTEGER LPOOL, LEAF
       INTEGER IPOOL( LPOOL )
@@ -87,9 +86,9 @@ C
       INTEGER  MUMPS_PROCNODE, MUMPS_TYPENODE
       EXTERNAL MUMPS_PROCNODE, MUMPS_TYPENODE
       FPERE = KEEP(38)
-      TYPE_SON = MUMPS_TYPENODE(PROCNODE_STEPS(STEP(INODE)),KEEP(199))
+      TYPE_SON = MUMPS_TYPENODE(PROCNODE_STEPS(STEP(INODE)),SLAVEF)
       IF ( MUMPS_PROCNODE( PROCNODE_STEPS(STEP(INODE)), 
-     &     KEEP(199) ).EQ.MYID) THEN
+     &     SLAVEF ).EQ.MYID) THEN
        IOLDPS   = PTLUST_S(STEP(INODE))
        NFRONT   = IW(IOLDPS+KEEP(IXSZ))
        NPIV     = IW(IOLDPS+1+KEEP(IXSZ))
@@ -141,7 +140,7 @@ C
      &   IWPOS, IWPOSCB, IPTRLU, LRLU, LRLUS, IW, LIW, A, LA,
      &   PTRIST, PTLUST_S(1), PTRFAC(1), PTRAST(1),
      &   STEP, PIMASTER, PAMASTER,
-     &   NSTK_S, COMP, IFLAG, IERROR, PERM,
+     &   NSTK_S, COMP, IFLAG, IERROR, NBPROCFILS,
      &   IPOOL, LPOOL, LEAF, NBFIN, SLAVEF,
      &   OPASSW, OPELIW, ITLOC, RHS_MUMPS,
      &   FILS, DAD, PTRARW, PTRAIW,
@@ -173,7 +172,7 @@ C
      &    IWPOS, IWPOSCB, IPTRLU, LRLU, LRLUS, IW, LIW, A, LA,
      &    PTRIST, PTLUST_S, PTRFAC,
      &    PTRAST, STEP, PIMASTER, PAMASTER,
-     &    NSTK_S, COMP, IFLAG, IERROR, PERM,
+     &    NSTK_S, COMP, IFLAG, IERROR, NBPROCFILS,
      &    IPOOL, LPOOL, LEAF, NBFIN, SLAVEF,
      &    OPASSW, OPELIW, ITLOC, RHS_MUMPS,
      &    FILS, DAD, PTRARW, PTRAIW,
@@ -198,8 +197,8 @@ C
          LDA = NPIV+NBROW
        ENDIF
        CALL DMUMPS_COMPACT_FACTORS(A(POSELT), LDA,
-     &          NPIV, NBROW, KEEP,
-     &          int(LDA,8)*int(NBROW+NPIV,8), IW(IOLDPS+H_INODE+NFRONT))
+     &          NPIV, NBROW, KEEP(50),
+     &          int(LDA,8)*int(NBROW+NPIV,8))
        IW(IOLDPS + KEEP(IXSZ))     = NBCOL
        IW(IOLDPS + 1 +KEEP(IXSZ)) = NASS - NPIV
        IF (TYPE_SON.EQ.2) THEN
@@ -221,7 +220,7 @@ C
       ELSE 
         ISON = INODE
         PDEST_MASTER_ISON = 
-     &      MUMPS_PROCNODE( PROCNODE_STEPS(STEP(ISON)), KEEP(199) )
+     &      MUMPS_PROCNODE(PROCNODE_STEPS(STEP(ISON)), SLAVEF)
         IF ( PTRIST(STEP(ISON)) .EQ. 0) THEN
           CALL DMUMPS_TREAT_DESCBAND( ISON, COMM_LOAD,
      &    ASS_IRECV,
@@ -231,7 +230,7 @@ C
      &    PTLUST_S, PTRFAC,
      &    PTRAST, STEP, PIMASTER, PAMASTER, NSTK_S, COMP,
      &    IFLAG, IERROR, COMM,
-     &    PERM, IPOOL, LPOOL, LEAF, NBFIN, MYID, SLAVEF,
+     &    NBPROCFILS, IPOOL, LPOOL, LEAF, NBFIN, MYID, SLAVEF,
      &
      &    root, OPASSW, OPELIW, ITLOC, RHS_MUMPS,
      &    FILS, DAD, PTRARW, PTRAIW,
@@ -248,13 +247,23 @@ C
      &     ( KEEP(50) .NE. 0 .AND.
      &       IW( PTRIST(STEP(ISON)) + 6  +KEEP(IXSZ)) .NE. 0 ) )
           IF ( KEEP(50).eq.0) THEN
+#if defined(IBC_TEST)
+            MSGSOU = IW( PTRIST(STEP(ISON)) + 7 +  KEEP(IXSZ) )
+            MSGTAG = BLOC_FACTO
+#else
             MSGSOU = PDEST_MASTER_ISON
             MSGTAG = BLOC_FACTO
+#endif
           ELSE
             IF ( IW( PTRIST(STEP(ISON)) + 1  +KEEP(IXSZ)) .NE.
      &           IW( PTRIST(STEP(ISON)) + 3  +KEEP(IXSZ)) ) THEN
+#if defined(IBC_TEST)
+              MSGSOU = IW( PTRIST(STEP(ISON)) + 9 +  KEEP(IXSZ) )
+              MSGTAG = BLOC_FACTO_SYM
+#else
               MSGSOU = PDEST_MASTER_ISON
               MSGTAG = BLOC_FACTO_SYM
+#endif
             ELSE
               MSGSOU = MPI_ANY_SOURCE
               MSGTAG = BLOC_FACTO_SYM_SLAVE
@@ -273,7 +282,7 @@ C
      &    PTLUST_S, PTRFAC,
      &    PTRAST, STEP, PIMASTER, PAMASTER, NSTK_S, COMP,
      &    IFLAG, IERROR, COMM,
-     &    PERM, IPOOL, LPOOL, LEAF, NBFIN, MYID, SLAVEF,
+     &    NBPROCFILS, IPOOL, LPOOL, LEAF, NBFIN, MYID, SLAVEF,
      &
      &    root, OPASSW, OPELIW, ITLOC, RHS_MUMPS,
      &    FILS, DAD, PTRARW, PTRAIW,
@@ -328,7 +337,7 @@ C
      &    IWPOS, IWPOSCB, IPTRLU, LRLU, LRLUS, IW, LIW, A, LA,
      &    PTRIST, PTLUST_S, PTRFAC,
      &    PTRAST, STEP, PIMASTER, PAMASTER,
-     &    NSTK_S, COMP, IFLAG, IERROR, PERM,
+     &    NSTK_S, COMP, IFLAG, IERROR, NBPROCFILS,
      &    IPOOL, LPOOL, LEAF, NBFIN, SLAVEF,
      &    OPASSW, OPELIW, ITLOC, RHS_MUMPS,
      &    FILS, DAD, PTRARW, PTRAIW,

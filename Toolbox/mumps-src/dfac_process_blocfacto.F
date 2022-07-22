@@ -1,22 +1,21 @@
 C
-C  This file is part of MUMPS 5.5.1, released
-C  on Tue Jul 12 13:17:24 UTC 2022
+C  This file is part of MUMPS 5.2.1, released
+C  on Fri Jun 14 14:46:05 UTC 2019
 C
 C
-C  Copyright 1991-2022 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license 
-C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
-C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
+C  released under the CeCILL-C license:
+C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
 C
       RECURSIVE SUBROUTINE DMUMPS_PROCESS_BLOCFACTO(
      &   COMM_LOAD, ASS_IRECV,
      &   BUFR, LBUFR,
      &   LBUFR_BYTES, PROCNODE_STEPS, MSGSOU,
      &   SLAVEF, IWPOS, IWPOSCB, IPTRLU, LRLU, LRLUS, N, IW, LIW,
-     &   A, LA, PTRIST, PTRAST, NSTK_S, PERM,
+     &   A, LA, PTRIST, PTRAST, NSTK_S, NBPROCFILS,
      &   COMP, STEP, PIMASTER, PAMASTER, POSFAC,
      &   MYID, COMM, IFLAG, IERROR, NBFIN,
      &
@@ -30,7 +29,9 @@ C
      &               , LRGROUPS
      &    )
       USE DMUMPS_OOC, ONLY : IO_BLOCK
-      USE MUMPS_OOC_COMMON, ONLY : TYPEF_L, STRAT_TRY_WRITE
+      USE MUMPS_OOC_COMMON, ONLY : TYPEF_L,
+     &                       STRAT_WRITE_MAX,
+     &                       STRAT_TRY_WRITE
       USE DMUMPS_LOAD
       USE DMUMPS_LR_CORE
       USE DMUMPS_LR_TYPE
@@ -60,7 +61,7 @@ C
       INTEGER(8) :: PAMASTER(KEEP(28))
       INTEGER(8) :: PTRAST(KEEP(28))
       INTEGER(8) :: PTRFAC(KEEP(28))
-      INTEGER PERM(N), STEP(N), 
+      INTEGER NBPROCFILS( KEEP(28) ), STEP(N), 
      & PIMASTER(KEEP(28))
       INTEGER IW( LIW )
       DOUBLE PRECISION A( LA )
@@ -107,7 +108,6 @@ C
       LOGICAL LAST_CALL
       INTEGER LRELAY_INFO
       INTEGER :: INFO_TMP(2)
-      INTEGER :: IDUMMY(1)
       INTEGER :: NELIM, NPARTSASS_MASTER, NPARTSASS_MASTER_AUX,
      &           IPANEL, 
      &           CURRENT_BLR, 
@@ -126,6 +126,10 @@ C
       INTEGER :: OMP_NUM
       INTEGER NPARTSASS, NPARTSCB, MAXI_CLUSTER, LWORK,
      &        MAXI_CLUSTER_L, MAXI_CLUSTER_U, MAXI_CLUSTER_COL
+      INTEGER T1, T2, COUNT_RATE
+      DOUBLE PRECISION, DIMENSION(:), ALLOCATABLE :: DYN_BLOCFACTO
+      INTEGER, DIMENSION(:), ALLOCATABLE :: DYN_PIVINFO
+      LOGICAL :: DYNAMIC_ALLOC
       INTEGER  :: allocok
       INTEGER MUMPS_PROCNODE
       EXTERNAL MUMPS_PROCNODE
@@ -134,6 +138,7 @@ C
       NB_BLR_U = -7654321
       NULLIFY(BEGS_BLR_U)
       I_HAVE_SET_K117 = .FALSE.
+      DYNAMIC_ALLOC = .FALSE.
       FPERE    = -1
       POSITION = 0
       CALL MPI_UNPACK( BUFR, LBUFR_BYTES, POSITION, INODE, 1,
@@ -166,10 +171,10 @@ C
       CALL DMUMPS_GET_SIZE_NEEDED(
      &      NPIV, LA_BLOCFACTO, .FALSE.,
      &      KEEP(1), KEEP8(1),
-     &      N, IW, LIW, A, LA,
+     &      N, KEEP(28), IW, LIW, A, LA,
      &      LRLU, IPTRLU,
      &      IWPOS, IWPOSCB, PTRIST, PTRAST,
-     &      STEP, PIMASTER, PAMASTER, LRLUS,
+     &      STEP, PIMASTER, PAMASTER, KEEP(216),LRLUS,
      &      KEEP(IXSZ),COMP,DKEEP(97),MYID,SLAVEF, PROCNODE_STEPS, 
      &      DAD, IFLAG, IERROR)
       IF (IFLAG.LT.0) GOTO 700
@@ -248,11 +253,11 @@ C
      &    PTLUST_S, PTRFAC,
      &    PTRAST, STEP, PIMASTER, PAMASTER, NSTK_S, COMP,
      &    IFLAG, IERROR, COMM,
-     &    PERM, IPOOL, LPOOL, LEAF, NBFIN, MYID, SLAVEF,
+     &    NBPROCFILS, IPOOL, LPOOL, LEAF, NBFIN, MYID, SLAVEF,
      &
      &    root, OPASSW, OPELIW, ITLOC, RHS_MUMPS,
      &    FILS, DAD, PTRARW, PTRAIW,
-     &    INTARR, DBLARR, ICNTL,KEEP,KEEP8,DKEEP,ND, FRERE_STEPS,
+     &    INTARR, DBLARR, ICNTL,KEEP,KEEP8,DKEEP,ND, FRERE_STEPS, 
      &    LPTRAR, NELT, FRTPTR, FRTELT, 
      &    ISTEP_TO_INIV2, TAB_POS_IN_PERE, .TRUE.
      &               , LRGROUPS
@@ -260,7 +265,13 @@ C
           IF ( IFLAG .LT. 0 ) GOTO 600
       ENDIF
       IF ( IW( PTRIST(STEP(INODE)) + 3 +KEEP(IXSZ)) .EQ. 0 ) THEN
+#if ! defined(NO_XXNBPR)
+       CALL CHECK_EQUAL(NBPROCFILS(STEP(INODE)),
+     &                  IW(PTRIST(STEP(INODE))+XXNBPR))
        DO WHILE ( IW(PTRIST(STEP(INODE)) + XXNBPR) .NE. 0)
+#else
+       DO WHILE ( NBPROCFILS( STEP(INODE)) .NE. 0 )
+#endif
         BLOCKING = .TRUE.
         SET_IRECV = .FALSE.
         MESSAGE_RECEIVED = .FALSE.
@@ -274,7 +285,7 @@ C
      &    PTLUST_S, PTRFAC,
      &    PTRAST, STEP, PIMASTER, PAMASTER, NSTK_S, COMP,
      &    IFLAG, IERROR, COMM,
-     &    PERM, IPOOL, LPOOL, LEAF, NBFIN, MYID, SLAVEF,
+     &    NBPROCFILS, IPOOL, LPOOL, LEAF, NBFIN, MYID, SLAVEF,
      &
      &    root, OPASSW, OPELIW, ITLOC, RHS_MUMPS,
      &    FILS, DAD, PTRARW, PTRAIW,
@@ -299,7 +310,7 @@ C
      &    PTLUST_S, PTRFAC,
      &    PTRAST, STEP, PIMASTER, PAMASTER, NSTK_S, COMP,
      &    IFLAG, IERROR, COMM,
-     &    PERM, IPOOL, LPOOL, LEAF, NBFIN, MYID, SLAVEF,
+     &    NBPROCFILS, IPOOL, LPOOL, LEAF, NBFIN, MYID, SLAVEF,
      &
      &    root, OPASSW, OPELIW, ITLOC, RHS_MUMPS,
      &    FILS, DAD, PTRARW, PTRAIW,
@@ -343,6 +354,17 @@ C
       NCOL1  = LCONT1 + NPIV1
       IF (NPIV.GT.0) THEN
         ICT11 = IOLDPS+HS+NROW1+NPIV1 - 1
+        IF (DYNAMIC_ALLOC) THEN
+          DO I = 1, NPIV
+            IF (DYN_PIVINFO(I).EQ.I) CYCLE
+            ISW = IW(ICT11+I)
+            IW(ICT11+I) = IW(ICT11+DYN_PIVINFO(I))
+            IW(ICT11+DYN_PIVINFO(I)) = ISW
+            IPOS = POSELT + int(NPIV1 + I - 1,8)
+            KPOS = POSELT + int(NPIV1 + DYN_PIVINFO(I) - 1,8)
+            CALL dswap(NROW1, A_PTR(IPOS), NCOL1, A_PTR(KPOS), NCOL1)
+          ENDDO
+        ELSE
           DO I = 1, NPIV
             IF (IW(IPIV+I-1).EQ.I) CYCLE
             ISW = IW(ICT11+I)
@@ -352,13 +374,27 @@ C
             KPOS = POSELT + int(NPIV1 + IW(IPIV+I-1) - 1,8)
             CALL dswap(NROW1, A_PTR(IPOS), NCOL1, A_PTR(KPOS), NCOL1)
           ENDDO
+        ENDIF
         LPOS2 = POSELT + int(NPIV1,8)
         LPOS  = LPOS2 + int(NPIV,8)
         IF ((.NOT. LR_ACTIVATED).OR.KEEP(475).EQ.0) THEN
-              CALL dtrsm('L','L','N','N', NPIV, NROW1, ONE,
-     &             A(POSBLOCFACTO), LD_BLOCFACTO,
-     &             A_PTR(LPOS2), NCOL1)
+        IF (KEEP(486).NE.0) THEN
+          CALL SYSTEM_CLOCK(T1)
         ENDIF
+        IF (DYNAMIC_ALLOC) THEN
+          CALL dtrsm('L','L','N','N',NPIV, NROW1, ONE, 
+     &           DYN_BLOCFACTO, LD_BLOCFACTO, A_PTR(LPOS2), NCOL1)
+        ELSE
+          CALL dtrsm('L','L','N','N',NPIV, NROW1, ONE, 
+     &           A(POSBLOCFACTO), LD_BLOCFACTO, 
+     &           A_PTR(LPOS2), NCOL1)
+        ENDIF
+        IF (KEEP(486).NE.0) THEN
+          CALL SYSTEM_CLOCK(T2,COUNT_RATE)
+          ACC_TRSM_TIME = ACC_TRSM_TIME + 
+     &            DBLE(T2-T1)/DBLE(COUNT_RATE)
+        ENDIF
+      ENDIF
       ENDIF 
       COMPRESS_CB = .FALSE.
       IF ( LR_ACTIVATED) THEN 
@@ -368,9 +404,8 @@ C
            COMPRESS_CB = .FALSE.
            IW(IOLDPS+XXLR) = IW(IOLDPS+XXLR) -1
         ENDIF
-        IF (NPIV.NE.0) THEN
         IF ( (NPIV1.EQ.0) 
-     &     ) THEN
+     &   ) THEN
           IOLDPS = PTRIST(STEP(INODE))
           CALL GET_CUT(IW(IOLDPS+HS:IOLDPS+HS+NROW1-1), 0,
      &                    NROW1, LRGROUPS, NPARTSCB, 
@@ -424,7 +459,6 @@ C
           NPARTSCB  = NB_BLR_L
         ENDIF 
       ENDIF
-      ENDIF
       IF ( (NPIV .GT. 0)
      &   ) THEN
         IF (LR_ACTIVATED) THEN
@@ -469,6 +503,7 @@ C
      &             ': ERROR allocation during DMUMPS_PROCESS_BLOCFACTO'
               GOTO 700
            ENDIF
+        CALL SYSTEM_CLOCK(T1)
 #if defined(BLR_MT)          
 !$OMP PARALLEL
 #endif
@@ -482,8 +517,8 @@ C
      &        BLOCK, MAXI_CLUSTER, NELIM, 
      &        .TRUE.,  
      &        NPIV, NPIV1,
-     &        2, KEEP(483), KEEP8,
-     &        OMP_NUM )
+     &        2, KEEP(483), KEEP8, OMP_NUM
+     &        )
 #if defined(BLR_MT)
 !$OMP MASTER
 #endif
@@ -497,17 +532,43 @@ C
 #if defined(BLR_MT)          
 !$OMP END MASTER
 !$OMP BARRIER
+!$OMP MASTER
 #endif
+          CALL SYSTEM_CLOCK(T2,COUNT_RATE)
+          ACC_DEMOTING_TIME = ACC_DEMOTING_TIME + 
+     &              DBLE(T2-T1)/DBLE(COUNT_RATE)
+          CALL SYSTEM_CLOCK(T1)
+#if defined(BLR_MT)          
+!$OMP END MASTER
+#endif          
           IF (IFLAG.LT.0) GOTO 300
           IF (KEEP(475).GE.1) THEN
+            IF (DYNAMIC_ALLOC) THEN
+              CALL DMUMPS_BLR_PANEL_LRTRSM(
+     &              DYN_BLOCFACTO, LA_BLOCFACTO, 1_8, 
+     &              LD_BLOCFACTO, -6666, 
+     &              NB_BLR_L+1,  
+     &              BLR_L, CURRENT_BLR, CURRENT_BLR+1, NB_BLR_L+1, 
+     &              2, 0, 0,  
+     &              .TRUE.) 
+            ELSE
               CALL DMUMPS_BLR_PANEL_LRTRSM(A, LA, POSBLOCFACTO, 
      &              LD_BLOCFACTO, -6666, 
      &              NB_BLR_L+1,  
      &              BLR_L, CURRENT_BLR, CURRENT_BLR+1, NB_BLR_L+1, 
      &              2, 0, 0,  
      &              .TRUE.) 
+            ENDIF
 #if defined(BLR_MT)          
 !$OMP BARRIER
+!$OMP MASTER
+#endif          
+            CALL SYSTEM_CLOCK(T2,COUNT_RATE)
+            ACC_TRSM_TIME = ACC_TRSM_TIME + 
+     &              DBLE(T2-T1)/DBLE(COUNT_RATE)
+            CALL SYSTEM_CLOCK(T1)
+#if defined(BLR_MT)          
+!$OMP END MASTER
 #endif          
             IF (KEEP(486).NE.2) THEN
               CALL DMUMPS_DECOMPRESS_PANEL_I_NOOPT(
@@ -516,7 +577,17 @@ C
      &        .TRUE.,    
      &        NPIV1+1,   
      &        1,         
-     &        NB_BLR_L+1, BLR_L(1), CURRENT_BLR, 'V', 1)
+     &        NB_BLR_L+1, BLR_L(1), CURRENT_BLR, 'V')
+#if defined(BLR_MT)          
+!$OMP MASTER
+#endif          
+              CALL SYSTEM_CLOCK(T2,COUNT_RATE)
+              ACC_PROMOTING_TIME = ACC_PROMOTING_TIME + 
+     &               DBLE(T2-T1)/DBLE(COUNT_RATE)
+              CALL SYSTEM_CLOCK(T1)
+#if defined(BLR_MT)          
+!$OMP END MASTER
+#endif          
             ENDIF
           ENDIF
  300      CONTINUE
@@ -553,6 +624,15 @@ C
         IF (LR_ACTIVATED) THEN
           IF (NELIM.GT.0) THEN
             UPOS = 1_8+int(NPIV,8)
+            IF (DYNAMIC_ALLOC) THEN
+              CALL DMUMPS_BLR_UPD_NELIM_VAR_L_I(
+     &        DYN_BLOCFACTO, LA_BLOCFACTO, UPOS,
+     &        A_PTR(POSELT), LA_PTR, LPOS-POSELT+1_8,
+     &        IFLAG, IERROR, LD_BLOCFACTO, NCOL1,
+     &        BEGS_BLR_L(1), size(BEGS_BLR_L),
+     &        CURRENT_BLR, BLR_L(1), NB_BLR_L+1, 
+     &        CURRENT_BLR+1, NELIM, 'N')
+            ELSE
               CALL DMUMPS_BLR_UPD_NELIM_VAR_L_I(
      &        A(POSBLOCFACTO), LA_BLOCFACTO, UPOS,
      &        A_PTR(POSELT), LA_PTR, LPOS-POSELT+1_8,
@@ -560,6 +640,7 @@ C
      &        BEGS_BLR_L(1), size(BEGS_BLR_L),
      &        CURRENT_BLR, BLR_L(1), NB_BLR_L+1, 
      &        CURRENT_BLR+1, NELIM, 'N')
+            ENDIF
           ENDIF
 #if defined(BLR_MT)          
 !$OMP PARALLEL
@@ -575,19 +656,38 @@ C
      &        .TRUE., 
      &        NPIV1,  
      &        2, 0, 
-     &        KEEP(481), DKEEP(11), KEEP(466), KEEP(477) 
+     &        KEEP(481), DKEEP(8), KEEP(466), KEEP(477) 
      &        )
+#if defined(BLR_MT)          
+!$OMP MASTER
+#endif          
+          CALL SYSTEM_CLOCK(T2,COUNT_RATE)
+          ACC_UPDT_TIME = ACC_UPDT_TIME + 
+     &               DBLE(T2-T1)/DBLE(COUNT_RATE)
+          CALL SYSTEM_CLOCK(T1)
+#if defined(BLR_MT)          
+!$OMP END MASTER
+#endif
 #if defined(BLR_MT)          
 !$OMP END PARALLEL
 #endif          
           IF (IFLAG.LT.0) GOTO 700
-        ELSE 
-              UPOS = POSBLOCFACTO+int(NPIV,8)
-              CALL dgemm('N','N', NCOL-NPIV, NROW1, NPIV,
-     &             ALPHA,A(UPOS), NCOL,
-     &             A_PTR(LPOS2), NCOL1, ONE, A_PTR(LPOS), NCOL1)
-        ENDIF 
-      ENDIF 
+          CALL STATS_STORE_BLR_PANEL_MRY(BLR_L,
+     &               0, NPARTSCB, 'V', 2)
+        ELSE
+          IF (DYNAMIC_ALLOC) THEN
+            UPOS = int(NPIV+1,8)
+            CALL dgemm('N','N', NCOL-NPIV,NROW1,NPIV,
+     &             ALPHA,DYN_BLOCFACTO(UPOS),NCOL,
+     &             A_PTR(LPOS2),NCOL1,ONE, A_PTR(LPOS),NCOL1)
+          ELSE
+            UPOS = POSBLOCFACTO+int(NPIV,8)
+            CALL dgemm('N','N', NCOL-NPIV,NROW1,NPIV,
+     &             ALPHA,A(UPOS),NCOL,
+     &             A_PTR(LPOS2),NCOL1,ONE, A_PTR(LPOS),NCOL1)
+          ENDIF
+        ENDIF
+      ENDIF
       IW(IOLDPS+KEEP(IXSZ) ) = IW(IOLDPS+KEEP(IXSZ) ) - NPIV
       IW(IOLDPS + 3+KEEP(IXSZ) ) = IW(IOLDPS+3+KEEP(IXSZ) ) + NPIV
       IF (LASTBL) THEN
@@ -601,17 +701,18 @@ C
       IF (LR_ACTIVATED) THEN
         IF ((NPIV.GT.0)
      &     ) THEN
-          CALL DEALLOC_BLR_PANEL( BLR_U, NB_BLR_U, KEEP8, KEEP(34))
+          CALL DEALLOC_BLR_PANEL( BLR_U, NB_BLR_U, KEEP8)
           DEALLOCATE(BLR_U)
           IF (KEEP(486).EQ.3) THEN
-            CALL DEALLOC_BLR_PANEL( BLR_L, NB_BLR_L, KEEP8, KEEP(34))
+            CALL DEALLOC_BLR_PANEL( BLR_L, NB_BLR_L, KEEP8)
             DEALLOCATE(BLR_L)
-          ELSE
-            CALL UPD_MRY_LU_LRGAIN(BLR_L, NPARTSCB
-     &               )
           ENDIF
       ENDIF 
       ENDIF 
+      IF (DYNAMIC_ALLOC) THEN
+        DEALLOCATE(DYN_BLOCFACTO)
+        DEALLOCATE(DYN_PIVINFO)
+      ELSE
         LRLU  = LRLU + LA_BLOCFACTO
         LRLUS = LRLUS + LA_BLOCFACTO
         KEEP8(69) = KEEP8(69) - LA_BLOCFACTO
@@ -619,6 +720,7 @@ C
         CALL DMUMPS_LOAD_MEM_UPDATE(.FALSE.,.FALSE.,
      &             LA-LRLUS,0_8,-LA_BLOCFACTO,KEEP,KEEP8,LRLUS)
         IWPOS = IWPOS - NPIV
+      ENDIF
       FLOP1 = dble( NPIV1*NROW1 ) +
      &        dble(NROW1*NPIV1)*dble(2*NCOL1-NPIV1-1)
      &   -
@@ -683,6 +785,7 @@ C
            ENDIF
            CALL DMUMPS_BLR_SAVE_CB_LRB(IW(IOLDPS+XXF),CB_LRB)
          ENDIF
+         CALL SYSTEM_CLOCK(T1)
 #if defined(BLR_MT)          
 !$OMP PARALLEL
 #endif
@@ -695,14 +798,22 @@ C
      &      NPARTSASS_MASTER, 
      &      NROW1, NCOL1-NPIV1-NPIV, INODE,
      &      IW(IOLDPS+XXF), 0, 2, IFLAG, IERROR,
-     &      DKEEP(12), KEEP(466), KEEP(484), KEEP(489),
+     &      DKEEP(8), KEEP(466), KEEP(484), KEEP(489),
      &      CB_LRB(1,1),
      &      WORK, TAU, JPVT, LWORK, RWORK, BLOCK,
      &      MAXI_CLUSTER, KEEP8, OMP_NUM,
-     &      -9999, -9999, -9999, KEEP(1),
-     &      IDUMMY, 0, -9999 )
+     &      -9999, -9999, KEEP(1)
+     &       )
 #if defined(BLR_MT)
 !$OMP BARRIER
+!$OMP MASTER
+#endif
+            CALL SYSTEM_CLOCK(T2,COUNT_RATE)
+            ACC_CB_DEMOTING_TIME = ACC_CB_DEMOTING_TIME + 
+     &               DBLE(T2-T1)/DBLE(COUNT_RATE)
+            CALL SYSTEM_CLOCK(T1)
+#if defined(BLR_MT)
+!$OMP END MASTER
 #endif
          ENDIF
 #if defined(BLR_MT)          
@@ -720,7 +831,7 @@ C
      &    IWPOS, IWPOSCB, IPTRLU, LRLU, LRLUS, IW, LIW, A, LA,
      &    PTRIST, PTLUST_S, PTRFAC, PTRAST, STEP, PIMASTER,
      &    PAMASTER,
-     &    NSTK_S, COMP, IFLAG, IERROR, PERM,
+     &    NSTK_S, COMP, IFLAG, IERROR, NBPROCFILS,
      &    IPOOL, LPOOL, LEAF, NBFIN, SLAVEF,
      &    OPASSW, OPELIW, ITLOC, RHS_MUMPS, FILS, DAD, PTRARW, PTRAIW,
      &    INTARR, DBLARR,ICNTL,KEEP,KEEP8,DKEEP,ND, FRERE_STEPS,
@@ -773,7 +884,7 @@ C
       INTEGER(8) :: KEEP8(150)
       LOGICAL :: ISLR
       INTEGER :: ISLR_INT, I
-      INTEGER :: K, M, N
+      INTEGER :: LRFORM, K, M, N, KSVD
       INCLUDE 'mpif.h'
       INCLUDE 'mumps_tags.h'
       IERR = 0
@@ -789,6 +900,9 @@ C
         CALL MPI_UNPACK( BUFR, LBUFR_BYTES, POSITION,
      &                 ISLR_INT, 1, MPI_INTEGER, COMM, IERR )
         CALL MPI_UNPACK( BUFR, LBUFR_BYTES, POSITION,
+     &                 LRFORM, 1,
+     &                 MPI_INTEGER, COMM, IERR )
+        CALL MPI_UNPACK( BUFR, LBUFR_BYTES, POSITION,
      &                 K, 1,
      &                 MPI_INTEGER, COMM, IERR )
         CALL MPI_UNPACK( BUFR, LBUFR_BYTES, POSITION,
@@ -797,15 +911,22 @@ C
         CALL MPI_UNPACK( BUFR, LBUFR_BYTES, POSITION,
      &                 N, 1,
      &                 MPI_INTEGER, COMM, IERR )
+        CALL MPI_UNPACK( BUFR, LBUFR_BYTES, POSITION,
+     &                 KSVD, 1,
+     &                 MPI_INTEGER, COMM, IERR )
         BEGS_BLR_U(I+2) = BEGS_BLR_U(I+1) + M
         IF (ISLR_INT .eq. 1) THEN
           ISLR = .TRUE.
         ELSE
           ISLR = .FALSE.
         ENDIF
-        CALL ALLOC_LRB( BLR_U(I), K, M, N, ISLR, 
+        CALL ALLOC_LRB( BLR_U(I), K, KSVD, M, N, ISLR, 
      &             IFLAG, IERROR, KEEP8 )
         IF (IFLAG.LT.0) RETURN
+        IF (LRFORM .NE. BLR_U(I)%LRFORM) THEN
+          WRITE(*,*) "Internal error 2 in ALLOC_LRB",
+     &    LRFORM, BLR_U(I)%LRFORM
+        ENDIF
         IF (ISLR) THEN
           IF (K .GT. 0) THEN
             CALL MPI_UNPACK( BUFR, LBUFR_BYTES, POSITION,

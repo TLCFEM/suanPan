@@ -1,16 +1,15 @@
 /*
  *
- *  This file is part of MUMPS 5.5.1, released
- *  on Tue Jul 12 13:17:24 UTC 2022
+ *  This file is part of MUMPS 5.2.1, released
+ *  on Fri Jun 14 14:46:05 UTC 2019
  *
  *
- *  Copyright 1991-2022 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+ *  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
  *  Mumps Technologies, University of Bordeaux.
  *
  *  This version of MUMPS is provided to you free of charge. It is
- *  released under the CeCILL-C license
- *  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
- *  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
+ *  released under the CeCILL-C license:
+ *  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
  *
  */
 
@@ -29,7 +28,7 @@ extern "C" {
 
 #ifndef MUMPS_VERSION
 /* Protected in case headers of other arithmetics are included */
-#define MUMPS_VERSION "5.5.1"
+#define MUMPS_VERSION "5.2.1"
 #endif
 #ifndef MUMPS_VERSION_MAX_LEN
 #define MUMPS_VERSION_MAX_LEN 30
@@ -41,93 +40,88 @@ extern "C" {
  */
 typedef struct {
 
-    MUMPS_INT sym, par, job;
-    MUMPS_INT comm_fortran; /* Fortran communicator */
-    MUMPS_INT icntl[60];
-    MUMPS_INT keep[500];
-    DMUMPS_REAL cntl[15];
-    DMUMPS_REAL dkeep[230];
-    MUMPS_INT8 keep8[150];
-    MUMPS_INT n;
-    MUMPS_INT nblk;
+	MUMPS_INT sym, par, job;
+	MUMPS_INT comm_fortran; /* Fortran communicator */
+	MUMPS_INT icntl[60];
+	MUMPS_INT keep[500];
+	DMUMPS_REAL cntl[15];
+	DMUMPS_REAL dkeep[230];
+	MUMPS_INT8 keep8[150];
+	MUMPS_INT n;
 
-    MUMPS_INT nz_alloc; /* used in matlab interface to decide if we
-                           free + malloc when we have large variation */
+	MUMPS_INT nz_alloc; /* used in matlab interface to decide if we
+                                free + malloc when we have large variation */
 
-    /* Assembled entry */
-    MUMPS_INT nz;
-    MUMPS_INT8 nnz;
-    MUMPS_INT* irn;
-    MUMPS_INT* jcn;
-    DMUMPS_COMPLEX* a;
+	/* Assembled entry */
+	MUMPS_INT nz;
+	MUMPS_INT8 nnz;
+	MUMPS_INT* irn;
+	MUMPS_INT* jcn;
+	DMUMPS_COMPLEX* a;
 
-    /* Distributed entry */
-    MUMPS_INT nz_loc;
-    MUMPS_INT8 nnz_loc;
-    MUMPS_INT* irn_loc;
-    MUMPS_INT* jcn_loc;
-    DMUMPS_COMPLEX* a_loc;
+	/* Distributed entry */
+	MUMPS_INT nz_loc;
+	MUMPS_INT8 nnz_loc;
+	MUMPS_INT* irn_loc;
+	MUMPS_INT* jcn_loc;
+	DMUMPS_COMPLEX* a_loc;
 
-    /* Element entry */
-    MUMPS_INT nelt;
-    MUMPS_INT* eltptr;
-    MUMPS_INT* eltvar;
-    DMUMPS_COMPLEX* a_elt;
+	/* Element entry */
+	MUMPS_INT nelt;
+	MUMPS_INT* eltptr;
+	MUMPS_INT* eltvar;
+	DMUMPS_COMPLEX* a_elt;
 
-    /* Matrix by blocks */
-    MUMPS_INT* blkptr;
-    MUMPS_INT* blkvar;
+	/* Ordering, if given by user */
+	MUMPS_INT* perm_in;
 
-    /* Ordering, if given by user */
-    MUMPS_INT* perm_in;
+	/* Orderings returned to user */
+	MUMPS_INT* sym_perm; /* symmetric permutation */
+	MUMPS_INT* uns_perm; /* column permutation */
 
-    /* Orderings returned to user */
-    MUMPS_INT* sym_perm; /* symmetric permutation */
-    MUMPS_INT* uns_perm; /* column permutation */
+	/* Scaling (inout but complicated) */
+	DMUMPS_REAL* colsca;
+	DMUMPS_REAL* rowsca;
+	MUMPS_INT colsca_from_mumps;
+	MUMPS_INT rowsca_from_mumps;
 
-    /* Scaling (inout but complicated) */
-    DMUMPS_REAL* colsca;
-    DMUMPS_REAL* rowsca;
-    MUMPS_INT colsca_from_mumps;
-    MUMPS_INT rowsca_from_mumps;
+	/* RHS, solution, ouptput data and statistics */
+	DMUMPS_COMPLEX *rhs, *redrhs, *rhs_sparse, *sol_loc, *rhs_loc;
+	MUMPS_INT *irhs_sparse, *irhs_ptr, *isol_loc, *irhs_loc;
+	MUMPS_INT nrhs, lrhs, lredrhs, nz_rhs, lsol_loc, nloc_rhs, lrhs_loc;
+	MUMPS_INT schur_mloc, schur_nloc, schur_lld;
+	MUMPS_INT mblock, nblock, nprow, npcol;
+	MUMPS_INT info[80], infog[80];
+	DMUMPS_REAL rinfo[40], rinfog[40];
 
-    /* RHS, solution, ouptput data and statistics */
-    DMUMPS_COMPLEX *rhs, *redrhs, *rhs_sparse, *sol_loc, *rhs_loc;
-    MUMPS_INT *irhs_sparse, *irhs_ptr, *isol_loc, *irhs_loc;
-    MUMPS_INT nrhs, lrhs, lredrhs, nz_rhs, lsol_loc, nloc_rhs, lrhs_loc;
-    MUMPS_INT schur_mloc, schur_nloc, schur_lld;
-    MUMPS_INT mblock, nblock, nprow, npcol;
-    MUMPS_INT info[80], infog[80];
-    DMUMPS_REAL rinfo[40], rinfog[40];
+	/* Null space */
+	MUMPS_INT deficiency;
+	MUMPS_INT* pivnul_list;
+	MUMPS_INT* mapping;
 
-    /* Null space */
-    MUMPS_INT deficiency;
-    MUMPS_INT* pivnul_list;
-    MUMPS_INT* mapping;
+	/* Schur */
+	MUMPS_INT size_schur;
+	MUMPS_INT* listvar_schur;
+	DMUMPS_COMPLEX* schur;
 
-    /* Schur */
-    MUMPS_INT size_schur;
-    MUMPS_INT* listvar_schur;
-    DMUMPS_COMPLEX* schur;
+	/* Internal parameters */
+	MUMPS_INT instance_number;
+	DMUMPS_COMPLEX* wk_user;
 
-    /* Internal parameters */
-    MUMPS_INT instance_number;
-    DMUMPS_COMPLEX* wk_user;
+	/* Version number: length=14 in FORTRAN + 1 for final \0 + 1 for alignment */
+	char version_number[MUMPS_VERSION_MAX_LEN + 1 + 1];
+	/* For out-of-core */
+	char ooc_tmpdir[256];
+	char ooc_prefix[64];
+	/* To save the matrix in matrix market format */
+	char write_problem[256];
+	MUMPS_INT lwk_user;
+	/* For save/restore feature */
+	char save_dir[256];
+	char save_prefix[256];
 
-    /* Version number: length=14 in FORTRAN + 1 for final \0 + 1 for alignment */
-    char version_number[MUMPS_VERSION_MAX_LEN + 1 + 1];
-    /* For out-of-core */
-    char ooc_tmpdir[256];
-    char ooc_prefix[64];
-    /* To save the matrix in matrix market format */
-    char write_problem[256];
-    MUMPS_INT lwk_user;
-    /* For save/restore feature */
-    char save_dir[256];
-    char save_prefix[256];
-
-    /* Metis options */
-    MUMPS_INT metis_options[40];
+	/* Metis options */
+	MUMPS_INT metis_options[40];
 } DMUMPS_STRUC_C;
 
 void MUMPS_CALL

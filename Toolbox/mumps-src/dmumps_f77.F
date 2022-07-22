@@ -1,22 +1,20 @@
 C
-C  This file is part of MUMPS 5.5.1, released
-C  on Tue Jul 12 13:17:24 UTC 2022
+C  This file is part of MUMPS 5.2.1, released
+C  on Fri Jun 14 14:46:05 UTC 2019
 C
 C
-C  Copyright 1991-2022 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license 
-C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
-C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
+C  released under the CeCILL-C license:
+C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
 C
-      SUBROUTINE DMUMPS_F77( JOB, SYM, PAR, COMM_F77, N, NBLK, ICNTL,
-     &     CNTL, KEEP, DKEEP, KEEP8, NZ, NNZ, IRN, IRNhere, JCN,
-     &     JCNhere, A, Ahere, NZ_loc, NNZ_loc, IRN_loc, IRN_lochere,
+      SUBROUTINE DMUMPS_F77( JOB, SYM, PAR, COMM_F77, N, ICNTL, CNTL,
+     &     KEEP, DKEEP, KEEP8, NZ, NNZ, IRN, IRNhere, JCN, JCNhere,
+     &     A, Ahere, NZ_loc, NNZ_loc, IRN_loc, IRN_lochere,
      &     JCN_loc, JCN_lochere, A_loc, A_lochere, NELT, ELTPTR,
      &     ELTPTRhere,  ELTVAR, ELTVARhere, A_ELT, A_ELThere,
-     &     BLKPTR, BLKPTRhere, BLKVAR, BLKVARhere,
      &     PERM_IN, PERM_INhere, RHS, RHShere, REDRHS, REDRHShere,
      &     INFO, RINFO, INFOG, RINFOG, DEFICIENCY, LWK_USER,
      &     SIZE_SCHUR, LISTVAR_SCHUR, LISTVAR_SCHURhere, SCHUR,
@@ -43,7 +41,7 @@ C
       PARAMETER(PB_MAX_LENGTH=255)
       INTEGER, PARAMETER :: SAVE_DIR_MAX_LENGTH    = 255
       INTEGER, PARAMETER :: SAVE_PREFIX_MAX_LENGTH = 255
-      INTEGER JOB, SYM, PAR, COMM_F77, N, NBLK, NZ, NZ_loc, NELT,
+      INTEGER JOB, SYM, PAR, COMM_F77, N, NZ, NZ_loc, NELT,
      &        DEFICIENCY, LWK_USER, SIZE_SCHUR, INSTANCE_NUMBER,
      &        NRHS, LRHS,
      &        NZ_RHS, LSOL_loc,Nloc_RHS, LRHS_loc, LREDRHS
@@ -59,7 +57,6 @@ C
       INTEGER, TARGET :: LISTVAR_SCHUR(*)
       INTEGER, TARGET :: IRHS_PTR(*), IRHS_SPARSE(*)
       INTEGER, TARGET :: ISOL_loc(*), IRHS_loc(*)
-      INTEGER, TARGET :: BLKPTR(*), BLKVAR(*)
       DOUBLE PRECISION, TARGET :: A(*), A_ELT(*), A_loc(*), RHS(*)
       DOUBLE PRECISION, TARGET :: WK_USER(*)
       DOUBLE PRECISION, TARGET :: REDRHS(*)
@@ -74,8 +71,7 @@ C
       INTEGER, INTENT(in) :: SAVE_PREFIX(SAVE_PREFIX_MAX_LENGTH)
       INTEGER METIS_OPTIONS(40)
       INTEGER IRNhere, JCNhere, Ahere, ELTPTRhere, ELTVARhere,
-     &        A_ELThere, BLKPTRhere, BLKVARhere, PERM_INhere,
-     &        WK_USERhere,
+     &        A_ELThere, PERM_INhere, WK_USERhere,
      &        RHShere, REDRHShere, IRN_lochere,
      &        JCN_lochere, A_lochere, LISTVAR_SCHURhere,
      &        SCHURhere, COLSCAhere, ROWSCAhere, RHS_SPARSEhere,
@@ -92,8 +88,8 @@ C
      &  mumps_par_array_bis
       INTEGER, SAVE :: DMUMPS_STRUC_ARRAY_SIZE = 0
       INTEGER, SAVE :: N_INSTANCES = 0
-      INTEGER I, Np, IERR
-      INTEGER(8) :: A_ELT_SIZE, NNZ_i
+      INTEGER A_ELT_SIZE, I, Np, IERR
+      INTEGER(8) :: NNZ_i
       INTEGER DMUMPS_STRUC_ARRAY_SIZE_INIT
       PARAMETER (DMUMPS_STRUC_ARRAY_SIZE_INIT=10)
       EXTERNAL MUMPS_ASSIGN_MAPPING,
@@ -155,12 +151,11 @@ C
         CALL MUMPS_ABORT()
       END IF
       mumps_par => mumps_par_array(INSTANCE_NUMBER)%PTR
-      mumps_par%SYM  = SYM
-      mumps_par%PAR  = PAR
-      mumps_par%JOB  = JOB
-      mumps_par%N    = N
-      mumps_par%NBLK = NBLK
-      mumps_par%NZ   = NZ
+      mumps_par%SYM = SYM
+      mumps_par%PAR = PAR
+      mumps_par%JOB = JOB
+      mumps_par%N   = N
+      mumps_par%NZ  = NZ
       mumps_par%NNZ  = NNZ
       mumps_par%NZ_loc  = NZ_loc
       mumps_par%NNZ_loc  = NNZ_loc
@@ -205,7 +200,7 @@ C
       IF ( ELTVARhere /= 0 ) mumps_par%ELTVAR =>
      &   ELTVAR(1:ELTPTR(NELT+1)-1)
       IF ( A_ELThere /= 0 ) THEN
-        A_ELT_SIZE = 0_8
+        A_ELT_SIZE = 0
         DO I = 1, NELT
           Np = ELTPTR(I+1) -ELTPTR(I)
           IF (SYM == 0) THEN
@@ -214,10 +209,8 @@ C
             A_ELT_SIZE = A_ELT_SIZE + Np * ( Np + 1 ) / 2
           END IF
         END DO
-        mumps_par%A_ELT => A_ELT(1_8:A_ELT_SIZE)
+        mumps_par%A_ELT => A_ELT(1:A_ELT_SIZE)
       END IF
-      IF ( BLKPTRhere /= 0 ) mumps_par%BLKPTR => BLKPTR(1:NBLK+1)
-      IF ( BLKVARhere /= 0 ) mumps_par%BLKVAR => BLKVAR(1:N)
       IF ( PERM_INhere /= 0) mumps_par%PERM_IN => PERM_IN(1:N)
       IF ( LISTVAR_SCHURhere /= 0)
      &   mumps_par%LISTVAR_SCHUR =>LISTVAR_SCHUR(1:SIZE_SCHUR)
@@ -225,10 +218,8 @@ C
         mumps_par%SCHUR_CINTERFACE=>SCHUR(1:1)
       ENDIF
       IF (NRHS .NE. 1) THEN
-        IF ( RHShere /= 0 ) mumps_par%RHS =>
-     &                      RHS(1_8:int(NRHS,8)*int(LRHS,8))
-        IF (REDRHShere /= 0)mumps_par%REDRHS=>
-     &                      REDRHS(1_8:int(NRHS,8)*int(LREDRHS,8))
+        IF ( RHShere /= 0 ) mumps_par%RHS => RHS(1:NRHS*LRHS)
+        IF (REDRHShere /= 0)mumps_par%REDRHS=>REDRHS(1:NRHS*LREDRHS)
       ELSE
         IF ( RHShere /= 0 ) mumps_par%RHS => RHS(1:N)
         IF (REDRHShere /= 0)mumps_par%REDRHS=>REDRHS(1:SIZE_SCHUR)
@@ -247,9 +238,9 @@ C
       IF ( IRHS_SPARSEhere /=0 ) mumps_par%IRHS_SPARSE=>
      &                          IRHS_SPARSE(1:NZ_RHS)
       IF ( SOL_lochere /=0 ) mumps_par%SOL_loc=>
-     &                          SOL_loc(1_8:int(LSOL_loc,8)*int(NRHS,8))
+     &                          SOL_loc(1:LSOL_loc*NRHS)
       IF ( RHS_lochere /=0 ) mumps_par%RHS_loc=>
-     &                          RHS_loc(1_8:int(LRHS_loc,8)*int(NRHS,8))
+     &                          RHS_loc(1:LRHS_loc*NRHS)
       IF ( ISOL_lochere /=0 ) mumps_par%ISOL_loc=>
      &                          ISOL_loc(1:LSOL_loc)
       IF ( IRHS_lochere /=0 ) mumps_par%IRHS_loc=>
@@ -297,33 +288,32 @@ C
       DKEEP(1:230) = mumps_par%DKEEP(1:230)
       KEEP8(1:150) = mumps_par%KEEP8(1:150)
       METIS_OPTIONS(1:40) = mumps_par%METIS_OPTIONS(1:40)
-      SYM        = mumps_par%SYM
-      PAR        = mumps_par%PAR
-      JOB        = mumps_par%JOB
-      N          = mumps_par%N
-      NBLK       = mumps_par%NBLK
-      NZ         = mumps_par%NZ
-      NNZ        = mumps_par%NNZ
-      NRHS       = mumps_par%NRHS
-      LRHS       = mumps_par%LRHS
-      LREDRHS    = mumps_par%LREDRHS
-      NZ_loc     = mumps_par%NZ_loc
-      NNZ_loc    = mumps_par%NNZ_loc
-      NZ_RHS     = mumps_par%NZ_RHS
-      LSOL_loc   = mumps_par%LSOL_loc
-      Nloc_RHS   = mumps_par%Nloc_RHS
-      LRHS_loc   = mumps_par%LRHS_loc
-      SIZE_SCHUR = mumps_par%SIZE_SCHUR
-      LWK_USER   = mumps_par%LWK_USER
-      NELT       = mumps_par%NELT
+      SYM = mumps_par%SYM
+      PAR = mumps_par%PAR
+      JOB = mumps_par%JOB
+      N   = mumps_par%N
+      NZ  = mumps_par%NZ
+      NNZ = mumps_par%NNZ
+      NRHS = mumps_par%NRHS
+      LRHS = mumps_par%LRHS
+      LREDRHS = mumps_par%LREDRHS
+      NZ_loc  = mumps_par%NZ_loc
+      NNZ_loc  = mumps_par%NNZ_loc
+      NZ_RHS  = mumps_par%NZ_RHS
+      LSOL_loc = mumps_par%LSOL_loc
+      Nloc_RHS = mumps_par%Nloc_RHS
+      LRHS_loc = mumps_par%LRHS_loc
+      SIZE_SCHUR  = mumps_par%SIZE_SCHUR
+      LWK_USER = mumps_par%LWK_USER
+      NELT= mumps_par%NELT
       DEFICIENCY = mumps_par%Deficiency
-      SCHUR_MLOC = mumps_par%SCHUR_MLOC
-      SCHUR_NLOC = mumps_par%SCHUR_NLOC
-      SCHUR_LLD  = mumps_par%SCHUR_LLD
-      MBLOCK     = mumps_par%MBLOCK
-      NBLOCK     = mumps_par%NBLOCK
-      NPROW      = mumps_par%NPROW
-      NPCOL      = mumps_par%NPCOL
+      SCHUR_MLOC   = mumps_par%SCHUR_MLOC
+      SCHUR_NLOC   = mumps_par%SCHUR_NLOC
+      SCHUR_LLD    = mumps_par%SCHUR_LLD
+      MBLOCK       = mumps_par%MBLOCK
+      NBLOCK       = mumps_par%NBLOCK
+      NPROW        = mumps_par%NPROW
+      NPCOL        = mumps_par%NPCOL
       IF ( associated (mumps_par%MAPPING) ) THEN
          CALL MUMPS_ASSIGN_MAPPING(mumps_par%MAPPING(1))
       ELSE

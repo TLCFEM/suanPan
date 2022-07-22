@@ -1,15 +1,14 @@
 C
-C  This file is part of MUMPS 5.5.1, released
-C  on Tue Jul 12 13:17:24 UTC 2022
+C  This file is part of MUMPS 5.2.1, released
+C  on Fri Jun 14 14:46:05 UTC 2019
 C
 C
-C  Copyright 1991-2022 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license 
-C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
-C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
+C  released under the CeCILL-C license:
+C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
 C
       MODULE DMUMPS_PARALLEL_ANALYSIS
       USE DMUMPS_STRUC_DEF
@@ -55,8 +54,8 @@ C
       USE DMUMPS_STRUC_DEF
       IMPLICIT NONE
       TYPE(DMUMPS_STRUC)   :: id
-      INTEGER, TARGET  :: WORK1(:), WORK2(:)
-      INTEGER          :: NFSIZ(:), FILS(:), FRERE(:)
+      INTEGER, POINTER     :: WORK1(:), WORK2(:),
+     &     NFSIZ(:), FILS(:), FRERE(:)
       TYPE(ORD_TYPE)       :: ord
       INTEGER, POINTER     :: IPE(:), NV(:),
      &     NE(:), NA(:), NODE(:),
@@ -66,9 +65,6 @@ C
       INTEGER              :: MYID, NPROCS, IERR, NEMIN, LDIAG
       LOGICAL              :: SPLITROOT
       INTEGER(8), PARAMETER :: K79REF=12000000_8
-      INTEGER, PARAMETER :: LIDUMMY = 1
-      INTEGER :: IDUMMY(1) 
-      DOUBLE PRECISION      :: TIMEB
       nullify(IPE, NV, NE, NA, NODE, ND, SUBORD, NAMALG, IPS,
      &     CUMUL, SAVEIRN, SAVEJCN)
       CALL MPI_COMM_RANK (id%COMM, MYID, IERR)
@@ -101,14 +97,7 @@ C
       CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
      &     id%COMM, id%MYID )
       IF ( id%INFO(1) .LT. 0 ) RETURN
-      IF (PROKG) CALL MUMPS_SECDEB( TIMEB )
       CALL DMUMPS_DO_PAR_ORD(id, ord, WORK2)
-      IF (PROKG) THEN
-       CALL MUMPS_SECFIN( TIMEB )
-       WRITE(MPG,
-     &   '(" ELAPSED time in parallel ordering       =",F12.4)')
-     &   TIMEB
-      ENDIF
       CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
      &     id%COMM, id%MYID )
       IF ( id%INFO(1) .LT. 0 ) RETURN
@@ -152,11 +141,11 @@ C
      &        NA(1), NFSIZ(1), NODE(1), id%INFOG(6), FILS(1), FRERE(1),
      &        ND(1), NEMIN, SUBORD(1), id%KEEP(60), id%KEEP(20),
      &        id%KEEP(38), NAMALG(1), id%KEEP(104), CUMUL(1),
-     &        id%KEEP(50), id%ICNTL(13), id%KEEP(37), id%KEEP(197),
-     &        id%NSLAVES, id%KEEP(250).EQ.1, .FALSE., IDUMMY, LIDUMMY)
+     &        id%KEEP(50), id%ICNTL(13), id%KEEP(37), id%NSLAVES,
+     &        id%KEEP(250).EQ.1)
          CALL MUMPS_DEALLOC(CUMUL, NV, IPE, MEMCNT=MEMCNT)
          CALL DMUMPS_ANA_M(NE(1), ND(1), id%INFOG(6), id%INFOG(5),
-     &        id%KEEP(2), id%KEEP(50), id%KEEP8(101), id%KEEP(108),
+     &        id%KEEP(2), id%KEEP(50), id%KEEP(101), id%KEEP(108),
      &        id%KEEP(5), id%KEEP(6), id%KEEP(226), id%KEEP(253))
          IF ( id%KEEP(53) .NE. 0 ) THEN
             CALL MUMPS_MAKE1ROOT(id%N, FRERE(1), FILS(1), NFSIZ(1),
@@ -187,9 +176,8 @@ C
           IF (id%KEEP(210).EQ.1) THEN
             SPLITROOT = .FALSE. 
             IF ( id%KEEP(62).GE.1) THEN
-               IDUMMY(1) = -1
                CALL DMUMPS_CUTNODES(id%N, FRERE(1), FILS(1),
-     &              NFSIZ(1), IDUMMY, LIDUMMY, id%INFOG(6),
+     &              NFSIZ(1), id%INFOG(6),
      &              id%NSLAVES, id%KEEP(1), id%KEEP8(1), SPLITROOT,
      &              MP, LDIAG, id%INFOG(1), id%INFOG(2))
                IF (id%INFOG(1).LT.0) RETURN
@@ -200,10 +188,8 @@ C
      &        (id%NSLAVES.GT.id%ICNTL(13))) .OR.
      &        (id%ICNTL(13).EQ.-1)) .AND. (id%KEEP(60).EQ.0)
          IF (SPLITROOT) THEN
-            IDUMMY(1) = -1
             CALL DMUMPS_CUTNODES(id%N, FRERE(1), FILS(1), NFSIZ(1),
-     &           IDUMMY, LIDUMMY, id%INFOG(6), 
-     &           id%NSLAVES, id%KEEP(1), id%KEEP8(1),
+     &           id%INFOG(6), id%NSLAVES, id%KEEP(1), id%KEEP8(1),
      &           SPLITROOT, MP, LDIAG, id%INFOG(1), id%INFOG(2))
             IF (id%INFOG(1).LT.0) RETURN
          ENDIF
@@ -302,13 +288,13 @@ C
          ord%MYID       = id%MYID
          ord%IDO        = (id%MYID .GE. 1) .OR. (id%KEEP(46) .EQ. 1)
          IF(PROKG) WRITE(MPG,
-     &        '(" Using PT-SCOTCH for parallel ordering")')
+     &        '("Using PT-SCOTCH for parallel ordering.")')
          RETURN
 #else
          id%INFOG(1) = -38
          id%INFO(1)  = -38
          IF(id%MYID .EQ.0 ) WRITE(LP,
-     &        '(" PT-SCOTCH not available")')
+     &        '("PT-SCOTCH not available.")')
          RETURN
 #endif
       ELSE IF (id%KEEP(245) .EQ. 2) THEN
@@ -341,13 +327,13 @@ C
          ord%SUBSTRAT = 0
          ord%MYID     = id%MYID
          IF(PROKG) WRITE(MPG,
-     &        '(" Using ParMETIS for parallel ordering")')
+     &        '("Using ParMETIS for parallel ordering.")')
          RETURN
 #else
          id%INFOG(1) = -38
          id%INFO(1)  = -38
          IF(id%MYID .EQ.0 ) WRITE(LP,
-     &        '(" ParMETIS not available.")')
+     &        '("ParMETIS not available.")')
          RETURN
 #endif
       END IF
@@ -356,7 +342,7 @@ C
       IMPLICIT NONE
       TYPE(DMUMPS_STRUC)            :: id
       TYPE(ORD_TYPE)                :: ord
-      INTEGER                       :: WORK(:)
+      INTEGER, POINTER              :: WORK(:)
 #if defined(parmetis) || defined(parmetis3)
       INTEGER                       :: IERR
 #endif
@@ -387,7 +373,7 @@ C
       IMPLICIT NONE
       TYPE(DMUMPS_STRUC)  :: id
       TYPE(ORD_TYPE)      :: ord
-      INTEGER, TARGET    :: WORK(:)
+      INTEGER, POINTER    :: WORK(:)
       INTEGER             :: I, MYID, NPROCS, IERR, BASE, METIS_IDX_SIZE
       INTEGER, POINTER    :: FIRST(:),
      &     LAST(:), SWORK(:)
@@ -402,7 +388,7 @@ C
       CALL MPI_COMM_RANK (id%COMM, MYID, IERR)
       CALL MPI_COMM_SIZE (id%COMM, NPROCS, IERR)
       IERR=0
-      IF(size(WORK) .LT. id%N*3) THEN
+      IF(MUMPS_GETSIZE(WORK) .LT. id%N*3) THEN
          WRITE(LP,
      &        '("Insufficient workspace inside DMUMPS_PARMETIS_ORD")')
          CALL MUMPS_ABORT()
@@ -510,12 +496,11 @@ C
 #endif
 #if defined(ptscotch)
       SUBROUTINE DMUMPS_PTSCOTCH_ORD(id, ord, WORK)
-!$    USE OMP_LIB
       IMPLICIT NONE
       INCLUDE 'ptscotchf.h'
       TYPE(DMUMPS_STRUC)            :: id
       TYPE(ORD_TYPE)                :: ord
-      INTEGER, TARGET               :: WORK(:)
+      INTEGER, POINTER              :: WORK(:)
       INTEGER                       :: MYID, NPROCS, IERR
       INTEGER, POINTER              :: FIRST(:),
      &     LAST(:), SWORK(:)
@@ -524,9 +509,8 @@ C
       INTEGER(8)                    :: EDGELOCNBR
       INTEGER(8), POINTER           :: VERTLOCTAB(:)
       INTEGER, POINTER              :: EDGELOCTAB(:)
-      INTEGER :: PTHREAD_NUMBER, NOMP
       nullify(FIRST, LAST, SWORK, VERTLOCTAB, EDGELOCTAB)
-      IF (size(WORK) .LT. id%N*3) THEN
+      IF(MUMPS_GETSIZE(WORK) .LT. id%N*3) THEN
          WRITE(LP,
      &      '("Insufficient workspace inside DMUMPS_PTSCOTCH_ORD")')
          CALL MUMPS_ABORT()
@@ -563,12 +547,6 @@ C
       IF(MEMCNT .GT. MAXMEM) MAXMEM=MEMCNT
       IF(ord%IDO) THEN
          CALL MUMPS_SCOTCH_INTSIZE(SCOTCH_INT_SIZE)
-         NOMP=0
-!$       NOMP=omp_get_max_threads()
-         IF (NOMP .GT. 0) THEN
-           CALL MUMPS_SCOTCH_GET_PTHREAD_NUMBER (PTHREAD_NUMBER)
-           CALL MUMPS_SCOTCH_SET_PTHREAD_NUMBER (NOMP)
-         ENDIF
          IF(SCOTCH_INT_SIZE.EQ.32) THEN
            IF (id%KEEP(10).EQ.1) THEN
             id%INFO(1) = -52
@@ -587,9 +565,6 @@ C
      &           EDGELOCNBR, EDGELOCTAB,
      &           IERR)
          END IF
-         IF (NOMP .GT. 0) THEN
-           CALL MUMPS_SCOTCH_SET_PTHREAD_NUMBER (PTHREAD_NUMBER)
-         ENDIF
       END IF
       IF(IERR.NE.0) THEN
          id%INFO(1:2) = -50
@@ -865,7 +840,7 @@ C
       DO I=ANODE+1, id%NSLAVES
          ord%FIRST(BASE+I) = id%N+1
          ord%LAST(BASE+I) = id%N
-      END DO            
+      END DO      
       DEALLOCATE(LIST, ALIST, AWEIGHTS, WORK)
  90   continue
       RETURN
@@ -875,7 +850,7 @@ C
       TYPE(DMUMPS_STRUC)   :: id
       TYPE(ORD_TYPE)       :: ord
       INTEGER, POINTER     :: GPE(:), GNV(:)
-      INTEGER, TARGET      :: WORK(:)
+      INTEGER, POINTER     :: WORK(:)
       TYPE(GRAPH_TYPE)     :: top_graph
       INTEGER(8), POINTER  :: IPE(:), IPET(:),
      &     BUF_PE1(:), BUF_PE2(:), TMP1(:)
@@ -885,7 +860,7 @@ C
      &     DEGREE(:), W(:), PERM(:),
      &     LISTVAR_SCHUR(:), NEXT(:),
      &     HEAD(:), NV(:), ELEN(:),
-     &     LSTVAR(:)
+     &     RCVCNT(:), LSTVAR(:)
       INTEGER, POINTER     :: MYLIST(:),
      &     LPERM(:),
      &     LIPERM(:),
@@ -909,13 +884,13 @@ C
       INTEGER              :: THRESH
       nullify(PE, IPE, LENG, I_HALO_MAP, NCLIQUES)
       nullify(NDENSE, LAST, DEGREE, W, PERM, LISTVAR_SCHUR,
-     &     NEXT, HEAD, NV, ELEN, LSTVAR)
+     &     NEXT, HEAD, NV, ELEN, RCVCNT, LSTVAR)
       nullify(MYLIST, LVARPT,
      &     LPERM, LIPERM, IPET, NVT, BUF_PE1, BUF_PE2,
      &     BUF_NV1, BUF_NV2, ROOTPERM, TMP1, TMP2, BWORK)
       CALL MPI_COMM_RANK (id%COMM, MYID, IERR)
       CALL MPI_COMM_SIZE (id%COMM, NPROCS, IERR)
-      IF(size(WORK) .LT. 4*id%N) THEN
+      IF(MUMPS_GETSIZE(WORK) .LT. 4*id%N) THEN
          WRITE(LP,*)'Insufficient workspace in DMUMPS_PARSYMFACT'
          CALL MUMPS_ABORT()
       ELSE
@@ -966,7 +941,7 @@ C
          LISTVAR_SCHUR(I) = NROWS_LOC+I
       END DO
       THRESH = -1
-      AGG6   = .FALSE.
+      AGG6   = .TRUE.
       PFREES = IPE(NROWS_LOC+1)
       PFS_SAVE = PFREES
       PELEN = PFREES-1 + 2_8*int(NROWS_LOC+ord%TOPNODES(2),8)
@@ -978,8 +953,8 @@ C
          ELSE
             JOB = 1
          END IF
-         IF(HIDX .GT.0) CALL MUMPS_SYMQAMD_NEW(JOB, THRESH, NDENSE(1),
-     &        HIDX, PELEN, IPE(1), PFREES, LENG(1), PE(1), NV(1), 
+         CALL MUMPS_SYMQAMD_NEW(JOB, THRESH, NDENSE(1), HIDX,
+     &        PELEN, IPE(1), PFREES, LENG(1), PE(1), NV(1), 
      &        ELEN(1), LAST(1), NCMPA, DEGREE(1), HEAD(1), NEXT(1), 
      &        W(1), PERM(1), LISTVAR_SCHUR(1), SIZE_SCHUR, AGG6)
       MYNCLIQUES = 0
@@ -1087,8 +1062,8 @@ C
                PERM(I) = I
             END DO
             PELEN = max(PFREET+int(TGSIZE,8),1_8)
-            IF(TGSIZE.GT.0) CALL MUMPS_SYMQAMD_NEW(2, -1, NDENSE(1),
-     &           TGSIZE, PELEN, IPET(1), PFREET, LENG(1), PE(1), 
+            CALL MUMPS_SYMQAMD_NEW(2, -1, NDENSE(1), TGSIZE,
+     &           PELEN, IPET(1), PFREET, LENG(1), PE(1), 
      &           NVT(1), ELEN(1), LAST(1), NCMPA, DEGREE(1), HEAD(1), 
      &           NEXT(1), W(1), PERM(1), LISTVAR_SCHUR(1), TOTNCLIQUES, 
      &           AGG6)
@@ -1205,7 +1180,7 @@ C
      &     MEMCNT=MEMCNT)
       CALL MUMPS_DEALLOC(LPERM, LIPERM, NVT, MEMCNT=MEMCNT)
       CALL MUMPS_DEALLOC(ROOTPERM, TMP2, MEMCNT=MEMCNT)
-      NULLIFY(HEAD, ELEN, LENG, PERM)
+      NULLIFY(HEAD, ELEN, LENG, PERM, RCVCNT)
       RETURN
       END SUBROUTINE DMUMPS_PARSYMFACT
       SUBROUTINE DMUMPS_MAKE_LOC_IDX(id, TOPNODES, LPERM, LIPERM, ord)
@@ -1221,7 +1196,7 @@ C
       IF(MEMCNT .GT. MAXMEM) MAXMEM=MEMCNT
       LPERM = 0
       K = 1 
-      DO I=TOPNODES(1), 1, -1
+      DO I=1, TOPNODES(1)
          DO J=TOPNODES(2*I+1), TOPNODES(2*I+2)
             GIDX        = ord%PERITAB(J) 
             LPERM(GIDX) = K
@@ -1393,11 +1368,11 @@ C
      &                           RCVPNT, PNT, SAVEPNT, DUPS, TOTDUPS
       INTEGER                 :: NROWS_LOC
       INTEGER                 :: STATUS(MPI_STATUS_SIZE)
-      INTEGER, POINTER        :: MAPTAB(:)
+      INTEGER, POINTER        :: MAPTAB(:), SDISPL(:)
       INTEGER(8), POINTER     :: MSGCNT(:), SNDCNT(:), RCVCNT(:)
       INTEGER, POINTER        :: RDISPL(:), BUFLEVEL(:),
      &     SIPES(:,:), LENG(:)
-      INTEGER, POINTER        :: TSENDI(:),
+      INTEGER, POINTER        :: PCNT(:), TSENDI(:),
      &     TSENDJ(:), RCVBUF(:)
       TYPE(ARRPNT), POINTER   :: APNT(:)
       INTEGER                 :: BUFSIZE, SOURCE, MAXS, allocok
@@ -1408,9 +1383,9 @@ C
 #if defined(DETERMINISTIC_PARALLEL_GRAPH)
       INTEGER                 :: L
 #endif
-      nullify(MAPTAB, SNDCNT, RCVCNT)
+      nullify(MAPTAB, SNDCNT, RCVCNT, SDISPL)
       nullify(RDISPL, MSGCNT, SIPES, LENG, BUFLEVEL)
-      nullify(TSENDI, TSENDJ, RCVBUF, APNT)
+      nullify(PCNT, TSENDI, TSENDJ, RCVBUF, APNT)
       CALL MPI_COMM_RANK (id%COMM, MYID, IERR)
       CALL MPI_COMM_SIZE (id%COMM, NPROCS, IERR)
       IF(MUMPS_GETSIZE(WORK) .LT. id%N*2) THEN
@@ -1563,7 +1538,7 @@ C
          SYMMETRY = dble(TOTDUPS)/(dble(id%KEEP8(28))-dble(id%N))
          SYMMETRY = min(SYMMETRY,1.0d0)
          IF(id%KEEP(50) .GE. 1) SYMMETRY = 1.d0
-         IF(PROKG) WRITE(MPG,'(" Structural symmetry is:",i3,"%")')
+         IF(PROKG) WRITE(MPG,'("Structural symmetry is:",i3,"%")')
      &        ceiling(SYMMETRY*100.d0)
          id%INFOG(8) = ceiling(SYMMETRY*100.0d0)
       END IF
@@ -1604,10 +1579,10 @@ C
       INTEGER                :: STATUS(MPI_STATUS_SIZE)
       INTEGER(8), POINTER    :: MSGCNT(:), SNDCNT(:), RCVCNT(:)
       INTEGER, POINTER       :: MAPTAB(:),
-     &     HALO_MAP(:), BUFLEVEL(:)
+     &     SDISPL(:), HALO_MAP(:), BUFLEVEL(:)
       INTEGER, POINTER       :: RDISPL(:),
      &     SIPES(:,:)
-      INTEGER, POINTER       :: TSENDI(:),
+      INTEGER, POINTER       :: PCNT(:), TSENDI(:),
      &     TSENDJ(:), RCVBUF(:)
       TYPE(ARRPNT), POINTER  :: APNT(:)
       INTEGER                :: BUFSIZE, SOURCE, MAXS, allocok
@@ -1615,9 +1590,9 @@ C
       INTEGER, PARAMETER     :: ITAG=30
       INTEGER(KIND=8)        :: TLEN
       LOGICAL                :: FLAG
-      nullify(MAPTAB, SNDCNT, RCVCNT, HALO_MAP)
+      nullify(MAPTAB, SNDCNT, RCVCNT, SDISPL, HALO_MAP)
       nullify(RDISPL, MSGCNT, SIPES, BUFLEVEL)
-      nullify(TSENDI, TSENDJ, RCVBUF, APNT)
+      nullify(PCNT, TSENDI, TSENDJ, RCVBUF, APNT)
       CALL MPI_COMM_RANK (id%COMM, MYID, IERR)
       CALL MPI_COMM_SIZE (id%COMM, NPROCS, IERR)
       IF(MUMPS_GETSIZE(WORK) .LT. id%N*2) THEN
@@ -2377,12 +2352,10 @@ C
       CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
      &     COMM, id%MYID )
       IF ( id%INFO(1) .LT. 0 ) GOTO 10
-      IF ( id%KEEP(10) .NE. 1 ) THEN
-        CALL MUMPS_ICOPY_64TO32(ORDER_I8(1),
-     &       size(ORDER), ORDER(1))
-        CALL MUMPS_ICOPY_64TO32(SIZES_I8(1),
-     &       size(SIZES), SIZES(1))
-      ENDIF
+      CALL MUMPS_ICOPY_64TO32(ORDER_I8(1),
+     &     size(ORDER), ORDER(1))
+      CALL MUMPS_ICOPY_64TO32(SIZES_I8(1),
+     &     size(SIZES), SIZES(1))
  10   CONTINUE 
       CALL MUMPS_I8DEALLOC(FIRST_I8, MEMCNT=MEMCNT)
       CALL MUMPS_I8DEALLOC(SIZES_I8, MEMCNT=MEMCNT)

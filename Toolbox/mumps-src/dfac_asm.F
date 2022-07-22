@@ -1,15 +1,14 @@
 C
-C  This file is part of MUMPS 5.5.1, released
-C  on Tue Jul 12 13:17:24 UTC 2022
+C  This file is part of MUMPS 5.2.1, released
+C  on Fri Jun 14 14:46:05 UTC 2019
 C
 C
-C  Copyright 1991-2022 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license 
-C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
-C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
+C  released under the CeCILL-C license:
+C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
 C
       SUBROUTINE DMUMPS_ASM_SLAVE_MASTER(N, INODE, IW, LIW, A, LA, 
      &    ISON, NBROWS, NBCOLS, ROWLIST,
@@ -37,6 +36,7 @@ C
      &        LDAFS_PERE, IBEG, DIAG
       INCLUDE 'mumps_headers.h'
       LOGICAL SAME_PROC
+      INTRINSIC real
       IOLDPS = PTLUST_S(STEP(INODE))
       POSELT = PTRAST(STEP(INODE))
       NFRONT = IW(IOLDPS+KEEP(IXSZ))
@@ -286,10 +286,9 @@ C
      &              + int((NBROWS-1),8)*int(NBCOLF,8)
             IDIAG = 0
             DO I=NBROWS,1,-1
-             DO J=1,NBCOLS-IDIAG
-               K8 = APOS+int(J-1,8)
-               A_PTR(K8) = A_PTR(K8) + VALSON(J,I)
-             ENDDO
+             A_PTR(APOS:APOS+int(NBCOLS-IDIAG-1,8))= 
+     &         A_PTR(APOS:APOS+int(NBCOLS-IDIAG-1,8)) +
+     &         VALSON(1:NBCOLS-IDIAG,I)
              APOS = APOS - int(NBCOLF,8)
              IDIAG = IDIAG + 1
             ENDDO
@@ -364,9 +363,6 @@ C
                 IPOSCB = IPOSCB + 1_8
               ENDDO
             ELSE
-#if defined(__ve__)
-!NEC$ IVDEP
-#endif
               DO J=1, I
                 APOS = POSELT + int(IW( J ),8)
                 A(IAFATH+ APOS -1_8) = A(IACB+IPOSCB-1_8)
@@ -375,9 +371,6 @@ C
               ENDDO
             ENDIF
           ELSE
-#if defined(__ve__)
-!NEC$ IVDEP
-#endif
             DO J=1, I
               APOS = POSELT + int(IW( J ),8)
               A(IAFATH+ APOS -1_8) = A(IACB+IPOSCB-1_8)
@@ -423,17 +416,11 @@ C
 !$    LOGICAL    :: OMP_FLAG
       IF ((ETATASS.EQ.0) .OR. (ETATASS.EQ.1)) THEN
         IPOSCB = 1_8
-#if defined(__ve__)
-!NEC$ IVDEP
-#endif
         DO I = 1, NELIM
           POSELT = int( IW( I ) - 1, 8 ) * int(NFRONT, 8)
           IF (.NOT. CB_IS_COMPRESSED) THEN
             IPOSCB = 1_8 + int( I - 1, 8 ) * int(NCOLS,8)
           ENDIF
-#if defined(__ve__)
-!NEC$ IVDEP
-#endif
           DO J = 1, I
             APOS = POSELT + int(IW( J ),8)
             A(IAFATH+ APOS -1_8) = A(IAFATH+ APOS -1_8)
@@ -453,9 +440,6 @@ C
           ENDIF
           POSELT = int(IW( I ),8)
           IF (POSELT.LE. int(NASS1,8)) THEN 
-#if defined(__ve__)
-!NEC$ IVDEP
-#endif
             DO J = 1, NELIM
               APOS = POSELT + int( IW( J ) - 1, 8 ) * int(NFRONT,8)
               A(IAFATH+APOS-1_8) = A(IAFATH+APOS-1_8) +
@@ -464,9 +448,6 @@ C
             END DO
           ELSE
             POSELT = int( IW( I ) - 1, 8 ) * int(NFRONT, 8)
-#if defined(__ve__)
-!NEC$ IVDEP
-#endif
             DO J = 1, NELIM
              APOS = POSELT + int(IW( J ), 8)
              A(IAFATH+APOS-1_8) = A(IAFATH+APOS-1_8)
@@ -485,9 +466,6 @@ C
             END DO
           ELSE
             POSELT = int( IW( I ) - 1, 8 ) * int(NFRONT, 8)
-#if defined(__ve__)
-!NEC$ IVDEP
-#endif
             DO J = NELIM + 1, I
              APOS = POSELT + int(IW( J ), 8)
              A(IAFATH+APOS-1_8) = A(IAFATH+APOS-1_8)
@@ -783,206 +761,3 @@ C
       ENDDO
       RETURN
       END SUBROUTINE DMUMPS_ASM_SLAVE_ARROWHEADS
-      SUBROUTINE DMUMPS_SET_PARPIVT1 ( INODE, NFRONT, NASS1, KEEP,
-     &                                 LR_ACTIVATED, PARPIV_T1)
-       IMPLICIT NONE
-      INTEGER, intent(in)  :: INODE, NFRONT, NASS1, KEEP(500)
-      LOGICAL, intent(in)  :: LR_ACTIVATED
-      INTEGER, intent(out) :: PARPIV_T1
-      INTEGER :: NCB
-      LOGICAL, EXTERNAL :: DMUMPS_IS_TRSM_LARGE_ENOUGH, 
-     &                     DMUMPS_IS_GEMM_LARGE_ENOUGH
-      PARPIV_T1 = KEEP(269)
-      IF (PARPIV_T1.EQ.-3) THEN
-        PARPIV_T1 = 0
-      ENDIF
-      IF (PARPIV_T1.EQ.77) THEN
-       PARPIV_T1 = 0
-      ENDIF
-      IF (PARPIV_T1.EQ.0) RETURN
-      IF ( (PARPIV_T1.EQ.-2).AND.LR_ACTIVATED ) THEN
-         PARPIV_T1 = 1
-      ENDIF
-      NCB = NFRONT-NASS1
-      IF (PARPIV_T1.EQ.-2) THEN
-         IF ( 
-     &   ( DMUMPS_IS_TRSM_LARGE_ENOUGH ( NASS1, NCB
-     &                                 ) 
-     &   )
-     &   .OR. 
-     &   ( DMUMPS_IS_GEMM_LARGE_ENOUGH ( NCB, NCB, NASS1
-     &                                 ) 
-     &   )
-     &       ) THEN
-            PARPIV_T1 = 1
-         ELSE
-            PARPIV_T1 = 0
-         ENDIF
-      ENDIF
-      IF (NCB.EQ.KEEP(253)) THEN
-       PARPIV_T1 = 0
-      ENDIF
-      RETURN
-      END SUBROUTINE DMUMPS_SET_PARPIVT1 
-      LOGICAL FUNCTION DMUMPS_IS_TRSM_LARGE_ENOUGH 
-     &           ( M, N
-     &           )
-      IMPLICIT NONE
-      INTEGER, INTENT(in) :: M, N
-      DOUBLE PRECISION    :: AI 
-      INTEGER, PARAMETER  :: THRES_AI = 400
-      AI = ( dble(M)*dble(N) ) /
-     &     ( dble(M)/dble(2) + dble(2)*dble(N) )
-      DMUMPS_IS_TRSM_LARGE_ENOUGH = (AI.GE.dble(THRES_AI))
-      RETURN
-      END FUNCTION DMUMPS_IS_TRSM_LARGE_ENOUGH
-      LOGICAL FUNCTION DMUMPS_IS_GEMM_LARGE_ENOUGH 
-     &           ( M, N, K
-     &           )
-      IMPLICIT NONE
-      INTEGER, INTENT(in) :: M, N, K
-      DOUBLE PRECISION    :: AI 
-      INTEGER, PARAMETER  :: THRES_AI = 400
-      AI = ( dble(2)*dble(M)*dble(N)*dble(K) ) /
-     &     ( dble(M)*dble(N) + dble(M)*dble(K) + dble(K)*dble(N) )
-      DMUMPS_IS_GEMM_LARGE_ENOUGH = (AI.GE.dble(THRES_AI))
-      RETURN
-      END FUNCTION DMUMPS_IS_GEMM_LARGE_ENOUGH
-      SUBROUTINE DMUMPS_PARPIVT1_SET_MAX ( INODE, 
-     &                           A, LAELL8, KEEP, NFRONT, 
-     &                           NASS1, NVSCHUR_K253, NB_POSTPONED)
-       IMPLICIT NONE
-      INTEGER(8), intent(in) :: LAELL8
-      INTEGER, intent(in)    :: INODE
-      INTEGER, intent(in)    :: KEEP(500), NFRONT, NASS1, 
-     &                          NVSCHUR_K253
-      INTEGER, intent(in)    :: NB_POSTPONED
-      DOUBLE PRECISION, intent(inout) :: A(LAELL8)
-      INTEGER(8) :: APOSMAX, APOS, NASS1_8, NFRONT_8
-      INTEGER    :: I, J, NCB
-      DOUBLE PRECISION    :: ZERO
-      DOUBLE PRECISION       :: RMAX
-      PARAMETER( ZERO = 0.0D0 )
-      NASS1_8  = int(NASS1, 8)
-      NFRONT_8 = int(NFRONT, 8)
-      NCB      =  NFRONT-NASS1-NVSCHUR_K253
-       IF ((NCB.EQ.0).AND.(NVSCHUR_K253.EQ.0)) CALL MUMPS_ABORT()
-       APOSMAX  = LAELL8 - NASS1_8 + 1_8
-       A(APOSMAX:APOSMAX+NASS1_8-1_8)= ZERO
-       IF (NCB.EQ.0) RETURN
-      IF (KEEP(50).EQ.2) THEN
-       APOS = 1_8 + (NASS1_8*NFRONT_8)
-       DO I = 1, NCB
-        DO J = 1, NASS1
-         RMAX = dble(A(APOSMAX+int(J,8)-1_8))
-         RMAX = max(RMAX, abs(A(APOS+int(J,8)-1_8)))
-         A(APOSMAX+int(J,8)-1_8) = RMAX
-        ENDDO
-        APOS = APOS+NFRONT_8
-       ENDDO
-      ELSE
-       APOS = 1_8 + NASS1_8
-       DO I = 1, NASS1
-        RMAX =  dble(A(APOSMAX+int(I,8)-1_8))
-        DO J = 1, NCB
-         RMAX =  max(RMAX, abs(A(APOS+int(J,8)-1)))
-        ENDDO
-        A(APOSMAX+int(I,8)-1_8) = RMAX
-        APOS = APOS+NFRONT_8
-       ENDDO
-      ENDIF
-      CALL DMUMPS_UPDATE_PARPIV_ENTRIES ( INODE,
-     &     KEEP, A(APOSMAX), NASS1, NB_POSTPONED)
-      RETURN
-      END SUBROUTINE DMUMPS_PARPIVT1_SET_MAX
-      SUBROUTINE DMUMPS_UPDATE_PARPIV_ENTRIES ( INODE,
-     &           KEEP, PARPIV, LPARPIV, 
-     &           NB_POSTPONED)
-      IMPLICIT NONE
-      INTEGER, intent(in)   :: INODE, LPARPIV, KEEP(500)
-      DOUBLE PRECISION, intent(inout):: PARPIV(LPARPIV)
-      INTEGER, intent(in)   :: NB_POSTPONED
-      INTEGER    :: I
-      DOUBLE PRECISION       :: EPS, RMIN, RZERO, RTMP
-      DOUBLE PRECISION       :: RMAX
-      LOGICAL    :: UPDATE_PARPIV
-      PARAMETER( RZERO = 0.0D0 )
-      UPDATE_PARPIV=.FALSE.
-      RMIN      = huge(RZERO)
-      RMAX      = RZERO
-      EPS       = sqrt(epsilon(RZERO))*0.01D0
-      DO I = 1, LPARPIV
-        RTMP = dble(PARPIV(I))
-        IF (RTMP.GT.RZERO) THEN
-         RMIN = min(RMIN,  RTMP)
-        ELSE
-         UPDATE_PARPIV=.TRUE.
-        ENDIF
-        IF (RTMP.LE.EPS) UPDATE_PARPIV=.TRUE.
-        RMAX=  max(RMAX,dble(PARPIV(I)))
-      ENDDO
-      IF (UPDATE_PARPIV) THEN
-       IF (RMIN.LT.huge(RMIN)) THEN
-        RMAX= min (RMAX, EPS)
-        DO I = 1, LPARPIV-NB_POSTPONED
-          RTMP = dble(PARPIV(I))
-          IF (RTMP.LE.EPS) THEN
-            PARPIV(I) = -RMAX
-          ENDIF
-        ENDDO
-        IF (NB_POSTPONED.GT.0) THEN
-         DO I=LPARPIV-NB_POSTPONED+1, LPARPIV
-          RTMP = dble(PARPIV(I))
-          IF (RTMP.LE.EPS) THEN
-            PARPIV(I) = -RMAX
-          ENDIF
-         ENDDO
-        ENDIF
-       ENDIF
-      ENDIF
-      RETURN
-      END SUBROUTINE DMUMPS_UPDATE_PARPIV_ENTRIES
-      SUBROUTINE DMUMPS_PARPIVT1_SET_NVSCHUR_MAX
-     &    (N, INODE, IW, LIW, A, LA, KEEP, PERM,
-     &     IOLDPS, POSELT, 
-     &     NFRONT, NASS1, LR_ACTIVATED, PARPIV_T1, 
-     &     NB_POSTPONED)
-      USE DMUMPS_FAC_FRONT_AUX_M, ONLY: DMUMPS_GET_SIZE_SCHUR_IN_FRONT
-      IMPLICIT NONE
-      INTEGER, intent(in)    :: N, INODE, LIW, IOLDPS,
-     &                          NFRONT, NASS1, NB_POSTPONED
-      INTEGER(8), intent(in) :: LA, POSELT
-      INTEGER, intent(in)    :: IW (LIW), PERM(N), KEEP(500)
-      LOGICAL, intent(in)    :: LR_ACTIVATED
-      DOUBLE PRECISION, intent(inout) :: A(LA)
-      INTEGER, intent(inout) :: PARPIV_T1
-      INTEGER     :: NVSCHUR_K253, IROW_L
-      INTEGER(8)  :: LAELL8, NFRONT8
-      INCLUDE 'mumps_headers.h'
-      IF (PARPIV_T1.EQ.-999) THEN
-        CALL DMUMPS_SET_PARPIVT1 ( INODE, NFRONT, NASS1, KEEP, 
-     &                             LR_ACTIVATED, PARPIV_T1) 
-      ELSE IF ((PARPIV_T1.NE.0.AND.PARPIV_T1.NE.1)) THEN
-       PARPIV_T1 = 0
-      ENDIF
-      IF (PARPIV_T1.NE.0) THEN
-          IF ((KEEP(114).EQ.1) .AND. (KEEP(116).GT.0) ) THEN
-             IROW_L = IOLDPS+6+KEEP(IXSZ)+NASS1
-             CALL DMUMPS_GET_SIZE_SCHUR_IN_FRONT ( 
-     &                   N, 
-     &                   NFRONT-NASS1, 
-     &                   KEEP(116), 
-     &                   IW(IROW_L), PERM, 
-     &                   NVSCHUR_K253 )
-          ELSE
-             NVSCHUR_K253 = KEEP(253)
-          ENDIF
-          NFRONT8 = int(NFRONT,8)
-          LAELL8  = NFRONT8 * NFRONT8 + int(NASS1,8)
-          CALL DMUMPS_PARPIVT1_SET_MAX ( INODE, 
-     &                            A(POSELT), LAELL8, KEEP, 
-     &                            NFRONT, NASS1, NVSCHUR_K253,
-     &                            NB_POSTPONED )
-      ENDIF
-      RETURN
-      END SUBROUTINE DMUMPS_PARPIVT1_SET_NVSCHUR_MAX

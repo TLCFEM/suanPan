@@ -1,21 +1,19 @@
 C
-C  This file is part of MUMPS 5.5.1, released
-C  on Tue Jul 12 13:17:24 UTC 2022
+C  This file is part of MUMPS 5.2.1, released
+C  on Fri Jun 14 14:46:05 UTC 2019
 C
 C
-C  Copyright 1991-2022 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license 
-C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
-C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
+C  released under the CeCILL-C license:
+C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
 C
       SUBROUTINE DMUMPS_END_DRIVER( id )
       USE DMUMPS_OOC
       USE DMUMPS_STRUC_DEF
       USE DMUMPS_BUF
-      USE DMUMPS_FACSOL_L0OMP_M, ONLY: DMUMPS_FREE_L0_OMP_FACTORS
       IMPLICIT NONE
       include 'mpif.h'
       TYPE( DMUMPS_STRUC ) :: id
@@ -26,7 +24,7 @@ C
 C     Explicit needed because of pointer arguments
       INTERFACE
       SUBROUTINE DMUMPS_FREE_ID_DATA_MODULES(id_FDM_F_ENCODING,
-     &  id_BLRARRAY_ENCODING, KEEP8, K34)
+     &  id_BLRARRAY_ENCODING, KEEP8)
 #     if defined(MUMPS_F2003)
       CHARACTER, DIMENSION(:), POINTER, intent(inout) ::
      &                                            id_BLRARRAY_ENCODING
@@ -37,7 +35,6 @@ C     Explicit needed because of pointer arguments
       CHARACTER, DIMENSION(:), POINTER :: id_FDM_F_ENCODING
 #     endif
       INTEGER(8), intent(inout) :: KEEP8(150)
-      INTEGER, intent(in) :: K34
       END SUBROUTINE DMUMPS_FREE_ID_DATA_MODULES
       END INTERFACE
       I_AM_SLAVE = ( id%MYID .ne. MASTER .OR. id%KEEP(46) .NE. 0 )
@@ -72,7 +69,6 @@ C       old SP2 in Bonn.)
 C       Free communicator related to load messages.
         CALL MPI_COMM_FREE( id%COMM_LOAD, IERR )
       END IF
-      CALL MUMPS_DESTROY_ARCH_NODE_COMM( id%KEEP(411) )
 C     -----------------------------------
 C     Right-hand-side is always user data
 C     We do not free it.
@@ -122,6 +118,10 @@ C     -------------------------------------
       IF (associated(id%IS)) THEN
         DEALLOCATE(id%IS)
         NULLIFY(id%IS)
+      ENDIF
+      IF (associated(id%IS1)) THEN
+        DEALLOCATE(id%IS1)
+        NULLIFY(id%IS1)
       ENDIF
       IF (associated(id%STEP))      THEN
         DEALLOCATE(id%STEP)
@@ -186,6 +186,10 @@ c     ---------------------
       IF (associated(id%PROCNODE_STEPS)) THEN
         DEALLOCATE(id%PROCNODE_STEPS)
         NULLIFY(id%PROCNODE_STEPS)
+      ENDIF
+      IF (associated(id%PROCNODE)) THEN
+        DEALLOCATE(id%PROCNODE)
+        NULLIFY(id%PROCNODE)
       ENDIF
       IF (associated(id%RHSCOMP)) THEN
         DEALLOCATE(id%RHSCOMP)
@@ -359,7 +363,7 @@ c     ENDIF
         ENDIF
 !     ENDIF
       CALL DMUMPS_FREE_ID_DATA_MODULES(id%FDM_F_ENCODING,
-     &  id%BLRARRAY_ENCODING, id%KEEP8(1), id%KEEP(34))
+     &  id%BLRARRAY_ENCODING, id%KEEP8(1))
       IF (associated(id%MPITOOMP_PROCS_MAP)) THEN
         DEALLOCATE(id%MPITOOMP_PROCS_MAP)
         NULLIFY(id%MPITOOMP_PROCS_MAP)
@@ -389,6 +393,11 @@ C       ------------------------
 C       Deallocate buffer for integers (facto/solve)
         CALL DMUMPS_BUF_DEALL_SMALL_BUF( IERR )
       END IF
+C     --------------
+C     Receive buffer
+C     --------------
+      IF ( associated( id%BUFR ) ) DEALLOCATE( id%BUFR )
+      NULLIFY( id%BUFR )
 C Mapping information used during solve
       IF (associated(id%IPTR_WORKING)) THEN
         DEALLOCATE(id%IPTR_WORKING)
@@ -398,13 +407,13 @@ C Mapping information used during solve
         DEALLOCATE(id%WORKING)
         NULLIFY(id%WORKING)
       END IF
-      IF (associated(id%IPOOL_B_L0_OMP)) THEN
-        DEALLOCATE(id%IPOOL_B_L0_OMP)
-        NULLIFY(id%IPOOL_B_L0_OMP)
+      IF (associated(id%IPOOL_AFTER_L0_OMP)) THEN
+        DEALLOCATE(id%IPOOL_AFTER_L0_OMP)
+        NULLIFY(id%IPOOL_AFTER_L0_OMP)
       END IF
-      IF (associated(id%IPOOL_A_L0_OMP)) THEN
-        DEALLOCATE(id%IPOOL_A_L0_OMP)
-        NULLIFY(id%IPOOL_A_L0_OMP)
+      IF (associated(id%IPOOL_BEFORE_L0_OMP)) THEN
+        DEALLOCATE(id%IPOOL_BEFORE_L0_OMP)
+        NULLIFY(id%IPOOL_BEFORE_L0_OMP)
       END IF
       IF (associated(id%PHYS_L0_OMP)) THEN
         DEALLOCATE(id%PHYS_L0_OMP)
@@ -413,10 +422,6 @@ C Mapping information used during solve
       IF (associated(id%VIRT_L0_OMP)) THEN
         DEALLOCATE(id%VIRT_L0_OMP)
         NULLIFY(id%VIRT_L0_OMP)
-      END IF
-      IF (associated(id%VIRT_L0_OMP_MAPPING)) THEN
-        DEALLOCATE(id%VIRT_L0_OMP_MAPPING)
-        NULLIFY(id%VIRT_L0_OMP_MAPPING)
       END IF
       IF (associated(id%PERM_L0_OMP)) THEN
         DEALLOCATE(id%PERM_L0_OMP)
@@ -430,21 +435,10 @@ C Mapping information used during solve
         DEALLOCATE(id%L0_OMP_MAPPING)
         NULLIFY(id%L0_OMP_MAPPING)
       END IF
-      IF (associated(id%I4_L0_OMP)) THEN
-        DEALLOCATE(id%I4_L0_OMP)
-        NULLIFY(id%I4_L0_OMP)
-      END IF
-      IF (associated(id%I8_L0_OMP)) THEN
-        DEALLOCATE(id%I8_L0_OMP)
-        NULLIFY(id%I8_L0_OMP)
-      END IF
-      IF (associated(id%L0_OMP_FACTORS)) THEN
-        CALL DMUMPS_FREE_L0_OMP_FACTORS(id%L0_OMP_FACTORS)
-      END IF
       RETURN
       END SUBROUTINE DMUMPS_END_DRIVER
       SUBROUTINE DMUMPS_FREE_ID_DATA_MODULES(id_FDM_F_ENCODING,
-     &  id_BLRARRAY_ENCODING, KEEP8, K34)
+     &  id_BLRARRAY_ENCODING, KEEP8)
       USE MUMPS_FRONT_DATA_MGT_M, only : MUMPS_FDM_STRUC_TO_MOD,
      &                                   MUMPS_FDM_END
       USE DMUMPS_LR_DATA_M, only : DMUMPS_BLR_STRUC_TO_MOD,
@@ -475,7 +469,6 @@ C
       CHARACTER, DIMENSION(:), POINTER :: id_FDM_F_ENCODING
 #     endif
       INTEGER(8), intent(inout) :: KEEP8(150)
-      INTEGER, intent(in) :: K34
 C
       IF (associated(id_FDM_F_ENCODING)) THEN
 C       Allow access to FDM_F data for BLR_END_MODULE
@@ -484,7 +477,7 @@ C       Allow access to FDM_F data for BLR_END_MODULE
 C         Pass id_BLRARRAY_ENCODING control to module
 C         and terminate BLR module of current instance
           CALL DMUMPS_BLR_STRUC_TO_MOD(id_BLRARRAY_ENCODING)
-          CALL DMUMPS_BLR_END_MODULE(0, KEEP8, K34,
+          CALL DMUMPS_BLR_END_MODULE(0, KEEP8, 
      &                               LRSOLVE_ACT_OPT=.TRUE.)
         ENDIF
 C       ---------------------------------------

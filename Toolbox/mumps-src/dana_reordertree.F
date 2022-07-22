@@ -1,26 +1,25 @@
 C
-C  This file is part of MUMPS 5.5.1, released
-C  on Tue Jul 12 13:17:24 UTC 2022
+C  This file is part of MUMPS 5.2.1, released
+C  on Fri Jun 14 14:46:05 UTC 2019
 C
 C
-C  Copyright 1991-2022 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license 
-C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
-C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
+C  released under the CeCILL-C license:
+C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
 C
       SUBROUTINE DMUMPS_REORDER_TREE(N,FRERE, STEP, FILS,
      &     NA,LNA,NE,ND, DAD, LDAD, USE_DAD,
-     &     NSTEPS,PERM,SYM,INFO,LP,K215,K234,K55,K199,
+     &     NSTEPS,PERM,SYM,INFO,LP,K215,K234,K55,
      &     PROCNODE,SLAVEF, PEAK,SBTR_WHICH_M
      &     )
       IMPLICIT NONE
       INTEGER N,PERM,SYM, NSTEPS, LNA, LP,LDAD
       INTEGER FRERE(NSTEPS), FILS(N), STEP(N)
       INTEGER NA(LNA), NE(NSTEPS), ND(NSTEPS)
-      INTEGER K215,K234,K55,K199
+      INTEGER K215,K234,K55
       INTEGER DAD(LDAD)
       LOGICAL USE_DAD
       INTEGER INFO(80)
@@ -244,7 +243,7 @@ C
         ENDIF
         IF((PERM.EQ.4).OR.(PERM.EQ.3))THEN
            IF(MUMPS_IN_OR_ROOT_SSARBR(PROCNODE(STEP(INODE)),
-     &         K199))THEN
+     &         SLAVEF))THEN
               DEPTH(STEP(INODE))=0
            ENDIF
         ENDIF
@@ -338,7 +337,7 @@ C
              ENDIF
              IF(PERM.EQ.2)THEN
                 IF (MUMPS_IN_OR_ROOT_SSARBR(PROCNODE(STEP(INODE)),
-     &               K199))THEN
+     &               SLAVEF))THEN
                    TAB1(II)=M_TOTAL(STEP(SON(II)))-SIZECB
      &                  -fact(STEP(SON(II)))
                    TAB2(II)=SIZECB
@@ -349,7 +348,7 @@ C
              ENDIF
              IF(PERM.EQ.3)THEN
                 IF (MUMPS_IN_OR_ROOT_SSARBR(PROCNODE(STEP(INODE)),
-     &               K199))THEN
+     &               SLAVEF))THEN
                    TAB1(II)=M(STEP(SON(II)))-SIZECB
                    TAB2(II)=SIZECB               
                 ELSE
@@ -359,7 +358,7 @@ C
              ENDIF
              IF(PERM.EQ.4)THEN
                 IF (MUMPS_IN_OR_ROOT_SSARBR(PROCNODE(STEP(INODE)),
-     &               K199))THEN
+     &               SLAVEF))THEN
                    TAB1(II)=M(STEP(SON(II)))-
      &                  SIZECB-fact(STEP(SON(II)))
                    TAB2(II)=SIZECB             
@@ -604,7 +603,7 @@ C
               CALL MUMPS_GET_FLOPS_COST(NFR4,NELIM4,NELIM4,
      &             SYM,1,COST_NODE)
               IF(IFATH.NE.0)THEN
-                 IF(MUMPS_INSSARBR(PROCNODE(STEP(INODE)),K199))THEN
+                 IF(MUMPS_INSSARBR(PROCNODE(STEP(INODE)),SLAVEF))THEN
                     COST_TRAV(STEP(INODE))=COST_TRAV(STEP(
      &                   ROOT_OF_CUR_SBTR))
                  ELSE
@@ -621,7 +620,7 @@ C
            TEMP(I)=IN
            IF((PERM.EQ.5).OR.(PERM.EQ.6))THEN
               IF((SLAVEF.NE.1).AND.(.NOT.MUMPS_IN_OR_ROOT_SSARBR(
-     &             PROCNODE(STEP(INODE)),K199)))THEN
+     &             PROCNODE(STEP(INODE)),SLAVEF)))THEN
                  NFR4   = ND(STEP(INODE))
                  NFR    = int(NFR4,8)
                  NELIM4 = 0
@@ -645,7 +644,7 @@ C
         ENDDO
         IF((PERM.EQ.5).OR.(PERM.EQ.6))THEN
            IF((SLAVEF.NE.1).AND.(.NOT.MUMPS_IN_OR_ROOT_SSARBR(
-     &          PROCNODE(STEP(INODE)),K199)))THEN
+     &          PROCNODE(STEP(INODE)),SLAVEF)))THEN
               CALL DMUMPS_FUSION_SORT(TEMP,NE(STEP(INODE)),TAB1,TAB2,
      &             LOCAL_PERM
      &             ,RESULT,T1,T2)
@@ -729,7 +728,7 @@ C
       END SUBROUTINE DMUMPS_REORDER_TREE
       SUBROUTINE DMUMPS_BUILD_LOAD_MEM_INFO(N,FRERE, STEP, FILS,
      &     NA,LNA,NE,ND, DAD, LDAD, USE_DAD,
-     &     NSTEPS,PERM,SYM,INFO,LP,K47,K81,K76,K215,K234,K55,KEEP199,
+     &     NSTEPS,PERM,SYM,INFO,LP,K47,K81,K76,K215,K234,K55,
      &     PROCNODE,MEM_SUBTREE,SLAVEF, SIZE_MEM_SBTR, PEAK
      &     ,SBTR_WHICH_M,SIZE_DEPTH_FIRST,SIZE_COST_TRAV,
      &     DEPTH_FIRST_TRAV,DEPTH_FIRST_SEQ,COST_TRAV,MY_FIRST_LEAF,
@@ -739,7 +738,7 @@ C
       INTEGER N,PERM,SYM, NSTEPS, LNA, LP, SIZE_MEM_SBTR,LDAD
       INTEGER FRERE(NSTEPS), FILS(N), STEP(N)
       INTEGER NA(LNA), NE(NSTEPS), ND(NSTEPS)
-      INTEGER K47,K81,K76,K215,K234,K55,KEEP199
+      INTEGER K47,K81,K76,K215,K234,K55
       INTEGER DAD(LDAD)
       LOGICAL USE_DAD
       INTEGER INFO(80)
@@ -968,7 +967,7 @@ C
            CALL MUMPS_ABORT()
         ENDIF
         IF(SIZE_SBTR.NE.0)THEN 
-           IF(.NOT.MUMPS_INSSARBR(PROCNODE(STEP(INODE)),KEEP199))THEN
+           IF(.NOT.MUMPS_INSSARBR(PROCNODE(STEP(INODE)),SLAVEF))THEN
               IF ( K47 == 4 .OR. ((K81.GE.1).AND.(K47.GE.2))) THEN
                  IF((SLAVEF.NE.1))THEN
                     MY_FIRST_LEAF(INDICE(ID+1)-1,ID+1)=FIRST_LEAF
@@ -979,13 +978,13 @@ C
               ENDIF
            ENDIF
         ENDIF
-        IF(MUMPS_ROOTSSARBR(PROCNODE(STEP(INODE)),KEEP199))THEN
+        IF(MUMPS_ROOTSSARBR(PROCNODE(STEP(INODE)),SLAVEF))THEN
            ROOT_OF_CUR_SBTR=INODE
         ENDIF
         IF (K76.EQ.4)THEN
            IF(SLAVEF.NE.1)THEN
               WRITE(*,*)'INODE=',INODE,'RANK',RANK_TRAV
-              IF(MUMPS_INSSARBR(PROCNODE(STEP(INODE)),KEEP199))THEN
+              IF(MUMPS_INSSARBR(PROCNODE(STEP(INODE)),SLAVEF))THEN
                  DEPTH_FIRST_TRAV(STEP(INODE))=DEPTH_FIRST_TRAV(STEP(
      &                ROOT_OF_CUR_SBTR))
               ELSE
@@ -1020,7 +1019,7 @@ C
               CALL MUMPS_GET_FLOPS_COST(NFR4,NELIM4,NELIM4,
      &             SYM,1,COST_NODE)
               IF(IFATH.NE.0)THEN
-                 IF(MUMPS_INSSARBR(PROCNODE(STEP(INODE)),KEEP199))THEN
+                 IF(MUMPS_INSSARBR(PROCNODE(STEP(INODE)),SLAVEF))THEN
                     COST_TRAV(STEP(INODE))=COST_TRAV(STEP(
      &                   ROOT_OF_CUR_SBTR))
                  ELSE
@@ -1038,9 +1037,9 @@ C
         ENDIF
         IF ( K47 == 4 .OR. ((K81.GE.1).AND.(K47.GE.2))) THEN
               IF((SLAVEF.NE.1).AND.
-     &          MUMPS_ROOTSSARBR(PROCNODE(STEP(INODE)),KEEP199))THEN
+     &          MUMPS_ROOTSSARBR(PROCNODE(STEP(INODE)),SLAVEF))THEN
                 IF (NE(STEP(INODE)).NE.0) THEN
-                   ID=MUMPS_PROCNODE(PROCNODE(STEP(INODE)),KEEP199)
+                   ID=MUMPS_PROCNODE(PROCNODE(STEP(INODE)),SLAVEF)
                    IF((SBTR_WHICH_M.EQ.1).AND.(PERM.NE.1))THEN
                       MEM_SUBTREE(INDICE(ID+1),ID+1)=
      &                     dble(M_TOTAL(STEP(INODE)))
@@ -1053,7 +1052,7 @@ C
                 ENDIF
               ENDIF
               IF((SLAVEF.EQ.1).AND.FRERE(STEP(INODE)).EQ.0)THEN
-                 ID=MUMPS_PROCNODE(PROCNODE(STEP(INODE)),KEEP199)
+                 ID=MUMPS_PROCNODE(PROCNODE(STEP(INODE)),SLAVEF)
                  IF((SBTR_WHICH_M.EQ.1).AND.(PERM.NE.1))THEN
                     MEM_SUBTREE(INDICE(ID+1),ID+1)=
      &                   dble(M_TOTAL(STEP(INODE)))
@@ -1079,7 +1078,7 @@ C
         IF(NE(STEP(INODE)).EQ.0)THEN
            IF ( K47 == 4 .OR. ((K81.GE.1).AND.(K47.GE.2))) THEN
               IF(SLAVEF.NE.1)THEN
-                 IF(MUMPS_INSSARBR(PROCNODE(STEP(INODE)),KEEP199))THEN
+                 IF(MUMPS_INSSARBR(PROCNODE(STEP(INODE)),SLAVEF))THEN
                     IF(FIRST_LEAF.EQ.-9999)THEN
                        FIRST_LEAF=INODE
                     ENDIF
@@ -1127,18 +1126,18 @@ C
            ENDIF
  9600      CONTINUE
            IF(SLAVEF.NE.1)THEN
-              ID=MUMPS_PROCNODE(PROCNODE(STEP(INODE)),KEEP199)
+              ID=MUMPS_PROCNODE(PROCNODE(STEP(INODE)),SLAVEF)
               DEPTH_FIRST_TRAV(STEP(INODE))=CUR_DEPTH_FIRST_RANK
               DEPTH_FIRST_SEQ(CUR_DEPTH_FIRST_RANK)=INODE
               CUR_DEPTH_FIRST_RANK=CUR_DEPTH_FIRST_RANK+1
               IF(MUMPS_IN_OR_ROOT_SSARBR(PROCNODE(STEP(INODE)),
-     &             KEEP199))THEN
+     &             SLAVEF))THEN
                  SBTR_ID(STEP(INODE))=OOC_CUR_SBTR
               ELSE
                  SBTR_ID(STEP(INODE))=-9999
               ENDIF
               IF(MUMPS_ROOTSSARBR(PROCNODE(STEP(INODE)),
-     &             KEEP199))THEN
+     &             SLAVEF))THEN
                  OOC_CUR_SBTR=OOC_CUR_SBTR+1
               ENDIF
            ENDIF

@@ -1,15 +1,14 @@
 C
-C  This file is part of MUMPS 5.5.1, released
-C  on Tue Jul 12 13:17:24 UTC 2022
+C  This file is part of MUMPS 5.2.1, released
+C  on Fri Jun 14 14:46:05 UTC 2019
 C
 C
-C  Copyright 1991-2022 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license 
-C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
-C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
+C  released under the CeCILL-C license:
+C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
 C
       RECURSIVE SUBROUTINE DMUMPS_END_FACTO_SLAVE(
      &    COMM_LOAD, ASS_IRECV, 
@@ -21,7 +20,7 @@ C
      &    IWPOS, IWPOSCB, IPTRLU, LRLU, LRLUS, IW, LIW, A, LA,
      &    PTRIST, PTLUST_S, PTRFAC, PTRAST, STEP, PIMASTER,
      &    PAMASTER,
-     &    NSTK, COMP, IFLAG, IERROR, PERM,
+     &    NSTK, COMP, IFLAG, IERROR, NBPROCFILS,
      &    IPOOL, LPOOL, LEAF, NBFIN, SLAVEF,
      &    OPASSW, OPELIW, ITLOC, RHS_MUMPS, FILS, DAD, PTRARW, PTRAIW,
      &    INTARR, DBLARR, ICNTL, KEEP,KEEP8,DKEEP, ND, FRERE,
@@ -64,7 +63,7 @@ C
       INTEGER(8) :: PAMASTER(KEEP(28))
       INTEGER STEP(N), PIMASTER(KEEP(28))
       INTEGER COMP, IFLAG, IERROR
-      INTEGER PERM(N)
+      INTEGER NBPROCFILS( KEEP(28) )
       INTEGER LPOOL, LEAF
       INTEGER IPOOL( LPOOL )
       INTEGER NBFIN, SLAVEF
@@ -116,8 +115,7 @@ C
      &         (KEEP(486).EQ.2) 
      &       )
      &       .AND..NOT.COMPRESS_CB) THEN
-          CALL DMUMPS_BLR_END_FRONT(IW(IOLDPS+XXF), IFLAG, KEEP8,
-     &                              KEEP(34))
+          CALL DMUMPS_BLR_END_FRONT(IW(IOLDPS+XXF), IFLAG, KEEP8)
         ENDIF
         IW(IOLDPS+XXS)=S_ALL
          IOLDPS = PTRIST(STEP(INODE))
@@ -199,7 +197,7 @@ C
      &    IWPOS, IWPOSCB, IPTRLU, LRLU, LRLUS, IW, LIW, A, LA,
      &    PTRIST, PTLUST_S, PTRFAC, PTRAST, STEP, PIMASTER,
      &    PAMASTER,
-     &    NSTK, COMP, IFLAG, IERROR, PERM,
+     &    NSTK, COMP, IFLAG, IERROR, NBPROCFILS,
      &    IPOOL, LPOOL, LEAF, NBFIN, SLAVEF,
      &    OPASSW, OPELIW, ITLOC, RHS_MUMPS, FILS, DAD, PTRARW, PTRAIW,
      &    INTARR,DBLARR,ICNTL,KEEP,KEEP8,DKEEP,.FALSE.,ND,FRERE,
@@ -284,7 +282,7 @@ C
      &  PROCNODE_STEPS, SLAVEF, POSFAC, IWPOS, IWPOSCB, IPTRLU, LRLU,
      &  LRLUS, N, IW, LIW, A, LA, PTRIST, PTLUST_S, PTRFAC,
      &  PTRAST, STEP, PIMASTER, PAMASTER, NSTK, COMP,
-     &  IFLAG, IERROR, MYID, COMM, PERM, IPOOL, LPOOL, LEAF,
+     &  IFLAG, IERROR, MYID, COMM, NBPROCFILS, IPOOL, LPOOL, LEAF,
      &  NBFIN, ICNTL, KEEP,KEEP8,DKEEP,
      &  root, OPASSW, OPELIW,
      &  ITLOC, RHS_MUMPS,
