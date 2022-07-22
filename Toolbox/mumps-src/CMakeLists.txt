@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.13.0)
 project(mumps C Fortran)
 
 if (CMAKE_Fortran_COMPILER MATCHES "ifx")
-    set(CMAKE_Fortran_COMPILER "ifort")
+    set(CMAKE_Fortran_COMPILER "gfortran")
 endif ()
 
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../../Libs)
@@ -32,7 +32,7 @@ endif ()
 file(GLOB mumps_f "*.F")
 file(GLOB mumps_c "*.c")
 
-add_library(mumps_f_mod OBJECT lr_common.F dlr_type.F dmumps_struc_def.F dlr_stats.F front_data_mgt_m.F dmumps_lr_data_m.F dlr_core.F dmumps_comm_buffer.F)
+add_library(mumps_f_mod OBJECT lr_common.F dlr_type.F dmumps_struc_def.F dlr_stats.F front_data_mgt_m.F dmumps_lr_data_m.F dlr_core.F dmumps_comm_buffer.F ana_blk_m.F)
 add_library(mumps_f_lib OBJECT ${mumps_f})
 add_library(mumps_c_lib OBJECT ${mumps_c})
 

@@ -1,16 +1,17 @@
 C
-C  This file is part of MUMPS 5.2.1, released
-C  on Fri Jun 14 14:46:05 UTC 2019
+C  This file is part of MUMPS 5.5.1, released
+C  on Tue Jul 12 13:17:24 UTC 2022
 C
 C
-C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2022 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license:
-C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+C  released under the CeCILL-C license 
+C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
-       MODULE IDLL
+      MODULE MUMPS_IDLL
       IMPLICIT NONE
       TYPE IDLL_NODE_T
           TYPE ( IDLL_NODE_T ), POINTER :: NEXT, PREV
@@ -438,11 +439,11 @@ C
 #endif
           INTEGER :: LENGTH
           TYPE ( IDLL_NODE_T ), POINTER :: AUX
+          LENGTH = 0
           IF ( .NOT. associated ( DLL ) ) THEN
               IDLL_LENGTH = -1
               RETURN
           END IF
-          LENGTH = 0
           AUX => DLL%FRONT
           DO WHILE ( associated ( AUX ) )
               LENGTH = LENGTH + 1
@@ -508,7 +509,7 @@ C
               RETURN
           END IF
           LENGTH = IDLL_LENGTH(DLL)
-          ALLOCATE ( ARRAY ( LENGTH ), STAT=IERR )
+          ALLOCATE ( ARRAY ( max(1,LENGTH) ), STAT=IERR )
           IF ( IERR .NE. 0 ) THEN
               IDLL_2_ARRAY = -2
               RETURN
@@ -522,8 +523,8 @@ C
           END DO
           IDLL_2_ARRAY = 0
       END FUNCTION IDLL_2_ARRAY
-      END MODULE IDLL
-      MODULE DDLL
+      END MODULE MUMPS_IDLL
+      MODULE MUMPS_DDLL
       IMPLICIT NONE
       TYPE DDLL_NODE_T
           TYPE ( DDLL_NODE_T ), POINTER :: NEXT, PREV
@@ -1022,8 +1023,7 @@ C
               RETURN
           END IF
           LENGTH = DDLL_LENGTH(DLL)
-          I = DDLL_LENGTH(DLL)
-          ALLOCATE ( ARRAY ( I ), STAT=IERR )
+          ALLOCATE ( ARRAY ( max(1,LENGTH) ), STAT=IERR )
           IF ( IERR .NE. 0 ) THEN
               DDLL_2_ARRAY = -2
               RETURN
@@ -1037,4 +1037,4 @@ C
           END DO
           DDLL_2_ARRAY = 0
       END FUNCTION DDLL_2_ARRAY
-      END MODULE DDLL
+      END MODULE MUMPS_DDLL

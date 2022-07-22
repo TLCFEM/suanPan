@@ -1,14 +1,15 @@
 C
-C  This file is part of MUMPS 5.2.1, released
-C  on Fri Jun 14 14:46:05 UTC 2019
+C  This file is part of MUMPS 5.5.1, released
+C  on Tue Jul 12 13:17:24 UTC 2022
 C
 C
-C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2022 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license:
-C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+C  released under the CeCILL-C license 
+C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
       SUBROUTINE DMUMPS_INIT_POOL_LAST3(IPOOL, LPOOL, LEAF)
       USE DMUMPS_LOAD
@@ -21,11 +22,11 @@ C
       RETURN
       END SUBROUTINE DMUMPS_INIT_POOL_LAST3
       SUBROUTINE DMUMPS_INSERT_POOL_N
-     &           (N, POOL, LPOOL, PROCNODE, SLAVEF,
+     &           (N, POOL, LPOOL, PROCNODE, SLAVEF, KEEP199,
      &           K28, K76, K80, K47, STEP, INODE)
       USE DMUMPS_LOAD
       IMPLICIT NONE
-      INTEGER N, INODE, LPOOL, K28, SLAVEF, K76, K80, K47
+      INTEGER N, INODE, LPOOL, K28, SLAVEF, K76, K80, K47, KEEP199
       INTEGER STEP(N), POOL(LPOOL), PROCNODE(K28)
       EXTERNAL MUMPS_IN_OR_ROOT_SSARBR
       LOGICAL MUMPS_IN_OR_ROOT_SSARBR, ATM_CURRENT_NODE
@@ -45,7 +46,7 @@ C
       ENDIF
       IF(((INODE.GT.0).AND.(INODE.LE.N)).AND.(.NOT.
      &     MUMPS_IN_OR_ROOT_SSARBR(PROCNODE(STEP(INODE_EFF)),
-     &               SLAVEF))
+     &               KEEP199))
      &  ) THEN
          IF ((K80 == 1 .AND. K47 .GE. 1) .OR.
      &     (( K80 == 2 .OR. K80==3 ) .AND.
@@ -54,15 +55,12 @@ C
          ENDIF
       ENDIF
       IF ( MUMPS_IN_OR_ROOT_SSARBR(PROCNODE(STEP(INODE_EFF)),
-     &                             SLAVEF) ) THEN
+     &                             KEEP199) ) THEN
         POOL(NBINSUBTREE + 1 ) = INODE
         NBINSUBTREE = NBINSUBTREE + 1
       ELSE
          POS_TO_INSERT=NBTOP+1
          IF((K76.EQ.4).OR.(K76.EQ.5).OR.(K76.EQ.6))THEN
-#if defined(NOT_ATM_POOL_SPECIAL)
-            J=NBTOP
-#else
             IF((INODE.GT.N).OR.(INODE.LE.0))THEN
                DO J=NBTOP,1,-1
                   IF((POOL(LPOOL-2-J).GT.0)
@@ -106,19 +104,8 @@ C
                POS_TO_INSERT=POS_TO_INSERT-1
             ENDDO
  888        CONTINUE
-#endif
             DO I=J,1,-1
-#if defined(NOT_ATM_POOL_SPECIAL)
-               IF ( POOL(LPOOL-2-I) < 0 ) THEN
-                  NODE=-POOL(LPOOL-2-I)
-               ELSE IF ( POOL(LPOOL-2-I) > N ) THEN
-                  NODE = POOL(LPOOL-2-I) - N
-               ELSE
-                  NODE = POOL(LPOOL-2-I)
-               ENDIF
-#else
                NODE=POOL(LPOOL-2-I)
-#endif
                IF((K76.EQ.4).OR.(K76.EQ.6))THEN
                   IF(DEPTH_FIRST_LOAD(STEP(NODE)).GE.
      &                 DEPTH_FIRST_LOAD(STEP(INODE_EFF)))THEN
@@ -263,9 +250,7 @@ C
       IF ( LEFT ) THEN
          INODE = POOL( NBINSUBTREE )
          IF(KEEP(81).EQ.2)THEN
-#if ! defined(NOT_ATM_POOL_SPECIAL)
             IF((INODE.GE.0).AND.(INODE.LE.N))THEN
-#endif
                CALL DMUMPS_MEM_NODE_SELECT(INODE,POOL,LPOOL,N,
      &              STEP,KEEP,KEEP8,PROCNODE,SLAVEF,MYID,SBTR_FLAG,
      &              PROC_FLAG,MIN_PROC)
@@ -274,13 +259,9 @@ C
                   LEFT=.FALSE.
                   GOTO 222
                ENDIF
-#if ! defined(NOT_ATM_POOL_SPECIAL)
             ENDIF
-#endif
          ELSEIF(KEEP(81).EQ.3)THEN
-#if ! defined(NOT_ATM_POOL_SPECIAL)
             IF((INODE.GE.0).AND.(INODE.LE.N))THEN
-#endif
                NODE_TO_EXTRACT=INODE
                FLAG_MEM=.FALSE.
                CALL DMUMPS_LOAD_CHK_MEMCST_POOL(FLAG_MEM)
@@ -295,9 +276,7 @@ C
                      GOTO 222
                   ENDIF
                ENDIF
-#if ! defined(NOT_ATM_POOL_SPECIAL)
             ENDIF
-#endif
          ENDIF
          NBINSUBTREE = NBINSUBTREE - 1
          IF ( INODE < 0 ) THEN
@@ -307,14 +286,15 @@ C
          ELSE
             INODE_EFF = INODE
          ENDIF
-         IF ( MUMPS_INSSARBR( PROCNODE(STEP(INODE_EFF)), SLAVEF) ) THEN
+         IF ( MUMPS_INSSARBR( PROCNODE(STEP(INODE_EFF)),
+     &                        KEEP(199)) ) THEN
             IF((KEEP(47).GE.2.AND.KEEP(81).EQ.1).AND.
      &           (INSUBTREE.EQ.0))THEN
                CALL DMUMPS_LOAD_SET_SBTR_MEM(.TRUE.)
             ENDIF
             INSUBTREE = 1
          ELSE IF ( MUMPS_ROOTSSARBR( PROCNODE(STEP(INODE_EFF)), 
-     &           SLAVEF)) THEN
+     &           KEEP(199))) THEN
             IF((KEEP(47).GE.2.AND.KEEP(81).EQ.1).AND.
      &           (INSUBTREE.EQ.1))THEN
                CALL DMUMPS_LOAD_SET_SBTR_MEM(.FALSE.)
@@ -336,10 +316,10 @@ C
             ELSE
                NBINSUBTREE=NBINSUBTREE-1
                IF ( MUMPS_INSSARBR( PROCNODE(STEP(INODE)), 
-     &              SLAVEF) ) THEN
+     &              KEEP(199)) ) THEN
                   INSUBTREE = 1
                ELSE IF ( MUMPS_ROOTSSARBR( PROCNODE(STEP(INODE)), 
-     &                 SLAVEF)) THEN
+     &                 KEEP(199))) THEN
                   INSUBTREE = 0
                ENDIF
                GOTO 777
@@ -356,9 +336,7 @@ C
             ENDIF
          ELSE
             IF(KEEP(81).EQ.3)THEN
-#if ! defined(NOT_ATM_POOL_SPECIAL)
                IF((INODE.GE.0).AND.(INODE.LE.N))THEN
-#endif
                   NODE_TO_EXTRACT=INODE
                   FLAG_MEM=.FALSE.
                   CALL DMUMPS_LOAD_CHK_MEMCST_POOL(FLAG_MEM)
@@ -375,9 +353,7 @@ C
                   ELSE
                      CALL DMUMPS_LOAD_CLEAN_MEMINFO_POOL(INODE)
                   ENDIF
-#if ! defined(NOT_ATM_POOL_SPECIAL)
                ENDIF
-#endif
             ENDIF
          ENDIF
  666     CONTINUE
@@ -424,9 +400,7 @@ C
       FLAG_SAME_PROC=.FALSE.
       SBTR=.FALSE.
       MIN_PROC=-9999
-#if ! defined(NOT_ATM_POOL_SPECIAL)
       IF((INODE.GT.0).AND.(INODE.LE.N))THEN
-#endif
          POS_TO_EXTRACT=-1
          NODE_TO_EXTRACT=-1
          DO I=NBTOP,1,-1
@@ -472,10 +446,8 @@ C
          ENDDO
          POOL(LPOOL-2-NBTOP)=INODE
          CALL DMUMPS_LOAD_CLEAN_MEMINFO_POOL(INODE)
-#if ! defined(NOT_ATM_POOL_SPECIAL)
       ELSE
       ENDIF
-#endif
       END SUBROUTINE DMUMPS_MEM_CONS_MNG
       SUBROUTINE DMUMPS_MEM_NODE_SELECT(INODE,POOL,LPOOL,N,STEP,
      &     KEEP,KEEP8,
@@ -502,13 +474,9 @@ C
          RETURN
       ENDIF
       IF(MIN_PROC.EQ.-9999)THEN
-#if ! defined(NOT_ATM_POOL_SPECIAL)
          IF((INODE.GT.0).AND.(INODE.LT.N))THEN
-#endif
             SBTR_FLAG=(NBINSUBTREE.NE.0)
-#if ! defined(NOT_ATM_POOL_SPECIAL)
          ENDIF
-#endif
          RETURN
       ENDIF
       IF(.NOT.PROC_FLAG)THEN
@@ -517,7 +485,7 @@ C
             CALL DMUMPS_FIND_BEST_NODE_FOR_MEM(MIN_PROC,POOL,
      &           LPOOL,INODE)
             IF(MUMPS_INSSARBR(PROCNODE(STEP(INODE)),
-     &           SLAVEF))THEN
+     &           KEEP(199)))THEN
                WRITE(*,*)MYID,': Extracting from a subtree
      &              for helping',MIN_PROC
                SBTR_FLAG=.TRUE.

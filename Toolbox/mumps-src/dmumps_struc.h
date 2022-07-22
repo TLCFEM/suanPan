@@ -1,14 +1,15 @@
 !
-!  This file is part of MUMPS 5.2.1, released
-!  on Fri Jun 14 14:46:05 UTC 2019
+!  This file is part of MUMPS 5.5.1, released
+!  on Tue Jul 12 13:17:24 UTC 2022
 !
 !
-!  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+!  Copyright 1991-2022 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 !  Mumps Technologies, University of Bordeaux.
 !
 !  This version of MUMPS is provided to you free of charge. It is
-!  released under the CeCILL-C license:
-!  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+!  released under the CeCILL-C license 
+!  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+!  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 !
       INCLUDE 'dmumps_root.h'
       TYPE DMUMPS_STRUC
@@ -71,6 +72,12 @@
 !    ---------------------------------------------
         INTEGER, DIMENSION(:), POINTER :: PERM_IN
 !
+!    ----------------
+!    Format by blocks
+!    ----------------
+        INTEGER :: NBLK, pad5
+        INTEGER, DIMENSION(:), POINTER :: BLKPTR
+        INTEGER, DIMENSION(:), POINTER :: BLKVAR
 !
 ! ******************
 ! INPUT/OUTPUT data 
@@ -89,7 +96,7 @@
         INTEGER, DIMENSION(:), POINTER :: ISOL_loc
         INTEGER, DIMENSION(:), POINTER :: IRHS_loc
         INTEGER :: LRHS, NRHS, NZ_RHS, Nloc_RHS, LRHS_loc, LREDRHS
-        INTEGER :: LSOL_loc, pad5
+        INTEGER :: LSOL_loc, pad6
 !    ----------------------------
 !    Control parameters,
 !    statistics and output data
@@ -134,7 +141,7 @@
         CHARACTER(LEN=255) :: OOC_TMPDIR
         CHARACTER(LEN=63) :: OOC_PREFIX
 !    ------------------------------------------
-!    To save the matrix in matrix market format
+!    Name of file to dump a matrix/rhs to disk
 !    ------------------------------------------
         CHARACTER(LEN=255) ::  WRITE_PROBLEM
 !    -----------
@@ -142,7 +149,7 @@
 !    -----------
         CHARACTER(LEN=255) :: SAVE_DIR
         CHARACTER(LEN=255)  :: SAVE_PREFIX
-        CHARACTER(LEN=7)   ::  pad8  
+        CHARACTER(LEN=7)   ::  pad7  
 !
 !
 ! **********************
@@ -152,33 +159,24 @@
         INTEGER ::  INST_Number
 !       For MPI
         INTEGER ::  COMM_NODES, MYID_NODES, COMM_LOAD
-        INTEGER ::   MYID, NPROCS, NSLAVES
+        INTEGER ::  MYID, NPROCS, NSLAVES
         INTEGER ::  ASS_IRECV
-        INTEGER ::  LBUFR
-        INTEGER ::  LBUFR_BYTES
-        INTEGER, DIMENSION(:), POINTER ::  BUFR
 !       IS is used for the factors + workspace for contrib. blocks
         INTEGER, DIMENSION(:), POINTER :: IS
-!       IS1 (maxis1) contains working arrays computed 
-!       and used only during analysis
-        INTEGER, DIMENSION(:), POINTER :: IS1
-!       For analysis/facto/solve phases
-        INTEGER ::  MAXIS1, Deficiency
         INTEGER ::  KEEP(500)
 !       The following data/arrays are computed during the analysis
 !       phase and used during the factorization and solve phases.
         INTEGER ::  LNA
         INTEGER ::  NBSA
         INTEGER,POINTER,DIMENSION(:) :: STEP, NE_STEPS, ND_STEPS
-!  Info for pruning tree 
-        INTEGER,POINTER,DIMENSION(:) :: Step2node
-!  ---------------------
         INTEGER,POINTER,DIMENSION(:) :: FRERE_STEPS, DAD_STEPS
         INTEGER,POINTER,DIMENSION(:) :: FILS, FRTPTR, FRTELT
         INTEGER(8),POINTER,DIMENSION(:) :: PTRAR
         INTEGER,POINTER,DIMENSION(:) :: NA, PROCNODE_STEPS
-!       The two pointer arrays computed in facto and used by the solve
-!          (except the factors) are PTLUST_S and PTRFAC. 
+!       Info for pruning tree 
+        INTEGER,POINTER,DIMENSION(:) :: Step2node
+!       PTLUST_S and PTRFAC are two pointer arrays computed during
+!       factorization and used by the solve
         INTEGER, DIMENSION(:), POINTER :: PTLUST_S
         INTEGER(8), DIMENSION(:), POINTER :: PTRFAC
 !       main real working arrays for factorization/solve phases
@@ -254,30 +252,37 @@
 !    Pointer array encoding BLR factors pointers
         CHARACTER, DIMENSION(:), POINTER :: BLRARRAY_ENCODING
 !    Multicore
-        INTEGER :: LPOOL_AFTER_L0_OMP, LPOOL_BEFORE_L0_OMP
+        TYPE(DMUMPS_L0OMPFAC_T),DIMENSION(:),POINTER :: L0_OMP_FACTORS
+        INTEGER :: LPOOL_A_L0_OMP, LPOOL_B_L0_OMP
         INTEGER :: L_PHYS_L0_OMP
         INTEGER :: L_VIRT_L0_OMP                                    
-        INTEGER :: LL0_OMP_MAPPING,pad15
+        INTEGER :: LL0_OMP_MAPPING, LL0_OMP_FACTORS
         INTEGER(8) :: THREAD_LA
+! Estimates before L0_OMP
+        INTEGER, DIMENSION(:,:), POINTER    :: I4_L0_OMP
+        INTEGER(8), DIMENSION(:,:), POINTER :: I8_L0_OMP
 ! Pool before L0_OMP
-        INTEGER, DIMENSION(:), POINTER :: IPOOL_BEFORE_L0_OMP
+        INTEGER, DIMENSION(:), POINTER :: IPOOL_B_L0_OMP
 ! Pool after L0_OMP
-        INTEGER, DIMENSION(:), POINTER :: IPOOL_AFTER_L0_OMP
+        INTEGER, DIMENSION(:), POINTER :: IPOOL_A_L0_OMP
 ! Subtrees
         INTEGER, DIMENSION(:), POINTER :: PHYS_L0_OMP
 ! Amalgamated subtrees
         INTEGER, DIMENSION(:), POINTER :: VIRT_L0_OMP
+! Mapping of amalgamated subtrees
+        INTEGER, DIMENSION(:), POINTER :: VIRT_L0_OMP_MAPPING
 ! From heaviest to lowest subtree
         INTEGER, DIMENSION(:), POINTER :: PERM_L0_OMP
 ! To get leafs in global pool
         INTEGER, DIMENSION(:), POINTER :: PTR_LEAFS_L0_OMP
-! Mapping of the subtrees
+! Mapping of the subtree nodes
         INTEGER, DIMENSION(:), POINTER :: L0_OMP_MAPPING
 ! Mpi to omp - mumps agile
         INTEGER, DIMENSION(:), POINTER :: MPITOOMP_PROCS_MAP
 ! for RR on root
         DOUBLE PRECISION, DIMENSION(:), POINTER :: SINGULAR_VALUES
         INTEGER ::  NB_SINGULAR_VALUES
+        INTEGER ::  Deficiency, pad16
 ! To know if OOC files are associated to a saved and so if they should be removed.
         LOGICAL :: ASSOCIATED_OOC_FILES
       END TYPE DMUMPS_STRUC

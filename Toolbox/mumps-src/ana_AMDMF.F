@@ -1,14 +1,15 @@
 C
-C  This file is part of MUMPS 5.2.1, released
-C  on Fri Jun 14 14:46:05 UTC 2019
+C  This file is part of MUMPS 5.5.1, released
+C  on Tue Jul 12 13:17:24 UTC 2022
 C
 C
-C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2022 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license:
-C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+C  released under the CeCILL-C license 
+C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
       SUBROUTINE MUMPS_SYMQAMD_NEW
      &                ( JOB, THRESH, NDENSE, 
@@ -37,6 +38,8 @@ C
       LOGICAL IDENSE
       INTEGER :: FDEG, ThresMin, ThresPrev, IBEGSchur, 
      &        ThresMinINIT
+      LOGICAL :: AGG6_loc
+      INTEGER :: THD_AGG
       LOGICAL :: SchurON
       INTEGER :: DEG, DEGME, DEXT, DMAX, E, ELENME, ELN, I,
      &        ILAST, INEXT, J, JLAST, JNEXT, K, KNT1, KNT2, KNT3,
@@ -56,6 +59,8 @@ C
            NV(1) = 1
            RETURN
         ENDIF
+        AGG6_loc = AGG6
+        THD_AGG = max(128, min(N/2048, 1024))
         IF ( SIZE_COMPLEM_LIST < 0 .OR. SIZE_COMPLEM_LIST > N ) THEN
           WRITE(*,*) "Internal MUMPS_SYMQAMD_NEW", SIZE_COMPLEM_LIST,N
           CALL MUMPS_ABORT()
@@ -499,6 +504,7 @@ C
   140       CONTINUE
           ENDIF
   150   CONTINUE
+        AGG6_loc = (AGG6 .OR. (DEGREE(ME) .LT. THD_AGG))
         DO 180 PME = PME1, PME2
           I = IW (PME)
           IF (DEGREE(I).GT.N) GOTO 180
@@ -515,15 +521,15 @@ C
               IW (PN) = E
               PN = PN + 1
               HASH = HASH + int(E,kind=8)
-            ELSE IF (.NOT. AGG6 .AND. DEXT .EQ. 0) THEN
+            ELSE IF (.NOT. AGG6_loc .AND. DEXT .EQ. 0) THEN
               IW (PN) = E
               PN = PN + 1
               HASH = HASH + int(E,kind=8)
-            ELSE IF (AGG6 .AND. (DEXT .EQ. 0) .AND.
+            ELSE IF (AGG6_loc .AND. (DEXT .EQ. 0) .AND.
      &            ((NDENSE(ME).EQ.NBD).OR.(NDENSE(E).EQ.0))) THEN
                 PE (E) = int(-ME,8)
                 W (E)  = 0
-             ELSE IF (AGG6 .AND. DEXT.EQ.0) THEN
+             ELSE IF (AGG6_loc .AND. DEXT.EQ.0) THEN
                   IW(PN) = E
                   PN     = PN+1
                   HASH   = HASH + int(E,kind=8)
@@ -543,7 +549,7 @@ C
   170     CONTINUE
           IF (((ELEN(I).EQ.1).AND.(P3.EQ.PN))
      &     .OR.
-     &         (AGG6.AND.(DEG .EQ. 0).AND.(NDENSE(ME).EQ.NBD))
+     &         (AGG6_loc.AND.(DEG .EQ. 0).AND.(NDENSE(ME).EQ.NBD))
      &       )
      &    THEN
             PE (I) = int(-ME, 8)
@@ -740,3 +746,334 @@ C
       PFREE = MAXMEM
       RETURN
       END SUBROUTINE MUMPS_SYMQAMD_NEW
+      SUBROUTINE MUMPS_WRAP_GINP94 
+     &       ( N, IPE, IW, LIW8,
+     &         PERM, SizeOfBlocks,
+     &         KEEP60, LISTVAR_SCHUR, SIZE_SCHUR, KEEP378,
+     &   COLCOUNT, PARENT, 
+     &   PORDER, IWTMP1, IWTMP2, IWTMP3, IWTMP4, 
+     &   IWTMP5,
+     &   INFO )  
+      IMPLICIT NONE
+      INTEGER, INTENT(IN)      :: N
+      INTEGER(8), INTENT(IN)   :: LIW8
+      INTEGER(8), INTENT(IN)   :: IPE(N+1)
+      INTEGER,    INTENT(IN)   :: SizeOfBlocks(N)
+      INTEGER, INTENT(INOUT)   :: PERM(N)
+      INTEGER, INTENT(IN)      :: IW(LIW8)
+      INTEGER, INTENT(OUT)     :: COLCOUNT(N)
+      INTEGER, INTENT(OUT)     :: PARENT(N)
+      INTEGER, INTENT(IN)      :: KEEP60, SIZE_SCHUR
+      INTEGER, INTENT(IN)      :: LISTVAR_SCHUR(SIZE_SCHUR)
+      INTEGER, INTENT(IN)      :: KEEP378
+      INTEGER, INTENT(INOUT)   :: INFO(2)
+      INTEGER, INTENT(OUT):: PORDER(N), IWTMP1(N), IWTMP2(N) 
+      INTEGER, INTENT(OUT):: IWTMP3(N), IWTMP4(N), IWTMP5(N)
+      INTEGER :: I, KEEP378_loc
+      LOGICAL :: SizeOfBlocks_provided 
+      SizeOfBlocks_provided = (SizeOfBlocks(1).NE.-1)
+      IF (KEEP378.NE.0) KEEP378_loc=1 
+      DO I=1, N
+        IWTMP1(PERM(I)) = I
+      END DO
+      CALL MUMPS_GINP94_ELIM_TREE (
+     &            N, IPE, IW, LIW8, IWTMP1, PERM, PARENT, 
+     &            IWTMP2, INFO)
+      IF (INFO(1).LT.0) RETURN
+      CALL MUMPS_GINP94_POSTORDER(PARENT, N, PORDER, 
+     &     IWTMP1, IWTMP2, IWTMP3, 
+     &     INFO)
+      IF (INFO(1).LT.0) RETURN
+      CALL MUMPS_GINP94_COLCOUNTS(
+     &         N, LIW8, IPE, IW, PARENT, PORDER, COLCOUNT, 
+     &         SizeOfBlocks_provided, SizeOfBlocks, KEEP378_loc,
+     &         IWTMP1, IWTMP2, IWTMP3, IWTMP4, IWTMP5,
+     &         INFO)
+      IF (INFO(1).LT.0) RETURN
+      IF (KEEP60.NE.0) THEN
+       CALL MUMPS_GINP94_POSTPROCESS_SCHUR (
+     &      N, PARENT, COLCOUNT, PERM,
+     &      LISTVAR_SCHUR, SIZE_SCHUR )
+      ENDIF
+      RETURN
+      END SUBROUTINE MUMPS_WRAP_GINP94
+        SUBROUTINE MUMPS_GINP94_ELIM_TREE (
+     &              n, iptr, jcn, ljcn, invperm, perm, parent,
+     &              ancestor, info)
+        IMPLICIT NONE
+        INTEGER(8), INTENT(IN)   :: ljcn
+        integer                  :: n
+        INTEGER(8), INTENT(IN)   :: iptr(n+1)
+        integer, INTENT(IN)      :: jcn(ljcn), invperm(n), perm(n)
+        integer, INTENT(OUT)     :: parent(n)
+        integer, INTENT(INOUT)   :: INFO(2)
+        integer, INTENT(OUT)     :: ancestor(n)
+        integer                  :: jpos, i, j, k
+        integer(8)               :: iidx8
+       ancestor=0
+       parent  =0
+       do jpos = 1, n
+         j = invperm(jpos)
+         do iidx8 = iptr(j), iptr(j+1)-1
+           i = jcn(iidx8)
+           if (perm(i).ge.jpos) cycle 
+           k = i
+           call add_node(n, ancestor, parent, j, k)
+         end do 
+       end do 
+       return
+       contains
+       subroutine add_node(n, ancestor, parent, j, i)
+         implicit none
+         integer, intent(in):: n
+         integer      :: parent(n)
+         integer      :: ancestor(n)
+         integer      :: i, j
+         integer      :: r, k
+         if(i.eq.0) return
+         k = i
+         do
+            r = ancestor(k)
+            if (r .eq. j) then
+               return
+            end if
+            ancestor(k) = j
+            if(r .eq. 0) then
+               parent(k) = j
+               return
+            end if
+            k = r
+         end do
+         end subroutine add_node
+        END SUBROUTINE MUMPS_GINP94_ELIM_TREE
+        SUBROUTINE MUMPS_GINP94_POSTORDER(parent, n, porder, 
+     &        son, brother, stack, 
+     &        INFO
+     &         )
+        IMPLICIT NONE
+        integer, intent(in)   :: n
+        integer, intent(in)   :: parent(n)
+        integer, intent(out)  :: porder(n) 
+        integer, intent(inout):: INFO(2)
+        integer, intent(out) :: son(n), brother(n), stack(n)
+        integer              :: i, father, br, head, hp, pp, t
+        son = 0
+           do i=n, 1, -1
+              father = parent(i)
+              if (father .ne. 0) then
+                 br          = son(father)
+                 brother(i)  = br
+                 son(father) = i
+              end if
+           end do
+        head = 0
+        hp   = 0
+        pp   = 1
+        do t=1, n
+           if (parent(t) .ne. 0) cycle
+           hp        = hp+1
+           stack(hp) = t
+           head      = t
+           do
+              if(son(head) .eq. 0) then
+                 porder(pp) = head
+                 pp = pp+1
+                 hp = hp-1
+                 if (parent(head) .ne. 0) then
+                    son(parent(head)) = brother(head)
+                 end if
+                 if (hp .eq. 0) then
+                    exit
+                 end if
+                 head = stack(hp)
+              else
+                 hp = hp+1
+                 stack(hp) = son(head)
+                 head = son(head)
+              end if
+           end do
+        end do
+        RETURN
+        END SUBROUTINE MUMPS_GINP94_POSTORDER
+        SUBROUTINE MUMPS_GINP94_COLCOUNTS( 
+     &            n, ljcn, iptr, jcn, parent, porder, cc, 
+     &            SizeOfBlocks_provided, SizeOfBlocks, KEEP378,
+     &            fst_desc, iporder, prev_p,  prev_nbr, setpath,
+     &            INFO)
+        IMPLICIT NONE
+        integer, intent(in)    :: n 
+        integer(8), intent(in) :: ljcn
+        integer(8), intent(in) :: iptr(n+1)
+        integer, intent(in)    ::  jcn(ljcn)
+        integer, intent(inout) :: parent(n), porder(n) 
+        integer, intent(in)    ::  SizeOfBlocks(n)
+        logical, intent(in)    ::  SizeOfBlocks_provided
+        integer, intent(in)    ::  KEEP378
+        integer, intent(out)   :: cc(n)
+         integer, intent(inout):: INFO(2)
+        integer, intent(out)  :: fst_desc(n), iporder(n), prev_p(n) 
+        integer, intent(out)  :: prev_nbr(n), setpath(n)
+        integer               :: i, curr, fd, j, jidx, k
+        integer(8)            :: iidx8
+        integer               :: f, ref, p_leaf, q, jj
+        do j=1, n
+           iporder(porder(j)) = j
+        end do
+        cc = 0
+        fst_desc=-1
+        do i=1, n
+           curr = porder(i)
+           fd   = curr
+           if(fst_desc(curr) .eq. -1) then
+              if (SizeOfBlocks_provided) then
+                  cc(curr) = SizeOfBlocks(curr)
+              else
+                  cc(curr) = 1
+              endif
+           end if
+           do
+              if (fst_desc(curr) .gt. 0) exit
+              fst_desc(curr) = fd
+              if (parent(curr) .eq. 0) exit
+              curr = parent(curr)
+           end do
+        end do
+        do j=1, n
+           setpath(j)=j
+        end do
+        prev_p   = 0
+        prev_nbr = 0
+        do jidx=1, n
+           j = abs(porder(jidx))
+#if defined(check)
+           if (parent(j).eq.0)
+     &     write(6,*) " ========= jidx,j= ", jidx,j," is a rootnode "
+#endif
+           if(parent(j) .ne. 0) then
+              if (KEEP378.eq.1) then
+               if (cc(parent(j)) .lt. 0) then
+                  porder(iporder(parent(j)))= -parent(j)
+               endif
+              endif
+              if (SizeOfBlocks_provided) then
+                cc(parent(j)) = cc(parent(j)) - SizeOfBlocks(j)
+              else
+                cc(parent(j)) = cc(parent(j))-1
+              endif
+           endif
+           do iidx8=iptr(j), iptr(j+1)-1
+              i = jcn(iidx8)
+              if (iporder(i).le.jidx) cycle
+              if(prev_nbr(i) .eq. 0) then
+                 ref = 0
+              else
+                 ref = iporder(prev_nbr(i))
+              end if
+              if(iporder(fst_desc(j)) .gt. ref) then
+                 if (KEEP378.eq.1) then
+                     porder(iporder(j))= -j
+                 endif
+                 if (SizeOfBlocks_provided) then
+                   cc(j) = cc(j) + SizeOfBlocks(i)
+                 else
+                   cc(j) = cc(j) + 1
+                 endif
+                 p_leaf = prev_p(i)
+                 if (p_leaf .ne. 0) then
+                    q = setfind(setpath, p_leaf)
+                    if (SizeOfBlocks_provided) then
+                      cc(q) = cc(q) - SizeOfBlocks(i)
+                    else
+                      cc(q) = cc(q) - 1
+                    endif
+                 end if
+                 prev_p(i) = j
+              end if
+              prev_nbr(i) = j
+           end do
+           if (parent(j).ne.0) setpath(j)=parent(j)
+        end do
+        do jj=1, n-1
+           j=abs(porder(jj))
+           if(parent(j) .ne. 0) cc(parent(j)) = cc(parent(j)) + cc(j)
+        end do
+        if (KEEP378.eq.1) then
+          i=1
+          do while (i .lt. n)
+             porder(i) = abs(porder(i))
+             j = i+1
+             if (parent(porder(i)).ne.0) then
+              do while (porder(j) .gt. 0) 
+                j = j+1
+                if (parent(abs(porder(j-1))).eq.0) exit
+                if (j.gt.n) exit
+              end do
+             endif
+             parent(porder(i)) = parent(porder(j-1))
+             do k=i+1, j-1
+                parent(porder(k)) = -porder(i)
+                cc(porder(k)) = 0
+            end do
+            i = j
+          end do
+          porder(n) = abs(porder(n))
+        do i=1,n-1
+          f = abs(parent(i))
+          if (f.eq.0) cycle
+          if (cc(f).eq.0) then
+            parent(i) = parent(f)
+          endif
+        end do
+        endif
+        do i=1,n
+          f = parent(i)
+          if (parent(i).gt.0) then 
+            parent(i) = -parent(i)
+          endif
+        end do
+        return
+        contains
+        function setfind(setpath, p_leaf)
+          implicit none
+          integer :: setpath(:), p_leaf, setfind
+          integer :: q, c, tmp
+          q=p_leaf
+          do while (setpath(q) .ne.q)
+             q = setpath(q)
+          end do
+          c = p_leaf
+          do while (c .ne.q)
+             tmp = setpath(c)
+             setpath(c) = q
+             c = tmp
+          end do
+          setfind = q
+          return
+        end function setfind
+        END SUBROUTINE MUMPS_GINP94_COLCOUNTS
+        SUBROUTINE MUMPS_GINP94_POSTPROCESS_SCHUR (
+     &      N, PARENT, COLCOUNT, PERM,
+     &      LISTVAR_SCHUR, SIZE_SCHUR 
+     &      )
+        IMPLICIT NONE
+        INTEGER, INTENT(IN) :: N, SIZE_SCHUR 
+        INTEGER, INTENT(IN) :: PERM(N), LISTVAR_SCHUR(SIZE_SCHUR)
+        INTEGER, INTENT(INOUT) :: PARENT(N), COLCOUNT(N)
+        INTEGER I, FIRSTinSchur, PrincipalVarSchur
+        FIRSTinSchur      = N-SIZE_SCHUR+1
+        PrincipalVarSchur = LISTVAR_SCHUR(1)
+        DO I=1, N
+         IF (I.EQ.PrincipalVarSchur) THEN
+           PARENT(I)   = 0 
+             COLCOUNT(I) = SIZE_SCHUR
+         ELSE IF (PARENT(I).EQ.0.AND.PERM(I).LT.FIRSTinSchur) THEN
+           PARENT(I) = -PrincipalVarSchur
+         ELSE IF (PERM(I).GE.FIRSTinSchur) THEN
+          PARENT(I)    = -PrincipalVarSchur
+            COLCOUNT (I) = 0
+         ELSE IF (PERM(-PARENT(I)).GE.FIRSTinSchur) THEN
+          PARENT(I) =  -PrincipalVarSchur
+         ENDIF
+        ENDDO
+        RETURN
+        END SUBROUTINE MUMPS_GINP94_POSTPROCESS_SCHUR 

@@ -1,14 +1,15 @@
 C
-C  This file is part of MUMPS 5.2.1, released
-C  on Fri Jun 14 14:46:05 UTC 2019
+C  This file is part of MUMPS 5.5.1, released
+C  on Tue Jul 12 13:17:24 UTC 2022
 C
 C
-C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2022 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license:
-C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+C  released under the CeCILL-C license 
+C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
       SUBROUTINE DMUMPS_ASS_ROOT( root, KEEP50,
      &                     NROW_SON, NCOL_SON, INDROW_SON, 
@@ -70,7 +71,7 @@ C
      &    IWPOS, IWPOSCB, IPTRLU, LRLU, LRLUS, IW, LIW, A, LA,
      &    PTRIST, PTLUST_S, PTRFAC,
      &    PTRAST, STEP, PIMASTER, PAMASTER,
-     &    NSTK, COMP, IFLAG, IERROR, NBPROCFILS,
+     &    NSTK, COMP, IFLAG, IERROR, PERM,
      &    IPOOL, LPOOL, LEAF, NBFIN, SLAVEF,
      &    OPASSW, OPELIW, ITLOC, RHS_MUMPS,
      &    FILS, DAD, PTRARW, PTRAIW,
@@ -117,7 +118,7 @@ C
       INTEGER PTRIST( KEEP(28) ), PTLUST_S(KEEP(28))
       INTEGER STEP(N), PIMASTER(KEEP(28)), NSTK( N )
       INTEGER COMP, IFLAG, IERROR
-      INTEGER NBPROCFILS( KEEP(28) )
+      INTEGER PERM(N)
       INTEGER LPOOL, LEAF
       INTEGER IPOOL( LPOOL )
       INTEGER NBFIN, SLAVEF
@@ -376,37 +377,27 @@ C
            CALL DMUMPS_ROOT_ALLOC_STATIC(root, IROOT, N, IW, LIW,
      &               A, LA,
      &               FILS, DAD, MYID, SLAVEF, PROCNODE_STEPS,
+     &               LPTRAR, NELT, FRTPTR, FRTELT,
      &               PTRAIW, PTRARW, INTARR, DBLARR,
      &               LRLU, IPTRLU,
      &               IWPOS, IWPOSCB, PTRIST, PTRAST,
      &               STEP, PIMASTER, PAMASTER, ITLOC, RHS_MUMPS,
      &               COMP, LRLUS, IFLAG, KEEP,KEEP8,DKEEP, IERROR )
-           NBPROCFILS( STEP(IROOT) ) = -1
-#if ! defined(NO_XXNBPR)
            KEEP(121) = -1 
-#endif
            IF (IFLAG.LT.0) THEN
                 CALL DMUMPS_BDC_ERROR( MYID, SLAVEF, COMM, KEEP )
                 RETURN
            ENDIF
         ELSE
-           NBPROCFILS(STEP(IROOT)) = NBPROCFILS(STEP(IROOT)) - 1
-#if ! defined(NO_XXNBPR)
            KEEP(121) = KEEP(121) - 1
-#endif
-#if ! defined(NO_XXNBPR)
-           CALL CHECK_EQUAL(NBPROCFILS(STEP(IROOT)), KEEP(121))
            IF ( KEEP(121) .eq. 0 ) THEN 
-#else
-           IF ( NBPROCFILS( STEP(IROOT) ) .eq. 0 ) THEN
-#endif
               IF (KEEP(201).EQ.1) THEN
                  CALL DMUMPS_OOC_FORCE_WRT_BUF_PANEL(IERR)
               ELSE IF (KEEP(201).EQ.2) THEN
                  CALL DMUMPS_FORCE_WRITE_BUF(IERR)              
               ENDIF
               CALL DMUMPS_INSERT_POOL_N(N, IPOOL, LPOOL, PROCNODE_STEPS,
-     &        SLAVEF, KEEP(28), KEEP(76), KEEP(80), KEEP(47),
+     &        SLAVEF, KEEP(199), KEEP(28), KEEP(76), KEEP(80), KEEP(47),
      &        STEP, IROOT+N )
               IF (KEEP(47) .GE. 3) THEN
                  CALL DMUMPS_LOAD_POOL_UPD_NEW_POOL(
@@ -490,11 +481,11 @@ C
               IF ( LRLU .LT. int(NSUBSET_ROW,8) * int(NSUBSET_COL,8)
      &        .AND. LRLUS .GT. int(NSUBSET_ROW,8) * int(NSUBSET_COL,8) )
      &        THEN
-                CALL DMUMPS_COMPRE_NEW(N, KEEP(28),
+                CALL DMUMPS_COMPRE_NEW(N, KEEP,
      &          IW, LIW, A, LA,
      &          LRLU, IPTRLU,
      &          IWPOS, IWPOSCB, PTRIST, PTRAST,
-     &          STEP, PIMASTER, PAMASTER, KEEP(216),LRLUS,
+     &          STEP, PIMASTER, PAMASTER, LRLUS,
      &          KEEP(IXSZ), COMP, DKEEP(97),
      &          MYID, SLAVEF, PROCNODE_STEPS, DAD)
                 IF ( LRLU .NE. LRLUS ) THEN
@@ -536,7 +527,7 @@ C
      &            IPTRLU, LRLU, LRLUS, N, IW, LIW, A, LA,
      &            PTRIST, PTLUST_S, PTRFAC, PTRAST, STEP,
      &            PIMASTER, PAMASTER, NSTK,
-     &            COMP, IFLAG, IERROR, COMM, NBPROCFILS, IPOOL, LPOOL,
+     &            COMP, IFLAG, IERROR, COMM, PERM, IPOOL, LPOOL,
      &            LEAF, NBFIN, MYID, SLAVEF, root,
      &            OPASSW, OPELIW, ITLOC, RHS_MUMPS, FILS, DAD,
      &            PTRARW,PTRAIW,INTARR,DBLARR,ICNTL,KEEP,KEEP8,DKEEP,
@@ -842,8 +833,14 @@ C
       INTEGER N, IROOT, INFO(80), KEEP(500)
       INTEGER FILS( N )
       INTEGER INODE, I, allocok
-      IF ( associated( root%RG2L_ROW ) ) DEALLOCATE( root%RG2L_ROW )
-      IF ( associated( root%RG2L_COL ) ) DEALLOCATE( root%RG2L_COL )
+      IF ( associated( root%RG2L_ROW ) ) THEN
+        DEALLOCATE( root%RG2L_ROW )
+        NULLIFY( root%RG2L_ROW )
+      ENDIF
+      IF ( associated( root%RG2L_COL ) ) THEN
+        DEALLOCATE( root%RG2L_COL )
+        NULLIFY( root%RG2L_COL )
+      ENDIF
       ALLOCATE( root%RG2L_ROW( N ), stat = allocok )
       IF ( allocok .GT. 0 ) THEN
         INFO(1)=-13
@@ -852,6 +849,7 @@ C
       ENDIF
       ALLOCATE( root%RG2L_COL( N ), stat = allocok )
       IF ( allocok .GT. 0 ) THEN
+        DEALLOCATE( root%RG2L_ROW ); NULLIFY( root%RG2L_ROW )
         INFO(1)=-13
         INFO(2)=N
         RETURN
@@ -1082,6 +1080,7 @@ C
       SUBROUTINE DMUMPS_ROOT_ALLOC_STATIC(root, IROOT, N,
      &                  IW, LIW, A, LA,
      &                  FILS, DAD, MYID, SLAVEF, PROCNODE_STEPS,
+     &                  LPTRAR, NELT, FRTPTR, FRTELT,
      &                  PTRAIW, PTRARW, INTARR, DBLARR,
      &                  LRLU, IPTRLU,
      &                  IWPOS, IWPOSCB, PTRIST, PTRAST,
@@ -1108,7 +1107,9 @@ C
       INTEGER COMP, IFLAG, IERROR
       INCLUDE 'mumps_headers.h'
       INTEGER FILS( N ), DAD(KEEP(28))
-      INTEGER(8), INTENT(IN) :: PTRAIW(N), PTRARW( N )
+      INTEGER LPTRAR, NELT
+      INTEGER FRTPTR( N+1), FRTELT( NELT )
+      INTEGER(8), INTENT(IN) :: PTRAIW( LPTRAR ), PTRARW( LPTRAR )
       INTEGER INTARR(KEEP8(27))
       DOUBLE PRECISION DBLARR(KEEP8(26))
       INTEGER numroc
@@ -1117,38 +1118,38 @@ C
       PARAMETER( ZERO = 0.0D0 )
       INTEGER(8) :: LREQA_ROOT
       INTEGER LREQI_ROOT, LOCAL_M, LOCAL_N, allocok
-            LOCAL_M = numroc( root%ROOT_SIZE, root%MBLOCK,
-     &                root%MYROW, 0, root%NPROW )
-            LOCAL_M = max( 1, LOCAL_M )
-            LOCAL_N = numroc( root%ROOT_SIZE, root%NBLOCK,
-     &                root%MYCOL, 0, root%NPCOL )
-            IF (KEEP(253).GT.0) THEN
-              root%RHS_NLOC = numroc( KEEP(253), root%NBLOCK,
-     &                root%MYCOL, 0, root%NPCOL )
-              root%RHS_NLOC = max(1, root%RHS_NLOC)
-            ELSE
-              root%RHS_NLOC = 1
-            ENDIF
-            IF (associated( root%RHS_ROOT) ) 
-     &               DEALLOCATE (root%RHS_ROOT)
-            ALLOCATE(root%RHS_ROOT(LOCAL_M,root%RHS_NLOC), 
-     &                stat=allocok)
-            IF ( allocok.GT.0) THEN
-              IFLAG=-13
-              IERROR = LOCAL_M*root%RHS_NLOC
-              RETURN
-            ENDIF
-            IF (KEEP(253).NE.0) THEN
-              root%RHS_ROOT = ZERO
-              CALL DMUMPS_ASM_RHS_ROOT (  N, FILS, 
-     &             root, KEEP, RHS_MUMPS, 
-     &             IFLAG, IERROR )
-              IF ( IFLAG .LT. 0 ) RETURN
-            ENDIF
-            IF (KEEP(60) .NE. 0) THEN
-              PTRIST(STEP(IROOT)) = -6666666
-              RETURN
-            ENDIF
+      LOGICAL :: EARLYT3ROOTINS
+          LOCAL_M = numroc( root%ROOT_SIZE, root%MBLOCK,
+     &              root%MYROW, 0, root%NPROW )
+          LOCAL_M = max( 1, LOCAL_M )
+          LOCAL_N = numroc( root%ROOT_SIZE, root%NBLOCK,
+     &              root%MYCOL, 0, root%NPCOL )
+          IF (KEEP(253).GT.0) THEN
+            root%RHS_NLOC = numroc( KEEP(253), root%NBLOCK,
+     &              root%MYCOL, 0, root%NPCOL )
+            root%RHS_NLOC = max(1, root%RHS_NLOC)
+          ELSE
+            root%RHS_NLOC = 1
+          ENDIF
+          IF (associated( root%RHS_ROOT) ) 
+     &             DEALLOCATE (root%RHS_ROOT)
+          ALLOCATE(root%RHS_ROOT(LOCAL_M,root%RHS_NLOC), 
+     &              stat=allocok)
+          IF ( allocok.GT.0) THEN
+            IFLAG=-13
+            IERROR = LOCAL_M*root%RHS_NLOC
+            RETURN
+          ENDIF
+          IF (KEEP(253).NE.0) THEN
+            root%RHS_ROOT = ZERO
+            CALL DMUMPS_ASM_RHS_ROOT (  N, FILS, 
+     &           root, KEEP, RHS_MUMPS, 
+     &           IFLAG, IERROR )
+            IF ( IFLAG .LT. 0 ) RETURN
+          ENDIF
+          IF (KEEP(60) .NE. 0) THEN
+            PTRIST(STEP(IROOT)) = -6666666
+          ELSE
             LREQI_ROOT = 2 + KEEP(IXSZ)
             LREQA_ROOT = int(LOCAL_M,8) * int(LOCAL_N,8)
             IF (LREQA_ROOT.EQ.0_8) THEN
@@ -1162,15 +1163,135 @@ C
      &                     PTRIST, PTRAST,
      &                     STEP, PIMASTER, PAMASTER, LREQI_ROOT,
      &                     LREQA_ROOT, IROOT, S_NOTFREE, .TRUE., COMP,
-     &                     LRLUS, IFLAG, IERROR
+     &                     LRLUS, KEEP8(67), IFLAG, IERROR
      &           )
             IF ( IFLAG .LT. 0 ) RETURN
             PTRIST  ( STEP(IROOT) ) = IWPOSCB + 1
             PAMASTER( STEP(IROOT) ) = IPTRLU  + 1_8
             IW( IWPOSCB + 1 + KEEP(IXSZ)) = - LOCAL_N
             IW( IWPOSCB + 2 + KEEP(IXSZ)) =   LOCAL_M
+          ENDIF
+          EARLYT3ROOTINS = KEEP(200) .EQ.0
+     &        .OR.  ( KEEP(200) .LT. 0 .AND. KEEP(400) .EQ. 0 )
+          IF (LOCAL_N > 0 .AND. .NOT. EARLYT3ROOTINS ) THEN
+            IF (KEEP(60) .EQ. 0) THEN
+              CALL DMUMPS_SET_TO_ZERO(A(IPTRLU+1_8), LOCAL_M,
+     &        LOCAL_M, LOCAL_N, KEEP)
+            ELSE
+              CALL DMUMPS_SET_TO_ZERO(root%SCHUR_POINTER(1),
+     &        root%SCHUR_LLD, LOCAL_M, LOCAL_N, KEEP)
+            ENDIF
+            IF (KEEP(55) .eq. 0) THEN
+              IF (KEEP(60) .EQ. 0) THEN
+                CALL DMUMPS_ASM_ARR_ROOT( N, root, IROOT,
+     &          A(IPTRLU+1_8), LOCAL_M, LOCAL_M, LOCAL_N,
+     &          FILS, PTRAIW, PTRARW, INTARR, DBLARR,
+     &          KEEP8(27), KEEP8(26), MYID )
+              ELSE
+                CALL DMUMPS_ASM_ARR_ROOT( N, root, IROOT,
+     &          root%SCHUR_POINTER(1), root%SCHUR_LLD, LOCAL_M, LOCAL_N,
+     &          FILS, PTRAIW, PTRARW, INTARR, DBLARR,
+     &          KEEP8(27), KEEP8(26), MYID )
+              ENDIF
+            ELSE
+              IF (KEEP(60) .EQ. 0) THEN
+                CALL DMUMPS_ASM_ELT_ROOT( N, root,
+     &          A(IPTRLU+1_8), LOCAL_M, LOCAL_M, LOCAL_N,
+     &          LPTRAR, NELT, FRTPTR, FRTELT,
+     &          PTRAIW, PTRARW, INTARR, DBLARR,
+     &          KEEP8(27), KEEP8(26), KEEP, KEEP8, MYID )
+              ELSE
+                CALL DMUMPS_ASM_ELT_ROOT( N, root,
+     &           root%SCHUR_POINTER(1), root%SCHUR_LLD,
+     &           root%SCHUR_MLOC, root%SCHUR_NLOC,
+     &           LPTRAR, NELT, FRTPTR, FRTELT,
+     &           PTRAIW, PTRARW, INTARR, DBLARR,
+     &           KEEP8(27), KEEP8(26), KEEP, KEEP8, MYID )
+              ENDIF
+            ENDIF
+          ENDIF
       RETURN
       END SUBROUTINE DMUMPS_ROOT_ALLOC_STATIC
+      SUBROUTINE DMUMPS_ASM_ELT_ROOT( N, root, 
+     &       VALROOT, LOCAL_M_LLD, LOCAL_M, LOCAL_N,
+     &       LPTRAR, NELT, FRTPTR, FRTELT,
+     &       PTRAIW, PTRARW,
+     &       INTARR, DBLARR, LINTARR, LDBLARR,
+     &       KEEP, KEEP8,
+     &       MYID)
+      USE DMUMPS_STRUC_DEF, ONLY : DMUMPS_ROOT_STRUC
+      IMPLICIT NONE
+      TYPE (DMUMPS_ROOT_STRUC) :: root
+      INTEGER :: N, MYID, LOCAL_M, LOCAL_N, KEEP(500)
+      INTEGER :: LOCAL_M_LLD
+      INTEGER(8) KEEP8(150)
+      DOUBLE PRECISION VALROOT(LOCAL_M_LLD,LOCAL_N)
+      INTEGER LPTRAR, NELT
+      INTEGER FRTPTR( N+1), FRTELT( NELT )
+      INTEGER(8), INTENT(IN) :: PTRARW( LPTRAR ), PTRAIW( LPTRAR )
+      INTEGER(8), INTENT(IN) :: LINTARR, LDBLARR
+      INTEGER, INTENT(INOUT) :: INTARR(LINTARR)
+      DOUBLE PRECISION DBLARR(LDBLARR)
+      INTEGER(8) :: J1, J2, K8, IPTR
+      INTEGER    :: IELT, I, J, IGLOB, JGLOB, SIZEI, IBEG
+      INTEGER    :: ARROW_ROOT
+      INTEGER    :: IPOSROOT, JPOSROOT, IROW_GRID, JCOL_GRID
+      INTEGER    :: ILOCROOT, JLOCROOT
+      ARROW_ROOT = 0
+      DO IPTR = FRTPTR(KEEP(38)), FRTPTR(KEEP(38)+1) - 1
+        IELT = FRTELT( IPTR )
+        J1 = PTRAIW(IELT)
+        J2 = PTRAIW(IELT+1)-1
+        K8 = PTRARW(IELT)
+        SIZEI=int(J2-J1)+1
+        DO J=1, SIZEI
+          JGLOB          = INTARR(J1+J-1)
+          INTARR(J1+J-1) = root%RG2L_ROW(JGLOB)
+        ENDDO
+        DO J = 1, SIZEI
+          JGLOB         = INTARR(J1+J-1)
+          IF ( KEEP(50).eq. 0 ) THEN
+            IBEG = 1
+          ELSE
+            IBEG = J
+          END IF
+          DO I = IBEG, SIZEI
+            IGLOB = INTARR(J1+I-1)
+            IF ( KEEP(50).eq.0 ) THEN
+              IPOSROOT = INTARR(J1+I-1)
+              JPOSROOT = INTARR(J1+J-1)
+            ELSE
+              IF ( INTARR(J1+I-1).GT. INTARR(J1+J-1) ) THEN
+                IPOSROOT = INTARR(J1+I-1)
+                JPOSROOT = INTARR(J1+J-1)
+              ELSE
+                IPOSROOT = INTARR(J1+J-1)
+                JPOSROOT = INTARR(J1+I-1)
+              END IF
+            END IF
+            IROW_GRID = mod( ( IPOSROOT - 1 )/root%MBLOCK,
+     &                         root%NPROW )
+            JCOL_GRID = mod( ( JPOSROOT - 1 )/root%NBLOCK,
+     &                         root%NPCOL )
+            IF ( IROW_GRID.EQ.root%MYROW .AND.
+     &           JCOL_GRID.EQ.root%MYCOL ) THEN
+              ILOCROOT = root%MBLOCK * ( ( IPOSROOT - 1 ) /
+     &               ( root%MBLOCK * root%NPROW ) )
+     &             + mod( IPOSROOT - 1, root%MBLOCK ) + 1
+              JLOCROOT = root%NBLOCK * ( ( JPOSROOT - 1 ) /
+     &               ( root%NBLOCK * root%NPCOL ) )
+     &             + mod( JPOSROOT - 1, root%NBLOCK ) + 1
+              VALROOT( ILOCROOT, JLOCROOT ) = 
+     &        VALROOT( ILOCROOT, JLOCROOT ) + DBLARR(K8)
+            ENDIF
+            K8 = K8 + 1_8
+          END DO
+        END DO
+        ARROW_ROOT = ARROW_ROOT + int(PTRARW(IELT+1_8)-PTRARW(IELT))
+      END DO
+      KEEP(49) = ARROW_ROOT
+      RETURN
+      END SUBROUTINE DMUMPS_ASM_ELT_ROOT
       SUBROUTINE DMUMPS_ASM_RHS_ROOT
      &           ( N, FILS, root, KEEP, RHS_MUMPS, 
      &             IFLAG, IERROR )
@@ -1206,3 +1327,83 @@ C
       ENDDO
       RETURN
       END SUBROUTINE DMUMPS_ASM_RHS_ROOT
+      SUBROUTINE DMUMPS_ASM_ARR_ROOT( N, root, IROOT,
+     &   VALROOT, LOCAL_M_LLD, LOCAL_M, LOCAL_N, FILS,
+     &       PTRAIW, PTRARW,
+     &       INTARR, DBLARR, LINTARR, LDBLARR,
+     &       MYID)
+      USE DMUMPS_STRUC_DEF, ONLY : DMUMPS_ROOT_STRUC
+      IMPLICIT NONE
+      TYPE (DMUMPS_ROOT_STRUC) :: root
+      INTEGER :: N, MYID, IROOT, LOCAL_M, LOCAL_N
+      INTEGER :: LOCAL_M_LLD
+      INTEGER FILS( N )
+      INTEGER(8), INTENT(IN) :: PTRARW( N ), PTRAIW( N )
+      DOUBLE PRECISION VALROOT(LOCAL_M_LLD,LOCAL_N)
+      INTEGER(8), INTENT(IN) :: LINTARR, LDBLARR
+      INTEGER INTARR(LINTARR)
+      DOUBLE PRECISION DBLARR(LDBLARR)
+      DOUBLE PRECISION VAL
+      INTEGER(8) :: JJ, J1,JK, J2,J3, J4, AINPUT
+      INTEGER IORG, IBROT, NUMORG,
+     &        IROW, JCOL
+      INTEGER IPOSROOT, JPOSROOT, IROW_GRID, JCOL_GRID
+      INTEGER ILOCROOT, JLOCROOT
+      NUMORG = root%ROOT_SIZE
+      IBROT  = IROOT
+      DO IORG = 1, NUMORG
+        JK = PTRAIW(IBROT)
+        AINPUT = PTRARW(IBROT)
+        IBROT = FILS(IBROT)
+        JJ = JK + 1
+        J1 = JJ + 1
+        J2 = J1 + INTARR(JK)
+        J3 = J2 + 1
+        J4 = J2 - INTARR(JJ)
+        JCOL = INTARR(J1)
+        DO JJ = J1, J2
+         IROW = INTARR(JJ)
+         VAL  = DBLARR(AINPUT)
+         AINPUT = AINPUT + 1
+         IPOSROOT = root%RG2L_ROW( IROW )
+         JPOSROOT = root%RG2L_COL( JCOL )
+         IROW_GRID  = mod( ( IPOSROOT - 1 ) / root%MBLOCK, root%NPROW )
+         JCOL_GRID  = mod( ( JPOSROOT - 1 ) / root%NBLOCK, root%NPCOL )
+         IF ( IROW_GRID .EQ. root%MYROW .AND.
+     &        JCOL_GRID .EQ. root%MYCOL ) THEN
+            ILOCROOT = root%MBLOCK * ( ( IPOSROOT - 1 ) /
+     &                 ( root%MBLOCK * root%NPROW ) )
+     &               + mod( IPOSROOT - 1, root%MBLOCK ) + 1
+            JLOCROOT = root%NBLOCK * ( ( JPOSROOT - 1 ) /
+     &                 ( root%NBLOCK * root%NPCOL ) )
+     &               + mod( JPOSROOT - 1, root%NBLOCK ) + 1
+            VALROOT( ILOCROOT, JLOCROOT ) =
+     &      VALROOT( ILOCROOT, JLOCROOT ) + VAL
+         END IF
+        END DO
+        IF (J3 .LE. J4) THEN
+         IROW =  INTARR(J1)
+         DO JJ= J3,J4
+          JCOL = INTARR(JJ)
+          VAL  = DBLARR(AINPUT)
+          AINPUT = AINPUT + 1
+          IPOSROOT = root%RG2L_ROW( IROW )
+          JPOSROOT = root%RG2L_COL( JCOL )
+          IROW_GRID= mod( ( IPOSROOT - 1 )/root%MBLOCK, root%NPROW)
+          JCOL_GRID= mod( ( JPOSROOT - 1 )/root%NBLOCK, root%NPCOL)
+          IF ( IROW_GRID .EQ. root%MYROW .AND.
+     &        JCOL_GRID .EQ. root%MYCOL ) THEN
+            ILOCROOT = root%MBLOCK * ( ( IPOSROOT - 1 ) /
+     &                 ( root%MBLOCK * root%NPROW ) )
+     &               + mod( IPOSROOT - 1, root%MBLOCK ) + 1
+            JLOCROOT = root%NBLOCK * ( ( JPOSROOT - 1 ) /
+     &                 ( root%NBLOCK * root%NPCOL ) )
+     &               + mod( JPOSROOT - 1, root%NBLOCK ) + 1
+            VALROOT( ILOCROOT, JLOCROOT ) = 
+     &      VALROOT( ILOCROOT, JLOCROOT ) + VAL
+          END IF
+         END DO
+        ENDIF
+      ENDDO
+      RETURN
+      END SUBROUTINE DMUMPS_ASM_ARR_ROOT

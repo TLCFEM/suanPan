@@ -1,14 +1,15 @@
 C
-C  This file is part of MUMPS 5.2.1, released
-C  on Fri Jun 14 14:46:05 UTC 2019
+C  This file is part of MUMPS 5.5.1, released
+C  on Tue Jul 12 13:17:24 UTC 2022
 C
 C
-C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2022 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license:
-C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+C  released under the CeCILL-C license 
+C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
       MODULE DMUMPS_FAC_LR
       USE DMUMPS_LR_CORE
@@ -19,7 +20,7 @@ C
      &        BEGS_BLR, NB_BLR, CURRENT_BLR, BLR_L,
      &        NELIM, IW2, BLOCK,
      &        MAXI_CLUSTER, NPIV, NIV, 
-     &        COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT, KPERCENT)
+     &        MIDBLK_COMPRESS, TOLEPS, TOL_OPT, KPERCENT)
 !$    USE OMP_LIB
       INTEGER(8), intent(in)       :: LA
       INTEGER(8), intent(in)       :: POSELT 
@@ -31,7 +32,7 @@ C
       DOUBLE PRECISION, INTENT(INOUT) :: BLOCK(MAXI_CLUSTER,*)
       INTEGER, intent(in) :: IW2(*)
       INTEGER, DIMENSION(:) :: BEGS_BLR
-      INTEGER,intent(in) :: COMPRESS_MID_PRODUCT, KPERCENT
+      INTEGER,intent(in) :: MIDBLK_COMPRESS, KPERCENT
       DOUBLE PRECISION,intent(in) :: TOLEPS
       INTEGER :: I, NB_BLOCKS_PANEL, J, MID_RANK
       LOGICAL :: BUILDQ
@@ -65,20 +66,18 @@ C
             POSELTT = POSELT + int(NFRONT,8) *
      &                int(BEGS_BLR(CURRENT_BLR+I)-1,8)
      &           + int(BEGS_BLR(CURRENT_BLR+J) - 1, 8)
-            CALL DMUMPS_LRGEMM3('N', 'T', MONE,
-     &            BLR_L(J),BLR_L(I), ONE, A, LA, 
-     &            POSELTT, NFRONT, 1, NIV, IFLAG, IERROR, 
-     &            COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT, KPERCENT,
+            CALL DMUMPS_LRGEMM4(MONE,
+     &            BLR_L(J), BLR_L(I), ONE, A, LA, 
+     &            POSELTT, NFRONT, 1, IFLAG, IERROR, 
+     &            MIDBLK_COMPRESS, TOLEPS, TOL_OPT, KPERCENT,
      &            MID_RANK, BUILDQ,
-     &            A(POSELTD), NFRONT, 
-     &            IW2,
-     &            BLOCK(1:MAXI_CLUSTER,OMP_NUM*MAXI_CLUSTER+1), 
-     &            MAXI_CLUSTER)
+     &            .FALSE., MAXI_CLUSTER=MAXI_CLUSTER,
+     &            DIAG=A(POSELTD), LD_DIAG=NFRONT, IW2=IW2,
+     &            BLOCK=BLOCK(1:MAXI_CLUSTER,OMP_NUM*MAXI_CLUSTER+1))
             IF (IFLAG.LT.0) CYCLE
-            CALL UPDATE_FLOP_STATS_LRB_PRODUCT(BLR_L(J), BLR_L(I), 'N',
-     &          'T', NIV, COMPRESS_MID_PRODUCT, MID_RANK, BUILDQ
-     &          , (I.EQ.J)
-     &           )
+            CALL UPD_FLOP_UPDATE(BLR_L(J), BLR_L(I),
+     &          MIDBLK_COMPRESS, MID_RANK, BUILDQ,
+     &          (I.EQ.J), .FALSE.)
          ENDDO
 #if defined(BLR_MT) 
 !$OMP END DO
@@ -92,7 +91,7 @@ C
      &        CURRENT_BLR_LM, CURRENT_BLR_LS,
      &        IW2, BLOCK,
      &        MAXI_CLUSTER,
-     &        COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT, KPERCENT
+     &        MIDBLK_COMPRESS, TOLEPS, TOL_OPT, KPERCENT
      &        )
 !$    USE OMP_LIB      
       INTEGER(8), intent(in)  :: LA, LA_BLOCFACTO
@@ -109,7 +108,7 @@ C
       INTEGER, DIMENSION(:) :: BEGS_BLR_LM, BEGS_BLR_LS
       TYPE(LRB_TYPE),intent(in) :: BLR_LM(NB_BLR_LM-CURRENT_BLR_LM),
      &                             BLR_LS(NB_BLR_LS-CURRENT_BLR_LS)
-      INTEGER,intent(in) :: COMPRESS_MID_PRODUCT, KPERCENT
+      INTEGER,intent(in) :: MIDBLK_COMPRESS, KPERCENT
       DOUBLE PRECISION,intent(in) :: TOLEPS
       INTEGER :: I, NB_BLOCKS_PANEL_LM, NB_BLOCKS_PANEL_LS, J, MID_RANK
       LOGICAL :: BUILDQ
@@ -143,20 +142,19 @@ C
      &           + int(NCOL,8) * 
      &             int((BEGS_BLR_LS(CURRENT_BLR_LS+I)+ISHIFT_LS-1),8)
      &           + int((BEGS_BLR_LM(CURRENT_BLR_LM+J)+ISHIFT_LM-1),8)
-            CALL DMUMPS_LRGEMM3('N', 'T', MONE,
-     &            BLR_LM(J),BLR_LS(I), ONE, A, LA, 
+            CALL DMUMPS_LRGEMM4(MONE,
+     &            BLR_LM(J), BLR_LS(I), ONE, A, LA, 
      &            POSELTT, NCOL, 
-     &            1, 2, IFLAG, IERROR, 
-     &            COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT, KPERCENT,
-     &            MID_RANK, BUILDQ,
-     &            A_BLOCFACTO, LD_BLOCFACTO, 
-     &            IW2,
-     &            BLOCK(1:MAXI_CLUSTER,OMP_NUM*MAXI_CLUSTER+1),
-     &            MAXI_CLUSTER)
+     &            1, IFLAG, IERROR, 
+     &            MIDBLK_COMPRESS, TOLEPS, TOL_OPT, KPERCENT,
+     &            MID_RANK, BUILDQ, 
+     &            .FALSE., MAXI_CLUSTER=MAXI_CLUSTER,
+     &            DIAG=A_BLOCFACTO, LD_DIAG=LD_BLOCFACTO, IW2=IW2,
+     &            BLOCK=BLOCK(1:MAXI_CLUSTER,OMP_NUM*MAXI_CLUSTER+1))
             IF (IFLAG.LT.0) CYCLE
-            CALL UPDATE_FLOP_STATS_LRB_PRODUCT(BLR_LM(J), BLR_LS(I),
-     &           'N','T', 2, COMPRESS_MID_PRODUCT, MID_RANK, BUILDQ,
-     &            .FALSE.) 
+            CALL UPD_FLOP_UPDATE(BLR_LM(J), BLR_LS(I),
+     &           MIDBLK_COMPRESS, MID_RANK, BUILDQ,
+     &           .FALSE., .FALSE.)
          ENDDO
 #if defined(BLR_MT) 
 !$OMP END DO
@@ -176,20 +174,19 @@ C
      &        + int(NCOL,8) * 
      &          int((BEGS_BLR_LS(CURRENT_BLR_LS+I)+ISHIFT_LS-1),8)
      &        + int((NCOL-NROW+(BEGS_BLR_LS(CURRENT_BLR_LS+J)-1)),8)
-          CALL DMUMPS_LRGEMM3('N', 'T', MONE,
+          CALL DMUMPS_LRGEMM4(MONE,
      &            BLR_LS(J),BLR_LS(I), ONE, A, LA, 
      &            POSELTT, NCOL, 
-     &            1, 2, IFLAG, IERROR, 
-     &            COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT, KPERCENT,
+     &            1, IFLAG, IERROR, 
+     &            MIDBLK_COMPRESS, TOLEPS, TOL_OPT, KPERCENT,
      &            MID_RANK, BUILDQ,
-     &            A_BLOCFACTO, LD_BLOCFACTO, 
-     &            IW2,
-     &            BLOCK(1:MAXI_CLUSTER,OMP_NUM*MAXI_CLUSTER+1),
-     &            MAXI_CLUSTER)
+     &            .FALSE., MAXI_CLUSTER=MAXI_CLUSTER,
+     &            DIAG=A_BLOCFACTO, LD_DIAG=LD_BLOCFACTO, IW2=IW2,
+     &            BLOCK=BLOCK(1:MAXI_CLUSTER,OMP_NUM*MAXI_CLUSTER+1))
             IF (IFLAG.LT.0) CYCLE
-            CALL UPDATE_FLOP_STATS_LRB_PRODUCT(BLR_LS(J), BLR_LS(I),
-     &           'N','T', 2, COMPRESS_MID_PRODUCT, MID_RANK, BUILDQ,
-     &            (I.EQ.J)) 
+            CALL UPD_FLOP_UPDATE(BLR_LS(J), BLR_LS(I),
+     &            MIDBLK_COMPRESS, MID_RANK, BUILDQ, 
+     &            (I.EQ.J), .FALSE.)
       ENDDO
 #if defined(BLR_MT) 
 !$OMP END DO
@@ -217,12 +214,13 @@ C
       DOUBLE PRECISION :: ONE, MONE, ZERO
       PARAMETER (ONE = 1.0D0, MONE=-1.0D0)
       PARAMETER (ZERO=0.0D0)
-#if defined(BLR_MT) 
-!$OMP MASTER
-#endif
       IF (NELIM.NE.0) THEN 
         LPOS = POSELT + int(NFRONT,8)*int(NPIV,8) + int(IBEG_BLR-1,8)
-        DO IP = FIRST_BLOCK, NB_BLR
+#if defined(BLR_MT) 
+!$OMP DO PRIVATE(LRB, UPOS)
+#endif
+        DO IP = FIRST_BLOCK, NB_BLR 
+          IF (IFLAG.LT.0) CYCLE
           LRB => BLR_U(IP-CURRENT_BLR)
           UPOS = POSELT + int(NFRONT,8)*int(NPIV,8) 
      &                  + int(BEGS_BLR(IP)-1,8)
@@ -232,9 +230,6 @@ C
                IF (allocok .GT. 0) THEN
                  IFLAG  = -13
                  IERROR = NELIM * LRB%K
-                 write(*,*) 'Allocation problem in BLR routine 
-     &         DMUMPS_BLR_UPD_NELIM_VAR_U: ',
-     &         'not enough memory? memory requested = ', IERROR
                  GOTO 100
                ENDIF
                CALL dgemm('N', 'N', LRB%K, NELIM, LRB%N, ONE,
@@ -250,12 +245,12 @@ C
      &              LRB%Q(1,1), LRB%M, A(LPOS), NFRONT,
      &              ONE, A(UPOS), NFRONT) 
           ENDIF
+ 100    CONTINUE
         ENDDO
-      ENDIF
- 100  CONTINUE
 #if defined(BLR_MT) 
-!$OMP END MASTER
+!$OMP ENDDO
 #endif
+      ENDIF
       END SUBROUTINE DMUMPS_BLR_UPD_NELIM_VAR_U
       SUBROUTINE DMUMPS_BLR_UPD_NELIM_VAR_L(
      &        A_U, LA_U, UPOS, A_L, LA_L, LPOS, IFLAG, IERROR, LDU, LDL,
@@ -279,11 +274,12 @@ C
       PARAMETER (ONE = 1.0D0, MONE=-1.0D0)
       PARAMETER (ZERO=0.0D0)
       NB_BLOCKS_PANEL_L = NB_BLR_L-CURRENT_BLR
-#if defined(BLR_MT) 
-!$OMP MASTER
-#endif
       IF (NELIM.NE.0) THEN 
+#if defined(BLR_MT) 
+!$OMP DO PRIVATE(KL, ML, NL, IPOS)
+#endif
         DO I = FIRST_BLOCK-CURRENT_BLR, NB_BLOCKS_PANEL_L
+          IF (IFLAG.LT.0) CYCLE
           KL = BLR_L(I)%K 
           ML = BLR_L(I)%M 
           NL = BLR_L(I)%N 
@@ -313,19 +309,19 @@ C
      &              A_U(UPOS) , LDU , BLR_L(I)%Q(1,1) , ML ,
      &              ONE , A_L(IPOS) , LDL) 
           ENDIF
+ 100      CONTINUE
         ENDDO
-      ENDIF
- 100  CONTINUE
 #if defined(BLR_MT) 
-!$OMP END MASTER
+!$OMP ENDDO
 #endif
+      ENDIF
       END SUBROUTINE DMUMPS_BLR_UPD_NELIM_VAR_L
       SUBROUTINE DMUMPS_BLR_UPDATE_TRAILING(
      &        A, LA, POSELT, IFLAG, IERROR, NFRONT,
      &        BEGS_BLR_L, BEGS_BLR_U, CURRENT_BLR, BLR_L, NB_BLR_L, 
      &        BLR_U,
      &        NB_BLR_U, NELIM, LBANDSLAVE, ISHIFT, NIV, SYM,
-     &        COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT, KPERCENT)
+     &        MIDBLK_COMPRESS, TOLEPS, TOL_OPT, KPERCENT)
 !$    USE OMP_LIB
       INTEGER(8), intent(in)       :: LA
       INTEGER(8), intent(in)       :: POSELT 
@@ -339,7 +335,7 @@ C
       TYPE(LRB_TYPE),TARGET,intent(in) :: BLR_U(:)
       TYPE(LRB_TYPE),TARGET,intent(in) :: BLR_L(:)
       INTEGER :: BEGS_BLR_L(:), BEGS_BLR_U(:)
-      INTEGER,intent(in) :: COMPRESS_MID_PRODUCT, KPERCENT
+      INTEGER,intent(in) :: MIDBLK_COMPRESS, KPERCENT
       DOUBLE PRECISION,intent(in) :: TOLEPS
       INTEGER :: I, NB_BLOCKS_PANEL_L, NB_BLOCKS_PANEL_U, 
      &           KL, ML, NL, J, IS, MID_RANK
@@ -376,9 +372,6 @@ C
                IF (allocok .GT. 0) THEN
                  IFLAG  = -13
                  IERROR = NELIM * KL
-                 write(*,*) 'Allocation problem in BLR routine 
-     &           DMUMPS_BLR_UPDATE_TRAILING: ',
-     &           'not enough memory? memory requested = ', IERROR
                  GOTO 100
                ENDIF
                POSELT_TOP  = POSELT 
@@ -423,29 +416,19 @@ C
         IF (IFLAG.LT.0) CYCLE
         I = (IBIS-1)/NB_BLOCKS_PANEL_U+1
         J = IBIS - (I-1)*NB_BLOCKS_PANEL_U
-            POSELT_INCB = POSELT 
+        POSELT_INCB = POSELT 
      &           + int(NFRONT,8) * int((BEGS_BLR_L(CURRENT_BLR+I)-1),8)
      &           + int(BEGS_BLR_U(CURRENT_BLR+J) +IS - 1,8)
-         IF (SYM.EQ.0) THEN
-            CALL DMUMPS_LRGEMM3('N', 'T', MONE, BLR_U(J),
-     &            BLR_L(I), ONE, A, LA, POSELT_INCB,
-     &            NFRONT, 0, NIV, IFLAG, IERROR, 
-     &            COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT,
-     &            KPERCENT, MID_RANK, BUILDQ)
-            IF (IFLAG.LT.0) CYCLE
-            CALL UPDATE_FLOP_STATS_LRB_PRODUCT(BLR_U(J), BLR_L(I),
-     &          'N', 'T', NIV, COMPRESS_MID_PRODUCT, MID_RANK, BUILDQ)
-         ELSE
-            CALL DMUMPS_LRGEMM3('N', 'T', MONE, BLR_U(J),
-     &            BLR_L(I), ONE, A, LA, POSELT_INCB,
-     &            NFRONT, 0, NIV, IFLAG, IERROR, 
-     &            COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT,
-     &            KPERCENT, MID_RANK, BUILDQ)
-            IF (IFLAG.LT.0) CYCLE
-            CALL UPDATE_FLOP_STATS_LRB_PRODUCT(BLR_U(J), BLR_L(I), 'N',
-     &          'T', NIV, COMPRESS_MID_PRODUCT, MID_RANK, BUILDQ)
-         ENDIF
-         ENDDO
+         CALL DMUMPS_LRGEMM4(MONE, BLR_U(J),
+     &           BLR_L(I), ONE, A, LA, POSELT_INCB,
+     &           NFRONT, 0, IFLAG, IERROR, 
+     &           MIDBLK_COMPRESS, TOLEPS, TOL_OPT,
+     &           KPERCENT, MID_RANK, BUILDQ, .FALSE.)
+         IF (IFLAG.LT.0) CYCLE
+         CALL UPD_FLOP_UPDATE(BLR_U(J), BLR_L(I), 
+     &           MIDBLK_COMPRESS, MID_RANK, BUILDQ,
+     &           .FALSE., .FALSE.)
+       ENDDO
 #if defined(BLR_MT) 
 !$OMP END DO
 #endif
@@ -456,7 +439,7 @@ C
      &        BEGS_BLR, CURRENT_BLR, NB_BLR, NPARTSASS,
      &        NELIM, IW2, BLOCK, ACC_LUA,
      &        MAXI_CLUSTER, MAXI_RANK, NIV, IFLAG, IERROR,
-     &        COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT, KPERCENT_RMB,
+     &        MIDBLK_COMPRESS, TOLEPS, TOL_OPT, KPERCENT_RMB,
      &        K480, K479, K478, KPERCENT_LUA, KPERCENT,
      &        KEEP8,
      &        FIRST_BLOCK
@@ -475,13 +458,13 @@ C
       TYPE(LRB_TYPE), POINTER :: ACC_LUA(:)
       INTEGER(8) :: KEEP8(150)
       INTEGER, DIMENSION(:) :: BEGS_BLR
-      INTEGER,intent(in) :: COMPRESS_MID_PRODUCT, KPERCENT_RMB
+      INTEGER,intent(in) :: MIDBLK_COMPRESS, KPERCENT_RMB
       DOUBLE PRECISION,intent(in) :: TOLEPS
       INTEGER,intent(inout) :: IFLAG, IERROR
       INTEGER,OPTIONAL,intent(in) :: FIRST_BLOCK
       TYPE(LRB_TYPE), POINTER :: BLR_L(:), NEXT_BLR_L(:)
       TYPE(LRB_TYPE), POINTER :: ACC_LRB
-      INTEGER :: OLD_ACC_RANK, MAX_ACC_RANK, NEW_ACC_RANK, FR_BLOCKS,
+      INTEGER :: OLD_ACC_RANK, MAX_ACC_RANK, NEW_ACC_RANK, FRFR_UPDATES,
      &           I, II, J, JJ, NB_BLOCKS_PANEL, IND_U, IND_L, K_MAX,
      &           MAXRANK, NB_DEC, FR_RANK
       INTEGER :: MID_RANK, allocok
@@ -521,7 +504,7 @@ C
 !$OMP&         BLR_L, OMP_NUM, J_ORDER, J_RANK,
 !$OMP&         IND_U, IND_L, ACC_LRB, POSELTD, NB_DEC,
 !$OMP&         MAX_ACC_RANK, OLD_ACC_RANK, NEW_ACC_RANK,
-!$OMP&         FR_BLOCKS, COMPRESSED_FR, FR_RANK, II, OFFSET_IW)
+!$OMP&         FRFR_UPDATES, COMPRESSED_FR, FR_RANK, II, OFFSET_IW)
 #endif
       DO I = 1, NB_BLOCKS_PANEL
 #if defined(BLR_MT)         
@@ -546,24 +529,23 @@ C
           CALL DMUMPS_GET_LUA_ORDER(CURRENT_BLR, J_ORDER, J_RANK,
      &                              IWHANDLER, 
      &                              1, 0, I, 0, 
-     &                              FR_BLOCKS)
+     &                              FRFR_UPDATES)
         ENDIF
         FR_RANK = 0
         IF ((K480.GE.5).AND.(I.NE.1)) THEN
           IF (I.GT.FIRST_BLOCK) THEN
-            IF (FR_BLOCKS.EQ.0) THEN
+            IF (FRFR_UPDATES.EQ.0) THEN
               CALL DMUMPS_COMPRESS_FR_UPDATES(ACC_LRB,
      &               MAXI_CLUSTER, MAXI_RANK, A, LA, POSELT_INCB,
      &               NFRONT, NIV, TOLEPS, TOL_OPT, KPERCENT, 
-     &               COMPRESSED_FR, 
-     &               0)
+     &               COMPRESSED_FR, 0, .FALSE.)
               MAX_ACC_RANK = ACC_LRB%K
               NEW_ACC_RANK = ACC_LRB%K
               FR_RANK = ACC_LRB%K
             ENDIF
           ENDIF
         ENDIF
-        NB_DEC = FR_BLOCKS
+        NB_DEC = FRFR_UPDATES
         DO JJ = 1, CURRENT_BLR
           J = J_ORDER(JJ)
           K_MAX = J_RANK(JJ)
@@ -589,22 +571,23 @@ C
             ENDIF
             OLD_ACC_RANK = ACC_LRB%K
           ENDIF
-          CALL DMUMPS_LRGEMM3_LUA('N', 'T',
-     &              MONE, BLR_L(IND_U), BLR_L(IND_L), ONE,
-     &              ACC_LRB, MAXI_CLUSTER, MAXI_RANK, K480,
+          CALL DMUMPS_LRGEMM4(MONE,
+     &              BLR_L(IND_U), BLR_L(IND_L), ONE,
      &              A, LA, POSELT_INCB,
-     &              NFRONT, 1, NIV, IFLAG, IERROR, 
-     &              COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT,
+     &              NFRONT, 1, IFLAG, IERROR, 
+     &              MIDBLK_COMPRESS, TOLEPS, TOL_OPT,
      &              KPERCENT_RMB, MID_RANK, BUILDQ, 
-     &              A(POSELTD), NFRONT, 
-     &              IW2(OFFSET_IW),
-     &              BLOCK(1:MAXI_CLUSTER,OMP_NUM*MAXI_CLUSTER+1)
-     &              )
+     &              (K480.GE.3), LorU=0, 
+     &              LRB3=ACC_LRB, MAXI_RANK=MAXI_RANK,
+     &              MAXI_CLUSTER=MAXI_CLUSTER,
+     &              DIAG=A(POSELTD), LD_DIAG=NFRONT, 
+     &              IW2=IW2(OFFSET_IW),
+     &              BLOCK=BLOCK(1:MAXI_CLUSTER,OMP_NUM*MAXI_CLUSTER+1))
           IF (IFLAG.LT.0) GOTO 100
-          CALL UPDATE_FLOP_STATS_LRB_PRODUCT(BLR_L(IND_U), 
-     &      BLR_L(IND_L), 'N', 'T', NIV, COMPRESS_MID_PRODUCT, 
-     &      MID_RANK, BUILDQ, IS_DIAG=(I.EQ.1), K480=K480)
-          IF ((COMPRESS_MID_PRODUCT.GE.1).AND.BUILDQ) THEN
+          CALL UPD_FLOP_UPDATE(BLR_L(IND_U), 
+     &      BLR_L(IND_L), MIDBLK_COMPRESS, 
+     &      MID_RANK, BUILDQ, (I.EQ.1), (K480.GE.3))
+          IF ((MIDBLK_COMPRESS.GE.1).AND.BUILDQ) THEN
             J_RANK(JJ) = MID_RANK
           ENDIF
           IF (K480.GE.3) THEN
@@ -616,7 +599,7 @@ C
                 IF (ACC_LRB%K.GT.0) THEN
                   CALL DMUMPS_RECOMPRESS_ACC(ACC_LRB,
      &                 MAXI_CLUSTER, MAXI_RANK, A, LA, POSELT_INCB,
-     &                 NFRONT, NIV, COMPRESS_MID_PRODUCT, TOLEPS,
+     &                 NFRONT, NIV, MIDBLK_COMPRESS, TOLEPS,
      &                 TOL_OPT,
      &                 KPERCENT_RMB, KPERCENT_LUA, NEW_ACC_RANK)
                   MAX_ACC_RANK = ACC_LRB%K
@@ -625,17 +608,16 @@ C
             ENDIF
             IF ((K480.GE.5).AND.(I.NE.1)) THEN
               IF (I.GT.FIRST_BLOCK) THEN
-                IF (JJ.EQ.FR_BLOCKS) THEN
+                IF (JJ.EQ.FRFR_UPDATES) THEN
                   CALL DMUMPS_COMPRESS_FR_UPDATES(ACC_LRB,
      &                MAXI_CLUSTER, MAXI_RANK, A, LA, POSELT_INCB,
      &                NFRONT, NIV, TOLEPS, TOL_OPT, KPERCENT, 
-     &                COMPRESSED_FR,
-     &                0)
+     &                COMPRESSED_FR, 0, .FALSE.)
                   MAX_ACC_RANK = ACC_LRB%K
                   NEW_ACC_RANK = ACC_LRB%K
                   IF (COMPRESSED_FR) THEN
                     J_RANK(JJ) = ACC_LRB%K 
-                    NB_DEC = FR_BLOCKS-1 
+                    NB_DEC = FRFR_UPDATES-1 
                   ENDIF
                 ENDIF
               ENDIF
@@ -647,14 +629,14 @@ C
             IF (COMPRESSED_FR.OR.(K480.GE.6)) THEN  
               IF (ACC_LRB%K.GT.0) THEN
                 IF (K478.EQ.-1) THEN
-                  IF (CURRENT_BLR-FR_BLOCKS.GT.1) THEN
+                  IF (CURRENT_BLR-FRFR_UPDATES.GT.1) THEN
                     CALL DMUMPS_RECOMPRESS_ACC(ACC_LRB,
      &               MAXI_CLUSTER, MAXI_RANK, A, LA, POSELT_INCB,
-     &               NFRONT, NIV, COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT,
+     &               NFRONT, NIV, MIDBLK_COMPRESS, TOLEPS, TOL_OPT,
      &               KPERCENT_RMB, KPERCENT_LUA, NEW_ACC_RANK)
                   ENDIF
                 ELSEIF (K478.LE.-2) THEN
-                  IF (FR_BLOCKS.GT.0) THEN
+                  IF (FRFR_UPDATES.GT.0) THEN
                     allocate(POS_LIST(CURRENT_BLR-NB_DEC),stat=allocok)
                     IF (allocok .GT. 0) THEN
                        IFLAG  = -13
@@ -671,7 +653,7 @@ C
                     ENDDO
                     CALL DMUMPS_RECOMPRESS_ACC_NARYTREE(ACC_LRB,
      &               MAXI_CLUSTER, MAXI_RANK, A, LA, POSELT_INCB, KEEP8,
-     &               NFRONT, NIV, COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT,
+     &               NFRONT, NIV, MIDBLK_COMPRESS, TOLEPS, TOL_OPT,
      &               KPERCENT_RMB, KPERCENT_LUA, K478, 
      &               J_RANK(NB_DEC+1:CURRENT_BLR), POS_LIST,
      &               CURRENT_BLR-NB_DEC, 0)
@@ -707,7 +689,7 @@ C
                     ENDDO
                     CALL DMUMPS_RECOMPRESS_ACC_NARYTREE(ACC_LRB,
      &               MAXI_CLUSTER, MAXI_RANK, A, LA, POSELT_INCB, KEEP8,
-     &               NFRONT, NIV, COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT,
+     &               NFRONT, NIV, MIDBLK_COMPRESS, TOLEPS, TOL_OPT,
      &               KPERCENT_RMB, KPERCENT_LUA, K478, 
      &               RANK_LIST, POS_LIST,
      &               CURRENT_BLR+1, 0)
@@ -732,10 +714,10 @@ C
             ENDIF
           ELSE 
             IF ((K480.EQ.4).AND.(K478.EQ.-1).AND.(ACC_LRB%K.GT.0)) THEN
-              IF (CURRENT_BLR-FR_BLOCKS.GT.1) THEN
+              IF (CURRENT_BLR-FRFR_UPDATES.GT.1) THEN
                 CALL DMUMPS_RECOMPRESS_ACC(ACC_LRB,
      &               MAXI_CLUSTER, MAXI_RANK, A, LA, POSELT_INCB,
-     &               NFRONT, NIV, COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT,
+     &               NFRONT, NIV, MIDBLK_COMPRESS, TOLEPS, TOL_OPT,
      &               KPERCENT_RMB, KPERCENT_LUA, NEW_ACC_RANK)
               ENDIF
             ELSEIF ((K480.EQ.4).AND.(K478.LE.-2).AND.(ACC_LRB%K.GT.0)) 
@@ -744,10 +726,6 @@ C
                IF (allocok .GT. 0) THEN
                   IFLAG  = -13
                   IERROR = CURRENT_BLR-NB_DEC
-                  write(*,*) 'Allocation problem in BLR routine ',
-     &                 'DMUMPS_BLR_UPD_PANEL_LEFT_LDLT: ',
-     &                 'not enough memory? memory requested = ',
-     &                 IERROR
                   GOTO 100
                ENDIF
               POS_LIST(1) = 1
@@ -756,7 +734,7 @@ C
               ENDDO
               CALL DMUMPS_RECOMPRESS_ACC_NARYTREE(ACC_LRB,
      &               MAXI_CLUSTER, MAXI_RANK, A, LA, POSELT_INCB, KEEP8,
-     &               NFRONT, NIV, COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT,
+     &               NFRONT, NIV, MIDBLK_COMPRESS, TOLEPS, TOL_OPT,
      &               KPERCENT_RMB, KPERCENT_LUA, K478, 
      &               J_RANK(NB_DEC+1:CURRENT_BLR), POS_LIST,
      &               CURRENT_BLR-NB_DEC, 0)
@@ -777,7 +755,7 @@ C
      &        BEGS_BLR, BEGS_BLR_U, CURRENT_BLR, ACC_LUA,
      &        NB_BLR, NPARTSASS, NELIM, NIV, SYM, 
      &        LBANDSLAVE, IFLAG, IERROR, ISHIFT,
-     &        COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT, KPERCENT_RMB,
+     &        MIDBLK_COMPRESS, TOLEPS, TOL_OPT, KPERCENT_RMB,
      &        K480, K479, K478, KPERCENT_LUA, KPERCENT,
      &        MAXI_CLUSTER, MAXI_RANK, 
      &        K474, FSorCB, BLR_U_COL, KEEP8,
@@ -796,14 +774,14 @@ C
       TYPE(LRB_TYPE), POINTER :: ACC_LUA(:), BLR_U_COL(:)
       INTEGER(8) :: KEEP8(150)
       INTEGER, DIMENSION(:) :: BEGS_BLR, BEGS_BLR_U
-      INTEGER,intent(in) :: COMPRESS_MID_PRODUCT, KPERCENT_RMB, TOL_OPT
+      INTEGER,intent(in) :: MIDBLK_COMPRESS, KPERCENT_RMB, TOL_OPT
       DOUBLE PRECISION,intent(in) :: TOLEPS
       INTEGER,intent(inout) :: IFLAG, IERROR
       INTEGER,OPTIONAL,intent(in) :: FIRST_BLOCK
       INTEGER,OPTIONAL,intent(in) :: BEG_I_IN, END_I_IN
       TYPE(LRB_TYPE), POINTER :: BLR_U(:), BLR_L(:), NEXT_BLR(:)
       TYPE(LRB_TYPE), POINTER :: ACC_LRB
-      INTEGER :: OLD_ACC_RANK, MAX_ACC_RANK, NEW_ACC_RANK, FR_BLOCKS,
+      INTEGER :: OLD_ACC_RANK, MAX_ACC_RANK, NEW_ACC_RANK, FRFR_UPDATES,
      &           NB_DEC, FR_RANK, MAXRANK, BEG_I, END_I
       INTEGER :: I,II,J,JJ, NB_BLOCKS_PANEL, IND_U, IND_L, K_MAX
       INTEGER :: MID_RANK, allocok
@@ -863,7 +841,7 @@ C
 !$OMP&         BLR_U, BLR_L, J_ORDER, J_RANK, K_MAX,
 !$OMP&         IND_U, IND_L, OMP_NUM, ACC_LRB,
 !$OMP&         MAX_ACC_RANK, OLD_ACC_RANK, NEW_ACC_RANK,
-!$OMP&         FR_BLOCKS, FR_RANK, COMPRESSED_FR)
+!$OMP&         FRFR_UPDATES, FR_RANK, COMPRESSED_FR)
 #endif
       DO I = BEG_I, END_I
         IF (IFLAG.LT.0) CYCLE
@@ -908,25 +886,24 @@ C
           CALL DMUMPS_GET_LUA_ORDER(CURRENT_BLR, J_ORDER, J_RANK, 
      &                              IWHANDLER, 
      &                              0, 0, I, LorU, 
-     &                              FR_BLOCKS, 
+     &                              FRFR_UPDATES, 
      &                              LBANDSLAVE, K474, BLR_U_COL)
         ENDIF
         FR_RANK = 0
         IF ((K480.GE.5).AND.(I.NE.1)) THEN
           IF (I.GT.FIRST_BLOCK) THEN
-            IF (FR_BLOCKS.EQ.0) THEN
+            IF (FRFR_UPDATES.EQ.0) THEN
               CALL DMUMPS_COMPRESS_FR_UPDATES(ACC_LRB,
      &                MAXI_CLUSTER, MAXI_RANK, A, LA, POSELT_INCB,
      &                NFRONT, NIV, TOLEPS, TOL_OPT, KPERCENT, 
-     &                COMPRESSED_FR,
-     &                LorU)
+     &                COMPRESSED_FR, LorU, .FALSE.)
               MAX_ACC_RANK = ACC_LRB%K
               NEW_ACC_RANK = ACC_LRB%K
               FR_RANK = ACC_LRB%K
             ENDIF
           ENDIF
         ENDIF
-        NB_DEC = FR_BLOCKS
+        NB_DEC = FRFR_UPDATES
         DO JJ = 1, CURRENT_BLR
           J = J_ORDER(JJ)
           K_MAX = J_RANK(JJ)
@@ -969,19 +946,21 @@ C
           ENDIF
           OLD_ACC_RANK = ACC_LRB%K
         ENDIF
-        CALL DMUMPS_LRGEMM3_LUA('N', 'T',
-     &            MONE, BLR_U(IND_U), BLR_L(IND_L), ONE,
-     &            ACC_LRB, MAXI_CLUSTER, MAXI_RANK, K480,
+          CALL DMUMPS_LRGEMM4(MONE,
+     &            BLR_U(IND_U), BLR_L(IND_L), ONE,
      &            A, LA, POSELT_INCB,
-     &            NFRONT, 0, NIV, IFLAG, IERROR, 
-     &            COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT,
-     &            KPERCENT_RMB, MID_RANK, BUILDQ
+     &            NFRONT, 0, IFLAG, IERROR, 
+     &            MIDBLK_COMPRESS, TOLEPS, TOL_OPT,
+     &            KPERCENT_RMB, MID_RANK, BUILDQ,
+     &            (K480.GE.3), LorU=LorU, 
+     &            LRB3=ACC_LRB, MAXI_RANK=MAXI_RANK,
+     &            MAXI_CLUSTER=MAXI_CLUSTER
      &            )
         IF (IFLAG.LT.0) GOTO 100
-        CALL UPDATE_FLOP_STATS_LRB_PRODUCT(BLR_U(IND_U), 
-     &            BLR_L(IND_L), 'N', 'T', NIV,
-     &            COMPRESS_MID_PRODUCT, MID_RANK, BUILDQ, K480=K480)
-          IF ((COMPRESS_MID_PRODUCT.GE.1).AND.BUILDQ) THEN
+        CALL UPD_FLOP_UPDATE(BLR_U(IND_U), BLR_L(IND_L),
+     &            MIDBLK_COMPRESS, MID_RANK, BUILDQ, 
+     &            .FALSE., (K480.GE.3))
+          IF ((MIDBLK_COMPRESS.GE.1).AND.BUILDQ) THEN
             J_RANK(JJ) = MID_RANK
           ENDIF
         IF (K480.GE.3) THEN
@@ -992,7 +971,7 @@ C
      &          THEN
               CALL DMUMPS_RECOMPRESS_ACC(ACC_LRB,MAXI_CLUSTER,
      &            MAXI_RANK, A, LA, POSELT_INCB, NFRONT, NIV,
-     &            COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT, KPERCENT_RMB,
+     &            MIDBLK_COMPRESS, TOLEPS, TOL_OPT, KPERCENT_RMB,
      &            KPERCENT_LUA, NEW_ACC_RANK)
               MAX_ACC_RANK = ACC_LRB%K
             ENDIF
@@ -1000,17 +979,16 @@ C
         ENDIF
         IF ((K480.GE.5).AND.(I.NE.1)) THEN
           IF (I.GT.FIRST_BLOCK) THEN
-            IF (JJ.EQ.FR_BLOCKS) THEN
+            IF (JJ.EQ.FRFR_UPDATES) THEN
               CALL DMUMPS_COMPRESS_FR_UPDATES(ACC_LRB,
      &               MAXI_CLUSTER, MAXI_RANK, A, LA, POSELT_INCB,
      &               NFRONT, NIV, TOLEPS, TOL_OPT, KPERCENT,
-     &               COMPRESSED_FR,
-     &               LorU)
+     &               COMPRESSED_FR, LorU, .FALSE.)
               MAX_ACC_RANK = ACC_LRB%K
               NEW_ACC_RANK = ACC_LRB%K
               IF (COMPRESSED_FR) THEN
                 J_RANK(JJ) = ACC_LRB%K 
-                NB_DEC = FR_BLOCKS-1 
+                NB_DEC = FRFR_UPDATES-1 
               ENDIF
             ENDIF
           ENDIF
@@ -1021,14 +999,14 @@ C
             IF (COMPRESSED_FR.OR.(K480.GE.6)) THEN  
               IF (ACC_LRB%K.GT.0) THEN
                 IF (K478.EQ.-1) THEN
-                  IF (CURRENT_BLR-FR_BLOCKS.GT.1) THEN
+                  IF (CURRENT_BLR-FRFR_UPDATES.GT.1) THEN
                     CALL DMUMPS_RECOMPRESS_ACC(ACC_LRB,
      &               MAXI_CLUSTER, MAXI_RANK, A, LA, POSELT_INCB,
-     &               NFRONT, NIV, COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT,
+     &               NFRONT, NIV, MIDBLK_COMPRESS, TOLEPS, TOL_OPT,
      &               KPERCENT_RMB, KPERCENT_LUA, NEW_ACC_RANK)
                   ENDIF
                 ELSEIF (K478.LE.-2) THEN
-                  IF (FR_BLOCKS.GT.0) THEN
+                  IF (FRFR_UPDATES.GT.0) THEN
                     allocate(POS_LIST(CURRENT_BLR-NB_DEC),stat=allocok)
                     IF (allocok .GT. 0) THEN
                        IFLAG  = -13
@@ -1045,7 +1023,7 @@ C
                     ENDDO
                     CALL DMUMPS_RECOMPRESS_ACC_NARYTREE(ACC_LRB,
      &               MAXI_CLUSTER, MAXI_RANK, A, LA, POSELT_INCB, KEEP8,
-     &               NFRONT, NIV, COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT,
+     &               NFRONT, NIV, MIDBLK_COMPRESS, TOLEPS, TOL_OPT,
      &               KPERCENT_RMB, KPERCENT_LUA, K478, 
      &               J_RANK(NB_DEC+1:CURRENT_BLR), POS_LIST,
      &               CURRENT_BLR-NB_DEC, 0)
@@ -1081,7 +1059,7 @@ C
                     ENDDO
                     CALL DMUMPS_RECOMPRESS_ACC_NARYTREE(ACC_LRB,
      &               MAXI_CLUSTER, MAXI_RANK, A, LA, POSELT_INCB, KEEP8,
-     &               NFRONT, NIV, COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT,
+     &               NFRONT, NIV, MIDBLK_COMPRESS, TOLEPS, TOL_OPT,
      &               KPERCENT_RMB, KPERCENT_LUA, K478, 
      &               RANK_LIST, POS_LIST,
      &               CURRENT_BLR+1, 0)
@@ -1106,10 +1084,10 @@ C
             ENDIF
           ELSE 
             IF ((K480.EQ.4).AND.(K478.EQ.-1).AND.(ACC_LRB%K.GT.0)) THEN
-              IF (CURRENT_BLR-FR_BLOCKS.GT.1) THEN
+              IF (CURRENT_BLR-FRFR_UPDATES.GT.1) THEN
                 CALL DMUMPS_RECOMPRESS_ACC(ACC_LRB,
      &               MAXI_CLUSTER, MAXI_RANK, A, LA, POSELT_INCB,
-     &               NFRONT, NIV, COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT,
+     &               NFRONT, NIV, MIDBLK_COMPRESS, TOLEPS, TOL_OPT,
      &               KPERCENT_RMB, KPERCENT_LUA, NEW_ACC_RANK)
               ENDIF
             ELSEIF ((K480.EQ.4).AND.(K478.LE.-2).AND.(ACC_LRB%K.GT.0)) 
@@ -1118,10 +1096,6 @@ C
               IF (allocok .GT. 0) THEN
                  IFLAG  = -13
                  IERROR = CURRENT_BLR-NB_DEC
-                 write(*,*) 'Allocation problem in BLR routine ',
-     &                'DMUMPS_BLR_UPD_PANEL_LEFT: ',
-     &                'not enough memory? memory requested = ',
-     &                IERROR
                  GOTO 100
               ENDIF
               POS_LIST(1) = 1
@@ -1130,7 +1104,7 @@ C
               ENDDO
               CALL DMUMPS_RECOMPRESS_ACC_NARYTREE(ACC_LRB,
      &               MAXI_CLUSTER, MAXI_RANK, A, LA, POSELT_INCB, KEEP8,
-     &               NFRONT, NIV, COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT,
+     &               NFRONT, NIV, MIDBLK_COMPRESS, TOLEPS, TOL_OPT,
      &               KPERCENT_RMB, KPERCENT_LUA, K478, 
      &               J_RANK(NB_DEC+1:CURRENT_BLR), POS_LIST,
      &               CURRENT_BLR-NB_DEC, 0)
@@ -1151,7 +1125,7 @@ C
      &        IWHANDLER, 
      &        IW2, BLOCK, ACC_LUA,
      &        MAXI_CLUSTER, MAXI_RANK, NIV, IFLAG, IERROR,
-     &        COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT, KPERCENT_RMB,
+     &        MIDBLK_COMPRESS, TOLEPS, TOL_OPT, KPERCENT_RMB,
      &        K480, K479, K478, KPERCENT_LUA, KPERCENT, KEEP8)
 !$    USE OMP_LIB 
       INTEGER(8), intent(in)       :: LA
@@ -1168,14 +1142,14 @@ C
       DOUBLE PRECISION, INTENT(INOUT) :: BLOCK(MAXI_CLUSTER,*)
       INTEGER, intent(in) :: IW2(*)
       TYPE(LRB_TYPE), POINTER :: ACC_LUA(:)
-      INTEGER,intent(in) :: COMPRESS_MID_PRODUCT, KPERCENT_RMB, TOL_OPT
+      INTEGER,intent(in) :: MIDBLK_COMPRESS, KPERCENT_RMB, TOL_OPT
       DOUBLE PRECISION,intent(in) :: TOLEPS
       INTEGER :: M, N, allocok
       INTEGER :: I, II, J, K, KK, IND_L, IND_U, K_MAX, IBIS,
      &           K_ORDER(NB_INASM), K_RANK(NB_INASM), NB_DEC
       INTEGER, ALLOCATABLE :: POS_LIST(:), RANK_LIST(:)
       INTEGER(8) :: POSELT_BLOCK, POSELTD
-      INTEGER :: NCB, MID_RANK, FR_BLOCKS, MAXRANK, FR_RANK
+      INTEGER :: NCB, MID_RANK, FRFR_UPDATES, MAXRANK, FR_RANK
       LOGICAL :: BUILDQ, COMPRESSED_FR
       TYPE(LRB_TYPE), POINTER :: BLR_L(:)
       TYPE(LRB_TYPE), POINTER :: ACC_LRB
@@ -1198,7 +1172,7 @@ C
 !$OMP&         BLR_L, IND_U, IND_L, M, N, K_ORDER, K_RANK,
 !$OMP&         K_MAX, OMP_NUM, ACC_LRB, POSELTD,
 !$OMP&         MAX_ACC_RANK, OLD_ACC_RANK, NEW_ACC_RANK, 
-!$OMP&         FR_BLOCKS, FR_RANK, NB_DEC, II)
+!$OMP&         FRFR_UPDATES, FR_RANK, NB_DEC, II)
 #endif
       DO IBIS = 1,NB_INCB*(NB_INCB+1)/2
         IF (IFLAG.LT.0) CYCLE     
@@ -1227,22 +1201,21 @@ C
           CALL DMUMPS_GET_LUA_ORDER(NB_INASM, K_ORDER, K_RANK, 
      &                             IWHANDLER, 
      &                             1, 1, I, J, 
-     &                             FR_BLOCKS)
+     &                             FRFR_UPDATES)
         ENDIF
         FR_RANK = 0
         IF ((K480.GE.5).AND.(I.NE.J)) THEN
-          IF (FR_BLOCKS.EQ.0) THEN
+          IF (FRFR_UPDATES.EQ.0) THEN
             CALL DMUMPS_COMPRESS_FR_UPDATES(ACC_LRB,
      &                MAXI_CLUSTER, MAXI_RANK, A, LA, POSELT_BLOCK,
      &                NFRONT, NIV, TOLEPS, TOL_OPT, KPERCENT, 
-     &                COMPRESSED_FR, 
-     &                0)
+     &                COMPRESSED_FR, 0, .TRUE.)
             FR_RANK = ACC_LRB%K
             MAX_ACC_RANK = ACC_LRB%K
             NEW_ACC_RANK = ACC_LRB%K
           ENDIF
         ENDIF
-        NB_DEC = FR_BLOCKS
+        NB_DEC = FRFR_UPDATES
         DO KK = 1, NB_INASM
           K = K_ORDER(KK)
           K_MAX = K_RANK(KK)
@@ -1269,23 +1242,23 @@ C
             ENDIF
             OLD_ACC_RANK = ACC_LRB%K
           ENDIF
-          CALL DMUMPS_LRGEMM3_LUA('N', 'T',
-     &              MONE, BLR_L(IND_U), BLR_L(IND_L), ONE,
-     &              ACC_LRB, MAXI_CLUSTER, MAXI_RANK, K480,
+          CALL DMUMPS_LRGEMM4(MONE,
+     &              BLR_L(IND_U), BLR_L(IND_L), ONE,
      &              A, LA, POSELT_BLOCK,
-     &              NFRONT, 1, NIV, IFLAG, IERROR, 
-     &              COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT,
+     &              NFRONT, 1, IFLAG, IERROR, 
+     &              MIDBLK_COMPRESS, TOLEPS, TOL_OPT,
      &              KPERCENT_RMB, MID_RANK, BUILDQ,
-     &              A(POSELTD), NFRONT, 
-     &              IW2(OFFSET_IW),
-     &              BLOCK(1:MAXI_CLUSTER,OMP_NUM*MAXI_CLUSTER+1)
-     &              )
+     &              (K480.GE.3), LorU=2, 
+     &              LRB3=ACC_LRB, MAXI_RANK=MAXI_RANK,
+     &              MAXI_CLUSTER=MAXI_CLUSTER,
+     &              DIAG=A(POSELTD), LD_DIAG=NFRONT, 
+     &              IW2=IW2(OFFSET_IW),
+     &              BLOCK=BLOCK(1:MAXI_CLUSTER,OMP_NUM*MAXI_CLUSTER+1))
           IF (IFLAG.LT.0) GOTO 100
-          CALL UPDATE_FLOP_STATS_LRB_PRODUCT(BLR_L(IND_U), 
-     &           BLR_L(IND_L), 'N', 'T', NIV, 
-     &           COMPRESS_MID_PRODUCT, MID_RANK, BUILDQ, 
-     &           IS_DIAG=(I.EQ.J), K480=K480)
-          IF ((COMPRESS_MID_PRODUCT.GE.1).AND.BUILDQ) THEN
+          CALL UPD_FLOP_UPDATE(BLR_L(IND_U), BLR_L(IND_L), 
+     &           MIDBLK_COMPRESS, MID_RANK, BUILDQ, 
+     &           (I.EQ.J), (K480.GE.3))
+          IF ((MIDBLK_COMPRESS.GE.1).AND.BUILDQ) THEN
             K_RANK(KK) = MID_RANK
           ENDIF
           IF (K480.GE.3) THEN
@@ -1297,7 +1270,7 @@ C
                 IF (ACC_LRB%K.GT.0) THEN
                   CALL DMUMPS_RECOMPRESS_ACC(ACC_LRB,
      &               MAXI_CLUSTER, MAXI_RANK, A, LA, POSELT_BLOCK,
-     &               NFRONT, NIV, COMPRESS_MID_PRODUCT, TOLEPS,
+     &               NFRONT, NIV, MIDBLK_COMPRESS, TOLEPS,
      &               TOL_OPT,
      &               KPERCENT_RMB, KPERCENT_LUA, NEW_ACC_RANK)
                   MAX_ACC_RANK = ACC_LRB%K
@@ -1305,15 +1278,14 @@ C
               ENDIF
             ENDIF
             IF ((K480.GE.5).AND.(I.NE.J)) THEN
-              IF (KK.EQ.FR_BLOCKS) THEN
+              IF (KK.EQ.FRFR_UPDATES) THEN
                 CALL DMUMPS_COMPRESS_FR_UPDATES(ACC_LRB,
      &                   MAXI_CLUSTER, MAXI_RANK, A, LA, POSELT_BLOCK,
      &                   NFRONT, NIV, TOLEPS, TOL_OPT, KPERCENT, 
-     &                   COMPRESSED_FR,
-     &                   0)
+     &                   COMPRESSED_FR, 0, .TRUE.)
                 IF (COMPRESSED_FR) THEN
                   K_RANK(KK) = ACC_LRB%K 
-                  NB_DEC = FR_BLOCKS-1 
+                  NB_DEC = FRFR_UPDATES-1 
                 ENDIF
                 MAX_ACC_RANK = ACC_LRB%K
                 NEW_ACC_RANK = ACC_LRB%K
@@ -1326,15 +1298,15 @@ C
             IF (COMPRESSED_FR.OR.(K480.GE.6)) THEN  
               IF (ACC_LRB%K.GT.0) THEN
                 IF (K478.EQ.-1) THEN
-                  IF (NB_INASM-FR_BLOCKS.GT.1) THEN               
+                  IF (NB_INASM-FRFR_UPDATES.GT.1) THEN               
                     CALL DMUMPS_RECOMPRESS_ACC(ACC_LRB,
      &               MAXI_CLUSTER, MAXI_RANK, A, LA, POSELT_BLOCK,
-     &               NFRONT, NIV, COMPRESS_MID_PRODUCT, TOLEPS,
+     &               NFRONT, NIV, MIDBLK_COMPRESS, TOLEPS,
      &               TOL_OPT,
      &               KPERCENT_RMB, KPERCENT_LUA, NEW_ACC_RANK)
                   ENDIF
                 ELSEIF (K478.LE.-2) THEN
-                  IF (FR_BLOCKS.GT.0) THEN
+                  IF (FRFR_UPDATES.GT.0) THEN
                     allocate(POS_LIST(NB_INASM-NB_DEC),stat=allocok)
                     IF (allocok .GT. 0) THEN
                        IFLAG  = -13
@@ -1351,7 +1323,7 @@ C
                     ENDDO
                     CALL DMUMPS_RECOMPRESS_ACC_NARYTREE(ACC_LRB,
      &               MAXI_CLUSTER, MAXI_RANK, A, LA, POSELT_BLOCK,KEEP8,
-     &               NFRONT, NIV, COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT,
+     &               NFRONT, NIV, MIDBLK_COMPRESS, TOLEPS, TOL_OPT,
      &               KPERCENT_RMB, KPERCENT_LUA, K478, 
      &               K_RANK(NB_DEC+1:NB_INASM), POS_LIST,
      &               NB_INASM-NB_DEC, 0)
@@ -1387,7 +1359,7 @@ C
                     ENDDO
                     CALL DMUMPS_RECOMPRESS_ACC_NARYTREE(ACC_LRB,
      &               MAXI_CLUSTER, MAXI_RANK, A, LA, POSELT_BLOCK,KEEP8,
-     &               NFRONT, NIV, COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT,
+     &               NFRONT, NIV, MIDBLK_COMPRESS, TOLEPS, TOL_OPT,
      &               KPERCENT_RMB, KPERCENT_LUA, K478, 
      &               RANK_LIST, POS_LIST,
      &               NB_INASM+1, 0)
@@ -1409,10 +1381,10 @@ C
             ENDIF
           ELSE 
             IF ((K480.EQ.4).AND.(K478.EQ.-1).AND.(ACC_LRB%K.GT.0)) THEN
-              IF (NB_INASM-FR_BLOCKS.GT.1) THEN               
+              IF (NB_INASM-FRFR_UPDATES.GT.1) THEN               
                 CALL DMUMPS_RECOMPRESS_ACC(ACC_LRB,
      &               MAXI_CLUSTER, MAXI_RANK, A, LA, POSELT_BLOCK,
-     &               NFRONT, NIV, COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT,
+     &               NFRONT, NIV, MIDBLK_COMPRESS, TOLEPS, TOL_OPT,
      &               KPERCENT_RMB, KPERCENT_LUA, NEW_ACC_RANK)
               ENDIF
             ELSEIF ((K480.EQ.4).AND.(K478.LE.-2).AND.(ACC_LRB%K.GT.0)) 
@@ -1421,10 +1393,6 @@ C
               IF (allocok .GT. 0) THEN
                  IFLAG  = -13
                  IERROR = NB_INASM-NB_DEC
-                 write(*,*) 'Allocation problem in BLR routine ',
-     &                'DMUMPS_BLR_UPD_CB_LEFT_LDLT: ',
-     &                'not enough memory? memory requested = ',
-     &                IERROR
                  GOTO 100
               ENDIF
               POS_LIST(1) = 1
@@ -1433,7 +1401,7 @@ C
               ENDDO
               CALL DMUMPS_RECOMPRESS_ACC_NARYTREE(ACC_LRB,
      &               MAXI_CLUSTER, MAXI_RANK, A, LA, POSELT_BLOCK,
-     &               KEEP8, NFRONT, NIV, COMPRESS_MID_PRODUCT, TOLEPS, 
+     &               KEEP8, NFRONT, NIV, MIDBLK_COMPRESS, TOLEPS, 
      &               TOL_OPT, KPERCENT_RMB, KPERCENT_LUA, K478, 
      &               K_RANK(NB_DEC+1:NB_INASM), POS_LIST,
      &               NB_INASM-NB_DEC, 0)
@@ -1452,10 +1420,11 @@ C
       SUBROUTINE DMUMPS_BLR_UPD_CB_LEFT(A, LA, POSELT, NFRONT,
      &        BEGS_BLR, BEGS_BLR_U, NB_ROWS, NB_INCB, NB_INASM, NASS,
      &        IWHANDLER, NIV, LBANDSLAVE, IFLAG, IERROR,
-     &        COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT, KPERCENT_RMB,
-     &        ACC_LUA, K480, K479, K478, KPERCENT_LUA, KPERCENT,
+     &        MIDBLK_COMPRESS, TOLEPS, TOL_OPT, KPERCENT_RMB,
+     &        ACC_LUA, K480, K479, K478, KPERCENT_LUA,
+     &        KPERCENT,
      &        MAXI_CLUSTER, MAXI_RANK,
-     &        K474, FSorCB, BLR_U_COL, KEEP8)
+     &        K474, FSorCB, BLR_U_COL, COMPRESS_CB, CB_LRB, KEEP8)
 !$    USE OMP_LIB
       INTEGER(8), intent(in)       :: LA
       DOUBLE PRECISION, intent(inout)       :: A(LA)
@@ -1467,20 +1436,25 @@ C
      &                                FSorCB
       INTEGER, intent(inout)         :: IFLAG, IERROR
       INTEGER, DIMENSION(:) :: BEGS_BLR, BEGS_BLR_U
+#if defined(MUMPS_F2003)
+      TYPE(LRB_TYPE), POINTER, intent(inout) :: CB_LRB(:,:)
+#else
+      TYPE(LRB_TYPE), POINTER :: CB_LRB(:,:)
+#endif
       TYPE(LRB_TYPE), POINTER :: ACC_LUA(:), BLR_U_COL(:)
       INTEGER(8) :: KEEP8(150)
-      INTEGER,intent(in) :: COMPRESS_MID_PRODUCT, KPERCENT_RMB, TOL_OPT
+      INTEGER,intent(in) :: MIDBLK_COMPRESS, KPERCENT_RMB, TOL_OPT
       DOUBLE PRECISION,intent(in) :: TOLEPS
-      LOGICAL, intent(in) :: LBANDSLAVE
+      LOGICAL, intent(in) :: LBANDSLAVE, COMPRESS_CB
       INTEGER :: M, N, allocok
       INTEGER :: I, II, J, K, KK, IND_L, IND_U, IBIS,
      &           K_ORDER(NB_INASM), K_RANK(NB_INASM)
       INTEGER, ALLOCATABLE :: POS_LIST(:), RANK_LIST(:)
       INTEGER(8) :: POSELT_BLOCK
-      INTEGER :: MID_RANK, K_MAX, FR_BLOCKS, NB_DEC
+      INTEGER :: MID_RANK, K_MAX, FRFR_UPDATES, NB_DEC
       LOGICAL :: BUILDQ, COMPRESSED_FR
       TYPE(LRB_TYPE), POINTER :: BLR_U(:), BLR_L(:)
-      TYPE(LRB_TYPE), POINTER :: ACC_LRB
+      TYPE(LRB_TYPE), POINTER :: ACC_LRB, LRB
       INTEGER :: OLD_ACC_RANK, MAX_ACC_RANK, NEW_ACC_RANK, MAXRANK,
      &           FR_RANK
 #if defined(BLR_MT)
@@ -1498,7 +1472,7 @@ C
 !$OMP&         BLR_U, BLR_L, IND_U, IND_L, M, N, 
 !$OMP&         ACC_LRB, OMP_NUM, K_MAX, K_ORDER, K_RANK,
 !$OMP&         MAX_ACC_RANK, OLD_ACC_RANK, NEW_ACC_RANK,
-!$OMP&         FR_BLOCKS)
+!$OMP&         FRFR_UPDATES, LRB)
 #endif
       DO IBIS = 1,NB_ROWS*NB_INCB
         IF (IFLAG.LT.0) CYCLE     
@@ -1547,24 +1521,27 @@ C
           CALL DMUMPS_GET_LUA_ORDER(NB_INASM, K_ORDER, K_RANK,
      &                             IWHANDLER, 
      &                             0, 1, I, J, 
-     &                             FR_BLOCKS,
+     &                             FRFR_UPDATES,
      &                             LBANDSLAVE, K474, BLR_U_COL)
         ENDIF
+        COMPRESSED_FR = .FALSE.
         FR_RANK = 0
-        IF ((K480.GE.5).AND.(I.NE.J)) THEN
-          IF (FR_BLOCKS.EQ.0) THEN
-            CALL DMUMPS_COMPRESS_FR_UPDATES(ACC_LRB,
-     &                MAXI_CLUSTER, MAXI_RANK, A, LA, POSELT_BLOCK,
-     &                NFRONT, NIV, TOLEPS, TOL_OPT, KPERCENT, 
-     &                COMPRESSED_FR, 
-     &                0)
-            FR_RANK = ACC_LRB%K
-            MAX_ACC_RANK = ACC_LRB%K
-            NEW_ACC_RANK = ACC_LRB%K
-          ENDIF
-        ENDIF
-        NB_DEC = FR_BLOCKS
         DO KK = 1, NB_INASM
+          IF ((K480.GE.5.OR.COMPRESS_CB).AND.I.NE.J) THEN
+            IF (KK-1.EQ.FRFR_UPDATES) THEN
+              CALL DMUMPS_COMPRESS_FR_UPDATES(ACC_LRB,
+     &                 MAXI_CLUSTER, MAXI_RANK, A, LA, POSELT_BLOCK,
+     &                 NFRONT, NIV, TOLEPS, TOL_OPT, KPERCENT, 
+     &                 COMPRESSED_FR, 0, .TRUE.)
+              IF (COMPRESSED_FR) THEN
+                K_RANK(KK) = ACC_LRB%K 
+                NB_DEC = FRFR_UPDATES-1 
+              ENDIF
+              MAX_ACC_RANK = ACC_LRB%K
+              NEW_ACC_RANK = ACC_LRB%K
+              FR_RANK = ACC_LRB%K
+            ENDIF
+          ENDIF
           K = K_ORDER(KK)
           K_MAX = K_RANK(KK)
           IF (LBANDSLAVE) THEN
@@ -1593,6 +1570,7 @@ C
           ENDIF
           IF (K480.GE.3) THEN
             IF (ACC_LRB%K+K_MAX.GT.MAXI_RANK) THEN
+              COMPRESSED_FR = .FALSE.
               NB_DEC = KK-1
               CALL DMUMPS_DECOMPRESS_ACC(ACC_LRB, 
      &              MAXI_CLUSTER, MAXI_RANK, A, LA, POSELT_BLOCK, 
@@ -1601,19 +1579,20 @@ C
             ENDIF
             OLD_ACC_RANK = ACC_LRB%K
           ENDIF
-          CALL DMUMPS_LRGEMM3_LUA('N', 'T',
-     &              MONE, BLR_U(IND_U), BLR_L(IND_L), ONE,
-     &              ACC_LRB, MAXI_CLUSTER, MAXI_RANK, K480,
+            CALL DMUMPS_LRGEMM4(MONE,
+     &              BLR_U(IND_U), BLR_L(IND_L), ONE,
      &              A, LA, POSELT_BLOCK,
-     &              NFRONT, 0, NIV, IFLAG, IERROR,
-     &              COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT,
-     &              KPERCENT_RMB, MID_RANK, BUILDQ
-     &              )
+     &              NFRONT, 0, IFLAG, IERROR,
+     &              MIDBLK_COMPRESS, TOLEPS, TOL_OPT,
+     &              KPERCENT_RMB, MID_RANK, BUILDQ,
+     &              (K480.GE.3), LorU=2,
+     &              LRB3=ACC_LRB, MAXI_RANK=MAXI_RANK,
+     &              MAXI_CLUSTER=MAXI_CLUSTER)
           IF (IFLAG.LT.0) GOTO 100
-          CALL UPDATE_FLOP_STATS_LRB_PRODUCT(BLR_U(IND_U), 
-     &           BLR_L(IND_L), 'N', 'T', NIV, 
-     &           COMPRESS_MID_PRODUCT, MID_RANK, BUILDQ, K480=K480)
-          IF ((COMPRESS_MID_PRODUCT.GE.1).AND.BUILDQ) THEN
+          CALL UPD_FLOP_UPDATE(BLR_U(IND_U), BLR_L(IND_L),
+     &           MIDBLK_COMPRESS, MID_RANK, BUILDQ, 
+     &           .FALSE., (K480.GE.3))
+          IF ((MIDBLK_COMPRESS.GE.1).AND.BUILDQ) THEN
             K_RANK(KK) = MID_RANK
           ENDIF
           IF (K480.GE.3) THEN
@@ -1624,50 +1603,31 @@ C
      &          THEN
                 CALL DMUMPS_RECOMPRESS_ACC(ACC_LRB,
      &                 MAXI_CLUSTER, MAXI_RANK, A, LA, POSELT_BLOCK,
-     &                 NFRONT, NIV, COMPRESS_MID_PRODUCT, TOLEPS,
+     &                 NFRONT, NIV, MIDBLK_COMPRESS, TOLEPS,
      &                 TOL_OPT,
      &                 KPERCENT_RMB, KPERCENT_LUA, NEW_ACC_RANK)
                 MAX_ACC_RANK = ACC_LRB%K
               ENDIF
             ENDIF
-            IF ((K480.GE.5).AND.(I.NE.J)) THEN
-              IF (KK.EQ.FR_BLOCKS) THEN
-                CALL DMUMPS_COMPRESS_FR_UPDATES(ACC_LRB,
-     &                   MAXI_CLUSTER, MAXI_RANK, A, LA, POSELT_BLOCK,
-     &                   NFRONT, NIV, TOLEPS, TOL_OPT, KPERCENT, 
-     &                   COMPRESSED_FR,
-     &                   0)
-                IF (COMPRESSED_FR) THEN
-                  K_RANK(KK) = ACC_LRB%K 
-                  NB_DEC = FR_BLOCKS-1 
-                ENDIF
-                MAX_ACC_RANK = ACC_LRB%K
-                NEW_ACC_RANK = ACC_LRB%K
-              ENDIF
-            ENDIF
           ENDIF
         END DO
         IF (K480.GE.3) THEN
-          IF ((K480.GE.5)) THEN
-            IF (COMPRESSED_FR.OR.(K480.GE.6)) THEN  
+          IF (K480.GE.5.OR.COMPRESS_CB) THEN
+            IF (K480.GE.5.AND.(COMPRESSED_FR.OR.K480.GE.6)) THEN  
               IF (ACC_LRB%K.GT.0) THEN
                 IF (K478.EQ.-1) THEN
-                  IF (NB_INASM-FR_BLOCKS.GT.1) THEN               
+                  IF (NB_INASM-FRFR_UPDATES.GT.1) THEN               
                     CALL DMUMPS_RECOMPRESS_ACC(ACC_LRB,
      &               MAXI_CLUSTER, MAXI_RANK, A, LA, POSELT_BLOCK,
-     &               NFRONT, NIV, COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT,
+     &               NFRONT, NIV, MIDBLK_COMPRESS, TOLEPS, TOL_OPT,
      &               KPERCENT_RMB, KPERCENT_LUA, NEW_ACC_RANK)
                   ENDIF
                 ELSEIF (K478.LE.-2) THEN
-                  IF (FR_BLOCKS.GT.0) THEN
+                  IF (FRFR_UPDATES.GT.0) THEN
                     allocate(POS_LIST(NB_INASM-NB_DEC),stat=allocok)
                     IF (allocok .GT. 0) THEN
                        IFLAG  = -13
                        IERROR = NB_INASM-NB_DEC
-                       write(*,*) 'Allocation problem in BLR routine ',
-     &                      'DMUMPS_BLR_UPD_CB_LEFT: ',
-     &                      'not enough memory? memory requested = ',
-     &                      IERROR
                        GOTO 100
                     ENDIF
                     POS_LIST(1) = 1
@@ -1676,7 +1636,7 @@ C
                     ENDDO
                     CALL DMUMPS_RECOMPRESS_ACC_NARYTREE(ACC_LRB,
      &               MAXI_CLUSTER, MAXI_RANK, A, LA, POSELT_BLOCK,KEEP8,
-     &               NFRONT, NIV, COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT,
+     &               NFRONT, NIV, MIDBLK_COMPRESS, TOLEPS, TOL_OPT,
      &               KPERCENT_RMB, KPERCENT_LUA, K478, 
      &               K_RANK(NB_DEC+1:NB_INASM), POS_LIST,
      &               NB_INASM-NB_DEC, 0)
@@ -1685,10 +1645,6 @@ C
                     IF (allocok .GT. 0) THEN
                        IFLAG  = -13
                        IERROR = NB_INASM+1
-                       write(*,*) 'Allocation problem in BLR routine ',
-     &                      'DMUMPS_BLR_UPD_CB_LEFT: ',
-     &                      'not enough memory? memory requested = ',
-     &                      IERROR
                        GOTO 100
                     ENDIF
                     POS_LIST(1) = 1
@@ -1700,10 +1656,6 @@ C
                     IF (allocok .GT. 0) THEN
                        IFLAG  = -13
                        IERROR = NB_INASM+1
-                       write(*,*) 'Allocation problem in BLR routine ',
-     &                      'DMUMPS_BLR_UPD_CB_LEFT: ',
-     &                      'not enough memory? memory requested = ',
-     &                      IERROR
                        GOTO 100
                     ENDIF
                     RANK_LIST(1) = FR_RANK
@@ -1712,7 +1664,7 @@ C
                     ENDDO
                     CALL DMUMPS_RECOMPRESS_ACC_NARYTREE(ACC_LRB,
      &               MAXI_CLUSTER, MAXI_RANK, A, LA, POSELT_BLOCK,KEEP8,
-     &               NFRONT, NIV, COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT,
+     &               NFRONT, NIV, MIDBLK_COMPRESS, TOLEPS, TOL_OPT,
      &               KPERCENT_RMB, KPERCENT_LUA, K478, 
      &               RANK_LIST, POS_LIST,
      &               NB_INASM+1, 0)
@@ -1724,20 +1676,35 @@ C
             ENDIF
             MAXRANK = FLOOR(dble(ACC_LRB%M*ACC_LRB%N)/dble(ACC_LRB%M+
      &                                                     ACC_LRB%N))
-            IF (COMPRESSED_FR.AND.(ACC_LRB%K.LE.MAXRANK)) THEN  
-              CALL DMUMPS_DECOMPRESS_ACC(ACC_LRB,MAXI_CLUSTER,
-     &              MAXI_RANK, A, LA, POSELT_BLOCK, NFRONT, NIV, 2,
-     &              COUNT_FLOPS=.FALSE.)
+            IF (COMPRESSED_FR.AND.(ACC_LRB%K.LE.MAXRANK)) THEN
+              LRB => CB_LRB(I-NB_INASM,J-NB_INASM)
+              CALL ALLOC_LRB_FROM_ACC(ACC_LRB, LRB,
+     &                       ACC_LRB%K, ACC_LRB%M, ACC_LRB%N, 0,
+     &                       IFLAG, IERROR, KEEP8)
+              CALL UPD_MRY_CB_LRGAIN(LRB
+     &                              )
+              ACC_LRB%K = 0
+              IF (IFLAG.LT.0) GOTO 100
             ELSE
               CALL DMUMPS_DECOMPRESS_ACC(ACC_LRB,MAXI_CLUSTER,
      &              MAXI_RANK, A, LA, POSELT_BLOCK, NFRONT, NIV, 2)
+              LRB => CB_LRB(I-NB_INASM,J-NB_INASM)
+              CALL ALLOC_LRB(LRB, ACC_LRB%K, ACC_LRB%N, ACC_LRB%M, 
+     &                 .FALSE., IFLAG, IERROR, KEEP8)
+              IF (IFLAG.LT.0) GOTO 100
+              DO II=1,ACC_LRB%N
+                LRB%Q(II,1:ACC_LRB%M) =
+     &          A( POSELT_BLOCK+int((II-1),8)*int(NFRONT,8) :
+     &            POSELT_BLOCK+int((II-1),8)*int(NFRONT,8)
+     &                        +int(ACC_LRB%M-1,8) )
+              END DO  
             ENDIF
           ELSE 
             IF ((K480.EQ.4).AND.(K478.EQ.-1).AND.(ACC_LRB%K.GT.0)) THEN
-              IF (NB_INASM-FR_BLOCKS.GT.1) THEN               
+              IF (NB_INASM-FRFR_UPDATES.GT.1) THEN               
                 CALL DMUMPS_RECOMPRESS_ACC(ACC_LRB,
      &               MAXI_CLUSTER, MAXI_RANK, A, LA, POSELT_BLOCK,
-     &               NFRONT, NIV, COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT,
+     &               NFRONT, NIV, MIDBLK_COMPRESS, TOLEPS, TOL_OPT,
      &               KPERCENT_RMB, KPERCENT_LUA, NEW_ACC_RANK)
               ENDIF
             ELSEIF ((K480.EQ.4).AND.(K478.LE.-2).AND.(ACC_LRB%K.GT.0)) 
@@ -1746,10 +1713,6 @@ C
               IF (allocok .GT. 0) THEN
                  IFLAG  = -13
                  IERROR = NB_INASM-NB_DEC
-                 write(*,*) 'Allocation problem in BLR routine ',
-     &                'DMUMPS_BLR_UPD_CB_LEFT: ',
-     &                'not enough memory? memory requested = ',
-     &                IERROR
                  GOTO 100
               ENDIF
               POS_LIST(1) = 1
@@ -1758,7 +1721,7 @@ C
               ENDDO
               CALL DMUMPS_RECOMPRESS_ACC_NARYTREE(ACC_LRB,
      &               MAXI_CLUSTER, MAXI_RANK, A, LA, POSELT_BLOCK,
-     &               KEEP8,NFRONT, NIV, COMPRESS_MID_PRODUCT, TOLEPS, 
+     &               KEEP8,NFRONT, NIV, MIDBLK_COMPRESS, TOLEPS, 
      &               TOL_OPT, KPERCENT_RMB, KPERCENT_LUA, K478, 
      &               K_RANK(NB_DEC+1:NB_INASM), POS_LIST,
      &               NB_INASM-NB_DEC, 0)
@@ -1773,11 +1736,20 @@ C
 #if defined(BLR_MT)
 !$OMP END DO 
 #endif
+#if defined(BLR_MT) 
+!$OMP MASTER
+#endif
+      IF (COMPRESS_CB) THEN
+        CALL UPD_MRY_CB_FR(NFRONT-NASS, NFRONT-NASS, 0)
+      ENDIF
+#if defined(BLR_MT) 
+!$OMP END MASTER
+#endif
       END SUBROUTINE DMUMPS_BLR_UPD_CB_LEFT
       SUBROUTINE DMUMPS_DECOMPRESS_PANEL(A, LA, POSELT, LDA11,
      &        LDA21, COPY_DENSE_BLOCKS,
      &        BEGS_BLR_DIAG, BEGS_BLR_FIRST_OFFDIAG,
-     &        NB_BLR, BLR_PANEL, CURRENT_BLR, DIR,
+     &        NB_BLR, BLR_PANEL, CURRENT_BLR, DIR, DECOMP_TIMER,
      &        BEG_I_IN, END_I_IN, ONLY_NELIM_IN, CBASM_TOFIX_IN)
 !$    USE OMP_LIB 
       INTEGER(8), intent(in)       :: LA
@@ -1790,6 +1762,7 @@ C
       TYPE(LRB_TYPE), intent(inout) :: BLR_PANEL(:)
       CHARACTER(len=1) :: DIR
       INTEGER, intent(in) :: LDA11, LDA21
+      INTEGER, intent(in) :: DECOMP_TIMER
       INTEGER,OPTIONAL,intent(in) :: BEG_I_IN, END_I_IN, ONLY_NELIM_IN
       LOGICAL,OPTIONAL,intent(in) :: CBASM_TOFIX_IN
       INTEGER :: IP, M, N, BIP, BEG_I, END_I, ONLY_NELIM
@@ -1798,7 +1771,6 @@ C
       INTEGER :: LAST_IP, CHUNK
 #endif
       INTEGER :: K, I
-      LOGICAL :: COUNT_FLOPS
       DOUBLE PRECISION :: PROMOTE_COST
       INTEGER(8) :: POSELT_BLOCK, LD_BLK_IN_FRONT
       DOUBLE PRECISION :: ONE, ALPHA, ZERO
@@ -1816,10 +1788,8 @@ C
       ENDIF
       IF(present(ONLY_NELIM_IN)) THEN
         ONLY_NELIM = ONLY_NELIM_IN
-        COUNT_FLOPS = .TRUE.
       ELSE
         ONLY_NELIM = 0
-        COUNT_FLOPS = .FALSE.
       ENDIF
       IF (present(CBASM_TOFIX_IN)) THEN
         CBASM_TOFIX = CBASM_TOFIX_IN
@@ -1828,6 +1798,17 @@ C
       ENDIF
       LD_BLK_IN_FRONT = int(LDA11,8)
       BIP             = BEGS_BLR_FIRST_OFFDIAG
+#if !defined(BLR_MT)
+      IF (BEG_I .NE. CURRENT_BLR+1) THEN
+        DO I = 1, BEG_I - CURRENT_BLR - 1
+          IF (CBASM_TOFIX) THEN
+            BIP  = BIP +  BLR_PANEL(I)%N
+          ELSE
+            BIP  = BIP +  BLR_PANEL(I)%M
+          ENDIF
+        ENDDO
+      ENDIF
+#endif
 #if defined(BLR_MT)
       LAST_IP = CURRENT_BLR+1
       CHUNK = 1
@@ -1872,74 +1853,75 @@ C
           ONLY_NELIM = N
         ENDIF
         K = BLR_PANEL(IP-CURRENT_BLR)%K
-       IF ((BLR_PANEL(IP-CURRENT_BLR)%ISLR).AND.
-     &      (BLR_PANEL(IP-CURRENT_BLR)%LRFORM.EQ.1)) THEN
-        IF (K.EQ.0) THEN
+        IF (BLR_PANEL(IP-CURRENT_BLR)%ISLR) THEN
+          IF (K.EQ.0) THEN
+            IF (DIR .eq. 'V') THEN
+              DO I = 1, M
+                IF (BIP+I-1.GT.LDA21) THEN
+                  LD_BLK_IN_FRONT = int(LDA21,8)
+                ENDIF
+                A(POSELT_BLOCK+int(I-1,8)*LD_BLK_IN_FRONT :
+     &                   POSELT_BLOCK+int(I-1,8)*LD_BLK_IN_FRONT
+     &                          + int(N-1,8)) = ZERO
+              ENDDO
+            ELSE 
+              DO I = N-ONLY_NELIM+1, N
+              A(POSELT_BLOCK+int(I-1,8)*int(LDA11,8):
+     &          POSELT_BLOCK+int(I-1,8)*int(LDA11,8) + int(M-1,8)) 
+     &              = ZERO
+              ENDDO
+            ENDIF
+            GOTO 1800
+          ENDIF
+          IF (DIR .eq. 'V') THEN
+            IF (DIR .eq.'V' .AND. BIP .LE. LDA21
+     &                 .AND. BIP + M - 1 .GT. LDA21
+     &                 .AND..NOT.CBASM_TOFIX) THEN
+              CALL dgemm('T', 'T', N, LDA21-BIP+1, K, ONE ,
+     &            BLR_PANEL(IP-CURRENT_BLR)%R(1,1) , K, 
+     &            BLR_PANEL(IP-CURRENT_BLR)%Q(1,1) , M, 
+     &            ZERO, A(POSELT_BLOCK), int(LD_BLK_IN_FRONT))
+              CALL dgemm('T', 'T', N, BIP+M-LDA21-1, K, ONE ,
+     &            BLR_PANEL(IP-CURRENT_BLR)%R(1,1) , K, 
+     &            BLR_PANEL(IP-CURRENT_BLR)%Q(LDA21-BIP+2,1) , M, 
+     &            ZERO, A(POSELT_BLOCK+int(LDA21-BIP,8)*int(LDA11,8)),
+     &            LDA21)
+            ELSE
+              CALL dgemm('T', 'T', N, M, K, ONE ,
+     &            BLR_PANEL(IP-CURRENT_BLR)%R(1,1) , K, 
+     &            BLR_PANEL(IP-CURRENT_BLR)%Q(1,1) , M, 
+     &            ZERO, A(POSELT_BLOCK), int(LD_BLK_IN_FRONT))
+            ENDIF
+          ELSE 
+             CALL dgemm('N', 'N', M, ONLY_NELIM, K, ONE,
+     &          BLR_PANEL(IP-CURRENT_BLR)%Q(1,1), M, 
+     &          BLR_PANEL(IP-CURRENT_BLR)%R(1,N-ONLY_NELIM+1), K, ZERO,
+     &          A(POSELT_BLOCK+int(N-ONLY_NELIM,8)*int(LDA11,8)), LDA11)
+          ENDIF
+          PROMOTE_COST = 2.0D0*M*K*ONLY_NELIM
+          IF (CBASM_TOFIX) THEN
+            CALL UPD_FLOP_DECOMPRESS(PROMOTE_COST, .TRUE.)
+          ELSEIF(present(ONLY_NELIM_IN)) THEN
+            CALL UPD_FLOP_DECOMPRESS(PROMOTE_COST, .FALSE.)
+          ENDIF
+        ELSE  IF (COPY_DENSE_BLOCKS) THEN
           IF (DIR .eq. 'V') THEN
             DO I = 1, M
               IF (BIP+I-1.GT.LDA21) THEN
                 LD_BLK_IN_FRONT = int(LDA21,8)
               ENDIF
-              A(POSELT_BLOCK+int(I-1,8)*LD_BLK_IN_FRONT :
-     &                 POSELT_BLOCK+int(I-1,8)*LD_BLK_IN_FRONT
-     &                        + int(N-1,8)) = ZERO
+                A(POSELT_BLOCK+int(I-1,8)*LD_BLK_IN_FRONT :
+     &            POSELT_BLOCK+int(I-1,8)*LD_BLK_IN_FRONT
+     &                                           + int(N-1,8)) 
+     &          = BLR_PANEL(IP-CURRENT_BLR)%Q(I,1:N)
             ENDDO
           ELSE 
             DO I = N-ONLY_NELIM+1, N
-            A(POSELT_BLOCK+int(I-1,8)*int(LDA11,8):
-     &              POSELT_BLOCK+int(I-1,8)*int(LDA11,8) + int(M-1,8)) 
-     &            = ZERO
+              A(POSELT_BLOCK+int(I-1,8)*int(LDA11,8):
+     &           POSELT_BLOCK+int(I-1,8)*int(LDA11,8) + int(M-1,8))
+     &        = BLR_PANEL(IP-CURRENT_BLR)%Q(1:M,I)
             ENDDO
           ENDIF
-          GOTO 1800
-        ENDIF
-        IF (DIR .eq. 'V') THEN
-          IF (DIR .eq.'V' .AND. BIP .LE. LDA21
-     &               .AND. BIP + M - 1 .GT. LDA21
-     &               .AND..NOT.CBASM_TOFIX) THEN
-            CALL dgemm('T', 'T', N, LDA21-BIP+1, K, ONE ,
-     &          BLR_PANEL(IP-CURRENT_BLR)%R(1,1) , K, 
-     &          BLR_PANEL(IP-CURRENT_BLR)%Q(1,1) , M, 
-     &          ZERO, A(POSELT_BLOCK), int(LD_BLK_IN_FRONT))
-            CALL dgemm('T', 'T', N, BIP+M-LDA21-1, K, ONE ,
-     &          BLR_PANEL(IP-CURRENT_BLR)%R(1,1) , K, 
-     &          BLR_PANEL(IP-CURRENT_BLR)%Q(LDA21-BIP+2,1) , M, 
-     &          ZERO, A(POSELT_BLOCK+int(LDA21-BIP,8)*int(LDA11,8)),
-     &          LDA21)
-          ELSE
-            CALL dgemm('T', 'T', N, M, K, ONE ,
-     &          BLR_PANEL(IP-CURRENT_BLR)%R(1,1) , K, 
-     &          BLR_PANEL(IP-CURRENT_BLR)%Q(1,1) , M, 
-     &          ZERO, A(POSELT_BLOCK), int(LD_BLK_IN_FRONT))
-          ENDIF
-        ELSE 
-           CALL dgemm('N', 'N', M, ONLY_NELIM, K, ONE ,
-     &          BLR_PANEL(IP-CURRENT_BLR)%Q(1,1) , M, 
-     &          BLR_PANEL(IP-CURRENT_BLR)%R(1,N-ONLY_NELIM+1) , K, ZERO,
-     &          A(POSELT_BLOCK+int(N-ONLY_NELIM,8)*int(LDA11,8)), LDA11)
-        ENDIF
-        IF (COUNT_FLOPS) THEN
-          PROMOTE_COST = 2.0D0*M*K*ONLY_NELIM
-          CALL UPDATE_FLOP_STATS_PROMOTE(PROMOTE_COST,2)
-        ENDIF
-         ELSE  IF (COPY_DENSE_BLOCKS) THEN
-             IF (DIR .eq. 'V') THEN
-                 DO I = 1, M
-                   IF (BIP+I-1.GT.LDA21) THEN
-                     LD_BLK_IN_FRONT = int(LDA21,8)
-                   ENDIF
-                     A(POSELT_BLOCK+int(I-1,8)*LD_BLK_IN_FRONT :
-     &                 POSELT_BLOCK+int(I-1,8)*LD_BLK_IN_FRONT
-     &                                                + int(N-1,8)) 
-     &               = BLR_PANEL(IP-CURRENT_BLR)%Q(I,1:N)
-                 ENDDO
-             ELSE 
-                 DO I = N-ONLY_NELIM+1, N
-                   A(POSELT_BLOCK+int(I-1,8)*int(LDA11,8):
-     &                POSELT_BLOCK+int(I-1,8)*int(LDA11,8) + int(M-1,8))
-     &             = BLR_PANEL(IP-CURRENT_BLR)%Q(1:M,I)
-                 ENDDO
-             ENDIF
         ENDIF
  1800   CONTINUE
 #if !defined(BLR_MT)
@@ -1949,7 +1931,7 @@ C
           BIP  = BIP +  BLR_PANEL(IP-CURRENT_BLR)%M
         ENDIF
 #endif
-      END DO 
+      ENDDO
 #if defined(BLR_MT)
 !$OMP END DO
 #endif
@@ -1960,8 +1942,8 @@ C
      &        IWHANDLER, SYM, NIV, IFLAG, IERROR,
      &        TOLEPS, TOL_OPT, KPERCENT, K489, CB_LRB,
      &        WORK, TAU, JPVT, LWORK, RWORK, BLOCK,
-     &        MAXI_CLUSTER, KEEP8, 
-     &        NFS4FATHER, NPIV, KEEP,  
+     &        MAXI_CLUSTER, KEEP8,
+     &        NFS4FATHER, NPIV, NVSCHUR_K253, KEEP,
      &        M_ARRAY,
      &        NELIM, 
      &        NBROWSinF
@@ -1983,11 +1965,11 @@ C
       INTEGER, TARGET, DIMENSION(:) :: JPVT
       INTEGER(8) :: KEEP8(150)
       DOUBLE PRECISION,intent(in) :: TOLEPS
-      INTEGER, INTENT(in) :: NFS4FATHER, NPIV, KEEP(500)
+      INTEGER, INTENT(in) :: NFS4FATHER, NPIV, NVSCHUR_K253, KEEP(500)
       DOUBLE PRECISION, OPTIONAL :: M_ARRAY(max(NFS4FATHER,1))
       INTEGER, intent(in), OPTIONAL :: NELIM
       INTEGER, intent(in), OPTIONAL :: NBROWSinF
-      INTEGER :: M, N, INFO, FRONT_CB_BLR_SAVINGS
+      INTEGER :: M, N, INFO
       INTEGER :: I, J, IBIS, IBIS_END, RANK, MAXRANK, II, JJ
       INTEGER(8) :: POSELT_BLOCK
       LOGICAL :: ISLR
@@ -2015,7 +1997,7 @@ C
        ELSE
         NROWS_CM  = NROWS  - NBROWSinF
        ENDIF
-       IF (NROWS_CM.GT.0) THEN
+       IF (NROWS_CM-NVSCHUR_K253.GT.0)  THEN
          IF (NIV.EQ.1) THEN
           POSA     = POSELT
      &             + int(LDA,8)*int(NPIV+NFS4FATHER,8)
@@ -2032,8 +2014,10 @@ C
      &             - int(NPIV,8)
          ENDIF
          CALL DMUMPS_COMPUTE_MAXPERCOL (
-     &      A(POSA), ASIZE, LDA, NROWS_CM,
-     &      M_ARRAY(1), NFS4FATHER, .FALSE., -9999)
+     &      A(POSA), ASIZE, LDA, 
+     &      NROWS_CM-NVSCHUR_K253,
+     &      M_ARRAY(1), NFS4FATHER, .FALSE., 
+     &      -9999)
        ELSE 
           DO I=1, NFS4FATHER
             M_ARRAY(I) = ZERO
@@ -2044,7 +2028,6 @@ C
 !$OMP END MASTER
 !$OMP BARRIER
 #endif
-      FRONT_CB_BLR_SAVINGS = 0
       OMP_NUM = 0 
       IF (SYM.EQ.0.OR.NIV.EQ.2) THEN
         IBIS_END = NB_ROWS*NB_COLS
@@ -2122,6 +2105,7 @@ C
             MAXRANK = 1
             RANK = MAXRANK+1
             INFO = 0
+            ISLR = .FALSE.
             GOTO 3800
         ENDIF
         DO II=1,M
@@ -2137,34 +2121,18 @@ C
      &       TAU_THR(1), 
      &       WORK_THR(1), N, 
      &       RWORK_THR(1), 
-     &       TOLEPS, TOL_OPT, RANK, MAXRANK, INFO)
+     &       TOLEPS, TOL_OPT, RANK, MAXRANK, INFO,
+     &       ISLR)
  3800 CONTINUE
         IF (INFO < 0) THEN
            WRITE(*,*) " PROBLEM IN ARGUMENT NUMBER ",INFO,
      &                 " OF TRUNCATED_RRQR WHILE COMPRESSING A CB BLOCK"
            CALL MUMPS_ABORT()
         END IF
-        ISLR = ((RANK.LE.MAXRANK).AND.(M.NE.0).AND.(N.NE.0))     
-        CALL ALLOC_LRB(LRB, RANK, RANK, 
-     &                 M, N, ISLR, IFLAG, IERROR, KEEP8)
+        CALL ALLOC_LRB(LRB, RANK, M, N, ISLR, IFLAG, IERROR, KEEP8)
         IF (IFLAG.LT.0) CYCLE
         IF (ISLR) THEN 
            IF (RANK .GT. 0) THEN 
-               LRB%Q = ZERO
-               DO II=1,RANK
-                 LRB%Q(II,II) = ONE
-               END DO
-               CALL dormqr 
-     &           ('L', 'N', M, RANK, RANK,
-     &           BLOCK_THR(1,1), 
-     &           MAXI_CLUSTER, TAU_THR(1), 
-     &           LRB%Q(1,1),
-     &           M, WORK_THR(1), LWORK, INFO )
-               IF (INFO < 0) THEN
-                 WRITE(*,*) " PROBLEM IN ARGUMENT NUMBER ",INFO,
-     &                     " OF CUNMQR WHILE COMPRESSING A CB BLOCK"
-                 CALL MUMPS_ABORT()
-               END IF
                DO JJ=1,N
                   DO II=1,MIN(RANK,JJ)
                      LRB%R(II,JPVT_THR(JJ)) = BLOCK_THR(II,JJ)
@@ -2172,13 +2140,27 @@ C
                   IF(JJ.LT.RANK) LRB%R(MIN(RANK,JJ)+1:RANK,JPVT_THR(JJ))
      &                 = ZERO
                ENDDO
+               CALL dorgqr 
+     &           (M, RANK, RANK,
+     &           BLOCK_THR(1,1), 
+     &           MAXI_CLUSTER, TAU_THR(1), 
+     &           WORK_THR(1), LWORK, INFO )
+               DO II=1,RANK
+                 DO JJ= 1, M
+                  LRB%Q(JJ,II) = BLOCK_THR(JJ,II)
+                 ENDDO
+               END DO
+               IF (INFO < 0) THEN
+                 WRITE(*,*) " PROBLEM IN ARGUMENT NUMBER ",INFO,
+     &                     " OF CUNGQR WHILE COMPRESSING A CB BLOCK"
+                 CALL MUMPS_ABORT()
+               END IF
                IF (K489.NE.3) THEN
-                 CALL UPDATE_FLOP_STATS_DEMOTE(LRB, NIV,
-     &                       CB_COMPRESS=.TRUE.)
+                 CALL UPD_FLOP_COMPRESS(LRB, CB_COMPRESS=.TRUE.)
                ENDIF
           END IF
-          FRONT_CB_BLR_SAVINGS = FRONT_CB_BLR_SAVINGS + 
-     &                (M-RANK)*(N-RANK)-RANK*RANK
+          CALL UPD_MRY_CB_LRGAIN(LRB
+     &                           )
         ELSE 
            DO II=1,M
              LRB%Q(II,1:N) =
@@ -2187,8 +2169,7 @@ C
      &                     +int(N-1,8) )
            END DO  
            IF (K489.NE.3) THEN
-               CALL UPDATE_FLOP_STATS_DEMOTE(LRB, NIV,
-     &                       CB_COMPRESS=.TRUE.)
+               CALL UPD_FLOP_COMPRESS(LRB, CB_COMPRESS=.TRUE.)
            ENDIF
            LRB%K = -1
         END IF
@@ -2196,17 +2177,12 @@ C
 #if defined(BLR_MT)
 !$OMP END DO 
 #endif
-#if defined(BLR_MT)
-!$      OMP_NUM = OMP_GET_THREAD_NUM()
-!$      IF (OMP_NUM.EQ.0) THEN
+#if defined(BLR_MT) 
+!$OMP MASTER
 #endif
-        CALL STATS_COMPUTE_MRY_FRONT_CB(NROWS, NCOLS, SYM, NIV, INODE,
-     &                        FRONT_CB_BLR_SAVINGS)
-#if defined(BLR_MT)
-!$      ELSE
-!$        CALL STATS_COMPUTE_MRY_FRONT_CB(0, 0, SYM, NIV, INODE,
-!$   &                        FRONT_CB_BLR_SAVINGS)
-!$      ENDIF
+      CALL UPD_MRY_CB_FR(NROWS, NCOLS, SYM)
+#if defined(BLR_MT) 
+!$OMP END MASTER
 #endif
       END SUBROUTINE DMUMPS_COMPRESS_CB
       SUBROUTINE DMUMPS_COMPRESS_PANEL(
@@ -2217,16 +2193,16 @@ C
      &        LWORK, RWORK, BLOCK,
      &        MAXI_CLUSTER, NELIM, 
      &        LBANDSLAVE, NPIV, ISHIFT, NIV, KPERCENT, 
-     &        KEEP8, K480,
-     &        BEG_I_IN, END_I_IN, FR_SWAP
+     &        KEEP8,
+     &        K480, BEG_I_IN, END_I_IN, FRSWAP
      &        )
 !$    USE OMP_LIB
       INTEGER(8), intent(in)       :: LA
+      DOUBLE PRECISION, intent(inout)       :: A(LA)
       INTEGER(8), intent(in)       :: POSELT 
       INTEGER, intent(in)          :: NFRONT, NB_BLR, CURRENT_BLR, NIV
       INTEGER, intent(inout)          :: IFLAG, IERROR
       TYPE(LRB_TYPE), intent(inout) :: BLR_PANEL(:)
-      DOUBLE PRECISION, intent(inout)       :: A(LA)
       DOUBLE PRECISION, TARGET, DIMENSION(:) :: RWORK
       DOUBLE PRECISION, TARGET, DIMENSION(:,:) :: BLOCK
       DOUBLE PRECISION, TARGET, DIMENSION(:) :: WORK, TAU
@@ -2235,14 +2211,13 @@ C
       INTEGER(8) :: KEEP8(150)
       INTEGER, OPTIONAL, intent(in) :: K480
       INTEGER,OPTIONAL,intent(in) :: BEG_I_IN, END_I_IN
-      LOGICAL, OPTIONAL, intent(in) :: FR_SWAP
+      LOGICAL, OPTIONAL, intent(in) :: FRSWAP
       INTEGER, intent(in)          :: NPIV, ISHIFT, KPERCENT, K473,
      &                                TOL_OPT
       LOGICAL, intent(in)          :: LBANDSLAVE
       INTEGER                      :: MAXI_CLUSTER, LWORK, NELIM
       DOUBLE PRECISION,intent(in)              :: TOLEPS
       CHARACTER(len=1) :: DIR
-      INTRINSIC maxval
       INTEGER :: IP, NB_BLOCKS_PANEL, M, N, RANK, MAXRANK
       INTEGER :: INFO, I, J, IS, BEG_I, END_I
       INTEGER(8) :: POSELT_BLOCK
@@ -2334,12 +2309,6 @@ C
      &                    BLR_PANEL(IP-CURRENT_BLR)%N
               CALL MUMPS_ABORT()
             ENDIF
-            IF (BLR_PANEL(IP-CURRENT_BLR)%LRFORM.NE.1) THEN
-              write(*,*) 'Internal error in DMUMPS_COMPRESS_PANEL',
-     &                    ' LRFORM inconsistency',
-     &                    BLR_PANEL(IP-CURRENT_BLR)%LRFORM
-              CALL MUMPS_ABORT()
-            ENDIF
             MAXRANK = floor(dble(M*N)/dble(M+N))
             IF (BLR_PANEL(IP-CURRENT_BLR)%K.GT.MAXRANK) THEN
               write(*,*) 'Internal error in DMUMPS_COMPRESS_PANEL',
@@ -2356,6 +2325,7 @@ C
             MAXRANK = 1
             RANK = MAXRANK+1
             INFO = 0
+            ISLR = .FALSE.
             GOTO 3800
         ENDIF
         IF (DIR .eq. 'V') THEN
@@ -2379,36 +2349,23 @@ C
      &       TAU_THR(1), 
      &       WORK_THR(1), N, 
      &       RWORK_THR(1), 
-     &       TOLEPS, TOL_OPT, RANK, MAXRANK, INFO)
+     &       TOLEPS, TOL_OPT, RANK, MAXRANK, INFO,
+     &       ISLR)
  3800 CONTINUE
-      IF (INFO < 0) THEN
+        IF (INFO < 0) THEN
            WRITE(*,*) " PROBLEM IN ARGUMENT NUMBER ",INFO,
      &                 " OF TRUNCATED_RRQR WHILE COMPRESSING A BLOCK "
            CALL MUMPS_ABORT()
         END IF
-        ISLR = ((RANK.LE.MAXRANK).AND.(M.NE.0).AND.(N.NE.0))     
-        CALL ALLOC_LRB(BLR_PANEL(IP-CURRENT_BLR), RANK, RANK, 
+        CALL ALLOC_LRB(BLR_PANEL(IP-CURRENT_BLR), RANK,
      &                 M, N, ISLR, IFLAG, IERROR, KEEP8)
         IF (IFLAG.LT.0) CYCLE
-        IF ((M.EQ.0).OR.(N.EQ.0)) GOTO 3000
+        IF ((M.EQ.0).OR.(N.EQ.0)) THEN
+          GOTO 3000
+        ENDIF
         IF (ISLR) THEN 
            IF (RANK .EQ. 0) THEN 
            ELSE 
-               BLR_PANEL(IP-CURRENT_BLR)%Q = ZERO
-               DO I=1,RANK
-                 BLR_PANEL(IP-CURRENT_BLR)%Q(I,I) = ONE
-               END DO
-               CALL dormqr 
-     &           ('L', 'N', M, RANK, RANK,
-     &           BLOCK_THR(1,1), 
-     &           MAXI_CLUSTER, TAU_THR(1), 
-     &           BLR_PANEL(IP-CURRENT_BLR)%Q(1,1),
-     &           M, WORK_THR(1), LWORK, INFO )
-               IF (INFO < 0) THEN
-                 WRITE(*,*) " PROBLEM IN ARGUMENT NUMBER ",INFO,
-     &                     " OF CUNMQR WHILE COMPRESSING A BLOCK "
-                 CALL MUMPS_ABORT()
-               END IF
                DO J=1,N
                  BLR_PANEL(IP-CURRENT_BLR)%R(1:MIN(RANK,J),
      &               JPVT_THR(J)) =
@@ -2416,12 +2373,24 @@ C
                  IF(J.LT.RANK) BLR_PANEL(IP-CURRENT_BLR)%
      &               R(MIN(RANK,J)+1:RANK,JPVT_THR(J))= ZERO
                ENDDO
-               IF (present(FR_SWAP)) THEN
-                 CALL UPDATE_FLOP_STATS_DEMOTE(
-     &               BLR_PANEL(IP-CURRENT_BLR), NIV, FR_SWAP=FR_SWAP)
+               CALL dorgqr 
+     &           (M, RANK, RANK,
+     &           BLOCK_THR(1,1), 
+     &           MAXI_CLUSTER, TAU_THR(1), 
+     &           WORK_THR(1), LWORK, INFO )
+               DO I=1,RANK
+                 BLR_PANEL(IP-CURRENT_BLR)%Q(1:M,I) = BLOCK_THR(1:M,I)
+               END DO
+               IF (INFO < 0) THEN
+                 WRITE(*,*) " PROBLEM IN ARGUMENT NUMBER ",INFO,
+     &                     " OF CUNGQR WHILE COMPRESSING A BLOCK "
+                 CALL MUMPS_ABORT()
+               END IF
+               IF (present(FRSWAP)) THEN
+                 CALL UPD_FLOP_COMPRESS(
+     &               BLR_PANEL(IP-CURRENT_BLR), FRSWAP=FRSWAP)
                ELSE
-                 CALL UPDATE_FLOP_STATS_DEMOTE(
-     &               BLR_PANEL(IP-CURRENT_BLR), NIV)
+                 CALL UPD_FLOP_COMPRESS(BLR_PANEL(IP-CURRENT_BLR))
                ENDIF
           END IF
         ELSE 
@@ -2441,12 +2410,11 @@ C
                END DO  
            END IF
            IF (K473.EQ.0) THEN
-             IF (present(FR_SWAP)) THEN
-               CALL UPDATE_FLOP_STATS_DEMOTE(BLR_PANEL(IP-CURRENT_BLR), 
-     &                                   NIV, FR_SWAP=FR_SWAP)
+             IF (present(FRSWAP)) THEN
+               CALL UPD_FLOP_COMPRESS(BLR_PANEL(IP-CURRENT_BLR), 
+     &                                   FRSWAP=FRSWAP)
              ELSE
-               CALL UPDATE_FLOP_STATS_DEMOTE(BLR_PANEL(IP-CURRENT_BLR), 
-     &                                   NIV)
+               CALL UPD_FLOP_COMPRESS(BLR_PANEL(IP-CURRENT_BLR))
              ENDIF
            ENDIF
            BLR_PANEL(IP-CURRENT_BLR)%K = -1
@@ -2456,102 +2424,8 @@ C
 #if defined(BLR_MT) 
 !$OMP END DO NOWAIT
 #endif
+      RETURN
       END SUBROUTINE DMUMPS_COMPRESS_PANEL
-      SUBROUTINE DMUMPS_LRTRSM_NELIM_VAR(
-     &                A,
-     &                LA, POSELT, NFRONT,
-     &                IBEG_BLOCK, IEND_BLOCK, NB_BLR,
-     &                NELIM, NIV, SYM,PIVOT_OPTION, 
-     &                IW, OFFSET_IW, NASS) 
-!$    USE OMP_LIB
-      INTEGER(8), intent(in)  :: LA
-      INTEGER, intent(in)     :: NFRONT, NELIM, NB_BLR,
-     &                           NIV, SYM, PIVOT_OPTION
-      INTEGER(8), intent(in)  :: POSELT 
-      INTEGER, intent(in)     :: IBEG_BLOCK, IEND_BLOCK
-      INTEGER, OPTIONAL, intent(in)     :: NASS
-      DOUBLE PRECISION, intent(inout)  :: A(LA)
-      INTEGER, OPTIONAL :: OFFSET_IW
-      INTEGER, OPTIONAL :: IW(*)
-      INTEGER(8) :: LPOS, POSELT_LOCAL, DPOS, POSPV1, POSPV2,
-     &              OFFDAG, LDA8, UPOS
-      INTEGER    :: I, J, NPIV, LKJIW, LDA
-      DOUBLE PRECISION :: ONE, MONE, ZERO
-      DOUBLE PRECISION :: MULT1, MULT2, A11, DETPIV, A22, A12
-      PARAMETER (ONE = 1.0D0, MONE=-1.0D0)
-      PARAMETER (ZERO=0.0D0)
-      LDA = NFRONT
-      LDA8 = int(LDA,8)
-      IF (SYM.NE.0.AND.NIV.EQ.2) THEN
-        IF (present(NASS)) THEN
-          LDA = NASS
-       ELSE
-          write(*,*) 'Internal error in DMUMPS_LRTRSM_NELIM_VAR'
-          CALL MUMPS_ABORT()
-        ENDIF
-      ENDIF
-      POSELT_LOCAL = POSELT + 
-     &      int(IBEG_BLOCK-1,8)*LDA8 + int(IBEG_BLOCK - 1,8)
-#if defined(BLR_MT) 
-!$OMP SINGLE
-#endif  
-      NPIV   = IEND_BLOCK - NELIM
-      LKJIW  = NPIV - IBEG_BLOCK + 1
-      LPOS = POSELT_LOCAL + int(NPIV,8)*int(LDA,8)
-      UPOS = POSELT_LOCAL + int(NPIV,8)
-      IF (NELIM.GT.0.AND.PIVOT_OPTION.LT.2) THEN
-        IF (SYM.EQ.0) THEN
-          CALL dtrsm('L', 'L', 'N', 'N', LKJIW, NELIM, ONE,
-     &               A(POSELT_LOCAL), NFRONT,
-     &               A(LPOS), NFRONT)
-        ELSE
-          CALL dtrsm('L', 'U', 'T', 'U', LKJIW, NELIM, ONE,
-     &               A(POSELT_LOCAL), NFRONT,
-     &               A(LPOS), NFRONT)
-          DPOS = POSELT_LOCAL
-          I = 1
-          DO
-          IF(I .GT. LKJIW) EXIT
-          IF(IW(OFFSET_IW+I-1) .GT. 0) THEN
-            A11 = ONE/A(DPOS)
-            CALL dcopy(NELIM, A(LPOS+int(I-1,8)), LDA,
-     &                        A(UPOS+int(I-1,8)*LDA8), 1)
-            CALL dscal(NELIM, A11, A(LPOS+int(I-1,8)), LDA)
-            DPOS = DPOS + int(LDA+1,8)
-            I = I+1
-          ELSE
-            CALL dcopy(NELIM, A(LPOS+int(I-1,8)), LDA,
-     &                        A(UPOS+int(I-1,8)*LDA8), 1)
-            CALL dcopy(NELIM, A(LPOS+int(I,8)), LDA,
-     &                        A(UPOS+int(I,8)*LDA8), 1)
-            POSPV1 = DPOS
-            POSPV2 = DPOS + int(LDA+1,8)
-            OFFDAG = POSPV1+1_8
-            A11 = A(POSPV1)
-            A22 = A(POSPV2)
-            A12 = A(OFFDAG)
-            DETPIV = A11*A22 - A12**2
-            A22 = A11/DETPIV
-            A11 = A(POSPV2)/DETPIV
-            A12 = -A12/DETPIV
-            DO J = 1,NELIM
-              MULT1 = A11*A(LPOS+int(J-1,8)*LDA8+int(I-1,8)) 
-     &              + A12*A(LPOS+int(J-1,8)*LDA8+int(I,8))
-              MULT2 = A12*A(LPOS+int(J-1,8)*LDA8+int(I-1,8)) 
-     &              + A22*A(LPOS+int(J-1,8)*LDA8+int(I,8))
-              A(LPOS+int(J-1,8)*LDA8+int(I-1,8)) = MULT1
-              A(LPOS+int(J-1,8)*LDA8+int(I,8))   = MULT2
-            ENDDO
-            DPOS = POSPV2 + int(LDA+1,8)
-            I = I+2
-          ENDIF
-          ENDDO
-        ENDIF
-      ENDIF
-#if defined(BLR_MT) 
-!$OMP END SINGLE
-#endif  
-      END SUBROUTINE DMUMPS_LRTRSM_NELIM_VAR
       SUBROUTINE DMUMPS_BLR_PANEL_LRTRSM(
      &                A,
      &                LA, POSELT, NFRONT,

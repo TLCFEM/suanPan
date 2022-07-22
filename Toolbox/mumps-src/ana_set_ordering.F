@@ -1,21 +1,22 @@
 C
-C  This file is part of MUMPS 5.2.1, released
-C  on Fri Jun 14 14:46:05 UTC 2019
+C  This file is part of MUMPS 5.5.1, released
+C  on Tue Jul 12 13:17:24 UTC 2022
 C
 C
-C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2022 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license:
-C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+C  released under the CeCILL-C license 
+C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
-      SUBROUTINE MUMPS_SET_ORDERING(N, SYM, NPROCS, IORD,
-     &                       symmetry, NBQD, AvgDens,
+      SUBROUTINE MUMPS_SET_ORDERING(N, KEEP, SYM, NPROCS, IORD,
+     &                       NBQD, AvgDens,
      &                       PROK, MP)
       IMPLICIT NONE
-      INTEGER, intent(in)    :: N, NPROCS, SYM
-      INTEGER, intent(in)    :: symmetry, NBQD, AvgDens, MP
+      INTEGER, intent(in)    :: N, KEEP(500), NPROCS, SYM
+      INTEGER, intent(in)    :: NBQD, AvgDens, MP
       LOGICAL, intent(in)    :: PROK
       INTEGER, intent(inout) :: IORD
       INTEGER MAXQD

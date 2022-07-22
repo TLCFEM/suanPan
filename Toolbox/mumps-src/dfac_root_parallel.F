@@ -1,26 +1,31 @@
 C
-C  This file is part of MUMPS 5.2.1, released
-C  on Fri Jun 14 14:46:05 UTC 2019
+C  This file is part of MUMPS 5.5.1, released
+C  on Tue Jul 12 13:17:24 UTC 2022
 C
 C
-C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2022 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license:
-C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+C  released under the CeCILL-C license 
+C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
-      SUBROUTINE DMUMPS_FACTO_ROOT( MYID, MASTER_OF_ROOT,
+      SUBROUTINE DMUMPS_FACTO_ROOT( 
+     &           MPA, MYID, MASTER_OF_ROOT,
      &           root, N, IROOT,
      &           COMM, IW, LIW, IFREE,
      &           A, LA, PTRAST, PTLUST_S, PTRFAC,
      &           STEP, INFO, LDLT, QR,
-     &           WK, LWK, KEEP,KEEP8,DKEEP,OPELIW)
-        USE DMUMPS_LR_STATS, ONLY: UPDATE_FLOPS_STATS_ROOT
+     &           WK, LWK, KEEP,KEEP8,DKEEP,OPELIW,
+     &           DET_EXP, DET_MANT, DET_SIGN
+     & )
+        USE DMUMPS_LR_STATS, ONLY: UPD_FLOP_ROOT
         USE DMUMPS_STRUC_DEF, ONLY : DMUMPS_ROOT_STRUC
-        IMPLICIT NONE
+         IMPLICIT NONE
       INCLUDE 'mpif.h'
       TYPE ( DMUMPS_ROOT_STRUC ) :: root
+      INTEGER, INTENT(IN) :: MPA
       INTEGER N, IROOT, COMM, LIW, MYID, IFREE, MASTER_OF_ROOT
       INTEGER(8) :: LA
       INTEGER(8) :: LWK
@@ -34,8 +39,11 @@ C
       INTEGER INFO( 2 ), LDLT, QR
       DOUBLE PRECISION A( LA )
       DOUBLE PRECISION, intent(inout) :: OPELIW
+      INTEGER, INTENT(INOUT) :: DET_SIGN, DET_EXP
+      DOUBLE PRECISION, INTENT(INOUT) :: DET_MANT
       INTEGER IOLDPS
       INTEGER(8) :: IAPOS
+      DOUBLE PRECISION :: FLOPS_ROOT
       INTEGER(8) :: ENTRIES_ROOT
       INTEGER LOCAL_M, LOCAL_N, LPIV, IERR, allocok
       INTEGER FWD_LOCAL_N_RHS, FWD_MTYPE 
@@ -52,6 +60,16 @@ C
      &      root%TOT_ROOT_SIZE, MYID, COMM )
           ENDIF
         RETURN
+        ENDIF
+        IF (MPA.GT.0) THEN
+         IF (MYID.EQ.MASTER_OF_ROOT) THEN
+           CALL  MUMPS_GET_FLOPS_COST
+     &     (root%TOT_ROOT_SIZE, root%TOT_ROOT_SIZE, root%TOT_ROOT_SIZE,
+     &      LDLT, 3, FLOPS_ROOT)
+           WRITE(MPA,'(A, A, 1PD10.3)')
+     &     " ... Start processing the root node with ScaLAPACK, ", 
+     &     " remaining flops                = ", FLOPS_ROOT
+         ENDIF
         ENDIF
         IOLDPS  = PTLUST_S(STEP(IROOT))+KEEP(IXSZ)
         IAPOS   = PTRAST(STEP(IROOT))
@@ -115,7 +133,7 @@ C
      &                          root%TOT_ROOT_SIZE, INFO(2),
      &                          root%NPROW, root%NPCOL, MYID )
           IF (KEEP(486) .GT. 0) THEN
-            CALL UPDATE_FLOPS_STATS_ROOT( LDLT,
+            CALL UPD_FLOP_ROOT( LDLT,
      &                          root%TOT_ROOT_SIZE, INFO(2),
      &                          root%NPROW, root%NPCOL, MYID )
           ENDIF
@@ -124,7 +142,7 @@ C
      &                          root%TOT_ROOT_SIZE, root%TOT_ROOT_SIZE,
      &                          root%NPROW, root%NPCOL, MYID )
           IF (KEEP(486) .GT. 0) THEN
-            CALL UPDATE_FLOPS_STATS_ROOT( LDLT,
+            CALL UPD_FLOP_ROOT( LDLT,
      &                          root%TOT_ROOT_SIZE, root%TOT_ROOT_SIZE,
      &                          root%NPROW, root%NPCOL, MYID )
           ENDIF
@@ -142,6 +160,10 @@ C
           KEEP8(10)=KEEP8(10) +
      &    mod(ENTRIES_ROOT, int(root%NPROW*root%NPCOL,8))
         ENDIF
+        CALL DMUMPS_PAR_ROOT_MINMAX_PIV_UPD (
+     &         root%MBLOCK, root%IPIV(1),root%MYROW,
+     &         root%MYCOL, root%NPROW, root%NPCOL, A(IAPOS), LOCAL_M,
+     &         LOCAL_N, root%TOT_ROOT_SIZE, MYID, DKEEP, KEEP, LDLT)
         IF (KEEP(258).NE.0) THEN
            IF (root%MBLOCK.NE.root%NBLOCK) THEN
             write(*,*) "Internal error in DMUMPS_FACTO_ROOT:",
@@ -151,7 +173,7 @@ C
           ENDIF
           CALL DMUMPS_GETDETER2D(root%MBLOCK, root%IPIV(1),root%MYROW,
      &         root%MYCOL, root%NPROW, root%NPCOL, A(IAPOS), LOCAL_M,
-     &         LOCAL_N, root%TOT_ROOT_SIZE, MYID, DKEEP(6), KEEP(259),
+     &         LOCAL_N, root%TOT_ROOT_SIZE, MYID, DET_MANT, DET_EXP,
      &         LDLT)
         ENDIF
         IF (KEEP(252) .NE. 0) THEN

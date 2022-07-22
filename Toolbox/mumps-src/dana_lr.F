@@ -1,20 +1,23 @@
 C
-C  This file is part of MUMPS 5.2.1, released
-C  on Fri Jun 14 14:46:05 UTC 2019
+C  This file is part of MUMPS 5.5.1, released
+C  on Tue Jul 12 13:17:24 UTC 2022
 C
 C
-C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2022 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license:
-C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+C  released under the CeCILL-C license 
+C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
       MODULE DMUMPS_ANA_LR
       USE DMUMPS_LR_CORE
       USE DMUMPS_LR_STATS
       USE MUMPS_LR_COMMON
       USE MUMPS_ANA_ORD_WRAPPERS
+      USE MUMPS_ANA_BLK_M, ONLY: LMATRIX_T
+!$    USE OMP_LIB, ONLY: omp_get_max_threads
       IMPLICIT NONE
       CONTAINS
       SUBROUTINE GET_CUT(IWR, NASS, NCB, LRGROUPS, NPARTSCB,
@@ -64,7 +67,7 @@ C
       END SUBROUTINE GET_CUT
       SUBROUTINE SEP_GROUPING(NV, VLIST, N, NZ, LRGROUPS, NBGROUPS, IW, 
      &   LW, IPE, LEN, GROUP_SIZE, HALO_DEPTH, TRACE, WORKH, NODE,
-     &   GEN2HALO, K482, K472, K469, SEP_SIZE, 
+     &   GEN2HALO, K482, K472, K469, SEP_SIZE, MAXSIZE_PARTS,
      &   KEEP10, LP, LPOK, IFLAG, IERROR)
         INTEGER(8), INTENT(IN) :: NZ, LW
         INTEGER, INTENT(IN)    :: NV, N, GROUP_SIZE, HALO_DEPTH
@@ -77,11 +80,13 @@ C
         INTEGER                :: LRGROUPS(:) 
         INTEGER, INTENT(INOUT) :: GEN2HALO(N)
         INTEGER, INTENT(INOUT) :: IFLAG, IERROR
+        INTEGER, INTENT(INOUT) :: MAXSIZE_PARTS
         INTEGER(8), ALLOCATABLE, DIMENSION(:) :: IPTRHALO
         INTEGER,    ALLOCATABLE, DIMENSION(:) :: PARTS, JCNHALO
         INTEGER(8) :: HALOEDGENBR
         INTEGER    :: NHALO,
      &       NBGROUPS_KWAY, I, GROUP_SIZE2, LRGROUPS_SIGN, IERR
+        INTEGER    :: MAXSIZE_PARTS_LOC
 #if defined (metis) || defined (parmetis) || defined (metis4) || defined (parmetis3)
         INTEGER :: METIS_IDX_SIZE
 #endif
@@ -89,7 +94,9 @@ C
         INTEGER :: SCOTCH_IDX_SIZE
 #endif
         CALL COMPUTE_BLR_VCS(K472, GROUP_SIZE2, GROUP_SIZE, NV)
-        NBGROUPS_KWAY = MAX(NINT(dble(NV)/dble(GROUP_SIZE2)),1)
+        NBGROUPS_KWAY = MAX(
+     &                INT(dble(NV+GROUP_SIZE2-1)/dble(GROUP_SIZE2))
+     &                ,1)
         IF (NV .GE. SEP_SIZE) THEN
           LRGROUPS_SIGN = 1
         ELSE
@@ -182,9 +189,12 @@ C
             CALL MUMPS_ABORT()
           END IF
           IF (IFLAG.LT.0) GOTO 500
-          CALL GET_GLOBAL_GROUPS(PARTS,VLIST,NV,
-     &     NBGROUPS_KWAY, LRGROUPS, N, NBGROUPS, LRGROUPS_SIGN)
+          CALL GET_GLOBAL_GROUPS(PARTS, VLIST, NV, 
+     &     NBGROUPS_KWAY, LRGROUPS, N, NBGROUPS, LRGROUPS_SIGN,
+     &     MAXSIZE_PARTS_LOC)
+           MAXSIZE_PARTS = max(MAXSIZE_PARTS, MAXSIZE_PARTS_LOC)
         ELSE 
+          MAXSIZE_PARTS = max(MAXSIZE_PARTS,NV)
 !$OMP CRITICAL(lrgrouping_cri)
           DO I=1,NV
             LRGROUPS(VLIST(I)) = LRGROUPS_SIGN*(NBGROUPS + 1)
@@ -203,17 +213,294 @@ C
         ENDIF
         RETURN
       END SUBROUTINE SEP_GROUPING
+      SUBROUTINE SEP_GROUPING_AB (NV, NVEXPANDED, 
+     &   VLIST, N, LRGROUPS, NBGROUPS, LUMAT, SIZEOFBLOCKS,
+     &   GROUP_SIZE, HALO_DEPTH, TRACE, WORKH, NODE,
+     &   GEN2HALO, K482, K472, K469, SEP_SIZE, MAXSIZE_PARTS,
+     &   KEEP10, LP, LPOK, IFLAG, IERROR)
+        TYPE(LMATRIX_T)        :: LUMAT
+        INTEGER, INTENT(IN)    :: NV, NVEXPANDED, 
+     &                            N, GROUP_SIZE, HALO_DEPTH
+        INTEGER, INTENT(IN)    :: SIZEOFBLOCKS(N)
+        INTEGER, INTENT(IN)    :: NODE, K482
+        INTEGER, INTENT(IN)    :: K472, K469, SEP_SIZE, KEEP10, LP
+        LOGICAL                :: LPOK
+        INTEGER, INTENT(INOUT) :: NBGROUPS, WORKH(N)
+        INTEGER, INTENT(INOUT) :: VLIST(NV), TRACE(N)
+        INTEGER                :: LRGROUPS(:) 
+        INTEGER, INTENT(INOUT) :: GEN2HALO(N)
+        INTEGER, INTENT(INOUT) :: IFLAG, IERROR
+        INTEGER, INTENT(INOUT) :: MAXSIZE_PARTS
+        INTEGER(8), ALLOCATABLE, DIMENSION(:) :: IPTRHALO
+        INTEGER,    ALLOCATABLE, DIMENSION(:) :: PARTS, JCNHALO
+        INTEGER,    ALLOCATABLE, DIMENSION(:) :: VWGT
+        INTEGER(8) :: HALOEDGENBR
+        INTEGER    :: NHALO,
+     &       NBGROUPS_KWAY, I, GROUP_SIZE2, LRGROUPS_SIGN, IERR
+        INTEGER    :: MAXSIZE_PARTS_LOC
+        DOUBLE PRECISION       :: COMPRESS_RATIO
+#if defined (metis) || defined (parmetis) || defined (metis4) || defined (parmetis3)
+        INTEGER :: METIS_IDX_SIZE
+#endif
+#if defined (scotch) || defined (ptscotch)
+        INTEGER :: SCOTCH_IDX_SIZE
+#endif
+        CALL COMPUTE_BLR_VCS(K472, GROUP_SIZE2, GROUP_SIZE, NVEXPANDED)
+        COMPRESS_RATIO= dble(NVEXPANDED)/dble(NV)
+        NBGROUPS_KWAY = MAX(
+     &          INT(dble(NVEXPANDED+GROUP_SIZE2-1)/dble(GROUP_SIZE2))
+     &          ,1)
+        NBGROUPS_KWAY = min(NBGROUPS_KWAY, NV)
+        IF (NVEXPANDED .GE. SEP_SIZE) THEN
+          LRGROUPS_SIGN = 1
+        ELSE
+          LRGROUPS_SIGN = -1
+        ENDIF
+        IF (NBGROUPS_KWAY > 1) THEN 
+          IF (K469.EQ.3) THEN
+!$OMP CRITICAL(gethalo_cri)
+            CALL GETHALONODES_AB(N, LUMAT, VLIST, NV, HALO_DEPTH,
+     &                 NHALO, TRACE, WORKH, NODE, HALOEDGENBR,
+     &                 GEN2HALO)
+            ALLOCATE(PARTS(NHALO), IPTRHALO(NHALO+1),
+     &      JCNHALO(HALOEDGENBR), VWGT(NHALO), STAT=IERR)
+            IF (IERR.GT.0) THEN
+              IF (LPOK) WRITE(LP,*) 
+     &        " Error allocate integer array of size: ", 
+     &         int(2*NHALO+(KEEP10*(NHALO+1)),8) + HALOEDGENBR
+              IFLAG  = -7
+              CALL MUMPS_SET_IERROR 
+     &         (int(2*NHALO+(KEEP10*(NHALO+1)),8) + HALOEDGENBR,
+     &          IERROR)
+            ENDIF
+            DO I=1, NHALO
+             VWGT(I) = SIZEOFBLOCKS(WORKH(I))
+            ENDDO
+            CALL GETHALOGRAPH_AB(WORKH, NV,
+     &      NHALO, N, LUMAT, IPTRHALO,
+     &      JCNHALO, HALOEDGENBR,TRACE,NODE, GEN2HALO, PARTS)
+!$OMP END CRITICAL(gethalo_cri)
+            IF (IFLAG.LT.0) RETURN
+          ELSE
+            CALL GETHALONODES_AB(N, LUMAT, VLIST, NV, HALO_DEPTH,
+     &                 NHALO, TRACE, WORKH, NODE, HALOEDGENBR,
+     &                 GEN2HALO)
+            ALLOCATE(PARTS(NHALO), IPTRHALO(NHALO+1),
+     &      JCNHALO(HALOEDGENBR), VWGT(NHALO), STAT=IERR)
+            IF (IERR.GT.0) THEN
+              IF (LPOK) WRITE(LP,*) 
+     &        " Error allocate integer array of size: ", 
+     &         int(2*NHALO+(KEEP10*(NHALO+1)),8) + HALOEDGENBR
+              IFLAG  = -7
+              CALL MUMPS_SET_IERROR 
+     &         (int(2*NHALO+(KEEP10*(NHALO+1)),8) + HALOEDGENBR,
+     &          IERROR)
+              RETURN
+            ENDIF
+            DO I=1, NHALO
+             VWGT(I) = SIZEOFBLOCKS(WORKH(I))
+            ENDDO
+            CALL GETHALOGRAPH_AB(WORKH, NV, 
+     &      NHALO, N, LUMAT, IPTRHALO, 
+     &     JCNHALO, HALOEDGENBR,TRACE,NODE, GEN2HALO, PARTS)
+          ENDIF
+          IF (K482.EQ.1) THEN
+#if defined (metis) || defined (parmetis) || defined (metis4) || defined (parmetis3)
+             CALL MUMPS_METIS_IDXSIZE(METIS_IDX_SIZE)
+             IF (METIS_IDX_SIZE .EQ. 64) THEN
+                CALL MUMPS_METIS_KWAY_AB_MIXEDto64(NHALO, HALOEDGENBR,
+     &               IPTRHALO,
+     &               JCNHALO,
+     &               NBGROUPS_KWAY, PARTS, VWGT, LP, LPOK, KEEP10,
+     &               IFLAG, IERROR)
+             ELSE
+               IF (KEEP10.EQ.1) THEN
+                IFLAG  = -52
+                IERROR = 1
+               ELSE
+                CALL MUMPS_METIS_KWAY_AB_MIXEDto32(NHALO, HALOEDGENBR,
+     &               IPTRHALO,
+     &               JCNHALO,
+     &               NBGROUPS_KWAY, PARTS, VWGT, LP, LPOK, KEEP10,
+     &               IFLAG, IERROR)
+               ENDIF
+             ENDIF
+#endif
+          ELSE IF (K482.EQ.2) THEN
+#if defined (scotch) || defined (ptscotch)
+             CALL MUMPS_SCOTCH_INTSIZE(SCOTCH_IDX_SIZE)
+             IF (SCOTCH_IDX_SIZE .EQ. 32) THEN
+               IF (KEEP10.EQ.1) THEN
+                IFLAG  = -52
+                IERROR = 2
+               ELSE
+                CALL MUMPS_SCOTCH_KWAY_MIXEDto32(
+     &               NHALO, HALOEDGENBR, IPTRHALO, JCNHALO,
+     &               NBGROUPS_KWAY, PARTS, LP, LPOK, KEEP10,
+     &               IFLAG, IERROR)
+               ENDIF
+             ELSE
+                CALL MUMPS_SCOTCH_KWAY_MIXEDto64(
+     &               NHALO, HALOEDGENBR, IPTRHALO, JCNHALO,
+     &               NBGROUPS_KWAY, PARTS, LP, LPOK, KEEP10,
+     &               IFLAG, IERROR)
+             END IF
+#endif
+          ELSE
+            WRITE(6,*) " Internal ERROR K482=", K482
+            CALL MUMPS_ABORT()
+          END IF
+          IF (IFLAG.LT.0) GOTO 500
+          CALL GET_GLOBAL_GROUPS(PARTS,VLIST, NV, 
+     &     NBGROUPS_KWAY, LRGROUPS, N, NBGROUPS, LRGROUPS_SIGN,
+     &     MAXSIZE_PARTS_LOC)
+           MAXSIZE_PARTS = max( MAXSIZE_PARTS, 
+     &                   int(dble(MAXSIZE_PARTS_LOC*COMPRESS_RATIO))  )
+        ELSE 
+          MAXSIZE_PARTS = max(MAXSIZE_PARTS,NV)
+!$OMP CRITICAL(lrgrouping_cri)
+          DO I=1,NV
+            LRGROUPS(VLIST(I)) = LRGROUPS_SIGN*(NBGROUPS + 1)
+          END DO
+            NBGROUPS = NBGROUPS + 1
+!$OMP END CRITICAL(lrgrouping_cri)
+        END IF
+  500   IF (allocated(IPTRHALO)) then
+           DEALLOCATE(IPTRHALO)
+        ENDIF
+        IF (allocated(PARTS)) then
+           DEALLOCATE(PARTS) 
+        ENDIF
+        IF (allocated(JCNHALO)) then
+           DEALLOCATE(JCNHALO   )
+        ENDIF
+        IF (allocated(VWGT)) then
+           DEALLOCATE(VWGT) 
+        ENDIF
+        RETURN
+      END SUBROUTINE SEP_GROUPING_AB
+      SUBROUTINE GETHALONODES_AB(N, LUMAT, IND, NIND, PMAX, 
+     &                        NHALO, TRACE, WORKH, NODE, HALOEDGENBR,
+     &                        GEN2HALO)
+        TYPE(LMATRIX_T)        :: LUMAT
+        INTEGER,DIMENSION(:),INTENT(IN) :: IND
+        INTEGER, INTENT(IN)             :: N, NODE
+        INTEGER, INTENT(IN)             :: PMAX,NIND
+        INTEGER, INTENT(OUT)            :: NHALO
+        INTEGER, INTENT(INOUT)          :: TRACE(N), WORKH(N)
+        INTEGER                         :: GEN2HALO(N)
+        INTEGER(8), INTENT(OUT)         :: HALOEDGENBR
+        INTEGER                         :: I, J, II
+        INTEGER                         :: HALOI, NB, NEWNHALO
+        INTEGER(8)                      :: SEPEDGES_TOTAL,
+     &                                     SEPEDGES_INTERNAL
+        WORKH(1:NIND)  = IND
+        NHALO          = NIND
+        NEWNHALO       = 0
+        HALOEDGENBR    = 0_8
+        SEPEDGES_TOTAL = 0_8
+        SEPEDGES_INTERNAL = 0_8
+        DO I=1,NIND
+          HALOI = WORKH(I)
+          GEN2HALO(HALOI) = I
+          IF (TRACE(HALOI) .NE. NODE) THEN
+             TRACE(HALOI) = NODE
+          END IF
+        ENDDO
+        DO I=1,NIND
+          HALOI = WORKH(I)
+          NB = LUMAT%COL(HALOI)%NBINCOL
+          SEPEDGES_TOTAL = SEPEDGES_TOTAL + int(NB,8)
+          DO J=1, NB
+           II = LUMAT%COL(HALOI)%IRN(J)
+           IF (TRACE(II).NE.NODE) THEN
+            NEWNHALO               = NEWNHALO + 1
+            WORKH(NHALO+NEWNHALO)  = II
+            GEN2HALO(II)           = NHALO+NEWNHALO
+            TRACE(II)              = NODE
+           ELSE
+            IF (GEN2HALO(II).LE.NHALO) THEN
+             SEPEDGES_INTERNAL = SEPEDGES_INTERNAL + 1_8
+            ENDIF
+           ENDIF
+          ENDDO
+        END DO
+        HALOEDGENBR = SEPEDGES_TOTAL + 
+     &                (SEPEDGES_TOTAL - SEPEDGES_INTERNAL)
+        NHALO  = NHALO + NEWNHALO
+      END SUBROUTINE GETHALONODES_AB
+      SUBROUTINE GETHALOGRAPH_AB(HALO,NSEP,NHALO,
+     &     N,LUMAT,IPTRHALO,JCNHALO,
+     &     HALOEDGENBR,TRACE,NODE, GEN2HALO, IQ)
+      INTEGER, INTENT(IN) :: N
+      TYPE(LMATRIX_T)     :: LUMAT
+      INTEGER,INTENT(IN):: NSEP, NHALO, NODE
+      INTEGER,INTENT(IN):: GEN2HALO(N)
+      INTEGER,DIMENSION(NHALO),INTENT(IN) :: HALO
+      INTEGER, INTENT(IN)     :: TRACE(N)
+      INTEGER(8),INTENT(IN)   :: HALOEDGENBR
+      INTEGER(8), INTENT(OUT) :: IPTRHALO(NHALO+1)
+      INTEGER, INTENT(OUT)    :: JCNHALO(HALOEDGENBR)
+      INTEGER                 :: IQ(NHALO)
+      INTEGER::I,J,NB,II,JJ,HALOI,HALOJ
+      DO I=NSEP+1, NHALO
+       IQ(I) = 0
+      ENDDO
+      DO I=1,NSEP
+        HALOI = HALO(I)
+        NB    = LUMAT%COL(HALOI)%NBINCOL
+        IQ(I) = NB
+        DO JJ=1, NB
+         II = LUMAT%COL(HALOI)%IRN(JJ)
+         J  = GEN2HALO(II)
+         IF (J.GT.NSEP) THEN
+           IQ(J) = IQ(J) + 1
+         ENDIF
+        ENDDO
+      ENDDO
+      IPTRHALO(1) = 1_8
+      DO I=1,NHALO
+       IPTRHALO(I+1) = IPTRHALO(I)+int(IQ(I),8)
+      ENDDO
+      DO I=1,NSEP
+        HALOI = HALO(I)
+        NB    = LUMAT%COL(HALOI)%NBINCOL
+        DO JJ=1, NB
+         HALOJ = LUMAT%COL(HALOI)%IRN(JJ)
+         J     = GEN2HALO(HALOJ)
+         JCNHALO(IPTRHALO(I)) = J
+         IPTRHALO(I)          = IPTRHALO(I) + 1
+         IF (J.GT.NSEP) THEN
+           JCNHALO(IPTRHALO(J)) = I
+           IPTRHALO(J)          = IPTRHALO(J) + 1
+         ENDIF
+        ENDDO
+      ENDDO
+      IPTRHALO(1) = 1_8
+      DO I=1,NHALO
+       IPTRHALO(I+1) = IPTRHALO(I)+int(IQ(I),8)
+      ENDDO
+      END SUBROUTINE GETHALOGRAPH_AB
       SUBROUTINE GET_GLOBAL_GROUPS(PARTS, SEP, NSEP, NPARTS, 
-     &                    LRGROUPS, N, NBGROUPS, LRGROUPS_SIGN)
+     &                    LRGROUPS, N, NBGROUPS, LRGROUPS_SIGN,
+     &                    MAXSIZE_PARTS_LOC)
       INTEGER,INTENT(IN) :: NSEP, N, LRGROUPS_SIGN
       INTEGER :: PARTS(:)
       INTEGER,DIMENSION(:),INTENT(INOUT) :: SEP 
       INTEGER, INTENT(INOUT) :: NPARTS 
       INTEGER, INTENT(INOUT) :: NBGROUPS
       INTEGER                :: LRGROUPS(:)  
-      INTEGER::I,CNT,NB_PARTS_WITHOUT_SEP_NODE,allocok
+      INTEGER, INTENT(OUT)   :: MAXSIZE_PARTS_LOC
+      INTRINSIC maxval
+      INTEGER:: I,CNT,NB_PARTS_WITHOUT_SEP_NODE,allocok
+      INTEGER:: TARGET_SIZE_KWAY
+      INTEGER:: MAXSIZE_PARTS_LOC_NEW
       INTEGER,DIMENSION(:),ALLOCATABLE::SIZES, RIGHTPART
       INTEGER,DIMENSION(:),ALLOCATABLE::PARTPTR
+#if ! defined(NO_SPLIT_IN_BLRGROUPING)
+      INTEGER :: NB_PARTS_WITH_SPLIT, IP, SZ_FINAL, II, NB_SPLIT
+      INTEGER :: TARGET_SIZE_SPLIT
+#endif
       INTEGER,DIMENSION(:),ALLOCATABLE :: NEWSEP
       ALLOCATE( NEWSEP(NSEP),
      &          SIZES(NPARTS),
@@ -223,14 +510,17 @@ C
          write(*,*) "Allocation error in GET_GLOBAL_GROUPS"
          CALL MUMPS_ABORT()
       ENDIF
+      TARGET_SIZE_KWAY  = (NSEP+NPARTS-1) / NPARTS
+      TARGET_SIZE_SPLIT = 2*TARGET_SIZE_KWAY
       NB_PARTS_WITHOUT_SEP_NODE = 0
-      RIGHTPART = 0
+      RIGHTPART     = 0
       SIZES = 0
       DO I=1,NSEP
         SIZES(PARTS(I)) = SIZES(PARTS(I)) + 1
       END DO
-      PARTPTR(1)=1
+      MAXSIZE_PARTS_LOC = maxval(SIZES)
       CNT = 0
+      PARTPTR(1)=1
       DO I=2,NPARTS+1
         PARTPTR(I) = PARTPTR(I-1) + SIZES(I-1)
         IF (SIZES(I-1)==0) THEN
@@ -238,20 +528,61 @@ C
         ELSE
           CNT = CNT + 1
           RIGHTPART(I-1) = CNT
+#if ! defined(NO_SPLIT_IN_BLRGROUPING)
+          SIZES(CNT) = SIZES(I-1)
+#endif          
         END IF
       END DO
       NPARTS = NPARTS - NB_PARTS_WITHOUT_SEP_NODE 
-!$OMP CRITICAL(lrgrouping_cri)
-      DO I=1,NSEP
-        NEWSEP(PARTPTR(PARTS(I))) = SEP(I)  
-        LRGROUPS(SEP(I)) = LRGROUPS_SIGN*(RIGHTPART(PARTS(I)) 
-     &    + NBGROUPS)
-        PARTPTR(PARTS(I)) = 
-     &    PARTPTR(PARTS(I)) + 1
-      END DO
-      NBGROUPS = NBGROUPS + NPARTS
-!$OMP END CRITICAL(lrgrouping_cri)
-      SEP = NEWSEP
+#if ! defined(NO_SPLIT_IN_BLRGROUPING)
+       IF (MAXSIZE_PARTS_LOC.LT.TARGET_SIZE_SPLIT) THEN
+#endif
+!$OMP    CRITICAL(lrgrouping_cri)
+         DO I=1,NSEP
+          NEWSEP(PARTPTR(PARTS(I))) = SEP(I)  
+          LRGROUPS(SEP(I)) = LRGROUPS_SIGN*(RIGHTPART(PARTS(I)) 
+     &      + NBGROUPS)
+          PARTPTR(PARTS(I)) = 
+     &      PARTPTR(PARTS(I)) + 1
+         END DO
+         NBGROUPS = NBGROUPS + NPARTS
+!$OMP    END CRITICAL(lrgrouping_cri)
+         SEP = NEWSEP
+#if ! defined(NO_SPLIT_IN_BLRGROUPING)
+      ELSE
+         DO I=1,NSEP
+           NEWSEP(PARTPTR(PARTS(I))) = SEP(I)  
+           PARTPTR(PARTS(I)) = 
+     &       PARTPTR(PARTS(I)) + 1
+         END DO
+         SEP = NEWSEP
+         PARTPTR(1)=1
+         DO I=2,NPARTS+1
+           PARTPTR(I) = PARTPTR(I-1) + SIZES(I-1)
+         ENDDO
+         NB_PARTS_WITH_SPLIT = 0
+         MAXSIZE_PARTS_LOC_NEW = 0
+!$OMP    CRITICAL(lrgrouping_cri)
+         DO IP=1,NPARTS
+           NB_SPLIT =   (SIZES(IP) + TARGET_SIZE_SPLIT-1) 
+     &                    / TARGET_SIZE_SPLIT
+           SZ_FINAL     = (SIZES(IP) + NB_SPLIT-1) / NB_SPLIT 
+           MAXSIZE_PARTS_LOC_NEW = max(MAXSIZE_PARTS_LOC_NEW, 
+     &                                    SZ_FINAL)
+           DO I=PARTPTR(IP), PARTPTR(IP+1)-1, SZ_FINAL
+             NB_PARTS_WITH_SPLIT = NB_PARTS_WITH_SPLIT +1
+             DO II=I, min(I+SZ_FINAL-1,PARTPTR(IP+1)-1)
+               LRGROUPS(SEP(II)) = LRGROUPS_SIGN*(NB_PARTS_WITH_SPLIT
+     &                           + NBGROUPS)
+             ENDDO
+           ENDDO
+         ENDDO
+         NBGROUPS = NBGROUPS + NB_PARTS_WITH_SPLIT
+!$OMP    END CRITICAL(lrgrouping_cri)
+         NPARTS = NB_PARTS_WITH_SPLIT
+         MAXSIZE_PARTS_LOC = MAXSIZE_PARTS_LOC_NEW
+      ENDIF
+#endif
       DEALLOCATE(NEWSEP,SIZES,RIGHTPART,PARTPTR)
       END SUBROUTINE GET_GLOBAL_GROUPS
       SUBROUTINE GETHALONODES(N, IW, LW, IPE, IND, NIND, PMAX, 
@@ -444,7 +775,7 @@ C
      &     LRGROUPS, SYM, ICNTL, HALO_DEPTH, GROUP_SIZE, SEP_SIZE,
      &     K38, K20, K60,
      &     IFLAG, IERROR, K264, K265, K482, K472, MAXFRONT, K10, 
-     &     K54, LPOK, LP)
+     &     K54, K142, LPOK, LP, GATHER_MATRIX_ALLOCATED)
       IMPLICIT NONE
       INTEGER, INTENT(IN)    :: N, NSTEPS, LNA, SYM,
      &     HALO_DEPTH, SEP_SIZE, GROUP_SIZE
@@ -453,12 +784,14 @@ C
       INTEGER, INTENT(INOUT) :: K38, K20, K264, K265 
       INTEGER, INTENT(IN)    :: K482, K10, K60, K54
       INTEGER, INTENT(IN)    :: LP
+      INTEGER, INTENT(OUT)   :: K142
       LOGICAL, INTENT(IN)    :: LPOK
       INTEGER, POINTER, DIMENSION(:) :: IRN, JCN
       INTEGER, INTENT(IN)    ::  NE_STEPS(:), ICNTL(60)
       INTEGER :: FILS(:), FRERE_STEPS(:), STEP(:),
      &     NA(:), DAD_STEPS(:), LRGROUPS(:)
-      INTEGER, INTENT(IN) :: K472, MAXFRONT
+      INTEGER, INTENT(IN)    :: K472, MAXFRONT
+      LOGICAL, INTENT(INOUT) :: GATHER_MATRIX_ALLOCATED
       INTEGER :: K482_LOC, K38ou20
       INTEGER :: I, F, PV, NV, NLEAVES, NROOTS, PP, C, NF, NODE,
      &     SYMTRY, NBQD, AD
@@ -535,6 +868,7 @@ C
         deallocate(JCN)
         NULLIFY(IRN)
         NULLIFY(JCN)
+        GATHER_MATRIX_ALLOCATED = .FALSE.
       ENDIF
       IF (allocated(IQ)) DEALLOCATE(IQ)
       LRGROUPS = -1
@@ -556,6 +890,7 @@ C
         RETURN
       ENDIF
       TRACE = 0
+      K142 = 0
       DO WHILE(PP .GT. 0)
          PV = ABS(POOL(PP))
          NODE = STEP(PV)
@@ -575,14 +910,14 @@ C
      &        ) 
      &     THEN
                DO I=1,NV
-                  LRGROUPS(WORK(I))=NBGROUPS+1+I/GROUP_SIZE2
+                  LRGROUPS(WORK(I))=NBGROUPS+1+(I-1)/GROUP_SIZE2
                END DO
-               NBGROUPS = NBGROUPS + NV/GROUP_SIZE2 + 1
+               NBGROUPS = NBGROUPS + (NV-1)/GROUP_SIZE2 + 1
             ELSE
               CALL SEP_GROUPING(NV, WORK(1), N, NZ8,
      &              LRGROUPS, NBGROUPS, IW(1), LW, IPE(1), LEN(1),
      &              GROUP_SIZE, HALO_DEPTH, TRACE(1), WORKH(1), NODE,
-     &              GEN2HALO(1), K482_LOC, K472, 0, SEP_SIZE, 
+     &              GEN2HALO(1), K482_LOC, K472, 0, SEP_SIZE, K142,
      &              K10, LP, LPOK, IFLAG, IERROR)
               IF (IFLAG.LT.0) GOTO 500
             END IF
@@ -636,10 +971,10 @@ C
       RETURN
       END SUBROUTINE DMUMPS_LR_GROUPING
       SUBROUTINE DMUMPS_LR_GROUPING_NEW(N, NZ8, NSTEPS, IRN, JCN, FILS,
-     &     FRERE_STEPS, DAD_STEPS, NE_STEPS, STEP, NA, LNA, LRGROUPS, 
+     &     FRERE_STEPS, DAD_STEPS, STEP, NA, LNA, LRGROUPS, 
      &     SYM, ICNTL, HALO_DEPTH, GROUP_SIZE, SEP_SIZE, K38, K20,
      &     K60, IFLAG, IERROR, K264, K265, K482, K472, MAXFRONT, K469, 
-     &     K10, K54, LPOK, LP)
+     &     K10, K54, K142, LPOK, LP, GATHER_MATRIX_ALLOCATED)
       IMPLICIT NONE
       INTEGER, INTENT(IN)    :: N, NSTEPS, LNA, SYM,
      &     HALO_DEPTH, SEP_SIZE, GROUP_SIZE
@@ -650,16 +985,18 @@ C
       INTEGER, INTENT(IN)    :: LP
       LOGICAL, INTENT(IN)    :: LPOK
       INTEGER, POINTER, DIMENSION(:)  :: IRN, JCN
-      INTEGER, INTENT(IN)    :: NE_STEPS(:), ICNTL(60)
+      INTEGER, INTENT(IN)    :: ICNTL(60)
       INTEGER, POINTER :: FILS(:), FRERE_STEPS(:), STEP(:),
      &      NA(:), DAD_STEPS(:), LRGROUPS(:)
       INTEGER, INTENT(IN) :: K472, K469
+      LOGICAL, INTENT(INOUT) :: GATHER_MATRIX_ALLOCATED
+      INTEGER, INTENT(OUT)   :: K142
       INTEGER :: K482_LOC,  K469_LOC, K38ou20
       INTEGER :: I, F, PV, NV, NODE,
      &     SYMTRY, NBQD, AD
       LOGICAL :: PVSCHANGED
       INTEGER(8) :: LW, IWFR, NRORM, NIORM
-      INTEGER :: NBGROUPS
+      INTEGER :: NBGROUPS, NBGROUPS_local
       INTEGER, ALLOCATABLE, DIMENSION (:) :: PVS, WORK
       INTEGER, ALLOCATABLE, DIMENSION (:) :: LEN, IW
       INTEGER(8), ALLOCATABLE, DIMENSION (:) :: IPE, IQ
@@ -671,6 +1008,11 @@ C
       INTEGER :: GROUP_SIZE2, IERR, OMP_NUM
       INTEGER :: IERR_PRIV 
       LOGICAL :: INPLACE64_GRAPH_COPY
+#if defined(ptscotch) || defined(scotch)     
+      INTEGER :: VSCOTCH
+      LOGICAL :: SCOTCH_IS_THREAD_SAFE
+      INTEGER :: PTHREAD_NUMBER, NOMP
+#endif
       K38ou20=max(K38,K20)
       IF (K38ou20.GT.0) THEN
        STEP_SCALAPACK_ROOT = STEP(K38ou20)
@@ -708,11 +1050,17 @@ C
       ELSE IF (K482.EQ.3) THEN
          K482_LOC = 3
       END IF
+      K469_LOC = K469
+#if defined(ptscotch) || defined(scotch)     
+      SCOTCH_IS_THREAD_SAFE = .FALSE.
       IF (K482_LOC.EQ.2) THEN
-        K469_LOC = 1
-      ELSE
-        K469_LOC = K469
+      CALL MUMPS_SCOTCH_VERSION (VSCOTCH)
+      IF (VSCOTCH.GE.7) SCOTCH_IS_THREAD_SAFE=.TRUE.
       ENDIF
+      IF (K482_LOC.EQ.2.AND.(.NOT.SCOTCH_IS_THREAD_SAFE) ) THEN
+        K469_LOC = 1
+      ENDIF
+#endif
       NBGROUPS = 0
       LW = 2_8 * NZ8
       ALLOCATE(IW(LW), IPE(N+1), LEN(N), IQ(N), 
@@ -735,6 +1083,7 @@ C
         deallocate(JCN)
         NULLIFY(IRN)
         NULLIFY(JCN)
+        GATHER_MATRIX_ALLOCATED = .FALSE.
       ENDIF
       IF (allocated(IQ)) DEALLOCATE(IQ)
       LRGROUPS = -1
@@ -749,13 +1098,26 @@ C
           GOTO 501
         ENDIF
       ENDIF
+#if defined(ptscotch) || defined(scotch)     
+      IF (K482_LOC.EQ.2) THEN
+        NOMP=0
+!$      NOMP=omp_get_max_threads()
+        IF (NOMP .GT. 0) THEN
+           CALL MUMPS_SCOTCH_GET_PTHREAD_NUMBER (PTHREAD_NUMBER)
+           NOMP =1
+           CALL MUMPS_SCOTCH_SET_PTHREAD_NUMBER (NOMP)
+        ENDIF
+      ENDIF
+#endif
+      K142 = 0
       PVSCHANGED = .FALSE.
       OMP_NUM = 1
-!$    OMP_NUM = OMP_GET_MAX_THREADS()
+!$    OMP_NUM = omp_get_max_threads()
       OMP_NUM = min(OMP_NUM,8)
 !$OMP PARALLEL PRIVATE(I, NODE, PV, NV, F, GROUP_SIZE2, WORK, IERR_PRIV,
-!$OMP&         WORKH_PRV, TRACE_PRV, GEN2HALO_PRV
+!$OMP&         WORKH_PRV, TRACE_PRV, GEN2HALO_PRV, NBGROUPS_local
 !$OMP&         )
+!$OMP&         REDUCTION( max : K142)
 !$OMP&         IF (K469_LOC.GT.1) NUM_THREADS(OMP_NUM)
       ALLOCATE(WORK(MAXFRONT), STAT=IERR_PRIV)
       IF (IERR_PRIV.GT.0) THEN
@@ -763,11 +1125,12 @@ C
      *    "size: ", MAXFRONT
 !$OMP ATOMIC WRITE
         IFLAG = -7
+!$OMP END ATOMIC
 !$OMP ATOMIC WRITE
         IERROR = MAXFRONT
-        GOTO 500
+!$OMP END ATOMIC
       ENDIF
-      IF (K469_LOC.EQ.2) THEN
+      IF (IERR_PRIV .EQ. 0 .AND. K469_LOC.EQ.2) THEN
         ALLOCATE(TRACE_PRV(N), WORKH_PRV(N), GEN2HALO_PRV(N),
      &           STAT=IERR_PRIV)
         IF (IERR_PRIV.GT.0) THEN
@@ -775,10 +1138,15 @@ C
      *    "size: ", 3*N
 !$OMP ATOMIC WRITE
           IFLAG = -7
+!$OMP END ATOMIC
 !$OMP ATOMIC WRITE
           IERROR = 3*N
-          GOTO 500
+!$OMP END ATOMIC
         ENDIF
+      ENDIF
+!$OMP BARRIER
+      IF (IFLAG .LT. 0 ) THEN
+        GOTO 500
       ENDIF
       IF (K469_LOC.EQ.2) THEN
         TRACE_PRV = 0
@@ -812,9 +1180,9 @@ C
      &    THEN
 !$OMP CRITICAL(lrgrouping_cri)
             DO I=1,NV
-              LRGROUPS(WORK(I))=NBGROUPS+1+I/GROUP_SIZE2
+              LRGROUPS(WORK(I))=NBGROUPS+1+(I-1)/GROUP_SIZE2
             END DO
-            NBGROUPS = NBGROUPS + NV/GROUP_SIZE2 + 1
+            NBGROUPS = NBGROUPS + (NV-1)/GROUP_SIZE2 + 1
 !$OMP END CRITICAL(lrgrouping_cri)
           ELSE
             IF (K469_LOC .EQ. 2) THEN
@@ -822,13 +1190,13 @@ C
      &              LRGROUPS, NBGROUPS, IW(1), LW, IPE(1), LEN(1),
      &              GROUP_SIZE, HALO_DEPTH, TRACE_PRV, WORKH_PRV, 
      &              NODE, GEN2HALO_PRV, K482_LOC, K472, K469_LOC, 
-     &              SEP_SIZE, K10, LP, LPOK, IFLAG, IERROR)
+     &              SEP_SIZE, K142, K10, LP, LPOK, IFLAG, IERROR)
             ELSE
               CALL SEP_GROUPING(NV, WORK(1), N, NZ8,
      &              LRGROUPS, NBGROUPS, IW(1), LW, IPE(1), LEN(1),
      &              GROUP_SIZE, HALO_DEPTH, TRACE, WORKH, 
      &              NODE, GEN2HALO, K482_LOC, K472, K469_LOC, 
-     &              SEP_SIZE, K10, LP, LPOK, IFLAG, IERROR)
+     &              SEP_SIZE, K142, K10, LP, LPOK, IFLAG, IERROR)
             ENDIF
             IF (IFLAG.LT.0) CYCLE
             PVS(NODE) = WORK(1)
@@ -853,17 +1221,18 @@ C
           ENDIF
         ELSE
 !$OMP CRITICAL(lrgrouping_cri)
+          NBGROUPS = NBGROUPS + 1
+          NBGROUPS_local = NBGROUPS
+!$OMP END CRITICAL(lrgrouping_cri)
           IF (NV .GE. SEP_SIZE) THEN
             DO I = 1, NV
-              LRGROUPS( WORK(I) ) = (NBGROUPS + 1)
+              LRGROUPS( WORK(I) ) = NBGROUPS_local
             ENDDO
           ELSE
             DO I = 1, NV
-              LRGROUPS( WORK(I) ) = -(NBGROUPS + 1)
+              LRGROUPS( WORK(I) ) = -NBGROUPS_local
             ENDDO
           ENDIF
-          NBGROUPS = NBGROUPS + 1
-!$OMP END CRITICAL(lrgrouping_cri)
         ENDIF
       ENDDO       
 !$OMP END DO
@@ -901,6 +1270,11 @@ C
         IF (allocated(GEN2HALO_PRV)) DEALLOCATE(GEN2HALO_PRV)
       ENDIF
 !$OMP END PARALLEL
+#if defined(ptscotch) || defined(scotch)     
+      IF (K482_LOC.EQ.2.AND.NOMP .GT. 0) THEN
+        CALL MUMPS_SCOTCH_SET_PTHREAD_NUMBER (PTHREAD_NUMBER)
+      ENDIF
+#endif
  501  CONTINUE
       IF (K469_LOC.NE.2) THEN
         IF (allocated(TRACE))    DEALLOCATE(TRACE)
@@ -912,4 +1286,797 @@ C
       IF (allocated(LEN)) DEALLOCATE(LEN)
       RETURN
       END SUBROUTINE DMUMPS_LR_GROUPING_NEW
+      SUBROUTINE DMUMPS_AB_LR_GROUPING(N, MAPCOL, SIZEMAPCOL,
+     &     NSTEPS, LUMAT, FILS,
+     &     FRERE_STEPS, DAD_STEPS, STEP, NA, LNA, LRGROUPS, 
+     &     SIZEOFBLOCKS, SYM, ICNTL, HALO_DEPTH, GROUP_SIZE, 
+     &     SEP_SIZE, K38, K20,
+     &     K60, IFLAG, IERROR, K264, K265, K482, K472, MAXFRONT, K469, 
+     &     K10, K54, K142, LPOK, LP, MYID, COMM)
+      IMPLICIT NONE
+      INTEGER, INTENT(IN)     :: MYID, COMM
+      TYPE(LMATRIX_T)         :: LUMAT
+      INTEGER, INTENT(IN)    :: N, NSTEPS, LNA, SYM,
+     &     HALO_DEPTH, SEP_SIZE, GROUP_SIZE
+      INTEGER, INTENT(IN)    :: SIZEMAPCOL
+      INTEGER, INTENT(IN)    :: MAPCOL(SIZEMAPCOL)
+      INTEGER, INTENT(INOUT) :: IFLAG, IERROR
+      INTEGER, INTENT(INOUT) :: K38, K20, K264, K265 
+      INTEGER, INTENT(IN)    :: K482, K10, MAXFRONT, K60, K54
+      INTEGER, INTENT(IN)    :: LP
+      LOGICAL, INTENT(IN)    :: LPOK
+      INTEGER, INTENT(OUT)   :: K142
+      INTEGER, INTENT(IN)    :: ICNTL(60)
+      INTEGER, POINTER :: FILS(:), FRERE_STEPS(:), STEP(:),
+     &      NA(:), DAD_STEPS(:), LRGROUPS(:)
+      INTEGER, INTENT(IN)  :: SIZEOFBLOCKS(N)
+      INTEGER, INTENT(IN) :: K472, K469
+      INTEGER :: K482_LOC,  K469_LOC, K38ou20
+      INTEGER :: I, F, PV, NV, NVEXPANDED, NODE
+      DOUBLE PRECISION    :: COMPRESS_RATIO
+      LOGICAL :: PVSCHANGED
+      INTEGER :: NBGROUPS, NBGROUPS_local
+      INTEGER, ALLOCATABLE, DIMENSION (:) :: PVS, WORK
+      INTEGER, ALLOCATABLE, DIMENSION (:) :: TRACE, WORKH, 
+     &                                       GEN2HALO
+      INTEGER, ALLOCATABLE, DIMENSION (:) :: TRACE_PRV, WORKH_PRV, 
+     &                                   GEN2HALO_PRV
+      INTEGER :: STEP_SCALAPACK_ROOT
+      INTEGER :: GROUP_SIZE2, IERR, OMP_NUM
+      INTEGER :: IERR_PRIV 
+      LOGICAL :: MAPCOL_PROVIDED
+#if defined(ptscotch) || defined(scotch)     
+      INTEGER :: VSCOTCH
+      LOGICAL :: SCOTCH_IS_THREAD_SAFE
+      INTEGER :: PTHREAD_NUMBER, NOMP
+#endif
+      MAPCOL_PROVIDED = (MAPCOL(1).GE.0)
+      K38ou20=max(K38,K20)
+      IF (K38ou20.GT.0) THEN
+       STEP_SCALAPACK_ROOT = STEP(K38ou20)
+      ELSE
+       STEP_SCALAPACK_ROOT = 0
+      ENDIF
+      IF((K482.LE.0) .OR. (K482.GT.3)) THEN
+#if defined(parmetis) || defined(metis) || defined(parmetis3) || defined(metis4)
+         K482_LOC = 1
+#elif defined(ptscotch) || defined(scotch)
+         K482_LOC = 2
+#else
+         K482_LOC = 3
+#endif
+      ELSE IF (K482.EQ.1) THEN
+#if !defined(parmetis) && !defined(metis) && !defined(parmetis3) && !defined(metis4)
+#if defined(ptscotch) || defined(scotch)     
+         K482_LOC = 2
+#else
+         K482_LOC = 3
+#endif
+#else
+         K482_LOC = 1
+#endif
+      ELSE IF (K482.EQ.2) THEN
+#if !defined(ptscotch) && !defined(scotch)
+#if defined(parmetis) || defined(metis) || defined(parmetis3) || defined(metis4)
+         K482_LOC = 1
+#else
+         K482_LOC = 3
+#endif
+#else
+         K482_LOC = 2
+#endif
+      ELSE IF (K482.EQ.3) THEN
+         K482_LOC = 3
+      END IF
+      K469_LOC = K469
+#if defined(ptscotch) || defined(scotch)     
+      SCOTCH_IS_THREAD_SAFE = .FALSE.
+      IF (K482_LOC.EQ.2) THEN
+      CALL MUMPS_SCOTCH_VERSION (VSCOTCH)
+      IF (VSCOTCH.GE.7) SCOTCH_IS_THREAD_SAFE=.TRUE.
+      ENDIF
+      IF (K482_LOC.EQ.2.AND.(.NOT.SCOTCH_IS_THREAD_SAFE) ) THEN
+        K469_LOC = 1
+      ENDIF
+#endif
+      NBGROUPS = 0
+      ALLOCATE( PVS(NSTEPS), STAT=IERR)
+      IF (IERR.GT.0) THEN
+        IFLAG = -7
+        IERROR = NSTEPS
+        IF (LPOK) WRITE(LP,*) " Error allocate integer array of ", 
+     *    "size: ", IERROR
+        GOTO 501
+      ENDIF
+      LRGROUPS = -1
+      IF (K469_LOC.NE.2) THEN
+        ALLOCATE(TRACE(N), WORKH(N), GEN2HALO(N), 
+     &          STAT=IERR)
+        IF (IERR.GT.0) THEN
+          IF (LPOK) WRITE(LP,*) " Error allocate integer array of ", 
+     *    "size: ", 3*N
+          IFLAG = -7
+          IERROR = 3*N
+          GOTO 501
+        ENDIF
+      ENDIF
+#if defined(ptscotch) || defined(scotch)     
+      IF (K482_LOC.EQ.2) THEN
+        NOMP=0
+!$      NOMP=omp_get_max_threads()
+        IF (NOMP .GT. 0) THEN
+           CALL MUMPS_SCOTCH_GET_PTHREAD_NUMBER (PTHREAD_NUMBER)
+           NOMP =1
+           CALL MUMPS_SCOTCH_SET_PTHREAD_NUMBER (NOMP)
+        ENDIF
+      ENDIF
+#endif
+      K142 = 0
+      PVSCHANGED = .FALSE.
+      OMP_NUM = 1
+!$    OMP_NUM = omp_get_max_threads()
+      OMP_NUM = min(OMP_NUM,8)
+!$OMP PARALLEL PRIVATE(I, NODE, PV, NV, F, GROUP_SIZE2, WORK, IERR_PRIV,
+!$OMP&         WORKH_PRV, TRACE_PRV, GEN2HALO_PRV, NBGROUPS_local,
+!$OMP&         NVEXPANDED, COMPRESS_RATIO
+!$OMP&         )
+!$OMP&         REDUCTION( max : K142)
+!$OMP&         IF (K469_LOC.GT.1) NUM_THREADS(OMP_NUM)
+      ALLOCATE(WORK(MAXFRONT), STAT=IERR_PRIV)
+      IF (IERR_PRIV.GT.0) THEN
+        IF (LPOK) WRITE(LP,*) " Error allocate integer array of ", 
+     *    "size: ", MAXFRONT
+!$OMP ATOMIC WRITE
+        IFLAG = -7
+!$OMP END ATOMIC
+!$OMP ATOMIC WRITE
+        IERROR = MAXFRONT
+!$OMP END ATOMIC
+      ENDIF
+      IF (IERR_PRIV .EQ. 0 .AND. K469_LOC.EQ.2) THEN
+        ALLOCATE(TRACE_PRV(N), WORKH_PRV(N), GEN2HALO_PRV(N),
+     &           STAT=IERR_PRIV)
+        IF (IERR_PRIV.GT.0) THEN
+          IF (LPOK) WRITE(LP,*) " Error allocate integer array of ", 
+     *    "size: ", 3*N
+!$OMP ATOMIC WRITE
+          IFLAG = -7
+!$OMP ATOMIC WRITE
+          IERROR = 3*N
+        ENDIF
+      ENDIF
+!$OMP BARRIER
+      IF (IFLAG .LT. 0 ) THEN
+        GOTO 500
+      ENDIF
+      IF (K469_LOC.EQ.2) THEN
+        TRACE_PRV = 0
+      ELSE
+!$OMP SINGLE
+        TRACE = 0
+!$OMP END SINGLE
+      ENDIF
+!$OMP DO
+      DO I = 1,N
+        IF (STEP(I).GT.0) PVS(STEP(I)) = I
+      END DO
+!$OMP END DO
+!$OMP DO SCHEDULE(DYNAMIC,1)
+      DO NODE=NSTEPS,1,-1
+        IF (IFLAG.LT.0) CYCLE
+          IF (MAPCOL_PROVIDED) THEN
+            IF (MAPCOL(NODE).NE.MYID) THEN
+             PVS(NODE) = -999  
+             CYCLE
+            ENDIF
+          ENDIF
+        PV = PVS(NODE)
+        NV         = 0
+        NVEXPANDED = 0
+        F = PV
+        DO WHILE(F .GT. 0)
+          NV = NV+1
+          NVEXPANDED = NVEXPANDED+SIZEOFBLOCKS(F)
+          WORK(NV) = F
+          F = FILS(F)
+        END DO
+        COMPRESS_RATIO = dble(NVEXPANDED)/dble(NV)
+        CALL COMPUTE_BLR_VCS(K472, GROUP_SIZE2, GROUP_SIZE, NVEXPANDED)
+        IF (NVEXPANDED .GE. GROUP_SIZE2)  THEN
+          IF ( (K482_LOC.EQ.3)
+     &           .OR.
+     &         ( (K60.NE.0).AND.(WORK(1).EQ.K38ou20) )
+     &        ) 
+     &    THEN
+            GROUP_SIZE2 = max(int(dble(GROUP_SIZE2)/COMPRESS_RATIO), 1)
+!$OMP CRITICAL(lrgrouping_cri)
+            DO I=1,NV
+              LRGROUPS(WORK(I))=NBGROUPS+1+(I-1)/GROUP_SIZE2
+            END DO
+            NBGROUPS = NBGROUPS + (NV-1)/GROUP_SIZE2 + 1
+!$OMP END CRITICAL(lrgrouping_cri)
+          ELSE
+            IF (K469_LOC .EQ. 2) THEN
+              CALL SEP_GROUPING_AB(NV, NVEXPANDED, WORK(1), N, 
+     &              LRGROUPS, NBGROUPS, LUMAT, SIZEOFBLOCKS,
+     &              GROUP_SIZE, HALO_DEPTH, TRACE_PRV, WORKH_PRV, 
+     &              NODE, GEN2HALO_PRV, K482_LOC, K472, K469_LOC, 
+     &              SEP_SIZE, K142, K10, LP, LPOK, IFLAG, IERROR)
+            ELSE
+              CALL SEP_GROUPING_AB(NV, NVEXPANDED, WORK(1), N, 
+     &              LRGROUPS, NBGROUPS, LUMAT,  SIZEOFBLOCKS,
+     &              GROUP_SIZE, HALO_DEPTH, TRACE, WORKH, 
+     &              NODE, GEN2HALO, K482_LOC, K472, K469_LOC, 
+     &              SEP_SIZE, K142, K10, LP, LPOK, IFLAG, IERROR)
+            ENDIF
+            IF (IFLAG.LT.0) CYCLE
+            PVS(NODE) = WORK(1)
+!$OMP ATOMIC WRITE
+            PVSCHANGED = .TRUE.
+!$OMP END ATOMIC
+            STEP(WORK(1)) = ABS(STEP(WORK(1)))
+            IF (STEP(WORK(1)).EQ.STEP_SCALAPACK_ROOT) THEN
+              IF (K38.GT.0) THEN
+                K38 = WORK(1)
+              ELSE
+                K20 = WORK(1)
+              ENDIF
+            ENDIF
+            DO I=1, NV-1
+              STEP(WORK(I+1)) = -STEP(WORK(1))
+              IF (FILS(WORK(I)).LE.0) THEN
+                FILS(WORK(NV)) = FILS(WORK(I))
+              ENDIF
+              FILS(WORK(I)) = WORK(I+1)
+            ENDDO
+          ENDIF
+        ELSE
+!$OMP CRITICAL(lrgrouping_cri)
+          NBGROUPS = NBGROUPS + 1
+          NBGROUPS_local = NBGROUPS
+!$OMP END CRITICAL(lrgrouping_cri)
+          IF (NVEXPANDED .GE. SEP_SIZE) THEN
+            DO I = 1, NV
+              LRGROUPS( WORK(I) ) = NBGROUPS_local
+            ENDDO
+          ELSE
+            DO I = 1, NV
+              LRGROUPS( WORK(I) ) = -NBGROUPS_local
+            ENDDO
+          ENDIF
+        ENDIF
+      ENDDO       
+!$OMP END DO
+      IF (IFLAG.LT.0) GOTO 500
+      IF (.NOT.PVSCHANGED) GOTO 500
+!$OMP DO
+      DO NODE = 1,NSTEPS
+        IF(FRERE_STEPS(NODE) .GT. 0) THEN
+          FRERE_STEPS(NODE) = PVS(ABS(STEP(FRERE_STEPS(NODE))))
+        ELSE IF(FRERE_STEPS(NODE) .LT. 0) THEN
+          FRERE_STEPS(NODE) = -PVS(ABS(STEP(DAD_STEPS(NODE))))
+        ENDIF
+        IF(DAD_STEPS(NODE) .NE. 0) THEN
+          DAD_STEPS(NODE) = PVS(ABS(STEP(DAD_STEPS(NODE))))
+        END IF
+      ENDDO
+!$OMP END DO NOWAIT
+!$OMP DO
+      DO I=3,LNA
+        NA(I) = PVS(ABS(STEP(NA(I))))
+      ENDDO
+!$OMP END DO NOWAIT
+!$OMP DO
+      DO I=1,N
+        IF (FILS(I).LT.0) THEN
+          FILS(I) = -PVS(ABS(STEP(-FILS(I))))
+        ENDIF
+      ENDDO
+!$OMP END DO 
+ 500  CONTINUE
+      IF (allocated(WORK)) DEALLOCATE(WORK)
+      IF (K469_LOC.EQ.2) THEN
+        IF (allocated(TRACE_PRV))    DEALLOCATE(TRACE_PRV)
+        IF (allocated(WORKH_PRV))    DEALLOCATE(WORKH_PRV)
+        IF (allocated(GEN2HALO_PRV)) DEALLOCATE(GEN2HALO_PRV)
+      ENDIF
+!$OMP END PARALLEL
+#if defined(ptscotch) || defined(scotch)     
+      IF (K482_LOC.EQ.2.AND.NOMP .GT. 0) THEN
+        CALL MUMPS_SCOTCH_SET_PTHREAD_NUMBER (PTHREAD_NUMBER)
+      ENDIF
+#endif
+ 501  CONTINUE
+      IF (K469_LOC.NE.2) THEN
+        IF (allocated(TRACE))    DEALLOCATE(TRACE)
+        IF (allocated(WORKH))    DEALLOCATE(WORKH)
+        IF (allocated(GEN2HALO)) DEALLOCATE(GEN2HALO)
+      ENDIF
+      IF (allocated(PVS)) DEALLOCATE(PVS)
+      RETURN
+      END SUBROUTINE DMUMPS_AB_LR_GROUPING
+      SUBROUTINE DMUMPS_AB_LR_MPI_GROUPING(
+     &     N, MAPCOL, SIZEMAPCOL,
+     &     NSTEPS, LUMAT, FILS,
+     &     FRERE_STEPS, DAD_STEPS, STEP, NA, LNA, LRGROUPS, 
+     &     SIZEOFBLOCKS, SYM, ICNTL, HALO_DEPTH, GROUP_SIZE, 
+     &     SEP_SIZE, K38, K20,
+     &     K60, IFLAG, IERROR, K264, K265, K482, K472, MAXFRONT, K469, 
+     &     K10, K54, K142, LPOK, LP, 
+     &     COMM, MYID, NPROCS 
+     &     )
+      IMPLICIT NONE
+      INCLUDE 'mpif.h'
+      INCLUDE 'mumps_tags.h'
+      INTEGER  :: IERR_MPI, MASTER
+      PARAMETER( MASTER = 0 )
+      INTEGER :: STATUS(MPI_STATUS_SIZE)
+      INTEGER, INTENT(IN)     :: MYID, COMM, NPROCS
+      TYPE(LMATRIX_T)         :: LUMAT
+      INTEGER, INTENT(IN)    :: N, NSTEPS, LNA, SYM,
+     &     HALO_DEPTH, SEP_SIZE, GROUP_SIZE
+      INTEGER, INTENT(IN)    :: SIZEMAPCOL
+      INTEGER, INTENT(IN)    :: MAPCOL(SIZEMAPCOL)
+      INTEGER, INTENT(INOUT) :: IFLAG, IERROR
+      INTEGER, INTENT(INOUT) :: K38, K20, K264, K265
+      INTEGER, INTENT(IN)    :: K482, K10, MAXFRONT, K60, K54
+      INTEGER, INTENT(IN)    :: LP
+      LOGICAL, INTENT(IN)    :: LPOK
+      INTEGER, INTENT(OUT)   :: K142
+      INTEGER, INTENT(IN)    :: ICNTL(60)
+      INTEGER, POINTER :: FILS(:), FRERE_STEPS(:), STEP(:),
+     &      NA(:), DAD_STEPS(:), LRGROUPS(:)
+      INTEGER, INTENT(IN)  :: SIZEOFBLOCKS(N)
+      INTEGER, INTENT(IN) :: K472, K469
+      INTEGER :: K482_LOC,  K469_LOC, K38ou20, K142_GLOB
+      INTEGER :: I, F, PV, NV, NVEXPANDED, NODE
+      DOUBLE PRECISION    :: COMPRESS_RATIO
+      LOGICAL :: PVSCHANGED
+      INTEGER :: PVSCHANGED_INT, PVSCHANGED_INT_GLOB, IPROC
+      INTEGER :: NBGROUPS, NBGROUPS_local 
+      INTEGER, ALLOCATABLE, DIMENSION (:) :: PVS, WORK
+      INTEGER :: NBGROUPS_sent
+      INTEGER :: NBNODES_LOC, SIZE_SENT, ISHIFT, 
+     &           MSGSOU, ILOOP
+      INTEGER, ALLOCATABLE, DIMENSION (:) :: TRACE, WORKH, 
+     &                                       GEN2HALO
+      INTEGER, ALLOCATABLE, DIMENSION (:) :: TRACE_PRV, WORKH_PRV, 
+     &                                   GEN2HALO_PRV
+      INTEGER :: STEP_SCALAPACK_ROOT
+      INTEGER :: GROUP_SIZE2, IERR, OMP_NUM
+      INTEGER :: IERR_PRIV 
+      LOGICAL :: MAPCOL_PROVIDED
+#if defined(ptscotch) || defined(scotch)     
+      INTEGER :: VSCOTCH
+      LOGICAL :: SCOTCH_IS_THREAD_SAFE
+      INTEGER :: PTHREAD_NUMBER, NOMP
+#endif
+      MAPCOL_PROVIDED = (MAPCOL(1).GE.0)
+      K38ou20=max(K38,K20)
+      IF (K38ou20.GT.0) THEN
+       STEP_SCALAPACK_ROOT = STEP(K38ou20)
+      ELSE
+       STEP_SCALAPACK_ROOT = 0
+      ENDIF
+      IF (MAPCOL_PROVIDED) THEN
+       CALL MPI_BCAST( FILS(1), N, MPI_INTEGER,
+     &     MASTER, COMM, IERR )
+      ENDIF
+      IF((K482.LE.0) .OR. (K482.GT.3)) THEN
+#if defined(parmetis) || defined(metis) || defined(parmetis3) || defined(metis4)
+         K482_LOC = 1
+#elif defined(ptscotch) || defined(scotch)
+         K482_LOC = 2
+#else
+         K482_LOC = 3
+#endif
+      ELSE IF (K482.EQ.1) THEN
+#if !defined(parmetis) && !defined(metis) && !defined(parmetis3) && !defined(metis4)
+#if defined(ptscotch) || defined(scotch)     
+         K482_LOC = 2
+#else
+         K482_LOC = 3
+#endif
+#else
+         K482_LOC = 1
+#endif
+      ELSE IF (K482.EQ.2) THEN
+#if !defined(ptscotch) && !defined(scotch)
+#if defined(parmetis) || defined(metis) || defined(parmetis3) || defined(metis4)
+         K482_LOC = 1
+#else
+         K482_LOC = 3
+#endif
+#else
+         K482_LOC = 2
+#endif
+      ELSE IF (K482.EQ.3) THEN
+         K482_LOC = 3
+      END IF
+      K469_LOC = K469
+#if defined(ptscotch) || defined(scotch)     
+      SCOTCH_IS_THREAD_SAFE = .FALSE.
+      IF (K482_LOC.EQ.2) THEN
+      CALL MUMPS_SCOTCH_VERSION (VSCOTCH)
+      IF (VSCOTCH.GE.7) SCOTCH_IS_THREAD_SAFE=.TRUE.
+      ENDIF
+      IF (K482_LOC.EQ.2.AND.(.NOT.SCOTCH_IS_THREAD_SAFE) ) THEN
+        K469_LOC = 1
+      ENDIF
+#endif
+      NBGROUPS = 0
+      K142 = 0
+      ALLOCATE( PVS(NSTEPS), STAT=IERR)
+      IF (IERR.GT.0) THEN
+        IFLAG = -7
+        IERROR = NSTEPS
+        IF (LPOK) WRITE(LP,*) " Error allocate integer array of ", 
+     *    "size: ", IERROR
+        GOTO 491
+      ENDIF
+      LRGROUPS = -1
+      IF (K469_LOC.NE.2) THEN
+        ALLOCATE(TRACE(N), WORKH(N), GEN2HALO(N), 
+     &          STAT=IERR)
+        IF (IERR.GT.0) THEN
+          IF (LPOK) WRITE(LP,*) " Error allocate integer array of ", 
+     *    "size: ", 3*N
+          IFLAG = -7
+          IERROR = 3*N
+          GOTO 491
+        ENDIF
+      ENDIF
+491   CONTINUE
+      CALL MUMPS_PROPINFO( ICNTL(1), IFLAG,
+     &     COMM, MYID )
+      IF (IFLAG.LT.0) GOTO 501
+#if defined(ptscotch) || defined(scotch)     
+      NOMP=0
+      IF (K482_LOC.EQ.2) THEN
+!$      NOMP=omp_get_max_threads()
+        IF (NOMP .GT. 0) THEN
+           CALL MUMPS_SCOTCH_GET_PTHREAD_NUMBER (PTHREAD_NUMBER)
+           NOMP =1
+           CALL MUMPS_SCOTCH_SET_PTHREAD_NUMBER (NOMP)
+        ENDIF
+      ENDIF
+#endif
+      K142 = 0
+      PVSCHANGED = .FALSE.
+      OMP_NUM = 1
+!$    OMP_NUM = omp_get_max_threads()
+      OMP_NUM = min(OMP_NUM,8)
+!$OMP PARALLEL PRIVATE(I, NODE, PV, NV, F, GROUP_SIZE2, WORK, IERR_PRIV,
+!$OMP&         WORKH_PRV, TRACE_PRV, GEN2HALO_PRV, NBGROUPS_local,
+!$OMP&         NVEXPANDED, COMPRESS_RATIO, IPROC
+!$OMP&         )
+!$OMP&         REDUCTION( max : K142)
+!$OMP&         IF (K469_LOC.GT.1) NUM_THREADS(OMP_NUM)
+      ALLOCATE(WORK(2*MAXFRONT+1), STAT=IERR_PRIV)
+      IF (IERR_PRIV.GT.0) THEN
+        IF (LPOK) WRITE(LP,*) " Error allocate integer array of ", 
+     *    "size: ", 2*MAXFRONT+1
+!$OMP ATOMIC WRITE
+        IFLAG = -7
+!$OMP END ATOMIC
+!$OMP ATOMIC WRITE
+        IERROR = 2*MAXFRONT+1
+!$OMP END ATOMIC
+      ENDIF
+      IF (IERR_PRIV .EQ. 0 .AND. K469_LOC.EQ.2) THEN
+        ALLOCATE(TRACE_PRV(N), WORKH_PRV(N), GEN2HALO_PRV(N),
+     &           STAT=IERR_PRIV)
+        IF (IERR_PRIV.GT.0) THEN
+          IF (LPOK) WRITE(LP,*) " Error allocate integer array of ", 
+     *    "size: ", 3*N
+!$OMP ATOMIC WRITE
+          IFLAG = -7
+!$OMP END ATOMIC
+!$OMP ATOMIC WRITE
+          IERROR = 3*N
+!$OMP END ATOMIC
+        ENDIF
+      ENDIF
+!$OMP BARRIER
+      IF (IFLAG .LT. 0 ) THEN
+        GOTO 498
+      ENDIF
+      IF (K469_LOC.EQ.2) THEN
+        TRACE_PRV = 0
+      ELSE
+!$OMP SINGLE
+        TRACE = 0
+!$OMP END SINGLE
+      ENDIF
+!$OMP DO
+      DO I = 1,N
+        IF (STEP(I).GT.0) PVS(STEP(I)) = I
+      END DO
+!$OMP END DO
+!$OMP DO SCHEDULE(DYNAMIC,1)
+      DO NODE=NSTEPS,1,-1
+        IF (IFLAG.LT.0) CYCLE
+        IF (MAPCOL_PROVIDED) THEN
+            IPROC = MAPCOL(NODE)
+            IF (IPROC.NE.MYID) THEN
+             PVS(NODE) = -999  
+             CYCLE
+            ENDIF
+        ENDIF
+        PV = PVS(NODE)
+        NV         = 0
+        NVEXPANDED = 0
+        F = PV
+        DO WHILE(F .GT. 0)
+          NV = NV+1
+          NVEXPANDED = NVEXPANDED+SIZEOFBLOCKS(F)
+          WORK(NV) = F
+          F = FILS(F)
+        END DO
+        COMPRESS_RATIO = dble(NVEXPANDED)/dble(NV)
+        CALL COMPUTE_BLR_VCS(K472, GROUP_SIZE2, GROUP_SIZE, NVEXPANDED)
+        IF (NVEXPANDED .GE. GROUP_SIZE2)  THEN
+          IF ( (K482_LOC.EQ.3)
+     &           .OR.
+     &         ( (K60.NE.0).AND.(WORK(1).EQ.K38ou20) )
+     &        ) 
+     &    THEN
+            GROUP_SIZE2 = max(int(dble(GROUP_SIZE2)/COMPRESS_RATIO), 1)
+!$OMP CRITICAL(lrgrouping_cri)
+            DO I=1,NV
+              LRGROUPS(WORK(I))=NBGROUPS+1+(I-1)/GROUP_SIZE2
+            END DO
+            NBGROUPS = NBGROUPS + (NV-1)/GROUP_SIZE2 + 1
+!$OMP END CRITICAL(lrgrouping_cri)
+          ELSE
+            IF (K469_LOC .EQ. 2) THEN
+              CALL SEP_GROUPING_AB(NV, NVEXPANDED, WORK(1), N, 
+     &              LRGROUPS, NBGROUPS, LUMAT, SIZEOFBLOCKS,
+     &              GROUP_SIZE, HALO_DEPTH, TRACE_PRV, WORKH_PRV, 
+     &              NODE, GEN2HALO_PRV, K482_LOC, K472, K469_LOC, 
+     &              SEP_SIZE, K142, K10, LP, LPOK, IFLAG, IERROR)
+            ELSE
+              CALL SEP_GROUPING_AB(NV, NVEXPANDED, WORK(1), N, 
+     &              LRGROUPS, NBGROUPS, LUMAT, SIZEOFBLOCKS,
+     &              GROUP_SIZE, HALO_DEPTH, TRACE, WORKH, 
+     &              NODE, GEN2HALO, K482_LOC, K472, K469_LOC, 
+     &              SEP_SIZE, K142, K10, LP, LPOK, IFLAG, IERROR)
+            ENDIF
+            IF (IFLAG.LT.0) CYCLE
+            PVS(NODE) = WORK(1)
+!$OMP ATOMIC WRITE
+            PVSCHANGED = .TRUE.
+!$OMP END ATOMIC
+            STEP(WORK(1)) = ABS(STEP(WORK(1)))
+            IF (STEP(WORK(1)).EQ.STEP_SCALAPACK_ROOT) THEN
+              IF (K38.GT.0) THEN
+                K38 = WORK(1)
+              ELSE
+                K20 = WORK(1)
+              ENDIF
+            ENDIF
+            DO I=1, NV-1
+              STEP(WORK(I+1)) = -STEP(WORK(1))
+              IF (FILS(WORK(I)).LE.0) THEN
+                FILS(WORK(NV)) = FILS(WORK(I))
+              ENDIF
+              FILS(WORK(I)) = WORK(I+1)
+            ENDDO
+          ENDIF
+        ELSE
+!$OMP ATOMIC CAPTURE
+          NBGROUPS = NBGROUPS + 1
+          NBGROUPS_local = NBGROUPS
+!$OMP END ATOMIC 
+          IF (NVEXPANDED .GE. SEP_SIZE) THEN
+            DO I = 1, NV
+              LRGROUPS( WORK(I) ) = NBGROUPS_local
+            ENDDO
+          ELSE
+            DO I = 1, NV
+              LRGROUPS( WORK(I) ) = -NBGROUPS_local
+            ENDDO
+          ENDIF
+        ENDIF
+      ENDDO       
+!$OMP END DO
+ 498  CONTINUE
+!$OMP MASTER
+      CALL MUMPS_PROPINFO( ICNTL(1), IFLAG,
+     &     COMM, MYID )
+!$OMP END MASTER
+!$OMP BARRIER
+      IF (IFLAG.LT.0) GOTO 500
+      IF (K469_LOC.EQ.2) THEN
+        IF (allocated(TRACE_PRV))    DEALLOCATE(TRACE_PRV)
+        IF (allocated(WORKH_PRV))    DEALLOCATE(WORKH_PRV)
+        IF (allocated(GEN2HALO_PRV)) DEALLOCATE(GEN2HALO_PRV)
+      ENDIF
+!$OMP MASTER
+      IF (K469_LOC.NE.2) THEN
+          IF (allocated(WORKH)) DEALLOCATE(WORKH)
+          IF (allocated(TRACE)) DEALLOCATE(TRACE)
+          IF (allocated(GEN2HALO)) DEALLOCATE(GEN2HALO)
+      ENDIF
+!$OMP END MASTER
+      IF (.NOT.MAPCOL_PROVIDED) THEN 
+!$OMP MASTER
+        IF (PVSCHANGED) THEN
+         PVSCHANGED_INT_GLOB = 1
+        ELSE
+         PVSCHANGED_INT_GLOB = 0
+        ENDIF
+!$OMP END MASTER
+      ELSE
+!$OMP MASTER
+        IF (PVSCHANGED) THEN
+           PVSCHANGED_INT = 1
+        ELSE
+           PVSCHANGED_INT = 0
+        ENDIF
+        CALL MPI_ALLREDUCE( PVSCHANGED_INT, PVSCHANGED_INT_GLOB, 1, 
+     &                 MPI_INTEGER,
+     &                 MPI_MAX, COMM, IERR_MPI )
+        PVSCHANGED_INT_GLOB = 1
+        IF (PVSCHANGED_INT_GLOB.NE.0) THEN
+          IF (NPROCS.GT.1) THEN 
+            ALLOCATE(WORKH(2*N+3*NSTEPS+1), STAT=IERR_PRIV)
+            IF (IERR_PRIV.GT.0) THEN
+              IF (LPOK) WRITE(LP,*) 
+     &        " Error allocate integer array of ", 
+     &        "size: ", 2*MAXFRONT+1
+              IFLAG = -7
+              IERROR = 2*N+3*NSTEPS+1
+            ENDIF
+            CALL MUMPS_PROPINFO( ICNTL(1), IFLAG,
+     &           COMM, MYID )
+            IF (IFLAG.LT.0) GOTO 499
+            IF (MYID.EQ.MASTER) THEN
+              IPROC = 0
+              DO WHILE (IPROC.NE.NPROCS-1) 
+                IPROC = IPROC + 1
+                CALL MPI_RECV( NBNODES_LOC, 1, MPI_INTEGER, 
+     &                MPI_ANY_SOURCE,
+     &                GROUPING, COMM, STATUS, IERR )
+                MSGSOU = STATUS( MPI_SOURCE )
+                IF (NBNODES_LOC.EQ.0) THEN
+                  CYCLE
+                ENDIF
+                CALL MPI_RECV( NBGROUPS_sent, 1, MPI_INTEGER, 
+     &                 MSGSOU, GROUPING, COMM, STATUS, IERR )
+                CALL MPI_RECV( SIZE_SENT, 1, MPI_INTEGER, 
+     &                 MSGSOU, GROUPING, COMM, STATUS, IERR )
+                CALL MPI_RECV( WORKH, SIZE_SENT, MPI_INTEGER, 
+     &                 MSGSOU, GROUPING, COMM, STATUS, IERR )
+                ISHIFT = 0
+                DO ILOOP=1, NBNODES_LOC
+                  ISHIFT = ISHIFT+1
+                  NODE   = WORKH (ISHIFT)
+                  ISHIFT = ISHIFT+1
+                  NV     = WORKH(ISHIFT)
+                  PVS(NODE)           = WORKH(ISHIFT+1)
+                  STEP(WORKH(ISHIFT+1)) = NODE
+                  IF (STEP(WORKH(ISHIFT+1)).EQ.STEP_SCALAPACK_ROOT) THEN
+                    IF (K38.GT.0) THEN
+                      K38 = WORKH(ISHIFT+1)
+                    ELSE
+                      K20 = WORKH(ISHIFT+1)
+                    END IF
+                  END IF
+                  DO I=2, NV
+                    STEP(WORKH(I+ISHIFT)) = -NODE
+                  END DO
+                  DO I=1, NV
+                   FILS(WORKH(I+ISHIFT))     = WORKH(I+1+ISHIFT)
+                   IF (WORKH(NV+1+I+ISHIFT).LT.0) THEN
+                     LRGROUPS(WORKH(I+ISHIFT)) = 
+     &                            - NBGROUPS + WORKH(NV+1+I+ISHIFT)
+                   ELSE
+                     LRGROUPS(WORKH(I+ISHIFT)) = 
+     &                            NBGROUPS + WORKH(NV+1+I+ISHIFT)
+                   END IF
+                  END DO
+                  ISHIFT = ISHIFT + 2*NV +1
+                END DO
+                NBGROUPS = NBGROUPS + NBGROUPS_sent
+              ENDDO
+            ELSE
+              NBNODES_LOC = 0
+              SIZE_SENT   = 0
+              ISHIFT      = 0
+              DO NODE = 1,NSTEPS
+               IPROC = MAPCOL(NODE)
+               IF (IPROC.EQ.MYID) THEN
+                 NBNODES_LOC   = NBNODES_LOC + 1
+                 ISHIFT        = ISHIFT +1
+                 WORKH(ISHIFT) = NODE
+                 ISHIFT        = ISHIFT +1
+                 NV            = 0
+                 F             =  PVS(NODE)
+                 DO WHILE (F.GT.0) 
+                  NV               = NV + 1
+                  WORKH(NV+ISHIFT) = F
+                  F                = FILS(F)
+                 ENDDO
+                 WORKH(ISHIFT) = NV
+                 WORKH(NV+1+ISHIFT) = F
+                 DO I=1, NV
+                  WORKH(NV+1+I+ISHIFT) = LRGROUPS(WORKH(I+ISHIFT))
+                 ENDDO
+                 ISHIFT = ISHIFT + 2*NV+1
+               ENDIF
+              ENDDO
+              SIZE_SENT = ISHIFT
+              CALL MPI_SEND( NBNODES_LOC, 1, MPI_INTEGER, MASTER,
+     &               GROUPING, COMM, IERR )
+              IF (NBNODES_LOC.GT.0) THEN
+                CALL MPI_SEND( NBGROUPS, 1, MPI_INTEGER, MASTER,
+     &               GROUPING, COMM, IERR )
+                CALL MPI_SEND( SIZE_SENT, 1, MPI_INTEGER, MASTER,
+     &                 GROUPING, COMM, IERR )
+                CALL MPI_SEND( WORKH, SIZE_SENT, MPI_INTEGER, MASTER,
+     &               GROUPING, COMM, IERR )
+              ENDIF
+            ENDIF
+          ENDIF
+        ENDIF 
+ 499  CONTINUE
+!$OMP END MASTER
+      ENDIF
+!$OMP BARRIER
+      IF (IFLAG.LT.0) GOTO 500
+      IF (MYID.EQ.MASTER) THEN
+        IF (PVSCHANGED_INT_GLOB.EQ.0) GOTO 500
+!$OMP   DO
+        DO NODE = 1,NSTEPS
+          IF(FRERE_STEPS(NODE) .GT. 0) THEN
+            FRERE_STEPS(NODE) = PVS(ABS(STEP(FRERE_STEPS(NODE))))
+          ELSE IF(FRERE_STEPS(NODE) .LT. 0) THEN
+            FRERE_STEPS(NODE) = -PVS(ABS(STEP(DAD_STEPS(NODE))))
+          ENDIF
+          IF(DAD_STEPS(NODE) .NE. 0) THEN
+            DAD_STEPS(NODE) = PVS(ABS(STEP(DAD_STEPS(NODE))))
+          END IF
+        ENDDO
+!$OMP   END DO NOWAIT
+!$OMP   DO
+        DO I=3,LNA
+          NA(I) = PVS(ABS(STEP(NA(I))))
+        ENDDO
+!$OMP   END DO NOWAIT
+!$OMP   DO
+        DO I=1,N
+          IF (FILS(I).LT.0) THEN
+            FILS(I) = -PVS(ABS(STEP(-FILS(I))))
+          ENDIF
+        ENDDO
+!$OMP   END DO 
+      ENDIF 
+ 500  CONTINUE
+      IF (allocated(WORK)) DEALLOCATE(WORK)
+      IF (K469_LOC.EQ.2) THEN
+        IF (allocated(TRACE_PRV))    DEALLOCATE(TRACE_PRV)
+        IF (allocated(WORKH_PRV))    DEALLOCATE(WORKH_PRV)
+        IF (allocated(GEN2HALO_PRV)) DEALLOCATE(GEN2HALO_PRV)
+      ENDIF
+!$OMP END PARALLEL
+      K142_GLOB = 0
+      CALL MPI_REDUCE( K142, K142_GLOB, 1, 
+     &                 MPI_INTEGER,
+     &                 MPI_MAX, MASTER, COMM, IERR_MPI )
+      K142 = K142_GLOB
+#if defined(ptscotch) || defined(scotch)     
+      IF (K482_LOC.EQ.2.AND.NOMP .GT. 0) THEN
+        CALL MUMPS_SCOTCH_SET_PTHREAD_NUMBER (PTHREAD_NUMBER)
+      ENDIF
+#endif
+ 501  CONTINUE
+      IF (K469_LOC.NE.2) THEN
+        IF (allocated(TRACE))    DEALLOCATE(TRACE)
+        IF (allocated(WORKH))    DEALLOCATE(WORKH)
+        IF (allocated(GEN2HALO)) DEALLOCATE(GEN2HALO)
+      ENDIF
+      IF (allocated(PVS)) DEALLOCATE(PVS)
+      RETURN
+      END SUBROUTINE DMUMPS_AB_LR_MPI_GROUPING
       END MODULE DMUMPS_ANA_LR

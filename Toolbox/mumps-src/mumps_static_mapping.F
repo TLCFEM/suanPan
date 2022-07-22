@@ -1,14 +1,15 @@
 C
-C  This file is part of MUMPS 5.2.1, released
-C  on Fri Jun 14 14:46:05 UTC 2019
+C  This file is part of MUMPS 5.5.1, released
+C  on Tue Jul 12 13:17:24 UTC 2022
 C
 C
-C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2022 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license:
-C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+C  released under the CeCILL-C license 
+C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
       MODULE MUMPS_STATIC_MAPPING
       USE MUMPS_LR_COMMON
@@ -41,8 +42,8 @@ C
       type alloc_arraytype
          integer, pointer, dimension(:)::t2_nodenumbers
          integer, pointer, dimension(:,:)::t2_cand
-         DOUBLE PRECISION, pointer, dimension(:)::t2_candcostw(:),
-     &                                            t2_candcostm(:)
+         DOUBLE PRECISION, pointer, dimension(:)::t2_candcostw,
+     &                                            t2_candcostm
          integer:: nmb_t2s
       end type alloc_arraytype
       type splitting_data
@@ -82,16 +83,21 @@ C
      & cv_tcostw,cv_ncostm,cv_tcostm,cv_layerworkload,cv_layermemused
      & ,cv_layerl0_sorted_costw
       type(procs4node_t),dimension(:),pointer :: cv_prop_map
+      integer, dimension(:), pointer :: cv_SIZEOFBLOCKS
+      logical  :: cv_BLKON
       contains
       subroutine MUMPS_DISTRIBUTE(n,slavef,icntl,info,
      &                        ne,nfsiz,frere,fils,keep,KEEP8,
      &                        procnode,ssarbr,nbsa,peak,istat
+     &                        , SIZEOFBLOCKS, LSIZEOFBLOCKS
      &     )
       implicit none
       integer,intent(in)::n,slavef
       integer, intent(inout),TARGET:: ne(n),nfsiz(n),
      &         procnode(n),ssarbr(n),frere(n),fils(n),keep(500),
      &         icntl(60),info(80)
+      integer, intent(in) :: LSIZEOFBLOCKS
+      integer, intent(in) :: SIZEOFBLOCKS(LSIZEOFBLOCKS)
       INTEGER(8) KEEP8(150)
       integer,intent(out)::nbsa,istat
       integer ierr,nmb_thislayer,layernmb,mapalgo,allocok,i
@@ -102,9 +108,12 @@ C
       DOUBLE PRECISION:: cost_root_node
       DOUBLE PRECISION,dimension(:),allocatable:: work_per_proc
       integer,dimension(:),allocatable::id_son
-      logical::cont
+      logical :: cont
       character (len=48):: err_rep,subname
       DOUBLE PRECISION peak
+      logical :: BLKON
+      BLKON    = (SIZEOFBLOCKS(1).GT.0)
+      cv_BLKON = BLKON
       istat=-1
       subname='DISTRIBUTE'
       cv_lp=icntl(1)
@@ -115,6 +124,7 @@ C
       call MUMPS_INITPART1(n,slavef,
      &                   frere,fils,nfsiz,ne,keep,KEEP8,icntl,info,
      &                   procnode,ssarbr,peak,ierr
+     &                      , SIZEOFBLOCKS, LSIZEOFBLOCKS
      &     )
       if (ierr.ne.0) goto 99999
       err_rep='PROCINIT'
@@ -303,9 +313,8 @@ C
       DOUBLE PRECISION,dimension(:),intent(in)::workload, memused
       logical,intent(out)::accepted
       integer,intent(out)::istat
-      DOUBLE PRECISION maxi,mini,mean,stddev
+      DOUBLE PRECISION maxi,mini,mean,stddev, dpkeep102
       integer i,nmb
-      intrinsic maxval,minval,count,sum
       character (len=48):: subname
       logical alternative_criterion
       DOUBLE PRECISION::
@@ -318,11 +327,34 @@ C
        CL_RATE =0.8D0
        DV_RATE=0.2D0
       else
-       MINFLOPS = 5.0D7
-       MINMEM=5.0D6
-       CL_RATE =0.8D0
-       DV_RATE=0.2D0
+       IF (cv_keep(198).NE.0) THEN
+         MINFLOPS = 5.0D8
+         MINMEM=5.0D7
+         CL_RATE =0.8D0
+         DV_RATE=0.2D0
+       ELSE
+         MINFLOPS = 5.0D7
+         MINMEM=5.0D6
+         CL_RATE =0.8D0
+         DV_RATE=0.2D0
+       ENDIF
       endif
+      dpkeep102 = dble(cv_keep(102))
+      IF (cv_keep(198).NE.0) THEN
+        IF (cv_slavef.LT.3)THEN
+         dpkeep102 = dble(150)
+        ELSEIF (cv_slavef.LT.5)THEN
+         dpkeep102 = dble(200)
+        ELSEIF (cv_slavef.LT.8)THEN
+         dpkeep102 = dble(250)
+        ELSEIF (cv_slavef.LT.32)THEN
+         dpkeep102 = dble(275)
+        ELSEIF (cv_slavef.LT.512)THEN
+         dpkeep102 = dble(300)
+        ELSEIF (cv_slavef.GE.512)THEN
+         dpkeep102 = dble(400)
+        ENDIF
+      ENDIF
       subname='ACCEPT_L0'
       accepted=.FALSE.
       alternative_criterion=.FALSE. 
@@ -331,7 +363,7 @@ C
          mini=minval(workload)
          if (maxi.lt.MINFLOPS) then
             accepted=.TRUE.
-         elseif(maxi.le.(dble(cv_keep(102))/dble(100))*mini)then
+         elseif(maxi.le.(dpkeep102/dble(100))*mini)then
             accepted=.TRUE.
          endif
          if ((.NOT.accepted).AND.(alternative_criterion)) then
@@ -424,7 +456,7 @@ C
       return
       end subroutine MUMPS_ARRANGEL0
       subroutine MUMPS_ASSIGN_TYPES( layernmb,thislayer,nmb_thislayer,
-     &                                 istat)
+     &                                 istat )
       implicit none
       integer,intent(in)::layernmb,thislayer(:), 
      &                    nmb_thislayer
@@ -474,8 +506,12 @@ C
             in = inode
             npiv = 0
             do while (in.gt.0)
+               if (cv_BLKON) then
+                 npiv = npiv + cv_SIZEOFBLOCKS(in)
+               else
+                 npiv = npiv + 1
+               endif
                in = cv_fils(in)
-               npiv = npiv + 1
             end do
             nfront = cv_nfsiz(inode)
             if(cv_nodetype(inode).ne.cv_invalid) cycle 
@@ -812,7 +848,6 @@ C
       DOUBLE PRECISION flop1,work_type2_thislayer,
      &        relative_weight,workmaster,nrow
       logical force_cand
-      intrinsic count,max
       character (len=48):: subname
       integer MUMPS_REG_GETKMAX, MUMPS_BLOC2_GET_NSLAVESMIN,
      &        MUMPS_BLOC2_GET_NSLAVESMAX
@@ -846,7 +881,11 @@ C
             npiv=0
             in=inode
             do while(in.gt.0)
-               npiv=npiv+1
+               if (cv_BLKON) then
+                 npiv = npiv + cv_SIZEOFBLOCKS(in)
+               else
+                 npiv=npiv+1
+               endif
                in=cv_fils(in)
             end do
             ncb=nfront-npiv
@@ -957,7 +996,6 @@ C
      &        relative_weight,workmaster,nrow
       DOUBLE PRECISION save_ncostw, save_ncostm
       LOGICAL SPLITNODE, BLRNODE
-      intrinsic count,max
       character (len=48):: subname
       integer MUMPS_REG_GETKMAX, MUMPS_BLOC2_GET_NSLAVESMIN
       external MUMPS_REG_GETKMAX, MUMPS_BLOC2_GET_NSLAVESMIN
@@ -999,7 +1037,11 @@ C
             npiv=0
             in=inode
             do while(in.gt.0)
-               npiv=npiv+1
+               if (cv_BLKON) then
+                 npiv = npiv + cv_SIZEOFBLOCKS(in)
+               else
+                 npiv=npiv+1
+               endif
                in=cv_fils(in)
             end do
             ncb=nfront-npiv
@@ -1158,7 +1200,7 @@ C
       end subroutine MUMPS_COSTS_LAYER_T2PM
       subroutine MUMPS_SPLIT_DURING_MAPPING(
      &     layernmb,thislayer,nmb_thislayer,
-     &     istat)
+     &     istat )
       implicit none
       integer,intent(in)::layernmb,nmb_thislayer
       integer,intent(in)::thislayer(:) 
@@ -1168,6 +1210,8 @@ C
       logical doit
       integer, allocatable, dimension(:) :: npivsplit
       integer :: lnpivsplit
+      integer :: bsize
+      integer :: k1_temp, npiv_beg, npiv_end
       character (len=48):: err_rep,subname
       istat=-1
       subname='SPLIT_DURING_MAPPING'
@@ -1196,8 +1240,12 @@ C
         inode_tmp=inode
         npiv=0
         do while (inode_tmp.gt.0)
+          if (cv_BLKON) then
+            npiv = npiv + cv_SIZEOFBLOCKS(inode_tmp)
+          else
+            npiv=npiv+1
+          endif
            inode_tmp=cv_fils(inode_tmp)
-           npiv=npiv+1
         end do
         if (inode_tmp .eq. 0) cycle
         npropmap=0
@@ -1206,11 +1254,15 @@ C
               npropmap=npropmap+1
            endif
         end do
-        IF (keep(376) .EQ.1) THEN
+        IF ((keep(376) .EQ.1)
+     &     ) THEN
            err_rep='GET_SPLIT_4_PERF'
            CALL MUMPS_GET_SPLIT_4_PERF(inode, nfront, npiv,
      &     dble(npropmap),
-     &     k1, lnpivsplit, npivsplit, n, cv_frere(1), cv_keep(1), istat)
+     &     k1, lnpivsplit, npivsplit, n, cv_frere(1), 
+     &     cv_keep(1),
+     &     cv_fils(1), cv_BLKON, cv_SIZEOFBLOCKS(1),
+     &     istat)
            k3=k1
            doit = .true.
            GOTO 200
@@ -1232,10 +1284,44 @@ C
             write(*,*) 'error in', subname, lnpivsplit, k1, cv_keep(108)
             call MUMPS_ABORT()
           endif
-          do j = 1, k1-1
-            npivsplit(j)=npiv/k1
-          enddo
-          npivsplit(k1)=npiv-(npiv/k1)*(k1-1)
+          bsize   = max(npiv/k1,1)
+          if (cv_BLKON) then
+            inode_tmp = inode
+            npiv_beg = 0  
+            npiv_end = 0
+            k1_temp  = 0
+            do while (inode_tmp.gt.0)
+             npiv_end = npiv_end + cv_SIZEOFBLOCKS(inode_tmp)
+             if (npiv_end-npiv_beg.ge.bsize) then
+               k1_temp = k1_temp+1
+               npivsplit(k1_temp) = npiv_end-npiv_beg
+               npiv_beg = npiv_end
+               if ( ( (npiv-npiv_beg).gt.0) .and.
+     &              (npiv-npiv_beg.LT.2*bsize) 
+     &            ) then
+                k1_temp = k1_temp+1
+                npivsplit(k1_temp) = npiv - npiv_beg
+                exit
+               endif
+             endif
+             inode_tmp=cv_fils(inode_tmp)
+            enddo
+            if (k1_temp.eq.0) then
+              k1_temp = 1
+              npivsplit(1) = npiv
+            else
+             if (npiv_end.gt.npiv_beg) then
+              k1_temp = k1_temp+1
+              npivsplit(k1_temp) = npiv_end-npiv_beg
+             endif
+            endif
+            k1 = k1_temp
+          else
+            do j = 1, k1-1
+              npivsplit(j)= bsize
+            enddo
+            npivsplit(k1) = npiv-bsize*(k1-1)
+          endif
         endif
  200    CONTINUE
         if(ierr.ne.0) then
@@ -1251,7 +1337,10 @@ C
      &        lnpivsplit, npivsplit, cv_keep(1), n, cv_fils(1),
      &        cv_frere(1),
      &        cv_nfsiz(1), cv_ne(1), cv_info(5), 
-     &        cv_nsteps, cv_nodetype(1), ierr)
+     &        cv_nsteps, cv_nodetype(1), ierr
+     &                      , SIZEOFBLOCKS, LSIZEOFBLOCKS
+     &                      , BLKON
+     &      )
          if(ierr.ne.0) then
             if(cv_lp.gt.0)
      &      write(cv_lp,*)'Error reported by ',err_rep,
@@ -1569,6 +1658,7 @@ C
       integer, intent(out)::istat
       integer i,in,inode
       character (len=48):: subname
+      integer, external :: MUMPS_ENCODE_TPN_IPROC
       istat=-1
       subname='ENCODE_PROCNODE'
       do i=1,cv_nbsa
@@ -1596,7 +1686,8 @@ C
                  cv_nodetype(i)=3
                endif
             endif
-            cv_procnode(i)=(cv_nodetype(i)-1)*cv_slavef+cv_procnode(i)
+            cv_procnode(i)=MUMPS_ENCODE_TPN_IPROC( cv_nodetype(i),
+     &           cv_procnode(i)-1, cv_keep(199))
             in=cv_fils(i)
             do while (in>0)
                cv_procnode(in)=cv_procnode(i)
@@ -1695,7 +1786,6 @@ C
       logical,intent(in),OPTIONAL::respect_prop
       integer i
       logical respect_proportional
-      intrinsic huge
       DOUBLE PRECISION dummy
       character (len=48):: subname
       istat=-1
@@ -1901,6 +1991,7 @@ C
       subroutine MUMPS_INITPART1(n,slavef,
      &                    frere,fils,nfsiz,ne,keep,KEEP8,icntl,info,
      &                    procnode,ssarbr,peak,istat
+     &                      , SIZEOFBLOCKS, LSIZEOFBLOCKS
      &     )
       implicit none
       integer, intent(in)::n,slavef
@@ -1909,16 +2000,19 @@ C
      &  procnode(n),ssarbr(n)
       INTEGER(8), intent(in), TARGET:: KEEP8(150)
       integer,intent(out)::istat
+      integer, intent(in)         :: LSIZEOFBLOCKS
+      integer, intent(in), TARGET :: SIZEOFBLOCKS(LSIZEOFBLOCKS)
       integer i,allocok,rest
       DOUBLE PRECISION peak
       character (len=48):: subname
-      intrinsic bit_size,min,max
       istat=-1
       nullify(cv_frere,cv_fils,cv_nfsiz,cv_ne,cv_keep,cv_keep8,
      &        cv_icntl,cv_info,cv_procnode,cv_ssarbr)
       nullify(cv_ncostw,cv_tcostw,cv_ncostm,cv_tcostm,
      &        cv_nodelayer,cv_nodetype,cv_depth,
      &        cv_layerworkload,cv_layermemused,cv_prop_map)
+       nullify(cv_SIZEOFBLOCKS)
+       cv_SIZEOFBLOCKS => SIZEOFBLOCKS
       subname='INITPART1'
       cv_n=n
       cv_slavef=slavef
@@ -2107,25 +2201,37 @@ C
       implicit none
       integer,intent(out)::istat
       integer i,ierr,inode
-      logical accepted,splitting_allowed
+      logical accepted
       integer,parameter::map_strat=cv_equilib_flops
       character (len=48):: err_rep,subname
       logical use_geist_ng_replace, skiparrangeL0
       INTEGER MINSIZE_L0
+      INTEGER CURRENT_SIZE_L0
       istat=-1
       subname='LAYERL0'
       accepted=.FALSE.
-      splitting_allowed=.TRUE.
-      splitting_allowed=.FALSE.
       IF (cv_keep(72).EQ.2) THEN
        MINSIZE_L0 = 6*cv_slavef
       ELSE
+       IF (cv_keep(198).NE.0) THEN
+         IF (cv_keep(198).EQ.1) THEN
+           MINSIZE_L0 = 3*cv_slavef
+         ELSE
+           MINSIZE_L0 = 2*cv_slavef
+         ENDIF
+       ELSE
          MINSIZE_L0 = 3*cv_slavef
+       ENDIF
       ENDIF
  55   continue
       skiparrangeL0 = .false.
       do while(.not.accepted)
-         IF ( (    (layerL0_endforarrangeL0.LT.MINSIZE_L0)
+         IF (cv_keep(198).EQ.2) THEN
+            CURRENT_SIZE_L0 = layerL0_endforarrangeL0
+         ELSE
+            CURRENT_SIZE_L0 = layerL0_endforarrangeL0
+         ENDIF
+         IF ( (    (CURRENT_SIZE_L0.LT.MINSIZE_L0)
      &             .OR. skiparrangeL0
      &        )
      &        .AND.
@@ -2153,8 +2259,10 @@ C
             return
           end if
          ENDIF
-         IF (cv_slavef.GT.16) 
-     &        skiparrangeL0 = .NOT.skiparrangeL0   
+         IF (cv_keep(198).EQ.0) THEN
+           IF (cv_slavef.GT.16) 
+     &          skiparrangeL0 = .NOT.skiparrangeL0   
+         ENDIF
          if (accepted.OR.(cv_costw_total.le.0.0D0)) then
             exit
          elseif(((cv_costw_layer0/cv_costw_total).gt.cv_l0wthresh) .AND.
@@ -2737,7 +2845,6 @@ C
      &        totalnmb,node_of_master,node_of_candid,node_of_swapper
       DOUBLE PRECISION::mastermem,slavemem,maxmem
       logical swapthem,cand_better_master_arch,cand_better_swapper_arch
-      intrinsic maxval,minval
       maxmem=maxval(cv_proc_memused(:))
       totalnmb=0
       do layernmb=cv_maxlayer,1,-1
@@ -2845,7 +2952,6 @@ C
      &                                      maxmem(cv_slavef)
       integer,intent(out)::istat
       integer i,allocok
-      intrinsic huge
       DOUBLE PRECISION dummy
       character (len=48):: subname
       istat=-1
@@ -2904,9 +3010,9 @@ C
       return
       end subroutine MUMPS_PROCINIT
       recursive subroutine MUMPS_MOD_PROPMAP
-     &                    (inode,ctr,istat)
+     &                    (inode_entry,ctr_entry,istat)
       implicit none
-      integer, intent(in)::inode,ctr
+      integer, intent(in)::inode_entry,ctr_entry
       integer, intent(inout)::istat
       integer::j,k,in,in1,ierr,son,nmb_procs_inode,nmb_sons_inode,
      &         current,i
@@ -2916,13 +3022,16 @@ C
       DOUBLE PRECISION :: relative_weight,costs_sons
       DOUBLE PRECISION :: loc_relax
       INTEGER :: depth
+      INTEGER :: inode,ctr
       logical force_cand
       DOUBLE PRECISION Y
-      intrinsic random_number
       integer nmb_propmap_strict,share2,procsrest,current2
       integer k69onid
       INTEGER, ALLOCATABLE, DIMENSION(:) :: procs_inode
       LOGICAL UPDATE_CTR
+      inode = inode_entry
+      ctr   = ctr_entry
+ 1234 CONTINUE
       if (ctr.le.0) then
          istat = 0
          return
@@ -2931,6 +3040,53 @@ C
       if(cv_frere(inode).eq.cv_n+1) return
       subname='MOD_PROPMAP'
       if(.NOT.associated(cv_prop_map(inode)%ind_proc)) return
+      nmb_sons_inode = 0
+      costs_sons = dble(0)
+      force_cand=(mod(cv_keep(24),2).eq.0)
+      in = inode
+      do while (cv_fils(in).gt.0)
+         in=cv_fils(in)
+      end do
+      if (cv_fils(in).eq.0) then
+         istat = 0
+         goto 999
+      endif
+      in = -cv_fils(in)
+      son=in 
+      do while(in.gt.0)
+         nmb_sons_inode = nmb_sons_inode + 1
+         if(cv_tcostw(in).le.0.0D0) then
+            if(cv_lp.gt.0)
+     &           write(cv_lp,*)'Subtree costs for ',in,
+     &                         ' should be positive in ',subname
+            goto 999
+         endif
+         if (cv_keep(67) .ne. 1) then
+           costs_sons = costs_sons + cv_tcostw(in)
+         else
+           costs_sons = costs_sons + cv_tcostm(in)
+         end if
+         in=cv_frere(in)
+      enddo
+      if(costs_sons.le.0D0) then
+         if(cv_lp.gt.0)
+     &        write(cv_lp,*)'Error in ',subname
+     &        ,subname
+         goto 999
+      endif
+      if ((cv_nodelayer(inode).eq.0).AND.
+     &         (cv_frere(inode).ne.cv_n+1)) then
+         istat = 0
+         goto 999
+      endif
+      IF (nmb_sons_inode.eq.1) THEN
+          if(.NOT.associated(cv_prop_map(son)%ind_proc)) then
+          WRITE(6,*) son, " cv_prop_map(son)%ind_proc not associated "
+          endif
+         cv_prop_map(son)%ind_proc = cv_prop_map(inode)%ind_proc
+         inode = son
+         GOTO 1234
+      ENDIF
       ALLOCATE(procs_inode(cv_slavef),
      &         procs4son(cv_size_ind_proc),stat=allocok)
       if (allocok.gt.0) then
@@ -2973,41 +3129,6 @@ C
      &        ,subname
          goto 999
       end if
-      if ((cv_nodelayer(inode).eq.0).AND.
-     &         (cv_frere(inode).ne.cv_n+1)) then
-         istat = 0
-         goto 999
-      endif
-      nmb_sons_inode = 0
-      costs_sons = dble(0)
-      force_cand=(mod(cv_keep(24),2).eq.0)
-      in = inode
-      do while (cv_fils(in).gt.0)
-         in=cv_fils(in)
-      end do
-      if (cv_fils(in).eq.0) then
-         istat = 0
-         goto 999
-      endif
-      in = -cv_fils(in)
-      son=in 
-      do while(in.gt.0)
-         nmb_sons_inode = nmb_sons_inode + 1
-         if(cv_tcostw(in).le.0.0D0) then
-            if(cv_lp.gt.0)
-     &           write(cv_lp,*)'Subtree costs for ',in,
-     &                         ' should be positive in ',subname
-            goto 999
-         endif
-         costs_sons = costs_sons + cv_tcostw(in)
-         in=cv_frere(in)
-      enddo
-      if(costs_sons.le.0D0) then
-         if(cv_lp.gt.0)
-     &        write(cv_lp,*)'Error in ',subname
-     &        ,subname
-         goto 999
-      endif
       depth= max(cv_mixed_strat_bound - ctr,0)
       if ((cv_keep(24).eq.16).OR.(cv_keep(24).eq.18)) then
          if(depth.ge.cv_mixed_strat_bound) then
@@ -3043,7 +3164,11 @@ C
                end if
             end do
             if(costs_sons.gt.0.0D0) then
-               relative_weight=cv_tcostw(in)/costs_sons
+               if (cv_keep(67) .ne. 1) then
+                 relative_weight=cv_tcostw(in)/costs_sons
+               else
+                 relative_weight=cv_tcostm(in)/costs_sons
+               endif
             else
                relative_weight=0.0D0
             endif
@@ -3102,12 +3227,13 @@ C
       end do
       istat = 0
  999  continue
-      DEALLOCATE(procs_inode,procs4son)
+      if (allocated(procs_inode)) DEALLOCATE(procs_inode)
+      if (allocated(procs4son)) DEALLOCATE(procs4son)
       return
       end subroutine MUMPS_MOD_PROPMAP
-      recursive subroutine MUMPS_PROPMAP(inode,ctr,istat)
+      recursive subroutine MUMPS_PROPMAP(inode_entry, ctr_entry, istat)
       implicit none
-      integer, intent(in)::inode,ctr
+      integer, intent(in)::inode_entry,ctr_entry
       integer, intent(inout)::istat
       integer::j,k,in,in1,ierr,son,nmb_procs_inode,nmb_sons_inode,
      &           share,current,offset,
@@ -3126,13 +3252,16 @@ C
       integer MUMPS_REG_GETKMAX, MUMPS_BLOC2_GET_NSLAVESMIN
       external MUMPS_REG_GETKMAX, MUMPS_BLOC2_GET_NSLAVESMIN
       DOUBLE PRECISION Y
-      intrinsic random_number
       integer nmb_propmap_strict,share2,procsrest,current2
       integer k69onid,nb_free_procs,local_son_indice,nb_procs_for_sons,
      &     ptr_upper_ro_procs
+      integer :: inode, ctr
       INTEGER :: allocok
       logical upper_round_off,are_sons_treated
       DOUBLE PRECISION tmp_cost
+      inode = inode_entry
+      ctr   = ctr_entry
+ 1234 CONTINUE
       if (ctr.le.0) then
          istat = 0
          return
@@ -3157,8 +3286,8 @@ C
          return
       endif
       ptr_upper_ro_procs=1
-      work_per_proc(1:cv_slavef)=0.0D0
-      id_son(1:cv_slavef)=0
+      work_per_proc(1:cv_slavef)=0.0D0  
+      id_son(1:cv_slavef)=0             
       nmb_sons_inode = 0
       costs_sons = dble(0)
       force_cand=(mod(cv_keep(24),2).eq.0)
@@ -3181,18 +3310,46 @@ C
      &                         ' should be positive in ',subname
             return
          endif
-         costs_sons = costs_sons + cv_tcostw(in)
+         if (cv_keep(67) .ne. 1) then
+           costs_sons = costs_sons + cv_tcostw(in)
+         else
+           costs_sons = costs_sons + cv_tcostm(in)
+         endif
          in=cv_frere(in)
       enddo
+      IF (nmb_sons_inode.eq.1) THEN
+         if(.NOT.associated(cv_prop_map(son)%ind_proc)) then
+                 call MUMPS_PROPMAP_INIT(son,ierr)
+              if(ierr.ne.0) then
+               if(cv_lp.gt.0)
+     &              write(cv_lp,*)'PROPMAP_INIT signalled error to'
+     &              ,subname
+               istat = ierr
+               goto 999
+              end if
+         endif
+         ctr = ctr -1
+         cv_prop_map(son)%ind_proc = cv_prop_map(inode)%ind_proc
+         inode = son
+         GOTO 1234
+      ENDIF
       costs_sons_real = costs_sons
       SkipSmallNodes = .true.
       IF (costs_sons_real.gt.0.0D0) then
        in = son
        do while (in.gt.0) 
-          relative_weight=cv_tcostw(in)/costs_sons_real
+          if (cv_keep(67) .ne. 1) then
+            relative_weight=cv_tcostw(in)/costs_sons_real
+          else
+            relative_weight=cv_tcostm(in)/costs_sons_real
+          endif
           shtemp = relative_weight*dble(nmb_procs_inode)
           IF (shtemp.lt.PartofaProc) THEN
-            costs_sons = costs_sons - cv_tcostw(in)
+            if (cv_keep(67) .ne. 1) then
+              costs_sons = costs_sons - cv_tcostw(in)
+            else
+              costs_sons = costs_sons - cv_tcostm(in)
+            endif
           ENDIF
           in=cv_frere(in)
        enddo
@@ -3262,7 +3419,11 @@ C
                end do
             end do
             if(costs_sons.gt.0.0D0) then
-               relative_weight=cv_tcostw(in)/costs_sons
+              if (cv_keep(67) .ne. 1) then
+                relative_weight=cv_tcostw(in)/costs_sons
+              else
+                relative_weight=cv_tcostm(in)/costs_sons
+              endif
             else
                relative_weight=dble(0)
             endif
@@ -3392,8 +3553,13 @@ C
             if(.not.upper_round_off)then
                if(local_son_indice.lt.cv_slavef)then
                   id_son(local_son_indice)=in
-                  work_per_proc(local_son_indice)=cv_tcostw(in)/
+                  if ( cv_keep(67) .ne. 1 ) then
+                    work_per_proc(local_son_indice)=cv_tcostw(in)/
      &                 dble(nmb_propmap_strict)
+                  else
+                    work_per_proc(local_son_indice)=cv_tcostm(in)/
+     &                 dble(nmb_propmap_strict)
+                  endif
                   local_son_indice=local_son_indice+1
                   if(local_son_indice.eq.cv_slavef)then
                      CALL MUMPS_SORT_MSORT(ierr,cv_slavef,id_son,
@@ -3408,7 +3574,11 @@ C
                   endif
                else
                   current2=cv_slavef
-                  tmp_cost=cv_tcostw(in)/dble(nmb_propmap_strict)
+                  if (cv_keep(67) .ne.1) then
+                    tmp_cost=cv_tcostw(in)/dble(nmb_propmap_strict)
+                  else
+                    tmp_cost=cv_tcostm(in)/dble(nmb_propmap_strict)
+                  endif
                   do while(current2.ge.1)
                      if(tmp_cost.lt.work_per_proc(current2))exit
                      current2=current2-1
@@ -3478,8 +3648,12 @@ C
             npiv=0
             in_tmp=in_tmp
             do while(in_tmp.gt.0)
+              if (cv_BLKON) then
+                npiv = npiv + cv_SIZEOFBLOCKS(in_tmp)
+              else
                npiv=npiv+1
-               in_tmp=cv_fils(in_tmp)
+              endif
+              in_tmp=cv_fils(in_tmp)
             end do
             ncb=nfront-npiv
             if (force_cand) then
@@ -3501,7 +3675,11 @@ C
             endif
             min_cand_needed = max(min_cand_needed, cv_keep(91))
             if(costs_sons.gt.0.0D0) then
-               relative_weight=cv_tcostw(in)/costs_sons
+               if (cv_keep(67) .ne.1) then
+                 relative_weight=cv_tcostw(in)/costs_sons
+               else
+                 relative_weight=cv_tcostm(in)/costs_sons
+               endif
             else
                relative_weight=dble(0)
             endif
@@ -3575,6 +3753,7 @@ C
          ierr=0
          in1=in
          cv_prop_map(in1)%ind_proc = procs4son
+         IF (nmb_sons_inode.EQ.1) DEALLOCATE(procs4son)
          call MUMPS_PROPMAP(in1,ctr-1,ierr)
          if(ierr.ne.0) then
             if(cv_lp.gt.0) write(cv_lp,*)
@@ -3586,7 +3765,7 @@ C
       end do
       istat = 0
  999  CONTINUE
-      DEALLOCATE(procs4son)
+      if (allocated(procs4son)) DEALLOCATE(procs4son)
       return
       end subroutine MUMPS_PROPMAP
       subroutine MUMPS_PROPMAP_INIT(inode,istat)
@@ -4043,13 +4222,13 @@ C
       nfront=cv_nfsiz(pos)
       npiv=1
       nextpos=cv_fils(pos)
-      do
-         if(nextpos.le.0) then
-            exit
+      do while (nextpos.gt.0)
+         if (cv_BLKON) then
+           npiv = npiv + cv_SIZEOFBLOCKS(nextpos)
          else
-            npiv=npiv+1
-            nextpos=cv_fils(nextpos)
-         end if
+           npiv=npiv+1
+         endif
+         nextpos=cv_fils(nextpos)
       end do
       call MUMPS_CALCNODECOSTS(npiv,nfront,
      &     cv_ncostw(pos), cv_ncostm(pos))
@@ -4092,7 +4271,6 @@ C
       DOUBLE PRECISION,dimension(:),intent(in)::workload,
      &                                                  memused
       DOUBLE PRECISION,intent(out)::maxwork,minwork,maxmem,minmem
-      intrinsic maxval,minval
       maxwork=maxval(workload)
       minwork=minval(workload, mask= workload > dble(0))
       maxmem=maxval(memused)
@@ -4653,7 +4831,7 @@ C
             KEEP(38) = IROOTTREE
          ELSE
             KEEP(38) = 0
-             IF (MP.GT.0) WRITE(MP,*)
+             IF (MP.GT.0) WRITE(MP,'(A,I9,A)')
      &          ' WARNING: Largest root node of size ', SIZEROOT,
      &          ' not selected for parallel execution'
          END IF
@@ -4669,7 +4847,10 @@ C
       SUBROUTINE MUMPS_SPLITNODE_INTREE(inode,nfront,npiv,k,
      &     lnpivsplit, npivsplit, keep, n, fils, frere,
      &     nfsiz, ne, info5_nfrmax, k28_nsteps, nodetype,
-     &     istat)
+     &     istat
+     &                      , SIZEOFBLOCKS, LSIZEOFBLOCKS
+     &                      , BLKON
+     &      )
       implicit none
       integer, intent(in)::nfront,npiv
       integer, intent(in):: k
@@ -4677,12 +4858,15 @@ C
       integer, intent(in)::npivsplit(lnpivsplit)
       integer, intent(in):: inode
       integer, intent(out)::istat
-      integer, intent(inout):: keep(150)
+      integer, intent(inout):: keep(500)
       integer, intent(inout):: k28_nsteps
       integer, intent(in)  :: info5_nfrmax
       integer, intent(in)  :: n
       integer, intent(inout)::frere(n), fils(n), nfsiz(n), ne(n)
       integer, intent(inout):: nodetype(n)
+      integer, intent(in) :: LSIZEOFBLOCKS
+      integer, intent(in) :: SIZEOFBLOCKS(LSIZEOFBLOCKS)
+      logical,intent(in)  :: BLKON
       integer i,lev,in,in_son,in_father,in_grandpa,npiv_father,
      &     npiv_son,nfrontk,npivk,d1,f1,e1,dk,fk,next_father
       integer::ison,ifather
@@ -4701,9 +4885,17 @@ C
       d1 = inode
       f1 = d1
       e1 = frere(d1)
-      do i=1,npiv_son-1
-         f1 = fils(f1)
-      enddo
+      if (BLKON) then
+         i= SIZEOFBLOCKS(f1)
+         do while (i.lt.npiv_son)
+            f1 = fils(f1)
+             i = i + SIZEOFBLOCKS(f1)
+         enddo
+      else
+         do i=1,npiv_son-1
+           f1 = fils(f1)
+         enddo
+       endif
       ison = d1
       in_son = f1
       next_father = fils(in_son)
@@ -4712,9 +4904,17 @@ C
          in_father = ifather
          npiv_son=   abs(npivsplit(lev))
          npiv_father=abs(npivsplit(lev+1))
-         do i=1,npiv_father-1
-            in_father=fils(in_father)
-         enddo
+         if (BLKON) then
+            i= SIZEOFBLOCKS(in_father)
+            do while (i.lt.npiv_father)
+             in_father=fils(in_father)
+             i = i + SIZEOFBLOCKS(in_father)
+            enddo
+         else
+            do i=1,npiv_father-1
+               in_father=fils(in_father)
+            enddo
+         endif
          frere(ison)=-ifather
          next_father = fils(in_father)
          fils(in_father)=-ison
@@ -4857,14 +5057,20 @@ C
       end subroutine MUMPS_SETUP_CAND_CHAIN
       subroutine MUMPS_GET_SPLIT_4_PERF(inode, nfront, npiv, nproc,
      &                                  k, lnpivsplit, npivsplit,
-     &                                  n, frere, keep, istat)
+     &                                  n, frere, keep,
+     &                                  fils, BLKON, sizeofblocks,
+     &                                  istat)
       implicit none
       integer,intent(in)::inode, nfront, npiv, lnpivsplit, n
       integer,intent(in)::frere(n)
-      integer,intent(in)::keep(150)
+      integer,intent(in) :: fils(n)
+      logical, intent(in) :: BLKON
+      integer, intent(in) :: sizeofblocks(*)
+      integer,intent(in)::keep(500)
       double precision, intent(in):: nproc
       integer,intent(out)::k, npivsplit(lnpivsplit), istat
       logical :: nosplit
+      integer :: inode_tmp
       integer :: kk, optimization_strategy, nass, npiv2
       double precision :: nproc2
       integer :: npivOld, npivNew
@@ -4889,6 +5095,7 @@ C
       nproc2 = nproc
       nass = 0
       kk = 0
+      inode_tmp = inode
       do while (nass .lt. npiv)
         if ((nproc2 .eq. 2.0d0) .or.
      &           (nfront - nass .le. 6*keep(9))) then
@@ -4905,28 +5112,36 @@ C
               npiv2 = min(npiv - nass,
      &                    npiv4equilibreRows(nfront - nass, nproc2 ))
             endif
-         else
+          else
             write(*,*) "Internal error in MUMPS_GET_SPLIT_4_PERF,"
             write(*,*) "optimization_strategy not implemented"
             call MUMPS_ABORT()
           endif
         endif
-        nass = nass + npiv2
         kk = kk + 1
-        npivsplit(kk) = npiv2
-        if (keep(79) .ge. 1  
-     &    .and. kk .ne. 1) then  
+        IF (BLKON) THEN
+          npivsplit(kk) = 0
+          DO WHILE (npivsplit(kk) .LT. npiv2 .and. inode_tmp .gt. 0)
+            npivsplit(kk) = npivsplit(kk) + sizeofblocks(inode_tmp)
+            inode_tmp= fils(inode_tmp)
+          ENDDO
+          npiv2 = npivsplit(kk)
+        ELSE
+          npivsplit(kk) = npiv2
+        ENDIF
+        if (keep(79) .ge. 1       
+     &    .and. kk .ne. 1) then   
           if (optimization_strategy .eq. 0) then 
             npivOld = min(npiv - nass,
-     &                npiv4equilibreRows(nfront - nass, nproc ))
+     &              npiv4equilibreRows(nfront - nass, nproc ))
             npivNew = min(npiv - nass,
-     &                npiv4equilibreRows(nfront - nass, nproc2 - 1.0d0))
+     &              npiv4equilibreRows(nfront - nass, nproc2 - 1.0d0))
           else if (optimization_strategy .eq. 1) then 
             npivOld = min(npiv - nass,
      &              npiv4equilibreFlops(nfront - nass, nproc ))
             npivNew = min(npiv - nass,
      &              npiv4equilibreRows(nfront - nass, nproc2 - 1.0d0))
-         else
+          else
             write(*,*) "Internal error in MUMPS_GET_SPLIT_4_PERF,"
             write(*,*) "optimization_strategy not implemented"
             call MUMPS_ABORT()
@@ -4935,7 +5150,7 @@ C
           timeFacOld = timeFacto(int(nfront-nass,8), int(npivOld,8),
      &                           nproc)
           timeFacNew = timeFacto(int(nfront-nass,8),int(npivNew,8),
-     &                           nproc2)
+     &                           nproc2-1)
           if ( (flopsFactoPanel(int(npivOld,8),int(nfront-nass,8))+
      &          flopsUpdate(int(nfront-nass-npivOld,8),
      &          int(nfront-nass-npivOld,8), int(npivOld,8)))/
@@ -4948,8 +5163,11 @@ C
             nproc2 = nproc
           else
             nproc2 = nproc2 - 1.0d0
+            npiv2 = npivNew
+            npivsplit(kk)=npivNew
           endif
         endif
+        nass = nass + npiv2
       enddo
       k = kk
       istat=0

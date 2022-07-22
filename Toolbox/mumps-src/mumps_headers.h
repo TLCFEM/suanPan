@@ -1,14 +1,15 @@
 C
-C  This file is part of MUMPS 5.2.1, released
-C  on Fri Jun 14 14:46:05 UTC 2019
+C  This file is part of MUMPS 5.5.1, released
+C  on Tue Jul 12 13:17:24 UTC 2022
 C
 C
-C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2022 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license:
-C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+C  released under the CeCILL-C license 
+C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
 C
 C     Common header positions:
@@ -26,6 +27,8 @@ C                                           2=LowRank factors/panels only
 C                                           3=LowRank CB+factor/panel)
 C     XXEBF  ->  End of Blocfacto (0=not yet, 1=finished)  
 C     XXD    ->  dynamic data size
+C     XXG    ->  GPU information (currently number of pinned rows NFRONT-NBROWS_CPU
+C                for type 1 nodes, pinning status for type 2 strips)
 C REMARK: .h file could be replaced by a module with functions to get node status
 C          added in the module.
 C 
@@ -35,6 +38,7 @@ C
       INTEGER, PARAMETER :: XXNBPR = 9
       INTEGER, PARAMETER :: XXEBF = 10
       INTEGER, PARAMETER :: XXD = 11
+      INTEGER, PARAMETER :: XXG = 13
 C 
 C     Size of header in incore and out-of-core
 C
@@ -43,8 +47,8 @@ C
 C     At the moment, all headers are of the same size because
 C     no OOC specific information are stored in header.
 CM     other OOC specific information directly in the headers.
-      PARAMETER (XSIZE_IC=13,XSIZE_OOC_SYM=13,XSIZE_OOC_UNSYM=13,
-     &           XSIZE_OOC_NOPANEL=13)
+      PARAMETER (XSIZE_IC=14,XSIZE_OOC_SYM=14,XSIZE_OOC_UNSYM=14,
+     &           XSIZE_OOC_NOPANEL=14)
 C
 C     -------------------------------------------------------
 C     Position of header size (formerly XSIZE) in KEEP array.
@@ -75,3 +79,7 @@ C     -------------------------------------------------------
      &  S_ROOTBAND_INIT
          PARAMETER(S_ROOT2SON_CALLED=-341,S_REC_CONTSTATIC=1,
      &             S_ROOTBAND_INIT=0)
+          INTEGER, PARAMETER :: MemNotPinned = -1
+          INTEGER, PARAMETER :: MemPinned = -2
+          INTEGER, PARAMETER :: PinningOnTheWay = -3
+          INTEGER, PARAMETER :: UnpinningOnTheWay = -4

@@ -1,14 +1,15 @@
 C
-C  This file is part of MUMPS 5.2.1, released
-C  on Fri Jun 14 14:46:05 UTC 2019
+C  This file is part of MUMPS 5.5.1, released
+C  on Tue Jul 12 13:17:24 UTC 2022
 C
 C
-C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2022 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license:
-C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+C  released under the CeCILL-C license 
+C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
       SUBROUTINE DMUMPS_ANA_DIST_ARROWHEADS( MYID, SLAVEF, N,
      &           PROCNODE, STEP, PTRAIW, PTRARW, ISTEP_TO_INIV2,
@@ -30,18 +31,20 @@ C
       EXTERNAL MUMPS_TYPENODE, MUMPS_PROCNODE, MUMPS_TYPESPLIT
       INTEGER ISTEP, I, NCOL, NROW, allocok
       INTEGER TYPE_PARALL, ITYPE, IRANK, INIV2, TYPESPLIT 
-      LOGICAL T4_MASTER_CONCERNED
+      LOGICAL T4_MASTER_CONCERNED, EARLYT3ROOTINS
       INTEGER(8) :: IPTRI, IPTRR
+      EARLYT3ROOTINS = KEEP(200) .EQ. 0
+     & .OR. (KEEP(200) .LT. 0 .AND. KEEP(400) .EQ. 0)
       TYPE_PARALL = KEEP(46)
       I_AM_SLAVE = (KEEP(46).EQ.1 .OR. MYID.NE.0)
       KEEP8(26) = 0_8
       KEEP8(27) = 0_8
       DO I = 1, N
         ISTEP=abs(STEP(I))
-        ITYPE = MUMPS_TYPENODE( PROCNODE(ISTEP), SLAVEF )
-        IRANK = MUMPS_PROCNODE( PROCNODE(ISTEP), SLAVEF )
+        ITYPE = MUMPS_TYPENODE( PROCNODE(ISTEP), KEEP(199) )
+        IRANK = MUMPS_PROCNODE( PROCNODE(ISTEP), KEEP(199) )
         I_AM_CAND_LOC = .FALSE.
-        TYPESPLIT = MUMPS_TYPESPLIT ( PROCNODE(ISTEP), SLAVEF )
+        TYPESPLIT = MUMPS_TYPESPLIT ( PROCNODE(ISTEP), KEEP(199) )
         T4_MASTER_CONCERNED = .FALSE.
         IF (ITYPE.EQ.2) THEN
          INIV2         = ISTEP_TO_INIV2(ISTEP)
@@ -72,6 +75,11 @@ C
           KEEP8(26) = KEEP8(26) + 1_8 + PTRAIW(I)+PTRARW(I)
           KEEP8(27) = KEEP8(27) + 3_8 + PTRAIW(I)+PTRARW(I)
         ELSE IF ( ITYPE .EQ. 3 ) THEN
+          IF (EARLYT3ROOTINS) THEN
+          ELSE
+            KEEP8(26) = KEEP8(26) + 1_8 + PTRAIW(I)+PTRARW(I)
+            KEEP8(27) = KEEP8(27) + 3_8 + PTRAIW(I)+PTRARW(I)
+          ENDIF
         ELSE IF ( ITYPE .EQ. 2 .AND. I_AM_CAND_LOC ) THEN
            PTRARW( I ) = 0_8
            KEEP8(26) = KEEP8(26) + 1_8 + PTRAIW(I)+PTRARW(I)
@@ -101,9 +109,9 @@ C
       IPTRR = 1_8
       DO I = 1, N
         ISTEP = abs(STEP(I))
-        ITYPE = MUMPS_TYPENODE( PROCNODE(ISTEP), SLAVEF )
-        IRANK = MUMPS_PROCNODE( PROCNODE(ISTEP), SLAVEF )
-        TYPESPLIT = MUMPS_TYPESPLIT ( PROCNODE(ISTEP), SLAVEF )
+        ITYPE = MUMPS_TYPENODE( PROCNODE(ISTEP), KEEP(199) )
+        IRANK = MUMPS_PROCNODE( PROCNODE(ISTEP), KEEP(199) )
+        TYPESPLIT = MUMPS_TYPESPLIT ( PROCNODE(ISTEP), KEEP(199) )
         I_AM_CAND_LOC = .FALSE.
         T4_MASTER_CONCERNED = .FALSE.
         IF (ITYPE.EQ.2) THEN
@@ -144,6 +152,21 @@ C
           PTRARW( I ) = IPTRR
           IPTRI = IPTRI + int(NCOL + NROW + 3,8)
           IPTRR = IPTRR + int(NCOL + NROW + 1,8)
+        ELSE IF ( ITYPE .eq. 3) THEN
+          IF ( EARLYT3ROOTINS ) THEN
+            PTRAIW(I)=0
+            PTRARW(I)=0
+          ELSE
+            NCOL = int(PTRAIW( I ))
+            NROW = int(PTRARW( I ))
+            id%INTARR( IPTRI     ) = NCOL
+            id%INTARR( IPTRI + 1 ) = -NROW
+            id%INTARR( IPTRI + 2 ) = I
+            PTRAIW( I ) = IPTRI
+            PTRARW( I ) = IPTRR
+            IPTRI = IPTRI + int(NCOL + NROW + 3,8)
+            IPTRR = IPTRR + int(NCOL + NROW + 1,8)
+          ENDIF
         ELSE IF ( ITYPE .eq. 2  .AND. I_AM_CAND_LOC ) THEN
            NCOL = int(PTRAIW( I ))
            NROW = 0
@@ -170,13 +193,14 @@ C
       END IF
       RETURN
       END SUBROUTINE DMUMPS_ANA_DIST_ARROWHEADS
-      SUBROUTINE DMUMPS_FACTO_SEND_ARROWHEADS(N, NZ, ASPK, 
+      SUBROUTINE DMUMPS_FACTO_SEND_ARROWHEADS( N, NZ, ASPK, 
      &   IRN, ICN, PERM,
      &   LSCAL,COLSCA,ROWSCA,
      &   MYID, SLAVEF, PROCNODE_STEPS, NBRECORDS,
      &   LP, COMM, root, KEEP, KEEP8, FILS, RG2L,
      &   INTARR, LINTARR, DBLARR, LDBLARR, PTRAIW, PTRARW, FRERE_STEPS,
      &   STEP, A, LA, ISTEP_TO_INIV2, I_AM_CAND, CANDIDATES )
+!$    USE OMP_LIB
       USE DMUMPS_STRUC_DEF, ONLY : DMUMPS_ROOT_STRUC
       IMPLICIT NONE
       INTEGER    :: N, COMM, NBRECORDS
@@ -208,8 +232,9 @@ C
      &        MUMPS_TYPESPLIT
       EXTERNAL MUMPS_PROCNODE, MUMPS_TYPENODE, numroc, 
      &        MUMPS_TYPESPLIT
-      DOUBLE PRECISION VAL
-      INTEGER IOLD,JOLD,INEW,JNEW,ISEND,JSEND,DEST,I,IARR
+      DOUBLE PRECISION VAL, VAL_SHR
+      INTEGER IOLD,JOLD,ISEND,JSEND,DEST,I,IARR
+      INTEGER ISEND_SHR, JSEND_SHR, DEST_SHR
       INTEGER IPOSROOT, JPOSROOT
       INTEGER IROW_GRID, JCOL_GRID
       INTEGER INODE, ISTEP
@@ -217,17 +242,21 @@ C
       INTEGER ARROW_ROOT, TAILLE
       INTEGER LOCAL_M, LOCAL_N
       INTEGER(8) :: PTR_ROOT
-      INTEGER TYPENODE_TMP, MASTER_NODE
+      INTEGER TYPE_NODE, MASTER_NODE
       LOGICAL I_AM_CAND_LOC, I_AM_SLAVE
       INTEGER JARR, ILOCROOT, JLOCROOT
       INTEGER allocok, INIV2, TYPESPLIT, T4MASTER
-      INTEGER(8) ::  I1, IA, IIW, IS1, IS, IAS, ISHIFT, K
+      INTEGER(8) ::  I1, IA, IS1, IAS, ISHIFT, K
       INTEGER NCAND
-      LOGICAL T4_MASTER_CONCERNED
+      LOGICAL T4_MASTER_CONCERNED, EARLYT3ROOTINS
       DOUBLE PRECISION ZERO
       PARAMETER( ZERO = 0.0D0 )
-      INTEGER, POINTER, DIMENSION(:,:) :: IW4
+      INTEGER, ALLOCATABLE, DIMENSION(:,:) :: IW4
+      LOGICAL :: DOIT, OMP_FLAG, OMP_FLAG_P
+      INTEGER NOMP, NOMP_P, IOMP, P2
       ARROW_ROOT = 0
+      EARLYT3ROOTINS = KEEP(200) .EQ. 0
+     & .OR. (KEEP(200) .LT. 0 .AND. KEEP(400) .EQ. 0)
       I_AM_SLAVE=(MYID.NE.0.OR.KEEP(46).EQ.1)
       IF ( KEEP(46) .eq. 0 ) THEN
         NBUFS = SLAVEF
@@ -238,6 +267,9 @@ C
           WRITE(*,*) 'Error allocating IW4'
           CALL MUMPS_ABORT()
         END IF
+#if defined(__ve__)
+!NEC$ IVDEP
+#endif
         DO I = 1, N
           I1 = PTRAIW( I )
           IA = PTRARW( I )
@@ -248,24 +280,12 @@ C
             INTARR( I1 + 2 ) = I
           END IF
         END DO
-        IF ( KEEP(38) .NE. 0 ) THEN
-          IF (KEEP(60)==0) THEN
-            LOCAL_M = numroc( root%ROOT_SIZE, root%MBLOCK,
-     &               root%MYROW, 0, root%NPROW )
-            LOCAL_M = max( 1, LOCAL_M )
-            LOCAL_N = numroc( root%ROOT_SIZE, root%NBLOCK,
-     &               root%MYCOL, 0, root%NPCOL )
-            PTR_ROOT = LA - int(LOCAL_M,8) * int(LOCAL_N,8) + 1_8
-            IF ( PTR_ROOT .LE. LA ) THEN
-              A( PTR_ROOT:LA ) = ZERO
-            END IF
-          ELSE
-            DO I = 1, root%SCHUR_NLOC
-              root%SCHUR_POINTER(int(I-1,8)*int(root%SCHUR_LLD,8)+1_8:
-     &        int(I-1,8)*int(root%SCHUR_LLD,8)+int(root%SCHUR_MLOC,8))=
-     &        ZERO
-            ENDDO
-          ENDIF
+        IF ( KEEP(38) .NE. 0 .AND. EARLYT3ROOTINS ) THEN
+          CALL DMUMPS_GET_ROOT_INFO(root, LOCAL_M, LOCAL_N,
+     &                              PTR_ROOT, LA)
+          CALL DMUMPS_SET_ROOT_TO_ZERO(root, KEEP, A, LA)
+        ELSE
+          LOCAL_M = -19999; LOCAL_N = -29999; PTR_ROOT = -99999_8
         END IF
       END IF
       IF (NBUFS.GT.0) THEN
@@ -290,217 +310,284 @@ C
         INODE = FILS( INODE )
         I = I + 1
       END DO
-      DO 120 K=1,NZ
+      NOMP = 1
+!$    NOMP=omp_get_max_threads()
+      OMP_FLAG = KEEP(399).EQ.1 .AND. NOMP.GE.2 .AND. SLAVEF.EQ.1
+     &           .AND. KEEP(46) .EQ. 1
+!$OMP PARALLEL PRIVATE(K, I, DEST, I_AM_CAND_LOC,
+!$OMP&          T4MASTER, T4_MASTER_CONCERNED,
+!$OMP&          INIV2, NCAND, IROW_GRID, JCOL_GRID,
+!$OMP&          ILOCROOT, JLOCROOT, IPOSROOT, JPOSROOT,
+!$OMP&          TYPE_NODE, TYPESPLIT, MASTER_NODE,
+!$OMP&          IA, ISHIFT, IS1, IAS, TAILLE, VAL,
+!$OMP&          IARR, JARR, ISTEP, ISEND, JSEND,
+!$OMP&          IOLD, JOLD, IOMP, DOIT, P2, NOMP_P, OMP_FLAG_P)
+!$OMP& REDUCTION(+: ARROW_ROOT) IF (OMP_FLAG)
+      IOMP=0
+!$    IOMP=omp_get_thread_num()
+      NOMP_P=1
+!$    NOMP_P=omp_get_num_threads()
+      OMP_FLAG_P = .FALSE.
+!$    OMP_FLAG_P = OMP_FLAG .AND. NOMP_P .GT. 1
+      IF (OMP_FLAG_P) THEN
+        IF ( NOMP_P .GE. 16 ) THEN
+          NOMP_P=16
+          P2 = 4
+        ELSE IF (NOMP_P.GE.8) THEN
+          NOMP_P=8
+          P2 = 3
+        ELSE IF (NOMP_P.GE.4) THEN
+          NOMP_P=4
+          P2 = 2
+        ELSE IF (NOMP_P.GE.2) THEN
+          NOMP_P=2
+          P2 = 1
+        ENDIF
+      ELSE
+        NOMP_P = 1
+        P2 = 0
+      ENDIF
+      IF ( IOMP .LT. NOMP_P ) THEN
+       DO K=1, NZ
         IOLD = IRN(K)
         JOLD = ICN(K)
         IF ( (IOLD.GT.N).OR.(JOLD.GT.N).OR.(IOLD.LT.1)
      &                 .OR.(JOLD.LT.1) ) THEN
-           GOTO 120
+          CYCLE
         END IF
-        IF (LSCAL) THEN
-          VAL = ASPK(K)*ROWSCA(IOLD)*COLSCA(JOLD)
+        IF (OMP_FLAG_P) THEN
+          IF (IOLD.EQ.JOLD) THEN
+            IARR = IOLD
+          ELSE IF (PERM(IOLD).LT.PERM(JOLD)) THEN
+             IARR = IOLD
+          ELSE
+             IARR = JOLD
+          ENDIF
+          DOIT = ( IOMP .EQ. ibits(IARR, P2-1, P2))
         ELSE
-          VAL = ASPK(K)
+          DOIT = .TRUE.
         ENDIF
-        IF (IOLD.EQ.JOLD) THEN
-          ISEND = IOLD
-          JSEND = JOLD
-        ELSE
-          INEW = PERM(IOLD)
-          JNEW = PERM(JOLD)
-          IF (INEW.LT.JNEW) THEN
+        IF (DOIT) THEN
+          IF (IOLD.EQ.JOLD) THEN
             ISEND = IOLD
-            IF ( KEEP(50) .NE. 0 ) ISEND = -IOLD
+            JSEND = JOLD
+            IARR  = IOLD
+          ELSE IF (PERM(IOLD).LT.PERM(JOLD)) THEN
+            IARR = IOLD
+            IF ( KEEP(50) .NE. 0 ) THEN
+              ISEND = -IOLD
+            ELSE
+              ISEND = IOLD
+            ENDIF
             JSEND = JOLD
           ELSE
+            IARR = JOLD
             ISEND = -JOLD
             JSEND = IOLD
           ENDIF
-        ENDIF
-        IARR  = abs( ISEND )
-        ISTEP = abs( STEP(IARR) )
-        TYPENODE_TMP = MUMPS_TYPENODE( PROCNODE_STEPS(ISTEP),
-     &                                 SLAVEF ) 
-        MASTER_NODE  = MUMPS_PROCNODE( PROCNODE_STEPS(ISTEP),
-     &                                 SLAVEF )
-        I_AM_CAND_LOC          = .FALSE.
-        TYPESPLIT  = MUMPS_TYPESPLIT(  PROCNODE_STEPS(ISTEP),
-     &                                 SLAVEF )
-        T4_MASTER_CONCERNED = .FALSE.
-        T4MASTER               = -9999
-        IF (TYPENODE_TMP.EQ.2) THEN
-         INIV2         = ISTEP_TO_INIV2(ISTEP)
-         IF (I_AM_SLAVE)  I_AM_CAND_LOC = I_AM_CAND(INIV2)
-         IF ( (TYPESPLIT.EQ.5).OR.(TYPESPLIT.EQ.6)) THEN
-          T4_MASTER_CONCERNED = .TRUE.
-          T4MASTER=CANDIDATES(CANDIDATES(SLAVEF+1,INIV2)+1,INIV2)
-          IF ( KEEP(46) .eq. 0 ) THEN
-           T4MASTER=T4MASTER+1
-          ENDIF
-         ENDIF
-        ENDIF
-        IF ( TYPENODE_TMP .EQ. 1 ) THEN
-          IF ( KEEP(46) .eq. 0 ) THEN
-            DEST = MASTER_NODE + 1
-          ELSE
-            DEST = MASTER_NODE
-          END IF
-        ELSE IF ( TYPENODE_TMP .EQ. 2 ) THEN
-          IF ( ISEND .LT. 0  ) THEN
-            DEST = -1
-          ELSE
-            IF ( KEEP( 46 ) .eq. 0 ) THEN
+          ISTEP = abs( STEP(IARR) )
+          CALL MUMPS_TYPEANDPROCNODE( TYPE_NODE, MASTER_NODE,
+     &    PROCNODE_STEPS(ISTEP), KEEP(199) ) 
+          I_AM_CAND_LOC          = .FALSE.
+          T4_MASTER_CONCERNED    = .FALSE.
+          T4MASTER               = -9999
+          IF ( TYPE_NODE .EQ. 1 ) THEN
+            IF ( KEEP(46) .eq. 0 ) THEN
               DEST = MASTER_NODE + 1
-            ELSE 
+            ELSE
               DEST = MASTER_NODE
             END IF
-          END IF
-        ELSE
-          IF ( ISEND .LT. 0 ) THEN
-            IPOSROOT = RG2L(JSEND)
-            JPOSROOT = RG2L(IARR)
-          ELSE
-            IPOSROOT = RG2L( IARR )
-            JPOSROOT = RG2L( JSEND )
-          END IF
-          IROW_GRID = mod( ( IPOSROOT - 1 )/root%MBLOCK, root%NPROW )
-          JCOL_GRID = mod( ( JPOSROOT - 1 )/root%NBLOCK, root%NPCOL )
-          IF ( KEEP( 46 ) .eq. 0 ) THEN
-            DEST = IROW_GRID * root%NPCOL + JCOL_GRID + 1
-          ELSE
-            DEST = IROW_GRID * root%NPCOL + JCOL_GRID
-          END IF
-        END IF
-        IF ( DEST .eq. 0 .or.
-     &      ( DEST .eq. -1 .and. KEEP( 46 ) .eq. 1 .AND.
-     &       ( I_AM_CAND_LOC .OR. MASTER_NODE .EQ. 0 ) )
-     &     .or. 
-     &      ( T4MASTER.EQ.0 )
-     &     ) THEN
-          IARR = ISEND  
-          JARR = JSEND
-          IF ( TYPENODE_TMP .eq. 3 ) THEN
-            ARROW_ROOT = ARROW_ROOT + 1
-            IF ( IROW_GRID .EQ. root%MYROW .AND.
-     &         JCOL_GRID .EQ. root%MYCOL ) THEN
-              ILOCROOT = root%MBLOCK * ( ( IPOSROOT - 1 ) /
-     &                 ( root%MBLOCK * root%NPROW ) )
-     &               + mod( IPOSROOT - 1, root%MBLOCK ) + 1
-              JLOCROOT = root%NBLOCK * ( ( JPOSROOT - 1 ) /
-     &                 ( root%NBLOCK * root%NPCOL ) )
-     &               + mod( JPOSROOT - 1, root%NBLOCK ) + 1
-             IF (KEEP(60)==0) THEN
-               A( PTR_ROOT
-     &           + int(JLOCROOT - 1,8) * int(LOCAL_M,8) 
-     &           + int(ILOCROOT - 1,8) )
-     &         =  A( PTR_ROOT
-     &           + int(JLOCROOT - 1,8) * int(LOCAL_M,8)
-     &           + int(ILOCROOT - 1,8) )
-     &         + VAL
-             ELSE
-               root%SCHUR_POINTER( int(JLOCROOT - 1,8)
-     &                           * int(root%SCHUR_LLD,8)
-     &                           + int(ILOCROOT,8) )
-     &          = root%SCHUR_POINTER( int(JLOCROOT - 1,8)
-     &                           *    int(root%SCHUR_LLD,8)
-     &                           +    int(ILOCROOT,8))
-     &          + VAL
-             ENDIF
+          ELSE IF ( TYPE_NODE .EQ. 2 ) THEN
+            IF ( ISEND .LT. 0  ) THEN
+              DEST = -1
             ELSE
-              WRITE(*,*) MYID,':INTERNAL Error: root arrowhead '
-              WRITE(*,*) MYID,':is not belonging to me. IARR,JARR='
-     &        ,IARR,JARR
-              CALL MUMPS_ABORT()
-            END IF
-          ELSE IF ( IARR .GE. 0 ) THEN
-            IF ( IARR .eq. JARR ) THEN
-              IA = PTRARW( IARR )
-              DBLARR( IA ) = DBLARR( IA ) + VAL
-            ELSE
-              IS1 =  PTRAIW(IARR)
-              ISHIFT      = int(INTARR(IS1) + IW4(IARR,2),8)
-              IW4(IARR,2) = IW4(IARR,2) - 1
-              IIW         = IS1 + ISHIFT + 2_8
-              INTARR(IIW)     = JARR
-              IS          = PTRARW(IARR)
-              IAS         = IS + ISHIFT
-              DBLARR(IAS) = VAL
-            END IF
-          ELSE
-            IARR = -IARR
-            ISHIFT      = int(PTRAIW(IARR)+IW4(IARR,1)+2,8)
-            INTARR(ISHIFT)  = JARR
-            IAS         = PTRARW(IARR)+int(IW4(IARR,1),8)
-            IW4(IARR,1) = IW4(IARR,1) - 1
-            DBLARR(IAS)      = VAL
-            IF ( (KEEP(50) .NE. 0 .OR. KEEP(234).NE.0 .OR. .TRUE.)
-     &           .AND.  IW4(IARR,1) .EQ. 0 .AND.
-     &           STEP( IARR) > 0 ) THEN
-              IF (MUMPS_PROCNODE( PROCNODE_STEPS(abs(STEP(IARR))),
-     &                            SLAVEF ) == MYID) THEN
-                TAILLE = INTARR( PTRAIW(IARR) )
-                CALL DMUMPS_QUICK_SORT_ARROWHEADS( N, PERM,
-     &             INTARR( PTRAIW(IARR) + 3 ),
-     &             DBLARR( PTRARW(IARR) + 1 ),
-     &             TAILLE, 1, TAILLE )
+              IF ( KEEP( 46 ) .eq. 0 ) THEN
+                DEST = MASTER_NODE + 1
+              ELSE 
+                DEST = MASTER_NODE
               END IF
             END IF
+            INIV2         = ISTEP_TO_INIV2(ISTEP)
+            IF (I_AM_SLAVE) I_AM_CAND_LOC = I_AM_CAND(INIV2)
+            IF ( KEEP(79) .GT. 0) THEN
+              TYPESPLIT  = MUMPS_TYPESPLIT( PROCNODE_STEPS(ISTEP),
+     &                                      KEEP(199) )
+              IF ( (TYPESPLIT.EQ.5).OR.(TYPESPLIT.EQ.6)) THEN
+                T4_MASTER_CONCERNED = .TRUE.
+                T4MASTER=CANDIDATES(CANDIDATES(SLAVEF+1,INIV2)+1,INIV2)
+                IF ( KEEP(46) .eq. 0 ) THEN
+                 T4MASTER=T4MASTER+1
+                ENDIF
+              ENDIF
+            ENDIF
+          ELSE 
+            ARROW_ROOT = ARROW_ROOT + 1
+            IF (EARLYT3ROOTINS) THEN
+              IF ( ISEND .LT. 0 ) THEN
+                IPOSROOT = RG2L(JSEND)
+                JPOSROOT = RG2L(IARR)
+              ELSE
+                IPOSROOT = RG2L( IARR )
+                JPOSROOT = RG2L( JSEND )
+              END IF
+              IROW_GRID = mod( ( IPOSROOT-1 )/root%MBLOCK, root%NPROW )
+              JCOL_GRID = mod( ( JPOSROOT-1 )/root%NBLOCK, root%NPCOL )
+              IF ( KEEP( 46 ) .eq. 0 ) THEN
+                DEST = IROW_GRID * root%NPCOL + JCOL_GRID + 1
+              ELSE
+                DEST = IROW_GRID * root%NPCOL + JCOL_GRID
+              END IF
+            ELSE
+              DEST = -2
+            ENDIF
+          END IF
+          IF (LSCAL) THEN
+            VAL = ASPK(K)*ROWSCA(IOLD)*COLSCA(JOLD)
+          ELSE
+            VAL = ASPK(K)
           ENDIF
-        END IF
-        IF ( DEST.EQ. -1 ) THEN
-         INIV2 = ISTEP_TO_INIV2(ISTEP)
-         NCAND = CANDIDATES(SLAVEF+1,INIV2)
-         IF (KEEP(79).GT.0) THEN
-          DO I=1, SLAVEF
-           DEST=CANDIDATES(I,INIV2)
-           IF (KEEP(46).EQ.0.AND.(DEST.GE.0)) DEST=DEST+1
-           IF (DEST.LT.0) EXIT 
-           IF (I.EQ.NCAND+1) CYCLE 
-           IF (DEST.NE.0)
-     &     CALL DMUMPS_ARROW_FILL_SEND_BUF( ISEND, JSEND, VAL,
-     &     DEST, BUFI, BUFR, NBRECORDS, NBUFS, 
-     &     LP, COMM, KEEP(46))
-          ENDDO
-         ELSE
-          DO I=1, NCAND
-           DEST=CANDIDATES(I,INIV2)
-           IF (KEEP(46).EQ.0) DEST=DEST+1
-           IF (DEST.NE.0)
-     &     CALL DMUMPS_ARROW_FILL_SEND_BUF( ISEND, JSEND, VAL,
-     &     DEST, BUFI, BUFR, NBRECORDS, NBUFS, 
-     &     LP, COMM, KEEP(46))
-          ENDDO
-         ENDIF
-         DEST = MASTER_NODE
-         IF (KEEP(46).EQ.0) DEST=DEST+1
-         IF ( DEST .NE. 0 ) THEN
-           CALL DMUMPS_ARROW_FILL_SEND_BUF( ISEND, JSEND, VAL,
-     &     DEST, BUFI, BUFR, NBRECORDS, NBUFS, 
-     &     LP, COMM, KEEP(46))
-         ENDIF
-         IF ((T4_MASTER_CONCERNED).AND.(T4MASTER.GT.0)) THEN 
-          CALL DMUMPS_ARROW_FILL_SEND_BUF( ISEND, JSEND, VAL,
-     &     T4MASTER, BUFI, BUFR, NBRECORDS, NBUFS, 
-     &     LP, COMM, KEEP(46))
-         ENDIF 
-        ELSE IF ( DEST .GT. 0 ) THEN
-         CALL DMUMPS_ARROW_FILL_SEND_BUF( ISEND, JSEND, VAL,
-     &    DEST, BUFI, BUFR, NBRECORDS, NBUFS, 
-     &    LP, COMM, KEEP(46))
-         IF ( T4MASTER.GT.0 ) THEN
-          CALL DMUMPS_ARROW_FILL_SEND_BUF( ISEND, JSEND, VAL,
-     &    T4MASTER, BUFI, BUFR, NBRECORDS, NBUFS, 
-     &    LP, COMM, KEEP(46))
-         ENDIF
-        ELSE IF ( T4MASTER.GT.0 ) THEN
-         CALL DMUMPS_ARROW_FILL_SEND_BUF( ISEND, JSEND, VAL,
-     &    T4MASTER, BUFI, BUFR, NBRECORDS, NBUFS, 
-     &    LP, COMM, KEEP(46))
-        END IF
-  120 CONTINUE
-      KEEP(49) = ARROW_ROOT
-      IF (NBUFS.GT.0) THEN
-       CALL DMUMPS_ARROW_FINISH_SEND_BUF(
+          IF ( DEST .eq. 0
+     &       .or. 
+     &        ( DEST .eq. -1 .and. KEEP( 46 ) .eq. 1 .AND.
+     &         ( I_AM_CAND_LOC .OR. MASTER_NODE .EQ. 0 ) )
+     &       .or. 
+     &        ( T4MASTER.EQ.0 )
+     &       .or. 
+     &        ( DEST .EQ. -2 .AND. KEEP( 46 ) .EQ. 1 )
+     &       ) THEN
+            IARR = ISEND  
+            JARR = JSEND
+            IF ( TYPE_NODE .eq. 3 .AND. EARLYT3ROOTINS ) THEN
+              IF ( IROW_GRID .EQ. root%MYROW .AND.
+     &           JCOL_GRID .EQ. root%MYCOL ) THEN
+                ILOCROOT = root%MBLOCK * ( ( IPOSROOT - 1 ) /
+     &                   ( root%MBLOCK * root%NPROW ) )
+     &                 + mod( IPOSROOT - 1, root%MBLOCK ) + 1
+                JLOCROOT = root%NBLOCK * ( ( JPOSROOT - 1 ) /
+     &                   ( root%NBLOCK * root%NPCOL ) )
+     &                 + mod( JPOSROOT - 1, root%NBLOCK ) + 1
+               IF (KEEP(60)==0) THEN
+                 A( PTR_ROOT
+     &             + int(JLOCROOT - 1,8) * int(LOCAL_M,8) 
+     &             + int(ILOCROOT - 1,8) )
+     &           =  A( PTR_ROOT
+     &             + int(JLOCROOT - 1,8) * int(LOCAL_M,8)
+     &             + int(ILOCROOT - 1,8) )
+     &           + VAL
+               ELSE
+                 root%SCHUR_POINTER( int(JLOCROOT - 1,8)
+     &                             * int(root%SCHUR_LLD,8)
+     &                             + int(ILOCROOT,8) )
+     &            = root%SCHUR_POINTER( int(JLOCROOT - 1,8)
+     &                             *    int(root%SCHUR_LLD,8)
+     &                             +    int(ILOCROOT,8))
+     &            + VAL
+               ENDIF
+              ELSE
+                WRITE(*,*) MYID,':INTERNAL Error: root arrowhead '
+                WRITE(*,*) MYID,':is not belonging to me. IARR,JARR='
+     &          ,IARR,JARR
+                CALL MUMPS_ABORT()
+              END IF
+            ELSE IF ( IARR .GE. 0 ) THEN
+              IF ( IARR .eq. JARR ) THEN
+                IA = PTRARW( IARR )
+                DBLARR( IA ) = DBLARR( IA ) + VAL
+              ELSE
+                IS1 =  PTRAIW(IARR)
+                ISHIFT      = int(INTARR(IS1) + IW4(IARR,2),8)
+                IW4(IARR,2) = IW4(IARR,2) - 1
+                INTARR(IS1 + ISHIFT + 2_8) = JARR
+                DBLARR(PTRARW(IARR)+ISHIFT) = VAL
+              END IF
+            ELSE
+              IARR = -IARR
+              ISHIFT      = int(PTRAIW(IARR)+IW4(IARR,1)+2,8)
+              INTARR(ISHIFT)  = JARR
+              IAS         = PTRARW(IARR)+int(IW4(IARR,1),8)
+              IW4(IARR,1) = IW4(IARR,1) - 1
+              DBLARR(IAS)      = VAL
+              IF ( IW4(IARR,1) .EQ. 0 .AND.
+     &             STEP( IARR) > 0 ) THEN
+                IF ( MASTER_NODE == MYID) THEN
+                  TAILLE = INTARR( PTRAIW(IARR) )
+                  CALL DMUMPS_QUICK_SORT_ARROWHEADS( N, PERM,
+     &               INTARR( PTRAIW(IARR) + 3 ),
+     &               DBLARR( PTRARW(IARR) + 1 ),
+     &               TAILLE, 1, TAILLE )
+                END IF
+              END IF
+            END IF
+          END IF
+          IF ( DEST.EQ. -1 ) THEN
+            INIV2 = ISTEP_TO_INIV2(ISTEP)
+            NCAND = CANDIDATES(SLAVEF+1,INIV2)
+            IF (KEEP(79).GT.0) THEN
+              DO I=1, SLAVEF
+                DEST=CANDIDATES(I,INIV2)
+                IF (KEEP(46).EQ.0.AND.(DEST.GE.0)) DEST=DEST+1
+                IF (DEST.LT.0) EXIT 
+                IF (I.EQ.NCAND+1) CYCLE
+                IF (DEST.NE.0) THEN
+                  ISEND_SHR=ISEND; JSEND_SHR=JSEND
+                  VAL_SHR=VAL; DEST_SHR=DEST
+                  CALL DMUMPS_ARROW_FILL_SEND_BUF()
+                ENDIF
+              ENDDO
+            ELSE
+              DO I=1, NCAND
+                DEST=CANDIDATES(I,INIV2)
+                IF (KEEP(46).EQ.0) DEST=DEST+1
+                IF (DEST.NE.0) THEN
+                  ISEND_SHR=ISEND; JSEND_SHR=JSEND
+                  VAL_SHR=VAL; DEST_SHR=DEST
+                  CALL DMUMPS_ARROW_FILL_SEND_BUF()
+                ENDIF
+              ENDDO
+            ENDIF
+            DEST = MASTER_NODE
+            IF (KEEP(46).EQ.0) DEST=DEST+1
+            IF ( DEST .NE. 0 ) THEN
+              ISEND_SHR=ISEND; JSEND_SHR=JSEND
+              VAL_SHR=VAL; DEST_SHR=DEST
+              CALL DMUMPS_ARROW_FILL_SEND_BUF()
+            ENDIF
+            IF ((T4_MASTER_CONCERNED).AND.(T4MASTER.GT.0)) THEN 
+              ISEND_SHR=ISEND; JSEND_SHR=JSEND
+              VAL_SHR=VAL; DEST_SHR=T4MASTER
+              CALL DMUMPS_ARROW_FILL_SEND_BUF()
+            ENDIF
+          ELSE IF ( DEST .GT. 0 ) THEN
+            ISEND_SHR=ISEND; JSEND_SHR=JSEND
+            VAL_SHR=VAL; DEST_SHR=DEST
+            CALL DMUMPS_ARROW_FILL_SEND_BUF()
+            IF ( T4MASTER.GT.0 ) THEN
+              ISEND_SHR=ISEND; JSEND_SHR=JSEND
+              VAL_SHR=VAL; DEST_SHR=T4MASTER
+              CALL DMUMPS_ARROW_FILL_SEND_BUF()
+            ENDIF
+          ELSE IF ( T4MASTER.GT.0 ) THEN
+            ISEND_SHR=ISEND; JSEND_SHR=JSEND
+            VAL_SHR=VAL; DEST_SHR=T4MASTER
+            CALL DMUMPS_ARROW_FILL_SEND_BUF()
+          ELSE IF ( DEST .EQ. -2 ) THEN
+            DO I = 0, SLAVEF-1
+              DEST = I
+              IF (KEEP(46) .EQ. 0) DEST = DEST + 1
+              IF (DEST .NE. 0) THEN
+                ISEND_SHR=ISEND; JSEND_SHR=JSEND
+                VAL_SHR=VAL; DEST_SHR=DEST
+                CALL DMUMPS_ARROW_FILL_SEND_BUF()
+              ENDIF
+            ENDDO
+          ENDIF
+        ENDIF 
+       ENDDO
+      ENDIF
+!$OMP END PARALLEL
+       KEEP(49) = ARROW_ROOT
+       IF (NBUFS.GT.0) THEN
+        CALL DMUMPS_ARROW_FINISH_SEND_BUF(
      &   BUFI, BUFR, NBRECORDS, NBUFS,
      &   LP, COMM, KEEP( 46 ) )
       ENDIF
@@ -510,39 +597,63 @@ C
         DEALLOCATE( BUFR )
       ENDIF
       RETURN
-      END SUBROUTINE DMUMPS_FACTO_SEND_ARROWHEADS
-      SUBROUTINE DMUMPS_ARROW_FILL_SEND_BUF(ISEND, JSEND, VAL,
-     &   DEST, BUFI, BUFR, NBRECORDS, NBUFS, LP, COMM,
-     &   TYPE_PARALL )
+      CONTAINS
+      SUBROUTINE DMUMPS_ARROW_FILL_SEND_BUF()
       IMPLICIT NONE
-      INTEGER ISEND, JSEND, DEST, NBUFS, NBRECORDS, TYPE_PARALL
-      INTEGER BUFI( NBRECORDS * 2 + 1, NBUFS )
-      DOUBLE PRECISION BUFR( NBRECORDS, NBUFS )
-      INTEGER COMM
-      INTEGER LP
-      DOUBLE PRECISION VAL
       INCLUDE 'mpif.h'
       INCLUDE 'mumps_tags.h'
       INTEGER IERR
       INTEGER TAILLE_SENDI, TAILLE_SENDR, IREQ
-         IF (BUFI(1,DEST)+1.GT.NBRECORDS) THEN
-          TAILLE_SENDI = BUFI(1,DEST) * 2 + 1
-          TAILLE_SENDR = BUFI(1,DEST)
-          CALL MPI_SEND(BUFI(1,DEST),TAILLE_SENDI,
+         IF (BUFI(1,DEST_SHR)+1.GT.NBRECORDS) THEN
+          TAILLE_SENDI = BUFI(1,DEST_SHR) * 2 + 1
+          TAILLE_SENDR = BUFI(1,DEST_SHR)
+          CALL MPI_SEND(BUFI(1,DEST_SHR),TAILLE_SENDI,
      &                   MPI_INTEGER,
-     &                   DEST, ARROWHEAD, COMM, IERR )
-          CALL MPI_SEND( BUFR(1,DEST), TAILLE_SENDR,
-     &                   MPI_DOUBLE_PRECISION, DEST,
+     &                   DEST_SHR, ARROWHEAD, COMM, IERR )
+          CALL MPI_SEND( BUFR(1,DEST_SHR), TAILLE_SENDR,
+     &                   MPI_DOUBLE_PRECISION, DEST_SHR,
      &                   ARROWHEAD, COMM, IERR )
-          BUFI(1,DEST) = 0
+          BUFI(1,DEST_SHR) = 0
          ENDIF
-         IREQ = BUFI(1,DEST) + 1
-         BUFI(1,DEST) = IREQ
-         BUFI( IREQ * 2, DEST )     = ISEND
-         BUFI( IREQ * 2 + 1, DEST ) = JSEND
-         BUFR( IREQ, DEST )         = VAL
+         IREQ = BUFI(1,DEST_SHR) + 1
+         BUFI(1,DEST_SHR) = IREQ
+         BUFI( IREQ * 2, DEST_SHR )     = ISEND_SHR
+         BUFI( IREQ * 2 + 1, DEST_SHR ) = JSEND_SHR
+         BUFR( IREQ, DEST_SHR )         = VAL_SHR
       RETURN
       END SUBROUTINE DMUMPS_ARROW_FILL_SEND_BUF
+      END SUBROUTINE DMUMPS_FACTO_SEND_ARROWHEADS
+      SUBROUTINE DMUMPS_ARROW_FILL_SEND_BUF_ELT(
+     &   ISEND_SHR, JSEND_SHR, VAL_SHR,
+     &   DEST_SHR, BUFI, BUFR, NBRECORDS, NBUFS, LP, COMM )
+      IMPLICIT NONE
+      INTEGER, INTENT(in) :: ISEND_SHR, JSEND_SHR
+      DOUBLE PRECISION, INTENT(in) :: VAL_SHR
+      INTEGER :: DEST_SHR, NBRECORDS, NBUFS, LP, COMM
+      INTEGER :: BUFI( NBRECORDS*2+1, NBUFS )
+      DOUBLE PRECISION :: BUFR( NBRECORDS, NBUFS )
+      INCLUDE 'mpif.h'
+      INCLUDE 'mumps_tags.h'
+      INTEGER IERR
+      INTEGER TAILLE_SENDI, TAILLE_SENDR, IREQ
+         IF (BUFI(1,DEST_SHR)+1.GT.NBRECORDS) THEN
+          TAILLE_SENDI = BUFI(1,DEST_SHR) * 2 + 1
+          TAILLE_SENDR = BUFI(1,DEST_SHR)
+          CALL MPI_SEND(BUFI(1,DEST_SHR),TAILLE_SENDI,
+     &                   MPI_INTEGER,
+     &                   DEST_SHR, ARROWHEAD, COMM, IERR )
+          CALL MPI_SEND( BUFR(1,DEST_SHR), TAILLE_SENDR,
+     &                   MPI_DOUBLE_PRECISION, DEST_SHR,
+     &                   ARROWHEAD, COMM, IERR )
+          BUFI(1,DEST_SHR) = 0
+         ENDIF
+         IREQ = BUFI(1,DEST_SHR) + 1
+         BUFI(1,DEST_SHR) = IREQ
+         BUFI( IREQ * 2, DEST_SHR )     = ISEND_SHR
+         BUFI( IREQ * 2 + 1, DEST_SHR ) = JSEND_SHR
+         BUFR( IREQ, DEST_SHR )         = VAL_SHR
+      RETURN
+      END SUBROUTINE DMUMPS_ARROW_FILL_SEND_BUF_ELT
       SUBROUTINE DMUMPS_ARROW_FINISH_SEND_BUF(
      &   BUFI, BUFR, NBRECORDS, NBUFS, LP, COMM,
      &   TYPE_PARALL )
@@ -637,6 +748,7 @@ C
       INTEGER, POINTER, DIMENSION(:) :: BUFI
       DOUBLE PRECISION, POINTER, DIMENSION(:) :: BUFR
       INTEGER, POINTER, DIMENSION(:,:) :: IW4
+      LOGICAL :: EARLYT3ROOTINS
       LOGICAL FINI 
       INTEGER IREC, NB_REC, IARR, JARR, I, allocok
       INTEGER(8) :: I18, IA8, IS18, IIW8, IS8, IAS8
@@ -661,6 +773,8 @@ C
       EXTERNAL numroc
       TYPE_PARALL = KEEP(46)
       ARROW_ROOT=0
+      EARLYT3ROOTINS = KEEP(200) .EQ. 0
+     & .OR. (KEEP(200) .LT. 0 .AND. KEEP(400) .EQ. 0)
       ALLOCATE( BUFI( NBRECORDS * 2 + 1 ), stat = allocok )
       IF ( allocok .GT. 0 ) THEN
         INFO1 = -13
@@ -682,25 +796,16 @@ C
         WRITE(*,*) MYID,': Could not allocate IW4: goto 500'
         GOTO 500
       END IF
-      IF ( KEEP(38).NE.0) THEN
-        IF (KEEP(60)==0) THEN
-         LOCAL_M = numroc( root%ROOT_SIZE, root%MBLOCK,
-     &             root%MYROW, 0, root%NPROW )
-         LOCAL_M = max( 1, LOCAL_M )
-         LOCAL_N = numroc( root%ROOT_SIZE, root%NBLOCK,
-     &             root%MYCOL, 0, root%NPCOL )
-         PTR_ROOT = LA - int(LOCAL_M,8) * int(LOCAL_N,8) + 1_8
-         IF ( PTR_ROOT .LE. LA ) THEN
-           A( PTR_ROOT:LA ) = ZERO
-         END IF
-        ELSE
-         DO I=1, root%SCHUR_NLOC
-           root%SCHUR_POINTER((I-1)*root%SCHUR_LLD+1:
-     &     (I-1)*root%SCHUR_LLD+root%SCHUR_MLOC)=ZERO
-         ENDDO
-        ENDIF
+      IF ( KEEP(38).NE.0 .AND. EARLYT3ROOTINS ) THEN
+        CALL DMUMPS_GET_ROOT_INFO(root, LOCAL_M, LOCAL_N, PTR_ROOT, LA)
+        CALL DMUMPS_SET_ROOT_TO_ZERO(root, KEEP, A, LA)
+      ELSE
+        LOCAL_M = -19999; LOCAL_N = -29999; PTR_ROOT = -99999_8
       END IF
       FINI = .FALSE.
+#if defined(__ve__)
+!NEC$ IVDEP
+#endif
       DO I=1,N
        I18 = PTRAIW(I)
        IA8 = PTRARW(I)
@@ -712,81 +817,80 @@ C
        ENDIF
       ENDDO
       DO WHILE (.NOT.FINI) 
-       CALL MPI_RECV( BUFI(1), 2*NBRECORDS+1, 
+        CALL MPI_RECV( BUFI(1), 2*NBRECORDS+1, 
      &                MPI_INTEGER, MASTER, 
      &                ARROWHEAD,
      &                COMM, STATUS, IERR )
-       NB_REC = BUFI(1)
-       IF (NB_REC.LE.0) THEN
-         FINI = .TRUE.
-         NB_REC = -NB_REC 
-       ENDIF
-       IF (NB_REC.EQ.0) EXIT
-       CALL MPI_RECV( BUFR(1), NBRECORDS, MPI_DOUBLE_PRECISION,
+        NB_REC = BUFI(1)
+        IF (NB_REC.LE.0) THEN
+          FINI = .TRUE.
+          NB_REC = -NB_REC 
+        ENDIF
+        IF (NB_REC.EQ.0) EXIT
+        CALL MPI_RECV( BUFR(1), NBRECORDS, MPI_DOUBLE_PRECISION,
      &                  MASTER, ARROWHEAD,
      &                COMM, STATUS, IERR )
-       DO IREC=1, NB_REC
-        IARR = BUFI( IREC * 2 )
-        JARR = BUFI( IREC * 2 + 1 )
-        VAL  = BUFR( IREC )
-        IF ( MUMPS_TYPENODE( PROCNODE_STEPS(abs(STEP(abs(IARR)))),
-     &                       SLAVEF ) .eq. 3 ) THEN
-          ARROW_ROOT = ARROW_ROOT + 1
-          IF ( IARR .GT. 0 ) THEN
-            IPOSROOT = root%RG2L_ROW( IARR )
-            JPOSROOT = root%RG2L_COL( JARR )
-          ELSE
-            IPOSROOT = root%RG2L_ROW( JARR )
-            JPOSROOT = root%RG2L_COL( -IARR )
-          END IF
+        DO IREC=1, NB_REC
+          IARR = BUFI( IREC * 2 )
+          JARR = BUFI( IREC * 2 + 1 )
+          VAL  = BUFR( IREC )
+          IF ( MUMPS_TYPENODE( PROCNODE_STEPS(abs(STEP(abs(IARR)))),
+     &                         KEEP(199) ) .eq. 3
+     &         .AND.  EARLYT3ROOTINS ) THEN
+            IF ( IARR .GT. 0 ) THEN
+              IPOSROOT = root%RG2L_ROW( IARR )
+              JPOSROOT = root%RG2L_COL( JARR )
+            ELSE
+              IPOSROOT = root%RG2L_ROW( JARR )
+              JPOSROOT = root%RG2L_COL( -IARR )
+            END IF
             ILOCROOT = root%MBLOCK * ( ( IPOSROOT - 1 ) /
-     &                 ( root%MBLOCK * root%NPROW ) )
-     &               + mod( IPOSROOT - 1, root%MBLOCK ) + 1
+     &                ( root%MBLOCK * root%NPROW ) )
+     &              + mod( IPOSROOT - 1, root%MBLOCK ) + 1
             JLOCROOT = root%NBLOCK * ( ( JPOSROOT - 1 ) /
-     &                 ( root%NBLOCK * root%NPCOL ) )
-     &               + mod( JPOSROOT - 1, root%NBLOCK ) + 1
-           IF (KEEP(60)==0) THEN
-             A( PTR_ROOT + int(JLOCROOT - 1,8) * int(LOCAL_M,8)
+     &                ( root%NBLOCK * root%NPCOL ) )
+     &              + mod( JPOSROOT - 1, root%NBLOCK ) + 1
+            IF (KEEP(60)==0) THEN
+              A( PTR_ROOT + int(JLOCROOT - 1,8) * int(LOCAL_M,8)
      &                   + int(ILOCROOT - 1,8) )
-     &       =  A( PTR_ROOT + int(JLOCROOT - 1,8)
+     &        =  A( PTR_ROOT + int(JLOCROOT - 1,8)
      &                      * int(LOCAL_M,8)
      &                      + int(ILOCROOT - 1,8))
-     &        + VAL
-           ELSE
-             root%SCHUR_POINTER( int(JLOCROOT-1,8)
-     &                         * int(root%SCHUR_LLD,8)
-     &                         + int(ILOCROOT,8) )
-     &       = root%SCHUR_POINTER( int(JLOCROOT - 1,8)
-     &                         * int(root%SCHUR_LLD,8)
-     &                         + int(ILOCROOT,8))
-     &       + VAL
-           ENDIF
-        ELSE IF (IARR.GE.0) THEN
-         IF (IARR.EQ.JARR) THEN
-          IA8 = PTRARW(IARR)
-          DBLARR(IA8) = DBLARR(IA8) + VAL
-         ELSE
-          IS18 =  PTRAIW(IARR)
-          ISHIFT       = INTARR(IS18) + IW4(IARR,2)
-          IW4(IARR,2)  = IW4(IARR,2) - 1
-          IIW8         = IS18 + ISHIFT + 2
-          INTARR(IIW8) = JARR
-          IS8          = PTRARW(IARR)
-          IAS8         = IS8 + ISHIFT
-          DBLARR(IAS8) = VAL
-         ENDIF
-        ELSE
-           IARR = -IARR
-           IS8          = PTRAIW(IARR)+IW4(IARR,1)+2
-           INTARR(IS8)  = JARR
-           IAS8         = PTRARW(IARR)+IW4(IARR,1)
-           IW4(IARR,1)  = IW4(IARR,1) - 1
-           DBLARR(IAS8) = VAL
-           IF ( (KEEP(50) .NE. 0 .OR. KEEP(234).NE.0 .OR. .TRUE.)
-     &          .AND.  IW4(IARR,1) .EQ. 0 
-     &          .AND. STEP(IARR) > 0 ) THEN
-              IPROC = MUMPS_PROCNODE( PROCNODE_STEPS(abs(STEP(IARR))),
-     &                                SLAVEF )
+     &           + VAL
+            ELSE
+              root%SCHUR_POINTER( int(JLOCROOT-1,8)
+     &                          * int(root%SCHUR_LLD,8)
+     &                          + int(ILOCROOT,8) )
+     &        = root%SCHUR_POINTER( int(JLOCROOT - 1,8)
+     &                          * int(root%SCHUR_LLD,8)
+     &                          + int(ILOCROOT,8))
+     &          + VAL
+            ENDIF
+          ELSE IF (IARR.GE.0) THEN
+            IF (IARR.EQ.JARR) THEN
+              IA8 = PTRARW(IARR)
+              DBLARR(IA8) = DBLARR(IA8) + VAL
+            ELSE
+              IS18 =  PTRAIW(IARR)
+              ISHIFT       = INTARR(IS18) + IW4(IARR,2)
+              IW4(IARR,2)  = IW4(IARR,2) - 1
+              IIW8         = IS18 + ISHIFT + 2
+              INTARR(IIW8) = JARR
+              IS8          = PTRARW(IARR)
+              IAS8         = IS8 + ISHIFT
+              DBLARR(IAS8) = VAL
+            ENDIF
+          ELSE
+            IARR = -IARR
+            IS8          = PTRAIW(IARR)+IW4(IARR,1)+2
+            INTARR(IS8)  = JARR
+            IAS8         = PTRARW(IARR)+IW4(IARR,1)
+            IW4(IARR,1)  = IW4(IARR,1) - 1
+            DBLARR(IAS8) = VAL
+            IF ( IW4(IARR,1) .EQ. 0 
+     &         .AND. STEP(IARR) > 0 ) THEN
+              IPROC = MUMPS_PROCNODE( PROCNODE_STEPS(STEP(IARR)),
+     &                              KEEP(199) )
               IF ( TYPE_PARALL .eq. 0 ) THEN
                 IPROC = IPROC + 1
               END IF 
@@ -797,9 +901,9 @@ C
      &            DBLARR( PTRARW(IARR) + 1 ),
      &            TAILLE, 1, TAILLE )
               END IF
-           END IF
-        ENDIF
-       ENDDO
+            END IF
+          ENDIF
+        ENDDO
       END DO
       DEALLOCATE( BUFI )
       DEALLOCATE( BUFR )
@@ -808,3 +912,74 @@ C
       KEEP(49) = ARROW_ROOT
       RETURN 
       END SUBROUTINE DMUMPS_FACTO_RECV_ARROWHD2
+      SUBROUTINE DMUMPS_SET_TO_ZERO(A, LLD, M, N, KEEP)
+!$    USE OMP_LIB, ONLY : OMP_GET_MAX_THREADS
+      IMPLICIT NONE
+      INTEGER, INTENT(IN) :: LLD, M, N
+      DOUBLE PRECISION             :: A(int(LLD,8)*int(N-1,8)+int(M,8))
+      INTEGER             :: KEEP(500)
+      DOUBLE PRECISION,    PARAMETER :: ZERO = 0.0D0
+      INTEGER I, J
+!$    INTEGER :: NOMP
+      INTEGER(8) :: I8, LA
+!$    NOMP = OMP_GET_MAX_THREADS()
+      IF (LLD .EQ. M) THEN
+        LA=int(LLD,8)*int(N-1,8)+int(M,8)
+!$OMP   PARALLEL DO PRIVATE(I8) SCHEDULE(STATIC,KEEP(361))
+!$OMP&  IF ( LA > int(KEEP(361),8) .AND. NOMP .GT. 1)
+        DO I8=1, LA
+          A(I8) = ZERO
+        ENDDO
+!$OMP   END PARALLEL DO
+      ELSE
+!$OMP   PARALLEL DO PRIVATE(I,J) COLLAPSE(2)
+!$OMP&  SCHEDULE(STATIC,KEEP(361)) IF (int(M,8)*int(N,8)
+!$OMP&  .GT. KEEP(361).AND. NOMP .GT.1)
+        DO I = 1, N
+          DO J = 1, M
+            A( int(I-1,8)*int(LLD,8)+ int(J,8) ) = ZERO
+          ENDDO
+        ENDDO
+!$OMP   END PARALLEL DO
+      ENDIF
+      RETURN
+      END SUBROUTINE DMUMPS_SET_TO_ZERO
+      SUBROUTINE DMUMPS_SET_ROOT_TO_ZERO(root, KEEP, A, LA)
+      USE DMUMPS_STRUC_DEF, ONLY : DMUMPS_ROOT_STRUC
+      IMPLICIT NONE
+      INTEGER(8), INTENT(IN)   :: LA
+      DOUBLE PRECISION, INTENT(INOUT)   :: A(LA)
+      INTEGER                  :: KEEP(500)
+      TYPE (DMUMPS_ROOT_STRUC) :: root
+      INTEGER :: LOCAL_M, LOCAL_N
+      INTEGER(8) :: PTR_ROOT
+      IF (KEEP(60)==0) THEN
+        CALL DMUMPS_GET_ROOT_INFO(root, LOCAL_M, LOCAL_N, PTR_ROOT, LA)
+        IF (LOCAL_N .GT. 0) THEN 
+          CALL DMUMPS_SET_TO_ZERO(A(PTR_ROOT),
+     &                            LOCAL_M, LOCAL_M, LOCAL_N, KEEP)
+        ENDIF
+      ELSE IF (root%yes) THEN
+        CALL DMUMPS_SET_TO_ZERO(root%SCHUR_POINTER(1),
+     &       root%SCHUR_LLD, root%SCHUR_MLOC, root%SCHUR_NLOC,
+     &       KEEP)
+      ENDIF
+      RETURN
+      END SUBROUTINE DMUMPS_SET_ROOT_TO_ZERO
+      SUBROUTINE DMUMPS_GET_ROOT_INFO(root,
+     &                                LOCAL_M, LOCAL_N, PTR_ROOT, LA)
+      USE DMUMPS_STRUC_DEF, ONLY : DMUMPS_ROOT_STRUC
+      IMPLICIT NONE
+      TYPE (DMUMPS_ROOT_STRUC), INTENT(IN) :: root
+      INTEGER,    INTENT(OUT) :: LOCAL_M, LOCAL_N
+      INTEGER(8), INTENT(OUT) :: PTR_ROOT
+      INTEGER(8), INTENT(IN)  :: LA
+      INTEGER, EXTERNAL :: numroc
+      LOCAL_M = numroc( root%ROOT_SIZE, root%MBLOCK,
+     &         root%MYROW, 0, root%NPROW )
+      LOCAL_M = max( 1, LOCAL_M )
+      LOCAL_N = numroc( root%ROOT_SIZE, root%NBLOCK,
+     &         root%MYCOL, 0, root%NPCOL )
+      PTR_ROOT = LA - int(LOCAL_M,8) * int(LOCAL_N,8) + 1_8
+      RETURN
+      END SUBROUTINE DMUMPS_GET_ROOT_INFO

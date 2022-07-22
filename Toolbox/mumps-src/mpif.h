@@ -1,17 +1,18 @@
 !
-!  This file is part of MUMPS 5.2.1, released
-!  on Fri Jun 14 14:46:05 UTC 2019
+!  This file is part of MUMPS 5.5.1, released
+!  on Tue Jul 12 13:17:24 UTC 2022
 !
 !
-!  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+!  Copyright 1991-2022 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 !  Mumps Technologies, University of Bordeaux.
 !
 !  This version of MUMPS is provided to you free of charge. It is
-!  released under the CeCILL-C license:
-!  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+!  released under the CeCILL-C license 
+!  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+!  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 !
 !
-!      Dummy mpif.h file including symbols used by MUMPS.
+!     Stub mpif.h file including symbols used by MUMPS.
 !
       INTEGER MPI_2DOUBLE_PRECISION
       INTEGER MPI_2INTEGER
@@ -47,7 +48,11 @@
       INTEGER MPI_LAND
       INTEGER MPI_INTEGER8
       INTEGER MPI_REAL8
+      INTEGER MPI_COMM_SELF
       INTEGER MPI_BSEND_OVERHEAD
+      INTEGER MPI_THREAD_SINGLE
+      INTEGER MPI_THREAD_FUNNELED
+      INTEGER MPI_THREAD_MULTIPLE
       PARAMETER (MPI_2DOUBLE_PRECISION=1)
       PARAMETER (MPI_2INTEGER=2)
       PARAMETER (MPI_2REAL=3)
@@ -82,6 +87,10 @@
       PARAMETER (MPI_LAND=32)
       PARAMETER (MPI_INTEGER8=33)
       PARAMETER (MPI_REAL8=34)
+      PARAMETER (MPI_COMM_SELF=35)
+      PARAMETER (MPI_THREAD_SINGLE=36)
+      PARAMETER (MPI_THREAD_FUNNELED=37)
+      PARAMETER (MPI_THREAD_MULTIPLE=38)
 
       INTEGER MPI_IN_PLACE
       COMMON/mpif_libseq/MPI_IN_PLACE

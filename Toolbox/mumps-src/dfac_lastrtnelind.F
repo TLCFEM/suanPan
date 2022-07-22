@@ -1,14 +1,15 @@
 C
-C  This file is part of MUMPS 5.2.1, released
-C  on Fri Jun 14 14:46:05 UTC 2019
+C  This file is part of MUMPS 5.5.1, released
+C  on Tue Jul 12 13:17:24 UTC 2022
 C
 C
-C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2022 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license:
-C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+C  released under the CeCILL-C license 
+C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
       SUBROUTINE DMUMPS_LAST_RTNELIND( COMM_LOAD, ASS_IRECV, 
      &    root, FRERE, IROOT, 
@@ -18,7 +19,7 @@ C
      &    PTLUST_S, PTRFAC,
      &    PTRAST, STEP, PIMASTER, PAMASTER, NSTK_S, COMP,
      &    IFLAG, IERROR, COMM,
-     &    NBPROCFILS,
+     &    PERM,
      &    IPOOL, LPOOL, LEAF,
      &    NBFIN, MYID, SLAVEF,
      &
@@ -55,7 +56,7 @@ C
       INTEGER STEP(N), PIMASTER(KEEP(28))
       INTEGER COMP
       INTEGER NSTK_S( KEEP(28) ), PROCNODE_STEPS( KEEP(28) )
-      INTEGER NBPROCFILS( KEEP(28) )
+      INTEGER PERM(N)
       INTEGER IFLAG, IERROR, COMM
       INTEGER LPTRAR, NELT
       INTEGER FRTPTR( N+1 ), FRTELT( NELT )
@@ -107,12 +108,12 @@ C
      &    PTLUST_S, PTRFAC,
      &    PTRAST, STEP, PIMASTER, PAMASTER, NSTK_S, COMP,
      &    IFLAG, IERROR, COMM, COMM_LOAD,
-     &    NBPROCFILS,
      &    IPOOL, LPOOL, LEAF,
      &    NBFIN, MYID, SLAVEF,
      &
-     &    OPASSW, OPELIW, ITLOC, RHS_MUMPS,
-     &    FILS, DAD, PTRARW, PTRAIW,
+     &    OPASSW, OPELIW, ITLOC, RHS_MUMPS, FILS, DAD,
+     &    LPTRAR, NELT, FRTPTR, FRTELT,
+     &    PTRARW, PTRAIW,
      &    INTARR,DBLARR,ICNTL,KEEP,KEEP8,DKEEP,ND )
        IF (IFLAG < 0 ) RETURN
       HF = 6 + KEEP(IXSZ)
@@ -152,7 +153,7 @@ C
           NELIM_SENT = ILOC_ROW - IOLDPS - HF + 1
           DO ISLAVE = 0,NSLAVES_SON
             IF (ISLAVE.EQ.0) THEN
-             PDEST= MUMPS_PROCNODE(PROCNODE_STEPS(STEP(IN)),SLAVEF)
+             PDEST= MUMPS_PROCNODE(PROCNODE_STEPS(STEP(IN)),KEEP(199))
             ELSE
              PDEST = IW(IPOS_SON + 5 + ISLAVE+KEEP(IXSZ))
             ENDIF
@@ -174,7 +175,7 @@ C
      &       PTLUST_S, PTRFAC,
      &       PTRAST, STEP, PIMASTER, PAMASTER, NSTK_S, COMP,
      &       IFLAG, IERROR, COMM,
-     &       NBPROCFILS,
+     &       PERM,
      &       IPOOL, LPOOL, LEAF,
      &       NBFIN, MYID, SLAVEF,
      &

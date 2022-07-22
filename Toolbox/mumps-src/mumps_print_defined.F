@@ -1,14 +1,15 @@
 C
-C  This file is part of MUMPS 5.2.1, released
-C  on Fri Jun 14 14:46:05 UTC 2019
+C  This file is part of MUMPS 5.5.1, released
+C  on Tue Jul 12 13:17:24 UTC 2022
 C
 C
-C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2022 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license:
-C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+C  released under the CeCILL-C license 
+C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
       SUBROUTINE MUMPS_PRINT_IF_DEFINED(MPG)
       IMPLICIT NONE
@@ -20,6 +21,14 @@ C
 #endif
 #if defined(GEMMT_AVAILABLE)
       write(MPG, *) "MUMPS compiled with option -DGEMMT_AVAILABLE"
+#endif
+#if defined(WORKAROUNDINTELILP64MPI2INTEGER)
+      write(MPG,*) "MUMPS compiled with option"
+     &     ," -DWORKAROUNDINTELILP64MPI2INTEGER"
+#endif
+#if defined(WORKAROUNDILP64MPICUSTOMREDUCE)
+      write(MPG,*) "MUMPS compiled with option"
+     &     ," -DWORKAROUNDILP64MPICUSTOMREDUCE"
 #endif
 #if defined(DETERMINISTIC_PARALLEL_GRAPH)
       write(MPG,*) "MUMPS compiled with option"
@@ -52,12 +61,11 @@ C
 #if defined(MUMPS_USE_BLAS2)
       write(MPG,*) "MUMPS compiled with option -DMUMPS_USE_BLAS2"
 #endif
-      write(MPG,*) "This MUMPS version includes code for SAVE_RESTORE"
-#if defined(NODYNAMICCB)
-      write(MPG,*) "MUMPS compiled with option -DNODYNAMICCB"
-#endif
 #if defined(BLR_MT)
       write(MPG,*) "MUMPS compiled with option -DBLR_MT"
+#endif
+#if defined(NODYNAMICCB)
+      write(MPG,*) "MUMPS compiled with option -DNODYNAMICCB"
 #endif
       write(MPG,*) "================================================="
       RETURN
