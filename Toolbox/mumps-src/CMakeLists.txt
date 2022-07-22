@@ -11,6 +11,11 @@ add_compile_definitions(pord)
 add_compile_definitions(metis)
 add_compile_definitions(MUMPS_ARITH=MUMPS_ARITH_d)
 
+add_compile_definitions(BLR_MT)
+if (USE_MKL)
+    add_compile_definitions(GEMMT_AVAILABLE)
+endif ()
+
 include(../../Driver.cmake)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
