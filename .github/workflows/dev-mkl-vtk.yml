@@ -1,0 +1,76 @@
+name: Dev With MKL VTK
+on:
+  push:
+    branches: [ dev ]
+  pull_request:
+    branches: [ dev ]
+jobs:
+  ubuntu-mkl-vtk-dev:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Clone
+        uses: actions/checkout@v2
+      - name: Install VTK
+        run: |
+          wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+          sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+          echo "deb https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
+          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.1.0-linux.tar.gz
+          tar xf VTK-9.1.0-linux.tar.gz
+      - name: Golang
+        uses: actions/setup-go@v2
+      - name: Compile
+        run: |
+          go build Checker/updater.go
+          sudo apt-get update && sudo apt-get install mesa-common-dev mesa-utils freeglut3-dev libglvnd-dev dpkg-dev xz-utils intel-oneapi-mkl-devel intel-oneapi-compiler-dpcpp-cpp intel-oneapi-compiler-fortran
+          source /opt/intel/oneapi/setvars.sh
+          cmake -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icx -DCMAKE_Fortran_COMPILER=ifx -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.1/ -DUSE_MKL=ON -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DCMAKE_INSTALL_PREFIX=suanPan-linux-mkl-vtk .
+          make install -j"$(nproc)"
+          make package
+      - name: Test
+        run: |
+          export LD_LIBRARY_PATH=/home/runner/work/suanPan/suanPan/suanPan-linux-mkl-vtk/lib
+          ./suanPan-linux-mkl-vtk/bin/suanPan -v
+      - uses: actions/upload-artifact@v3
+        with:
+          name: suanPan-2.5.0-1.x86_64.deb
+          path: suanPan-2.5.0-1.x86_64.deb
+  fedora-mkl-vtk-dev:
+    runs-on: ubuntu-22.04
+    container: fedora:35
+    steps:
+      - name: Setup
+        run: |
+          tee > oneAPI.repo << EOF
+          [oneAPI]
+          name=Intel oneAPI repository
+          baseurl=https://yum.repos.intel.com/oneapi
+          enabled=1
+          gpgcheck=1
+          repo_gpgcheck=1
+          gpgkey=https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+          EOF
+          mv oneAPI.repo /etc/yum.repos.d/
+          dnf upgrade --refresh -y
+          dnf install libglvnd-devel gcc g++ gfortran rpm-build rpm-devel rpmdevtools cmake wget intel-oneapi-mkl-devel intel-oneapi-compiler-dpcpp-cpp intel-oneapi-compiler-fortran git procps -y
+          git config --global --add safe.directory /__w/suanPan/suanPan
+      - name: Clone
+        uses: actions/checkout@v2
+      - name: Install MKL VTK
+        run: |
+          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.1.0-linux.tar.gz
+          tar xf VTK-9.1.0-linux.tar.gz
+      - name: Compile
+        run: |
+          source /opt/intel/oneapi/setvars.sh
+          cmake -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icx -DCMAKE_Fortran_COMPILER=ifx -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.1/ -DUSE_MKL=ON -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DLINK_DYNAMIC_MKL=OFF .
+          make package -j"$(nproc)"
+      - name: Test
+        run: |
+          dnf install ./suanPan-2.5.0-1.x86_64.rpm -y
+          suanPan -v
+      - name: Upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: suanPan-2.5.0-1.x86_64.rpm
+          path: suanPan-2.5.0-1.x86_64.rpm

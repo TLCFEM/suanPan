@@ -2,6 +2,12 @@ cmake_minimum_required(VERSION 3.13.0)
 
 project(mumps C Fortran)
 
+# ifx does not compile properly due to potential memory allocation issues
+if (CMAKE_Fortran_COMPILER MATCHES "ifx")
+    set(CMAKE_Fortran_COMPILER "ifort")
+    string(REPLACE "fiopenmp" "fopenmp" CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS}")
+endif ()
+
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../../Libs)
 
 include_directories(.)
@@ -11,12 +17,17 @@ add_compile_definitions(pord)
 add_compile_definitions(metis)
 add_compile_definitions(MUMPS_ARITH=MUMPS_ARITH_d)
 
+add_compile_definitions(BLR_MT)
+if (USE_MKL)
+    add_compile_definitions(GEMMT_AVAILABLE)
+endif ()
+
 include(../../Driver.cmake)
 
-if ((CMAKE_C_COMPILER_ID MATCHES "GNU") OR (CMAKE_C_COMPILER_ID MATCHES "Clang")) # GNU GCC COMPILER
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
-else () # MSVC COMPILER
+if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W0")
+else ()
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
 endif ()
 
 file(GLOB mumps_f "*.F")

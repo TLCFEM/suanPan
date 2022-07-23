@@ -53,6 +53,9 @@ void gkfooo() { return; }
 #endif
 
 #include "GKlib.h"
+#ifndef _MSC_BUILD
+#include <strings.h>
+#endif
 
 
 /******************************************************************************/

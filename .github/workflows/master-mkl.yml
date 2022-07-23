@@ -6,7 +6,7 @@ on:
     branches: [ master ]
 jobs:
   ubuntu-mkl:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Clone
         uses: actions/checkout@v2
@@ -20,7 +20,6 @@ jobs:
         uses: actions/setup-go@v2
       - name: Compile
         run: |
-          export CC=gcc-10 && export CXX=g++-10 && export FC=gfortran-10
           go build Checker/updater.go
           sudo apt-get update && sudo apt-get install intel-oneapi-mkl-devel
           cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_MKL=ON -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DUSE_INTEL_OPENMP=OFF -DLINK_DYNAMIC_MKL=OFF -DCMAKE_INSTALL_PREFIX=suanPan-linux-mkl .

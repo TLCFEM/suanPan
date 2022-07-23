@@ -78,22 +78,8 @@
 #endif
 
 // SUANPAN_VERSION SUANPAN_COMPILER
-// __GNUG__ --> GCC
-#ifdef __GNUG__
-#define SUANPAN_VERSION __VERSION__
-#define SUANPAN_COMPILER "GCC"
-#define SUANPAN_GCC
-#endif
-// _MSC_BUILD --> MSVC
-#ifdef _MSC_BUILD
-#define SUANPAN_VERSION _MSC_FULL_VER
-#define SUANPAN_COMPILER "MSVC"
-#define SUANPAN_MSVC
-// cuda unused local function
-#pragma warning(disable : 4505)
-#endif
-// __clang__ --> clang
 #ifdef __clang__
+// __clang__ --> clang
 #ifdef SUANPAN_VERSION
 #undef SUANPAN_VERSION
 #endif
@@ -103,9 +89,20 @@
 #endif
 #define SUANPAN_COMPILER "CLANG"
 #define SUANPAN_CLANG
-#endif
+#elif defined(__GNUG__)
+// __GNUG__ --> GCC
+#define SUANPAN_VERSION __VERSION__
+#define SUANPAN_COMPILER "GCC"
+#define SUANPAN_GCC
+#elif defined(_MSC_BUILD)
+// _MSC_BUILD --> MSVC
+#define SUANPAN_VERSION _MSC_FULL_VER
+#define SUANPAN_COMPILER "MSVC"
+#define SUANPAN_MSVC
+// cuda unused local function
+#pragma warning(disable : 4505)
+#elif defined(__ICC)
 // __ICC --> Intel C++
-#ifdef __ICC
 #define SUANPAN_VERSION __ICC
 #define SUANPAN_COMPILER "INTEL"
 #define SUANPAN_INTEL
@@ -115,9 +112,8 @@
 #ifndef SUANPAN_UNIX
 #define SUANPAN_UNIX
 #endif
-#endif
+#elif defined(__ICL)
 // __ICL --> Intel C++
-#ifdef __ICL
 #define SUANPAN_VERSION __ICL
 #define SUANPAN_COMPILER "INTEL"
 #define SUANPAN_INTEL
@@ -237,7 +233,7 @@ namespace suanpan {
     }
 }
 
-#ifdef SUANPAN_CLANG
+#if defined(SUANPAN_CLANG) && !defined(__INTEL_LLVM_COMPILER)
 // as of clang 13, ranges support is not complete
 namespace std::ranges {
     template<class IN, class OUT, class FN> OUT transform(IN& from, OUT to, FN&& func) { return std::transform(from.begin(), from.end(), to, std::forward<FN>(func)); }

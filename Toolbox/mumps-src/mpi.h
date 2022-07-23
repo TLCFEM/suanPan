@@ -26,7 +26,7 @@
    #define LIBSEQ_CALL
    #define LIBSEQ_CALL __declspec(dllexport)
    #define LIBSEQ_CALL __declspec(dllexport) */
-#define LIBSEQ_CALL
+#define LIBSEQ_CALL __declspec(dllexport)
 #else
 #define LIBSEQ_CALL
 #endif
