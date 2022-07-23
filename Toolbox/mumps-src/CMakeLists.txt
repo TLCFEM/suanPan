@@ -5,7 +5,6 @@ project(mumps C Fortran)
 # ifx does not compile properly due to potential memory allocation issues
 if (CMAKE_Fortran_COMPILER MATCHES "ifx")
     set(CMAKE_Fortran_COMPILER "ifort")
-    string(REPLACE "fiopenmp" "fopenmp" CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS}")
 endif ()
 
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../../Libs)
