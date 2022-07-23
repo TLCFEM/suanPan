@@ -54,9 +54,9 @@ void NodeGroup::initialize(const shared_ptr<DomainBase>& D) {
 
             if(0 == size) continue;
 
-            const vec s_point(access::rwp(s_node.mem), size, false, true);
-            const vec e_point(access::rwp(e_node.mem), size, false, true);
-            const vec m_point(access::rwp(J.mem), size, false, true);
+            const vec s_point(s_node.mem, size);
+            const vec e_point(e_node.mem, size);
+            const vec m_point(J.mem, size);
 
             if(const auto denom = e_point(0) - s_point(0); fabs(denom) >= 1E-8) {
                 if(const auto T = (m_point(0) - s_point(0)) / denom; T >= 0. && T <= 1.) {
@@ -89,7 +89,7 @@ void NodeGroup::initialize(const shared_ptr<DomainBase>& D) {
 
             if(0 == size) continue;
 
-            if(const vec part(access::rwp(rule.mem), size, false, true), m_point(access::rwp(J.mem), size, false, true); fabs(dot(part, m_point) + rule.back()) <= 1E-8) pond.emplace_back(I->get_tag());
+            if(const vec part(rule.mem, size), m_point(J.mem, size); fabs(dot(part, m_point) + rule.back()) <= 1E-8) pond.emplace_back(I->get_tag());
         }
     else
         // generate by polynomial curve fitting

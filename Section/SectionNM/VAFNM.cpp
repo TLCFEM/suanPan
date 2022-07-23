@@ -20,7 +20,7 @@
 
 int VAFNM::compute_local_integration(vec& q, mat& jacobian) {
     trial_history = current_history;
-    const vec current_beta(&current_history(0), d_size, false, true);
+    const vec current_beta(&current_history(0), d_size);
     const auto &ani = current_history(d_size), &anj = current_history(d_size + 1llu);
 
     vec beta(&trial_history(0), d_size, false, true);

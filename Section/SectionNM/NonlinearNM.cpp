@@ -99,7 +99,7 @@ int NonlinearNM::update_trial_status(const vec& t_deformation) {
 
     const vec trial_q = trial_resistance.head(d_size) / yield_diag;
 
-    const vec current_beta(&current_history(0), d_size, false, true);
+    const vec current_beta(&current_history(0), d_size);
     const vec bni = current_beta(ni), bnj = current_beta(nj);
     const auto &ani = current_history(d_size), &anj = current_history(d_size + 1llu);
 

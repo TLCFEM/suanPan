@@ -112,7 +112,7 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
     // check if yield
 
-    const vec current_alpha(&current_history(0), 6, false, true);
+    const vec current_alpha(&current_history(0), 6);
 
     vec eta = s + p * current_alpha;
     auto norm_eta = tensor::stress::norm(eta);
@@ -137,7 +137,7 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
     // yield function violated
 
-    const vec current_z(&current_history(6), 6, false, true);
+    const vec current_z(&current_history(6), 6);
 
     trial_history = current_history;
     vec alpha(&trial_history(0), 6, false, true);

@@ -481,8 +481,8 @@ int CDPM2::update_trial_status(const vec& t_strain) {
 
     const auto& omegat = trial_history(16);
     const auto& omegac = trial_history(17);
-    const rowvec pot(&data(0), 4, false, true);
-    const rowvec poc(&data(4), 4, false, true);
+    const rowvec pot(&data(0), 4);
+    const rowvec poc(&data(4), 4);
     const auto& pocpac = data(8);
 
     const rowvec potpe = pot * left;

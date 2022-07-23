@@ -47,7 +47,7 @@ void LeeNewmark::update_residual() const {
     auto& t_residual = access::rw(residual);
 
     for(uword I = 0, J = n_block, K = J + n_block - 1; I < n_damping; ++I, J += n_block, K += n_block) {
-        const vec n_internal(access::rwp(&trial_internal(J)), n_block, false, true);
+        const vec n_internal(&trial_internal(J), n_block);
         t_residual.rows(J, K) = current_mass * vec(t_vel - n_internal) * mass_coef(I) - current_stiffness * n_internal * stiffness_coef(I);
     }
 }
@@ -176,7 +176,7 @@ void LeeNewmark::assemble_resistance() {
     if(nullptr != current_mass) {
         vec internal_velocity = CM * W->get_trial_velocity();
         for(uword I = 0, J = n_block; I < n_damping; ++I, J += n_block) {
-            const vec n_internal(&trial_internal(J), n_block, false, true);
+            const vec n_internal(&trial_internal(J), n_block);
             internal_velocity -= mass_coef(I) * n_internal;
         }
         W->update_trial_damping_force(W->get_trial_damping_force() + current_mass * internal_velocity);

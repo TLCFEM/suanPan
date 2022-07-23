@@ -98,7 +98,7 @@ template<sp_d T> int SparseMatBaseFGMRES<T>::direct_solve(Mat<T>& X, const Mat<T
                 break;
             }
             if(request != 1) return request;
-            const vec xn(&work[ipar[21] - 1llu], X.n_rows, false, true);
+            const vec xn(&work[ipar[21] - 1llu], X.n_rows);
             // ReSharper disable once CppInitializedValueIsAlwaysRewritten
             // ReSharper disable once CppEntityAssignedButNoRead
             vec yn(&work[ipar[22] - 1llu], X.n_rows, false, true);

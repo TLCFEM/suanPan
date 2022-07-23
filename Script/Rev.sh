@@ -22,7 +22,7 @@ else
 fi
 
 # sleep random time to avoid git conflict in parallel execution
-sleep .$((((RANDOM % 10)) + 1))s
+sleep $((RANDOM % 4)).$((((RANDOM % 10)) + 1))s
 
 git_rev=$(git rev-parse --short=8 HEAD)
 
