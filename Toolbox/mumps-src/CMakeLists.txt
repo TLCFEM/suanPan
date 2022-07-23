@@ -2,8 +2,10 @@ cmake_minimum_required(VERSION 3.13.0)
 
 project(mumps C Fortran)
 
+# ifx does not compile properly due to potential memory allocation issues
 if (CMAKE_Fortran_COMPILER MATCHES "ifx")
     set(CMAKE_Fortran_COMPILER "ifort")
+    string(REPLACE "fiopenmp" "fopenmp" CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS}")
 endif ()
 
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../../Libs)
@@ -18,7 +20,6 @@ add_compile_definitions(MUMPS_ARITH=MUMPS_ARITH_d)
 add_compile_definitions(BLR_MT)
 if (USE_MKL)
     add_compile_definitions(GEMMT_AVAILABLE)
-    string(REPLACE "fiopenmp" "fopenmp" CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS}")
 endif ()
 
 include(../../Driver.cmake)
