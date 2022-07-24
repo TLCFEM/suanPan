@@ -26,8 +26,8 @@
  * @{
  */
 
-#ifndef ILU_H
-#define ILU_H
+#ifndef ILU_HPP
+#define ILU_HPP
 
 #ifndef SUANPAN_SUPERLUMT
 
@@ -58,7 +58,7 @@ template<sp_d data_t> class ILU final : public Preconditioner<data_t> {
 
     static void wrap_mat(SuperMatrix*, const Col<data_t>&);
 
-    template<sp_i index_t> void init(triplet_form<data_t, index_t>&  );
+    template<sp_i index_t> void init(triplet_form<data_t, index_t>&);
 
 public:
     template<sp_i index_t> explicit ILU(triplet_form<data_t, index_t>&& triplet_mat);
@@ -81,14 +81,10 @@ template<sp_d data_t> void ILU<data_t>::wrap_mat(SuperMatrix* out, const Col<dat
 }
 
 template<sp_d data_t> template<sp_i index_t> ILU<data_t>::ILU(triplet_form<data_t, index_t>&& triplet_mat)
-    : Preconditioner<data_t>() {
-    init(triplet_mat);
-}
+    : Preconditioner<data_t>() { init(triplet_mat); }
 
 template<sp_d data_t> template<sp_i index_t> ILU<data_t>::ILU(triplet_form<data_t, index_t>& triplet_mat)
-    : Preconditioner<data_t>() {
-    init(triplet_mat);
-}
+    : Preconditioner<data_t>() { init(triplet_mat); }
 
 template<sp_d data_t> ILU<data_t>::~ILU() {
     Destroy_SuperMatrix_Store(&A);
@@ -130,9 +126,7 @@ template<sp_d data_t> Col<data_t> ILU<data_t>::apply(const Col<data_t>& in) {
     return out;
 }
 
-template<sp_d data_t>
-template<sp_i index_t>
-void ILU<data_t>::init(triplet_form<data_t, index_t>&triplet_mat) {
+template<sp_d data_t> template<sp_i index_t> void ILU<data_t>::init(triplet_form<data_t, index_t>& triplet_mat) {
     csc_form<data_t, int> csc_mat(triplet_mat);
 
     auto t_size = sizeof(data_t) * csc_mat.n_elem;

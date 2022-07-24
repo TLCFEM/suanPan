@@ -26,8 +26,8 @@
  * @{
  */
 
-#ifndef PRECONDITIONER_H
-#define PRECONDITIONER_H
+#ifndef PRECONDITIONER_HPP
+#define PRECONDITIONER_HPP
 
 #include <suanPan.h>
 

@@ -21,13 +21,13 @@
  * @author tlc
  * @date 21/07/2022
  * @version 0.1.0
- * @file Jacobi.h
+ * @file Jacobi.hpp
  * @addtogroup Preconditioner
  * @{
  */
 
-#ifndef JACOBI_H
-#define JACOBI_H
+#ifndef JACOBI_HPP
+#define JACOBI_HPP
 
 #include "Preconditioner.hpp"
 
@@ -35,25 +35,21 @@ template<sp_d data_t> class Jacobi final : public Preconditioner<data_t> {
     const Col<data_t> diag_reciprocal;
 
 public:
-    template<typename Container> explicit Jacobi(const Container& in_mat);
+    template<typename Container> explicit Jacobi(const Container& in_mat)
+        : Preconditioner<data_t>()
+        , diag_reciprocal(1. / Col<data_t>(in_mat.diag())) {}
 
-    explicit Jacobi(Col<data_t>&&);
+    explicit Jacobi(Col<data_t>&& in_diag)
+        : Preconditioner<data_t>()
+        , diag_reciprocal(1. / in_diag) {}
 
     [[nodiscard]] Col<data_t> apply(const Col<data_t>&) override;
 };
 
-template<sp_d data_t> template<typename Container> Jacobi<data_t>::Jacobi(const Container& in_mat)
-    : Preconditioner<data_t>()
-    , diag_reciprocal(1. / Col<data_t>(in_mat.diag())) {}
-
-template<sp_d data_t> Jacobi<data_t>::Jacobi(Col<data_t>&& in_diag)
-    : Preconditioner<data_t>()
-    , diag_reciprocal(1. / in_diag) {}
-
 template<sp_d data_t> Col<data_t> Jacobi<data_t>::apply(const Col<data_t>& in) {
     vec out = in;
 
-    for(auto I = 0llu; I < in.n_elem; I += diag_reciprocal.n_elem) out.subvec(I, size(diag_reciprocal)) %= diag_reciprocal;
+    for(auto I = 0llu; I < in.n_elem; I += diag_reciprocal.n_elem) out.subvec(I, arma::size(diag_reciprocal)) %= diag_reciprocal;
 
     return out;
 }
