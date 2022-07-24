@@ -15,5 +15,3 @@ target_sources(${PROJECT_NAME} PRIVATE
         Storage.hpp
         Tag.cpp
         )
-
-add_subdirectory(MetaMat)

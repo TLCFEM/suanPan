@@ -18,7 +18,7 @@
 #ifndef SOLVERSETTING_HPP
 #define SOLVERSETTING_HPP
 
-#include "Preconditioner/Preconditioner.h"
+#include "Preconditioner.hpp"
 
 enum class Precision {
     MIXED,
@@ -31,6 +31,12 @@ enum class IterativeSolver {
     NONE
 };
 
+enum class PreconditionerType {
+    ILU,
+    JACOBI,
+    NONE
+};
+
 template<sp_d data_t> struct SolverSetting {
     int restart = 20;
     int max_iteration = 200;
@@ -38,36 +44,8 @@ template<sp_d data_t> struct SolverSetting {
     unsigned iterative_refinement = 5;
     Precision precision = Precision::FULL;
     IterativeSolver iterative_solver = IterativeSolver::NONE;
-    unique_ptr<Preconditioner> preconditioner = nullptr;
-
-    SolverSetting() = default;
-
-    SolverSetting(const SolverSetting& other)
-        : restart(other.restart)
-        , max_iteration(other.max_iteration)
-        , tolerance(other.tolerance)
-        , iterative_refinement(other.iterative_refinement)
-        , precision(other.precision)
-        , iterative_solver(other.iterative_solver)
-        , preconditioner(other.preconditioner ? other.preconditioner->get_copy() : nullptr) {}
-
-    SolverSetting(SolverSetting&&) noexcept = delete;
-
-    SolverSetting& operator=(const SolverSetting& other) {
-        if(this == &other) return *this;
-        restart = other.restart;
-        max_iteration = other.max_iteration;
-        tolerance = other.tolerance;
-        iterative_refinement = other.iterative_refinement;
-        precision = other.precision;
-        iterative_solver = other.iterative_solver;
-        preconditioner = other.preconditioner ? other.preconditioner->get_copy() : nullptr;
-        return *this;
-    }
-
-    SolverSetting& operator=(SolverSetting&&) noexcept = delete;
-
-    ~SolverSetting() = default;
+    PreconditionerType preconditioner_type = PreconditionerType::JACOBI;
+    Preconditioner<data_t>* preconditioner = nullptr;
 };
 
 #endif

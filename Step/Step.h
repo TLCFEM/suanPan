@@ -110,6 +110,7 @@ public:
     void set_max_substep(unsigned);
     void set_system_solver(SolverType);
     void set_system_solver(IterativeSolver);
+    void set_preconditioner(PreconditionerType);
     void set_precision(Precision);
     void set_tolerance(double);
     void set_refinement(unsigned);

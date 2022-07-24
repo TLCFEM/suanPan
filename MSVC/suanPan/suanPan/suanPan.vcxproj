@@ -150,7 +150,6 @@
     <ClCompile Include="..\..\..\Domain\Group\Group.cpp" />
     <ClCompile Include="..\..\..\Domain\Group\GroupGroup.cpp" />
     <ClCompile Include="..\..\..\Domain\Group\NodeGroup.cpp" />
-    <ClCompile Include="..\..\..\Domain\MetaMat\Preconditioner\Jacobi.cpp" />
     <ClCompile Include="..\..\..\Domain\Node.cpp" />
     <ClCompile Include="..\..\..\Domain\Tag.cpp" />
     <ClCompile Include="..\..\..\Element\Beam\B21.cpp" />
@@ -559,11 +558,12 @@
     <ClInclude Include="..\..\..\Domain\MetaMat\DenseMat.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\FullMat.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\FullMatCUDA.hpp" />
+    <ClInclude Include="..\..\..\Domain\MetaMat\ILU.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\IterativeSolver.hpp" />
+    <ClInclude Include="..\..\..\Domain\MetaMat\Jacobi.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\MetaMat.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\operator_times.hpp" />
-    <ClInclude Include="..\..\..\Domain\MetaMat\Preconditioner\Jacobi.h" />
-    <ClInclude Include="..\..\..\Domain\MetaMat\Preconditioner\Preconditioner.h" />
+    <ClInclude Include="..\..\..\Domain\MetaMat\Preconditioner.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\SolverSetting.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\SparseMat.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\SparseMatCUDA.hpp" />

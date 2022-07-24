@@ -31,7 +31,8 @@
 
 #include "triplet_form.hpp"
 #include "IterativeSolver.hpp"
-#include "Preconditioner/Jacobi.h"
+#include "ILU.hpp"
+#include "Jacobi.hpp"
 
 template<typename T, typename U> concept ArmaContainer = std::is_floating_point_v<U> && (std::is_convertible_v<T, Mat<U>> || std::is_convertible_v<T, SpMat<U>>) ;
 
@@ -173,9 +174,19 @@ template<sp_d T> Mat<T> MetaMat<T>::iterative_solve(const Mat<T>& B) {
 template<sp_d T> Mat<T> MetaMat<T>::iterative_solve(const SpMat<T>& B) { return this->iterative_solve(mat(B)); }
 
 template<sp_d T> int MetaMat<T>::iterative_solve(Mat<T>& X, const Mat<T>& B) {
-    X = B;
+    X.zeros(arma::size(B));
 
-    if(nullptr == this->setting.preconditioner) this->setting.preconditioner = std::make_unique<Jacobi>(this->diag());
+    unique_ptr<Preconditioner<T>> preconditioner;
+    if(PreconditionerType::JACOBI == this->setting.preconditioner_type) preconditioner = std::make_unique<Jacobi<T>>(this->diag());
+#ifndef SUANPAN_SUPERLUMT
+    else if(PreconditionerType::ILU == this->setting.preconditioner_type) {
+        if(this->triplet_mat.is_empty()) preconditioner = std::make_unique<ILU<T>>(to_triplet_form<T, int>(this));
+        else preconditioner = std::make_unique<ILU<T>>(this->triplet_mat);
+    }
+#endif
+    else if(PreconditionerType::NONE == this->setting.preconditioner_type) preconditioner = std::make_unique<UnityPreconditioner<T>>();
+
+    this->setting.preconditioner = preconditioner.get();
 
     std::atomic_int code = 0;
 
@@ -240,7 +251,7 @@ template<sp_d data_t, sp_i index_t> Mat<data_t> to_mat(const csc_form<data_t, in
     return out_mat;
 }
 
-template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> to_triplet_form(const shared_ptr<MetaMat<data_t>>& in_mat) {
+template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> to_triplet_form(MetaMat<data_t>* in_mat) {
     if(!in_mat->triplet_mat.is_empty()) return triplet_form<data_t, index_t>(in_mat->triplet_mat);
 
     const sp_i auto n_rows = index_t(in_mat->n_rows);
@@ -252,6 +263,8 @@ template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> to_triplet_for
 
     return out_mat;
 }
+
+template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> to_triplet_form(const shared_ptr<MetaMat<data_t>>& in_mat) { return to_triplet_form<data_t, index_t>(in_mat.get()); }
 
 #endif
 
