@@ -58,7 +58,10 @@ template<sp_d data_t> class ILU final : public Preconditioner<data_t> {
 
     static void wrap_mat(SuperMatrix*, const Col<data_t>&);
 
+    template<sp_i index_t> void init(triplet_form<data_t, index_t>&  );
+
 public:
+    template<sp_i index_t> explicit ILU(triplet_form<data_t, index_t>&& triplet_mat);
     template<sp_i index_t> explicit ILU(triplet_form<data_t, index_t>& triplet_mat);
 
     ~ILU() override;
@@ -77,45 +80,14 @@ template<sp_d data_t> void ILU<data_t>::wrap_mat(SuperMatrix* out, const Col<dat
     }
 }
 
+template<sp_d data_t> template<sp_i index_t> ILU<data_t>::ILU(triplet_form<data_t, index_t>&& triplet_mat)
+    : Preconditioner<data_t>() {
+    init(triplet_mat);
+}
+
 template<sp_d data_t> template<sp_i index_t> ILU<data_t>::ILU(triplet_form<data_t, index_t>& triplet_mat)
     : Preconditioner<data_t>() {
-    csc_form<data_t, int> csc_mat(triplet_mat);
-
-    auto t_size = sizeof(data_t) * csc_mat.n_elem;
-    t_val = superlu_malloc(t_size);
-    std::memcpy(t_val, (void*)csc_mat.val_mem(), t_size);
-
-    t_size = sizeof(int) * csc_mat.n_elem;
-    t_row = (int*)superlu_malloc(t_size);
-    std::memcpy(t_row, (void*)csc_mat.row_mem(), t_size);
-
-    t_size = sizeof(int) * (csc_mat.n_cols + 1llu);
-    t_col = (int*)superlu_malloc(t_size);
-    std::memcpy(t_col, (void*)csc_mat.col_mem(), t_size);
-
-    if(std::is_same_v<data_t, float>) {
-        using E = float;
-        sCreate_CompCol_Matrix(&A, csc_mat.n_rows, csc_mat.n_cols, csc_mat.n_elem, (E*)t_val, t_row, t_col, Stype_t::SLU_NC, Dtype_t::SLU_S, Mtype_t::SLU_GE);
-    }
-    else {
-        using E = double;
-        dCreate_CompCol_Matrix(&A, csc_mat.n_rows, csc_mat.n_cols, csc_mat.n_elem, (E*)t_val, t_row, t_col, Stype_t::SLU_NC, Dtype_t::SLU_D, Mtype_t::SLU_GE);
-    }
-
-    perm_r = (int*)superlu_malloc(sizeof(int) * (csc_mat.n_rows + 1llu));
-    perm_c = (int*)superlu_malloc(sizeof(int) * (csc_mat.n_cols + 1llu));
-    scale_r = superlu_malloc(sizeof(data_t) * (csc_mat.n_rows + 1llu));
-    scale_c = superlu_malloc(sizeof(data_t) * (csc_mat.n_cols + 1llu));
-
-    etree = (int*)superlu_malloc(sizeof(int) * (csc_mat.n_cols + 1llu));
-
-    ilu_set_default_options(&options);
-
-    StatInit(&stat);
-
-    const auto unused = this->apply(vec(csc_mat.n_cols, 1, fill::zeros));
-
-    options.Fact = superlu::FACTORED;
+    init(triplet_mat);
 }
 
 template<sp_d data_t> ILU<data_t>::~ILU() {
@@ -156,6 +128,48 @@ template<sp_d data_t> Col<data_t> ILU<data_t>::apply(const Col<data_t>& in) {
     Destroy_SuperMatrix_Store(&Y);
 
     return out;
+}
+
+template<sp_d data_t>
+template<sp_i index_t>
+void ILU<data_t>::init(triplet_form<data_t, index_t>&triplet_mat) {
+    csc_form<data_t, int> csc_mat(triplet_mat);
+
+    auto t_size = sizeof(data_t) * csc_mat.n_elem;
+    t_val = superlu_malloc(t_size);
+    std::memcpy(t_val, (void*)csc_mat.val_mem(), t_size);
+
+    t_size = sizeof(int) * csc_mat.n_elem;
+    t_row = (int*)superlu_malloc(t_size);
+    std::memcpy(t_row, (void*)csc_mat.row_mem(), t_size);
+
+    t_size = sizeof(int) * (csc_mat.n_cols + 1llu);
+    t_col = (int*)superlu_malloc(t_size);
+    std::memcpy(t_col, (void*)csc_mat.col_mem(), t_size);
+
+    if(std::is_same_v<data_t, float>) {
+        using E = float;
+        sCreate_CompCol_Matrix(&A, csc_mat.n_rows, csc_mat.n_cols, csc_mat.n_elem, (E*)t_val, t_row, t_col, Stype_t::SLU_NC, Dtype_t::SLU_S, Mtype_t::SLU_GE);
+    }
+    else {
+        using E = double;
+        dCreate_CompCol_Matrix(&A, csc_mat.n_rows, csc_mat.n_cols, csc_mat.n_elem, (E*)t_val, t_row, t_col, Stype_t::SLU_NC, Dtype_t::SLU_D, Mtype_t::SLU_GE);
+    }
+
+    perm_r = (int*)superlu_malloc(sizeof(int) * (csc_mat.n_rows + 1llu));
+    perm_c = (int*)superlu_malloc(sizeof(int) * (csc_mat.n_cols + 1llu));
+    scale_r = superlu_malloc(sizeof(data_t) * (csc_mat.n_rows + 1llu));
+    scale_c = superlu_malloc(sizeof(data_t) * (csc_mat.n_cols + 1llu));
+
+    etree = (int*)superlu_malloc(sizeof(int) * (csc_mat.n_cols + 1llu));
+
+    ilu_set_default_options(&options);
+
+    StatInit(&stat);
+
+    const auto unused = this->apply(vec(csc_mat.n_cols, 1, fill::zeros));
+
+    options.Fact = superlu::FACTORED;
 }
 
 #endif
