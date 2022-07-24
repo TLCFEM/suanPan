@@ -31,9 +31,9 @@ step dynamic 2 6
 set ini_step_size .02
 set fixed_step_size 1
 set sparse_mat 1
-set system_solver BiCGSTAB
+set system_solver GMRES
 set preconditioner ILU
-set tolerance 1E-7
+set tolerance 1E-10
 
 integrator LeeNewmarkFull 1 .25 .5 \
 -type0 .005 1 \
