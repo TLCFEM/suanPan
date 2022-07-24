@@ -31,10 +31,10 @@
 
 #ifndef SUANPAN_SUPERLUMT
 
-#include "Preconditioner.hpp"
 #include <superlu-mt/superlu-mt.h>
-#include "Domain/MetaMat/csc_form.hpp"
-#include "Domain/MetaMat/triplet_form.hpp"
+#include "Preconditioner.hpp"
+#include "csc_form.hpp"
+#include "triplet_form.hpp"
 
 template<sp_d data_t> class ILU final : public Preconditioner<data_t> {
     SuperMatrix A{}, L{}, U{};

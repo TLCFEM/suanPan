@@ -39,10 +39,6 @@ public:
         : Preconditioner<data_t>()
         , diag_reciprocal(1. / Col<data_t>(in_mat.diag())) {}
 
-    explicit Jacobi(Col<data_t>&& in_diag)
-        : Preconditioner<data_t>()
-        , diag_reciprocal(1. / in_diag) {}
-
     [[nodiscard]] Col<data_t> apply(const Col<data_t>&) override;
 };
 

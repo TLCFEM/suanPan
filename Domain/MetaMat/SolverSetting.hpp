@@ -18,7 +18,7 @@
 #ifndef SOLVERSETTING_HPP
 #define SOLVERSETTING_HPP
 
-#include "Preconditioner/Preconditioner.hpp"
+#include "Preconditioner.hpp"
 
 enum class Precision {
     MIXED,
