@@ -135,6 +135,8 @@ void Step::set_system_solver(const SolverType P) {
 
 void Step::set_system_solver(const IterativeSolver P) { setting.iterative_solver = P; }
 
+void Step::set_preconditioner(const PreconditionerType P) { setting.preconditioner_type = P; }
+
 void Step::set_precision(const Precision P) { setting.precision = P; }
 
 void Step::set_tolerance(const double T) { setting.tolerance = T; }

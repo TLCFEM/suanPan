@@ -323,8 +323,8 @@ LeeNewmarkFull::LeeNewmarkFull(const unsigned T, std::vector<Mode>&& M, const do
 int LeeNewmarkFull::initialize() {
     if(SUANPAN_SUCCESS != LeeNewmarkBase::initialize()) return SUANPAN_FAIL;
 
-    if(if_iterative) {
-        suanpan_error("iterative solver is not supported, please consider LeeNewmark.\n");
+    if(if_iterative && PreconditionerType::ILU != factory->get_solver_setting().preconditioner_type) {
+        suanpan_error("iterative solver with preconditioner other than ILU is not supported, please consider LeeNewmark.\n");
         return SUANPAN_FAIL;
     }
 

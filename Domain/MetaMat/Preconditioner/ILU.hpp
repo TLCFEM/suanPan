@@ -29,6 +29,8 @@
 #ifndef ILU_H
 #define ILU_H
 
+#ifndef SUANPAN_SUPERLUMT
+
 #include "Preconditioner.hpp"
 #include <superlu-mt/superlu-mt.h>
 #include "Domain/MetaMat/csc_form.hpp"
@@ -155,6 +157,8 @@ template<sp_d data_t> Col<data_t> ILU<data_t>::apply(const Col<data_t>& in) {
 
     return out;
 }
+
+#endif
 
 #endif
 

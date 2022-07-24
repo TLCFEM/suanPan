@@ -1025,6 +1025,15 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
         else if(is_equal(value, "NONE")) t_step->set_system_solver(IterativeSolver::NONE);
         else suanpan_error("set_property() need a valid solver id.\n");
     }
+    else if(is_equal(property_id, "preconditioner")) {
+        if(string value; !get_input(command, value)) suanpan_error("set_property() need a valid value.\n");
+        else if(is_equal(value, "NONE")) t_step->set_preconditioner(PreconditionerType::NONE);
+        else if(is_equal(value, "JACOBI")) t_step->set_preconditioner(PreconditionerType::JACOBI);
+#ifndef SUANPAN_SUPERLUMT
+        else if(is_equal(value, "ILU")) t_step->set_preconditioner(PreconditionerType::ILU);
+#endif
+        else suanpan_error("set_property() need a valid solver id.\n");
+    }
     else if(is_equal(property_id, "precision")) {
         if(string value; !get_input(command, value)) suanpan_error("set_property() need a valid value.\n");
         else if(is_equal(value, "DOUBLE") || is_equal(value, "FULL")) t_step->set_precision(Precision::FULL);

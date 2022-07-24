@@ -178,7 +178,9 @@ template<sp_d T> int MetaMat<T>::iterative_solve(Mat<T>& X, const Mat<T>& B) {
 
     unique_ptr<Preconditioner<T>> preconditioner;
     if(PreconditionerType::JACOBI == this->setting.preconditioner_type) preconditioner = std::make_unique<Jacobi<T>>(this->diag());
-    else if(PreconditionerType::ILU == this->setting.preconditioner_type) preconditioner = std::make_unique<ILU<T>>(this->triplet_mat);
+#ifndef SUANPAN_SUPERLUMT
+    else if(PreconditionerType::ILU == this->setting.preconditioner_type) preconditioner = std::make_unique<ILU<T>>(to_triplet_form(this));
+#endif
     else if(PreconditionerType::NONE == this->setting.preconditioner_type) preconditioner = std::make_unique<UnityPreconditioner<T>>();
 
     this->setting.preconditioner = preconditioner.get();
@@ -246,7 +248,7 @@ template<sp_d data_t, sp_i index_t> Mat<data_t> to_mat(const csc_form<data_t, in
     return out_mat;
 }
 
-template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> to_triplet_form(const shared_ptr<MetaMat<data_t>>& in_mat) {
+template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> to_triplet_form(const MetaMat<data_t>* in_mat) {
     if(!in_mat->triplet_mat.is_empty()) return triplet_form<data_t, index_t>(in_mat->triplet_mat);
 
     const sp_i auto n_rows = index_t(in_mat->n_rows);
@@ -258,6 +260,8 @@ template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> to_triplet_for
 
     return out_mat;
 }
+
+template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> to_triplet_form(const shared_ptr<MetaMat<data_t>>& in_mat) { return to_triplet_form(in_mat.get()); }
 
 #endif
 
