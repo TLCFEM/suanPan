@@ -1393,9 +1393,6 @@
     <ClCompile Include="..\..\..\UnitTest\TestSolver.cpp">
       <Filter>UnitTest</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Domain\MetaMat\Preconditioner\Jacobi.cpp">
-      <Filter>Domain\MetaMat\Preconditioner</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\UnitTest\TestSorting.cpp">
       <Filter>UnitTest</Filter>
     </ClCompile>
@@ -2653,10 +2650,13 @@
     <ClInclude Include="..\..\..\Domain\MetaMat\IterativeSolver.hpp">
       <Filter>Domain\MetaMat</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Domain\MetaMat\Preconditioner\Jacobi.h">
+    <ClInclude Include="..\..\..\Domain\MetaMat\Preconditioner\ILU.hpp">
       <Filter>Domain\MetaMat\Preconditioner</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Domain\MetaMat\Preconditioner\Preconditioner.h">
+    <ClInclude Include="..\..\..\Domain\MetaMat\Preconditioner\Jacobi.hpp">
+      <Filter>Domain\MetaMat\Preconditioner</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\MetaMat\Preconditioner\Preconditioner.hpp">
       <Filter>Domain\MetaMat\Preconditioner</Filter>
     </ClInclude>
   </ItemGroup>

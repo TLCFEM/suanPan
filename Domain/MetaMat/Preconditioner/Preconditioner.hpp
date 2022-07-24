@@ -21,7 +21,7 @@
  * @author tlc
  * @date 21/07/2022
  * @version 0.1.0
- * @file Preconditioner.h
+ * @file Preconditioner.hpp
  * @addtogroup Preconditioner
  * @{
  */
@@ -31,7 +31,7 @@
 
 #include <suanPan.h>
 
-class Preconditioner {
+template<sp_d data_t> class Preconditioner {
 public:
     Preconditioner() = default;
     Preconditioner(const Preconditioner&) = default;
@@ -40,9 +40,15 @@ public:
     Preconditioner& operator=(Preconditioner&&) noexcept = default;
     virtual ~Preconditioner() = default;
 
-    [[nodiscard]] virtual vec apply(const vec&) const = 0;
-    [[nodiscard]] virtual unique_ptr<Preconditioner> get_copy() const = 0;
+    [[nodiscard]] virtual Col<data_t> apply(const Col<data_t>&) = 0;
 };
+
+template<sp_d data_t> class UnityPreconditioner final : Preconditioner<data_t> {
+public:
+    [[nodiscard]] Col<data_t> apply(const Col<data_t>&) override;
+};
+
+template<sp_d data_t> Col<data_t> UnityPreconditioner<data_t>::apply(const Col<data_t>& in) { return in; }
 
 #endif
 

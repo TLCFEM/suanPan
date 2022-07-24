@@ -14,14 +14,43 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @class Jacobi
+ * @brief A Jacobi class.
+ *
+ * @author tlc
+ * @date 21/07/2022
+ * @version 0.1.0
+ * @file Jacobi.h
+ * @addtogroup Preconditioner
+ * @{
+ */
 
-#include "Jacobi.h"
+#ifndef JACOBI_H
+#define JACOBI_H
 
-Jacobi::Jacobi(vec&& in_diag)
+#include "Preconditioner.hpp"
+
+template<sp_d data_t> class Jacobi final : public Preconditioner<data_t> {
+    const Col<data_t> diag_reciprocal;
+
+public:
+    template<typename Container> explicit Jacobi(const Container& in_mat);
+
+    explicit Jacobi(Col<data_t>&&);
+
+    [[nodiscard]] Col<data_t> apply(const Col<data_t>&) override;
+};
+
+template<sp_d data_t> template<typename Container> Jacobi<data_t>::Jacobi(const Container& in_mat)
+    : Preconditioner()
+    , diag_reciprocal(1. / Col<data_t>(in_mat.diag())) {}
+
+template<sp_d data_t> Jacobi<data_t>::Jacobi(Col<data_t>&& in_diag)
     : Preconditioner()
     , diag_reciprocal(1. / in_diag) {}
 
-vec Jacobi::apply(const vec& in) const {
+template<sp_d data_t> Col<data_t> Jacobi<data_t>::apply(const Col<data_t>& in) {
     vec out = in;
 
     for(auto I = 0llu; I < in.n_elem; I += diag_reciprocal.n_elem) out.subvec(I, size(diag_reciprocal)) %= diag_reciprocal;
@@ -29,4 +58,6 @@ vec Jacobi::apply(const vec& in) const {
     return out;
 }
 
-unique_ptr<Preconditioner> Jacobi::get_copy() const { return make_unique<Jacobi>(*this); }
+#endif
+
+//! @}

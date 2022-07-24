@@ -31,7 +31,8 @@
 
 #include "triplet_form.hpp"
 #include "IterativeSolver.hpp"
-#include "Preconditioner/Jacobi.h"
+#include "Preconditioner/ILU.hpp"
+#include "Preconditioner/Jacobi.hpp"
 
 template<typename T, typename U> concept ArmaContainer = std::is_floating_point_v<U> && (std::is_convertible_v<T, Mat<U>> || std::is_convertible_v<T, SpMat<U>>) ;
 
@@ -175,7 +176,12 @@ template<sp_d T> Mat<T> MetaMat<T>::iterative_solve(const SpMat<T>& B) { return 
 template<sp_d T> int MetaMat<T>::iterative_solve(Mat<T>& X, const Mat<T>& B) {
     X = B;
 
-    if(nullptr == this->setting.preconditioner) this->setting.preconditioner = std::make_unique<Jacobi>(this->diag());
+    unique_ptr<Preconditioner<T>> preconditioner;
+    if(PreconditionerType::JACOBI == this->setting.preconditioner_type) preconditioner = std::make_unique<Jacobi>(this->diag());
+    else if(PreconditionerType::ILU == this->setting.preconditioner_type) preconditioner = std::make_unique<ILU<T>>(this->triplet_mat);
+    else if(PreconditionerType::NONE == this->setting.preconditioner_type) preconditioner = std::make_unique<UnityPreconditioner<T>>();
+
+    this->setting.preconditioner = preconditioner.get();
 
     std::atomic_int code = 0;
 

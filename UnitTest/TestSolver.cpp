@@ -24,7 +24,8 @@ TEST_CASE("GMRES Solver", "[Utility.Solver]") {
         vec x;
 
         SolverSetting<double> setting;
-        setting.preconditioner = std::make_unique<Jacobi>(A.A);
+        auto preconditioner = Jacobi<double>(A.A);
+        setting.preconditioner = &preconditioner;
 
         GMRES(&A, x, b, setting);
 
@@ -40,7 +41,8 @@ TEST_CASE("BiCGSTAB Solver", "[Utility.Solver]") {
         vec x;
 
         SolverSetting<double> setting;
-        setting.preconditioner = std::make_unique<Jacobi>(A.A);
+        auto preconditioner = Jacobi<double>(A.A);
+        setting.preconditioner = &preconditioner;
 
         BiCGSTAB(&A, x, b, setting);
 
@@ -64,7 +66,8 @@ TEST_CASE("Iterative Solver Sparse", "[Matrix.Solver]") {
         for(auto J = B.begin(); J != B.end(); ++J) A.at(J.row(), J.col()) = *J;
 
         SolverSetting<double> setting;
-        setting.preconditioner = std::make_unique<Jacobi>(A);
+        auto preconditioner = Jacobi<double>(A);
+        setting.preconditioner = &preconditioner;
 
         BiCGSTAB(&A, x, C, setting);
 
