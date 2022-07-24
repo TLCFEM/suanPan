@@ -177,7 +177,7 @@ template<sp_d T> int MetaMat<T>::iterative_solve(Mat<T>& X, const Mat<T>& B) {
     X = B;
 
     unique_ptr<Preconditioner<T>> preconditioner;
-    if(PreconditionerType::JACOBI == this->setting.preconditioner_type) preconditioner = std::make_unique<Jacobi>(this->diag());
+    if(PreconditionerType::JACOBI == this->setting.preconditioner_type) preconditioner = std::make_unique<Jacobi<T>>(this->diag());
     else if(PreconditionerType::ILU == this->setting.preconditioner_type) preconditioner = std::make_unique<ILU<T>>(this->triplet_mat);
     else if(PreconditionerType::NONE == this->setting.preconditioner_type) preconditioner = std::make_unique<UnityPreconditioner<T>>();
 

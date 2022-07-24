@@ -43,7 +43,7 @@ public:
     [[nodiscard]] virtual Col<data_t> apply(const Col<data_t>&) = 0;
 };
 
-template<sp_d data_t> class UnityPreconditioner final : Preconditioner<data_t> {
+template<sp_d data_t> class UnityPreconditioner final : public Preconditioner<data_t> {
 public:
     [[nodiscard]] Col<data_t> apply(const Col<data_t>&) override;
 };

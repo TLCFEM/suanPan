@@ -45,7 +45,7 @@ template<sp_d data_t> struct SolverSetting {
     Precision precision = Precision::FULL;
     IterativeSolver iterative_solver = IterativeSolver::NONE;
     PreconditionerType preconditioner_type = PreconditionerType::JACOBI;
-    Preconditioner* preconditioner = nullptr;
+    Preconditioner<data_t>* preconditioner = nullptr;
 };
 
 #endif

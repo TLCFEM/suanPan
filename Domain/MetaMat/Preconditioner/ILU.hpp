@@ -76,7 +76,7 @@ template<sp_d data_t> void ILU<data_t>::wrap_mat(SuperMatrix* out, const Col<dat
 }
 
 template<sp_d data_t> template<sp_i index_t> ILU<data_t>::ILU(triplet_form<data_t, index_t>& triplet_mat)
-    : Preconditioner() {
+    : Preconditioner<data_t>() {
     csc_form<data_t, int> csc_mat(triplet_mat);
 
     auto t_size = sizeof(data_t) * csc_mat.n_elem;

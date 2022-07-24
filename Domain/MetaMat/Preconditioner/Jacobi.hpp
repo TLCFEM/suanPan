@@ -43,11 +43,11 @@ public:
 };
 
 template<sp_d data_t> template<typename Container> Jacobi<data_t>::Jacobi(const Container& in_mat)
-    : Preconditioner()
+    : Preconditioner<data_t>()
     , diag_reciprocal(1. / Col<data_t>(in_mat.diag())) {}
 
 template<sp_d data_t> Jacobi<data_t>::Jacobi(Col<data_t>&& in_diag)
-    : Preconditioner()
+    : Preconditioner<data_t>()
     , diag_reciprocal(1. / in_diag) {}
 
 template<sp_d data_t> Col<data_t> Jacobi<data_t>::apply(const Col<data_t>& in) {
