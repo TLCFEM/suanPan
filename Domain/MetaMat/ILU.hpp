@@ -161,7 +161,7 @@ template<sp_d data_t> template<sp_i index_t> void ILU<data_t>::init(triplet_form
 
     StatInit(&stat);
 
-    const auto unused = this->apply(vec(csc_mat.n_cols, 1, fill::zeros));
+    [[maybe_unused]] const auto unused = this->apply(vec(csc_mat.n_cols, 1, fill::zeros));
 
     options.Fact = superlu::FACTORED;
 }
