@@ -53,6 +53,7 @@ template<sp_d data_t, HasEvaluate<data_t> System> int GMRES(const System* system
     };
 
     if(x.empty()) x = conditioner->apply(b);
+    else x.zeros(arma::size(b));
 
     const auto mp = setting.restart + 1;
 
@@ -133,6 +134,7 @@ template<sp_d data_t, HasEvaluate<data_t> System> int BiCGSTAB(const System* sys
     if(suanpan::approx_equal(norm_b, ZERO)) norm_b = ONE;
 
     if(x.empty()) x = conditioner->apply(b);
+    else x.zeros(arma::size(b));
 
     Col<data_t> r = b - system->evaluate(x);
     const auto initial_r = r;

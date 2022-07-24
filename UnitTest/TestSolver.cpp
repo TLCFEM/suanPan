@@ -117,7 +117,11 @@ TEST_CASE("Iterative Solver Dense", "[Matrix.Solver]") {
 }
 
 TEST_CASE("Iterative Solver Sparse Mat", "[Matrix.Solver]") {
-    for(auto I = 0; I < 100; ++I) {
+    SolverSetting<double> setting;
+    setting.iterative_solver = IterativeSolver::BICGSTAB;
+    setting.preconditioner_type = PreconditionerType::ILU;
+
+    for(auto I = 0; I < 10; ++I) {
         const auto N = randi<uword>(distr_param(100, 200));
         auto A = SparseMatSuperLU<double>(N, N);
         REQUIRE(A.n_rows == N);
@@ -125,16 +129,12 @@ TEST_CASE("Iterative Solver Sparse Mat", "[Matrix.Solver]") {
 
         sp_mat B = sprandu(N, N, .02) + speye(N, N) * 1E1;
 
-        const mat C = randu<mat>(N, N);
+        const mat C = randu<mat>(N, 2 * N);
         mat x;
 
         A.zeros();
         for(auto J = B.begin(); J != B.end(); ++J) A.at(J.row(), J.col()) = *J;
-
-        SolverSetting<double> setting;
-        setting.iterative_solver = IterativeSolver::BICGSTAB;
-        setting.preconditioner_type = PreconditionerType::ILU;
-
+        A.set_solver_setting(setting);
         A.iterative_solve(x, C);
 
         REQUIRE(norm(spsolve(B, C) - x) <= 1E-12);
