@@ -186,6 +186,8 @@ template<sp_d T> int MetaMat<T>::iterative_solve(Mat<T>& X, const Mat<T>& B) {
 #endif
     else if(PreconditionerType::NONE == this->setting.preconditioner_type) preconditioner = std::make_unique<UnityPreconditioner<T>>();
 
+    if(SUANPAN_SUCCESS != preconditioner->init()) return SUANPAN_FAIL;
+
     this->setting.preconditioner = preconditioner.get();
 
     std::atomic_int code = 0;

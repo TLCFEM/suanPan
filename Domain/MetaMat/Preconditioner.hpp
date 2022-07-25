@@ -40,6 +40,8 @@ public:
     Preconditioner& operator=(Preconditioner&&) noexcept = default;
     virtual ~Preconditioner() = default;
 
+    virtual int init() { return SUANPAN_SUCCESS; }
+
     [[nodiscard]] virtual Col<data_t> apply(const Col<data_t>&) = 0;
 };
 

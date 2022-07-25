@@ -31,7 +31,7 @@ step dynamic 2 6
 set ini_step_size .02
 set fixed_step_size 1
 set sparse_mat 1
-set system_solver GMRES
+set system_solver BiCGStab
 set preconditioner ILU
 set tolerance 1E-10
 
