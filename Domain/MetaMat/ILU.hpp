@@ -38,7 +38,7 @@
 #include "triplet_form.hpp"
 
 template<sp_d data_t> class ILU final : public Preconditioner<data_t> {
-    inline static char equed = 'C';
+    inline static char equed = 'N';
 
     SuperMatrix A{}, L{}, U{};
 
@@ -198,7 +198,7 @@ template<sp_d data_t> Col<data_t> ILU<data_t>::apply(const Col<data_t>& in) {
 
     this->apply_solver(&X, &B);
 
-    this->apply_column_scale(out);
+    // this->apply_column_scale(out);
 
     Destroy_SuperMatrix_Store(&X);
     Destroy_SuperMatrix_Store(&B);
