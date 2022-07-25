@@ -26,6 +26,7 @@
  * @{
  */
 
+// ReSharper disable CppCStyleCast
 #ifndef ILU_HPP
 #define ILU_HPP
 
@@ -37,6 +38,8 @@
 #include "triplet_form.hpp"
 
 template<sp_d data_t> class ILU final : public Preconditioner<data_t> {
+    inline static char equed = 'C';
+
     SuperMatrix A{}, L{}, U{};
 
     SuperLUStat_t stat{};
@@ -56,77 +59,57 @@ template<sp_d data_t> class ILU final : public Preconditioner<data_t> {
 
     int* etree = nullptr;
 
-    static void wrap_mat(SuperMatrix*, const Col<data_t>&);
+    static void wrap_b(SuperMatrix*, const Col<data_t>&);
 
-    template<sp_i index_t> void init(triplet_form<data_t, index_t>&);
+    int apply_solver(SuperMatrix*, SuperMatrix*);
+
+    void apply_row_scale(Col<data_t>&);
+    void apply_column_scale(Col<data_t>&);
+
+    template<sp_i index_t> void allocate(triplet_form<data_t, index_t>&);
 
 public:
-    template<sp_i index_t> explicit ILU(triplet_form<data_t, index_t>&& triplet_mat);
-    template<sp_i index_t> explicit ILU(triplet_form<data_t, index_t>& triplet_mat);
+    template<sp_i index_t> explicit ILU(triplet_form<data_t, index_t>&&);
+    template<sp_i index_t> explicit ILU(triplet_form<data_t, index_t>&);
 
     ~ILU() override;
+
+    int init() override;
 
     [[nodiscard]] Col<data_t> apply(const Col<data_t>&) override;
 };
 
-template<sp_d data_t> void ILU<data_t>::wrap_mat(SuperMatrix* out, const Col<data_t>& in) {
+template<sp_d data_t> void ILU<data_t>::wrap_b(SuperMatrix* out, const Col<data_t>& in) {
     if(std::is_same_v<data_t, float>) {
         using E = float;
-        sCreate_Dense_Matrix(out, (int)in.n_rows, (int)in.n_cols, (E*)in.memptr(), (int)in.n_rows, Stype_t::SLU_DN, Dtype_t::SLU_S, Mtype_t::SLU_GE);
+        sCreate_Dense_Matrix(out, (int)in.n_rows, (int)in.n_cols, (E*)in.memptr(), (int)in.n_rows, Stype_t::SLU_DN, Dtype_t::SLU_S, Mtype_t::SLU_GE); // NOLINT(clang-diagnostic-cast-qual)
     }
     else {
         using E = double;
-        dCreate_Dense_Matrix(out, (int)in.n_rows, (int)in.n_cols, (E*)in.memptr(), (int)in.n_rows, Stype_t::SLU_DN, Dtype_t::SLU_D, Mtype_t::SLU_GE);
+        dCreate_Dense_Matrix(out, (int)in.n_rows, (int)in.n_cols, (E*)in.memptr(), (int)in.n_rows, Stype_t::SLU_DN, Dtype_t::SLU_D, Mtype_t::SLU_GE); // NOLINT(clang-diagnostic-cast-qual)
     }
 }
 
-template<sp_d data_t> template<sp_i index_t> ILU<data_t>::ILU(triplet_form<data_t, index_t>&& triplet_mat)
-    : Preconditioner<data_t>() { init(triplet_mat); }
-
-template<sp_d data_t> template<sp_i index_t> ILU<data_t>::ILU(triplet_form<data_t, index_t>& triplet_mat)
-    : Preconditioner<data_t>() { init(triplet_mat); }
-
-template<sp_d data_t> ILU<data_t>::~ILU() {
-    Destroy_SuperMatrix_Store(&A);
-    Destroy_SuperNode_Matrix(&L);
-    Destroy_CompCol_Matrix(&U);
-
-    if(t_val) superlu_free(t_val);
-    if(t_row) superlu_free(t_row);
-    if(t_col) superlu_free(t_col);
-    if(etree) superlu_free(etree);
-    if(perm_r) superlu_free(perm_r);
-    if(perm_c) superlu_free(perm_c);
-    if(scale_r) superlu_free(scale_r);
-    if(scale_c) superlu_free(scale_c);
-}
-
-template<sp_d data_t> Col<data_t> ILU<data_t>::apply(const Col<data_t>& in) {
-    Col<data_t> out = in;
-
-    SuperMatrix X, Y;
-    this->wrap_mat(&X, out);
-    this->wrap_mat(&Y, in);
-
-    char equed = 'N';
+template<sp_d data_t> int ILU<data_t>::apply_solver(SuperMatrix* X, SuperMatrix* B) {
     int info;
 
     if(std::is_same_v<data_t, float>) {
         using E = float;
-        sgsisx(&options, &A, perm_c, perm_r, etree, &equed, (E*)scale_r, (E*)scale_c, &L, &U, nullptr, 0, &Y, &X, nullptr, nullptr, &global_setting, &usage, &stat, &info);
+        sgsisx(&options, &A, perm_c, perm_r, etree, &equed, (E*)scale_r, (E*)scale_c, &L, &U, nullptr, 0, B, X, nullptr, nullptr, &global_setting, &usage, &stat, &info);
     }
     else {
         using E = double;
-        dgsisx(&options, &A, perm_c, perm_r, etree, &equed, (E*)scale_r, (E*)scale_c, &L, &U, nullptr, 0, &Y, &X, nullptr, nullptr, &global_setting, &usage, &stat, &info);
+        dgsisx(&options, &A, perm_c, perm_r, etree, &equed, (E*)scale_r, (E*)scale_c, &L, &U, nullptr, 0, B, X, nullptr, nullptr, &global_setting, &usage, &stat, &info);
     }
 
-    Destroy_SuperMatrix_Store(&X);
-    Destroy_SuperMatrix_Store(&Y);
-
-    return out;
+    return info;
 }
 
-template<sp_d data_t> template<sp_i index_t> void ILU<data_t>::init(triplet_form<data_t, index_t>& triplet_mat) {
+template<sp_d data_t> void ILU<data_t>::apply_row_scale(Col<data_t>& in_mat) { in_mat %= Col<data_t>((data_t*)scale_r, in_mat.n_elem); }
+
+template<sp_d data_t> void ILU<data_t>::apply_column_scale(Col<data_t>& in_mat) { in_mat %= Col<data_t>((data_t*)scale_c, in_mat.n_elem); }
+
+template<sp_d data_t> template<sp_i index_t> void ILU<data_t>::allocate(triplet_form<data_t, index_t>& triplet_mat) {
     csc_form<data_t, int> csc_mat(triplet_mat);
 
     auto t_size = sizeof(data_t) * csc_mat.n_elem;
@@ -160,10 +143,67 @@ template<sp_d data_t> template<sp_i index_t> void ILU<data_t>::init(triplet_form
     ilu_set_default_options(&options);
 
     StatInit(&stat);
+}
 
-    [[maybe_unused]] const auto unused = this->apply(vec(csc_mat.n_cols, 1, fill::zeros));
+template<sp_d data_t> template<sp_i index_t> ILU<data_t>::ILU(triplet_form<data_t, index_t>&& triplet_mat)
+    : Preconditioner<data_t>() { this->allocate(triplet_mat); }
+
+template<sp_d data_t> template<sp_i index_t> ILU<data_t>::ILU(triplet_form<data_t, index_t>& triplet_mat)
+    : Preconditioner<data_t>() { this->allocate(triplet_mat); }
+
+template<sp_d data_t> ILU<data_t>::~ILU() {
+    Destroy_SuperMatrix_Store(&A);
+    Destroy_SuperNode_Matrix(&L);
+    Destroy_CompCol_Matrix(&U);
+
+    if(t_val) superlu_free(t_val);
+    if(t_row) superlu_free(t_row);
+    if(t_col) superlu_free(t_col);
+    if(etree) superlu_free(etree);
+    if(perm_r) superlu_free(perm_r);
+    if(perm_c) superlu_free(perm_c);
+    if(scale_r) superlu_free(scale_r);
+    if(scale_c) superlu_free(scale_c);
+}
+
+template<sp_d data_t> int ILU<data_t>::init() {
+    Col<data_t> in(A.ncol, 1, fill::none);
+    Col<data_t> out(A.nrow, 1, fill::none);
+
+    SuperMatrix B, X;
+    this->wrap_b(&X, out);
+    this->wrap_b(&B, in);
+
+    B.ncol = 0;
+
+    if(const auto code = this->apply_solver(&X, &B); 0 != code) {
+        suanpan_error("ILU factorisation returns %d.\n", code);
+        return SUANPAN_FAIL;
+    }
+
+    Destroy_SuperMatrix_Store(&X);
+    Destroy_SuperMatrix_Store(&B);
 
     options.Fact = superlu::FACTORED;
+
+    return SUANPAN_SUCCESS;
+}
+
+template<sp_d data_t> Col<data_t> ILU<data_t>::apply(const Col<data_t>& in) {
+    Col<data_t> out(arma::size(in), fill::none);
+
+    SuperMatrix X, B;
+    this->wrap_b(&X, out);
+    this->wrap_b(&B, in);
+
+    this->apply_solver(&X, &B);
+
+    this->apply_column_scale(out);
+
+    Destroy_SuperMatrix_Store(&X);
+    Destroy_SuperMatrix_Store(&B);
+
+    return out;
 }
 
 #endif

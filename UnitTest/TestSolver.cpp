@@ -120,6 +120,7 @@ TEST_CASE("Iterative Solver Sparse Mat", "[Matrix.Solver]") {
     SolverSetting<double> setting;
     setting.iterative_solver = IterativeSolver::BICGSTAB;
     setting.preconditioner_type = PreconditionerType::ILU;
+    setting.tolerance = 1E-14;
 
     for(auto I = 0; I < 10; ++I) {
         const auto N = randi<uword>(distr_param(100, 200));
@@ -138,5 +139,35 @@ TEST_CASE("Iterative Solver Sparse Mat", "[Matrix.Solver]") {
         A.iterative_solve(x, C);
 
         REQUIRE(norm(spsolve(B, C) - x) <= 1E-12);
+    }
+}
+
+TEST_CASE("Iterative Solver Dense Mat", "[Matrix.Solver]") {
+    SolverSetting<double> setting;
+    setting.iterative_solver = IterativeSolver::GMRES;
+    setting.preconditioner_type = PreconditionerType::ILU;
+    setting.tolerance = 1E-14;
+
+    for(auto I = 0; I < 10; ++I) {
+        const auto N = randi<uword>(distr_param(100, 200));
+        auto A = BandMat<double>(N, N, 3);
+        REQUIRE(A.n_rows == N);
+        REQUIRE(A.n_cols == N);
+
+        mat B = randu(N, N) + eye(N, N) * 1E1;
+
+        const mat C = randu<mat>(N, 2 * N);
+        mat x;
+
+        A.zeros();
+        for(auto i = 0llu; i < N; ++i)
+            for(auto j = 0llu; j < N; ++j)
+                if(std::abs(static_cast<int>(i) - static_cast<int>(j)) <= 3) A.at(i, j) = B(i, j);
+                else B(i, j) = 0.;
+
+        A.set_solver_setting(setting);
+        A.iterative_solve(x, C);
+
+        REQUIRE(norm(solve(B, C) - x) <= 1E-12);
     }
 }
