@@ -76,22 +76,16 @@ int B21E::update_status() {
 }
 
 int B21E::commit_status() {
-    b_trans->commit_status();
-
     current_rotation = trial_rotation;
     return B21::commit_status();
 }
 
 int B21E::clear_status() {
-    b_trans->clear_status();
-
     current_rotation = trial_rotation.zeros();
     return B21::clear_status();
 }
 
 int B21E::reset_status() {
-    b_trans->reset_status();
-
     trial_rotation = current_rotation;
     return B21::reset_status();
 }
