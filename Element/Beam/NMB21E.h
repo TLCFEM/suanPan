@@ -32,16 +32,10 @@
 #include "NMB21.h"
 
 class NMB21E final : public NMB21 {
-    static const unsigned max_iteration;
-    static const double tolerance;
+    const uvec a, b;
 
-    const unsigned which;
-
-    const uvec a{which};
-    const uvec b = 1llu == which ? uvec{0, 2} : uvec{0, 1};
-
-    vec trial_rotation = zeros(a.n_elem);
-    vec current_rotation = zeros(a.n_elem);
+    vec trial_local_deformation;
+    vec current_local_deformation;
 
 public:
     NMB21E(unsigned,    // tag
@@ -50,6 +44,8 @@ public:
            unsigned,    // section tag
            bool = false // nonlinear geometry switch
     );
+
+    int initialize(const shared_ptr<DomainBase>&) override;
 
     int update_status() override;
 

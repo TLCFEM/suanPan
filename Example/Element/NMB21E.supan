@@ -1,8 +1,8 @@
 # A TEST MODEL FOR NMB21E ELEMENT
 
 node 1 0 0
-node 2 1 0
-node 3 1 1
+node 2 2 0
+node 3 2 2
 
 section NM2D3 1 12 1 12 2 1. 0.01  0 0 .9 1.8 0. 1 2 0 1 0 2
 element NMB21 1 1 2 1

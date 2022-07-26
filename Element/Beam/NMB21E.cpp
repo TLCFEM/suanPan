@@ -20,65 +20,57 @@
 #include <Element/Utility/Orientation.h>
 #include <Section/Section.h>
 
-constexpr unsigned NMB21E::max_iteration = 20;
-constexpr double NMB21E::tolerance = 1E-13;
-
 NMB21E::NMB21E(const unsigned T, const unsigned W, uvec&& N, const unsigned S, const bool F)
     : NMB21(T, std::forward<uvec>(N), S, F)
-    , which(1 == W ? 1 : 2) {}
+    , a{1 == W ? 1llu : 2llu}
+    , b{1 == W ? uvec{0llu, 2llu} : uvec{0llu, 1llu}} {}
+
+int NMB21E::initialize(const shared_ptr<DomainBase>& D) {
+    const auto code = NMB21::initialize(D);
+
+    current_local_deformation = trial_local_deformation = b_trans->to_local_vec(get_current_displacement());
+
+    return code;
+}
 
 int NMB21E::update_status() {
     b_trans->update_status();
 
-    auto local_deformation = b_trans->to_local_vec(get_trial_displacement());
-    local_deformation(a) += trial_rotation;
+    vec incre_deformation = -trial_local_deformation(b);
+    trial_local_deformation(b) = b_trans->to_local_vec(get_trial_displacement())(b);
+    incre_deformation += trial_local_deformation(b);
 
-    auto counter = 0u;
-    while(true) {
-        if(++counter > max_iteration) {
-            suanpan_error("NMB21E element %u fails to converge.\n", get_tag());
-            return SUANPAN_FAIL;
-        }
+    const auto& t_stiffness = b_section->get_trial_stiffness();
+    const auto& t_resistance = b_section->get_trial_resistance();
 
-        if(SUANPAN_SUCCESS != b_section->update_trial_status(local_deformation / length)) return SUANPAN_FAIL;
+    trial_local_deformation(a) -= solve(t_stiffness(a, a), t_resistance(a) * length + t_stiffness(a, b) * incre_deformation);
 
-        mat local_stiffness = b_section->get_trial_stiffness() / length;
-        vec local_resistance = b_section->get_trial_resistance();
+    if(SUANPAN_SUCCESS != b_section->update_trial_status(trial_local_deformation / length)) return SUANPAN_FAIL;
 
-        const auto error = norm(local_resistance(a));
-        suanpan_extra_debug("NMB21E local iteration error: %.4E.\n", error);
+    mat local_stiffness(3, 3, fill::zeros);
+    vec local_resistance(3, fill::zeros);
+    local_resistance(b) = t_resistance(b) - t_stiffness(b, a) * solve(t_stiffness(a, a), t_resistance(a));
+    local_stiffness(b, b) = t_stiffness(b, b) - t_stiffness(b, a) * solve(t_stiffness(a, a), t_stiffness(a, b));
 
-        if(error < tolerance) {
-            const mat t_mat = local_stiffness(b, b) - local_stiffness(b, a) * solve(local_stiffness(a, a), local_stiffness(a, b));
+    trial_resistance = b_trans->to_global_vec(local_resistance);
+    trial_stiffness = b_trans->to_global_stiffness_mat(local_stiffness / length);
 
-            local_stiffness.zeros();
-            local_stiffness(b, b) = t_mat;
+    if(nlgeom) trial_geometry = b_trans->to_global_geometry_mat(local_resistance);
 
-            trial_resistance = b_trans->to_global_vec(local_resistance);
-            trial_stiffness = b_trans->to_global_stiffness_mat(local_stiffness);
-
-            if(nlgeom) trial_geometry = b_trans->to_global_geometry_mat(local_resistance);
-
-            return SUANPAN_SUCCESS;
-        }
-
-        const vec incre = solve(local_stiffness(a, a), local_resistance(a));
-        local_deformation(a) -= incre;
-        trial_rotation -= incre;
-    }
+    return SUANPAN_SUCCESS;
 }
 
 int NMB21E::commit_status() {
-    current_rotation = trial_rotation;
+    current_local_deformation = trial_local_deformation;
     return NMB21::commit_status();
 }
 
 int NMB21E::clear_status() {
-    current_rotation = trial_rotation.zeros();
+    current_local_deformation = trial_local_deformation.zeros();
     return NMB21::clear_status();
 }
 
 int NMB21E::reset_status() {
-    trial_rotation = current_rotation;
+    trial_local_deformation = current_local_deformation;
     return NMB21::reset_status();
 }
