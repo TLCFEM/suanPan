@@ -1393,6 +1393,9 @@
     <ClCompile Include="..\..\..\UnitTest\TestSorting.cpp">
       <Filter>UnitTest</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Element\Beam\NMB21E.cpp">
+      <Filter>Element\Beam</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2655,6 +2658,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Domain\MetaMat\Jacobi.hpp">
       <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Beam\NMB21E.h">
+      <Filter>Element\Beam</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

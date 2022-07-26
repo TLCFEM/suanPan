@@ -75,6 +75,18 @@
       "details":"2D Displacement Based Bernoulli Beam with N-M Interaction Sections"
     },
     {
+      "trigger":"NMB21EL",
+      "contents":"element NMB21EL ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# [5] bool string, nonlinear geometry switch, default: false",
+      "kind":"type",
+      "details":"2D Displacement Based Bernoulli Beam with N-M Interaction Sections and Low End Moment Release"
+    },
+    {
+      "trigger":"NMB21EH",
+      "contents":"element NMB21EH ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# [5] bool string, nonlinear geometry switch, default: false",
+      "kind":"type",
+      "details":"2D Displacement Based Bernoulli Beam with N-M Interaction Sections and High End Moment Release"
+    },
+    {
       "trigger":"NMB31",
       "contents":"element NMB31 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:[6]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# (5) int, orientation tag\n# [6] bool string, nonlinear geometry switch, default: false",
       "kind":"type",

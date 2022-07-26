@@ -50,7 +50,7 @@ void new_allman(unique_ptr<Element>& return_obj, istringstream& command) {
     return_obj = make_unique<Allman>(tag, std::move(node_tag), material_tag, thickness);
 }
 
-void new_b21(unique_ptr<Element>& return_obj, istringstream& command) {
+void new_b21(unique_ptr<Element>& return_obj, istringstream& command, const unsigned which) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("new_b21() needs a valid tag.\n");
@@ -82,42 +82,8 @@ void new_b21(unique_ptr<Element>& return_obj, istringstream& command) {
         return;
     }
 
-    return_obj = make_unique<B21>(tag, std::move(node_tag), section_id, int_pt, is_true(nonlinear));
-}
-
-void new_b21e(unique_ptr<Element>& return_obj, istringstream& command, const unsigned which) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("new_b21e() needs a valid tag.\n");
-        return;
-    }
-
-    uvec node_tag(2);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_b21e() needs two valid nodes.\n");
-            return;
-        }
-
-    unsigned section_id;
-    if(!get_input(command, section_id)) {
-        suanpan_error("new_b21e() needs a valid section tag.\n");
-        return;
-    }
-
-    unsigned int_pt = 6;
-    if(!get_optional_input(command, int_pt)) {
-        suanpan_error("new_b21e() needs a valid number of integration points.\n");
-        return;
-    }
-
-    string nonlinear = "false";
-    if(!get_optional_input(command, nonlinear)) {
-        suanpan_error("new_b21e() needs a valid nonlinear geometry switch (0,1).\n");
-        return;
-    }
-
-    return_obj = make_unique<B21E>(tag, which, std::move(node_tag), section_id, int_pt, is_true(nonlinear));
+    if(0 == which) return_obj = make_unique<B21>(tag, std::move(node_tag), section_id, int_pt, is_true(nonlinear));
+    else return_obj = make_unique<B21E>(tag, which, std::move(node_tag), section_id, int_pt, is_true(nonlinear));
 }
 
 void new_b21h(unique_ptr<Element>& return_obj, istringstream& command) {
@@ -196,7 +162,7 @@ void new_b31(unique_ptr<Element>& return_obj, istringstream& command) {
     return_obj = make_unique<B31>(tag, std::move(node_tag), section_id, orientation_id, int_pt, is_true(nonlinear));
 }
 
-void new_nmb21(unique_ptr<Element>& return_obj, istringstream& command) {
+void new_nmb21(unique_ptr<Element>& return_obj, istringstream& command, const unsigned which) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("new_nmb21() needs a valid tag.\n");
@@ -222,7 +188,8 @@ void new_nmb21(unique_ptr<Element>& return_obj, istringstream& command) {
         return;
     }
 
-    return_obj = make_unique<NMB21>(tag, std::move(node_tag), section_id, is_true(nonlinear));
+    if(0 == which) return_obj = make_unique<NMB21>(tag, std::move(node_tag), section_id, is_true(nonlinear));
+    else return_obj = make_unique<NMB21E>(tag, which, std::move(node_tag), section_id, is_true(nonlinear));
 }
 
 void new_nmb31(unique_ptr<Element>& return_obj, istringstream& command) {
@@ -2663,12 +2630,14 @@ int create_new_element(const shared_ptr<DomainBase>& domain, istringstream& comm
     unique_ptr<Element> new_element = nullptr;
 
     if(is_equal(element_id, "Allman")) new_allman(new_element, command);
-    else if(is_equal(element_id, "B21")) new_b21(new_element, command);
-    else if(is_equal(element_id, "B21EL")) new_b21e(new_element, command, 1);
-    else if(is_equal(element_id, "B21EH")) new_b21e(new_element, command, 2);
+    else if(is_equal(element_id, "B21")) new_b21(new_element, command, 0);
+    else if(is_equal(element_id, "B21EL")) new_b21(new_element, command, 1);
+    else if(is_equal(element_id, "B21EH")) new_b21(new_element, command, 2);
     else if(is_equal(element_id, "B21H")) new_b21h(new_element, command);
     else if(is_equal(element_id, "B31")) new_b31(new_element, command);
-    else if(is_equal(element_id, "NMB21")) new_nmb21(new_element, command);
+    else if(is_equal(element_id, "NMB21")) new_nmb21(new_element, command, 0);
+    else if(is_equal(element_id, "NMB21EL")) new_nmb21(new_element, command, 1);
+    else if(is_equal(element_id, "NMB21EH")) new_nmb21(new_element, command, 2);
     else if(is_equal(element_id, "NMB31")) new_nmb31(new_element, command);
     else if(is_equal(element_id, "C3D20")) new_c3d20(new_element, command);
     else if(is_equal(element_id, "C3D4")) new_c3d4(new_element, command);
