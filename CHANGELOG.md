@@ -7,7 +7,7 @@
 
 ## version 2.5
 
-1. reformulate NM sections
+1. reformulate NM sections, add `NMB21E` element with end moment release
 2. add couple stress membranes `CST3`, `CST6`, `CSM4-8`
 3. add universal iterative solvers `BiCGSTAB` and `GMRES`, and preconditioners `Jacobi` and `ILU`
 4. add support for `icx` and `ifx` compilers
