@@ -2,7 +2,7 @@
 
 node 1 0 0
 node 2 1 0
-node 3 1 1
+node 3 2 3
 
 material MPF 1 1000 20 .1
 
@@ -20,7 +20,7 @@ recorder 2 hdf5 Element S 1
 recorder 3 hdf5 Element PE 1
 
 step static 1 1
-set ini_step_size 1E-1
+set ini_step_size 1E-2
 set fixed_step_size true
 
 converger RelIncreDisp 1 1E-11 10 1
@@ -28,11 +28,12 @@ converger RelIncreDisp 1 1E-11 10 1
 analyze
 
 # Node 2:
-#    1.0000        0
+# Coordinate:
+# 1.0000 0
 # Displacement:
-#    6.6667e-03   8.8653e-06   1.3210e-05
+# 0.0081 -0.0014 -0.0021
 # Resistance:
-#    1.0000e+02   8.9539e-13  -2.3050e-13
+# 1.0000e+02 8.8995e-13 -4.3036e-14
 peek node 2
 
 peek element 1

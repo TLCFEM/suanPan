@@ -1,10 +1,10 @@
 # A TEST MODEL FOR NMB21E ELEMENT
 
 node 1 0 0
-node 2 1 0
-node 3 1 1
+node 2 2 0
+node 3 2 3
 
-section NM2D3 1 12 1 12 2 1. 0.01  0 0 .9 1.8 0. 1 2 0 1 0 2
+section NM2D3 1 12 1 12 2 1. 0.01 0 0 .9 1.8 0. 1 2 0 1 0 2
 element NMB21 1 1 2 1
 element NMB21EL 2 2 3 1
 
@@ -26,11 +26,11 @@ analyze
 
 # Node 2:
 # Coordinate:
-#    1.0000        0
+# 2.0000 0
 # Displacement:
-#    2.7423e+00   3.8874e-19   5.8312e-19
+# 21.6882 0 0
 # Resistance:
-#    2.0000e+01   2.4956e-27   3.5730e-28
+# 20.0000 0 0
 peek node 2
 
 peek element 1
