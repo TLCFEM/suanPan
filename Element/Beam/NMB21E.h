@@ -15,56 +15,47 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class NMB21
- * @brief The NMB21 class.
+ * @class NMB21E
+ * @brief The NMB21E class.
  * @author tlc
- * @date 26/11/2021
+ * @date 26/07/2022
  * @version 0.1.0
- * @file NMB21.h
+ * @file NMB21E.h
  * @addtogroup Beam
  * @ingroup Element
  * @{
  */
 
-#ifndef NMB21_H
-#define NMB21_H
+#ifndef NMB21E_H
+#define NMB21E_H
 
-#include <Element/SectionElement.h>
-#include <Element/Utility/Orientation.h>
+#include "NMB21.h"
 
-class NMB21 : public SectionNMElement2D {
-    static constexpr unsigned b_node = 2, b_dof = 3, b_size = b_dof * b_node;
+class NMB21E final : public NMB21 {
+    static const unsigned max_iteration;
+    static const double tolerance;
 
-protected:
-    const double length = 0.;
+    const unsigned which;
 
-    unique_ptr<Orientation> b_trans;
-    unique_ptr<Section> b_section;
+    const uvec a{which};
+    const uvec b = 1llu == which ? uvec{0, 2} : uvec{0, 1};
+
+    vec trial_rotation = zeros(a.n_elem);
+    vec current_rotation = zeros(a.n_elem);
 
 public:
-    NMB21(unsigned,    // tag
-          uvec&&,      // node tags
-          unsigned,    // section tag
-          bool = false // nonlinear geometry switch
+    NMB21E(unsigned,    // tag
+           unsigned,    // which
+           uvec&&,      // node tags
+           unsigned,    // section tag
+           bool = false // nonlinear geometry switch
     );
-
-    int initialize(const shared_ptr<DomainBase>&) override;
 
     int update_status() override;
 
     int commit_status() override;
     int clear_status() override;
     int reset_status() override;
-
-    vector<vec> record(OutputType) override;
-
-    void print() override;
-
-#ifdef SUANPAN_VTK
-    void Setup() override;
-    void GetData(vtkSmartPointer<vtkDoubleArray>&, OutputType) override;
-    void SetDeformation(vtkSmartPointer<vtkPoints>&, double) override;
-#endif
 };
 
 #endif

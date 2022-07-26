@@ -9,5 +9,6 @@ set(Beam
         Beam/F31.cpp
         Beam/MVLEM.cpp
         Beam/NMB21.cpp
+        Beam/NMB21E.cpp
         Beam/NMB31.cpp
         )

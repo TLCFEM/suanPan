@@ -162,6 +162,7 @@
     <ClCompile Include="..\..\..\Element\Beam\F31.cpp" />
     <ClCompile Include="..\..\..\Element\Beam\MVLEM.cpp" />
     <ClCompile Include="..\..\..\Element\Beam\NMB21.cpp" />
+    <ClCompile Include="..\..\..\Element\Beam\NMB21E.cpp" />
     <ClCompile Include="..\..\..\Element\Beam\NMB31.cpp" />
     <ClCompile Include="..\..\..\Element\Cube\C3D20.cpp" />
     <ClCompile Include="..\..\..\Element\Cube\C3D4.cpp" />
@@ -587,6 +588,7 @@
     <ClInclude Include="..\..\..\Element\Beam\F31.h" />
     <ClInclude Include="..\..\..\Element\Beam\MVLEM.h" />
     <ClInclude Include="..\..\..\Element\Beam\NMB21.h" />
+    <ClInclude Include="..\..\..\Element\Beam\NMB21E.h" />
     <ClInclude Include="..\..\..\Element\Beam\NMB31.h" />
     <ClInclude Include="..\..\..\Element\Cube\C3D20.h" />
     <ClInclude Include="..\..\..\Element\Cube\C3D4.h" />
