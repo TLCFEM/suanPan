@@ -21,11 +21,12 @@
 #include <Section/Section.h>
 
 constexpr unsigned B21E::max_iteration = 20;
-constexpr double B21E::tolerance = 1E-13;
+constexpr double B21E::tolerance = 1E-14;
 
 B21E::B21E(const unsigned T, const unsigned W, uvec&& N, const unsigned S, const unsigned P, const bool F)
     : B21(T, std::forward<uvec>(N), S, P, F)
-    , which(1 == W ? 1 : 2) {}
+    , a{1u == W ? 1llu : 2llu}
+    , b{1u == W ? uvec{0llu, 2llu} : uvec{0llu, 1llu}} {}
 
 int B21E::update_status() {
     b_trans->update_status();
