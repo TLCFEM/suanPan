@@ -21,7 +21,7 @@
 #include <Section/Section.h>
 
 constexpr unsigned B21E::max_iteration = 20;
-constexpr double B21E::tolerance = 1E-14;
+constexpr double B21E::tolerance = 1E-13;
 
 B21E::B21E(const unsigned T, const unsigned W, uvec&& N, const unsigned S, const unsigned P, const bool F)
     : B21(T, std::forward<uvec>(N), S, P, F)
@@ -39,6 +39,11 @@ int B21E::update_status() {
 
     auto counter = 0u;
     while(true) {
+        if(++counter > max_iteration) {
+            suanpan_error("B21E element %u fails to converge to %.1E.\n", get_tag(), tolerance);
+            return SUANPAN_FAIL;
+        }
+
         local_stiffness.zeros();
         local_resistance.zeros();
 
@@ -49,9 +54,10 @@ int B21E::update_status() {
         }
 
         const auto error = norm(local_resistance(a));
+        const vec incre = solve(local_stiffness(a, a), local_resistance(a));
         suanpan_extra_debug("B21E local iteration error: %.4E.\n", error);
 
-        if(error < tolerance) {
+        if(error < tolerance && norm(incre) < tolerance) {
             const mat t_mat = local_stiffness(b, b) - local_stiffness(b, a) * solve(local_stiffness(a, a), local_stiffness(a, b));
 
             local_stiffness.zeros();
@@ -65,14 +71,8 @@ int B21E::update_status() {
             return SUANPAN_SUCCESS;
         }
 
-        const vec incre = solve(local_stiffness(a, a), local_resistance(a));
         local_deformation(a) -= incre;
         trial_rotation -= incre;
-
-        if(++counter > max_iteration) {
-            suanpan_error("B21E element %u fails to converge.\n", get_tag());
-            return SUANPAN_FAIL;
-        }
     }
 }
 
