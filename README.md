@@ -55,7 +55,7 @@ The highlights of **suanPan** are
 ## Quick Start
 
 Sample models are available for almost all models/commands. Please check the `Example` folder for details. Further
-details can be seen [here](https://suanpan-manual.readthedocs.io/Tutorial/Obtain/) regarding how to run model files.
+details can be seen [here](https://tlcfem.gitbook.io/suanpan-manual/tutorial/obtain) regarding how to run model files.
 
 ## Installation
 
