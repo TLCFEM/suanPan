@@ -398,6 +398,10 @@
       "kind":"type",
       "details":"Point Mass"
     },
+    "Mass2D",
+    "Mass3D",
+    "MassPoint2D",
+    "MassPoint3D",
     {
       "trigger":"SingleSection2D",
       "contents":"element SingleSection2D ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique tag\n# (2) int, node tag\n# (3) int, section tag",
