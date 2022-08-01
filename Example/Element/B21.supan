@@ -9,6 +9,7 @@ section Rectangle2D 1 12 1 1
 
 element B21 1 1 2 1 6 1
 # element EB21 1 1 2 12 1 1 1
+element MassPoint2D 2 2 1 1
 
 fix 1 P 1
 
