@@ -12,6 +12,8 @@ section Rectangle3D 1 12 1 1
 
 element B31 1 1 2 1 1
 element B31 2 2 3 1 1
+element MassPoint3D 3 2 1
+element MassPoint3D 4 2 1 1
 
 fix2 1 E 1
 
