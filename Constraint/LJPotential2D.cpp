@@ -14,44 +14,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-/**
- * @class ParticleCollision2D
- * @brief A ParticleCollision2D class.
- *
- * @author tlc
- * @date 15/02/2020
- * @version 0.1.0
- * @file ParticleCollision2D.h
- * @addtogroup Constraint
- * @{
- */
 
-#ifndef PARTICLECOLLISION2D_H
-#define PARTICLECOLLISION2D_H
+#include "LJPotential2D.h"
 
-#include "ParticleCollision.h"
+double LJPotential2D::compute_f(const double distance) const {
+    if(distance >= space) return 0.;
 
-class ParticleCollision2D : public ParticleCollision {
-    struct CellList {
-        int x = 0, y = 0;
-        unsigned tag = 0;
-    };
+    const auto pow_term = std::pow(.1 * space / distance, 6);
 
-    std::vector<CellList> list;
+    return alpha * pow_term * (4. - 4. * pow_term);
+}
 
-    [[nodiscard]] double compute_f(double) const override;
-    [[nodiscard]] double compute_df(double) const override;
+double LJPotential2D::compute_df(const double distance) const {
+    if(distance >= space) return 0.;
 
-    int process_meta(const shared_ptr<DomainBase>&, bool) override;
+    const auto pow_term = std::pow(.1 * space / distance, 6);
 
-protected:
-    const double space = 1.;
-    const double alpha = 1.;
-
-public:
-    ParticleCollision2D(unsigned, unsigned, double = 1., double = 1.);
-};
-
-#endif
-
-//! @}
+    return alpha * pow_term * (48. * pow_term - 24.) / distance;
+}
