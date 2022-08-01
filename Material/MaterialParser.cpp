@@ -174,18 +174,15 @@ void new_armstrongfrederick(unique_ptr<Material>& return_obj, istringstream& com
         suanpan_error("new_armstrongfrederick() requires a valid tag.\n");
         return;
     }
-    vec pool(std::initializer_list<double>{2E5, .2, 4E2, 5E2, 0., 1E1});
 
-    auto idx = 0;
-    double para;
-    while(!command.eof() && idx < 6)
-        if(get_input(command, para)) pool(idx++) = para;
-        else {
-            suanpan_error("new_armstrongfrederick() requires valid inputs.\n");
-            return;
-        }
+    vec pool{2E5, .2, 4E2, 5E2, 0., 1E1};
+    if(!get_optional_input(command, pool)) {
+        suanpan_error("new_armstrongfrederick() requires valid inputs.\n");
+        return;
+    }
 
     vector<double> ai, bi, all;
+    double para;
     while(!command.eof())
         if(get_input(command, para)) all.emplace_back(para);
         else {
@@ -196,7 +193,7 @@ void new_armstrongfrederick(unique_ptr<Material>& return_obj, istringstream& com
     auto size = all.size();
     auto density = 0.;
     if(size % 2 == 1) {
-        size--;
+        --size;
         density = all.back();
     }
 
@@ -214,17 +211,14 @@ void new_armstrongfrederick1d(unique_ptr<Material>& return_obj, istringstream& c
         suanpan_error("new_armstrongfrederick1d() requires a valid tag.\n");
         return;
     }
-    vec pool(std::initializer_list<double>{2E5, 4E2, 5E2, 0., 1E1});
 
-    auto idx = 0;
+    vec pool{2E5, 4E2, 5E2, 0., 1E1};
+    if(!get_optional_input(command, pool)) {
+        suanpan_error("new_armstrongfrederick1d() requires valid inputs.\n");
+        return;
+    }
+
     double para;
-    while(!command.eof() && idx < 5)
-        if(get_input(command, para)) pool(idx++) = para;
-        else {
-            suanpan_error("new_armstrongfrederick1d() requires valid inputs.\n");
-            return;
-        }
-
     vector<double> ai, bi, all;
     while(!command.eof())
         if(get_input(command, para)) all.emplace_back(para);
@@ -236,7 +230,7 @@ void new_armstrongfrederick1d(unique_ptr<Material>& return_obj, istringstream& c
     auto size = all.size();
     auto density = 0.;
     if(size % 2 == 1) {
-        size--;
+        --size;
         density = all.back();
     }
 
@@ -578,25 +572,22 @@ void new_bilinearhoffman(unique_ptr<Material>& return_obj, istringstream& comman
     }
 
     vec modulus(6);
-    for(unsigned I = 0; I < modulus.n_elem; ++I)
-        if(!get_input(command, modulus(I))) {
-            suanpan_error("new_linearhoffman() requires a valid modulus.\n");
-            return;
-        }
+    if(!get_input(command, modulus)) {
+        suanpan_error("new_linearhoffman() requires a valid modulus.\n");
+        return;
+    }
 
     vec poissons_ratio(3);
-    for(unsigned I = 0; I < poissons_ratio.n_elem; ++I)
-        if(!get_input(command, poissons_ratio(I))) {
-            suanpan_error("new_linearhoffman() requires a valid poisson's ratio.\n");
-            return;
-        }
+    if(!get_input(command, poissons_ratio)) {
+        suanpan_error("new_linearhoffman() requires a valid poisson's ratio.\n");
+        return;
+    }
 
     vec stress(9);
-    for(unsigned I = 0; I < stress.n_elem; ++I)
-        if(!get_input(command, stress(I))) {
-            suanpan_error("new_linearhoffman() requires a valid yield stress.\n");
-            return;
-        }
+    if(!get_input(command, stress)) {
+        suanpan_error("new_linearhoffman() requires a valid yield stress.\n");
+        return;
+    }
 
     auto hardening = 0.;
     if(command.eof()) suanpan_debug("new_linearhoffman() assumes zero hardening.\n");
@@ -864,12 +855,11 @@ void new_bwbn(unique_ptr<Material>& return_obj, istringstream& command) {
         return;
     }
 
-    vec para_pool(std::initializer_list<double>{2E5, 4E2, 1E-2, 5E-1, 1., 1., 0., 1., 0., 1., 0., 0., 0., 0., 0., 1., 0.});
+    vec para_pool{2E5, 4E2, 1E-2, 5E-1, 1., 1., 0., 1., 0., 1., 0., 0., 0., 0., 0., 1., 0.};
 
-    for(uword I = 0; I < para_pool.n_elem; ++I) {
-        double para;
-        if(command.eof() || !get_input(command, para)) break;
-        para_pool(I) = para;
+    if(!get_optional_input(command, para_pool)) {
+        suanpan_error("new_bwbn() requires a valid parameter.\n");
+        return;
     }
 
     return_obj = make_unique<BWBN>(tag, para_pool.head(16), para_pool(16));
@@ -882,12 +872,11 @@ void new_cdp(unique_ptr<Material>& return_obj, istringstream& command) {
         return;
     }
 
-    vec para_pool(std::initializer_list<double>{3E4, .2, 3., 30., 5E-4, 5E-2, .2, 2., .5, .65, .2, 1.16, .5, 2400E-12});
+    vec para_pool{3E4, .2, 3., 30., 5E-4, 5E-2, .2, 2., .5, .65, .2, 1.16, .5, 2400E-12};
 
-    for(uword I = 0; I < para_pool.n_elem; ++I) {
-        double para;
-        if(command.eof() || !get_input(command, para)) break;
-        para_pool(I) = para;
+    if(!get_optional_input(command, para_pool)) {
+        suanpan_error("new_cdp() requires a valid parameter.\n");
+        return;
     }
 
     return_obj = make_unique<CDP>(tag, para_pool(0), para_pool(1), para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6), para_pool(7), para_pool(8), para_pool(9), para_pool(10), para_pool(11), para_pool(12), para_pool(13));
@@ -900,12 +889,11 @@ void new_cdpm2(unique_ptr<Material>& return_obj, istringstream& command, const u
         return;
     }
 
-    vec para_pool(std::initializer_list<double>{3E4, .3, 3., 30., .3, .01, .85, .08, .003, 2., 1E-6, 5., 2E-4, 1E-4, 0.});
+    vec para_pool{3E4, .3, 3., 30., .3, .01, .85, .08, .003, 2., 1E-6, 5., 2E-4, 1E-4, 0.};
 
-    for(uword I = 0; I < para_pool.n_elem; ++I) {
-        double para;
-        if(command.eof() || !get_input(command, para)) break;
-        para_pool(I) = para;
+    if(!get_optional_input(command, para_pool)) {
+        suanpan_error("new_cdpm2() requires a valid parameter.\n");
+        return;
     }
 
     auto dt = CDPM2::DamageType::ISOTROPIC;
@@ -973,11 +961,7 @@ void new_concretecm(unique_ptr<Material>& return_obj, istringstream& command) {
     }
 
     double NC, NT;
-    if(!get_input(command, NC)) {
-        suanpan_error("new_concretecm() requires a valid parameter.\n");
-        return;
-    }
-    if(!get_input(command, NT)) {
+    if(!get_input(command, NC, NT)) {
         suanpan_error("new_concretecm() requires a valid parameter.\n");
         return;
     }
@@ -1024,11 +1008,11 @@ void new_concreteexp(unique_ptr<Material>& return_obj, istringstream& command) {
     }
 
     double f_t, a_t, g_t, f_c, a_c, g_c;
-    if(!get_input(command, f_t) || !get_input(command, a_t) || !get_input(command, g_t)) {
+    if(!get_input(command, f_t, a_t, g_t)) {
         suanpan_error("new_concreteexp() requires a valid tension parameter.\n");
         return;
     }
-    if(!get_input(command, f_c) || !get_input(command, a_c) || !get_input(command, g_c)) {
+    if(!get_input(command, f_c, a_c, g_c)) {
         suanpan_error("new_concreteexp() requires a valid compression parameter.\n");
         return;
     }
@@ -1060,11 +1044,7 @@ void new_concretetable(unique_ptr<Material>& return_obj, istringstream& command)
 
     mat t_table, c_table;
 
-    if(!get_input(command, t_name)) {
-        suanpan_error("new_concretetable() requires a valid parameter.\n");
-        return;
-    }
-    if(!get_input(command, c_name)) {
+    if(!get_input(command, t_name, c_name)) {
         suanpan_error("new_concretetable() requires a valid parameter.\n");
         return;
     }
@@ -1120,7 +1100,7 @@ void new_coulombfriction(unique_ptr<Material>& return_obj, istringstream& comman
     }
 
     double max_friction, factor;
-    if(!get_input(command, max_friction) || !get_input(command, factor)) {
+    if(!get_input(command, max_friction, factor)) {
         suanpan_error("new_coulombfriction() requires a parameter.\n");
         return;
     }
@@ -1303,15 +1283,7 @@ void new_expdp(unique_ptr<Material>& return_obj, istringstream& command) {
         suanpan_error("new_expdp() requires a valid xi.\n");
         return;
     }
-    if(!get_input(command, cohesion)) {
-        suanpan_error("new_expdp() requires a valid cohesion.\n");
-        return;
-    }
-    if(!get_input(command, cohesion_a)) {
-        suanpan_error("new_expdp() requires a valid cohesion.\n");
-        return;
-    }
-    if(!get_input(command, cohesion_b)) {
+    if(!get_input(command, cohesion, cohesion_a, cohesion_b)) {
         suanpan_error("new_expdp() requires a valid cohesion.\n");
         return;
     }
@@ -1331,10 +1303,12 @@ void new_expgurson(unique_ptr<Material>& return_obj, istringstream& command) {
         suanpan_error("new_expgurson() requires a valid tag.\n");
         return;
     }
-    vec para_pool(std::initializer_list<double>{2E2, .3, .4, .2, 1., 1., 0., 1., 0., 0.});
 
-    auto idx = 0;
-    while(!command.eof() && idx < 10) if(double para; get_input(command, para)) para_pool(idx++) = para;
+    vec para_pool{2E2, .3, .4, .2, 1., 1., 0., 1., 0., 0.};
+    if(!get_optional_input(command, para_pool)) {
+        suanpan_error("new_expgurson() requires a valid parameter.\n");
+        return;
+    }
 
     return_obj = make_unique<ExpGurson>(tag, para_pool(0), para_pool(1), para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6), para_pool(7), para_pool(8), para_pool(9));
 }
@@ -1345,10 +1319,12 @@ void new_expgurson1d(unique_ptr<Material>& return_obj, istringstream& command) {
         suanpan_error("new_expgurson1d() requires a valid tag.\n");
         return;
     }
-    vec para_pool(std::initializer_list<double>{2E2, .3, .4, .2, 1., 1., 0., 1., 0., 0.});
 
-    auto idx = 0;
-    while(!command.eof() && idx < 10) if(double para; get_input(command, para)) para_pool(idx++) = para;
+    vec para_pool{2E2, .3, .4, .2, 1., 1., 0., 1., 0., 0.};
+    if(!get_optional_input(command, para_pool)) {
+        suanpan_error("new_expgurson1d() requires a valid parameter.\n");
+        return;
+    }
 
     return_obj = make_unique<ExpGurson1D>(tag, para_pool(0), para_pool(1), para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6), para_pool(7), para_pool(8), para_pool(9));
 }
@@ -1361,25 +1337,22 @@ void new_exphoffman(unique_ptr<Material>& return_obj, istringstream& command) {
     }
 
     vec modulus(6);
-    for(unsigned I = 0; I < modulus.n_elem; ++I)
-        if(!get_input(command, modulus(I))) {
-            suanpan_error("new_linearhoffman() requires a valid modulus.\n");
-            return;
-        }
+    if(!get_input(command, modulus)) {
+        suanpan_error("new_linearhoffman() requires a valid modulus.\n");
+        return;
+    }
 
     vec poissons_ratio(3);
-    for(unsigned I = 0; I < poissons_ratio.n_elem; ++I)
-        if(!get_input(command, poissons_ratio(I))) {
-            suanpan_error("new_linearhoffman() requires a valid poisson's ratio.\n");
-            return;
-        }
+    if(!get_input(command, poissons_ratio)) {
+        suanpan_error("new_linearhoffman() requires a valid poisson's ratio.\n");
+        return;
+    }
 
     vec stress(9);
-    for(unsigned I = 0; I < stress.n_elem; ++I)
-        if(!get_input(command, stress(I))) {
-            suanpan_error("new_linearhoffman() requires a valid yield stress.\n");
-            return;
-        }
+    if(!get_input(command, stress)) {
+        suanpan_error("new_linearhoffman() requires a valid yield stress.\n");
+        return;
+    }
 
     double a, b;
     if(!get_input(command, a)) {
@@ -1461,16 +1434,8 @@ void new_expmises1d(unique_ptr<Material>& return_obj, istringstream& command) {
         suanpan_error("new_expmises1d() requires a valid yield stress.\n");
         return;
     }
-    if(!get_input(command, a)) {
-        suanpan_error("new_expmises1d() requires a valid a.\n");
-        return;
-    }
-    if(!get_input(command, b)) {
-        suanpan_error("new_expmises1d() requires a valid b.\n");
-        return;
-    }
-    if(!get_input(command, c)) {
-        suanpan_error("new_expmises1d() requires a valid c.\n");
+    if(!get_input(command, a, b, c)) {
+        suanpan_error("new_expmises1d() requires a valid parameter.\n");
         return;
     }
 
@@ -1490,10 +1455,11 @@ void new_dafaliasmanzari(unique_ptr<Material>& return_obj, istringstream& comman
         return;
     }
 
-    vec p(std::initializer_list<double>{125., .05, 1.25, .02, .9, .7, .01, 7., .1, .9, 1.1, -.7, 3.5, 4., 6E2, -130., .2, 0.});
-
-    auto idx = 0;
-    while(!command.eof() && idx < 18) if(double para; get_input(command, para)) p(idx++) = para;
+    vec p{125., .05, 1.25, .02, .9, .7, .01, 7., .1, .9, 1.1, -.7, 3.5, 4., 6E2, -130., .2, 0.};
+    if(!get_optional_input(command, p)) {
+        suanpan_error("new_dafaliasmanzari() requires a valid parameter.\n");
+        return;
+    }
 
     return_obj = make_unique<DafaliasManzari>(tag, p(0), p(1), p(2), p(3), p(4), p(5), p(6), p(7), p(8), p(9), p(10), p(11), p(12), p(13), p(14), p(15), p(16), p(17));
 }
@@ -1691,14 +1657,8 @@ void new_kelvin(unique_ptr<Material>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned damper_tag;
-    if(!get_input(command, damper_tag)) {
-        suanpan_error("new_kelvin() requires a valid tag.\n");
-        return;
-    }
-
-    unsigned spring_tag;
-    if(!get_input(command, spring_tag)) {
+    unsigned damper_tag, spring_tag;
+    if(!get_input(command, damper_tag, spring_tag)) {
         suanpan_error("new_kelvin() requires a valid tag.\n");
         return;
     }
@@ -1751,20 +1711,8 @@ void new_laminated(unique_ptr<Material>& return_obj, istringstream& command) {
 }
 
 void new_maxwell(unique_ptr<Material>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("new_maxwell() requires a valid tag.\n");
-        return;
-    }
-
-    unsigned damper_tag;
-    if(!get_input(command, damper_tag)) {
-        suanpan_error("new_maxwell() requires a valid tag.\n");
-        return;
-    }
-
-    unsigned spring_tag;
-    if(!get_input(command, spring_tag)) {
+    unsigned tag, damper_tag, spring_tag;
+    if(!get_input(command, tag, damper_tag, spring_tag)) {
         suanpan_error("new_maxwell() requires a valid tag.\n");
         return;
     }
@@ -1981,7 +1929,7 @@ void new_multilinearelastic1d(unique_ptr<Material>& return_obj, istringstream& c
     auto size = all.size();
     auto density = 0.;
     if(size % 2 == 1) {
-        size--;
+        --size;
         density = all.back();
     }
 
@@ -2081,11 +2029,10 @@ void new_nle3d01(unique_ptr<Material>& return_obj, istringstream& command) {
     }
 
     vec pool(4);
-    for(unsigned I = 0; I < pool.n_elem; ++I)
-        if(!get_input(command, pool(I))) {
-            suanpan_error("new_nle3d01() requires a valid parameter.\n");
-            return;
-        }
+    if(!get_input(command, pool)) {
+        suanpan_error("new_nle3d01() requires a valid parameter.\n");
+        return;
+    }
 
     auto density = 0.;
     if(command.eof()) suanpan_debug("new_nle3d01() assumes zero density.\n");
@@ -2105,18 +2052,16 @@ void new_orthotropicelastic3d(unique_ptr<Material>& return_obj, istringstream& c
     }
 
     vec modulus(6);
-    for(unsigned I = 0; I < modulus.n_elem; ++I)
-        if(!get_input(command, modulus(I))) {
-            suanpan_error("new_orthotropicelastic3d() requires a valid modulus.\n");
-            return;
-        }
+    if(!get_input(command, modulus)) {
+        suanpan_error("new_orthotropicelastic3d() requires a valid modulus.\n");
+        return;
+    }
 
     vec poissons_ratio(3);
-    for(unsigned I = 0; I < poissons_ratio.n_elem; ++I)
-        if(!get_input(command, poissons_ratio(I))) {
-            suanpan_error("new_orthotropicelastic3d() requires a valid poisson's ratio.\n");
-            return;
-        }
+    if(!get_input(command, poissons_ratio)) {
+        suanpan_error("new_orthotropicelastic3d() requires a valid poisson's ratio.\n");
+        return;
+    }
 
     auto density = 0.;
     if(command.eof()) suanpan_debug("new_orthotropicelastic3d() assumes zero density.\n");
@@ -2346,13 +2291,13 @@ void new_rebar2d(unique_ptr<Material>& return_obj, istringstream& command) {
     }
 
     unsigned major_tag, minor_tag;
-    if(!get_input(command, major_tag) || !get_input(command, minor_tag)) {
+    if(!get_input(command, major_tag, minor_tag)) {
         suanpan_error("new_rebar2d() requires a valid material tag.\n");
         return;
     }
 
     double major_ratio, minor_ratio;
-    if(!get_input(command, major_ratio) || !get_input(command, minor_ratio)) {
+    if(!get_input(command, major_ratio, minor_ratio)) {
         suanpan_error("new_rebar2d() requires a valid reinforcement ratio.\n");
         return;
     }
@@ -2368,13 +2313,13 @@ void new_rebar3d(unique_ptr<Material>& return_obj, istringstream& command) {
     }
 
     unsigned tag_x, tag_y, tag_z;
-    if(!get_input(command, tag_x) || !get_input(command, tag_y) || !get_input(command, tag_z)) {
+    if(!get_input(command, tag_x, tag_y, tag_z)) {
         suanpan_error("new_rebar3d() requires a valid material tag.\n");
         return;
     }
 
     double ratio_x, ratio_y, ratio_z;
-    if(!get_input(command, ratio_x) || !get_input(command, ratio_y) || !get_input(command, ratio_z)) {
+    if(!get_input(command, ratio_x, ratio_y, ratio_z)) {
         suanpan_error("new_rebar3d() requires a valid reinforcement ratio.\n");
         return;
     }
@@ -2505,10 +2450,11 @@ void new_simplesand(unique_ptr<Material>& return_obj, istringstream& command) {
         return;
     }
 
-    vec pool(std::initializer_list<double>{10E4, .2, .01, -.7, 5., 1.25, 1.1, 3.5, 1.915, -130., .02, 2., 0.});
-
-    auto idx = 0;
-    while(!command.eof() && idx < 13) if(double para; get_input(command, para)) pool(idx++) = para;
+    vec pool{10E4, .2, .01, -.7, 5., 1.25, 1.1, 3.5, 1.915, -130., .02, 2., 0.};
+    if(!get_optional_input(command, pool)) {
+        suanpan_error("new_simplesand() requires a valid parameter.\n");
+        return;
+    }
 
     return_obj = make_unique<SimpleSand>(tag, pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), pool(6), pool(7), pool(8), pool(9), pool(10), pool(11), pool(12));
 }
@@ -2553,7 +2499,7 @@ void new_rotation3d(unique_ptr<Material>& return_obj, istringstream& command) {
     }
 
     double a, b, c;
-    if(!get_input(command, a) || !get_input(command, b) || !get_input(command, c)) {
+    if(!get_input(command, a, b, c)) {
         suanpan_error("new_rotation3d() requires a valid angle.\n");
         return;
     }
@@ -2567,7 +2513,8 @@ void new_tablecdp(unique_ptr<Material>& return_obj, istringstream& command) {
         suanpan_error("new_tablecdp() requires a valid tag.\n");
         return;
     }
-    vec para_pool(std::initializer_list<double>{3E4, .2, .2, 1.16, .5, 2400E-12});
+
+    vec para_pool{3E4, .2, .2, 1.16, .5, 2400E-12};
 
     auto idx = 0;
     double para;
@@ -2609,7 +2556,8 @@ void new_tablegurson(unique_ptr<Material>& return_obj, istringstream& command) {
         suanpan_error("new_tablegurson() requires a valid tag.\n");
         return;
     }
-    vec para_pool(std::initializer_list<double>{2E2, .3, 1., 1., 0., 1., 0., 0.});
+
+    vec para_pool{2E2, .3, 1., 1., 0., 1., 0., 0.};
 
     auto idx = 0;
     double para;
@@ -2701,18 +2649,15 @@ void new_vafcrp(unique_ptr<Material>& return_obj, istringstream& command) {
         suanpan_error("new_vafcrp() requires a valid tag.\n");
         return;
     }
-    vec pool(std::initializer_list<double>{2E5, .2, 4E2, 5E2, 0., 1E1, 0., 0.});
 
-    auto idx = 0;
-    double para;
-    while(!command.eof() && idx < 8)
-        if(get_input(command, para)) pool(idx++) = para;
-        else {
-            suanpan_error("new_vafcrp() requires valid inputs.\n");
-            return;
-        }
+    vec pool{2E5, .2, 4E2, 5E2, 0., 1E1, 0., 0.};
+    if(!get_optional_input(command, pool)) {
+        suanpan_error("new_vafcrp() requires a valid parameter.\n");
+        return;
+    }
 
     vector<double> ai, bi, all;
+    double para;
     while(!command.eof())
         if(get_input(command, para)) all.emplace_back(para);
         else {
@@ -2723,7 +2668,7 @@ void new_vafcrp(unique_ptr<Material>& return_obj, istringstream& command) {
     auto size = all.size();
     auto density = 0.;
     if(size % 2 == 1) {
-        size--;
+        --size;
         density = all.back();
     }
 
@@ -2741,18 +2686,15 @@ void new_vafcrp1d(unique_ptr<Material>& return_obj, istringstream& command) {
         suanpan_error("new_vafcrp1d() requires a valid tag.\n");
         return;
     }
-    vec pool(std::initializer_list<double>{2E5, 4E2, 1E2, 0., 1E1, 0., 0.});
 
-    auto idx = 0;
-    double para;
-    while(!command.eof() && idx < 7)
-        if(get_input(command, para)) pool(idx++) = para;
-        else {
-            suanpan_error("new_vafcrp1d() requires valid inputs.\n");
-            return;
-        }
+    vec pool{2E5, 4E2, 1E2, 0., 1E1, 0., 0.};
+    if(!get_optional_input(command, pool)) {
+        suanpan_error("new_vafcrp1d() requires a valid parameter.\n");
+        return;
+    }
 
     vector<double> ai, bi, all;
+    double para;
     while(!command.eof())
         if(get_input(command, para)) all.emplace_back(para);
         else {
@@ -2763,7 +2705,7 @@ void new_vafcrp1d(unique_ptr<Material>& return_obj, istringstream& command) {
     auto size = all.size();
     auto density = 0.;
     if(size % 2 == 1) {
-        size--;
+        --size;
         density = all.back();
     }
 
@@ -2972,11 +2914,9 @@ int test_material2d(const shared_ptr<DomainBase>& domain, istringstream& command
     }
 
     vec incre(3);
-    for(auto& I : incre) {
-        if(!get_input(command, I)) {
-            suanpan_error("test_material2d() needs a valid step size.\n");
-            return SUANPAN_SUCCESS;
-        }
+    if(!get_input(command, incre)) {
+        suanpan_error("test_material2d() needs a valid step size.\n");
+        return SUANPAN_SUCCESS;
     }
 
     vector<unsigned> load_step;
@@ -3012,11 +2952,10 @@ int test_material3d(const shared_ptr<DomainBase>& domain, istringstream& command
     }
 
     vec incre(6);
-    for(auto& I : incre)
-        if(!get_input(command, I)) {
-            suanpan_error("test_material3d() needs a valid step size.\n");
-            return SUANPAN_SUCCESS;
-        }
+    if(!get_input(command, incre)) {
+        suanpan_error("test_material3d() needs a valid step size.\n");
+        return SUANPAN_SUCCESS;
+    }
 
     vector<unsigned> load_step;
     int step;
@@ -3051,18 +2990,16 @@ int test_material_with_base3d(const shared_ptr<DomainBase>& domain, istringstrea
     }
 
     vec base(6);
-    for(auto& I : base)
-        if(!get_input(command, I)) {
-            suanpan_error("test_material3dwithbase() needs a valid step size.\n");
-            return SUANPAN_SUCCESS;
-        }
+    if(!get_input(command, base)) {
+        suanpan_error("test_material3dwithbase() needs a valid step size.\n");
+        return SUANPAN_SUCCESS;
+    }
 
     vec incre(6);
-    for(auto& I : incre)
-        if(!get_input(command, I)) {
-            suanpan_error("test_material3dwithbase() needs a valid step size.\n");
-            return SUANPAN_SUCCESS;
-        }
+    if(!get_input(command, incre)) {
+        suanpan_error("test_material3dwithbase() needs a valid step size.\n");
+        return SUANPAN_SUCCESS;
+    }
 
     vector<unsigned> load_step;
     int step;
@@ -3149,11 +3086,10 @@ int test_material_by_load2d(const shared_ptr<DomainBase>& domain, istringstream&
     }
 
     vec incre(3);
-    for(auto& I : incre)
-        if(!get_input(command, I)) {
-            suanpan_error("test_material2d() needs a valid step size.\n");
-            return SUANPAN_SUCCESS;
-        }
+    if(!get_input(command, incre)) {
+        suanpan_error("test_material2d() needs a valid step size.\n");
+        return SUANPAN_SUCCESS;
+    }
 
     vector<unsigned> load_step;
     int step;
@@ -3188,11 +3124,10 @@ int test_material_by_load3d(const shared_ptr<DomainBase>& domain, istringstream&
     }
 
     vec incre(6);
-    for(auto& I : incre)
-        if(!get_input(command, I)) {
-            suanpan_error("test_material3d() needs a valid step size.\n");
-            return SUANPAN_SUCCESS;
-        }
+    if(!get_input(command, incre)) {
+        suanpan_error("test_material3d() needs a valid step size.\n");
+        return SUANPAN_SUCCESS;
+    }
 
     vector<unsigned> load_step;
     int step;
@@ -3227,18 +3162,16 @@ int test_material_by_load_with_base3d(const shared_ptr<DomainBase>& domain, istr
     }
 
     vec base(6);
-    for(auto& I : base)
-        if(!get_input(command, I)) {
-            suanpan_error("test_material3dwithbase() needs a valid step size.\n");
-            return SUANPAN_SUCCESS;
-        }
+    if(!get_input(command, base)) {
+        suanpan_error("test_material3dwithbase() needs a valid step size.\n");
+        return SUANPAN_SUCCESS;
+    }
 
     vec incre(6);
-    for(auto& I : incre)
-        if(!get_input(command, I)) {
-            suanpan_error("test_material3dwithbase() needs a valid step size.\n");
-            return SUANPAN_SUCCESS;
-        }
+    if(!get_input(command, incre)) {
+        suanpan_error("test_material3dwithbase() needs a valid step size.\n");
+        return SUANPAN_SUCCESS;
+    }
 
     vector<unsigned> load_step;
     int step;

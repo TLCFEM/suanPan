@@ -60,6 +60,14 @@ namespace suanpan {
 
 template<typename T> bool get_input(istringstream& I, T& O) { return static_cast<bool>(I >> O); }
 
+template<typename T> bool get_input(istringstream& I, Col<T>& O) {
+    auto code = true;
+    for(auto& P : O) code &= static_cast<bool>(I >> P);
+    return code;
+}
+
+template<typename T, typename...U> bool get_input(istringstream& I, T& O, U&...R) { return static_cast<bool>(I >> O) ? get_input(I, R...) : false; }
+
 template<typename T> T get_input(istringstream& I) {
     T O;
     I >> O;
@@ -72,6 +80,18 @@ template<typename T> bool get_optional_input(istringstream& I, T& O) {
     if(I.eof()) return true;
 
     return static_cast<bool>(I >> O);
+}
+
+template<typename T> bool get_optional_input(istringstream& I, Col<T>& O) {
+    auto code = true;
+    for(auto& P : O) code &= I.eof() ? true : static_cast<bool>(I >> P);
+    return code;
+}
+
+template<typename T, typename...U> bool get_optional_input(istringstream& I, T& O, U&...R) {
+    if(I.eof()) return true;
+
+    return static_cast<bool>(I >> O) ? get_optional_input(I, R...) : false;
 }
 
 bool is_equal(const char*, const char*);

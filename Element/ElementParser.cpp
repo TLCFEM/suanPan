@@ -31,11 +31,10 @@ void new_allman(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(3);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_allman() needs three valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_allman() needs three valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -58,11 +57,10 @@ void new_b21(unique_ptr<Element>& return_obj, istringstream& command, const unsi
     }
 
     uvec node_tag(2);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_b21() needs two valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_b21() needs two valid nodes.\n");
+        return;
+    }
 
     unsigned section_id;
     if(!get_input(command, section_id)) {
@@ -94,11 +92,10 @@ void new_b21h(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(2);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_b21h() needs two valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_b21h() needs two valid nodes.\n");
+        return;
+    }
 
     unsigned section_id;
     if(!get_input(command, section_id)) {
@@ -129,11 +126,10 @@ void new_b31(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(2);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_b31() needs two valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_b31() needs two valid nodes.\n");
+        return;
+    }
 
     unsigned section_id;
     if(!get_input(command, section_id)) {
@@ -170,11 +166,10 @@ void new_nmb21(unique_ptr<Element>& return_obj, istringstream& command, const un
     }
 
     uvec node_tag(2);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_nmb21() needs two valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_nmb21() needs two valid nodes.\n");
+        return;
+    }
 
     unsigned section_id;
     if(!get_input(command, section_id)) {
@@ -200,11 +195,10 @@ void new_nmb31(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(2);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_nmb31() needs two valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_nmb31() needs two valid nodes.\n");
+        return;
+    }
 
     unsigned section_id;
     if(!get_input(command, section_id)) {
@@ -235,11 +229,10 @@ void new_c3d20(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(20);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_c3d20() needs twenty valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_c3d20() needs twenty valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -266,11 +259,10 @@ void new_c3d4(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(4);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_c3d4() needs four valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_c3d4() needs four valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -293,11 +285,10 @@ void new_c3d8(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(8);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_c3d8() needs eight valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_c3d8() needs eight valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -324,11 +315,10 @@ void new_c3d8r(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(8);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_c3d8r() needs eight valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_c3d8r() needs eight valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -351,11 +341,10 @@ void new_c3d8i(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(8);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_c3d8i() needs eight valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_c3d8i() needs eight valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -374,11 +363,10 @@ void new_cax3(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(3);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_cax3() needs three valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_cax3() needs three valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -401,11 +389,10 @@ void new_cax4(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(4);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_cax4() needs four valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_cax4() needs four valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -424,11 +411,10 @@ void new_cax8(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(8);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_cax8() needs eight valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_cax8() needs eight valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -499,11 +485,10 @@ void new_cp3(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(3);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_cp3() needs three valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_cp3() needs three valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -532,11 +517,10 @@ void new_cp4(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(4);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_cp4() needs four valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_cp4() needs four valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -575,11 +559,10 @@ void new_cp4i(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(4);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_cp4i() needs four valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_cp4i() needs four valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -604,11 +587,10 @@ void new_cp4r(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(4);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_cp4r() needs four valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_cp4r() needs four valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -637,11 +619,10 @@ void new_cp5(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(5);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_cp5() needs five valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_cp5() needs five valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -672,11 +653,10 @@ void new_cp6(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(6);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_cp6() needs six valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_cp6() needs six valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -707,11 +687,10 @@ void new_cp7(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(7);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_cp7() needs five valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_cp7() needs five valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -742,11 +721,10 @@ void new_cp8(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(8);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_cp8() needs eight valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_cp8() needs eight valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -783,11 +761,10 @@ void new_cpe8(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(8);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_cpe8() needs eight valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_cpe8() needs eight valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -818,11 +795,10 @@ void new_cpe8r(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(8);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_cpe8r() needs eight valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_cpe8r() needs eight valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -847,11 +823,10 @@ void new_cinp4(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(4);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_cinp4() needs four valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_cinp4() needs four valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -876,11 +851,10 @@ void new_cin3d8(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(8);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_cin3d8() needs eight valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_cin3d8() needs eight valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -899,11 +873,10 @@ void new_csmt3(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(3);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_csmt3() needs three valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_csmt3() needs three valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -934,11 +907,10 @@ void new_csmt6(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(6);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_csmt6() needs six valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_csmt6() needs six valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -969,11 +941,10 @@ void new_csmq(unique_ptr<Element>& return_obj, istringstream& command, const uns
     }
 
     uvec node_tag(size);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_csmq() needs four valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_csmq() needs four valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -1008,11 +979,10 @@ void new_damper01(unique_ptr<Element>& return_obj, istringstream& command, const
     }
 
     uvec node_tag(2);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_damper01() needs two valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_damper01() needs two valid nodes.\n");
+        return;
+    }
 
     unsigned damper_tag;
     if(!get_input(command, damper_tag)) {
@@ -1031,11 +1001,10 @@ void new_damper02(unique_ptr<Element>& return_obj, istringstream& command, const
     }
 
     uvec node_tag(2);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_damper02() needs two valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_damper02() needs two valid nodes.\n");
+        return;
+    }
 
     unsigned damper_tag;
     if(!get_input(command, damper_tag)) {
@@ -1078,11 +1047,10 @@ void new_dc3d4(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(4);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_dc3d4() needs four valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_dc3d4() needs four valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -1113,11 +1081,10 @@ void new_dc3d8(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(8);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_dc3d8() needs four valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_dc3d8() needs four valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -1148,11 +1115,10 @@ void new_dcp3(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(3);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_dcp3() needs three valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_dcp3() needs three valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -1189,11 +1155,10 @@ void new_dcp4(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(4);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_dcp4() needs four valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_dcp4() needs four valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -1230,11 +1195,10 @@ void new_dkt3(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(3);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_dkt3() needs three valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_dkt3() needs three valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -1265,11 +1229,10 @@ void new_dkt4(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(4);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_dkt4() needs four valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_dkt4() needs four valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -1300,11 +1263,10 @@ void new_dkts3(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(3);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_dkts3() needs three valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_dkts3() needs three valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -1364,11 +1326,10 @@ void new_eb21(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(2);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_eb21() needs two valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_eb21() needs two valid nodes.\n");
+        return;
+    }
 
     double area;
     if(!get_input(command, area)) {
@@ -1403,11 +1364,10 @@ void new_f21(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(2);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_f21() needs two valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_f21() needs two valid nodes.\n");
+        return;
+    }
 
     unsigned section_id;
     if(!get_input(command, section_id)) {
@@ -1436,11 +1396,10 @@ void new_f21h(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(2);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_f21h() needs two valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_f21h() needs two valid nodes.\n");
+        return;
+    }
 
     unsigned section_id;
     if(!get_input(command, section_id)) {
@@ -1469,11 +1428,10 @@ void new_f31(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(2);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_f31() needs two valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_f31() needs two valid nodes.\n");
+        return;
+    }
 
     unsigned section_id;
     if(!get_input(command, section_id)) {
@@ -1510,11 +1468,10 @@ void new_gcmq(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(4);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_gcmq() needs four valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_gcmq() needs four valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -1540,11 +1497,10 @@ void new_gcmqi(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(4);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_gcmq() needs four valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_gcmq() needs four valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -1567,11 +1523,10 @@ void new_gcmql(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(4);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_gcmq() needs four valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_gcmq() needs four valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -1594,11 +1549,10 @@ void new_gcmqg(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(4);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_gcmq() needs four valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_gcmq() needs four valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -1621,11 +1575,10 @@ void new_sgcmqi(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(4);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_sgcmqi() needs four valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_sgcmqi() needs four valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -1648,11 +1601,10 @@ void new_sgcmql(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(4);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_sgcmql() needs four valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_sgcmql() needs four valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -1675,11 +1627,10 @@ void new_sgcmqg(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(4);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_sgcmqg() needs four valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_sgcmqg() needs four valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -1702,11 +1653,10 @@ void new_sgcms(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(4);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_sgcms() needs four valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_sgcms() needs four valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -1731,11 +1681,10 @@ void new_gq12(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(4);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_gq12() needs four valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_gq12() needs four valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -1758,11 +1707,10 @@ void new_joint(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(2);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_joint() needs two valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_joint() needs two valid nodes.\n");
+        return;
+    }
 
     vector<uword> pool;
     uword material_tag;
@@ -1771,7 +1719,7 @@ void new_joint(unique_ptr<Element>& return_obj, istringstream& command) {
     return_obj = make_unique<Joint>(tag, std::move(node_tag), std::move(pool));
 }
 
-void new_mass(unique_ptr<Element>& return_obj, istringstream& command) {
+void new_mass(unique_ptr<Element>& return_obj, istringstream& command, const unsigned which) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("new_mass() needs a valid tag.\n");
@@ -1794,7 +1742,51 @@ void new_mass(unique_ptr<Element>& return_obj, istringstream& command) {
     vector<uword> dof_tag;
     while(!command.eof() && get_input(command, dof)) dof_tag.push_back(dof);
 
-    return_obj = make_unique<Mass>(tag, node, magnitude, uvec(dof_tag));
+    if(2 == which && *std::max_element(dof_tag.cbegin(), dof_tag.cend()) > 3) {
+        suanpan_error("new_mass() supports at most three dofs.\n");
+        return;
+    }
+    if(3 == which && *std::max_element(dof_tag.cbegin(), dof_tag.cend()) > 6) {
+        suanpan_error("new_mass() supports at most six dofs.\n");
+        return;
+    }
+
+    if(2 == which) return_obj = make_unique<Mass2D>(tag, node, magnitude, uvec(dof_tag));
+    else return_obj = make_unique<Mass3D>(tag, node, magnitude, uvec(dof_tag));
+}
+
+void new_masspoint(unique_ptr<Element>& return_obj, istringstream& command, const unsigned which) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("new_masspoint() needs a valid tag.\n");
+        return;
+    }
+
+    unsigned node;
+    if(!get_input(command, node)) {
+        suanpan_error("new_masspoint() needs one valid node.\n");
+        return;
+    }
+
+    double translational_magnitude;
+    if(!get_input(command, translational_magnitude)) {
+        suanpan_error("new_masspoint() needs a valid translational magnitude.\n");
+        return;
+    }
+
+    if(command.eof()) {
+        if(2 == which) return_obj = make_unique<MassPoint2D>(tag, node, translational_magnitude);
+        else return_obj = make_unique<MassPoint3D>(tag, node, translational_magnitude);
+    }
+    else {
+        double rotational_magnitude;
+        if(!get_input(command, rotational_magnitude)) {
+            suanpan_error("new_masspoint() needs a valid rotational magnitude.\n");
+            return;
+        }
+        if(2 == which) return_obj = make_unique<MassPoint2D>(tag, node, translational_magnitude, rotational_magnitude);
+        else return_obj = make_unique<MassPoint3D>(tag, node, translational_magnitude, rotational_magnitude);
+    }
 }
 
 void new_mindlin(unique_ptr<Element>& return_obj, istringstream& command) {
@@ -1805,11 +1797,10 @@ void new_mindlin(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(4);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_mindlin() needs four valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_mindlin() needs four valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -1840,11 +1831,10 @@ void new_mvlem(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(2);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_mvlem() needs two valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_mvlem() needs two valid nodes.\n");
+        return;
+    }
 
     unsigned shear_tag;
     if(!get_input(command, shear_tag)) {
@@ -1901,11 +1891,10 @@ void new_pcpedc(unique_ptr<Element>& return_obj, istringstream& command, const u
     }
 
     uvec node_tag(node);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_pcpedc() needs %u valid nodes.\n", node);
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_pcpedc() needs %u valid nodes.\n", node);
+        return;
+    }
 
     unsigned solid_tag;
     if(!get_input(command, solid_tag)) {
@@ -1944,11 +1933,10 @@ void new_pcpeuc(unique_ptr<Element>& return_obj, istringstream& command, const u
     }
 
     uvec node_tag(node);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_pcpeuc() needs %u valid nodes.\n", node);
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_pcpeuc() needs %u valid nodes.\n", node);
+        return;
+    }
 
     unsigned solid_tag;
     if(!get_input(command, solid_tag)) {
@@ -1983,11 +1971,10 @@ void new_ps(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(4);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_ps() needs four valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_ps() needs four valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -2010,11 +1997,10 @@ void new_qe2(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(4);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_qe2() needs four valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_qe2() needs four valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -2037,11 +2023,10 @@ void new_s4(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(4);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_s4() needs four valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_s4() needs four valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -2110,11 +2095,10 @@ void new_spring01(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(2);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_spring01() needs two valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_spring01() needs two valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -2133,11 +2117,10 @@ void new_spring02(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(2);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_spring02() needs two valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_spring02() needs two valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -2156,11 +2139,10 @@ void new_t2d2(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(2);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_t2d2() needs two valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_t2d2() needs two valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -2196,11 +2178,10 @@ void new_t2d2s(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(2);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_t2d2s() needs two valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_t2d2s() needs two valid nodes.\n");
+        return;
+    }
 
     unsigned section_tag;
     if(!get_input(command, section_tag)) {
@@ -2227,11 +2208,10 @@ void new_t3d2(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(2);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_t3d2() needs two valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_t3d2() needs two valid nodes.\n");
+        return;
+    }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
@@ -2267,11 +2247,10 @@ void new_t3d2s(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     uvec node_tag(2);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("new_t3d2s() needs two valid nodes.\n");
-            return;
-        }
+    if(!get_input(command, node_tag)) {
+        suanpan_error("new_t3d2s() needs two valid nodes.\n");
+        return;
+    }
 
     unsigned section_tag;
     if(!get_input(command, section_tag)) {
@@ -2369,11 +2348,7 @@ void new_patchquad(unique_ptr<Element>& return_obj, istringstream& command) {
         suanpan_error("new_patchquad() needs a valid node tags.\n");
         return;
     }
-    if(knot_x.empty()) {
-        suanpan_error("new_patchquad() needs a valid knot vector.\n");
-        return;
-    }
-    if(knot_y.empty()) {
+    if(knot_x.empty() || knot_y.empty()) {
         suanpan_error("new_patchquad() needs a valid knot vector.\n");
         return;
     }
@@ -2433,15 +2408,7 @@ void new_patchcube(unique_ptr<Element>& return_obj, istringstream& command) {
         suanpan_error("new_patchcube() needs a valid node tags.\n");
         return;
     }
-    if(knot_x.empty()) {
-        suanpan_error("new_patchcube() needs a valid knot vector.\n");
-        return;
-    }
-    if(knot_y.empty()) {
-        suanpan_error("new_patchcube() needs a valid knot vector.\n");
-        return;
-    }
-    if(knot_z.empty()) {
+    if(knot_x.empty() || knot_y.empty() || knot_z.empty()) {
         suanpan_error("new_patchcube() needs a valid knot vector.\n");
         return;
     }
@@ -2476,7 +2443,12 @@ int create_new_mass(const shared_ptr<DomainBase>& domain, istringstream& command
     vector<uword> dof_tag;
     while(get_input(command, dof)) dof_tag.push_back(dof);
 
-    domain->insert(make_shared<Mass>(tag, node, magnitude, uvec(dof_tag)));
+    if(*std::max_element(dof_tag.cbegin(), dof_tag.cend()) > 6) {
+        suanpan_error("new_mass() supports at most six dofs.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    domain->insert(make_shared<Mass3D>(tag, node, magnitude, uvec(dof_tag)));
 
     return SUANPAN_SUCCESS;
 }
@@ -2524,19 +2496,7 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
         }
 
         double a, b, c, d;
-        if(!get_input(command, a)) {
-            suanpan_error("create_new_modifier() needs four valid numbers.\n");
-            return SUANPAN_SUCCESS;
-        }
-        if(!get_input(command, b)) {
-            suanpan_error("create_new_modifier() needs four valid numbers.\n");
-            return SUANPAN_SUCCESS;
-        }
-        if(!get_input(command, c)) {
-            suanpan_error("create_new_modifier() needs four valid numbers.\n");
-            return SUANPAN_SUCCESS;
-        }
-        if(!get_input(command, d)) {
+        if(!get_input(command, a, b, c, d)) {
             suanpan_error("create_new_modifier() needs four valid numbers.\n");
             return SUANPAN_SUCCESS;
         }
@@ -2554,11 +2514,7 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
         }
 
         double a, b;
-        if(!get_input(command, a)) {
-            suanpan_error("create_new_modifier() needs two valid numbers.\n");
-            return SUANPAN_SUCCESS;
-        }
-        if(!get_input(command, b)) {
+        if(!get_input(command, a, b)) {
             suanpan_error("create_new_modifier() needs two valid numbers.\n");
             return SUANPAN_SUCCESS;
         }
@@ -2608,11 +2564,10 @@ int create_new_orientation(const shared_ptr<DomainBase>& domain, istringstream& 
     }
 
     vec xyz(3);
-    for(auto& I : xyz)
-        if(!get_input(command, I)) {
-            suanpan_error("create_new_orientation() needs a vector.\n");
-            return SUANPAN_SUCCESS;
-        }
+    if(!get_input(command, xyz)) {
+        suanpan_error("create_new_orientation() needs a vector.\n");
+        return SUANPAN_SUCCESS;
+    }
 
     if(is_equal(file_type, "B3DL")) domain->insert(make_shared<B3DL>(tag, std::move(xyz)));
     else if(is_equal(file_type, "B3DC")) domain->insert(make_shared<B3DC>(tag, std::move(xyz)));
@@ -2696,7 +2651,11 @@ int create_new_element(const shared_ptr<DomainBase>& domain, istringstream& comm
     else if(is_equal(element_id, "GCMQL")) new_gcmql(new_element, command);
     else if(is_equal(element_id, "GQ12")) new_gq12(new_element, command);
     else if(is_equal(element_id, "Joint")) new_joint(new_element, command);
-    else if(is_equal(element_id, "Mass")) new_mass(new_element, command);
+    else if(is_equal(element_id, "Mass2D")) new_mass(new_element, command, 2);
+    else if(is_equal(element_id, "Mass3D")) new_mass(new_element, command, 3);
+    else if(is_equal(element_id, "Mass")) new_mass(new_element, command, 3);
+    else if(is_equal(element_id, "MassPoint2D")) new_masspoint(new_element, command, 2);
+    else if(is_equal(element_id, "MassPoint3D")) new_masspoint(new_element, command, 3);
     else if(is_equal(element_id, "Mindlin")) new_mindlin(new_element, command);
     else if(is_equal(element_id, "MVLEM")) new_mvlem(new_element, command);
     else if(is_equal(element_id, "PS")) new_ps(new_element, command);
