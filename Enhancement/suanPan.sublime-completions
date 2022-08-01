@@ -1349,6 +1349,7 @@
     "PARDISO",
     "particlecollision2d",
     "ParticleCollision2D",
+    "LJPotential2D",
     "particlecollision3d",
     "ParticleCollision3D",
     "PCPE4DC",
