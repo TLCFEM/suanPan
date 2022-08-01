@@ -51,7 +51,7 @@ initial velocity -0.3111 2 10
 hdf5recorder 1 Global KE
 # hdf5recorder 2 Visualisation U every 20 width 4
 
-ljpotential2d 1 2.
+constraint ljpotential2d 1 5. 10.
 
 rigidwall 2 5 0 -1 0 1E0
 rigidwall 3 0 5 0 -1 1E0
@@ -59,7 +59,7 @@ rigidwall 4 -5 0 1 0 1E0
 rigidwall 5 0 -5 0 1 1E0
 
 step dynamic 1 200
-set ini_step_size 2E-2
+set ini_step_size 1E-2
 set fixed_step_size 1
 set band_mat false
 set symm_mat false
