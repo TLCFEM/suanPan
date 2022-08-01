@@ -174,8 +174,8 @@ void new_armstrongfrederick(unique_ptr<Material>& return_obj, istringstream& com
         suanpan_error("new_armstrongfrederick() requires a valid tag.\n");
         return;
     }
-    vec pool{2E5, .2, 4E2, 5E2, 0., 1E1};
 
+    vec pool{2E5, .2, 4E2, 5E2, 0., 1E1};
     if(!get_optional_input(command, pool)) {
         suanpan_error("new_armstrongfrederick() requires valid inputs.\n");
         return;
@@ -211,17 +211,14 @@ void new_armstrongfrederick1d(unique_ptr<Material>& return_obj, istringstream& c
         suanpan_error("new_armstrongfrederick1d() requires a valid tag.\n");
         return;
     }
-    vec pool(std::initializer_list<double>{2E5, 4E2, 5E2, 0., 1E1});
 
-    auto idx = 0;
+    vec pool{2E5, 4E2, 5E2, 0., 1E1};
+    if(!get_optional_input(command, pool)) {
+        suanpan_error("new_armstrongfrederick1d() requires valid inputs.\n");
+        return;
+    }
+
     double para;
-    while(!command.eof() && idx < 5)
-        if(get_input(command, para)) pool(idx++) = para;
-        else {
-            suanpan_error("new_armstrongfrederick1d() requires valid inputs.\n");
-            return;
-        }
-
     vector<double> ai, bi, all;
     while(!command.eof())
         if(get_input(command, para)) all.emplace_back(para);
@@ -858,12 +855,11 @@ void new_bwbn(unique_ptr<Material>& return_obj, istringstream& command) {
         return;
     }
 
-    vec para_pool(std::initializer_list<double>{2E5, 4E2, 1E-2, 5E-1, 1., 1., 0., 1., 0., 1., 0., 0., 0., 0., 0., 1., 0.});
+    vec para_pool{2E5, 4E2, 1E-2, 5E-1, 1., 1., 0., 1., 0., 1., 0., 0., 0., 0., 0., 1., 0.};
 
-    for(uword I = 0; I < para_pool.n_elem; ++I) {
-        double para;
-        if(command.eof() || !get_input(command, para)) break;
-        para_pool(I) = para;
+    if(!get_optional_input(command, para_pool)) {
+        suanpan_error("new_bwbn() requires a valid parameter.\n");
+        return;
     }
 
     return_obj = make_unique<BWBN>(tag, para_pool.head(16), para_pool(16));
@@ -1307,10 +1303,12 @@ void new_expgurson(unique_ptr<Material>& return_obj, istringstream& command) {
         suanpan_error("new_expgurson() requires a valid tag.\n");
         return;
     }
-    vec para_pool(std::initializer_list<double>{2E2, .3, .4, .2, 1., 1., 0., 1., 0., 0.});
 
-    auto idx = 0;
-    while(!command.eof() && idx < 10) if(double para; get_input(command, para)) para_pool(idx++) = para;
+    vec para_pool{2E2, .3, .4, .2, 1., 1., 0., 1., 0., 0.};
+    if(!get_optional_input(command, para_pool)) {
+        suanpan_error("new_expgurson() requires a valid parameter.\n");
+        return;
+    }
 
     return_obj = make_unique<ExpGurson>(tag, para_pool(0), para_pool(1), para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6), para_pool(7), para_pool(8), para_pool(9));
 }
@@ -1321,10 +1319,12 @@ void new_expgurson1d(unique_ptr<Material>& return_obj, istringstream& command) {
         suanpan_error("new_expgurson1d() requires a valid tag.\n");
         return;
     }
-    vec para_pool(std::initializer_list<double>{2E2, .3, .4, .2, 1., 1., 0., 1., 0., 0.});
 
-    auto idx = 0;
-    while(!command.eof() && idx < 10) if(double para; get_input(command, para)) para_pool(idx++) = para;
+    vec para_pool{2E2, .3, .4, .2, 1., 1., 0., 1., 0., 0.};
+    if(!get_optional_input(command, para_pool)) {
+        suanpan_error("new_expgurson1d() requires a valid parameter.\n");
+        return;
+    }
 
     return_obj = make_unique<ExpGurson1D>(tag, para_pool(0), para_pool(1), para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6), para_pool(7), para_pool(8), para_pool(9));
 }
@@ -1337,25 +1337,22 @@ void new_exphoffman(unique_ptr<Material>& return_obj, istringstream& command) {
     }
 
     vec modulus(6);
-    for(unsigned I = 0; I < modulus.n_elem; ++I)
-        if(!get_input(command, modulus(I))) {
-            suanpan_error("new_linearhoffman() requires a valid modulus.\n");
-            return;
-        }
+    if(!get_input(command, modulus)) {
+        suanpan_error("new_linearhoffman() requires a valid modulus.\n");
+        return;
+    }
 
     vec poissons_ratio(3);
-    for(unsigned I = 0; I < poissons_ratio.n_elem; ++I)
-        if(!get_input(command, poissons_ratio(I))) {
-            suanpan_error("new_linearhoffman() requires a valid poisson's ratio.\n");
-            return;
-        }
+    if(!get_input(command, poissons_ratio)) {
+        suanpan_error("new_linearhoffman() requires a valid poisson's ratio.\n");
+        return;
+    }
 
     vec stress(9);
-    for(unsigned I = 0; I < stress.n_elem; ++I)
-        if(!get_input(command, stress(I))) {
-            suanpan_error("new_linearhoffman() requires a valid yield stress.\n");
-            return;
-        }
+    if(!get_input(command, stress)) {
+        suanpan_error("new_linearhoffman() requires a valid yield stress.\n");
+        return;
+    }
 
     double a, b;
     if(!get_input(command, a)) {
@@ -1458,10 +1455,11 @@ void new_dafaliasmanzari(unique_ptr<Material>& return_obj, istringstream& comman
         return;
     }
 
-    vec p(std::initializer_list<double>{125., .05, 1.25, .02, .9, .7, .01, 7., .1, .9, 1.1, -.7, 3.5, 4., 6E2, -130., .2, 0.});
-
-    auto idx = 0;
-    while(!command.eof() && idx < 18) if(double para; get_input(command, para)) p(idx++) = para;
+    vec p{125., .05, 1.25, .02, .9, .7, .01, 7., .1, .9, 1.1, -.7, 3.5, 4., 6E2, -130., .2, 0.};
+    if(!get_optional_input(command, p)) {
+        suanpan_error("new_dafaliasmanzari() requires a valid parameter.\n");
+        return;
+    }
 
     return_obj = make_unique<DafaliasManzari>(tag, p(0), p(1), p(2), p(3), p(4), p(5), p(6), p(7), p(8), p(9), p(10), p(11), p(12), p(13), p(14), p(15), p(16), p(17));
 }
@@ -2031,11 +2029,10 @@ void new_nle3d01(unique_ptr<Material>& return_obj, istringstream& command) {
     }
 
     vec pool(4);
-    for(unsigned I = 0; I < pool.n_elem; ++I)
-        if(!get_input(command, pool(I))) {
-            suanpan_error("new_nle3d01() requires a valid parameter.\n");
-            return;
-        }
+    if(!get_input(command, pool)) {
+        suanpan_error("new_nle3d01() requires a valid parameter.\n");
+        return;
+    }
 
     auto density = 0.;
     if(command.eof()) suanpan_debug("new_nle3d01() assumes zero density.\n");
@@ -2055,18 +2052,16 @@ void new_orthotropicelastic3d(unique_ptr<Material>& return_obj, istringstream& c
     }
 
     vec modulus(6);
-    for(unsigned I = 0; I < modulus.n_elem; ++I)
-        if(!get_input(command, modulus(I))) {
-            suanpan_error("new_orthotropicelastic3d() requires a valid modulus.\n");
-            return;
-        }
+    if(!get_input(command, modulus)) {
+        suanpan_error("new_orthotropicelastic3d() requires a valid modulus.\n");
+        return;
+    }
 
     vec poissons_ratio(3);
-    for(unsigned I = 0; I < poissons_ratio.n_elem; ++I)
-        if(!get_input(command, poissons_ratio(I))) {
-            suanpan_error("new_orthotropicelastic3d() requires a valid poisson's ratio.\n");
-            return;
-        }
+    if(!get_input(command, poissons_ratio)) {
+        suanpan_error("new_orthotropicelastic3d() requires a valid poisson's ratio.\n");
+        return;
+    }
 
     auto density = 0.;
     if(command.eof()) suanpan_debug("new_orthotropicelastic3d() assumes zero density.\n");
@@ -2455,10 +2450,11 @@ void new_simplesand(unique_ptr<Material>& return_obj, istringstream& command) {
         return;
     }
 
-    vec pool(std::initializer_list<double>{10E4, .2, .01, -.7, 5., 1.25, 1.1, 3.5, 1.915, -130., .02, 2., 0.});
-
-    auto idx = 0;
-    while(!command.eof() && idx < 13) if(double para; get_input(command, para)) pool(idx++) = para;
+    vec pool{10E4, .2, .01, -.7, 5., 1.25, 1.1, 3.5, 1.915, -130., .02, 2., 0.};
+    if(!get_optional_input(command, pool)) {
+        suanpan_error("new_simplesand() requires a valid parameter.\n");
+        return;
+    }
 
     return_obj = make_unique<SimpleSand>(tag, pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), pool(6), pool(7), pool(8), pool(9), pool(10), pool(11), pool(12));
 }
@@ -2517,7 +2513,8 @@ void new_tablecdp(unique_ptr<Material>& return_obj, istringstream& command) {
         suanpan_error("new_tablecdp() requires a valid tag.\n");
         return;
     }
-    vec para_pool(std::initializer_list<double>{3E4, .2, .2, 1.16, .5, 2400E-12});
+
+    vec para_pool{3E4, .2, .2, 1.16, .5, 2400E-12};
 
     auto idx = 0;
     double para;
@@ -2559,7 +2556,8 @@ void new_tablegurson(unique_ptr<Material>& return_obj, istringstream& command) {
         suanpan_error("new_tablegurson() requires a valid tag.\n");
         return;
     }
-    vec para_pool(std::initializer_list<double>{2E2, .3, 1., 1., 0., 1., 0., 0.});
+
+    vec para_pool{2E2, .3, 1., 1., 0., 1., 0., 0.};
 
     auto idx = 0;
     double para;
@@ -2651,18 +2649,15 @@ void new_vafcrp(unique_ptr<Material>& return_obj, istringstream& command) {
         suanpan_error("new_vafcrp() requires a valid tag.\n");
         return;
     }
-    vec pool(std::initializer_list<double>{2E5, .2, 4E2, 5E2, 0., 1E1, 0., 0.});
 
-    auto idx = 0;
-    double para;
-    while(!command.eof() && idx < 8)
-        if(get_input(command, para)) pool(idx++) = para;
-        else {
-            suanpan_error("new_vafcrp() requires valid inputs.\n");
-            return;
-        }
+    vec pool{2E5, .2, 4E2, 5E2, 0., 1E1, 0., 0.};
+    if(!get_optional_input(command, pool)) {
+        suanpan_error("new_vafcrp() requires a valid parameter.\n");
+        return;
+    }
 
     vector<double> ai, bi, all;
+    double para;
     while(!command.eof())
         if(get_input(command, para)) all.emplace_back(para);
         else {
@@ -2691,18 +2686,15 @@ void new_vafcrp1d(unique_ptr<Material>& return_obj, istringstream& command) {
         suanpan_error("new_vafcrp1d() requires a valid tag.\n");
         return;
     }
-    vec pool(std::initializer_list<double>{2E5, 4E2, 1E2, 0., 1E1, 0., 0.});
 
-    auto idx = 0;
-    double para;
-    while(!command.eof() && idx < 7)
-        if(get_input(command, para)) pool(idx++) = para;
-        else {
-            suanpan_error("new_vafcrp1d() requires valid inputs.\n");
-            return;
-        }
+    vec pool{2E5, 4E2, 1E2, 0., 1E1, 0., 0.};
+    if(!get_optional_input(command, pool)) {
+        suanpan_error("new_vafcrp1d() requires a valid parameter.\n");
+        return;
+    }
 
     vector<double> ai, bi, all;
+    double para;
     while(!command.eof())
         if(get_input(command, para)) all.emplace_back(para);
         else {
