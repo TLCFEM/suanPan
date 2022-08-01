@@ -115,6 +115,7 @@
     <ClCompile Include="..\..\..\Constraint\Criterion\StrainEnergyEvolution.cpp" />
     <ClCompile Include="..\..\..\Constraint\Embed.cpp" />
     <ClCompile Include="..\..\..\Constraint\FixedLength.cpp" />
+    <ClCompile Include="..\..\..\Constraint\LJPotential2D.cpp" />
     <ClCompile Include="..\..\..\Constraint\MPC.cpp" />
     <ClCompile Include="..\..\..\Constraint\NodeFacet.cpp" />
     <ClCompile Include="..\..\..\Constraint\NodeLine.cpp" />
@@ -515,6 +516,7 @@
     <ClInclude Include="..\..\..\Constraint\Criterion\StrainEnergyEvolution.h" />
     <ClInclude Include="..\..\..\Constraint\Embed.h" />
     <ClInclude Include="..\..\..\Constraint\FixedLength.h" />
+    <ClInclude Include="..\..\..\Constraint\LJPotential2D.h" />
     <ClInclude Include="..\..\..\Constraint\MPC.h" />
     <ClInclude Include="..\..\..\Constraint\NodeFacet.h" />
     <ClInclude Include="..\..\..\Constraint\NodeLine.h" />

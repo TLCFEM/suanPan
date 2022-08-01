@@ -15,41 +15,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class ParticleCollision2D
- * @brief A ParticleCollision2D class.
+ * @class LJPotential2D
+ * @brief A LJPotential2D class.
  *
  * @author tlc
- * @date 15/02/2020
+ * @date 01/08/2022
  * @version 0.1.0
- * @file ParticleCollision2D.h
+ * @file LJPotential2D.h
  * @addtogroup Constraint
  * @{
  */
 
-#ifndef PARTICLECOLLISION2D_H
-#define PARTICLECOLLISION2D_H
+#ifndef LJPOTENTIAL2D_H
+#define LJPOTENTIAL2D_H
 
-#include "ParticleCollision.h"
+#include "ParticleCollision2D.h"
 
-class ParticleCollision2D : public ParticleCollision {
-    struct CellList {
-        int x = 0, y = 0;
-        unsigned tag = 0;
-    };
-
-    std::vector<CellList> list;
-
+class LJPotential2D final : public ParticleCollision2D {
     [[nodiscard]] double compute_f(double) const override;
     [[nodiscard]] double compute_df(double) const override;
-
-    int process_meta(const shared_ptr<DomainBase>&, bool) override;
-
-protected:
-    const double space = 1.;
-    const double alpha = 1.;
-
 public:
-    ParticleCollision2D(unsigned, unsigned, double = 1., double = 1.);
+    using ParticleCollision2D::ParticleCollision2D;
 };
 
 #endif
