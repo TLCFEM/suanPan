@@ -32,6 +32,6 @@ analyze
 
 peek node 1 2
 
-save recorder 1
+# save recorder 1
 
 exit

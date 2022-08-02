@@ -16,7 +16,7 @@ fix 2 3 1
 
 amplitude Tabular 1 EZ
 
-supportacceleration 2 1 .2 1 1
+supportvelocity 2 1 .2 1 1
 
 hdf5recorder 1 Node U1 1 2
 
@@ -24,7 +24,7 @@ step dynamic 1 25
 set ini_step_size 1E-2
 set fixed_step_size true
 
-integrator GSSSSU0 1 .6 .6 .6
+integrator BatheTwoStep 1
 
 converger RelIncreDisp 1 1E-10 4 1
 
