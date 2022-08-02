@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -34,7 +33,7 @@ func main() {
 		}
 	}(response.Body)
 
-	html, err := ioutil.ReadAll(response.Body)
+	html, err := io.ReadAll(response.Body)
 	if err != nil {
 		return
 	}
