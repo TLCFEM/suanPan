@@ -347,7 +347,8 @@ int process_file(const shared_ptr<Bead>& model, const char* file_name) {
         if(!command_line.empty() && command_line[0] != '#' && command_line[0] != '!') {
             if(const auto if_comment = command_line.find('!'); string::npos != if_comment) command_line.erase(if_comment);
             for(auto& c : command_line) if(',' == c || '\t' == c || '\r' == c || '\n' == c) c = ' ';
-            while(*command_line.crbegin() == ' ') command_line.pop_back();
+            while(!command_line.empty() && *command_line.crbegin() == ' ') command_line.pop_back();
+            if(command_line.empty()) continue;
             if(*command_line.crbegin() == '\\') {
                 command_line.back() = ' ';
                 all_line.append(command_line);
