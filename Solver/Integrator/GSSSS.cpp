@@ -175,13 +175,13 @@ void GSSSS::update_compatibility() const {
 vec GSSSS::from_incre_velocity(const vec& incre_velocity, const uvec& encoding) {
     auto& W = get_domain().lock()->get_factory();
 
-    return W->get_current_displacement()(encoding) + L1 * DT * W1 * W->get_current_velocity()(encoding) + (L2 - L3 * L4 / L5) * DT * DT * W1 * W->get_current_acceleration()(encoding) + L3 / L5 * DT * W1 * incre_velocity;
+    return W->get_current_displacement()(encoding) + L1 * DT * W3G3 / L3 * W->get_current_velocity()(encoding) + (L2 / L3 - L4 / L5) * DT * DT * W3G3 * W->get_current_acceleration()(encoding) + DT * W3G3 / L5 * incre_velocity;
 }
 
 vec GSSSS::from_incre_acceleration(const vec& incre_acceleration, const uvec& encoding) {
     auto& W = get_domain().lock()->get_factory();
 
-    return W->get_current_displacement()(encoding) + L1 * DT * W1 * W->get_current_velocity()(encoding) + L2 * DT * DT * W1 * W->get_current_acceleration()(encoding) + L3 * DT * DT * W1 * incre_acceleration;
+    return W->get_current_displacement()(encoding) + L1 / L3 * W3G3 * DT * W->get_current_velocity()(encoding) + L2 / L3 * W3G3 * DT * DT * W->get_current_acceleration()(encoding) + W3G3 * DT * DT * incre_acceleration;
 }
 
 void GSSSS::print() { suanpan_info("A time integrator using the GSSSS algorithm.\n"); }
