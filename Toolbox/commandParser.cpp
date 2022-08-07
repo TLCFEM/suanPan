@@ -316,30 +316,34 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
 }
 
 int process_file(const shared_ptr<Bead>& model, const char* file_name) {
+    std::vector<string> file_list;
+    file_list.reserve(9);
+
+    string str_name(file_name);
+    file_list.emplace_back(str_name);
+    file_list.emplace_back(str_name + ".supan");
+    file_list.emplace_back(str_name + ".sp");
+
+    suanpan::to_lower(str_name);
+    file_list.emplace_back(str_name);
+    file_list.emplace_back(str_name + ".supan");
+    file_list.emplace_back(str_name + ".sp");
+
+    suanpan::to_upper(str_name);
+    file_list.emplace_back(str_name);
+    file_list.emplace_back(str_name + ".SUPAN");
+    file_list.emplace_back(str_name + ".SP");
+
     ifstream input_file;
 
-    input_file.open(fs::path(file_name));
+    for(const auto& file : file_list) {
+        input_file.open(fs::path(file));
+        if(input_file.is_open()) break;
+    }
 
     if(!input_file.is_open()) {
-        string new_name = file_name;
-        new_name += ".supan";
-        input_file.open(fs::path(new_name));
-        if(!input_file.is_open()) {
-            new_name = file_name;
-            suanpan::to_upper(new_name);
-            new_name += ".supan";
-            input_file.open(fs::path(new_name));
-            if(!input_file.is_open()) {
-                new_name = file_name;
-                suanpan::to_lower(new_name);
-                new_name += ".supan";
-                input_file.open(fs::path(new_name));
-                if(!input_file.is_open()) {
-                    suanpan_error("process_file() cannot open %s.\n", fs::path(file_name).generic_string().c_str());
-                    return SUANPAN_EXIT;
-                }
-            }
-        }
+        suanpan_error("process_file() cannot open %s.\n", fs::path(file_name).generic_string().c_str());
+        return SUANPAN_EXIT;
     }
 
     string all_line, command_line;
