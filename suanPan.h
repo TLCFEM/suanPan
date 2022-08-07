@@ -233,7 +233,7 @@ namespace suanpan {
     }
 }
 
-#if defined(SUANPAN_CLANG) && !defined(__INTEL_LLVM_COMPILER) && __clang_major__ < 14
+#if defined(SUANPAN_CLANG) && !defined(__cpp_lib_ranges)
 // as of clang 13, ranges support is not complete
 namespace std::ranges {
     template<class IN, class OUT, class FN> OUT transform(IN& from, OUT to, FN&& func) { return std::transform(from.begin(), from.end(), to, std::forward<FN>(func)); }
