@@ -47,6 +47,8 @@ elseif (CMAKE_SYSTEM_NAME MATCHES "Linux") # LINUX PLATFORM
     elseif (CMAKE_CXX_COMPILER_ID MATCHES "Intel") # Intel COMPILER Classic icc
         set(COMPILER_IDENTIFIER "gcc-linux")
         message("Classic Intel compiler icc has incomplete CPP20 support, if it fails to compile please use another compiler.")
+    elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang") # Clang COMPILER
+        set(COMPILER_IDENTIFIER "clang-linux")
     endif ()
     option(USE_EXTERNAL_CUDA "USE EXTERNAL CUDA LIBRARY TO UTILIZE GPU" OFF)
 elseif (CMAKE_SYSTEM_NAME MATCHES "Darwin") # MAC PLATFORM
