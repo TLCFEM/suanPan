@@ -21,7 +21,10 @@
 #include <Domain/Node.h>
 
 GSSSS::GSSSS(const unsigned T)
-    : Integrator(T) {}
+    : Integrator(T)
+    , L1(1.)
+    , L2(.5)
+    , L4(1.) {}
 
 void GSSSS::assemble_resistance() {
     const auto& D = get_domain().lock();
@@ -187,10 +190,7 @@ vec GSSSS::from_incre_acceleration(const vec& incre_acceleration, const uvec& en
 void GSSSS::print() { suanpan_info("A time integrator using the GSSSS algorithm.\n"); }
 
 template<> void GSSSS::generate_constants<GSSSSU0>(const double R3, const double R1, const double R2) {
-    L1 = 1.;
-    L2 = .5;
     L3 = 1. / (1. + R1) / (1. + R2);
-    L4 = 1.;
     L5 = .5 * (3. + R1 + R2 - R1 * R2) * L3;
 
     W1G1 = 1. / (1. + R3);
@@ -213,10 +213,7 @@ GSSSSU0::GSSSSU0(const unsigned T, vec&& R)
 }
 
 template<> void GSSSS::generate_constants<GSSSSV0>(const double R3, const double R1, const double R2) {
-    L1 = 1.;
-    L2 = .5;
     L3 = .5 / (1. + R3);
-    L4 = 1.;
     L5 = 2. * L3;
 
     W2G2 = 1. / (1. + R1) / (1. + R2);

@@ -37,7 +37,9 @@
 
 class GSSSS : public Integrator {
 protected:
-    double L1 = 0., L2 = 0., L3 = 0., L4 = 0., L5 = 0.;
+    const double L1, L2, L4;
+    
+    double L3 = 0., L5 = 0.;
     double W1 = 0., W1G1 = 0., W2G2 = 0., W3G3 = 0., W1G4 = 0., W2G5 = 0., W1G6 = 0.;
 
     double DT = 0.;
