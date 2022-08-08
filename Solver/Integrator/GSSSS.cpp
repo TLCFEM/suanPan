@@ -239,3 +239,26 @@ GSSSSV0::GSSSSV0(const unsigned T, vec&& R)
     R = sort(R.clamp(0., 1.));
     generate_constants<GSSSSV0>(R(0), R(1), R(2));
 }
+
+template<> void GSSSS::generate_constants<GSSSSOptimal>(const double R, double, double) {
+    L3 = .5 / (1. + R);
+    L5 = 2. * L3;
+
+    W1G1 = L5;
+    W2G2 = L3;
+    W3G3 = W2G2 * W1G1;
+    W1G4 = W1G1;
+    W2G5 = W1G1 * W1G1;
+    W1G6 = (3. + 2. * R - R * R) * W3G3;
+
+    W1 = W1G1;
+
+    XPV2 = 1. - W2G5 * L1 / L3;
+    XPA3 = 1. - W1G6 * L2 / L3;
+}
+
+GSSSSOptimal::GSSSSOptimal(const unsigned T, double R)
+    : GSSSS(T) {
+    R = std::min(1., std::max(0., R));
+    generate_constants<GSSSSOptimal>(R, R, 1.);
+}

@@ -2089,13 +2089,19 @@
       "trigger":"GSSSSU0",
       "contents":"integrator GSSSSU0 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique integrator tag\n# (2-4) double, three spectral radii",
       "kind":"type",
-      "details":""
+      "details":"U0 family scheme for GSSSS"
     },
     {
       "trigger":"GSSSSV0",
       "contents":"integrator GSSSSV0 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique integrator tag\n# (2-4) double, three spectral radii",
       "kind":"type",
-      "details":""
+      "details":"V0 family scheme for GSSSS"
+    },
+    {
+      "trigger":"GSSSSOptimal",
+      "contents":"integrator GSSSSOptimal ${1:(1)} ${2:(2)}\n# (1) int, unique integrator tag\n# (2) double, spectral radius",
+      "kind":"type",
+      "details":"Optimal scheme for GSSSS"
     },
     {
       "trigger":"GeneralizedAlpha",
