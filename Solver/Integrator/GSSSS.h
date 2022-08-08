@@ -38,7 +38,7 @@
 class GSSSS : public Integrator {
 protected:
     const double L1, L2, L4;
-    
+
     double L3 = 0., L5 = 0.;
     double W1 = 0., W1G1 = 0., W2G2 = 0., W3G3 = 0., W1G4 = 0., W2G5 = 0., W1G6 = 0.;
 
@@ -81,6 +81,11 @@ public:
 class GSSSSV0 final : public GSSSS {
 public:
     GSSSSV0(unsigned, vec&&);
+};
+
+class GSSSSOptimal final : public GSSSS {
+public:
+    GSSSSOptimal(unsigned, double);
 };
 
 #endif
