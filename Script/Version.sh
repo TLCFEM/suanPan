@@ -19,15 +19,12 @@ if [ ! -f "suanPan.cpp" ]; then
 fi
 
 # ci/cd
-file_name="$folder_name/.github/workflows/dev-vtk.yml"
-if [ -f $file_name ]; then
-  sed -i "s/suanPan-[0-9]\.[0-9]\.[0-9]/suanPan-$1\.$2\.$3/g" $file_name
-fi
-
-file_name="$folder_name/.github/workflows/master-mkl-vtk.yml"
-if [ -f $file_name ]; then
-  sed -i "s/suanPan-[0-9]\.[0-9]\.[0-9]/suanPan-$1\.$2\.$3/g" $file_name
-fi
+yml_file=$(find "$folder_name/.github/workflows" -name "*.yml")
+for file in $yml_file; do
+  if [ -f $file ]; then
+    sed -i "s/suanPan-[0-9]\.[0-9]\.[0-9]/suanPan-$1\.$2\.$3/g" $file
+  fi
+done
 
 # inno setup
 file_name="$folder_name/Enhancement/suanPan.iss"
