@@ -56,6 +56,8 @@ uword LeeNewmarkFull::get_total_size() const {
 }
 
 void LeeNewmarkFull::update_stiffness() const {
+    if(build_graph) access::rw(graph).set_size(get_total_size() / n_block, get_total_size() / n_block);
+
     auto IDX = n_block;
 
     // ! make sure global stiffness only holds unrolled damping matrix when exit
@@ -69,6 +71,8 @@ void LeeNewmarkFull::update_stiffness() const {
         else if(Type::T4 == t) assemble_by_mode_four(IDX, mass_coef, stiffness_coef, static_cast<int>(p(0)), static_cast<int>(p(1)), static_cast<int>(p(2)), static_cast<int>(p(3)), p(4));
 
     stiffness->csc_condense();
+
+    if(build_graph) access::rw(build_graph) = false;
 }
 
 void LeeNewmarkFull::update_residual() const {
@@ -93,14 +97,22 @@ void LeeNewmarkFull::update_residual() const {
     fc.get();
 }
 
+void LeeNewmarkFull::assemble_mass(const uword row_shift, const uword col_shift, const double scalar) const { assemble(current_mass, row_shift, col_shift, scalar); }
+
+void LeeNewmarkFull::assemble_stiffness(const uword row_shift, const uword col_shift, const double scalar) const { assemble(current_stiffness, row_shift, col_shift, scalar); }
+
+void LeeNewmarkFull::assemble_mass(const std::vector<uword>& row_shift, const std::vector<uword>& col_shift, const std::vector<double>& scalar) const { assemble(current_mass, row_shift, col_shift, scalar); }
+
+void LeeNewmarkFull::assemble_stiffness(const std::vector<uword>& row_shift, const std::vector<uword>& col_shift, const std::vector<double>& scalar) const { assemble(current_stiffness, row_shift, col_shift, scalar); }
+
 void LeeNewmarkFull::formulate_block(uword& current_pos, const double m_coef, const double s_coef, int order) const {
     auto I = current_pos;
     auto J = current_pos += n_block;
     auto K = current_pos += n_block;
 
     while(order > 1) {
-        stiffness->triplet_mat.assemble(current_mass, {J, K}, {K, J}, {m_coef, m_coef});
-        stiffness->triplet_mat.assemble(current_stiffness, {I, J}, {J, I}, {s_coef, s_coef});
+        assemble_mass({J, K}, {K, J}, {m_coef, m_coef});
+        assemble_stiffness({I, J}, {J, I}, {s_coef, s_coef});
 
         I = current_pos;
         J = current_pos += n_block;
@@ -110,8 +122,8 @@ void LeeNewmarkFull::formulate_block(uword& current_pos, const double m_coef, co
 
     if(order > 0) {
         // eq. 68
-        stiffness->triplet_mat.assemble(current_mass, J, J, -m_coef);
-        stiffness->triplet_mat.assemble(current_stiffness, {I, J}, {J, I}, {s_coef, s_coef});
+        assemble_mass(J, J, -m_coef);
+        assemble_stiffness({I, J}, {J, I}, {s_coef, s_coef});
 
         current_pos = K;
 
@@ -120,7 +132,7 @@ void LeeNewmarkFull::formulate_block(uword& current_pos, const double m_coef, co
 
     if(order > -1) {
         // eq. 73
-        stiffness->triplet_mat.assemble(current_stiffness, I, I, s_coef);
+        assemble_stiffness(I, I, s_coef);
 
         current_pos = J;
 
@@ -128,7 +140,7 @@ void LeeNewmarkFull::formulate_block(uword& current_pos, const double m_coef, co
     }
 
     // eq. 71
-    stiffness->triplet_mat.assemble(current_mass, I, I, m_coef);
+    assemble_mass(I, I, m_coef);
 
     current_pos = J;
 }
@@ -142,8 +154,8 @@ void LeeNewmarkFull::formulate_block(uword& current_pos, const std::vector<doubl
 void LeeNewmarkFull::assemble_by_mode_zero(uword& current_pos, const double mass_coef, const double stiffness_coef) const {
     const auto I = current_pos;
 
-    stiffness->triplet_mat.assemble(current_mass, {0, 0, I, I}, {0, I, 0, I}, {mass_coef, mass_coef, mass_coef, mass_coef});
-    stiffness->triplet_mat.assemble(current_stiffness, I, I, stiffness_coef);
+    assemble_mass({0, 0, I, I}, {0, I, 0, I}, {mass_coef, mass_coef, mass_coef, mass_coef});
+    assemble_stiffness(I, I, stiffness_coef);
 
     current_pos += n_block;
 }
@@ -160,8 +172,8 @@ void LeeNewmarkFull::assemble_by_mode_one(uword& current_pos, const double mass_
 
     while(order > 1) {
         // eq. 61
-        stiffness->triplet_mat.assemble(current_mass, {I, J, J, K, L, M}, {J, I, K, J, M, L}, {mass_coef, mass_coef, mass_coefs, mass_coefs, mass_coefs, mass_coefs});
-        stiffness->triplet_mat.assemble(current_stiffness, {K, L, J, K, L, M}, {L, K, K, J, M, L}, {stiffness_coef, stiffness_coef, stiffness_coefs, stiffness_coefs, stiffness_coefs, stiffness_coefs});
+        assemble_mass({I, J, J, K, L, M}, {J, I, K, J, M, L}, {mass_coef, mass_coef, mass_coefs, mass_coefs, mass_coefs, mass_coefs});
+        assemble_stiffness({K, L, J, K, L, M}, {L, K, K, J, M, L}, {stiffness_coef, stiffness_coef, stiffness_coefs, stiffness_coefs, stiffness_coefs, stiffness_coefs});
 
         I = current_pos;
         J = current_pos += n_block;
@@ -173,8 +185,8 @@ void LeeNewmarkFull::assemble_by_mode_one(uword& current_pos, const double mass_
 
     // eq. 3
     if(order < 1) {
-        stiffness->triplet_mat.assemble(current_mass, {I, J, I, J}, {I, J, J, I}, {mass_coef, mass_coef, mass_coef, mass_coef});
-        stiffness->triplet_mat.assemble(current_stiffness, J, J, stiffness_coef);
+        assemble_mass({I, J, I, J}, {I, J, J, I}, {mass_coef, mass_coef, mass_coef, mass_coef});
+        assemble_stiffness(J, J, stiffness_coef);
 
         current_pos = K;
 
@@ -182,8 +194,8 @@ void LeeNewmarkFull::assemble_by_mode_one(uword& current_pos, const double mass_
     }
 
     // eq. 53
-    stiffness->triplet_mat.assemble(current_mass, {I, J, J, K, L}, {J, I, K, J, L}, {mass_coef, mass_coef, mass_coefs, mass_coefs, -mass_coef});
-    stiffness->triplet_mat.assemble(current_stiffness, {J, K, K, L, L}, {K, J, L, K, L}, {stiffness_coefs, stiffness_coefs, stiffness_coef, stiffness_coef, -stiffness_coef});
+    assemble_mass({I, J, J, K, L}, {J, I, K, J, L}, {mass_coef, mass_coef, mass_coefs, mass_coefs, -mass_coef});
+    assemble_stiffness({J, K, K, L, L}, {K, J, L, K, L}, {stiffness_coefs, stiffness_coefs, stiffness_coef, stiffness_coef, -stiffness_coef});
 }
 
 void LeeNewmarkFull::assemble_by_mode_two(uword& current_pos, double mass_coef, double stiffness_coef, const int npr, const int npl) const {
@@ -199,7 +211,7 @@ void LeeNewmarkFull::assemble_by_mode_two(uword& current_pos, double mass_coef, 
 
     // eq. 100
     if(0 == npr) {
-        stiffness->triplet_mat.assemble(current_mass, {0, 0, I, I}, {0, I, 0, I}, {mass_coef, mass_coef, mass_coef, mass_coef});
+        assemble_mass({0, 0, I, I}, {0, I, 0, I}, {mass_coef, mass_coef, mass_coef, mass_coef});
 
         formulate_block(current_pos, mass_coef, stiffness_coef, npl);
 
@@ -209,7 +221,7 @@ void LeeNewmarkFull::assemble_by_mode_two(uword& current_pos, double mass_coef, 
     const auto J = current_pos + n_block * npr;
 
     // eq. 81
-    stiffness->triplet_mat.assemble(current_mass, {0, I, I, J}, {I, 0, J, I}, {mass_coef, mass_coef, mass_coef, mass_coef});
+    assemble_mass({0, I, I, J}, {I, 0, J, I}, {mass_coef, mass_coef, mass_coef, mass_coef});
 
     // central block, right bottom corner
     formulate_block(current_pos, {-mass_coef, mass_coef}, {-stiffness_coef, stiffness_coef}, {npr - 1, npl});
@@ -222,8 +234,8 @@ void LeeNewmarkFull::assemble_by_mode_three(uword& current_pos, double mass_coef
     const auto I = current_pos;
     const auto J = current_pos += n_block;
 
-    stiffness->triplet_mat.assemble(current_mass, {J, 0, I, 0, I}, {J, 0, I, I, 0}, {.25 / gm * mass_coef, mass_coef, mass_coef, -mass_coef, -mass_coef});
-    stiffness->triplet_mat.assemble(current_stiffness, {J, I, I, J}, {J, I, J, I}, {(1. + .25 / gm) * stiffness_coef, stiffness_coef, -stiffness_coef, -stiffness_coef});
+    assemble_mass({J, 0, I, 0, I}, {J, 0, I, I, 0}, {.25 / gm * mass_coef, mass_coef, mass_coef, -mass_coef, -mass_coef});
+    assemble_stiffness({J, I, I, J}, {J, I, J, I}, {(1. + .25 / gm) * stiffness_coef, stiffness_coef, -stiffness_coef, -stiffness_coef});
 
     current_pos += n_block;
 }
@@ -249,7 +261,7 @@ void LeeNewmarkFull::assemble_by_mode_four(uword& current_pos, const double mass
         const auto I = current_pos;
         const auto J = I + n_block * npl + n_block;
 
-        stiffness->triplet_mat.assemble(current_mass, {0, 0, 0, I, I, I, J, J, J}, {0, I, J, 0, I, J, 0, I, J}, {m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_s + m_coef_p / bgm});
+        assemble_mass({0, 0, 0, I, I, I, J, J, J}, {0, I, J, 0, I, J, 0, I, J}, {m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_s + m_coef_p / bgm});
 
         formulate_block(current_pos, {m_coef_s, m_coef_p / bgm}, {s_coef_s, s_coef_p / bgm}, {npl, npk});
 
@@ -262,7 +274,7 @@ void LeeNewmarkFull::assemble_by_mode_four(uword& current_pos, const double mass
         const auto J = I + n_block * npl + n_block;
         const auto K = J + n_block * npk + n_block;
 
-        stiffness->triplet_mat.assemble(current_mass, {0, 0, 0, I, I, I, J, J, J, J, K}, {0, I, J, 0, I, J, 0, I, J, K, J}, {m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_p, m_coef_p});
+        assemble_mass({0, 0, 0, I, I, I, J, J, J, J, K}, {0, I, J, 0, I, J, 0, I, J, K, J}, {m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_p, m_coef_p});
 
         formulate_block(current_pos, {m_coef_s, m_coef_p / bgm, -bgm * m_coef_p}, {s_coef_s, s_coef_p / bgm, -bgm * s_coef_p}, {npl, npk, npm - 1});
 
@@ -275,7 +287,7 @@ void LeeNewmarkFull::assemble_by_mode_four(uword& current_pos, const double mass
         const auto J = I + n_block * npr;
         const auto K = J + n_block * npl + n_block;
 
-        stiffness->triplet_mat.assemble(current_mass, {0, I, I, I, J, K, K}, {I, 0, J, K, I, I, K}, {m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_p / bgm});
+        assemble_mass({0, I, I, I, J, K, K}, {I, 0, J, K, I, I, K}, {m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_p / bgm});
 
         formulate_block(current_pos, {-m_coef_s, m_coef_s, m_coef_p / bgm}, {-s_coef_s, s_coef_s, s_coef_p / bgm}, {npr - 1, npl, npk});
 
@@ -288,7 +300,7 @@ void LeeNewmarkFull::assemble_by_mode_four(uword& current_pos, const double mass
     const auto K = J + n_block * npl + n_block;
     const auto L = K + n_block * npk + n_block;
 
-    stiffness->triplet_mat.assemble(current_mass, {0, I, I, I, J, K, K, L}, {I, 0, J, K, I, I, L, K}, {m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_p, m_coef_p});
+    assemble_mass({0, I, I, I, J, K, K, L}, {I, 0, J, K, I, I, L, K}, {m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_p, m_coef_p});
 
     formulate_block(current_pos, {-m_coef_s, m_coef_s, m_coef_p / bgm, -bgm * m_coef_p}, {-s_coef_s, s_coef_s, s_coef_p / bgm, -bgm * s_coef_p}, {npr - 1, npl, npk, npm - 1});
 }
