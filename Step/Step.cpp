@@ -65,10 +65,8 @@ int Step::initialize() {
 
     factory = t_domain->get_factory();
 
-    factory->set_precision(precision);
-    factory->set_tolerance(tolerance);
-    factory->set_solver(system_solver);
-    factory->set_refinement(refinement);
+    factory->set_solver_type(system_solver);
+    factory->set_solver_setting(setting);
 
     return 0;
 }
@@ -130,13 +128,20 @@ void Step::set_max_step_size(const double T) { max_step_size = T; }
 
 void Step::set_max_substep(const unsigned M) { max_substep = M; }
 
-void Step::set_system_solver(const SolverType P) { system_solver = P; }
+void Step::set_system_solver(const SolverType P) {
+    system_solver = P;
+    setting.iterative_solver = IterativeSolver::NONE;
+}
 
-void Step::set_precision(const Precision P) { precision = P; }
+void Step::set_system_solver(const IterativeSolver P) { setting.iterative_solver = P; }
 
-void Step::set_tolerance(const double T) { tolerance = T; }
+void Step::set_preconditioner(const PreconditionerType P) { setting.preconditioner_type = P; }
 
-void Step::set_refinement(const unsigned T) { refinement = T; }
+void Step::set_precision(const Precision P) { setting.precision = P; }
+
+void Step::set_tolerance(const double T) { setting.tolerance = T; }
+
+void Step::set_refinement(const unsigned T) { setting.iterative_refinement = T; }
 
 double Step::get_ini_step_size() const { return ini_step_size; }
 
@@ -145,12 +150,6 @@ double Step::get_min_step_size() const { return min_step_size; }
 double Step::get_max_step_size() const { return max_step_size; }
 
 unsigned Step::get_max_substep() const { return max_substep; }
-
-SolverType Step::get_system_solver() const { return system_solver; }
-
-Precision Step::get_precision() const { return precision; }
-
-double Step::get_tolerance() const { return tolerance; }
 
 bool Step::is_fixed_step_size() const { return fixed_step_size; }
 

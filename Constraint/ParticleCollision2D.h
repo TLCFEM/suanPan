@@ -31,7 +31,7 @@
 
 #include "ParticleCollision.h"
 
-class ParticleCollision2D final : public ParticleCollision {
+class ParticleCollision2D : public ParticleCollision {
     struct CellList {
         int x = 0, y = 0;
         unsigned tag = 0;
@@ -39,13 +39,14 @@ class ParticleCollision2D final : public ParticleCollision {
 
     std::vector<CellList> list;
 
-    const double space = 1.;
-    const double alpha = 1.;
-
     [[nodiscard]] double compute_f(double) const override;
     [[nodiscard]] double compute_df(double) const override;
 
     int process_meta(const shared_ptr<DomainBase>&, bool) override;
+
+protected:
+    const double space = 1.;
+    const double alpha = 1.;
 
 public:
     ParticleCollision2D(unsigned, unsigned, double = 1., double = 1.);

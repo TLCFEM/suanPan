@@ -38,8 +38,6 @@ struct DataSectionNM3D {
 };
 
 class SectionNM3D : protected DataSectionNM3D, public SectionNM {
-    const double ET = 1E3 * std::max(std::max(4. * EIS, 4. * EIW), EA);
-
 public:
     SectionNM3D(unsigned, // tag
                 double,

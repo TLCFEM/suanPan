@@ -55,8 +55,8 @@ public:
 
     void zeros() override;
 
-    int solve(Mat<T>&, Mat<T>&&) override;
-    int solve(Mat<T>&, const Mat<T>&) override;
+    int direct_solve(Mat<T>&, Mat<T>&&) override;
+    int direct_solve(Mat<T>&, const Mat<T>&) override;
 
     [[nodiscard]] int sign_det() const override;
 };
@@ -134,7 +134,7 @@ template<sp_d T> void SparseMatBaseMUMPS<T>::zeros() {
     dealloc();
 }
 
-template<sp_d T> int SparseMatBaseMUMPS<T>::solve(Mat<T>& X, Mat<T>&& B) {
+template<sp_d T> int SparseMatBaseMUMPS<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
     if(const auto code = alloc(); 0 != code) return code;
 
     mumps_job.rhs = B.memptr();
@@ -148,7 +148,7 @@ template<sp_d T> int SparseMatBaseMUMPS<T>::solve(Mat<T>& X, Mat<T>&& B) {
     return mumps_job.info[0];
 }
 
-template<sp_d T> int SparseMatBaseMUMPS<T>::solve(Mat<T>& X, const Mat<T>& B) {
+template<sp_d T> int SparseMatBaseMUMPS<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
     if(const auto code = alloc(); 0 != code) return code;
 
     X = B;
@@ -162,7 +162,10 @@ template<sp_d T> int SparseMatBaseMUMPS<T>::solve(Mat<T>& X, const Mat<T>& B) {
     return mumps_job.info[0];
 }
 
-template<sp_d T> int SparseMatBaseMUMPS<T>::sign_det() const { return mumps_job.rinfog[11] < 0. ? -1 : 1; }
+template<sp_d T> int SparseMatBaseMUMPS<T>::sign_det() const {
+    if(IterativeSolver::NONE != this->setting.iterative_solver) throw invalid_argument("analysis requires the sign of determinant but iterative solver does not support it");
+    return mumps_job.rinfog[11] < 0. ? -1 : 1;
+}
 
 template<sp_d T> class SparseMatMUMPS final : public SparseMatBaseMUMPS<T> {
 public:

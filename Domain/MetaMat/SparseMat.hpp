@@ -34,7 +34,7 @@
 template<sp_d T> class SparseMat : public MetaMat<T> {
 public:
     using MetaMat<T>::triplet_mat;
-    using MetaMat<T>::solve;
+    using MetaMat<T>::direct_solve;
 
     SparseMat(uword, uword, uword = 0);
 
@@ -45,6 +45,7 @@ public:
     void nullify(uword) override;
 
     [[nodiscard]] T max() const override;
+    [[nodiscard]] Col<T> diag() const override;
 
     const T& operator()(uword, uword) const override;
     T& at(uword, uword) override;
@@ -58,7 +59,7 @@ public:
     void operator+=(const triplet_form<T, uword>&) override;
     void operator-=(const triplet_form<T, uword>&) override;
 
-    Mat<T> operator*(const Mat<T>&) override;
+    Mat<T> operator*(const Mat<T>&) const override;
 
     void operator*=(T) override;
 
@@ -66,6 +67,8 @@ public:
 
     void csc_condense() override;
     void csr_condense() override;
+
+    int iterative_solve(Mat<T>&, const Mat<T>&) override;
 };
 
 template<sp_d T> SparseMat<T>::SparseMat(const uword in_row, const uword in_col, const uword in_elem)
@@ -94,6 +97,8 @@ template<sp_d T> void SparseMat<T>::nullify(const uword idx) {
 }
 
 template<sp_d T> T SparseMat<T>::max() const { return triplet_mat.max(); }
+
+template<sp_d T> Col<T> SparseMat<T>::diag() const { return triplet_mat.diag(); }
 
 template<sp_d T> const T& SparseMat<T>::operator()(const uword in_row, const uword in_col) const {
     using index_t = typename decltype(triplet_mat)::index_type;
@@ -136,7 +141,7 @@ template<sp_d T> void SparseMat<T>::operator-=(const triplet_form<T, uword>& in_
     this->factored = false;
 }
 
-template<sp_d T> Mat<T> SparseMat<T>::operator*(const Mat<T>& in_mat) { return triplet_mat * in_mat; }
+template<sp_d T> Mat<T> SparseMat<T>::operator*(const Mat<T>& in_mat) const { return triplet_mat * in_mat; }
 
 template<sp_d T> void SparseMat<T>::operator*=(const T scalar) { triplet_mat *= scalar; }
 
@@ -145,6 +150,11 @@ template<sp_d T> int SparseMat<T>::sign_det() const { throw invalid_argument("no
 template<sp_d T> void SparseMat<T>::csc_condense() { triplet_mat.csc_condense(); }
 
 template<sp_d T> void SparseMat<T>::csr_condense() { triplet_mat.csr_condense(); }
+
+template<sp_d T> int SparseMat<T>::iterative_solve(Mat<T>& X, const Mat<T>& B) {
+    csc_condense();
+    return MetaMat<T>::iterative_solve(X, B);
+}
 
 #endif
 

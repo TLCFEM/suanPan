@@ -2,10 +2,15 @@ set(SNM
         SectionNM/SectionNM.cpp
         SectionNM/SectionNM2D.cpp
         SectionNM/SectionNM3D.cpp
-        SectionNM/NonlinearNM2D.cpp
-        SectionNM/NonlinearNM3D.cpp
+        SectionNM/NonlinearNM.cpp
+        SectionNM/LinearHardeningNM.cpp
+        SectionNM/VAFNM.cpp
+        SectionNM/SurfaceNM2D.cpp
+        SectionNM/SurfaceNM3D.cpp
         SectionNM/NM2D1.cpp
         SectionNM/NM2D2.cpp
+        SectionNM/NM2D3.cpp
         SectionNM/NM3D1.cpp
         SectionNM/NM3D2.cpp
+        SectionNM/NM3D3.cpp
         )

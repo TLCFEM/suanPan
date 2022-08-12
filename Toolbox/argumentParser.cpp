@@ -35,7 +35,7 @@ using std::ifstream;
 using std::ofstream;
 
 constexpr auto SUANPAN_MAJOR = 2;
-constexpr auto SUANPAN_MINOR = 4;
+constexpr auto SUANPAN_MINOR = 5;
 constexpr auto SUANPAN_PATCH = 0;
 constexpr auto SUANPAN_CODE = "Betelgeuse";
 constexpr auto SUANPAN_ARCH = 64;
@@ -49,15 +49,14 @@ bool check_debugger() {
     return false;
 #endif
 #ifdef SUANPAN_WIN
-    if(IsDebuggerPresent()) exit(EXIT_SUCCESS);
+    if(IsDebuggerPresent()) exit(EXIT_SUCCESS); // NOLINT(concurrency-mt-unsafe)
 
     BOOL FLAG = false;
     if(CheckRemoteDebuggerPresent(GetCurrentProcess(), &FLAG) && FLAG) std::swap(access::rw(datum::eps), access::rw(datum::pi));
 
     CONTEXT CTX{};
     CTX.ContextFlags = CONTEXT_DEBUG_REGISTERS;
-    if(GetThreadContext(GetCurrentThread(), &CTX) && (CTX.Dr0 != 0 || CTX.Dr1 != 0 || CTX.Dr2 != 0 || CTX.Dr3 != 0)) exit(EXIT_SUCCESS);
-
+    if(GetThreadContext(GetCurrentThread(), &CTX) && (CTX.Dr0 != 0 || CTX.Dr1 != 0 || CTX.Dr2 != 0 || CTX.Dr3 != 0)) exit(EXIT_SUCCESS); // NOLINT(concurrency-mt-unsafe)
 #elif defined(SUANPAN_UNIX)
 #endif
     return false;
@@ -168,6 +167,8 @@ void print_header() {
 
 void argument_parser(const int argc, char** argv) {
     if(check_debugger()) return;
+
+    if(0 == argc) return;
 
     SUANPAN_EXE = argv[0];
 
@@ -311,7 +312,8 @@ void cli_mode(const shared_ptr<Bead>& model) {
         if(!command_line.empty() && command_line[0] != '#' && command_line[0] != '!') {
             if(const auto if_comment = command_line.find('!'); string::npos != if_comment) command_line.erase(if_comment);
             for(auto& c : command_line) if(',' == c || '\t' == c || '\r' == c || '\n' == c) c = ' ';
-            while(*command_line.crbegin() == ' ') command_line.pop_back();
+            while(!command_line.empty() && *command_line.crbegin() == ' ') command_line.pop_back();
+            if(command_line.empty()) continue;
             if(*command_line.crbegin() == '\\') {
                 command_line.back() = ' ';
                 all_line.append(command_line);

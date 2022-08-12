@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -34,7 +33,7 @@ func main() {
 		}
 	}(response.Body)
 
-	html, err := ioutil.ReadAll(response.Body)
+	html, err := io.ReadAll(response.Body)
 	if err != nil {
 		return
 	}
@@ -93,6 +92,18 @@ func downloadLatestVersion(versionString string) error {
 	fmt.Printf("      Visualisation may be useful when it comes to post-processing, but it requires OpenGL support. Please make sure the corresponding packages are installed.\n")
 	fmt.Printf("\nDownload the new version:\n")
 
+	regex, _ := regexp.Compile(`suanPan-v(\d)\.(\d)\.?(\d?)`)
+
+	number := regex.FindStringSubmatch(versionString)
+
+	newMajor, _ := strconv.Atoi(number[1])
+	newMinor, _ := strconv.Atoi(number[2])
+	newPatch := 0
+
+	if len(number) == 3 {
+		newPatch, _ = strconv.Atoi(number[3])
+	}
+
 	if cos == "windows" {
 		fmt.Printf("    [0] suanPan-win-mkl-vtk.exe (Installer)\n")
 		fmt.Printf("    [1] suanPan-win-mkl-vtk.zip (Portable Archive)\n")
@@ -102,6 +113,8 @@ func downloadLatestVersion(versionString string) error {
 		fmt.Printf("    [1] suanPan-linux-mkl.tar.gz (Portable Archive)\n")
 		fmt.Printf("    [2] suanPan-linux-openblas-vtk.tar.gz (Portable Archive)\n")
 		fmt.Printf("    [3] suanPan-linux-openblas.tar.gz (Portable Archive)\n")
+		fmt.Printf("    [4] suanPan-%d.%d.%d-1.x86_64.deb (Debian Installer)\n", newMajor, newMinor, newPatch)
+		fmt.Printf("    [5] suanPan-%d.%d.%d-1.x86_64.rpm (Red Hat Installer)\n", newMajor, newMinor, newPatch)
 	} else if cos == "darwin" {
 		fmt.Printf("    [0] suanPan-macos-openblas-vtk.tar.gz (Portable Archive)\n")
 		fmt.Printf("    [1] suanPan-macos-openblas.tar.gz (Portable Archive)\n")
@@ -133,6 +146,10 @@ func downloadLatestVersion(versionString string) error {
 			fileName = "suanPan-linux-openblas-vtk.tar.gz"
 		} else if 3 == downloadOption {
 			fileName = "suanPan-linux-openblas.tar.gz"
+		} else if 4 == downloadOption {
+			fileName = fmt.Sprintf("suanPan-%d.%d.%d-1.x86_64.deb", newMajor, newMinor, newPatch)
+		} else if 5 == downloadOption {
+			fileName = fmt.Sprintf("suanPan-%d.%d.%d-1.x86_64.rpm", newMajor, newMinor, newPatch)
 		}
 	} else if cos == "darwin" {
 		if 0 == downloadOption {

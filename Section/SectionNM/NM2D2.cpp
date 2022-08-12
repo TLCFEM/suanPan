@@ -15,86 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-// ReSharper disable IdentifierTypo
 #include "NM2D2.h"
 
-double NM2D2::evaluate(const double p, const double ms, const mat& weight) const {
-    double value = weight(0);
+double NM2D2::compute_f(const vec& s, const vec& h) const { return compute_sf(s, h); }
 
-    if(weight(1) > 0.) value *= pow(p, weight(1));
-    if(weight(2) > 0.) value *= pow(ms, weight(2));
+vec NM2D2::compute_df(const vec& s, const vec& h) const { return compute_dsf(s, h); }
 
-    return value;
-}
-
-vec NM2D2::differentiate(const mat& weight, uword location, const uword order) {
-    ++location;
-
-    vec weight_out = weight.as_col();
-
-    weight_out(location) = weight(location) - static_cast<double>(order);
-
-    if(weight_out(location) < 0.) weight_out.zeros();
-    else for(auto I = static_cast<uword>(weight(location)); I > static_cast<uword>(weight_out(location)); --I) weight_out(0) *= static_cast<double>(I);
-
-    return weight_out;
-}
-
-double NM2D2::compute_h(const double alpha) const { return std::max(0., c + h * alpha); }
-
-double NM2D2::compute_dh(const double alpha) const { return (c + h * alpha > 0.) * h; }
-
-double NM2D2::compute_f(const vec& s) const {
-    const auto p = s(0) / yield_force(0);
-    const auto ms = s(1) / yield_force(1);
-
-    auto f = 0.;
-    for(auto I = 0llu; I < para_set.n_rows; ++I) f += evaluate(p, ms, para_set.row(I));
-
-    return f;
-}
-
-vec NM2D2::compute_df(const vec& s) const {
-    const auto p = s(0) / yield_force(0);
-    const auto ms = s(1) / yield_force(1);
-
-    vec df(2, fill::zeros);
-
-    for(auto I = 0llu; I < para_set.n_rows; ++I) for(auto J = 0llu; J < df.n_elem; ++J) df(J) += evaluate(p, ms, differentiate(para_set.row(I), J, 1));
-
-    return df / yield_force;
-}
-
-mat NM2D2::compute_ddf(const vec& s) const {
-    const auto p = s(0) / yield_force(0);
-    const auto ms = s(1) / yield_force(1);
-
-    mat ddf(2, 2, fill::zeros);
-
-    for(auto I = 0llu; I < para_set.n_rows; ++I)
-        for(auto J = 0llu; J < ddf.n_rows; ++J) {
-            const auto dfj = differentiate(para_set.row(I), J, 1);
-            for(auto K = 0llu; K < ddf.n_cols; ++K) ddf(J, K) += evaluate(p, ms, differentiate(dfj, K, 1));
-        }
-
-    return ddf / (yield_force * yield_force.t());
-}
+mat NM2D2::compute_ddf(const vec& s, const vec& h) const { return compute_ddsf(s, h); }
 
 NM2D2::NM2D2(const unsigned T, const double EEA, const double EEIS, const double NP, const double MSP, const double CC, const double HH, const double KK, const double LD, mat&& PS)
-    : NonlinearNM2D(T, EEA, EEIS, KK, LD)
-    , para_set(PS.empty() ? mat{{1.15, 2., 0.}, {1., 0., 2.}, {3.67, 2., 2.}} : std::forward<mat>(PS))
-    , yield_force{NP, MSP}
-    , c(CC)
-    , h(HH)
-    , k(KK) {}
-
-int NM2D2::initialize(const shared_ptr<DomainBase>& D) {
-    if(SUANPAN_SUCCESS != NonlinearNM2D::initialize(D)) return SUANPAN_FAIL;
-
-    initialize_weight(yield_force, k);
-
-    return SUANPAN_SUCCESS;
-}
+    : SurfaceNM2D(CC, std::forward<mat>(PS))
+    , LinearHardeningNM(T, EEA, EEIS, HH, KK, LD, vec{NP, MSP}) {}
 
 unique_ptr<Section> NM2D2::get_copy() { return make_unique<NM2D2>(*this); }
 

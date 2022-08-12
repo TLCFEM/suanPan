@@ -27,7 +27,7 @@ endif ()
 
 include(../../Driver.cmake)
 
-if (CMAKE_Fortran_COMPILER_ID MATCHES "GNU") # GNU GCC COMPILER
+if (NOT COMPILER_IDENTIFIER MATCHES "vs") # GNU GCC COMPILER
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -ffree-line-length-none -ffixed-line-length-none")
 endif ()
 

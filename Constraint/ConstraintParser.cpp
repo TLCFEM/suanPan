@@ -246,6 +246,28 @@ void new_particlecollision(unique_ptr<Constraint>& return_obj, istringstream& co
     2 == dim ? return_obj = make_unique<ParticleCollision2D>(tag, 0, space, alpha) : return_obj = make_unique<ParticleCollision3D>(tag, 0, space, alpha);
 }
 
+void new_ljpotential(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("new_particlecollision() needs a valid tag.\n");
+        return;
+    }
+
+    auto space = 1.;
+    if(!command.eof() && !get_input(command, space)) {
+        suanpan_error("new_particlecollision() needs a valid spacing.\n");
+        return;
+    }
+
+    auto alpha = 1.;
+    if(!command.eof() && !get_input(command, alpha)) {
+        suanpan_error("new_particlecollision() needs a valid multiplier.\n");
+        return;
+    }
+
+    return_obj = make_unique<LJPotential2D>(tag, 0, space, alpha);
+}
+
 void new_rigidwall(unique_ptr<Constraint>& return_obj, istringstream& command, const bool finite, const bool penalty) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -515,6 +537,7 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, istringstream& c
     else if(is_equal(constraint_id, "NodeFacet")) new_nodefacet(new_constraint, command);
     else if(is_equal(constraint_id, "ParticleCollision2D")) new_particlecollision(new_constraint, command, 2);
     else if(is_equal(constraint_id, "ParticleCollision3D")) new_particlecollision(new_constraint, command, 3);
+    else if(is_equal(constraint_id, "LJPotential2D")) new_ljpotential(new_constraint, command, 2);
     else if(is_equal(constraint_id, "RigidWallMultiplier")) new_rigidwall(new_constraint, command, false, false);
     else if(is_equal(constraint_id, "RigidWall") || is_equal(constraint_id, "RigidWallPenalty")) new_rigidwall(new_constraint, command, false, true);
     else if(is_equal(constraint_id, "FiniteRigidWallMultiplier")) new_rigidwall(new_constraint, command, true, false);

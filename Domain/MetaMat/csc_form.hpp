@@ -70,6 +70,12 @@ public:
 
     [[nodiscard]] data_t* val_mem() { return val_idx.get(); }
 
+    index_t row(const index_t I) const { return row_idx[I]; }
+
+    index_t col(const index_t I) const { return col_ptr[I]; }
+
+    data_t val(const index_t I) const { return val_idx[I]; }
+
     [[nodiscard]] data_t max() const {
         if(0 == n_elem) return data_t(0);
         return *std::max_element(val_idx.get(), val_idx.get() + n_elem);
@@ -77,12 +83,12 @@ public:
 
     void print() const;
 
-    template<sp_d T2> csc_form<data_t, index_t> operator*(const T2 scalar) {
+    template<sp_d T2> csc_form<data_t, index_t> operator*(const T2 scalar) const {
         csc_form<data_t, index_t> copy = *this;
         return copy *= scalar;
     }
 
-    template<sp_d T2> csc_form<data_t, index_t> operator/(const T2 scalar) {
+    template<sp_d T2> csc_form<data_t, index_t> operator/(const T2 scalar) const {
         csc_form<data_t, index_t> copy = *this;
         return copy /= scalar;
     }
@@ -106,13 +112,13 @@ public:
         return access::rw(bin) = data_t(0);
     }
 
-    Mat<data_t> operator*(const Col<data_t>& in_mat) {
+    Mat<data_t> operator*(const Col<data_t>& in_mat) const {
         Mat<data_t> out_mat = arma::zeros<Mat<data_t>>(in_mat.n_rows, 1);
         for(index_t I = 0; I < n_cols; ++I) for(auto J = col_ptr[I]; J < col_ptr[I + 1]; ++J) out_mat(row_idx[J]) += val_idx[J] * in_mat(I);
         return out_mat;
     }
 
-    Mat<data_t> operator*(const Mat<data_t>& in_mat) {
+    Mat<data_t> operator*(const Mat<data_t>& in_mat) const {
         Mat<data_t> out_mat = arma::zeros<Mat<data_t>>(in_mat.n_rows, in_mat.n_cols);
         for(index_t I = 0; I < n_cols; ++I) for(auto J = col_ptr[I]; J < col_ptr[I + 1]; ++J) out_mat.row(row_idx[J]) += val_idx[J] * in_mat.row(I);
         return out_mat;

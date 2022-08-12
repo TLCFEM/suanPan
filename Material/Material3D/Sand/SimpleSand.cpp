@@ -51,7 +51,7 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
     if(norm(incre_strain) <= tolerance) return SUANPAN_SUCCESS;
 
     trial_history = current_history;
-    const vec current_alpha(&current_history(0), 6, false, true);
+    const vec current_alpha(&current_history(0), 6);
     vec alpha(&trial_history(0), 6, false, true);
 
     const auto state_const = v0 - vc + v0 * tensor::trace3(trial_strain);

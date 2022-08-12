@@ -55,7 +55,7 @@ public:
 
     unique_ptr<MetaMat<T>> make_copy() override;
 
-    int solve(Mat<T>&, const Mat<T>&) override;
+    int direct_solve(Mat<T>&, const Mat<T>&) override;
 };
 
 template<sp_d T> SparseMatPARDISO<T>::SparseMatPARDISO(const uword in_row, const uword in_col, const uword in_elem)
@@ -72,7 +72,7 @@ template<sp_d T> SparseMatPARDISO<T>::SparseMatPARDISO(const uword in_row, const
 
 template<sp_d T> unique_ptr<MetaMat<T>> SparseMatPARDISO<T>::make_copy() { return std::make_unique<SparseMatPARDISO<T>>(*this); }
 
-template<sp_d T> int SparseMatPARDISO<T>::solve(Mat<T>& X, const Mat<T>& B) {
+template<sp_d T> int SparseMatPARDISO<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
     X.set_size(B.n_rows, B.n_cols);
 
     csr_form<T, int> csr_mat(this->triplet_mat, SparseBase::ZERO, true);

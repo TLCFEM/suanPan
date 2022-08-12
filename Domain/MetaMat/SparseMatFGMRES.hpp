@@ -38,15 +38,11 @@
 #include "SparseMat.hpp"
 
 template<sp_d T> class SparseMatBaseFGMRES : public SparseMat<T> {
-    static double tolerance;
-
     const matrix_descr descr;
 
     podarray<int> ipar;
     podarray<double> dpar;
     podarray<double> work;
-
-    friend void set_fgmres_tolerance(double);
 
 public:
     SparseMatBaseFGMRES(uword, uword, uword, bool);
@@ -56,12 +52,8 @@ public:
     SparseMatBaseFGMRES& operator=(SparseMatBaseFGMRES&&) noexcept = delete;
     ~SparseMatBaseFGMRES() override;
 
-    int solve(Mat<T>&, const Mat<T>&) override;
+    int direct_solve(Mat<T>&, const Mat<T>&) override;
 };
-
-template<sp_d T> double SparseMatBaseFGMRES<T>::tolerance = 1E-4;
-
-inline void set_fgmres_tolerance(const double T) { SparseMatBaseFGMRES<double>::tolerance = T; }
 
 template<sp_d T> SparseMatBaseFGMRES<T>::SparseMatBaseFGMRES(const uword in_row, const uword in_col, const uword in_elem, const bool in_sym)
     : SparseMat<T>(in_row, in_col, in_elem)
@@ -73,7 +65,7 @@ template<sp_d T> SparseMatBaseFGMRES<T>::~SparseMatBaseFGMRES() {
     mkl_free_buffers();
 }
 
-template<sp_d T> int SparseMatBaseFGMRES<T>::solve(Mat<T>& X, const Mat<T>& B) {
+template<sp_d T> int SparseMatBaseFGMRES<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
     const auto N = static_cast<int>(B.n_rows);
 
     work.zeros((5 * N * N + 11 * N + 2) / 2);
@@ -91,7 +83,7 @@ template<sp_d T> int SparseMatBaseFGMRES<T>::solve(Mat<T>& X, const Mat<T>& B) {
         ipar[8] = 1;
         ipar[9] = 0;
         ipar[11] = 1;
-        dpar[0] = tolerance;
+        dpar[0] = this->setting.tolerance;
 
         dfgmres_check(&N, (double*)X.colptr(I), (double*)B.colptr(I), &request, ipar.memptr(), dpar.memptr(), work.memptr());
         if(request == -1100) return request;
@@ -106,7 +98,7 @@ template<sp_d T> int SparseMatBaseFGMRES<T>::solve(Mat<T>& X, const Mat<T>& B) {
                 break;
             }
             if(request != 1) return request;
-            const vec xn(&work[ipar[21] - 1llu], X.n_rows, false, true);
+            const vec xn(&work[ipar[21] - 1llu], X.n_rows);
             // ReSharper disable once CppInitializedValueIsAlwaysRewritten
             // ReSharper disable once CppEntityAssignedButNoRead
             vec yn(&work[ipar[22] - 1llu], X.n_rows, false, true);

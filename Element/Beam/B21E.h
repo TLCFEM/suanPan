@@ -35,10 +35,7 @@ class B21E final : public B21 {
     static const unsigned max_iteration;
     static const double tolerance;
 
-    const unsigned which;
-
-    const uvec a{which};
-    const uvec b = 1llu == which ? uvec{0, 2} : uvec{0, 1};
+    const uvec a, b;
 
     vec trial_rotation = zeros(a.n_elem);
     vec current_rotation = zeros(a.n_elem);

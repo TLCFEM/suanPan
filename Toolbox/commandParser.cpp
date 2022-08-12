@@ -316,30 +316,34 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
 }
 
 int process_file(const shared_ptr<Bead>& model, const char* file_name) {
+    std::vector<string> file_list;
+    file_list.reserve(9);
+
+    string str_name(file_name);
+    file_list.emplace_back(str_name);
+    file_list.emplace_back(str_name + ".supan");
+    file_list.emplace_back(str_name + ".sp");
+
+    suanpan::to_lower(str_name);
+    file_list.emplace_back(str_name);
+    file_list.emplace_back(str_name + ".supan");
+    file_list.emplace_back(str_name + ".sp");
+
+    suanpan::to_upper(str_name);
+    file_list.emplace_back(str_name);
+    file_list.emplace_back(str_name + ".SUPAN");
+    file_list.emplace_back(str_name + ".SP");
+
     ifstream input_file;
 
-    input_file.open(fs::path(file_name));
+    for(const auto& file : file_list) {
+        input_file.open(fs::path(file));
+        if(input_file.is_open()) break;
+    }
 
     if(!input_file.is_open()) {
-        string new_name = file_name;
-        new_name += ".supan";
-        input_file.open(fs::path(new_name));
-        if(!input_file.is_open()) {
-            new_name = file_name;
-            suanpan::to_upper(new_name);
-            new_name += ".supan";
-            input_file.open(fs::path(new_name));
-            if(!input_file.is_open()) {
-                new_name = file_name;
-                suanpan::to_lower(new_name);
-                new_name += ".supan";
-                input_file.open(fs::path(new_name));
-                if(!input_file.is_open()) {
-                    suanpan_error("process_file() cannot open %s.\n", fs::path(file_name).generic_string().c_str());
-                    return SUANPAN_EXIT;
-                }
-            }
-        }
+        suanpan_error("process_file() cannot open %s.\n", fs::path(file_name).generic_string().c_str());
+        return SUANPAN_EXIT;
     }
 
     string all_line, command_line;
@@ -347,7 +351,8 @@ int process_file(const shared_ptr<Bead>& model, const char* file_name) {
         if(!command_line.empty() && command_line[0] != '#' && command_line[0] != '!') {
             if(const auto if_comment = command_line.find('!'); string::npos != if_comment) command_line.erase(if_comment);
             for(auto& c : command_line) if(',' == c || '\t' == c || '\r' == c || '\n' == c) c = ' ';
-            while(*command_line.crbegin() == ' ') command_line.pop_back();
+            while(!command_line.empty() && *command_line.crbegin() == ' ') command_line.pop_back();
+            if(command_line.empty()) continue;
             if(*command_line.crbegin() == '\\') {
                 command_line.back() = ' ';
                 all_line.append(command_line);
@@ -982,14 +987,6 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
 
         return SUANPAN_SUCCESS;
     }
-#ifdef SUANPAN_MKL
-    if(is_equal(property_id, "fgmres_tolerance")) {
-        double value;
-        get_input(command, value) ? set_fgmres_tolerance(value) : suanpan_error("set_property() need a valid value.\n");
-
-        return SUANPAN_SUCCESS;
-    }
-#endif
 
     if(domain->get_current_step_tag() == 0) return SUANPAN_SUCCESS;
 
@@ -1028,6 +1025,18 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
         else if(is_equal(value, "PARDISO")) t_step->set_system_solver(SolverType::PARDISO);
         else if(is_equal(value, "FGMRES")) t_step->set_system_solver(SolverType::FGMRES);
 #endif
+        else if(is_equal(value, "GMRES")) t_step->set_system_solver(IterativeSolver::GMRES);
+        else if(is_equal(value, "BICGSTAB")) t_step->set_system_solver(IterativeSolver::BICGSTAB);
+        else if(is_equal(value, "NONE")) t_step->set_system_solver(IterativeSolver::NONE);
+        else suanpan_error("set_property() need a valid solver id.\n");
+    }
+    else if(is_equal(property_id, "preconditioner")) {
+        if(string value; !get_input(command, value)) suanpan_error("set_property() need a valid value.\n");
+        else if(is_equal(value, "NONE")) t_step->set_preconditioner(PreconditionerType::NONE);
+        else if(is_equal(value, "JACOBI")) t_step->set_preconditioner(PreconditionerType::JACOBI);
+#ifndef SUANPAN_SUPERLUMT
+        else if(is_equal(value, "ILU")) t_step->set_preconditioner(PreconditionerType::ILU);
+#endif
         else suanpan_error("set_property() need a valid solver id.\n");
     }
     else if(is_equal(property_id, "precision")) {
@@ -1040,6 +1049,12 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
         double value;
         get_input(command, value) ? t_step->set_tolerance(value) : suanpan_error("set_property() need a valid value.\n");
     }
+#ifdef SUANPAN_MKL
+    else if(is_equal(property_id, "fgmres_tolerance")) {
+        double value;
+        get_input(command, value) ? t_step->set_tolerance(value) : suanpan_error("set_property() need a valid value.\n");
+    }
+#endif
     else if(is_equal(property_id, "ini_step_size")) {
         double step_time;
         get_input(command, step_time) ? t_step->set_ini_step_size(step_time) : suanpan_error("set_property() need a valid value.\n");

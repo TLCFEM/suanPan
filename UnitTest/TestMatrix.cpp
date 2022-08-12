@@ -27,8 +27,8 @@ template<typename MT, std::invocable T> void test_mat_solve(MT& A, const vec& D,
     REQUIRE(norm(E - D) < tol);
 
     // mixed precision
-    A.set_precision(Precision::MIXED);
-    A.set_tolerance(1E-18);
+    A.get_solver_setting().precision = Precision::MIXED;
+    A.get_solver_setting().tolerance = 1E-18;
 
     clear_mat();
 
@@ -59,15 +59,15 @@ template<typename MT, std::invocable T> void benchmark_mat_solve(string&& title,
     BENCHMARK((title + " Full").c_str()) {
         clear_mat();
         A.solve(D, C);
-        REQUIRE(norm(E - D) < tol);
+        REQUIRE(norm(E - D) < static_cast<double>(C.n_elem) * tol);
     };
 
-    A.set_precision(Precision::MIXED);
+    A.get_solver_setting().precision = Precision::MIXED;
 
     BENCHMARK((title + " Mixed").c_str()) {
         clear_mat();
         A.solve(D, C);
-        REQUIRE(norm(E - D) < tol);
+        REQUIRE(norm(E - D) < static_cast<double>(C.n_elem) * tol);
     };
 }
 
@@ -98,10 +98,12 @@ TEST_CASE("Mixed Precision", "[Matrix.Benchmark]") {
         benchmark_mat_setup<SparseMatSuperLU<double>>(I);
         benchmark_mat_setup<FullMat<double>>(I);
 #ifdef SUANPAN_CUDA
-        benchmark_mat_setup<FullMatCUDA<double>>(I);
         benchmark_mat_setup<SparseMatCUDA<double>>(I);
 #endif
     }
+#ifdef SUANPAN_CUDA
+    for(auto I = 0x0100; I < 0x2000; I *= 2) benchmark_mat_setup<FullMatCUDA<double>>(I);
+#endif
 }
 
 TEST_CASE("FullMat", "[Matrix.Dense]") {

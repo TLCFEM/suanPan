@@ -25,7 +25,7 @@ converger RelIncreDisp 1 1E-10 3 1
 step dynamic 2 6
 set ini_step_size .02
 set fixed_step_size 1
-set system_solver SuperLU
+set system_solver GMRES
 
 integrator LeeNewmark 1 .25 .5 .05 4
 

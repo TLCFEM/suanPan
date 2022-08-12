@@ -75,6 +75,18 @@
       "details":"2D Displacement Based Bernoulli Beam with N-M Interaction Sections"
     },
     {
+      "trigger":"NMB21EL",
+      "contents":"element NMB21EL ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# [5] bool string, nonlinear geometry switch, default: false",
+      "kind":"type",
+      "details":"2D Displacement Based Bernoulli Beam with N-M Interaction Sections and Low End Moment Release"
+    },
+    {
+      "trigger":"NMB21EH",
+      "contents":"element NMB21EH ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# [5] bool string, nonlinear geometry switch, default: false",
+      "kind":"type",
+      "details":"2D Displacement Based Bernoulli Beam with N-M Interaction Sections and High End Moment Release"
+    },
+    {
       "trigger":"NMB31",
       "contents":"element NMB31 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:[6]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# (5) int, orientation tag\n# [6] bool string, nonlinear geometry switch, default: false",
       "kind":"type",
@@ -386,6 +398,10 @@
       "kind":"type",
       "details":"Point Mass"
     },
+    "Mass2D",
+    "Mass3D",
+    "MassPoint2D",
+    "MassPoint3D",
     {
       "trigger":"SingleSection2D",
       "contents":"element SingleSection2D ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique tag\n# (2) int, node tag\n# (3) int, section tag",
@@ -710,6 +726,8 @@
       "kind":"type",
       "details":"N-M Interaction Elastic Section"
     },
+    "NM2D3",
+    "NM3D3",
     "1000WB215",
     "1000WB258",
     "1000WB296",
@@ -1310,6 +1328,11 @@
     "multiplierbc",
     "MultiplierBC",
     "MUMPS",
+    "GMRES",
+    "BICGSTAB",
+    "preconditioner",
+    "Jacobi",
+    "ILU",
     "mute",
     "NLE3D01",
     "nobar",
@@ -1330,6 +1353,7 @@
     "PARDISO",
     "particlecollision2d",
     "ParticleCollision2D",
+    "LJPotential2D",
     "particlecollision3d",
     "ParticleCollision3D",
     "PCPE4DC",
@@ -2065,13 +2089,19 @@
       "trigger":"GSSSSU0",
       "contents":"integrator GSSSSU0 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique integrator tag\n# (2-4) double, three spectral radii",
       "kind":"type",
-      "details":""
+      "details":"U0 family scheme for GSSSS"
     },
     {
       "trigger":"GSSSSV0",
       "contents":"integrator GSSSSV0 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique integrator tag\n# (2-4) double, three spectral radii",
       "kind":"type",
-      "details":""
+      "details":"V0 family scheme for GSSSS"
+    },
+    {
+      "trigger":"GSSSSOptimal",
+      "contents":"integrator GSSSSOptimal ${1:(1)} ${2:(2)}\n# (1) int, unique integrator tag\n# (2) double, spectral radius",
+      "kind":"type",
+      "details":"Optimal scheme for GSSSS"
     },
     {
       "trigger":"GeneralizedAlpha",

@@ -9,6 +9,8 @@ using superlu::Dtype_t;
 using superlu::Mtype_t;
 using superlu::superlu_options_t;
 using superlu::SuperLUStat_t;
+using superlu::mem_usage_t;
+using superlu::GlobalLU_t;
 
 #else
 
@@ -135,6 +137,9 @@ void dCreate_CompCol_Matrix(SuperMatrix*, int, int, int, double*, int*, int*, St
 void sCreate_CompCol_Matrix(SuperMatrix*, int, int, int, float*, int*, int*, Stype_t, Dtype_t, Mtype_t);
 void dCreate_Dense_Matrix(SuperMatrix*, int, int, double*, int, Stype_t, Dtype_t, Mtype_t);
 void sCreate_Dense_Matrix(SuperMatrix*, int, int, float*, int, Stype_t, Dtype_t, Mtype_t);
+void dgsisx(superlu_options_t*, SuperMatrix*, int*, int*, int*, char*, double*, double*, SuperMatrix*, SuperMatrix*, void*, int, SuperMatrix*, SuperMatrix*, double*, double*, GlobalLU_t*, mem_usage_t*, SuperLUStat_t*, int*);
+void sgsisx(superlu_options_t*, SuperMatrix*, int*, int*, int*, char*, float*, float*, SuperMatrix*, SuperMatrix*, void*, int, SuperMatrix*, SuperMatrix*, float*, float*, GlobalLU_t*, mem_usage_t*, SuperLUStat_t*, int*);
+void ilu_set_default_options(superlu_options_t*);
 
 #ifdef __cplusplus
 }

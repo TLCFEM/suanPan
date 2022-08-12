@@ -1,0 +1,45 @@
+# A TEST MODEL FOR NM2D2 SECTION
+
+node 1 0 0
+node 2 2 0
+
+section NM2D2 1 1E3 1E3 1E2 1E2 1. .05 .08 0.
+element NMB21 1 1 2 1
+
+fix2 1 P 1
+fix2 2 3 2
+
+displacement 1 0 .5 2 2
+displacement 2 0 -.4 1 2
+
+step static 1 1
+set ini_step_size 1E-1
+set fixed_step_size true
+set symm_mat false
+
+converger RelIncreDisp 1 1E-10 5 1
+
+analyze
+
+# Node 1:
+# Coordinate:
+# 0 0
+# Displacement:
+# 0 0 0
+# Resistance:
+# 1.8307e+01 -1.7590e+02 -1.7590e+02
+# 
+# Node 2:
+# Coordinate:
+# 2.0000 0
+# Displacement:
+# -0.4000 0.5000 0
+# Resistance:
+# -1.8307e+01 1.7590e+02 -1.7590e+02
+peek node 1 2
+
+peek element 1
+
+reset
+clear
+exit

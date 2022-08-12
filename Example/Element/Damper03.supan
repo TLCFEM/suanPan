@@ -10,7 +10,7 @@ material Viscosity01 3 .8 10E0 100E0
 element T3D2 1 1 2 1 1
 element Damper03 2 1 2 2
 element Damper03 4 1 2 3
-element Mass 3 2 1 1
+element Mass2D 3 2 1 1
 
 fix 1 1 1
 fix 2 2 1 2

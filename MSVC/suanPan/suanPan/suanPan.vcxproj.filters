@@ -1279,13 +1279,7 @@
     <ClCompile Include="..\..\..\Section\SectionNM\NM3D1.cpp">
       <Filter>Section\SectionNM</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Section\SectionNM\SectionNM3D.cpp">
-      <Filter>Section\SectionNM</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Section\SectionNM\NM2D1.cpp">
-      <Filter>Section\SectionNM</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Section\SectionNM\SectionNM2D.cpp">
       <Filter>Section\SectionNM</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Element\Beam\NMB21.cpp">
@@ -1297,13 +1291,7 @@
     <ClCompile Include="..\..\..\Section\SectionNM\SectionNM.cpp">
       <Filter>Section\SectionNM</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Section\SectionNM\NonlinearNM2D.cpp">
-      <Filter>Section\SectionNM</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Section\SectionNM\NM2D2.cpp">
-      <Filter>Section\SectionNM</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Section\SectionNM\NonlinearNM3D.cpp">
       <Filter>Section\SectionNM</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Element\Utility\B3DC.cpp">
@@ -1367,6 +1355,48 @@
       <Filter>Domain\Group</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Constraint\RestitutionWallPenalty.cpp">
+      <Filter>Constraint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionNM\NonlinearNM.cpp">
+      <Filter>Section\SectionNM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionNM\SectionNM2D.cpp">
+      <Filter>Section\SectionNM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionNM\SectionNM3D.cpp">
+      <Filter>Section\SectionNM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionNM\SurfaceNM2D.cpp">
+      <Filter>Section\SectionNM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionNM\SurfaceNM3D.cpp">
+      <Filter>Section\SectionNM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionNM\LinearHardeningNM.cpp">
+      <Filter>Section\SectionNM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionNM\VAFNM.cpp">
+      <Filter>Section\SectionNM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionNM\NM2D3.cpp">
+      <Filter>Section\SectionNM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionNM\NM3D3.cpp">
+      <Filter>Section\SectionNM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestSurfaceNM.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestSolver.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestSorting.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Beam\NMB21E.cpp">
+      <Filter>Element\Beam</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\LJPotential2D.cpp">
       <Filter>Constraint</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2509,12 +2539,6 @@
     <ClInclude Include="..\..\..\Section\SectionNM\NM3D1.h">
       <Filter>Section\SectionNM</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Section\SectionNM\SectionNM3D.h">
-      <Filter>Section\SectionNM</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Section\SectionNM\SectionNM2D.h">
-      <Filter>Section\SectionNM</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Section\SectionNM\NM2D1.h">
       <Filter>Section\SectionNM</Filter>
     </ClInclude>
@@ -2527,13 +2551,7 @@
     <ClInclude Include="..\..\..\Section\SectionNM\SectionNM.h">
       <Filter>Section\SectionNM</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Section\SectionNM\NonlinearNM2D.h">
-      <Filter>Section\SectionNM</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Section\SectionNM\NM2D2.h">
-      <Filter>Section\SectionNM</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Section\SectionNM\NonlinearNM3D.h">
       <Filter>Section\SectionNM</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Element\Utility\B3DC.h">
@@ -2595,6 +2613,60 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Domain\NodeHelper.hpp">
       <Filter>Domain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionNM\NonlinearNM.h">
+      <Filter>Section\SectionNM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionNM\SectionNM2D.h">
+      <Filter>Section\SectionNM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionNM\SectionNM3D.h">
+      <Filter>Section\SectionNM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionNM\SurfaceNM2D.h">
+      <Filter>Section\SectionNM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionNM\SurfaceNM3D.h">
+      <Filter>Section\SectionNM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionNM\LinearHardeningNM.h">
+      <Filter>Section\SectionNM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionNM\VAFNM.h">
+      <Filter>Section\SectionNM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionNM\NM2D3.h">
+      <Filter>Section\SectionNM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionNM\NM3D3.h">
+      <Filter>Section\SectionNM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\LBFGS.hpp">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UnitTest\TestSolver.h">
+      <Filter>UnitTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\MetaMat\SolverSetting.hpp">
+      <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\MetaMat\IterativeSolver.hpp">
+      <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\MetaMat\Preconditioner.hpp">
+      <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\MetaMat\ILU.hpp">
+      <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\MetaMat\Jacobi.hpp">
+      <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Beam\NMB21E.h">
+      <Filter>Element\Beam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\LJPotential2D.h">
+      <Filter>Constraint</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

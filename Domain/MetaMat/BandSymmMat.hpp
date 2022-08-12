@@ -54,10 +54,10 @@ public:
     const T& operator()(uword, uword) const override;
     T& at(uword, uword) override;
 
-    Mat<T> operator*(const Mat<T>&) override;
+    Mat<T> operator*(const Mat<T>&) const override;
 
-    int solve(Mat<T>&, Mat<T>&&) override;
-    int solve(Mat<T>&, const Mat<T>&) override;
+    int direct_solve(Mat<T>&, Mat<T>&&) override;
+    int direct_solve(Mat<T>&, const Mat<T>&) override;
 };
 
 template<sp_d T> T BandSymmMat<T>::bin = 0.;
@@ -92,7 +92,7 @@ template<sp_d T> T& BandSymmMat<T>::at(const uword in_row, const uword in_col) {
     return access::rw(this->memory[in_row - in_col + in_col * m_rows]);
 }
 
-template<sp_d T> Mat<T> BandSymmMat<T>::operator*(const Mat<T>& X) {
+template<sp_d T> Mat<T> BandSymmMat<T>::operator*(const Mat<T>& X) const {
     Mat<T> Y(arma::size(X));
 
     const auto N = static_cast<int>(this->n_cols);
@@ -114,7 +114,7 @@ template<sp_d T> Mat<T> BandSymmMat<T>::operator*(const Mat<T>& X) {
     return Y;
 }
 
-template<sp_d T> int BandSymmMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
+template<sp_d T> int BandSymmMat<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
     if(this->factored) return this->solve_trs(X, B);
 
     const auto N = static_cast<int>(this->n_rows);
@@ -131,7 +131,7 @@ template<sp_d T> int BandSymmMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
         X = B;
         arma_fortran(arma_spbsv)(&UPLO, &N, &KD, &NRHS, (E*)this->memptr(), &LDAB, (E*)X.memptr(), &LDB, &INFO);
     }
-    else if(Precision::FULL == this->precision) {
+    else if(Precision::FULL == this->setting.precision) {
         using E = double;
         X = B;
         arma_fortran(arma_dpbsv)(&UPLO, &N, &KD, &NRHS, (E*)this->memptr(), &LDAB, (E*)X.memptr(), &LDB, &INFO);
@@ -160,7 +160,7 @@ template<sp_d T> int BandSymmMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
         X = B;
         arma_fortran(arma_spbtrs)(&UPLO, &N, &KD, &NRHS, (E*)this->memptr(), &LDAB, (E*)X.memptr(), &LDB, &INFO);
     }
-    else if(Precision::FULL == this->precision) {
+    else if(Precision::FULL == this->setting.precision) {
         using E = double;
         X = B;
         arma_fortran(arma_dpbtrs)(&UPLO, &N, &KD, &NRHS, (E*)this->memptr(), &LDAB, (E*)X.memptr(), &LDB, &INFO);
@@ -173,8 +173,8 @@ template<sp_d T> int BandSymmMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
         auto multiplier = norm(full_residual);
 
         auto counter = 0u;
-        while(counter++ < this->refinement) {
-            if(multiplier < this->tolerance) break;
+        while(counter++ < this->setting.iterative_refinement) {
+            if(multiplier < this->setting.tolerance) break;
 
             auto residual = conv_to<fmat>::from(full_residual / multiplier);
 
@@ -194,7 +194,7 @@ template<sp_d T> int BandSymmMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
     return INFO;
 }
 
-template<sp_d T> int BandSymmMat<T>::solve(Mat<T>& X, Mat<T>&& B) {
+template<sp_d T> int BandSymmMat<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
     if(this->factored) return this->solve_trs(X, std::forward<Mat<T>>(B));
 
     const auto N = static_cast<int>(this->n_rows);
@@ -211,7 +211,7 @@ template<sp_d T> int BandSymmMat<T>::solve(Mat<T>& X, Mat<T>&& B) {
         arma_fortran(arma_spbsv)(&UPLO, &N, &KD, &NRHS, (E*)this->memptr(), &LDAB, (E*)B.memptr(), &LDB, &INFO);
         X = std::move(B);
     }
-    else if(Precision::FULL == this->precision) {
+    else if(Precision::FULL == this->setting.precision) {
         using E = double;
         arma_fortran(arma_dpbsv)(&UPLO, &N, &KD, &NRHS, (E*)this->memptr(), &LDAB, (E*)B.memptr(), &LDB, &INFO);
         X = std::move(B);
@@ -240,7 +240,7 @@ template<sp_d T> int BandSymmMat<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
         arma_fortran(arma_spbtrs)(&UPLO, &N, &KD, &NRHS, (E*)this->memptr(), &LDAB, (E*)B.memptr(), &LDB, &INFO);
         X = std::move(B);
     }
-    else if(Precision::FULL == this->precision) {
+    else if(Precision::FULL == this->setting.precision) {
         using E = double;
         arma_fortran(arma_dpbtrs)(&UPLO, &N, &KD, &NRHS, (E*)this->memptr(), &LDAB, (E*)B.memptr(), &LDB, &INFO);
         X = std::move(B);
@@ -251,8 +251,8 @@ template<sp_d T> int BandSymmMat<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
         auto multiplier = norm(B);
 
         auto counter = 0u;
-        while(counter++ < this->refinement) {
-            if(multiplier < this->tolerance) break;
+        while(counter++ < this->setting.iterative_refinement) {
+            if(multiplier < this->setting.tolerance) break;
 
             auto residual = conv_to<fmat>::from(B / multiplier);
 

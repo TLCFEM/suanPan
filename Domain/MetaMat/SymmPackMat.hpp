@@ -51,10 +51,10 @@ public:
     const T& operator()(uword, uword) const override;
     T& at(uword, uword) override;
 
-    Mat<T> operator*(const Mat<T>&) override;
+    Mat<T> operator*(const Mat<T>&) const override;
 
-    int solve(Mat<T>&, Mat<T>&&) override;
-    int solve(Mat<T>&, const Mat<T>&) override;
+    int direct_solve(Mat<T>&, Mat<T>&&) override;
+    int direct_solve(Mat<T>&, const Mat<T>&) override;
 };
 
 template<sp_d T> T SymmPackMat<T>::bin = 0.;
@@ -86,7 +86,7 @@ template<sp_d T> T& SymmPackMat<T>::at(const uword in_row, const uword in_col) {
 
 template<const char S, const char T, sp_d T1> Mat<T1> spmm(const SymmPackMat<T1>& A, const Mat<T1>& B);
 
-template<sp_d T> Mat<T> SymmPackMat<T>::operator*(const Mat<T>& X) {
+template<sp_d T> Mat<T> SymmPackMat<T>::operator*(const Mat<T>& X) const {
     if(!X.is_colvec()) return spmm<'R', 'N'>(*this, X);
 
     auto Y = X;
@@ -108,7 +108,7 @@ template<sp_d T> Mat<T> SymmPackMat<T>::operator*(const Mat<T>& X) {
     return Y;
 }
 
-template<sp_d T> int SymmPackMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
+template<sp_d T> int SymmPackMat<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
     if(this->factored) return this->solve_trs(X, B);
 
     const auto N = static_cast<int>(this->n_rows);
@@ -123,7 +123,7 @@ template<sp_d T> int SymmPackMat<T>::solve(Mat<T>& X, const Mat<T>& B) {
         X = B;
         arma_fortran(arma_sppsv)(&UPLO, &N, &NRHS, (E*)this->memptr(), (E*)X.memptr(), &LDB, &INFO);
     }
-    else if(Precision::FULL == this->precision) {
+    else if(Precision::FULL == this->setting.precision) {
         using E = double;
         X = B;
         arma_fortran(arma_dppsv)(&UPLO, &N, &NRHS, (E*)this->memptr(), (E*)X.memptr(), &LDB, &INFO);
@@ -150,7 +150,7 @@ template<sp_d T> int SymmPackMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
         X = B;
         arma_fortran(arma_spptrs)(&UPLO, &N, &NRHS, (E*)this->memptr(), (E*)X.memptr(), &LDB, &INFO);
     }
-    else if(Precision::FULL == this->precision) {
+    else if(Precision::FULL == this->setting.precision) {
         using E = double;
         X = B;
         arma_fortran(arma_dpptrs)(&UPLO, &N, &NRHS, (E*)this->memptr(), (E*)X.memptr(), &LDB, &INFO);
@@ -163,8 +163,8 @@ template<sp_d T> int SymmPackMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
         auto multiplier = norm(full_residual);
 
         auto counter = 0u;
-        while(counter++ < this->refinement) {
-            if(multiplier < this->tolerance) break;
+        while(counter++ < this->setting.iterative_refinement) {
+            if(multiplier < this->setting.tolerance) break;
 
             auto residual = conv_to<fmat>::from(full_residual / multiplier);
 
@@ -184,7 +184,7 @@ template<sp_d T> int SymmPackMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
     return INFO;
 }
 
-template<sp_d T> int SymmPackMat<T>::solve(Mat<T>& X, Mat<T>&& B) {
+template<sp_d T> int SymmPackMat<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
     if(this->factored) return this->solve_trs(X, std::forward<Mat<T>>(B));
 
     const auto N = static_cast<int>(this->n_rows);
@@ -199,7 +199,7 @@ template<sp_d T> int SymmPackMat<T>::solve(Mat<T>& X, Mat<T>&& B) {
         arma_fortran(arma_sppsv)(&UPLO, &N, &NRHS, (E*)this->memptr(), (E*)B.memptr(), &LDB, &INFO);
         X = std::move(B);
     }
-    else if(Precision::FULL == this->precision) {
+    else if(Precision::FULL == this->setting.precision) {
         using E = double;
         arma_fortran(arma_dppsv)(&UPLO, &N, &NRHS, (E*)this->memptr(), (E*)B.memptr(), &LDB, &INFO);
         X = std::move(B);
@@ -226,7 +226,7 @@ template<sp_d T> int SymmPackMat<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
         arma_fortran(arma_spptrs)(&UPLO, &N, &NRHS, (E*)this->memptr(), (E*)B.memptr(), &LDB, &INFO);
         X = std::move(B);
     }
-    else if(Precision::FULL == this->precision) {
+    else if(Precision::FULL == this->setting.precision) {
         using E = double;
         arma_fortran(arma_dpptrs)(&UPLO, &N, &NRHS, (E*)this->memptr(), (E*)B.memptr(), &LDB, &INFO);
         X = std::move(B);
@@ -237,8 +237,8 @@ template<sp_d T> int SymmPackMat<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
         auto multiplier = arma::norm(B);
 
         auto counter = 0u;
-        while(counter++ < this->refinement) {
-            if(multiplier < this->tolerance) break;
+        while(counter++ < this->setting.iterative_refinement) {
+            if(multiplier < this->setting.tolerance) break;
 
             auto residual = conv_to<fmat>::from(B / multiplier);
 

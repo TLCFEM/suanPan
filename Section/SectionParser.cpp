@@ -352,7 +352,12 @@ void new_fibre1d(unique_ptr<Section>& return_obj, istringstream& command) {
     }
 
     vector<uword> tag_vector;
-    while(!command.eof()) if(uword section_tag; get_input(command, section_tag)) tag_vector.emplace_back(section_tag);
+    while(!command.eof())
+        if(uword section_tag; get_input(command, section_tag)) tag_vector.emplace_back(section_tag);
+        else {
+            suanpan_error("new_fibre1d() requires a valid parameter.\n");
+            return;
+        }
 
     return_obj = make_unique<Fibre1D>(tag, std::move(tag_vector));
 }
@@ -365,7 +370,12 @@ void new_fibre2d(unique_ptr<Section>& return_obj, istringstream& command) {
     }
 
     vector<uword> tag_vector;
-    while(!command.eof()) if(uword section_tag; get_input(command, section_tag)) tag_vector.emplace_back(section_tag);
+    while(!command.eof())
+        if(uword section_tag; get_input(command, section_tag)) tag_vector.emplace_back(section_tag);
+        else {
+            suanpan_error("new_fibre2d() requires a valid parameter.\n");
+            return;
+        }
 
     return_obj = make_unique<Fibre2D>(tag, std::move(tag_vector));
 }
@@ -378,7 +388,12 @@ void new_fibre3d(unique_ptr<Section>& return_obj, istringstream& command) {
     }
 
     vector<uword> tag_vector;
-    while(!command.eof()) if(uword section_tag; get_input(command, section_tag)) tag_vector.emplace_back(section_tag);
+    while(!command.eof())
+        if(uword section_tag; get_input(command, section_tag)) tag_vector.emplace_back(section_tag);
+        else {
+            suanpan_error("new_fibre3d() requires a valid parameter.\n");
+            return;
+        }
 
     return_obj = make_unique<Fibre3D>(tag, std::move(tag_vector));
 }
@@ -689,90 +704,76 @@ void new_tsection3d(unique_ptr<Section>& return_obj, istringstream& command) {
     return_obj = make_unique<TSection3D>(tag, std::move(dim), material_id, int_pt, vec{eccentricity_y, eccentricity_z});
 }
 
-void new_nm2d1(unique_ptr<Section>& return_obj, istringstream& command) {
+void new_nm2d(unique_ptr<Section>& return_obj, istringstream& command, const unsigned size) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("new_nm2d1() requires a valid tag.\n");
+        suanpan_error("new_nm2d() requires a valid tag.\n");
         return;
     }
 
-    vec P(3);
+    vec P(size);
     for(auto& I : P)
         if(!get_input(command, I)) {
-            suanpan_error("new_nm2d1() requires a valid parameter.\n");
+            suanpan_error("new_nm2d() requires a valid parameter.\n");
             return;
         }
 
-    return_obj = make_unique<NM2D1>(tag, P(0), P(1), P(2));
-}
-
-void new_nm2d2(unique_ptr<Section>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("new_nm2d2() requires a valid tag.\n");
+    if(3 == size) {
+        return_obj = make_unique<NM2D1>(tag, P(0), P(1), P(2));
         return;
     }
-
-    vec P(8);
-    for(auto& I : P)
-        if(!get_input(command, I)) {
-            suanpan_error("new_nm2d2() requires a valid parameter.\n");
-            return;
-        }
 
     vector<double> para_set;
     double para;
-    while(!command.eof()) if(get_input(command, para)) para_set.emplace_back(para);
+    while(!command.eof() && get_input(command, para)) para_set.emplace_back(para);
 
     if(para_set.size() % 3 != 0) {
-        suanpan_error("new_nm2d2() requires proper parameter set.\n");
+        suanpan_error("new_nm2d() requires proper parameter set.\n");
         return;
     }
 
-    return_obj = make_unique<NM2D2>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), std::move(para_set));
+    mat poly_set(para_set);
+    poly_set.reshape(3, poly_set.n_elem / 3);
+    inplace_trans(poly_set);
+
+    if(8 == size) return_obj = make_unique<NM2D2>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), std::move(poly_set));
+    else if(11 == size) return_obj = make_unique<NM2D3>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), P(10), std::move(poly_set));
 }
 
-void new_nm3d1(unique_ptr<Section>& return_obj, istringstream& command) {
+void new_nm3d(unique_ptr<Section>& return_obj, istringstream& command, const unsigned size) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("new_nm3d1() requires a valid tag.\n");
+        suanpan_error("new_nm3d() requires a valid tag.\n");
         return;
     }
 
-    vec P(4);
+    vec P(size);
     for(auto& I : P)
         if(!get_input(command, I)) {
-            suanpan_error("new_nm3d1() requires a valid parameter.\n");
+            suanpan_error("new_nm3d() requires a valid parameter.\n");
             return;
         }
 
-    return_obj = make_unique<NM3D1>(tag, P(0), P(1), P(2), P(3));
-}
-
-void new_nm3d2(unique_ptr<Section>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("new_nm3d2() requires a valid tag.\n");
+    if(4 == size) {
+        return_obj = make_unique<NM3D1>(tag, P(0), P(1), P(2), P(3));
         return;
     }
-
-    vec P(10);
-    for(auto& I : P)
-        if(!get_input(command, I)) {
-            suanpan_error("new_nm3d2() requires a valid parameter.\n");
-            return;
-        }
 
     vector<double> para_set;
     double para;
-    while(!command.eof()) if(get_input(command, para)) para_set.emplace_back(para);
+    while(!command.eof() && get_input(command, para)) para_set.emplace_back(para);
 
     if(para_set.size() % 4 != 0) {
-        suanpan_error("new_nm3d2() requires proper parameter set.\n");
+        suanpan_error("new_nm3d() requires proper parameter set.\n");
         return;
     }
 
-    return_obj = make_unique<NM3D2>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), std::move(para_set));
+    mat poly_set(para_set);
+    poly_set.reshape(4, poly_set.n_elem / 4);
+    inplace_trans(poly_set);
+
+    if(10 == size) return_obj = make_unique<NM3D2>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), std::move(poly_set));
+    else if(13 == size) return_obj = make_unique<NM3D3>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), P(10), P(11), P(12), std::move(poly_set));
 }
 
 vec euisection(const string& type) {
@@ -2193,10 +2194,12 @@ int create_new_section(const shared_ptr<DomainBase>& domain, istringstream& comm
     else if(is_equal(section_id, "TrussSection")) new_trusssection(new_section, command);
     else if(is_equal(section_id, "TSection2D")) new_tsection2d(new_section, command);
     else if(is_equal(section_id, "TSection3D")) new_tsection3d(new_section, command);
-    else if(is_equal(section_id, "NM2D1")) new_nm2d1(new_section, command);
-    else if(is_equal(section_id, "NM2D2")) new_nm2d2(new_section, command);
-    else if(is_equal(section_id, "NM3D1")) new_nm3d1(new_section, command);
-    else if(is_equal(section_id, "NM3D2")) new_nm3d2(new_section, command);
+    else if(is_equal(section_id, "NM2D1")) new_nm2d(new_section, command, 3);
+    else if(is_equal(section_id, "NM2D2")) new_nm2d(new_section, command, 8);
+    else if(is_equal(section_id, "NM2D3")) new_nm2d(new_section, command, 11);
+    else if(is_equal(section_id, "NM3D1")) new_nm3d(new_section, command, 4);
+    else if(is_equal(section_id, "NM3D2")) new_nm3d(new_section, command, 10);
+    else if(is_equal(section_id, "NM3D3")) new_nm3d(new_section, command, 13);
     else if(is_equal(section_id, "EU2D")) new_eu2d(new_section, command);
     else if(is_equal(section_id, "EU3D")) new_eu3d(new_section, command);
     else if(is_equal(section_id, "NZ2D")) new_nz2d(new_section, command);

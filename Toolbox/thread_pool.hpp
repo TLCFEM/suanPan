@@ -73,7 +73,8 @@ class thread_pool {
 
 public:
     explicit thread_pool(const concurrency_t thread_count_ = std::thread::hardware_concurrency())
-        : thread_count(thread_count_ > 1 ? thread_count_ : 1), threads(std::make_unique<std::thread[]>(thread_count)) { create_threads(); }
+        : thread_count(thread_count_ > 1 ? thread_count_ : 1)
+        , threads(std::make_unique<std::thread[]>(thread_count)) { create_threads(); }
 
     ~thread_pool() {
         wait_for_tasks();
@@ -94,14 +95,11 @@ public:
 
     concurrency_t get_thread_count() const { return thread_count; }
 
-    template<typename F, typename... A>
-    void push_task(const F& task, const A&... args) {
+    template<typename F, typename... A> void push_task(const F& task, const A&... args) {
         {
             const std::scoped_lock tasks_lock(tasks_mutex);
-            if constexpr(sizeof...(args) == 0)
-                tasks.push(std::function<void()>(task));
-            else
-                tasks.push(std::function<void()>([task, args...] { task(args...); }));
+            if constexpr(sizeof...(args) == 0) tasks.push(std::function<void()>(task));
+            else tasks.push(std::function<void()>([task, args...] { task(args...); }));
         }
         ++tasks_total;
         task_available_cv.notify_one();
@@ -118,8 +116,7 @@ public:
         create_threads();
     }
 
-    template<typename F, typename... A, typename R = std::invoke_result_t<std::decay_t<F>, std::decay_t<A>...>>
-    std::future<R> submit(const F& task, const A&... args) {
+    template<typename F, typename... A, typename R = std::invoke_result_t<std::decay_t<F>, std::decay_t<A>...>> std::future<R> submit(const F& task, const A&... args) {
         std::shared_ptr<std::promise<R>> task_promise = std::make_shared<std::promise<R>>();
         push_task(
             [task, args..., task_promise] {
@@ -128,16 +125,11 @@ public:
                         task(args...);
                         task_promise->set_value();
                     }
-                    else {
-                        task_promise->set_value(task(args...));
-                    }
+                    else { task_promise->set_value(task(args...)); }
                 }
                 catch(...) {
-                    try {
-                        task_promise->set_exception(std::current_exception());
-                    }
-                    catch(...) {
-                    }
+                    try { task_promise->set_exception(std::current_exception()); }
+                    catch(...) { }
                 }
             });
         return task_promise->get_future();

@@ -3,13 +3,22 @@
 ## known issues
 
 1. `MKL` includes outdated `FEAST`, the external names in `FEAST` library are modified to avoid linking error.
-2. `OpenBLAS` causes SEG FAULT with version 0.3.20
+2. `OpenBLAS` causes SEGFAULT with version 0.3.15+ when compiled with `DYNAMIC_ARCH` enabled.
+
+## version 2.5
+
+1. reformulate NM sections, add `NMB21E` element with end moment release
+2. add couple stress membranes `CST3`, `CST6`, `CSM4-8`
+3. add universal iterative solvers `BiCGSTAB` and `GMRES`, and preconditioners `Jacobi` and `ILU`
+4. add support for `icx` and `ifx` compilers, add support for `clang` on linux
+5. fix a bug in `GSSSS` with loads are applied as support motions, add `GSSSSOptimal` scheme
+6. add `MassPoint2D` and `MassPoint3D` elements
 
 ## version 2.4
 
 1. add `RestitutionWall` constraint which conserves momentum and energy
 2. add `benchmark` command to benchmark platform
-3. constraints and loads are processes in a fully parallelized manner
+3. constraints and loads are processed in a fully parallelized manner
 4. add 3D viscous damper `Damper03` and `Damper04`
 5. bugfixes
 

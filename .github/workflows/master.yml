@@ -6,7 +6,7 @@ on:
     branches: [ master ]
 jobs:
   ubuntu-openblas:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Clone
         uses: actions/checkout@v2
@@ -14,7 +14,6 @@ jobs:
         uses: actions/setup-go@v2
       - name: Compile
         run: |
-          export CC=gcc-10 && export CXX=g++-10 && export FC=gfortran-10
           go build Checker/updater.go
           echo "SP_TIME=daily-$(date +''%Y%m%d%H'')" >> $GITHUB_ENV
           cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DCMAKE_INSTALL_PREFIX=suanPan-linux-openblas .

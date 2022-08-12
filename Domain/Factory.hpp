@@ -33,8 +33,8 @@
 
 #include <future>
 
-#include "MetaMat/operator_times.hpp"
-#include "Toolbox/container.h"
+#include <Domain/MetaMat/operator_times.hpp>
+#include <Toolbox/container.h>
 
 enum class AnalysisType {
     NONE,
@@ -78,10 +78,8 @@ template<sp_d T> class Factory final {
 
     bool nlgeom = false;
 
-    double tolerance = 1E-14;
-    Precision precision = Precision::FULL;
     SolverType solver = SolverType::LAPACK;
-    unsigned refinement = 10;
+    SolverSetting<T> setting{};
 
     T error = 0.; // error produced by certain solvers
 
@@ -183,16 +181,11 @@ public:
     void set_nlgeom(bool);
     [[nodiscard]] bool is_nlgeom() const;
 
-    void set_tolerance(double);
-    [[nodiscard]] double get_tolerance() const;
+    void set_solver_type(SolverType);
+    [[nodiscard]] SolverType get_solver_type() const;
 
-    void set_precision(Precision);
-    [[nodiscard]] Precision get_precision() const;
-
-    void set_solver(SolverType);
-    [[nodiscard]] SolverType get_solver() const;
-
-    void set_refinement(unsigned);
+    void set_solver_setting(const SolverSetting<double>&);
+    [[nodiscard]] const SolverSetting<double>& get_solver_setting() const;
 
     void set_analysis_type(AnalysisType);
     [[nodiscard]] AnalysisType get_analysis_type() const;
@@ -619,19 +612,13 @@ template<sp_d T> void Factory<T>::set_nlgeom(const bool B) {
 
 template<sp_d T> bool Factory<T>::is_nlgeom() const { return nlgeom; }
 
-template<sp_d T> void Factory<T>::set_tolerance(const double E) { tolerance = E; }
+template<sp_d T> void Factory<T>::set_solver_type(const SolverType E) { solver = E; }
 
-template<sp_d T> double Factory<T>::get_tolerance() const { return tolerance; }
+template<sp_d T> SolverType Factory<T>::get_solver_type() const { return solver; }
 
-template<sp_d T> void Factory<T>::set_precision(const Precision E) { precision = E; }
+template<sp_d T> void Factory<T>::set_solver_setting(const SolverSetting<double>& SS) { setting = SS; }
 
-template<sp_d T> Precision Factory<T>::get_precision() const { return precision; }
-
-template<sp_d T> void Factory<T>::set_solver(const SolverType E) { solver = E; }
-
-template<sp_d T> SolverType Factory<T>::get_solver() const { return solver; }
-
-template<sp_d T> void Factory<T>::set_refinement(const unsigned R) { refinement = R; }
+template<sp_d T> const SolverSetting<double>& Factory<T>::get_solver_setting() const { return setting; }
 
 template<sp_d T> void Factory<T>::set_analysis_type(const AnalysisType AT) {
     if(AT == analysis_type) return;

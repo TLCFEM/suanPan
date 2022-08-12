@@ -32,9 +32,10 @@
 #include <Element/SectionElement.h>
 #include <Element/Utility/Orientation.h>
 
-class NMB21 final : public SectionNMElement2D {
+class NMB21 : public SectionNMElement2D {
     static constexpr unsigned b_node = 2, b_dof = 3, b_size = b_dof * b_node;
 
+protected:
     const double length = 0.;
 
     unique_ptr<Orientation> b_trans;

@@ -69,7 +69,6 @@ int Converter::process(std::ifstream& input_file, std::ofstream& output_file) {
 }
 
 int Converter::process_amplitude(std::ifstream& input_file, std::ofstream& output_file, const std::string& amplitude_name, const std::string& type) {
-
     if(std::string line; is_equal(type, "")) {
         if(std::ofstream amp_out(output_path + amplitude_name); amp_out.is_open()) {
             amp_out.setf(std::ios::scientific);
@@ -129,7 +128,6 @@ int Converter::process_amplitude(std::ifstream& input_file, std::ofstream& outpu
 }
 
 int Converter::process_boundary(std::ifstream& input_file, std::ofstream& output_file, const std::string& amplitude_name, const std::string& type_name) {
-
     std::string command_name;
 
     while(input_file.peek() != '*')
@@ -206,7 +204,6 @@ int Converter::process_boundary(std::ifstream& input_file, std::ofstream& output
 }
 
 int Converter::process_cload(std::ifstream& input_file, std::ofstream& output_file, const std::string& amplitude_name) {
-
     while(input_file.peek() != '*')
         if(std::string line; getline(input_file, line)) {
             output_file << "groupcload " << ++load_tag << ' ' << (amplitude_name.empty() ? 0 : amplitude_pool[amplitude_name]) << ' ';
@@ -219,7 +216,6 @@ int Converter::process_cload(std::ifstream& input_file, std::ofstream& output_fi
 }
 
 int Converter::process_element(std::ifstream& input_file, std::ofstream& output_file, const std::string& type) const {
-
     while(input_file.peek() != '*')
         if(std::string line; getline(input_file, line)) {
             unsigned tag;
@@ -254,7 +250,6 @@ std::string Converter::extract_element_type(const std::string& line) const {
 }
 
 int Converter::process_node(std::ifstream& input_file, std::ofstream& output_file) const {
-
     while(input_file.peek() != '*')
         if(std::string line; getline(input_file, line)) {
             double component;
@@ -284,14 +279,13 @@ int Converter::process_node_set(std::ifstream& input_file, std::ofstream& output
                     if(int end, interval; get_input(tmp_str, end) && get_input(tmp_str, interval)) output_file << ' ' << interval << ' ' << end;
                 }
             }
-            else {
+            else
                 do {
                     int tag;
                     auto tmp_str = clean(line);
                     while(get_input(tmp_str, tag)) output_file << ' ' << tag;
                 }
                 while(input_file.peek() != '*' && getline(input_file, line));
-            }
             output_file << '\n';
         }
 
@@ -313,14 +307,13 @@ int Converter::process_element_set(std::ifstream& input_file, std::ofstream& out
                     if(int end, interval; get_input(tmp_str, end) && get_input(tmp_str, interval)) output_file << ' ' << interval << ' ' << end;
                 }
             }
-            else {
+            else
                 do {
                     int tag;
                     auto tmp_str = clean(line);
                     while(get_input(tmp_str, tag)) output_file << ' ' << tag;
                 }
                 while(input_file.peek() != '*' && getline(input_file, line));
-            }
             output_file << '\n';
         }
 

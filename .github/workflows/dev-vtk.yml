@@ -29,46 +29,8 @@ jobs:
           ./suanPan-linux-openblas-vtk/bin/suanPan -v
       - uses: actions/upload-artifact@v3
         with:
-          name: suanPan-2.4.0-1.x86_64.deb
-          path: suanPan-2.4.0-1.x86_64.deb
-  fedora-mkl-vtk-dev:
-    runs-on: ubuntu-20.04
-    container: fedora:35
-    steps:
-      - name: Setup
-        run: |
-          tee > oneAPI.repo << EOF
-          [oneAPI]
-          name=Intel oneAPI repository
-          baseurl=https://yum.repos.intel.com/oneapi
-          enabled=1
-          gpgcheck=1
-          repo_gpgcheck=1
-          gpgkey=https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
-          EOF
-          mv oneAPI.repo /etc/yum.repos.d/
-          dnf upgrade --refresh -y
-          dnf install libglvnd-devel gcc g++ gfortran rpm-build rpm-devel rpmdevtools cmake wget intel-oneapi-mkl-devel git -y
-          git config --global --add safe.directory /__w/suanPan/suanPan
-      - name: Clone
-        uses: actions/checkout@v2
-      - name: Install MKL VTK
-        run: |
-          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.1.0-linux.tar.gz
-          tar xf VTK-9.1.0-linux.tar.gz
-      - name: Compile
-        run: |
-          cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.1/ -DUSE_MKL=ON -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DUSE_INTEL_OPENMP=OFF -DLINK_DYNAMIC_MKL=OFF .
-          make package -j"$(nproc)"
-      - name: Test
-        run: |
-          dnf install ./suanPan-2.4.0-1.x86_64.rpm -y
-          suanPan -v
-      - name: Upload
-        uses: actions/upload-artifact@v3
-        with:
-          name: suanPan-2.4.0-1.x86_64.rpm
-          path: suanPan-2.4.0-1.x86_64.rpm
+          name: suanPan-2.5.0-1.x86_64.deb
+          path: suanPan-2.5.0-1.x86_64.deb
   macos-openblas-vtk-dev:
     runs-on: macos-11
     steps:
@@ -82,7 +44,7 @@ jobs:
         uses: actions/setup-go@v2
       - name: Compile
         run: |
-          export CC=/usr/local/opt/llvm/bin/clang && export CXX=/usr/local/opt/llvm/bin/clang++ && export FC=gfortran-10
+          export CC=$(brew --prefix llvm@14)/bin/clang && export CXX=$(brew --prefix llvm@14)/bin/clang++ && export FC=gfortran-10
           go build Checker/updater.go
           brew install llvm glfw glew libomp
           cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.1/ -DCMAKE_INSTALL_PREFIX=suanPan-macos-openblas-vtk .

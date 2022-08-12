@@ -68,7 +68,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../../Libs/gcc-win;../../$(Configuration)/Libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../../Libs/win;../../$(Configuration)/Libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libfext.lib;metis.lib;superlu.lib;libopenblas.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -115,6 +115,7 @@
     <ClCompile Include="..\..\..\Constraint\Criterion\StrainEnergyEvolution.cpp" />
     <ClCompile Include="..\..\..\Constraint\Embed.cpp" />
     <ClCompile Include="..\..\..\Constraint\FixedLength.cpp" />
+    <ClCompile Include="..\..\..\Constraint\LJPotential2D.cpp" />
     <ClCompile Include="..\..\..\Constraint\MPC.cpp" />
     <ClCompile Include="..\..\..\Constraint\NodeFacet.cpp" />
     <ClCompile Include="..\..\..\Constraint\NodeLine.cpp" />
@@ -162,6 +163,7 @@
     <ClCompile Include="..\..\..\Element\Beam\F31.cpp" />
     <ClCompile Include="..\..\..\Element\Beam\MVLEM.cpp" />
     <ClCompile Include="..\..\..\Element\Beam\NMB21.cpp" />
+    <ClCompile Include="..\..\..\Element\Beam\NMB21E.cpp" />
     <ClCompile Include="..\..\..\Element\Beam\NMB31.cpp" />
     <ClCompile Include="..\..\..\Element\Cube\C3D20.cpp" />
     <ClCompile Include="..\..\..\Element\Cube\C3D4.cpp" />
@@ -424,15 +426,20 @@
     <ClCompile Include="..\..\..\Section\Section3D\Rectangle3D.cpp" />
     <ClCompile Include="..\..\..\Section\Section3D\Section3D.cpp" />
     <ClCompile Include="..\..\..\Section\Section3D\TSection3D.cpp" />
+    <ClCompile Include="..\..\..\Section\SectionNM\LinearHardeningNM.cpp" />
     <ClCompile Include="..\..\..\Section\SectionNM\NM2D1.cpp" />
     <ClCompile Include="..\..\..\Section\SectionNM\NM2D2.cpp" />
-    <ClCompile Include="..\..\..\Section\SectionNM\NonlinearNM2D.cpp" />
+    <ClCompile Include="..\..\..\Section\SectionNM\NM2D3.cpp" />
+    <ClCompile Include="..\..\..\Section\SectionNM\NM3D3.cpp" />
+    <ClCompile Include="..\..\..\Section\SectionNM\NonlinearNM.cpp" />
     <ClCompile Include="..\..\..\Section\SectionNM\NM3D1.cpp" />
     <ClCompile Include="..\..\..\Section\SectionNM\NM3D2.cpp" />
-    <ClCompile Include="..\..\..\Section\SectionNM\NonlinearNM3D.cpp" />
     <ClCompile Include="..\..\..\Section\SectionNM\SectionNM.cpp" />
     <ClCompile Include="..\..\..\Section\SectionNM\SectionNM2D.cpp" />
     <ClCompile Include="..\..\..\Section\SectionNM\SectionNM3D.cpp" />
+    <ClCompile Include="..\..\..\Section\SectionNM\SurfaceNM2D.cpp" />
+    <ClCompile Include="..\..\..\Section\SectionNM\SurfaceNM3D.cpp" />
+    <ClCompile Include="..\..\..\Section\SectionNM\VAFNM.cpp" />
     <ClCompile Include="..\..\..\Section\SectionParser.cpp" />
     <ClCompile Include="..\..\..\Section\SectionShell\Homogeneous.cpp" />
     <ClCompile Include="..\..\..\Section\SectionShell\SectionShell.cpp" />
@@ -475,6 +482,7 @@
     <ClCompile Include="..\..\..\Toolbox\tensorToolbox.cpp" />
     <ClCompile Include="..\..\..\Toolbox\utility.cpp" />
     <ClCompile Include="..\..\..\UnitTest\CatchTest.cpp" />
+    <ClCompile Include="..\..\..\UnitTest\TestSolver.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestColoring.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestIntegration.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestMatrix.cpp" />
@@ -482,7 +490,9 @@
     <ClCompile Include="..\..\..\UnitTest\TestMode.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestQuaternion.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestShape.cpp" />
+    <ClCompile Include="..\..\..\UnitTest\TestSorting.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestString.cpp" />
+    <ClCompile Include="..\..\..\UnitTest\TestSurfaceNM.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestTensor.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestUtility.cpp" />
   </ItemGroup>
@@ -506,6 +516,7 @@
     <ClInclude Include="..\..\..\Constraint\Criterion\StrainEnergyEvolution.h" />
     <ClInclude Include="..\..\..\Constraint\Embed.h" />
     <ClInclude Include="..\..\..\Constraint\FixedLength.h" />
+    <ClInclude Include="..\..\..\Constraint\LJPotential2D.h" />
     <ClInclude Include="..\..\..\Constraint\MPC.h" />
     <ClInclude Include="..\..\..\Constraint\NodeFacet.h" />
     <ClInclude Include="..\..\..\Constraint\NodeLine.h" />
@@ -550,8 +561,13 @@
     <ClInclude Include="..\..\..\Domain\MetaMat\DenseMat.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\FullMat.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\FullMatCUDA.hpp" />
+    <ClInclude Include="..\..\..\Domain\MetaMat\ILU.hpp" />
+    <ClInclude Include="..\..\..\Domain\MetaMat\IterativeSolver.hpp" />
+    <ClInclude Include="..\..\..\Domain\MetaMat\Jacobi.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\MetaMat.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\operator_times.hpp" />
+    <ClInclude Include="..\..\..\Domain\MetaMat\Preconditioner.hpp" />
+    <ClInclude Include="..\..\..\Domain\MetaMat\SolverSetting.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\SparseMat.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\SparseMatCUDA.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\SparseMatFGMRES.hpp" />
@@ -574,6 +590,7 @@
     <ClInclude Include="..\..\..\Element\Beam\F31.h" />
     <ClInclude Include="..\..\..\Element\Beam\MVLEM.h" />
     <ClInclude Include="..\..\..\Element\Beam\NMB21.h" />
+    <ClInclude Include="..\..\..\Element\Beam\NMB21E.h" />
     <ClInclude Include="..\..\..\Element\Beam\NMB31.h" />
     <ClInclude Include="..\..\..\Element\Cube\C3D20.h" />
     <ClInclude Include="..\..\..\Element\Cube\C3D4.h" />
@@ -840,15 +857,20 @@
     <ClInclude Include="..\..\..\Section\Section3D\Rectangle3D.h" />
     <ClInclude Include="..\..\..\Section\Section3D\Section3D.h" />
     <ClInclude Include="..\..\..\Section\Section3D\TSection3D.h" />
+    <ClInclude Include="..\..\..\Section\SectionNM\LinearHardeningNM.h" />
     <ClInclude Include="..\..\..\Section\SectionNM\NM2D1.h" />
     <ClInclude Include="..\..\..\Section\SectionNM\NM2D2.h" />
-    <ClInclude Include="..\..\..\Section\SectionNM\NonlinearNM2D.h" />
+    <ClInclude Include="..\..\..\Section\SectionNM\NM2D3.h" />
+    <ClInclude Include="..\..\..\Section\SectionNM\NM3D3.h" />
+    <ClInclude Include="..\..\..\Section\SectionNM\NonlinearNM.h" />
     <ClInclude Include="..\..\..\Section\SectionNM\NM3D1.h" />
     <ClInclude Include="..\..\..\Section\SectionNM\NM3D2.h" />
-    <ClInclude Include="..\..\..\Section\SectionNM\NonlinearNM3D.h" />
     <ClInclude Include="..\..\..\Section\SectionNM\SectionNM.h" />
     <ClInclude Include="..\..\..\Section\SectionNM\SectionNM2D.h" />
     <ClInclude Include="..\..\..\Section\SectionNM\SectionNM3D.h" />
+    <ClInclude Include="..\..\..\Section\SectionNM\SurfaceNM2D.h" />
+    <ClInclude Include="..\..\..\Section\SectionNM\SurfaceNM3D.h" />
+    <ClInclude Include="..\..\..\Section\SectionNM\VAFNM.h" />
     <ClInclude Include="..\..\..\Section\SectionParser.h" />
     <ClInclude Include="..\..\..\Section\SectionShell\Homogeneous.h" />
     <ClInclude Include="..\..\..\Section\SectionShell\SectionShell.h" />
@@ -885,6 +907,7 @@
     <ClInclude Include="..\..\..\Toolbox\commandParser.h" />
     <ClInclude Include="..\..\..\Toolbox\container.h" />
     <ClInclude Include="..\..\..\Toolbox\Converter.h" />
+    <ClInclude Include="..\..\..\Toolbox\LBFGS.hpp" />
     <ClInclude Include="..\..\..\Toolbox\print.h" />
     <ClInclude Include="..\..\..\Toolbox\IntegrationPlan.h" />
     <ClInclude Include="..\..\..\Toolbox\Quaternion.hpp" />
@@ -896,6 +919,7 @@
     <ClInclude Include="..\..\..\Toolbox\thread_pool.hpp" />
     <ClInclude Include="..\..\..\Toolbox\utility.h" />
     <ClInclude Include="..\..\..\UnitTest\CatchTest.h" />
+    <ClInclude Include="..\..\..\UnitTest\TestSolver.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\..\Resource\suanPan.rc" />

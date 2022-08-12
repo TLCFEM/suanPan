@@ -33,7 +33,7 @@ void LeeNewmark::update_stiffness() const {
                 const auto M = K + J;
                 for(unsigned L = 0; L < n_block; ++L) {
                     const auto N = L + J;
-                    auto t_val = current_mass->operator()(K, L);
+                    sp_d auto t_val = current_mass->operator()(K, L);
                     if(!suanpan::approx_equal(0., t_val)) stiffness->at(M, L) = C1 * (stiffness->at(K, N) = -(stiffness->at(M, N) = mass_coef(I) * t_val));
                     t_val = current_stiffness->operator()(K, L);
                     if(!suanpan::approx_equal(0., t_val)) stiffness->at(M, N) = stiffness_coef(I) * t_val;
@@ -47,7 +47,7 @@ void LeeNewmark::update_residual() const {
     auto& t_residual = access::rw(residual);
 
     for(uword I = 0, J = n_block, K = J + n_block - 1; I < n_damping; ++I, J += n_block, K += n_block) {
-        const vec n_internal(access::rwp(&trial_internal(J)), n_block, false, true);
+        const vec n_internal(&trial_internal(J), n_block);
         t_residual.rows(J, K) = current_mass * vec(t_vel - n_internal) * mass_coef(I) - current_stiffness * n_internal * stiffness_coef(I);
     }
 }
@@ -90,6 +90,10 @@ int LeeNewmark::process_constraint() {
         // assuming mass does not change
         // otherwise swap and assemble
         current_mass = factory->get_mass()->make_copy();
+        if(if_iterative) {
+            const auto current_mass_max = current_mass->max() * 1E-10;
+            for(uword I = 0llu; I < std::min(current_mass->n_rows, current_mass->n_cols); ++I) current_mass->at(I, I) += current_mass_max;
+        }
     }
     else {
         // if not first iteration
@@ -172,7 +176,7 @@ void LeeNewmark::assemble_resistance() {
     if(nullptr != current_mass) {
         vec internal_velocity = CM * W->get_trial_velocity();
         for(uword I = 0, J = n_block; I < n_damping; ++I, J += n_block) {
-            const vec n_internal(&trial_internal(J), n_block, false, true);
+            const vec n_internal(&trial_internal(J), n_block);
             internal_velocity -= mass_coef(I) * n_internal;
         }
         W->update_trial_damping_force(W->get_trial_damping_force() + current_mass * internal_velocity);

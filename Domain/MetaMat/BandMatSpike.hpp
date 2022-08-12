@@ -62,10 +62,10 @@ public:
     const T& operator()(uword, uword) const override;
     T& at(uword, uword) override;
 
-    Mat<T> operator*(const Mat<T>&) override;
+    Mat<T> operator*(const Mat<T>&) const override;
 
-    int solve(Mat<T>&, Mat<T>&&) override;
-    int solve(Mat<T>&, const Mat<T>&) override;
+    int direct_solve(Mat<T>&, Mat<T>&&) override;
+    int direct_solve(Mat<T>&, const Mat<T>&) override;
 
     [[nodiscard]] int sign_det() const override;
 };
@@ -112,7 +112,7 @@ template<sp_d T> T& BandMatSpike<T>::at(const uword in_row, const uword in_col) 
     return access::rw(this->memory[in_row + u_band + in_col * (m_rows - 1)]);
 }
 
-template<sp_d T> Mat<T> BandMatSpike<T>::operator*(const Mat<T>& X) {
+template<sp_d T> Mat<T> BandMatSpike<T>::operator*(const Mat<T>& X) const {
     Mat<T> Y(arma::size(X));
 
     const auto M = static_cast<int>(this->n_rows);
@@ -136,7 +136,7 @@ template<sp_d T> Mat<T> BandMatSpike<T>::operator*(const Mat<T>& X) {
     return Y;
 }
 
-template<sp_d T> int BandMatSpike<T>::solve(Mat<T>& X, const Mat<T>& B) {
+template<sp_d T> int BandMatSpike<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
     if(!this->factored) {
         auto N = static_cast<int>(this->n_rows);
         auto KL = static_cast<int>(l_band);
@@ -150,7 +150,7 @@ template<sp_d T> int BandMatSpike<T>::solve(Mat<T>& X, const Mat<T>& B) {
             WORK.zeros(KLU * KLU * SPIKE(9));
             sspike_gbtrf_(SPIKE.memptr(), &N, &KL, &KU, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), &INFO);
         }
-        else if(Precision::FULL == this->precision) {
+        else if(Precision::FULL == this->setting.precision) {
             using E = double;
             WORK.zeros(KLU * KLU * SPIKE(9));
             dspike_gbtrf_(SPIKE.memptr(), &N, &KL, &KU, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), &INFO);
@@ -185,7 +185,7 @@ template<sp_d T> int BandMatSpike<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
         X = B;
         sspike_gbtrs_(SPIKE.memptr(), &TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), (E*)X.memptr(), &LDB);
     }
-    else if(Precision::FULL == this->precision) {
+    else if(Precision::FULL == this->setting.precision) {
         using E = double;
         X = B;
         dspike_gbtrs_(SPIKE.memptr(), &TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), (E*)X.memptr(), &LDB);
@@ -198,8 +198,8 @@ template<sp_d T> int BandMatSpike<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
         auto multiplier = norm(full_residual);
 
         auto counter = 0u;
-        while(counter++ < this->refinement) {
-            if(multiplier < this->tolerance) break;
+        while(counter++ < this->setting.iterative_refinement) {
+            if(multiplier < this->setting.tolerance) break;
 
             auto residual = conv_to<fmat>::from(full_residual / multiplier);
 
@@ -216,7 +216,7 @@ template<sp_d T> int BandMatSpike<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
     return SUANPAN_SUCCESS;
 }
 
-template<sp_d T> int BandMatSpike<T>::solve(Mat<T>& X, Mat<T>&& B) {
+template<sp_d T> int BandMatSpike<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
     if(!this->factored) {
         auto N = static_cast<int>(this->n_rows);
         auto KL = static_cast<int>(l_band);
@@ -230,7 +230,7 @@ template<sp_d T> int BandMatSpike<T>::solve(Mat<T>& X, Mat<T>&& B) {
             WORK.zeros(KLU * KLU * SPIKE(9));
             sspike_gbtrf_(SPIKE.memptr(), &N, &KL, &KU, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), &INFO);
         }
-        else if(Precision::FULL == this->precision) {
+        else if(Precision::FULL == this->setting.precision) {
             using E = double;
             WORK.zeros(KLU * KLU * SPIKE(9));
             dspike_gbtrf_(SPIKE.memptr(), &N, &KL, &KU, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), &INFO);
@@ -265,7 +265,7 @@ template<sp_d T> int BandMatSpike<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
         sspike_gbtrs_(SPIKE.memptr(), &TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), (E*)B.memptr(), &LDB);
         X = std::move(B);
     }
-    else if(Precision::FULL == this->precision) {
+    else if(Precision::FULL == this->setting.precision) {
         using E = double;
         dspike_gbtrs_(SPIKE.memptr(), &TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), (E*)B.memptr(), &LDB);
         X = std::move(B);
@@ -276,8 +276,8 @@ template<sp_d T> int BandMatSpike<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
         auto multiplier = norm(B);
 
         auto counter = 0u;
-        while(counter++ < this->refinement) {
-            if(multiplier < this->tolerance) break;
+        while(counter++ < this->setting.iterative_refinement) {
+            if(multiplier < this->setting.tolerance) break;
 
             auto residual = conv_to<fmat>::from(B / multiplier);
 
