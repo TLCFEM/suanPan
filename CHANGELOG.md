@@ -5,6 +5,10 @@
 1. `MKL` includes outdated `FEAST`, the external names in `FEAST` library are modified to avoid linking error.
 2. `OpenBLAS` causes SEGFAULT with version 0.3.15+ when compiled with `DYNAMIC_ARCH` enabled.
 
+## version 2.6
+
+1. add `TabularSpline` amplitude that uses cubic spline interpolation
+
 ## version 2.5
 
 1. reformulate NM sections, add `NMB21E` element with end moment release

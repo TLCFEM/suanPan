@@ -45,7 +45,7 @@ void Tabular::initialize(const shared_ptr<DomainBase>& D) {
         }
     }
     else {
-        suanpan_error("cannot load file.\n");
+        suanpan_error("Tabular() cannot load file.\n");
         D->disable_amplitude(get_tag());
     }
 }

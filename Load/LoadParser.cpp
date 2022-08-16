@@ -238,6 +238,14 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& co
         }
         domain->insert(make_shared<Tabular>(tag, std::move(file_name), step_tag));
     }
+    else if(is_equal(amplitude_type, "TabularSpline")) {
+        string file_name;
+        if(!get_input(command, file_name)) {
+            suanpan_error("create_new_amplitude() needs a valid file.\n");
+            return SUANPAN_SUCCESS;
+        }
+        domain->insert(make_shared<TabularSpline>(tag, std::move(file_name), step_tag));
+    }
     else if(is_equal(amplitude_type, "Decay")) {
         double A;
         if(!get_input(command, A)) {

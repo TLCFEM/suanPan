@@ -1399,6 +1399,9 @@
     <ClCompile Include="..\..\..\Constraint\LJPotential2D.cpp">
       <Filter>Constraint</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Load\Amplitude\TabularSpline.cpp">
+      <Filter>Load\Amplitude</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2667,6 +2670,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Constraint\LJPotential2D.h">
       <Filter>Constraint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Load\Amplitude\TabularSpline.h">
+      <Filter>Load\Amplitude</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

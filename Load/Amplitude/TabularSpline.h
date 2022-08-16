@@ -15,32 +15,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class Tabular
- * @brief A Tabular class that can generate Amplitude pattern.
+ * @class TabularSpline
+ * @brief A TabularSpline class that can generate Amplitude pattern.
  *
  * @author tlc
- * @date 15/07/2017
+ * @date 15/08/2022
  * @version 0.1.0
- * @file Tabular.h
+ * @file TabularSpline.h
  * @addtogroup Amplitude
  * @{
  */
 
-#ifndef TABULAR_H
-#define TABULAR_H
+#ifndef TABULARSPLINE_H
+#define TABULARSPLINE_H
 
-#include <Load/Amplitude/Amplitude.h>
+#include "Tabular.h"
 
-class Tabular : public Amplitude {
-    const string file_name;
+class TabularSpline final : public Tabular {
+    vec dt, dy, m;
 
-protected:
-    vec time;      // time
-    vec magnitude; // magnitude
+    [[nodiscard]] double evaluate(uword, double) const;
 
 public:
-    Tabular(unsigned, vec&&, vec&&, unsigned);
-    Tabular(unsigned, string&&, unsigned);
+    using Tabular::Tabular;
 
     void initialize(const shared_ptr<DomainBase>&) override;
 
