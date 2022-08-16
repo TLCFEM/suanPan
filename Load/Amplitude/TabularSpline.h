@@ -34,8 +34,6 @@
 class TabularSpline final : public Tabular {
     vec dt, dy, m;
 
-    [[nodiscard]] double evaluate(uword, double) const;
-
 public:
     using Tabular::Tabular;
 

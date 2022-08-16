@@ -19,16 +19,6 @@
 #include <Domain/DomainBase.h>
 #include <Domain/MetaMat/BandMat.hpp>
 
-double TabularSpline::evaluate(const uword I, const double x) const {
-    const auto J = I - 1llu;
-
-    double y = (m(J) * pow(time(I) - x, 3.) + m(I) * pow(x - time(J), 3.)) / dt(J);
-    y += (magnitude(J) / dt(J) - m(J) * dt(J)) * (time(I) - x);
-    y += (magnitude(I) / dt(J) - m(I) * dt(J)) * (x - time(J));
-
-    return y;
-}
-
 void TabularSpline::initialize(const shared_ptr<DomainBase>& D) {
     Tabular::initialize(D);
 
@@ -69,16 +59,24 @@ void TabularSpline::initialize(const shared_ptr<DomainBase>& D) {
         b(I) = (dy(I) / dt(I) - dy(J) / dt(J)) / denom;
     });
 
-    system.solve(m, b);
+    m = system.solve(b);
 }
 
 double TabularSpline::get_amplitude(const double T) {
     const auto step_time = T - start_time;
 
-    uword IDX = 0;
-    while(IDX < time.n_elem && time(IDX) < step_time) ++IDX;
+    if(step_time <= time.front()) return magnitude.front();
 
-    return IDX == 0 ? 0. : IDX == time.n_elem ? magnitude(magnitude.n_elem - 1) : evaluate(IDX, step_time);
+    if(step_time >= time.back()) return magnitude.back();
+
+    const auto I = std::distance(time.cbegin(), std::lower_bound(time.cbegin(), time.cend(), step_time));
+    const auto J = I - 1;
+
+    double y = (m(J) * pow(time(I) - step_time, 3.) + m(I) * pow(step_time - time(J), 3.)) / dt(J);
+    y += (magnitude(J) / dt(J) - m(J) * dt(J)) * (time(I) - step_time);
+    y += (magnitude(I) / dt(J) - m(I) * dt(J)) * (step_time - time(J));
+
+    return y;
 }
 
 void TabularSpline::print() { suanpan_info("TabularSpline.\n"); }
