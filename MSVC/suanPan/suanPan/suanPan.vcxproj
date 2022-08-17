@@ -265,6 +265,7 @@
     <ClCompile Include="..\..\..\Load\Amplitude\Ramp.cpp" />
     <ClCompile Include="..\..\..\Load\Amplitude\Sine.cpp" />
     <ClCompile Include="..\..\..\Load\Amplitude\Tabular.cpp" />
+    <ClCompile Include="..\..\..\Load\Amplitude\TabularSpline.cpp" />
     <ClCompile Include="..\..\..\Load\BodyForce.cpp" />
     <ClCompile Include="..\..\..\Load\GroupBodyForce.cpp" />
     <ClCompile Include="..\..\..\Load\GroupNodalDisplacement.cpp" />
@@ -694,6 +695,7 @@
     <ClInclude Include="..\..\..\Load\Amplitude\Ramp.h" />
     <ClInclude Include="..\..\..\Load\Amplitude\Sine.h" />
     <ClInclude Include="..\..\..\Load\Amplitude\Tabular.h" />
+    <ClInclude Include="..\..\..\Load\Amplitude\TabularSpline.h" />
     <ClInclude Include="..\..\..\Load\BodyForce.h" />
     <ClInclude Include="..\..\..\Load\GroupBodyForce.h" />
     <ClInclude Include="..\..\..\Load\GroupNodalDisplacement.h" />

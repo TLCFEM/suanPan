@@ -9,3 +9,4 @@
 #include "Ramp.h"
 #include "Sine.h"
 #include "Tabular.h"
+#include "TabularSpline.h"
