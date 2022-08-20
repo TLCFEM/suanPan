@@ -115,6 +115,7 @@
     <ClCompile Include="..\..\..\Constraint\Criterion\StrainEnergyEvolution.cpp" />
     <ClCompile Include="..\..\..\Constraint\Embed.cpp" />
     <ClCompile Include="..\..\..\Constraint\FixedLength.cpp" />
+    <ClCompile Include="..\..\..\Constraint\LinearSpring2D.cpp" />
     <ClCompile Include="..\..\..\Constraint\LJPotential2D.cpp" />
     <ClCompile Include="..\..\..\Constraint\MPC.cpp" />
     <ClCompile Include="..\..\..\Constraint\NodeFacet.cpp" />
@@ -205,6 +206,7 @@
     <ClCompile Include="..\..\..\Element\Membrane\Porous\PCPE8DC.cpp" />
     <ClCompile Include="..\..\..\Element\Membrane\Porous\PCPE8UC.cpp" />
     <ClCompile Include="..\..\..\Element\Modifier\ElementalModal.cpp" />
+    <ClCompile Include="..\..\..\Element\Modifier\LinearViscosity.cpp" />
     <ClCompile Include="..\..\..\Element\Modifier\LumpedScale.cpp" />
     <ClCompile Include="..\..\..\Element\Modifier\LumpedSimple.cpp" />
     <ClCompile Include="..\..\..\Element\Modifier\Modifier.cpp" />
@@ -517,6 +519,7 @@
     <ClInclude Include="..\..\..\Constraint\Criterion\StrainEnergyEvolution.h" />
     <ClInclude Include="..\..\..\Constraint\Embed.h" />
     <ClInclude Include="..\..\..\Constraint\FixedLength.h" />
+    <ClInclude Include="..\..\..\Constraint\LinearSpring2D.h" />
     <ClInclude Include="..\..\..\Constraint\LJPotential2D.h" />
     <ClInclude Include="..\..\..\Constraint\MPC.h" />
     <ClInclude Include="..\..\..\Constraint\NodeFacet.h" />
@@ -634,6 +637,7 @@
     <ClInclude Include="..\..\..\Element\Membrane\Porous\PCPE8DC.h" />
     <ClInclude Include="..\..\..\Element\Membrane\Porous\PCPE8UC.h" />
     <ClInclude Include="..\..\..\Element\Modifier\ElementalModal.h" />
+    <ClInclude Include="..\..\..\Element\Modifier\LinearViscosity.h" />
     <ClInclude Include="..\..\..\Element\Modifier\LumpedScale.h" />
     <ClInclude Include="..\..\..\Element\Modifier\LumpedSimple.h" />
     <ClInclude Include="..\..\..\Element\Modifier\Modifier.h" />
