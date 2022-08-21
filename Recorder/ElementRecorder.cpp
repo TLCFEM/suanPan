@@ -35,7 +35,9 @@ void ElementRecorder::record(const shared_ptr<DomainBase>& D) {
 
     auto& obj_tag = get_object_tag();
 
-    for(unsigned I = 0; I < obj_tag.n_elem; ++I) if(const auto& t_element = D->get<Element>(obj_tag(I)); t_element->is_active()) insert(t_element->record(get_variable_type()), I);
+    if(OutputType::K == get_variable_type()) { for(unsigned I = 0; I < obj_tag.n_elem; ++I) if(const auto& t_element = D->get<Element>(obj_tag(I)); t_element->is_active()) insert({vectorise(t_element->get_current_stiffness())}, I); }
+    else if(OutputType::M == get_variable_type()) { for(unsigned I = 0; I < obj_tag.n_elem; ++I) if(const auto& t_element = D->get<Element>(obj_tag(I)); t_element->is_active()) insert({vectorise(t_element->get_current_mass())}, I); }
+    else for(unsigned I = 0; I < obj_tag.n_elem; ++I) if(const auto& t_element = D->get<Element>(obj_tag(I)); t_element->is_active()) insert(t_element->record(get_variable_type()), I);
 
     if(if_record_time()) insert(D->get_factory()->get_current_time());
 }
