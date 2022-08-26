@@ -48,6 +48,7 @@
 #include "Step/Bead.h"
 #include "Step/Frequency.h"
 #include "argumentParser.h"
+#include "resampling.h"
 #include "thread_pool.hpp"
 #ifdef SUANPAN_WIN
 #include <Windows.h>
@@ -61,7 +62,7 @@ int SUANPAN_NUM_THREADS = static_cast<int>(std::thread::hardware_concurrency());
 fs::path SUANPAN_OUTPUT = fs::current_path();
 
 void qrcode() {
-    for(char encode[] = "SLLLLLLLWWWLWWWLWWWLWWWLLLLLLLSFWLLLWFWLUWLWUWLWWFFFWFWLLLWFSFWFFFWFWWFWWFFWWFUFUWWFWFFFWFSFLLLLLFWLWFUFWFUFUFULWFLLLLLFSLLLWLLLLFWWULWWULUUFFLLWWWLWWSULUUFFLWWULFFULFFWWUFLFWLULLFSLUUFWULFWUFLUUFLFFFUULLUULWFLSLUFULULLWUUUWLUULLWUUUFWLFWLFSLFLLLLLWLFWULWWLFFULFUFLWFWFLSLWLWWULLFWLFFULWUFFWWFULLUULFSLULFUFLFFFFLUUFULFUFFFFFFUWUWSLLLLLLLWFLUUWLUWFUUFFWLWFLUFFSFWLLLWFWFFWULWWUWFUWFLLLFUWWLSFWFFFWFWLFWFFULUFULLUWWFFLUUFSFLLLLLFWFFFLUUFLFFUFFFWLFWWFL"; const auto I : encode)
+    for(constexpr char encode[] = "SLLLLLLLWWWLWWWLWWWLWWWLLLLLLLSFWLLLWFWLUWLWUWLWWFFFWFWLLLWFSFWFFFWFWWFWWFFWWFUFUWWFWFFFWFSFLLLLLFWLWFUFWFUFUFULWFLLLLLFSLLLWLLLLFWWULWWULUUFFLLWWWLWWSULUUFFLWWULFFULFFWWUFLFWLULLFSLUUFWULFWUFLUUFLFFFUULLUULWFLSLUFULULLWUUUWLUULLWUUUFWLFWLFSLFLLLLLWLFWULWWLFFULFUFLWFWFLSLWLWWULLFWLFFULWUFFWWFULLUULFSLULFUFLFFFFLUUFULFUFFFFFFUWUWSLLLLLLLWFLUUWLUWFUUFFWLWFLUFFSFWLLLWFWFFWULWWUWFUWFLLLFUWWLSFWFFFWFWLFWFFULUFULLUWWFFLUUFSFLLLLLFWFFFLUUFLFFUFFFWLFWWFL"; const auto I : encode)
         if(I == 'S') suanpan_info("\n            ");
         else if(I == 'W') suanpan_info(" ");
         else if(I == 'F') suanpan_info("%s", u8"\u2588");
@@ -104,6 +105,37 @@ int benchmark() {
     suanpan_info("\nCurrent platform rates (higher is better): %.2f.\n", 1E9 / static_cast<double>(duration.count()));
 
     return SUANPAN_SUCCESS;
+}
+
+void perform_upsampling(istringstream& command) {
+    string file_name;
+    uword up_rate;
+
+    if(!get_input(command, file_name, up_rate)) {
+        suanpan_error("perform_upsampling() requires valid file name and upsampling ratio.\n");
+        return;
+    }
+
+    string window_type = "Hamming";
+
+    if(!get_optional_input(command, window_type)) {
+        suanpan_error("perform_upsampling() requires valid window type.\n");
+        return;
+    }
+
+    mat result;
+
+    if(is_equal(window_type, "Hamming")) result = upsampling<WindowType::Hamming>(file_name, up_rate);
+    else if(is_equal(window_type, "Hann")) result = upsampling<WindowType::Hann>(file_name, up_rate);
+    else if(is_equal(window_type, "Blackman")) result = upsampling<WindowType::Blackman>(file_name, up_rate);
+    else if(is_equal(window_type, "BlackmanNuttall")) result = upsampling<WindowType::BlackmanNuttall>(file_name, up_rate);
+    else if(is_equal(window_type, "BlackmanHarris")) result = upsampling<WindowType::BlackmanHarris>(file_name, up_rate);
+    else if(is_equal(window_type, "FlatTop")) result = upsampling<WindowType::FlatTop>(file_name, up_rate);
+
+    if(result.empty()) suanpan_error("perform_upsampling() fails to perform upsampling, please ensure the input is equally spaced and stored in two columns.\n");
+
+    if(!result.save(file_name += "_upsampled", raw_ascii)) suanpan_error("fail to save file.\n");
+    else suanpan_info("upsampled data is saved to %s.\n", file_name.c_str());
 }
 
 int process_command(const shared_ptr<Bead>& model, istringstream& command) {
@@ -306,6 +338,11 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
 
     if(is_equal(command_id, "terminal")) {
         execute_command(command);
+        return SUANPAN_SUCCESS;
+    }
+
+    if(is_equal(command_id, "upsampling")) {
+        perform_upsampling(command);
         return SUANPAN_SUCCESS;
     }
 

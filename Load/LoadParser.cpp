@@ -19,7 +19,7 @@
 #include <Domain/DomainBase.h>
 #include <Domain/ExternalModule.h>
 #include <Load/Load>
-#include <Toolbox/utility.h>
+#include <Toolbox/resampling.h>
 
 void new_acceleration(unique_ptr<Load>& return_obj, istringstream& command) {
     unsigned load_id;
@@ -236,7 +236,24 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& co
             suanpan_error("create_new_amplitude() needs a valid file.\n");
             return SUANPAN_SUCCESS;
         }
-        domain->insert(make_shared<Tabular>(tag, std::move(file_name), step_tag));
+
+        if(command.eof()) domain->insert(make_shared<Tabular>(tag, std::move(file_name), step_tag));
+        else {
+            uword up_rate;
+            if(!get_input(command, up_rate)) {
+                suanpan_error("create_new_amplitude() needs a valid upsampling ratio.\n");
+                return SUANPAN_SUCCESS;
+            }
+
+            const auto result = upsampling<WindowType::Hamming>(file_name, up_rate);
+
+            if(result.empty()) {
+                suanpan_error("create_new_amplitude() fails to perform upsampling.\n");
+                return SUANPAN_SUCCESS;
+            }
+
+            domain->insert(make_shared<Tabular>(tag, result.col(0), result.col(1), step_tag));
+        }
     }
     else if(is_equal(amplitude_type, "TabularSpline")) {
         string file_name;

@@ -480,11 +480,13 @@
     <ClCompile Include="..\..\..\Toolbox\Converter.cpp" />
     <ClCompile Include="..\..\..\Toolbox\print.cpp" />
     <ClCompile Include="..\..\..\Toolbox\IntegrationPlan.cpp" />
+    <ClCompile Include="..\..\..\Toolbox\resampling.cpp" />
     <ClCompile Include="..\..\..\Toolbox\sort_rcm.cpp" />
     <ClCompile Include="..\..\..\Toolbox\sync_ostream.cpp" />
     <ClCompile Include="..\..\..\Toolbox\tensorToolbox.cpp" />
     <ClCompile Include="..\..\..\Toolbox\utility.cpp" />
     <ClCompile Include="..\..\..\UnitTest\CatchTest.cpp" />
+    <ClCompile Include="..\..\..\UnitTest\TestSampling.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestSolver.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestColoring.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestIntegration.cpp" />
@@ -917,6 +919,7 @@
     <ClInclude Include="..\..\..\Toolbox\print.h" />
     <ClInclude Include="..\..\..\Toolbox\IntegrationPlan.h" />
     <ClInclude Include="..\..\..\Toolbox\Quaternion.hpp" />
+    <ClInclude Include="..\..\..\Toolbox\resampling.h" />
     <ClInclude Include="..\..\..\Toolbox\shapeFunction.h" />
     <ClInclude Include="..\..\..\Toolbox\sort_color.hpp" />
     <ClInclude Include="..\..\..\Toolbox\sort_rcm.h" />
