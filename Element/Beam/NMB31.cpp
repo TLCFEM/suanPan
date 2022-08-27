@@ -18,6 +18,7 @@
 #include "NMB31.h"
 #include <Domain/DomainBase.h>
 #include <Element/Utility/B3DL.h>
+#include <Recorder/OutputType.h>
 #include <Section/Section.h>
 
 NMB31::NMB31(const unsigned T, uvec&& N, const unsigned S, const unsigned O, const bool F)
@@ -78,7 +79,12 @@ int NMB31::reset_status() {
     return b_section->reset_status();
 }
 
-vector<vec> NMB31::record(const OutputType P) { return b_section->record(P); }
+vector<vec> NMB31::record(const OutputType P) {
+    if(P == OutputType::BEAME) return {b_trans->to_local_vec(get_current_displacement())};
+    if(P == OutputType::BEAMS) return {b_section->get_current_resistance()};
+
+    return b_section->record(P);
+}
 
 void NMB31::print() {
     suanpan_info("A spatial beam element using N-M interaction section.\n");
