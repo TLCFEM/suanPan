@@ -18,6 +18,7 @@
 #include "NMB21.h"
 #include <Domain/DomainBase.h>
 #include <Element/Utility/B2DC.h>
+#include <Recorder/OutputType.h>
 #include <Section/Section.h>
 
 NMB21::NMB21(const unsigned T, uvec&& N, const unsigned S, const bool R)
@@ -66,7 +67,12 @@ int NMB21::reset_status() {
     return b_section->reset_status();
 }
 
-vector<vec> NMB21::record(const OutputType P) { return b_section->record(P); }
+vector<vec> NMB21::record(const OutputType P) {
+    if(P == OutputType::BEAME) return {b_trans->to_local_vec(get_current_displacement())};
+    if(P == OutputType::BEAMS) return {b_section->get_current_resistance()};
+
+    return b_section->record(P);
+}
 
 void NMB21::print() {
     suanpan_info("A planar beam element.\n");

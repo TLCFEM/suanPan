@@ -18,6 +18,8 @@ recorder 2 hdf5 Element E 1
 recorder 3 hdf5 Element PE 1
 recorder 4 hdf5 Node U2 2
 recorder 5 hdf5 Node Rf2 2
+recorder 6 hdf5 Element BEAME 1
+recorder 7 hdf5 Element BEAMS 1
 
 step static 1 1
 set ini_step_size 5E-2

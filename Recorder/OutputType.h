@@ -258,6 +258,10 @@ enum class OutputType {
     // yield flag
     YF,
 
+    // beam element end forces
+    BEAME,
+    BEAMS,
+
     NL
 };
 
