@@ -39,6 +39,9 @@ vec blackman_harris(uword);
 vec flat_top(uword);
 
 vec fir_low_pass(uword, double, vec (*)(uword));
+vec fir_high_pass(uword, double, vec (*)(uword));
+vec fir_band_pass(uword, double, double, vec (*)(uword));
+vec fir_band_stop(uword, double, double, vec (*)(uword));
 
 template<WindowType T> vec fir_low_pass(uword, double) { throw invalid_argument("unknown window type"); }
 
@@ -53,6 +56,48 @@ template<> vec fir_low_pass<WindowType::BlackmanNuttall>(uword, double);
 template<> vec fir_low_pass<WindowType::BlackmanHarris>(uword, double);
 
 template<> vec fir_low_pass<WindowType::FlatTop>(uword, double);
+
+template<WindowType T> vec fir_high_pass(uword, double) { throw invalid_argument("unknown window type"); }
+
+template<> vec fir_high_pass<WindowType::Hamming>(uword, double);
+
+template<> vec fir_high_pass<WindowType::Hann>(uword, double);
+
+template<> vec fir_high_pass<WindowType::Blackman>(uword, double);
+
+template<> vec fir_high_pass<WindowType::BlackmanNuttall>(uword, double);
+
+template<> vec fir_high_pass<WindowType::BlackmanHarris>(uword, double);
+
+template<> vec fir_high_pass<WindowType::FlatTop>(uword, double);
+
+template<WindowType T> vec fir_band_pass(uword, double, double) { throw invalid_argument("unknown window type"); }
+
+template<> vec fir_band_pass<WindowType::Hamming>(uword, double, double);
+
+template<> vec fir_band_pass<WindowType::Hann>(uword, double, double);
+
+template<> vec fir_band_pass<WindowType::Blackman>(uword, double, double);
+
+template<> vec fir_band_pass<WindowType::BlackmanNuttall>(uword, double, double);
+
+template<> vec fir_band_pass<WindowType::BlackmanHarris>(uword, double, double);
+
+template<> vec fir_band_pass<WindowType::FlatTop>(uword, double, double);
+
+template<WindowType T> vec fir_band_stop(uword, double, double) { throw invalid_argument("unknown window type"); }
+
+template<> vec fir_band_stop<WindowType::Hamming>(uword, double, double);
+
+template<> vec fir_band_stop<WindowType::Hann>(uword, double, double);
+
+template<> vec fir_band_stop<WindowType::Blackman>(uword, double, double);
+
+template<> vec fir_band_stop<WindowType::BlackmanNuttall>(uword, double, double);
+
+template<> vec fir_band_stop<WindowType::BlackmanHarris>(uword, double, double);
+
+template<> vec fir_band_stop<WindowType::FlatTop>(uword, double, double);
 
 template<WindowType T> vec upsampling(const vec& in, const uword up_rate) {
     vec out(up_rate * in.n_elem, fill::none);

@@ -65,6 +65,68 @@ vec fir_low_pass(const uword s, const double f, vec (*window)(uword)) {
     return b / sum(b);
 }
 
+vec fir_high_pass(const uword s, const double f, vec (*window)(uword)) {
+    suanpan_debug([&] { if(0 != s % 2) throw invalid_argument("order must be even"); });
+
+    const auto sp = s + 1;
+
+    const auto h = window(sp);
+
+    vec b(sp, fill::none);
+
+    for(auto m = 0llu; m < sp; ++m) {
+        const auto term = static_cast<double>(m) - .5 * static_cast<double>(s);
+        b(m) = h(m) * (sinc(term) - f * sinc(f * term));
+    }
+
+    vec bb(sp);
+    for(auto i = 0llu; i < sp; i += 2llu) bb(i) = b(i);
+    for(auto i = 1llu; i < sp; i += 2llu) bb(i) = -b(i);
+
+    return b / abs(sum(bb));
+}
+
+vec fir_band_pass(const uword s, const double fa, const double fb, vec (*window)(uword)) {
+    suanpan_debug([&] { if(fb <= fa) throw invalid_argument("frequencies must be [0 < fa < fb < 1]"); });
+
+    const auto sp = s + 1;
+
+    const auto h = window(sp);
+
+    vec b(sp, fill::none);
+
+    for(auto m = 0llu; m < sp; ++m) {
+        const auto term = static_cast<double>(m) - .5 * static_cast<double>(s);
+        b(m) = h(m) * (fb * sinc(fb * term) - fa * sinc(fa * term));
+    }
+
+    const auto fc = .5 * (fa + fb);
+    const std::complex pi(0., -datum::pi);
+    const vec fv = regspace(0, static_cast<double>(s));
+
+    return b / abs(sum(exp(pi * fv * fc) % b));
+}
+
+vec fir_band_stop(const uword s, const double fa, const double fb, vec (*window)(uword)) {
+    suanpan_debug([&] {
+        if(0 != s % 2) throw invalid_argument("order must be even");
+        if(fb <= fa) throw invalid_argument("frequencies must be [0 < fa < fb < 1]");
+    });
+
+    const auto sp = s + 1;
+
+    const auto h = window(sp);
+
+    vec b(sp, fill::none);
+
+    for(auto m = 0llu; m < sp; ++m) {
+        const auto term = static_cast<double>(m) - .5 * static_cast<double>(s);
+        b(m) = h(m) * (sinc(term) - fb * sinc(fb * term) + fa * sinc(fa * term));
+    }
+
+    return b / sum(b);
+}
+
 template<> vec fir_low_pass<WindowType::Hamming>(const uword s, const double f) { return fir_low_pass(s, f, hamming); }
 
 template<> vec fir_low_pass<WindowType::Hann>(const uword s, const double f) { return fir_low_pass(s, f, hann); }
@@ -76,3 +138,39 @@ template<> vec fir_low_pass<WindowType::BlackmanNuttall>(const uword s, const do
 template<> vec fir_low_pass<WindowType::BlackmanHarris>(const uword s, const double f) { return fir_low_pass(s, f, blackman_harris); }
 
 template<> vec fir_low_pass<WindowType::FlatTop>(const uword s, const double f) { return fir_low_pass(s, f, flat_top); }
+
+template<> vec fir_high_pass<WindowType::Hamming>(const uword s, const double f) { return fir_high_pass(s, f, hamming); }
+
+template<> vec fir_high_pass<WindowType::Hann>(const uword s, const double f) { return fir_high_pass(s, f, hann); }
+
+template<> vec fir_high_pass<WindowType::Blackman>(const uword s, const double f) { return fir_high_pass(s, f, blackman); }
+
+template<> vec fir_high_pass<WindowType::BlackmanNuttall>(const uword s, const double f) { return fir_high_pass(s, f, blackman_nuttall); }
+
+template<> vec fir_high_pass<WindowType::BlackmanHarris>(const uword s, const double f) { return fir_high_pass(s, f, blackman_harris); }
+
+template<> vec fir_high_pass<WindowType::FlatTop>(const uword s, const double f) { return fir_high_pass(s, f, flat_top); }
+
+template<> vec fir_band_pass<WindowType::Hamming>(const uword s, const double fa, const double fb) { return fir_band_pass(s, fa, fb, hamming); }
+
+template<> vec fir_band_pass<WindowType::Hann>(const uword s, const double fa, const double fb) { return fir_band_pass(s, fa, fb, hann); }
+
+template<> vec fir_band_pass<WindowType::Blackman>(const uword s, const double fa, const double fb) { return fir_band_pass(s, fa, fb, blackman); }
+
+template<> vec fir_band_pass<WindowType::BlackmanNuttall>(const uword s, const double fa, const double fb) { return fir_band_pass(s, fa, fb, blackman_nuttall); }
+
+template<> vec fir_band_pass<WindowType::BlackmanHarris>(const uword s, const double fa, const double fb) { return fir_band_pass(s, fa, fb, blackman_harris); }
+
+template<> vec fir_band_pass<WindowType::FlatTop>(const uword s, const double fa, const double fb) { return fir_band_pass(s, fa, fb, flat_top); }
+
+template<> vec fir_band_stop<WindowType::Hamming>(const uword s, const double fa, const double fb) { return fir_band_stop(s, fa, fb, hamming); }
+
+template<> vec fir_band_stop<WindowType::Hann>(const uword s, const double fa, const double fb) { return fir_band_stop(s, fa, fb, hann); }
+
+template<> vec fir_band_stop<WindowType::Blackman>(const uword s, const double fa, const double fb) { return fir_band_stop(s, fa, fb, blackman); }
+
+template<> vec fir_band_stop<WindowType::BlackmanNuttall>(const uword s, const double fa, const double fb) { return fir_band_stop(s, fa, fb, blackman_nuttall); }
+
+template<> vec fir_band_stop<WindowType::BlackmanHarris>(const uword s, const double fa, const double fb) { return fir_band_stop(s, fa, fb, blackman_harris); }
+
+template<> vec fir_band_stop<WindowType::FlatTop>(const uword s, const double fa, const double fb) { return fir_band_stop(s, fa, fb, flat_top); }
