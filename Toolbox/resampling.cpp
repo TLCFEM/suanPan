@@ -83,7 +83,7 @@ vec fir_high_pass(const uword s, const double f, vec (*window)(uword)) {
     for(auto i = 0llu; i < sp; i += 2llu) bb(i) = b(i);
     for(auto i = 1llu; i < sp; i += 2llu) bb(i) = -b(i);
 
-    return b / abs(sum(bb));
+    return b / std::abs(sum(bb));
 }
 
 vec fir_band_pass(const uword s, const double fa, const double fb, vec (*window)(uword)) {
@@ -104,7 +104,7 @@ vec fir_band_pass(const uword s, const double fa, const double fb, vec (*window)
     const std::complex pi(0., -datum::pi);
     const vec fv = regspace(0, static_cast<double>(s));
 
-    return b / abs(sum(exp(pi * fv * fc) % b));
+    return b / std::abs(sum(exp(pi * fv * fc) % b));
 }
 
 vec fir_band_stop(const uword s, const double fa, const double fb, vec (*window)(uword)) {
