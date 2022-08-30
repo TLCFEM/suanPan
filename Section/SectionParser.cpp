@@ -406,11 +406,10 @@ void new_hsection2d(unique_ptr<Section>& return_obj, istringstream& command) {
     }
 
     vec dim(6);
-    for(auto& I : dim)
-        if(!get_input(command, I)) {
-            suanpan_error("new_hsection2d() requires a valid dimension.\n");
-            return;
-        }
+    if(!get_input(command, dim)) {
+        suanpan_error("new_hsection2d() requires a valid dimension.\n");
+        return;
+    }
 
     unsigned material_id;
     if(!get_input(command, material_id)) {
@@ -441,11 +440,10 @@ void new_isection2d(unique_ptr<Section>& return_obj, istringstream& command) {
     }
 
     vec dim(6);
-    for(auto& I : dim)
-        if(!get_input(command, I)) {
-            suanpan_error("new_isection2d() requires a valid dimension.\n");
-            return;
-        }
+    if(!get_input(command, dim)) {
+        suanpan_error("new_isection2d() requires a valid dimension.\n");
+        return;
+    }
 
     unsigned material_id;
     if(!get_input(command, material_id)) {
@@ -476,11 +474,10 @@ void new_isection3d(unique_ptr<Section>& return_obj, istringstream& command) {
     }
 
     vec dim(6);
-    for(auto& I : dim)
-        if(!get_input(command, I)) {
-            suanpan_error("new_isection3d() requires a valid dimension.\n");
-            return;
-        }
+    if(!get_input(command, dim)) {
+        suanpan_error("new_isection3d() requires a valid dimension.\n");
+        return;
+    }
 
     unsigned material_id;
     if(!get_input(command, material_id)) {
@@ -637,11 +634,10 @@ void new_tsection2d(unique_ptr<Section>& return_obj, istringstream& command) {
     }
 
     vec dim(4);
-    for(auto& I : dim)
-        if(!get_input(command, I)) {
-            suanpan_error("new_tsection2d() requires a valid dimension.\n");
-            return;
-        }
+    if(!get_input(command, dim)) {
+        suanpan_error("new_tsection2d() requires a valid dimension.\n");
+        return;
+    }
 
     unsigned material_id;
     if(!get_input(command, material_id)) {
@@ -672,11 +668,10 @@ void new_tsection3d(unique_ptr<Section>& return_obj, istringstream& command) {
     }
 
     vec dim(4);
-    for(auto& I : dim)
-        if(!get_input(command, I)) {
-            suanpan_error("new_tsection3d() requires a valid dimension.\n");
-            return;
-        }
+    if(!get_input(command, dim)) {
+        suanpan_error("new_tsection3d() requires a valid dimension.\n");
+        return;
+    }
 
     unsigned material_id;
     if(!get_input(command, material_id)) {
@@ -712,11 +707,10 @@ void new_nm2d(unique_ptr<Section>& return_obj, istringstream& command, const uns
     }
 
     vec P(size);
-    for(auto& I : P)
-        if(!get_input(command, I)) {
-            suanpan_error("new_nm2d() requires a valid parameter.\n");
-            return;
-        }
+    if(!get_input(command, P)) {
+        suanpan_error("new_nm2d() requires a valid parameter.\n");
+        return;
+    }
 
     if(3 == size) {
         return_obj = make_unique<NM2D1>(tag, P(0), P(1), P(2));
@@ -737,7 +731,7 @@ void new_nm2d(unique_ptr<Section>& return_obj, istringstream& command, const uns
     inplace_trans(poly_set);
 
     if(8 == size) return_obj = make_unique<NM2D2>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), std::move(poly_set));
-    else if(11 == size) return_obj = make_unique<NM2D3>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), P(10), std::move(poly_set));
+    else if(11 == size) return_obj = make_unique<NM2D3>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), vec{P(8), P(8)}, vec{P(9), P(9)}, P(10), std::move(poly_set));
 }
 
 void new_nm3d(unique_ptr<Section>& return_obj, istringstream& command, const unsigned size) {
@@ -748,11 +742,10 @@ void new_nm3d(unique_ptr<Section>& return_obj, istringstream& command, const uns
     }
 
     vec P(size);
-    for(auto& I : P)
-        if(!get_input(command, I)) {
-            suanpan_error("new_nm3d() requires a valid parameter.\n");
-            return;
-        }
+    if(!get_input(command, P)) {
+        suanpan_error("new_nm3d() requires a valid parameter.\n");
+        return;
+    }
 
     if(4 == size) {
         return_obj = make_unique<NM3D1>(tag, P(0), P(1), P(2), P(3));
@@ -773,7 +766,39 @@ void new_nm3d(unique_ptr<Section>& return_obj, istringstream& command, const uns
     inplace_trans(poly_set);
 
     if(10 == size) return_obj = make_unique<NM3D2>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), std::move(poly_set));
-    else if(13 == size) return_obj = make_unique<NM3D3>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), P(10), P(11), P(12), std::move(poly_set));
+    else if(13 == size) return_obj = make_unique<NM3D3>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), vec{P(10), P(10), P(10)}, vec{P(11), P(11), P(11)}, P(12), std::move(poly_set));
+}
+
+void new_nmk(unique_ptr<Section>& return_obj, istringstream& command, const unsigned size) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("new_nmk() requires a valid tag.\n");
+        return;
+    }
+
+    vec P(size);
+    if(!get_input(command, P)) {
+        suanpan_error("new_nmk() requires a valid parameter.\n");
+        return;
+    }
+
+    vector<double> para_set;
+    double para;
+    while(!command.eof() && get_input(command, para)) para_set.emplace_back(para);
+
+    const auto p_size = 13 == size ? 3 : 4;
+
+    if(para_set.size() % p_size != 0) {
+        suanpan_error("new_nmk() requires proper parameter set.\n");
+        return;
+    }
+
+    mat poly_set(para_set);
+    poly_set.reshape(p_size, poly_set.n_elem / p_size);
+    inplace_trans(poly_set);
+
+    if(13 == size) return_obj = make_unique<NM2D3>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), vec{P(8), P(9)}, vec{P(10), P(11)}, P(12), std::move(poly_set));
+    else if(17 == size) return_obj = make_unique<NM3D3>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), vec{P(10), P(11), P(12)}, vec{P(13), P(14), P(15)}, P(16), std::move(poly_set));
 }
 
 vec euisection(const string& type) {
@@ -2200,6 +2225,8 @@ int create_new_section(const shared_ptr<DomainBase>& domain, istringstream& comm
     else if(is_equal(section_id, "NM3D1")) new_nm3d(new_section, command, 4);
     else if(is_equal(section_id, "NM3D2")) new_nm3d(new_section, command, 10);
     else if(is_equal(section_id, "NM3D3")) new_nm3d(new_section, command, 13);
+    else if(is_equal(section_id, "NM2D3K")) new_nmk(new_section, command, 13);
+    else if(is_equal(section_id, "NM3D3K")) new_nmk(new_section, command, 17);
     else if(is_equal(section_id, "EU2D")) new_eu2d(new_section, command);
     else if(is_equal(section_id, "EU3D")) new_eu3d(new_section, command);
     else if(is_equal(section_id, "NZ2D")) new_nz2d(new_section, command);

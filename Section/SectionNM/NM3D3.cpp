@@ -23,9 +23,9 @@ vec NM3D3::compute_df(const vec& s, const vec& h) const { return compute_dsf(s, 
 
 mat NM3D3::compute_ddf(const vec& s, const vec& h) const { return compute_ddsf(s, h); }
 
-NM3D3::NM3D3(const unsigned T, const double EEA, const double EEIS, const double EEIW, const double NP, const double MSP, const double MWP, const double CC, const double HH, const double HS, const double HD, const double KK, const double KB, const double LD, mat&& PS)
+NM3D3::NM3D3(const unsigned T, const double EEA, const double EEIS, const double EEIW, const double NP, const double MSP, const double MWP, const double CC, const double HH, const double HS, const double HD, vec&& KK, vec&& KB, const double LD, mat&& PS)
     : SurfaceNM3D(CC, std::forward<mat>(PS))
-    , VAFNM(T, EEA, EEIS, EEIW, HH, HS, HD, KK, KB, LD, vec{NP, MSP, MWP}) {}
+    , VAFNM(T, EEA, EEIS, EEIW, HH, HS, HD, std::forward<vec>(KK), std::forward<vec>(KB), LD, vec{NP, MSP, MWP}) {}
 
 unique_ptr<Section> NM3D3::get_copy() { return make_unique<NM3D3>(*this); }
 

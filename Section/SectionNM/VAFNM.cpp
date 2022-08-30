@@ -92,7 +92,7 @@ int VAFNM::compute_local_integration(vec& q, mat& jacobian) {
             gamma = .5 * residual(ge(0)) / dot(m, z);
             q -= gamma * m;
             if(has_kinematic) {
-                beta += kin_modulus * gamma * m;
+                beta += gamma * kin_modulus % m;
                 beta /= 1. + kin_base * gamma;
             }
             ai += gamma * norm_mi;
@@ -121,13 +121,13 @@ int VAFNM::compute_local_integration(vec& q, mat& jacobian) {
         dzdx.cols(gd) = pzpaj;
 
         if(has_kinematic) {
-            residual(gb) = (1. + kin_base * gamma) * beta - current_beta - kin_modulus * gamma * m;
+            residual(gb) = (1. + kin_base * gamma) % beta - current_beta - gamma * kin_modulus % m;
 
-            jacobian(gb, gb) += kin_base * gamma * eye(d_size, d_size);
-            jacobian(gb, ge) = kin_base * beta - kin_modulus * m;
+            jacobian(gb, gb) += diagmat(kin_base * gamma);
+            jacobian(gb, ge) = kin_base % beta - kin_modulus % m;
             jacobian(ge, gb) = -z.t();
 
-            prpz.rows(gb) = -kin_modulus * gamma * eye(d_size, d_size);
+            prpz.rows(gb) = diagmat(-gamma * kin_modulus);
 
             dzdx.cols(gb) = -pzpq;
         }
@@ -151,18 +151,18 @@ vec VAFNM::compute_h(const double alpha) const { return {n_size, fill::value(std
 
 vec VAFNM::compute_dh(const double alpha) const { return compute_h(alpha).transform([&](const double h) { return suanpan::approx_equal(h, datum::eps) ? 0. : iso_modulus + iso_saturation * iso_decay * exp(-iso_decay * alpha); }); }
 
-VAFNM::VAFNM(const unsigned T, const double EEA, const double EEIS, const double HH, const double HS, const double HD, const double KK, const double KB, const double LD, vec&& YF)
-    : NonlinearNM(T, EEA, EEIS, !suanpan::approx_equal(KK, 0.) || !suanpan::approx_equal(KB, 0.), LD, std::forward<vec>(YF))
+VAFNM::VAFNM(const unsigned T, const double EEA, const double EEIS, const double HH, const double HS, const double HD, vec&& KK, vec&& KB, const double LD, vec&& YF)
+    : NonlinearNM(T, EEA, EEIS, any(KK) || any(KB), LD, std::forward<vec>(YF))
     , iso_modulus(HH)
-    , kin_modulus(KK)
     , iso_saturation(HS)
     , iso_decay(HD)
-    , kin_base(KB) {}
+    , kin_modulus{KK(0), KK(1), KK(1)}
+    , kin_base{KB(0), KB(1), KB(1)} {}
 
-VAFNM::VAFNM(const unsigned T, const double EEA, const double EEIS, const double EEIW, const double HH, const double HS, const double HD, const double KK, const double KB, const double LD, vec&& YF)
-    : NonlinearNM(T, EEA, EEIS, EEIW, !suanpan::approx_equal(KK, 0.) || !suanpan::approx_equal(KB, 0.), LD, std::forward<vec>(YF))
+VAFNM::VAFNM(const unsigned T, const double EEA, const double EEIS, const double EEIW, const double HH, const double HS, const double HD, vec&& KK, vec&& KB, const double LD, vec&& YF)
+    : NonlinearNM(T, EEA, EEIS, EEIW, any(KK) || any(KB), LD, std::forward<vec>(YF))
     , iso_modulus(HH)
-    , kin_modulus(KK)
     , iso_saturation(HS)
     , iso_decay(HD)
-    , kin_base(KB) {}
+    , kin_modulus{KK(0), KK(1), KK(1), KK(2), KK(2)}
+    , kin_base{KB(0), KB(1), KB(1), KB(2), KB(2)} {}

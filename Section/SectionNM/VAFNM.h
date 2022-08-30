@@ -32,11 +32,9 @@
 #include "NonlinearNM.h"
 
 class VAFNM : public NonlinearNM {
-    const double iso_modulus;
-    const double kin_modulus;
+    const double iso_modulus, iso_saturation, iso_decay;
 
-    const double iso_saturation, iso_decay;
-    const double kin_base;
+    const vec kin_modulus, kin_base;
 
     [[nodiscard]] int compute_local_integration(vec&, mat&) override;
 
@@ -51,8 +49,8 @@ public:
           double,   // isotropic modulus
           double,   // isotropic saturation
           double,   // isotropic decay
-          double,   // kinematic modulus
-          double,   // kinematic base
+          vec&&,    // kinematic modulus
+          vec&&,    // kinematic base
           double,   // linear density
           vec&&
     );
@@ -63,8 +61,8 @@ public:
           double,   // isotropic modulus
           double,   // isotropic saturation
           double,   // isotropic decay
-          double,   // kinematic modulus
-          double,   // kinematic base
+          vec&&,    // kinematic modulus
+          vec&&,    // kinematic base
           double,   // linear density
           vec&&
     );
