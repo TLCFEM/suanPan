@@ -36,7 +36,7 @@ as [ABAQUS UNIFIED FEA](https://www.3ds.com/products-services/simulia/products/a
 and [OpenSees](http://opensees.berkeley.edu/).
 
 Please check documentation [here](https://tlcfem.gitbook.io/suanpan-manual/) and [here](http://suanpan-manual.rtfd.io/)
-for command references. Please consider star ⭐ the project!
+for command references. Please consider starring ⭐ the project!
 
 ## Features
 
@@ -115,6 +115,10 @@ MKL for linear algebra.
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/suanpan)
 
 [![asciicast](https://asciinema.org/a/491330.svg)](https://asciinema.org/a/491330)
+
+Alternatively, download the RPM (Fedora 35) or DEB (Ubuntu 22.04) package from the release page. The packages may not be
+compatible with older distributions (due to different version of `libstdc++`). It is also possible to compile the
+package via docker, check the dockerfiles under the `Script` folder, for any questions please open an issue.
 
 ### Other Platforms
 
