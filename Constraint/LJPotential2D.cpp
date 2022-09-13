@@ -20,15 +20,15 @@
 double LJPotential2D::compute_f(const double distance) const {
     if(distance >= space) return 0.;
 
-    const auto pow_term = std::pow(.1 * space / distance, 6);
+    const auto pow_term = std::pow(.1 * space / distance, 6.);
 
-    return alpha * pow_term * (4. - 4. * pow_term);
+    return 24. * alpha * pow_term / distance * (2. * pow_term - 1.);
 }
 
 double LJPotential2D::compute_df(const double distance) const {
     if(distance >= space) return 0.;
 
-    const auto pow_term = std::pow(.1 * space / distance, 6);
+    const auto pow_term = std::pow(.1 * space / distance, 6.);
 
-    return alpha * pow_term * (48. * pow_term - 24.) / distance;
+    return alpha * pow_term * pow(distance, -2.) * (168. - 624. * pow_term);
 }
