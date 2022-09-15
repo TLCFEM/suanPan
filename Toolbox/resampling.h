@@ -100,8 +100,6 @@ template<> vec fir_band_stop<WindowType::BlackmanHarris>(uword, double, double);
 template<> vec fir_band_stop<WindowType::FlatTop>(uword, double, double);
 
 template<WindowType T> vec upsampling(const vec& in, const uword up_rate) {
-    vec out(up_rate * in.n_elem, fill::none);
-
     const auto coef = fir_low_pass<T>(8llu * up_rate, 1. / static_cast<double>(up_rate));
 
     const auto buffer_size = coef.n_elem;
@@ -122,9 +120,14 @@ template<WindowType T> vec upsampling(const vec& in, const uword up_rate) {
         return result;
     };
 
-    for(auto n = 0llu; n < out.n_elem; ++n) out(n) = static_cast<double>(up_rate) * feed(0 == n % up_rate ? in(n / up_rate) : 0.);
+    const auto output_size = up_rate * in.n_elem;
 
-    return out;
+    vec out(output_size + buffer_size, fill::none);
+
+    for(auto n = 0llu; n < output_size; ++n) out(n) = feed(0 == n % up_rate ? in(n / up_rate) : 0.);
+    for(auto n = 0llu; n < buffer_size; ++n) out(n + output_size) = feed(0.);
+
+    return out *= static_cast<double>(up_rate);
 }
 
 template<WindowType T> mat upsampling(const string& file_name, const uword up_rate) {
@@ -142,9 +145,11 @@ template<WindowType T> mat upsampling(const string& file_name, const uword up_ra
         return ext_data;
     }
 
-    mat result(ext_data.n_rows * up_rate, 2, fill::none);
+    const auto upsampled_data = upsampling<T>(ext_data.col(1), up_rate);
 
-    result.col(1) = upsampling<T>(ext_data.col(1), up_rate);
+    mat result(upsampled_data.n_elem, 2, fill::none);
+
+    result.col(1) = upsampled_data;
 
     const auto time_size = mean(time_diff) / static_cast<double>(up_rate);
 
