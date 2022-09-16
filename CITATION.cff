@@ -1,0 +1,32 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: >-
+  suanPan --- An Open Source, Parallel and
+  Heterogeneous Finite Element Analysis Framework
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Theodore
+    family-names: Chang
+    email: tlcfem@gmail.com
+    orcid: 'https://orcid.org/0000-0002-4911-0230'
+    affiliation: Humboldt-Universität zu Berlin
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.1285221
+repository-code: 'https://github.com/TLCFEM/suanPan'
+url: 'https://bit.ly/suanpan-doc'
+keywords:
+  - FEM
+  - Seismic Engineering
+  - Dynamics
+  - HPC
+  - IGA
+  - Solid Mechanics
+license: GPL-3.0
+version: '2.5'
+date-released: '2022-08-13'
