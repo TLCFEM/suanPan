@@ -22,7 +22,7 @@ apps:
   suanpan:
     command: bin/suanPan
     environment:
-      LIBGL_DRIVERS_PATH: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/dri
+      LIBGL_DRIVERS_PATH: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/dri
     plugs:
       - home
       - desktop
@@ -40,7 +40,7 @@ parts:
       - -DBUILD_MULTITHREAD=ON
       - -DUSE_HDF5=ON
       - -DUSE_EXTERNAL_VTK=ON
-      - -DVTK_DIR=$SNAPCRAFT_PART_BUILD/lib/cmake/vtk-9.1/
+      - -DVTK_DIR=$CRAFT_PART_BUILD/lib/cmake/vtk-9.1/
       - -DUSE_MKL=ON
       - -DMKLROOT=/opt/intel/oneapi/mkl/latest
       - -DUSE_INTEL_OPENMP=OFF
@@ -59,7 +59,7 @@ parts:
       tar xf VTK-9.1.0-linux.tar.gz
       wget -q https://registrationcenter-download.intel.com/akdlm/irc_nas/18721/l_onemkl_p_2022.1.0.223_offline.sh
       sh ./l_onemkl_p_2022.1.0.223_offline.sh -a --silent --eula accept
-      snapcraftctl build
+      craftctl default
     stage-packages:
       - libgfortran5
       - libgl1
