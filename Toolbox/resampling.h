@@ -100,34 +100,13 @@ template<> vec fir_band_stop<WindowType::BlackmanHarris>(uword, double, double);
 template<> vec fir_band_stop<WindowType::FlatTop>(uword, double, double);
 
 template<WindowType T> vec upsampling(const vec& in, const uword up_rate) {
-    const auto coef = fir_low_pass<T>(8llu * up_rate, 1. / static_cast<double>(up_rate));
+    const vec coef = static_cast<double>(up_rate) * fir_low_pass<T>(8llu * up_rate, 1. / static_cast<double>(up_rate));
 
-    const auto buffer_size = coef.n_elem;
+    vec out(up_rate * in.n_elem, fill::zeros);
 
-    vec buffer(buffer_size, fill::zeros);
-    auto index = 0llu;
+    for(auto I = 0llu, J = 0llu; I < in.n_elem; ++I, J += up_rate) out(J) = in(I);
 
-    auto feed = [&](const double next) {
-        buffer(index) = next;
-
-        uword p = 0;
-        double result = 0.;
-        for(auto m = index; m < buffer_size; ++m) result += coef(p++) * buffer(m);
-        for(auto m = 0llu; m < index; ++m) result += coef(p++) * buffer(m);
-
-        index = (index == 0 ? buffer_size : index) - 1;
-
-        return result;
-    };
-
-    const auto output_size = up_rate * in.n_elem;
-
-    vec out(output_size + buffer_size, fill::none);
-
-    for(auto n = 0llu; n < output_size; ++n) out(n) = feed(0 == n % up_rate ? in(n / up_rate) : 0.);
-    for(auto n = 0llu; n < buffer_size; ++n) out(n + output_size) = feed(0.);
-
-    return out *= static_cast<double>(up_rate);
+    return conv(out, coef, "same");
 }
 
 template<WindowType T> mat upsampling(const string& file_name, const uword up_rate) {
