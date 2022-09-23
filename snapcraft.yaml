@@ -1,5 +1,5 @@
 name: suanpan
-base: core20
+base: core22
 confinement: strict
 contact: tlcfem@gmail.com
 donation: https://ko-fi.com/suanpan
@@ -45,13 +45,10 @@ parts:
       - -DMKLROOT=/opt/intel/oneapi/mkl/latest
       - -DUSE_INTEL_OPENMP=OFF
       - -DLINK_DYNAMIC_MKL=OFF
-      - -DCMAKE_C_COMPILER=gcc-10
-      - -DCMAKE_CXX_COMPILER=g++-10
-      - -DCMAKE_Fortran_COMPILER=gfortran-10
     build-packages:
-      - gcc-10
-      - g++-10
-      - gfortran-10
+      - gcc
+      - g++
+      - gfortran
       - wget
       - mesa-common-dev
       - mesa-utils
