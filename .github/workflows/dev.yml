@@ -25,6 +25,7 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           directory: cmake-build-debug
+          gcov: true
   macos-dev:
     runs-on: macos-11
     steps:
