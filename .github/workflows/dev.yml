@@ -21,7 +21,10 @@ jobs:
           chmod +x ../Script/Coverage.sh
           ../Script/Coverage.sh .
           for SRC in `find . | egrep '\.o'`; do gcov -n $SRC > /dev/null; done
-          bash <(curl -s https://codecov.io/bash)
+      - name: Upload
+        uses: codecov/codecov-action@v3
+        with:
+          directory: cmake-build-debug
   macos-dev:
     runs-on: macos-11
     steps:
