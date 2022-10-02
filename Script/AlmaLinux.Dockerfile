@@ -1,4 +1,4 @@
-FROM almalinux:9
+FROM almalinux:9 as build
 
 RUN dnf upgrade --refresh -y && dnf install -y libglvnd-devel gcc g++ gfortran rpm-build rpm-devel rpmdevtools cmake wget git
 
@@ -17,3 +17,12 @@ RUN cd suanPan/build && cp suanPan*.rpm / && \
     tar czf /suanPan-linux-mkl-vtk.tar.gz suanPan-linux-mkl-vtk && \
     cd suanPan-linux-mkl-vtk/bin && ./suanPan.sh -v && \
     cd / && ls -al && rm -r suanPan
+
+FROM almalinux:9 as runtime
+
+COPY --from=build /suanPan-linux-mkl-vtk.tar.gz /suanPan-linux-mkl-vtk.tar.gz
+COPY --from=build /suanPan*.rpm /suanPan*.rpm
+
+RUN dnf upgrade --refresh -y && dnf install ./suanPan*.rpm -y
+
+RUN suanPan -v

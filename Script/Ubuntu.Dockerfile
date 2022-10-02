@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM ubuntu:focal as build
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -30,3 +30,12 @@ RUN cd suanPan/build && cp suanPan*.deb / && \
     tar czf /suanPan-linux-mkl-vtk.tar.gz suanPan-linux-mkl-vtk && \
     cd suanPan-linux-mkl-vtk/bin && ./suanPan.sh -v && \
     cd / && ls -al && rm -r suanPan
+
+FROM ubuntu:focal as runtime
+
+COPY --from=build /suanPan-linux-mkl-vtk.tar.gz /suanPan-linux-mkl-vtk.tar.gz
+COPY --from=build /suanPan*.deb /suanPan*.deb
+
+RUN apt-get update -y && apt-get install ./suanPan*.deb -y
+
+RUN suanPan -v
