@@ -2,8 +2,8 @@ FROM almalinux:9 as build
 
 RUN dnf upgrade --refresh -y && dnf install -y libglvnd-devel gcc g++ gfortran rpm-build rpm-devel rpmdevtools cmake wget git
 
-RUN wget -q https://registrationcenter-download.intel.com/akdlm/irc_nas/18721/l_onemkl_p_2022.1.0.223_offline.sh
-RUN sh ./l_onemkl_p_2022.1.0.223_offline.sh -a --silent --eula accept && rm ./l_onemkl_p_2022.1.0.223_offline.sh
+RUN wget -q https://registrationcenter-download.intel.com/akdlm/irc_nas/18898/l_onemkl_p_2022.2.0.8748_offline.sh
+RUN sh ./l_onemkl_p_2022.2.0.8748_offline.sh -a --silent --eula accept && rm ./l_onemkl_p_2022.2.0.8748_offline.sh
 
 RUN mkdir vtk-build && cd vtk-build && \
     wget -q https://www.vtk.org/files/release/9.1/VTK-9.1.0.tar.gz && tar xf VTK-9.1.0.tar.gz && \
