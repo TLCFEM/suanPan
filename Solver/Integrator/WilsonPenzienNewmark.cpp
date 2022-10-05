@@ -150,7 +150,7 @@ void WilsonPenzienNewmark::assemble_resistance() {
     fb.get();
     fc.get();
 
-    W->update_trial_damping_force(W->get_trial_damping_force() + theta * (beta % (theta.t() * W->get_trial_velocity())));
+    W->update_trial_damping_force_by(theta * (beta % (theta.t() * W->get_trial_velocity())));
 
     W->set_sushi(W->get_trial_resistance() + W->get_trial_damping_force() + W->get_trial_inertial_force());
 }

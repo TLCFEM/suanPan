@@ -179,7 +179,7 @@ void LeeNewmark::assemble_resistance() {
             const vec n_internal(&trial_internal(J), n_block);
             internal_velocity -= mass_coef(I) * n_internal;
         }
-        W->update_trial_damping_force(W->get_trial_damping_force() + current_mass * internal_velocity);
+        W->update_trial_damping_force_by(current_mass * internal_velocity);
     }
 
     W->set_sushi(W->get_trial_resistance() + W->get_trial_damping_force() + W->get_trial_inertial_force());

@@ -126,8 +126,8 @@ int GSSSS::update_trial_status() {
     const auto& D = get_domain().lock();
     auto& W = D->get_factory();
 
-    W->update_trial_velocity(W->get_trial_velocity() + XCVD * W->get_ninja());
-    W->update_trial_acceleration(W->get_trial_acceleration() + XCAD * W->get_ninja());
+    W->update_trial_velocity_by(XCVD * W->get_ninja());
+    W->update_trial_acceleration_by(XCAD * W->get_ninja());
 
     return D->update_trial_status();
 }
