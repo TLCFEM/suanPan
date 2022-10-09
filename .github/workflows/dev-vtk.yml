@@ -12,15 +12,15 @@ jobs:
         uses: actions/checkout@v2
       - name: Install VTK
         run: |
-          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.1.0-linux.tar.gz
-          tar xf VTK-9.1.0-linux.tar.gz
+          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.2-linux.tar.gz
+          tar xf VTK-9.2.2-linux.tar.gz
       - name: Golang
         uses: actions/setup-go@v2
       - name: Compile
         run: |
           go build Checker/updater.go
           sudo apt-get update && sudo apt-get install mesa-common-dev mesa-utils freeglut3-dev libglvnd-dev dpkg-dev xz-utils
-          cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.1/ -DCMAKE_INSTALL_PREFIX=suanPan-linux-openblas-vtk .
+          cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.2/ -DCMAKE_INSTALL_PREFIX=suanPan-linux-openblas-vtk .
           make install -j"$(nproc)"
           make package
       - name: Test
@@ -38,8 +38,8 @@ jobs:
         uses: actions/checkout@v2
       - name: Install VTK
         run: |
-          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.1.0-macos.tar.gz
-          tar xf VTK-9.1.0-macos.tar.gz
+          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.2-macos.tar.gz
+          tar xf VTK-9.2.2-macos.tar.gz
       - name: Golang
         uses: actions/setup-go@v2
       - name: Compile
@@ -47,7 +47,7 @@ jobs:
           export CC=$(brew --prefix llvm@14)/bin/clang && export CXX=$(brew --prefix llvm@14)/bin/clang++ && export FC=gfortran-10
           go build Checker/updater.go
           brew install llvm glfw glew libomp
-          cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.1/ -DCMAKE_INSTALL_PREFIX=suanPan-macos-openblas-vtk .
+          cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.2/ -DCMAKE_INSTALL_PREFIX=suanPan-macos-openblas-vtk .
           make install -j4
       - name: Test
         run: |
