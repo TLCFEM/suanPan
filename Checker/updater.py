@@ -1,6 +1,6 @@
+import re
 import sys
 import urllib.request
-import re
 
 
 def check_version(_major: int, _minor: int, _patch: int):
@@ -16,14 +16,14 @@ def check_version(_major: int, _minor: int, _patch: int):
     new_minor = int(version.group(2))
     new_patch = int(version.group(3)) if version.group(3) else 0
 
-    if 100 * new_major + 10 * new_minor + _patch <= 100 * _major + 10 * _minor + _patch:
+    if 100 * new_major + 10 * new_minor + new_patch <= 100 * _major + 10 * _minor + _patch:
         return
 
     url = f'https://github.com/TLCFEM/suanPan/releases/download/{version.group(0)}/'
 
     result = input(f'New version {version.group(0)} available, download now? [Y/n] ')
 
-    if result != '' and result != 'y' and result != 'Y':
+    if result == '' or result[0] != 'y' and result[0] != 'Y':
         return
 
     print('\nDownload the new version:')
@@ -50,7 +50,15 @@ def check_version(_major: int, _minor: int, _patch: int):
 
     result = input("\nPlease select the version you want to download (leave empty to exit): ")
 
-    file_name = version_list[int(result)][0]
+    if not result.isdigit():
+        return
+
+    result = int(result)
+
+    if result < 0 or result >= len(version_list):
+        return
+
+    file_name = version_list[result][0]
 
     urllib.request.urlretrieve(url + file_name, file_name)
 
