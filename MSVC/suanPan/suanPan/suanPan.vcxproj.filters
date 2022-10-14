@@ -1414,6 +1414,9 @@
     <ClCompile Include="..\..\..\UnitTest\TestSampling.cpp">
       <Filter>UnitTest</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Element\Modifier\LeeElementalDamping.cpp">
+      <Filter>Element\Modifier</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2694,6 +2697,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Toolbox\resampling.h">
       <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Modifier\LeeElementalDamping.h">
+      <Filter>Element\Modifier</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

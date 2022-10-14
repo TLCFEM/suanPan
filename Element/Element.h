@@ -236,8 +236,8 @@ public:
     [[nodiscard]] const mat& get_initial_geometry() const override;
     [[nodiscard]] const mat& get_initial_secant() const override;
 
-    [[nodiscard]] const mat& get_stiffness_container() const override;
     [[nodiscard]] const mat& get_mass_container() const override;
+    [[nodiscard]] const mat& get_stiffness_container() const override;
 
     int clear_status() override = 0;
     int commit_status() override = 0;

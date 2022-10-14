@@ -5,4 +5,5 @@ set(Modifier
         Modifier/Modifier.cpp
         Modifier/Rayleigh.cpp
         Modifier/LinearViscosity.cpp
+        Modifier/LeeElementalDamping.cpp
         )

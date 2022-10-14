@@ -487,9 +487,9 @@ const mat& Element::get_initial_geometry() const { return initial_geometry; }
 
 const mat& Element::get_initial_secant() const { return get_initial_stiffness(); }
 
-const mat& Element::get_stiffness_container() const { return stiffness_container; }
-
 const mat& Element::get_mass_container() const { return mass_container; }
+
+const mat& Element::get_stiffness_container() const { return stiffness_container; }
 
 int Element::clear_status() {
     if(update_mass && !initial_mass.is_empty()) trial_mass = current_mass = initial_mass;
