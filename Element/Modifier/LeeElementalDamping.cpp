@@ -17,30 +17,22 @@
 
 #include "LeeElementalDamping.h"
 
-LeeElementalDamping::LeeElementalDamping(const unsigned T, const double A, const double B, const double C, const double D, uvec&& ET)
+LeeElementalDamping::LeeElementalDamping(const unsigned T, const double A, const double B, uvec&& ET)
     : Modifier(T, std::forward<uvec>(ET))
     , a(A)
-    , b(B)
-    , c(C)
-    , d(D) {}
+    , b(B) {}
 
 int LeeElementalDamping::update_status() {
     suanpan::for_all(element_pool, [&](const weak_ptr<Element>& ele_ptr) {
         if(const auto t_ptr = ele_ptr.lock(); nullptr != t_ptr && t_ptr->if_update_damping()) {
             if(a != 0. && !t_ptr->get_current_mass().empty()) access::rw(t_ptr->get_mass_container()) = a * t_ptr->get_current_mass();
 
-            mat t_stiffness(t_ptr->get_total_number(), t_ptr->get_total_number(), fill::zeros);
             if(b != 0. && !t_ptr->get_current_stiffness().empty()) {
+                mat t_stiffness(t_ptr->get_total_number(), t_ptr->get_total_number(), fill::zeros);
                 t_stiffness += b * t_ptr->get_current_stiffness();
                 if(t_ptr->is_nlgeom() && !t_ptr->get_current_geometry().empty()) t_stiffness += b * t_ptr->get_current_geometry();
+                access::rw(t_ptr->get_stiffness_container()) = t_stiffness;
             }
-            if(c != 0. && !t_ptr->get_initial_stiffness().empty()) t_stiffness += c * t_ptr->get_initial_stiffness();
-            if(d != 0. && !t_ptr->get_trial_stiffness().empty()) {
-                t_stiffness += d * t_ptr->get_trial_stiffness();
-                if(t_ptr->is_nlgeom() && !t_ptr->get_trial_geometry().empty()) t_stiffness += d * t_ptr->get_trial_geometry();
-            }
-
-            access::rw(t_ptr->get_stiffness_container()) = t_stiffness;
         }
     });
 

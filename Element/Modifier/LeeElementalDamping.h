@@ -31,10 +31,10 @@
 #include <Element/Modifier/Modifier.h>
 
 class LeeElementalDamping final : public Modifier {
-    const double a, b, c, d;
+    const double a, b;
 
 public:
-    LeeElementalDamping(unsigned, double, double, double, double, uvec&& = {});
+    LeeElementalDamping(unsigned, double, double, uvec&& = {});
 
     int update_status() override;
 };

@@ -1384,6 +1384,7 @@
     "Ramm",
     "Ramp",
     "Rayleigh",
+    "LeeElementalDamping",
     "LinearViscosity",
     "Rebar2D",
     "Rebar3D",
@@ -2123,6 +2124,12 @@
     {
       "trigger":"LeeNewmark",
       "contents":"integrator LeeNewmark ${1:(1)} ${2:(2)} ${3:(3)} (${4:(4)} ${5:(5)}...)\n# (1) int, unique integrator tag\n# (2) double, alpha\n# (3) double, beta\n# (4) double, damping ratio \\zeta_p at the peak of each mode\n# (5) double, circular frequency\\omega_p at the peak of each mode",
+      "kind":"type",
+      "details":""
+    },
+    {
+      "trigger":"LeeElementalNewmark",
+      "contents":"integrator LeeElementalNewmark ${1:(1)} ${2:(2)} ${3:(3)} (${4:(4)} ${5:(5)}...)\n# (1) int, unique integrator tag\n# (2) double, alpha\n# (3) double, beta\n# (4) double, damping ratio \\zeta_p at the peak of each mode\n# (5) double, circular frequency\\omega_p at the peak of each mode",
       "kind":"type",
       "details":""
     },
