@@ -2510,13 +2510,13 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
             return SUANPAN_SUCCESS;
         }
 
-        double a, b;
-        if(!get_input(command, a, b)) {
-            suanpan_error("create_new_modifier() needs two valid numbers.\n");
+        double damping_ratio;
+        if(!get_input(command, damping_ratio)) {
+            suanpan_error("create_new_modifier() needs a valid damping ratio.\n");
             return SUANPAN_SUCCESS;
         }
 
-        new_modifier = make_unique<LeeElementalDamping>(tag, a, b, get_element_pool());
+        new_modifier = make_unique<LeeElementalDamping>(tag, damping_ratio, get_element_pool());
     }
     else if(is_equal(modifier_type, "LinearViscosity")) {
         unsigned tag;
