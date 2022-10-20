@@ -220,7 +220,7 @@ void perform_sdof_response(istringstream& command) {
     }
 
     double damping_ratio = 0.;
-    if(!get_input(command, damping_ratio) || damping_ratio <= 0.) {
+    if(!get_input(command, damping_ratio) || damping_ratio < 0.) {
         suanpan_error("perform_response_spectrum() requires a valid damping ratio.\n");
         return;
     }
