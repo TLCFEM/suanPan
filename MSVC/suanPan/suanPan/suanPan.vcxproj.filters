@@ -2695,6 +2695,9 @@
     <ClInclude Include="..\..\..\Toolbox\resampling.h">
       <Filter>Toolbox</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\response_spectrum.h">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\..\Resource\suanPan.rc" />

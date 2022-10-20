@@ -1,0 +1,7 @@
+# TEST RESPONSE
+
+response_spectrum EZ EZ .05
+
+sdof_response EZ 2 .05
+
+exit
