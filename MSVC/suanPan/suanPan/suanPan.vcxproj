@@ -206,6 +206,7 @@
     <ClCompile Include="..\..\..\Element\Membrane\Porous\PCPE8DC.cpp" />
     <ClCompile Include="..\..\..\Element\Membrane\Porous\PCPE8UC.cpp" />
     <ClCompile Include="..\..\..\Element\Modifier\ElementalModal.cpp" />
+    <ClCompile Include="..\..\..\Element\Modifier\LeeElementalDamping.cpp" />
     <ClCompile Include="..\..\..\Element\Modifier\LinearViscosity.cpp" />
     <ClCompile Include="..\..\..\Element\Modifier\LumpedScale.cpp" />
     <ClCompile Include="..\..\..\Element\Modifier\LumpedSimple.cpp" />
@@ -639,6 +640,7 @@
     <ClInclude Include="..\..\..\Element\Membrane\Porous\PCPE8DC.h" />
     <ClInclude Include="..\..\..\Element\Membrane\Porous\PCPE8UC.h" />
     <ClInclude Include="..\..\..\Element\Modifier\ElementalModal.h" />
+    <ClInclude Include="..\..\..\Element\Modifier\LeeElementalDamping.h" />
     <ClInclude Include="..\..\..\Element\Modifier\LinearViscosity.h" />
     <ClInclude Include="..\..\..\Element\Modifier\LumpedScale.h" />
     <ClInclude Include="..\..\..\Element\Modifier\LumpedSimple.h" />
