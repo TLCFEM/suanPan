@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Clone
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Install MKL VTK
         run: |
           echo "SP_TIME=daily-$(date +''%Y%m%d%H'')" >> $GITHUB_ENV
@@ -18,7 +18,7 @@ jobs:
           wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.2-linux.tar.gz
           tar xf VTK-9.2.2-linux.tar.gz
       - name: Golang
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
       - name: Compile
         run: |
           go build Checker/updater.go
@@ -76,7 +76,7 @@ jobs:
           dnf install libglvnd-devel gcc g++ gfortran rpm-build rpm-devel rpmdevtools cmake wget intel-oneapi-mkl-devel git -y
           git config --global --add safe.directory /__w/suanPan/suanPan
       - name: Clone
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Install MKL VTK
         run: |
           wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.2-linux.tar.gz

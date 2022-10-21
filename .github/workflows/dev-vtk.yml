@@ -9,13 +9,13 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Clone
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Install VTK
         run: |
           wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.2-linux.tar.gz
           tar xf VTK-9.2.2-linux.tar.gz
       - name: Golang
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
       - name: Compile
         run: |
           go build Checker/updater.go
@@ -35,13 +35,13 @@ jobs:
     runs-on: macos-11
     steps:
       - name: Clone
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Install VTK
         run: |
           wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.2-macos.tar.gz
           tar xf VTK-9.2.2-macos.tar.gz
       - name: Golang
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
       - name: Compile
         run: |
           export CC=$(brew --prefix llvm@14)/bin/clang && export CXX=$(brew --prefix llvm@14)/bin/clang++ && export FC=gfortran-10
