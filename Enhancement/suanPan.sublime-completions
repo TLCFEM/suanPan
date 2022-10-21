@@ -2085,6 +2085,8 @@
     "WT9X87.5",
     "WT9X96",
     "Yeoh",
+    "response_spectrum",
+    "sdof_response",
     {
       "trigger":"BatheTwoStep",
       "contents":"integrator BatheTwoStep ${1:(1)}\n# (1) int, unique integrator tag",

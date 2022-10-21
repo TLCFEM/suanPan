@@ -2701,6 +2701,9 @@
     <ClInclude Include="..\..\..\Element\Modifier\LeeElementalDamping.h">
       <Filter>Element\Modifier</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\response_spectrum.h">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\..\Resource\suanPan.rc" />
