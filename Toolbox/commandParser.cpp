@@ -59,7 +59,7 @@ using std::ifstream;
 using std::string;
 using std::vector;
 
-int SUANPAN_NUM_THREADS = static_cast<int>(std::thread::hardware_concurrency());
+int SUANPAN_NUM_THREADS = std::max(1, static_cast<int>(std::thread::hardware_concurrency()));
 fs::path SUANPAN_OUTPUT = fs::current_path();
 
 void qrcode() {
@@ -179,6 +179,7 @@ void perform_response_spectrum(istringstream& command) {
 
     freq(0) = std::max(freq(0), 1E-4);
 
+    // ReSharper disable once CppTooWideScopeInitStatement
     const auto spectrum = response_spectrum<double>(damping_ratio, interval, motion, freq.col(0));
 
     if(!spectrum.save(motion_name += "_response_spectrum", raw_ascii)) suanpan_error("fail to save file.\n");
@@ -225,6 +226,7 @@ void perform_sdof_response(istringstream& command) {
         return;
     }
 
+    // ReSharper disable once CppTooWideScopeInitStatement
     const auto response = sdof_response<double>(damping_ratio, interval, freq, motion);
 
     if(!response.save(motion_name += "_sdof_response", raw_ascii)) suanpan_error("fail to save file.\n");

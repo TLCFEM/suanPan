@@ -48,6 +48,26 @@ public:
         : omega(O)
         , zeta(Z) {}
 
+    std::tuple<Col<T>, Col<T>, Col<T>> populate_displacement(const Col<T>& motion) {
+        Col<T> displacement(motion.n_elem, fill::none);
+        displacement(0) = T(0);
+        displacement(1) = b * displacement(0) - motion(0);
+
+        for(auto I = 2llu, J = 1llu, K = 0llu; I < motion.n_elem; ++I, ++J, ++K) displacement(I) = b * displacement(J) - c * displacement(K) - motion(J);
+
+        const auto n_elem = motion.n_elem - 1llu;
+
+        Col<T> velocity(motion.n_elem, fill::none);
+        velocity(0) = T(0);
+        velocity.tail(n_elem) = arma::diff(displacement);
+
+        Col<T> acceleration(motion.n_elem, fill::none);
+        acceleration(0) = T(0);
+        acceleration.tail(n_elem) = arma::diff(velocity);
+
+        return std::make_tuple(displacement, velocity, acceleration);
+    }
+
     void compute_parameter(const T interval) {
         const auto exp_term = std::exp(-alpha * interval);
 
@@ -61,22 +81,8 @@ public:
     Mat<T> compute_response(const T interval, const Col<T>& motion) {
         compute_parameter(interval);
 
-        Col<T> displacement(motion.n_elem, fill::none);
-        Col<T> velocity(motion.n_elem, fill::none);
-        Col<T> acceleration(motion.n_elem, fill::none);
-
-        displacement(0) = T(0);
-        displacement(1) = b * displacement(0) - motion(0);
-
-        for(auto I = 2llu, J = 1llu, K = 0llu; I < motion.n_elem; ++I, ++J, ++K) displacement(I) = b * displacement(J) - c * displacement(K) - motion(J);
-
-        const auto n_elem = motion.n_elem - 1llu;
-
-        velocity(0) = T(0);
-        velocity.tail(n_elem) = arma::diff(displacement);
-
-        acceleration(0) = T(0);
-        acceleration.tail(n_elem) = arma::diff(velocity);
+        Col<T> displacement, velocity, acceleration;
+        std::tie(displacement, velocity, acceleration) = populate_displacement(motion);
 
         const auto factor = gamma * a;
 
@@ -85,6 +91,21 @@ public:
         acceleration *= factor / interval;
 
         return arma::join_rows(displacement, velocity, acceleration);
+    }
+
+    Col<T> compute_maximum_response(const T interval, const Col<T>& motion) {
+        compute_parameter(interval);
+
+        Col<T> displacement, velocity, acceleration;
+        std::tie(displacement, velocity, acceleration) = populate_displacement(motion);
+
+        const auto factor = gamma * a;
+
+        const auto max_u = arma::abs(displacement).max() * factor * interval;
+        const auto max_v = arma::abs(velocity).max() * factor;
+        const auto max_a = arma::abs(acceleration).max() * factor / interval;
+
+        return {max_u, max_v, max_a};
     }
 };
 
@@ -102,7 +123,7 @@ template<sp_d T> Mat<T> response_spectrum(const T damping_ratio, const T interva
     suanpan_for(0llu, freq.n_elem, [&](const uword I) {
         Oscillator system(freq(I) * datum::tau, damping_ratio);
 
-        spectrum.col(I) = arma::max(arma::abs(system.compute_response(interval, motion))).t();
+        spectrum.col(I) = system.compute_maximum_response(interval, motion);
     });
 
     arma::inplace_trans(spectrum);
