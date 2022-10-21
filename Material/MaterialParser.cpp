@@ -1049,11 +1049,11 @@ void new_concretetable(unique_ptr<Material>& return_obj, istringstream& command)
         return;
     }
 
-    if(!fs::exists(t_name) || !t_table.load(t_name, raw_ascii) || t_table.n_cols != 2) {
+    if(!fs::exists(t_name) || !t_table.load(t_name) || t_table.n_cols != 2) {
         suanpan_error("new_concretetable() cannot load file %s.\n", t_name.c_str());
         return;
     }
-    if(!fs::exists(c_name) || !c_table.load(c_name, raw_ascii) || c_table.n_cols != 2) {
+    if(!fs::exists(c_name) || !c_table.load(c_name) || c_table.n_cols != 2) {
         suanpan_error("new_concretetable() cannot load file %s.\n", c_name.c_str());
         return;
     }
@@ -1859,11 +1859,11 @@ void new_multilinearoo(unique_ptr<Material>& return_obj, istringstream& command)
     mat t_backbone, c_backbone;
 
     string name;
-    if(!get_input(command, name) || !t_backbone.load(name, raw_ascii) || t_backbone.empty()) {
+    if(!get_input(command, name) || !t_backbone.load(name) || t_backbone.empty()) {
         suanpan_error("new_multilinearoo() requires a valid tension backbone file.\n");
         return;
     }
-    if(!get_input(command, name) || !c_backbone.load(name, raw_ascii) || c_backbone.empty()) {
+    if(!get_input(command, name) || !c_backbone.load(name) || c_backbone.empty()) {
         suanpan_error("new_multilinearoo() requires a valid compression backbone file.\n");
         return;
     }
@@ -1890,11 +1890,11 @@ void new_multilinearpo(unique_ptr<Material>& return_obj, istringstream& command)
     mat t_backbone, c_backbone;
 
     string name;
-    if(!get_input(command, name) || !t_backbone.load(name, raw_ascii) || t_backbone.empty()) {
+    if(!get_input(command, name) || !t_backbone.load(name) || t_backbone.empty()) {
         suanpan_error("new_multilinearpo() requires a valid tension backbone file.\n");
         return;
     }
-    if(!get_input(command, name) || !c_backbone.load(name, raw_ascii) || c_backbone.empty()) {
+    if(!get_input(command, name) || !c_backbone.load(name) || c_backbone.empty()) {
         suanpan_error("new_multilinearpo() requires a valid compression backbone file.\n");
         return;
     }
@@ -2529,7 +2529,7 @@ void new_tablecdp(unique_ptr<Material>& return_obj, istringstream& command) {
             suanpan_error("new_tablecdp() requires a valid parameter.\n");
             return false;
         }
-        if(std::error_code code; !fs::exists(table_name, code) || !table.load(table_name, raw_ascii) || table.n_cols < 2) {
+        if(std::error_code code; !fs::exists(table_name, code) || !table.load(table_name) || table.n_cols < 2) {
             suanpan_error("new_tablecdp() cannot load file %s.\n", table_name.c_str());
             return false;
         }

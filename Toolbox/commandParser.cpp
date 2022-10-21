@@ -140,19 +140,19 @@ void perform_upsampling(istringstream& command) {
 }
 
 void perform_response_spectrum(istringstream& command) {
-    string motion_name, freq_name;
-    if(!get_input(command, motion_name, freq_name)) {
-        suanpan_error("perform_response_spectrum() requires valid file names for ground motion and frequency vector.\n");
+    string motion_name, period_name;
+    if(!get_input(command, motion_name, period_name)) {
+        suanpan_error("perform_response_spectrum() requires valid file names for ground motion and period vector.\n");
         return;
     }
 
-    mat motion, freq;
-    if(!fs::exists(motion_name) || !motion.load(motion_name, raw_ascii) || motion.empty()) {
+    mat motion, period;
+    if(!fs::exists(motion_name) || !motion.load(motion_name) || motion.empty()) {
         suanpan_error("perform_response_spectrum() requires a valid ground motion stored in either one or two columns.\n");
         return;
     }
-    if(!fs::exists(freq_name) || !freq.load(freq_name, raw_ascii) || freq.empty()) {
-        suanpan_error("perform_response_spectrum() requires a valid ground motion stored in one column.\n");
+    if(!fs::exists(period_name) || !period.load(period_name) || period.empty()) {
+        suanpan_error("perform_response_spectrum() requires a valid period vector stored in one column.\n");
         return;
     }
 
@@ -172,15 +172,15 @@ void perform_response_spectrum(istringstream& command) {
     }
 
     double damping_ratio = 0.;
-    if(!get_input(command, damping_ratio) || damping_ratio <= 0.) {
+    if(!get_input(command, damping_ratio) || damping_ratio < 0.) {
         suanpan_error("perform_response_spectrum() requires a valid damping ratio.\n");
         return;
     }
 
-    freq(0) = std::max(freq(0), 1E-4);
+    period(0) = std::max(period(0), 1E-4);
 
     // ReSharper disable once CppTooWideScopeInitStatement
-    const auto spectrum = response_spectrum<double>(damping_ratio, interval, motion, freq.col(0));
+    const auto spectrum = response_spectrum<double>(damping_ratio, interval, motion, period.col(0));
 
     if(!spectrum.save(motion_name += "_response_spectrum", raw_ascii)) suanpan_error("fail to save file.\n");
     else suanpan_info("response spectrum data is saved to %s.\n", motion_name.c_str());
@@ -189,20 +189,20 @@ void perform_response_spectrum(istringstream& command) {
 void perform_sdof_response(istringstream& command) {
     string motion_name;
     if(!get_input(command, motion_name)) {
-        suanpan_error("perform_response_spectrum() requires a valid file name for ground motion.\n");
+        suanpan_error("perform_sdof_response() requires a valid file name for ground motion.\n");
         return;
     }
 
     mat motion;
-    if(!fs::exists(motion_name) || !motion.load(motion_name, raw_ascii) || motion.empty()) {
-        suanpan_error("perform_response_spectrum() requires a valid ground motion stored in either one or two columns.\n");
+    if(!fs::exists(motion_name) || !motion.load(motion_name) || motion.empty()) {
+        suanpan_error("perform_sdof_response() requires a valid ground motion stored in either one or two columns.\n");
         return;
     }
 
     double interval = 0.;
     if(1llu == motion.n_cols) {
         if(!get_input(command, interval) || interval <= 0.) {
-            suanpan_error("perform_response_spectrum() requires a valid sampling interval.\n");
+            suanpan_error("perform_sdof_response() requires a valid sampling interval.\n");
             return;
         }
     }
@@ -216,13 +216,13 @@ void perform_sdof_response(istringstream& command) {
 
     double freq = 0.;
     if(!get_input(command, freq) || freq <= 0.) {
-        suanpan_error("perform_response_spectrum() requires a valid frequency in hertz.\n");
+        suanpan_error("perform_sdof_response() requires a valid frequency in hertz.\n");
         return;
     }
 
     double damping_ratio = 0.;
     if(!get_input(command, damping_ratio) || damping_ratio < 0.) {
-        suanpan_error("perform_response_spectrum() requires a valid damping ratio.\n");
+        suanpan_error("perform_sdof_response() requires a valid damping ratio.\n");
         return;
     }
 

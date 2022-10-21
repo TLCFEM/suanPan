@@ -43,12 +43,22 @@ template<sp_d T> class Oscillator {
 
     T gamma{0.};
     T a{0.}, b{0.}, c{0.};
-public:
-    Oscillator(const T O, const T Z)
-        : omega(O)
-        , zeta(Z) {}
 
-    std::tuple<Col<T>, Col<T>, Col<T>> populate_displacement(const Col<T>& motion) {
+    T amplitude(const Col<T>& data) { return std::max(std::abs(data.max()), std::abs(data.min())); }
+
+    void compute_parameter(const T interval) {
+        const auto exp_term = std::exp(-alpha * interval);
+
+        a = exp_term * std::sin(beta * interval) / beta;
+        b = 2. * exp_term * std::cos(beta * interval);
+        c = exp_term * exp_term;
+
+        gamma = (1. - b + c) / a / interval / omega / omega;
+    }
+
+    std::tuple<Col<T>, Col<T>, Col<T>> populate_response(const T interval, const Col<T>& motion) {
+        this->compute_parameter(interval);
+
         Col<T> displacement(motion.n_elem, fill::none);
         displacement(0) = T(0);
         displacement(1) = b * displacement(0) - motion(0);
@@ -68,21 +78,14 @@ public:
         return std::make_tuple(displacement, velocity, acceleration);
     }
 
-    void compute_parameter(const T interval) {
-        const auto exp_term = std::exp(-alpha * interval);
-
-        a = exp_term * std::sin(beta * interval) / beta;
-        b = 2. * exp_term * std::cos(beta * interval);
-        c = exp_term * exp_term;
-
-        gamma = (1. - b + c) / a / interval / omega / omega;
-    }
+public:
+    Oscillator(const T O, const T Z)
+        : omega(O)
+        , zeta(Z) {}
 
     Mat<T> compute_response(const T interval, const Col<T>& motion) {
-        compute_parameter(interval);
-
         Col<T> displacement, velocity, acceleration;
-        std::tie(displacement, velocity, acceleration) = populate_displacement(motion);
+        std::tie(displacement, velocity, acceleration) = this->populate_response(interval, motion);
 
         const auto factor = gamma * a;
 
@@ -94,16 +97,14 @@ public:
     }
 
     Col<T> compute_maximum_response(const T interval, const Col<T>& motion) {
-        compute_parameter(interval);
-
         Col<T> displacement, velocity, acceleration;
-        std::tie(displacement, velocity, acceleration) = populate_displacement(motion);
+        std::tie(displacement, velocity, acceleration) = this->populate_response(interval, motion);
 
         const auto factor = gamma * a;
 
-        const auto max_u = arma::abs(displacement).max() * factor * interval;
-        const auto max_v = arma::abs(velocity).max() * factor;
-        const auto max_a = arma::abs(acceleration).max() * factor / interval;
+        const auto max_u = this->amplitude(displacement) * factor * interval;
+        const auto max_v = this->amplitude(velocity) * factor;
+        const auto max_a = this->amplitude(acceleration * factor / interval + motion);
 
         return {max_u, max_v, max_a};
     }
@@ -114,23 +115,31 @@ public:
  * \param damping_ratio damping ratio
  * \param interval sampling interval of the target ground motion
  * \param motion target ground motion stored in one column
- * \param freq frequencies where response spectrum needs to be computed
- * \return response spectrum stored in three columns
+ * \param period periods where response spectrum needs to be computed
+ * \return response spectrum stored in four columns (period, displacement, velocity, acceleration)
  */
-template<sp_d T> Mat<T> response_spectrum(const T damping_ratio, const T interval, const Col<T>& motion, const Col<T>& freq) {
-    Mat<T> spectrum(3, freq.n_elem, fill::none);
+template<sp_d T> Mat<T> response_spectrum(const T damping_ratio, const T interval, const Col<T>& motion, const Col<T>& period) {
+    Mat<T> spectrum(3, period.n_elem, fill::none);
 
-    suanpan_for(0llu, freq.n_elem, [&](const uword I) {
-        Oscillator system(freq(I) * datum::tau, damping_ratio);
+    suanpan_for(0llu, period.n_elem, [&](const uword I) {
+        Oscillator system(datum::tau / period(I), damping_ratio);
 
         spectrum.col(I) = system.compute_maximum_response(interval, motion);
     });
 
     arma::inplace_trans(spectrum);
 
-    return arma::join_rows(freq, spectrum);
+    return arma::join_rows(period, spectrum);
 }
 
+/**
+ * \brief compute response of a linear SDOF system
+ * \param damping_ratio damping ratio of the system
+ * \param interval time step size
+ * \param freq frequency of the system (Hz)
+ * \param motion acceleration record
+ * \return response history
+ */
 template<sp_d T> Mat<T> sdof_response(const T damping_ratio, const T interval, const T freq, const Col<T>& motion) {
     Oscillator system(freq * datum::tau, damping_ratio);
 
