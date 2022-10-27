@@ -177,8 +177,6 @@ void perform_response_spectrum(istringstream& command) {
         return;
     }
 
-    period(0) = std::max(period(0), 1E-4);
-
     // ReSharper disable once CppTooWideScopeInitStatement
     const auto spectrum = response_spectrum<double>(damping_ratio, interval, motion, period.col(0));
 
