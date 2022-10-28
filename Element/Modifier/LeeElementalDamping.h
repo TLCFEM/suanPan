@@ -31,6 +31,7 @@
 #include <Element/Modifier/Modifier.h>
 
 class LeeElementalDamping final : public Modifier {
+    const double default_damping_ratio = .02;
     const double damping_ratio;
 
 public:

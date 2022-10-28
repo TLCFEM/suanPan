@@ -22,14 +22,15 @@ LeeElementalDamping::LeeElementalDamping(const unsigned T, const double A, uvec&
     , damping_ratio(std::abs(A)) {}
 
 int LeeElementalDamping::update_status() {
+    const auto real_damping_ratio = damping_ratio < 0. ? default_damping_ratio : damping_ratio;
     suanpan::for_all(element_pool, [&](const weak_ptr<Element>& ele_ptr) {
         if(const auto t_ptr = ele_ptr.lock(); nullptr != t_ptr && t_ptr->if_update_damping()) {
-            if(!t_ptr->get_current_mass().empty()) access::rw(t_ptr->get_mass_container()) = damping_ratio * t_ptr->get_current_mass();
+            if(!t_ptr->get_current_mass().empty()) access::rw(t_ptr->get_mass_container()) = real_damping_ratio * t_ptr->get_current_mass();
 
             if(!t_ptr->get_current_stiffness().empty()) {
                 mat t_stiffness(t_ptr->get_total_number(), t_ptr->get_total_number(), fill::zeros);
                 t_stiffness += damping_ratio * t_ptr->get_current_stiffness();
-                if(t_ptr->is_nlgeom() && !t_ptr->get_current_geometry().empty()) t_stiffness += damping_ratio * t_ptr->get_current_geometry();
+                if(t_ptr->is_nlgeom() && !t_ptr->get_current_geometry().empty()) t_stiffness += real_damping_ratio * t_ptr->get_current_geometry();
                 access::rw(t_ptr->get_stiffness_container()) = t_stiffness;
             }
         }

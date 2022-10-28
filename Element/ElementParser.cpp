@@ -2510,8 +2510,8 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
             return SUANPAN_SUCCESS;
         }
 
-        double damping_ratio;
-        if(!get_input(command, damping_ratio)) {
+        double damping_ratio = -1.;
+        if(!command.eof() && !get_input(command, damping_ratio)) {
             suanpan_error("create_new_modifier() needs a valid damping ratio.\n");
             return SUANPAN_SUCCESS;
         }
