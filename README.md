@@ -135,12 +135,12 @@ A few flavors are available:
 Advanced users can compile the program from source by themselves in order to enable GPU based solvers which require
 available [CUDA](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) library.
 
-Since CI/CD uses `GCC 10.3.0` (on Linux) and `Clang 13.0.1` (on MacOS), it may be required to update/install
-proper `libstdc++` (or `libc++`) version. The easiest way is to install the same compiler. For example, on Ubuntu,
+Since CI/CD uses `GCC 11` (on Linux) and `Clang 13.0.1` (on MacOS), it may be required to update/install
+proper `libstdc++` (or `libc++`) version. The easiest way is to install the same compiler. For example, on Ubuntu 22.04,
 
 ```bash
 # Ubuntu
-sudo apt install gcc-10 g++-10 gfortran-10 libomp5
+sudo apt install gcc g++ gfortran libomp5
 ```
 
 For VTK enabled versions, it may be necessary to install OpenGL.
