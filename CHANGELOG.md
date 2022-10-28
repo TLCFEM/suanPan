@@ -9,6 +9,7 @@
 
 1. add `TabularSpline` amplitude that uses cubic spline interpolation
 2. update `MKL` to version `2022.2.0`
+3. update `TBB` to version `2021.7.0`
 
 ## version 2.5
 
