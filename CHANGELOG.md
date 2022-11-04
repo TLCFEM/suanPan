@@ -7,9 +7,14 @@
 
 ## version 2.6
 
-1. add `TabularSpline` amplitude that uses cubic spline interpolation
-2. update `MKL` to version `2022.2.0`
-3. update `TBB` to version `2021.7.0`
+1. update `MKL` to version `2022.2.0`
+2. update `TBB` to version `2021.7.0`
+3. update `VTK` to version `9.2.2`
+4. add docker images and docker build scripts
+5. add `TabularSpline` amplitude that uses cubic spline interpolation
+6. add `upsampling` command to upsample time series data
+7. add `sdof_response` command to compute response of single degree of freedom system
+8. add `response_spectrum` command to compute response spectrum for given ground motion
 
 ## version 2.5
 
@@ -83,12 +88,12 @@
 
 ## version 1.7
 
-3. revise `SimpleSand` model
-4. add `DafaliasManzari` sand model
-5. add `materialtestbystrainhistory` and `materialtestbystresshistory` utility functions
-6. bugfix: potential racing in initialising reference dof, change to serial initialisation
-7. bugfix: wrong update of plastic strain in `CDP` model
-8. add `CDPM2` model with isotropic damage
+1. revise `SimpleSand` model
+2. add `DafaliasManzari` sand model
+3. add `materialtestbystrainhistory` and `materialtestbystresshistory` utility functions
+4. bugfix: potential racing in initialising reference dof, change to serial initialisation
+5. bugfix: wrong update of plastic strain in `CDP` model
+6. add `CDPM2` model with isotropic damage
 
 ## version 1.6
 
