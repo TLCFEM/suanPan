@@ -29,8 +29,8 @@ jobs:
           ./suanPan-linux-openblas-vtk/bin/suanPan -v
       - uses: actions/upload-artifact@v3
         with:
-          name: suanPan-2.6.0-1.x86_64.deb
-          path: suanPan-2.6.0-1.x86_64.deb
+          name: suanPan-2.7.0-1.x86_64.deb
+          path: suanPan-2.7.0-1.x86_64.deb
   macos-openblas-vtk-dev:
     runs-on: macos-11
     steps:
