@@ -92,7 +92,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../../../Libs/vs;../../$(Configuration)/Libs;$(VTK_LIB);$(CUDA_PATH)/lib/x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>cusparse.lib;cusolver.lib;cublas.lib;cudart.lib;amd.lib;arpack.lib;metis.lib;mumps_c.lib;mumps_f.lib;feast.lib;spmm.lib;superlu.lib;libhdf5.lib;libhdf5_hl.lib;opengl32.lib;wsock32.lib;psapi.lib;dbghelp.lib;vtkChartsCore-9.1.lib;vtkCommonColor-9.1.lib;vtkCommonComputationalGeometry-9.1.lib;vtkCommonCore-9.1.lib;vtkCommonDataModel-9.1.lib;vtkCommonExecutionModel-9.1.lib;vtkCommonMath-9.1.lib;vtkCommonMisc-9.1.lib;vtkCommonSystem-9.1.lib;vtkCommonTransforms-9.1.lib;vtkDICOMParser-9.1.lib;vtkDomainsChemistry-9.1.lib;vtkDomainsChemistryOpenGL2-9.1.lib;vtkFiltersAMR-9.1.lib;vtkFiltersCore-9.1.lib;vtkFiltersExtraction-9.1.lib;vtkFiltersFlowPaths-9.1.lib;vtkFiltersGeneral-9.1.lib;vtkFiltersGeneric-9.1.lib;vtkFiltersGeometry-9.1.lib;vtkFiltersHybrid-9.1.lib;vtkFiltersHyperTree-9.1.lib;vtkFiltersImaging-9.1.lib;vtkFiltersModeling-9.1.lib;vtkFiltersParallel-9.1.lib;vtkFiltersParallelImaging-9.1.lib;vtkFiltersPoints-9.1.lib;vtkFiltersProgrammable-9.1.lib;vtkFiltersSMP-9.1.lib;vtkFiltersSelection-9.1.lib;vtkFiltersSources-9.1.lib;vtkFiltersStatistics-9.1.lib;vtkFiltersTexture-9.1.lib;vtkFiltersTopology-9.1.lib;vtkFiltersVerdict-9.1.lib;vtkGeovisCore-9.1.lib;vtkIOAMR-9.1.lib;vtkIOAsynchronous-9.1.lib;vtkIOCGNSReader-9.1.lib;vtkIOCONVERGECFD-9.1.lib;vtkIOChemistry-9.1.lib;vtkIOCityGML-9.1.lib;vtkIOCore-9.1.lib;vtkIOEnSight-9.1.lib;vtkIOExodus-9.1.lib;vtkIOExport-9.1.lib;vtkIOExportGL2PS-9.1.lib;vtkIOExportPDF-9.1.lib;vtkIOGeometry-9.1.lib;vtkIOHDF-9.1.lib;vtkIOIOSS-9.1.lib;vtkIOImage-9.1.lib;vtkIOImport-9.1.lib;vtkIOInfovis-9.1.lib;vtkIOLSDyna-9.1.lib;vtkIOLegacy-9.1.lib;vtkIOMINC-9.1.lib;vtkIOMotionFX-9.1.lib;vtkIOMovie-9.1.lib;vtkIONetCDF-9.1.lib;vtkIOOggTheora-9.1.lib;vtkIOPLY-9.1.lib;vtkIOParallel-9.1.lib;vtkIOParallelXML-9.1.lib;vtkIOSQL-9.1.lib;vtkIOSegY-9.1.lib;vtkIOTecplotTable-9.1.lib;vtkIOVeraOut-9.1.lib;vtkIOVideo-9.1.lib;vtkIOXML-9.1.lib;vtkIOXMLParser-9.1.lib;vtkImagingColor-9.1.lib;vtkImagingCore-9.1.lib;vtkImagingFourier-9.1.lib;vtkImagingGeneral-9.1.lib;vtkImagingHybrid-9.1.lib;vtkImagingMath-9.1.lib;vtkImagingMorphological-9.1.lib;vtkImagingSources-9.1.lib;vtkImagingStatistics-9.1.lib;vtkImagingStencil-9.1.lib;vtkInfovisCore-9.1.lib;vtkInfovisLayout-9.1.lib;vtkInteractionImage-9.1.lib;vtkInteractionStyle-9.1.lib;vtkInteractionWidgets-9.1.lib;vtkParallelCore-9.1.lib;vtkParallelDIY-9.1.lib;vtkRenderingAnnotation-9.1.lib;vtkRenderingContext2D-9.1.lib;vtkRenderingContextOpenGL2-9.1.lib;vtkRenderingCore-9.1.lib;vtkRenderingFreeType-9.1.lib;vtkRenderingGL2PSOpenGL2-9.1.lib;vtkRenderingImage-9.1.lib;vtkRenderingLOD-9.1.lib;vtkRenderingLabel-9.1.lib;vtkRenderingOpenGL2-9.1.lib;vtkRenderingSceneGraph-9.1.lib;vtkRenderingUI-9.1.lib;vtkRenderingVolume-9.1.lib;vtkRenderingVolumeOpenGL2-9.1.lib;vtkRenderingVtkJS-9.1.lib;vtkTestingRendering-9.1.lib;vtkViewsContext2D-9.1.lib;vtkViewsCore-9.1.lib;vtkViewsInfovis-9.1.lib;vtkWrappingTools-9.1.lib;vtkcgns-9.1.lib;vtkdoubleconversion-9.1.lib;vtkexodusII-9.1.lib;vtkexpat-9.1.lib;vtkfmt-9.1.lib;vtkfreetype-9.1.lib;vtkgl2ps-9.1.lib;vtkglew-9.1.lib;vtkhdf5-9.1.lib;vtkhdf5_hl-9.1.lib;vtkioss-9.1.lib;vtkjpeg-9.1.lib;vtkjsoncpp-9.1.lib;vtkkissfft-9.1.lib;vtklibharu-9.1.lib;vtklibproj-9.1.lib;vtklibxml2-9.1.lib;vtkloguru-9.1.lib;vtklz4-9.1.lib;vtklzma-9.1.lib;vtkmetaio-9.1.lib;vtknetcdf-9.1.lib;vtkogg-9.1.lib;vtkpng-9.1.lib;vtkpugixml-9.1.lib;vtksqlite-9.1.lib;vtksys-9.1.lib;vtktheora-9.1.lib;vtktiff-9.1.lib;vtkverdict-9.1.lib;vtkzlib-9.1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>cusparse.lib;cusolver.lib;cublas.lib;cudart.lib;amd.lib;arpack.lib;metis.lib;mumps_c.lib;mumps_f.lib;feast.lib;spmm.lib;superlu.lib;libhdf5.lib;libhdf5_hl.lib;opengl32.lib;wsock32.lib;psapi.lib;dbghelp.lib;vtkcgns-9.2.lib;vtkChartsCore-9.2.lib;vtkCommonColor-9.2.lib;vtkCommonComputationalGeometry-9.2.lib;vtkCommonCore-9.2.lib;vtkCommonDataModel-9.2.lib;vtkCommonExecutionModel-9.2.lib;vtkCommonMath-9.2.lib;vtkCommonMisc-9.2.lib;vtkCommonSystem-9.2.lib;vtkCommonTransforms-9.2.lib;vtkDICOMParser-9.2.lib;vtkDomainsChemistry-9.2.lib;vtkDomainsChemistryOpenGL2-9.2.lib;vtkdoubleconversion-9.2.lib;vtkexodusII-9.2.lib;vtkexpat-9.2.lib;vtkFiltersAMR-9.2.lib;vtkFiltersCore-9.2.lib;vtkFiltersExtraction-9.2.lib;vtkFiltersFlowPaths-9.2.lib;vtkFiltersGeneral-9.2.lib;vtkFiltersGeneric-9.2.lib;vtkFiltersGeometry-9.2.lib;vtkFiltersHybrid-9.2.lib;vtkFiltersHyperTree-9.2.lib;vtkFiltersImaging-9.2.lib;vtkFiltersModeling-9.2.lib;vtkFiltersParallel-9.2.lib;vtkFiltersParallelImaging-9.2.lib;vtkFiltersPoints-9.2.lib;vtkFiltersProgrammable-9.2.lib;vtkFiltersSelection-9.2.lib;vtkFiltersSMP-9.2.lib;vtkFiltersSources-9.2.lib;vtkFiltersStatistics-9.2.lib;vtkFiltersTexture-9.2.lib;vtkFiltersTopology-9.2.lib;vtkFiltersVerdict-9.2.lib;vtkfmt-9.2.lib;vtkfreetype-9.2.lib;vtkGeovisCore-9.2.lib;vtkgl2ps-9.2.lib;vtkglew-9.2.lib;vtkhdf5_hl-9.2.lib;vtkhdf5-9.2.lib;vtkImagingColor-9.2.lib;vtkImagingCore-9.2.lib;vtkImagingFourier-9.2.lib;vtkImagingGeneral-9.2.lib;vtkImagingHybrid-9.2.lib;vtkImagingMath-9.2.lib;vtkImagingMorphological-9.2.lib;vtkImagingSources-9.2.lib;vtkImagingStatistics-9.2.lib;vtkImagingStencil-9.2.lib;vtkInfovisCore-9.2.lib;vtkInfovisLayout-9.2.lib;vtkInteractionImage-9.2.lib;vtkInteractionStyle-9.2.lib;vtkInteractionWidgets-9.2.lib;vtkIOAMR-9.2.lib;vtkIOAsynchronous-9.2.lib;vtkIOCesium3DTiles-9.2.lib;vtkIOCGNSReader-9.2.lib;vtkIOChemistry-9.2.lib;vtkIOCityGML-9.2.lib;vtkIOCONVERGECFD-9.2.lib;vtkIOCore-9.2.lib;vtkIOEnSight-9.2.lib;vtkIOExodus-9.2.lib;vtkIOExport-9.2.lib;vtkIOExportGL2PS-9.2.lib;vtkIOExportPDF-9.2.lib;vtkIOGeometry-9.2.lib;vtkIOHDF-9.2.lib;vtkIOImage-9.2.lib;vtkIOImport-9.2.lib;vtkIOInfovis-9.2.lib;vtkIOIOSS-9.2.lib;vtkIOLegacy-9.2.lib;vtkIOLSDyna-9.2.lib;vtkIOMINC-9.2.lib;vtkIOMotionFX-9.2.lib;vtkIOMovie-9.2.lib;vtkIONetCDF-9.2.lib;vtkIOOggTheora-9.2.lib;vtkIOParallel-9.2.lib;vtkIOParallelXML-9.2.lib;vtkIOPLY-9.2.lib;vtkIOSegY-9.2.lib;vtkIOSQL-9.2.lib;vtkioss-9.2.lib;vtkIOTecplotTable-9.2.lib;vtkIOVeraOut-9.2.lib;vtkIOVideo-9.2.lib;vtkIOXML-9.2.lib;vtkIOXMLParser-9.2.lib;vtkjpeg-9.2.lib;vtkjsoncpp-9.2.lib;vtkkissfft-9.2.lib;vtklibharu-9.2.lib;vtklibproj-9.2.lib;vtklibxml2-9.2.lib;vtkloguru-9.2.lib;vtklz4-9.2.lib;vtklzma-9.2.lib;vtkmetaio-9.2.lib;vtknetcdf-9.2.lib;vtkogg-9.2.lib;vtkParallelCore-9.2.lib;vtkParallelDIY-9.2.lib;vtkpng-9.2.lib;vtkpugixml-9.2.lib;vtkRenderingAnnotation-9.2.lib;vtkRenderingContext2D-9.2.lib;vtkRenderingContextOpenGL2-9.2.lib;vtkRenderingCore-9.2.lib;vtkRenderingFreeType-9.2.lib;vtkRenderingGL2PSOpenGL2-9.2.lib;vtkRenderingHyperTreeGrid-9.2.lib;vtkRenderingImage-9.2.lib;vtkRenderingLabel-9.2.lib;vtkRenderingLICOpenGL2-9.2.lib;vtkRenderingLOD-9.2.lib;vtkRenderingOpenGL2-9.2.lib;vtkRenderingSceneGraph-9.2.lib;vtkRenderingUI-9.2.lib;vtkRenderingVolume-9.2.lib;vtkRenderingVolumeOpenGL2-9.2.lib;vtkRenderingVtkJS-9.2.lib;vtksqlite-9.2.lib;vtksys-9.2.lib;vtkTestingRendering-9.2.lib;vtktheora-9.2.lib;vtktiff-9.2.lib;vtkverdict-9.2.lib;vtkViewsContext2D-9.2.lib;vtkViewsCore-9.2.lib;vtkViewsInfovis-9.2.lib;vtkWrappingTools-9.2.lib;vtkzlib-9.2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -115,6 +115,7 @@
     <ClCompile Include="..\..\..\Constraint\Criterion\StrainEnergyEvolution.cpp" />
     <ClCompile Include="..\..\..\Constraint\Embed.cpp" />
     <ClCompile Include="..\..\..\Constraint\FixedLength.cpp" />
+    <ClCompile Include="..\..\..\Constraint\LinearSpring2D.cpp" />
     <ClCompile Include="..\..\..\Constraint\LJPotential2D.cpp" />
     <ClCompile Include="..\..\..\Constraint\MPC.cpp" />
     <ClCompile Include="..\..\..\Constraint\NodeFacet.cpp" />
@@ -205,6 +206,8 @@
     <ClCompile Include="..\..\..\Element\Membrane\Porous\PCPE8DC.cpp" />
     <ClCompile Include="..\..\..\Element\Membrane\Porous\PCPE8UC.cpp" />
     <ClCompile Include="..\..\..\Element\Modifier\ElementalModal.cpp" />
+    <ClCompile Include="..\..\..\Element\Modifier\LeeElementalDamping.cpp" />
+    <ClCompile Include="..\..\..\Element\Modifier\LinearViscosity.cpp" />
     <ClCompile Include="..\..\..\Element\Modifier\LumpedScale.cpp" />
     <ClCompile Include="..\..\..\Element\Modifier\LumpedSimple.cpp" />
     <ClCompile Include="..\..\..\Element\Modifier\Modifier.cpp" />
@@ -265,6 +268,7 @@
     <ClCompile Include="..\..\..\Load\Amplitude\Ramp.cpp" />
     <ClCompile Include="..\..\..\Load\Amplitude\Sine.cpp" />
     <ClCompile Include="..\..\..\Load\Amplitude\Tabular.cpp" />
+    <ClCompile Include="..\..\..\Load\Amplitude\TabularSpline.cpp" />
     <ClCompile Include="..\..\..\Load\BodyForce.cpp" />
     <ClCompile Include="..\..\..\Load\GroupBodyForce.cpp" />
     <ClCompile Include="..\..\..\Load\GroupNodalDisplacement.cpp" />
@@ -477,11 +481,13 @@
     <ClCompile Include="..\..\..\Toolbox\Converter.cpp" />
     <ClCompile Include="..\..\..\Toolbox\print.cpp" />
     <ClCompile Include="..\..\..\Toolbox\IntegrationPlan.cpp" />
+    <ClCompile Include="..\..\..\Toolbox\resampling.cpp" />
     <ClCompile Include="..\..\..\Toolbox\sort_rcm.cpp" />
     <ClCompile Include="..\..\..\Toolbox\sync_ostream.cpp" />
     <ClCompile Include="..\..\..\Toolbox\tensorToolbox.cpp" />
     <ClCompile Include="..\..\..\Toolbox\utility.cpp" />
     <ClCompile Include="..\..\..\UnitTest\CatchTest.cpp" />
+    <ClCompile Include="..\..\..\UnitTest\TestSampling.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestSolver.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestColoring.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestIntegration.cpp" />
@@ -516,6 +522,7 @@
     <ClInclude Include="..\..\..\Constraint\Criterion\StrainEnergyEvolution.h" />
     <ClInclude Include="..\..\..\Constraint\Embed.h" />
     <ClInclude Include="..\..\..\Constraint\FixedLength.h" />
+    <ClInclude Include="..\..\..\Constraint\LinearSpring2D.h" />
     <ClInclude Include="..\..\..\Constraint\LJPotential2D.h" />
     <ClInclude Include="..\..\..\Constraint\MPC.h" />
     <ClInclude Include="..\..\..\Constraint\NodeFacet.h" />
@@ -633,6 +640,8 @@
     <ClInclude Include="..\..\..\Element\Membrane\Porous\PCPE8DC.h" />
     <ClInclude Include="..\..\..\Element\Membrane\Porous\PCPE8UC.h" />
     <ClInclude Include="..\..\..\Element\Modifier\ElementalModal.h" />
+    <ClInclude Include="..\..\..\Element\Modifier\LeeElementalDamping.h" />
+    <ClInclude Include="..\..\..\Element\Modifier\LinearViscosity.h" />
     <ClInclude Include="..\..\..\Element\Modifier\LumpedScale.h" />
     <ClInclude Include="..\..\..\Element\Modifier\LumpedSimple.h" />
     <ClInclude Include="..\..\..\Element\Modifier\Modifier.h" />
@@ -694,6 +703,7 @@
     <ClInclude Include="..\..\..\Load\Amplitude\Ramp.h" />
     <ClInclude Include="..\..\..\Load\Amplitude\Sine.h" />
     <ClInclude Include="..\..\..\Load\Amplitude\Tabular.h" />
+    <ClInclude Include="..\..\..\Load\Amplitude\TabularSpline.h" />
     <ClInclude Include="..\..\..\Load\BodyForce.h" />
     <ClInclude Include="..\..\..\Load\GroupBodyForce.h" />
     <ClInclude Include="..\..\..\Load\GroupNodalDisplacement.h" />
@@ -911,6 +921,8 @@
     <ClInclude Include="..\..\..\Toolbox\print.h" />
     <ClInclude Include="..\..\..\Toolbox\IntegrationPlan.h" />
     <ClInclude Include="..\..\..\Toolbox\Quaternion.hpp" />
+    <ClInclude Include="..\..\..\Toolbox\resampling.h" />
+    <ClInclude Include="..\..\..\Toolbox\response_spectrum.h" />
     <ClInclude Include="..\..\..\Toolbox\shapeFunction.h" />
     <ClInclude Include="..\..\..\Toolbox\sort_color.hpp" />
     <ClInclude Include="..\..\..\Toolbox\sort_rcm.h" />

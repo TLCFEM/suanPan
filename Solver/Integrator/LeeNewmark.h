@@ -35,21 +35,25 @@
 
 #include "LeeNewmarkBase.h"
 
-class LeeNewmark final : public LeeNewmarkBase {
+class LeeNewmark : public LeeNewmarkBase {
     const vec mass_coef, stiffness_coef;
 
     const uword n_damping = mass_coef.n_elem;
 
     const double CM;
 
-    shared_ptr<MetaMat<double>> current_mass = nullptr;
-    shared_ptr<MetaMat<double>> current_stiffness = nullptr;
-    shared_ptr<MetaMat<double>> current_geometry = nullptr;
-
     [[nodiscard]] uword get_total_size() const override;
 
     void update_stiffness() const override;
     void update_residual() const override;
+
+    virtual void initialize_mass(const shared_ptr<DomainBase>&);
+    virtual void initialize_stiffness(const shared_ptr<DomainBase>&);
+
+protected:
+    shared_ptr<MetaMat<double>> current_mass = nullptr;
+    shared_ptr<MetaMat<double>> current_stiffness = nullptr;
+    shared_ptr<MetaMat<double>> current_geometry = nullptr;
 
 public:
     explicit LeeNewmark(unsigned, vec&&, vec&&, double, double);
@@ -61,6 +65,14 @@ public:
     void assemble_resistance() override;
 
     void print() override;
+};
+
+class LeeElementalNewmark final : public LeeNewmark {
+    void initialize_mass(const shared_ptr<DomainBase>&) override;
+    void initialize_stiffness(const shared_ptr<DomainBase>&) override;
+
+public:
+    using LeeNewmark::LeeNewmark;
 };
 
 #endif

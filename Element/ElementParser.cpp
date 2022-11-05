@@ -2462,6 +2462,14 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
 
     unique_ptr<Modifier> new_modifier = nullptr;
 
+    auto get_element_pool = [&] {
+        vector<uword> element_tag;
+        unsigned e_tag;
+        while(!command.eof() && get_input(command, e_tag)) element_tag.emplace_back(e_tag);
+
+        return uvec(element_tag);
+    };
+
     if(is_equal(modifier_type, "LumpedSimple")) {
         unsigned tag;
         if(!get_input(command, tag)) {
@@ -2469,11 +2477,7 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
             return SUANPAN_SUCCESS;
         }
 
-        vector<uword> element_tag;
-        unsigned e_tag;
-        while(!command.eof() && get_input(command, e_tag)) element_tag.emplace_back(e_tag);
-
-        new_modifier = make_unique<LumpedSimple>(tag, uvec(element_tag));
+        new_modifier = make_unique<LumpedSimple>(tag, get_element_pool());
     }
     else if(is_equal(modifier_type, "LumpedScale")) {
         unsigned tag;
@@ -2482,11 +2486,7 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
             return SUANPAN_SUCCESS;
         }
 
-        vector<uword> element_tag;
-        unsigned e_tag;
-        while(!command.eof() && get_input(command, e_tag)) element_tag.emplace_back(e_tag);
-
-        new_modifier = make_unique<LumpedScale>(tag, uvec(element_tag));
+        new_modifier = make_unique<LumpedScale>(tag, get_element_pool());
     }
     else if(is_equal(modifier_type, "Rayleigh")) {
         unsigned tag;
@@ -2500,11 +2500,38 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
             suanpan_error("create_new_modifier() needs four valid numbers.\n");
             return SUANPAN_SUCCESS;
         }
-        vector<uword> element_tag;
-        unsigned e_tag;
-        while(!command.eof() && get_input(command, e_tag)) element_tag.emplace_back(e_tag);
 
-        new_modifier = make_unique<Rayleigh>(tag, a, b, c, d, uvec(element_tag));
+        new_modifier = make_unique<Rayleigh>(tag, a, b, c, d, get_element_pool());
+    }
+    else if(is_equal(modifier_type, "LeeElementalDamping")) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("create_new_modifier() needs a valid tag.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        double damping_ratio = -1.;
+        if(!command.eof() && !get_input(command, damping_ratio)) {
+            suanpan_error("create_new_modifier() needs a valid damping ratio.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        new_modifier = make_unique<LeeElementalDamping>(tag, damping_ratio, get_element_pool());
+    }
+    else if(is_equal(modifier_type, "LinearViscosity")) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("create_new_modifier() needs a valid tag.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        double mu;
+        if(!get_input(command, mu)) {
+            suanpan_error("create_new_modifier() needs four valid numbers.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        new_modifier = make_unique<LinearViscosity>(tag, mu, get_element_pool());
     }
     else if(is_equal(modifier_type, "ElementalModal")) {
         unsigned tag;
@@ -2519,11 +2546,7 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
             return SUANPAN_SUCCESS;
         }
 
-        vector<uword> element_tag;
-        unsigned e_tag;
-        while(!command.eof() && get_input(command, e_tag)) element_tag.emplace_back(e_tag);
-
-        new_modifier = make_unique<ElementalModal>(tag, a, b, uvec(element_tag));
+        new_modifier = make_unique<ElementalModal>(tag, a, b, get_element_pool());
     }
     else {
         // check if the library is already loaded

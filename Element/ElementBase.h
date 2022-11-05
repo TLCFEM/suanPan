@@ -147,6 +147,9 @@ public:
     [[nodiscard]] virtual const mat& get_initial_geometry() const = 0;
     [[nodiscard]] virtual const mat& get_initial_secant() const = 0;
 
+    [[nodiscard]] virtual const mat& get_mass_container() const = 0;
+    [[nodiscard]] virtual const mat& get_stiffness_container() const = 0;
+
     virtual int update_status() = 0;
     virtual int clear_status() = 0;
     virtual int commit_status() = 0;

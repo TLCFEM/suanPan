@@ -50,8 +50,8 @@ public:
           double,   // h
           double,   // h
           double,   // h
-          double,   // k
-          double,   // k
+          vec&&,    // k
+          vec&&,    // k
           double,   // linear density
           mat&& = {});
 

@@ -9,6 +9,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         ParticleCollision.cpp
         ParticleCollision2D.cpp
         LJPotential2D.cpp
+        LinearSpring2D.cpp
         ParticleCollision3D.cpp
         RestitutionWallPenalty.cpp
         RigidWallMultiplier.cpp

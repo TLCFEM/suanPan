@@ -1,5 +1,5 @@
 name: suanpan
-base: core20
+base: core22
 confinement: strict
 contact: tlcfem@gmail.com
 donation: https://ko-fi.com/suanpan
@@ -9,7 +9,7 @@ issues: https://github.com/TLCFEM/suanPan/issues
 license: GPL-3.0
 source-code: https://github.com/TLCFEM/suanPan
 summary: An Open Source, Parallel and Heterogeneous Finite Element Analysis Framework
-version: "2.5"
+version: "2.6"
 website: https://bit.ly/suanpan-doc
 description: |
   [**suanPan**](https://github.com/TLCFEM/suanPan) is a finite element method (FEM) simulation platform for applications
@@ -22,7 +22,7 @@ apps:
   suanpan:
     command: bin/suanPan
     environment:
-      LIBGL_DRIVERS_PATH: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/dri
+      LIBGL_DRIVERS_PATH: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/dri
     plugs:
       - home
       - desktop
@@ -40,29 +40,26 @@ parts:
       - -DBUILD_MULTITHREAD=ON
       - -DUSE_HDF5=ON
       - -DUSE_EXTERNAL_VTK=ON
-      - -DVTK_DIR=$SNAPCRAFT_PART_BUILD/lib/cmake/vtk-9.1/
+      - -DVTK_DIR=$CRAFT_PART_BUILD/lib/cmake/vtk-9.2/
       - -DUSE_MKL=ON
       - -DMKLROOT=/opt/intel/oneapi/mkl/latest
       - -DUSE_INTEL_OPENMP=OFF
       - -DLINK_DYNAMIC_MKL=OFF
-      - -DCMAKE_C_COMPILER=gcc-10
-      - -DCMAKE_CXX_COMPILER=g++-10
-      - -DCMAKE_Fortran_COMPILER=gfortran-10
     build-packages:
-      - gcc-10
-      - g++-10
-      - gfortran-10
+      - gcc
+      - g++
+      - gfortran
       - wget
       - mesa-common-dev
       - mesa-utils
       - freeglut3-dev
       - libglvnd-dev
     override-build: |
-      wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.1.0-linux.tar.gz
-      tar xf VTK-9.1.0-linux.tar.gz
-      wget -q https://registrationcenter-download.intel.com/akdlm/irc_nas/18721/l_onemkl_p_2022.1.0.223_offline.sh
-      sh ./l_onemkl_p_2022.1.0.223_offline.sh -a --silent --eula accept
-      snapcraftctl build
+      wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.2-linux.tar.gz
+      tar xf VTK-9.2.2-linux.tar.gz
+      wget -q https://registrationcenter-download.intel.com/akdlm/irc_nas/18898/l_onemkl_p_2022.2.0.8748_offline.sh
+      sh ./l_onemkl_p_2022.2.0.8748_offline.sh -a --silent --eula accept
+      craftctl default
     stage-packages:
       - libgfortran5
       - libgl1

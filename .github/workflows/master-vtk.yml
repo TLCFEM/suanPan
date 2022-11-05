@@ -9,19 +9,19 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Clone
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Install VTK
         run: |
           echo "SP_TIME=daily-$(date +''%Y%m%d%H'')" >> $GITHUB_ENV
-          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.1.0-linux.tar.gz
-          tar xf VTK-9.1.0-linux.tar.gz
+          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.2-linux.tar.gz
+          tar xf VTK-9.2.2-linux.tar.gz
       - name: Golang
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
       - name: Compile
         run: |
           go build Checker/updater.go
           sudo apt-get update && sudo apt-get install mesa-common-dev mesa-utils freeglut3-dev libglvnd-dev
-          cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.1/ -DCMAKE_INSTALL_PREFIX=suanPan-linux-openblas-vtk .
+          cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.2/ -DCMAKE_INSTALL_PREFIX=suanPan-linux-openblas-vtk .
           make install -j"$(nproc)"
       - name: Pack
         run: |
@@ -42,20 +42,20 @@ jobs:
     runs-on: macos-11
     steps:
       - name: Clone
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Install VTK
         run: |
           echo "SP_TIME=daily-$(date +''%Y%m%d%H'')" >> $GITHUB_ENV
-          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.1.0-macos.tar.gz
-          tar xf VTK-9.1.0-macos.tar.gz
+          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.2-macos.tar.gz
+          tar xf VTK-9.2.2-macos.tar.gz
       - name: Golang
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
       - name: Compile
         run: |
           export CC=$(brew --prefix llvm@14)/bin/clang && export CXX=$(brew --prefix llvm@14)/bin/clang++ && export FC=gfortran-10
           go build Checker/updater.go
           brew install llvm glfw glew libomp
-          cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.1/ -DCMAKE_INSTALL_PREFIX=suanPan-macos-openblas-vtk .
+          cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.2/ -DCMAKE_INSTALL_PREFIX=suanPan-macos-openblas-vtk .
           make install -j4
       - name: Pack
         run: |
@@ -77,18 +77,18 @@ jobs:
     runs-on: windows-2022
     steps:
       - name: Clone
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Install VTK
         run: |
           echo ("SP_TIME=daily-"+(get-date -format "yyyyMMddHH")) >> $env:GITHUB_ENV
-          C:/msys64/usr/bin/wget.exe https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.1.0-win.7z
-          7z x VTK-9.1.0-win.7z
+          C:/msys64/usr/bin/wget.exe https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.2-win.7z
+          7z x VTK-9.2.2-win.7z
       - name: Golang
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
       - name: Compile
         run: |
           go build Checker/updater.go
-          cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=D:/a/suanPan/suanPan/lib/cmake/vtk-9.1/ -DCMAKE_INSTALL_PREFIX=suanPan-win-openblas-vtk .
+          cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=D:/a/suanPan/suanPan/lib/cmake/vtk-9.2/ -DCMAKE_INSTALL_PREFIX=suanPan-win-openblas-vtk .
           cmake --build . --target INSTALL --config Release
       - name: Pack
         run: |

@@ -275,6 +275,34 @@ void Domain::assemble_trial_geometry() const {
     factory->get_geometry()->csc_condense();
 }
 
+void Domain::assemble_mass_container() const {
+    factory->clear_mass();
+    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_mass_container(), I->get_dof_encoding());
+    else
+        std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
+            suanpan::for_all(color, [&](const unsigned tag) {
+                const auto& I = get_element(tag);
+                factory->assemble_mass(I->get_mass_container(), I->get_dof_encoding());
+            });
+        });
+
+    factory->get_mass()->csc_condense();
+}
+
+void Domain::assemble_stiffness_container() const {
+    factory->clear_stiffness();
+    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_stiffness_container(), I->get_dof_encoding());
+    else
+        std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
+            suanpan::for_all(color, [&](const unsigned tag) {
+                const auto& I = get_element(tag);
+                factory->assemble_stiffness(I->get_stiffness_container(), I->get_dof_encoding());
+            });
+        });
+
+    factory->get_stiffness()->csc_condense();
+}
+
 int Domain::update_trial_status() const {
     auto& trial_displacement = factory->get_trial_displacement();
     auto& trial_velocity = factory->get_trial_velocity();

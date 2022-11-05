@@ -126,8 +126,8 @@ int GSSSS::update_trial_status() {
     const auto& D = get_domain().lock();
     auto& W = D->get_factory();
 
-    W->update_trial_velocity(W->get_trial_velocity() + XCVD * W->get_ninja());
-    W->update_trial_acceleration(W->get_trial_acceleration() + XCAD * W->get_ninja());
+    W->update_trial_velocity_by(XCVD * W->get_ninja());
+    W->update_trial_acceleration_by(XCAD * W->get_ninja());
 
     return D->update_trial_status();
 }
@@ -152,10 +152,10 @@ void GSSSS::update_parameter(const double NT) {
 
     DT = NT;
 
-    XPV3 = W1G4 * DT - W2G5 * L2 / L3 * DT;
+    XPV3 = (W1G4 - W2G5 * L2 / L3) * DT;
     XPA2 = -W1G6 * L1 / L3 / DT;
-    XCVD = W2G5 / DT / W3G3;
-    XCAD = W1G6 / DT / DT / W3G3;
+    XCVD = W2G5 / W3G3 / DT;
+    XCAD = W1G6 / W3G3 / DT / DT;
 }
 
 void GSSSS::update_compatibility() const {
@@ -178,13 +178,13 @@ void GSSSS::update_compatibility() const {
 vec GSSSS::from_incre_velocity(const vec& incre_velocity, const uvec& encoding) {
     auto& W = get_domain().lock()->get_factory();
 
-    return W->get_current_displacement()(encoding) + L1 * DT * W3G3 / L3 * W->get_current_velocity()(encoding) + (L2 / L3 - L4 / L5) * DT * DT * W3G3 * W->get_current_acceleration()(encoding) + DT * W3G3 / L5 * incre_velocity;
+    return W->get_current_displacement()(encoding) + W3G3 * L1 / L3 * DT * W->get_current_velocity()(encoding) + W3G3 * (L2 / L3 - L4 / L5) * DT * DT * W->get_current_acceleration()(encoding) + W3G3 / L5 * DT * incre_velocity;
 }
 
 vec GSSSS::from_incre_acceleration(const vec& incre_acceleration, const uvec& encoding) {
     auto& W = get_domain().lock()->get_factory();
 
-    return W->get_current_displacement()(encoding) + L1 / L3 * W3G3 * DT * W->get_current_velocity()(encoding) + L2 / L3 * W3G3 * DT * DT * W->get_current_acceleration()(encoding) + W3G3 * DT * DT * incre_acceleration;
+    return W->get_current_displacement()(encoding) + W3G3 * L1 / L3 * DT * W->get_current_velocity()(encoding) + W3G3 * L2 / L3 * DT * DT * W->get_current_acceleration()(encoding) + W3G3 * DT * DT * incre_acceleration;
 }
 
 void GSSSS::print() { suanpan_info("A time integrator using the GSSSS algorithm.\n"); }

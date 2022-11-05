@@ -369,6 +369,9 @@ public:
     virtual void assemble_current_geometry() const = 0;
     virtual void assemble_trial_geometry() const = 0;
 
+    virtual void assemble_mass_container() const = 0;
+    virtual void assemble_stiffness_container() const = 0;
+
     virtual void erase_machine_error() const = 0;
 
     virtual void update_load() = 0;

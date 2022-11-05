@@ -9,9 +9,9 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Clone
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Golang
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
       - name: Compile
         run: |
           go build Checker/updater.go
@@ -21,14 +21,18 @@ jobs:
           chmod +x ../Script/Coverage.sh
           ../Script/Coverage.sh .
           for SRC in `find . | egrep '\.o'`; do gcov -n $SRC > /dev/null; done
-          bash <(curl -s https://codecov.io/bash)
+          cd ..
+      - name: Upload
+        uses: codecov/codecov-action@v3
+        with:
+          gcov: true
   macos-dev:
     runs-on: macos-11
     steps:
       - name: Clone
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Golang
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
       - name: Compile
         run: |
           export CC=gcc-10 && export CXX=g++-10 && export FC=gfortran-10

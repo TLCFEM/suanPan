@@ -3,3 +3,5 @@
 #include "LumpedSimple.h"
 #include "Modifier.h"
 #include "Rayleigh.h"
+#include "LinearViscosity.h"
+#include "LeeElementalDamping.h"

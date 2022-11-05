@@ -88,9 +88,9 @@ int Ramm::analyze() {
         // avoid machine error accumulation
         G->erase_machine_error();
         // update trial displacement
-        W->update_trial_displacement(W->get_trial_displacement() + t_ninja);
+        W->update_trial_displacement_by(t_ninja);
         // update trial load factor
-        W->update_trial_load_factor(W->get_trial_load_factor() + t_lambda);
+        W->update_trial_load_factor_by(vec{t_lambda});
         // set time to load factor
         W->update_trial_time(W->get_trial_load_factor().at(0));
         // for tracking

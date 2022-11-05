@@ -52,6 +52,35 @@ void LeeNewmark::update_residual() const {
     }
 }
 
+void LeeNewmark::initialize_mass(const shared_ptr<DomainBase>&) {
+    // assuming mass does not change
+    // otherwise swap and assemble
+    current_mass = factory->get_mass()->make_copy();
+    if(if_iterative) {
+        const auto current_mass_max = current_mass->max() * 1E-10;
+        for(uword I = 0llu; I < std::min(current_mass->n_rows, current_mass->n_cols); ++I) current_mass->at(I, I) += current_mass_max;
+    }
+}
+
+void LeeNewmark::initialize_stiffness(const shared_ptr<DomainBase>& D) {
+    auto& t_stiff = get_stiffness(factory);
+    auto& t_geometry = get_geometry(factory);
+
+    auto fa = std::async([&] {
+        current_stiffness.swap(t_stiff);
+        D->assemble_current_stiffness();
+    });
+
+    if(!factory->is_nlgeom()) fa.get();
+    else {
+        current_geometry.swap(t_geometry);
+        D->assemble_current_geometry();
+        current_geometry.swap(t_geometry);
+        fa.get();
+        t_stiff += current_geometry;
+    }
+}
+
 LeeNewmark::LeeNewmark(const unsigned T, vec&& X, vec&& F, const double A, const double B)
     : LeeNewmarkBase(T, A, B)
     , mass_coef(4. * X % F)
@@ -83,17 +112,7 @@ int LeeNewmark::process_constraint() {
     if(first_iteration) {
         t_triplet.init((4 * n_damping + 2) * t_stiff->n_elem);
 
-        // current_mass.swap(t_mass);
-        // D->assemble_current_mass();
-        // current_mass.swap(t_mass);
-
-        // assuming mass does not change
-        // otherwise swap and assemble
-        current_mass = factory->get_mass()->make_copy();
-        if(if_iterative) {
-            const auto current_mass_max = current_mass->max() * 1E-10;
-            for(uword I = 0llu; I < std::min(current_mass->n_rows, current_mass->n_cols); ++I) current_mass->at(I, I) += current_mass_max;
-        }
+        initialize_mass(D);
     }
     else {
         // if not first iteration
@@ -135,20 +154,7 @@ int LeeNewmark::process_constraint() {
         // for the first iteration of each substep
         // store current stiffness to be used in the whole substep
         // check in constant terms that does not change in the substep
-
-        auto fa = std::async([&] {
-            current_stiffness.swap(t_stiff);
-            D->assemble_current_stiffness();
-        });
-
-        if(!factory->is_nlgeom()) fa.get();
-        else {
-            current_geometry.swap(get_geometry(factory));
-            D->assemble_current_geometry();
-            current_geometry.swap(get_geometry(factory));
-            fa.get();
-            t_stiff += current_geometry;
-        }
+        initialize_stiffness(D);
 
         if(SUANPAN_SUCCESS != Integrator::process_constraint()) return SUANPAN_FAIL;
         t_stiff->csc_condense();
@@ -179,7 +185,7 @@ void LeeNewmark::assemble_resistance() {
             const vec n_internal(&trial_internal(J), n_block);
             internal_velocity -= mass_coef(I) * n_internal;
         }
-        W->update_trial_damping_force(W->get_trial_damping_force() + current_mass * internal_velocity);
+        W->update_trial_damping_force_by(current_mass * internal_velocity);
     }
 
     W->set_sushi(W->get_trial_resistance() + W->get_trial_damping_force() + W->get_trial_inertial_force());
@@ -190,4 +196,24 @@ void LeeNewmark::print() {
     const vec X = .25 * sqrt(mass_coef % stiffness_coef);
     const vec F = sqrt(mass_coef / stiffness_coef);
     for(auto I = 0llu; I < n_damping; ++I) suanpan_info("\tDamping Ratio: %.4f\tFrequency (rad/s): %.4f\n", X(I), F(I));
+}
+
+void LeeElementalNewmark::initialize_mass(const shared_ptr<DomainBase>& D) {
+    auto& t_mass = get_mass(factory);
+
+    current_mass.swap(t_mass);
+    D->assemble_mass_container();
+    current_mass.swap(t_mass);
+
+    if(if_iterative) {
+        const auto current_mass_max = current_mass->max() * 1E-10;
+        for(uword I = 0llu; I < std::min(current_mass->n_rows, current_mass->n_cols); ++I) current_mass->at(I, I) += current_mass_max;
+    }
+}
+
+void LeeElementalNewmark::initialize_stiffness(const shared_ptr<DomainBase>& D) {
+    auto& t_stiff = get_stiffness(factory);
+
+    current_stiffness.swap(t_stiff);
+    D->assemble_stiffness_container();
 }

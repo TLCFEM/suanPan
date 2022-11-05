@@ -31,11 +31,13 @@
 
 #include <Load/Amplitude/Amplitude.h>
 
-class Tabular final : public Amplitude {
+class Tabular : public Amplitude {
     const string file_name;
 
+protected:
     vec time;      // time
     vec magnitude; // magnitude
+
 public:
     Tabular(unsigned, vec&&, vec&&, unsigned);
     Tabular(unsigned, string&&, unsigned);

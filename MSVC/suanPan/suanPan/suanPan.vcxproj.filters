@@ -1399,6 +1399,24 @@
     <ClCompile Include="..\..\..\Constraint\LJPotential2D.cpp">
       <Filter>Constraint</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Load\Amplitude\TabularSpline.cpp">
+      <Filter>Load\Amplitude</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\LinearSpring2D.cpp">
+      <Filter>Constraint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Modifier\LinearViscosity.cpp">
+      <Filter>Element\Modifier</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\resampling.cpp">
+      <Filter>Toolbox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestSampling.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Modifier\LeeElementalDamping.cpp">
+      <Filter>Element\Modifier</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2667,6 +2685,24 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Constraint\LJPotential2D.h">
       <Filter>Constraint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Load\Amplitude\TabularSpline.h">
+      <Filter>Load\Amplitude</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\LinearSpring2D.h">
+      <Filter>Constraint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Modifier\LinearViscosity.h">
+      <Filter>Element\Modifier</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\resampling.h">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Modifier\LeeElementalDamping.h">
+      <Filter>Element\Modifier</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\response_spectrum.h">
+      <Filter>Toolbox</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

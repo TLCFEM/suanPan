@@ -390,6 +390,11 @@ const char* to_char(const OutputType& L) {
     case OutputType::YF:
         return "YF";
 
+    case OutputType::BEAME:
+        return "BEAME";
+    case OutputType::BEAMS:
+        return "BEAMS";
+
     case OutputType::NL:
     default:
         return "NL";
@@ -588,6 +593,9 @@ OutputType to_list(const char* L) {
     if(is_equal(L, "HIST")) return OutputType::HIST;
     if(is_equal(L, "AMP")) return OutputType::AMP;
     if(is_equal(L, "YF")) return OutputType::YF;
+
+    if(is_equal(L, "BEAME")) return OutputType::BEAME;
+    if(is_equal(L, "BEAMS")) return OutputType::BEAMS;
 
     if(is_equal(L, "NL")) return OutputType::NL;
 

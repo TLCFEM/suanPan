@@ -10,6 +10,7 @@
 #include "ParticleCollision.h"
 #include "ParticleCollision2D.h"
 #include "LJPotential2D.h"
+#include "LinearSpring2D.h"
 #include "ParticleCollision3D.h"
 #include "RestitutionWallPenalty.h"
 #include "RigidWallMultiplier.h"

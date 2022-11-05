@@ -1,733 +1,5 @@
 {
-  "scope":[
-    "source.supan"
-  ],
   "completions":[
-    {
-      "trigger":"node",
-      "contents":"node ${1:(1)} ${2:[2...]}\n# (1) int, unique tag\n# [2...] double, coordinates",
-      "kind":"keyword"
-    },
-    {
-      "trigger":"B21",
-      "contents":"element B21 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]} ${6:[6]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# [5] int, number of integration points, default: 6\n# [6] bool string, nonlinear geometry switch, default: false",
-      "kind":"type",
-      "details":"2D Displacement Based Bernoulli Beam"
-    },
-    {
-      "trigger":"B21EL",
-      "contents":"element B21EL ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]} ${6:[6]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# [5] int, number of integration points, default: 6\n# [6] bool string, nonlinear geometry switch, default: false",
-      "kind":"type",
-      "details":"2D Displacement Based Bernoulli Beam With End Moment Release"
-    },
-    {
-      "trigger":"B21EH",
-      "contents":"element B21EH ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]} ${6:[6]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# [5] int, number of integration points, default: 6\n# [6] bool string, nonlinear geometry switch, default: false",
-      "kind":"type",
-      "details":"2D Displacement Based Bernoulli Beam With End Moment Release"
-    },
-    {
-      "trigger":"B21H",
-      "contents":"element B21H ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]} ${6:[6]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# [5] double, normalized length of each end hinge, default: 0.2 \n# [6] bool string, nonlinear geometry switch, default: false",
-      "kind":"type",
-      "details":"2D Displacement Based Bernoulli Beam with Lumped End Hinges"
-    },
-    {
-      "trigger":"B31",
-      "contents":"element B31 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:[6]} ${7:[7]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# (5) int, orientation tag\n# [6] int, number of integration points, default: 5\n# [7] bool string, nonlinear geometry switch, default: false",
-      "kind":"type",
-      "details":"3D Displacement Based Bernoulli Beam"
-    },
-    {
-      "trigger":"EB21",
-      "contents":"element EB21 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) double, area\n# (5) double, moment inertia\n# (6) int, material tag\n# [7] bool string, nonlinear geometry switch, default: false",
-      "kind":"type",
-      "details":"2D Elastic Bernoulli Beam"
-    },
-    {
-      "trigger":"F21",
-      "contents":"element F21 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]} ${6:[6]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# [5] int, number of integration points, default: 6\n# [6] bool string, nonlinear geometry switch, default: false",
-      "kind":"type",
-      "details":"2D Force Based Bernoulli Beam"
-    },
-    {
-      "trigger":"F21H",
-      "contents":"element F21H ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]} ${6:[6]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# [5] double, normalized length of each end hinge, default: 0.2 \n# [6] bool string, nonlinear geometry switch, default: false",
-      "kind":"type",
-      "details":"2D Force Based Bernoulli Beam With Lumped End Hinges"
-    },
-    {
-      "trigger":"F31",
-      "contents":"element F31 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:[6]} ${7:[7]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# (5) int, orientation tag\n# [6] int, number of integration points, default: 5\n# [7] bool string, nonlinear geometry switch, default: false",
-      "kind":"type",
-      "details":"3D Displacement Based Bernoulli Beam"
-    },
-    {
-      "trigger":"MVLEM",
-      "contents":"element MVLEM ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} (${6:(6)} ${7:(7)} ${8:(8)} ${9:(9)} ${10:(10)}...)\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, material tag of shear spring\n# (5) double, height of shear spring, ranges from 0 to 1\n# (6) double, fibre width\n# (7) double, fibre thickness\n# (8) double, reinforcement ratio of target fibre\n# (9) int, concrete material ${host:(host)} tag\n# (10) int, steel material tag",
-      "kind":"type",
-      "details":"Multiple Vertical Line Element Model"
-    },
-    {
-      "trigger":"NMB21",
-      "contents":"element NMB21 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# [5] bool string, nonlinear geometry switch, default: false",
-      "kind":"type",
-      "details":"2D Displacement Based Bernoulli Beam with N-M Interaction Sections"
-    },
-    {
-      "trigger":"NMB21EL",
-      "contents":"element NMB21EL ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# [5] bool string, nonlinear geometry switch, default: false",
-      "kind":"type",
-      "details":"2D Displacement Based Bernoulli Beam with N-M Interaction Sections and Low End Moment Release"
-    },
-    {
-      "trigger":"NMB21EH",
-      "contents":"element NMB21EH ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# [5] bool string, nonlinear geometry switch, default: false",
-      "kind":"type",
-      "details":"2D Displacement Based Bernoulli Beam with N-M Interaction Sections and High End Moment Release"
-    },
-    {
-      "trigger":"NMB31",
-      "contents":"element NMB31 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:[6]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# (5) int, orientation tag\n# [6] bool string, nonlinear geometry switch, default: false",
-      "kind":"type",
-      "details":"3D Displacement Based Bernoulli Beam with N-M Interaction Sections"
-    },
-    {
-      "trigger":"Orientation",
-      "contents":"orientation ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)}\n# (1) int, unique orientation tag\n# (2) string, orientation type\n# (3) double, x component of local z axis\n# (4) double, y component of local z axis\n# (5) double, z component of local z axis",
-      "kind":"type",
-      "details":"Section Orientation For 3D Beams"
-    },
-    {
-      "trigger":"C3D20",
-      "contents":"element C3D20 ${1:(1)} ${2:(2...21)} ${22:(22)} ${23:[23]} ${24:[24]}\n# (1) int, unique element tag\n# (2...21) int, eight corner nodes with conventional order\n# (22) int, material tag\n# [23] bool string, reduced integration scheme switch, default: true\n# [24] bool string, nonlinear geometry switch, default: false",
-      "kind":"type",
-      "details":"Second Order Cube/Brick"
-    },
-    {
-      "trigger":"C3D4",
-      "contents":"element C3D4 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2...5) int, four corner nodes with conventional order\n# (6) int, material tag\n# [7] bool string, nonlinear geometry switch, default: false",
-      "kind":"type",
-      "details":"Linear Tetrahedral"
-    },
-    {
-      "trigger":"C3D8",
-      "contents":"element C3D8 ${1:(1)} ${2:(2...9)} ${10:(10)} ${11:[11]} ${12:[12]}\n# (1) int, unique element tag\n# (2...9) int, eight corner nodes with conventional order\n# (10) int, material tag\n# [11] string, integration scheme, default: 'I'\n# [12] bool string, nonlinear geometry switch, default: false",
-      "kind":"type",
-      "details":"Linear Cube/Brick"
-    },
-    {
-      "trigger":"C3D8I",
-      "contents":"element C3D8I ${1:(1)} ${2:(2...9)} ${10:(10)}\n# (1) int, unique element tag\n# (2...9) int, eight corner nodes with conventional order\n# (10) int, material tag",
-      "kind":"type",
-      "details":"Linear Cube/Brick with Incompatible Modes"
-    },
-    {
-      "trigger":"CIN3D8",
-      "contents":"",
-      "kind":"type",
-      "details":"Linear Infinite Cube/Brick"
-    },
-    {
-      "trigger":"DC3D4",
-      "contents":"",
-      "kind":"type",
-      "details":""
-    },
-    {
-      "trigger":"DC3D8",
-      "contents":"",
-      "kind":"type",
-      "details":""
-    },
-    {
-      "trigger":"CINP4",
-      "contents":"element CINP4 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0",
-      "kind":"type",
-      "details":"Bilinear Infinite Quadrilateral"
-    },
-    {
-      "trigger":"DCP3",
-      "contents":"element DCP3 ${1:(1)} ${2:(2...4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:[8]}\n# (1) int, unique element tag\n# (2...4) int, node i, j, k\n# (5) int, material tag\n# (6) double, characteristic length\n# (7) double, energy release rate\n# [8] double, element thickness, default: 1.0",
-      "kind":"type",
-      "details":"Constant Strain Triangle With Crack Phase"
-    },
-    {
-      "trigger":"DCP4",
-      "contents":"element DCP4 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:[9]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# (7) double, characteristic length\n# (8) double, energy release rate\n# [9] double, element thickness, default: 1.0",
-      "kind":"type",
-      "details":"Bilinear Quadrilateral With Crack Phase"
-    },
-    {
-      "trigger":"PCPE4DC",
-      "contents":"element PCPE4DC ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:(9)} ${10:(10)}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, solid material tag\n# (7) int, fluid material tag\n# (8) double, alpha\n# (9) double, porosity n\n# (10) double, permeability k",
-      "kind":"type",
-      "details":"Bilinear Quadrilateral With Pore Pressure"
-    },
-    {
-      "trigger":"CAX3",
-      "contents":"element CAX3 ${1:(1)} ${2:(2...4)} ${5:(5)} ${6:[6]}\n# (1) int, unique element tag\n# (2...4) int, node tags\n# (5) int, material tag\n# [6] bool string, nonlinear geometry switch, default: false",
-      "kind":"type",
-      "details":"Axisymmetric Linear Triangle"
-    },
-    {
-      "trigger":"CAX4",
-      "contents":"element CAX4 ${1:(1)} ${2:(2...5)} ${6:(6)}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag",
-      "kind":"type",
-      "details":"Axisymmetric Linear Quadrilateral"
-    },
-    {
-      "trigger":"CAX8",
-      "contents":"element CAX8 ${1:(1)} ${2:(2...9)} ${10:(10)}\n# (1) int, unique element tag\n# (2...9) int, node tags\n# (10) int, material tag",
-      "kind":"type",
-      "details":"Axisymmetric Quadratic Quadrilateral"
-    },
-    {
-      "trigger":"Allman",
-      "contents":"element Allman ${1:(1)} ${2:(2...4)} ${5:(5)} ${6:[6]}\n# (1) int, unique element tag\n# (2...4) int, node i, j, k\n# (5) int, material tag\n# [6] double, element thickness, default: 1.0",
-      "kind":"type",
-      "details":"Allman’s Triangle With Drilling DoFs"
-    },
-    {
-      "trigger":"GCMQ",
-      "contents":"element GCMQI ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]} ${8:[8]}\nelement GCMQL ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]} ${8:[8]}\nelement GCMQG ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]} ${8:[8]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0",
-      "kind":"type",
-      "details":"Generalized Conforming Mixed Quadrilateral With Drilling DoFs"
-    },
-    {
-      "trigger":"SGCMQ",
-      "contents":"element SGCMQI ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]} ${8:[8]}\nelement SGCMQL ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]} ${8:[8]}\nelement SGCMQG ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]} ${8:[8]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0",
-      "kind":"type",
-      "details":"Generalized Conforming Mixed Quadrilateral With Drilling DoFs"
-    },
-    {
-      "trigger":"GQ12",
-      "contents":"element GQ12 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0",
-      "kind":"type",
-      "details":"Quadrilateral With Drilling DoFs"
-    },
-    {
-      "trigger":"PS",
-      "contents":"element PS ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0",
-      "kind":"type",
-      "details":"Pian-Sumihara Quadrilateral Element"
-    },
-    {
-      "trigger":"QE2",
-      "contents":"element QE2 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0",
-      "kind":"type",
-      "details":"Mixed Four-Node Quadrilateral Element"
-    },
-    {
-      "trigger":"CP3",
-      "contents":"element CP3 ${1:(1)} ${2:(2...4)} ${5:(5)} ${6:[6]} ${7:[7]}\n# (1) int, unique element tag\n# (2...4) int, node i, j, k\n# (5) int, material tag\n# [6] double, element thickness, default: 1.0\n# [7] bool string, nonlinear geometry switch, default: false",
-      "kind":"type",
-      "details":"Constant Strain Triangle"
-    },
-    {
-      "trigger":"CP4",
-      "contents":"element CP4 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]} ${8:[8]} ${9:[9]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0\n# [8] bool string, reduced integration switch, default: false\n# [9] bool string, nonlinear geometry switch, default: false",
-      "kind":"type",
-      "details":"Bilinear Quadrilateral"
-    },
-    {
-      "trigger":"CP4I",
-      "contents":"element CP4I ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0",
-      "kind":"type",
-      "details":"Bilinear Incompatible Quadrilateral"
-    },
-    {
-      "trigger":"CP5",
-      "contents":"element CP5 ${1:(1)} ${2:(2...6)} ${7:(7)} ${8:[8]} ${9:[9]}\n# (1) int, unique element tag\n# (2...6) int, node tags that define the element\n# (7) int, material tag\n# [8] double, element thickness, default: 1.0\n# [9] bool string, nonlinear geometry switch, default: false",
-      "kind":"type",
-      "details":"Five-Point Quadrilateral"
-    },
-    {
-      "trigger":"CP6",
-      "contents":"element CP6 ${1:(1)} ${2:(2...7)} ${8:(8)} ${9:[9]} ${10:[10]}\n# (1) int, unique element tag\n# (2...7) int, node tags that define the element\n# (8) int, material tag\n# [9] double, element thickness, default: 1.0\n# [10] bool string, nonlinear geometry switch, default: false",
-      "kind":"type",
-      "details":"Quadratic Triangle"
-    },
-    {
-      "trigger":"CP7",
-      "contents":"element CP7 ${1:(1)} ${2:(2...8)} ${9:(9)} ${10:[10]} ${11:[11]}\n# (1) int, unique element tag\n# (2...8) int, node tags that define the element\n# (9) int, material tag\n# [10] double, element thickness, default: 1.0\n# [11] bool string, nonlinear geometry switch, default: false",
-      "kind":"type",
-      "details":"Seven-Point Quadrilateral"
-    },
-    {
-      "trigger":"CP8",
-      "contents":"element CP8 ${1:(1)} ${2:(2...9)} ${10:(10)} ${11:[11]} ${12:[12]} ${13:[13]}\n# (1) int, unique element tag\n# (2...9) int, node 1 to node 8\n# (10) int, material tag\n# [11] double, element thickness, default: 1.0\n# [12] bool string, reduced integration switch, default: false\n# [13] bool string, nonlinear geometry switch, default: false",
-      "kind":"type",
-      "details":"Second Order Quadrilateral"
-    },
-    {
-      "trigger":"T2D2",
-      "contents":"element T2D2 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:[6]} ${7:[7]} ${8:[8]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, material tag\n# (5) double, cross sectional area\n# [6] bool string, nonlinear geometry switch, default: false\n# [7] bool string, if to update sectional area, default: false\n# [8] bool string, if to use log strain, default: false",
-      "kind":"type",
-      "details":"2D Linear Truss"
-    },
-    {
-      "trigger":"T2D2S",
-      "contents":"element T2D2S ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${6:[6]} ${7:[7]} ${8:[8]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# [5] bool string, nonlinear geometry switch, default: false\n# [6] bool string, if to use log strain, default: false",
-      "kind":"type",
-      "details":"2D Linear Truss Using Section"
-    },
-    {
-      "trigger":"T3D2",
-      "contents":"element T3D2 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:[6]} ${7:[7]} ${8:[8]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, material tag\n# (5) double, cross sectional area\n# [6] bool string, nonlinear geometry switch, default: false\n# [7] bool string, if to update sectional area, default: false\n# [8] bool string, if to use log strain, default: false",
-      "kind":"type",
-      "details":"3D Linear Truss"
-    },
-    {
-      "trigger":"T3D2S",
-      "contents":"element T3D2S ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${6:[6]} ${7:[7]} ${8:[8]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# [5] bool string, nonlinear geometry switch, default: false\n# [6] bool string, if to use log strain, default: false",
-      "kind":"type",
-      "details":"3D Linear Truss Using Section"
-    },
-    {
-      "trigger":"PatchCube",
-      "contents":"element PatchCube ${1:(1)} -node ${2:(2...)} -knotx ${3:(3...)} -knoty ${4:(4...)} -knotz ${5:(5...)} -material ${6:(6)} ${-thickness (7:[-thickness (7)}]\n# (1) int, unique element ${patch:(patch)} tag\n# (2...) int, node tags of control node polygon\n# (3...) double, knot vector along x axis\n# (4...) double, knot vector along y axis\n# (5...) double, knot vector along z axis\n# (6) int, material tag\n# (7) double, thickness",
-      "kind":"type",
-      "details":"Patch of Hexahedron Elements"
-    },
-    {
-      "trigger":"PatchQuad",
-      "contents":"element PatchQuad ${1:(1)} -node ${2:(2...)} -knotx ${3:(3...)} -knoty ${4:(4...)} -material ${5:(5)} ${-thickness (6:[-thickness (6)}]\n# (1) int, unique element ${patch:(patch)} tag\n# (2...) int, node tags of control node polygon\n# (3...) double, knot vector along x axis\n# (4...) double, knot vector along y axis\n# (5) int, material tag\n# (6) double, thickness",
-      "kind":"type",
-      "details":"Patch of Quadrilateral Elements"
-    },
-    {
-      "trigger":"DKT3",
-      "contents":"element DKT3 ${1:(1)} ${2:(2...4)} ${5:(5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2...4) int, node i, j, k\n# (5) int, material tag\n# (6) double, thickness\n# [7] int, numer of integration points, default: 3",
-      "kind":"type",
-      "details":"DKT Triangle Plate"
-    },
-    {
-      "trigger":"DKT4",
-      "contents":"element DKT4 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)} ${8:[8]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# (7) double, thickness\n# [8] int, numer of integration points along thickness, default: 3",
-      "kind":"type",
-      "details":"DKT Quadrilateral Plate"
-    },
-    {
-      "trigger":"Mindlin",
-      "contents":"element Mindlin ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)} ${8:[8]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# (7) double, thickness\n# [8] int, numer of integration points, default: 5",
-      "kind":"type",
-      "details":"Mindlin Plate Element"
-    },
-    {
-      "trigger":"DKTS3",
-      "contents":"element DKTS3 ${1:(1)} ${2:(2...4)} ${5:(5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2...4) int, node i, j, k\n# (5) int, material tag\n# (6) double, thickness\n# [7] int, numer of integration points, default: 3",
-      "kind":"type",
-      "details":"DKT Triangle Shell"
-    },
-    {
-      "trigger":"DKTS4",
-      "contents":"element DKTS4 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)} ${8:[8]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# (7) double, thickness\n# [8] int, numer of integration points, default: 3",
-      "kind":"type",
-      "details":"DKT Quadrilateral Shell"
-    },
-    {
-      "trigger":"S4",
-      "contents":"element S4 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# (7) double, thickness",
-      "kind":"type",
-      "details":"Four Node Shell Element"
-    },
-    {
-      "trigger":"SGCMS",
-      "contents":"element SGCMS ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# (7) double, thickness",
-      "kind":"type",
-      "details":"Simplified Generalized Conforming Mixed Shell Element"
-    },
-    {
-      "trigger":"Contact2D",
-      "contents":"element Contact2D ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]}\n# (1) int, unique element tag\n# (2) int, master group tag\n# (3) int, slave group tag\n# [4] double, penalty factor",
-      "kind":"type",
-      "details":"2D Node${Slave:(Slave)}-Line${Master:(Master)} Contact Element"
-    },
-    {
-      "trigger":"Contact3D",
-      "contents":"element Contact3D ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]}\n# (1) int, unique element tag\n# (2) int, master group tag\n# (3) int, slave group tag\n# [4] double, penalty factor",
-      "kind":"type",
-      "details":"3D Node${Slave:(Slave)}-Triangular Facet${Master:(Master)} Contact Element"
-    },
-    {
-      "trigger":"Damper01",
-      "contents":"element Damper01 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, material tag of associated viscosity material",
-      "kind":"type",
-      "details":"2D Viscous Damper"
-    },
-    {
-      "trigger":"Damper03",
-      "contents":"element Damper03 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, material tag of associated viscosity material",
-      "kind":"type",
-      "details":"3D Viscous Damper"
-    },
-    {
-      "trigger":"Damper02",
-      "contents":"element Damper02 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:[6]} ${7:[7]} ${8:[8]}\n# (1) int, unique tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, damper tag\n# (5) int, spring tag\n# [6] bool string, if to use matrix in iteration, default: true\n# [7] int, the maximum delay number, default: 0\n# [8] double, beta, default: 0.5",
-      "kind":"type",
-      "details":"2D Maxwell Model"
-    },
-    {
-      "trigger":"Damper04",
-      "contents":"element Damper04 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:[6]} ${7:[7]} ${8:[8]}\n# (1) int, unique tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, damper tag\n# (5) int, spring tag\n# [6] bool string, if to use matrix in iteration, default: true\n# [7] int, the maximum delay number, default: 0\n# [8] double, beta, default: 0.5",
-      "kind":"type",
-      "details":"3D Maxwell Model"
-    },
-    {
-      "trigger":"Embedded2D",
-      "contents":"element Embedded2D ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]}\n# (1) int, unique element tag\n# (2) int, host element tag\n# (3) int, slave node tag\n# [4] double, penalty factor, default: 1E4",
-      "kind":"type",
-      "details":"2D Embedded Element"
-    },
-    {
-      "trigger":"Embedded3D",
-      "contents":"element Embedded3D ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]}\n# (1) int, unique element tag\n# (2) int, host element tag\n# (3) int, slave node tag\n# [4] double, penalty factor, default: 1E4",
-      "kind":"type",
-      "details":"3D Embedded Element"
-    },
-    {
-      "trigger":"Joint",
-      "contents":"element Joint ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4...)}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4...) int, material tags",
-      "kind":"type",
-      "details":"Joint Element"
-    },
-    {
-      "trigger":"Mass",
-      "contents":"Mass ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4...)}\nelement Mass ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4...)}\n# (1) int, unique element tag\n# (2) int, node tag\n# (3) double, magnitude\n# (4...) int, dof tag",
-      "kind":"type",
-      "details":"Point Mass"
-    },
-    "Mass2D",
-    "Mass3D",
-    "MassPoint2D",
-    "MassPoint3D",
-    {
-      "trigger":"SingleSection2D",
-      "contents":"element SingleSection2D ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique tag\n# (2) int, node tag\n# (3) int, section tag",
-      "kind":"type",
-      "details":"2D Single Section"
-    },
-    {
-      "trigger":"SingleSection3D",
-      "contents":"element SingleSection3D ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique tag\n# (2) int, node tag\n# (3) int, section tag",
-      "kind":"type",
-      "details":"3D Single Section"
-    },
-    {
-      "trigger":"Spring01",
-      "contents":"element Spring01 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, tag of associated material",
-      "kind":"type",
-      "details":""
-    },
-    {
-      "trigger":"Spring02",
-      "contents":"element Spring02 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, tag of associated material",
-      "kind":"type",
-      "details":""
-    },
-    {
-      "trigger":"Tie",
-      "contents":"",
-      "kind":"type",
-      "details":"element Tie ${1:(1)} ${2:(2)} ${3:(3)} ${(4:[(4)} ${5:(5)} ${6:(6)}...]\n# (1) int, unique element tag\n# (2) double, right hand side of the constraint equation, the constraint is homogeneous if this parameter is zero\n# (3) double, penalty number, a relatively large number\n# (4) int, node tag\n# (5) int, dof tag\n# (6) double, weight"
-    },
-    {
-      "trigger":"ConcreteCM",
-      "contents":"material ConcreteCM ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:[7]} ${8:[8]} ${9:[9]} ${10:[10]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, compression strength, should be negative but sign insensitive\n# (4) double, tension strength, should be positive but sign insensitive\n# (5) double, NC\n# (6) double, NT\n# [7] double, strain at compression strength, default: -2E-3\n# [8] double, strain at tension strength, default: 1E-4\n# [9] bool string, linear transition switch, default: false\n# [10] double, density, default: 0.0",
-      "kind":"type",
-      "details":"Chang-Mander Concrete Model"
-    },
-    {
-      "trigger":"ConcreteExp",
-      "contents":"material ConcreteExp ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:[9]} ${10:[10]}\n# (1) int, unique tag\n# (2) double, elastic modulus\n# (3) double, f_t\n# (4) double, a_t\n# (5) double, g_t\n# (6) double, f_{c,m}\n# (7) double, a_c\n# (8) double, g_c\n# [9] double, middle point, default: 0.2\n# [10] double, density, default: 0.0",
-      "kind":"type",
-      "details":"Objective Concrete Model"
-    },
-    {
-      "trigger":"ConcreteTsai",
-      "contents":"material ConcreteTsai ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:[8]} ${9:[9]} ${10:[10]} ${11:[11]}\n# (1) int, unique material tag\n# (2) double, compression strength, should be negative but sign insensitive\n# (3) double, tension strength, should be positive but sign insensitive\n# (4) double, MC\n# (5) double, NC\n# (6) double, MT\n# (7) double, NT\n# [8] double, strain at compression strength, default: -2E-3\n# [9] double, strain at tension strength, default: 1E-4\n# [10] double, middle point, default: 0.2\n# [11] double, density, default: 0.0",
-      "kind":"type",
-      "details":"Uniaxial Concrete Model Using Tsai's Equation"
-    },
-    {
-      "trigger":"BilinearElastic1D",
-      "contents":"material BilinearElastic1D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, yield stress\n# (4) double, hardening modulus\n# [5] double, density, default: 0.0",
-      "kind":"type",
-      "details":"Uniaxial Bilinear Elastic Material"
-    },
-    {
-      "trigger":"Elastic1D",
-      "contents":"material Elastic1D ${1:(1)} ${2:(2)} ${3:[3]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# [3] double, density, default: 0.0",
-      "kind":"type",
-      "details":"Uniaxial Elastic Material"
-    },
-    {
-      "trigger":"MultilinearElastic1D",
-      "contents":"material MultilinearElastic1D ${1:(1)} ${2:(2 3...)} ${4:[4]}\n# (1) int, unique material tag\n# (2) double, strain of the data point\n# (3) double, stress of the data point\n# [4] double, density, default: 0.0",
-      "kind":"type",
-      "details":"Uniaxial Multilinear Elastic Material"
-    },
-    {
-      "trigger":"NLE1D01",
-      "contents":"material NLE1D01 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]} ${6:[6]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, turning stress\n# (4) double, hardening ratio\n# [5] double, radius of transition, default: 20\n# [6] double, density, default: 0.0",
-      "kind":"type",
-      "details":"Nonlinear Elastic 1D Type 01"
-    },
-    {
-      "trigger":"PolyElastic1D",
-      "contents":"material PolyElastic1D ${1:(1)} [${2:(2)}...]\n# (1) int, unique material tag\n# (2) double, polynomial parameters, a_n",
-      "kind":"type",
-      "details":"Polynomial Based Uniaxial Nonlinear Elastic"
-    },
-    {
-      "trigger":"AFC01",
-      "contents":"material AFC01 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)}\n# (1) int, unique tag\n# (2) double, elastic modulus\n# (3) double, tension yield stress\n# (4) double, tension hardening modulus\n# (5) double, tension unloading modulus\n# (6) double, compression yield stress\n# (7) double, compression hardening modulus\n# (8) double, compression unloading modulus",
-      "kind":"type",
-      "details":"Asymmetrical Friction Connection"
-    },
-    {
-      "trigger":"AFC02",
-      "contents":"material AFC02 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)}\n# (1) int, unique tag\n# (2) double, elastic modulus\n# (3) double, yield stress\n# (4) double, hardening modulus\n# (5) double, unloading modulus",
-      "kind":"type",
-      "details":"Symmetrical Friction Connection"
-    },
-    {
-      "trigger":"AFCN",
-      "contents":"material AFCN ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:[9]} ${10:[10]}\n# (1) int, unique tag\n# (2) double, elastic modulus\n# (3) double, tension yield stress\n# (4) double, tension hardening modulus\n# (5) double, tension unloading modulus\n# (6) double, compression yield stress\n# (7) double, compression hardening modulus\n# (8) double, compression unloading modulus\n# [9] double, non-negative degradation paramater, default: 0.0\n# [10] double, density, default: 0.0",
-      "kind":"type",
-      "details":"Nonlinear Version of AFC"
-    },
-    {
-      "trigger":"BilinearOO",
-      "contents":"material BilinearOO ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:[7]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, tension yield strain\n# (4) double, tension hardening ratio\n# (5) double, compression yield strain\n# (6) double, compression hardening ratio\n# [7] double, density, default: 0.0",
-      "kind":"type",
-      "details":"Bilinear Origin Oriented Model"
-    },
-    {
-      "trigger":"BilinearPO",
-      "contents":"material BilinearPO ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:[7]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, tension yield strain\n# (4) double, tension hardening ratio\n# (5) double, compression yield strain\n# (6) double, compression hardening ratio\n# [7] double, density, default: 0.0",
-      "kind":"type",
-      "details":"Bilinear Peak Oriented Model"
-    },
-    {
-      "trigger":"BouncWen",
-      "contents":"material BoucWen ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, yield stress\n# (4) double, hardening ratio\n# (5) double, beta, a positive parameter\n# (6) double, n, a positive exponent",
-      "kind":"type",
-      "details":"Bouc-Wen Model"
-    },
-    {
-      "trigger":"BWBN",
-      "contents":"material BWBN ${1:(1)} ${2:[2...18]}\n# (1) int, unique material tag\n# [2] double, elastic modulus, default: 2E5\n# [3] double, yield stress, default: 4E2\n# [4] double, hardening ratio, default: 1E-2\n# [5] double, beta (>0), default: 0.5\n# [6] double, exponent n (>0, normally >=1), default: 1.0\n# [7] double, initial \nu (>0), default: 1.0\n# [8] double, slope of \nu (>0), default: 0.0\n# [9] double, initial eta (>0), default: 1.0\n# [10] double, slope of eta (>0), default: 0.0\n# [11] double, initial phi (>0), default: 1.0\n# [12] double, slope of phi (>0), default: 0.0\n# [13] double, zeta ${1>zeta>0:(1>zeta>0)}, default: 0.0\n# [14] double, slope of A (>0), default: 0.0\n# [15] double, p (>0), default: 0.0\n# [16] double, q (>0), default: 0.0\n# [17] double, lambda (>0), default: 1.0\n# [18] double, density, default: 0.0",
-      "kind":"type",
-      "details":"Bouc-Wen-Baber-Noori Model"
-    },
-    {
-      "trigger":"Flag01",
-      "contents":"material Flag01 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, yield stress, positive\n# (4) double, residual stress, can be either positive or negative\n# (5) double, hardening ratio",
-      "kind":"type",
-      "details":""
-    },
-    {
-      "trigger":"Flag02",
-      "contents":"",
-      "kind":"type",
-      "details":"material Flag02 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, tension yield stress, positive\n# (4) double, tension residual stress, can be either positive or negative\n# (5) double, tension hardening ratio\n# (6) double, compression yield stress, negative\n# (7) double, compression residual stress, can be either positive or negative\n# (8) double, compression hardening ratio"
-    },
-    {
-      "trigger":"MPF",
-      "contents":"material MPF ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]} ${5:[5]} ${6:[6]} ${7:[7]} ${8:[8]} ${9:[9]} ${10:[10]} ${11:[11]} ${12:[12]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, initial yield stress\n# [4] double, hardening ratio, default: 0.05\n# [5] double, R0, default: 20.0\n# [6] double, A1, default: 18.5\n# [7] double, A2, default: 0.15\n# [8] double, A3, default: 0.01\n# [9] double, A4, default: 7.0\n# [10] bool string, isotropic hardening switch, default: false\n# [11] bool string, constant radius switch, default: false\n# [12] double, density, default: 0.0",
-      "kind":"type",
-      "details":"Menegotto-Pinto-Filippou Steel Model"
-    },
-    {
-      "trigger":"MultilinearOO",
-      "contents":"material MultilinearOO ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]}\n# (1) int, unique material tag\n# (2) string, file name of tension backbone\n# (3) string, file name of compression backbone\n# [4] double, density, default: 0.0",
-      "kind":"type",
-      "details":"Multilinear Origin Oriented Hysteresis Model"
-    },
-    {
-      "trigger":"MultilinearPO",
-      "contents":"Multilinear Peak Oriented Hysteresis Model",
-      "kind":"type",
-      "details":"material MultilinearPO ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]}\n# (1) int, unique material tag\n# (2) string, file name of tension backbone\n# (3) string, file name of compression backbone\n# [4] double, density, default: 0.0"
-    },
-    {
-      "trigger":"RambergOsgood",
-      "contents":"material RambergOsgood ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, initial yield stress\n# [4] double, offset alpha, default: 1.0\n# [5] double, n, default: 4.0\n# [6] double, density, default: 0.0",
-      "kind":"type",
-      "details":"Ramberg-Osgood Steel Model"
-    },
-    {
-      "trigger":"SlipLock",
-      "contents":"material SlipLock ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]} ${6:[6]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, initial yield strain\n# (4) double, hardening ratio\n# [5] double, radius, default: 20.0\n# [6] double, density, default: 0.0",
-      "kind":"type",
-      "details":"Slip-Lock Material"
-    },
-    {
-      "trigger":"SteelBRB",
-      "contents":"material SteelBRB ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:(9)} ${10:(10)} ${11:[11]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, yield stress\n# (4) double, plastic modulus\n# (5) double, tension saturated stress\n# (6) double, tension delta_r\n# (7) double, tension alpha\n# (8) double, compression saturated stress\n# (9) double, compression delta_r\n# (10) double, compression alpha\n# [11] double, density, default: 0.0",
-      "kind":"type",
-      "details":"Steel Model For Modelling BRB"
-    },
-    {
-      "trigger":"converger",
-      "contents":"converger ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]}\n# (1) string, converger type\n# (2) int, unique tag\n# (3) double, tolerance\n# (4) int, maximum iteration\n# [5] bool string, print switch, default: false",
-      "kind":"type",
-      "details":"Convergence Tester"
-    },
-    {
-      "trigger":"Circle1D",
-      "contents":"section Circle1D ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique section tag\n# (2) double, radius\n# (3) int, material tag",
-      "kind":"type",
-      "details":"1D Circle Section"
-    },
-    {
-      "trigger":"Fibre1D",
-      "contents":"section Fibre1D ${1:(1)} [${2:(2)}...]\n# (1) int, unique section tag\n# [(2)...] int, associated section tags",
-      "kind":"type",
-      "details":"1D Fibre Section"
-    },
-    {
-      "trigger":"Rectangle1D",
-      "contents":"section Rectangle1D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique section tag\n# (2) double, section width\n# (3) double, section height\n# (4) int, material tag",
-      "kind":"type",
-      "details":"1D Rectangle Section"
-    },
-    {
-      "trigger":"TrussSection",
-      "contents":"section TrussSection ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique section tag\n# (2) double, section area\n# (3) int, material tag",
-      "kind":"type",
-      "details":"1D Truss Section"
-    },
-    {
-      "trigger":"Bar2D",
-      "contents":"section Bar2D ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]}\n# (1) int, unique section tag\n# (2) double, area\n# (3) int, material tag\n# [4] double, eccentricity, default: 0.0",
-      "kind":"type",
-      "details":"2D Reinforcing Bar Section"
-    },
-    {
-      "trigger":"Box2D",
-      "contents":"section Box2D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:[6]} ${7:[7]}\n# (1) int, unique section tag\n# (2) double, width\n# (3) double, height\n# (4) double, thickness\n# (5) int, material tag\n# [6] int, number of integration points, default: 6\n# [7] double, eccentricity, default: 0.0",
-      "kind":"type",
-      "details":"2D Box Section"
-    },
-    {
-      "trigger":"Circle2D",
-      "contents":"section Circle2D ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]} ${5:[5]}\n# (1) int, unique section tag\n# (2) double, radius\n# (3) int, material tag\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0",
-      "kind":"type",
-      "details":"2D Circle Section"
-    },
-    {
-      "trigger":"CircularHollow2D",
-      "contents":"section CircularHollow2D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]} ${6:[6]}\n# (1) int, unique section tag\n# (2) double, radius\n# (3) double, thickness\n# (4) int, material tag\n# [5] int, number of integration points, default: 10\n# [6] double, eccentricity, default: 0.0",
-      "kind":"type",
-      "details":"2D Hollow Circular Section"
-    },
-    {
-      "trigger":"Fibre2D",
-      "contents":"section Fibre2D ${1:(1)} [${2:(2)}...]\n# (1) int, unique section tag\n# [(2)...] int, associated section tags",
-      "kind":"type",
-      "details":"2D Fibre Section"
-    },
-    {
-      "trigger":"HSection2D",
-      "contents":"section HSection2D ${1:(1)} ${2:(2...7)} ${8:(8)} ${9:[9]} ${10:[10]}\n# (1) int, unique tag\n# (2...7) double, section dimensions\n# (8) int, material tag\n# [9] int, number of integration points, default: 6\n# [10] double, eccentricity measured from the centre, default: 0.0",
-      "kind":"type",
-      "details":"2D H-Section"
-    },
-    {
-      "trigger":"ISection2D",
-      "contents":"section ISection2D ${1:(1)} ${2:(2...7)} ${8:(8)} ${9:[9]} ${10:[10]}\n# (1) int, unique tag\n# (2...7) double, section dimensions\n# (8) int, material tag\n# [9] int, number of integration points, default: 6\n# [10] double, eccentricity measured from the centre, default: 0.0",
-      "kind":"type",
-      "details":"2D I-Section"
-    },
-    {
-      "trigger":"Rectangle2D",
-      "contents":"section Rectangle2D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) double, section width\n# (3) double, section height\n# (4) int, material tag\n# [5] int, number of integration points, default: 6\n# [6] double, eccentricity measured from the centre, default: 0.0",
-      "kind":"type",
-      "details":"2D Rectangle Section"
-    },
-    {
-      "trigger":"TSection2D",
-      "contents":"section TSection2D ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]} ${8:[8]}\n# (1) int, unique tag\n# (2...5) double, section dimensions\n# (6) int, material tag\n# [7] int, number of integration points, default: 6\n# [8] double, eccentricity measured from the centre, default: 0.0",
-      "kind":"type",
-      "details":"2D T-Section"
-    },
-    {
-      "trigger":"Bar3D",
-      "contents":"section Bar3D ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]} ${5:[5]}\n# (1) int, unique section tag\n# (2) double, area\n# (3) int, material tag\n# [4] double, eccentricity along y axis, default: 0.0\n# [5] double, eccentricity along z axis, default: 0.0",
-      "kind":"type",
-      "details":"3D Reinforcing Bar Section"
-    },
-    {
-      "trigger":"Box3D",
-      "contents":"section Box3D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:[6]} ${7:[7]} ${8:[8]}\n# (1) int, unique section tag\n# (2) double, width\n# (3) double, height\n# (4) double, thickness\n# (5) int, material tag\n# [6] int, number of integration points, default: 3\n# [7] double, eccentricity along y axis, default: 0.0\n# [8] double, eccentricity along z axis, default: 0.0",
-      "kind":"type",
-      "details":"3D Box Section"
-    },
-    {
-      "trigger":"Circle3D",
-      "contents":"section Circle3D ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique section tag\n# (2) double, radius\n# (3) int, material tag\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity along y axis, default: 0.0\n# [6] double, eccentricity along z axis, default: 0.0",
-      "kind":"type",
-      "details":"3D Circle Section"
-    },
-    {
-      "trigger":"CircleHollow3D",
-      "contents":"section CircularHollow3D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]} ${6:[6]} ${7:[7]}\n# (1) int, unique section tag\n# (2) double, radius\n# (3) double, thickness\n# (4) int, material tag\n# [5] int, number of integration points, default: 10\n# [6] double, eccentricity along y axis, default: 0.0\n# [7] double, eccentricity along z axis, default: 0.0",
-      "kind":"type",
-      "details":"3D Hollow Circle Section"
-    },
-    {
-      "trigger":"Fibre3D",
-      "contents":"section Fibre3D ${1:(1)} [${2:(2)}...]\n# (1) int, unique section tag\n# [(2)...] int, associated section tags",
-      "kind":"type",
-      "details":"3D Fibre Section"
-    },
-    {
-      "trigger":"ISection3D",
-      "contents":"section ISection3D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:[9]} ${10:[10]} ${11:[11]}\n# (1) int, unique section tag\n# (2) double, top flange width\n# (3) double, top flange thickness\n# (4) double, bottom flange width\n# (5) double, bottom flange thickness\n# (6) double, web height\n# (7) double, web thickness\n# (8) int, material tag\n# [9] int, number of integration points, default: 3\n# [10] double, eccentricity along y axis, default: 0.0\n# [11] double, eccentricity along z axis, default: 0.0",
-      "kind":"type",
-      "details":"3D I-Section"
-    },
-    {
-      "trigger":"Rectangle3D",
-      "contents":"section Rectangle3D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]} ${6:[6]} ${7:[7]}\n# (1) int, unique section tag\n# (2) double, section width\n# (3) double, section height\n# (4) int, material tag\n# [5] int, number of integration points, default: 3\n# [6] double, eccentricity along y axis, default: 0.0\n# [7] double, eccentricity along z axis, default: 0.0",
-      "kind":"type",
-      "details":"3D Rectangle Section"
-    },
-    {
-      "trigger":"TSection3D",
-      "contents":"section TSection3D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:[7]} ${8:[8]} ${9:[9]}\n# (1) int, unique section tag\n# (2) double, top flange width\n# (3) double, top flange thickness\n# (4) double, web height\n# (5) double, web thickness\n# (6) int, material tag\n# [7] int, number of integration points, default: 3\n# [8] double, eccentricity along y axis, default: 0.0\n# [9] double, eccentricity along z axis, default: 0.0",
-      "kind":"type",
-      "details":"3D T-Section"
-    },
-    {
-      "trigger":"NM2D1",
-      "contents":"section NM2D1 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique section tag\n# (2) double, EA\n# (3) double, EI\n# (4) double, linear density",
-      "kind":"type",
-      "details":"N-M Interaction Elastic Section"
-    },
-    {
-      "trigger":"NM2D2",
-      "contents":"section NM2D2 ${1:(1)} ${2:(2...9)} [${10:(10)} ${11:(11)} ${12:(12)}...]\n# (1) int, unique section tag\n# (2) double, EA\n# (3) double, EI\n# (4) double, yielding axial force\n# (5) double, yielding strong axis moment\n# (6) double, d\n# (7) double, isotropic hardening parameter H\n# (8) double, kinematic hardening parameter K\n# (9) double, linear density\n# (10) double, a_i\n# (11) double, b_i\n# (12) double, c_i",
-      "kind":"type",
-      "details":"N-M Interaction Elastic Section"
-    },
-    {
-      "trigger":"NM3D1",
-      "contents":"section NM3D1 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique section tag\n# (2) double, EA\n# (3) double, EI of strong axis\n# (4) double, EI of weak axis\n# (5) double, linear density",
-      "kind":"type",
-      "details":"N-M Interaction Elastic Section"
-    },
-    {
-      "trigger":"NM3D2",
-      "contents":"section NM3D2 ${1:(1)} ${2:(2...11)}\n# (1) int, unique section tag\n# (2) double, EA\n# (3) double, strong axis EI\n# (4) double, weak axis EI\n# (5) double, yielding axial force\n# (6) double, yielding strong axis moment\n# (7) double, yielding weak axis moment\n# (8) double, c\n# (9) double, isotropic hardening parameter H\n# (10) double, kinematic hardening parameter K\n# (11) double, linear density",
-      "kind":"type",
-      "details":"N-M Interaction Elastic Section"
-    },
-    "NM2D3",
-    "NM3D3",
     "1000WB215",
     "1000WB258",
     "1000WB296",
@@ -966,28 +238,20 @@
     "900WB218",
     "900WB257",
     "900WB282",
+    "AFC",
+    "AFC03",
+    "AFCS",
     "AbsDisp",
     "AbsError",
     "AbsIncreDisp",
     "AbsIncreEnergy",
     "AbsResidual",
-    "acc",
-    "acceleration",
-    "AFC",
-    "AFC03",
-    "AFCS",
-    "amplitude",
-    "analyse",
-    "analyze",
-    "angularvelocity",
     "ArcLength",
     "ArmstrongFrederick",
     "ArmstrongFrederick1D",
-    "avel",
     "Axisymmetric",
     "AxisymmetricElastic",
     "B3DL",
-    "band_mat",
     "Bilinear1D",
     "Bilinear2D",
     "BilinearCC",
@@ -998,7 +262,6 @@
     "BilinearPeric",
     "BilinearViscosity",
     "BlatzKo",
-    "bodyforce",
     "Buckle",
     "C3D8R",
     "CDP",
@@ -1007,26 +270,10 @@
     "CDPM2ISO",
     "CDPM2NO",
     "CIN3D8",
-    "CircularHollow3D",
-    "clear",
-    "cload",
-    "color_model",
-    "Combine",
-    "command",
-    "Concrete21",
-    "Concrete22",
-    "ConcreteTable",
-    "Constant",
-    "constraint_multiplier",
-    "constraint",
-    "converger",
-    "Cosine",
-    "CoulombFriction",
     "CP4R",
     "CPE8",
     "CPE8R",
     "CPS8",
-    "criterion",
     "CSMQ4",
     "CSMQ5",
     "CSMQ6",
@@ -1034,38 +281,30 @@
     "CSMQ8",
     "CSMT3",
     "CSMT6",
-    "CUDA",
-    "DafaliasManzari",
-    "Damping",
+    "CircularHollow3D",
+    "Combine",
+    "Concrete21",
+    "Concrete22",
+    "ConcreteTable",
+    "Constant",
+    "Cosine",
+    "CoulombFriction",
     "DC3D4",
     "DC3D8",
+    "DafaliasManzari",
+    "Damping",
     "Decay",
-    "deformed",
-    "delete",
     "Dhakal",
-    "disable",
-    "disp",
-    "displacement",
-    "dispload",
-    "domain",
-    "double",
     "Dynamic",
-    "eigen_number",
-    "Eigen",
-    "eigenvalue",
-    "Elastic2D",
-    "Elastic3D",
-    "element",
-    "Element",
-    "ElementalModal",
-    "elementgroup",
-    "Embed2D",
-    "Embed3D",
-    "enable",
-    "erase",
     "EU2D",
     "EU3D",
-    "exit",
+    "Eigen",
+    "Elastic2D",
+    "Elastic3D",
+    "Element",
+    "ElementalModal",
+    "Embed2D",
+    "Embed3D",
     "ExpCC",
     "ExpDP",
     "ExpGurson",
@@ -1074,51 +313,22 @@
     "ExpJ2",
     "ExpMises1D",
     "FEAST",
-    "FGMRES",
-    "file",
-    "finiterigidwall",
-    "finiterigidwallmultiplier",
-    "finiterigidwallpenalty",
-    "finiterestitutionwall",
-    "finiterestitutionwallpenalty",
-    "fix",
-    "fix2",
-    "fixed_step_size",
-    "fixedlength2d",
     "FixedLength2D",
-    "fixedlength3d",
     "FixedLength3D",
     "FixedNumber",
     "Fluid",
-    "fontsize",
     "Frame",
     "Frequency",
-    "full",
-    "fullname",
-    "Gap01",
     "GCMQG",
     "GCMQI",
     "GCMQL",
-    "generate",
-    "generatebyplane",
-    "generatebypoint",
-    "generatebyrule",
+    "Gap01",
     "Global",
-    "group",
-    "groupbodyforce",
-    "groupcload",
-    "groupdisp",
-    "groupdisplacement",
-    "groupdispload",
     "GroupElement",
-    "groupgroup",
-    "groupmultiplierbc",
     "GroupMultiplierBC",
     "GroupNode",
-    "grouppenaltybc",
     "GroupPenaltyBC",
     "GroupSum",
-    "hdf5recorder",
     "HEA100",
     "HEA1000",
     "HEA120",
@@ -1167,7 +377,6 @@
     "HEB700",
     "HEB800",
     "HEB900",
-    "help",
     "HEM100",
     "HEM1000",
     "HEM120",
@@ -1192,7 +401,6 @@
     "HEM700",
     "HEM800",
     "HEM900",
-    "history",
     "HP10X42",
     "HP10X57",
     "HP12X53",
@@ -1215,10 +423,7 @@
     "HP18X181",
     "HP18X204",
     "HP8X36",
-    "import",
-    "ini_step_size",
-    "initial",
-    "integrator",
+    "ILU",
     "IPE100",
     "IPE120",
     "IPE140",
@@ -1238,29 +443,29 @@
     "IPE600",
     "IPE80",
     "IsotropicElastic3D",
-    "iterative_refinement",
+    "Jacobi",
     "Kelvin",
-    "Laminated",
     "LBFGS",
-    "Linear",
-    "LinearDamage",
+    "LJPotential2D",
+    "Laminated",
+    "LeeElementalDamping",
     "LineUDL2D",
     "LineUDL3D",
-    "list",
-    "load_multiplier",
-    "load",
-    "LumpedScale",
-    "LumpedSimple",
+    "Linear",
+    "LinearDamage",
+    "LinearViscosity",
     "LogicAND",
     "LogicOR",
     "LogicXOR",
+    "LumpedScale",
+    "LumpedSimple",
     "M10X7.5",
     "M10X8",
     "M10X9",
     "M12.5X11.6",
     "M12.5X12.4",
-    "M12X10.8",
     "M12X10",
+    "M12X10.8",
     "M12X11.8",
     "M3X2.9",
     "M4X3.2",
@@ -1272,41 +477,6 @@
     "M6X4.4",
     "M8X6.2",
     "M8X6.5",
-    "mass",
-    "material",
-    "materialtest1d",
-    "materialtest2d",
-    "materialtest3d",
-    "materialtestbyload1d",
-    "materialtestbyload2d",
-    "materialtestbyload3d",
-    "materialtestbyloadwithbase3d",
-    "materialtestbystrainhistory",
-    "materialtestbystresshistory",
-    "materialtestwithbase3d",
-    "max_iteration",
-    "max_step_size",
-    "MaxDisplacement",
-    "MaxGap2D",
-    "MaxGap3D",
-    "MaxHistory",
-    "MaximumGap2D",
-    "MaximumGap3D",
-    "MaxResistance",
-    "Maxwell",
-    "min_step_size",
-    "MinDisplacement",
-    "MinGap2D",
-    "MinGap3D",
-    "MinimumGap2D",
-    "MinimumGap3D",
-    "MinResistance",
-    "mixed",
-    "Model",
-    "modifier",
-    "Modulated",
-    "MooneyRivlin",
-    "mpc",
     "MPC",
     "MPDC",
     "MT2.5X9.45",
@@ -1316,67 +486,65 @@
     "MT4X3.1",
     "MT4X3.25",
     "MT5X3.75",
-    "MT5X4.5",
     "MT5X4",
+    "MT5X4.5",
     "MT6.25X5.8",
     "MT6.25X6.2",
+    "MT6X5",
     "MT6X5.4",
     "MT6X5.9",
-    "MT6X5",
+    "Mass2D",
+    "Mass3D",
+    "MassPoint2D",
+    "MassPoint3D",
+    "MaxDisplacement",
+    "MaxGap2D",
+    "MaxGap3D",
+    "MaxHistory",
+    "MaxResistance",
+    "MaximumGap2D",
+    "MaximumGap3D",
+    "Maxwell",
+    "MinDisplacement",
+    "MinGap2D",
+    "MinGap3D",
+    "MinResistance",
+    "MinimumGap2D",
+    "MinimumGap3D",
+    "Model",
+    "Modulated",
+    "MooneyRivlin",
     "MultilinearJ2",
     "MultilinearMises1D",
-    "multiplierbc",
     "MultiplierBC",
-    "MUMPS",
-    "GMRES",
-    "BICGSTAB",
-    "preconditioner",
-    "Jacobi",
-    "ILU",
-    "mute",
     "NLE3D01",
-    "nobar",
-    "node",
-    "Node",
-    "NodeFacet",
-    "nodegroup",
-    "NodeLine",
-    "num_threads",
+    "NM2D3",
+    "NM2D3K",
+    "NM3D3",
+    "NM3D3K",
     "NZ2D",
     "NZ3D",
     "NZStrongMotion",
+    "Node",
+    "NodeFacet",
+    "NodeLine",
     "Optimisation",
     "OrthotropicElastic3D",
-    "output_folder",
-    "ParabolicCC",
-    "Parallel",
-    "PARDISO",
-    "particlecollision2d",
-    "ParticleCollision2D",
-    "LJPotential2D",
-    "particlecollision3d",
-    "ParticleCollision3D",
     "PCPE4DC",
     "PCPE4DI",
-    "PCPE8DC",
     "PCPE4UC",
+    "PCPE8DC",
     "PCPE8UC",
-    "peek",
-    "penaltybc",
+    "ParabolicCC",
+    "Parallel",
+    "ParticleCollision2D",
+    "ParticleCollision3D",
     "PenaltyBC",
-    "plainrecorder",
     "PlaneStrain",
     "PlaneStress",
     "PlaneSymmetric13",
     "PlaneSymmetric23",
-    "plot",
     "PolyJ2",
-    "precheck",
-    "precision",
-    "print",
-    "protect",
-    "pwd",
-    "quit",
     "R2D2",
     "R3D2",
     "Ramm",
@@ -1384,20 +552,12 @@
     "Rayleigh",
     "Rebar2D",
     "Rebar3D",
-    "recorder",
     "Recorder",
     "RelDisp",
     "RelError",
     "RelIncreDisp",
     "RelIncreEnergy",
     "RelResidual",
-    "remove",
-    "reset",
-    "rigidwall",
-    "rigidwallmultiplier",
-    "rigidwallpenalty",
-    "restitutionwall",
-    "restitutionwallpenalty",
     "Rotation2D",
     "Rotation3D",
     "S10X25.4",
@@ -1428,25 +588,9 @@
     "S6X17.25",
     "S8X18.4",
     "S8X23",
-    "save",
-    "scale",
-    "Scale",
-    "screen_output",
-    "section",
-    "Sequential",
-    "set",
     "SGCMQG",
     "SGCMQI",
     "SGCMQL",
-    "SimpleSand",
-    "Sine",
-    "single",
-    "size",
-    "Sleeve2D",
-    "Sleeve3D",
-    "solver",
-    "sparse_mat",
-    "Spike",
     "ST1.5X2.85",
     "ST1.5X3.75",
     "ST10X33",
@@ -1475,39 +619,29 @@
     "ST7.5X25",
     "ST9X27.35",
     "ST9X35",
+    "Scale",
+    "Sequential",
+    "SimpleSand",
+    "Sine",
+    "Sleeve2D",
+    "Sleeve3D",
     "Stacked",
     "Static",
-    "step",
     "Stiffness",
     "StrainEnergyEvolution",
     "Substepping",
     "Sum",
-    "summary",
-    "SuperLU",
-    "supportacceleration",
-    "supportdisplacement",
-    "supportvelocity",
-    "suspend",
-    "symm_mat",
-    "system_solver",
     "TableCDP",
     "TableGurson",
     "Tabular",
-    "terminal",
     "Tie",
-    "tolerance",
     "TrilinearDegradation",
     "Trivial",
-    "type",
-    "undeformed",
-    "Uniaxial",
     "US2D",
     "US3D",
+    "Uniaxial",
     "VAFCRP",
     "VAFCRP1D",
-    "vel",
-    "velocity",
-    "version",
     "Viscosity01",
     "Viscosity02",
     "Visualisation",
@@ -1794,7 +928,6 @@
     "W8X48",
     "W8X58",
     "W8X67",
-    "Width",
     "WT10.5X100.5",
     "WT10.5X111.5",
     "WT10.5X124",
@@ -2078,72 +1211,1151 @@
     "WT9X79",
     "WT9X87.5",
     "WT9X96",
+    "Width",
     "Yeoh",
+    "acc",
+    "acceleration",
+    "amplitude",
+    "analyse",
+    "analyze",
+    "angularvelocity",
+    "avel",
+    "bodyforce",
+    "cload",
+    "command",
+    "constraint",
+    "converger",
+    "criterion",
+    "deformed",
+    "delete",
+    "disable",
+    "disp",
+    "displacement",
+    "dispload",
+    "double",
+    "eigen_number",
+    "eigenvalue",
+    "element",
+    "elementgroup",
+    "enable",
+    "erase",
+    "finiterestitutionwall",
+    "finiterestitutionwallpenalty",
+    "finiterigidwall",
+    "finiterigidwallmultiplier",
+    "finiterigidwallpenalty",
+    "fix",
+    "fix2",
+    "fixedlength2d",
+    "fixedlength3d",
+    "fontsize",
+    "full",
+    "generate",
+    "generatebyplane",
+    "generatebypoint",
+    "generatebyrule",
+    "group",
+    "groupbodyforce",
+    "groupcload",
+    "groupdisp",
+    "groupdisplacement",
+    "groupdispload",
+    "groupgroup",
+    "groupmultiplierbc",
+    "grouppenaltybc",
+    "hdf5recorder",
+    "help",
+    "history",
+    "initial",
+    "integrator",
+    "list",
+    "load",
+    "mass",
+    "material",
+    "materialtest1d",
+    "materialtest2d",
+    "materialtest3d",
+    "materialtestbyload1d",
+    "materialtestbyload2d",
+    "materialtestbyload3d",
+    "materialtestbyloadwithbase3d",
+    "materialtestbystrainhistory",
+    "materialtestbystresshistory",
+    "materialtestwithbase3d",
+    "mixed",
+    "modifier",
+    "mpc",
+    "multiplierbc",
+    "mute",
+    "nobar",
+    "nodegroup",
+    "output_folder",
+    "particlecollision2d",
+    "particlecollision3d",
+    "peek",
+    "penaltybc",
+    "plainrecorder",
+    "plot",
+    "precheck",
+    "print",
+    "protect",
+    "recorder",
+    "remove",
+    "restitutionwall",
+    "restitutionwallpenalty",
+    "rigidwall",
+    "rigidwallmultiplier",
+    "rigidwallpenalty",
+    "scale",
+    "screen_output",
+    "section",
+    "set",
+    "single",
+    "size",
+    "solver",
+    "sparse_mat",
+    "step",
+    "summary",
+    "supportacceleration",
+    "supportdisplacement",
+    "supportvelocity",
+    "suspend",
+    "system_solver",
+    "tabularspline",
+    "terminal",
+    "tolerance",
+    "type",
+    "undeformed",
+    "vel",
+    "velocity",
+    "version",
     {
-      "trigger":"BatheTwoStep",
+      "contents":"",
+      "details":"",
+      "kind":"type",
+      "trigger":"DC3D4"
+    },
+    {
+      "contents":"",
+      "details":"",
+      "kind":"type",
+      "trigger":"DC3D8"
+    },
+    {
+      "contents":"",
+      "details":"Linear Infinite Cube/Brick",
+      "kind":"type",
+      "trigger":"CIN3D8"
+    },
+    {
+      "contents":"",
+      "details":"element Tie ${1:(1)} ${2:(2)} ${3:(3)} ${(4:[(4)} ${5:(5)} ${6:(6)}...]\n# (1) int, unique element tag\n# (2) double, right hand side of the constraint equation, the constraint is homogeneous if this parameter is zero\n# (3) double, penalty number, a relatively large number\n# (4) int, node tag\n# (5) int, dof tag\n# (6) double, weight",
+      "kind":"type",
+      "trigger":"Tie"
+    },
+    {
+      "contents":"",
+      "details":"material Flag02 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, tension yield stress, positive\n# (4) double, tension residual stress, can be either positive or negative\n# (5) double, tension hardening ratio\n# (6) double, compression yield stress, negative\n# (7) double, compression residual stress, can be either positive or negative\n# (8) double, compression hardening ratio",
+      "kind":"type",
+      "trigger":"Flag02"
+    },
+    {
+      "contents":"Mass ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4...)}\nelement Mass ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4...)}\n# (1) int, unique element tag\n# (2) int, node tag\n# (3) double, magnitude\n# (4...) int, dof tag",
+      "details":"Point Mass",
+      "kind":"type",
+      "trigger":"Mass"
+    },
+    {
+      "contents":"Multilinear Peak Oriented Hysteresis Model",
+      "details":"material MultilinearPO ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]}\n# (1) int, unique material tag\n# (2) string, file name of tension backbone\n# (3) string, file name of compression backbone\n# [4] double, density, default: 0.0",
+      "kind":"type",
+      "trigger":"MultilinearPO"
+    },
+    {
+      "contents":"clear",
+      "details":"Clear Domain",
+      "kind":"type",
+      "trigger":"clear"
+    },
+    {
+      "contents":"converger ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]}\n# (1) string, converger type\n# (2) int, unique tag\n# (3) double, tolerance\n# (4) int, maximum iteration\n# [5] bool string, print switch, default: false",
+      "details":"Convergence Tester",
+      "kind":"type",
+      "trigger":"converger"
+    },
+    {
+      "contents":"domain ${1:(1)}\n# (1) integer, domain tag",
+      "details":"Switch to Target Domain",
+      "kind":"type",
+      "trigger":"domain"
+    },
+    {
+      "contents":"element Allman ${1:(1)} ${2:(2...4)} ${5:(5)} ${6:[6]}\n# (1) int, unique element tag\n# (2...4) int, node i, j, k\n# (5) int, material tag\n# [6] double, element thickness, default: 1.0",
+      "details":"Allman’s Triangle With Drilling DoFs",
+      "kind":"type",
+      "trigger":"Allman"
+    },
+    {
+      "contents":"element B21 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]} ${6:[6]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# [5] int, number of integration points, default: 6\n# [6] bool string, nonlinear geometry switch, default: false",
+      "details":"2D Displacement Based Bernoulli Beam",
+      "kind":"type",
+      "trigger":"B21"
+    },
+    {
+      "contents":"element B21EH ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]} ${6:[6]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# [5] int, number of integration points, default: 6\n# [6] bool string, nonlinear geometry switch, default: false",
+      "details":"2D Displacement Based Bernoulli Beam With End Moment Release",
+      "kind":"type",
+      "trigger":"B21EH"
+    },
+    {
+      "contents":"element B21EL ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]} ${6:[6]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# [5] int, number of integration points, default: 6\n# [6] bool string, nonlinear geometry switch, default: false",
+      "details":"2D Displacement Based Bernoulli Beam With End Moment Release",
+      "kind":"type",
+      "trigger":"B21EL"
+    },
+    {
+      "contents":"element B21H ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]} ${6:[6]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# [5] double, normalized length of each end hinge, default: 0.2 \n# [6] bool string, nonlinear geometry switch, default: false",
+      "details":"2D Displacement Based Bernoulli Beam with Lumped End Hinges",
+      "kind":"type",
+      "trigger":"B21H"
+    },
+    {
+      "contents":"element B31 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:[6]} ${7:[7]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# (5) int, orientation tag\n# [6] int, number of integration points, default: 5\n# [7] bool string, nonlinear geometry switch, default: false",
+      "details":"3D Displacement Based Bernoulli Beam",
+      "kind":"type",
+      "trigger":"B31"
+    },
+    {
+      "contents":"element C3D20 ${1:(1)} ${2:(2...21)} ${22:(22)} ${23:[23]} ${24:[24]}\n# (1) int, unique element tag\n# (2...21) int, eight corner nodes with conventional order\n# (22) int, material tag\n# [23] bool string, reduced integration scheme switch, default: true\n# [24] bool string, nonlinear geometry switch, default: false",
+      "details":"Second Order Cube/Brick",
+      "kind":"type",
+      "trigger":"C3D20"
+    },
+    {
+      "contents":"element C3D4 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2...5) int, four corner nodes with conventional order\n# (6) int, material tag\n# [7] bool string, nonlinear geometry switch, default: false",
+      "details":"Linear Tetrahedral",
+      "kind":"type",
+      "trigger":"C3D4"
+    },
+    {
+      "contents":"element C3D8 ${1:(1)} ${2:(2...9)} ${10:(10)} ${11:[11]} ${12:[12]}\n# (1) int, unique element tag\n# (2...9) int, eight corner nodes with conventional order\n# (10) int, material tag\n# [11] string, integration scheme, default: 'I'\n# [12] bool string, nonlinear geometry switch, default: false",
+      "details":"Linear Cube/Brick",
+      "kind":"type",
+      "trigger":"C3D8"
+    },
+    {
+      "contents":"element C3D8I ${1:(1)} ${2:(2...9)} ${10:(10)}\n# (1) int, unique element tag\n# (2...9) int, eight corner nodes with conventional order\n# (10) int, material tag",
+      "details":"Linear Cube/Brick with Incompatible Modes",
+      "kind":"type",
+      "trigger":"C3D8I"
+    },
+    {
+      "contents":"element CAX3 ${1:(1)} ${2:(2...4)} ${5:(5)} ${6:[6]}\n# (1) int, unique element tag\n# (2...4) int, node tags\n# (5) int, material tag\n# [6] bool string, nonlinear geometry switch, default: false",
+      "details":"Axisymmetric Linear Triangle",
+      "kind":"type",
+      "trigger":"CAX3"
+    },
+    {
+      "contents":"element CAX4 ${1:(1)} ${2:(2...5)} ${6:(6)}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag",
+      "details":"Axisymmetric Linear Quadrilateral",
+      "kind":"type",
+      "trigger":"CAX4"
+    },
+    {
+      "contents":"element CAX8 ${1:(1)} ${2:(2...9)} ${10:(10)}\n# (1) int, unique element tag\n# (2...9) int, node tags\n# (10) int, material tag",
+      "details":"Axisymmetric Quadratic Quadrilateral",
+      "kind":"type",
+      "trigger":"CAX8"
+    },
+    {
+      "contents":"element CINP4 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0",
+      "details":"Bilinear Infinite Quadrilateral",
+      "kind":"type",
+      "trigger":"CINP4"
+    },
+    {
+      "contents":"element CP3 ${1:(1)} ${2:(2...4)} ${5:(5)} ${6:[6]} ${7:[7]}\n# (1) int, unique element tag\n# (2...4) int, node i, j, k\n# (5) int, material tag\n# [6] double, element thickness, default: 1.0\n# [7] bool string, nonlinear geometry switch, default: false",
+      "details":"Constant Strain Triangle",
+      "kind":"type",
+      "trigger":"CP3"
+    },
+    {
+      "contents":"element CP4 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]} ${8:[8]} ${9:[9]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0\n# [8] bool string, reduced integration switch, default: false\n# [9] bool string, nonlinear geometry switch, default: false",
+      "details":"Bilinear Quadrilateral",
+      "kind":"type",
+      "trigger":"CP4"
+    },
+    {
+      "contents":"element CP4I ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0",
+      "details":"Bilinear Incompatible Quadrilateral",
+      "kind":"type",
+      "trigger":"CP4I"
+    },
+    {
+      "contents":"element CP5 ${1:(1)} ${2:(2...6)} ${7:(7)} ${8:[8]} ${9:[9]}\n# (1) int, unique element tag\n# (2...6) int, node tags that define the element\n# (7) int, material tag\n# [8] double, element thickness, default: 1.0\n# [9] bool string, nonlinear geometry switch, default: false",
+      "details":"Five-Point Quadrilateral",
+      "kind":"type",
+      "trigger":"CP5"
+    },
+    {
+      "contents":"element CP6 ${1:(1)} ${2:(2...7)} ${8:(8)} ${9:[9]} ${10:[10]}\n# (1) int, unique element tag\n# (2...7) int, node tags that define the element\n# (8) int, material tag\n# [9] double, element thickness, default: 1.0\n# [10] bool string, nonlinear geometry switch, default: false",
+      "details":"Quadratic Triangle",
+      "kind":"type",
+      "trigger":"CP6"
+    },
+    {
+      "contents":"element CP7 ${1:(1)} ${2:(2...8)} ${9:(9)} ${10:[10]} ${11:[11]}\n# (1) int, unique element tag\n# (2...8) int, node tags that define the element\n# (9) int, material tag\n# [10] double, element thickness, default: 1.0\n# [11] bool string, nonlinear geometry switch, default: false",
+      "details":"Seven-Point Quadrilateral",
+      "kind":"type",
+      "trigger":"CP7"
+    },
+    {
+      "contents":"element CP8 ${1:(1)} ${2:(2...9)} ${10:(10)} ${11:[11]} ${12:[12]} ${13:[13]}\n# (1) int, unique element tag\n# (2...9) int, node 1 to node 8\n# (10) int, material tag\n# [11] double, element thickness, default: 1.0\n# [12] bool string, reduced integration switch, default: false\n# [13] bool string, nonlinear geometry switch, default: false",
+      "details":"Second Order Quadrilateral",
+      "kind":"type",
+      "trigger":"CP8"
+    },
+    {
+      "contents":"element Contact2D ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]}\n# (1) int, unique element tag\n# (2) int, master group tag\n# (3) int, slave group tag\n# [4] double, penalty factor",
+      "details":"2D Node${Slave:(Slave)}-Line${Master:(Master)} Contact Element",
+      "kind":"type",
+      "trigger":"Contact2D"
+    },
+    {
+      "contents":"element Contact3D ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]}\n# (1) int, unique element tag\n# (2) int, master group tag\n# (3) int, slave group tag\n# [4] double, penalty factor",
+      "details":"3D Node${Slave:(Slave)}-Triangular Facet${Master:(Master)} Contact Element",
+      "kind":"type",
+      "trigger":"Contact3D"
+    },
+    {
+      "contents":"element DCP3 ${1:(1)} ${2:(2...4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:[8]}\n# (1) int, unique element tag\n# (2...4) int, node i, j, k\n# (5) int, material tag\n# (6) double, characteristic length\n# (7) double, energy release rate\n# [8] double, element thickness, default: 1.0",
+      "details":"Constant Strain Triangle With Crack Phase",
+      "kind":"type",
+      "trigger":"DCP3"
+    },
+    {
+      "contents":"element DCP4 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:[9]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# (7) double, characteristic length\n# (8) double, energy release rate\n# [9] double, element thickness, default: 1.0",
+      "details":"Bilinear Quadrilateral With Crack Phase",
+      "kind":"type",
+      "trigger":"DCP4"
+    },
+    {
+      "contents":"element DKT3 ${1:(1)} ${2:(2...4)} ${5:(5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2...4) int, node i, j, k\n# (5) int, material tag\n# (6) double, thickness\n# [7] int, numer of integration points, default: 3",
+      "details":"DKT Triangle Plate",
+      "kind":"type",
+      "trigger":"DKT3"
+    },
+    {
+      "contents":"element DKT4 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)} ${8:[8]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# (7) double, thickness\n# [8] int, numer of integration points along thickness, default: 3",
+      "details":"DKT Quadrilateral Plate",
+      "kind":"type",
+      "trigger":"DKT4"
+    },
+    {
+      "contents":"element DKTS3 ${1:(1)} ${2:(2...4)} ${5:(5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2...4) int, node i, j, k\n# (5) int, material tag\n# (6) double, thickness\n# [7] int, numer of integration points, default: 3",
+      "details":"DKT Triangle Shell",
+      "kind":"type",
+      "trigger":"DKTS3"
+    },
+    {
+      "contents":"element DKTS4 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)} ${8:[8]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# (7) double, thickness\n# [8] int, numer of integration points, default: 3",
+      "details":"DKT Quadrilateral Shell",
+      "kind":"type",
+      "trigger":"DKTS4"
+    },
+    {
+      "contents":"element Damper01 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, material tag of associated viscosity material",
+      "details":"2D Viscous Damper",
+      "kind":"type",
+      "trigger":"Damper01"
+    },
+    {
+      "contents":"element Damper02 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:[6]} ${7:[7]} ${8:[8]}\n# (1) int, unique tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, damper tag\n# (5) int, spring tag\n# [6] bool string, if to use matrix in iteration, default: true\n# [7] int, the maximum delay number, default: 0\n# [8] double, beta, default: 0.5",
+      "details":"2D Maxwell Model",
+      "kind":"type",
+      "trigger":"Damper02"
+    },
+    {
+      "contents":"element Damper03 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, material tag of associated viscosity material",
+      "details":"3D Viscous Damper",
+      "kind":"type",
+      "trigger":"Damper03"
+    },
+    {
+      "contents":"element Damper04 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:[6]} ${7:[7]} ${8:[8]}\n# (1) int, unique tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, damper tag\n# (5) int, spring tag\n# [6] bool string, if to use matrix in iteration, default: true\n# [7] int, the maximum delay number, default: 0\n# [8] double, beta, default: 0.5",
+      "details":"3D Maxwell Model",
+      "kind":"type",
+      "trigger":"Damper04"
+    },
+    {
+      "contents":"element EB21 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) double, area\n# (5) double, moment inertia\n# (6) int, material tag\n# [7] bool string, nonlinear geometry switch, default: false",
+      "details":"2D Elastic Bernoulli Beam",
+      "kind":"type",
+      "trigger":"EB21"
+    },
+    {
+      "contents":"element Embedded2D ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]}\n# (1) int, unique element tag\n# (2) int, host element tag\n# (3) int, slave node tag\n# [4] double, penalty factor, default: 1E4",
+      "details":"2D Embedded Element",
+      "kind":"type",
+      "trigger":"Embedded2D"
+    },
+    {
+      "contents":"element Embedded3D ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]}\n# (1) int, unique element tag\n# (2) int, host element tag\n# (3) int, slave node tag\n# [4] double, penalty factor, default: 1E4",
+      "details":"3D Embedded Element",
+      "kind":"type",
+      "trigger":"Embedded3D"
+    },
+    {
+      "contents":"element F21 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]} ${6:[6]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# [5] int, number of integration points, default: 6\n# [6] bool string, nonlinear geometry switch, default: false",
+      "details":"2D Force Based Bernoulli Beam",
+      "kind":"type",
+      "trigger":"F21"
+    },
+    {
+      "contents":"element F21H ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]} ${6:[6]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# [5] double, normalized length of each end hinge, default: 0.2 \n# [6] bool string, nonlinear geometry switch, default: false",
+      "details":"2D Force Based Bernoulli Beam With Lumped End Hinges",
+      "kind":"type",
+      "trigger":"F21H"
+    },
+    {
+      "contents":"element F31 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:[6]} ${7:[7]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# (5) int, orientation tag\n# [6] int, number of integration points, default: 5\n# [7] bool string, nonlinear geometry switch, default: false",
+      "details":"3D Displacement Based Bernoulli Beam",
+      "kind":"type",
+      "trigger":"F31"
+    },
+    {
+      "contents":"element GCMQI ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]} ${8:[8]}\nelement GCMQL ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]} ${8:[8]}\nelement GCMQG ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]} ${8:[8]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0",
+      "details":"Generalized Conforming Mixed Quadrilateral With Drilling DoFs",
+      "kind":"type",
+      "trigger":"GCMQ"
+    },
+    {
+      "contents":"element GQ12 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0",
+      "details":"Quadrilateral With Drilling DoFs",
+      "kind":"type",
+      "trigger":"GQ12"
+    },
+    {
+      "contents":"element Joint ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4...)}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4...) int, material tags",
+      "details":"Joint Element",
+      "kind":"type",
+      "trigger":"Joint"
+    },
+    {
+      "contents":"element MVLEM ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} (${6:(6)} ${7:(7)} ${8:(8)} ${9:(9)} ${10:(10)}...)\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, material tag of shear spring\n# (5) double, height of shear spring, ranges from 0 to 1\n# (6) double, fibre width\n# (7) double, fibre thickness\n# (8) double, reinforcement ratio of target fibre\n# (9) int, concrete material ${host:(host)} tag\n# (10) int, steel material tag",
+      "details":"Multiple Vertical Line Element Model",
+      "kind":"type",
+      "trigger":"MVLEM"
+    },
+    {
+      "contents":"element Mindlin ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)} ${8:[8]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# (7) double, thickness\n# [8] int, numer of integration points, default: 5",
+      "details":"Mindlin Plate Element",
+      "kind":"type",
+      "trigger":"Mindlin"
+    },
+    {
+      "contents":"element NMB21 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# [5] bool string, nonlinear geometry switch, default: false",
+      "details":"2D Displacement Based Bernoulli Beam with N-M Interaction Sections",
+      "kind":"type",
+      "trigger":"NMB21"
+    },
+    {
+      "contents":"element NMB21EH ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# [5] bool string, nonlinear geometry switch, default: false",
+      "details":"2D Displacement Based Bernoulli Beam with N-M Interaction Sections and High End Moment Release",
+      "kind":"type",
+      "trigger":"NMB21EH"
+    },
+    {
+      "contents":"element NMB21EL ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# [5] bool string, nonlinear geometry switch, default: false",
+      "details":"2D Displacement Based Bernoulli Beam with N-M Interaction Sections and Low End Moment Release",
+      "kind":"type",
+      "trigger":"NMB21EL"
+    },
+    {
+      "contents":"element NMB31 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:[6]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# (5) int, orientation tag\n# [6] bool string, nonlinear geometry switch, default: false",
+      "details":"3D Displacement Based Bernoulli Beam with N-M Interaction Sections",
+      "kind":"type",
+      "trigger":"NMB31"
+    },
+    {
+      "contents":"element PCPE4DC ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:(9)} ${10:(10)}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, solid material tag\n# (7) int, fluid material tag\n# (8) double, alpha\n# (9) double, porosity n\n# (10) double, permeability k",
+      "details":"Bilinear Quadrilateral With Pore Pressure",
+      "kind":"type",
+      "trigger":"PCPE4DC"
+    },
+    {
+      "contents":"element PS ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0",
+      "details":"Pian-Sumihara Quadrilateral Element",
+      "kind":"type",
+      "trigger":"PS"
+    },
+    {
+      "contents":"element PatchCube ${1:(1)} -node ${2:(2...)} -knotx ${3:(3...)} -knoty ${4:(4...)} -knotz ${5:(5...)} -material ${6:(6)} ${-thickness (7:[-thickness (7)}]\n# (1) int, unique element ${patch:(patch)} tag\n# (2...) int, node tags of control node polygon\n# (3...) double, knot vector along x axis\n# (4...) double, knot vector along y axis\n# (5...) double, knot vector along z axis\n# (6) int, material tag\n# (7) double, thickness",
+      "details":"Patch of Hexahedron Elements",
+      "kind":"type",
+      "trigger":"PatchCube"
+    },
+    {
+      "contents":"element PatchQuad ${1:(1)} -node ${2:(2...)} -knotx ${3:(3...)} -knoty ${4:(4...)} -material ${5:(5)} ${-thickness (6:[-thickness (6)}]\n# (1) int, unique element ${patch:(patch)} tag\n# (2...) int, node tags of control node polygon\n# (3...) double, knot vector along x axis\n# (4...) double, knot vector along y axis\n# (5) int, material tag\n# (6) double, thickness",
+      "details":"Patch of Quadrilateral Elements",
+      "kind":"type",
+      "trigger":"PatchQuad"
+    },
+    {
+      "contents":"element QE2 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0",
+      "details":"Mixed Four-Node Quadrilateral Element",
+      "kind":"type",
+      "trigger":"QE2"
+    },
+    {
+      "contents":"element S4 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# (7) double, thickness",
+      "details":"Four Node Shell Element",
+      "kind":"type",
+      "trigger":"S4"
+    },
+    {
+      "contents":"element SGCMQI ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]} ${8:[8]}\nelement SGCMQL ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]} ${8:[8]}\nelement SGCMQG ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]} ${8:[8]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0",
+      "details":"Generalized Conforming Mixed Quadrilateral With Drilling DoFs",
+      "kind":"type",
+      "trigger":"SGCMQ"
+    },
+    {
+      "contents":"element SGCMS ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# (7) double, thickness",
+      "details":"Simplified Generalized Conforming Mixed Shell Element",
+      "kind":"type",
+      "trigger":"SGCMS"
+    },
+    {
+      "contents":"element SingleSection2D ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique tag\n# (2) int, node tag\n# (3) int, section tag",
+      "details":"2D Single Section",
+      "kind":"type",
+      "trigger":"SingleSection2D"
+    },
+    {
+      "contents":"element SingleSection3D ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique tag\n# (2) int, node tag\n# (3) int, section tag",
+      "details":"3D Single Section",
+      "kind":"type",
+      "trigger":"SingleSection3D"
+    },
+    {
+      "contents":"element Spring01 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, tag of associated material",
+      "details":"",
+      "kind":"type",
+      "trigger":"Spring01"
+    },
+    {
+      "contents":"element Spring02 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, tag of associated material",
+      "details":"",
+      "kind":"type",
+      "trigger":"Spring02"
+    },
+    {
+      "contents":"element T2D2 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:[6]} ${7:[7]} ${8:[8]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, material tag\n# (5) double, cross sectional area\n# [6] bool string, nonlinear geometry switch, default: false\n# [7] bool string, if to update sectional area, default: false\n# [8] bool string, if to use log strain, default: false",
+      "details":"2D Linear Truss",
+      "kind":"type",
+      "trigger":"T2D2"
+    },
+    {
+      "contents":"element T2D2S ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${6:[6]} ${7:[7]} ${8:[8]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# [5] bool string, nonlinear geometry switch, default: false\n# [6] bool string, if to use log strain, default: false",
+      "details":"2D Linear Truss Using Section",
+      "kind":"type",
+      "trigger":"T2D2S"
+    },
+    {
+      "contents":"element T3D2 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:[6]} ${7:[7]} ${8:[8]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, material tag\n# (5) double, cross sectional area\n# [6] bool string, nonlinear geometry switch, default: false\n# [7] bool string, if to update sectional area, default: false\n# [8] bool string, if to use log strain, default: false",
+      "details":"3D Linear Truss",
+      "kind":"type",
+      "trigger":"T3D2"
+    },
+    {
+      "contents":"element T3D2S ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${6:[6]} ${7:[7]} ${8:[8]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# [5] bool string, nonlinear geometry switch, default: false\n# [6] bool string, if to use log strain, default: false",
+      "details":"3D Linear Truss Using Section",
+      "kind":"type",
+      "trigger":"T3D2S"
+    },
+    {
+      "contents":"exit",
+      "details":"Exit/Quit",
+      "kind":"type",
+      "trigger":"exit"
+    },
+    {
+      "contents":"file ${1:(1)}\n# (1) string, file name with or without suffix .sp",
+      "details":"Load external file.",
+      "kind":"type",
+      "trigger":"file"
+    },
+    {
+      "contents":"fullname",
+      "details":"Print full name (including path) of the executable.",
+      "kind":"type",
+      "trigger":"fullname"
+    },
+    {
+      "contents":"import ${1:(1)}\n# (1) string, external module name",
+      "details":"Import External Module",
+      "kind":"type",
+      "trigger":"import"
+    },
+    {
       "contents":"integrator BatheTwoStep ${1:(1)}\n# (1) int, unique integrator tag",
+      "details":"",
       "kind":"type",
-      "details":""
+      "trigger":"BatheTwoStep"
     },
     {
-      "trigger":"GSSSSU0",
-      "contents":"integrator GSSSSU0 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique integrator tag\n# (2-4) double, three spectral radii",
-      "kind":"type",
-      "details":"U0 family scheme for GSSSS"
-    },
-    {
-      "trigger":"GSSSSV0",
-      "contents":"integrator GSSSSV0 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique integrator tag\n# (2-4) double, three spectral radii",
-      "kind":"type",
-      "details":"V0 family scheme for GSSSS"
-    },
-    {
-      "trigger":"GSSSSOptimal",
       "contents":"integrator GSSSSOptimal ${1:(1)} ${2:(2)}\n# (1) int, unique integrator tag\n# (2) double, spectral radius",
+      "details":"Optimal scheme for GSSSS",
       "kind":"type",
-      "details":"Optimal scheme for GSSSS"
+      "trigger":"GSSSSOptimal"
     },
     {
-      "trigger":"GeneralizedAlpha",
+      "contents":"integrator GSSSSU0 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique integrator tag\n# (2-4) double, three spectral radii",
+      "details":"U0 family scheme for GSSSS",
+      "kind":"type",
+      "trigger":"GSSSSU0"
+    },
+    {
+      "contents":"integrator GSSSSV0 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique integrator tag\n# (2-4) double, three spectral radii",
+      "details":"V0 family scheme for GSSSS",
+      "kind":"type",
+      "trigger":"GSSSSV0"
+    },
+    {
       "contents":"integrator GeneralisedAlpha ${1:(1)} ${2:[2]}\n# (1) int, unique tag\n# [2] double, spectral radius at infinite frequency, default: 0.5\n\nintegrator GeneralisedAlpha ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique tag\n# (2) double, \\alpha_f\n# (3) double, \\alpha_m",
+      "details":"",
       "kind":"type",
-      "details":""
+      "trigger":"GeneralisedAlpha"
     },
     {
-      "trigger":"GeneralisedAlpha",
       "contents":"integrator GeneralisedAlpha ${1:(1)} ${2:[2]}\n# (1) int, unique tag\n# [2] double, spectral radius at infinite frequency, default: 0.5\n\nintegrator GeneralisedAlpha ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique tag\n# (2) double, \\alpha_f\n# (3) double, \\alpha_m",
+      "details":"",
       "kind":"type",
-      "details":""
+      "trigger":"GeneralizedAlpha"
     },
     {
-      "trigger":"LeeNewmark",
+      "contents":"integrator LeeElementalNewmark ${1:(1)} ${2:(2)} ${3:(3)} (${4:(4)} ${5:(5)}...)\n# (1) int, unique integrator tag\n# (2) double, alpha\n# (3) double, beta\n# (4) double, damping ratio \\zeta_p at the peak of each mode\n# (5) double, circular frequency\\omega_p at the peak of each mode",
+      "details":"",
+      "kind":"type",
+      "trigger":"LeeElementalNewmark"
+    },
+    {
       "contents":"integrator LeeNewmark ${1:(1)} ${2:(2)} ${3:(3)} (${4:(4)} ${5:(5)}...)\n# (1) int, unique integrator tag\n# (2) double, alpha\n# (3) double, beta\n# (4) double, damping ratio \\zeta_p at the peak of each mode\n# (5) double, circular frequency\\omega_p at the peak of each mode",
+      "details":"",
       "kind":"type",
-      "details":""
+      "trigger":"LeeNewmark"
     },
     {
-      "trigger":"LeeNewmarkFull",
       "contents":"integrator LeeNewmarkFull ${1:(1)} ${2:(2)} ${3:(3)} (${4:(4)} ${5:(5)} ${6:(6)} ${7:[7...]}...)\n# (1) int, unique integrator tag\n# (2) double, alpha in Newmark method\n# (3) double, beta in Newmark method\n# (4) string, type identifier\n# (5) double, \\zeta_p\n# (6) double, \\omega_p\n# (7...) double/int, parameters associated with the mode",
+      "details":"",
       "kind":"type",
-      "details":""
+      "trigger":"LeeNewmarkFull"
     },
     {
-      "trigger":"Newmark",
       "contents":"integrator Newmark ${1:(1)} ${2:[2]} ${3:[3]}\n# (1) int, unique tag\n# [2] double, alpha, default: 0.25\n# [3] double, beta, default: 0.5",
+      "details":"",
       "kind":"type",
-      "details":""
+      "trigger":"Newmark"
     },
     {
-      "trigger":"RayleighNewmark",
       "contents":"integrator RayleighNewmark ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)}\n# (1) int, unique tag\n# (2) double, alpha (beta in some references) in Newmark method, normally 0.25\n# (3) double, beta (gamma in some references) in Newmark method, normally 0.5\n# (4) double, alpha\n# (5) double, beta\n# (6) double, theta\n# (7) double, eta",
+      "details":"",
       "kind":"type",
-      "details":""
+      "trigger":"RayleighNewmark"
     },
     {
-      "trigger":"WilsonPenzienNewmark",
       "contents":"integrator WilsonPenzienNewmark ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4...]}\n# (1) int, unique integrator tag\n# (2) double, alpha in Newmark algorithm\n# (3) double, beta in Newmark algorithm\n# [4...] double, damping ratios on the first n modes",
+      "details":"",
       "kind":"type",
-      "details":""
+      "trigger":"WilsonPenzienNewmark"
+    },
+    {
+      "contents":"material AFC01 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)}\n# (1) int, unique tag\n# (2) double, elastic modulus\n# (3) double, tension yield stress\n# (4) double, tension hardening modulus\n# (5) double, tension unloading modulus\n# (6) double, compression yield stress\n# (7) double, compression hardening modulus\n# (8) double, compression unloading modulus",
+      "details":"Asymmetrical Friction Connection",
+      "kind":"type",
+      "trigger":"AFC01"
+    },
+    {
+      "contents":"material AFC02 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)}\n# (1) int, unique tag\n# (2) double, elastic modulus\n# (3) double, yield stress\n# (4) double, hardening modulus\n# (5) double, unloading modulus",
+      "details":"Symmetrical Friction Connection",
+      "kind":"type",
+      "trigger":"AFC02"
+    },
+    {
+      "contents":"material AFCN ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:[9]} ${10:[10]}\n# (1) int, unique tag\n# (2) double, elastic modulus\n# (3) double, tension yield stress\n# (4) double, tension hardening modulus\n# (5) double, tension unloading modulus\n# (6) double, compression yield stress\n# (7) double, compression hardening modulus\n# (8) double, compression unloading modulus\n# [9] double, non-negative degradation paramater, default: 0.0\n# [10] double, density, default: 0.0",
+      "details":"Nonlinear Version of AFC",
+      "kind":"type",
+      "trigger":"AFCN"
+    },
+    {
+      "contents":"material BWBN ${1:(1)} ${2:[2...18]}\n# (1) int, unique material tag\n# [2] double, elastic modulus, default: 2E5\n# [3] double, yield stress, default: 4E2\n# [4] double, hardening ratio, default: 1E-2\n# [5] double, beta (>0), default: 0.5\n# [6] double, exponent n (>0, normally >=1), default: 1.0\n# [7] double, initial \nu (>0), default: 1.0\n# [8] double, slope of \nu (>0), default: 0.0\n# [9] double, initial eta (>0), default: 1.0\n# [10] double, slope of eta (>0), default: 0.0\n# [11] double, initial phi (>0), default: 1.0\n# [12] double, slope of phi (>0), default: 0.0\n# [13] double, zeta ${1>zeta>0:(1>zeta>0)}, default: 0.0\n# [14] double, slope of A (>0), default: 0.0\n# [15] double, p (>0), default: 0.0\n# [16] double, q (>0), default: 0.0\n# [17] double, lambda (>0), default: 1.0\n# [18] double, density, default: 0.0",
+      "details":"Bouc-Wen-Baber-Noori Model",
+      "kind":"type",
+      "trigger":"BWBN"
+    },
+    {
+      "contents":"material BilinearElastic1D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, yield stress\n# (4) double, hardening modulus\n# [5] double, density, default: 0.0",
+      "details":"Uniaxial Bilinear Elastic Material",
+      "kind":"type",
+      "trigger":"BilinearElastic1D"
+    },
+    {
+      "contents":"material BilinearOO ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:[7]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, tension yield strain\n# (4) double, tension hardening ratio\n# (5) double, compression yield strain\n# (6) double, compression hardening ratio\n# [7] double, density, default: 0.0",
+      "details":"Bilinear Origin Oriented Model",
+      "kind":"type",
+      "trigger":"BilinearOO"
+    },
+    {
+      "contents":"material BilinearPO ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:[7]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, tension yield strain\n# (4) double, tension hardening ratio\n# (5) double, compression yield strain\n# (6) double, compression hardening ratio\n# [7] double, density, default: 0.0",
+      "details":"Bilinear Peak Oriented Model",
+      "kind":"type",
+      "trigger":"BilinearPO"
+    },
+    {
+      "contents":"material BoucWen ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, yield stress\n# (4) double, hardening ratio\n# (5) double, beta, a positive parameter\n# (6) double, n, a positive exponent",
+      "details":"Bouc-Wen Model",
+      "kind":"type",
+      "trigger":"BouncWen"
+    },
+    {
+      "contents":"material ConcreteCM ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:[7]} ${8:[8]} ${9:[9]} ${10:[10]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, compression strength, should be negative but sign insensitive\n# (4) double, tension strength, should be positive but sign insensitive\n# (5) double, NC\n# (6) double, NT\n# [7] double, strain at compression strength, default: -2E-3\n# [8] double, strain at tension strength, default: 1E-4\n# [9] bool string, linear transition switch, default: false\n# [10] double, density, default: 0.0",
+      "details":"Chang-Mander Concrete Model",
+      "kind":"type",
+      "trigger":"ConcreteCM"
+    },
+    {
+      "contents":"material ConcreteExp ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:[9]} ${10:[10]}\n# (1) int, unique tag\n# (2) double, elastic modulus\n# (3) double, f_t\n# (4) double, a_t\n# (5) double, g_t\n# (6) double, f_{c,m}\n# (7) double, a_c\n# (8) double, g_c\n# [9] double, middle point, default: 0.2\n# [10] double, density, default: 0.0",
+      "details":"Objective Concrete Model",
+      "kind":"type",
+      "trigger":"ConcreteExp"
+    },
+    {
+      "contents":"material ConcreteTsai ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:[8]} ${9:[9]} ${10:[10]} ${11:[11]}\n# (1) int, unique material tag\n# (2) double, compression strength, should be negative but sign insensitive\n# (3) double, tension strength, should be positive but sign insensitive\n# (4) double, MC\n# (5) double, NC\n# (6) double, MT\n# (7) double, NT\n# [8] double, strain at compression strength, default: -2E-3\n# [9] double, strain at tension strength, default: 1E-4\n# [10] double, middle point, default: 0.2\n# [11] double, density, default: 0.0",
+      "details":"Uniaxial Concrete Model Using Tsai's Equation",
+      "kind":"type",
+      "trigger":"ConcreteTsai"
+    },
+    {
+      "contents":"material Elastic1D ${1:(1)} ${2:(2)} ${3:[3]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# [3] double, density, default: 0.0",
+      "details":"Uniaxial Elastic Material",
+      "kind":"type",
+      "trigger":"Elastic1D"
+    },
+    {
+      "contents":"material Flag01 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, yield stress, positive\n# (4) double, residual stress, can be either positive or negative\n# (5) double, hardening ratio",
+      "details":"",
+      "kind":"type",
+      "trigger":"Flag01"
+    },
+    {
+      "contents":"material MPF ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]} ${5:[5]} ${6:[6]} ${7:[7]} ${8:[8]} ${9:[9]} ${10:[10]} ${11:[11]} ${12:[12]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, initial yield stress\n# [4] double, hardening ratio, default: 0.05\n# [5] double, R0, default: 20.0\n# [6] double, A1, default: 18.5\n# [7] double, A2, default: 0.15\n# [8] double, A3, default: 0.01\n# [9] double, A4, default: 7.0\n# [10] bool string, isotropic hardening switch, default: false\n# [11] bool string, constant radius switch, default: false\n# [12] double, density, default: 0.0",
+      "details":"Menegotto-Pinto-Filippou Steel Model",
+      "kind":"type",
+      "trigger":"MPF"
+    },
+    {
+      "contents":"material MultilinearElastic1D ${1:(1)} ${2:(2 3...)} ${4:[4]}\n# (1) int, unique material tag\n# (2) double, strain of the data point\n# (3) double, stress of the data point\n# [4] double, density, default: 0.0",
+      "details":"Uniaxial Multilinear Elastic Material",
+      "kind":"type",
+      "trigger":"MultilinearElastic1D"
+    },
+    {
+      "contents":"material MultilinearOO ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]}\n# (1) int, unique material tag\n# (2) string, file name of tension backbone\n# (3) string, file name of compression backbone\n# [4] double, density, default: 0.0",
+      "details":"Multilinear Origin Oriented Hysteresis Model",
+      "kind":"type",
+      "trigger":"MultilinearOO"
+    },
+    {
+      "contents":"material NLE1D01 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]} ${6:[6]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, turning stress\n# (4) double, hardening ratio\n# [5] double, radius of transition, default: 20\n# [6] double, density, default: 0.0",
+      "details":"Nonlinear Elastic 1D Type 01",
+      "kind":"type",
+      "trigger":"NLE1D01"
+    },
+    {
+      "contents":"material PolyElastic1D ${1:(1)} [${2:(2)}...]\n# (1) int, unique material tag\n# (2) double, polynomial parameters, a_n",
+      "details":"Polynomial Based Uniaxial Nonlinear Elastic",
+      "kind":"type",
+      "trigger":"PolyElastic1D"
+    },
+    {
+      "contents":"material RambergOsgood ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, initial yield stress\n# [4] double, offset alpha, default: 1.0\n# [5] double, n, default: 4.0\n# [6] double, density, default: 0.0",
+      "details":"Ramberg-Osgood Steel Model",
+      "kind":"type",
+      "trigger":"RambergOsgood"
+    },
+    {
+      "contents":"material SlipLock ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]} ${6:[6]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, initial yield strain\n# (4) double, hardening ratio\n# [5] double, radius, default: 20.0\n# [6] double, density, default: 0.0",
+      "details":"Slip-Lock Material",
+      "kind":"type",
+      "trigger":"SlipLock"
+    },
+    {
+      "contents":"material SteelBRB ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:(9)} ${10:(10)} ${11:[11]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, yield stress\n# (4) double, plastic modulus\n# (5) double, tension saturated stress\n# (6) double, tension delta_r\n# (7) double, tension alpha\n# (8) double, compression saturated stress\n# (9) double, compression delta_r\n# (10) double, compression alpha\n# [11] double, density, default: 0.0",
+      "details":"Steel Model For Modelling BRB",
+      "kind":"type",
+      "trigger":"SteelBRB"
+    },
+    {
+      "contents":"node ${1:(1)} ${2:(2...)}\n# (1) integer, unique node tag\n# (2...) double, coordinates",
+      "details":"Define Node",
+      "kind":"type",
+      "trigger":"node"
+    },
+    {
+      "contents":"node ${1:(1)} ${2:[2...]}\n# (1) int, unique tag\n# [2...] double, coordinates",
+      "kind":"keyword",
+      "trigger":"node"
+    },
+    {
+      "contents":"orientation ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)}\n# (1) int, unique orientation tag\n# (2) string, orientation type\n# (3) double, x component of local z axis\n# (4) double, y component of local z axis\n# (5) double, z component of local z axis",
+      "details":"Section Orientation For 3D Beams",
+      "kind":"type",
+      "trigger":"Orientation"
+    },
+    {
+      "contents":"peek ${1:(1)} ${2:(2...)}\n# (1) string, object type\n# (2...) integer, tags",
+      "details":"Quick Check",
+      "kind":"type",
+      "trigger":"peek"
+    },
+    {
+      "contents":"precheck",
+      "details":"Dry-run analysis",
+      "kind":"type",
+      "trigger":"precheck"
+    },
+    {
+      "contents":"pwd ${1:[1]}\n# [1] string, path name",
+      "details":"Print or change current working folder.",
+      "kind":"type",
+      "trigger":"pwd"
+    },
+    {
+      "contents":"quit",
+      "details":"Exit/Quit",
+      "kind":"type",
+      "trigger":"quit"
+    },
+    {
+      "contents":"reset",
+      "details":"Reset Domain",
+      "kind":"type",
+      "trigger":"reset"
+    },
+    {
+      "contents":"response_spectrum ${1:(motion_file_name)} ${2:(period_file_name)} ${3:[interval]} ${4:(damping_ratio)}",
+      "details":"Compute response spectrum of a target ground motion over given periods.",
+      "kind":"type",
+      "trigger":"response_spectrum"
+    },
+    {
+      "contents":"save recorder ${1:(1...)}\n# (1...) integer, tags of recorders need to be saved",
+      "details":"Save recorded data to disk",
+      "kind":"type",
+      "trigger":"save"
+    },
+    {
+      "contents":"sdof_response ${1:(motion_file_name)} ${2:[interval]} ${3:(natural_frequency)} ${4:(damping_ratio)}",
+      "details":"Perform response history analysis on a SDOF system with target natural frequency and damping ratio.",
+      "kind":"type",
+      "trigger":"sdof_response"
+    },
+    {
+      "contents":"section Bar2D ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]}\n# (1) int, unique section tag\n# (2) double, area\n# (3) int, material tag\n# [4] double, eccentricity, default: 0.0",
+      "details":"2D Reinforcing Bar Section",
+      "kind":"type",
+      "trigger":"Bar2D"
+    },
+    {
+      "contents":"section Bar3D ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]} ${5:[5]}\n# (1) int, unique section tag\n# (2) double, area\n# (3) int, material tag\n# [4] double, eccentricity along y axis, default: 0.0\n# [5] double, eccentricity along z axis, default: 0.0",
+      "details":"3D Reinforcing Bar Section",
+      "kind":"type",
+      "trigger":"Bar3D"
+    },
+    {
+      "contents":"section Box2D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:[6]} ${7:[7]}\n# (1) int, unique section tag\n# (2) double, width\n# (3) double, height\n# (4) double, thickness\n# (5) int, material tag\n# [6] int, number of integration points, default: 6\n# [7] double, eccentricity, default: 0.0",
+      "details":"2D Box Section",
+      "kind":"type",
+      "trigger":"Box2D"
+    },
+    {
+      "contents":"section Box3D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:[6]} ${7:[7]} ${8:[8]}\n# (1) int, unique section tag\n# (2) double, width\n# (3) double, height\n# (4) double, thickness\n# (5) int, material tag\n# [6] int, number of integration points, default: 3\n# [7] double, eccentricity along y axis, default: 0.0\n# [8] double, eccentricity along z axis, default: 0.0",
+      "details":"3D Box Section",
+      "kind":"type",
+      "trigger":"Box3D"
+    },
+    {
+      "contents":"section Circle1D ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique section tag\n# (2) double, radius\n# (3) int, material tag",
+      "details":"1D Circle Section",
+      "kind":"type",
+      "trigger":"Circle1D"
+    },
+    {
+      "contents":"section Circle2D ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]} ${5:[5]}\n# (1) int, unique section tag\n# (2) double, radius\n# (3) int, material tag\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0",
+      "details":"2D Circle Section",
+      "kind":"type",
+      "trigger":"Circle2D"
+    },
+    {
+      "contents":"section Circle3D ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique section tag\n# (2) double, radius\n# (3) int, material tag\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity along y axis, default: 0.0\n# [6] double, eccentricity along z axis, default: 0.0",
+      "details":"3D Circle Section",
+      "kind":"type",
+      "trigger":"Circle3D"
+    },
+    {
+      "contents":"section CircularHollow2D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]} ${6:[6]}\n# (1) int, unique section tag\n# (2) double, radius\n# (3) double, thickness\n# (4) int, material tag\n# [5] int, number of integration points, default: 10\n# [6] double, eccentricity, default: 0.0",
+      "details":"2D Hollow Circular Section",
+      "kind":"type",
+      "trigger":"CircularHollow2D"
+    },
+    {
+      "contents":"section CircularHollow3D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]} ${6:[6]} ${7:[7]}\n# (1) int, unique section tag\n# (2) double, radius\n# (3) double, thickness\n# (4) int, material tag\n# [5] int, number of integration points, default: 10\n# [6] double, eccentricity along y axis, default: 0.0\n# [7] double, eccentricity along z axis, default: 0.0",
+      "details":"3D Hollow Circle Section",
+      "kind":"type",
+      "trigger":"CircleHollow3D"
+    },
+    {
+      "contents":"section Fibre1D ${1:(1)} [${2:(2)}...]\n# (1) int, unique section tag\n# [(2)...] int, associated section tags",
+      "details":"1D Fibre Section",
+      "kind":"type",
+      "trigger":"Fibre1D"
+    },
+    {
+      "contents":"section Fibre2D ${1:(1)} [${2:(2)}...]\n# (1) int, unique section tag\n# [(2)...] int, associated section tags",
+      "details":"2D Fibre Section",
+      "kind":"type",
+      "trigger":"Fibre2D"
+    },
+    {
+      "contents":"section Fibre3D ${1:(1)} [${2:(2)}...]\n# (1) int, unique section tag\n# [(2)...] int, associated section tags",
+      "details":"3D Fibre Section",
+      "kind":"type",
+      "trigger":"Fibre3D"
+    },
+    {
+      "contents":"section HSection2D ${1:(1)} ${2:(2...7)} ${8:(8)} ${9:[9]} ${10:[10]}\n# (1) int, unique tag\n# (2...7) double, section dimensions\n# (8) int, material tag\n# [9] int, number of integration points, default: 6\n# [10] double, eccentricity measured from the centre, default: 0.0",
+      "details":"2D H-Section",
+      "kind":"type",
+      "trigger":"HSection2D"
+    },
+    {
+      "contents":"section ISection2D ${1:(1)} ${2:(2...7)} ${8:(8)} ${9:[9]} ${10:[10]}\n# (1) int, unique tag\n# (2...7) double, section dimensions\n# (8) int, material tag\n# [9] int, number of integration points, default: 6\n# [10] double, eccentricity measured from the centre, default: 0.0",
+      "details":"2D I-Section",
+      "kind":"type",
+      "trigger":"ISection2D"
+    },
+    {
+      "contents":"section ISection3D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:[9]} ${10:[10]} ${11:[11]}\n# (1) int, unique section tag\n# (2) double, top flange width\n# (3) double, top flange thickness\n# (4) double, bottom flange width\n# (5) double, bottom flange thickness\n# (6) double, web height\n# (7) double, web thickness\n# (8) int, material tag\n# [9] int, number of integration points, default: 3\n# [10] double, eccentricity along y axis, default: 0.0\n# [11] double, eccentricity along z axis, default: 0.0",
+      "details":"3D I-Section",
+      "kind":"type",
+      "trigger":"ISection3D"
+    },
+    {
+      "contents":"section NM2D1 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique section tag\n# (2) double, EA\n# (3) double, EI\n# (4) double, linear density",
+      "details":"N-M Interaction Elastic Section",
+      "kind":"type",
+      "trigger":"NM2D1"
+    },
+    {
+      "contents":"section NM2D2 ${1:(1)} ${2:(2...9)} [${10:(10)} ${11:(11)} ${12:(12)}...]\n# (1) int, unique section tag\n# (2) double, EA\n# (3) double, EI\n# (4) double, yielding axial force\n# (5) double, yielding strong axis moment\n# (6) double, d\n# (7) double, isotropic hardening parameter H\n# (8) double, kinematic hardening parameter K\n# (9) double, linear density\n# (10) double, a_i\n# (11) double, b_i\n# (12) double, c_i",
+      "details":"N-M Interaction Elastic Section",
+      "kind":"type",
+      "trigger":"NM2D2"
+    },
+    {
+      "contents":"section NM3D1 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique section tag\n# (2) double, EA\n# (3) double, EI of strong axis\n# (4) double, EI of weak axis\n# (5) double, linear density",
+      "details":"N-M Interaction Elastic Section",
+      "kind":"type",
+      "trigger":"NM3D1"
+    },
+    {
+      "contents":"section NM3D2 ${1:(1)} ${2:(2...11)}\n# (1) int, unique section tag\n# (2) double, EA\n# (3) double, strong axis EI\n# (4) double, weak axis EI\n# (5) double, yielding axial force\n# (6) double, yielding strong axis moment\n# (7) double, yielding weak axis moment\n# (8) double, c\n# (9) double, isotropic hardening parameter H\n# (10) double, kinematic hardening parameter K\n# (11) double, linear density",
+      "details":"N-M Interaction Elastic Section",
+      "kind":"type",
+      "trigger":"NM3D2"
+    },
+    {
+      "contents":"section Rectangle1D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique section tag\n# (2) double, section width\n# (3) double, section height\n# (4) int, material tag",
+      "details":"1D Rectangle Section",
+      "kind":"type",
+      "trigger":"Rectangle1D"
+    },
+    {
+      "contents":"section Rectangle2D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) double, section width\n# (3) double, section height\n# (4) int, material tag\n# [5] int, number of integration points, default: 6\n# [6] double, eccentricity measured from the centre, default: 0.0",
+      "details":"2D Rectangle Section",
+      "kind":"type",
+      "trigger":"Rectangle2D"
+    },
+    {
+      "contents":"section Rectangle3D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]} ${6:[6]} ${7:[7]}\n# (1) int, unique section tag\n# (2) double, section width\n# (3) double, section height\n# (4) int, material tag\n# [5] int, number of integration points, default: 3\n# [6] double, eccentricity along y axis, default: 0.0\n# [7] double, eccentricity along z axis, default: 0.0",
+      "details":"3D Rectangle Section",
+      "kind":"type",
+      "trigger":"Rectangle3D"
+    },
+    {
+      "contents":"section TSection2D ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]} ${8:[8]}\n# (1) int, unique tag\n# (2...5) double, section dimensions\n# (6) int, material tag\n# [7] int, number of integration points, default: 6\n# [8] double, eccentricity measured from the centre, default: 0.0",
+      "details":"2D T-Section",
+      "kind":"type",
+      "trigger":"TSection2D"
+    },
+    {
+      "contents":"section TSection3D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:[7]} ${8:[8]} ${9:[9]}\n# (1) int, unique section tag\n# (2) double, top flange width\n# (3) double, top flange thickness\n# (4) double, web height\n# (5) double, web thickness\n# (6) int, material tag\n# [7] int, number of integration points, default: 3\n# [8] double, eccentricity along y axis, default: 0.0\n# [9] double, eccentricity along z axis, default: 0.0",
+      "details":"3D T-Section",
+      "kind":"type",
+      "trigger":"TSection3D"
+    },
+    {
+      "contents":"section TrussSection ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique section tag\n# (2) double, section area\n# (3) int, material tag",
+      "details":"1D Truss Section",
+      "kind":"type",
+      "trigger":"TrussSection"
+    },
+    {
+      "contents":"set band_mat ${1:(1)}\n# (1) bool, true of false",
+      "details":"Enable/Disable Banded Storage",
+      "kind":"type",
+      "trigger":"band_mat"
+    },
+    {
+      "contents":"set color_model ${1:(1)}\n# (1) string, color algorithm, one of WP, MIS and false",
+      "details":"Set Coloring Algorithm",
+      "kind":"type",
+      "trigger":"color_model"
+    },
+    {
+      "contents":"set constraint_multiplier ${1:(1)}\n# (1) double, multiplier",
+      "details":"Set Multiplier for Constraint",
+      "kind":"type",
+      "trigger":"constraint_multiplier"
+    },
+    {
+      "contents":"set fixed_step_size ${1:(1)}\n# (1) bool, true or false",
+      "details":"Set if to use fixed step size or allow automatic adjustment.",
+      "kind":"type",
+      "trigger":"fixed_step_size"
+    },
+    {
+      "contents":"set ini_step_size ${1:(1)}\n# (1) double, step size",
+      "details":"Set Initial Step Size",
+      "kind":"type",
+      "trigger":"ini_step_size"
+    },
+    {
+      "contents":"set iterative_refinement ${1:(1)}\n# (1) integer, number of refinement steps",
+      "details":"Set Iterative Refinement Number",
+      "kind":"type",
+      "trigger":"iterative_refinement"
+    },
+    {
+      "contents":"set load_multiplier ${1:(1)}\n# (1) double, multiplier",
+      "details":"Set Multiplier for Load",
+      "kind":"type",
+      "trigger":"load_multiplier"
+    },
+    {
+      "contents":"set max_iteration ${1:(1)}\n# (1) integer, number of iterations",
+      "details":"Set Maximum Iteration",
+      "kind":"type",
+      "trigger":"max_iteration"
+    },
+    {
+      "contents":"set max_step_size ${1:(1)}\n# (1) double, step size",
+      "details":"Set Maximum Step Size",
+      "kind":"type",
+      "trigger":"max_step_size"
+    },
+    {
+      "contents":"set min_step_size ${1:(1)}\n# (1) double, step size",
+      "details":"Set Minimum Step Size",
+      "kind":"type",
+      "trigger":"min_step_size"
+    },
+    {
+      "contents":"set num_threads ${1:(1)}\n# (1) integer, thread number",
+      "details":"Set Number of Threads Used by OpenMP",
+      "kind":"type",
+      "trigger":"num_threads"
+    },
+    {
+      "contents":"set precision ${1:(1)}\n# (1) string, preconditioner type, full or mixed",
+      "details":"Set Solving Precision",
+      "kind":"type",
+      "trigger":"precision"
+    },
+    {
+      "contents":"set preconditioner ${1:(1)}\n# (1) string, preconditioner type, one of Jacobi, ILU and None",
+      "details":"Set Preconditioner Algorithm",
+      "kind":"type",
+      "trigger":"preconditioner"
+    },
+    {
+      "contents":"set symm_mat ${1:(1)}\n# (1) bool, true of false",
+      "details":"Enable/Disable Symmetric Storage",
+      "kind":"type",
+      "trigger":"symm_mat"
+    },
+    {
+      "contents":"set system_solver BICGSTAB",
+      "details":"Use BICGSTAB Solver",
+      "kind":"type",
+      "trigger":"BICGSTAB"
+    },
+    {
+      "contents":"set system_solver CUDA",
+      "details":"Use CUDA Solver",
+      "kind":"type",
+      "trigger":"CUDA"
+    },
+    {
+      "contents":"set system_solver FGMRES",
+      "details":"Use FGMRES Solver",
+      "kind":"type",
+      "trigger":"FGMRES"
+    },
+    {
+      "contents":"set system_solver GMRES",
+      "details":"Use GMRES Solver",
+      "kind":"type",
+      "trigger":"GMRES"
+    },
+    {
+      "contents":"set system_solver LAPACK",
+      "details":"Use LAPACK Solver",
+      "kind":"type",
+      "trigger":"LAPACK"
+    },
+    {
+      "contents":"set system_solver MUMPS",
+      "details":"Use MUMPS Solver",
+      "kind":"type",
+      "trigger":"MUMPS"
+    },
+    {
+      "contents":"set system_solver PARDISO",
+      "details":"Use PARDISO Solver",
+      "kind":"type",
+      "trigger":"PARDISO"
+    },
+    {
+      "contents":"set system_solver Spike",
+      "details":"Use Spike Solver",
+      "kind":"type",
+      "trigger":"Spike"
+    },
+    {
+      "contents":"set system_solver SuperLU",
+      "details":"Use SuperLU Solver",
+      "kind":"type",
+      "trigger":"SuperLU"
+    },
+    {
+      "contents":"upsampling ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) string, file name\n# (2) integer, upsampling ratio\n# (3) string, window type, one of Hamming, Hann, Blackman, BlackmanNuttall, BlackmanHarris and FlatTop",
+      "details":"Upsample a given ground motion using a specific window type.",
+      "kind":"type",
+      "trigger":"upsampling"
     }
+  ],
+  "scope":[
+    "source.supan"
   ]
 }

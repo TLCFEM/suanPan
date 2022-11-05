@@ -8,6 +8,7 @@
 [![release](https://img.shields.io/github/release-pre/TLCFEM/suanPan.svg?color=44cc11)](https://github.com/TLCFEM/suanPan/releases)
 [![suanpan](https://snapcraft.io//suanpan/badge.svg)](https://snapcraft.io/suanpan)
 [![Chocolatey](https://img.shields.io/chocolatey/v/suanpan?color=44cc11)](https://chocolatey.org/packages/suanpan)
+[![Chocolatey](https://img.shields.io/chocolatey/dt/suanpan?color=44cc11&label=choco%20install)](https://chocolatey.org/packages/suanpan)
 [![download](https://img.shields.io/github/downloads/TLCFEM/suanPan/total.svg?color=44cc11)](https://img.shields.io/github/downloads/TLCFEM/suanPan/total.svg?color=44cc11)
 [![stable build](https://github.com/TLCFEM/suanPan/workflows/Stable%20Release/badge.svg?branch=master)](https://github.com/TLCFEM/suanPan/actions)
 [![AppVeyor](https://img.shields.io/appveyor/ci/TLCFEM/suanPan/master.svg?label=master&logo=appveyor)](https://ci.appveyor.com/project/TLCFEM/suanpan/branch/master)
@@ -35,7 +36,7 @@ as [ABAQUS UNIFIED FEA](https://www.3ds.com/products-services/simulia/products/a
 and [OpenSees](http://opensees.berkeley.edu/).
 
 Please check documentation [here](https://tlcfem.gitbook.io/suanpan-manual/) and [here](http://suanpan-manual.rtfd.io/)
-for command references. Please consider star ⭐ the project!
+for command references. Please consider starring ⭐ the project!
 
 ## Features
 
@@ -115,6 +116,10 @@ MKL for linear algebra.
 
 [![asciicast](https://asciinema.org/a/491330.svg)](https://asciinema.org/a/491330)
 
+Alternatively, download the RPM (Fedora 35) or DEB (Ubuntu 22.04) package from the release page. The packages may not be
+compatible with older distributions (due to different version of `libstdc++`). It is also possible to compile the
+package via docker, check the dockerfiles under the `Script` folder, for any questions please open an issue.
+
 ### Other Platforms
 
 Precompiled binaries are provided via CI/CD on MacOS, Windows and Ubuntu. Please download the file from
@@ -130,12 +135,12 @@ A few flavors are available:
 Advanced users can compile the program from source by themselves in order to enable GPU based solvers which require
 available [CUDA](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) library.
 
-Since CI/CD uses `GCC 10.3.0` (on Linux) and `Clang 13.0.1` (on MacOS), it may be required to update/install
-proper `libstdc++` (or `libc++`) version. The easiest way is to install the same compiler. For example, on Ubuntu,
+Since CI/CD uses `GCC 11` (on Linux) and `Clang 13.0.1` (on MacOS), it may be required to update/install
+proper `libstdc++` (or `libc++`) version. The easiest way is to install the same compiler. For example, on Ubuntu 22.04,
 
 ```bash
 # Ubuntu
-sudo apt install gcc-10 g++-10 gfortran-10 libomp5
+sudo apt install gcc g++ gfortran libomp5
 ```
 
 For VTK enabled versions, it may be necessary to install OpenGL.
@@ -173,15 +178,15 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**FEAST**](http://www.feast-solver.org/) version 4.0
 - [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 5.3.0 and [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 3.1
 - [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.15
-- [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2021.5.0
+- [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2021.7.0
 - [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 1.10.6
 - [**MUMPS**](http://mumps.enseeiht.fr/) version 5.2.1
 - [**METIS**](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview) version 5.1.0
-- [**VTK**](https://vtk.org/) version 9.1
+- [**VTK**](https://vtk.org/) version 9.2.2
 - [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 11.7
 - [**Armadillo**](http://arma.sourceforge.net/) version 11.0
 - [**ensmallen**](https://ensmallen.org/) version 2.19.0
-- [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2022.1.0
+- [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2022.2.0
 - [**Catch2**](https://github.com/catchorg/Catch2) version 2.13.9
 - **thread_pool** abridged version of [`thread-pool`](https://github.com/bshoshany/thread-pool)
 

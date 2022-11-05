@@ -1,0 +1,11 @@
+# TEST UPSAMLING
+
+upsampling EZ 2
+upsampling EZ 2 Hamming
+upsampling EZ 2 Hann
+upsampling EZ 2 Blackman
+upsampling EZ 2 BlackmanNuttall
+upsampling EZ 2 BlackmanHarris
+upsampling EZ 2 FlatTop
+
+exit

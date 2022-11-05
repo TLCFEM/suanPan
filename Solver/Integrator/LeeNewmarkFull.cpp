@@ -56,7 +56,11 @@ uword LeeNewmarkFull::get_total_size() const {
 }
 
 void LeeNewmarkFull::update_stiffness() const {
-    if(build_graph) access::rw(graph).set_size(get_total_size() / n_block, get_total_size() / n_block);
+    if(build_graph) {
+        const auto t_size = get_total_size() / n_block;
+        access::rw(stiffness_graph).set_size(t_size, t_size);
+        access::rw(mass_graph).set_size(t_size, t_size);
+    }
 
     auto IDX = n_block;
 
@@ -97,13 +101,21 @@ void LeeNewmarkFull::update_residual() const {
     fc.get();
 }
 
-void LeeNewmarkFull::assemble_mass(const uword row_shift, const uword col_shift, const double scalar) const { assemble(current_mass, row_shift, col_shift, scalar); }
+void LeeNewmarkFull::assemble_mass(const uword row_shift, const uword col_shift, const double scalar) const { assemble(access::rw(mass_graph), current_mass, row_shift, col_shift, scalar); }
 
-void LeeNewmarkFull::assemble_stiffness(const uword row_shift, const uword col_shift, const double scalar) const { assemble(current_stiffness, row_shift, col_shift, scalar); }
+void LeeNewmarkFull::assemble_stiffness(const uword row_shift, const uword col_shift, const double scalar) const { assemble(access::rw(stiffness_graph), current_stiffness, row_shift, col_shift, scalar); }
 
-void LeeNewmarkFull::assemble_mass(const std::vector<uword>& row_shift, const std::vector<uword>& col_shift, const std::vector<double>& scalar) const { assemble(current_mass, row_shift, col_shift, scalar); }
+void LeeNewmarkFull::assemble_mass(const std::vector<uword>& row_shift, const std::vector<uword>& col_shift, const std::vector<double>& scalar) const {
+    suanpan_debug([&] { if(scalar.size() != row_shift.size() || scalar.size() != col_shift.size()) throw invalid_argument("size mismatch detected"); });
 
-void LeeNewmarkFull::assemble_stiffness(const std::vector<uword>& row_shift, const std::vector<uword>& col_shift, const std::vector<double>& scalar) const { assemble(current_stiffness, row_shift, col_shift, scalar); }
+    for(decltype(scalar.size()) I = 0; I < scalar.size(); ++I) assemble_mass(row_shift[I], col_shift[I], scalar[I]);
+}
+
+void LeeNewmarkFull::assemble_stiffness(const std::vector<uword>& row_shift, const std::vector<uword>& col_shift, const std::vector<double>& scalar) const {
+    suanpan_debug([&] { if(scalar.size() != row_shift.size() || scalar.size() != col_shift.size()) throw invalid_argument("size mismatch detected"); });
+
+    for(decltype(scalar.size()) I = 0; I < scalar.size(); ++I) assemble_stiffness(row_shift[I], col_shift[I], scalar[I]);
+}
 
 void LeeNewmarkFull::formulate_block(uword& current_pos, const double m_coef, const double s_coef, int order) const {
     auto I = current_pos;

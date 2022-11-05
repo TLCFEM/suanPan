@@ -51,4 +51,6 @@ peek node 2
 
 peek integrator 1
 
+peek amplitude 1
+
 exit

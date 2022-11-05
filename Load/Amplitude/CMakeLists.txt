@@ -9,5 +9,6 @@ target_sources(${PROJECT_NAME} PRIVATE
         Ramp.cpp
         Sine.cpp
         Tabular.cpp
+        TabularSpline.cpp
         NZStrongMotion.cpp
         )

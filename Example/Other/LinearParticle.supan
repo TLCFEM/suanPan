@@ -1,0 +1,27 @@
+node 1 -1 0
+mass 1 1 100 1 2
+
+node 2 1 0
+mass 2 2 100 1 2
+
+hdf5recorder 1 Global KE
+# hdf5recorder 2 Visualisation U every 20 width 4
+
+constraint linearspring2d 1 3. 10.
+
+modifier LinearViscosity 1 1E1
+
+step dynamic 1 200
+set ini_step_size 1E-2
+set fixed_step_size 1
+set band_mat false
+set symm_mat false
+
+converger AbsIncreDisp 1 1E-11 10 1
+
+analyze
+
+save recorder 1
+
+exit
+

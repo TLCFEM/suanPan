@@ -79,6 +79,25 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
 
             if(domain->insert(make_shared<LeeNewmark>(tag, damping_coef, frequency, alpha, beta))) code = 1;
         }
+        else if(is_equal(integrator_type, "LeeElementalNewmark")) {
+            vector<double> damping_coef, frequency;
+
+            while(!command.eof()) {
+                double t_para;
+                if(!get_input(command, t_para)) {
+                    suanpan_error("create_new_integrator() needs a valid damping coefficient.\n");
+                    return SUANPAN_SUCCESS;
+                }
+                damping_coef.emplace_back(t_para);
+                if(!get_input(command, t_para)) {
+                    suanpan_error("create_new_integrator() needs a valid frequency.\n");
+                    return SUANPAN_SUCCESS;
+                }
+                frequency.emplace_back(t_para);
+            }
+
+            if(domain->insert(make_shared<LeeElementalNewmark>(tag, damping_coef, frequency, alpha, beta))) code = 1;
+        }
         else if(integrator_type.size() >= 14 && is_equal(integrator_type.substr(0, 14), "LeeNewmarkFull")) {
             vector<LeeNewmarkFull::Mode> modes;
 

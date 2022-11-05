@@ -161,12 +161,12 @@ void Integrator::update_trial_load_factor(const double lambda) { update_trial_lo
 
 void Integrator::update_trial_load_factor(const vec& lambda) {
     const auto& W = get_domain().lock()->get_factory();
-    W->update_trial_load_factor(W->get_trial_load_factor() + lambda);
+    W->update_trial_load_factor_by(lambda);
 }
 
 void Integrator::update_trial_displacement(const vec& ninja) {
     const auto& W = get_domain().lock()->get_factory();
-    W->update_trial_displacement(W->get_trial_displacement() + ninja);
+    W->update_trial_displacement_by(ninja);
 }
 
 void Integrator::update_trial_time(const double T) {

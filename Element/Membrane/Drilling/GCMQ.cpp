@@ -305,8 +305,6 @@ vector<vec> GCMQ::record(const OutputType T) {
     else if(T == OutputType::AXIAL) data.emplace_back(vec{edge[0].F(current_alpha), edge[1].F(current_alpha), edge[2].F(current_alpha), edge[3].F(current_alpha)});
     else if(T == OutputType::SHEAR) data.emplace_back(vec{edge[0].V(current_alpha), edge[1].V(current_alpha), edge[2].V(current_alpha), edge[3].V(current_alpha)});
     else if(T == OutputType::MOMENT) data.emplace_back(vec{edge[0].M(current_alpha), edge[1].M(current_alpha), edge[2].M(current_alpha), edge[3].M(current_alpha)});
-    else if(T == OutputType::K) data.emplace_back(vectorise(current_stiffness));
-    else if(T == OutputType::M) data.emplace_back(vectorise(current_mass));
     else if(T == OutputType::MISES)
         for(const auto& I : int_pt) {
             const vec t_stress = I.poly_stress * current_alpha;

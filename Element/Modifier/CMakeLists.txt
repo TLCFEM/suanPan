@@ -4,4 +4,6 @@ set(Modifier
         Modifier/LumpedSimple.cpp
         Modifier/Modifier.cpp
         Modifier/Rayleigh.cpp
+        Modifier/LinearViscosity.cpp
+        Modifier/LeeElementalDamping.cpp
         )

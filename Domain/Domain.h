@@ -355,6 +355,9 @@ public:
     void assemble_current_geometry() const override;
     void assemble_trial_geometry() const override;
 
+    void assemble_mass_container() const override;
+    void assemble_stiffness_container() const override;
+
     void erase_machine_error() const override;
 
     void update_load() override;

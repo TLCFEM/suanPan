@@ -17,6 +17,7 @@
 
 #include "F21H.h"
 #include <Domain/DomainBase.h>
+#include <Recorder/OutputType.h>
 #include <Section/Section.h>
 #include <Toolbox/IntegrationPlan.h>
 
@@ -169,6 +170,9 @@ int F21H::reset_status() {
 }
 
 vector<vec> F21H::record(const OutputType P) {
+    if(P == OutputType::BEAME) return {current_local_deformation};
+    if(P == OutputType::BEAMS) return {current_local_resistance};
+
     vector<vec> output;
     for(const auto& I : int_pt) for(const auto& J : I.b_section->record(P)) output.emplace_back(J);
     return output;

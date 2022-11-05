@@ -33,19 +33,17 @@ void Tabular::initialize(const shared_ptr<DomainBase>& D) {
         return;
     }
 
-    if(mat ext_data; fs::exists(file_name) && ext_data.load(file_name, raw_ascii)) {
-        if(2 == ext_data.n_cols) {
-            time = ext_data.col(0);
-            magnitude = ext_data.col(1);
-        }
-        else if(ext_data.n_cols > 2) suanpan_warning("Tabular() reads more than two columns from the given file, check it.\n");
-        else {
-            suanpan_error("Tabular() requires two valid columns.\n");
-            D->disable_amplitude(get_tag());
-        }
+    if(mat ext_data; !fs::exists(file_name) || !ext_data.load(file_name)) {
+        suanpan_error("Tabular() cannot load file.\n");
+        D->disable_amplitude(get_tag());
+    }
+    else if(ext_data.n_cols >= 2llu) {
+        if(ext_data.n_cols > 2llu) suanpan_warning("Tabular() reads more than two columns from the given file, please ensure the correct file is used.\n");
+        time = ext_data.col(0);
+        magnitude = ext_data.col(1);
     }
     else {
-        suanpan_error("cannot load file.\n");
+        suanpan_error("Tabular() requires two valid columns.\n");
         D->disable_amplitude(get_tag());
     }
 }
@@ -53,10 +51,15 @@ void Tabular::initialize(const shared_ptr<DomainBase>& D) {
 double Tabular::get_amplitude(const double T) {
     const auto step_time = T - start_time;
 
-    uword IDX = 0;
-    while(IDX < time.n_elem && time(IDX) < step_time) ++IDX;
+    if(step_time <= time.front()) return magnitude.front();
 
-    return IDX == 0 ? 0. : IDX == time.n_elem ? magnitude(magnitude.n_elem - 1) : magnitude(IDX - 1) + (step_time - time(IDX - 1)) * (magnitude(IDX) - magnitude(IDX - 1)) / (time(IDX) - time(IDX - 1));
+    if(step_time >= time.back()) return magnitude.back();
+
+    vec result(1);
+
+    interp1(time, magnitude, vec{step_time}, result, "*linear");
+
+    return result(0);
 }
 
 void Tabular::print() { suanpan_info("Tabular.\n"); }

@@ -48,6 +48,8 @@
 #include "Step/Bead.h"
 #include "Step/Frequency.h"
 #include "argumentParser.h"
+#include "resampling.h"
+#include "response_spectrum.h"
 #include "thread_pool.hpp"
 #ifdef SUANPAN_WIN
 #include <Windows.h>
@@ -57,11 +59,11 @@ using std::ifstream;
 using std::string;
 using std::vector;
 
-int SUANPAN_NUM_THREADS = static_cast<int>(std::thread::hardware_concurrency());
+int SUANPAN_NUM_THREADS = std::max(1, static_cast<int>(std::thread::hardware_concurrency()));
 fs::path SUANPAN_OUTPUT = fs::current_path();
 
 void qrcode() {
-    for(char encode[] = "SLLLLLLLWWWLWWWLWWWLWWWLLLLLLLSFWLLLWFWLUWLWUWLWWFFFWFWLLLWFSFWFFFWFWWFWWFFWWFUFUWWFWFFFWFSFLLLLLFWLWFUFWFUFUFULWFLLLLLFSLLLWLLLLFWWULWWULUUFFLLWWWLWWSULUUFFLWWULFFULFFWWUFLFWLULLFSLUUFWULFWUFLUUFLFFFUULLUULWFLSLUFULULLWUUUWLUULLWUUUFWLFWLFSLFLLLLLWLFWULWWLFFULFUFLWFWFLSLWLWWULLFWLFFULWUFFWWFULLUULFSLULFUFLFFFFLUUFULFUFFFFFFUWUWSLLLLLLLWFLUUWLUWFUUFFWLWFLUFFSFWLLLWFWFFWULWWUWFUWFLLLFUWWLSFWFFFWFWLFWFFULUFULLUWWFFLUUFSFLLLLLFWFFFLUUFLFFUFFFWLFWWFL"; const auto I : encode)
+    for(constexpr char encode[] = "SLLLLLLLWWWLWWWLWWWLWWWLLLLLLLSFWLLLWFWLUWLWUWLWWFFFWFWLLLWFSFWFFFWFWWFWWFFWWFUFUWWFWFFFWFSFLLLLLFWLWFUFWFUFUFULWFLLLLLFSLLLWLLLLFWWULWWULUUFFLLWWWLWWSULUUFFLWWULFFULFFWWUFLFWLULLFSLUUFWULFWUFLUUFLFFFUULLUULWFLSLUFULULLWUUUWLUULLWUUUFWLFWLFSLFLLLLLWLFWULWWLFFULFUFLWFWFLSLWLWWULLFWLFFULWUFFWWFULLUULFSLULFUFLFFFFLUUFULFUFFFFFFUWUWSLLLLLLLWFLUUWLUWFUUFFWLWFLUFFSFWLLLWFWFFWULWWUWFUWFLLLFUWWLSFWFFFWFWLFWFFULUFULLUWWFFLUUFSFLLLLLFWFFFLUUFLFFUFFFWLFWWFL"; const auto I : encode)
         if(I == 'S') suanpan_info("\n            ");
         else if(I == 'W') suanpan_info(" ");
         else if(I == 'F') suanpan_info("%s", u8"\u2588");
@@ -104,6 +106,129 @@ int benchmark() {
     suanpan_info("\nCurrent platform rates (higher is better): %.2f.\n", 1E9 / static_cast<double>(duration.count()));
 
     return SUANPAN_SUCCESS;
+}
+
+void perform_upsampling(istringstream& command) {
+    string file_name;
+    uword up_rate;
+
+    if(!get_input(command, file_name, up_rate)) {
+        suanpan_error("perform_upsampling() requires valid file name and upsampling ratio.\n");
+        return;
+    }
+
+    string window_type = "Hamming";
+
+    if(!get_optional_input(command, window_type)) {
+        suanpan_error("perform_upsampling() requires valid window type.\n");
+        return;
+    }
+
+    mat result;
+
+    if(is_equal(window_type, "Hamming")) result = upsampling<WindowType::Hamming>(file_name, up_rate);
+    else if(is_equal(window_type, "Hann")) result = upsampling<WindowType::Hann>(file_name, up_rate);
+    else if(is_equal(window_type, "Blackman")) result = upsampling<WindowType::Blackman>(file_name, up_rate);
+    else if(is_equal(window_type, "BlackmanNuttall")) result = upsampling<WindowType::BlackmanNuttall>(file_name, up_rate);
+    else if(is_equal(window_type, "BlackmanHarris")) result = upsampling<WindowType::BlackmanHarris>(file_name, up_rate);
+    else if(is_equal(window_type, "FlatTop")) result = upsampling<WindowType::FlatTop>(file_name, up_rate);
+
+    if(result.empty()) suanpan_error("perform_upsampling() fails to perform upsampling, please ensure the input is equally spaced and stored in two columns.\n");
+
+    if(!result.save(file_name += "_upsampled", raw_ascii)) suanpan_error("fail to save file.\n");
+    else suanpan_info("upsampled data is saved to %s.\n", file_name.c_str());
+}
+
+void perform_response_spectrum(istringstream& command) {
+    string motion_name, period_name;
+    if(!get_input(command, motion_name, period_name)) {
+        suanpan_error("perform_response_spectrum() requires valid file names for ground motion and period vector.\n");
+        return;
+    }
+
+    mat motion, period;
+    if(!fs::exists(motion_name) || !motion.load(motion_name) || motion.empty()) {
+        suanpan_error("perform_response_spectrum() requires a valid ground motion stored in either one or two columns.\n");
+        return;
+    }
+    if(!fs::exists(period_name) || !period.load(period_name) || period.empty()) {
+        suanpan_error("perform_response_spectrum() requires a valid period vector stored in one column.\n");
+        return;
+    }
+
+    double interval = 0.;
+    if(1llu == motion.n_cols) {
+        if(!get_input(command, interval) || interval <= 0.) {
+            suanpan_error("perform_response_spectrum() requires a valid sampling interval.\n");
+            return;
+        }
+    }
+    else {
+        const vec time_diff = diff(motion.col(0));
+        motion = motion.col(1);
+        interval = mean(time_diff);
+
+        if(mean(arma::abs(diff(time_diff))) > 1E-8) suanpan_warning("please ensure the ground motion is equally spaced.\n");
+    }
+
+    double damping_ratio = 0.;
+    if(!get_input(command, damping_ratio) || damping_ratio < 0.) {
+        suanpan_error("perform_response_spectrum() requires a valid damping ratio.\n");
+        return;
+    }
+
+    // ReSharper disable once CppTooWideScopeInitStatement
+    const auto spectrum = response_spectrum<double>(damping_ratio, interval, motion, period.col(0));
+
+    if(!spectrum.save(motion_name += "_response_spectrum", raw_ascii)) suanpan_error("fail to save file.\n");
+    else suanpan_info("response spectrum data is saved to %s.\n", motion_name.c_str());
+}
+
+void perform_sdof_response(istringstream& command) {
+    string motion_name;
+    if(!get_input(command, motion_name)) {
+        suanpan_error("perform_sdof_response() requires a valid file name for ground motion.\n");
+        return;
+    }
+
+    mat motion;
+    if(!fs::exists(motion_name) || !motion.load(motion_name) || motion.empty()) {
+        suanpan_error("perform_sdof_response() requires a valid ground motion stored in either one or two columns.\n");
+        return;
+    }
+
+    double interval = 0.;
+    if(1llu == motion.n_cols) {
+        if(!get_input(command, interval) || interval <= 0.) {
+            suanpan_error("perform_sdof_response() requires a valid sampling interval.\n");
+            return;
+        }
+    }
+    else {
+        const vec time_diff = diff(motion.col(0));
+        motion = motion.col(1);
+        interval = mean(time_diff);
+
+        if(mean(arma::abs(diff(time_diff))) > 1E-8) suanpan_warning("please make sure the ground motion is equally spaced.\n");
+    }
+
+    double freq = 0.;
+    if(!get_input(command, freq) || freq <= 0.) {
+        suanpan_error("perform_sdof_response() requires a valid frequency in hertz.\n");
+        return;
+    }
+
+    double damping_ratio = 0.;
+    if(!get_input(command, damping_ratio) || damping_ratio < 0.) {
+        suanpan_error("perform_sdof_response() requires a valid damping ratio.\n");
+        return;
+    }
+
+    // ReSharper disable once CppTooWideScopeInitStatement
+    const auto response = sdof_response<double>(damping_ratio, interval, freq, motion);
+
+    if(!response.save(motion_name += "_sdof_response", raw_ascii)) suanpan_error("fail to save file.\n");
+    else suanpan_info("sdof response data is saved to %s.\n", motion_name.c_str());
 }
 
 int process_command(const shared_ptr<Bead>& model, istringstream& command) {
@@ -306,6 +431,21 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
 
     if(is_equal(command_id, "terminal")) {
         execute_command(command);
+        return SUANPAN_SUCCESS;
+    }
+
+    if(is_equal(command_id, "upsampling")) {
+        perform_upsampling(command);
+        return SUANPAN_SUCCESS;
+    }
+
+    if(is_equal(command_id, "response_spectrum")) {
+        perform_response_spectrum(command);
+        return SUANPAN_SUCCESS;
+    }
+
+    if(is_equal(command_id, "sdof_response")) {
+        perform_sdof_response(command);
         return SUANPAN_SUCCESS;
     }
 

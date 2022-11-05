@@ -9,4 +9,5 @@ target_sources(${PROJECT_NAME} PRIVATE
         sync_ostream.cpp
         tensorToolbox.cpp
         utility.cpp
+        resampling.cpp
         )
