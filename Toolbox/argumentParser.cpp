@@ -172,8 +172,6 @@ void argument_parser(const int argc, char** argv) {
 
     SUANPAN_EXE = argv[0];
 
-    check_version(SUANPAN_EXE);
-
     string input_file_name;
     const auto buffer_backup = SUANPAN_COUT.rdbuf();
 
@@ -183,7 +181,7 @@ void argument_parser(const int argc, char** argv) {
     if(argc > 1) {
         ofstream output_file;
         string output_file_name;
-        auto strip = false, convert = false;
+        auto strip = false, convert = false, check_new = true;
 
         for(auto I = 1; I < argc; ++I) {
             if(is_equal(argv[I], "-v") || is_equal(argv[I], "--version")) print_version();
@@ -193,6 +191,7 @@ void argument_parser(const int argc, char** argv) {
             else if(is_equal(argv[I], "-o") || is_equal(argv[I], "--output")) output_file_name = argv[++I];
             else if(is_equal(argv[I], "-np") || is_equal(argv[I], "--noprint")) SUANPAN_PRINT = false;
             else if(is_equal(argv[I], "-vb") || is_equal(argv[I], "--verbose")) SUANPAN_VERBOSE = true;
+            else if(is_equal(argv[I], "-nu") || is_equal(argv[I], "--noupdate")) check_new = false;
             else if(is_equal(argv[I], "-s") || is_equal(argv[I], "--strip")) {
                 strip = true;
                 convert = false;
@@ -206,6 +205,8 @@ void argument_parser(const int argc, char** argv) {
                 return;
             }
         }
+
+        if(check_new) check_version(SUANPAN_EXE);
 
         if(strip || convert) {
             if(input_file_name.empty()) return;
@@ -245,6 +246,7 @@ void argument_parser(const int argc, char** argv) {
         }
     }
     else {
+        check_version(SUANPAN_EXE);
         print_header();
         const auto model = make_shared<Bead>();
         cli_mode(model);
@@ -287,6 +289,7 @@ void print_helper() {
     suanpan_info("\t-%-10s  --%-20s%s\n", "s", "strip", "strip comments out in given ABAQUS input file");
     // suanpan_info("\t-%-10s  --%-20s%s\n", "c", "convert", "partially convert ABAQUS input file into suanPan model script");
     suanpan_info("\t-%-10s  --%-20s%s\n", "np", "noprint", "suppress most console output");
+    suanpan_info("\t-%-10s  --%-20s%s\n", "nu", "noupdate", "do not check for newer version on startup");
     suanpan_info("\t-%-10s  --%-20s%s\n", "f", "file", "process model file");
     suanpan_info("\t-%-10s  --%-20s%s\n", "o", "output", "set output file for logging");
     suanpan_info("\n");

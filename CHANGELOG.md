@@ -5,6 +5,10 @@
 1. `MKL` includes outdated `FEAST`, the external names in `FEAST` library are modified to avoid linking error.
 2. `OpenBLAS` causes SEGFAULT with version 0.3.15+ when compiled with `DYNAMIC_ARCH` enabled.
 
+## version 2.7
+
+1. add `-nu` (`--noupdate`) flag to skip check of new version on startup
+
 ## version 2.6
 
 1. update `MKL` to version `2022.2.0`
