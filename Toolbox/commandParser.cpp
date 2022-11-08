@@ -146,12 +146,13 @@ void perform_response_spectrum(istringstream& command) {
         return;
     }
 
+    std::error_code code;
     mat motion, period;
-    if(!fs::exists(motion_name) || !motion.load(motion_name, raw_ascii) || motion.empty()) {
+    if(!fs::exists(motion_name, code) || !motion.load(motion_name, raw_ascii) || motion.empty()) {
         suanpan_error("perform_response_spectrum() requires a valid ground motion stored in either one or two columns.\n");
         return;
     }
-    if(!fs::exists(period_name) || !period.load(period_name, raw_ascii) || period.empty()) {
+    if(!fs::exists(period_name, code) || !period.load(period_name, raw_ascii) || period.empty()) {
         suanpan_error("perform_response_spectrum() requires a valid period vector stored in one column.\n");
         return;
     }
@@ -192,7 +193,7 @@ void perform_sdof_response(istringstream& command) {
     }
 
     mat motion;
-    if(!fs::exists(motion_name) || !motion.load(motion_name, raw_ascii) || motion.empty()) {
+    if(std::error_code code; !fs::exists(motion_name, code) || !motion.load(motion_name, raw_ascii) || motion.empty()) {
         suanpan_error("perform_sdof_response() requires a valid ground motion stored in either one or two columns.\n");
         return;
     }

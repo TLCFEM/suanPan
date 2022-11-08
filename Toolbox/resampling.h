@@ -111,8 +111,7 @@ template<WindowType T> vec upsampling(const vec& in, const uword up_rate) {
 
 template<WindowType T> mat upsampling(const string& file_name, const uword up_rate) {
     mat ext_data;
-
-    if(!fs::exists(file_name) || !ext_data.load(file_name, raw_ascii) || ext_data.empty() || ext_data.n_cols < 2) {
+    if(std::error_code code; !fs::exists(file_name, code) || !ext_data.load(file_name, raw_ascii) || ext_data.empty() || ext_data.n_cols < 2) {
         ext_data.reset();
         return ext_data;
     }
