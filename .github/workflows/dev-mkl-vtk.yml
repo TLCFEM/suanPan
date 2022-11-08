@@ -32,8 +32,8 @@ jobs:
           ./suanPan-linux-mkl-vtk/bin/suanPan -v
       - uses: actions/upload-artifact@v3
         with:
-          name: suanPan-2.7.0-1.x86_64.deb
-          path: suanPan-2.7.0-1.x86_64.deb
+          name: suanPan-2.6.1-1.x86_64.deb
+          path: suanPan-2.6.1-1.x86_64.deb
   fedora-mkl-vtk-dev:
     runs-on: ubuntu-22.04
     container: fedora:35
@@ -66,10 +66,10 @@ jobs:
           make package -j"$(nproc)"
       - name: Test
         run: |
-          dnf install ./suanPan-2.7.0-1.x86_64.rpm -y
+          dnf install ./suanPan-2.6.1-1.x86_64.rpm -y
           suanPan -v
       - name: Upload
         uses: actions/upload-artifact@v3
         with:
-          name: suanPan-2.7.0-1.x86_64.rpm
-          path: suanPan-2.7.0-1.x86_64.rpm
+          name: suanPan-2.6.1-1.x86_64.rpm
+          path: suanPan-2.6.1-1.x86_64.rpm
