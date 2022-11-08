@@ -8,6 +8,7 @@
 ## version 2.7
 
 1. add `-nu` (`--noupdate`) flag to skip check of new version on startup
+2. fix issue [#74](https://github.com/TLCFEM/suanPan/issues/74)
 
 ## version 2.6
 
