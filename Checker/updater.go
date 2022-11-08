@@ -15,7 +15,7 @@ import (
 const URL = "https://github.com/TLCFEM/suanPan/releases"
 
 func main() {
-	fmt.Printf("Checking new version, delete or rename file updater/updater.exe if not wanted.\n")
+	fmt.Printf("Checking new version, delete/rename file updater/updater.exe or execute with '-nu' flag if not wanted.\n")
 
 	client := &http.Client{
 		Timeout: 2 * time.Second,

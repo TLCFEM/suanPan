@@ -33,7 +33,8 @@ void Tabular::initialize(const shared_ptr<DomainBase>& D) {
         return;
     }
 
-    if(mat ext_data; !fs::exists(file_name) || !ext_data.load(file_name)) {
+    std::error_code code;
+    if(mat ext_data; !fs::exists(file_name, code) || !ext_data.load(file_name, raw_ascii)) {
         suanpan_error("Tabular() cannot load file.\n");
         D->disable_amplitude(get_tag());
     }

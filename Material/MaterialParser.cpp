@@ -1041,19 +1041,18 @@ void new_concretetable(unique_ptr<Material>& return_obj, istringstream& command)
     }
 
     string c_name, t_name;
-
-    mat t_table, c_table;
-
     if(!get_input(command, t_name, c_name)) {
         suanpan_error("new_concretetable() requires a valid parameter.\n");
         return;
     }
 
-    if(!fs::exists(t_name) || !t_table.load(t_name) || t_table.n_cols != 2) {
+    std::error_code code;
+    mat t_table, c_table;
+    if(!fs::exists(t_name, code) || !t_table.load(t_name, raw_ascii) || t_table.n_cols != 2) {
         suanpan_error("new_concretetable() cannot load file %s.\n", t_name.c_str());
         return;
     }
-    if(!fs::exists(c_name) || !c_table.load(c_name) || c_table.n_cols != 2) {
+    if(!fs::exists(c_name, code) || !c_table.load(c_name, raw_ascii) || c_table.n_cols != 2) {
         suanpan_error("new_concretetable() cannot load file %s.\n", c_name.c_str());
         return;
     }
@@ -1859,11 +1858,11 @@ void new_multilinearoo(unique_ptr<Material>& return_obj, istringstream& command)
     mat t_backbone, c_backbone;
 
     string name;
-    if(!get_input(command, name) || !t_backbone.load(name) || t_backbone.empty()) {
+    if(!get_input(command, name) || !t_backbone.load(name, raw_ascii) || t_backbone.empty()) {
         suanpan_error("new_multilinearoo() requires a valid tension backbone file.\n");
         return;
     }
-    if(!get_input(command, name) || !c_backbone.load(name) || c_backbone.empty()) {
+    if(!get_input(command, name) || !c_backbone.load(name, raw_ascii) || c_backbone.empty()) {
         suanpan_error("new_multilinearoo() requires a valid compression backbone file.\n");
         return;
     }
@@ -1890,11 +1889,11 @@ void new_multilinearpo(unique_ptr<Material>& return_obj, istringstream& command)
     mat t_backbone, c_backbone;
 
     string name;
-    if(!get_input(command, name) || !t_backbone.load(name) || t_backbone.empty()) {
+    if(!get_input(command, name) || !t_backbone.load(name, raw_ascii) || t_backbone.empty()) {
         suanpan_error("new_multilinearpo() requires a valid tension backbone file.\n");
         return;
     }
-    if(!get_input(command, name) || !c_backbone.load(name) || c_backbone.empty()) {
+    if(!get_input(command, name) || !c_backbone.load(name, raw_ascii) || c_backbone.empty()) {
         suanpan_error("new_multilinearpo() requires a valid compression backbone file.\n");
         return;
     }
@@ -2524,12 +2523,11 @@ void new_tablecdp(unique_ptr<Material>& return_obj, istringstream& command) {
 
     auto check_file = [&](mat& table) {
         string table_name;
-
         if(!get_input(command, table_name)) {
             suanpan_error("new_tablecdp() requires a valid parameter.\n");
             return false;
         }
-        if(std::error_code code; !fs::exists(table_name, code) || !table.load(table_name) || table.n_cols < 2) {
+        if(std::error_code code; !fs::exists(table_name, code) || !table.load(table_name, raw_ascii) || table.n_cols < 2) {
             suanpan_error("new_tablecdp() cannot load file %s.\n", table_name.c_str());
             return false;
         }
@@ -2570,8 +2568,7 @@ void new_tablegurson(unique_ptr<Material>& return_obj, istringstream& command) {
     }
 
     mat hardening_table;
-
-    if(!fs::exists(table_name) || !hardening_table.load(table_name, auto_detect) || hardening_table.n_cols < 2) {
+    if(std::error_code code; !fs::exists(table_name, code) || !hardening_table.load(table_name, raw_ascii) || hardening_table.n_cols < 2) {
         suanpan_error("new_tablegurson() cannot load file %s.\n", table_name.c_str());
         return;
     }
@@ -3212,7 +3209,7 @@ int test_material_by_strain_history(const shared_ptr<DomainBase>& domain, istrin
     }
 
     mat strain_history;
-    if(!strain_history.load(history_file) || !domain->find_material(material_tag)) return SUANPAN_SUCCESS;
+    if(!strain_history.load(history_file, raw_ascii) || !domain->find_material(material_tag)) return SUANPAN_SUCCESS;
 
     auto& material_proto = domain->get_material(material_tag);
 
@@ -3247,7 +3244,7 @@ int test_material_by_stress_history(const shared_ptr<DomainBase>& domain, istrin
     }
 
     mat stress_history;
-    if(!stress_history.load(history_file) || !domain->find_material(material_tag)) return SUANPAN_SUCCESS;
+    if(!stress_history.load(history_file, raw_ascii) || !domain->find_material(material_tag)) return SUANPAN_SUCCESS;
 
     auto& material_proto = domain->get_material(material_tag);
 

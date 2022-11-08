@@ -23,7 +23,8 @@ NZStrongMotion::NZStrongMotion(const unsigned T, const char* P, const unsigned S
     , file_name(P) {}
 
 void NZStrongMotion::initialize(const shared_ptr<DomainBase>& D) {
-    if(Col<int> data; !fs::exists(file_name) || !data.load(file_name, auto_detect)) {
+    std::error_code code;
+    if(Col<int> data; !fs::exists(file_name, code) || !data.load(file_name, auto_detect)) {
         suanpan_error("cannot load file %s.\n", file_name.c_str());
         D->disable_amplitude(get_tag());
     }
