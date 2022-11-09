@@ -18,14 +18,25 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 
-#include <suanPan.h>
 #include <concepts>
+#include <suanPan.h>
+#ifdef SUANPAN_MT
+#include <execution>
+#endif
 
 template<sp_i IT, typename F> void suanpan_for(const IT start, const IT end, F&& FN) {
 #ifdef SUANPAN_MT
     tbb::parallel_for(start, end, std::forward<F>(FN));
 #else
     for(IT I = start; I < end; ++I) FN(I);
+#endif
+}
+
+template<typename T> constexpr T suanpan_max_element(T start, T end) {
+#ifdef SUANPAN_MT
+    return std::max_element(std::execution::par, start, end);
+#else
+    return std::max_element(start, end);
 #endif
 }
 

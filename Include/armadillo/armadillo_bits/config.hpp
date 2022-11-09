@@ -168,7 +168,7 @@
 #endif
 
 #if !defined(ARMA_MAT_PREALLOC)
-#define ARMA_MAT_PREALLOC 4
+#define ARMA_MAT_PREALLOC 6
 #endif
 //// This is the number of preallocated elements used by matrices and vectors;
 //// it must be an integer that is at least 1.
