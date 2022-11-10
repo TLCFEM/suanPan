@@ -20,7 +20,7 @@
 
 #include <concepts>
 #include <suanPan.h>
-#ifdef SUANPAN_MT
+#ifdef __cpp_lib_execution
 #include <execution>
 #endif
 
@@ -33,7 +33,7 @@ template<sp_i IT, typename F> void suanpan_for(const IT start, const IT end, F&&
 }
 
 template<typename T> constexpr T suanpan_max_element(T start, T end) {
-#ifdef SUANPAN_MT
+#ifdef __cpp_lib_execution
     return std::max_element(std::execution::par, start, end);
 #else
     return std::max_element(start, end);
