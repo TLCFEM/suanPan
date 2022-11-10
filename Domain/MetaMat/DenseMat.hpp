@@ -137,7 +137,7 @@ template<sp_d T> void DenseMat<T>::zeros() {
 }
 
 template<sp_d T> T DenseMat<T>::max() const {
-    T max_value = T(0);
+    T max_value = T(1);
     const auto t_size = std::min(this->n_rows, this->n_cols);
     for(uword I = 0; I < t_size; ++I) if(const auto t_val = this->operator()(I, I); t_val > max_value) max_value = t_val;
     return max_value;
