@@ -170,7 +170,7 @@ public:
 
     [[nodiscard]] data_t max() const {
         if(is_empty()) return data_t(0);
-        return *std::max_element(val_idx.get(), val_idx.get() + n_elem);
+        return *suanpan_max_element(val_idx.get(), val_idx.get() + n_elem);
     }
 
     void zeros() {

@@ -78,7 +78,7 @@ public:
 
     [[nodiscard]] data_t max() const {
         if(0 == n_elem) return data_t(0);
-        return *std::max_element(val_idx.get(), val_idx.get() + n_elem);
+        return *suanpan_max_element(val_idx.get(), val_idx.get() + n_elem);
     }
 
     void print() const;

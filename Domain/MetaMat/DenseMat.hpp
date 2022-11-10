@@ -136,7 +136,12 @@ template<sp_d T> void DenseMat<T>::zeros() {
     this->factored = false;
 }
 
-template<sp_d T> T DenseMat<T>::max() const { return op_max::direct_max(memptr(), this->n_elem); }
+template<sp_d T> T DenseMat<T>::max() const {
+    T max_value = T(1);
+    const auto t_size = std::min(this->n_rows, this->n_cols);
+    for(uword I = 0; I < t_size; ++I) if(const auto t_val = this->operator()(I, I); t_val > max_value) max_value = t_val;
+    return max_value;
+}
 
 template<sp_d T> Col<T> DenseMat<T>::diag() const {
     Col<T> diag_vec(std::min(this->n_rows, this->n_cols), fill::none);

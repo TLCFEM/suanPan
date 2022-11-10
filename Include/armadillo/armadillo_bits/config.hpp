@@ -168,7 +168,7 @@
 #endif
 
 #if !defined(ARMA_MAT_PREALLOC)
-#define ARMA_MAT_PREALLOC 4
+#define ARMA_MAT_PREALLOC 6
 #endif
 //// This is the number of preallocated elements used by matrices and vectors;
 //// it must be an integer that is at least 1.
@@ -176,7 +176,7 @@
 //// change the number to the size of your vectors.
 
 #if !defined(ARMA_OPENMP_THRESHOLD)
-#define ARMA_OPENMP_THRESHOLD 320
+#define ARMA_OPENMP_THRESHOLD 400
 #endif
 //// The minimum number of elements in a matrix to allow OpenMP based parallelisation;
 //// it must be an integer that is at least 1.
