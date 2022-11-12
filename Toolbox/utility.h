@@ -26,7 +26,8 @@
 
 template<sp_i IT, typename F> void suanpan_for(const IT start, const IT end, F&& FN) {
 #ifdef SUANPAN_MT
-    tbb::parallel_for(start, end, std::forward<F>(FN));
+    static tbb::affinity_partitioner ap;
+    tbb::parallel_for(start, end, std::forward<F>(FN), ap);
 #else
     for(IT I = start; I < end; ++I) FN(I);
 #endif
