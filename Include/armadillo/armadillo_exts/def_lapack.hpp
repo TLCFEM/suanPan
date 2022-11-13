@@ -10,8 +10,6 @@
 
 #define arma_sspmv SSPMV
 #define arma_dspmv DSPMV
-#define arma_sspmm SSPMM
-#define arma_dspmm DSPMM
 
 #define arma_dsysv DSYSV
 #define arma_dsygvx DSYGVX
@@ -54,8 +52,6 @@
 
 #define arma_sspmv sspmv
 #define arma_dspmv dspmv
-#define arma_sspmm sspmm
-#define arma_dspmm dspmm
 
 #define arma_dsysv dsysv
 #define arma_dsygvx dsygvx
@@ -102,10 +98,6 @@ void arma_fortran(arma_dsbmv)(const char* UPLO, const int* N, const int* K, cons
 void arma_fortran(arma_sspmv)(const char* UPLO, const int* N, const float* ALPHA, const float* AP, const float* X, const int* INCX, const float* BETA, float* Y, const int* INCY);
 
 void arma_fortran(arma_dspmv)(const char* UPLO, const int* N, const double* ALPHA, const double* AP, const double* X, const int* INCX, const double* BETA, double* Y, const int* INCY);
-
-void arma_fortran(arma_sspmm)(const char* SIDE, const char* UPLO, const char* TRAN, const int* M, const int* N, const float* A, const float* ALPHA, const float* B, const int* LDB, const float* BETA, float* C, const int* LDC);
-
-void arma_fortran(arma_dspmm)(const char* SIDE, const char* UPLO, const char* TRAN, const int* M, const int* N, const double* A, const double* ALPHA, const double* B, const int* LDB, const double* BETA, double* C, const int* LDC);
 
 // symmetric matrix
 void arma_fortran(arma_dsysv)(char* UPLO, int* N, int* NRHS, double* A, int* LDA, int* IPIV, double* B, int* LDB, double* WORK, int* LWORK, int* INFO);

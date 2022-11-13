@@ -76,7 +76,8 @@ template<sp_d T> void BandSymmMat<T>::unify(const uword K) {
 
 template<sp_d T> void BandSymmMat<T>::nullify(const uword K) {
     suanpan_for(std::max(band, K) - band, K, [&](const uword I) { access::rw(this->memory[K - I + I * m_rows]) = 0.; });
-    suanpan_for(K, std::min(this->n_rows, K + band + 1), [&](const uword I) { access::rw(this->memory[I - K + K * m_rows]) = 0.; });
+    const auto t_factor = K * m_rows - K;
+    suanpan_for(K, std::min(this->n_rows, K + band + 1), [&](const uword I) { access::rw(this->memory[I + t_factor]) = 0.; });
 
     this->factored = false;
 }
