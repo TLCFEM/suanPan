@@ -88,7 +88,7 @@ template<sp_d T> const T& BandSymmMat<T>::operator()(const uword in_row, const u
 }
 
 template<sp_d T> T& BandSymmMat<T>::at(const uword in_row, const uword in_col) {
-    if(in_row > band + in_col || in_row < in_col) return bin = 0.;
+    if(in_row > band + in_col || in_row < in_col) [[unlikely]] return bin = 0.;
     this->factored = false;
     return access::rw(this->memory[in_row - in_col + in_col * m_rows]);
 }
