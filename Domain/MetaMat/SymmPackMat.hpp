@@ -89,7 +89,7 @@ template<sp_d T> T& SymmPackMat<T>::unsafe_at(const uword in_row, const uword in
 }
 
 template<sp_d T> T& SymmPackMat<T>::at(const uword in_row, const uword in_col) {
-    if(in_row < in_col) [[unlikely]]return bin;
+    if(in_row < in_col) [[unlikely]] return bin;
     this->factored = false;
     return access::rw(this->memory[in_row + (length - in_col) * in_col / 2]);
 }
