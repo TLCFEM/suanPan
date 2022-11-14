@@ -19,8 +19,8 @@
  * @brief A SymmPackMat class that holds matrices.
  *
  * @author tlc
- * @date 06/09/2017
- * @version 0.1.0
+ * @date 13/11/2022
+ * @version 0.2.0
  * @file SymmPackMat.hpp
  * @addtogroup MetaMat
  * @{
@@ -33,9 +33,11 @@
 #include "DenseMat.hpp"
 
 template<sp_d T> class SymmPackMat final : public DenseMat<T> {
-    static constexpr char UPLO = 'U';
+    static constexpr char UPLO = 'L';
 
     static T bin;
+
+    const uword length; // 2n-1
 
     int solve_trs(Mat<T>&, Mat<T>&&);
     int solve_trs(Mat<T>&, const Mat<T>&);
@@ -49,6 +51,7 @@ public:
     void nullify(uword) override;
 
     const T& operator()(uword, uword) const override;
+    T& unsafe_at(uword, uword) override;
     T& at(uword, uword) override;
 
     Mat<T> operator*(const Mat<T>&) const override;
@@ -60,49 +63,52 @@ public:
 template<sp_d T> T SymmPackMat<T>::bin = 0.;
 
 template<sp_d T> SymmPackMat<T>::SymmPackMat(const uword in_size)
-    : DenseMat<T>(in_size, in_size, (in_size + 1) * in_size / 2) {}
+    : DenseMat<T>(in_size, in_size, (in_size + 1) * in_size / 2)
+    , length(2 * in_size - 1) {}
 
 template<sp_d T> unique_ptr<MetaMat<T>> SymmPackMat<T>::make_copy() { return std::make_unique<SymmPackMat<T>>(*this); }
 
 template<sp_d T> void SymmPackMat<T>::unify(const uword K) {
     nullify(K);
-    access::rw(this->memory[(K * K + 3 * K) / 2]) = 1.;
+    access::rw(this->memory[(length - K + 2) * K / 2]) = 1.;
 }
 
 template<sp_d T> void SymmPackMat<T>::nullify(const uword K) {
-    suanpan_for(0llu, K, [&](const uword I) { access::rw(this->memory[(K * K + K) / 2 + I]) = 0.; });
-    suanpan_for(K, this->n_rows, [&](const uword I) { access::rw(this->memory[(I * I + I) / 2 + K]) = 0.; });
+    suanpan_for(0llu, K, [&](const uword I) { access::rw(this->memory[K + (length - I) * I / 2]) = 0.; });
+    const auto t_factor = (length - K) * K / 2;
+    suanpan_for(K, this->n_rows, [&](const uword I) { access::rw(this->memory[I + t_factor]) = 0.; });
 
     this->factored = false;
 }
 
-template<sp_d T> const T& SymmPackMat<T>::operator()(const uword in_row, const uword in_col) const { return this->memory[in_col > in_row ? (in_col * in_col + in_col) / 2 + in_row : (in_row * in_row + in_row) / 2 + in_col]; }
+template<sp_d T> const T& SymmPackMat<T>::operator()(const uword in_row, const uword in_col) const { return this->memory[in_row >= in_col ? in_row + (length - in_col) * in_col / 2 : in_col + (length - in_row) * in_row / 2]; }
+
+template<sp_d T> T& SymmPackMat<T>::unsafe_at(const uword in_row, const uword in_col) {
+    this->factored = false;
+    return access::rw(this->memory[in_row + (length - in_col) * in_col / 2]);
+}
 
 template<sp_d T> T& SymmPackMat<T>::at(const uword in_row, const uword in_col) {
-    if(in_col < in_row) return bin;
+    if(in_row < in_col) [[unlikely]] return bin;
     this->factored = false;
-    return access::rw(this->memory[(in_col * in_col + in_col) / 2 + in_row]);
+    return access::rw(this->memory[in_row + (length - in_col) * in_col / 2]);
 }
 
-template<const char S, const char T, sp_d T1> Mat<T1> spmm(const SymmPackMat<T1>& A, const Mat<T1>& B);
-
 template<sp_d T> Mat<T> SymmPackMat<T>::operator*(const Mat<T>& X) const {
-    if(!X.is_colvec()) return spmm<'R', 'N'>(*this, X);
-
-    auto Y = X;
+    auto Y = Mat<T>(arma::size(X), fill::none);
 
     const auto N = static_cast<int>(this->n_rows);
-    constexpr auto INC = 1;
+    const auto INC = 1;
     T ALPHA = 1.;
     T BETA = 0.;
 
     if(std::is_same_v<T, float>) {
         using E = float;
-        arma_fortran(arma_sspmv)(&UPLO, &N, (E*)&ALPHA, (E*)this->memptr(), (E*)X.memptr(), &INC, (E*)&BETA, (E*)Y.memptr(), &INC);
+        suanpan_for(0llu, X.n_cols, [&](const uword I) { arma_fortran(arma_sspmv)(&UPLO, &N, (E*)&ALPHA, (E*)this->memptr(), (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC); });
     }
     else if(std::is_same_v<T, double>) {
         using E = double;
-        arma_fortran(arma_dspmv)(&UPLO, &N, (E*)&ALPHA, (E*)this->memptr(), (E*)X.memptr(), &INC, (E*)&BETA, (E*)Y.memptr(), &INC);
+        suanpan_for(0llu, X.n_cols, [&](const uword I) { arma_fortran(arma_dspmv)(&UPLO, &N, (E*)&ALPHA, (E*)this->memptr(), (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC); });
     }
 
     return Y;
@@ -175,7 +181,7 @@ template<sp_d T> int SymmPackMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 
             X += incre;
 
-            suanpan_debug("mixed precision algorithm multiplier: %.5E.\n", multiplier = norm(full_residual -= this->operator*(incre)));
+            suanpan_debug("mixed precision algorithm multiplier: %.5E.\n", multiplier = arma::norm(full_residual -= this->operator*(incre)));
         }
     }
 
@@ -249,7 +255,7 @@ template<sp_d T> int SymmPackMat<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
 
             X += incre;
 
-            suanpan_debug("mixed precision algorithm multiplier: %.5E.\n", multiplier = norm(B -= this->operator*(incre)));
+            suanpan_debug("mixed precision algorithm multiplier: %.5E.\n", multiplier = arma::norm(B -= this->operator*(incre)));
         }
     }
 

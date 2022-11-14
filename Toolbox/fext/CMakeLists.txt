@@ -9,7 +9,6 @@ include(../../Driver.cmake)
 add_library(${PROJECT_NAME} ${LIBRARY_TYPE}
         $<TARGET_OBJECTS:amd_obj>
         $<TARGET_OBJECTS:arpack_obj>
-        $<TARGET_OBJECTS:spmm_obj>
         $<TARGET_OBJECTS:feast_obj>
         $<TARGET_OBJECTS:mumps_f_lib>
         $<TARGET_OBJECTS:mumps_c_lib>
