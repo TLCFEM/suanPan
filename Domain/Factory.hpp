@@ -1816,6 +1816,12 @@ template<sp_d T> void Factory<T>::assemble_inertial_force(const Mat<T>& ER, cons
     for(unsigned I = 0; I < EI.n_elem; ++I) trial_inertial_force(EI(I)) += ER(I);
 }
 
+/**
+ * \brief Assemble given elemental matrix into global matrix
+ * \param GM global matrix
+ * \param EM elemental matrix
+ * \param EI elemental matrix indices
+ */
 template<sp_d T> void Factory<T>::assemble_matrix_helper(shared_ptr<MetaMat<T>>& GM, const Mat<T>& EM, const uvec& EI) {
     if(EM.is_empty()) return;
 
@@ -1823,7 +1829,7 @@ template<sp_d T> void Factory<T>::assemble_matrix_helper(shared_ptr<MetaMat<T>>&
         const uvec NEI = sort_index(EI);
         for(unsigned I = 0; I < NEI.n_elem; ++I) for(unsigned J = 0; J <= I; ++J) GM->unsafe_at(EI(NEI(I)), EI(NEI(J))) += EM(NEI(I), NEI(J));
     }
-    else for(unsigned I = 0; I < EI.n_elem; ++I) for(unsigned J = 0; J < EI.n_elem; ++J) GM->at(EI(J), EI(I)) += EM(J, I);
+    else for(unsigned I = 0; I < EI.n_elem; ++I) for(unsigned J = 0; J < EI.n_elem; ++J) GM->unsafe_at(EI(J), EI(I)) += EM(J, I);
 }
 
 template<sp_d T> void Factory<T>::assemble_mass(const Mat<T>& EM, const uvec& EI) { this->assemble_matrix_helper(global_mass, EM, EI); }

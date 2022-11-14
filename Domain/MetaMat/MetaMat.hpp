@@ -72,8 +72,20 @@ public:
     [[nodiscard]] virtual T max() const = 0;
     [[nodiscard]] virtual Col<T> diag() const = 0;
 
+    /**
+     * \brief Access element (read-only), returns zero if out-of-bound
+     * \return value
+     */
     virtual const T& operator()(uword, uword) const = 0;
+    /**
+     * \brief Access element without bound check
+     * \return value
+     */
     virtual T& unsafe_at(uword, uword);
+    /**
+     * \brief Access element with bound check
+     * \return value
+     */
     virtual T& at(uword, uword) = 0;
 
     [[nodiscard]] virtual const T* memptr() const = 0;
