@@ -1821,7 +1821,7 @@ template<sp_d T> void Factory<T>::assemble_matrix_helper(shared_ptr<MetaMat<T>>&
 
     if(StorageScheme::BANDSYMM == storage_type || StorageScheme::SYMMPACK == storage_type) {
         const uvec NEI = sort_index(EI);
-        for(unsigned I = 0; I < NEI.n_elem; ++I) for(unsigned J = 0; J <= I; ++J) GM->at(EI(NEI(I)), EI(NEI(J))) += EM(NEI(I), NEI(J));
+        for(unsigned I = 0; I < NEI.n_elem; ++I) for(unsigned J = 0; J <= I; ++J) GM->unsafe_at(EI(NEI(I)), EI(NEI(J))) += EM(NEI(I), NEI(J));
         return;
     }
 

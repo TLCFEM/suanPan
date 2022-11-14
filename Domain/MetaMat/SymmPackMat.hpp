@@ -51,6 +51,7 @@ public:
     void nullify(uword) override;
 
     const T& operator()(uword, uword) const override;
+    T& unsafe_at(uword, uword) override;
     T& at(uword, uword) override;
 
     Mat<T> operator*(const Mat<T>&) const override;
@@ -81,6 +82,11 @@ template<sp_d T> void SymmPackMat<T>::nullify(const uword K) {
 }
 
 template<sp_d T> const T& SymmPackMat<T>::operator()(const uword in_row, const uword in_col) const { return this->memory[in_row >= in_col ? in_row + (length - in_col) * in_col / 2 : in_col + (length - in_row) * in_row / 2]; }
+
+template<sp_d T> T& SymmPackMat<T>::unsafe_at(const uword in_row, const uword in_col) {
+    this->factored = false;
+    return access::rw(this->memory[in_row + (length - in_col) * in_col / 2]);
+}
 
 template<sp_d T> T& SymmPackMat<T>::at(const uword in_row, const uword in_col) {
     if(in_row < in_col) [[unlikely]]return bin;
