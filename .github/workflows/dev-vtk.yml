@@ -79,4 +79,3 @@ jobs:
         with:
           name: suanPan-win-openblas-vtk.7z
           path: suanPan-win-openblas-vtk.7z
-
