@@ -27,6 +27,9 @@ BOOL WIN_EVENT(DWORD) { return TRUE; }
 // ReSharper disable once CppParameterMayBeConst
 int main(int argc, char** argv) {
 #ifdef SUANPAN_WIN
+#if defined(SUANPAN_DEBUG) && defined(SUANPAN_MSVC)
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
     if(!SetConsoleCtrlHandler(WIN_EVENT, TRUE)) return 0;
     const auto handle = GetStdHandle(STD_OUTPUT_HANDLE);
     CONSOLE_SCREEN_BUFFER_INFO info;
