@@ -47,8 +47,8 @@ mat tensor::orthotropic_stiffness(const vec& modulus, const vec& poissons_ratio)
     return stiffness;
 }
 
-mat tensor::unit_deviatoric_tensor4() {
-    mat T = zeros(6, 6);
+mat66 tensor::unit_deviatoric_tensor4() {
+    mat66 T(fill::zeros);
 
     T(3, 3) = T(4, 4) = T(5, 5) = .5;
 
@@ -57,16 +57,16 @@ mat tensor::unit_deviatoric_tensor4() {
     return T;
 }
 
-mat tensor::unit_deviatoric_tensor4v2() {
-    mat T = eye(6, 6);
+mat66 tensor::unit_deviatoric_tensor4v2() {
+    mat66 T(fill::eye);
 
     T(span(0, 2), span(0, 2)) -= 1. / 3.;
 
     return T;
 }
 
-mat tensor::unit_symmetric_tensor4() {
-    mat T = zeros(6, 6);
+mat66 tensor::unit_symmetric_tensor4() {
+    mat66 T(fill::zeros);
 
     for(auto I = 0; I < 3; ++I) T(I, I) = 1.;
     for(auto I = 3; I < 6; ++I) T(I, I) = .5;

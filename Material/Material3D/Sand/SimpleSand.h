@@ -50,7 +50,7 @@ struct DataSimpleSand {
 
 class SimpleSand final : DataSimpleSand, public Material3D {
     static constexpr unsigned max_iteration = 20;
-    static const mat unit_dev_tensor;
+    static const mat66 unit_dev_tensor;
 
     static constexpr uword sa = 0, sb = 1;
     static const span sc, sd;

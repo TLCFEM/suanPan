@@ -20,7 +20,7 @@
 #include <Toolbox/tensorToolbox.h>
 
 const double NonlinearJ2::root_two_third = sqrt(two_third);
-const mat NonlinearJ2::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
+const mat66 NonlinearJ2::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 NonlinearJ2::NonlinearJ2(const unsigned T, const double E, const double V, const double R)
     : DataNonlinearJ2{E, V}

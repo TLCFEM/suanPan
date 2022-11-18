@@ -26,7 +26,7 @@ B31::IntegrationPoint::IntegrationPoint(const double C, const double W, unique_p
     : coor(C)
     , weight(W)
     , b_section(std::forward<unique_ptr<Section>>(M))
-    , strain_mat(3, 6, fill::zeros) {}
+    , strain_mat(fill::zeros) {}
 
 B31::B31(const unsigned T, uvec&& N, const unsigned S, const unsigned O, const unsigned P, const bool F)
     : SectionElement3D(T, b_node, b_dof, std::forward<uvec>(N), uvec{S}, F)
@@ -56,7 +56,7 @@ int B31::initialize(const shared_ptr<DomainBase>& D) {
 
     const IntegrationPlan plan(1, int_pt_num, IntegrationType::LOBATTO);
 
-    mat local_stiffness(6, 6, fill::zeros);
+    mat66 local_stiffness(fill::zeros);
     int_pt.clear();
     int_pt.reserve(int_pt_num);
     for(unsigned I = 0; I < int_pt_num; ++I) {
@@ -81,8 +81,8 @@ int B31::update_status() {
 
     const auto local_deformation = b_trans->to_local_vec(get_trial_displacement());
 
-    mat local_stiffness(6, 6, fill::zeros);
-    vec local_resistance(6, fill::zeros);
+    mat66 local_stiffness(fill::zeros);
+    vec6 local_resistance(fill::zeros);
     for(const auto& I : int_pt) {
         if(I.b_section->update_trial_status(I.strain_mat * local_deformation / length) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
         local_stiffness += I.strain_mat.t() * I.b_section->get_trial_stiffness()(b_span, b_span) * I.strain_mat * I.weight / length;

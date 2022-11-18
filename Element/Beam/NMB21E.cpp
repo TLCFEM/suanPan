@@ -47,8 +47,8 @@ int NMB21E::update_status() {
 
     if(SUANPAN_SUCCESS != b_section->update_trial_status(trial_local_deformation / length)) return SUANPAN_FAIL;
 
-    mat local_stiffness(3, 3, fill::zeros);
-    vec local_resistance(3, fill::zeros);
+    mat33 local_stiffness(fill::zeros);
+    vec3 local_resistance(fill::zeros);
     local_resistance(b) = t_resistance(b) - t_stiffness(b, a) * solve(t_stiffness(a, a), t_resistance(a));
     local_stiffness(b, b) = t_stiffness(b, b) - t_stiffness(b, a) * solve(t_stiffness(a, a), t_stiffness(a, b));
 

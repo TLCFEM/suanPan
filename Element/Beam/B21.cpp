@@ -25,7 +25,7 @@ B21::IntegrationPoint::IntegrationPoint(const double C, const double W, unique_p
     : coor(C)
     , weight(W)
     , b_section(std::forward<unique_ptr<Section>>(M))
-    , strain_mat(2, 3, fill::zeros) {}
+    , strain_mat(fill::zeros) {}
 
 B21::B21(const unsigned T, uvec&& N, const unsigned S, const unsigned P, const bool F)
     : SectionElement2D(T, b_node, b_dof, std::forward<uvec>(N), uvec{S}, F)
@@ -66,8 +66,8 @@ int B21::update_status() {
 
     const auto local_deformation = b_trans->to_local_vec(get_trial_displacement());
 
-    mat local_stiffness(3, 3, fill::zeros);
-    vec local_resistance(3, fill::zeros);
+    mat33 local_stiffness(fill::zeros);
+    vec3 local_resistance(fill::zeros);
     for(const auto& I : int_pt) {
         if(SUANPAN_SUCCESS != I.b_section->update_trial_status(I.strain_mat * local_deformation / length)) return SUANPAN_FAIL;
         local_stiffness += I.strain_mat.t() * I.b_section->get_trial_stiffness() * I.strain_mat * I.weight / length;

@@ -18,9 +18,9 @@
 #include "MooneyRivlin.h"
 #include <Toolbox/tensorToolbox.h>
 
-const vec MooneyRivlin::weight{2., 2., 2., 1., 1., 1.};
-const vec MooneyRivlin::I1E{2., 2., 2., 0., 0., 0.};
-const mat MooneyRivlin::I2EE;
+const vec6 MooneyRivlin::weight{2., 2., 2., 1., 1., 1.};
+const vec6 MooneyRivlin::I1E{2., 2., 2., 0., 0., 0.};
+const mat66 MooneyRivlin::I2EE;
 constexpr double MooneyRivlin::one_three = 1. / 3.;
 constexpr double MooneyRivlin::two_three = 2. * one_three;
 constexpr double MooneyRivlin::four_three = 2. * two_three;
@@ -33,7 +33,7 @@ MooneyRivlin::MooneyRivlin(const unsigned T, const double KK, const double AA, c
 
 int MooneyRivlin::initialize(const shared_ptr<DomainBase>&) {
     if(I2EE.is_empty()) {
-        mat TI2EE(6, 6, fill::zeros);
+        mat66 TI2EE(fill::zeros);
         TI2EE(span(0, 2), span(0, 2)).fill(4.);
         TI2EE(0, 0) = TI2EE(1, 1) = TI2EE(2, 2) = 0.;
         TI2EE(3, 3) = TI2EE(4, 4) = TI2EE(5, 5) = -2.;

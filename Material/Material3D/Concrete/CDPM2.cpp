@@ -23,7 +23,7 @@
 
 const double CDPM2::sqrt_six = std::sqrt(6.);
 const double CDPM2::sqrt_three_two = std::sqrt(1.5);
-const mat CDPM2::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
+const mat66 CDPM2::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 void CDPM2::compute_plasticity(const double s, const double p, const double kp, podarray<double>& data) const {
     auto& f = data(0);
@@ -361,10 +361,12 @@ int CDPM2::update_trial_status(const vec& t_strain) {
 
     auto gamma = 0., s = trial_s, p = trial_p;
 
-    mat jacobian(4, 4, fill::none), left(4, 6, fill::zeros);
+    mat44 jacobian(fill::none);
+    mat::fixed<4, 6> left(fill::zeros);
     jacobian(0, 0) = 0.;
 
-    vec residual(4), incre;
+    vec4 residual(fill::none);
+    vec incre;
 
     podarray<double> data(15);
     const auto& f = data(0);
@@ -428,7 +430,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
 
             trial_stress = s * n + p * tensor::unit_tensor2;
 
-            mat right(4, 6, fill::none);
+            mat::fixed<4, 6> right(fill::none);
 
             right.row(0).zeros();
             right.row(1) = double_shear * unit_n.t() * unit_dev_tensor;
@@ -503,7 +505,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
             const mat n23 = eig_vec.col(1) * eig_vec.col(2).t();
             const mat n31 = eig_vec.col(2) * eig_vec.col(0).t();
 
-            mat pij(6, 6);
+            mat66 pij(fill::none);
 
             pij.col(0) = tensor::stress::to_voigt(eig_vec.col(0) * eig_vec.col(0).t());
             pij.col(1) = tensor::stress::to_voigt(eig_vec.col(1) * eig_vec.col(1).t());

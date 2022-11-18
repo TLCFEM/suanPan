@@ -44,8 +44,8 @@ struct DataNonlinearDruckerPrager {
 
 class NonlinearDruckerPrager : protected DataNonlinearDruckerPrager, public Material3D {
     static constexpr unsigned max_iteration = 20;
-    static const mat unit_dev_tensor;
-    static const mat unit_x_unit;
+    static const mat66 unit_dev_tensor;
+    static const mat66 unit_x_unit;
 
     const double shear = elastic_modulus / (2. + 2. * poissons_ratio); // shear modulus
     const double bulk = elastic_modulus / (3. - 6. * poissons_ratio);  // bulk modulus

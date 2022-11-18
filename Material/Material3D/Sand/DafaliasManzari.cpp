@@ -24,7 +24,7 @@ const span DafaliasManzari::sb(1, 6);
 const span DafaliasManzari::sk(2, 7);
 const span DafaliasManzari::sl(8, 13);
 const span DafaliasManzari::sm(14, 19);
-const mat DafaliasManzari::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
+const mat66 DafaliasManzari::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 DafaliasManzari::DafaliasManzari(const unsigned T, const double G0, const double NU, const double AC, const double LC, const double E0, const double XI, const double M, const double H0, const double H1, const double CH, const double NB, const double A, const double ND, const double ZM, const double CZ, const double PC, const double GR, const double R)
     : DataDafaliasManzari{fabs(G0), fabs(NU), fabs(AC), fabs(LC), fabs(E0), fabs(XI), fabs(M), fabs(H0), fabs(H1), fabs(CH), fabs(NB), A, fabs(ND), fabs(ZM), fabs(CZ), -fabs(PC), fabs(GR)}
@@ -331,7 +331,7 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
     trial_stress = s + p * tensor::unit_tensor2;
 
-    mat left(20, 6, fill::none), right;
+    mat::fixed<20, 6> left(fill::none), right;
 
     left.row(si).zeros();
     left.row(sj) = pr * (pgpe * (incre_ev - gamma * d) + g - g * gamma * pdpe) * tensor::unit_tensor2.t();

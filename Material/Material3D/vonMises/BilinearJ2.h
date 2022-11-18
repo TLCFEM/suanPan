@@ -45,7 +45,7 @@ struct DataBilinearJ2 {
 class BilinearJ2 final : DataBilinearJ2, public Material3D {
     static const double two_third;
     static const double root_two_third;
-    static const mat unit_dev_tensor;
+    static const mat66 unit_dev_tensor;
 
     const double shear_modulus = elastic_modulus / (2. + 2. * poissons_ratio); // shear modulus
     const double double_shear = 2. * shear_modulus;                            // double shear modulus

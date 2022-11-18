@@ -21,7 +21,7 @@
 #include <Toolbox/tensorToolbox.h>
 
 const double NonlinearPeric::root_three_two = sqrt(1.5);
-const mat NonlinearPeric::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
+const mat66 NonlinearPeric::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 constexpr double NonlinearPeric::unit_time = 1.;
 
 NonlinearPeric::NonlinearPeric(const unsigned T, const double E, const double V, const double MU, const double EPS, const double R)

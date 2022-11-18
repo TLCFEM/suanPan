@@ -34,8 +34,8 @@ int B21E::update_status() {
     auto local_deformation = b_trans->to_local_vec(get_trial_displacement());
     local_deformation(a) += trial_rotation;
 
-    mat local_stiffness(3, 3);
-    vec local_resistance(3);
+    mat33 local_stiffness;
+    vec3 local_resistance;
 
     auto counter = 0u;
     while(true) {

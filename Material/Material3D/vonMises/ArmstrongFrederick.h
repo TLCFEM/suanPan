@@ -51,7 +51,7 @@ struct DataArmstrongFrederick {
 class ArmstrongFrederick final : DataArmstrongFrederick, public Material3D {
     static constexpr unsigned max_iteration = 20;
     static const double root_three_two;
-    static const mat unit_dev_tensor;
+    static const mat66 unit_dev_tensor;
 
     const unsigned size = static_cast<unsigned>(a.size());
 

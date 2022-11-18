@@ -20,7 +20,7 @@
 #include <Toolbox/tensorToolbox.h>
 
 const double NonlinearGurson::sqrt_three_two = sqrt(1.5);
-const mat NonlinearGurson::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
+const mat66 NonlinearGurson::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 NonlinearGurson::NonlinearGurson(const unsigned T, const double E, const double V, const double Q1, const double Q2, const double FN, const double SN, const double EN, const double R)
     : DataNonlinearGurson{E, V, Q1, Q2, FN, SN, EN}
@@ -61,8 +61,8 @@ int NonlinearGurson::update_trial_status(const vec& t_strain) {
     const auto trial_p = tensor::mean3(trial_stress);                    // trial hydrostatic stress
     auto p = trial_p;                                                    // hydrostatic stress
 
-    mat jacobian(4, 4);
-    vec incre, residual(4);
+    mat44 jacobian(fill::none);
+    vec4 incre, residual;
     auto gamma = 0.;
     double denom;
 
@@ -125,7 +125,7 @@ int NonlinearGurson::update_trial_status(const vec& t_strain) {
 
     trial_s /= denom;
 
-    mat left, right(4, 6);
+    mat::fixed<4, 6> left, right(fill::none);
 
     right.row(0) = -six_shear / denom * trial_s.t();
     right.row(1) = -2. * gamma * right.row(0) + p * tensor::unit_tensor2.t();

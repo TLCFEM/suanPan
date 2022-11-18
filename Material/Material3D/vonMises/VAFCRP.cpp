@@ -22,7 +22,7 @@
 #include <Toolbox/tensorToolbox.h>
 
 const double VAFCRP::root_three_two = sqrt(1.5);
-const mat VAFCRP::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
+const mat66 VAFCRP::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 VAFCRP::VAFCRP(const unsigned T, const double E, const double V, const double Y, const double S, const double H, const double M, const double MU, const double EP, vec&& A, vec&& B, const double R)
     : DataVAFCRP{E, V, Y, S, H, M, MU, EP, std::forward<vec>(A), std::forward<vec>(B)}
@@ -109,7 +109,7 @@ int VAFCRP::update_trial_status(const vec& t_strain) {
 
     const vec u = xi / norm_xi;
 
-    vec sum_c(6, fill::zeros);
+    vec6 sum_c(fill::zeros);
     for(unsigned I = 0; I < size; ++I) {
         vec beta(&trial_history(1 + 6llu * I), 6, false, true);
         sum_c += b(I) * pow(1. + b(I) * gamma, -2.) * (beta - tensor::stress::double_contraction(u, beta) * u);

@@ -46,7 +46,7 @@ class MVLEM final : public MaterialElement1D {
     double shear_height_b = 0.;
     double total_area = 0.;
 
-    mat trans_mat;
+    mat66 trans_mat;
 
     vector<Fibre> axial_spring;
 

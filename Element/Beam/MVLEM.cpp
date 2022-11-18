@@ -53,7 +53,7 @@ int MVLEM::initialize(const shared_ptr<DomainBase>& D) {
     shear_height_a = shear_height * length;
     shear_height_b = shear_height_a - length;
 
-    trans_mat.zeros(6, 6);
+    trans_mat.zeros();
     trans_mat(2, 2) = trans_mat(5, 5) = 1.;
     trans_mat(0, 0) = trans_mat(1, 1) = trans_mat(3, 3) = trans_mat(4, 4) = pos_diff(1) / length;
     trans_mat(0, 1) = trans_mat(3, 4) = -(trans_mat(1, 0) = trans_mat(4, 3) = pos_diff(0)) / length;

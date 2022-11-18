@@ -42,7 +42,7 @@ class NonlinearJ2 : protected DataNonlinearJ2, public Material3D {
     static constexpr unsigned max_iteration = 20;
     static constexpr double two_third = 2. / 3.;
     static const double root_two_third;
-    static const mat unit_dev_tensor;
+    static const mat66 unit_dev_tensor;
 
     const double shear_modulus = elastic_modulus / (2. + 2. * poissons_ratio); // shear modulus
     const double double_shear = 2. * shear_modulus;                            // double shear modulus

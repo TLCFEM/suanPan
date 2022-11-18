@@ -19,7 +19,7 @@
 #include <Toolbox/tensorToolbox.h>
 
 const double NonlinearCamClay::sqrt_three_two = sqrt(1.5);
-const mat NonlinearCamClay::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
+const mat66 NonlinearCamClay::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 NonlinearCamClay::NonlinearCamClay(const unsigned T, const double E, const double V, const double B, const double M, const double P, const double R)
     : DataNonlinearCamClay{fabs(E), fabs(V), B * B, fabs(M), fabs(P)}
@@ -60,9 +60,9 @@ int NonlinearCamClay::update_trial_status(const vec& t_strain) {
     auto gamma = 0., rel_error = 0.;
     double trial_p, denom;
 
-    vec residual(2), incre;
-    mat jacobian(2, 2);
-    mat left(6, 2);
+    vec2 residual, incre;
+    mat22 jacobian(fill::none);
+    mat::fixed<6, 2> left(fill::none);
 
     unsigned counter = 0;
     while(true) {

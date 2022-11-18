@@ -26,11 +26,11 @@ namespace tensor {
     mat isotropic_stiffness(double, double);
     mat orthotropic_stiffness(const vec&, const vec&);
 
-    mat unit_deviatoric_tensor4();
-    mat unit_deviatoric_tensor4v2();
-    mat unit_symmetric_tensor4();
+    mat66 unit_deviatoric_tensor4();
+    mat66 unit_deviatoric_tensor4v2();
+    mat66 unit_symmetric_tensor4();
 
-    static const vec unit_tensor2{1., 1., 1., 0., 0., 0.};
+    static const vec6 unit_tensor2{1., 1., 1., 0., 0., 0.};
 
     namespace stress {
         // applies to 3D tensor only, either principal or not
@@ -45,7 +45,7 @@ namespace tensor {
         // compute derivative of lode angle based on input stress
         vec lode_der(vec);
 
-        static const vec norm_weight{1., 1., 1., 2., 2., 2.};
+        static const vec6 norm_weight{1., 1., 1., 2., 2., 2.};
     } // namespace stress
     namespace strain {
         // applies to 3D tensor only, either principal or not
@@ -58,7 +58,7 @@ namespace tensor {
         // compute load angle based on input deviatoric strain
         double lode(vec);
 
-        static const vec norm_weight{1., 1., 1., .5, .5, .5};
+        static const vec6 norm_weight{1., 1., 1., .5, .5, .5};
     } // namespace strain
     double trace2(const vec&);
     double trace3(const vec&);

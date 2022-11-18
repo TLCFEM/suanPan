@@ -20,7 +20,7 @@
 #include <Toolbox/tensorToolbox.h>
 
 const double NonlinearCDP::root_three_two = sqrt(1.5);
-const mat NonlinearCDP::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
+const mat66 NonlinearCDP::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 double NonlinearCDP::compute_r(const vec& in) {
     const auto r = .5 + .5 * accu(in) / accu(abs(in));

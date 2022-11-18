@@ -20,7 +20,7 @@
 #include <Toolbox/tensorToolbox.h>
 
 const double ArmstrongFrederick::root_three_two = sqrt(1.5);
-const mat ArmstrongFrederick::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
+const mat66 ArmstrongFrederick::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 ArmstrongFrederick::ArmstrongFrederick(const unsigned T, const double E, const double V, const double Y, const double S, const double H, const double M, vec&& A, vec&& B, const double R)
     : DataArmstrongFrederick{E, V, Y, S, H, M, std::forward<vec>(A), std::forward<vec>(B)}
@@ -108,7 +108,7 @@ int ArmstrongFrederick::update_trial_status(const vec& t_strain) {
 
     const vec u = xi / norm_xi;
 
-    vec sum_c(6, fill::zeros);
+    vec6 sum_c(fill::zeros);
     for(unsigned I = 0; I < size; ++I) {
         vec beta(&trial_history(1 + 6ull * I), 6, false, true);
         sum_c += b(I) * pow(1. + b(I) * gamma, -2.) * (beta - tensor::stress::double_contraction(u, beta) * u);

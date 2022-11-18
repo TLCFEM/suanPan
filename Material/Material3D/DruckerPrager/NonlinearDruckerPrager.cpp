@@ -18,8 +18,8 @@
 #include "NonlinearDruckerPrager.h"
 #include <Toolbox/tensorToolbox.h>
 
-const mat NonlinearDruckerPrager::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
-const mat NonlinearDruckerPrager::unit_x_unit = tensor::unit_tensor2 * tensor::unit_tensor2.t();
+const mat66 NonlinearDruckerPrager::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
+const mat66 NonlinearDruckerPrager::unit_x_unit = tensor::unit_tensor2 * tensor::unit_tensor2.t();
 
 NonlinearDruckerPrager::NonlinearDruckerPrager(const unsigned T, const double E, const double V, const double ETAY, const double ETAF, const double XI, const double R)
     : DataNonlinearDruckerPrager{E, V, ETAY, ETAF, XI}

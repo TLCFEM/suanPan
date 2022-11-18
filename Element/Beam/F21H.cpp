@@ -25,7 +25,7 @@ F21H::IntegrationPoint::IntegrationPoint(const double C, const double W, unique_
     : coor(C)
     , weight(W)
     , b_section(std::forward<unique_ptr<Section>>(M))
-    , B(2, 3, fill::zeros) { B(0, 0) = 1.; }
+    , B(fill::zeros) { B(0, 0) = 1.; }
 
 F21H::F21H(const unsigned T, uvec&& N, const unsigned S, const double L, const bool F)
     : SectionElement2D(T, b_node, b_dof, std::forward<uvec>(N), uvec{S}, F)

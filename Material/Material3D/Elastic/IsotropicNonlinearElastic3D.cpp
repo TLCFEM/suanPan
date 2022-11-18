@@ -18,8 +18,8 @@
 #include "IsotropicNonlinearElastic3D.h"
 #include <Toolbox/tensorToolbox.h>
 
-const mat IsotropicNonlinearElastic3D::unit_dev_tensor = two_third * tensor::unit_deviatoric_tensor4();
-const mat IsotropicNonlinearElastic3D::unit_unit = unit_dev_tensor * tensor::unit_deviatoric_tensor4v2();
+const mat66 IsotropicNonlinearElastic3D::unit_dev_tensor = two_third * tensor::unit_deviatoric_tensor4();
+const mat66 IsotropicNonlinearElastic3D::unit_unit = unit_dev_tensor * tensor::unit_deviatoric_tensor4v2();
 
 IsotropicNonlinearElastic3D::IsotropicNonlinearElastic3D(const unsigned T, const double R)
     : Material3D(T, R) {}

@@ -55,7 +55,7 @@ class NonlinearCDP : protected DataNonlinearCDP, public Material3D {
     static constexpr unsigned max_iteration = 20;
     static const double root_three_two;
     static constexpr double scale = .999; // to avoid overshoot
-    static const mat unit_dev_tensor;
+    static const mat66 unit_dev_tensor;
 
     const double bulk = elastic_modulus / (3. - 6. * poissons_ratio);
     const double double_shear = elastic_modulus / (1. + poissons_ratio);

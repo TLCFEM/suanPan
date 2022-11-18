@@ -33,8 +33,8 @@
 
 class IsotropicNonlinearElastic3D : public Material3D {
     static constexpr double two_third = 2. / 3.;
-    static const mat unit_dev_tensor;
-    static const mat unit_unit;
+    static const mat66 unit_dev_tensor;
+    static const mat66 unit_unit;
 
     /**
      * \brief compute the derivatives of potential energy w.r.t. volumetric strain and equivalent strain squared

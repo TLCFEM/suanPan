@@ -21,7 +21,7 @@
 
 constexpr double BilinearJ2::two_third = 2. / 3.;
 const double BilinearJ2::root_two_third = sqrt(two_third);
-const mat BilinearJ2::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
+const mat66 BilinearJ2::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 BilinearJ2::BilinearJ2(const unsigned T, const double E, const double V, const double Y, const double H, const double B, const double R)
     : DataBilinearJ2{fabs(E), V, fabs(Y), H, B}

@@ -27,7 +27,7 @@ F31::IntegrationPoint::IntegrationPoint(const double C, const double W, unique_p
     : coor(C)
     , weight(W)
     , b_section(std::forward<unique_ptr<Section>>(M))
-    , strain_mat(3, 6, fill::zeros) {}
+    , strain_mat(fill::zeros) {}
 
 F31::F31(const unsigned T, uvec&& N, const unsigned S, const unsigned O, const unsigned P, const bool F)
     : SectionElement3D(T, b_node, b_dof, std::forward<uvec>(N), uvec{S}, F)

@@ -43,7 +43,7 @@ struct DataNonlinearPeric {
 class NonlinearPeric : DataNonlinearPeric, public Material3D {
     static constexpr unsigned max_iteration = 20;
     static const double root_three_two;
-    static const mat unit_dev_tensor;
+    static const mat66 unit_dev_tensor;
     static const double unit_time;
 
     const double shear_modulus = elastic_modulus / (2. + 2. * poissons_ratio); // shear modulus

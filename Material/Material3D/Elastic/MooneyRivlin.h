@@ -39,9 +39,9 @@ struct DataMooneyRivlin {
 };
 
 class MooneyRivlin final : DataMooneyRivlin, public Material3D {
-    static const vec weight;
-    static const vec I1E;
-    static const mat I2EE;
+    static const vec6 weight;
+    static const vec6 I1E;
+    static const mat66 I2EE;
     static const double one_three, two_three, four_three, five_three, eight_nine;
 
 public:

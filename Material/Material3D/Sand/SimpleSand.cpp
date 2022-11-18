@@ -20,7 +20,7 @@
 
 const span SimpleSand::sc(2, 7);
 const span SimpleSand::sd(8, 13);
-const mat SimpleSand::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
+const mat66 SimpleSand::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 SimpleSand::SimpleSand(const unsigned T, const double E, const double V, const double M, const double A, const double H, const double AC, const double NB, const double ND, const double VC, const double PC, const double LC, const double V0, const double R)
     : DataSimpleSand{E, V, fabs(M), A, H, AC, fabs(NB), fabs(ND), fabs(VC), -fabs(PC), fabs(LC), fabs(V0)}
@@ -63,8 +63,8 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
     auto s = trial_s;
     auto p = trial_p;
 
-    mat jacobian(14, 14, fill::none);
-    vec residual(14, fill::none), incre;
+    mat::fixed<14, 14> jacobian(fill::none);
+    vec::fixed<14> residual(fill::none), incre;
 
     jacobian(sa, sa) = 0.;
 
@@ -134,7 +134,7 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
 
     trial_stress = s + p * tensor::unit_tensor2;
 
-    mat left(14, 6, fill::none), right;
+    mat::fixed<14, 6> left(fill::none), right;
 
     left.row(sa).zeros();
     left.row(sb) = (bulk - bulk * a * gamma * alpha_d * nd * v0) * tensor::unit_tensor2.t();

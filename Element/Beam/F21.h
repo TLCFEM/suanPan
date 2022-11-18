@@ -41,7 +41,7 @@ class F21 final : public SectionElement2D {
     struct IntegrationPoint final {
         double coor, weight;
         unique_ptr<Section> b_section;
-        mat B;
+        mat::fixed<2, 3> B;
         IntegrationPoint(double, double, unique_ptr<Section>&&);
     };
 
