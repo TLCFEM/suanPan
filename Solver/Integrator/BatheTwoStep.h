@@ -39,10 +39,11 @@ class BatheTwoStep final : public Integrator {
 
     FLAG step_flag = FLAG::TRAP;
 
-    double C0 = 0., C1 = 0., C2 = 0., C3 = 0., C4 = 0., C5 = 0., C6 = 0.;
+    const double Q1, Q2, Q0, Q02 = Q0 / Q2, Q12 = Q1 / Q2;
 
+    double P0{0.}, P1{0.}, P2{0.}, P3{0.}, P4{0.}, P5{0.}, P6{0.}, P7{0.}, P8{0.}, P9{0.};
 public:
-    using Integrator::Integrator;
+    BatheTwoStep(unsigned, double);
 
     void assemble_resistance() override;
     void assemble_matrix() override;
@@ -57,6 +58,8 @@ public:
 
     vec from_incre_velocity(const vec&, const uvec&) override;
     vec from_incre_acceleration(const vec&, const uvec&) override;
+    vec from_total_velocity(const vec&, const uvec&) override;
+    vec from_total_acceleration(const vec&, const uvec&) override;
 
     void print() override;
 };

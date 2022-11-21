@@ -252,7 +252,7 @@ void Integrator::reset_status() {
 }
 
 /**
- * When tim step changes, some parameters may need to be updated.
+ * When time step changes, some parameters may need to be updated.
  */
 void Integrator::update_parameter(double) {}
 
@@ -273,7 +273,7 @@ void Integrator::update_compatibility() const {}
  * That is, in AX=B, A is the effective stiffness matrix and X is the displacement increment.
  * Thus, loads in velocity/acceleration must be converted to displacement.
  * This cannot be done arbitrarily due to compatibility issues.
- * This method takes velocity increment and converts it to displacement increment.
+ * This method takes velocity increment and converts it to TOTAL displacement.
  */
 vec Integrator::from_incre_velocity(const vec&, const uvec& encoding) { return zeros(encoding.n_elem); }
 
@@ -283,7 +283,7 @@ vec Integrator::from_incre_velocity(const vec&, const uvec& encoding) { return z
  * That is, in AX=B, A is the effective stiffness matrix and X is the displacement increment.
  * Thus, loads in velocity/acceleration must be converted to displacement.
  * This cannot be done arbitrarily due to compatibility issues.
- * This method takes acceleration increment and converts it to displacement increment.
+ * This method takes acceleration increment and converts it to TOTAL displacement.
  */
 vec Integrator::from_incre_acceleration(const vec&, const uvec& encoding) { return zeros(encoding.n_elem); }
 

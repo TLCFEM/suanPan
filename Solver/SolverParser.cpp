@@ -221,8 +221,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
         if(domain->insert(make_shared<GSSSSV0>(tag, std::move(pool)))) code = 1;
     }
     else if(is_equal(integrator_type, "GSSSSOptimal")) {
-        double radius = .5;
-
+        double radius;
         if(!get_input(command, radius)) {
             suanpan_error("create_new_integrator() needs a valid damping radius.\n");
             return SUANPAN_SUCCESS;
@@ -230,7 +229,16 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
 
         if(domain->insert(make_shared<GSSSSOptimal>(tag, radius))) code = 1;
     }
-    else if(is_equal(integrator_type, "BatheTwoStep") && domain->insert(make_shared<BatheTwoStep>(tag))) code = 1;
+    else if(is_equal(integrator_type, "BatheTwoStep")) {
+        double radius = 0.;
+        if(!get_optional_input(command, radius)) {
+            suanpan_error("create_new_integrator() needs a valid damping radius.\n");
+            return SUANPAN_SUCCESS;
+        }
+        radius = std::max(0., std::min(radius, 1.));
+
+        if(domain->insert(make_shared<BatheTwoStep>(tag, radius))) code = 1;
+    }
 
     if(1 == code) {
         if(0 != domain->get_current_step_tag()) domain->get_current_step()->set_integrator_tag(tag);

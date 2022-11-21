@@ -8,6 +8,7 @@
 ## version 2.7
 
 1. optimise assembling of symmetric global matrices, around 10% overall performance improvement on memory bounded systems [#79](https://github.com/TLCFEM/suanPan/pull/79)
+2. extend `BatheTwoStep` to allow customisation of spectral radius [#80](https://github.com/TLCFEM/suanPan/pull/80)
 
 ## version 2.6.1
 

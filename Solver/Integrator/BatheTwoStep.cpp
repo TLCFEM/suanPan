@@ -20,6 +20,12 @@
 #include <Domain/Factory.hpp>
 #include <Domain/Node.h>
 
+BatheTwoStep::BatheTwoStep(const unsigned T, const double R)
+    : Integrator(T)
+    , Q1((R + 1) / (R + 3))
+    , Q2(.5 - .5 * Q1)
+    , Q0(1. - Q1 - Q2) {}
+
 void BatheTwoStep::assemble_resistance() {
     const auto& D = get_domain().lock();
     auto& W = D->get_factory();
@@ -53,19 +59,19 @@ void BatheTwoStep::assemble_matrix() {
 
     t_stiff += W->get_geometry();
 
-    t_stiff += FLAG::TRAP == step_flag ? C6 * W->get_mass() + C3 * W->get_damping() : C5 * W->get_mass() + C2 * W->get_damping();
+    t_stiff += FLAG::TRAP == step_flag ? P3 * W->get_mass() + P2 * W->get_damping() : P9 * W->get_mass() + P8 * W->get_damping();
 }
 
 int BatheTwoStep::update_trial_status() {
     const auto& D = get_domain().lock();
 
     if(auto& W = D->get_factory(); FLAG::TRAP == step_flag) {
-        W->update_incre_acceleration(C6 * W->get_incre_displacement() - C4 * W->get_current_velocity() - 2. * W->get_current_acceleration());
-        W->update_incre_velocity(C3 * W->get_incre_displacement() - 2. * W->get_current_velocity());
+        W->update_trial_acceleration(P3 * W->get_incre_displacement() - P4 * W->get_current_velocity() - W->get_current_acceleration());
+        W->update_trial_velocity(P2 * W->get_incre_displacement() - W->get_current_velocity());
     }
     else {
-        W->update_trial_velocity(C2 * W->get_incre_displacement() + C1 * (W->get_pre_displacement() - W->get_current_displacement()));
-        W->update_trial_acceleration(C1 * W->get_pre_velocity() - C3 * W->get_current_velocity() + C2 * W->get_trial_velocity());
+        W->update_trial_velocity(P8 * (W->get_trial_displacement() - W->get_pre_displacement()) - Q02 * W->get_pre_velocity() - Q12 * W->get_current_velocity());
+        W->update_trial_acceleration(P8 * (W->get_trial_velocity() - W->get_pre_velocity()) - Q02 * W->get_pre_acceleration() - Q12 * W->get_current_acceleration());
     }
 
     return D->update_trial_status();
@@ -86,6 +92,7 @@ void BatheTwoStep::commit_status() {
 
     W->commit_pre_displacement();
     W->commit_pre_velocity();
+    W->commit_pre_acceleration();
 
     Integrator::commit_status();
 }
@@ -105,12 +112,12 @@ void BatheTwoStep::update_compatibility() const {
     auto& W = D->get_factory();
 
     if(FLAG::TRAP == step_flag) {
-        W->update_incre_acceleration(-C4 * W->get_current_velocity() - 2. * W->get_current_acceleration());
-        W->update_incre_velocity(-2. * W->get_current_velocity());
+        W->update_trial_acceleration(-P4 * W->get_current_velocity() - W->get_current_acceleration());
+        W->update_trial_velocity(-W->get_current_velocity());
     }
     else {
-        W->update_trial_velocity(C1 * (W->get_pre_displacement() - W->get_current_displacement()));
-        W->update_trial_acceleration(C1 * W->get_pre_velocity() - C3 * W->get_current_velocity() + C2 * W->get_trial_velocity());
+        W->update_trial_velocity(P8 * (W->get_current_displacement() - W->get_pre_displacement()) - Q02 * W->get_pre_velocity() - Q12 * W->get_current_velocity());
+        W->update_trial_acceleration(P8 * (W->get_trial_velocity() - W->get_pre_velocity()) - Q02 * W->get_pre_acceleration() - Q12 * W->get_current_acceleration());
     }
 
     auto& trial_dsp = W->get_trial_displacement();
@@ -123,35 +130,48 @@ void BatheTwoStep::update_compatibility() const {
 vec BatheTwoStep::from_incre_velocity(const vec& incre_velocity, const uvec& encoding) {
     auto& W = get_domain().lock()->get_factory();
 
-    vec total_displacement = W->get_current_displacement()(encoding);
-
-    if(FLAG::TRAP == step_flag) total_displacement += incre_velocity / C3 + C0 * W->get_current_velocity()(encoding);
-    else total_displacement += (incre_velocity + W->get_current_velocity()(encoding)) / C2 + (W->get_current_displacement()(encoding) - W->get_pre_displacement()(encoding)) / 3.;
-
-    return total_displacement;
+    return from_total_velocity(W->get_current_velocity()(encoding) + incre_velocity, encoding);
 }
 
 vec BatheTwoStep::from_incre_acceleration(const vec& incre_acceleration, const uvec& encoding) {
     auto& W = get_domain().lock()->get_factory();
 
-    vec total_displacement = W->get_current_displacement()(encoding);
+    return from_total_acceleration(W->get_current_acceleration()(encoding) + incre_acceleration, encoding);
+}
 
-    if(FLAG::TRAP == step_flag) total_displacement += incre_acceleration / C6 + C0 * W->get_current_velocity()(encoding) + 2. / C6 * W->get_current_acceleration()(encoding);
-    else total_displacement += (incre_acceleration + W->get_current_acceleration()(encoding)) / C5 + C3 / C5 * W->get_current_velocity()(encoding) - C1 / C5 * W->get_pre_velocity()(encoding) + (W->get_current_displacement()(encoding) - W->get_pre_displacement()(encoding)) / 3.;
+vec BatheTwoStep::from_total_velocity(const vec& total_velocity, const uvec& encoding) {
+    auto& W = get_domain().lock()->get_factory();
 
-    return total_displacement;
+    if(FLAG::TRAP == step_flag) return W->get_current_displacement()(encoding) + P1 * (W->get_current_velocity()(encoding) + total_velocity);
+
+    return W->get_pre_displacement()(encoding) + P5 * W->get_pre_velocity()(encoding) + P6 * W->get_current_velocity()(encoding) + P7 * total_velocity;
+}
+
+vec BatheTwoStep::from_total_acceleration(const vec& total_acceleration, const uvec& encoding) {
+    auto& W = get_domain().lock()->get_factory();
+
+    vec total_velocity;
+    if(FLAG::TRAP == step_flag) total_velocity = W->get_current_velocity()(encoding) + P1 * (W->get_current_acceleration()(encoding) + total_acceleration);
+    else total_velocity = W->get_pre_velocity()(encoding) + P5 * W->get_pre_acceleration()(encoding) + P6 * W->get_current_acceleration()(encoding) + P7 * total_acceleration;
+
+    return from_total_velocity(total_velocity, encoding);
 }
 
 void BatheTwoStep::update_parameter(const double NT) {
-    if(suanpan::approx_equal(C0, NT)) return;
+    if(suanpan::approx_equal(P0, NT)) return;
 
-    C0 = NT;
-    C1 = .5 / C0;
-    C2 = 3. * C1;
-    C3 = 4. * C1;
-    C4 = 2. * C3;
-    C5 = C2 * C2;
-    C6 = C4 / C0;
+    P0 = NT;
+
+    P1 = .5 * P0;
+    P2 = 1. / P1;
+    P3 = P2 * P2;
+    P4 = 2. * P2;
+
+    P5 = 2. * P0 * Q0;
+    P6 = 2. * P0 * Q1;
+    P7 = 2. * P0 * Q2;
+    P8 = 1. / P7;
+    P9 = P8 * P8;
 }
 
 void BatheTwoStep::print() { suanpan_info("A BatheTwoStep solver.\n"); }
