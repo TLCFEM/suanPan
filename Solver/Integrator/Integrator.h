@@ -120,8 +120,8 @@ public:
 
     virtual vec from_incre_velocity(const vec&, const uvec&);     // obtain target displacement from increment of velocity
     virtual vec from_incre_acceleration(const vec&, const uvec&); // obtain target displacement from increment of acceleration
-    vec from_total_velocity(const vec&, const uvec&);
-    vec from_total_acceleration(const vec&, const uvec&);
+    virtual vec from_total_velocity(const vec&, const uvec&);
+    virtual vec from_total_acceleration(const vec&, const uvec&);
     vec from_incre_velocity(double, const uvec&);
     vec from_incre_acceleration(double, const uvec&);
     vec from_total_velocity(double, const uvec&);
