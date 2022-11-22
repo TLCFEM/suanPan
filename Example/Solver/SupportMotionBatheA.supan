@@ -24,7 +24,7 @@ step dynamic 1 25
 set ini_step_size 1E-2
 set fixed_step_size true
 
-integrator BatheTwoStep 1 .2
+integrator BatheTwoStep 1 .2 .1
 
 converger RelIncreDisp 1 1E-10 4 1
 
@@ -34,13 +34,13 @@ analyze
 # Coordinate:
 #         0   1.0000
 # Displacement:
-#   -4.3710e-01  -8.3282e-19  -3.6335e-01
+#   -4.2877e-01  -1.0948e-17  -3.6772e-01
 # Resistance:
-#    7.3319e+01   3.2922e-16   3.2406e-01
+#    7.4201e+01  -6.4902e-15   3.2793e-01
 # Velocity:
-#   -7.4350e-01  -4.7314e-16   7.8844e-01
+#   -6.7990e-01  -1.3070e-16   6.9642e-01
 # Acceleration:
-#   -7.0828e+00  -9.4491e-17   1.0601e+01
+#   -7.1680e+00   8.9633e-15   1.0730e+01
 peek node 1 2
 
 # save recorder 1
