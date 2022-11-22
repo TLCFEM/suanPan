@@ -83,6 +83,7 @@ int Dynamic::initialize() {
 int Dynamic::analyze() {
     auto& S = get_solver();
     auto& G = get_integrator();
+    auto& W = get_factory();
 
     auto remain_time = get_time_period();
     auto step_time = get_ini_step_size();
@@ -104,18 +105,20 @@ int Dynamic::analyze() {
         G->update_incre_time(step_time);
         if(const auto code = S->analyze(); SUANPAN_SUCCESS == code) {
             // success step
+            // eat current increment
+            set_time_left(remain_time -= W->get_incre_time());
             // commit converged iteration
             G->stage_and_commit_status();
             // record response
             G->record();
-            // eat current increment
-            set_time_left(remain_time -= step_time);
-            if(!is_fixed_step_size() && ++num_converged_step > 5 && G->allow_to_change_time_step()) {
-                step_time = std::min(get_max_step_size(), step_time * time_step_amplification);
-                num_converged_step = 0;
+            if(G->allow_to_change_time_step()) {
+                if(!is_fixed_step_size() && ++num_converged_step > 5) {
+                    step_time = std::min(get_max_step_size(), step_time * time_step_amplification);
+                    num_converged_step = 0;
+                }
+                // check if time overflows
+                if(step_time > remain_time) step_time = remain_time;
             }
-            // check if time overflows
-            if(step_time > remain_time) step_time = remain_time;
         }
         else if(SUANPAN_FAIL == code) {
             // failed step

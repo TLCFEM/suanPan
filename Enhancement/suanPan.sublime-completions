@@ -1798,7 +1798,7 @@
       "trigger":"import"
     },
     {
-      "contents":"integrator BatheTwoStep ${1:(1)} ${2:(2)}\n# (1) int, unique integrator tag\n# [2] double, spectral radius, default: 0",
+      "contents":"integrator BatheTwoStep ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique integrator tag\n# [2] double, spectral radius, default: 0\n# [3] double, sub-step size, default: 0.5",
       "details":"",
       "kind":"type",
       "trigger":"BatheTwoStep"

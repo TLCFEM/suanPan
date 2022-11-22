@@ -169,12 +169,6 @@ void Integrator::update_trial_displacement(const vec& ninja) {
     W->update_trial_displacement_by(ninja);
 }
 
-void Integrator::update_trial_time(const double T) {
-    const auto& W = get_domain().lock()->get_factory();
-    W->update_trial_time(T);
-    update_parameter(W->get_incre_time());
-}
-
 void Integrator::update_incre_time(const double T) {
     const auto& W = get_domain().lock()->get_factory();
     W->update_incre_time(T);
