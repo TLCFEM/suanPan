@@ -20,10 +20,11 @@
 #include <Domain/Factory.hpp>
 #include <Domain/Node.h>
 
-BatheTwoStep::BatheTwoStep(const unsigned T, const double R)
+BatheTwoStep::BatheTwoStep(const unsigned T, const double R, const double G)
     : Integrator(T)
-    , Q1((R + 1) / (R + 3))
-    , Q2(.5 - .5 * Q1)
+    , GM(G)
+    , Q1((R + 1) / (2. * GM * (R - 1) + 4))
+    , Q2(.5 - GM * Q1)
     , Q0(1. - Q1 - Q2) {}
 
 void BatheTwoStep::assemble_resistance() {
@@ -60,6 +61,12 @@ void BatheTwoStep::assemble_matrix() {
     t_stiff += W->get_geometry();
 
     t_stiff += FLAG::TRAP == step_flag ? P3 * W->get_mass() + P2 * W->get_damping() : P9 * W->get_mass() + P8 * W->get_damping();
+}
+
+void BatheTwoStep::update_incre_time(const double T) {
+    const auto& W = get_domain().lock()->get_factory();
+    W->update_incre_time(2. * T * (FLAG::TRAP == step_flag ? GM : 1. - GM));
+    update_parameter(2. * T);
 }
 
 int BatheTwoStep::update_trial_status() {
@@ -162,14 +169,14 @@ void BatheTwoStep::update_parameter(const double NT) {
 
     P0 = NT;
 
-    P1 = .5 * P0;
+    P1 = .5 * P0 * GM;
     P2 = 1. / P1;
     P3 = P2 * P2;
     P4 = 2. * P2;
 
-    P5 = 2. * P0 * Q0;
-    P6 = 2. * P0 * Q1;
-    P7 = 2. * P0 * Q2;
+    P5 = P0 * Q0;
+    P6 = P0 * Q1;
+    P7 = P0 * Q2;
     P8 = 1. / P7;
     P9 = P8 * P8;
 }

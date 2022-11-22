@@ -39,14 +39,19 @@ class BatheTwoStep final : public Integrator {
 
     FLAG step_flag = FLAG::TRAP;
 
+    const double GM;
+
     const double Q1, Q2, Q0, Q02 = Q0 / Q2, Q12 = Q1 / Q2;
 
     double P0{0.}, P1{0.}, P2{0.}, P3{0.}, P4{0.}, P5{0.}, P6{0.}, P7{0.}, P8{0.}, P9{0.};
+
 public:
-    BatheTwoStep(unsigned, double);
+    BatheTwoStep(unsigned, double, double);
 
     void assemble_resistance() override;
     void assemble_matrix() override;
+
+    void update_incre_time(double) override;
 
     int update_trial_status() override;
 

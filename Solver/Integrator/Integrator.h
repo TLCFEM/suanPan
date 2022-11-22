@@ -90,8 +90,8 @@ public:
     virtual void update_trial_load_factor(const vec&);
     virtual void update_trial_displacement(const vec&);
 
-    void update_trial_time(double);
-    void update_incre_time(double);
+    virtual void update_incre_time(double);
+
     virtual int update_trial_status();
     virtual int update_incre_status();
 
