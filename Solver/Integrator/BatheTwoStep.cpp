@@ -63,10 +63,10 @@ void BatheTwoStep::assemble_matrix() {
     t_stiff += FLAG::TRAP == step_flag ? P3 * W->get_mass() + P2 * W->get_damping() : P9 * W->get_mass() + P8 * W->get_damping();
 }
 
-void BatheTwoStep::update_incre_time(const double T) {
+void BatheTwoStep::update_incre_time(double T) {
     const auto& W = get_domain().lock()->get_factory();
-    W->update_incre_time(2. * T * (FLAG::TRAP == step_flag ? GM : 1. - GM));
-    update_parameter(2. * T);
+    update_parameter(T *= 2.);
+    W->update_incre_time(T * (FLAG::TRAP == step_flag ? GM : 1. - GM));
 }
 
 int BatheTwoStep::update_trial_status() {

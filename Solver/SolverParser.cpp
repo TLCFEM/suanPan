@@ -242,10 +242,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
             suanpan_error("create_new_integrator() needs a valid gamma.\n");
             return SUANPAN_SUCCESS;
         }
-        if(suanpan::approx_equal(gamma, 0.) || suanpan::approx_equal(gamma, 1.) || suanpan::approx_equal(gamma, 2. / (1. - radius))) {
-            suanpan_warning("BatheTwoStep resets gamma to 0.5.\n");
-            gamma = .5;
-        }
+        if(gamma <= 0. || gamma >= 1.) gamma = .5;
 
         if(domain->insert(make_shared<BatheTwoStep>(tag, radius, gamma))) code = 1;
     }
