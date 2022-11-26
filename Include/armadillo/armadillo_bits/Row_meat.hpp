@@ -51,12 +51,11 @@ Row<eT>::Row(const uword in_n_elem)
   {
   arma_extra_debug_sigprint();
   
-  #if (!defined(ARMA_DONT_ZERO_INIT))
+  if(arma_config::zero_init)
     {
     arma_extra_debug_print("Row::constructor: zeroing memory");
     arrayops::fill_zeros(Mat<eT>::memptr(), Mat<eT>::n_elem);
     }
-  #endif
   }
 
 
@@ -70,12 +69,11 @@ Row<eT>::Row(const uword in_n_rows, const uword in_n_cols)
   
   Mat<eT>::init_warm(in_n_rows, in_n_cols);
   
-  #if (!defined(ARMA_DONT_ZERO_INIT))
+  if(arma_config::zero_init)
     {
     arma_extra_debug_print("Row::constructor: zeroing memory");
     arrayops::fill_zeros(Mat<eT>::memptr(), Mat<eT>::n_elem);
     }
-  #endif
   }
 
 
@@ -89,12 +87,11 @@ Row<eT>::Row(const SizeMat& s)
   
   Mat<eT>::init_warm(s.n_rows, s.n_cols);
   
-  #if (!defined(ARMA_DONT_ZERO_INIT))
+  if(arma_config::zero_init)
     {
     arma_extra_debug_print("Row::constructor: zeroing memory");
     arrayops::fill_zeros(Mat<eT>::memptr(), Mat<eT>::n_elem);
     }
-  #endif
   }
 
 
@@ -314,10 +311,9 @@ Row<eT>::Row(const std::vector<eT>& x)
   {
   arma_extra_debug_sigprint_this(this);
   
-  if(x.size() > 0)
-    {
-    arrayops::copy( Mat<eT>::memptr(), &(x[0]), uword(x.size()) );
-    }
+  const uword N = uword(x.size());
+  
+  if(N > 0)  { arrayops::copy( Mat<eT>::memptr(), &(x[0]), N ); }
   }
   
   
@@ -330,12 +326,11 @@ Row<eT>::operator=(const std::vector<eT>& x)
   {
   arma_extra_debug_sigprint();
   
-  Mat<eT>::init_warm(1, uword(x.size()));
+  const uword N = uword(x.size());
   
-  if(x.size() > 0)
-    {
-    arrayops::copy( Mat<eT>::memptr(), &(x[0]), uword(x.size()) );
-    }
+  Mat<eT>::init_warm(1, N);
+  
+  if(N > 0)  { arrayops::copy( Mat<eT>::memptr(), &(x[0]), N ); }
   
   return *this;
   }
@@ -345,11 +340,13 @@ Row<eT>::operator=(const std::vector<eT>& x)
 template<typename eT>
 inline
 Row<eT>::Row(const std::initializer_list<eT>& list)
-  : Mat<eT>(arma_vec_indicator(), 2)
+  : Mat<eT>(arma_vec_indicator(), 1, uword(list.size()), 2)
   {
-  arma_extra_debug_sigprint();
+  arma_extra_debug_sigprint_this(this);
   
-  (*this).operator=(list);
+  const uword N = uword(list.size());
+  
+  if(N > 0)  { arrayops::copy( Mat<eT>::memptr(), list.begin(), N ); }
   }
 
 
@@ -361,14 +358,11 @@ Row<eT>::operator=(const std::initializer_list<eT>& list)
   {
   arma_extra_debug_sigprint();
   
-  Mat<eT> tmp(list);
+  const uword N = uword(list.size());
   
-  arma_debug_check( ((tmp.n_elem > 0) && (tmp.is_vec() == false)), "Mat::init(): requested size is not compatible with row vector layout" );
+  Mat<eT>::init_warm(1, N);
   
-  access::rw(tmp.n_rows) = 1;
-  access::rw(tmp.n_cols) = tmp.n_elem;
-  
-  (*this).steal_mem(tmp);
+  if(N > 0)  { arrayops::copy( Mat<eT>::memptr(), list.begin(), N ); }
   
   return *this;
   }
@@ -424,15 +418,7 @@ Row<eT>::operator=(Row<eT>&& X)
   {
   arma_extra_debug_sigprint(arma_str::format("this = %x   X = %x") % this % &X);
   
-  (*this).steal_mem(X);
-  
-  if( (X.mem_state == 0) && (X.n_alloc <= arma_config::mat_prealloc) && (this != &X) )
-    {
-    access::rw(X.n_rows)  = 1;
-    access::rw(X.n_cols)  = 0;
-    access::rw(X.n_elem)  = 0;
-    access::rw(X.mem)     = nullptr;
-    }
+  (*this).steal_mem(X, true);
   
   return *this;
   }
@@ -625,7 +611,7 @@ Row<eT>::operator=(const subview_cube<eT>& X)
 
 template<typename eT>
 inline
-arma_cold
+arma_deprecated
 mat_injector< Row<eT> >
 Row<eT>::operator<<(const eT val)
   {
@@ -1068,12 +1054,25 @@ Row<eT>::shed_cols(const Base<uword, T1>& indices)
 
 
 
-//! insert N cols at the specified col position,
-//! optionally setting the elements of the inserted cols to zero
 template<typename eT>
+arma_deprecated
 inline
 void
 Row<eT>::insert_cols(const uword col_num, const uword N, const bool set_to_zero)
+  {
+  arma_extra_debug_sigprint();
+  
+  arma_ignore(set_to_zero);
+  
+  (*this).insert_cols(col_num, N);
+  }
+
+
+
+template<typename eT>
+inline
+void
+Row<eT>::insert_cols(const uword col_num, const uword N)
   {
   arma_extra_debug_sigprint();
   
@@ -1085,30 +1084,26 @@ Row<eT>::insert_cols(const uword col_num, const uword N, const bool set_to_zero)
   // insertion at col_num == n_cols is in effect an append operation
   arma_debug_check_bounds( (col_num > t_n_cols), "Row::insert_cols(): index out of bounds" );
   
-  if(N > 0)
+  if(N == 0)  { return; }
+  
+  Row<eT> out(t_n_cols + N, arma_nozeros_indicator());
+  
+        eT* out_mem = out.memptr();
+  const eT*   t_mem = (*this).memptr();
+  
+  if(A_n_cols > 0)
     {
-    Row<eT> out(t_n_cols + N, arma_nozeros_indicator());
-    
-          eT* out_mem = out.memptr();
-    const eT*   t_mem = (*this).memptr();
-    
-    if(A_n_cols > 0)
-      {
-      arrayops::copy( out_mem, t_mem, A_n_cols );
-      }
-    
-    if(B_n_cols > 0)
-      {
-      arrayops::copy( &(out_mem[col_num + N]), &(t_mem[col_num]), B_n_cols );
-      }
-    
-    if(set_to_zero)
-      {
-      arrayops::inplace_set( &(out_mem[col_num]), eT(0), N );
-      }
-    
-    Mat<eT>::steal_mem(out);
+    arrayops::copy( out_mem, t_mem, A_n_cols );
     }
+  
+  if(B_n_cols > 0)
+    {
+    arrayops::copy( &(out_mem[col_num + N]), &(t_mem[col_num]), B_n_cols );
+    }
+  
+  arrayops::fill_zeros( &(out_mem[col_num]), N );
+  
+  Mat<eT>::steal_mem(out);
   }
 
 
@@ -1236,7 +1231,7 @@ Row<eT>::fixed<fixed_n_elem>::fixed()
   {
   arma_extra_debug_sigprint_this(this);
   
-  #if (!defined(ARMA_DONT_ZERO_INIT))
+  if(arma_config::zero_init)
     {
     arma_extra_debug_print("Row::fixed::constructor: zeroing memory");
     
@@ -1244,7 +1239,6 @@ Row<eT>::fixed<fixed_n_elem>::fixed()
     
     arrayops::inplace_set_fixed<eT,fixed_n_elem>( mem_use, eT(0) );
     }
-  #endif
   }
 
 

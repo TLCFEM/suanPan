@@ -22,7 +22,7 @@
 #endif
 //// The level of warning messages printed to ARMA_CERR_STREAM.
 //// Must be an integer >= 0. The default value is 2.
-//// 0 = no warnings
+//// 0 = no warnings; generally not recommended
 //// 1 = only critical warnings about arguments and/or data which are likely to lead to incorrect results
 //// 2 = as per level 1, and warnings about poorly conditioned systems (low rcond) detected by solve(), spsolve(), etc
 //// 3 = as per level 2, and warnings about failed decompositions, failed saving/loading, etc
@@ -105,13 +105,13 @@
 //// These "hidden" arguments are typically tacked onto the end of function definitions.
 
 // #define ARMA_USE_TBB_ALLOC
-//// Uncomment the above line if you want to use Intel TBB scalable_malloc() and scalable_free() instead of standard malloc() and free()
+//// Uncomment the above line to use Intel TBB scalable_malloc() and scalable_free() instead of standard malloc() and free()
 
 // #define ARMA_USE_MKL_ALLOC
-//// Uncomment the above line if you want to use Intel MKL mkl_malloc() and mkl_free() instead of standard malloc() and free()
+//// Uncomment the above line to use Intel MKL mkl_malloc() and mkl_free() instead of standard malloc() and free()
 
 // #define ARMA_USE_MKL_TYPES
-//// Uncomment the above line if you want to use Intel MKL types for complex numbers.
+//// Uncomment the above line to use Intel MKL types for complex numbers.
 //// You will need to include appropriate MKL headers before the Armadillo header.
 //// You may also need to enable or disable the following options:
 //// ARMA_BLAS_LONG, ARMA_BLAS_LONG_LONG, ARMA_USE_FORTRAN_HIDDEN_ARGS
@@ -136,31 +136,31 @@
 #endif
 
 #if !defined(ARMA_OPTIMISE_BAND)
-  // #define ARMA_OPTIMISE_BAND
-  //// Comment out the above line if you don't want automatically optimised handling
+  #define ARMA_OPTIMISE_BAND
+  //// Comment out the above line to disable optimised handling
   //// of band matrices by solve() and chol()
 #endif
 
 #if !defined(ARMA_OPTIMISE_SYMPD)
   #define ARMA_OPTIMISE_SYMPD
-  //// Comment out the above line if you don't want automatically optimised handling
+  //// Comment out the above line to disable optimised handling
   //// of symmetric/hermitian positive definite matrices by various functions:
   //// solve(), inv(), pinv(), expmat(), logmat(), sqrtmat(), rcond(), rank()
 #endif
 
 #if !defined(ARMA_OPTIMISE_INVEXPR)
   #define ARMA_OPTIMISE_INVEXPR
-  //// Comment out the above line if you don't want automatically optimised handling
+  //// Comment out the above line to disable optimised handling
   //// of inv() and inv_sympd() within compound expressions
 #endif
 
 #if !defined(ARMA_CHECK_NONFINITE)
   #define ARMA_CHECK_NONFINITE
-  //// Comment out the above line if you don't want automatic checking for nonfinite matrices
+  //// Comment out the above line to disable checking for nonfinite matrices
 #endif
 
-// #define ARMA_USE_HDF5_ALT
-#if defined(ARMA_USE_HDF5_ALT) && defined(ARMA_USE_WRAPPER)
+// #define ARMA_USE_HDF5_CMAKE
+#if defined(ARMA_USE_HDF5_CMAKE) && defined(ARMA_USE_WRAPPER)
   #undef  ARMA_USE_HDF5
   #define ARMA_USE_HDF5
   
@@ -188,15 +188,20 @@
 //// it must be an integer that is at least 1.
 
 // #define ARMA_NO_DEBUG
-//// Uncomment the above line if you want to disable all run-time checks.
-//// This will result in faster code, but you first need to make sure that your code runs correctly!
-//// We strongly recommend to have the run-time checks enabled during development,
-//// as this greatly aids in finding mistakes in your code, and hence speeds up development.
-//// We recommend that run-time checks be disabled _only_ for the shipped version of your program.
+//// Uncomment the above line to disable all run-time checks. NOT RECOMMENDED.
+//// It is strongly recommended that run-time checks are enabled during development,
+//// as this greatly aids in finding mistakes in your code.
 
 // #define ARMA_EXTRA_DEBUG
-//// Uncomment the above line if you want to see the function traces of how Armadillo evaluates expressions.
+//// Uncomment the above line to see the function traces of how Armadillo evaluates expressions.
 //// This is mainly useful for debugging of the library.
+
+
+#if defined(ARMA_EXTRA_DEBUG)
+  #undef  ARMA_NO_DEBUG
+  #undef  ARMA_WARN_LEVEL
+  #define ARMA_WARN_LEVEL 3
+#endif
 
 
 #if defined(ARMA_DEFAULT_OSTREAM)
@@ -263,7 +268,7 @@
 
 #if defined(ARMA_DONT_USE_WRAPPER)
   #undef ARMA_USE_WRAPPER
-  #undef ARMA_USE_HDF5_ALT
+  #undef ARMA_USE_HDF5_CMAKE
 #endif
 
 #if defined(ARMA_DONT_USE_FORTRAN_HIDDEN_ARGS)
@@ -310,7 +315,7 @@
 
 #if defined(ARMA_DONT_USE_HDF5)
   #undef ARMA_USE_HDF5
-  #undef ARMA_USE_HDF5_ALT
+  #undef ARMA_USE_HDF5_CMAKE
 #endif
 
 #if defined(ARMA_DONT_OPTIMISE_BAND) || defined(ARMA_DONT_OPTIMISE_SOLVE_BAND)
@@ -329,10 +334,17 @@
   #undef ARMA_CHECK_NONFINITE
 #endif
 
-// #if defined(ARMA_DONT_PRINT_ERRORS)
-//     #pragma message ("WARNING: support for ARMA_DONT_PRINT_ERRORS option has been removed;")
-//     #pragma message ("WARNING: use ARMA_WARN_LEVEL and ARMA_DONT_PRINT_EXCEPTIONS options instead.")
-// #endif
+#if defined(ARMA_DONT_PRINT_ERRORS)
+  #pragma message ("INFO: support for ARMA_DONT_PRINT_ERRORS option has been removed")
+  
+  #if defined(ARMA_PRINT_EXCEPTIONS)
+    #pragma message ("INFO: suggest to use ARMA_WARN_LEVEL and ARMA_DONT_PRINT_EXCEPTIONS options instead")
+  #else
+    #pragma message ("INFO: suggest to use ARMA_WARN_LEVEL option instead")
+  #endif
+  
+  #pragma message ("INFO: see the documentation for details")
+#endif
 
 #if defined(ARMA_DONT_PRINT_EXCEPTIONS)
   #undef ARMA_PRINT_EXCEPTIONS

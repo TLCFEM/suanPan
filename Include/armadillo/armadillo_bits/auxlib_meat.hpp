@@ -344,7 +344,7 @@ auxlib::inv_sympd_rcond(Mat<eT>& A, bool& out_sympd_state, eT& out_rcond, const 
     
     out_rcond = auxlib::lu_rcond_sympd<T>(A, norm_val);
     
-    if( (rcond_threshold > eT(0)) && (out_rcond < rcond_threshold) )  { return false; }
+    if( arma_isnan(out_rcond) || ((rcond_threshold > eT(0)) && (out_rcond < rcond_threshold)) )  { return false; }
     
     arma_extra_debug_print("lapack::potri()");
     lapack::potri(&uplo, &n, A.memptr(), &n, &info);
@@ -412,7 +412,7 @@ auxlib::inv_sympd_rcond(Mat< std::complex<T> >& A, bool& out_sympd_state, T& out
     
     out_rcond = auxlib::lu_rcond_sympd<T>(A, norm_val);
     
-    if( (rcond_threshold > T(0)) && (out_rcond < rcond_threshold) )  { return false; }
+    if( arma_isnan(out_rcond) || ((rcond_threshold > T(0)) && (out_rcond < rcond_threshold)) )  { return false; }
     
     arma_extra_debug_print("lapack::potri()");
     lapack::potri(&uplo, &n, A.memptr(), &n, &info);
@@ -3967,28 +3967,26 @@ auxlib::solve_square_fast(Mat<typename T1::elem_type>& out, Mat<typename T1::ele
   
   typedef typename T1::elem_type eT;
   
-  const uword A_n_rows = A.n_rows;
-  
   out = B_expr.get_ref();
   
   const uword B_n_rows = out.n_rows;
   const uword B_n_cols = out.n_cols;
-    
-  arma_debug_check( (A_n_rows != B_n_rows), "solve(): number of rows in the given matrices must be the same" );
-    
+  
+  arma_debug_check( (A.n_rows != B_n_rows), "solve(): number of rows in given matrices must be the same", [&](){ out.soft_reset(); } );
+  
   if(A.is_empty() || out.is_empty())  { out.zeros(A.n_cols, B_n_cols); return true; }
   
   #if defined(ARMA_USE_LAPACK)
     {
     arma_debug_assert_blas_size(A);
     
-    blas_int n    = blas_int(A_n_rows);  // assuming A is square
-    blas_int lda  = blas_int(A_n_rows);
+    blas_int n    = blas_int(A.n_rows);  // assuming A is square
+    blas_int lda  = blas_int(A.n_rows);
     blas_int ldb  = blas_int(B_n_rows);
     blas_int nrhs = blas_int(B_n_cols);
     blas_int info = blas_int(0);
     
-    podarray<blas_int> ipiv(A_n_rows + 2);  // +2 for paranoia: some versions of Lapack might be trashing memory
+    podarray<blas_int> ipiv(A.n_rows + 2);  // +2 for paranoia: some versions of Lapack might be trashing memory
     
     arma_extra_debug_print("lapack::gesv()");
     lapack::gesv<eT>(&n, &nrhs, A.memptr(), &lda, ipiv.memptr(), out.memptr(), &ldb, &info);
@@ -4009,7 +4007,7 @@ auxlib::solve_square_fast(Mat<typename T1::elem_type>& out, Mat<typename T1::ele
 template<typename T1>
 inline
 bool
-auxlib::solve_square_rcond(Mat<typename T1::elem_type>& out, typename T1::pod_type& out_rcond, Mat<typename T1::elem_type>& A, const Base<typename T1::elem_type,T1>& B_expr, const bool allow_ugly)
+auxlib::solve_square_rcond(Mat<typename T1::elem_type>& out, typename T1::pod_type& out_rcond, Mat<typename T1::elem_type>& A, const Base<typename T1::elem_type,T1>& B_expr)
   {
   arma_extra_debug_sigprint();
   
@@ -4024,9 +4022,9 @@ auxlib::solve_square_rcond(Mat<typename T1::elem_type>& out, typename T1::pod_ty
     
     const uword B_n_rows = out.n_rows;
     const uword B_n_cols = out.n_cols;
-      
-    arma_debug_check( (A.n_rows != B_n_rows), "solve(): number of rows in the given matrices must be the same" );
-      
+    
+    arma_debug_check( (A.n_rows != B_n_rows), "solve(): number of rows in given matrices must be the same", [&](){ out.soft_reset(); } );
+    
     if(A.is_empty() || out.is_empty())  { out.zeros(A.n_cols, B_n_cols); return true; }
     
     arma_debug_assert_blas_size(A);
@@ -4058,8 +4056,6 @@ auxlib::solve_square_rcond(Mat<typename T1::elem_type>& out, typename T1::pod_ty
     
     out_rcond = auxlib::lu_rcond<T>(A, norm_val);
     
-    if( (allow_ugly == false) && (out_rcond < auxlib::epsilon_lapack(A)) )  { return false; }
-    
     return true;
     }
   #else
@@ -4068,7 +4064,6 @@ auxlib::solve_square_rcond(Mat<typename T1::elem_type>& out, typename T1::pod_ty
     arma_ignore(out_rcond);
     arma_ignore(A);
     arma_ignore(B_expr);
-    arma_ignore(allow_ugly);
     arma_stop_logic_error("solve(): use of LAPACK must be enabled");
     return false;
     }
@@ -4081,7 +4076,7 @@ auxlib::solve_square_rcond(Mat<typename T1::elem_type>& out, typename T1::pod_ty
 template<typename T1>
 inline
 bool
-auxlib::solve_square_refine(Mat<typename T1::pod_type>& out, typename T1::pod_type& out_rcond, Mat<typename T1::pod_type>& A, const Base<typename T1::pod_type,T1>& B_expr, const bool equilibrate, const bool allow_ugly)
+auxlib::solve_square_refine(Mat<typename T1::pod_type>& out, typename T1::pod_type& out_rcond, Mat<typename T1::pod_type>& A, const Base<typename T1::pod_type,T1>& B_expr, const bool equilibrate)
   {
   arma_extra_debug_sigprint();
   
@@ -4101,7 +4096,7 @@ auxlib::solve_square_refine(Mat<typename T1::pod_type>& out, typename T1::pod_ty
     
     const Mat<eT>& B = (use_copy) ? B_tmp : UB_M_as_Mat;
     
-    arma_debug_check( (A.n_rows != B.n_rows), "solve(): number of rows in the given matrices must be the same" );
+    arma_debug_check( (A.n_rows != B.n_rows), "solve(): number of rows in given matrices must be the same" );
       
     if(A.is_empty() || B.is_empty())  { out.zeros(A.n_rows, B.n_cols); return true; }
     
@@ -4156,7 +4151,7 @@ auxlib::solve_square_refine(Mat<typename T1::pod_type>& out, typename T1::pod_ty
     
     out_rcond = rcond;
     
-    return (allow_ugly) ? ((info == 0) || (info == (n+1))) : (info == 0);
+    return ((info == 0) || (info == (n+1)));
     }
   #else
     {
@@ -4165,7 +4160,6 @@ auxlib::solve_square_refine(Mat<typename T1::pod_type>& out, typename T1::pod_ty
     arma_ignore(A);
     arma_ignore(B_expr);
     arma_ignore(equilibrate);
-    arma_ignore(allow_ugly);
     arma_stop_logic_error("solve(): use of LAPACK must be enabled");
     return false;
     }
@@ -4178,7 +4172,7 @@ auxlib::solve_square_refine(Mat<typename T1::pod_type>& out, typename T1::pod_ty
 template<typename T1>
 inline
 bool
-auxlib::solve_square_refine(Mat< std::complex<typename T1::pod_type> >& out, typename T1::pod_type& out_rcond, Mat< std::complex<typename T1::pod_type> >& A, const Base<std::complex<typename T1::pod_type>,T1>& B_expr, const bool equilibrate, const bool allow_ugly)
+auxlib::solve_square_refine(Mat< std::complex<typename T1::pod_type> >& out, typename T1::pod_type& out_rcond, Mat< std::complex<typename T1::pod_type> >& A, const Base<std::complex<typename T1::pod_type>,T1>& B_expr, const bool equilibrate)
   {
   arma_extra_debug_sigprint();
   
@@ -4199,7 +4193,7 @@ auxlib::solve_square_refine(Mat< std::complex<typename T1::pod_type> >& out, typ
     
     const Mat<eT>& B = (use_copy) ? B_tmp : UB_M_as_Mat;
     
-    arma_debug_check( (A.n_rows != B.n_rows), "solve(): number of rows in the given matrices must be the same" );
+    arma_debug_check( (A.n_rows != B.n_rows), "solve(): number of rows in given matrices must be the same" );
       
     if(A.is_empty() || B.is_empty())  { out.zeros(A.n_rows, B.n_cols); return true; }
     
@@ -4254,7 +4248,7 @@ auxlib::solve_square_refine(Mat< std::complex<typename T1::pod_type> >& out, typ
     
     out_rcond = rcond;
     
-    return (allow_ugly) ? ((info == 0) || (info == (n+1))) : (info == 0);
+    return ((info == 0) || (info == (n+1)));
     }
   #else
     {
@@ -4263,7 +4257,6 @@ auxlib::solve_square_refine(Mat< std::complex<typename T1::pod_type> >& out, typ
     arma_ignore(A);
     arma_ignore(B_expr);
     arma_ignore(equilibrate);
-    arma_ignore(allow_ugly);
     arma_stop_logic_error("solve(): use of LAPACK must be enabled");
     return false;
     }
@@ -4303,14 +4296,12 @@ auxlib::solve_sympd_fast_common(Mat<typename T1::elem_type>& out, Mat<typename T
   
   typedef typename T1::elem_type eT;
   
-  const uword A_n_rows = A.n_rows;
-  
   out = B_expr.get_ref();
   
   const uword B_n_rows = out.n_rows;
   const uword B_n_cols = out.n_cols;
   
-  arma_debug_check( (A_n_rows != B_n_rows), "solve(): number of rows in the given matrices must be the same" );
+  arma_debug_check( (A.n_rows != B_n_rows), "solve(): number of rows in given matrices must be the same", [&](){ out.soft_reset(); } );
   
   if(A.is_empty() || out.is_empty())  { out.zeros(A.n_cols, B_n_cols); return true; }
   
@@ -4319,9 +4310,9 @@ auxlib::solve_sympd_fast_common(Mat<typename T1::elem_type>& out, Mat<typename T
     arma_debug_assert_blas_size(A, out);
     
     char     uplo = 'L';
-    blas_int n    = blas_int(A_n_rows);  // assuming A is square
+    blas_int n    = blas_int(A.n_rows);  // assuming A is square
     blas_int nrhs = blas_int(B_n_cols);
-    blas_int lda  = blas_int(A_n_rows);
+    blas_int lda  = blas_int(A.n_rows);
     blas_int ldb  = blas_int(B_n_rows);
     blas_int info = blas_int(0);
     
@@ -4347,7 +4338,7 @@ auxlib::solve_sympd_fast_common(Mat<typename T1::elem_type>& out, Mat<typename T
 template<typename T1>
 inline
 bool
-auxlib::solve_sympd_rcond(Mat<typename T1::pod_type>& out, bool& out_sympd_state, typename T1::pod_type& out_rcond, Mat<typename T1::pod_type>& A, const Base<typename T1::pod_type,T1>& B_expr, const bool allow_ugly)
+auxlib::solve_sympd_rcond(Mat<typename T1::pod_type>& out, bool& out_sympd_state, typename T1::pod_type& out_rcond, Mat<typename T1::pod_type>& A, const Base<typename T1::pod_type,T1>& B_expr)
   {
   arma_extra_debug_sigprint();
   
@@ -4364,7 +4355,7 @@ auxlib::solve_sympd_rcond(Mat<typename T1::pod_type>& out, bool& out_sympd_state
     const uword B_n_rows = out.n_rows;
     const uword B_n_cols = out.n_cols;
     
-    arma_debug_check( (A.n_rows != B_n_rows), "solve(): number of rows in the given matrices must be the same" );
+    arma_debug_check( (A.n_rows != B_n_rows), "solve(): number of rows in given matrices must be the same", [&](){ out.soft_reset(); } );
     
     if(A.is_empty() || out.is_empty())  { out.zeros(A.n_cols, B_n_cols); return true; }
     
@@ -4396,8 +4387,6 @@ auxlib::solve_sympd_rcond(Mat<typename T1::pod_type>& out, bool& out_sympd_state
     
     out_rcond = auxlib::lu_rcond_sympd<T>(A, norm_val);
     
-    if( (allow_ugly == false) && (out_rcond < auxlib::epsilon_lapack(A)) )  { return false; }
-    
     return true;
     }
   #else
@@ -4407,7 +4396,6 @@ auxlib::solve_sympd_rcond(Mat<typename T1::pod_type>& out, bool& out_sympd_state
     arma_ignore(out_rcond);
     arma_ignore(A);
     arma_ignore(B_expr);
-    arma_ignore(allow_ugly);
     arma_stop_logic_error("solve(): use of LAPACK must be enabled");
     return false;
     }
@@ -4420,7 +4408,7 @@ auxlib::solve_sympd_rcond(Mat<typename T1::pod_type>& out, bool& out_sympd_state
 template<typename T1>
 inline
 bool
-auxlib::solve_sympd_rcond(Mat< std::complex<typename T1::pod_type> >& out, bool& out_sympd_state, typename T1::pod_type& out_rcond, Mat< std::complex<typename T1::pod_type> >& A, const Base< std::complex<typename T1::pod_type>,T1>& B_expr, const bool allow_ugly)
+auxlib::solve_sympd_rcond(Mat< std::complex<typename T1::pod_type> >& out, bool& out_sympd_state, typename T1::pod_type& out_rcond, Mat< std::complex<typename T1::pod_type> >& A, const Base< std::complex<typename T1::pod_type>,T1>& B_expr)
   {
   arma_extra_debug_sigprint();
   
@@ -4430,7 +4418,7 @@ auxlib::solve_sympd_rcond(Mat< std::complex<typename T1::pod_type> >& out, bool&
     
     out_sympd_state = false;
     
-    return auxlib::solve_square_rcond(out, out_rcond, A, B_expr, allow_ugly);
+    return auxlib::solve_square_rcond(out, out_rcond, A, B_expr);
     }
   #elif defined(ARMA_USE_LAPACK)
     {
@@ -4445,7 +4433,7 @@ auxlib::solve_sympd_rcond(Mat< std::complex<typename T1::pod_type> >& out, bool&
     const uword B_n_rows = out.n_rows;
     const uword B_n_cols = out.n_cols;
     
-    arma_debug_check( (A.n_rows != B_n_rows), "solve(): number of rows in the given matrices must be the same" );
+    arma_debug_check( (A.n_rows != B_n_rows), "solve(): number of rows in given matrices must be the same", [&](){ out.soft_reset(); } );
     
     if(A.is_empty() || out.is_empty())  { out.zeros(A.n_cols, B_n_cols); return true; }
     
@@ -4477,8 +4465,6 @@ auxlib::solve_sympd_rcond(Mat< std::complex<typename T1::pod_type> >& out, bool&
     
     out_rcond = auxlib::lu_rcond_sympd<T>(A, norm_val);
     
-    if( (allow_ugly == false) && (out_rcond < auxlib::epsilon_lapack(A)) )  { return false; }
-    
     return true;
     }
   #else
@@ -4488,7 +4474,6 @@ auxlib::solve_sympd_rcond(Mat< std::complex<typename T1::pod_type> >& out, bool&
     arma_ignore(out_rcond);
     arma_ignore(A);
     arma_ignore(B_expr);
-    arma_ignore(allow_ugly);
     arma_stop_logic_error("solve(): use of LAPACK must be enabled");
     return false;
     }
@@ -4501,7 +4486,7 @@ auxlib::solve_sympd_rcond(Mat< std::complex<typename T1::pod_type> >& out, bool&
 template<typename T1>
 inline
 bool
-auxlib::solve_sympd_refine(Mat<typename T1::pod_type>& out, typename T1::pod_type& out_rcond, Mat<typename T1::pod_type>& A, const Base<typename T1::pod_type,T1>& B_expr, const bool equilibrate, const bool allow_ugly)
+auxlib::solve_sympd_refine(Mat<typename T1::pod_type>& out, typename T1::pod_type& out_rcond, Mat<typename T1::pod_type>& A, const Base<typename T1::pod_type,T1>& B_expr, const bool equilibrate)
   {
   arma_extra_debug_sigprint();
   
@@ -4521,7 +4506,7 @@ auxlib::solve_sympd_refine(Mat<typename T1::pod_type>& out, typename T1::pod_typ
     
     const Mat<eT>& B = (use_copy) ? B_tmp : UB_M_as_Mat;
     
-    arma_debug_check( (A.n_rows != B.n_rows), "solve(): number of rows in the given matrices must be the same" );
+    arma_debug_check( (A.n_rows != B.n_rows), "solve(): number of rows in given matrices must be the same" );
     
     if(A.is_empty() || B.is_empty())  { out.zeros(A.n_rows, B.n_cols); return true; }
     
@@ -4558,7 +4543,7 @@ auxlib::solve_sympd_refine(Mat<typename T1::pod_type>& out, typename T1::pod_typ
     // NOTE: lapack::posvx() sets rcond to zero if A is not sympd
     out_rcond = rcond;
     
-    return (allow_ugly) ? ((info == 0) || (info == (n+1))) : (info == 0);
+    return ((info == 0) || (info == (n+1)));
     }
   #else
     {
@@ -4567,7 +4552,6 @@ auxlib::solve_sympd_refine(Mat<typename T1::pod_type>& out, typename T1::pod_typ
     arma_ignore(A);
     arma_ignore(B_expr);
     arma_ignore(equilibrate);
-    arma_ignore(allow_ugly);
     arma_stop_logic_error("solve(): use of LAPACK must be enabled");
     return false;
     }
@@ -4580,7 +4564,7 @@ auxlib::solve_sympd_refine(Mat<typename T1::pod_type>& out, typename T1::pod_typ
 template<typename T1>
 inline
 bool
-auxlib::solve_sympd_refine(Mat< std::complex<typename T1::pod_type> >& out, typename T1::pod_type& out_rcond, Mat< std::complex<typename T1::pod_type> >& A, const Base<std::complex<typename T1::pod_type>,T1>& B_expr, const bool equilibrate, const bool allow_ugly)
+auxlib::solve_sympd_refine(Mat< std::complex<typename T1::pod_type> >& out, typename T1::pod_type& out_rcond, Mat< std::complex<typename T1::pod_type> >& A, const Base<std::complex<typename T1::pod_type>,T1>& B_expr, const bool equilibrate)
   {
   arma_extra_debug_sigprint();
   
@@ -4588,7 +4572,7 @@ auxlib::solve_sympd_refine(Mat< std::complex<typename T1::pod_type> >& out, type
     {
     arma_extra_debug_print("auxlib::solve_sympd_refine(): redirecting to auxlib::solve_square_refine() due to crippled LAPACK");
     
-    return auxlib::solve_square_refine(out, out_rcond, A, B_expr, equilibrate, allow_ugly);
+    return auxlib::solve_square_refine(out, out_rcond, A, B_expr, equilibrate);
     }
   #elif defined(ARMA_USE_LAPACK)
     {
@@ -4607,7 +4591,7 @@ auxlib::solve_sympd_refine(Mat< std::complex<typename T1::pod_type> >& out, type
     
     const Mat<eT>& B = (use_copy) ? B_tmp : UB_M_as_Mat;
     
-    arma_debug_check( (A.n_rows != B.n_rows), "solve(): number of rows in the given matrices must be the same" );
+    arma_debug_check( (A.n_rows != B.n_rows), "solve(): number of rows in given matrices must be the same" );
       
     if(A.is_empty() || B.is_empty())  { out.zeros(A.n_rows, B.n_cols); return true; }
     
@@ -4644,7 +4628,7 @@ auxlib::solve_sympd_refine(Mat< std::complex<typename T1::pod_type> >& out, type
     // NOTE: lapack::cx_posvx() sets rcond to zero if A is not sympd
     out_rcond = rcond;
     
-    return (allow_ugly) ? ((info == 0) || (info == (n+1))) : (info == 0);
+    return ((info == 0) || (info == (n+1)));
     }
   #else
     {
@@ -4653,7 +4637,6 @@ auxlib::solve_sympd_refine(Mat< std::complex<typename T1::pod_type> >& out, type
     arma_ignore(A);
     arma_ignore(B_expr);
     arma_ignore(equilibrate);
-    arma_ignore(allow_ugly);
     arma_stop_logic_error("solve(): use of LAPACK must be enabled");
     return false;
     }
@@ -4677,7 +4660,7 @@ auxlib::solve_rect_fast(Mat<typename T1::elem_type>& out, Mat<typename T1::elem_
     const unwrap<T1>   U(B_expr.get_ref());
     const Mat<eT>& B = U.M;
     
-    arma_debug_check( (A.n_rows != B.n_rows), "solve(): number of rows in the given matrices must be the same" );
+    arma_debug_check( (A.n_rows != B.n_rows), "solve(): number of rows in given matrices must be the same" );
     
     if(A.is_empty() || B.is_empty())  { out.zeros(A.n_cols, B.n_cols); return true; }
     
@@ -4757,7 +4740,7 @@ auxlib::solve_rect_fast(Mat<typename T1::elem_type>& out, Mat<typename T1::elem_
 template<typename T1>
 inline
 bool
-auxlib::solve_rect_rcond(Mat<typename T1::elem_type>& out, typename T1::pod_type& out_rcond, Mat<typename T1::elem_type>& A, const Base<typename T1::elem_type,T1>& B_expr, const bool allow_ugly)
+auxlib::solve_rect_rcond(Mat<typename T1::elem_type>& out, typename T1::pod_type& out_rcond, Mat<typename T1::elem_type>& A, const Base<typename T1::elem_type,T1>& B_expr)
   {
   arma_extra_debug_sigprint();
   
@@ -4771,7 +4754,7 @@ auxlib::solve_rect_rcond(Mat<typename T1::elem_type>& out, typename T1::pod_type
     const unwrap<T1>   U(B_expr.get_ref());
     const Mat<eT>& B = U.M;
     
-    arma_debug_check( (A.n_rows != B.n_rows), "solve(): number of rows in the given matrices must be the same" );
+    arma_debug_check( (A.n_rows != B.n_rows), "solve(): number of rows in given matrices must be the same" );
     
     if(A.is_empty() || B.is_empty())  { out.zeros(A.n_cols, B.n_cols); return true; }
     
@@ -4842,8 +4825,6 @@ auxlib::solve_rect_rcond(Mat<typename T1::elem_type>& out, typename T1::pod_type
       
       // determine quality of solution
       out_rcond = auxlib::rcond_trimat(R, 0);   // 0: upper triangular; 1: lower triangular
-      
-      if( (allow_ugly == false) && (out_rcond < auxlib::epsilon_lapack(A)) )  { return false; }
       }
     else
     if(A.n_rows < A.n_cols)
@@ -4865,8 +4846,6 @@ auxlib::solve_rect_rcond(Mat<typename T1::elem_type>& out, typename T1::pod_type
       
       // determine quality of solution
       out_rcond = auxlib::rcond_trimat(L, 1);   // 0: upper triangular; 1: lower triangular
-      
-      if( (allow_ugly == false) && (out_rcond < auxlib::epsilon_lapack(A)) )  { return false; }
       }
     
     if(tmp.n_rows == A.n_cols)
@@ -4886,7 +4865,6 @@ auxlib::solve_rect_rcond(Mat<typename T1::elem_type>& out, typename T1::pod_type
     arma_ignore(out_rcond);
     arma_ignore(A);
     arma_ignore(B_expr);
-    arma_ignore(allow_ugly);
     arma_stop_logic_error("solve(): use of LAPACK must be enabled");
     return false;
     }
@@ -4909,7 +4887,7 @@ auxlib::solve_approx_svd(Mat<typename T1::pod_type>& out, Mat<typename T1::pod_t
     const unwrap<T1>   U(B_expr.get_ref());
     const Mat<eT>& B = U.M;
     
-    arma_debug_check( (A.n_rows != B.n_rows), "solve(): number of rows in the given matrices must be the same" );
+    arma_debug_check( (A.n_rows != B.n_rows), "solve(): number of rows in given matrices must be the same" );
     
     if(A.is_empty() || B.is_empty())  { out.zeros(A.n_cols, B.n_cols); return true; }
     
@@ -5030,7 +5008,7 @@ auxlib::solve_approx_svd(Mat< std::complex<typename T1::pod_type> >& out, Mat< s
     const unwrap<T1>   U(B_expr.get_ref());
     const Mat<eT>& B = U.M;
     
-    arma_debug_check( (A.n_rows != B.n_rows), "solve(): number of rows in the given matrices must be the same" );
+    arma_debug_check( (A.n_rows != B.n_rows), "solve(): number of rows in given matrices must be the same" );
     
     if(A.is_empty() || B.is_empty())  { out.zeros(A.n_cols, B.n_cols); return true; }
     
@@ -5151,7 +5129,7 @@ auxlib::solve_trimat_fast(Mat<typename T1::elem_type>& out, const Mat<typename T
     const uword B_n_rows = out.n_rows;
     const uword B_n_cols = out.n_cols;
     
-    arma_debug_check( (A.n_rows != B_n_rows), "solve(): number of rows in the given matrices must be the same" );
+    arma_debug_check( (A.n_rows != B_n_rows), "solve(): number of rows in given matrices must be the same", [&](){ out.soft_reset(); } );
     
     if(A.is_empty() || out.is_empty())  { out.zeros(A.n_cols, B_n_cols); return true; }
     
@@ -5186,7 +5164,7 @@ auxlib::solve_trimat_fast(Mat<typename T1::elem_type>& out, const Mat<typename T
 template<typename T1>
 inline
 bool
-auxlib::solve_trimat_rcond(Mat<typename T1::elem_type>& out, typename T1::pod_type& out_rcond, const Mat<typename T1::elem_type>& A, const Base<typename T1::elem_type,T1>& B_expr, const uword layout, const bool allow_ugly)
+auxlib::solve_trimat_rcond(Mat<typename T1::elem_type>& out, typename T1::pod_type& out_rcond, const Mat<typename T1::elem_type>& A, const Base<typename T1::elem_type,T1>& B_expr, const uword layout)
   {
   arma_extra_debug_sigprint();
   
@@ -5201,7 +5179,7 @@ auxlib::solve_trimat_rcond(Mat<typename T1::elem_type>& out, typename T1::pod_ty
     const uword B_n_rows = out.n_rows;
     const uword B_n_cols = out.n_cols;
     
-    arma_debug_check( (A.n_rows != B_n_rows), "solve(): number of rows in the given matrices must be the same" );
+    arma_debug_check( (A.n_rows != B_n_rows), "solve(): number of rows in given matrices must be the same", [&](){ out.soft_reset(); } );
     
     if(A.is_empty() || out.is_empty())  { out.zeros(A.n_cols, B_n_cols); return true; }
     
@@ -5222,8 +5200,6 @@ auxlib::solve_trimat_rcond(Mat<typename T1::elem_type>& out, typename T1::pod_ty
     // determine quality of solution
     out_rcond = auxlib::rcond_trimat(A, layout);
     
-    if( (allow_ugly == false) && (out_rcond < auxlib::epsilon_lapack(A)) )  { return false; }
-    
     return true;
     }
   #else
@@ -5233,7 +5209,6 @@ auxlib::solve_trimat_rcond(Mat<typename T1::elem_type>& out, typename T1::pod_ty
     arma_ignore(A);
     arma_ignore(B_expr);
     arma_ignore(layout);
-    arma_ignore(allow_ugly);
     arma_stop_logic_error("solve(): use of LAPACK must be enabled");
     return false;
     }
@@ -5298,7 +5273,7 @@ auxlib::solve_band_fast_common(Mat<typename T1::elem_type>& out, const Mat<typen
     const uword B_n_rows = out.n_rows;
     const uword B_n_cols = out.n_cols;
     
-    arma_debug_check( (A.n_rows != B_n_rows), "solve(): number of rows in the given matrices must be the same" );
+    arma_debug_check( (A.n_rows != B_n_rows), "solve(): number of rows in given matrices must be the same", [&](){ out.soft_reset(); } );
     
     if(A.is_empty() || out.is_empty())  { out.zeros(A.n_rows, B_n_cols); return true; }
     
@@ -5347,11 +5322,11 @@ auxlib::solve_band_fast_common(Mat<typename T1::elem_type>& out, const Mat<typen
 template<typename T1>
 inline
 bool
-auxlib::solve_band_rcond(Mat<typename T1::pod_type>& out, typename T1::pod_type& out_rcond, Mat<typename T1::pod_type>& A, const uword KL, const uword KU, const Base<typename T1::pod_type,T1>& B_expr, const bool allow_ugly)
+auxlib::solve_band_rcond(Mat<typename T1::pod_type>& out, typename T1::pod_type& out_rcond, Mat<typename T1::pod_type>& A, const uword KL, const uword KU, const Base<typename T1::pod_type,T1>& B_expr)
   {
   arma_extra_debug_sigprint();
   
-  return auxlib::solve_band_rcond_common(out, out_rcond, A, KL, KU, B_expr, allow_ugly);
+  return auxlib::solve_band_rcond_common(out, out_rcond, A, KL, KU, B_expr);
   }
 
 
@@ -5360,7 +5335,7 @@ auxlib::solve_band_rcond(Mat<typename T1::pod_type>& out, typename T1::pod_type&
 template<typename T1>
 inline
 bool
-auxlib::solve_band_rcond(Mat< std::complex<typename T1::pod_type> >& out, typename T1::pod_type& out_rcond, Mat< std::complex<typename T1::pod_type> >& A, const uword KL, const uword KU, const Base< std::complex<typename T1::pod_type>,T1>& B_expr, const bool allow_ugly)
+auxlib::solve_band_rcond(Mat< std::complex<typename T1::pod_type> >& out, typename T1::pod_type& out_rcond, Mat< std::complex<typename T1::pod_type> >& A, const uword KL, const uword KU, const Base< std::complex<typename T1::pod_type>,T1>& B_expr)
   {
   arma_extra_debug_sigprint();
   
@@ -5371,11 +5346,11 @@ auxlib::solve_band_rcond(Mat< std::complex<typename T1::pod_type> >& out, typena
     arma_ignore(KL);
     arma_ignore(KU);
     
-    return auxlib::solve_square_rcond(out, out_rcond, A, B_expr, allow_ugly);
+    return auxlib::solve_square_rcond(out, out_rcond, A, B_expr);
     }
   #else
     {
-    return auxlib::solve_band_rcond_common(out, out_rcond, A, KL, KU, B_expr, allow_ugly);
+    return auxlib::solve_band_rcond_common(out, out_rcond, A, KL, KU, B_expr);
     }
   #endif
   }
@@ -5386,7 +5361,7 @@ auxlib::solve_band_rcond(Mat< std::complex<typename T1::pod_type> >& out, typena
 template<typename T1>
 inline
 bool
-auxlib::solve_band_rcond_common(Mat<typename T1::elem_type>& out, typename T1::pod_type& out_rcond, const Mat<typename T1::elem_type>& A, const uword KL, const uword KU, const Base<typename T1::elem_type,T1>& B_expr, const bool allow_ugly)
+auxlib::solve_band_rcond_common(Mat<typename T1::elem_type>& out, typename T1::pod_type& out_rcond, const Mat<typename T1::elem_type>& A, const uword KL, const uword KU, const Base<typename T1::elem_type,T1>& B_expr)
   {
   arma_extra_debug_sigprint();
   
@@ -5402,7 +5377,7 @@ auxlib::solve_band_rcond_common(Mat<typename T1::elem_type>& out, typename T1::p
     const uword B_n_rows = out.n_rows;
     const uword B_n_cols = out.n_cols;
     
-    arma_debug_check( (A.n_rows != B_n_rows), "solve(): number of rows in the given matrices must be the same" );
+    arma_debug_check( (A.n_rows != B_n_rows), "solve(): number of rows in given matrices must be the same", [&](){ out.soft_reset(); } );
     
     if(A.is_empty() || out.is_empty())  { out.zeros(A.n_rows, B_n_cols); return true; }
     
@@ -5444,8 +5419,6 @@ auxlib::solve_band_rcond_common(Mat<typename T1::elem_type>& out, typename T1::p
     
     out_rcond = auxlib::lu_rcond_band<T>(AB, KL, KU, ipiv, norm_val);
     
-    if( (allow_ugly == false) && (out_rcond < auxlib::epsilon_lapack(AB)) )  { return false; }
-    
     return true;
     }
   #else
@@ -5456,7 +5429,6 @@ auxlib::solve_band_rcond_common(Mat<typename T1::elem_type>& out, typename T1::p
     arma_ignore(KL);
     arma_ignore(KU);
     arma_ignore(B_expr);
-    arma_ignore(allow_ugly);
     arma_stop_logic_error("solve(): use of LAPACK must be enabled");
     return false;
     }
@@ -5469,7 +5441,7 @@ auxlib::solve_band_rcond_common(Mat<typename T1::elem_type>& out, typename T1::p
 template<typename T1>
 inline
 bool
-auxlib::solve_band_refine(Mat<typename T1::pod_type>& out, typename T1::pod_type& out_rcond, Mat<typename T1::pod_type>& A, const uword KL, const uword KU, const Base<typename T1::pod_type,T1>& B_expr, const bool equilibrate, const bool allow_ugly)
+auxlib::solve_band_refine(Mat<typename T1::pod_type>& out, typename T1::pod_type& out_rcond, Mat<typename T1::pod_type>& A, const uword KL, const uword KU, const Base<typename T1::pod_type,T1>& B_expr, const bool equilibrate)
   {
   arma_extra_debug_sigprint();
   
@@ -5479,7 +5451,7 @@ auxlib::solve_band_refine(Mat<typename T1::pod_type>& out, typename T1::pod_type
     
     Mat<eT> B = B_expr.get_ref();  // B is overwritten
     
-    arma_debug_check( (A.n_rows != B.n_rows), "solve(): number of rows in the given matrices must be the same" );
+    arma_debug_check( (A.n_rows != B.n_rows), "solve(): number of rows in given matrices must be the same" );
       
     if(A.is_empty() || B.is_empty())  { out.zeros(A.n_rows, B.n_cols); return true; }
     
@@ -5540,7 +5512,7 @@ auxlib::solve_band_refine(Mat<typename T1::pod_type>& out, typename T1::pod_type
     
     out_rcond = rcond;
     
-    return (allow_ugly) ? ((info == 0) || (info == (n+1))) : (info == 0);
+    return ((info == 0) || (info == (n+1)));
     }
   #else
     {
@@ -5551,7 +5523,6 @@ auxlib::solve_band_refine(Mat<typename T1::pod_type>& out, typename T1::pod_type
     arma_ignore(KU);
     arma_ignore(B_expr);
     arma_ignore(equilibrate);
-    arma_ignore(allow_ugly);
     arma_stop_logic_error("solve(): use of LAPACK must be enabled");
     return false;
     }
@@ -5564,7 +5535,7 @@ auxlib::solve_band_refine(Mat<typename T1::pod_type>& out, typename T1::pod_type
 template<typename T1>
 inline
 bool
-auxlib::solve_band_refine(Mat< std::complex<typename T1::pod_type> >& out, typename T1::pod_type& out_rcond, Mat< std::complex<typename T1::pod_type> >& A, const uword KL, const uword KU, const Base<std::complex<typename T1::pod_type>,T1>& B_expr, const bool equilibrate, const bool allow_ugly)
+auxlib::solve_band_refine(Mat< std::complex<typename T1::pod_type> >& out, typename T1::pod_type& out_rcond, Mat< std::complex<typename T1::pod_type> >& A, const uword KL, const uword KU, const Base<std::complex<typename T1::pod_type>,T1>& B_expr, const bool equilibrate)
   {
   arma_extra_debug_sigprint();
   
@@ -5575,7 +5546,7 @@ auxlib::solve_band_refine(Mat< std::complex<typename T1::pod_type> >& out, typen
     arma_ignore(KL);
     arma_ignore(KU);
     
-    return auxlib::solve_square_refine(out, out_rcond, A, B_expr, equilibrate, allow_ugly);
+    return auxlib::solve_square_refine(out, out_rcond, A, B_expr, equilibrate);
     }
   #elif defined(ARMA_USE_LAPACK)
     {
@@ -5584,7 +5555,7 @@ auxlib::solve_band_refine(Mat< std::complex<typename T1::pod_type> >& out, typen
     
     Mat<eT> B = B_expr.get_ref();  // B is overwritten
     
-    arma_debug_check( (A.n_rows != B.n_rows), "solve(): number of rows in the given matrices must be the same" );
+    arma_debug_check( (A.n_rows != B.n_rows), "solve(): number of rows in given matrices must be the same" );
       
     if(A.is_empty() || B.is_empty())  { out.zeros(A.n_rows, B.n_cols); return true; }
     
@@ -5645,7 +5616,7 @@ auxlib::solve_band_refine(Mat< std::complex<typename T1::pod_type> >& out, typen
     
     out_rcond = rcond;
     
-    return (allow_ugly) ? ((info == 0) || (info == (n+1))) : (info == 0);
+    return ((info == 0) || (info == (n+1)));
     }
   #else
     {
@@ -5656,7 +5627,6 @@ auxlib::solve_band_refine(Mat< std::complex<typename T1::pod_type> >& out, typen
     arma_ignore(KU);
     arma_ignore(B_expr);
     arma_ignore(equilibrate);
-    arma_ignore(allow_ugly);
     arma_stop_logic_error("solve(): use of LAPACK must be enabled");
     return false;
     }
@@ -5718,7 +5688,7 @@ auxlib::solve_tridiag_fast_common(Mat<typename T1::elem_type>& out, const Mat<ty
     const uword B_n_rows = out.n_rows;
     const uword B_n_cols = out.n_cols;
     
-    arma_debug_check( (A.n_rows != B_n_rows), "solve(): number of rows in the given matrices must be the same" );
+    arma_debug_check( (A.n_rows != B_n_rows), "solve(): number of rows in given matrices must be the same", [&](){ out.soft_reset(); } );
     
     if(A.is_empty() || out.is_empty())  { out.zeros(A.n_rows, B_n_cols); return true; }
     
@@ -5952,7 +5922,7 @@ auxlib::qz(Mat<T>& A, Mat<T>& B, Mat<T>& vsl, Mat<T>& vsr, const Base<T,T1>& X_e
     A = X_expr.get_ref();
     B = Y_expr.get_ref();
     
-    arma_debug_check( ((A.is_square() == false) || (B.is_square() == false)), "qz(): given matrices must be square sized" );
+    arma_debug_check( ((A.is_square() == false) || (B.is_square() == false)), "qz(): given matrices must be square sized", [&](){ A.soft_reset(); B.soft_reset(); } );
     
     arma_debug_check( (A.n_rows != B.n_rows), "qz(): given matrices must have the same size" );
     
@@ -6039,7 +6009,7 @@ auxlib::qz(Mat< std::complex<T> >& A, Mat< std::complex<T> >& B, Mat< std::compl
     A = X_expr.get_ref();
     B = Y_expr.get_ref();
     
-    arma_debug_check( ((A.is_square() == false) || (B.is_square() == false)), "qz(): given matrices must be square sized" );
+    arma_debug_check( ((A.is_square() == false) || (B.is_square() == false)), "qz(): given matrices must be square sized", [&](){ A.soft_reset(); B.soft_reset(); } );
     
     arma_debug_check( (A.n_rows != B.n_rows), "qz(): given matrices must have the same size" );
     
@@ -6649,58 +6619,6 @@ auxlib::crippled_lapack(const Base<typename T1::elem_type, T1>&)
     return false;
     }
   #endif
-  }
-
-
-
-template<typename T1>
-inline
-typename T1::pod_type
-auxlib::epsilon_lapack(const Base<typename T1::elem_type, T1>&)
-  {
-  typedef typename T1::pod_type T;
-  
-  return T(0.5)*std::numeric_limits<T>::epsilon();
-  
-  // value reverse engineered from dgesvx.f and dlamch.f
-  // http://www.netlib.org/lapack/explore-html/da/d21/dgesvx_8f.html
-  // http://www.netlib.org/lapack/explore-html/d5/dd4/dlamch_8f.html
-  //
-  // Fortran epsilon(X) function:
-  // https://gcc.gnu.org/onlinedocs/gfortran/EPSILON.html
-  // "EPSILON(X) returns the smallest number E of the same kind as X such that 1 + E > 1"
-  // 
-  // C++ std::numeric_limits<T>::epsilon() function:
-  // https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon
-  // "the difference between 1.0 and the next value representable by the floating-point type T"
-  // 
-  // extract from dgesvx.f:
-  // 
-  //   IF( rcond.LT.dlamch( 'Epsilon' ) )
-  //     info = n + 1
-  //   RETURN
-  // 
-  // extract from dlamch.f:
-  //   
-  //   * rnd = 1.0 when rounding occurs in addition, 0.0 otherwise
-  //   ...
-  //   *  Assume rounding, not chopping. Always
-  //   
-  //   rnd = one
-  //   
-  //   IF( one.EQ.rnd ) THEN
-  //     eps = epsilon(zero) * 0.5
-  //   ELSE
-  //     eps = epsilon(zero)
-  //   END IF
-  //   ...
-  //   IF( lsame( cmach, 'E' ) ) THEN
-  //     rmach = eps
-  //   ...
-  //   END IF
-  //   ...
-  //   dlamch = rmach
-  //   RETURN
   }
 
 

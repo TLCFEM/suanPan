@@ -117,8 +117,6 @@ class op_rel_noteq;
 class gen_eye;
 class gen_ones;
 class gen_zeros;
-class gen_randu;
-class gen_randn;
 
 
 
@@ -348,6 +346,7 @@ struct arma_nozeros_indicator : public arma_initmode_indicator<false> {};
 
 template<typename Dummy = int> struct injector_end_of_row {};
 
+// DEPRECATED: DO NOT USE IN NEW CODE
 static const injector_end_of_row<> endr = injector_end_of_row<>();
 //!< endr indicates "end of row" when using the << operator;
 //!< similar conceptual meaning to std::endl

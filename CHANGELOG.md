@@ -9,6 +9,8 @@
 
 1. optimise assembling of symmetric global matrices, around 10% overall performance improvement on memory bounded systems [#79](https://github.com/TLCFEM/suanPan/pull/79)
 2. extend `BatheTwoStep` to allow customisation of spectral radius [#81](https://github.com/TLCFEM/suanPan/pull/81) and sub-step size [#82](https://github.com/TLCFEM/suanPan/pull/82)
+3. update `Catch2` to version `2.13.10`
+4. update `Armadillo` to version `11.4`
 
 ## version 2.6.1
 
