@@ -1,0 +1,9 @@
+[Desktop Entry]
+Exec=
+Version=1.0
+Type=Application
+Icon=io.github.tlcfem.suanPan
+Categories=Science
+Name=suanPan
+Terminal=true
+
