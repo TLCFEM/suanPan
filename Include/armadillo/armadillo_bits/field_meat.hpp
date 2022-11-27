@@ -427,6 +427,8 @@ field<oT>::operator=(field<oT>&& X)
   {
   arma_extra_debug_sigprint(arma_str::format("this = %x   X = %x") % this % &X);
   
+  if(this == &X)  { return *this; }
+  
   reset();
   
   access::rw(n_rows  ) = X.n_rows;
@@ -758,7 +760,7 @@ field<oT>::back() const
 
 
 template<typename oT>
-arma_cold
+arma_deprecated
 inline
 field_injector< field<oT> >
 field<oT>::operator<<(const oT& val)
@@ -769,7 +771,7 @@ field<oT>::operator<<(const oT& val)
 
 
 template<typename oT>
-arma_cold
+arma_deprecated
 inline
 field_injector< field<oT> >
 field<oT>::operator<<(const injector_end_of_row<>& x)
