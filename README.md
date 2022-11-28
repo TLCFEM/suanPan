@@ -109,12 +109,23 @@ It is also possible to use [Scoop](https://scoop.sh/) to install the package.
 
 ### Linux
 
-Linux's users are recommended to obtain the binaries via snap. The snap supports visualization via VTK and uses Intel
-MKL for linear algebra.
+Linux's users are recommended to obtain the binaries via snap or flatpak.
+
+#### Snap
+
+The snap supports visualization via VTK and uses Intel MKL for linear algebra.
 
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/suanpan)
 
 [![asciicast](https://asciinema.org/a/491330.svg)](https://asciinema.org/a/491330)
+
+#### Flatpak
+
+Flatpak is also available if preferred.
+
+<a href='https://flathub.org/apps/details/io.github.tlcfem.suanPan'><img width='200' alt='Download on Flathub' src='https://flathub.org/assets/badges/flathub-badge-en.svg'/></a>
+
+#### Installation Packages
 
 Alternatively, download the RPM (Fedora 35) or DEB (Ubuntu 22.04) package from the release page. The packages may not be
 compatible with older distributions (due to different version of `libstdc++`). It is also possible to compile the
