@@ -134,7 +134,7 @@ int VAFCRP1D::reset_status() {
 
 vector<vec> VAFCRP1D::record(const OutputType P) {
     if(P == OutputType::PEEQ) return {vec{current_history(size)}};
-    
+
     return Material1D::record(P);
 }
 

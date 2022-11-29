@@ -99,8 +99,7 @@ vector<vec> Elastic2D::record(const OutputType P) {
 
     if(P == OutputType::MISES) {
         vec trial_mises(1);
-        if(plane_type == PlaneType::S)
-            trial_mises(0) = sqrt(current_stress(0) * current_stress(0) - current_stress(0) * current_stress(1) + current_stress(1) * current_stress(1) + 3. * current_stress(2) * current_stress(2));
+        if(plane_type == PlaneType::S) trial_mises(0) = sqrt(current_stress(0) * current_stress(0) - current_stress(0) * current_stress(1) + current_stress(1) * current_stress(1) + 3. * current_stress(2) * current_stress(2));
         else if(plane_type == PlaneType::E) {
             const auto sigma_mean = (current_stress(0) + current_stress(1) + sigma_33) / 3.;
             const auto tmp_a = current_stress(0) - sigma_mean;

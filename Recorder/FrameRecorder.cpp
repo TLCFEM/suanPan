@@ -47,25 +47,25 @@ void FrameRecorder::record([[maybe_unused]] const shared_ptr<DomainBase>& D) {
     if(!if_perform_record()) return;
 
     ostringstream group_name;
-        group_name << "/";
-        group_name << D->get_factory()->get_current_time();
+    group_name << "/";
+    group_name << D->get_factory()->get_current_time();
 
-        const auto group_id = H5Gcreate(file_id, group_name.str().c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    const auto group_id = H5Gcreate(file_id, group_name.str().c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
-        for(const auto& I : D->get_element_pool()) {
-            if(const auto data = I->record(get_variable_type()); !data.empty()) {
-                mat data_to_write(data[0].n_elem, data.size());
+    for(const auto& I : D->get_element_pool()) {
+        if(const auto data = I->record(get_variable_type()); !data.empty()) {
+            mat data_to_write(data[0].n_elem, data.size());
 
-                uword idx = 0;
-                for(const auto& J : data) data_to_write.col(idx++) = J;
+            uword idx = 0;
+            for(const auto& J : data) data_to_write.col(idx++) = J;
 
-                const hsize_t dimension[2] = {data_to_write.n_cols, data_to_write.n_rows};
+            const hsize_t dimension[2] = {data_to_write.n_cols, data_to_write.n_rows};
 
-                H5LTmake_dataset(group_id, std::to_string(I->get_tag()).c_str(), 2, dimension, H5T_NATIVE_DOUBLE, data_to_write.mem);
-            }
+            H5LTmake_dataset(group_id, std::to_string(I->get_tag()).c_str(), 2, dimension, H5T_NATIVE_DOUBLE, data_to_write.mem);
         }
+    }
 
-        H5Gclose(group_id);
+    H5Gclose(group_id);
 #endif
 }
 
