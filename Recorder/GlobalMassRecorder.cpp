@@ -30,9 +30,7 @@ GlobalMassRecorder::GlobalMassRecorder(const unsigned T, const unsigned I, const
     : GlobalRecorder(T, OutputType::M, I, R, H) {}
 
 void GlobalMassRecorder::record(const shared_ptr<DomainBase>& D) {
-    if(1 != interval && counter++ != interval) return;
-
-    counter = 1;
+    if(!if_perform_record()) return;
 
     auto& W = D->get_factory();
     auto& C = D->get_color_map();

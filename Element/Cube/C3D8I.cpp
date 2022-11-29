@@ -142,9 +142,8 @@ mat C3D8I::compute_shape_function(const mat& coordinate, const unsigned order) c
 
 vector<vec> C3D8I::record(const OutputType T) {
     vector<vec> data;
-    if(OutputType::E == T) for(const auto& I : int_pt) data.emplace_back(I.c_material->get_trial_strain());
-    else if(OutputType::S == T) for(const auto& I : int_pt) data.emplace_back(I.c_material->get_trial_stress());
-    else for(const auto& I : int_pt) for(const auto& J : I.c_material->record(T)) data.emplace_back(J);
+    for(const auto& I : int_pt)
+        for(const auto& J : I.c_material->record(T)) data.emplace_back(J);
     return data;
 }
 

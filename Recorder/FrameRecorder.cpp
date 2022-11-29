@@ -44,10 +44,9 @@ FrameRecorder::~FrameRecorder() {
 
 void FrameRecorder::record([[maybe_unused]] const shared_ptr<DomainBase>& D) {
 #ifdef SUANPAN_HDF5
-    if(1 == interval || counter++ == interval) {
-        counter = 1;
+    if(!if_perform_record()) return;
 
-        ostringstream group_name;
+    ostringstream group_name;
         group_name << "/";
         group_name << D->get_factory()->get_current_time();
 
@@ -67,7 +66,6 @@ void FrameRecorder::record([[maybe_unused]] const shared_ptr<DomainBase>& D) {
         }
 
         H5Gclose(group_id);
-    }
 #endif
 }
 

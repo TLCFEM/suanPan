@@ -105,14 +105,11 @@ int BilinearJ2::reset_status() {
 }
 
 vector<vec> BilinearJ2::record(const OutputType P) {
-    vector<vec> data;
+    if(P == OutputType::MISES) return {vec{tensor::stress::norm(tensor::dev(current_stress)) / root_two_third}};
+    if(P == OutputType::EEQ) return {vec{root_two_third * tensor::strain::norm(tensor::dev(current_strain))}};
+    if(P == OutputType::PEEQ) return {vec{current_history(0)}};
 
-    if(P == OutputType::MISES) data.emplace_back(vec{tensor::stress::norm(tensor::dev(current_stress)) / root_two_third});
-    else if(P == OutputType::EEQ) data.emplace_back(vec{root_two_third * tensor::strain::norm(tensor::dev(current_strain))});
-    else if(P == OutputType::PEEQ) data.emplace_back(vec{current_history(0)});
-    else return Material3D::record(P);
-
-    return data;
+    return Material3D::record(P);
 }
 
 void BilinearJ2::print() { suanpan_info("A 3D bilinear hardening model.\n"); }

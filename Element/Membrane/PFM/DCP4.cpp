@@ -154,7 +154,6 @@ int DCP4::reset_status() {
 
 vector<vec> DCP4::record(const OutputType P) {
     vector<vec> output;
-    output.reserve(int_pt.size());
 
     if(P == OutputType::NMISES) {
         mat A(int_pt.size(), 4);

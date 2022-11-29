@@ -133,12 +133,9 @@ int VAFCRP1D::reset_status() {
 }
 
 vector<vec> VAFCRP1D::record(const OutputType P) {
-    vector<vec> data;
-
-    if(P == OutputType::PEEQ) data.emplace_back(vec{current_history(size)});
-    else return Material1D::record(P);
-
-    return data;
+    if(P == OutputType::PEEQ) return {vec{current_history(size)}};
+    
+    return Material1D::record(P);
 }
 
 void VAFCRP1D::print() {

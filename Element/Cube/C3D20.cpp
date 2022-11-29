@@ -179,9 +179,7 @@ mat C3D20::compute_shape_function(const mat& coordinate, const unsigned order) c
 
 vector<vec> C3D20::record(const OutputType T) {
     vector<vec> data;
-
     for(const auto& I : int_pt) for(const auto& J : I.c_material->record(T)) data.emplace_back(J);
-
     return data;
 }
 

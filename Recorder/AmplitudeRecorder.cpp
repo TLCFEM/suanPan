@@ -29,11 +29,9 @@ void AmplitudeRecorder::initialize(const shared_ptr<DomainBase>& D) {
 }
 
 void AmplitudeRecorder::record(const shared_ptr<DomainBase>& D) {
-    if(1 != interval && counter++ != interval) return;
+    if(!if_perform_record()) return;
 
-    counter = 1;
-
-    auto& current_time = D->get_factory()->get_current_time();
+    sp_d auto& current_time = D->get_factory()->get_current_time();
     auto& obj_tag = get_object_tag();
 
     for(unsigned I = 0; I < obj_tag.n_elem; ++I) insert({{D->get<Amplitude>(obj_tag(I))->get_amplitude(current_time)}}, I);

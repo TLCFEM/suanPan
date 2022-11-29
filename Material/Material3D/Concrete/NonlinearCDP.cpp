@@ -248,15 +248,12 @@ int NonlinearCDP::reset_status() {
 }
 
 vector<vec> NonlinearCDP::record(const OutputType T) {
-    vector<vec> data;
+    if(T == OutputType::DT) return {vec{current_history(0)}};
+    if(T == OutputType::DC) return {vec{current_history(1)}};
+    if(T == OutputType::KAPPAT) return {vec{current_history(2)}};
+    if(T == OutputType::KAPPAC) return {vec{current_history(3)}};
 
-    if(T == OutputType::DT) data.emplace_back(vec{current_history(0)});
-    else if(T == OutputType::DC) data.emplace_back(vec{current_history(1)});
-    else if(T == OutputType::KAPPAT) data.emplace_back(vec{current_history(2)});
-    else if(T == OutputType::KAPPAC) data.emplace_back(vec{current_history(3)});
-    else return Material3D::record(T);
-
-    return data;
+    return Material3D::record(T);
 }
 
 void NonlinearCDP::print() { suanpan_info("A concrete damage plasticity model.\n"); }
