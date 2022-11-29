@@ -88,7 +88,7 @@ public:
 
     virtual void update_trial_load_factor(double);
     virtual void update_trial_load_factor(const vec&);
-    virtual void update_trial_displacement(const vec&);
+    virtual void update_from_ninja(const vec&);
 
     virtual void update_incre_time(double);
 
@@ -116,7 +116,6 @@ public:
     virtual void reset_status();
 
     virtual void update_parameter(double);
-    virtual void update_compatibility() const;
 
     virtual vec from_incre_velocity(const vec&, const uvec&);     // obtain target displacement from increment of velocity
     virtual vec from_incre_acceleration(const vec&, const uvec&); // obtain target displacement from increment of acceleration

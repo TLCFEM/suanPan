@@ -33,17 +33,12 @@
 #include "Converger.h"
 
 class FixedNumber final : public Converger {
-    unsigned counter = 0;
-
-protected:
-    void set_conv_flag(bool) override;
-
 public:
     explicit FixedNumber(unsigned = 0, unsigned = 7, bool = false);
 
     unique_ptr<Converger> get_copy() override;
 
-    bool is_converged() override;
+    bool is_converged(unsigned) override;
 };
 
 #endif

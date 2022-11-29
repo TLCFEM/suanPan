@@ -74,9 +74,6 @@ int Dynamic::initialize() {
     if(SUANPAN_SUCCESS != modifier->initialize()) return SUANPAN_FAIL;
     if(SUANPAN_SUCCESS != solver->initialize()) return SUANPAN_FAIL;
 
-    modifier->update_parameter(get_ini_step_size());
-    modifier->update_compatibility();
-
     return SUANPAN_SUCCESS;
 }
 
@@ -87,9 +84,6 @@ int Dynamic::analyze() {
 
     auto remain_time = get_time_period();
     auto step_time = get_ini_step_size();
-
-    // record initial state
-    // if(W->get_current_time() == 0.) G->record();
 
     unsigned num_increment = 0, num_converged_step = 0;
 

@@ -73,9 +73,6 @@ int Static::analyze() {
     auto remain_time = get_time_period();
     auto step_time = get_ini_step_size();
 
-    // record initial state
-    // if(W->get_current_time() == 0.) G->record();
-
     unsigned num_increment = 0, num_converged_step = 0;
 
     while(true) {

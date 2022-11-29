@@ -18,7 +18,6 @@
 #include "GSSSS.h"
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Domain/Node.h>
 
 GSSSS::GSSSS(const unsigned T)
     : Integrator(T)
@@ -156,23 +155,6 @@ void GSSSS::update_parameter(const double NT) {
     XPA2 = -W1G6 * L1 / L3 / DT;
     XCVD = W2G5 / W3G3 / DT;
     XCAD = W1G6 / W3G3 / DT / DT;
-}
-
-void GSSSS::update_compatibility() const {
-    const auto& D = get_domain().lock();
-    auto& W = D->get_factory();
-
-    auto fb = std::async([&] { W->update_trial_velocity(XPV2 * W->get_current_velocity() + XPV3 * W->get_current_acceleration()); });
-    auto fc = std::async([&] { W->update_trial_acceleration(XPA2 * W->get_current_velocity() + XPA3 * W->get_current_acceleration()); });
-
-    fb.get();
-    fc.get();
-
-    auto& trial_dsp = W->get_trial_displacement();
-    auto& trial_vel = W->get_trial_velocity();
-    auto& trial_acc = W->get_trial_acceleration();
-
-    suanpan::for_all(D->get_node_pool(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_status(trial_dsp, trial_vel, trial_acc); });
 }
 
 vec GSSSS::from_incre_velocity(const vec& incre_velocity, const uvec& encoding) {

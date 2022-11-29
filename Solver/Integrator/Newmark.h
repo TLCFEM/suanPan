@@ -56,7 +56,6 @@ public:
     int update_trial_status() override;
 
     void update_parameter(double) override;
-    void update_compatibility() const override;
 
     vec from_incre_velocity(const vec&, const uvec&) override;
     vec from_incre_acceleration(const vec&, const uvec&) override;

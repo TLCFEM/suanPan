@@ -46,6 +46,8 @@ int Ramm::analyze() {
     unsigned counter = 0;
 
     while(true) {
+        // update for nodes and elements
+        if(SUANPAN_SUCCESS != G->update_trial_status()) return SUANPAN_FAIL;
         // process modifiers
         if(SUANPAN_SUCCESS != G->process_modifier()) return SUANPAN_FAIL;
         // assemble resistance
@@ -87,6 +89,18 @@ int Ramm::analyze() {
 
         // avoid machine error accumulation
         G->erase_machine_error();
+
+        // exit if converged
+        if(C->is_converged(counter)) {
+            if(!fixed_arc_length) arc_length *= sqrt(max_iteration / static_cast<double>(counter));
+            return SUANPAN_SUCCESS;
+        }
+        // exit if maximum iteration is hit
+        if(++counter > max_iteration) {
+            if(!fixed_arc_length) arc_length *= .5;
+            return SUANPAN_FAIL;
+        }
+
         // update trial displacement
         W->update_trial_displacement_by(t_ninja);
         // update trial load factor
@@ -97,19 +111,6 @@ int Ramm::analyze() {
         G->update_load();
         // for tracking
         G->update_constraint();
-        // update for nodes and elements
-        if(SUANPAN_SUCCESS != G->update_trial_status()) return SUANPAN_FAIL;
-
-        // exit if maximum iteration is hit
-        if(++counter == max_iteration) {
-            if(!fixed_arc_length) arc_length *= .5;
-            return SUANPAN_FAIL;
-        }
-        // exit if converged
-        if(C->is_converged()) {
-            if(!fixed_arc_length) arc_length *= sqrt(max_iteration / static_cast<double>(counter));
-            return SUANPAN_SUCCESS;
-        }
     }
 }
 

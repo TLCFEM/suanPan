@@ -51,9 +51,9 @@ int LogicConverger::initialize() {
 
 unique_ptr<Converger> LogicAND::get_copy() { return make_unique<LogicAND>(*this); }
 
-bool LogicAND::is_converged() {
-    auto result_a = std::async([&] { return converger_a->is_converged(); });
-    auto result_b = std::async([&] { return converger_b->is_converged(); });
+bool LogicAND::is_converged(const unsigned counter) {
+    auto result_a = std::async([&] { return converger_a->is_converged(counter); });
+    auto result_b = std::async([&] { return converger_b->is_converged(counter); });
 
     const auto logic_result = result_a.get() && result_b.get();
     set_conv_flag(logic_result);
@@ -65,9 +65,9 @@ bool LogicAND::is_converged() {
 
 unique_ptr<Converger> LogicOR::get_copy() { return make_unique<LogicOR>(*this); }
 
-bool LogicOR::is_converged() {
-    auto result_a = std::async([&] { return converger_a->is_converged(); });
-    auto result_b = std::async([&] { return converger_b->is_converged(); });
+bool LogicOR::is_converged(const unsigned counter) {
+    auto result_a = std::async([&] { return converger_a->is_converged(counter); });
+    auto result_b = std::async([&] { return converger_b->is_converged(counter); });
 
     const auto logic_result = result_a.get() || result_b.get();
     set_conv_flag(logic_result);
@@ -79,9 +79,9 @@ bool LogicOR::is_converged() {
 
 unique_ptr<Converger> LogicXOR::get_copy() { return make_unique<LogicXOR>(*this); }
 
-bool LogicXOR::is_converged() {
-    auto result_a = std::async([&] { return converger_a->is_converged(); });
-    auto result_b = std::async([&] { return converger_b->is_converged(); });
+bool LogicXOR::is_converged(const unsigned counter) {
+    auto result_a = std::async([&] { return converger_a->is_converged(counter); });
+    auto result_b = std::async([&] { return converger_b->is_converged(counter); });
 
     const auto logic_result = result_a.get() != result_b.get();
     set_conv_flag(logic_result);

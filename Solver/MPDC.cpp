@@ -31,6 +31,8 @@ int MPDC::analyze() {
     unsigned counter = 0;
 
     while(true) {
+        // update for nodes and elements
+        if(SUANPAN_SUCCESS != G->update_trial_status()) return SUANPAN_FAIL;
         // process modifiers
         if(SUANPAN_SUCCESS != G->process_modifier()) return SUANPAN_FAIL;
         // assemble resistance
@@ -63,22 +65,21 @@ int MPDC::analyze() {
 
         // avoid machine error accumulation
         G->erase_machine_error();
+
+        // exit if converged
+        if(C->is_converged(counter)) return SUANPAN_SUCCESS;
+        // exit if maximum iteration is hit
+        if(++counter > max_iteration) return SUANPAN_FAIL;
+
         // update internal variable
         G->update_internal(ninja);
         // update trial load factor
         G->update_trial_load_factor(incre_lambda);
         // update trial displacement
-        G->update_trial_displacement(ninja);
+        G->update_from_ninja(ninja);
         // for tracking
         G->update_load();
         // for tracking
         G->update_constraint();
-        // update for nodes and elements
-        if(SUANPAN_SUCCESS != G->update_trial_status()) return SUANPAN_FAIL;
-
-        // exit if converged
-        if(C->is_converged()) return SUANPAN_SUCCESS;
-        // exit if maximum iteration is hit
-        if(++counter > max_iteration) return SUANPAN_FAIL;
     }
 }

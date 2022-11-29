@@ -24,16 +24,10 @@ AbsResidual::AbsResidual(const unsigned T, const double E, const unsigned M, con
 
 unique_ptr<Converger> AbsResidual::get_copy() { return make_unique<AbsResidual>(*this); }
 
-bool AbsResidual::is_converged() {
-    const auto& D = get_domain().lock();
-    auto& W = D->get_factory();
+bool AbsResidual::is_converged(unsigned) {
+    auto& W = get_domain().lock()->get_factory();
 
-    vec residual = W->get_trial_load() - W->get_trial_resistance();
-    if(!W->get_reference_load().is_empty() && !W->get_trial_load_factor().is_empty()) residual += W->get_reference_load() * W->get_trial_load_factor();
-
-    for(const auto& t_dof : D->get_restrained_dof()) residual(t_dof) = 0.;
-
-    set_error(norm(residual));
+    set_error(norm(get_residual()) / static_cast<double>(W->get_size()));
 
     set_conv_flag(get_tolerance() > get_error());
 

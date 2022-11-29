@@ -164,7 +164,7 @@ void Integrator::update_trial_load_factor(const vec& lambda) {
     W->update_trial_load_factor_by(lambda);
 }
 
-void Integrator::update_trial_displacement(const vec& ninja) {
+void Integrator::update_from_ninja(const vec& ninja) {
     const auto& W = get_domain().lock()->get_factory();
     W->update_trial_displacement_by(ninja);
 }
@@ -230,36 +230,16 @@ void Integrator::stage_and_commit_status() {
 
 void Integrator::stage_status() { database.lock()->stage_status(); }
 
-void Integrator::commit_status() {
-    database.lock()->commit_status();
-    update_compatibility();
-}
+void Integrator::commit_status() { database.lock()->commit_status(); }
 
-void Integrator::clear_status() {
-    database.lock()->clear_status();
-    update_compatibility();
-}
+void Integrator::clear_status() { database.lock()->clear_status(); }
 
-void Integrator::reset_status() {
-    database.lock()->reset_status();
-    update_compatibility();
-}
+void Integrator::reset_status() { database.lock()->reset_status(); }
 
 /**
  * When time step changes, some parameters may need to be updated.
  */
 void Integrator::update_parameter(double) {}
-
-/**
- * Make sure that the trial displacement/velocity/acceleration are consistent with each other.
- * When starting a new trial state, the trial displacement is identical to the current displacement.
- * This essentially means that the displacement increment is zero.
- * To have such a trial state with the given time step, the trial velocity and acceleration shall be
- * updated to be compatible with the trial displacement.
- *
- * On exit, trial velocity and acceleration should be computed from current/trial displacement.
- */
-void Integrator::update_compatibility() const {}
 
 /**
  * When external loads are applied, they can be applied in forms of displacement/velocity/acceleration.

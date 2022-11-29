@@ -31,7 +31,7 @@ set symm_mat 0
 
 integrator BatheTwoStep 1
 
-converger RelIncreDisp 1 1E-10 10 1
+converger RelIncreDisp 1 1E-12 10 1
 
 analyze
 
