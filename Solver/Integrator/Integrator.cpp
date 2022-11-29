@@ -17,7 +17,7 @@
 
 #include "Integrator.h"
 #include <Domain/DomainBase.h>
-#include <Domain/Factory.hpp>
+#include <Domain/FactoryHelper.hpp>
 
 Integrator::Integrator(const unsigned T)
     : Tag(T) { suanpan_debug("Integrator %u ctor() called.\n", T); }
@@ -164,9 +164,9 @@ void Integrator::update_trial_load_factor(const vec& lambda) {
     W->update_trial_load_factor_by(lambda);
 }
 
-void Integrator::update_from_ninja(const vec& ninja) {
+void Integrator::update_from_ninja() {
     const auto& W = get_domain().lock()->get_factory();
-    W->update_trial_displacement_by(ninja);
+    W->update_trial_displacement_by(W->get_ninja());
 }
 
 void Integrator::update_incre_time(const double T) {
@@ -231,7 +231,13 @@ int Integrator::solve(mat& X, sp_mat&& B) { return database.lock()->get_factory(
  * The penalty method can apply homogeneous constraints approximately.
  * The corresponding DoF shall be set to zero after solving the system.
  */
-void Integrator::erase_machine_error() const { database.lock()->erase_machine_error(); }
+void Integrator::erase_machine_error(vec& ninja) const {
+    const auto& D = get_domain().lock();
+    auto& W = D->get_factory();
+
+    D->erase_machine_error(ninja);
+    get_ninja(W) = ninja.head(W->get_size());
+}
 
 void Integrator::stage_and_commit_status() {
     stage_status();
@@ -272,7 +278,7 @@ vec Integrator::from_incre_velocity(const vec&, const uvec& encoding) { return z
 vec Integrator::from_incre_acceleration(const vec&, const uvec& encoding) { return zeros(encoding.n_elem); }
 
 vec Integrator::from_total_velocity(const vec& total_velocity, const uvec& encoding) {
-    const auto& W = get_domain().lock()->get_factory();
+    auto& W = get_domain().lock()->get_factory();
 
     if(AnalysisType::DYNAMICS != W->get_analysis_type()) return zeros(encoding.n_elem);
 
@@ -280,7 +286,7 @@ vec Integrator::from_total_velocity(const vec& total_velocity, const uvec& encod
 }
 
 vec Integrator::from_total_acceleration(const vec& total_acceleration, const uvec& encoding) {
-    const auto& W = get_domain().lock()->get_factory();
+    auto& W = get_domain().lock()->get_factory();
 
     if(AnalysisType::DYNAMICS != W->get_analysis_type()) return zeros(encoding.n_elem);
 

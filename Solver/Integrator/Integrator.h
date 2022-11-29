@@ -88,7 +88,7 @@ public:
 
     virtual void update_trial_load_factor(double);
     virtual void update_trial_load_factor(const vec&);
-    virtual void update_from_ninja(const vec&);
+    virtual void update_from_ninja();
 
     virtual void update_incre_time(double);
 
@@ -106,7 +106,7 @@ public:
     virtual int solve(mat&, mat&&);
     virtual int solve(mat&, sp_mat&&);
 
-    virtual void erase_machine_error() const;
+    virtual void erase_machine_error(vec&) const;
 
     virtual void stage_and_commit_status();
 

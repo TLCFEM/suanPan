@@ -53,10 +53,6 @@ int LeeNewmarkBase::initialize() {
 int LeeNewmarkBase::update_internal(const mat& t_internal) {
     trial_internal += t_internal;
 
-    // order matters
-    // cannot resize before assignment
-    get_ninja(factory).resize(n_block);
-
     return SUANPAN_SUCCESS;
 }
 
