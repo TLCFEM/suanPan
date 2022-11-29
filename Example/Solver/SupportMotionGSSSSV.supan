@@ -11,8 +11,8 @@ element B21 1 1 2 1 6
 
 mass 2 2 10 1
 
-fix 1 2 1
-fix 2 3 1
+fix2 1 2 1
+fix2 2 3 1
 
 amplitude Tabular 1 EZ
 
@@ -30,6 +30,17 @@ converger RelIncreDisp 1 1E-10 4 1
 
 analyze
 
+# Node 2:
+# Coordinate:
+# 0 1.0000
+# Displacement:
+# -7.3456e-01 -4.6773e-18 7.7375e-01
+# Resistance:
+# -1.4798e+02 -1.4995e-15 -6.5407e-01
+# Velocity:
+# -7.1231e+00 2.8635e-16 1.0661e+01
+# Acceleration:
+# 1.4559e+01 5.5269e-16 -2.1790e+01
 peek node 1 2
 
 # save recorder 1

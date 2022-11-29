@@ -19,7 +19,7 @@ set band_mat 0
 analyze
 
 # Eigenvalues:
-#    30.0000
+# 30.0000
 peek eigenvalue
 
 exit

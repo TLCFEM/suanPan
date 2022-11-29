@@ -45,8 +45,8 @@ element EB21 18 18 19 100 1 1 1
 element EB21 19 19 20 100 1 1 1
 element EB21 20 20 21 100 1 1 1
 
-fix 1 1 1 21
-fix 2 2 1 21
+fix2 1 1 1 21
+fix2 2 2 1 21
 
 recorder 1 hdf5 Node U 7
 # recorder 2 hdf5 Node RF1 7
@@ -56,18 +56,19 @@ set symm_mat false
 
 criterion MinDisplacement 1 7 2 -1.8
 
-converger RelIncreDisp 1 1E-4 4 1
+converger RelIncreDisp 1 1E-10 4 1
 
 analyze
 
 # Node 7:
-#    4.0223   0.8396
+# Coordinate:
+# 4.0223 0.8396
 # Displacement:
-#    0.0168  -1.8050   0.1679
+# 0.0179 -1.8127 0.1669
 # Resistance:
-#   -1.4197e-10  -1.8196e+02  -2.2510e-11
+# 4.9835e-10 -1.9847e+02 -1.0118e-11
 peek node 7
 
-# save recorder 1
+save recorder 1
 
 exit

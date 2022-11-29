@@ -125,8 +125,11 @@ int GSSSS::update_trial_status() {
     const auto& D = get_domain().lock();
     auto& W = D->get_factory();
 
-    W->update_trial_velocity_by(XCVD * W->get_ninja());
-    W->update_trial_acceleration_by(XCAD * W->get_ninja());
+    auto fa = std::async([&] { W->update_trial_velocity(XPV2 * W->get_current_velocity() + XPV3 * W->get_current_acceleration() + XCVD * W->get_incre_displacement()); });
+    auto fb = std::async([&] { W->update_trial_acceleration(XPA2 * W->get_current_velocity() + XPA3 * W->get_current_acceleration() + XCAD * W->get_incre_displacement()); });
+
+    fa.get();
+    fb.get();
 
     return D->update_trial_status();
 }

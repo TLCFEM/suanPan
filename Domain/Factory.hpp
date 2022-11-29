@@ -1466,6 +1466,8 @@ template<sp_d T> void Factory<T>::clear_energy() {
 }
 
 template<sp_d T> void Factory<T>::commit_status() {
+    ninja.zeros();
+
     commit_energy();
 
     commit_time();

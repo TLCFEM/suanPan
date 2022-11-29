@@ -175,9 +175,19 @@ void Integrator::update_incre_time(const double T) {
     update_parameter(W->get_incre_time());
 }
 
-int Integrator::update_trial_status() { return database.lock()->update_trial_status(); }
+int Integrator::update_trial_status() {
+    const auto& D = get_domain().lock();
+    auto& W = D->get_factory();
 
-int Integrator::update_incre_status() { return database.lock()->update_incre_status(); }
+    return suanpan::approx_equal(norm(W->get_incre_displacement()), 0.) ? SUANPAN_SUCCESS : D->update_trial_status();
+}
+
+int Integrator::update_incre_status() {
+    const auto& D = get_domain().lock();
+    auto& W = D->get_factory();
+
+    return suanpan::approx_equal(norm(W->get_incre_displacement()), 0.) ? SUANPAN_SUCCESS : D->update_incre_status();
+}
 
 /**
  * Must change ninja to the real displacement increment.

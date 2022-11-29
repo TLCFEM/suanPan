@@ -29,15 +29,15 @@ analyze
 
 # Node 2:
 # Coordinate:
-#         0   1.0000
+# 0 1.0000
 # Displacement:
-#    0.0137        0  -0.0205
+# 0.0137 0 -0.0205
 # Resistance:
-#    4.5503        0   0.0169
+# 4.5503 0 0.0169
 # Velocity:
-#   -0.0867        0   0.1299
+# -0.0867 0 0.1299
 # Acceleration:
-#   -0.3936        0   0.5893
+# -0.3936 0 0.5893
 peek node 2
 
 peek integrator 1

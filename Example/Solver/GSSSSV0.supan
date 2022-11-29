@@ -28,15 +28,15 @@ converger RelIncreDisp 1 1E-4 4 1
 analyze
 
 # Node 2:
-#         0   1.0000
+# 0 1.0000
 # Displacement:
-#    0.0139        0  -0.0208
+# 0.0139 0 -0.0208
 # Resistance:
-#    4.5853        0   0.0170
+# 4.5853 0 0.0170
 # Velocity:
-#   -0.0866        0   0.1297
+# -0.0866 0 0.1297
 # Acceleration:
-#   -0.4049        0   0.6062
+# -0.4049 0 0.6062
 peek node 2
 
 peek integrator 1

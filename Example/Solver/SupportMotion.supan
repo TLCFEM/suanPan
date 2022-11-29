@@ -11,8 +11,8 @@ element B21 1 1 2 1 6
 
 mass 2 2 10 1
 
-fix 1 2 1
-fix 2 3 1
+fix2 1 2 1
+fix2 2 3 1
 
 amplitude Tabular 1 EZ
 
@@ -46,6 +46,17 @@ disable load 2
 
 analyze
 
+# Node 2:
+# Coordinate:
+# 0 1.0000
+# Displacement:
+# -1.7910e-05 -4.6943e-21 -1.1507e-03
+# Resistance:
+# 2.3702e-01 -4.1863e-18 3.4382e-03
+# Velocity:
+# -6.3067e-04 -1.2206e-19 -2.4443e-02
+# Acceleration:
+# -1.6608e-02 -2.1913e-18 -2.6324e-01
 peek node 1 2
 
 clear
