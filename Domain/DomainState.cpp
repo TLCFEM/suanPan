@@ -334,6 +334,8 @@ int Domain::update_incre_status() const {
 int Domain::update_current_status() const {
     const auto analysis_type = factory->get_analysis_type();
 
+    if(analysis_type != AnalysisType::STATICS && analysis_type != AnalysisType::DYNAMICS && analysis_type != AnalysisType::BUCKLE) return SUANPAN_SUCCESS;
+
     // collect initial nodal quantities into global storage
     if(analysis_type == AnalysisType::DYNAMICS) {
         vec c_g_dsp(factory->get_size(), fill::zeros);
