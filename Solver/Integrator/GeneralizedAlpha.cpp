@@ -56,7 +56,7 @@ void GeneralizedAlpha::assemble_resistance() {
     fb.get();
     fc.get();
 
-    W->set_sushi(F1 * (W->get_current_resistance() + W->get_current_damping_force()) + F2 * (W->get_trial_resistance() + W->get_trial_damping_force()) + F3 * W->get_current_inertial_force() + F4 * W->get_trial_inertial_force());
+    W->set_sushi(W->get_current_resistance() + F2 * W->get_incre_resistance() + W->get_current_damping_force() + F2 * W->get_incre_damping_force() + W->get_current_inertial_force() + F4 * W->get_incre_inertial_force());
 }
 
 void GeneralizedAlpha::assemble_matrix() {
