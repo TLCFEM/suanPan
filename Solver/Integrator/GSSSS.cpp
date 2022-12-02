@@ -20,7 +20,7 @@
 #include <Domain/Factory.hpp>
 
 GSSSS::GSSSS(const unsigned T)
-    : Integrator(T)
+    : ImplicitIntegrator(T)
     , L1(1.)
     , L2(.5)
     , L4(1.) {}

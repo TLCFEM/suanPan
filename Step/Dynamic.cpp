@@ -21,14 +21,14 @@
 #include <Domain/Factory.hpp>
 #include <Load/GroupNodalDisplacement.h>
 #include <Solver/BFGS.h>
-#include <Solver/Integrator/LeeNewmark.h>
-#include <Solver/Integrator/LeeNewmarkFull.h>
+#include <Solver/Integrator/LeeNewmarkBase.h>
 #include <Solver/MPDC.h>
 #include <Solver/Newton.h>
 #include <Solver/Ramm.h>
 
-Dynamic::Dynamic(const unsigned T, const double P)
-    : Step(T, P) {}
+Dynamic::Dynamic(const unsigned T, const double P, const IntegratorType AT)
+    : Step(T, P)
+    , analysis_type(AT) {}
 
 int Dynamic::initialize() {
     configure_storage_scheme();
@@ -45,11 +45,21 @@ int Dynamic::initialize() {
 
     // integrator
     if(nullptr == modifier) modifier = make_shared<Newmark>();
+    else if(IntegratorType::Implicit == analysis_type) {
+        if(IntegratorType::Implicit != modifier->type()) {
+            suanpan_error("an implicit integrator is required.\n");
+            return SUANPAN_FAIL;
+        }
+    }
+    else if(IntegratorType::Implicit == modifier->type()) {
+        suanpan_error("an explicit integrator is required.\n");
+        return SUANPAN_FAIL;
+    }
     modifier->set_domain(t_domain);
 
     // solver
     // avoid arc length solver
-    if(nullptr != solver) if(const auto& t_solver = *solver; typeid(t_solver) == typeid(Ramm)) solver = nullptr;
+    if(nullptr != solver) if(dynamic_cast<Ramm*>(solver.get())) solver = nullptr;
     // automatically enable displacement controlled solver
     if(nullptr == solver) {
         auto flag = false;
@@ -61,8 +71,7 @@ int Dynamic::initialize() {
         flag ? solver = make_shared<MPDC>() : solver = make_shared<Newton>();
     }
 
-    const auto& t_solver = *solver;
-    if(const auto& t_modifier = *modifier; typeid(t_solver) == typeid(BFGS) && typeid(t_modifier) == typeid(LeeNewmark) && typeid(t_modifier) == typeid(LeeNewmarkFull)) {
+    if(dynamic_cast<BFGS*>(solver.get()) && dynamic_cast<LeeNewmarkBase*>(modifier.get())) {
         suanpan_error("currently BFGS solver is not supported by Lee damping model.\n");
         return SUANPAN_FAIL;
     }

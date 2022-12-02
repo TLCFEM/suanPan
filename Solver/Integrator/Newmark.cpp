@@ -20,7 +20,7 @@
 #include <Domain/Factory.hpp>
 
 Newmark::Newmark(const unsigned T, const double A, const double B)
-    : Integrator(T)
+    : ImplicitIntegrator(T)
     , beta(A)
     , gamma(B) {}
 

@@ -9,4 +9,5 @@ set(Integrator
         Integrator/Newmark.cpp
         Integrator/RayleighNewmark.cpp
         Integrator/WilsonPenzienNewmark.cpp
+        Integrator/Tchamwa.cpp
         )

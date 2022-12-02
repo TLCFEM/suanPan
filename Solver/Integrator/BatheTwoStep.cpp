@@ -20,7 +20,7 @@
 #include <Domain/Factory.hpp>
 
 BatheTwoStep::BatheTwoStep(const unsigned T, const double R, const double G)
-    : Integrator(T)
+    : ImplicitIntegrator(T)
     , GM(G)
     , Q1((R + 1) / (2. * GM * (R - 1) + 4))
     , Q2(.5 - GM * Q1)

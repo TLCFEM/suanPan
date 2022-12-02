@@ -43,6 +43,11 @@
 
 class DomainBase;
 
+enum class IntegratorType {
+    Implicit,
+    Explicit
+};
+
 class Integrator : public Tag {
     bool time_step_switch = true;
 
@@ -60,6 +65,8 @@ public:
     [[nodiscard]] const weak_ptr<DomainBase>& get_domain() const;
 
     virtual int initialize();
+
+    [[nodiscard]] virtual constexpr IntegratorType type() const = 0;
 
     // ! some multistep integrators may require fixed time step for some consecutive sub-steps
     void set_time_step_switch(bool);
@@ -124,6 +131,20 @@ public:
     vec from_incre_acceleration(double, const uvec&);
     vec from_total_velocity(double, const uvec&);
     vec from_total_acceleration(double, const uvec&);
+};
+
+class ImplicitIntegrator : public Integrator {
+public:
+    using Integrator::Integrator;
+
+    [[nodiscard]] constexpr IntegratorType type() const override { return IntegratorType::Implicit; }
+};
+
+class ExplicitIntegrator : public Integrator {
+public:
+    using Integrator::Integrator;
+
+    [[nodiscard]] constexpr IntegratorType type() const override { return IntegratorType::Explicit; }
 };
 
 #endif

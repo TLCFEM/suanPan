@@ -20,7 +20,7 @@
 #include <Domain/Factory.hpp>
 
 GeneralizedAlpha::GeneralizedAlpha(const unsigned T, const double R)
-    : Integrator(T)
+    : ImplicitIntegrator(T)
     , alpha_f(R / (R + 1.))
     , alpha_m((2. * R - 1.) / (R + 1.))
     , gamma(.5 - (R - 1.) / (R + 1.))
@@ -32,7 +32,7 @@ GeneralizedAlpha::GeneralizedAlpha(const unsigned T, const double R)
     , F9(-.5 / beta) {}
 
 GeneralizedAlpha::GeneralizedAlpha(const unsigned T, const double AF, const double AM)
-    : Integrator(T)
+    : ImplicitIntegrator(T)
     , alpha_f(std::min(.5, std::max(AF, .0)))
     , alpha_m(std::min(alpha_f, std::max(AM, -1.)))
     , gamma(.5 - alpha_m + alpha_f)

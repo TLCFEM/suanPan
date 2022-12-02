@@ -35,7 +35,7 @@
 
 #include "Integrator.h"
 
-class GSSSS : public Integrator {
+class GSSSS : public ImplicitIntegrator {
 protected:
     const double L1, L2, L4;
 

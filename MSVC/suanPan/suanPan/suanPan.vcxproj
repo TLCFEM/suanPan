@@ -459,6 +459,7 @@
     <ClCompile Include="..\..\..\Solver\Integrator\LeeNewmarkFull.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\Newmark.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\RayleighNewmark.cpp" />
+    <ClCompile Include="..\..\..\Solver\Integrator\Tchamwa.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\WilsonPenzienNewmark.cpp" />
     <ClCompile Include="..\..\..\Solver\MPDC.cpp" />
     <ClCompile Include="..\..\..\Solver\Newton.cpp" />
@@ -896,6 +897,7 @@
     <ClInclude Include="..\..\..\Solver\Integrator\LeeNewmarkFull.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\Newmark.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\RayleighNewmark.h" />
+    <ClInclude Include="..\..\..\Solver\Integrator\Tchamwa.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\WilsonPenzienNewmark.h" />
     <ClInclude Include="..\..\..\Solver\MPDC.h" />
     <ClInclude Include="..\..\..\Solver\Newton.h" />
