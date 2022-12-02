@@ -54,6 +54,8 @@ class Converger : public Tag {
 
     bool conv_flag = false; /**< converger flag */
 protected:
+    [[nodiscard]] vec get_residual() const;
+
     [[nodiscard]] bool is_print() const;
 
 public:
@@ -83,7 +85,7 @@ public:
     virtual void set_conv_flag(bool);
     [[nodiscard]] bool get_conv_flag() const;
 
-    virtual bool is_converged() = 0;
+    virtual bool is_converged(unsigned) = 0;
 };
 
 #endif

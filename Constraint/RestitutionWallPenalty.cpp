@@ -85,7 +85,7 @@ int RestitutionWallPenalty::process(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-int RestitutionWallPenalty::stage(const shared_ptr<DomainBase>& D) {
+void RestitutionWallPenalty::stage(const shared_ptr<DomainBase>& D) {
     auto& W = D->get_factory();
 
     auto trial_acceleration = get_trial_acceleration(W);
@@ -97,8 +97,6 @@ int RestitutionWallPenalty::stage(const shared_ptr<DomainBase>& D) {
     }
 
     W->update_trial_acceleration(trial_acceleration);
-
-    return SUANPAN_SUCCESS;
 }
 
 void RestitutionWallPenalty::commit_status() { node_pool.clear(); }

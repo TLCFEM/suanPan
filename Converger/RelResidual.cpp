@@ -16,30 +16,16 @@
  ******************************************************************************/
 
 #include "RelResidual.h"
-#include <Domain/DomainBase.h>
-#include <Domain/Factory.hpp>
 
 RelResidual::RelResidual(const unsigned T, const double E, const unsigned M, const bool P)
     : Converger(T, E, M, P) {}
 
 unique_ptr<Converger> RelResidual::get_copy() { return make_unique<RelResidual>(*this); }
 
-bool RelResidual::is_converged() {
-    const auto& D = get_domain().lock();
-    auto& W = D->get_factory();
-
-    auto residual = W->get_trial_load();
-
-    if(!W->get_reference_load().is_empty() && !W->get_trial_load_factor().is_empty()) residual += W->get_reference_load() * W->get_trial_load_factor();
-
-    const auto ref_residual = norm(residual);
-
-    residual -= W->get_trial_resistance();
-
-    for(const auto& t_dof : D->get_restrained_dof()) residual(t_dof) = 0.;
-
-    set_error(norm(residual) / ref_residual);
-
+bool RelResidual::is_converged(const unsigned counter) {
+    const auto residual = norm(get_residual());
+    if(0u == counter) ref_residual = residual;
+    set_error(residual / ref_residual);
     set_conv_flag(get_tolerance() > get_error());
 
     if(is_print()) suanpan_info("relative residual: %.5E.\n", get_error());

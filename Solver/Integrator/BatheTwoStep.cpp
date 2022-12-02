@@ -18,7 +18,6 @@
 #include "BatheTwoStep.h"
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Domain/Node.h>
 
 BatheTwoStep::BatheTwoStep(const unsigned T, const double R, const double G)
     : Integrator(T)
@@ -109,29 +108,6 @@ void BatheTwoStep::clear_status() {
     set_time_step_switch(true);
 
     Integrator::clear_status();
-}
-
-/**
- * \brief update acceleration and velocity for zero displacement increment
- */
-void BatheTwoStep::update_compatibility() const {
-    const auto& D = get_domain().lock();
-    auto& W = D->get_factory();
-
-    if(FLAG::TRAP == step_flag) {
-        W->update_trial_acceleration(-P4 * W->get_current_velocity() - W->get_current_acceleration());
-        W->update_trial_velocity(-W->get_current_velocity());
-    }
-    else {
-        W->update_trial_velocity(P8 * (W->get_current_displacement() - W->get_pre_displacement()) - Q02 * W->get_pre_velocity() - Q12 * W->get_current_velocity());
-        W->update_trial_acceleration(P8 * (W->get_trial_velocity() - W->get_pre_velocity()) - Q02 * W->get_pre_acceleration() - Q12 * W->get_current_acceleration());
-    }
-
-    auto& trial_dsp = W->get_trial_displacement();
-    auto& trial_vel = W->get_trial_velocity();
-    auto& trial_acc = W->get_trial_acceleration();
-
-    suanpan::for_all(D->get_node_pool(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_status(trial_dsp, trial_vel, trial_acc); });
 }
 
 vec BatheTwoStep::from_incre_velocity(const vec& incre_velocity, const uvec& encoding) {

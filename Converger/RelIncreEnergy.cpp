@@ -31,27 +31,14 @@ RelIncreEnergy::RelIncreEnergy(const unsigned T, const double E, const unsigned 
 
 unique_ptr<Converger> RelIncreEnergy::get_copy() { return make_unique<RelIncreEnergy>(*this); }
 
-bool RelIncreEnergy::is_converged() {
+bool RelIncreEnergy::is_converged(const unsigned counter) {
     const auto& D = get_domain().lock();
     auto& W = D->get_factory();
 
-    vec residual = W->get_trial_load() - W->get_sushi();
-
-    if(!W->get_reference_load().is_empty() && !W->get_trial_load_factor().is_empty()) residual += W->get_reference_load() * W->get_trial_load_factor();
-
-    for(const auto& t_dof : D->get_restrained_dof()) residual(t_dof) = 0.;
-
-    if(fabs(ref_energy + 1.) < 1E-12) {
-        ref_energy = fabs(dot(W->get_ninja(), residual));
-        set_error(1.);
-    }
-    else set_error(fabs(dot(W->get_ninja(), residual)) / ref_energy);
-
-    if(get_tolerance() > get_error()) {
-        set_conv_flag(true);
-        ref_energy = -1.;
-    }
-    else set_conv_flag(false);
+    const auto energy = fabs(dot(W->get_ninja(), get_residual()));
+    if(0u == counter) ref_energy = energy;
+    set_error(energy / ref_energy);
+    set_conv_flag(get_tolerance() > get_error());
 
     if(is_print()) suanpan_info("relative energy increment error: %.5E.\n", get_error());
 

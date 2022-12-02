@@ -17,11 +17,6 @@
 
 #include "FixedNumber.h"
 
-void FixedNumber::set_conv_flag(const bool F) {
-    if(F) counter = 0;
-    Converger::set_conv_flag(F);
-}
-
 /**
  * \brief the complete constructor.
  * \param T `unique_tag`
@@ -33,9 +28,7 @@ FixedNumber::FixedNumber(const unsigned T, const unsigned M, const bool P)
 
 unique_ptr<Converger> FixedNumber::get_copy() { return make_unique<FixedNumber>(*this); }
 
-bool FixedNumber::is_converged() {
-    ++counter;
-
+bool FixedNumber::is_converged(const unsigned counter) {
     if(is_print()) suanpan_info("iteration counter: %u.\n", counter);
 
     set_conv_flag(get_max_iteration() <= counter);

@@ -17,7 +17,7 @@
 
 #include "Integrator.h"
 #include <Domain/DomainBase.h>
-#include <Domain/Factory.hpp>
+#include <Domain/FactoryHelper.hpp>
 
 Integrator::Integrator(const unsigned T)
     : Tag(T) { suanpan_debug("Integrator %u ctor() called.\n", T); }
@@ -164,9 +164,9 @@ void Integrator::update_trial_load_factor(const vec& lambda) {
     W->update_trial_load_factor_by(lambda);
 }
 
-void Integrator::update_trial_displacement(const vec& ninja) {
+void Integrator::update_from_ninja() {
     const auto& W = get_domain().lock()->get_factory();
-    W->update_trial_displacement_by(ninja);
+    W->update_trial_displacement_by(W->get_ninja());
 }
 
 void Integrator::update_incre_time(const double T) {
@@ -176,8 +176,6 @@ void Integrator::update_incre_time(const double T) {
 }
 
 int Integrator::update_trial_status() { return database.lock()->update_trial_status(); }
-
-int Integrator::update_incre_status() { return database.lock()->update_incre_status(); }
 
 /**
  * Must change ninja to the real displacement increment.
@@ -221,7 +219,13 @@ int Integrator::solve(mat& X, sp_mat&& B) { return database.lock()->get_factory(
  * The penalty method can apply homogeneous constraints approximately.
  * The corresponding DoF shall be set to zero after solving the system.
  */
-void Integrator::erase_machine_error() const { database.lock()->erase_machine_error(); }
+void Integrator::erase_machine_error(vec& ninja) const {
+    const auto& D = get_domain().lock();
+    auto& W = D->get_factory();
+
+    D->erase_machine_error(ninja);
+    get_ninja(W) = ninja.head(W->get_size());
+}
 
 void Integrator::stage_and_commit_status() {
     stage_status();
@@ -230,36 +234,16 @@ void Integrator::stage_and_commit_status() {
 
 void Integrator::stage_status() { database.lock()->stage_status(); }
 
-void Integrator::commit_status() {
-    database.lock()->commit_status();
-    update_compatibility();
-}
+void Integrator::commit_status() { database.lock()->commit_status(); }
 
-void Integrator::clear_status() {
-    database.lock()->clear_status();
-    update_compatibility();
-}
+void Integrator::clear_status() { database.lock()->clear_status(); }
 
-void Integrator::reset_status() {
-    database.lock()->reset_status();
-    update_compatibility();
-}
+void Integrator::reset_status() { database.lock()->reset_status(); }
 
 /**
  * When time step changes, some parameters may need to be updated.
  */
 void Integrator::update_parameter(double) {}
-
-/**
- * Make sure that the trial displacement/velocity/acceleration are consistent with each other.
- * When starting a new trial state, the trial displacement is identical to the current displacement.
- * This essentially means that the displacement increment is zero.
- * To have such a trial state with the given time step, the trial velocity and acceleration shall be
- * updated to be compatible with the trial displacement.
- *
- * On exit, trial velocity and acceleration should be computed from current/trial displacement.
- */
-void Integrator::update_compatibility() const {}
 
 /**
  * When external loads are applied, they can be applied in forms of displacement/velocity/acceleration.

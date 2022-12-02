@@ -18,7 +18,6 @@
 #include "Newmark.h"
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Domain/Node.h>
 
 Newmark::Newmark(const unsigned T, const double A, const double B)
     : Integrator(T)
@@ -65,23 +64,6 @@ int Newmark::update_trial_status() {
     W->update_incre_velocity(C5 * W->get_current_acceleration() + C3 * W->get_incre_acceleration());
 
     return D->update_trial_status();
-}
-
-/**
- * \brief update acceleration and velocity for zero displacement increment
- */
-void Newmark::update_compatibility() const {
-    const auto& D = get_domain().lock();
-    auto& W = D->get_factory();
-
-    W->update_incre_acceleration(-C2 * W->get_current_velocity() - C4 * W->get_current_acceleration());
-    W->update_incre_velocity(C5 * W->get_current_acceleration() + C3 * W->get_incre_acceleration());
-
-    auto& trial_dsp = W->get_trial_displacement();
-    auto& trial_vel = W->get_trial_velocity();
-    auto& trial_acc = W->get_trial_acceleration();
-
-    suanpan::for_all(D->get_node_pool(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_status(trial_dsp, trial_vel, trial_acc); });
 }
 
 vec Newmark::from_incre_velocity(const vec& incre_velocity, const uvec& encoding) {

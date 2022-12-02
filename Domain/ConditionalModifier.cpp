@@ -76,8 +76,6 @@ int ConditionalModifier::initialize(const shared_ptr<DomainBase>& D) {
 
 int ConditionalModifier::process_resistance(const shared_ptr<DomainBase>& D) { return process(D); }
 
-int ConditionalModifier::stage(const shared_ptr<DomainBase>&) { return SUANPAN_SUCCESS; }
-
 const uvec& ConditionalModifier::get_node_encoding() const { return node_encoding; }
 
 const uvec& ConditionalModifier::get_dof_encoding() const { return dof_encoding; }

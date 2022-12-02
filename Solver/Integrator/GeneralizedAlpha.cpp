@@ -166,23 +166,6 @@ void GeneralizedAlpha::update_parameter(const double NT) {
     F5 = F4 * F7;
 }
 
-/**
- * \brief update acceleration and velocity for zero displacement increment
- */
-void GeneralizedAlpha::update_compatibility() const {
-    const auto& D = get_domain().lock();
-    auto& W = D->get_factory();
-
-    W->update_incre_acceleration(F8 * W->get_current_velocity() + F9 * W->get_current_acceleration());
-    W->update_incre_velocity(F10 * W->get_current_acceleration() + F11 * W->get_incre_acceleration());
-
-    auto& trial_dsp = W->get_trial_displacement();
-    auto& trial_vel = W->get_trial_velocity();
-    auto& trial_acc = W->get_trial_acceleration();
-
-    suanpan::for_all(D->get_node_pool(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_status(trial_dsp, trial_vel, trial_acc); });
-}
-
 vec GeneralizedAlpha::from_incre_velocity(const vec& incre_velocity, const uvec& encoding) {
     auto& W = get_domain().lock()->get_factory();
 

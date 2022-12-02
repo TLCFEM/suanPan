@@ -35,9 +35,10 @@ unique_ptr<Converger> AbsIncreDisp::get_copy() { return make_unique<AbsIncreDisp
  * \brief Method to return `conv_flag`.
  * \return `conv_flag`
  */
-bool AbsIncreDisp::is_converged() {
+bool AbsIncreDisp::is_converged(unsigned) {
     auto& W = get_domain().lock()->get_factory();
-    set_error(norm(W->get_ninja()) / static_cast<double>(W->get_ninja().n_elem));
+
+    set_error(norm(W->get_ninja()) / static_cast<double>(W->get_size()));
     set_conv_flag(get_tolerance() > get_error());
 
     if(is_print()) suanpan_info("absolute incremental displacement error: %.5E.\n", get_error());

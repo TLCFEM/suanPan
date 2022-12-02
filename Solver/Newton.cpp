@@ -37,14 +37,13 @@ int Newton::analyze() {
     // iteration counter
     unsigned counter = 0;
 
-    // ninja alias
-    auto& ninja = get_ninja(W);
-
-    vec pre_ninja;
+    vec samurai, pre_samurai;
 
     auto aitken = false;
 
     while(true) {
+        // update for nodes and elements
+        if(SUANPAN_SUCCESS != G->update_trial_status()) return SUANPAN_FAIL;
         // process modifiers
         if(SUANPAN_SUCCESS != G->process_modifier()) return SUANPAN_FAIL;
         // assemble resistance
@@ -67,10 +66,10 @@ int Newton::analyze() {
         }
 
         // call solver
-        auto flag = G->solve(ninja, G->get_force_residual());
+        auto flag = G->solve(samurai, G->get_force_residual());
 
         suanpan_debug([&] {
-            if(!ninja.is_finite()) {
+            if(!samurai.is_finite()) {
                 suanpan_fatal("infinite number detected.\n");
                 flag = SUANPAN_FAIL;
             }
@@ -89,39 +88,38 @@ int Newton::analyze() {
             mat right;
             if(SUANPAN_SUCCESS != G->solve(right, border)) return SUANPAN_FAIL;
             auto& aux_lambda = get_auxiliary_lambda(W);
-            if(!solve(aux_lambda, border.t() * right.head_rows(n_size), border.t() * ninja.head_rows(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
-            ninja -= right * aux_lambda;
+            if(!solve(aux_lambda, border.t() * right.head_rows(n_size), border.t() * samurai.head_rows(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
+            samurai -= right * aux_lambda;
         }
 
         if(initial_stiffness) {
             if(!aitken) {
                 aitken = true;
-                pre_ninja = ninja;
+                pre_samurai = samurai;
             }
             else {
                 aitken = false;
-                const vec diff_ninja = pre_ninja - ninja;
-                ninja *= dot(pre_ninja, diff_ninja) / dot(diff_ninja, diff_ninja);
+                const vec diff_ninja = pre_samurai - samurai;
+                samurai *= dot(pre_samurai, diff_ninja) / dot(diff_ninja, diff_ninja);
             }
         }
 
         // avoid machine error accumulation
-        G->erase_machine_error();
+        G->erase_machine_error(samurai);
+
+        // exit if converged
+        if(C->is_converged(counter)) return SUANPAN_SUCCESS;
+        // exit if maximum iteration is hit
+        if(++counter > max_iteration) return SUANPAN_FAIL;
+
         // update internal variable
-        G->update_internal(ninja);
+        G->update_internal(samurai);
         // update trial status for factory
-        G->update_trial_displacement(ninja);
+        G->update_from_ninja();
         // for tracking
         G->update_load();
         // for tracking
         G->update_constraint();
-        // update for nodes and elements
-        if(SUANPAN_SUCCESS != G->update_trial_status()) return SUANPAN_FAIL;
-
-        // exit if converged
-        if(C->is_converged()) return SUANPAN_SUCCESS;
-        // exit if maximum iteration is hit
-        if(++counter > max_iteration) return SUANPAN_FAIL;
     }
 }
 

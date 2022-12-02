@@ -46,12 +46,14 @@
 class DomainBase;
 
 class RelResidual final : public Converger {
+    double ref_residual = 0.;
+
 public:
     explicit RelResidual(unsigned = 0, double = 1E-8, unsigned = 7, bool = false);
 
     unique_ptr<Converger> get_copy() override;
 
-    bool is_converged() override;
+    bool is_converged(unsigned) override;
 };
 
 #endif

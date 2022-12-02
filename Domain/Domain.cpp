@@ -1177,10 +1177,7 @@ void Domain::summary() const {
     suanpan_info("\t%llu loads, %llu constraints and %llu recorders.\n", get_load(), get_constraint(), get_recorder());
 }
 
-void Domain::erase_machine_error() const {
-    auto& t_ninja = get_ninja(factory);
-    suanpan::for_all(restrained_dofs, [&](const uword I) { t_ninja(I) = 0.; });
-}
+void Domain::erase_machine_error(vec& ninja) const { suanpan::for_all(restrained_dofs, [&](const uword I) { ninja(I) = 0.; }); }
 
 void Domain::update_load() {}
 

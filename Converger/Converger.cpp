@@ -17,6 +17,7 @@
 
 #include "Converger.h"
 #include <Domain/DomainBase.h>
+#include <Domain/Factory.hpp>
 
 /**
  * \brief the complete constructor.
@@ -91,6 +92,18 @@ void Converger::set_conv_flag(const bool C) { conv_flag = C; }
  * \return `conv_flag`
  */
 bool Converger::get_conv_flag() const { return conv_flag; }
+
+vec Converger::get_residual() const {
+    const auto& D = get_domain().lock();
+    auto& W = D->get_factory();
+
+    vec residual = W->get_trial_load() - W->get_sushi();
+    if(!W->get_reference_load().is_empty() && !W->get_trial_load_factor().is_empty()) residual += W->get_reference_load() * W->get_trial_load_factor();
+
+    for(const auto& t_dof : D->get_restrained_dof()) residual(t_dof) = 0.;
+
+    return residual;
+}
 
 /**
  * \brief method to return `print_flag`.
