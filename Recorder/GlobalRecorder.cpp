@@ -25,9 +25,7 @@ GlobalRecorder::GlobalRecorder(const unsigned T, const OutputType L, const unsig
     : Recorder(T, {0}, L, I, R, H) {}
 
 void GlobalRecorder::record(const shared_ptr<DomainBase>& D) {
-    if(1 != interval && counter++ != interval) return;
-
-    counter = 1;
+    if(!if_perform_record()) return;
 
     auto get_momentum_component = [&](const DOF C) {
         auto momentum = 0.;

@@ -187,7 +187,6 @@ mat PCPE8DC::compute_shape_function(const mat& coordinate, const unsigned order)
 
 vector<vec> PCPE8DC::record(const OutputType P) {
     vector<vec> output;
-    output.reserve(int_pt.size());
 
     if(P == OutputType::PP) {
         const auto t_disp = get_current_displacement();

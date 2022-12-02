@@ -9,6 +9,6 @@ for folder in $(find . -maxdepth 1 -type d -name "cmake-build*"); do
   (
     echo "Compiling $folder"
     cd "$folder" || exit
-    make -j"$(nproc)"
+    cmake --build . --target all -j "$(nproc)"
   )
 done

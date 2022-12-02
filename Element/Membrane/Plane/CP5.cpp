@@ -178,10 +178,7 @@ mat CP5::compute_shape_function(const mat& coordinate, const unsigned order) con
 
 vector<vec> CP5::record(const OutputType P) {
     vector<vec> output;
-    output.reserve(int_pt.size());
-
     for(const auto& I : int_pt) for(const auto& J : I.m_material->record(P)) output.emplace_back(J);
-
     return output;
 }
 

@@ -148,12 +148,9 @@ int VAFCRP::reset_status() {
 }
 
 vector<vec> VAFCRP::record(const OutputType P) {
-    vector<vec> data;
+    if(P == OutputType::PEEQ) return {vec{current_history(0)}};
 
-    if(P == OutputType::PEEQ) data.emplace_back(vec{current_history(0)});
-    else return Material3D::record(P);
-
-    return data;
+    return Material3D::record(P);
 }
 
 void VAFCRP::print() { suanpan_info("The VADCRP model.\n"); }

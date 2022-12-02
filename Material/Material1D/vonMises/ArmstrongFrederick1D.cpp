@@ -131,12 +131,9 @@ int ArmstrongFrederick1D::reset_status() {
 }
 
 vector<vec> ArmstrongFrederick1D::record(const OutputType P) {
-    vector<vec> data;
+    if(P == OutputType::PEEQ) return {vec{current_history(size)}};
 
-    if(P == OutputType::PEEQ) data.emplace_back(vec{current_history(size)});
-    else return Material1D::record(P);
-
-    return data;
+    return Material1D::record(P);
 }
 
 void ArmstrongFrederick1D::print() {

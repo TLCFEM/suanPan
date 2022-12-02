@@ -77,12 +77,10 @@ int EB21::reset_status() {
 }
 
 vector<vec> EB21::record(const OutputType P) {
-    vector<vec> output;
+    if(P == OutputType::BEAME) return {b_trans->to_local_vec(get_current_displacement())};
+    if(P == OutputType::BEAMS) return {vec{local_stiff * b_trans->to_local_vec(get_current_displacement())}};
 
-    if(P == OutputType::E) output.emplace_back(b_trans->to_local_vec(get_current_displacement()));
-    else if(P == OutputType::S) output.emplace_back(local_stiff * b_trans->to_local_vec(get_current_displacement()));
-
-    return output;
+    return {};
 }
 
 void EB21::print() { suanpan_info("An elastic B21 element%s", nlgeom ? " with corotational formulation.\n" : ".\n"); }

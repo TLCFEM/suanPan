@@ -126,11 +126,7 @@ int NonlinearJ2::reset_status() {
 }
 
 vector<vec> NonlinearJ2::record(const OutputType P) {
-    if(P == OutputType::PEEQ) {
-        vector<vec> data;
-        data.emplace_back(vec{current_history(0)});
-        return data;
-    }
+    if(P == OutputType::PEEQ) return {vec{current_history(0)}};
 
     return Material3D::record(P);
 }

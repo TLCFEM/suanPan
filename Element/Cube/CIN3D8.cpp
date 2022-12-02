@@ -228,17 +228,7 @@ int CIN3D8::reset_status() {
 
 vector<vec> CIN3D8::record(const OutputType T) {
     vector<vec> data;
-    switch(T) {
-    case OutputType::E:
-        for(const auto& I : int_pt) data.emplace_back(I.c_material->get_trial_strain());
-        break;
-    case OutputType::S:
-        for(const auto& I : int_pt) data.emplace_back(I.c_material->get_trial_stress());
-        break;
-    default:
-        for(const auto& I : int_pt) for(const auto& J : I.c_material->record(T)) data.emplace_back(J);
-        break;
-    }
+    for(const auto& I : int_pt) for(const auto& J : I.c_material->record(T)) data.emplace_back(J);
     return data;
 }
 
