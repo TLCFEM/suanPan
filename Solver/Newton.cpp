@@ -82,13 +82,12 @@ int Newton::analyze() {
         }
 
         // deal with mpc
-        if(0 != W->get_mpc()) {
-            const auto n_size = W->get_size();
+        if(const auto n_size = W->get_size(); 0 != W->get_mpc()) {
             auto& border = W->get_auxiliary_stiffness();
             mat right;
             if(SUANPAN_SUCCESS != G->solve(right, border)) return SUANPAN_FAIL;
             auto& aux_lambda = get_auxiliary_lambda(W);
-            if(!solve(aux_lambda, border.t() * right.head_rows(n_size), border.t() * samurai.head_rows(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
+            if(!solve(aux_lambda, border.t() * right.head_rows(n_size), border.t() * samurai.head(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
             samurai -= right * aux_lambda;
         }
 
@@ -99,8 +98,8 @@ int Newton::analyze() {
             }
             else {
                 aitken = false;
-                const vec diff_ninja = pre_samurai - samurai;
-                samurai *= dot(pre_samurai, diff_ninja) / dot(diff_ninja, diff_ninja);
+                const vec diff_samurai = pre_samurai - samurai;
+                samurai *= dot(pre_samurai, diff_samurai) / dot(diff_samurai, diff_samurai);
             }
         }
 

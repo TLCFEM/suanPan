@@ -175,7 +175,12 @@ void Integrator::update_incre_time(const double T) {
     update_parameter(W->get_incre_time());
 }
 
-int Integrator::update_trial_status() { return database.lock()->update_trial_status(); }
+int Integrator::update_trial_status() {
+    const auto& D = get_domain().lock();
+    auto& W = D->get_factory();
+
+    return suanpan::approx_equal(norm(W->get_incre_displacement()), 0.) ? SUANPAN_SUCCESS : D->update_trial_status();
+}
 
 /**
  * Must change ninja to the real displacement increment.
@@ -266,7 +271,7 @@ vec Integrator::from_incre_velocity(const vec&, const uvec& encoding) { return z
 vec Integrator::from_incre_acceleration(const vec&, const uvec& encoding) { return zeros(encoding.n_elem); }
 
 vec Integrator::from_total_velocity(const vec& total_velocity, const uvec& encoding) {
-    const auto& W = get_domain().lock()->get_factory();
+    auto& W = get_domain().lock()->get_factory();
 
     if(AnalysisType::DYNAMICS != W->get_analysis_type()) return zeros(encoding.n_elem);
 
@@ -274,7 +279,7 @@ vec Integrator::from_total_velocity(const vec& total_velocity, const uvec& encod
 }
 
 vec Integrator::from_total_acceleration(const vec& total_acceleration, const uvec& encoding) {
-    const auto& W = get_domain().lock()->get_factory();
+    auto& W = get_domain().lock()->get_factory();
 
     if(AnalysisType::DYNAMICS != W->get_analysis_type()) return zeros(encoding.n_elem);
 
