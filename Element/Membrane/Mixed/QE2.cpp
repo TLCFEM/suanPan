@@ -206,7 +206,6 @@ mat QE2::compute_shape_function(const mat& coordinate, const unsigned order) con
 
 vector<vec> QE2::record(const OutputType T) {
     vector<vec> data;
-    data.reserve(int_pt.size());
 
     if(T == OutputType::E) for(const auto& I : int_pt) data.emplace_back(I.A * current_alpha);
     else if(T == OutputType::S) for(const auto& I : int_pt) data.emplace_back(I.P * current_beta);

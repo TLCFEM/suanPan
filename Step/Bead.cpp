@@ -67,15 +67,21 @@ int Bead::precheck() {
 }
 
 int Bead::analyze() {
-    for(const auto& [d_tag, t_domain] : domain_pool)
-        if(t_domain->is_active())
-            for(const auto& [s_tag, t_step] : t_domain->get_step_pool()) {
-                t_domain->set_current_step_tag(t_step->get_tag());
-                t_step->set_domain(t_domain);
-                if(SUANPAN_FAIL == t_step->Step::initialize()) return SUANPAN_FAIL;
-                if(SUANPAN_FAIL == t_step->initialize()) return SUANPAN_FAIL;
-                if(SUANPAN_FAIL == t_step->analyze()) return SUANPAN_FAIL;
+    for(const auto& [d_tag, t_domain] : domain_pool) {
+        if(!t_domain->is_active()) continue;
+        bool initial_record = true;
+        for(const auto& [s_tag, t_step] : t_domain->get_step_pool()) {
+            t_domain->set_current_step_tag(t_step->get_tag());
+            t_step->set_domain(t_domain);
+            if(SUANPAN_FAIL == t_step->Step::initialize()) return SUANPAN_FAIL;
+            if(SUANPAN_FAIL == t_step->initialize()) return SUANPAN_FAIL;
+            if(initial_record) {
+                initial_record = false;
+                t_domain->record();
             }
+            if(SUANPAN_FAIL == t_step->analyze()) return SUANPAN_FAIL;
+        }
+    }
 
     return SUANPAN_SUCCESS;
 }

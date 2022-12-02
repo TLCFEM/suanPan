@@ -43,7 +43,9 @@ class Recorder : public Tag {
 
 protected:
     const unsigned interval;
-    unsigned counter = 1;
+    unsigned counter = 0;
+
+    bool if_perform_record();
 
 public:
     Recorder(unsigned,   // tag

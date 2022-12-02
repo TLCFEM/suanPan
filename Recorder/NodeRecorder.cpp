@@ -30,9 +30,7 @@ void NodeRecorder::initialize(const shared_ptr<DomainBase>& D) {
 }
 
 void NodeRecorder::record(const shared_ptr<DomainBase>& D) {
-    if(1 != interval && counter++ != interval) return;
-
-    counter = 1;
+    if(!if_perform_record()) return;
 
     auto& obj_tag = get_object_tag();
 

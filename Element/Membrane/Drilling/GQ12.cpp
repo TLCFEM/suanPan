@@ -167,10 +167,7 @@ mat GQ12::compute_shape_function(const mat& coordinate, const unsigned order) co
 
 vector<vec> GQ12::record(const OutputType T) {
     vector<vec> data;
-    data.reserve(int_pt.size());
-
     for(const auto& I : int_pt) for(const auto& J : I.m_material->record(T)) data.emplace_back(J);
-
     return data;
 }
 
