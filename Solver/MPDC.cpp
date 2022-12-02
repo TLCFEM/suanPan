@@ -46,7 +46,7 @@ int MPDC::analyze() {
         // solve ninja
         if(SUANPAN_SUCCESS != G->solve(samurai, G->get_displacement_residual())) return SUANPAN_FAIL;
         // solve reference displacement
-        if(SUANPAN_SUCCESS != G->solve(disp_a, W->get_reference_load())) return SUANPAN_FAIL;
+        if(SUANPAN_SUCCESS != G->solve(disp_a, G->get_reference_load())) return SUANPAN_FAIL;
 
         if(const auto n_size = W->get_size(); 0 != W->get_mpc()) {
             mat right, kernel;
