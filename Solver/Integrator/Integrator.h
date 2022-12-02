@@ -79,8 +79,8 @@ public:
 
     virtual vec get_force_residual();
     virtual vec get_displacement_residual();
-    virtual vec get_auxiliary_residual();
     virtual sp_mat get_reference_load();
+    virtual vec get_auxiliary_residual();
     virtual sp_mat get_auxiliary_stiffness();
 
     virtual void update_load();

@@ -54,13 +54,14 @@ void GSSSS::assemble_matrix() {
     fc.get();
     fd.get();
 
-    auto& t_stiffness = W->get_stiffness();
-
-    t_stiffness += W->get_geometry();
-
-    t_stiffness *= W3G3 / L3;
-    t_stiffness += W2G5 * C5 * W->get_damping() + W1G6 * C0 * W->get_mass();
+    W->get_stiffness() += W->get_geometry() + XV * W->get_damping() + XA * W->get_mass();
 }
+
+vec GSSSS::get_force_residual() { return XD * Integrator::get_force_residual(); }
+
+vec GSSSS::get_displacement_residual() { return XD * Integrator::get_displacement_residual(); }
+
+sp_mat GSSSS::get_reference_load() { return XD * Integrator::get_reference_load(); }
 
 int GSSSS::process_load() {
     const auto& D = get_domain().lock();
@@ -140,12 +141,18 @@ void GSSSS::update_parameter(const double NT) {
     if(suanpan::approx_equal(DT, NT)) return;
 
     DT = NT;
-    C5 = 1. / L3 / DT;
-    C0 = C5 / DT;
-    C1 = -L1 * C5;
+
+    const auto L3T = 1. / L3 / DT;
+
+    C0 = L3T / DT;
+    C1 = -L1 * L3T;
     C2 = -L2 / L3;
     C3 = L4 * DT;
     C4 = L5 * DT;
+
+    XD = L3 / W3G3;
+    XV = W2G5 / W3G3 / DT;
+    XA = W1G6 / W3G3 / DT / DT;
 }
 
 vec GSSSS::from_incre_velocity(const vec& incre_velocity, const uvec& encoding) {

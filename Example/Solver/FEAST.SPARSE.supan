@@ -20,7 +20,7 @@ set sparse_mat 1
 analyze
 
 # Eigenvalues:
-#    24.2601
+# 24.2601
 peek eigenvalue
 
 exit

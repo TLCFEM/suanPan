@@ -23,11 +23,11 @@ analyze
 peek element 1
 
 # Node 1:
-#         0        0
+# 0 0
 # Displacement:
-#    4.9538e-16   3.0060e+00
+# 4.9538e-16 3.0060e+00
 # Resistance:
-#    4.4409e-16   3.0000e+00
+# 4.4409e-16 3.0000e+00
 peek node 1
 
 reset

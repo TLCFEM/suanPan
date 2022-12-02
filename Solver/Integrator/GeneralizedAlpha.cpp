@@ -18,7 +18,6 @@
 #include "GeneralizedAlpha.h"
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Domain/Node.h>
 
 GeneralizedAlpha::GeneralizedAlpha(const unsigned T, const double R)
     : Integrator(T)
@@ -73,13 +72,14 @@ void GeneralizedAlpha::assemble_matrix() {
     fc.get();
     fd.get();
 
-    auto& t_stiffness = W->get_stiffness();
-
-    t_stiffness += W->get_geometry();
-
-    t_stiffness *= F2;
-    t_stiffness += F5 * W->get_mass() + F6 * W->get_damping();
+    W->get_stiffness() += W->get_geometry() + F5 / F2 * W->get_mass() + F6 / F2 * W->get_damping();
 }
+
+vec GeneralizedAlpha::get_force_residual() { return Integrator::get_force_residual() / F2; }
+
+vec GeneralizedAlpha::get_displacement_residual() { return Integrator::get_displacement_residual() / F2; }
+
+sp_mat GeneralizedAlpha::get_reference_load() { return Integrator::get_reference_load() / F2; }
 
 int GeneralizedAlpha::process_load() {
     const auto& D = get_domain().lock();

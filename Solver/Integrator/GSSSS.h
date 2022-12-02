@@ -44,7 +44,7 @@ protected:
 
     double DT = 0.;
 
-    double C0{0.}, C1{0.}, C2{0.}, C3{0.}, C4{0.}, C5{0.};
+    double C0{0.}, C1{0.}, C2{0.}, C3{0.}, C4{0.}, XD{0.}, XV{0.}, XA{0.};
 
     // ReSharper disable once CppMemberFunctionMayBeStatic
     template<typename T> void generate_constants(double, double, double) { throw invalid_argument("need a proper scheme"); }
@@ -54,6 +54,10 @@ public:
 
     void assemble_resistance() override;
     void assemble_matrix() override;
+
+    vec get_force_residual() override;
+    vec get_displacement_residual() override;
+    sp_mat get_reference_load() override;
 
     [[nodiscard]] int process_load() override;
     [[nodiscard]] int process_constraint() override;

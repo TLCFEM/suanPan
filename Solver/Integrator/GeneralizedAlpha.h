@@ -56,6 +56,10 @@ public:
     void assemble_resistance() override;
     void assemble_matrix() override;
 
+    vec get_force_residual() override;
+    vec get_displacement_residual() override;
+    sp_mat get_reference_load() override;
+
     [[nodiscard]] int process_load() override;
     [[nodiscard]] int process_constraint() override;
     [[nodiscard]] int process_load_resistance() override;

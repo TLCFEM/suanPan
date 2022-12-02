@@ -140,6 +140,8 @@ vec Integrator::get_displacement_residual() {
     return residual;
 }
 
+sp_mat Integrator::get_reference_load() { return database.lock()->get_factory()->get_reference_load(); }
+
 /**
  * Assemble the global residual vector due to nonlinear constraints implemented via the multiplier method.
  */
@@ -148,8 +150,6 @@ vec Integrator::get_auxiliary_residual() {
 
     return W->get_auxiliary_load() - W->get_auxiliary_resistance();
 }
-
-sp_mat Integrator::get_reference_load() { return database.lock()->get_factory()->get_reference_load(); }
 
 sp_mat Integrator::get_auxiliary_stiffness() { return database.lock()->get_factory()->get_auxiliary_stiffness(); }
 

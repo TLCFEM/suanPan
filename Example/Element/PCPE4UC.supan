@@ -26,18 +26,18 @@ set fixed_step_size true
 analyze
 
 # Node 3:
-#    2.0000   2.0000
+# 2.0000 2.0000
 # Displacement:
-#         0  -0.2000
+# 0 -0.2000
 # Resistance:
-#   -1.6000e+02  -2.8000e+02
+# -1.6000e+02 -2.8000e+02
 # 
 # Node 4:
-#         0   2.0000
+# 0 2.0000
 # Displacement:
-#         0  -0.2000
+# 0 -0.2000
 # Resistance:
-#    1.6000e+02  -2.8000e+02
+# 1.6000e+02 -2.8000e+02
 peek node 3 4
 
 peek element 1

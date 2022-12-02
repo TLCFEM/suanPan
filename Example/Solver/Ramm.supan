@@ -51,11 +51,11 @@ converger RelIncreDisp 1 1E-8 5 1
 analyze
 
 # Node 11:
-#    2.0000   8.0000
+# 2.0000 8.0000
 # Displacement:
-#    5.9350  -5.5107   0.6801
+# 5.9350 -5.5107 0.6801
 # Resistance:
-#    1.4495e-10  -1.0647e+01   3.9790e-13
+# 1.4495e-10 -1.0647e+01 3.9790e-13
 peek node 11
 
 # save recorder 1

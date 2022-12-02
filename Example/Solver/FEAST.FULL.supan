@@ -21,7 +21,7 @@ set band_mat false
 analyze
 
 # Eigenvalues:
-#    24.2601
+# 24.2601
 peek eigenvalue
 
 exit

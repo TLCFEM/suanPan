@@ -27,15 +27,15 @@ analyze
 # save recorder 1 2 3
 
 # Node 1:
-#         0   1.0000
+# 0 1.0000
 # Displacement:
-#         0  -0.1357
+# 0 -0.1357
 # Resistance:
-#         0        0
+# 0 0
 # Velocity:
-#         0   0.5259
+# 0 0.5259
 # Acceleration:
-#         0  -1.0000
+# 0 -1.0000
 peek node 1
 
 exit
