@@ -372,7 +372,7 @@ public:
     virtual void assemble_mass_container() const = 0;
     virtual void assemble_stiffness_container() const = 0;
 
-    virtual void erase_machine_error() const = 0;
+    virtual void erase_machine_error(vec&) const = 0;
 
     virtual void update_load() = 0;
     virtual void update_constraint() = 0;

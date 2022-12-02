@@ -46,7 +46,7 @@ public:
 
     int process(const shared_ptr<DomainBase>&) override;
 
-    int stage(const shared_ptr<DomainBase>&) override;
+    void stage(const shared_ptr<DomainBase>&) override;
 
     void commit_status() override;
     void clear_status() override;

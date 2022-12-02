@@ -88,12 +88,11 @@ public:
 
     virtual void update_trial_load_factor(double);
     virtual void update_trial_load_factor(const vec&);
-    virtual void update_trial_displacement(const vec&);
+    virtual void update_from_ninja();
 
     virtual void update_incre_time(double);
 
     virtual int update_trial_status();
-    virtual int update_incre_status();
 
     virtual int update_internal(const mat&);
 
@@ -106,9 +105,9 @@ public:
     virtual int solve(mat&, mat&&);
     virtual int solve(mat&, sp_mat&&);
 
-    virtual void erase_machine_error() const;
+    virtual void erase_machine_error(vec&) const;
 
-    virtual void stage_and_commit_status();
+    void stage_and_commit_status();
 
     virtual void stage_status();
     virtual void commit_status();
@@ -116,7 +115,6 @@ public:
     virtual void reset_status();
 
     virtual void update_parameter(double);
-    virtual void update_compatibility() const;
 
     virtual vec from_incre_velocity(const vec&, const uvec&);     // obtain target displacement from increment of velocity
     virtual vec from_incre_acceleration(const vec&, const uvec&); // obtain target displacement from increment of acceleration

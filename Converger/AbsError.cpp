@@ -35,8 +35,10 @@ unique_ptr<Converger> AbsError::get_copy() { return make_unique<AbsError>(*this)
  * \brief Method to return `conv_flag`.
  * \return `conv_flag`
  */
-bool AbsError::is_converged() {
-    set_error(get_domain().lock()->get_factory()->get_error());
+bool AbsError::is_converged(unsigned) {
+    auto& W = get_domain().lock()->get_factory();
+
+    set_error(fabs(W->get_error()) / static_cast<double>(W->get_size()));
     set_conv_flag(get_tolerance() > get_error());
 
     if(is_print()) suanpan_info("absolute error: %.5E.\n", get_error());

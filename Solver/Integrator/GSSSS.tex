@@ -1,0 +1,47 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=20mm]{geometry}
+\usepackage{mathpazo,amsmath,amsfonts,amssymb}
+\newcommand{\ddfrac}[2]{\dfrac{\mathrm{d}~#1}{\mathrm{d}~#2}}
+\newcommand{\dt}{\Delta{}t}
+\newcommand{\LM}{\varLambda_6W_1}
+\newcommand{\LC}{\varLambda_5W_2}
+\newcommand{\LK}{\varLambda_3W_3}
+\begin{document}
+\title{GSSSS}\date{}
+\maketitle
+\section{Integration}
+The GSSSS method assumes that the displacement $d$ and the velocity $v$ are integrated as such,
+\begin{gather}\label{EQ1}
+d_{n+1}=d_n+\lambda_1\dt{}v_n+\lambda_2\dt^2a_n+\lambda_3\dt^2\left(a_{n+1}-a_n\right),\\
+v_{n+1}=v_n+\lambda_4\dt{}a_n+\lambda_5\dt\left(a_{n+1}-a_n\right),
+\end{gather}
+where $\lambda_n$ are parameters associated with spectral radii.
+\section{Updating}
+The incremental form is then
+\begin{gather}
+\Delta{}a=\dfrac{1}{\lambda_3\dt^2}\Delta{}d-\dfrac{\lambda_1}{\lambda_3\dt}v_n-\dfrac{\lambda_2}{\lambda_3}a_n,\\
+\Delta{}v=\lambda_4\dt{}a_n+\lambda_5\dt\Delta{}a,
+\end{gather}
+Thus, according to chain rule
+\begin{gather}
+\ddfrac{a_{n+1}}{d_{n+1}}=\dfrac{1}{\lambda_3\dt^2},\qquad{}\ddfrac{v_{n+1}}{d_{n+1}}=\dfrac{\lambda_5}{\lambda_3\dt}.
+\end{gather}
+\section{EOM}
+The EOM is expressed at somewhere between $t_n$ and $t_{n+1}$.
+\begin{multline}
+M\left(\left(1-\LM\right)a_n+\LM{}a_{n+1}\right)+
+C\left(\left(1-\dfrac{\LC}{\lambda_5}\right)v_n+\dfrac{\LC}{\lambda_5}v_{n+1}\right)+\\
+K\left(\left(1-\dfrac{\LK}{\lambda_3}\right)d_n+\dfrac{\LK}{\lambda_3}d_{n+1}\right)=
+\left(1-W_1\right)F_n+W_1F_{n+1}
+\end{multline}
+\section{Effective Stiffness}
+The effective stiffness can be computed as
+\begin{gather}
+\bar{K}=\dfrac{\LM}{\lambda_3\dt^2}M+\dfrac{\LC}{\lambda_3\dt}C+\dfrac{\LK}{\lambda_3}K
+\end{gather}
+with $\Delta{}d=d_{n+1}-d_n$ be the unknown variable. Once converges,
+\begin{gather}
+\Delta{}a=\dfrac{1}{\lambda_3\dt^2}\Delta{}d-\dfrac{\lambda_1}{\lambda_3\dt}v_n-\dfrac{\lambda_2}{\lambda_3}a_n,\\
+\Delta{}v=\lambda_4\dt{}a_n+\lambda_5\dt\Delta{}a,
+\end{gather}
+\end{document}

@@ -74,6 +74,9 @@ void Domain::assemble_resistance() const {
         });
 
     suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_resistance(trial_resistance(t_node->get_reordered_dof())); });
+
+    // update to sync incre_resistance
+    factory->update_trial_resistance(trial_resistance);
 }
 
 void Domain::assemble_damping_force() const {
@@ -88,6 +91,9 @@ void Domain::assemble_damping_force() const {
         });
 
     suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_damping_force(trial_damping_force(t_node->get_reordered_dof())); });
+
+    // update to sync incre_damping_force
+    factory->update_trial_damping_force(trial_damping_force);
 }
 
 void Domain::assemble_inertial_force() const {
@@ -102,6 +108,9 @@ void Domain::assemble_inertial_force() const {
         });
 
     suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_inertial_force(trial_inertial_force(t_node->get_reordered_dof())); });
+
+    // update to sync incre_inertial_force
+    factory->update_trial_inertial_force(trial_inertial_force);
 }
 
 void Domain::assemble_initial_mass() const {
@@ -311,9 +320,8 @@ int Domain::update_trial_status() const {
     if(AnalysisType::DYNAMICS == factory->get_analysis_type()) suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_status(trial_displacement, trial_velocity, trial_acceleration); });
     else suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_status(trial_displacement); });
 
-    auto code = 0;
+    std::atomic_int code = 0;
     suanpan::for_all(element_pond.get(), [&](const shared_ptr<Element>& t_element) { code += t_element->update_status(); });
-
     return code;
 }
 
@@ -325,9 +333,8 @@ int Domain::update_incre_status() const {
     if(AnalysisType::DYNAMICS == factory->get_analysis_type()) suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_incre_status(incre_displacement, incre_velocity, incre_acceleration); });
     else suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_incre_status(incre_displacement); });
 
-    auto code = 0;
+    std::atomic_int code = 0;
     suanpan::for_all(element_pond.get(), [&](const shared_ptr<Element>& t_element) { code += t_element->update_status(); });
-
     return code;
 }
 

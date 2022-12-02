@@ -56,7 +56,7 @@ void GeneralizedAlpha::assemble_resistance() {
     fb.get();
     fc.get();
 
-    W->set_sushi(F1 * (W->get_current_resistance() + W->get_current_damping_force()) + F2 * (W->get_trial_resistance() + W->get_trial_damping_force()) + F3 * W->get_current_inertial_force() + F4 * W->get_trial_inertial_force());
+    W->set_sushi(W->get_current_resistance() + F2 * W->get_incre_resistance() + W->get_current_damping_force() + F2 * W->get_incre_damping_force() + W->get_current_inertial_force() + F4 * W->get_incre_inertial_force());
 }
 
 void GeneralizedAlpha::assemble_matrix() {
@@ -164,23 +164,6 @@ void GeneralizedAlpha::update_parameter(const double NT) {
     F7 = -F8 / F10;
     F6 = -gamma * F8 * F2;
     F5 = F4 * F7;
-}
-
-/**
- * \brief update acceleration and velocity for zero displacement increment
- */
-void GeneralizedAlpha::update_compatibility() const {
-    const auto& D = get_domain().lock();
-    auto& W = D->get_factory();
-
-    W->update_incre_acceleration(F8 * W->get_current_velocity() + F9 * W->get_current_acceleration());
-    W->update_incre_velocity(F10 * W->get_current_acceleration() + F11 * W->get_incre_acceleration());
-
-    auto& trial_dsp = W->get_trial_displacement();
-    auto& trial_vel = W->get_trial_velocity();
-    auto& trial_acc = W->get_trial_acceleration();
-
-    suanpan::for_all(D->get_node_pool(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_status(trial_dsp, trial_vel, trial_acc); });
 }
 
 vec GeneralizedAlpha::from_incre_velocity(const vec& incre_velocity, const uvec& encoding) {
