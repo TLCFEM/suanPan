@@ -58,7 +58,7 @@ int MPDC::analyze() {
             disp_a -= right * solve(kernel, border.t() * disp_a.head_rows(n_size));
         }
 
-        const vec incre_lambda = solve(mat(disp_a.rows(idx)), W->get_trial_settlement()(idx) - W->get_trial_displacement()(idx) - samurai.rows(idx));
+        const vec incre_lambda = solve(mat(disp_a.rows(idx)), W->get_trial_settlement()(idx) - G->get_trial_displacement()(idx) - samurai.rows(idx));
 
         samurai += disp_a * incre_lambda;
 

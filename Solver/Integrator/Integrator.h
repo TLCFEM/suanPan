@@ -90,6 +90,8 @@ public:
     virtual vec get_auxiliary_residual();
     virtual sp_mat get_auxiliary_stiffness();
 
+    virtual const vec& get_trial_displacement() const;
+
     virtual void update_load();
     virtual void update_constraint();
 
@@ -145,6 +147,8 @@ public:
     using Integrator::Integrator;
 
     [[nodiscard]] constexpr IntegratorType type() const override { return IntegratorType::Explicit; }
+
+    const vec& get_trial_displacement() const override;
 
     int solve(mat&, const mat&) override;
     int solve(mat&, const sp_mat&) override;

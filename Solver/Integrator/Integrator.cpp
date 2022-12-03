@@ -54,7 +54,7 @@ int Integrator::process_load() { return database.lock()->process_load(true); }
  */
 int Integrator::process_constraint() {
     const auto& D = database.lock();
-    const auto& W = D->get_factory();
+    auto& W = D->get_factory();
 
     const auto code = D->process_constraint(true);
 
@@ -81,7 +81,7 @@ int Integrator::process_load_resistance() { return SUANPAN_SUCCESS; }
  */
 int Integrator::process_constraint_resistance() {
     const auto& D = database.lock();
-    const auto& W = D->get_factory();
+    auto& W = D->get_factory();
 
     const auto code = D->process_constraint(false);
 
@@ -94,7 +94,7 @@ void Integrator::record() const { database.lock()->record(); }
 
 void Integrator::assemble_resistance() {
     const auto& D = database.lock();
-    const auto& W = D->get_factory();
+    auto& W = D->get_factory();
     D->assemble_resistance();
     W->set_sushi(W->get_trial_resistance());
 }
@@ -116,7 +116,7 @@ void Integrator::assemble_matrix() {
  */
 vec Integrator::get_force_residual() {
     const auto& D = database.lock();
-    const auto& W = D->get_factory();
+    auto& W = D->get_factory();
 
     vec residual = W->get_trial_load() - W->get_sushi();
 
@@ -131,7 +131,7 @@ vec Integrator::get_force_residual() {
  */
 vec Integrator::get_displacement_residual() {
     const auto& D = database.lock();
-    const auto& W = D->get_factory();
+    auto& W = D->get_factory();
 
     vec residual = W->get_reference_load() * W->get_trial_load_factor() + W->get_trial_load() - W->get_sushi();
 
@@ -146,12 +146,14 @@ sp_mat Integrator::get_reference_load() { return database.lock()->get_factory()-
  * Assemble the global residual vector due to nonlinear constraints implemented via the multiplier method.
  */
 vec Integrator::get_auxiliary_residual() {
-    const auto& W = get_domain().lock()->get_factory();
+    auto& W = get_domain().lock()->get_factory();
 
     return W->get_auxiliary_load() - W->get_auxiliary_resistance();
 }
 
 sp_mat Integrator::get_auxiliary_stiffness() { return database.lock()->get_factory()->get_auxiliary_stiffness(); }
+
+const vec& Integrator::get_trial_displacement() const { return database.lock()->get_factory()->get_trial_displacement(); }
 
 void Integrator::update_load() { database.lock()->update_load(); }
 
@@ -160,17 +162,17 @@ void Integrator::update_constraint() { database.lock()->update_constraint(); }
 void Integrator::update_trial_load_factor(const double lambda) { update_trial_load_factor(vec{lambda}); }
 
 void Integrator::update_trial_load_factor(const vec& lambda) {
-    const auto& W = get_domain().lock()->get_factory();
+    auto& W = get_domain().lock()->get_factory();
     W->update_trial_load_factor_by(lambda);
 }
 
 void Integrator::update_from_ninja() {
-    const auto& W = get_domain().lock()->get_factory();
+    auto& W = get_domain().lock()->get_factory();
     W->update_trial_displacement_by(W->get_ninja());
 }
 
 void Integrator::update_incre_time(const double T) {
-    const auto& W = get_domain().lock()->get_factory();
+    auto& W = get_domain().lock()->get_factory();
     W->update_incre_time(T);
     update_parameter(W->get_incre_time());
 }
@@ -301,6 +303,8 @@ vec Integrator::from_incre_acceleration(const double magnitude, const uvec& enco
 vec Integrator::from_total_velocity(const double magnitude, const uvec& encoding) { return from_total_velocity(vec(encoding.n_elem, fill::value(magnitude)), encoding); }
 
 vec Integrator::from_total_acceleration(const double magnitude, const uvec& encoding) { return from_total_acceleration(vec(encoding.n_elem, fill::value(magnitude)), encoding); }
+
+const vec& ExplicitIntegrator::get_trial_displacement() const { return get_domain().lock()->get_factory()->get_trial_acceleration(); }
 
 int ExplicitIntegrator::solve(mat& X, const mat& B) { return get_domain().lock()->get_factory()->get_mass()->solve(X, B); }
 
