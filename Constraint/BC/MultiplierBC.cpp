@@ -19,6 +19,8 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
+#include "Solver/Integrator/Integrator.h"
+
 /**
  * \brief method to apply the BC to the system.
  * \param D `Domain`
@@ -31,21 +33,29 @@ int MultiplierBC::process(const shared_ptr<DomainBase>& D) {
     // the container used is concurrently safe
     D->insert_restrained_dof(dof_encoding = get_nodal_active_dof(D));
 
-    if(auto& t_stiff = W->get_stiffness(); nullptr != t_stiff) {
-        std::scoped_lock lock(W->get_stiffness_mutex());
-        for(const auto I : dof_encoding) t_stiff->unify(I);
+    if(IntegratorType::Explicit == D->get_current_integrator()->type()) {
+        if(auto& t_mass = W->get_mass(); nullptr != t_mass) {
+            std::scoped_lock lock(W->get_mass_mutex());
+            for(const auto I : dof_encoding) t_mass->unify(I);
+        }
     }
-    if(auto& t_mass = W->get_mass(); nullptr != t_mass) {
-        std::scoped_lock lock(W->get_mass_mutex());
-        for(const auto I : dof_encoding) t_mass->nullify(I);
-    }
-    if(auto& t_damping = W->get_damping(); nullptr != t_damping) {
-        std::scoped_lock lock(W->get_damping_mutex());
-        for(const auto I : dof_encoding) t_damping->nullify(I);
-    }
-    if(auto& t_geometry = W->get_geometry(); nullptr != t_geometry) {
-        std::scoped_lock lock(W->get_geometry_mutex());
-        for(const auto I : dof_encoding) t_geometry->nullify(I);
+    else {
+        if(auto& t_stiff = W->get_stiffness(); nullptr != t_stiff) {
+            std::scoped_lock lock(W->get_stiffness_mutex());
+            for(const auto I : dof_encoding) t_stiff->unify(I);
+        }
+        if(auto& t_mass = W->get_mass(); nullptr != t_mass) {
+            std::scoped_lock lock(W->get_mass_mutex());
+            for(const auto I : dof_encoding) t_mass->nullify(I);
+        }
+        if(auto& t_damping = W->get_damping(); nullptr != t_damping) {
+            std::scoped_lock lock(W->get_damping_mutex());
+            for(const auto I : dof_encoding) t_damping->nullify(I);
+        }
+        if(auto& t_geometry = W->get_geometry(); nullptr != t_geometry) {
+            std::scoped_lock lock(W->get_geometry_mutex());
+            for(const auto I : dof_encoding) t_geometry->nullify(I);
+        }
     }
 
     return SUANPAN_SUCCESS;

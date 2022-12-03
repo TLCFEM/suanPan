@@ -244,6 +244,7 @@
     "AbsDisp",
     "AbsError",
     "AbsIncreDisp",
+    "AbsIncreAcc",
     "AbsIncreEnergy",
     "AbsResidual",
     "ArcLength",
@@ -296,6 +297,8 @@
     "Decay",
     "Dhakal",
     "Dynamic",
+    "ImplicitDynamic",
+    "ExplicitDynamic",
     "EU2D",
     "EU3D",
     "Eigen",
@@ -556,6 +559,7 @@
     "RelDisp",
     "RelError",
     "RelIncreDisp",
+    "RelIncreAcc",
     "RelIncreEnergy",
     "RelResidual",
     "Rotation2D",
@@ -1796,6 +1800,12 @@
       "details":"Import External Module",
       "kind":"type",
       "trigger":"import"
+    },
+    {
+      "contents":"integrator Tchamwa ${1:(1)} ${2:(2)}\n# (1) int, unique integrator tag\n# [2] double, spectral radius, default: 0.6",
+      "details":"",
+      "kind":"type",
+      "trigger":"Tchamwa"
     },
     {
       "contents":"integrator BatheTwoStep ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique integrator tag\n# [2] double, spectral radius, default: 0\n# [3] double, sub-step size, default: 0.5",
