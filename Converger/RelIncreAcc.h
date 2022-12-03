@@ -14,21 +14,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @class RelIncreAcc
+ * @brief The RelIncreAcc class that handles converger test to indicate if the
+ * iteration converges.
+ * @author tlc
+ * @date 03/12/2022
+ * @version 0.1.0
+ * @file RelIncreAcc.h
+ * @addtogroup Converger
+ * @{
+ */
 
-#include "RayleighNewmark.h"
-#include <Domain/DomainBase.h>
-#include <Domain/Factory.hpp>
-#include <Element/Utility/MatrixModifier.hpp>
+#ifndef RELINCREACC_H
+#define RELINCREACC_H
 
-RayleighNewmark::RayleighNewmark(const unsigned T, const double A, const double B, const double DA, const double DB, const double DC, const double DD)
-    : Newmark(T, A, B)
-    , damping_alpha(DA)
-    , damping_beta(DB)
-    , damping_zeta(DC)
-    , damping_eta(DD) {}
+#include "Converger.h"
 
-void RayleighNewmark::assemble_resistance() {
-    suanpan::for_all(get_domain()->get_element_pool(), [&](const shared_ptr<Element>& t_element) { suanpan::damping::rayleigh::apply(t_element, damping_alpha, damping_beta, damping_zeta, damping_eta); });
+class RelIncreAcc final : public Converger {
+public:
+    explicit RelIncreAcc(unsigned = 0, double = 1E-8, unsigned = 7, bool = false);
 
-    Newmark::assemble_resistance();
-}
+    unique_ptr<Converger> get_copy() override;
+
+    bool is_converged(unsigned) override;
+};
+
+#endif
+
+//! @}

@@ -42,7 +42,7 @@
 
 #include "Integrator.h"
 
-class Newmark : public Integrator {
+class Newmark : public ImplicitIntegrator {
     const double beta;  /**< parameter = .25 */
     const double gamma; /**< parameter = .5 */
 protected:

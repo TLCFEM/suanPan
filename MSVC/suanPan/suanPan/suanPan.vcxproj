@@ -128,6 +128,7 @@
     <ClCompile Include="..\..\..\Constraint\RigidWallPenalty.cpp" />
     <ClCompile Include="..\..\..\Converger\AbsDisp.cpp" />
     <ClCompile Include="..\..\..\Converger\AbsError.cpp" />
+    <ClCompile Include="..\..\..\Converger\AbsIncreAcc.cpp" />
     <ClCompile Include="..\..\..\Converger\AbsIncreDisp.cpp" />
     <ClCompile Include="..\..\..\Converger\AbsIncreEnergy.cpp" />
     <ClCompile Include="..\..\..\Converger\AbsResidual.cpp" />
@@ -137,6 +138,7 @@
     <ClCompile Include="..\..\..\Converger\LogicConverger.cpp" />
     <ClCompile Include="..\..\..\Converger\RelDisp.cpp" />
     <ClCompile Include="..\..\..\Converger\RelError.cpp" />
+    <ClCompile Include="..\..\..\Converger\RelIncreAcc.cpp" />
     <ClCompile Include="..\..\..\Converger\RelIncreDisp.cpp" />
     <ClCompile Include="..\..\..\Converger\RelIncreEnergy.cpp" />
     <ClCompile Include="..\..\..\Converger\RelResidual.cpp" />
@@ -459,6 +461,7 @@
     <ClCompile Include="..\..\..\Solver\Integrator\LeeNewmarkFull.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\Newmark.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\RayleighNewmark.cpp" />
+    <ClCompile Include="..\..\..\Solver\Integrator\Tchamwa.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\WilsonPenzienNewmark.cpp" />
     <ClCompile Include="..\..\..\Solver\MPDC.cpp" />
     <ClCompile Include="..\..\..\Solver\Newton.cpp" />
@@ -535,6 +538,7 @@
     <ClInclude Include="..\..\..\Constraint\RigidWallPenalty.h" />
     <ClInclude Include="..\..\..\Converger\AbsDisp.h" />
     <ClInclude Include="..\..\..\Converger\AbsError.h" />
+    <ClInclude Include="..\..\..\Converger\AbsIncreAcc.h" />
     <ClInclude Include="..\..\..\Converger\AbsIncreDisp.h" />
     <ClInclude Include="..\..\..\Converger\AbsIncreEnergy.h" />
     <ClInclude Include="..\..\..\Converger\AbsResidual.h" />
@@ -544,6 +548,7 @@
     <ClInclude Include="..\..\..\Converger\LogicConverger.h" />
     <ClInclude Include="..\..\..\Converger\RelDisp.h" />
     <ClInclude Include="..\..\..\Converger\RelError.h" />
+    <ClInclude Include="..\..\..\Converger\RelIncreAcc.h" />
     <ClInclude Include="..\..\..\Converger\RelIncreDisp.h" />
     <ClInclude Include="..\..\..\Converger\RelIncreEnergy.h" />
     <ClInclude Include="..\..\..\Converger\RelResidual.h" />
@@ -896,6 +901,7 @@
     <ClInclude Include="..\..\..\Solver\Integrator\LeeNewmarkFull.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\Newmark.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\RayleighNewmark.h" />
+    <ClInclude Include="..\..\..\Solver\Integrator\Tchamwa.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\WilsonPenzienNewmark.h" />
     <ClInclude Include="..\..\..\Solver\MPDC.h" />
     <ClInclude Include="..\..\..\Solver\Newton.h" />

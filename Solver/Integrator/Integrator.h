@@ -43,6 +43,11 @@
 
 class DomainBase;
 
+enum class IntegratorType {
+    Implicit,
+    Explicit
+};
+
 class Integrator : public Tag {
     bool time_step_switch = true;
 
@@ -57,9 +62,11 @@ public:
     ~Integrator() override;
 
     void set_domain(const weak_ptr<DomainBase>&);
-    [[nodiscard]] const weak_ptr<DomainBase>& get_domain() const;
+    [[nodiscard]] shared_ptr<DomainBase> get_domain() const;
 
     virtual int initialize();
+
+    [[nodiscard]] virtual constexpr IntegratorType type() const { return IntegratorType::Implicit; }
 
     // ! some multistep integrators may require fixed time step for some consecutive sub-steps
     void set_time_step_switch(bool);
@@ -79,9 +86,10 @@ public:
 
     virtual vec get_force_residual();
     virtual vec get_displacement_residual();
-    virtual sp_mat get_reference_load();
     virtual vec get_auxiliary_residual();
-    virtual sp_mat get_auxiliary_stiffness();
+    virtual sp_mat get_reference_load();
+
+    [[nodiscard]] virtual const vec& get_trial_displacement() const;
 
     virtual void update_load();
     virtual void update_constraint();
@@ -90,6 +98,7 @@ public:
     virtual void update_trial_load_factor(const vec&);
     virtual void update_from_ninja();
 
+    virtual void update_trial_time(double);
     virtual void update_incre_time(double);
 
     virtual int update_trial_status();
@@ -124,6 +133,29 @@ public:
     vec from_incre_acceleration(double, const uvec&);
     vec from_total_velocity(double, const uvec&);
     vec from_total_acceleration(double, const uvec&);
+};
+
+class ImplicitIntegrator : public Integrator {
+public:
+    using Integrator::Integrator;
+
+    [[nodiscard]] constexpr IntegratorType type() const override { return IntegratorType::Implicit; }
+};
+
+class ExplicitIntegrator : public Integrator {
+public:
+    using Integrator::Integrator;
+
+    [[nodiscard]] constexpr IntegratorType type() const override { return IntegratorType::Explicit; }
+
+    const vec& get_trial_displacement() const override;
+
+    int solve(mat&, const mat&) override;
+    int solve(mat&, const sp_mat&) override;
+    int solve(mat&, mat&&) override;
+    int solve(mat&, sp_mat&&) override;
+
+    vec from_incre_velocity(const vec&, const uvec&) override;
 };
 
 #endif

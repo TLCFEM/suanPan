@@ -36,7 +36,7 @@ int Arnoldi::initialize() {
 
 int Arnoldi::analyze() {
     auto& G = get_integrator();
-    const auto& D = G->get_domain().lock();
+    const auto& D = G->get_domain();
     auto& W = D->get_factory();
 
     if(SUANPAN_SUCCESS != G->process_modifier()) return SUANPAN_FAIL;

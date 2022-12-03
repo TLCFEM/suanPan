@@ -17,7 +17,7 @@
 
 #include "NonlinearPeric.h"
 #include <Domain/DomainBase.h>
-#include <Domain/Factory.hpp>
+#include <Domain/FactoryHelper.hpp>
 #include <Toolbox/tensorToolbox.h>
 
 const double NonlinearPeric::root_three_two = sqrt(1.5);
@@ -29,7 +29,7 @@ NonlinearPeric::NonlinearPeric(const unsigned T, const double E, const double V,
     , Material3D(T, R) {}
 
 int NonlinearPeric::initialize(const shared_ptr<DomainBase>& D) {
-    incre_time = D == nullptr ? &unit_time : &D->get_factory()->get_incre_time();
+    incre_time = D == nullptr ? &unit_time : &get_incre_time(D->get_factory());
 
     trial_stiffness = current_stiffness = initial_stiffness = tensor::isotropic_stiffness(elastic_modulus, poissons_ratio);
 

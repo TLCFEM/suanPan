@@ -31,7 +31,7 @@
 
 #include "Integrator.h"
 
-class BatheTwoStep final : public Integrator {
+class BatheTwoStep final : public ImplicitIntegrator {
     enum class FLAG {
         TRAP,
         EULER

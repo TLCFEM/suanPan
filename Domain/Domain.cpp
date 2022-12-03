@@ -41,7 +41,8 @@
 
 Domain::Domain(const unsigned T)
     : DomainBase(T)
-    , factory(make_shared<Factory<double>>()) {}
+    , factory(make_shared<Factory<double>>())
+    , attribute(10, false) {}
 
 Domain::~Domain() { for(const auto& I : thread_pond) I->get(); }
 
@@ -711,6 +712,10 @@ const suanpan::unordered_set<uword>& Domain::get_constrained_dof() const { retur
 bool Domain::is_updated() const { return updated.load(); }
 
 bool Domain::is_sparse() const { return factory->is_sparse(); }
+
+void Domain::set_attribute(const ModalAttribute A) { attribute[static_cast<size_t>(A)] = true; }
+
+bool Domain::get_attribute(const ModalAttribute A) { return attribute[static_cast<size_t>(A)]; }
 
 void Domain::set_color_model(const ColorMethod B) {
     color_model = B;

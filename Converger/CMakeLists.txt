@@ -8,6 +8,7 @@ add_library(${PROJECT_NAME} STATIC
         AbsDisp.cpp
         AbsError.cpp
         AbsIncreDisp.cpp
+        AbsIncreAcc.cpp
         AbsIncreEnergy.cpp
         AbsResidual.cpp
         Converger.cpp
@@ -17,6 +18,7 @@ add_library(${PROJECT_NAME} STATIC
         RelDisp.cpp
         RelError.cpp
         RelIncreDisp.cpp
+        RelIncreAcc.cpp
         RelIncreEnergy.cpp
         RelResidual.cpp
         )

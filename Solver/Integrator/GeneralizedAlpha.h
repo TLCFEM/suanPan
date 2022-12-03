@@ -39,7 +39,7 @@
 
 #include "Integrator.h"
 
-class GeneralizedAlpha final : public Integrator {
+class GeneralizedAlpha final : public ImplicitIntegrator {
     const double alpha_f;
     const double alpha_m;
     const double gamma;

@@ -33,7 +33,7 @@ cp ../Example/Material/CYCLE.txt .
 
 for file in $files; do
   echo "Processing $file ..."
-  ./suanPan -f "$file" >>$log_file
+  time ./suanPan -f "$file" >>$log_file
 done
 
 {

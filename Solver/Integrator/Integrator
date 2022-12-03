@@ -9,3 +9,4 @@
 #include "Newmark.h"
 #include "RayleighNewmark.h"
 #include "WilsonPenzienNewmark.h"
+#include "Tchamwa.h"

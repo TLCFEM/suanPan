@@ -17,7 +17,7 @@
 
 #include "Maxwell.h"
 #include <Domain/DomainBase.h>
-#include <Domain/Factory.hpp>
+#include <Domain/FactoryHelper.hpp>
 #include <Recorder/OutputType.h>
 
 Maxwell::Maxwell(const unsigned T, const unsigned DT, const unsigned ST, const bool UM, const unsigned PC, const double BT)
@@ -45,7 +45,7 @@ int Maxwell::initialize(const shared_ptr<DomainBase>& D) {
 
     if(nullptr == damper || nullptr == spring) return SUANPAN_FAIL;
 
-    incre_time = &D->get_factory()->get_incre_time();
+    incre_time = &get_incre_time(D->get_factory());
 
     trial_strain_rate = current_strain_rate = incre_strain_rate.zeros(1);
 

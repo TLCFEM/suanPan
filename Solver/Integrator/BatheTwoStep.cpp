@@ -20,14 +20,14 @@
 #include <Domain/Factory.hpp>
 
 BatheTwoStep::BatheTwoStep(const unsigned T, const double R, const double G)
-    : Integrator(T)
+    : ImplicitIntegrator(T)
     , GM(G)
     , Q1((R + 1) / (2. * GM * (R - 1) + 4))
     , Q2(.5 - GM * Q1)
     , Q0(1. - Q1 - Q2) {}
 
 void BatheTwoStep::assemble_resistance() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
     auto& W = D->get_factory();
 
     auto fa = std::async([&] { D->assemble_resistance(); });
@@ -42,7 +42,7 @@ void BatheTwoStep::assemble_resistance() {
 }
 
 void BatheTwoStep::assemble_matrix() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
     auto& W = D->get_factory();
 
     auto fa = std::async([&] { D->assemble_trial_stiffness(); });
@@ -63,13 +63,13 @@ void BatheTwoStep::assemble_matrix() {
 }
 
 void BatheTwoStep::update_incre_time(double T) {
-    const auto& W = get_domain().lock()->get_factory();
+    const auto& W = get_domain()->get_factory();
     update_parameter(T *= 2.);
     W->update_incre_time(T * (FLAG::TRAP == step_flag ? GM : 1. - GM));
 }
 
 int BatheTwoStep::update_trial_status() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
 
     if(auto& W = D->get_factory(); FLAG::TRAP == step_flag) {
         W->update_trial_acceleration(P3 * W->get_incre_displacement() - P4 * W->get_current_velocity() - W->get_current_acceleration());
@@ -84,7 +84,7 @@ int BatheTwoStep::update_trial_status() {
 }
 
 void BatheTwoStep::commit_status() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
     auto& W = D->get_factory();
 
     if(FLAG::TRAP == step_flag) {
@@ -111,19 +111,19 @@ void BatheTwoStep::clear_status() {
 }
 
 vec BatheTwoStep::from_incre_velocity(const vec& incre_velocity, const uvec& encoding) {
-    auto& W = get_domain().lock()->get_factory();
+    auto& W = get_domain()->get_factory();
 
     return from_total_velocity(W->get_current_velocity()(encoding) + incre_velocity, encoding);
 }
 
 vec BatheTwoStep::from_incre_acceleration(const vec& incre_acceleration, const uvec& encoding) {
-    auto& W = get_domain().lock()->get_factory();
+    auto& W = get_domain()->get_factory();
 
     return from_total_acceleration(W->get_current_acceleration()(encoding) + incre_acceleration, encoding);
 }
 
 vec BatheTwoStep::from_total_velocity(const vec& total_velocity, const uvec& encoding) {
-    auto& W = get_domain().lock()->get_factory();
+    auto& W = get_domain()->get_factory();
 
     if(FLAG::TRAP == step_flag) return W->get_current_displacement()(encoding) + P1 * (W->get_current_velocity()(encoding) + total_velocity);
 
@@ -131,7 +131,7 @@ vec BatheTwoStep::from_total_velocity(const vec& total_velocity, const uvec& enc
 }
 
 vec BatheTwoStep::from_total_acceleration(const vec& total_acceleration, const uvec& encoding) {
-    auto& W = get_domain().lock()->get_factory();
+    auto& W = get_domain()->get_factory();
 
     vec total_velocity;
     if(FLAG::TRAP == step_flag) total_velocity = W->get_current_velocity()(encoding) + P1 * (W->get_current_acceleration()(encoding) + total_acceleration);

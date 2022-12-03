@@ -1417,6 +1417,15 @@
     <ClCompile Include="..\..\..\Element\Modifier\LeeElementalDamping.cpp">
       <Filter>Element\Modifier</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\Tchamwa.cpp">
+      <Filter>Solver\Integrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Converger\RelIncreAcc.cpp">
+      <Filter>Converger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Converger\AbsIncreAcc.cpp">
+      <Filter>Converger</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2703,6 +2712,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Toolbox\response_spectrum.h">
       <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\Tchamwa.h">
+      <Filter>Solver\Integrator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Converger\RelIncreAcc.h">
+      <Filter>Converger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Converger\AbsIncreAcc.h">
+      <Filter>Converger</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

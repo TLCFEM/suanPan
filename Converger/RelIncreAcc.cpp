@@ -15,20 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include "RayleighNewmark.h"
+#include "RelIncreAcc.h"
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Element/Utility/MatrixModifier.hpp>
 
-RayleighNewmark::RayleighNewmark(const unsigned T, const double A, const double B, const double DA, const double DB, const double DC, const double DD)
-    : Newmark(T, A, B)
-    , damping_alpha(DA)
-    , damping_beta(DB)
-    , damping_zeta(DC)
-    , damping_eta(DD) {}
+RelIncreAcc::RelIncreAcc(const unsigned T, const double E, const unsigned M, const bool P)
+    : Converger(T, E, M, P) {}
 
-void RayleighNewmark::assemble_resistance() {
-    suanpan::for_all(get_domain()->get_element_pool(), [&](const shared_ptr<Element>& t_element) { suanpan::damping::rayleigh::apply(t_element, damping_alpha, damping_beta, damping_zeta, damping_eta); });
+unique_ptr<Converger> RelIncreAcc::get_copy() { return make_unique<RelIncreAcc>(*this); }
 
-    Newmark::assemble_resistance();
+bool RelIncreAcc::is_converged(unsigned) {
+    auto& W = get_domain().lock()->get_factory();
+
+    const auto rel_incre_disp = norm(W->get_ninja()) / norm(W->get_incre_acceleration() + W->get_ninja());
+    set_error(std::isfinite(rel_incre_disp) ? rel_incre_disp : 1.);
+    set_conv_flag(get_tolerance() > get_error());
+
+    if(is_print()) suanpan_info("relative incremental acceleration error: %.5E.\n", get_error());
+
+    return get_conv_flag();
 }

@@ -30,11 +30,15 @@
 
 #include <Step/Step.h>
 
+enum class IntegratorType;
+
 class Dynamic final : public Step {
     const double time_step_amplification = 1.2;
 
+    const IntegratorType analysis_type;
+
 public:
-    explicit Dynamic(unsigned = 0, double = 1.);
+    Dynamic(unsigned, double, IntegratorType);
 
     int initialize() override;
 

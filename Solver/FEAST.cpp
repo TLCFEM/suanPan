@@ -201,7 +201,7 @@ int FEAST::initialize() {
         return SUANPAN_FAIL;
     }
 
-    auto& W = G->get_domain().lock()->get_factory();
+    auto& W = G->get_domain()->get_factory();
 
     if(const auto scheme = W->get_storage_scheme(); StorageScheme::SYMMPACK == scheme) {
         suanpan_error("FEAST solver does not support symmetric pack storage.\n");
@@ -219,7 +219,7 @@ int FEAST::initialize() {
 
 int FEAST::analyze() {
     auto& G = get_integrator();
-    const auto& D = G->get_domain().lock();
+    const auto& D = G->get_domain();
     auto& W = D->get_factory();
 
     if(SUANPAN_SUCCESS != G->process_modifier()) return SUANPAN_FAIL;

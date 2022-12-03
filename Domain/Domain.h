@@ -75,6 +75,8 @@ class Domain final : public DomainBase, public std::enable_shared_from_this<Doma
 
     std::vector<std::vector<unsigned>> color_map;
 
+    std::vector<bool> attribute;
+
 public:
     explicit Domain(unsigned = 0);
     Domain(const Domain&) = delete;            // copy forbidden
@@ -302,6 +304,9 @@ public:
 
     bool is_updated() const override;
     bool is_sparse() const override;
+
+    void set_attribute(ModalAttribute) override;
+    [[nodiscard]] bool get_attribute(ModalAttribute) override;
 
     void set_color_model(ColorMethod) override;
     const std::vector<std::vector<unsigned>>& get_color_map() const override;
