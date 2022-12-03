@@ -359,7 +359,7 @@ int LeeNewmarkFull::initialize() {
 }
 
 int LeeNewmarkFull::process_constraint() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
 
     // process constraint for the first time to obtain proper stiffness
     if(SUANPAN_SUCCESS != Integrator::process_constraint()) return SUANPAN_FAIL;

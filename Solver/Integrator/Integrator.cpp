@@ -26,7 +26,7 @@ Integrator::~Integrator() { suanpan_debug("Integrator %u dtor() called.\n", get_
 
 void Integrator::set_domain(const weak_ptr<DomainBase>& D) { if(database.lock() != D.lock()) database = D; }
 
-const weak_ptr<DomainBase>& Integrator::get_domain() const { return database; }
+shared_ptr<DomainBase> Integrator::get_domain() const { return database.lock(); }
 
 int Integrator::initialize() {
     if(nullptr != database.lock()) return SUANPAN_SUCCESS;
@@ -144,7 +144,7 @@ vec Integrator::get_displacement_residual() {
  * Assemble the global residual vector due to nonlinear constraints implemented via the multiplier method.
  */
 vec Integrator::get_auxiliary_residual() {
-    auto& W = get_domain().lock()->get_factory();
+    auto& W = get_domain()->get_factory();
 
     return W->get_auxiliary_load() - W->get_auxiliary_resistance();
 }
@@ -160,29 +160,29 @@ void Integrator::update_constraint() { database.lock()->update_constraint(); }
 void Integrator::update_trial_load_factor(const double lambda) { update_trial_load_factor(vec{lambda}); }
 
 void Integrator::update_trial_load_factor(const vec& lambda) {
-    auto& W = get_domain().lock()->get_factory();
+    auto& W = get_domain()->get_factory();
     W->update_trial_load_factor_by(lambda);
 }
 
 void Integrator::update_from_ninja() {
-    auto& W = get_domain().lock()->get_factory();
+    auto& W = get_domain()->get_factory();
     W->update_trial_displacement_by(W->get_ninja());
 }
 
 void Integrator::update_trial_time(const double T) {
-    auto& W = get_domain().lock()->get_factory();
+    auto& W = get_domain()->get_factory();
     W->update_trial_time(T);
     update_parameter(W->get_incre_time());
 }
 
 void Integrator::update_incre_time(const double T) {
-    auto& W = get_domain().lock()->get_factory();
+    auto& W = get_domain()->get_factory();
     W->update_incre_time(T);
     update_parameter(W->get_incre_time());
 }
 
 int Integrator::update_trial_status() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
     auto& W = D->get_factory();
 
     return suanpan::approx_equal(norm(W->get_incre_displacement()), 0.) ? SUANPAN_SUCCESS : D->update_trial_status();
@@ -231,7 +231,7 @@ int Integrator::solve(mat& X, sp_mat&& B) { return database.lock()->get_factory(
  * The corresponding DoF shall be set to zero after solving the system.
  */
 void Integrator::erase_machine_error(vec& ninja) const {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
     auto& W = D->get_factory();
 
     D->erase_machine_error(ninja);
@@ -277,7 +277,7 @@ vec Integrator::from_incre_velocity(const vec&, const uvec& encoding) { return z
 vec Integrator::from_incre_acceleration(const vec&, const uvec& encoding) { return zeros(encoding.n_elem); }
 
 vec Integrator::from_total_velocity(const vec& total_velocity, const uvec& encoding) {
-    auto& W = get_domain().lock()->get_factory();
+    auto& W = get_domain()->get_factory();
 
     if(AnalysisType::DYNAMICS != W->get_analysis_type()) return zeros(encoding.n_elem);
 
@@ -285,7 +285,7 @@ vec Integrator::from_total_velocity(const vec& total_velocity, const uvec& encod
 }
 
 vec Integrator::from_total_acceleration(const vec& total_acceleration, const uvec& encoding) {
-    auto& W = get_domain().lock()->get_factory();
+    auto& W = get_domain()->get_factory();
 
     if(AnalysisType::DYNAMICS != W->get_analysis_type()) return zeros(encoding.n_elem);
 
@@ -308,14 +308,14 @@ vec Integrator::from_total_velocity(const double magnitude, const uvec& encoding
 
 vec Integrator::from_total_acceleration(const double magnitude, const uvec& encoding) { return from_total_acceleration(vec(encoding.n_elem, fill::value(magnitude)), encoding); }
 
-const vec& ExplicitIntegrator::get_trial_displacement() const { return get_domain().lock()->get_factory()->get_trial_acceleration(); }
+const vec& ExplicitIntegrator::get_trial_displacement() const { return get_domain()->get_factory()->get_trial_acceleration(); }
 
-int ExplicitIntegrator::solve(mat& X, const mat& B) { return get_domain().lock()->get_factory()->get_mass()->solve(X, B); }
+int ExplicitIntegrator::solve(mat& X, const mat& B) { return get_domain()->get_factory()->get_mass()->solve(X, B); }
 
-int ExplicitIntegrator::solve(mat& X, const sp_mat& B) { return get_domain().lock()->get_factory()->get_mass()->solve(X, B); }
+int ExplicitIntegrator::solve(mat& X, const sp_mat& B) { return get_domain()->get_factory()->get_mass()->solve(X, B); }
 
-int ExplicitIntegrator::solve(mat& X, mat&& B) { return get_domain().lock()->get_factory()->get_mass()->solve(X, std::forward<mat>(B)); }
+int ExplicitIntegrator::solve(mat& X, mat&& B) { return get_domain()->get_factory()->get_mass()->solve(X, std::forward<mat>(B)); }
 
-int ExplicitIntegrator::solve(mat& X, sp_mat&& B) { return get_domain().lock()->get_factory()->get_mass()->solve(X, std::forward<sp_mat>(B)); }
+int ExplicitIntegrator::solve(mat& X, sp_mat&& B) { return get_domain()->get_factory()->get_mass()->solve(X, std::forward<sp_mat>(B)); }
 
 vec ExplicitIntegrator::from_incre_velocity(const vec&, const uvec&) { throw invalid_argument("support velocity cannot be used with explicit integrator"); }

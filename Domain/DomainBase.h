@@ -87,6 +87,10 @@ enum class ColorMethod {
     MIS
 };
 
+enum class ModalAttribute: size_t {
+    PureElastic
+};
+
 class DomainBase : public Tag {
 public:
     explicit DomainBase(unsigned);
@@ -324,6 +328,9 @@ public:
 
     [[nodiscard]] virtual bool is_updated() const = 0;
     [[nodiscard]] virtual bool is_sparse() const = 0;
+
+    virtual void set_attribute(ModalAttribute) = 0;
+    [[nodiscard]] virtual bool get_attribute(ModalAttribute) = 0;
 
     virtual void set_color_model(ColorMethod) = 0;
     [[nodiscard]] virtual const std::vector<std::vector<unsigned>>& get_color_map() const = 0;

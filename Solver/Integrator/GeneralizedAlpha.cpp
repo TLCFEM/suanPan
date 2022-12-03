@@ -44,7 +44,7 @@ GeneralizedAlpha::GeneralizedAlpha(const unsigned T, const double AF, const doub
     , F9(-.5 / beta) { if(!suanpan::approx_equal(alpha_m, AM) || !suanpan::approx_equal(alpha_f, AF)) suanpan_error("GeneralizedAlpha() parameters are not acceptable hence automatically adjusted.\n"); }
 
 void GeneralizedAlpha::assemble_resistance() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
     auto& W = D->get_factory();
 
     auto fa = std::async([&] { D->assemble_resistance(); });
@@ -59,7 +59,7 @@ void GeneralizedAlpha::assemble_resistance() {
 }
 
 void GeneralizedAlpha::assemble_matrix() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
     auto& W = D->get_factory();
 
     auto fa = std::async([&] { D->assemble_trial_stiffness(); });
@@ -82,7 +82,7 @@ vec GeneralizedAlpha::get_displacement_residual() { return Integrator::get_displ
 sp_mat GeneralizedAlpha::get_reference_load() { return Integrator::get_reference_load() / F2; }
 
 int GeneralizedAlpha::process_load() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
     auto& W = D->get_factory();
 
     const sp_d auto current_time = W->get_current_time();
@@ -98,7 +98,7 @@ int GeneralizedAlpha::process_load() {
 }
 
 int GeneralizedAlpha::process_constraint() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
     auto& W = D->get_factory();
 
     const sp_d auto current_time = W->get_current_time();
@@ -114,7 +114,7 @@ int GeneralizedAlpha::process_constraint() {
 }
 
 int GeneralizedAlpha::process_load_resistance() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
     auto& W = D->get_factory();
 
     const sp_d auto current_time = W->get_current_time();
@@ -130,7 +130,7 @@ int GeneralizedAlpha::process_load_resistance() {
 }
 
 int GeneralizedAlpha::process_constraint_resistance() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
     auto& W = D->get_factory();
 
     const sp_d auto current_time = W->get_current_time();
@@ -146,7 +146,7 @@ int GeneralizedAlpha::process_constraint_resistance() {
 }
 
 int GeneralizedAlpha::update_trial_status() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
     auto& W = D->get_factory();
 
     W->update_incre_acceleration(F7 * W->get_incre_displacement() + F8 * W->get_current_velocity() + F9 * W->get_current_acceleration());
@@ -167,13 +167,13 @@ void GeneralizedAlpha::update_parameter(const double NT) {
 }
 
 vec GeneralizedAlpha::from_incre_velocity(const vec& incre_velocity, const uvec& encoding) {
-    auto& W = get_domain().lock()->get_factory();
+    auto& W = get_domain()->get_factory();
 
     return incre_velocity / (F11 * F7) + F10 * W->get_current_velocity()(encoding) - (F10 + F11 * F9) / (F11 * F7) * W->get_current_acceleration()(encoding) + W->get_current_displacement()(encoding);
 }
 
 vec GeneralizedAlpha::from_incre_acceleration(const vec& incre_acceleration, const uvec& encoding) {
-    auto& W = get_domain().lock()->get_factory();
+    auto& W = get_domain()->get_factory();
 
     return incre_acceleration / F7 + F10 * W->get_current_velocity()(encoding) - F9 / F7 * W->get_current_acceleration()(encoding) + W->get_current_displacement()(encoding);
 }

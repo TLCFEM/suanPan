@@ -26,7 +26,7 @@ GSSSS::GSSSS(const unsigned T)
     , L4(1.) {}
 
 void GSSSS::assemble_resistance() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
     auto& W = D->get_factory();
 
     auto fa = std::async([&] { D->assemble_resistance(); });
@@ -41,7 +41,7 @@ void GSSSS::assemble_resistance() {
 }
 
 void GSSSS::assemble_matrix() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
     auto& W = D->get_factory();
 
     auto fa = std::async([&] { D->assemble_trial_stiffness(); });
@@ -64,7 +64,7 @@ vec GSSSS::get_displacement_residual() { return XD * Integrator::get_displacemen
 sp_mat GSSSS::get_reference_load() { return XD * Integrator::get_reference_load(); }
 
 int GSSSS::process_load() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
     auto& W = D->get_factory();
 
     const sp_d auto current_time = W->get_current_time();
@@ -80,7 +80,7 @@ int GSSSS::process_load() {
 }
 
 int GSSSS::process_constraint() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
     auto& W = D->get_factory();
 
     const sp_d auto current_time = W->get_current_time();
@@ -96,7 +96,7 @@ int GSSSS::process_constraint() {
 }
 
 int GSSSS::process_load_resistance() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
     auto& W = D->get_factory();
 
     const sp_d auto current_time = W->get_current_time();
@@ -112,7 +112,7 @@ int GSSSS::process_load_resistance() {
 }
 
 int GSSSS::process_constraint_resistance() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
     auto& W = D->get_factory();
 
     const sp_d auto current_time = W->get_current_time();
@@ -128,7 +128,7 @@ int GSSSS::process_constraint_resistance() {
 }
 
 int GSSSS::update_trial_status() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
     auto& W = D->get_factory();
 
     W->update_incre_acceleration(C0 * W->get_incre_displacement() + C1 * W->get_current_velocity() + C2 * W->get_current_acceleration());
@@ -156,13 +156,13 @@ void GSSSS::update_parameter(const double NT) {
 }
 
 vec GSSSS::from_incre_velocity(const vec& incre_velocity, const uvec& encoding) {
-    auto& W = get_domain().lock()->get_factory();
+    auto& W = get_domain()->get_factory();
 
     return from_incre_acceleration(incre_velocity / C4 - C3 / C4 * W->get_current_acceleration()(encoding), encoding);
 }
 
 vec GSSSS::from_incre_acceleration(const vec& incre_acceleration, const uvec& encoding) {
-    auto& W = get_domain().lock()->get_factory();
+    auto& W = get_domain()->get_factory();
 
     return incre_acceleration / C0 - C1 / C0 * W->get_current_velocity()(encoding) - C2 / C0 * W->get_current_acceleration()(encoding) + W->get_current_displacement()(encoding);
 }

@@ -98,7 +98,7 @@ int LeeNewmark::initialize() {
 }
 
 int LeeNewmark::process_constraint() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
 
     // process constraint for the first time to obtain proper stiffness
     if(SUANPAN_SUCCESS != Integrator::process_constraint()) return SUANPAN_FAIL;
@@ -171,7 +171,7 @@ int LeeNewmark::process_constraint() {
 }
 
 void LeeNewmark::assemble_resistance() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
     const auto& W = factory;
 
     D->assemble_resistance();

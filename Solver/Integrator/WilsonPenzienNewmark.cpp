@@ -27,7 +27,7 @@ WilsonPenzienNewmark::WilsonPenzienNewmark(const unsigned T, vec&& DR, const dou
 int WilsonPenzienNewmark::initialize() {
     if(SUANPAN_SUCCESS != Newmark::initialize()) return SUANPAN_FAIL;
 
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
     auto& W = D->get_factory();
 
     theta.zeros(W->get_size(), damping_ratio.n_elem);
@@ -40,7 +40,7 @@ int WilsonPenzienNewmark::process_constraint() {
     // process constraint for the first time to obtain proper stiffness
     if(SUANPAN_SUCCESS != Integrator::process_constraint()) return SUANPAN_FAIL;
 
-    auto& W = get_domain().lock()->get_factory();
+    auto& W = get_domain()->get_factory();
 
     auto& t_stiff = W->get_stiffness();
     auto& t_mass = W->get_mass();
@@ -139,7 +139,7 @@ void WilsonPenzienNewmark::reset_status() {
 }
 
 void WilsonPenzienNewmark::assemble_resistance() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
     auto& W = D->get_factory();
 
     auto fa = std::async([&] { D->assemble_resistance(); });
@@ -156,7 +156,7 @@ void WilsonPenzienNewmark::assemble_resistance() {
 }
 
 void WilsonPenzienNewmark::assemble_matrix() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
     auto& W = D->get_factory();
 
     auto fa = std::async([&] { D->assemble_trial_stiffness(); });

@@ -400,7 +400,7 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
 
         auto flag = true;
         for(const auto& t_integrator : domain->get_integrator_pool())
-            if(t_integrator->get_domain().lock() != nullptr) {
+            if(t_integrator->get_domain() != nullptr) {
                 t_integrator->clear_status();
                 flag = false;
             }
@@ -415,7 +415,7 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
 
         auto flag = true;
         for(const auto& t_integrator : domain->get_integrator_pool())
-            if(t_integrator->get_domain().lock() != nullptr) {
+            if(t_integrator->get_domain() != nullptr) {
                 t_integrator->reset_status();
                 flag = false;
             }
@@ -1125,6 +1125,12 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
     if(is_equal(property_id, "load_multiplier")) {
         double value;
         get_input(command, value) ? set_load_multiplier(value) : suanpan_error("set_property() need a valid value.\n");
+
+        return SUANPAN_SUCCESS;
+    }
+
+    if(is_equal(property_id, "pure_elastic")) {
+        domain->set_attribute(ModalAttribute::PureElastic);
 
         return SUANPAN_SUCCESS;
     }

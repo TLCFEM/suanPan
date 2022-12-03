@@ -27,7 +27,7 @@ LeeNewmarkBase::LeeNewmarkBase(const unsigned T, const double A, const double B,
 int LeeNewmarkBase::initialize() {
     if(Newmark::initialize() != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 
-    factory = get_domain().lock()->get_factory();
+    factory = get_domain()->get_factory();
 
     access::rw(n_block) = factory->get_size();
 

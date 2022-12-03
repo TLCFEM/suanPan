@@ -10,7 +10,8 @@ MPDC::MPDC(const unsigned T)
 int MPDC::analyze() {
     auto& C = get_converger();
     auto& G = get_integrator();
-    auto& W = G->get_domain().lock()->get_factory();
+    const auto& D = G->get_domain();
+    auto& W = D->get_factory();
 
     suanpan_info("current analysis time: %.5f.\n", W->get_trial_time());
 
@@ -80,5 +81,14 @@ int MPDC::analyze() {
         G->update_load();
         // for tracking
         G->update_constraint();
+
+        if(D->get_attribute(ModalAttribute::PureElastic)) {
+            if(SUANPAN_SUCCESS != G->update_trial_status()) return SUANPAN_FAIL;
+            // process modifiers
+            if(SUANPAN_SUCCESS != G->process_modifier()) return SUANPAN_FAIL;
+            // assemble resistance
+            G->assemble_resistance();
+            return SUANPAN_SUCCESS;
+        }
     }
 }

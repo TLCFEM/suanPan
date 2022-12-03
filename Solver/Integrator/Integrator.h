@@ -62,7 +62,7 @@ public:
     ~Integrator() override;
 
     void set_domain(const weak_ptr<DomainBase>&);
-    [[nodiscard]] const weak_ptr<DomainBase>& get_domain() const;
+    [[nodiscard]] shared_ptr<DomainBase> get_domain() const;
 
     virtual int initialize();
 

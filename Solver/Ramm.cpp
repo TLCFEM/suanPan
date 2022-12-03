@@ -29,7 +29,7 @@ Ramm::Ramm(const unsigned T, const double L, const bool F)
 int Ramm::analyze() {
     auto& C = get_converger();
     auto& G = get_integrator();
-    auto& W = G->get_domain().lock()->get_factory();
+    auto& W = G->get_domain()->get_factory();
 
     suanpan_info("current load level: %+.5f.\n", W->get_trial_load_factor().at(0));
 
