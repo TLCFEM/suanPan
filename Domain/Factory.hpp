@@ -484,7 +484,7 @@ public:
     template<sp_d T1> friend SpCol<T1>& get_trial_constraint_resistance(const shared_ptr<Factory<T1>>&);
     template<sp_d T1> friend SpCol<T1>& get_current_constraint_resistance(const shared_ptr<Factory<T1>>&);
 
-    template<sp_d T1> friend T& get_trial_time(const shared_ptr<Factory<T1>>&);
+    template<sp_d T1> friend T1& get_trial_time(const shared_ptr<Factory<T1>>&);
     template<sp_d T1> friend Col<T1>& get_trial_load_factor(const shared_ptr<Factory<T1>>&);
     template<sp_d T1> friend Col<T1>& get_trial_load(const shared_ptr<Factory<T1>>&);
     template<sp_d T1> friend Col<T1>& get_trial_settlement(const shared_ptr<Factory<T1>>&);
@@ -496,7 +496,7 @@ public:
     template<sp_d T1> friend Col<T1>& get_trial_acceleration(const shared_ptr<Factory<T1>>&);
     template<sp_d T1> friend Col<T1>& get_trial_temperature(const shared_ptr<Factory<T1>>&);
 
-    template<sp_d T1> friend T& get_incre_time(const shared_ptr<Factory<T1>>&);
+    template<sp_d T1> friend T1& get_incre_time(const shared_ptr<Factory<T1>>&);
     template<sp_d T1> friend Col<T1>& get_incre_load_factor(const shared_ptr<Factory<T1>>&);
     template<sp_d T1> friend Col<T1>& get_incre_load(const shared_ptr<Factory<T1>>&);
     template<sp_d T1> friend Col<T1>& get_incre_settlement(const shared_ptr<Factory<T1>>&);
@@ -508,7 +508,7 @@ public:
     template<sp_d T1> friend Col<T1>& get_incre_acceleration(const shared_ptr<Factory<T1>>&);
     template<sp_d T1> friend Col<T1>& get_incre_temperature(const shared_ptr<Factory<T1>>&);
 
-    template<sp_d T1> friend T& get_current_time(const shared_ptr<Factory<T1>>&);
+    template<sp_d T1> friend T1& get_current_time(const shared_ptr<Factory<T1>>&);
     template<sp_d T1> friend Col<T1>& get_current_load_factor(const shared_ptr<Factory<T1>>&);
     template<sp_d T1> friend Col<T1>& get_current_load(const shared_ptr<Factory<T1>>&);
     template<sp_d T1> friend Col<T1>& get_current_settlement(const shared_ptr<Factory<T1>>&);
@@ -520,7 +520,7 @@ public:
     template<sp_d T1> friend Col<T1>& get_current_acceleration(const shared_ptr<Factory<T1>>&);
     template<sp_d T1> friend Col<T1>& get_current_temperature(const shared_ptr<Factory<T1>>&);
 
-    template<sp_d T1> friend T& get_pre_time(const shared_ptr<Factory<T1>>&);
+    template<sp_d T1> friend T1& get_pre_time(const shared_ptr<Factory<T1>>&);
     template<sp_d T1> friend Col<T1>& get_pre_load_factor(const shared_ptr<Factory<T1>>&);
     template<sp_d T1> friend Col<T1>& get_pre_load(const shared_ptr<Factory<T1>>&);
     template<sp_d T1> friend Col<T1>& get_pre_settlement(const shared_ptr<Factory<T1>>&);
