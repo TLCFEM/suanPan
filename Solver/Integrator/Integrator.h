@@ -86,11 +86,10 @@ public:
 
     virtual vec get_force_residual();
     virtual vec get_displacement_residual();
-    virtual sp_mat get_reference_load();
     virtual vec get_auxiliary_residual();
-    virtual sp_mat get_auxiliary_stiffness();
+    virtual sp_mat get_reference_load();
 
-    virtual const vec& get_trial_displacement() const;
+    [[nodiscard]] virtual const vec& get_trial_displacement() const;
 
     virtual void update_load();
     virtual void update_constraint();
@@ -99,6 +98,7 @@ public:
     virtual void update_trial_load_factor(const vec&);
     virtual void update_from_ninja();
 
+    virtual void update_trial_time(double);
     virtual void update_incre_time(double);
 
     virtual int update_trial_status();

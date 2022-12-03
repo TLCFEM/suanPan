@@ -140,8 +140,6 @@ vec Integrator::get_displacement_residual() {
     return residual;
 }
 
-sp_mat Integrator::get_reference_load() { return database.lock()->get_factory()->get_reference_load(); }
-
 /**
  * Assemble the global residual vector due to nonlinear constraints implemented via the multiplier method.
  */
@@ -151,7 +149,7 @@ vec Integrator::get_auxiliary_residual() {
     return W->get_auxiliary_load() - W->get_auxiliary_resistance();
 }
 
-sp_mat Integrator::get_auxiliary_stiffness() { return database.lock()->get_factory()->get_auxiliary_stiffness(); }
+sp_mat Integrator::get_reference_load() { return database.lock()->get_factory()->get_reference_load(); }
 
 const vec& Integrator::get_trial_displacement() const { return database.lock()->get_factory()->get_trial_displacement(); }
 
@@ -169,6 +167,12 @@ void Integrator::update_trial_load_factor(const vec& lambda) {
 void Integrator::update_from_ninja() {
     auto& W = get_domain().lock()->get_factory();
     W->update_trial_displacement_by(W->get_ninja());
+}
+
+void Integrator::update_trial_time(const double T) {
+    auto& W = get_domain().lock()->get_factory();
+    W->update_trial_time(T);
+    update_parameter(W->get_incre_time());
 }
 
 void Integrator::update_incre_time(const double T) {

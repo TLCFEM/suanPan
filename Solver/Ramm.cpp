@@ -103,7 +103,7 @@ int Ramm::analyze() {
         // update trial load factor
         G->update_trial_load_factor(vec{t_lambda});
         // set time to load factor
-        W->update_trial_time(W->get_trial_load_factor().at(0));
+        G->update_trial_time(W->get_trial_load_factor().at(0));
         // for tracking
         G->update_load();
         // for tracking

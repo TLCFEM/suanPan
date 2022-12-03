@@ -27,7 +27,7 @@ set fixed_step_size true
 
 integrator Tchamwa 1 .6
 
-converger RelIncreAcc 1 1E-10 4 1
+converger AbsIncreAcc 1 1E-10 4 1
 
 analyze
 

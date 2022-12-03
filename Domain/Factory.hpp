@@ -208,8 +208,8 @@ public:
     void set_reference_dof(const suanpan::set<uword>&);
     [[nodiscard]] const suanpan::set<uword>& get_reference_dof() const;
 
-    void set_error(const T&);
-    const T& get_error() const;
+    void set_error(T);
+    T get_error() const;
 
     /*************************INITIALIZER*************************/
 
@@ -242,7 +242,7 @@ public:
 
     void set_reference_load(const SpMat<T>&);
 
-    void set_trial_time(const T&);
+    void set_trial_time(T);
     void set_trial_load_factor(const Col<T>&);
     void set_trial_load(const Col<T>&);
     void set_trial_settlement(const Col<T>&);
@@ -254,7 +254,7 @@ public:
     void set_trial_acceleration(const Col<T>&);
     void set_trial_temperature(const Col<T>&);
 
-    void set_incre_time(const T&);
+    void set_incre_time(T);
     void set_incre_load_factor(const Col<T>&);
     void set_incre_load(const Col<T>&);
     void set_incre_settlement(const Col<T>&);
@@ -266,7 +266,7 @@ public:
     void set_incre_acceleration(const Col<T>&);
     void set_incre_temperature(const Col<T>&);
 
-    void set_current_time(const T&);
+    void set_current_time(T);
     void set_current_load_factor(const Col<T>&);
     void set_current_load(const Col<T>&);
     void set_current_settlement(const Col<T>&);
@@ -278,7 +278,7 @@ public:
     void set_current_acceleration(const Col<T>&);
     void set_current_temperature(const Col<T>&);
 
-    void set_pre_time(const T&);
+    void set_pre_time(T);
     void set_pre_load_factor(const Col<T>&);
     void set_pre_load(const Col<T>&);
     void set_pre_settlement(const Col<T>&);
@@ -322,7 +322,7 @@ public:
     T get_complementary_energy();
     const Col<T>& get_momentum();
 
-    const T& get_trial_time() const;
+    T get_trial_time() const;
     const Col<T>& get_trial_load_factor() const;
     const Col<T>& get_trial_load() const;
     const Col<T>& get_trial_settlement() const;
@@ -334,7 +334,7 @@ public:
     const Col<T>& get_trial_acceleration() const;
     const Col<T>& get_trial_temperature() const;
 
-    const T& get_incre_time() const;
+    T get_incre_time() const;
     const Col<T>& get_incre_load_factor() const;
     const Col<T>& get_incre_load() const;
     const Col<T>& get_incre_settlement() const;
@@ -346,7 +346,7 @@ public:
     const Col<T>& get_incre_acceleration() const;
     const Col<T>& get_incre_temperature() const;
 
-    const T& get_current_time() const;
+    T get_current_time() const;
     const Col<T>& get_current_load_factor() const;
     const Col<T>& get_current_load() const;
     const Col<T>& get_current_settlement() const;
@@ -358,7 +358,7 @@ public:
     const Col<T>& get_current_acceleration() const;
     const Col<T>& get_current_temperature() const;
 
-    const T& get_pre_time() const;
+    T get_pre_time() const;
     const Col<T>& get_pre_load_factor() const;
     const Col<T>& get_pre_load() const;
     const Col<T>& get_pre_settlement() const;
@@ -395,7 +395,7 @@ public:
 
     /*************************UPDATER*************************/
 
-    void update_trial_time(const T&);
+    void update_trial_time(T);
     void update_trial_load_factor(const Col<T>&);
     void update_trial_load(const Col<T>&);
     void update_trial_settlement(const Col<T>&);
@@ -407,7 +407,7 @@ public:
     void update_trial_acceleration(const Col<T>&);
     void update_trial_temperature(const Col<T>&);
 
-    void update_incre_time(const T&);
+    void update_incre_time(T);
     void update_incre_load_factor(const Col<T>&);
     void update_incre_load(const Col<T>&);
     void update_incre_settlement(const Col<T>&);
@@ -419,7 +419,7 @@ public:
     void update_incre_acceleration(const Col<T>&);
     void update_incre_temperature(const Col<T>&);
 
-    void update_current_time(const T&);
+    void update_current_time(T);
     void update_current_load_factor(const Col<T>&);
     void update_current_load(const Col<T>&);
     void update_current_settlement(const Col<T>&);
@@ -431,7 +431,7 @@ public:
     void update_current_acceleration(const Col<T>&);
     void update_current_temperature(const Col<T>&);
 
-    void update_trial_time_by(const T&);
+    void update_trial_time_by(T);
     void update_trial_load_factor_by(const Col<T>&);
     void update_trial_load_by(const Col<T>&);
     void update_trial_settlement_by(const Col<T>&);
@@ -443,7 +443,7 @@ public:
     void update_trial_acceleration_by(const Col<T>&);
     void update_trial_temperature_by(const Col<T>&);
 
-    void update_incre_time_by(const T&);
+    void update_incre_time_by(T);
     void update_incre_load_factor_by(const Col<T>&);
     void update_incre_load_by(const Col<T>&);
     void update_incre_settlement_by(const Col<T>&);
@@ -455,7 +455,7 @@ public:
     void update_incre_acceleration_by(const Col<T>&);
     void update_incre_temperature_by(const Col<T>&);
 
-    void update_current_time_by(const T&);
+    void update_current_time_by(T);
     void update_current_load_factor_by(const Col<T>&);
     void update_current_load_by(const Col<T>&);
     void update_current_settlement_by(const Col<T>&);
@@ -704,9 +704,9 @@ template<sp_d T> void Factory<T>::set_reference_dof(const suanpan::set<uword>& D
 
 template<sp_d T> const suanpan::set<uword>& Factory<T>::get_reference_dof() const { return reference_dof; }
 
-template<sp_d T> void Factory<T>::set_error(const T& E) { error = E; }
+template<sp_d T> void Factory<T>::set_error(const T E) { error = E; }
 
-template<sp_d T> const T& Factory<T>::get_error() const { return error; }
+template<sp_d T> T Factory<T>::get_error() const { return error; }
 
 template<sp_d T> int Factory<T>::initialize() {
     reference_dof.clear(); // clear reference dof vector in every step
@@ -859,7 +859,7 @@ template<sp_d T> void Factory<T>::set_mpc(const unsigned S) {
 
 template<sp_d T> void Factory<T>::set_reference_load(const SpMat<T>& L) { reference_load = L; }
 
-template<sp_d T> void Factory<T>::set_trial_time(const T& M) { trial_time = M; }
+template<sp_d T> void Factory<T>::set_trial_time(const T M) { trial_time = M; }
 
 template<sp_d T> void Factory<T>::set_trial_load_factor(const Col<T>& L) { trial_load_factor = L; }
 
@@ -881,7 +881,7 @@ template<sp_d T> void Factory<T>::set_trial_acceleration(const Col<T>& A) { tria
 
 template<sp_d T> void Factory<T>::set_trial_temperature(const Col<T>& M) { trial_temperature = M; }
 
-template<sp_d T> void Factory<T>::set_incre_time(const T& M) { incre_time = M; }
+template<sp_d T> void Factory<T>::set_incre_time(const T M) { incre_time = M; }
 
 template<sp_d T> void Factory<T>::set_incre_load_factor(const Col<T>& L) { incre_load_factor = L; }
 
@@ -903,7 +903,7 @@ template<sp_d T> void Factory<T>::set_incre_acceleration(const Col<T>& A) { incr
 
 template<sp_d T> void Factory<T>::set_incre_temperature(const Col<T>& M) { incre_temperature = M; }
 
-template<sp_d T> void Factory<T>::set_current_time(const T& M) { current_time = M; }
+template<sp_d T> void Factory<T>::set_current_time(const T M) { current_time = M; }
 
 template<sp_d T> void Factory<T>::set_current_load_factor(const Col<T>& L) { current_load_factor = L; }
 
@@ -925,7 +925,7 @@ template<sp_d T> void Factory<T>::set_current_acceleration(const Col<T>& A) { cu
 
 template<sp_d T> void Factory<T>::set_current_temperature(const Col<T>& M) { current_temperature = M; }
 
-template<sp_d T> void Factory<T>::set_pre_time(const T& M) { pre_time = M; }
+template<sp_d T> void Factory<T>::set_pre_time(const T M) { pre_time = M; }
 
 template<sp_d T> void Factory<T>::set_pre_load_factor(const Col<T>& L) { pre_load_factor = L; }
 
@@ -991,7 +991,7 @@ template<sp_d T> T Factory<T>::get_complementary_energy() { return complementary
 
 template<sp_d T> const Col<T>& Factory<T>::get_momentum() { return momentum; }
 
-template<sp_d T> const T& Factory<T>::get_trial_time() const { return trial_time; }
+template<sp_d T> T Factory<T>::get_trial_time() const { return trial_time; }
 
 template<sp_d T> const Col<T>& Factory<T>::get_trial_load_factor() const { return trial_load_factor; }
 
@@ -1013,7 +1013,7 @@ template<sp_d T> const Col<T>& Factory<T>::get_trial_acceleration() const { retu
 
 template<sp_d T> const Col<T>& Factory<T>::get_trial_temperature() const { return trial_temperature; }
 
-template<sp_d T> const T& Factory<T>::get_incre_time() const { return incre_time; }
+template<sp_d T> T Factory<T>::get_incre_time() const { return incre_time; }
 
 template<sp_d T> const Col<T>& Factory<T>::get_incre_load_factor() const { return incre_load_factor; }
 
@@ -1035,7 +1035,7 @@ template<sp_d T> const Col<T>& Factory<T>::get_incre_acceleration() const { retu
 
 template<sp_d T> const Col<T>& Factory<T>::get_incre_temperature() const { return incre_temperature; }
 
-template<sp_d T> const T& Factory<T>::get_current_time() const { return current_time; }
+template<sp_d T> T Factory<T>::get_current_time() const { return current_time; }
 
 template<sp_d T> const Col<T>& Factory<T>::get_current_load_factor() const { return current_load_factor; }
 
@@ -1057,7 +1057,7 @@ template<sp_d T> const Col<T>& Factory<T>::get_current_acceleration() const { re
 
 template<sp_d T> const Col<T>& Factory<T>::get_current_temperature() const { return current_temperature; }
 
-template<sp_d T> const T& Factory<T>::get_pre_time() const { return pre_time; }
+template<sp_d T> T Factory<T>::get_pre_time() const { return pre_time; }
 
 template<sp_d T> const Col<T>& Factory<T>::get_pre_load_factor() const { return pre_load_factor; }
 
@@ -1113,7 +1113,7 @@ template<sp_d T> const Col<T>& Factory<T>::get_eigenvalue() const { return eigen
 
 template<sp_d T> const Mat<T>& Factory<T>::get_eigenvector() const { return eigenvector; }
 
-template<sp_d T> void Factory<T>::update_trial_time(const T& M) {
+template<sp_d T> void Factory<T>::update_trial_time(const T M) {
     trial_time = M;
     incre_time = trial_time - current_time;
 }
@@ -1168,7 +1168,7 @@ template<sp_d T> void Factory<T>::update_trial_temperature(const Col<T>& M) {
     incre_temperature = trial_temperature - current_temperature;
 }
 
-template<sp_d T> void Factory<T>::update_incre_time(const T& M) {
+template<sp_d T> void Factory<T>::update_incre_time(const T M) {
     incre_time = M;
     trial_time = current_time + incre_time;
 }
@@ -1223,7 +1223,7 @@ template<sp_d T> void Factory<T>::update_incre_temperature(const Col<T>& M) {
     trial_temperature = current_temperature + incre_temperature;
 }
 
-template<sp_d T> void Factory<T>::update_current_time(const T& M) {
+template<sp_d T> void Factory<T>::update_current_time(const T M) {
     trial_time = current_time = M;
     incre_time = 0.;
 }
@@ -1278,7 +1278,7 @@ template<sp_d T> void Factory<T>::update_current_temperature(const Col<T>& M) {
     incre_temperature.zeros();
 }
 
-template<sp_d T> void Factory<T>::update_trial_time_by(const T& M) {
+template<sp_d T> void Factory<T>::update_trial_time_by(const T M) {
     trial_time += M;
     incre_time = trial_time - current_time;
 }
@@ -1333,7 +1333,7 @@ template<sp_d T> void Factory<T>::update_trial_temperature_by(const Col<T>& M) {
     incre_temperature = trial_temperature - current_temperature;
 }
 
-template<sp_d T> void Factory<T>::update_incre_time_by(const T& M) {
+template<sp_d T> void Factory<T>::update_incre_time_by(const T M) {
     incre_time += M;
     trial_time = current_time + incre_time;
 }
@@ -1388,7 +1388,7 @@ template<sp_d T> void Factory<T>::update_incre_temperature_by(const Col<T>& M) {
     trial_temperature = current_temperature + incre_temperature;
 }
 
-template<sp_d T> void Factory<T>::update_current_time_by(const T& M) {
+template<sp_d T> void Factory<T>::update_current_time_by(const T M) {
     trial_time = current_time += M;
     incre_time = 0.;
 }
