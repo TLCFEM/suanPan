@@ -17,7 +17,7 @@
 
 #include "NonlinearPeric.h"
 #include <Domain/DomainBase.h>
-#include <Domain/Factory.hpp>
+#include <Domain/FactoryHelper.hpp>
 #include <Toolbox/tensorToolbox.h>
 
 const double NonlinearPeric::root_three_two = sqrt(1.5);

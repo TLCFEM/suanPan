@@ -17,7 +17,7 @@
 
 #include "VAFCRP.h"
 #include <Domain/DomainBase.h>
-#include <Domain/Factory.hpp>
+#include <Domain/FactoryHelper.hpp>
 #include <Recorder/OutputType.h>
 #include <Toolbox/tensorToolbox.h>
 
