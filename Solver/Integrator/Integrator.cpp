@@ -301,3 +301,13 @@ vec Integrator::from_incre_acceleration(const double magnitude, const uvec& enco
 vec Integrator::from_total_velocity(const double magnitude, const uvec& encoding) { return from_total_velocity(vec(encoding.n_elem, fill::value(magnitude)), encoding); }
 
 vec Integrator::from_total_acceleration(const double magnitude, const uvec& encoding) { return from_total_acceleration(vec(encoding.n_elem, fill::value(magnitude)), encoding); }
+
+int ExplicitIntegrator::solve(mat& X, const mat& B) { return get_domain().lock()->get_factory()->get_mass()->solve(X, B); }
+
+int ExplicitIntegrator::solve(mat& X, const sp_mat& B) { return get_domain().lock()->get_factory()->get_mass()->solve(X, B); }
+
+int ExplicitIntegrator::solve(mat& X, mat&& B) { return get_domain().lock()->get_factory()->get_mass()->solve(X, std::forward<mat>(B)); }
+
+int ExplicitIntegrator::solve(mat& X, sp_mat&& B) { return get_domain().lock()->get_factory()->get_mass()->solve(X, std::forward<sp_mat>(B)); }
+
+vec ExplicitIntegrator::from_incre_velocity(const vec&, const uvec&) { throw invalid_argument("support velocity cannot be used with explicit integrator"); }

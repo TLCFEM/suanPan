@@ -66,7 +66,7 @@ public:
 
     virtual int initialize();
 
-    [[nodiscard]] virtual constexpr IntegratorType type() const = 0;
+    [[nodiscard]] virtual constexpr IntegratorType type() const { return IntegratorType::Implicit; }
 
     // ! some multistep integrators may require fixed time step for some consecutive sub-steps
     void set_time_step_switch(bool);
@@ -145,6 +145,13 @@ public:
     using Integrator::Integrator;
 
     [[nodiscard]] constexpr IntegratorType type() const override { return IntegratorType::Explicit; }
+
+    int solve(mat&, const mat&) override;
+    int solve(mat&, const sp_mat&) override;
+    int solve(mat&, mat&&) override;
+    int solve(mat&, sp_mat&&) override;
+
+    vec from_incre_velocity(const vec&, const uvec&) override;
 };
 
 #endif
