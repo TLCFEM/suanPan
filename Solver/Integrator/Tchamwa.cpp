@@ -57,8 +57,4 @@ int Tchamwa::update_trial_status() {
 
 void Tchamwa::update_parameter(const double NT) { DT = NT; }
 
-vec Tchamwa::from_incre_acceleration(const vec& incre_acceleration, const uvec& encoding) { return get_domain()->get_factory()->get_current_acceleration()(encoding) + incre_acceleration; }
-
-vec Tchamwa::from_total_acceleration(const vec& total_acceleration, const uvec&) { return total_acceleration; }
-
 void Tchamwa::print() { suanpan_info("A Tchamwa solver.\n"); }

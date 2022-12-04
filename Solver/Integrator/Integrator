@@ -1,6 +1,7 @@
 #include "Integrator.h"
 
 #include "BatheTwoStep.h"
+#include "BatheExplicit.h"
 #include "GSSSS.h"
 #include "GeneralizedAlpha.h"
 #include "LeeNewmark.h"

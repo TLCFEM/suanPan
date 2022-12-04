@@ -161,6 +161,9 @@ public:
     int solve(mat&, sp_mat&&) override;
 
     vec from_incre_velocity(const vec&, const uvec&) override;
+
+    vec from_incre_acceleration(const vec&, const uvec&) override; // obtain target acceleration from increment of acceleration
+    vec from_total_acceleration(const vec&, const uvec&) override;
 };
 
 #endif

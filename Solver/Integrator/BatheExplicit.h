@@ -15,35 +15,48 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class Tchamwa
- * @brief A Tchamwa class defines a solver using Tchamwa algorithm.
+ * @class BatheExplicit
+ * @brief A BatheExplicit class defines a solver using BatheExplicit algorithm.
  *
  * @author tlc
  * @date 03/12/2022
  * @version 0.1.0
- * @file Tchamwa.h
+ * @file BatheExplicit.h
  * @addtogroup Integrator
  * @{
  */
 
-#ifndef TCHAMWA_H
-#define TCHAMWA_H
+#ifndef BATHEEXPLICIT_H
+#define BATHEEXPLICIT_H
 
 #include "Integrator.h"
 
-class Tchamwa final : public ExplicitIntegrator {
-    const double PHI;
-    double DT{0.};
+class BatheExplicit final : public ExplicitIntegrator {
+    enum class FLAG {
+        FIRST,
+        SECOND
+    };
+
+    FLAG step_flag = FLAG::FIRST;
+
+    const double P, Q1, Q2, Q0;
+    double DT{0.}, A0{0.}, A1{0.}, A2{0.}, A3{0.}, A4{0.}, A5{0.}, A6{0.}, A7{0.};
 
 public:
-    Tchamwa(unsigned, double);
+    BatheExplicit(unsigned, double);
+
+    [[nodiscard]] bool has_corrector() const override;
 
     void assemble_resistance() override;
     void assemble_matrix() override;
 
-    void update_from_ninja() override;
+    void update_incre_time(double) override;
 
     int update_trial_status() override;
+    int correct_trial_status() override;
+
+    void commit_status() override;
+    void clear_status() override;
 
     void update_parameter(double) override;
 

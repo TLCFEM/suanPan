@@ -452,6 +452,7 @@
     <ClCompile Include="..\..\..\Solver\Arnoldi.cpp" />
     <ClCompile Include="..\..\..\Solver\BFGS.cpp" />
     <ClCompile Include="..\..\..\Solver\FEAST.cpp" />
+    <ClCompile Include="..\..\..\Solver\Integrator\BatheExplicit.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\BatheTwoStep.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\GeneralizedAlpha.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\GSSSS.cpp" />
@@ -892,6 +893,7 @@
     <ClInclude Include="..\..\..\Solver\Arnoldi.h" />
     <ClInclude Include="..\..\..\Solver\BFGS.h" />
     <ClInclude Include="..\..\..\Solver\FEAST.h" />
+    <ClInclude Include="..\..\..\Solver\Integrator\BatheExplicit.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\BatheTwoStep.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\GeneralizedAlpha.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\GSSSS.h" />

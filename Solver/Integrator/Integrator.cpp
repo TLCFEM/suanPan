@@ -358,3 +358,7 @@ int ExplicitIntegrator::solve(mat& X, mat&& B) { return get_domain()->get_factor
 int ExplicitIntegrator::solve(mat& X, sp_mat&& B) { return get_domain()->get_factory()->get_mass()->solve(X, std::forward<sp_mat>(B)); }
 
 vec ExplicitIntegrator::from_incre_velocity(const vec&, const uvec&) { throw invalid_argument("support velocity cannot be used with explicit integrator"); }
+
+vec ExplicitIntegrator::from_incre_acceleration(const vec& incre_acceleration, const uvec& encoding) { return get_domain()->get_factory()->get_current_acceleration()(encoding) + incre_acceleration; }
+
+vec ExplicitIntegrator::from_total_acceleration(const vec& total_acceleration, const uvec&) { return total_acceleration; }
