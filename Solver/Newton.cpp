@@ -108,7 +108,8 @@ int Newton::analyze() {
         G->erase_machine_error(samurai);
 
         // exit if converged
-        if(C->is_converged(counter)) return SUANPAN_SUCCESS;
+        // call corrector if it exists
+        if(C->is_converged(counter)) return G->sync_status(true);
         // exit if maximum iteration is hit
         if(++counter > max_iteration) return SUANPAN_FAIL;
 
@@ -121,14 +122,10 @@ int Newton::analyze() {
         // for tracking
         G->update_constraint();
 
-        if(D->get_attribute(ModalAttribute::PureElastic)) {
-            if(SUANPAN_SUCCESS != G->update_trial_status()) return SUANPAN_FAIL;
-            // process modifiers
-            if(SUANPAN_SUCCESS != G->process_modifier()) return SUANPAN_FAIL;
-            // assemble resistance
-            G->assemble_resistance();
-            return SUANPAN_SUCCESS;
-        }
+        // fast handling for linear elastic case
+        // sync status using newly computed increment across elements and nodes
+        // this may just call predictor or call corrector
+        if(D->get_attribute(ModalAttribute::PureElastic)) return G->sync_status(false);
     }
 }
 

@@ -114,7 +114,7 @@ int BFGS::analyze() {
         G->erase_machine_error(samurai);
 
         // exit if converged
-        if(C->is_converged(counter)) return SUANPAN_SUCCESS;
+        if(C->is_converged(counter)) return G->sync_status(true);
         // exit if maximum iteration is hit
         if(++counter > max_iteration) return SUANPAN_FAIL;
 
@@ -126,6 +126,11 @@ int BFGS::analyze() {
         G->update_load();
         // for tracking multiplier
         G->update_constraint();
+
+        // fast handling for linear elastic case
+        // sync status using newly computed increment across elements and nodes
+        // this may just call predictor or call corrector
+        if(D->get_attribute(ModalAttribute::PureElastic)) return G->sync_status(false);
 
         // check if the maximum record number is hit (L-BFGS)
         if(counter > max_hist) {

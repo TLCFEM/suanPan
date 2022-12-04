@@ -44,6 +44,8 @@ void Integrator::set_time_step_switch(const bool T) { time_step_switch = T; }
  */
 bool Integrator::allow_to_change_time_step() const { return time_step_switch; }
 
+bool Integrator::has_corrector() const { return false; }
+
 int Integrator::process_load() { return database.lock()->process_load(true); }
 
 /**
@@ -188,10 +190,47 @@ int Integrator::update_trial_status() {
     return suanpan::approx_equal(norm(W->get_incre_displacement()), 0.) ? SUANPAN_SUCCESS : D->update_trial_status();
 }
 
+int Integrator::correct_trial_status() { return SUANPAN_SUCCESS; }
+
 /**
- * Must change ninja to the real displacement increment.
+ * When a new displacement increment is computed, it is added to global displacement vector.
+ * At this moment, nodal and elemental quantities are all computed from the previous displacement
+ * vector, directly committing the new results causes out-of-sync issue.
+ * Some algorithms use predictor-corrector type scheme, which means the converged quantities are
+ * different from the committed quantities.
+ * This method is in charge of syncing quantities between global and local quantities by updating
+ * nodal/elemental quantities using the committed quantities.
  */
-int Integrator::update_internal(const mat&) { return 0; }
+int Integrator::sync_status(const bool only_correct) {
+    auto handle_force = [&] {
+        // process modifiers
+        if(SUANPAN_SUCCESS != process_modifier()) return SUANPAN_FAIL;
+        // assemble resistance
+        assemble_resistance();
+        return SUANPAN_SUCCESS;
+    };
+
+    // only perform corrector if defined
+    if(only_correct) {
+        if(!has_corrector()) return SUANPAN_SUCCESS;
+
+        if(SUANPAN_SUCCESS != correct_trial_status()) return SUANPAN_FAIL;
+
+        return handle_force();
+    }
+
+    // perform corrector/predictor depending on the algorithm
+    if(SUANPAN_SUCCESS != (has_corrector() ? correct_trial_status() : update_trial_status())) return SUANPAN_FAIL;
+
+    return handle_force();
+}
+
+/**
+ * Some algorithms solve a system which differs from the original one.
+ * The size of the problem changes thus the computed increment contains additional internal
+ * quantities. This methods updates internal quantities stored in those integrators.
+ */
+int Integrator::update_internal(const mat&) { return SUANPAN_SUCCESS; }
 
 mat Integrator::solve(const mat& B) {
     mat X;

@@ -24,10 +24,11 @@ hdf5recorder 1 Node U1 1 2
 step explicitdynamic 1 25
 set ini_step_size 1E-3
 set fixed_step_size true
+set pure_elastic
 
 integrator Tchamwa 1 .6
 
-converger AbsIncreAcc 1 1E-10 4 1
+converger AbsIncreAcc 1 1E-10 4 0
 
 analyze
 
