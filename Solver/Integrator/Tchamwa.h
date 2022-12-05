@@ -41,8 +41,6 @@ public:
     void assemble_resistance() override;
     void assemble_matrix() override;
 
-    void update_from_ninja() override;
-
     int update_trial_status() override;
 
     void update_parameter(double) override;

@@ -349,6 +349,11 @@ vec Integrator::from_total_acceleration(const double magnitude, const uvec& enco
 
 const vec& ExplicitIntegrator::get_trial_displacement() const { return get_domain()->get_factory()->get_trial_acceleration(); }
 
+void ExplicitIntegrator::update_from_ninja() {
+    const auto& W = get_domain()->get_factory();
+    W->update_trial_acceleration_by(W->get_ninja());
+}
+
 int ExplicitIntegrator::solve(mat& X, const mat& B) { return get_domain()->get_factory()->get_mass()->solve(X, B); }
 
 int ExplicitIntegrator::solve(mat& X, const sp_mat& B) { return get_domain()->get_factory()->get_mass()->solve(X, B); }

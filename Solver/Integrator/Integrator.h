@@ -153,7 +153,9 @@ public:
 
     [[nodiscard]] constexpr IntegratorType type() const override { return IntegratorType::Explicit; }
 
-    const vec& get_trial_displacement() const override;
+    [[nodiscard]] const vec& get_trial_displacement() const override;
+
+    void update_from_ninja() override;
 
     int solve(mat&, const mat&) override;
     int solve(mat&, const sp_mat&) override;

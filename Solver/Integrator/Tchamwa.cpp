@@ -40,11 +40,6 @@ void Tchamwa::assemble_resistance() {
 
 void Tchamwa::assemble_matrix() { get_domain()->assemble_trial_mass(); }
 
-void Tchamwa::update_from_ninja() {
-    const auto& W = get_domain()->get_factory();
-    W->update_trial_acceleration_by(W->get_ninja());
-}
-
 int Tchamwa::update_trial_status() {
     const auto& D = get_domain();
     auto& W = D->get_factory();
