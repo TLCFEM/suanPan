@@ -21,8 +21,8 @@
 #include <Element/Element.h>
 
 #ifdef SUANPAN_HDF5
-#include <hdf5/hdf5.h>
-#include <hdf5/hdf5_hl.h>
+#include <hdf5.h>
+#include <hdf5_hl.h>
 #endif
 
 extern fs::path SUANPAN_OUTPUT;
