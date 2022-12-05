@@ -29,7 +29,7 @@ hdf5recorder 3 Global MOMENTUMY
 hdf5recorder 4 Node MOMENTUMX 2 3 4
 hdf5recorder 5 Node MOMENTUMY 2 3 4
 
-step dynamic 1 10
+step dynamic 1 1
 set ini_step_size 1E-3
 set fixed_step_size 1
 set symm_mat 0
@@ -39,6 +39,19 @@ integrator BatheTwoStep 1
 converger RelIncreDisp 1 1E-10 10 1
 
 analyze
+
+# Node 4:
+# Coordinate:
+# 0 -5.0000
+# Displacement:
+# 2.5699 8.2627
+# Resistance:
+# 0 0
+# Velocity:
+# 3.5857 1.0751
+# Acceleration:
+# -1.7425 -15.4797
+peek node 4
 
 # save recorder 1 2 3 4 5
 

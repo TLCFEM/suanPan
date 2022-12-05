@@ -14,7 +14,7 @@ initial acceleration -2 2 1
 
 restitutionwall 1 0 0 0 1 1. 1E4
 
-step dynamic 1 8
+step dynamic 1 1.5
 set ini_step_size 1E-2
 set fixed_step_size 1
 set symm_mat 0
@@ -24,8 +24,19 @@ converger RelIncreDisp 1 1E-10 5 1
 
 analyze
 
-save recorder 1 2 3
+# save recorder 1 2 3
 
+# Node 1:
+# Coordinate:
+# 0 1.0000
+# Displacement:
+# 0 -0.2409
+# Resistance:
+# 0 0
+# Velocity:
+# 0 0.9784
+# Acceleration:
+# 0 -2.0000
 peek node 1
 
 exit

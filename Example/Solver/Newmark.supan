@@ -27,7 +27,7 @@ modifier LumpedScale 1 1
 modifier LumpedSimple 2 2
 modifier Rayleigh 3 .2 .002 .0 .0
 
-step dynamic 1 25
+step dynamic 1 1
 set ini_step_size 5E-2
 set fixed_step_size true
 
@@ -38,15 +38,16 @@ converger RelIncreDisp 1 1E-10 4 1
 analyze
 
 # Node 2:
+# Coordinate:
 # 0 1.0000
 # Displacement:
-# -0.0325 0.0372 0.0258
+# 0.0333 -0.0002 -0.0497
 # Resistance:
-# -2.1849 -0.0045 0.0009
+# 9.5880 0.1065 -0.0060
 # Velocity:
-# -0.0444 -0.0010 0.0642
+# 0.3181 -0.0050 -0.4666
 # Acceleration:
-# 0.2173 0.0041 -0.3138
+# -0.0593 -0.0836 -0.1654
 peek node 2
 
 peek integrator 1

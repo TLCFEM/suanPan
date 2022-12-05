@@ -25,7 +25,7 @@ cload 3 1 -200 2 4
 
 hdf5recorder 1 Node U 2 3 4
 
-step explicitdynamic 1 2
+step explicitdynamic 1 1
 set ini_step_size 1E-3
 set fixed_step_size 1
 set symm_mat 0
@@ -37,17 +37,17 @@ converger RelIncreAcc 1 1E-10 10 0
 
 analyze
 
-# Node 2:
+# Node 4:
 # Coordinate:
-# 0 -2.0000
+# 0 -5.0000
 # Displacement:
-# -1.9970 1.8954
+# 2.1257 9.3850
 # Resistance:
-# 2.2182e+04 1.0577e+04
+# 2.7423e+03 3.8522e+03
 # Velocity:
-# 0.0254 -0.0748
+# 0.1839 0.6416
 # Acceleration:
-# -1.1091e+03 -5.3886e+02
+# -1.3711e+02 -2.0261e+02
 peek node 2 3 4
 
 peek integrator 1

@@ -27,7 +27,7 @@ plainrecorder 1 Element S 2
 plainrecorder 2 Element E 2
 plainrecorder 3 Element V 2
 
-step dynamic 1 20
+step dynamic 1 2
 set ini_step_size .01
 set fixed_step_size 1
 
@@ -38,6 +38,19 @@ converger RelIncreDisp 1 1E-8 4 1
 analyze
 
 peek element 2 3
+
+# Node 2:
+# Coordinate:
+# 1.0000 0 0
+# Displacement:
+# -0.1894 0 0
+# Resistance:
+# -6.9652 0 0
+# Velocity:
+# -0.4712 0 0
+# Acceleration:
+# 6.9652 0 0
+peek node 2
 
 reset
 clear
