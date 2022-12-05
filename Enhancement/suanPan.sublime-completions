@@ -1814,6 +1814,12 @@
       "trigger":"BatheTwoStep"
     },
     {
+      "contents":"integrator BatheExplicit ${1:(1)} ${2:(2)}\n# (1) int, unique integrator tag\n# [2] double, spectral radius, default: 0.9",
+      "details":"",
+      "kind":"type",
+      "trigger":"BatheExplicit"
+    },
+    {
       "contents":"integrator GSSSSOptimal ${1:(1)} ${2:(2)}\n# (1) int, unique integrator tag\n# (2) double, spectral radius",
       "details":"Optimal scheme for GSSSS",
       "kind":"type",

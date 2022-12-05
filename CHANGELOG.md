@@ -11,6 +11,7 @@
 2. extend `BatheTwoStep` to allow customisation of spectral radius [#81](https://github.com/TLCFEM/suanPan/pull/81) and sub-step size [#82](https://github.com/TLCFEM/suanPan/pull/82)
 3. update `Catch2` to version `2.13.10`
 4. update `Armadillo` to version `11.4`
+5. add `Tchamwa` and `BatheExplicit` explicit time integration methods
 
 ## version 2.6.1
 
