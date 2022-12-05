@@ -1129,8 +1129,8 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
         return SUANPAN_SUCCESS;
     }
 
-    if(is_equal(property_id, "pure_elastic")) {
-        domain->set_attribute(ModalAttribute::PureElastic);
+    if(is_equal(property_id, "linear_system")) {
+        domain->set_attribute(ModalAttribute::LinearSystem);
 
         return SUANPAN_SUCCESS;
     }

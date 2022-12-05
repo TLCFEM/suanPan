@@ -130,7 +130,7 @@ int BFGS::analyze() {
         // fast handling for linear elastic case
         // sync status using newly computed increment across elements and nodes
         // this may just call predictor or call corrector
-        if(D->get_attribute(ModalAttribute::PureElastic)) return G->sync_status(false);
+        if(D->get_attribute(ModalAttribute::LinearSystem)) return G->sync_status(false);
 
         // check if the maximum record number is hit (L-BFGS)
         if(counter > max_hist) {

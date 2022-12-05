@@ -88,7 +88,7 @@ enum class ColorMethod {
 };
 
 enum class ModalAttribute: size_t {
-    PureElastic
+    LinearSystem
 };
 
 class DomainBase : public Tag {

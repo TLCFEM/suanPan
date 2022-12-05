@@ -29,7 +29,7 @@ step explicitdynamic 1 1
 set ini_step_size 1E-3
 set fixed_step_size 1
 set symm_mat 0
-set pure_elastic
+set linear_system
 
 integrator Tchamwa 1
 
