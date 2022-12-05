@@ -1,5 +1,6 @@
 set(Integrator
         Integrator/BatheTwoStep.cpp
+        Integrator/BatheExplicit.cpp
         Integrator/GeneralizedAlpha.cpp
         Integrator/GSSSS.cpp
         Integrator/Integrator.cpp

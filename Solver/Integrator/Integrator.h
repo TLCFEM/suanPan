@@ -72,6 +72,8 @@ public:
     void set_time_step_switch(bool);
     [[nodiscard]] bool allow_to_change_time_step() const;
 
+    [[nodiscard]] virtual bool has_corrector() const;
+
     [[nodiscard]] virtual int process_load();
     [[nodiscard]] virtual int process_constraint();
     [[nodiscard]] virtual int process_criterion();
@@ -102,6 +104,9 @@ public:
     virtual void update_incre_time(double);
 
     virtual int update_trial_status();
+    virtual int correct_trial_status();
+
+    virtual int sync_status(bool);
 
     virtual int update_internal(const mat&);
 
@@ -148,7 +153,9 @@ public:
 
     [[nodiscard]] constexpr IntegratorType type() const override { return IntegratorType::Explicit; }
 
-    const vec& get_trial_displacement() const override;
+    [[nodiscard]] const vec& get_trial_displacement() const override;
+
+    void update_from_ninja() override;
 
     int solve(mat&, const mat&) override;
     int solve(mat&, const sp_mat&) override;
@@ -156,6 +163,9 @@ public:
     int solve(mat&, sp_mat&&) override;
 
     vec from_incre_velocity(const vec&, const uvec&) override;
+
+    vec from_incre_acceleration(const vec&, const uvec&) override; // obtain target acceleration from increment of acceleration
+    vec from_total_acceleration(const vec&, const uvec&) override;
 };
 
 #endif

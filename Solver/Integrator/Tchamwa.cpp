@@ -40,11 +40,6 @@ void Tchamwa::assemble_resistance() {
 
 void Tchamwa::assemble_matrix() { get_domain()->assemble_trial_mass(); }
 
-void Tchamwa::update_from_ninja() {
-    const auto& W = get_domain()->get_factory();
-    W->update_trial_acceleration_by(W->get_ninja());
-}
-
 int Tchamwa::update_trial_status() {
     const auto& D = get_domain();
     auto& W = D->get_factory();
@@ -56,9 +51,5 @@ int Tchamwa::update_trial_status() {
 }
 
 void Tchamwa::update_parameter(const double NT) { DT = NT; }
-
-vec Tchamwa::from_incre_acceleration(const vec& incre_acceleration, const uvec& encoding) { return get_domain()->get_factory()->get_current_acceleration()(encoding) + incre_acceleration; }
-
-vec Tchamwa::from_total_acceleration(const vec& total_acceleration, const uvec&) { return total_acceleration; }
 
 void Tchamwa::print() { suanpan_info("A Tchamwa solver.\n"); }
