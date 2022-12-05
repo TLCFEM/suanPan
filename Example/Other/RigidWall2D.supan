@@ -14,7 +14,7 @@ initial acceleration -1 2 1
 
 constraint rigidwall 1 0 0 0 1 .1
 
-step dynamic 1 8
+step dynamic 1 1.5
 set ini_step_size 1E-3
 set fixed_step_size 1
 set symm_mat 0
@@ -27,13 +27,14 @@ analyze
 # save recorder 1 2 3
 
 # Node 1:
+# Coordinate:
 # 0 1.0000
 # Displacement:
-# 0 -0.1357
+# 0 -0.8956
 # Resistance:
 # 0 0
 # Velocity:
-# 0 0.5259
+# 0 1.3396
 # Acceleration:
 # 0 -1.0000
 peek node 1

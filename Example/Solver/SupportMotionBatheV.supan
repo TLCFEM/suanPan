@@ -20,7 +20,7 @@ supportvelocity 2 1 .2 1 1
 
 hdf5recorder 1 Node U1 1 2
 
-step dynamic 1 25
+step dynamic 1 1
 set ini_step_size 1E-2
 set fixed_step_size true
 
@@ -34,13 +34,13 @@ analyze
 # Coordinate:
 # 0 1.0000
 # Displacement:
-# -7.4350e-01 -2.1221e-17 7.8844e-01
+# -3.0649e-01 2.4660e-18 6.0049e-01
 # Resistance:
-# -1.5909e+02 -2.6622e-14 -7.0317e-01
+# -1.1055e+02 4.0147e-15 4.7749e+00
 # Velocity:
-# -7.0828e+00 1.0577e-15 1.0601e+01
+# 1.1059e+00 -1.6142e-16 -7.6754e-03
 # Acceleration:
-# 1.5369e+01 3.3567e-14 -2.3002e+01
+# 1.3227e+01 -7.0120e-15 -2.8148e+02
 peek node 1 2
 
 # save recorder 1

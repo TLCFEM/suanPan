@@ -9,7 +9,7 @@ element EB21 1 1 2 10 1 1 0
 
 mass 2 2 10 1
 
-fix 1 P 1
+fix2 1 P 1
 
 modifier Rayleigh 3 .2 .002 .0 .0
 
@@ -17,7 +17,7 @@ amplitude Tabular 1 EZ
 
 acceleration 2 1 .2 1 2
 
-step dynamic 1 25
+step dynamic 1 1
 set ini_step_size .05
 set fixed_step_size 1
 
@@ -31,13 +31,13 @@ analyze
 # Coordinate:
 # 0 1.0000
 # Displacement:
-# 0.0137 0 -0.0205
+# 0.0322 0 -0.0482
 # Resistance:
-# 4.1213 0 0.0153
+# 9.7595 0 0.0646
 # Velocity:
-# -0.0867 0 0.1299
+# 0.3811 0 -0.5858
 # Acceleration:
-# -0.3936 0 0.5893
+# 0.1950 0 -1.6547
 peek node 2
 
 peek integrator 1

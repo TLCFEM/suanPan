@@ -169,11 +169,12 @@ step static 1
 analyze
 
 # Node 117:
+# Coordinate:
 # 20.0000 5.0000
 # Displacement:
-# -9.0824e-18 2.0000e+00
+# -2.1376e-15 2.0000e+00
 # Resistance:
-# -1.7375e-14 6.9464e-01
+# -7.8271e-15 6.9464e-01
 peek node 117
 
 peek element 1

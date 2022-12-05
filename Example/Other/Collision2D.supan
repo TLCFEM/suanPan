@@ -58,7 +58,7 @@ rigidwall 3 0 5 0 -1 1E0
 rigidwall 4 -5 0 1 0 1E0
 rigidwall 5 0 -5 0 1 1E0
 
-step dynamic 1 200
+step dynamic 1 2
 set ini_step_size 2E-2
 set fixed_step_size 1
 set band_mat false
@@ -67,6 +67,19 @@ set symm_mat false
 converger RelIncreDisp 1 1E-11 10 1
 
 analyze
+
+# Node 2:
+# Coordinate:
+# 1.7580 2.2530
+# Displacement:
+# 0.5282 -1.4996
+# Resistance:
+# 0 0
+# Velocity:
+# 0.2642 -0.7496
+# Acceleration:
+# 0.0079 0.0086
+peek node 2
 
 # save recorder 1
 

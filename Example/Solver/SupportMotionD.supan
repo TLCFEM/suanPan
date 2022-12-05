@@ -20,7 +20,7 @@ supportdisplacement 2 1 .2 1 1
 
 hdf5recorder 1 Node U1 1 2
 
-step dynamic 1 25
+step dynamic 1 1
 set ini_step_size 5E-2
 set fixed_step_size true
 
@@ -30,6 +30,17 @@ converger RelIncreDisp 1 1E-10 4 1
 
 analyze
 
+# Node 2:
+# Coordinate:
+# 0 1.0000
+# Displacement:
+# 1.0892e+00 2.1307e-17 -8.2083e+00
+# Resistance:
+# -4.7306e+03 1.2609e-13 -3.1861e+03
+# Velocity:
+# 8.4889e+00 1.0537e-15 1.2187e+03
+# Acceleration:
+# -2.5940e+03 -8.3703e-14 1.1645e+06
 peek node 1 2
 
 exit
