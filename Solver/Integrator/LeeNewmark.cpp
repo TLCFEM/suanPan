@@ -101,7 +101,7 @@ int LeeNewmark::process_constraint() {
     const auto& D = get_domain();
 
     // process constraint for the first time to obtain proper stiffness
-    if(SUANPAN_SUCCESS != Integrator::process_constraint()) return SUANPAN_FAIL;
+    if(SUANPAN_SUCCESS != LeeNewmarkBase::process_constraint()) return SUANPAN_FAIL;
 
     // this stiffness contains geometry, mass and damping which are handled in Newmark::assemble_matrix()
     auto& t_stiff = get_stiffness(factory);
@@ -156,7 +156,7 @@ int LeeNewmark::process_constraint() {
         // check in constant terms that does not change in the substep
         initialize_stiffness(D);
 
-        if(SUANPAN_SUCCESS != Integrator::process_constraint()) return SUANPAN_FAIL;
+        if(SUANPAN_SUCCESS != LeeNewmarkBase::process_constraint()) return SUANPAN_FAIL;
         t_stiff->csc_condense();
         current_stiffness.swap(t_stiff);
 

@@ -57,11 +57,11 @@ void GSSSS::assemble_matrix() {
     W->get_stiffness() += W->get_geometry() + XV * W->get_damping() + XA * W->get_mass();
 }
 
-vec GSSSS::get_force_residual() { return XD * Integrator::get_force_residual(); }
+vec GSSSS::get_force_residual() { return XD * ImplicitIntegrator::get_force_residual(); }
 
-vec GSSSS::get_displacement_residual() { return XD * Integrator::get_displacement_residual(); }
+vec GSSSS::get_displacement_residual() { return XD * ImplicitIntegrator::get_displacement_residual(); }
 
-sp_mat GSSSS::get_reference_load() { return XD * Integrator::get_reference_load(); }
+sp_mat GSSSS::get_reference_load() { return XD * ImplicitIntegrator::get_reference_load(); }
 
 int GSSSS::process_load() {
     const auto& D = get_domain();
@@ -72,7 +72,7 @@ int GSSSS::process_load() {
 
     W->update_trial_time((1. - W1) * current_time + W1 * trial_time);
 
-    const auto code = Integrator::process_load();
+    const auto code = ImplicitIntegrator::process_load();
 
     W->update_trial_time(trial_time);
 
@@ -88,7 +88,7 @@ int GSSSS::process_constraint() {
 
     W->update_trial_time((1. - W1) * current_time + W1 * trial_time);
 
-    const auto code = Integrator::process_constraint();
+    const auto code = ImplicitIntegrator::process_constraint();
 
     W->update_trial_time(trial_time);
 
@@ -104,7 +104,7 @@ int GSSSS::process_load_resistance() {
 
     W->update_trial_time((1. - W1) * current_time + W1 * trial_time);
 
-    const auto code = Integrator::process_load_resistance();
+    const auto code = ImplicitIntegrator::process_load_resistance();
 
     W->update_trial_time(trial_time);
 
@@ -120,7 +120,7 @@ int GSSSS::process_constraint_resistance() {
 
     W->update_trial_time((1. - W1) * current_time + W1 * trial_time);
 
-    const auto code = Integrator::process_constraint_resistance();
+    const auto code = ImplicitIntegrator::process_constraint_resistance();
 
     W->update_trial_time(trial_time);
 

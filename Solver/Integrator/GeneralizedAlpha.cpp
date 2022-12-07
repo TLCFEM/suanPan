@@ -75,11 +75,11 @@ void GeneralizedAlpha::assemble_matrix() {
     W->get_stiffness() += W->get_geometry() + F5 / F2 * W->get_mass() + F6 / F2 * W->get_damping();
 }
 
-vec GeneralizedAlpha::get_force_residual() { return Integrator::get_force_residual() / F2; }
+vec GeneralizedAlpha::get_force_residual() { return ImplicitIntegrator::get_force_residual() / F2; }
 
-vec GeneralizedAlpha::get_displacement_residual() { return Integrator::get_displacement_residual() / F2; }
+vec GeneralizedAlpha::get_displacement_residual() { return ImplicitIntegrator::get_displacement_residual() / F2; }
 
-sp_mat GeneralizedAlpha::get_reference_load() { return Integrator::get_reference_load() / F2; }
+sp_mat GeneralizedAlpha::get_reference_load() { return ImplicitIntegrator::get_reference_load() / F2; }
 
 int GeneralizedAlpha::process_load() {
     const auto& D = get_domain();
@@ -90,7 +90,7 @@ int GeneralizedAlpha::process_load() {
 
     W->update_trial_time(F1 * current_time + F2 * trial_time);
 
-    const auto code = Integrator::process_load();
+    const auto code = ImplicitIntegrator::process_load();
 
     W->update_trial_time(trial_time);
 
@@ -106,7 +106,7 @@ int GeneralizedAlpha::process_constraint() {
 
     W->update_trial_time(F1 * current_time + F2 * trial_time);
 
-    const auto code = Integrator::process_constraint();
+    const auto code = ImplicitIntegrator::process_constraint();
 
     W->update_trial_time(trial_time);
 
@@ -122,7 +122,7 @@ int GeneralizedAlpha::process_load_resistance() {
 
     W->update_trial_time(F1 * current_time + F2 * trial_time);
 
-    const auto code = Integrator::process_load_resistance();
+    const auto code = ImplicitIntegrator::process_load_resistance();
 
     W->update_trial_time(trial_time);
 
@@ -138,7 +138,7 @@ int GeneralizedAlpha::process_constraint_resistance() {
 
     W->update_trial_time(F1 * current_time + F2 * trial_time);
 
-    const auto code = Integrator::process_constraint_resistance();
+    const auto code = ImplicitIntegrator::process_constraint_resistance();
 
     W->update_trial_time(trial_time);
 

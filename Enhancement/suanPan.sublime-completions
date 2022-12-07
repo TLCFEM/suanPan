@@ -1826,6 +1826,12 @@
       "trigger":"GSSSSOptimal"
     },
     {
+      "contents":"integrator OALTS ${1:(1)} ${2:(2)}\n# (1) int, unique integrator tag\n# (2) double, spectral radius",
+      "details":"OALTS doi:10.1002/nme.6188",
+      "kind":"type",
+      "trigger":"OALTS"
+    },
+    {
       "contents":"integrator GSSSSU0 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique integrator tag\n# (2-4) double, three spectral radii",
       "details":"U0 family scheme for GSSSS",
       "kind":"type",

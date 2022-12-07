@@ -1,6 +1,6 @@
 set(Integrator
-        Integrator/BatheTwoStep.cpp
         Integrator/BatheExplicit.cpp
+        Integrator/BatheTwoStep.cpp
         Integrator/GeneralizedAlpha.cpp
         Integrator/GSSSS.cpp
         Integrator/Integrator.cpp
@@ -8,7 +8,8 @@ set(Integrator
         Integrator/LeeNewmarkBase.cpp
         Integrator/LeeNewmarkFull.cpp
         Integrator/Newmark.cpp
+        Integrator/OALTS.cpp
         Integrator/RayleighNewmark.cpp
-        Integrator/WilsonPenzienNewmark.cpp
         Integrator/Tchamwa.cpp
+        Integrator/WilsonPenzienNewmark.cpp
         )
