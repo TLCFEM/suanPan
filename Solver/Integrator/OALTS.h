@@ -38,10 +38,10 @@ class OALTS final : public ImplicitIntegrator {
 
     double DT{0.}, P1{0.}, P2{0.}, P3{0.};
 
+    bool if_staring = true;
+
 public:
     OALTS(unsigned, double);
-
-    int initialize() override;
 
     void assemble_resistance() override;
     void assemble_matrix() override;
@@ -51,6 +51,7 @@ public:
     void update_parameter(double) override;
 
     void commit_status() override;
+    void clear_status() override;
 
     vec from_incre_velocity(const vec&, const uvec&) override;
     vec from_incre_acceleration(const vec&, const uvec&) override;

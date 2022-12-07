@@ -29,18 +29,6 @@ OALTS::OALTS(const unsigned T, const double R)
     , B10(B1 / B0)
     , B20(B2 / B0) { set_time_step_switch(false); }
 
-int OALTS::initialize() {
-    if(SUANPAN_SUCCESS != ImplicitIntegrator::initialize()) return SUANPAN_FAIL;
-
-    auto& W = get_domain()->get_factory();
-
-    W->commit_pre_displacement();
-    W->commit_pre_velocity();
-    W->commit_pre_acceleration();
-
-    return SUANPAN_SUCCESS;
-}
-
 void OALTS::assemble_resistance() {
     const auto& D = get_domain();
     auto& W = D->get_factory();
@@ -70,15 +58,24 @@ void OALTS::assemble_matrix() {
     fc.get();
     fd.get();
 
-    W->get_stiffness() += W->get_geometry() + P1 * P1 * W->get_mass() + P1 * W->get_damping();
+    if(if_staring) [[unlikely]] W->get_stiffness() += W->get_geometry() + 4. / DT / DT * W->get_mass() + 2. / DT * W->get_damping();
+    else [[likely]] W->get_stiffness() += W->get_geometry() + P1 * P1 * W->get_mass() + P1 * W->get_damping();
 }
 
 int OALTS::update_trial_status() {
     const auto& D = get_domain();
     auto& W = D->get_factory();
 
-    W->update_trial_velocity(P1 * W->get_trial_displacement() + P2 * W->get_current_displacement() + P3 * W->get_pre_displacement() - B10 * W->get_current_velocity() - B20 * W->get_pre_velocity());
-    W->update_trial_acceleration(P1 * W->get_trial_velocity() + P2 * W->get_current_velocity() + P3 * W->get_pre_velocity() - B10 * W->get_current_acceleration() - B20 * W->get_pre_acceleration());
+    if(if_staring) [[unlikely]]
+    {
+        W->update_trial_velocity(2. / DT * (W->get_trial_displacement() - W->get_current_displacement()) - W->get_current_velocity());
+        W->update_trial_acceleration(2. / DT * (W->get_trial_velocity() - W->get_current_velocity()) - W->get_current_acceleration());
+    }
+    else [[likely]]
+    {
+        W->update_trial_velocity(P1 * W->get_trial_displacement() + P2 * W->get_current_displacement() + P3 * W->get_pre_displacement() - B10 * W->get_current_velocity() - B20 * W->get_pre_velocity());
+        W->update_trial_acceleration(P1 * W->get_trial_velocity() + P2 * W->get_current_velocity() + P3 * W->get_pre_velocity() - B10 * W->get_current_acceleration() - B20 * W->get_pre_acceleration());
+    }
 
     return D->update_trial_status();
 }
@@ -96,11 +93,19 @@ void OALTS::update_parameter(const double NT) {
 void OALTS::commit_status() {
     auto& W = get_domain()->get_factory();
 
+    if_staring = false;
+
     W->commit_pre_displacement();
     W->commit_pre_velocity();
     W->commit_pre_acceleration();
 
     ImplicitIntegrator::commit_status();
+}
+
+void OALTS::clear_status() {
+    if_staring = true;
+
+    ImplicitIntegrator::clear_status();
 }
 
 vec OALTS::from_incre_velocity(const vec& incre_velocity, const uvec& encoding) {
@@ -118,13 +123,17 @@ vec OALTS::from_incre_acceleration(const vec& incre_acceleration, const uvec& en
 vec OALTS::from_total_velocity(const vec& total_velocity, const uvec& encoding) {
     auto& W = get_domain()->get_factory();
 
-    return total_velocity / P1 - P2 / P1 * W->get_current_displacement()(encoding) - P3 / P1 * W->get_pre_displacement()(encoding) + B10 / P1 * W->get_current_velocity()(encoding) + B20 / P1 * W->get_pre_velocity()(encoding);
+    if(if_staring) return .5 * DT * (total_velocity + W->get_current_velocity()(encoding)) + W->get_current_displacement()(encoding);
+
+    return total_velocity / P1 - A1 * W->get_current_displacement()(encoding) - A2 * W->get_pre_displacement()(encoding) + B10 / P1 * W->get_current_velocity()(encoding) + B20 / P1 * W->get_pre_velocity()(encoding);
 }
 
 vec OALTS::from_total_acceleration(const vec& total_acceleration, const uvec& encoding) {
     auto& W = get_domain()->get_factory();
 
-    return from_total_velocity(total_acceleration / P1 - P2 / P1 * W->get_current_velocity()(encoding) - P3 / P1 * W->get_pre_velocity()(encoding) + B10 / P1 * W->get_current_acceleration()(encoding) + B20 / P1 * W->get_pre_acceleration()(encoding), encoding);
+    if(if_staring) return from_total_velocity(.5 * DT * (total_acceleration + W->get_current_acceleration()(encoding)) + W->get_current_velocity()(encoding), encoding);
+
+    return from_total_velocity(total_acceleration / P1 - A1 * W->get_current_velocity()(encoding) - A2 * W->get_pre_velocity()(encoding) + B10 / P1 * W->get_current_acceleration()(encoding) + B20 / P1 * W->get_pre_acceleration()(encoding), encoding);
 }
 
 void OALTS::print() { suanpan_info("A time integrator using the OALTS algorithm.\ndoi:10.1002/nme.6188\n"); }
