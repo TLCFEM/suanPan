@@ -100,14 +100,14 @@ void BatheTwoStep::commit_status() {
     W->commit_pre_velocity();
     W->commit_pre_acceleration();
 
-    Integrator::commit_status();
+    ImplicitIntegrator::commit_status();
 }
 
 void BatheTwoStep::clear_status() {
     step_flag = FLAG::TRAP;
     set_time_step_switch(true);
 
-    Integrator::clear_status();
+    ImplicitIntegrator::clear_status();
 }
 
 vec BatheTwoStep::from_incre_velocity(const vec& incre_velocity, const uvec& encoding) {

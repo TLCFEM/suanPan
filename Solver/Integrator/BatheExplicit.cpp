@@ -92,14 +92,14 @@ void BatheExplicit::commit_status() {
     W->commit_pre_velocity();
     W->commit_pre_acceleration();
 
-    Integrator::commit_status();
+    ExplicitIntegrator::commit_status();
 }
 
 void BatheExplicit::clear_status() {
     step_flag = FLAG::FIRST;
     set_time_step_switch(true);
 
-    Integrator::clear_status();
+    ExplicitIntegrator::clear_status();
 }
 
 void BatheExplicit::update_parameter(const double NT) {

@@ -1429,6 +1429,9 @@
     <ClCompile Include="..\..\..\Solver\Integrator\BatheExplicit.cpp">
       <Filter>Solver\Integrator</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\OALTS.cpp">
+      <Filter>Solver\Integrator</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2726,6 +2729,9 @@
       <Filter>Converger</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Solver\Integrator\BatheExplicit.h">
+      <Filter>Solver\Integrator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\OALTS.h">
       <Filter>Solver\Integrator</Filter>
     </ClInclude>
   </ItemGroup>

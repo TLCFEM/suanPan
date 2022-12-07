@@ -12,6 +12,7 @@
 3. update `Catch2` to version `2.13.10`
 4. update `Armadillo` to version `11.4`
 5. add `Tchamwa` and `BatheExplicit` explicit time integration methods
+6. add `OALTS` two-step implicit time integration method
 
 ## version 2.6.1
 

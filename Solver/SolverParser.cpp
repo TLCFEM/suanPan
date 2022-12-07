@@ -227,17 +227,26 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
             return SUANPAN_SUCCESS;
         }
 
-        if(domain->insert(make_shared<GSSSSOptimal>(tag, radius))) code = 1;
+        if(domain->insert(make_shared<GSSSSOptimal>(tag, std::max(0., std::min(radius, 1.))))) code = 1;
+    }
+    else if(is_equal(integrator_type, "OALTS")) {
+        double radius;
+        if(!get_input(command, radius)) {
+            suanpan_error("create_new_integrator() needs a valid damping radius.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        if(domain->insert(make_shared<OALTS>(tag, std::max(0., std::min(radius, 1.))))) code = 1;
     }
     else if(is_equal(integrator_type, "BatheTwoStep")) {
-        double radius = 0.;
+        auto radius = 0.;
         if(!get_optional_input(command, radius)) {
             suanpan_error("create_new_integrator() needs a valid damping radius.\n");
             return SUANPAN_SUCCESS;
         }
         radius = std::max(0., std::min(radius, 1.));
 
-        double gamma = .5;
+        auto gamma = .5;
         if(!get_optional_input(command, gamma)) {
             suanpan_error("create_new_integrator() needs a valid gamma.\n");
             return SUANPAN_SUCCESS;
@@ -247,7 +256,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
         if(domain->insert(make_shared<BatheTwoStep>(tag, radius, gamma))) code = 1;
     }
     else if(is_equal(integrator_type, "Tchamwa")) {
-        double radius = .6;
+        auto radius = .6;
         if(!get_optional_input(command, radius)) {
             suanpan_error("create_new_integrator() needs a valid damping radius.\n");
             return SUANPAN_SUCCESS;
@@ -256,7 +265,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
         if(domain->insert(make_shared<Tchamwa>(tag, std::max(0., std::min(radius, 1.))))) code = 1;
     }
     else if(is_equal(integrator_type, "BatheExplicit")) {
-        double radius = .9;
+        auto radius = .9;
         if(!get_optional_input(command, radius)) {
             suanpan_error("create_new_integrator() needs a valid damping radius.\n");
             return SUANPAN_SUCCESS;
