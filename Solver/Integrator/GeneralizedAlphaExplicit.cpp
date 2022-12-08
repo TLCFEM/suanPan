@@ -25,6 +25,8 @@ GeneralizedAlphaExplicit::GeneralizedAlphaExplicit(const unsigned T, const doubl
     , AM((2. * R - 1) / (1. + R))
     , AF(AM - .5) {}
 
+bool GeneralizedAlphaExplicit::has_corrector() const { return true; }
+
 void GeneralizedAlphaExplicit::assemble_resistance() {
     const auto& D = get_domain();
     auto& W = D->get_factory();
@@ -47,6 +49,70 @@ vec GeneralizedAlphaExplicit::get_force_residual() { return ExplicitIntegrator::
 vec GeneralizedAlphaExplicit::get_displacement_residual() { return ExplicitIntegrator::get_displacement_residual() / (1. - AM); }
 
 sp_mat GeneralizedAlphaExplicit::get_reference_load() { return ExplicitIntegrator::get_reference_load() / (1. - AM); }
+
+int GeneralizedAlphaExplicit::process_load() {
+    const auto& D = get_domain();
+    auto& W = D->get_factory();
+
+    const sp_d auto current_time = W->get_current_time();
+    const sp_d auto trial_time = W->get_trial_time();
+
+    W->update_trial_time(AF * current_time + (1. - AF) * trial_time);
+
+    const auto code = ExplicitIntegrator::process_load();
+
+    W->update_trial_time(trial_time);
+
+    return code;
+}
+
+int GeneralizedAlphaExplicit::process_constraint() {
+    const auto& D = get_domain();
+    auto& W = D->get_factory();
+
+    const sp_d auto current_time = W->get_current_time();
+    const sp_d auto trial_time = W->get_trial_time();
+
+    W->update_trial_time(AF * current_time + (1. - AF) * trial_time);
+
+    const auto code = ExplicitIntegrator::process_constraint();
+
+    W->update_trial_time(trial_time);
+
+    return code;
+}
+
+int GeneralizedAlphaExplicit::process_load_resistance() {
+    const auto& D = get_domain();
+    auto& W = D->get_factory();
+
+    const sp_d auto current_time = W->get_current_time();
+    const sp_d auto trial_time = W->get_trial_time();
+
+    W->update_trial_time(AF * current_time + (1. - AF) * trial_time);
+
+    const auto code = ExplicitIntegrator::process_load_resistance();
+
+    W->update_trial_time(trial_time);
+
+    return code;
+}
+
+int GeneralizedAlphaExplicit::process_constraint_resistance() {
+    const auto& D = get_domain();
+    auto& W = D->get_factory();
+
+    const sp_d auto current_time = W->get_current_time();
+    const sp_d auto trial_time = W->get_trial_time();
+
+    W->update_trial_time(AF * current_time + (1. - AF) * trial_time);
+
+    const auto code = ExplicitIntegrator::process_constraint_resistance();
+
+    W->update_trial_time(trial_time);
+
+    return code;
+}
 
 int GeneralizedAlphaExplicit::update_trial_status() {
     const auto& D = get_domain();

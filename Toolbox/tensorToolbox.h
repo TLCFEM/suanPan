@@ -87,8 +87,7 @@ namespace tensor {
         double double_contraction(const vec&, const vec&);
         double double_contraction(vec&&, vec&&);
     } // namespace stress
-
-} // namespace tensor
+}     // namespace tensor
 
 namespace transform {
     double atan2(const vec&);
@@ -175,7 +174,6 @@ namespace transform {
     namespace triangle {
         vec to_area_coordinate(const vec&, const mat&);
     }
-
 } // namespace transform
 
 namespace suanpan {

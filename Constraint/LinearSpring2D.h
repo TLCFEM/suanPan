@@ -34,6 +34,7 @@
 class LinearSpring2D final : public ParticleCollision2D {
     [[nodiscard]] double compute_f(double) const override;
     [[nodiscard]] double compute_df(double) const override;
+
 public:
     using ParticleCollision2D::ParticleCollision2D;
 };
