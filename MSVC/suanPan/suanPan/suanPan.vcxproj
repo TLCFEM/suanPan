@@ -455,6 +455,7 @@
     <ClCompile Include="..\..\..\Solver\Integrator\BatheExplicit.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\BatheTwoStep.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\GeneralizedAlpha.cpp" />
+    <ClCompile Include="..\..\..\Solver\Integrator\GeneralizedAlphaExplicit.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\GSSSS.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\Integrator.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\LeeNewmark.cpp" />
@@ -897,6 +898,7 @@
     <ClInclude Include="..\..\..\Solver\Integrator\BatheExplicit.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\BatheTwoStep.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\GeneralizedAlpha.h" />
+    <ClInclude Include="..\..\..\Solver\Integrator\GeneralizedAlphaExplicit.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\GSSSS.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\Integrator.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\LeeNewmark.h" />
