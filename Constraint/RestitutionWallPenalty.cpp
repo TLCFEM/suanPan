@@ -64,7 +64,6 @@ int RestitutionWallPenalty::process(const shared_ptr<DomainBase>& D) {
     resistance.zeros(W->get_size());
     auto counter = 0llu;
     for(const auto& I : node_pool) {
-        if(dot(current_velocity_handler(I), outer_norm) > 0.) continue;
         const auto c_vel = current_velocity_handler(I);
         if(dot(c_vel, outer_norm) > 0.) continue;
         auto& t_dof = I->get_reordered_dof();
