@@ -21,17 +21,8 @@
 #include <Domain/MetaMat/MetaMat.hpp>
 #include <memory>
 
-// general matrix
-int eig_solve(cx_vec&, cx_mat&, const std::shared_ptr<MetaMat<double>>&, unsigned, const char* = "SM");
+int eig_solve(vec&, mat&, const std::shared_ptr<MetaMat<double>>&, const std::shared_ptr<MetaMat<double>>&, unsigned, const char* = "SM");
 
-// modal analysis
-int eig_solve(vec& eigval, mat& eigvec, const std::shared_ptr<MetaMat<double>>&, const std::shared_ptr<MetaMat<double>>&, unsigned, const char* = "SM");
-
-int eig_solve(cx_vec& eigval, cx_mat& eigvec, const std::shared_ptr<MetaMat<double>>&, const std::shared_ptr<MetaMat<double>>&, unsigned, const char* = "LM");
-
-// buckling analysis
-int eig_solve(vec& eigval, mat& eigvec, const std::shared_ptr<MetaMat<double>>&, const std::shared_ptr<MetaMat<double>>&);
-
-int eig_solve(cx_vec& eigval, cx_mat& eigvec, const std::shared_ptr<MetaMat<double>>&, const std::shared_ptr<MetaMat<double>>&);
+int eig_solve(cx_vec&, cx_mat&, const std::shared_ptr<MetaMat<double>>&, const std::shared_ptr<MetaMat<double>>&, unsigned, const char* = "LM");
 
 #endif

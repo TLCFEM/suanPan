@@ -1,11 +1,13 @@
 target_sources(${PROJECT_NAME} PRIVATE
         CatchTest.cpp
         TestColoring.cpp
+        TestEigen.cpp
         TestIntegration.cpp
         TestMatrix.cpp
         TestMode.cpp
         TestNURBS.cpp
         TestQuaternion.cpp
+        TestSampling.cpp
         TestShape.cpp
         TestSolver.cpp
         TestSorting.cpp
@@ -13,5 +15,4 @@ target_sources(${PROJECT_NAME} PRIVATE
         TestSurfaceNM.cpp
         TestTensor.cpp
         TestUtility.cpp
-        TestSampling.cpp
         )
