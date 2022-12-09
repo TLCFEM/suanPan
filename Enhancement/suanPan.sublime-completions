@@ -1802,7 +1802,7 @@
       "trigger":"import"
     },
     {
-      "contents":"integrator Tchamwa ${1:(1)} ${2:(2)}\n# (1) int, unique integrator tag\n# [2] double, spectral radius, default: 0.6",
+      "contents":"integrator Tchamwa ${1:(1)} ${2:(2)}\n# (1) int, unique integrator tag\n# [2] double, spectral radius, default: 0.5",
       "details":"",
       "kind":"type",
       "trigger":"Tchamwa"
@@ -1814,19 +1814,19 @@
       "trigger":"BatheTwoStep"
     },
     {
-      "contents":"integrator BatheExplicit ${1:(1)} ${2:(2)}\n# (1) int, unique integrator tag\n# [2] double, spectral radius, default: 0.9",
+      "contents":"integrator BatheExplicit ${1:(1)} ${2:(2)}\n# (1) int, unique integrator tag\n# [2] double, spectral radius, default: 0.5",
       "details":"",
       "kind":"type",
       "trigger":"BatheExplicit"
     },
     {
-      "contents":"integrator GSSSSOptimal ${1:(1)} ${2:(2)}\n# (1) int, unique integrator tag\n# (2) double, spectral radius",
+      "contents":"integrator GSSSSOptimal ${1:(1)} ${2:[2]}\n# (1) int, unique integrator tag\n# [2] double, spectral radius, default: 0.5",
       "details":"Optimal scheme for GSSSS",
       "kind":"type",
       "trigger":"GSSSSOptimal"
     },
     {
-      "contents":"integrator OALTS ${1:(1)} ${2:(2)}\n# (1) int, unique integrator tag\n# (2) double, spectral radius",
+      "contents":"integrator OALTS ${1:(1)} ${2:[2]}\n# (1) int, unique integrator tag\n# [2] double, spectral radius, default: 0.5",
       "details":"OALTS doi:10.1002/nme.6188",
       "kind":"type",
       "trigger":"OALTS"
@@ -1850,7 +1850,7 @@
       "trigger":"GeneralisedAlpha"
     },
     {
-      "contents":"integrator GeneralisedAlphaExplicit ${1:(1)} ${2:[2]}\n# (1) int, unique tag\n# [2] double, spectral radius at infinite frequency, default: 0.9",
+      "contents":"integrator GeneralisedAlphaExplicit ${1:(1)} ${2:[2]}\n# (1) int, unique tag\n# [2] double, spectral radius at infinite frequency, default: 0.5",
       "details":"",
       "kind":"type",
       "trigger":"GeneralisedAlphaExplicit"

@@ -221,8 +221,8 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
         if(domain->insert(make_shared<GSSSSV0>(tag, std::move(pool)))) code = 1;
     }
     else if(is_equal(integrator_type, "GSSSSOptimal")) {
-        double radius;
-        if(!get_input(command, radius)) {
+        auto radius = .5;
+        if(!get_optional_input(command, radius)) {
             suanpan_error("create_new_integrator() needs a valid damping radius.\n");
             return SUANPAN_SUCCESS;
         }
@@ -230,8 +230,8 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
         if(domain->insert(make_shared<GSSSSOptimal>(tag, std::max(0., std::min(radius, 1.))))) code = 1;
     }
     else if(is_equal(integrator_type, "OALTS")) {
-        double radius;
-        if(!get_input(command, radius)) {
+        auto radius = .5;
+        if(!get_optional_input(command, radius)) {
             suanpan_error("create_new_integrator() needs a valid damping radius.\n");
             return SUANPAN_SUCCESS;
         }
@@ -256,7 +256,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
         if(domain->insert(make_shared<BatheTwoStep>(tag, radius, gamma))) code = 1;
     }
     else if(is_equal(integrator_type, "Tchamwa")) {
-        auto radius = .6;
+        auto radius = .5;
         if(!get_optional_input(command, radius)) {
             suanpan_error("create_new_integrator() needs a valid damping radius.\n");
             return SUANPAN_SUCCESS;
@@ -265,7 +265,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
         if(domain->insert(make_shared<Tchamwa>(tag, std::max(0., std::min(radius, 1.))))) code = 1;
     }
     else if(is_equal(integrator_type, "BatheExplicit")) {
-        auto radius = .9;
+        auto radius = .5;
         if(!get_optional_input(command, radius)) {
             suanpan_error("create_new_integrator() needs a valid damping radius.\n");
             return SUANPAN_SUCCESS;
@@ -274,7 +274,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
         if(domain->insert(make_shared<BatheExplicit>(tag, std::max(0., std::min(radius, 1.))))) code = 1;
     }
     else if(is_equal(integrator_type, "GeneralizedAlphaExplicit") || is_equal(integrator_type, "GeneralisedAlphaExplicit")) {
-        auto radius = .9;
+        auto radius = .5;
         if(!get_optional_input(command, radius)) {
             suanpan_error("create_new_integrator() needs a valid damping radius.\n");
             return SUANPAN_SUCCESS;
