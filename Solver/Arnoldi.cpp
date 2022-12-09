@@ -21,9 +21,10 @@
 #include <Solver/Integrator/Integrator.h>
 #include <Toolbox/arpack_wrapper.h>
 
-Arnoldi::Arnoldi(const unsigned T, const unsigned N)
+Arnoldi::Arnoldi(const unsigned T, const unsigned N, const char TP)
     : Solver(T)
-    , eigen_num(N) {}
+    , eigen_num(N)
+    , eigen_type(TP) {}
 
 int Arnoldi::initialize() {
     if(get_integrator() == nullptr) {
@@ -47,7 +48,7 @@ int Arnoldi::analyze() {
     // if(SUANPAN_SUCCESS != G->process_load()) return SUANPAN_FAIL;
     if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
 
-    return eig_solve(get_eigenvalue(W), get_eigenvector(W), W->get_stiffness(), W->get_mass(), eigen_num, "SM");
+    return eig_solve(get_eigenvalue(W), get_eigenvector(W), W->get_stiffness(), W->get_mass(), eigen_num, 'L' == eigen_type ? "LM" : "SM");
 }
 
 void Arnoldi::print() { suanpan_info("A solver using Arnoldi method.\n"); }

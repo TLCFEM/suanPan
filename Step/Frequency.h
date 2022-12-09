@@ -32,9 +32,10 @@
 
 class Frequency final : public Step {
     const unsigned eigen_number;
+    const char eigen_type;
 
 public:
-    explicit Frequency(unsigned = 0, unsigned = 4);
+    explicit Frequency(unsigned = 0, unsigned = 4, char = 'S');
 
     int initialize() override;
 

@@ -49,9 +49,13 @@ int eig_solve(cx_vec& eigval, cx_mat& eigvec, const std::shared_ptr<MetaMat<doub
             vec Y(WORKD.memptr() + IPNTR[1] - 1, N, false);
             Y = K * X;
         }
+        else if(0 != INFO) break;
     }
 
-    if(INFO != 0) return INFO;
+    if(0 != INFO) {
+        suanpan_error("arpack solver returns %d.\n", INFO);
+        return SUANPAN_FAIL;
+    }
 
     auto RVEC = 1;
     auto HOWMNY = 'A';
@@ -126,9 +130,13 @@ int eig_solve(vec& eigval, mat& eigvec, const std::shared_ptr<MetaMat<double>>& 
             const vec X(WORKD.memptr() + IPNTR[0] - 1, N, false);
             Y = K * X;
         }
+        else if(0 != INFO) break;
     }
 
-    if(0 != INFO) return INFO;
+    if(0 != INFO) {
+        suanpan_error("arpack solver returns %d.\n", INFO);
+        return SUANPAN_FAIL;
+    }
 
     suanpan_debug("Arnoldi iteration counter: %d.\n", IPARAM(2));
 
@@ -171,19 +179,13 @@ int eig_solve(cx_vec& eigval, cx_mat& eigvec, const std::shared_ptr<MetaMat<doub
 
     K += M;
 
-    auto first_solve = true;
-
     while(99 != IDO) {
         arma_fortran(arma_dnaupd)(&IDO, &BMAT, &N, WHICH, &NEV, &TOL, RESID.memptr(), &NCV, V.memptr(), &LDV, IPARAM.memptr(), IPNTR.memptr(), WORKD.memptr(), WORKL.memptr(), &LWORKL, &INFO);
         // ReSharper disable once CppEntityAssignedButNoRead
         if(vec Y(WORKD.memptr() + IPNTR[1] - 1, N, false); -1 == IDO) {
             vec X(WORKD.memptr() + IPNTR[0] - 1, N, false);
             X = M * X;
-            if(first_solve) {
-                Y = K->solve(X);
-                first_solve = false;
-            }
-            else Y = K->solve(X);
+            Y = K->solve(X);
         }
         else if(1 == IDO) {
             const vec X(WORKD.memptr() + IPNTR[2] - 1, N, false);
@@ -193,9 +195,13 @@ int eig_solve(cx_vec& eigval, cx_mat& eigvec, const std::shared_ptr<MetaMat<doub
             const vec X(WORKD.memptr() + IPNTR[0] - 1, N, false);
             Y = M * X;
         }
+        else if(0 != INFO) break;
     }
 
-    if(INFO != 0) return INFO;
+    if(0 != INFO) {
+        suanpan_error("arpack solver returns %d.\n", INFO);
+        return SUANPAN_FAIL;
+    }
 
     auto RVEC = 1;
     auto HOWMNY = 'A';
@@ -270,9 +276,13 @@ int eig_solve(vec& eigval, mat& eigvec, const std::shared_ptr<MetaMat<double>>& 
             const vec X(WORKD.memptr() + IPNTR[0] - 1, N, false);
             Y = K * X;
         }
+        else if(0 != INFO) break;
     }
 
-    if(0 != INFO) return INFO;
+    if(0 != INFO) {
+        suanpan_error("arpack solver returns %d.\n", INFO);
+        return SUANPAN_FAIL;
+    }
 
     suanpan_debug("Arnoldi iteration counter: %d.\n", IPARAM(2));
 
@@ -330,9 +340,13 @@ int eig_solve(cx_vec& eigval, cx_mat& eigvec, const std::shared_ptr<MetaMat<doub
             const vec X(WORKD.memptr() + IPNTR[0] - 1, N, false);
             Y = KG * X;
         }
+        else if(0 != INFO) break;
     }
 
-    if(INFO != 0) return INFO;
+    if(0 != INFO) {
+        suanpan_error("arpack solver returns %d.\n", INFO);
+        return SUANPAN_FAIL;
+    }
 
     auto RVEC = 1;
     auto HOWMNY = 'A';

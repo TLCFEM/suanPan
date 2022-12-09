@@ -40,7 +40,14 @@ int create_new_step(const shared_ptr<DomainBase>& domain, istringstream& command
             suanpan_error("create_new_step() reads a wrong number of eigenvalues.\n");
             return SUANPAN_SUCCESS;
         }
-        if(domain->insert(make_shared<Frequency>(tag, eigen_number))) domain->set_current_step_tag(tag);
+
+        char type = 's';
+        if(!get_optional_input(command, type)) {
+            suanpan_error("create_new_step() needs a correct eigenvalue type.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        if(domain->insert(make_shared<Frequency>(tag, eigen_number, suanpan::to_upper(type)))) domain->set_current_step_tag(tag);
         else suanpan_error("create_new_step() cannot create the new step.\n");
     }
     else if(is_equal(step_type, "Buckling") || is_equal(step_type, "Buckle")) {

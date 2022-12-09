@@ -21,9 +21,10 @@
 #include <Solver/Arnoldi.h>
 #include <Solver/Integrator/Integrator.h>
 
-Frequency::Frequency(const unsigned T, const unsigned N)
+Frequency::Frequency(const unsigned T, const unsigned N, const char TP)
     : Step(T, 0.)
-    , eigen_number(N) {}
+    , eigen_number(N)
+    , eigen_type(TP) {}
 
 int Frequency::initialize() {
     configure_storage_scheme();
@@ -37,7 +38,7 @@ int Frequency::initialize() {
     modifier->set_domain(t_domain);
 
     // solver
-    if(nullptr == solver) solver = make_shared<Arnoldi>(0, eigen_number);
+    if(nullptr == solver) solver = make_shared<Arnoldi>(0, eigen_number, eigen_type);
     solver->set_integrator(modifier);
 
     if(SUANPAN_SUCCESS != modifier->initialize()) return SUANPAN_FAIL;
