@@ -333,35 +333,26 @@ int create_new_solver(const shared_ptr<DomainBase>& domain, istringstream& comma
 
         if(domain->insert(make_shared<Ramm>(tag, arc_length, is_true(fixed_arc_length)))) code = 1;
     }
-    else if(is_equal(solver_type, "FEAST")) {
+    else if(is_equal(solver_type, "FEAST") || is_equal(solver_type, "QuadraticFEAST")) {
         unsigned eigen_number;
         if(!get_input(command, eigen_number)) {
             suanpan_error("create_new_solver() requires a valid number of frequencies.\n");
             return SUANPAN_SUCCESS;
         }
 
-        double radius;
-        if(!get_input(command, radius)) {
+        double centre;
+        if(!get_input(command, centre)) {
             suanpan_error("create_new_solver() requires a valid radius.\n");
             return SUANPAN_SUCCESS;
         }
 
-        if(domain->insert(make_shared<FEAST>(tag, eigen_number, radius, false))) code = 1;
-    }
-    else if(is_equal(solver_type, "QuadraticFEAST")) {
-        unsigned eigen_number;
-        if(!get_input(command, eigen_number)) {
-            suanpan_error("create_new_solver() requires a valid number of frequencies.\n");
-            return SUANPAN_SUCCESS;
-        }
-
-        double radius;
-        if(!get_input(command, radius)) {
+        auto radius = centre;
+        if(!get_optional_input(command, radius)) {
             suanpan_error("create_new_solver() requires a valid radius.\n");
             return SUANPAN_SUCCESS;
         }
 
-        if(domain->insert(make_shared<FEAST>(tag, eigen_number, radius, true))) code = 1;
+        if(domain->insert(make_shared<FEAST>(tag, eigen_number, centre, radius, is_equal(solver_type, "QuadraticFEAST")))) code = 1;
     }
     else if(is_equal(solver_type, "DisplacementControl") || is_equal(solver_type, "MPDC")) { if(domain->insert(make_shared<MPDC>(tag))) code = 1; }
     else suanpan_error("create_new_solver() cannot identify solver type.\n");

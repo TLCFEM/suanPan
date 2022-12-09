@@ -37,8 +37,8 @@ int FEAST::linear_solve(const shared_ptr<LongFactory>& W) const {
 
     std::vector output(4, 0);
     std::vector input(4, 0.);
-    input[1] = 0.;     // centre
-    input[2] = radius; // radius
+    input[1] = centre - radius; // centre
+    input[2] = centre + radius; // radius
 
     output[1] = static_cast<int>(eigen_num);
 
@@ -106,7 +106,7 @@ int FEAST::quadratic_solve(const shared_ptr<LongFactory>& W) const {
 
     std::vector output(4, 0);
     std::vector input(4, 0.);
-    input[0] = radius; // centre
+    input[0] = centre; // centre
     input[1] = 0.;     // centre
     input[2] = radius; // radius
 
@@ -187,10 +187,11 @@ int FEAST::quadratic_solve(const shared_ptr<LongFactory>& W) const {
     return SUANPAN_SUCCESS;
 }
 
-FEAST::FEAST(const unsigned T, const unsigned N, const double R, const bool Q)
+FEAST::FEAST(const unsigned T, const unsigned N, const double C, const double R, const bool Q)
     : Solver(T)
     , quadratic(Q)
     , eigen_num(N)
+    , centre(C)
     , radius(R) {}
 
 int FEAST::initialize() {
