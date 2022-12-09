@@ -1435,6 +1435,9 @@
     <ClCompile Include="..\..\..\Solver\Integrator\GeneralizedAlphaExplicit.cpp">
       <Filter>Solver\Integrator</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestEigen.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">

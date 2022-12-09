@@ -48,7 +48,11 @@ int Arnoldi::analyze() {
     // if(SUANPAN_SUCCESS != G->process_load()) return SUANPAN_FAIL;
     if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
 
-    return eig_solve(get_eigenvalue(W), get_eigenvector(W), W->get_stiffness(), W->get_mass(), eigen_num, 'L' == eigen_type ? "LM" : "SM");
+    const shared_ptr t_mass = W->get_mass()->make_copy();
+    const auto factor = 1E-12 * t_mass->max();
+    for(auto I = 0llu; I < t_mass->n_rows; ++I) t_mass->at(I, I) += factor;
+
+    return eig_solve(get_eigenvalue(W), get_eigenvector(W), W->get_stiffness(), t_mass, eigen_num, 'L' == eigen_type ? "LM" : "SM");
 }
 
 void Arnoldi::print() { suanpan_info("A solver using Arnoldi method.\n"); }
