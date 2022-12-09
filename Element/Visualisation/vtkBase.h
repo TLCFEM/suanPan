@@ -43,6 +43,7 @@ using arma::mat;
 
 class vtkBase {
 #ifdef SUANPAN_VTK
+
 protected:
     vtkSmartPointer<vtkCell> vtk_cell;
 

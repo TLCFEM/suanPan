@@ -51,6 +51,7 @@ protected:
     Col<double> (*trial_displacement_handler)(const shared_ptr<Node>&) = nullptr;
     Col<double> (*trial_velocity_handler)(const shared_ptr<Node>&) = nullptr;
     Col<double> (*trial_acceleration_handler)(const shared_ptr<Node>&) = nullptr;
+
 public:
     RigidWallPenalty(unsigned, unsigned, unsigned, vec&&, vec&&, double, unsigned);
     RigidWallPenalty(unsigned, unsigned, unsigned, vec&&, vec&&, vec&&, double, unsigned);

@@ -78,7 +78,7 @@ template<typename T> bool get_input(istringstream& I, Col<T>& O) {
     return code;
 }
 
-template<typename T, typename...U> bool get_input(istringstream& I, T& O, U&...R) { return static_cast<bool>(I >> O) ? get_input(I, R...) : false; }
+template<typename T, typename... U> bool get_input(istringstream& I, T& O, U&... R) { return static_cast<bool>(I >> O) ? get_input(I, R...) : false; }
 
 template<typename T> T get_input(istringstream& I) {
     T O;
@@ -100,7 +100,7 @@ template<typename T> bool get_optional_input(istringstream& I, Col<T>& O) {
     return code;
 }
 
-template<typename T, typename...U> bool get_optional_input(istringstream& I, T& O, U&...R) {
+template<typename T, typename... U> bool get_optional_input(istringstream& I, T& O, U&... R) {
     if(I.eof()) return true;
 
     return static_cast<bool>(I >> O) ? get_optional_input(I, R...) : false;

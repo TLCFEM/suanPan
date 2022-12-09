@@ -23,6 +23,7 @@
 class sync_ostream {
     std::unique_lock<std::mutex> print_lock;
     std::ostream* ostream;
+
 public:
     explicit sync_ostream(std::ostream&);
     sync_ostream(const sync_ostream&) = delete;

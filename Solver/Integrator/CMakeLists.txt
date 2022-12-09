@@ -2,6 +2,7 @@ set(Integrator
         Integrator/BatheExplicit.cpp
         Integrator/BatheTwoStep.cpp
         Integrator/GeneralizedAlpha.cpp
+        Integrator/GeneralizedAlphaExplicit.cpp
         Integrator/GSSSS.cpp
         Integrator/Integrator.cpp
         Integrator/LeeNewmark.cpp

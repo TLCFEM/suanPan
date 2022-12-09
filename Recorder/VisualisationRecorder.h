@@ -44,6 +44,7 @@ class VisualisationRecorder final : public Recorder {
 
     void (*function_handler)(const shared_ptr<DomainBase>&, vtkInfo) = nullptr;
 #endif
+
 public:
     VisualisationRecorder(unsigned,   // tag
                           OutputType, // recorder type

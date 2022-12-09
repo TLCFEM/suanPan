@@ -3,6 +3,7 @@
 #include "BatheExplicit.h"
 #include "BatheTwoStep.h"
 #include "GeneralizedAlpha.h"
+#include "GeneralizedAlphaExplicit.h"
 #include "GSSSS.h"
 #include "LeeNewmark.h"
 #include "LeeNewmarkBase.h"
