@@ -43,6 +43,8 @@ analyze
 # 1.0789e+00 -2.6537e-16 -1.8176e+00
 peek node 1 2
 
+peek integrator 1
+
 # save recorder 1
 
 exit

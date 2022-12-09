@@ -45,4 +45,6 @@ analyze
 # 1.4698e+00 1.7756e-17 9.2360e-01
 peek node 1 2
 
+peek integrator 1
+
 exit

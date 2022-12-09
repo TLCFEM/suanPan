@@ -273,7 +273,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
 
         if(domain->insert(make_shared<BatheExplicit>(tag, std::max(0., std::min(radius, 1.))))) code = 1;
     }
-    else if(is_equal(integrator_type, "GeneralizedAlphaExplicit")) {
+    else if(is_equal(integrator_type, "GeneralizedAlphaExplicit") || is_equal(integrator_type, "GeneralisedAlphaExplicit")) {
         auto radius = .9;
         if(!get_optional_input(command, radius)) {
             suanpan_error("create_new_integrator() needs a valid damping radius.\n");
