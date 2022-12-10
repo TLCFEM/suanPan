@@ -184,7 +184,7 @@ to `~/.local/share/applications`.
 
 Additional libraries used in **suanPan** are listed as follows.
 
-- [**ARPACK**](https://www.caam.rice.edu/software/ARPACK/) version 0.96
+- [**ARPACK**](https://github.com/opencollab/arpack-ng)
 - [**SPIKE**](http://www.spike-solver.org/) version 1.0
 - [**FEAST**](http://www.feast-solver.org/) version 4.0
 - [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 5.3.0 and [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 3.1
