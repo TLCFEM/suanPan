@@ -1133,6 +1133,52 @@ void new_dhakal(unique_ptr<Material>& return_obj, istringstream& command) {
     return_obj = make_unique<Dhakal>(tag, mat_tag, y_strain, parameter);
 }
 
+void new_sinh1d(unique_ptr<Material>& return_obj, istringstream& command) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("new_sinh1d() requires a valid tag.\n");
+        return;
+    }
+
+    double elastic_modulus;
+    if(!get_input(command, elastic_modulus)) {
+        suanpan_error("new_sinh1d() requires a valid elastic modulus.\n");
+        return;
+    }
+
+    auto density = 0.;
+    if(command.eof()) suanpan_debug("new_sinh1d() assumes zero density.\n");
+    else if(!get_input(command, density)) {
+        suanpan_error("new_sinh1d() requires a valid density.\n");
+        return;
+    }
+
+    return_obj = make_unique<Sinh1D>(tag, elastic_modulus, density);
+}
+
+void new_tanh1d(unique_ptr<Material>& return_obj, istringstream& command) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("new_tanh1d() requires a valid tag.\n");
+        return;
+    }
+
+    double elastic_modulus;
+    if(!get_input(command, elastic_modulus)) {
+        suanpan_error("new_tanh1d() requires a valid elastic modulus.\n");
+        return;
+    }
+
+    auto density = 0.;
+    if(command.eof()) suanpan_debug("new_tanh1d() assumes zero density.\n");
+    else if(!get_input(command, density)) {
+        suanpan_error("new_tanh1d() requires a valid density.\n");
+        return;
+    }
+
+    return_obj = make_unique<Tanh1D>(tag, elastic_modulus, density);
+}
+
 void new_elastic1d(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -3312,6 +3358,8 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "CoulombFriction")) new_coulombfriction(new_material, command);
     else if(is_equal(material_id, "Dhakal")) new_dhakal(new_material, command);
     else if(is_equal(material_id, "DafaliasManzari")) new_dafaliasmanzari(new_material, command);
+    else if(is_equal(material_id, "Sinh1D")) new_sinh1d(new_material, command);
+    else if(is_equal(material_id, "Tanh1D")) new_tanh1d(new_material, command);
     else if(is_equal(material_id, "Elastic1D")) new_elastic1d(new_material, command);
     else if(is_equal(material_id, "Elastic2D")) new_elastic2d(new_material, command);
     else if(is_equal(material_id, "Elastic3D")) new_isotropicelastic3d(new_material, command);

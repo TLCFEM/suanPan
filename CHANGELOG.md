@@ -13,6 +13,7 @@
 4. update `Armadillo` to version `11.4`
 5. add `Tchamwa` [#88](https://github.com/TLCFEM/suanPan/pull/88), `BatheExplicit` [#90](https://github.com/TLCFEM/suanPan/pull/90) and `GeneralisedAlphaExplicit` [#93](https://github.com/TLCFEM/suanPan/pull/93) explicit time integration methods
 6. add `OALTS` two-step implicit time integration method [#92](https://github.com/TLCFEM/suanPan/pull/92)
+7. add `Sinh1D` and `Tanh1D` nonlinear elastic 1D material
 
 ## version 2.6.1
 

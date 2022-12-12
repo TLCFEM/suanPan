@@ -10,6 +10,8 @@ set(M1D
         Material1D/Elastic/Elastic1D.cpp
         Material1D/Elastic/MultilinearElastic1D.cpp
         Material1D/Elastic/PolyElastic1D.cpp
+        Material1D/Elastic/Sinh1D.cpp
+        Material1D/Elastic/Tanh1D.cpp
         Material1D/Hysteresis/AFC.cpp
         Material1D/Hysteresis/BilinearOO.cpp
         Material1D/Hysteresis/BilinearPO.cpp

@@ -1438,6 +1438,12 @@
     <ClCompile Include="..\..\..\UnitTest\TestEigen.cpp">
       <Filter>UnitTest</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Elastic\Sinh1D.cpp">
+      <Filter>Material\Material1D\Elastic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Elastic\Tanh1D.cpp">
+      <Filter>Material\Material1D\Elastic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2742,6 +2748,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Solver\Integrator\GeneralizedAlphaExplicit.h">
       <Filter>Solver\Integrator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Elastic\Sinh1D.h">
+      <Filter>Material\Material1D\Elastic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Elastic\Tanh1D.h">
+      <Filter>Material\Material1D\Elastic</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
