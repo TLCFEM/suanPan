@@ -1970,6 +1970,18 @@
       "trigger":"Elastic1D"
     },
     {
+      "contents":"material Sinh1D ${1:(1)} ${2:(2)} ${3:[3]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# [3] double, density, default: 0.0",
+      "details":"Uniaxial Nonlinear Elastic Material Using Sinh",
+      "kind":"type",
+      "trigger":"Sinh1D"
+    },
+    {
+      "contents":"material Tanh1D ${1:(1)} ${2:(2)} ${3:[3]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# [3] double, density, default: 0.0",
+      "details":"Uniaxial Nonlinear Elastic Material Using Tanh",
+      "kind":"type",
+      "trigger":"Tanh1D"
+    },
+    {
       "contents":"material Flag01 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, yield stress, positive\n# (4) double, residual stress, can be either positive or negative\n# (5) double, hardening ratio",
       "details":"",
       "kind":"type",

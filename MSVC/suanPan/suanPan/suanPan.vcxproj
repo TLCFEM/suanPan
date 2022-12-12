@@ -295,6 +295,8 @@
     <ClCompile Include="..\..\..\Material\Material1D\Elastic\Elastic1D.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Elastic\MultilinearElastic1D.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Elastic\PolyElastic1D.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Elastic\Sinh1D.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Elastic\Tanh1D.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\AFC.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\BilinearOO.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\BilinearPO.cpp" />
@@ -738,6 +740,8 @@
     <ClInclude Include="..\..\..\Material\Material1D\Elastic\Elastic1D.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Elastic\MultilinearElastic1D.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Elastic\PolyElastic1D.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Elastic\Sinh1D.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Elastic\Tanh1D.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\AFC.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\BilinearOO.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\BilinearPO.h" />
