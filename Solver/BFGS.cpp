@@ -66,12 +66,14 @@ int BFGS::analyze() {
         // assemble resistance
         G->assemble_resistance();
 
-        if(0 == counter) {
+        if(0 == counter || (D->get_attribute(ModalAttribute::LinearSystem) && !G->matrix_is_assembled())) {
             // assemble stiffness for the first iteration
             G->assemble_matrix();
             // process loads and constraints
             if(SUANPAN_SUCCESS != G->process_load()) return SUANPAN_FAIL;
             if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
+            // indicate the global matrix has been assembled
+            G->set_matrix_assembled_switch(true);
             // solve the system and commit current displacement increment
             if(SUANPAN_SUCCESS != G->solve(samurai, residual = G->get_force_residual())) return SUANPAN_FAIL;
             // deal with mpc
