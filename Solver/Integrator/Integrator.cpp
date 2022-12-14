@@ -76,7 +76,7 @@ int Integrator::process_criterion() { return database.lock()->process_criterion(
 
 int Integrator::process_modifier() { return database.lock()->process_modifier(); }
 
-int Integrator::process_load_resistance() { return SUANPAN_SUCCESS; }
+int Integrator::process_load_resistance() { return database.lock()->process_load(false); }
 
 /**
  * This method is similar to process_constraint(), but it only updates the global residual vector.
