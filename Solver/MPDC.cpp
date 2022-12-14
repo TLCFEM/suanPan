@@ -37,12 +37,23 @@ int MPDC::analyze() {
         if(SUANPAN_SUCCESS != G->process_modifier()) return SUANPAN_FAIL;
         // assemble resistance
         G->assemble_resistance();
-        // assemble stiffness
-        G->assemble_matrix();
-        // process loads
-        if(SUANPAN_SUCCESS != G->process_load()) return SUANPAN_FAIL;
-        // process constraints
-        if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
+
+        if(D->get_attribute(ModalAttribute::LinearSystem) && G->matrix_is_assembled()) {
+            // some loads may have resistance
+            if(SUANPAN_SUCCESS != G->process_load_resistance()) return SUANPAN_FAIL;
+            // some constraints may have resistance
+            if(SUANPAN_SUCCESS != G->process_constraint_resistance()) return SUANPAN_FAIL;
+        }
+        else {
+            // assemble stiffness
+            G->assemble_matrix();
+            // process loads
+            if(SUANPAN_SUCCESS != G->process_load()) return SUANPAN_FAIL;
+            // process constraints
+            if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
+            // indicate the global matrix has been assembled
+            G->set_matrix_assembled_switch(true);
+        }
 
         // solve ninja
         if(SUANPAN_SUCCESS != G->solve(samurai, G->get_displacement_residual())) return SUANPAN_FAIL;

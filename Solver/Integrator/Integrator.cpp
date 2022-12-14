@@ -44,6 +44,10 @@ void Integrator::set_time_step_switch(const bool T) { time_step_switch = T; }
  */
 bool Integrator::allow_to_change_time_step() const { return time_step_switch; }
 
+void Integrator::set_matrix_assembled_switch(const bool T) { matrix_assembled_switch = T; }
+
+bool Integrator::matrix_is_assembled() const { return matrix_assembled_switch; }
+
 bool Integrator::has_corrector() const { return false; }
 
 int Integrator::process_load() { return database.lock()->process_load(true); }
@@ -286,7 +290,10 @@ void Integrator::stage_status() { database.lock()->stage_status(); }
 
 void Integrator::commit_status() { database.lock()->commit_status(); }
 
-void Integrator::clear_status() { database.lock()->clear_status(); }
+void Integrator::clear_status() {
+    matrix_assembled_switch = false;
+    database.lock()->clear_status();
+}
 
 void Integrator::reset_status() { database.lock()->reset_status(); }
 

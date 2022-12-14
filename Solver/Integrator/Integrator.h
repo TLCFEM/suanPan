@@ -50,6 +50,7 @@ enum class IntegratorType {
 
 class Integrator : public Tag {
     bool time_step_switch = true;
+    bool matrix_assembled_switch = false;
 
     weak_ptr<DomainBase> database;
 
@@ -71,6 +72,10 @@ public:
     // ! some multistep integrators may require fixed time step for some consecutive sub-steps
     void set_time_step_switch(bool);
     [[nodiscard]] bool allow_to_change_time_step() const;
+
+    // ! manually set switch after assembling global matrix
+    void set_matrix_assembled_switch(bool);
+    [[nodiscard]] bool matrix_is_assembled() const;
 
     [[nodiscard]] virtual bool has_corrector() const;
 
