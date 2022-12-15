@@ -27,12 +27,12 @@ Solver::Solver(const unsigned T)
 Solver::~Solver() { suanpan_debug("Solver %u dtor() called.\n", get_tag()); }
 
 int Solver::initialize() {
-    if(converger == nullptr) {
+    if(nullptr == converger) {
         suanpan_error("initialize() needs a valid converger.\n");
         return SUANPAN_FAIL;
     }
 
-    if(modifier == nullptr) {
+    if(nullptr == modifier) {
         suanpan_error("initialize() needs a valid integrator.\n");
         return SUANPAN_FAIL;
     }
@@ -51,7 +51,7 @@ const shared_ptr<Integrator>& Solver::get_integrator() const { return modifier; 
 bool Solver::constant_matrix() const {
     auto& G = get_integrator();
     const auto& D = G->get_domain();
-    const auto& S = D->get_current_step();
+    auto& S = D->get_current_step();
 
     // need to satisfy a number of conditions:
     // 1. fixed step size
