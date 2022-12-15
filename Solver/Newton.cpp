@@ -50,7 +50,7 @@ int Newton::analyze() {
         // assemble resistance
         G->assemble_resistance();
 
-        if((initial_stiffness && counter != 0) || (D->get_attribute(ModalAttribute::LinearSystem) && G->matrix_is_assembled())) {
+        if((initial_stiffness && counter != 0) || constant_matrix()) {
             // some loads may have resistance
             if(SUANPAN_SUCCESS != G->process_load_resistance()) return SUANPAN_FAIL;
             // some constraints may have resistance

@@ -78,6 +78,7 @@ public:
     [[nodiscard]] bool matrix_is_assembled() const;
 
     [[nodiscard]] virtual bool has_corrector() const;
+    [[nodiscard]] virtual bool time_independent_matrix() const;
 
     [[nodiscard]] virtual int process_load();
     [[nodiscard]] virtual int process_constraint();
@@ -150,6 +151,8 @@ public:
     using Integrator::Integrator;
 
     [[nodiscard]] constexpr IntegratorType type() const override { return IntegratorType::Implicit; }
+
+    [[nodiscard]] bool time_independent_matrix() const override;
 };
 
 class ExplicitIntegrator : public Integrator {
