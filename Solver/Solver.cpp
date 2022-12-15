@@ -19,8 +19,7 @@
 #include <Converger/Converger.h>
 #include <Solver/Integrator/Integrator.h>
 #include <Domain/DomainBase.h>
-
-#include "Step/Step.h"
+#include <Step/Step.h>
 
 Solver::Solver(const unsigned T)
     : Tag(T) { suanpan_debug("Solver %u ctor() called.\n", get_tag()); }
