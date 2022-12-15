@@ -38,7 +38,7 @@ int MPDC::analyze() {
         // assemble resistance
         G->assemble_resistance();
 
-        if(D->get_attribute(ModalAttribute::LinearSystem) && G->matrix_is_assembled()) {
+        if(constant_matrix()) {
             // some loads may have resistance
             if(SUANPAN_SUCCESS != G->process_load_resistance()) return SUANPAN_FAIL;
             // some constraints may have resistance

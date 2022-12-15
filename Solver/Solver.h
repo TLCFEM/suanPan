@@ -56,6 +56,8 @@ public:
 
     void set_integrator(const shared_ptr<Integrator>&);
     [[nodiscard]] const shared_ptr<Integrator>& get_integrator() const;
+
+    [[nodiscard]] bool constant_matrix() const;
 };
 
 #endif

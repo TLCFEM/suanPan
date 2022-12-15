@@ -50,6 +50,8 @@ bool Integrator::matrix_is_assembled() const { return matrix_assembled_switch; }
 
 bool Integrator::has_corrector() const { return false; }
 
+bool Integrator::time_independent_matrix() const { return true; }
+
 int Integrator::process_load() { return database.lock()->process_load(true); }
 
 /**
@@ -353,6 +355,8 @@ vec Integrator::from_incre_acceleration(const double magnitude, const uvec& enco
 vec Integrator::from_total_velocity(const double magnitude, const uvec& encoding) { return from_total_velocity(vec(encoding.n_elem, fill::value(magnitude)), encoding); }
 
 vec Integrator::from_total_acceleration(const double magnitude, const uvec& encoding) { return from_total_acceleration(vec(encoding.n_elem, fill::value(magnitude)), encoding); }
+
+bool ImplicitIntegrator::time_independent_matrix() const { return false; }
 
 const vec& ExplicitIntegrator::get_trial_displacement() const { return get_domain()->get_factory()->get_trial_acceleration(); }
 

@@ -66,7 +66,7 @@ int BFGS::analyze() {
         // assemble resistance
         G->assemble_resistance();
 
-        if(0 == counter || (D->get_attribute(ModalAttribute::LinearSystem) && !G->matrix_is_assembled())) {
+        if(0 == counter) {
             // assemble stiffness for the first iteration
             G->assemble_matrix();
             // process loads and constraints
