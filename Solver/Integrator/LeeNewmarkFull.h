@@ -85,12 +85,15 @@ private:
     void assemble_by_mode_three(uword&, double, double, double) const;
     void assemble_by_mode_four(uword&, double, double, int, int, int, int, double) const;
 
+    int erase_top_left_block() const;
+
 public:
     LeeNewmarkFull(unsigned, std::vector<Mode>&&, double, double, StiffnessType);
 
     int initialize() override;
 
     int process_constraint() override;
+    int process_constraint_resistance() override;
 
     void print() override;
 };

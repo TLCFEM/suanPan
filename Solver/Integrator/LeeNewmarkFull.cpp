@@ -317,6 +317,39 @@ void LeeNewmarkFull::assemble_by_mode_four(uword& current_pos, const double mass
     formulate_block(current_pos, {-m_coef_s, m_coef_s, m_coef_p / bgm, -bgm * m_coef_p}, {-s_coef_s, s_coef_s, s_coef_p / bgm, -bgm * s_coef_p}, {npr - 1, npl, npk, npm - 1});
 }
 
+int LeeNewmarkFull::erase_top_left_block() const {
+    auto& t_triplet = stiffness->triplet_mat;
+
+    uword *ptr_a, *ptr_b;
+
+    if(t_triplet.is_csc_sorted()) {
+        ptr_a = t_triplet.col_mem();
+        ptr_b = t_triplet.row_mem();
+    }
+    else if(t_triplet.is_csr_sorted()) {
+        ptr_a = t_triplet.row_mem();
+        ptr_b = t_triplet.col_mem();
+    }
+    else {
+        suanpan_error("the system is not sorted while entering iteration, please file a bug report.\n");
+        return SUANPAN_FAIL;
+    }
+
+    const auto& val = t_triplet.val_mem();
+
+    for(uword I = 0; I < t_triplet.n_elem; ++I) {
+        // quit if current column/row is beyond the original size of matrix
+        if(ptr_a[I] >= n_block) break;
+        // erase existing entries if fall in intact stiffness matrix
+        if(ptr_b[I] < n_block) val[I] = 0.;
+    }
+
+    // check in original nonzero entries in unrolled damping matrix
+    stiffness += rabbit;
+
+    return SUANPAN_SUCCESS;
+}
+
 LeeNewmarkFull::LeeNewmarkFull(const unsigned T, std::vector<Mode>&& M, const double A, const double B, const StiffnessType ST)
     : LeeNewmarkBase(T, A, B, ST)
     , damping_mode(std::forward<std::vector<Mode>>(M)) {
@@ -497,33 +530,7 @@ int LeeNewmarkFull::process_constraint() {
     else {
         // if not first iteration
         // erase the tangent stiffness entries
-
-        uword *ptr_a, *ptr_b;
-
-        if(t_triplet.is_csc_sorted()) {
-            ptr_a = t_triplet.col_mem();
-            ptr_b = t_triplet.row_mem();
-        }
-        else if(t_triplet.is_csr_sorted()) {
-            ptr_a = t_triplet.row_mem();
-            ptr_b = t_triplet.col_mem();
-        }
-        else {
-            suanpan_error("the system is not sorted while entering iteration, please file a bug report.\n");
-            return SUANPAN_FAIL;
-        }
-
-        const auto& val = t_triplet.val_mem();
-
-        for(uword I = 0; I < t_triplet.n_elem; ++I) {
-            // quit if current column/row is beyond the original size of matrix
-            if(ptr_a[I] >= n_block) break;
-            // erase existing entries if fall in intact stiffness matrix
-            if(ptr_b[I] < n_block) val[I] = 0.;
-        }
-
-        // check in original nonzero entries in unrolled damping matrix
-        stiffness += rabbit;
+        if(SUANPAN_SUCCESS != erase_top_left_block()) return SUANPAN_FAIL;
 
         update_residual();
 
@@ -531,6 +538,16 @@ int LeeNewmarkFull::process_constraint() {
     }
 
     return SUANPAN_SUCCESS;
+}
+
+int LeeNewmarkFull::process_constraint_resistance() {
+    if(SUANPAN_SUCCESS != erase_top_left_block()) return SUANPAN_FAIL;
+
+    update_residual();
+
+    stiffness += factory->get_stiffness()->triplet_mat;
+
+    return LeeNewmarkBase::process_constraint_resistance();
 }
 
 void LeeNewmarkFull::print() { suanpan_info("A Newmark solver using Lee's damping model with adjustable bandwidth using %s stiffness. doi: 10.1016/j.compstruc.2020.106423 and 10.1016/j.compstruc.2021.106663\n", stiffness_type == StiffnessType::TRIAL ? "tangent" : stiffness_type == StiffnessType::CURRENT ? "converged" : "initial"); }

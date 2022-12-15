@@ -170,6 +170,12 @@ int LeeNewmark::process_constraint() {
     return SUANPAN_SUCCESS;
 }
 
+int LeeNewmark::process_constraint_resistance() {
+    update_residual();
+
+    return LeeNewmarkBase::process_constraint_resistance();
+}
+
 void LeeNewmark::assemble_resistance() {
     const auto& D = get_domain();
     const auto& W = factory;
