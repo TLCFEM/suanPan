@@ -45,4 +45,6 @@ peek node 1 2
 
 # save recorder 1
 
+reset
+clear
 exit

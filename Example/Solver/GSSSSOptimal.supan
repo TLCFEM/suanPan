@@ -20,6 +20,7 @@ acceleration 2 1 .2 1 2
 step dynamic 1 1
 set ini_step_size .05
 set fixed_step_size 1
+set linear_system
 
 integrator GSSSSOptimal 1 .6
 
