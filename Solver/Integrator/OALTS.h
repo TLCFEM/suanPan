@@ -38,7 +38,7 @@ class OALTS final : public ImplicitIntegrator {
 
     double DT{0.}, P1{0.}, P2{0.}, P3{0.};
 
-    bool if_staring = true;
+    bool if_starting = true;
 
 public:
     OALTS(unsigned, double);

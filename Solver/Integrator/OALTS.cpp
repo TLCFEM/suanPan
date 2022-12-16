@@ -58,7 +58,7 @@ void OALTS::assemble_matrix() {
     fc.get();
     fd.get();
 
-    if(if_staring) [[unlikely]] W->get_stiffness() += W->get_geometry() + 4. / DT / DT * W->get_mass() + 2. / DT * W->get_damping();
+    if(if_starting) [[unlikely]] W->get_stiffness() += W->get_geometry() + 4. / DT / DT * W->get_mass() + 2. / DT * W->get_damping();
     else [[likely]] W->get_stiffness() += W->get_geometry() + P1 * P1 * W->get_mass() + P1 * W->get_damping();
 }
 
@@ -66,7 +66,7 @@ int OALTS::update_trial_status() {
     const auto& D = get_domain();
     auto& W = D->get_factory();
 
-    if(if_staring) [[unlikely]]
+    if(if_starting) [[unlikely]]
     {
         W->update_trial_velocity(2. / DT * (W->get_trial_displacement() - W->get_current_displacement()) - W->get_current_velocity());
         W->update_trial_acceleration(2. / DT * (W->get_trial_velocity() - W->get_current_velocity()) - W->get_current_acceleration());
@@ -93,7 +93,7 @@ void OALTS::update_parameter(const double NT) {
 void OALTS::commit_status() {
     auto& W = get_domain()->get_factory();
 
-    if_staring = false;
+    if_starting = false;
 
     W->commit_pre_displacement();
     W->commit_pre_velocity();
@@ -103,7 +103,7 @@ void OALTS::commit_status() {
 }
 
 void OALTS::clear_status() {
-    if_staring = true;
+    if_starting = true;
 
     ImplicitIntegrator::clear_status();
 }
@@ -123,7 +123,7 @@ vec OALTS::from_incre_acceleration(const vec& incre_acceleration, const uvec& en
 vec OALTS::from_total_velocity(const vec& total_velocity, const uvec& encoding) {
     auto& W = get_domain()->get_factory();
 
-    if(if_staring) return .5 * DT * (total_velocity + W->get_current_velocity()(encoding)) + W->get_current_displacement()(encoding);
+    if(if_starting) return .5 * DT * (total_velocity + W->get_current_velocity()(encoding)) + W->get_current_displacement()(encoding);
 
     return total_velocity / P1 - A1 * W->get_current_displacement()(encoding) - A2 * W->get_pre_displacement()(encoding) + B10 / P1 * W->get_current_velocity()(encoding) + B20 / P1 * W->get_pre_velocity()(encoding);
 }
@@ -131,7 +131,7 @@ vec OALTS::from_total_velocity(const vec& total_velocity, const uvec& encoding) 
 vec OALTS::from_total_acceleration(const vec& total_acceleration, const uvec& encoding) {
     auto& W = get_domain()->get_factory();
 
-    if(if_staring) return from_total_velocity(.5 * DT * (total_acceleration + W->get_current_acceleration()(encoding)) + W->get_current_velocity()(encoding), encoding);
+    if(if_starting) return from_total_velocity(.5 * DT * (total_acceleration + W->get_current_acceleration()(encoding)) + W->get_current_velocity()(encoding), encoding);
 
     return from_total_velocity(total_acceleration / P1 - A1 * W->get_current_velocity()(encoding) - A2 * W->get_pre_velocity()(encoding) + B10 / P1 * W->get_current_acceleration()(encoding) + B20 / P1 * W->get_pre_acceleration()(encoding), encoding);
 }
