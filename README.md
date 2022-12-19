@@ -125,6 +125,15 @@ Flatpak is also available if preferred.
 
 <a href='https://flathub.org/apps/details/io.github.tlcfem.suanPan'><img width='200' alt='Download on Flathub' src='https://flathub.org/assets/badges/flathub-badge-en.svg'/></a>
 
+```bash
+# add repo
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+# install
+flatpak install flathub io.github.tlcfem.suanPan
+# define alias
+echo "alias suanpan=\"flatpak run io.github.tlcfem.suanPan\"" >> ~/.bashrc
+```
+
 #### Installation Packages
 
 Alternatively, download the RPM (Fedora 35) or DEB (Ubuntu 22.04) package from the release page. The packages may not be
@@ -197,7 +206,7 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 11.7
 - [**Armadillo**](http://arma.sourceforge.net/) version 11.4
 - [**ensmallen**](https://ensmallen.org/) version 2.19.0
-- [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2022.2.0
+- [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2023.0.0
 - [**Catch2**](https://github.com/catchorg/Catch2) version 2.13.10
 - **thread_pool** abridged version of [`thread-pool`](https://github.com/bshoshany/thread-pool)
 
