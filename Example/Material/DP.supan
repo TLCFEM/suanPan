@@ -35,11 +35,11 @@ analyze
 
 # Node 5:
 # Coordinate:
-#    5.0000  -5.0000   5.0000
+# 5.0000 -5.0000 5.0000
 # Displacement:
-#         0        0  -0.2000
+# 0 0 -0.2000
 # Resistance:
-#   -3.9787e-13   6.2223e-13  -4.8162e+02
+# -3.9787e-13 6.2223e-13 -4.8162e+02
 peek node 5
 
 # save recorder 1

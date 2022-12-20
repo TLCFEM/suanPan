@@ -18,10 +18,9 @@
 #include "GeneralizedAlpha.h"
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Domain/Node.h>
 
 GeneralizedAlpha::GeneralizedAlpha(const unsigned T, const double R)
-    : Integrator(T)
+    : ImplicitIntegrator(T)
     , alpha_f(R / (R + 1.))
     , alpha_m((2. * R - 1.) / (R + 1.))
     , gamma(.5 - (R - 1.) / (R + 1.))
@@ -33,7 +32,7 @@ GeneralizedAlpha::GeneralizedAlpha(const unsigned T, const double R)
     , F9(-.5 / beta) {}
 
 GeneralizedAlpha::GeneralizedAlpha(const unsigned T, const double AF, const double AM)
-    : Integrator(T)
+    : ImplicitIntegrator(T)
     , alpha_f(std::min(.5, std::max(AF, .0)))
     , alpha_m(std::min(alpha_f, std::max(AM, -1.)))
     , gamma(.5 - alpha_m + alpha_f)
@@ -45,7 +44,7 @@ GeneralizedAlpha::GeneralizedAlpha(const unsigned T, const double AF, const doub
     , F9(-.5 / beta) { if(!suanpan::approx_equal(alpha_m, AM) || !suanpan::approx_equal(alpha_f, AF)) suanpan_error("GeneralizedAlpha() parameters are not acceptable hence automatically adjusted.\n"); }
 
 void GeneralizedAlpha::assemble_resistance() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
     auto& W = D->get_factory();
 
     auto fa = std::async([&] { D->assemble_resistance(); });
@@ -56,11 +55,11 @@ void GeneralizedAlpha::assemble_resistance() {
     fb.get();
     fc.get();
 
-    W->set_sushi(F1 * (W->get_current_resistance() + W->get_current_damping_force()) + F2 * (W->get_trial_resistance() + W->get_trial_damping_force()) + F3 * W->get_current_inertial_force() + F4 * W->get_trial_inertial_force());
+    W->set_sushi(W->get_current_resistance() + F2 * W->get_incre_resistance() + W->get_current_damping_force() + F2 * W->get_incre_damping_force() + W->get_current_inertial_force() + F4 * W->get_incre_inertial_force());
 }
 
 void GeneralizedAlpha::assemble_matrix() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
     auto& W = D->get_factory();
 
     auto fa = std::async([&] { D->assemble_trial_stiffness(); });
@@ -73,16 +72,17 @@ void GeneralizedAlpha::assemble_matrix() {
     fc.get();
     fd.get();
 
-    auto& t_stiffness = W->get_stiffness();
-
-    t_stiffness += W->get_geometry();
-
-    t_stiffness *= F2;
-    t_stiffness += F5 * W->get_mass() + F6 * W->get_damping();
+    W->get_stiffness() += W->get_geometry() + F5 / F2 * W->get_mass() + F6 / F2 * W->get_damping();
 }
 
+vec GeneralizedAlpha::get_force_residual() { return ImplicitIntegrator::get_force_residual() / F2; }
+
+vec GeneralizedAlpha::get_displacement_residual() { return ImplicitIntegrator::get_displacement_residual() / F2; }
+
+sp_mat GeneralizedAlpha::get_reference_load() { return ImplicitIntegrator::get_reference_load() / F2; }
+
 int GeneralizedAlpha::process_load() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
     auto& W = D->get_factory();
 
     const sp_d auto current_time = W->get_current_time();
@@ -90,7 +90,7 @@ int GeneralizedAlpha::process_load() {
 
     W->update_trial_time(F1 * current_time + F2 * trial_time);
 
-    const auto code = Integrator::process_load();
+    const auto code = ImplicitIntegrator::process_load();
 
     W->update_trial_time(trial_time);
 
@@ -98,7 +98,7 @@ int GeneralizedAlpha::process_load() {
 }
 
 int GeneralizedAlpha::process_constraint() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
     auto& W = D->get_factory();
 
     const sp_d auto current_time = W->get_current_time();
@@ -106,7 +106,7 @@ int GeneralizedAlpha::process_constraint() {
 
     W->update_trial_time(F1 * current_time + F2 * trial_time);
 
-    const auto code = Integrator::process_constraint();
+    const auto code = ImplicitIntegrator::process_constraint();
 
     W->update_trial_time(trial_time);
 
@@ -114,7 +114,7 @@ int GeneralizedAlpha::process_constraint() {
 }
 
 int GeneralizedAlpha::process_load_resistance() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
     auto& W = D->get_factory();
 
     const sp_d auto current_time = W->get_current_time();
@@ -122,7 +122,7 @@ int GeneralizedAlpha::process_load_resistance() {
 
     W->update_trial_time(F1 * current_time + F2 * trial_time);
 
-    const auto code = Integrator::process_load_resistance();
+    const auto code = ImplicitIntegrator::process_load_resistance();
 
     W->update_trial_time(trial_time);
 
@@ -130,7 +130,7 @@ int GeneralizedAlpha::process_load_resistance() {
 }
 
 int GeneralizedAlpha::process_constraint_resistance() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
     auto& W = D->get_factory();
 
     const sp_d auto current_time = W->get_current_time();
@@ -138,7 +138,7 @@ int GeneralizedAlpha::process_constraint_resistance() {
 
     W->update_trial_time(F1 * current_time + F2 * trial_time);
 
-    const auto code = Integrator::process_constraint_resistance();
+    const auto code = ImplicitIntegrator::process_constraint_resistance();
 
     W->update_trial_time(trial_time);
 
@@ -146,7 +146,7 @@ int GeneralizedAlpha::process_constraint_resistance() {
 }
 
 int GeneralizedAlpha::update_trial_status() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
     auto& W = D->get_factory();
 
     W->update_incre_acceleration(F7 * W->get_incre_displacement() + F8 * W->get_current_velocity() + F9 * W->get_current_acceleration());
@@ -166,31 +166,14 @@ void GeneralizedAlpha::update_parameter(const double NT) {
     F5 = F4 * F7;
 }
 
-/**
- * \brief update acceleration and velocity for zero displacement increment
- */
-void GeneralizedAlpha::update_compatibility() const {
-    const auto& D = get_domain().lock();
-    auto& W = D->get_factory();
-
-    W->update_incre_acceleration(F8 * W->get_current_velocity() + F9 * W->get_current_acceleration());
-    W->update_incre_velocity(F10 * W->get_current_acceleration() + F11 * W->get_incre_acceleration());
-
-    auto& trial_dsp = W->get_trial_displacement();
-    auto& trial_vel = W->get_trial_velocity();
-    auto& trial_acc = W->get_trial_acceleration();
-
-    suanpan::for_all(D->get_node_pool(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_status(trial_dsp, trial_vel, trial_acc); });
-}
-
 vec GeneralizedAlpha::from_incre_velocity(const vec& incre_velocity, const uvec& encoding) {
-    auto& W = get_domain().lock()->get_factory();
+    auto& W = get_domain()->get_factory();
 
     return incre_velocity / (F11 * F7) + F10 * W->get_current_velocity()(encoding) - (F10 + F11 * F9) / (F11 * F7) * W->get_current_acceleration()(encoding) + W->get_current_displacement()(encoding);
 }
 
 vec GeneralizedAlpha::from_incre_acceleration(const vec& incre_acceleration, const uvec& encoding) {
-    auto& W = get_domain().lock()->get_factory();
+    auto& W = get_domain()->get_factory();
 
     return incre_acceleration / F7 + F10 * W->get_current_velocity()(encoding) - F9 / F7 * W->get_current_acceleration()(encoding) + W->get_current_displacement()(encoding);
 }

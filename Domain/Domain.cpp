@@ -41,7 +41,8 @@
 
 Domain::Domain(const unsigned T)
     : DomainBase(T)
-    , factory(make_shared<Factory<double>>()) {}
+    , factory(make_shared<Factory<double>>())
+    , attribute(10, false) {}
 
 Domain::~Domain() { for(const auto& I : thread_pond) I->get(); }
 
@@ -712,6 +713,10 @@ bool Domain::is_updated() const { return updated.load(); }
 
 bool Domain::is_sparse() const { return factory->is_sparse(); }
 
+void Domain::set_attribute(const ModalAttribute A) { attribute[static_cast<size_t>(A)] = true; }
+
+bool Domain::get_attribute(const ModalAttribute A) { return attribute[static_cast<size_t>(A)]; }
+
 void Domain::set_color_model(const ColorMethod B) {
     color_model = B;
     color_map.clear();
@@ -1177,10 +1182,7 @@ void Domain::summary() const {
     suanpan_info("\t%llu loads, %llu constraints and %llu recorders.\n", get_load(), get_constraint(), get_recorder());
 }
 
-void Domain::erase_machine_error() const {
-    auto& t_ninja = get_ninja(factory);
-    suanpan::for_all(restrained_dofs, [&](const uword I) { t_ninja(I) = 0.; });
-}
+void Domain::erase_machine_error(vec& ninja) const { suanpan::for_all(restrained_dofs, [&](const uword I) { ninja(I) = 0.; }); }
 
 void Domain::update_load() {}
 

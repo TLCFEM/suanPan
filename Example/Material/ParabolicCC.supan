@@ -31,7 +31,7 @@ converger AbsIncreDisp 1 1E-13 10 1
 analyze
 
 # Resistance:
-#   -5.8435e+03   5.8435e+03  -7.7404e+03
+# -5.8435e+03 5.8435e+03 -7.7404e+03
 peek node 5 6 7 8
 
 peek element 1

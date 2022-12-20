@@ -32,7 +32,7 @@ converger RelIncreDisp 1 1E-10 10 1
 
 analyze
 
-#   0.0020   0.0075   0.0020
+# 0.0020 0.0075 0.0020
 peek node 4
 
 peek element 1

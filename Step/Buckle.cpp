@@ -66,7 +66,10 @@ int Buckle::analyze() {
 
     if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
 
-    if(eig_solve(get_eigenvalue(W), get_eigenvector(W), W->get_stiffness(), W->get_geometry()) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
+    const shared_ptr t_geometry = W->get_geometry()->make_copy();
+    t_geometry *= -1.;
+
+    if(eig_solve(get_eigenvalue(W), get_eigenvector(W), W->get_stiffness(), t_geometry, 1, "SM") != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 
     suanpan_info("\nbuckling load multiplier: %.8E.\n", W->get_eigenvalue().at(0));
 

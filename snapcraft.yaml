@@ -9,7 +9,7 @@ issues: https://github.com/TLCFEM/suanPan/issues
 license: GPL-3.0
 source-code: https://github.com/TLCFEM/suanPan
 summary: An Open Source, Parallel and Heterogeneous Finite Element Analysis Framework
-version: "2.6.1"
+version: "2.7"
 website: https://bit.ly/suanpan-doc
 description: |
   [**suanPan**](https://github.com/TLCFEM/suanPan) is a finite element method (FEM) simulation platform for applications
@@ -57,8 +57,8 @@ parts:
     override-build: |
       wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.2-linux.tar.gz
       tar xf VTK-9.2.2-linux.tar.gz
-      wget -q https://registrationcenter-download.intel.com/akdlm/irc_nas/18898/l_onemkl_p_2022.2.0.8748_offline.sh
-      sh ./l_onemkl_p_2022.2.0.8748_offline.sh -a --silent --eula accept
+      wget -q https://registrationcenter-download.intel.com/akdlm/irc_nas/19138/l_onemkl_p_2023.0.0.25398_offline.sh
+      sh ./l_onemkl_p_2023.0.0.25398_offline.sh -a --silent --eula accept
       craftctl default
     stage-packages:
       - libgfortran5

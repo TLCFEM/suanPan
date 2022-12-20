@@ -61,11 +61,11 @@ converger RelIncreDisp 1 1E-4 4 1
 analyze
 
 # Node 7:
-#    4.0223   0.8396
+# 4.0223 0.8396
 # Displacement:
-#    0.0168  -1.8050   0.1679
+# 0.0168 -1.8050 0.1679
 # Resistance:
-#   -1.4197e-10  -1.8196e+02  -2.2510e-11
+# -1.4197e-10 -1.8196e+02 -2.2510e-11
 peek node 7
 
 # save recorder 1

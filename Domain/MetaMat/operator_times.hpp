@@ -42,6 +42,11 @@ template<sp_d T> const shared_ptr<MetaMat<T>>& operator*=(const shared_ptr<MetaM
     return M;
 }
 
+template<sp_d T> const unique_ptr<MetaMat<T>>& operator*=(const unique_ptr<MetaMat<T>>& M, const T value) {
+    M->operator*=(value);
+    return M;
+}
+
 template<sp_d T> const shared_ptr<MetaMat<T>>& operator+=(const shared_ptr<MetaMat<T>>& M, const shared_ptr<MetaMat<T>>& A) {
     M->operator+=(A);
     return M;
@@ -151,66 +156,6 @@ template<sp_d T> Mat<T> operator*(const Mat<T>& A, const FullMat<T>& B) {
 
     return C;
 }
-
-template<char S, const char T, sp_d T1> Mat<T1> spmm(const SymmPackMat<T1>& A, const Mat<T1>& B) {
-    Mat<T1> C;
-
-    const auto SIDE = S;
-    const auto TRAN = T;
-    constexpr auto UPLO = 'U';
-
-    auto M = static_cast<int>(A.n_rows);
-
-    auto PT = 0;
-    if constexpr(SIDE == 'L') PT += 1;
-    if constexpr(TRAN == 'T') PT += 10;
-
-    int N, LDC;
-
-    switch(PT) {
-    case 0: // A*B
-        N = static_cast<int>(B.n_cols);
-        C.set_size(M, N);
-        LDC = M;
-        break;
-    case 1: // B*A
-        N = static_cast<int>(B.n_rows);
-        C.set_size(N, M);
-        LDC = N;
-        break;
-    case 10: // A*B**T
-        N = static_cast<int>(B.n_rows);
-        C.set_size(M, N);
-        LDC = M;
-        break;
-    case 11: // B**T*A
-        N = static_cast<int>(B.n_cols);
-        C.set_size(N, M);
-        LDC = N;
-        break;
-    default:
-        break;
-    }
-
-    T1 ALPHA = 1.;
-    const auto LDB = static_cast<int>(B.n_rows);
-    T1 BETA = 0.;
-
-    if(std::is_same_v<T1, float>) {
-        using E = float;
-        arma_fortran(arma_sspmm)(&SIDE, &UPLO, &TRAN, &M, &N, (E*)A.memptr(), (E*)&ALPHA, (E*)B.memptr(), &LDB, (E*)&BETA, (E*)C.memptr(), &LDC);
-    }
-    else if(std::is_same_v<T1, double>) {
-        using E = double;
-        arma_fortran(arma_dspmm)(&SIDE, &UPLO, &TRAN, &M, &N, (E*)A.memptr(), (E*)&ALPHA, (E*)B.memptr(), &LDB, (E*)&BETA, (E*)C.memptr(), &LDC);
-    }
-
-    return C;
-}
-
-template<sp_d T> Mat<T> operator*(const Mat<T>& A, const SymmPackMat<T>& B) { return spmm<'L', 'N'>(B, A); }
-
-template<sp_d T> Mat<T> operator*(const Op<Mat<T>, op_htrans>& A, const SymmPackMat<T>& B) { return spmm<'L', 'T'>(B, A.m); }
 
 template<sp_d T, sp_i IT> triplet_form<T, IT> operator*(const T value, const triplet_form<T, IT>& M) {
     auto N = M;

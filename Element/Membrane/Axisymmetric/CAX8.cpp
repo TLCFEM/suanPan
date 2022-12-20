@@ -138,9 +138,7 @@ int CAX8::reset_status() {
 
 vector<vec> CAX8::record(const OutputType T) {
     vector<vec> data;
-
     for(const auto& I : int_pt) for(const auto& J : I.m_material->record(T)) data.emplace_back(J);
-
     return data;
 }
 

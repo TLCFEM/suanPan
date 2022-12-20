@@ -187,7 +187,6 @@ mat PCPE4DC::compute_shape_function(const mat& coordinate, const unsigned order)
 
 vector<vec> PCPE4DC::record(const OutputType P) {
     vector<vec> output;
-    output.reserve(int_pt.size());
 
     if(P == OutputType::NMISES) {
         mat A(int_pt.size(), 4);

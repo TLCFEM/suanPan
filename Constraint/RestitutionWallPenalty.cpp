@@ -64,7 +64,6 @@ int RestitutionWallPenalty::process(const shared_ptr<DomainBase>& D) {
     resistance.zeros(W->get_size());
     auto counter = 0llu;
     for(const auto& I : node_pool) {
-        if(dot(current_velocity_handler(I), outer_norm) > 0.) continue;
         const auto c_vel = current_velocity_handler(I);
         if(dot(c_vel, outer_norm) > 0.) continue;
         auto& t_dof = I->get_reordered_dof();
@@ -85,7 +84,7 @@ int RestitutionWallPenalty::process(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-int RestitutionWallPenalty::stage(const shared_ptr<DomainBase>& D) {
+void RestitutionWallPenalty::stage(const shared_ptr<DomainBase>& D) {
     auto& W = D->get_factory();
 
     auto trial_acceleration = get_trial_acceleration(W);
@@ -97,8 +96,6 @@ int RestitutionWallPenalty::stage(const shared_ptr<DomainBase>& D) {
     }
 
     W->update_trial_acceleration(trial_acceleration);
-
-    return SUANPAN_SUCCESS;
 }
 
 void RestitutionWallPenalty::commit_status() { node_pool.clear(); }

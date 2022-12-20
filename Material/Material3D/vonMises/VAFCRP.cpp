@@ -17,7 +17,7 @@
 
 #include "VAFCRP.h"
 #include <Domain/DomainBase.h>
-#include <Domain/Factory.hpp>
+#include <Domain/FactoryHelper.hpp>
 #include <Recorder/OutputType.h>
 #include <Toolbox/tensorToolbox.h>
 
@@ -29,7 +29,7 @@ VAFCRP::VAFCRP(const unsigned T, const double E, const double V, const double Y,
     , Material3D(T, R) { access::rw(tolerance) = 1E-15; }
 
 int VAFCRP::initialize(const shared_ptr<DomainBase>& D) {
-    incre_time = &D->get_factory()->get_incre_time();
+    incre_time = &get_incre_time(D->get_factory());
 
     trial_stiffness = current_stiffness = initial_stiffness = tensor::isotropic_stiffness(elastic_modulus, poissons_ratio);
 
@@ -148,12 +148,9 @@ int VAFCRP::reset_status() {
 }
 
 vector<vec> VAFCRP::record(const OutputType P) {
-    vector<vec> data;
+    if(P == OutputType::PEEQ) return {vec{current_history(0)}};
 
-    if(P == OutputType::PEEQ) data.emplace_back(vec{current_history(0)});
-    else return Material3D::record(P);
-
-    return data;
+    return Material3D::record(P);
 }
 
 void VAFCRP::print() { suanpan_info("The VADCRP model.\n"); }

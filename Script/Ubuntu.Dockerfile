@@ -1,4 +1,4 @@
-FROM ubuntu:focal as build
+FROM ubuntu:jammy as build
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -14,9 +14,7 @@ RUN apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
 RUN echo "deb https://apt.repos.intel.com/oneapi all main" | tee /etc/apt/sources.list.d/oneAPI.list
 RUN rm GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
 
-RUN apt-get update -y && apt-get install -y gcc-10 g++-10 gfortran-10 cmake git intel-oneapi-mkl-devel libxt-dev freeglut3-dev libxcursor-dev file dpkg-dev
-
-RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 --slave /usr/bin/g++ g++ /usr/bin/g++-10 --slave /usr/bin/gfortran gfortran /usr/bin/gfortran-10 --slave /usr/bin/gcov gcov /usr/bin/gcov-10
+RUN apt-get update -y && apt-get install -y gcc g++ gfortran cmake git intel-oneapi-mkl-devel libxt-dev freeglut3-dev libxcursor-dev file dpkg-dev
 
 RUN mkdir vtk-build && cd vtk-build && \
     wget -q https://www.vtk.org/files/release/9.2/VTK-9.2.2.tar.gz && tar xf VTK-9.2.2.tar.gz && \
@@ -31,7 +29,7 @@ RUN cd suanPan/build && cp suanPan*.deb / && \
     cd suanPan-linux-mkl-vtk/bin && ./suanPan.sh -v && \
     cd / && ls -al && rm -r suanPan
 
-FROM ubuntu:focal as runtime
+FROM ubuntu:jammy as runtime
 
 COPY --from=build /suanPan*.deb /suanPan*.deb
 

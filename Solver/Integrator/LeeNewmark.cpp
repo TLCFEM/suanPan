@@ -98,10 +98,10 @@ int LeeNewmark::initialize() {
 }
 
 int LeeNewmark::process_constraint() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
 
     // process constraint for the first time to obtain proper stiffness
-    if(SUANPAN_SUCCESS != Integrator::process_constraint()) return SUANPAN_FAIL;
+    if(SUANPAN_SUCCESS != LeeNewmarkBase::process_constraint()) return SUANPAN_FAIL;
 
     // this stiffness contains geometry, mass and damping which are handled in Newmark::assemble_matrix()
     auto& t_stiff = get_stiffness(factory);
@@ -114,34 +114,7 @@ int LeeNewmark::process_constraint() {
 
         initialize_mass(D);
     }
-    else {
-        // if not first iteration
-        // erase the tangent stiffness entries
-
-        uword *ptr_a, *ptr_b;
-
-        if(t_triplet.is_csc_sorted()) {
-            ptr_a = t_triplet.col_mem();
-            ptr_b = t_triplet.row_mem();
-        }
-        else if(t_triplet.is_csr_sorted()) {
-            ptr_a = t_triplet.row_mem();
-            ptr_b = t_triplet.col_mem();
-        }
-        else {
-            suanpan_error("the system is not sorted while entering iteration, please file a bug report.\n");
-            return SUANPAN_FAIL;
-        }
-
-        const auto& val = t_triplet.val_mem();
-
-        for(uword I = 0; I < t_triplet.n_elem; ++I) {
-            // quit if current column/row is beyond the original size of matrix
-            if(ptr_a[I] >= n_block) break;
-            // erase existing entries if fall in intact stiffness matrix
-            if(ptr_b[I] < n_block) val[I] = 0.;
-        }
-    }
+    else if(SUANPAN_SUCCESS != erase_top_left_block()) return SUANPAN_FAIL;
 
     t_stiff += C1 * CM * current_mass;
 
@@ -156,7 +129,7 @@ int LeeNewmark::process_constraint() {
         // check in constant terms that does not change in the substep
         initialize_stiffness(D);
 
-        if(SUANPAN_SUCCESS != Integrator::process_constraint()) return SUANPAN_FAIL;
+        if(SUANPAN_SUCCESS != LeeNewmarkBase::process_constraint()) return SUANPAN_FAIL;
         t_stiff->csc_condense();
         current_stiffness.swap(t_stiff);
 
@@ -170,8 +143,14 @@ int LeeNewmark::process_constraint() {
     return SUANPAN_SUCCESS;
 }
 
+int LeeNewmark::process_constraint_resistance() {
+    update_residual();
+
+    return LeeNewmarkBase::process_constraint_resistance();
+}
+
 void LeeNewmark::assemble_resistance() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
     const auto& W = factory;
 
     D->assemble_resistance();

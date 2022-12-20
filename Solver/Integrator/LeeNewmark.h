@@ -61,6 +61,7 @@ public:
     int initialize() override;
 
     int process_constraint() override;
+    int process_constraint_resistance() override;
 
     void assemble_resistance() override;
 

@@ -33,18 +33,18 @@ analyze
 save recorder 1 2
 
 # Node 1:
-#         0        0        0
+# 0 0 0
 # Displacement:
-#    0.0071        0
+# 0.0071 0
 # Resistance:
-#    1.0000   0.2000
+# 1.0000 0.2000
 # 
 # Node 4:
-#         0   1.0000        0
+# 0 1.0000 0
 # Displacement:
-#    0.0071        0
+# 0.0071 0
 # Resistance:
-#    1.0000  -0.2000
+# 1.0000 -0.2000
 peek node 1 4
 
 peek element 4

@@ -70,6 +70,8 @@ int create_new_converger(const shared_ptr<DomainBase>& domain, istringstream& co
         else if(is_equal(converger_id, "RelResidual") && domain->insert(make_shared<RelResidual>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
         else if(is_equal(converger_id, "AbsIncreDisp") && domain->insert(make_shared<AbsIncreDisp>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
         else if(is_equal(converger_id, "RelIncreDisp") && domain->insert(make_shared<RelIncreDisp>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
+        else if(is_equal(converger_id, "AbsIncreAcc") && domain->insert(make_shared<AbsIncreAcc>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
+        else if(is_equal(converger_id, "RelIncreAcc") && domain->insert(make_shared<RelIncreAcc>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
         else if(is_equal(converger_id, "AbsDisp") && domain->insert(make_shared<AbsDisp>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
         else if(is_equal(converger_id, "RelDisp") && domain->insert(make_shared<RelDisp>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
         else if(is_equal(converger_id, "AbsError") && domain->insert(make_shared<AbsError>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;

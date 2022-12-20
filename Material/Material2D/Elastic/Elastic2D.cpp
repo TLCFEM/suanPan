@@ -95,10 +95,9 @@ void Elastic2D::print() {
 }
 
 vector<vec> Elastic2D::record(const OutputType P) {
-    vector<vec> output;
-    output.reserve(1);
+    const auto sigma_33 = elastic_modulus * poissons_ratio / (1. + poissons_ratio) / (1. - 2. * poissons_ratio) * (trial_strain(0) + trial_strain(1));
 
-    if(const auto sigma_33 = elastic_modulus * poissons_ratio / (1. + poissons_ratio) / (1. - 2. * poissons_ratio) * (trial_strain(0) + trial_strain(1)); P == OutputType::MISES) {
+    if(P == OutputType::MISES) {
         vec trial_mises(1);
         if(plane_type == PlaneType::S) trial_mises(0) = sqrt(current_stress(0) * current_stress(0) - current_stress(0) * current_stress(1) + current_stress(1) * current_stress(1) + 3. * current_stress(2) * current_stress(2));
         else if(plane_type == PlaneType::E) {
@@ -108,9 +107,10 @@ vector<vec> Elastic2D::record(const OutputType P) {
             const auto tmp_c = sigma_33 - sigma_mean;
             trial_mises(0) = sqrt(1.5 * (tmp_a * tmp_a + tmp_b * tmp_b + tmp_c * tmp_c + 2. * current_stress(2) * current_stress(2)));
         }
-        output.emplace_back(trial_mises);
+
+        return {trial_mises};
     }
-    else if(P == OutputType::S) {
+    if(P == OutputType::S) {
         vec trail_sigma(4);
 
         trail_sigma(0) = trial_stress(0);
@@ -118,10 +118,9 @@ vector<vec> Elastic2D::record(const OutputType P) {
         trail_sigma(3) = trial_stress(2);
         trail_sigma(2) = plane_type == PlaneType::S ? 0. : sigma_33;
 
-        output.emplace_back(trail_sigma);
+        return {trail_sigma};
     }
-    else if(P == OutputType::SP) output.emplace_back(transform::stress::principal(trial_stress));
-    else return Material2D::record(P);
+    if(P == OutputType::SP) return {transform::stress::principal(trial_stress)};
 
-    return output;
+    return Material2D::record(P);
 }

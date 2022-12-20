@@ -24,10 +24,11 @@ RelDisp::RelDisp(const unsigned T, const double E, const unsigned M, const bool 
 
 unique_ptr<Converger> RelDisp::get_copy() { return make_unique<RelDisp>(*this); }
 
-bool RelDisp::is_converged() {
-    const auto& t_factory = get_domain().lock()->get_factory();
+bool RelDisp::is_converged(unsigned) {
+    auto& W = get_domain().lock()->get_factory();
 
-    set_error(norm(t_factory->get_incre_displacement() / t_factory->get_trial_displacement()));
+    const auto rel_disp = norm(W->get_incre_displacement() + W->get_ninja()) / norm(W->get_trial_displacement());
+    set_error(std::isfinite(rel_disp) ? rel_disp : 1.);
     set_conv_flag(get_tolerance() > get_error());
 
     if(is_print()) suanpan_info("relative displacement error: %.5E.\n", get_error());

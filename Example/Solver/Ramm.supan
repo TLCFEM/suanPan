@@ -46,16 +46,17 @@ step arclength 1 11 2 -20
 
 criterion MinDisplacement 1 11 2 -5.5
 
-converger RelIncreDisp 1 1E-8 5 1
+converger RelIncreDisp 1 1E-10 4 1
 
 analyze
 
 # Node 11:
-#    2.0000   8.0000
+# Coordinate:
+# 2.0000 8.0000
 # Displacement:
-#    5.9350  -5.5107   0.6801
+# 5.9364 -5.5092 0.6794
 # Resistance:
-#    1.4495e-10  -1.0647e+01   3.9790e-13
+# -1.2223e-09 -1.0142e+01 1.8190e-12
 peek node 11
 
 # save recorder 1

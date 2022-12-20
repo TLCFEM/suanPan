@@ -5,7 +5,7 @@ node 2 1 0
 
 material Elastic1D 1 100
 
-element T2D2 1 1 2 1 1
+element T2D2 1 1 2 1 1 1 1 1
 element Mass 2 1 100 1 2
 element Mass 3 2 100 1 2
 
@@ -51,15 +51,16 @@ converger RelIncreDisp 2 1E-10 10 1
 analyze
 
 # Node 2:
-#    1.0000        0
+# Coordinate:
+# 1.0000 0
 # Displacement:
-#    0.1007        0
+# 0.0978 0
 # Resistance:
-#    10.0668         0
+# 8.5029 0
 # Velocity:
-#    0.0351        0
+# 0.0327 0
 # Acceleration:
-#   -0.1077        0
+# -0.0905 0
 peek node 2
 
 # save recorder 1 2 3

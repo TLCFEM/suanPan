@@ -39,13 +39,13 @@ class FEAST final : public Solver {
     const bool quadratic = false;
 
     const unsigned eigen_num;
-    const double radius;
+    const double centre, radius;
 
     [[nodiscard]] int linear_solve(const shared_ptr<LongFactory>&) const;
     [[nodiscard]] int quadratic_solve(const shared_ptr<LongFactory>&) const;
 
 public:
-    FEAST(unsigned, unsigned, double, bool);
+    FEAST(unsigned, unsigned, double, double, bool);
 
     int initialize() override;
 

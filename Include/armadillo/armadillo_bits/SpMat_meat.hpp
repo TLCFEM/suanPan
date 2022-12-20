@@ -1355,8 +1355,8 @@ SpMat<eT>::operator=(const SpSubview<eT>& X)
       const uword sv_col_start = X.aux_col1;
       const uword sv_col_end   = X.aux_col1 + X.n_cols - 1;
       
-      typename SpMat<eT>::const_col_iterator m_it     = X.m.begin_col(sv_col_start);
-      typename SpMat<eT>::const_col_iterator m_it_end = X.m.end_col(sv_col_end);
+      typename SpMat<eT>::const_col_iterator m_it     = X.m.begin_col_no_sync(sv_col_start);
+      typename SpMat<eT>::const_col_iterator m_it_end = X.m.end_col_no_sync(sv_col_end);
       
       uword count = 0;
       
@@ -3842,10 +3842,7 @@ SpMat<eT>::resize(const uword in_rows, const uword in_cols)
   {
   arma_extra_debug_sigprint();
   
-  if( (n_rows == in_rows) && (n_cols == in_cols) )
-    {
-    return;
-    }
+  if( (n_rows == in_rows) && (n_cols == in_cols) )  { return; }
   
   if( (n_elem == 0) || (n_nonzero == 0) )
     {
@@ -4561,13 +4558,11 @@ SpMat<eT>::reset_cache()
     }
   #elif (!defined(ARMA_DONT_USE_STD_MUTEX))
     {
-    cache_mutex.lock();
+    const std::lock_guard<std::mutex> lock(cache_mutex);
     
     cache.reset();
     
     sync_state = 0;
-    
-    cache_mutex.unlock();
     }
   #else
     {
@@ -5196,13 +5191,13 @@ SpMat<eT>::init(const SpMat<eT>& x)
   #elif (!defined(ARMA_DONT_USE_STD_MUTEX))
     if(x.sync_state == 1)
       {
-      x.cache_mutex.lock();
+      const std::lock_guard<std::mutex> lock(x.cache_mutex);
+      
       if(x.sync_state == 1)
         {
         (*this).init(x.cache);
         init_done = true;
         }
-      x.cache_mutex.unlock();
       }
   #else
     if(x.sync_state == 1)
@@ -5818,6 +5813,8 @@ SpMat<eT>::steal_mem(SpMat<eT>& x)
   
   if(layout_ok)
     {
+    arma_extra_debug_print("SpMat::steal_mem(): stealing memory");
+    
     x.sync_csc();
     
     steal_mem_simple(x);
@@ -5828,6 +5825,8 @@ SpMat<eT>::steal_mem(SpMat<eT>& x)
     }
   else
     {
+    arma_extra_debug_print("SpMat::steal_mem(): copying memory");
+    
     (*this).operator=(x);
     }
   }
@@ -6800,11 +6799,9 @@ SpMat<eT>::sync_cache() const
     {
     if(sync_state == 0)
       {
-      cache_mutex.lock();
+      const std::lock_guard<std::mutex> lock(cache_mutex);
       
       sync_cache_simple();
-      
-      cache_mutex.unlock();
       }
     }
   #else
@@ -6852,11 +6849,9 @@ SpMat<eT>::sync_csc() const
   #elif (!defined(ARMA_DONT_USE_STD_MUTEX))
     if(sync_state == 1)
       {
-      cache_mutex.lock();
+      const std::lock_guard<std::mutex> lock(cache_mutex);
       
       sync_csc_simple();
-      
-      cache_mutex.unlock();
       }
   #else
     {

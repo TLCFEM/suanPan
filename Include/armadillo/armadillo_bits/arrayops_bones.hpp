@@ -29,10 +29,6 @@ class arrayops
   copy(eT* dest, const eT* src, const uword n_elem);
   
   template<typename eT>
-  arma_cold inline static void
-  copy_small(eT* dest, const eT* src, const uword n_elem);
-  
-  template<typename eT>
   inline static void
   fill_zeros(eT* dest, const uword n_elem);
   
@@ -143,11 +139,6 @@ class arrayops
   arma_hot inline static
   void
   inplace_set_base(eT* dest, const eT val, const uword n_elem);
-  
-  template<typename eT>
-  arma_cold inline static
-  void
-  inplace_set_small(eT* dest, const eT val, const uword n_elem);
   
   template<typename eT, const uword n_elem>
   arma_hot inline static

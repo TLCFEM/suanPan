@@ -41,7 +41,7 @@ int ArcLength::initialize() {
     modifier->set_domain(t_domain);
 
     // solver
-    if(nullptr != solver) if(const auto& t_solver = *solver; typeid(t_solver) != typeid(Ramm)) solver = nullptr;
+    if(nullptr != solver) if(!dynamic_cast<Ramm*>(solver.get())) solver = nullptr;
     if(nullptr == solver) solver = make_shared<Ramm>();
     solver->set_converger(tester);
     solver->set_integrator(modifier);

@@ -17,7 +17,7 @@
 
 #include "VAFCRP1D.h"
 #include <Domain/DomainBase.h>
-#include <Domain/Factory.hpp>
+#include <Domain/FactoryHelper.hpp>
 #include <Recorder/OutputType.h>
 
 constexpr double VAFCRP1D::unit_time = 1.;
@@ -27,7 +27,7 @@ VAFCRP1D::VAFCRP1D(const unsigned T, const double E, const double Y, const doubl
     , Material1D(T, R) { access::rw(tolerance) = 1E-15; }
 
 int VAFCRP1D::initialize(const shared_ptr<DomainBase>& D) {
-    incre_time = D == nullptr ? &unit_time : &D->get_factory()->get_incre_time();
+    incre_time = D == nullptr ? &unit_time : &get_incre_time(D->get_factory());
 
     trial_stiffness = current_stiffness = initial_stiffness = elastic_modulus;
 
@@ -133,12 +133,9 @@ int VAFCRP1D::reset_status() {
 }
 
 vector<vec> VAFCRP1D::record(const OutputType P) {
-    vector<vec> data;
+    if(P == OutputType::PEEQ) return {vec{current_history(size)}};
 
-    if(P == OutputType::PEEQ) data.emplace_back(vec{current_history(size)});
-    else return Material1D::record(P);
-
-    return data;
+    return Material1D::record(P);
 }
 
 void VAFCRP1D::print() {

@@ -45,11 +45,11 @@ converger RelIncreDisp 1 1E-12 50 1
 analyze
 
 # Node 7:
-#    2.0000   2.0000   2.0000
+# 2.0000 2.0000 2.0000
 # Displacement:
-#   -0.2317  -0.2317   1.0000
+# -0.2317 -0.2317 1.0000
 # Resistance:
-#    9.4141e-15   5.1640e-15  -4.6875e+01
+# 9.4141e-15 5.1640e-15 -4.6875e+01
 peek node 7
 
 peek element 1

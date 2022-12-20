@@ -32,11 +32,11 @@ converger RelIncreDisp 1 1E-14 50 1
 analyze
 
 # Node 5:
-#    5.0000  -5.0000   5.0000
+# 5.0000 -5.0000 5.0000
 # Displacement:
-#         0        0   0.0500
+# 0 0 0.0500
 # Resistance:
-#    1.4398e-04  -1.4398e-04   6.9317e+03
+# 1.4398e-04 -1.4398e-04 6.9317e+03
 peek node 5
 
 reset

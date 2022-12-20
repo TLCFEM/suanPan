@@ -61,6 +61,8 @@ protected:
     virtual void update_stiffness() const = 0;
     virtual void update_residual() const = 0;
 
+    int erase_top_left_block() const;
+
 public:
     explicit LeeNewmarkBase(unsigned, double, double, StiffnessType = StiffnessType::CURRENT);
 

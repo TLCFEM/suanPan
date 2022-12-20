@@ -11,8 +11,8 @@ element B21 1 1 2 1 6
 
 mass 2 2 10 1
 
-fix 1 2 1
-fix 2 3 1
+fix2 1 2 1
+fix2 2 3 1
 
 amplitude Tabular 1 EZ
 
@@ -20,7 +20,7 @@ supportvelocity 2 1 .2 1 1
 
 hdf5recorder 1 Node U1 1 2
 
-step dynamic 1 25
+step dynamic 1 1
 set ini_step_size 1E-2
 set fixed_step_size true
 
@@ -30,6 +30,17 @@ converger RelIncreDisp 1 1E-10 4 1
 
 analyze
 
+# Node 2:
+# Coordinate:
+# 0 1.0000
+# Displacement:
+# -3.0497e-01 2.9176e-18 6.1005e-01
+# Resistance:
+# -1.0254e+02 3.2517e-15 9.7347e+00
+# Velocity:
+# 1.0789e+00 -6.4215e-18 -1.8176e+00
+# Acceleration:
+# 1.5064e+01 5.2593e-16 -7.4586e+02
 peek node 1 2
 
 # save recorder 1

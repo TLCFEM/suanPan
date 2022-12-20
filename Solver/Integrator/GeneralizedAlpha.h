@@ -39,7 +39,7 @@
 
 #include "Integrator.h"
 
-class GeneralizedAlpha final : public Integrator {
+class GeneralizedAlpha final : public ImplicitIntegrator {
     const double alpha_f;
     const double alpha_m;
     const double gamma;
@@ -56,6 +56,10 @@ public:
     void assemble_resistance() override;
     void assemble_matrix() override;
 
+    vec get_force_residual() override;
+    vec get_displacement_residual() override;
+    sp_mat get_reference_load() override;
+
     [[nodiscard]] int process_load() override;
     [[nodiscard]] int process_constraint() override;
     [[nodiscard]] int process_load_resistance() override;
@@ -64,7 +68,6 @@ public:
     int update_trial_status() override;
 
     void update_parameter(double) override;
-    void update_compatibility() const override;
 
     vec from_incre_velocity(const vec&, const uvec&) override;
     vec from_incre_acceleration(const vec&, const uvec&) override;

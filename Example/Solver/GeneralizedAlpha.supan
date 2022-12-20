@@ -9,7 +9,7 @@ element EB21 1 1 2 10 1 1 0
 
 mass 2 2 10 1
 
-fix 1 P 1
+fix2 1 P 1
 
 modifier Rayleigh 3 .2 .002 .0 .0
 
@@ -17,9 +17,10 @@ amplitude Tabular 1 EZ
 
 acceleration 2 1 .2 1 2
 
-step dynamic 1 25
+step dynamic 1 1
 set ini_step_size .05
 set fixed_step_size 1
+set linear_system
 
 integrator GeneralizedAlpha 1 .6
 
@@ -28,15 +29,16 @@ converger RelIncreDisp 1 1E-4 4 1
 analyze
 
 # Node 2:
-#         0   1.0000
+# Coordinate:
+# 0 1.0000
 # Displacement:
-#    0.0145        0  -0.0217
+# 0.0321 0 -0.0481
 # Resistance:
-#    4.3722        0   0.0162
+# 9.7372 0 0.0619
 # Velocity:
-#   -0.0912        0   0.1365
+# 0.3776 0 -0.5775
 # Acceleration:
-#   -0.4329        0   0.6482
+# 0.6774 0 -1.9255
 peek node 2
 
 peek integrator 1

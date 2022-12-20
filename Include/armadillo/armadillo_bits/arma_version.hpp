@@ -22,9 +22,9 @@
 
 
 #define ARMA_VERSION_MAJOR 11
-#define ARMA_VERSION_MINOR 0
-#define ARMA_VERSION_PATCH 0
-#define ARMA_VERSION_NAME  "Creme Brulee"
+#define ARMA_VERSION_MINOR 4
+#define ARMA_VERSION_PATCH 2
+#define ARMA_VERSION_NAME  "Ship of Theseus"
 
 
 

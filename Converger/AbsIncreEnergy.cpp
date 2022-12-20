@@ -31,12 +31,10 @@ AbsIncreEnergy::AbsIncreEnergy(const unsigned T, const double E, const unsigned 
 
 unique_ptr<Converger> AbsIncreEnergy::get_copy() { return make_unique<AbsIncreEnergy>(*this); }
 
-bool AbsIncreEnergy::is_converged() {
-    const auto& D = get_domain().lock();
+bool AbsIncreEnergy::is_converged(unsigned) {
+    auto& W = get_domain().lock()->get_factory();
 
-    if(auto& W = D->get_factory(); W->get_reference_load().is_empty() || W->get_trial_load_factor().is_empty()) set_error(fabs(dot(W->get_ninja(), W->get_trial_load() - W->get_sushi())) / static_cast<double>(W->get_ninja().n_elem));
-    else set_error(fabs(dot(W->get_ninja(), W->get_reference_load() * W->get_trial_load_factor() + W->get_trial_load() - W->get_sushi())) / static_cast<double>(W->get_ninja().n_elem));
-
+    set_error(fabs(dot(W->get_ninja(), get_residual())) / static_cast<double>(W->get_size()));
     set_conv_flag(get_tolerance() > get_error());
 
     if(is_print()) suanpan_info("absolute energy increment error: %.5E.\n", get_error());

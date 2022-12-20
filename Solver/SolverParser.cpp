@@ -221,16 +221,67 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
         if(domain->insert(make_shared<GSSSSV0>(tag, std::move(pool)))) code = 1;
     }
     else if(is_equal(integrator_type, "GSSSSOptimal")) {
-        double radius = .5;
-
-        if(!get_input(command, radius)) {
+        auto radius = .5;
+        if(!get_optional_input(command, radius)) {
             suanpan_error("create_new_integrator() needs a valid damping radius.\n");
             return SUANPAN_SUCCESS;
         }
 
-        if(domain->insert(make_shared<GSSSSOptimal>(tag, radius))) code = 1;
+        if(domain->insert(make_shared<GSSSSOptimal>(tag, std::max(0., std::min(radius, 1.))))) code = 1;
     }
-    else if(is_equal(integrator_type, "BatheTwoStep") && domain->insert(make_shared<BatheTwoStep>(tag))) code = 1;
+    else if(is_equal(integrator_type, "OALTS")) {
+        auto radius = .5;
+        if(!get_optional_input(command, radius)) {
+            suanpan_error("create_new_integrator() needs a valid damping radius.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        if(domain->insert(make_shared<OALTS>(tag, std::max(0., std::min(radius, 1.))))) code = 1;
+    }
+    else if(is_equal(integrator_type, "BatheTwoStep")) {
+        auto radius = 0.;
+        if(!get_optional_input(command, radius)) {
+            suanpan_error("create_new_integrator() needs a valid damping radius.\n");
+            return SUANPAN_SUCCESS;
+        }
+        radius = std::max(0., std::min(radius, 1.));
+
+        auto gamma = .5;
+        if(!get_optional_input(command, gamma)) {
+            suanpan_error("create_new_integrator() needs a valid gamma.\n");
+            return SUANPAN_SUCCESS;
+        }
+        if(gamma <= 0. || gamma >= 1.) gamma = .5;
+
+        if(domain->insert(make_shared<BatheTwoStep>(tag, radius, gamma))) code = 1;
+    }
+    else if(is_equal(integrator_type, "Tchamwa")) {
+        auto radius = .5;
+        if(!get_optional_input(command, radius)) {
+            suanpan_error("create_new_integrator() needs a valid damping radius.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        if(domain->insert(make_shared<Tchamwa>(tag, std::max(0., std::min(radius, 1.))))) code = 1;
+    }
+    else if(is_equal(integrator_type, "BatheExplicit")) {
+        auto radius = .5;
+        if(!get_optional_input(command, radius)) {
+            suanpan_error("create_new_integrator() needs a valid damping radius.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        if(domain->insert(make_shared<BatheExplicit>(tag, std::max(0., std::min(radius, 1.))))) code = 1;
+    }
+    else if(is_equal(integrator_type, "GeneralizedAlphaExplicit") || is_equal(integrator_type, "GeneralisedAlphaExplicit")) {
+        auto radius = .5;
+        if(!get_optional_input(command, radius)) {
+            suanpan_error("create_new_integrator() needs a valid damping radius.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        if(domain->insert(make_shared<GeneralizedAlphaExplicit>(tag, std::max(0., std::min(radius, 1.))))) code = 1;
+    }
 
     if(1 == code) {
         if(0 != domain->get_current_step_tag()) domain->get_current_step()->set_integrator_tag(tag);
@@ -282,35 +333,26 @@ int create_new_solver(const shared_ptr<DomainBase>& domain, istringstream& comma
 
         if(domain->insert(make_shared<Ramm>(tag, arc_length, is_true(fixed_arc_length)))) code = 1;
     }
-    else if(is_equal(solver_type, "FEAST")) {
+    else if(is_equal(solver_type, "FEAST") || is_equal(solver_type, "QuadraticFEAST")) {
         unsigned eigen_number;
         if(!get_input(command, eigen_number)) {
             suanpan_error("create_new_solver() requires a valid number of frequencies.\n");
             return SUANPAN_SUCCESS;
         }
 
-        double radius;
-        if(!get_input(command, radius)) {
+        double centre;
+        if(!get_input(command, centre)) {
             suanpan_error("create_new_solver() requires a valid radius.\n");
             return SUANPAN_SUCCESS;
         }
 
-        if(domain->insert(make_shared<FEAST>(tag, eigen_number, radius, false))) code = 1;
-    }
-    else if(is_equal(solver_type, "QuadraticFEAST")) {
-        unsigned eigen_number;
-        if(!get_input(command, eigen_number)) {
-            suanpan_error("create_new_solver() requires a valid number of frequencies.\n");
-            return SUANPAN_SUCCESS;
-        }
-
-        double radius;
-        if(!get_input(command, radius)) {
+        auto radius = centre;
+        if(!get_optional_input(command, radius)) {
             suanpan_error("create_new_solver() requires a valid radius.\n");
             return SUANPAN_SUCCESS;
         }
 
-        if(domain->insert(make_shared<FEAST>(tag, eigen_number, radius, true))) code = 1;
+        if(domain->insert(make_shared<FEAST>(tag, eigen_number, centre, radius, is_equal(solver_type, "QuadraticFEAST")))) code = 1;
     }
     else if(is_equal(solver_type, "DisplacementControl") || is_equal(solver_type, "MPDC")) { if(domain->insert(make_shared<MPDC>(tag))) code = 1; }
     else suanpan_error("create_new_solver() cannot identify solver type.\n");

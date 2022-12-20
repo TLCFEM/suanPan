@@ -31,18 +31,16 @@ int BFGS::analyze() {
     const auto& D = C->get_domain().lock();
     auto& W = D->get_factory();
 
-    const auto max_iteration = C->get_max_iteration();
-
     suanpan_info("current analysis time: %.5f.\n", W->get_trial_time());
+
+    const auto max_iteration = C->get_max_iteration();
 
     // iteration counter
     unsigned counter = 0;
 
-    // ninja alias
-    auto& ninja = get_ninja(W);
     // lambda alias
     auto& aux_lambda = get_auxiliary_lambda(W);
-    vec residual;
+    vec samurai, residual;
 
     // clear container
     hist_ninja.clear();
@@ -55,12 +53,14 @@ int BFGS::analyze() {
         auto& border = W->get_auxiliary_stiffness();
         mat right;
         if(SUANPAN_SUCCESS != G->solve(right, border)) return SUANPAN_FAIL;
-        if(!solve(aux_lambda, border.t() * right.head_rows(n_size), border.t() * ninja.head_rows(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
-        ninja -= right * aux_lambda;
+        if(!solve(aux_lambda, border.t() * right.head_rows(n_size), border.t() * samurai.head(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
+        samurai -= right * aux_lambda;
         return SUANPAN_SUCCESS;
     };
 
     while(true) {
+        // update for nodes and elements
+        if(SUANPAN_SUCCESS != G->update_trial_status()) return SUANPAN_FAIL;
         // process modifiers
         if(SUANPAN_SUCCESS != G->process_modifier()) return SUANPAN_FAIL;
         // assemble resistance
@@ -72,8 +72,10 @@ int BFGS::analyze() {
             // process loads and constraints
             if(SUANPAN_SUCCESS != G->process_load()) return SUANPAN_FAIL;
             if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
+            // indicate the global matrix has been assembled
+            G->set_matrix_assembled_switch(true);
             // solve the system and commit current displacement increment
-            if(SUANPAN_SUCCESS != G->solve(ninja, residual = G->get_force_residual())) return SUANPAN_FAIL;
+            if(SUANPAN_SUCCESS != G->solve(samurai, residual = G->get_force_residual())) return SUANPAN_FAIL;
             // deal with mpc
             if(SUANPAN_SUCCESS != adjust_for_mpc()) return SUANPAN_FAIL;
         }
@@ -89,44 +91,48 @@ int BFGS::analyze() {
             // commit current factor after obtaining residual
             hist_factor.emplace_back(dot(hist_ninja.back(), hist_residual.back()));
             // copy current residual to ninja
-            ninja = residual;
+            samurai = residual;
             // perform two-step recursive loop
             // right side loop
             for(auto J = static_cast<int>(hist_factor.size()) - 1; J >= 0; --J) {
                 // compute and commit alpha
-                alpha.emplace_back(dot(hist_ninja[J], ninja) / hist_factor[J]);
+                alpha.emplace_back(dot(hist_ninja[J], samurai) / hist_factor[J]);
                 // update ninja
-                ninja -= alpha.back() * hist_residual[J];
+                samurai -= alpha.back() * hist_residual[J];
             }
             // apply the Hessian from the factorization in the first iteration
-            ninja = G->solve(ninja);
+            samurai = G->solve(samurai);
             // deal with mpc
             if(SUANPAN_SUCCESS != adjust_for_mpc()) return SUANPAN_FAIL;
             // left side loop
-            for(size_t I = 0, J = hist_factor.size() - 1; I < hist_factor.size(); ++I, --J) ninja += (alpha[J] - dot(hist_residual[I], ninja) / hist_factor[I]) * hist_ninja[I];
+            for(size_t I = 0, J = hist_factor.size() - 1; I < hist_factor.size(); ++I, --J) samurai += (alpha[J] - dot(hist_residual[I], samurai) / hist_factor[I]) * hist_ninja[I];
         }
 
         // commit current displacement increment
-        hist_ninja.emplace_back(ninja);       // complete
+        hist_ninja.emplace_back(samurai);     // complete
         hist_residual.emplace_back(residual); // part of residual increment
 
         // avoid machine error accumulation
-        G->erase_machine_error();
+        G->erase_machine_error(samurai);
+
+        // exit if converged
+        if(C->is_converged(counter)) return G->sync_status(true);
+        // exit if maximum iteration is hit
+        if(++counter > max_iteration) return SUANPAN_FAIL;
+
         // update internal variable
-        G->update_internal(ninja);
+        G->update_internal(samurai);
         // update trial status for factory
-        G->update_trial_displacement(ninja);
+        G->update_from_ninja();
         // for tracking
         G->update_load();
         // for tracking multiplier
         G->update_constraint();
-        // update for nodes and elements
-        if(SUANPAN_SUCCESS != G->update_trial_status()) return SUANPAN_FAIL;
 
-        // exit if converged
-        if(C->is_converged()) return SUANPAN_SUCCESS;
-        // exit if maximum iteration is hit
-        if(++counter > max_iteration) return SUANPAN_FAIL;
+        // fast handling for linear elastic case
+        // sync status using newly computed increment across elements and nodes
+        // this may just call predictor or call corrector
+        if(D->get_attribute(ModalAttribute::LinearSystem)) return G->sync_status(false);
 
         // check if the maximum record number is hit (L-BFGS)
         if(counter > max_hist) {

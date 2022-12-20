@@ -557,14 +557,11 @@ int CDPM2::reset_status() {
 }
 
 vector<vec> CDPM2::record(const OutputType T) {
-    vector<vec> data;
+    if(T == OutputType::KAPPAP) return {vec{current_history(0)}};
+    if(T == OutputType::DT) return {vec{current_history(16)}};
+    if(T == OutputType::DC) return {vec{current_history(17)}};
 
-    if(T == OutputType::KAPPAP) data.emplace_back(vec{current_history(0)});
-    else if(T == OutputType::DT) data.emplace_back(vec{current_history(16)});
-    else if(T == OutputType::DC) data.emplace_back(vec{current_history(17)});
-    else return Material3D::record(T);
-
-    return data;
+    return Material3D::record(T);
 }
 
 void CDPM2::print() { suanpan_info("A concrete damage plasticity model based on the CDPM2 model. doi: 10.1016/j.ijsolstr.2013.07.008\n"); }

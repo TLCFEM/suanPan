@@ -20,8 +20,8 @@
 extern fs::path SUANPAN_OUTPUT;
 
 #ifdef SUANPAN_HDF5
-#include <hdf5/hdf5.h>
-#include <hdf5/hdf5_hl.h>
+#include <hdf5.h>
+#include <hdf5_hl.h>
 #endif
 
 /**
@@ -58,6 +58,8 @@ bool Recorder::if_hdf5() const { return use_hdf5; }
 
 bool Recorder::if_record_time() const { return record_time; }
 
+bool Recorder::if_perform_record() { return 1 == interval || 0 == std::remainder(counter++, interval); }
+
 void Recorder::insert(const double T) { time_pool.emplace_back(T); }
 
 void Recorder::insert(const std::vector<vec>& D, const unsigned I) { data_pool[I].emplace_back(D); }
@@ -90,12 +92,12 @@ void Recorder::save() {
             auto max_size = 0llu;
             for(const auto& I : s_data_pool[0]) if(I.n_elem > max_size) max_size = I.n_elem;
 
-            mat data_to_write(s_data_pool.cbegin()->size() * max_size + 1, time_pool.size() + 1, fill::zeros);
+            mat data_to_write(s_data_pool.cbegin()->size() * max_size + 1, time_pool.size(), fill::zeros);
 
             for(size_t I = 0; I < time_pool.size(); ++I) {
-                data_to_write(0, I + 1) = time_pool[I];
+                data_to_write(0, I) = time_pool[I];
                 unsigned L = 1;
-                for(const auto& J : s_data_pool[I]) for(unsigned K = 0; K < J.n_elem; ++K) data_to_write(L++, I + 1) = J[K];
+                for(const auto& J : s_data_pool[I]) for(unsigned K = 0; K < J.n_elem; ++K) data_to_write(L++, I) = J[K];
             }
 
             hsize_t dimension[2] = {data_to_write.n_cols, data_to_write.n_rows};
@@ -115,12 +117,12 @@ void Recorder::save() {
             auto max_size = 0llu;
             for(const auto& I : s_data_pool[0]) if(I.n_elem > max_size) max_size = I.n_elem;
 
-            mat data_to_write(s_data_pool.cbegin()->size() * max_size + 1, time_pool.size() + 1, fill::zeros);
+            mat data_to_write(s_data_pool.cbegin()->size() * max_size + 1, time_pool.size(), fill::zeros);
 
             for(size_t I = 0; I < time_pool.size(); ++I) {
-                data_to_write(0, I + 1) = time_pool[I];
+                data_to_write(0, I) = time_pool[I];
                 unsigned L = 1;
-                for(const auto& J : s_data_pool[I]) for(unsigned K = 0; K < J.n_elem; ++K) data_to_write(L++, I + 1) = J[K];
+                for(const auto& J : s_data_pool[I]) for(unsigned K = 0; K < J.n_elem; ++K) data_to_write(L++, I) = J[K];
             }
 
             ostringstream dataset_name;
@@ -135,12 +137,12 @@ void Recorder::save() {
         auto max_size = 0llu;
         for(const auto& I : s_data_pool[0]) if(I.n_elem > max_size) max_size = I.n_elem;
 
-        mat data_to_write(s_data_pool.cbegin()->size() * max_size + 1, time_pool.size() + 1, fill::zeros);
+        mat data_to_write(s_data_pool.cbegin()->size() * max_size + 1, time_pool.size(), fill::zeros);
 
         for(size_t I = 0; I < time_pool.size(); ++I) {
-            data_to_write(0, I + 1) = time_pool[I];
+            data_to_write(0, I) = time_pool[I];
             auto L = 1;
-            for(const auto& J : s_data_pool[I]) for(unsigned K = 0; K < J.n_elem; ++K) data_to_write(L++, I + 1) = J[K];
+            for(const auto& J : s_data_pool[I]) for(unsigned K = 0; K < J.n_elem; ++K) data_to_write(L++, I) = J[K];
         }
 
         ostringstream dataset_name;

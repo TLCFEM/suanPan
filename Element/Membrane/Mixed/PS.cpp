@@ -158,10 +158,7 @@ mat PS::compute_shape_function(const mat& coordinate, const unsigned order) cons
 
 vector<vec> PS::record(const OutputType P) {
     vector<vec> output;
-    output.reserve(int_pt.size());
-
     for(const auto& I : int_pt) for(const auto& J : I.m_material->record(P)) output.emplace_back(J);
-
     return output;
 }
 

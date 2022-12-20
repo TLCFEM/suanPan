@@ -18,15 +18,14 @@
 #include "Newmark.h"
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Domain/Node.h>
 
 Newmark::Newmark(const unsigned T, const double A, const double B)
-    : Integrator(T)
+    : ImplicitIntegrator(T)
     , beta(A)
     , gamma(B) {}
 
 void Newmark::assemble_resistance() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
     auto& W = D->get_factory();
 
     auto fa = std::async([&] { D->assemble_resistance(); });
@@ -41,7 +40,7 @@ void Newmark::assemble_resistance() {
 }
 
 void Newmark::assemble_matrix() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
     auto& W = D->get_factory();
 
     auto fa = std::async([&] { D->assemble_trial_stiffness(); });
@@ -58,7 +57,7 @@ void Newmark::assemble_matrix() {
 }
 
 int Newmark::update_trial_status() {
-    const auto& D = get_domain().lock();
+    const auto& D = get_domain();
     auto& W = D->get_factory();
 
     W->update_incre_acceleration(C0 * W->get_incre_displacement() - C2 * W->get_current_velocity() - C4 * W->get_current_acceleration());
@@ -67,31 +66,14 @@ int Newmark::update_trial_status() {
     return D->update_trial_status();
 }
 
-/**
- * \brief update acceleration and velocity for zero displacement increment
- */
-void Newmark::update_compatibility() const {
-    const auto& D = get_domain().lock();
-    auto& W = D->get_factory();
-
-    W->update_incre_acceleration(-C2 * W->get_current_velocity() - C4 * W->get_current_acceleration());
-    W->update_incre_velocity(C5 * W->get_current_acceleration() + C3 * W->get_incre_acceleration());
-
-    auto& trial_dsp = W->get_trial_displacement();
-    auto& trial_vel = W->get_trial_velocity();
-    auto& trial_acc = W->get_trial_acceleration();
-
-    suanpan::for_all(D->get_node_pool(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_status(trial_dsp, trial_vel, trial_acc); });
-}
-
 vec Newmark::from_incre_velocity(const vec& incre_velocity, const uvec& encoding) {
-    auto& W = get_domain().lock()->get_factory();
+    auto& W = get_domain()->get_factory();
 
     return incre_velocity / C1 + C5 * W->get_current_velocity()(encoding) + (C3 * C4 - C5) / C1 * W->get_current_acceleration()(encoding) + W->get_current_displacement()(encoding);
 }
 
 vec Newmark::from_incre_acceleration(const vec& incre_acceleration, const uvec& encoding) {
-    auto& W = get_domain().lock()->get_factory();
+    auto& W = get_domain()->get_factory();
 
     return incre_acceleration / C0 + C5 * W->get_current_velocity()(encoding) + C4 / C0 * W->get_current_acceleration()(encoding) + W->get_current_displacement()(encoding);
 }

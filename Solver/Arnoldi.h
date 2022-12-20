@@ -32,10 +32,12 @@
 
 class Arnoldi final : public Solver {
     const unsigned eigen_num;
+    const char eigen_type;
 
 public:
     explicit Arnoldi(unsigned = 0, // unique solver tag
-                     unsigned = 1  // number of eigenvalues
+                     unsigned = 1, // number of eigenvalues
+                     char = 'S'    // type
     );
 
     int initialize() override;

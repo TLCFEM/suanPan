@@ -35,16 +35,16 @@
 
 #include "Integrator.h"
 
-class GSSSS : public Integrator {
+class GSSSS : public ImplicitIntegrator {
 protected:
     const double L1, L2, L4;
 
     double L3 = 0., L5 = 0.;
-    double W1 = 0., W1G1 = 0., W2G2 = 0., W3G3 = 0., W1G4 = 0., W2G5 = 0., W1G6 = 0.;
+    double W1 = 0., W3G3 = 0., W2G5 = 0., W1G6 = 0.;
 
     double DT = 0.;
 
-    double XPV2 = 0., XPV3 = 0., XPA2 = 0., XPA3 = 0., XCVD = 0., XCAD = 0.;
+    double C0{0.}, C1{0.}, C2{0.}, C3{0.}, C4{0.}, XD{0.}, XV{0.}, XA{0.};
 
     // ReSharper disable once CppMemberFunctionMayBeStatic
     template<typename T> void generate_constants(double, double, double) { throw invalid_argument("need a proper scheme"); }
@@ -55,6 +55,10 @@ public:
     void assemble_resistance() override;
     void assemble_matrix() override;
 
+    vec get_force_residual() override;
+    vec get_displacement_residual() override;
+    sp_mat get_reference_load() override;
+
     [[nodiscard]] int process_load() override;
     [[nodiscard]] int process_constraint() override;
     [[nodiscard]] int process_load_resistance() override;
@@ -62,10 +66,7 @@ public:
 
     int update_trial_status() override;
 
-    void stage_status() override;
-
     void update_parameter(double) override;
-    void update_compatibility() const override;
 
     vec from_incre_velocity(const vec&, const uvec&) override;
     vec from_incre_acceleration(const vec&, const uvec&) override;

@@ -54,6 +54,7 @@ public:
     void nullify(uword) override;
 
     const T& operator()(uword, uword) const override;
+    T& unsafe_at(uword, uword) override;
     T& at(uword, uword) override;
 
     Mat<T> operator*(const Mat<T>&) const override;
@@ -88,6 +89,11 @@ template<sp_d T> void BandMat<T>::nullify(const uword K) {
 template<sp_d T> const T& BandMat<T>::operator()(const uword in_row, const uword in_col) const {
     if(in_row > in_col + l_band || in_row + u_band < in_col) return bin = 0.;
     return this->memory[in_row + s_band + in_col * (m_rows - 1)];
+}
+
+template<sp_d T> T& BandMat<T>::unsafe_at(const uword in_row, const uword in_col) {
+    this->factored = false;
+    return access::rw(this->memory[in_row + s_band + in_col * (m_rows - 1)]);
 }
 
 template<sp_d T> T& BandMat<T>::at(const uword in_row, const uword in_col) {

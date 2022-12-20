@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "suanPan"
-#define MyAppVersion "2.6.1"
+#define MyAppVersion "2.7"
 #define MyAppPublisher "Theodore Chang"
 #define MyAppURL "https://github.com/TLCFEM/suanPan"
 #define MyAppExeName "suanPan.exe"
@@ -32,7 +32,7 @@ InfoAfterFile=.\POST.txt
 PrivilegesRequiredOverridesAllowed=dialog
 OutputDir={#StoragePath}\installer
 OutputBaseFilename=suanPan-win-mkl-vtk
-SetupIconFile=..\Resource\suanPan-Papirus.ico
+SetupIconFile=..\Resource\suanPan-3.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
@@ -58,7 +58,6 @@ Source: "{#StoragePath}tbbmalloc.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StoragePath}tbbmalloc_proxy.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StoragePath}updater.exe"; DestDir: "{app}"; Flags: ignoreversion; Tasks: updater
 Source: "{#StoragePath}msvcp140.dll"; DestDir: "{app}"; Flags: ignoreversion; Tasks: vcredist
-Source: "{#StoragePath}msvcp140_atomic_wait.dll"; DestDir: "{app}"; Flags: ignoreversion; Tasks: vcredist
 Source: "{#StoragePath}vcruntime140.dll"; DestDir: "{app}"; Flags: ignoreversion; Tasks: vcredist
 Source: "{#StoragePath}vcruntime140_1.dll"; DestDir: "{app}"; Flags: ignoreversion; Tasks: vcredist
 Source: ".\AddAssociation.bat"; DestDir: "{app}"; Flags: ignoreversion

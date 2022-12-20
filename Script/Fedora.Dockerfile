@@ -1,9 +1,9 @@
-FROM fedora:35 as build
+FROM fedora:37 as build
 
 RUN dnf upgrade --refresh -y && dnf install -y libglvnd-devel gcc g++ gfortran rpm-build rpm-devel rpmdevtools cmake wget git
 
-RUN wget -q https://registrationcenter-download.intel.com/akdlm/irc_nas/18898/l_onemkl_p_2022.2.0.8748_offline.sh
-RUN sh ./l_onemkl_p_2022.2.0.8748_offline.sh -a --silent --eula accept && rm ./l_onemkl_p_2022.2.0.8748_offline.sh
+RUN wget -q https://registrationcenter-download.intel.com/akdlm/irc_nas/19138/l_onemkl_p_2023.0.0.25398_offline.sh
+RUN sh ./l_onemkl_p_2023.0.0.25398_offline.sh -a --silent --eula accept && rm ./l_onemkl_p_2023.0.0.25398_offline.sh
 
 RUN mkdir vtk-build && cd vtk-build && \
     wget -q https://www.vtk.org/files/release/9.2/VTK-9.2.2.tar.gz && tar xf VTK-9.2.2.tar.gz && \
@@ -18,11 +18,10 @@ RUN cd suanPan/build && cp suanPan*.rpm / && \
     cd suanPan-linux-mkl-vtk/bin && ./suanPan.sh -v && \
     cd / && ls -al && rm -r suanPan
 
-FROM fedora:35 as runtime
+FROM fedora:37 as runtime
 
 COPY --from=build /suanPan*.rpm /suanPan*.rpm
 
 RUN dnf upgrade --refresh -y && dnf install ./suanPan*.rpm -y
 
 RUN suanPan -v
-

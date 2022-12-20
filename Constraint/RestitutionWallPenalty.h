@@ -38,6 +38,7 @@ class RestitutionWallPenalty : public RigidWallPenalty {
     suanpan::set<shared_ptr<Node>> node_pool;
 
     const double restitution_coefficient;
+
 public:
     RestitutionWallPenalty(unsigned, unsigned, unsigned, vec&&, vec&&, double, double, unsigned);
     RestitutionWallPenalty(unsigned, unsigned, unsigned, vec&&, vec&&, vec&&, double, double, unsigned);
@@ -46,7 +47,7 @@ public:
 
     int process(const shared_ptr<DomainBase>&) override;
 
-    int stage(const shared_ptr<DomainBase>&) override;
+    void stage(const shared_ptr<DomainBase>&) override;
 
     void commit_status() override;
     void clear_status() override;

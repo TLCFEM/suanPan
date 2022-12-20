@@ -10,7 +10,7 @@ material MPF 2 100 5 .1 20. 18.5 .15 .01 7. true
 element T2D2 1 1 2 1 10
 element T2D2 2 3 2 2 10
 
-fix 1 P 1 3
+fix2 1 P 1 3
 
 step static 1
 solver BFGS 1
@@ -24,11 +24,12 @@ converger RelIncreDisp 1 1E-8 50 1
 analyze
 
 # Node 2:
-#    4.0000        0
+# Coordinate:
+# 4.0000 0
 # Displacement:
-#    -3.5333   14.8500
+# -3.5333 14.8500
 # Resistance:
-#    1.3333e-06   1.0000e+02
+# -5.6843e-14 1.0000e+02
 peek node 2
 
 peek solver 1

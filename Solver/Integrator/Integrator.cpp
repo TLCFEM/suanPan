@@ -17,7 +17,7 @@
 
 #include "Integrator.h"
 #include <Domain/DomainBase.h>
-#include <Domain/Factory.hpp>
+#include <Domain/FactoryHelper.hpp>
 
 Integrator::Integrator(const unsigned T)
     : Tag(T) { suanpan_debug("Integrator %u ctor() called.\n", T); }
@@ -26,7 +26,7 @@ Integrator::~Integrator() { suanpan_debug("Integrator %u dtor() called.\n", get_
 
 void Integrator::set_domain(const weak_ptr<DomainBase>& D) { if(database.lock() != D.lock()) database = D; }
 
-const weak_ptr<DomainBase>& Integrator::get_domain() const { return database; }
+shared_ptr<DomainBase> Integrator::get_domain() const { return database.lock(); }
 
 int Integrator::initialize() {
     if(nullptr != database.lock()) return SUANPAN_SUCCESS;
@@ -44,6 +44,14 @@ void Integrator::set_time_step_switch(const bool T) { time_step_switch = T; }
  */
 bool Integrator::allow_to_change_time_step() const { return time_step_switch; }
 
+void Integrator::set_matrix_assembled_switch(const bool T) { matrix_assembled_switch = T; }
+
+bool Integrator::matrix_is_assembled() const { return matrix_assembled_switch; }
+
+bool Integrator::has_corrector() const { return false; }
+
+bool Integrator::time_independent_matrix() const { return true; }
+
 int Integrator::process_load() { return database.lock()->process_load(true); }
 
 /**
@@ -54,7 +62,7 @@ int Integrator::process_load() { return database.lock()->process_load(true); }
  */
 int Integrator::process_constraint() {
     const auto& D = database.lock();
-    const auto& W = D->get_factory();
+    auto& W = D->get_factory();
 
     const auto code = D->process_constraint(true);
 
@@ -70,7 +78,7 @@ int Integrator::process_criterion() { return database.lock()->process_criterion(
 
 int Integrator::process_modifier() { return database.lock()->process_modifier(); }
 
-int Integrator::process_load_resistance() { return SUANPAN_SUCCESS; }
+int Integrator::process_load_resistance() { return database.lock()->process_load(false); }
 
 /**
  * This method is similar to process_constraint(), but it only updates the global residual vector.
@@ -81,7 +89,7 @@ int Integrator::process_load_resistance() { return SUANPAN_SUCCESS; }
  */
 int Integrator::process_constraint_resistance() {
     const auto& D = database.lock();
-    const auto& W = D->get_factory();
+    auto& W = D->get_factory();
 
     const auto code = D->process_constraint(false);
 
@@ -94,7 +102,7 @@ void Integrator::record() const { database.lock()->record(); }
 
 void Integrator::assemble_resistance() {
     const auto& D = database.lock();
-    const auto& W = D->get_factory();
+    auto& W = D->get_factory();
     D->assemble_resistance();
     W->set_sushi(W->get_trial_resistance());
 }
@@ -116,7 +124,7 @@ void Integrator::assemble_matrix() {
  */
 vec Integrator::get_force_residual() {
     const auto& D = database.lock();
-    const auto& W = D->get_factory();
+    auto& W = D->get_factory();
 
     vec residual = W->get_trial_load() - W->get_sushi();
 
@@ -131,7 +139,7 @@ vec Integrator::get_force_residual() {
  */
 vec Integrator::get_displacement_residual() {
     const auto& D = database.lock();
-    const auto& W = D->get_factory();
+    auto& W = D->get_factory();
 
     vec residual = W->get_reference_load() * W->get_trial_load_factor() + W->get_trial_load() - W->get_sushi();
 
@@ -144,14 +152,14 @@ vec Integrator::get_displacement_residual() {
  * Assemble the global residual vector due to nonlinear constraints implemented via the multiplier method.
  */
 vec Integrator::get_auxiliary_residual() {
-    const auto& W = get_domain().lock()->get_factory();
+    auto& W = get_domain()->get_factory();
 
     return W->get_auxiliary_load() - W->get_auxiliary_resistance();
 }
 
 sp_mat Integrator::get_reference_load() { return database.lock()->get_factory()->get_reference_load(); }
 
-sp_mat Integrator::get_auxiliary_stiffness() { return database.lock()->get_factory()->get_auxiliary_stiffness(); }
+const vec& Integrator::get_trial_displacement() const { return database.lock()->get_factory()->get_trial_displacement(); }
 
 void Integrator::update_load() { database.lock()->update_load(); }
 
@@ -160,35 +168,75 @@ void Integrator::update_constraint() { database.lock()->update_constraint(); }
 void Integrator::update_trial_load_factor(const double lambda) { update_trial_load_factor(vec{lambda}); }
 
 void Integrator::update_trial_load_factor(const vec& lambda) {
-    const auto& W = get_domain().lock()->get_factory();
+    auto& W = get_domain()->get_factory();
     W->update_trial_load_factor_by(lambda);
 }
 
-void Integrator::update_trial_displacement(const vec& ninja) {
-    const auto& W = get_domain().lock()->get_factory();
-    W->update_trial_displacement_by(ninja);
+void Integrator::update_from_ninja() {
+    auto& W = get_domain()->get_factory();
+    W->update_trial_displacement_by(W->get_ninja());
 }
 
 void Integrator::update_trial_time(const double T) {
-    const auto& W = get_domain().lock()->get_factory();
+    auto& W = get_domain()->get_factory();
     W->update_trial_time(T);
     update_parameter(W->get_incre_time());
 }
 
 void Integrator::update_incre_time(const double T) {
-    const auto& W = get_domain().lock()->get_factory();
+    auto& W = get_domain()->get_factory();
     W->update_incre_time(T);
     update_parameter(W->get_incre_time());
 }
 
-int Integrator::update_trial_status() { return database.lock()->update_trial_status(); }
+int Integrator::update_trial_status() {
+    const auto& D = get_domain();
+    auto& W = D->get_factory();
 
-int Integrator::update_incre_status() { return database.lock()->update_incre_status(); }
+    return suanpan::approx_equal(norm(W->get_incre_displacement()), 0.) ? SUANPAN_SUCCESS : D->update_trial_status();
+}
+
+int Integrator::correct_trial_status() { return SUANPAN_SUCCESS; }
 
 /**
- * Must change ninja to the real displacement increment.
+ * When a new displacement increment is computed, it is added to global displacement vector.
+ * At this moment, nodal and elemental quantities are all computed from the previous displacement
+ * vector, directly committing the new results causes out-of-sync issue.
+ * Some algorithms use predictor-corrector type scheme, which means the converged quantities are
+ * different from the committed quantities.
+ * This method is in charge of syncing quantities between global and local quantities by updating
+ * nodal/elemental quantities using the committed quantities.
  */
-int Integrator::update_internal(const mat&) { return 0; }
+int Integrator::sync_status(const bool only_correct) {
+    auto handle_force = [&] {
+        // process modifiers
+        if(SUANPAN_SUCCESS != process_modifier()) return SUANPAN_FAIL;
+        // assemble resistance
+        assemble_resistance();
+        return SUANPAN_SUCCESS;
+    };
+
+    // only perform corrector if defined
+    if(only_correct) {
+        if(!has_corrector()) return SUANPAN_SUCCESS;
+
+        if(SUANPAN_SUCCESS != correct_trial_status()) return SUANPAN_FAIL;
+
+        return handle_force();
+    }
+
+    // perform corrector/predictor depending on the algorithm
+    if(SUANPAN_SUCCESS != (has_corrector() ? correct_trial_status() : update_trial_status())) return SUANPAN_FAIL;
+
+    return handle_force();
+}
+
+/**
+ * Some algorithms solve a system which differs from the original one.
+ * The size of the problem changes thus the computed increment contains additional internal
+ * quantities. This methods updates internal quantities stored in those integrators.
+ */
+int Integrator::update_internal(const mat&) { return SUANPAN_SUCCESS; }
 
 mat Integrator::solve(const mat& B) {
     mat X;
@@ -227,7 +275,13 @@ int Integrator::solve(mat& X, sp_mat&& B) { return database.lock()->get_factory(
  * The penalty method can apply homogeneous constraints approximately.
  * The corresponding DoF shall be set to zero after solving the system.
  */
-void Integrator::erase_machine_error() const { database.lock()->erase_machine_error(); }
+void Integrator::erase_machine_error(vec& ninja) const {
+    const auto& D = get_domain();
+    auto& W = D->get_factory();
+
+    D->erase_machine_error(ninja);
+    get_ninja(W) = ninja.head(W->get_size());
+}
 
 void Integrator::stage_and_commit_status() {
     stage_status();
@@ -236,36 +290,19 @@ void Integrator::stage_and_commit_status() {
 
 void Integrator::stage_status() { database.lock()->stage_status(); }
 
-void Integrator::commit_status() {
-    database.lock()->commit_status();
-    update_compatibility();
-}
+void Integrator::commit_status() { database.lock()->commit_status(); }
 
 void Integrator::clear_status() {
+    matrix_assembled_switch = false;
     database.lock()->clear_status();
-    update_compatibility();
 }
 
-void Integrator::reset_status() {
-    database.lock()->reset_status();
-    update_compatibility();
-}
+void Integrator::reset_status() { database.lock()->reset_status(); }
 
 /**
- * When tim step changes, some parameters may need to be updated.
+ * When time step changes, some parameters may need to be updated.
  */
 void Integrator::update_parameter(double) {}
-
-/**
- * Make sure that the trial displacement/velocity/acceleration are consistent with each other.
- * When starting a new trial state, the trial displacement is identical to the current displacement.
- * This essentially means that the displacement increment is zero.
- * To have such a trial state with the given time step, the trial velocity and acceleration shall be
- * updated to be compatible with the trial displacement.
- *
- * On exit, trial velocity and acceleration should be computed from current/trial displacement.
- */
-void Integrator::update_compatibility() const {}
 
 /**
  * When external loads are applied, they can be applied in forms of displacement/velocity/acceleration.
@@ -273,7 +310,7 @@ void Integrator::update_compatibility() const {}
  * That is, in AX=B, A is the effective stiffness matrix and X is the displacement increment.
  * Thus, loads in velocity/acceleration must be converted to displacement.
  * This cannot be done arbitrarily due to compatibility issues.
- * This method takes velocity increment and converts it to displacement increment.
+ * This method takes velocity increment and converts it to TOTAL displacement.
  */
 vec Integrator::from_incre_velocity(const vec&, const uvec& encoding) { return zeros(encoding.n_elem); }
 
@@ -283,12 +320,12 @@ vec Integrator::from_incre_velocity(const vec&, const uvec& encoding) { return z
  * That is, in AX=B, A is the effective stiffness matrix and X is the displacement increment.
  * Thus, loads in velocity/acceleration must be converted to displacement.
  * This cannot be done arbitrarily due to compatibility issues.
- * This method takes acceleration increment and converts it to displacement increment.
+ * This method takes acceleration increment and converts it to TOTAL displacement.
  */
 vec Integrator::from_incre_acceleration(const vec&, const uvec& encoding) { return zeros(encoding.n_elem); }
 
 vec Integrator::from_total_velocity(const vec& total_velocity, const uvec& encoding) {
-    const auto& W = get_domain().lock()->get_factory();
+    auto& W = get_domain()->get_factory();
 
     if(AnalysisType::DYNAMICS != W->get_analysis_type()) return zeros(encoding.n_elem);
 
@@ -296,7 +333,7 @@ vec Integrator::from_total_velocity(const vec& total_velocity, const uvec& encod
 }
 
 vec Integrator::from_total_acceleration(const vec& total_acceleration, const uvec& encoding) {
-    const auto& W = get_domain().lock()->get_factory();
+    auto& W = get_domain()->get_factory();
 
     if(AnalysisType::DYNAMICS != W->get_analysis_type()) return zeros(encoding.n_elem);
 
@@ -318,3 +355,26 @@ vec Integrator::from_incre_acceleration(const double magnitude, const uvec& enco
 vec Integrator::from_total_velocity(const double magnitude, const uvec& encoding) { return from_total_velocity(vec(encoding.n_elem, fill::value(magnitude)), encoding); }
 
 vec Integrator::from_total_acceleration(const double magnitude, const uvec& encoding) { return from_total_acceleration(vec(encoding.n_elem, fill::value(magnitude)), encoding); }
+
+bool ImplicitIntegrator::time_independent_matrix() const { return false; }
+
+const vec& ExplicitIntegrator::get_trial_displacement() const { return get_domain()->get_factory()->get_trial_acceleration(); }
+
+void ExplicitIntegrator::update_from_ninja() {
+    const auto& W = get_domain()->get_factory();
+    W->update_trial_acceleration_by(W->get_ninja());
+}
+
+int ExplicitIntegrator::solve(mat& X, const mat& B) { return get_domain()->get_factory()->get_mass()->solve(X, B); }
+
+int ExplicitIntegrator::solve(mat& X, const sp_mat& B) { return get_domain()->get_factory()->get_mass()->solve(X, B); }
+
+int ExplicitIntegrator::solve(mat& X, mat&& B) { return get_domain()->get_factory()->get_mass()->solve(X, std::forward<mat>(B)); }
+
+int ExplicitIntegrator::solve(mat& X, sp_mat&& B) { return get_domain()->get_factory()->get_mass()->solve(X, std::forward<sp_mat>(B)); }
+
+vec ExplicitIntegrator::from_incre_velocity(const vec&, const uvec&) { throw invalid_argument("support velocity cannot be used with explicit integrator"); }
+
+vec ExplicitIntegrator::from_incre_acceleration(const vec& incre_acceleration, const uvec& encoding) { return get_domain()->get_factory()->get_current_acceleration()(encoding) + incre_acceleration; }
+
+vec ExplicitIntegrator::from_total_acceleration(const vec& total_acceleration, const uvec&) { return total_acceleration; }

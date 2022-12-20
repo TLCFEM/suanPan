@@ -244,6 +244,7 @@
     "AbsDisp",
     "AbsError",
     "AbsIncreDisp",
+    "AbsIncreAcc",
     "AbsIncreEnergy",
     "AbsResidual",
     "ArcLength",
@@ -296,6 +297,8 @@
     "Decay",
     "Dhakal",
     "Dynamic",
+    "ImplicitDynamic",
+    "ExplicitDynamic",
     "EU2D",
     "EU3D",
     "Eigen",
@@ -556,6 +559,7 @@
     "RelDisp",
     "RelError",
     "RelIncreDisp",
+    "RelIncreAcc",
     "RelIncreEnergy",
     "RelResidual",
     "Rotation2D",
@@ -1798,16 +1802,34 @@
       "trigger":"import"
     },
     {
-      "contents":"integrator BatheTwoStep ${1:(1)}\n# (1) int, unique integrator tag",
+      "contents":"integrator Tchamwa ${1:(1)} ${2:(2)}\n# (1) int, unique integrator tag\n# [2] double, spectral radius, default: 0.5",
+      "details":"",
+      "kind":"type",
+      "trigger":"Tchamwa"
+    },
+    {
+      "contents":"integrator BatheTwoStep ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique integrator tag\n# [2] double, spectral radius, default: 0\n# [3] double, sub-step size, default: 0.5",
       "details":"",
       "kind":"type",
       "trigger":"BatheTwoStep"
     },
     {
-      "contents":"integrator GSSSSOptimal ${1:(1)} ${2:(2)}\n# (1) int, unique integrator tag\n# (2) double, spectral radius",
+      "contents":"integrator BatheExplicit ${1:(1)} ${2:(2)}\n# (1) int, unique integrator tag\n# [2] double, spectral radius, default: 0.5",
+      "details":"",
+      "kind":"type",
+      "trigger":"BatheExplicit"
+    },
+    {
+      "contents":"integrator GSSSSOptimal ${1:(1)} ${2:[2]}\n# (1) int, unique integrator tag\n# [2] double, spectral radius, default: 0.5",
       "details":"Optimal scheme for GSSSS",
       "kind":"type",
       "trigger":"GSSSSOptimal"
+    },
+    {
+      "contents":"integrator OALTS ${1:(1)} ${2:[2]}\n# (1) int, unique integrator tag\n# [2] double, spectral radius, default: 0.5",
+      "details":"OALTS doi:10.1002/nme.6188",
+      "kind":"type",
+      "trigger":"OALTS"
     },
     {
       "contents":"integrator GSSSSU0 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique integrator tag\n# (2-4) double, three spectral radii",
@@ -1826,6 +1848,12 @@
       "details":"",
       "kind":"type",
       "trigger":"GeneralisedAlpha"
+    },
+    {
+      "contents":"integrator GeneralisedAlphaExplicit ${1:(1)} ${2:[2]}\n# (1) int, unique tag\n# [2] double, spectral radius at infinite frequency, default: 0.5",
+      "details":"",
+      "kind":"type",
+      "trigger":"GeneralisedAlphaExplicit"
     },
     {
       "contents":"integrator GeneralisedAlpha ${1:(1)} ${2:[2]}\n# (1) int, unique tag\n# [2] double, spectral radius at infinite frequency, default: 0.5\n\nintegrator GeneralisedAlpha ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique tag\n# (2) double, \\alpha_f\n# (3) double, \\alpha_m",
@@ -1940,6 +1968,18 @@
       "details":"Uniaxial Elastic Material",
       "kind":"type",
       "trigger":"Elastic1D"
+    },
+    {
+      "contents":"material Sinh1D ${1:(1)} ${2:(2)} ${3:[3]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# [3] double, density, default: 0.0",
+      "details":"Uniaxial Nonlinear Elastic Material Using Sinh",
+      "kind":"type",
+      "trigger":"Sinh1D"
+    },
+    {
+      "contents":"material Tanh1D ${1:(1)} ${2:(2)} ${3:[3]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# [3] double, density, default: 0.0",
+      "details":"Uniaxial Nonlinear Elastic Material Using Tanh",
+      "kind":"type",
+      "trigger":"Tanh1D"
     },
     {
       "contents":"material Flag01 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, yield stress, positive\n# (4) double, residual stress, can be either positive or negative\n# (5) double, hardening ratio",

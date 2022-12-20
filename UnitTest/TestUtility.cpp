@@ -19,18 +19,18 @@ TEST_CASE("Sign", "[Utility.Sign]") {
 
 TEST_CASE("Matrix Allocation", "[Utility.Matrix]") {
     BENCHMARK("Static Size 20") {
-        mat::fixed<20, 20> A(fill::randn);
-        A(10, 10) = 1.;
-        REQUIRE(A.n_elem == 400);
-        return A;
-    };
+            mat::fixed<20, 20> A(fill::randn);
+            A(10, 10) = 1.;
+            REQUIRE(A.n_elem == 400);
+            return A;
+        };
 
     BENCHMARK("Dynamic Size 20") {
-        mat A(20, 20, fill::randn);
-        A(10, 10) = 1.;
-        REQUIRE(A.n_elem == 400);
-        return A;
-    };
+            mat A(20, 20, fill::randn);
+            A(10, 10) = 1.;
+            REQUIRE(A.n_elem == 400);
+            return A;
+        };
 }
 
 TEST_CASE("Sync Stream", "[Utility.Print]") {

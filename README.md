@@ -109,12 +109,32 @@ It is also possible to use [Scoop](https://scoop.sh/) to install the package.
 
 ### Linux
 
-Linux's users are recommended to obtain the binaries via snap. The snap supports visualization via VTK and uses Intel
-MKL for linear algebra.
+Linux's users are recommended to obtain the binaries via snap or flatpak.
+
+#### Snap
+
+The snap supports visualization via VTK and uses Intel MKL for linear algebra.
 
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/suanpan)
 
 [![asciicast](https://asciinema.org/a/491330.svg)](https://asciinema.org/a/491330)
+
+#### Flatpak
+
+Flatpak is also available if preferred.
+
+<a href='https://flathub.org/apps/details/io.github.tlcfem.suanPan'><img width='200' alt='Download on Flathub' src='https://flathub.org/assets/badges/flathub-badge-en.svg'/></a>
+
+```bash
+# add repo
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+# install
+flatpak install flathub io.github.tlcfem.suanPan
+# define alias
+echo "alias suanpan=\"flatpak run io.github.tlcfem.suanPan\"" >> ~/.bashrc
+```
+
+#### Installation Packages
 
 Alternatively, download the RPM (Fedora 35) or DEB (Ubuntu 22.04) package from the release page. The packages may not be
 compatible with older distributions (due to different version of `libstdc++`). It is also possible to compile the
@@ -173,7 +193,7 @@ to `~/.local/share/applications`.
 
 Additional libraries used in **suanPan** are listed as follows.
 
-- [**ARPACK**](https://www.caam.rice.edu/software/ARPACK/) version 0.96
+- [**ARPACK**](https://github.com/opencollab/arpack-ng)
 - [**SPIKE**](http://www.spike-solver.org/) version 1.0
 - [**FEAST**](http://www.feast-solver.org/) version 4.0
 - [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 5.3.0 and [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 3.1
@@ -184,10 +204,10 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**METIS**](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview) version 5.1.0
 - [**VTK**](https://vtk.org/) version 9.2.2
 - [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 11.7
-- [**Armadillo**](http://arma.sourceforge.net/) version 11.0
+- [**Armadillo**](http://arma.sourceforge.net/) version 11.4
 - [**ensmallen**](https://ensmallen.org/) version 2.19.0
-- [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2022.2.0
-- [**Catch2**](https://github.com/catchorg/Catch2) version 2.13.9
+- [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2023.0.0
+- [**Catch2**](https://github.com/catchorg/Catch2) version 2.13.10
 - **thread_pool** abridged version of [`thread-pool`](https://github.com/bshoshany/thread-pool)
 
 Those libraries may depend on other libraries such as [zlib](https://zlib.net/)

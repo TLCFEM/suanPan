@@ -185,7 +185,6 @@ mat CSMQ4::compute_shape_function(const mat& coordinate, const unsigned order) c
 
 vector<vec> CSMQ4::record(const OutputType P) {
     vector<vec> output;
-    output.reserve(int_pt.size());
 
     if(P == OutputType::NMISES) {
         mat A(int_pt.size(), 4);

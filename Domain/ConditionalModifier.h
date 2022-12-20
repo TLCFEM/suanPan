@@ -96,7 +96,7 @@ public:
      * predictor--corrector type algorithms. This method is called before committing trial status to perform
      * necessary operations.
      */
-    virtual int stage(const shared_ptr<DomainBase>&);
+    virtual void stage(const shared_ptr<DomainBase>&) {}
 
     [[nodiscard]] const uvec& get_node_encoding() const;
     [[nodiscard]] const uvec& get_dof_encoding() const;

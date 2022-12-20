@@ -19,6 +19,7 @@
 #include <Domain/DomainBase.h>
 #include <Step/Step>
 #include <Toolbox/utility.h>
+#include <Solver/Integrator/Integrator.h>
 
 int create_new_step(const shared_ptr<DomainBase>& domain, istringstream& command) {
     string step_type;
@@ -39,7 +40,14 @@ int create_new_step(const shared_ptr<DomainBase>& domain, istringstream& command
             suanpan_error("create_new_step() reads a wrong number of eigenvalues.\n");
             return SUANPAN_SUCCESS;
         }
-        if(domain->insert(make_shared<Frequency>(tag, eigen_number))) domain->set_current_step_tag(tag);
+
+        char type = 's';
+        if(!get_optional_input(command, type)) {
+            suanpan_error("create_new_step() needs a correct eigenvalue type.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        if(domain->insert(make_shared<Frequency>(tag, eigen_number, suanpan::to_upper(type)))) domain->set_current_step_tag(tag);
         else suanpan_error("create_new_step() cannot create the new step.\n");
     }
     else if(is_equal(step_type, "Buckling") || is_equal(step_type, "Buckle")) {
@@ -64,13 +72,22 @@ int create_new_step(const shared_ptr<DomainBase>& domain, istringstream& command
         if(domain->insert(make_shared<Static>(tag, time))) domain->set_current_step_tag(tag);
         else suanpan_error("create_new_step() cannot create the new step.\n");
     }
-    else if(is_equal(step_type, "Dynamic")) {
+    else if(is_equal(step_type, "Dynamic") || is_equal(step_type, "ImplicitDynamic")) {
         auto time = 1.;
         if(!command.eof() && !get_input(command, time)) {
             suanpan_error("create_new_step() reads a wrong time period.\n");
             return SUANPAN_SUCCESS;
         }
-        if(domain->insert(make_shared<Dynamic>(tag, time))) domain->set_current_step_tag(tag);
+        if(domain->insert(make_shared<Dynamic>(tag, time, IntegratorType::Implicit))) domain->set_current_step_tag(tag);
+        else suanpan_error("create_new_step() cannot create the new step.\n");
+    }
+    else if(is_equal(step_type, "ExplicitDynamic")) {
+        auto time = 1.;
+        if(!command.eof() && !get_input(command, time)) {
+            suanpan_error("create_new_step() reads a wrong time period.\n");
+            return SUANPAN_SUCCESS;
+        }
+        if(domain->insert(make_shared<Dynamic>(tag, time, IntegratorType::Explicit))) domain->set_current_step_tag(tag);
         else suanpan_error("create_new_step() cannot create the new step.\n");
     }
     else if(is_equal(step_type, "ArcLength")) {

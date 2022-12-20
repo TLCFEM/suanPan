@@ -24,13 +24,11 @@ RelIncreDisp::RelIncreDisp(const unsigned T, const double E, const unsigned M, c
 
 unique_ptr<Converger> RelIncreDisp::get_copy() { return make_unique<RelIncreDisp>(*this); }
 
-bool RelIncreDisp::is_converged() {
-    auto& t_factory = get_domain().lock()->get_factory();
+bool RelIncreDisp::is_converged(unsigned) {
+    auto& W = get_domain().lock()->get_factory();
 
-    const auto n_norm = norm(t_factory->get_ninja());
-    const auto d_norm = norm(t_factory->get_incre_displacement());
-    const auto rel_error = n_norm / d_norm;
-    set_error(std::isfinite(rel_error) ? rel_error : n_norm);
+    const auto rel_incre_disp = norm(W->get_ninja()) / norm(W->get_incre_displacement() + W->get_ninja());
+    set_error(std::isfinite(rel_incre_disp) ? rel_incre_disp : 1.);
     set_conv_flag(get_tolerance() > get_error());
 
     if(is_print()) suanpan_info("relative incremental displacement error: %.5E.\n", get_error());

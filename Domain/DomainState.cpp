@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+#include "Domain.h"
 #include <Constraint/Constraint.h>
 #include <Domain/Node.h>
 #include <Element/Element.h>
 #include <Load/Load.h>
-#include "Domain.h"
-#include "FactoryHelper.hpp"
+#include <Domain/FactoryHelper.hpp>
 
 void Domain::update_current_resistance() const {
     get_trial_resistance(factory).zeros();
@@ -74,6 +74,9 @@ void Domain::assemble_resistance() const {
         });
 
     suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_resistance(trial_resistance(t_node->get_reordered_dof())); });
+
+    // update to sync incre_resistance
+    factory->update_trial_resistance(trial_resistance);
 }
 
 void Domain::assemble_damping_force() const {
@@ -88,6 +91,9 @@ void Domain::assemble_damping_force() const {
         });
 
     suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_damping_force(trial_damping_force(t_node->get_reordered_dof())); });
+
+    // update to sync incre_damping_force
+    factory->update_trial_damping_force(trial_damping_force);
 }
 
 void Domain::assemble_inertial_force() const {
@@ -102,6 +108,9 @@ void Domain::assemble_inertial_force() const {
         });
 
     suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_inertial_force(trial_inertial_force(t_node->get_reordered_dof())); });
+
+    // update to sync incre_inertial_force
+    factory->update_trial_inertial_force(trial_inertial_force);
 }
 
 void Domain::assemble_initial_mass() const {
@@ -311,9 +320,8 @@ int Domain::update_trial_status() const {
     if(AnalysisType::DYNAMICS == factory->get_analysis_type()) suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_status(trial_displacement, trial_velocity, trial_acceleration); });
     else suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_status(trial_displacement); });
 
-    auto code = 0;
+    std::atomic_int code = 0;
     suanpan::for_all(element_pond.get(), [&](const shared_ptr<Element>& t_element) { code += t_element->update_status(); });
-
     return code;
 }
 
@@ -325,22 +333,19 @@ int Domain::update_incre_status() const {
     if(AnalysisType::DYNAMICS == factory->get_analysis_type()) suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_incre_status(incre_displacement, incre_velocity, incre_acceleration); });
     else suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_incre_status(incre_displacement); });
 
-    auto code = 0;
+    std::atomic_int code = 0;
     suanpan::for_all(element_pond.get(), [&](const shared_ptr<Element>& t_element) { code += t_element->update_status(); });
-
     return code;
 }
 
 int Domain::update_current_status() const {
-    const auto& analysis_type = factory->get_analysis_type();
+    const auto analysis_type = factory->get_analysis_type();
 
-    if(vec c_g_dsp(factory->get_size(), fill::zeros); analysis_type == AnalysisType::STATICS || analysis_type == AnalysisType::BUCKLE) {
-        for(const auto& I : node_pond.get()) c_g_dsp(I->get_reordered_dof()) = I->get_current_displacement();
-        factory->update_current_displacement(c_g_dsp);
+    if(analysis_type != AnalysisType::STATICS && analysis_type != AnalysisType::DYNAMICS && analysis_type != AnalysisType::BUCKLE) return SUANPAN_SUCCESS;
 
-        update_current_resistance();
-    }
-    else if(analysis_type == AnalysisType::DYNAMICS) {
+    // collect initial nodal quantities into global storage
+    if(analysis_type == AnalysisType::DYNAMICS) {
+        vec c_g_dsp(factory->get_size(), fill::zeros);
         vec c_g_vel(factory->get_size(), fill::zeros);
         vec c_g_acc(factory->get_size(), fill::zeros);
 
@@ -353,8 +358,33 @@ int Domain::update_current_status() const {
         factory->update_current_displacement(c_g_dsp);
         factory->update_current_velocity(c_g_vel);
         factory->update_current_acceleration(c_g_acc);
+    }
+    else {
+        vec c_g_dsp(factory->get_size(), fill::zeros);
 
-        update_current_resistance();
+        for(const auto& I : node_pond.get()) {
+            auto& t_dof = I->get_reordered_dof();
+            c_g_dsp(t_dof) = I->get_current_displacement();
+        }
+        factory->update_current_displacement(c_g_dsp);
+    }
+
+    std::atomic_int code = 0;
+    suanpan::for_all(element_pond.get(), [&](const shared_ptr<Element>& t_element) { code += t_element->update_status(); });
+
+    if(SUANPAN_SUCCESS != code) {
+        suanpan_error("initial conditions cause significant non-linearity, use an analysis step instead.\n");
+        return SUANPAN_FAIL;
+    }
+
+    // commit element status
+    suanpan::for_all(element_pond.get(), [](const shared_ptr<Element>& t_element) {
+        t_element->Element::commit_status();
+        t_element->commit_status();
+    });
+
+    update_current_resistance();
+    if(analysis_type == AnalysisType::DYNAMICS) {
         update_current_damping_force();
         update_current_inertial_force();
     }

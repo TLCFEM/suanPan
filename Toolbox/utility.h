@@ -18,14 +18,26 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 
-#include <suanPan.h>
 #include <concepts>
+#include <suanPan.h>
+#ifdef __cpp_lib_execution
+#include <execution>
+#endif
 
 template<sp_i IT, typename F> void suanpan_for(const IT start, const IT end, F&& FN) {
 #ifdef SUANPAN_MT
-    tbb::parallel_for(start, end, std::forward<F>(FN));
+    static tbb::affinity_partitioner ap;
+    tbb::parallel_for(start, end, std::forward<F>(FN), ap);
 #else
     for(IT I = start; I < end; ++I) FN(I);
+#endif
+}
+
+template<typename T> constexpr T suanpan_max_element(T start, T end) {
+#ifdef __cpp_lib_execution
+    return std::max_element(std::execution::par, start, end);
+#else
+    return std::max_element(start, end);
 #endif
 }
 
@@ -66,7 +78,7 @@ template<typename T> bool get_input(istringstream& I, Col<T>& O) {
     return code;
 }
 
-template<typename T, typename...U> bool get_input(istringstream& I, T& O, U&...R) { return static_cast<bool>(I >> O) ? get_input(I, R...) : false; }
+template<typename T, typename... U> bool get_input(istringstream& I, T& O, U&... R) { return static_cast<bool>(I >> O) ? get_input(I, R...) : false; }
 
 template<typename T> T get_input(istringstream& I) {
     T O;
@@ -88,7 +100,7 @@ template<typename T> bool get_optional_input(istringstream& I, Col<T>& O) {
     return code;
 }
 
-template<typename T, typename...U> bool get_optional_input(istringstream& I, T& O, U&...R) {
+template<typename T, typename... U> bool get_optional_input(istringstream& I, T& O, U&... R) {
     if(I.eof()) return true;
 
     return static_cast<bool>(I >> O) ? get_optional_input(I, R...) : false;

@@ -115,7 +115,7 @@ public:
 
     virtual unique_ptr<SectionShell> get_copy() = 0;
 
-    virtual double get_parameter(ParameterType = ParameterType::NONE);
+    virtual double get_parameter(ParameterType);
 
     int update_incre_status(double, double);
     int update_incre_status(double, double, double, double);
@@ -131,7 +131,7 @@ public:
     virtual int commit_status() = 0;
     virtual int reset_status() = 0;
 
-    virtual vector<vec> record(const OutputType&);
+    virtual vector<vec> record(OutputType);
 };
 
 namespace suanpan {

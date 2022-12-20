@@ -35,6 +35,7 @@ class FrameRecorder final : public Recorder {
 #ifdef SUANPAN_HDF5
     hid_t file_id = 0;
 #endif
+
 public:
     FrameRecorder(unsigned,   // tag
                   OutputType, // recorder type

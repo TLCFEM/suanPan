@@ -188,8 +188,8 @@ class Mat : public Base< eT, Mat<eT> >
   inline Mat& operator/=(const spdiagview<eT>& X);
   
   
-  arma_cold inline mat_injector<Mat> operator<<(const eT val);
-  arma_cold inline mat_injector<Mat> operator<<(const injector_end_of_row<>& x);
+  arma_deprecated inline mat_injector<Mat> operator<<(const eT val);
+  arma_deprecated inline mat_injector<Mat> operator<<(const injector_end_of_row<>& x);
   
   
   arma_inline       subview_row<eT> row(const uword row_num);
@@ -308,8 +308,11 @@ class Mat : public Base< eT, Mat<eT> >
   template<typename T1> inline void shed_rows(const Base<uword, T1>& indices);
   template<typename T1> inline void shed_cols(const Base<uword, T1>& indices);
   
-  inline void insert_rows(const uword row_num, const uword N, const bool set_to_zero = true);
-  inline void insert_cols(const uword col_num, const uword N, const bool set_to_zero = true);
+  arma_deprecated inline void insert_rows(const uword row_num, const uword N, const bool set_to_zero);
+  arma_deprecated inline void insert_cols(const uword col_num, const uword N, const bool set_to_zero);
+  
+  inline void insert_rows(const uword row_num, const uword N);
+  inline void insert_cols(const uword col_num, const uword N);
   
   template<typename T1> inline void insert_rows(const uword row_num, const Base<eT,T1>& X);
   template<typename T1> inline void insert_cols(const uword col_num, const Base<eT,T1>& X);
@@ -745,7 +748,8 @@ class Mat : public Base< eT, Mat<eT> >
   
   inline void swap(Mat& B);
   
-  inline void steal_mem(Mat& X);  //!< don't use this unless you're writing code internal to Armadillo
+  inline void steal_mem(Mat& X);                      //!< don't use this unless you're writing code internal to Armadillo
+  inline void steal_mem(Mat& X, const bool is_move);  //!< don't use this unless you're writing code internal to Armadillo
   
   inline void steal_mem_col(Mat& X, const uword max_n_rows);
   

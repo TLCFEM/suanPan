@@ -31,11 +31,11 @@ analyze
 peek element 1
 
 # Node 3:
-#    2.0000        0
+# 2.0000 0
 # Displacement:
-#   -0.0020        0
+# -0.0020 0
 # Resistance:
-#   -0.2618        0
+# -0.2618 0
 peek node 3
 
 reset

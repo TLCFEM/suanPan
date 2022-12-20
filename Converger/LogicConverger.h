@@ -49,7 +49,7 @@ public:
 
     unique_ptr<Converger> get_copy() override;
 
-    bool is_converged() override;
+    bool is_converged(unsigned) override;
 };
 
 class LogicOR final : public LogicConverger {
@@ -58,7 +58,7 @@ public:
 
     unique_ptr<Converger> get_copy() override;
 
-    bool is_converged() override;
+    bool is_converged(unsigned) override;
 };
 
 class LogicXOR final : public LogicConverger {
@@ -67,7 +67,7 @@ public:
 
     unique_ptr<Converger> get_copy() override;
 
-    bool is_converged() override;
+    bool is_converged(unsigned) override;
 };
 
 #endif

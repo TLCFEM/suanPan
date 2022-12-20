@@ -8,8 +8,8 @@ material Bilinear1D 1 100 1 .05 1. 1E-2
 element T2D2 1 1 2 1 1
 element Mass 2 2 100 1
 
-fix 1 1 1
-fix 2 2 1 2
+fix2 1 1 1
+fix2 2 2 1 2
 
 hdf5recorder 1 Node U1 2
 hdf5recorder 2 Node RF1 2
@@ -34,15 +34,15 @@ converger RelIncreDisp 2 1E-10 3 1
 analyze
 
 # Node 2:
-#    1.0000        0
+# 1.0000 0
 # Displacement:
-#    0.0102        0
+# 0.0102 0
 # Resistance:
-#    0.8333        0
+# 0.8333 0
 # Velocity:
-#    0.0026        0
+# 0.0026 0
 # Acceleration:
-#   -0.0085        0
+# -0.0085 0
 peek node 2
 
 # save recorder 1 2

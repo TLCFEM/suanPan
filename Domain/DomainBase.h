@@ -87,6 +87,10 @@ enum class ColorMethod {
     MIS
 };
 
+enum class ModalAttribute: size_t {
+    LinearSystem
+};
+
 class DomainBase : public Tag {
 public:
     explicit DomainBase(unsigned);
@@ -325,6 +329,9 @@ public:
     [[nodiscard]] virtual bool is_updated() const = 0;
     [[nodiscard]] virtual bool is_sparse() const = 0;
 
+    virtual void set_attribute(ModalAttribute) = 0;
+    [[nodiscard]] virtual bool get_attribute(ModalAttribute) = 0;
+
     virtual void set_color_model(ColorMethod) = 0;
     [[nodiscard]] virtual const std::vector<std::vector<unsigned>>& get_color_map() const = 0;
     [[nodiscard]] virtual std::pair<std::vector<unsigned>, suanpan::graph<unsigned>> get_element_connectivity(bool) = 0;
@@ -372,7 +379,7 @@ public:
     virtual void assemble_mass_container() const = 0;
     virtual void assemble_stiffness_container() const = 0;
 
-    virtual void erase_machine_error() const = 0;
+    virtual void erase_machine_error(vec&) const = 0;
 
     virtual void update_load() = 0;
     virtual void update_constraint() = 0;

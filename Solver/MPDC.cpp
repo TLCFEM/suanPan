@@ -10,14 +10,14 @@ MPDC::MPDC(const unsigned T)
 int MPDC::analyze() {
     auto& C = get_converger();
     auto& G = get_integrator();
-    auto& W = G->get_domain().lock()->get_factory();
+    const auto& D = G->get_domain();
+    auto& W = D->get_factory();
 
     suanpan_info("current analysis time: %.5f.\n", W->get_trial_time());
 
     const auto max_iteration = C->get_max_iteration();
 
-    // ninja anchor
-    auto& ninja = get_ninja(W);
+    vec samurai;
 
     // get column index for each nonzero dof
     // uvec load_ref_idx = find(load_ref);
@@ -31,54 +31,68 @@ int MPDC::analyze() {
     unsigned counter = 0;
 
     while(true) {
+        // update for nodes and elements
+        if(SUANPAN_SUCCESS != G->update_trial_status()) return SUANPAN_FAIL;
         // process modifiers
         if(SUANPAN_SUCCESS != G->process_modifier()) return SUANPAN_FAIL;
         // assemble resistance
         G->assemble_resistance();
-        // assemble stiffness
-        G->assemble_matrix();
-        // process loads
-        if(SUANPAN_SUCCESS != G->process_load()) return SUANPAN_FAIL;
-        // process constraints
-        if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
+
+        if(constant_matrix()) {
+            // some loads may have resistance
+            if(SUANPAN_SUCCESS != G->process_load_resistance()) return SUANPAN_FAIL;
+            // some constraints may have resistance
+            if(SUANPAN_SUCCESS != G->process_constraint_resistance()) return SUANPAN_FAIL;
+        }
+        else {
+            // assemble stiffness
+            G->assemble_matrix();
+            // process loads
+            if(SUANPAN_SUCCESS != G->process_load()) return SUANPAN_FAIL;
+            // process constraints
+            if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
+            // indicate the global matrix has been assembled
+            G->set_matrix_assembled_switch(true);
+        }
 
         // solve ninja
-        if(SUANPAN_SUCCESS != G->solve(ninja, G->get_displacement_residual())) return SUANPAN_FAIL;
+        if(SUANPAN_SUCCESS != G->solve(samurai, G->get_displacement_residual())) return SUANPAN_FAIL;
         // solve reference displacement
-        if(SUANPAN_SUCCESS != G->solve(disp_a, W->get_reference_load())) return SUANPAN_FAIL;
+        if(SUANPAN_SUCCESS != G->solve(disp_a, G->get_reference_load())) return SUANPAN_FAIL;
 
         if(const auto n_size = W->get_size(); 0 != W->get_mpc()) {
             mat right, kernel;
             auto& border = W->get_auxiliary_stiffness();
             if(SUANPAN_SUCCESS != G->solve(right, border)) return SUANPAN_FAIL;
             auto& aux_lambda = get_auxiliary_lambda(W);
-            if(!solve(aux_lambda, kernel = border.t() * right.head_rows(n_size), border.t() * ninja.head_rows(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
-            ninja -= right * aux_lambda;
+            if(!solve(aux_lambda, kernel = border.t() * right.head_rows(n_size), border.t() * samurai.head(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
+            samurai -= right * aux_lambda;
             disp_a -= right * solve(kernel, border.t() * disp_a.head_rows(n_size));
         }
 
-        const vec incre_lambda = solve(mat(disp_a.rows(idx)), W->get_trial_settlement()(idx) - W->get_trial_displacement()(idx) - ninja.rows(idx));
+        const vec incre_lambda = solve(mat(disp_a.rows(idx)), W->get_trial_settlement()(idx) - G->get_trial_displacement()(idx) - samurai.rows(idx));
 
-        ninja += disp_a * incre_lambda;
+        samurai += disp_a * incre_lambda;
 
         // avoid machine error accumulation
-        G->erase_machine_error();
+        G->erase_machine_error(samurai);
+
+        // exit if converged
+        if(C->is_converged(counter)) return G->sync_status(true);
+        // exit if maximum iteration is hit
+        if(++counter > max_iteration) return SUANPAN_FAIL;
+
         // update internal variable
-        G->update_internal(ninja);
+        G->update_internal(samurai);
         // update trial load factor
         G->update_trial_load_factor(incre_lambda);
         // update trial displacement
-        G->update_trial_displacement(ninja);
+        G->update_from_ninja();
         // for tracking
         G->update_load();
         // for tracking
         G->update_constraint();
-        // update for nodes and elements
-        if(SUANPAN_SUCCESS != G->update_trial_status()) return SUANPAN_FAIL;
 
-        // exit if converged
-        if(C->is_converged()) return SUANPAN_SUCCESS;
-        // exit if maximum iteration is hit
-        if(++counter > max_iteration) return SUANPAN_FAIL;
+        if(D->get_attribute(ModalAttribute::LinearSystem)) return G->sync_status(false);
     }
 }

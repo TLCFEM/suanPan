@@ -28,7 +28,7 @@ RayleighNewmark::RayleighNewmark(const unsigned T, const double A, const double 
     , damping_eta(DD) {}
 
 void RayleighNewmark::assemble_resistance() {
-    suanpan::for_all(get_domain().lock()->get_element_pool(), [&](const shared_ptr<Element>& t_element) { suanpan::damping::rayleigh::apply(t_element, damping_alpha, damping_beta, damping_zeta, damping_eta); });
+    suanpan::for_all(get_domain()->get_element_pool(), [&](const shared_ptr<Element>& t_element) { suanpan::damping::rayleigh::apply(t_element, damping_alpha, damping_beta, damping_zeta, damping_eta); });
 
     Newmark::assemble_resistance();
 }

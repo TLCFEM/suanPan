@@ -72,7 +72,20 @@ public:
     [[nodiscard]] virtual T max() const = 0;
     [[nodiscard]] virtual Col<T> diag() const = 0;
 
+    /**
+     * \brief Access element (read-only), returns zero if out-of-bound
+     * \return value
+     */
     virtual const T& operator()(uword, uword) const = 0;
+    /**
+     * \brief Access element without bound check
+     * \return value
+     */
+    virtual T& unsafe_at(uword, uword);
+    /**
+     * \brief Access element with bound check
+     * \return value
+     */
     virtual T& at(uword, uword) = 0;
 
     [[nodiscard]] virtual const T* memptr() const = 0;
@@ -152,6 +165,8 @@ template<sp_d T> void MetaMat<T>::set_solver_setting(const SolverSetting<T>& SS)
 template<sp_d T> SolverSetting<T>& MetaMat<T>::get_solver_setting() { return setting; }
 
 template<sp_d T> void MetaMat<T>::set_factored(const bool F) { factored = F; }
+
+template<sp_d T> T& MetaMat<T>::unsafe_at(const uword I, const uword J) { return this->at(I, J); }
 
 template<sp_d T> int MetaMat<T>::direct_solve(Mat<T>& X, const SpMat<T>& B) { return this->direct_solve(X, Mat<T>(B)); }
 
