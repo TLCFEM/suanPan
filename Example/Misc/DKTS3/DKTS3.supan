@@ -15,6 +15,7 @@ set ini_step_size 1E0
 set fixed_step_size 1
 set symm_mat 1
 set sparse_mat 0
+set color_model MIS
 
 converger AbsIncreDisp 2 1E-8 20 1
 # converger FixedNumber 2 1 1 1

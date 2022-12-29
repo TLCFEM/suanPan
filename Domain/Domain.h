@@ -36,7 +36,7 @@ using ThreadQueue = std::vector<shared_ptr<future<void>>>;
 
 class Domain final : public DomainBase, public std::enable_shared_from_this<Domain> {
     std::atomic_bool updated = false;
-    ColorMethod color_model = ColorMethod::WP;
+    ColorMethod color_model = ColorMethod::MIS;
 
     unsigned current_step_tag = 0;
     unsigned current_converger_tag = 0;
