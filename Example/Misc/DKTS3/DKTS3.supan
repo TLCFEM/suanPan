@@ -11,15 +11,38 @@ displacement 1 0 -5 3 2 3 6 175 176 177 178 179 180 181 182 183 682 683 684 685 
 # hdf5recorder 1 Visualisation U1 width 2
 
 step static 1
-set ini_step_size 1E-1
+set ini_step_size 1E0
 set fixed_step_size 1
 set symm_mat 1
 set sparse_mat 0
 
-converger AbsIncreEnergy 2 1E-8 20 1
+converger AbsIncreDisp 2 1E-8 20 1
 # converger FixedNumber 2 1 1 1
 analyze
 
+# Node 2:
+# Coordinate:
+# 0 0 -20.0000
+# Displacement:
+# -3.6816 -0.0042 -5.0000 0.0029 0.3897 0.0046
+# Resistance:
+# 2.6943e-12 2.7367e-14 -9.6426e+00 -3.0444e-16 1.1203e-13 -5.2097e-14
+# 
+# Node 3:
+# Coordinate:
+# 0 -5.0000 -20.0000
+# Displacement:
+# -3.6677 0.0002 -5.0000 -0.0852 0.2718 0.0247
+# Resistance:
+# 3.7237e-13 1.3743e-14 -4.4882e+00 2.2942e-16 -3.8155e-14 -8.0816e-14
+# 
+# Node 6:
+# Coordinate:
+# 0 5.0000 -20.0000
+# Displacement:
+# -3.6667 -0.0082 -5.0000 0.0541 0.2731 -0.0222
+# Resistance:
+# -7.0122e-13 5.3552e-13 -4.4888e+00 -6.2483e-16 7.4103e-14 -1.9514e-13
 peek node 2 3 6
 
 # plot type U3 scale 1 save U.vtk
