@@ -114,7 +114,7 @@ void new_box2d(unique_ptr<Section>& return_obj, istringstream& command) {
 
     unsigned int_pt = 6;
     if(command.eof())
-        suanpan_extra_debug("new_rectangle2D() uses six integration points.\n");
+        suanpan_debug("new_rectangle2D() uses six integration points.\n");
     else if(!get_input(command, int_pt))
         SP_E("A valid number of integration points is required.\n");
 
@@ -157,7 +157,7 @@ void new_box3d(unique_ptr<Section>& return_obj, istringstream& command) {
 
     unsigned int_pt = 3;
     if(command.eof())
-        suanpan_extra_debug("new_rectangle2D() uses six integration points.\n");
+        suanpan_debug("new_rectangle2D() uses six integration points.\n");
     else if(!get_input(command, int_pt))
         SP_E("A valid number of integration points is required.\n");
 
@@ -564,7 +564,7 @@ void new_rectangle2d(unique_ptr<Section>& return_obj, istringstream& command) {
 
     unsigned int_pt = 6;
     if(command.eof())
-        suanpan_extra_debug("new_rectangle2D() uses six integration points.\n");
+        suanpan_debug("new_rectangle2D() uses six integration points.\n");
     else if(!get_input(command, int_pt))
         SP_E("A valid number of integration points is required.\n");
 
@@ -601,7 +601,7 @@ void new_rectangle3d(unique_ptr<Section>& return_obj, istringstream& command) {
 
     unsigned int_pt = 3;
     if(command.eof())
-        suanpan_extra_debug("new_rectangle3d() uses six integration points.\n");
+        suanpan_debug("new_rectangle3d() uses six integration points.\n");
     else if(!get_input(command, int_pt))
         SP_E("A valid number of integration points is required.\n");
 

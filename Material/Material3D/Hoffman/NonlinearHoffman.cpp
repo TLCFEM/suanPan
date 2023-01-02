@@ -108,7 +108,7 @@ int NonlinearHoffman::update_trial_status(const vec& t_strain) {
     while(++counter < max_iteration) {
         const auto incre_gamma = residual / gradient;
         const auto error = fabs(incre_gamma);
-        suanpan_extra_debug("Hoffman local iterative loop error: %.5E.\n", error);
+        suanpan_debug("Hoffman local iterative loop error: %.5E.\n", error);
         if(error <= tolerance || fabs(residual) <= tolerance) break;
         hessian = inv(inv_stiffness + (gamma += incre_gamma) * proj_a);
         n = proj_a * (t_stress = hessian * (e_strain - gamma * proj_b)) + proj_b;

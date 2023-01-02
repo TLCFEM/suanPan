@@ -100,7 +100,7 @@ int VAFCRP::update_trial_status(const vec& t_strain) {
         jacobian = exp_gamma * (root_three_two * sum_b - three_shear - q * epsilon * mu / (*incre_time + mu * gamma)) - dk;
 
         const auto incre = (q * exp_gamma - k) / jacobian;
-        suanpan_extra_debug("VAFCRP local iteration error: %.5E.\n", fabs(incre));
+        suanpan_debug("VAFCRP local iteration error: %.5E.\n", fabs(incre));
         if(fabs(incre) <= tolerance) break;
 
         gamma -= incre;

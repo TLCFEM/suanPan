@@ -22,10 +22,6 @@
 
 void suanpan_info(const char*, ...);
 void suanpan_debug(const char*, ...);
-void suanpan_extra_debug(const char*, ...);
-void suanpan_warning(const char*, ...);
-void suanpan_error(const char*, ...);
-void suanpan_fatal(const char*, ...);
 
 void suanpan_debug(const std::function<void()>&);
 

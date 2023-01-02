@@ -104,7 +104,7 @@ int Maxwell::update_trial_status(const vec& t_strain, const vec& t_strain_rate) 
             const vec incre = inv_jacobian * residual / (factor_a * (K1 + K2) + K3);
 
             if(1 == counter) ref_error = std::max(1., norm(residual));
-            suanpan_extra_debug("Maxwell local iteration error: %.4E.\n", error = norm(residual) / ref_error);
+            suanpan_debug("Maxwell local iteration error: %.4E.\n", error = norm(residual) / ref_error);
             if(norm(incre) <= tolerance && error <= tolerance) break;
             solution += incre;
             spring->update_incre_status(solution(0));
@@ -120,7 +120,7 @@ int Maxwell::update_trial_status(const vec& t_strain, const vec& t_strain_rate) 
             const auto jacobian = K1 + K2 + K3 / factor_a;
             const auto incre = residual / jacobian;
             if(1 == counter) ref_error = std::max(1., fabs(residual));
-            suanpan_extra_debug("Maxwell local iteration error: %.4E.\n", error = fabs(residual) / ref_error);
+            suanpan_debug("Maxwell local iteration error: %.4E.\n", error = fabs(residual) / ref_error);
             if(fabs(incre) <= tolerance && error <= tolerance) break;
             solution(0) += incre;
             solution(1) += residual_a - incre;

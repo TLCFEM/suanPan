@@ -78,7 +78,7 @@ int NonlinearJ2::update_trial_status(const vec& t_strain) {
         denom = double_shear + two_third * (dk + compute_dh(plastic_strain));
         const auto incre_gamma = yield_func / denom;
         const auto abs_error = fabs(incre_gamma);
-        suanpan_extra_debug("NonlinearJ2 local iteration error: %.5E.\n", abs_error);
+        suanpan_debug("NonlinearJ2 local iteration error: %.5E.\n", abs_error);
         if(abs_error <= tolerance) break;
         incre_h = compute_h(plastic_strain = current_history(0) + root_two_third * (gamma += incre_gamma)) - current_h;
         update_isotropic_hardening();

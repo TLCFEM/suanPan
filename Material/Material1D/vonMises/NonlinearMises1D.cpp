@@ -56,7 +56,7 @@ int NonlinearMises1D::update_trial_status(const vec& t_strain) {
 
             const auto incre_gamma = yield_func / (elastic_modulus + (dkdh = compute_dk(plastic_strain) + compute_dh(plastic_strain)));
             const auto abs_error = fabs(incre_gamma);
-            suanpan_extra_debug("NonlinearMises1D local iteration error: %.5E.\n", abs_error);
+            suanpan_debug("NonlinearMises1D local iteration error: %.5E.\n", abs_error);
             if(abs_error <= tolerance) break;
             incre_h = compute_h(plastic_strain = current_history(0) + (gamma += incre_gamma)) - current_h;
             yield_func = norm_shifted_stress - elastic_modulus * gamma - std::max(0., compute_k(plastic_strain)) - incre_h;

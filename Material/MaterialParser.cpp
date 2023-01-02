@@ -991,7 +991,7 @@ void new_concretecm(unique_ptr<Material>& return_obj, istringstream& command) {
     }
 
     auto density = 0.;
-    if(command.eof()) suanpan_extra_debug("new_concretecm() assumes zero density.\n");
+    if(command.eof()) suanpan_debug("new_concretecm() assumes zero density.\n");
     else if(!get_input(command, density)) {
         SP_E("A valid density is required.\n");
         return;
@@ -1030,7 +1030,7 @@ void new_concreteexp(unique_ptr<Material>& return_obj, istringstream& command) {
     }
 
     auto density = 0.;
-    if(command.eof()) suanpan_extra_debug("new_concreteexp() assumes zero density.\n");
+    if(command.eof()) suanpan_debug("new_concreteexp() assumes zero density.\n");
     else if(!get_input(command, density)) {
         SP_E("A valid density is required.\n");
         return;

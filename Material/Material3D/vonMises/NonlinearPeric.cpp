@@ -75,7 +75,7 @@ int NonlinearPeric::update_trial_status(const vec& t_strain) {
     while(++counter < max_iteration) {
         const auto gradient = (triple_shear + factor_a * (eqv_stress - triple_shear * gamma) / denom) * pow_term - dk;
         const auto incre_gamma = residual / gradient;
-        suanpan_extra_debug("NonlinearPeric local iteration error: %.5E.\n", incre_gamma);
+        suanpan_debug("NonlinearPeric local iteration error: %.5E.\n", incre_gamma);
         if(fabs(incre_gamma) <= tolerance) break;
         plastic_strain = current_history(0) + (gamma += incre_gamma);
         denom = *incre_time + mu * gamma;

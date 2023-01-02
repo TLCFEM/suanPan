@@ -99,7 +99,7 @@ int ArmstrongFrederick::update_trial_status(const vec& t_strain) {
         jacobian = root_three_two * sum_b - three_shear - dk;
 
         const auto incre = yield_func / jacobian;
-        suanpan_extra_debug("ArmstrongFrederick local iteration error: %.5E.\n", fabs(incre));
+        suanpan_debug("ArmstrongFrederick local iteration error: %.5E.\n", fabs(incre));
         if(fabs(incre) <= tolerance) break;
 
         gamma -= incre;
