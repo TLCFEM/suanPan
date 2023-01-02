@@ -182,6 +182,52 @@ inline auto& SUANPAN_CERR = std::cerr;
 inline auto& SUANPAN_SYNC_COUT = SUANPAN_COUT;
 inline auto& SUANPAN_SYNC_CERR = SUANPAN_CERR;
 
+#include <source_location>
+#include <fmt/color.h>
+#include <filesystem>
+
+namespace fs = std::filesystem;
+
+template<typename... T> void sp_info(const std::string_view format_str, const T&... args) { SUANPAN_SYNC_COUT << fmt::vformat(fg(fmt::terminal_color::green), format_str, fmt::make_format_args(args...)); }
+
+template<typename... T> void sp_debug(const std::source_location loc, const std::string_view format_str, const T&... args) {
+    std::string pattern{"[DEBUG] "};
+    pattern += fs::path(loc.file_name()).filename().string();
+    pattern += ":{}: ";
+    pattern += format_str;
+    SUANPAN_SYNC_COUT << fmt::vformat(fg(fmt::terminal_color::green), pattern, fmt::make_format_args(loc.line(), args...));
+}
+
+template<typename... T> void sp_warning(const std::source_location loc, const std::string_view format_str, const T&... args) {
+    std::string pattern{"[WARNING] "};
+    pattern += fs::path(loc.file_name()).filename().string();
+    pattern += ":{}: ";
+    pattern += format_str;
+    SUANPAN_SYNC_COUT << fmt::vformat(fg(fmt::terminal_color::blue), pattern, fmt::make_format_args(loc.line(), args...));
+}
+
+template<typename... T> void sp_error(const std::source_location loc, const std::string_view format_str, const T&... args) {
+    std::string pattern{"[ERROR] "};
+    pattern += fs::path(loc.file_name()).filename().string();
+    pattern += ":{}: ";
+    pattern += format_str;
+    SUANPAN_SYNC_COUT << fmt::vformat(fg(fmt::terminal_color::yellow), pattern, fmt::make_format_args(loc.line(), args...));
+}
+
+template<typename... T> void sp_fatal(const std::source_location loc, const std::string_view format_str, const T&... args) {
+    std::string pattern{"[FATAL] "};
+    pattern += fs::path(loc.file_name()).filename().string();
+    pattern += ":{}: ";
+    pattern += format_str;
+    SUANPAN_SYNC_COUT << fmt::vformat(fg(fmt::terminal_color::red), pattern, fmt::make_format_args(loc.line(), args...));
+}
+
+#define SP_I(...) sp_info(##__VA_ARGS__)
+#define SP_D(...) sp_debug(std::source_location::current(), ##__VA_ARGS__)
+#define SP_W(...) sp_warning(std::source_location::current(), ##__VA_ARGS__)
+#define SP_E(...) sp_error(std::source_location::current(), ##__VA_ARGS__)
+#define SP_F(...) sp_fatal(std::source_location::current(), ##__VA_ARGS__)
+
 #ifdef SUANPAN_WIN
 #define FOREGROUND_CYAN (FOREGROUND_BLUE | FOREGROUND_GREEN)
 #define FOREGROUND_YELLOW (FOREGROUND_RED | FOREGROUND_GREEN)
@@ -201,10 +247,6 @@ inline auto& SUANPAN_SYNC_CERR = SUANPAN_CERR;
 #include <armadillo/armadillo>
 
 using namespace arma;
-
-#include <filesystem>
-
-namespace fs = std::filesystem;
 
 #include <memory>
 

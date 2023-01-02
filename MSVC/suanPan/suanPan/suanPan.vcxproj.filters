@@ -202,6 +202,9 @@
     <Filter Include="Domain\Group">
       <UniqueIdentifier>{ea4086e5-ad87-4755-905a-5f572935c34d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="FMT">
+      <UniqueIdentifier>{e84f8d8a-3ad6-4b36-b42c-26cd55281245}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Constraint\BC\GroupMultiplierBC.cpp">
@@ -1443,6 +1446,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Material\Material1D\Elastic\Tanh1D.cpp">
       <Filter>Material\Material1D\Elastic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Include\fmt\src\fmt.cc">
+      <Filter>FMT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Include\fmt\src\format.cc">
+      <Filter>FMT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Include\fmt\src\os.cc">
+      <Filter>FMT</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
