@@ -54,7 +54,7 @@ public:
                double, // compression yield strain
                double, // compression hardening ratio
                double  // density
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

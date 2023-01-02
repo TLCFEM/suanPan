@@ -44,7 +44,7 @@ public:
                    bool,         // nonlinear geometry switch
                    SectionType,  // section type
                    vector<DOF>&& // dof identifier
-    );
+        );
 };
 
 class SectionElement1D : public SectionElement {
@@ -56,7 +56,7 @@ public:
                      uvec&&,       // section tags
                      bool,         // nonlinear geometry switch
                      vector<DOF>&& // dof identifier
-    );
+        );
 };
 
 class SectionElement2D : public SectionElement {
@@ -68,7 +68,7 @@ public:
                      uvec&&,                                      // section tags
                      bool,                                        // nonlinear geometry switch
                      vector<DOF>&& = {DOF::U1, DOF::U2, DOF::UR3} // dof identifier
-    );
+        );
 };
 
 class SectionElement3D : public SectionElement {
@@ -80,7 +80,7 @@ public:
                      uvec&&,                                                                   // section tags
                      bool,                                                                     // nonlinear geometry switch
                      vector<DOF>&& = {DOF::U1, DOF::U2, DOF::U3, DOF::UR1, DOF::UR2, DOF::UR3} // dof identifier
-    );
+        );
 };
 
 class SectionNMElement2D : public SectionElement {
@@ -92,7 +92,7 @@ public:
                        uvec&&,                                      // section tags
                        bool,                                        // nonlinear geometry switch
                        vector<DOF>&& = {DOF::U1, DOF::U2, DOF::UR3} // dof identifier
-    );
+        );
 };
 
 class SectionNMElement3D : public SectionElement {
@@ -104,7 +104,7 @@ public:
                        uvec&&,                                                                   // section tags
                        bool,                                                                     // nonlinear geometry switch
                        vector<DOF>&& = {DOF::U1, DOF::U2, DOF::U3, DOF::UR1, DOF::UR2, DOF::UR3} // dof identifier
-    );
+        );
 };
 
 #endif

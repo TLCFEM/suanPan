@@ -50,7 +50,7 @@ public:
                  double = 80, // a10
                  double = 20, // a01
                  double = 0.  // density
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

@@ -52,7 +52,7 @@ public:
                   field<vec>&&, // knot pool
                   bool,         // nonlinear geometry switch
                   MaterialType  // material type
-    );
+        );
 };
 
 class MaterialPatch2D : public MaterialPatch {
@@ -63,7 +63,7 @@ public:
                     uvec&&,       // material tags
                     field<vec>&&, // knot pool
                     bool          // nonlinear geometry switch
-    );
+        );
 };
 
 class MaterialPatch3D : public MaterialPatch {
@@ -74,7 +74,7 @@ public:
                     uvec&&,       // material tags
                     field<vec>&&, // knot pool
                     bool          // nonlinear geometry switch
-    );
+        );
 };
 
 class SectionPatch : public Patch, public SectionElement {
@@ -86,7 +86,7 @@ public:
                  field<vec>&&, // knot pool
                  bool,         // nonlinear geometry switch
                  SectionType   // section type
-    );
+        );
 };
 
 class SectionPatch2D : public SectionPatch {
@@ -97,7 +97,7 @@ public:
                    uvec&&,       // section tags
                    field<vec>&&, // knot pool
                    bool          // nonlinear geometry switch
-    );
+        );
 };
 
 class SectionPatch3D : public SectionPatch {
@@ -108,7 +108,7 @@ public:
                    uvec&&,       // section tags
                    field<vec>&&, // knot pool
                    bool          // nonlinear geometry switch
-    );
+        );
 };
 
 #endif

@@ -23,8 +23,8 @@ const double NonlinearHoffman::root_two_third = sqrt(.5 * four_third);
 constexpr unsigned NonlinearHoffman::max_iteration = 20;
 
 double NonlinearHoffman::compute_yield_function(const vec& t_stress) const {
-    const auto &S1 = t_stress(0), &S2 = t_stress(1), &S3 = t_stress(2);
-    const auto &S4 = t_stress(3), &S5 = t_stress(4), &S6 = t_stress(5);
+    const auto& S1 = t_stress(0),& S2 = t_stress(1),& S3 = t_stress(2);
+    const auto& S4 = t_stress(3),& S5 = t_stress(4),& S6 = t_stress(5);
 
     const auto T1 = pow(S1 - S2, 2.), T2 = pow(S2 - S3, 2.), T3 = pow(S3 - S1, 2.);
 

@@ -343,7 +343,8 @@ int create_new_load(const shared_ptr<DomainBase>& domain, istringstream& command
 
     if(new_load != nullptr) new_load->set_start_step(domain->get_current_step_tag());
 
-    if(new_load == nullptr || !domain->insert(std::move(new_load))) SP_E("Fail to create new load via \"{}\".\n", command.str());
+    if(new_load == nullptr || !domain->insert(std::move(new_load)))
+        SP_E("Fail to create new load via \"{}\".\n", command.str());
 
     return SUANPAN_SUCCESS;
 }

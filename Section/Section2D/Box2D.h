@@ -40,13 +40,13 @@ public:
           unsigned,     // material tag
           unsigned = 6, // number of integration points
           double = 0.   // eccentricity
-    );
+        );
     Box2D(unsigned,     // tag
           vec&&,        // dimension
           unsigned,     // material tag
           unsigned = 6, // number of integration points
           double = 0.   // eccentricity
-    );
+        );
 
     unique_ptr<Section> get_copy() override;
 

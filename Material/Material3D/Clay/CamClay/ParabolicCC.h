@@ -52,7 +52,7 @@ public:
                 double,     // a
                 double,     // a_slope
                 double = 0. // density
-    );
+        );
 
     unique_ptr<Material> get_copy() override;
 

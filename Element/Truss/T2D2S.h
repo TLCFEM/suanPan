@@ -51,7 +51,7 @@ public:
           unsigned,     // section tag
           bool = false, // nonlinear geometry switch
           bool = true   // log strain switch
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

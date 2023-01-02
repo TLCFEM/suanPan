@@ -48,7 +48,7 @@ public:
                   double = 1.,  // offset
                   double = 20., // n
                   double = 0.   // density
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

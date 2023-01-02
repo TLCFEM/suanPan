@@ -20,9 +20,9 @@
 #include <Toolbox/Quaternion.hpp>
 
 void Rotation3D::form_transformation(mat&& R) {
-    const auto &R1 = R(0, 0), &R2 = R(0, 1), &R3 = R(0, 2);
-    const auto &R4 = R(1, 0), &R5 = R(1, 1), &R6 = R(1, 2);
-    const auto &R7 = R(2, 0), &R8 = R(2, 1), &R9 = R(2, 2);
+    const auto& R1 = R(0, 0),& R2 = R(0, 1),& R3 = R(0, 2);
+    const auto& R4 = R(1, 0),& R5 = R(1, 1),& R6 = R(1, 2);
+    const auto& R7 = R(2, 0),& R8 = R(2, 1),& R9 = R(2, 2);
 
     trans_mat.set_size(6, 6);
 

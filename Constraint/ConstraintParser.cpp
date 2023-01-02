@@ -575,7 +575,8 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, istringstream& c
 
     if(new_constraint != nullptr) new_constraint->set_start_step(domain->get_current_step_tag());
 
-    if(new_constraint == nullptr || !domain->insert(std::move(new_constraint))) SP_E("Fail to create new constraint via \"{}\".\n", command.str());
+    if(new_constraint == nullptr || !domain->insert(std::move(new_constraint)))
+        SP_E("Fail to create new constraint via \"{}\".\n", command.str());
 
     return SUANPAN_SUCCESS;
 }

@@ -143,7 +143,7 @@ public:
             unsigned,          // number of dofs
             uvec&&,            // node encoding
             std::vector<DOF>&& // dof identifier
-    );
+        );
     Element(unsigned,          // tag
             unsigned,          // number of nodes
             unsigned,          // number of dofs
@@ -152,7 +152,7 @@ public:
             bool,              // nonlinear geometry switch
             MaterialType,      // material type for internal check
             std::vector<DOF>&& // dof identifier
-    );
+        );
     Element(unsigned,          // tag
             unsigned,          // number of nodes
             unsigned,          // number of dofs
@@ -161,16 +161,16 @@ public:
             bool,              // nonlinear geometry switch
             SectionType,       // section type for internal check
             std::vector<DOF>&& // dof identifier
-    );
+        );
     Element(unsigned, // tag
             unsigned, // number of dofs
             uvec&&    // group encoding
-    );
+        );
     Element(unsigned, // tag
             unsigned, // number of dofs
             unsigned, // other element tag
             unsigned  // node tag
-    );
+        );
     Element(const Element&) = delete;            // copy forbidden
     Element(Element&&) = delete;                 // move forbidden
     Element& operator=(const Element&) = delete; // assign forbidden

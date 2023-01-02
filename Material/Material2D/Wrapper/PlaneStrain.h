@@ -43,7 +43,7 @@ public:
     PlaneStrain(unsigned, // tag
                 unsigned, // 3D material tag
                 unsigned  // type
-    );
+        );
     PlaneStrain(const PlaneStrain&);
     PlaneStrain(PlaneStrain&&) = delete;
     PlaneStrain& operator=(const PlaneStrain&) = delete;

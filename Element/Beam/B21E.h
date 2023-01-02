@@ -47,7 +47,7 @@ public:
          unsigned,     // section tag
          unsigned = 6, // integration points
          bool = false  // nonlinear geometry switch
-    );
+        );
 
     int update_status() override;
 

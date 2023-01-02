@@ -80,7 +80,7 @@ public:
                      unsigned = 0,                  // material tag
                      double = 0.,                   // area
                      vec&& = {0., 0.}               // eccentricity
-    );
+        );
     Section(const Section&) = default;           // default copy ctor
     Section(Section&&) = delete;                 // move forbidden
     Section& operator=(const Section&) = delete; // assign forbidden

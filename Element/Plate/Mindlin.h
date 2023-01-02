@@ -62,7 +62,7 @@ public:
             unsigned,    // material tag
             double,      // thickness
             unsigned = 2 // integration points along thickness
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

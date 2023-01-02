@@ -46,7 +46,7 @@ public:
                  double,   // start strain
                  double,   // end strain
                  double    // end damage value
-    );
+        );
 
     unique_ptr<Material> get_copy() override;
 };

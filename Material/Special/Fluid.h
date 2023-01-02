@@ -39,7 +39,7 @@ public:
     Fluid(unsigned, // tag
           double,   // bulk modulus
           double    // density
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

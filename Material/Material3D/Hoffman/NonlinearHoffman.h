@@ -57,7 +57,7 @@ public:
                      vec&&,      // poissons ratio
                      vec&&,      // sigma
                      double = 0. // density
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

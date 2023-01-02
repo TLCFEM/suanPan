@@ -57,7 +57,7 @@ public:
         double = 1.,  // thickness
         bool = false, // reduced integration
         bool = false  // nonlinear geometry switch
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

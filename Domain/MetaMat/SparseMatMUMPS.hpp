@@ -100,7 +100,8 @@ template<sp_d T> int SparseMatBaseMUMPS<T>::alloc() {
     mumps_job.job = 4;
     dmumps_c(&mumps_job);
 
-    if(0 != mumps_job.info[0]) SP_E("Error code {} received.\n", mumps_job.info[0]);
+    if(0 != mumps_job.info[0])
+        SP_E("Error code {} received.\n", mumps_job.info[0]);
 
     return mumps_job.info[0];
 }

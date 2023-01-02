@@ -45,7 +45,7 @@ public:
                double,   // rotation vector
                double,   // rotation vector
                double    // rotation vector
-    );
+        );
     Rotation3D(unsigned, // tag
                unsigned, // mat tag
                mat&&);

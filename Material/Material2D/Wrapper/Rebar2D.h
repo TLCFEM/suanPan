@@ -43,7 +43,7 @@ public:
             unsigned, // material tag along y axis
             double,   // reinforcement ratio along x axis
             double    // reinforcement ratio along y axis
-    );
+        );
     Rebar2D(const Rebar2D&);
     Rebar2D(Rebar2D&&) noexcept = delete;
     Rebar2D& operator=(const Rebar2D&) = delete;

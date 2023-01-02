@@ -40,7 +40,7 @@ public:
     FrameRecorder(unsigned,   // tag
                   OutputType, // recorder type
                   unsigned    // interval
-    );
+        );
     FrameRecorder(const FrameRecorder&) = delete;
     FrameRecorder(FrameRecorder&&) noexcept = delete;
     FrameRecorder& operator=(const FrameRecorder&) = delete;

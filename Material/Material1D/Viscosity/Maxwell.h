@@ -52,7 +52,7 @@ public:
             bool = false, // if to use matrix
             unsigned = 0, // if to process when fails to converge
             double = 0.   // beta
-    );
+        );
     Maxwell(const Maxwell&);
     Maxwell(Maxwell&&) = delete;
     Maxwell& operator=(const Maxwell&) = delete;

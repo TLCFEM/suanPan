@@ -62,7 +62,7 @@ public:
                          vec&&,      // a
                          vec&&,      // b
                          double = 0. // density
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

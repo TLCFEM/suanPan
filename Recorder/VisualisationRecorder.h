@@ -51,7 +51,7 @@ public:
                           unsigned,   // interval
                           unsigned,   // output width
                           double = 1. // scale
-    );
+        );
 
     void record(const shared_ptr<DomainBase>&) override;
 

@@ -110,7 +110,7 @@ public:
                  double,   // biaxial compression strength ratio
                  double,   // stiffness recovery
                  double    // density
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

@@ -47,7 +47,7 @@ public:
            double,     // poisson's ratio
            vec&&,      // poly parameter
            double = 0. // density
-    );
+        );
 
     unique_ptr<Material> get_copy() override;
 

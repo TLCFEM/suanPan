@@ -43,7 +43,7 @@ public:
               double,                // amplitude
               std::vector<double>&&, // frequency
               unsigned = 0           // step tag
-    );
+        );
 
     double get_amplitude(double) override;
 

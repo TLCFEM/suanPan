@@ -65,9 +65,9 @@ int PatchCube::initialize(const shared_ptr<DomainBase>& D) {
     for(auto I : ele_span(0))
         for(auto J : ele_span(1))
             for(auto K : ele_span(2)) {
-                const auto &xl = knot_pool[0](I), &xh = knot_pool[0](I + 1);
-                const auto &yl = knot_pool[1](J), &yh = knot_pool[1](J + 1);
-                const auto &zl = knot_pool[2](K), &zh = knot_pool[2](K + 1);
+                const auto& xl = knot_pool[0](I),& xh = knot_pool[0](I + 1);
+                const auto& yl = knot_pool[1](J),& yh = knot_pool[1](J + 1);
+                const auto& zl = knot_pool[2](K),& zh = knot_pool[2](K + 1);
                 const auto dx = xh - xl, dy = yh - yl, dz = zh - zl;
                 for(unsigned L = 0; L < plan.n_rows; ++L) {
                     const auto x = xl + dx * (.5 * plan(L, 0) + .5);

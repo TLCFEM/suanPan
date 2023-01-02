@@ -230,8 +230,7 @@ void argument_parser(const int argc, char** argv) {
 
         if(!output_file_name.empty()) {
             output_file.open(output_file_name);
-            if(output_file.is_open())
-                SUANPAN_COUT.rdbuf(output_file.rdbuf());
+            if(output_file.is_open()) SUANPAN_COUT.rdbuf(output_file.rdbuf());
             else
                 SP_E("Cannot open the output file \"{}\".\n", output_file_name);
         }

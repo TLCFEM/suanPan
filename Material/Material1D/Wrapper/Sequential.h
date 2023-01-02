@@ -46,7 +46,7 @@ class Sequential final : public Material1D {
 public:
     Sequential(unsigned, // tag
                uvec&&    // material tag pool
-    );
+        );
     Sequential(const Sequential&);
     Sequential(Sequential&&) = delete;
     Sequential& operator=(const Sequential&) = delete;

@@ -39,7 +39,7 @@ class Static : public Step {
 public:
     explicit Static(unsigned = 0, // tag
                     double = 1.   // step time period
-    );
+        );
 
     int initialize() override;
 

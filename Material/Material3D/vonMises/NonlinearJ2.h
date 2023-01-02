@@ -58,7 +58,7 @@ public:
                 double,     // elastic modulus
                 double,     // poisson's ratio
                 double = 0. // density
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

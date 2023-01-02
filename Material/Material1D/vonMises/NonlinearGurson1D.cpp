@@ -69,7 +69,7 @@ int NonlinearGurson1D::update_trial_status(const vec& t_strain) {
         }
 
         const auto hardening = compute_hardening(pe);
-        const auto &k = hardening(0), &dk = hardening(1);
+        const auto& k = hardening(0),& dk = hardening(1);
         const auto hyper_term = .5 * q2 * s / k;
         const auto cosh_term = cosh(hyper_term);
         const auto sinh_term = sinh(hyper_term);

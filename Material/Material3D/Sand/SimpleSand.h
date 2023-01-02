@@ -74,7 +74,7 @@ public:
                double,     // lambda_c
                double,     // v_0
                double = 0. // density
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

@@ -38,7 +38,7 @@ class Laminated final : public Material2D {
 public:
     Laminated(unsigned, // tag
               uvec&&    // mat tag
-    );
+        );
     Laminated(const Laminated&);
     Laminated(Laminated&&) = delete;
     Laminated& operator=(const Laminated&) = delete;

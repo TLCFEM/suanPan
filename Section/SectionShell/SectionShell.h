@@ -74,7 +74,7 @@ public:
     explicit SectionShell(unsigned = 0,    // section tag
                           unsigned = 0,    // material tag
                           vec&& = {0., 0.} // eccentricity
-    );
+        );
     SectionShell(const SectionShell&) = default;           // default copy ctor
     SectionShell(SectionShell&&) = delete;                 // move forbidden
     SectionShell& operator=(const SectionShell&) = delete; // assign forbidden

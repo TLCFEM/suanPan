@@ -48,7 +48,7 @@ public:
                       double,   // damping
                       double,   // yield stress
                       double    // hardening ratio
-    );
+        );
 
     unique_ptr<Material> get_copy() override;
 };

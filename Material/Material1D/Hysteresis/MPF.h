@@ -61,7 +61,7 @@ public:
         bool = false,  // isotropic hardening switch
         bool = false,  // constant radius switch
         double = 0.    // density
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

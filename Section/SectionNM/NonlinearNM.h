@@ -68,7 +68,7 @@ public:
                 bool,     // kinematic hardening modulus
                 double,   // linear density
                 vec&&
-    );
+        );
     NonlinearNM(unsigned, // tag
                 double,   // axial rigidity
                 double,   // flexural rigidity
@@ -76,7 +76,7 @@ public:
                 bool,     // kinematic hardening modulus
                 double,   // linear density
                 vec&&
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

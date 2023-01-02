@@ -914,10 +914,8 @@ void new_concrete21(unique_ptr<Material>& return_obj, istringstream& command) {
     double input;
     while(!command.eof() && get_input(command, input)) para.emplace_back(input);
 
-    if(para.size() == 9)
-        return_obj = make_unique<Concrete21>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], 0.);
-    else if(para.size() == 10)
-        return_obj = make_unique<Concrete21>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], para[9]);
+    if(para.size() == 9) return_obj = make_unique<Concrete21>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], 0.);
+    else if(para.size() == 10) return_obj = make_unique<Concrete21>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], para[9]);
     else
         SP_E("9 or 10 double inputs are required.\n");
 }
@@ -933,10 +931,8 @@ void new_concrete22(unique_ptr<Material>& return_obj, istringstream& command) {
     double input;
     while(!command.eof() && get_input(command, input)) para.emplace_back(input);
 
-    if(para.size() == 11)
-        return_obj = make_unique<Concrete22>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], para[9], para[10], 0.);
-    else if(para.size() == 12)
-        return_obj = make_unique<Concrete22>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], para[9], para[10], para[11]);
+    if(para.size() == 11) return_obj = make_unique<Concrete22>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], para[9], para[10], 0.);
+    else if(para.size() == 12) return_obj = make_unique<Concrete22>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], para[9], para[10], para[11]);
     else
         SP_E("11 or 12 double inputs are required.\n");
 }
@@ -1090,14 +1086,10 @@ void new_concretetsai(unique_ptr<Material>& return_obj, istringstream& command) 
     double input;
     while(!command.eof() && get_input(command, input)) para.emplace_back(input);
 
-    if(para.size() == 7)
-        return_obj = make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], 0.);
-    else if(para.size() == 8)
-        return_obj = make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7]);
-    else if(para.size() == 9)
-        return_obj = make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], 0.);
-    else if(para.size() == 10)
-        return_obj = make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], para[9]);
+    if(para.size() == 7) return_obj = make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], 0.);
+    else if(para.size() == 8) return_obj = make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7]);
+    else if(para.size() == 9) return_obj = make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], 0.);
+    else if(para.size() == 10) return_obj = make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], para[9]);
     else
         SP_E("7, 8, 9 or 10 double inputs are required.\n");
 }
@@ -2936,10 +2928,12 @@ int test_material1d(const shared_ptr<DomainBase>& domain, istringstream& command
     const auto result = material_tester(material_proto->get_copy(), load_step, {incre});
 
 #ifdef SUANPAN_HDF5
-    if(!result.save("RESULT.h5", hdf5_binary_trans)) SP_E("Fail to save to file.\n");
+    if(!result.save("RESULT.h5", hdf5_binary_trans))
+        SP_E("Fail to save to file.\n");
 #endif
 
-    if(!result.save("RESULT.txt", raw_ascii)) SP_E("Fail to save to file.\n");
+    if(!result.save("RESULT.txt", raw_ascii))
+        SP_E("Fail to save to file.\n");
 
     if(std::ofstream gnuplot("RESULT.plt"); gnuplot.is_open()) {
         gnuplot << "reset\n";
@@ -2990,10 +2984,12 @@ int test_material2d(const shared_ptr<DomainBase>& domain, istringstream& command
     const auto result = material_tester(material_proto->get_copy(), load_step, incre);
 
 #ifdef SUANPAN_HDF5
-    if(!result.save("RESULT.h5", hdf5_binary_trans)) SP_E("Fail to save to file.\n");
+    if(!result.save("RESULT.h5", hdf5_binary_trans))
+        SP_E("Fail to save to file.\n");
 #endif
 
-    if(!result.save("RESULT.txt", raw_ascii)) SP_E("Fail to save to file.\n");
+    if(!result.save("RESULT.txt", raw_ascii))
+        SP_E("Fail to save to file.\n");
 
     return SUANPAN_SUCCESS;
 }
@@ -3028,10 +3024,12 @@ int test_material3d(const shared_ptr<DomainBase>& domain, istringstream& command
     const auto result = material_tester(material_proto->get_copy(), load_step, incre);
 
 #ifdef SUANPAN_HDF5
-    if(!result.save("RESULT.h5", hdf5_binary_trans)) SP_E("Fail to save to file.\n");
+    if(!result.save("RESULT.h5", hdf5_binary_trans))
+        SP_E("Fail to save to file.\n");
 #endif
 
-    if(!result.save("RESULT.txt", raw_ascii)) SP_E("Fail to save to file.\n");
+    if(!result.save("RESULT.txt", raw_ascii))
+        SP_E("Fail to save to file.\n");
 
     return SUANPAN_SUCCESS;
 }
@@ -3072,10 +3070,12 @@ int test_material_with_base3d(const shared_ptr<DomainBase>& domain, istringstrea
     const auto result = material_tester(material_proto->get_copy(), load_step, incre, base);
 
 #ifdef SUANPAN_HDF5
-    if(!result.save("RESULT.h5", hdf5_binary_trans)) SP_E("Fail to save to file.\n");
+    if(!result.save("RESULT.h5", hdf5_binary_trans))
+        SP_E("Fail to save to file.\n");
 #endif
 
-    if(!result.save("RESULT.txt", raw_ascii)) SP_E("Fail to save to file.\n");
+    if(!result.save("RESULT.txt", raw_ascii))
+        SP_E("Fail to save to file.\n");
 
     return SUANPAN_SUCCESS;
 }
@@ -3110,10 +3110,12 @@ int test_material_by_load1d(const shared_ptr<DomainBase>& domain, istringstream&
     const auto result = material_tester_by_load(material_proto->get_copy(), load_step, {incre});
 
 #ifdef SUANPAN_HDF5
-    if(!result.save("RESULT.h5", hdf5_binary_trans)) SP_E("Fail to save to file.\n");
+    if(!result.save("RESULT.h5", hdf5_binary_trans))
+        SP_E("Fail to save to file.\n");
 #endif
 
-    if(!result.save("RESULT.txt", raw_ascii)) SP_E("Fail to save to file.\n");
+    if(!result.save("RESULT.txt", raw_ascii))
+        SP_E("Fail to save to file.\n");
 
     if(std::ofstream gnuplot("RESULT.plt"); gnuplot.is_open()) {
         gnuplot << "reset\n";
@@ -3162,10 +3164,12 @@ int test_material_by_load2d(const shared_ptr<DomainBase>& domain, istringstream&
     const auto result = material_tester_by_load(material_proto->get_copy(), load_step, incre);
 
 #ifdef SUANPAN_HDF5
-    if(!result.save("RESULT.h5", hdf5_binary_trans)) SP_E("Fail to save to file.\n");
+    if(!result.save("RESULT.h5", hdf5_binary_trans))
+        SP_E("Fail to save to file.\n");
 #endif
 
-    if(!result.save("RESULT.txt", raw_ascii)) SP_E("Fail to save to file.\n");
+    if(!result.save("RESULT.txt", raw_ascii))
+        SP_E("Fail to save to file.\n");
 
     return SUANPAN_SUCCESS;
 }
@@ -3200,10 +3204,12 @@ int test_material_by_load3d(const shared_ptr<DomainBase>& domain, istringstream&
     const auto result = material_tester_by_load(material_proto->get_copy(), load_step, incre);
 
 #ifdef SUANPAN_HDF5
-    if(!result.save("RESULT.h5", hdf5_binary_trans)) SP_E("Fail to save to file.\n");
+    if(!result.save("RESULT.h5", hdf5_binary_trans))
+        SP_E("Fail to save to file.\n");
 #endif
 
-    if(!result.save("RESULT.txt", raw_ascii)) SP_E("Fail to save to file.\n");
+    if(!result.save("RESULT.txt", raw_ascii))
+        SP_E("Fail to save to file.\n");
 
     return SUANPAN_SUCCESS;
 }
@@ -3244,10 +3250,12 @@ int test_material_by_load_with_base3d(const shared_ptr<DomainBase>& domain, istr
     const auto result = material_tester_by_load(material_proto->get_copy(), load_step, incre, base);
 
 #ifdef SUANPAN_HDF5
-    if(!result.save("RESULT.h5", hdf5_binary_trans)) SP_E("Fail to save to file.\n");
+    if(!result.save("RESULT.h5", hdf5_binary_trans))
+        SP_E("Fail to save to file.\n");
 #endif
 
-    if(!result.save("RESULT.txt", raw_ascii)) SP_E("Fail to save to file.\n");
+    if(!result.save("RESULT.txt", raw_ascii))
+        SP_E("Fail to save to file.\n");
 
     return SUANPAN_SUCCESS;
 }
@@ -3279,7 +3287,8 @@ int test_material_by_strain_history(const shared_ptr<DomainBase>& domain, istrin
     const auto result = material_tester_by_strain_history(material_proto->get_copy(), strain_history);
 
 #ifdef SUANPAN_HDF5
-    if(!result.save("RESULT.h5", hdf5_binary_trans)) SP_E("Fail to save to file.\n");
+    if(!result.save("RESULT.h5", hdf5_binary_trans))
+        SP_E("Fail to save to file.\n");
 #else
     if(!result.save("RESULT.txt", raw_ascii)) SP_E("Fail to save to file.\n");
 #endif
@@ -3314,7 +3323,8 @@ int test_material_by_stress_history(const shared_ptr<DomainBase>& domain, istrin
     const auto result = material_tester_by_stress_history(material_proto->get_copy(), stress_history);
 
 #ifdef SUANPAN_HDF5
-    if(!result.save("RESULT.h5", hdf5_binary_trans)) SP_E("Fail to save to file.\n");
+    if(!result.save("RESULT.h5", hdf5_binary_trans))
+        SP_E("Fail to save to file.\n");
 #else
     if(!result.save("RESULT.txt", raw_ascii)) SP_E("Fail to save to file.\n");
 #endif
@@ -3432,7 +3442,8 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "Yeoh")) new_yeoh(new_material, command);
     else load::object(new_material, domain, material_id, command);
 
-    if(nullptr == new_material || !domain->insert(std::move(new_material))) SP_E("Fail to create new material via \"{}\".\n", command.str());
+    if(nullptr == new_material || !domain->insert(std::move(new_material)))
+        SP_E("Fail to create new material via \"{}\".\n", command.str());
 
     return 0;
 }

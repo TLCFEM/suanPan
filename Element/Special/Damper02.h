@@ -51,7 +51,7 @@ public:
              unsigned, // if proceed when fail to converge
              double,   // beta
              unsigned  // dimension
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

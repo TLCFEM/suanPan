@@ -69,7 +69,7 @@ public:
                      double,     // m
                      double,     // pt
                      double = 0. // density
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

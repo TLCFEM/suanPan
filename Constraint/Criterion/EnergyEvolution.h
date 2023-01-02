@@ -69,7 +69,7 @@ public:
                     unsigned = 10, // reactivation ratio
                     double = .5,   // propagation weight
                     double = 1E-5  // tolerance
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

@@ -50,7 +50,7 @@ public:
                 double,   // gap_a
                 double,   // gap_b
                 double    // cut-off
-    );
+        );
 
     unique_ptr<Material> get_copy() override;
 };

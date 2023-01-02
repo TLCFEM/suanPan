@@ -158,7 +158,8 @@ template<sp_d T> int BandMat<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
         if(0 == INFO) INFO = this->solve_trs(X, B);
     }
 
-    if(0 != INFO) SP_E("Error code {} received, the matrix is probably singular.\n", INFO);
+    if(0 != INFO)
+        SP_E("Error code {} received, the matrix is probably singular.\n", INFO);
 
     return INFO;
 }
@@ -207,7 +208,8 @@ template<sp_d T> int BandMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
         }
     }
 
-    if(0 != INFO) SP_E("Error code {} received, the matrix is probably singular.\n", INFO);
+    if(0 != INFO)
+        SP_E("Error code {} received, the matrix is probably singular.\n", INFO);
 
     return INFO;
 }
@@ -244,7 +246,8 @@ template<sp_d T> int BandMat<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
         if(0 == INFO) INFO = this->solve_trs(X, std::forward<Mat<T>>(B));
     }
 
-    if(0 != INFO) SP_E("Error code {} received, the matrix is probably singular.\n", INFO);
+    if(0 != INFO)
+        SP_E("Error code {} received, the matrix is probably singular.\n", INFO);
 
     return INFO;
 }
@@ -291,7 +294,8 @@ template<sp_d T> int BandMat<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
         }
     }
 
-    if(0 != INFO) SP_E("Error code {} received, the matrix is probably singular.\n", INFO);
+    if(0 != INFO)
+        SP_E("Error code {} received, the matrix is probably singular.\n", INFO);
 
     return INFO;
 }

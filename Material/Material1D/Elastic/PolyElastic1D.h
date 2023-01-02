@@ -39,7 +39,7 @@ public:
     PolyElastic1D(unsigned,   // tag
                   vec&&,      // parameters
                   double = 0. // density
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

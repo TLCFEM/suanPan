@@ -48,7 +48,7 @@ public:
     C3D8I(unsigned, // tag
           uvec&&,   // node tag
           unsigned  // material tag
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

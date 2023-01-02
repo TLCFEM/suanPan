@@ -22,7 +22,7 @@
 int LeeNewmarkBase::erase_top_left_block() const {
     auto& t_triplet = stiffness->triplet_mat;
 
-    uword *ptr_a, *ptr_b;
+    uword* ptr_a,* ptr_b;
 
     if(t_triplet.is_csc_sorted()) {
         ptr_a = t_triplet.col_mem();

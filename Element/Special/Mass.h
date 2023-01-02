@@ -64,7 +64,7 @@ public:
              unsigned,          // number of dofs
              uvec&&,            // node encoding
              std::vector<DOF>&& // dof identifier
-    );
+        );
 
     int update_status() override;
 
@@ -92,7 +92,7 @@ public:
            unsigned, // node tag
            double,   // magnitude
            uvec&&    // dof tags
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 };
@@ -107,7 +107,7 @@ public:
            unsigned, // node tag
            double,   // magnitude
            uvec&&    // dof tags
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 };
@@ -120,12 +120,12 @@ public:
     MassPoint2D(unsigned, // element tag
                 unsigned, // node tag
                 double    // translational magnitude
-    );
+        );
     MassPoint2D(unsigned, // element tag
                 unsigned, // node tag
                 double,   // translational magnitude
                 double    // rotational magnitude
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 };
@@ -138,12 +138,12 @@ public:
     MassPoint3D(unsigned, // element tag
                 unsigned, // node tag
                 double    // translational magnitude
-    );
+        );
     MassPoint3D(unsigned, // element tag
                 unsigned, // node tag
                 double,   // translational magnitude
                 double    // rotational magnitude
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 };

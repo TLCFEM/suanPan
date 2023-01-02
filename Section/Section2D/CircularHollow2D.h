@@ -42,13 +42,13 @@ public:
                      unsigned,      // material tag
                      unsigned = 10, // number of integration points
                      double = 0.    // eccentricity
-    );
+        );
     CircularHollow2D(unsigned,      // tag
                      vec&&,         // dimension
                      unsigned,      // material tag
                      unsigned = 10, // number of integration points
                      double = 0.    // eccentricity
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

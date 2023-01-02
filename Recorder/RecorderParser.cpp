@@ -40,7 +40,8 @@ int create_new_recorder(const shared_ptr<DomainBase>& domain, istringstream& com
     }
 
     if(is_equal(object_type, "Eigen")) {
-        if(!domain->insert(make_shared<EigenRecorder>(tag, is_equal(file_type[0], 'h')))) SP_E("Fail to create new eigen recorder.\n");
+        if(!domain->insert(make_shared<EigenRecorder>(tag, is_equal(file_type[0], 'h'))))
+            SP_E("Fail to create new eigen recorder.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -63,13 +64,15 @@ int create_new_recorder(const shared_ptr<DomainBase>& domain, istringstream& com
     }
 
     if(is_equal(object_type, "Frame")) {
-        if(!domain->insert(make_shared<FrameRecorder>(tag, to_list(variable_type.c_str()), interval))) SP_E("Fail to create new frame recorder.\n");
+        if(!domain->insert(make_shared<FrameRecorder>(tag, to_list(variable_type.c_str()), interval)))
+            SP_E("Fail to create new frame recorder.\n");
         return SUANPAN_SUCCESS;
     }
     if(is_equal(object_type, "Visualisation")) {
         unsigned width = 6;
         if(!command.eof() && !get_input(command, width)) width = 6;
-        if(!domain->insert(make_shared<VisualisationRecorder>(tag, to_list(variable_type.c_str()), interval, width))) SP_E("Fail to create new visualisation recorder.\n");
+        if(!domain->insert(make_shared<VisualisationRecorder>(tag, to_list(variable_type.c_str()), interval, width)))
+            SP_E("Fail to create new visualisation recorder.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -93,13 +96,11 @@ int create_new_recorder(const shared_ptr<DomainBase>& domain, istringstream& com
         SP_E("Fail to create new amplitude recorder.\n");
     else if(is_equal(object_type, "Global")) {
         bool flag;
-        if(OutputType::K == to_list(variable_type.c_str()))
-            flag = domain->insert(make_shared<GlobalStiffnessRecorder>(tag, interval, true, use_hdf5));
-        else if(OutputType::M == to_list(variable_type.c_str()))
-            flag = domain->insert(make_shared<GlobalMassRecorder>(tag, interval, true, use_hdf5));
-        else
-            flag = domain->insert(make_shared<GlobalRecorder>(tag, to_list(variable_type.c_str()), interval, true, use_hdf5));
-        if(!flag) SP_E("Fail to create new global recorder.\n");
+        if(OutputType::K == to_list(variable_type.c_str())) flag = domain->insert(make_shared<GlobalStiffnessRecorder>(tag, interval, true, use_hdf5));
+        else if(OutputType::M == to_list(variable_type.c_str())) flag = domain->insert(make_shared<GlobalMassRecorder>(tag, interval, true, use_hdf5));
+        else flag = domain->insert(make_shared<GlobalRecorder>(tag, to_list(variable_type.c_str()), interval, true, use_hdf5));
+        if(!flag)
+            SP_E("Fail to create new global recorder.\n");
     }
 
     return SUANPAN_SUCCESS;
@@ -119,7 +120,8 @@ int create_new_plainrecorder(const shared_ptr<DomainBase>& domain, istringstream
     }
 
     if(is_equal(object_type, "Eigen")) {
-        if(!domain->insert(make_shared<EigenRecorder>(tag, false))) SP_E("Fail to create new eigen recorder.\n");
+        if(!domain->insert(make_shared<EigenRecorder>(tag, false)))
+            SP_E("Fail to create new eigen recorder.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -144,7 +146,8 @@ int create_new_plainrecorder(const shared_ptr<DomainBase>& domain, istringstream
     if(is_equal(object_type, "Visualisation")) {
         unsigned width = 6;
         if(!command.eof() && !get_input(command, width)) width = 6;
-        if(!domain->insert(make_shared<VisualisationRecorder>(tag, to_list(variable_type.c_str()), interval, width))) SP_E("Fail to create new visualisation recorder.\n");
+        if(!domain->insert(make_shared<VisualisationRecorder>(tag, to_list(variable_type.c_str()), interval, width)))
+            SP_E("Fail to create new visualisation recorder.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -168,13 +171,11 @@ int create_new_plainrecorder(const shared_ptr<DomainBase>& domain, istringstream
         SP_E("Fail to create new amplitude recorder.\n");
     else if(is_equal(object_type, "Global")) {
         bool flag;
-        if(OutputType::K == to_list(variable_type.c_str()))
-            flag = domain->insert(make_shared<GlobalStiffnessRecorder>(tag, interval, true, false));
-        else if(OutputType::M == to_list(variable_type.c_str()))
-            flag = domain->insert(make_shared<GlobalMassRecorder>(tag, interval, true, false));
-        else
-            flag = domain->insert(make_shared<GlobalRecorder>(tag, to_list(variable_type.c_str()), interval, true, false));
-        if(!flag) SP_E("Fail to create new global recorder.\n");
+        if(OutputType::K == to_list(variable_type.c_str())) flag = domain->insert(make_shared<GlobalStiffnessRecorder>(tag, interval, true, false));
+        else if(OutputType::M == to_list(variable_type.c_str())) flag = domain->insert(make_shared<GlobalMassRecorder>(tag, interval, true, false));
+        else flag = domain->insert(make_shared<GlobalRecorder>(tag, to_list(variable_type.c_str()), interval, true, false));
+        if(!flag)
+            SP_E("Fail to create new global recorder.\n");
     }
 
     return SUANPAN_SUCCESS;
@@ -194,7 +195,8 @@ int create_new_hdf5recorder(const shared_ptr<DomainBase>& domain, istringstream&
     }
 
     if(is_equal(object_type, "Eigen")) {
-        if(!domain->insert(make_shared<EigenRecorder>(tag, true))) SP_E("Fail to create new eigen recorder.\n");
+        if(!domain->insert(make_shared<EigenRecorder>(tag, true)))
+            SP_E("Fail to create new eigen recorder.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -217,7 +219,8 @@ int create_new_hdf5recorder(const shared_ptr<DomainBase>& domain, istringstream&
     }
 
     if(is_equal(object_type, "Frame")) {
-        if(!domain->insert(make_shared<FrameRecorder>(tag, to_list(variable_type.c_str()), interval))) SP_E("Fail to create new frame recorder.\n");
+        if(!domain->insert(make_shared<FrameRecorder>(tag, to_list(variable_type.c_str()), interval)))
+            SP_E("Fail to create new frame recorder.\n");
         return SUANPAN_SUCCESS;
     }
     if(is_equal(object_type, "Visualisation")) {
@@ -237,7 +240,8 @@ int create_new_hdf5recorder(const shared_ptr<DomainBase>& domain, istringstream&
                     SP_E("A valid scale is required.\n");
                 }
             }
-        if(!domain->insert(make_shared<VisualisationRecorder>(tag, to_list(variable_type.c_str()), interval, width, scale))) SP_E("Fail to create new visualisation recorder.\n");
+        if(!domain->insert(make_shared<VisualisationRecorder>(tag, to_list(variable_type.c_str()), interval, width, scale)))
+            SP_E("Fail to create new visualisation recorder.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -261,13 +265,11 @@ int create_new_hdf5recorder(const shared_ptr<DomainBase>& domain, istringstream&
         SP_E("Fail to create new amplitude recorder.\n");
     else if(is_equal(object_type, "Global")) {
         bool flag;
-        if(OutputType::K == to_list(variable_type.c_str()))
-            flag = domain->insert(make_shared<GlobalStiffnessRecorder>(tag, interval, true, true));
-        else if(OutputType::M == to_list(variable_type.c_str()))
-            flag = domain->insert(make_shared<GlobalMassRecorder>(tag, interval, true, true));
-        else
-            flag = domain->insert(make_shared<GlobalRecorder>(tag, to_list(variable_type.c_str()), interval, true, true));
-        if(!flag) SP_E("Fail to create new global recorder.\n");
+        if(OutputType::K == to_list(variable_type.c_str())) flag = domain->insert(make_shared<GlobalStiffnessRecorder>(tag, interval, true, true));
+        else if(OutputType::M == to_list(variable_type.c_str())) flag = domain->insert(make_shared<GlobalMassRecorder>(tag, interval, true, true));
+        else flag = domain->insert(make_shared<GlobalRecorder>(tag, to_list(variable_type.c_str()), interval, true, true));
+        if(!flag)
+            SP_E("Fail to create new global recorder.\n");
     }
 
     return SUANPAN_SUCCESS;

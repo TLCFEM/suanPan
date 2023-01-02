@@ -58,7 +58,7 @@ public:
           unsigned,    // material tag
           double = 1., // thickness
           double = -1. // length
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

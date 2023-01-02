@@ -68,8 +68,8 @@ int PatchQuad::initialize(const shared_ptr<DomainBase>& D) {
     int_pt.reserve(num_element * plan.n_rows);
     for(auto I : ele_span(0))
         for(auto J : ele_span(1)) {
-            const auto &xl = knot_pool[0](I), &xh = knot_pool[0](I + 1);
-            const auto &yl = knot_pool[1](J), &yh = knot_pool[1](J + 1);
+            const auto& xl = knot_pool[0](I),& xh = knot_pool[0](I + 1);
+            const auto& yl = knot_pool[1](J),& yh = knot_pool[1](J + 1);
             const auto dx = xh - xl, dy = yh - yl;
             for(auto K = 0u; K < plan.n_rows; ++K) {
                 const auto x = xl + dx * (.5 * plan(K, 0) + .5);

@@ -74,7 +74,7 @@ int QE2::initialize(const shared_ptr<DomainBase>& D) {
 
         auto& c_pt = int_pt.back();
 
-        const auto &X = c_pt.coor(0), &Y = c_pt.coor(1);
+        const auto& X = c_pt.coor(0),& Y = c_pt.coor(1);
 
         c_pt.A = solve(mat_stiffness, c_pt.P = shape::stress7(iso_mapping * form_stress_mode(X, Y)));
 

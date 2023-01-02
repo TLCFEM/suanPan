@@ -52,7 +52,7 @@ unique_ptr<Material> MooneyRivlin::get_copy() { return make_unique<MooneyRivlin>
 int MooneyRivlin::update_trial_status(const vec& t_strain) {
     const vec G = weight % (trial_strain = t_strain) + tensor::unit_tensor2;
 
-    const auto &C1 = G(0), &C2 = G(1), &C3 = G(2), &C4 = G(3), &C5 = G(4), &C6 = G(5);
+    const auto& C1 = G(0),& C2 = G(1),& C3 = G(2),& C4 = G(3),& C5 = G(4),& C6 = G(5);
 
     const auto I1 = C1 + C2 + C3;
     const auto I2 = C1 * C2 + C1 * C3 + C2 * C3 - C4 * C4 - C5 * C5 - C6 * C6;

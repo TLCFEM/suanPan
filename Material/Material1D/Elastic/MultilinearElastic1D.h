@@ -39,7 +39,7 @@ public:
     MultilinearElastic1D(unsigned,   // tag
                          mat&&,      // backbone
                          double = 0. // density
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

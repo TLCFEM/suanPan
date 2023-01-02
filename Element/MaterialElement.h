@@ -44,7 +44,7 @@ public:
                     bool,         // nonlinear geometry switch
                     MaterialType, // material type
                     vector<DOF>&& // dof identifier
-    );
+        );
 };
 
 class MaterialElement1D : public MaterialElement {
@@ -56,7 +56,7 @@ public:
                       uvec&&,       // material tags
                       bool,         // nonlinear geometry switch
                       vector<DOF>&& // dof identifier
-    );
+        );
 };
 
 class MaterialElement2D : public MaterialElement {
@@ -68,7 +68,7 @@ public:
                       uvec&&,            // material tags
                       bool,              // nonlinear geometry switch
                       vector<DOF>&& = {} // dof identifier
-    );
+        );
 };
 
 class MaterialElement3D : public MaterialElement {
@@ -80,7 +80,7 @@ public:
                       uvec&&,                                     // material tags
                       bool,                                       // nonlinear geometry switch
                       vector<DOF>&& = {DOF::U1, DOF::U2, DOF::U3} // dof identifier
-    );
+        );
 };
 
 #endif

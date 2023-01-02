@@ -48,7 +48,7 @@ public:
           unsigned, // section tag
           unsigned, // orientation tag
           bool      // nlgeom
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

@@ -43,10 +43,8 @@ int create_new_converger(const shared_ptr<DomainBase>& domain, istringstream& co
         }
 
         if(is_equal(converger_id, "LogicAND") && domain->insert(make_shared<LogicAND>(tag, tag_a, tag_b))) code = 1; // NOLINT(bugprone-branch-clone)
-        else if(is_equal(converger_id, "LogicOR") && domain->insert(make_shared<LogicOR>(tag, tag_a, tag_b)))
-            code = 1;
-        else if(is_equal(converger_id, "LogicXOR") && domain->insert(make_shared<LogicXOR>(tag, tag_a, tag_b)))
-            code = 1;
+        else if(is_equal(converger_id, "LogicOR") && domain->insert(make_shared<LogicOR>(tag, tag_a, tag_b))) code = 1;
+        else if(is_equal(converger_id, "LogicXOR") && domain->insert(make_shared<LogicXOR>(tag, tag_a, tag_b))) code = 1;
         else
             SP_E("Cannot identify converger type.\n");
     }
@@ -80,10 +78,8 @@ int create_new_converger(const shared_ptr<DomainBase>& domain, istringstream& co
         else if(is_equal(converger_id, "AbsError") && domain->insert(make_shared<AbsError>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
         else if(is_equal(converger_id, "RelError") && domain->insert(make_shared<RelError>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
         else if(is_equal(converger_id, "AbsIncreEnergy") && domain->insert(make_shared<AbsIncreEnergy>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
-        else if(is_equal(converger_id, "RelIncreEnergy") && domain->insert(make_shared<RelIncreEnergy>(tag, tolerance, max_iteration, is_true(print_flag))))
-            code = 1;
-        else if(is_equal(converger_id, "FixedNumber") && domain->insert(make_shared<FixedNumber>(tag, max_iteration, is_true(print_flag))))
-            code = 1;
+        else if(is_equal(converger_id, "RelIncreEnergy") && domain->insert(make_shared<RelIncreEnergy>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
+        else if(is_equal(converger_id, "FixedNumber") && domain->insert(make_shared<FixedNumber>(tag, max_iteration, is_true(print_flag)))) code = 1;
         else
             SP_E("Cannot identify converger type.\n");
     }

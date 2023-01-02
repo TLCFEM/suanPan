@@ -42,7 +42,7 @@ class Parallel final : public Material1D {
 public:
     Parallel(unsigned, // tag
              uvec&&    // material tag pool
-    );
+        );
     Parallel(const Parallel&);
     Parallel(Parallel&&) = delete;
     Parallel& operator=(const Parallel&) = delete;

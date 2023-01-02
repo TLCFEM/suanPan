@@ -53,7 +53,7 @@ public:
        uvec&&,     // node tags
        unsigned,   // material tag
        double = 1. // thickness
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

@@ -39,7 +39,7 @@ public:
                        unsigned, // interval
                        bool,     // if to record time
                        bool      // if to use hdf5
-    );
+        );
 
     void record(const shared_ptr<DomainBase>&) override;
 

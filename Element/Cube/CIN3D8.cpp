@@ -30,7 +30,7 @@ CIN3D8::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<M
     , strain_mat(6, c_size, fill::zeros) {}
 
 mat CIN3D8::compute_mapping(const vec& C) {
-    const auto &X = C(0), &Y = C(1), &Z = C(2);
+    const auto& X = C(0),& Y = C(1),& Z = C(2);
 
     mat m(c_node, 3);
 
@@ -73,7 +73,7 @@ mat CIN3D8::compute_mapping(const vec& C) {
 }
 
 mat CIN3D8::compute_n(const vec& C) {
-    const auto &X = C(0), &Y = C(1), &Z = C(2);
+    const auto& X = C(0),& Y = C(1),& Z = C(2);
 
     mat n(c_node, 1);
 

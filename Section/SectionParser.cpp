@@ -113,13 +113,13 @@ void new_box2d(unique_ptr<Section>& return_obj, istringstream& command) {
     }
 
     unsigned int_pt = 6;
-    if(command.eof())
-        suanpan_debug("new_rectangle2D() uses six integration points.\n");
+    if(command.eof()) suanpan_debug("new_rectangle2D() uses six integration points.\n");
     else if(!get_input(command, int_pt))
         SP_E("A valid number of integration points is required.\n");
 
     auto eccentricity = 0.;
-    if(!command.eof() && !get_input(command, eccentricity)) SP_E("A valid eccentricity is required.\n");
+    if(!command.eof() && !get_input(command, eccentricity))
+        SP_E("A valid eccentricity is required.\n");
 
     return_obj = make_unique<Box2D>(tag, width, height, thickness, material_id, int_pt, eccentricity);
 }
@@ -156,14 +156,15 @@ void new_box3d(unique_ptr<Section>& return_obj, istringstream& command) {
     }
 
     unsigned int_pt = 3;
-    if(command.eof())
-        suanpan_debug("new_rectangle2D() uses six integration points.\n");
+    if(command.eof()) suanpan_debug("new_rectangle2D() uses six integration points.\n");
     else if(!get_input(command, int_pt))
         SP_E("A valid number of integration points is required.\n");
 
     auto eccentricity_a = 0., eccentricity_b = 0.;
-    if(!command.eof() && !get_input(command, eccentricity_a)) SP_E("A valid eccentricity is required.\n");
-    if(!command.eof() && !get_input(command, eccentricity_b)) SP_E("A valid eccentricity is required.\n");
+    if(!command.eof() && !get_input(command, eccentricity_a))
+        SP_E("A valid eccentricity is required.\n");
+    if(!command.eof() && !get_input(command, eccentricity_b))
+        SP_E("A valid eccentricity is required.\n");
 
     return_obj = make_unique<Box3D>(tag, width, height, thickness, material_id, int_pt, eccentricity_a, eccentricity_b);
 }
@@ -563,13 +564,13 @@ void new_rectangle2d(unique_ptr<Section>& return_obj, istringstream& command) {
     }
 
     unsigned int_pt = 6;
-    if(command.eof())
-        suanpan_debug("new_rectangle2D() uses six integration points.\n");
+    if(command.eof()) suanpan_debug("new_rectangle2D() uses six integration points.\n");
     else if(!get_input(command, int_pt))
         SP_E("A valid number of integration points is required.\n");
 
     auto eccentricity = 0.;
-    if(!command.eof() && !get_input(command, eccentricity)) SP_E("A valid eccentricity is required.\n");
+    if(!command.eof() && !get_input(command, eccentricity))
+        SP_E("A valid eccentricity is required.\n");
 
     return_obj = make_unique<Rectangle2D>(tag, width, height, material_id, int_pt, eccentricity);
 }
@@ -600,14 +601,15 @@ void new_rectangle3d(unique_ptr<Section>& return_obj, istringstream& command) {
     }
 
     unsigned int_pt = 3;
-    if(command.eof())
-        suanpan_debug("new_rectangle3d() uses six integration points.\n");
+    if(command.eof()) suanpan_debug("new_rectangle3d() uses six integration points.\n");
     else if(!get_input(command, int_pt))
         SP_E("A valid number of integration points is required.\n");
 
     auto eccentricity_a = 0., eccentricity_b = 0.;
-    if(!command.eof() && !get_input(command, eccentricity_a)) SP_E("A valid eccentricity is required.\n");
-    if(!command.eof() && !get_input(command, eccentricity_b)) SP_E("A valid eccentricity is required.\n");
+    if(!command.eof() && !get_input(command, eccentricity_a))
+        SP_E("A valid eccentricity is required.\n");
+    if(!command.eof() && !get_input(command, eccentricity_b))
+        SP_E("A valid eccentricity is required.\n");
 
     return_obj = make_unique<Rectangle3D>(tag, width, height, material_id, int_pt, eccentricity_a, eccentricity_b);
 }
@@ -2243,7 +2245,8 @@ int create_new_section(const shared_ptr<DomainBase>& domain, istringstream& comm
     else if(is_equal(section_id, "US3D")) new_us3d(new_section, command);
     else load::object(new_section, domain, section_id, command);
 
-    if(new_section == nullptr || !domain->insert(std::move(new_section))) SP_E("Fail to create new section via \"{}\".\n", command.str());
+    if(new_section == nullptr || !domain->insert(std::move(new_section)))
+        SP_E("Fail to create new section via \"{}\".\n", command.str());
 
     return 0;
 }

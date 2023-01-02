@@ -54,7 +54,7 @@ public:
                  double,     // peak strain in negative
                  double,     // crack strain in positive
                  double = 0. // density
-    );
+        );
     ConcreteTsai(unsigned,   // tag
                  double,     // peak stress in negative
                  double,     // crack stress in positive
@@ -64,7 +64,7 @@ public:
                  double,     // peak strain in negative
                  double,     // crack strain in positive
                  double = 0. // density
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

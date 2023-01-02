@@ -44,7 +44,7 @@ class Axisymmetric final : public Material2D {
 public:
     Axisymmetric(unsigned, // tag
                  unsigned  // 3D material tag
-    );
+        );
     Axisymmetric(const Axisymmetric&);
 
     int initialize(const shared_ptr<DomainBase>&) override;

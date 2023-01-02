@@ -59,7 +59,7 @@ public:
         unsigned,     // orientation tag
         unsigned = 6, // integration points
         bool = false  // nonlinear geometry switch
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

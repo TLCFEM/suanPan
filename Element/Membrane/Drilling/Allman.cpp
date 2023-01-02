@@ -28,7 +28,7 @@ Allman::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<M
     , strain_mat(3, m_size) {}
 
 mat Allman::form_coor(const mat& C) {
-    const auto &X1 = C(0, 0), &X2 = C(1, 0), &X3 = C(2, 0), &Y1 = C(0, 1), &Y2 = C(1, 1), &Y3 = C(2, 1);
+    const auto& X1 = C(0, 0),& X2 = C(1, 0),& X3 = C(2, 0),& Y1 = C(0, 1),& Y2 = C(1, 1),& Y3 = C(2, 1);
 
     mat coor(6, 6);
 
@@ -53,7 +53,7 @@ mat Allman::form_coor(const mat& C) {
 }
 
 field<mat> Allman::form_transform(const mat& C) {
-    const auto &X1 = C(0, 0), &X2 = C(1, 0), &X3 = C(2, 0), &Y1 = C(0, 1), &Y2 = C(1, 1), &Y3 = C(2, 1);
+    const auto& X1 = C(0, 0),& X2 = C(1, 0),& X3 = C(2, 0),& Y1 = C(0, 1),& Y2 = C(1, 1),& Y3 = C(2, 1);
 
     mat BMX(6, 9, fill::zeros), BMY(6, 9, fill::zeros);
 
@@ -92,7 +92,7 @@ int Allman::initialize(const shared_ptr<DomainBase>& D) {
 
     const auto dkt_trans = form_transform(coor);
 
-    const auto &BMX = dkt_trans(0), &BMY = dkt_trans(1);
+    const auto& BMX = dkt_trans(0),& BMY = dkt_trans(1);
 
     initial_stiffness.zeros(m_size, m_size);
 

@@ -42,7 +42,8 @@ GeneralizedAlpha::GeneralizedAlpha(const unsigned T, const double AF, const doub
     , F3(alpha_m)
     , F4(1. - F3)
     , F9(-.5 / beta) {
-    if(!suanpan::approx_equal(alpha_m, AM) || !suanpan::approx_equal(alpha_f, AF)) SP_E("Parameters automatically adjusted.\n");
+    if(!suanpan::approx_equal(alpha_m, AM) || !suanpan::approx_equal(alpha_f, AF))
+        SP_E("Parameters automatically adjusted.\n");
 }
 
 void GeneralizedAlpha::assemble_resistance() {

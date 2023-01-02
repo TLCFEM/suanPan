@@ -355,9 +355,7 @@ int create_new_solver(const shared_ptr<DomainBase>& domain, istringstream& comma
 
         if(domain->insert(make_shared<FEAST>(tag, eigen_number, centre, radius, is_equal(solver_type, "QuadraticFEAST")))) code = 1;
     }
-    else if(is_equal(solver_type, "DisplacementControl") || is_equal(solver_type, "MPDC")) {
-        if(domain->insert(make_shared<MPDC>(tag))) code = 1;
-    }
+    else if(is_equal(solver_type, "DisplacementControl") || is_equal(solver_type, "MPDC")) { if(domain->insert(make_shared<MPDC>(tag))) code = 1; }
     else
         SP_E("Cannot identify the solver type.\n");
 

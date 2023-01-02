@@ -78,7 +78,8 @@ ExternalModule::ExternalModule(string L)
         suanpan::to_upper(gnu_name);
         ext_library = LoadLibraryA(gnu_name.c_str());
     }
-    if(ext_library == nullptr) SP_E("Cannot load the library with the name \"{}\".\n", file_name);
+    if(ext_library == nullptr)
+        SP_E("Cannot load the library with the name \"{}\".\n", file_name);
 #elif defined(SUANPAN_UNIX)
     auto file_name = "./lib" + library_name + ".so";
     ext_library = dlopen(file_name.c_str(), RTLD_NOW);

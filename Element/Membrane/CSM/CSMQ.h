@@ -61,7 +61,7 @@ public:
          unsigned,    // number of nodes
          double = 1., // thickness
          double = -1. // length
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 
@@ -98,7 +98,7 @@ public:
           unsigned,    // material tag
           double = 1., // thickness
           double = -1. // length
-    );
+        );
 };
 
 class CSMQ6 final : public CSMQ {
@@ -114,7 +114,7 @@ public:
           unsigned,    // material tag
           double = 1., // thickness
           double = -1. // length
-    );
+        );
 };
 
 class CSMQ7 final : public CSMQ {
@@ -130,7 +130,7 @@ public:
           unsigned,    // material tag
           double = 1., // thickness
           double = -1. // length
-    );
+        );
 };
 
 #endif

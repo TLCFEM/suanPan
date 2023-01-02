@@ -38,7 +38,7 @@ class Material3D : public Material {
 public:
     Material3D(unsigned, // tag
                double    // density
-    );
+        );
 
     vector<vec> record(OutputType) override;
 };

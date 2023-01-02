@@ -62,7 +62,7 @@ public:
          unsigned,    // section tags
          double = .2, // hinge length
          bool = false // nonlinear geometry switch
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

@@ -47,7 +47,7 @@ public:
     Uniaxial(unsigned,    // tag
              unsigned,    // 3D material tag
              unsigned = 1 // max iteration
-    );
+        );
     Uniaxial(const Uniaxial&);
     Uniaxial(Uniaxial&&) = delete;
     Uniaxial& operator=(const Uniaxial&) = delete;

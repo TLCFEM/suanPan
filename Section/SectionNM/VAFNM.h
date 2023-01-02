@@ -53,7 +53,7 @@ public:
           vec&&,    // kinematic base
           double,   // linear density
           vec&&
-    );
+        );
     VAFNM(unsigned, // tag
           double,   // axial rigidity
           double,   // flexural rigidity
@@ -65,7 +65,7 @@ public:
           vec&&,    // kinematic base
           double,   // linear density
           vec&&
-    );
+        );
 };
 
 #endif

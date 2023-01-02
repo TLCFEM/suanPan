@@ -53,7 +53,7 @@ public:
                double,     // peak strain in negative
                double,     // crack strain in positive
                double = 0. // density
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

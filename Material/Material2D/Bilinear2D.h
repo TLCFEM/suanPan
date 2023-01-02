@@ -53,7 +53,7 @@ public:
                double = 1.,              // isotropic (1.0) / kinematic (0.0) hardening factor
                PlaneType = PlaneType::S, // plane stress or plane strain
                double = 0.               // density
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
     void initialize_couple(const shared_ptr<DomainBase>&) override;

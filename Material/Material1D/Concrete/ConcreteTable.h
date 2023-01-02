@@ -49,7 +49,7 @@ public:
                   mat&&,      // tension table
                   double,     // middle point
                   double = 0. // density
-    );
+        );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

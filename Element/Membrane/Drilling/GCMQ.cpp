@@ -34,7 +34,7 @@
  */
 GCMQ::ResultantConverter::ResultantConverter(const Edge E, const double T, const mat& EC, const IntegrationPlan& IP, const mat& TRANS)
     : direction_cosine(2, 3) {
-    const auto &X1 = IP(0, 0), &X2 = IP(1, 0);
+    const auto& X1 = IP(0, 0),& X2 = IP(1, 0);
 
     vec node_i, node_j, pt_a, pt_b;
 
@@ -116,7 +116,7 @@ mat GCMQ::form_transformation(const mat& jacobian) {
 mat GCMQ::form_enhanced_strain(const vec& coor, const int num_enhanced_mode) {
     mat poly(3, num_enhanced_mode, fill::zeros);
 
-    if(auto &X = coor(0), &Y = coor(1); 1 == num_enhanced_mode) {
+    if(auto& X = coor(0),& Y = coor(1); 1 == num_enhanced_mode) {
         poly(0, 0) = 3. * X * X - 1.;
         poly(1, 0) = 3. * Y * Y - 1.;
     }
@@ -164,7 +164,7 @@ int GCMQ::initialize(const shared_ptr<DomainBase>& D) {
     int_pt.clear();
     int_pt.reserve(plan.n_rows);
     for(unsigned I = 0; I < plan.n_rows; ++I) {
-        const auto &X = plan(I, 0), &Y = plan(I, 1);
+        const auto& X = plan(I, 0),& Y = plan(I, 1);
 
         vec t_vec{X, Y};
         const auto pn = compute_shape_function(t_vec, 1);
