@@ -51,7 +51,7 @@ int Frequency::analyze() {
     auto& G = get_integrator();
 
     if(SUANPAN_SUCCESS != solver->analyze()) {
-        suanpan_warning("fail to decompose the system, try to increase the number of eigen values.\n");
+        SP_W("Fail to decompose the system, try to increase the number of eigenvalues.\n");
         return SUANPAN_SUCCESS;
     }
 

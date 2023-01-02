@@ -169,7 +169,7 @@ void perform_response_spectrum(istringstream& command) {
         motion = motion.col(1);
         interval = mean(time_diff);
 
-        if(mean(arma::abs(diff(time_diff))) > 1E-8) suanpan_warning("please ensure the ground motion is equally spaced.\n");
+        if(mean(arma::abs(diff(time_diff))) > 1E-8) SP_W("Please ensure the ground motion is equally spaced.\n");
     }
 
     double damping_ratio = 0.;
@@ -210,7 +210,7 @@ void perform_sdof_response(istringstream& command) {
         motion = motion.col(1);
         interval = mean(time_diff);
 
-        if(mean(arma::abs(diff(time_diff))) > 1E-8) suanpan_warning("please make sure the ground motion is equally spaced.\n");
+        if(mean(arma::abs(diff(time_diff))) > 1E-8) SP_W("Please make sure the ground motion is equally spaced.\n");
     }
 
     double freq = 0.;

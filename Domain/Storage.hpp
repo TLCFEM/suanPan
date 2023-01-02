@@ -147,7 +147,7 @@ template<typename T> typename Storage<T>::iterator Storage<T>::end() { return po
 
 template<typename T> bool Storage<T>::insert(const shared_ptr<T>& I) {
     auto flag = pond.insert({I->get_tag(), I}).second;
-    if(!flag) suanpan_warning("Storage fails to insert %s %u.\n", type, I->get_tag());
+    if(!flag) SP_W("Fail to insert {} {}.\n", type, I->get_tag());
     return flag;
 }
 

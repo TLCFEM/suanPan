@@ -30,7 +30,7 @@ int Section::initialize_base(const shared_ptr<DomainBase>& D) {
     if(initialized) return SUANPAN_SUCCESS;
 
     if(0 != material_tag && (!D->find<Material>(material_tag) || MaterialType::D1 != D->get<Material>(material_tag)->get_material_type())) {
-        suanpan_warning("Section %u cannot find material %u or wrong material type assigned thus disabled.\n", get_tag(), material_tag);
+        SP_W("Section {} disabled as material {} cannot be found or wrong material type assigned.\n", get_tag(), material_tag);
         return SUANPAN_FAIL;
     }
 

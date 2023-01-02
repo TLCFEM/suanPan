@@ -46,7 +46,7 @@ int CAX4::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
     if(PlaneType::A != static_cast<PlaneType>(material_proto->get_parameter(ParameterType::PLANETYPE))) {
-        suanpan_warning("Element %u is assigned with an inconsistent material.\n", get_tag());
+        SP_W("Element {} is assigned with an inconsistent material.\n", get_tag());
         return SUANPAN_FAIL;
     }
 

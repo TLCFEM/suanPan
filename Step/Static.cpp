@@ -80,7 +80,7 @@ int Static::analyze() {
         if(remain_time <= 1E-7) return SUANPAN_SUCCESS;
         // check if the maximum substep number is hit
         if(++num_increment > get_max_substep()) {
-            suanpan_warning("analyze() reaches maximum substep number %u.\n", get_max_substep());
+            SP_W("The maximum sub-step number {} reached.\n", get_max_substep());
             return SUANPAN_FAIL;
         }
         // update incremental and trial time

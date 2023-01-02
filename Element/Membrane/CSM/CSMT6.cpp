@@ -36,7 +36,7 @@ int CSMT6::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
     if(!material_proto->is_support_couple()) {
-        suanpan_warning("Element %u is assigned with a material that does not support couple stress.\n", get_tag());
+        SP_W("Element {} is assigned with a material that does not support couple stress.\n", get_tag());
         return SUANPAN_FAIL;
     }
 

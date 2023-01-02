@@ -104,7 +104,7 @@ void Step::set_time_period(const double T) {
     const auto t_iteration = static_cast<int>(floor(time_period / ini_step_size)) + 1;
     if(t_iteration <= static_cast<int>(max_substep) || 0 == max_substep) return;
     if(t_iteration > static_cast<int>(std::numeric_limits<unsigned>::max())) {
-        suanpan_warning("set_ini_step_size() exceeds limits.\n");
+        SP_W("Too many iterations.\n");
         set_max_substep(std::numeric_limits<unsigned>::max());
     }
     else set_max_substep(t_iteration);

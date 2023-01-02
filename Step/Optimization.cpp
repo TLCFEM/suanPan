@@ -23,7 +23,7 @@ int Optimization::initialize() {
     if(SUANPAN_SUCCESS != Static::initialize()) return SUANPAN_FAIL;
 
     if(0 == get_domain().lock()->get_criterion()) {
-        suanpan_warning("at least one valid criterion shall be defined to run optimization.\n");
+        SP_W("At least one valid criterion shall be defined.\n");
         return SUANPAN_FAIL;
     }
 

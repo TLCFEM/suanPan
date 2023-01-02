@@ -15,4 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-void test_mode() {}
+#include <string>
+#include <suanPan.h>
+
+void test_mode() {
+    std::string A{"asdewf"};
+    SP_W("This is a test message: {}.\n", A);
+}

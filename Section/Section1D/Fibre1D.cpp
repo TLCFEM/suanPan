@@ -42,7 +42,7 @@ int Fibre1D::initialize(const shared_ptr<DomainBase>& D) {
     for(const auto I : fibre_tag) {
         fibre.emplace_back(suanpan::initialized_section_copy(D, I));
         if(nullptr == fibre.back() || SectionType::D1 != fibre.back()->get_section_type()) {
-            suanpan_warning("Fibre1D ignores section %llu since it is not a 1D section.\n", I);
+            SP_W("Section {} is ignored as it is not a valid 1D section.\n", I);
             fibre.pop_back();
         }
         else {

@@ -39,7 +39,7 @@ void Tabular::initialize(const shared_ptr<DomainBase>& D) {
         D->disable_amplitude(get_tag());
     }
     else if(ext_data.n_cols >= 2llu) {
-        if(ext_data.n_cols > 2llu) suanpan_warning("Tabular() reads more than two columns from the given file, please ensure the correct file is used.\n");
+        if(ext_data.n_cols > 2llu) SP_W("More than two columns read from \"{}\".\n", file_name);
         time = ext_data.col(0);
         magnitude = ext_data.col(1);
     }

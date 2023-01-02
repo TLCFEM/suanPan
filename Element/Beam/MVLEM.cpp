@@ -66,7 +66,7 @@ int MVLEM::initialize(const shared_ptr<DomainBase>& D) {
 
     shear_spring = suanpan::make_copy(D->get<Material>(shear_spring_tag));
     if(MaterialType::D1 != shear_spring->get_material_type()) {
-        suanpan_warning("Element %u is assigned with an inconsistent material.\n", get_tag());
+        SP_W("Element {} is assigned with an inconsistent material.\n", get_tag());
         return SUANPAN_FAIL;
     }
 

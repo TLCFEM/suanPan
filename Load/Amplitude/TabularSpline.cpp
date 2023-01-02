@@ -28,7 +28,7 @@ void TabularSpline::initialize(const shared_ptr<DomainBase>& D) {
 
     if(!all(dt)) {
         D->disable_amplitude(get_tag());
-        suanpan_warning("TabularSpline() detects repeated data points.\n");
+        SP_W("Repeated data points detected.\n");
         return;
     }
 

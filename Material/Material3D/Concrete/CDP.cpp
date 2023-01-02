@@ -65,14 +65,14 @@ CDP::CDP(const unsigned T, const double E, const double V, const double ST, cons
     const auto half_stress = .5 * f_t;
     const auto half_strain = log(1. + a_t + sqrt(1. + a_t * a_t)) / f_t / (1. + .5 * a_t) * g_t + half_stress / elastic_modulus;
     if(const auto ratio_t = half_stress / half_strain / elastic_modulus; ratio_t >= DT) {
-        suanpan_warning("CDP: requires a minimum tension degradation of %.2f, now reset it.\n", ratio_t);
+        SP_W("A minimum tension degradation of {:.2f} is required, resetting.\n", ratio_t);
         access::rw(cb_t) = log(ratio_t >= .9 ? ratio_t : ratio_t + .05) / log(.5 * (1. + a_t - sqrt(1. + a_t * a_t)) / a_t);
     }
     // compression
     const auto peak_stress = -fabs(SC);
     const auto peak_strain = log(2. * a_c / (1. + a_c)) / f_c / (1. + .5 * a_c) * g_c + peak_stress / elastic_modulus;
     if(const auto ratio_c = peak_stress / peak_strain / elastic_modulus; ratio_c >= DC) {
-        suanpan_warning("CDP: requires a minimum compression degradation of %.2f, now reset it.\n", ratio_c);
+        SP_W("A minimum compression degradation of {:.2f} is required, resetting.\n", ratio_c);
         access::rw(cb_c) = log(ratio_c >= .9 ? ratio_c : ratio_c + .05) / log(.5 + .5 / a_c);
     }
 }

@@ -348,7 +348,7 @@ int Element::initialize_base(const shared_ptr<DomainBase>& D) {
     node_ptr.reserve(num_node);
     for(const auto& t_tag : node_encoding) {
         if(!D->find<Node>(t_tag)) {
-            suanpan_warning("Element %u cannot find node %u thus disabled.\n", get_tag(), t_tag);
+            SP_W("Element {} disabled as node {} cannot be found.\n", get_tag(), t_tag);
             return SUANPAN_FAIL;
         }
         auto& t_node = D->get<Node>(t_tag);
@@ -356,7 +356,7 @@ int Element::initialize_base(const shared_ptr<DomainBase>& D) {
         if(!t_node->is_active()) inactive = true;
     }
     if(inactive) {
-        suanpan_warning("Element %u finds inactive nodes thus disabled.\n", get_tag());
+        SP_W("Element {} disabled as inactive nodes used.\n", get_tag());
         return SUANPAN_FAIL;
     }
     for(auto& I : node_ptr) if(I.lock()->get_dof_number() < num_dof) I.lock()->set_dof_number(num_dof);
@@ -365,7 +365,7 @@ int Element::initialize_base(const shared_ptr<DomainBase>& D) {
     if(MaterialType::D0 != mat_type)
         for(const auto& t_tag : material_tag)
             if(auto& t_material = D->get<Material>(t_tag); nullptr == t_material || !t_material->is_active() || t_material->get_material_type() != MaterialType::DS && t_material->get_material_type() != mat_type) {
-                suanpan_warning("Element %u cannot find valid material %llu thus disabled.\n", get_tag(), t_tag);
+                SP_W("Element {} disabled as material {} cannot be found.\n", get_tag(), t_tag);
                 return SUANPAN_FAIL;
             }
 
@@ -373,7 +373,7 @@ int Element::initialize_base(const shared_ptr<DomainBase>& D) {
     if(SectionType::D0 != sec_type)
         for(const auto& t_tag : section_tag)
             if(auto& t_section = D->get<Section>(t_tag); nullptr == t_section || !t_section->is_active() || t_section->get_section_type() != sec_type) {
-                suanpan_warning("Element %u cannot find valid section %llu thus disabled.\n", get_tag(), t_tag);
+                SP_W("Element {} disabled as section {} cannot be found.\n", get_tag(), t_tag);
                 return SUANPAN_FAIL;
             }
 

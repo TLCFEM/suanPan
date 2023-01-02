@@ -38,14 +38,14 @@ int F31::initialize(const shared_ptr<DomainBase>& D) {
     auto& sec_proto = D->get<Section>(section_tag(0));
 
     if(!D->find_orientation(orientation_tag)) {
-        suanpan_warning("Element %u cannot find the assigned transformation.\n", get_tag());
+        SP_W("Element {} cannot find the assigned transformation {}.\n", get_tag(), orientation_tag);
         return SUANPAN_FAIL;
     }
 
     b_trans = D->get_orientation(orientation_tag)->get_copy();
 
     if(b_trans->is_nlgeom() != is_nlgeom()) {
-        suanpan_warning("Element %u is assigned with an inconsistent transformation.\n", get_tag());
+        SP_W("Element {} is assigned with an inconsistent transformation {}.\n", get_tag(), orientation_tag);
         return SUANPAN_FAIL;
     }
 

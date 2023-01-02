@@ -73,7 +73,7 @@ int Newton::analyze() {
 
         suanpan_debug([&] {
             if(!samurai.is_finite()) {
-                suanpan_fatal("infinite number detected.\n");
+                SP_F("Infinite number detected.\n");
                 flag = SUANPAN_FAIL;
             }
         });

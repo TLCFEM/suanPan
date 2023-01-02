@@ -975,7 +975,7 @@ int Domain::initialize() {
     for(const auto I : remove_list) erase_element(I);
     element_pond.update();
     if(element_pond.get().empty()) {
-        suanpan_warning("no active element.\n");
+        SP_W("No active elements.\n");
         return SUANPAN_FAIL;
     }
 
