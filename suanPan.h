@@ -205,11 +205,11 @@ namespace suanpan {
     extern std::mutex print_mutex;
 }
 
-inline std::string suanpan_pattern(std::string_view header, std::source_location loc, std::string_view format) {
+inline std::string suanpan_pattern(const std::string_view header, const std::source_location& loc, const std::string_view& format) {
     std::string pattern{header};
     pattern += fs::path(loc.file_name()).filename().string();
     pattern += ":{}: ";
-    pattern += format_str;
+    pattern += format;
     return pattern;
 }
 
