@@ -497,7 +497,7 @@ int process_file(const shared_ptr<Bead>& model, const char* file_name) {
     }
 
     if(!input_file.is_open()) {
-        SP_E("Cannot open \"{}\".\n", fs::path(file_name).generic_string());
+        SP_E("Cannot open the input file \"{}\".\n", fs::path(file_name).generic_string());
         return SUANPAN_EXIT;
     }
 

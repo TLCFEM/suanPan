@@ -514,7 +514,7 @@ void new_cp3(unique_ptr<Element>& return_obj, istringstream& command) {
 
     auto thickness = 1.;
     if(!get_optional_input(command, thickness)) {
-        suanpan_error("new_cp3() assumes thickness to be unit.\n");
+        SP_E("A valid thickness is required.\n");
         return;
     }
 
@@ -2237,7 +2237,7 @@ void new_t2d2s(unique_ptr<Element>& return_obj, istringstream& command) {
 
     unsigned section_tag;
     if(!get_input(command, section_tag)) {
-        suanpan_error("new_t2d2s() needs a valid material/section tag.\n");
+        SP_E("A valid material/section tag is required.\n");
         return;
     }
 
@@ -2563,7 +2563,7 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
 
         double a, b, c, d;
         if(!get_input(command, a, b, c, d)) {
-            suanpan_error("create_new_modifier() needs four valid numbers.\n");
+            SP_E("A valid value is required.\n");
             return SUANPAN_SUCCESS;
         }
 

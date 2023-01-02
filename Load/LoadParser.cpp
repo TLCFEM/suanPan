@@ -293,7 +293,7 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& co
     else if(is_equal(amplitude_type, "Modulated") || is_equal(amplitude_type, "Sine") || is_equal(amplitude_type, "Cosine")) {
         double W;
         if(!get_input(command, W)) {
-            suanpan_error("create_new_amplitude() needs a period/amplitude.\n");
+            SP_E("A valid value is required.\n");
             return SUANPAN_SUCCESS;
         }
 
