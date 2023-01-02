@@ -110,12 +110,12 @@ int Static::analyze() {
             G->reset_status();
             // check if minimum step size is hit
             if(step_time <= get_min_step_size()) {
-                suanpan_error("analyze() reaches minimum step size %.3E.\n", get_min_step_size());
+                SP_E("The minimum step size {:.3E} reached.\n", get_min_step_size());
                 return SUANPAN_FAIL;
             }
             // check if fixed step size
             if(is_fixed_step_size()) {
-                suanpan_error("analyze() does not converge for given fixed step size %.3E.\n", step_time);
+                SP_E("Cannot converge with the given step size {:.3E}.\n", step_time);
                 return SUANPAN_FAIL;
             }
             // step size is allowed to decrease

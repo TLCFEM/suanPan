@@ -35,7 +35,7 @@ void Tabular::initialize(const shared_ptr<DomainBase>& D) {
 
     std::error_code code;
     if(mat ext_data; !fs::exists(file_name, code) || !ext_data.load(file_name, raw_ascii)) {
-        suanpan_error("Tabular() cannot load file.\n");
+        SP_E("Cannot load \"{}\".\n", file_name);
         D->disable_amplitude(get_tag());
     }
     else if(ext_data.n_cols >= 2llu) {
@@ -44,7 +44,7 @@ void Tabular::initialize(const shared_ptr<DomainBase>& D) {
         magnitude = ext_data.col(1);
     }
     else {
-        suanpan_error("Tabular() requires two valid columns.\n");
+        SP_E("Two valid columns are required.\n");
         D->disable_amplitude(get_tag());
     }
 }

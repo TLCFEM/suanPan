@@ -37,7 +37,7 @@ int Stacked::initialize(const shared_ptr<DomainBase>& D) {
     for(const auto I : mat_tag) {
         mat_pool.emplace_back(suanpan::initialized_material_copy(D, I));
         if(nullptr == mat_pool.back() || mat_pool.back()->get_material_type() != MaterialType::D3) {
-            suanpan_error("Stacked %u requires 3D host material models.\n", get_tag());
+            SP_E("A valid 3D host material is required.\n");
             return SUANPAN_FAIL;
         }
         access::rw(density) += mat_pool.back()->get_parameter(ParameterType::DENSITY);

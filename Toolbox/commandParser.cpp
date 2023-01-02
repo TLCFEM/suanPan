@@ -113,54 +113,62 @@ void perform_upsampling(istringstream& command) {
     uword up_rate;
 
     if(!get_input(command, file_name, up_rate)) {
-        suanpan_error("perform_upsampling() requires valid file name and upsampling ratio.\n");
+        SP_E("A valid file name and a valid ratio are required.\n");
         return;
     }
 
     string window_type = "Hamming";
 
     if(!get_optional_input(command, window_type)) {
-        suanpan_error("perform_upsampling() requires valid window type.\n");
+        SP_E("A valid window type is required.\n");
         return;
     }
 
     mat result;
 
-    if(is_equal(window_type, "Hamming")) result = upsampling<WindowType::Hamming>(file_name, up_rate);
-    else if(is_equal(window_type, "Hann")) result = upsampling<WindowType::Hann>(file_name, up_rate);
-    else if(is_equal(window_type, "Blackman")) result = upsampling<WindowType::Blackman>(file_name, up_rate);
-    else if(is_equal(window_type, "BlackmanNuttall")) result = upsampling<WindowType::BlackmanNuttall>(file_name, up_rate);
-    else if(is_equal(window_type, "BlackmanHarris")) result = upsampling<WindowType::BlackmanHarris>(file_name, up_rate);
-    else if(is_equal(window_type, "FlatTop")) result = upsampling<WindowType::FlatTop>(file_name, up_rate);
+    if(is_equal(window_type, "Hamming"))
+        result = upsampling<WindowType::Hamming>(file_name, up_rate);
+    else if(is_equal(window_type, "Hann"))
+        result = upsampling<WindowType::Hann>(file_name, up_rate);
+    else if(is_equal(window_type, "Blackman"))
+        result = upsampling<WindowType::Blackman>(file_name, up_rate);
+    else if(is_equal(window_type, "BlackmanNuttall"))
+        result = upsampling<WindowType::BlackmanNuttall>(file_name, up_rate);
+    else if(is_equal(window_type, "BlackmanHarris"))
+        result = upsampling<WindowType::BlackmanHarris>(file_name, up_rate);
+    else if(is_equal(window_type, "FlatTop"))
+        result = upsampling<WindowType::FlatTop>(file_name, up_rate);
 
-    if(result.empty()) suanpan_error("perform_upsampling() fails to perform upsampling, please ensure the input is equally spaced and stored in two columns.\n");
+    if(result.empty()) SP_E("Fail to perform upsampling, please ensure the input is equally spaced and stored in two columns.\n");
 
-    if(!result.save(file_name += "_upsampled", raw_ascii)) suanpan_error("fail to save file.\n");
-    else suanpan_info("upsampled data is saved to %s.\n", file_name.c_str());
+    if(!result.save(file_name += "_upsampled", raw_ascii))
+        SP_E("Fail to save to file.\n");
+    else
+        suanpan_info("upsampled data is saved to %s.\n", file_name.c_str());
 }
 
 void perform_response_spectrum(istringstream& command) {
     string motion_name, period_name;
     if(!get_input(command, motion_name, period_name)) {
-        suanpan_error("perform_response_spectrum() requires valid file names for ground motion and period vector.\n");
+        SP_E("Valid file names for ground motion and period vector are required.\n");
         return;
     }
 
     std::error_code code;
     mat motion, period;
     if(!fs::exists(motion_name, code) || !motion.load(motion_name, raw_ascii) || motion.empty()) {
-        suanpan_error("perform_response_spectrum() requires a valid ground motion stored in either one or two columns.\n");
+        SP_E("A valid ground motion stored in either one or two columns is required.\n");
         return;
     }
     if(!fs::exists(period_name, code) || !period.load(period_name, raw_ascii) || period.empty()) {
-        suanpan_error("perform_response_spectrum() requires a valid period vector stored in one column.\n");
+        SP_E("A valid period vector stored in one column is required.\n");
         return;
     }
 
     double interval = 0.;
     if(1llu == motion.n_cols) {
         if(!get_input(command, interval) || interval <= 0.) {
-            suanpan_error("perform_response_spectrum() requires a valid sampling interval.\n");
+            SP_E("A valid sampling interval is required.\n");
             return;
         }
     }
@@ -174,34 +182,36 @@ void perform_response_spectrum(istringstream& command) {
 
     double damping_ratio = 0.;
     if(!get_input(command, damping_ratio) || damping_ratio < 0.) {
-        suanpan_error("perform_response_spectrum() requires a valid damping ratio.\n");
+        SP_E("A valid damping ratio is required.\n");
         return;
     }
 
     // ReSharper disable once CppTooWideScopeInitStatement
     const auto spectrum = response_spectrum<double>(damping_ratio, interval, motion, period.col(0));
 
-    if(!spectrum.save(motion_name += "_response_spectrum", raw_ascii)) suanpan_error("fail to save file.\n");
-    else suanpan_info("response spectrum data is saved to %s.\n", motion_name.c_str());
+    if(!spectrum.save(motion_name += "_response_spectrum", raw_ascii))
+        SP_E("Fail to save to file.\n");
+    else
+        suanpan_info("response spectrum data is saved to %s.\n", motion_name.c_str());
 }
 
 void perform_sdof_response(istringstream& command) {
     string motion_name;
     if(!get_input(command, motion_name)) {
-        suanpan_error("perform_sdof_response() requires a valid file name for ground motion.\n");
+        SP_E("A valid file name for ground motion is required.\n");
         return;
     }
 
     mat motion;
     if(std::error_code code; !fs::exists(motion_name, code) || !motion.load(motion_name, raw_ascii) || motion.empty()) {
-        suanpan_error("perform_sdof_response() requires a valid ground motion stored in either one or two columns.\n");
+        SP_E("A valid ground motion stored in either one or two columns is required.\n");
         return;
     }
 
     double interval = 0.;
     if(1llu == motion.n_cols) {
         if(!get_input(command, interval) || interval <= 0.) {
-            suanpan_error("perform_sdof_response() requires a valid sampling interval.\n");
+            SP_E("A valid sampling interval is required.\n");
             return;
         }
     }
@@ -215,21 +225,23 @@ void perform_sdof_response(istringstream& command) {
 
     double freq = 0.;
     if(!get_input(command, freq) || freq <= 0.) {
-        suanpan_error("perform_sdof_response() requires a valid frequency in hertz.\n");
+        SP_E("A valid frequency in hertz is required.\n");
         return;
     }
 
     double damping_ratio = 0.;
     if(!get_input(command, damping_ratio) || damping_ratio < 0.) {
-        suanpan_error("perform_sdof_response() requires a valid damping ratio.\n");
+        SP_E("A valid damping ratio is required.\n");
         return;
     }
 
     // ReSharper disable once CppTooWideScopeInitStatement
     const auto response = sdof_response<double>(damping_ratio, interval, freq, motion);
 
-    if(!response.save(motion_name += "_sdof_response", raw_ascii)) suanpan_error("fail to save file.\n");
-    else suanpan_info("sdof response data is saved to %s.\n", motion_name.c_str());
+    if(!response.save(motion_name += "_sdof_response", raw_ascii))
+        SP_E("Fail to save to file.\n");
+    else
+        suanpan_info("sdof response data is saved to %s.\n", motion_name.c_str());
 }
 
 int process_command(const shared_ptr<Bead>& model, istringstream& command) {
@@ -243,7 +255,7 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     if(is_equal(command_id, "file")) {
         string file_name;
         if(!get_input(command, file_name)) {
-            suanpan_error("process_file() needs a file name.\n");
+            SP_E("A valid file name is required.\n");
             return SUANPAN_SUCCESS;
         }
 
@@ -383,7 +395,7 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
         else if(string path; get_input(command, path)) {
             std::error_code code;
             fs::current_path(path, code);
-            if(0 != code.value()) suanpan_error("fail to set current path: %s\n", code.category().message(code.value()).c_str());
+            if(0 != code.value()) SP_E("Fail to set path \"{}\"\n", code.category().message(code.value()).c_str());
         }
         return SUANPAN_SUCCESS;
     }
@@ -450,8 +462,10 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
         return SUANPAN_SUCCESS;
     }
 
-    if(is_equal(command_id, "version")) print_version();
-    else suanpan_error("command not found.\n");
+    if(is_equal(command_id, "version"))
+        print_version();
+    else
+        SP_E("Command \"{}\" not found.\n", command.str());
 
     return SUANPAN_SUCCESS;
 }
@@ -483,7 +497,7 @@ int process_file(const shared_ptr<Bead>& model, const char* file_name) {
     }
 
     if(!input_file.is_open()) {
-        suanpan_error("process_file() cannot open %s.\n", fs::path(file_name).generic_string().c_str());
+        SP_E("Cannot open \"{}\".\n", fs::path(file_name).generic_string());
         return SUANPAN_EXIT;
     }
 
@@ -511,7 +525,7 @@ int process_file(const shared_ptr<Bead>& model, const char* file_name) {
 int create_new_domain(const shared_ptr<Bead>& model, istringstream& command) {
     unsigned domain_id;
     if(!get_input(command, domain_id)) {
-        suanpan_error("create_new_domain() requires a tag.\n");
+        SP_E("A valid tag is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -529,13 +543,13 @@ int create_new_domain(const shared_ptr<Bead>& model, istringstream& command) {
 int disable_object(const shared_ptr<Bead>& model, istringstream& command) {
     const auto& domain = get_current_domain(model);
     if(nullptr == domain) {
-        suanpan_error("disable_object() needs a valid domain.\n");
+        SP_E("A valid domain is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     string object_type;
     if(!get_input(command, object_type)) {
-        suanpan_error("disable_object() needs object type.\n");
+        SP_E("A valid object type is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -564,13 +578,13 @@ int disable_object(const shared_ptr<Bead>& model, istringstream& command) {
 int enable_object(const shared_ptr<Bead>& model, istringstream& command) {
     const auto& domain = get_current_domain(model);
     if(nullptr == domain) {
-        suanpan_error("enable_object() needs a valid domain.\n");
+        SP_E("A valid domain is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     string object_type;
     if(!get_input(command, object_type)) {
-        suanpan_error("enable_object() needs object type.\n");
+        SP_E("A valid object type is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -600,13 +614,13 @@ int enable_object(const shared_ptr<Bead>& model, istringstream& command) {
 int erase_object(const shared_ptr<Bead>& model, istringstream& command) {
     const auto& domain = get_current_domain(model);
     if(nullptr == domain) {
-        suanpan_error("erase_object() needs a valid domain.\n");
+        SP_E("A valid domain is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     string object_type;
     if(!get_input(command, object_type)) {
-        suanpan_error("erase_object() needs object type.\n");
+        SP_E("A valid object type is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -633,13 +647,13 @@ int erase_object(const shared_ptr<Bead>& model, istringstream& command) {
 
 int save_object(const shared_ptr<DomainBase>& domain, istringstream& command) {
     if(nullptr == domain) {
-        suanpan_error("erase_object() needs a valid domain.\n");
+        SP_E("A valid domain is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     string object_id;
     if(!get_input(command, object_id)) {
-        suanpan_error("save_object() needs a valid object type.\n");
+        SP_E("A valid object type is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -673,13 +687,13 @@ int save_object(const shared_ptr<DomainBase>& domain, istringstream& command) {
 
 int list_object(const shared_ptr<DomainBase>& domain, istringstream& command) {
     if(nullptr == domain) {
-        suanpan_error("list_object() needs a valid domain.\n");
+        SP_E("A valid domain is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     string object_type;
     if(!get_input(command, object_type)) {
-        suanpan_error("list_object() needs object type.\n");
+        SP_E("A valid object type is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -701,13 +715,13 @@ int list_object(const shared_ptr<DomainBase>& domain, istringstream& command) {
 
 int suspend_object(const shared_ptr<DomainBase>& domain, istringstream& command) {
     if(nullptr == domain) {
-        suanpan_error("suspend_object() needs a valid domain.\n");
+        SP_E("A valid domain is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     string object_type;
     if(!get_input(command, object_type)) {
-        suanpan_error("suspend_object() needs object type.\n");
+        SP_E("A valid object type is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -721,13 +735,13 @@ int suspend_object(const shared_ptr<DomainBase>& domain, istringstream& command)
 
 int protect_object(const shared_ptr<DomainBase>& domain, istringstream& command) {
     if(nullptr == domain) {
-        suanpan_error("protect_object() needs a valid domain.\n");
+        SP_E("A valid domain is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     string object_type;
     if(!get_input(command, object_type)) {
-        suanpan_error("protect_object() needs object type.\n");
+        SP_E("A valid object type is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -740,7 +754,7 @@ int protect_object(const shared_ptr<DomainBase>& domain, istringstream& command)
 int create_new_nodegroup(const shared_ptr<DomainBase>& domain, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("create_new_nodegroup() needs a tag.\n");
+        SP_E("A valid tag is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -748,7 +762,7 @@ int create_new_nodegroup(const shared_ptr<DomainBase>& domain, istringstream& co
     vector<uword> value_pool;
     while(get_input(command, value)) value_pool.push_back(value);
 
-    if(!domain->insert(make_shared<NodeGroup>(tag, value_pool))) suanpan_error("create_new_nodegroup() fails to create new node group.\n");
+    if(!domain->insert(make_shared<NodeGroup>(tag, value_pool))) SP_E("Fail to create new node group.\n");
 
     return SUANPAN_SUCCESS;
 }
@@ -756,7 +770,7 @@ int create_new_nodegroup(const shared_ptr<DomainBase>& domain, istringstream& co
 int create_new_elementgroup(const shared_ptr<DomainBase>& domain, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("create_new_elementgroup() needs a tag.\n");
+        SP_E("A valid tag is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -764,7 +778,7 @@ int create_new_elementgroup(const shared_ptr<DomainBase>& domain, istringstream&
     vector<uword> value_pool;
     while(get_input(command, value)) value_pool.push_back(value);
 
-    if(!domain->insert(make_shared<ElementGroup>(tag, value_pool))) suanpan_error("create_new_elementgroup() fails to create new element group.\n");
+    if(!domain->insert(make_shared<ElementGroup>(tag, value_pool))) SP_E("Fail to create new element group.\n");
 
     return SUANPAN_SUCCESS;
 }
@@ -772,19 +786,19 @@ int create_new_elementgroup(const shared_ptr<DomainBase>& domain, istringstream&
 int create_new_generate(const shared_ptr<DomainBase>& domain, istringstream& command) {
     string type;
     if(!get_input(command, type)) {
-        suanpan_error("create_new_generate() needs a type.\n");
+        SP_E("A valid type is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("create_new_generate() needs a tag.\n");
+        SP_E("A valid tag is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     int start, interval, end;
     if(!get_input(command, start)) {
-        suanpan_error("create_new_generate() needs a valid tag.\n");
+        SP_E("A valid tag is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -811,8 +825,10 @@ int create_new_generate(const shared_ptr<DomainBase>& domain, istringstream& com
         start += interval;
     }
 
-    if(is_equal(type, "nodegroup") && !domain->insert(make_shared<NodeGroup>(tag, tag_pool))) suanpan_error("create_new_generate() fails to create new node group.\n");
-    else if(is_equal(type, "elementgroup") && !domain->insert(make_shared<ElementGroup>(tag, tag_pool))) suanpan_error("create_new_generate() fails to create new element group.\n");
+    if(is_equal(type, "nodegroup") && !domain->insert(make_shared<NodeGroup>(tag, tag_pool)))
+        SP_E("Fail to create new node group.\n");
+    else if(is_equal(type, "elementgroup") && !domain->insert(make_shared<ElementGroup>(tag, tag_pool)))
+        SP_E("Fail to create new element group.\n");
 
     return SUANPAN_SUCCESS;
 }
@@ -820,19 +836,19 @@ int create_new_generate(const shared_ptr<DomainBase>& domain, istringstream& com
 int create_new_generatebyrule(const shared_ptr<DomainBase>& domain, istringstream& command) {
     string type;
     if(!get_input(command, type)) {
-        suanpan_error("create_new_generatebyrule() needs a type.\n");
+        SP_E("A valid type is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("create_new_generatebyrule() needs a tag.\n");
+        SP_E("A valid tag is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     unsigned dof;
     if(!get_input(command, dof)) {
-        suanpan_error("create_new_generatebyrule() needs a valid dof.\n");
+        SP_E("A valid dof identifier is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -840,7 +856,7 @@ int create_new_generatebyrule(const shared_ptr<DomainBase>& domain, istringstrea
     vector<double> pool;
     while(!command.eof() && get_input(command, para)) pool.emplace_back(para);
 
-    if(is_equal(type, "nodegroup") && !domain->insert(make_shared<NodeGroup>(tag, dof, pool))) suanpan_error("create_new_generatebyrule() fails to create new node group.\n");
+    if(is_equal(type, "nodegroup") && !domain->insert(make_shared<NodeGroup>(tag, dof, pool))) SP_E("Fail to create new node group.\n");
 
     return SUANPAN_SUCCESS;
 }
@@ -848,13 +864,13 @@ int create_new_generatebyrule(const shared_ptr<DomainBase>& domain, istringstrea
 int create_new_generatebyplane(const shared_ptr<DomainBase>& domain, istringstream& command) {
     string type;
     if(!get_input(command, type)) {
-        suanpan_error("create_new_generatebyplane() needs a type.\n");
+        SP_E("A valid type is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("create_new_generatebyplane() needs a tag.\n");
+        SP_E("A valid tag is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -864,7 +880,7 @@ int create_new_generatebyplane(const shared_ptr<DomainBase>& domain, istringstre
 
     if(pool.empty()) return SUANPAN_SUCCESS;
 
-    if(is_equal(type, "nodegroup") && !domain->insert(make_shared<NodeGroup>(tag, pool))) suanpan_error("create_new_generatebyplane() fails to create new node group.\n");
+    if(is_equal(type, "nodegroup") && !domain->insert(make_shared<NodeGroup>(tag, pool))) SP_E("Fail to create new node group.\n");
 
     return SUANPAN_SUCCESS;
 }
@@ -872,13 +888,13 @@ int create_new_generatebyplane(const shared_ptr<DomainBase>& domain, istringstre
 int create_new_generatebypoint(const shared_ptr<DomainBase>& domain, istringstream& command) {
     string type;
     if(!get_input(command, type)) {
-        suanpan_error("create_new_generatebypoint() needs a type.\n");
+        SP_E("A valid type is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("create_new_generatebypoint() needs a tag.\n");
+        SP_E("A valid tag is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -886,7 +902,9 @@ int create_new_generatebypoint(const shared_ptr<DomainBase>& domain, istringstre
     vector<double> pool;
     while(!command.eof() && get_input(command, para)) pool.emplace_back(para);
 
-    if(pool.size() % 2 == 0) { if(const auto size = static_cast<long long>(pool.size()) / 2; is_equal(type, "nodegroup") && !domain->insert(make_shared<NodeGroup>(tag, vector(pool.begin(), pool.begin() + size), vector(pool.end() - size, pool.end())))) suanpan_error("create_new_generatebypoint() fails to create new node group.\n"); }
+    if(pool.size() % 2 == 0) {
+        if(const auto size = static_cast<long long>(pool.size()) / 2; is_equal(type, "nodegroup") && !domain->insert(make_shared<NodeGroup>(tag, vector(pool.begin(), pool.begin() + size), vector(pool.end() - size, pool.end())))) SP_E("Fail to create new node group.\n");
+    }
 
     return SUANPAN_SUCCESS;
 }
@@ -894,7 +912,7 @@ int create_new_generatebypoint(const shared_ptr<DomainBase>& domain, istringstre
 int create_new_groupgroup(const shared_ptr<DomainBase>& domain, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("create_new_groupgroup() needs a tag.\n");
+        SP_E("A valid tag is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -902,7 +920,7 @@ int create_new_groupgroup(const shared_ptr<DomainBase>& domain, istringstream& c
     vector<uword> pool;
     while(!command.eof() && get_input(command, para)) pool.emplace_back(para);
 
-    if(!domain->insert(make_shared<GroupGroup>(tag, pool))) suanpan_error("create_new_groupgroup() fails to create new group of groups.\n");
+    if(!domain->insert(make_shared<GroupGroup>(tag, pool))) SP_E("Fail to create new group of groups.\n");
 
     return SUANPAN_SUCCESS;
 }
@@ -911,7 +929,7 @@ int create_new_external_module(const shared_ptr<DomainBase>& domain, istringstre
     string library_name;
 
     if(!get_input(command, library_name)) {
-        suanpan_error("create_new_external_module() needs module name.\n");
+        SP_E("A valid module name is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -930,20 +948,20 @@ int create_new_external_module(const shared_ptr<DomainBase>& domain, istringstre
 int create_new_initial(const shared_ptr<DomainBase>& domain, istringstream& command) {
     string variable_type;
     if(!get_input(command, variable_type)) {
-        suanpan_error("create_new_initial() needs a valid variable type.\n");
+        SP_E("A valid variable type is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     if(is_equal("material", variable_type)) {
         string state_type;
         if(!get_input(command, state_type)) {
-            suanpan_error("create_new_initial() needs a valid state type.\n");
+            SP_E("A valid state type is required.\n");
             return SUANPAN_SUCCESS;
         }
 
         unsigned mat_tag;
         if(!get_input(command, mat_tag)) {
-            suanpan_error("create_new_initial() needs a valid material tag.\n");
+            SP_E("A valid material tag is required.\n");
             return SUANPAN_SUCCESS;
         }
 
@@ -958,13 +976,13 @@ int create_new_initial(const shared_ptr<DomainBase>& domain, istringstream& comm
         vec magnitude(3);
         for(auto& I : magnitude)
             if(!get_input(command, I)) {
-                suanpan_error("create_new_initial() needs a valid magnitude.\n");
+                SP_E("A valid magnitude is required.\n");
                 return SUANPAN_SUCCESS;
             }
 
         unsigned ref_node;
         if(!get_input(command, ref_node) || !domain->find_node(ref_node)) {
-            suanpan_error("create_new_initial() needs a valid reference node tag.\n");
+            SP_E("A valid reference node tag is required.\n");
             return SUANPAN_SUCCESS;
         }
 
@@ -980,7 +998,7 @@ int create_new_initial(const shared_ptr<DomainBase>& domain, istringstream& comm
                 t_node->update_current_velocity(cross(magnitude, t_coor - t_ref_coor));
             }
             else {
-                suanpan_error("create_new_initial() needs a valid node tag.\n");
+                SP_E("A valid node tag is required.\n");
                 return SUANPAN_SUCCESS;
             }
         }
@@ -990,13 +1008,13 @@ int create_new_initial(const shared_ptr<DomainBase>& domain, istringstream& comm
 
     double magnitude;
     if(!get_input(command, magnitude)) {
-        suanpan_error("create_new_initial() needs a valid magnitude.\n");
+        SP_E("A valid magnitude is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     unsigned dof_tag;
     if(!get_input(command, dof_tag)) {
-        suanpan_error("create_new_initial() needs a valid dof tag.\n");
+        SP_E("A valid dof identifier is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -1010,7 +1028,7 @@ int create_new_initial(const shared_ptr<DomainBase>& domain, istringstream& comm
                 t_node->update_current_displacement(t_variable);
             }
             else {
-                suanpan_error("create_new_initial() needs a valid node tag.\n");
+                SP_E("A valid node tag is required.\n");
                 return SUANPAN_SUCCESS;
             }
     else if(is_equal("velocity", variable_type) || is_equal("vel", variable_type))
@@ -1023,7 +1041,7 @@ int create_new_initial(const shared_ptr<DomainBase>& domain, istringstream& comm
                 t_node->update_current_velocity(t_variable);
             }
             else {
-                suanpan_error("create_new_initial() needs a valid node tag.\n");
+                SP_E("A valid node tag is required.\n");
                 return SUANPAN_SUCCESS;
             }
     else if(is_equal("acceleration", variable_type) || is_equal("acc", variable_type))
@@ -1036,7 +1054,7 @@ int create_new_initial(const shared_ptr<DomainBase>& domain, istringstream& comm
                 t_node->update_current_acceleration(t_variable);
             }
             else {
-                suanpan_error("create_new_initial() needs a valid node tag.\n");
+                SP_E("A valid node tag is required.\n");
                 return SUANPAN_SUCCESS;
             }
         }
@@ -1047,7 +1065,7 @@ int create_new_initial(const shared_ptr<DomainBase>& domain, istringstream& comm
 int create_new_node(const shared_ptr<DomainBase>& domain, istringstream& command) {
     unsigned node_id;
     if(!get_input(command, node_id)) {
-        suanpan_error("create_new_node() needs a tag.\n");
+        SP_E("A valid tag is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -1055,7 +1073,7 @@ int create_new_node(const shared_ptr<DomainBase>& domain, istringstream& command
     double X;
     while(get_input(command, X)) coor.push_back(X);
 
-    if(!domain->insert(make_shared<Node>(node_id, vec(coor)))) suanpan_error("create_new_node() fails to insert Node %u.\n", node_id);
+    if(!domain->insert(make_shared<Node>(node_id, vec(coor)))) SP_E("Fail to create new node via \"{}\".\n", command.str());
 
     return SUANPAN_SUCCESS;
 }
@@ -1063,7 +1081,7 @@ int create_new_node(const shared_ptr<DomainBase>& domain, istringstream& command
 int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
     string property_id;
     if(!get_input(command, property_id)) {
-        suanpan_error("set_property() need a property type.\n");
+        SP_E("A valid property type is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -1071,7 +1089,7 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
         string value;
 
         if(!get_input(command, value)) {
-            suanpan_error("set_property() need a valid value.\n");
+            SP_E("A valid value is required.\n");
             return SUANPAN_SUCCESS;
         }
 
@@ -1084,7 +1102,7 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
                 std::error_code code;
                 create_directories(new_path, code);
                 if(0 != code.value()) {
-                    suanpan_error("cannot create %s.\n", new_path.generic_string().c_str());
+                    SP_E("Cannot create \"{}\".\n", new_path.generic_string());
                     return SUANPAN_SUCCESS;
                 }
             }
@@ -1096,35 +1114,43 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
         return SUANPAN_SUCCESS;
     }
     if(is_equal(property_id, "num_threads")) {
-        if(int value; get_input(command, value)) SUANPAN_NUM_THREADS = value;
-        else suanpan_error("set_property() need a valid value.\n");
+        if(int value; get_input(command, value))
+            SUANPAN_NUM_THREADS = value;
+        else
+            SP_E("A valid value is required.\n");
 
         return SUANPAN_SUCCESS;
     }
     if(is_equal(property_id, "screen_output")) {
-        if(string value; get_input(command, value)) SUANPAN_PRINT = is_true(value);
-        else suanpan_error("set_property() need a valid value.\n");
+        if(string value; get_input(command, value))
+            SUANPAN_PRINT = is_true(value);
+        else
+            SP_E("A valid value is required.\n");
 
         return SUANPAN_SUCCESS;
     }
 
     if(is_equal(property_id, "color_model")) {
-        if(string value; !get_input(command, value)) suanpan_error("set_property() need a valid value.\n");
-        else if(is_equal("WP", value)) domain->set_color_model(ColorMethod::WP);
-        else if(is_equal("MIS", value)) domain->set_color_model(ColorMethod::MIS);
-        else domain->set_color_model(ColorMethod::OFF);
+        if(string value; !get_input(command, value))
+            SP_E("A valid value is required.\n");
+        else if(is_equal("WP", value))
+            domain->set_color_model(ColorMethod::WP);
+        else if(is_equal("MIS", value))
+            domain->set_color_model(ColorMethod::MIS);
+        else
+            domain->set_color_model(ColorMethod::OFF);
 
         return SUANPAN_SUCCESS;
     }
     if(is_equal(property_id, "constraint_multiplier")) {
         double value;
-        get_input(command, value) ? set_constraint_multiplier(value) : suanpan_error("set_property() need a valid value.\n");
+        get_input(command, value) ? set_constraint_multiplier(value) : SP_E("A valid value is required.\n");
 
         return SUANPAN_SUCCESS;
     }
     if(is_equal(property_id, "load_multiplier")) {
         double value;
-        get_input(command, value) ? set_load_multiplier(value) : suanpan_error("set_property() need a valid value.\n");
+        get_input(command, value) ? set_load_multiplier(value) : SP_E("A valid value is required.\n");
 
         return SUANPAN_SUCCESS;
     }
@@ -1141,89 +1167,115 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
 
     if(is_equal(property_id, "fixed_step_size")) {
         string value;
-        get_input(command, value) ? t_step->set_fixed_step_size(is_true(value)) : suanpan_error("set_property() need a valid value.\n");
+        get_input(command, value) ? t_step->set_fixed_step_size(is_true(value)) : SP_E("A valid value is required.\n");
     }
     else if(is_equal(property_id, "symm_mat")) {
         string value;
-        get_input(command, value) ? t_step->set_symm(is_true(value)) : suanpan_error("set_property() need a valid value.\n");
+        get_input(command, value) ? t_step->set_symm(is_true(value)) : SP_E("A valid value is required.\n");
     }
     else if(is_equal(property_id, "band_mat")) {
         string value;
-        get_input(command, value) ? t_step->set_band(is_true(value)) : suanpan_error("set_property() need a valid value.\n");
+        get_input(command, value) ? t_step->set_band(is_true(value)) : SP_E("A valid value is required.\n");
     }
     else if(is_equal(property_id, "sparse_mat")) {
         string value;
-        get_input(command, value) ? t_step->set_sparse(is_true(value)) : suanpan_error("set_property() need a valid value.\n");
+        get_input(command, value) ? t_step->set_sparse(is_true(value)) : SP_E("A valid value is required.\n");
     }
     else if(is_equal(property_id, "iterative_refinement")) {
-        if(unsigned value; get_input(command, value)) t_step->set_refinement(value);
-        else suanpan_error("set_property() need a valid value.\n");
+        if(unsigned value; get_input(command, value))
+            t_step->set_refinement(value);
+        else
+            SP_E("A valid value is required.\n");
     }
     else if(is_equal(property_id, "system_solver")) {
-        if(string value; !get_input(command, value)) suanpan_error("set_property() need a valid value.\n");
-        else if(is_equal(value, "LAPACK")) t_step->set_system_solver(SolverType::LAPACK);
-        else if(is_equal(value, "SPIKE")) t_step->set_system_solver(SolverType::SPIKE);
-        else if(is_equal(value, "SUPERLU")) t_step->set_system_solver(SolverType::SUPERLU);
-        else if(is_equal(value, "MUMPS")) t_step->set_system_solver(SolverType::MUMPS);
+        if(string value; !get_input(command, value))
+            SP_E("A valid value is required.\n");
+        else if(is_equal(value, "LAPACK"))
+            t_step->set_system_solver(SolverType::LAPACK);
+        else if(is_equal(value, "SPIKE"))
+            t_step->set_system_solver(SolverType::SPIKE);
+        else if(is_equal(value, "SUPERLU"))
+            t_step->set_system_solver(SolverType::SUPERLU);
+        else if(is_equal(value, "MUMPS"))
+            t_step->set_system_solver(SolverType::MUMPS);
 #ifdef SUANPAN_CUDA
-        else if(is_equal(value, "CUDA")) t_step->set_system_solver(SolverType::CUDA);
+        else if(is_equal(value, "CUDA"))
+            t_step->set_system_solver(SolverType::CUDA);
 #endif
 #ifdef SUANPAN_MKL
-        else if(is_equal(value, "PARDISO")) t_step->set_system_solver(SolverType::PARDISO);
-        else if(is_equal(value, "FGMRES")) t_step->set_system_solver(SolverType::FGMRES);
+        else if(is_equal(value, "PARDISO"))
+            t_step->set_system_solver(SolverType::PARDISO);
+        else if(is_equal(value, "FGMRES"))
+            t_step->set_system_solver(SolverType::FGMRES);
 #endif
-        else if(is_equal(value, "GMRES")) t_step->set_system_solver(IterativeSolver::GMRES);
-        else if(is_equal(value, "BICGSTAB")) t_step->set_system_solver(IterativeSolver::BICGSTAB);
-        else if(is_equal(value, "NONE")) t_step->set_system_solver(IterativeSolver::NONE);
-        else suanpan_error("set_property() need a valid solver id.\n");
+        else if(is_equal(value, "GMRES"))
+            t_step->set_system_solver(IterativeSolver::GMRES);
+        else if(is_equal(value, "BICGSTAB"))
+            t_step->set_system_solver(IterativeSolver::BICGSTAB);
+        else if(is_equal(value, "NONE"))
+            t_step->set_system_solver(IterativeSolver::NONE);
+        else
+            SP_E("A valid solver type is required.\n");
     }
     else if(is_equal(property_id, "preconditioner")) {
-        if(string value; !get_input(command, value)) suanpan_error("set_property() need a valid value.\n");
-        else if(is_equal(value, "NONE")) t_step->set_preconditioner(PreconditionerType::NONE);
-        else if(is_equal(value, "JACOBI")) t_step->set_preconditioner(PreconditionerType::JACOBI);
+        if(string value; !get_input(command, value))
+            SP_E("A valid value is required.\n");
+        else if(is_equal(value, "NONE"))
+            t_step->set_preconditioner(PreconditionerType::NONE);
+        else if(is_equal(value, "JACOBI"))
+            t_step->set_preconditioner(PreconditionerType::JACOBI);
 #ifndef SUANPAN_SUPERLUMT
-        else if(is_equal(value, "ILU")) t_step->set_preconditioner(PreconditionerType::ILU);
+        else if(is_equal(value, "ILU"))
+            t_step->set_preconditioner(PreconditionerType::ILU);
 #endif
-        else suanpan_error("set_property() need a valid solver id.\n");
+        else
+            SP_E("A valid solver type is required.\n");
     }
     else if(is_equal(property_id, "precision")) {
-        if(string value; !get_input(command, value)) suanpan_error("set_property() need a valid value.\n");
-        else if(is_equal(value, "DOUBLE") || is_equal(value, "FULL")) t_step->set_precision(Precision::FULL);
-        else if(is_equal(value, "SINGLE") || is_equal(value, "MIXED")) t_step->set_precision(Precision::MIXED);
-        else suanpan_error("set_property() need a valid precision.\n");
+        if(string value; !get_input(command, value))
+            SP_E("A valid value is required.\n");
+        else if(is_equal(value, "DOUBLE") || is_equal(value, "FULL"))
+            t_step->set_precision(Precision::FULL);
+        else if(is_equal(value, "SINGLE") || is_equal(value, "MIXED"))
+            t_step->set_precision(Precision::MIXED);
+        else
+            SP_E("A valid precision is required.\n");
     }
     else if(is_equal(property_id, "tolerance")) {
         double value;
-        get_input(command, value) ? t_step->set_tolerance(value) : suanpan_error("set_property() need a valid value.\n");
+        get_input(command, value) ? t_step->set_tolerance(value) : SP_E("A valid value is required.\n");
     }
 #ifdef SUANPAN_MKL
     else if(is_equal(property_id, "fgmres_tolerance")) {
         double value;
-        get_input(command, value) ? t_step->set_tolerance(value) : suanpan_error("set_property() need a valid value.\n");
+        get_input(command, value) ? t_step->set_tolerance(value) : SP_E("A valid value is required.\n");
     }
 #endif
     else if(is_equal(property_id, "ini_step_size")) {
         double step_time;
-        get_input(command, step_time) ? t_step->set_ini_step_size(step_time) : suanpan_error("set_property() need a valid value.\n");
+        get_input(command, step_time) ? t_step->set_ini_step_size(step_time) : SP_E("A valid value is required.\n");
     }
     else if(is_equal(property_id, "min_step_size")) {
         double step_time;
-        get_input(command, step_time) ? t_step->set_min_step_size(step_time) : suanpan_error("set_property() need a valid value.\n");
+        get_input(command, step_time) ? t_step->set_min_step_size(step_time) : SP_E("A valid value is required.\n");
     }
     else if(is_equal(property_id, "max_step_size")) {
         double step_time;
-        get_input(command, step_time) ? t_step->set_max_step_size(step_time) : suanpan_error("set_property() need a valid value.\n");
+        get_input(command, step_time) ? t_step->set_max_step_size(step_time) : SP_E("A valid value is required.\n");
     }
     else if(is_equal(property_id, "max_iteration")) {
         unsigned max_number;
-        get_input(command, max_number) ? t_step->set_max_substep(max_number) : suanpan_error("set_property() need a valid value.\n");
+        get_input(command, max_number) ? t_step->set_max_substep(max_number) : SP_E("A valid value is required.\n");
     }
     else if(is_equal(property_id, "eigen_number")) {
         if(unsigned eigen_number; get_input(command, eigen_number)) {
-            if(const auto eigen_step = std::dynamic_pointer_cast<Frequency>(t_step); nullptr == eigen_step) suanpan_error("set_property() cannot set eigen number for noneigen step.\n");
-            else eigen_step->set_eigen_number(eigen_number);
+            if(const auto eigen_step = std::dynamic_pointer_cast<Frequency>(t_step); nullptr == eigen_step)
+                SP_E("Cannot set eigen number for non-eigen step.\n");
+            else
+                eigen_step->set_eigen_number(eigen_number);
         }
-        else suanpan_error("set_property() need a valid eigen number.\n");
+        else
+            SP_E("A valid eigen number is required.\n");
     }
 
     return SUANPAN_SUCCESS;
@@ -1232,7 +1284,7 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
 int print_info(const shared_ptr<DomainBase>& domain, istringstream& command) {
     string object_type;
     if(!get_input(command, object_type)) {
-        suanpan_error("print_info() needs object type.\n");
+        SP_E("A valid object type is required.\n");
         return SUANPAN_SUCCESS;
     }
 

@@ -71,7 +71,7 @@ int ArmstrongFrederick::update_trial_status(const vec& t_strain) {
     unsigned counter = 0;
     while(true) {
         if(max_iteration == ++counter) {
-            suanpan_error("ArmstrongFrederick cannot converge within %u iterations.\n", max_iteration);
+            SP_E("Cannot converge within {} iterations.\n", max_iteration);
             return SUANPAN_FAIL;
         }
 

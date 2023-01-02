@@ -31,7 +31,7 @@ shared_ptr<DomainBase> Integrator::get_domain() const { return database.lock(); 
 int Integrator::initialize() {
     if(nullptr != database.lock()) return SUANPAN_SUCCESS;
 
-    suanpan_error("initialize() needs a valid domain.\n");
+    SP_E("A valid domain is required.\n");
     return SUANPAN_FAIL;
 }
 

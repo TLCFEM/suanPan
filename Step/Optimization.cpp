@@ -38,7 +38,7 @@ int Optimization::analyze() {
 
     while(true) {
         if(++num_increment > get_max_substep()) {
-            suanpan_error("maximum iteration reached.\n");
+            SP_E("The maximum iteration {} reached.\n", get_max_substep());
             return SUANPAN_FAIL;
         }
 

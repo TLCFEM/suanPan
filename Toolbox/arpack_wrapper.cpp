@@ -64,7 +64,7 @@ int eig_solve(vec& eigval, mat& eigvec, const std::shared_ptr<MetaMat<double>>& 
     }
 
     if(0 != INFO) {
-        suanpan_error("arpack solver returns %d.\n", INFO);
+        SP_E("Error code {} received.\n", INFO);
         return SUANPAN_FAIL;
     }
 
@@ -129,7 +129,7 @@ int eig_solve(cx_vec& eigval, cx_mat& eigvec, const std::shared_ptr<MetaMat<doub
     }
 
     if(0 != INFO) {
-        suanpan_error("arpack solver returns %d.\n", INFO);
+        SP_E("Error code {} received.\n", INFO);
         return SUANPAN_FAIL;
     }
 

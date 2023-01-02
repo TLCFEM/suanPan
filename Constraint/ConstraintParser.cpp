@@ -24,20 +24,20 @@
 void new_bc(unique_ptr<Constraint>& return_obj, istringstream& command, const bool penalty, const bool group) {
     unsigned bc_id;
     if(!get_input(command, bc_id)) {
-        suanpan_error("new_bc() needs a valid tag.\n");
+        SP_E("A valid tag is required.\n");
         return;
     }
 
     string dof_id;
     if(!get_input(command, dof_id)) {
-        suanpan_error("new_bc() needs a valid DoF identifier.\n");
+        SP_E("A valid dof identifier is required.\n");
         return;
     }
 
     const auto bc_type = suanpan::to_lower(dof_id[0]);
 
     if(!is_equal(bc_type, 'p') && !is_equal(bc_type, 'e') && !is_equal(bc_type, 'x') && !is_equal(bc_type, 'y') && !is_equal(bc_type, 'z') && !is_equal(bc_type, '1') && !is_equal(bc_type, '2') && !is_equal(bc_type, '3') && !is_equal(bc_type, '4') && !is_equal(bc_type, '5') && !is_equal(bc_type, '6')) {
-        suanpan_error("new_bc() needs a valid DoF identifier.\n");
+        SP_E("A valid dof identifier is required.\n");
         return;
     }
 
@@ -51,13 +51,13 @@ void new_bc(unique_ptr<Constraint>& return_obj, istringstream& command, const bo
 void new_fixedlength(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dof) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("new_fixedlength() needs a valid tag.\n");
+        SP_E("A valid tag is required.\n");
         return;
     }
 
     uword node_i, node_j;
     if(!get_input(command, node_i) || !get_input(command, node_j)) {
-        suanpan_error("new_fixedlength() needs two node tags.\n");
+        SP_E("Two valid nodes are required.\n");
         return;
     }
 
@@ -67,19 +67,19 @@ void new_fixedlength(unique_ptr<Constraint>& return_obj, istringstream& command,
 void new_minimumgap(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dof) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("new_minimumgap() needs a valid tag.\n");
+        SP_E("A valid tag is required.\n");
         return;
     }
 
     uword node_i, node_j;
     if(!get_input(command, node_i) || !get_input(command, node_j)) {
-        suanpan_error("new_minimumgap() needs two node tags.\n");
+        SP_E("Two valid nodes are required.\n");
         return;
     }
 
     double gap;
     if(!get_input(command, gap)) {
-        suanpan_error("new_minimumgap() needs a valid minimum gap.\n");
+        SP_E("A valid minimum gap is required.\n");
         return;
     }
 
@@ -89,19 +89,19 @@ void new_minimumgap(unique_ptr<Constraint>& return_obj, istringstream& command, 
 void new_maximumgap(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dof) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("new_maximumgap() needs a valid tag.\n");
+        SP_E("A valid tag is required.\n");
         return;
     }
 
     uword node_i, node_j;
     if(!get_input(command, node_i) || !get_input(command, node_j)) {
-        suanpan_error("new_maximumgap() needs two node tags.\n");
+        SP_E("Two valid nodes are required.\n");
         return;
     }
 
     double gap;
     if(!get_input(command, gap)) {
-        suanpan_error("new_maximumgap() needs a valid minimum gap.\n");
+        SP_E("A valid minimum gap is required.\n");
         return;
     }
 
@@ -111,23 +111,23 @@ void new_maximumgap(unique_ptr<Constraint>& return_obj, istringstream& command, 
 void new_sleeve(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dof) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("new_sleeve() needs a valid tag.\n");
+        SP_E("A valid tag is required.\n");
         return;
     }
 
     uword node_i, node_j;
     if(!get_input(command, node_i) || !get_input(command, node_j)) {
-        suanpan_error("new_sleeve() needs two node tags.\n");
+        SP_E("Two valid nodes are required.\n");
         return;
     }
 
     double min_gap, max_gap;
     if(!get_input(command, min_gap)) {
-        suanpan_error("new_sleeve() needs a valid minimum gap.\n");
+        SP_E("A valid minimum gap is required.\n");
         return;
     }
     if(!get_input(command, max_gap)) {
-        suanpan_error("new_sleeve() needs a valid maximum gap.\n");
+        SP_E("A valid maximum gap is required.\n");
         return;
     }
 
@@ -137,19 +137,19 @@ void new_sleeve(unique_ptr<Constraint>& return_obj, istringstream& command, cons
 void new_embed(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dof) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("new_embed() needs a valid tag.\n");
+        SP_E("A valid tag is required.\n");
         return;
     }
 
     unsigned element_tag;
     if(!get_input(command, element_tag)) {
-        suanpan_error("new_embed() needs a valid element tag.\n");
+        SP_E("A valid element tag is required.\n");
         return;
     }
 
     unsigned node_tag;
     if(!get_input(command, node_tag)) {
-        suanpan_error("new_embed() needs a valid node tag.\n");
+        SP_E("A valid node tag is required.\n");
         return;
     }
 
@@ -160,19 +160,19 @@ void new_embed(unique_ptr<Constraint>& return_obj, istringstream& command, const
 void new_mpc(unique_ptr<Constraint>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("new_mpc() needs a valid tag.\n");
+        SP_E("A valid tag is required.\n");
         return;
     }
 
     unsigned amplitude;
     if(!get_input(command, amplitude)) {
-        suanpan_error("new_mpc() needs a valid amplitude tag.\n");
+        SP_E("A valid amplitude tag is required.\n");
         return;
     }
 
     double magnitude;
     if(!get_input(command, magnitude)) {
-        suanpan_error("new_mpc() needs a valid magnitude.\n");
+        SP_E("A valid magnitude is required.\n");
         return;
     }
 
@@ -193,14 +193,14 @@ void new_mpc(unique_ptr<Constraint>& return_obj, istringstream& command) {
 void new_nodeline(unique_ptr<Constraint>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("new_nodeline() needs a valid tag.\n");
+        SP_E("A valid tag is required.\n");
         return;
     }
 
     uvec node_tag(3);
     for(auto& I : node_tag)
         if(!get_input(command, I)) {
-            suanpan_error("new_nodeline() needs a valid node tag.\n");
+            SP_E("A valid node tag is required.\n");
             return;
         }
 
@@ -210,14 +210,14 @@ void new_nodeline(unique_ptr<Constraint>& return_obj, istringstream& command) {
 void new_nodefacet(unique_ptr<Constraint>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("new_nodefacet() needs a valid tag.\n");
+        SP_E("A valid tag is required.\n");
         return;
     }
 
     uvec node_tag(4);
     for(auto& I : node_tag)
         if(!get_input(command, I)) {
-            suanpan_error("new_nodefacet() needs a valid node tag.\n");
+            SP_E("A valid node tag is required.\n");
             return;
         }
 
@@ -227,19 +227,19 @@ void new_nodefacet(unique_ptr<Constraint>& return_obj, istringstream& command) {
 void new_particlecollision(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dim) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("new_particlecollision() needs a valid tag.\n");
+        SP_E("A valid tag is required.\n");
         return;
     }
 
     auto space = 1.;
     if(!command.eof() && !get_input(command, space)) {
-        suanpan_error("new_particlecollision() needs a valid spacing.\n");
+        SP_E("A valid spacing is required.\n");
         return;
     }
 
     auto alpha = 1.;
     if(!command.eof() && !get_input(command, alpha)) {
-        suanpan_error("new_particlecollision() needs a valid multiplier.\n");
+        SP_E("A valid multiplier is required.\n");
         return;
     }
 
@@ -249,19 +249,19 @@ void new_particlecollision(unique_ptr<Constraint>& return_obj, istringstream& co
 void new_ljpotential(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("new_particlecollision() needs a valid tag.\n");
+        SP_E("A valid tag is required.\n");
         return;
     }
 
     auto space = 1.;
     if(!command.eof() && !get_input(command, space)) {
-        suanpan_error("new_particlecollision() needs a valid spacing.\n");
+        SP_E("A valid spacing is required.\n");
         return;
     }
 
     auto alpha = 1.;
     if(!command.eof() && !get_input(command, alpha)) {
-        suanpan_error("new_particlecollision() needs a valid multiplier.\n");
+        SP_E("A valid multiplier is required.\n");
         return;
     }
 
@@ -271,19 +271,19 @@ void new_ljpotential(unique_ptr<Constraint>& return_obj, istringstream& command,
 void new_linearspring(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("new_linearspring() needs a valid tag.\n");
+        SP_E("A valid tag is required.\n");
         return;
     }
 
     auto space = 1.;
     if(!command.eof() && !get_input(command, space)) {
-        suanpan_error("new_linearspring() needs a valid spacing.\n");
+        SP_E("A valid spacing is required.\n");
         return;
     }
 
     auto alpha = 1.;
     if(!command.eof() && !get_input(command, alpha)) {
-        suanpan_error("new_linearspring() needs a valid multiplier.\n");
+        SP_E("A valid multiplier is required.\n");
         return;
     }
 
@@ -293,7 +293,7 @@ void new_linearspring(unique_ptr<Constraint>& return_obj, istringstream& command
 void new_rigidwall(unique_ptr<Constraint>& return_obj, istringstream& command, const bool finite, const bool penalty) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("new_rigidwall() needs a valid tag.\n");
+        SP_E("A valid tag is required.\n");
         return;
     }
 
@@ -357,14 +357,14 @@ void new_rigidwall(unique_ptr<Constraint>& return_obj, istringstream& command, c
         else return_obj = make_unique<RigidWallMultiplier3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, vec{p[3], p[4], p[5]}, vec{p[6], p[7], p[8]}, p[9]);
         break;
     default:
-        suanpan_error("new_rigidwall() requires valid number of parameters.\n");
+        SP_E("A valid number of parameters is required.\n");
     }
 }
 
 void new_restitutionwall(unique_ptr<Constraint>& return_obj, istringstream& command, const bool finite) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("new_restitutionwall() needs a valid tag.\n");
+        SP_E("A valid tag is required.\n");
         return;
     }
 
@@ -414,33 +414,33 @@ void new_restitutionwall(unique_ptr<Constraint>& return_obj, istringstream& comm
         return_obj = make_unique<RestitutionWallPenalty3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, vec{p[3], p[4], p[5]}, vec{p[6], p[7], p[8]}, p[9], p[10]);
         break;
     default:
-        suanpan_error("new_restitutionwall() requires valid number of parameters.\n");
+        SP_E("A valid number of parameters is required.\n");
     }
 }
 
 int create_new_criterion(const shared_ptr<DomainBase>& domain, istringstream& command) {
     const auto& step_tag = domain->get_current_step_tag();
     if(0 == step_tag) {
-        suanpan_error("create_new_criterion() needs a valid step.\n");
+        SP_E("A valid step is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     string criterion_type;
     if(!get_input(command, criterion_type)) {
-        suanpan_error("create_new_criterion() need a criterion type.\n");
+        SP_E("A valid criterion type is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("create_new_criterion() requires a tag.\n");
+        SP_E("A valid tag is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     if(is_equal(criterion_type.substr(0, 5), "Logic")) {
         unsigned tag_a, tag_b;
         if(!get_input(command, tag_a) || !get_input(command, tag_b)) {
-            suanpan_error("create_new_criterion() requires a valid tag.\n");
+            SP_E("A valid tag is required.\n");
             return SUANPAN_SUCCESS;
         }
 
@@ -453,37 +453,37 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, istringstream& co
     if(is_equal(criterion_type, "StrainEnergyEvolution")) {
         unsigned incre_level, final_level;
         if(!get_input(command, incre_level)) {
-            suanpan_error("create_new_criterion() requires a valid level.\n");
+            SP_E("A valid level is required.\n");
             return SUANPAN_SUCCESS;
         }
         if(!get_input(command, final_level)) {
-            suanpan_error("create_new_criterion() requires a valid level.\n");
+            SP_E("A valid level is required.\n");
             return SUANPAN_SUCCESS;
         }
 
         auto weight = 1.;
         if(!command.eof() && !get_input(command, weight)) {
-            suanpan_error("create_new_criterion() requires a valid weight of central element.\n");
+            SP_E("A valid weight of central element is required.\n");
             return SUANPAN_SUCCESS;
         }
         auto iteration = 2;
         if(!command.eof() && !get_input(command, iteration)) {
-            suanpan_error("create_new_criterion() requires a valid number of iteration.\n");
+            SP_E("A valid number of iteration is required.\n");
             return SUANPAN_SUCCESS;
         }
         auto reactivation = 10;
         if(!command.eof() && !get_input(command, reactivation)) {
-            suanpan_error("create_new_criterion() requires a valid number of reactivation ratio.\n");
+            SP_E("A valid number of reactivation ratio is required.\n");
             return SUANPAN_SUCCESS;
         }
         auto propagation = .5;
         if(!command.eof() && !get_input(command, propagation)) {
-            suanpan_error("create_new_criterion() requires a valid propagation factor.\n");
+            SP_E("A valid propagation factor is required.\n");
             return SUANPAN_SUCCESS;
         }
         auto tolerance = 1E-5;
         if(!command.eof() && !get_input(command, tolerance)) {
-            suanpan_error("create_new_criterion() requires a valid tolerance.\n");
+            SP_E("A valid tolerance is required.\n");
             return SUANPAN_SUCCESS;
         }
 
@@ -496,11 +496,11 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, istringstream& co
         string type;
         double limit;
         if(!get_input(command, type)) {
-            suanpan_error("create_new_criterion() requires a valid type.\n");
+            SP_E("A valid type is required.\n");
             return SUANPAN_SUCCESS;
         }
         if(!get_input(command, limit)) {
-            suanpan_error("create_new_criterion() requires a valid limit.\n");
+            SP_E("A valid limit is required.\n");
             return SUANPAN_SUCCESS;
         }
 
@@ -511,19 +511,19 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, istringstream& co
 
     unsigned node;
     if(!get_input(command, node)) {
-        suanpan_error("create_new_criterion() requires a node.\n");
+        SP_E("A valid node tag is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     unsigned dof;
     if(!get_input(command, dof)) {
-        suanpan_error("create_new_criterion() requires a dof.\n");
+        SP_E("A valid dof identifier is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     double limit;
     if(!get_input(command, limit)) {
-        suanpan_error("create_new_criterion() requires a limit.\n");
+        SP_E("A valid limit is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -538,7 +538,7 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, istringstream& co
 int create_new_constraint(const shared_ptr<DomainBase>& domain, istringstream& command) {
     string constraint_id;
     if(!get_input(command, constraint_id)) {
-        suanpan_error("create_new_constraint() needs constraint type.\n");
+        SP_E("A valid constraint type is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -575,7 +575,7 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, istringstream& c
 
     if(new_constraint != nullptr) new_constraint->set_start_step(domain->get_current_step_tag());
 
-    if(new_constraint == nullptr || !domain->insert(std::move(new_constraint))) suanpan_error("create_new_constraint() fails to create new constraint.\n");
+    if(new_constraint == nullptr || !domain->insert(std::move(new_constraint))) SP_E("Fail to create new constraint via \"{}\".\n", command.str());
 
     return SUANPAN_SUCCESS;
 }

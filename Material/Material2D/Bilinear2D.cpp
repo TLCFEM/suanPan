@@ -43,7 +43,7 @@ int Bilinear2D::initialize(const shared_ptr<DomainBase>&) {
 void Bilinear2D::initialize_couple(const shared_ptr<DomainBase>&) {
     if(characteristic_length < 0.) {
         characteristic_length = 1.;
-        suanpan_error("characteristic length is not set, use unity by default.\n");
+        SP_W("Characteristic length is set to unity.\n");
     }
 
     initial_couple_stiffness = 2. * characteristic_length * characteristic_length * elastic_modulus / (1. + poissons_ratio) * eye(2, 2);

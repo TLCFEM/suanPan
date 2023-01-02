@@ -30,7 +30,7 @@ vec ExpGurson1D::compute_hardening(const double plastic_strain) const {
     unsigned counter = 0;
     while(true) {
         if(max_iteration == ++counter) {
-            suanpan_error("NonlinearGurson cannot converge in %u iterations.\n", max_iteration);
+            SP_E("Cannot converge within {} iterations.\n", max_iteration);
             k = pow_term = 1.;
             break;
         }

@@ -82,14 +82,14 @@ void strip_mode(const string& input_file_name, const string& output_file_name) {
     ifstream input_file(input_file_name);
 
     if(!input_file.is_open()) {
-        suanpan_error("fail to open %s.\n", input_file_name.c_str());
+        SP_E("Fail to open \"{}\".\n", input_file_name);
         return;
     }
 
     ofstream output_file(output_file_name);
 
     if(!output_file.is_open()) {
-        suanpan_error("fail to open %s.\n", output_file_name.c_str());
+        SP_E("Fail to open \"{}\".\n", output_file_name);
         return;
     }
 
@@ -111,14 +111,14 @@ void convert_mode(const string& input_file_name, const string& output_file_name)
     ifstream input_file(input_file_name);
 
     if(!input_file.is_open()) {
-        suanpan_error("fail to open %s.\n", input_file_name.c_str());
+        SP_E("Fail to open \"{}\".\n", input_file_name);
         return;
     }
 
     ofstream output_file(output_file_name);
 
     if(!output_file.is_open()) {
-        suanpan_error("fail to open %s.\n", output_file_name.c_str());
+        SP_E("Fail to open \"{}\".\n", output_file_name);
         return;
     }
 
@@ -230,8 +230,10 @@ void argument_parser(const int argc, char** argv) {
 
         if(!output_file_name.empty()) {
             output_file.open(output_file_name);
-            if(output_file.is_open()) SUANPAN_COUT.rdbuf(output_file.rdbuf());
-            else suanpan_error("argumentParser() cannot open the output file.\n");
+            if(output_file.is_open())
+                SUANPAN_COUT.rdbuf(output_file.rdbuf());
+            else
+                SP_E("Cannot open the output file \"{}\".\n", output_file_name);
         }
 
         if(!input_file_name.empty()) {

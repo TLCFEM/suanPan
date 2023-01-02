@@ -50,7 +50,7 @@ int SlipLock::update_trial_status(const vec& t_strain) {
         if(!suanpan::approx_equal(sign(trial_stress(0)), sign(trial_strain(0)))) trial_stress = 0.;
     }
 
-    suanpan_error("SlipLock cannot converge within %u iterations.\n", max_iteration);
+    SP_E("Cannot converge within {} iterations.\n", max_iteration);
     return SUANPAN_FAIL;
 }
 

@@ -40,7 +40,7 @@ int Rebar2D::initialize(const shared_ptr<DomainBase>& D) {
     rebar_y = suanpan::initialized_material_copy(D, tag_y);
 
     if(nullptr == rebar_x || nullptr == rebar_y || rebar_x->get_material_type() != MaterialType::D1 || rebar_y->get_material_type() != MaterialType::D1) {
-        suanpan_error("Rebar2D %u requires 1D host material models.\n", get_tag());
+        SP_E("A valid 1D host material is required.\n");
         return SUANPAN_FAIL;
     }
 

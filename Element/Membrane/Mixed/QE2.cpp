@@ -95,7 +95,7 @@ int QE2::initialize(const shared_ptr<DomainBase>& D) {
     HT = trans(H);
 
     if(!solve(HIL, H, L) || !solve(HILI, H, LI)) {
-        suanpan_error("QE2 %u fails to initialize and is disabled.\n", get_tag());
+        SP_E("Element {} fails to initialize and is disabled.\n", get_tag());
         return SUANPAN_FAIL;
     }
 

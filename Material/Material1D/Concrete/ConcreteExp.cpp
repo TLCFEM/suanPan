@@ -49,7 +49,7 @@ podarray<double> ConcreteExp::compute_compression_backbone(const double n_strain
 
     while(true) {
         if(++counter == max_iteration) {
-            suanpan_error("ConcreteExp cannot converge within %u iterations.\n", max_iteration);
+            SP_E("Cannot converge within {} iterations.\n", max_iteration);
             return response;
         }
 
@@ -84,7 +84,7 @@ podarray<double> ConcreteExp::compute_tension_backbone(const double n_strain) co
 
     while(true) {
         if(++counter == max_iteration) {
-            suanpan_error("ConcreteExp cannot converge within %u iterations.\n", max_iteration);
+            SP_E("Cannot converge within {} iterations.\n", max_iteration);
             return response;
         }
 

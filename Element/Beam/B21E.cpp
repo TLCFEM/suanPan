@@ -40,7 +40,7 @@ int B21E::update_status() {
     auto counter = 0u;
     while(true) {
         if(++counter > max_iteration) {
-            suanpan_error("B21E element %u fails to converge to %.1E.\n", get_tag(), tolerance);
+            SP_E("Element {} fails to converge to {:.2E}.\n", get_tag(), tolerance);
             return SUANPAN_FAIL;
         }
 

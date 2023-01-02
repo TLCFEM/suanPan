@@ -56,7 +56,7 @@ int PlaneStress::initialize(const shared_ptr<DomainBase>& D) {
     base = suanpan::initialized_material_copy(D, base_tag);
 
     if(nullptr == base || base->get_material_type() != MaterialType::D3) {
-        suanpan_error("PlaneStress %u requires a 3D host material model.\n", get_tag());
+        SP_E("A valid 3D host material is required.\n");
         return SUANPAN_FAIL;
     }
 
@@ -103,7 +103,7 @@ int PlaneStress::update_trial_status(const vec& t_strain) {
             }
 
         if(counter == max_iteration) {
-            suanpan_error("PlaneStress cannot converge within %u iterations.\n", counter);
+            SP_E("Cannot converge within {} iterations.\n", max_iteration);
             return SUANPAN_FAIL;
         }
 

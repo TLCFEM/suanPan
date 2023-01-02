@@ -348,13 +348,13 @@ int LeeNewmarkFull::initialize() {
     if(SUANPAN_SUCCESS != LeeNewmarkBase::initialize()) return SUANPAN_FAIL;
 
     if(if_iterative && PreconditionerType::ILU != factory->get_solver_setting().preconditioner_type) {
-        suanpan_error("iterative solver with preconditioner other than ILU is not supported, please consider LeeNewmark.\n");
+        SP_E("Iterative solver with preconditioner other than ILU is not supported, please consider LeeNewmark.\n");
         return SUANPAN_FAIL;
     }
 
     if(factory->is_sparse()) return SUANPAN_SUCCESS;
 
-    suanpan_error("please use command `set sparse_mat true` to enable sparse storage.\n");
+    SP_E("The sparse storage needs to be enabled via \"set sparse_mat true\".\n");
     return SUANPAN_FAIL;
 }
 
@@ -369,7 +369,7 @@ int LeeNewmarkFull::process_constraint() {
 
     t_stiff.csc_condense();
 
-    const auto num_entry = 2 * t_stiff.n_elem;
+    const sp_i auto num_entry = 2 * t_stiff.n_elem;
 
     auto& t_triplet = stiffness->triplet_mat;
 

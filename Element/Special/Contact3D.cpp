@@ -149,7 +149,7 @@ int Contact3D::initialize(const shared_ptr<DomainBase>& D) {
     const auto& m_pool = D->get<Group>(master_tag)->get_pool();
 
     if(0 != m_pool.n_elem % 3) {
-        suanpan_error("Contact3D %u master group has wrong number of nodes.", get_tag());
+        SP_E("Element {} has wrong number of nodes.", get_tag());
         return SUANPAN_FAIL;
     }
 

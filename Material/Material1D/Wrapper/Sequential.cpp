@@ -37,7 +37,7 @@ int Sequential::initialize(const shared_ptr<DomainBase>& D) {
     for(const auto I : mat_tag) {
         mat_pool.emplace_back(suanpan::initialized_material_copy(D, I));
         if(nullptr == mat_pool.back() || mat_pool.back()->get_material_type() != MaterialType::D1) {
-            suanpan_error("Sequential %u requires 1D host material models.\n", get_tag());
+            SP_E("A valid 1D host material is required.\n");
             return SUANPAN_FAIL;
         }
         access::rw(density) += mat_pool.back()->get_parameter(ParameterType::DENSITY);
@@ -87,7 +87,7 @@ int Sequential::update_trial_status(const vec& t_strain) {
     }
 
     if(max_iteration == counter) {
-        suanpan_error("Sequential cannot converge within %u iterations.\n", max_iteration);
+        SP_E("Cannot converge within {} iterations.\n", max_iteration);
         return SUANPAN_FAIL;
     }
 

@@ -50,7 +50,7 @@ int NonlinearMises1D::update_trial_status(const vec& t_strain) {
         auto counter = 0u;
         while(true) {
             if(max_iteration == ++counter) {
-                suanpan_error("NonlinearMises1D cannot converge in %u iterations.\n", max_iteration);
+                SP_E("Cannot converge within {} iterations.\n", max_iteration);
                 return SUANPAN_FAIL;
             }
 

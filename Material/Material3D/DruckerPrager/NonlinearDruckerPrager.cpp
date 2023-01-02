@@ -71,7 +71,7 @@ int NonlinearDruckerPrager::update_trial_status(const vec& t_strain) {
     }
 
     if(max_iteration == counter) {
-        suanpan_error("NonlinearDruckerPrager cannot converge within %u iterations.\n", max_iteration);
+        SP_E("Cannot converge within {} iterations.\n", max_iteration);
         return SUANPAN_FAIL;
     }
 
@@ -103,7 +103,7 @@ int NonlinearDruckerPrager::update_trial_status(const vec& t_strain) {
         }
 
         if(max_iteration == counter) {
-            suanpan_error("NonlinearDruckerPrager cannot converge within %u iterations.\n", max_iteration);
+            SP_E("Cannot converge within {} iterations.\n", max_iteration);
             return SUANPAN_FAIL;
         }
 

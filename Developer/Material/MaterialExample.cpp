@@ -21,40 +21,40 @@
 SUANPAN_EXPORT void new_materialexample(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("new_materialexample() requires a valid tag.\n");
+        SP_E("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        suanpan_error("new_materialexample() requires a valid elastic modulus.\n");
+        SP_E("A valid elastic modulus is required.\n");
         return;
     }
 
     double yield_stress;
     if(!get_input(command, yield_stress)) {
-        suanpan_error("new_materialexample() requires a valid yield stress.\n");
+        SP_E("A valid yield stress is required.\n");
         return;
     }
 
     auto hardening_ratio = 0.;
     if(command.eof()) suanpan_debug("new_materialexample() assumes zero hardening ratio.\n");
     else if(!get_input(command, hardening_ratio)) {
-        suanpan_error("new_materialexample() requires a valid hardening ratio.\n");
+        SP_E("A valid hardening ratio is required.\n");
         return;
     }
 
     auto beta = 0.;
     if(command.eof()) suanpan_debug("new_materialexample() assumes isotropic hardening.\n");
     else if(!get_input(command, beta)) {
-        suanpan_error("new_materialexample() requires a valid beta.\n");
+        SP_E("A valid beta is required.\n");
         return;
     }
 
     auto density = 0.;
     if(command.eof()) suanpan_debug("new_materialexample() assumes zero density.\n");
     else if(!get_input(command, density)) {
-        suanpan_error("new_materialexample() requires a valid density.\n");
+        SP_E("A valid density is required.\n");
         return;
     }
 

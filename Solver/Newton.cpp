@@ -80,7 +80,7 @@ int Newton::analyze() {
 
         // make sure system solver succeeds
         if(SUANPAN_SUCCESS != flag) {
-            suanpan_error("system solver returns error code %d.\n", flag);
+            SP_E("Error code {} received.\n", flag);
             return flag;
         }
 

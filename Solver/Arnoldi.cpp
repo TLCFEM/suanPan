@@ -28,7 +28,7 @@ Arnoldi::Arnoldi(const unsigned T, const unsigned N, const char TP)
 
 int Arnoldi::initialize() {
     if(get_integrator() == nullptr) {
-        suanpan_error("initialize() needs a valid integrator.\n");
+        SP_E("A valid integrator is required.\n");
         return SUANPAN_FAIL;
     }
 

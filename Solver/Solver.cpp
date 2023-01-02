@@ -28,12 +28,12 @@ Solver::~Solver() { suanpan_debug("Solver %u dtor() called.\n", get_tag()); }
 
 int Solver::initialize() {
     if(nullptr == converger) {
-        suanpan_error("initialize() needs a valid converger.\n");
+        SP_E("A valid converger is required.\n");
         return SUANPAN_FAIL;
     }
 
     if(nullptr == modifier) {
-        suanpan_error("initialize() needs a valid integrator.\n");
+        SP_E("A valid integrator is required.\n");
         return SUANPAN_FAIL;
     }
 

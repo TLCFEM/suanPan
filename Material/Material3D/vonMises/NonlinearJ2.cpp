@@ -86,7 +86,7 @@ int NonlinearJ2::update_trial_status(const vec& t_strain) {
     }
 
     if(max_iteration == counter) {
-        suanpan_error("NonlinearJ2 cannot converge within %u iterations.\n", max_iteration);
+        SP_E("Cannot converge within {} iterations.\n", max_iteration);
         return SUANPAN_FAIL;
     }
 

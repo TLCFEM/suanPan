@@ -33,7 +33,7 @@ int NonlinearViscosity::initialize(const shared_ptr<DomainBase>&) {
 }
 
 int NonlinearViscosity::update_trial_status(const vec&) {
-    suanpan_error("NonlinearViscosity receives strain only from the associated element, check the model.\n");
+    SP_E("Receives strain only from the associated element.\n");
     return SUANPAN_FAIL;
 }
 

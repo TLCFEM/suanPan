@@ -24,27 +24,27 @@
 SUANPAN_EXPORT void new_elementexample(unique_ptr<Element>& return_obj, std::istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("new_elementexample() needs a tag.\n");
+        SP_E("A valid tag is required.\n");
         return;
     }
 
     std::vector<uword> node_tag(3);
     for(auto& I : node_tag)
         if(!get_input(command, I)) {
-            suanpan_error("new_elementexample() needs 3 nodes.\n");
+            SP_E("Three valid nodes are required.\n");
             return;
         }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
-        suanpan_error("new_elementexample() needs a material tag.\n");
+        SP_E("A valid material tag is required.\n");
         return;
     }
 
     auto thickness = 1.;
     if(command.eof()) suanpan_info("new_elementexample() assumes a unit thickness.\n");
     else if(!get_input(command, thickness)) {
-        suanpan_error("new_elementexample() needs a valid thickness.\n");
+        SP_E("A valid thickness is required.\n");
         return;
     }
 

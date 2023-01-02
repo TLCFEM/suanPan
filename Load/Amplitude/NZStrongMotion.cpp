@@ -25,7 +25,7 @@ NZStrongMotion::NZStrongMotion(const unsigned T, const char* P, const unsigned S
 void NZStrongMotion::initialize(const shared_ptr<DomainBase>& D) {
     std::error_code code;
     if(Col<int> data; !fs::exists(file_name, code) || !data.load(file_name, auto_detect)) {
-        suanpan_error("cannot load file %s.\n", file_name.c_str());
+        SP_E("Cannot load \"{}\".\n", file_name);
         D->disable_amplitude(get_tag());
     }
     else magnitude = conv_to<vec>::from(data);

@@ -34,7 +34,7 @@ int Rotation2D::initialize(const shared_ptr<DomainBase>& D) {
     mat_obj = suanpan::initialized_material_copy(D, mat_tag);
 
     if(nullptr == mat_obj || mat_obj->get_material_type() != MaterialType::D2) {
-        suanpan_error("Rotation2D %u requires a 2D host material model.\n", get_tag());
+        SP_E("A valid 2D host material is required.\n");
         return SUANPAN_FAIL;
     }
 

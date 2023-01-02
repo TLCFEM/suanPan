@@ -21,7 +21,7 @@
 SUANPAN_EXPORT void new_modifierexample(unique_ptr<Modifier>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("new_modifierexample() requires a valid tag.\n");
+        SP_E("A valid tag is required.\n");
         return;
     }
 

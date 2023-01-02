@@ -38,7 +38,7 @@ int VAFNM::compute_local_integration(vec& q, mat& jacobian) {
     auto ref_error = 1.;
     while(true) {
         if(max_iteration == ++counter) {
-            suanpan_error("VAFNM cannot converge within %u iterations.\n", max_iteration);
+            SP_E("Cannot converge within {} iterations.\n", max_iteration);
             return SUANPAN_FAIL;
         }
 

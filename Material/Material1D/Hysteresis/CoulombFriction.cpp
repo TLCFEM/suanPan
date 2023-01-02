@@ -30,7 +30,7 @@ int CoulombFriction::initialize(const shared_ptr<DomainBase>&) {
 unique_ptr<Material> CoulombFriction::get_copy() { return make_unique<CoulombFriction>(*this); }
 
 int CoulombFriction::update_trial_status(const vec&) {
-    suanpan_error("CoulombFriction receives strain only from the associated element, check the model.\n");
+    SP_E("Receives strain only from the associated element.\n");
     return SUANPAN_FAIL;
 }
 

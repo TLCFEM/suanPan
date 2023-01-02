@@ -25,15 +25,15 @@ bool initialise_material(const shared_ptr<Material>& obj, const uword size) {
     }
 
     if(obj->get_material_type() == MaterialType::D1 && 1 != size) {
-        suanpan_error("the tester cannot be applied to the given material model.\n");
+        SP_E("The tester cannot be applied to the given material model.\n");
         return false;
     }
     if(obj->get_material_type() == MaterialType::D2 && 3 != size) {
-        suanpan_error("the tester cannot be applied to the given material model.\n");
+        SP_E("The tester cannot be applied to the given material model.\n");
         return false;
     }
     if(obj->get_material_type() == MaterialType::D3 && 6 != size) {
-        suanpan_error("the tester cannot be applied to the given material model.\n");
+        SP_E("The tester cannot be applied to the given material model.\n");
         return false;
     }
 

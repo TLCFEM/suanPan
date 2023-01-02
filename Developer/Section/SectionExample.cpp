@@ -21,19 +21,19 @@
 SUANPAN_EXPORT void new_sectionexample(unique_ptr<Section>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("new_sectionexample() requires a valid tag.\n");
+        SP_E("A valid tag is required.\n");
         return;
     }
 
     double edge;
     if(!get_input(command, edge)) {
-        suanpan_error("new_sectionexample() requires a valid width.\n");
+        SP_E("A valid width is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        suanpan_error("new_sectionexample() requires a valid modulus.\n");
+        SP_E("A valid modulus is required.\n");
         return;
     }
 

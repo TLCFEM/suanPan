@@ -58,7 +58,7 @@ int Maxwell::initialize(const shared_ptr<DomainBase>& D) {
 unique_ptr<Material> Maxwell::get_copy() { return make_unique<Maxwell>(*this); }
 
 int Maxwell::update_trial_status(const vec&) {
-    suanpan_error("Maxwell receives strain only from the associated element, check the model.\n");
+    SP_E("Receives strain only from the associated element.\n");
     return SUANPAN_FAIL;
 }
 
@@ -142,7 +142,7 @@ int Maxwell::update_trial_status(const vec& t_strain, const vec& t_strain_rate) 
     }
 
     if(1 >= proceed || ++delay_counter == proceed) {
-        suanpan_error("Maxwell local iteration cannot converge within %u iterations.\n", max_iteration);
+        SP_E("Cannot converge within {} iterations.\n", max_iteration);
         return SUANPAN_FAIL;
     }
 

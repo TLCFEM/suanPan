@@ -185,7 +185,7 @@ int GCMQ::initialize(const shared_ptr<DomainBase>& D) {
     HT = trans(H);
 
     if(!solve(NT, H, N) || !solve(MT, H, M)) {
-        suanpan_error("GCMQ %u fails to initialize and is disabled.\n", get_tag());
+        SP_E("Element {} fails to initialize and is disabled.\n", get_tag());
         return SUANPAN_FAIL;
     }
 

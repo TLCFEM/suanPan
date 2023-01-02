@@ -41,7 +41,9 @@ GeneralizedAlpha::GeneralizedAlpha(const unsigned T, const double AF, const doub
     , F2(1. - F1)
     , F3(alpha_m)
     , F4(1. - F3)
-    , F9(-.5 / beta) { if(!suanpan::approx_equal(alpha_m, AM) || !suanpan::approx_equal(alpha_f, AF)) suanpan_error("GeneralizedAlpha() parameters are not acceptable hence automatically adjusted.\n"); }
+    , F9(-.5 / beta) {
+    if(!suanpan::approx_equal(alpha_m, AM) || !suanpan::approx_equal(alpha_f, AF)) SP_E("Parameters automatically adjusted.\n");
+}
 
 void GeneralizedAlpha::assemble_resistance() {
     const auto& D = get_domain();

@@ -41,11 +41,11 @@ int PCPE4UC::initialize(const shared_ptr<DomainBase>& D) {
 
     // validate material type
     if(PlaneType::E != static_cast<PlaneType>(s_mat->get_parameter(ParameterType::PLANETYPE))) {
-        suanpan_error("PCPE4UC %u only supports the plane strain material for solid phase.\n", get_tag());
+        SP_E("Only plane strain material for solid phase is supported.\n");
         return SUANPAN_FAIL;
     }
     if(MaterialType::DS != f_mat->get_material_type()) {
-        suanpan_error("PCPE4UC %u only supports the isotropic fluid phase.\n", get_tag());
+        SP_E("Only isotropic fluid phase is supported.\n");
         return SUANPAN_FAIL;
     }
 
@@ -54,11 +54,11 @@ int PCPE4UC::initialize(const shared_ptr<DomainBase>& D) {
     const auto kf = f_mat->get_parameter(ParameterType::BULKMODULUS);
 
     if(suanpan::approx_equal(ks, 0.)) {
-        suanpan_error("PCPE4UC %u solid phase returns a zero bulk modulus.\n", get_tag());
+        SP_E("A zero bulk modulus is detected.\n");
         return SUANPAN_FAIL;
     }
     if(suanpan::approx_equal(kf, 0.)) {
-        suanpan_error("PCPE4UC %u fluid phase returns a zero bulk modulus.\n", get_tag());
+        SP_E("A zero bulk modulus is detected.\n");
         return SUANPAN_FAIL;
     }
 
