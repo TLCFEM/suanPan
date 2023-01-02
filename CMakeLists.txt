@@ -66,6 +66,7 @@ add_subdirectory(Solver)
 add_subdirectory(Step)
 add_subdirectory(Toolbox)
 add_subdirectory(UnitTest)
+add_subdirectory(Include/fmt)
 
 target_link_libraries(${PROJECT_NAME}
         Converger
@@ -73,6 +74,7 @@ target_link_libraries(${PROJECT_NAME}
         Material
         Section
         Solver
+        fmt::fmt
         )
 
 if (FORTRAN_STATUS)

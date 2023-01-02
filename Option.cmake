@@ -1,6 +1,7 @@
 include_directories(${ROOT})
 include_directories(Include)
 include_directories(Include/metis)
+include_directories(Include/fmt/include)
 
 set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Debug Release RelWithDebInfo MinSizeRel")
 
