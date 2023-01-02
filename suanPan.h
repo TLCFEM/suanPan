@@ -182,63 +182,6 @@ inline auto& SUANPAN_CERR = std::cerr;
 inline auto& SUANPAN_SYNC_COUT = SUANPAN_COUT;
 inline auto& SUANPAN_SYNC_CERR = SUANPAN_CERR;
 
-#include <filesystem>
-#include <fmt/color.h>
-#include <source_location>
-
-namespace fs = std::filesystem;
-
-namespace suanpan {
-    extern std::mutex print_mutex;
-}
-
-template<typename... T> void sp_info(const std::string_view format_str, const T&... args) {
-    const std::scoped_lock lock(suanpan::print_mutex);
-    SUANPAN_COUT << fmt::vformat(fg(fmt::terminal_color::green), format_str, fmt::make_format_args(args...));
-}
-
-template<typename... T> void sp_debug(const std::source_location loc, const std::string_view format_str, const T&... args) {
-    std::string pattern{"[DEBUG] "};
-    pattern += fs::path(loc.file_name()).filename().string();
-    pattern += ":{}: ";
-    pattern += format_str;
-    const std::scoped_lock lock(suanpan::print_mutex);
-    SUANPAN_COUT << fmt::vformat(fg(fmt::terminal_color::green), pattern, fmt::make_format_args(loc.line(), args...));
-}
-
-template<typename... T> void sp_warning(const std::source_location loc, const std::string_view format_str, const T&... args) {
-    std::string pattern{"[WARNING] "};
-    pattern += fs::path(loc.file_name()).filename().string();
-    pattern += ":{}: ";
-    pattern += format_str;
-    const std::scoped_lock lock(suanpan::print_mutex);
-    SUANPAN_COUT << fmt::vformat(fg(fmt::terminal_color::blue), pattern, fmt::make_format_args(loc.line(), args...));
-}
-
-template<typename... T> void sp_error(const std::source_location loc, const std::string_view format_str, const T&... args) {
-    std::string pattern{"[ERROR] "};
-    pattern += fs::path(loc.file_name()).filename().string();
-    pattern += ":{}: ";
-    pattern += format_str;
-    const std::scoped_lock lock(suanpan::print_mutex);
-    SUANPAN_COUT << fmt::vformat(fg(fmt::terminal_color::yellow), pattern, fmt::make_format_args(loc.line(), args...));
-}
-
-template<typename... T> void sp_fatal(const std::source_location loc, const std::string_view format_str, const T&... args) {
-    std::string pattern{"[FATAL] "};
-    pattern += fs::path(loc.file_name()).filename().string();
-    pattern += ":{}: ";
-    pattern += format_str;
-    const std::scoped_lock lock(suanpan::print_mutex);
-    SUANPAN_COUT << fmt::vformat(fg(fmt::terminal_color::red), pattern, fmt::make_format_args(loc.line(), args...));
-}
-
-#define SP_I(...) sp_info(##__VA_ARGS__)
-#define SP_D(...) sp_debug(std::source_location::current(), ##__VA_ARGS__)
-#define SP_W(...) sp_warning(std::source_location::current(), ##__VA_ARGS__)
-#define SP_E(...) sp_error(std::source_location::current(), ##__VA_ARGS__)
-#define SP_F(...) sp_fatal(std::source_location::current(), ##__VA_ARGS__)
-
 #ifdef SUANPAN_WIN
 #define FOREGROUND_CYAN (FOREGROUND_BLUE | FOREGROUND_GREEN)
 #define FOREGROUND_YELLOW (FOREGROUND_RED | FOREGROUND_GREEN)
@@ -252,8 +195,57 @@ template<typename... T> void sp_fatal(const std::source_location loc, const std:
 
 #include <Toolbox/print.h>
 
-#define ARMA_COUT_STREAM SUANPAN_SYNC_COUT
-#define ARMA_CERR_STREAM SUANPAN_SYNC_CERR
+#include <filesystem>
+#include <fmt/color.h>
+#include <source_location>
+
+namespace fs = std::filesystem;
+
+namespace suanpan {
+    extern std::mutex print_mutex;
+}
+
+inline std::string suanpan_pattern(std::string_view header, std::source_location loc, std::string_view format) {
+    std::string pattern{header};
+    pattern += fs::path(loc.file_name()).filename().string();
+    pattern += ":{}: ";
+    pattern += format_str;
+    return pattern;
+}
+
+template<typename... T> void sp_info(const std::string_view format_str, const T&... args) {
+    const std::scoped_lock lock(suanpan::print_mutex);
+    SUANPAN_COUT << fmt::vformat(fg(fmt::terminal_color::green), format_str, fmt::make_format_args(args...));
+}
+
+template<typename... T> void sp_debug(const std::source_location loc, const std::string_view format_str, const T&... args) {
+    const std::scoped_lock lock(suanpan::print_mutex);
+    SUANPAN_COUT << fmt::vformat(fg(fmt::terminal_color::green), suanpan_pattern("[DEBUG] ", loc, format_str), fmt::make_format_args(loc.line(), args...));
+}
+
+template<typename... T> void sp_warning(const std::source_location loc, const std::string_view format_str, const T&... args) {
+    const std::scoped_lock lock(suanpan::print_mutex);
+    SUANPAN_COUT << fmt::vformat(fg(fmt::terminal_color::blue), suanpan_pattern("[WARNING] ", loc, format_str), fmt::make_format_args(loc.line(), args...));
+}
+
+template<typename... T> void sp_error(const std::source_location loc, const std::string_view format_str, const T&... args) {
+    const std::scoped_lock lock(suanpan::print_mutex);
+    SUANPAN_COUT << fmt::vformat(fg(fmt::terminal_color::yellow), suanpan_pattern("[ERROR] ", loc, format_str), fmt::make_format_args(loc.line(), args...));
+}
+
+template<typename... T> void sp_fatal(const std::source_location loc, const std::string_view format_str, const T&... args) {
+    const std::scoped_lock lock(suanpan::print_mutex);
+    SUANPAN_COUT << fmt::vformat(fg(fmt::terminal_color::red), suanpan_pattern("[FATAL] ", loc, format_str), fmt::make_format_args(loc.line(), args...));
+}
+
+#define SP_I(...) sp_info(##__VA_ARGS__)
+#define SP_D(...) sp_debug(std::source_location::current(), ##__VA_ARGS__)
+#define SP_W(...) sp_warning(std::source_location::current(), ##__VA_ARGS__)
+#define SP_E(...) sp_error(std::source_location::current(), ##__VA_ARGS__)
+#define SP_F(...) sp_fatal(std::source_location::current(), ##__VA_ARGS__)
+
+#define ARMA_COUT_STREAM SUANPAN_COUT
+#define ARMA_CERR_STREAM SUANPAN_COUT
 
 #include <armadillo/armadillo>
 
