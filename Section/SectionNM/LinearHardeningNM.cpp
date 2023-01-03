@@ -38,7 +38,7 @@ int LinearHardeningNM::compute_local_integration(vec& q, mat& jacobian) {
     auto ref_error = 1.;
     while(true) {
         if(max_iteration == ++counter) {
-            SP_E("Cannot converge within {} iterations.\n", max_iteration);
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
             return SUANPAN_FAIL;
         }
 
@@ -132,7 +132,7 @@ int LinearHardeningNM::compute_local_integration(vec& q, mat& jacobian) {
 
         auto error = norm(residual);
         if(2 == counter) ref_error = std::max(1., error);
-        SP_D("Local iteration error: {:.5E}.\n", error /= ref_error);
+        suanpan_debug("Local iteration error: {:.5E}.\n", error /= ref_error);
         if(norm(incre) <= tolerance && error <= tolerance) return SUANPAN_SUCCESS;
 
         q -= incre(ga);

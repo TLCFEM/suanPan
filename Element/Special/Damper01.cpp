@@ -90,4 +90,6 @@ int Damper01::reset_status() { return damper->reset_status(); }
 
 vector<vec> Damper01::record(const OutputType P) { return damper->record(P); }
 
-void Damper01::print() { sp_info("A viscous damper element using displacement and velocity as basic quantities.\n"); }
+void Damper01::print() {
+    suanpan_info("A viscous damper element using displacement and velocity as basic quantities.\n");
+}

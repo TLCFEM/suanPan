@@ -140,4 +140,6 @@ int Yeoh::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-void Yeoh::print() { sp_info("A Yeoh material model.\n"); }
+void Yeoh::print() {
+    suanpan_info("A Yeoh material model.\n");
+}

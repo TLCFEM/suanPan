@@ -32,7 +32,7 @@ ParticleCollision::ParticleCollision(const unsigned T, const unsigned S, const u
 
 int ParticleCollision::initialize(const shared_ptr<DomainBase>& D) {
     if(const auto t_scheme = D->get_factory()->get_storage_scheme(); StorageScheme::FULL != t_scheme && StorageScheme::SPARSE != t_scheme && StorageScheme::SPARSESYMM != t_scheme) {
-        SP_W("The full or sparse matrix storage scheme is required.\n");
+        suanpan_warning("The full or sparse matrix storage scheme is required.\n");
         return SUANPAN_FAIL;
     }
 

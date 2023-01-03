@@ -24,13 +24,13 @@
 int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& command) {
     string integrator_type;
     if(!get_input(command, integrator_type)) {
-        SP_E("A valid integrator type is required.\n");
+        suanpan_error("A valid integrator type is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -39,11 +39,11 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
         auto alpha = .25, beta = .5;
         if(!command.eof()) {
             if(!get_input(command, alpha)) {
-                SP_E("A valid alpha is required.\n");
+                suanpan_error("A valid alpha is required.\n");
                 return SUANPAN_SUCCESS;
             }
             if(!get_input(command, beta)) {
-                SP_E("A valid beta is required.\n");
+                suanpan_error("A valid beta is required.\n");
                 return SUANPAN_SUCCESS;
             }
         }
@@ -54,7 +54,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
             auto idx = 0llu;
             while(!command.eof() && idx < p.n_elem)
                 if(!get_input(command, p(idx++))) {
-                    SP_E("A valid parameter for rayleigh damping is required.\n");
+                    suanpan_error("A valid parameter for rayleigh damping is required.\n");
                     return SUANPAN_SUCCESS;
                 }
 
@@ -66,12 +66,12 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
             while(!command.eof()) {
                 double t_para;
                 if(!get_input(command, t_para)) {
-                    SP_E("A valid damping coefficient is required.\n");
+                    suanpan_error("A valid damping coefficient is required.\n");
                     return SUANPAN_SUCCESS;
                 }
                 damping_coef.emplace_back(t_para);
                 if(!get_input(command, t_para)) {
-                    SP_E("A valid frequency is required.\n");
+                    suanpan_error("A valid frequency is required.\n");
                     return SUANPAN_SUCCESS;
                 }
                 frequency.emplace_back(t_para);
@@ -85,12 +85,12 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
             while(!command.eof()) {
                 double t_para;
                 if(!get_input(command, t_para)) {
-                    SP_E("A valid damping coefficient is required.\n");
+                    suanpan_error("A valid damping coefficient is required.\n");
                     return SUANPAN_SUCCESS;
                 }
                 damping_coef.emplace_back(t_para);
                 if(!get_input(command, t_para)) {
-                    SP_E("A valid frequency is required.\n");
+                    suanpan_error("A valid frequency is required.\n");
                     return SUANPAN_SUCCESS;
                 }
                 frequency.emplace_back(t_para);
@@ -105,11 +105,11 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
 
             auto get_basic_input = [&] {
                 if(!get_input(command, zeta)) {
-                    SP_E("A valid zeta_p is required.\n");
+                    suanpan_error("A valid zeta_p is required.\n");
                     return SUANPAN_FAIL;
                 }
                 if(!get_input(command, omega)) {
-                    SP_E("A valid omega_p is required.\n");
+                    suanpan_error("A valid omega_p is required.\n");
                     return SUANPAN_FAIL;
                 }
                 return SUANPAN_SUCCESS;
@@ -117,7 +117,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
 
             auto get_first = [&] {
                 if(!get_input(command, para_a)) {
-                    SP_E("A valid parameter is required.\n");
+                    suanpan_error("A valid parameter is required.\n");
                     return SUANPAN_FAIL;
                 }
                 return SUANPAN_SUCCESS;
@@ -125,7 +125,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
 
             auto get_second = [&] {
                 if(!get_input(command, para_b)) {
-                    SP_E("A valid parameter is required.\n");
+                    suanpan_error("A valid parameter is required.\n");
                     return SUANPAN_FAIL;
                 }
                 return SUANPAN_SUCCESS;
@@ -134,7 +134,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
             while(!command.eof()) {
                 string type;
                 if(!get_input(command, type)) {
-                    SP_E("A valid type is required.\n");
+                    suanpan_error("A valid type is required.\n");
                     return SUANPAN_SUCCESS;
                 }
                 if(is_equal("-type0", type)) {
@@ -157,13 +157,13 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
                     if(SUANPAN_SUCCESS != get_basic_input() || SUANPAN_SUCCESS != get_first() || SUANPAN_SUCCESS != get_second()) return SUANPAN_SUCCESS;
                     double para_c, para_d, para_e;
                     if(!get_input(command, para_c) || !get_input(command, para_d) || !get_input(command, para_e)) {
-                        SP_E("A valid parameter is required.\n");
+                        suanpan_error("A valid parameter is required.\n");
                         return SUANPAN_SUCCESS;
                     }
                     modes.emplace_back(LeeNewmarkFull::Mode{LeeNewmarkFull::Type::T4, vec{static_cast<double>(static_cast<unsigned>(para_a)), static_cast<double>(static_cast<unsigned>(para_b)), static_cast<double>(static_cast<unsigned>(para_c)), static_cast<double>(static_cast<unsigned>(para_d)), para_e}, zeta, omega});
                 }
                 else {
-                    SP_E("A valid type is required.\n");
+                    suanpan_error("A valid type is required.\n");
                     return SUANPAN_SUCCESS;
                 }
             }
@@ -178,7 +178,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
             while(!command.eof()) {
                 double t_para;
                 if(!get_input(command, t_para)) {
-                    SP_E("A valid damping coefficient is required.\n");
+                    suanpan_error("A valid damping coefficient is required.\n");
                     return SUANPAN_SUCCESS;
                 }
                 damping_coef.emplace_back(t_para);
@@ -203,7 +203,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
 
         for(auto& I : pool)
             if(!get_input(command, I)) {
-                SP_E("A valid damping radius is required.\n");
+                suanpan_error("A valid damping radius is required.\n");
                 return SUANPAN_SUCCESS;
             }
 
@@ -214,7 +214,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
 
         for(auto& I : pool)
             if(!get_input(command, I)) {
-                SP_E("A valid damping radius is required.\n");
+                suanpan_error("A valid damping radius is required.\n");
                 return SUANPAN_SUCCESS;
             }
 
@@ -223,7 +223,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
     else if(is_equal(integrator_type, "GSSSSOptimal")) {
         auto radius = .5;
         if(!get_optional_input(command, radius)) {
-            SP_E("A valid damping radius is required.\n");
+            suanpan_error("A valid damping radius is required.\n");
             return SUANPAN_SUCCESS;
         }
 
@@ -232,7 +232,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
     else if(is_equal(integrator_type, "OALTS")) {
         auto radius = .5;
         if(!get_optional_input(command, radius)) {
-            SP_E("A valid damping radius is required.\n");
+            suanpan_error("A valid damping radius is required.\n");
             return SUANPAN_SUCCESS;
         }
 
@@ -241,14 +241,14 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
     else if(is_equal(integrator_type, "BatheTwoStep")) {
         auto radius = 0.;
         if(!get_optional_input(command, radius)) {
-            SP_E("A valid damping radius is required.\n");
+            suanpan_error("A valid damping radius is required.\n");
             return SUANPAN_SUCCESS;
         }
         radius = std::max(0., std::min(radius, 1.));
 
         auto gamma = .5;
         if(!get_optional_input(command, gamma)) {
-            SP_E("A valid gamma is required.\n");
+            suanpan_error("A valid gamma is required.\n");
             return SUANPAN_SUCCESS;
         }
         if(gamma <= 0. || gamma >= 1.) gamma = .5;
@@ -258,7 +258,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
     else if(is_equal(integrator_type, "Tchamwa")) {
         auto radius = .5;
         if(!get_optional_input(command, radius)) {
-            SP_E("A valid damping radius is required.\n");
+            suanpan_error("A valid damping radius is required.\n");
             return SUANPAN_SUCCESS;
         }
 
@@ -267,7 +267,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
     else if(is_equal(integrator_type, "BatheExplicit")) {
         auto radius = .5;
         if(!get_optional_input(command, radius)) {
-            SP_E("A valid damping radius is required.\n");
+            suanpan_error("A valid damping radius is required.\n");
             return SUANPAN_SUCCESS;
         }
 
@@ -276,7 +276,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
     else if(is_equal(integrator_type, "GeneralizedAlphaExplicit") || is_equal(integrator_type, "GeneralisedAlphaExplicit")) {
         auto radius = .5;
         if(!get_optional_input(command, radius)) {
-            SP_E("A valid damping radius is required.\n");
+            suanpan_error("A valid damping radius is required.\n");
             return SUANPAN_SUCCESS;
         }
 
@@ -288,7 +288,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
         domain->set_current_integrator_tag(tag);
     }
     else
-        SP_E("Fail to create new integrator via \"{}\".\n", command.str());
+        suanpan_error("Fail to create new integrator via \"{}\".\n", command.str());
 
     return SUANPAN_SUCCESS;
 }
@@ -296,13 +296,13 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
 int create_new_solver(const shared_ptr<DomainBase>& domain, istringstream& command) {
     string solver_type;
     if(!get_input(command, solver_type)) {
-        SP_E("A valid solver type is required.\n");
+        suanpan_error("A valid solver type is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -313,7 +313,7 @@ int create_new_solver(const shared_ptr<DomainBase>& domain, istringstream& comma
     else if(is_equal(solver_type, "LBFGS")) {
         auto max_history = 20;
         if(!command.eof() && !get_input(command, max_history)) {
-            SP_E("A valid maximum step number is required.\n");
+            suanpan_error("A valid maximum step number is required.\n");
             return SUANPAN_SUCCESS;
         }
 
@@ -324,11 +324,11 @@ int create_new_solver(const shared_ptr<DomainBase>& domain, istringstream& comma
         string fixed_arc_length = "False";
 
         if(!command.eof() && !get_input(command, arc_length)) {
-            SP_E("A valid arc length is required.\n");
+            suanpan_error("A valid arc length is required.\n");
             return SUANPAN_SUCCESS;
         }
         if(!command.eof() && !get_input(command, fixed_arc_length)) {
-            SP_E("A valid fixed arc length switch is required.\n");
+            suanpan_error("A valid fixed arc length switch is required.\n");
             return SUANPAN_SUCCESS;
         }
 
@@ -337,19 +337,19 @@ int create_new_solver(const shared_ptr<DomainBase>& domain, istringstream& comma
     else if(is_equal(solver_type, "FEAST") || is_equal(solver_type, "QuadraticFEAST")) {
         unsigned eigen_number;
         if(!get_input(command, eigen_number)) {
-            SP_E("A valid number of frequencies is required.\n");
+            suanpan_error("A valid number of frequencies is required.\n");
             return SUANPAN_SUCCESS;
         }
 
         double centre;
         if(!get_input(command, centre)) {
-            SP_E("A valid radius is required.\n");
+            suanpan_error("A valid radius is required.\n");
             return SUANPAN_SUCCESS;
         }
 
         auto radius = centre;
         if(!get_optional_input(command, radius)) {
-            SP_E("A valid radius is required.\n");
+            suanpan_error("A valid radius is required.\n");
             return SUANPAN_SUCCESS;
         }
 
@@ -357,14 +357,14 @@ int create_new_solver(const shared_ptr<DomainBase>& domain, istringstream& comma
     }
     else if(is_equal(solver_type, "DisplacementControl") || is_equal(solver_type, "MPDC")) { if(domain->insert(make_shared<MPDC>(tag))) code = 1; }
     else
-        SP_E("Cannot identify the solver type.\n");
+        suanpan_error("Cannot identify the solver type.\n");
 
     if(1 == code) {
         if(0 != domain->get_current_step_tag()) domain->get_current_step()->set_solver_tag(tag);
         domain->set_current_solver_tag(tag);
     }
     else
-        SP_E("Fail to create new solver via \"{}\".\n", command.str());
+        suanpan_error("Fail to create new solver via \"{}\".\n", command.str());
 
     return SUANPAN_SUCCESS;
 }

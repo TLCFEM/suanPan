@@ -257,7 +257,7 @@ Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& 
     , num_dof(ND)
     , mat_type(MTP)
     , sec_type(SectionType::D0)
-    , dof_identifier(std::forward<std::vector<DOF>>(DI)) { suanpan_debug([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw invalid_argument("size of dof identifier must meet number of dofs"); }); }
+    , dof_identifier(std::forward<std::vector<DOF>>(DI)) { suanpan_assert([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw invalid_argument("size of dof identifier must meet number of dofs"); }); }
 
 Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& ST, const bool F, const SectionType STP, std::vector<DOF>&& DI)
     : DataElement{std::forward<uvec>(NT), uvec{}, std::forward<uvec>(ST), F, true, true, true, true, {}}
@@ -266,7 +266,7 @@ Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& 
     , num_dof(ND)
     , mat_type(MaterialType::D0)
     , sec_type(STP)
-    , dof_identifier(std::forward<std::vector<DOF>>(DI)) { suanpan_debug([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw invalid_argument("size of dof identifier must meet number of dofs"); }); }
+    , dof_identifier(std::forward<std::vector<DOF>>(DI)) { suanpan_assert([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw invalid_argument("size of dof identifier must meet number of dofs"); }); }
 
 // for contact elements that use node groups
 Element::Element(const unsigned T, const unsigned ND, uvec&& GT)
@@ -340,7 +340,7 @@ int Element::initialize_base(const shared_ptr<DomainBase>& D) {
     node_ptr.reserve(num_node);
     for(const auto& t_tag : node_encoding) {
         if(!D->find<Node>(t_tag)) {
-            SP_W("Element {} disabled as node {} cannot be found.\n", get_tag(), t_tag);
+            suanpan_warning("Element {} disabled as node {} cannot be found.\n", get_tag(), t_tag);
             return SUANPAN_FAIL;
         }
         auto& t_node = D->get<Node>(t_tag);
@@ -348,7 +348,7 @@ int Element::initialize_base(const shared_ptr<DomainBase>& D) {
         if(!t_node->is_active()) inactive = true;
     }
     if(inactive) {
-        SP_W("Element {} disabled as inactive nodes used.\n", get_tag());
+        suanpan_warning("Element {} disabled as inactive nodes used.\n", get_tag());
         return SUANPAN_FAIL;
     }
     for(auto& I : node_ptr) if(I.lock()->get_dof_number() < num_dof) I.lock()->set_dof_number(num_dof);
@@ -357,7 +357,7 @@ int Element::initialize_base(const shared_ptr<DomainBase>& D) {
     if(MaterialType::D0 != mat_type)
         for(const auto& t_tag : material_tag)
             if(auto& t_material = D->get<Material>(t_tag); nullptr == t_material || !t_material->is_active() || t_material->get_material_type() != MaterialType::DS && t_material->get_material_type() != mat_type) {
-                SP_W("Element {} disabled as material {} cannot be found.\n", get_tag(), t_tag);
+                suanpan_warning("Element {} disabled as material {} cannot be found.\n", get_tag(), t_tag);
                 return SUANPAN_FAIL;
             }
 
@@ -365,7 +365,7 @@ int Element::initialize_base(const shared_ptr<DomainBase>& D) {
     if(SectionType::D0 != sec_type)
         for(const auto& t_tag : section_tag)
             if(auto& t_section = D->get<Section>(t_tag); nullptr == t_section || !t_section->is_active() || t_section->get_section_type() != sec_type) {
-                SP_W("Element {} disabled as section {} cannot be found.\n", get_tag(), t_tag);
+                suanpan_warning("Element {} disabled as section {} cannot be found.\n", get_tag(), t_tag);
                 return SUANPAN_FAIL;
             }
 

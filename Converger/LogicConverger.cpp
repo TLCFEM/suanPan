@@ -28,7 +28,7 @@ LogicConverger::LogicConverger(const unsigned T, const unsigned TA, const unsign
 int LogicConverger::initialize() {
     const auto t_domain = get_domain().lock();
     if(nullptr == t_domain) {
-        SP_E("A valid domain is required.\n");
+        suanpan_error("A valid domain is required.\n");
         return SUANPAN_FAIL;
     }
 
@@ -36,7 +36,7 @@ int LogicConverger::initialize() {
     const auto& t_converger_b = t_domain->get_converger(tag_b);
 
     if(nullptr == t_converger_a || nullptr == t_converger_b) {
-        SP_E("Two valid convergers are required.\n");
+        suanpan_error("Two valid convergers are required.\n");
         return SUANPAN_FAIL;
     }
 

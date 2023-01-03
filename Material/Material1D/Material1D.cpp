@@ -49,4 +49,6 @@ vector<vec> Material1D::record(const OutputType P) {
     return data;
 }
 
-void Material1D::print() { sp_info("Current Strain: {:.3E}\tCurrent Stress: {:.3E}\n", current_strain(0), current_stress(0)); }
+void Material1D::print() {
+    suanpan_info("Current Strain: {:.3E}\tCurrent Stress: {:.3E}\n", current_strain(0), current_stress(0));
+}

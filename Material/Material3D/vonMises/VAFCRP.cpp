@@ -71,7 +71,7 @@ int VAFCRP::update_trial_status(const vec& t_strain) {
     unsigned counter = 0;
     while(true) {
         if(max_iteration == ++counter) {
-            SP_E("Cannot converge within {} iterations.\n", max_iteration);
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
             return SUANPAN_FAIL;
         }
 
@@ -100,7 +100,7 @@ int VAFCRP::update_trial_status(const vec& t_strain) {
         jacobian = exp_gamma * (root_three_two * sum_b - three_shear - q * epsilon * mu / (*incre_time + mu * gamma)) - dk;
 
         const auto incre = (q * exp_gamma - k) / jacobian;
-        SP_D("Local iteration error: {:.5E}.\n", fabs(incre));
+        suanpan_debug("Local iteration error: {:.5E}.\n", fabs(incre));
         if(fabs(incre) <= tolerance) break;
 
         gamma -= incre;
@@ -153,4 +153,6 @@ vector<vec> VAFCRP::record(const OutputType P) {
     return Material3D::record(P);
 }
 
-void VAFCRP::print() { sp_info("A VADCRP material model.\n"); }
+void VAFCRP::print() {
+    suanpan_info("A VADCRP material model.\n");
+}

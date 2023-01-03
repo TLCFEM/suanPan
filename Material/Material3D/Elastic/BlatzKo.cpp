@@ -105,4 +105,6 @@ int BlatzKo::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-void BlatzKo::print() { sp_info("A Blatz-Ko material model.\n"); }
+void BlatzKo::print() {
+    suanpan_info("A Blatz-Ko material model.\n");
+}

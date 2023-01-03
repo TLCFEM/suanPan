@@ -36,7 +36,7 @@ int main(int argc, char** argv) {
     argument_parser(argc, argv);
 #else
     try { argument_parser(argc, argv); }
-    catch(const std::exception& e) { SP_F("Some unexpected error happens: {}, please file a bug report via https://github.com/TLCFEM/suanPan/issues.\n", e.what()); }
+    catch(const std::exception& e) { suanpan_fatal("Some unexpected error happens: {}, please file a bug report via https://github.com/TLCFEM/suanPan/issues.\n", e.what()); }
 #endif
 
     return SUANPAN_SUCCESS;

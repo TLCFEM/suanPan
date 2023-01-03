@@ -73,8 +73,8 @@ int Spring02::reset_status() { return s_material->reset_status(); }
 vector<vec> Spring02::record(const OutputType P) { return s_material->record(P); }
 
 void Spring02::print() {
-    sp_info("A spring element that uses strain as basic quantity. The material model used shall be based on displacement-force relationship.\n");
+    suanpan_info("A spring element that uses strain as basic quantity. The material model used shall be based on displacement-force relationship.\n");
     if(!is_initialized()) return;
-    sp_info("Material:\n");
+    suanpan_info("Material:\n");
     s_material->print();
 }

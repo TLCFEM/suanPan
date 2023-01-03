@@ -24,25 +24,25 @@
 void new_bar2d(unique_ptr<Section>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double area;
     if(!get_input(command, area)) {
-        SP_E("A valid area is required.\n");
+        suanpan_error("A valid area is required.\n");
         return;
     }
 
     unsigned material_id;
     if(!get_input(command, material_id)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return;
     }
 
     auto eccentricity = 0.;
     if(!command.eof() && !get_input(command, eccentricity)) {
-        SP_E("A valid eccentricity is required.\n");
+        suanpan_error("A valid eccentricity is required.\n");
         return;
     }
 
@@ -52,29 +52,29 @@ void new_bar2d(unique_ptr<Section>& return_obj, istringstream& command) {
 void new_bar3d(unique_ptr<Section>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double area;
     if(!get_input(command, area)) {
-        SP_E("A valid area is required.\n");
+        suanpan_error("A valid area is required.\n");
         return;
     }
 
     unsigned material_id;
     if(!get_input(command, material_id)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return;
     }
 
     auto eccentricity_a = 0., eccentricity_b = 0.;
     if(!command.eof() && !get_input(command, eccentricity_a)) {
-        SP_E("A valid eccentricity is required.\n");
+        suanpan_error("A valid eccentricity is required.\n");
         return;
     }
     if(!command.eof() && !get_input(command, eccentricity_b)) {
-        SP_E("A valid eccentricity is required.\n");
+        suanpan_error("A valid eccentricity is required.\n");
         return;
     }
 
@@ -84,43 +84,43 @@ void new_bar3d(unique_ptr<Section>& return_obj, istringstream& command) {
 void new_box2d(unique_ptr<Section>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double width;
     if(!get_input(command, width)) {
-        SP_E("A valid width is required.\n");
+        suanpan_error("A valid width is required.\n");
         return;
     }
 
     double height;
     if(!get_input(command, height)) {
-        SP_E("A valid height is required.\n");
+        suanpan_error("A valid height is required.\n");
         return;
     }
 
     double thickness;
     if(!get_input(command, thickness)) {
-        SP_E("A valid thickness is required.\n");
+        suanpan_error("A valid thickness is required.\n");
         return;
     }
 
     unsigned material_id;
     if(!get_input(command, material_id)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return;
     }
 
     unsigned int_pt = 6;
     if(command.eof())
-        SP_D("Six integration points assumed.\n");
+        suanpan_debug("Six integration points assumed.\n");
     else if(!get_input(command, int_pt))
-        SP_E("A valid number of integration points is required.\n");
+        suanpan_error("A valid number of integration points is required.\n");
 
     auto eccentricity = 0.;
     if(!command.eof() && !get_input(command, eccentricity))
-        SP_E("A valid eccentricity is required.\n");
+        suanpan_error("A valid eccentricity is required.\n");
 
     return_obj = make_unique<Box2D>(tag, width, height, thickness, material_id, int_pt, eccentricity);
 }
@@ -128,45 +128,45 @@ void new_box2d(unique_ptr<Section>& return_obj, istringstream& command) {
 void new_box3d(unique_ptr<Section>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double width;
     if(!get_input(command, width)) {
-        SP_E("A valid width is required.\n");
+        suanpan_error("A valid width is required.\n");
         return;
     }
 
     double height;
     if(!get_input(command, height)) {
-        SP_E("A valid height is required.\n");
+        suanpan_error("A valid height is required.\n");
         return;
     }
 
     double thickness;
     if(!get_input(command, thickness)) {
-        SP_E("A valid thickness is required.\n");
+        suanpan_error("A valid thickness is required.\n");
         return;
     }
 
     unsigned material_id;
     if(!get_input(command, material_id)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return;
     }
 
     unsigned int_pt = 3;
     if(command.eof())
-        SP_D("Six integration points assumed.\n");
+        suanpan_debug("Six integration points assumed.\n");
     else if(!get_input(command, int_pt))
-        SP_E("A valid number of integration points is required.\n");
+        suanpan_error("A valid number of integration points is required.\n");
 
     auto eccentricity_a = 0., eccentricity_b = 0.;
     if(!command.eof() && !get_input(command, eccentricity_a))
-        SP_E("A valid eccentricity is required.\n");
+        suanpan_error("A valid eccentricity is required.\n");
     if(!command.eof() && !get_input(command, eccentricity_b))
-        SP_E("A valid eccentricity is required.\n");
+        suanpan_error("A valid eccentricity is required.\n");
 
     return_obj = make_unique<Box3D>(tag, width, height, thickness, material_id, int_pt, eccentricity_a, eccentricity_b);
 }
@@ -174,19 +174,19 @@ void new_box3d(unique_ptr<Section>& return_obj, istringstream& command) {
 void new_circle1d(unique_ptr<Section>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double radius;
     if(!get_input(command, radius)) {
-        SP_E("A valid radius is required.\n");
+        suanpan_error("A valid radius is required.\n");
         return;
     }
 
     unsigned material_id;
     if(!get_input(command, material_id)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return;
     }
 
@@ -196,31 +196,31 @@ void new_circle1d(unique_ptr<Section>& return_obj, istringstream& command) {
 void new_circle2d(unique_ptr<Section>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double radius;
     if(!get_input(command, radius)) {
-        SP_E("A valid radius is required.\n");
+        suanpan_error("A valid radius is required.\n");
         return;
     }
 
     unsigned material_id;
     if(!get_input(command, material_id)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return;
     }
 
     unsigned int_pt = 6;
     if(!command.eof() && !get_input(command, int_pt)) {
-        SP_E("A valid number of integration points is required.\n");
+        suanpan_error("A valid number of integration points is required.\n");
         return;
     }
 
     auto eccentricity = 0.;
     if(!command.eof() && !get_input(command, eccentricity)) {
-        SP_E("A valid eccentricity is required.\n");
+        suanpan_error("A valid eccentricity is required.\n");
         return;
     }
 
@@ -230,36 +230,36 @@ void new_circle2d(unique_ptr<Section>& return_obj, istringstream& command) {
 void new_circle3d(unique_ptr<Section>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double radius;
     if(!get_input(command, radius)) {
-        SP_E("A valid radius is required.\n");
+        suanpan_error("A valid radius is required.\n");
         return;
     }
 
     unsigned material_id;
     if(!get_input(command, material_id)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return;
     }
 
     unsigned int_pt = 6;
     if(!command.eof() && !get_input(command, int_pt)) {
-        SP_E("A valid number of integration points is required.\n");
+        suanpan_error("A valid number of integration points is required.\n");
         return;
     }
 
     auto eccentricity_y = 0.;
     if(!command.eof() && !get_input(command, eccentricity_y)) {
-        SP_E("A valid eccentricity is required.\n");
+        suanpan_error("A valid eccentricity is required.\n");
         return;
     }
     auto eccentricity_z = 0.;
     if(!command.eof() && !get_input(command, eccentricity_z)) {
-        SP_E("A valid eccentricity is required.\n");
+        suanpan_error("A valid eccentricity is required.\n");
         return;
     }
 
@@ -269,37 +269,37 @@ void new_circle3d(unique_ptr<Section>& return_obj, istringstream& command) {
 void new_circularhollow2D(unique_ptr<Section>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double radius;
     if(!get_input(command, radius)) {
-        SP_E("A valid radius is required.\n");
+        suanpan_error("A valid radius is required.\n");
         return;
     }
 
     double thickness;
     if(!get_input(command, thickness)) {
-        SP_E("A valid radius is required.\n");
+        suanpan_error("A valid radius is required.\n");
         return;
     }
 
     unsigned material_id;
     if(!get_input(command, material_id)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return;
     }
 
     unsigned int_pt = 10;
     if(!command.eof() && !get_input(command, int_pt)) {
-        SP_E("A valid number of integration points is required.\n");
+        suanpan_error("A valid number of integration points is required.\n");
         return;
     }
 
     auto eccentricity = 0.;
     if(!command.eof() && !get_input(command, eccentricity)) {
-        SP_E("A valid eccentricity is required.\n");
+        suanpan_error("A valid eccentricity is required.\n");
         return;
     }
 
@@ -309,42 +309,42 @@ void new_circularhollow2D(unique_ptr<Section>& return_obj, istringstream& comman
 void new_circularhollow3D(unique_ptr<Section>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double radius;
     if(!get_input(command, radius)) {
-        SP_E("A valid radius is required.\n");
+        suanpan_error("A valid radius is required.\n");
         return;
     }
 
     double thickness;
     if(!get_input(command, thickness)) {
-        SP_E("A valid radius is required.\n");
+        suanpan_error("A valid radius is required.\n");
         return;
     }
 
     unsigned material_id;
     if(!get_input(command, material_id)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return;
     }
 
     unsigned int_pt = 10;
     if(!command.eof() && !get_input(command, int_pt)) {
-        SP_E("A valid number of integration points is required.\n");
+        suanpan_error("A valid number of integration points is required.\n");
         return;
     }
 
     auto eccentricity_y = 0.;
     if(!command.eof() && !get_input(command, eccentricity_y)) {
-        SP_E("A valid eccentricity is required.\n");
+        suanpan_error("A valid eccentricity is required.\n");
         return;
     }
     auto eccentricity_z = 0.;
     if(!command.eof() && !get_input(command, eccentricity_z)) {
-        SP_E("A valid eccentricity is required.\n");
+        suanpan_error("A valid eccentricity is required.\n");
         return;
     }
 
@@ -354,7 +354,7 @@ void new_circularhollow3D(unique_ptr<Section>& return_obj, istringstream& comman
 void new_fibre1d(unique_ptr<Section>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
@@ -362,7 +362,7 @@ void new_fibre1d(unique_ptr<Section>& return_obj, istringstream& command) {
     while(!command.eof())
         if(uword section_tag; get_input(command, section_tag)) tag_vector.emplace_back(section_tag);
         else {
-            SP_E("A valid parameter is required.\n");
+            suanpan_error("A valid parameter is required.\n");
             return;
         }
 
@@ -372,7 +372,7 @@ void new_fibre1d(unique_ptr<Section>& return_obj, istringstream& command) {
 void new_fibre2d(unique_ptr<Section>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
@@ -380,7 +380,7 @@ void new_fibre2d(unique_ptr<Section>& return_obj, istringstream& command) {
     while(!command.eof())
         if(uword section_tag; get_input(command, section_tag)) tag_vector.emplace_back(section_tag);
         else {
-            SP_E("A valid parameter is required.\n");
+            suanpan_error("A valid parameter is required.\n");
             return;
         }
 
@@ -390,7 +390,7 @@ void new_fibre2d(unique_ptr<Section>& return_obj, istringstream& command) {
 void new_fibre3d(unique_ptr<Section>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
@@ -398,7 +398,7 @@ void new_fibre3d(unique_ptr<Section>& return_obj, istringstream& command) {
     while(!command.eof())
         if(uword section_tag; get_input(command, section_tag)) tag_vector.emplace_back(section_tag);
         else {
-            SP_E("A valid parameter is required.\n");
+            suanpan_error("A valid parameter is required.\n");
             return;
         }
 
@@ -408,31 +408,31 @@ void new_fibre3d(unique_ptr<Section>& return_obj, istringstream& command) {
 void new_hsection2d(unique_ptr<Section>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     vec dim(6);
     if(!get_input(command, dim)) {
-        SP_E("A valid dimension is required.\n");
+        suanpan_error("A valid dimension is required.\n");
         return;
     }
 
     unsigned material_id;
     if(!get_input(command, material_id)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return;
     }
 
     unsigned int_pt = 6;
     if(!command.eof() && !get_input(command, int_pt)) {
-        SP_E("A valid number of integration points is required.\n");
+        suanpan_error("A valid number of integration points is required.\n");
         return;
     }
 
     auto eccentricity = 0.;
     if(!command.eof() && !get_input(command, eccentricity)) {
-        SP_E("A valid eccentricity is required.\n");
+        suanpan_error("A valid eccentricity is required.\n");
         return;
     }
 
@@ -442,31 +442,31 @@ void new_hsection2d(unique_ptr<Section>& return_obj, istringstream& command) {
 void new_isection2d(unique_ptr<Section>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     vec dim(6);
     if(!get_input(command, dim)) {
-        SP_E("A valid dimension is required.\n");
+        suanpan_error("A valid dimension is required.\n");
         return;
     }
 
     unsigned material_id;
     if(!get_input(command, material_id)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return;
     }
 
     unsigned int_pt = 6;
     if(!command.eof() && !get_input(command, int_pt)) {
-        SP_E("A valid number of integration points is required.\n");
+        suanpan_error("A valid number of integration points is required.\n");
         return;
     }
 
     auto eccentricity = 0.;
     if(!command.eof() && !get_input(command, eccentricity)) {
-        SP_E("A valid eccentricity is required.\n");
+        suanpan_error("A valid eccentricity is required.\n");
         return;
     }
 
@@ -476,36 +476,36 @@ void new_isection2d(unique_ptr<Section>& return_obj, istringstream& command) {
 void new_isection3d(unique_ptr<Section>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     vec dim(6);
     if(!get_input(command, dim)) {
-        SP_E("A valid dimension is required.\n");
+        suanpan_error("A valid dimension is required.\n");
         return;
     }
 
     unsigned material_id;
     if(!get_input(command, material_id)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return;
     }
 
     unsigned int_pt = 6;
     if(!command.eof() && !get_input(command, int_pt)) {
-        SP_E("A valid number of integration points is required.\n");
+        suanpan_error("A valid number of integration points is required.\n");
         return;
     }
 
     auto eccentricity_y = 0.;
     if(!command.eof() && !get_input(command, eccentricity_y)) {
-        SP_E("A valid eccentricity is required.\n");
+        suanpan_error("A valid eccentricity is required.\n");
         return;
     }
     auto eccentricity_z = 0.;
     if(!command.eof() && !get_input(command, eccentricity_z)) {
-        SP_E("A valid eccentricity is required.\n");
+        suanpan_error("A valid eccentricity is required.\n");
         return;
     }
 
@@ -515,25 +515,25 @@ void new_isection3d(unique_ptr<Section>& return_obj, istringstream& command) {
 void new_rectangle1d(unique_ptr<Section>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double width;
     if(!get_input(command, width)) {
-        SP_E("A valid width is required.\n");
+        suanpan_error("A valid width is required.\n");
         return;
     }
 
     double height;
     if(!get_input(command, height)) {
-        SP_E("A valid height is required.\n");
+        suanpan_error("A valid height is required.\n");
         return;
     }
 
     unsigned material_id;
     if(!get_input(command, material_id)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return;
     }
 
@@ -543,37 +543,37 @@ void new_rectangle1d(unique_ptr<Section>& return_obj, istringstream& command) {
 void new_rectangle2d(unique_ptr<Section>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double width;
     if(!get_input(command, width)) {
-        SP_E("A valid width is required.\n");
+        suanpan_error("A valid width is required.\n");
         return;
     }
 
     double height;
     if(!get_input(command, height)) {
-        SP_E("A valid height is required.\n");
+        suanpan_error("A valid height is required.\n");
         return;
     }
 
     unsigned material_id;
     if(!get_input(command, material_id)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return;
     }
 
     unsigned int_pt = 6;
     if(command.eof())
-        SP_D("Six integration points assumed.\n");
+        suanpan_debug("Six integration points assumed.\n");
     else if(!get_input(command, int_pt))
-        SP_E("A valid number of integration points is required.\n");
+        suanpan_error("A valid number of integration points is required.\n");
 
     auto eccentricity = 0.;
     if(!command.eof() && !get_input(command, eccentricity))
-        SP_E("A valid eccentricity is required.\n");
+        suanpan_error("A valid eccentricity is required.\n");
 
     return_obj = make_unique<Rectangle2D>(tag, width, height, material_id, int_pt, eccentricity);
 }
@@ -581,39 +581,39 @@ void new_rectangle2d(unique_ptr<Section>& return_obj, istringstream& command) {
 void new_rectangle3d(unique_ptr<Section>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double width;
     if(!get_input(command, width)) {
-        SP_E("A valid width is required.\n");
+        suanpan_error("A valid width is required.\n");
         return;
     }
 
     double height;
     if(!get_input(command, height)) {
-        SP_E("A valid height is required.\n");
+        suanpan_error("A valid height is required.\n");
         return;
     }
 
     unsigned material_id;
     if(!get_input(command, material_id)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return;
     }
 
     unsigned int_pt = 3;
     if(command.eof())
-        SP_D("Six integration points assumed.\n");
+        suanpan_debug("Six integration points assumed.\n");
     else if(!get_input(command, int_pt))
-        SP_E("A valid number of integration points is required.\n");
+        suanpan_error("A valid number of integration points is required.\n");
 
     auto eccentricity_a = 0., eccentricity_b = 0.;
     if(!command.eof() && !get_input(command, eccentricity_a))
-        SP_E("A valid eccentricity is required.\n");
+        suanpan_error("A valid eccentricity is required.\n");
     if(!command.eof() && !get_input(command, eccentricity_b))
-        SP_E("A valid eccentricity is required.\n");
+        suanpan_error("A valid eccentricity is required.\n");
 
     return_obj = make_unique<Rectangle3D>(tag, width, height, material_id, int_pt, eccentricity_a, eccentricity_b);
 }
@@ -621,19 +621,19 @@ void new_rectangle3d(unique_ptr<Section>& return_obj, istringstream& command) {
 void new_trusssection(unique_ptr<Section>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double area;
     if(!get_input(command, area)) {
-        SP_E("A valid area is required.\n");
+        suanpan_error("A valid area is required.\n");
         return;
     }
 
     unsigned material_id;
     if(!get_input(command, material_id)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return;
     }
 
@@ -643,31 +643,31 @@ void new_trusssection(unique_ptr<Section>& return_obj, istringstream& command) {
 void new_tsection2d(unique_ptr<Section>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     vec dim(4);
     if(!get_input(command, dim)) {
-        SP_E("A valid dimension is required.\n");
+        suanpan_error("A valid dimension is required.\n");
         return;
     }
 
     unsigned material_id;
     if(!get_input(command, material_id)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return;
     }
 
     unsigned int_pt = 4;
     if(!command.eof() && !get_input(command, int_pt)) {
-        SP_E("A valid number of integration points is required.\n");
+        suanpan_error("A valid number of integration points is required.\n");
         return;
     }
 
     auto eccentricity = 0.;
     if(!command.eof() && !get_input(command, eccentricity)) {
-        SP_E("A valid eccentricity is required.\n");
+        suanpan_error("A valid eccentricity is required.\n");
         return;
     }
 
@@ -677,36 +677,36 @@ void new_tsection2d(unique_ptr<Section>& return_obj, istringstream& command) {
 void new_tsection3d(unique_ptr<Section>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     vec dim(4);
     if(!get_input(command, dim)) {
-        SP_E("A valid dimension is required.\n");
+        suanpan_error("A valid dimension is required.\n");
         return;
     }
 
     unsigned material_id;
     if(!get_input(command, material_id)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return;
     }
 
     unsigned int_pt = 3;
     if(!command.eof() && !get_input(command, int_pt)) {
-        SP_E("A valid number of integration points is required.\n");
+        suanpan_error("A valid number of integration points is required.\n");
         return;
     }
 
     auto eccentricity_y = 0.;
     if(!command.eof() && !get_input(command, eccentricity_y)) {
-        SP_E("A valid eccentricity is required.\n");
+        suanpan_error("A valid eccentricity is required.\n");
         return;
     }
     auto eccentricity_z = 0.;
     if(!command.eof() && !get_input(command, eccentricity_z)) {
-        SP_E("A valid eccentricity is required.\n");
+        suanpan_error("A valid eccentricity is required.\n");
         return;
     }
 
@@ -716,13 +716,13 @@ void new_tsection3d(unique_ptr<Section>& return_obj, istringstream& command) {
 void new_nm2d(unique_ptr<Section>& return_obj, istringstream& command, const unsigned size) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     vec P(size);
     if(!get_input(command, P)) {
-        SP_E("A valid parameter is required.\n");
+        suanpan_error("A valid parameter is required.\n");
         return;
     }
 
@@ -736,7 +736,7 @@ void new_nm2d(unique_ptr<Section>& return_obj, istringstream& command, const uns
     while(!command.eof() && get_input(command, para)) para_set.emplace_back(para);
 
     if(para_set.size() % 3 != 0) {
-        SP_E("A valid parameter set is required.\n");
+        suanpan_error("A valid parameter set is required.\n");
         return;
     }
 
@@ -751,13 +751,13 @@ void new_nm2d(unique_ptr<Section>& return_obj, istringstream& command, const uns
 void new_nm3d(unique_ptr<Section>& return_obj, istringstream& command, const unsigned size) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     vec P(size);
     if(!get_input(command, P)) {
-        SP_E("A valid parameter is required.\n");
+        suanpan_error("A valid parameter is required.\n");
         return;
     }
 
@@ -771,7 +771,7 @@ void new_nm3d(unique_ptr<Section>& return_obj, istringstream& command, const uns
     while(!command.eof() && get_input(command, para)) para_set.emplace_back(para);
 
     if(para_set.size() % 4 != 0) {
-        SP_E("A valid parameter set is required.\n");
+        suanpan_error("A valid parameter set is required.\n");
         return;
     }
 
@@ -786,13 +786,13 @@ void new_nm3d(unique_ptr<Section>& return_obj, istringstream& command, const uns
 void new_nmk(unique_ptr<Section>& return_obj, istringstream& command, const unsigned size) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     vec P(size);
     if(!get_input(command, P)) {
-        SP_E("A valid parameter is required.\n");
+        suanpan_error("A valid parameter is required.\n");
         return;
     }
 
@@ -803,7 +803,7 @@ void new_nmk(unique_ptr<Section>& return_obj, istringstream& command, const unsi
     const auto p_size = 13 == size ? 3 : 4;
 
     if(para_set.size() % p_size != 0) {
-        SP_E("A valid parameter set is required.\n");
+        suanpan_error("A valid parameter set is required.\n");
         return;
     }
 
@@ -1850,44 +1850,44 @@ vec ustsection(const string& type) {
 void new_eu2d(unique_ptr<Section>& return_obj, istringstream& command) {
     string type;
     if(!get_input(command, type)) {
-        SP_E("A valid designation is required.\n");
+        suanpan_error("A valid designation is required.\n");
         return;
     }
 
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     unsigned material_id;
     if(!get_input(command, material_id)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return;
     }
 
     auto scale = 1.;
     if(!command.eof() && !get_input(command, scale)) {
-        SP_E("A valid scale is required.\n");
+        suanpan_error("A valid scale is required.\n");
         return;
     }
 
     unsigned int_pt = 6;
     if(!command.eof() && !get_input(command, int_pt)) {
-        SP_E("A valid number of integration points is required.\n");
+        suanpan_error("A valid number of integration points is required.\n");
         return;
     }
 
     auto eccentricity = 0.;
     if(!command.eof() && !get_input(command, eccentricity)) {
-        SP_E("A valid eccentricity is required.\n");
+        suanpan_error("A valid eccentricity is required.\n");
         return;
     }
 
     const auto dim = euisection(type);
 
     if(dim.is_empty()) {
-        SP_E("Cannot identify section type.\n");
+        suanpan_error("Cannot identify section type.\n");
         return;
     }
 
@@ -1897,50 +1897,50 @@ void new_eu2d(unique_ptr<Section>& return_obj, istringstream& command) {
 void new_eu3d(unique_ptr<Section>& return_obj, istringstream& command) {
     string type;
     if(!get_input(command, type)) {
-        SP_E("A valid designation is required.\n");
+        suanpan_error("A valid designation is required.\n");
         return;
     }
 
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     unsigned material_id;
     if(!get_input(command, material_id)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return;
     }
 
     auto scale = 1.;
     if(!command.eof() && !get_input(command, scale)) {
-        SP_E("A valid scale is required.\n");
+        suanpan_error("A valid scale is required.\n");
         return;
     }
 
     unsigned int_pt = 6;
     if(!command.eof() && !get_input(command, int_pt)) {
-        SP_E("A valid number of integration points is required.\n");
+        suanpan_error("A valid number of integration points is required.\n");
         return;
     }
 
     auto eccentricity_y = 0.;
     if(!command.eof() && !get_input(command, eccentricity_y)) {
-        SP_E("A valid eccentricity is required.\n");
+        suanpan_error("A valid eccentricity is required.\n");
         return;
     }
 
     auto eccentricity_z = 0.;
     if(!command.eof() && !get_input(command, eccentricity_z)) {
-        SP_E("A valid eccentricity is required.\n");
+        suanpan_error("A valid eccentricity is required.\n");
         return;
     }
 
     const auto dim = euisection(type);
 
     if(dim.is_empty()) {
-        SP_E("Cannot identify section type.\n");
+        suanpan_error("Cannot identify section type.\n");
         return;
     }
 
@@ -1950,37 +1950,37 @@ void new_eu3d(unique_ptr<Section>& return_obj, istringstream& command) {
 void new_nz2d(unique_ptr<Section>& return_obj, istringstream& command) {
     string type;
     if(!get_input(command, type)) {
-        SP_E("A valid designation is required.\n");
+        suanpan_error("A valid designation is required.\n");
         return;
     }
 
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     unsigned material_id;
     if(!get_input(command, material_id)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return;
     }
 
     auto scale = 1.;
     if(!command.eof() && !get_input(command, scale)) {
-        SP_E("A valid scale is required.\n");
+        suanpan_error("A valid scale is required.\n");
         return;
     }
 
     unsigned int_pt = 6;
     if(!command.eof() && !get_input(command, int_pt)) {
-        SP_E("A valid number of integration points is required.\n");
+        suanpan_error("A valid number of integration points is required.\n");
         return;
     }
 
     auto eccentricity = 0.;
     if(!command.eof() && !get_input(command, eccentricity)) {
-        SP_E("A valid eccentricity is required.\n");
+        suanpan_error("A valid eccentricity is required.\n");
         return;
     }
 
@@ -2012,49 +2012,49 @@ void new_nz2d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    SP_E("Cannot identify section type.\n");
+    suanpan_error("Cannot identify section type.\n");
 }
 
 void new_nz3d(unique_ptr<Section>& return_obj, istringstream& command) {
     string type;
     if(!get_input(command, type)) {
-        SP_E("A valid designation is required.\n");
+        suanpan_error("A valid designation is required.\n");
         return;
     }
 
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     unsigned material_id;
     if(!get_input(command, material_id)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return;
     }
 
     auto scale = 1.;
     if(!command.eof() && !get_input(command, scale)) {
-        SP_E("A valid scale is required.\n");
+        suanpan_error("A valid scale is required.\n");
         return;
     }
 
     unsigned int_pt = 6;
     if(!command.eof() && !get_input(command, int_pt)) {
-        SP_E("A valid number of integration points is required.\n");
+        suanpan_error("A valid number of integration points is required.\n");
         return;
     }
 
     auto eccentricity_y = 0.;
     if(!command.eof() && !get_input(command, eccentricity_y)) {
-        SP_E("A valid eccentricity is required.\n");
+        suanpan_error("A valid eccentricity is required.\n");
         return;
     }
 
     auto eccentricity_z = 0.;
     if(!command.eof() && !get_input(command, eccentricity_z)) {
-        SP_E("A valid eccentricity is required.\n");
+        suanpan_error("A valid eccentricity is required.\n");
         return;
     }
 
@@ -2086,43 +2086,43 @@ void new_nz3d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    SP_E("Cannot identify section type.\n");
+    suanpan_error("Cannot identify section type.\n");
 }
 
 void new_us2d(unique_ptr<Section>& return_obj, istringstream& command) {
     string type;
     if(!get_input(command, type)) {
-        SP_E("A valid designation is required.\n");
+        suanpan_error("A valid designation is required.\n");
         return;
     }
 
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     unsigned material_id;
     if(!get_input(command, material_id)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return;
     }
 
     auto scale = 1.;
     if(!command.eof() && !get_input(command, scale)) {
-        SP_E("A valid scale is required.\n");
+        suanpan_error("A valid scale is required.\n");
         return;
     }
 
     unsigned int_pt = 6;
     if(!command.eof() && !get_input(command, int_pt)) {
-        SP_E("A valid number of integration points is required.\n");
+        suanpan_error("A valid number of integration points is required.\n");
         return;
     }
 
     auto eccentricity = 0.;
     if(!command.eof() && !get_input(command, eccentricity)) {
-        SP_E("A valid eccentricity is required.\n");
+        suanpan_error("A valid eccentricity is required.\n");
         return;
     }
 
@@ -2140,49 +2140,49 @@ void new_us2d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    SP_E("Cannot identify section type.\n");
+    suanpan_error("Cannot identify section type.\n");
 }
 
 void new_us3d(unique_ptr<Section>& return_obj, istringstream& command) {
     string type;
     if(!get_input(command, type)) {
-        SP_E("A valid designation is required.\n");
+        suanpan_error("A valid designation is required.\n");
         return;
     }
 
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     unsigned material_id;
     if(!get_input(command, material_id)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return;
     }
 
     auto scale = 1.;
     if(!command.eof() && !get_input(command, scale)) {
-        SP_E("A valid scale is required.\n");
+        suanpan_error("A valid scale is required.\n");
         return;
     }
 
     unsigned int_pt = 6;
     if(!command.eof() && !get_input(command, int_pt)) {
-        SP_E("A valid number of integration points is required.\n");
+        suanpan_error("A valid number of integration points is required.\n");
         return;
     }
 
     auto eccentricity_y = 0.;
     if(!command.eof() && !get_input(command, eccentricity_y)) {
-        SP_E("A valid eccentricity is required.\n");
+        suanpan_error("A valid eccentricity is required.\n");
         return;
     }
 
     auto eccentricity_z = 0.;
     if(!command.eof() && !get_input(command, eccentricity_z)) {
-        SP_E("A valid eccentricity is required.\n");
+        suanpan_error("A valid eccentricity is required.\n");
         return;
     }
 
@@ -2200,13 +2200,13 @@ void new_us3d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    SP_E("Cannot identify section type.\n");
+    suanpan_error("Cannot identify section type.\n");
 }
 
 int create_new_section(const shared_ptr<DomainBase>& domain, istringstream& command) {
     string section_id;
     if(!get_input(command, section_id)) {
-        SP_E("A valid section type is required.\n");
+        suanpan_error("A valid section type is required.\n");
         return 0;
     }
 
@@ -2250,7 +2250,7 @@ int create_new_section(const shared_ptr<DomainBase>& domain, istringstream& comm
     else load::object(new_section, domain, section_id, command);
 
     if(new_section == nullptr || !domain->insert(std::move(new_section)))
-        SP_E("Fail to create new section via \"{}\".\n", command.str());
+        suanpan_error("Fail to create new section via \"{}\".\n", command.str());
 
     return 0;
 }

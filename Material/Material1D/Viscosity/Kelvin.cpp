@@ -48,7 +48,7 @@ int Kelvin::initialize(const shared_ptr<DomainBase>& D) {
 unique_ptr<Material> Kelvin::get_copy() { return make_unique<Kelvin>(*this); }
 
 int Kelvin::update_trial_status(const vec&) {
-    SP_E("Receives strain only from the associated element.\n");
+    suanpan_error("Receives strain only from the associated element.\n");
     return SUANPAN_FAIL;
 }
 
@@ -112,4 +112,6 @@ vector<vec> Kelvin::record(const OutputType P) {
     return data;
 }
 
-void Kelvin::print() { sp_info("A Kelvin material model.\n"); }
+void Kelvin::print() {
+    suanpan_info("A Kelvin material model.\n");
+}

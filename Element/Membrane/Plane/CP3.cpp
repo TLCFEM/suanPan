@@ -249,9 +249,9 @@ int CP3::reset_status() { return m_material->reset_status(); }
 vector<vec> CP3::record(const OutputType T) { return m_material->record(T); }
 
 void CP3::print() {
-    sp_info("CP3 element connects nodes:", node_encoding);
+    suanpan_info("CP3 element connects nodes:", node_encoding);
     if(!is_initialized()) return;
-    sp_info("Material:\n");
+    suanpan_info("Material:\n");
     m_material->print();
 }
 

@@ -127,6 +127,6 @@ int Flag::reset_status() {
 }
 
 void Flag::print() {
-    sp_info("A bilinear flag material model with an elastic modulus of {:.3E}, a tension hardening ratio of {:.2f} and a compression hardening ratio of {:.2f}.\n", elastic_modulus, t_hardening_ratio, c_hardening_ratio);
+    suanpan_info("A bilinear flag material model with an elastic modulus of {:.3E}, a tension hardening ratio of {:.2f} and a compression hardening ratio of {:.2f}.\n", elastic_modulus, t_hardening_ratio, c_hardening_ratio);
     Material1D::print();
 }

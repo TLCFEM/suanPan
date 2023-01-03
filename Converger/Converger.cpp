@@ -34,7 +34,7 @@ Converger::Converger(const unsigned T, const double E, const unsigned M, const b
 
 int Converger::initialize() {
     if(nullptr == database.lock()) {
-        SP_E("A valid domain is required.\n");
+        suanpan_error("A valid domain is required.\n");
         return SUANPAN_FAIL;
     }
 

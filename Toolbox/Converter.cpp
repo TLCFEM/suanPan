@@ -96,9 +96,9 @@ int Converter::process_amplitude(std::ifstream& input_file, std::ofstream& outpu
                 pool.emplace_back(value);
             }
             output_file << pool[1] << ' ' << .5 * pool[3] / std::acos(-1.) << ' ' << .5 * pool[4] / std::acos(-1.) << '\n';
-            SP_W("The starting time is set to the start of current step.\n");
+            suanpan_warning("The starting time is set to the start of current step.\n");
             if(pool[0] != 0.)
-                SP_W("The constant part is not supported currently.\n");
+                suanpan_warning("The constant part is not supported currently.\n");
         }
     }
     else if(is_equal(type, "decay")) {
@@ -114,13 +114,13 @@ int Converter::process_amplitude(std::ifstream& input_file, std::ofstream& outpu
                 pool.emplace_back(value);
             }
             output_file << pool[1] << ' ' << pool[3] << '\n';
-            SP_W("The starting time is set to the start of current step.\n");
+            suanpan_warning("The starting time is set to the start of current step.\n");
             if(pool[0] != 0.)
-                SP_W("The constant part is not supported currently.\n");
+                suanpan_warning("The constant part is not supported currently.\n");
         }
     }
     else if(is_equal(type, "periodic")) {
-        SP_W("The periodic amplitude is not supported currently.\n");
+        suanpan_warning("The periodic amplitude is not supported currently.\n");
         return SUANPAN_SUCCESS;
     }
 

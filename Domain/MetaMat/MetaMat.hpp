@@ -176,7 +176,7 @@ template<sp_d T> int MetaMat<T>::direct_solve(Mat<T>& X, SpMat<T>&& B) { return 
 
 template<sp_d T> void MetaMat<T>::save(const char* name) {
     if(!to_mat(*this).save(name))
-        SP_E("Cannot save to file \"{}\".\n", name);
+        suanpan_error("Cannot save to file \"{}\".\n", name);
 }
 
 template<sp_d T> void MetaMat<T>::csc_condense() {}

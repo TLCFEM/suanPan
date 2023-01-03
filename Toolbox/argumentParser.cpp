@@ -41,7 +41,12 @@ constexpr auto SUANPAN_CODE = "Betelgeuse";
 constexpr auto SUANPAN_ARCH = 64;
 
 bool SUANPAN_PRINT = true;
+#ifdef SUANPAN_DEBUG
+bool SUANPAN_VERBOSE = true;
+#else
 bool SUANPAN_VERBOSE = false;
+#endif
+
 const char* SUANPAN_EXE = "";
 
 bool check_debugger() {
@@ -82,14 +87,14 @@ void strip_mode(const string& input_file_name, const string& output_file_name) {
     ifstream input_file(input_file_name);
 
     if(!input_file.is_open()) {
-        SP_E("Fail to open \"{}\".\n", input_file_name);
+        suanpan_error("Fail to open \"{}\".\n", input_file_name);
         return;
     }
 
     ofstream output_file(output_file_name);
 
     if(!output_file.is_open()) {
-        SP_E("Fail to open \"{}\".\n", output_file_name);
+        suanpan_error("Fail to open \"{}\".\n", output_file_name);
         return;
     }
 
@@ -111,14 +116,14 @@ void convert_mode(const string& input_file_name, const string& output_file_name)
     ifstream input_file(input_file_name);
 
     if(!input_file.is_open()) {
-        SP_E("Fail to open \"{}\".\n", input_file_name);
+        suanpan_error("Fail to open \"{}\".\n", input_file_name);
         return;
     }
 
     ofstream output_file(output_file_name);
 
     if(!output_file.is_open()) {
-        SP_E("Fail to open \"{}\".\n", output_file_name);
+        suanpan_error("Fail to open \"{}\".\n", output_file_name);
         return;
     }
 
@@ -130,26 +135,28 @@ void convert_mode(const string& input_file_name, const string& output_file_name)
 }
 
 void print_header() {
-    sp_info("+--------------------------------------------------+\n");
-    sp_info("|   __        __         suanPan is an open source |\n");
-    sp_info("|  /  \\      |  \\           FEM framework ({}-bit) |\n", SUANPAN_ARCH);
-    sp_info("|  \\__       |__/  __   __      {} ({}.{}.{}) |\n", SUANPAN_CODE, SUANPAN_MAJOR, SUANPAN_MINOR, SUANPAN_PATCH);
-    sp_info("|     \\ |  | |    |  \\ |  |      by tlc @ {} |\n", SUANPAN_REVISION);
-    sp_info("|  \\__/ |__| |    |__X |  |    all rights reserved |\n");
-    sp_info("|                           10.5281/zenodo.1285221 |\n");
-    sp_info("+--------------------------------------------------+\n");
+    suanpan_info("+--------------------------------------------------+\n");
+    suanpan_info("|   __        __         suanPan is an open source |\n");
+    suanpan_info("|  /  \\      |  \\           FEM framework ({}-bit) |\n", SUANPAN_ARCH);
+    suanpan_info("|  \\__       |__/  __   __      {} ({}.{}.{}) |\n", SUANPAN_CODE, SUANPAN_MAJOR, SUANPAN_MINOR, SUANPAN_PATCH);
+    suanpan_info("|     \\ |  | |    |  \\ |  |      by tlc @ {} |\n", SUANPAN_REVISION);
+    suanpan_info("|  \\__/ |__| |    |__X |  |    all rights reserved |\n");
+    suanpan_info("|                           10.5281/zenodo.1285221 |\n");
+    suanpan_info("+--------------------------------------------------+\n");
 #ifdef SUANPAN_WIN
-    sp_info("|  https://github.com/TLCFEM/suanPan               |\n");
-    sp_info("|  https://github.com/TLCFEM/suanPan-manual        |\n");
-    sp_info("+--------------------------------------------------+\n");
-    sp_info("|  https://gitter.im/suanPan-dev/community         |\n");
+    suanpan_info("|  https://github.com/TLCFEM/suanPan               |\n");
+    suanpan_info("|  https://github.com/TLCFEM/suanPan-manual        |\n");
+    suanpan_info("+--------------------------------------------------+\n");
+    suanpan_info("|  https://gitter.im/suanPan-dev/community         |\n");
 #else
-    sp_info("|  \U0001F9EE https://github.com/TLCFEM/suanPan            |\n");
-    sp_info("|  \U0001F4DA https://github.com/TLCFEM/suanPan-manual     |\n");
-    sp_info("+--------------------------------------------------+\n");
-    sp_info("|  \U0001F30F https://gitter.im/suanPan-dev/community      |\n");
+    static constexpr std::array POOL{"\U0001F308", "\U0001F30F", "\U0001F3A7", "\U0001F3B1", "\U0001F479", "\U0001F4BB", "\U0001F50B", "\U0001F514", "\U0001F680", "\U0001F9E9"};
+    arma_rng::set_seed_random();
+    suanpan_info("|  \U0001F9EE https://github.com/TLCFEM/suanPan            |\n");
+    suanpan_info("|  \U0001F4DA https://github.com/TLCFEM/suanPan-manual     |\n");
+    suanpan_info("+--------------------------------------------------+\n");
+    suanpan_info("|  {} https://gitter.im/suanPan-dev/community      |\n", POOL[randi() % POOL.size()]);
 #endif
-    sp_info("+--------------------------------------------------+\n\n");
+    suanpan_info("+--------------------------------------------------+\n\n");
 }
 
 void argument_parser(const int argc, char** argv) {
@@ -219,7 +226,7 @@ void argument_parser(const int argc, char** argv) {
             output_file.open(output_file_name);
             if(output_file.is_open()) SUANPAN_COUT.rdbuf(output_file.rdbuf());
             else
-                SP_E("Cannot open the output file \"{}\".\n", output_file_name);
+                suanpan_error("Cannot open the output file \"{}\".\n", output_file_name);
         }
 
         if(!input_file_name.empty()) {
@@ -240,22 +247,22 @@ void argument_parser(const int argc, char** argv) {
         cli_mode(model);
     }
 
-    sp_info("\nTime Wasted: {:.4f} Seconds.\n", T.toc());
+    suanpan_info("\nTime Wasted: {:.4f} Seconds.\n", T.toc());
 }
 
 void print_version() {
-    sp_info("Copyright (C) 2017-2023 Theodore Chang\n\n");
-    sp_info("This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.\n\n");
-    sp_info("This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\n");
-    sp_info("You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.\n\n\n");
-    sp_info("suanPan is an open source FEM framework.\n");
-    sp_info("    The binary is compiled on {}.\n", __DATE__);
-    sp_info("    The source code of suanPan is hosted on GitHub. https://tlcfem.github.io/suanPan/\n");
-    sp_info("    The documentation is hosted on GitBook and readthedocs. https://tlcfem.gitbook.io/suanpan-manual/ and https://suanpan-manual.readthedocs.io/\n");
+    suanpan_info("Copyright (C) 2017-2023 Theodore Chang\n\n");
+    suanpan_info("This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.\n\n");
+    suanpan_info("This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\n");
+    suanpan_info("You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.\n\n\n");
+    suanpan_info("suanPan is an open source FEM framework.\n");
+    suanpan_info("    The binary is compiled on {}.\n", __DATE__);
+    suanpan_info("    The source code of suanPan is hosted on GitHub. https://tlcfem.github.io/suanPan/\n");
+    suanpan_info("    The documentation is hosted on GitBook and readthedocs. https://tlcfem.gitbook.io/suanpan-manual/ and https://suanpan-manual.readthedocs.io/\n");
 #ifdef SUANPAN_MKL
     sp_info("    The linear algebra support is provided by Armadillo with Intel MKL. http://arma.sourceforge.net/\n");
 #else
-    sp_info("    The linear algebra support is provided by Armadillo. http://arma.sourceforge.net/\n");
+    suanpan_info("    The linear algebra support is provided by Armadillo. http://arma.sourceforge.net/\n");
 #endif
 #ifdef SUANPAN_CUDA
     sp_info("    The GPCPU solvers are provided by CUDA. https://developer.nvidia.com/about-cuda\n");
@@ -266,21 +273,21 @@ void print_version() {
 #ifdef SUANPAN_VTK
     sp_info("    The visualisation support is implemented via VTK library. https://vtk.org/\n");
 #endif
-    sp_info("\nPlease join gitter for any feedback. https://gitter.im/suanPan-dev/community\n");
-    sp_info("\n\n[From Wikipedia] Betelgeuse is usually the tenth-brightest star in the night sky and, after Rigel, the second-brightest in the constellation of Orion. It is a distinctly reddish semiregular variable star whose apparent magnitude has the widest range displayed by any first-magnitude star.\n\n");
+    suanpan_info("\nPlease join gitter for any feedback. https://gitter.im/suanPan-dev/community\n");
+    suanpan_info("\n\n[From Wikipedia] Betelgeuse is usually the tenth-brightest star in the night sky and, after Rigel, the second-brightest in the constellation of Orion. It is a distinctly reddish semiregular variable star whose apparent magnitude has the widest range displayed by any first-magnitude star.\n\n");
 }
 
 void print_helper() {
-    sp_info("Available Parameters:\n");
-    sp_info("\t-{:<10}  --{:<20}{}\n", "v", "version", "check version information");
-    sp_info("\t-{:<10}  --{:<20}{}\n", "h", "help", "print this helper");
-    sp_info("\t-{:<10}  --{:<20}{}\n", "s", "strip", "strip comments out in given ABAQUS input file");
+    suanpan_info("Available Parameters:\n");
+    suanpan_info("\t-{:<10}  --{:<20}{}\n", "v", "version", "check version information");
+    suanpan_info("\t-{:<10}  --{:<20}{}\n", "h", "help", "print this helper");
+    suanpan_info("\t-{:<10}  --{:<20}{}\n", "s", "strip", "strip comments out in given ABAQUS input file");
     // sp_info("\t-{:<10}  --{:<20}{}\n", "c", "convert", "partially convert ABAQUS input file into suanPan model script");
-    sp_info("\t-{:<10}  --{:<20}{}\n", "np", "noprint", "suppress most console output");
-    sp_info("\t-{:<10}  --{:<20}{}\n", "nu", "noupdate", "do not check for newer version on startup");
-    sp_info("\t-{:<10}  --{:<20}{}\n", "f", "file", "process model file");
-    sp_info("\t-{:<10}  --{:<20}{}\n", "o", "output", "set output file for logging");
-    sp_info("\n");
+    suanpan_info("\t-{:<10}  --{:<20}{}\n", "np", "noprint", "suppress most console output");
+    suanpan_info("\t-{:<10}  --{:<20}{}\n", "nu", "noupdate", "do not check for newer version on startup");
+    suanpan_info("\t-{:<10}  --{:<20}{}\n", "f", "file", "process model file");
+    suanpan_info("\t-{:<10}  --{:<20}{}\n", "o", "output", "set output file for logging");
+    suanpan_info("\n");
 }
 
 void cli_mode(const shared_ptr<Bead>& model) {
@@ -298,7 +305,7 @@ void cli_mode(const shared_ptr<Bead>& model) {
     string all_line;
     while(true) {
         string command_line;
-        sp_info("suanPan ~<> ");
+        suanpan_info("suanPan ~<> ");
         getline(std::cin, command_line);
         if(!command_line.empty() && command_line[0] != '#' && command_line[0] != '!') {
             if(const auto if_comment = command_line.find('!'); string::npos != if_comment) command_line.erase(if_comment);

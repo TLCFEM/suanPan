@@ -106,13 +106,13 @@ void LeeNewmarkFull::assemble_mass(const uword row_shift, const uword col_shift,
 void LeeNewmarkFull::assemble_stiffness(const uword row_shift, const uword col_shift, const double scalar) const { assemble(access::rw(stiffness_graph), current_stiffness, row_shift, col_shift, scalar); }
 
 void LeeNewmarkFull::assemble_mass(const std::vector<uword>& row_shift, const std::vector<uword>& col_shift, const std::vector<double>& scalar) const {
-    suanpan_debug([&] { if(scalar.size() != row_shift.size() || scalar.size() != col_shift.size()) throw invalid_argument("size mismatch detected"); });
+    suanpan_assert([&] { if(scalar.size() != row_shift.size() || scalar.size() != col_shift.size()) throw invalid_argument("size mismatch detected"); });
 
     for(decltype(scalar.size()) I = 0; I < scalar.size(); ++I) assemble_mass(row_shift[I], col_shift[I], scalar[I]);
 }
 
 void LeeNewmarkFull::assemble_stiffness(const std::vector<uword>& row_shift, const std::vector<uword>& col_shift, const std::vector<double>& scalar) const {
-    suanpan_debug([&] { if(scalar.size() != row_shift.size() || scalar.size() != col_shift.size()) throw invalid_argument("size mismatch detected"); });
+    suanpan_assert([&] { if(scalar.size() != row_shift.size() || scalar.size() != col_shift.size()) throw invalid_argument("size mismatch detected"); });
 
     for(decltype(scalar.size()) I = 0; I < scalar.size(); ++I) assemble_stiffness(row_shift[I], col_shift[I], scalar[I]);
 }
@@ -158,7 +158,7 @@ void LeeNewmarkFull::formulate_block(uword& current_pos, const double m_coef, co
 }
 
 void LeeNewmarkFull::formulate_block(uword& current_pos, const std::vector<double>& m_coef, const std::vector<double>& s_coef, const std::vector<int>& order) const {
-    suanpan_debug([&] { if(order.size() != m_coef.size() || order.size() != s_coef.size()) throw invalid_argument("size mismatch detected"); });
+    suanpan_assert([&] { if(order.size() != m_coef.size() || order.size() != s_coef.size()) throw invalid_argument("size mismatch detected"); });
 
     for(size_t I = 0; I < order.size(); ++I) formulate_block(current_pos, m_coef[I], s_coef[I], order[I]);
 }
@@ -348,13 +348,13 @@ int LeeNewmarkFull::initialize() {
     if(SUANPAN_SUCCESS != LeeNewmarkBase::initialize()) return SUANPAN_FAIL;
 
     if(if_iterative && PreconditionerType::ILU != factory->get_solver_setting().preconditioner_type) {
-        SP_E("Iterative solver with preconditioner other than ILU is not supported, please consider LeeNewmark.\n");
+        suanpan_error("Iterative solver with preconditioner other than ILU is not supported, please consider LeeNewmark.\n");
         return SUANPAN_FAIL;
     }
 
     if(factory->is_sparse()) return SUANPAN_SUCCESS;
 
-    SP_E("The sparse storage needs to be enabled via \"set sparse_mat true\".\n");
+    suanpan_error("The sparse storage needs to be enabled via \"set sparse_mat true\".\n");
     return SUANPAN_FAIL;
 }
 
@@ -524,9 +524,9 @@ int LeeNewmarkFull::process_constraint_resistance() {
 }
 
 void LeeNewmarkFull::print() {
-    sp_info("A Newmark solver using Lee's damping model with adjustable bandwidth using {} stiffness. doi: 10.1016/j.compstruc.2020.106423 and 10.1016/j.compstruc.2021.106663\n", stiffness_type == StiffnessType::TRIAL
-            ? "tangent"
-            : stiffness_type == StiffnessType::CURRENT
-            ? "converged"
-            : "initial");
+    suanpan_info("A Newmark solver using Lee's damping model with adjustable bandwidth using {} stiffness. doi: 10.1016/j.compstruc.2020.106423 and 10.1016/j.compstruc.2021.106663\n", stiffness_type == StiffnessType::TRIAL
+                 ? "tangent"
+                 : stiffness_type == StiffnessType::CURRENT
+                 ? "converged"
+                 : "initial");
 }

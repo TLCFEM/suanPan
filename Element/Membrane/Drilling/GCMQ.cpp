@@ -185,7 +185,7 @@ int GCMQ::initialize(const shared_ptr<DomainBase>& D) {
     HT = trans(H);
 
     if(!solve(NT, H, N) || !solve(MT, H, M)) {
-        SP_E("Element {} fails to initialize and is disabled.\n", get_tag());
+        suanpan_error("Element {} fails to initialize and is disabled.\n", get_tag());
         return SUANPAN_FAIL;
     }
 
@@ -316,20 +316,20 @@ vector<vec> GCMQ::record(const OutputType T) {
 }
 
 void GCMQ::print() {
-    sp_info("A GCMQ mixed quadrilateral element connecting nodes:", node_encoding);
+    suanpan_info("A GCMQ mixed quadrilateral element connecting nodes:", node_encoding);
     if(!is_initialized()) return;
-    sp_info("Material Response:\n");
+    suanpan_info("Material Response:\n");
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        sp_info("IP {}:\t", I + 1);
-        sp_info(int_pt[I].coor);
+        suanpan_info("IP {}:\t", I + 1);
+        suanpan_info(int_pt[I].coor);
         int_pt[I].m_material->print();
     }
-    sp_info("Element Response:\n");
+    suanpan_info("Element Response:\n");
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        sp_info("IP {}:\t", I + 1);
-        sp_info(int_pt[I].coor);
-        sp_info("Strain:\t", vec{int_pt[I].poly_strain * current_beta});
-        sp_info("Stress:\t", vec{int_pt[I].poly_stress * current_alpha});
+        suanpan_info("IP {}:\t", I + 1);
+        suanpan_info(int_pt[I].coor);
+        suanpan_info("Strain:\t", vec{int_pt[I].poly_strain * current_beta});
+        suanpan_info("Stress:\t", vec{int_pt[I].poly_stress * current_alpha});
     }
 }
 

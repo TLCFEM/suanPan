@@ -36,7 +36,7 @@ int CSMQ4::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
     if(!material_proto->is_support_couple()) {
-        SP_W("Element {} is assigned with a material that does not support couple stress.\n", get_tag());
+        suanpan_warning("Element {} is assigned with a material that does not support couple stress.\n", get_tag());
         return SUANPAN_FAIL;
     }
 
@@ -208,12 +208,12 @@ vector<vec> CSMQ4::record(const OutputType P) {
 }
 
 void CSMQ4::print() {
-    sp_info("A four-node membrane element (CSMQ4) connecting nodes:", node_encoding);
+    suanpan_info("A four-node membrane element (CSMQ4) connecting nodes:", node_encoding);
     if(!is_initialized()) return;
-    sp_info("Material:\n");
+    suanpan_info("Material:\n");
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        sp_info("IP {}:\t", I + 1);
-        sp_info(int_pt[I].coor);
+        suanpan_info("IP {}:\t", I + 1);
+        suanpan_info(int_pt[I].coor);
         int_pt[I].m_material->print();
     }
 }

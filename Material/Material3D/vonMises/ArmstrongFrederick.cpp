@@ -71,7 +71,7 @@ int ArmstrongFrederick::update_trial_status(const vec& t_strain) {
     unsigned counter = 0;
     while(true) {
         if(max_iteration == ++counter) {
-            SP_E("Cannot converge within {} iterations.\n", max_iteration);
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
             return SUANPAN_FAIL;
         }
 
@@ -99,7 +99,7 @@ int ArmstrongFrederick::update_trial_status(const vec& t_strain) {
         jacobian = root_three_two * sum_b - three_shear - dk;
 
         const auto incre = yield_func / jacobian;
-        SP_D("Local iteration error: {:.5E}.\n", fabs(incre));
+        suanpan_debug("Local iteration error: {:.5E}.\n", fabs(incre));
         if(fabs(incre) <= tolerance) break;
 
         gamma -= incre;
@@ -152,4 +152,6 @@ vector<vec> ArmstrongFrederick::record(const OutputType P) {
     return Material3D::record(P);
 }
 
-void ArmstrongFrederick::print() { sp_info("A 3D nonlinear hardening model using Armstrong-Frederick kinematic hardening rule.\n"); }
+void ArmstrongFrederick::print() {
+    suanpan_info("A 3D nonlinear hardening model using Armstrong-Frederick kinematic hardening rule.\n");
+}

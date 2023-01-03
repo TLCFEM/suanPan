@@ -29,4 +29,6 @@ int NM2D1::update_trial_status(const vec& t_deformation) {
     return SUANPAN_SUCCESS;
 }
 
-void NM2D1::print() { sp_info("A NM2D1 section.\n"); }
+void NM2D1::print() {
+    suanpan_info("A NM2D1 section.\n");
+}

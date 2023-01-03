@@ -48,7 +48,7 @@ int BWBN::update_trial_status(const vec& t_strain) {
     unsigned counter = 0;
     while(true) {
         if(max_iteration == ++counter) {
-            SP_E("Cannot converge within {} iterations.\n", max_iteration);
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
             return SUANPAN_FAIL;
         }
 
@@ -100,7 +100,7 @@ int BWBN::update_trial_status(const vec& t_strain) {
 
         const auto error = fabs(incre = -residual / jacobian);
 
-        SP_D("Local iteration error: {:.5E}.\n", error);
+        suanpan_debug("Local iteration error: {:.5E}.\n", error);
 
         if(error <= tolerance) {
             trial_stress = modulus_a * trial_strain + modulus_b * z;
@@ -154,6 +154,6 @@ int BWBN::reset_status() {
 }
 
 void BWBN::print() {
-    sp_info("A BWBN material model.\n");
+    suanpan_info("A BWBN material model.\n");
     Material1D::print();
 }

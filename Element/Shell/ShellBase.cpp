@@ -22,7 +22,7 @@ const uvec ShellBase::m_dof{0, 1, 5};
 const uvec ShellBase::p_dof{2, 3, 4};
 
 vec ShellBase::reshuffle(const vec& membrane_resistance, const vec& plate_resistance) {
-    suanpan_debug([&] { if(membrane_resistance.n_elem != plate_resistance.n_elem) throw invalid_argument("size conflicts"); });
+    suanpan_assert([&] { if(membrane_resistance.n_elem != plate_resistance.n_elem) throw invalid_argument("size conflicts"); });
 
     const auto t_size = 2 * plate_resistance.n_elem;
 
@@ -38,7 +38,7 @@ vec ShellBase::reshuffle(const vec& membrane_resistance, const vec& plate_resist
 }
 
 mat ShellBase::reshuffle(const mat& membrane_stiffness, const mat& plate_stiffness) {
-    suanpan_debug([&] {
+    suanpan_assert([&] {
         if(membrane_stiffness.n_cols != membrane_stiffness.n_rows) throw invalid_argument("size conflicts");
         if(membrane_stiffness.n_cols != plate_stiffness.n_cols) throw invalid_argument("size conflicts");
         if(plate_stiffness.n_cols != plate_stiffness.n_rows) throw invalid_argument("size conflicts");
@@ -91,7 +91,7 @@ vec& ShellBase::transform_from_global_to_local(vec& displacement) const {
 }
 
 mat& ShellBase::transform_from_local_to_global(mat& stiffness) const {
-    suanpan_debug([&] { if(stiffness.n_cols != stiffness.n_rows) throw invalid_argument("size conflicts"); });
+    suanpan_assert([&] { if(stiffness.n_cols != stiffness.n_rows) throw invalid_argument("size conflicts"); });
 
     for(auto I = 0llu, K = 2llu; I < stiffness.n_cols; I += 3llu, K += 3llu) {
         const span i_span(I, K);

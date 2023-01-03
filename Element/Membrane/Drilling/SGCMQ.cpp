@@ -269,12 +269,12 @@ vector<vec> SGCMQ::record(const OutputType T) {
 }
 
 void SGCMQ::print() {
-    sp_info("A SGCMQ mixed quadrilateral element connects nodes:", node_encoding);
+    suanpan_info("A SGCMQ mixed quadrilateral element connects nodes:", node_encoding);
     if(!is_initialized()) return;
-    sp_info("Material:\n");
+    suanpan_info("Material:\n");
     for(size_t I = 0, J = 1; I < int_pt.size(); ++I, ++J) {
-        sp_info("IP {}:\t", J);
-        sp_info(int_pt[I].coor);
+        suanpan_info("IP {}:\t", J);
+        suanpan_info(int_pt[I].coor);
         int_pt[I].m_material->print();
     }
 }

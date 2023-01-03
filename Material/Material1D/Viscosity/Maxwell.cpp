@@ -58,7 +58,7 @@ int Maxwell::initialize(const shared_ptr<DomainBase>& D) {
 unique_ptr<Material> Maxwell::get_copy() { return make_unique<Maxwell>(*this); }
 
 int Maxwell::update_trial_status(const vec&) {
-    SP_E("Receives strain only from the associated element.\n");
+    suanpan_error("Receives strain only from the associated element.\n");
     return SUANPAN_FAIL;
 }
 
@@ -104,7 +104,7 @@ int Maxwell::update_trial_status(const vec& t_strain, const vec& t_strain_rate) 
             const vec incre = inv_jacobian * residual / (factor_a * (K1 + K2) + K3);
 
             if(1 == counter) ref_error = std::max(1., norm(residual));
-            SP_D("Local iteration error: {:.5E}.\n", error = norm(residual) / ref_error);
+            suanpan_debug("Local iteration error: {:.5E}.\n", error = norm(residual) / ref_error);
             if(norm(incre) <= tolerance && error <= tolerance) break;
             solution += incre;
             spring->update_incre_status(solution(0));
@@ -120,7 +120,7 @@ int Maxwell::update_trial_status(const vec& t_strain, const vec& t_strain_rate) 
             const auto jacobian = K1 + K2 + K3 / factor_a;
             const auto incre = residual / jacobian;
             if(1 == counter) ref_error = std::max(1., fabs(residual));
-            SP_D("Local iteration error: {:.5E}.\n", error = fabs(residual) / ref_error);
+            suanpan_debug("Local iteration error: {:.5E}.\n", error = fabs(residual) / ref_error);
             if(fabs(incre) <= tolerance && error <= tolerance) break;
             solution(0) += incre;
             solution(1) += residual_a - incre;
@@ -142,7 +142,7 @@ int Maxwell::update_trial_status(const vec& t_strain, const vec& t_strain_rate) 
     }
 
     if(1 >= proceed || ++delay_counter == proceed) {
-        SP_E("Cannot converge within {} iterations.\n", max_iteration);
+        suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
         return SUANPAN_FAIL;
     }
 
@@ -191,4 +191,6 @@ vector<vec> Maxwell::record(const OutputType P) {
     return data;
 }
 
-void Maxwell::print() { sp_info("A Maxwell material model.\n"); }
+void Maxwell::print() {
+    suanpan_info("A Maxwell material model.\n");
+}

@@ -31,7 +31,7 @@ int BFGS::analyze() {
     const auto& D = C->get_domain().lock();
     auto& W = D->get_factory();
 
-    sp_info("-> Current Analysis Time: {:.5f}.\n", W->get_trial_time());
+    suanpan_info("-> Current Analysis Time: {:.5f}.\n", W->get_trial_time());
 
     const auto max_iteration = C->get_max_iteration();
 
@@ -143,4 +143,6 @@ int BFGS::analyze() {
     }
 }
 
-void BFGS::print() { sp_info("A (L-)BFGS solver.\n"); }
+void BFGS::print() {
+    suanpan_info("A (L-)BFGS solver.\n");
+}

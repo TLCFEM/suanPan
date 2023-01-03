@@ -40,7 +40,7 @@ int B21E::update_status() {
     auto counter = 0u;
     while(true) {
         if(++counter > max_iteration) {
-            SP_E("Element {} fails to converge to {:.2E}.\n", get_tag(), tolerance);
+            suanpan_error("Element {} fails to converge to {:.2E}.\n", get_tag(), tolerance);
             return SUANPAN_FAIL;
         }
 
@@ -55,7 +55,7 @@ int B21E::update_status() {
 
         const auto error = norm(local_resistance(a));
         const vec incre = solve(local_stiffness(a, a), local_resistance(a));
-        SP_D("Local iteration error: {:.5E}.\n", error);
+        suanpan_debug("Local iteration error: {:.5E}.\n", error);
 
         if(error < tolerance && norm(incre) < tolerance) {
             const mat t_mat = local_stiffness(b, b) - local_stiffness(b, a) * solve(local_stiffness(a, a), local_stiffness(a, b));

@@ -62,4 +62,6 @@ int Rectangle3D::initialize(const shared_ptr<DomainBase>& D) {
 
 unique_ptr<Section> Rectangle3D::get_copy() { return make_unique<Rectangle3D>(*this); }
 
-void Rectangle3D::print() { sp_info("A 3D rectangular section.\n"); }
+void Rectangle3D::print() {
+    suanpan_info("A 3D rectangular section.\n");
+}

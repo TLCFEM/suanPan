@@ -826,7 +826,7 @@ int Domain::assign_color() {
 
         suanpan::for_all(color_map, [&](std::vector<unsigned>& color) { std::ranges::transform(color, color.begin(), [&](const unsigned element) { return element_map[element]; }); });
 
-        SP_D("The model is colored by {} colors.\n", color_map.size());
+        suanpan_debug("The model is colored by {} colors.\n", color_map.size());
     }
 
     // count how many entries in the sparse form and preallocate memory
@@ -975,7 +975,7 @@ int Domain::initialize() {
     for(const auto I : remove_list) erase_element(I);
     element_pond.update();
     if(element_pond.get().empty()) {
-        SP_W("No active elements.\n");
+        suanpan_warning("No active elements.\n");
         return SUANPAN_FAIL;
     }
 
@@ -1178,8 +1178,8 @@ void Domain::enable_all() {
 }
 
 void Domain::summary() const {
-    sp_info("Domain {} contains:\n\t{} nodes, {} elements, {} materials,\n", get_tag(), get_node(), get_element(), get_material());
-    sp_info("\t{} loads, {} constraints and {} recorders.\n", get_load(), get_constraint(), get_recorder());
+    suanpan_info("Domain {} contains:\n\t{} nodes, {} elements, {} materials,\n", get_tag(), get_node(), get_element(), get_material());
+    suanpan_info("\t{} loads, {} constraints and {} recorders.\n", get_load(), get_constraint(), get_recorder());
 }
 
 void Domain::erase_machine_error(vec& ninja) const { suanpan::for_all(restrained_dofs, [&](const uword I) { ninja(I) = 0.; }); }

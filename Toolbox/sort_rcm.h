@@ -46,7 +46,7 @@
 uvec sort_rcm(const std::vector<uvec>&, const uvec&);
 
 template<typename eT> uvec sort_rcm(const SpMat<eT>& MEAT) {
-    suanpan_debug([&] { if(!MEAT.is_square()) throw logic_error("RCM() can only be applied to square matrix.\n"); });
+    suanpan_assert([&] { if(!MEAT.is_square()) throw logic_error("RCM() can only be applied to square matrix.\n"); });
 
     wall_clock TM;
     TM.tic();
@@ -111,7 +111,7 @@ template<typename eT> uvec sort_rcm(const SpMat<eT>& MEAT) {
         for(const auto& IDX : A[R(IDXB--)]) if(!M[IDX]) M[R(IDXC--) = IDX] = true;
     }
 
-    SP_D("RCM algorithm takes {:.5E} seconds.\n", TM.toc());
+    suanpan_debug("RCM algorithm takes {:.5E} seconds.\n", TM.toc());
 
     return R;
 }

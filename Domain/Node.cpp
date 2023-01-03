@@ -85,7 +85,7 @@ void Node::initialize(const shared_ptr<DomainBase>& D) {
         trial_acceleration.resize(num_dof);
     }
     else {
-        SP_D("Node {} disabled as it is not used.\n", get_tag());
+        suanpan_debug("Node {} disabled as it is not used.\n", get_tag());
         D->disable_node(get_tag());
     }
 
@@ -113,7 +113,7 @@ void Node::set_dof_identifier(const std::vector<DOF>& D) {
     for(size_t I = 0; I < D.size(); ++I) {
         if(DOF::NONE == D[I]) continue;
         if(DOF::NONE != dof_identifier[I] && D[I] != dof_identifier[I])
-            SP_W("Inconsistent DoF assignment for node {} detected.\n", get_tag());
+            suanpan_warning("Inconsistent DoF assignment for node {} detected.\n", get_tag());
         dof_identifier[I] = D[I];
     }
 }
@@ -535,10 +535,12 @@ std::vector<vec> Node::record(const OutputType L) const {
 }
 
 void Node::print() {
-    sp_info("Node {}{}\n", get_tag(), is_active() ? ":" : " is currently inactive.");
-    sp_info("Coordinate:", coordinate);
-    sp_info("Displacement:", current_displacement);
-    sp_info("Resistance:", current_resistance);
-    if(!suanpan::approx_equal(accu(current_velocity), 0.)) sp_info("Velocity:", current_velocity);
-    if(!suanpan::approx_equal(accu(current_acceleration), 0.)) sp_info("Acceleration:", current_acceleration);
+    suanpan_info("Node {}{}\n", get_tag(), is_active() ? ":" : " is currently inactive.");
+    suanpan_info("Coordinate:", coordinate);
+    suanpan_info("Displacement:", current_displacement);
+    suanpan_info("Resistance:", current_resistance);
+    if(!suanpan::approx_equal(accu(current_velocity), 0.))
+        suanpan_info("Velocity:", current_velocity);
+    if(!suanpan::approx_equal(accu(current_acceleration), 0.))
+        suanpan_info("Acceleration:", current_acceleration);
 }

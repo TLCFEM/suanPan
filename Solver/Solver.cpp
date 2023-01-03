@@ -26,12 +26,12 @@ Solver::Solver(const unsigned T)
 
 int Solver::initialize() {
     if(nullptr == converger) {
-        SP_E("A valid converger is required.\n");
+        suanpan_error("A valid converger is required.\n");
         return SUANPAN_FAIL;
     }
 
     if(nullptr == modifier) {
-        SP_E("A valid integrator is required.\n");
+        suanpan_error("A valid integrator is required.\n");
         return SUANPAN_FAIL;
     }
 

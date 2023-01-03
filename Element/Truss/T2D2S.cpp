@@ -84,12 +84,14 @@ int T2D2S::reset_status() {
 vector<vec> T2D2S::record(const OutputType P) { return t_section->record(P); }
 
 void T2D2S::print() {
-    sp_info("A 2D truss element with ");
-    if(nlgeom) sp_info("corotational formulation, assuming constant area and {} strain.", log_strain ? "logarithmic" : "engineering");
-    else sp_info("linear formulation.");
-    sp_info(" The nodes connected are:", node_encoding);
+    suanpan_info("A 2D truss element with ");
+    if(nlgeom)
+        suanpan_info("corotational formulation, assuming constant area and {} strain.", log_strain ? "logarithmic" : "engineering");
+    else
+        suanpan_info("linear formulation.");
+    suanpan_info(" The nodes connected are:", node_encoding);
     if(!is_initialized()) return;
-    sp_info("Section:\n");
+    suanpan_info("Section:\n");
     t_section->print();
 }
 

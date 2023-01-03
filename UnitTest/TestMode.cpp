@@ -20,5 +20,5 @@
 
 void test_mode() {
     std::string A{"asdewf"};
-    SP_W("This is a test message: {}.\n", A);
+    suanpan_warning("This is a test message: {}.\n", A);
 }

@@ -27,48 +27,48 @@ using std::vector;
 void new_afc01(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     double t_yield_stress, t_hardening, t_unloading;
     double c_yield_stress, c_hardening, c_unloading;
     if(!get_input(command, t_yield_stress)) {
-        SP_E("A valid tension yield stress is required.\n");
+        suanpan_error("A valid tension yield stress is required.\n");
         return;
     }
     if(!get_input(command, t_hardening)) {
-        SP_E("A valid tension hardening modulus is required.\n");
+        suanpan_error("A valid tension hardening modulus is required.\n");
         return;
     }
     if(!get_input(command, t_unloading)) {
-        SP_E("A valid tension unloading modulus is required.\n");
+        suanpan_error("A valid tension unloading modulus is required.\n");
         return;
     }
     if(!get_input(command, c_yield_stress)) {
-        SP_E("A valid compression yield stress is required.\n");
+        suanpan_error("A valid compression yield stress is required.\n");
         return;
     }
     if(!get_input(command, c_hardening)) {
-        SP_E("A valid compression hardening modulus is required.\n");
+        suanpan_error("A valid compression hardening modulus is required.\n");
         return;
     }
     if(!get_input(command, c_unloading)) {
-        SP_E("A valid compression unloading modulus is required.\n");
+        suanpan_error("A valid compression unloading modulus is required.\n");
         return;
     }
 
     auto density = 0.;
     if(command.eof())
-        SP_D("Zero density assumed.\n");
+        suanpan_debug("Zero density assumed.\n");
     else if(!get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -78,35 +78,35 @@ void new_afc01(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_afc02(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     double t_yield_stress, t_hardening, t_unloading;
     if(!get_input(command, t_yield_stress)) {
-        SP_E("A valid yield stress is required.\n");
+        suanpan_error("A valid yield stress is required.\n");
         return;
     }
     if(!get_input(command, t_hardening)) {
-        SP_E("A valid hardening modulus is required.\n");
+        suanpan_error("A valid hardening modulus is required.\n");
         return;
     }
     if(!get_input(command, t_unloading)) {
-        SP_E("A valid unloading modulus is required.\n");
+        suanpan_error("A valid unloading modulus is required.\n");
         return;
     }
 
     auto density = 0.;
     if(command.eof())
-        SP_D("Zero density assumed.\n");
+        suanpan_debug("Zero density assumed.\n");
     else if(!get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -116,56 +116,56 @@ void new_afc02(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_afc03(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     double t_yield_stress, t_hardening, t_unloading;
     double c_yield_stress, c_hardening, c_unloading;
     if(!get_input(command, t_yield_stress)) {
-        SP_E("A valid tension yield stress is required.\n");
+        suanpan_error("A valid tension yield stress is required.\n");
         return;
     }
     if(!get_input(command, t_hardening)) {
-        SP_E("A valid tension hardening modulus is required.\n");
+        suanpan_error("A valid tension hardening modulus is required.\n");
         return;
     }
     if(!get_input(command, t_unloading)) {
-        SP_E("A valid tension unloading modulus is required.\n");
+        suanpan_error("A valid tension unloading modulus is required.\n");
         return;
     }
     if(!get_input(command, c_yield_stress)) {
-        SP_E("A valid compression yield stress is required.\n");
+        suanpan_error("A valid compression yield stress is required.\n");
         return;
     }
     if(!get_input(command, c_hardening)) {
-        SP_E("A valid compression hardening modulus is required.\n");
+        suanpan_error("A valid compression hardening modulus is required.\n");
         return;
     }
     if(!get_input(command, c_unloading)) {
-        SP_E("A valid compression unloading modulus is required.\n");
+        suanpan_error("A valid compression unloading modulus is required.\n");
         return;
     }
 
     auto degrade = 0.;
     if(command.eof())
-        SP_D("Linear degradation assumed.\n");
+        suanpan_debug("Linear degradation assumed.\n");
     else if(!get_input(command, degrade)) {
-        SP_E("A valid degradation parameter is required.\n");
+        suanpan_error("A valid degradation parameter is required.\n");
         return;
     }
 
     auto density = 0.;
     if(command.eof())
-        SP_D("Zero density assumed.\n");
+        suanpan_debug("Zero density assumed.\n");
     else if(!get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -175,13 +175,13 @@ void new_afc03(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_armstrongfrederick(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     vec pool{2E5, .2, 4E2, 5E2, 0., 1E1};
     if(!get_optional_input(command, pool)) {
-        SP_E("Valid inputs are required.\n");
+        suanpan_error("Valid inputs are required.\n");
         return;
     }
 
@@ -190,7 +190,7 @@ void new_armstrongfrederick(unique_ptr<Material>& return_obj, istringstream& com
     while(!command.eof())
         if(get_input(command, para)) all.emplace_back(para);
         else {
-            SP_E("Valid inputs are required.\n");
+            suanpan_error("Valid inputs are required.\n");
             return;
         }
 
@@ -212,13 +212,13 @@ void new_armstrongfrederick(unique_ptr<Material>& return_obj, istringstream& com
 void new_armstrongfrederick1d(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     vec pool{2E5, 4E2, 5E2, 0., 1E1};
     if(!get_optional_input(command, pool)) {
-        SP_E("Valid inputs are required.\n");
+        suanpan_error("Valid inputs are required.\n");
         return;
     }
 
@@ -227,7 +227,7 @@ void new_armstrongfrederick1d(unique_ptr<Material>& return_obj, istringstream& c
     while(!command.eof())
         if(get_input(command, para)) all.emplace_back(para);
         else {
-            SP_E("Valid inputs are required.\n");
+            suanpan_error("Valid inputs are required.\n");
             return;
         }
 
@@ -249,13 +249,13 @@ void new_armstrongfrederick1d(unique_ptr<Material>& return_obj, istringstream& c
 void new_axisymmetric(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     unsigned full_tag;
     if(!get_input(command, full_tag)) {
-        SP_E("A valid reference material tag is required.\n");
+        suanpan_error("A valid reference material tag is required.\n");
         return;
     }
 
@@ -265,27 +265,27 @@ void new_axisymmetric(unique_ptr<Material>& return_obj, istringstream& command) 
 void new_axisymmetricelastic(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     double poissons_ratio;
     if(!get_input(command, poissons_ratio)) {
-        SP_E("A valid poissons ratio is required.\n");
+        suanpan_error("A valid poissons ratio is required.\n");
         return;
     }
 
     auto density = 0.;
     if(command.eof())
-        SP_D("Zero density assumed.\n");
+        suanpan_debug("Zero density assumed.\n");
     else if(!get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -295,35 +295,35 @@ void new_axisymmetricelastic(unique_ptr<Material>& return_obj, istringstream& co
 void new_bilinear1d(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     double yield_stress;
     if(!get_input(command, yield_stress)) {
-        SP_E("A valid yield stress is required.\n");
+        suanpan_error("A valid yield stress is required.\n");
         return;
     }
 
     auto hardening_ratio = 0.;
     if(command.eof())
-        SP_D("Zero hardening ratio assumed.\n");
+        suanpan_debug("Zero hardening ratio assumed.\n");
     else if(!get_input(command, hardening_ratio)) {
-        SP_E("A valid hardening ratio is required.\n");
+        suanpan_error("A valid hardening ratio is required.\n");
         return;
     }
 
     auto beta = 1.;
     if(command.eof())
-        SP_D("Isotropic hardening assumed.\n");
+        suanpan_debug("Isotropic hardening assumed.\n");
     else if(!get_input(command, beta)) {
-        SP_E("A valid beta is required.\n");
+        suanpan_error("A valid beta is required.\n");
         return;
     }
     if(beta > 1.) beta = 1.;
@@ -331,9 +331,9 @@ void new_bilinear1d(unique_ptr<Material>& return_obj, istringstream& command) {
 
     auto density = 0.;
     if(command.eof())
-        SP_D("Zero density assumed.\n");
+        suanpan_debug("Zero density assumed.\n");
     else if(!get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -343,55 +343,55 @@ void new_bilinear1d(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_bilinear2d(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     double poissons_ratio;
     if(!get_input(command, poissons_ratio)) {
-        SP_E("A valid poissons ratio is required.\n");
+        suanpan_error("A valid poissons ratio is required.\n");
         return;
     }
 
     double yield_stress;
     if(!get_input(command, yield_stress)) {
-        SP_E("A valid yield stress is required.\n");
+        suanpan_error("A valid yield stress is required.\n");
         return;
     }
 
     auto hardening_ratio = 0.;
     if(command.eof())
-        SP_D("Zero hardening ratio assumed.\n");
+        suanpan_debug("Zero hardening ratio assumed.\n");
     else if(!get_input(command, hardening_ratio)) {
-        SP_E("A valid hardening ratio is required.\n");
+        suanpan_error("A valid hardening ratio is required.\n");
         return;
     }
 
     auto beta = 1.;
     if(command.eof())
-        SP_D("Isotropic hardening assumed.\n");
+        suanpan_debug("Isotropic hardening assumed.\n");
     else if(!get_input(command, beta)) {
-        SP_E("A valid beta is required.\n");
+        suanpan_error("A valid beta is required.\n");
         return;
     }
 
     unsigned material_type = 0;
     if(!command.eof() && !get_input(command, material_type)) {
-        SP_E("A valid material type is required.\n");
+        suanpan_error("A valid material type is required.\n");
         return;
     }
 
     auto density = 0.;
     if(command.eof())
-        SP_D("Zero density assumed.\n");
+        suanpan_debug("Zero density assumed.\n");
     else if(!get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -401,47 +401,47 @@ void new_bilinear2d(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_bilinearcc(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     double poissons_ratio;
     if(!get_input(command, poissons_ratio)) {
-        SP_E("A valid poisson's ratio is required.\n");
+        suanpan_error("A valid poisson's ratio is required.\n");
         return;
     }
 
     double beta, m, pt, a, a_slope;
     if(!get_input(command, beta)) {
-        SP_E("A valid beta is required.\n");
+        suanpan_error("A valid beta is required.\n");
         return;
     }
     if(!get_input(command, m)) {
-        SP_E("A valid radius ratio is required.\n");
+        suanpan_error("A valid radius ratio is required.\n");
         return;
     }
     if(!get_input(command, pt)) {
-        SP_E("A valid tensile yield strength is required.\n");
+        suanpan_error("A valid tensile yield strength is required.\n");
         return;
     }
     if(!get_input(command, a)) {
-        SP_E("A valid initial size is required.\n");
+        suanpan_error("A valid initial size is required.\n");
         return;
     }
     if(!get_input(command, a_slope)) {
-        SP_E("A valid hardening slope is required.\n");
+        suanpan_error("A valid hardening slope is required.\n");
         return;
     }
 
     auto density = 0.;
     if(!command.eof() && !get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -451,47 +451,47 @@ void new_bilinearcc(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_bilineardp(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     double poissons_ratio;
     if(!get_input(command, poissons_ratio)) {
-        SP_E("A valid poisson's ratio is required.\n");
+        suanpan_error("A valid poisson's ratio is required.\n");
         return;
     }
 
     double eta_yield, eta_flow, xi, cohesion, cohesion_slope;
     if(!get_input(command, eta_yield)) {
-        SP_E("A valid eta for yielding criterion is required.\n");
+        suanpan_error("A valid eta for yielding criterion is required.\n");
         return;
     }
     if(!get_input(command, eta_flow)) {
-        SP_E("A valid eta for plasticity flow rule is required.\n");
+        suanpan_error("A valid eta for plasticity flow rule is required.\n");
         return;
     }
     if(!get_input(command, xi)) {
-        SP_E("A valid xi is required.\n");
+        suanpan_error("A valid xi is required.\n");
         return;
     }
     if(!get_input(command, cohesion)) {
-        SP_E("A valid cohesion is required.\n");
+        suanpan_error("A valid cohesion is required.\n");
         return;
     }
     if(!get_input(command, cohesion_slope)) {
-        SP_E("A valid cohesion is required.\n");
+        suanpan_error("A valid cohesion is required.\n");
         return;
     }
 
     auto density = 0.;
     if(!command.eof() && !get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -501,35 +501,35 @@ void new_bilineardp(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_bilinearelastic1d(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     double yield_stress;
     if(!get_input(command, yield_stress)) {
-        SP_E("A valid yield stress is required.\n");
+        suanpan_error("A valid yield stress is required.\n");
         return;
     }
 
     auto hardening_ratio = 0.;
     if(command.eof())
-        SP_D("Zero hardening ratio assumed.\n");
+        suanpan_debug("Zero hardening ratio assumed.\n");
     else if(!get_input(command, hardening_ratio)) {
-        SP_E("A valid hardening ratio is required.\n");
+        suanpan_error("A valid hardening ratio is required.\n");
         return;
     }
 
     auto density = 0.;
     if(command.eof())
-        SP_D("Zero density assumed.\n");
+        suanpan_debug("Zero density assumed.\n");
     else if(!get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -539,39 +539,39 @@ void new_bilinearelastic1d(unique_ptr<Material>& return_obj, istringstream& comm
 void new_nle1d01(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     double yield_stress;
     if(!get_input(command, yield_stress)) {
-        SP_E("A valid yield stress is required.\n");
+        suanpan_error("A valid yield stress is required.\n");
         return;
     }
 
     double hardening_ratio;
     if(!get_input(command, hardening_ratio)) {
-        SP_E("A valid hardening ratio is required.\n");
+        suanpan_error("A valid hardening ratio is required.\n");
         return;
     }
 
     double radius;
     if(!get_input(command, radius)) {
-        SP_E("A valid radius for transition is required.\n");
+        suanpan_error("A valid radius for transition is required.\n");
         return;
     }
 
     auto density = 0.;
     if(command.eof())
-        SP_D("Zero density assumed.\n");
+        suanpan_debug("Zero density assumed.\n");
     else if(!get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -581,41 +581,41 @@ void new_nle1d01(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_bilinearhoffman(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     vec modulus(6);
     if(!get_input(command, modulus)) {
-        SP_E("A valid modulus is required.\n");
+        suanpan_error("A valid modulus is required.\n");
         return;
     }
 
     vec poissons_ratio(3);
     if(!get_input(command, poissons_ratio)) {
-        SP_E("A valid poisson's ratio is required.\n");
+        suanpan_error("A valid poisson's ratio is required.\n");
         return;
     }
 
     vec stress(9);
     if(!get_input(command, stress)) {
-        SP_E("A valid yield stress is required.\n");
+        suanpan_error("A valid yield stress is required.\n");
         return;
     }
 
     auto hardening = 0.;
     if(command.eof())
-        SP_D("Zero hardening ratio assumed.\n");
+        suanpan_debug("Zero hardening ratio assumed.\n");
     else if(!get_input(command, hardening)) {
-        SP_E("A valid hardening ratio is required.\n");
+        suanpan_error("A valid hardening ratio is required.\n");
         return;
     }
 
     auto density = 0.;
     if(command.eof())
-        SP_D("Zero density assumed.\n");
+        suanpan_debug("Zero density assumed.\n");
     else if(!get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -625,49 +625,49 @@ void new_bilinearhoffman(unique_ptr<Material>& return_obj, istringstream& comman
 void new_bilinearj2(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     double poissons_ratio;
     if(!get_input(command, poissons_ratio)) {
-        SP_E("A valid poissons ratio is required.\n");
+        suanpan_error("A valid poissons ratio is required.\n");
         return;
     }
 
     double yield_stress;
     if(!get_input(command, yield_stress)) {
-        SP_E("A valid yield stress is required.\n");
+        suanpan_error("A valid yield stress is required.\n");
         return;
     }
 
     auto hardening_ratio = 0.;
     if(command.eof())
-        SP_D("Zero hardening ratio assumed.\n");
+        suanpan_debug("Zero hardening ratio assumed.\n");
     else if(!get_input(command, hardening_ratio)) {
-        SP_E("A valid hardening ratio is required.\n");
+        suanpan_error("A valid hardening ratio is required.\n");
         return;
     }
 
     auto beta = 1.;
     if(command.eof())
-        SP_D("Isotropic hardening assumed.\n");
+        suanpan_debug("Isotropic hardening assumed.\n");
     else if(!get_input(command, beta)) {
-        SP_E("A valid beta is required.\n");
+        suanpan_error("A valid beta is required.\n");
         return;
     }
 
     auto density = 0.;
     if(command.eof())
-        SP_D("Zero density assumed.\n");
+        suanpan_debug("Zero density assumed.\n");
     else if(!get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -677,35 +677,35 @@ void new_bilinearj2(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_bilinearmises1d(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     double yield_stress;
     if(!get_input(command, yield_stress)) {
-        SP_E("A valid yield stress is required.\n");
+        suanpan_error("A valid yield stress is required.\n");
         return;
     }
 
     auto hardening_ratio = 0.;
     if(command.eof())
-        SP_D("Zero hardening ratio assumed.\n");
+        suanpan_debug("Zero hardening ratio assumed.\n");
     else if(!get_input(command, hardening_ratio)) {
-        SP_E("A valid hardening ratio is required.\n");
+        suanpan_error("A valid hardening ratio is required.\n");
         return;
     }
 
     auto density = 0.;
     if(command.eof())
-        SP_D("Zero density assumed.\n");
+        suanpan_debug("Zero density assumed.\n");
     else if(!get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -715,7 +715,7 @@ void new_bilinearmises1d(unique_ptr<Material>& return_obj, istringstream& comman
 void new_bilinearoo(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
@@ -733,7 +733,7 @@ void new_bilinearoo(unique_ptr<Material>& return_obj, istringstream& command) {
     else if(5 == pool.size()) pool.emplace_back(0.);
 
     if(6 != pool.size()) {
-        SP_E("3 to 6 parameters are required.\n");
+        suanpan_error("3 to 6 parameters are required.\n");
         return;
     }
 
@@ -743,7 +743,7 @@ void new_bilinearoo(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_bilinearpo(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
@@ -761,7 +761,7 @@ void new_bilinearpo(unique_ptr<Material>& return_obj, istringstream& command) {
     else if(5 == pool.size()) pool.emplace_back(0.);
 
     if(6 != pool.size()) {
-        SP_E("3 to 6 parameters are required.\n");
+        suanpan_error("3 to 6 parameters are required.\n");
         return;
     }
 
@@ -771,49 +771,49 @@ void new_bilinearpo(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_bilinearperic(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     double poissons_ratio;
     if(!get_input(command, poissons_ratio)) {
-        SP_E("A valid poissons ratio is required.\n");
+        suanpan_error("A valid poissons ratio is required.\n");
         return;
     }
 
     double yield_stress;
     if(!get_input(command, yield_stress)) {
-        SP_E("A valid yield stress is required.\n");
+        suanpan_error("A valid yield stress is required.\n");
         return;
     }
 
     double hardening;
     if(!get_input(command, hardening)) {
-        SP_E("A valid hardening modulus is required.\n");
+        suanpan_error("A valid hardening modulus is required.\n");
         return;
     }
 
     double mu, epsilon;
     if(!get_input(command, mu)) {
-        SP_E("A valid mu is required.\n");
+        suanpan_error("A valid mu is required.\n");
         return;
     }
     if(!get_input(command, epsilon)) {
-        SP_E("A valid epsilon is required.\n");
+        suanpan_error("A valid epsilon is required.\n");
         return;
     }
 
     auto density = 0.;
     if(command.eof())
-        SP_D("Zero density assumed.\n");
+        suanpan_debug("Zero density assumed.\n");
     else if(!get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -823,27 +823,27 @@ void new_bilinearperic(unique_ptr<Material>& return_obj, istringstream& command)
 void new_blatzko(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     double poissons_ratio;
     if(!get_input(command, poissons_ratio)) {
-        SP_E("A valid poissons ratio is required.\n");
+        suanpan_error("A valid poissons ratio is required.\n");
         return;
     }
 
     auto density = 0.;
     if(command.eof())
-        SP_D("Zero density assumed.\n");
+        suanpan_debug("Zero density assumed.\n");
     else if(!get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -853,7 +853,7 @@ void new_blatzko(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_boucwen(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
@@ -864,7 +864,7 @@ void new_boucwen(unique_ptr<Material>& return_obj, istringstream& command) {
     if(5 == pool.size()) pool.emplace_back(0.);
 
     if(6 != pool.size()) {
-        SP_E("6 or 7 parameters are required.\n");
+        suanpan_error("6 or 7 parameters are required.\n");
         return;
     }
 
@@ -874,14 +874,14 @@ void new_boucwen(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_bwbn(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     vec para_pool{2E5, 4E2, 1E-2, 5E-1, 1., 1., 0., 1., 0., 1., 0., 0., 0., 0., 0., 1., 0.};
 
     if(!get_optional_input(command, para_pool)) {
-        SP_E("A valid parameter is required.\n");
+        suanpan_error("A valid parameter is required.\n");
         return;
     }
 
@@ -891,14 +891,14 @@ void new_bwbn(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_cdp(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     vec para_pool{3E4, .2, 3., 30., 5E-4, 5E-2, .2, 2., .5, .65, .2, 1.16, .5, 2400E-12};
 
     if(!get_optional_input(command, para_pool)) {
-        SP_E("A valid parameter is required.\n");
+        suanpan_error("A valid parameter is required.\n");
         return;
     }
 
@@ -908,14 +908,14 @@ void new_cdp(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_cdpm2(unique_ptr<Material>& return_obj, istringstream& command, const unsigned damage_type) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     vec para_pool{3E4, .3, 3., 30., .3, .01, .85, .08, .003, 2., 1E-6, 5., 2E-4, 1E-4, 0.};
 
     if(!get_optional_input(command, para_pool)) {
-        SP_E("A valid parameter is required.\n");
+        suanpan_error("A valid parameter is required.\n");
         return;
     }
 
@@ -929,7 +929,7 @@ void new_cdpm2(unique_ptr<Material>& return_obj, istringstream& command, const u
 void new_concrete21(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
@@ -940,13 +940,13 @@ void new_concrete21(unique_ptr<Material>& return_obj, istringstream& command) {
     if(para.size() == 9) return_obj = make_unique<Concrete21>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], 0.);
     else if(para.size() == 10) return_obj = make_unique<Concrete21>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], para[9]);
     else
-        SP_E("9 or 10 double inputs are required.\n");
+        suanpan_error("9 or 10 double inputs are required.\n");
 }
 
 void new_concrete22(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
@@ -957,63 +957,63 @@ void new_concrete22(unique_ptr<Material>& return_obj, istringstream& command) {
     if(para.size() == 11) return_obj = make_unique<Concrete22>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], para[9], para[10], 0.);
     else if(para.size() == 12) return_obj = make_unique<Concrete22>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], para[9], para[10], para[11]);
     else
-        SP_E("11 or 12 double inputs are required.\n");
+        suanpan_error("11 or 12 double inputs are required.\n");
 }
 
 void new_concretecm(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     double peak_stress;
     if(!get_input(command, peak_stress)) {
-        SP_E("A valid compression stress is required.\n");
+        suanpan_error("A valid compression stress is required.\n");
         return;
     }
 
     double crack_stress;
     if(!get_input(command, crack_stress)) {
-        SP_E("A valid tension stress is required.\n");
+        suanpan_error("A valid tension stress is required.\n");
         return;
     }
 
     double NC, NT;
     if(!get_input(command, NC, NT)) {
-        SP_E("A valid parameter is required.\n");
+        suanpan_error("A valid parameter is required.\n");
         return;
     }
 
     auto peak_strain = 2E-3;
     if(!command.eof() && !get_input(command, peak_strain)) {
-        SP_E("A valid tension stress is required.\n");
+        suanpan_error("A valid tension stress is required.\n");
         return;
     }
 
     auto crack_strain = 1E-4;
     if(!command.eof() && !get_input(command, crack_strain)) {
-        SP_E("A valid tension stress is required.\n");
+        suanpan_error("A valid tension stress is required.\n");
         return;
     }
 
     string linear_trans = "false";
     if(!command.eof() && !get_input(command, linear_trans)) {
-        SP_E("A valid transition switch is required.\n");
+        suanpan_error("A valid transition switch is required.\n");
         return;
     }
 
     auto density = 0.;
     if(command.eof())
-        SP_D("Zero density assumed.\n");
+        suanpan_debug("Zero density assumed.\n");
     else if(!get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -1023,37 +1023,37 @@ void new_concretecm(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_concreteexp(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     double f_t, a_t, g_t, f_c, a_c, g_c;
     if(!get_input(command, f_t, a_t, g_t)) {
-        SP_E("A valid tension parameter is required.\n");
+        suanpan_error("A valid tension parameter is required.\n");
         return;
     }
     if(!get_input(command, f_c, a_c, g_c)) {
-        SP_E("A valid compression parameter is required.\n");
+        suanpan_error("A valid compression parameter is required.\n");
         return;
     }
 
     auto middle_point = .2;
     if(!command.eof() && !get_input(command, middle_point)) {
-        SP_E("A valid middle point is required.\n");
+        suanpan_error("A valid middle point is required.\n");
         return;
     }
 
     auto density = 0.;
     if(command.eof())
-        SP_D("Zero density assumed.\n");
+        suanpan_debug("Zero density assumed.\n");
     else if(!get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -1063,38 +1063,38 @@ void new_concreteexp(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_concretetable(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     string c_name, t_name;
     if(!get_input(command, t_name, c_name)) {
-        SP_E("A valid parameter is required.\n");
+        suanpan_error("A valid parameter is required.\n");
         return;
     }
 
     std::error_code code;
     mat t_table, c_table;
     if(!fs::exists(t_name, code) || !t_table.load(t_name, raw_ascii) || t_table.n_cols != 2) {
-        SP_E("Cannot load \"{}\".\n", t_name);
+        suanpan_error("Cannot load \"{}\".\n", t_name);
         return;
     }
     if(!fs::exists(c_name, code) || !c_table.load(c_name, raw_ascii) || c_table.n_cols != 2) {
-        SP_E("Cannot load \"{}\".\n", c_name);
+        suanpan_error("Cannot load \"{}\".\n", c_name);
         return;
     }
 
     auto m_point = .2;
     if(!command.eof() && !get_input(command, m_point)) {
-        SP_E("A valid transition switch is required.\n");
+        suanpan_error("A valid transition switch is required.\n");
         return;
     }
 
     auto density = 0.;
     if(command.eof())
-        SP_D("Zero density assumed.\n");
+        suanpan_debug("Zero density assumed.\n");
     else if(!get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -1104,7 +1104,7 @@ void new_concretetable(unique_ptr<Material>& return_obj, istringstream& command)
 void new_concretetsai(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
@@ -1117,19 +1117,19 @@ void new_concretetsai(unique_ptr<Material>& return_obj, istringstream& command) 
     else if(para.size() == 9) return_obj = make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], 0.);
     else if(para.size() == 10) return_obj = make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], para[9]);
     else
-        SP_E("7, 8, 9 or 10 double inputs are required.\n");
+        suanpan_error("7, 8, 9 or 10 double inputs are required.\n");
 }
 
 void new_coulombfriction(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double max_friction, factor;
     if(!get_input(command, max_friction, factor)) {
-        SP_E("Valid parameters are required.\n");
+        suanpan_error("Valid parameters are required.\n");
         return;
     }
 
@@ -1139,23 +1139,23 @@ void new_coulombfriction(unique_ptr<Material>& return_obj, istringstream& comman
 void new_dhakal(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     unsigned mat_tag;
     if(!get_input(command, mat_tag)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return;
     }
 
     double y_strain, parameter;
     if(!get_input(command, y_strain)) {
-        SP_E("A valid yield strain is required.\n");
+        suanpan_error("A valid yield strain is required.\n");
         return;
     }
     if(!get_input(command, parameter)) {
-        SP_E("A valid bar parameter is required.\n");
+        suanpan_error("A valid bar parameter is required.\n");
         return;
     }
 
@@ -1165,21 +1165,21 @@ void new_dhakal(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_sinh1d(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     auto density = 0.;
     if(command.eof())
-        SP_D("Zero density assumed.\n");
+        suanpan_debug("Zero density assumed.\n");
     else if(!get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -1189,21 +1189,21 @@ void new_sinh1d(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_tanh1d(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     auto density = 0.;
     if(command.eof())
-        SP_D("Zero density assumed.\n");
+        suanpan_debug("Zero density assumed.\n");
     else if(!get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -1213,21 +1213,21 @@ void new_tanh1d(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_elastic1d(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     auto density = 0.;
     if(command.eof())
-        SP_D("Zero density assumed.\n");
+        suanpan_debug("Zero density assumed.\n");
     else if(!get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -1237,35 +1237,35 @@ void new_elastic1d(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_elastic2d(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     double poissons_ratio;
     if(!get_input(command, poissons_ratio)) {
-        SP_E("A valid poissons ratio is required.\n");
+        suanpan_error("A valid poissons ratio is required.\n");
         return;
     }
 
     auto density = 0.;
     if(command.eof())
-        SP_D("Zero density assumed.\n");
+        suanpan_debug("Zero density assumed.\n");
     else if(!get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
     auto material_type = 0;
     if(command.eof())
-        SP_D("Plane stress assumed.\n");
+        suanpan_debug("Plane stress assumed.\n");
     else if(!get_input(command, material_type)) {
-        SP_E("A valid material type is required.\n");
+        suanpan_error("A valid material type is required.\n");
         return;
     }
 
@@ -1275,55 +1275,55 @@ void new_elastic2d(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_expcc(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     double poissons_ratio;
     if(!get_input(command, poissons_ratio)) {
-        SP_E("A valid poisson's ratio is required.\n");
+        suanpan_error("A valid poisson's ratio is required.\n");
         return;
     }
 
     double beta, m, pt, a0, e0, lambda, kappa;
     if(!get_input(command, beta)) {
-        SP_E("A valid beta is required.\n");
+        suanpan_error("A valid beta is required.\n");
         return;
     }
     if(!get_input(command, m)) {
-        SP_E("A valid radius ratio is required.\n");
+        suanpan_error("A valid radius ratio is required.\n");
         return;
     }
     if(!get_input(command, pt)) {
-        SP_E("A valid tensile yield strength is required.\n");
+        suanpan_error("A valid tensile yield strength is required.\n");
         return;
     }
     if(!get_input(command, a0)) {
-        SP_E("A valid initial a_0 is required.\n");
+        suanpan_error("A valid initial a_0 is required.\n");
         return;
     }
     if(!get_input(command, e0)) {
-        SP_E("A valid initial void ratio is required.\n");
+        suanpan_error("A valid initial void ratio is required.\n");
         return;
     }
     if(!get_input(command, lambda)) {
-        SP_E("A valid lambda is required.\n");
+        suanpan_error("A valid lambda is required.\n");
         return;
     }
     if(!get_input(command, kappa)) {
-        SP_E("A valid kappa is required.\n");
+        suanpan_error("A valid kappa is required.\n");
         return;
     }
 
     auto density = 0.;
     if(!command.eof() && !get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -1333,43 +1333,43 @@ void new_expcc(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_expdp(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     double poissons_ratio;
     if(!get_input(command, poissons_ratio)) {
-        SP_E("A valid poisson's ratio is required.\n");
+        suanpan_error("A valid poisson's ratio is required.\n");
         return;
     }
 
     double eta_yield, eta_flow, xi, cohesion, cohesion_a, cohesion_b;
     if(!get_input(command, eta_yield)) {
-        SP_E("A valid eta for yielding criterion is required.\n");
+        suanpan_error("A valid eta for yielding criterion is required.\n");
         return;
     }
     if(!get_input(command, eta_flow)) {
-        SP_E("A valid eta for plasticity flow rule is required.\n");
+        suanpan_error("A valid eta for plasticity flow rule is required.\n");
         return;
     }
     if(!get_input(command, xi)) {
-        SP_E("A valid xi is required.\n");
+        suanpan_error("A valid xi is required.\n");
         return;
     }
     if(!get_input(command, cohesion, cohesion_a, cohesion_b)) {
-        SP_E("A valid cohesion is required.\n");
+        suanpan_error("A valid cohesion is required.\n");
         return;
     }
 
     auto density = 0.;
     if(!command.eof() && !get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -1379,13 +1379,13 @@ void new_expdp(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_expgurson(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     vec para_pool{2E2, .3, .4, .2, 1., 1., 0., 1., 0., 0.};
     if(!get_optional_input(command, para_pool)) {
-        SP_E("A valid parameter is required.\n");
+        suanpan_error("A valid parameter is required.\n");
         return;
     }
 
@@ -1395,13 +1395,13 @@ void new_expgurson(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_expgurson1d(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     vec para_pool{2E2, .3, .4, .2, 1., 1., 0., 1., 0., 0.};
     if(!get_optional_input(command, para_pool)) {
-        SP_E("A valid parameter is required.\n");
+        suanpan_error("A valid parameter is required.\n");
         return;
     }
 
@@ -1411,43 +1411,43 @@ void new_expgurson1d(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_exphoffman(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     vec modulus(6);
     if(!get_input(command, modulus)) {
-        SP_E("A valid modulus is required.\n");
+        suanpan_error("A valid modulus is required.\n");
         return;
     }
 
     vec poissons_ratio(3);
     if(!get_input(command, poissons_ratio)) {
-        SP_E("A valid poisson's ratio is required.\n");
+        suanpan_error("A valid poisson's ratio is required.\n");
         return;
     }
 
     vec stress(9);
     if(!get_input(command, stress)) {
-        SP_E("A valid yield stress is required.\n");
+        suanpan_error("A valid yield stress is required.\n");
         return;
     }
 
     double a, b;
     if(!get_input(command, a)) {
-        SP_E("A valid a is required.\n");
+        suanpan_error("A valid a is required.\n");
         return;
     }
     if(!get_input(command, b)) {
-        SP_E("A valid b is required.\n");
+        suanpan_error("A valid b is required.\n");
         return;
     }
 
     auto density = 0.;
     if(command.eof())
-        SP_D("Zero density assumed.\n");
+        suanpan_debug("Zero density assumed.\n");
     else if(!get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -1457,39 +1457,39 @@ void new_exphoffman(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_expj2(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     double poissons_ratio;
     if(!get_input(command, poissons_ratio)) {
-        SP_E("A valid poissons ratio is required.\n");
+        suanpan_error("A valid poissons ratio is required.\n");
         return;
     }
 
     double yield_stress, a, b;
     if(!get_input(command, yield_stress)) {
-        SP_E("A valid yield stress is required.\n");
+        suanpan_error("A valid yield stress is required.\n");
         return;
     }
     if(!get_input(command, a)) {
-        SP_E("A valid a is required.\n");
+        suanpan_error("A valid a is required.\n");
         return;
     }
     if(!get_input(command, b)) {
-        SP_E("A valid b is required.\n");
+        suanpan_error("A valid b is required.\n");
         return;
     }
 
     auto density = 0.;
     if(!command.eof() && !get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -1499,29 +1499,29 @@ void new_expj2(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_expmises1d(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     double yield_stress, a, b, c;
     if(!get_input(command, yield_stress)) {
-        SP_E("A valid yield stress is required.\n");
+        suanpan_error("A valid yield stress is required.\n");
         return;
     }
     if(!get_input(command, a, b, c)) {
-        SP_E("A valid parameter is required.\n");
+        suanpan_error("A valid parameter is required.\n");
         return;
     }
 
     auto density = 0.;
     if(!command.eof() && !get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -1531,13 +1531,13 @@ void new_expmises1d(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_dafaliasmanzari(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     vec p{125., .05, 1.25, .02, .9, .7, .01, 7., .1, .9, 1.1, -.7, 3.5, 4., 6E2, -130., .2, 0.};
     if(!get_optional_input(command, p)) {
-        SP_E("A valid parameter is required.\n");
+        suanpan_error("A valid parameter is required.\n");
         return;
     }
 
@@ -1547,41 +1547,41 @@ void new_dafaliasmanzari(unique_ptr<Material>& return_obj, istringstream& comman
 void new_flag01(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     double yield_stress;
     if(!get_input(command, yield_stress)) {
-        SP_E("A valid yield stress is required.\n");
+        suanpan_error("A valid yield stress is required.\n");
         return;
     }
 
     double residual;
     if(!get_input(command, residual)) {
-        SP_E("A valid residual stress is required.\n");
+        suanpan_error("A valid residual stress is required.\n");
         return;
     }
 
     auto hardening_ratio = 0.;
     if(command.eof())
-        SP_D("Zero hardening ratio assumed.\n");
+        suanpan_debug("Zero hardening ratio assumed.\n");
     else if(!get_input(command, hardening_ratio)) {
-        SP_E("A valid hardening ratio is required.\n");
+        suanpan_error("A valid hardening ratio is required.\n");
         return;
     }
 
     auto density = 0.;
     if(command.eof())
-        SP_D("Zero density assumed.\n");
+        suanpan_debug("Zero density assumed.\n");
     else if(!get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -1591,57 +1591,57 @@ void new_flag01(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_flag02(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     double t_yield_stress;
     if(!get_input(command, t_yield_stress)) {
-        SP_E("A valid yield stress is required.\n");
+        suanpan_error("A valid yield stress is required.\n");
         return;
     }
 
     double t_residual;
     if(!get_input(command, t_residual)) {
-        SP_E("A valid residual stress is required.\n");
+        suanpan_error("A valid residual stress is required.\n");
         return;
     }
 
     double t_hardening_ratio;
     if(!get_input(command, t_hardening_ratio)) {
-        SP_E("A valid hardening ratio is required.\n");
+        suanpan_error("A valid hardening ratio is required.\n");
         return;
     }
 
     double c_yield_stress;
     if(!get_input(command, c_yield_stress)) {
-        SP_E("A valid yield stress is required.\n");
+        suanpan_error("A valid yield stress is required.\n");
         return;
     }
 
     double c_residual;
     if(!get_input(command, c_residual)) {
-        SP_E("A valid residual stress is required.\n");
+        suanpan_error("A valid residual stress is required.\n");
         return;
     }
 
     double c_hardening_ratio;
     if(!get_input(command, c_hardening_ratio)) {
-        SP_E("A valid hardening ratio is required.\n");
+        suanpan_error("A valid hardening ratio is required.\n");
         return;
     }
 
     auto density = 0.;
     if(command.eof())
-        SP_D("Zero density assumed.\n");
+        suanpan_debug("Zero density assumed.\n");
     else if(!get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -1651,19 +1651,19 @@ void new_flag02(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_fluid(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double bulk_modulus;
     if(!get_input(command, bulk_modulus)) {
-        SP_E("A valid bulk modulus is required.\n");
+        suanpan_error("A valid bulk modulus is required.\n");
         return;
     }
 
     double density;
     if(!get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -1673,31 +1673,31 @@ void new_fluid(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_gap01(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     double yield_stress;
     if(!get_input(command, yield_stress)) {
-        SP_E("A valid yield stress is required.\n");
+        suanpan_error("A valid yield stress is required.\n");
         return;
     }
 
     auto gap_strain = 0.;
     if(!command.eof() && !get_input(command, gap_strain)) {
-        SP_E("A valid hardening ratio is required.\n");
+        suanpan_error("A valid hardening ratio is required.\n");
         return;
     }
 
     auto density = 0.;
     if(!command.eof() && !get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -1707,27 +1707,27 @@ void new_gap01(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_isotropicelastic3d(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     double poissons_ratio;
     if(!get_input(command, poissons_ratio)) {
-        SP_E("A valid poissons ratio is required.\n");
+        suanpan_error("A valid poissons ratio is required.\n");
         return;
     }
 
     auto density = 0.;
     if(command.eof())
-        SP_D("Zero density assumed.\n");
+        suanpan_debug("Zero density assumed.\n");
     else if(!get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -1737,13 +1737,13 @@ void new_isotropicelastic3d(unique_ptr<Material>& return_obj, istringstream& com
 void new_kelvin(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     unsigned damper_tag, spring_tag;
     if(!get_input(command, damper_tag, spring_tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
@@ -1753,27 +1753,27 @@ void new_kelvin(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_lineardamage(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     unsigned mat_tag;
     if(!get_input(command, mat_tag)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return;
     }
 
     vec value(3, fill::zeros);
     if(!get_input(command, value(0))) {
-        SP_E("A valid start strain is required.\n");
+        suanpan_error("A valid start strain is required.\n");
         return;
     }
     if(!get_input(command, value(1))) {
-        SP_E("A valid end strain is required.\n");
+        suanpan_error("A valid end strain is required.\n");
         return;
     }
     if(!command.eof() && !get_input(command, value(2))) {
-        SP_E("A valid end damage value is required.\n");
+        suanpan_error("A valid end damage value is required.\n");
         return;
     }
 
@@ -1783,7 +1783,7 @@ void new_lineardamage(unique_ptr<Material>& return_obj, istringstream& command) 
 void new_laminated(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
@@ -1797,25 +1797,25 @@ void new_laminated(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_maxwell(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag, damper_tag, spring_tag;
     if(!get_input(command, tag, damper_tag, spring_tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     string matrix = "false";
     if(!command.eof() && !get_input(command, matrix)) {
-        SP_E("A valid algorithm switch is required.\n");
+        suanpan_error("A valid algorithm switch is required.\n");
         return;
     }
 
     unsigned proceed = 0;
     if(!command.eof() && !get_input(command, proceed)) {
-        SP_E("A valid algorithm switch is required.\n");
+        suanpan_error("A valid algorithm switch is required.\n");
         return;
     }
 
     auto beta = .5;
     if(!command.eof() && !get_input(command, beta)) {
-        SP_E("A valid beta value is required.\n");
+        suanpan_error("A valid beta value is required.\n");
         return;
     }
 
@@ -1825,33 +1825,33 @@ void new_maxwell(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_mooneyrivlin(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double bulk_modulus;
     if(!get_input(command, bulk_modulus)) {
-        SP_E("A valid bulk modulus is required.\n");
+        suanpan_error("A valid bulk modulus is required.\n");
         return;
     }
 
     double a10;
     if(!get_input(command, a10)) {
-        SP_E("A valid a10 is required.\n");
+        suanpan_error("A valid a10 is required.\n");
         return;
     }
 
     double a01;
     if(!get_input(command, a01)) {
-        SP_E("A valid a01 is required.\n");
+        suanpan_error("A valid a01 is required.\n");
         return;
     }
 
     auto density = 0.;
     if(command.eof())
-        SP_D("Zero density assumed.\n");
+        suanpan_debug("Zero density assumed.\n");
     else if(!get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -1861,73 +1861,73 @@ void new_mooneyrivlin(unique_ptr<Material>& return_obj, istringstream& command) 
 void new_mpf(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     double yield_stress;
     if(!get_input(command, yield_stress)) {
-        SP_E("A valid yield stress is required.\n");
+        suanpan_error("A valid yield stress is required.\n");
         return;
     }
 
     auto hardening_ratio = .05;
     if(!command.eof() && !get_input(command, hardening_ratio)) {
-        SP_E("A valid hardening ratio is required.\n");
+        suanpan_error("A valid hardening ratio is required.\n");
         return;
     }
 
     auto R0 = 20.;
     if(!command.eof() && !get_input(command, R0)) {
-        SP_E("A valid r0 is required.\n");
+        suanpan_error("A valid r0 is required.\n");
         return;
     }
 
     auto A1 = 18.5;
     if(!command.eof() && !get_input(command, A1)) {
-        SP_E("A valid a1 is required.\n");
+        suanpan_error("A valid a1 is required.\n");
         return;
     }
 
     auto A2 = .15;
     if(!command.eof() && !get_input(command, A2)) {
-        SP_E("A valid a2 is required.\n");
+        suanpan_error("A valid a2 is required.\n");
         return;
     }
 
     auto A3 = .01;
     if(!command.eof() && !get_input(command, A3)) {
-        SP_E("A valid a3 is required.\n");
+        suanpan_error("A valid a3 is required.\n");
         return;
     }
 
     auto A4 = 7.;
     if(!command.eof() && !get_input(command, A4)) {
-        SP_E("A valid a4 is required.\n");
+        suanpan_error("A valid a4 is required.\n");
         return;
     }
 
     string iso = "false";
     if(!command.eof() && !get_input(command, iso)) {
-        SP_E("A valid isotropic hardening switch is required.\n");
+        suanpan_error("A valid isotropic hardening switch is required.\n");
         return;
     }
 
     string con = "false";
     if(!command.eof() && !get_input(command, con)) {
-        SP_E("A valid constant radius switch is required.\n");
+        suanpan_error("A valid constant radius switch is required.\n");
         return;
     }
 
     auto density = 0.;
     if(!command.eof() && !get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -1937,7 +1937,7 @@ void new_mpf(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_multilinearoo(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
@@ -1945,17 +1945,17 @@ void new_multilinearoo(unique_ptr<Material>& return_obj, istringstream& command)
 
     string name;
     if(!get_input(command, name) || !t_backbone.load(name, raw_ascii) || t_backbone.empty()) {
-        SP_E("A valid tension backbone file is required.\n");
+        suanpan_error("A valid tension backbone file is required.\n");
         return;
     }
     if(!get_input(command, name) || !c_backbone.load(name, raw_ascii) || c_backbone.empty()) {
-        SP_E("A valid compression backbone file is required.\n");
+        suanpan_error("A valid compression backbone file is required.\n");
         return;
     }
 
     auto density = 0.;
     if(!command.eof() && !get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -1968,7 +1968,7 @@ void new_multilinearoo(unique_ptr<Material>& return_obj, istringstream& command)
 void new_multilinearpo(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
@@ -1976,17 +1976,17 @@ void new_multilinearpo(unique_ptr<Material>& return_obj, istringstream& command)
 
     string name;
     if(!get_input(command, name) || !t_backbone.load(name, raw_ascii) || t_backbone.empty()) {
-        SP_E("A valid tension backbone file is required.\n");
+        suanpan_error("A valid tension backbone file is required.\n");
         return;
     }
     if(!get_input(command, name) || !c_backbone.load(name, raw_ascii) || c_backbone.empty()) {
-        SP_E("A valid compression backbone file is required.\n");
+        suanpan_error("A valid compression backbone file is required.\n");
         return;
     }
 
     auto density = 0.;
     if(!command.eof() && !get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -1999,7 +1999,7 @@ void new_multilinearpo(unique_ptr<Material>& return_obj, istringstream& command)
 void new_multilinearelastic1d(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
@@ -2007,7 +2007,7 @@ void new_multilinearelastic1d(unique_ptr<Material>& return_obj, istringstream& c
     while(!command.eof())
         if(double para; get_input(command, para)) all.emplace_back(para);
         else {
-            SP_E("Valid inputs are required.\n");
+            suanpan_error("Valid inputs are required.\n");
             return;
         }
 
@@ -2029,25 +2029,25 @@ void new_multilinearelastic1d(unique_ptr<Material>& return_obj, istringstream& c
 void new_multilinearj2(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     double poissons_ratio;
     if(!get_input(command, poissons_ratio)) {
-        SP_E("A valid poissons ratio is required.\n");
+        suanpan_error("A valid poissons ratio is required.\n");
         return;
     }
 
     auto density = 0.;
     if(!get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -2055,12 +2055,12 @@ void new_multilinearj2(unique_ptr<Material>& return_obj, istringstream& command)
     while(!command.eof()) {
         double c_value;
         if(!get_input(command, c_value)) {
-            SP_E("A valid plastic strain is required.\n");
+            suanpan_error("A valid plastic strain is required.\n");
             return;
         }
         p_strain.emplace_back(c_value);
         if(!get_input(command, c_value)) {
-            SP_E("A valid plastic stress is required.\n");
+            suanpan_error("A valid plastic stress is required.\n");
             return;
         }
         p_stress.emplace_back(c_value);
@@ -2072,19 +2072,19 @@ void new_multilinearj2(unique_ptr<Material>& return_obj, istringstream& command)
 void new_multilinearmises1d(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     auto density = 0.;
     if(!get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -2092,12 +2092,12 @@ void new_multilinearmises1d(unique_ptr<Material>& return_obj, istringstream& com
     while(!command.eof()) {
         double c_value;
         if(!get_input(command, c_value)) {
-            SP_E("A valid plastic strain is required.\n");
+            suanpan_error("A valid plastic strain is required.\n");
             return;
         }
         p_strain.emplace_back(c_value);
         if(!get_input(command, c_value)) {
-            SP_E("A valid plastic stress is required.\n");
+            suanpan_error("A valid plastic stress is required.\n");
             return;
         }
         p_stress.emplace_back(c_value);
@@ -2109,21 +2109,21 @@ void new_multilinearmises1d(unique_ptr<Material>& return_obj, istringstream& com
 void new_nle3d01(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     vec pool(4);
     if(!get_input(command, pool)) {
-        SP_E("A valid parameter is required.\n");
+        suanpan_error("A valid parameter is required.\n");
         return;
     }
 
     auto density = 0.;
     if(command.eof())
-        SP_D("Zero density assumed.\n");
+        suanpan_debug("Zero density assumed.\n");
     else if(!get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -2133,27 +2133,27 @@ void new_nle3d01(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_orthotropicelastic3d(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     vec modulus(6);
     if(!get_input(command, modulus)) {
-        SP_E("A valid modulus is required.\n");
+        suanpan_error("A valid modulus is required.\n");
         return;
     }
 
     vec poissons_ratio(3);
     if(!get_input(command, poissons_ratio)) {
-        SP_E("A valid poisson's ratio is required.\n");
+        suanpan_error("A valid poisson's ratio is required.\n");
         return;
     }
 
     auto density = 0.;
     if(command.eof())
-        SP_D("Zero density assumed.\n");
+        suanpan_debug("Zero density assumed.\n");
     else if(!get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -2163,47 +2163,47 @@ void new_orthotropicelastic3d(unique_ptr<Material>& return_obj, istringstream& c
 void new_paraboliccc(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     double poissons_ratio;
     if(!get_input(command, poissons_ratio)) {
-        SP_E("A valid poisson's ratio is required.\n");
+        suanpan_error("A valid poisson's ratio is required.\n");
         return;
     }
 
     double beta, m, pt, a, a_slope;
     if(!get_input(command, beta)) {
-        SP_E("A valid beta is required.\n");
+        suanpan_error("A valid beta is required.\n");
         return;
     }
     if(!get_input(command, m)) {
-        SP_E("A valid radius ratio is required.\n");
+        suanpan_error("A valid radius ratio is required.\n");
         return;
     }
     if(!get_input(command, pt)) {
-        SP_E("A valid tensile yield strength is required.\n");
+        suanpan_error("A valid tensile yield strength is required.\n");
         return;
     }
     if(!get_input(command, a)) {
-        SP_E("A valid initial size is required.\n");
+        suanpan_error("A valid initial size is required.\n");
         return;
     }
     if(!get_input(command, a_slope)) {
-        SP_E("A valid hardening slope is required.\n");
+        suanpan_error("A valid hardening slope is required.\n");
         return;
     }
 
     auto density = 0.;
     if(!command.eof() && !get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -2213,7 +2213,7 @@ void new_paraboliccc(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_parallel(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
@@ -2226,13 +2226,13 @@ void new_parallel(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_planestrain(unique_ptr<Material>& return_obj, istringstream& command, const unsigned type) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     unsigned full_tag;
     if(!get_input(command, full_tag)) {
-        SP_E("A valid reference material tag is required.\n");
+        suanpan_error("A valid reference material tag is required.\n");
         return;
     }
 
@@ -2242,25 +2242,25 @@ void new_planestrain(unique_ptr<Material>& return_obj, istringstream& command, c
 void new_planestress(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     unsigned full_tag;
     if(!get_input(command, full_tag)) {
-        SP_E("A valid reference material tag is required.\n");
+        suanpan_error("A valid reference material tag is required.\n");
         return;
     }
 
     auto max_iteration = 1;
     if(!command.eof() && !get_input(command, max_iteration)) {
-        SP_E("A valid number of maximum iteration is required.\n");
+        suanpan_error("A valid number of maximum iteration is required.\n");
         return;
     }
 
     string use_matrix = "true";
     if(!command.eof() && !get_input(command, use_matrix)) {
-        SP_E("A valid flag to indicate if to use the matrix in iteration is required.\n");
+        suanpan_error("A valid flag to indicate if to use the matrix in iteration is required.\n");
         return;
     }
 
@@ -2270,7 +2270,7 @@ void new_planestress(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_polyelastic1d(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
@@ -2278,7 +2278,7 @@ void new_polyelastic1d(unique_ptr<Material>& return_obj, istringstream& command)
     while(!command.eof()) {
         double c_value;
         if(!get_input(command, c_value)) {
-            SP_E("Valid parameters are required.\n");
+            suanpan_error("Valid parameters are required.\n");
             return;
         }
         p_para.emplace_back(c_value);
@@ -2290,25 +2290,25 @@ void new_polyelastic1d(unique_ptr<Material>& return_obj, istringstream& command)
 void new_polyj2(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     double poissons_ratio;
     if(!get_input(command, poissons_ratio)) {
-        SP_E("A valid poissons ratio is required.\n");
+        suanpan_error("A valid poissons ratio is required.\n");
         return;
     }
 
     double density;
     if(!get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -2316,14 +2316,14 @@ void new_polyj2(unique_ptr<Material>& return_obj, istringstream& command) {
     while(!command.eof()) {
         double c_value;
         if(!get_input(command, c_value)) {
-            SP_E("A valid plastic strain is required.\n");
+            suanpan_error("A valid plastic strain is required.\n");
             return;
         }
         p_para.emplace_back(c_value);
     }
 
     if(p_para.size() < 3) {
-        SP_E("At least two valid parameters for hardening are required.\n");
+        suanpan_error("At least two valid parameters for hardening are required.\n");
         return;
     }
 
@@ -2333,37 +2333,37 @@ void new_polyj2(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_rambergosgood(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     double yield_stress;
     if(!get_input(command, yield_stress)) {
-        SP_E("A valid yield stress is required.\n");
+        suanpan_error("A valid yield stress is required.\n");
         return;
     }
 
     auto offset = 1.;
     if(!command.eof() && !get_input(command, offset)) {
-        SP_E("A valid offset is required.\n");
+        suanpan_error("A valid offset is required.\n");
         return;
     }
 
     auto n = 4.;
     if(!command.eof() && !get_input(command, n)) {
-        SP_E("A valid n is required.\n");
+        suanpan_error("A valid n is required.\n");
         return;
     }
 
     auto density = 0.;
     if(!command.eof() && !get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -2373,19 +2373,19 @@ void new_rambergosgood(unique_ptr<Material>& return_obj, istringstream& command)
 void new_rebar2d(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     unsigned major_tag, minor_tag;
     if(!get_input(command, major_tag, minor_tag)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return;
     }
 
     double major_ratio, minor_ratio;
     if(!get_input(command, major_ratio, minor_ratio)) {
-        SP_E("A valid reinforcement ratio is required.\n");
+        suanpan_error("A valid reinforcement ratio is required.\n");
         return;
     }
 
@@ -2395,19 +2395,19 @@ void new_rebar2d(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_rebar3d(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     unsigned tag_x, tag_y, tag_z;
     if(!get_input(command, tag_x, tag_y, tag_z)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return;
     }
 
     double ratio_x, ratio_y, ratio_z;
     if(!get_input(command, ratio_x, ratio_y, ratio_z)) {
-        SP_E("A valid reinforcement ratio is required.\n");
+        suanpan_error("A valid reinforcement ratio is required.\n");
         return;
     }
 
@@ -2417,7 +2417,7 @@ void new_rebar3d(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_sequential(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
@@ -2425,7 +2425,7 @@ void new_sequential(unique_ptr<Material>& return_obj, istringstream& command) {
     while(!command.eof()) if(uword m_tag; get_input(command, m_tag)) m_pool.emplace_back(m_tag);
 
     if(1 == m_pool.size()) {
-        SP_E("At least two material models are required.\n");
+        suanpan_error("At least two material models are required.\n");
         return;
     }
 
@@ -2435,37 +2435,37 @@ void new_sequential(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_sliplock(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     double yield_strain;
     if(!get_input(command, yield_strain)) {
-        SP_E("A valid yield strain is required.\n");
+        suanpan_error("A valid yield strain is required.\n");
         return;
     }
 
     auto hardening_ratio = 100.;
     if(!command.eof() && !get_input(command, hardening_ratio)) {
-        SP_E("A valid hardening ratio is required.\n");
+        suanpan_error("A valid hardening ratio is required.\n");
         return;
     }
 
     auto R0 = 20.;
     if(!command.eof() && !get_input(command, R0)) {
-        SP_E("A valid r0 is required.\n");
+        suanpan_error("A valid r0 is required.\n");
         return;
     }
 
     auto density = 0.;
     if(!command.eof() && !get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -2475,7 +2475,7 @@ void new_sliplock(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_stacked(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
@@ -2489,19 +2489,19 @@ void new_stacked(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_substepping(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return;
     }
 
     unsigned max_iteration = 20;
     if(!get_optional_input(command, max_iteration)) {
-        SP_E("A valid maximum iteration is required.\n");
+        suanpan_error("A valid maximum iteration is required.\n");
         return;
     }
 
@@ -2511,19 +2511,19 @@ void new_substepping(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_rotation2d(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     unsigned full_tag;
     if(!get_input(command, full_tag)) {
-        SP_E("A valid reference material tag is required.\n");
+        suanpan_error("A valid reference material tag is required.\n");
         return;
     }
 
     double a;
     if(!get_input(command, a)) {
-        SP_E("A valid angle is required.\n");
+        suanpan_error("A valid angle is required.\n");
         return;
     }
 
@@ -2533,13 +2533,13 @@ void new_rotation2d(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_simplesand(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     vec pool{10E4, .2, .01, -.7, 5., 1.25, 1.1, 3.5, 1.915, -130., .02, 2., 0.};
     if(!get_optional_input(command, pool)) {
-        SP_E("A valid parameter is required.\n");
+        suanpan_error("A valid parameter is required.\n");
         return;
     }
 
@@ -2549,7 +2549,7 @@ void new_simplesand(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_steelbrb(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
@@ -2565,7 +2565,7 @@ void new_steelbrb(unique_ptr<Material>& return_obj, istringstream& command) {
     else if(9 == pool.size()) pool.emplace_back(0.);
 
     if(10 != pool.size()) {
-        SP_E("6 or 9 parameters are required.\n");
+        suanpan_error("6 or 9 parameters are required.\n");
         return;
     }
 
@@ -2575,19 +2575,19 @@ void new_steelbrb(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_rotation3d(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     unsigned full_tag;
     if(!get_input(command, full_tag)) {
-        SP_E("A valid reference material tag is required.\n");
+        suanpan_error("A valid reference material tag is required.\n");
         return;
     }
 
     double a, b, c;
     if(!get_input(command, a, b, c)) {
-        SP_E("A valid angle is required.\n");
+        suanpan_error("A valid angle is required.\n");
         return;
     }
 
@@ -2597,7 +2597,7 @@ void new_rotation3d(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_tablecdp(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
@@ -2612,15 +2612,15 @@ void new_tablecdp(unique_ptr<Material>& return_obj, istringstream& command) {
     auto check_file = [&](mat& table) {
         string table_name;
         if(!get_input(command, table_name)) {
-            SP_E("A valid parameter is required.\n");
+            suanpan_error("A valid parameter is required.\n");
             return false;
         }
         if(std::error_code code; !fs::exists(table_name, code) || !table.load(table_name, raw_ascii) || table.n_cols < 2) {
-            SP_E("Cannot load \"{}\".\n", table_name);
+            suanpan_error("Cannot load \"{}\".\n", table_name);
             return false;
         }
         if(0. != table(0)) {
-            SP_E("Nonzero first plastic strain detected.\n");
+            suanpan_error("Nonzero first plastic strain detected.\n");
             return false;
         }
         return true;
@@ -2639,7 +2639,7 @@ void new_tablecdp(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_tablegurson(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
@@ -2651,13 +2651,13 @@ void new_tablegurson(unique_ptr<Material>& return_obj, istringstream& command) {
 
     string table_name;
     if(!get_input(command, table_name)) {
-        SP_E("A valid parameter is required.\n");
+        suanpan_error("A valid parameter is required.\n");
         return;
     }
 
     mat hardening_table;
     if(std::error_code code; !fs::exists(table_name, code) || !hardening_table.load(table_name, raw_ascii) || hardening_table.n_cols < 2) {
-        SP_E("Cannot load \"{}\".\n", table_name);
+        suanpan_error("Cannot load \"{}\".\n", table_name);
         return;
     }
 
@@ -2669,27 +2669,27 @@ void new_tablegurson(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_trilineardegradation(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     unsigned mat_tag;
     if(!get_input(command, mat_tag)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return;
     }
 
     double s_strain, e_strain, e_damage;
     if(!get_input(command, s_strain)) {
-        SP_E("A valid start strain is required.\n");
+        suanpan_error("A valid start strain is required.\n");
         return;
     }
     if(!get_input(command, e_strain)) {
-        SP_E("A valid end strain is required.\n");
+        suanpan_error("A valid end strain is required.\n");
         return;
     }
     if(!get_input(command, e_damage)) {
-        SP_E("A valid end damage is required.\n");
+        suanpan_error("A valid end damage is required.\n");
         return;
     }
 
@@ -2699,7 +2699,7 @@ void new_trilineardegradation(unique_ptr<Material>& return_obj, istringstream& c
 void new_trivial(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
@@ -2709,19 +2709,19 @@ void new_trivial(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_uniaxial(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     unsigned full_tag;
     if(!get_input(command, full_tag)) {
-        SP_E("A valid reference material tag is required.\n");
+        suanpan_error("A valid reference material tag is required.\n");
         return;
     }
 
     auto max_iteration = 1;
     if(!command.eof() && !get_input(command, max_iteration)) {
-        SP_E("A valid number for maximum iteration is required.\n");
+        suanpan_error("A valid number for maximum iteration is required.\n");
         return;
     }
 
@@ -2731,13 +2731,13 @@ void new_uniaxial(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_vafcrp(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     vec pool{2E5, .2, 4E2, 5E2, 0., 1E1, 0., 0.};
     if(!get_optional_input(command, pool)) {
-        SP_E("A valid parameter is required.\n");
+        suanpan_error("A valid parameter is required.\n");
         return;
     }
 
@@ -2746,7 +2746,7 @@ void new_vafcrp(unique_ptr<Material>& return_obj, istringstream& command) {
     while(!command.eof())
         if(get_input(command, para)) all.emplace_back(para);
         else {
-            SP_E("Valid inputs are required.\n");
+            suanpan_error("Valid inputs are required.\n");
             return;
         }
 
@@ -2768,13 +2768,13 @@ void new_vafcrp(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_vafcrp1d(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     vec pool{2E5, 4E2, 1E2, 0., 1E1, 0., 0.};
     if(!get_optional_input(command, pool)) {
-        SP_E("A valid parameter is required.\n");
+        suanpan_error("A valid parameter is required.\n");
         return;
     }
 
@@ -2783,7 +2783,7 @@ void new_vafcrp1d(unique_ptr<Material>& return_obj, istringstream& command) {
     while(!command.eof())
         if(get_input(command, para)) all.emplace_back(para);
         else {
-            SP_E("Valid inputs are required.\n");
+            suanpan_error("Valid inputs are required.\n");
             return;
         }
 
@@ -2805,25 +2805,25 @@ void new_vafcrp1d(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_viscosity01(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double alpha;
     if(!get_input(command, alpha)) {
-        SP_E("A valid alpha is required.\n");
+        suanpan_error("A valid alpha is required.\n");
         return;
     }
 
     double damping;
     if(!get_input(command, damping)) {
-        SP_E("A valid damping coefficient is required.\n");
+        suanpan_error("A valid damping coefficient is required.\n");
         return;
     }
 
     auto limit = 1.;
     if(!command.eof() && !get_input(command, limit)) {
-        SP_E("A valid limit is required.\n");
+        suanpan_error("A valid limit is required.\n");
         return;
     }
 
@@ -2833,55 +2833,55 @@ void new_viscosity01(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_viscosity02(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double alpha;
     if(!get_input(command, alpha)) {
-        SP_E("A valid alpha is required.\n");
+        suanpan_error("A valid alpha is required.\n");
         return;
     }
 
     double damping_a;
     if(!get_input(command, damping_a)) {
-        SP_E("A valid damping coefficient for the first quadrant is required.\n");
+        suanpan_error("A valid damping coefficient for the first quadrant is required.\n");
         return;
     }
 
     auto damping_b = damping_a;
     if(!command.eof() && !get_input(command, damping_b)) {
-        SP_E("A valid damping coefficient for the second quadrant is required.\n");
+        suanpan_error("A valid damping coefficient for the second quadrant is required.\n");
         return;
     }
 
     auto damping_c = damping_a;
     if(!command.eof() && !get_input(command, damping_c)) {
-        SP_E("A valid damping coefficient for the third quadrant is required.\n");
+        suanpan_error("A valid damping coefficient for the third quadrant is required.\n");
         return;
     }
 
     auto damping_d = damping_a;
     if(!command.eof() && !get_input(command, damping_d)) {
-        SP_E("A valid damping coefficient for the fourth quadrant is required.\n");
+        suanpan_error("A valid damping coefficient for the fourth quadrant is required.\n");
         return;
     }
 
     auto gap_a = 1E3;
     if(!command.eof() && !get_input(command, gap_a)) {
-        SP_E("A valid gap size for strain axis is required.\n");
+        suanpan_error("A valid gap size for strain axis is required.\n");
         return;
     }
 
     auto gap_b = 1E3;
     if(!command.eof() && !get_input(command, gap_b)) {
-        SP_E("A valid gap size for strain rate axis is required.\n");
+        suanpan_error("A valid gap size for strain rate axis is required.\n");
         return;
     }
 
     auto limit = 1.;
     if(!command.eof() && !get_input(command, limit)) {
-        SP_E("A valid limit is required.\n");
+        suanpan_error("A valid limit is required.\n");
         return;
     }
 
@@ -2891,25 +2891,25 @@ void new_viscosity02(unique_ptr<Material>& return_obj, istringstream& command) {
 void new_bilinearviscosity(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double damping;
     if(!get_input(command, damping)) {
-        SP_E("A valid damping coefficient is required.\n");
+        suanpan_error("A valid damping coefficient is required.\n");
         return;
     }
 
     double yield_stress;
     if(!get_input(command, yield_stress)) {
-        SP_E("A valid yield stress is required.\n");
+        suanpan_error("A valid yield stress is required.\n");
         return;
     }
 
     auto hardening = 0.;
     if(!command.eof() && !get_input(command, hardening)) {
-        SP_E("A valid hardening ratio is required.\n");
+        suanpan_error("A valid hardening ratio is required.\n");
         return;
     }
 
@@ -2919,7 +2919,7 @@ void new_bilinearviscosity(unique_ptr<Material>& return_obj, istringstream& comm
 void new_yeoh(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
@@ -2940,13 +2940,13 @@ void new_yeoh(unique_ptr<Material>& return_obj, istringstream& command) {
 int test_material1d(const shared_ptr<DomainBase>& domain, istringstream& command) {
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     double incre;
     if(!get_input(command, incre)) {
-        SP_E("A valid step size is required.\n");
+        suanpan_error("A valid step size is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -2968,11 +2968,11 @@ int test_material1d(const shared_ptr<DomainBase>& domain, istringstream& command
 
 #ifdef SUANPAN_HDF5
     if(!result.save("RESULT.h5", hdf5_binary_trans))
-        SP_E("Fail to save to file.\n");
+        suanpan_error("Fail to save to file.\n");
 #endif
 
     if(!result.save("RESULT.txt", raw_ascii))
-        SP_E("Fail to save to file.\n");
+        suanpan_error("Fail to save to file.\n");
 
     if(std::ofstream gnuplot("RESULT.plt"); gnuplot.is_open()) {
         gnuplot << "reset\n";
@@ -2996,13 +2996,13 @@ int test_material1d(const shared_ptr<DomainBase>& domain, istringstream& command
 int test_material2d(const shared_ptr<DomainBase>& domain, istringstream& command) {
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     vec incre(3);
     if(!get_input(command, incre)) {
-        SP_E("A valid step size is required.\n");
+        suanpan_error("A valid step size is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -3024,11 +3024,11 @@ int test_material2d(const shared_ptr<DomainBase>& domain, istringstream& command
 
 #ifdef SUANPAN_HDF5
     if(!result.save("RESULT.h5", hdf5_binary_trans))
-        SP_E("Fail to save to file.\n");
+        suanpan_error("Fail to save to file.\n");
 #endif
 
     if(!result.save("RESULT.txt", raw_ascii))
-        SP_E("Fail to save to file.\n");
+        suanpan_error("Fail to save to file.\n");
 
     return SUANPAN_SUCCESS;
 }
@@ -3036,13 +3036,13 @@ int test_material2d(const shared_ptr<DomainBase>& domain, istringstream& command
 int test_material3d(const shared_ptr<DomainBase>& domain, istringstream& command) {
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     vec incre(6);
     if(!get_input(command, incre)) {
-        SP_E("A valid step size is required.\n");
+        suanpan_error("A valid step size is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -3064,11 +3064,11 @@ int test_material3d(const shared_ptr<DomainBase>& domain, istringstream& command
 
 #ifdef SUANPAN_HDF5
     if(!result.save("RESULT.h5", hdf5_binary_trans))
-        SP_E("Fail to save to file.\n");
+        suanpan_error("Fail to save to file.\n");
 #endif
 
     if(!result.save("RESULT.txt", raw_ascii))
-        SP_E("Fail to save to file.\n");
+        suanpan_error("Fail to save to file.\n");
 
     return SUANPAN_SUCCESS;
 }
@@ -3076,19 +3076,19 @@ int test_material3d(const shared_ptr<DomainBase>& domain, istringstream& command
 int test_material_with_base3d(const shared_ptr<DomainBase>& domain, istringstream& command) {
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     vec base(6);
     if(!get_input(command, base)) {
-        SP_E("A valid step size is required.\n");
+        suanpan_error("A valid step size is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     vec incre(6);
     if(!get_input(command, incre)) {
-        SP_E("A valid step size is required.\n");
+        suanpan_error("A valid step size is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -3110,11 +3110,11 @@ int test_material_with_base3d(const shared_ptr<DomainBase>& domain, istringstrea
 
 #ifdef SUANPAN_HDF5
     if(!result.save("RESULT.h5", hdf5_binary_trans))
-        SP_E("Fail to save to file.\n");
+        suanpan_error("Fail to save to file.\n");
 #endif
 
     if(!result.save("RESULT.txt", raw_ascii))
-        SP_E("Fail to save to file.\n");
+        suanpan_error("Fail to save to file.\n");
 
     return SUANPAN_SUCCESS;
 }
@@ -3122,13 +3122,13 @@ int test_material_with_base3d(const shared_ptr<DomainBase>& domain, istringstrea
 int test_material_by_load1d(const shared_ptr<DomainBase>& domain, istringstream& command) {
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     double incre;
     if(!get_input(command, incre)) {
-        SP_E("A valid step size is required.\n");
+        suanpan_error("A valid step size is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -3150,11 +3150,11 @@ int test_material_by_load1d(const shared_ptr<DomainBase>& domain, istringstream&
 
 #ifdef SUANPAN_HDF5
     if(!result.save("RESULT.h5", hdf5_binary_trans))
-        SP_E("Fail to save to file.\n");
+        suanpan_error("Fail to save to file.\n");
 #endif
 
     if(!result.save("RESULT.txt", raw_ascii))
-        SP_E("Fail to save to file.\n");
+        suanpan_error("Fail to save to file.\n");
 
     if(std::ofstream gnuplot("RESULT.plt"); gnuplot.is_open()) {
         gnuplot << "reset\n";
@@ -3176,13 +3176,13 @@ int test_material_by_load1d(const shared_ptr<DomainBase>& domain, istringstream&
 int test_material_by_load2d(const shared_ptr<DomainBase>& domain, istringstream& command) {
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     vec incre(3);
     if(!get_input(command, incre)) {
-        SP_E("A valid step size is required.\n");
+        suanpan_error("A valid step size is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -3204,11 +3204,11 @@ int test_material_by_load2d(const shared_ptr<DomainBase>& domain, istringstream&
 
 #ifdef SUANPAN_HDF5
     if(!result.save("RESULT.h5", hdf5_binary_trans))
-        SP_E("Fail to save to file.\n");
+        suanpan_error("Fail to save to file.\n");
 #endif
 
     if(!result.save("RESULT.txt", raw_ascii))
-        SP_E("Fail to save to file.\n");
+        suanpan_error("Fail to save to file.\n");
 
     return SUANPAN_SUCCESS;
 }
@@ -3216,13 +3216,13 @@ int test_material_by_load2d(const shared_ptr<DomainBase>& domain, istringstream&
 int test_material_by_load3d(const shared_ptr<DomainBase>& domain, istringstream& command) {
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     vec incre(6);
     if(!get_input(command, incre)) {
-        SP_E("A valid step size is required.\n");
+        suanpan_error("A valid step size is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -3244,11 +3244,11 @@ int test_material_by_load3d(const shared_ptr<DomainBase>& domain, istringstream&
 
 #ifdef SUANPAN_HDF5
     if(!result.save("RESULT.h5", hdf5_binary_trans))
-        SP_E("Fail to save to file.\n");
+        suanpan_error("Fail to save to file.\n");
 #endif
 
     if(!result.save("RESULT.txt", raw_ascii))
-        SP_E("Fail to save to file.\n");
+        suanpan_error("Fail to save to file.\n");
 
     return SUANPAN_SUCCESS;
 }
@@ -3256,19 +3256,19 @@ int test_material_by_load3d(const shared_ptr<DomainBase>& domain, istringstream&
 int test_material_by_load_with_base3d(const shared_ptr<DomainBase>& domain, istringstream& command) {
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     vec base(6);
     if(!get_input(command, base)) {
-        SP_E("A valid step size is required.\n");
+        suanpan_error("A valid step size is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     vec incre(6);
     if(!get_input(command, incre)) {
-        SP_E("A valid step size is required.\n");
+        suanpan_error("A valid step size is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -3290,11 +3290,11 @@ int test_material_by_load_with_base3d(const shared_ptr<DomainBase>& domain, istr
 
 #ifdef SUANPAN_HDF5
     if(!result.save("RESULT.h5", hdf5_binary_trans))
-        SP_E("Fail to save to file.\n");
+        suanpan_error("Fail to save to file.\n");
 #endif
 
     if(!result.save("RESULT.txt", raw_ascii))
-        SP_E("Fail to save to file.\n");
+        suanpan_error("Fail to save to file.\n");
 
     return SUANPAN_SUCCESS;
 }
@@ -3302,13 +3302,13 @@ int test_material_by_load_with_base3d(const shared_ptr<DomainBase>& domain, istr
 int test_material_by_strain_history(const shared_ptr<DomainBase>& domain, istringstream& command) {
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     string history_file;
     if(!get_input(command, history_file)) {
-        SP_E("A valid history file name is required.\n");
+        suanpan_error("A valid history file name is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -3327,10 +3327,10 @@ int test_material_by_strain_history(const shared_ptr<DomainBase>& domain, istrin
 
 #ifdef SUANPAN_HDF5
     if(!result.save("RESULT.h5", hdf5_binary_trans))
-        SP_E("Fail to save to file.\n");
+        suanpan_error("Fail to save to file.\n");
 #else
     if(!result.save("RESULT.txt", raw_ascii))
-        SP_E("Fail to save to file.\n");
+        suanpan_error("Fail to save to file.\n");
 #endif
 
     return SUANPAN_SUCCESS;
@@ -3339,13 +3339,13 @@ int test_material_by_strain_history(const shared_ptr<DomainBase>& domain, istrin
 int test_material_by_stress_history(const shared_ptr<DomainBase>& domain, istringstream& command) {
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
-        SP_E("A valid material tag is required.\n");
+        suanpan_error("A valid material tag is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     string history_file;
     if(!get_input(command, history_file)) {
-        SP_E("A valid history file name is required.\n");
+        suanpan_error("A valid history file name is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -3364,10 +3364,10 @@ int test_material_by_stress_history(const shared_ptr<DomainBase>& domain, istrin
 
 #ifdef SUANPAN_HDF5
     if(!result.save("RESULT.h5", hdf5_binary_trans))
-        SP_E("Fail to save to file.\n");
+        suanpan_error("Fail to save to file.\n");
 #else
     if(!result.save("RESULT.txt", raw_ascii))
-        SP_E("Fail to save to file.\n");
+        suanpan_error("Fail to save to file.\n");
 #endif
 
     return SUANPAN_SUCCESS;
@@ -3376,7 +3376,7 @@ int test_material_by_stress_history(const shared_ptr<DomainBase>& domain, istrin
 int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& command) {
     string material_id;
     if(!get_input(command, material_id)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return 0;
     }
 
@@ -3484,7 +3484,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else load::object(new_material, domain, material_id, command);
 
     if(nullptr == new_material || !domain->insert(std::move(new_material)))
-        SP_E("Fail to create new material via \"{}\".\n", command.str());
+        suanpan_error("Fail to create new material via \"{}\".\n", command.str());
 
     return 0;
 }

@@ -183,9 +183,9 @@ vector<vec> CP7::record(const OutputType P) {
 }
 
 void CP7::print() {
-    sp_info("A CP7 element{}.\n", nlgeom ? " with nonlinear geometry on" : "");
-    sp_info("The nodes connected are:", node_encoding);
+    suanpan_info("A CP7 element{}.\n", nlgeom ? " with nonlinear geometry on" : "");
+    suanpan_info("The nodes connected are:", node_encoding);
     if(!is_initialized()) return;
-    sp_info("Material:\n");
+    suanpan_info("Material:\n");
     for(const auto& I : int_pt) I.m_material->print();
 }

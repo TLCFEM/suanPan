@@ -49,7 +49,7 @@ podarray<double> ConcreteExp::compute_compression_backbone(const double n_strain
 
     while(true) {
         if(++counter == max_iteration) {
-            SP_E("Cannot converge within {} iterations.\n", max_iteration);
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
             return response;
         }
 
@@ -58,7 +58,7 @@ podarray<double> ConcreteExp::compute_compression_backbone(const double n_strain
         jacobian = b_c / elastic_modulus * (2. * a_c * exp_term - 1. - a_c) * exp_term - 1. / f_c;
         const auto incre = residual / jacobian;
 
-        SP_D("Local compression iteration error: {:.5E}.\n", fabs(incre));
+        suanpan_debug("Local compression iteration error: {:.5E}.\n", fabs(incre));
         if(fabs(incre) < tolerance) break;
 
         stress -= incre;
@@ -84,7 +84,7 @@ podarray<double> ConcreteExp::compute_tension_backbone(const double n_strain) co
 
     while(true) {
         if(++counter == max_iteration) {
-            SP_E("Cannot converge within {} iterations.\n", max_iteration);
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
             return response;
         }
 
@@ -93,7 +93,7 @@ podarray<double> ConcreteExp::compute_tension_backbone(const double n_strain) co
         jacobian = b_t / elastic_modulus * (1. + a_t - 2. * a_t * exp_term) * exp_term - 1. / f_t;
         const auto incre = residual / jacobian;
 
-        SP_D("Local tension iteration error: {:.5E}.\n", fabs(incre));
+        suanpan_debug("Local tension iteration error: {:.5E}.\n", fabs(incre));
         if(fabs(incre) < tolerance) break;
 
         stress -= incre;

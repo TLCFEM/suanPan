@@ -144,13 +144,13 @@ vector<vec> F21::record(const OutputType P) {
 }
 
 void F21::print() {
-    sp_info("A 2D force based beam element{}.\n", nlgeom ? " and corotational formulation" : "");
-    sp_info("The element connects nodes:", node_encoding);
+    suanpan_info("A 2D force based beam element{}.\n", nlgeom ? " and corotational formulation" : "");
+    suanpan_info("The element connects nodes:", node_encoding);
     if(!is_initialized()) return;
-    sp_info("Section:\n");
+    suanpan_info("Section:\n");
     auto J = 1;
     for(const auto& I : int_pt) {
-        sp_info("IP {}: ", J++);
+        suanpan_info("IP {}: ", J++);
         I.b_section->print();
     }
 }

@@ -85,7 +85,7 @@ template<sp_d T> int SparseMatPARDISO<T>::direct_solve(Mat<T>& X, const Mat<T>& 
     pardiso(pt, &maxfct, &mnum, &mtype, &phase, &n, (void*)csr_mat.val_mem(), csr_mat.row_mem(), csr_mat.col_mem(), nullptr, &nrhs, iparm, &msglvl, nullptr, nullptr, &error);
 
     if(0 != error) {
-        SP_E("Error code {} received.\n", error);
+        suanpan_error("Error code {} received.\n", error);
         return SUANPAN_FAIL;
     }
 
@@ -93,7 +93,7 @@ template<sp_d T> int SparseMatPARDISO<T>::direct_solve(Mat<T>& X, const Mat<T>& 
     pardiso(pt, &maxfct, &mnum, &mtype, &phase, &n, (void*)csr_mat.val_mem(), csr_mat.row_mem(), csr_mat.col_mem(), nullptr, &nrhs, iparm, &msglvl, (void*)B.memptr(), (void*)X.memptr(), &error);
 
     if(0 != error) {
-        SP_E("Error code {} received.\n", error);
+        suanpan_error("Error code {} received.\n", error);
         return SUANPAN_FAIL;
     }
 

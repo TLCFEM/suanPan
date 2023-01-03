@@ -75,7 +75,7 @@ template<typename T> auto sort_color_metis(suanpan::graph<T>& element_register, 
     if('K' == method) METIS_PartGraphKway(&nvtxs, &ncon, xadj.data(), adjncy.data(), nullptr, vsize, nullptr, &nparts, tpwgts, ubvec, options, &edgecut, part.data());
     else METIS_PartGraphRecursive(&nvtxs, &ncon, xadj.data(), adjncy.data(), nullptr, vsize, nullptr, &nparts, tpwgts, ubvec, options, &edgecut, part.data());
 
-    SP_D("Coloring algorithm takes {:.5E} seconds.\n", timer.toc());
+    suanpan_debug("Coloring algorithm takes {:.5E} seconds.\n", timer.toc());
 
     return part;
 }
@@ -122,7 +122,7 @@ template<typename T> std::vector<std::vector<T>> sort_color_wp(const suanpan::gr
     for(auto& color : color_map) color.shrink_to_fit();
     color_map.shrink_to_fit();
 
-    SP_D("Coloring algorithm takes {:.5E} seconds.\n", timer.toc());
+    suanpan_debug("Coloring algorithm takes {:.5E} seconds.\n", timer.toc());
 
     return color_map;
 }
@@ -164,7 +164,7 @@ template<typename T> std::vector<std::vector<T>> sort_color_mis(const suanpan::g
     for(auto& color : color_map) color.shrink_to_fit();
     color_map.shrink_to_fit();
 
-    SP_D("Coloring algorithm takes {:.5E} seconds.\n", timer.toc());
+    suanpan_debug("Coloring algorithm takes {:.5E} seconds.\n", timer.toc());
 
     return color_map;
 }

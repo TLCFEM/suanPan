@@ -57,6 +57,6 @@ int Tanh1D::reset_status() {
 }
 
 void Tanh1D::print() {
-    sp_info("A uniaxial nonlinear elastic material using tanh function with an elastic modulus of {:.4E}.\n", elastic_modulus);
+    suanpan_info("A uniaxial nonlinear elastic material using tanh function with an elastic modulus of {:.4E}.\n", elastic_modulus);
     Material1D::print();
 }

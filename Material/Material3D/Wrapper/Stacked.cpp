@@ -37,7 +37,7 @@ int Stacked::initialize(const shared_ptr<DomainBase>& D) {
     for(const auto I : mat_tag) {
         mat_pool.emplace_back(suanpan::initialized_material_copy(D, I));
         if(nullptr == mat_pool.back() || mat_pool.back()->get_material_type() != MaterialType::D3) {
-            SP_E("A valid 3D host material is required.\n");
+            suanpan_error("A valid 3D host material is required.\n");
             return SUANPAN_FAIL;
         }
         access::rw(density) += mat_pool.back()->get_parameter(ParameterType::DENSITY);
@@ -110,10 +110,10 @@ vector<vec> Stacked::record(const OutputType P) {
 }
 
 void Stacked::print() {
-    sp_info("A stack wrapper for 3D problems.\n");
+    suanpan_info("A stack wrapper for 3D problems.\n");
     unsigned t_tag = 0;
     for(const auto& I : mat_pool) {
-        sp_info("Component {}: ", ++t_tag);
+        suanpan_info("Component {}: ", ++t_tag);
         I->print();
     }
 }

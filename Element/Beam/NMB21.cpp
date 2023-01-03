@@ -75,7 +75,7 @@ vector<vec> NMB21::record(const OutputType P) {
 }
 
 void NMB21::print() {
-    sp_info("A planar beam element.\n");
+    suanpan_info("A planar beam element.\n");
     b_section->print();
 }
 

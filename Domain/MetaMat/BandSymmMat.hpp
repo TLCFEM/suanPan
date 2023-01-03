@@ -150,7 +150,7 @@ template<sp_d T> int BandSymmMat<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
     }
 
     if(0 != INFO)
-        SP_E("Error code {} received, the matrix is probably singular.\n", INFO);
+        suanpan_error("Error code {} received, the matrix is probably singular.\n", INFO);
 
     return INFO;
 }
@@ -193,12 +193,12 @@ template<sp_d T> int BandSymmMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 
             X += incre;
 
-            SP_D("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier = arma::norm(full_residual -= this->operator*(incre)));
+            suanpan_debug("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier = arma::norm(full_residual -= this->operator*(incre)));
         }
     }
 
     if(0 != INFO)
-        SP_E("Error code {} received, the matrix is probably singular.\n", INFO);
+        suanpan_error("Error code {} received, the matrix is probably singular.\n", INFO);
 
     return INFO;
 }
@@ -232,7 +232,7 @@ template<sp_d T> int BandSymmMat<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
     }
 
     if(0 != INFO)
-        SP_E("Error code {} received, the matrix is probably singular.\n", INFO);
+        suanpan_error("Error code {} received, the matrix is probably singular.\n", INFO);
 
     return INFO;
 }
@@ -273,12 +273,12 @@ template<sp_d T> int BandSymmMat<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
 
             X += incre;
 
-            SP_D("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier = arma::norm(B -= this->operator*(incre)));
+            suanpan_debug("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier = arma::norm(B -= this->operator*(incre)));
         }
     }
 
     if(0 != INFO)
-        SP_E("Error code {} received, the matrix is probably singular.\n", INFO);
+        suanpan_error("Error code {} received, the matrix is probably singular.\n", INFO);
 
     return INFO;
 }

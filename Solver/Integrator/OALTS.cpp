@@ -136,4 +136,6 @@ vec OALTS::from_total_acceleration(const vec& total_acceleration, const uvec& en
     return from_total_velocity(total_acceleration / P1 - A1 * W->get_current_velocity()(encoding) - A2 * W->get_pre_velocity()(encoding) + B10 / P1 * W->get_current_acceleration()(encoding) + B20 / P1 * W->get_pre_acceleration()(encoding), encoding);
 }
 
-void OALTS::print() { sp_info("A time integrator using the OALTS algorithm. doi:10.1002/nme.6188\n"); }
+void OALTS::print() {
+    suanpan_info("A time integrator using the OALTS algorithm. doi:10.1002/nme.6188\n");
+}

@@ -48,4 +48,6 @@ PolyJ2::PolyJ2(const unsigned T, const double E, const double V, vec&& H, const 
 
 unique_ptr<Material> PolyJ2::get_copy() { return make_unique<PolyJ2>(*this); }
 
-void PolyJ2::print() { sp_info("A 3D polynomial hardening model.\n"); }
+void PolyJ2::print() {
+    suanpan_info("A 3D polynomial hardening model.\n");
+}

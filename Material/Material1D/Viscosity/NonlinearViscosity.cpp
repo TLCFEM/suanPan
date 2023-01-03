@@ -33,7 +33,7 @@ int NonlinearViscosity::initialize(const shared_ptr<DomainBase>&) {
 }
 
 int NonlinearViscosity::update_trial_status(const vec&) {
-    SP_E("Receives strain only from the associated element.\n");
+    suanpan_error("Receives strain only from the associated element.\n");
     return SUANPAN_FAIL;
 }
 
@@ -112,6 +112,6 @@ vector<vec> NonlinearViscosity::record(const OutputType P) {
 }
 
 void NonlinearViscosity::print() {
-    sp_info("A uniaxial viscous damping material model.\n");
+    suanpan_info("A uniaxial viscous damping material model.\n");
     Material1D::print();
 }

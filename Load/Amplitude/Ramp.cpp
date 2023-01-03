@@ -27,4 +27,6 @@ double Ramp::get_amplitude(const double T) {
     return step_time;
 }
 
-void Ramp::print() { sp_info("Ramp.\n"); }
+void Ramp::print() {
+    suanpan_info("Ramp.\n");
+}

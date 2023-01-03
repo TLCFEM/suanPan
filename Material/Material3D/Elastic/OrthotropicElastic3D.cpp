@@ -56,4 +56,6 @@ int OrthotropicElastic3D::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-void OrthotropicElastic3D::print() { sp_info("A 3D orthotropic elastic material model.\n"); }
+void OrthotropicElastic3D::print() {
+    suanpan_info("A 3D orthotropic elastic material model.\n");
+}

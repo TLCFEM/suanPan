@@ -45,11 +45,11 @@ int PCPE8DC::initialize(const shared_ptr<DomainBase>& D) {
 
     // validate material type
     if(PlaneType::E != static_cast<PlaneType>(s_mat->get_parameter(ParameterType::PLANETYPE))) {
-        SP_E("Only plane strain material for solid phase is supported.\n");
+        suanpan_error("Only plane strain material for solid phase is supported.\n");
         return SUANPAN_FAIL;
     }
     if(MaterialType::DS != f_mat->get_material_type()) {
-        SP_E("Only isotropic fluid phase is supported.\n");
+        suanpan_error("Only isotropic fluid phase is supported.\n");
         return SUANPAN_FAIL;
     }
 
@@ -58,11 +58,11 @@ int PCPE8DC::initialize(const shared_ptr<DomainBase>& D) {
     const auto kf = f_mat->get_parameter(ParameterType::BULKMODULUS);
 
     if(suanpan::approx_equal(ks, 0.)) {
-        SP_E("A zero bulk modulus is detected.\n");
+        suanpan_error("A zero bulk modulus is detected.\n");
         return SUANPAN_FAIL;
     }
     if(suanpan::approx_equal(kf, 0.)) {
-        SP_E("A zero bulk modulus is detected.\n");
+        suanpan_error("A zero bulk modulus is detected.\n");
         return SUANPAN_FAIL;
     }
 
@@ -198,13 +198,13 @@ vector<vec> PCPE8DC::record(const OutputType P) {
 }
 
 void PCPE8DC::print() {
-    sp_info("A eight-node membrane element (PCPE8DC).\n");
-    sp_info("The nodes connected are:", node_encoding);
+    suanpan_info("A eight-node membrane element (PCPE8DC).\n");
+    suanpan_info("The nodes connected are:", node_encoding);
     if(!is_initialized()) return;
-    sp_info("Material:\n");
+    suanpan_info("Material:\n");
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        sp_info("IP {}:\t", I + 1);
-        sp_info(int_pt[I].coor);
+        suanpan_info("IP {}:\t", I + 1);
+        suanpan_info(int_pt[I].coor);
         int_pt[I].m_material->print();
     }
 }

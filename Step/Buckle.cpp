@@ -71,7 +71,7 @@ int Buckle::analyze() {
 
     if(eig_solve(get_eigenvalue(W), get_eigenvector(W), W->get_stiffness(), t_geometry, 1, "SM") != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 
-    sp_info("\nBuckling load multiplier: {:.8E}.\n", W->get_eigenvalue().at(0));
+    suanpan_info("\nBuckling load multiplier: {:.8E}.\n", W->get_eigenvalue().at(0));
 
     // record response
     G->record();

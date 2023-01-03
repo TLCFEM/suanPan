@@ -147,13 +147,13 @@ vector<vec> C3D8I::record(const OutputType T) {
 }
 
 void C3D8I::print() {
-    sp_info("C3D8I element connects nodes:", node_encoding);
+    suanpan_info("C3D8I element connects nodes:", node_encoding);
     if(!is_initialized()) return;
-    sp_info("Material:\n");
+    suanpan_info("Material:\n");
     for(const auto& t_pt : int_pt) {
         t_pt.c_material->print();
-        sp_info("Strain:\t", t_pt.c_material->get_trial_strain());
-        sp_info("Stress:\t", t_pt.c_material->get_trial_stress());
+        suanpan_info("Strain:\t", t_pt.c_material->get_trial_strain());
+        suanpan_info("Stress:\t", t_pt.c_material->get_trial_stress());
     }
 }
 

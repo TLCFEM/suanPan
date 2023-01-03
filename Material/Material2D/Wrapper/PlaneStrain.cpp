@@ -37,7 +37,7 @@ int PlaneStrain::initialize(const shared_ptr<DomainBase>& D) {
     base = suanpan::initialized_material_copy(D, base_tag);
 
     if(nullptr == base || base->get_material_type() != MaterialType::D3) {
-        SP_E("A valid 3D host material is required.\n");
+        suanpan_error("A valid 3D host material is required.\n");
         return SUANPAN_FAIL;
     }
 
@@ -94,6 +94,6 @@ int PlaneStrain::reset_status() {
 vector<vec> PlaneStrain::record(const OutputType P) { return base->record(P); }
 
 void PlaneStrain::print() {
-    sp_info("A plane strain wrapper.\n");
+    suanpan_info("A plane strain wrapper.\n");
     if(base) base->print();
 }

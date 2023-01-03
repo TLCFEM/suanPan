@@ -64,7 +64,7 @@ int NonlinearGurson1D::update_trial_status(const vec& t_strain) {
     unsigned counter = 0;
     while(true) {
         if(max_iteration == ++counter) {
-            SP_E("Cannot converge within {} iterations.\n", max_iteration);
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
             return SUANPAN_FAIL;
         }
 
@@ -105,7 +105,7 @@ int NonlinearGurson1D::update_trial_status(const vec& t_strain) {
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
         const auto error = norm(residual);
-        SP_D("Local iteration error: {:.5E}.\n", error);
+        suanpan_debug("Local iteration error: {:.5E}.\n", error);
         if(error <= tolerance || norm(incre) <= tolerance) break;
 
         gamma -= incre(0);

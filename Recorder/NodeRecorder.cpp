@@ -100,4 +100,6 @@ void NodeRecorder::record(const shared_ptr<DomainBase>& D) {
     if(if_record_time()) insert(D->get_factory()->get_current_time());
 }
 
-void NodeRecorder::print() { sp_info("A node recorder.\n"); }
+void NodeRecorder::print() {
+    suanpan_info("A node recorder.\n");
+}

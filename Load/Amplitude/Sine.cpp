@@ -34,4 +34,6 @@ double Sine::get_amplitude(const double T) {
     return A;
 }
 
-void Sine::print() { sp_info("Sine.\n"); }
+void Sine::print() {
+    suanpan_info("Sine.\n");
+}

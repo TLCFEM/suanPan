@@ -75,7 +75,7 @@ int NonlinearPeric::update_trial_status(const vec& t_strain) {
     while(++counter < max_iteration) {
         const auto gradient = (triple_shear + factor_a * (eqv_stress - triple_shear * gamma) / denom) * pow_term - dk;
         const auto incre_gamma = residual / gradient;
-        SP_D("Local iteration error: {:.5E}.\n", incre_gamma);
+        suanpan_debug("Local iteration error: {:.5E}.\n", incre_gamma);
         if(fabs(incre_gamma) <= tolerance) break;
         plastic_strain = current_history(0) + (gamma += incre_gamma);
         denom = *incre_time + mu * gamma;
@@ -85,7 +85,7 @@ int NonlinearPeric::update_trial_status(const vec& t_strain) {
     }
 
     if(max_iteration == counter) {
-        SP_E("Cannot converge within {} iterations.\n", max_iteration);
+        suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
         return SUANPAN_FAIL;
     }
 
@@ -120,4 +120,6 @@ int NonlinearPeric::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-void NonlinearPeric::print() { sp_info("A 3D bilinear hardening viscoplasticity model using Perzyna rule.\n"); }
+void NonlinearPeric::print() {
+    suanpan_info("A 3D bilinear hardening viscoplasticity model using Perzyna rule.\n");
+}

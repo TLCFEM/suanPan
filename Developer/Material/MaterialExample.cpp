@@ -21,43 +21,43 @@
 SUANPAN_EXPORT void new_materialexample(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        SP_E("A valid elastic modulus is required.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     double yield_stress;
     if(!get_input(command, yield_stress)) {
-        SP_E("A valid yield stress is required.\n");
+        suanpan_error("A valid yield stress is required.\n");
         return;
     }
 
     auto hardening_ratio = 0.;
     if(command.eof())
-        SP_D("Zero hardening ratio assumed.\n");
+        suanpan_debug("Zero hardening ratio assumed.\n");
     else if(!get_input(command, hardening_ratio)) {
-        SP_E("A valid hardening ratio is required.\n");
+        suanpan_error("A valid hardening ratio is required.\n");
         return;
     }
 
     auto beta = 0.;
     if(command.eof())
-        SP_D("Isotropic hardening assumed.\n");
+        suanpan_debug("Isotropic hardening assumed.\n");
     else if(!get_input(command, beta)) {
-        SP_E("A valid beta is required.\n");
+        suanpan_error("A valid beta is required.\n");
         return;
     }
 
     auto density = 0.;
     if(command.eof())
-        SP_D("Zero density assumed.\n");
+        suanpan_debug("Zero density assumed.\n");
     else if(!get_input(command, density)) {
-        SP_E("A valid density is required.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -217,6 +217,6 @@ int MaterialExample::reset_status() {
 }
 
 void MaterialExample::print() {
-    sp_info("A material example based on uniaxial J2 bilinear mixed hardening model.\n");
-    sp_info("Strain: {:.5E}\tStress: {:.5E}\n", current_strain.at(0), current_stress.at(0));
+    suanpan_info("A material example based on uniaxial J2 bilinear mixed hardening model.\n");
+    suanpan_info("Strain: {:.5E}\tStress: {:.5E}\n", current_strain.at(0), current_stress.at(0));
 }

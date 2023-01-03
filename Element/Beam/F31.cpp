@@ -38,14 +38,14 @@ int F31::initialize(const shared_ptr<DomainBase>& D) {
     auto& sec_proto = D->get<Section>(section_tag(0));
 
     if(!D->find_orientation(orientation_tag)) {
-        SP_W("Element {} cannot find the assigned transformation {}.\n", get_tag(), orientation_tag);
+        suanpan_warning("Element {} cannot find the assigned transformation {}.\n", get_tag(), orientation_tag);
         return SUANPAN_FAIL;
     }
 
     b_trans = D->get_orientation(orientation_tag)->get_copy();
 
     if(b_trans->is_nlgeom() != is_nlgeom()) {
-        SP_W("Element {} is assigned with an inconsistent transformation {}.\n", get_tag(), orientation_tag);
+        suanpan_warning("Element {} is assigned with an inconsistent transformation {}.\n", get_tag(), orientation_tag);
         return SUANPAN_FAIL;
     }
 
@@ -160,13 +160,13 @@ vector<vec> F31::record(const OutputType P) {
 }
 
 void F31::print() {
-    sp_info("A 2D force based beam element{}.\n", nlgeom ? " and corotational formulation" : "");
-    sp_info("The element connects nodes:", node_encoding);
+    suanpan_info("A 2D force based beam element{}.\n", nlgeom ? " and corotational formulation" : "");
+    suanpan_info("The element connects nodes:", node_encoding);
     if(!is_initialized()) return;
-    sp_info("Section:\n");
+    suanpan_info("Section:\n");
     auto J = 1;
     for(const auto& I : int_pt) {
-        sp_info("IP {}: ", J++);
+        suanpan_info("IP {}: ", J++);
         I.b_section->print();
     }
 }

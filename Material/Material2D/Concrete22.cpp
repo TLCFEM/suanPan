@@ -113,7 +113,7 @@ int Concrete22::update_trial_status(const vec& t_strain) {
     // const vec elastic_stress = current_stiffness * trial_strain;
     // trial_stiffness = current_stiffness + trial_stress * trial_stress.t() / dot(trial_stress, trial_strain) - elastic_stress * elastic_stress.t() / dot(trial_strain, elastic_stress);
 
-    suanpan_debug([&] { if(!trial_stress.is_finite() || !trial_stiffness.is_finite()) throw invalid_argument("infinite number detected"); });
+    suanpan_assert([&] { if(!trial_stress.is_finite() || !trial_stiffness.is_finite()) throw invalid_argument("infinite number detected"); });
 
     return SUANPAN_SUCCESS;
 }
@@ -143,6 +143,6 @@ int Concrete22::reset_status() {
 }
 
 void Concrete22::print() {
-    sp_info("Strain:", current_strain);
-    sp_info("Stress:", current_stress);
+    suanpan_info("Strain:", current_strain);
+    suanpan_info("Stress:", current_stress);
 }

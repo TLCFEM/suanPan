@@ -346,12 +346,12 @@ vector<vec> CINP4::record(const OutputType P) {
 }
 
 void CINP4::print() {
-    sp_info("CINP4 element (doi: 10.1016/0045-7949(84)90019-1) connects: ", node_encoding);
+    suanpan_info("CINP4 element (doi: 10.1016/0045-7949(84)90019-1) connects: ", node_encoding);
     if(!is_initialized()) return;
-    sp_info("Material:\n");
+    suanpan_info("Material:\n");
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        sp_info("IP {}:\t", I + 1);
-        sp_info(int_pt[I].coor);
+        suanpan_info("IP {}:\t", I + 1);
+        suanpan_info(int_pt[I].coor);
         int_pt[I].m_material->print();
     }
 }

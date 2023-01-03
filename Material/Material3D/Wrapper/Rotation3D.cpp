@@ -86,7 +86,7 @@ int Rotation3D::initialize(const shared_ptr<DomainBase>& D) {
     mat_obj = suanpan::initialized_material_copy(D, mat_tag);
 
     if(nullptr == mat_obj || mat_obj->get_material_type() != MaterialType::D3) {
-        SP_E("A valid 3D host material is required.\n");
+        suanpan_error("A valid 3D host material is required.\n");
         return SUANPAN_FAIL;
     }
 

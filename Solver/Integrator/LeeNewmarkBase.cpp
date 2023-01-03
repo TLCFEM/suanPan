@@ -33,7 +33,7 @@ int LeeNewmarkBase::erase_top_left_block() const {
         ptr_b = t_triplet.col_mem();
     }
     else {
-        SP_E("The system is not sorted, please file a bug report.\n");
+        suanpan_error("The system is not sorted, please file a bug report.\n");
         return SUANPAN_FAIL;
     }
 

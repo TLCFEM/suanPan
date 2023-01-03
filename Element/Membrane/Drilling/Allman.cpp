@@ -168,7 +168,9 @@ vector<vec> Allman::record(const OutputType T) {
     return data;
 }
 
-void Allman::print() { sp_info("Allman element connects:", node_encoding); }
+void Allman::print() {
+    suanpan_info("Allman element connects:", node_encoding);
+}
 
 #ifdef SUANPAN_VTK
 #include <vtkTriangle.h>

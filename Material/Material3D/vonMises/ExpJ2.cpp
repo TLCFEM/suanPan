@@ -37,4 +37,6 @@ ExpJ2::ExpJ2(const unsigned T, const double E, const double V, const double YS, 
 
 unique_ptr<Material> ExpJ2::get_copy() { return make_unique<ExpJ2>(*this); }
 
-void ExpJ2::print() { sp_info("A 3D exponential hardening model.\n"); }
+void ExpJ2::print() {
+    suanpan_info("A 3D exponential hardening model.\n");
+}

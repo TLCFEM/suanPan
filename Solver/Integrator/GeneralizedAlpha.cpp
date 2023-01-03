@@ -43,7 +43,7 @@ GeneralizedAlpha::GeneralizedAlpha(const unsigned T, const double AF, const doub
     , F4(1. - F3)
     , F9(-.5 / beta) {
     if(!suanpan::approx_equal(alpha_m, AM) || !suanpan::approx_equal(alpha_f, AF))
-        SP_E("Parameters automatically adjusted.\n");
+        suanpan_error("Parameters automatically adjusted.\n");
 }
 
 void GeneralizedAlpha::assemble_resistance() {
@@ -181,4 +181,6 @@ vec GeneralizedAlpha::from_incre_acceleration(const vec& incre_acceleration, con
     return incre_acceleration / F7 + F10 * W->get_current_velocity()(encoding) - F9 / F7 * W->get_current_acceleration()(encoding) + W->get_current_displacement()(encoding);
 }
 
-void GeneralizedAlpha::print() { sp_info("A time integrator using the Generalized-Alpha algorithm. doi:10.1115/1.2900803\n"); }
+void GeneralizedAlpha::print() {
+    suanpan_info("A time integrator using the Generalized-Alpha algorithm. doi:10.1115/1.2900803\n");
+}

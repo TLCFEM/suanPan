@@ -53,4 +53,6 @@ void GlobalStiffnessRecorder::record(const shared_ptr<DomainBase>& D) {
     if(if_record_time()) insert(D->get_factory()->get_current_time());
 }
 
-void GlobalStiffnessRecorder::print() { sp_info("A global recorder.\n"); }
+void GlobalStiffnessRecorder::print() {
+    suanpan_info("A global recorder.\n");
+}

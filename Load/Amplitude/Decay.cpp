@@ -28,4 +28,6 @@ double Decay::get_amplitude(const double T) {
     return step_time <= 0. ? 0. : A * exp(-start_time / TD);
 }
 
-void Decay::print() { sp_info("Decay.\n"); }
+void Decay::print() {
+    suanpan_info("Decay.\n");
+}

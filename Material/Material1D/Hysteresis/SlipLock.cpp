@@ -44,13 +44,13 @@ int SlipLock::update_trial_status(const vec& t_strain) {
         const auto tmp_b = (1. - hardening_ratio) * pow(tmp_a, -1. / R0);
         trial_stiffness = elastic_modulus * tmp_a / (hardening_ratio * tmp_a + tmp_b);
         const auto error = trial_strain(0) - trial_stress(0) / elastic_modulus * (hardening_ratio + tmp_b);
-        SP_D("Local iteration error: {:.5E}.\n", fabs(error));
+        suanpan_debug("Local iteration error: {:.5E}.\n", fabs(error));
         if(fabs(error) <= tolerance) return SUANPAN_SUCCESS;
         trial_stress += error * trial_stiffness;
         if(!suanpan::approx_equal(sign(trial_stress(0)), sign(trial_strain(0)))) trial_stress = 0.;
     }
 
-    SP_E("Cannot converge within {} iterations.\n", max_iteration);
+    suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
     return SUANPAN_FAIL;
 }
 
@@ -76,6 +76,6 @@ int SlipLock::reset_status() {
 }
 
 void SlipLock::print() {
-    sp_info("A slip lock material model using Menegotto-Pinto relationship.\n");
+    suanpan_info("A slip lock material model using Menegotto-Pinto relationship.\n");
     Material1D::print();
 }

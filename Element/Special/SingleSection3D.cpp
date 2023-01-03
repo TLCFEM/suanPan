@@ -47,6 +47,6 @@ int SingleSection3D::clear_status() { return s_section->clear_status(); }
 int SingleSection3D::reset_status() { return s_section->reset_status(); }
 
 void SingleSection3D::print() {
-    sp_info("A SingleSection3D element that represents a section which can be used for section analysis.\n");
+    suanpan_info("A SingleSection3D element that represents a section which can be used for section analysis.\n");
     if(is_initialized()) s_section->print();
 }

@@ -276,7 +276,7 @@ template<sp_d T> int SparseMatSuperLU<T>::solve_trs(Mat<T>& out_mat, const Mat<T
 
         out_mat += incre;
 
-        SP_D("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier = norm(full_residual -= this->operator*(incre)));
+        suanpan_debug("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier = norm(full_residual -= this->operator*(incre)));
     }
 
     return flag;
@@ -345,7 +345,7 @@ template<sp_d T> int SparseMatSuperLU<T>::solve_trs(Mat<T>& out_mat, Mat<T>&& in
 
         out_mat += incre;
 
-        SP_D("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier = norm(in_mat -= this->operator*(incre)));
+        suanpan_debug("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier = norm(in_mat -= this->operator*(incre)));
     }
 
     return flag;

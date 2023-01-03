@@ -52,4 +52,6 @@ int Trivial::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-void Trivial::print() { sp_info("A trivial material model returns zero response.\n"); }
+void Trivial::print() {
+    suanpan_info("A trivial material model returns zero response.\n");
+}

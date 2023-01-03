@@ -39,4 +39,6 @@ void AmplitudeRecorder::record(const shared_ptr<DomainBase>& D) {
     if(if_record_time()) insert(current_time);
 }
 
-void AmplitudeRecorder::print() { sp_info("A recorder to record amplitudes.\n"); }
+void AmplitudeRecorder::print() {
+    suanpan_info("A recorder to record amplitudes.\n");
+}

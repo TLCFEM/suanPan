@@ -27,14 +27,14 @@ NMB31::NMB31(const unsigned T, uvec&& N, const unsigned S, const unsigned O, con
 
 int NMB31::initialize(const shared_ptr<DomainBase>& D) {
     if(!D->find_orientation(orientation_tag)) {
-        SP_W("Element {} cannot find the assigned transformation {}.\n", get_tag(), orientation_tag);
+        suanpan_warning("Element {} cannot find the assigned transformation {}.\n", get_tag(), orientation_tag);
         return SUANPAN_FAIL;
     }
 
     b_trans = D->get_orientation(orientation_tag)->get_copy();
 
     if(b_trans->is_nlgeom() != is_nlgeom()) {
-        SP_W("Element {} is assigned with an inconsistent transformation {}.\n", get_tag(), orientation_tag);
+        suanpan_warning("Element {} is assigned with an inconsistent transformation {}.\n", get_tag(), orientation_tag);
         return SUANPAN_FAIL;
     }
 
@@ -87,7 +87,7 @@ vector<vec> NMB31::record(const OutputType P) {
 }
 
 void NMB31::print() {
-    sp_info("A spatial beam element using N-M interaction section.\n");
+    suanpan_info("A spatial beam element using N-M interaction section.\n");
     b_section->print();
 }
 

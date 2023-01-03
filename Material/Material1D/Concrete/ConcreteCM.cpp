@@ -20,7 +20,7 @@
 podarray<double> ConcreteCM::compute_compression_backbone(const double n_strain) {
     podarray<double> response(2);
 
-    suanpan_debug([&] { if(n_strain > 0.) throw invalid_argument("argument is not acceptable"); });
+    suanpan_assert([&] { if(n_strain > 0.) throw invalid_argument("argument is not acceptable"); });
 
     const auto normal_strain = std::max(datum::eps, n_strain / c_strain);
 
@@ -35,7 +35,7 @@ podarray<double> ConcreteCM::compute_compression_backbone(const double n_strain)
 podarray<double> ConcreteCM::compute_tension_backbone(const double n_strain) {
     podarray<double> response(2);
 
-    suanpan_debug([&] { if(n_strain < 0.) throw invalid_argument("argument is not acceptable"); });
+    suanpan_assert([&] { if(n_strain < 0.) throw invalid_argument("argument is not acceptable"); });
 
     const auto normal_strain = std::max(datum::eps, n_strain / t_strain);
 
@@ -194,7 +194,7 @@ podarray<double> ConcreteCM::compute_transition(const double EM, const double EA
         const auto secant = (SB - SA) / d_strain;
         const auto tmp_a = secant - KA;
         const auto ratio = (KB - secant) / tmp_a;
-        suanpan_debug([&] { if(ratio <= 0.) throw invalid_argument("argument is not acceptable"); });
+        suanpan_assert([&] { if(ratio <= 0.) throw invalid_argument("argument is not acceptable"); });
         const auto tmp_b = tmp_a * pow(i_strain / d_strain, ratio);
 
         response(0) = SA + i_strain * (KA + tmp_b);
@@ -527,6 +527,6 @@ int ConcreteCM::reset_status() {
 }
 
 void ConcreteCM::print() {
-    sp_info("A concrete model based on Chang & Mander's concrete model.\n");
+    suanpan_info("A concrete model based on Chang & Mander's concrete model.\n");
     Material1D::print();
 }

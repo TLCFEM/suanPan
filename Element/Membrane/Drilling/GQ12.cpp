@@ -172,11 +172,11 @@ vector<vec> GQ12::record(const OutputType T) {
 }
 
 void GQ12::print() {
-    sp_info("A GQ12 element.\n");
+    suanpan_info("A GQ12 element.\n");
     if(!is_initialized()) return;
-    sp_info("Material:\n");
+    suanpan_info("Material:\n");
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        sp_info("IP {}:\t", I + 1);
+        suanpan_info("IP {}:\t", I + 1);
         int_pt[I].m_material->print();
     }
 }

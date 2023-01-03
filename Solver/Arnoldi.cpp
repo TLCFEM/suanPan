@@ -28,7 +28,7 @@ Arnoldi::Arnoldi(const unsigned T, const unsigned N, const char TP)
 
 int Arnoldi::initialize() {
     if(get_integrator() == nullptr) {
-        SP_E("A valid integrator is required.\n");
+        suanpan_error("A valid integrator is required.\n");
         return SUANPAN_FAIL;
     }
 
@@ -55,4 +55,6 @@ int Arnoldi::analyze() {
     return eig_solve(get_eigenvalue(W), get_eigenvector(W), W->get_stiffness(), t_mass, eigen_num, 'L' == eigen_type ? "LM" : "SM");
 }
 
-void Arnoldi::print() { sp_info("A solver using Arnoldi method.\n"); }
+void Arnoldi::print() {
+    suanpan_info("A solver using Arnoldi method.\n");
+}

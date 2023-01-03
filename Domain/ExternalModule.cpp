@@ -79,7 +79,7 @@ ExternalModule::ExternalModule(string L)
         ext_library = LoadLibraryA(gnu_name.c_str());
     }
     if(ext_library == nullptr)
-        SP_E("Cannot load the library with the name \"{}\".\n", file_name);
+        suanpan_error("Cannot load the library with the name \"{}\".\n", file_name);
 #elif defined(SUANPAN_UNIX)
     auto file_name = "./lib" + library_name + ".so";
     ext_library = dlopen(file_name.c_str(), RTLD_NOW);
@@ -87,7 +87,7 @@ ExternalModule::ExternalModule(string L)
         file_name = "./" + library_name + ".so";
         ext_library = dlopen(file_name.c_str(), RTLD_NOW);
     }
-    if(ext_library == nullptr) SP_E("Cannot load the library with the name \"{}\".\n", file_name);
+    if(ext_library == nullptr) suanpan_error("Cannot load the library with the name \"{}\".\n", file_name);
 #endif
 }
 
@@ -127,7 +127,7 @@ void ExternalModule::new_adapter(unique_ptr<Material>& return_obj, istringstream
     unsigned tag;
 
     if(!get_input(command, tag)) {
-        SP_E("A valid tag is required.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 

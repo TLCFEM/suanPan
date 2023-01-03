@@ -300,7 +300,7 @@ int CDPM2::compute_damage_factor(const double kd, const double kd1, const double
         const auto incre = (term_a - term_b * kd) / jacobian;
 
         const auto error = fabs(incre);
-        SP_D("Local damage iteration error: {:.5E}.\n", error);
+        suanpan_debug("Local damage iteration error: {:.5E}.\n", error);
 
         if(error <= tolerance) {
             popkd = term_b / jacobian;
@@ -419,7 +419,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
         const auto error = norm(residual);
-        SP_D("Local plasticity iteration error: {:.5E}.\n", error);
+        suanpan_debug("Local plasticity iteration error: {:.5E}.\n", error);
 
         if(error <= tolerance) {
             const vec unit_n = n % tensor::stress::norm_weight;
@@ -564,4 +564,6 @@ vector<vec> CDPM2::record(const OutputType T) {
     return Material3D::record(T);
 }
 
-void CDPM2::print() { sp_info("A concrete damage plasticity model based on the CDPM2 model. doi: 10.1016/j.ijsolstr.2013.07.008\n"); }
+void CDPM2::print() {
+    suanpan_info("A concrete damage plasticity model based on the CDPM2 model. doi: 10.1016/j.ijsolstr.2013.07.008\n");
+}

@@ -84,6 +84,6 @@ int Bilinear1D::reset_status() {
 }
 
 void Bilinear1D::print() {
-    sp_info("A uniaxial bilinear hardening material using J2 plasticity and associated flow rule.\n");
+    suanpan_info("A uniaxial bilinear hardening material using J2 plasticity and associated flow rule.\n");
     Material1D::print();
 }

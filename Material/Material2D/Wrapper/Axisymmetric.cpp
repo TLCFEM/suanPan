@@ -35,7 +35,7 @@ int Axisymmetric::initialize(const shared_ptr<DomainBase>& D) {
     base = suanpan::initialized_material_copy(D, base_tag);
 
     if(nullptr == base || base->get_material_type() != MaterialType::D3) {
-        SP_E("A valid 3D host material is required.\n");
+        suanpan_error("A valid 3D host material is required.\n");
         return SUANPAN_FAIL;
     }
 
@@ -91,6 +91,6 @@ int Axisymmetric::reset_status() {
 vector<vec> Axisymmetric::record(const OutputType P) { return base->record(P); }
 
 void Axisymmetric::print() {
-    sp_info("An axisymmetric wrapper.\n");
+    suanpan_info("An axisymmetric wrapper.\n");
     if(base) base->print();
 }

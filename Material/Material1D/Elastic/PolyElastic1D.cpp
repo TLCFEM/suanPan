@@ -70,6 +70,6 @@ int PolyElastic1D::reset_status() {
 }
 
 void PolyElastic1D::print() {
-    sp_info("An elastic model based on polynomial.\n");
+    suanpan_info("An elastic model based on polynomial.\n");
     Material1D::print();
 }

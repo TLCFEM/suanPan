@@ -64,6 +64,6 @@ int AxisymmetricElastic::reset_status() {
 }
 
 void AxisymmetricElastic::print() {
-    sp_info("Strain:\t", get_trial_strain());
-    sp_info("Stress:\t", get_trial_stress());
+    suanpan_info("Strain:\t", get_trial_strain());
+    suanpan_info("Stress:\t", get_trial_stress());
 }

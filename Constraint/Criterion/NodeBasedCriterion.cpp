@@ -26,7 +26,7 @@ NodeBasedCriterion::NodeBasedCriterion(const unsigned T, const unsigned ST, cons
 
 int NodeBasedCriterion::initialize(const shared_ptr<DomainBase>& D) {
     if(!D->find<Node>(node)) {
-        SP_E("Node {} is not active.\n", node);
+        suanpan_error("Node {} is not active.\n", node);
         D->disable_criterion(get_tag());
     }
 

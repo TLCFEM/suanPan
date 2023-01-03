@@ -33,4 +33,6 @@ ExpDP::ExpDP(const unsigned T, const double E, const double V, const double ETAY
 
 unique_ptr<Material> ExpDP::get_copy() { return make_unique<ExpDP>(*this); }
 
-void ExpDP::print() { sp_info("A 3D exponential hardening model using Drucker-Prager yielding criterion.\n"); }
+void ExpDP::print() {
+    suanpan_info("A 3D exponential hardening model using Drucker-Prager yielding criterion.\n");
+}

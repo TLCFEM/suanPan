@@ -37,7 +37,7 @@ int Sequential::initialize(const shared_ptr<DomainBase>& D) {
     for(const auto I : mat_tag) {
         mat_pool.emplace_back(suanpan::initialized_material_copy(D, I));
         if(nullptr == mat_pool.back() || mat_pool.back()->get_material_type() != MaterialType::D1) {
-            SP_E("A valid 1D host material is required.\n");
+            suanpan_error("A valid 1D host material is required.\n");
             return SUANPAN_FAIL;
         }
         access::rw(density) += mat_pool.back()->get_parameter(ParameterType::DENSITY);
@@ -82,12 +82,12 @@ int Sequential::update_trial_status(const vec& t_strain) {
         for(size_t I = 0; I < mat_pool.size(); ++I) mat_pool[I]->update_trial_status(mat_pool[I]->get_trial_strain() + i_strain[I]);
 
         const auto error = norm(i_strain);
-        SP_D("Local iteration error: {:.5E}.\n", error);
+        suanpan_debug("Local iteration error: {:.5E}.\n", error);
         if(error <= tolerance) break;
     }
 
     if(max_iteration == counter) {
-        SP_E("Cannot converge within {} iterations.\n", max_iteration);
+        suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
         return SUANPAN_FAIL;
     }
 
@@ -146,6 +146,6 @@ vector<vec> Sequential::record(const OutputType P) {
 }
 
 void Sequential::print() {
-    sp_info("A wrapper of several material models.\n");
+    suanpan_info("A wrapper of several material models.\n");
     for(const auto& I : mat_pool) I->print();
 }

@@ -40,7 +40,7 @@ int Fibre3D::initialize(const shared_ptr<DomainBase>& D) {
     for(const auto I : fibre_tag) {
         fibre.emplace_back(suanpan::initialized_section_copy(D, I));
         if(nullptr == fibre.back() || SectionType::D3 != fibre.back()->get_section_type()) {
-            SP_W("Section {} is ignored as it is not a valid 3D section.\n", I);
+            suanpan_warning("Section {} is ignored as it is not a valid 3D section.\n", I);
             fibre.pop_back();
         }
         else {
@@ -110,4 +110,6 @@ int Fibre3D::reset_status() {
     return code;
 }
 
-void Fibre3D::print() { sp_info("A 3D fibre section that consists of fibres.\n"); }
+void Fibre3D::print() {
+    suanpan_info("A 3D fibre section that consists of fibres.\n");
+}

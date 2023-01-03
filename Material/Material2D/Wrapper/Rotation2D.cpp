@@ -34,7 +34,7 @@ int Rotation2D::initialize(const shared_ptr<DomainBase>& D) {
     mat_obj = suanpan::initialized_material_copy(D, mat_tag);
 
     if(nullptr == mat_obj || mat_obj->get_material_type() != MaterialType::D2) {
-        SP_E("A valid 2D host material is required.\n");
+        suanpan_error("A valid 2D host material is required.\n");
         return SUANPAN_FAIL;
     }
 
@@ -84,6 +84,6 @@ int Rotation2D::reset_status() {
 vector<vec> Rotation2D::record(const OutputType P) { return mat_obj->record(P); }
 
 void Rotation2D::print() {
-    sp_info("A rotation wrapper with the underlying material.\n");
+    suanpan_info("A rotation wrapper with the underlying material.\n");
     if(nullptr != mat_obj) mat_obj->print();
 }

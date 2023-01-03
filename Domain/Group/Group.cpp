@@ -28,4 +28,6 @@ void Group::initialize(const shared_ptr<DomainBase>&) {}
 
 const uvec& Group::get_pool() const { return pool; }
 
-void Group::print() { sp_info("A group contains the following tags:", pool); }
+void Group::print() {
+    suanpan_info("A group contains the following tags:", pool);
+}

@@ -27,4 +27,6 @@ BilinearDP::BilinearDP(const unsigned T, const double E, const double V, const d
 
 unique_ptr<Material> BilinearDP::get_copy() { return make_unique<BilinearDP>(*this); }
 
-void BilinearDP::print() { sp_info("A 3D nonlinear model using Drucker-Prager yielding criterion with linear cohesion.\n"); }
+void BilinearDP::print() {
+    suanpan_info("A 3D nonlinear model using Drucker-Prager yielding criterion with linear cohesion.\n");
+}

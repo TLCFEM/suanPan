@@ -135,4 +135,6 @@ int GeneralizedAlphaExplicit::correct_trial_status() {
 
 void GeneralizedAlphaExplicit::update_parameter(const double NT) { DT = NT; }
 
-void GeneralizedAlphaExplicit::print() { sp_info("An explicit integrator using the Generalized-Alpha algorithm.\n"); }
+void GeneralizedAlphaExplicit::print() {
+    suanpan_info("An explicit integrator using the Generalized-Alpha algorithm.\n");
+}

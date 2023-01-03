@@ -177,7 +177,7 @@ template<sp_d data_t> int ILU<data_t>::init() {
     B.ncol = 0;
 
     if(const auto code = this->apply_solver(&X, &B); 0 != code) {
-        SP_E("Error code {} received.\n", code);
+        suanpan_error("Error code {} received.\n", code);
         return SUANPAN_FAIL;
     }
 

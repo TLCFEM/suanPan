@@ -46,7 +46,7 @@ int BoucWen::update_trial_status(const vec& t_strain) {
     unsigned counter = 0;
     while(true) {
         if(max_iteration == ++counter) {
-            SP_E("Cannot converge within {} iterations.\n", max_iteration);
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
             return SUANPAN_FAIL;
         }
 
@@ -60,7 +60,7 @@ int BoucWen::update_trial_status(const vec& t_strain) {
 
         const auto error = fabs(incre = -residual * z / jacobian);
 
-        SP_D("Local iteration error: {:.5E}.\n", error);
+        suanpan_debug("Local iteration error: {:.5E}.\n", error);
 
         if(error <= tolerance) {
             trial_stress = modulus_a * trial_strain + modulus_b * z;
@@ -96,6 +96,6 @@ int BoucWen::reset_status() {
 }
 
 void BoucWen::print() {
-    sp_info("A Bouc-Wen material model.\n");
+    suanpan_info("A Bouc-Wen material model.\n");
     Material1D::print();
 }

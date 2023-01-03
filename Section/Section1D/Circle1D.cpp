@@ -25,6 +25,6 @@ Circle1D::Circle1D(const unsigned T, const double B, const unsigned M)
 unique_ptr<Section> Circle1D::get_copy() { return make_unique<Circle1D>(*this); }
 
 void Circle1D::print() {
-    sp_info("A uniaxial circular section with radius of {:.3E}.\nMaterial: ", radius);
+    suanpan_info("A uniaxial circular section with radius of {:.3E}.\nMaterial: ", radius);
     s_material->print();
 }

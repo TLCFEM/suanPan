@@ -352,13 +352,13 @@ vector<vec> CP4I::record(const OutputType P) {
 }
 
 void CP4I::print() {
-    sp_info("A four-node membrane element (CP4I).\n");
-    sp_info("The nodes connected are:", node_encoding);
+    suanpan_info("A four-node membrane element (CP4I).\n");
+    suanpan_info("The nodes connected are:", node_encoding);
     if(!is_initialized()) return;
-    sp_info("Material:\n");
+    suanpan_info("Material:\n");
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        sp_info("IP {}:\t", I + 1);
-        sp_info(int_pt[I].coor);
+        suanpan_info("IP {}:\t", I + 1);
+        suanpan_info(int_pt[I].coor);
         int_pt[I].m_material->print();
     }
 }

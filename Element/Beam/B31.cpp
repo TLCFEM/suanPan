@@ -39,14 +39,14 @@ int B31::initialize(const shared_ptr<DomainBase>& D) {
     const mat sec_stiff = sec_proto->get_initial_stiffness()(b_span, b_span);
 
     if(!D->find_orientation(orientation_tag)) {
-        SP_W("Element {} cannot find the assigned transformation {}.\n", get_tag(), orientation_tag);
+        suanpan_warning("Element {} cannot find the assigned transformation {}.\n", get_tag(), orientation_tag);
         return SUANPAN_FAIL;
     }
 
     b_trans = D->get_orientation(orientation_tag)->get_copy();
 
     if(b_trans->is_nlgeom() != is_nlgeom()) {
-        SP_W("Element {} is assigned with an inconsistent transformation {}.\n", get_tag(), orientation_tag);
+        suanpan_warning("Element {} is assigned with an inconsistent transformation {}.\n", get_tag(), orientation_tag);
         return SUANPAN_FAIL;
     }
 
@@ -128,7 +128,9 @@ vector<vec> B31::record(const OutputType P) {
     return output;
 }
 
-void B31::print() { sp_info("A spatial beam element.\n"); }
+void B31::print() {
+    suanpan_info("A spatial beam element.\n");
+}
 
 #ifdef SUANPAN_VTK
 #include <vtkLine.h>
