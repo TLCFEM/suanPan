@@ -28,7 +28,6 @@ add_library(${PROJECT_NAME} SHARED
         ../../Domain/Tag.cpp
         ../../Material/Material.cpp
         ../../Section/Section.cpp
-        ../../Toolbox/print.cpp
         )
 
 message(STATUS "SectionExample CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
