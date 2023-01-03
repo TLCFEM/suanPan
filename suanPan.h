@@ -239,7 +239,7 @@ namespace suanpan {
 
     template<typename T> std::string format(const Col<T>& in_vec) {
         std::string output;
-        if(std::is_floating_point_v<T>) for(const auto I : in_vec) output += format(" {: 1.5e}", I);
+        if(std::is_floating_point_v<T>) for(const auto I : in_vec) output += format(" {: 1.4e}", I);
         else for(const auto I : in_vec) output += format(" {:6d}", I);
         output += '\n';
         return output;
