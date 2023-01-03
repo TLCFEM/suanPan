@@ -37,6 +37,7 @@ link_directories(${PROJECT_BINARY_DIR}/Libs)
 
 add_executable(${PROJECT_NAME}
         "suanPan.cpp"
+        "Include/fmt/src/format.cc"
         "Constraint/CMakeLists.txt"
         "Database/CMakeLists.txt"
         "Domain/CMakeLists.txt"
@@ -66,7 +67,6 @@ add_subdirectory(Solver)
 add_subdirectory(Step)
 add_subdirectory(Toolbox)
 add_subdirectory(UnitTest)
-add_subdirectory(Include/fmt)
 
 target_link_libraries(${PROJECT_NAME}
         Converger
@@ -74,7 +74,6 @@ target_link_libraries(${PROJECT_NAME}
         Material
         Section
         Solver
-        fmt::fmt
         )
 
 if (FORTRAN_STATUS)
