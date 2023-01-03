@@ -182,6 +182,7 @@ inline auto& SUANPAN_CERR = std::cerr;
 
 #include <filesystem>
 #include <fmt/color.h>
+#include <mutex>
 #include <source_location>
 
 namespace fs = std::filesystem;
