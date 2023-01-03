@@ -289,10 +289,8 @@ namespace std::ranges {
 #endif
 
 template<typename T> void sp_info(const Col<T>& in_vec) {
-    if(std::is_floating_point<T>::value)
-        for(const auto& I : in_vec) sp_info(" {:1.5e}", I);
-    else
-        for(const auto& I : in_vec) sp_info(" {:d}", I);
+    if(std::is_floating_point_v<T>) for(const auto& I : in_vec) sp_info(" {:1.5e}", I);
+    else for(const auto& I : in_vec) sp_info(" {:d}", I);
     sp_info("\n");
 }
 

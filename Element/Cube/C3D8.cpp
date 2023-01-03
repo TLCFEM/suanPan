@@ -204,8 +204,11 @@ vector<vec> C3D8::record(const OutputType T) {
 }
 
 void C3D8::print() {
-    sp_info("A C3D8 element{}{}.\n", int_scheme == 'R' ? " reduced integration" : int_scheme == 'I' ? " Iron's integration"
-                                                                                                    : " full integration",
+    sp_info("A C3D8 element{}{}.\n", int_scheme == 'R'
+            ? " reduced integration"
+            : int_scheme == 'I'
+            ? " Iron's integration"
+            : " full integration",
             nlgeom ? " nonlinear geometry" : "");
     sp_info("The element connects nodes:", node_encoding);
     if(!is_initialized()) return;
