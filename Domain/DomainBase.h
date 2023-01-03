@@ -98,7 +98,7 @@ public:
     DomainBase(DomainBase&&) = delete;                 // move forbidden
     DomainBase& operator=(const DomainBase&) = delete; // assign forbidden
     DomainBase& operator=(DomainBase&&) = delete;      // assign forbidden
-    ~DomainBase() override;
+    ~DomainBase() override = default;
 
     virtual void set_factory(const shared_ptr<LongFactory>&) = 0;
     [[nodiscard]] virtual const shared_ptr<LongFactory>& get_factory() const = 0;

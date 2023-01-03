@@ -75,7 +75,7 @@ public:
     Step(Step&&) noexcept = delete;
     Step& operator=(const Step&) = delete;
     Step& operator=(Step&&) noexcept = delete;
-    ~Step() override;
+    ~Step() override = default;
 
     virtual int initialize();
 

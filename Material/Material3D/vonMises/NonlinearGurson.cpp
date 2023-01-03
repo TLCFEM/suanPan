@@ -112,7 +112,7 @@ int NonlinearGurson::update_trial_status(const vec& t_strain) {
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
         const auto error = norm(residual);
-        suanpan_debug("NonlinearGurson local iteration error: %.5E.\n", error);
+        SP_D("Local iteration error: {:.5E}.\n", error);
         if(error <= tolerance || norm(incre) <= tolerance) break;
 
         gamma -= incre(0);

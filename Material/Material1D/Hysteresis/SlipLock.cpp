@@ -44,7 +44,7 @@ int SlipLock::update_trial_status(const vec& t_strain) {
         const auto tmp_b = (1. - hardening_ratio) * pow(tmp_a, -1. / R0);
         trial_stiffness = elastic_modulus * tmp_a / (hardening_ratio * tmp_a + tmp_b);
         const auto error = trial_strain(0) - trial_stress(0) / elastic_modulus * (hardening_ratio + tmp_b);
-        suanpan_debug("SlipLock local iteration error: %.5E.\n", fabs(error));
+        SP_D("Local iteration error: {:.5E}.\n", fabs(error));
         if(fabs(error) <= tolerance) return SUANPAN_SUCCESS;
         trial_stress += error * trial_stiffness;
         if(!suanpan::approx_equal(sign(trial_stress(0)), sign(trial_strain(0)))) trial_stress = 0.;

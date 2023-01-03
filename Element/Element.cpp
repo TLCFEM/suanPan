@@ -258,7 +258,6 @@ Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& 
     , mat_type(MTP)
     , sec_type(SectionType::D0)
     , dof_identifier(std::forward<std::vector<DOF>>(DI)) {
-    suanpan_debug("Element %u ctor() called.\n", T);
     suanpan_debug([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw invalid_argument("size of dof identifier must meet number of dofs"); });
 }
 
@@ -270,7 +269,6 @@ Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& 
     , mat_type(MaterialType::D0)
     , sec_type(STP)
     , dof_identifier(std::forward<std::vector<DOF>>(DI)) {
-    suanpan_debug("Element %u ctor() called.\n", T);
     suanpan_debug([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw invalid_argument("size of dof identifier must meet number of dofs"); });
 }
 
@@ -282,7 +280,7 @@ Element::Element(const unsigned T, const unsigned ND, uvec&& GT)
     , num_dof(ND)
     , use_group(true)
     , mat_type(MaterialType::D0)
-    , sec_type(SectionType::D0) { suanpan_debug("Element %u ctor() called.\n", T); }
+    , sec_type(SectionType::D0) {}
 
 // for elements that use other elements
 Element::Element(const unsigned T, const unsigned ND, const unsigned ET, const unsigned NT)
@@ -292,9 +290,7 @@ Element::Element(const unsigned T, const unsigned ND, const unsigned ET, const u
     , num_dof(ND)
     , use_other(ET)
     , mat_type(MaterialType::D0)
-    , sec_type(SectionType::D0) { suanpan_debug("Element %u ctor() called.\n", T); }
-
-Element::~Element() { suanpan_debug("Element %u dtor() called.\n", get_tag()); }
+    , sec_type(SectionType::D0) {}
 
 int Element::initialize_base(const shared_ptr<DomainBase>& D) {
     // initialized already, check node validity

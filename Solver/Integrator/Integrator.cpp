@@ -20,9 +20,7 @@
 #include <Domain/FactoryHelper.hpp>
 
 Integrator::Integrator(const unsigned T)
-    : Tag(T) { suanpan_debug("Integrator %u ctor() called.\n", T); }
-
-Integrator::~Integrator() { suanpan_debug("Integrator %u dtor() called.\n", get_tag()); }
+    : Tag(T) {}
 
 void Integrator::set_domain(const weak_ptr<DomainBase>& D) { if(database.lock() != D.lock()) database = D; }
 

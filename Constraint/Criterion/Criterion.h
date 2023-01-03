@@ -40,7 +40,7 @@ class Criterion : public Tag {
 
 public:
     explicit Criterion(unsigned = 0, unsigned = 0);
-    ~Criterion() override;
+    ~Criterion() override = default;
 
     void set_step_tag(unsigned);
     [[nodiscard]] unsigned get_step_tag() const;

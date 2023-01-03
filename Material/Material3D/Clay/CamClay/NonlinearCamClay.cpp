@@ -93,7 +93,7 @@ int NonlinearCamClay::update_trial_status(const vec& t_strain) {
 
         auto error = norm(residual);
         if(1 == counter) rel_error = std::max(1., error);
-        suanpan_debug("NonlinearCamClay local iteration error: %.5E.\n", error /= rel_error);
+        SP_D("Local iteration error: {:.5E}.\n", error /= rel_error);
         if(error <= tolerance || norm(incre) <= tolerance) {
             rel_error = 2. * bulk / square_b; // reuse variable
             left.col(0) = rel_error * rel_p * tensor::unit_tensor2 + six_shear / denom * (trial_s *= square_m / denom);

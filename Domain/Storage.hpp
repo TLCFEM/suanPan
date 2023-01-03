@@ -102,12 +102,12 @@ template<typename T> class Storage : public std::enable_shared_from_this<Storage
 public:
     typedef T object_type;
 
-    Storage();
+    Storage() = default;
     Storage(const Storage&) = delete;
     Storage(Storage&&) noexcept = delete;
     Storage& operator=(const Storage&) = delete;
     Storage& operator=(Storage&&) noexcept = delete;
-    ~Storage();
+    ~Storage() = default;
 
     const_iterator cbegin() const;
     const_iterator cend() const;
@@ -132,10 +132,6 @@ public:
 
     [[nodiscard]] size_t size() const;
 };
-
-template<typename T> Storage<T>::Storage() { suanpan_debug("Storage %s ctor() called.\n", type); }
-
-template<typename T> Storage<T>::~Storage() { suanpan_debug("Storage %s dtor() called.\n", type); }
 
 template<typename T> typename Storage<T>::const_iterator Storage<T>::cbegin() const { return pond.cbegin(); }
 

@@ -18,9 +18,7 @@
 #include "Database.h"
 
 Database::Database(const unsigned T)
-    : Tag(T) { suanpan_debug("Database %u ctor() called.\n", T); }
-
-Database::~Database() { suanpan_debug("Database %u dtor() called.\n", get_tag()); }
+    : Tag(T) {}
 
 void Database::set_domain(const shared_ptr<DomainBase>& D) { domain = D; }
 

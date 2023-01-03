@@ -60,7 +60,8 @@ int eig_solve(vec& eigval, mat& eigvec, const std::shared_ptr<MetaMat<double>>& 
             const vec X(WORKD.memptr() + IPNTR[0] - 1, N, false);
             Y = K * X;
         }
-        else if(0 != INFO) break;
+        else if(0 != INFO)
+            break;
     }
 
     if(0 != INFO) {
@@ -68,7 +69,7 @@ int eig_solve(vec& eigval, mat& eigvec, const std::shared_ptr<MetaMat<double>>& 
         return SUANPAN_FAIL;
     }
 
-    suanpan_debug("Arnoldi iteration counter: %d.\n", IPARAM(2));
+    SP_D("Arnoldi iteration counter: {}.\n", IPARAM(2));
 
     auto RVEC = 1;
     auto HOWMNY = 'A';

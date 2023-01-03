@@ -136,7 +136,7 @@ int VAFNM::compute_local_integration(vec& q, mat& jacobian) {
 
         auto error = norm(residual);
         if(2 == counter) ref_error = std::max(1., error);
-        suanpan_debug("VAFNM local iteration error: %.5E.\n", error /= ref_error);
+        SP_D("Local iteration error: {:.5E}.\n", error /= ref_error);
         if(norm(incre) <= tolerance && error <= tolerance) return SUANPAN_SUCCESS;
 
         q -= incre(ga);

@@ -68,7 +68,7 @@ int RambergOsgood::update_trial_status(const vec& t_strain) {
         const auto jacobian = pow_a + n * pow_b;
         const auto incre = (norm_stress * (pow_a + pow_b) - elastic_predictor * pow_a) / jacobian;
         const auto error = fabs(incre) / yield_stress;
-        suanpan_debug("RambergOsgood local iteration error: %.5E.\n", error);
+        SP_D("Local iteration error: {:.5E}.\n", error);
         if(error <= tolerance || max_iteration == ++counter) {
             trial_stress = load_sign * norm_stress + reverse_stress;
             trial_stiffness = elastic_modulus * pow_a / jacobian;

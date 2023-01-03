@@ -38,21 +38,24 @@ SUANPAN_EXPORT void new_materialexample(unique_ptr<Material>& return_obj, istrin
     }
 
     auto hardening_ratio = 0.;
-    if(command.eof()) suanpan_debug("new_materialexample() assumes zero hardening ratio.\n");
+    if(command.eof())
+        SP_D("Zero hardening ratio assumed.\n");
     else if(!get_input(command, hardening_ratio)) {
         SP_E("A valid hardening ratio is required.\n");
         return;
     }
 
     auto beta = 0.;
-    if(command.eof()) suanpan_debug("new_materialexample() assumes isotropic hardening.\n");
+    if(command.eof())
+        SP_D("Isotropic hardening assumed.\n");
     else if(!get_input(command, beta)) {
         SP_E("A valid beta is required.\n");
         return;
     }
 
     auto density = 0.;
-    if(command.eof()) suanpan_debug("new_materialexample() assumes zero density.\n");
+    if(command.eof())
+        SP_D("Zero density assumed.\n");
     else if(!get_input(command, density)) {
         SP_E("A valid density is required.\n");
         return;

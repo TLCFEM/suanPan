@@ -35,7 +35,7 @@ class Database : public Tag {
 
 public:
     explicit Database(unsigned = 0);
-    ~Database() override;
+    ~Database() override = default;
 
     void set_domain(const shared_ptr<DomainBase>& D);
     [[nodiscard]] const shared_ptr<DomainBase>& get_domain() const;

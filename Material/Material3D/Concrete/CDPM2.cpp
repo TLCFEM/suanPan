@@ -300,7 +300,7 @@ int CDPM2::compute_damage_factor(const double kd, const double kd1, const double
         const auto incre = (term_a - term_b * kd) / jacobian;
 
         const auto error = fabs(incre);
-        suanpan_debug("CDPM2 local damage iteration error: %.5E.\n", error);
+        SP_D("Local damage iteration error: {:.5E}.\n", error);
 
         if(error <= tolerance) {
             popkd = term_b / jacobian;
@@ -419,7 +419,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
         const auto error = norm(residual);
-        suanpan_debug("CDPM2 local plasticity iteration error: %.5E.\n", error);
+        SP_D("Local plasticity iteration error: {:.5E}.\n", error);
 
         if(error <= tolerance) {
             const vec unit_n = n % tensor::stress::norm_weight;

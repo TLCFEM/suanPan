@@ -18,11 +18,6 @@
 #ifndef PRINT_H
 #define PRINT_H
 
-#include <functional>
-
 void suanpan_info(const char*, ...);
-void suanpan_debug(const char*, ...);
-
-void suanpan_debug(const std::function<void()>&);
 
 #endif

@@ -55,7 +55,7 @@ int B21E::update_status() {
 
         const auto error = norm(local_resistance(a));
         const vec incre = solve(local_stiffness(a, a), local_resistance(a));
-        suanpan_debug("B21E local iteration error: %.4E.\n", error);
+        SP_D("Local iteration error: {:.5E}.\n", error);
 
         if(error < tolerance && norm(incre) < tolerance) {
             const mat t_mat = local_stiffness(b, b) - local_stiffness(b, a) * solve(local_stiffness(a, a), local_stiffness(a, b));

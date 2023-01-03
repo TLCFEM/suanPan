@@ -60,7 +60,7 @@ int BoucWen::update_trial_status(const vec& t_strain) {
 
         const auto error = fabs(incre = -residual * z / jacobian);
 
-        suanpan_debug("BoucWen local iteration error: %.5E.\n", error);
+        SP_D("Local iteration error: {:.5E}.\n", error);
 
         if(error <= tolerance) {
             trial_stress = modulus_a * trial_strain + modulus_b * z;

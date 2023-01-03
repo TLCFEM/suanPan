@@ -130,19 +130,19 @@ void convert_mode(const string& input_file_name, const string& output_file_name)
 }
 
 void print_header() {
-    suanpan_info("+--------------------------------------------------+\n");
-    suanpan_info("|   __        __         suanPan is an open source |\n");
-    suanpan_info("|  /  \\      |  \\           FEM framework (%u-bit) |\n", SUANPAN_ARCH);
-    suanpan_info("|  \\__       |__/  __   __      %s (%u.%u.%u) |\n", SUANPAN_CODE, SUANPAN_MAJOR, SUANPAN_MINOR, SUANPAN_PATCH);
-    suanpan_info("|     \\ |  | |    |  \\ |  |      by tlc @ %s |\n", SUANPAN_REVISION);
-    suanpan_info("|  \\__/ |__| |    |__X |  |    all rights reserved |\n");
-    suanpan_info("|                           10.5281/zenodo.1285221 |\n");
-    suanpan_info("+--------------------------------------------------+\n");
+    sp_info("+--------------------------------------------------+\n");
+    sp_info("|   __        __         suanPan is an open source |\n");
+    sp_info("|  /  \\      |  \\           FEM framework ({}-bit) |\n", SUANPAN_ARCH);
+    sp_info("|  \\__       |__/  __   __      {} ({}.{}.{}) |\n", SUANPAN_CODE, SUANPAN_MAJOR, SUANPAN_MINOR, SUANPAN_PATCH);
+    sp_info("|     \\ |  | |    |  \\ |  |      by tlc @ {} |\n", SUANPAN_REVISION);
+    sp_info("|  \\__/ |__| |    |__X |  |    all rights reserved |\n");
+    sp_info("|                           10.5281/zenodo.1285221 |\n");
+    sp_info("+--------------------------------------------------+\n");
 #ifdef SUANPAN_WIN
-    suanpan_info("|  https://github.com/TLCFEM/suanPan               |\n");
-    suanpan_info("|  https://github.com/TLCFEM/suanPan-manual        |\n");
-    suanpan_info("+--------------------------------------------------+\n");
-    suanpan_info("|  https://gitter.im/suanPan-dev/community         |\n");
+    sp_info("|  https://github.com/TLCFEM/suanPan               |\n");
+    sp_info("|  https://github.com/TLCFEM/suanPan-manual        |\n");
+    sp_info("+--------------------------------------------------+\n");
+    sp_info("|  https://gitter.im/suanPan-dev/community         |\n");
 #else
     std::vector<const char8_t*> POOL;
     POOL.reserve(10);
@@ -311,7 +311,7 @@ void cli_mode(const shared_ptr<Bead>& model) {
     string all_line;
     while(true) {
         string command_line;
-        suanpan_info("suanPan ~<> ");
+        sp_info("suanPan ~<> ");
         getline(std::cin, command_line);
         if(!command_line.empty() && command_line[0] != '#' && command_line[0] != '!') {
             if(const auto if_comment = command_line.find('!'); string::npos != if_comment) command_line.erase(if_comment);

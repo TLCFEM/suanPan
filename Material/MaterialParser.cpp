@@ -65,7 +65,8 @@ void new_afc01(unique_ptr<Material>& return_obj, istringstream& command) {
     }
 
     auto density = 0.;
-    if(command.eof()) suanpan_debug("new_afc01() assumes zero density.\n");
+    if(command.eof())
+        SP_D("Zero density assumed.\n");
     else if(!get_input(command, density)) {
         SP_E("A valid density is required.\n");
         return;
@@ -102,7 +103,8 @@ void new_afc02(unique_ptr<Material>& return_obj, istringstream& command) {
     }
 
     auto density = 0.;
-    if(command.eof()) suanpan_debug("new_afc02() assumes zero density.\n");
+    if(command.eof())
+        SP_D("Zero density assumed.\n");
     else if(!get_input(command, density)) {
         SP_E("A valid density is required.\n");
         return;
@@ -152,14 +154,16 @@ void new_afc03(unique_ptr<Material>& return_obj, istringstream& command) {
     }
 
     auto degrade = 0.;
-    if(command.eof()) suanpan_debug("new_afc03() assumes linear degradation.\n");
+    if(command.eof())
+        SP_D("Linear degradation assumed.\n");
     else if(!get_input(command, degrade)) {
         SP_E("A valid degradation parameter is required.\n");
         return;
     }
 
     auto density = 0.;
-    if(command.eof()) suanpan_debug("new_afc03() assumes zero density.\n");
+    if(command.eof())
+        SP_D("Zero density assumed.\n");
     else if(!get_input(command, density)) {
         SP_E("A valid density is required.\n");
         return;
@@ -278,7 +282,8 @@ void new_axisymmetricelastic(unique_ptr<Material>& return_obj, istringstream& co
     }
 
     auto density = 0.;
-    if(command.eof()) suanpan_debug("new_axistmmetricelastic() assumes zero density.\n");
+    if(command.eof())
+        SP_D("Zero density assumed.\n");
     else if(!get_input(command, density)) {
         SP_E("A valid density is required.\n");
         return;
@@ -307,23 +312,28 @@ void new_bilinear1d(unique_ptr<Material>& return_obj, istringstream& command) {
     }
 
     auto hardening_ratio = 0.;
-    if(command.eof()) suanpan_debug("new_bilinear1d() assumes zero hardening ratio.\n");
+    if(command.eof())
+        SP_D("Zero hardening ratio assumed.\n");
     else if(!get_input(command, hardening_ratio)) {
         SP_E("A valid hardening ratio is required.\n");
         return;
     }
 
     auto beta = 1.;
-    if(command.eof()) suanpan_debug("new_bilinear1d() assumes isotropic hardening.\n");
+    if(command.eof())
+        SP_D("Isotropic hardening assumed.\n");
     else if(!get_input(command, beta)) {
         SP_E("A valid beta is required.\n");
         return;
     }
-    if(beta > 1.) beta = 1.;
-    else if(beta < 0.) beta = 0.;
+    if(beta > 1.)
+        beta = 1.;
+    else if(beta < 0.)
+        beta = 0.;
 
     auto density = 0.;
-    if(command.eof()) suanpan_debug("new_bilinear1d() assumes zero density.\n");
+    if(command.eof())
+        SP_D("Zero density assumed.\n");
     else if(!get_input(command, density)) {
         SP_E("A valid density is required.\n");
         return;
@@ -358,14 +368,16 @@ void new_bilinear2d(unique_ptr<Material>& return_obj, istringstream& command) {
     }
 
     auto hardening_ratio = 0.;
-    if(command.eof()) suanpan_debug("new_bilinear2d() assumes zero hardening ratio.\n");
+    if(command.eof())
+        SP_D("Zero hardening ratio assumed.\n");
     else if(!get_input(command, hardening_ratio)) {
         SP_E("A valid hardening ratio is required.\n");
         return;
     }
 
     auto beta = 1.;
-    if(command.eof()) suanpan_debug("new_bilinear2d() assumes isotropic hardening.\n");
+    if(command.eof())
+        SP_D("Isotropic hardening assumed.\n");
     else if(!get_input(command, beta)) {
         SP_E("A valid beta is required.\n");
         return;
@@ -378,7 +390,8 @@ void new_bilinear2d(unique_ptr<Material>& return_obj, istringstream& command) {
     }
 
     auto density = 0.;
-    if(command.eof()) suanpan_debug("new_bilinear2d() assumes zero density.\n");
+    if(command.eof())
+        SP_D("Zero density assumed.\n");
     else if(!get_input(command, density)) {
         SP_E("A valid density is required.\n");
         return;
@@ -507,14 +520,16 @@ void new_bilinearelastic1d(unique_ptr<Material>& return_obj, istringstream& comm
     }
 
     auto hardening_ratio = 0.;
-    if(command.eof()) suanpan_debug("new_bilinearelastic1d() assumes zero hardening ratio.\n");
+    if(command.eof())
+        SP_D("Zero hardening ratio assumed.\n");
     else if(!get_input(command, hardening_ratio)) {
         SP_E("A valid hardening ratio is required.\n");
         return;
     }
 
     auto density = 0.;
-    if(command.eof()) suanpan_debug("new_bilinear1d() assumes zero density.\n");
+    if(command.eof())
+        SP_D("Zero density assumed.\n");
     else if(!get_input(command, density)) {
         SP_E("A valid density is required.\n");
         return;
@@ -555,7 +570,8 @@ void new_nle1d01(unique_ptr<Material>& return_obj, istringstream& command) {
     }
 
     auto density = 0.;
-    if(command.eof()) suanpan_debug("new_nle1d01() assumes zero density.\n");
+    if(command.eof())
+        SP_D("Zero density assumed.\n");
     else if(!get_input(command, density)) {
         SP_E("A valid density is required.\n");
         return;
@@ -590,14 +606,16 @@ void new_bilinearhoffman(unique_ptr<Material>& return_obj, istringstream& comman
     }
 
     auto hardening = 0.;
-    if(command.eof()) suanpan_debug("new_linearhoffman() assumes zero hardening.\n");
+    if(command.eof())
+        SP_D("Zero hardening ratio assumed.\n");
     else if(!get_input(command, hardening)) {
         SP_E("A valid hardening ratio is required.\n");
         return;
     }
 
     auto density = 0.;
-    if(command.eof()) suanpan_debug("new_linearhoffman() assumes zero density.\n");
+    if(command.eof())
+        SP_D("Zero density assumed.\n");
     else if(!get_input(command, density)) {
         SP_E("A valid density is required.\n");
         return;
@@ -632,21 +650,24 @@ void new_bilinearj2(unique_ptr<Material>& return_obj, istringstream& command) {
     }
 
     auto hardening_ratio = 0.;
-    if(command.eof()) suanpan_debug("new_bilinearj2() assumes zero hardening ratio.\n");
+    if(command.eof())
+        SP_D("Zero hardening ratio assumed.\n");
     else if(!get_input(command, hardening_ratio)) {
         SP_E("A valid hardening ratio is required.\n");
         return;
     }
 
     auto beta = 1.;
-    if(command.eof()) suanpan_debug("new_bilinearj2() assumes isotropic hardening.\n");
+    if(command.eof())
+        SP_D("Isotropic hardening assumed.\n");
     else if(!get_input(command, beta)) {
         SP_E("A valid beta is required.\n");
         return;
     }
 
     auto density = 0.;
-    if(command.eof()) suanpan_debug("new_bilinearj2() assumes zero density.\n");
+    if(command.eof())
+        SP_D("Zero density assumed.\n");
     else if(!get_input(command, density)) {
         SP_E("A valid density is required.\n");
         return;
@@ -675,14 +696,16 @@ void new_bilinearmises1d(unique_ptr<Material>& return_obj, istringstream& comman
     }
 
     auto hardening_ratio = 0.;
-    if(command.eof()) suanpan_debug("new_bilinearmises1d() assumes zero hardening ratio.\n");
+    if(command.eof())
+        SP_D("Zero hardening ratio assumed.\n");
     else if(!get_input(command, hardening_ratio)) {
         SP_E("A valid hardening ratio is required.\n");
         return;
     }
 
     auto density = 0.;
-    if(command.eof()) suanpan_debug("new_bilinearmises1d() assumes zero density.\n");
+    if(command.eof())
+        SP_D("Zero density assumed.\n");
     else if(!get_input(command, density)) {
         SP_E("A valid density is required.\n");
         return;
@@ -789,7 +812,8 @@ void new_bilinearperic(unique_ptr<Material>& return_obj, istringstream& command)
     }
 
     auto density = 0.;
-    if(command.eof()) suanpan_debug("new_bilinearperic() assumes zero density.\n");
+    if(command.eof())
+        SP_D("Zero density assumed.\n");
     else if(!get_input(command, density)) {
         SP_E("A valid density is required.\n");
         return;
@@ -818,7 +842,8 @@ void new_blatzko(unique_ptr<Material>& return_obj, istringstream& command) {
     }
 
     auto density = 0.;
-    if(command.eof()) suanpan_debug("new_blatzko() assumes zero density.\n");
+    if(command.eof())
+        SP_D("Zero density assumed.\n");
     else if(!get_input(command, density)) {
         SP_E("A valid density is required.\n");
         return;
@@ -987,7 +1012,8 @@ void new_concretecm(unique_ptr<Material>& return_obj, istringstream& command) {
     }
 
     auto density = 0.;
-    if(command.eof()) suanpan_debug("new_concretecm() assumes zero density.\n");
+    if(command.eof())
+        SP_D("Zero density assumed.\n");
     else if(!get_input(command, density)) {
         SP_E("A valid density is required.\n");
         return;
@@ -1026,7 +1052,8 @@ void new_concreteexp(unique_ptr<Material>& return_obj, istringstream& command) {
     }
 
     auto density = 0.;
-    if(command.eof()) suanpan_debug("new_concreteexp() assumes zero density.\n");
+    if(command.eof())
+        SP_D("Zero density assumed.\n");
     else if(!get_input(command, density)) {
         SP_E("A valid density is required.\n");
         return;
@@ -1066,7 +1093,8 @@ void new_concretetable(unique_ptr<Material>& return_obj, istringstream& command)
     }
 
     auto density = 0.;
-    if(command.eof()) suanpan_debug("new_concretetable() assumes zero density.\n");
+    if(command.eof())
+        SP_D("Zero density assumed.\n");
     else if(!get_input(command, density)) {
         SP_E("A valid density is required.\n");
         return;
@@ -1150,7 +1178,8 @@ void new_sinh1d(unique_ptr<Material>& return_obj, istringstream& command) {
     }
 
     auto density = 0.;
-    if(command.eof()) suanpan_debug("new_sinh1d() assumes zero density.\n");
+    if(command.eof())
+        SP_D("Zero density assumed.\n");
     else if(!get_input(command, density)) {
         SP_E("A valid density is required.\n");
         return;
@@ -1173,7 +1202,8 @@ void new_tanh1d(unique_ptr<Material>& return_obj, istringstream& command) {
     }
 
     auto density = 0.;
-    if(command.eof()) suanpan_debug("new_tanh1d() assumes zero density.\n");
+    if(command.eof())
+        SP_D("Zero density assumed.\n");
     else if(!get_input(command, density)) {
         SP_E("A valid density is required.\n");
         return;
@@ -1196,7 +1226,8 @@ void new_elastic1d(unique_ptr<Material>& return_obj, istringstream& command) {
     }
 
     auto density = 0.;
-    if(command.eof()) suanpan_debug("new_elastic1d() assumes zero density.\n");
+    if(command.eof())
+        SP_D("Zero density assumed.\n");
     else if(!get_input(command, density)) {
         SP_E("A valid density is required.\n");
         return;
@@ -1225,14 +1256,16 @@ void new_elastic2d(unique_ptr<Material>& return_obj, istringstream& command) {
     }
 
     auto density = 0.;
-    if(command.eof()) suanpan_debug("new_elastic2d() assumes zero density.\n");
+    if(command.eof())
+        SP_D("Zero density assumed.\n");
     else if(!get_input(command, density)) {
         SP_E("A valid density is required.\n");
         return;
     }
 
     auto material_type = 0;
-    if(command.eof()) suanpan_debug("new_elastic2d() assumes plane stress.\n");
+    if(command.eof())
+        SP_D("Plane stress assumed.\n");
     else if(!get_input(command, material_type)) {
         SP_E("A valid material type is required.\n");
         return;
@@ -1413,7 +1446,8 @@ void new_exphoffman(unique_ptr<Material>& return_obj, istringstream& command) {
     }
 
     auto density = 0.;
-    if(command.eof()) suanpan_debug("new_linearhoffman() assumes zero density.\n");
+    if(command.eof())
+        SP_D("Zero density assumed.\n");
     else if(!get_input(command, density)) {
         SP_E("A valid density is required.\n");
         return;
@@ -1538,14 +1572,16 @@ void new_flag01(unique_ptr<Material>& return_obj, istringstream& command) {
     }
 
     auto hardening_ratio = 0.;
-    if(command.eof()) suanpan_debug("new_flag() assumes zero hardening ratio.\n");
+    if(command.eof())
+        SP_D("Zero hardening ratio assumed.\n");
     else if(!get_input(command, hardening_ratio)) {
         SP_E("A valid hardening ratio is required.\n");
         return;
     }
 
     auto density = 0.;
-    if(command.eof()) suanpan_debug("new_bilinear1d() assumes zero density.\n");
+    if(command.eof())
+        SP_D("Zero density assumed.\n");
     else if(!get_input(command, density)) {
         SP_E("A valid density is required.\n");
         return;
@@ -1604,7 +1640,8 @@ void new_flag02(unique_ptr<Material>& return_obj, istringstream& command) {
     }
 
     auto density = 0.;
-    if(command.eof()) suanpan_debug("new_bilinear1d() assumes zero density.\n");
+    if(command.eof())
+        SP_D("Zero density assumed.\n");
     else if(!get_input(command, density)) {
         SP_E("A valid density is required.\n");
         return;
@@ -1689,7 +1726,8 @@ void new_isotropicelastic3d(unique_ptr<Material>& return_obj, istringstream& com
     }
 
     auto density = 0.;
-    if(command.eof()) suanpan_debug("new_elastic3d() assumes zero density.\n");
+    if(command.eof())
+        SP_D("Zero density assumed.\n");
     else if(!get_input(command, density)) {
         SP_E("A valid density is required.\n");
         return;
@@ -1779,7 +1817,7 @@ void new_maxwell(unique_ptr<Material>& return_obj, istringstream& command) {
 
     auto beta = .5;
     if(!command.eof() && !get_input(command, beta)) {
-        suanpan_debug("new_maxwell() needs a valid beta value.\n");
+        SP_E("A valid beta value is required.\n");
         return;
     }
 
@@ -1812,7 +1850,8 @@ void new_mooneyrivlin(unique_ptr<Material>& return_obj, istringstream& command) 
     }
 
     auto density = 0.;
-    if(command.eof()) suanpan_debug("new_mooneyrivlin() assumes zero density.\n");
+    if(command.eof())
+        SP_D("Zero density assumed.\n");
     else if(!get_input(command, density)) {
         SP_E("A valid density is required.\n");
         return;
@@ -2083,7 +2122,8 @@ void new_nle3d01(unique_ptr<Material>& return_obj, istringstream& command) {
     }
 
     auto density = 0.;
-    if(command.eof()) suanpan_debug("new_nle3d01() assumes zero density.\n");
+    if(command.eof())
+        SP_D("Zero density assumed.\n");
     else if(!get_input(command, density)) {
         SP_E("A valid density is required.\n");
         return;
@@ -2112,7 +2152,8 @@ void new_orthotropicelastic3d(unique_ptr<Material>& return_obj, istringstream& c
     }
 
     auto density = 0.;
-    if(command.eof()) suanpan_debug("new_orthotropicelastic3d() assumes zero density.\n");
+    if(command.eof())
+        SP_D("Zero density assumed.\n");
     else if(!get_input(command, density)) {
         SP_E("A valid density is required.\n");
         return;

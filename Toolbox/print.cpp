@@ -16,29 +16,7 @@
  ******************************************************************************/
 
 #include "print.h"
-#include <cstdarg>
 #include <suanPan.h>
-#ifdef SUANPAN_WIN
-#include <Windows.h>
-#endif
-
-#ifdef SUANPAN_MSVC
-#pragma warning(disable : 4100)
-#endif
-
-#ifdef SUANPAN_WIN
-void suanpan_print_header(const char* header, const unsigned short color) {
-    const auto handle = GetStdHandle(STD_OUTPUT_HANDLE);
-    CONSOLE_SCREEN_BUFFER_INFO info;
-    GetConsoleScreenBufferInfo(handle, &info);
-    const auto current_attribute = info.wAttributes;
-    SetConsoleTextAttribute(handle, FOREGROUND_INTENSITY | color);
-    SUANPAN_SYNC_COUT << header << ": ";
-    SetConsoleTextAttribute(handle, current_attribute);
-}
-#else
-void suanpan_print_header(const char* header, const char* color) { SUANPAN_SYNC_COUT << color << header << ": " << FOREGROUND_GREEN; }
-#endif
 
 namespace suanpan {
     std::mutex print_mutex;
@@ -58,28 +36,4 @@ void suanpan_info(const char* M, ...) {
 
     const std::scoped_lock lock(suanpan::print_mutex);
     SUANPAN_SYNC_COUT << vec.data();
-}
-
-// empty function call will automatically be optimized out
-void suanpan_debug(const char* M, ...) {
-#ifdef SUANPAN_DEBUG
-    va_list list;
-    va_start(list, M);
-    const size_t len = std::vsnprintf(nullptr, 0, M, list);
-    va_end(list);
-    std::vector<char> vec(len + 1);
-    va_start(list, M);
-    std::vsnprintf(vec.data(), len + 1, M, list);
-    va_end(list);
-
-    const std::scoped_lock lock(suanpan::print_mutex);
-    suanpan_print_header("debug", FOREGROUND_CYAN);
-    SUANPAN_SYNC_COUT << vec.data();
-#endif
-}
-
-void suanpan_debug(const std::function<void()>& F) {
-#ifdef SUANPAN_DEBUG
-    F();
-#endif
 }

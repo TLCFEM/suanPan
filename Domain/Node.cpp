@@ -22,13 +22,12 @@
 #include <Toolbox/utility.h>
 
 Node::Node(const unsigned T)
-    : Tag(T) { suanpan_debug("Node %u ctor() called.\n", T); }
+    : Tag(T) {}
 
 Node::Node(const unsigned T, vec&& C)
     : Tag(T) {
     num_dof = static_cast<unsigned>(C.n_elem);
     coordinate = std::forward<vec>(C);
-    suanpan_debug("Node %u ctor() called.\n", T);
 }
 
 /**
@@ -40,7 +39,6 @@ Node::Node(const unsigned T, const unsigned D)
     : Tag(T) {
     num_dof = D;
     coordinate.zeros(D);
-    suanpan_debug("Node %u ctor() called.\n", T);
 }
 
 /**
@@ -53,13 +51,8 @@ Node::Node(const unsigned T, const unsigned D, vec&& C)
     : Tag(T) {
     num_dof = D;
     coordinate = std::forward<vec>(C);
-    suanpan_debug("Node %u ctor() called.\n", T);
 }
 
-/**
- * \brief default destructor.
- */
-Node::~Node() { suanpan_debug("Node %u dtor() called.\n", get_tag()); }
 
 /**
  * \brief This method should be called after Element objects are set. Element
@@ -92,7 +85,7 @@ void Node::initialize(const shared_ptr<DomainBase>& D) {
         trial_acceleration.resize(num_dof);
     }
     else {
-        suanpan_debug("Node %u is not used in the problem, now disable it.\n", get_tag());
+        SP_D("Node {} disabled as it is not used.\n", get_tag());
         D->disable_node(get_tag());
     }
 

@@ -40,9 +40,7 @@ Recorder::Recorder(const unsigned T, uvec&& B, const OutputType L, const unsigne
     , data_pool(object_tag.n_elem)
     , record_time(R)
     , use_hdf5(H)
-    , interval(I) { suanpan_debug("Recorder %u ctor() called.\n", T); }
-
-Recorder::~Recorder() { suanpan_debug("Recorder %u dtor() called.\n", get_tag()); }
+    , interval(I) {}
 
 void Recorder::initialize(const shared_ptr<DomainBase>&) {}
 

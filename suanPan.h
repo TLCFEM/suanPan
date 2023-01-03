@@ -205,6 +205,12 @@ namespace suanpan {
     extern std::mutex print_mutex;
 }
 
+inline void suanpan_debug(const std::function<void()>& F) {
+#ifdef SUANPAN_DEBUG
+    F();
+#endif
+}
+
 inline std::string suanpan_pattern(const std::string_view header, const std::source_location& loc, const std::string_view& format) {
     std::string pattern{header};
     pattern += fs::path(loc.file_name()).filename().string();

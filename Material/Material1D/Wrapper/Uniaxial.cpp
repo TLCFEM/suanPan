@@ -79,7 +79,7 @@ int Uniaxial::update_trial_status(const vec& t_strain) {
             if(base->update_trial_status(trial_full_strain) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
             trial_full_strain(F2) -= solve(t_stiffness(F2, F2), t_stress(F2));
             const auto error = norm(t_stress(F2));
-            suanpan_debug("Uniaxial state determination error: %.4E.\n", error);
+            SP_D("Local iteration error: {:.5E}.\n", error);
             if(error <= tolerance) break;
         }
 

@@ -23,18 +23,21 @@
 #include <Solver/Solver.h>
 
 void Step::configure_storage_scheme() const {
-    if(sparse_mat) factory->set_storage_scheme(symm_mat ? StorageScheme::SPARSESYMM : StorageScheme::SPARSE);
-    else if(symm_mat && band_mat) factory->set_storage_scheme(StorageScheme::BANDSYMM);
-    else if(!symm_mat && band_mat) factory->set_storage_scheme(StorageScheme::BAND);
-    else if(symm_mat && !band_mat) factory->set_storage_scheme(StorageScheme::SYMMPACK);
-    else if(!symm_mat && !band_mat) factory->set_storage_scheme(StorageScheme::FULL);
+    if(sparse_mat)
+        factory->set_storage_scheme(symm_mat ? StorageScheme::SPARSESYMM : StorageScheme::SPARSE);
+    else if(symm_mat && band_mat)
+        factory->set_storage_scheme(StorageScheme::BANDSYMM);
+    else if(!symm_mat && band_mat)
+        factory->set_storage_scheme(StorageScheme::BAND);
+    else if(symm_mat && !band_mat)
+        factory->set_storage_scheme(StorageScheme::SYMMPACK);
+    else if(!symm_mat && !band_mat)
+        factory->set_storage_scheme(StorageScheme::FULL);
 }
 
 Step::Step(const unsigned T, const double P)
     : Tag(T)
-    , time_period(P) { suanpan_debug("Step %u ctor() called.\n", T); }
-
-Step::~Step() { suanpan_debug("Step %u dtor() called.\n", get_tag()); }
+    , time_period(P) {}
 
 int Step::initialize() {
     const auto& t_domain = database.lock();

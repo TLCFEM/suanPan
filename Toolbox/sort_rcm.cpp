@@ -18,10 +18,8 @@
 #include "sort_rcm.h"
 
 uvec sort_rcm(const std::vector<uvec>& A, const uvec& E) {
-#ifdef SUANPAN_DEBUG
     wall_clock TM;
     TM.tic();
-#endif
 
     const auto S = E.n_elem;
 
@@ -37,12 +35,11 @@ uvec sort_rcm(const std::vector<uvec>& A, const uvec& E) {
             if(IDXA == S) break;
             M[R(IDXC--) = G(IDXA++)] = true;
         }
-        for(const auto& IDX : A[R(IDXB--)]) if(!M[IDX]) M[R(IDXC--) = IDX] = true;
+        for(const auto& IDX : A[R(IDXB--)])
+            if(!M[IDX]) M[R(IDXC--) = IDX] = true;
     }
 
-#ifdef SUANPAN_DEBUG
-    suanpan_debug("RCM algorithm takes %.5E seconds.\n", TM.toc());
-#endif
+    SP_D("RCM algorithm takes {:.5E} seconds.\n", TM.toc());
 
     return R;
 }

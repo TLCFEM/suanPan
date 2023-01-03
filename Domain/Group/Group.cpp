@@ -18,13 +18,11 @@
 #include "Group.h"
 
 Group::Group(const unsigned T)
-    : Tag(T) { suanpan_debug("Group %u ctor() called.\n", get_tag()); }
+    : Tag(T) {}
 
 Group::Group(const unsigned T, uvec&& R)
     : Tag(T)
-    , pool(std::forward<uvec>(R)) { suanpan_debug("Group %u ctor() called.\n", get_tag()); }
-
-Group::~Group() { suanpan_debug("Group %u dtor() called.\n", get_tag()); }
+    , pool(std::forward<uvec>(R)) {}
 
 void Group::initialize(const shared_ptr<DomainBase>&) {}
 

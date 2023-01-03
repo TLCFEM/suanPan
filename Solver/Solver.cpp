@@ -22,9 +22,7 @@
 #include <Step/Step.h>
 
 Solver::Solver(const unsigned T)
-    : Tag(T) { suanpan_debug("Solver %u ctor() called.\n", get_tag()); }
-
-Solver::~Solver() { suanpan_debug("Solver %u dtor() called.\n", get_tag()); }
+    : Tag(T) {}
 
 int Solver::initialize() {
     if(nullptr == converger) {

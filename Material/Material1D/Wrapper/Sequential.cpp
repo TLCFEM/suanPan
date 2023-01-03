@@ -82,7 +82,7 @@ int Sequential::update_trial_status(const vec& t_strain) {
         for(size_t I = 0; I < mat_pool.size(); ++I) mat_pool[I]->update_trial_status(mat_pool[I]->get_trial_strain() + i_strain[I]);
 
         const auto error = norm(i_strain);
-        suanpan_debug("Sequential local iteration error: %.4E.\n", error);
+        SP_D("Local iteration error: {:.5E}.\n", error);
         if(error <= tolerance) break;
     }
 

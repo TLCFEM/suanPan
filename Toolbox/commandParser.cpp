@@ -1351,133 +1351,133 @@ int print_info(const shared_ptr<DomainBase>& domain, istringstream& command) {
 int run_example() {
     const auto new_model = make_shared<Bead>();
 
-    suanpan_info("====================================================\n");
-    suanpan_info("-> A Minimum Example: Elastic Truss Under Tension <-\n");
-    suanpan_info("====================================================\n");
+    sp_info("====================================================\n");
+    sp_info("-> A Minimum Example: Elastic Truss Under Tension <-\n");
+    sp_info("====================================================\n");
 
     constexpr auto wait_time = 1000;
 
     auto run_command = [&](const string& command_string) {
-        suanpan_info("\t%s\n", command_string.c_str());
+        sp_info("\t{}\n", command_string);
         auto command = istringstream(command_string);
         process_command(new_model, command);
         std::this_thread::sleep_for(std::chrono::milliseconds(wait_time));
     };
 
     // node
-    suanpan_info("--> create two nodes at (0,0) and (2,0):\n");
+    sp_info("--> create two nodes at (0,0) and (2,0):\n");
     run_command("node 1 0 0");
     run_command("node 2 2 0");
 
     // material
-    suanpan_info("--> create material model (elastic modulus 52):\n");
+    sp_info("--> create material model (elastic modulus 52):\n");
     run_command("material Elastic1D 1 52");
 
     // element
-    suanpan_info("--> create a truss element connecting nodes 1 and 2:\n");
+    sp_info("--> create a truss element connecting nodes 1 and 2:\n");
     run_command("element T2D2 1 1 2 1 93");
 
     // boundary condition and load
-    suanpan_info("--> define boundary condition and load:\n");
+    sp_info("--> define boundary condition and load:\n");
     run_command("fix 1 1 1");
     run_command("fix 2 2 1 2");
     run_command("displacement 1 0 1.4 1 2");
 
     // step
-    suanpan_info("--> define a static step:\n");
+    sp_info("--> define a static step:\n");
     run_command("step static 1");
 
     // analyze
-    suanpan_info("--> perform the analysis:\n");
+    sp_info("--> perform the analysis:\n");
     run_command("analyze");
 
     // analyze
-    suanpan_info("--> check nodal force (P=UEA/L=1.4*52*93/2=3385.2):\n");
+    sp_info("--> check nodal force (P=UEA/L=1.4*52*93/2=3385.2):\n");
     run_command("peek node 2");
 
     // clean up
-    suanpan_info("--> clean up and it's your turn!\n");
+    sp_info("--> clean up and it's your turn!\n");
 
-    suanpan_info("====================================================\n");
+    sp_info("====================================================\n");
     return SUANPAN_SUCCESS;
 }
 
 int print_command() {
-    suanpan_info("The available commands are listed. Please check online manual for reference. https://tlcfem.gitbook.io/suanpan-manual/\n");
+    sp_info("The available commands are listed. Please check online manual for reference. https://tlcfem.gitbook.io/suanpan-manual/\n");
 
-    constexpr auto format = "    %-30s  %s\n";
-    suanpan_info(format, "acceleration", "define acceleration");
-    suanpan_info(format, "amplitude", "define amplitude");
-    suanpan_info(format, "analyze/analyse", "analyse the model");
-    suanpan_info(format, "benchmark", "benchmark the platform for comparison");
-    suanpan_info(format, "clear", "clear model");
-    suanpan_info(format, "cload", "define concentrated load");
-    suanpan_info(format, "command", "list all commands");
-    suanpan_info(format, "converger", "define converger");
-    suanpan_info(format, "criterion", "define stopping criterion");
-    suanpan_info(format, "delete/erase/remove", "delete objects");
-    suanpan_info(format, "disable/mute", "disable objects");
-    suanpan_info(format, "disp/displacement/dispload", "define displacement load");
-    suanpan_info(format, "domain", "create/switch to domains");
-    suanpan_info(format, "element", "define element");
-    suanpan_info(format, "elementgroup", "define group containing element tags");
-    suanpan_info(format, "enable", "enable objects");
-    suanpan_info(format, "example", "establish adn execute a minimum example");
-    suanpan_info(format, "exit/quit", "exit program");
-    suanpan_info(format, "file", "load external files");
-    suanpan_info(format, "finiterigidwall", "define rigid wall constraint with finite dimensions");
-    suanpan_info(format, "fix/penaltybc", "define boundary conditions by penalty method");
-    suanpan_info(format, "fix2/multiplierbc", "define boundary conditions by multiplier method");
-    suanpan_info(format, "fullname", "print the full path of the program");
-    suanpan_info(format, "generate", "generate node or element group by fixed interval");
-    suanpan_info(format, "generatebyplane", "generate node or element group by plane");
-    suanpan_info(format, "generatebypoint", "generate node or element group by line segment");
-    suanpan_info(format, "generatebyrule", "generate node or element group by polynomial");
-    suanpan_info(format, "groupcload", "define concentrated load based on given group");
-    suanpan_info(format, "groupdisp", "define displacement load based on given group");
-    suanpan_info(format, "groupmultiplierbc", "define boundary conditions by multiplier method based on given group");
-    suanpan_info(format, "grouppenaltybc", "define boundary conditions by penalty method based on given group");
-    suanpan_info(format, "hdf5recorder", "define recorder using hdf5 format");
-    suanpan_info(format, "help", "print help information");
-    suanpan_info(format, "import", "import external module");
-    suanpan_info(format, "initial", "define initial condition");
-    suanpan_info(format, "integrator", "define time integration algorithm");
-    suanpan_info(format, "list", "list objects in the current domain");
-    suanpan_info(format, "mass", "define point mass");
-    suanpan_info(format, "material", "define material");
-    suanpan_info(format, "materialtest1d", "test independent material modal using displacement input");
-    suanpan_info(format, "materialtest2d", "test independent material modal using displacement input");
-    suanpan_info(format, "materialtest3d", "test independent material modal using displacement input");
-    suanpan_info(format, "materialtestbyload1d", "test independent material modal using force input");
-    suanpan_info(format, "materialtestbyload2d", "test independent material modal using force input");
-    suanpan_info(format, "materialtestbyload3d", "test independent material modal using force input");
-    suanpan_info(format, "materialtestbyloadwithbase3d", "test independent material modal using force input");
-    suanpan_info(format, "materialtestwithbase3d", "test independent material modal using displacement input");
-    suanpan_info(format, "modifier", "define modifier that modifies existing modal properties");
-    suanpan_info(format, "mpc", "define multi-point constraint");
-    suanpan_info(format, "node", "define node");
-    suanpan_info(format, "nodegroup", "define group containing node tags");
-    suanpan_info(format, "orientation", "define beam section orientation");
-    suanpan_info(format, "particlecollision", "define collision constraint between particles");
-    suanpan_info(format, "peek", "peek current information of target object");
-    suanpan_info(format, "plainrecorder", "define recorder using plain text format");
-    suanpan_info(format, "plot", "plot and optionally save model");
-    suanpan_info(format, "precheck", "check the model without analyse");
-    suanpan_info(format, "protect", "protect objects from being disabled");
-    suanpan_info(format, "pwd", "print/change current working folder");
-    suanpan_info(format, "qrcode", "print a qr code");
-    suanpan_info(format, "recorder", "define recorder");
-    suanpan_info(format, "reset", "reset model to the previously converged state");
-    suanpan_info(format, "rigidwall", "define rigid wall constraint with infinite dimensions");
-    suanpan_info(format, "save", "save objects");
-    suanpan_info(format, "section", "define section");
-    suanpan_info(format, "set", "set properties of analysis");
-    suanpan_info(format, "solver", "define solver");
-    suanpan_info(format, "step", "define step");
-    suanpan_info(format, "summary", "print summary for the current domain");
-    suanpan_info(format, "suspend", "suspend object in current step");
-    suanpan_info(format, "terminal", "execute command in terminal");
-    suanpan_info(format, "version", "print version information");
+    constexpr auto format = "    {:<30}  {}\n";
+    sp_info(format, "acceleration", "define acceleration");
+    sp_info(format, "amplitude", "define amplitude");
+    sp_info(format, "analyze/analyse", "analyse the model");
+    sp_info(format, "benchmark", "benchmark the platform for comparison");
+    sp_info(format, "clear", "clear model");
+    sp_info(format, "cload", "define concentrated load");
+    sp_info(format, "command", "list all commands");
+    sp_info(format, "converger", "define converger");
+    sp_info(format, "criterion", "define stopping criterion");
+    sp_info(format, "delete/erase/remove", "delete objects");
+    sp_info(format, "disable/mute", "disable objects");
+    sp_info(format, "disp/displacement/dispload", "define displacement load");
+    sp_info(format, "domain", "create/switch to domains");
+    sp_info(format, "element", "define element");
+    sp_info(format, "elementgroup", "define group containing element tags");
+    sp_info(format, "enable", "enable objects");
+    sp_info(format, "example", "establish adn execute a minimum example");
+    sp_info(format, "exit/quit", "exit program");
+    sp_info(format, "file", "load external files");
+    sp_info(format, "finiterigidwall", "define rigid wall constraint with finite dimensions");
+    sp_info(format, "fix/penaltybc", "define boundary conditions by penalty method");
+    sp_info(format, "fix2/multiplierbc", "define boundary conditions by multiplier method");
+    sp_info(format, "fullname", "print the full path of the program");
+    sp_info(format, "generate", "generate node or element group by fixed interval");
+    sp_info(format, "generatebyplane", "generate node or element group by plane");
+    sp_info(format, "generatebypoint", "generate node or element group by line segment");
+    sp_info(format, "generatebyrule", "generate node or element group by polynomial");
+    sp_info(format, "groupcload", "define concentrated load based on given group");
+    sp_info(format, "groupdisp", "define displacement load based on given group");
+    sp_info(format, "groupmultiplierbc", "define boundary conditions by multiplier method based on given group");
+    sp_info(format, "grouppenaltybc", "define boundary conditions by penalty method based on given group");
+    sp_info(format, "hdf5recorder", "define recorder using hdf5 format");
+    sp_info(format, "help", "print help information");
+    sp_info(format, "import", "import external module");
+    sp_info(format, "initial", "define initial condition");
+    sp_info(format, "integrator", "define time integration algorithm");
+    sp_info(format, "list", "list objects in the current domain");
+    sp_info(format, "mass", "define point mass");
+    sp_info(format, "material", "define material");
+    sp_info(format, "materialtest1d", "test independent material modal using displacement input");
+    sp_info(format, "materialtest2d", "test independent material modal using displacement input");
+    sp_info(format, "materialtest3d", "test independent material modal using displacement input");
+    sp_info(format, "materialtestbyload1d", "test independent material modal using force input");
+    sp_info(format, "materialtestbyload2d", "test independent material modal using force input");
+    sp_info(format, "materialtestbyload3d", "test independent material modal using force input");
+    sp_info(format, "materialtestbyloadwithbase3d", "test independent material modal using force input");
+    sp_info(format, "materialtestwithbase3d", "test independent material modal using displacement input");
+    sp_info(format, "modifier", "define modifier that modifies existing modal properties");
+    sp_info(format, "mpc", "define multi-point constraint");
+    sp_info(format, "node", "define node");
+    sp_info(format, "nodegroup", "define group containing node tags");
+    sp_info(format, "orientation", "define beam section orientation");
+    sp_info(format, "particlecollision", "define collision constraint between particles");
+    sp_info(format, "peek", "peek current information of target object");
+    sp_info(format, "plainrecorder", "define recorder using plain text format");
+    sp_info(format, "plot", "plot and optionally save model");
+    sp_info(format, "precheck", "check the model without analyse");
+    sp_info(format, "protect", "protect objects from being disabled");
+    sp_info(format, "pwd", "print/change current working folder");
+    sp_info(format, "qrcode", "print a qr code");
+    sp_info(format, "recorder", "define recorder");
+    sp_info(format, "reset", "reset model to the previously converged state");
+    sp_info(format, "rigidwall", "define rigid wall constraint with infinite dimensions");
+    sp_info(format, "save", "save objects");
+    sp_info(format, "section", "define section");
+    sp_info(format, "set", "set properties of analysis");
+    sp_info(format, "solver", "define solver");
+    sp_info(format, "step", "define step");
+    sp_info(format, "summary", "print summary for the current domain");
+    sp_info(format, "suspend", "suspend object in current step");
+    sp_info(format, "terminal", "execute command in terminal");
+    sp_info(format, "version", "print version information");
 
     return SUANPAN_SUCCESS;
 }

@@ -93,7 +93,7 @@ int SteelBRB::update_trial_status(const vec& t_strain) {
 
         const auto error = fabs(incre = -residual / jacobian);
 
-        suanpan_debug("SteelBRB local iteration error: %.5E.\n", error);
+        SP_D("Local iteration error: {:.5E}.\n", error);
 
         if(error <= tolerance) {
             trial_stiffness *= 1. - (pow_term + incre_strain(0) * elastic_modulus * exponent * pow_term / numerator) / jacobian;

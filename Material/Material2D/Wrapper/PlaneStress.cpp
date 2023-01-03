@@ -90,7 +90,7 @@ int PlaneStress::update_trial_status(const vec& t_strain) {
                 if(SUANPAN_SUCCESS != base->update_trial_status(trial_full_strain)) return SUANPAN_FAIL;
                 trial_full_strain(F2) -= solve(t_stiffness(F2, F2), t_stress(F2));
                 const auto error = norm(t_stress(F2));
-                suanpan_debug("PlaneStress local iteration error: %.4E.\n", error);
+                SP_D("Local iteration error: {:.5E}.\n", error);
                 if(error < tolerance) break;
             }
         else
@@ -98,7 +98,7 @@ int PlaneStress::update_trial_status(const vec& t_strain) {
                 if(SUANPAN_SUCCESS != base->update_trial_status(trial_full_strain)) return SUANPAN_FAIL;
                 trial_full_strain(F2) -= t_stress(F2) / vec(t_stiffness.diag())(F2);
                 const auto error = norm(t_stress(F2));
-                suanpan_debug("PlaneStress local iteration error: %.4E.\n", error);
+                SP_D("Local iteration error: {:.5E}.\n", error);
                 if(error < tolerance) break;
             }
 

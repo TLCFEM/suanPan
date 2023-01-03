@@ -46,13 +46,10 @@
 uvec sort_rcm(const std::vector<uvec>&, const uvec&);
 
 template<typename eT> uvec sort_rcm(const SpMat<eT>& MEAT) {
-#ifdef SUANPAN_DEBUG
-    //! Check if the matrix is square.
-    if(!MEAT.is_square()) throw logic_error("RCM() can only be applied to square matrix.\n");
+    suanpan_debug([&] {if(!MEAT.is_square()) throw logic_error("RCM() can only be applied to square matrix.\n"); });
 
     wall_clock TM;
     TM.tic();
-#endif
 
     //! Get the size of the square matrix.
     auto S = MEAT.n_cols;
@@ -111,12 +108,11 @@ template<typename eT> uvec sort_rcm(const SpMat<eT>& MEAT) {
         //! sorted, we can simply push in. When the loop is finished, move IDXB to
         //! next position, which may have another root or the children of current
         //! root.
-        for(const auto& IDX : A[R(IDXB--)]) if(!M[IDX]) M[R(IDXC--) = IDX] = true;
+        for(const auto& IDX : A[R(IDXB--)])
+            if(!M[IDX]) M[R(IDXC--) = IDX] = true;
     }
 
-#ifdef SUANPAN_DEBUG
-    suanpan_debug("RCM algorithm takes %.5E seconds.\n", TM.toc());
-#endif
+    SP_D("RCM algorithm takes {:.5E} seconds.\n", TM.toc());
 
     return R;
 }

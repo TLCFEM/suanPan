@@ -826,7 +826,7 @@ int Domain::assign_color() {
 
         suanpan::for_all(color_map, [&](std::vector<unsigned>& color) { std::ranges::transform(color, color.begin(), [&](const unsigned element) { return element_map[element]; }); });
 
-        suanpan_debug("The model is colored by %llu colors.\n", color_map.size());
+        SP_D("The model is colored by {} colors.\n", color_map.size());
     }
 
     // count how many entries in the sparse form and preallocate memory

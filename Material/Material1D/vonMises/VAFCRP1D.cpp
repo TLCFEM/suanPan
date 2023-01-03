@@ -81,11 +81,13 @@ int VAFCRP1D::update_trial_status(const vec& t_strain) {
 
         jacobian = -elastic_modulus - epsilon * mu * q / (*incre_time + mu * gamma);
 
-        if(xi > 0.) for(unsigned I = 0; I < size; ++I) jacobian += (b(I) * trial_history(I) - a(I)) * pow(1. + b(I) * gamma, -2.);
-        else for(unsigned I = 0; I < size; ++I) jacobian -= (b(I) * trial_history(I) + a(I)) * pow(1. + b(I) * gamma, -2.);
+        if(xi > 0.)
+            for(unsigned I = 0; I < size; ++I) jacobian += (b(I) * trial_history(I) - a(I)) * pow(1. + b(I) * gamma, -2.);
+        else
+            for(unsigned I = 0; I < size; ++I) jacobian -= (b(I) * trial_history(I) + a(I)) * pow(1. + b(I) * gamma, -2.);
 
         const auto incre = (q * exp_gamma - k) / ((jacobian *= exp_gamma) -= dk);
-        suanpan_debug("VAFCRP1D local iterative loop error: %.5E.\n", fabs(incre));
+        SP_D("Local iteration error: {:.5E}.\n", fabs(incre));
         if(fabs(incre) <= tolerance) break;
 
         gamma -= incre;

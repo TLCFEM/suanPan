@@ -168,7 +168,7 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
 
         auto error = norm(residual);
         if(1 == counter) ref_error = std::max(1., error);
-        suanpan_debug("NonlinearCDP local iteration error: %.5E.\n", error /= ref_error);
+        SP_D("Local iteration error: {:.5E}.\n", error /= ref_error);
         if(error <= tolerance || norm(incre) <= tolerance) break;
 
         lambda -= incre(0);

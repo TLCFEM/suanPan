@@ -60,7 +60,7 @@ public:
     Load& operator=(const Load&) = delete; // assign forbidden
     Load& operator=(Load&&) = delete;      // assign forbidden
 
-    ~Load() override;
+    ~Load() override = default;
 
     void enable_displacement_control() const;
     [[nodiscard]] bool if_displacement_control() const;

@@ -22,9 +22,7 @@
 
 Section::Section(const unsigned T, const SectionType ST, const unsigned MT, const double A, vec&& EC)
     : DataSection{MT, ST, A, 0., {-EC(0), EC(1)}, {}, {}, {}, {}, {}, {}, {}, {}, {}}
-    , Tag(T) { suanpan_debug("Section %u ctor() called.\n", T); }
-
-Section::~Section() { suanpan_debug("Section %u dtor() called.\n", get_tag()); }
+    , Tag(T) {}
 
 int Section::initialize_base(const shared_ptr<DomainBase>& D) {
     if(initialized) return SUANPAN_SUCCESS;

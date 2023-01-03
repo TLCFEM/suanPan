@@ -64,7 +64,7 @@ public:
     Constraint& operator=(const Constraint&) = delete; // assign forbidden
     Constraint& operator=(Constraint&&) = delete;      // assign forbidden
 
-    ~Constraint() override;
+    ~Constraint() override = default;
 
     const sp_vec& get_resistance() const;
     const sp_mat& get_stiffness() const;

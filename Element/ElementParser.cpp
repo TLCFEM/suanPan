@@ -43,7 +43,8 @@ void new_allman(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     auto thickness = 1.;
-    if(command.eof()) suanpan_debug("new_allman() assumes thickness to be unit.\n");
+    if(command.eof())
+        SP_D("Unit thickness assumed.\n");
     else if(!get_input(command, thickness))
         SP_E("A valid thickness is required.\n");
 
@@ -242,12 +243,14 @@ void new_c3d20(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     string reduced_scheme = "true";
-    if(command.eof()) suanpan_debug("new_c3d20() assumes standard Irons 14-point integration scheme.\n");
+    if(command.eof())
+        SP_D("Standard Irons 14-point integration scheme assumed.\n");
     else if(!get_input(command, reduced_scheme))
         SP_E("A valid reduced integration switch is required.\n");
 
     string nonlinear = "false";
-    if(command.eof()) suanpan_debug("new_c3d20() assumes linear geometry.\n");
+    if(command.eof())
+        SP_D("Linear geometry assumed.\n");
     else if(!get_input(command, nonlinear))
         SP_E("A valid nonlinear geometry switch is required.\n");
 
@@ -274,7 +277,8 @@ void new_c3d4(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     string nonlinear = "false";
-    if(command.eof()) suanpan_debug("new_c3d4() assumes linear geometry.\n");
+    if(command.eof())
+        SP_D("Linear geometry assumed.\n");
     else if(!get_input(command, nonlinear))
         SP_E("A valid nonlinear geometry switch is required.\n");
 
@@ -301,12 +305,14 @@ void new_c3d8(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     string reduced_scheme = "I";
-    if(command.eof()) suanpan_debug("new_c3d8() assumes standard integration scheme (2*2).\n");
+    if(command.eof())
+        SP_D("Standard 4-point integration scheme assumed.\n");
     else if(!get_input(command, reduced_scheme))
         SP_E("A valid reduced integration switch is required.\n");
 
     string nonlinear = "false";
-    if(command.eof()) suanpan_debug("new_c3d8() assumes linear geometry.\n");
+    if(command.eof())
+        SP_D("Linear geometry assumed.\n");
     else if(!get_input(command, nonlinear))
         SP_E("A valid nonlinear geometry switch is required.\n");
 
@@ -333,7 +339,8 @@ void new_c3d8r(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     string nonlinear = "false";
-    if(command.eof()) suanpan_debug("new_c3d8() assumes linear geometry.\n");
+    if(command.eof())
+        SP_D("Linear geometry assumed.\n");
     else if(!get_input(command, nonlinear))
         SP_E("A valid nonlinear geometry switch is required.\n");
 
@@ -382,7 +389,8 @@ void new_cax3(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     string nonlinear = "false";
-    if(command.eof()) suanpan_debug("new_cax3() assumes linear geometry.\n");
+    if(command.eof())
+        SP_D("Linear geometry assumed.\n");
     else if(!get_input(command, nonlinear))
         SP_E("A valid nonlinear geometry switch is required.\n");
 
@@ -511,7 +519,8 @@ void new_cp3(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     string nonlinear = "false";
-    if(command.eof()) suanpan_debug("new_cp3() assumes linear geometry.\n");
+    if(command.eof())
+        SP_D("Linear geometry assumed.\n");
     else if(!get_input(command, nonlinear))
         SP_E("A valid nonlinear geometry switch is required.\n");
 
@@ -544,14 +553,16 @@ void new_cp4(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     string reduced_scheme = "N";
-    if(command.eof()) suanpan_debug("new_cp4() assumes full integration.\n");
+    if(command.eof())
+        SP_D("Full integration assumed.\n");
     else if(!get_input(command, reduced_scheme)) {
         SP_E("A valid reduced scheme switch is required.\n");
         return;
     }
 
     string nonlinear = "N";
-    if(command.eof()) suanpan_debug("new_cp4() assumes linear geometry.\n");
+    if(command.eof())
+        SP_D("Linear geometry assumed.\n");
     else if(!get_input(command, nonlinear)) {
         SP_E("A valid nonlinear geometry switch is required.\n");
         return;
@@ -614,7 +625,8 @@ void new_cp4r(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     string nonlinear = "false";
-    if(command.eof()) suanpan_debug("new_cp4r() assumes linear geometry.\n");
+    if(command.eof())
+        SP_D("Linear geometry assumed.\n");
     else if(!get_input(command, nonlinear))
         SP_E("A valid nonlinear geometry switch is required.\n");
 
@@ -1360,7 +1372,8 @@ void new_eb21(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     string nonlinear = "false";
-    if(command.eof()) suanpan_debug("new_eb21() assumes linear geometry.\n");
+    if(command.eof())
+        SP_D("Linear geometry assumed.\n");
     else if(!get_input(command, nonlinear))
         SP_E("A valid nonlinear geometry switch is required.\n");
 
@@ -1393,7 +1406,8 @@ void new_f21(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     unsigned nonlinear = 0;
-    if(command.eof()) suanpan_debug("new_f21() assumes linear geometry.\n");
+    if(command.eof())
+        SP_D("Linear geometry assumed.\n");
     else if(!get_input(command, nonlinear))
         SP_E("A valid nonlinear geometry switch is required.\n");
 
@@ -1426,7 +1440,8 @@ void new_f21h(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     unsigned nonlinear = 0;
-    if(command.eof()) suanpan_debug("new_f21h() assumes linear geometry.\n");
+    if(command.eof())
+        SP_D("Linear geometry assumed.\n");
     else if(!get_input(command, nonlinear))
         SP_E("A valid nonlinear geometry switch is required.\n");
 
@@ -1493,7 +1508,8 @@ void new_gcmq(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     auto thickness = 1.;
-    if(command.eof()) suanpan_debug("new_gcmq() assumes thickness to be unit.\n");
+    if(command.eof())
+        SP_D("Unit thickness assumed.\n");
     else if(!get_input(command, thickness))
         SP_E("A valid thickness is required.\n");
 
@@ -1524,7 +1540,8 @@ void new_gcmqi(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     auto thickness = 1.;
-    if(command.eof()) suanpan_debug("new_gcmq() assumes thickness to be unit.\n");
+    if(command.eof())
+        SP_D("Unit thickness assumed.\n");
     else if(!get_input(command, thickness))
         SP_E("A valid thickness is required.\n");
 
@@ -1551,7 +1568,8 @@ void new_gcmql(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     auto thickness = 1.;
-    if(command.eof()) suanpan_debug("new_gcmq() assumes thickness to be unit.\n");
+    if(command.eof())
+        SP_D("Unit thickness assumed.\n");
     else if(!get_input(command, thickness))
         SP_E("A valid thickness is required.\n");
 
@@ -1578,7 +1596,8 @@ void new_gcmqg(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     auto thickness = 1.;
-    if(command.eof()) suanpan_debug("new_gcmq() assumes thickness to be unit.\n");
+    if(command.eof())
+        SP_D("Unit thickness assumed.\n");
     else if(!get_input(command, thickness))
         SP_E("A valid thickness is required.\n");
 
@@ -1605,7 +1624,8 @@ void new_sgcmqi(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     auto thickness = 1.;
-    if(command.eof()) suanpan_debug("new_sgcmqi() assumes thickness to be unit.\n");
+    if(command.eof())
+        SP_D("Unit thickness assumed.\n");
     else if(!get_input(command, thickness))
         SP_E("A valid thickness is required.\n");
 
@@ -1632,7 +1652,8 @@ void new_sgcmql(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     auto thickness = 1.;
-    if(command.eof()) suanpan_debug("new_sgcmql() assumes thickness to be unit.\n");
+    if(command.eof())
+        SP_D("Unit thickness assumed.\n");
     else if(!get_input(command, thickness))
         SP_E("A valid thickness is required.\n");
 
@@ -1659,7 +1680,8 @@ void new_sgcmqg(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     auto thickness = 1.;
-    if(command.eof()) suanpan_debug("new_sgcmqg() assumes thickness to be unit.\n");
+    if(command.eof())
+        SP_D("Unit thickness assumed.\n");
     else if(!get_input(command, thickness))
         SP_E("A valid thickness is required.\n");
 
@@ -1714,7 +1736,8 @@ void new_gq12(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     auto thickness = 1.;
-    if(command.eof()) suanpan_debug("new_gq12() assumes thickness to be unit.\n");
+    if(command.eof())
+        SP_D("Unit thickness assumed.\n");
     else if(!get_input(command, thickness))
         SP_E("A valid thickness is required.\n");
 
@@ -2005,7 +2028,8 @@ void new_ps(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     auto thickness = 1.;
-    if(command.eof()) suanpan_debug("new_ps() assumes thickness to be unit.\n");
+    if(command.eof())
+        SP_D("Unit thickness assumed.\n");
     else if(!get_input(command, thickness))
         SP_E("A valid thickness is required.\n");
 
@@ -2032,7 +2056,8 @@ void new_qe2(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     auto thickness = 1.;
-    if(command.eof()) suanpan_debug("new_qe2() assumes thickness to be unit.\n");
+    if(command.eof())
+        SP_D("Unit thickness assumed.\n");
     else if(!get_input(command, thickness))
         SP_E("A valid thickness is required.\n");
 
@@ -2182,15 +2207,18 @@ void new_t2d2(unique_ptr<Element>& return_obj, istringstream& command) {
 
     string nonlinear = "N", update_area = "N", log_strain = "N";
 
-    if(command.eof()) suanpan_debug("new_t2d2() assumes linear geometry.\n");
+    if(command.eof())
+        SP_D("Linear geometry assumed.\n");
     else if(!get_input(command, nonlinear))
         SP_E("A valid nonlinear geometry switch is required.\n");
 
-    if(command.eof()) suanpan_debug("new_t2d2() assumes constant area.\n");
+    if(command.eof())
+        SP_D("Constant area assumed.\n");
     else if(!get_input(command, update_area))
         SP_E("A valid area switch is required.\n");
 
-    if(command.eof()) suanpan_debug("new_t2d2() assumes engineering strain.\n");
+    if(command.eof())
+        SP_D("Engineering strain assumed.\n");
     else if(!get_input(command, log_strain))
         SP_E("A valid engineering strain switch is required.\n");
 
@@ -2218,11 +2246,13 @@ void new_t2d2s(unique_ptr<Element>& return_obj, istringstream& command) {
 
     string nonlinear = "N", log_strain = "N";
 
-    if(command.eof()) suanpan_debug("new_t2d2() assumes linear geometry.\n");
+    if(command.eof())
+        SP_D("Linear geometry assumed.\n");
     else if(!get_input(command, nonlinear))
         SP_E("A valid nonlinear geometry switch is required.\n");
 
-    if(command.eof()) suanpan_debug("new_t2d2() assumes engineering strain.\n");
+    if(command.eof())
+        SP_D("Engineering strain assumed.\n");
     else if(!get_input(command, log_strain))
         SP_E("A valid switch to indicate if to use engineering strain is required.\n");
 
@@ -2256,15 +2286,18 @@ void new_t3d2(unique_ptr<Element>& return_obj, istringstream& command) {
 
     string nonlinear = "N", update_area = "N", log_strain = "N";
 
-    if(command.eof()) suanpan_debug("new_t2d2() assumes linear geometry.\n");
+    if(command.eof())
+        SP_D("Linear geometry assumed.\n");
     else if(!get_input(command, nonlinear))
         SP_E("A valid nonlinear geometry switch is required.\n");
 
-    if(command.eof()) suanpan_debug("new_truss2d() assumes constant area.\n");
+    if(command.eof())
+        SP_D("Constant area assumed.\n");
     else if(!get_input(command, update_area))
         SP_E("A valid area switch is required.\n");
 
-    if(command.eof()) suanpan_debug("new_t3d2() assumes engineering strain.\n");
+    if(command.eof())
+        SP_D("Engineering strain assumed.\n");
     else if(!get_input(command, log_strain))
         SP_E("A valid engineering strain switch is required.\n");
 
@@ -2292,11 +2325,13 @@ void new_t3d2s(unique_ptr<Element>& return_obj, istringstream& command) {
 
     string nonlinear = "N", log_strain = "N";
 
-    if(command.eof()) suanpan_debug("new_t2d2() assumes linear geometry.\n");
+    if(command.eof())
+        SP_D("Linear geometry assumed.\n");
     else if(!get_input(command, nonlinear))
         SP_E("A valid nonlinear geometry switch is required.\n");
 
-    if(command.eof()) suanpan_debug("new_t2d2() assumes engineering strain.\n");
+    if(command.eof())
+        SP_D("Engineering strain assumed.\n");
     else if(!get_input(command, log_strain))
         SP_E("A valid switch to indicate if to use engineering strain is required.\n");
 
