@@ -58,4 +58,9 @@ int print_info(const shared_ptr<DomainBase>&, istringstream&);
 int print_command();
 int execute_command(istringstream&);
 
+template<typename... T> void highlight_command(const std::string_view format_str, const T&... args) {
+    const std::scoped_lock lock(suanpan::print_mutex);
+    SUANPAN_COUT << fmt::vformat(fg(fmt::color::pink), format_str, fmt::make_format_args(args...));
+}
+
 #endif
