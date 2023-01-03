@@ -139,4 +139,4 @@ int NonlinearDruckerPrager::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-void NonlinearDruckerPrager::print() { suanpan_info("A 3D nonlinear model using Drucker--Prager yielding criterion.\n"); }
+void NonlinearDruckerPrager::print() { sp_info("A 3D nonlinear model using Drucker-Prager yielding criterion.\n"); }

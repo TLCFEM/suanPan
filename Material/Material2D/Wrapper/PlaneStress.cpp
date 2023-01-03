@@ -152,7 +152,7 @@ int PlaneStress::reset_status() {
 vector<vec> PlaneStress::record(const OutputType P) { return base->record(P); }
 
 void PlaneStress::print() {
-    suanpan_info("A plane stress wrapper.\n");
+    sp_info("A plane stress wrapper.\n");
     current_strain.t().print("Strain:");
     current_stress.t().print("Stress:");
     if(base) base->print();

@@ -26,4 +26,4 @@ Box2D::Box2D(const unsigned T, vec&& D, const unsigned M, const unsigned S, cons
 
 unique_ptr<Section> Box2D::get_copy() { return make_unique<Box2D>(*this); }
 
-void Box2D::print() { suanpan_info("A Box section.\n"); }
+void Box2D::print() { sp_info("A 2D box section.\n"); }

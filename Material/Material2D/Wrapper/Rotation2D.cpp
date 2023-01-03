@@ -84,6 +84,6 @@ int Rotation2D::reset_status() {
 vector<vec> Rotation2D::record(const OutputType P) { return mat_obj->record(P); }
 
 void Rotation2D::print() {
-    suanpan_info("A Rotation wrapper with the underlying material.\n");
+    sp_info("A rotation wrapper with the underlying material.\n");
     if(nullptr != mat_obj) mat_obj->print();
 }

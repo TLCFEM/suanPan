@@ -100,7 +100,7 @@ int Concrete21::reset_status() {
 }
 
 void Concrete21::print() {
-    suanpan_info("A planar concrete model: \n");
+    sp_info("A planar concrete model.\n");
     current_strain.t().print("Strain:");
     current_stress.t().print("Stress:");
 }

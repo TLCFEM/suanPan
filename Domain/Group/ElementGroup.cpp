@@ -30,4 +30,4 @@ void ElementGroup::initialize(const shared_ptr<DomainBase>& D) {
     for(uword I = 0; I < pool.n_elem; ++I) pool(I) = e_pool[I]->get_tag();
 }
 
-void ElementGroup::print() { suanpan_info("An Element Group.\n"); }
+void ElementGroup::print() { sp_info("An element group.\n"); }

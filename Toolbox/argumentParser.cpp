@@ -144,25 +144,12 @@ void print_header() {
     sp_info("+--------------------------------------------------+\n");
     sp_info("|  https://gitter.im/suanPan-dev/community         |\n");
 #else
-    std::vector<const char8_t*> POOL;
-    POOL.reserve(10);
-    POOL.emplace_back(u8"\U0001F308");
-    POOL.emplace_back(u8"\U0001F30F");
-    POOL.emplace_back(u8"\U0001F3A7");
-    POOL.emplace_back(u8"\U0001F3B1");
-    POOL.emplace_back(u8"\U0001F479");
-    POOL.emplace_back(u8"\U0001F4BB");
-    POOL.emplace_back(u8"\U0001F50B");
-    POOL.emplace_back(u8"\U0001F514");
-    POOL.emplace_back(u8"\U0001F680");
-    POOL.emplace_back(u8"\U0001F9E9");
-    arma_rng::set_seed_random();
-    suanpan_info("|  %-5shttps://github.com/TLCFEM/suanPan            |\n", u8"\U0001F9EE");
-    suanpan_info("|  %-5shttps://github.com/TLCFEM/suanPan-manual     |\n", u8"\U0001F4DA");
-    suanpan_info("+--------------------------------------------------+\n");
-    suanpan_info("|  %-5shttps://gitter.im/suanPan-dev/community      |\n", POOL[randi() % POOL.size()]);
+    sp_info("|  \U0001F9EE https://github.com/TLCFEM/suanPan            |\n");
+    sp_info("|  \U0001F4DA https://github.com/TLCFEM/suanPan-manual     |\n");
+    sp_info("+--------------------------------------------------+\n");
+    sp_info("|  \U0001F30F https://gitter.im/suanPan-dev/community      |\n");
 #endif
-    suanpan_info("+--------------------------------------------------+\n\n");
+    sp_info("+--------------------------------------------------+\n\n");
 }
 
 void argument_parser(const int argc, char** argv) {
@@ -253,47 +240,47 @@ void argument_parser(const int argc, char** argv) {
         cli_mode(model);
     }
 
-    suanpan_info("\nTime Wasted: %.4F Seconds.\n", T.toc());
+    sp_info("\nTime Wasted: {:.4f} Seconds.\n", T.toc());
 }
 
 void print_version() {
-    suanpan_info("Copyright (C) 2017-2023 Theodore Chang\n\n");
-    suanpan_info("This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.\n\n");
-    suanpan_info("This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\n");
-    suanpan_info("You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.\n\n\n");
-    suanpan_info("suanPan is an open source FEM framework.\n");
-    suanpan_info("    The binary is compiled on %s.\n", __DATE__);
-    suanpan_info("    The source code of suanPan is hosted on GitHub. https://tlcfem.github.io/suanPan/\n");
-    suanpan_info("    The documentation is hosted on GitBook and readthedocs. https://tlcfem.gitbook.io/suanpan-manual/ and https://suanpan-manual.readthedocs.io/\n");
+    sp_info("Copyright (C) 2017-2023 Theodore Chang\n\n");
+    sp_info("This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.\n\n");
+    sp_info("This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\n");
+    sp_info("You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.\n\n\n");
+    sp_info("suanPan is an open source FEM framework.\n");
+    sp_info("    The binary is compiled on {}.\n", __DATE__);
+    sp_info("    The source code of suanPan is hosted on GitHub. https://tlcfem.github.io/suanPan/\n");
+    sp_info("    The documentation is hosted on GitBook and readthedocs. https://tlcfem.gitbook.io/suanpan-manual/ and https://suanpan-manual.readthedocs.io/\n");
 #ifdef SUANPAN_MKL
-    suanpan_info("    The linear algebra support is provided by Armadillo with Intel MKL. http://arma.sourceforge.net/\n");
+    sp_info("    The linear algebra support is provided by Armadillo with Intel MKL. http://arma.sourceforge.net/\n");
 #else
-    suanpan_info("    The linear algebra support is provided by Armadillo. http://arma.sourceforge.net/\n");
+    sp_info("    The linear algebra support is provided by Armadillo. http://arma.sourceforge.net/\n");
 #endif
 #ifdef SUANPAN_CUDA
-    suanpan_info("    The GPCPU solvers are provided by CUDA. https://developer.nvidia.com/about-cuda\n");
+    sp_info("    The GPCPU solvers are provided by CUDA. https://developer.nvidia.com/about-cuda\n");
 #endif
 #ifdef SUANPAN_MT
-    suanpan_info("    The parallelisation support is implemented via TBB library. https://github.com/oneapi-src/oneTBB\n");
+    sp_info("    The parallelisation support is implemented via TBB library. https://github.com/oneapi-src/oneTBB\n");
 #endif
 #ifdef SUANPAN_VTK
-    suanpan_info("    The visualisation support is implemented via VTK library. https://vtk.org/\n");
+    sp_info("    The visualisation support is implemented via VTK library. https://vtk.org/\n");
 #endif
-    suanpan_info("\nPlease join gitter for any feedback. https://gitter.im/suanPan-dev/community\n");
-    suanpan_info("\n\n[From Wikipedia] Betelgeuse is usually the tenth-brightest star in the night sky and, after Rigel, the second-brightest in the constellation of Orion. It is a distinctly reddish semiregular variable star whose apparent magnitude has the widest range displayed by any first-magnitude star.\n\n");
+    sp_info("\nPlease join gitter for any feedback. https://gitter.im/suanPan-dev/community\n");
+    sp_info("\n\n[From Wikipedia] Betelgeuse is usually the tenth-brightest star in the night sky and, after Rigel, the second-brightest in the constellation of Orion. It is a distinctly reddish semiregular variable star whose apparent magnitude has the widest range displayed by any first-magnitude star.\n\n");
 }
 
 void print_helper() {
-    suanpan_info("Available Parameters:\n");
-    suanpan_info("\t-%-10s  --%-20s%s\n", "v", "version", "check version information");
-    suanpan_info("\t-%-10s  --%-20s%s\n", "h", "help", "print this helper");
-    suanpan_info("\t-%-10s  --%-20s%s\n", "s", "strip", "strip comments out in given ABAQUS input file");
-    // suanpan_info("\t-%-10s  --%-20s%s\n", "c", "convert", "partially convert ABAQUS input file into suanPan model script");
-    suanpan_info("\t-%-10s  --%-20s%s\n", "np", "noprint", "suppress most console output");
-    suanpan_info("\t-%-10s  --%-20s%s\n", "nu", "noupdate", "do not check for newer version on startup");
-    suanpan_info("\t-%-10s  --%-20s%s\n", "f", "file", "process model file");
-    suanpan_info("\t-%-10s  --%-20s%s\n", "o", "output", "set output file for logging");
-    suanpan_info("\n");
+    sp_info("Available Parameters:\n");
+    sp_info("\t-{:<10}  --{:<20}{}\n", "v", "version", "check version information");
+    sp_info("\t-{:<10}  --{:<20}{}\n", "h", "help", "print this helper");
+    sp_info("\t-{:<10}  --{:<20}{}\n", "s", "strip", "strip comments out in given ABAQUS input file");
+    // sp_info("\t-{:<10}  --{:<20}{}\n", "c", "convert", "partially convert ABAQUS input file into suanPan model script");
+    sp_info("\t-{:<10}  --{:<20}{}\n", "np", "noprint", "suppress most console output");
+    sp_info("\t-{:<10}  --{:<20}{}\n", "nu", "noupdate", "do not check for newer version on startup");
+    sp_info("\t-{:<10}  --{:<20}{}\n", "f", "file", "process model file");
+    sp_info("\t-{:<10}  --{:<20}{}\n", "o", "output", "set output file for logging");
+    sp_info("\n");
 }
 
 void cli_mode(const shared_ptr<Bead>& model) {

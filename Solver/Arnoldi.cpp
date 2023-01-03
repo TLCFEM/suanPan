@@ -55,4 +55,4 @@ int Arnoldi::analyze() {
     return eig_solve(get_eigenvalue(W), get_eigenvector(W), W->get_stiffness(), t_mass, eigen_num, 'L' == eigen_type ? "LM" : "SM");
 }
 
-void Arnoldi::print() { suanpan_info("A solver using Arnoldi method.\n"); }
+void Arnoldi::print() { sp_info("A solver using Arnoldi method.\n"); }

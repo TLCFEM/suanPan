@@ -103,6 +103,6 @@ int RambergOsgood::reset_status() {
 }
 
 void RambergOsgood::print() {
-    suanpan_info("A Ramberg--Osgood material model.\n");
+    sp_info("A Ramberg-Osgood material model.\n");
     Material1D::print();
 }

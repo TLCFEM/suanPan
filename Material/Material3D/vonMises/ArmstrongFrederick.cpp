@@ -152,4 +152,4 @@ vector<vec> ArmstrongFrederick::record(const OutputType P) {
     return Material3D::record(P);
 }
 
-void ArmstrongFrederick::print() { suanpan_info("A 3D nonlinear hardening model using Armstrong--Frederick kinematic hardening rule.\n"); }
+void ArmstrongFrederick::print() { sp_info("A 3D nonlinear hardening model using Armstrong-Frederick kinematic hardening rule.\n"); }

@@ -139,6 +139,6 @@ vector<vec> VAFCRP1D::record(const OutputType P) {
 }
 
 void VAFCRP1D::print() {
-    suanpan_info("A uniaxial VAFCRP model.\n");
+    sp_info("A uniaxial VAFCRP material model.\n");
     Material1D::print();
 }

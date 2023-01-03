@@ -40,4 +40,4 @@ void ElementRecorder::record(const shared_ptr<DomainBase>& D) {
     if(if_record_time()) insert(D->get_factory()->get_current_time());
 }
 
-void ElementRecorder::print() { suanpan_info("An Element Recorder.\n"); }
+void ElementRecorder::print() { sp_info("An element recorder.\n"); }

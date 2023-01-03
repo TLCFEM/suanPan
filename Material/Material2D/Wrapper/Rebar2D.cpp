@@ -111,9 +111,13 @@ vector<vec> Rebar2D::record(const OutputType P) {
 }
 
 void Rebar2D::print() {
-    suanpan_info("A rebar layer with major/minor reinforcement ratio of %.3E and %.3E.\n", ratio_x, ratio_y);
-    suanpan_info("Major: ");
-    if(rebar_x) rebar_x->print();
-    suanpan_info("Minor: ");
-    if(rebar_y) rebar_y->print();
+    sp_info("A rebar layer with major/minor reinforcement ratio of {:.3E} and {:.3E}.\n", ratio_x, ratio_y);
+    if(rebar_x) {
+        sp_info("Major: ");
+        rebar_x->print();
+    }
+    if(rebar_y) {
+        sp_info("Minor: ");
+        rebar_y->print();
+    }
 }

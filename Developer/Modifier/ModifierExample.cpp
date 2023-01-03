@@ -26,18 +26,15 @@ SUANPAN_EXPORT void new_modifierexample(unique_ptr<Modifier>& return_obj, istrin
     }
 
     double a, b;
-    if(!get_input(command, a)) {
-        suanpan_info("new_modifierexample() needs two valid numbers.\n");
-        return;
-    }
-    if(!get_input(command, b)) {
-        suanpan_info("new_modifierexample() needs two valid numbers.\n");
+    if(!get_input(command, a, b)) {
+        SP_D("Two valid numbers are required.\n");
         return;
     }
 
     std::vector<uword> element_tag;
     unsigned e_tag;
-    while(!command.eof()) if(get_input(command, e_tag)) element_tag.emplace_back(e_tag);
+    while(!command.eof())
+        if(get_input(command, e_tag)) element_tag.emplace_back(e_tag);
 
     return_obj = make_unique<ModifierExample>(tag, a, b, element_tag);
 }

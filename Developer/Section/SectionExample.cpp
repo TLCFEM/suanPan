@@ -83,4 +83,4 @@ int SectionExample::reset_status() {
     return 0;
 }
 
-void SectionExample::print() { suanpan_info("This is an example section object represents the square elastic section.\n"); }
+void SectionExample::print() { sp_info("An example section that represents a square elastic section.\n"); }

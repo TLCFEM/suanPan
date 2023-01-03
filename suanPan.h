@@ -182,17 +182,6 @@ inline auto& SUANPAN_CERR = std::cerr;
 inline auto& SUANPAN_SYNC_COUT = SUANPAN_COUT;
 inline auto& SUANPAN_SYNC_CERR = SUANPAN_CERR;
 
-#ifdef SUANPAN_WIN
-#define FOREGROUND_CYAN (FOREGROUND_BLUE | FOREGROUND_GREEN)
-#define FOREGROUND_YELLOW (FOREGROUND_RED | FOREGROUND_GREEN)
-#else
-#define FOREGROUND_RED "\033[1;31m"
-#define FOREGROUND_GREEN "\033[1;32m"
-#define FOREGROUND_YELLOW "\033[1;33m"
-#define FOREGROUND_BLUE "\033[1;34m"
-#define FOREGROUND_CYAN "\033[1;36m"
-#endif
-
 #include <Toolbox/print.h>
 
 #include <filesystem>
@@ -244,7 +233,6 @@ template<typename... T> void sp_fatal(const std::source_location loc, const std:
     SUANPAN_COUT << fmt::vformat(fg(fmt::terminal_color::red), suanpan_pattern("[FATAL] ", loc, format_str), fmt::make_format_args(loc.line(), args...));
 }
 
-#define SP_I(...) sp_info(##__VA_ARGS__)
 #define SP_D(...) sp_debug(std::source_location::current(), ##__VA_ARGS__)
 #define SP_W(...) sp_warning(std::source_location::current(), ##__VA_ARGS__)
 #define SP_E(...) sp_error(std::source_location::current(), ##__VA_ARGS__)

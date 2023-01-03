@@ -217,6 +217,6 @@ int MaterialExample::reset_status() {
 }
 
 void MaterialExample::print() {
-    suanpan_info("A material example based on uniaxial J2 bilinear mixed hardening model.\n");
-    suanpan_info("Strain: %.5E\tStress: %.5E\n", current_strain.at(0), current_stress.at(0));
+    sp_info("A material example based on uniaxial J2 bilinear mixed hardening model.\n");
+    sp_info("Strain: {:.5E}\tStress: {:.5E}\n", current_strain.at(0), current_stress.at(0));
 }

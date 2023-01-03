@@ -39,4 +39,4 @@ void GroupNodeRecorder::initialize(const shared_ptr<DomainBase>& D) {
     NodeRecorder::initialize(D);
 }
 
-void GroupNodeRecorder::print() { suanpan_info("A Node Recorder based on groups.\n"); }
+void GroupNodeRecorder::print() { sp_info("A node recorder based on groups.\n"); }

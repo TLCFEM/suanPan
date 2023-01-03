@@ -50,4 +50,4 @@ vec ExpGurson::compute_hardening(const double plastic_strain) const {
 
 unique_ptr<Material> ExpGurson::get_copy() { return make_unique<ExpGurson>(*this); }
 
-void ExpGurson::print() { suanpan_info("The Gurson model.\n"); }
+void ExpGurson::print() { sp_info("A Gurson model.\n"); }

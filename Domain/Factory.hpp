@@ -1847,7 +1847,7 @@ template<sp_d T> void Factory<T>::assemble_stiffness(const SpMat<T>& EK, const u
     for(auto I = EK.begin(); I != EK.end(); ++I) global_stiffness->at(EI(I.row()), EI(I.col())) += *I;
 }
 
-template<sp_d T> void Factory<T>::print() const { suanpan_info("This is a Factory object with size of %u.\n", n_size); }
+template<sp_d T> void Factory<T>::print() const { sp_info("A Factory object with size of {}.\n", n_size); }
 
 #endif // FACTORY_HPP
 

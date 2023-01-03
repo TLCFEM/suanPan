@@ -131,4 +131,4 @@ vector<vec> NonlinearJ2::record(const OutputType P) {
     return Material3D::record(P);
 }
 
-void NonlinearJ2::print() { suanpan_info("A 3D nonlinear hardening model using von-Mises yielding criterion.\n"); }
+void NonlinearJ2::print() { sp_info("A 3D nonlinear hardening model using von-Mises yielding criterion.\n"); }

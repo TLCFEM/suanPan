@@ -42,7 +42,8 @@ SUANPAN_EXPORT void new_elementexample(unique_ptr<Element>& return_obj, std::ist
     }
 
     auto thickness = 1.;
-    if(command.eof()) suanpan_info("new_elementexample() assumes a unit thickness.\n");
+    if(command.eof())
+        SP_D("Unit thickness assumed.\n");
     else if(!get_input(command, thickness)) {
         SP_E("A valid thickness is required.\n");
         return;
@@ -100,6 +101,6 @@ int ElementExample::clear_status() { return m_material->clear_status(); }
 int ElementExample::reset_status() { return m_material->reset_status(); }
 
 void ElementExample::print() {
-    suanpan_info("This is an element example based on CP3 element using the following material model.\n");
+    sp_info("An element example based on CP3 element using the following material model.\n");
     if(m_material) m_material->print();
 }

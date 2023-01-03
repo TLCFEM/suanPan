@@ -81,6 +81,6 @@ int MultilinearElastic1D::reset_status() {
 }
 
 void MultilinearElastic1D::print() {
-    suanpan_info("A multilinear elastic material model.\n");
+    sp_info("A multilinear elastic material model.\n");
     Material1D::print();
 }

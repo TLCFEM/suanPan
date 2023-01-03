@@ -39,4 +39,4 @@ void GroupElementRecorder::initialize(const shared_ptr<DomainBase>& D) {
     ElementRecorder::initialize(D);
 }
 
-void GroupElementRecorder::print() { suanpan_info("An Element Recorder based on groups.\n"); }
+void GroupElementRecorder::print() { sp_info("An element recorder based on groups.\n"); }

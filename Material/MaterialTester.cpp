@@ -145,7 +145,7 @@ mat material_tester_by_load(const shared_ptr<Material>& obj, const std::vector<u
             while(true) {
                 const vec incre_strain = solve(obj->get_trial_stiffness(), total_load - obj->get_trial_stress());
                 const auto error = norm(incre_strain);
-                suanpan_info("local iteration error: %.5E.\n", error);
+                SP_D("Local iteration error: {:.5E}.\n", error);
                 if(error < 1E-12) break;
                 if(++counter == 10 || obj->update_trial_status(obj->get_trial_strain() + incre_strain) != SUANPAN_SUCCESS) {
                     info = SUANPAN_FAIL;
@@ -191,7 +191,7 @@ mat material_tester_by_load(const shared_ptr<Material>& obj, const std::vector<u
     while(true) {
         const vec incre_strain = solve(obj->get_trial_stiffness(), total_load - obj->get_trial_stress());
         const auto error = norm(incre_strain);
-        suanpan_info("local iteration error: %.5E.\n", error);
+        SP_D("Local iteration error: {:.5E}.\n", error);
         if(error < 1E-12) break;
         if(++counter == 10 || obj->update_trial_status(obj->get_trial_strain() + incre_strain) != SUANPAN_SUCCESS) {
             info = SUANPAN_FAIL;
@@ -210,7 +210,7 @@ mat material_tester_by_load(const shared_ptr<Material>& obj, const std::vector<u
                 while(true) {
                     const vec incre_strain = solve(obj->get_trial_stiffness(), total_load - obj->get_trial_stress());
                     const auto error = norm(incre_strain);
-                    suanpan_info("local iteration error: %.5E.\n", error);
+                    SP_D("Local iteration error: {:.5E}.\n", error);
                     if(error <= 1E-12) break;
                     if(++counter == 10 || obj->update_trial_status(obj->get_trial_strain() + incre_strain) != SUANPAN_SUCCESS) {
                         info = SUANPAN_FAIL;
@@ -267,7 +267,7 @@ mat material_tester_by_stress_history(const shared_ptr<Material>& obj, const mat
             }
             const vec incre_strain = solve(obj->get_trial_stiffness(), history.row(I).t() - obj->get_trial_stress());
             const auto error = norm(incre_strain);
-            suanpan_info("local iteration error: %.5E.\n", error);
+            SP_D("Local iteration error: {:.5E}.\n", error);
             if(error <= 1E-12) break;
             strain += incre_strain;
             if(SUANPAN_SUCCESS != obj->update_trial_status(strain)) {

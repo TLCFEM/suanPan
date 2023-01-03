@@ -162,7 +162,7 @@ template<typename T> Quaternion<T> Quaternion<T>::operator/(const Quaternion& B)
 
 template<typename T> Quaternion<T>& Quaternion<T>::operator/=(const Quaternion& B) { return *this = *this * B.inv(); }
 
-template<typename T> void Quaternion<T>::print() const { suanpan_info("re: %+0.6e im: %+0.6e %+0.6e %+0.6e\n", re, im(0), im(1), im(2)); }
+template<typename T> void Quaternion<T>::print() const { sp_info("re: {:+0.6E} im: {:+0.6E} {:+0.6E} {:+0.6E}\n", re, im(0), im(1), im(2)); }
 
 template<typename T> Mat<T> Quaternion<T>::operator*(const Mat<T>& I) const { return to_mat() * I; }
 

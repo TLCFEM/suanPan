@@ -178,6 +178,6 @@ int AFC::reset_status() {
 }
 
 void AFC::print() {
-    suanpan_info("A AFC material model using nonlinear transition.\n");
+    sp_info("An AFC material model using nonlinear transition.\n");
     Material1D::print();
 }

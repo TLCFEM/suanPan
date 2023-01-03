@@ -89,7 +89,7 @@ int Elastic2D::reset_status() {
 }
 
 void Elastic2D::print() {
-    suanpan_info("2D isotropic elastic material model.\n");
+    sp_info("A 2D isotropic elastic material model.\n");
     current_strain.t().print("Strain:");
     current_stress.t().print("Stress:");
 }

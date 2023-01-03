@@ -91,6 +91,6 @@ int Axisymmetric::reset_status() {
 vector<vec> Axisymmetric::record(const OutputType P) { return base->record(P); }
 
 void Axisymmetric::print() {
-    suanpan_info("An axisymmetric wrapper.\n");
+    sp_info("An axisymmetric wrapper.\n");
     if(base) base->print();
 }

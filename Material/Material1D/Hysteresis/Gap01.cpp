@@ -87,6 +87,6 @@ int Gap01::reset_status() {
 }
 
 void Gap01::print() {
-    suanpan_info("A gap material model.\n");
+    sp_info("A gap material model.\n");
     Material1D::print();
 }

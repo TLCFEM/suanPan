@@ -20,8 +20,6 @@
 
 #ifdef SUANPAN_WIN
 #include <Windows.h>
-
-BOOL WIN_EVENT(DWORD) { return TRUE; }
 #endif
 
 // ReSharper disable once CppParameterMayBeConst
@@ -30,16 +28,8 @@ int main(int argc, char** argv) {
 #if defined(SUANPAN_DEBUG) && defined(SUANPAN_MSVC)
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
-    if(!SetConsoleCtrlHandler(WIN_EVENT, TRUE)) return 0;
-    const auto handle = GetStdHandle(STD_OUTPUT_HANDLE);
-    CONSOLE_SCREEN_BUFFER_INFO info;
-    GetConsoleScreenBufferInfo(handle, &info);
-    const auto current_attribute = info.wAttributes;
-    SetConsoleTextAttribute(handle, FOREGROUND_INTENSITY | FOREGROUND_GREEN);
     SetConsoleCP(CP_UTF8);
     SetConsoleOutputCP(CP_UTF8);
-#else
-    SUANPAN_SYNC_COUT << FOREGROUND_GREEN;
 #endif
 
 #ifdef SUANPAN_DEBUG
@@ -47,12 +37,6 @@ int main(int argc, char** argv) {
 #else
     try { argument_parser(argc, argv); }
     catch(const std::exception& e) { SP_F("Some unexpected error happens: {}, please file a bug report via https://github.com/TLCFEM/suanPan/issues.\n", e.what()); }
-#endif
-
-#ifdef SUANPAN_WIN
-    SetConsoleTextAttribute(handle, current_attribute);
-#else
-    SUANPAN_SYNC_COUT << "\033[0m";
 #endif
 
     return SUANPAN_SUCCESS;

@@ -64,4 +64,4 @@ int CircularHollow2D::initialize(const shared_ptr<DomainBase>& D) {
 
 unique_ptr<Section> CircularHollow2D::get_copy() { return make_unique<CircularHollow2D>(*this); }
 
-void CircularHollow2D::print() { suanpan_info("A CircularHollow2D Section.\n"); }
+void CircularHollow2D::print() { sp_info("A 2D circular hollow section.\n"); }

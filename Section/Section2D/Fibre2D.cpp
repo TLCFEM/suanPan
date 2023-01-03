@@ -114,6 +114,6 @@ int Fibre2D::reset_status() {
 }
 
 void Fibre2D::print() {
-    suanpan_info("A composite section that consists of following sections:\n");
+    sp_info("A 2D composite section that consists of following sections.\n");
     for(const auto& I : fibre) I->print();
 }

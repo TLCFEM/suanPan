@@ -120,4 +120,4 @@ int NonlinearPeric::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-void NonlinearPeric::print() { suanpan_info("A 3D bilinear hardening viscoplasticity model using Perzyna rule.\n"); }
+void NonlinearPeric::print() { sp_info("A 3D bilinear hardening viscoplasticity model using Perzyna rule.\n"); }

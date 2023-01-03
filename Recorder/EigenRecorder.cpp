@@ -79,4 +79,4 @@ void EigenRecorder::save() {
 #endif
 }
 
-void EigenRecorder::print() { suanpan_info("A recorder to record eigen values and eigen vectors.\n"); }
+void EigenRecorder::print() { sp_info("A recorder to record eigen values and eigen vectors.\n"); }

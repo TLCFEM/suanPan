@@ -191,4 +191,4 @@ vector<vec> Maxwell::record(const OutputType P) {
     return data;
 }
 
-void Maxwell::print() { suanpan_info("A Maxwell material model.\n"); }
+void Maxwell::print() { sp_info("A Maxwell material model.\n"); }

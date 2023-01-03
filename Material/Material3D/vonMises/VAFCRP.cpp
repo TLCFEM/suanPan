@@ -153,4 +153,4 @@ vector<vec> VAFCRP::record(const OutputType P) {
     return Material3D::record(P);
 }
 
-void VAFCRP::print() { suanpan_info("The VADCRP model.\n"); }
+void VAFCRP::print() { sp_info("A VADCRP material model.\n"); }

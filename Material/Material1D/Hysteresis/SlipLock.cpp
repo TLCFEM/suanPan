@@ -76,6 +76,6 @@ int SlipLock::reset_status() {
 }
 
 void SlipLock::print() {
-    suanpan_info("A Slip-Lock material model using Menegotto-Pinto relationship.\n");
+    sp_info("A slip lock material model using Menegotto-Pinto relationship.\n");
     Material1D::print();
 }

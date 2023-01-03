@@ -25,6 +25,6 @@ PeakOriented::PeakOriented(const int T, const double R)
     : SimpleHysteresis(T, 1., R) {}
 
 void PeakOriented::print() {
-    suanpan_info("A Peak-Oriented hysteresis model.\n");
+    sp_info("A peak oriented hysteresis model.\n");
     SimpleHysteresis::print();
 }

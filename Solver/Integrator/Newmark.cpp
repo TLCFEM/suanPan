@@ -89,4 +89,4 @@ void Newmark::update_parameter(const double NT) {
     C3 = C5 * gamma;
 }
 
-void Newmark::print() { suanpan_info("A Newmark solver.\n"); }
+void Newmark::print() { sp_info("A Newmark solver.\n"); }

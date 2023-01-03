@@ -96,6 +96,6 @@ int BoucWen::reset_status() {
 }
 
 void BoucWen::print() {
-    suanpan_info("Bouc-Wen model.\n");
+    sp_info("A Bouc-Wen material model.\n");
     Material1D::print();
 }

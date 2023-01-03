@@ -154,6 +154,6 @@ int BWBN::reset_status() {
 }
 
 void BWBN::print() {
-    suanpan_info("BWBN model.\n");
+    sp_info("A BWBN material model.\n");
     Material1D::print();
 }

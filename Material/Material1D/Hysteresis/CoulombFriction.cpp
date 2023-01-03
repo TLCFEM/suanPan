@@ -67,4 +67,4 @@ int CoulombFriction::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-void CoulombFriction::print() { suanpan_info("A Coulomb friction model.\n"); }
+void CoulombFriction::print() { sp_info("A Coulomb friction model.\n"); }

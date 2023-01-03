@@ -112,4 +112,4 @@ vector<vec> Kelvin::record(const OutputType P) {
     return data;
 }
 
-void Kelvin::print() { suanpan_info("A Kelvin material model.\n"); }
+void Kelvin::print() { sp_info("A Kelvin material model.\n"); }

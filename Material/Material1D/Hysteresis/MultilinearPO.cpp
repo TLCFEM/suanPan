@@ -92,6 +92,6 @@ int MultilinearPO::initialize(const shared_ptr<DomainBase>&) {
 unique_ptr<Material> MultilinearPO::get_copy() { return make_unique<MultilinearPO>(*this); }
 
 void MultilinearPO::print() {
-    suanpan_info("A Multilinear Peak Oriented hysteresis model.\n");
+    sp_info("A multilinear peak oriented hysteresis model.\n");
     PeakOriented::print();
 }

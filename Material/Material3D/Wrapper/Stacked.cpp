@@ -110,7 +110,7 @@ vector<vec> Stacked::record(const OutputType P) {
 }
 
 void Stacked::print() {
-    suanpan_info("A stack wrapper for 3D problems.\n");
+    sp_info("A stack wrapper for 3D problems.\n");
     unsigned t_tag = 0;
     for(const auto& I : mat_pool) {
         suanpan_info("Component %u: ", ++t_tag);

@@ -173,4 +173,4 @@ vector<vec> NonlinearGurson::record(const OutputType P) {
     return Material3D::record(P);
 }
 
-void NonlinearGurson::print() { suanpan_info("A 3D nonlinear hardening model using Gurson's model.\n"); }
+void NonlinearGurson::print() { sp_info("A 3D nonlinear hardening model using Gurson's model.\n"); }

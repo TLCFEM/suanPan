@@ -27,4 +27,4 @@ BilinearCC::BilinearCC(const unsigned T, const double E, const double V, const d
 
 unique_ptr<Material> BilinearCC::get_copy() { return make_unique<BilinearCC>(*this); }
 
-void BilinearCC::print() { suanpan_info("A 3D Cam-Clay model using linear hardening.\n"); }
+void BilinearCC::print() { sp_info("A 3D Cam-Clay model using linear hardening.\n"); }

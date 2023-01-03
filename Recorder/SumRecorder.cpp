@@ -43,4 +43,4 @@ void SumRecorder::record(const shared_ptr<DomainBase>& D) {
     if(if_record_time()) insert(D->get_factory()->get_current_time());
 }
 
-void SumRecorder::print() { suanpan_info("A Summation Recorder.\n"); }
+void SumRecorder::print() { sp_info("A summation recorder.\n"); }

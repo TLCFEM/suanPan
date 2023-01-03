@@ -527,6 +527,6 @@ int ConcreteCM::reset_status() {
 }
 
 void ConcreteCM::print() {
-    suanpan_info("A concrete model based on Chang & Mander's concrete model.\n");
+    sp_info("A concrete model based on Chang & Mander's concrete model.\n");
     Material1D::print();
 }

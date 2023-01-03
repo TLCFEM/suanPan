@@ -175,4 +175,4 @@ int SimpleSand::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-void SimpleSand::print() { suanpan_info("A simple sand model.\n"); }
+void SimpleSand::print() { sp_info("A simple sand model.\n"); }

@@ -137,4 +137,4 @@ int NonlinearCamClay::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-void NonlinearCamClay::print() { suanpan_info("A 3D nonlinear modified Cam-Clay model.\n"); }
+void NonlinearCamClay::print() { sp_info("A 3D nonlinear modified Cam-Clay model.\n"); }

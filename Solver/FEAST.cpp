@@ -235,4 +235,4 @@ int FEAST::analyze() {
     return quadratic ? quadratic_solve(W) : linear_solve(W);
 }
 
-void FEAST::print() { suanpan_info("An eigen solver using FEAST solver.\n"); }
+void FEAST::print() { sp_info("An eigen solver using FEAST solver.\n"); }

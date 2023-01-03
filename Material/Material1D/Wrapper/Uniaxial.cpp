@@ -126,7 +126,7 @@ int Uniaxial::reset_status() {
 vector<vec> Uniaxial::record(const OutputType P) { return base->record(P); }
 
 void Uniaxial::print() {
-    suanpan_info("A uniaxial wrapper.\n");
+    sp_info("A uniaxial wrapper.\n");
     current_strain.t().print("Strain:");
     current_stress.t().print("Stress:");
     if(base) base->print();

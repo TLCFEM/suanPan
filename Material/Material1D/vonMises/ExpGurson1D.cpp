@@ -51,6 +51,6 @@ vec ExpGurson1D::compute_hardening(const double plastic_strain) const {
 unique_ptr<Material> ExpGurson1D::get_copy() { return make_unique<ExpGurson1D>(*this); }
 
 void ExpGurson1D::print() {
-    suanpan_info("The Gurson model.\n");
+    sp_info("A uniaxial Gurson model.\n");
     NonlinearGurson1D::print();
 }

@@ -256,4 +256,4 @@ vector<vec> NonlinearCDP::record(const OutputType T) {
     return Material3D::record(T);
 }
 
-void NonlinearCDP::print() { suanpan_info("A concrete damage plasticity model.\n"); }
+void NonlinearCDP::print() { sp_info("A concrete damage plasticity model.\n"); }

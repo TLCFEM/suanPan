@@ -174,4 +174,4 @@ void WilsonPenzienNewmark::assemble_matrix() {
     t_stiff += W->get_geometry();
 }
 
-void WilsonPenzienNewmark::print() { suanpan_info("A Newmark solver with Wilson-Penzien damping model.\n"); }
+void WilsonPenzienNewmark::print() { sp_info("A Newmark solver with Wilson-Penzien damping model.\n"); }

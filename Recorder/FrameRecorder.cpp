@@ -71,4 +71,4 @@ void FrameRecorder::record([[maybe_unused]] const shared_ptr<DomainBase>& D) {
 
 void FrameRecorder::save() {}
 
-void FrameRecorder::print() { suanpan_info("A Frame Recorder.\n"); }
+void FrameRecorder::print() { sp_info("A frame recorder.\n"); }

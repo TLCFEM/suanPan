@@ -112,6 +112,6 @@ vector<vec> NonlinearViscosity::record(const OutputType P) {
 }
 
 void NonlinearViscosity::print() {
-    suanpan_info("A 1D viscous damping material %u.\n", get_tag());
+    sp_info("A uniaxial viscous damping material model.\n");
     Material1D::print();
 }

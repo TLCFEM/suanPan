@@ -97,6 +97,6 @@ int Bar3D::reset_status() {
 }
 
 void Bar3D::print() {
-    suanpan_info("A Bar3D section that represents for example rebar in RC section.\n");
+    sp_info("A 3D section that represents for example rebar in RC section.\n");
     s_material->print();
 }

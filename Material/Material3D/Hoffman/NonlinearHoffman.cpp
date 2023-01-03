@@ -157,4 +157,4 @@ int NonlinearHoffman::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-void NonlinearHoffman::print() { suanpan_info("A 3D nonlinear hardening model using Hoffman yielding criterion.\n"); }
+void NonlinearHoffman::print() { sp_info("A 3D nonlinear hardening model using Hoffman yielding criterion.\n"); }

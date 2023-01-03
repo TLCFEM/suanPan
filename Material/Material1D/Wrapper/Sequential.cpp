@@ -146,6 +146,6 @@ vector<vec> Sequential::record(const OutputType P) {
 }
 
 void Sequential::print() {
-    suanpan_info("A wrapper of several material models.\n");
+    sp_info("A wrapper of several material models.\n");
     for(const auto& I : mat_pool) I->print();
 }

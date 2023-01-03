@@ -143,4 +143,4 @@ int BFGS::analyze() {
     }
 }
 
-void BFGS::print() { suanpan_info("(L-)BFGS.\n"); }
+void BFGS::print() { sp_info("A (L-)BFGS solver.\n"); }

@@ -198,7 +198,7 @@ vector<vec> CSMQ::record(const OutputType P) {
 }
 
 void CSMQ::print() {
-    suanpan_info("Element %u is a membrane element (CSMQ) with %u nodes.\n", get_tag(), m_node);
+    sp_info("A membrane element (CSMQ) with {} nodes.\n", m_node);
     node_encoding.t().print("The nodes connected are:");
     if(!is_initialized()) return;
     suanpan_info("Material:\n");

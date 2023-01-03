@@ -64,13 +64,18 @@ fs::path SUANPAN_OUTPUT = fs::current_path();
 
 void qrcode() {
     for(constexpr char encode[] = "SLLLLLLLWWWLWWWLWWWLWWWLLLLLLLSFWLLLWFWLUWLWUWLWWFFFWFWLLLWFSFWFFFWFWWFWWFFWWFUFUWWFWFFFWFSFLLLLLFWLWFUFWFUFUFULWFLLLLLFSLLLWLLLLFWWULWWULUUFFLLWWWLWWSULUUFFLWWULFFULFFWWUFLFWLULLFSLUUFWULFWUFLUUFLFFFUULLUULWFLSLUFULULLWUUUWLUULLWUUUFWLFWLFSLFLLLLLWLFWULWWLFFULFUFLWFWFLSLWLWWULLFWLFFULWUFFWWFULLUULFSLULFUFLFFFFLUUFULFUFFFFFFUWUWSLLLLLLLWFLUUWLUWFUUFFWLWFLUFFSFWLLLWFWFFWULWWUWFUWFLLLFUWWLSFWFFFWFWLFWFFULUFULLUWWFFLUUFSFLLLLLFWFFFLUUFLFFUFFFWLFWWFL"; const auto I : encode)
-        if(I == 'S') suanpan_info("\n            ");
-        else if(I == 'W') suanpan_info(" ");
-        else if(I == 'F') suanpan_info("%s", u8"\u2588");
-        else if(I == 'L') suanpan_info("%s", u8"\u2584");
-        else if(I == 'U') suanpan_info("%s", u8"\u2580");
+        if(I == 'S')
+            sp_info("\n            ");
+        else if(I == 'W')
+            sp_info(" ");
+        else if(I == 'F')
+            sp_info("\u2588");
+        else if(I == 'L')
+            sp_info("\u2584");
+        else if(I == 'U')
+            sp_info("\u2580");
 
-    suanpan_info("\n\n");
+    sp_info("\n\n");
 }
 
 int benchmark() {
@@ -86,12 +91,12 @@ int benchmark() {
 
     for(auto I = 1; I <= N; ++I) {
         pool.push_task([I] {
-            SUANPAN_SYNC_COUT << '[';
+            SUANPAN_COUT << '[';
             const auto length = static_cast<int>(50. * I / N);
-            for(auto J = 0; J < length; ++J) SUANPAN_SYNC_COUT << '=';
-            for(auto J = length; J < 50; ++J) SUANPAN_SYNC_COUT << '-';
-            SUANPAN_SYNC_COUT << "]\r";
-            SUANPAN_SYNC_COUT.flush();
+            for(auto J = 0; J < length; ++J) SUANPAN_COUT << '=';
+            for(auto J = length; J < 50; ++J) SUANPAN_COUT << '-';
+            SUANPAN_COUT << "]\r";
+            SUANPAN_COUT.flush();
         });
         vec x = solve(A, b);
         x(randi<uvec>(1, distr_param(0, M - 1))).fill(I);
@@ -103,7 +108,7 @@ int benchmark() {
 
     pool.wait_for_tasks();
 
-    suanpan_info("\nCurrent platform rates (higher is better): %.2f.\n", 1E9 / static_cast<double>(duration.count()));
+    sp_info("\nCurrent platform rates (higher is better): {:.2f}.\n", 1E9 / static_cast<double>(duration.count()));
 
     return SUANPAN_SUCCESS;
 }
@@ -138,7 +143,8 @@ void perform_upsampling(istringstream& command) {
 
     if(!result.save(file_name += "_upsampled", raw_ascii))
         SP_E("Fail to save to file.\n");
-    else suanpan_info("upsampled data is saved to %s.\n", file_name.c_str());
+    else
+        sp_info("Data is saved to file \"{}\".\n", file_name);
 }
 
 void perform_response_spectrum(istringstream& command) {
@@ -186,7 +192,8 @@ void perform_response_spectrum(istringstream& command) {
 
     if(!spectrum.save(motion_name += "_response_spectrum", raw_ascii))
         SP_E("Fail to save to file.\n");
-    else suanpan_info("response spectrum data is saved to %s.\n", motion_name.c_str());
+    else
+        sp_info("Data is saved to file \"{}\".\n", motion_name);
 }
 
 void perform_sdof_response(istringstream& command) {
@@ -235,7 +242,8 @@ void perform_sdof_response(istringstream& command) {
 
     if(!response.save(motion_name += "_sdof_response", raw_ascii))
         SP_E("Fail to save to file.\n");
-    else suanpan_info("sdof response data is saved to %s.\n", motion_name.c_str());
+    else
+        sp_info("Data is saved to file \"{}\".\n", motion_name);
 }
 
 int process_command(const shared_ptr<Bead>& model, istringstream& command) {
@@ -375,22 +383,23 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
 
     if(is_equal(command_id, "analyze") || is_equal(command_id, "analyse")) {
         const auto code = model->analyze();
-        suanpan_info("\n");
+        sp_info("\n");
         return code;
     }
 
     if(is_equal(command_id, "fullname")) {
-        suanpan_info("%s\n", SUANPAN_EXE);
+        sp_info("{}\n", SUANPAN_EXE);
         return SUANPAN_SUCCESS;
     }
 
     if(is_equal(command_id, "pwd")) {
-        if(command.eof()) suanpan_info("%s\n", fs::current_path().generic_string().c_str());
+        if(command.eof())
+            sp_info("{}\n", fs::current_path().generic_string());
         else if(string path; get_input(command, path)) {
             std::error_code code;
             fs::current_path(path, code);
             if(0 != code.value())
-                SP_E("Fail to set path \"{}\"\n", code.category().message(code.value()).c_str());
+                SP_E("Fail to set path \"{}\"\n", code.category().message(code.value()));
         }
         return SUANPAN_SUCCESS;
     }
@@ -525,10 +534,11 @@ int create_new_domain(const shared_ptr<Bead>& model, istringstream& command) {
 
     model->set_current_domain_tag(domain_id);
 
-    if(auto& tmp_domain = get_domain(model, domain_id); nullptr != tmp_domain) suanpan_info("create_new_domain() switches to Domain %u.\n", domain_id);
+    if(auto& tmp_domain = get_domain(model, domain_id); nullptr != tmp_domain)
+        sp_info("Switch to domain {}.\n", domain_id);
     else {
         tmp_domain = make_shared<Domain>(domain_id);
-        if(nullptr != tmp_domain) suanpan_info("create_new_domain() successfully creates Domain %u.\n", domain_id);
+        if(nullptr != tmp_domain) sp_info("Domain {} is successfully created.\n", domain_id);
     }
 
     return SUANPAN_SUCCESS;
@@ -692,17 +702,24 @@ int list_object(const shared_ptr<DomainBase>& domain, istringstream& command) {
     }
 
     vector<unsigned> list;
-    if(is_equal(object_type, "converger")) for(const auto& I : domain->get_converger_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "constraint")) for(const auto& I : domain->get_constraint_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "element")) for(const auto& I : domain->get_element_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "load")) for(const auto& I : domain->get_load_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "material")) for(const auto& I : domain->get_material_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "node")) for(const auto& I : domain->get_node_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "recorder")) for(const auto& I : domain->get_recorder_pool()) list.emplace_back(I->get_tag());
+    if(is_equal(object_type, "converger"))
+        for(const auto& I : domain->get_converger_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "constraint"))
+        for(const auto& I : domain->get_constraint_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "element"))
+        for(const auto& I : domain->get_element_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "load"))
+        for(const auto& I : domain->get_load_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "material"))
+        for(const auto& I : domain->get_material_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "node"))
+        for(const auto& I : domain->get_node_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "recorder"))
+        for(const auto& I : domain->get_recorder_pool()) list.emplace_back(I->get_tag());
 
-    suanpan_info("This domain has the following %ss:", object_type.c_str());
-    for(const auto& I : list) suanpan_info("\t%u", I);
-    suanpan_info(".\n");
+    sp_info("This domain has the following {}s:", object_type);
+    for(const auto& I : list) sp_info("\t{}", I);
+    sp_info(".\n");
 
     return SUANPAN_SUCCESS;
 }
@@ -1111,7 +1128,7 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
             SUANPAN_OUTPUT = canonical(new_path);
         }
 
-        suanpan_info("%s\n", SUANPAN_OUTPUT.generic_string().c_str());
+        sp_info("{}\n", SUANPAN_OUTPUT.generic_string());
         return SUANPAN_SUCCESS;
     }
     if(is_equal(property_id, "num_threads")) {
@@ -1271,56 +1288,56 @@ int print_info(const shared_ptr<DomainBase>& domain, istringstream& command) {
         while(get_input(command, tag)) {
             if(domain->find_node(tag)) {
                 get_node(domain, tag)->print();
-                suanpan_info("\n");
+                sp_info("\n");
             }
         }
     else if(is_equal(object_type, "element"))
         while(get_input(command, tag)) {
             if(domain->find_element(tag)) {
                 get_element(domain, tag)->print();
-                suanpan_info("\n");
+                sp_info("\n");
             }
         }
     else if(is_equal(object_type, "material"))
         while(get_input(command, tag)) {
             if(domain->find_material(tag)) {
                 get_material(domain, tag)->print();
-                suanpan_info("\n");
+                sp_info("\n");
             }
         }
     else if(is_equal(object_type, "constraint"))
         while(get_input(command, tag)) {
             if(domain->find_constraint(tag)) {
                 get_constraint(domain, tag)->print();
-                suanpan_info("\n");
+                sp_info("\n");
             }
         }
     else if(is_equal(object_type, "recorder"))
         while(get_input(command, tag)) {
             if(domain->find_recorder(tag)) {
                 get_recorder(domain, tag)->print();
-                suanpan_info("\n");
+                sp_info("\n");
             }
         }
     else if(is_equal(object_type, "solver"))
         while(get_input(command, tag)) {
             if(domain->find_solver(tag)) {
                 get_solver(domain, tag)->print();
-                suanpan_info("\n");
+                sp_info("\n");
             }
         }
     else if(is_equal(object_type, "integrator"))
         while(get_input(command, tag)) {
             if(domain->find_integrator(tag)) {
                 get_integrator(domain, tag)->print();
-                suanpan_info("\n");
+                sp_info("\n");
             }
         }
     else if(is_equal(object_type, "group"))
         while(get_input(command, tag)) {
             if(domain->find_group(tag)) {
                 get_group(domain, tag)->print();
-                suanpan_info("\n");
+                sp_info("\n");
             }
         }
     else if(is_equal(object_type, "nodegroup"))
@@ -1329,21 +1346,22 @@ int print_info(const shared_ptr<DomainBase>& domain, istringstream& command) {
                 for(const auto t_node : get_group(domain, tag)->get_pool())
                     if(domain->find<Node>(t_node)) {
                         get_node(domain, static_cast<unsigned>(t_node))->print();
-                        suanpan_info("\n");
+                        sp_info("\n");
                     }
         }
     else if(is_equal(object_type, "amplitude"))
         while(get_input(command, tag)) {
             if(domain->find_amplitude(tag)) {
                 get_amplitude(domain, tag)->print();
-                suanpan_info("\n");
+                sp_info("\n");
             }
         }
     else if(is_equal(object_type, "eigenvalue")) {
         domain->get_factory()->get_eigenvalue().print("Eigenvalues:");
-        suanpan_info("\n");
+        sp_info("\n");
     }
-    else if(is_equal(object_type, "output_folder")) suanpan_info("%s\n", SUANPAN_OUTPUT.generic_string().c_str());
+    else if(is_equal(object_type, "output_folder"))
+        sp_info("{}\n", SUANPAN_OUTPUT.generic_string());
 
     return SUANPAN_SUCCESS;
 }
@@ -1483,13 +1501,6 @@ int print_command() {
 }
 
 int execute_command(istringstream& command) {
-#ifdef SUANPAN_WIN
-    const auto handle = GetStdHandle(STD_OUTPUT_HANDLE);
-    CONSOLE_SCREEN_BUFFER_INFO info;
-    GetConsoleScreenBufferInfo(handle, &info);
-    const auto current_attribute = info.wAttributes;
-#endif
-
 #ifdef SUANPAN_MSVC
     std::wstringstream terminal_command;
     terminal_command << command.str().substr(command.tellg()).c_str();
@@ -1498,12 +1509,6 @@ int execute_command(istringstream& command) {
     std::stringstream terminal_command;
     terminal_command << command.str().substr(command.tellg()).c_str();
     const auto code = system(terminal_command.str().c_str());
-#endif
-
-#ifdef SUANPAN_WIN
-    SetConsoleTextAttribute(handle, current_attribute);
-#else
-    SUANPAN_SYNC_COUT << FOREGROUND_GREEN;
 #endif
 
     return code;

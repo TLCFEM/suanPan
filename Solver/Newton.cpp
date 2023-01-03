@@ -131,4 +131,4 @@ int Newton::analyze() {
     }
 }
 
-void Newton::print() { suanpan_info("A solver based on Newton--Raphson iteration method %s", initial_stiffness ? "using initial stiffness for each substep.\n" : ".\n"); }
+void Newton::print() { suanpan_info("A solver based on Newton-Raphson iteration method %s", initial_stiffness ? "using initial stiffness for each substep.\n" : ".\n"); }

@@ -137,6 +137,6 @@ vector<vec> ArmstrongFrederick1D::record(const OutputType P) {
 }
 
 void ArmstrongFrederick1D::print() {
-    suanpan_info("A uniaxial nonlinear hardening model using Armstrong--Frederick kinematic hardening rule.\n");
+    sp_info("A uniaxial nonlinear hardening model using Armstrong-Frederick kinematic hardening rule.\n");
     Material1D::print();
 }

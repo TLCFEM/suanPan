@@ -52,4 +52,4 @@ int Circle2D::initialize(const shared_ptr<DomainBase>& D) {
 
 unique_ptr<Section> Circle2D::get_copy() { return make_unique<Circle2D>(*this); }
 
-void Circle2D::print() { suanpan_info("A Circle2D Section.\n"); }
+void Circle2D::print() { sp_info("A 2D circular section.\n"); }

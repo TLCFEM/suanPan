@@ -108,7 +108,7 @@ vector<vec> Laminated::record(const OutputType P) {
 }
 
 void Laminated::print() {
-    suanpan_info("A multilayer wrapper for planar problems.\n");
+    sp_info("A multilayer wrapper for planar problems.\n");
     unsigned t_tag = 0;
     for(const auto& I : mat_pool) {
         suanpan_info("Component %u: ", ++t_tag);

@@ -94,6 +94,6 @@ int PlaneStrain::reset_status() {
 vector<vec> PlaneStrain::record(const OutputType P) { return base->record(P); }
 
 void PlaneStrain::print() {
-    suanpan_info("A plane strain wrapper.\n");
+    sp_info("A plane strain wrapper.\n");
     if(base) base->print();
 }

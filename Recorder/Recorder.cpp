@@ -152,4 +152,4 @@ void Recorder::save() {
 #endif
 }
 
-void Recorder::print() { suanpan_info("print() needs to be overwritten.\n"); }
+void Recorder::print() {}
