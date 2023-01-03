@@ -32,6 +32,15 @@
     <ClCompile Include="..\..\..\Domain\Group\Group.cpp">
       <Filter>DEPEND</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Include\fmt\src\fmt.cc">
+      <Filter>DEPEND</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Include\fmt\src\format.cc">
+      <Filter>DEPEND</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Include\fmt\src\os.cc">
+      <Filter>DEPEND</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Developer\Element\ElementExample.h">

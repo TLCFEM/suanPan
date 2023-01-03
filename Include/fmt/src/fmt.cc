@@ -45,6 +45,7 @@ module;
 
 #if _MSC_VER
 #  include <intrin.h>
+#pragma warning(disable : 4702)
 #endif
 #if defined __APPLE__ || defined(__FreeBSD__)
 #  include <xlocale.h>
