@@ -36,8 +36,7 @@ void Bead::erase_domain(const unsigned T) {
             sp_info("Switch to domain {}.\n", current_domain_tag);
         }
     }
-    else
-        sp_info("Cannot find domain {}, nothing changed.\n", T);
+    else sp_info("Cannot find domain {}, nothing changed.\n", T);
 }
 
 void Bead::enable_domain(const unsigned T) { domain_pool.enable(T); }

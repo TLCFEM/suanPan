@@ -64,16 +64,11 @@ fs::path SUANPAN_OUTPUT = fs::current_path();
 
 void qrcode() {
     for(constexpr char encode[] = "SLLLLLLLWWWLWWWLWWWLWWWLLLLLLLSFWLLLWFWLUWLWUWLWWFFFWFWLLLWFSFWFFFWFWWFWWFFWWFUFUWWFWFFFWFSFLLLLLFWLWFUFWFUFUFULWFLLLLLFSLLLWLLLLFWWULWWULUUFFLLWWWLWWSULUUFFLWWULFFULFFWWUFLFWLULLFSLUUFWULFWUFLUUFLFFFUULLUULWFLSLUFULULLWUUUWLUULLWUUUFWLFWLFSLFLLLLLWLFWULWWLFFULFUFLWFWFLSLWLWWULLFWLFFULWUFFWWFULLUULFSLULFUFLFFFFLUUFULFUFFFFFFUWUWSLLLLLLLWFLUUWLUWFUUFFWLWFLUFFSFWLLLWFWFFWULWWUWFUWFLLLFUWWLSFWFFFWFWLFWFFULUFULLUWWFFLUUFSFLLLLLFWFFFLUUFLFFUFFFWLFWWFL"; const auto I : encode)
-        if(I == 'S')
-            sp_info("\n            ");
-        else if(I == 'W')
-            sp_info(" ");
-        else if(I == 'F')
-            sp_info("\u2588");
-        else if(I == 'L')
-            sp_info("\u2584");
-        else if(I == 'U')
-            sp_info("\u2580");
+        if(I == 'S') sp_info("\n            ");
+        else if(I == 'W') sp_info(" ");
+        else if(I == 'F') sp_info("\u2588");
+        else if(I == 'L') sp_info("\u2584");
+        else if(I == 'U') sp_info("\u2580");
 
     sp_info("\n\n");
 }
@@ -143,8 +138,7 @@ void perform_upsampling(istringstream& command) {
 
     if(!result.save(file_name += "_upsampled", raw_ascii))
         SP_E("Fail to save to file.\n");
-    else
-        sp_info("Data is saved to file \"{}\".\n", file_name);
+    else sp_info("Data is saved to file \"{}\".\n", file_name);
 }
 
 void perform_response_spectrum(istringstream& command) {
@@ -192,8 +186,7 @@ void perform_response_spectrum(istringstream& command) {
 
     if(!spectrum.save(motion_name += "_response_spectrum", raw_ascii))
         SP_E("Fail to save to file.\n");
-    else
-        sp_info("Data is saved to file \"{}\".\n", motion_name);
+    else sp_info("Data is saved to file \"{}\".\n", motion_name);
 }
 
 void perform_sdof_response(istringstream& command) {
@@ -242,8 +235,7 @@ void perform_sdof_response(istringstream& command) {
 
     if(!response.save(motion_name += "_sdof_response", raw_ascii))
         SP_E("Fail to save to file.\n");
-    else
-        sp_info("Data is saved to file \"{}\".\n", motion_name);
+    else sp_info("Data is saved to file \"{}\".\n", motion_name);
 }
 
 int process_command(const shared_ptr<Bead>& model, istringstream& command) {
@@ -393,8 +385,7 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     }
 
     if(is_equal(command_id, "pwd")) {
-        if(command.eof())
-            sp_info("{}\n", fs::current_path().generic_string());
+        if(command.eof()) sp_info("{}\n", fs::current_path().generic_string());
         else if(string path; get_input(command, path)) {
             std::error_code code;
             fs::current_path(path, code);
@@ -534,8 +525,7 @@ int create_new_domain(const shared_ptr<Bead>& model, istringstream& command) {
 
     model->set_current_domain_tag(domain_id);
 
-    if(auto& tmp_domain = get_domain(model, domain_id); nullptr != tmp_domain)
-        sp_info("Switch to domain {}.\n", domain_id);
+    if(auto& tmp_domain = get_domain(model, domain_id); nullptr != tmp_domain) sp_info("Switch to domain {}.\n", domain_id);
     else {
         tmp_domain = make_shared<Domain>(domain_id);
         if(nullptr != tmp_domain) sp_info("Domain {} is successfully created.\n", domain_id);
@@ -702,20 +692,13 @@ int list_object(const shared_ptr<DomainBase>& domain, istringstream& command) {
     }
 
     vector<unsigned> list;
-    if(is_equal(object_type, "converger"))
-        for(const auto& I : domain->get_converger_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "constraint"))
-        for(const auto& I : domain->get_constraint_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "element"))
-        for(const auto& I : domain->get_element_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "load"))
-        for(const auto& I : domain->get_load_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "material"))
-        for(const auto& I : domain->get_material_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "node"))
-        for(const auto& I : domain->get_node_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "recorder"))
-        for(const auto& I : domain->get_recorder_pool()) list.emplace_back(I->get_tag());
+    if(is_equal(object_type, "converger")) for(const auto& I : domain->get_converger_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "constraint")) for(const auto& I : domain->get_constraint_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "element")) for(const auto& I : domain->get_element_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "load")) for(const auto& I : domain->get_load_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "material")) for(const auto& I : domain->get_material_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "node")) for(const auto& I : domain->get_node_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "recorder")) for(const auto& I : domain->get_recorder_pool()) list.emplace_back(I->get_tag());
 
     sp_info("This domain has the following {}s:", object_type);
     for(const auto& I : list) sp_info("\t{}", I);
@@ -1360,8 +1343,7 @@ int print_info(const shared_ptr<DomainBase>& domain, istringstream& command) {
         domain->get_factory()->get_eigenvalue().print("Eigenvalues:");
         sp_info("\n");
     }
-    else if(is_equal(object_type, "output_folder"))
-        sp_info("{}\n", SUANPAN_OUTPUT.generic_string());
+    else if(is_equal(object_type, "output_folder")) sp_info("{}\n", SUANPAN_OUTPUT.generic_string());
 
     return SUANPAN_SUCCESS;
 }
