@@ -21,6 +21,7 @@
 #include <Domain/ExternalModule.h>
 #include <Material/Material>
 #include <Toolbox/utility.h>
+#include <Material/MaterialTester.h>
 
 using std::vector;
 
