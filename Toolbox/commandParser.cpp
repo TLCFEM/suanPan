@@ -23,6 +23,7 @@
 #include <Element/ElementParser.h>
 #include <Load/LoadParser.h>
 #include <Material/MaterialParser.h>
+#include <Material/MaterialTester.h>
 #include <Recorder/RecorderParser.h>
 #include <Section/SectionParser.h>
 #include <Solver/SolverParser.h>
