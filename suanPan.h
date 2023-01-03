@@ -214,47 +214,56 @@ namespace suanpan {
     template<typename... T> void debug(const sl::source_location loc, const std::string_view format_str, const T&... args) {
         if(!SUANPAN_VERBOSE || !SUANPAN_PRINT) return;
         const std::scoped_lock lock(print_mutex);
-        SUANPAN_COUT << fmt::vformat(fg(fmt::terminal_color::green), pattern("[DEBUG] ", loc, format_str), fmt::make_format_args(loc.line(), args...));
+        SUANPAN_COUT << fmt::vformat(fg(fmt::terminal_color::bright_green), pattern("[DEBUG] ", loc, format_str), fmt::make_format_args(loc.line(), args...));
     }
 
     template<typename... T> void warning(const sl::source_location loc, const std::string_view format_str, const T&... args) {
         if(!SUANPAN_PRINT) return;
         const std::scoped_lock lock(print_mutex);
-        SUANPAN_COUT << fmt::vformat(fg(fmt::terminal_color::blue), pattern("[WARNING] ", loc, format_str), fmt::make_format_args(loc.line(), args...));
+        SUANPAN_COUT << fmt::vformat(fg(fmt::terminal_color::bright_blue), pattern("[WARNING] ", loc, format_str), fmt::make_format_args(loc.line(), args...));
     }
 
     template<typename... T> void error(const sl::source_location loc, const std::string_view format_str, const T&... args) {
         if(!SUANPAN_PRINT) return;
         const std::scoped_lock lock(print_mutex);
-        SUANPAN_COUT << fmt::vformat(fg(fmt::terminal_color::yellow), pattern("[ERROR] ", loc, format_str), fmt::make_format_args(loc.line(), args...));
+        SUANPAN_COUT << fmt::vformat(fg(fmt::terminal_color::bright_yellow), pattern("[ERROR] ", loc, format_str), fmt::make_format_args(loc.line(), args...));
     }
 
     template<typename... T> void fatal(const sl::source_location loc, const std::string_view format_str, const T&... args) {
         if(!SUANPAN_PRINT) return;
         const std::scoped_lock lock(print_mutex);
-        SUANPAN_COUT << fmt::vformat(fg(fmt::terminal_color::red), pattern("[FATAL] ", loc, format_str), fmt::make_format_args(loc.line(), args...));
+        SUANPAN_COUT << fmt::vformat(fg(fmt::terminal_color::bright_red), pattern("[FATAL] ", loc, format_str), fmt::make_format_args(loc.line(), args...));
     }
 
     template<typename... T> void info(const std::string_view format_str, const T&... args) {
         if(!SUANPAN_PRINT) return;
         const std::scoped_lock lock(print_mutex);
-        SUANPAN_COUT << fmt::vformat(fg(fmt::terminal_color::green), format_str, fmt::make_format_args(args...));
+        SUANPAN_COUT << fmt::vformat(fg(fmt::terminal_color::bright_green), format_str, fmt::make_format_args(args...));
+    }
+
+    template<typename... T> std::string format(const std::string_view format_str, const T&... args) { return fmt::vformat(fg(fmt::terminal_color::bright_green), format_str, fmt::make_format_args(args...)); }
+
+    template<typename T> std::string format(const Col<T>& in_vec) {
+        std::string output;
+        if(std::is_floating_point_v<T>) for(const auto I : in_vec) output += format(" {: 1.5e}", I);
+        else for(const auto I : in_vec) output += format(" {:6d}", I);
+        output += '\n';
+        return output;
     }
 
     template<typename T> void info(const Col<T>& in_vec) {
         if(!SUANPAN_PRINT) return;
-        if(std::is_floating_point_v<T>)
-            for(const auto& I : in_vec) info(" {: 1.5e}", I);
-        else
-            for(const auto& I : in_vec) info(" {:6d}", I);
-        info("\n");
+        const std::scoped_lock lock(print_mutex);
+        SUANPAN_COUT << format(in_vec);
     }
 
     template<typename T> void info(const std::string_view format_str, const Col<T>& in_vec) {
         if(!SUANPAN_PRINT) return;
-        info(format_str);
-        if(format_str.back() != '\t') info("\n");
-        info(in_vec);
+        std::string output = format(format_str);
+        if(format_str.back() != '\t') output += '\n';
+        output += format(in_vec);
+        const std::scoped_lock lock(print_mutex);
+        SUANPAN_COUT << output;
     }
 
 }
