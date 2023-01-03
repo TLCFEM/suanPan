@@ -190,11 +190,19 @@ namespace suanpan {
     extern std::mutex print_mutex;
 }
 
+#ifdef SUANPAN_MSVC
+#pragma warning(disable : 4100)
+#endif
+#include <functional>
+
 inline void suanpan_debug(const std::function<void()>& F) {
 #ifdef SUANPAN_DEBUG
     F();
 #endif
 }
+#ifdef SUANPAN_MSVC
+#pragma warning(default : 4100)
+#endif
 
 inline std::string suanpan_pattern(const std::string_view header, const std::source_location& loc, const std::string_view& format) {
     std::string pattern{header};
