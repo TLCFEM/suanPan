@@ -90,10 +90,8 @@ vector<vec> T3D2::record(const OutputType T) { return t_material->record(T); }
 
 void T3D2::print() {
     sp_info("A 3D truss element with ");
-    if(nlgeom)
-        sp_info("corotational formulation, assuming constant {} and {} strain.", update_area ? "volume" : "area", log_strain ? "logarithmic" : "engineering");
-    else
-        sp_info("linear formulation.");
+    if(nlgeom) sp_info("corotational formulation, assuming constant {} and {} strain.", update_area ? "volume" : "area", log_strain ? "logarithmic" : "engineering");
+    else sp_info("linear formulation.");
     node_encoding.t().print(" The nodes connected are:");
     sp_info("The area is {:.4E}. The initial element length is {:.4E}.\n", area, length);
     if(!is_initialized()) return;

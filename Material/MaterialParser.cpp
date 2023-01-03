@@ -3329,7 +3329,8 @@ int test_material_by_strain_history(const shared_ptr<DomainBase>& domain, istrin
     if(!result.save("RESULT.h5", hdf5_binary_trans))
         SP_E("Fail to save to file.\n");
 #else
-    if(!result.save("RESULT.txt", raw_ascii)) SP_E("Fail to save to file.\n");
+    if(!result.save("RESULT.txt", raw_ascii))
+        SP_E("Fail to save to file.\n");
 #endif
 
     return SUANPAN_SUCCESS;
@@ -3365,7 +3366,8 @@ int test_material_by_stress_history(const shared_ptr<DomainBase>& domain, istrin
     if(!result.save("RESULT.h5", hdf5_binary_trans))
         SP_E("Fail to save to file.\n");
 #else
-    if(!result.save("RESULT.txt", raw_ascii)) SP_E("Fail to save to file.\n");
+    if(!result.save("RESULT.txt", raw_ascii))
+        SP_E("Fail to save to file.\n");
 #endif
 
     return SUANPAN_SUCCESS;

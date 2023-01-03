@@ -493,7 +493,6 @@
     <ClCompile Include="..\..\..\Toolbox\arpack_wrapper.cpp" />
     <ClCompile Include="..\..\..\Toolbox\commandParser.cpp" />
     <ClCompile Include="..\..\..\Toolbox\Converter.cpp" />
-    <ClCompile Include="..\..\..\Toolbox\print.cpp" />
     <ClCompile Include="..\..\..\Toolbox\IntegrationPlan.cpp" />
     <ClCompile Include="..\..\..\Toolbox\resampling.cpp" />
     <ClCompile Include="..\..\..\Toolbox\sort_rcm.cpp" />
@@ -941,7 +940,6 @@
     <ClInclude Include="..\..\..\Toolbox\container.h" />
     <ClInclude Include="..\..\..\Toolbox\Converter.h" />
     <ClInclude Include="..\..\..\Toolbox\LBFGS.hpp" />
-    <ClInclude Include="..\..\..\Toolbox\print.h" />
     <ClInclude Include="..\..\..\Toolbox\IntegrationPlan.h" />
     <ClInclude Include="..\..\..\Toolbox\Quaternion.hpp" />
     <ClInclude Include="..\..\..\Toolbox\resampling.h" />

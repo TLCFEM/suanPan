@@ -1089,9 +1089,6 @@
     <ClCompile Include="..\..\..\Toolbox\Converter.cpp">
       <Filter>Toolbox</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\print.cpp">
-      <Filter>Toolbox</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\IntegrationPlan.cpp">
       <Filter>Toolbox</Filter>
     </ClCompile>
@@ -2392,9 +2389,6 @@
       <Filter>Toolbox</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Toolbox\Converter.h">
-      <Filter>Toolbox</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Toolbox\print.h">
       <Filter>Toolbox</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Toolbox\IntegrationPlan.h">

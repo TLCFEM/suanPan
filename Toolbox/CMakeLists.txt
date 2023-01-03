@@ -4,7 +4,6 @@ target_sources(${PROJECT_NAME} PRIVATE
         commandParser.cpp
         Converter.cpp
         IntegrationPlan.cpp
-        print.cpp
         sort_rcm.cpp
         sync_ostream.cpp
         tensorToolbox.cpp
