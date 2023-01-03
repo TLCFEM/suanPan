@@ -536,9 +536,9 @@ std::vector<vec> Node::record(const OutputType L) const {
 
 void Node::print() {
     sp_info("Node {}{}\n", get_tag(), is_active() ? ":" : " is currently inactive.");
-    coordinate.t().print("Coordinate:");
-    current_displacement.t().print("Displacement:");
-    current_resistance.t().print("Resistance:");
-    if(!suanpan::approx_equal(accu(current_velocity), 0.)) current_velocity.t().print("Velocity:");
-    if(!suanpan::approx_equal(accu(current_acceleration), 0.)) current_acceleration.t().print("Acceleration:");
+    sp_info("Coordinate:", coordinate);
+    sp_info("Displacement:", current_displacement);
+    sp_info("Resistance:", current_resistance);
+    if(!suanpan::approx_equal(accu(current_velocity), 0.)) sp_info("Velocity:", current_velocity);
+    if(!suanpan::approx_equal(accu(current_acceleration), 0.)) sp_info("Acceleration:", current_acceleration);
 }

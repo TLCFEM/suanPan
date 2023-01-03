@@ -149,14 +149,12 @@ vector<vec> PatchCube::record(const OutputType T) {
 }
 
 void PatchCube::print() {
-    node_encoding.t().print("PatchCube element connects nodes:");
+    sp_info("PatchCube element connects nodes:", node_encoding);
     if(!is_initialized()) return;
     sp_info("Material:\n");
     for(const auto& t_pt : int_pt) {
         t_pt.c_material->print();
-        sp_info("Strain:\t");
-        t_pt.c_material->get_trial_strain().t().print();
-        sp_info("Stress:\t");
-        t_pt.c_material->get_trial_stress().t().print();
+        sp_info("Strain:\t", t_pt.c_material->get_trial_strain());
+        sp_info("Stress:\t", t_pt.c_material->get_trial_stress());
     }
 }

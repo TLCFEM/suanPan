@@ -161,7 +161,7 @@ vector<vec> F31::record(const OutputType P) {
 
 void F31::print() {
     sp_info("A 2D force based beam element{}.\n", nlgeom ? " and corotational formulation" : "");
-    node_encoding.t().print("The element connects nodes:");
+    sp_info("The element connects nodes:", node_encoding);
     if(!is_initialized()) return;
     sp_info("Section:\n");
     auto J = 1;

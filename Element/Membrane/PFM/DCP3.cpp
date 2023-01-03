@@ -120,7 +120,7 @@ vector<vec> DCP3::record(const OutputType T) {
 }
 
 void DCP3::print() {
-    node_encoding.t().print("DCP3 element connects nodes:");
+    sp_info("DCP3 element connects nodes:", node_encoding);
     if(!is_initialized()) return;
     sp_info("Material:\n");
     m_material->print();

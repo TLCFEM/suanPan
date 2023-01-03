@@ -101,6 +101,6 @@ int Concrete21::reset_status() {
 
 void Concrete21::print() {
     sp_info("A planar concrete model.\n");
-    current_strain.t().print("Strain:");
-    current_stress.t().print("Stress:");
+    sp_info("Strain:", current_strain);
+    sp_info("Stress:", current_stress);
 }

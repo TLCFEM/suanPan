@@ -132,6 +132,6 @@ vector<vec> Parallel::record(const OutputType P) {
 }
 
 void Parallel::print() {
-    mat_tag.t().print("A Parallel container that holds following models:");
+    sp_info("A Parallel container that holds following models:", mat_tag);
     for(const auto& I : mat_pool) I->print();
 }

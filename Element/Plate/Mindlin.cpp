@@ -143,7 +143,7 @@ vector<vec> Mindlin::record(const OutputType P) {
     return data;
 }
 
-void Mindlin::print() { node_encoding.t().print("A Mindlin plate element connects:"); }
+void Mindlin::print() { sp_info("A Mindlin plate element connects:", node_encoding); }
 
 #ifdef SUANPAN_VTK
 #include <vtkQuad.h>

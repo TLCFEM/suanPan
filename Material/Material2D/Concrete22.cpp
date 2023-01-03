@@ -143,6 +143,6 @@ int Concrete22::reset_status() {
 }
 
 void Concrete22::print() {
-    current_strain.t().print("Strain:");
-    current_stress.t().print("Stress:");
+    sp_info("Strain:", current_strain);
+    sp_info("Stress:", current_stress);
 }

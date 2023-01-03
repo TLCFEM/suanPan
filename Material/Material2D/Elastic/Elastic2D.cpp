@@ -90,8 +90,8 @@ int Elastic2D::reset_status() {
 
 void Elastic2D::print() {
     sp_info("A 2D isotropic elastic material model.\n");
-    current_strain.t().print("Strain:");
-    current_stress.t().print("Stress:");
+    sp_info("Strain:", current_strain);
+    sp_info("Stress:", current_stress);
 }
 
 vector<vec> Elastic2D::record(const OutputType P) {

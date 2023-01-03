@@ -199,7 +199,7 @@ vector<vec> CSMT3::record(const OutputType T) {
 }
 
 void CSMT3::print() {
-    node_encoding.t().print("CSMT3 element connects:");
+    sp_info("CSMT3 element connects:", node_encoding);
     if(!is_initialized()) return;
     sp_info("Material:\n");
     for(const auto& I : int_pt) I.m_material->print();

@@ -199,12 +199,12 @@ vector<vec> PCPE8DC::record(const OutputType P) {
 
 void PCPE8DC::print() {
     sp_info("A eight-node membrane element (PCPE8DC).\n");
-    node_encoding.t().print("The nodes connected are:");
+    sp_info("The nodes connected are:", node_encoding);
     if(!is_initialized()) return;
     sp_info("Material:\n");
     for(size_t I = 0; I < int_pt.size(); ++I) {
         sp_info("IP {}:\t", I + 1);
-        int_pt[I].coor.t().print();
+        sp_info(int_pt[I].coor);
         int_pt[I].m_material->print();
     }
 }

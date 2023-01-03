@@ -136,15 +136,13 @@ vector<vec> DC3D8::record(const OutputType T) {
 }
 
 void DC3D8::print() {
-    node_encoding.t().print("DC3D8 element connects:");
+    sp_info("DC3D8 element connects:", node_encoding);
     if(!is_initialized()) return;
     sp_info("Material:\n");
     for(const auto& t_pt : int_pt) {
         t_pt.c_material->print();
-        sp_info("Strain:\t");
-        t_pt.c_material->get_current_strain().t().print();
-        sp_info("Stress:\t");
-        t_pt.c_material->get_current_stress().t().print();
+        sp_info("Strain:\t", t_pt.c_material->get_current_strain());
+        sp_info("Stress:\t", t_pt.c_material->get_current_stress());
     }
 }
 

@@ -127,7 +127,7 @@ vector<vec> Uniaxial::record(const OutputType P) { return base->record(P); }
 
 void Uniaxial::print() {
     sp_info("A uniaxial wrapper.\n");
-    current_strain.t().print("Strain:");
-    current_stress.t().print("Stress:");
+    sp_info("Strain:", current_strain);
+    sp_info("Stress:", current_stress);
     if(base) base->print();
 }

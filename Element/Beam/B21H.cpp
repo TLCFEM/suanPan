@@ -137,7 +137,7 @@ vector<vec> B21H::record(const OutputType P) {
 void B21H::print() {
     sp_info("A 2D beam element with lumped end plasticity (hinges){}", nlgeom ? " and corotational formulation.\n" : ".\n");
     sp_info("The plastic hinge length is: {:.3f}.\n", hinge_length);
-    node_encoding.t().print("The element connects nodes:");
+    sp_info("The element connects nodes:", node_encoding);
     if(!is_initialized()) return;
     sp_info("Section:\n");
     auto J = 1;

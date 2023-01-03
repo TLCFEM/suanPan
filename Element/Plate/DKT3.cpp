@@ -200,7 +200,7 @@ vector<vec> DKT3::record(const OutputType P) {
     return data;
 }
 
-void DKT3::print() { node_encoding.t().print("A DKT triangular plate element connects:"); }
+void DKT3::print() { sp_info("A DKT triangular plate element connects:", node_encoding); }
 
 #ifdef SUANPAN_VTK
 #include <vtkTriangle.h>

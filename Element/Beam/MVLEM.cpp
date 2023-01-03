@@ -216,7 +216,7 @@ vector<vec> MVLEM::record(const OutputType P) {
 }
 
 void MVLEM::print() {
-    node_encoding.t().print("A MVLEM element connects nodes:");
+    sp_info("A MVLEM element connects nodes:", node_encoding);
     if(!is_initialized()) return;
     sp_info("Section:\n");
     auto J = 0;

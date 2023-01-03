@@ -215,7 +215,7 @@ vector<vec> QE2::record(const OutputType T) {
 }
 
 void QE2::print() {
-    node_encoding.t().print("Piltner's mixed quad element connects nodes:");
+    sp_info("Piltner's mixed quad element connects nodes:", node_encoding);
     if(!is_initialized()) return;
     sp_info("Material Response:\n");
     for(size_t I = 0; I < int_pt.size(); ++I) {
@@ -225,8 +225,8 @@ void QE2::print() {
     sp_info("Element Response:\n");
     for(size_t I = 0; I < int_pt.size(); ++I) {
         sp_info("IP {}:\n", I + 1);
-        (int_pt[I].A * current_alpha).t().print("Strain:");
-        (int_pt[I].P * current_beta).t().print("Stress:");
+        sp_info("Strain:\t", int_pt[I].A * current_alpha);
+        sp_info("Stress:\t", int_pt[I].P * current_beta);
     }
 }
 

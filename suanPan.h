@@ -285,7 +285,21 @@ namespace std::ranges {
     template<class IN, class FN> FN for_each(IN& from, FN&& func) { return std::for_each(from.begin(), from.end(), std::forward<FN>(func)); }
 
     template<class IN, class OUT> OUT copy(IN& from, OUT to) { return std::copy(from.begin(), from.end(), to); }
-}
+} // namespace std::ranges
 #endif
+
+template<typename T> void sp_info(const Col<T>& in_vec) {
+    if(std::is_floating_point<T>::value)
+        for(const auto& I : in_vec) sp_info(" {:1.5e}", I);
+    else
+        for(const auto& I : in_vec) sp_info(" {:d}", I);
+    sp_info("\n");
+}
+
+template<typename T> void sp_info(const std::string_view format_str, const Col<T>& in_vec) {
+    sp_info(format_str);
+    if(format_str.back() != '\t') sp_info("\n");
+    sp_info(in_vec);
+}
 
 #endif

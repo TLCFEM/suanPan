@@ -87,7 +87,7 @@ int CAX3::reset_status() { return m_material->reset_status(); }
 vector<vec> CAX3::record(const OutputType T) { return m_material->record(T); }
 
 void CAX3::print() {
-    node_encoding.t().print("CAX3 element connects:");
+    sp_info("CAX3 element connects:", node_encoding);
     if(!is_initialized()) return;
     sp_info("Material:\n");
     m_material->print();

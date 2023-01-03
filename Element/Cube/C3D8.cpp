@@ -204,21 +204,16 @@ vector<vec> C3D8::record(const OutputType T) {
 }
 
 void C3D8::print() {
-    sp_info("A C3D8 element{}{}.\n", int_scheme == 'R'
-            ? " reduced integration"
-            : int_scheme == 'I'
-            ? " Iron's integration"
-            : " full integration",
+    sp_info("A C3D8 element{}{}.\n", int_scheme == 'R' ? " reduced integration" : int_scheme == 'I' ? " Iron's integration"
+                                                                                                    : " full integration",
             nlgeom ? " nonlinear geometry" : "");
-    node_encoding.t().print("The element connects nodes:");
+    sp_info("The element connects nodes:", node_encoding);
     if(!is_initialized()) return;
     sp_info("Material:\n");
     for(const auto& t_pt : int_pt) {
         t_pt.c_material->print();
-        sp_info("Strain:\t");
-        t_pt.c_material->get_trial_strain().t().print();
-        sp_info("Stress:\t");
-        t_pt.c_material->get_trial_stress().t().print();
+        sp_info("Strain:\t", t_pt.c_material->get_trial_strain());
+        sp_info("Stress:\t", t_pt.c_material->get_trial_stress());
     }
 }
 

@@ -114,7 +114,7 @@ vector<vec> B21::record(const OutputType P) {
 
 void B21::print() {
     sp_info("A classic 2D displacement based beam element using Hermite interpolation functions{}", nlgeom ? " and corotational formulation.\n" : ".\n");
-    node_encoding.t().print("The element connects nodes:");
+    sp_info("The element connects nodes:", node_encoding);
     if(!is_initialized()) return;
     sp_info("Section:\n");
     auto J = 1;

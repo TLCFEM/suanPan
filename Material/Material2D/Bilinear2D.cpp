@@ -117,8 +117,8 @@ int Bilinear2D::reset_status() {
 
 void Bilinear2D::print() {
     sp_info("A 2D bilinear plane {} material model.\n", plane_type == PlaneType::S ? "stress" : "strain");
-    current_strain.t().print("Strain:");
-    current_stress.t().print("Stress:");
+    sp_info("Strain:", current_strain);
+    sp_info("Stress:", current_stress);
 }
 
 vector<vec> Bilinear2D::record(const OutputType P) {
