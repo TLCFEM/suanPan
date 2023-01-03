@@ -260,18 +260,18 @@ void print_version() {
     suanpan_info("    The source code of suanPan is hosted on GitHub. https://tlcfem.github.io/suanPan/\n");
     suanpan_info("    The documentation is hosted on GitBook and readthedocs. https://tlcfem.gitbook.io/suanpan-manual/ and https://suanpan-manual.readthedocs.io/\n");
 #ifdef SUANPAN_MKL
-    sp_info("    The linear algebra support is provided by Armadillo with Intel MKL. http://arma.sourceforge.net/\n");
+    suanpan_info("    The linear algebra support is provided by Armadillo with Intel MKL. http://arma.sourceforge.net/\n");
 #else
     suanpan_info("    The linear algebra support is provided by Armadillo. http://arma.sourceforge.net/\n");
 #endif
 #ifdef SUANPAN_CUDA
-    sp_info("    The GPCPU solvers are provided by CUDA. https://developer.nvidia.com/about-cuda\n");
+    suanpan_info("    The GPCPU solvers are provided by CUDA. https://developer.nvidia.com/about-cuda\n");
 #endif
 #ifdef SUANPAN_MT
-    sp_info("    The parallelisation support is implemented via TBB library. https://github.com/oneapi-src/oneTBB\n");
+    suanpan_info("    The parallelisation support is implemented via TBB library. https://github.com/oneapi-src/oneTBB\n");
 #endif
 #ifdef SUANPAN_VTK
-    sp_info("    The visualisation support is implemented via VTK library. https://vtk.org/\n");
+    suanpan_info("    The visualisation support is implemented via VTK library. https://vtk.org/\n");
 #endif
     suanpan_info("\nPlease join gitter for any feedback. https://gitter.im/suanPan-dev/community\n");
     suanpan_info("\n\n[From Wikipedia] Betelgeuse is usually the tenth-brightest star in the night sky and, after Rigel, the second-brightest in the constellation of Orion. It is a distinctly reddish semiregular variable star whose apparent magnitude has the widest range displayed by any first-magnitude star.\n\n");
@@ -282,7 +282,7 @@ void print_helper() {
     suanpan_info("\t-{:<10}  --{:<20}{}\n", "v", "version", "check version information");
     suanpan_info("\t-{:<10}  --{:<20}{}\n", "h", "help", "print this helper");
     suanpan_info("\t-{:<10}  --{:<20}{}\n", "s", "strip", "strip comments out in given ABAQUS input file");
-    // sp_info("\t-{:<10}  --{:<20}{}\n", "c", "convert", "partially convert ABAQUS input file into suanPan model script");
+    // suanpan_info("\t-{:<10}  --{:<20}{}\n", "c", "convert", "partially convert ABAQUS input file into suanPan model script");
     suanpan_info("\t-{:<10}  --{:<20}{}\n", "np", "noprint", "suppress most console output");
     suanpan_info("\t-{:<10}  --{:<20}{}\n", "nu", "noupdate", "do not check for newer version on startup");
     suanpan_info("\t-{:<10}  --{:<20}{}\n", "f", "file", "process model file");
