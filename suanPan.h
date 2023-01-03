@@ -167,8 +167,8 @@ constexpr auto SUANPAN_FAIL = -1;
 #endif
 
 #ifdef SUANPAN_MT
-#include <tbb/parallel_sort.h>
 #include <tbb/parallel_for_each.h>
+#include <tbb/parallel_sort.h>
 #define suanpan_sort tbb::parallel_sort
 #define suanpan_for_each tbb::parallel_for_each
 #else
@@ -178,64 +178,55 @@ constexpr auto SUANPAN_FAIL = -1;
 
 #include <iostream>
 inline auto& SUANPAN_COUT = std::cout;
-inline auto& SUANPAN_CERR = std::cerr;
+inline auto& SUANPAN_CWRN = std::cout;
+inline auto& SUANPAN_CERR = std::cout;
+inline auto& SUANPAN_CFTL = std::cout;
 
 #define ARMA_COUT_STREAM SUANPAN_COUT
 #define ARMA_CERR_STREAM SUANPAN_COUT
 
 #include <armadillo/armadillo>
-
 using namespace arma;
 
 #include <filesystem>
+namespace fs = std::filesystem;
+
 #include <fmt/color.h>
 #include <mutex>
-#ifndef __has_include
-#include <source_location>
-namespace sl = std;
-#elif __has_include(<experimental/source_location>)
-#include <experimental/source_location>
-namespace sl = std::experimental;
-#else
-#include <source_location>
-namespace sl = std;
-#endif
-
-namespace fs = std::filesystem;
 
 namespace suanpan {
     inline std::mutex print_mutex;
 
-    inline std::string pattern(const std::string_view header, const sl::source_location& loc, const std::string_view& format) {
+    inline std::string pattern(const std::string_view header, const std::string_view& file_name, const std::string_view& format) {
         std::string pattern{header};
-        pattern += fs::path(loc.file_name()).filename().string();
+        pattern += fs::path(file_name).filename().string();
         pattern += ":{}: ";
         pattern += format;
         return pattern;
     }
 
-    template<typename... T> void debug(const sl::source_location loc, const std::string_view format_str, const T&... args) {
+    template<typename... T> void debug(const std::string_view file_name, const int line, const std::string_view format_str, const T&... args) {
         if(!SUANPAN_VERBOSE || !SUANPAN_PRINT) return;
         const std::scoped_lock lock(print_mutex);
-        SUANPAN_COUT << fmt::vformat(fg(fmt::terminal_color::bright_green), pattern("[DEBUG] ", loc, format_str), fmt::make_format_args(loc.line(), args...));
+        SUANPAN_COUT << fmt::vformat(fg(fmt::terminal_color::bright_green), pattern("[DEBUG] ", file_name, format_str), fmt::make_format_args(line, args...));
     }
 
-    template<typename... T> void warning(const sl::source_location loc, const std::string_view format_str, const T&... args) {
+    template<typename... T> void warning(const std::string_view file_name, const int line, const std::string_view format_str, const T&... args) {
         if(!SUANPAN_PRINT) return;
         const std::scoped_lock lock(print_mutex);
-        SUANPAN_COUT << fmt::vformat(fg(fmt::terminal_color::bright_blue), pattern("[WARNING] ", loc, format_str), fmt::make_format_args(loc.line(), args...));
+        SUANPAN_CWRN << fmt::vformat(fg(fmt::terminal_color::bright_blue), pattern("[WARNING] ", file_name, format_str), fmt::make_format_args(line, args...));
     }
 
-    template<typename... T> void error(const sl::source_location loc, const std::string_view format_str, const T&... args) {
+    template<typename... T> void error(const std::string_view file_name, const int line, const std::string_view format_str, const T&... args) {
         if(!SUANPAN_PRINT) return;
         const std::scoped_lock lock(print_mutex);
-        SUANPAN_COUT << fmt::vformat(fg(fmt::terminal_color::bright_yellow), pattern("[ERROR] ", loc, format_str), fmt::make_format_args(loc.line(), args...));
+        SUANPAN_CERR << fmt::vformat(fg(fmt::terminal_color::bright_yellow), pattern("[ERROR] ", file_name, format_str), fmt::make_format_args(line, args...));
     }
 
-    template<typename... T> void fatal(const sl::source_location loc, const std::string_view format_str, const T&... args) {
+    template<typename... T> void fatal(const std::string_view file_name, const int line, const std::string_view format_str, const T&... args) {
         if(!SUANPAN_PRINT) return;
         const std::scoped_lock lock(print_mutex);
-        SUANPAN_COUT << fmt::vformat(fg(fmt::terminal_color::bright_red), pattern("[FATAL] ", loc, format_str), fmt::make_format_args(loc.line(), args...));
+        SUANPAN_CFTL << fmt::vformat(fg(fmt::terminal_color::bright_red), pattern("[FATAL] ", file_name, format_str), fmt::make_format_args(line, args...));
     }
 
     template<typename... T> void info(const std::string_view format_str, const T&... args) {
@@ -286,10 +277,10 @@ inline void suanpan_assert(const std::function<void()>& F) {
 #endif
 
 #define suanpan_info suanpan::info
-#define suanpan_debug(...) suanpan::debug(sl::source_location::current(), ##__VA_ARGS__)
-#define suanpan_warning(...) suanpan::warning(sl::source_location::current(), ##__VA_ARGS__)
-#define suanpan_error(...) suanpan::error(sl::source_location::current(), ##__VA_ARGS__)
-#define suanpan_fatal(...) suanpan::fatal(sl::source_location::current(), ##__VA_ARGS__)
+#define suanpan_debug(...) suanpan::debug(__FILE__, __LINE__, ##__VA_ARGS__)
+#define suanpan_warning(...) suanpan::warning(__FILE__, __LINE__, ##__VA_ARGS__)
+#define suanpan_error(...) suanpan::error(__FILE__, __LINE__, ##__VA_ARGS__)
+#define suanpan_fatal(...) suanpan::fatal(__FILE__, __LINE__, ##__VA_ARGS__)
 
 #include <memory>
 
