@@ -169,7 +169,7 @@ vector<vec> Allman::record(const OutputType T) {
 }
 
 void Allman::print() {
-    suanpan_info("Allman element connects:", node_encoding);
+    suanpan_info("Allman element connects:\t", node_encoding);
 }
 
 #ifdef SUANPAN_VTK

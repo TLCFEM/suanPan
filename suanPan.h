@@ -243,8 +243,10 @@ namespace suanpan {
 
     template<typename T> void info(const Col<T>& in_vec) {
         if(!SUANPAN_PRINT) return;
-        if(std::is_floating_point_v<T>) for(const auto& I : in_vec) info(" {: 1.5e}", I);
-        else for(const auto& I : in_vec) info(" {:d}", I);
+        if(std::is_floating_point_v<T>)
+            for(const auto& I : in_vec) info(" {: 1.5e}", I);
+        else
+            for(const auto& I : in_vec) info(" {:6d}", I);
         info("\n");
     }
 
