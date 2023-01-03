@@ -32,9 +32,6 @@
     <ClCompile Include="..\..\..\Section\Section.cpp">
       <Filter>DEPEND</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\print.cpp">
-      <Filter>DEPEND</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Domain\Group\Group.cpp">
       <Filter>DEPEND</Filter>
     </ClCompile>

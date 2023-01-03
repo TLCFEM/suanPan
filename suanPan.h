@@ -183,12 +183,18 @@ inline auto& SUANPAN_CERR = std::cerr;
 #include <filesystem>
 #include <fmt/color.h>
 #include <mutex>
+#ifdef SUANPAN_CLANG
+#include <experimental/source_location>
+namespace sl = std::experimental;
+#else
 #include <source_location>
+namespace sl = std;
+#endif
 
 namespace fs = std::filesystem;
 
 namespace suanpan {
-    extern std::mutex print_mutex;
+    inline std::mutex print_mutex;
 }
 
 #ifdef SUANPAN_MSVC
@@ -205,7 +211,7 @@ inline void suanpan_debug(const std::function<void()>& F) {
 #pragma warning(default : 4100)
 #endif
 
-inline std::string suanpan_pattern(const std::string_view header, const std::source_location& loc, const std::string_view& format) {
+inline std::string suanpan_pattern(const std::string_view header, const sl::source_location& loc, const std::string_view& format) {
     std::string pattern{header};
     pattern += fs::path(loc.file_name()).filename().string();
     pattern += ":{}: ";
@@ -218,30 +224,30 @@ template<typename... T> void sp_info(const std::string_view format_str, const T&
     SUANPAN_COUT << fmt::vformat(fg(fmt::terminal_color::green), format_str, fmt::make_format_args(args...));
 }
 
-template<typename... T> void sp_debug(const std::source_location loc, const std::string_view format_str, const T&... args) {
+template<typename... T> void sp_debug(const sl::source_location loc, const std::string_view format_str, const T&... args) {
     const std::scoped_lock lock(suanpan::print_mutex);
     SUANPAN_COUT << fmt::vformat(fg(fmt::terminal_color::green), suanpan_pattern("[DEBUG] ", loc, format_str), fmt::make_format_args(loc.line(), args...));
 }
 
-template<typename... T> void sp_warning(const std::source_location loc, const std::string_view format_str, const T&... args) {
+template<typename... T> void sp_warning(const sl::source_location loc, const std::string_view format_str, const T&... args) {
     const std::scoped_lock lock(suanpan::print_mutex);
     SUANPAN_COUT << fmt::vformat(fg(fmt::terminal_color::blue), suanpan_pattern("[WARNING] ", loc, format_str), fmt::make_format_args(loc.line(), args...));
 }
 
-template<typename... T> void sp_error(const std::source_location loc, const std::string_view format_str, const T&... args) {
+template<typename... T> void sp_error(const sl::source_location loc, const std::string_view format_str, const T&... args) {
     const std::scoped_lock lock(suanpan::print_mutex);
     SUANPAN_COUT << fmt::vformat(fg(fmt::terminal_color::yellow), suanpan_pattern("[ERROR] ", loc, format_str), fmt::make_format_args(loc.line(), args...));
 }
 
-template<typename... T> void sp_fatal(const std::source_location loc, const std::string_view format_str, const T&... args) {
+template<typename... T> void sp_fatal(const sl::source_location loc, const std::string_view format_str, const T&... args) {
     const std::scoped_lock lock(suanpan::print_mutex);
     SUANPAN_COUT << fmt::vformat(fg(fmt::terminal_color::red), suanpan_pattern("[FATAL] ", loc, format_str), fmt::make_format_args(loc.line(), args...));
 }
 
-#define SP_D(...) sp_debug(std::source_location::current(), ##__VA_ARGS__)
-#define SP_W(...) sp_warning(std::source_location::current(), ##__VA_ARGS__)
-#define SP_E(...) sp_error(std::source_location::current(), ##__VA_ARGS__)
-#define SP_F(...) sp_fatal(std::source_location::current(), ##__VA_ARGS__)
+#define SP_D(...) sp_debug(sl::source_location::current(), ##__VA_ARGS__)
+#define SP_W(...) sp_warning(sl::source_location::current(), ##__VA_ARGS__)
+#define SP_E(...) sp_error(sl::source_location::current(), ##__VA_ARGS__)
+#define SP_F(...) sp_fatal(sl::source_location::current(), ##__VA_ARGS__)
 
 #define ARMA_COUT_STREAM SUANPAN_COUT
 #define ARMA_CERR_STREAM SUANPAN_COUT
@@ -289,7 +295,7 @@ namespace std::ranges {
 #endif
 
 template<typename T> void sp_info(const Col<T>& in_vec) {
-    if(std::is_floating_point_v<T>) for(const auto& I : in_vec) sp_info(" {:1.5e}", I);
+    if(std::is_floating_point_v<T>) for(const auto& I : in_vec) sp_info(" {: 1.5e}", I);
     else for(const auto& I : in_vec) sp_info(" {:d}", I);
     sp_info("\n");
 }

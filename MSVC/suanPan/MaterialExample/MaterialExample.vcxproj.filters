@@ -23,9 +23,6 @@
     <ClCompile Include="..\..\..\Developer\Material\ElasticExternal.cpp">
       <Filter>SRC</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\print.cpp">
-      <Filter>DEPEND</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Developer\Material\MaterialExample.h">
