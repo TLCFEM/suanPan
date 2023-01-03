@@ -193,12 +193,12 @@ using namespace arma;
 #ifndef __has_include
 #include <source_location>
 namespace sl = std;
-#elif __has_include(<source_location>)
-#include <source_location>
-namespace sl = std;
-#else
+#elif __has_include(<experimental/source_location>)
 #include <experimental/source_location>
 namespace sl = std::experimental;
+#else
+#include <source_location>
+namespace sl = std;
 #endif
 
 namespace fs = std::filesystem;
