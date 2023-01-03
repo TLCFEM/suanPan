@@ -23,4 +23,4 @@ TrussSection::TrussSection(const unsigned T, const double A, const unsigned M)
 
 unique_ptr<Section> TrussSection::get_copy() { return make_unique<TrussSection>(*this); }
 
-void TrussSection::print() { suanpan_info("A 1D generalized section with an area of %.3E.\n", area); }
+void TrussSection::print() { sp_info("A uniaxial generalized section with an area of {:.3E}.\n", area); }

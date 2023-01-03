@@ -57,6 +57,6 @@ int Sinh1D::reset_status() {
 }
 
 void Sinh1D::print() {
-    suanpan_info("A 1D nonlinear elastic material using sinh function with an elastic modulus of %.4E.\n", elastic_modulus);
+    sp_info("A uniaxial nonlinear elastic material using sinh function with an elastic modulus of {:.4E}.\n", elastic_modulus);
     Material1D::print();
 }

@@ -1178,8 +1178,8 @@ void Domain::enable_all() {
 }
 
 void Domain::summary() const {
-    suanpan_info("Domain %u contains:\n\t%llu nodes, %llu elements, %llu materials,\n", get_tag(), get_node(), get_element(), get_material());
-    suanpan_info("\t%llu loads, %llu constraints and %llu recorders.\n", get_load(), get_constraint(), get_recorder());
+    sp_info("Domain {} contains:\n\t{} nodes, {} elements, {} materials,\n", get_tag(), get_node(), get_element(), get_material());
+    sp_info("\t{} loads, {} constraints and {} recorders.\n", get_load(), get_constraint(), get_recorder());
 }
 
 void Domain::erase_machine_error(vec& ninja) const { suanpan::for_all(restrained_dofs, [&](const uword I) { ninja(I) = 0.; }); }

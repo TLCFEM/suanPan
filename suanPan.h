@@ -179,10 +179,6 @@ constexpr auto SUANPAN_FAIL = -1;
 #include <iostream>
 inline auto& SUANPAN_COUT = std::cout;
 inline auto& SUANPAN_CERR = std::cerr;
-inline auto& SUANPAN_SYNC_COUT = SUANPAN_COUT;
-inline auto& SUANPAN_SYNC_CERR = SUANPAN_CERR;
-
-#include <Toolbox/print.h>
 
 #include <filesystem>
 #include <fmt/color.h>

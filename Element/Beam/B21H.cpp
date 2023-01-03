@@ -135,14 +135,14 @@ vector<vec> B21H::record(const OutputType P) {
 }
 
 void B21H::print() {
-    suanpan_info("A 2D beam element with lumped end plasticity (hinges)%s", nlgeom ? " and corotational formulation.\n" : ".\n");
-    suanpan_info("The plastic length is: %.3f.\n", hinge_length);
+    sp_info("A 2D beam element with lumped end plasticity (hinges){}", nlgeom ? " and corotational formulation.\n" : ".\n");
+    sp_info("The plastic hinge length is: {:.3f}.\n", hinge_length);
     node_encoding.t().print("The element connects nodes:");
     if(!is_initialized()) return;
-    suanpan_info("Section:\n");
+    sp_info("Section:\n");
     auto J = 1;
     for(const auto& I : int_pt) {
-        suanpan_info("IP %d: ", J++);
+        sp_info("IP {}: ", J++);
         I.b_section->print();
     }
 }

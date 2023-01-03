@@ -71,4 +71,4 @@ int CircularHollow3D::initialize(const shared_ptr<DomainBase>& D) {
 
 unique_ptr<Section> CircularHollow3D::get_copy() { return make_unique<CircularHollow3D>(*this); }
 
-void CircularHollow3D::print() { suanpan_info("A CircularHollow3D Section.\n"); }
+void CircularHollow3D::print() { sp_info("A 3D circular hollow section.\n"); }

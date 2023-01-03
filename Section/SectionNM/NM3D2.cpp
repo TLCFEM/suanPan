@@ -30,7 +30,7 @@ NM3D2::NM3D2(const unsigned T, const double EEA, const double EEIS, const double
 unique_ptr<Section> NM3D2::get_copy() { return make_unique<NM3D2>(*this); }
 
 void NM3D2::print() {
-    suanpan_info("A N-M based section. doi: 10.1007/978-94-007-6573-3_3\n");
+    sp_info("A N-M based section. doi: 10.1007/978-94-007-6573-3_3\n");
     current_deformation.head(5).t().print("Local Deformation:");
     current_resistance.head(5).t().print("Local Resistance:");
 }

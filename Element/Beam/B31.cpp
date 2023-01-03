@@ -128,7 +128,7 @@ vector<vec> B31::record(const OutputType P) {
     return output;
 }
 
-void B31::print() { suanpan_info("A spatial beam element.\n"); }
+void B31::print() { sp_info("A spatial beam element.\n"); }
 
 #ifdef SUANPAN_VTK
 #include <vtkLine.h>

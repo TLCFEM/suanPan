@@ -67,7 +67,7 @@ void HSection2D::print() {
     sp_info("A 2D H-shape section.\n");
     auto J = 1;
     for(const auto& I : int_pt) {
-        suanpan_info("IP %u: %.4E.\n", J++, I.coor);
+        sp_info("IP {}: {:.4E}.\n", J++, I.coor);
         I.s_material->print();
     }
 }

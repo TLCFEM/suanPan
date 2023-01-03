@@ -31,7 +31,7 @@ int Ramm::analyze() {
     auto& G = get_integrator();
     auto& W = G->get_domain()->get_factory();
 
-    suanpan_info("current load level: %+.5f.\n", W->get_trial_load_factor().at(0));
+    sp_info("-> Current Load Level: {:+.5f}.\n", W->get_trial_load_factor().at(0));
 
     const auto max_iteration = C->get_max_iteration();
 
@@ -111,4 +111,4 @@ int Ramm::analyze() {
     }
 }
 
-void Ramm::print() { suanpan_info("A solver using Ramm's arc length method.\n"); }
+void Ramm::print() { sp_info("A solver using Ramm's arc length method.\n"); }

@@ -181,4 +181,4 @@ vec GeneralizedAlpha::from_incre_acceleration(const vec& incre_acceleration, con
     return incre_acceleration / F7 + F10 * W->get_current_velocity()(encoding) - F9 / F7 * W->get_current_acceleration()(encoding) + W->get_current_displacement()(encoding);
 }
 
-void GeneralizedAlpha::print() { suanpan_info("A time integrator using the Generalized-Alpha algorithm.\ndoi:10.1115/1.2900803\n"); }
+void GeneralizedAlpha::print() { sp_info("A time integrator using the Generalized-Alpha algorithm. doi:10.1115/1.2900803\n"); }

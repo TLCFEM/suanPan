@@ -113,7 +113,7 @@ void Stacked::print() {
     sp_info("A stack wrapper for 3D problems.\n");
     unsigned t_tag = 0;
     for(const auto& I : mat_pool) {
-        suanpan_info("Component %u: ", ++t_tag);
+        sp_info("Component {}: ", ++t_tag);
         I->print();
     }
 }

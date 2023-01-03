@@ -183,9 +183,9 @@ vector<vec> CP5::record(const OutputType P) {
 }
 
 void CP5::print() {
-    suanpan_info("A CP5 element%s.\n", nlgeom ? " with nonlinear geometry on" : "");
+    sp_info("A CP5 element{}.\n", nlgeom ? " with nonlinear geometry on" : "");
     node_encoding.t().print("The nodes connected are:");
     if(!is_initialized()) return;
-    suanpan_info("Material:\n");
+    sp_info("Material:\n");
     for(const auto& I : int_pt) I.m_material->print();
 }

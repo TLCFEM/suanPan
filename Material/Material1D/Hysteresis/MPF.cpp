@@ -119,6 +119,6 @@ int MPF::reset_status() {
 }
 
 void MPF::print() {
-    suanpan_info("Menegotto-Pinto-Filippou model with initial stiffness %.3E and yield stress %.3E with isotropic hardening %s and Bauschinger effect %s.\n", elastic_modulus, yield_stress, isotropic_hardening ? "enabled" : "disabled", constant_radius ? "disabled" : "enabled");
+    sp_info("A Menegotto-Pinto-Filippou model with initial stiffness {:.3E} and yield stress {:.3E} with isotropic hardening {} and Bauschinger effect {}.\n", elastic_modulus, yield_stress, isotropic_hardening ? "enabled" : "disabled", constant_radius ? "disabled" : "enabled");
     Material1D::print();
 }

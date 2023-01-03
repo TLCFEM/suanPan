@@ -157,4 +157,4 @@ void BatheTwoStep::update_parameter(const double NT) {
     P9 = P8 * P8;
 }
 
-void BatheTwoStep::print() { suanpan_info("A BatheTwoStep solver.\n"); }
+void BatheTwoStep::print() { sp_info("A BatheTwoStep time integrator.\n"); }

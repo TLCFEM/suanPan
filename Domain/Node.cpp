@@ -535,7 +535,7 @@ std::vector<vec> Node::record(const OutputType L) const {
 }
 
 void Node::print() {
-    suanpan_info("Node %u:\n", get_tag(), is_active() ? "" : " is currently inactive");
+    sp_info("Node {}{}\n", get_tag(), is_active() ? ":" : " is currently inactive.");
     coordinate.t().print("Coordinate:");
     current_displacement.t().print("Displacement:");
     current_resistance.t().print("Resistance:");

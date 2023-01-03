@@ -116,7 +116,7 @@ int Bilinear2D::reset_status() {
 }
 
 void Bilinear2D::print() {
-    suanpan_info("A 2D bilinear plane %s material model.\n", plane_type == PlaneType::S ? "stress" : "strain");
+    sp_info("A 2D bilinear plane {} material model.\n", plane_type == PlaneType::S ? "stress" : "strain");
     current_strain.t().print("Strain:");
     current_stress.t().print("Stress:");
 }

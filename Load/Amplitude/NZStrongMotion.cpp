@@ -43,4 +43,4 @@ double NZStrongMotion::get_amplitude(const double T) {
     return (magnitude(IDX + 2) + (step_time - static_cast<double>(IDX) * magnitude(0) / 1E3) * diff_magnitude / magnitude(0)) / magnitude(1);
 }
 
-void NZStrongMotion::print() { suanpan_info("NZStrongMotion %s with total duration of %.2f seconds and raw PGA of %.4f mm/s/s.\n", file_name.c_str(), static_cast<double>(magnitude.n_elem - 2llu) * magnitude(0) / 1E3, magnitude(1) / 1E3); }
+void NZStrongMotion::print() { sp_info("NZStrongMotion {} with total duration of {:.2f} seconds and raw PGA of {:.4f} mm/s/s.\n", file_name, static_cast<double>(magnitude.n_elem - 2llu) * magnitude(0) / 1E3, magnitude(1) / 1E3); }

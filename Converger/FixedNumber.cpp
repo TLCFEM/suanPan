@@ -29,7 +29,7 @@ FixedNumber::FixedNumber(const unsigned T, const unsigned M, const bool P)
 unique_ptr<Converger> FixedNumber::get_copy() { return make_unique<FixedNumber>(*this); }
 
 bool FixedNumber::is_converged(const unsigned counter) {
-    if(is_print()) suanpan_info("iteration counter: %u.\n", counter);
+    if(is_print()) sp_info("--> Iteration Counter: {}.\n", counter);
 
     set_conv_flag(get_max_iteration() <= counter);
 

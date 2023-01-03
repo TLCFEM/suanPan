@@ -96,6 +96,6 @@ int Fibre1D::reset_status() {
 }
 
 void Fibre1D::print() {
-    suanpan_info("A 1D fibre section consists of %llu sections.\n", fibre.size());
+    sp_info("A uniaxial fibre section consists of {} sections.\n", fibre.size());
     for(const auto& I : fibre) I->print();
 }

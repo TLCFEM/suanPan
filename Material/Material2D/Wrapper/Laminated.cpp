@@ -111,7 +111,7 @@ void Laminated::print() {
     sp_info("A multilayer wrapper for planar problems.\n");
     unsigned t_tag = 0;
     for(const auto& I : mat_pool) {
-        suanpan_info("Component %u: ", ++t_tag);
+        sp_info("Component {}: ", ++t_tag);
         I->print();
     }
 }

@@ -72,6 +72,6 @@ int BilinearElastic1D::reset_status() {
 }
 
 void BilinearElastic1D::print() {
-    suanpan_info("A bilinear elastic material model with an elastic modulus of %.3E and a hardening ratio of %.2f.\n", elastic_modulus, hardening_modulus / elastic_modulus);
+    sp_info("A bilinear elastic material model with an elastic modulus of {:.3E} and a hardening ratio of {:.2f}.\n", elastic_modulus, hardening_modulus / elastic_modulus);
     Material1D::print();
 }

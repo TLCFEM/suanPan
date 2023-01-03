@@ -89,7 +89,7 @@ vector<vec> CAX3::record(const OutputType T) { return m_material->record(T); }
 void CAX3::print() {
     node_encoding.t().print("CAX3 element connects:");
     if(!is_initialized()) return;
-    suanpan_info("Material:\n");
+    sp_info("Material:\n");
     m_material->print();
 }
 

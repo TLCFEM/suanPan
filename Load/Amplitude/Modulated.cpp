@@ -33,4 +33,4 @@ double Modulated::get_amplitude(const double T) {
     return A;
 }
 
-void Modulated::print() { suanpan_info("Modulated Amplitude.\n"); }
+void Modulated::print() { sp_info("Modulated.\n"); }

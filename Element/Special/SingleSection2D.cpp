@@ -47,6 +47,6 @@ int SingleSection2D::clear_status() { return s_section->clear_status(); }
 int SingleSection2D::reset_status() { return s_section->reset_status(); }
 
 void SingleSection2D::print() {
-    suanpan_info("A SingleSection2D element that represents a section which can be used for section analysis.\n");
+    sp_info("A SingleSection2D element that represents a section which can be used for section analysis.\n");
     if(is_initialized()) s_section->print();
 }

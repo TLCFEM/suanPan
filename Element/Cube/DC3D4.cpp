@@ -114,11 +114,11 @@ vector<vec> DC3D4::record(const OutputType T) {
 void DC3D4::print() {
     node_encoding.t().print("DC3D4 element connects:");
     if(!is_initialized()) return;
-    suanpan_info("Material:\n");
+    sp_info("Material:\n");
     c_material->print();
-    suanpan_info("Strain:\t");
+    sp_info("Strain:\t");
     c_material->get_current_strain().t().print();
-    suanpan_info("Stress:\t");
+    sp_info("Stress:\t");
     c_material->get_current_stress().t().print();
 }
 

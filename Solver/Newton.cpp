@@ -31,7 +31,7 @@ int Newton::analyze() {
     const auto& D = G->get_domain();
     auto& W = D->get_factory();
 
-    suanpan_info("current analysis time: %.5f.\n", W->get_trial_time());
+    sp_info("-> Current Analysis Time: {:.5f}.\n", W->get_trial_time());
 
     const auto max_iteration = C->get_max_iteration();
 
@@ -131,4 +131,4 @@ int Newton::analyze() {
     }
 }
 
-void Newton::print() { suanpan_info("A solver based on Newton-Raphson iteration method %s", initial_stiffness ? "using initial stiffness for each substep.\n" : ".\n"); }
+void Newton::print() { sp_info("A solver based on Newton-Raphson method{}", initial_stiffness ? " using initial stiffness for each substep.\n" : ".\n"); }

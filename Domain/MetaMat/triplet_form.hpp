@@ -390,12 +390,12 @@ template<sp_d data_t, sp_i index_t> data_t& triplet_form<data_t, index_t>::at(co
 }
 
 template<sp_d data_t, sp_i index_t> void triplet_form<data_t, index_t>::print() const {
-    suanpan_info("A sparse matrix in triplet form with size of %u by %u, the density of %.3f%%.\n", static_cast<unsigned>(n_rows), static_cast<unsigned>(n_cols), static_cast<double>(n_elem) / static_cast<double>(n_rows) / static_cast<double>(n_cols) * 1E2);
+    sp_info("A sparse matrix in triplet form with size of {} by {}, the density of {:.3f}%.\n", static_cast<unsigned>(n_rows), static_cast<unsigned>(n_cols), static_cast<double>(n_elem) / static_cast<double>(n_rows) / static_cast<double>(n_cols) * 1E2);
     if(n_elem > index_t(1000)) {
-        suanpan_info("Not going to print all elements as more than 1000 elements exist.\n");
+        sp_info("More than 1000 elements exist.\n");
         return;
     }
-    for(index_t I = 0; I < n_elem; ++I) suanpan_info("(%3u, %3u) ===> %+.10E\n", static_cast<unsigned>(row_idx[I]), static_cast<unsigned>(col_idx[I]), val_idx[I]);
+    for(index_t I = 0; I < n_elem; ++I) sp_info("({}, {}) ===> {:+.8E}\n", static_cast<unsigned>(row_idx[I]), static_cast<unsigned>(col_idx[I]), val_idx[I]);
 }
 
 template<sp_d data_t, sp_i index_t> void triplet_form<data_t, index_t>::csr_sort() {

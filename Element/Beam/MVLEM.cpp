@@ -218,13 +218,13 @@ vector<vec> MVLEM::record(const OutputType P) {
 void MVLEM::print() {
     node_encoding.t().print("A MVLEM element connects nodes:");
     if(!is_initialized()) return;
-    suanpan_info("Section:\n");
+    sp_info("Section:\n");
     auto J = 0;
     for(const auto& I : axial_spring) {
-        suanpan_info("Fibre %d:\n", ++J);
-        suanpan_info("Concrete: ");
+        sp_info("Fibre {}:\n", ++J);
+        sp_info("Concrete: ");
         I.c_material->print();
-        suanpan_info("Steel: ");
+        sp_info("Steel: ");
         I.s_material->print();
     }
 }

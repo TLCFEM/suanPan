@@ -113,13 +113,13 @@ vector<vec> B21::record(const OutputType P) {
 }
 
 void B21::print() {
-    suanpan_info("A classic 2D displacement based beam element using Hermite interpolation functions%s", nlgeom ? " and corotational formulation.\n" : ".\n");
+    sp_info("A classic 2D displacement based beam element using Hermite interpolation functions{}", nlgeom ? " and corotational formulation.\n" : ".\n");
     node_encoding.t().print("The element connects nodes:");
     if(!is_initialized()) return;
-    suanpan_info("Section:\n");
+    sp_info("Section:\n");
     auto J = 1;
     for(const auto& I : int_pt) {
-        suanpan_info("IP %d: ", J++);
+        sp_info("IP {}: ", J++);
         I.b_section->print();
     }
 }

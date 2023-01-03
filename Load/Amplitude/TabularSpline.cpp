@@ -79,4 +79,4 @@ double TabularSpline::get_amplitude(const double T) {
     return y;
 }
 
-void TabularSpline::print() { suanpan_info("TabularSpline.\n"); }
+void TabularSpline::print() { sp_info("TabularSpline.\n"); }

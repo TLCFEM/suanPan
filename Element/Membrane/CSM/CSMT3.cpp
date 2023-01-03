@@ -201,7 +201,7 @@ vector<vec> CSMT3::record(const OutputType T) {
 void CSMT3::print() {
     node_encoding.t().print("CSMT3 element connects:");
     if(!is_initialized()) return;
-    suanpan_info("Material:\n");
+    sp_info("Material:\n");
     for(const auto& I : int_pt) I.m_material->print();
 }
 

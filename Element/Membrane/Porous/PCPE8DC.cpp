@@ -198,12 +198,12 @@ vector<vec> PCPE8DC::record(const OutputType P) {
 }
 
 void PCPE8DC::print() {
-    suanpan_info("Element %u is a eight-node membrane element (PCPE8DC).\n", get_tag());
+    sp_info("A eight-node membrane element (PCPE8DC).\n");
     node_encoding.t().print("The nodes connected are:");
     if(!is_initialized()) return;
-    suanpan_info("Material:\n");
+    sp_info("Material:\n");
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        suanpan_info("Integration Point %llu:\t", I + 1);
+        sp_info("IP {}:\t", I + 1);
         int_pt[I].coor.t().print();
         int_pt[I].m_material->print();
     }

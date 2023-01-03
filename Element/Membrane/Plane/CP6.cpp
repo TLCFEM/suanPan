@@ -185,7 +185,7 @@ vector<vec> CP6::record(const OutputType T) {
 void CP6::print() {
     node_encoding.t().print("CP6 element connects:");
     if(!is_initialized()) return;
-    suanpan_info("Material:\n");
+    sp_info("Material:\n");
     for(const auto& I : int_pt) I.m_material->print();
 }
 

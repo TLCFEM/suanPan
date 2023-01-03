@@ -110,4 +110,4 @@ int Fibre3D::reset_status() {
     return code;
 }
 
-void Fibre3D::print() { suanpan_info("A Fibre3D object represents sections consist of fibres.\n"); }
+void Fibre3D::print() { sp_info("A 3D fibre section that consists of fibres.\n"); }

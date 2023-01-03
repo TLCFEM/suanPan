@@ -167,7 +167,7 @@ vec GSSSS::from_incre_acceleration(const vec& incre_acceleration, const uvec& en
     return incre_acceleration / C0 - C1 / C0 * W->get_current_velocity()(encoding) - C2 / C0 * W->get_current_acceleration()(encoding) + W->get_current_displacement()(encoding);
 }
 
-void GSSSS::print() { suanpan_info("A time integrator using the GSSSS algorithm.\n"); }
+void GSSSS::print() { sp_info("A time integrator using the GSSSS algorithm.\n"); }
 
 template<> void GSSSS::generate_constants<GSSSSU0>(const double R3, const double R1, const double R2) {
     L3 = 1. / (1. + R1) / (1. + R2);

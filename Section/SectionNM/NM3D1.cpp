@@ -29,4 +29,4 @@ int NM3D1::update_trial_status(const vec& t_deformation) {
     return SUANPAN_SUCCESS;
 }
 
-void NM3D1::print() { suanpan_info("A NM3D1 Section.\n"); }
+void NM3D1::print() { sp_info("A NM3D1 section.\n"); }

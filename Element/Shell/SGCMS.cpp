@@ -336,7 +336,7 @@ vector<vec> SGCMS::record(const OutputType P) {
     return data;
 }
 
-void SGCMS::print() { suanpan_info("A four node planar shell element using SGCMQ for membrane action and DKT4 for plate action.\n"); }
+void SGCMS::print() { sp_info("A four-node planar shell element using SGCMQ for membrane action and DKT4 for plate action.\n"); }
 
 #ifdef SUANPAN_VTK
 #include <vtkQuad.h>

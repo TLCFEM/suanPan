@@ -29,6 +29,5 @@ void Group::initialize(const shared_ptr<DomainBase>&) {}
 const uvec& Group::get_pool() const { return pool; }
 
 void Group::print() {
-    suanpan_info("A Group object with tag %u contains the following tags:\n", get_tag());
-    pool.t().print();
+    pool.t().print("A group contains the following tags:");
 }

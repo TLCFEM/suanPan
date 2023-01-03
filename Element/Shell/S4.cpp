@@ -223,7 +223,7 @@ vector<vec> S4::record(const OutputType P) {
     return data;
 }
 
-void S4::print() { suanpan_info("A four node planar shell element using GQ12 for membrane action and Mindlin for plate action.\n"); }
+void S4::print() { sp_info("A four-node planar shell element using GQ12 for membrane action and Mindlin for plate action.\n"); }
 
 #ifdef SUANPAN_VTK
 #include <vtkQuad.h>

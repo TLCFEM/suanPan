@@ -117,4 +117,4 @@ void BatheExplicit::update_parameter(const double NT) {
     A7 = Q2 * A3;
 }
 
-void BatheExplicit::print() { suanpan_info("A BatheExplicit solver.\n"); }
+void BatheExplicit::print() { sp_info("A BatheExplicit time integrator.\n"); }

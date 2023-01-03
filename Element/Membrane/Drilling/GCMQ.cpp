@@ -316,22 +316,21 @@ vector<vec> GCMQ::record(const OutputType T) {
 }
 
 void GCMQ::print() {
-    suanpan_info("GCMQ mixed quadrilateral element %u connects nodes:\n", get_tag());
-    node_encoding.t().print();
+    node_encoding.t().print("A GCMQ mixed quadrilateral element connecting nodes:");
     if(!is_initialized()) return;
-    suanpan_info("Material Response:\n");
+    sp_info("Material Response:\n");
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        suanpan_info("Integration Point %llu:\t", I + 1);
+        sp_info("IP {}:\t", I + 1);
         int_pt[I].coor.t().print();
         int_pt[I].m_material->print();
     }
-    suanpan_info("Element Response:\n");
+    sp_info("Element Response:\n");
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        suanpan_info("Integration Point %llu:\t", I + 1);
+        sp_info("IP {}:\t", I + 1);
         int_pt[I].coor.t().print();
-        suanpan_info("Strain: ");
+        sp_info("Strain:\t");
         (int_pt[I].poly_strain * current_beta).t().print();
-        suanpan_info("Stress: ");
+        sp_info("Stress:\t");
         (int_pt[I].poly_stress * current_alpha).t().print();
     }
 }

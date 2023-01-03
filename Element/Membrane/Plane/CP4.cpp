@@ -399,12 +399,12 @@ vector<vec> CP4::record(const OutputType P) {
 }
 
 void CP4::print() {
-    suanpan_info("Element %u is a four-node membrane element (CP4)%s.\n", get_tag(), nlgeom ? " with nonlinear geometry (TL formulation)" : "");
+    sp_info("A four-node membrane element (CP4){}.\n", nlgeom ? " with nonlinear geometry (TL formulation)" : "");
     node_encoding.t().print("The nodes connected are:");
     if(!is_initialized()) return;
-    suanpan_info("Material:\n");
+    sp_info("Material:\n");
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        suanpan_info("Integration Point %llu:\t", I + 1);
+        sp_info("IP {}:\t", I + 1);
         int_pt[I].coor.t().print();
         int_pt[I].m_material->print();
     }

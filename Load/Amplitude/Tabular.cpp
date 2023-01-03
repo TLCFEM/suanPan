@@ -64,4 +64,4 @@ double Tabular::get_amplitude(const double T) {
     return result(0);
 }
 
-void Tabular::print() { suanpan_info("Tabular.\n"); }
+void Tabular::print() { sp_info("Tabular.\n"); }

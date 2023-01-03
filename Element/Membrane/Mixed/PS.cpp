@@ -163,12 +163,11 @@ vector<vec> PS::record(const OutputType P) {
 }
 
 void PS::print() {
-    suanpan_info("Element %u is a four-node membrane element (Pian-Sumihara).\n", get_tag());
-    node_encoding.t().print("The nodes connected are:");
+    node_encoding.t().print("A four-node membrane element (Pian-Sumihara) connecting nodes:");
     if(!is_initialized()) return;
-    suanpan_info("Material:\n");
+    sp_info("Material:\n");
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        suanpan_info("Integration Point %llu:\t", I + 1);
+        sp_info("IP {}:\t", I + 1);
         int_pt[I].coor.t().print();
         int_pt[I].m_material->print();
     }

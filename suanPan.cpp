@@ -15,12 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include <suanPan.h>
 #include <Toolbox/argumentParser.h>
+#include <suanPan.h>
 
 #ifdef SUANPAN_WIN
 #include <Windows.h>
 #endif
+
+namespace suanpan {
+    std::mutex print_mutex;
+}
 
 // ReSharper disable once CppParameterMayBeConst
 int main(int argc, char** argv) {
