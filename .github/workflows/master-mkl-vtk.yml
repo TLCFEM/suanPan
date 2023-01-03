@@ -57,7 +57,7 @@ jobs:
           overwrite: true
   fedora-mkl-vtk:
     runs-on: ubuntu-22.04
-    container: fedora:35
+    container: fedora:36
     steps:
       - name: Setup
         run: |
