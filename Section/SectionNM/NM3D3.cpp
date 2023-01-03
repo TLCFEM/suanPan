@@ -31,6 +31,6 @@ unique_ptr<Section> NM3D3::get_copy() { return make_unique<NM3D3>(*this); }
 
 void NM3D3::print() {
     sp_info("A N-M based section. doi: 10.1007/978-94-007-6573-3_3\n");
-    sp_info("Local Deformation:\t", current_deformation.head(5));
-    sp_info("Local Resistance:\t", current_resistance.head(5));
+    sp_info("Local Deformation:\t", vec{current_deformation.head(5)});
+    sp_info("Local Resistance:\t", vec{current_resistance.head(5)});
 }

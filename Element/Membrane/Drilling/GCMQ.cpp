@@ -328,8 +328,8 @@ void GCMQ::print() {
     for(size_t I = 0; I < int_pt.size(); ++I) {
         sp_info("IP {}:\t", I + 1);
         sp_info(int_pt[I].coor);
-        sp_info("Strain:\t", int_pt[I].poly_strain * current_beta);
-        sp_info("Stress:\t", int_pt[I].poly_stress * current_alpha);
+        sp_info("Strain:\t", vec{int_pt[I].poly_strain * current_beta});
+        sp_info("Stress:\t", vec{int_pt[I].poly_stress * current_alpha});
     }
 }
 
