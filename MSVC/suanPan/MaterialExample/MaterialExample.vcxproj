@@ -58,11 +58,7 @@
     <ClCompile Include="..\..\..\Developer\Material\ElasticExternal.cpp" />
     <ClCompile Include="..\..\..\Developer\Material\MaterialExample.cpp" />
     <ClCompile Include="..\..\..\Domain\Tag.cpp" />
-    <ClCompile Include="..\..\..\Include\fmt\src\fmt.cc">
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCppModule</CompileAs>
-    </ClCompile>
     <ClCompile Include="..\..\..\Include\fmt\src\format.cc" />
-    <ClCompile Include="..\..\..\Include\fmt\src\os.cc" />
     <ClCompile Include="..\..\..\Material\Material.cpp" />
   </ItemGroup>
   <ItemGroup>

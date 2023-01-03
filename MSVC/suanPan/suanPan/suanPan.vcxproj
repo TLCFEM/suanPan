@@ -259,12 +259,7 @@
     <ClCompile Include="..\..\..\Element\Utility\T3DL.cpp" />
     <ClCompile Include="..\..\..\Element\Visualisation\vtkBase.cpp" />
     <ClCompile Include="..\..\..\Element\Visualisation\vtkParser.cpp" />
-    <ClCompile Include="..\..\..\Include\fmt\src\fmt.cc">
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCppModule</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCppModule</CompileAs>
-    </ClCompile>
     <ClCompile Include="..\..\..\Include\fmt\src\format.cc" />
-    <ClCompile Include="..\..\..\Include\fmt\src\os.cc" />
     <ClCompile Include="..\..\..\Load\Amplitude\Amplitude.cpp" />
     <ClCompile Include="..\..\..\Load\Amplitude\Combine.cpp" />
     <ClCompile Include="..\..\..\Load\Amplitude\Constant.cpp" />
