@@ -60,8 +60,7 @@ int eig_solve(vec& eigval, mat& eigvec, const std::shared_ptr<MetaMat<double>>& 
             const vec X(WORKD.memptr() + IPNTR[0] - 1, N, false);
             Y = K * X;
         }
-        else if(0 != INFO)
-            break;
+        else if(0 != INFO) break;
     }
 
     if(0 != INFO) {

@@ -326,10 +326,8 @@ void new_bilinear1d(unique_ptr<Material>& return_obj, istringstream& command) {
         SP_E("A valid beta is required.\n");
         return;
     }
-    if(beta > 1.)
-        beta = 1.;
-    else if(beta < 0.)
-        beta = 0.;
+    if(beta > 1.) beta = 1.;
+    else if(beta < 0.) beta = 0.;
 
     auto density = 0.;
     if(command.eof())

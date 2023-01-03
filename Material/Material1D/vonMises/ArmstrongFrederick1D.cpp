@@ -79,10 +79,8 @@ int ArmstrongFrederick1D::update_trial_status(const vec& t_strain) {
 
         jacobian = -elastic_modulus - dk;
 
-        if(xi > 0.)
-            for(unsigned I = 0; I < size; ++I) jacobian += (b(I) * trial_history(I) - a(I)) * pow(1. + b(I) * gamma, -2.);
-        else
-            for(unsigned I = 0; I < size; ++I) jacobian -= (b(I) * trial_history(I) + a(I)) * pow(1. + b(I) * gamma, -2.);
+        if(xi > 0.) for(unsigned I = 0; I < size; ++I) jacobian += (b(I) * trial_history(I) - a(I)) * pow(1. + b(I) * gamma, -2.);
+        else for(unsigned I = 0; I < size; ++I) jacobian -= (b(I) * trial_history(I) + a(I)) * pow(1. + b(I) * gamma, -2.);
 
         const auto incre = yield_func / jacobian;
         SP_D("Local iteration error: {:.5E}.\n", fabs(incre));

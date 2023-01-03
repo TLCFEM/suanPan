@@ -72,10 +72,8 @@ template<typename T> auto sort_color_metis(suanpan::graph<T>& element_register, 
 #endif
     options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_VOL;
 
-    if('K' == method)
-        METIS_PartGraphKway(&nvtxs, &ncon, xadj.data(), adjncy.data(), nullptr, vsize, nullptr, &nparts, tpwgts, ubvec, options, &edgecut, part.data());
-    else
-        METIS_PartGraphRecursive(&nvtxs, &ncon, xadj.data(), adjncy.data(), nullptr, vsize, nullptr, &nparts, tpwgts, ubvec, options, &edgecut, part.data());
+    if('K' == method) METIS_PartGraphKway(&nvtxs, &ncon, xadj.data(), adjncy.data(), nullptr, vsize, nullptr, &nparts, tpwgts, ubvec, options, &edgecut, part.data());
+    else METIS_PartGraphRecursive(&nvtxs, &ncon, xadj.data(), adjncy.data(), nullptr, vsize, nullptr, &nparts, tpwgts, ubvec, options, &edgecut, part.data());
 
     SP_D("Coloring algorithm takes {:.5E} seconds.\n", timer.toc());
 

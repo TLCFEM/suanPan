@@ -113,7 +113,8 @@ void new_box2d(unique_ptr<Section>& return_obj, istringstream& command) {
     }
 
     unsigned int_pt = 6;
-    if(command.eof()) SP_D("Six integration points assumed.\n");
+    if(command.eof())
+        SP_D("Six integration points assumed.\n");
     else if(!get_input(command, int_pt))
         SP_E("A valid number of integration points is required.\n");
 
@@ -156,7 +157,8 @@ void new_box3d(unique_ptr<Section>& return_obj, istringstream& command) {
     }
 
     unsigned int_pt = 3;
-    if(command.eof()) SP_D("Six integration points assumed.\n");
+    if(command.eof())
+        SP_D("Six integration points assumed.\n");
     else if(!get_input(command, int_pt))
         SP_E("A valid number of integration points is required.\n");
 
@@ -564,7 +566,8 @@ void new_rectangle2d(unique_ptr<Section>& return_obj, istringstream& command) {
     }
 
     unsigned int_pt = 6;
-    if(command.eof()) SP_D("Six integration points assumed.\n");
+    if(command.eof())
+        SP_D("Six integration points assumed.\n");
     else if(!get_input(command, int_pt))
         SP_E("A valid number of integration points is required.\n");
 
@@ -601,7 +604,8 @@ void new_rectangle3d(unique_ptr<Section>& return_obj, istringstream& command) {
     }
 
     unsigned int_pt = 3;
-    if(command.eof()) SP_D("Six integration points assumed.\n");
+    if(command.eof())
+        SP_D("Six integration points assumed.\n");
     else if(!get_input(command, int_pt))
         SP_E("A valid number of integration points is required.\n");
 

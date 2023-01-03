@@ -35,8 +35,7 @@ uvec sort_rcm(const std::vector<uvec>& A, const uvec& E) {
             if(IDXA == S) break;
             M[R(IDXC--) = G(IDXA++)] = true;
         }
-        for(const auto& IDX : A[R(IDXB--)])
-            if(!M[IDX]) M[R(IDXC--) = IDX] = true;
+        for(const auto& IDX : A[R(IDXB--)]) if(!M[IDX]) M[R(IDXC--) = IDX] = true;
     }
 
     SP_D("RCM algorithm takes {:.5E} seconds.\n", TM.toc());
