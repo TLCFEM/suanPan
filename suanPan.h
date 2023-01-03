@@ -190,17 +190,15 @@ using namespace arma;
 #include <filesystem>
 #include <fmt/color.h>
 #include <mutex>
-#if defined(__has_include)
-#if __has_include(<source_location>)
+#ifndef __has_include
+#include <source_location>
+namespace sl = std;
+#elif __has_include(<source_location>)
 #include <source_location>
 namespace sl = std;
 #else
 #include <experimental/source_location>
 namespace sl = std::experimental;
-#endif
-#else
-#include <source_location>
-namespace sl = std;
 #endif
 
 namespace fs = std::filesystem;
