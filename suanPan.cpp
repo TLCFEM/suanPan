@@ -22,10 +22,6 @@
 #include <Windows.h>
 #endif
 
-namespace suanpan {
-    std::mutex print_mutex;
-}
-
 // ReSharper disable once CppParameterMayBeConst
 int main(int argc, char** argv) {
 #ifdef SUANPAN_WIN
