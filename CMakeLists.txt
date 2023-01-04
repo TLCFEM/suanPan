@@ -48,8 +48,6 @@ add_executable(${PROJECT_NAME}
         "UnitTest/CMakeLists.txt"
         )
 
-set_property(TARGET ${PROJECT_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
-
 if (COMPILER_IDENTIFIER MATCHES "vs") # MSVC COMPILER
     target_sources(${PROJECT_NAME} PRIVATE "Resource/suanPan.rc")
 else ()
