@@ -1,0 +1,7 @@
+material CDP 2 3E4 .2 4. 40. 2E-3 4E-1 .2 4. .4 .8 .2 1.16 .2 2400E-12
+material PlaneStress 1 2
+
+materialTest2D 1 -1E-4 -1E-4 0 10
+materialTestByLoad2D 1 -1E0 -1E0 0 10
+
+exit

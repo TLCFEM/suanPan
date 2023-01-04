@@ -244,7 +244,7 @@ mat material_tester_by_strain_history(const shared_ptr<Material>& obj, const mat
     for(auto I = 0llu; I < history.n_rows; ++I) {
         if(SUANPAN_SUCCESS != obj->update_trial_status(history.row(I).t())) break;
         obj->commit_status();
-        response.row(I) = obj->get_current_stress();
+        response.row(I) = obj->get_current_stress().t();
     }
 
     obj->print();
@@ -282,7 +282,7 @@ mat material_tester_by_stress_history(const shared_ptr<Material>& obj, const mat
         if(flag) break;
 
         obj->commit_status();
-        response.row(I) = obj->get_current_strain();
+        response.row(I) = obj->get_current_strain().t();
     }
 
     obj->print();
