@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.13.0)
 
 cmake_policy(SET CMP0076 NEW)
 
-set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
-
 project(suanPan C CXX)
 
 set(CMAKE_C_STANDARD 11)
@@ -49,6 +47,8 @@ add_executable(${PROJECT_NAME}
         "Toolbox/CMakeLists.txt"
         "UnitTest/CMakeLists.txt"
         )
+
+set_property(TARGET ${PROJECT_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
 
 if (COMPILER_IDENTIFIER MATCHES "vs") # MSVC COMPILER
     target_sources(${PROJECT_NAME} PRIVATE "Resource/suanPan.rc")
