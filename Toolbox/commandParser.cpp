@@ -1372,7 +1372,7 @@ int run_example() {
     constexpr auto wait_time = 1000;
 
     auto run_command = [&](const string& command_string) {
-        highlight_command("\t{}\n", command_string);
+        suanpan_highlight("\t{}\n", command_string);
         auto command = istringstream(command_string);
         process_command(new_model, command);
         std::this_thread::sleep_for(std::chrono::milliseconds(wait_time));
