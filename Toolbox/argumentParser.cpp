@@ -16,12 +16,12 @@
  ******************************************************************************/
 
 #include "argumentParser.h"
+#include <iomanip>
 #include <Step/Bead.h>
-#include <Toolbox/Converter.h>
 #include <Toolbox/commandParser.h>
+#include <Toolbox/Converter.h>
 #include <Toolbox/utility.h>
 #include <UnitTest/CatchTest.h>
-#include <iomanip>
 #include "revision.h"
 #ifdef SUANPAN_WIN
 #include <Windows.h>
