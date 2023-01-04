@@ -34,7 +34,7 @@ int Substepping::initialize(const shared_ptr<DomainBase>& D) {
     current_mat_obj = suanpan::initialized_material_copy(D, mat_tag);
 
     if(nullptr == current_mat_obj) {
-        suanpan_error("Substepping %u requires a valid host material model.\n", get_tag());
+        suanpan_error("A valid host material is required.\n");
         return SUANPAN_FAIL;
     }
 

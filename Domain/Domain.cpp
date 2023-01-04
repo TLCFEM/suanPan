@@ -826,7 +826,7 @@ int Domain::assign_color() {
 
         suanpan::for_all(color_map, [&](std::vector<unsigned>& color) { std::ranges::transform(color, color.begin(), [&](const unsigned element) { return element_map[element]; }); });
 
-        suanpan_debug("The model is colored by %llu colors.\n", color_map.size());
+        suanpan_debug("The model is colored by {} colors.\n", color_map.size());
     }
 
     // count how many entries in the sparse form and preallocate memory
@@ -975,7 +975,7 @@ int Domain::initialize() {
     for(const auto I : remove_list) erase_element(I);
     element_pond.update();
     if(element_pond.get().empty()) {
-        suanpan_warning("no active element.\n");
+        suanpan_warning("No active elements.\n");
         return SUANPAN_FAIL;
     }
 
@@ -1054,7 +1054,7 @@ int Domain::process_load(const bool full) {
 #ifdef SUANPAN_MT
         oneapi::tbb::this_task_arena::isolate([&] { code += std::invoke(process_handler, t_load, shared_from_this()); });
 #else
-        code += std::invoke(process_handler, t_load, shared_from_this());
+		code += std::invoke(process_handler, t_load, shared_from_this());
 #endif
         if(!t_load->get_trial_load().empty()) {
             std::scoped_lock trial_load_lock(factory->get_trial_load_mutex());
@@ -1099,7 +1099,7 @@ int Domain::process_constraint(const bool full) {
 #ifdef SUANPAN_MT
         oneapi::tbb::this_task_arena::isolate([&] { code += std::invoke(process_handler, t_constraint, shared_from_this()); });
 #else
-        code += std::invoke(process_handler, t_constraint, shared_from_this());
+		code += std::invoke(process_handler, t_constraint, shared_from_this());
 #endif
         if(const auto multiplier_size = t_constraint->get_multiplier_size(); multiplier_size > 0) {
             counter += multiplier_size;
@@ -1178,8 +1178,8 @@ void Domain::enable_all() {
 }
 
 void Domain::summary() const {
-    suanpan_info("Domain %u contains:\n\t%llu nodes, %llu elements, %llu materials,\n", get_tag(), get_node(), get_element(), get_material());
-    suanpan_info("\t%llu loads, %llu constraints and %llu recorders.\n", get_load(), get_constraint(), get_recorder());
+    suanpan_info("Domain {} contains:\n\t{} nodes, {} elements, {} materials,\n", get_tag(), get_node(), get_element(), get_material());
+    suanpan_info("\t{} loads, {} constraints and {} recorders.\n", get_load(), get_constraint(), get_recorder());
 }
 
 void Domain::erase_machine_error(vec& ninja) const { suanpan::for_all(restrained_dofs, [&](const uword I) { ninja(I) = 0.; }); }

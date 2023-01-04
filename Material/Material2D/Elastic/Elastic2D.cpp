@@ -42,7 +42,7 @@ int Elastic2D::initialize(const shared_ptr<DomainBase>&) {
 void Elastic2D::initialize_couple(const shared_ptr<DomainBase>&) {
     if(characteristic_length < 0.) {
         characteristic_length = 1.;
-        suanpan_error("characteristic length is not set, use unity by default.\n");
+        suanpan_warning("Characteristic length is set to unity.\n");
     }
 
     initial_couple_stiffness = 2. * characteristic_length * characteristic_length * elastic_modulus / (1. + poissons_ratio) * eye(2, 2);
@@ -89,9 +89,9 @@ int Elastic2D::reset_status() {
 }
 
 void Elastic2D::print() {
-    suanpan_info("2D isotropic elastic material model.\n");
-    current_strain.t().print("Strain:");
-    current_stress.t().print("Stress:");
+    suanpan_info("A 2D isotropic elastic material model.\n");
+    suanpan_info("Strain:", current_strain);
+    suanpan_info("Stress:", current_stress);
 }
 
 vector<vec> Elastic2D::record(const OutputType P) {

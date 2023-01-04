@@ -184,7 +184,7 @@ template<sp_d T> int SparseMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) 
 
             X += incre;
 
-            suanpan_debug("mixed precision algorithm multiplier: %.5E\n", multiplier = arma::norm(full_residual -= this->operator*(incre)));
+            suanpan_debug("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier = arma::norm(full_residual -= this->operator*(incre)));
         }
     }
 

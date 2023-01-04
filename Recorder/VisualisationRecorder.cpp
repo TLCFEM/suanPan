@@ -55,4 +55,6 @@ void VisualisationRecorder::record([[maybe_unused]] const shared_ptr<DomainBase>
 
 void VisualisationRecorder::save() {}
 
-void VisualisationRecorder::print() { suanpan_info("A Visualisation Recorder.\n"); }
+void VisualisationRecorder::print() {
+    suanpan_info("A visualisation recorder.\n");
+}

@@ -33,7 +33,7 @@ int CSMT3::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
     if(!material_proto->is_support_couple()) {
-        suanpan_warning("Element %u is assigned with a material that does not support couple stress.\n", get_tag());
+        suanpan_warning("Element {} is assigned with a material that does not support couple stress.\n", get_tag());
         return SUANPAN_FAIL;
     }
 
@@ -199,7 +199,7 @@ vector<vec> CSMT3::record(const OutputType T) {
 }
 
 void CSMT3::print() {
-    node_encoding.t().print("CSMT3 element connects:");
+    suanpan_info("CSMT3 element connects:", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Material:\n");
     for(const auto& I : int_pt) I.m_material->print();

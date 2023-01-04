@@ -80,6 +80,6 @@ int Bar2D::reset_status() {
 }
 
 void Bar2D::print() {
-    suanpan_info("A Bar2D section that represents for example rebar in RC section.\n");
+    suanpan_info("A 2D section that represents for example rebar in RC section.\n");
     s_material->print();
 }

@@ -44,7 +44,7 @@ public:
     Group(Group&&) = delete;                 // move forbidden
     Group& operator=(const Group&) = delete; // assign forbidden
     Group& operator=(Group&&) = delete;      // assign forbidden
-    ~Group() override;
+    ~Group() override = default;
 
     virtual void initialize(const shared_ptr<DomainBase>&);
 

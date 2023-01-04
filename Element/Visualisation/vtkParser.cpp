@@ -121,7 +121,7 @@ void vtk_save(const vtkSmartPointer<vtkUnstructuredGrid>& grid, const vtkInfo& c
     writer->SetFileName(config.file_name.c_str());
     writer->SetFileTypeToBinary();
     writer->Write();
-    suanpan_debug("plot is written to %s.\n", config.file_name.c_str());
+    suanpan_debug("Plot is written to file \"{}\".\n", config.file_name);
 }
 
 int vtk_parser(const shared_ptr<DomainBase>& domain, istringstream& command) {

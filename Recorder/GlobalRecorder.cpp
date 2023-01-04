@@ -64,4 +64,6 @@ void GlobalRecorder::record(const shared_ptr<DomainBase>& D) {
     if(if_record_time()) insert(D->get_factory()->get_current_time());
 }
 
-void GlobalRecorder::print() { suanpan_info("A Global Recorder.\n"); }
+void GlobalRecorder::print() {
+    suanpan_info("A global recorder.\n");
+}

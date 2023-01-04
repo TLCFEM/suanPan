@@ -124,4 +124,6 @@ int MooneyRivlin::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-void MooneyRivlin::print() { suanpan_info("Mooney-Rivlin material.\n"); }
+void MooneyRivlin::print() {
+    suanpan_info("A Mooney-Rivlin material model.\n");
+}

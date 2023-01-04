@@ -29,14 +29,15 @@ void Bead::erase_domain(const unsigned T) {
         if(domain_pool.size() == 0) {
             insert(make_shared<Domain>(1));
             set_current_domain_tag(1);
-            suanpan_info("erase_domain() removes the last domain and switches to default Domain 1.\n");
+            suanpan_info("Remove the last domain and switch to default one.\n");
         }
         else if(current_domain_tag == T) {
             set_current_domain_tag(domain_pool.cbegin()->first);
-            suanpan_info("erase_domain() switches to Domain %u.\n", current_domain_tag);
+            suanpan_info("Switch to domain {}.\n", current_domain_tag);
         }
     }
-    else suanpan_info("erase_domain() cannot find Domain %u, nothing changed.\n", T);
+    else
+        suanpan_info("Cannot find domain {}, nothing changed.\n", T);
 }
 
 void Bead::enable_domain(const unsigned T) { domain_pool.enable(T); }

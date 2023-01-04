@@ -176,7 +176,7 @@ vec tensor::stress::lode_der(vec S) {
  * \return trace of tensor
  */
 double tensor::trace2(const vec& S) {
-    suanpan_debug([&] { if(S.n_elem < 2) throw invalid_argument("need a valid vector"); });
+    suanpan_assert([&] { if(S.n_elem < 2) throw invalid_argument("need a valid vector"); });
 
     return S(0) + S(1);
 }
@@ -187,7 +187,7 @@ double tensor::trace2(const vec& S) {
  * \return trace of tensor
  */
 double tensor::trace3(const vec& S) {
-    suanpan_debug([&] { if(S.n_elem < 3) throw invalid_argument("need a valid vector"); });
+    suanpan_assert([&] { if(S.n_elem < 3) throw invalid_argument("need a valid vector"); });
 
     return S(0) + S(1) + S(2);
 }
@@ -206,7 +206,7 @@ vec tensor::dev(vec&& S) {
 }
 
 mat tensor::dev(const mat& in) {
-    suanpan_debug([&] { if(in.n_rows != in.n_cols) throw invalid_argument("need square matrix"); });
+    suanpan_assert([&] { if(in.n_rows != in.n_cols) throw invalid_argument("need square matrix"); });
 
     auto out = in;
     out.diag() -= mean(out.diag());
@@ -214,7 +214,7 @@ mat tensor::dev(const mat& in) {
 }
 
 mat tensor::dev(mat&& in) {
-    suanpan_debug([&] { if(in.n_rows != in.n_cols) throw invalid_argument("need square matrix"); });
+    suanpan_assert([&] { if(in.n_rows != in.n_cols) throw invalid_argument("need square matrix"); });
 
     in.diag() -= mean(in.diag());
     return std::move(in);
@@ -456,7 +456,7 @@ mat transform::compute_jacobian_principal_to_nominal(const mat& in) {
 }
 
 vec transform::triangle::to_area_coordinate(const vec& g_coord, const mat& nodes) {
-    suanpan_debug([&] { if(nodes.n_cols != 2 || nodes.n_rows != 3) throw invalid_argument("need 3 by 2 mat"); });
+    suanpan_assert([&] { if(nodes.n_cols != 2 || nodes.n_rows != 3) throw invalid_argument("need 3 by 2 mat"); });
 
     vec a_coord(3);
     a_coord(0) = 1.;
@@ -471,7 +471,7 @@ vec transform::triangle::to_area_coordinate(const vec& g_coord, const mat& nodes
 }
 
 double transform::strain::angle(const vec& strain) {
-    suanpan_debug([&] { if(strain.n_elem != 3) throw invalid_argument("need 2D strain in Voigt form"); });
+    suanpan_assert([&] { if(strain.n_elem != 3) throw invalid_argument("need 2D strain in Voigt form"); });
 
     return .5 * std::atan2(strain(2), strain(0) - strain(1));
 }
@@ -503,7 +503,7 @@ vec transform::strain::principal(const vec& strain) {
 }
 
 vec transform::strain::rotate(const vec& strain, const double theta) {
-    suanpan_debug([&] { if(strain.n_elem != 3) throw invalid_argument("need 2D strain in Voigt form"); });
+    suanpan_assert([&] { if(strain.n_elem != 3) throw invalid_argument("need 2D strain in Voigt form"); });
 
     return trans(theta) * strain;
 }

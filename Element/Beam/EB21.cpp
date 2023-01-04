@@ -83,7 +83,9 @@ vector<vec> EB21::record(const OutputType P) {
     return {};
 }
 
-void EB21::print() { suanpan_info("An elastic B21 element%s", nlgeom ? " with corotational formulation.\n" : ".\n"); }
+void EB21::print() {
+    suanpan_info("An elastic B21 element{}", nlgeom ? " with corotational formulation.\n" : ".\n");
+}
 
 #ifdef SUANPAN_VTK
 #include <vtkLine.h>

@@ -24,13 +24,13 @@
 int create_new_converger(const shared_ptr<DomainBase>& domain, istringstream& command) {
     string converger_id;
     if(!get_input(command, converger_id)) {
-        suanpan_error("create_new_converger() requires converger type.\n");
+        suanpan_error("A valid converger type is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("create_new_converger() requires a tag.\n");
+        suanpan_error("A valid tag is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -38,31 +38,32 @@ int create_new_converger(const shared_ptr<DomainBase>& domain, istringstream& co
     if(is_equal(converger_id.substr(0, 5), "Logic")) {
         unsigned tag_a, tag_b;
         if(!get_input(command, tag_a) || !get_input(command, tag_b)) {
-            suanpan_error("create_new_converger() requires a tag.\n");
+            suanpan_error("A valid tag is required.\n");
             return SUANPAN_SUCCESS;
         }
 
         if(is_equal(converger_id, "LogicAND") && domain->insert(make_shared<LogicAND>(tag, tag_a, tag_b))) code = 1; // NOLINT(bugprone-branch-clone)
         else if(is_equal(converger_id, "LogicOR") && domain->insert(make_shared<LogicOR>(tag, tag_a, tag_b))) code = 1;
         else if(is_equal(converger_id, "LogicXOR") && domain->insert(make_shared<LogicXOR>(tag, tag_a, tag_b))) code = 1;
-        else suanpan_error("create_new_converger() cannot identify the converger type.\n");
+        else
+            suanpan_error("Cannot identify converger type.\n");
     }
     else {
         auto tolerance = 1E-6;
         if(!is_equal(converger_id, "FixedNumber") && (!command.eof() && !get_input(command, tolerance))) {
-            suanpan_error("create_new_converger() reads wrong tolerance.\n");
+            suanpan_error("A valid tolerance is required.\n");
             return SUANPAN_SUCCESS;
         }
 
         auto max_iteration = 10;
         if(!command.eof() && !get_input(command, max_iteration)) {
-            suanpan_error("create_new_converger() reads wrong max iteration.\n");
+            suanpan_error("A valid maximum iteration is required.\n");
             return SUANPAN_SUCCESS;
         }
 
         string print_flag = "false";
         if(!command.eof() && !get_input(command, print_flag)) {
-            suanpan_error("create_new_converger() reads wrong print flag.\n");
+            suanpan_error("A valid print flag is required.\n");
             return SUANPAN_SUCCESS;
         }
 
@@ -79,14 +80,16 @@ int create_new_converger(const shared_ptr<DomainBase>& domain, istringstream& co
         else if(is_equal(converger_id, "AbsIncreEnergy") && domain->insert(make_shared<AbsIncreEnergy>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
         else if(is_equal(converger_id, "RelIncreEnergy") && domain->insert(make_shared<RelIncreEnergy>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
         else if(is_equal(converger_id, "FixedNumber") && domain->insert(make_shared<FixedNumber>(tag, max_iteration, is_true(print_flag)))) code = 1;
-        else suanpan_error("create_new_converger() cannot identify the converger type.\n");
+        else
+            suanpan_error("Cannot identify converger type.\n");
     }
 
     if(1 == code) {
         if(domain->get_current_step_tag() != 0) domain->get_current_step()->set_converger_tag(tag);
         domain->set_current_converger_tag(tag);
     }
-    else suanpan_error("create_new_converger() fails to create the new converger.\n");
+    else
+        suanpan_error("Fail to create new converger via \"{}\".\n", command.str());
 
     return SUANPAN_SUCCESS;
 }

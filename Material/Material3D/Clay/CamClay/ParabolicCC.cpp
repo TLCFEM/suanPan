@@ -27,4 +27,6 @@ ParabolicCC::ParabolicCC(const unsigned T, const double E, const double V, const
 
 unique_ptr<Material> ParabolicCC::get_copy() { return make_unique<ParabolicCC>(*this); }
 
-void ParabolicCC::print() { suanpan_info("A 3D Cam-Clay model using parabolic hardening.\n"); }
+void ParabolicCC::print() {
+    suanpan_info("A 3D Cam-Clay model using parabolic hardening.\n");
+}

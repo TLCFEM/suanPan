@@ -84,10 +84,12 @@ int T3D2S::reset_status() {
 vector<vec> T3D2S::record(const OutputType T) { return t_section->record(T); }
 
 void T3D2S::print() {
-    suanpan_info("3D truss element with ");
-    if(nlgeom) suanpan_info("corotational formulation, assuming constant area and %s strain. ", log_strain ? "logarithmic" : "engineering");
-    else suanpan_info("linear formulation. ");
-    node_encoding.t().print("The nodes connected are:");
+    suanpan_info("A 3D truss element with ");
+    if(nlgeom)
+        suanpan_info("corotational formulation, assuming constant area and {} strain.", log_strain ? "logarithmic" : "engineering");
+    else
+        suanpan_info("linear formulation.");
+    suanpan_info(" The nodes connected are:", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Section:\n");
     t_section->print();

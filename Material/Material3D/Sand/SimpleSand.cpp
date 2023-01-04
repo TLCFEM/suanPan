@@ -123,7 +123,7 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
         auto error = norm(residual);
 
         if(1 == counter) ref_error = std::max(1., error);
-        suanpan_debug("SimpleSand local iteration error: %.5E.\n", error /= ref_error);
+        suanpan_debug("Local iteration error: {:.5E}.\n", error /= ref_error);
         if(error <= tolerance || norm(incre) <= tolerance) break;
 
         gamma -= incre(sa);
@@ -175,4 +175,6 @@ int SimpleSand::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-void SimpleSand::print() { suanpan_info("A simple sand model.\n"); }
+void SimpleSand::print() {
+    suanpan_info("A simple sand model.\n");
+}

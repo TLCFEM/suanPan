@@ -30,6 +30,7 @@ cp ../Example/Material/Table .
 cp ../Example/Material/C.txt .
 cp ../Example/Material/T.txt .
 cp ../Example/Material/CYCLE.txt .
+cp ../Example/Material/EHIST .
 
 for file in $files; do
   echo "Processing $file ..."
@@ -38,6 +39,9 @@ done
 
 {
   ./suanPan -t
+  ./suanPan -vb -t
+  ./suanPan -nc -vb -t
+  ./suanPan -nc -vb -np -t
   ./suanPan -v
   ./suanPan -ctest
   ./suanPan -c -f ../Example/Misc/Converter/TEST.inp

@@ -176,7 +176,7 @@ public:
     Element& operator=(const Element&) = delete; // assign forbidden
     Element& operator=(Element&&) = delete;      // assign forbidden
 
-    ~Element() override;
+    ~Element() override = default;
 
     int initialize_base(const shared_ptr<DomainBase>&) final;
 

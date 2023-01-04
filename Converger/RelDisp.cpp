@@ -31,7 +31,8 @@ bool RelDisp::is_converged(unsigned) {
     set_error(std::isfinite(rel_disp) ? rel_disp : 1.);
     set_conv_flag(get_tolerance() > get_error());
 
-    if(is_print()) suanpan_info("relative displacement error: %.5E.\n", get_error());
+    if(is_print())
+        suanpan_info("--> Relative Displacement: {:.5E}.\n", get_error());
 
     return get_conv_flag();
 }

@@ -59,7 +59,7 @@
       <WarningLevel>Level4</WarningLevel>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../..;../../../Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../..;../../../Include;../../../Include/fmt/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
@@ -80,7 +80,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SUANPAN_MT;SUANPAN_HDF5;SUANPAN_VTK;SUANPAN_MKL;SUANPAN_CUDA;NDEBUG;_CONSOLE;_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../..;../../../Include;../../../Include/hdf5;../../../Include/hdf5-vs;$(VTK_INC);$(CUDA_PATH)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../..;../../../Include;../../../Include/hdf5;../../../Include/hdf5-vs;../../../Include/fmt/include;$(VTK_INC);$(CUDA_PATH)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard>stdcpp20</LanguageStandard>
@@ -259,6 +259,7 @@
     <ClCompile Include="..\..\..\Element\Utility\T3DL.cpp" />
     <ClCompile Include="..\..\..\Element\Visualisation\vtkBase.cpp" />
     <ClCompile Include="..\..\..\Element\Visualisation\vtkParser.cpp" />
+    <ClCompile Include="..\..\..\Include\fmt\src\format.cc" />
     <ClCompile Include="..\..\..\Load\Amplitude\Amplitude.cpp" />
     <ClCompile Include="..\..\..\Load\Amplitude\Combine.cpp" />
     <ClCompile Include="..\..\..\Load\Amplitude\Constant.cpp" />
@@ -487,7 +488,6 @@
     <ClCompile Include="..\..\..\Toolbox\arpack_wrapper.cpp" />
     <ClCompile Include="..\..\..\Toolbox\commandParser.cpp" />
     <ClCompile Include="..\..\..\Toolbox\Converter.cpp" />
-    <ClCompile Include="..\..\..\Toolbox\print.cpp" />
     <ClCompile Include="..\..\..\Toolbox\IntegrationPlan.cpp" />
     <ClCompile Include="..\..\..\Toolbox\resampling.cpp" />
     <ClCompile Include="..\..\..\Toolbox\sort_rcm.cpp" />
@@ -935,7 +935,6 @@
     <ClInclude Include="..\..\..\Toolbox\container.h" />
     <ClInclude Include="..\..\..\Toolbox\Converter.h" />
     <ClInclude Include="..\..\..\Toolbox\LBFGS.hpp" />
-    <ClInclude Include="..\..\..\Toolbox\print.h" />
     <ClInclude Include="..\..\..\Toolbox\IntegrationPlan.h" />
     <ClInclude Include="..\..\..\Toolbox\Quaternion.hpp" />
     <ClInclude Include="..\..\..\Toolbox\resampling.h" />

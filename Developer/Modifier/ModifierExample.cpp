@@ -21,17 +21,13 @@
 SUANPAN_EXPORT void new_modifierexample(unique_ptr<Modifier>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("new_modifierexample() requires a valid tag.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double a, b;
-    if(!get_input(command, a)) {
-        suanpan_info("new_modifierexample() needs two valid numbers.\n");
-        return;
-    }
-    if(!get_input(command, b)) {
-        suanpan_info("new_modifierexample() needs two valid numbers.\n");
+    if(!get_input(command, a, b)) {
+        suanpan_debug("Two valid numbers are required.\n");
         return;
     }
 

@@ -48,4 +48,6 @@ int SectionNM::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-void SectionNM::print() { suanpan_info("A N-M interaction based section.\n"); }
+void SectionNM::print() {
+    suanpan_info("An N-M interaction based section.\n");
+}

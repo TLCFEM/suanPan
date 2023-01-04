@@ -54,6 +54,6 @@ int Elastic1D::reset_status() {
 }
 
 void Elastic1D::print() {
-    suanpan_info("A 1D elastic material with an elastic modulus of %.4E.\n", elastic_modulus);
+    suanpan_info("A uniaxial elastic material with an elastic modulus of {:.4E}.\n", elastic_modulus);
     Material1D::print();
 }

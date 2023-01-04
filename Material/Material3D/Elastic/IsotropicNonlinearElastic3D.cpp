@@ -85,4 +85,6 @@ int IsotropicNonlinearElastic3D::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-void IsotropicNonlinearElastic3D::print() { suanpan_info("A 3D isotropic nonlinear elastic material.\n"); }
+void IsotropicNonlinearElastic3D::print() {
+    suanpan_info("A 3D isotropic nonlinear elastic material model.\n");
+}

@@ -46,7 +46,7 @@ int CAX4::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
     if(PlaneType::A != static_cast<PlaneType>(material_proto->get_parameter(ParameterType::PLANETYPE))) {
-        suanpan_warning("Element %u is assigned with an inconsistent material.\n", get_tag());
+        suanpan_warning("Element {} is assigned with an inconsistent material.\n", get_tag());
         return SUANPAN_FAIL;
     }
 
@@ -134,13 +134,13 @@ vector<vec> CAX4::record(const OutputType P) {
 }
 
 void CAX4::print() {
-    suanpan_info("Element %u is a four-node axisymmteric element (CAX4)%s.\n", get_tag(), nlgeom ? " with nonlinear geometry (TL formulation)" : "");
-    node_encoding.t().print("The nodes connected are:");
+    suanpan_info("A four-node axisymmteric element (CAX4){}.\n", nlgeom ? " with nonlinear geometry (TL formulation)" : "");
+    suanpan_info("The nodes connected are:", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Material:\n");
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        suanpan_info("Integration Point %llu:\t", I + 1);
-        int_pt[I].coor.t().print();
+        suanpan_info("IP {}:\t", I + 1);
+        suanpan_info(int_pt[I].coor);
         int_pt[I].m_material->print();
     }
 }

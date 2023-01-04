@@ -74,6 +74,6 @@ int MultilinearOO::initialize(const shared_ptr<DomainBase>&) {
 unique_ptr<Material> MultilinearOO::get_copy() { return make_unique<MultilinearOO>(*this); }
 
 void MultilinearOO::print() {
-    suanpan_info("A Multilinear Origin Oriented hysteresis model.\n");
+    suanpan_info("A multilinear origin oriented hysteresis model.\n");
     OriginOriented::print();
 }

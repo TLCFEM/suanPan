@@ -1086,9 +1086,6 @@
     <ClCompile Include="..\..\..\Toolbox\Converter.cpp">
       <Filter>Toolbox</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\print.cpp">
-      <Filter>Toolbox</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\IntegrationPlan.cpp">
       <Filter>Toolbox</Filter>
     </ClCompile>
@@ -1443,6 +1440,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Material\Material1D\Elastic\Tanh1D.cpp">
       <Filter>Material\Material1D\Elastic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Include\fmt\src\format.cc">
+      <Filter>Toolbox</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2380,9 +2380,6 @@
       <Filter>Toolbox</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Toolbox\Converter.h">
-      <Filter>Toolbox</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Toolbox\print.h">
       <Filter>Toolbox</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Toolbox\IntegrationPlan.h">

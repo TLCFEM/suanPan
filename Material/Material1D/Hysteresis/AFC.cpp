@@ -43,7 +43,7 @@ podarray<double> AFC::compute_transition(const double TX, const double XS, const
     response(0) = YS + TC * (ES + TD);
     response(1) = ES + (R + 1.) * TD;
 
-    suanpan_debug([&] { if(!std::isfinite(response(0)) || !std::isfinite(response(1))) throw invalid_argument("infinite numbers detected"); });
+    suanpan_assert([&] { if(!std::isfinite(response(0)) || !std::isfinite(response(1))) throw invalid_argument("infinite numbers detected"); });
 
     return response;
 }
@@ -178,6 +178,6 @@ int AFC::reset_status() {
 }
 
 void AFC::print() {
-    suanpan_info("A AFC material model using nonlinear transition.\n");
+    suanpan_info("An AFC material model using nonlinear transition.\n");
     Material1D::print();
 }

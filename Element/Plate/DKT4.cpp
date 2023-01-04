@@ -191,7 +191,9 @@ vector<vec> DKT4::record(const OutputType P) {
     return data;
 }
 
-void DKT4::print() { node_encoding.t().print("A DKT quadrilateral plate element connects:"); }
+void DKT4::print() {
+    suanpan_info("A DKT quadrilateral plate element connects:", node_encoding);
+}
 
 #ifdef SUANPAN_VTK
 #include <vtkQuad.h>

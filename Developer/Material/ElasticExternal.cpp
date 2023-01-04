@@ -97,7 +97,7 @@ SUANPAN_EXPORT void elasticexternal_handler(ExternalMaterialData* data, int* inf
     else if(CLEAR == *info) clear(data, info);
     else if(VALIDATE == *info) validate(data, info);
     else {
-        suanpan_error("unknown flag received.\n");
+        suanpan_error("Unknown flag {} received.\n", *info);
         *info = -1;
     }
 }

@@ -32,9 +32,7 @@ void Step::configure_storage_scheme() const {
 
 Step::Step(const unsigned T, const double P)
     : Tag(T)
-    , time_period(P) { suanpan_debug("Step %u ctor() called.\n", T); }
-
-Step::~Step() { suanpan_debug("Step %u dtor() called.\n", get_tag()); }
+    , time_period(P) {}
 
 int Step::initialize() {
     const auto& t_domain = database.lock();
@@ -104,7 +102,7 @@ void Step::set_time_period(const double T) {
     const auto t_iteration = static_cast<int>(floor(time_period / ini_step_size)) + 1;
     if(t_iteration <= static_cast<int>(max_substep) || 0 == max_substep) return;
     if(t_iteration > static_cast<int>(std::numeric_limits<unsigned>::max())) {
-        suanpan_warning("set_ini_step_size() exceeds limits.\n");
+        suanpan_warning("Too many iterations.\n");
         set_max_substep(std::numeric_limits<unsigned>::max());
     }
     else set_max_substep(t_iteration);

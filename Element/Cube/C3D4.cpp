@@ -141,14 +141,12 @@ int C3D4::reset_status() { return c_material->reset_status(); }
 vector<vec> C3D4::record(const OutputType T) { return c_material->record(T); }
 
 void C3D4::print() {
-    node_encoding.t().print("C3D4 element connects:");
+    suanpan_info("C3D4 element connects:", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Material:\n");
     c_material->print();
-    suanpan_info("Strain:\t");
-    c_material->get_trial_strain().t().print();
-    suanpan_info("Stress:\t");
-    c_material->get_trial_stress().t().print();
+    suanpan_info("Strain:\t", c_material->get_trial_strain());
+    suanpan_info("Stress:\t", c_material->get_trial_stress());
 }
 
 #ifdef SUANPAN_VTK

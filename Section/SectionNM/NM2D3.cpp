@@ -31,6 +31,6 @@ unique_ptr<Section> NM2D3::get_copy() { return make_unique<NM2D3>(*this); }
 
 void NM2D3::print() {
     suanpan_info("A N-M based section. doi: 10.1007/978-94-007-6573-3_3\n");
-    current_deformation.t().print("Local Deformation:");
-    current_resistance.t().print("Local Resistance:");
+    suanpan_info("Local Deformation:", current_deformation);
+    suanpan_info("Local Resistance:", current_resistance);
 }

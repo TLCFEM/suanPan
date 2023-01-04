@@ -81,4 +81,6 @@ int Box3D::initialize(const shared_ptr<DomainBase>& D) {
 
 unique_ptr<Section> Box3D::get_copy() { return make_unique<Box3D>(*this); }
 
-void Box3D::print() { suanpan_info("A Box3D Section.\n"); }
+void Box3D::print() {
+    suanpan_info("A 3D box section.\n");
+}

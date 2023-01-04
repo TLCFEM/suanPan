@@ -41,7 +41,8 @@ bool AbsError::is_converged(unsigned) {
     set_error(fabs(W->get_error()) / static_cast<double>(W->get_size()));
     set_conv_flag(get_tolerance() > get_error());
 
-    if(is_print()) suanpan_info("absolute error: %.5E.\n", get_error());
+    if(is_print())
+        suanpan_info("--> Absolute Error: {:.5E}.\n", get_error());
 
     return get_conv_flag();
 }

@@ -37,4 +37,6 @@ void GroupSumRecorder::initialize(const shared_ptr<DomainBase>& D) {
     SumRecorder::initialize(D);
 }
 
-void GroupSumRecorder::print() { suanpan_info("A Summation Recorder.\n"); }
+void GroupSumRecorder::print() {
+    suanpan_info("A summation recorder.\n");
+}

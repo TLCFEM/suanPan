@@ -115,7 +115,7 @@ public:
 
             const auto error = norm(ninja);
             const auto ref_error = error / ref_magnitude;
-            suanpan_debug("LBFGS local iteration error: %.5E.\n", ref_error);
+            suanpan_debug("Local iteration error: {:.5E}.\n", ref_error);
             if(error <= abs_tol && ref_error <= rel_tol) return SUANPAN_SUCCESS;
             if(++counter > max_iteration) return SUANPAN_FAIL;
 

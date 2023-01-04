@@ -40,7 +40,7 @@ int Rebar2D::initialize(const shared_ptr<DomainBase>& D) {
     rebar_y = suanpan::initialized_material_copy(D, tag_y);
 
     if(nullptr == rebar_x || nullptr == rebar_y || rebar_x->get_material_type() != MaterialType::D1 || rebar_y->get_material_type() != MaterialType::D1) {
-        suanpan_error("Rebar2D %u requires 1D host material models.\n", get_tag());
+        suanpan_error("A valid 1D host material is required.\n");
         return SUANPAN_FAIL;
     }
 
@@ -111,9 +111,13 @@ vector<vec> Rebar2D::record(const OutputType P) {
 }
 
 void Rebar2D::print() {
-    suanpan_info("A rebar layer with major/minor reinforcement ratio of %.3E and %.3E.\n", ratio_x, ratio_y);
-    suanpan_info("Major: ");
-    if(rebar_x) rebar_x->print();
-    suanpan_info("Minor: ");
-    if(rebar_y) rebar_y->print();
+    suanpan_info("A rebar layer with major/minor reinforcement ratio of {:.3E} and {:.3E}.\n", ratio_x, ratio_y);
+    if(rebar_x) {
+        suanpan_info("Major: ");
+        rebar_x->print();
+    }
+    if(rebar_y) {
+        suanpan_info("Minor: ");
+        rebar_y->print();
+    }
 }

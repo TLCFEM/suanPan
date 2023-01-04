@@ -20,9 +20,7 @@
 #include <Domain/FactoryHelper.hpp>
 
 Integrator::Integrator(const unsigned T)
-    : Tag(T) { suanpan_debug("Integrator %u ctor() called.\n", T); }
-
-Integrator::~Integrator() { suanpan_debug("Integrator %u dtor() called.\n", get_tag()); }
+    : Tag(T) {}
 
 void Integrator::set_domain(const weak_ptr<DomainBase>& D) { if(database.lock() != D.lock()) database = D; }
 
@@ -31,7 +29,7 @@ shared_ptr<DomainBase> Integrator::get_domain() const { return database.lock(); 
 int Integrator::initialize() {
     if(nullptr != database.lock()) return SUANPAN_SUCCESS;
 
-    suanpan_error("initialize() needs a valid domain.\n");
+    suanpan_error("A valid domain is required.\n");
     return SUANPAN_FAIL;
 }
 

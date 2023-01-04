@@ -20,9 +20,7 @@
 
 Modifier::Modifier(const unsigned T, uvec&& ET)
     : Tag(T)
-    , element_tag(std::forward<uvec>(ET)) { suanpan_debug("Modifier %u ctor() called.\n", T); }
-
-Modifier::~Modifier() { suanpan_debug("Modifier %u dtor() called.\n", get_tag()); }
+    , element_tag(std::forward<uvec>(ET)) {}
 
 void Modifier::initialize(const shared_ptr<DomainBase>& D) {
     element_pool.clear();

@@ -249,7 +249,9 @@ vector<vec> DKTS3::record(const OutputType P) {
     return data;
 }
 
-void DKTS3::print() { suanpan_info("A three node planar shell element using CST for membrane action and DKT3 for plate action.\n"); }
+void DKTS3::print() {
+    suanpan_info("A three-node planar shell element using CST for membrane action and DKT3 for plate action.\n");
+}
 
 #ifdef SUANPAN_VTK
 #include <vtkTriangle.h>

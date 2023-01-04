@@ -48,7 +48,7 @@ public:
     Modifier& operator=(const Modifier&) = delete; // assign forbidden
     Modifier& operator=(Modifier&&) = delete;      // assign forbidden
 
-    ~Modifier() override;
+    ~Modifier() override = default;
 
     virtual void initialize(const shared_ptr<DomainBase>&);
 

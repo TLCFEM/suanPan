@@ -103,7 +103,7 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
         auto error = norm(residual);
         if(1 == counter) ref_error = std::max(1., error);
-        suanpan_debug("DafaliasManzari local elastic iteration error: %.5E.\n", error /= ref_error);
+        suanpan_debug("Local elastic iteration error: {:.5E}.\n", error /= ref_error);
         if(error <= tolerance) break;
 
         p -= incre(sa);
@@ -319,7 +319,7 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
         auto error = norm(residual);
         if(1 == counter) ref_error = std::max(1., error);
-        suanpan_debug("DafaliasManzari local plastic iteration error: %.5E.\n", error /= ref_error);
+        suanpan_debug("Local plastic iteration error: {:.5E}.\n", error /= ref_error);
         if(error <= tolerance) break;
 
         gamma -= incre(si);
@@ -377,4 +377,6 @@ int DafaliasManzari::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-void DafaliasManzari::print() { suanpan_info("A Dafalias--Manzari sand model. doi: 10.1061/(ASCE)0733-9399(2004)130:6(622)\n"); }
+void DafaliasManzari::print() {
+    suanpan_info("A Dafalias-Manzari sand model. doi: 10.1061/(ASCE)0733-9399(2004)130:6(622)\n");
+}

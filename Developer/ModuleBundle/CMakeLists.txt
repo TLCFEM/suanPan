@@ -34,7 +34,6 @@ add_library(${PROJECT_NAME} SHARED
         ../../Element/Element.cpp
         ../../Material/Material.cpp
         ../../Section/Section.cpp
-        ../../Toolbox/print.cpp
         ../Element/ElementExample.cpp
         ../Material/MaterialExample.cpp
         ../Material/ElasticExternal.cpp

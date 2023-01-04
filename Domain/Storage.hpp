@@ -102,12 +102,12 @@ template<typename T> class Storage : public std::enable_shared_from_this<Storage
 public:
     typedef T object_type;
 
-    Storage();
+    Storage() = default;
     Storage(const Storage&) = delete;
     Storage(Storage&&) noexcept = delete;
     Storage& operator=(const Storage&) = delete;
     Storage& operator=(Storage&&) noexcept = delete;
-    ~Storage();
+    ~Storage() = default;
 
     const_iterator cbegin() const;
     const_iterator cend() const;
@@ -133,10 +133,6 @@ public:
     [[nodiscard]] size_t size() const;
 };
 
-template<typename T> Storage<T>::Storage() { suanpan_debug("Storage %s ctor() called.\n", type); }
-
-template<typename T> Storage<T>::~Storage() { suanpan_debug("Storage %s dtor() called.\n", type); }
-
 template<typename T> typename Storage<T>::const_iterator Storage<T>::cbegin() const { return pond.cbegin(); }
 
 template<typename T> typename Storage<T>::const_iterator Storage<T>::cend() const { return pond.cend(); }
@@ -147,7 +143,8 @@ template<typename T> typename Storage<T>::iterator Storage<T>::end() { return po
 
 template<typename T> bool Storage<T>::insert(const shared_ptr<T>& I) {
     auto flag = pond.insert({I->get_tag(), I}).second;
-    if(!flag) suanpan_warning("Storage fails to insert %s %u.\n", type, I->get_tag());
+    if(!flag)
+        suanpan_warning("Fail to insert {} {}.\n", type, I->get_tag());
     return flag;
 }
 
@@ -163,7 +160,7 @@ template<typename T> bool Storage<T>::erase(const unsigned L) {
 #ifdef SUANPAN_MT
     return pond.unsafe_erase(L) == 1;
 #else
-    return pond.erase(L) == 1;
+	return pond.erase(L) == 1;
 #endif
 }
 

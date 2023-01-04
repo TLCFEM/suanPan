@@ -184,8 +184,8 @@ vector<vec> CP8::record(const OutputType P) {
 }
 
 void CP8::print() {
-    suanpan_info("A CP8%s element%s.\n", reduced_scheme ? "R" : "", nlgeom ? " with nonlinear geometry on" : "");
-    node_encoding.t().print("The nodes connected are:");
+    suanpan_info("A CP8{} element{}.\n", reduced_scheme ? "R" : "", nlgeom ? " with nonlinear geometry on" : "");
+    suanpan_info("The nodes connected are:", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Material:\n");
     for(const auto& I : int_pt) I.m_material->print();

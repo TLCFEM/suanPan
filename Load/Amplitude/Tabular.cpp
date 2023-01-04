@@ -35,16 +35,17 @@ void Tabular::initialize(const shared_ptr<DomainBase>& D) {
 
     std::error_code code;
     if(mat ext_data; !fs::exists(file_name, code) || !ext_data.load(file_name, raw_ascii)) {
-        suanpan_error("Tabular() cannot load file.\n");
+        suanpan_error("Cannot load \"{}\".\n", file_name);
         D->disable_amplitude(get_tag());
     }
     else if(ext_data.n_cols >= 2llu) {
-        if(ext_data.n_cols > 2llu) suanpan_warning("Tabular() reads more than two columns from the given file, please ensure the correct file is used.\n");
+        if(ext_data.n_cols > 2llu)
+            suanpan_warning("More than two columns read from \"{}\".\n", file_name);
         time = ext_data.col(0);
         magnitude = ext_data.col(1);
     }
     else {
-        suanpan_error("Tabular() requires two valid columns.\n");
+        suanpan_error("Two valid columns are required.\n");
         D->disable_amplitude(get_tag());
     }
 }
@@ -63,4 +64,6 @@ double Tabular::get_amplitude(const double T) {
     return result(0);
 }
 
-void Tabular::print() { suanpan_info("Tabular.\n"); }
+void Tabular::print() {
+    suanpan_info("Tabular.\n");
+}

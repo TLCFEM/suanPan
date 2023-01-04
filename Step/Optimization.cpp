@@ -23,7 +23,7 @@ int Optimization::initialize() {
     if(SUANPAN_SUCCESS != Static::initialize()) return SUANPAN_FAIL;
 
     if(0 == get_domain().lock()->get_criterion()) {
-        suanpan_warning("at least one valid criterion shall be defined to run optimization.\n");
+        suanpan_warning("At least one valid criterion shall be defined.\n");
         return SUANPAN_FAIL;
     }
 
@@ -38,7 +38,7 @@ int Optimization::analyze() {
 
     while(true) {
         if(++num_increment > get_max_substep()) {
-            suanpan_error("maximum iteration reached.\n");
+            suanpan_error("The maximum iteration {} reached.\n", get_max_substep());
             return SUANPAN_FAIL;
         }
 

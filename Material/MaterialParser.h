@@ -24,15 +24,4 @@ class DomainBase;
 
 int create_new_material(const std::shared_ptr<DomainBase>&, std::istringstream&);
 
-int test_material1d(const std::shared_ptr<DomainBase>&, std::istringstream&);
-int test_material2d(const std::shared_ptr<DomainBase>&, std::istringstream&);
-int test_material3d(const std::shared_ptr<DomainBase>&, std::istringstream&);
-int test_material_with_base3d(const std::shared_ptr<DomainBase>&, std::istringstream&);
-int test_material_by_load1d(const std::shared_ptr<DomainBase>&, std::istringstream&);
-int test_material_by_load2d(const std::shared_ptr<DomainBase>&, std::istringstream&);
-int test_material_by_load3d(const std::shared_ptr<DomainBase>&, std::istringstream&);
-int test_material_by_load_with_base3d(const std::shared_ptr<DomainBase>&, std::istringstream&);
-int test_material_by_strain_history(const std::shared_ptr<DomainBase>&, std::istringstream&);
-int test_material_by_stress_history(const std::shared_ptr<DomainBase>&, std::istringstream&);
-
 #endif

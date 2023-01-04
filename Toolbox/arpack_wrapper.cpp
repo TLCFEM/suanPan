@@ -64,11 +64,11 @@ int eig_solve(vec& eigval, mat& eigvec, const std::shared_ptr<MetaMat<double>>& 
     }
 
     if(0 != INFO) {
-        suanpan_error("arpack solver returns %d.\n", INFO);
+        suanpan_error("Error code {} received.\n", INFO);
         return SUANPAN_FAIL;
     }
 
-    suanpan_debug("Arnoldi iteration counter: %d.\n", IPARAM(2));
+    suanpan_debug("Arnoldi iteration counter: {}.\n", IPARAM(2));
 
     auto RVEC = 1;
     auto HOWMNY = 'A';
@@ -129,7 +129,7 @@ int eig_solve(cx_vec& eigval, cx_mat& eigvec, const std::shared_ptr<MetaMat<doub
     }
 
     if(0 != INFO) {
-        suanpan_error("arpack solver returns %d.\n", INFO);
+        suanpan_error("Error code {} received.\n", INFO);
         return SUANPAN_FAIL;
     }
 

@@ -90,7 +90,7 @@ public:
     Node(Node&&) = delete;                 // move forbidden
     Node& operator=(const Node&) = delete; // assign forbidden
     Node& operator=(Node&&) = delete;      // assign forbidden
-    ~Node() override;
+    ~Node() override = default;
 
     void initialize(const shared_ptr<DomainBase>&);
 

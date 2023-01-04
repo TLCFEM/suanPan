@@ -67,4 +67,6 @@ int IsotropicElastic3D::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-void IsotropicElastic3D::print() { suanpan_info("A 3D isotropic elastic material with E=%.4E and nu=%.4E.\n", elastic_modulus, poissons_ratio); }
+void IsotropicElastic3D::print() {
+    suanpan_info("A 3D isotropic elastic material with E={:.4E} and nu={:.4E}.\n", elastic_modulus, poissons_ratio);
+}

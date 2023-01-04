@@ -16,12 +16,12 @@
  ******************************************************************************/
 
 #include "argumentParser.h"
+#include <iomanip>
 #include <Step/Bead.h>
-#include <Toolbox/Converter.h>
 #include <Toolbox/commandParser.h>
+#include <Toolbox/Converter.h>
 #include <Toolbox/utility.h>
 #include <UnitTest/CatchTest.h>
-#include <iomanip>
 #include "revision.h"
 #ifdef SUANPAN_WIN
 #include <Windows.h>
@@ -41,12 +41,18 @@ constexpr auto SUANPAN_CODE = "Betelgeuse";
 constexpr auto SUANPAN_ARCH = 64;
 
 bool SUANPAN_PRINT = true;
+bool SUANPAN_COLOR = true;
+#ifdef SUANPAN_DEBUG
+bool SUANPAN_VERBOSE = true;
+#else
 bool SUANPAN_VERBOSE = false;
+#endif
+
 const char* SUANPAN_EXE = "";
 
 bool check_debugger() {
 #ifdef SUANPAN_DEBUG
-    return false;
+	return false;
 #endif
 #ifdef SUANPAN_WIN
     if(IsDebuggerPresent()) exit(EXIT_SUCCESS); // NOLINT(concurrency-mt-unsafe)
@@ -82,14 +88,14 @@ void strip_mode(const string& input_file_name, const string& output_file_name) {
     ifstream input_file(input_file_name);
 
     if(!input_file.is_open()) {
-        suanpan_error("fail to open %s.\n", input_file_name.c_str());
+        suanpan_error("Fail to open \"{}\".\n", input_file_name);
         return;
     }
 
     ofstream output_file(output_file_name);
 
     if(!output_file.is_open()) {
-        suanpan_error("fail to open %s.\n", output_file_name.c_str());
+        suanpan_error("Fail to open \"{}\".\n", output_file_name);
         return;
     }
 
@@ -111,14 +117,14 @@ void convert_mode(const string& input_file_name, const string& output_file_name)
     ifstream input_file(input_file_name);
 
     if(!input_file.is_open()) {
-        suanpan_error("fail to open %s.\n", input_file_name.c_str());
+        suanpan_error("Fail to open \"{}\".\n", input_file_name);
         return;
     }
 
     ofstream output_file(output_file_name);
 
     if(!output_file.is_open()) {
-        suanpan_error("fail to open %s.\n", output_file_name.c_str());
+        suanpan_error("Fail to open \"{}\".\n", output_file_name);
         return;
     }
 
@@ -132,9 +138,9 @@ void convert_mode(const string& input_file_name, const string& output_file_name)
 void print_header() {
     suanpan_info("+--------------------------------------------------+\n");
     suanpan_info("|   __        __         suanPan is an open source |\n");
-    suanpan_info("|  /  \\      |  \\           FEM framework (%u-bit) |\n", SUANPAN_ARCH);
-    suanpan_info("|  \\__       |__/  __   __      %s (%u.%u.%u) |\n", SUANPAN_CODE, SUANPAN_MAJOR, SUANPAN_MINOR, SUANPAN_PATCH);
-    suanpan_info("|     \\ |  | |    |  \\ |  |      by tlc @ %s |\n", SUANPAN_REVISION);
+    suanpan_info("|  /  \\      |  \\           FEM framework ({}-bit) |\n", SUANPAN_ARCH);
+    suanpan_info("|  \\__       |__/  __   __      {} ({}.{}.{}) |\n", SUANPAN_CODE, SUANPAN_MAJOR, SUANPAN_MINOR, SUANPAN_PATCH);
+    suanpan_info("|     \\ |  | |    |  \\ |  |      by tlc @ {} |\n", SUANPAN_REVISION);
     suanpan_info("|  \\__/ |__| |    |__X |  |    all rights reserved |\n");
     suanpan_info("|                           10.5281/zenodo.1285221 |\n");
     suanpan_info("+--------------------------------------------------+\n");
@@ -144,23 +150,12 @@ void print_header() {
     suanpan_info("+--------------------------------------------------+\n");
     suanpan_info("|  https://gitter.im/suanPan-dev/community         |\n");
 #else
-    std::vector<const char8_t*> POOL;
-    POOL.reserve(10);
-    POOL.emplace_back(u8"\U0001F308");
-    POOL.emplace_back(u8"\U0001F30F");
-    POOL.emplace_back(u8"\U0001F3A7");
-    POOL.emplace_back(u8"\U0001F3B1");
-    POOL.emplace_back(u8"\U0001F479");
-    POOL.emplace_back(u8"\U0001F4BB");
-    POOL.emplace_back(u8"\U0001F50B");
-    POOL.emplace_back(u8"\U0001F514");
-    POOL.emplace_back(u8"\U0001F680");
-    POOL.emplace_back(u8"\U0001F9E9");
+    static constexpr std::array POOL{"\U0001F308", "\U0001F30F", "\U0001F3A7", "\U0001F3B1", "\U0001F479", "\U0001F4BB", "\U0001F50B", "\U0001F514", "\U0001F680", "\U0001F9E9"};
     arma_rng::set_seed_random();
-    suanpan_info("|  %-5shttps://github.com/TLCFEM/suanPan            |\n", u8"\U0001F9EE");
-    suanpan_info("|  %-5shttps://github.com/TLCFEM/suanPan-manual     |\n", u8"\U0001F4DA");
+    suanpan_info("|  \U0001F9EE https://github.com/TLCFEM/suanPan            |\n");
+    suanpan_info("|  \U0001F4DA https://github.com/TLCFEM/suanPan-manual     |\n");
     suanpan_info("+--------------------------------------------------+\n");
-    suanpan_info("|  %-5shttps://gitter.im/suanPan-dev/community      |\n", POOL[randi() % POOL.size()]);
+    suanpan_info("|  {} https://gitter.im/suanPan-dev/community      |\n", POOL[randi() % POOL.size()]);
 #endif
     suanpan_info("+--------------------------------------------------+\n\n");
 }
@@ -184,14 +179,19 @@ void argument_parser(const int argc, char** argv) {
         auto strip = false, convert = false, check_new = true;
 
         for(auto I = 1; I < argc; ++I) {
-            if(is_equal(argv[I], "-v") || is_equal(argv[I], "--version")) print_version();
-            else if(is_equal(argv[I], "-h") || is_equal(argv[I], "--help")) print_helper();
-            else if(is_equal(argv[I], "-t") || is_equal(argv[I], "--test")) test_mode();
-            else if(is_equal(argv[I], "-f") || is_equal(argv[I], "--file")) input_file_name = argv[++I];
+            if(is_equal(argv[I], "-f") || is_equal(argv[I], "--file")) input_file_name = argv[++I];
             else if(is_equal(argv[I], "-o") || is_equal(argv[I], "--output")) output_file_name = argv[++I];
-            else if(is_equal(argv[I], "-np") || is_equal(argv[I], "--noprint")) SUANPAN_PRINT = false;
             else if(is_equal(argv[I], "-vb") || is_equal(argv[I], "--verbose")) SUANPAN_VERBOSE = true;
+            else if(is_equal(argv[I], "-np") || is_equal(argv[I], "--noprint")) SUANPAN_PRINT = false;
+            else if(is_equal(argv[I], "-nc") || is_equal(argv[I], "--nocolor")) SUANPAN_COLOR = false;
             else if(is_equal(argv[I], "-nu") || is_equal(argv[I], "--noupdate")) check_new = false;
+            else if(is_equal(argv[I], "-v") || is_equal(argv[I], "--version")) return print_version();
+            else if(is_equal(argv[I], "-h") || is_equal(argv[I], "--help")) return print_helper();
+            else if(is_equal(argv[I], "-t") || is_equal(argv[I], "--test")) return test_mode();
+            else if(is_equal(argv[I], "-ctest") || is_equal(argv[I], "--catch2test")) {
+                catchtest_main(argc, argv);
+                return;
+            }
             else if(is_equal(argv[I], "-s") || is_equal(argv[I], "--strip")) {
                 strip = true;
                 convert = false;
@@ -199,10 +199,6 @@ void argument_parser(const int argc, char** argv) {
             else if(is_equal(argv[I], "-c") || is_equal(argv[I], "--convert")) {
                 convert = true;
                 strip = false;
-            }
-            else if(is_equal(argv[I], "-ctest") || is_equal(argv[I], "--catch2test")) {
-                catchtest_main(argc, argv);
-                return;
             }
         }
 
@@ -223,7 +219,7 @@ void argument_parser(const int argc, char** argv) {
                 output_file_name += strip ? "_out.inp" : "_out.supan";
             }
 
-            for(auto& I : output_file_name) if(I == '\\') I = '/';
+            for(auto& I : output_file_name) if('\\' == I) I = '/';
 
             return convert ? convert_mode(input_file_name, output_file_name) : strip_mode(input_file_name, output_file_name);
         }
@@ -231,18 +227,19 @@ void argument_parser(const int argc, char** argv) {
         if(!output_file_name.empty()) {
             output_file.open(output_file_name);
             if(output_file.is_open()) SUANPAN_COUT.rdbuf(output_file.rdbuf());
-            else suanpan_error("argumentParser() cannot open the output file.\n");
+            else
+                suanpan_error("Cannot open the output file \"{}\".\n", output_file_name);
         }
 
-        if(!input_file_name.empty()) {
-            print_header();
-            if(const auto model = make_shared<Bead>(); process_file(model, input_file_name.c_str()) != SUANPAN_EXIT) {
-                if(output_file.is_open()) {
-                    SUANPAN_COUT.rdbuf(buffer_backup);
-                    print_header();
-                }
-                cli_mode(model);
+        print_header();
+        const auto model = make_shared<Bead>();
+        if(input_file_name.empty()) cli_mode(model);
+        else if(process_file(model, input_file_name.c_str()) != SUANPAN_EXIT) {
+            if(output_file.is_open()) {
+                SUANPAN_COUT.rdbuf(buffer_backup);
+                print_header();
             }
+            cli_mode(model);
         }
     }
     else {
@@ -252,7 +249,7 @@ void argument_parser(const int argc, char** argv) {
         cli_mode(model);
     }
 
-    suanpan_info("\nTime Wasted: %.4F Seconds.\n", T.toc());
+    suanpan_info("\nTime Wasted: {:.4f} Seconds.\n", T.toc());
 }
 
 void print_version() {
@@ -261,13 +258,13 @@ void print_version() {
     suanpan_info("This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\n");
     suanpan_info("You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.\n\n\n");
     suanpan_info("suanPan is an open source FEM framework.\n");
-    suanpan_info("    The binary is compiled on %s.\n", __DATE__);
+    suanpan_info("    The binary is compiled on {}.\n", __DATE__);
     suanpan_info("    The source code of suanPan is hosted on GitHub. https://tlcfem.github.io/suanPan/\n");
     suanpan_info("    The documentation is hosted on GitBook and readthedocs. https://tlcfem.gitbook.io/suanpan-manual/ and https://suanpan-manual.readthedocs.io/\n");
 #ifdef SUANPAN_MKL
     suanpan_info("    The linear algebra support is provided by Armadillo with Intel MKL. http://arma.sourceforge.net/\n");
 #else
-    suanpan_info("    The linear algebra support is provided by Armadillo. http://arma.sourceforge.net/\n");
+	suanpan_info("    The linear algebra support is provided by Armadillo. http://arma.sourceforge.net/\n");
 #endif
 #ifdef SUANPAN_CUDA
     suanpan_info("    The GPCPU solvers are provided by CUDA. https://developer.nvidia.com/about-cuda\n");
@@ -284,14 +281,15 @@ void print_version() {
 
 void print_helper() {
     suanpan_info("Available Parameters:\n");
-    suanpan_info("\t-%-10s  --%-20s%s\n", "v", "version", "check version information");
-    suanpan_info("\t-%-10s  --%-20s%s\n", "h", "help", "print this helper");
-    suanpan_info("\t-%-10s  --%-20s%s\n", "s", "strip", "strip comments out in given ABAQUS input file");
-    // suanpan_info("\t-%-10s  --%-20s%s\n", "c", "convert", "partially convert ABAQUS input file into suanPan model script");
-    suanpan_info("\t-%-10s  --%-20s%s\n", "np", "noprint", "suppress most console output");
-    suanpan_info("\t-%-10s  --%-20s%s\n", "nu", "noupdate", "do not check for newer version on startup");
-    suanpan_info("\t-%-10s  --%-20s%s\n", "f", "file", "process model file");
-    suanpan_info("\t-%-10s  --%-20s%s\n", "o", "output", "set output file for logging");
+    suanpan_info("\t-{:<10}  --{:<20}{}\n", "v", "version", "check version information");
+    suanpan_info("\t-{:<10}  --{:<20}{}\n", "h", "help", "print this helper");
+    suanpan_info("\t-{:<10}  --{:<20}{}\n", "s", "strip", "strip comments out in given ABAQUS input file");
+    // suanpan_info("\t-{:<10}  --{:<20}{}\n", "c", "convert", "partially convert ABAQUS input file into suanPan model script");
+    suanpan_info("\t-{:<10}  --{:<20}{}\n", "np", "noprint", "suppress most console output");
+    suanpan_info("\t-{:<10}  --{:<20}{}\n", "nc", "nocolor", "suppress colors in output");
+    suanpan_info("\t-{:<10}  --{:<20}{}\n", "nu", "noupdate", "do not check for newer version on startup");
+    suanpan_info("\t-{:<10}  --{:<20}{}\n", "f", "file", "process model file");
+    suanpan_info("\t-{:<10}  --{:<20}{}\n", "o", "output", "set output file for logging");
     suanpan_info("\n");
 }
 

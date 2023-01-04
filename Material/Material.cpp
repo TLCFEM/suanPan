@@ -21,9 +21,7 @@
 Material::Material(const unsigned T, const MaterialType MT, const double D)
     : DataMaterial{1E-14, fabs(D), MT, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}}
     , DataCoupleMaterial{-1., {}, {}, {}, {}, {}, {}, {}, {}, {}}
-    , Tag(T) { suanpan_debug("Material %u ctor() called.\n", T); }
-
-Material::~Material() { suanpan_debug("Material %u dtor() called.\n", get_tag()); }
+    , Tag(T) {}
 
 int Material::initialize_base(const shared_ptr<DomainBase>&) {
     if(initialized) return SUANPAN_SUCCESS;

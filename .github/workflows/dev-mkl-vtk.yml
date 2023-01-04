@@ -36,7 +36,7 @@ jobs:
           path: suanPan-2.8.0-1.x86_64.deb
   fedora-mkl-vtk-dev:
     runs-on: ubuntu-22.04
-    container: fedora:35
+    container: fedora:36
     steps:
       - name: Setup
         run: |

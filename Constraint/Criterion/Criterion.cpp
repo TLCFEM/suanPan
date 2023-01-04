@@ -20,9 +20,7 @@
 
 Criterion::Criterion(const unsigned T, const unsigned ST)
     : Tag(T)
-    , step_tag(ST) { suanpan_debug("Criterion %u ctor() called.\n", T); }
-
-Criterion::~Criterion() { suanpan_debug("Criterion %u dtor() called.\n", get_tag()); }
+    , step_tag(ST) {}
 
 void Criterion::set_step_tag(const unsigned T) { step_tag = T; }
 

@@ -112,4 +112,6 @@ vector<vec> BilinearJ2::record(const OutputType P) {
     return Material3D::record(P);
 }
 
-void BilinearJ2::print() { suanpan_info("A 3D bilinear hardening model.\n"); }
+void BilinearJ2::print() {
+    suanpan_info("A 3D bilinear hardening model.\n");
+}

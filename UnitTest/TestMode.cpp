@@ -15,4 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-void test_mode() {}
+#include <suanPan.h>
+
+void test_mode() {
+    suanpan_info("TEST.\n");
+    suanpan_highlight("TEST.\n");
+    suanpan_debug("TEST.\n");
+    suanpan_warning("TEST.\n");
+    suanpan_error("TEST.\n");
+    suanpan_fatal("TEST.\n");
+    suanpan_info("TEST.\n", vec{1, 2, 3});
+}

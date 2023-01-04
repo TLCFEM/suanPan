@@ -66,7 +66,7 @@ int MVLEM::initialize(const shared_ptr<DomainBase>& D) {
 
     shear_spring = suanpan::make_copy(D->get<Material>(shear_spring_tag));
     if(MaterialType::D1 != shear_spring->get_material_type()) {
-        suanpan_warning("Element %u is assigned with an inconsistent material.\n", get_tag());
+        suanpan_warning("Element {} is assigned with an inconsistent material.\n", get_tag());
         return SUANPAN_FAIL;
     }
 
@@ -216,12 +216,12 @@ vector<vec> MVLEM::record(const OutputType P) {
 }
 
 void MVLEM::print() {
-    node_encoding.t().print("A MVLEM element connects nodes:");
+    suanpan_info("A MVLEM element connects nodes:", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Section:\n");
     auto J = 0;
     for(const auto& I : axial_spring) {
-        suanpan_info("Fibre %d:\n", ++J);
+        suanpan_info("Fibre {}:\n", ++J);
         suanpan_info("Concrete: ");
         I.c_material->print();
         suanpan_info("Steel: ");

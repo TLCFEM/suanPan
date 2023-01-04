@@ -120,7 +120,7 @@ public:
     Material& operator=(const Material&) = delete; // assign forbidden
     Material& operator=(Material&&) = delete;      // assign forbidden
 
-    ~Material() override;
+    ~Material() override = default;
 
     int initialize_base(const shared_ptr<DomainBase>&);
 

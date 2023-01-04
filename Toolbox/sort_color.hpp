@@ -35,10 +35,8 @@
 #include "metis/metis.h"
 
 template<typename T> auto sort_color_metis(suanpan::graph<T>& element_register, const int num_color, const char method) {
-#ifdef SUANPAN_DEBUG
     wall_clock timer;
     timer.tic();
-#endif
 
     const auto element_size = element_register.size();
 
@@ -70,25 +68,21 @@ template<typename T> auto sort_color_metis(suanpan::graph<T>& element_register, 
     idx_t options[METIS_NOPTIONS];
     METIS_SetDefaultOptions(options);
 #ifdef SUANPAN_DEBUG
-    options[METIS_OPTION_DBGLVL] = METIS_DBG_INFO | METIS_DBG_TIME;
+	options[METIS_OPTION_DBGLVL] = METIS_DBG_INFO | METIS_DBG_TIME;
 #endif
     options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_VOL;
 
     if('K' == method) METIS_PartGraphKway(&nvtxs, &ncon, xadj.data(), adjncy.data(), nullptr, vsize, nullptr, &nparts, tpwgts, ubvec, options, &edgecut, part.data());
     else METIS_PartGraphRecursive(&nvtxs, &ncon, xadj.data(), adjncy.data(), nullptr, vsize, nullptr, &nparts, tpwgts, ubvec, options, &edgecut, part.data());
 
-#ifdef SUANPAN_DEBUG
-    suanpan_debug("Coloring algorithm takes %.5E seconds.\n", timer.toc());
-#endif
+    suanpan_debug("Coloring algorithm takes {:.5E} seconds.\n", timer.toc());
 
     return part;
 }
 
 template<typename T> std::vector<std::vector<T>> sort_color_wp(const suanpan::graph<T>& node_register) {
-#ifdef SUANPAN_DEBUG
     wall_clock timer;
     timer.tic();
-#endif
 
     const auto num_node = node_register.size();
 
@@ -128,18 +122,14 @@ template<typename T> std::vector<std::vector<T>> sort_color_wp(const suanpan::gr
     for(auto& color : color_map) color.shrink_to_fit();
     color_map.shrink_to_fit();
 
-#ifdef SUANPAN_DEBUG
-    suanpan_debug("Coloring algorithm takes %.5E seconds.\n", timer.toc());
-#endif
+    suanpan_debug("Coloring algorithm takes {:.5E} seconds.\n", timer.toc());
 
     return color_map;
 }
 
 template<typename T> std::vector<std::vector<T>> sort_color_mis(const suanpan::graph<T>& node_register) {
-#ifdef SUANPAN_DEBUG
     wall_clock timer;
     timer.tic();
-#endif
 
     const auto num_node = node_register.size();
 
@@ -174,9 +164,7 @@ template<typename T> std::vector<std::vector<T>> sort_color_mis(const suanpan::g
     for(auto& color : color_map) color.shrink_to_fit();
     color_map.shrink_to_fit();
 
-#ifdef SUANPAN_DEBUG
-    suanpan_debug("Coloring algorithm takes %.5E seconds.\n", timer.toc());
-#endif
+    suanpan_debug("Coloring algorithm takes {:.5E} seconds.\n", timer.toc());
 
     return color_map;
 }

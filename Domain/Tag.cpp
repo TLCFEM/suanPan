@@ -37,4 +37,6 @@ bool Tag::is_active() const { return alive; }
 
 bool Tag::is_guarded() const { return guarded; }
 
-void Tag::print() { suanpan_info("A tagged object.\n"); }
+void Tag::print() {
+    suanpan_info("A tagged object.\n");
+}

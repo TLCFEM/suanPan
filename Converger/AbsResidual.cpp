@@ -30,7 +30,8 @@ bool AbsResidual::is_converged(unsigned) {
     set_error(norm(get_residual()) / static_cast<double>(W->get_size()));
     set_conv_flag(get_tolerance() > get_error());
 
-    if(is_print()) suanpan_info("absolute residual: %.5E.\n", get_error());
+    if(is_print())
+        suanpan_info("--> Absolute Residual: {:.5E}.\n", get_error());
 
     return get_conv_flag();
 }

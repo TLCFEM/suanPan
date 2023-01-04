@@ -42,7 +42,7 @@ int Fibre1D::initialize(const shared_ptr<DomainBase>& D) {
     for(const auto I : fibre_tag) {
         fibre.emplace_back(suanpan::initialized_section_copy(D, I));
         if(nullptr == fibre.back() || SectionType::D1 != fibre.back()->get_section_type()) {
-            suanpan_warning("Fibre1D ignores section %llu since it is not a 1D section.\n", I);
+            suanpan_warning("Section {} is ignored as it is not a valid 1D section.\n", I);
             fibre.pop_back();
         }
         else {
@@ -96,6 +96,6 @@ int Fibre1D::reset_status() {
 }
 
 void Fibre1D::print() {
-    suanpan_info("A 1D fibre section consists of %llu sections.\n", fibre.size());
+    suanpan_info("A uniaxial fibre section consists of {} sections.\n", fibre.size());
     for(const auto& I : fibre) I->print();
 }

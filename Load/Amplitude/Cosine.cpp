@@ -34,4 +34,6 @@ double Cosine::get_amplitude(const double T) {
     return A;
 }
 
-void Cosine::print() { suanpan_info("Cosine Amplitude.\n"); }
+void Cosine::print() {
+    suanpan_info("Cosine.\n");
+}

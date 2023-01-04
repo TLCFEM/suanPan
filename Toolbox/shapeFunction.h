@@ -107,7 +107,7 @@ namespace shape {
 template<typename T> T area::triangle(const Mat<T>& EC) { return .5 * (EC(0, 0) * (EC(1, 1) - EC(2, 1)) + EC(1, 0) * (EC(2, 1) - EC(0, 1)) + EC(2, 0) * (EC(0, 1) - EC(1, 1))); }
 
 template<typename T> T area::shoelace(const Mat<T>& C) {
-    suanpan_debug([&] { if(2 != C.n_cols) throw invalid_argument("need two columns"); });
+    suanpan_assert([&] { if(2 != C.n_cols) throw invalid_argument("need two columns"); });
 
     const auto S = C.n_rows;
     Mat<T> E = arma::resize(C, S + 1, C.n_cols);
@@ -591,7 +591,7 @@ template<typename T> Mat<T> shape::linear_stress(T X, T Y) {
 }
 
 template<typename T> Mat<T> shape::plate::triangle(const Col<T>& int_pts, const unsigned order, const unsigned num_node, const Mat<T>& nodes) {
-    suanpan_debug([&] { if(order > 1 || (num_node != 3 && num_node != 6) || (nodes.n_cols != 2) || nodes.n_rows < 3) throw invalid_argument("not supported"); });
+    suanpan_assert([&] { if(order > 1 || (num_node != 3 && num_node != 6) || (nodes.n_cols != 2) || nodes.n_rows < 3) throw invalid_argument("not supported"); });
 
     Mat<T> N;
 

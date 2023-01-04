@@ -29,4 +29,6 @@ double Linear::get_amplitude(const double T) {
     return step_time * slope;
 }
 
-void Linear::print() { suanpan_info("Linear Amplitude.\n"); }
+void Linear::print() {
+    suanpan_info("Linear.\n");
+}

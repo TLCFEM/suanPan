@@ -233,15 +233,13 @@ vector<vec> CIN3D8::record(const OutputType T) {
 }
 
 void CIN3D8::print() {
-    node_encoding.t().print("CIN3D8 element connects nodes:");
+    suanpan_info("CIN3D8 element connects nodes:", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Material:\n");
     for(const auto& t_pt : int_pt) {
         t_pt.c_material->print();
-        suanpan_info("Strain:\t");
-        t_pt.c_material->get_trial_strain().t().print();
-        suanpan_info("Stress:\t");
-        t_pt.c_material->get_trial_stress().t().print();
+        suanpan_info("Strain:\t", t_pt.c_material->get_trial_strain());
+        suanpan_info("Stress:\t", t_pt.c_material->get_trial_stress());
     }
 }
 

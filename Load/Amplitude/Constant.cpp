@@ -19,4 +19,6 @@
 
 double Constant::get_amplitude(double) { return 1.; }
 
-void Constant::print() { suanpan_info("Constant Amplitude.\n"); }
+void Constant::print() {
+    suanpan_info("Constant.\n");
+}

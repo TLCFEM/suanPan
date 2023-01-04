@@ -86,7 +86,7 @@ public:
     Section& operator=(const Section&) = delete; // assign forbidden
     Section& operator=(Section&&) = delete;      // assign forbidden
 
-    ~Section() override;
+    ~Section() override = default;
 
     int initialize_base(const shared_ptr<DomainBase>&);
 

@@ -30,11 +30,11 @@ Converger::Converger(const unsigned T, const double E, const unsigned M, const b
     : Tag(T)
     , tolerance(E)
     , max_iteration(M)
-    , print_flag(P) { suanpan_debug("Converger %u ctor() called.\n", T); }
+    , print_flag(P) {}
 
 int Converger::initialize() {
     if(nullptr == database.lock()) {
-        suanpan_error("initialize() needs a valid Domain.\n");
+        suanpan_error("A valid domain is required.\n");
         return SUANPAN_FAIL;
     }
 

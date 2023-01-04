@@ -29,7 +29,9 @@ int MassBase::clear_status() { return SUANPAN_SUCCESS; }
 
 int MassBase::reset_status() { return SUANPAN_SUCCESS; }
 
-void MassBase::print() { suanpan_info("A point mass element.\n"); }
+void MassBase::print() {
+    suanpan_info("A point mass element.\n");
+}
 
 #ifdef SUANPAN_VTK
 #include <vtkVertex.h>

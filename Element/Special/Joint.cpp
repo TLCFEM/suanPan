@@ -76,4 +76,6 @@ vector<vec> Joint::record(const OutputType P) {
     return data;
 }
 
-void Joint::print() { suanpan_info("A joint element that uses displacement as basic quantity. The material model used shall be based on displacement--force relationship.\n"); }
+void Joint::print() {
+    suanpan_info("A joint element that uses displacement as basic quantity. The material model used shall be based on displacement-force relationship.\n");
+}

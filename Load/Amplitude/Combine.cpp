@@ -30,4 +30,6 @@ double Combine::get_amplitude(const double T) {
     return A;
 }
 
-void Combine::print() { suanpan_info("Combine Amplitude.\n"); }
+void Combine::print() {
+    suanpan_info("Combine.\n");
+}

@@ -74,7 +74,7 @@ int ArcLength::analyze() {
 
     while(true) {
         if(num_iteration++ > get_max_substep()) {
-            suanpan_warning("analyze() reaches maximum substep number %u.\n", get_max_substep());
+            suanpan_warning("The maximum sub-step number {} reached.\n", get_max_substep());
             return SUANPAN_FAIL;
         }
         if(auto code = S->analyze(); code == SUANPAN_SUCCESS) {

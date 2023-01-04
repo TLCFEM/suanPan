@@ -24,25 +24,25 @@
 void new_acceleration(unique_ptr<Load>& return_obj, istringstream& command) {
     unsigned load_id;
     if(!get_input(command, load_id)) {
-        suanpan_error("new_acceleration() needs a tag.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     unsigned amplitude_id;
     if(!get_input(command, amplitude_id)) {
-        suanpan_error("new_acceleration() needs a valid amplitude tag.\n");
+        suanpan_error("A valid amplitude tag is required.\n");
         return;
     }
 
     double magnitude;
     if(!get_input(command, magnitude)) {
-        suanpan_error("new_acceleration() needs load magnitude.\n");
+        suanpan_error("A valid load magnitude is required.\n");
         return;
     }
 
     unsigned dof_id;
     if(!get_input(command, dof_id)) {
-        suanpan_error("new_acceleration() needs dof.\n");
+        suanpan_error("A valid dof identifier is required.\n");
         return;
     }
 
@@ -56,25 +56,25 @@ void new_acceleration(unique_ptr<Load>& return_obj, istringstream& command) {
 void new_bodyforce(unique_ptr<Load>& return_obj, istringstream& command, const bool flag) {
     unsigned load_id;
     if(!get_input(command, load_id)) {
-        suanpan_error("new_bodyforce() needs a tag.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     unsigned amplitude_id;
     if(!get_input(command, amplitude_id)) {
-        suanpan_error("new_bodyforce() needs a valid amplitude tag.\n");
+        suanpan_error("A valid amplitude tag is required.\n");
         return;
     }
 
     double magnitude;
     if(!get_input(command, magnitude)) {
-        suanpan_error("new_bodyforce() needs load magnitude.\n");
+        suanpan_error("A valid load magnitude is required.\n");
         return;
     }
 
     unsigned dof_id;
     if(!get_input(command, dof_id)) {
-        suanpan_error("new_bodyforce() needs a valid DoF.\n");
+        suanpan_error("A valid dof identifier is required.\n");
         return;
     }
 
@@ -88,25 +88,25 @@ void new_bodyforce(unique_ptr<Load>& return_obj, istringstream& command, const b
 void new_cload(unique_ptr<Load>& return_obj, istringstream& command, const bool flag) {
     unsigned load_id;
     if(!get_input(command, load_id)) {
-        suanpan_error("new_cload() needs a tag.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     unsigned amplitude_id;
     if(!get_input(command, amplitude_id)) {
-        suanpan_error("new_cload() needs a valid amplitude tag.\n");
+        suanpan_error("A valid amplitude tag is required.\n");
         return;
     }
 
     double magnitude;
     if(!get_input(command, magnitude)) {
-        suanpan_error("new_cload() needs load magnitude.\n");
+        suanpan_error("A valid load magnitude is required.\n");
         return;
     }
 
     unsigned dof_id;
     if(!get_input(command, dof_id)) {
-        suanpan_error("new_cload() needs a valid DoF.\n");
+        suanpan_error("A valid dof identifier is required.\n");
         return;
     }
 
@@ -120,25 +120,25 @@ void new_cload(unique_ptr<Load>& return_obj, istringstream& command, const bool 
 void new_lineudl(unique_ptr<Load>& return_obj, istringstream& command, const unsigned dimension) {
     unsigned load_id;
     if(!get_input(command, load_id)) {
-        suanpan_error("new_lineudl() needs a tag.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     unsigned amplitude_id;
     if(!get_input(command, amplitude_id)) {
-        suanpan_error("new_lineudl() needs a valid amplitude tag.\n");
+        suanpan_error("A valid amplitude tag is required.\n");
         return;
     }
 
     double magnitude;
     if(!get_input(command, magnitude)) {
-        suanpan_error("new_lineudl() needs load magnitude.\n");
+        suanpan_error("A valid load magnitude is required.\n");
         return;
     }
 
     unsigned dof_id;
     if(!get_input(command, dof_id)) {
-        suanpan_error("new_lineudl() needs a valid DoF.\n");
+        suanpan_error("A valid dof identifier is required.\n");
         return;
     }
 
@@ -152,25 +152,25 @@ void new_lineudl(unique_ptr<Load>& return_obj, istringstream& command, const uns
 void new_displacement(unique_ptr<Load>& return_obj, istringstream& command, const bool flag) {
     unsigned load_id;
     if(!get_input(command, load_id)) {
-        suanpan_error("new_displacement() needs a tag.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     unsigned amplitude_id;
     if(!get_input(command, amplitude_id)) {
-        suanpan_error("new_displacement() needs a valid amplitude tag.\n");
+        suanpan_error("A valid amplitude tag is required.\n");
         return;
     }
 
     double magnitude;
     if(!get_input(command, magnitude)) {
-        suanpan_error("new_displacement() needs load magnitude.\n");
+        suanpan_error("A valid load magnitude is required.\n");
         return;
     }
 
     unsigned dof_id;
     if(!get_input(command, dof_id)) {
-        suanpan_error("new_displacement() needs a valid DoF.\n");
+        suanpan_error("A valid dof identifier is required.\n");
         return;
     }
 
@@ -184,25 +184,25 @@ void new_displacement(unique_ptr<Load>& return_obj, istringstream& command, cons
 void new_supportmotion(unique_ptr<Load>& return_obj, istringstream& command, const unsigned flag) {
     unsigned load_id;
     if(!get_input(command, load_id)) {
-        suanpan_error("new_supportmotion() needs a tag.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     unsigned amplitude_id;
     if(!get_input(command, amplitude_id)) {
-        suanpan_error("new_supportmotion() needs a valid amplitude tag.\n");
+        suanpan_error("A valid amplitude tag is required.\n");
         return;
     }
 
     double magnitude;
     if(!get_input(command, magnitude)) {
-        suanpan_error("new_supportmotion() needs load magnitude.\n");
+        suanpan_error("A valid load magnitude is required.\n");
         return;
     }
 
     unsigned dof_id;
     if(!get_input(command, dof_id)) {
-        suanpan_error("new_supportmotion() needs a valid DoF.\n");
+        suanpan_error("A valid dof identifier is required.\n");
         return;
     }
 
@@ -218,13 +218,13 @@ void new_supportmotion(unique_ptr<Load>& return_obj, istringstream& command, con
 int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& command) {
     string amplitude_type;
     if(!get_input(command, amplitude_type)) {
-        suanpan_error("create_new_amplitude() needs a valid amplitude type.\n");
+        suanpan_error("A valid amplitude type is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("create_new_amplitude() needs a valid amplitude type.\n");
+        suanpan_error("A valid amplitude type is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -233,7 +233,7 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& co
     else if(is_equal(amplitude_type, "Tabular")) {
         string file_name;
         if(!get_input(command, file_name)) {
-            suanpan_error("create_new_amplitude() needs a valid file.\n");
+            suanpan_error("A valid file is required.\n");
             return SUANPAN_SUCCESS;
         }
 
@@ -241,14 +241,14 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& co
         else {
             uword up_rate;
             if(!get_input(command, up_rate)) {
-                suanpan_error("create_new_amplitude() needs a valid upsampling ratio.\n");
+                suanpan_error("A valid upsampling ratio is required.\n");
                 return SUANPAN_SUCCESS;
             }
 
             const auto result = upsampling<WindowType::Hamming>(file_name, up_rate);
 
             if(result.empty()) {
-                suanpan_error("create_new_amplitude() fails to perform upsampling.\n");
+                suanpan_error("Fail to perform upsampling.\n");
                 return SUANPAN_SUCCESS;
             }
 
@@ -258,7 +258,7 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& co
     else if(is_equal(amplitude_type, "TabularSpline")) {
         string file_name;
         if(!get_input(command, file_name)) {
-            suanpan_error("create_new_amplitude() needs a valid file.\n");
+            suanpan_error("A valid file is required.\n");
             return SUANPAN_SUCCESS;
         }
         domain->insert(make_shared<TabularSpline>(tag, std::move(file_name), step_tag));
@@ -266,12 +266,12 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& co
     else if(is_equal(amplitude_type, "Decay")) {
         double A;
         if(!get_input(command, A)) {
-            suanpan_error("create_new_amplitude() needs a A.\n");
+            suanpan_error("A valid value is required.\n");
             return SUANPAN_SUCCESS;
         }
         double TD;
         if(!get_input(command, TD)) {
-            suanpan_error("create_new_amplitude() needs a TD.\n");
+            suanpan_error("A valid value is required.\n");
             return SUANPAN_SUCCESS;
         }
         domain->insert(make_shared<Decay>(tag, A, TD, step_tag));
@@ -279,7 +279,7 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& co
     else if(is_equal(amplitude_type, "Linear")) {
         double A;
         if(!get_input(command, A)) {
-            suanpan_error("create_new_amplitude() needs a slope.\n");
+            suanpan_error("A valid value is required.\n");
             return SUANPAN_SUCCESS;
         }
         domain->insert(make_shared<Linear>(tag, A, step_tag));
@@ -293,7 +293,7 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& co
     else if(is_equal(amplitude_type, "Modulated") || is_equal(amplitude_type, "Sine") || is_equal(amplitude_type, "Cosine")) {
         double W;
         if(!get_input(command, W)) {
-            suanpan_error("create_new_amplitude() needs a period/amplitude.\n");
+            suanpan_error("A valid value is required.\n");
             return SUANPAN_SUCCESS;
         }
 
@@ -308,7 +308,7 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& co
     else if(is_equal(amplitude_type, "NZStrongMotion")) {
         string name;
         if(!get_input(command, name)) {
-            suanpan_error("create_new_amplitude() needs a name.\n");
+            suanpan_error("A valid name is required.\n");
             return SUANPAN_SUCCESS;
         }
 
@@ -321,7 +321,7 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& co
 int create_new_load(const shared_ptr<DomainBase>& domain, istringstream& command) {
     string load_id;
     if(!get_input(command, load_id)) {
-        suanpan_error("create_new_load() needs load type.\n");
+        suanpan_error("A valid load type is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -343,7 +343,8 @@ int create_new_load(const shared_ptr<DomainBase>& domain, istringstream& command
 
     if(new_load != nullptr) new_load->set_start_step(domain->get_current_step_tag());
 
-    if(new_load == nullptr || !domain->insert(std::move(new_load))) suanpan_error("create_new_load() fails to create new load.\n");
+    if(new_load == nullptr || !domain->insert(std::move(new_load)))
+        suanpan_error("Fail to create new load via \"{}\".\n", command.str());
 
     return SUANPAN_SUCCESS;
 }

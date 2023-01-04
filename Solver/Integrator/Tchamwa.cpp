@@ -52,4 +52,6 @@ int Tchamwa::update_trial_status() {
 
 void Tchamwa::update_parameter(const double NT) { DT = NT; }
 
-void Tchamwa::print() { suanpan_info("A Tchamwa solver.\n"); }
+void Tchamwa::print() {
+    suanpan_info("A Tchamwa solver.\n");
+}

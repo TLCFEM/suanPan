@@ -54,7 +54,7 @@ int CAX8::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
     if(PlaneType::A != static_cast<PlaneType>(material_proto->get_parameter(ParameterType::PLANETYPE))) {
-        suanpan_warning("Element %u is assigned with an inconsistent material.\n", get_tag());
+        suanpan_warning("Element {} is assigned with an inconsistent material.\n", get_tag());
         return SUANPAN_FAIL;
     }
 
@@ -143,8 +143,8 @@ vector<vec> CAX8::record(const OutputType T) {
 }
 
 void CAX8::print() {
-    suanpan_info("A CAX8%s element%s.\n", reduced_scheme ? "R" : "", nlgeom ? " with nonlinear geometry on" : "");
-    node_encoding.t().print("The nodes connected are:");
+    suanpan_info("A CAX8{} element{}.\n", reduced_scheme ? "R" : "", nlgeom ? " with nonlinear geometry on" : "");
+    suanpan_info("The nodes connected are:", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Material:\n");
     for(const auto& I : int_pt) I.m_material->print();

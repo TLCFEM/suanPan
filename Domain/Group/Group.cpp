@@ -18,19 +18,16 @@
 #include "Group.h"
 
 Group::Group(const unsigned T)
-    : Tag(T) { suanpan_debug("Group %u ctor() called.\n", get_tag()); }
+    : Tag(T) {}
 
 Group::Group(const unsigned T, uvec&& R)
     : Tag(T)
-    , pool(std::forward<uvec>(R)) { suanpan_debug("Group %u ctor() called.\n", get_tag()); }
-
-Group::~Group() { suanpan_debug("Group %u dtor() called.\n", get_tag()); }
+    , pool(std::forward<uvec>(R)) {}
 
 void Group::initialize(const shared_ptr<DomainBase>&) {}
 
 const uvec& Group::get_pool() const { return pool; }
 
 void Group::print() {
-    suanpan_info("A Group object with tag %u contains the following tags:\n", get_tag());
-    pool.t().print();
+    suanpan_info("A group contains the following tags:", pool);
 }

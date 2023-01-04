@@ -22,13 +22,12 @@
 #include <Toolbox/utility.h>
 
 Node::Node(const unsigned T)
-    : Tag(T) { suanpan_debug("Node %u ctor() called.\n", T); }
+    : Tag(T) {}
 
 Node::Node(const unsigned T, vec&& C)
     : Tag(T) {
     num_dof = static_cast<unsigned>(C.n_elem);
     coordinate = std::forward<vec>(C);
-    suanpan_debug("Node %u ctor() called.\n", T);
 }
 
 /**
@@ -40,7 +39,6 @@ Node::Node(const unsigned T, const unsigned D)
     : Tag(T) {
     num_dof = D;
     coordinate.zeros(D);
-    suanpan_debug("Node %u ctor() called.\n", T);
 }
 
 /**
@@ -53,13 +51,7 @@ Node::Node(const unsigned T, const unsigned D, vec&& C)
     : Tag(T) {
     num_dof = D;
     coordinate = std::forward<vec>(C);
-    suanpan_debug("Node %u ctor() called.\n", T);
 }
-
-/**
- * \brief default destructor.
- */
-Node::~Node() { suanpan_debug("Node %u dtor() called.\n", get_tag()); }
 
 /**
  * \brief This method should be called after Element objects are set. Element
@@ -92,7 +84,7 @@ void Node::initialize(const shared_ptr<DomainBase>& D) {
         trial_acceleration.resize(num_dof);
     }
     else {
-        suanpan_debug("Node %u is not used in the problem, now disable it.\n", get_tag());
+        suanpan_debug("Node {} disabled as it is not used.\n", get_tag());
         D->disable_node(get_tag());
     }
 
@@ -119,7 +111,8 @@ void Node::set_dof_identifier(const std::vector<DOF>& D) {
 
     for(size_t I = 0; I < D.size(); ++I) {
         if(DOF::NONE == D[I]) continue;
-        if(DOF::NONE != dof_identifier[I] && D[I] != dof_identifier[I]) suanpan_warning("inconsistent DoF assignment for Node %u detected, which is likely an error, please double check the model.\n", get_tag());
+        if(DOF::NONE != dof_identifier[I] && D[I] != dof_identifier[I])
+            suanpan_warning("Inconsistent DoF assignment for node {} detected.\n", get_tag());
         dof_identifier[I] = D[I];
     }
 }
@@ -541,10 +534,12 @@ std::vector<vec> Node::record(const OutputType L) const {
 }
 
 void Node::print() {
-    suanpan_info("Node %u:\n", get_tag(), is_active() ? "" : " is currently inactive");
-    coordinate.t().print("Coordinate:");
-    current_displacement.t().print("Displacement:");
-    current_resistance.t().print("Resistance:");
-    if(!suanpan::approx_equal(accu(current_velocity), 0.)) current_velocity.t().print("Velocity:");
-    if(!suanpan::approx_equal(accu(current_acceleration), 0.)) current_acceleration.t().print("Acceleration:");
+    suanpan_info("Node {}{}\n", get_tag(), is_active() ? ":" : " is currently inactive.");
+    suanpan_info("Coordinate:", coordinate);
+    suanpan_info("Displacement:", current_displacement);
+    suanpan_info("Resistance:", current_resistance);
+    if(!suanpan::approx_equal(accu(current_velocity), 0.))
+        suanpan_info("Velocity:", current_velocity);
+    if(!suanpan::approx_equal(accu(current_acceleration), 0.))
+        suanpan_info("Acceleration:", current_acceleration);
 }

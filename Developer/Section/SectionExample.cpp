@@ -21,19 +21,19 @@
 SUANPAN_EXPORT void new_sectionexample(unique_ptr<Section>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("new_sectionexample() requires a valid tag.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double edge;
     if(!get_input(command, edge)) {
-        suanpan_error("new_sectionexample() requires a valid width.\n");
+        suanpan_error("A valid width is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        suanpan_error("new_sectionexample() requires a valid modulus.\n");
+        suanpan_error("A valid modulus is required.\n");
         return;
     }
 
@@ -83,4 +83,6 @@ int SectionExample::reset_status() {
     return 0;
 }
 
-void SectionExample::print() { suanpan_info("This is an example section object represents the square elastic section.\n"); }
+void SectionExample::print() {
+    suanpan_info("An example section that represents a square elastic section.\n");
+}

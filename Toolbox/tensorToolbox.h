@@ -95,7 +95,7 @@ namespace transform {
     mat compute_jacobian_principal_to_nominal(const mat&);
 
     template<typename T> Mat<T> skew_symm(const Mat<T>& R) {
-        suanpan_debug([&] { if(R.n_elem != 3) throw invalid_argument("need 3 element vector"); });
+        suanpan_assert([&] { if(R.n_elem != 3) throw invalid_argument("need 3 element vector"); });
 
         Mat<T> S(3, 3, fill::zeros);
 

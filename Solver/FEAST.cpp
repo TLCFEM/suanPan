@@ -32,7 +32,7 @@ int FEAST::linear_solve(const shared_ptr<LongFactory>& W) const {
     new_feastinit_(fpm.data());
 
 #ifdef SUANPAN_DEBUG
-    fpm[0] = 1;
+	fpm[0] = 1;
 #endif
 
     std::vector output(4, 0);
@@ -78,12 +78,12 @@ int FEAST::linear_solve(const shared_ptr<LongFactory>& W) const {
         new_dfeast_sbgv_(&UPLO, &N, &KL, stiffness->memptr(), &LD, &KL, mass->memptr(), &LD, fpm.data(), &input[3], &output[0], &input[1], &input[2], &output[1], E.data(), X.data(), &output[2], R.data(), &output[3]);
     }
     else {
-        suanpan_error("current matrix storage scheme is not supported by the FEAST solver.\n");
+        suanpan_error("The current matrix storage scheme is not supported by the FEAST solver.\n");
         return SUANPAN_FAIL;
     }
 
     if(0 != output[3]) {
-        suanpan_error("error code %d received from FEAST solver.\n", output[3]);
+        suanpan_error("Error code {} received.\n", output[3]);
         return SUANPAN_FAIL;
     }
 
@@ -99,7 +99,7 @@ int FEAST::quadratic_solve(const shared_ptr<LongFactory>& W) const {
     new_feastinit_(fpm.data());
 
 #ifdef SUANPAN_DEBUG
-    fpm[0] = 1;
+	fpm[0] = 1;
 #endif
 
     int N = static_cast<int>(W->get_size());
@@ -170,7 +170,7 @@ int FEAST::quadratic_solve(const shared_ptr<LongFactory>& W) const {
     new_dfeast_gcsrpev_(&P, &N, A.data(), IA.data(), JA.data(), fpm.data(), &input[3], &output[0], &input[0], &input[2], &output[1], E.data(), X.data(), &output[2], R.data(), &output[3]);
 
     if(0 != output[3]) {
-        suanpan_error("error code %d received from FEAST solver.\n", output[3]);
+        suanpan_error("Error code {} received.\n", output[3]);
         return SUANPAN_FAIL;
     }
 
@@ -198,19 +198,19 @@ int FEAST::initialize() {
     auto& G = get_integrator();
 
     if(nullptr == G) {
-        suanpan_error("initialize() needs a valid integrator.\n");
+        suanpan_error("A valid integrator is required.\n");
         return SUANPAN_FAIL;
     }
 
     auto& W = G->get_domain()->get_factory();
 
     if(const auto scheme = W->get_storage_scheme(); StorageScheme::SYMMPACK == scheme) {
-        suanpan_error("FEAST solver does not support symmetric pack storage.\n");
+        suanpan_error("The symmetric pack storage is not supported.\n");
 
         return SUANPAN_FAIL;
     }
     else if((StorageScheme::BAND == scheme || StorageScheme::BANDSYMM == scheme) && SolverType::SPIKE != W->get_solver_type()) {
-        suanpan_error("SPIKE system solver needs to be used for banded storage.\n");
+        suanpan_error("The SPIKE system solver is required for banded storage.\n");
 
         return SUANPAN_FAIL;
     }
@@ -235,4 +235,6 @@ int FEAST::analyze() {
     return quadratic ? quadratic_solve(W) : linear_solve(W);
 }
 
-void FEAST::print() { suanpan_info("An eigen solver using FEAST solver.\n"); }
+void FEAST::print() {
+    suanpan_info("An eigen solver using FEAST solver.\n");
+}

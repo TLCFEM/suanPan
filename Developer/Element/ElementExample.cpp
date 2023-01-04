@@ -24,27 +24,28 @@
 SUANPAN_EXPORT void new_elementexample(unique_ptr<Element>& return_obj, std::istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("new_elementexample() needs a tag.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     std::vector<uword> node_tag(3);
     for(auto& I : node_tag)
         if(!get_input(command, I)) {
-            suanpan_error("new_elementexample() needs 3 nodes.\n");
+            suanpan_error("Three valid nodes are required.\n");
             return;
         }
 
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
-        suanpan_error("new_elementexample() needs a material tag.\n");
+        suanpan_error("A valid material tag is required.\n");
         return;
     }
 
     auto thickness = 1.;
-    if(command.eof()) suanpan_info("new_elementexample() assumes a unit thickness.\n");
+    if(command.eof())
+        suanpan_debug("Unit thickness assumed.\n");
     else if(!get_input(command, thickness)) {
-        suanpan_error("new_elementexample() needs a valid thickness.\n");
+        suanpan_error("A valid thickness is required.\n");
         return;
     }
 
@@ -100,6 +101,6 @@ int ElementExample::clear_status() { return m_material->clear_status(); }
 int ElementExample::reset_status() { return m_material->reset_status(); }
 
 void ElementExample::print() {
-    suanpan_info("This is an element example based on CP3 element using the following material model.\n");
+    suanpan_info("An element example based on CP3 element using the following material model.\n");
     if(m_material) m_material->print();
 }

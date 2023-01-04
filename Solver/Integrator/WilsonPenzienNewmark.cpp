@@ -53,7 +53,7 @@ int WilsonPenzienNewmark::process_constraint() {
         cx_mat eig_vec;
         if(SUANPAN_SUCCESS != eig_solve(eig_val, eig_vec, t_stiff->make_copy(), t_mass, static_cast<unsigned>(damping_ratio.n_elem))) {
             if(!eig_pair(eig_val, eig_vec, to_mat(t_stiff), to_mat(t_mass))) {
-                suanpan_error("fail to perform eigen analysis, check the model.");
+                suanpan_error("Fail to perform eigen analysis.\n");
                 return SUANPAN_FAIL;
             }
             eig_val = eig_val.head(damping_ratio.n_elem);
@@ -174,4 +174,6 @@ void WilsonPenzienNewmark::assemble_matrix() {
     t_stiff += W->get_geometry();
 }
 
-void WilsonPenzienNewmark::print() { suanpan_info("A Newmark solver with Wilson-Penzien damping model.\n"); }
+void WilsonPenzienNewmark::print() {
+    suanpan_info("A Newmark solver with Wilson-Penzien damping model.\n");
+}

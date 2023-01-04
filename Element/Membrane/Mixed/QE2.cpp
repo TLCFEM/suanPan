@@ -95,7 +95,7 @@ int QE2::initialize(const shared_ptr<DomainBase>& D) {
     HT = trans(H);
 
     if(!solve(HIL, H, L) || !solve(HILI, H, LI)) {
-        suanpan_error("QE2 %u fails to initialize and is disabled.\n", get_tag());
+        suanpan_error("Element {} fails to initialize and is disabled.\n", get_tag());
         return SUANPAN_FAIL;
     }
 
@@ -215,20 +215,18 @@ vector<vec> QE2::record(const OutputType T) {
 }
 
 void QE2::print() {
-    node_encoding.t().print("Piltner's mixed quad element connects nodes:");
+    suanpan_info("Piltner's mixed quad element connects nodes:", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Material Response:\n");
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        suanpan_info("Integration Point %llu:\n", I + 1);
+        suanpan_info("IP {}:\t", I + 1);
         int_pt[I].m_material->print();
     }
     suanpan_info("Element Response:\n");
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        suanpan_info("Integration Point %llu:\n", I + 1);
-        suanpan_info("Strain:\n");
-        (int_pt[I].A * current_alpha).t().print();
-        suanpan_info("Stress:\n");
-        (int_pt[I].P * current_beta).t().print();
+        suanpan_info("IP {}:\n", I + 1);
+        suanpan_info("Strain:\t", vec{int_pt[I].A * current_alpha});
+        suanpan_info("Stress:\t", vec{int_pt[I].P * current_beta});
     }
 }
 

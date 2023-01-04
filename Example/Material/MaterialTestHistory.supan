@@ -1,0 +1,6 @@
+material ConcreteExp 1 3E4 3. .6 4E-3 30. 4. 1E-1 .2
+
+materialtestbystrainhistory 1 EHIST
+materialtestbystresshistory 1 EHIST
+
+exit

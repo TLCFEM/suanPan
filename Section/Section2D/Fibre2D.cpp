@@ -40,7 +40,7 @@ int Fibre2D::initialize(const shared_ptr<DomainBase>& D) {
     for(const auto I : fibre_tag) {
         fibre.emplace_back(suanpan::initialized_section_copy(D, I));
         if(nullptr == fibre.back() || SectionType::D2 != fibre.back()->get_section_type()) {
-            suanpan_warning("Fibre2D ignores section %llu since it is not a 2D section.\n", I);
+            suanpan_warning("Section {} is ignored as it is not a valid 2D section.\n", I);
             fibre.pop_back();
         }
         else {
@@ -81,7 +81,7 @@ int Fibre2D::update_trial_status(const vec& t_deformation) {
         trial_resistance += I->get_trial_resistance();
     }
 
-    suanpan_debug([&] { if(!trial_resistance.is_finite() || !trial_stiffness.is_finite()) throw invalid_argument("infinite number detected"); });
+    suanpan_assert([&] { if(!trial_resistance.is_finite() || !trial_stiffness.is_finite()) throw invalid_argument("infinite number detected"); });
 
     return SUANPAN_SUCCESS;
 }
@@ -114,6 +114,6 @@ int Fibre2D::reset_status() {
 }
 
 void Fibre2D::print() {
-    suanpan_info("A composite section that consists of following sections:\n");
+    suanpan_info("A 2D composite section that consists of following sections.\n");
     for(const auto& I : fibre) I->print();
 }
