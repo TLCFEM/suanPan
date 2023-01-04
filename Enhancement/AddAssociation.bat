@@ -38,7 +38,7 @@ set "target=%target:\=/%"
 
 :copyfile
 
-echo {"cmd":["%program%","-f","$file"],"selector":"source.supan","file_patterns":["*.supan","*.sp"]} > "%~dp0suanPan.sublime-build"
+echo {"cmd":["%program%","-nc","-f","$file"],"selector":"source.supan","file_patterns":["*.supan","*.sp"]} > "%~dp0suanPan.sublime-build"
 xcopy "%~dp0suanPan.sublime*" "%target%"
 
 :byebye
