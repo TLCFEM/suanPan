@@ -45,7 +45,7 @@ public:
     Joint(unsigned, // tag
           uvec&&,   // node tags
           uvec&&    // material tag
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

@@ -52,7 +52,7 @@ public:
          uvec&&,      // node tag
          unsigned,    // material tag
          bool = false // nonlinear geometry switch
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

@@ -70,7 +70,7 @@ public:
           unsigned,    // material tag
           double = 1., // thickness
           char = 'I'   // integration type
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

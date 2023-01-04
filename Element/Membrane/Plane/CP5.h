@@ -55,7 +55,7 @@ public:
         unsigned,    // material tag
         double = 1., // thickness
         bool = false // nonlinear geometry switch
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

@@ -52,7 +52,7 @@ class BoucWen final : DataBoucWen, public Material1D {
 public:
     BoucWen(unsigned, // tag
             vec&&     // parameter
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

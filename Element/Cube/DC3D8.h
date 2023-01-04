@@ -56,7 +56,7 @@ public:
           unsigned, // material tag
           double,   // characteristic length
           double    // release rate
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

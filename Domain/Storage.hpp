@@ -160,7 +160,7 @@ template<typename T> bool Storage<T>::erase(const unsigned L) {
 #ifdef SUANPAN_MT
     return pond.unsafe_erase(L) == 1;
 #else
-    return pond.erase(L) == 1;
+	return pond.erase(L) == 1;
 #endif
 }
 

@@ -54,7 +54,7 @@ public:
          uvec&&,   // node tag
          uvec&&,   // dof tag
          double    // nominal magnitude
-        );
+    );
     Load(const Load&) = delete;            // copy forbidden
     Load(Load&&) = delete;                 // move forbidden
     Load& operator=(const Load&) = delete; // assign forbidden

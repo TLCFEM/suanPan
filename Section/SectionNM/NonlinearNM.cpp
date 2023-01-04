@@ -101,7 +101,7 @@ int NonlinearNM::update_trial_status(const vec& t_deformation) {
 
     const vec current_beta(&current_history(0), d_size);
     const vec bni = current_beta(ni), bnj = current_beta(nj);
-    const auto& ani = current_history(d_size),& anj = current_history(d_size + 1llu);
+    const auto &ani = current_history(d_size), &anj = current_history(d_size + 1llu);
 
     if(compute_f(trial_q(ni) - bni, compute_h(ani)) <= 0. && compute_f(trial_q(nj) - bnj, compute_h(anj)) <= 0.) return SUANPAN_SUCCESS;
 

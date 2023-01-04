@@ -53,7 +53,7 @@ public:
                double,     // shear stress
                double,     // shear retention
                double = 0. // density
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

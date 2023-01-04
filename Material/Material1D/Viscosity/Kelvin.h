@@ -39,7 +39,7 @@ public:
     Kelvin(unsigned, // tag
            unsigned, // damper tag
            unsigned  // spring tag
-        );
+    );
     Kelvin(const Kelvin&);
     Kelvin(Kelvin&&) = delete;
     Kelvin& operator=(const Kelvin&) = delete;

@@ -38,7 +38,7 @@ public:
     explicit Circle1D(unsigned, // tag
                       double,   // radius
                       unsigned  // material tag
-        );
+    );
 
     unique_ptr<Section> get_copy() override;
 

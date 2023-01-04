@@ -38,7 +38,7 @@ public:
     explicit Arnoldi(unsigned = 0, // unique solver tag
                      unsigned = 1, // number of eigenvalues
                      char = 'S'    // type
-        );
+    );
 
     int initialize() override;
 

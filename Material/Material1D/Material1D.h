@@ -37,7 +37,7 @@ class Material1D : public Material {
 public:
     Material1D(unsigned, // tag
                double    // density
-        );
+    );
 
     const mat& get_trial_stiffness() override;
 

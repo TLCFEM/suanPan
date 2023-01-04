@@ -21,11 +21,11 @@
 int VAFNM::compute_local_integration(vec& q, mat& jacobian) {
     trial_history = current_history;
     const vec current_beta(&current_history(0), d_size);
-    const auto& ani = current_history(d_size),& anj = current_history(d_size + 1llu);
+    const auto &ani = current_history(d_size), &anj = current_history(d_size + 1llu);
 
     vec beta(&trial_history(0), d_size, false, true);
-    auto& ai = trial_history(d_size),& aj = trial_history(d_size + 1llu);
-    auto& flagi = trial_history(d_size + 2llu),& flagj = trial_history(d_size + 3llu); // yield flag
+    auto &ai = trial_history(d_size), &aj = trial_history(d_size + 1llu);
+    auto &flagi = trial_history(d_size + 2llu), &flagj = trial_history(d_size + 3llu); // yield flag
 
     const vec trial_q = q = trial_resistance.head(d_size) / yield_diag;
 

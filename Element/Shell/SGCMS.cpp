@@ -44,8 +44,8 @@ SGCMS::IntegrationPoint::IntegrationPoint(vec&& C)
     , BP(3, 12, fill::zeros) {}
 
 field<mat> SGCMS::form_plate_transformation(const mat& C) {
-    const auto& X1 = C(0, 0),& X2 = C(1, 0),& X3 = C(2, 0),& X4 = C(3, 0);
-    const auto& Y1 = C(0, 1),& Y2 = C(1, 1),& Y3 = C(2, 1),& Y4 = C(3, 1);
+    const auto &X1 = C(0, 0), &X2 = C(1, 0), &X3 = C(2, 0), &X4 = C(3, 0);
+    const auto &Y1 = C(0, 1), &Y2 = C(1, 1), &Y3 = C(2, 1), &Y4 = C(3, 1);
 
     const auto DX5 = X2 - X1, DX6 = X3 - X2, DX7 = X4 - X3, DX8 = X1 - X4;
     const auto DY5 = Y2 - Y1, DY6 = Y3 - Y2, DY7 = Y4 - Y3, DY8 = Y1 - Y4;
@@ -102,10 +102,10 @@ field<mat> SGCMS::form_plate_transformation(const mat& C) {
 mat SGCMS::form_drilling_n(const vec& coor, const vec& lxy) {
     mat poly(2, 12, fill::zeros);
 
-    auto& X = coor(0),& Y = coor(1);
+    auto &X = coor(0), &Y = coor(1);
 
-    auto& LX1 = lxy(0),& LX2 = lxy(1),& LX3 = lxy(2),& LX4 = lxy(3);
-    auto& LY1 = lxy(4),& LY2 = lxy(5),& LY3 = lxy(6),& LY4 = lxy(7);
+    auto &LX1 = lxy(0), &LX2 = lxy(1), &LX3 = lxy(2), &LX4 = lxy(3);
+    auto &LY1 = lxy(4), &LY2 = lxy(5), &LY3 = lxy(6), &LY4 = lxy(7);
 
     const auto XX = X * X - 1., YY = Y * Y - 1., YP = 1. + Y, YM = 1. - Y, XP = 1. + X, XM = 1. - X;
 
@@ -124,10 +124,10 @@ mat SGCMS::form_drilling_n(const vec& coor, const vec& lxy) {
 mat SGCMS::form_drilling_dn(const vec& coor, const vec& lxy) {
     mat poly(2, 8);
 
-    auto& X = coor(0),& Y = coor(1);
+    auto &X = coor(0), &Y = coor(1);
 
-    auto& LX1 = lxy(0),& LX2 = lxy(1),& LX3 = lxy(2),& LX4 = lxy(3);
-    auto& LY1 = lxy(4),& LY2 = lxy(5),& LY3 = lxy(6),& LY4 = lxy(7);
+    auto &LX1 = lxy(0), &LX2 = lxy(1), &LX3 = lxy(2), &LX4 = lxy(3);
+    auto &LY1 = lxy(4), &LY2 = lxy(5), &LY3 = lxy(6), &LY4 = lxy(7);
 
     const auto X2 = 2. * X, Y2 = 2. * Y, XP = X + 1., XM = X - 1., YP = Y + 1., YM = Y - 1.;
 
@@ -201,7 +201,7 @@ int SGCMS::initialize(const shared_ptr<DomainBase>& D) {
     int_pt.clear();
     int_pt.reserve(m_plan.n_rows);
     for(unsigned I = 0; I < m_plan.n_rows; ++I) {
-        const auto& X = m_plan(I, 0),& Y = m_plan(I, 1);
+        const auto &X = m_plan(I, 0), &Y = m_plan(I, 1);
 
         int_pt.emplace_back(vec{X, Y});
 
@@ -225,7 +225,7 @@ int SGCMS::initialize(const shared_ptr<DomainBase>& D) {
     // plate action
     //
     const auto trans = form_plate_transformation(ele_coor);
-    const auto& BX = trans(0),& BY = trans(1);
+    const auto &BX = trans(0), &BY = trans(1);
 
     ele_coor.resize(8, 2);
     ele_coor.row(4) = .5 * (ele_coor.row(0) + ele_coor.row(1));

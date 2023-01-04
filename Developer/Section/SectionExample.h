@@ -38,7 +38,7 @@ public:
     explicit SectionExample(unsigned, // tag
                             double,   // edge length
                             double    // elastic modulus
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

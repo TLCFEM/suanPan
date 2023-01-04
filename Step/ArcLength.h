@@ -43,7 +43,7 @@ public:
                        unsigned = 0, // node tag
                        unsigned = 0, // dof tag
                        double = 0.   // magnitude
-        );
+    );
 
     int initialize() override;
 

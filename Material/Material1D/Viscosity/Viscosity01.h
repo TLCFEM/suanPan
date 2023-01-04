@@ -44,7 +44,7 @@ public:
                 double,   // alpha
                 double,   // damp coefficient
                 double    // cut-off
-        );
+    );
 
     unique_ptr<Material> get_copy() override;
 };

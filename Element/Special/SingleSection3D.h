@@ -41,7 +41,7 @@ public:
     SingleSection3D(unsigned, // tag
                     unsigned, // node tag
                     unsigned  // section tag
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

@@ -58,7 +58,7 @@ class SteelBRB final : DataSteelBRB, public Material1D {
 public:
     SteelBRB(unsigned, // tag
              vec&&     // parameter
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

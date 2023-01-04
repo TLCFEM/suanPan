@@ -50,7 +50,7 @@ public:
                double,     // cohesion
                double,     // cohesion slope
                double = 0. // density
-        );
+    );
 
     unique_ptr<Material> get_copy() override;
 

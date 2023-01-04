@@ -42,7 +42,7 @@ public:
           unsigned, // element tag
           unsigned, // node tag
           unsigned  // dimension
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

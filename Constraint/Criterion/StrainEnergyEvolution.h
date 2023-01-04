@@ -44,7 +44,7 @@ public:
                           unsigned = 10, // reactivation ratio
                           double = .5,   // propagation weight
                           double = 1E-5  // tolerance
-        );
+    );
 
     unique_ptr<Criterion> get_copy() override;
 };

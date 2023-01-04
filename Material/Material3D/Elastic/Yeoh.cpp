@@ -26,7 +26,7 @@ vec Yeoh::compute_derivative(const double J1M3, const double J3M1) const {
 
     vec D(4, fill::zeros);
 
-    auto& DWDJ1 = D(0),& DWDJ3 = D(1),& DDWDDJ1 = D(2),& DDWDDJ3 = D(3);
+    auto &DWDJ1 = D(0), &DWDJ3 = D(1), &DDWDDJ1 = D(2), &DDWDDJ3 = D(3);
 
     auto TMP = 1., IDX = 1.;
     for(auto X = 0llu; X < A0.n_elem; ++X) {
@@ -79,7 +79,7 @@ unique_ptr<Material> Yeoh::get_copy() { return make_unique<Yeoh>(*this); }
 int Yeoh::update_trial_status(const vec& t_strain) {
     const vec G = weight % (trial_strain = t_strain) + tensor::unit_tensor2;
 
-    const auto& C1 = G(0),& C2 = G(1),& C3 = G(2),& C4 = G(3),& C5 = G(4),& C6 = G(5);
+    const auto &C1 = G(0), &C2 = G(1), &C3 = G(2), &C4 = G(3), &C5 = G(4), &C6 = G(5);
 
     const auto I1 = C1 + C2 + C3;
     const auto I3 = std::max(datum::eps, C1 * C2 * C3 + 2. * C4 * C5 * C6 - C1 * C5 * C5 - C2 * C6 * C6 - C3 * C4 * C4);
@@ -95,7 +95,7 @@ int Yeoh::update_trial_status(const vec& t_strain) {
 
     const auto D = compute_derivative(I1 * W1 - 3., sqrt(I3) - 1.);
 
-    const auto& DWDJ1 = D(0),& DWDJ3 = D(1),& DDWDDJ1 = D(2),& DDWDDJ3 = D(3);
+    const auto &DWDJ1 = D(0), &DWDJ3 = D(1), &DDWDDJ1 = D(2), &DDWDDJ3 = D(3);
 
     trial_stress = DWDJ1 * J1E + DWDJ3 * J3E;
 

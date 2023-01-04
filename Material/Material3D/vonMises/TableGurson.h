@@ -47,7 +47,7 @@ public:
                 double,     // sn
                 double,     // en
                 double = 0. // density
-        );
+    );
 
     [[nodiscard]] double get_parameter(ParameterType) const override;
 

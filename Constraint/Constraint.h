@@ -58,7 +58,7 @@ public:
                uvec&&,   // node tags
                uvec&&,   // dof tags
                unsigned  // size of multiplier
-        );
+    );
     Constraint(const Constraint&) = delete;            // copy forbidden
     Constraint(Constraint&&) = delete;                 // move forbidden
     Constraint& operator=(const Constraint&) = delete; // assign forbidden

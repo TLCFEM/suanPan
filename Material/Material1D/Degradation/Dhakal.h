@@ -45,7 +45,7 @@ public:
            unsigned, // material tag
            double,   // yield strain
            double    // parameter
-        );
+    );
 
     unique_ptr<Material> get_copy() override;
 };

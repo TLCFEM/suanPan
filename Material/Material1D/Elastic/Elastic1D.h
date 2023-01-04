@@ -38,7 +38,7 @@ public:
     Elastic1D(unsigned,   // tag
               double,     // elastic modulus
               double = 0. // density
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

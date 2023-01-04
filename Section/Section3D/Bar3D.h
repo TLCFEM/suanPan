@@ -39,7 +39,7 @@ public:
           unsigned,    // material tag
           double = 0., // eccentricity
           double = 0.  // eccentricity
-        );
+    );
     Bar3D(const Bar3D&);
     Bar3D(Bar3D&&) = delete;                 // move forbidden
     Bar3D& operator=(const Bar3D&) = delete; // assign forbidden

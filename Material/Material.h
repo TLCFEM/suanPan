@@ -114,7 +114,7 @@ public:
     explicit Material(unsigned = 0,                    // tag
                       MaterialType = MaterialType::D0, // material type
                       double = 0.                      // density
-        );
+    );
     Material(const Material&) = default;
     Material(Material&&) = delete;                 // move forbidden
     Material& operator=(const Material&) = delete; // assign forbidden

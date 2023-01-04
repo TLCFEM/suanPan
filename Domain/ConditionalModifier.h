@@ -71,7 +71,7 @@ public:
                         unsigned, // amplitude tag
                         uvec&&,   // node tag
                         uvec&&    // dof tag
-        );
+    );
 
     virtual int initialize(const shared_ptr<DomainBase>&);
 

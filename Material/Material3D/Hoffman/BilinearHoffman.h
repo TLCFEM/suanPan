@@ -44,7 +44,7 @@ public:
                     vec&&,      // sigma
                     double,     // hardening ratio
                     double = 0. // density
-        );
+    );
 
     unique_ptr<Material> get_copy() override;
 };

@@ -41,7 +41,7 @@ public:
     CoulombFriction(unsigned, // tag
                     double,   // maximum friction force
                     double    // factor
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

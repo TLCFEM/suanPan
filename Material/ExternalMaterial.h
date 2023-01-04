@@ -68,7 +68,7 @@ public:
     ExternalMaterial(unsigned,              // unique material tag
                      std::vector<double>&&, // parameter pool
                      void*                  // handler pointer
-        );
+    );
     ExternalMaterial(const ExternalMaterial&);
     ExternalMaterial(ExternalMaterial&&) noexcept = delete;
     ExternalMaterial& operator=(const ExternalMaterial&) = delete;

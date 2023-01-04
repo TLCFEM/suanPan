@@ -45,7 +45,7 @@ public:
             unsigned, // dof tag
             unsigned, // amplitude tag
             uword     // dimension
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 };
@@ -58,7 +58,7 @@ public:
               uvec&&,   // node tags
               unsigned, // dof tag
               unsigned  // amplitude tag
-        );
+    );
 
     int process(const shared_ptr<DomainBase>&) override;
 };
@@ -71,7 +71,7 @@ public:
               uvec&&,   // node tags
               unsigned, // dof tag
               unsigned  // amplitude tag
-        );
+    );
 
     int process(const shared_ptr<DomainBase>&) override;
 };

@@ -66,7 +66,7 @@ public:
     BWBN(unsigned, // tag
          vec&&,    // parameter
          double    // density
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

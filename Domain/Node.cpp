@@ -53,7 +53,6 @@ Node::Node(const unsigned T, const unsigned D, vec&& C)
     coordinate = std::forward<vec>(C);
 }
 
-
 /**
  * \brief This method should be called after Element objects are set. Element
  * objects will set the minimum number of DoFs for all related Node objects.

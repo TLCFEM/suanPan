@@ -41,7 +41,7 @@ class Degradation : public Material1D {
 public:
     Degradation(unsigned, // tag
                 unsigned  // material tag
-        );
+    );
     Degradation(const Degradation&);
     Degradation(Degradation&&) noexcept = delete;
     Degradation& operator=(const Degradation&) = delete;

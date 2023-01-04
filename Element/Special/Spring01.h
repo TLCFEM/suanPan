@@ -45,7 +45,7 @@ public:
     Spring01(unsigned, // tag
              uvec&&,   // node tags
              unsigned  // material tag
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

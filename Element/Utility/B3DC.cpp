@@ -209,7 +209,7 @@ vec B3DC::to_global_vec(const vec& l_resistance) const { return transformation.t
 mat B3DC::to_global_geometry_mat(const mat& l_force) const {
     mat geometry(12, 12, fill::zeros);
 
-    const auto& p1 = l_force(0),& p2 = l_force(1),& p3 = l_force(2),& p4 = l_force(3),& p5 = l_force(4),& p6 = l_force(5);
+    const auto &p1 = l_force(0), &p2 = l_force(1), &p3 = l_force(2), &p4 = l_force(3), &p5 = l_force(4), &p6 = l_force(5);
 
     const auto m2 = p2 * .5 / std::cos(theta(2));
     const auto m3 = p3 * .5 / std::cos(theta(5));

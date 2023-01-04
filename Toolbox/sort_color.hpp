@@ -68,7 +68,7 @@ template<typename T> auto sort_color_metis(suanpan::graph<T>& element_register, 
     idx_t options[METIS_NOPTIONS];
     METIS_SetDefaultOptions(options);
 #ifdef SUANPAN_DEBUG
-    options[METIS_OPTION_DBGLVL] = METIS_DBG_INFO | METIS_DBG_TIME;
+	options[METIS_OPTION_DBGLVL] = METIS_DBG_INFO | METIS_DBG_TIME;
 #endif
     options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_VOL;
 

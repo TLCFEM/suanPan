@@ -52,7 +52,7 @@ public:
           unsigned,    // material tag
           bool = true, // reduced integration
           bool = false // nonlinear geometry switch
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

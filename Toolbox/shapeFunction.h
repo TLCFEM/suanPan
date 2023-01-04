@@ -188,7 +188,7 @@ template<typename T> Mat<T> shape::triangle(const Col<T>& int_pts, const unsigne
 
     N.zeros(order + 1llu, 6);
 
-    if(const auto& X = int_pts(0),& Y = int_pts(1); order == 0) {
+    if(const auto &X = int_pts(0), &Y = int_pts(1); order == 0) {
         N(0, 0) = 1.;
         N(0, 1) = X;
         N(0, 2) = Y;

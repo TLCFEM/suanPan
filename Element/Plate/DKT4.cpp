@@ -36,8 +36,8 @@ DKT4::IntegrationPoint::IntegrationPoint(vec&& C)
     , strain_mat(3, p_size) {}
 
 field<mat> DKT4::form_transform(const mat& C) {
-    const auto& X1 = C(0, 0),& X2 = C(1, 0),& X3 = C(2, 0),& X4 = C(3, 0);
-    const auto& Y1 = C(0, 1),& Y2 = C(1, 1),& Y3 = C(2, 1),& Y4 = C(3, 1);
+    const auto &X1 = C(0, 0), &X2 = C(1, 0), &X3 = C(2, 0), &X4 = C(3, 0);
+    const auto &Y1 = C(0, 1), &Y2 = C(1, 1), &Y3 = C(2, 1), &Y4 = C(3, 1);
 
     const auto DX5 = X2 - X1, DX6 = X3 - X2, DX7 = X4 - X3, DX8 = X1 - X4;
     const auto DY5 = Y2 - Y1, DY6 = Y3 - Y2, DY7 = Y4 - Y3, DY8 = Y1 - Y4;

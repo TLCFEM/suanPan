@@ -48,7 +48,7 @@ public:
           double,      // yield stress
           double = 0., // gap strain
           double = 0.  // density
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

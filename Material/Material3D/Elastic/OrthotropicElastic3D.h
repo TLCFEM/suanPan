@@ -42,7 +42,7 @@ public:
                          vec&&,      // elastic modulus
                          vec&&,      // poissons ratio
                          double = 0. // density
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

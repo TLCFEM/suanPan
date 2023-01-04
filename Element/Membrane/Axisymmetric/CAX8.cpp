@@ -30,7 +30,7 @@ CAX8::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Mat
     , strain_mat(4, m_size, fill::zeros) {}
 
 vec CAX8::isoparametric_mapping(const vec& in) {
-    const auto& X1 = in(0),& X2 = in(1),& X3 = in(2),& X4 = in(3),& X5 = in(4),& X6 = in(5),& X7 = in(6),& X8 = in(7);
+    const auto &X1 = in(0), &X2 = in(1), &X3 = in(2), &X4 = in(3), &X5 = in(4), &X6 = in(5), &X7 = in(6), &X8 = in(7);
 
     vec out(8);
 

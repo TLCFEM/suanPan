@@ -39,7 +39,7 @@ public:
           double,
           double,
           unsigned // step tag
-        );
+    );
 
     double get_amplitude(double) override;
 

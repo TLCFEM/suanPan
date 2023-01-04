@@ -46,7 +46,7 @@ class IsotropicNonlinearElastic3D : public Material3D {
 public:
     explicit IsotropicNonlinearElastic3D(unsigned,   // tag
                                          double = 0. // density
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

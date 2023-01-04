@@ -53,7 +53,7 @@ public:
               unsigned,    // material tag
               double = 0., // area
               double = 0.  // eccentricity
-        );
+    );
 
     int update_trial_status(const vec&) override;
 

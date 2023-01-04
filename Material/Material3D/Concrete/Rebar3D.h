@@ -48,7 +48,7 @@ public:
             double,     // reinforcement ratio along y axis
             double,     // reinforcement ratio along z axis
             double = 0. // inclination
-        );
+    );
     Rebar3D(const Rebar3D&);
     Rebar3D(Rebar3D&&) = delete;
     Rebar3D& operator=(const Rebar3D&) = delete;

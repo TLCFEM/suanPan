@@ -52,7 +52,7 @@ public:
     CIN3D8(unsigned, // tag
            uvec&&,   // node tag
            unsigned  // material tag
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

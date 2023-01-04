@@ -36,8 +36,8 @@ DKT3::IntegrationPoint::IntegrationPoint(vec&& C)
     , strain_mat(3, p_size) {}
 
 mat DKT3::form_coor(const mat& C) {
-    const auto& X1 = C(0, 0),& X2 = C(1, 0),& X3 = C(2, 0);
-    const auto& Y1 = C(0, 1),& Y2 = C(1, 1),& Y3 = C(2, 1);
+    const auto &X1 = C(0, 0), &X2 = C(1, 0), &X3 = C(2, 0);
+    const auto &Y1 = C(0, 1), &Y2 = C(1, 1), &Y3 = C(2, 1);
 
     mat coor(6, 6);
 
@@ -62,7 +62,7 @@ mat DKT3::form_coor(const mat& C) {
 }
 
 field<mat> DKT3::form_transform(const mat& C) {
-    const auto& X1 = C(0, 0),& X2 = C(1, 0),& X3 = C(2, 0),& Y1 = C(0, 1),& Y2 = C(1, 1),& Y3 = C(2, 1);
+    const auto &X1 = C(0, 0), &X2 = C(1, 0), &X3 = C(2, 0), &Y1 = C(0, 1), &Y2 = C(1, 1), &Y3 = C(2, 1);
 
     const auto DX4 = X2 - X1, DX5 = X3 - X2, DX6 = X1 - X3;
     const auto DY4 = Y2 - Y1, DY5 = Y3 - Y2, DY6 = Y1 - Y3;

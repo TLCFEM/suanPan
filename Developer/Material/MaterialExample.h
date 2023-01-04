@@ -57,7 +57,7 @@ public:
                              double = .05,  // hardening ratio
                              double = 0.,   // isotropic/kinematic hardening factor
                              double = 0.    // density
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

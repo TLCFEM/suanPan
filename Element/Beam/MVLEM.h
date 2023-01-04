@@ -64,7 +64,7 @@ public:
           uvec&&,                // steel material tags
           unsigned,              // shear spring tag
           double                 // shear spring height
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

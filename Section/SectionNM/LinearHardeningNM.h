@@ -49,7 +49,7 @@ public:
                       double,   // kinematic hardening modulus
                       double,   // linear density
                       vec&&
-        );
+    );
     LinearHardeningNM(unsigned, // tag
                       double,   // axial rigidity
                       double,   // flexural rigidity
@@ -58,7 +58,7 @@ public:
                       double,   // kinematic hardening modulus
                       double,   // linear density
                       vec&&
-        );
+    );
 };
 
 #endif

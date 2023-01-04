@@ -47,7 +47,7 @@ public:
                       double,   // hardening ratio
                       double,   // radius
                       double    // density
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

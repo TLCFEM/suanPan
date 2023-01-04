@@ -83,7 +83,7 @@ public:
                double = 1E-4,  // crack strain in positive
                bool = false,   // if to use linear transition
                double = 0.     // density
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

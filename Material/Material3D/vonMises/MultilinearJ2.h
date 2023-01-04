@@ -45,7 +45,7 @@ public:
                   double,     // poisson's ratio
                   mat&&,      // backbone
                   double = 0. // density
-        );
+    );
 
     unique_ptr<Material> get_copy() override;
 

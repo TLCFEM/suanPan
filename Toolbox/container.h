@@ -50,13 +50,13 @@ namespace suanpan {
 #include <unordered_map>
 
 namespace suanpan {
-    template<typename T> using vector = std::vector<T>;
-    template<typename T> using set = std::set<T>;
-    template<typename T> using unordered_set = std::unordered_set<T>;
-    template<typename T, typename D> using map = std::map<T, D>;
-    template<typename T, typename D> using unordered_map = std::unordered_map<T, D>;
+	template<typename T> using vector = std::vector<T>;
+	template<typename T> using set = std::set<T>;
+	template<typename T> using unordered_set = std::unordered_set<T>;
+	template<typename T, typename D> using map = std::map<T, D>;
+	template<typename T, typename D> using unordered_map = std::unordered_map<T, D>;
 
-    template<typename T> using graph = vector<set<T>>;
+	template<typename T> using graph = vector<set<T>>;
 }
 #endif
 

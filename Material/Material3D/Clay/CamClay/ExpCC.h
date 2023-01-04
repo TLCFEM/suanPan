@@ -54,7 +54,7 @@ public:
           double,     // lambda
           double,     // kappa
           double = 0. // density
-        );
+    );
 
     unique_ptr<Material> get_copy() override;
 

@@ -38,7 +38,7 @@ public:
                   vec&&,      // poissons ratio
                   vec&&,      // yield stress
                   double = 0. // density
-        );
+    );
 };
 
 #endif

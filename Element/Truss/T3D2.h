@@ -52,7 +52,7 @@ public:
          bool = false, // nonlinear geometry switch
          bool = true,  // update area switch
          bool = true   // log strain switch
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

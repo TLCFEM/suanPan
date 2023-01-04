@@ -59,7 +59,7 @@ public:
          double,     // characteristic length
          double,     // energy release rate
          double = 1. // thickness
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

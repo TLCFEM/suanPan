@@ -55,7 +55,7 @@ public:
     Material2D(unsigned,  // tag
                PlaneType, // plane type
                double     // density
-        );
+    );
 
     vector<vec> record(OutputType) override;
 };

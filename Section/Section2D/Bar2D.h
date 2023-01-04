@@ -38,7 +38,7 @@ public:
           double,     // area
           unsigned,   // material tag
           double = 0. // eccentricity
-        );
+    );
     Bar2D(const Bar2D&);
     Bar2D(Bar2D&&) noexcept = delete;            // move forbidden
     Bar2D& operator=(const Bar2D&) = delete;     // assign forbidden

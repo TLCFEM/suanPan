@@ -41,7 +41,7 @@ protected:
 public:
     IsotropicDamage(unsigned, // tag
                     unsigned  // mat tag
-        );
+    );
     IsotropicDamage(const IsotropicDamage&);
     IsotropicDamage(IsotropicDamage&&) = delete;
     IsotropicDamage& operator=(const IsotropicDamage&) = delete;

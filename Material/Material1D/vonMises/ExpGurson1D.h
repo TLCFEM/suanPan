@@ -54,7 +54,7 @@ public:
                 double,     // sn
                 double,     // en
                 double = 0. // density
-        );
+    );
 
     unique_ptr<Material> get_copy() override;
 

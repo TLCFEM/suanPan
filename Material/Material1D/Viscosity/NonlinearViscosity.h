@@ -49,7 +49,7 @@ public:
     NonlinearViscosity(unsigned, // tag
                        double,   // alpha
                        double    // cut-off
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

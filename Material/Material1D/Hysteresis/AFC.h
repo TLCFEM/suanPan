@@ -59,7 +59,7 @@ public:
         double,   // compression unloading modulus
         double,   // degrade parameter
         double    // density
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

@@ -49,7 +49,7 @@ public:
          double,      // moment of inertia
          unsigned,    // material tags
          bool = false // nonlinear geometry switch
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

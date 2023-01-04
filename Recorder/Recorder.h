@@ -54,7 +54,7 @@ public:
              unsigned,   // interval
              bool,       // if to record time
              bool        // if to use hdf5
-        );
+    );
     Recorder(const Recorder&) = delete;
     Recorder(Recorder&&) = delete;                 // move forbidden
     Recorder& operator=(const Recorder&) = delete; // assign forbidden

@@ -63,7 +63,7 @@ public:
             double,   // alpha
             double,   // porosity
             double    // permeability
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

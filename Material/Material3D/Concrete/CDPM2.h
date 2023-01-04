@@ -100,7 +100,7 @@ public:
           double,     // efc
           DamageType, // damage type
           double      // density
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

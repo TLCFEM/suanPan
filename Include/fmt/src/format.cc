@@ -9,7 +9,6 @@
 
 FMT_BEGIN_NAMESPACE
     namespace detail {
-
         template FMT_API auto dragonbox::to_decimal(float x) noexcept
             -> dragonbox::decimal_fp<float>;
         template FMT_API auto dragonbox::to_decimal(double x) noexcept
@@ -42,6 +41,5 @@ FMT_BEGIN_NAMESPACE
         template FMT_API auto decimal_point_impl(locale_ref) -> wchar_t;
 
         template FMT_API void buffer<wchar_t>::append(const wchar_t*, const wchar_t*);
-
     } // namespace detail
 FMT_END_NAMESPACE

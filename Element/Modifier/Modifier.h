@@ -42,7 +42,7 @@ protected:
 public:
     explicit Modifier(unsigned = 0, // tag
                       uvec&& = {}   // element tags
-        );
+    );
     Modifier(const Modifier&) = delete;            // copy forbidden
     Modifier(Modifier&&) = delete;                 // move forbidden
     Modifier& operator=(const Modifier&) = delete; // assign forbidden

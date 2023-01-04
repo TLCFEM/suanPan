@@ -50,7 +50,7 @@ public:
              uvec&&,   // node tag
              unsigned, // damper tag
              unsigned  // dimension
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

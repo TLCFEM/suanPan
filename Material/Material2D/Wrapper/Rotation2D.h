@@ -41,7 +41,7 @@ public:
     Rotation2D(unsigned, // tag
                unsigned, // mat tag
                double    // Euler angle
-        );
+    );
     Rotation2D(const Rotation2D&);
     Rotation2D(Rotation2D&&) = delete;
     Rotation2D& operator=(const Rotation2D&) = delete;

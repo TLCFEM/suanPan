@@ -49,13 +49,13 @@ public:
                unsigned,        // material tag
                unsigned = 6,    // number of integration points
                vec&& = {0., 0.} // eccentricity
-        );
+    );
     ISection3D(unsigned,        // tag
                vec&&,           // dimension
                unsigned,        // material tag
                unsigned = 6,    // number of integration points
                vec&& = {0., 0.} // eccentricity
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

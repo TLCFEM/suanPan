@@ -44,7 +44,7 @@ public:
                unsigned,   // step tag
                OutputType, // history type
                double      // maximum history
-        );
+    );
 
     unique_ptr<Criterion> get_copy() override;
 

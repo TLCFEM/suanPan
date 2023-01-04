@@ -107,7 +107,7 @@ vec BSpline::evaluate_basis(const double u, sword p) const {
         right(j) = knot(i + j) - u;
         basis(j) = 0.;
         for(auto r = 0ll; r < j; ++r) {
-            const auto& c_right = right(r + 1),& c_left = left(j - r);
+            const auto &c_right = right(r + 1), &c_left = left(j - r);
             const auto factor = basis(r) / (c_right + c_left);
             basis(r) = basis(j) + c_right * factor;
             basis(j) = c_left * factor;
@@ -142,7 +142,7 @@ mat BSpline::evaluate_basis_derivative(const double u, sword n, sword p) const {
         right(j) = knot(i + j) - u;
         ndu(j, j) = 0.;
         for(auto r = 0ll; r < j; ++r) {
-            const auto& c_right = right(r + 1),& c_left = left(j - r);
+            const auto &c_right = right(r + 1), &c_left = left(j - r);
             ndu(j, r) = c_right + c_left;
             const auto factor = ndu(r, j - 1) / ndu(j, r);
             ndu(r, j) = ndu(j, j) + c_right * factor;

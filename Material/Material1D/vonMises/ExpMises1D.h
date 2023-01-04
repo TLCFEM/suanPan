@@ -49,7 +49,7 @@ public:
                         double,     // b
                         double,     // c
                         double = 0. // density
-        );
+    );
 
     unique_ptr<Material> get_copy() override;
 };

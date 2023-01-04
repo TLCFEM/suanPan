@@ -53,10 +53,10 @@ vec SGCMQ::form_diff_coor(const mat& ele_coor) {
 mat SGCMQ::form_drilling_n(const vec& coor, const vec& lxy) {
     mat poly(2, m_size, fill::zeros);
 
-    auto& X = coor(0),& Y = coor(1);
+    auto &X = coor(0), &Y = coor(1);
 
-    auto& LX1 = lxy(0),& LX2 = lxy(1),& LX3 = lxy(2),& LX4 = lxy(3);
-    auto& LY1 = lxy(4),& LY2 = lxy(5),& LY3 = lxy(6),& LY4 = lxy(7);
+    auto &LX1 = lxy(0), &LX2 = lxy(1), &LX3 = lxy(2), &LX4 = lxy(3);
+    auto &LY1 = lxy(4), &LY2 = lxy(5), &LY3 = lxy(6), &LY4 = lxy(7);
 
     const auto XX = X * X - 1., YY = Y * Y - 1., YP = 1. + Y, YM = 1. - Y, XP = 1. + X, XM = 1. - X;
 
@@ -75,10 +75,10 @@ mat SGCMQ::form_drilling_n(const vec& coor, const vec& lxy) {
 mat SGCMQ::form_drilling_dn(const vec& coor, const vec& lxy) {
     mat poly(2, 8);
 
-    auto& X = coor(0),& Y = coor(1);
+    auto &X = coor(0), &Y = coor(1);
 
-    auto& LX1 = lxy(0),& LX2 = lxy(1),& LX3 = lxy(2),& LX4 = lxy(3);
-    auto& LY1 = lxy(4),& LY2 = lxy(5),& LY3 = lxy(6),& LY4 = lxy(7);
+    auto &LX1 = lxy(0), &LX2 = lxy(1), &LX3 = lxy(2), &LX4 = lxy(3);
+    auto &LY1 = lxy(4), &LY2 = lxy(5), &LY3 = lxy(6), &LY4 = lxy(7);
 
     const auto X2 = 2. * X, Y2 = 2. * Y, XP = X + 1., XM = X - 1., YP = Y + 1., YM = Y - 1.;
 
@@ -178,7 +178,7 @@ int SGCMQ::initialize(const shared_ptr<DomainBase>& D) {
     int_pt.clear();
     int_pt.reserve(plan.n_rows);
     for(unsigned I = 0; I < plan.n_rows; ++I) {
-        const auto& X = plan(I, 0),& Y = plan(I, 1);
+        const auto &X = plan(I, 0), &Y = plan(I, 1);
 
         vec t_vec{X, Y};
         const auto pn = compute_shape_function(t_vec, 1);

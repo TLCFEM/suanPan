@@ -51,7 +51,7 @@ public:
             double,   // reference stress
             double,   // m
             double    // density
-        );
+    );
 
     unique_ptr<Material> get_copy() override;
 };

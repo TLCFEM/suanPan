@@ -43,7 +43,7 @@ public:
                       unsigned,   // interval
                       bool,       // if to record time
                       bool        // if to use hdf5
-        );
+    );
 
     void initialize(const shared_ptr<DomainBase>&) override;
 

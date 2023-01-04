@@ -70,14 +70,14 @@ public:
          double,   // compression residual stress
          double,   // compression hardening ratio
          double    // density
-        );
+    );
     Flag(unsigned, // tag
          double,   // elastic modulus
          double,   // initial yield stress
          double,   // residual stress
          double,   // hardening ratio
          double    // density
-        );
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

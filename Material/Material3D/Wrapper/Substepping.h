@@ -41,7 +41,7 @@ public:
     Substepping(unsigned, // tag
                 unsigned, // mat tag
                 unsigned  // max iteration
-        );
+    );
     Substepping(const Substepping&);
     Substepping(Substepping&&) = delete;
     Substepping& operator=(const Substepping&) = delete;

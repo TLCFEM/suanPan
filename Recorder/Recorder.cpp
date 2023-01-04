@@ -131,24 +131,24 @@ void Recorder::save() {
         }
     }
 #else
-    for(const auto& s_data_pool : data_pool) {
-        auto max_size = 0llu;
-        for(const auto& I : s_data_pool[0]) if(I.n_elem > max_size) max_size = I.n_elem;
+	for(const auto& s_data_pool : data_pool) {
+		auto max_size = 0llu;
+		for(const auto& I : s_data_pool[0]) if(I.n_elem > max_size) max_size = I.n_elem;
 
-        mat data_to_write(s_data_pool.cbegin()->size() * max_size + 1, time_pool.size(), fill::zeros);
+		mat data_to_write(s_data_pool.cbegin()->size() * max_size + 1, time_pool.size(), fill::zeros);
 
-        for(size_t I = 0; I < time_pool.size(); ++I) {
-            data_to_write(0, I) = time_pool[I];
-            auto L = 1;
-            for(const auto& J : s_data_pool[I]) for(unsigned K = 0; K < J.n_elem; ++K) data_to_write(L++, I) = J[K];
-        }
+		for(size_t I = 0; I < time_pool.size(); ++I) {
+			data_to_write(0, I) = time_pool[I];
+			auto L = 1;
+			for(const auto& J : s_data_pool[I]) for(unsigned K = 0; K < J.n_elem; ++K) data_to_write(L++, I) = J[K];
+		}
 
-        ostringstream dataset_name;
-        dataset_name << (SUANPAN_OUTPUT / origin_name).generic_string();
-        dataset_name << object_tag(idx++);
+		ostringstream dataset_name;
+		dataset_name << (SUANPAN_OUTPUT / origin_name).generic_string();
+		dataset_name << object_tag(idx++);
 
-        mat(data_to_write.t()).save(dataset_name.str() + ".txt", raw_ascii);
-    }
+		mat(data_to_write.t()).save(dataset_name.str() + ".txt", raw_ascii);
+	}
 #endif
 }
 

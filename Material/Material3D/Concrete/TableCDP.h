@@ -51,7 +51,7 @@ public:
              double = 1.16,    // biaxial compression strength ratio
              double = .5,      // stiffness recovery
              double = 2400E-12 // density
-        );
+    );
 
     unique_ptr<Material> get_copy() override;
 };

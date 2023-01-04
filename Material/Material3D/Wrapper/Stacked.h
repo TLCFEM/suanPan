@@ -38,7 +38,7 @@ class Stacked final : public Material3D {
 public:
     Stacked(unsigned, // tag
             uvec&&    // mat tag
-        );
+    );
     Stacked(const Stacked&);
     Stacked(Stacked&&) = delete;
     Stacked& operator=(const Stacked&) = delete;
