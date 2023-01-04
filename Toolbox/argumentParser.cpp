@@ -41,6 +41,7 @@ constexpr auto SUANPAN_CODE = "Betelgeuse";
 constexpr auto SUANPAN_ARCH = 64;
 
 bool SUANPAN_PRINT = true;
+bool SUANPAN_COLOR = true;
 #ifdef SUANPAN_DEBUG
 bool SUANPAN_VERBOSE = true;
 #else
@@ -185,6 +186,7 @@ void argument_parser(const int argc, char** argv) {
             else if(is_equal(argv[I], "-o") || is_equal(argv[I], "--output")) output_file_name = argv[++I];
             else if(is_equal(argv[I], "-np") || is_equal(argv[I], "--noprint")) SUANPAN_PRINT = false;
             else if(is_equal(argv[I], "-vb") || is_equal(argv[I], "--verbose")) SUANPAN_VERBOSE = true;
+            else if(is_equal(argv[I], "-nc") || is_equal(argv[I], "--nocolor")) SUANPAN_COLOR = false;
             else if(is_equal(argv[I], "-nu") || is_equal(argv[I], "--noupdate")) check_new = false;
             else if(is_equal(argv[I], "-s") || is_equal(argv[I], "--strip")) {
                 strip = true;
@@ -284,6 +286,7 @@ void print_helper() {
     suanpan_info("\t-{:<10}  --{:<20}{}\n", "s", "strip", "strip comments out in given ABAQUS input file");
     // suanpan_info("\t-{:<10}  --{:<20}{}\n", "c", "convert", "partially convert ABAQUS input file into suanPan model script");
     suanpan_info("\t-{:<10}  --{:<20}{}\n", "np", "noprint", "suppress most console output");
+    suanpan_info("\t-{:<10}  --{:<20}{}\n", "nc", "nocolor", "suppress colors in output");
     suanpan_info("\t-{:<10}  --{:<20}{}\n", "nu", "noupdate", "do not check for newer version on startup");
     suanpan_info("\t-{:<10}  --{:<20}{}\n", "f", "file", "process model file");
     suanpan_info("\t-{:<10}  --{:<20}{}\n", "o", "output", "set output file for logging");
