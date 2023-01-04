@@ -179,15 +179,19 @@ void argument_parser(const int argc, char** argv) {
         auto strip = false, convert = false, check_new = true;
 
         for(auto I = 1; I < argc; ++I) {
-            if(is_equal(argv[I], "-v") || is_equal(argv[I], "--version")) print_version();
-            else if(is_equal(argv[I], "-h") || is_equal(argv[I], "--help")) print_helper();
-            else if(is_equal(argv[I], "-t") || is_equal(argv[I], "--test")) test_mode();
-            else if(is_equal(argv[I], "-f") || is_equal(argv[I], "--file")) input_file_name = argv[++I];
+            if(is_equal(argv[I], "-f") || is_equal(argv[I], "--file")) input_file_name = argv[++I];
             else if(is_equal(argv[I], "-o") || is_equal(argv[I], "--output")) output_file_name = argv[++I];
-            else if(is_equal(argv[I], "-np") || is_equal(argv[I], "--noprint")) SUANPAN_PRINT = false;
             else if(is_equal(argv[I], "-vb") || is_equal(argv[I], "--verbose")) SUANPAN_VERBOSE = true;
+            else if(is_equal(argv[I], "-np") || is_equal(argv[I], "--noprint")) SUANPAN_PRINT = false;
             else if(is_equal(argv[I], "-nc") || is_equal(argv[I], "--nocolor")) SUANPAN_COLOR = false;
             else if(is_equal(argv[I], "-nu") || is_equal(argv[I], "--noupdate")) check_new = false;
+            else if(is_equal(argv[I], "-v") || is_equal(argv[I], "--version")) return print_version();
+            else if(is_equal(argv[I], "-h") || is_equal(argv[I], "--help")) return print_helper();
+            else if(is_equal(argv[I], "-t") || is_equal(argv[I], "--test")) return test_mode();
+            else if(is_equal(argv[I], "-ctest") || is_equal(argv[I], "--catch2test")) {
+                catchtest_main(argc, argv);
+                return;
+            }
             else if(is_equal(argv[I], "-s") || is_equal(argv[I], "--strip")) {
                 strip = true;
                 convert = false;
@@ -195,10 +199,6 @@ void argument_parser(const int argc, char** argv) {
             else if(is_equal(argv[I], "-c") || is_equal(argv[I], "--convert")) {
                 convert = true;
                 strip = false;
-            }
-            else if(is_equal(argv[I], "-ctest") || is_equal(argv[I], "--catch2test")) {
-                catchtest_main(argc, argv);
-                return;
             }
         }
 

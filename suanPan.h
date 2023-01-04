@@ -217,7 +217,7 @@ namespace suanpan {
     template<typename... T> void warning(const std::string_view file_name, const int line, const std::string_view format_str, const T&... args) {
         if(!SUANPAN_PRINT) return;
         const std::scoped_lock lock(print_mutex);
-        if(SUANPAN_COLOR) SUANPAN_CWRN << fmt::vformat(fg(fmt::color::alice_blue), pattern("[WARNING] ", file_name, format_str), fmt::make_format_args(line, args...));
+        if(SUANPAN_COLOR) SUANPAN_CWRN << fmt::vformat(fg(fmt::color::slate_blue), pattern("[WARNING] ", file_name, format_str), fmt::make_format_args(line, args...));
         else SUANPAN_CWRN << fmt::vformat(pattern("[WARNING] ", file_name, format_str), fmt::make_format_args(line, args...));
     }
 
@@ -262,7 +262,7 @@ namespace suanpan {
     template<typename T> void info(const std::string_view format_str, const Col<T>& in_vec) {
         if(!SUANPAN_PRINT) return;
         std::string output = format(format_str);
-        if(format_str.back() != '\t') output += '\n';
+        if(format_str.back() != '\t' && format_str.back() != '\n') output += '\n';
         output += format(in_vec);
         const std::scoped_lock lock(print_mutex);
         if(SUANPAN_COLOR) SUANPAN_COUT << fmt::format(fg(fmt::color::green_yellow), output);
@@ -272,7 +272,7 @@ namespace suanpan {
     template<typename... T> void highlight(const std::string_view format_str, const T&... args) {
         if(!SUANPAN_PRINT) return;
         const std::scoped_lock lock(print_mutex);
-        if(SUANPAN_COLOR) SUANPAN_COUT << fmt::vformat(fg(fmt::color::indian_red), format_str, fmt::make_format_args(args...));
+        if(SUANPAN_COLOR) SUANPAN_COUT << fmt::vformat(fg(fmt::color::crimson), format_str, fmt::make_format_args(args...));
         else SUANPAN_COUT << fmt::vformat(format_str, fmt::make_format_args(args...));
     }
 }
