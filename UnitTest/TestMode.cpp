@@ -15,10 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include <string>
 #include <suanPan.h>
 
 void test_mode() {
-    std::string A{"asdewf"};
-    suanpan_warning("This is a test message: {}.\n", A);
+    suanpan_info("TEST.\n");
+    suanpan_highlight("TEST.\n");
+    suanpan_debug("TEST.\n");
+    suanpan_warning("TEST.\n");
+    suanpan_error("TEST.\n");
+    suanpan_fatal("TEST.\n");
 }
