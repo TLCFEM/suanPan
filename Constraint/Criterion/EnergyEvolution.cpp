@@ -80,7 +80,7 @@ int EnergyEvolution::process(const shared_ptr<DomainBase>& D) {
         });
     }
 
-    suanpan_info("-> Current Rejection Ratio: {:.5E}.\n", current_level / 100.);
+    suanpan_highlight("-> Current Rejection Ratio: {:.3f}.\n", current_level / 100.);
 
     energy = (1. - propagation_weight) * energy + propagation_weight * current_energy;
 

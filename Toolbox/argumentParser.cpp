@@ -219,7 +219,7 @@ void argument_parser(const int argc, char** argv) {
                 output_file_name += strip ? "_out.inp" : "_out.supan";
             }
 
-            for(auto& I : output_file_name) if(I == '\\') I = '/';
+            for(auto& I : output_file_name) if('\\' == I) I = '/';
 
             return convert ? convert_mode(input_file_name, output_file_name) : strip_mode(input_file_name, output_file_name);
         }
@@ -231,15 +231,15 @@ void argument_parser(const int argc, char** argv) {
                 suanpan_error("Cannot open the output file \"{}\".\n", output_file_name);
         }
 
-        if(!input_file_name.empty()) {
-            print_header();
-            if(const auto model = make_shared<Bead>(); process_file(model, input_file_name.c_str()) != SUANPAN_EXIT) {
-                if(output_file.is_open()) {
-                    SUANPAN_COUT.rdbuf(buffer_backup);
-                    print_header();
-                }
-                cli_mode(model);
+        print_header();
+        const auto model = make_shared<Bead>();
+        if(input_file_name.empty()) cli_mode(model);
+        else if(process_file(model, input_file_name.c_str()) != SUANPAN_EXIT) {
+            if(output_file.is_open()) {
+                SUANPAN_COUT.rdbuf(buffer_backup);
+                print_header();
             }
+            cli_mode(model);
         }
     }
     else {
