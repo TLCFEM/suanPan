@@ -202,7 +202,7 @@ namespace suanpan {
     inline std::string pattern(const std::string_view header, const std::string_view& file_name, const std::string_view& format) {
         std::string pattern{header};
         pattern += fs::path(file_name).filename().string();
-        pattern += ":{}: ";
+        pattern += ":{:<6d}";
         pattern += format;
         return pattern;
     }
