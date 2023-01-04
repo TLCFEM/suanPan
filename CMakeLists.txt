@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.13.0)
 
 cmake_policy(SET CMP0076 NEW)
 
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+
 project(suanPan C CXX)
 
 set(CMAKE_C_STANDARD 11)
