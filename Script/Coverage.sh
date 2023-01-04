@@ -41,6 +41,7 @@ done
   ./suanPan -t
   ./suanPan -vb -t
   ./suanPan -nc -vb -t
+  ./suanPan -nc -vb -np -t
   ./suanPan -v
   ./suanPan -ctest
   ./suanPan -c -f ../Example/Misc/Converter/TEST.inp

@@ -24,4 +24,5 @@ void test_mode() {
     suanpan_warning("TEST.\n");
     suanpan_error("TEST.\n");
     suanpan_fatal("TEST.\n");
+    suanpan_info("TEST.\n", vec{1, 2, 3});
 }
