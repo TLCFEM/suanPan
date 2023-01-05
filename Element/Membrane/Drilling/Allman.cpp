@@ -18,7 +18,7 @@
 #include "Allman.h"
 #include <Domain/DomainBase.h>
 #include <Material/Material2D/Material2D.h>
-#include <Toolbox/shapeFunction.h>
+#include <Toolbox/shape.h>
 #include <Toolbox/utility.h>
 
 Allman::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M)

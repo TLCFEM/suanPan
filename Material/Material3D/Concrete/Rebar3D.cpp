@@ -18,7 +18,7 @@
 #include "Rebar3D.h"
 #include <Domain/DomainBase.h>
 #include <Material/Material1D/Material1D.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 Rebar3D::Rebar3D(const unsigned T, const unsigned XT, const unsigned YT, const unsigned ZT, const double XR, const double YR, const double ZR, const double R)
     : Material3D(T, R)

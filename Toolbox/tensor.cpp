@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include "tensorToolbox.h"
+#include "tensor.h"
 
 mat tensor::isotropic_stiffness(const double modulus, const double poissons_ratio) {
     const auto shear_modulus = modulus / (2. + 2. * poissons_ratio);

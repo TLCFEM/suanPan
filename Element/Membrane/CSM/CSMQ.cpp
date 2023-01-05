@@ -20,7 +20,7 @@
 #include <Material/Material2D/Material2D.h>
 #include <Recorder/OutputType.h>
 #include <Toolbox/IntegrationPlan.h>
-#include <Toolbox/shapeFunction.h>
+#include <Toolbox/shape.h>
 #include <Toolbox/utility.h>
 
 CSMQ::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M)

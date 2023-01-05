@@ -19,7 +19,7 @@
 #include <Domain/DomainBase.h>
 #include <Material/Material3D/Material3D.h>
 #include <Recorder/OutputType.h>
-#include <Toolbox/shapeFunction.h>
+#include <Toolbox/shape.h>
 
 const uvec DC3D4::u_dof{0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14};
 const uvec DC3D4::d_dof{3, 7, 11, 15};

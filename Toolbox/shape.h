@@ -15,19 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @fn shapeFunction
- * @brief A shapeFunction function.
+ * @fn shape
+ * @brief Provides common shape functions.
  *
  * @author tlc
- * @date 02/01/2020
- * @version 0.3.0
- * @file shapeFunction.h
+ * @date 05/01/2022
+ * @version 0.4.0
+ * @file shape.h
  * @addtogroup Utility
  * @{
  */
 
-#ifndef SHAPEFUNCTION_H
-#define SHAPEFUNCTION_H
+#ifndef SHAPE_H
+#define SHAPE_H
 
 #include <suanPan.h>
 

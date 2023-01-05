@@ -14,9 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @fn tensor
+ * @brief Provides common tensor utilities.
+ *
+ * @author tlc
+ * @date 05/01/2022
+ * @version 0.4.0
+ * @file tensor.h
+ * @addtogroup Utility
+ * @{
+ */
 
-#ifndef TENSORTOOLBOX_H
-#define TENSORTOOLBOX_H
+#ifndef TENSOR_H
+#define TENSOR_H
 
 #include <Toolbox/utility.h>
 
@@ -55,7 +66,7 @@ namespace tensor {
         // applies to 3D tensor only, either principal or not
         double invariant3(const vec&);
 
-        // compute load angle based on input deviatoric strain
+        // compute lode angle based on input deviatoric strain
         double lode(vec);
 
         static const vec norm_weight{1., 1., 1., .5, .5, .5};
@@ -181,3 +192,5 @@ namespace suanpan {
 } // namespace suanpan
 
 #endif
+
+//! @}

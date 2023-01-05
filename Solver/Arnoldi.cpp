@@ -19,7 +19,7 @@
 #include <Domain/DomainBase.h>
 #include <Domain/FactoryHelper.hpp>
 #include <Solver/Integrator/Integrator.h>
-#include <Toolbox/arpack_wrapper.h>
+#include <Toolbox/arpack.h>
 
 Arnoldi::Arnoldi(const unsigned T, const unsigned N, const char TP)
     : Solver(T)

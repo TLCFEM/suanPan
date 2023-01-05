@@ -17,7 +17,7 @@
 
 #include "NonlinearJ2.h"
 #include <Recorder/OutputType.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 const double NonlinearJ2::root_two_third = sqrt(two_third);
 const mat NonlinearJ2::unit_dev_tensor = tensor::unit_deviatoric_tensor4();

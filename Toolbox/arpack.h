@@ -15,26 +15,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @fn argumentParser
- * @brief An argumentParser function.
+ * @fn arpack
+ * @brief Provide a wrapper for ARPACK.
  *
  * @author tlc
- * @date 21/07/2017
- * @file argumentParser.h
+ * @date 05/01/2022
+ * @file arpack.h
+ * @addtogroup Utility
+ * @{
  */
 
-#ifndef ARGUMENTPARSER_H
-#define ARGUMENTPARSER_H
+#ifndef ARPACK_H
+#define ARPACK_H
 
-#include <Step/Bead.h>
+#include <Domain/MetaMat/MetaMat.hpp>
+#include <memory>
 
-void argument_parser(int, char**);
+int eig_solve(vec&, mat&, const std::shared_ptr<MetaMat<double>>&, const std::shared_ptr<MetaMat<double>>&, unsigned, const char* = "SM");
 
-void print_version();
-void print_helper();
-
-void cli_mode(const shared_ptr<Bead>&);
-
-extern void test_mode();
+int eig_solve(cx_vec&, cx_mat&, const std::shared_ptr<MetaMat<double>>&, const std::shared_ptr<MetaMat<double>>&, unsigned, const char* = "LM");
 
 #endif
+
+//! @}

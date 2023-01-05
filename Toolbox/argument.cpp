@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include "argumentParser.h"
-#include <iomanip>
+#include "argument.h"
 #include <Step/Bead.h>
-#include <Toolbox/commandParser.h>
 #include <Toolbox/Converter.h>
+#include <Toolbox/command.h>
 #include <Toolbox/utility.h>
 #include <UnitTest/CatchTest.h>
+#include <iomanip>
 #include "revision.h"
 #ifdef SUANPAN_WIN
 #include <Windows.h>

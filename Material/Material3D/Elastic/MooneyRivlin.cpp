@@ -16,7 +16,7 @@
  ******************************************************************************/
 
 #include "MooneyRivlin.h"
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 const vec MooneyRivlin::weight{2., 2., 2., 1., 1., 1.};
 const vec MooneyRivlin::I1E{2., 2., 2., 0., 0., 0.};

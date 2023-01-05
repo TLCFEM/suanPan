@@ -19,8 +19,8 @@
 #include <Domain/DomainBase.h>
 #include <Material/Material3D/Material3D.h>
 #include <Recorder/OutputType.h>
-#include <Toolbox/shapeFunction.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/shape.h>
+#include <Toolbox/tensor.h>
 
 C3D4::C3D4(const unsigned T, uvec&& N, const unsigned M, const bool F)
     : MaterialElement3D(T, c_node, c_dof, std::forward<uvec>(N), uvec{M}, F) {}

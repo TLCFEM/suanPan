@@ -20,7 +20,7 @@
 #include <Material/Material2D/Material2D.h>
 #include <Recorder/OutputType.h>
 #include <Toolbox/IntegrationPlan.h>
-#include <Toolbox/shapeFunction.h>
+#include <Toolbox/shape.h>
 #include <Toolbox/utility.h>
 
 const uvec DCP4::u_dof{0, 1, 3, 4, 6, 7, 9, 10};

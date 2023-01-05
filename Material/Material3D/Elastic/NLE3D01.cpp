@@ -17,7 +17,7 @@
 
 // ReSharper disable CppClangTidyClangDiagnosticDocumentationUnknownCommand
 #include "NLE3D01.h"
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 /**
  * \brief compute the derivatives of potential function

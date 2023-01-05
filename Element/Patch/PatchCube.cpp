@@ -21,7 +21,7 @@
 #include <Material/Material3D/Material3D.h>
 #include <Recorder/OutputType.h>
 #include <Toolbox/IntegrationPlan.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 PatchCube::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M)
     : coor(std::forward<vec>(C))

@@ -19,7 +19,7 @@
 #include <Domain/DomainBase.h>
 #include <Domain/FactoryHelper.hpp>
 #include <Recorder/OutputType.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 const double VAFCRP::root_three_two = sqrt(1.5);
 const mat VAFCRP::unit_dev_tensor = tensor::unit_deviatoric_tensor4();

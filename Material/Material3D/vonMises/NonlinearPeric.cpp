@@ -18,7 +18,7 @@
 #include "NonlinearPeric.h"
 #include <Domain/DomainBase.h>
 #include <Domain/FactoryHelper.hpp>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 const double NonlinearPeric::root_three_two = sqrt(1.5);
 const mat NonlinearPeric::unit_dev_tensor = tensor::unit_deviatoric_tensor4();

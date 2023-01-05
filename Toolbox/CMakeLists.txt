@@ -1,12 +1,12 @@
 target_sources(${PROJECT_NAME} PRIVATE
-        argumentParser.cpp
-        arpack_wrapper.cpp
-        commandParser.cpp
+        argument.cpp
+        arpack.cpp
+        command.cpp
         Converter.cpp
         IntegrationPlan.cpp
         sort_rcm.cpp
         sync_ostream.cpp
-        tensorToolbox.cpp
+        tensor.cpp
         utility.cpp
         resampling.cpp
         )

@@ -20,7 +20,7 @@
 #include <Material/Material.h>
 #include <Recorder/OutputType.h>
 #include <Toolbox/IntegrationPlan.h>
-#include <Toolbox/shapeFunction.h>
+#include <Toolbox/shape.h>
 
 const mat SGCMS::mapping = [] {
     mat t_mapping(4, 4);

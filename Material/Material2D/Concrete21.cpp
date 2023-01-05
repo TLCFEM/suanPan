@@ -17,7 +17,7 @@
 
 #include "Concrete21.h"
 #include <Domain/DomainBase.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 Concrete21::Concrete21(const unsigned T, const double CS, const double TS, const double MCC, const double NCC, const double MTT, const double NTT, const double MP, const double CE, const double TE, const double R)
     : Material2D(T, PlaneType::N, R)

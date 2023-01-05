@@ -17,7 +17,7 @@
 
 #include "Rotation2D.h"
 #include <Domain/DomainBase.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 Rotation2D::Rotation2D(const unsigned T, const unsigned MT, const double A)
     : Material2D(T, PlaneType::N, 0.)
