@@ -16,7 +16,7 @@
  ******************************************************************************/
 
 #include "Yeoh.h"
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 const vec Yeoh::weight{2., 2., 2., 1., 1., 1.};
 const vec Yeoh::I1E{2., 2., 2., 0., 0., 0.};

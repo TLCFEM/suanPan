@@ -18,7 +18,7 @@
 #include "WilsonPenzienNewmark.h"
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Toolbox/arpack_wrapper.h>
+#include <Toolbox/arpack.h>
 
 WilsonPenzienNewmark::WilsonPenzienNewmark(const unsigned T, vec&& DR, const double A, const double B)
     : Newmark(T, A, B)

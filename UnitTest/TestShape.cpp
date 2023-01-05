@@ -1,4 +1,4 @@
-#include <Toolbox/shapeFunction.h>
+#include <Toolbox/shape.h>
 #include "CatchHeader.h"
 
 TEST_CASE("Compute Area By Shoelace", "[Utility.Shape]") {

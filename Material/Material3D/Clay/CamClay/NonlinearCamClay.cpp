@@ -16,7 +16,7 @@
  ******************************************************************************/
 
 #include "NonlinearCamClay.h"
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 const double NonlinearCamClay::sqrt_three_two = sqrt(1.5);
 const mat NonlinearCamClay::unit_dev_tensor = tensor::unit_deviatoric_tensor4();

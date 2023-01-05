@@ -17,41 +17,41 @@
 
 // ReSharper disable StringLiteralTypo
 // ReSharper disable IdentifierTypo
-#include "commandParser.h"
-#include <thread>
+#include "command.h"
 #include <Constraint/Constraint.h>
 #include <Constraint/ConstraintParser.h>
 #include <Converger/Converger.h>
 #include <Converger/ConvergerParser.h>
 #include <Domain/Domain.h>
 #include <Domain/ExternalModule.h>
-#include <Domain/Node.h>
 #include <Domain/Group/ElementGroup.h>
 #include <Domain/Group/GroupGroup.h>
 #include <Domain/Group/NodeGroup.h>
 #include <Domain/MetaMat/SparseMatFGMRES.hpp>
+#include <Domain/Node.h>
 #include <Element/Element.h>
 #include <Element/ElementParser.h>
 #include <Element/Visualisation/vtkParser.h>
+#include <Load/Amplitude/Amplitude.h>
 #include <Load/Load.h>
 #include <Load/LoadParser.h>
-#include <Load/Amplitude/Amplitude.h>
 #include <Material/Material.h>
 #include <Material/MaterialParser.h>
 #include <Material/MaterialTester.h>
 #include <Recorder/Recorder.h>
 #include <Recorder/RecorderParser.h>
 #include <Section/SectionParser.h>
+#include <Solver/Integrator/Integrator.h>
 #include <Solver/Solver.h>
 #include <Solver/SolverParser.h>
-#include <Solver/Integrator/Integrator.h>
 #include <Step/Bead.h>
 #include <Step/Frequency.h>
 #include <Step/StepParser.h>
-#include <Toolbox/argumentParser.h>
+#include <Toolbox/argument.h>
 #include <Toolbox/resampling.h>
 #include <Toolbox/response_spectrum.h>
 #include <Toolbox/thread_pool.hpp>
+#include <thread>
 #ifdef SUANPAN_WIN
 #include <Windows.h>
 #endif

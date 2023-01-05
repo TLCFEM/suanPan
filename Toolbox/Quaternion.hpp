@@ -29,7 +29,7 @@
 #ifndef QUATERNION_H
 #define QUATERNION_H
 
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 template<typename T> class Quaternion {
     T re;

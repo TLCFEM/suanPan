@@ -17,7 +17,7 @@
 
 #include "Bilinear2D.h"
 #include <Recorder/OutputType.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 const uvec Bilinear2D::F1{0, 1, 3};
 const uvec Bilinear2D::F2{2, 4, 5};

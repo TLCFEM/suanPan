@@ -16,7 +16,7 @@
  ******************************************************************************/
 
 #include "IsotropicElastic3D.h"
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 IsotropicElastic3D::IsotropicElastic3D(const unsigned T, const double E, const double P, const double R)
     : DataIsotropicElastic3D{fabs(E), fabs(P)}

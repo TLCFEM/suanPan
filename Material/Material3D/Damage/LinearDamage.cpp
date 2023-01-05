@@ -16,7 +16,7 @@
  ******************************************************************************/
 
 #include "LinearDamage.h"
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 const double LinearDamage::root_two_third = sqrt(2. / 3.);
 

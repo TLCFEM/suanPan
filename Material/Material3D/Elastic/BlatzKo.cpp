@@ -16,7 +16,7 @@
  ******************************************************************************/
 
 #include "BlatzKo.h"
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 const vec BlatzKo::weight{2., 2., 2., 1., 1., 1.};
 

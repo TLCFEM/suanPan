@@ -16,7 +16,7 @@
  ******************************************************************************/
 
 #include "NonlinearHoffman.h"
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 constexpr double NonlinearHoffman::four_third = 4. / 3.;
 const double NonlinearHoffman::root_two_third = sqrt(.5 * four_third);

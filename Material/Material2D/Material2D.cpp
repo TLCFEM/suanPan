@@ -17,7 +17,7 @@
 
 #include "Material2D.h"
 #include <Recorder/OutputType.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 Material2D::Material2D(const unsigned T, const PlaneType PT, const double R)
     : Material(T, MaterialType::D2, R)

@@ -17,7 +17,7 @@
 
 #include "NonlinearGurson1D.h"
 #include <Recorder/OutputType.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 constexpr unsigned NonlinearGurson1D::max_iteration = 20;
 

@@ -17,7 +17,7 @@
 
 #include "T2DL.h"
 #include <Element/Element.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 const span T2DL::IS(0, 1);
 const span T2DL::JS(2, 3);

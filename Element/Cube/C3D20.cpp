@@ -19,8 +19,8 @@
 #include <Domain/DomainBase.h>
 #include <Material/Material3D/Material3D.h>
 #include <Toolbox/IntegrationPlan.h>
-#include <Toolbox/shapeFunction.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/shape.h>
+#include <Toolbox/tensor.h>
 
 C3D20::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M, mat&& P)
     : coor(std::forward<vec>(C))

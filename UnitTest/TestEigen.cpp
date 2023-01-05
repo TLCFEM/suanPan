@@ -1,7 +1,7 @@
+#include <Domain/MetaMat/FullMat.hpp>
+#include <Toolbox/arpack.h>
 #include <Toolbox/utility.h>
 #include "CatchHeader.h"
-#include <Domain/MetaMat/FullMat.hpp>
-#include <Toolbox/arpack_wrapper.h>
 
 TEST_CASE("Eigensolver", "[Utility.Eigen]") {
     constexpr auto N = 100;

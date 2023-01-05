@@ -17,7 +17,7 @@
 
 // ReSharper disable CppFunctionalStyleCast
 // ReSharper disable IdentifierTypo
-#include "arpack_wrapper.h"
+#include "arpack.h"
 #include <Domain/MetaMat/operator_times.hpp>
 
 int eig_solve(vec& eigval, mat& eigvec, const std::shared_ptr<MetaMat<double>>& K, const std::shared_ptr<MetaMat<double>>& M, const unsigned num, const char* form) {

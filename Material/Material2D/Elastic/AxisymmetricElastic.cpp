@@ -16,7 +16,7 @@
  ******************************************************************************/
 
 #include "AxisymmetricElastic.h"
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 AxisymmetricElastic::AxisymmetricElastic(const unsigned T, const double E, const double P, const double R)
     : Material2D(T, PlaneType::A, R)

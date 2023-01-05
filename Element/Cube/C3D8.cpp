@@ -20,8 +20,8 @@
 #include <Material/Material3D/Material3D.h>
 #include <Recorder/OutputType.h>
 #include <Toolbox/IntegrationPlan.h>
-#include <Toolbox/shapeFunction.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/shape.h>
+#include <Toolbox/tensor.h>
 
 const field<vec> C3D8::h_mode{{1., 1., -1., -1., -1., -1., 1., 1.}, {1., -1., -1., 1., -1., 1., 1., -1.}, {1., -1., 1., -1., 1., -1., 1., -1.}, {-1., 1., -1., 1., 1., -1., 1., -1.}};
 

@@ -17,7 +17,7 @@
 
 #include "Elastic2D.h"
 #include <Recorder/OutputType.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 Elastic2D::Elastic2D(const unsigned T, const double E, const double P, const double R, const PlaneType PT)
     : Material2D(T, PT, R)

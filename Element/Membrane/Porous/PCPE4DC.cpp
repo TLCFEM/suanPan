@@ -20,8 +20,8 @@
 #include <Material/Material2D/Material2D.h>
 #include <Recorder/OutputType.h>
 #include <Toolbox/IntegrationPlan.h>
-#include <Toolbox/shapeFunction.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/shape.h>
+#include <Toolbox/tensor.h>
 #include <Toolbox/utility.h>
 
 const uvec PCPE4DC::s_dof{0, 1, 4, 5, 8, 9, 12, 13};

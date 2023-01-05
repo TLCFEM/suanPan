@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include <Toolbox/argumentParser.h>
+#include <Toolbox/argument.h>
 #include <suanPan.h>
 
 #ifdef SUANPAN_WIN

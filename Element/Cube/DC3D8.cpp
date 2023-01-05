@@ -20,7 +20,7 @@
 #include <Material/Material3D/Material3D.h>
 #include <Recorder/OutputType.h>
 #include <Toolbox/IntegrationPlan.h>
-#include <Toolbox/shapeFunction.h>
+#include <Toolbox/shape.h>
 
 const uvec DC3D8::u_dof{0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18, 20, 21, 22, 24, 25, 26, 28, 29, 30};
 const uvec DC3D8::d_dof{3, 7, 11, 15, 19, 23, 27, 31};

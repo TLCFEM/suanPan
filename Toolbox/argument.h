@@ -14,15 +14,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @fn argument
+ * @brief Parsing arguments.
+ *
+ * @author tlc
+ * @date 21/07/2017
+ * @file argument.h
+ * @addtogroup Utility
+ * @{
+ */
 
-#ifndef ARPACK_WRAPPER_H
-#define ARPACK_WRAPPER_H
+#ifndef ARGUMENT_H
+#define ARGUMENT_H
 
-#include <Domain/MetaMat/MetaMat.hpp>
-#include <memory>
+#include <Step/Bead.h>
 
-int eig_solve(vec&, mat&, const std::shared_ptr<MetaMat<double>>&, const std::shared_ptr<MetaMat<double>>&, unsigned, const char* = "SM");
+void argument_parser(int, char**);
 
-int eig_solve(cx_vec&, cx_mat&, const std::shared_ptr<MetaMat<double>>&, const std::shared_ptr<MetaMat<double>>&, unsigned, const char* = "LM");
+void print_version();
+void print_helper();
+
+void cli_mode(const shared_ptr<Bead>&);
+
+extern void test_mode();
 
 #endif
+
+//! @}

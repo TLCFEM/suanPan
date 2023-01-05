@@ -21,7 +21,7 @@
 #include <Domain/FactoryHelper.hpp>
 #include <Solver/Integrator/Integrator.h>
 #include <Solver/Newton.h>
-#include <Toolbox/arpack_wrapper.h>
+#include <Toolbox/arpack.h>
 
 Buckle::Buckle(const unsigned T)
     : Static(T, 1.) {}

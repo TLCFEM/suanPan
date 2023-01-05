@@ -20,7 +20,7 @@
 #include <Domain/Factory.hpp>
 #include <Domain/Group/Group.h>
 #include <Domain/Node.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 void Contact3D::update_position() {
     for(auto& [node, span, position] : slave) {

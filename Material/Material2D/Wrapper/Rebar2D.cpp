@@ -17,7 +17,7 @@
 
 #include "Rebar2D.h"
 #include <Domain/DomainBase.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 Rebar2D::Rebar2D(const unsigned T, const unsigned XT, const unsigned YT, const double RX, const double RY)
     : Material2D(T, PlaneType::S, 0.)

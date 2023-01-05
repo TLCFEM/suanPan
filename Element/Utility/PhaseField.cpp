@@ -16,7 +16,7 @@
  ******************************************************************************/
 
 #include "PhaseField.h"
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 void PhaseField::commit_status(const unique_ptr<Material>& mat_obj) {
     const auto i_strain = mat_obj->get_trial_strain() - mat_obj->get_current_strain();

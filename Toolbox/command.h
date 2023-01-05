@@ -14,9 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @fn command
+ * @brief Parsing commands.
+ *
+ * @author tlc
+ * @date 05/01/2022
+ * @version 0.1.0
+ * @file command.h
+ * @addtogroup Utility
+ * @{
+ */
 
-#ifndef COMMANDPARSER_H
-#define COMMANDPARSER_H
+#ifndef COMMAND_H
+#define COMMAND_H
 
 #include <suanPan.h>
 
@@ -59,3 +70,5 @@ int print_command();
 int execute_command(istringstream&);
 
 #endif
+
+//! @}

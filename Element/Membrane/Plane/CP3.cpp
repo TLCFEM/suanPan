@@ -19,7 +19,7 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Node.h>
 #include <Material/Material2D/Material2D.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 #include <Toolbox/utility.h>
 
 void CP3::stack_stiffness(mat& K, const mat& D, const mat& N, const double F) {

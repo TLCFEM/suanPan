@@ -17,7 +17,7 @@
 
 #include "NonlinearGurson.h"
 #include <Recorder/OutputType.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 const double NonlinearGurson::sqrt_three_two = sqrt(1.5);
 const mat NonlinearGurson::unit_dev_tensor = tensor::unit_deviatoric_tensor4();

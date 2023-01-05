@@ -17,7 +17,7 @@
 
 #include "B2DL.h"
 #include <Element/Element.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 void B2DL::form_trans_mat(const vec& d_cosine) {
     trans_mat.zeros(3, 6);
