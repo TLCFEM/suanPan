@@ -31,6 +31,7 @@ add_library(${PROJECT_NAME} SHARED
         ../../Element/Element.cpp
         ../../Material/Material.cpp
         ../../Section/Section.cpp
+        ../../Include/fmt/src/format.cc
         )
 
 message(STATUS "ElementExample CXX_FLAGS: ${CMAKE_CXX_FLAGS}")

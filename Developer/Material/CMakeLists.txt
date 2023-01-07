@@ -28,6 +28,7 @@ add_library(${PROJECT_NAME} SHARED
         MaterialExample.cpp
         ../../Domain/Tag.cpp
         ../../Material/Material.cpp
+        ../../Include/fmt/src/format.cc
         )
 
 message(STATUS "MaterialExample CXX_FLAGS: ${CMAKE_CXX_FLAGS}")

@@ -38,6 +38,7 @@ add_library(${PROJECT_NAME} SHARED
         ../Material/MaterialExample.cpp
         ../Material/ElasticExternal.cpp
         ../Section/SectionExample.cpp
+        ../../Include/fmt/src/format.cc
         )
 
 message(STATUS "ModuleBundle CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
