@@ -1,7 +1,14 @@
 coverage:
-  range: 70..80
+  range: 75..85
   round: up
   precision: 4
+parsers:
+  gcov:
+    branch_detection:
+      conditional: no
+      loop: no
+      method: no
+      macro: no
 ignore:
   - "**/*Parser.cpp"
   - "Developer"
