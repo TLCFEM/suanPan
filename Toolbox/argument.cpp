@@ -38,7 +38,6 @@ constexpr auto SUANPAN_MAJOR = 2;
 constexpr auto SUANPAN_MINOR = 8;
 constexpr auto SUANPAN_PATCH = 0;
 constexpr auto SUANPAN_CODE = "Betelgeuse";
-constexpr auto SUANPAN_ARCH = 64;
 
 bool SUANPAN_PRINT = true;
 bool SUANPAN_COLOR = true;
@@ -136,28 +135,28 @@ void convert_mode(const string& input_file_name, const string& output_file_name)
 }
 
 void print_header() {
-    suanpan_info("+--------------------------------------------------+\n");
-    suanpan_info("|   __        __         suanPan is an open source |\n");
-    suanpan_info("|  /  \\      |  \\           FEM framework ({}-bit) |\n", SUANPAN_ARCH);
-    suanpan_info("|  \\__       |__/  __   __      {} ({}.{}.{}) |\n", SUANPAN_CODE, SUANPAN_MAJOR, SUANPAN_MINOR, SUANPAN_PATCH);
-    suanpan_info("|     \\ |  | |    |  \\ |  |      by tlc @ {} |\n", SUANPAN_REVISION);
-    suanpan_info("|  \\__/ |__| |    |__X |  |    all rights reserved |\n");
-    suanpan_info("|                           10.5281/zenodo.1285221 |\n");
-    suanpan_info("+--------------------------------------------------+\n");
+    suanpan_info("+-----------------------------------------------------+\n");
+    suanpan_info("|   __        __            suanPan is an open source |\n");
+    suanpan_info("|  /  \\      |  \\              FEM framework (64-bit) |\n");
+    suanpan_info("|  \\__       |__/  __   __         {} ({}.{}.{}) |\n", SUANPAN_CODE, SUANPAN_MAJOR, SUANPAN_MINOR, SUANPAN_PATCH);
+    suanpan_info("|     \\ |  | |    |  \\ |  |         by tlc @ {} |\n", SUANPAN_REVISION);
+    suanpan_info("|  \\__/ |__| |    |__X |  |       all rights reserved |\n");
+    suanpan_info("|                              10.5281/zenodo.1285221 |\n");
+    suanpan_info("+-----------------------------------------------------+\n");
 #ifdef SUANPAN_WIN
-    suanpan_info("|  https://github.com/TLCFEM/suanPan               |\n");
-    suanpan_info("|  https://github.com/TLCFEM/suanPan-manual        |\n");
-    suanpan_info("+--------------------------------------------------+\n");
-    suanpan_info("|  https://gitter.im/suanPan-dev/community         |\n");
+    suanpan_info("|  https://github.com/TLCFEM/suanPan                  |\n");
+    suanpan_info("|  https://tlcfem.github.io/suanPan-manual/latest     |\n");
+    suanpan_info("+-----------------------------------------------------+\n");
+    suanpan_info("|  https://gitter.im/suanPan-dev/community            |\n");
 #else
-    static constexpr std::array POOL{"\U0001F308", "\U0001F30F", "\U0001F3A7", "\U0001F3B1", "\U0001F479", "\U0001F4BB", "\U0001F50B", "\U0001F514", "\U0001F680", "\U0001F9E9"};
+    static constexpr std::array POOL{"\xF0\x9F\x8C\x88", "\xF0\x9F\x8C\x8F", "\xF0\x9F\x8E\xA7", "\xF0\x9F\x8E\xB1", "\xF0\x9F\x91\xB9", "\xF0\x9F\x92\xBB", "\xF0\x9F\x94\x8B", "\xF0\x9F\x94\x94", "\xF0\x9F\x9A\x80", "\xF0\x9F\xA7\xA9"};
     arma_rng::set_seed_random();
-    suanpan_info("|  \U0001F9EE https://github.com/TLCFEM/suanPan            |\n");
-    suanpan_info("|  \U0001F4DA https://github.com/TLCFEM/suanPan-manual     |\n");
-    suanpan_info("+--------------------------------------------------+\n");
-    suanpan_info("|  {} https://gitter.im/suanPan-dev/community      |\n", POOL[randi() % POOL.size()]);
+    suanpan_info("|  \xF0\x9F\xA7\xAE https://github.com/TLCFEM/suanPan               |\n");
+    suanpan_info("|  \xF0\x9F\x93\x9A https://tlcfem.github.io/suanPan-manual/latest  |\n");
+    suanpan_info("+-----------------------------------------------------+\n");
+    suanpan_info("|  {} https://gitter.im/suanPan-dev/community         |\n", POOL[randi() % POOL.size()]);
 #endif
-    suanpan_info("+--------------------------------------------------+\n\n");
+    suanpan_info("+-----------------------------------------------------+\n\n");
 }
 
 void argument_parser(const int argc, char** argv) {
@@ -259,23 +258,23 @@ void print_version() {
     suanpan_info("You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.\n\n\n");
     suanpan_info("suanPan is an open source FEM framework.\n");
     suanpan_info("    The binary is compiled on {}.\n", __DATE__);
-    suanpan_info("    The source code of suanPan is hosted on GitHub. https://tlcfem.github.io/suanPan/\n");
-    suanpan_info("    The documentation is hosted on GitBook and readthedocs. https://tlcfem.gitbook.io/suanpan-manual/ and https://suanpan-manual.readthedocs.io/\n");
+    suanpan_info("    The source code of suanPan is hosted on GitHub. https://github.com/TLCFEM/suanPan/\n");
+    suanpan_info("    The documentation is hosted on GitHub. https://tlcfem.github.io/suanPan-manual/latest/\n");
 #ifdef SUANPAN_MKL
     suanpan_info("    The linear algebra support is provided by Armadillo with Intel MKL. http://arma.sourceforge.net/\n");
 #else
 	suanpan_info("    The linear algebra support is provided by Armadillo. http://arma.sourceforge.net/\n");
 #endif
 #ifdef SUANPAN_CUDA
-    suanpan_info("    The GPCPU solvers are provided by CUDA. https://developer.nvidia.com/about-cuda\n");
+    suanpan_info("    The GPCPU solvers are provided by CUDA. https://developer.nvidia.com/about-cuda/\n");
 #endif
 #ifdef SUANPAN_MT
-    suanpan_info("    The parallelisation support is implemented via TBB library. https://github.com/oneapi-src/oneTBB\n");
+    suanpan_info("    The parallelisation support is implemented via TBB library. https://github.com/oneapi-src/oneTBB/\n");
 #endif
 #ifdef SUANPAN_VTK
     suanpan_info("    The visualisation support is implemented via VTK library. https://vtk.org/\n");
 #endif
-    suanpan_info("\nPlease join gitter for any feedback. https://gitter.im/suanPan-dev/community\n");
+    suanpan_info("\nPlease join gitter for any feedback. https://gitter.im/suanPan-dev/community/\n");
     suanpan_info("\n\n[From Wikipedia] Betelgeuse is usually the tenth-brightest star in the night sky and, after Rigel, the second-brightest in the constellation of Orion. It is a distinctly reddish semiregular variable star whose apparent magnitude has the widest range displayed by any first-magnitude star.\n\n");
 }
 

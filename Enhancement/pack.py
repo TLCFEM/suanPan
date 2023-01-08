@@ -32,7 +32,7 @@ print('[+] adding executables ...')
 verification.write('\nEXECUTABLE\n')
 
 fl = [
-    '../suanPan-vs/Release/suanPan.exe',
+    '../suanPan/build/Release/suanPan.exe',
     'updater.exe'
     ]
 cl = [

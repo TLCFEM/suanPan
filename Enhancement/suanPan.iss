@@ -48,7 +48,7 @@ Name: "updater"; Description: "Include updater.exe"
 Name: "vcredist"; Description: "Include Microsoft Visual C++ Redistributable *.dll"
 
 [Files]
-Source: "..\..\suanPan-vs\Release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\suanPan\build\Release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StoragePath}libifcoremd.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StoragePath}libiomp5md.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StoragePath}libmmd.dll"; DestDir: "{app}"; Flags: ignoreversion
