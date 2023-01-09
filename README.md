@@ -54,6 +54,31 @@ The highlights of **suanPan** are
 
 ## Quick Start
 
+Execute the application out-of-the-box in terminal on Linux using one of the following commands depending on how the
+application is obtained. See details below.
+
+```bash
+# in folder bin/ for linux portable tarball
+./suanPan.sh
+# for linux packages and snap
+suanPan
+# for flatpak
+flatpak run flathub io.github.tlcfem.suanPan
+```
+
+Or on Windows,
+
+```powershell
+# in the folder containing suanPan.exe
+.\suanPan.exe
+```
+
+First time user can use `overview` command to go through a quick introduction.
+
+```text
+suanPan ~<> overview
+```
+
 Sample models are available for almost all models/commands. Please check the `Example` folder for details. Further
 details can be seen [here](https://tlcfem.gitbook.io/suanpan-manual/tutorial/obtain) regarding how to run model files.
 

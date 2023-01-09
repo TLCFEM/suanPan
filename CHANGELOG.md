@@ -8,6 +8,7 @@
 ## version 2.8
 
 1. better on screen display with the fmt library [#99](https://github.com/TLCFEM/suanPan/pull/99)
+2. add command `overview`
 
 ## version 2.7
 
