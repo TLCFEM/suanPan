@@ -76,6 +76,20 @@ Or on Windows,
 First time user can use `overview` command to go through a quick introduction.
 
 ```text
++-----------------------------------------------------+
+|   __        __            suanPan is an open source |
+|  /  \      |  \              FEM framework (64-bit) |
+|  \__       |__/  __   __         Betelgeuse (2.8.0) |
+|     \ |  | |    |  \ |  |         by tlc @ 10fd6147 |
+|  \__/ |__| |    |__X |  |       all rights reserved |
+|                              10.5281/zenodo.1285221 |
++-----------------------------------------------------+
+|  https://github.com/TLCFEM/suanPan                  |
+|  https://tlcfem.github.io/suanPan-manual/latest     |
++-----------------------------------------------------+
+|  https://gitter.im/suanPan-dev/community            |
++-----------------------------------------------------+
+
 suanPan ~<> overview
 ```
 

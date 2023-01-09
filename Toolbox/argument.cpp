@@ -303,7 +303,7 @@ void cli_mode(const shared_ptr<Bead>& model) {
 
     history_path.append(".suanpan-history.sp");
 
-    if(true) {
+    if(!exists(history_path)) {
         suanpan_info("It appears that this is the first time you run ");
         suanpan_highlight("suanPan");
         suanpan_info(".\nFor a quick introduction, type in '");
