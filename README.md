@@ -35,8 +35,7 @@ is targeted to provide an efficient, concise, flexible and reliable FEM simulati
 as [ABAQUS UNIFIED FEA](https://www.3ds.com/products-services/simulia/products/abaqus/), [ANSYS](http://www.ansys.com/)
 and [OpenSees](http://opensees.berkeley.edu/).
 
-Please check documentation [here](https://tlcfem.gitbook.io/suanpan-manual/) and [here](http://suanpan-manual.rtfd.io/)
-for command references. Please consider starring ⭐ the project!
+Please check documentation [here](https://tlcfem.github.io/suanPan-manual/latest/) for command references. Please consider starring ⭐ the project!
 
 ## Features
 

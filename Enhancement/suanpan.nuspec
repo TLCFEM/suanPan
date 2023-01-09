@@ -13,7 +13,7 @@
     <licenseUrl>https://www.gnu.org/licenses/gpl-3.0</licenseUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <projectSourceUrl>https://github.com/TLCFEM/suanPan</projectSourceUrl>
-    <docsUrl>https://tlcfem.gitbook.io/suanpan-manual/</docsUrl>
+    <docsUrl>https://tlcfem.github.io/suanPan-manual/latest/</docsUrl>
     <mailingListUrl>https://github.com/TLCFEM/suanPan/discussions</mailingListUrl>
     <bugTrackerUrl>https://github.com/TLCFEM/suanPan/issues</bugTrackerUrl>
     <tags>FEM HPC IGA</tags>
