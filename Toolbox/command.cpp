@@ -493,7 +493,7 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     }
 
     if(is_equal(command_id, "fullname")) {
-        suanpan_info("{}\n", SUANPAN_EXE.c_str());
+        suanpan_info("{}\n", SUANPAN_EXE.generic_string());
         return SUANPAN_SUCCESS;
     }
 
