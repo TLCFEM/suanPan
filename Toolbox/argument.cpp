@@ -47,7 +47,7 @@ bool SUANPAN_VERBOSE = true;
 bool SUANPAN_VERBOSE = false;
 #endif
 
-const char* SUANPAN_EXE = "";
+fs::path SUANPAN_EXE = "";
 
 bool check_debugger() {
 #ifdef SUANPAN_DEBUG
@@ -67,8 +67,8 @@ bool check_debugger() {
     return false;
 }
 
-void check_version(const char* path_to_executable) {
-    auto updater_module = fs::path(path_to_executable).parent_path();
+void check_version(const fs::path& path_to_executable) {
+    auto updater_module = path_to_executable.parent_path();
 
 #ifdef SUANPAN_WIN
     updater_module.append("updater.exe");
@@ -164,7 +164,7 @@ void argument_parser(const int argc, char** argv) {
 
     if(0 == argc) return;
 
-    SUANPAN_EXE = argv[0];
+    SUANPAN_EXE = canonical(fs::path(argv[0]));
 
     string input_file_name;
     const auto buffer_backup = SUANPAN_COUT.rdbuf();
