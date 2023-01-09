@@ -279,11 +279,12 @@ void print_version() {
 }
 
 void print_helper() {
-    suanpan_info("Available Parameters:\n");
+    suanpan_highlight("Usage: suanPan [-vb] [-np] [-nc] [-nu] [-f <input_file>] [-o <output_file>]\nOptions:\n");
     suanpan_info("\t-{:<10}  --{:<20}{}\n", "v", "version", "check version information");
     suanpan_info("\t-{:<10}  --{:<20}{}\n", "h", "help", "print this helper");
     suanpan_info("\t-{:<10}  --{:<20}{}\n", "s", "strip", "strip comments out in given ABAQUS input file");
     // suanpan_info("\t-{:<10}  --{:<20}{}\n", "c", "convert", "partially convert ABAQUS input file into suanPan model script");
+    suanpan_info("\t-{:<10}  --{:<20}{}\n", "vb", "verbose", "enable debug information in output");
     suanpan_info("\t-{:<10}  --{:<20}{}\n", "np", "noprint", "suppress most console output");
     suanpan_info("\t-{:<10}  --{:<20}{}\n", "nc", "nocolor", "suppress colors in output");
     suanpan_info("\t-{:<10}  --{:<20}{}\n", "nu", "noupdate", "do not check for newer version on startup");
@@ -301,6 +302,16 @@ void cli_mode(const shared_ptr<Bead>& model) {
 #endif
 
     history_path.append(".suanpan-history.sp");
+
+    if(true) {
+        suanpan_info("It appears that this is the first time you run ");
+        suanpan_highlight("suanPan");
+        suanpan_info(".\nFor a quick introduction, type in '");
+        suanpan_highlight("overview");
+        suanpan_info("'.\nTo exit, just type in '");
+        suanpan_highlight("exit");
+        suanpan_info("'.\n\n");
+    }
 
     ofstream output_file(history_path, std::ios_base::app | std::ios_base::out);
 

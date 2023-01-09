@@ -114,6 +114,104 @@ int benchmark() {
     return SUANPAN_SUCCESS;
 }
 
+void overview() {
+    const auto new_model = make_shared<Bead>();
+
+    auto guide_command = [&](const string& target) {
+        while(true) {
+            string command_line;
+            suanpan_highlight("overview -> ");
+            getline(std::cin, command_line);
+            if(is_equal(command_line, "q")) {
+                suanpan_info("Bye. Happy modelling!\n\n");
+                return SUANPAN_EXIT;
+            }
+            if(is_equal(command_line, target)) {
+                istringstream tmp_str(command_line);
+                const auto code = process_command(new_model, tmp_str);
+                suanpan_highlight("overview -> [Press Enter to Continue]");
+                getline(std::cin, command_line);
+                return code;
+            }
+            suanpan_info("Try again.\n");
+        }
+    };
+
+    suanpan_info("Welcome to suanPan, a parallel finite element analysis software.\n\n"
+        "It can be used to solve various types of solid mechanics problems. It also provides a flexible platform for researchers to develop new numerical models and algorithms in a hassle-free manner.\n\n"
+        "The following is a quick introduction of the application, regarding its functionalities and basic usage. At any time, type in '");
+    suanpan_highlight("q");
+    suanpan_info("' to quit this introduction. First of all, type in '");
+    suanpan_highlight("version");
+    suanpan_info("' to check the license and version information.\n");
+
+    if(SUANPAN_EXIT == guide_command("version")) return;
+
+    suanpan_info("By invoking the application without input file, you are currently in the interactive mode, which allows you to create finite element models interactively. "
+        "A numerical model typically consists of nodes, elements connecting nodes, materials attached to elements, loads applied to nodes, boundary conditions imposed on nodes, etc. "
+        "To analyze, a number of analysis steps need to be defined with the proper convergence criteria and solvers.\n\nType in '");
+    suanpan_highlight("example");
+    suanpan_info("' to check out a simple elastic cantilever example.\n");
+
+    if(SUANPAN_EXIT == guide_command("example")) return;
+
+    suanpan_info("If you have some experience with ABAQUS scripting, you may have realised that the structure resembles that of ABAQUS *.inp files. "
+        "Basically you would need to define the geometry first, then define analysis steps and finally invoke the analysis.\n\n"
+        "Once you get used to the syntax and modelling workflow, you are more likely to write some model input files in plain text and use the '");
+    suanpan_highlight("-f");
+    suanpan_info("' option to directly perform the analysis, for example, '");
+    suanpan_highlight("suanPan -f some_text_file");
+    suanpan_info("'.\n\n"
+        "To this end, a file named as 'AddAssociation.bat' (Windows) or 'suanPan.sh' (Unix) is provided to help you setup autocompletion and syntax highlighting with Sublime Text. "
+        "It is placed in the same directory as the executable file. Type in '");
+    suanpan_highlight("fullname");
+    suanpan_info("' to see where the file is located.\n");
+
+    if(SUANPAN_EXIT == guide_command("fullname")) return;
+
+    suanpan_info("There are other options that can be used to invoke the application. Type in '");
+    suanpan_highlight("help");
+    suanpan_info("' to see what options are available.\n");
+
+    if(SUANPAN_EXIT == guide_command("help")) return;
+
+    suanpan_info("In the current interactive mode, it is also possible to load an existing model file and run it directly. "
+        "Let's first echo a '");
+    suanpan_highlight("benchmark");
+    suanpan_info("' command to file 'benchmark.sp' using the '");
+    suanpan_highlight("terminal");
+    suanpan_info("' command. Type in '");
+    suanpan_highlight("terminal echo benchmark >benchmark.sp");
+    suanpan_info("' to do so.\n");
+
+    if(SUANPAN_EXIT == guide_command("terminal echo benchmark >benchmark.sp")) return;
+
+    suanpan_info("Now the file can be loaded using the '");
+    suanpan_highlight("file");
+    suanpan_info("' command, the '");
+    suanpan_highlight("benchmark");
+    suanpan_info("' command we just echoed will perform some matrix solving operations, and it may take a few minites. Type in '");
+    suanpan_highlight("file benchmark.sp");
+    suanpan_info("' to execute the file.\n");
+
+    if(SUANPAN_EXIT == guide_command("file benchmark.sp")) return;
+
+    suanpan_info("In the documentation [https://tlcfem.github.io/suanPan-manual/latest/], there is an [Example] section that provides some practical examples for you to try out. "
+        "The source code respository also contains a folder named [Example] in which example usages of most models/algorithms are given. Please feel free to check that out.\n\n"
+        "Hope you will find suanPan useful. As it aims to bring the latest finite element models/algorithms to practice, you are welcome to embed your amazing research outcomes into suanPan. Type in '");
+    suanpan_highlight("qrcode");
+    suanpan_info("' to display a QR code for sharing. (UTF-8 is required, on Windows, some modern terminal such as Windows Terminal [https://github.com/microsoft/terminal] is recommended.)\n");
+
+    if(SUANPAN_EXIT == guide_command("qrcode")) return;
+
+    suanpan_info("This concludes the introduction. Type '");
+    suanpan_highlight("q");
+    suanpan_info("' to return to the normal interactive mode.\n");
+
+    // ReSharper disable once CppExpressionWithoutSideEffects
+    guide_command("q");
+}
+
 void perform_upsampling(istringstream& command) {
     string file_name;
     uword up_rate;
@@ -254,6 +352,11 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     if(!get_input(command, command_id)) return SUANPAN_SUCCESS;
 
     if(is_equal(command_id, "exit") || is_equal(command_id, "quit")) return SUANPAN_EXIT;
+
+    if(is_equal(command_id, "overview")) {
+        overview();
+        return SUANPAN_SUCCESS;
+    }
 
     if(is_equal(command_id, "file")) {
         string file_name;
