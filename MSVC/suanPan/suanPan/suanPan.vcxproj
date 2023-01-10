@@ -260,6 +260,7 @@
     <ClCompile Include="..\..\..\Element\Visualisation\vtkBase.cpp" />
     <ClCompile Include="..\..\..\Element\Visualisation\vtkParser.cpp" />
     <ClCompile Include="..\..\..\Include\fmt\src\format.cc" />
+    <ClCompile Include="..\..\..\Include\whereami\whereami.c" />
     <ClCompile Include="..\..\..\Load\Amplitude\Amplitude.cpp" />
     <ClCompile Include="..\..\..\Load\Amplitude\Combine.cpp" />
     <ClCompile Include="..\..\..\Load\Amplitude\Constant.cpp" />

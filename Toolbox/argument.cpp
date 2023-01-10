@@ -52,7 +52,7 @@ fs::path SUANPAN_EXE = "";
 
 bool check_debugger() {
 #ifdef SUANPAN_DEBUG
-	return false;
+    return false;
 #endif
 #ifdef SUANPAN_WIN
     if(IsDebuggerPresent()) exit(EXIT_SUCCESS); // NOLINT(concurrency-mt-unsafe)
@@ -277,7 +277,7 @@ void print_version() {
 #ifdef SUANPAN_MKL
     suanpan_info("    The linear algebra support is provided by Armadillo with Intel MKL. http://arma.sourceforge.net/\n");
 #else
-	suanpan_info("    The linear algebra support is provided by Armadillo. http://arma.sourceforge.net/\n");
+    suanpan_info("    The linear algebra support is provided by Armadillo. http://arma.sourceforge.net/\n");
 #endif
 #ifdef SUANPAN_CUDA
     suanpan_info("    The GPCPU solvers are provided by CUDA. https://developer.nvidia.com/about-cuda/\n");

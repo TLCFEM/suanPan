@@ -1444,6 +1444,9 @@
     <ClCompile Include="..\..\..\Toolbox\command.cpp">
       <Filter>Toolbox</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Include\whereami\whereami.c">
+      <Filter>Toolbox</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
