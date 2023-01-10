@@ -31,7 +31,7 @@ RUN cd suanPan/build && cp suanPan*.deb / && \
 
 FROM ubuntu:jammy as runtime
 
-COPY --from=build /suanPan*.deb /suanPan*.deb
+COPY --from=build /suanPan*.deb /
 
 RUN apt-get update -y && apt-get install ./suanPan*.deb -y
 

@@ -38,6 +38,7 @@ link_directories(${PROJECT_BINARY_DIR}/Libs)
 add_executable(${PROJECT_NAME}
         "suanPan.cpp"
         "Include/fmt/src/format.cc"
+        "Include/whereami/whereami.c"
         "Constraint/CMakeLists.txt"
         "Database/CMakeLists.txt"
         "Domain/CMakeLists.txt"

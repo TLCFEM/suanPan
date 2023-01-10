@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "argument.h"
+#include <Include/whereami/whereami.h>
 #include <Step/Bead.h>
 #include <Toolbox/Converter.h>
 #include <Toolbox/command.h>
@@ -159,12 +160,25 @@ void print_header() {
     suanpan_info("+-----------------------------------------------------+\n\n");
 }
 
+fs::path whereami(const char* argv) {
+    fs::path exe_path(argv);
+
+    if(const auto length = wai_getExecutablePath(nullptr, 0, nullptr); length > 0) {
+        const unique_ptr<char[]> buffer(new char[length + 1]);
+        wai_getExecutablePath(buffer.get(), length, nullptr);
+        buffer[length] = '\0';
+        exe_path = buffer.get();
+    }
+
+    return weakly_canonical(exe_path);
+}
+
 void argument_parser(const int argc, char** argv) {
     if(check_debugger()) return;
 
     if(0 == argc) return;
 
-    SUANPAN_EXE = canonical(fs::path(argv[0]));
+    SUANPAN_EXE = whereami(argv[0]);
 
     string input_file_name;
     const auto buffer_backup = SUANPAN_COUT.rdbuf();
