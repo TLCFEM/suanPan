@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "argument.h"
+#include <Include/whereami/whereami.h>
 #include <Step/Bead.h>
 #include <Toolbox/Converter.h>
 #include <Toolbox/command.h>
@@ -51,7 +52,7 @@ fs::path SUANPAN_EXE = "";
 
 bool check_debugger() {
 #ifdef SUANPAN_DEBUG
-	return false;
+    return false;
 #endif
 #ifdef SUANPAN_WIN
     if(IsDebuggerPresent()) exit(EXIT_SUCCESS); // NOLINT(concurrency-mt-unsafe)
@@ -159,12 +160,25 @@ void print_header() {
     suanpan_info("+-----------------------------------------------------+\n\n");
 }
 
+fs::path whereami(const char* argv) {
+    fs::path exe_path(argv);
+
+    if(const auto length = wai_getExecutablePath(nullptr, 0, nullptr); length > 0) {
+        const unique_ptr<char[]> buffer(new char[length + 1]);
+        wai_getExecutablePath(buffer.get(), length, nullptr);
+        buffer[length] = '\0';
+        exe_path = buffer.get();
+    }
+
+    return weakly_canonical(exe_path);
+}
+
 void argument_parser(const int argc, char** argv) {
     if(check_debugger()) return;
 
     if(0 == argc) return;
 
-    SUANPAN_EXE = canonical(fs::path(argv[0]));
+    SUANPAN_EXE = whereami(argv[0]);
 
     string input_file_name;
     const auto buffer_backup = SUANPAN_COUT.rdbuf();
@@ -263,7 +277,7 @@ void print_version() {
 #ifdef SUANPAN_MKL
     suanpan_info("    The linear algebra support is provided by Armadillo with Intel MKL. http://arma.sourceforge.net/\n");
 #else
-	suanpan_info("    The linear algebra support is provided by Armadillo. http://arma.sourceforge.net/\n");
+    suanpan_info("    The linear algebra support is provided by Armadillo. http://arma.sourceforge.net/\n");
 #endif
 #ifdef SUANPAN_CUDA
     suanpan_info("    The GPCPU solvers are provided by CUDA. https://developer.nvidia.com/about-cuda/\n");

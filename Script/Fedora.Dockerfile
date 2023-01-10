@@ -20,7 +20,7 @@ RUN cd suanPan/build && cp suanPan*.rpm / && \
 
 FROM fedora:37 as runtime
 
-COPY --from=build /suanPan*.rpm /suanPan*.rpm
+COPY --from=build /suanPan*.rpm /
 
 RUN dnf upgrade --refresh -y && dnf install ./suanPan*.rpm -y
 
