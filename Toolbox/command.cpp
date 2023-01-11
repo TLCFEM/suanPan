@@ -148,7 +148,7 @@ void overview() {
     };
     const auto restore = [&] {
         SUANPAN_COUT.rdbuf(buffer_backup);
-        for(const auto I : buffer_tmp->view()) {
+        for(const auto I : buffer_tmp->str()) {
             SUANPAN_COUT << I;
             SUANPAN_COUT.flush();
             std::this_thread::sleep_for(std::chrono::milliseconds(8));
