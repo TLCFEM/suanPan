@@ -1754,7 +1754,7 @@
       "trigger":"Spring02"
     },
     {
-      "contents":"element T2D2 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:[6]} ${7:[7]} ${8:[8]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, material tag\n# (5) double, cross sectional area\n# [6] bool string, nonlinear geometry switch, default: false\n# [7] bool string, if to update sectional area, default: false\n# [8] bool string, if to use log strain, default: false",
+      "contents":"element T2D2 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:[6]} ${7:[7]} ${8:[8]} ${9:[9]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, material tag\n# (5) double, cross sectional area\n# [6] bool string, nonlinear geometry switch, default: false\n# [7] bool string, if to update sectional area, default: false\n# [8] bool string, if to use log strain, default: false\n# [9] double, flexural rigidity, -1.0",
       "details":"2D Linear Truss",
       "kind":"type",
       "trigger":"T2D2"
