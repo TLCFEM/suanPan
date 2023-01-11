@@ -115,7 +115,7 @@ void vtk_setup(const vtkSmartPointer<vtkUnstructuredGrid>& grid, const vtkInfo& 
     interactor->Start();
 }
 
-void vtk_save(const vtkSmartPointer<vtkUnstructuredGrid>& grid, const vtkInfo& config) {
+void vtk_save(vtkSmartPointer<vtkUnstructuredGrid>&& grid, const vtkInfo config) { // NOLINT(performance-unnecessary-value-param)
     const auto writer = vtkSmartPointer<vtkUnstructuredGridWriter>::New();
     writer->SetInputData(grid);
     writer->SetFileName(config.file_name.c_str());
@@ -170,7 +170,7 @@ void vtk_plot_node_quantity(const shared_ptr<DomainBase>& domain, vtkInfo config
     data->SetComponentName(4, "5");
     data->SetComponentName(5, "6");
 
-    const auto grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
+    auto grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
     grid->Allocate(static_cast<vtkIdType>(t_element_pool.size()));
     std::ranges::for_each(t_element_pool, [&](const shared_ptr<Element>& t_element) {
         t_element->SetDeformation(node, config.scale);
@@ -188,7 +188,8 @@ void vtk_plot_node_quantity(const shared_ptr<DomainBase>& domain, vtkInfo config
     else if(config.save_file) {
         grid->GetPointData()->SetScalars(data);
         grid->GetPointData()->SetActiveScalars(vtk_get_name(config.type));
-        vtk_save(grid, config);
+        auto writer = std::thread(vtk_save, std::move(grid), config);
+        writer.detach();
     }
     else {
         const auto sub_data = vtkSmartPointer<vtkDoubleArray>::New();
@@ -234,7 +235,7 @@ void vtk_plot_element_quantity(const shared_ptr<DomainBase>& domain, vtkInfo con
     mat tensor(6, max_node, fill::zeros);
     vec counter(max_node, fill::zeros);
 
-    const auto grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
+    auto grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
     grid->Allocate(static_cast<vtkIdType>(t_element_pool.size()));
     std::ranges::for_each(t_element_pool, [&](const shared_ptr<Element>& t_element) {
         if(-1 != config.material_type) if(const auto& t_tag = t_element->get_material_tag(); t_tag.empty() || static_cast<uword>(config.material_type) != t_tag(0)) return;
@@ -261,7 +262,8 @@ void vtk_plot_element_quantity(const shared_ptr<DomainBase>& domain, vtkInfo con
     else if(config.save_file) {
         grid->GetPointData()->SetScalars(data);
         grid->GetPointData()->SetActiveScalars(vtk_get_name(config.type));
-        vtk_save(grid, config);
+        auto writer = std::thread(vtk_save, std::move(grid), config);
+        writer.detach();
     }
     else {
         const auto sub_data = vtkSmartPointer<vtkDoubleArray>::New();

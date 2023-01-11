@@ -50,7 +50,7 @@ vtkInfo vtk_process(istringstream&);
 
 void vtk_setup(const vtkSmartPointer<vtkUnstructuredGrid>&, const vtkInfo&);
 
-void vtk_save(const vtkSmartPointer<vtkUnstructuredGrid>&, const vtkInfo&);
+void vtk_save(vtkSmartPointer<vtkUnstructuredGrid>&&, vtkInfo);
 
 void vtk_plot_node_quantity(const shared_ptr<DomainBase>&, vtkInfo);
 
