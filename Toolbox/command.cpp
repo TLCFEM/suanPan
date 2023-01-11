@@ -138,6 +138,24 @@ void overview() {
         }
     };
 
+    std::streambuf* buffer_backup;
+    unique_ptr<std::stringbuf> buffer_tmp;
+
+    const auto redirect = [&] {
+        buffer_backup = SUANPAN_COUT.rdbuf();
+        buffer_tmp = make_unique<std::stringbuf>();
+        SUANPAN_COUT.rdbuf(buffer_tmp.get());
+    };
+    const auto restore = [&] {
+        SUANPAN_COUT.rdbuf(buffer_backup);
+        for(const auto I : buffer_tmp->view()) {
+            SUANPAN_COUT << I;
+            SUANPAN_COUT.flush();
+            std::this_thread::sleep_for(std::chrono::milliseconds(8));
+        }
+    };
+
+    redirect();
     suanpan_info("Welcome to suanPan, a parallel finite element analysis software.\n\n"
         "It can be used to solve various types of solid mechanics problems. It also provides a flexible platform for researchers to develop new numerical models and algorithms in a hassle-free manner.\n\n"
         "The following is a quick introduction of the application, regarding its functionalities and basic usage. At any time, type in '");
@@ -145,17 +163,21 @@ void overview() {
     suanpan_info("' to quit this introduction. First of all, type in '");
     suanpan_highlight("version");
     suanpan_info("' to check the license and version information.\n");
+    restore();
 
     if(SUANPAN_EXIT == guide_command("version")) return;
 
+    redirect();
     suanpan_info("By invoking the application without input file, you are currently in the interactive mode, which allows you to create finite element models interactively. "
         "A numerical model typically consists of nodes, elements connecting nodes, materials attached to elements, loads applied to nodes, boundary conditions imposed on nodes, etc. "
         "To analyze, a number of analysis steps need to be defined with the proper convergence criteria and solvers.\n\nType in '");
     suanpan_highlight("example");
     suanpan_info("' to check out a simple elastic cantilever example.\n");
+    restore();
 
     if(SUANPAN_EXIT == guide_command("example")) return;
 
+    redirect();
     suanpan_info("If you have some experience with ABAQUS scripting, you may have realised that the structure resembles that of ABAQUS *.inp files. "
         "Basically you would need to define the geometry first, then define analysis steps and finally invoke the analysis.\n\n"
         "Once you get used to the syntax and modelling workflow, you are more likely to write some model input files in plain text and use the '");
@@ -167,15 +189,19 @@ void overview() {
         "It is placed in the same directory as the executable file. Type in '");
     suanpan_highlight("fullname");
     suanpan_info("' to see where the file is located.\n");
+    restore();
 
     if(SUANPAN_EXIT == guide_command("fullname")) return;
 
+    redirect();
     suanpan_info("There are other options that can be used to invoke the application. Type in '");
     suanpan_highlight("help");
     suanpan_info("' to see what options are available.\n");
+    restore();
 
     if(SUANPAN_EXIT == guide_command("help")) return;
 
+    redirect();
     suanpan_info("In the current interactive mode, it is also possible to load an existing model file and run it directly. "
         "Let's first echo a '");
     suanpan_highlight("benchmark");
@@ -184,9 +210,11 @@ void overview() {
     suanpan_info("' command. Type in '");
     suanpan_highlight("terminal echo benchmark >benchmark.sp");
     suanpan_info("' to do so.\n");
+    restore();
 
     if(SUANPAN_EXIT == guide_command("terminal echo benchmark >benchmark.sp")) return;
 
+    redirect();
     suanpan_info("Now the file can be loaded using the '");
     suanpan_highlight("file");
     suanpan_info("' command, the '");
@@ -194,20 +222,25 @@ void overview() {
     suanpan_info("' command we just echoed will perform some matrix solving operations, and it may take a few minites. Type in '");
     suanpan_highlight("file benchmark.sp");
     suanpan_info("' to execute the file.\n");
+    restore();
 
     if(SUANPAN_EXIT == guide_command("file benchmark.sp")) return;
 
+    redirect();
     suanpan_info("In the documentation [https://tlcfem.github.io/suanPan-manual/latest/], there is an [Example] section that provides some practical examples for you to try out. "
         "The source code respository also contains a folder named [Example] in which example usages of most models/algorithms are given. Please feel free to check that out.\n\n"
         "Hope you will find suanPan useful. As it aims to bring the latest finite element models/algorithms to practice, you are welcome to embed your amazing research outcomes into suanPan. Type in '");
     suanpan_highlight("qrcode");
     suanpan_info("' to display a QR code for sharing. (UTF-8 is required, on Windows, some modern terminal such as Windows Terminal [https://github.com/microsoft/terminal] is recommended.)\n");
+    restore();
 
     if(SUANPAN_EXIT == guide_command("qrcode")) return;
 
+    redirect();
     suanpan_info("This concludes the introduction. Type '");
     suanpan_highlight("q");
     suanpan_info("' to return to the normal interactive mode.\n");
+    restore();
 
     // ReSharper disable once CppExpressionWithoutSideEffects
     guide_command("q");

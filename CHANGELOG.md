@@ -9,6 +9,8 @@
 1. better on screen display with the fmt library [#99](https://github.com/TLCFEM/suanPan/pull/99)
 2. add command `overview`
 3. update `OpenBLAS` to version `0.3.21`
+4. add Euler buckling load check for `T2D2`
+5. speed-up analysis with visualisation recorder
 
 ## version 2.7
 
