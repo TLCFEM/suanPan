@@ -308,6 +308,33 @@ int vtk_get_index(const OutputType config) {
     if(config == OutputType::PE12) return 3;
     if(config == OutputType::PE23) return 4;
     if(config == OutputType::PE13) return 5;
+    if(config == OutputType::U1) return 0;
+    if(config == OutputType::U2) return 1;
+    if(config == OutputType::U3) return 2;
+    if(config == OutputType::U4) return 3;
+    if(config == OutputType::U5) return 4;
+    if(config == OutputType::U6) return 5;
+    if(config == OutputType::UR1) return 3;
+    if(config == OutputType::UR2) return 4;
+    if(config == OutputType::UR3) return 5;
+    if(config == OutputType::V1) return 0;
+    if(config == OutputType::V2) return 1;
+    if(config == OutputType::V3) return 2;
+    if(config == OutputType::V4) return 3;
+    if(config == OutputType::V5) return 4;
+    if(config == OutputType::V6) return 5;
+    if(config == OutputType::VR1) return 3;
+    if(config == OutputType::VR2) return 4;
+    if(config == OutputType::VR3) return 5;
+    if(config == OutputType::A1) return 0;
+    if(config == OutputType::A2) return 1;
+    if(config == OutputType::A3) return 2;
+    if(config == OutputType::A4) return 3;
+    if(config == OutputType::A5) return 4;
+    if(config == OutputType::A6) return 5;
+    if(config == OutputType::AR1) return 3;
+    if(config == OutputType::AR2) return 4;
+    if(config == OutputType::AR3) return 5;
 
     return 0;
 }
