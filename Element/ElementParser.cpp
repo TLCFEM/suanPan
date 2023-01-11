@@ -2206,6 +2206,7 @@ void new_t2d2(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     string nonlinear = "N", update_area = "N", log_strain = "N";
+    double rigidity = -1.;
 
     if(command.eof())
         suanpan_debug("Linear geometry assumed.\n");
@@ -2222,7 +2223,12 @@ void new_t2d2(unique_ptr<Element>& return_obj, istringstream& command) {
     else if(!get_input(command, log_strain))
         suanpan_error("A valid engineering strain switch is required.\n");
 
-    return_obj = make_unique<T2D2>(tag, std::move(node_tag), material_tag, area, is_true(nonlinear), is_true(update_area), is_true(log_strain));
+    if(command.eof())
+        suanpan_debug("No buckling check.\n");
+    else if(!get_input(command, rigidity))
+        suanpan_error("A valid flexural rigidity is required.\n");
+
+    return_obj = make_unique<T2D2>(tag, std::move(node_tag), material_tag, area, is_true(nonlinear), is_true(update_area), is_true(log_strain), rigidity);
 }
 
 void new_t2d2s(unique_ptr<Element>& return_obj, istringstream& command) {

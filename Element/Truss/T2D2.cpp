@@ -19,9 +19,10 @@
 #include <Domain/DomainBase.h>
 #include <Material/Material1D/Material1D.h>
 
-T2D2::T2D2(const unsigned T, uvec&& N, const unsigned M, const double A, const bool F, const bool UA, const bool LS)
+T2D2::T2D2(const unsigned T, uvec&& N, const unsigned M, const double A, const bool F, const bool UA, const bool LS, const double FR)
     : MaterialElement1D(T, t_node, t_dof, std::forward<uvec>(N), uvec{M}, F, {DOF::U1, DOF::U2})
     , area(A)
+    , rigidity(FR)
     , t_trans(F ? make_unique<T2DC>() : make_unique<T2DL>())
     , update_area(UA)
     , log_strain(LS) {}
@@ -30,6 +31,8 @@ int T2D2::initialize(const shared_ptr<DomainBase>& D) {
     t_trans->set_element_ptr(this);
 
     access::rw(length) = t_trans->get_length();
+
+    if(rigidity > 0.) access::rw(euler) = -pow(datum::pi / length, 2.) * rigidity;
 
     t_material = D->get<Material>(material_tag(0))->get_copy();
 
@@ -63,7 +66,13 @@ int T2D2::update_status() {
         trial_stiffness = t_trans->to_global_stiffness_mat(area / length * t_material->get_trial_stiffness());
     }
 
-    trial_resistance = t_trans->to_global_vec(new_area * t_material->get_trial_stress());
+    const vec axial_force = new_area * t_material->get_trial_stress();
+    trial_resistance = t_trans->to_global_vec(axial_force);
+
+    if(euler < 0. && axial_force(0) <= euler) {
+        suanpan_error("Element {} exceeds Euler buckling limit.\n", get_tag());
+        return SUANPAN_FAIL;
+    }
 
     suanpan_assert([&] { if(!trial_stiffness.is_finite() || !trial_resistance.is_finite()) throw invalid_argument("infinite number detected"); });
 
