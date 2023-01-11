@@ -1,0 +1,28 @@
+# A TEST MODEL FOR T2D2 ELEMENT
+
+node 1 0 0
+node 2 4 0
+
+material MPF 1 100 300 .4
+
+element T2D2 1 1 2 1 100 0 0 0 10
+
+fix 1 1 1
+fix 2 2 1 2
+
+step static 1
+set fixed_step_size 1
+
+cload 1 0 -100 1 2
+
+converger RelIncreDisp 1 1E-4 10 1
+
+analyze
+
+peek node 2
+
+peek element 1
+
+reset
+clear
+exit
