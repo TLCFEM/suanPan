@@ -3,12 +3,12 @@
 ## known issues
 
 1. `MKL` includes outdated `FEAST`, the external names in `FEAST` library are modified to avoid linking error.
-2. `OpenBLAS` causes SEGFAULT with version 0.3.15+ when compiled with `DYNAMIC_ARCH` enabled.
 
 ## version 2.8
 
 1. better on screen display with the fmt library [#99](https://github.com/TLCFEM/suanPan/pull/99)
 2. add command `overview`
+3. update `OpenBLAS` to version `0.3.21`
 
 ## version 2.7
 
