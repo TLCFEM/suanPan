@@ -1447,6 +1447,12 @@
     <ClCompile Include="..\..\..\Include\whereami\whereami.c">
       <Filter>Toolbox</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestExpression.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\Expression.cpp">
+      <Filter>Toolbox</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2753,6 +2759,9 @@
       <Filter>Toolbox</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Toolbox\command.h">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\Expression.h">
       <Filter>Toolbox</Filter>
     </ClInclude>
   </ItemGroup>

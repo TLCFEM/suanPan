@@ -29,7 +29,7 @@ template<sp_i IT, typename F> void suanpan_for(const IT start, const IT end, F&&
     static tbb::affinity_partitioner ap;
     tbb::parallel_for(start, end, std::forward<F>(FN), ap);
 #else
-	for(IT I = start; I < end; ++I) FN(I);
+    for(IT I = start; I < end; ++I) FN(I);
 #endif
 }
 
@@ -68,7 +68,11 @@ namespace suanpan {
     string to_lower(const string&);
     string to_upper(string&&);
     string to_lower(string&&);
-} // namespace suanpan
+
+    namespace expression {
+        std::vector<std::string> split(const std::string& variable_string);
+    } // namespace expression 
+}     // namespace suanpan
 
 template<typename T> bool get_input(istringstream& I, T& O) { return static_cast<bool>(I >> O); }
 
