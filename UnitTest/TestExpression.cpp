@@ -4,8 +4,8 @@
 
 TEST_CASE("Variable Split", "[Utility.Expression]") {
     for(const auto test_list = std::vector<std::string>{
-            "x,y,d_z",
-            "\"x,y,d_z\"",
+            "x|y|d_z",
+            "\"x|y|d_z\"",
             R"("x""y""d_z")"
         }; const auto& I : test_list) {
         const auto variable_list = suanpan::expression::split(I);
@@ -18,7 +18,7 @@ TEST_CASE("Variable Split", "[Utility.Expression]") {
 }
 
 TEST_CASE("Expression Evaluation", "[Utility.Expression]") {
-    auto expression = Expression(0, "x,y");
+    auto expression = Expression(0, "x|y");
 
     REQUIRE(expression.compile("x^2+y^2+2*x*y") == true);
 
