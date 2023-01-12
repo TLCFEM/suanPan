@@ -41,6 +41,8 @@ class Expression final : public Tag {
 
     exprtk::expression<double> expression;
 
+    std::string expression_text;
+
 public:
     explicit Expression(unsigned, const std::string&);
 
@@ -51,6 +53,8 @@ public:
     double evaluate(const Col<double>&);
 
     Col<double> gradient(const Col<double>&);
+
+    void print() override;
 };
 
 #endif

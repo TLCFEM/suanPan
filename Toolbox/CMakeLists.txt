@@ -17,8 +17,6 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/Libs)
 
 if (MSVC)
     set_source_files_properties(Expression.cpp PROPERTY COMPILE_FLAGS /bigobj)
-else ()
-    set_source_files_properties(Expression.cpp PROPERTY COMPILE_FLAGS -Wa,-mbig-obj)
 endif ()
 
 target_link_libraries(${PROJECT_NAME} expression)

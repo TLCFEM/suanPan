@@ -70,7 +70,7 @@ std::vector<std::string> suanpan::expression::split(const std::string& variable_
     std::vector<std::string> variable_list;
     auto I = variable_string.cbegin(), J = variable_string.cbegin();
     while(I != variable_string.cend()) {
-        if(',' == *I || '"' == *I) {
+        if('|' == *I || '"' == *I) {
             if(I != J) variable_list.emplace_back(J, I);
             J = ++I;
         }

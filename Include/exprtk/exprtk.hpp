@@ -657,7 +657,7 @@ namespace exprtk
             d_itr = nd_itr;
          }
 
-         return true;
+         // return true;
       }
 
       inline bool wc_match(const std::string& wild_card,

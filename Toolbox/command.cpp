@@ -18,40 +18,41 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable IdentifierTypo
 #include "command.h"
+#include <thread>
 #include <Constraint/Constraint.h>
 #include <Constraint/ConstraintParser.h>
 #include <Converger/Converger.h>
 #include <Converger/ConvergerParser.h>
 #include <Domain/Domain.h>
 #include <Domain/ExternalModule.h>
+#include <Domain/Node.h>
 #include <Domain/Group/ElementGroup.h>
 #include <Domain/Group/GroupGroup.h>
 #include <Domain/Group/NodeGroup.h>
 #include <Domain/MetaMat/SparseMatFGMRES.hpp>
-#include <Domain/Node.h>
 #include <Element/Element.h>
 #include <Element/ElementParser.h>
 #include <Element/Visualisation/vtkParser.h>
-#include <Load/Amplitude/Amplitude.h>
 #include <Load/Load.h>
 #include <Load/LoadParser.h>
+#include <Load/Amplitude/Amplitude.h>
 #include <Material/Material.h>
 #include <Material/MaterialParser.h>
 #include <Material/MaterialTester.h>
 #include <Recorder/Recorder.h>
 #include <Recorder/RecorderParser.h>
 #include <Section/SectionParser.h>
-#include <Solver/Integrator/Integrator.h>
 #include <Solver/Solver.h>
 #include <Solver/SolverParser.h>
+#include <Solver/Integrator/Integrator.h>
 #include <Step/Bead.h>
 #include <Step/Frequency.h>
 #include <Step/StepParser.h>
 #include <Toolbox/argument.h>
+#include <Toolbox/Expression.h>
 #include <Toolbox/resampling.h>
 #include <Toolbox/response_spectrum.h>
 #include <Toolbox/thread_pool.hpp>
-#include <thread>
 #ifdef SUANPAN_WIN
 #include <Windows.h>
 #endif
@@ -379,6 +380,49 @@ void perform_sdof_response(istringstream& command) {
         suanpan_info("Data is saved to file \"{}\".\n", motion_name);
 }
 
+int create_new_expression(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid amplitude type is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    string variable_list;
+    if(!get_input(command, variable_list)) {
+        suanpan_error("A valid vertical bar separated variable list is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    string expression;
+    if(!get_input(command, expression)) {
+        suanpan_error("A valid expression or expression file name is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    if(fs::exists(expression)) {
+        const ifstream file(expression);
+        if(!file.is_open()) {
+            suanpan_error("Fail to open \"{}\".\n", expression);
+            return SUANPAN_SUCCESS;
+        }
+
+        std::stringstream buffer;
+        buffer << file.rdbuf();
+        expression = buffer.str();
+    }
+
+    auto expression_obj = make_unique<Expression>(tag, variable_list);
+
+    if(!expression_obj->compile(expression)) {
+        suanpan_error("Fail to parse \"{}\".\n", expression);
+        return SUANPAN_SUCCESS;
+    }
+
+    domain->insert(std::move(expression_obj));
+
+    return SUANPAN_SUCCESS;
+}
+
 int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     if(nullptr == model) return SUANPAN_SUCCESS;
 
@@ -420,6 +464,7 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     if(is_equal(command_id, "set")) return set_property(domain, command);
 
     if(is_equal(command_id, "amplitude")) return create_new_amplitude(domain, command);
+    if(is_equal(command_id, "expression")) return create_new_expression(domain, command);
     if(is_equal(command_id, "converger")) return create_new_converger(domain, command);
     if(is_equal(command_id, "constraint")) return create_new_constraint(domain, command);
     if(is_equal(command_id, "criterion")) return create_new_criterion(domain, command);
@@ -1486,6 +1531,13 @@ int print_info(const shared_ptr<DomainBase>& domain, istringstream& command) {
         while(get_input(command, tag)) {
             if(domain->find_amplitude(tag)) {
                 get_amplitude(domain, tag)->print();
+                suanpan_info("\n");
+            }
+        }
+    else if(is_equal(object_type, "expression"))
+        while(get_input(command, tag)) {
+            if(domain->find_expression(tag)) {
+                get_expression(domain, tag)->print();
                 suanpan_info("\n");
             }
         }

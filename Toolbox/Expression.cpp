@@ -35,6 +35,7 @@ Expression::Expression(const unsigned tag, const std::string& variable_string)
 uword Expression::size() const { return x.n_elem; }
 
 bool Expression::compile(const std::string& expression_string) {
+    expression_text = expression_string;
     const auto lock = std::scoped_lock{parser_lock};
     return parser.compile(expression_string, expression);
 }
@@ -49,4 +50,8 @@ Col<double> Expression::gradient(const Col<double>& in_x) {
     Col<double> result(x.n_elem);
     for(uword I = 0; I < x.n_elem; ++I) result(I) = derivative(expression, x(I));
     return result;
+}
+
+void Expression::print() {
+    suanpan_info("An expression represents \"{}\".", expression_text);
 }
