@@ -32,7 +32,7 @@
 #include <exprtk/exprtk.hpp>
 
 class Expression final : public Tag {
-    static std::mutex parser_lock;
+    static std::mutex parser_mutex;
     static exprtk::parser<double> parser;
 
     Col<double> x;

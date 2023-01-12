@@ -18,7 +18,7 @@
 #include "Expression.h"
 #include <Toolbox/utility.h>
 
-std::mutex Expression::parser_lock;
+std::mutex Expression::parser_mutex;
 exprtk::parser<double> Expression::parser;
 
 Expression::Expression(const unsigned tag, const std::string& variable_string)
@@ -36,7 +36,7 @@ uword Expression::size() const { return x.n_elem; }
 
 bool Expression::compile(const std::string& expression_string) {
     expression_text = expression_string;
-    const auto lock = std::scoped_lock{parser_lock};
+    std::scoped_lock lock{parser_mutex};
     return parser.compile(expression_string, expression);
 }
 
