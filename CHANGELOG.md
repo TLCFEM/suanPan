@@ -12,6 +12,7 @@
 4. add Euler buckling load check for `T2D2`
 5. speed-up analysis with visualisation recorder
 6. update `VTK` to version `9.2.5`
+7. add `Expression` to support custom function definition
 
 ## version 2.7
 

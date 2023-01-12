@@ -1352,14 +1352,20 @@
       "trigger":"CIN3D8"
     },
     {
-      "contents":"",
-      "details":"element Tie ${1:(1)} ${2:(2)} ${3:(3)} ${(4:[(4)} ${5:(5)} ${6:(6)}...]\n# (1) int, unique element tag\n# (2) double, right hand side of the constraint equation, the constraint is homogeneous if this parameter is zero\n# (3) double, penalty number, a relatively large number\n# (4) int, node tag\n# (5) int, dof tag\n# (6) double, weight",
+      "contents":"expression ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique expression tag\n# (2) string, variable list, vertical line separated\n# (3) string, expression or name of file containing expression",
+      "details":"Maths Expression",
+      "kind":"type",
+      "trigger":"expression"
+    },
+    {
+      "contents":"element Tie ${1:(1)} ${2:(2)} ${3:(3)} ${(4:[(4)} ${5:(5)} ${6:(6)}...]\n# (1) int, unique element tag\n# (2) double, right hand side of the constraint equation, the constraint is homogeneous if this parameter is zero\n# (3) double, penalty number, a relatively large number\n# (4) int, node tag\n# (5) int, dof tag\n# (6) double, weight",
+      "details":"",
       "kind":"type",
       "trigger":"Tie"
     },
     {
-      "contents":"",
-      "details":"material Flag02 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, tension yield stress, positive\n# (4) double, tension residual stress, can be either positive or negative\n# (5) double, tension hardening ratio\n# (6) double, compression yield stress, negative\n# (7) double, compression residual stress, can be either positive or negative\n# (8) double, compression hardening ratio",
+      "contents":"material Flag02 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, tension yield stress, positive\n# (4) double, tension residual stress, can be either positive or negative\n# (5) double, tension hardening ratio\n# (6) double, compression yield stress, negative\n# (7) double, compression residual stress, can be either positive or negative\n# (8) double, compression hardening ratio",
+      "details":"",
       "kind":"type",
       "trigger":"Flag02"
     },
