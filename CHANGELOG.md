@@ -11,6 +11,7 @@
 3. update `OpenBLAS` to version `0.3.21`
 4. add Euler buckling load check for `T2D2`
 5. speed-up analysis with visualisation recorder
+6. update `VTK` to version `9.2.5`
 
 ## version 2.7
 

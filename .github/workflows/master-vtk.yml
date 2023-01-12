@@ -13,8 +13,8 @@ jobs:
       - name: Install VTK
         run: |
           echo "SP_TIME=daily-$(date +''%Y%m%d%H'')" >> $GITHUB_ENV
-          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.2-linux.tar.gz
-          tar xf VTK-9.2.2-linux.tar.gz
+          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.5-linux.tar.gz
+          tar xf VTK-9.2.5-linux.tar.gz
       - name: Golang
         uses: actions/setup-go@v3
       - name: Compile
@@ -46,8 +46,8 @@ jobs:
       - name: Install VTK
         run: |
           echo "SP_TIME=daily-$(date +''%Y%m%d%H'')" >> $GITHUB_ENV
-          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.2-macos.tar.gz
-          tar xf VTK-9.2.2-macos.tar.gz
+          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.5-macos.tar.gz
+          tar xf VTK-9.2.5-macos.tar.gz
       - name: Golang
         uses: actions/setup-go@v3
       - name: Compile
@@ -81,8 +81,8 @@ jobs:
       - name: Install VTK
         run: |
           echo ("SP_TIME=daily-"+(get-date -format "yyyyMMddHH")) >> $env:GITHUB_ENV
-          C:/msys64/usr/bin/wget.exe https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.2-win.7z
-          7z x VTK-9.2.2-win.7z
+          C:/msys64/usr/bin/wget.exe https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.5-win.7z
+          7z x VTK-9.2.5-win.7z
       - name: Golang
         uses: actions/setup-go@v3
       - name: Compile

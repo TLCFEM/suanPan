@@ -241,7 +241,7 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 1.10.6
 - [**MUMPS**](http://mumps.enseeiht.fr/) version 5.2.1
 - [**METIS**](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview) version 5.1.0
-- [**VTK**](https://vtk.org/) version 9.2.2
+- [**VTK**](https://vtk.org/) version 9.2.5
 - [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 11.7
 - [**Armadillo**](http://arma.sourceforge.net/) version 11.4
 - [**ensmallen**](https://ensmallen.org/) version 2.19.0

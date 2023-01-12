@@ -6,8 +6,8 @@ RUN wget -q https://registrationcenter-download.intel.com/akdlm/irc_nas/19138/l_
 RUN sh ./l_onemkl_p_2023.0.0.25398_offline.sh -a --silent --eula accept && rm ./l_onemkl_p_2023.0.0.25398_offline.sh
 
 RUN mkdir vtk-build && cd vtk-build && \
-    wget -q https://www.vtk.org/files/release/9.2/VTK-9.2.2.tar.gz && tar xf VTK-9.2.2.tar.gz && \
-    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF ./VTK-9.2.2 && \
+    wget -q https://www.vtk.org/files/release/9.2/VTK-9.2.5.tar.gz && tar xf VTK-9.2.5.tar.gz && \
+    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF ./VTK-9.2.5 && \
     make install -j"$(nproc)" && cd .. && rm -r vtk-build
 
 RUN git clone -b dev --depth 1 https://github.com/TLCFEM/suanPan.git

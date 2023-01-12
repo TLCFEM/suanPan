@@ -14,8 +14,8 @@ jobs:
         run: |
           wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
           echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
-          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.2-linux.tar.gz
-          tar xf VTK-9.2.2-linux.tar.gz
+          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.5-linux.tar.gz
+          tar xf VTK-9.2.5-linux.tar.gz
       - name: Golang
         uses: actions/setup-go@v3
       - name: Compile
@@ -57,8 +57,8 @@ jobs:
         uses: actions/checkout@v3
       - name: Install MKL VTK
         run: |
-          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.2-linux.tar.gz
-          tar xf VTK-9.2.2-linux.tar.gz
+          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.5-linux.tar.gz
+          tar xf VTK-9.2.5-linux.tar.gz
       - name: Compile
         run: |
           source /opt/intel/oneapi/setvars.sh
