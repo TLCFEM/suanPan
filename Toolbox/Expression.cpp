@@ -40,12 +40,20 @@ bool Expression::compile(const std::string& expression_string) {
     return parser.compile(expression_string, expression);
 }
 
+double Expression::evaluate(const double in_x) { return evaluate(vec{in_x}); }
+
 double Expression::evaluate(const Col<double>& in_x) {
+    suanpan_assert([&] { if(x.n_elem != in_x.n_elem) throw std::runtime_error("input size mismatch"); });
+
     x = in_x;
     return expression.value();
 }
 
+Col<double> Expression::gradient(const double in_x) { return gradient(vec{in_x}); }
+
 Col<double> Expression::gradient(const Col<double>& in_x) {
+    suanpan_assert([&] { if(x.n_elem != in_x.n_elem) throw std::runtime_error("input size mismatch"); });
+
     x = in_x;
     Col<double> result(x.n_elem);
     for(uword I = 0; I < x.n_elem; ++I) result(I) = derivative(expression, x(I));

@@ -15,47 +15,41 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class Expression
- * @brief A Expression class represents a maths expression.
- *
+ * @class CustomElastic1D
+ * @brief A 1D Elastic class using custom constitutive equation.
  * @author tlc
  * @date 12/01/2023
- * @file Expression.h
- * @addtogroup Utility
+ * @file CustomElastic1D.h
+ * @addtogroup Material-1D
  * @{
  */
 
-#ifndef EXPRESSION_H
-#define EXPRESSION_H
+#ifndef CUSTOMELASTIC1D_H
+#define CUSTOMELASTIC1D_H
 
-#include <Domain/Tag.h>
-#include <exprtk/exprtk.hpp>
+#include <Material/Material1D/Material1D.h>
+#include <Toolbox/Expression.h>
 
-class Expression final : public Tag {
-    static std::mutex parser_lock;
-    static exprtk::parser<double> parser;
+class CustomElastic1D final : public Material1D {
+    const unsigned expression_tag;
 
-    Col<double> x;
-
-    exprtk::symbol_table<double> symbol_table;
-
-    exprtk::expression<double> expression;
-
-    std::string expression_text;
+    shared_ptr<Expression> expression;
 
 public:
-    Expression() = default;
-    explicit Expression(unsigned, const std::string&);
+    CustomElastic1D(unsigned,   // tag
+                    unsigned,   // expression tag
+                    double = 0. // density
+    );
 
-    [[nodiscard]] uword size() const;
+    int initialize(const shared_ptr<DomainBase>&) override;
 
-    bool compile(const std::string&);
+    unique_ptr<Material> get_copy() override;
 
-    double evaluate(double);
-    double evaluate(const Col<double>&);
+    int update_trial_status(const vec&) override;
 
-    Col<double> gradient(double);
-    Col<double> gradient(const Col<double>&);
+    int clear_status() override;
+    int commit_status() override;
+    int reset_status() override;
 
     void print() override;
 };

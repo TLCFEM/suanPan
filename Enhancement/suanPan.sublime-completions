@@ -1364,6 +1364,12 @@
       "trigger":"Tie"
     },
     {
+      "contents":"element CustomElastic1D ${1:(1)} ${2:(2)} ${3:[3]}\n# (1) int, unique element tag\n# (2) int, expression tag\n# (3) double, density, default: 0",
+      "details":"",
+      "kind":"type",
+      "trigger":"CustomElastic1D"
+    },
+    {
       "contents":"material Flag02 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, tension yield stress, positive\n# (4) double, tension residual stress, can be either positive or negative\n# (5) double, tension hardening ratio\n# (6) double, compression yield stress, negative\n# (7) double, compression residual stress, can be either positive or negative\n# (8) double, compression hardening ratio",
       "details":"",
       "kind":"type",

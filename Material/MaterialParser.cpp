@@ -1136,6 +1136,28 @@ void new_coulombfriction(unique_ptr<Material>& return_obj, istringstream& comman
     return_obj = make_unique<CoulombFriction>(tag, max_friction, factor);
 }
 
+void new_customelastic1d(unique_ptr<Material>& return_obj, istringstream& command) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    unsigned expression_tag;
+    if(!get_input(command, expression_tag)) {
+        suanpan_error("A valid expression tag is required.\n");
+        return;
+    }
+
+    auto density = 0.;
+    if(!get_optional_input(command, density)) {
+        suanpan_error("A valid density is required.\n");
+        return;
+    }
+
+    return_obj = make_unique<CustomElastic1D>(tag, expression_tag, density);
+}
+
 void new_dhakal(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -2982,6 +3004,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "ConcreteTable")) new_concretetable(new_material, command);
     else if(is_equal(material_id, "ConcreteTsai")) new_concretetsai(new_material, command);
     else if(is_equal(material_id, "CoulombFriction")) new_coulombfriction(new_material, command);
+    else if(is_equal(material_id, "CustomElastic1D")) new_customelastic1d(new_material, command);
     else if(is_equal(material_id, "Dhakal")) new_dhakal(new_material, command);
     else if(is_equal(material_id, "DafaliasManzari")) new_dafaliasmanzari(new_material, command);
     else if(is_equal(material_id, "Sinh1D")) new_sinh1d(new_material, command);
