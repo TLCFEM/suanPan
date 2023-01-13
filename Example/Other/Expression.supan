@@ -1,8 +1,9 @@
 # A TEST MODEL FOR EXPRESSION
 
 expression SimpleScalar 1 x|y x^2+y^2
+expression SimpleVector 2 x|2 y|2 y:=2x
 
-peek expression 1
+peek expression 1 2
 
 reset
 clear
