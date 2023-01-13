@@ -5,6 +5,10 @@ expression SimpleVector 2 x|2 y|2 y:=2x
 
 peek expression 1 2
 
+disable expression 1
+enable expression 1
+remove expression 1
+
 reset
 clear
 exit

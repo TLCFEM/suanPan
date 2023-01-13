@@ -712,17 +712,30 @@ int disable_object(const shared_ptr<Bead>& model, istringstream& command) {
     }
 
     if(unsigned tag; is_equal(object_type, "domain")) while(get_input(command, tag)) model->disable_domain(tag);
-    else if(is_equal(object_type, "amplitude")) while(get_input(command, tag)) domain->disable_amplitude(tag);
-    else if(is_equal(object_type, "constraint")) while(get_input(command, tag)) domain->disable_constraint(tag);
-    else if(is_equal(object_type, "converger")) while(get_input(command, tag)) domain->disable_converger(tag);
-    else if(is_equal(object_type, "criterion")) while(get_input(command, tag)) domain->disable_criterion(tag);
-    else if(is_equal(object_type, "element")) while(get_input(command, tag)) domain->disable_element(tag);
-    else if(is_equal(object_type, "group")) while(get_input(command, tag)) domain->disable_group(tag);
-    else if(is_equal(object_type, "integrator")) while(get_input(command, tag)) domain->disable_integrator(tag);
-    else if(is_equal(object_type, "load")) while(get_input(command, tag)) domain->disable_load(tag);
-    else if(is_equal(object_type, "material")) while(get_input(command, tag)) domain->disable_material(tag);
-    else if(is_equal(object_type, "modifier")) while(get_input(command, tag)) domain->disable_modifier(tag);
-    else if(is_equal(object_type, "node")) while(get_input(command, tag)) domain->disable_node(tag);
+    else if(is_equal(object_type, "amplitude"))
+        while(get_input(command, tag)) domain->disable_amplitude(tag);
+    else if(is_equal(object_type, "expression"))
+        while(get_input(command, tag)) domain->disable_expression(tag);
+    else if(is_equal(object_type, "constraint"))
+        while(get_input(command, tag)) domain->disable_constraint(tag);
+    else if(is_equal(object_type, "converger"))
+        while(get_input(command, tag)) domain->disable_converger(tag);
+    else if(is_equal(object_type, "criterion"))
+        while(get_input(command, tag)) domain->disable_criterion(tag);
+    else if(is_equal(object_type, "element"))
+        while(get_input(command, tag)) domain->disable_element(tag);
+    else if(is_equal(object_type, "group"))
+        while(get_input(command, tag)) domain->disable_group(tag);
+    else if(is_equal(object_type, "integrator"))
+        while(get_input(command, tag)) domain->disable_integrator(tag);
+    else if(is_equal(object_type, "load"))
+        while(get_input(command, tag)) domain->disable_load(tag);
+    else if(is_equal(object_type, "material"))
+        while(get_input(command, tag)) domain->disable_material(tag);
+    else if(is_equal(object_type, "modifier"))
+        while(get_input(command, tag)) domain->disable_modifier(tag);
+    else if(is_equal(object_type, "node"))
+        while(get_input(command, tag)) domain->disable_node(tag);
     else if(is_equal(object_type, "orientation")) while(get_input(command, tag)) domain->disable_orientation(tag);
     else if(is_equal(object_type, "recorder")) while(get_input(command, tag)) domain->disable_recorder(tag);
     else if(is_equal(object_type, "section")) while(get_input(command, tag)) domain->disable_section(tag);
@@ -747,17 +760,30 @@ int enable_object(const shared_ptr<Bead>& model, istringstream& command) {
     }
 
     if(unsigned tag; is_equal(object_type, "domain")) while(get_input(command, tag)) model->enable_domain(tag);
-    else if(is_equal(object_type, "amplitude")) while(get_input(command, tag)) domain->enable_amplitude(tag);
-    else if(is_equal(object_type, "constraint")) while(get_input(command, tag)) domain->enable_constraint(tag);
-    else if(is_equal(object_type, "converger")) while(get_input(command, tag)) domain->enable_converger(tag);
-    else if(is_equal(object_type, "criterion")) while(get_input(command, tag)) domain->enable_criterion(tag);
-    else if(is_equal(object_type, "element")) while(get_input(command, tag)) domain->enable_element(tag);
-    else if(is_equal(object_type, "group")) while(get_input(command, tag)) domain->enable_group(tag);
-    else if(is_equal(object_type, "integrator")) while(get_input(command, tag)) domain->enable_integrator(tag);
-    else if(is_equal(object_type, "load")) while(get_input(command, tag)) domain->enable_load(tag);
-    else if(is_equal(object_type, "material")) while(get_input(command, tag)) domain->enable_material(tag);
-    else if(is_equal(object_type, "modifier")) while(get_input(command, tag)) domain->enable_modifier(tag);
-    else if(is_equal(object_type, "node")) while(get_input(command, tag)) domain->enable_node(tag);
+    else if(is_equal(object_type, "amplitude"))
+        while(get_input(command, tag)) domain->enable_amplitude(tag);
+    else if(is_equal(object_type, "expression"))
+        while(get_input(command, tag)) domain->enable_expression(tag);
+    else if(is_equal(object_type, "constraint"))
+        while(get_input(command, tag)) domain->enable_constraint(tag);
+    else if(is_equal(object_type, "converger"))
+        while(get_input(command, tag)) domain->enable_converger(tag);
+    else if(is_equal(object_type, "criterion"))
+        while(get_input(command, tag)) domain->enable_criterion(tag);
+    else if(is_equal(object_type, "element"))
+        while(get_input(command, tag)) domain->enable_element(tag);
+    else if(is_equal(object_type, "group"))
+        while(get_input(command, tag)) domain->enable_group(tag);
+    else if(is_equal(object_type, "integrator"))
+        while(get_input(command, tag)) domain->enable_integrator(tag);
+    else if(is_equal(object_type, "load"))
+        while(get_input(command, tag)) domain->enable_load(tag);
+    else if(is_equal(object_type, "material"))
+        while(get_input(command, tag)) domain->enable_material(tag);
+    else if(is_equal(object_type, "modifier"))
+        while(get_input(command, tag)) domain->enable_modifier(tag);
+    else if(is_equal(object_type, "node"))
+        while(get_input(command, tag)) domain->enable_node(tag);
     else if(is_equal(object_type, "orientation")) while(get_input(command, tag)) domain->enable_orientation(tag);
     else if(is_equal(object_type, "recorder")) while(get_input(command, tag)) domain->enable_recorder(tag);
     else if(is_equal(object_type, "section")) while(get_input(command, tag)) domain->enable_section(tag);
@@ -783,17 +809,30 @@ int erase_object(const shared_ptr<Bead>& model, istringstream& command) {
     }
 
     if(unsigned tag; is_equal(object_type, "domain")) while(get_input(command, tag)) model->erase_domain(tag);
-    else if(is_equal(object_type, "amplitude")) while(get_input(command, tag)) domain->erase_amplitude(tag);
-    else if(is_equal(object_type, "constraint")) while(get_input(command, tag)) domain->erase_constraint(tag);
-    else if(is_equal(object_type, "converger")) while(get_input(command, tag)) domain->erase_converger(tag);
-    else if(is_equal(object_type, "criterion")) while(get_input(command, tag)) domain->erase_criterion(tag);
-    else if(is_equal(object_type, "element")) while(get_input(command, tag)) domain->erase_element(tag);
-    else if(is_equal(object_type, "group")) while(get_input(command, tag)) domain->erase_group(tag);
-    else if(is_equal(object_type, "integrator")) while(get_input(command, tag)) domain->erase_integrator(tag);
-    else if(is_equal(object_type, "load")) while(get_input(command, tag)) domain->erase_load(tag);
-    else if(is_equal(object_type, "material")) while(get_input(command, tag)) domain->erase_material(tag);
-    else if(is_equal(object_type, "modifier")) while(get_input(command, tag)) domain->erase_modifier(tag);
-    else if(is_equal(object_type, "node")) while(get_input(command, tag)) domain->erase_node(tag);
+    else if(is_equal(object_type, "amplitude"))
+        while(get_input(command, tag)) domain->erase_amplitude(tag);
+    else if(is_equal(object_type, "expression"))
+        while(get_input(command, tag)) domain->erase_expression(tag);
+    else if(is_equal(object_type, "constraint"))
+        while(get_input(command, tag)) domain->erase_constraint(tag);
+    else if(is_equal(object_type, "converger"))
+        while(get_input(command, tag)) domain->erase_converger(tag);
+    else if(is_equal(object_type, "criterion"))
+        while(get_input(command, tag)) domain->erase_criterion(tag);
+    else if(is_equal(object_type, "element"))
+        while(get_input(command, tag)) domain->erase_element(tag);
+    else if(is_equal(object_type, "group"))
+        while(get_input(command, tag)) domain->erase_group(tag);
+    else if(is_equal(object_type, "integrator"))
+        while(get_input(command, tag)) domain->erase_integrator(tag);
+    else if(is_equal(object_type, "load"))
+        while(get_input(command, tag)) domain->erase_load(tag);
+    else if(is_equal(object_type, "material"))
+        while(get_input(command, tag)) domain->erase_material(tag);
+    else if(is_equal(object_type, "modifier"))
+        while(get_input(command, tag)) domain->erase_modifier(tag);
+    else if(is_equal(object_type, "node"))
+        while(get_input(command, tag)) domain->erase_node(tag);
     else if(is_equal(object_type, "orientation")) while(get_input(command, tag)) domain->erase_orientation(tag);
     else if(is_equal(object_type, "recorder")) while(get_input(command, tag)) domain->erase_recorder(tag);
     else if(is_equal(object_type, "section")) while(get_input(command, tag)) domain->erase_section(tag);
