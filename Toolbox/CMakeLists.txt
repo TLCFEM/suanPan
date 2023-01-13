@@ -11,7 +11,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         resampling.cpp
         )
 
-add_library(expression STATIC Expression.cpp)
+add_library(expression STATIC Expression.cpp ExpressionParser.cpp)
 
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/Libs)
 

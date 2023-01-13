@@ -35,8 +35,6 @@ class Expression : public Tag {
     static std::mutex parser_mutex;
     static exprtk::parser<double> parser;
 
-    exprtk::symbol_table<double> symbol_table;
-
     std::string expression_text;
 
 protected:
@@ -44,8 +42,9 @@ protected:
 
     exprtk::expression<double> expression;
 
+    exprtk::symbol_table<double> symbol_table;
+
 public:
-    Expression() = default;
     explicit Expression(unsigned, const std::string&);
 
     [[nodiscard]] uword size() const;
@@ -53,11 +52,11 @@ public:
     bool compile(const std::string&);
     static string error();
 
-    double evaluate(double);
-    virtual double evaluate(const Col<double>&) = 0;
+    Mat<double> evaluate(double);
+    virtual Mat<double> evaluate(const Col<double>&) = 0;
 
-    Col<double> gradient(double);
-    virtual Col<double> gradient(const Col<double>&) = 0;
+    Mat<double> gradient(double);
+    virtual Mat<double> gradient(const Col<double>&) = 0;
 
     void print() override;
 };
@@ -66,9 +65,20 @@ class SimpleScalarExpression : public Expression {
 public:
     using Expression::Expression;
 
-    double evaluate(const Col<double>&) override;
+    Mat<double> evaluate(const Col<double>&) override;
 
-    Col<double> gradient(const Col<double>&) override;
+    Mat<double> gradient(const Col<double>&) override;
+};
+
+class SimpleVectorExpression : public Expression {
+    Col<double> y;
+
+public:
+    SimpleVectorExpression(unsigned, const std::string&, const std::string&);
+
+    Mat<double> evaluate(const Col<double>&) override;
+
+    Mat<double> gradient(const Col<double>&) override { throw std::runtime_error("gradient is not implemented for vector expression"); }
 };
 
 #endif

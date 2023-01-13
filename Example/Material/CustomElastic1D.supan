@@ -1,4 +1,4 @@
-expression 1 x x^3+x
+expression SimpleScalar 1 x x^3+x
 
 material CustomElastic1D 1 1
 

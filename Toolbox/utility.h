@@ -70,7 +70,7 @@ namespace suanpan {
     string to_lower(string&&);
 
     namespace expression {
-        std::vector<std::string> split(const std::string& variable_string);
+        std::vector<std::pair<string, unsigned>> split(const std::string& variable_string);
     } // namespace expression 
 }     // namespace suanpan
 

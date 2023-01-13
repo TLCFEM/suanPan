@@ -35,7 +35,7 @@ int CustomElastic1D::initialize(const shared_ptr<DomainBase>& D) {
         return SUANPAN_FAIL;
     }
 
-    trial_stiffness = current_stiffness = initial_stiffness = expression->gradient(vec{0.}).at(0);
+    trial_stiffness = current_stiffness = initial_stiffness = expression->gradient(vec{0.});
 
     return SUANPAN_SUCCESS;
 }
@@ -44,7 +44,7 @@ unique_ptr<Material> CustomElastic1D::get_copy() { return make_unique<CustomElas
 
 int CustomElastic1D::update_trial_status(const vec& t_strain) {
     trial_stress = expression->evaluate(trial_strain = t_strain);
-    trial_stiffness = expression->gradient(trial_strain).at(0);
+    trial_stiffness = expression->gradient(trial_strain);
     return SUANPAN_SUCCESS;
 }
 

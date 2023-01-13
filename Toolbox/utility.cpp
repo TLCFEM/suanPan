@@ -66,7 +66,7 @@ string suanpan::to_lower(string&& U) {
     return std::move(U);
 }
 
-std::vector<std::string> suanpan::expression::split(const std::string& variable_string) {
+std::vector<std::pair<string, unsigned>> suanpan::expression::split(const std::string& variable_string) {
     std::vector<std::string> variable_list;
     auto I = variable_string.cbegin(), J = variable_string.cbegin();
     while(I != variable_string.cend()) {
@@ -74,12 +74,20 @@ std::vector<std::string> suanpan::expression::split(const std::string& variable_
             if(I != J) variable_list.emplace_back(J, I);
             J = ++I;
         }
-        else ++I;
+        else
+            ++I;
     }
 
     if(I != J) variable_list.emplace_back(J, I);
 
-    return variable_list;
+    std::vector<std::pair<string, unsigned>> variable_size_list;
+    for(const auto& variable : variable_list)
+        if(is_integer(variable))
+            variable_size_list.back().second = std::stoi(variable);
+        else
+            variable_size_list.emplace_back(variable, 1);
+
+    return variable_size_list;
 }
 
 void ignore_whitespace(istringstream& I) {

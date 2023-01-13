@@ -18,41 +18,44 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable IdentifierTypo
 #include "command.h"
-#include <thread>
 #include <Constraint/Constraint.h>
 #include <Constraint/ConstraintParser.h>
 #include <Converger/Converger.h>
 #include <Converger/ConvergerParser.h>
 #include <Domain/Domain.h>
 #include <Domain/ExternalModule.h>
-#include <Domain/Node.h>
 #include <Domain/Group/ElementGroup.h>
 #include <Domain/Group/GroupGroup.h>
 #include <Domain/Group/NodeGroup.h>
-#include <Domain/MetaMat/SparseMatFGMRES.hpp>
+#include <Domain/Node.h>
 #include <Element/Element.h>
 #include <Element/ElementParser.h>
 #include <Element/Visualisation/vtkParser.h>
+#include <Load/Amplitude/Amplitude.h>
 #include <Load/Load.h>
 #include <Load/LoadParser.h>
-#include <Load/Amplitude/Amplitude.h>
 #include <Material/Material.h>
 #include <Material/MaterialParser.h>
 #include <Material/MaterialTester.h>
 #include <Recorder/Recorder.h>
 #include <Recorder/RecorderParser.h>
 #include <Section/SectionParser.h>
+#include <Solver/Integrator/Integrator.h>
 #include <Solver/Solver.h>
 #include <Solver/SolverParser.h>
-#include <Solver/Integrator/Integrator.h>
 #include <Step/Bead.h>
 #include <Step/Frequency.h>
 #include <Step/StepParser.h>
-#include <Toolbox/argument.h>
 #include <Toolbox/Expression.h>
+#include <Toolbox/ExpressionParser.h>
+#include <Toolbox/argument.h>
 #include <Toolbox/resampling.h>
 #include <Toolbox/response_spectrum.h>
 #include <Toolbox/thread_pool.hpp>
+#include <thread>
+#ifdef SUANPAN_MKL
+#include <Domain/MetaMat/SparseMatFGMRES.hpp>
+#endif
 #ifdef SUANPAN_WIN
 #include <Windows.h>
 #endif
@@ -116,6 +119,8 @@ int benchmark() {
     return SUANPAN_SUCCESS;
 }
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "misc-no-recursion"
 void overview() {
     const auto new_model = make_shared<Bead>();
 
@@ -220,7 +225,7 @@ void overview() {
     suanpan_highlight("file");
     suanpan_info("' command, the '");
     suanpan_highlight("benchmark");
-    suanpan_info("' command we just echoed will perform some matrix solving operations, and it may take a few minites. Type in '");
+    suanpan_info("' command we just echoed will perform some matrix solving operations, and it may take a few minutes. Type in '");
     suanpan_highlight("file benchmark.sp");
     suanpan_info("' to execute the file.\n");
     restore();
@@ -229,8 +234,8 @@ void overview() {
 
     redirect();
     suanpan_info("In the documentation [https://tlcfem.github.io/suanPan-manual/latest/], there is an [Example] section that provides some practical examples for you to try out. "
-        "The source code respository also contains a folder named [Example] in which example usages of most models/algorithms are given. Please feel free to check that out.\n\n"
-        "Hope you will find suanPan useful. As it aims to bring the latest finite element models/algorithms to practice, you are welcome to embed your amazing research outcomes into suanPan. Type in '");
+                 "The source code repository also contains a folder named [Example] in which example usages of most models/algorithms are given. Please feel free to check that out.\n\n"
+                 "Hope you will find suanPan useful. As it aims to bring the latest finite element models/algorithms to practice, you are welcome to embed your amazing research outcomes into suanPan. Type in '");
     suanpan_highlight("qrcode");
     suanpan_info("' to display a QR code for sharing. (UTF-8 is required, on Windows, some modern terminal such as Windows Terminal [https://github.com/microsoft/terminal] is recommended.)\n");
     restore();
@@ -246,6 +251,7 @@ void overview() {
     // ReSharper disable once CppExpressionWithoutSideEffects
     guide_command("q");
 }
+#pragma clang diagnostic pop
 
 void perform_upsampling(istringstream& command) {
     string file_name;
@@ -380,62 +386,8 @@ void perform_sdof_response(istringstream& command) {
         suanpan_info("Data is saved to file \"{}\".\n", motion_name);
 }
 
-int create_new_expression(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    string expression_type;
-    if(!get_input(command, expression_type)) {
-        suanpan_error("A valid expression type is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid amplitude type is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    string variable_list;
-    if(!get_input(command, variable_list)) {
-        suanpan_error("A valid vertical bar separated variable list is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    string expression;
-    if(!get_input(command, expression)) {
-        suanpan_error("A valid expression or expression file name is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    if(fs::exists(expression)) {
-        const ifstream file(expression);
-        if(!file.is_open()) {
-            suanpan_error("Fail to open \"{}\".\n", expression);
-            return SUANPAN_SUCCESS;
-        }
-
-        std::stringstream buffer;
-        buffer << file.rdbuf();
-        expression = buffer.str();
-    }
-
-    unique_ptr<Expression> expression_obj;
-
-    if(is_equal(expression_type, "SimpleScalar")) { expression_obj = make_unique<SimpleScalarExpression>(tag, variable_list); }
-
-    if(!expression_obj) {
-        suanpan_error("Unknown expression type \"{}\".\n", expression_type);
-        return SUANPAN_SUCCESS;
-    }
-
-    if(!expression_obj->compile(expression)) {
-        suanpan_error("Fail to parse \"{}\", error: {}.\n", expression, expression_obj->error());
-        return SUANPAN_SUCCESS;
-    }
-
-    domain->insert(std::move(expression_obj));
-
-    return SUANPAN_SUCCESS;
-}
-
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "misc-no-recursion"
 int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     if(nullptr == model) return SUANPAN_SUCCESS;
 
@@ -662,13 +614,17 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
         return SUANPAN_SUCCESS;
     }
 
-    if(is_equal(command_id, "version")) print_version();
+    if(is_equal(command_id, "version"))
+        print_version();
     else
         suanpan_error("Command \"{}\" not found.\n", command.str());
 
     return SUANPAN_SUCCESS;
 }
+#pragma clang diagnostic pop
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "misc-no-recursion"
 int process_file(const shared_ptr<Bead>& model, const char* file_name) {
     std::vector<string> file_list;
     file_list.reserve(9);
@@ -720,6 +676,7 @@ int process_file(const shared_ptr<Bead>& model, const char* file_name) {
 
     return SUANPAN_SUCCESS;
 }
+#pragma clang diagnostic pop
 
 int create_new_domain(const shared_ptr<Bead>& model, istringstream& command) {
     unsigned domain_id;
@@ -1564,6 +1521,8 @@ int print_info(const shared_ptr<DomainBase>& domain, istringstream& command) {
     return SUANPAN_SUCCESS;
 }
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "misc-no-recursion"
 int run_example() {
     const auto new_model = make_shared<Bead>();
 
@@ -1617,6 +1576,7 @@ int run_example() {
     suanpan_info("====================================================\n");
     return SUANPAN_SUCCESS;
 }
+#pragma clang diagnostic pop
 
 int print_command() {
     suanpan_info("The available commands are listed. Please check online manual for reference. https://tlcfem.gitbook.io/suanpan-manual/\n");

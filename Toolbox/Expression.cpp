@@ -23,30 +23,26 @@ exprtk::parser<double> Expression::parser;
 
 Expression::Expression(const unsigned tag, const std::string& variable_string)
     : Tag(tag) {
+    symbol_table.add_constants();
+
     const auto variable_list = suanpan::expression::split(variable_string);
 
-    std::vector<std::pair<string, unsigned>> variable_size_list;
-    for(const auto& I : variable_list)
-        if(is_integer(I)) variable_size_list.back().second = std::stoi(I);
-        else variable_size_list.emplace_back(I, 1);
-
-    x.zeros(std::accumulate(variable_size_list.cbegin(), variable_size_list.cend(), 0, [](const auto a, const auto b) { return a + b.second; }));
+    x.zeros(std::accumulate(variable_list.cbegin(), variable_list.cend(), 0, [](const auto a, const auto b) { return a + b.second; }));
 
     unsigned index = 0;
-    for(const auto& [name, length] : variable_size_list)
-        if(1 == length) symbol_table.add_variable(name, x(index++));
+    for(const auto& [name, length] : variable_list)
+        if(1 == length)
+            symbol_table.add_variable(name, x(index++));
         else {
             symbol_table.add_vector(name, x.memptr() + index, length);
             index += length;
         }
-
-    symbol_table.add_constants();
-    expression.register_symbol_table(symbol_table);
 }
 
 uword Expression::size() const { return x.n_elem; }
 
 bool Expression::compile(const std::string& expression_string) {
+    expression.register_symbol_table(symbol_table);
     expression_text = expression_string;
     std::scoped_lock lock{parser_mutex};
     return parser.compile(expression_string, expression);
@@ -54,26 +50,43 @@ bool Expression::compile(const std::string& expression_string) {
 
 string Expression::error() { return parser.error(); }
 
-double Expression::evaluate(const double in_x) { return evaluate(vec{in_x}); }
+Mat<double> Expression::evaluate(const double in_x) { return evaluate(vec{in_x}); }
 
-Col<double> Expression::gradient(const double in_x) { return gradient(vec{in_x}); }
+Mat<double> Expression::gradient(const double in_x) { return gradient(vec{in_x}); }
 
 void Expression::print() {
     suanpan_info("An expression represents \"{}\".", expression_text);
 }
 
-double SimpleScalarExpression::evaluate(const Col<double>& in_x) {
+Mat<double> SimpleScalarExpression::evaluate(const Col<double>& in_x) {
     suanpan_assert([&] { if(x.n_elem != in_x.n_elem) throw std::runtime_error("input size mismatch"); });
 
     x = in_x;
-    return expression.value();
+    return {expression.value()};
 }
 
-Col<double> SimpleScalarExpression::gradient(const Col<double>& in_x) {
+Mat<double> SimpleScalarExpression::gradient(const Col<double>& in_x) {
     suanpan_assert([&] { if(x.n_elem != in_x.n_elem) throw std::runtime_error("input size mismatch"); });
 
     x = in_x;
     Col<double> result(x.n_elem);
     for(uword I = 0; I < x.n_elem; ++I) result(I) = derivative(expression, x(I));
     return result;
+}
+
+SimpleVectorExpression::SimpleVectorExpression(const unsigned tag, const std::string& variable_string, const std::string& output_string)
+    : Expression(tag, variable_string) {
+    const auto variable_list = suanpan::expression::split(output_string);
+
+    y.zeros(variable_list[0].second);
+
+    symbol_table.add_vector(variable_list[0].first, y.memptr(), y.n_elem);
+}
+
+Mat<double> SimpleVectorExpression::evaluate(const Col<double>& in_x) {
+    suanpan_assert([&] { if(x.n_elem != in_x.n_elem) throw std::runtime_error("input size mismatch"); });
+
+    x = in_x;
+    expression.value();
+    return y;
 }
