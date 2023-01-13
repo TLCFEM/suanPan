@@ -27,17 +27,20 @@ Expression::Expression(const unsigned tag, const std::string& variable_string)
 
     std::vector<std::pair<string, unsigned>> variable_size_list;
     for(const auto& I : variable_list)
-        if(is_integer(I)) variable_size_list.back().second = std::stoi(I);
-        else variable_size_list.emplace_back(I, 1);
+        if(is_integer(I))
+            variable_size_list.back().second = std::stoi(I);
+        else
+            variable_size_list.emplace_back(I, 1);
 
     x.zeros(std::accumulate(variable_size_list.cbegin(), variable_size_list.cend(), 0, [](const auto a, const auto b) { return a + b.second; }));
 
     unsigned index = 0;
-    for(const auto& [name, size] : variable_size_list)
-        if(1 == size) symbol_table.add_variable(name, x(index++));
+    for(const auto& [name, length] : variable_size_list)
+        if(1 == length)
+            symbol_table.add_variable(name, x(index++));
         else {
-            symbol_table.add_vector(name, x.memptr() + index, size);
-            index += size;
+            symbol_table.add_vector(name, x.memptr() + index, length);
+            index += length;
         }
 
     symbol_table.add_constants();
