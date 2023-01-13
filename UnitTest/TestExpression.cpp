@@ -17,21 +17,37 @@ TEST_CASE("Variable Split", "[Utility.Expression]") {
     }
 }
 
-TEST_CASE("Expression Evaluation", "[Utility.Expression]") {
-    auto expression = Expression(0, "x|y");
+TEST_CASE("Simple Scalar Evaluation", "[Utility.Expression]") {
+    auto expression = SimpleScalarExpression(0, "x|y");
 
     REQUIRE(expression.compile("x^2+y^2+2*x*y") == true);
 
     mat test_data = randn(2, 100);
 
     suanpan_for(0llu, test_data.n_cols, [&](const uword I) {
-        const auto& x = test_data(0, I);
-        const auto& y = test_data(1, I);
+        const auto &x = test_data(0, I), &y = test_data(1, I);
         const auto f = x * x + y * y + 2. * x * y;
         REQUIRE(expression.evaluate(test_data.col(I)) == Approx(f));
         const auto df = 2. * (x + y);
         const auto gradient = expression.gradient(test_data.col(I));
         for(auto J = 0llu; J < test_data.n_rows; ++J)
             REQUIRE(gradient(J) == Approx(df));
+    });
+}
+
+TEST_CASE("Simple Dot Evaluation", "[Utility.Expression]") {
+    auto expression = SimpleScalarExpression(0, "x|2");
+
+    REQUIRE(expression.compile("sum(x)") == true);
+
+    mat test_data = randn(2, 100);
+
+    suanpan_for(0llu, test_data.n_cols, [&](const uword I) {
+        const auto &x = test_data(0, I), &y = test_data(1, I);
+        const auto f = x + y;
+        REQUIRE(expression.evaluate(test_data.col(I)) == Approx(f));
+        const auto gradient = expression.gradient(test_data.col(I));
+        for(auto J = 0llu; J < test_data.n_rows; ++J)
+            REQUIRE(gradient(J) == Approx(1));
     });
 }

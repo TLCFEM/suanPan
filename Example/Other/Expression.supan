@@ -1,6 +1,6 @@
 # A TEST MODEL FOR EXPRESSION
 
-expression 1 x|y x^2+y^2
+expression SimpleScalar 1 x|y x^2+y^2
 
 peek expression 1
 

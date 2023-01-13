@@ -1352,8 +1352,8 @@
       "trigger":"CIN3D8"
     },
     {
-      "contents":"expression ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique expression tag\n# (2) string, variable list, vertical line separated\n# (3) string, expression or name of file containing expression",
-      "details":"Maths Expression",
+      "contents":"expression SimpleScalar ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique expression tag\n# (2) string, variable list, vertical line separated\n# (3) string, expression or name of file containing expression",
+      "details":"Simple Scalar Valued Maths Expression",
       "kind":"type",
       "trigger":"expression"
     },

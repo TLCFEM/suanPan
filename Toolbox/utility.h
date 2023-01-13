@@ -131,4 +131,6 @@ bool is_false(const char*);
 bool is_true(const string&);
 bool is_false(const string&);
 
+bool is_integer(const string&);
+
 #endif

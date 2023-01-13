@@ -2962,7 +2962,7 @@ void new_yeoh(unique_ptr<Material>& return_obj, istringstream& command) {
 int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& command) {
     string material_id;
     if(!get_input(command, material_id)) {
-        suanpan_error("A valid tag is required.\n");
+        suanpan_error("A valid material type is required.\n");
         return 0;
     }
 

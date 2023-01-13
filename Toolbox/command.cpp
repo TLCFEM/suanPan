@@ -381,6 +381,12 @@ void perform_sdof_response(istringstream& command) {
 }
 
 int create_new_expression(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    string expression_type;
+    if(!get_input(command, expression_type)) {
+        suanpan_error("A valid expression type is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid amplitude type is required.\n");
@@ -411,10 +417,17 @@ int create_new_expression(const shared_ptr<DomainBase>& domain, istringstream& c
         expression = buffer.str();
     }
 
-    auto expression_obj = make_unique<Expression>(tag, variable_list);
+    unique_ptr<Expression> expression_obj;
+
+    if(is_equal(expression_type, "SimpleScalar")) { expression_obj = make_unique<SimpleScalarExpression>(tag, variable_list); }
+
+    if(!expression_obj) {
+        suanpan_error("Unknown expression type \"{}\".\n", expression_type);
+        return SUANPAN_SUCCESS;
+    }
 
     if(!expression_obj->compile(expression)) {
-        suanpan_error("Fail to parse \"{}\".\n", expression);
+        suanpan_error("Fail to parse \"{}\", error: {}.\n", expression, expression_obj->error());
         return SUANPAN_SUCCESS;
     }
 

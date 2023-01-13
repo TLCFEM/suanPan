@@ -31,17 +31,18 @@
 #include <Domain/Tag.h>
 #include <exprtk/exprtk.hpp>
 
-class Expression final : public Tag {
+class Expression : public Tag {
     static std::mutex parser_mutex;
     static exprtk::parser<double> parser;
 
-    Col<double> x;
-
     exprtk::symbol_table<double> symbol_table;
 
-    exprtk::expression<double> expression;
-
     std::string expression_text;
+
+protected:
+    Col<double> x;
+
+    exprtk::expression<double> expression;
 
 public:
     Expression() = default;
@@ -50,14 +51,24 @@ public:
     [[nodiscard]] uword size() const;
 
     bool compile(const std::string&);
+    static string error();
 
     double evaluate(double);
-    double evaluate(const Col<double>&);
+    virtual double evaluate(const Col<double>&) = 0;
 
     Col<double> gradient(double);
-    Col<double> gradient(const Col<double>&);
+    virtual Col<double> gradient(const Col<double>&) = 0;
 
     void print() override;
+};
+
+class SimpleScalarExpression : public Expression {
+public:
+    using Expression::Expression;
+
+    double evaluate(const Col<double>&) override;
+
+    Col<double> gradient(const Col<double>&) override;
 };
 
 #endif
