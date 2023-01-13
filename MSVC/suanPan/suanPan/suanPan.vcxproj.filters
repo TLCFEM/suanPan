@@ -1456,6 +1456,9 @@
     <ClCompile Include="..\..\..\Material\Material1D\Elastic\CustomElastic1D.cpp">
       <Filter>Material\Material1D\Elastic</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\ExpressionParser.cpp">
+      <Filter>Toolbox</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2769,6 +2772,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material1D\Elastic\CustomElastic1D.h">
       <Filter>Material\Material1D\Elastic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\ExpressionParser.h">
+      <Filter>Toolbox</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

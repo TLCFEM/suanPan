@@ -119,8 +119,6 @@ int benchmark() {
     return SUANPAN_SUCCESS;
 }
 
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "misc-no-recursion"
 void overview() {
     const auto new_model = make_shared<Bead>();
 
@@ -251,7 +249,6 @@ void overview() {
     // ReSharper disable once CppExpressionWithoutSideEffects
     guide_command("q");
 }
-#pragma clang diagnostic pop
 
 void perform_upsampling(istringstream& command) {
     string file_name;
@@ -386,8 +383,6 @@ void perform_sdof_response(istringstream& command) {
         suanpan_info("Data is saved to file \"{}\".\n", motion_name);
 }
 
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "misc-no-recursion"
 int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     if(nullptr == model) return SUANPAN_SUCCESS;
 
@@ -620,10 +615,7 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
 
     return SUANPAN_SUCCESS;
 }
-#pragma clang diagnostic pop
 
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "misc-no-recursion"
 int process_file(const shared_ptr<Bead>& model, const char* file_name) {
     std::vector<string> file_list;
     file_list.reserve(9);
@@ -675,7 +667,6 @@ int process_file(const shared_ptr<Bead>& model, const char* file_name) {
 
     return SUANPAN_SUCCESS;
 }
-#pragma clang diagnostic pop
 
 int create_new_domain(const shared_ptr<Bead>& model, istringstream& command) {
     unsigned domain_id;
@@ -1523,8 +1514,6 @@ int print_info(const shared_ptr<DomainBase>& domain, istringstream& command) {
     return SUANPAN_SUCCESS;
 }
 
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "misc-no-recursion"
 int run_example() {
     const auto new_model = make_shared<Bead>();
 
@@ -1578,7 +1567,6 @@ int run_example() {
     suanpan_info("====================================================\n");
     return SUANPAN_SUCCESS;
 }
-#pragma clang diagnostic pop
 
 int print_command() {
     suanpan_info("The available commands are listed. Please check online manual for reference. https://tlcfem.gitbook.io/suanpan-manual/\n");
