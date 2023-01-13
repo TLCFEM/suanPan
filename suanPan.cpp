@@ -26,14 +26,14 @@
 int main(int argc, char** argv) {
 #ifdef SUANPAN_WIN
 #if defined(SUANPAN_DEBUG) && defined(SUANPAN_MSVC)
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
     SetConsoleCP(CP_UTF8);
     SetConsoleOutputCP(CP_UTF8);
 #endif
 
 #ifdef SUANPAN_DEBUG
-	argument_parser(argc, argv);
+    argument_parser(argc, argv);
 #else
     try { argument_parser(argc, argv); }
     catch(const std::exception& e) { suanpan_fatal("Some unexpected error happens: {}, please file a bug report via https://github.com/TLCFEM/suanPan/issues.\n", e.what()); }

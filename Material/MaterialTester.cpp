@@ -48,8 +48,8 @@ void save_result(const mat& result) {
     if(!result.save("RESULT.h5", hdf5_binary_trans))
         suanpan_error("Fail to save to file.\n");
 #else
-	if(!result.save("RESULT.txt", raw_ascii))
-		suanpan_error("Fail to save to file.\n");
+    if(!result.save("RESULT.txt", raw_ascii))
+        suanpan_error("Fail to save to file.\n");
 #endif
 }
 

@@ -19,7 +19,7 @@
 #include <Toolbox/utility.h>
 
 std::mutex Expression::parser_mutex;
-exprtk::parser<double> Expression::parser;
+exprtk::parser<double> Expression::parser; // NOLINT(cppcoreguidelines-interfaces-global-init)
 
 Expression::Expression(const unsigned tag, const std::string& variable_string)
     : Tag(tag) {
@@ -31,8 +31,7 @@ Expression::Expression(const unsigned tag, const std::string& variable_string)
 
     unsigned index = 0;
     for(const auto& [name, length] : variable_list)
-        if(1 == length)
-            symbol_table.add_variable(name, x(index++));
+        if(1 == length) symbol_table.add_variable(name, x(index++));
         else {
             symbol_table.add_vector(name, x.memptr() + index, length);
             index += length;
@@ -87,6 +86,7 @@ Mat<double> SimpleVectorExpression::evaluate(const Col<double>& in_x) {
     suanpan_assert([&] { if(x.n_elem != in_x.n_elem) throw std::runtime_error("input size mismatch"); });
 
     x = in_x;
+    // ReSharper disable once CppExpressionWithoutSideEffects
     expression.value();
     return y;
 }

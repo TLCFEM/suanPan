@@ -1089,7 +1089,7 @@ int Domain::process_load(const bool full) {
 #ifdef SUANPAN_MT
         oneapi::tbb::this_task_arena::isolate([&] { code += std::invoke(process_handler, t_load, shared_from_this()); });
 #else
-		code += std::invoke(process_handler, t_load, shared_from_this());
+        code += std::invoke(process_handler, t_load, shared_from_this());
 #endif
         if(!t_load->get_trial_load().empty()) {
             std::scoped_lock trial_load_lock(factory->get_trial_load_mutex());
@@ -1134,7 +1134,7 @@ int Domain::process_constraint(const bool full) {
 #ifdef SUANPAN_MT
         oneapi::tbb::this_task_arena::isolate([&] { code += std::invoke(process_handler, t_constraint, shared_from_this()); });
 #else
-		code += std::invoke(process_handler, t_constraint, shared_from_this());
+        code += std::invoke(process_handler, t_constraint, shared_from_this());
 #endif
         if(const auto multiplier_size = t_constraint->get_multiplier_size(); multiplier_size > 0) {
             counter += multiplier_size;

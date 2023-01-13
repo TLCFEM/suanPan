@@ -10,9 +10,9 @@
 2. add command `overview`
 3. update `OpenBLAS` to version `0.3.21`
 4. add Euler buckling load check for `T2D2`
-5. speed-up analysis with visualisation recorder
+5. speed-up analysis with visualisation recorder [#102](https://github.com/TLCFEM/suanPan/pull/102)
 6. update `VTK` to version `9.2.5`
-7. add `Expression` to support custom function definition
+7. add `Expression` to support custom function definition [#105](https://github.com/TLCFEM/suanPan/pull/105)
 
 ## version 2.7
 

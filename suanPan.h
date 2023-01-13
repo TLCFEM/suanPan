@@ -283,7 +283,7 @@ namespace suanpan {
 
 inline void suanpan_assert(const std::function<void()>& F) {
 #ifdef SUANPAN_DEBUG
-	F();
+    F();
 #endif
 }
 #ifdef SUANPAN_MSVC

@@ -74,8 +74,7 @@ std::vector<std::pair<string, unsigned>> suanpan::expression::split(const std::s
             if(I != J) variable_list.emplace_back(J, I);
             J = ++I;
         }
-        else
-            ++I;
+        else ++I;
     }
 
     if(I != J) variable_list.emplace_back(J, I);
@@ -84,10 +83,8 @@ std::vector<std::pair<string, unsigned>> suanpan::expression::split(const std::s
 
     std::vector<std::pair<string, unsigned>> variable_size_list;
     for(const auto& variable : variable_list)
-        if(is_integer(variable))
-            variable_size_list.back().second = std::stoi(variable);
-        else
-            variable_size_list.emplace_back(variable, 1);
+        if(is_integer(variable)) variable_size_list.back().second = std::stoi(variable);
+        else variable_size_list.emplace_back(variable, 1);
 
     return variable_size_list;
 }
