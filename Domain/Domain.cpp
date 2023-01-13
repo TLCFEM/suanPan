@@ -1213,7 +1213,7 @@ void Domain::enable_all() {
 }
 
 void Domain::summary() const {
-    suanpan_info("Domain {} contains:\n\t{} nodes, {} elements, {} materials,\n", get_tag(), get_node(), get_element(), get_material());
+    suanpan_info("Domain {} contains:\n\t{} nodes, {} elements, {} materials, {} expressions,\n", get_tag(), get_node(), get_element(), get_material(), get_expression());
     suanpan_info("\t{} loads, {} constraints and {} recorders.\n", get_load(), get_constraint(), get_recorder());
 }
 
