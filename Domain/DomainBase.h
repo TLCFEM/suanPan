@@ -43,6 +43,7 @@ using std::future;
 
 template<sp_d T> class Factory;
 class Amplitude;
+class Expression;
 class Constraint;
 class Converger;
 class Criterion;
@@ -62,6 +63,7 @@ class Solver;
 class Step;
 
 using AmplitudeQueue = std::vector<shared_ptr<Amplitude>>;
+using ExpressionQueue = std::vector<shared_ptr<Expression>>;
 using ConstraintQueue = std::vector<shared_ptr<Constraint>>;
 using ConvergerQueue = std::vector<shared_ptr<Converger>>;
 using CriterionQueue = std::vector<shared_ptr<Criterion>>;
@@ -111,6 +113,7 @@ public:
     [[nodiscard]] virtual const std::vector<shared_ptr<ExternalModule>>& get_external_module_pool() const = 0;
 
     virtual bool insert(const shared_ptr<Amplitude>&) = 0;
+    virtual bool insert(const shared_ptr<Expression>&) = 0;
     virtual bool insert(const shared_ptr<Constraint>&) = 0;
     virtual bool insert(const shared_ptr<Converger>&) = 0;
     virtual bool insert(const shared_ptr<Criterion>&) = 0;
@@ -130,6 +133,7 @@ public:
 
     template<typename T> bool erase(unsigned);
     virtual bool erase_amplitude(unsigned) = 0;
+    virtual bool erase_expression(unsigned) = 0;
     virtual bool erase_constraint(unsigned) = 0;
     virtual bool erase_converger(unsigned) = 0;
     virtual bool erase_criterion(unsigned) = 0;
@@ -148,6 +152,7 @@ public:
     virtual bool erase_step(unsigned) = 0;
 
     virtual void disable_amplitude(unsigned) = 0;
+    virtual void disable_expression(unsigned) = 0;
     virtual void disable_constraint(unsigned) = 0;
     virtual void disable_converger(unsigned) = 0;
     virtual void disable_criterion(unsigned) = 0;
@@ -166,6 +171,7 @@ public:
     virtual void disable_step(unsigned) = 0;
 
     virtual void enable_amplitude(unsigned) = 0;
+    virtual void enable_expression(unsigned) = 0;
     virtual void enable_constraint(unsigned) = 0;
     virtual void enable_converger(unsigned) = 0;
     virtual void enable_criterion(unsigned) = 0;
@@ -187,6 +193,7 @@ public:
     template<typename T> const shared_ptr<T>& get(uword);
     template<typename T> std::vector<shared_ptr<T>> get(const uvec&);
     [[nodiscard]] virtual const shared_ptr<Amplitude>& get_amplitude(unsigned) const = 0;
+    [[nodiscard]] virtual const shared_ptr<Expression>& get_expression(unsigned) const = 0;
     [[nodiscard]] virtual const shared_ptr<Constraint>& get_constraint(unsigned) const = 0;
     [[nodiscard]] virtual const shared_ptr<Converger>& get_converger(unsigned) const = 0;
     [[nodiscard]] virtual const shared_ptr<Criterion>& get_criterion(unsigned) const = 0;
@@ -206,6 +213,7 @@ public:
 
     template<typename T> const std::vector<shared_ptr<T>>& get_pool();
     [[nodiscard]] virtual const AmplitudeQueue& get_amplitude_pool() const = 0;
+    [[nodiscard]] virtual const ExpressionQueue& get_expression_pool() const = 0;
     [[nodiscard]] virtual const ConstraintQueue& get_constraint_pool() const = 0;
     [[nodiscard]] virtual const ConvergerQueue& get_converger_pool() const = 0;
     [[nodiscard]] virtual const CriterionQueue& get_criterion_pool() const = 0;
@@ -224,6 +232,7 @@ public:
     [[nodiscard]] virtual const StepQueue& get_step_pool() const = 0;
 
     friend shared_ptr<Amplitude>& get_amplitude(const shared_ptr<DomainBase>&, unsigned);
+    friend shared_ptr<Expression>& get_expression(const shared_ptr<DomainBase>&, unsigned);
     friend shared_ptr<Constraint>& get_constraint(const shared_ptr<DomainBase>&, unsigned);
     friend shared_ptr<Converger>& get_converger(const shared_ptr<DomainBase>&, unsigned);
     friend shared_ptr<Criterion>& get_criterion(const shared_ptr<DomainBase>&, unsigned);
@@ -243,6 +252,7 @@ public:
 
     template<typename T> size_t get();
     [[nodiscard]] virtual size_t get_amplitude() const = 0;
+    [[nodiscard]] virtual size_t get_expression() const = 0;
     [[nodiscard]] virtual size_t get_constraint() const = 0;
     [[nodiscard]] virtual size_t get_converger() const = 0;
     [[nodiscard]] virtual size_t get_criterion() const = 0;
@@ -264,6 +274,7 @@ public:
     template<typename T> bool find(uword);
     template<typename T> bool find(const uvec&);
     [[nodiscard]] virtual bool find_amplitude(unsigned) const = 0;
+    [[nodiscard]] virtual bool find_expression(unsigned) const = 0;
     [[nodiscard]] virtual bool find_constraint(unsigned) const = 0;
     [[nodiscard]] virtual bool find_converger(unsigned) const = 0;
     [[nodiscard]] virtual bool find_criterion(unsigned) const = 0;
@@ -403,6 +414,8 @@ template<typename T> bool DomainBase::erase(unsigned) { throw invalid_argument("
 
 template<> inline bool DomainBase::erase<Amplitude>(const unsigned T) { return erase_amplitude(T); }
 
+template<> inline bool DomainBase::erase<Expression>(const unsigned T) { return erase_expression(T); }
+
 template<> inline bool DomainBase::erase<Constraint>(const unsigned T) { return erase_constraint(T); }
 
 template<> inline bool DomainBase::erase<Converger>(const unsigned T) { return erase_converger(T); }
@@ -450,6 +463,8 @@ template<typename T> std::vector<shared_ptr<T>> DomainBase::get(const uvec& P) {
 
 template<> inline const shared_ptr<Amplitude>& DomainBase::get<Amplitude>(const uword T) { return get_amplitude(static_cast<unsigned>(T)); }
 
+template<> inline const shared_ptr<Expression>& DomainBase::get<Expression>(const uword T) { return get_expression(static_cast<unsigned>(T)); }
+
 template<> inline const shared_ptr<Constraint>& DomainBase::get<Constraint>(const uword T) { return get_constraint(static_cast<unsigned>(T)); }
 
 template<> inline const shared_ptr<Converger>& DomainBase::get<Converger>(const uword T) { return get_converger(static_cast<unsigned>(T)); }
@@ -483,6 +498,8 @@ template<> inline const shared_ptr<Solver>& DomainBase::get<Solver>(const uword 
 template<> inline const shared_ptr<Step>& DomainBase::get<Step>(const uword T) { return get_step(static_cast<unsigned>(T)); }
 
 template<> inline const shared_ptr<Amplitude>& DomainBase::get<Amplitude>(const unsigned T) { return get_amplitude(T); }
+
+template<> inline const shared_ptr<Expression>& DomainBase::get<Expression>(const unsigned T) { return get_expression(T); }
 
 template<> inline const shared_ptr<Constraint>& DomainBase::get<Constraint>(const unsigned T) { return get_constraint(T); }
 
@@ -520,6 +537,8 @@ template<typename T> const std::vector<shared_ptr<T>>& DomainBase::get_pool() { 
 
 template<> inline const std::vector<shared_ptr<Amplitude>>& DomainBase::get_pool<Amplitude>() { return get_amplitude_pool(); }
 
+template<> inline const std::vector<shared_ptr<Expression>>& DomainBase::get_pool<Expression>() { return get_expression_pool(); }
+
 template<> inline const std::vector<shared_ptr<Constraint>>& DomainBase::get_pool<Constraint>() { return get_constraint_pool(); }
 
 template<> inline const std::vector<shared_ptr<Converger>>& DomainBase::get_pool<Converger>() { return get_converger_pool(); }
@@ -553,6 +572,8 @@ template<> inline const std::vector<shared_ptr<Solver>>& DomainBase::get_pool<So
 template<typename T> size_t DomainBase::get() { throw invalid_argument("unsupported"); }
 
 template<> inline size_t DomainBase::get<Amplitude>() { return get_amplitude(); }
+
+template<> inline size_t DomainBase::get<Expression>() { return get_expression(); }
 
 template<> inline size_t DomainBase::get<Constraint>() { return get_constraint(); }
 
@@ -598,6 +619,8 @@ template<typename T> bool DomainBase::find(const uvec& P) {
 
 template<> inline bool DomainBase::find<Amplitude>(const uword T) { return find_amplitude(static_cast<unsigned>(T)); }
 
+template<> inline bool DomainBase::find<Expression>(const uword T) { return find_expression(static_cast<unsigned>(T)); }
+
 template<> inline bool DomainBase::find<Constraint>(const uword T) { return find_constraint(static_cast<unsigned>(T)); }
 
 template<> inline bool DomainBase::find<Converger>(const uword T) { return find_converger(static_cast<unsigned>(T)); }
@@ -631,6 +654,8 @@ template<> inline bool DomainBase::find<Solver>(const uword T) { return find_sol
 template<> inline bool DomainBase::find<Step>(const uword T) { return find_step(static_cast<unsigned>(T)); }
 
 template<> inline bool DomainBase::find<Amplitude>(const unsigned T) { return find_amplitude(T); }
+
+template<> inline bool DomainBase::find<Expression>(const unsigned T) { return find_expression(T); }
 
 template<> inline bool DomainBase::find<Constraint>(const unsigned T) { return find_constraint(T); }
 

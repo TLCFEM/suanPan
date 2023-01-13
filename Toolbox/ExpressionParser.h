@@ -15,29 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include <Toolbox/argument.h>
-#include <suanPan.h>
+#ifndef EXPRESSIONPARSER_H
+#define EXPRESSIONPARSER_H
 
-#ifdef SUANPAN_WIN
-#include <Windows.h>
-#endif
+#include <memory>
 
-// ReSharper disable once CppParameterMayBeConst
-int main(int argc, char** argv) {
-#ifdef SUANPAN_WIN
-#if defined(SUANPAN_DEBUG) && defined(SUANPAN_MSVC)
-    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-#endif
-    SetConsoleCP(CP_UTF8);
-    SetConsoleOutputCP(CP_UTF8);
-#endif
+class DomainBase;
 
-#ifdef SUANPAN_DEBUG
-    argument_parser(argc, argv);
-#else
-    try { argument_parser(argc, argv); }
-    catch(const std::exception& e) { suanpan_fatal("Some unexpected error happens: {}, please file a bug report via https://github.com/TLCFEM/suanPan/issues.\n", e.what()); }
-#endif
+int create_new_expression(const std::shared_ptr<DomainBase>&, std::istringstream&);
 
-    return SUANPAN_SUCCESS;
-}
+#endif

@@ -115,7 +115,8 @@ void vtk_setup(const vtkSmartPointer<vtkUnstructuredGrid>& grid, const vtkInfo& 
     interactor->Start();
 }
 
-void vtk_save(vtkSmartPointer<vtkUnstructuredGrid>&& grid, const vtkInfo config) { // NOLINT(performance-unnecessary-value-param)
+void vtk_save(vtkSmartPointer<vtkUnstructuredGrid>&& grid, const vtkInfo config) {
+    // NOLINT(performance-unnecessary-value-param)
     const auto writer = vtkSmartPointer<vtkUnstructuredGridWriter>::New();
     writer->SetInputData(grid);
     writer->SetFileName(config.file_name.c_str());

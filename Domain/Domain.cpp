@@ -36,6 +36,7 @@
 #include <Step/Step.h>
 #include <Toolbox/sort_color.hpp>
 #include <Toolbox/sort_rcm.h>
+#include <Toolbox/Expression.h>
 #include <numeric>
 #include <array>
 
@@ -72,6 +73,11 @@ const ExternalModuleQueue& Domain::get_external_module_pool() const { return ext
 bool Domain::insert(const shared_ptr<Amplitude>& A) {
     updated = false;
     return amplitude_pond.insert(A);
+}
+
+bool Domain::insert(const shared_ptr<Expression>& E) {
+    updated = false;
+    return expression_pond.insert(E);
 }
 
 bool Domain::insert(const shared_ptr<Constraint>& C) {
@@ -159,6 +165,13 @@ bool Domain::erase_amplitude(const unsigned T) {
 
     updated = false;
     return amplitude_pond.erase(T);
+}
+
+bool Domain::erase_expression(const unsigned T) {
+    if(!find<Expression>(T)) return true;
+
+    updated = false;
+    return expression_pond.erase(T);
 }
 
 bool Domain::erase_constraint(const unsigned T) {
@@ -278,6 +291,13 @@ void Domain::disable_amplitude(const unsigned T) {
 
     updated = false;
     amplitude_pond.disable(T);
+}
+
+void Domain::disable_expression(const unsigned T) {
+    if(!find<Expression>(T) || !get<Expression>(T)->is_active() || get<Expression>(T)->is_guarded()) return;
+
+    updated = false;
+    expression_pond.disable(T);
 }
 
 void Domain::disable_constraint(const unsigned T) {
@@ -400,6 +420,13 @@ void Domain::enable_amplitude(const unsigned T) {
     amplitude_pond.enable(T);
 }
 
+void Domain::enable_expression(const unsigned T) {
+    if(!find<Expression>(T) || get<Expression>(T)->is_active()) return;
+
+    updated = false;
+    expression_pond.enable(T);
+}
+
 void Domain::enable_constraint(const unsigned T) {
     if(!find<Constraint>(T) || get<Constraint>(T)->is_active()) return;
 
@@ -515,6 +542,8 @@ void Domain::enable_step(const unsigned T) {
 
 const shared_ptr<Amplitude>& Domain::get_amplitude(const unsigned T) const { return amplitude_pond.at(T); }
 
+const shared_ptr<Expression>& Domain::get_expression(const unsigned T) const { return expression_pond.at(T); }
+
 const shared_ptr<Constraint>& Domain::get_constraint(const unsigned T) const { return constraint_pond.at(T); }
 
 const shared_ptr<Converger>& Domain::get_converger(const unsigned T) const { return converger_pond.at(T); }
@@ -548,6 +577,8 @@ const shared_ptr<Solver>& Domain::get_solver(const unsigned T) const { return so
 const shared_ptr<Step>& Domain::get_step(const unsigned T) const { return step_pond.at(T); }
 
 const AmplitudeQueue& Domain::get_amplitude_pool() const { return amplitude_pond.get(); }
+
+const ExpressionQueue& Domain::get_expression_pool() const { return expression_pond.get(); }
 
 const ConstraintQueue& Domain::get_constraint_pool() const { return constraint_pond.get(); }
 
@@ -583,6 +614,8 @@ const StepQueue& Domain::get_step_pool() const { return step_pond; }
 
 size_t Domain::get_amplitude() const { return amplitude_pond.size(); }
 
+size_t Domain::get_expression() const { return expression_pond.size(); }
+
 size_t Domain::get_constraint() const { return constraint_pond.size(); }
 
 size_t Domain::get_converger() const { return converger_pond.size(); }
@@ -616,6 +649,8 @@ size_t Domain::get_solver() const { return solver_pond.size(); }
 size_t Domain::get_step() const { return step_pond.size(); }
 
 bool Domain::find_amplitude(const unsigned T) const { return amplitude_pond.find(T); }
+
+bool Domain::find_expression(const unsigned T) const { return expression_pond.find(T); }
 
 bool Domain::find_constraint(const unsigned T) const { return constraint_pond.find(T); }
 
@@ -1054,7 +1089,7 @@ int Domain::process_load(const bool full) {
 #ifdef SUANPAN_MT
         oneapi::tbb::this_task_arena::isolate([&] { code += std::invoke(process_handler, t_load, shared_from_this()); });
 #else
-		code += std::invoke(process_handler, t_load, shared_from_this());
+        code += std::invoke(process_handler, t_load, shared_from_this());
 #endif
         if(!t_load->get_trial_load().empty()) {
             std::scoped_lock trial_load_lock(factory->get_trial_load_mutex());
@@ -1099,7 +1134,7 @@ int Domain::process_constraint(const bool full) {
 #ifdef SUANPAN_MT
         oneapi::tbb::this_task_arena::isolate([&] { code += std::invoke(process_handler, t_constraint, shared_from_this()); });
 #else
-		code += std::invoke(process_handler, t_constraint, shared_from_this());
+        code += std::invoke(process_handler, t_constraint, shared_from_this());
 #endif
         if(const auto multiplier_size = t_constraint->get_multiplier_size(); multiplier_size > 0) {
             counter += multiplier_size;
@@ -1178,7 +1213,7 @@ void Domain::enable_all() {
 }
 
 void Domain::summary() const {
-    suanpan_info("Domain {} contains:\n\t{} nodes, {} elements, {} materials,\n", get_tag(), get_node(), get_element(), get_material());
+    suanpan_info("Domain {} contains:\n\t{} nodes, {} elements, {} materials, {} expressions,\n", get_tag(), get_node(), get_element(), get_material(), get_expression());
     suanpan_info("\t{} loads, {} constraints and {} recorders.\n", get_load(), get_constraint(), get_recorder());
 }
 

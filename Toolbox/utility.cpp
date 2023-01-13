@@ -66,6 +66,29 @@ string suanpan::to_lower(string&& U) {
     return std::move(U);
 }
 
+std::vector<std::pair<string, unsigned>> suanpan::expression::split(const std::string& variable_string) {
+    std::vector<std::string> variable_list;
+    auto I = variable_string.cbegin(), J = variable_string.cbegin();
+    while(I != variable_string.cend()) {
+        if('|' == *I || '"' == *I) {
+            if(I != J) variable_list.emplace_back(J, I);
+            J = ++I;
+        }
+        else ++I;
+    }
+
+    if(I != J) variable_list.emplace_back(J, I);
+
+    if(variable_list.empty() || is_integer(variable_list.front())) return {};
+
+    std::vector<std::pair<string, unsigned>> variable_size_list;
+    for(const auto& variable : variable_list)
+        if(is_integer(variable)) variable_size_list.back().second = std::stoi(variable);
+        else variable_size_list.emplace_back(variable, 1);
+
+    return variable_size_list;
+}
+
 void ignore_whitespace(istringstream& I) {
     while(true)
         if(const auto peek_value = I.peek(); is_equal(peek_value, '\t') || is_equal(peek_value, ' ')) I.ignore();
@@ -95,3 +118,5 @@ bool is_false(const char* S) { return is_equal(S, "Off") || is_equal(S, "False")
 bool is_true(const string& S) { return is_true(S.c_str()); }
 
 bool is_false(const string& S) { return is_false(S.c_str()); }
+
+bool is_integer(const string& S) { return !S.empty() && std::all_of(S.cbegin(), S.cend(), isdigit); }

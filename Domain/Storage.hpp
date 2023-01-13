@@ -30,6 +30,7 @@
 #include <Toolbox/container.h>
 
 class Amplitude;
+class Expression;
 class Constraint;
 class Converger;
 class Criterion;
@@ -51,6 +52,8 @@ class Solver;
 template<typename T> const char* StorageType() { return "Unknown"; }
 
 template<> inline const char* StorageType<Amplitude>() { return "Amplitude"; }
+
+template<> inline const char* StorageType<Expression>() { return "Expression"; }
 
 template<> inline const char* StorageType<Constraint>() { return "Constraint"; }
 
@@ -160,7 +163,7 @@ template<typename T> bool Storage<T>::erase(const unsigned L) {
 #ifdef SUANPAN_MT
     return pond.unsafe_erase(L) == 1;
 #else
-	return pond.erase(L) == 1;
+    return pond.erase(L) == 1;
 #endif
 }
 
@@ -199,6 +202,7 @@ template<typename T> typename Storage<T>::iterator begin(Storage<T>& S) { return
 template<typename T> typename Storage<T>::iterator end(Storage<T>& S) { return S.end(); }
 
 using AmplitudeStorage = Storage<Amplitude>;
+using ExpressionStorage = Storage<Expression>;
 using ConstraintStorage = Storage<Constraint>;
 using ConvergerStorage = Storage<Converger>;
 using CriterionStorage = Storage<Criterion>;

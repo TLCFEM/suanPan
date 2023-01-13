@@ -234,8 +234,8 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**ARPACK**](https://github.com/opencollab/arpack-ng)
 - [**SPIKE**](http://www.spike-solver.org/) version 1.0
 - [**FEAST**](http://www.feast-solver.org/) version 4.0
-- [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 5.3.0 and [**SuperLU MT
-  **](https://portal.nersc.gov/project/sparse/superlu/) version 3.1
+- [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 5.3.0
+- [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 3.1
 - [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.21
 - [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2021.7.0
 - [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 1.10.6
@@ -249,6 +249,7 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**Catch2**](https://github.com/catchorg/Catch2) version 2.13.10
 - [**fmt**](https://github.com/fmtlib/fmt) version 9.1.0
 - [**whereami**](https://github.com/gpakosz/whereami)
+- [**exprtk**](https://github.com/ArashPartow/exprtk)
 - **thread_pool** abridged version of [`thread-pool`](https://github.com/bshoshany/thread-pool)
 
 Those libraries may depend on other libraries such as [zlib](https://zlib.net/)

@@ -11,6 +11,7 @@
 #include "Elastic/PolyElastic1D.h"
 #include "Elastic/Sinh1D.h"
 #include "Elastic/Tanh1D.h"
+#include "Elastic/CustomElastic1D.h"
 #include "Hysteresis/AFC.h"
 #include "Hysteresis/BilinearOO.h"
 #include "Hysteresis/BilinearPO.h"

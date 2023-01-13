@@ -294,6 +294,7 @@
     <ClCompile Include="..\..\..\Material\Material1D\Degradation\Dhakal.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Degradation\TrilinearDegradation.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Elastic\BilinearElastic1D.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Elastic\CustomElastic1D.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Elastic\Elastic1D.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Elastic\MultilinearElastic1D.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Elastic\PolyElastic1D.cpp" />
@@ -489,6 +490,10 @@
     <ClCompile Include="..\..\..\Toolbox\arpack.cpp" />
     <ClCompile Include="..\..\..\Toolbox\command.cpp" />
     <ClCompile Include="..\..\..\Toolbox\Converter.cpp" />
+    <ClCompile Include="..\..\..\Toolbox\Expression.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\IntegrationPlan.cpp" />
     <ClCompile Include="..\..\..\Toolbox\resampling.cpp" />
     <ClCompile Include="..\..\..\Toolbox\sort_rcm.cpp" />
@@ -497,6 +502,7 @@
     <ClCompile Include="..\..\..\Toolbox\utility.cpp" />
     <ClCompile Include="..\..\..\UnitTest\CatchTest.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestEigen.cpp" />
+    <ClCompile Include="..\..\..\UnitTest\TestExpression.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestSampling.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestSolver.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestColoring.cpp" />
@@ -738,6 +744,7 @@
     <ClInclude Include="..\..\..\Material\Material1D\Degradation\Dhakal.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Degradation\TrilinearDegradation.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Elastic\BilinearElastic1D.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Elastic\CustomElastic1D.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Elastic\Elastic1D.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Elastic\MultilinearElastic1D.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Elastic\PolyElastic1D.h" />
@@ -935,6 +942,7 @@
     <ClInclude Include="..\..\..\Toolbox\command.h" />
     <ClInclude Include="..\..\..\Toolbox\container.h" />
     <ClInclude Include="..\..\..\Toolbox\Converter.h" />
+    <ClInclude Include="..\..\..\Toolbox\Expression.h" />
     <ClInclude Include="..\..\..\Toolbox\LBFGS.hpp" />
     <ClInclude Include="..\..\..\Toolbox\IntegrationPlan.h" />
     <ClInclude Include="..\..\..\Toolbox\Quaternion.hpp" />

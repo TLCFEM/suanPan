@@ -1,0 +1,7 @@
+expression SimpleScalar 1 x x^3+x
+
+material CustomElastic1D 1 1
+
+materialTest1D 1 1E-2 200
+
+exit

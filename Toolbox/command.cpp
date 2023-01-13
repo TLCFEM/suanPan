@@ -27,7 +27,6 @@
 #include <Domain/Group/ElementGroup.h>
 #include <Domain/Group/GroupGroup.h>
 #include <Domain/Group/NodeGroup.h>
-#include <Domain/MetaMat/SparseMatFGMRES.hpp>
 #include <Domain/Node.h>
 #include <Element/Element.h>
 #include <Element/ElementParser.h>
@@ -47,11 +46,16 @@
 #include <Step/Bead.h>
 #include <Step/Frequency.h>
 #include <Step/StepParser.h>
+#include <Toolbox/Expression.h>
+#include <Toolbox/ExpressionParser.h>
 #include <Toolbox/argument.h>
 #include <Toolbox/resampling.h>
 #include <Toolbox/response_spectrum.h>
 #include <Toolbox/thread_pool.hpp>
 #include <thread>
+#ifdef SUANPAN_MKL
+#include <Domain/MetaMat/SparseMatFGMRES.hpp>
+#endif
 #ifdef SUANPAN_WIN
 #include <Windows.h>
 #endif
@@ -115,6 +119,8 @@ int benchmark() {
     return SUANPAN_SUCCESS;
 }
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "misc-no-recursion"
 void overview() {
     const auto new_model = make_shared<Bead>();
 
@@ -219,7 +225,7 @@ void overview() {
     suanpan_highlight("file");
     suanpan_info("' command, the '");
     suanpan_highlight("benchmark");
-    suanpan_info("' command we just echoed will perform some matrix solving operations, and it may take a few minites. Type in '");
+    suanpan_info("' command we just echoed will perform some matrix solving operations, and it may take a few minutes. Type in '");
     suanpan_highlight("file benchmark.sp");
     suanpan_info("' to execute the file.\n");
     restore();
@@ -228,7 +234,7 @@ void overview() {
 
     redirect();
     suanpan_info("In the documentation [https://tlcfem.github.io/suanPan-manual/latest/], there is an [Example] section that provides some practical examples for you to try out. "
-        "The source code respository also contains a folder named [Example] in which example usages of most models/algorithms are given. Please feel free to check that out.\n\n"
+        "The source code repository also contains a folder named [Example] in which example usages of most models/algorithms are given. Please feel free to check that out.\n\n"
         "Hope you will find suanPan useful. As it aims to bring the latest finite element models/algorithms to practice, you are welcome to embed your amazing research outcomes into suanPan. Type in '");
     suanpan_highlight("qrcode");
     suanpan_info("' to display a QR code for sharing. (UTF-8 is required, on Windows, some modern terminal such as Windows Terminal [https://github.com/microsoft/terminal] is recommended.)\n");
@@ -245,6 +251,7 @@ void overview() {
     // ReSharper disable once CppExpressionWithoutSideEffects
     guide_command("q");
 }
+#pragma clang diagnostic pop
 
 void perform_upsampling(istringstream& command) {
     string file_name;
@@ -379,6 +386,8 @@ void perform_sdof_response(istringstream& command) {
         suanpan_info("Data is saved to file \"{}\".\n", motion_name);
 }
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "misc-no-recursion"
 int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     if(nullptr == model) return SUANPAN_SUCCESS;
 
@@ -420,6 +429,7 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     if(is_equal(command_id, "set")) return set_property(domain, command);
 
     if(is_equal(command_id, "amplitude")) return create_new_amplitude(domain, command);
+    if(is_equal(command_id, "expression")) return create_new_expression(domain, command);
     if(is_equal(command_id, "converger")) return create_new_converger(domain, command);
     if(is_equal(command_id, "constraint")) return create_new_constraint(domain, command);
     if(is_equal(command_id, "criterion")) return create_new_criterion(domain, command);
@@ -610,7 +620,10 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
 
     return SUANPAN_SUCCESS;
 }
+#pragma clang diagnostic pop
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "misc-no-recursion"
 int process_file(const shared_ptr<Bead>& model, const char* file_name) {
     std::vector<string> file_list;
     file_list.reserve(9);
@@ -662,6 +675,7 @@ int process_file(const shared_ptr<Bead>& model, const char* file_name) {
 
     return SUANPAN_SUCCESS;
 }
+#pragma clang diagnostic pop
 
 int create_new_domain(const shared_ptr<Bead>& model, istringstream& command) {
     unsigned domain_id;
@@ -698,6 +712,7 @@ int disable_object(const shared_ptr<Bead>& model, istringstream& command) {
 
     if(unsigned tag; is_equal(object_type, "domain")) while(get_input(command, tag)) model->disable_domain(tag);
     else if(is_equal(object_type, "amplitude")) while(get_input(command, tag)) domain->disable_amplitude(tag);
+    else if(is_equal(object_type, "expression")) while(get_input(command, tag)) domain->disable_expression(tag);
     else if(is_equal(object_type, "constraint")) while(get_input(command, tag)) domain->disable_constraint(tag);
     else if(is_equal(object_type, "converger")) while(get_input(command, tag)) domain->disable_converger(tag);
     else if(is_equal(object_type, "criterion")) while(get_input(command, tag)) domain->disable_criterion(tag);
@@ -733,6 +748,7 @@ int enable_object(const shared_ptr<Bead>& model, istringstream& command) {
 
     if(unsigned tag; is_equal(object_type, "domain")) while(get_input(command, tag)) model->enable_domain(tag);
     else if(is_equal(object_type, "amplitude")) while(get_input(command, tag)) domain->enable_amplitude(tag);
+    else if(is_equal(object_type, "expression")) while(get_input(command, tag)) domain->enable_expression(tag);
     else if(is_equal(object_type, "constraint")) while(get_input(command, tag)) domain->enable_constraint(tag);
     else if(is_equal(object_type, "converger")) while(get_input(command, tag)) domain->enable_converger(tag);
     else if(is_equal(object_type, "criterion")) while(get_input(command, tag)) domain->enable_criterion(tag);
@@ -769,6 +785,7 @@ int erase_object(const shared_ptr<Bead>& model, istringstream& command) {
 
     if(unsigned tag; is_equal(object_type, "domain")) while(get_input(command, tag)) model->erase_domain(tag);
     else if(is_equal(object_type, "amplitude")) while(get_input(command, tag)) domain->erase_amplitude(tag);
+    else if(is_equal(object_type, "expression")) while(get_input(command, tag)) domain->erase_expression(tag);
     else if(is_equal(object_type, "constraint")) while(get_input(command, tag)) domain->erase_constraint(tag);
     else if(is_equal(object_type, "converger")) while(get_input(command, tag)) domain->erase_converger(tag);
     else if(is_equal(object_type, "criterion")) while(get_input(command, tag)) domain->erase_criterion(tag);
@@ -1489,6 +1506,13 @@ int print_info(const shared_ptr<DomainBase>& domain, istringstream& command) {
                 suanpan_info("\n");
             }
         }
+    else if(is_equal(object_type, "expression"))
+        while(get_input(command, tag)) {
+            if(domain->find_expression(tag)) {
+                get_expression(domain, tag)->print();
+                suanpan_info("\n");
+            }
+        }
     else if(is_equal(object_type, "eigenvalue")) {
         domain->get_factory()->get_eigenvalue().print("Eigenvalues:");
         suanpan_info("\n");
@@ -1499,6 +1523,8 @@ int print_info(const shared_ptr<DomainBase>& domain, istringstream& command) {
     return SUANPAN_SUCCESS;
 }
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "misc-no-recursion"
 int run_example() {
     const auto new_model = make_shared<Bead>();
 
@@ -1552,6 +1578,7 @@ int run_example() {
     suanpan_info("====================================================\n");
     return SUANPAN_SUCCESS;
 }
+#pragma clang diagnostic pop
 
 int print_command() {
     suanpan_info("The available commands are listed. Please check online manual for reference. https://tlcfem.gitbook.io/suanpan-manual/\n");
