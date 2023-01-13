@@ -80,6 +80,8 @@ std::vector<std::pair<string, unsigned>> suanpan::expression::split(const std::s
 
     if(I != J) variable_list.emplace_back(J, I);
 
+    if(variable_list.empty() || is_integer(variable_list.front())) return {};
+
     std::vector<std::pair<string, unsigned>> variable_size_list;
     for(const auto& variable : variable_list)
         if(is_integer(variable))
