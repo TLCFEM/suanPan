@@ -40,6 +40,7 @@
 #include "vonMises/ArmstrongFrederick1D.h"
 #include "vonMises/Bilinear1D.h"
 #include "vonMises/BilinearMises1D.h"
+#include "vonMises/CustomMises1D.h"
 #include "vonMises/ExpGurson1D.h"
 #include "vonMises/ExpMises1D.h"
 #include "vonMises/MultilinearMises1D.h"

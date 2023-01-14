@@ -22,8 +22,8 @@
 
 bool initialise_material(const shared_ptr<DomainBase>& domain, const unique_ptr<Material>& obj, const uword size) {
     if(!obj->is_initialized()) {
-        obj->initialize_base(domain);
-        obj->initialize(domain);
+        if(SUANPAN_SUCCESS != obj->initialize_base(domain)) return false;
+        if(SUANPAN_SUCCESS != obj->initialize(domain)) return false;
         obj->set_initialized(true);
     }
 

@@ -47,7 +47,8 @@ protected:
 public:
     explicit Expression(unsigned, const std::string&);
 
-    [[nodiscard]] uword size() const;
+    [[nodiscard]] virtual uword input_size() const;
+    [[nodiscard]] virtual uword output_size() const;
 
     bool compile(const std::string&);
     static string error();
@@ -75,6 +76,8 @@ class SimpleVectorExpression : public Expression {
 
 public:
     SimpleVectorExpression(unsigned, const std::string&, const std::string&);
+
+    [[nodiscard]] uword output_size() const override;
 
     Mat<double> evaluate(const Col<double>&) override;
 

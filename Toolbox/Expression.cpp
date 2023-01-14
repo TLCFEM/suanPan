@@ -38,7 +38,9 @@ Expression::Expression(const unsigned tag, const std::string& variable_string)
         }
 }
 
-uword Expression::size() const { return x.n_elem; }
+uword Expression::input_size() const { return x.n_elem; }
+
+uword Expression::output_size() const { return 1; }
 
 bool Expression::compile(const std::string& expression_string) {
     expression.register_symbol_table(symbol_table);
@@ -81,6 +83,8 @@ SimpleVectorExpression::SimpleVectorExpression(const unsigned tag, const std::st
 
     symbol_table.add_vector(variable_list[0].first, y.memptr(), y.n_elem);
 }
+
+uword SimpleVectorExpression::output_size() const { return y.n_elem; }
 
 Mat<double> SimpleVectorExpression::evaluate(const Col<double>& in_x) {
     suanpan_assert([&] { if(x.n_elem != in_x.n_elem) throw std::runtime_error("input size mismatch"); });

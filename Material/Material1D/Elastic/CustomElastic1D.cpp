@@ -30,7 +30,7 @@ int CustomElastic1D::initialize(const shared_ptr<DomainBase>& D) {
 
     expression = D->get_expression(expression_tag);
 
-    if(expression->size() != 1) {
+    if(expression->input_size() != 1 || expression->output_size() != 1) {
         suanpan_error("The assigned expression {} is not a univariate function.\n", expression_tag);
         return SUANPAN_FAIL;
     }

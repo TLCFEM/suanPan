@@ -328,6 +328,7 @@
     <ClCompile Include="..\..\..\Material\Material1D\vonMises\ArmstrongFrederick1D.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\vonMises\Bilinear1D.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\vonMises\BilinearMises1D.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\vonMises\CustomMises1D.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\vonMises\ExpGurson1D.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\vonMises\ExpMises1D.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\vonMises\MultilinearMises1D.cpp" />
@@ -779,6 +780,7 @@
     <ClInclude Include="..\..\..\Material\Material1D\vonMises\ArmstrongFrederick1D.h" />
     <ClInclude Include="..\..\..\Material\Material1D\vonMises\Bilinear1D.h" />
     <ClInclude Include="..\..\..\Material\Material1D\vonMises\BilinearMises1D.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\vonMises\CustomMises1D.h" />
     <ClInclude Include="..\..\..\Material\Material1D\vonMises\ExpGurson1D.h" />
     <ClInclude Include="..\..\..\Material\Material1D\vonMises\ExpMises1D.h" />
     <ClInclude Include="..\..\..\Material\Material1D\vonMises\MultilinearMises1D.h" />
