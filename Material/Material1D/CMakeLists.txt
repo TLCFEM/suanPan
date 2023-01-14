@@ -41,6 +41,7 @@ set(M1D
         Material1D/vonMises/ArmstrongFrederick1D.cpp
         Material1D/vonMises/Bilinear1D.cpp
         Material1D/vonMises/BilinearMises1D.cpp
+        Material1D/vonMises/CustomMises1D.cpp
         Material1D/vonMises/ExpGurson1D.cpp
         Material1D/vonMises/ExpMises1D.cpp
         Material1D/vonMises/MultilinearMises1D.cpp
