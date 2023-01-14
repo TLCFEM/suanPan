@@ -1,8 +1,36 @@
 expression SimpleScalar 1 x 10+.5x
 expression SimpleScalar 2 x 0
 
+expression SimpleVector 3 x y|2 y[0]:=0;y[1]:=2;
+
+material CustomMises1D 1 10 5 2
+
+materialTest1D 1 1E-2 150 100 200 100 200
+
+remove material 1
+
+material CustomMises1D 1 10 3 2
+
+materialTest1D 1 1E-2 150 100 200 100 200
+
+remove material 1
+
+material CustomMises1D 1 10 1 5
+
+materialTest1D 1 1E-2 150 100 200 100 200
+
+remove material 1
+
+material CustomMises1D 1 10 1 3
+
+materialTest1D 1 1E-2 150 100 200 100 200
+
+remove material 1
+
 material CustomMises1D 1 10 1 2
 
 materialTest1D 1 1E-2 150 100 200 100 200
+
+remove material 1
 
 exit
