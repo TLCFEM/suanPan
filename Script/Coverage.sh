@@ -31,6 +31,7 @@ cp ../Example/Material/C.txt .
 cp ../Example/Material/T.txt .
 cp ../Example/Material/CYCLE.txt .
 cp ../Example/Material/EHIST .
+cp ../Example/Material/example .
 
 for file in $files; do
   echo "Processing $file ..."

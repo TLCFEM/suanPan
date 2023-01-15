@@ -1462,6 +1462,9 @@
     <ClCompile Include="..\..\..\Material\Material1D\vonMises\CustomMises1D.cpp">
       <Filter>Material\Material1D\vonMises</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Concrete\CustomCDP.cpp">
+      <Filter>Material\Material3D\Concrete</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2781,6 +2784,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material1D\vonMises\CustomMises1D.h">
       <Filter>Material\Material1D\vonMises</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Concrete\CustomCDP.h">
+      <Filter>Material\Material3D\Concrete</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

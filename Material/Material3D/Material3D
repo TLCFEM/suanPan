@@ -3,6 +3,7 @@
 #include "Clay/CamClay/NonlinearCamClay.h"
 #include "Clay/CamClay/ParabolicCC.h"
 #include "Concrete/CDP.h"
+#include "Concrete/CustomCDP.h"
 #include "Concrete/CDPM2.h"
 #include "Concrete/NonlinearCDP.h"
 #include "Concrete/Rebar3D.h"

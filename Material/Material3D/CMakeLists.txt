@@ -4,6 +4,7 @@ set(M3D
         Material3D/Clay/CamClay/NonlinearCamClay.cpp
         Material3D/Clay/CamClay/ParabolicCC.cpp
         Material3D/Concrete/CDP.cpp
+        Material3D/Concrete/CustomCDP.cpp
         Material3D/Concrete/CDPM2.cpp
         Material3D/Concrete/NonlinearCDP.cpp
         Material3D/Concrete/Rebar3D.cpp
