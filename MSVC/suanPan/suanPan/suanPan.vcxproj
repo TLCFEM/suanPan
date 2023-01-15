@@ -356,6 +356,7 @@
     <ClCompile Include="..\..\..\Material\Material3D\Clay\CamClay\ParabolicCC.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Concrete\CDP.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Concrete\CDPM2.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Concrete\CustomCDP.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Concrete\NonlinearCDP.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Concrete\Rebar3D.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Concrete\TableCDP.cpp" />
@@ -808,6 +809,7 @@
     <ClInclude Include="..\..\..\Material\Material3D\Clay\CamClay\ParabolicCC.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Concrete\CDP.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Concrete\CDPM2.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Concrete\CustomCDP.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Concrete\NonlinearCDP.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Concrete\Rebar3D.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Concrete\TableCDP.h" />

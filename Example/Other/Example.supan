@@ -1,5 +1,8 @@
 example
 
+set verbose_output false
+set screen_output true
+
 set output_folder result/a/b
 set output_folder result
 set output_folder result/a

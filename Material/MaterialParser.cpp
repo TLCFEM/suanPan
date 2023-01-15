@@ -905,6 +905,28 @@ void new_cdp(unique_ptr<Material>& return_obj, istringstream& command) {
     return_obj = make_unique<CDP>(tag, para_pool(0), para_pool(1), para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6), para_pool(7), para_pool(8), para_pool(9), para_pool(10), para_pool(11), para_pool(12), para_pool(13));
 }
 
+void new_customcdp(unique_ptr<Material>& return_obj, istringstream& command) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    Col<unsigned> expressions(2);
+    if(!get_input(command, expressions)) {
+        suanpan_error("Two valid expression tags are required.\n");
+        return;
+    }
+
+    vec pool{3E4, .2, 5E-4, 5E-2, .2, 1.16, .5, 2400E-12};
+    if(!get_optional_input(command, pool)) {
+        suanpan_error("A valid parameter is required.\n");
+        return;
+    }
+
+    return_obj = make_unique<CustomCDP>(tag, expressions(0), expressions(1), pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), pool(6), pool(7));
+}
+
 void new_cdpm2(unique_ptr<Material>& return_obj, istringstream& command, const unsigned damage_type) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -3021,6 +3043,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "BoucWen")) new_boucwen(new_material, command);
     else if(is_equal(material_id, "BWBN")) new_bwbn(new_material, command);
     else if(is_equal(material_id, "CDP")) new_cdp(new_material, command);
+    else if(is_equal(material_id, "CustomCDP")) new_customcdp(new_material, command);
     else if(is_equal(material_id, "CDPM2")) new_cdpm2(new_material, command, 1);
     else if(is_equal(material_id, "CDPM2NO")) new_cdpm2(new_material, command, 0);
     else if(is_equal(material_id, "CDPM2ISO")) new_cdpm2(new_material, command, 1);

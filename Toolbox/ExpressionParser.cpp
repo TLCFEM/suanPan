@@ -103,10 +103,8 @@ int create_new_expression(const shared_ptr<DomainBase>& domain, istringstream& c
 
     unique_ptr<Expression> new_expression = nullptr;
 
-    if(is_equal(expression_type, "SimpleScalar"))
-        new_simplescalar(new_expression, command);
-    else if(is_equal(expression_type, "SimpleVector"))
-        new_simplevector(new_expression, command);
+    if(is_equal(expression_type, "SimpleScalar")) new_simplescalar(new_expression, command);
+    else if(is_equal(expression_type, "SimpleVector")) new_simplevector(new_expression, command);
 
     if(nullptr == new_expression || !domain->insert(std::move(new_expression)))
         suanpan_error("Fail to create new expression via \"{}\".\n", command.str());

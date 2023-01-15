@@ -1286,6 +1286,13 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
 
         return SUANPAN_SUCCESS;
     }
+    if(is_equal(property_id, "verbose_output")) {
+        if(string value; get_input(command, value)) SUANPAN_VERBOSE = is_true(value);
+        else
+            suanpan_error("A valid value is required.\n");
+
+        return SUANPAN_SUCCESS;
+    }
 
     if(is_equal(property_id, "color_model")) {
         if(string value; !get_input(command, value))
