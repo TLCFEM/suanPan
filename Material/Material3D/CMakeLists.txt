@@ -33,6 +33,7 @@ set(M3D
         Material3D/vonMises/BilinearPeric.cpp
         Material3D/vonMises/ExpGurson.cpp
         Material3D/vonMises/ExpJ2.cpp
+        Material3D/vonMises/CustomJ2.cpp
         Material3D/vonMises/MultilinearJ2.cpp
         Material3D/vonMises/NonlinearGurson.cpp
         Material3D/vonMises/NonlinearJ2.cpp

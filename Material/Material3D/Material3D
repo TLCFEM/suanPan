@@ -35,6 +35,7 @@
 #include "vonMises/BilinearPeric.h"
 #include "vonMises/ExpGurson.h"
 #include "vonMises/ExpJ2.h"
+#include "vonMises/CustomJ2.h"
 #include "vonMises/MultilinearJ2.h"
 #include "vonMises/NonlinearGurson.h"
 #include "vonMises/NonlinearJ2.h"

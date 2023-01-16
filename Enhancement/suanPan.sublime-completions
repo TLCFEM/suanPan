@@ -3691,10 +3691,16 @@
       "trigger": "ExpHoffman"
     },
     {
-      "contents": "",
-      "details": "",
+      "contents": "material ExpJ2 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:[7]}\n#(1) int, unique material tag\n#(2) double, elastic modulus\n#(3) double, poissons ratio\n#(4) double, yield stress\n#(5) double, a\n#(6) double, b\n#[7] double, density, default: 0",
+      "details": "J2 model with exponential isotropic hardening",
       "kind": "type",
       "trigger": "ExpJ2"
+    },
+    {
+      "contents": "material CustomJ2 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:[6]}\n#(1) int, unique material tag\n#(2) double, elastic modulus\n#(3) double, poissons ratio\n#(4) int, isotropic hardening expression tag\n#(5) int, kinematic hardening expression tag\n#[6] double, density, default: 0",
+      "details": "J2 model with exponential isotropic hardening",
+      "kind": "type",
+      "trigger": "CustomJ2"
     },
     {
       "contents": "",

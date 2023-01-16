@@ -1568,6 +1568,40 @@ void new_expj2(unique_ptr<Material>& return_obj, istringstream& command) {
     return_obj = make_unique<ExpJ2>(tag, elastic_modulus, poissons_ratio, yield_stress, a, b, density);
 }
 
+void new_customj2(unique_ptr<Material>& return_obj, istringstream& command) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    double elastic_modulus;
+    if(!get_input(command, elastic_modulus)) {
+        suanpan_error("A valid elastic modulus is required.\n");
+        return;
+    }
+
+    double poissons_ratio;
+    if(!get_input(command, poissons_ratio)) {
+        suanpan_error("A valid poissons ratio is required.\n");
+        return;
+    }
+
+    unsigned k_tag, h_tag;
+    if(!get_input(command, k_tag, h_tag)) {
+        suanpan_error("A valid expression is required.\n");
+        return;
+    }
+
+    auto density = 0.;
+    if(!command.eof() && !get_input(command, density)) {
+        suanpan_error("A valid density is required.\n");
+        return;
+    }
+
+    return_obj = make_unique<CustomJ2>(tag, elastic_modulus, poissons_ratio, k_tag, h_tag, density);
+}
+
 void new_expmises1d(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -3070,6 +3104,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "ExpGurson1D")) new_expgurson1d(new_material, command);
     else if(is_equal(material_id, "ExpHoffman")) new_exphoffman(new_material, command);
     else if(is_equal(material_id, "ExpJ2")) new_expj2(new_material, command);
+    else if(is_equal(material_id, "CustomJ2")) new_customj2(new_material, command);
     else if(is_equal(material_id, "ExpMises1D")) new_expmises1d(new_material, command);
     else if(is_equal(material_id, "Flag01")) new_flag01(new_material, command);
     else if(is_equal(material_id, "Flag02")) new_flag02(new_material, command);
