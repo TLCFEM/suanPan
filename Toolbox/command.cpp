@@ -815,17 +815,17 @@ int save_object(const shared_ptr<DomainBase>& domain, istringstream& command) {
     else if(is_equal(object_id, "Stiffness")) {
         string name = "K";
         if(!command.eof() && !get_input(command, name)) name = "K";
-        domain->get_factory()->get_stiffness()->save(name.c_str());
+        if(const auto& stiffness = domain->get_factory()->get_stiffness()) stiffness->save(name.c_str());
     }
     else if(is_equal(object_id, "Mass")) {
         string name = "M";
         if(!command.eof() && !get_input(command, name)) name = "M";
-        domain->get_factory()->get_mass()->save(name.c_str());
+        if(const auto& mass = domain->get_factory()->get_mass()) mass->save(name.c_str());
     }
     else if(is_equal(object_id, "Damping")) {
         string name = "C";
         if(!command.eof() && !get_input(command, name)) name = "C";
-        domain->get_factory()->get_damping()->save(name.c_str());
+        if(const auto& damping = domain->get_factory()->get_damping()) damping->save(name.c_str());
     }
     else if(is_equal(object_id, "Model")) {
         string name = "Model.h5";

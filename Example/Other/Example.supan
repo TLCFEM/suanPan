@@ -1,5 +1,16 @@
 example
 
+help
+
+terminal ls
+
+version
+
+doesnotexist
+
+disable print
+enable print
+
 set verbose_output false
 set screen_output true
 
@@ -17,6 +28,8 @@ set output_folder $pwd
 peek ,output_folder
 
 pwd
+
+pwd ..
 
 benchmark
 

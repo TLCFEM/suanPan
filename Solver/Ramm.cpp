@@ -31,7 +31,7 @@ int Ramm::analyze() {
     auto& G = get_integrator();
     auto& W = G->get_domain()->get_factory();
 
-    suanpan_highlight("-> Current Load Level: {:+.5f}.\n", W->get_trial_load_factor().at(0));
+    suanpan_highlight(">> Current Load Level: {:+.5f}.\n", W->get_trial_load_factor().at(0));
 
     const auto max_iteration = C->get_max_iteration();
 

@@ -67,6 +67,14 @@ peek node 2
 
 peek integrator 1
 
+list converger
+list constraint
+list element
+list load
+list material
+list node
+list recorder
+
 reset
 clear
 exit

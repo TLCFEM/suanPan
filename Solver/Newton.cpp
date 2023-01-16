@@ -31,7 +31,7 @@ int Newton::analyze() {
     const auto& D = G->get_domain();
     auto& W = D->get_factory();
 
-    suanpan_highlight("-> Current Analysis Time: {:.5f}.\n", W->get_trial_time());
+    suanpan_highlight(">> Current Analysis Time: {:.5f}.\n", W->get_trial_time());
 
     const auto max_iteration = C->get_max_iteration();
 

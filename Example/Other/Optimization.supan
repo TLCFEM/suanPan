@@ -859,4 +859,9 @@ criterion StrainEnergyEvolution 1 2 70 2 2 20
 
 analyze
 
+peek nodegroup 1
+peek recorder 1
+peek constraint 1
+peek material 1
+
 exit
