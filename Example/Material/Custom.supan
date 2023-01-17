@@ -17,6 +17,9 @@ material CustomHoffman 7 1E5 1E5 1E5 1E5 1E5 1E5 .3 .3 .3 400 300 400 300 250 20
 material CustomDP 8 1E4 .3 .355 .355 .974 5
 material CustomDP 9 1E4 .3 .355 .355 .974 2
 
+material CustomCC 10 1E6 .4 .8 .8 20. 5
+material CustomCC 11 1E6 .4 .8 .8 20. 2
+
 step static 1
 
 precheck

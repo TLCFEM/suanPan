@@ -13,6 +13,7 @@
 5. speed-up analysis with visualisation recorder [#102](https://github.com/TLCFEM/suanPan/pull/102)
 6. update `VTK` to version `9.2.5`
 7. add `Expression` to support custom function definition [#105](https://github.com/TLCFEM/suanPan/pull/105)
+8. add `CustomMises1D`, `CustomCC`, `CustomCDP`, `CustomDP`, `CustomJ2` and `CustomHoffman` models
 
 ## version 2.7
 

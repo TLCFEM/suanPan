@@ -351,6 +351,7 @@
     <ClCompile Include="..\..\..\Material\Material2D\Wrapper\Rebar2D.cpp" />
     <ClCompile Include="..\..\..\Material\Material2D\Wrapper\Rotation2D.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Clay\CamClay\BilinearCC.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Clay\CamClay\CustomCC.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Clay\CamClay\ExpCC.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Clay\CamClay\NonlinearCamClay.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Clay\CamClay\ParabolicCC.cpp" />
@@ -807,6 +808,7 @@
     <ClInclude Include="..\..\..\Material\Material2D\Wrapper\Rebar2D.h" />
     <ClInclude Include="..\..\..\Material\Material2D\Wrapper\Rotation2D.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Clay\CamClay\BilinearCC.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Clay\CamClay\CustomCC.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Clay\CamClay\ExpCC.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Clay\CamClay\NonlinearCamClay.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Clay\CamClay\ParabolicCC.h" />

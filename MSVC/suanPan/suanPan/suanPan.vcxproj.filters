@@ -1474,6 +1474,9 @@
     <ClCompile Include="..\..\..\Material\Material3D\Hoffman\CustomHoffman.cpp">
       <Filter>Material\Material3D\Hoffman</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Clay\CamClay\CustomCC.cpp">
+      <Filter>Material\Material3D\Clay\CamClay</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2805,6 +2808,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material3D\Hoffman\CustomHoffman.h">
       <Filter>Material\Material3D\Hoffman</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Clay\CamClay\CustomCC.h">
+      <Filter>Material\Material3D\Clay\CamClay</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

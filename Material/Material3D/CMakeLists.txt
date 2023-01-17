@@ -1,5 +1,6 @@
 set(M3D
         Material3D/Clay/CamClay/BilinearCC.cpp
+        Material3D/Clay/CamClay/CustomCC.cpp
         Material3D/Clay/CamClay/ExpCC.cpp
         Material3D/Clay/CamClay/NonlinearCamClay.cpp
         Material3D/Clay/CamClay/ParabolicCC.cpp

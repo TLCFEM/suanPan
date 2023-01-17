@@ -1450,6 +1450,54 @@ void new_expcc(unique_ptr<Material>& return_obj, istringstream& command) {
     return_obj = make_unique<ExpCC>(tag, elastic_modulus, poissons_ratio, beta, m, pt, a0, e0, lambda, kappa, density);
 }
 
+void new_customcc(unique_ptr<Material>& return_obj, istringstream& command) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    double elastic_modulus;
+    if(!get_input(command, elastic_modulus)) {
+        suanpan_error("A valid elastic modulus is required.\n");
+        return;
+    }
+
+    double poissons_ratio;
+    if(!get_input(command, poissons_ratio)) {
+        suanpan_error("A valid poisson's ratio is required.\n");
+        return;
+    }
+
+    double beta, m, pt;
+    if(!get_input(command, beta)) {
+        suanpan_error("A valid beta is required.\n");
+        return;
+    }
+    if(!get_input(command, m)) {
+        suanpan_error("A valid radius ratio is required.\n");
+        return;
+    }
+    if(!get_input(command, pt)) {
+        suanpan_error("A valid tensile yield strength is required.\n");
+        return;
+    }
+
+    unsigned expression;
+    if(!get_input(command, expression)) {
+        suanpan_error("A valid expression tag is required.\n");
+        return;
+    }
+
+    auto density = 0.;
+    if(!command.eof() && !get_input(command, density)) {
+        suanpan_error("A valid density is required.\n");
+        return;
+    }
+
+    return_obj = make_unique<CustomCC>(tag, elastic_modulus, poissons_ratio, beta, m, pt, expression, density);
+}
+
 void new_expdp(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -3190,6 +3238,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "Elastic2D")) new_elastic2d(new_material, command);
     else if(is_equal(material_id, "Elastic3D")) new_isotropicelastic3d(new_material, command);
     else if(is_equal(material_id, "ExpCC")) new_expcc(new_material, command);
+    else if(is_equal(material_id, "CustomCC")) new_customcc(new_material, command);
     else if(is_equal(material_id, "ExpDP")) new_expdp(new_material, command);
     else if(is_equal(material_id, "ExpGurson")) new_expgurson(new_material, command);
     else if(is_equal(material_id, "ExpGurson1D")) new_expgurson1d(new_material, command);
