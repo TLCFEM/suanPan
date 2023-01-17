@@ -2,11 +2,12 @@
 
 expression SimpleVector 1 x y|6 example
 expression SimpleVector 2 x y|3 y:=0
+expression SimpleVector 3 x y y:=x
 
 material CustomJ2 1 500 0 5 5
 material CustomJ2 2 500 0 2 5
-material CustomJ2 3 500 0 1 5
-material CustomJ2 4 500 0 1 2
+material CustomJ2 3 500 0 3 5
+material CustomJ2 4 500 0 3 2
 
 step static 1
 
