@@ -1,0 +1,24 @@
+# A TEST MODEL FOR CUSTOM MATERIAL
+
+expression SimpleVector 1 x y|6 example
+expression SimpleVector 2 x y|3 y:=0
+expression SimpleVector 3 x y y:=x
+
+material CustomJ2 1 500 0 5 5
+material CustomJ2 2 500 0 2 5
+material CustomJ2 3 500 0 3 5
+material CustomJ2 4 500 0 3 2
+
+expression SimpleScalar 4 x .2+.02x
+material CustomHoffman 5 1E5 1E5 1E5 1E5 1E5 1E5 .3 .3 .3 400 300 400 300 250 200 200 200 200 5
+material CustomHoffman 6 1E5 1E5 1E5 1E5 1E5 1E5 .3 .3 .3 400 300 400 300 250 200 200 200 200 2
+material CustomHoffman 7 1E5 1E5 1E5 1E5 1E5 1E5 .3 .3 .3 400 300 400 300 250 200 200 200 200 4
+
+material CustomDP 8 1E4 .3 .355 .355 .974 5
+material CustomDP 9 1E4 .3 .355 .355 .974 2
+
+step static 1
+
+precheck
+
+exit

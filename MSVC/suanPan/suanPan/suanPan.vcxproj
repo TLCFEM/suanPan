@@ -363,6 +363,7 @@
     <ClCompile Include="..\..\..\Material\Material3D\Damage\IsotropicDamage.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Damage\LinearDamage.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\DruckerPrager\BilinearDP.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\DruckerPrager\CustomDP.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\DruckerPrager\ExpDP.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\DruckerPrager\NonlinearDruckerPrager.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Elastic\BlatzKo.cpp" />
@@ -373,6 +374,7 @@
     <ClCompile Include="..\..\..\Material\Material3D\Elastic\OrthotropicElastic3D.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Elastic\Yeoh.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Hoffman\BilinearHoffman.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Hoffman\CustomHoffman.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Hoffman\ExpHoffman.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Hoffman\NonlinearHill.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Hoffman\NonlinearHoffman.cpp" />
@@ -817,6 +819,7 @@
     <ClInclude Include="..\..\..\Material\Material3D\Damage\IsotropicDamage.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Damage\LinearDamage.h" />
     <ClInclude Include="..\..\..\Material\Material3D\DruckerPrager\BilinearDP.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\DruckerPrager\CustomDP.h" />
     <ClInclude Include="..\..\..\Material\Material3D\DruckerPrager\ExpDP.h" />
     <ClInclude Include="..\..\..\Material\Material3D\DruckerPrager\NonlinearDruckerPrager.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Elastic\BlatzKo.h" />
@@ -827,6 +830,7 @@
     <ClInclude Include="..\..\..\Material\Material3D\Elastic\OrthotropicElastic3D.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Elastic\Yeoh.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Hoffman\BilinearHoffman.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Hoffman\CustomHoffman.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Hoffman\ExpHoffman.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Hoffman\NonlinearHill.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Hoffman\NonlinearHoffman.h" />
