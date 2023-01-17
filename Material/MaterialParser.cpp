@@ -498,6 +498,54 @@ void new_bilineardp(unique_ptr<Material>& return_obj, istringstream& command) {
     return_obj = make_unique<BilinearDP>(tag, elastic_modulus, poissons_ratio, eta_yield, eta_flow, xi, cohesion, cohesion_slope, density);
 }
 
+void new_customdp(unique_ptr<Material>& return_obj, istringstream& command) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    double elastic_modulus;
+    if(!get_input(command, elastic_modulus)) {
+        suanpan_error("A valid elastic modulus is required.\n");
+        return;
+    }
+
+    double poissons_ratio;
+    if(!get_input(command, poissons_ratio)) {
+        suanpan_error("A valid poisson's ratio is required.\n");
+        return;
+    }
+
+    double eta_yield, eta_flow, xi;
+    if(!get_input(command, eta_yield)) {
+        suanpan_error("A valid eta for yielding criterion is required.\n");
+        return;
+    }
+    if(!get_input(command, eta_flow)) {
+        suanpan_error("A valid eta for plasticity flow rule is required.\n");
+        return;
+    }
+    if(!get_input(command, xi)) {
+        suanpan_error("A valid xi is required.\n");
+        return;
+    }
+
+    unsigned expression;
+    if(!get_input(command, expression)) {
+        suanpan_error("A valid expression tag is required.\n");
+        return;
+    }
+
+    auto density = 0.;
+    if(!command.eof() && !get_input(command, density)) {
+        suanpan_error("A valid density is required.\n");
+        return;
+    }
+
+    return_obj = make_unique<CustomDP>(tag, elastic_modulus, poissons_ratio, eta_yield, eta_flow, xi, expression, density);
+}
+
 void new_bilinearelastic1d(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -1524,6 +1572,48 @@ void new_exphoffman(unique_ptr<Material>& return_obj, istringstream& command) {
     }
 
     return_obj = make_unique<ExpHoffman>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), a, b, density);
+}
+
+void new_customhoffman(unique_ptr<Material>& return_obj, istringstream& command) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    vec modulus(6);
+    if(!get_input(command, modulus)) {
+        suanpan_error("A valid modulus is required.\n");
+        return;
+    }
+
+    vec poissons_ratio(3);
+    if(!get_input(command, poissons_ratio)) {
+        suanpan_error("A valid poisson's ratio is required.\n");
+        return;
+    }
+
+    vec stress(9);
+    if(!get_input(command, stress)) {
+        suanpan_error("A valid yield stress is required.\n");
+        return;
+    }
+
+    unsigned expression;
+    if(!get_input(command, expression)) {
+        suanpan_error("A valid expression tag is required.\n");
+        return;
+    }
+
+    auto density = 0.;
+    if(command.eof())
+        suanpan_debug("Zero density assumed.\n");
+    else if(!get_input(command, density)) {
+        suanpan_error("A valid density is required.\n");
+        return;
+    }
+
+    return_obj = make_unique<CustomHoffman>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), expression, density);
 }
 
 void new_expj2(unique_ptr<Material>& return_obj, istringstream& command) {
@@ -3066,6 +3156,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "Bilinear2D")) new_bilinear2d(new_material, command);
     else if(is_equal(material_id, "BilinearCC")) new_bilinearcc(new_material, command);
     else if(is_equal(material_id, "BilinearDP")) new_bilineardp(new_material, command);
+    else if(is_equal(material_id, "CustomDP")) new_customdp(new_material, command);
     else if(is_equal(material_id, "BilinearElastic1D")) new_bilinearelastic1d(new_material, command);
     else if(is_equal(material_id, "BilinearHoffman")) new_bilinearhoffman(new_material, command);
     else if(is_equal(material_id, "BilinearJ2")) new_bilinearj2(new_material, command);
@@ -3103,6 +3194,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "ExpGurson")) new_expgurson(new_material, command);
     else if(is_equal(material_id, "ExpGurson1D")) new_expgurson1d(new_material, command);
     else if(is_equal(material_id, "ExpHoffman")) new_exphoffman(new_material, command);
+    else if(is_equal(material_id, "CustomHoffman")) new_customhoffman(new_material, command);
     else if(is_equal(material_id, "ExpJ2")) new_expj2(new_material, command);
     else if(is_equal(material_id, "CustomJ2")) new_customj2(new_material, command);
     else if(is_equal(material_id, "ExpMises1D")) new_expmises1d(new_material, command);

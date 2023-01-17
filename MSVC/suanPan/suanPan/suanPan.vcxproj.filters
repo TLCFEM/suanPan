@@ -1468,6 +1468,12 @@
     <ClCompile Include="..\..\..\Material\Material3D\vonMises\CustomJ2.cpp">
       <Filter>Material\Material3D\vonMises</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\DruckerPrager\CustomDP.cpp">
+      <Filter>Material\Material3D\DruckerPrager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Hoffman\CustomHoffman.cpp">
+      <Filter>Material\Material3D\Hoffman</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2793,6 +2799,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material3D\vonMises\CustomJ2.h">
       <Filter>Material\Material3D\vonMises</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\DruckerPrager\CustomDP.h">
+      <Filter>Material\Material3D\DruckerPrager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Hoffman\CustomHoffman.h">
+      <Filter>Material\Material3D\Hoffman</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

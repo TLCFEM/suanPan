@@ -4,14 +4,15 @@ set(M3D
         Material3D/Clay/CamClay/NonlinearCamClay.cpp
         Material3D/Clay/CamClay/ParabolicCC.cpp
         Material3D/Concrete/CDP.cpp
-        Material3D/Concrete/CustomCDP.cpp
         Material3D/Concrete/CDPM2.cpp
+        Material3D/Concrete/CustomCDP.cpp
         Material3D/Concrete/NonlinearCDP.cpp
         Material3D/Concrete/Rebar3D.cpp
         Material3D/Concrete/TableCDP.cpp
         Material3D/Damage/IsotropicDamage.cpp
         Material3D/Damage/LinearDamage.cpp
         Material3D/DruckerPrager/BilinearDP.cpp
+        Material3D/DruckerPrager/CustomDP.cpp
         Material3D/DruckerPrager/ExpDP.cpp
         Material3D/DruckerPrager/NonlinearDruckerPrager.cpp
         Material3D/Elastic/BlatzKo.cpp
@@ -22,18 +23,19 @@ set(M3D
         Material3D/Elastic/OrthotropicElastic3D.cpp
         Material3D/Elastic/Yeoh.cpp
         Material3D/Hoffman/BilinearHoffman.cpp
+        Material3D/Hoffman/CustomHoffman.cpp
         Material3D/Hoffman/ExpHoffman.cpp
         Material3D/Hoffman/NonlinearHill.cpp
         Material3D/Hoffman/NonlinearHoffman.cpp
         Material3D/Material3D.cpp
-        Material3D/Sand/SimpleSand.cpp
         Material3D/Sand/DafaliasManzari.cpp
+        Material3D/Sand/SimpleSand.cpp
         Material3D/vonMises/ArmstrongFrederick.cpp
         Material3D/vonMises/BilinearJ2.cpp
         Material3D/vonMises/BilinearPeric.cpp
+        Material3D/vonMises/CustomJ2.cpp
         Material3D/vonMises/ExpGurson.cpp
         Material3D/vonMises/ExpJ2.cpp
-        Material3D/vonMises/CustomJ2.cpp
         Material3D/vonMises/MultilinearJ2.cpp
         Material3D/vonMises/NonlinearGurson.cpp
         Material3D/vonMises/NonlinearJ2.cpp
