@@ -18,7 +18,7 @@
 #include "Orientation.h"
 #include <Element/Element.h>
 
-void Orientation::check_element_ptr() const { suanpan_assert([&] { if(element_ptr == nullptr) throw logic_error("need to set element pointer first.\n"); }); }
+void Orientation::check_element_ptr() const { suanpan_assert([&] { if(element_ptr == nullptr) throw logic_error("need to set element pointer first"); }); }
 
 Orientation::Orientation(const unsigned T, vec&& O)
     : Tag(T)
