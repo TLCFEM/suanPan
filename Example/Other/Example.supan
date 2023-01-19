@@ -27,6 +27,9 @@ set output_folder $pwd
 
 peek ,output_folder
 
+set num_threads 2
+peek num_threads
+
 pwd
 
 pwd ..

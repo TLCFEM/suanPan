@@ -71,7 +71,9 @@ endif ()
 link_directories(Libs/${SP_EXTERNAL_LIB_PATH})
 
 if (USE_SUPERLUMT)
-    add_compile_definitions(SUANPAN_SUPERLUMT)
+    message(WARNING "Current SuperLU MT library may contain bugs. Disabling it.")
+    set(USE_SUPERLUMT OFF CACHE BOOL "" FORCE)
+    # add_compile_definitions(SUANPAN_SUPERLUMT)
 endif ()
 
 if (USE_MKL)
