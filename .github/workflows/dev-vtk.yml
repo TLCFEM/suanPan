@@ -68,7 +68,7 @@ jobs:
         run: |
           go build Checker/updater.go
           cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=D:/a/suanPan/suanPan/lib/cmake/vtk-9.2/ -DCMAKE_INSTALL_PREFIX=suanPan-win-openblas-vtk .
-          cmake --build . --target INSTALL --config Release
+          cmake --build . --target INSTALL --config Release -j 4
       - name: Pack
         run: |
           cp updater.exe suanPan-win-openblas-vtk/bin
