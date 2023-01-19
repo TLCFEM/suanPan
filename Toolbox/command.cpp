@@ -1517,6 +1517,8 @@ int print_info(const shared_ptr<DomainBase>& domain, istringstream& command) {
     }
     else if(is_equal(object_type, "output_folder"))
         suanpan_info("{}\n", SUANPAN_OUTPUT.generic_string());
+    else if(is_equal(object_type, "num_threads"))
+        suanpan_info("SUANPAN_NUM_THREADS: {}\n", SUANPAN_NUM_THREADS);
 
     return SUANPAN_SUCCESS;
 }
