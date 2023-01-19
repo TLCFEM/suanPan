@@ -16,29 +16,35 @@ using superlu::SuperMatrix;
 
 extern int SUANPAN_NUM_THREADS;
 
-typedef enum { SLU_NC,
-               SLU_NCP,
-               SLU_NR,
-               SLU_SC,
-               SLU_SCP,
-               SLU_SR,
-               SLU_DN,
-               SLU_NR_loc } Stype_t;
+typedef enum {
+    SLU_NC,
+    SLU_NCP,
+    SLU_NR,
+    SLU_SC,
+    SLU_SCP,
+    SLU_SR,
+    SLU_DN,
+    SLU_NR_loc
+} Stype_t;
 
-typedef enum { SLU_S,
-               SLU_D,
-               SLU_C,
-               SLU_Z } Dtype_t;
+typedef enum {
+    SLU_S,
+    SLU_D,
+    SLU_C,
+    SLU_Z
+} Dtype_t;
 
-typedef enum { SLU_GE,
-               SLU_TRLU,
-               SLU_TRUU,
-               SLU_TRL,
-               SLU_TRU,
-               SLU_SYL,
-               SLU_SYU,
-               SLU_HEL,
-               SLU_HEU } Mtype_t;
+typedef enum {
+    SLU_GE,
+    SLU_TRLU,
+    SLU_TRUU,
+    SLU_TRL,
+    SLU_TRU,
+    SLU_SYL,
+    SLU_SYU,
+    SLU_HEL,
+    SLU_HEU
+} Mtype_t;
 
 typedef struct {
     Stype_t Stype;
@@ -120,40 +126,66 @@ typedef struct {
     float* flops_by_height;
 } Gstat_t;
 
-typedef enum { NO,
-               YES } yes_no_t;
-typedef enum { DOFACT,
-               SamePattern,
-               SamePattern_SameRowPerm,
-               FACTORED } fact_t;
-typedef enum { NOROWPERM,
-               LargeDiag_MC64,
-               LargeDiag_HWPM,
-               MY_PERMR } rowperm_t;
-typedef enum { NATURAL,
-               MMD_ATA,
-               MMD_AT_PLUS_A,
-               COLAMD,
-               METIS_AT_PLUS_A,
-               PARMETIS,
-               ZOLTAN,
-               MY_PERMC } colperm_t;
-typedef enum { NOTRANS,
-               TRANS,
-               CONJ } trans_t;
-typedef enum { NOREFINE,
-               SLU_SINGLE = 1,
-               SLU_DOUBLE,
-               SLU_EXTRA } IterRefine_t;
-typedef enum { SYSTEM,
-               USER } LU_space_t;
-typedef enum { ONE_NORM,
-               TWO_NORM,
-               INF_NORM } norm_t;
-typedef enum { SILU,
-               SMILU_1,
-               SMILU_2,
-               SMILU_3 } milu_t;
+typedef enum {
+    NO,
+    YES
+} yes_no_t;
+
+typedef enum {
+    DOFACT,
+    SamePattern,
+    SamePattern_SameRowPerm,
+    FACTORED
+} fact_t;
+
+typedef enum {
+    NOROWPERM,
+    LargeDiag_MC64,
+    LargeDiag_HWPM,
+    MY_PERMR
+} rowperm_t;
+
+typedef enum {
+    NATURAL,
+    MMD_ATA,
+    MMD_AT_PLUS_A,
+    COLAMD,
+    METIS_AT_PLUS_A,
+    PARMETIS,
+    ZOLTAN,
+    MY_PERMC
+} colperm_t;
+
+typedef enum {
+    NOTRANS,
+    TRANS,
+    CONJ
+} trans_t;
+
+typedef enum {
+    NOREFINE,
+    SLU_SINGLE = 1,
+    SLU_DOUBLE,
+    SLU_EXTRA
+} IterRefine_t;
+
+typedef enum {
+    SYSTEM,
+    USER
+} LU_space_t;
+
+typedef enum {
+    ONE_NORM,
+    TWO_NORM,
+    INF_NORM
+} norm_t;
+
+typedef enum {
+    SILU,
+    SMILU_1,
+    SMILU_2,
+    SMILU_3
+} milu_t;
 
 typedef struct {
     fact_t Fact;
@@ -183,6 +215,7 @@ typedef struct {
     yes_no_t lookahead_etree;
     yes_no_t SymPattern;
 } superlu_options_t;
+
 typedef float flops_t;
 
 typedef struct {
