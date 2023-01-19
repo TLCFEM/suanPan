@@ -1,5 +1,5 @@
 coverage:
-  range: 75..85
+  range: 80..90
   round: up
   precision: 4
 parsers:
