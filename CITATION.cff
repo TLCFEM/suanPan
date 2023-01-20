@@ -19,7 +19,7 @@ identifiers:
   - type: doi
     value: 10.5281/zenodo.1285221
 repository-code: 'https://github.com/TLCFEM/suanPan'
-url: 'https://bit.ly/suanpan-doc'
+url: 'https://tlcfem.github.io/suanPan-manual/latest/'
 keywords:
   - FEM
   - Seismic Engineering
@@ -28,5 +28,5 @@ keywords:
   - IGA
   - Solid Mechanics
 license: GPL-3.0
-version: '2.7'
-date-released: '2022-12-21'
+version: '2.8'
+date-released: '2023-01-20'

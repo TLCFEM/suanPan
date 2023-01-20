@@ -46,7 +46,7 @@ if [ -f $file_name ]; then
 fi
 
 # application
-file_name="$folder_name/Toolbox/argumentParser.cpp"
+file_name="$folder_name/Toolbox/argument.cpp"
 if [ -f $file_name ]; then
   sed -i "s/constexpr auto SUANPAN_MAJOR = [0-9];/constexpr auto SUANPAN_MAJOR = $1;/g" $file_name
   sed -i "s/constexpr auto SUANPAN_MINOR = [0-9];/constexpr auto SUANPAN_MINOR = $2;/g" $file_name
