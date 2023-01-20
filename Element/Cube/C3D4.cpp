@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@
 #include <Domain/DomainBase.h>
 #include <Material/Material3D/Material3D.h>
 #include <Recorder/OutputType.h>
-#include <Toolbox/shapeFunction.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/shape.h>
+#include <Toolbox/tensor.h>
 
 C3D4::C3D4(const unsigned T, uvec&& N, const unsigned M, const bool F)
     : MaterialElement3D(T, c_node, c_dof, std::forward<uvec>(N), uvec{M}, F) {}
@@ -141,14 +141,12 @@ int C3D4::reset_status() { return c_material->reset_status(); }
 vector<vec> C3D4::record(const OutputType T) { return c_material->record(T); }
 
 void C3D4::print() {
-    node_encoding.t().print("C3D4 element connects:");
+    suanpan_info("C3D4 element connects:", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Material:\n");
     c_material->print();
-    suanpan_info("Strain:\t");
-    c_material->get_trial_strain().t().print();
-    suanpan_info("Stress:\t");
-    c_material->get_trial_stress().t().print();
+    suanpan_info("Strain:\t", c_material->get_trial_strain());
+    suanpan_info("Stress:\t", c_material->get_trial_stress());
 }
 
 #ifdef SUANPAN_VTK

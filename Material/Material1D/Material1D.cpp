@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,4 +49,6 @@ vector<vec> Material1D::record(const OutputType P) {
     return data;
 }
 
-void Material1D::print() { suanpan_info("Current Strain: %.3E\tCurrent Stress: %.3E\n", current_strain(0), current_stress(0)); }
+void Material1D::print() {
+    suanpan_info("Current Strain: {:.3E}\tCurrent Stress: {:.3E}\n", current_strain(0), current_stress(0));
+}

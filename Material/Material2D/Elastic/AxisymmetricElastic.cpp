@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
  ******************************************************************************/
 
 #include "AxisymmetricElastic.h"
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 AxisymmetricElastic::AxisymmetricElastic(const unsigned T, const double E, const double P, const double R)
     : Material2D(T, PlaneType::A, R)
@@ -64,6 +64,6 @@ int AxisymmetricElastic::reset_status() {
 }
 
 void AxisymmetricElastic::print() {
-    get_trial_strain().t().print("Strain:");
-    get_trial_stress().t().print("Stress:");
+    suanpan_info("Strain:\t", get_trial_strain());
+    suanpan_info("Stress:\t", get_trial_stress());
 }

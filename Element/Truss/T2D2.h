@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,6 +40,8 @@ class T2D2 final : public MaterialElement1D {
 
     const double length = 0.; // length of the element
     const double area;        // area of the cross-section
+    const double rigidity;
+    const double euler = 1.;
 
     unique_ptr<Material> t_material; // material model
     unique_ptr<Orientation> t_trans; // transformation
@@ -53,7 +55,8 @@ public:
          double,       // area
          bool = false, // nonlinear geometry switch
          bool = true,  // update area switch
-         bool = true   // log strain switch
+         bool = true,  // log strain switch
+         double = -1.  // flexural rigidity
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

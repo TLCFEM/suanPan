@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -79,4 +79,6 @@ void EigenRecorder::save() {
 #endif
 }
 
-void EigenRecorder::print() { suanpan_info("A recorder to record eigen values and eigen vectors.\n"); }
+void EigenRecorder::print() {
+    suanpan_info("A recorder to record eigen values and eigen vectors.\n");
+}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -72,6 +72,6 @@ int BilinearElastic1D::reset_status() {
 }
 
 void BilinearElastic1D::print() {
-    suanpan_info("A bilinear elastic material model with an elastic modulus of %.3E and a hardening ratio of %.2f.\n", elastic_modulus, hardening_modulus / elastic_modulus);
+    suanpan_info("A bilinear elastic material model with an elastic modulus of {:.3E} and a hardening ratio of {:.2f}.\n", elastic_modulus, hardening_modulus / elastic_modulus);
     Material1D::print();
 }

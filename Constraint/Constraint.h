@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -64,7 +64,7 @@ public:
     Constraint& operator=(const Constraint&) = delete; // assign forbidden
     Constraint& operator=(Constraint&&) = delete;      // assign forbidden
 
-    ~Constraint() override;
+    ~Constraint() override = default;
 
     const sp_vec& get_resistance() const;
     const sp_mat& get_stiffness() const;

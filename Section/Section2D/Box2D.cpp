@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,4 +26,6 @@ Box2D::Box2D(const unsigned T, vec&& D, const unsigned M, const unsigned S, cons
 
 unique_ptr<Section> Box2D::get_copy() { return make_unique<Box2D>(*this); }
 
-void Box2D::print() { suanpan_info("A Box section.\n"); }
+void Box2D::print() {
+    suanpan_info("A 2D box section.\n");
+}

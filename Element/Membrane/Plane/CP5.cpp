@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@
 #include <Domain/Node.h>
 #include <Material/Material2D/Material2D.h>
 #include <Toolbox/IntegrationPlan.h>
-#include <Toolbox/shapeFunction.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/shape.h>
+#include <Toolbox/tensor.h>
 #include <Toolbox/utility.h>
 
 CP5::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M, mat&& PNPXY)
@@ -183,8 +183,8 @@ vector<vec> CP5::record(const OutputType P) {
 }
 
 void CP5::print() {
-    suanpan_info("A CP5 element%s.\n", nlgeom ? " with nonlinear geometry on" : "");
-    node_encoding.t().print("The nodes connected are:");
+    suanpan_info("A CP5 element{}.\n", nlgeom ? " with nonlinear geometry on" : "");
+    suanpan_info("The nodes connected are:", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Material:\n");
     for(const auto& I : int_pt) I.m_material->print();

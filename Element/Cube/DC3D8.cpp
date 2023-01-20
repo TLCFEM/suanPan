@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #include <Material/Material3D/Material3D.h>
 #include <Recorder/OutputType.h>
 #include <Toolbox/IntegrationPlan.h>
-#include <Toolbox/shapeFunction.h>
+#include <Toolbox/shape.h>
 
 const uvec DC3D8::u_dof{0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18, 20, 21, 22, 24, 25, 26, 28, 29, 30};
 const uvec DC3D8::d_dof{3, 7, 11, 15, 19, 23, 27, 31};
@@ -136,15 +136,13 @@ vector<vec> DC3D8::record(const OutputType T) {
 }
 
 void DC3D8::print() {
-    node_encoding.t().print("DC3D8 element connects:");
+    suanpan_info("DC3D8 element connects:", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Material:\n");
     for(const auto& t_pt : int_pt) {
         t_pt.c_material->print();
-        suanpan_info("Strain:\t");
-        t_pt.c_material->get_current_strain().t().print();
-        suanpan_info("Stress:\t");
-        t_pt.c_material->get_current_stress().t().print();
+        suanpan_info("Strain:\t", t_pt.c_material->get_current_strain());
+        suanpan_info("Stress:\t", t_pt.c_material->get_current_stress());
     }
 }
 

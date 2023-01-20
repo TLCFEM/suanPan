@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ int RigidWallMultiplier::initialize(const shared_ptr<DomainBase>& D) {
     // for dynamic analysis, velocity and acceleration shall be changed
     // multiplier method does not give proper result
     if(AnalysisType::DYNAMICS == D->get_factory()->get_analysis_type()) {
-        suanpan_warning("multiplier rigid wall constraint cannot be applied in dynamic analysis.\n");
+        suanpan_warning("Multiplier rigid wall constraint cannot be applied in dynamic analysis.\n");
         access::rw(use_penalty) = true;
     }
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@ Circle1D::Circle1D(const unsigned T, const double B, const unsigned M)
 unique_ptr<Section> Circle1D::get_copy() { return make_unique<Circle1D>(*this); }
 
 void Circle1D::print() {
-    suanpan_info("A 1D circular section with radius of %.3E.\n", radius);
-    suanpan_info("Material: ");
+    suanpan_info("A uniaxial circular section with radius of {:.3E}.\nMaterial: ", radius);
     s_material->print();
 }

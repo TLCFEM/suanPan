@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@
 #include <Material/Material2D/Material2D.h>
 #include <Recorder/OutputType.h>
 #include <Toolbox/IntegrationPlan.h>
-#include <Toolbox/shapeFunction.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/shape.h>
+#include <Toolbox/tensor.h>
 #include <Toolbox/utility.h>
 
 PCPE4UC::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M)
@@ -41,11 +41,11 @@ int PCPE4UC::initialize(const shared_ptr<DomainBase>& D) {
 
     // validate material type
     if(PlaneType::E != static_cast<PlaneType>(s_mat->get_parameter(ParameterType::PLANETYPE))) {
-        suanpan_error("PCPE4UC %u only supports the plane strain material for solid phase.\n", get_tag());
+        suanpan_error("Only plane strain material for solid phase is supported.\n");
         return SUANPAN_FAIL;
     }
     if(MaterialType::DS != f_mat->get_material_type()) {
-        suanpan_error("PCPE4UC %u only supports the isotropic fluid phase.\n", get_tag());
+        suanpan_error("Only isotropic fluid phase is supported.\n");
         return SUANPAN_FAIL;
     }
 
@@ -54,11 +54,11 @@ int PCPE4UC::initialize(const shared_ptr<DomainBase>& D) {
     const auto kf = f_mat->get_parameter(ParameterType::BULKMODULUS);
 
     if(suanpan::approx_equal(ks, 0.)) {
-        suanpan_error("PCPE4UC %u solid phase returns a zero bulk modulus.\n", get_tag());
+        suanpan_error("A zero bulk modulus is detected.\n");
         return SUANPAN_FAIL;
     }
     if(suanpan::approx_equal(kf, 0.)) {
-        suanpan_error("PCPE4UC %u fluid phase returns a zero bulk modulus.\n", get_tag());
+        suanpan_error("A zero bulk modulus is detected.\n");
         return SUANPAN_FAIL;
     }
 
@@ -179,13 +179,13 @@ vector<vec> PCPE4UC::record(const OutputType P) {
 }
 
 void PCPE4UC::print() {
-    suanpan_info("Element %u is a four-node membrane element (PCPE4UC).\n", get_tag());
-    node_encoding.t().print("The nodes connected are:");
+    suanpan_info("A four-node membrane element (PCPE4UC).\n");
+    suanpan_info("The nodes connected are:", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Material:\n");
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        suanpan_info("Integration Point %llu:\t", I + 1);
-        int_pt[I].coor.t().print();
+        suanpan_info("IP {}:\t", I + 1);
+        suanpan_info(int_pt[I].coor);
         int_pt[I].m_material->print();
     }
 }

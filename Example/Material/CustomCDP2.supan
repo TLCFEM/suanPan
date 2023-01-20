@@ -1,0 +1,15 @@
+# A TEST MODEL FOR CDP MATERIAL
+
+expression SimpleVector 1 x y|6 example
+expression SimpleVector 2 x y|3 y:=0
+
+material CustomCDP 1 5 5
+material CustomCDP 2 2 5
+material CustomCDP 3 1 5
+material CustomCDP 4 1 2
+
+step static 1
+
+precheck
+
+exit

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -276,7 +276,7 @@ template<sp_d T> int SparseMatSuperLU<T>::solve_trs(Mat<T>& out_mat, const Mat<T
 
         out_mat += incre;
 
-        suanpan_debug("mixed precision algorithm multiplier: %.5E.\n", multiplier = norm(full_residual -= this->operator*(incre)));
+        suanpan_debug("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier = norm(full_residual -= this->operator*(incre)));
     }
 
     return flag;
@@ -345,7 +345,7 @@ template<sp_d T> int SparseMatSuperLU<T>::solve_trs(Mat<T>& out_mat, Mat<T>&& in
 
         out_mat += incre;
 
-        suanpan_debug("mixed precision algorithm multiplier: %.5E.\n", multiplier = norm(in_mat -= this->operator*(incre)));
+        suanpan_debug("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier = norm(in_mat -= this->operator*(incre)));
     }
 
     return flag;

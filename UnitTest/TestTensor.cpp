@@ -1,4 +1,4 @@
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 #include "CatchHeader.h"
 
 using namespace tensor;

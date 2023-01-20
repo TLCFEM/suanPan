@@ -1,5 +1,5 @@
 ﻿/*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ int Sequential::initialize(const shared_ptr<DomainBase>& D) {
     for(const auto I : mat_tag) {
         mat_pool.emplace_back(suanpan::initialized_material_copy(D, I));
         if(nullptr == mat_pool.back() || mat_pool.back()->get_material_type() != MaterialType::D1) {
-            suanpan_error("Sequential %u requires 1D host material models.\n", get_tag());
+            suanpan_error("A valid 1D host material is required.\n");
             return SUANPAN_FAIL;
         }
         access::rw(density) += mat_pool.back()->get_parameter(ParameterType::DENSITY);
@@ -82,12 +82,12 @@ int Sequential::update_trial_status(const vec& t_strain) {
         for(size_t I = 0; I < mat_pool.size(); ++I) mat_pool[I]->update_trial_status(mat_pool[I]->get_trial_strain() + i_strain[I]);
 
         const auto error = norm(i_strain);
-        suanpan_debug("Sequential local iteration error: %.4E.\n", error);
+        suanpan_debug("Local iteration error: {:.5E}.\n", error);
         if(error <= tolerance) break;
     }
 
     if(max_iteration == counter) {
-        suanpan_error("Sequential cannot converge within %u iterations.\n", max_iteration);
+        suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
         return SUANPAN_FAIL;
     }
 

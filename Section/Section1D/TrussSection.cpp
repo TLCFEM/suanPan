@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,4 +23,6 @@ TrussSection::TrussSection(const unsigned T, const double A, const unsigned M)
 
 unique_ptr<Section> TrussSection::get_copy() { return make_unique<TrussSection>(*this); }
 
-void TrussSection::print() { suanpan_info("A 1D generalized section with an area of %.3E.\n", area); }
+void TrussSection::print() {
+    suanpan_info("A uniaxial generalized section with an area of {:.3E}.\n", area);
+}

@@ -1,5 +1,19 @@
 example
 
+help
+
+terminal ls
+
+version
+
+doesnotexist
+
+disable print
+enable print
+
+set verbose_output false
+set screen_output true
+
 set output_folder result/a/b
 set output_folder result
 set output_folder result/a
@@ -13,8 +27,17 @@ set output_folder $pwd
 
 peek ,output_folder
 
+set num_threads 2
+peek num_threads
+
 pwd
 
+pwd ..
+
 benchmark
+
+command
+
+qrcode
 
 exit

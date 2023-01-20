@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,4 @@
 #include "DomainBase.h"
 
 DomainBase::DomainBase(const unsigned T)
-    : Tag(T) { suanpan_debug("Domain %u ctor() called.\n", T); }
-
-DomainBase::~DomainBase() { suanpan_debug("Domain %u dtor() called.\n", get_tag()); }
+    : Tag(T) {}

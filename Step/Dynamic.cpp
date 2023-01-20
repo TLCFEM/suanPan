@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,12 +47,12 @@ int Dynamic::initialize() {
     if(nullptr == modifier) modifier = make_shared<Newmark>();
     else if(IntegratorType::Implicit == analysis_type) {
         if(IntegratorType::Implicit != modifier->type()) {
-            suanpan_error("an implicit integrator is required.\n");
+            suanpan_error("An implicit integrator is required.\n");
             return SUANPAN_FAIL;
         }
     }
     else if(IntegratorType::Implicit == modifier->type()) {
-        suanpan_error("an explicit integrator is required.\n");
+        suanpan_error("An explicit integrator is required.\n");
         return SUANPAN_FAIL;
     }
     modifier->set_domain(t_domain);
@@ -72,7 +72,7 @@ int Dynamic::initialize() {
     }
 
     if(dynamic_cast<BFGS*>(solver.get()) && dynamic_cast<LeeNewmarkBase*>(modifier.get())) {
-        suanpan_error("currently BFGS solver is not supported by Lee damping model.\n");
+        suanpan_error("BFGS solver is not supported by Lee's damping model.\n");
         return SUANPAN_FAIL;
     }
 
@@ -101,7 +101,7 @@ int Dynamic::analyze() {
         if(remain_time <= 1E-7) return SUANPAN_SUCCESS;
         // check if the maximum substep number is hit
         if(++num_increment > get_max_substep()) {
-            suanpan_warning("analyze() reaches maximum substep number %u.\n", get_max_substep());
+            suanpan_warning("The maximum sub-step number {} reached.\n", get_max_substep());
             return SUANPAN_FAIL;
         }
         // update incremental and trial time
@@ -129,12 +129,12 @@ int Dynamic::analyze() {
             G->reset_status();
             // check if minimum step size is hit
             if(step_time <= get_min_step_size()) {
-                suanpan_error("analyze() reaches minimum step size %.3E.\n", get_min_step_size());
+                suanpan_error("The minimum step size {:.3E} reached.\n", get_min_step_size());
                 return SUANPAN_FAIL;
             }
             // check if fixed step size
             if(is_fixed_step_size() || !G->allow_to_change_time_step()) {
-                suanpan_error("analyze() does not converge for given fixed step size %.3E.\n", step_time);
+                suanpan_error("Cannot converge with the given step size {:.3E}.\n", step_time);
                 return SUANPAN_FAIL;
             }
             // step size is allowed to decrease

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 #include <Material/Material3D/Material3D.h>
 #include <Recorder/OutputType.h>
 #include <Toolbox/IntegrationPlan.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 PatchCube::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M)
     : coor(std::forward<vec>(C))
@@ -149,14 +149,12 @@ vector<vec> PatchCube::record(const OutputType T) {
 }
 
 void PatchCube::print() {
-    node_encoding.t().print("PatchCube element connects nodes:");
+    suanpan_info("PatchCube element connects nodes:", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Material:\n");
     for(const auto& t_pt : int_pt) {
         t_pt.c_material->print();
-        suanpan_info("Strain:\t");
-        t_pt.c_material->get_trial_strain().t().print();
-        suanpan_info("Stress:\t");
-        t_pt.c_material->get_trial_stress().t().print();
+        suanpan_info("Strain:\t", t_pt.c_material->get_trial_strain());
+        suanpan_info("Stress:\t", t_pt.c_material->get_trial_stress());
     }
 }

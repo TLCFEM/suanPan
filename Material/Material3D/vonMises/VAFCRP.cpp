@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 #include <Domain/DomainBase.h>
 #include <Domain/FactoryHelper.hpp>
 #include <Recorder/OutputType.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 const double VAFCRP::root_three_two = sqrt(1.5);
 const mat VAFCRP::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
@@ -71,7 +71,7 @@ int VAFCRP::update_trial_status(const vec& t_strain) {
     unsigned counter = 0;
     while(true) {
         if(max_iteration == ++counter) {
-            suanpan_error("VAFCRP cannot converge within %u iterations.\n", max_iteration);
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
             return SUANPAN_FAIL;
         }
 
@@ -100,7 +100,7 @@ int VAFCRP::update_trial_status(const vec& t_strain) {
         jacobian = exp_gamma * (root_three_two * sum_b - three_shear - q * epsilon * mu / (*incre_time + mu * gamma)) - dk;
 
         const auto incre = (q * exp_gamma - k) / jacobian;
-        suanpan_extra_debug("VAFCRP local iteration error: %.5E.\n", fabs(incre));
+        suanpan_debug("Local iteration error: {:.5E}.\n", fabs(incre));
         if(fabs(incre) <= tolerance) break;
 
         gamma -= incre;
@@ -153,4 +153,6 @@ vector<vec> VAFCRP::record(const OutputType P) {
     return Material3D::record(P);
 }
 
-void VAFCRP::print() { suanpan_info("The VADCRP model.\n"); }
+void VAFCRP::print() {
+    suanpan_info("A VADCRP material model.\n");
+}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #include <Material/Material.h>
 #include <Recorder/OutputType.h>
 #include <Toolbox/IntegrationPlan.h>
-#include <Toolbox/shapeFunction.h>
+#include <Toolbox/shape.h>
 #include <Toolbox/utility.h>
 
 Mindlin::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const double E, const double F, unique_ptr<Material>&& M)
@@ -143,7 +143,9 @@ vector<vec> Mindlin::record(const OutputType P) {
     return data;
 }
 
-void Mindlin::print() { node_encoding.t().print("A Mindlin plate element connects:"); }
+void Mindlin::print() {
+    suanpan_info("A Mindlin plate element connects:", node_encoding);
+}
 
 #ifdef SUANPAN_VTK
 #include <vtkQuad.h>

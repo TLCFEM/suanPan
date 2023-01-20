@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ int Substepping::initialize(const shared_ptr<DomainBase>& D) {
     current_mat_obj = suanpan::initialized_material_copy(D, mat_tag);
 
     if(nullptr == current_mat_obj) {
-        suanpan_error("Substepping %u requires a valid host material model.\n", get_tag());
+        suanpan_error("A valid host material is required.\n");
         return SUANPAN_FAIL;
     }
 

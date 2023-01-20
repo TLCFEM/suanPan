@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,4 +39,6 @@ void AmplitudeRecorder::record(const shared_ptr<DomainBase>& D) {
     if(if_record_time()) insert(current_time);
 }
 
-void AmplitudeRecorder::print() { suanpan_info("A recorder to record amplitudes.\n"); }
+void AmplitudeRecorder::print() {
+    suanpan_info("A recorder to record amplitudes.\n");
+}

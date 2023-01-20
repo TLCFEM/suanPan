@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -85,7 +85,7 @@ template<sp_d T> int SparseMatPARDISO<T>::direct_solve(Mat<T>& X, const Mat<T>& 
     pardiso(pt, &maxfct, &mnum, &mtype, &phase, &n, (void*)csr_mat.val_mem(), csr_mat.row_mem(), csr_mat.col_mem(), nullptr, &nrhs, iparm, &msglvl, nullptr, nullptr, &error);
 
     if(0 != error) {
-        suanpan_error("PARDISO solver returns %d.\n", error);
+        suanpan_error("Error code {} received.\n", error);
         return SUANPAN_FAIL;
     }
 
@@ -93,7 +93,7 @@ template<sp_d T> int SparseMatPARDISO<T>::direct_solve(Mat<T>& X, const Mat<T>& 
     pardiso(pt, &maxfct, &mnum, &mtype, &phase, &n, (void*)csr_mat.val_mem(), csr_mat.row_mem(), csr_mat.col_mem(), nullptr, &nrhs, iparm, &msglvl, (void*)B.memptr(), (void*)X.memptr(), &error);
 
     if(0 != error) {
-        suanpan_error("PARDISO solver returns %d.\n", error);
+        suanpan_error("Error code {} received.\n", error);
         return SUANPAN_FAIL;
     }
 

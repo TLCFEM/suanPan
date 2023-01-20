@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,4 +19,6 @@
 
 double Constant::get_amplitude(double) { return 1.; }
 
-void Constant::print() { suanpan_info("Constant Amplitude.\n"); }
+void Constant::print() {
+    suanpan_info("Constant.\n");
+}

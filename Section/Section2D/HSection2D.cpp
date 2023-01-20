@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -64,10 +64,10 @@ int HSection2D::initialize(const shared_ptr<DomainBase>& D) {
 unique_ptr<Section> HSection2D::get_copy() { return make_unique<HSection2D>(*this); }
 
 void HSection2D::print() {
-    suanpan_info("A H-shape section.\n");
+    suanpan_info("A 2D H-shape section.\n");
     auto J = 1;
     for(const auto& I : int_pt) {
-        suanpan_info("IP %u: %.4E.\n", J++, I.coor);
+        suanpan_info("IP {}: {:.4E}.\n", J++, I.coor);
         I.s_material->print();
     }
 }

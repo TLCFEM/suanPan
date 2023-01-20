@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
  ******************************************************************************/
 
 #include "NonlinearCamClay.h"
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 const double NonlinearCamClay::sqrt_three_two = sqrt(1.5);
 const mat NonlinearCamClay::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
@@ -67,7 +67,7 @@ int NonlinearCamClay::update_trial_status(const vec& t_strain) {
     unsigned counter = 0;
     while(true) {
         if(max_iteration == ++counter) {
-            suanpan_error("NonlinearCamClay cannot converge within %u iterations.\n", max_iteration);
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
             return SUANPAN_FAIL;
         }
 
@@ -93,7 +93,7 @@ int NonlinearCamClay::update_trial_status(const vec& t_strain) {
 
         auto error = norm(residual);
         if(1 == counter) rel_error = std::max(1., error);
-        suanpan_debug("NonlinearCamClay local iteration error: %.5E.\n", error /= rel_error);
+        suanpan_debug("Local iteration error: {:.5E}.\n", error /= rel_error);
         if(error <= tolerance || norm(incre) <= tolerance) {
             rel_error = 2. * bulk / square_b; // reuse variable
             left.col(0) = rel_error * rel_p * tensor::unit_tensor2 + six_shear / denom * (trial_s *= square_m / denom);
@@ -137,4 +137,6 @@ int NonlinearCamClay::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-void NonlinearCamClay::print() { suanpan_info("A 3D nonlinear modified Cam-Clay model.\n"); }
+void NonlinearCamClay::print() {
+    suanpan_info("A 3D nonlinear modified Cam-Clay model.\n");
+}

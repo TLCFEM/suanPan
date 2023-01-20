@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,4 +33,6 @@ ExpDP::ExpDP(const unsigned T, const double E, const double V, const double ETAY
 
 unique_ptr<Material> ExpDP::get_copy() { return make_unique<ExpDP>(*this); }
 
-void ExpDP::print() { suanpan_info("A 3D exponential hardening model using Drucker--Prager yielding criterion.\n"); }
+void ExpDP::print() {
+    suanpan_info("A 3D exponential hardening model using Drucker-Prager yielding criterion.\n");
+}

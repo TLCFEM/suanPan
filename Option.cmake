@@ -1,6 +1,7 @@
 include_directories(${ROOT})
 include_directories(Include)
 include_directories(Include/metis)
+include_directories(Include/fmt/include)
 
 set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Debug Release RelWithDebInfo MinSizeRel")
 
@@ -70,7 +71,9 @@ endif ()
 link_directories(Libs/${SP_EXTERNAL_LIB_PATH})
 
 if (USE_SUPERLUMT)
-    add_compile_definitions(SUANPAN_SUPERLUMT)
+    message(WARNING "Current SuperLU MT library may contain bugs. Disabling it.")
+    set(USE_SUPERLUMT OFF CACHE BOOL "" FORCE)
+    # add_compile_definitions(SUANPAN_SUPERLUMT)
 endif ()
 
 if (USE_MKL)
@@ -139,7 +142,7 @@ endif ()
 if (USE_HDF5)
     add_compile_definitions(SUANPAN_HDF5)
     if (HAVE_VTK)
-        string(REGEX REPLACE "/lib/cmake/vtk" "/include/vtk" VTK_INCLUDE ${VTK_DIR})
+        string(REGEX REPLACE "/lib6?4?/cmake/vtk" "/include/vtk" VTK_INCLUDE ${VTK_DIR})
         include_directories(${VTK_INCLUDE}/vtkhdf5)
         include_directories(${VTK_INCLUDE}/vtkhdf5/src)
         include_directories(${VTK_INCLUDE}/vtkhdf5/hl/src)

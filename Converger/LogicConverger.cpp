@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ LogicConverger::LogicConverger(const unsigned T, const unsigned TA, const unsign
 int LogicConverger::initialize() {
     const auto t_domain = get_domain().lock();
     if(nullptr == t_domain) {
-        suanpan_error("initialize() needs a valid Domain.\n");
+        suanpan_error("A valid domain is required.\n");
         return SUANPAN_FAIL;
     }
 
@@ -36,7 +36,7 @@ int LogicConverger::initialize() {
     const auto& t_converger_b = t_domain->get_converger(tag_b);
 
     if(nullptr == t_converger_a || nullptr == t_converger_b) {
-        suanpan_error("initialize() needs valid convergers.\n");
+        suanpan_error("Two valid convergers are required.\n");
         return SUANPAN_FAIL;
     }
 

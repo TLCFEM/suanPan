@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -135,14 +135,14 @@ vector<vec> B21H::record(const OutputType P) {
 }
 
 void B21H::print() {
-    suanpan_info("A 2D beam element with lumped end plasticity (hinges)%s", nlgeom ? " and corotational formulation.\n" : ".\n");
-    suanpan_info("The plastic length is: %.3f.\n", hinge_length);
-    node_encoding.t().print("The element connects nodes:");
+    suanpan_info("A 2D beam element with lumped end plasticity (hinges){}", nlgeom ? " and corotational formulation.\n" : ".\n");
+    suanpan_info("The plastic hinge length is: {:.3f}.\n", hinge_length);
+    suanpan_info("The element connects nodes:", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Section:\n");
     auto J = 1;
     for(const auto& I : int_pt) {
-        suanpan_info("IP %d: ", J++);
+        suanpan_info("IP {}: ", J++);
         I.b_section->print();
     }
 }

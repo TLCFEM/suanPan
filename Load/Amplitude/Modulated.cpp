@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,4 +33,6 @@ double Modulated::get_amplitude(const double T) {
     return A;
 }
 
-void Modulated::print() { suanpan_info("Modulated Amplitude.\n"); }
+void Modulated::print() {
+    suanpan_info("Modulated.\n");
+}

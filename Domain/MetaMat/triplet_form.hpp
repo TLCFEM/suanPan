@@ -1,5 +1,5 @@
 ﻿/*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -227,7 +227,7 @@ public:
     template<sp_d in_dt, sp_i in_it> void assemble(const triplet_form<in_dt, in_it>&, index_t, index_t, data_t);
 
     template<sp_d in_dt, sp_i in_it> void assemble(const triplet_form<in_dt, in_it>& in_mat, const std::vector<index_t>& row_shift, const std::vector<index_t>& col_shift, const std::vector<data_t>& scalar) {
-        suanpan_debug([&] { if(scalar.size() != row_shift.size() || scalar.size() != col_shift.size()) throw invalid_argument("size mismatch detected"); });
+        suanpan_assert([&] { if(scalar.size() != row_shift.size() || scalar.size() != col_shift.size()) throw invalid_argument("size mismatch detected"); });
 
         reserve(n_elem + index_t(scalar.size()) * index_t(in_mat.n_elem));
 
@@ -380,7 +380,7 @@ template<sp_d data_t, sp_i index_t> template<sp_d in_dt, sp_i in_it> triplet_for
 }
 
 template<sp_d data_t, sp_i index_t> data_t& triplet_form<data_t, index_t>::at(const index_t row, const index_t col) {
-    suanpan_debug([&] { if(row >= n_rows || col >= n_cols) throw invalid_argument("inconsistent size"); });
+    suanpan_assert([&] { if(row >= n_rows || col >= n_cols) throw invalid_argument("inconsistent size"); });
 
     invalidate_sorting_flag();
     reserve(n_elem + 1);
@@ -390,12 +390,13 @@ template<sp_d data_t, sp_i index_t> data_t& triplet_form<data_t, index_t>::at(co
 }
 
 template<sp_d data_t, sp_i index_t> void triplet_form<data_t, index_t>::print() const {
-    suanpan_info("A sparse matrix in triplet form with size of %u by %u, the density of %.3f%%.\n", static_cast<unsigned>(n_rows), static_cast<unsigned>(n_cols), static_cast<double>(n_elem) / static_cast<double>(n_rows) / static_cast<double>(n_cols) * 1E2);
+    suanpan_info("A sparse matrix in triplet form with size of {} by {}, the density of {:.3f}%.\n", static_cast<unsigned>(n_rows), static_cast<unsigned>(n_cols), static_cast<double>(n_elem) / static_cast<double>(n_rows) / static_cast<double>(n_cols) * 1E2);
     if(n_elem > index_t(1000)) {
-        suanpan_info("Not going to print all elements as more than 1000 elements exist.\n");
+        suanpan_info("More than 1000 elements exist.\n");
         return;
     }
-    for(index_t I = 0; I < n_elem; ++I) suanpan_info("(%3u, %3u) ===> %+.10E\n", static_cast<unsigned>(row_idx[I]), static_cast<unsigned>(col_idx[I]), val_idx[I]);
+    for(index_t I = 0; I < n_elem; ++I)
+        suanpan_info("({}, {}) ===> {:+.8E}\n", static_cast<unsigned>(row_idx[I]), static_cast<unsigned>(col_idx[I]), val_idx[I]);
 }
 
 template<sp_d data_t, sp_i index_t> void triplet_form<data_t, index_t>::csr_sort() {

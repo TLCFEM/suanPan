@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
  ******************************************************************************/
 
 #include "NonlinearHoffman.h"
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 constexpr double NonlinearHoffman::four_third = 4. / 3.;
 const double NonlinearHoffman::root_two_third = sqrt(.5 * four_third);
@@ -108,7 +108,7 @@ int NonlinearHoffman::update_trial_status(const vec& t_strain) {
     while(++counter < max_iteration) {
         const auto incre_gamma = residual / gradient;
         const auto error = fabs(incre_gamma);
-        suanpan_extra_debug("Hoffman local iterative loop error: %.5E.\n", error);
+        suanpan_debug("Local iteration error: {:.5E}.\n", error);
         if(error <= tolerance || fabs(residual) <= tolerance) break;
         hessian = inv(inv_stiffness + (gamma += incre_gamma) * proj_a);
         n = proj_a * (t_stress = hessian * (e_strain - gamma * proj_b)) + proj_b;
@@ -120,7 +120,7 @@ int NonlinearHoffman::update_trial_status(const vec& t_strain) {
     }
 
     if(max_iteration == counter) {
-        suanpan_error("Hoffman cannot converge within %u iterations.\n", max_iteration);
+        suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
         return SUANPAN_FAIL;
     }
 
@@ -157,4 +157,6 @@ int NonlinearHoffman::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-void NonlinearHoffman::print() { suanpan_info("A 3D nonlinear hardening model using Hoffman yielding criterion.\n"); }
+void NonlinearHoffman::print() {
+    suanpan_info("A 3D nonlinear hardening model using Hoffman yielding criterion.\n");
+}

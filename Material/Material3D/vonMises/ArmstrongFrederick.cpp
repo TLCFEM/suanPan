@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 
 #include "ArmstrongFrederick.h"
 #include <Recorder/OutputType.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 const double ArmstrongFrederick::root_three_two = sqrt(1.5);
 const mat ArmstrongFrederick::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
@@ -71,7 +71,7 @@ int ArmstrongFrederick::update_trial_status(const vec& t_strain) {
     unsigned counter = 0;
     while(true) {
         if(max_iteration == ++counter) {
-            suanpan_error("ArmstrongFrederick cannot converge within %u iterations.\n", max_iteration);
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
             return SUANPAN_FAIL;
         }
 
@@ -99,7 +99,7 @@ int ArmstrongFrederick::update_trial_status(const vec& t_strain) {
         jacobian = root_three_two * sum_b - three_shear - dk;
 
         const auto incre = yield_func / jacobian;
-        suanpan_extra_debug("ArmstrongFrederick local iteration error: %.5E.\n", fabs(incre));
+        suanpan_debug("Local iteration error: {:.5E}.\n", fabs(incre));
         if(fabs(incre) <= tolerance) break;
 
         gamma -= incre;
@@ -152,4 +152,6 @@ vector<vec> ArmstrongFrederick::record(const OutputType P) {
     return Material3D::record(P);
 }
 
-void ArmstrongFrederick::print() { suanpan_info("A 3D nonlinear hardening model using Armstrong--Frederick kinematic hardening rule.\n"); }
+void ArmstrongFrederick::print() {
+    suanpan_info("A 3D nonlinear hardening model using Armstrong-Frederick kinematic hardening rule.\n");
+}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,4 +48,6 @@ int SectionNM::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-void SectionNM::print() { suanpan_info("A N-M interaction based section.\n"); }
+void SectionNM::print() {
+    suanpan_info("An N-M interaction based section.\n");
+}

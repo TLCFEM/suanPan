@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -56,6 +56,6 @@ int BilinearOO::initialize(const shared_ptr<DomainBase>&) {
 unique_ptr<Material> BilinearOO::get_copy() { return make_unique<BilinearOO>(*this); }
 
 void BilinearOO::print() {
-    suanpan_info("A Bilinear Origin Oriented hysteresis model.\n");
+    suanpan_info("A bilinear origin oriented hysteresis model.\n");
     OriginOriented::print();
 }

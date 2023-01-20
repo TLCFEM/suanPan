@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -94,7 +94,7 @@ template<sp_d T> int SparseMatBaseFGMRES<T>::direct_solve(Mat<T>& X, const Mat<T
                 int counter;
                 dfgmres_get(&N, (double*)X.colptr(I), (double*)B.colptr(I), &request, ipar.memptr(), dpar.memptr(), work.memptr(), &counter);
                 if(request != 0) return request;
-                suanpan_debug("FGMRES uses %d iterations.\n", counter);
+                suanpan_debug("Iteration counter: {}.\n", counter);
                 break;
             }
             if(request != 1) return request;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -100,4 +100,6 @@ void NodeRecorder::record(const shared_ptr<DomainBase>& D) {
     if(if_record_time()) insert(D->get_factory()->get_current_time());
 }
 
-void NodeRecorder::print() { suanpan_info("A Node Recorder.\n"); }
+void NodeRecorder::print() {
+    suanpan_info("A node recorder.\n");
+}

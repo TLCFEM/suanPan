@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,14 +27,14 @@ NMB31::NMB31(const unsigned T, uvec&& N, const unsigned S, const unsigned O, con
 
 int NMB31::initialize(const shared_ptr<DomainBase>& D) {
     if(!D->find_orientation(orientation_tag)) {
-        suanpan_warning("Element %u cannot find the assigned transformation.\n", get_tag());
+        suanpan_warning("Element {} cannot find the assigned transformation {}.\n", get_tag(), orientation_tag);
         return SUANPAN_FAIL;
     }
 
     b_trans = D->get_orientation(orientation_tag)->get_copy();
 
     if(b_trans->is_nlgeom() != is_nlgeom()) {
-        suanpan_warning("Element %u is assigned with an inconsistent transformation.\n", get_tag());
+        suanpan_warning("Element {} is assigned with an inconsistent transformation {}.\n", get_tag(), orientation_tag);
         return SUANPAN_FAIL;
     }
 

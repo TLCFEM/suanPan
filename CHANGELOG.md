@@ -3,16 +3,29 @@
 ## known issues
 
 1. `MKL` includes outdated `FEAST`, the external names in `FEAST` library are modified to avoid linking error.
-2. `OpenBLAS` causes SEGFAULT with version 0.3.15+ when compiled with `DYNAMIC_ARCH` enabled.
+
+## version 2.8
+
+1. better on screen display with the fmt library [#99](https://github.com/TLCFEM/suanPan/pull/99)
+2. add command `overview`
+3. update `OpenBLAS` to version `0.3.21`
+4. add Euler buckling load check for `T2D2` [#104](https://github.com/TLCFEM/suanPan/pull/104)
+5. speed-up analysis with visualisation recorder [#102](https://github.com/TLCFEM/suanPan/pull/102)
+6. update `VTK` to version `9.2.5`
+7. add `Expression` to support custom function definition [#105](https://github.com/TLCFEM/suanPan/pull/105)
+8. add `CustomMises1D`, `CustomCC`, `CustomCDP`, `CustomDP`, `CustomJ2` and `CustomHoffman` models
 
 ## version 2.7
 
 1. optimise assembling of symmetric global matrices [#79](https://github.com/TLCFEM/suanPan/pull/79)
-2. extend `BatheTwoStep` to allow customisation of spectral radius [#81](https://github.com/TLCFEM/suanPan/pull/81) and sub-step size [#82](https://github.com/TLCFEM/suanPan/pull/82)
+2. extend `BatheTwoStep` to allow customisation of spectral radius [#81](https://github.com/TLCFEM/suanPan/pull/81) and
+   sub-step size [#82](https://github.com/TLCFEM/suanPan/pull/82)
 3. update `Catch2` to version `2.13.10`
 4. update `Armadillo` to version `11.4`
 5. update modern `Arpack` [#94](https://github.com/TLCFEM/suanPan/pull/94)
-6. add `Tchamwa` [#88](https://github.com/TLCFEM/suanPan/pull/88), `BatheExplicit` [#90](https://github.com/TLCFEM/suanPan/pull/90) and `GeneralisedAlphaExplicit` [#93](https://github.com/TLCFEM/suanPan/pull/93) explicit time integration methods
+6. add `Tchamwa` [#88](https://github.com/TLCFEM/suanPan/pull/88),
+   `BatheExplicit` [#90](https://github.com/TLCFEM/suanPan/pull/90)
+   and `GeneralisedAlphaExplicit` [#93](https://github.com/TLCFEM/suanPan/pull/93) explicit time integration methods
 7. add `OALTS` two-step implicit time integration method [#92](https://github.com/TLCFEM/suanPan/pull/92)
 8. add `Sinh1D` and `Tanh1D` nonlinear elastic 1D material
 9. add `linear_system` flag to speed up linear system analysis

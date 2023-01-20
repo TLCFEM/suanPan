@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,16 +23,5 @@
 class DomainBase;
 
 int create_new_material(const std::shared_ptr<DomainBase>&, std::istringstream&);
-
-int test_material1d(const std::shared_ptr<DomainBase>&, std::istringstream&);
-int test_material2d(const std::shared_ptr<DomainBase>&, std::istringstream&);
-int test_material3d(const std::shared_ptr<DomainBase>&, std::istringstream&);
-int test_material_with_base3d(const std::shared_ptr<DomainBase>&, std::istringstream&);
-int test_material_by_load1d(const std::shared_ptr<DomainBase>&, std::istringstream&);
-int test_material_by_load2d(const std::shared_ptr<DomainBase>&, std::istringstream&);
-int test_material_by_load3d(const std::shared_ptr<DomainBase>&, std::istringstream&);
-int test_material_by_load_with_base3d(const std::shared_ptr<DomainBase>&, std::istringstream&);
-int test_material_by_strain_history(const std::shared_ptr<DomainBase>&, std::istringstream&);
-int test_material_by_stress_history(const std::shared_ptr<DomainBase>&, std::istringstream&);
 
 #endif

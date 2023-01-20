@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 
 // ReSharper disable CppClangTidyClangDiagnosticDocumentationUnknownCommand
 #include "NLE3D01.h"
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 /**
  * \brief compute the derivatives of potential function

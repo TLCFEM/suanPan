@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
  ******************************************************************************/
 
 #include "MooneyRivlin.h"
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 const vec MooneyRivlin::weight{2., 2., 2., 1., 1., 1.};
 const vec MooneyRivlin::I1E{2., 2., 2., 0., 0., 0.};
@@ -124,4 +124,6 @@ int MooneyRivlin::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-void MooneyRivlin::print() { suanpan_info("Mooney-Rivlin material.\n"); }
+void MooneyRivlin::print() {
+    suanpan_info("A Mooney-Rivlin material model.\n");
+}

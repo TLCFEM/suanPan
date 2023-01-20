@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ vec ExpGurson::compute_hardening(const double plastic_strain) const {
     unsigned counter = 0;
     while(true) {
         if(max_iteration == ++counter) {
-            suanpan_error("NonlinearGurson cannot converge within %u iterations.\n", max_iteration);
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
             k = pow_term = 1.;
             break;
         }
@@ -50,4 +50,6 @@ vec ExpGurson::compute_hardening(const double plastic_strain) const {
 
 unique_ptr<Material> ExpGurson::get_copy() { return make_unique<ExpGurson>(*this); }
 
-void ExpGurson::print() { suanpan_info("The Gurson model.\n"); }
+void ExpGurson::print() {
+    suanpan_info("A Gurson model.\n");
+}

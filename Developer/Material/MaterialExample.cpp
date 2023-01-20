@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,40 +21,43 @@
 SUANPAN_EXPORT void new_materialexample(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("new_materialexample() requires a valid tag.\n");
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
-        suanpan_error("new_materialexample() requires a valid elastic modulus.\n");
+        suanpan_error("A valid elastic modulus is required.\n");
         return;
     }
 
     double yield_stress;
     if(!get_input(command, yield_stress)) {
-        suanpan_error("new_materialexample() requires a valid yield stress.\n");
+        suanpan_error("A valid yield stress is required.\n");
         return;
     }
 
     auto hardening_ratio = 0.;
-    if(command.eof()) suanpan_debug("new_materialexample() assumes zero hardening ratio.\n");
+    if(command.eof())
+        suanpan_debug("Zero hardening ratio assumed.\n");
     else if(!get_input(command, hardening_ratio)) {
-        suanpan_error("new_materialexample() requires a valid hardening ratio.\n");
+        suanpan_error("A valid hardening ratio is required.\n");
         return;
     }
 
     auto beta = 0.;
-    if(command.eof()) suanpan_debug("new_materialexample() assumes isotropic hardening.\n");
+    if(command.eof())
+        suanpan_debug("Isotropic hardening assumed.\n");
     else if(!get_input(command, beta)) {
-        suanpan_error("new_materialexample() requires a valid beta.\n");
+        suanpan_error("A valid beta is required.\n");
         return;
     }
 
     auto density = 0.;
-    if(command.eof()) suanpan_debug("new_materialexample() assumes zero density.\n");
+    if(command.eof())
+        suanpan_debug("Zero density assumed.\n");
     else if(!get_input(command, density)) {
-        suanpan_error("new_materialexample() requires a valid density.\n");
+        suanpan_error("A valid density is required.\n");
         return;
     }
 
@@ -215,5 +218,5 @@ int MaterialExample::reset_status() {
 
 void MaterialExample::print() {
     suanpan_info("A material example based on uniaxial J2 bilinear mixed hardening model.\n");
-    suanpan_info("Strain: %.5E\tStress: %.5E\n", current_strain.at(0), current_stress.at(0));
+    suanpan_info("Strain: {:.5E}\tStress: {:.5E}\n", current_strain.at(0), current_stress.at(0));
 }

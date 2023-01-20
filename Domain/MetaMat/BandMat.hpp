@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -129,7 +129,7 @@ template<sp_d T> Mat<T> BandMat<T>::operator*(const Mat<T>& X) const {
 template<sp_d T> int BandMat<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
     if(this->factored) return this->solve_trs(X, B);
 
-    suanpan_debug([&] { if(this->n_rows != this->n_cols) throw invalid_argument("requires a square matrix"); });
+    suanpan_assert([&] { if(this->n_rows != this->n_cols) throw invalid_argument("requires a square matrix"); });
 
     auto INFO = 0;
 
@@ -158,7 +158,8 @@ template<sp_d T> int BandMat<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
         if(0 == INFO) INFO = this->solve_trs(X, B);
     }
 
-    if(0 != INFO) suanpan_error("solve() receives error code %u from base driver, the matrix is probably singular.\n", INFO);
+    if(0 != INFO)
+        suanpan_error("Error code {} received, the matrix is probably singular.\n", INFO);
 
     return INFO;
 }
@@ -203,11 +204,12 @@ template<sp_d T> int BandMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 
             X += incre;
 
-            suanpan_debug("mixed precision algorithm multiplier: %.5E.\n", multiplier = arma::norm(full_residual -= this->operator*(incre)));
+            suanpan_debug("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier = arma::norm(full_residual -= this->operator*(incre)));
         }
     }
 
-    if(INFO != 0) suanpan_error("solve() receives error code %u from base driver, the matrix is probably singular.\n", INFO);
+    if(0 != INFO)
+        suanpan_error("Error code {} received, the matrix is probably singular.\n", INFO);
 
     return INFO;
 }
@@ -215,7 +217,7 @@ template<sp_d T> int BandMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 template<sp_d T> int BandMat<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
     if(this->factored) return this->solve_trs(X, std::forward<Mat<T>>(B));
 
-    suanpan_debug([&] { if(this->n_rows != this->n_cols) throw invalid_argument("requires a square matrix"); });
+    suanpan_assert([&] { if(this->n_rows != this->n_cols) throw invalid_argument("requires a square matrix"); });
 
     auto INFO = 0;
 
@@ -244,7 +246,8 @@ template<sp_d T> int BandMat<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
         if(0 == INFO) INFO = this->solve_trs(X, std::forward<Mat<T>>(B));
     }
 
-    if(0 != INFO) suanpan_error("solve() receives error code %u from base driver, the matrix is probably singular.\n", INFO);
+    if(0 != INFO)
+        suanpan_error("Error code {} received, the matrix is probably singular.\n", INFO);
 
     return INFO;
 }
@@ -287,11 +290,12 @@ template<sp_d T> int BandMat<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
 
             X += incre;
 
-            suanpan_debug("mixed precision algorithm multiplier: %.5E.\n", multiplier = arma::norm(B -= this->operator*(incre)));
+            suanpan_debug("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier = arma::norm(B -= this->operator*(incre)));
         }
     }
 
-    if(INFO != 0) suanpan_error("solve() receives error code %u from base driver, the matrix is probably singular.\n", INFO);
+    if(0 != INFO)
+        suanpan_error("Error code {} received, the matrix is probably singular.\n", INFO);
 
     return INFO;
 }

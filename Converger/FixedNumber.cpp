@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,8 @@ FixedNumber::FixedNumber(const unsigned T, const unsigned M, const bool P)
 unique_ptr<Converger> FixedNumber::get_copy() { return make_unique<FixedNumber>(*this); }
 
 bool FixedNumber::is_converged(const unsigned counter) {
-    if(is_print()) suanpan_info("iteration counter: %u.\n", counter);
+    if(is_print())
+        suanpan_info("--> Iteration Counter: {}.\n", counter);
 
     set_conv_flag(get_max_iteration() <= counter);
 

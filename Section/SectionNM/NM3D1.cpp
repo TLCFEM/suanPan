@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,4 +29,6 @@ int NM3D1::update_trial_status(const vec& t_deformation) {
     return SUANPAN_SUCCESS;
 }
 
-void NM3D1::print() { suanpan_info("A NM3D1 Section.\n"); }
+void NM3D1::print() {
+    suanpan_info("A NM3D1 section.\n");
+}

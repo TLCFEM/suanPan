@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@
 #include <Toolbox/container.h>
 
 class Amplitude;
+class Expression;
 class Constraint;
 class Converger;
 class Criterion;
@@ -51,6 +52,8 @@ class Solver;
 template<typename T> const char* StorageType() { return "Unknown"; }
 
 template<> inline const char* StorageType<Amplitude>() { return "Amplitude"; }
+
+template<> inline const char* StorageType<Expression>() { return "Expression"; }
 
 template<> inline const char* StorageType<Constraint>() { return "Constraint"; }
 
@@ -102,12 +105,12 @@ template<typename T> class Storage : public std::enable_shared_from_this<Storage
 public:
     typedef T object_type;
 
-    Storage();
+    Storage() = default;
     Storage(const Storage&) = delete;
     Storage(Storage&&) noexcept = delete;
     Storage& operator=(const Storage&) = delete;
     Storage& operator=(Storage&&) noexcept = delete;
-    ~Storage();
+    ~Storage() = default;
 
     const_iterator cbegin() const;
     const_iterator cend() const;
@@ -133,10 +136,6 @@ public:
     [[nodiscard]] size_t size() const;
 };
 
-template<typename T> Storage<T>::Storage() { suanpan_debug("Storage %s ctor() called.\n", type); }
-
-template<typename T> Storage<T>::~Storage() { suanpan_debug("Storage %s dtor() called.\n", type); }
-
 template<typename T> typename Storage<T>::const_iterator Storage<T>::cbegin() const { return pond.cbegin(); }
 
 template<typename T> typename Storage<T>::const_iterator Storage<T>::cend() const { return pond.cend(); }
@@ -147,7 +146,8 @@ template<typename T> typename Storage<T>::iterator Storage<T>::end() { return po
 
 template<typename T> bool Storage<T>::insert(const shared_ptr<T>& I) {
     auto flag = pond.insert({I->get_tag(), I}).second;
-    if(!flag) suanpan_warning("Storage fails to insert %s %u.\n", type, I->get_tag());
+    if(!flag)
+        suanpan_warning("Fail to insert {} {}.\n", type, I->get_tag());
     return flag;
 }
 
@@ -202,6 +202,7 @@ template<typename T> typename Storage<T>::iterator begin(Storage<T>& S) { return
 template<typename T> typename Storage<T>::iterator end(Storage<T>& S) { return S.end(); }
 
 using AmplitudeStorage = Storage<Amplitude>;
+using ExpressionStorage = Storage<Expression>;
 using ConstraintStorage = Storage<Constraint>;
 using ConvergerStorage = Storage<Converger>;
 using CriterionStorage = Storage<Criterion>;

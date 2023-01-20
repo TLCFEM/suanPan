@@ -1,5 +1,5 @@
 ﻿/*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #include <Material/Material.h>
 #include <Recorder/OutputType.h>
 #include <Toolbox/IntegrationPlan.h>
-#include <Toolbox/shapeFunction.h>
+#include <Toolbox/shape.h>
 
 const mat SGCMS::mapping = [] {
     mat t_mapping(4, 4);
@@ -336,7 +336,9 @@ vector<vec> SGCMS::record(const OutputType P) {
     return data;
 }
 
-void SGCMS::print() { suanpan_info("A four node planar shell element using SGCMQ for membrane action and DKT4 for plate action.\n"); }
+void SGCMS::print() {
+    suanpan_info("A four-node planar shell element using SGCMQ for membrane action and DKT4 for plate action.\n");
+}
 
 #ifdef SUANPAN_VTK
 #include <vtkQuad.h>

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@
 #include <Domain/DomainBase.h>
 #include <Material/Material3D/Material3D.h>
 #include <Toolbox/IntegrationPlan.h>
-#include <Toolbox/shapeFunction.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/shape.h>
+#include <Toolbox/tensor.h>
 
 C3D20::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M, mat&& P)
     : coor(std::forward<vec>(C))
@@ -184,16 +184,14 @@ vector<vec> C3D20::record(const OutputType T) {
 }
 
 void C3D20::print() {
-    suanpan_info("C3D20 element%s%s.\n", reduced_scheme ? " reduced eight-point Gauss integration" : " full fourteen-point Irons integration", nlgeom ? " nonlinear geometry" : "");
-    node_encoding.t().print("The element connects nodes:");
+    suanpan_info("A C3D20 element{}{}.\n", reduced_scheme ? " reduced eight-point Gauss integration" : " full fourteen-point Irons integration", nlgeom ? " nonlinear geometry" : "");
+    suanpan_info("The element connects nodes:", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Material:\n");
     for(const auto& t_pt : int_pt) {
         t_pt.c_material->print();
-        suanpan_info("Strain:\t");
-        t_pt.c_material->get_trial_strain().t().print();
-        suanpan_info("Stress:\t");
-        t_pt.c_material->get_trial_stress().t().print();
+        suanpan_info("Strain:\t", t_pt.c_material->get_trial_strain());
+        suanpan_info("Stress:\t", t_pt.c_material->get_trial_stress());
     }
 }
 

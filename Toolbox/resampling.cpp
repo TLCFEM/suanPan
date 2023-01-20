@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ vec fir_low_pass(const uword s, const double f, vec (*window)(uword)) {
 }
 
 vec fir_high_pass(const uword s, const double f, vec (*window)(uword)) {
-    suanpan_debug([&] { if(0 != s % 2) throw invalid_argument("order must be even"); });
+    suanpan_assert([&] { if(0 != s % 2) throw invalid_argument("order must be even"); });
 
     const auto sp = s + 1;
 
@@ -87,7 +87,7 @@ vec fir_high_pass(const uword s, const double f, vec (*window)(uword)) {
 }
 
 vec fir_band_pass(const uword s, const double fa, const double fb, vec (*window)(uword)) {
-    suanpan_debug([&] { if(fb <= fa) throw invalid_argument("frequencies must be [0 < fa < fb < 1]"); });
+    suanpan_assert([&] { if(fb <= fa) throw invalid_argument("frequencies must be [0 < fa < fb < 1]"); });
 
     const auto sp = s + 1;
 
@@ -108,7 +108,7 @@ vec fir_band_pass(const uword s, const double fa, const double fb, vec (*window)
 }
 
 vec fir_band_stop(const uword s, const double fa, const double fb, vec (*window)(uword)) {
-    suanpan_debug([&] {
+    suanpan_assert([&] {
         if(0 != s % 2) throw invalid_argument("order must be even");
         if(fb <= fa) throw invalid_argument("frequencies must be [0 < fa < fb < 1]");
     });

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ int Frequency::analyze() {
     auto& G = get_integrator();
 
     if(SUANPAN_SUCCESS != solver->analyze()) {
-        suanpan_warning("fail to decompose the system, try to increase the number of eigen values.\n");
+        suanpan_warning("Fail to decompose the system, try to increase the number of eigenvalues.\n");
         return SUANPAN_SUCCESS;
     }
 

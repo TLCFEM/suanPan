@@ -41,7 +41,7 @@
       <PreprocessorDefinitions>_DEBUG;MODIFIEREXAMPLE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>../../..;../../../Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../..;../../../Include;../../../Include/fmt/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -61,9 +61,9 @@
     <ClCompile Include="..\..\..\Domain\Tag.cpp" />
     <ClCompile Include="..\..\..\Element\Element.cpp" />
     <ClCompile Include="..\..\..\Element\Modifier\Modifier.cpp" />
+    <ClCompile Include="..\..\..\Include\fmt\src\format.cc" />
     <ClCompile Include="..\..\..\Material\Material.cpp" />
     <ClCompile Include="..\..\..\Section\Section.cpp" />
-    <ClCompile Include="..\..\..\Toolbox\print.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Developer\Modifier\ModifierExample.h" />

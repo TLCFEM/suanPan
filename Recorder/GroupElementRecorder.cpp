@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,4 +39,6 @@ void GroupElementRecorder::initialize(const shared_ptr<DomainBase>& D) {
     ElementRecorder::initialize(D);
 }
 
-void GroupElementRecorder::print() { suanpan_info("An Element Recorder based on groups.\n"); }
+void GroupElementRecorder::print() {
+    suanpan_info("An element recorder based on groups.\n");
+}

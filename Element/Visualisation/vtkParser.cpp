@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -115,13 +115,14 @@ void vtk_setup(const vtkSmartPointer<vtkUnstructuredGrid>& grid, const vtkInfo& 
     interactor->Start();
 }
 
-void vtk_save(const vtkSmartPointer<vtkUnstructuredGrid>& grid, const vtkInfo& config) {
+void vtk_save(vtkSmartPointer<vtkUnstructuredGrid>&& grid, const vtkInfo config) {
+    // NOLINT(performance-unnecessary-value-param)
     const auto writer = vtkSmartPointer<vtkUnstructuredGridWriter>::New();
     writer->SetInputData(grid);
     writer->SetFileName(config.file_name.c_str());
     writer->SetFileTypeToBinary();
     writer->Write();
-    suanpan_debug("plot is written to %s.\n", config.file_name.c_str());
+    suanpan_debug("Plot is written to file \"{}\".\n", config.file_name);
 }
 
 int vtk_parser(const shared_ptr<DomainBase>& domain, istringstream& command) {
@@ -170,7 +171,7 @@ void vtk_plot_node_quantity(const shared_ptr<DomainBase>& domain, vtkInfo config
     data->SetComponentName(4, "5");
     data->SetComponentName(5, "6");
 
-    const auto grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
+    auto grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
     grid->Allocate(static_cast<vtkIdType>(t_element_pool.size()));
     std::ranges::for_each(t_element_pool, [&](const shared_ptr<Element>& t_element) {
         t_element->SetDeformation(node, config.scale);
@@ -188,7 +189,8 @@ void vtk_plot_node_quantity(const shared_ptr<DomainBase>& domain, vtkInfo config
     else if(config.save_file) {
         grid->GetPointData()->SetScalars(data);
         grid->GetPointData()->SetActiveScalars(vtk_get_name(config.type));
-        vtk_save(grid, config);
+        auto writer = std::thread(vtk_save, std::move(grid), config);
+        writer.detach();
     }
     else {
         const auto sub_data = vtkSmartPointer<vtkDoubleArray>::New();
@@ -234,7 +236,7 @@ void vtk_plot_element_quantity(const shared_ptr<DomainBase>& domain, vtkInfo con
     mat tensor(6, max_node, fill::zeros);
     vec counter(max_node, fill::zeros);
 
-    const auto grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
+    auto grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
     grid->Allocate(static_cast<vtkIdType>(t_element_pool.size()));
     std::ranges::for_each(t_element_pool, [&](const shared_ptr<Element>& t_element) {
         if(-1 != config.material_type) if(const auto& t_tag = t_element->get_material_tag(); t_tag.empty() || static_cast<uword>(config.material_type) != t_tag(0)) return;
@@ -261,7 +263,8 @@ void vtk_plot_element_quantity(const shared_ptr<DomainBase>& domain, vtkInfo con
     else if(config.save_file) {
         grid->GetPointData()->SetScalars(data);
         grid->GetPointData()->SetActiveScalars(vtk_get_name(config.type));
-        vtk_save(grid, config);
+        auto writer = std::thread(vtk_save, std::move(grid), config);
+        writer.detach();
     }
     else {
         const auto sub_data = vtkSmartPointer<vtkDoubleArray>::New();
@@ -306,6 +309,33 @@ int vtk_get_index(const OutputType config) {
     if(config == OutputType::PE12) return 3;
     if(config == OutputType::PE23) return 4;
     if(config == OutputType::PE13) return 5;
+    if(config == OutputType::U1) return 0;
+    if(config == OutputType::U2) return 1;
+    if(config == OutputType::U3) return 2;
+    if(config == OutputType::U4) return 3;
+    if(config == OutputType::U5) return 4;
+    if(config == OutputType::U6) return 5;
+    if(config == OutputType::UR1) return 3;
+    if(config == OutputType::UR2) return 4;
+    if(config == OutputType::UR3) return 5;
+    if(config == OutputType::V1) return 0;
+    if(config == OutputType::V2) return 1;
+    if(config == OutputType::V3) return 2;
+    if(config == OutputType::V4) return 3;
+    if(config == OutputType::V5) return 4;
+    if(config == OutputType::V6) return 5;
+    if(config == OutputType::VR1) return 3;
+    if(config == OutputType::VR2) return 4;
+    if(config == OutputType::VR3) return 5;
+    if(config == OutputType::A1) return 0;
+    if(config == OutputType::A2) return 1;
+    if(config == OutputType::A3) return 2;
+    if(config == OutputType::A4) return 3;
+    if(config == OutputType::A5) return 4;
+    if(config == OutputType::A6) return 5;
+    if(config == OutputType::AR1) return 3;
+    if(config == OutputType::AR2) return 4;
+    if(config == OutputType::AR3) return 5;
 
     return 0;
 }

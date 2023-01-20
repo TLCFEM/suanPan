@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -113,13 +113,13 @@ vector<vec> B21::record(const OutputType P) {
 }
 
 void B21::print() {
-    suanpan_info("A classic 2D displacement based beam element using Hermite interpolation functions%s", nlgeom ? " and corotational formulation.\n" : ".\n");
-    node_encoding.t().print("The element connects nodes:");
+    suanpan_info("A classic 2D displacement based beam element using Hermite interpolation functions{}", nlgeom ? " and corotational formulation.\n" : ".\n");
+    suanpan_info("The element connects nodes:", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Section:\n");
     auto J = 1;
     for(const auto& I : int_pt) {
-        suanpan_info("IP %d: ", J++);
+        suanpan_info("IP {}: ", J++);
         I.b_section->print();
     }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -89,4 +89,6 @@ void Newmark::update_parameter(const double NT) {
     C3 = C5 * gamma;
 }
 
-void Newmark::print() { suanpan_info("A Newmark solver.\n"); }
+void Newmark::print() {
+    suanpan_info("A Newmark solver.\n");
+}

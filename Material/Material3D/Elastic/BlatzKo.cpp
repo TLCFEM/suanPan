@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
  ******************************************************************************/
 
 #include "BlatzKo.h"
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 const vec BlatzKo::weight{2., 2., 2., 1., 1., 1.};
 
@@ -105,4 +105,6 @@ int BlatzKo::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-void BlatzKo::print() { suanpan_info("Blatz-Ko material.\n"); }
+void BlatzKo::print() {
+    suanpan_info("A Blatz-Ko material model.\n");
+}

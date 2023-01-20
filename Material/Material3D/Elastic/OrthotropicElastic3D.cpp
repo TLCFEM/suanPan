@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
  ******************************************************************************/
 
 #include "OrthotropicElastic3D.h"
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 OrthotropicElastic3D::OrthotropicElastic3D(const unsigned T, vec&& E, vec&& P, const double R)
     : Material3D(T, R)
@@ -56,4 +56,6 @@ int OrthotropicElastic3D::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-void OrthotropicElastic3D::print() { suanpan_info("A 3D orthotropic elastic material.\n"); }
+void OrthotropicElastic3D::print() {
+    suanpan_info("A 3D orthotropic elastic material model.\n");
+}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ int Uniaxial::initialize(const shared_ptr<DomainBase>& D) {
     base = suanpan::initialized_material_copy(D, base_tag);
 
     if(nullptr == base || base->get_material_type() != MaterialType::D3) {
-        suanpan_error("Uniaxial %u requires a 3D host material model.\n", get_tag());
+        suanpan_error("A valid 3D host material is required.\n");
         return SUANPAN_FAIL;
     }
 
@@ -79,12 +79,12 @@ int Uniaxial::update_trial_status(const vec& t_strain) {
             if(base->update_trial_status(trial_full_strain) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
             trial_full_strain(F2) -= solve(t_stiffness(F2, F2), t_stress(F2));
             const auto error = norm(t_stress(F2));
-            suanpan_extra_debug("Uniaxial state determination error: %.4E.\n", error);
+            suanpan_debug("Local iteration error: {:.5E}.\n", error);
             if(error <= tolerance) break;
         }
 
         if(max_iteration == counter) {
-            suanpan_error("Uniaxial cannot converge within %u iterations.\n", counter);
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
             return SUANPAN_FAIL;
         }
 
@@ -127,7 +127,7 @@ vector<vec> Uniaxial::record(const OutputType P) { return base->record(P); }
 
 void Uniaxial::print() {
     suanpan_info("A uniaxial wrapper.\n");
-    current_strain.t().print("Strain:");
-    current_stress.t().print("Stress:");
+    suanpan_info("Strain:", current_strain);
+    suanpan_info("Stress:", current_stress);
     if(base) base->print();
 }

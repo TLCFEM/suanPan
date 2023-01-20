@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,4 +27,6 @@ double Ramp::get_amplitude(const double T) {
     return step_time;
 }
 
-void Ramp::print() { suanpan_info("Linear/Ramp Amplitude.\n"); }
+void Ramp::print() {
+    suanpan_info("Ramp.\n");
+}

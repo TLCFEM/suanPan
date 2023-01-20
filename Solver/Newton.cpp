@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ int Newton::analyze() {
     const auto& D = G->get_domain();
     auto& W = D->get_factory();
 
-    suanpan_info("current analysis time: %.5f.\n", W->get_trial_time());
+    suanpan_highlight(">> Current Analysis Time: {:.5f}.\n", W->get_trial_time());
 
     const auto max_iteration = C->get_max_iteration();
 
@@ -71,16 +71,16 @@ int Newton::analyze() {
         // call solver
         auto flag = G->solve(samurai, G->get_force_residual());
 
-        suanpan_debug([&] {
+        suanpan_assert([&] {
             if(!samurai.is_finite()) {
-                suanpan_fatal("infinite number detected.\n");
+                suanpan_fatal("Infinite number detected.\n");
                 flag = SUANPAN_FAIL;
             }
         });
 
         // make sure system solver succeeds
         if(SUANPAN_SUCCESS != flag) {
-            suanpan_error("system solver returns error code %d.\n", flag);
+            suanpan_error("Error code {} received.\n", flag);
             return flag;
         }
 
@@ -131,4 +131,6 @@ int Newton::analyze() {
     }
 }
 
-void Newton::print() { suanpan_info("A solver based on Newton--Raphson iteration method %s", initial_stiffness ? "using initial stiffness for each substep.\n" : ".\n"); }
+void Newton::print() {
+    suanpan_info("A solver based on Newton-Raphson method{}", initial_stiffness ? " using initial stiffness for each substep.\n" : ".\n");
+}

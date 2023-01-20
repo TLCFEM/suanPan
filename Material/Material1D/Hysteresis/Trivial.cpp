@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,4 +52,6 @@ int Trivial::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-void Trivial::print() { suanpan_info("A Trivial material model returns zero response.\n"); }
+void Trivial::print() {
+    suanpan_info("A trivial material model returns zero response.\n");
+}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 
 #include "NonlinearGurson.h"
 #include <Recorder/OutputType.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 const double NonlinearGurson::sqrt_three_two = sqrt(1.5);
 const mat NonlinearGurson::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
@@ -69,7 +69,7 @@ int NonlinearGurson::update_trial_status(const vec& t_strain) {
     unsigned counter = 0;
     while(true) {
         if(max_iteration == ++counter) {
-            suanpan_error("NonlinearGurson cannot converge within %u iterations.\n", max_iteration);
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
             return SUANPAN_FAIL;
         }
 
@@ -112,7 +112,7 @@ int NonlinearGurson::update_trial_status(const vec& t_strain) {
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
         const auto error = norm(residual);
-        suanpan_debug("NonlinearGurson local iteration error: %.5E.\n", error);
+        suanpan_debug("Local iteration error: {:.5E}.\n", error);
         if(error <= tolerance || norm(incre) <= tolerance) break;
 
         gamma -= incre(0);
@@ -173,4 +173,6 @@ vector<vec> NonlinearGurson::record(const OutputType P) {
     return Material3D::record(P);
 }
 
-void NonlinearGurson::print() { suanpan_info("A 3D nonlinear hardening model using Gurson's model.\n"); }
+void NonlinearGurson::print() {
+    suanpan_info("A 3D nonlinear hardening model using Gurson's model.\n");
+}

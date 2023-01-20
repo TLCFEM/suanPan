@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,18 +22,16 @@
 #include <Step/Step.h>
 
 Solver::Solver(const unsigned T)
-    : Tag(T) { suanpan_debug("Solver %u ctor() called.\n", get_tag()); }
-
-Solver::~Solver() { suanpan_debug("Solver %u dtor() called.\n", get_tag()); }
+    : Tag(T) {}
 
 int Solver::initialize() {
     if(nullptr == converger) {
-        suanpan_error("initialize() needs a valid converger.\n");
+        suanpan_error("A valid converger is required.\n");
         return SUANPAN_FAIL;
     }
 
     if(nullptr == modifier) {
-        suanpan_error("initialize() needs a valid integrator.\n");
+        suanpan_error("A valid integrator is required.\n");
         return SUANPAN_FAIL;
     }
 

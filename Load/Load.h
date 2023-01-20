@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ public:
     Load& operator=(const Load&) = delete; // assign forbidden
     Load& operator=(Load&&) = delete;      // assign forbidden
 
-    ~Load() override;
+    ~Load() override = default;
 
     void enable_displacement_control() const;
     [[nodiscard]] bool if_displacement_control() const;

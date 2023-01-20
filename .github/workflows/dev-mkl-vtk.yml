@@ -14,8 +14,8 @@ jobs:
         run: |
           wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
           echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
-          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.2-linux.tar.gz
-          tar xf VTK-9.2.2-linux.tar.gz
+          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.5-linux.tar.gz
+          tar xf VTK-9.2.5-linux.tar.gz
       - name: Golang
         uses: actions/setup-go@v3
       - name: Compile
@@ -32,11 +32,11 @@ jobs:
           ./suanPan-linux-mkl-vtk/bin/suanPan -v
       - uses: actions/upload-artifact@v3
         with:
-          name: suanPan-2.7.0-1.x86_64.deb
-          path: suanPan-2.7.0-1.x86_64.deb
+          name: suanPan-2.8.0-1.x86_64.deb
+          path: suanPan-2.8.0-1.x86_64.deb
   fedora-mkl-vtk-dev:
     runs-on: ubuntu-22.04
-    container: fedora:35
+    container: fedora:36
     steps:
       - name: Setup
         run: |
@@ -57,8 +57,8 @@ jobs:
         uses: actions/checkout@v3
       - name: Install MKL VTK
         run: |
-          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.2-linux.tar.gz
-          tar xf VTK-9.2.2-linux.tar.gz
+          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.5-linux.tar.gz
+          tar xf VTK-9.2.5-linux.tar.gz
       - name: Compile
         run: |
           source /opt/intel/oneapi/setvars.sh
@@ -66,10 +66,10 @@ jobs:
           make package -j"$(nproc)"
       - name: Test
         run: |
-          dnf install ./suanPan-2.7.0-1.x86_64.rpm -y
+          dnf install ./suanPan-2.8.0-1.x86_64.rpm -y
           suanPan -v
       - name: Upload
         uses: actions/upload-artifact@v3
         with:
-          name: suanPan-2.7.0-1.x86_64.rpm
-          path: suanPan-2.7.0-1.x86_64.rpm
+          name: suanPan-2.8.0-1.x86_64.rpm
+          path: suanPan-2.8.0-1.x86_64.rpm

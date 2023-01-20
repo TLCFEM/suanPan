@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,11 +30,11 @@ Converger::Converger(const unsigned T, const double E, const unsigned M, const b
     : Tag(T)
     , tolerance(E)
     , max_iteration(M)
-    , print_flag(P) { suanpan_debug("Converger %u ctor() called.\n", T); }
+    , print_flag(P) {}
 
 int Converger::initialize() {
     if(nullptr == database.lock()) {
-        suanpan_error("initialize() needs a valid Domain.\n");
+        suanpan_error("A valid domain is required.\n");
         return SUANPAN_FAIL;
     }
 

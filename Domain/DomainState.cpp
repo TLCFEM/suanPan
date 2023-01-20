@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -373,7 +373,7 @@ int Domain::update_current_status() const {
     suanpan::for_all(element_pond.get(), [&](const shared_ptr<Element>& t_element) { code += t_element->update_status(); });
 
     if(SUANPAN_SUCCESS != code) {
-        suanpan_error("initial conditions cause significant non-linearity, use an analysis step instead.\n");
+        suanpan_error("Initial conditions cause significant non-linearity, use an analysis step instead.\n");
         return SUANPAN_FAIL;
     }
 

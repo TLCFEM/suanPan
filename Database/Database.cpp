@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +18,7 @@
 #include "Database.h"
 
 Database::Database(const unsigned T)
-    : Tag(T) { suanpan_debug("Database %u ctor() called.\n", T); }
-
-Database::~Database() { suanpan_debug("Database %u dtor() called.\n", get_tag()); }
+    : Tag(T) {}
 
 void Database::set_domain(const shared_ptr<DomainBase>& D) { domain = D; }
 

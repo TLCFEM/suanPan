@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ int BoucWen::update_trial_status(const vec& t_strain) {
     unsigned counter = 0;
     while(true) {
         if(max_iteration == ++counter) {
-            suanpan_error("BoucWen cannot converge within %u iterations.\n", max_iteration);
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
             return SUANPAN_FAIL;
         }
 
@@ -60,7 +60,7 @@ int BoucWen::update_trial_status(const vec& t_strain) {
 
         const auto error = fabs(incre = -residual * z / jacobian);
 
-        suanpan_debug("BoucWen local iteration error: %.5E.\n", error);
+        suanpan_debug("Local iteration error: {:.5E}.\n", error);
 
         if(error <= tolerance) {
             trial_stress = modulus_a * trial_strain + modulus_b * z;
@@ -96,6 +96,6 @@ int BoucWen::reset_status() {
 }
 
 void BoucWen::print() {
-    suanpan_info("Bouc-Wen model.\n");
+    suanpan_info("A Bouc-Wen material model.\n");
     Material1D::print();
 }

@@ -1,5 +1,5 @@
 ﻿/*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 #include <Material/Material.h>
 #include <Recorder/OutputType.h>
 #include <Toolbox/IntegrationPlan.h>
-#include <Toolbox/shapeFunction.h>
+#include <Toolbox/shape.h>
 
 DKTS3::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const double E, const double F, unique_ptr<Material>&& M)
     : eccentricity(E)
@@ -249,7 +249,9 @@ vector<vec> DKTS3::record(const OutputType P) {
     return data;
 }
 
-void DKTS3::print() { suanpan_info("A three node planar shell element using CST for membrane action and DKT3 for plate action.\n"); }
+void DKTS3::print() {
+    suanpan_info("A three-node planar shell element using CST for membrane action and DKT3 for plate action.\n");
+}
 
 #ifdef SUANPAN_VTK
 #include <vtkTriangle.h>

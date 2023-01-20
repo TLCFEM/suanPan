@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 
 #include "Concrete22.h"
 #include <Domain/DomainBase.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 Concrete22::Concrete22(const unsigned T, const double CS, const double TS, const double MCC, const double NCC, const double MTT, const double NTT, const double MP, const double CE, const double TE, const double SS, const double SR, const double R)
     : Material2D(T, PlaneType::N, R)
@@ -113,7 +113,7 @@ int Concrete22::update_trial_status(const vec& t_strain) {
     // const vec elastic_stress = current_stiffness * trial_strain;
     // trial_stiffness = current_stiffness + trial_stress * trial_stress.t() / dot(trial_stress, trial_strain) - elastic_stress * elastic_stress.t() / dot(trial_strain, elastic_stress);
 
-    suanpan_debug([&] { if(!trial_stress.is_finite() || !trial_stiffness.is_finite()) throw invalid_argument("infinite number detected"); });
+    suanpan_assert([&] { if(!trial_stress.is_finite() || !trial_stiffness.is_finite()) throw invalid_argument("infinite number detected"); });
 
     return SUANPAN_SUCCESS;
 }
@@ -143,6 +143,6 @@ int Concrete22::reset_status() {
 }
 
 void Concrete22::print() {
-    current_strain.t().print("Strain:");
-    current_stress.t().print("Stress:");
+    suanpan_info("Strain:", current_strain);
+    suanpan_info("Stress:", current_stress);
 }

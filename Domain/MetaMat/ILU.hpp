@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -177,7 +177,7 @@ template<sp_d data_t> int ILU<data_t>::init() {
     B.ncol = 0;
 
     if(const auto code = this->apply_solver(&X, &B); 0 != code) {
-        suanpan_error("ILU factorisation returns %d.\n", code);
+        suanpan_error("Error code {} received.\n", code);
         return SUANPAN_FAIL;
     }
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,4 +27,6 @@ ExpCC::ExpCC(const unsigned T, const double E, const double V, const double B, c
 
 unique_ptr<Material> ExpCC::get_copy() { return make_unique<ExpCC>(*this); }
 
-void ExpCC::print() { suanpan_info("A 3D Cam-Clay model using exponential hardening.\n"); }
+void ExpCC::print() {
+    suanpan_info("A 3D Cam-Clay model using exponential hardening.\n");
+}

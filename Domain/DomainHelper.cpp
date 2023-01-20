@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,8 @@
 #include "Domain.h"
 
 shared_ptr<Amplitude>& get_amplitude(const shared_ptr<Domain>& D, const unsigned T) { return D->amplitude_pond[T]; }
+
+shared_ptr<Expression>& get_expression(const shared_ptr<Domain>& D, const unsigned T) { return D->expression_pond[T]; }
 
 shared_ptr<Constraint>& get_constraint(const shared_ptr<Domain>& D, const unsigned T) { return D->constraint_pond[T]; }
 
@@ -52,6 +54,8 @@ shared_ptr<Solver>& get_solver(const shared_ptr<Domain>& D, const unsigned T) { 
 shared_ptr<Step>& get_step(const shared_ptr<Domain>& D, const unsigned T) { return D->step_pond[T]; }
 
 shared_ptr<Amplitude>& get_amplitude(const shared_ptr<DomainBase>& D, const unsigned T) { return std::dynamic_pointer_cast<Domain>(D)->amplitude_pond[T]; }
+
+shared_ptr<Expression>& get_expression(const shared_ptr<DomainBase>& D, const unsigned T) { return std::dynamic_pointer_cast<Domain>(D)->expression_pond[T]; }
 
 shared_ptr<Constraint>& get_constraint(const shared_ptr<DomainBase>& D, const unsigned T) { return std::dynamic_pointer_cast<Domain>(D)->constraint_pond[T]; }
 

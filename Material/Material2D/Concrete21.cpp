@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 
 #include "Concrete21.h"
 #include <Domain/DomainBase.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 Concrete21::Concrete21(const unsigned T, const double CS, const double TS, const double MCC, const double NCC, const double MTT, const double NTT, const double MP, const double CE, const double TE, const double R)
     : Material2D(T, PlaneType::N, R)
@@ -100,7 +100,7 @@ int Concrete21::reset_status() {
 }
 
 void Concrete21::print() {
-    suanpan_info("A planar concrete model: \n");
-    current_strain.t().print("Strain:");
-    current_stress.t().print("Stress:");
+    suanpan_info("A planar concrete model.\n");
+    suanpan_info("Strain:", current_strain);
+    suanpan_info("Stress:", current_stress);
 }

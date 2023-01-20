@@ -1074,28 +1074,13 @@
     <ClCompile Include="..\..\..\Step\Step.cpp">
       <Filter>Step</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\argumentParser.cpp">
-      <Filter>Toolbox</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\arpack_wrapper.cpp">
-      <Filter>Toolbox</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\commandParser.cpp">
-      <Filter>Toolbox</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\Converter.cpp">
-      <Filter>Toolbox</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\print.cpp">
       <Filter>Toolbox</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\IntegrationPlan.cpp">
       <Filter>Toolbox</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\sort_rcm.cpp">
-      <Filter>Toolbox</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\tensorToolbox.cpp">
       <Filter>Toolbox</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\utility.cpp">
@@ -1443,6 +1428,54 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Material\Material1D\Elastic\Tanh1D.cpp">
       <Filter>Material\Material1D\Elastic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Include\fmt\src\format.cc">
+      <Filter>Toolbox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\tensor.cpp">
+      <Filter>Toolbox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\argument.cpp">
+      <Filter>Toolbox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\arpack.cpp">
+      <Filter>Toolbox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\command.cpp">
+      <Filter>Toolbox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Include\whereami\whereami.c">
+      <Filter>Toolbox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestExpression.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\Expression.cpp">
+      <Filter>Toolbox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Elastic\CustomElastic1D.cpp">
+      <Filter>Material\Material1D\Elastic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\ExpressionParser.cpp">
+      <Filter>Toolbox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\vonMises\CustomMises1D.cpp">
+      <Filter>Material\Material1D\vonMises</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Concrete\CustomCDP.cpp">
+      <Filter>Material\Material3D\Concrete</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\vonMises\CustomJ2.cpp">
+      <Filter>Material\Material3D\vonMises</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\DruckerPrager\CustomDP.cpp">
+      <Filter>Material\Material3D\DruckerPrager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Hoffman\CustomHoffman.cpp">
+      <Filter>Material\Material3D\Hoffman</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Clay\CamClay\CustomCC.cpp">
+      <Filter>Material\Material3D\Clay\CamClay</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2370,19 +2403,7 @@
     <ClInclude Include="..\..\..\Step\Step.h">
       <Filter>Step</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Toolbox\argumentParser.h">
-      <Filter>Toolbox</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Toolbox\arpack_wrapper.h">
-      <Filter>Toolbox</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Toolbox\commandParser.h">
-      <Filter>Toolbox</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Toolbox\Converter.h">
-      <Filter>Toolbox</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Toolbox\print.h">
       <Filter>Toolbox</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Toolbox\IntegrationPlan.h">
@@ -2391,16 +2412,10 @@
     <ClInclude Include="..\..\..\Toolbox\Quaternion.hpp">
       <Filter>Toolbox</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Toolbox\shapeFunction.h">
-      <Filter>Toolbox</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Toolbox\sort_color.hpp">
       <Filter>Toolbox</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Toolbox\sort_rcm.h">
-      <Filter>Toolbox</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Toolbox\tensorToolbox.h">
       <Filter>Toolbox</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Toolbox\utility.h">
@@ -2754,6 +2769,48 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material1D\Elastic\Tanh1D.h">
       <Filter>Material\Material1D\Elastic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\shape.h">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\tensor.h">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\argument.h">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\arpack.h">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\command.h">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\Expression.h">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Elastic\CustomElastic1D.h">
+      <Filter>Material\Material1D\Elastic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\ExpressionParser.h">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\vonMises\CustomMises1D.h">
+      <Filter>Material\Material1D\vonMises</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Concrete\CustomCDP.h">
+      <Filter>Material\Material3D\Concrete</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\vonMises\CustomJ2.h">
+      <Filter>Material\Material3D\vonMises</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\DruckerPrager\CustomDP.h">
+      <Filter>Material\Material3D\DruckerPrager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Hoffman\CustomHoffman.h">
+      <Filter>Material\Material3D\Hoffman</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Clay\CamClay\CustomCC.h">
+      <Filter>Material\Material3D\Clay\CamClay</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

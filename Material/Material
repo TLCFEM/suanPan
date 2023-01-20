@@ -3,7 +3,4 @@
 #include "Material3D/Material3D"
 #include "Special/Special"
 
-#include "ExternalMaterial.h"
 #include "Material.h"
-#include "MaterialTemplate.h"
-#include "MaterialTester.h"

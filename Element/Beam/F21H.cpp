@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -179,13 +179,13 @@ vector<vec> F21H::record(const OutputType P) {
 }
 
 void F21H::print() {
-    suanpan_info("A 2D force based beam element with lumped plasticity%sReference: https://doi.org/10.1016/0045-7949(95)00103-N \n", nlgeom ? " and corotational formulation.\n" : ".\n");
-    node_encoding.t().print("The element connects nodes:");
+    suanpan_info("A 2D force based beam element with lumped plasticity{} doi: https://doi.org/10.1016/0045-7949(95)00103-N \n", nlgeom ? " and corotational formulation." : ".");
+    suanpan_info("The element connects nodes:", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Section:\n");
     auto J = 1;
     for(const auto& I : int_pt) {
-        suanpan_info("IP %d: ", J++);
+        suanpan_info("IP {}: ", J++);
         I.b_section->print();
     }
 }

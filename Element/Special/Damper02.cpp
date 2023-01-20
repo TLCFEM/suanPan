@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -87,4 +87,6 @@ int Damper02::reset_status() { return device->reset_status(); }
 
 vector<vec> Damper02::record(const OutputType P) { return device->record(P); }
 
-void Damper02::print() { suanpan_info("A viscous damper element using displacement and velocity as basic quantities.\n"); }
+void Damper02::print() {
+    suanpan_info("A viscous damper element using displacement and velocity as basic quantities.\n");
+}

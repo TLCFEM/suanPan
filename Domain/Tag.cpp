@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,4 +37,6 @@ bool Tag::is_active() const { return alive; }
 
 bool Tag::is_guarded() const { return guarded; }
 
-void Tag::print() { suanpan_info("A tagged object.\n"); }
+void Tag::print() {
+    suanpan_info("A tagged object.\n");
+}

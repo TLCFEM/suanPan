@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 
 #include "NonlinearCDP.h"
 #include <Recorder/OutputType.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 const double NonlinearCDP::root_three_two = sqrt(1.5);
 const mat NonlinearCDP::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
@@ -114,7 +114,7 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
     unsigned counter = 0;
     while(true) {
         if(max_iteration == ++counter) {
-            suanpan_error("NonlinearCDP cannot converge within %u iterations.\n", max_iteration);
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
             return SUANPAN_FAIL;
         }
 
@@ -168,7 +168,7 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
 
         auto error = norm(residual);
         if(1 == counter) ref_error = std::max(1., error);
-        suanpan_debug("NonlinearCDP local iteration error: %.5E.\n", error /= ref_error);
+        suanpan_debug("Local iteration error: {:.5E}.\n", error /= ref_error);
         if(error <= tolerance || norm(incre) <= tolerance) break;
 
         lambda -= incre(0);
@@ -256,4 +256,6 @@ vector<vec> NonlinearCDP::record(const OutputType T) {
     return Material3D::record(T);
 }
 
-void NonlinearCDP::print() { suanpan_info("A concrete damage plasticity model.\n"); }
+void NonlinearCDP::print() {
+    suanpan_info("A concrete damage plasticity model.\n");
+}

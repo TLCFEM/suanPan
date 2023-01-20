@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
  ******************************************************************************/
 
 #include "SimpleSand.h"
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 const span SimpleSand::sc(2, 7);
 const span SimpleSand::sd(8, 13);
@@ -123,7 +123,7 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
         auto error = norm(residual);
 
         if(1 == counter) ref_error = std::max(1., error);
-        suanpan_debug("SimpleSand local iteration error: %.5E.\n", error /= ref_error);
+        suanpan_debug("Local iteration error: {:.5E}.\n", error /= ref_error);
         if(error <= tolerance || norm(incre) <= tolerance) break;
 
         gamma -= incre(sa);
@@ -175,4 +175,6 @@ int SimpleSand::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-void SimpleSand::print() { suanpan_info("A simple sand model.\n"); }
+void SimpleSand::print() {
+    suanpan_info("A simple sand model.\n");
+}

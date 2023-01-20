@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 #include <Domain/FactoryHelper.hpp>
 #include <Solver/Integrator/Integrator.h>
 #include <Solver/Newton.h>
-#include <Toolbox/arpack_wrapper.h>
+#include <Toolbox/arpack.h>
 
 Buckle::Buckle(const unsigned T)
     : Static(T, 1.) {}
@@ -71,7 +71,7 @@ int Buckle::analyze() {
 
     if(eig_solve(get_eigenvalue(W), get_eigenvector(W), W->get_stiffness(), t_geometry, 1, "SM") != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 
-    suanpan_info("\nbuckling load multiplier: %.8E.\n", W->get_eigenvalue().at(0));
+    suanpan_info("\nBuckling load multiplier: {:.8E}.\n", W->get_eigenvalue().at(0));
 
     // record response
     G->record();

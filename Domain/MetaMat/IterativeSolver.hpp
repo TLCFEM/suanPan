@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ template<sp_d data_t, HasEvaluate<data_t> System> int GMRES(const System* system
 
     auto stop_criterion = [&] {
         residual = (beta = arma::norm(r = conditioner->apply(b - system->evaluate(x)))) / norm_b;
-        suanpan_debug("GMRES solver local residual: %.4e.\n", residual);
+        suanpan_debug("Iterative solver residual: {:.5E}.\n", residual);
         if(residual > setting.tolerance) return SUANPAN_FAIL;
         setting.tolerance = residual;
         setting.max_iteration = counter;
@@ -107,7 +107,7 @@ template<sp_d data_t, HasEvaluate<data_t> System> int GMRES(const System* system
             apply_rotation(s(i), s(j), cs(i), sn(i));
 
             residual = std::fabs(s(j)) / norm_b;
-            suanpan_debug("GMRES solver local residual: %.4e.\n", residual);
+            suanpan_debug("Iterative solver residual: {:.5E}.\n", residual);
             if(residual < setting.tolerance) {
                 x += update(i);
                 setting.tolerance = residual;
@@ -140,7 +140,7 @@ template<sp_d data_t, HasEvaluate<data_t> System> int BiCGSTAB(const System* sys
     const auto initial_r = r;
 
     data_t residual = arma::norm(r) / norm_b;
-    suanpan_debug("BiCGSTAB solver local residual: %.4e.\n", residual);
+    suanpan_debug("Iterative solver residual: {:.5E}.\n", residual);
     if(residual < setting.tolerance) {
         setting.tolerance = residual;
         setting.max_iteration = 0;
@@ -166,7 +166,7 @@ template<sp_d data_t, HasEvaluate<data_t> System> int BiCGSTAB(const System* sys
         alpha = rho / arma::dot(initial_r, v);
         const Col<data_t> s = r - alpha * v;
 
-        suanpan_debug("BiCGSTAB solver local residual: %.4e.\n", residual = arma::norm(s) / norm_b);
+        suanpan_debug("Iterative solver residual: {:.5E}.\n", residual = arma::norm(s) / norm_b);
         if(residual < setting.tolerance) {
             x += alpha * phat;
             setting.tolerance = residual;
@@ -182,7 +182,7 @@ template<sp_d data_t, HasEvaluate<data_t> System> int BiCGSTAB(const System* sys
 
         pre_rho = rho;
 
-        suanpan_debug("BiCGSTAB solver local residual: %.4e.\n", residual = arma::norm(r) / norm_b);
+        suanpan_debug("Iterative solver residual: {:.5E}.\n", residual = arma::norm(r) / norm_b);
         if(residual < setting.tolerance) {
             setting.tolerance = residual;
             setting.max_iteration = i;

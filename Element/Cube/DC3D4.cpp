@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 #include <Domain/DomainBase.h>
 #include <Material/Material3D/Material3D.h>
 #include <Recorder/OutputType.h>
-#include <Toolbox/shapeFunction.h>
+#include <Toolbox/shape.h>
 
 const uvec DC3D4::u_dof{0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14};
 const uvec DC3D4::d_dof{3, 7, 11, 15};
@@ -112,14 +112,12 @@ vector<vec> DC3D4::record(const OutputType T) {
 }
 
 void DC3D4::print() {
-    node_encoding.t().print("DC3D4 element connects:");
+    suanpan_info("DC3D4 element connects:", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Material:\n");
     c_material->print();
-    suanpan_info("Strain:\t");
-    c_material->get_current_strain().t().print();
-    suanpan_info("Stress:\t");
-    c_material->get_current_stress().t().print();
+    suanpan_info("Strain:\t", c_material->get_current_strain());
+    suanpan_info("Stress:\t", c_material->get_current_stress());
 }
 
 #ifdef SUANPAN_VTK

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -144,13 +144,13 @@ vector<vec> F21::record(const OutputType P) {
 }
 
 void F21::print() {
-    suanpan_info("A 2D force based beam element%s.\n", nlgeom ? " and corotational formulation" : "");
-    node_encoding.t().print("The element connects nodes:");
+    suanpan_info("A 2D force based beam element{}.\n", nlgeom ? " and corotational formulation" : "");
+    suanpan_info("The element connects nodes:", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Section:\n");
     auto J = 1;
     for(const auto& I : int_pt) {
-        suanpan_info("IP %d: ", J++);
+        suanpan_info("IP {}: ", J++);
         I.b_section->print();
     }
 }

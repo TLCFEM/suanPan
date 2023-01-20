@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 
 #include "NonlinearGurson1D.h"
 #include <Recorder/OutputType.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 constexpr unsigned NonlinearGurson1D::max_iteration = 20;
 
@@ -64,7 +64,7 @@ int NonlinearGurson1D::update_trial_status(const vec& t_strain) {
     unsigned counter = 0;
     while(true) {
         if(max_iteration == ++counter) {
-            suanpan_error("NonlinearGurson1D cannot converge in %u iterations.\n", max_iteration);
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
             return SUANPAN_FAIL;
         }
 
@@ -105,7 +105,7 @@ int NonlinearGurson1D::update_trial_status(const vec& t_strain) {
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
         const auto error = norm(residual);
-        suanpan_debug("NonlinearGurson1D local iteration error: %.5E.\n", error);
+        suanpan_debug("Local iteration error: {:.5E}.\n", error);
         if(error <= tolerance || norm(incre) <= tolerance) break;
 
         gamma -= incre(0);

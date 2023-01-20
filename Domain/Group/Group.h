@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ public:
     Group(Group&&) = delete;                 // move forbidden
     Group& operator=(const Group&) = delete; // assign forbidden
     Group& operator=(Group&&) = delete;      // assign forbidden
-    ~Group() override;
+    ~Group() override = default;
 
     virtual void initialize(const shared_ptr<DomainBase>&);
 

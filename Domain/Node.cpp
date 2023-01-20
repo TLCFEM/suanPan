@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,13 +22,12 @@
 #include <Toolbox/utility.h>
 
 Node::Node(const unsigned T)
-    : Tag(T) { suanpan_debug("Node %u ctor() called.\n", T); }
+    : Tag(T) {}
 
 Node::Node(const unsigned T, vec&& C)
     : Tag(T) {
     num_dof = static_cast<unsigned>(C.n_elem);
     coordinate = std::forward<vec>(C);
-    suanpan_debug("Node %u ctor() called.\n", T);
 }
 
 /**
@@ -40,7 +39,6 @@ Node::Node(const unsigned T, const unsigned D)
     : Tag(T) {
     num_dof = D;
     coordinate.zeros(D);
-    suanpan_debug("Node %u ctor() called.\n", T);
 }
 
 /**
@@ -53,13 +51,7 @@ Node::Node(const unsigned T, const unsigned D, vec&& C)
     : Tag(T) {
     num_dof = D;
     coordinate = std::forward<vec>(C);
-    suanpan_debug("Node %u ctor() called.\n", T);
 }
-
-/**
- * \brief default destructor.
- */
-Node::~Node() { suanpan_debug("Node %u dtor() called.\n", get_tag()); }
 
 /**
  * \brief This method should be called after Element objects are set. Element
@@ -92,7 +84,7 @@ void Node::initialize(const shared_ptr<DomainBase>& D) {
         trial_acceleration.resize(num_dof);
     }
     else {
-        suanpan_debug("Node %u is not used in the problem, now disable it.\n", get_tag());
+        suanpan_debug("Node {} disabled as it is not used.\n", get_tag());
         D->disable_node(get_tag());
     }
 
@@ -119,7 +111,8 @@ void Node::set_dof_identifier(const std::vector<DOF>& D) {
 
     for(size_t I = 0; I < D.size(); ++I) {
         if(DOF::NONE == D[I]) continue;
-        if(DOF::NONE != dof_identifier[I] && D[I] != dof_identifier[I]) suanpan_warning("inconsistent DoF assignment for Node %u detected, which is likely an error, please double check the model.\n", get_tag());
+        if(DOF::NONE != dof_identifier[I] && D[I] != dof_identifier[I])
+            suanpan_warning("Inconsistent DoF assignment for node {} detected.\n", get_tag());
         dof_identifier[I] = D[I];
     }
 }
@@ -494,57 +487,59 @@ void Node::clear_status() {
 std::vector<vec> Node::record(const OutputType L) const {
     std::vector<vec> data;
 
-    if(L == OutputType::RF) data.push_back(current_resistance);
-    else if(L == OutputType::DF) data.push_back(current_damping_force);
-    else if(L == OutputType::IF) data.push_back(current_inertial_force);
+    if(L == OutputType::RF) data.push_back(current_resistance.empty() ? zeros(num_dof) : current_resistance);
+    else if(L == OutputType::DF) data.push_back(current_damping_force.empty() ? zeros(num_dof) : current_damping_force);
+    else if(L == OutputType::IF) data.push_back(current_inertial_force.empty() ? zeros(num_dof) : current_inertial_force);
     else if(L == OutputType::U) data.push_back(current_displacement);
     else if(L == OutputType::V) data.push_back(current_velocity);
     else if(L == OutputType::A) data.push_back(current_acceleration);
-    else if(L == OutputType::U1 && current_displacement.n_elem >= 1) data.emplace_back(vec{current_displacement(0)});
-    else if(L == OutputType::U2 && current_displacement.n_elem >= 2) data.emplace_back(vec{current_displacement(1)});
-    else if(L == OutputType::U3 && current_displacement.n_elem >= 3) data.emplace_back(vec{current_displacement(2)});
-    else if(L == OutputType::UR1 && current_displacement.n_elem >= 4) data.emplace_back(vec{current_displacement(3)});
-    else if(L == OutputType::UR2 && current_displacement.n_elem >= 5) data.emplace_back(vec{current_displacement(4)});
-    else if(L == OutputType::UR3 && current_displacement.n_elem >= 6) data.emplace_back(vec{current_displacement(5)});
-    else if(L == OutputType::V1 && current_velocity.n_elem >= 1) data.emplace_back(vec{current_velocity(0)});
-    else if(L == OutputType::V2 && current_velocity.n_elem >= 2) data.emplace_back(vec{current_velocity(1)});
-    else if(L == OutputType::V3 && current_velocity.n_elem >= 3) data.emplace_back(vec{current_velocity(2)});
-    else if(L == OutputType::VR1 && current_velocity.n_elem >= 4) data.emplace_back(vec{current_velocity(3)});
-    else if(L == OutputType::VR2 && current_velocity.n_elem >= 5) data.emplace_back(vec{current_velocity(4)});
-    else if(L == OutputType::VR3 && current_velocity.n_elem >= 6) data.emplace_back(vec{current_velocity(5)});
-    else if(L == OutputType::A1 && current_acceleration.n_elem >= 1) data.emplace_back(vec{current_acceleration(0)});
-    else if(L == OutputType::A2 && current_acceleration.n_elem >= 2) data.emplace_back(vec{current_acceleration(1)});
-    else if(L == OutputType::A3 && current_acceleration.n_elem >= 3) data.emplace_back(vec{current_acceleration(2)});
-    else if(L == OutputType::AR1 && current_acceleration.n_elem >= 4) data.emplace_back(vec{current_acceleration(3)});
-    else if(L == OutputType::AR2 && current_acceleration.n_elem >= 5) data.emplace_back(vec{current_acceleration(4)});
-    else if(L == OutputType::AR3 && current_acceleration.n_elem >= 6) data.emplace_back(vec{current_acceleration(5)});
-    else if(L == OutputType::RF1 && current_resistance.n_elem >= 1) data.emplace_back(vec{current_resistance(0)});
-    else if(L == OutputType::RF2 && current_resistance.n_elem >= 2) data.emplace_back(vec{current_resistance(1)});
-    else if(L == OutputType::RF3 && current_resistance.n_elem >= 3) data.emplace_back(vec{current_resistance(2)});
-    else if(L == OutputType::RM1 && current_resistance.n_elem >= 4) data.emplace_back(vec{current_resistance(3)});
-    else if(L == OutputType::RM2 && current_resistance.n_elem >= 5) data.emplace_back(vec{current_resistance(4)});
-    else if(L == OutputType::RM3 && current_resistance.n_elem >= 6) data.emplace_back(vec{current_resistance(5)});
-    else if(L == OutputType::DF1 && current_damping_force.n_elem >= 1) data.emplace_back(vec{current_damping_force(0)});
-    else if(L == OutputType::DF2 && current_damping_force.n_elem >= 2) data.emplace_back(vec{current_damping_force(1)});
-    else if(L == OutputType::DF3 && current_damping_force.n_elem >= 3) data.emplace_back(vec{current_damping_force(2)});
-    else if(L == OutputType::DM1 && current_damping_force.n_elem >= 4) data.emplace_back(vec{current_damping_force(3)});
-    else if(L == OutputType::DM2 && current_damping_force.n_elem >= 5) data.emplace_back(vec{current_damping_force(4)});
-    else if(L == OutputType::DM3 && current_damping_force.n_elem >= 6) data.emplace_back(vec{current_damping_force(5)});
-    else if(L == OutputType::IF1 && current_inertial_force.n_elem >= 1) data.emplace_back(vec{current_inertial_force(0)});
-    else if(L == OutputType::IF2 && current_inertial_force.n_elem >= 2) data.emplace_back(vec{current_inertial_force(1)});
-    else if(L == OutputType::IF3 && current_inertial_force.n_elem >= 3) data.emplace_back(vec{current_inertial_force(2)});
-    else if(L == OutputType::IM1 && current_inertial_force.n_elem >= 4) data.emplace_back(vec{current_inertial_force(3)});
-    else if(L == OutputType::IM2 && current_inertial_force.n_elem >= 5) data.emplace_back(vec{current_inertial_force(4)});
-    else if(L == OutputType::IM3 && current_inertial_force.n_elem >= 6) data.emplace_back(vec{current_inertial_force(5)});
+    else if(L == OutputType::U1) data.emplace_back(vec{current_displacement.n_elem >= 1 ? current_displacement(0) : 0.});
+    else if(L == OutputType::U2) data.emplace_back(vec{current_displacement.n_elem >= 2 ? current_displacement(1) : 0.});
+    else if(L == OutputType::U3) data.emplace_back(vec{current_displacement.n_elem >= 3 ? current_displacement(2) : 0.});
+    else if(L == OutputType::U4 || L == OutputType::UR1) data.emplace_back(vec{current_displacement.n_elem >= 4 ? current_displacement(3) : 0.});
+    else if(L == OutputType::U5 || L == OutputType::UR2) data.emplace_back(vec{current_displacement.n_elem >= 5 ? current_displacement(4) : 0.});
+    else if(L == OutputType::U6 || L == OutputType::UR3) data.emplace_back(vec{current_displacement.n_elem >= 6 ? current_displacement(5) : 0.});
+    else if(L == OutputType::V1) data.emplace_back(vec{current_velocity.n_elem >= 1 ? current_velocity(0) : 0.});
+    else if(L == OutputType::V2) data.emplace_back(vec{current_velocity.n_elem >= 2 ? current_velocity(1) : 0.});
+    else if(L == OutputType::V3) data.emplace_back(vec{current_velocity.n_elem >= 3 ? current_velocity(2) : 0.});
+    else if(L == OutputType::V4 || L == OutputType::VR1) data.emplace_back(vec{current_velocity.n_elem >= 4 ? current_velocity(3) : 0.});
+    else if(L == OutputType::V5 || L == OutputType::VR2) data.emplace_back(vec{current_velocity.n_elem >= 5 ? current_velocity(4) : 0.});
+    else if(L == OutputType::V6 || L == OutputType::VR3) data.emplace_back(vec{current_velocity.n_elem >= 6 ? current_velocity(5) : 0.});
+    else if(L == OutputType::A1) data.emplace_back(vec{current_acceleration.n_elem >= 1 ? current_acceleration(0) : 0.});
+    else if(L == OutputType::A2) data.emplace_back(vec{current_acceleration.n_elem >= 2 ? current_acceleration(1) : 0.});
+    else if(L == OutputType::A3) data.emplace_back(vec{current_acceleration.n_elem >= 3 ? current_acceleration(2) : 0.});
+    else if(L == OutputType::A4 || L == OutputType::AR1) data.emplace_back(vec{current_acceleration.n_elem >= 4 ? current_acceleration(3) : 0.});
+    else if(L == OutputType::A5 || L == OutputType::AR2) data.emplace_back(vec{current_acceleration.n_elem >= 5 ? current_acceleration(4) : 0.});
+    else if(L == OutputType::A6 || L == OutputType::AR3) data.emplace_back(vec{current_acceleration.n_elem >= 6 ? current_acceleration(5) : 0.});
+    else if(L == OutputType::RF1) data.emplace_back(vec{current_resistance.n_elem >= 1 ? current_resistance(0) : 0.});
+    else if(L == OutputType::RF2) data.emplace_back(vec{current_resistance.n_elem >= 2 ? current_resistance(1) : 0.});
+    else if(L == OutputType::RF3) data.emplace_back(vec{current_resistance.n_elem >= 3 ? current_resistance(2) : 0.});
+    else if(L == OutputType::RF4 || L == OutputType::RM1) data.emplace_back(vec{current_resistance.n_elem >= 4 ? current_resistance(3) : 0.});
+    else if(L == OutputType::RF5 || L == OutputType::RM2) data.emplace_back(vec{current_resistance.n_elem >= 5 ? current_resistance(4) : 0.});
+    else if(L == OutputType::RF6 || L == OutputType::RM3) data.emplace_back(vec{current_resistance.n_elem >= 6 ? current_resistance(5) : 0.});
+    else if(L == OutputType::DF1) data.emplace_back(vec{current_damping_force.n_elem >= 1 ? current_damping_force(0) : 0.});
+    else if(L == OutputType::DF2) data.emplace_back(vec{current_damping_force.n_elem >= 2 ? current_damping_force(1) : 0.});
+    else if(L == OutputType::DF3) data.emplace_back(vec{current_damping_force.n_elem >= 3 ? current_damping_force(2) : 0.});
+    else if(L == OutputType::DF4 || L == OutputType::DM1) data.emplace_back(vec{current_damping_force.n_elem >= 4 ? current_damping_force(3) : 0.});
+    else if(L == OutputType::DF5 || L == OutputType::DM2) data.emplace_back(vec{current_damping_force.n_elem >= 5 ? current_damping_force(4) : 0.});
+    else if(L == OutputType::DF6 || L == OutputType::DM3) data.emplace_back(vec{current_damping_force.n_elem >= 6 ? current_damping_force(5) : 0.});
+    else if(L == OutputType::IF1) data.emplace_back(vec{current_inertial_force.n_elem >= 1 ? current_inertial_force(0) : 0.});
+    else if(L == OutputType::IF2) data.emplace_back(vec{current_inertial_force.n_elem >= 2 ? current_inertial_force(1) : 0.});
+    else if(L == OutputType::IF3) data.emplace_back(vec{current_inertial_force.n_elem >= 3 ? current_inertial_force(2) : 0.});
+    else if(L == OutputType::IF4 || L == OutputType::IM1) data.emplace_back(vec{current_inertial_force.n_elem >= 4 ? current_inertial_force(3) : 0.});
+    else if(L == OutputType::IF5 || L == OutputType::IM2) data.emplace_back(vec{current_inertial_force.n_elem >= 5 ? current_inertial_force(4) : 0.});
+    else if(L == OutputType::IF6 || L == OutputType::IM3) data.emplace_back(vec{current_inertial_force.n_elem >= 6 ? current_inertial_force(5) : 0.});
 
     return data;
 }
 
 void Node::print() {
-    suanpan_info("Node %u:\n", get_tag(), is_active() ? "" : " is currently inactive");
-    coordinate.t().print("Coordinate:");
-    current_displacement.t().print("Displacement:");
-    current_resistance.t().print("Resistance:");
-    if(!suanpan::approx_equal(accu(current_velocity), 0.)) current_velocity.t().print("Velocity:");
-    if(!suanpan::approx_equal(accu(current_acceleration), 0.)) current_acceleration.t().print("Acceleration:");
+    suanpan_info("Node {}{}\n", get_tag(), is_active() ? ":" : " is currently inactive.");
+    suanpan_info("Coordinate:", coordinate);
+    suanpan_info("Displacement:", current_displacement);
+    suanpan_info("Resistance:", current_resistance);
+    if(!suanpan::approx_equal(accu(current_velocity), 0.))
+        suanpan_info("Velocity:", current_velocity);
+    if(!suanpan::approx_equal(accu(current_acceleration), 0.))
+        suanpan_info("Acceleration:", current_acceleration);
 }

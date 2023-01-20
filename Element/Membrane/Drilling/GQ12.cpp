@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 #include <Domain/DomainBase.h>
 #include <Material/Material2D/Material2D.h>
 #include <Toolbox/IntegrationPlan.h>
-#include <Toolbox/shapeFunction.h>
+#include <Toolbox/shape.h>
 #include <Toolbox/utility.h>
 
 GQ12::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M)
@@ -172,11 +172,11 @@ vector<vec> GQ12::record(const OutputType T) {
 }
 
 void GQ12::print() {
-    suanpan_info("GQ12 element.\n");
+    suanpan_info("A GQ12 element.\n");
     if(!is_initialized()) return;
     suanpan_info("Material:\n");
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        suanpan_info("Integration Point %llu:\n", I + 1);
+        suanpan_info("IP {}:\t", I + 1);
         int_pt[I].m_material->print();
     }
 }

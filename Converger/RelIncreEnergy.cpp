@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,7 +40,8 @@ bool RelIncreEnergy::is_converged(const unsigned counter) {
     set_error(energy / ref_energy);
     set_conv_flag(get_tolerance() > get_error());
 
-    if(is_print()) suanpan_info("relative energy increment error: %.5E.\n", get_error());
+    if(is_print())
+        suanpan_info("-> Relative Incremental Energy: {:.5E}.\n", get_error());
 
     return get_conv_flag();
 }

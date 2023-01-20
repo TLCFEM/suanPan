@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Node.h>
 #include <Material/Material2D/Material2D.h>
-#include <Toolbox/shapeFunction.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/shape.h>
+#include <Toolbox/tensor.h>
 #include <Toolbox/utility.h>
 
 CP6::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M, mat&& P)
@@ -183,7 +183,7 @@ vector<vec> CP6::record(const OutputType T) {
 }
 
 void CP6::print() {
-    node_encoding.t().print("CP6 element connects:");
+    suanpan_info("CP6 element connects:", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Material:\n");
     for(const auto& I : int_pt) I.m_material->print();

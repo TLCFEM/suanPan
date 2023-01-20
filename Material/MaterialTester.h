@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,8 +18,8 @@
  * @fn MaterialTester
  * @brief A MaterialTester function.
  * @author tlc
- * @date 12/01/2019
- * @version 0.2.0
+ * @date 04/01/2023
+ * @version 0.3.0
  * @file MaterialTester.h
  * @addtogroup Utility
  * @{
@@ -28,15 +28,20 @@
 #ifndef MATERIALTESTER_H
 #define MATERIALTESTER_H
 
-#include <Material/Material.h>
+#include <memory>
 
-bool initialise_material(const shared_ptr<Material>&, uword);
-mat material_tester(const shared_ptr<Material>&, const std::vector<unsigned>&, const vec&);
-mat material_tester(const shared_ptr<Material>&, const std::vector<unsigned>&, const vec&, const vec&);
-mat material_tester_by_load(const shared_ptr<Material>&, const std::vector<unsigned>&, const vec&);
-mat material_tester_by_load(const shared_ptr<Material>&, const std::vector<unsigned>&, const vec&, const vec&);
-mat material_tester_by_strain_history(const shared_ptr<Material>&, const mat&);
-mat material_tester_by_stress_history(const shared_ptr<Material>&, const mat&);
+class DomainBase;
+
+int test_material1d(const std::shared_ptr<DomainBase>&, std::istringstream&);
+int test_material2d(const std::shared_ptr<DomainBase>&, std::istringstream&);
+int test_material3d(const std::shared_ptr<DomainBase>&, std::istringstream&);
+int test_material_with_base3d(const std::shared_ptr<DomainBase>&, std::istringstream&);
+int test_material_by_load1d(const std::shared_ptr<DomainBase>&, std::istringstream&);
+int test_material_by_load2d(const std::shared_ptr<DomainBase>&, std::istringstream&);
+int test_material_by_load3d(const std::shared_ptr<DomainBase>&, std::istringstream&);
+int test_material_by_load_with_base3d(const std::shared_ptr<DomainBase>&, std::istringstream&);
+int test_material_by_strain_history(const std::shared_ptr<DomainBase>&, std::istringstream&);
+int test_material_by_stress_history(const std::shared_ptr<DomainBase>&, std::istringstream&);
 
 #endif
 

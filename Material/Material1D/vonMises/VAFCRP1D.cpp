@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ int VAFCRP1D::update_trial_status(const vec& t_strain) {
     unsigned counter = 0;
     while(true) {
         if(max_iteration == ++counter) {
-            suanpan_error("VAFCRP1D cannot converge in %u iterations.\n", max_iteration);
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
             return SUANPAN_FAIL;
         }
 
@@ -85,7 +85,7 @@ int VAFCRP1D::update_trial_status(const vec& t_strain) {
         else for(unsigned I = 0; I < size; ++I) jacobian -= (b(I) * trial_history(I) + a(I)) * pow(1. + b(I) * gamma, -2.);
 
         const auto incre = (q * exp_gamma - k) / ((jacobian *= exp_gamma) -= dk);
-        suanpan_extra_debug("VAFCRP1D local iterative loop error: %.5E.\n", fabs(incre));
+        suanpan_debug("Local iteration error: {:.5E}.\n", fabs(incre));
         if(fabs(incre) <= tolerance) break;
 
         gamma -= incre;
@@ -139,6 +139,6 @@ vector<vec> VAFCRP1D::record(const OutputType P) {
 }
 
 void VAFCRP1D::print() {
-    suanpan_info("A uniaxial VAFCRP model.\n");
+    suanpan_info("A uniaxial VAFCRP material model.\n");
     Material1D::print();
 }

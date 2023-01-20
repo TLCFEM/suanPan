@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -83,7 +83,9 @@ vector<vec> EB21::record(const OutputType P) {
     return {};
 }
 
-void EB21::print() { suanpan_info("An elastic B21 element%s", nlgeom ? " with corotational formulation.\n" : ".\n"); }
+void EB21::print() {
+    suanpan_info("An elastic B21 element{}", nlgeom ? " with corotational formulation.\n" : ".\n");
+}
 
 #ifdef SUANPAN_VTK
 #include <vtkLine.h>

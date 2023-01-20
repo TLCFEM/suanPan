@@ -1,5 +1,5 @@
 ﻿/*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -163,16 +163,16 @@ template<sp_d data_t, sp_i index_t> csc_form<data_t, index_t>& csc_form<data_t, 
 }
 
 template<sp_d data_t, sp_i index_t> void csc_form<data_t, index_t>::print() const {
-    suanpan_info("A sparse matrix in triplet form with size of %u by %u, the sparsity of %.3f%%.\n", static_cast<unsigned>(n_rows), static_cast<unsigned>(n_cols), 1E2 - static_cast<double>(n_elem) / static_cast<double>(n_rows) / static_cast<double>(n_cols) * 1E2);
+    suanpan_info("A sparse matrix in triplet form with size of {} by {}, the sparsity of {:.3f}%.\n", static_cast<unsigned>(n_rows), static_cast<unsigned>(n_cols), 1E2 - static_cast<double>(n_elem) / static_cast<double>(n_rows) / static_cast<double>(n_cols) * 1E2);
     if(n_elem > index_t(1000)) {
-        suanpan_info("more than 1000 elements exist.\n");
+        suanpan_info("More than 1000 elements exist.\n");
         return;
     }
 
     index_t c_idx = 1;
     for(index_t I = 0; I < n_elem; ++I) {
         if(I >= col_ptr[c_idx]) ++c_idx;
-        suanpan_info("(%3u, %3u) ===> %+.4E\n", static_cast<unsigned>(row_idx[I]), static_cast<unsigned>(c_idx) - 1, val_idx[I]);
+        suanpan_info("({}, {}) ===> {:+.8E}\n", static_cast<unsigned>(row_idx[I]), static_cast<unsigned>(c_idx) - 1, val_idx[I]);
     }
 }
 

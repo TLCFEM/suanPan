@@ -42,6 +42,11 @@ peek node 2 3
 
 peek element 1
 
+save stiffness
+save mass
+save damping
+save model
+
 reset
 clear
 exit

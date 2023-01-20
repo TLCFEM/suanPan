@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,6 +57,6 @@ int Sinh1D::reset_status() {
 }
 
 void Sinh1D::print() {
-    suanpan_info("A 1D nonlinear elastic material using sinh function with an elastic modulus of %.4E.\n", elastic_modulus);
+    suanpan_info("A uniaxial nonlinear elastic material using sinh function with an elastic modulus of {:.4E}.\n", elastic_modulus);
     Material1D::print();
 }

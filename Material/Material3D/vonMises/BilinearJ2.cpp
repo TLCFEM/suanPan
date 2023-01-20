@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 
 #include "BilinearJ2.h"
 #include <Recorder/OutputType.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 constexpr double BilinearJ2::two_third = 2. / 3.;
 const double BilinearJ2::root_two_third = sqrt(two_third);
@@ -112,4 +112,6 @@ vector<vec> BilinearJ2::record(const OutputType P) {
     return Material3D::record(P);
 }
 
-void BilinearJ2::print() { suanpan_info("A 3D bilinear hardening model.\n"); }
+void BilinearJ2::print() {
+    suanpan_info("A 3D bilinear hardening model.\n");
+}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ int Kelvin::initialize(const shared_ptr<DomainBase>& D) {
 unique_ptr<Material> Kelvin::get_copy() { return make_unique<Kelvin>(*this); }
 
 int Kelvin::update_trial_status(const vec&) {
-    suanpan_error("Kelvin receives strain only from the associated element, check the model.\n");
+    suanpan_error("Receives strain only from the associated element.\n");
     return SUANPAN_FAIL;
 }
 
@@ -112,4 +112,6 @@ vector<vec> Kelvin::record(const OutputType P) {
     return data;
 }
 
-void Kelvin::print() { suanpan_info("A Kelvin material model.\n"); }
+void Kelvin::print() {
+    suanpan_info("A Kelvin material model.\n");
+}

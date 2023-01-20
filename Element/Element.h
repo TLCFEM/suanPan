@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -176,7 +176,7 @@ public:
     Element& operator=(const Element&) = delete; // assign forbidden
     Element& operator=(Element&&) = delete;      // assign forbidden
 
-    ~Element() override;
+    ~Element() override = default;
 
     int initialize_base(const shared_ptr<DomainBase>&) final;
 

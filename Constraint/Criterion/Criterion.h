@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ class Criterion : public Tag {
 
 public:
     explicit Criterion(unsigned = 0, unsigned = 0);
-    ~Criterion() override;
+    ~Criterion() override = default;
 
     void set_step_tag(unsigned);
     [[nodiscard]] unsigned get_step_tag() const;

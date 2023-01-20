@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -80,6 +80,6 @@ int Bar2D::reset_status() {
 }
 
 void Bar2D::print() {
-    suanpan_info("A Bar2D section that represents for example rebar in RC section.\n");
+    suanpan_info("A 2D section that represents for example rebar in RC section.\n");
     s_material->print();
 }

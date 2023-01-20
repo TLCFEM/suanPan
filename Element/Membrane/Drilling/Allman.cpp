@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 #include "Allman.h"
 #include <Domain/DomainBase.h>
 #include <Material/Material2D/Material2D.h>
-#include <Toolbox/shapeFunction.h>
+#include <Toolbox/shape.h>
 #include <Toolbox/utility.h>
 
 Allman::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M)
@@ -168,7 +168,9 @@ vector<vec> Allman::record(const OutputType T) {
     return data;
 }
 
-void Allman::print() { node_encoding.t().print("Allman element connects:"); }
+void Allman::print() {
+    suanpan_info("Allman element connects:\t", node_encoding);
+}
 
 #ifdef SUANPAN_VTK
 #include <vtkTriangle.h>

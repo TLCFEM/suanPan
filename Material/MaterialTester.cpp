@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,33 +16,60 @@
  ******************************************************************************/
 
 #include "MaterialTester.h"
+#include <Domain/DomainBase.h>
+#include <Material/Material.h>
+#include <Toolbox/utility.h>
 
-bool initialise_material(const shared_ptr<Material>& obj, const uword size) {
+bool initialise_material(const shared_ptr<DomainBase>& domain, const unique_ptr<Material>& obj, const uword size) {
     if(!obj->is_initialized()) {
-        obj->initialize_base(nullptr);
-        obj->initialize(nullptr);
+        if(SUANPAN_SUCCESS != obj->initialize_base(domain)) return false;
+        if(SUANPAN_SUCCESS != obj->initialize(domain)) return false;
         obj->set_initialized(true);
     }
 
     if(obj->get_material_type() == MaterialType::D1 && 1 != size) {
-        suanpan_error("the tester cannot be applied to the given material model.\n");
+        suanpan_error("The tester cannot be applied to the given material model.\n");
         return false;
     }
     if(obj->get_material_type() == MaterialType::D2 && 3 != size) {
-        suanpan_error("the tester cannot be applied to the given material model.\n");
+        suanpan_error("The tester cannot be applied to the given material model.\n");
         return false;
     }
     if(obj->get_material_type() == MaterialType::D3 && 6 != size) {
-        suanpan_error("the tester cannot be applied to the given material model.\n");
+        suanpan_error("The tester cannot be applied to the given material model.\n");
         return false;
     }
 
     return true;
 }
 
-mat material_tester(const shared_ptr<Material>& obj, const std::vector<unsigned>& idx, const vec& incre) {
-    if(!initialise_material(obj, incre.n_elem)) return {};
+void save_result(const mat& result) {
+#ifdef SUANPAN_HDF5
+    if(!result.save("RESULT.h5", hdf5_binary_trans))
+        suanpan_error("Fail to save to file.\n");
+#else
+    if(!result.save("RESULT.txt", raw_ascii))
+        suanpan_error("Fail to save to file.\n");
+#endif
+}
 
+void save_gnuplot() {
+    if(std::ofstream gnuplot("RESULT.plt"); gnuplot.is_open()) {
+        gnuplot << "reset\n";
+        gnuplot << "set term tikz size 14cm,10cm\n";
+        gnuplot << "set output \"RESULT.tex\"\n";
+        gnuplot << "unset key\n";
+        gnuplot << "set xrange [*:*]\n";
+        gnuplot << "set yrange [*:*]\n";
+        gnuplot << "set xlabel \"input\"\n";
+        gnuplot << "set ylabel \"output\"\n";
+        gnuplot << "set grid\n";
+        gnuplot << "plot \"RESULT.txt\" u 1:2 w l lw 2\n";
+        gnuplot << "set output\n";
+    }
+}
+
+mat material_tester(const unique_ptr<Material>& obj, const std::vector<unsigned>& idx, const vec& incre) {
     unsigned total_size = 1;
     for(const auto& I : idx) total_size += I;
 
@@ -76,9 +103,7 @@ mat material_tester(const shared_ptr<Material>& obj, const std::vector<unsigned>
     return response;
 }
 
-mat material_tester(const shared_ptr<Material>& obj, const std::vector<unsigned>& idx, const vec& incre, const vec& base) {
-    if(!initialise_material(obj, incre.n_elem)) return {};
-
+mat material_tester(const unique_ptr<Material>& obj, const std::vector<unsigned>& idx, const vec& incre, const vec& base) {
     unsigned total_size = 2;
     for(const auto& I : idx) total_size += I;
 
@@ -119,9 +144,7 @@ mat material_tester(const shared_ptr<Material>& obj, const std::vector<unsigned>
     return response;
 }
 
-mat material_tester_by_load(const shared_ptr<Material>& obj, const std::vector<unsigned>& idx, const vec& incre) {
-    if(!initialise_material(obj, incre.n_elem)) return {};
-
+mat material_tester_by_load(const unique_ptr<Material>& obj, const std::vector<unsigned>& idx, const vec& incre) {
     unsigned total_size = 1;
     for(const auto& I : idx) total_size += I;
 
@@ -145,7 +168,7 @@ mat material_tester_by_load(const shared_ptr<Material>& obj, const std::vector<u
             while(true) {
                 const vec incre_strain = solve(obj->get_trial_stiffness(), total_load - obj->get_trial_stress());
                 const auto error = norm(incre_strain);
-                suanpan_info("local iteration error: %.5E.\n", error);
+                suanpan_debug("Local iteration error: {:.5E}.\n", error);
                 if(error < 1E-12) break;
                 if(++counter == 10 || obj->update_trial_status(obj->get_trial_strain() + incre_strain) != SUANPAN_SUCCESS) {
                     info = SUANPAN_FAIL;
@@ -168,9 +191,7 @@ mat material_tester_by_load(const shared_ptr<Material>& obj, const std::vector<u
     return response;
 }
 
-mat material_tester_by_load(const shared_ptr<Material>& obj, const std::vector<unsigned>& idx, const vec& incre, const vec& base) {
-    if(!initialise_material(obj, incre.n_elem)) return {};
-
+mat material_tester_by_load(const unique_ptr<Material>& obj, const std::vector<unsigned>& idx, const vec& incre, const vec& base) {
     unsigned total_size = 2;
     for(const auto& I : idx) total_size += I;
 
@@ -191,7 +212,7 @@ mat material_tester_by_load(const shared_ptr<Material>& obj, const std::vector<u
     while(true) {
         const vec incre_strain = solve(obj->get_trial_stiffness(), total_load - obj->get_trial_stress());
         const auto error = norm(incre_strain);
-        suanpan_info("local iteration error: %.5E.\n", error);
+        suanpan_debug("Local iteration error: {:.5E}.\n", error);
         if(error < 1E-12) break;
         if(++counter == 10 || obj->update_trial_status(obj->get_trial_strain() + incre_strain) != SUANPAN_SUCCESS) {
             info = SUANPAN_FAIL;
@@ -210,7 +231,7 @@ mat material_tester_by_load(const shared_ptr<Material>& obj, const std::vector<u
                 while(true) {
                     const vec incre_strain = solve(obj->get_trial_stiffness(), total_load - obj->get_trial_stress());
                     const auto error = norm(incre_strain);
-                    suanpan_info("local iteration error: %.5E.\n", error);
+                    suanpan_debug("Local iteration error: {:.5E}.\n", error);
                     if(error <= 1E-12) break;
                     if(++counter == 10 || obj->update_trial_status(obj->get_trial_strain() + incre_strain) != SUANPAN_SUCCESS) {
                         info = SUANPAN_FAIL;
@@ -233,15 +254,13 @@ mat material_tester_by_load(const shared_ptr<Material>& obj, const std::vector<u
     return response;
 }
 
-mat material_tester_by_strain_history(const shared_ptr<Material>& obj, const mat& history) {
-    if(!initialise_material(obj, history.n_cols)) return {};
-
+mat material_tester_by_strain_history(const unique_ptr<Material>& obj, const mat& history) {
     mat response(size(history));
 
     for(auto I = 0llu; I < history.n_rows; ++I) {
         if(SUANPAN_SUCCESS != obj->update_trial_status(history.row(I).t())) break;
         obj->commit_status();
-        response.row(I) = obj->get_current_stress();
+        response.row(I) = obj->get_current_stress().t();
     }
 
     obj->print();
@@ -251,9 +270,7 @@ mat material_tester_by_strain_history(const shared_ptr<Material>& obj, const mat
     return response;
 }
 
-mat material_tester_by_stress_history(const shared_ptr<Material>& obj, const mat& history) {
-    if(!initialise_material(obj, history.n_cols)) return {};
-
+mat material_tester_by_stress_history(const unique_ptr<Material>& obj, const mat& history) {
     mat response(size(history));
 
     for(auto I = 0llu; I < history.n_rows; ++I) {
@@ -267,7 +284,7 @@ mat material_tester_by_stress_history(const shared_ptr<Material>& obj, const mat
             }
             const vec incre_strain = solve(obj->get_trial_stiffness(), history.row(I).t() - obj->get_trial_stress());
             const auto error = norm(incre_strain);
-            suanpan_info("local iteration error: %.5E.\n", error);
+            suanpan_debug("Local iteration error: {:.5E}.\n", error);
             if(error <= 1E-12) break;
             strain += incre_strain;
             if(SUANPAN_SUCCESS != obj->update_trial_status(strain)) {
@@ -279,7 +296,7 @@ mat material_tester_by_stress_history(const shared_ptr<Material>& obj, const mat
         if(flag) break;
 
         obj->commit_status();
-        response.row(I) = obj->get_current_strain();
+        response.row(I) = obj->get_current_strain().t();
     }
 
     obj->print();
@@ -287,4 +304,294 @@ mat material_tester_by_stress_history(const shared_ptr<Material>& obj, const mat
     obj->clear_status();
 
     return response;
+}
+
+int test_material1d(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned material_tag;
+    if(!get_input(command, material_tag)) {
+        suanpan_error("A valid material tag is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    double incre;
+    if(!get_input(command, incre)) {
+        suanpan_error("A valid step size is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    std::vector<unsigned> load_step;
+    int step;
+    while(get_input(command, step)) load_step.push_back(static_cast<unsigned>(std::abs(step)));
+
+    if(!domain->find_material(material_tag)) return SUANPAN_SUCCESS;
+
+    const auto material = domain->get_material(material_tag)->get_copy();
+
+    if(!initialise_material(domain, material, 1)) return SUANPAN_SUCCESS;
+
+    save_result(material_tester(material, load_step, {incre}));
+
+    save_gnuplot();
+
+    return SUANPAN_SUCCESS;
+}
+
+int test_material2d(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned material_tag;
+    if(!get_input(command, material_tag)) {
+        suanpan_error("A valid material tag is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    vec incre(3);
+    if(!get_input(command, incre)) {
+        suanpan_error("A valid step size is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    std::vector<unsigned> load_step;
+    int step;
+    while(get_input(command, step)) load_step.push_back(static_cast<unsigned>(std::abs(step)));
+
+    if(!domain->find_material(material_tag)) return SUANPAN_SUCCESS;
+
+    const auto material = domain->get_material(material_tag)->get_copy();
+
+    if(!initialise_material(domain, material, incre.n_elem)) return SUANPAN_SUCCESS;
+
+    save_result(material_tester(material, load_step, incre));
+
+    return SUANPAN_SUCCESS;
+}
+
+int test_material3d(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned material_tag;
+    if(!get_input(command, material_tag)) {
+        suanpan_error("A valid material tag is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    vec incre(6);
+    if(!get_input(command, incre)) {
+        suanpan_error("A valid step size is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    std::vector<unsigned> load_step;
+    int step;
+    while(get_input(command, step)) load_step.push_back(static_cast<unsigned>(std::abs(step)));
+
+    if(!domain->find_material(material_tag)) return SUANPAN_SUCCESS;
+
+    const auto material = domain->get_material(material_tag)->get_copy();
+
+    if(!initialise_material(domain, material, incre.n_elem)) return SUANPAN_SUCCESS;
+
+    save_result(material_tester(material, load_step, incre));
+
+    return SUANPAN_SUCCESS;
+}
+
+int test_material_with_base3d(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned material_tag;
+    if(!get_input(command, material_tag)) {
+        suanpan_error("A valid material tag is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    vec base(6);
+    if(!get_input(command, base)) {
+        suanpan_error("A valid step size is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    vec incre(6);
+    if(!get_input(command, incre)) {
+        suanpan_error("A valid step size is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    std::vector<unsigned> load_step;
+    int step;
+    while(get_input(command, step)) load_step.push_back(static_cast<unsigned>(std::abs(step)));
+
+    if(!domain->find_material(material_tag)) return SUANPAN_SUCCESS;
+
+    const auto material = domain->get_material(material_tag)->get_copy();
+
+    if(!initialise_material(domain, material, incre.n_elem)) return {};
+
+    save_result(material_tester(material, load_step, incre, base));
+
+    return SUANPAN_SUCCESS;
+}
+
+int test_material_by_load1d(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned material_tag;
+    if(!get_input(command, material_tag)) {
+        suanpan_error("A valid material tag is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    double incre;
+    if(!get_input(command, incre)) {
+        suanpan_error("A valid step size is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    std::vector<unsigned> load_step;
+    int step;
+    while(get_input(command, step)) load_step.push_back(static_cast<unsigned>(std::abs(step)));
+
+    if(!domain->find_material(material_tag)) return SUANPAN_SUCCESS;
+
+    const auto material = domain->get_material(material_tag)->get_copy();
+
+    if(!initialise_material(domain, material, 1)) return SUANPAN_SUCCESS;
+
+    save_result(material_tester_by_load(material, load_step, {incre}));
+
+    save_gnuplot();
+
+    return SUANPAN_SUCCESS;
+}
+
+int test_material_by_load2d(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned material_tag;
+    if(!get_input(command, material_tag)) {
+        suanpan_error("A valid material tag is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    vec incre(3);
+    if(!get_input(command, incre)) {
+        suanpan_error("A valid step size is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    std::vector<unsigned> load_step;
+    int step;
+    while(get_input(command, step)) load_step.push_back(static_cast<unsigned>(std::abs(step)));
+
+    if(!domain->find_material(material_tag)) return SUANPAN_SUCCESS;
+
+    const auto material = domain->get_material(material_tag)->get_copy();
+
+    if(!initialise_material(domain, material, incre.n_elem)) return SUANPAN_SUCCESS;
+
+    save_result(material_tester_by_load(material, load_step, incre));
+
+    return SUANPAN_SUCCESS;
+}
+
+int test_material_by_load3d(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned material_tag;
+    if(!get_input(command, material_tag)) {
+        suanpan_error("A valid material tag is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    vec incre(6);
+    if(!get_input(command, incre)) {
+        suanpan_error("A valid step size is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    std::vector<unsigned> load_step;
+    int step;
+    while(get_input(command, step)) load_step.push_back(static_cast<unsigned>(std::abs(step)));
+
+    if(!domain->find_material(material_tag)) return SUANPAN_SUCCESS;
+
+    const auto material = domain->get_material(material_tag)->get_copy();
+
+    if(!initialise_material(domain, material, incre.n_elem)) return SUANPAN_SUCCESS;
+
+    save_result(material_tester_by_load(material, load_step, incre));
+
+    return SUANPAN_SUCCESS;
+}
+
+int test_material_by_load_with_base3d(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned material_tag;
+    if(!get_input(command, material_tag)) {
+        suanpan_error("A valid material tag is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    vec base(6);
+    if(!get_input(command, base)) {
+        suanpan_error("A valid step size is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    vec incre(6);
+    if(!get_input(command, incre)) {
+        suanpan_error("A valid step size is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    std::vector<unsigned> load_step;
+    int step;
+    while(get_input(command, step)) load_step.push_back(static_cast<unsigned>(std::abs(step)));
+
+    if(!domain->find_material(material_tag)) return SUANPAN_SUCCESS;
+
+    const auto material = domain->get_material(material_tag)->get_copy();
+
+    if(!initialise_material(domain, material, incre.n_elem)) return SUANPAN_SUCCESS;
+
+    save_result(material_tester_by_load(material, load_step, incre, base));
+
+    return SUANPAN_SUCCESS;
+}
+
+int test_material_by_strain_history(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned material_tag;
+    if(!get_input(command, material_tag)) {
+        suanpan_error("A valid material tag is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    string history_file;
+    if(!get_input(command, history_file)) {
+        suanpan_error("A valid history file name is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    mat strain_history;
+    if(!strain_history.load(history_file, raw_ascii) || !domain->find_material(material_tag)) return SUANPAN_SUCCESS;
+
+    const auto material = domain->get_material(material_tag)->get_copy();
+
+    if(!initialise_material(domain, material, strain_history.n_cols)) return SUANPAN_SUCCESS;
+
+    save_result(material_tester_by_strain_history(material, strain_history));
+
+    return SUANPAN_SUCCESS;
+}
+
+int test_material_by_stress_history(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned material_tag;
+    if(!get_input(command, material_tag)) {
+        suanpan_error("A valid material tag is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    string history_file;
+    if(!get_input(command, history_file)) {
+        suanpan_error("A valid history file name is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    mat stress_history;
+    if(!stress_history.load(history_file, raw_ascii) || !domain->find_material(material_tag)) return SUANPAN_SUCCESS;
+
+    const auto material = domain->get_material(material_tag)->get_copy();
+
+    if(!initialise_material(domain, material, stress_history.n_cols)) return SUANPAN_SUCCESS;
+
+    save_result(material_tester_by_stress_history(material, stress_history));
+
+    return SUANPAN_SUCCESS;
 }

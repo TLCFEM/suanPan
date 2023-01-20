@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #include <Domain/Node.h>
 #include <Material/Material2D/Material2D.h>
 #include <Toolbox/IntegrationPlan.h>
-#include <Toolbox/shapeFunction.h>
+#include <Toolbox/shape.h>
 #include <Toolbox/utility.h>
 
 CAX8::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M)
@@ -54,7 +54,7 @@ int CAX8::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
     if(PlaneType::A != static_cast<PlaneType>(material_proto->get_parameter(ParameterType::PLANETYPE))) {
-        suanpan_warning("Element %u is assigned with an inconsistent material.\n", get_tag());
+        suanpan_warning("Element {} is assigned with an inconsistent material.\n", get_tag());
         return SUANPAN_FAIL;
     }
 
@@ -143,8 +143,8 @@ vector<vec> CAX8::record(const OutputType T) {
 }
 
 void CAX8::print() {
-    suanpan_info("A CAX8%s element%s.\n", reduced_scheme ? "R" : "", nlgeom ? " with nonlinear geometry on" : "");
-    node_encoding.t().print("The nodes connected are:");
+    suanpan_info("A CAX8{} element{}.\n", reduced_scheme ? "R" : "", nlgeom ? " with nonlinear geometry on" : "");
+    suanpan_info("The nodes connected are:", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Material:\n");
     for(const auto& I : int_pt) I.m_material->print();

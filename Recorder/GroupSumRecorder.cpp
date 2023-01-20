@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,4 +37,6 @@ void GroupSumRecorder::initialize(const shared_ptr<DomainBase>& D) {
     SumRecorder::initialize(D);
 }
 
-void GroupSumRecorder::print() { suanpan_info("A Summation Recorder.\n"); }
+void GroupSumRecorder::print() {
+    suanpan_info("A summation recorder.\n");
+}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -157,4 +157,6 @@ void BatheTwoStep::update_parameter(const double NT) {
     P9 = P8 * P8;
 }
 
-void BatheTwoStep::print() { suanpan_info("A BatheTwoStep solver.\n"); }
+void BatheTwoStep::print() {
+    suanpan_info("A BatheTwoStep time integrator.\n");
+}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
  ******************************************************************************/
 
 #include "IsotropicNonlinearElastic3D.h"
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 const mat IsotropicNonlinearElastic3D::unit_dev_tensor = two_third * tensor::unit_deviatoric_tensor4();
 const mat IsotropicNonlinearElastic3D::unit_unit = unit_dev_tensor * tensor::unit_deviatoric_tensor4v2();
@@ -85,4 +85,6 @@ int IsotropicNonlinearElastic3D::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-void IsotropicNonlinearElastic3D::print() { suanpan_info("A 3D isotropic nonlinear elastic material.\n"); }
+void IsotropicNonlinearElastic3D::print() {
+    suanpan_info("A 3D isotropic nonlinear elastic material model.\n");
+}

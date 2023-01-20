@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@
 #include <Material/Material3D/Material3D.h>
 #include <Recorder/OutputType.h>
 #include <Toolbox/IntegrationPlan.h>
-#include <Toolbox/shapeFunction.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/shape.h>
+#include <Toolbox/tensor.h>
 
 const field<vec> C3D8::h_mode{{1., 1., -1., -1., -1., -1., 1., 1.}, {1., -1., -1., 1., -1., 1., 1., -1.}, {1., -1., 1., -1., 1., -1., 1., -1.}, {-1., 1., -1., 1., 1., -1., 1., -1.}};
 
@@ -204,16 +204,19 @@ vector<vec> C3D8::record(const OutputType T) {
 }
 
 void C3D8::print() {
-    suanpan_info("C3D8 element%s%s.\n", int_scheme == 'R' ? " reduced integration" : int_scheme == 'I' ? " Iron's integration" : " full integration", nlgeom ? " nonlinear geometry" : "");
-    node_encoding.t().print("The element connects nodes:");
+    suanpan_info("A C3D8 element{}{}.\n", int_scheme == 'R'
+                                              ? " reduced integration"
+                                              : int_scheme == 'I'
+                                              ? " Iron's integration"
+                                              : " full integration",
+                 nlgeom ? " nonlinear geometry" : "");
+    suanpan_info("The element connects nodes:", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Material:\n");
     for(const auto& t_pt : int_pt) {
         t_pt.c_material->print();
-        suanpan_info("Strain:\t");
-        t_pt.c_material->get_trial_strain().t().print();
-        suanpan_info("Stress:\t");
-        t_pt.c_material->get_trial_stress().t().print();
+        suanpan_info("Strain:\t", t_pt.c_material->get_trial_strain());
+        suanpan_info("Stress:\t", t_pt.c_material->get_trial_stress());
     }
 }
 

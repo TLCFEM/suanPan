@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ int NonlinearViscosity::initialize(const shared_ptr<DomainBase>&) {
 }
 
 int NonlinearViscosity::update_trial_status(const vec&) {
-    suanpan_error("NonlinearViscosity receives strain only from the associated element, check the model.\n");
+    suanpan_error("Receives strain only from the associated element.\n");
     return SUANPAN_FAIL;
 }
 
@@ -112,6 +112,6 @@ vector<vec> NonlinearViscosity::record(const OutputType P) {
 }
 
 void NonlinearViscosity::print() {
-    suanpan_info("A 1D viscous damping material %u.\n", get_tag());
+    suanpan_info("A uniaxial viscous damping material model.\n");
     Material1D::print();
 }

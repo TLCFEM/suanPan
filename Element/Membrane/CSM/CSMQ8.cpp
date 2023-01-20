@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #include <Material/Material2D/Material2D.h>
 #include <Recorder/OutputType.h>
 #include <Toolbox/IntegrationPlan.h>
-#include <Toolbox/shapeFunction.h>
+#include <Toolbox/shape.h>
 #include <Toolbox/utility.h>
 
 CSMQ8::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M)
@@ -36,7 +36,7 @@ int CSMQ8::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
     if(!material_proto->is_support_couple()) {
-        suanpan_warning("Element %u is assigned with a material that does not support couple stress.\n", get_tag());
+        suanpan_warning("Element {} is assigned with a material that does not support couple stress.\n", get_tag());
         return SUANPAN_FAIL;
     }
 
@@ -190,13 +190,12 @@ vector<vec> CSMQ8::record(const OutputType P) {
 }
 
 void CSMQ8::print() {
-    suanpan_info("Element %u is a eight-node membrane element (CSMQ8).\n", get_tag());
-    node_encoding.t().print("The nodes connected are:");
+    suanpan_info("A eight-node membrane element (CSMQ8) connecting nodes:", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Material:\n");
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        suanpan_info("Integration Point %llu:\t", I + 1);
-        int_pt[I].coor.t().print();
+        suanpan_info("IP {}:\t", I + 1);
+        suanpan_info(int_pt[I].coor);
         int_pt[I].m_material->print();
     }
 }

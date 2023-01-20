@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,95 +24,103 @@
 int create_new_step(const shared_ptr<DomainBase>& domain, istringstream& command) {
     string step_type;
     if(!get_input(command, step_type)) {
-        suanpan_error("create_new_step() requires step type.\n");
+        suanpan_error("A valid step type is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     unsigned tag;
     if(!get_input(command, tag)) {
-        suanpan_error("create_new_step() requires a tag.\n");
+        suanpan_error("A valid tag is required.\n");
         return SUANPAN_SUCCESS;
     }
 
     if(is_equal(step_type, "Frequency")) {
         auto eigen_number = 1;
         if(!command.eof() && !get_input(command, eigen_number)) {
-            suanpan_error("create_new_step() reads a wrong number of eigenvalues.\n");
+            suanpan_error("A valid number of eigenvalues is required.\n");
             return SUANPAN_SUCCESS;
         }
 
         char type = 's';
         if(!get_optional_input(command, type)) {
-            suanpan_error("create_new_step() needs a correct eigenvalue type.\n");
+            suanpan_error("A valid eigenvalue type is required.\n");
             return SUANPAN_SUCCESS;
         }
 
         if(domain->insert(make_shared<Frequency>(tag, eigen_number, suanpan::to_upper(type)))) domain->set_current_step_tag(tag);
-        else suanpan_error("create_new_step() cannot create the new step.\n");
+        else
+            suanpan_error("Cannot create new step.\n");
     }
     else if(is_equal(step_type, "Buckling") || is_equal(step_type, "Buckle")) {
         if(domain->insert(make_shared<Buckle>(tag))) domain->set_current_step_tag(tag);
-        else suanpan_error("create_new_step() cannot create the new step.\n");
+        else
+            suanpan_error("Cannot create new step.\n");
     }
     else if(is_equal(step_type, "Optimization") || is_equal(step_type, "Optimisation")) {
         auto time = 1.;
         if(!command.eof() && !get_input(command, time)) {
-            suanpan_error("create_new_step() reads a wrong time period.\n");
+            suanpan_error("A valid time period is required.\n");
             return SUANPAN_SUCCESS;
         }
         if(domain->insert(make_shared<Optimization>(tag, time))) domain->set_current_step_tag(tag);
-        else suanpan_error("create_new_step() cannot create the new step.\n");
+        else
+            suanpan_error("Cannot create new step.\n");
     }
     else if(is_equal(step_type, "Static")) {
         auto time = 1.;
         if(!command.eof() && !get_input(command, time)) {
-            suanpan_error("create_new_step() reads a wrong time period.\n");
+            suanpan_error("A valid time period is required.\n");
             return SUANPAN_SUCCESS;
         }
         if(domain->insert(make_shared<Static>(tag, time))) domain->set_current_step_tag(tag);
-        else suanpan_error("create_new_step() cannot create the new step.\n");
+        else
+            suanpan_error("Cannot create new step.\n");
     }
     else if(is_equal(step_type, "Dynamic") || is_equal(step_type, "ImplicitDynamic")) {
         auto time = 1.;
         if(!command.eof() && !get_input(command, time)) {
-            suanpan_error("create_new_step() reads a wrong time period.\n");
+            suanpan_error("A valid time period is required.\n");
             return SUANPAN_SUCCESS;
         }
         if(domain->insert(make_shared<Dynamic>(tag, time, IntegratorType::Implicit))) domain->set_current_step_tag(tag);
-        else suanpan_error("create_new_step() cannot create the new step.\n");
+        else
+            suanpan_error("Cannot create new step.\n");
     }
     else if(is_equal(step_type, "ExplicitDynamic")) {
         auto time = 1.;
         if(!command.eof() && !get_input(command, time)) {
-            suanpan_error("create_new_step() reads a wrong time period.\n");
+            suanpan_error("A valid time period is required.\n");
             return SUANPAN_SUCCESS;
         }
         if(domain->insert(make_shared<Dynamic>(tag, time, IntegratorType::Explicit))) domain->set_current_step_tag(tag);
-        else suanpan_error("create_new_step() cannot create the new step.\n");
+        else
+            suanpan_error("Cannot create new step.\n");
     }
     else if(is_equal(step_type, "ArcLength")) {
         unsigned node;
         if(!get_input(command, node)) {
-            suanpan_error("create_new_step() requires a node.\n");
+            suanpan_error("A valid node tag is required.\n");
             return SUANPAN_SUCCESS;
         }
 
         unsigned dof;
         if(!get_input(command, dof)) {
-            suanpan_error("create_new_step() requires a dof.\n");
+            suanpan_error("A valid dof identifier is required.\n");
             return SUANPAN_SUCCESS;
         }
 
         double magnitude;
         if(!get_input(command, magnitude)) {
-            suanpan_error("create_new_step() requires a magnitude.\n");
+            suanpan_error("A valid magnitude is required.\n");
             return SUANPAN_SUCCESS;
         }
 
         if(domain->insert(make_shared<ArcLength>(tag, node, dof, magnitude))) domain->set_current_step_tag(tag);
-        else suanpan_error("create_new_step() cannot create the new step.\n");
+        else
+            suanpan_error("Fail to create new step via \"{}\".\n", command.str());
     }
-    else suanpan_error("create_new_step() cannot identify step type.\n");
+    else
+        suanpan_error("Cannot identify step type.\n");
 
     return SUANPAN_SUCCESS;
 }

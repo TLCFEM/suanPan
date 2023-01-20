@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ ParticleCollision::ParticleCollision(const unsigned T, const unsigned S, const u
 
 int ParticleCollision::initialize(const shared_ptr<DomainBase>& D) {
     if(const auto t_scheme = D->get_factory()->get_storage_scheme(); StorageScheme::FULL != t_scheme && StorageScheme::SPARSE != t_scheme && StorageScheme::SPARSESYMM != t_scheme) {
-        suanpan_warning("DEM requires full/sparse matrix storage scheme.\n");
+        suanpan_warning("The full or sparse matrix storage scheme is required.\n");
         return SUANPAN_FAIL;
     }
 

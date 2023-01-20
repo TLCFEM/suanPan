@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,8 @@ bool RelIncreDisp::is_converged(unsigned) {
     set_error(std::isfinite(rel_incre_disp) ? rel_incre_disp : 1.);
     set_conv_flag(get_tolerance() > get_error());
 
-    if(is_print()) suanpan_info("relative incremental displacement error: %.5E.\n", get_error());
+    if(is_print())
+        suanpan_info("--> Relative Incremental Displacement: {:.5E}.\n", get_error());
 
     return get_conv_flag();
 }

@@ -1,5 +1,5 @@
 ﻿/*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 #include <Domain/DomainBase.h>
 #include <Material/Material.h>
 #include <Toolbox/IntegrationPlan.h>
-#include <Toolbox/shapeFunction.h>
+#include <Toolbox/shape.h>
 
 DKT3::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const double E, const double F, unique_ptr<Material>&& M)
     : eccentricity(E)
@@ -200,7 +200,9 @@ vector<vec> DKT3::record(const OutputType P) {
     return data;
 }
 
-void DKT3::print() { node_encoding.t().print("A DKT triangular plate element connects:"); }
+void DKT3::print() {
+    suanpan_info("A DKT triangular plate element connects:", node_encoding);
+}
 
 #ifdef SUANPAN_VTK
 #include <vtkTriangle.h>

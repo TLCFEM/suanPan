@@ -2,18 +2,18 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
     <id>suanpan</id>
-    <version>2.7</version>
+    <version>2.8</version>
     <packageSourceUrl>https://github.com/TLCFEM/suanPan</packageSourceUrl>
     <owners>Theodore Chang</owners>
     <title>suanPan</title>
     <authors>Theodore Chang</authors>
     <projectUrl>https://github.com/TLCFEM/suanPan</projectUrl>
     <iconUrl>https://raw.githubusercontent.com/TLCFEM/suanPan/dev/Resource/suanPan-ua.svg</iconUrl>
-    <copyright>2017-2022 Theodore Chang</copyright>
+    <copyright>2017-2023 Theodore Chang</copyright>
     <licenseUrl>https://www.gnu.org/licenses/gpl-3.0</licenseUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <projectSourceUrl>https://github.com/TLCFEM/suanPan</projectSourceUrl>
-    <docsUrl>https://tlcfem.gitbook.io/suanpan-manual/</docsUrl>
+    <docsUrl>https://tlcfem.github.io/suanPan-manual/latest/</docsUrl>
     <mailingListUrl>https://github.com/TLCFEM/suanPan/discussions</mailingListUrl>
     <bugTrackerUrl>https://github.com/TLCFEM/suanPan/issues</bugTrackerUrl>
     <tags>FEM HPC IGA</tags>

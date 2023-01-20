@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2017-2022 Theodore Chang
+// Copyright (C) 2017-2023 Theodore Chang
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -196,7 +196,7 @@ vec BSpline::evaluate_point(const double u, const field<vec>& polygon) const {
     const auto span = evaluate_span(u);
     const auto basis = evaluate_basis(u);
 
-    suanpan_debug([&] { if(polygon.n_elem < knot.n_elem - order - 1) throw invalid_argument("need more control points"); });
+    suanpan_assert([&] { if(polygon.n_elem < knot.n_elem - order - 1) throw invalid_argument("need more control points"); });
 
     vec point(dimension, fill::zeros);
 

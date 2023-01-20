@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,7 +37,8 @@ bool AbsDisp::is_converged(unsigned) {
     set_error(norm(W->get_incre_displacement() + W->get_ninja()) / static_cast<double>(W->get_size()));
     set_conv_flag(get_tolerance() > get_error());
 
-    if(is_print()) suanpan_info("absolute displacement error: %.5E.\n", get_error());
+    if(is_print())
+        suanpan_info("Absolute displacement error: {:.5E}.\n", get_error());
 
     return get_conv_flag();
 }

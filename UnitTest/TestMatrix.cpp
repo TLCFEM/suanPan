@@ -459,8 +459,8 @@ TEST_CASE("Benchmark Triplet Measure", "[Matrix.Sparse]") {
             end = std::chrono::high_resolution_clock::now();
             compress_mean += end - start;
         }
-        // suanpan_info("Assemble: %.3f\n", assemble_mean.count() / static_cast<double>(S));
-        // suanpan_info("Compress: %.3f\n", compress_mean.count() / static_cast<double>(S));
+        // suanpan_info("Assemble: {:.3f}\n", assemble_mean.count() / static_cast<double>(S));
+        // suanpan_info("Compress: {:.3f}\n", compress_mean.count() / static_cast<double>(S));
     }
 }
 

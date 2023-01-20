@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,4 +48,6 @@ PolyJ2::PolyJ2(const unsigned T, const double E, const double V, vec&& H, const 
 
 unique_ptr<Material> PolyJ2::get_copy() { return make_unique<PolyJ2>(*this); }
 
-void PolyJ2::print() { suanpan_info("A 3D polynomial hardening model.\n"); }
+void PolyJ2::print() {
+    suanpan_info("A 3D polynomial hardening model.\n");
+}

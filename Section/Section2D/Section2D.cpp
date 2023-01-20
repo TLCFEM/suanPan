@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ int Section2D::update_trial_status(const vec& t_deformation) {
 
     trial_stiffness(1, 0) = trial_stiffness(0, 1);
 
-    suanpan_debug([&] { if(!trial_resistance.is_finite() || !trial_stiffness.is_finite()) throw invalid_argument("infinite number detected"); });
+    suanpan_assert([&] { if(!trial_resistance.is_finite() || !trial_stiffness.is_finite()) throw invalid_argument("infinite number detected"); });
 
     return SUANPAN_SUCCESS;
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -72,6 +72,6 @@ int BilinearPO::initialize(const shared_ptr<DomainBase>&) {
 unique_ptr<Material> BilinearPO::get_copy() { return make_unique<BilinearPO>(*this); }
 
 void BilinearPO::print() {
-    suanpan_info("A Bilinear Peak Oriented hysteresis model.\n");
+    suanpan_info("A bilinear peak oriented hysteresis model.\n");
     PeakOriented::print();
 }

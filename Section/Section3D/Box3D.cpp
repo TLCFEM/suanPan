@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -81,4 +81,6 @@ int Box3D::initialize(const shared_ptr<DomainBase>& D) {
 
 unique_ptr<Section> Box3D::get_copy() { return make_unique<Box3D>(*this); }
 
-void Box3D::print() { suanpan_info("A Box3D Section.\n"); }
+void Box3D::print() {
+    suanpan_info("A 3D box section.\n");
+}

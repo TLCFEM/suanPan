@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,6 +54,6 @@ int Rectangle2D::initialize(const shared_ptr<DomainBase>& D) {
 unique_ptr<Section> Rectangle2D::get_copy() { return make_unique<Rectangle2D>(*this); }
 
 void Rectangle2D::print() {
-    suanpan_info("A rectangle section.\n");
+    suanpan_info("A 2D rectangular section.\n");
     for(const auto& I : int_pt) I.s_material->print();
 }

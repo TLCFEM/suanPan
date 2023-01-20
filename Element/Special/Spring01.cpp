@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -67,7 +67,7 @@ int Spring01::reset_status() { return s_material->reset_status(); }
 vector<vec> Spring01::record(const OutputType P) { return s_material->record(P); }
 
 void Spring01::print() {
-    suanpan_info("A spring element that uses displacement as basic quantity. The material model used shall be based on displacement--force relationship.\n");
+    suanpan_info("A spring element that uses displacement as basic quantity. The material model used shall be based on displacement-force relationship.\n");
     if(!is_initialized()) return;
     suanpan_info("Material:\n");
     s_material->print();

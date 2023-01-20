@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,6 @@ PeakOriented::PeakOriented(const int T, const double R)
     : SimpleHysteresis(T, 1., R) {}
 
 void PeakOriented::print() {
-    suanpan_info("A Peak-Oriented hysteresis model.\n");
+    suanpan_info("A peak oriented hysteresis model.\n");
     SimpleHysteresis::print();
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,9 @@ int MassBase::clear_status() { return SUANPAN_SUCCESS; }
 
 int MassBase::reset_status() { return SUANPAN_SUCCESS; }
 
-void MassBase::print() { suanpan_info("A point mass element.\n"); }
+void MassBase::print() {
+    suanpan_info("A point mass element.\n");
+}
 
 #ifdef SUANPAN_VTK
 #include <vtkVertex.h>

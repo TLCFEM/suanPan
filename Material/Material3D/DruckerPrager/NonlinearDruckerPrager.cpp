@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
  ******************************************************************************/
 
 #include "NonlinearDruckerPrager.h"
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 const mat NonlinearDruckerPrager::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 const mat NonlinearDruckerPrager::unit_x_unit = tensor::unit_tensor2 * tensor::unit_tensor2.t();
@@ -65,13 +65,14 @@ int NonlinearDruckerPrager::update_trial_status(const vec& t_strain) {
     unsigned counter = 0;
     while(++counter < max_iteration) {
         const auto incre_gamma = (yield_const - factor_a * gamma - xi * compute_c(plastic_strain)) / (denominator = factor_a + xi * xi * compute_dc(plastic_strain));
-        suanpan_extra_debug("NonlinearDruckerPrager local iteration error: %.5E.\n", incre_gamma);
-        if(fabs(incre_gamma) <= tolerance) break;
+        const auto error = fabs(incre_gamma);
+        suanpan_debug("Local iteration error: {:.5E}.\n", error);
+        if(error <= tolerance) break;
         plastic_strain = current_history(0) + xi * (gamma += incre_gamma);
     }
 
     if(max_iteration == counter) {
-        suanpan_error("NonlinearDruckerPrager cannot converge within %u iterations.\n", max_iteration);
+        suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
         return SUANPAN_FAIL;
     }
 
@@ -97,13 +98,14 @@ int NonlinearDruckerPrager::update_trial_status(const vec& t_strain) {
         while(++counter < max_iteration) {
             const auto residual = compute_c(plastic_strain) * xi / eta_flow - hydro_stress + bulk * gamma;
             const auto incre_gamma = residual / (denominator = factor_b * compute_dc(plastic_strain) + bulk);
-            suanpan_extra_debug("NonlinearDruckerPrager local iterative loop error: %.5E.\n", incre_gamma);
-            if(fabs(incre_gamma) <= tolerance) break;
+            const auto error = fabs(incre_gamma);
+            suanpan_debug("Local iteration error: {:.5E}.\n", error);
+            if(error <= tolerance) break;
             plastic_strain = current_history(0) + xi / eta_yield * (gamma -= incre_gamma);
         }
 
         if(max_iteration == counter) {
-            suanpan_error("NonlinearDruckerPrager cannot converge within %u iterations.\n", max_iteration);
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
             return SUANPAN_FAIL;
         }
 
@@ -139,4 +141,6 @@ int NonlinearDruckerPrager::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-void NonlinearDruckerPrager::print() { suanpan_info("A 3D nonlinear model using Drucker--Prager yielding criterion.\n"); }
+void NonlinearDruckerPrager::print() {
+    suanpan_info("A 3D nonlinear model using Drucker-Prager yielding criterion.\n");
+}

@@ -1,7 +1,14 @@
 coverage:
-  range: 70..80
+  range: 80..90
   round: up
   precision: 4
+parsers:
+  gcov:
+    branch_detection:
+      conditional: no
+      loop: no
+      method: no
+      macro: no
 ignore:
   - "**/*Parser.cpp"
   - "Developer"
@@ -16,3 +23,5 @@ ignore:
   - "Toolbox/mumps-src"
   - "Toolbox/superlu-src"
   - "Toolbox/superlumt-src"
+  - "Toolbox/argument.cpp"
+  - "Toolbox/command.cpp"

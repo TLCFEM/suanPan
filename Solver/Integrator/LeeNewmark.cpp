@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -174,7 +174,8 @@ void LeeNewmark::print() {
     suanpan_info("A Newmark solver using Lee's damping model. doi: 10.1016/j.jsv.2020.115312\n");
     const vec X = .25 * sqrt(mass_coef % stiffness_coef);
     const vec F = sqrt(mass_coef / stiffness_coef);
-    for(auto I = 0llu; I < n_damping; ++I) suanpan_info("\tDamping Ratio: %.4f\tFrequency (rad/s): %.4f\n", X(I), F(I));
+    for(auto I = 0llu; I < n_damping; ++I)
+        suanpan_info("\tDamping Ratio: {:.4f}\tFrequency (rad/s): {:.4f}\n", X(I), F(I));
 }
 
 void LeeElementalNewmark::initialize_mass(const shared_ptr<DomainBase>& D) {

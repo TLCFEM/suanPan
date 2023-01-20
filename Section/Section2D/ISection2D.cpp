@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -76,10 +76,10 @@ int ISection2D::initialize(const shared_ptr<DomainBase>& D) {
 unique_ptr<Section> ISection2D::get_copy() { return make_unique<ISection2D>(*this); }
 
 void ISection2D::print() {
-    suanpan_info("A I-shape section with following integration points.\n");
+    suanpan_info("A 2D I-shape section with following integration points.\n");
     auto J = 1;
     for(const auto& I : int_pt) {
-        suanpan_info("IP %u: %.4E.\n", J++, I.coor);
+        suanpan_info("IP {}: {:.4E}.\n", J++, I.coor);
         I.s_material->print();
     }
 }

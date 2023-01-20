@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #include <Domain/Factory.hpp>
 #include <Domain/Group/Group.h>
 #include <Domain/Node.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 void Contact3D::update_position() {
     for(auto& [node, span, position] : slave) {
@@ -149,7 +149,7 @@ int Contact3D::initialize(const shared_ptr<DomainBase>& D) {
     const auto& m_pool = D->get<Group>(master_tag)->get_pool();
 
     if(0 != m_pool.n_elem % 3) {
-        suanpan_error("Contact3D %u master group has wrong number of nodes.", get_tag());
+        suanpan_error("Element {} has wrong number of nodes.", get_tag());
         return SUANPAN_FAIL;
     }
 

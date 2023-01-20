@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ int Laminated::initialize(const shared_ptr<DomainBase>& D) {
     for(const auto I : mat_tag) {
         mat_pool.emplace_back(suanpan::initialized_material_copy(D, I));
         if(nullptr == mat_pool.back() || mat_pool.back()->get_material_type() != MaterialType::D2) {
-            suanpan_error("Laminated %u requires 2D host material models.\n", get_tag());
+            suanpan_error("A valid 2D host material is required.\n");
             return SUANPAN_FAIL;
         }
         access::rw(density) += mat_pool.back()->get_parameter(ParameterType::DENSITY);
@@ -111,7 +111,7 @@ void Laminated::print() {
     suanpan_info("A multilayer wrapper for planar problems.\n");
     unsigned t_tag = 0;
     for(const auto& I : mat_pool) {
-        suanpan_info("Component %u: ", ++t_tag);
+        suanpan_info("Component {}: ", ++t_tag);
         I->print();
     }
 }

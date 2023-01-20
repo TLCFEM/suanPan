@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ RestitutionWallPenalty::RestitutionWallPenalty(const unsigned T, const unsigned 
 
 int RestitutionWallPenalty::initialize(const shared_ptr<DomainBase>& D) {
     if(AnalysisType::DYNAMICS != D->get_factory()->get_analysis_type()) {
-        suanpan_error("restitution rigid wall constraint can only be applied in dynamic analysis.\n");
+        suanpan_error("Restitution rigid wall constraint can only be applied in dynamic analysis.\n");
         return SUANPAN_FAIL;
     }
 

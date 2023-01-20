@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -71,4 +71,6 @@ void FrameRecorder::record([[maybe_unused]] const shared_ptr<DomainBase>& D) {
 
 void FrameRecorder::save() {}
 
-void FrameRecorder::print() { suanpan_info("A Frame Recorder.\n"); }
+void FrameRecorder::print() {
+    suanpan_info("A frame recorder.\n");
+}

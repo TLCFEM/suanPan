@@ -1,0 +1,37 @@
+# A TEST MODEL FOR B31 ELEMENT
+# COROTATIONAL FORMULATION
+
+node 1 0 0 0
+node 2 .6 .8 .2
+
+node 3 2 0 0
+node 4 2.6 .8 .2
+
+material Elastic1D 1 10 1E-3
+section Rectangle3D 1 10 12 1
+
+orientation B3DC 1 .1 -.3 1.
+element B31 1 1 2 1 1 5 true
+
+orientation B3DL 2 .1 -.3 1.
+element B31 2 3 4 1 2 5 false
+
+fix2 1 E 1 3
+
+cload 1 0 100 3 2 4
+
+step static 1
+set ini_step_size .5
+set fixed_step_size true
+set symm_mat false
+set band_mat false
+
+converger RelIncreDisp 1 1E-12 10 1
+
+analyze
+
+peek node 2 4
+
+reset
+clear
+exit

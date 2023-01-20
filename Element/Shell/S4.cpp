@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #include <Material/Material.h>
 #include <Recorder/OutputType.h>
 #include <Toolbox/IntegrationPlan.h>
-#include <Toolbox/shapeFunction.h>
+#include <Toolbox/shape.h>
 #include <Toolbox/utility.h>
 
 S4::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const double E, const double F, unique_ptr<Material>&& M)
@@ -223,7 +223,9 @@ vector<vec> S4::record(const OutputType P) {
     return data;
 }
 
-void S4::print() { suanpan_info("A four node planar shell element using GQ12 for membrane action and Mindlin for plate action.\n"); }
+void S4::print() {
+    suanpan_info("A four-node planar shell element using GQ12 for membrane action and Mindlin for plate action.\n");
+}
 
 #ifdef SUANPAN_VTK
 #include <vtkQuad.h>

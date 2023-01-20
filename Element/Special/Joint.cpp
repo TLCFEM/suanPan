@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -76,4 +76,6 @@ vector<vec> Joint::record(const OutputType P) {
     return data;
 }
 
-void Joint::print() { suanpan_info("A joint element that uses displacement as basic quantity. The material model used shall be based on displacement--force relationship.\n"); }
+void Joint::print() {
+    suanpan_info("A joint element that uses displacement as basic quantity. The material model used shall be based on displacement-force relationship.\n");
+}

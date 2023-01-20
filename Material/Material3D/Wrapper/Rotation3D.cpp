@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -86,7 +86,7 @@ int Rotation3D::initialize(const shared_ptr<DomainBase>& D) {
     mat_obj = suanpan::initialized_material_copy(D, mat_tag);
 
     if(nullptr == mat_obj || mat_obj->get_material_type() != MaterialType::D3) {
-        suanpan_error("Rotation3D %u requires a 3D host material model.\n", get_tag());
+        suanpan_error("A valid 3D host material is required.\n");
         return SUANPAN_FAIL;
     }
 

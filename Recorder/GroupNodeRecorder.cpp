@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,4 +39,6 @@ void GroupNodeRecorder::initialize(const shared_ptr<DomainBase>& D) {
     NodeRecorder::initialize(D);
 }
 
-void GroupNodeRecorder::print() { suanpan_info("A Node Recorder based on groups.\n"); }
+void GroupNodeRecorder::print() {
+    suanpan_info("A node recorder based on groups.\n");
+}

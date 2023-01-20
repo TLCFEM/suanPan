@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -74,7 +74,7 @@ int ArcLength::analyze() {
 
     while(true) {
         if(num_iteration++ > get_max_substep()) {
-            suanpan_warning("analyze() reaches maximum substep number %u.\n", get_max_substep());
+            suanpan_warning("The maximum sub-step number {} reached.\n", get_max_substep());
             return SUANPAN_FAIL;
         }
         if(auto code = S->analyze(); code == SUANPAN_SUCCESS) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,8 @@ int ParticleCollision2D::process_meta(const shared_ptr<DomainBase>& D, const boo
 
     suanpan_for(static_cast<decltype(node_size)>(0), node_size, [&](const decltype(node_size) I) {
         const auto& t_node = node_pool[I];
-        if(norm(t_node->get_trial_velocity()) * W->get_incre_time() > space) suanpan_warning("the speed of Node %u seems to be too large, please decrease time step size.\n", t_node->get_tag());
+        if(norm(t_node->get_trial_velocity()) * W->get_incre_time() > space)
+            suanpan_warning("The nodal speed seems to be too large.\n");
         const auto new_pos = get_position(t_node);
         list[I].y = static_cast<int>(floor(new_pos(1) / space));
         list[I].x = static_cast<int>(floor(new_pos(0) / space));

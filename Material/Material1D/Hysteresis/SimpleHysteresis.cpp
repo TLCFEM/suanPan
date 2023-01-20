@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -181,7 +181,7 @@ int SimpleHysteresis::update_trial_status(const vec& t_strain) {
     trial_stress = response(0);
     trial_stiffness = response(1);
 
-    suanpan_debug([&] { if(!trial_stress.is_finite() || !trial_stiffness.is_finite()) throw invalid_argument("infinite number detected.\n"); });
+    suanpan_assert([&] { if(!trial_stress.is_finite() || !trial_stiffness.is_finite()) throw invalid_argument("infinite number detected"); });
 
     return SUANPAN_SUCCESS;
 }

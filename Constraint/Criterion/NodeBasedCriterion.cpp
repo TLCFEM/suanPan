@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ NodeBasedCriterion::NodeBasedCriterion(const unsigned T, const unsigned ST, cons
 
 int NodeBasedCriterion::initialize(const shared_ptr<DomainBase>& D) {
     if(!D->find<Node>(node)) {
-        suanpan_error("Node %u is not active in the model.\n", node);
+        suanpan_error("Node {} is not active.\n", node);
         D->disable_criterion(get_tag());
     }
 

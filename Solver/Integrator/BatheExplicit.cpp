@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -117,4 +117,6 @@ void BatheExplicit::update_parameter(const double NT) {
     A7 = Q2 * A3;
 }
 
-void BatheExplicit::print() { suanpan_info("A BatheExplicit solver.\n"); }
+void BatheExplicit::print() {
+    suanpan_info("A BatheExplicit time integrator.\n");
+}

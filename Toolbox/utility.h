@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -68,7 +68,11 @@ namespace suanpan {
     string to_lower(const string&);
     string to_upper(string&&);
     string to_lower(string&&);
-} // namespace suanpan
+
+    namespace expression {
+        std::vector<std::pair<string, unsigned>> split(const std::string& variable_string);
+    } // namespace expression 
+}     // namespace suanpan
 
 template<typename T> bool get_input(istringstream& I, T& O) { return static_cast<bool>(I >> O); }
 
@@ -126,5 +130,7 @@ bool is_true(const char*);
 bool is_false(const char*);
 bool is_true(const string&);
 bool is_false(const string&);
+
+bool is_integer(const string&);
 
 #endif

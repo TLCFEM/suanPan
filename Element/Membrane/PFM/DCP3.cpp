@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -120,7 +120,7 @@ vector<vec> DCP3::record(const OutputType T) {
 }
 
 void DCP3::print() {
-    node_encoding.t().print("DCP3 element connects nodes:");
+    suanpan_info("DCP3 element connects nodes:", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Material:\n");
     m_material->print();

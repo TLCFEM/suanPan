@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -80,7 +80,7 @@ int EnergyEvolution::process(const shared_ptr<DomainBase>& D) {
         });
     }
 
-    suanpan_info("current rejection ratio: %.4E.\n", current_level / 100.);
+    suanpan_highlight("-> Current Rejection Ratio: {:.3f}.\n", current_level / 100.);
 
     energy = (1. - propagation_weight) * energy + propagation_weight * current_energy;
 

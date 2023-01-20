@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ vtkInfo vtk_process(istringstream&);
 
 void vtk_setup(const vtkSmartPointer<vtkUnstructuredGrid>&, const vtkInfo&);
 
-void vtk_save(const vtkSmartPointer<vtkUnstructuredGrid>&, const vtkInfo&);
+void vtk_save(vtkSmartPointer<vtkUnstructuredGrid>&&, vtkInfo);
 
 void vtk_plot_node_quantity(const shared_ptr<DomainBase>&, vtkInfo);
 

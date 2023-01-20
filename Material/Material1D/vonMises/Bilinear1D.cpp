@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -84,6 +84,6 @@ int Bilinear1D::reset_status() {
 }
 
 void Bilinear1D::print() {
-    suanpan_info("1D bilinear hardening material using J2 plasticity and associated flow rule.\n");
+    suanpan_info("A uniaxial bilinear hardening material using J2 plasticity and associated flow rule.\n");
     Material1D::print();
 }

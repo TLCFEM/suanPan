@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,4 +53,6 @@ void GlobalStiffnessRecorder::record(const shared_ptr<DomainBase>& D) {
     if(if_record_time()) insert(D->get_factory()->get_current_time());
 }
 
-void GlobalStiffnessRecorder::print() { suanpan_info("A Global Recorder.\n"); }
+void GlobalStiffnessRecorder::print() {
+    suanpan_info("A global recorder.\n");
+}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -161,8 +161,8 @@ template<sp_d T> int BandMatSpike<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
             sspike_gbtrf_(SPIKE.memptr(), &N, &KL, &KU, this->s_memory.mem, &LDAB, SWORK.memptr(), &INFO);
         }
 
-        if(INFO != 0) {
-            suanpan_error("solve() receives error code %u from the base driver, the matrix is probably singular.\n", INFO);
+        if(0 != INFO) {
+            suanpan_error("Error code {} received, the matrix is probably singular.\n", INFO);
             return INFO;
         }
 
@@ -209,7 +209,7 @@ template<sp_d T> int BandMatSpike<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
 
             X += incre;
 
-            suanpan_debug("mixed precision algorithm multiplier: %.5E.\n", multiplier = arma::norm(full_residual -= this->operator*(incre)));
+            suanpan_debug("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier = arma::norm(full_residual -= this->operator*(incre)));
         }
     }
 
@@ -241,8 +241,8 @@ template<sp_d T> int BandMatSpike<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
             sspike_gbtrf_(SPIKE.memptr(), &N, &KL, &KU, this->s_memory.mem, &LDAB, SWORK.memptr(), &INFO);
         }
 
-        if(INFO != 0) {
-            suanpan_error("solve() receives error code %u from the base driver, the matrix is probably singular.\n", INFO);
+        if(0 != INFO) {
+            suanpan_error("Error code {} received, the matrix is probably singular.\n", INFO);
             return INFO;
         }
 
@@ -287,7 +287,7 @@ template<sp_d T> int BandMatSpike<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
 
             X += incre;
 
-            suanpan_debug("mixed precision algorithm multiplier: %.5E.\n", multiplier = arma::norm(B -= this->operator*(incre)));
+            suanpan_debug("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier = arma::norm(B -= this->operator*(incre)));
         }
     }
 

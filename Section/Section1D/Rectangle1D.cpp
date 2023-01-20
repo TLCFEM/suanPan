@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,6 @@ Rectangle1D::Rectangle1D(const unsigned T, const double B, const double H, const
 unique_ptr<Section> Rectangle1D::get_copy() { return make_unique<Rectangle1D>(*this); }
 
 void Rectangle1D::print() {
-    suanpan_info("A 1D rectangle section with width %.3E and height %.3E.\n", width, height);
-    suanpan_info("Material: ");
+    suanpan_info("A uniaxial rectangle section with width {:.3E} and height {:.3E}.\nMaterial: ", width, height);
     s_material->print();
 }

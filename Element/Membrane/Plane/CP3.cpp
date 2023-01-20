@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Node.h>
 #include <Material/Material2D/Material2D.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 #include <Toolbox/utility.h>
 
 void CP3::stack_stiffness(mat& K, const mat& D, const mat& N, const double F) {
@@ -249,7 +249,7 @@ int CP3::reset_status() { return m_material->reset_status(); }
 vector<vec> CP3::record(const OutputType T) { return m_material->record(T); }
 
 void CP3::print() {
-    node_encoding.t().print("CP3 element connects nodes:");
+    suanpan_info("CP3 element connects nodes:", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Material:\n");
     m_material->print();

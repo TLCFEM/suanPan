@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,7 +41,10 @@ GeneralizedAlpha::GeneralizedAlpha(const unsigned T, const double AF, const doub
     , F2(1. - F1)
     , F3(alpha_m)
     , F4(1. - F3)
-    , F9(-.5 / beta) { if(!suanpan::approx_equal(alpha_m, AM) || !suanpan::approx_equal(alpha_f, AF)) suanpan_error("GeneralizedAlpha() parameters are not acceptable hence automatically adjusted.\n"); }
+    , F9(-.5 / beta) {
+    if(!suanpan::approx_equal(alpha_m, AM) || !suanpan::approx_equal(alpha_f, AF))
+        suanpan_error("Parameters automatically adjusted.\n");
+}
 
 void GeneralizedAlpha::assemble_resistance() {
     const auto& D = get_domain();
@@ -178,4 +181,6 @@ vec GeneralizedAlpha::from_incre_acceleration(const vec& incre_acceleration, con
     return incre_acceleration / F7 + F10 * W->get_current_velocity()(encoding) - F9 / F7 * W->get_current_acceleration()(encoding) + W->get_current_displacement()(encoding);
 }
 
-void GeneralizedAlpha::print() { suanpan_info("A time integrator using the Generalized-Alpha algorithm.\ndoi:10.1115/1.2900803\n"); }
+void GeneralizedAlpha::print() {
+    suanpan_info("A time integrator using the Generalized-Alpha algorithm. doi:10.1115/1.2900803\n");
+}

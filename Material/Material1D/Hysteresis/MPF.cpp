@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -89,7 +89,7 @@ int MPF::update_trial_status(const vec& t_strain) {
     trial_stress = (hardening_ratio + factor_b) * normal_strain * gap_stress + reverse_stress;
     trial_stiffness = gap_stress / gap_strain * (hardening_ratio + factor_b / factor_a);
 
-    suanpan_debug([&] { if(!trial_stress.is_finite() || !trial_stiffness.is_finite()) throw invalid_argument("infinite number detected"); });
+    suanpan_assert([&] { if(!trial_stress.is_finite() || !trial_stiffness.is_finite()) throw invalid_argument("infinite number detected"); });
 
     return SUANPAN_SUCCESS;
 }
@@ -119,6 +119,6 @@ int MPF::reset_status() {
 }
 
 void MPF::print() {
-    suanpan_info("Menegotto-Pinto-Filippou model with initial stiffness %.3E and yield stress %.3E with isotropic hardening %s and Bauschinger effect %s.\n", elastic_modulus, yield_stress, isotropic_hardening ? "enabled" : "disabled", constant_radius ? "disabled" : "enabled");
+    suanpan_info("A Menegotto-Pinto-Filippou model with initial stiffness {:.3E} and yield stress {:.3E} with isotropic hardening {} and Bauschinger effect {}.\n", elastic_modulus, yield_stress, isotropic_hardening ? "enabled" : "disabled", constant_radius ? "disabled" : "enabled");
     Material1D::print();
 }

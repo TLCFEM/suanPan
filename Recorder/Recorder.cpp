@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,9 +40,7 @@ Recorder::Recorder(const unsigned T, uvec&& B, const OutputType L, const unsigne
     , data_pool(object_tag.n_elem)
     , record_time(R)
     , use_hdf5(H)
-    , interval(I) { suanpan_debug("Recorder %u ctor() called.\n", T); }
-
-Recorder::~Recorder() { suanpan_debug("Recorder %u dtor() called.\n", get_tag()); }
+    , interval(I) {}
 
 void Recorder::initialize(const shared_ptr<DomainBase>&) {}
 
@@ -154,4 +152,4 @@ void Recorder::save() {
 #endif
 }
 
-void Recorder::print() { suanpan_info("print() needs to be overwritten.\n"); }
+void Recorder::print() {}

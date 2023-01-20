@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -100,7 +100,8 @@ template<sp_d T> int SparseMatBaseMUMPS<T>::alloc() {
     mumps_job.job = 4;
     dmumps_c(&mumps_job);
 
-    if(0 != mumps_job.info[0]) suanpan_error("factorization fails with code %d.\n", mumps_job.info[0]);
+    if(0 != mumps_job.info[0])
+        suanpan_error("Error code {} received.\n", mumps_job.info[0]);
 
     return mumps_job.info[0];
 }

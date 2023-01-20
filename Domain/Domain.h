@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ using ThreadQueue = std::vector<shared_ptr<future<void>>>;
 
 class Domain final : public DomainBase, public std::enable_shared_from_this<Domain> {
     std::atomic_bool updated = false;
-    ColorMethod color_model = ColorMethod::WP;
+    ColorMethod color_model = ColorMethod::MIS;
 
     unsigned current_step_tag = 0;
     unsigned current_converger_tag = 0;
@@ -53,6 +53,7 @@ class Domain final : public DomainBase, public std::enable_shared_from_this<Doma
     StepQueue step_pond;
 
     AmplitudeStorage amplitude_pond;
+    ExpressionStorage expression_pond;
     ConstraintStorage constraint_pond;
     ConvergerStorage converger_pond;
     CriterionStorage criterion_pond;
@@ -96,6 +97,7 @@ public:
     const ExternalModuleQueue& get_external_module_pool() const override;
 
     bool insert(const shared_ptr<Amplitude>&) override;
+    bool insert(const shared_ptr<Expression>&) override;
     bool insert(const shared_ptr<Constraint>&) override;
     bool insert(const shared_ptr<Converger>&) override;
     bool insert(const shared_ptr<Criterion>&) override;
@@ -114,6 +116,7 @@ public:
     bool insert(const shared_ptr<Step>&) override;
 
     bool erase_amplitude(unsigned) override;
+    bool erase_expression(unsigned) override;
     bool erase_constraint(unsigned) override;
     bool erase_converger(unsigned) override;
     bool erase_criterion(unsigned) override;
@@ -132,6 +135,7 @@ public:
     bool erase_step(unsigned) override;
 
     void disable_amplitude(unsigned) override;
+    void disable_expression(unsigned) override;
     void disable_constraint(unsigned) override;
     void disable_converger(unsigned) override;
     void disable_criterion(unsigned) override;
@@ -150,6 +154,7 @@ public:
     void disable_step(unsigned) override;
 
     void enable_amplitude(unsigned) override;
+    void enable_expression(unsigned) override;
     void enable_constraint(unsigned) override;
     void enable_converger(unsigned) override;
     void enable_criterion(unsigned) override;
@@ -168,6 +173,7 @@ public:
     void enable_step(unsigned) override;
 
     const shared_ptr<Amplitude>& get_amplitude(unsigned) const override;
+    const shared_ptr<Expression>& get_expression(unsigned) const override;
     const shared_ptr<Constraint>& get_constraint(unsigned) const override;
     const shared_ptr<Converger>& get_converger(unsigned) const override;
     const shared_ptr<Criterion>& get_criterion(unsigned) const override;
@@ -186,6 +192,7 @@ public:
     const shared_ptr<Step>& get_step(unsigned) const override;
 
     const AmplitudeQueue& get_amplitude_pool() const override;
+    const ExpressionQueue& get_expression_pool() const override;
     const ConstraintQueue& get_constraint_pool() const override;
     const ConvergerQueue& get_converger_pool() const override;
     const CriterionQueue& get_criterion_pool() const override;
@@ -204,6 +211,7 @@ public:
     const StepQueue& get_step_pool() const override;
 
     friend shared_ptr<Amplitude>& get_amplitude(const shared_ptr<Domain>&, unsigned);
+    friend shared_ptr<Expression>& get_expression(const shared_ptr<Domain>&, unsigned);
     friend shared_ptr<Constraint>& get_constraint(const shared_ptr<Domain>&, unsigned);
     friend shared_ptr<Converger>& get_converger(const shared_ptr<Domain>&, unsigned);
     friend shared_ptr<Criterion>& get_criterion(const shared_ptr<Domain>&, unsigned);
@@ -222,6 +230,7 @@ public:
     friend shared_ptr<Step>& get_step(const shared_ptr<Domain>&, unsigned);
 
     friend shared_ptr<Amplitude>& get_amplitude(const shared_ptr<DomainBase>&, unsigned);
+    friend shared_ptr<Expression>& get_expression(const shared_ptr<DomainBase>&, unsigned);
     friend shared_ptr<Constraint>& get_constraint(const shared_ptr<DomainBase>&, unsigned);
     friend shared_ptr<Converger>& get_converger(const shared_ptr<DomainBase>&, unsigned);
     friend shared_ptr<Criterion>& get_criterion(const shared_ptr<DomainBase>&, unsigned);
@@ -240,6 +249,7 @@ public:
     friend shared_ptr<Step>& get_step(const shared_ptr<DomainBase>&, unsigned);
 
     size_t get_amplitude() const override;
+    size_t get_expression() const override;
     size_t get_constraint() const override;
     size_t get_converger() const override;
     size_t get_criterion() const override;
@@ -258,6 +268,7 @@ public:
     size_t get_step() const override;
 
     bool find_amplitude(unsigned) const override;
+    bool find_expression(unsigned) const override;
     bool find_constraint(unsigned) const override;
     bool find_converger(unsigned) const override;
     bool find_criterion(unsigned) const override;

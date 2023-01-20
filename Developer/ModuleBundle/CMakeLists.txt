@@ -34,11 +34,11 @@ add_library(${PROJECT_NAME} SHARED
         ../../Element/Element.cpp
         ../../Material/Material.cpp
         ../../Section/Section.cpp
-        ../../Toolbox/print.cpp
         ../Element/ElementExample.cpp
         ../Material/MaterialExample.cpp
         ../Material/ElasticExternal.cpp
         ../Section/SectionExample.cpp
+        ../../Include/fmt/src/format.cc
         )
 
 message(STATUS "ModuleBundle CXX_FLAGS: ${CMAKE_CXX_FLAGS}")

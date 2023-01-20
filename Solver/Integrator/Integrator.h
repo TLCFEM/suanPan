@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ public:
     Integrator(Integrator&&) = delete;                 // move forbidden
     Integrator& operator=(const Integrator&) = delete; // assign forbidden
     Integrator& operator=(Integrator&&) = delete;      // assign forbidden
-    ~Integrator() override;
+    ~Integrator() override = default;
 
     void set_domain(const weak_ptr<DomainBase>&);
     [[nodiscard]] shared_ptr<DomainBase> get_domain() const;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@
 #include <Material/Material2D/Material2D.h>
 #include <Recorder/OutputType.h>
 #include <Toolbox/IntegrationPlan.h>
-#include <Toolbox/shapeFunction.h>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/shape.h>
+#include <Toolbox/tensor.h>
 #include <Toolbox/utility.h>
 
 /**
@@ -185,7 +185,7 @@ int GCMQ::initialize(const shared_ptr<DomainBase>& D) {
     HT = trans(H);
 
     if(!solve(NT, H, N) || !solve(MT, H, M)) {
-        suanpan_error("GCMQ %u fails to initialize and is disabled.\n", get_tag());
+        suanpan_error("Element {} fails to initialize and is disabled.\n", get_tag());
         return SUANPAN_FAIL;
     }
 
@@ -316,23 +316,20 @@ vector<vec> GCMQ::record(const OutputType T) {
 }
 
 void GCMQ::print() {
-    suanpan_info("GCMQ mixed quadrilateral element %u connects nodes:\n", get_tag());
-    node_encoding.t().print();
+    suanpan_info("A GCMQ mixed quadrilateral element connecting nodes:", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Material Response:\n");
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        suanpan_info("Integration Point %llu:\t", I + 1);
-        int_pt[I].coor.t().print();
+        suanpan_info("IP {}:\t", I + 1);
+        suanpan_info(int_pt[I].coor);
         int_pt[I].m_material->print();
     }
     suanpan_info("Element Response:\n");
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        suanpan_info("Integration Point %llu:\t", I + 1);
-        int_pt[I].coor.t().print();
-        suanpan_info("Strain: ");
-        (int_pt[I].poly_strain * current_beta).t().print();
-        suanpan_info("Stress: ");
-        (int_pt[I].poly_stress * current_alpha).t().print();
+        suanpan_info("IP {}:\t", I + 1);
+        suanpan_info(int_pt[I].coor);
+        suanpan_info("Strain:\t", vec{int_pt[I].poly_strain * current_beta});
+        suanpan_info("Stress:\t", vec{int_pt[I].poly_stress * current_alpha});
     }
 }
 

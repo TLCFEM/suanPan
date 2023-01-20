@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 #include "NonlinearPeric.h"
 #include <Domain/DomainBase.h>
 #include <Domain/FactoryHelper.hpp>
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 const double NonlinearPeric::root_three_two = sqrt(1.5);
 const mat NonlinearPeric::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
@@ -75,7 +75,7 @@ int NonlinearPeric::update_trial_status(const vec& t_strain) {
     while(++counter < max_iteration) {
         const auto gradient = (triple_shear + factor_a * (eqv_stress - triple_shear * gamma) / denom) * pow_term - dk;
         const auto incre_gamma = residual / gradient;
-        suanpan_extra_debug("NonlinearPeric local iteration error: %.5E.\n", incre_gamma);
+        suanpan_debug("Local iteration error: {:.5E}.\n", incre_gamma);
         if(fabs(incre_gamma) <= tolerance) break;
         plastic_strain = current_history(0) + (gamma += incre_gamma);
         denom = *incre_time + mu * gamma;
@@ -85,7 +85,7 @@ int NonlinearPeric::update_trial_status(const vec& t_strain) {
     }
 
     if(max_iteration == counter) {
-        suanpan_error("NonlinearPeric cannot converge within %u iterations.\n", max_iteration);
+        suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
         return SUANPAN_FAIL;
     }
 
@@ -120,4 +120,6 @@ int NonlinearPeric::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-void NonlinearPeric::print() { suanpan_info("A 3D bilinear hardening viscoplasticity model using Perzyna rule.\n"); }
+void NonlinearPeric::print() {
+    suanpan_info("A 3D bilinear hardening viscoplasticity model using Perzyna rule.\n");
+}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ int ArmstrongFrederick1D::update_trial_status(const vec& t_strain) {
     unsigned counter = 0;
     while(true) {
         if(max_iteration == ++counter) {
-            suanpan_error("ArmstrongFrederick1D cannot converge in %u iterations.\n", max_iteration);
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
             return SUANPAN_FAIL;
         }
 
@@ -83,7 +83,7 @@ int ArmstrongFrederick1D::update_trial_status(const vec& t_strain) {
         else for(unsigned I = 0; I < size; ++I) jacobian -= (b(I) * trial_history(I) + a(I)) * pow(1. + b(I) * gamma, -2.);
 
         const auto incre = yield_func / jacobian;
-        suanpan_extra_debug("ArmstrongFrederick1D local iteration error: %.5E.\n", fabs(incre));
+        suanpan_debug("Local iteration error: {:.5E}.\n", fabs(incre));
         if(fabs(incre) <= tolerance) break;
 
         gamma -= incre;
@@ -137,6 +137,6 @@ vector<vec> ArmstrongFrederick1D::record(const OutputType P) {
 }
 
 void ArmstrongFrederick1D::print() {
-    suanpan_info("A uniaxial nonlinear hardening model using Armstrong--Frederick kinematic hardening rule.\n");
+    suanpan_info("A uniaxial nonlinear hardening model using Armstrong-Frederick kinematic hardening rule.\n");
     Material1D::print();
 }

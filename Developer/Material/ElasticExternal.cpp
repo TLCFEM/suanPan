@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -97,7 +97,7 @@ SUANPAN_EXPORT void elasticexternal_handler(ExternalMaterialData* data, int* inf
     else if(CLEAR == *info) clear(data, info);
     else if(VALIDATE == *info) validate(data, info);
     else {
-        suanpan_error("unknown flag received.\n");
+        suanpan_error("Unknown flag {} received.\n", *info);
         *info = -1;
     }
 }

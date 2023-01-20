@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -61,4 +61,6 @@ int Circle3D::initialize(const shared_ptr<DomainBase>& D) {
 
 unique_ptr<Section> Circle3D::get_copy() { return make_unique<Circle3D>(*this); }
 
-void Circle3D::print() { suanpan_info("A Circle3D Section.\n"); }
+void Circle3D::print() {
+    suanpan_info("A 3D circular section.\n");
+}

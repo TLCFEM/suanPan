@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ void TabularSpline::initialize(const shared_ptr<DomainBase>& D) {
 
     if(!all(dt)) {
         D->disable_amplitude(get_tag());
-        suanpan_warning("TabularSpline() detects repeated data points.\n");
+        suanpan_warning("Repeated data points detected.\n");
         return;
     }
 
@@ -79,4 +79,6 @@ double TabularSpline::get_amplitude(const double T) {
     return y;
 }
 
-void TabularSpline::print() { suanpan_info("TabularSpline.\n"); }
+void TabularSpline::print() {
+    suanpan_info("TabularSpline.\n");
+}

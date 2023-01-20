@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,6 +48,5 @@ int SingleSection3D::reset_status() { return s_section->reset_status(); }
 
 void SingleSection3D::print() {
     suanpan_info("A SingleSection3D element that represents a section which can be used for section analysis.\n");
-
     if(is_initialized()) s_section->print();
 }

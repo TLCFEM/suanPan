@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,4 +28,6 @@ double Decay::get_amplitude(const double T) {
     return step_time <= 0. ? 0. : A * exp(-start_time / TD);
 }
 
-void Decay::print() { suanpan_info("Decay Amplitude.\n"); }
+void Decay::print() {
+    suanpan_info("Decay.\n");
+}

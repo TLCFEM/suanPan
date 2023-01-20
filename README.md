@@ -35,8 +35,7 @@ is targeted to provide an efficient, concise, flexible and reliable FEM simulati
 as [ABAQUS UNIFIED FEA](https://www.3ds.com/products-services/simulia/products/abaqus/), [ANSYS](http://www.ansys.com/)
 and [OpenSees](http://opensees.berkeley.edu/).
 
-Please check documentation [here](https://tlcfem.gitbook.io/suanpan-manual/) and [here](http://suanpan-manual.rtfd.io/)
-for command references. Please consider starring ⭐ the project!
+Please check documentation [here](https://tlcfem.github.io/suanPan-manual/latest/) for command references. Please consider starring ⭐ the project!
 
 ## Features
 
@@ -54,6 +53,45 @@ The highlights of **suanPan** are
 - **suanPan** supports simple visualization supported by [VTK](https://vtk.org/).
 
 ## Quick Start
+
+Execute the application out-of-the-box in terminal on Linux using one of the following commands depending on how the
+application is obtained. See details below.
+
+```bash
+# in folder bin/ for linux portable tarball
+./suanPan.sh
+# for linux packages and snap
+suanPan
+# for flatpak
+flatpak run flathub io.github.tlcfem.suanPan
+```
+
+Or on Windows,
+
+```powershell
+# in the folder containing suanPan.exe
+.\suanPan.exe
+```
+
+First time user can use `overview` command to go through a quick introduction.
+
+```text
++-----------------------------------------------------+
+|   __        __            suanPan is an open source |
+|  /  \      |  \              FEM framework (64-bit) |
+|  \__       |__/  __   __         Betelgeuse (2.8.0) |
+|     \ |  | |    |  \ |  |         by tlc @ 10fd6147 |
+|  \__/ |__| |    |__X |  |       all rights reserved |
+|                              10.5281/zenodo.1285221 |
++-----------------------------------------------------+
+|  https://github.com/TLCFEM/suanPan                  |
+|  https://tlcfem.github.io/suanPan-manual/latest     |
++-----------------------------------------------------+
+|  https://gitter.im/suanPan-dev/community            |
++-----------------------------------------------------+
+
+suanPan ~<> overview
+```
 
 Sample models are available for almost all models/commands. Please check the `Example` folder for details. Further
 details can be seen [here](https://tlcfem.gitbook.io/suanpan-manual/tutorial/obtain) regarding how to run model files.
@@ -196,18 +234,22 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**ARPACK**](https://github.com/opencollab/arpack-ng)
 - [**SPIKE**](http://www.spike-solver.org/) version 1.0
 - [**FEAST**](http://www.feast-solver.org/) version 4.0
-- [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 5.3.0 and [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 3.1
-- [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.15
+- [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 5.3.0
+- [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 3.1
+- [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.21
 - [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2021.7.0
 - [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 1.10.6
 - [**MUMPS**](http://mumps.enseeiht.fr/) version 5.2.1
 - [**METIS**](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview) version 5.1.0
-- [**VTK**](https://vtk.org/) version 9.2.2
+- [**VTK**](https://vtk.org/) version 9.2.5
 - [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 11.7
 - [**Armadillo**](http://arma.sourceforge.net/) version 11.4
 - [**ensmallen**](https://ensmallen.org/) version 2.19.0
 - [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2023.0.0
 - [**Catch2**](https://github.com/catchorg/Catch2) version 2.13.10
+- [**fmt**](https://github.com/fmtlib/fmt) version 9.1.0
+- [**whereami**](https://github.com/gpakosz/whereami)
+- [**exprtk**](https://github.com/ArashPartow/exprtk)
 - **thread_pool** abridged version of [`thread-pool`](https://github.com/bshoshany/thread-pool)
 
 Those libraries may depend on other libraries such as [zlib](https://zlib.net/)

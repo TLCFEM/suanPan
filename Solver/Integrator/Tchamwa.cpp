@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,4 +52,6 @@ int Tchamwa::update_trial_status() {
 
 void Tchamwa::update_parameter(const double NT) { DT = NT; }
 
-void Tchamwa::print() { suanpan_info("A Tchamwa solver.\n"); }
+void Tchamwa::print() {
+    suanpan_info("A Tchamwa solver.\n");
+}

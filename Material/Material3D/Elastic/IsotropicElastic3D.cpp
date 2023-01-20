@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
  ******************************************************************************/
 
 #include "IsotropicElastic3D.h"
-#include <Toolbox/tensorToolbox.h>
+#include <Toolbox/tensor.h>
 
 IsotropicElastic3D::IsotropicElastic3D(const unsigned T, const double E, const double P, const double R)
     : DataIsotropicElastic3D{fabs(E), fabs(P)}
@@ -67,4 +67,6 @@ int IsotropicElastic3D::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-void IsotropicElastic3D::print() { suanpan_info("A 3D isotropic elastic material with E=%.4E and nu=%.4E.\n", elastic_modulus, poissons_ratio); }
+void IsotropicElastic3D::print() {
+    suanpan_info("A 3D isotropic elastic material with E={:.4E} and nu={:.4E}.\n", elastic_modulus, poissons_ratio);
+}

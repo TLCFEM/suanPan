@@ -11,7 +11,6 @@
 #include "Visualisation/Visualisation"
 
 #include "Element.h"
-#include "ElementTemplate.h"
 #include "MaterialElement.h"
 #include "SectionElement.h"
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -74,7 +74,7 @@ int SteelBRB::update_trial_status(const vec& t_strain) {
     auto counter = 0;
     while(true) {
         if(max_iteration == ++counter) {
-            suanpan_error("SteelBRB cannot converge within %u iterations.\n", max_iteration);
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
             return SUANPAN_FAIL;
         }
 
@@ -93,7 +93,7 @@ int SteelBRB::update_trial_status(const vec& t_strain) {
 
         const auto error = fabs(incre = -residual / jacobian);
 
-        suanpan_debug("SteelBRB local iteration error: %.5E.\n", error);
+        suanpan_debug("Local iteration error: {:.5E}.\n", error);
 
         if(error <= tolerance) {
             trial_stiffness *= 1. - (pow_term + incre_strain(0) * elastic_modulus * exponent * pow_term / numerator) / jacobian;
@@ -128,6 +128,6 @@ int SteelBRB::reset_status() {
 }
 
 void SteelBRB::print() {
-    suanpan_info("Steel model for BRB. doi: 10.1016/j.jcsr.2011.07.017\n");
+    suanpan_info("A steel model for BRB. doi: 10.1016/j.jcsr.2011.07.017\n");
     Material1D::print();
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,9 +21,7 @@ double Constraint::multiplier = 1E8;
 
 Constraint::Constraint(const unsigned T, const unsigned ST, const unsigned AT, uvec&& N, uvec&& D, const unsigned S)
     : ConditionalModifier(T, ST, AT, std::forward<uvec>(N), std::forward<uvec>(D))
-    , num_size(S) { suanpan_debug("Constraint %u ctor() called.\n", get_tag()); }
-
-Constraint::~Constraint() { suanpan_debug("Constraint %u dtor() called.\n", get_tag()); }
+    , num_size(S) {}
 
 const sp_vec& Constraint::get_resistance() const { return resistance; }
 

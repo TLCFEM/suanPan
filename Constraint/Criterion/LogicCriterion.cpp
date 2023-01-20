@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2022 Theodore Chang
+ * Copyright (C) 2017-2023 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ int LogicCriterion::initialize(const shared_ptr<DomainBase>& D) {
     const auto& t_criterion_b = D->get<Criterion>(tag_b);
 
     if(nullptr == t_criterion_a || nullptr == t_criterion_b) {
-        suanpan_error("cannot find criterion %u and/or %u.\n", tag_a, tag_b);
+        suanpan_error("Cannot find criteria {} and/or {}.\n", tag_a, tag_b);
         D->disable_criterion(get_tag());
         return SUANPAN_SUCCESS;
     }
@@ -37,7 +37,7 @@ int LogicCriterion::initialize(const shared_ptr<DomainBase>& D) {
     criterion_b = t_criterion_b->get_copy();
 
     if(SUANPAN_SUCCESS != criterion_a->initialize(D) || SUANPAN_SUCCESS != criterion_b->initialize(D)) {
-        suanpan_error("fail to initialize criterion %u and/or %u.\n", tag_a, tag_b);
+        suanpan_error("Fail to initialize criteria {} and/or {}.\n", tag_a, tag_b);
         D->disable_criterion(get_tag());
     }
 
