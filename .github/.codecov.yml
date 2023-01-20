@@ -23,3 +23,5 @@ ignore:
   - "Toolbox/mumps-src"
   - "Toolbox/superlu-src"
   - "Toolbox/superlumt-src"
+  - "Toolbox/argument.cpp"
+  - "Toolbox/command.cpp"

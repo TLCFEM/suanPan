@@ -9,7 +9,7 @@
 1. better on screen display with the fmt library [#99](https://github.com/TLCFEM/suanPan/pull/99)
 2. add command `overview`
 3. update `OpenBLAS` to version `0.3.21`
-4. add Euler buckling load check for `T2D2`
+4. add Euler buckling load check for `T2D2` [#104](https://github.com/TLCFEM/suanPan/pull/104)
 5. speed-up analysis with visualisation recorder [#102](https://github.com/TLCFEM/suanPan/pull/102)
 6. update `VTK` to version `9.2.5`
 7. add `Expression` to support custom function definition [#105](https://github.com/TLCFEM/suanPan/pull/105)
