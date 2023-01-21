@@ -1480,6 +1480,9 @@
     <ClCompile Include="..\..\..\Material\Material1D\vonMises\CustomGurson1D.cpp">
       <Filter>Material\Material1D\vonMises</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\vonMises\CustomGurson.cpp">
+      <Filter>Material\Material3D\vonMises</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2817,6 +2820,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material1D\vonMises\CustomGurson1D.h">
       <Filter>Material\Material1D\vonMises</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\vonMises\CustomGurson.h">
+      <Filter>Material\Material3D\vonMises</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

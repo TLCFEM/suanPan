@@ -15,24 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class CustomGurson1D
- * @brief The CustomGurson1D class.
+ * @class CustomGurson
+ * @brief The CustomGurson class.
  *
  * @author tlc
  * @date 22/01/2023
  * @version 0.1.0
- * @file CustomGurson1D.h
- * @addtogroup Material-1D
+ * @file CustomGurson.h
+ * @addtogroup Material-3D
  * @{
  */
 
-#ifndef CUSTOMGURSON1D_H
-#define CUSTOMGURSON1D_H
+#ifndef CUSTOMGURSON_H
+#define CUSTOMGURSON_H
 
-#include "NonlinearGurson1D.h"
+#include "NonlinearGurson.h"
 #include <Toolbox/Expression.h>
 
-class CustomGurson1D final : public NonlinearGurson1D {
+class CustomGurson final : public NonlinearGurson {
     const unsigned expression_tag;
 
     shared_ptr<Expression> expression;
@@ -40,16 +40,16 @@ class CustomGurson1D final : public NonlinearGurson1D {
     [[nodiscard]] vec compute_hardening(double) const override;
 
 public:
-    CustomGurson1D(unsigned,   // tag
-                   unsigned,   // expression tag
-                   double,     // elastic modulus
-                   double,     // poisson's ratio
-                   double,     // q1
-                   double,     // q2
-                   double,     // fn
-                   double,     // sn
-                   double,     // en
-                   double = 0. // density
+    CustomGurson(unsigned,   // tag
+                 unsigned,   // expression tag
+                 double,     // elastic modulus
+                 double,     // poisson's ratio 
+                 double,     // q1
+                 double,     // q2
+                 double,     // fn
+                 double,     // sn
+                 double,     // en
+                 double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;
