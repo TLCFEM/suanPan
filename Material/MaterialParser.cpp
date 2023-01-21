@@ -1576,6 +1576,22 @@ void new_expgurson1d(unique_ptr<Material>& return_obj, istringstream& command) {
     return_obj = make_unique<ExpGurson1D>(tag, para_pool(0), para_pool(1), para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6), para_pool(7), para_pool(8), para_pool(9));
 }
 
+void new_customgurson1d(unique_ptr<Material>& return_obj, istringstream& command) {
+    unsigned tag, expression_tag;
+    if(!get_input(command, tag, expression_tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    vec para_pool{2E2, .3, 1., 1., 0., 1., 0., 0.};
+    if(!get_optional_input(command, para_pool)) {
+        suanpan_error("A valid parameter is required.\n");
+        return;
+    }
+
+    return_obj = make_unique<CustomGurson1D>(tag, expression_tag, para_pool(0), para_pool(1), para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6), para_pool(7));
+}
+
 void new_exphoffman(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -3242,6 +3258,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "ExpDP")) new_expdp(new_material, command);
     else if(is_equal(material_id, "ExpGurson")) new_expgurson(new_material, command);
     else if(is_equal(material_id, "ExpGurson1D")) new_expgurson1d(new_material, command);
+    else if(is_equal(material_id, "CustomGurson1D")) new_customgurson1d(new_material, command);
     else if(is_equal(material_id, "ExpHoffman")) new_exphoffman(new_material, command);
     else if(is_equal(material_id, "CustomHoffman")) new_customhoffman(new_material, command);
     else if(is_equal(material_id, "ExpJ2")) new_expj2(new_material, command);
