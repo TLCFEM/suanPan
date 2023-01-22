@@ -4,6 +4,7 @@
 #include "Concrete/ConcreteTsai.h"
 #include "Degradation/Degradation.h"
 #include "Degradation/Dhakal.h"
+#include "Degradation/CustomDegradation.h"
 #include "Degradation/TrilinearDegradation.h"
 #include "Elastic/BilinearElastic1D.h"
 #include "Elastic/CustomElastic1D.h"

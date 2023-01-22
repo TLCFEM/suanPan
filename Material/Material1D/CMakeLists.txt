@@ -5,6 +5,7 @@ set(M1D
         Material1D/Concrete/ConcreteTsai.cpp
         Material1D/Degradation/Degradation.cpp
         Material1D/Degradation/Dhakal.cpp
+        Material1D/Degradation/CustomDegradation.cpp
         Material1D/Degradation/TrilinearDegradation.cpp
         Material1D/Elastic/BilinearElastic1D.cpp
         Material1D/Elastic/CustomElastic1D.cpp

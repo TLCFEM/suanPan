@@ -290,6 +290,7 @@
     <ClCompile Include="..\..\..\Material\Material1D\Concrete\ConcreteExp.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Concrete\ConcreteTable.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Concrete\ConcreteTsai.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Degradation\CustomDegradation.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Degradation\Degradation.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Degradation\Dhakal.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Degradation\TrilinearDegradation.cpp" />
@@ -749,6 +750,7 @@
     <ClInclude Include="..\..\..\Material\Material1D\Concrete\ConcreteExp.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Concrete\ConcreteTable.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Concrete\ConcreteTsai.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Degradation\CustomDegradation.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Degradation\Degradation.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Degradation\Dhakal.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Degradation\TrilinearDegradation.h" />

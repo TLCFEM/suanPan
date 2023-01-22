@@ -7386,6 +7386,12 @@
       "trigger": "TrilinearDegradation"
     },
     {
+      "contents": "material CustomDegradation ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique material tag\n# (2) int, host material tag\n# (3) int, degradation expression tag\n",
+      "details": "Uniaxial degradation with custom rules",
+      "kind": "type",
+      "trigger": "CustomDegradation"
+    },
+    {
       "contents": "",
       "details": "",
       "kind": "type",
