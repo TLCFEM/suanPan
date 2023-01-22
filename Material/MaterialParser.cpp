@@ -3272,7 +3272,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "CustomCC")) new_customcc(new_material, command);
     else if(is_equal(material_id, "CustomCDP")) new_customcdp(new_material, command);
     else if(is_equal(material_id, "CustomDP")) new_customdp(new_material, command);
-    else if(is_equal(material_id, "CustomDP")) new_customdegradation(new_material, command);
+    else if(is_equal(material_id, "CustomDegradation")) new_customdegradation(new_material, command);
     else if(is_equal(material_id, "CustomElastic1D")) new_customelastic1d(new_material, command);
     else if(is_equal(material_id, "CustomGurson")) new_customgurson(new_material, command);
     else if(is_equal(material_id, "CustomGurson1D")) new_customgurson1d(new_material, command);
