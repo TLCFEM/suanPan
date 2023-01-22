@@ -7,12 +7,12 @@ set(M1D
         Material1D/Degradation/Dhakal.cpp
         Material1D/Degradation/TrilinearDegradation.cpp
         Material1D/Elastic/BilinearElastic1D.cpp
+        Material1D/Elastic/CustomElastic1D.cpp
         Material1D/Elastic/Elastic1D.cpp
         Material1D/Elastic/MultilinearElastic1D.cpp
         Material1D/Elastic/PolyElastic1D.cpp
         Material1D/Elastic/Sinh1D.cpp
         Material1D/Elastic/Tanh1D.cpp
-        Material1D/Elastic/CustomElastic1D.cpp
         Material1D/Hysteresis/AFC.cpp
         Material1D/Hysteresis/BilinearOO.cpp
         Material1D/Hysteresis/BilinearPO.cpp
@@ -41,6 +41,7 @@ set(M1D
         Material1D/vonMises/ArmstrongFrederick1D.cpp
         Material1D/vonMises/Bilinear1D.cpp
         Material1D/vonMises/BilinearMises1D.cpp
+        Material1D/vonMises/CustomGurson1D.cpp
         Material1D/vonMises/CustomMises1D.cpp
         Material1D/vonMises/ExpGurson1D.cpp
         Material1D/vonMises/ExpMises1D.cpp

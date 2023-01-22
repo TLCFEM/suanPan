@@ -93,15 +93,13 @@ vec& ShellBase::transform_from_global_to_local(vec& displacement) const {
 mat& ShellBase::transform_from_local_to_global(mat& stiffness) const {
     suanpan_assert([&] { if(stiffness.n_cols != stiffness.n_rows) throw invalid_argument("size conflicts"); });
 
-    for(auto I = 0llu, K = 2llu; I < stiffness.n_cols; I += 3llu, K += 3llu) {
-        const span i_span(I, K);
-        for(auto J = 0llu, L = 2llu; J < stiffness.n_cols; J += 3llu, L += 3llu) {
-            const span j_span(J, L);
-            stiffness(i_span, j_span) = trans_mat * stiffness(i_span, j_span) * trans_mat.t();
-        }
+    mat global_trans(size(stiffness), fill::zeros);
+    for(auto I = 0llu, J = 2llu; I < stiffness.n_cols; I += 3llu, J += 3llu) {
+        const span t_span(I, J);
+        global_trans(t_span, t_span) = trans_mat;
     }
 
-    return stiffness;
+    return stiffness = global_trans * stiffness * global_trans.t();
 }
 
 vec ShellBase::transform_from_local_to_global(vec&& resistance) const { return std::move(transform_from_local_to_global(resistance)); }

@@ -33,6 +33,7 @@
 #include "vonMises/ArmstrongFrederick.h"
 #include "vonMises/BilinearJ2.h"
 #include "vonMises/BilinearPeric.h"
+#include "vonMises/CustomGurson.h"
 #include "vonMises/CustomJ2.h"
 #include "vonMises/ExpGurson.h"
 #include "vonMises/ExpJ2.h"

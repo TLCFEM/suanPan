@@ -3696,16 +3696,28 @@
       "trigger": "CustomDP"
     },
     {
-      "contents": "",
-      "details": "",
+      "contents": "material ExpGurson1D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:[6]} ${7:[7]} ${8:[8]} ${9:[9]} ${10:[10]} ${11:[11]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, poissons ratio\n# (4) double, yield stress\n# (5) double, n\n# [6] double, q1, default: 1.0\n# [7] double, q2, default: 1.0\n# [8] double, fn, default: 0.0\n# [9] double, sn, default: 1.0\n# [10] double, en, default: 0.0\n# [11] double, density, default: 0.0",
+      "details": "Uniaxial Gurson model using exponential hardening function",
+      "kind": "type",
+      "trigger": "ExpGurson1D"
+    },
+    {
+      "contents": "material CustomGurson1D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]} ${6:[6]} ${7:[7]} ${8:[8]} ${9:[9]} ${10:[10]}\n# (1) int, unique material tag\n# (2) int, expression tag\n# (3) double, elastic modulus\n# (4) double, poissons ratio\n# [5] double, q1, default: 1.0\n# [6] double, q2, default: 1.0\n# [7] double, fn, default: 0.0\n# [8] double, sn, default: 1.0\n# [9] double, en, default: 0.0\n# [10] double, density, default: 0.0",
+      "details": "Uniaxial Gurson model using custom hardening function",
+      "kind": "type",
+      "trigger": "CustomGurson1D"
+    },
+    {
+      "contents": "material ExpGurson ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:[6]} ${7:[7]} ${8:[8]} ${9:[9]} ${10:[10]} ${11:[11]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, poissons ratio\n# (4) double, yield stress\n# (5) double, n\n# [6] double, q1, default: 1.0\n# [7] double, q2, default: 1.0\n# [8] double, fn, default: 0.0\n# [9] double, sn, default: 1.0\n# [10] double, en, default: 0.0\n# [11] double, density, default: 0.0",
+      "details": "Gurson model using exponential hardening function",
       "kind": "type",
       "trigger": "ExpGurson"
     },
     {
-      "contents": "",
-      "details": "",
+      "contents": "material CustomGurson ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]} ${6:[6]} ${7:[7]} ${8:[8]} ${9:[9]} ${10:[10]}\n# (1) int, unique material tag\n# (2) int, expression tag\n# (3) double, elastic modulus\n# (4) double, poissons ratio\n# [5] double, q1, default: 1.0\n# [6] double, q2, default: 1.0\n# [7] double, fn, default: 0.0\n# [8] double, sn, default: 1.0\n# [9] double, en, default: 0.0\n# [10] double, density, default: 0.0",
+      "details": "Gurson model using custom hardening function",
       "kind": "type",
-      "trigger": "ExpGurson1D"
+      "trigger": "CustomGurson"
     },
     {
       "contents": "material ExpHoffman ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...19)} ${5:(20)} ${6:(21)} ${7:[22]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, E_{xy}, E_{yz}, E_{zx}\n# (8...10) double, three poissions ratios: v_{xx}, v_{yy}, v_{zz}\n# (11...19) double, nine yield stress\n# (20) double, a\n# (21) double, b\n# [22] double, density, default: 0.0",

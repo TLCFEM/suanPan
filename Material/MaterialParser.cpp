@@ -1560,6 +1560,22 @@ void new_expgurson(unique_ptr<Material>& return_obj, istringstream& command) {
     return_obj = make_unique<ExpGurson>(tag, para_pool(0), para_pool(1), para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6), para_pool(7), para_pool(8), para_pool(9));
 }
 
+void new_customgurson(unique_ptr<Material>& return_obj, istringstream& command) {
+    unsigned tag, expression_tag;
+    if(!get_input(command, tag, expression_tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    vec para_pool{2E2, .3, 1., 1., 0., 1., 0., 0.};
+    if(!get_optional_input(command, para_pool)) {
+        suanpan_error("A valid parameter is required.\n");
+        return;
+    }
+
+    return_obj = make_unique<CustomGurson>(tag, expression_tag, para_pool(0), para_pool(1), para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6), para_pool(7));
+}
+
 void new_expgurson1d(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -1574,6 +1590,22 @@ void new_expgurson1d(unique_ptr<Material>& return_obj, istringstream& command) {
     }
 
     return_obj = make_unique<ExpGurson1D>(tag, para_pool(0), para_pool(1), para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6), para_pool(7), para_pool(8), para_pool(9));
+}
+
+void new_customgurson1d(unique_ptr<Material>& return_obj, istringstream& command) {
+    unsigned tag, expression_tag;
+    if(!get_input(command, tag, expression_tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    vec para_pool{2E2, .3, 1., 1., 0., 1., 0., 0.};
+    if(!get_optional_input(command, para_pool)) {
+        suanpan_error("A valid parameter is required.\n");
+        return;
+    }
+
+    return_obj = make_unique<CustomGurson1D>(tag, expression_tag, para_pool(0), para_pool(1), para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6), para_pool(7));
 }
 
 void new_exphoffman(unique_ptr<Material>& return_obj, istringstream& command) {
@@ -3193,9 +3225,9 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     if(is_equal(material_id, "AFC01")) new_afc01(new_material, command);
     else if(is_equal(material_id, "AFC")) new_afc01(new_material, command);
     else if(is_equal(material_id, "AFC02")) new_afc02(new_material, command);
-    else if(is_equal(material_id, "AFCS")) new_afc02(new_material, command);
     else if(is_equal(material_id, "AFC03")) new_afc03(new_material, command);
     else if(is_equal(material_id, "AFCN")) new_afc03(new_material, command);
+    else if(is_equal(material_id, "AFCS")) new_afc02(new_material, command);
     else if(is_equal(material_id, "ArmstrongFrederick")) new_armstrongfrederick(new_material, command);
     else if(is_equal(material_id, "ArmstrongFrederick1D")) new_armstrongfrederick1d(new_material, command);
     else if(is_equal(material_id, "Axisymmetric")) new_axisymmetric(new_material, command);
@@ -3204,23 +3236,22 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "Bilinear2D")) new_bilinear2d(new_material, command);
     else if(is_equal(material_id, "BilinearCC")) new_bilinearcc(new_material, command);
     else if(is_equal(material_id, "BilinearDP")) new_bilineardp(new_material, command);
-    else if(is_equal(material_id, "CustomDP")) new_customdp(new_material, command);
     else if(is_equal(material_id, "BilinearElastic1D")) new_bilinearelastic1d(new_material, command);
     else if(is_equal(material_id, "BilinearHoffman")) new_bilinearhoffman(new_material, command);
     else if(is_equal(material_id, "BilinearJ2")) new_bilinearj2(new_material, command);
     else if(is_equal(material_id, "BilinearMises1D")) new_bilinearmises1d(new_material, command);
     else if(is_equal(material_id, "BilinearOO")) new_bilinearoo(new_material, command);
-    else if(is_equal(material_id, "BilinearPO")) new_bilinearpo(new_material, command);
     else if(is_equal(material_id, "BilinearPeric")) new_bilinearperic(new_material, command);
+    else if(is_equal(material_id, "BilinearPO")) new_bilinearpo(new_material, command);
+    else if(is_equal(material_id, "BilinearViscosity")) new_bilinearviscosity(new_material, command);
     else if(is_equal(material_id, "BlatzKo")) new_blatzko(new_material, command);
     else if(is_equal(material_id, "BoucWen")) new_boucwen(new_material, command);
     else if(is_equal(material_id, "BWBN")) new_bwbn(new_material, command);
     else if(is_equal(material_id, "CDP")) new_cdp(new_material, command);
-    else if(is_equal(material_id, "CustomCDP")) new_customcdp(new_material, command);
     else if(is_equal(material_id, "CDPM2")) new_cdpm2(new_material, command, 1);
-    else if(is_equal(material_id, "CDPM2NO")) new_cdpm2(new_material, command, 0);
-    else if(is_equal(material_id, "CDPM2ISO")) new_cdpm2(new_material, command, 1);
     else if(is_equal(material_id, "CDPM2ANISO")) new_cdpm2(new_material, command, 2);
+    else if(is_equal(material_id, "CDPM2ISO")) new_cdpm2(new_material, command, 1);
+    else if(is_equal(material_id, "CDPM2NO")) new_cdpm2(new_material, command, 0);
     else if(is_equal(material_id, "Concrete21")) new_concrete21(new_material, command);
     else if(is_equal(material_id, "Concrete22")) new_concrete22(new_material, command);
     else if(is_equal(material_id, "ConcreteCM")) new_concretecm(new_material, command);
@@ -3228,24 +3259,26 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "ConcreteTable")) new_concretetable(new_material, command);
     else if(is_equal(material_id, "ConcreteTsai")) new_concretetsai(new_material, command);
     else if(is_equal(material_id, "CoulombFriction")) new_coulombfriction(new_material, command);
+    else if(is_equal(material_id, "CustomCC")) new_customcc(new_material, command);
+    else if(is_equal(material_id, "CustomCDP")) new_customcdp(new_material, command);
+    else if(is_equal(material_id, "CustomDP")) new_customdp(new_material, command);
     else if(is_equal(material_id, "CustomElastic1D")) new_customelastic1d(new_material, command);
+    else if(is_equal(material_id, "CustomGurson")) new_customgurson(new_material, command);
+    else if(is_equal(material_id, "CustomGurson1D")) new_customgurson1d(new_material, command);
+    else if(is_equal(material_id, "CustomHoffman")) new_customhoffman(new_material, command);
+    else if(is_equal(material_id, "CustomJ2")) new_customj2(new_material, command);
     else if(is_equal(material_id, "CustomMises1D")) new_custommises1d(new_material, command);
-    else if(is_equal(material_id, "Dhakal")) new_dhakal(new_material, command);
     else if(is_equal(material_id, "DafaliasManzari")) new_dafaliasmanzari(new_material, command);
-    else if(is_equal(material_id, "Sinh1D")) new_sinh1d(new_material, command);
-    else if(is_equal(material_id, "Tanh1D")) new_tanh1d(new_material, command);
+    else if(is_equal(material_id, "Dhakal")) new_dhakal(new_material, command);
     else if(is_equal(material_id, "Elastic1D")) new_elastic1d(new_material, command);
     else if(is_equal(material_id, "Elastic2D")) new_elastic2d(new_material, command);
     else if(is_equal(material_id, "Elastic3D")) new_isotropicelastic3d(new_material, command);
     else if(is_equal(material_id, "ExpCC")) new_expcc(new_material, command);
-    else if(is_equal(material_id, "CustomCC")) new_customcc(new_material, command);
     else if(is_equal(material_id, "ExpDP")) new_expdp(new_material, command);
     else if(is_equal(material_id, "ExpGurson")) new_expgurson(new_material, command);
     else if(is_equal(material_id, "ExpGurson1D")) new_expgurson1d(new_material, command);
     else if(is_equal(material_id, "ExpHoffman")) new_exphoffman(new_material, command);
-    else if(is_equal(material_id, "CustomHoffman")) new_customhoffman(new_material, command);
     else if(is_equal(material_id, "ExpJ2")) new_expj2(new_material, command);
-    else if(is_equal(material_id, "CustomJ2")) new_customj2(new_material, command);
     else if(is_equal(material_id, "ExpMises1D")) new_expmises1d(new_material, command);
     else if(is_equal(material_id, "Flag01")) new_flag01(new_material, command);
     else if(is_equal(material_id, "Flag02")) new_flag02(new_material, command);
@@ -3258,11 +3291,11 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "Maxwell")) new_maxwell(new_material, command);
     else if(is_equal(material_id, "MooneyRivlin")) new_mooneyrivlin(new_material, command);
     else if(is_equal(material_id, "MPF")) new_mpf(new_material, command);
-    else if(is_equal(material_id, "MultilinearOO")) new_multilinearoo(new_material, command);
-    else if(is_equal(material_id, "MultilinearPO")) new_multilinearpo(new_material, command);
     else if(is_equal(material_id, "MultilinearElastic1D")) new_multilinearelastic1d(new_material, command);
     else if(is_equal(material_id, "MultilinearJ2")) new_multilinearj2(new_material, command);
     else if(is_equal(material_id, "MultilinearMises1D")) new_multilinearmises1d(new_material, command);
+    else if(is_equal(material_id, "MultilinearOO")) new_multilinearoo(new_material, command);
+    else if(is_equal(material_id, "MultilinearPO")) new_multilinearpo(new_material, command);
     else if(is_equal(material_id, "NLE1D01")) new_nle1d01(new_material, command);
     else if(is_equal(material_id, "NLE3D01")) new_nle3d01(new_material, command);
     else if(is_equal(material_id, "OrthotropicElastic3D")) new_orthotropicelastic3d(new_material, command);
@@ -3280,13 +3313,15 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "Rotation2D")) new_rotation2d(new_material, command);
     else if(is_equal(material_id, "Rotation3D")) new_rotation3d(new_material, command);
     else if(is_equal(material_id, "Sequential")) new_sequential(new_material, command);
-    else if(is_equal(material_id, "SlipLock")) new_sliplock(new_material, command);
     else if(is_equal(material_id, "SimpleSand")) new_simplesand(new_material, command);
+    else if(is_equal(material_id, "Sinh1D")) new_sinh1d(new_material, command);
+    else if(is_equal(material_id, "SlipLock")) new_sliplock(new_material, command);
     else if(is_equal(material_id, "Stacked")) new_stacked(new_material, command);
     else if(is_equal(material_id, "SteelBRB")) new_steelbrb(new_material, command);
     else if(is_equal(material_id, "Substepping")) new_substepping(new_material, command);
     else if(is_equal(material_id, "TableCDP")) new_tablecdp(new_material, command);
     else if(is_equal(material_id, "TableGurson")) new_tablegurson(new_material, command);
+    else if(is_equal(material_id, "Tanh1D")) new_tanh1d(new_material, command);
     else if(is_equal(material_id, "TrilinearDegradation")) new_trilineardegradation(new_material, command);
     else if(is_equal(material_id, "Trivial")) new_trivial(new_material, command);
     else if(is_equal(material_id, "Uniaxial")) new_uniaxial(new_material, command);
@@ -3294,7 +3329,6 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "VAFCRP1D")) new_vafcrp1d(new_material, command);
     else if(is_equal(material_id, "Viscosity01")) new_viscosity01(new_material, command);
     else if(is_equal(material_id, "Viscosity02")) new_viscosity02(new_material, command);
-    else if(is_equal(material_id, "BilinearViscosity")) new_bilinearviscosity(new_material, command);
     else if(is_equal(material_id, "Yeoh")) new_yeoh(new_material, command);
     else load::object(new_material, domain, material_id, command);
 
