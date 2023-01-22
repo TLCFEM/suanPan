@@ -32,7 +32,6 @@
 #define FACTORY_HPP
 
 #include <future>
-
 #include <Domain/MetaMat/operator_times.hpp>
 #include <Toolbox/container.h>
 
@@ -168,6 +167,7 @@ template<sp_d T> class Factory final {
     template<sp_d T1> friend unique_ptr<MetaMat<T1>> get_matrix_container(const Factory<T1>*);
 
     void assemble_matrix_helper(shared_ptr<MetaMat<T>>&, const Mat<T>&, const uvec&);
+    void assemble_matrix_helper(shared_ptr<MetaMat<T>>&, const Mat<T>&, const uvec&, const uvec&);
 
 public:
     const bool initialized = false;
@@ -614,10 +614,17 @@ public:
     void assemble_resistance(const Mat<T>&, const uvec&);
     void assemble_damping_force(const Mat<T>&, const uvec&);
     void assemble_inertial_force(const Mat<T>&, const uvec&);
+
     void assemble_mass(const Mat<T>&, const uvec&);
     void assemble_damping(const Mat<T>&, const uvec&);
     void assemble_stiffness(const Mat<T>&, const uvec&);
     void assemble_geometry(const Mat<T>&, const uvec&);
+
+    void assemble_mass(const Mat<T>&, const uvec&, const uvec&);
+    void assemble_damping(const Mat<T>&, const uvec&, const uvec&);
+    void assemble_stiffness(const Mat<T>&, const uvec&, const uvec&);
+    void assemble_geometry(const Mat<T>&, const uvec&, const uvec&);
+
     void assemble_stiffness(const SpMat<T>&, const uvec&);
 
     /*************************UTILITY*************************/
@@ -1834,6 +1841,13 @@ template<sp_d T> void Factory<T>::assemble_matrix_helper(shared_ptr<MetaMat<T>>&
     else for(unsigned I = 0; I < EI.n_elem; ++I) for(unsigned J = 0; J < EI.n_elem; ++J) GM->unsafe_at(EI(J), EI(I)) += EM(J, I);
 }
 
+template<sp_d T> void Factory<T>::assemble_matrix_helper(shared_ptr<MetaMat<T>>& GM, const Mat<T>& EM, const uvec& EI, const uvec& NEI) {
+    if(EM.is_empty()) return;
+
+    if(StorageScheme::BANDSYMM == storage_type || StorageScheme::SYMMPACK == storage_type) for(unsigned I = 0; I < NEI.n_elem; ++I) for(unsigned J = 0; J <= I; ++J) GM->unsafe_at(EI(NEI(I)), EI(NEI(J))) += EM(NEI(I), NEI(J));
+    else for(unsigned I = 0; I < EI.n_elem; ++I) for(unsigned J = 0; J < EI.n_elem; ++J) GM->unsafe_at(EI(J), EI(I)) += EM(J, I);
+}
+
 template<sp_d T> void Factory<T>::assemble_mass(const Mat<T>& EM, const uvec& EI) { this->assemble_matrix_helper(global_mass, EM, EI); }
 
 template<sp_d T> void Factory<T>::assemble_damping(const Mat<T>& EC, const uvec& EI) { this->assemble_matrix_helper(global_damping, EC, EI); }
@@ -1841,6 +1855,14 @@ template<sp_d T> void Factory<T>::assemble_damping(const Mat<T>& EC, const uvec&
 template<sp_d T> void Factory<T>::assemble_stiffness(const Mat<T>& EK, const uvec& EI) { this->assemble_matrix_helper(global_stiffness, EK, EI); }
 
 template<sp_d T> void Factory<T>::assemble_geometry(const Mat<T>& EG, const uvec& EI) { this->assemble_matrix_helper(global_geometry, EG, EI); }
+
+template<sp_d T> void Factory<T>::assemble_mass(const Mat<T>& EM, const uvec& EI, const uvec& NEI) { this->assemble_matrix_helper(global_mass, EM, EI, NEI); }
+
+template<sp_d T> void Factory<T>::assemble_damping(const Mat<T>& EC, const uvec& EI, const uvec& NEI) { this->assemble_matrix_helper(global_damping, EC, EI, NEI); }
+
+template<sp_d T> void Factory<T>::assemble_stiffness(const Mat<T>& EK, const uvec& EI, const uvec& NEI) { this->assemble_matrix_helper(global_stiffness, EK, EI, NEI); }
+
+template<sp_d T> void Factory<T>::assemble_geometry(const Mat<T>& EG, const uvec& EI, const uvec& NEI) { this->assemble_matrix_helper(global_geometry, EG, EI, NEI); }
 
 template<sp_d T> void Factory<T>::assemble_stiffness(const SpMat<T>& EK, const uvec& EI) {
     if(EK.is_empty()) return;

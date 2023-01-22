@@ -394,6 +394,8 @@ void Element::update_dof_encoding() {
         for(unsigned i = 0; i < num_dof; ++i) dof_encoding(idx++) = node_dof(i);
     }
 
+    dof_index = sort_index(dof_encoding);
+
     if(!dof_identifier.empty()) for(const auto& tmp_ptr : node_ptr) tmp_ptr.lock()->set_dof_identifier(dof_identifier);
 }
 
@@ -404,6 +406,8 @@ bool Element::if_update_damping() const { return update_damping; }
 bool Element::if_update_stiffness() const { return update_stiffness; }
 
 bool Element::if_update_geometry() const { return update_geometry; }
+
+const uvec& Element::get_dof_index() const { return dof_index; }
 
 const uvec& Element::get_dof_encoding() const { return dof_encoding; }
 
