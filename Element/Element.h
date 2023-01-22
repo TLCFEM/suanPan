@@ -102,7 +102,9 @@ class Element : protected DataElement, public ElementBase {
     const MaterialType mat_type;
     const SectionType sec_type;
 
-    std::vector<DOF> dof_identifier;
+    const std::vector<DOF> dof_identifier;
+
+    uvec dof_index;
 
     friend void ConstantMass(DataElement*);
     friend void ConstantDamping(DataElement*);
@@ -193,6 +195,7 @@ public:
     [[nodiscard]] bool if_update_stiffness() const override;
     [[nodiscard]] bool if_update_geometry() const override;
 
+    [[nodiscard]] const uvec& get_dof_index() const override;
     [[nodiscard]] const uvec& get_dof_encoding() const override;
     [[nodiscard]] const uvec& get_node_encoding() const override;
 
