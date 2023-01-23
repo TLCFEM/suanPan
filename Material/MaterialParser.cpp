@@ -2972,6 +2972,16 @@ void new_trilineardegradation(unique_ptr<Material>& return_obj, istringstream& c
     return_obj = make_unique<TrilinearDegradation>(tag, mat_tag, s_strain, e_strain, e_damage);
 }
 
+void new_customdegradation(unique_ptr<Material>& return_obj, istringstream& command) {
+    unsigned tag, mat_tag, expression_tag;
+    if(!get_input(command, tag, mat_tag, expression_tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    return_obj = make_unique<CustomDegradation>(tag, mat_tag, expression_tag);
+}
+
 void new_trivial(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -3262,6 +3272,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "CustomCC")) new_customcc(new_material, command);
     else if(is_equal(material_id, "CustomCDP")) new_customcdp(new_material, command);
     else if(is_equal(material_id, "CustomDP")) new_customdp(new_material, command);
+    else if(is_equal(material_id, "CustomDegradation")) new_customdegradation(new_material, command);
     else if(is_equal(material_id, "CustomElastic1D")) new_customelastic1d(new_material, command);
     else if(is_equal(material_id, "CustomGurson")) new_customgurson(new_material, command);
     else if(is_equal(material_id, "CustomGurson1D")) new_customgurson1d(new_material, command);

@@ -1,0 +1,6 @@
+material MPF 1 1000 5 .1
+expression SimpleVector 1 x y|2 y[0]:=1+.01x;y[1]:=.01
+material CustomDegradation 2 1 1
+materialTest1D 2 -1E-4 200 50 150 380 30 50 450 470 500
+
+exit
