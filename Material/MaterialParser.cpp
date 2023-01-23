@@ -3202,6 +3202,16 @@ void new_bilinearviscosity(unique_ptr<Material>& return_obj, istringstream& comm
     return_obj = make_unique<BilinearViscosity>(tag, damping, yield_stress, hardening);
 }
 
+void new_customviscosity(unique_ptr<Material>& return_obj, istringstream& command) {
+    unsigned tag, expression_tag;
+    if(!get_input(command, tag, expression_tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    return_obj = make_unique<CustomViscosity>(tag, expression_tag);
+}
+
 void new_yeoh(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -3254,6 +3264,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "BilinearPeric")) new_bilinearperic(new_material, command);
     else if(is_equal(material_id, "BilinearPO")) new_bilinearpo(new_material, command);
     else if(is_equal(material_id, "BilinearViscosity")) new_bilinearviscosity(new_material, command);
+    else if(is_equal(material_id, "CustomViscosity")) new_customviscosity(new_material, command);
     else if(is_equal(material_id, "BlatzKo")) new_blatzko(new_material, command);
     else if(is_equal(material_id, "BoucWen")) new_boucwen(new_material, command);
     else if(is_equal(material_id, "BWBN")) new_bwbn(new_material, command);

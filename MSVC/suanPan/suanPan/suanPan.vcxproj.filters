@@ -1486,6 +1486,9 @@
     <ClCompile Include="..\..\..\Material\Material1D\Degradation\CustomDegradation.cpp">
       <Filter>Material\Material1D\Degradation</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Viscosity\CustomViscosity.cpp">
+      <Filter>Material\Material1D\Viscosity</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2829,6 +2832,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material1D\Degradation\CustomDegradation.h">
       <Filter>Material\Material1D\Degradation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Viscosity\CustomViscosity.h">
+      <Filter>Material\Material1D\Viscosity</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

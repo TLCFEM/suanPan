@@ -3109,10 +3109,16 @@
       "trigger": "BilinearPeric"
     },
     {
-      "contents": "",
-      "details": "",
+      "contents": "material BilinearViscosity ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]}\n# (1) int, unique material tag\n# (2) double, damping coefficient\n# (3) double, yield stress\n# [4] double, hardening ratio, default: 0",
+      "details": "Viscosity with bilinear hardening",
       "kind": "type",
       "trigger": "BilinearViscosity"
+    },
+    {
+      "contents": "material CustomViscosity (1) (2)\n# (1) int, unique tag\n# (2) int, viscosity expression tag",
+      "details": "Viscosity with custom hardening",
+      "kind": "type",
+      "trigger": "CustomViscosity"
     },
     {
       "contents": "",

@@ -1,0 +1,54 @@
+# A TEST MODEL
+
+node 1 0 0
+node 2 1 0
+
+material Elastic1D 1 1E2
+
+expression SimpleVector 1 x|2 y|3 y[0]:=500*x[1];y[1]:=0;y[2]:=500;
+
+material CustomViscosity 2 1
+
+element T2D2 1 1 2 1 1
+element Damper02 2 1 2 2 1 true 0 .5
+
+mass 3 2 1E-3 1
+
+fix 1 P 1
+fix 2 2 2
+
+amplitude Sine 1 6.283185307179586 1.
+amplitude Linear 2 1.
+amplitude Combine 3 1 2
+
+displacement 2 3 1 1 2
+
+hdf5recorder 1 Element S 2
+hdf5recorder 2 Element ES 2
+hdf5recorder 3 Element ED 2
+hdf5recorder 4 Element VS 2
+hdf5recorder 5 Element VD 2
+hdf5recorder 6 Element LITR 2
+
+step dynamic 1 20
+set ini_step_size 1E-2
+set fixed_step_size true
+
+converger RelIncreDisp 1 1E-10 4 1
+
+analyze
+
+# Node 2:
+# Coordinate:
+#   1.0000e+00  0.0000e+00
+# Displacement:
+#   1.8259e+01  0.0000e+00
+# Resistance:
+#   3.7194e+03  0.0000e+00
+# Velocity:
+#   9.0747e+00  0.0000e+00
+# Acceleration:
+#  -1.9443e+01  0.0000e+00
+peek node 2
+
+exit
