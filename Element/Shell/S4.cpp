@@ -155,7 +155,8 @@ int S4::initialize(const shared_ptr<DomainBase>& D) {
 
 int S4::update_status() {
     // separate displacement vector
-    vec t_disp, m_disp(12), p_disp(12);
+    vec t_disp;
+    vec::fixed<12> m_disp, p_disp;
     transform_from_global_to_local(t_disp = get_trial_displacement());
     for(unsigned I = 0, J = 0; I < s_size; I += s_dof, J += 3) {
         const span t_span(J, J + 2llu);
@@ -163,8 +164,10 @@ int S4::update_status() {
         p_disp(t_span) = t_disp(I + p_dof);
     }
 
-    mat t_stiffness(3, 3), m_stiffness(12, 12, fill::zeros);
-    vec t_stress(3), m_resistance(12, fill::zeros);
+    mat33 t_stiffness;
+    mat::fixed<12, 12> m_stiffness(fill::zeros);
+    vec3 t_stress;
+    vec::fixed<12> m_resistance(fill::zeros);
 
     auto p_stiffness = penalty_stiffness;
     vec p_resistance = p_stiffness * p_disp;

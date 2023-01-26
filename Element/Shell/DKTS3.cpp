@@ -185,15 +185,17 @@ int DKTS3::initialize(const shared_ptr<DomainBase>& D) {
 int DKTS3::update_status() {
     // separate displacement vector
     const auto t_disp = transform_from_global_to_local(get_trial_displacement());
-    vec m_disp(9), p_disp(9);
+    vec9 m_disp, p_disp;
     for(unsigned I = 0, J = 0; I < s_size; I += s_dof, J += 3) {
         const span t_span(J, J + 2llu);
         m_disp(t_span) = t_disp(I + m_dof);
         p_disp(t_span) = t_disp(I + p_dof);
     }
 
-    mat t_stiffness(3, 3), m_stiffness(9, 9, fill::zeros), p_stiffness(9, 9, fill::zeros);
-    vec t_stress(3), m_resistance(9, fill::zeros), p_resistance(9, fill::zeros);
+    mat33 t_stiffness;
+    mat99 m_stiffness(fill::zeros), p_stiffness(fill::zeros);
+    vec3 t_stress;
+    vec9 m_resistance(fill::zeros), p_resistance(fill::zeros);
 
     for(const auto& I : int_pt) {
         const vec m_strain = I.BM * m_disp, p_strain = I.BP * p_disp;
