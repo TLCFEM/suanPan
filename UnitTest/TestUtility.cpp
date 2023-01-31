@@ -55,3 +55,13 @@ TEST_CASE("Sync Stream", "[Utility.Print]") {
     thread_a.join();
     thread_b.join();
 }
+
+TEST_CASE("Color Print", "[Utility.Print]") {
+    suanpan_info("TEST.\n");
+    suanpan_highlight("TEST.\n");
+    suanpan_debug("TEST.\n");
+    suanpan_warning("TEST.\n");
+    suanpan_error("TEST.\n");
+    suanpan_fatal("TEST.\n");
+    suanpan_info("TEST.\n", vec{1, 2, 3});
+}
