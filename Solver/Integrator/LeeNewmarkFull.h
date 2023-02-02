@@ -59,7 +59,7 @@ private:
     const triplet_form<double, uword> current_mass;
 
     const bool build_graph = false;
-    sp_mat stiffness_graph, mass_graph;
+    mutable sp_mat stiffness_graph, mass_graph;
 
     using index_tm = decltype(current_mass)::index_type;
     using index_ts = decltype(current_stiffness)::index_type;

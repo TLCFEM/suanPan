@@ -44,11 +44,9 @@ void LeeNewmark::update_stiffness() const {
 void LeeNewmark::update_residual() const {
     const auto& t_vel = factory->get_trial_velocity();
 
-    auto& t_residual = access::rw(residual);
-
     for(uword I = 0, J = n_block, K = J + n_block - 1; I < n_damping; ++I, J += n_block, K += n_block) {
         const vec n_internal(&trial_internal(J), n_block);
-        t_residual.rows(J, K) = current_mass * vec(t_vel - n_internal) * mass_coef(I) - current_stiffness * n_internal * stiffness_coef(I);
+        residual.rows(J, K) = current_mass * vec(t_vel - n_internal) * mass_coef(I) - current_stiffness * n_internal * stiffness_coef(I);
     }
 }
 
