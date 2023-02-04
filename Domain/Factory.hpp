@@ -97,15 +97,15 @@ template<sp_d T> class Factory final {
     SpCol<T> trial_constraint_resistance;
     SpCol<T> current_constraint_resistance;
 
-    T trial_time = 0.;   // global trial (pseudo) time
-    T incre_time = 0.;   // global incremental (pseudo) time
-    T current_time = 0.; // global current (pseudo) time
-    T pre_time = 0.;     // global previous (pseudo) time
+    T trial_time = T(0);   // global trial (pseudo) time
+    T incre_time = T(0);   // global incremental (pseudo) time
+    T current_time = T(0); // global current (pseudo) time
+    T pre_time = T(0);     // global previous (pseudo) time
 
-    T strain_energy = 0.;
-    T kinetic_energy = 0.;
-    T viscous_energy = 0.;
-    T complementary_energy = 0.;
+    T strain_energy = T(0);
+    T kinetic_energy = T(0);
+    T viscous_energy = T(0);
+    T complementary_energy = T(0);
     Col<T> momentum;
 
     Col<T> trial_load_factor;    // global trial load factor
@@ -166,8 +166,7 @@ template<sp_d T> class Factory final {
     template<sp_d T1> friend unique_ptr<MetaMat<T1>> get_basic_container(const Factory<T1>*);
     template<sp_d T1> friend unique_ptr<MetaMat<T1>> get_matrix_container(const Factory<T1>*);
 
-    void assemble_matrix_helper(shared_ptr<MetaMat<T>>&, const Mat<T>&, const uvec&);
-    void assemble_matrix_helper(shared_ptr<MetaMat<T>>&, const Mat<T>&, const uvec&, const uvec&);
+    void assemble_matrix_helper(shared_ptr<MetaMat<T>>&, const Mat<T>&, const uvec&, const uvec&, const uvec&);
 
 public:
     const bool initialized = false;
@@ -615,15 +614,10 @@ public:
     void assemble_damping_force(const Mat<T>&, const uvec&);
     void assemble_inertial_force(const Mat<T>&, const uvec&);
 
-    void assemble_mass(const Mat<T>&, const uvec&);
-    void assemble_damping(const Mat<T>&, const uvec&);
-    void assemble_stiffness(const Mat<T>&, const uvec&);
-    void assemble_geometry(const Mat<T>&, const uvec&);
-
-    void assemble_mass(const Mat<T>&, const uvec&, const uvec&);
-    void assemble_damping(const Mat<T>&, const uvec&, const uvec&);
-    void assemble_stiffness(const Mat<T>&, const uvec&, const uvec&);
-    void assemble_geometry(const Mat<T>&, const uvec&, const uvec&);
+    void assemble_mass(const Mat<T>&, const uvec&, const uvec&, const uvec&);
+    void assemble_damping(const Mat<T>&, const uvec&, const uvec&, const uvec&);
+    void assemble_stiffness(const Mat<T>&, const uvec&, const uvec&, const uvec&);
+    void assemble_geometry(const Mat<T>&, const uvec&, const uvec&, const uvec&);
 
     void assemble_stiffness(const SpMat<T>&, const uvec&);
 
@@ -1232,7 +1226,7 @@ template<sp_d T> void Factory<T>::update_incre_temperature(const Col<T>& M) {
 
 template<sp_d T> void Factory<T>::update_current_time(const T M) {
     trial_time = current_time = M;
-    incre_time = 0.;
+    incre_time = T(0);
 }
 
 template<sp_d T> void Factory<T>::update_current_load_factor(const Col<T>& L) {
@@ -1465,10 +1459,10 @@ template<sp_d T> void Factory<T>::commit_energy() {
 }
 
 template<sp_d T> void Factory<T>::clear_energy() {
-    strain_energy = 0.;
-    kinetic_energy = 0.;
-    viscous_energy = 0.;
-    complementary_energy = 0.;
+    strain_energy = T(0);
+    kinetic_energy = T(0);
+    viscous_energy = T(0);
+    complementary_energy = T(0);
     momentum.zeros();
 }
 
@@ -1493,7 +1487,7 @@ template<sp_d T> void Factory<T>::commit_status() {
 
 template<sp_d T> void Factory<T>::commit_time() {
     current_time = trial_time;
-    incre_time = 0.;
+    incre_time = T(0);
 }
 
 template<sp_d T> void Factory<T>::commit_load_factor() {
@@ -1714,7 +1708,7 @@ template<sp_d T> void Factory<T>::reset_status() {
 
 template<sp_d T> void Factory<T>::reset_time() {
     trial_time = current_time;
-    incre_time = 0.;
+    incre_time = T(0);
 }
 
 template<sp_d T> void Factory<T>::reset_load_factor() {
@@ -1812,57 +1806,33 @@ template<sp_d T> void Factory<T>::reset() {
 
 template<sp_d T> void Factory<T>::assemble_resistance(const Mat<T>& ER, const uvec& EI) {
     if(ER.is_empty()) return;
-    for(unsigned I = 0; I < EI.n_elem; ++I) trial_resistance(EI(I)) += ER(I);
+    for(auto I = 0llu; I < EI.n_elem; ++I) trial_resistance(EI(I)) += ER(I);
 }
 
 template<sp_d T> void Factory<T>::assemble_damping_force(const Mat<T>& ER, const uvec& EI) {
     if(ER.is_empty()) return;
-    for(unsigned I = 0; I < EI.n_elem; ++I) trial_damping_force(EI(I)) += ER(I);
+    for(auto I = 0llu; I < EI.n_elem; ++I) trial_damping_force(EI(I)) += ER(I);
 }
 
 template<sp_d T> void Factory<T>::assemble_inertial_force(const Mat<T>& ER, const uvec& EI) {
     if(ER.is_empty()) return;
-    for(unsigned I = 0; I < EI.n_elem; ++I) trial_inertial_force(EI(I)) += ER(I);
+    for(auto I = 0llu; I < EI.n_elem; ++I) trial_inertial_force(EI(I)) += ER(I);
 }
 
-/**
- * \brief Assemble given elemental matrix into global matrix
- * \param GM global matrix
- * \param EM elemental matrix
- * \param EI elemental matrix indices
- */
-template<sp_d T> void Factory<T>::assemble_matrix_helper(shared_ptr<MetaMat<T>>& GM, const Mat<T>& EM, const uvec& EI) {
+template<sp_d T> void Factory<T>::assemble_matrix_helper(shared_ptr<MetaMat<T>>& GM, const Mat<T>& EM, const uvec& EI, const uvec& NEI, const uvec& REI) {
     if(EM.is_empty()) return;
 
-    if(StorageScheme::BANDSYMM == storage_type || StorageScheme::SYMMPACK == storage_type) {
-        const uvec NEI = sort_index(EI);
-        for(unsigned I = 0; I < NEI.n_elem; ++I) for(unsigned J = 0; J <= I; ++J) GM->unsafe_at(EI(NEI(I)), EI(NEI(J))) += EM(NEI(I), NEI(J));
-    }
-    else for(unsigned I = 0; I < EI.n_elem; ++I) for(unsigned J = 0; J < EI.n_elem; ++J) GM->unsafe_at(EI(J), EI(I)) += EM(J, I);
+    if(StorageScheme::BANDSYMM == storage_type || StorageScheme::SYMMPACK == storage_type) for(auto I = 0llu; I < NEI.n_elem; ++I) for(auto J = I; J < NEI.n_elem; ++J) GM->unsafe_at(REI(J), REI(I)) += EM(NEI(J), NEI(I));
+    else for(auto I = 0llu; I < EI.n_elem; ++I) for(auto J = 0llu; J < EI.n_elem; ++J) GM->unsafe_at(EI(J), EI(I)) += EM(J, I);
 }
 
-template<sp_d T> void Factory<T>::assemble_matrix_helper(shared_ptr<MetaMat<T>>& GM, const Mat<T>& EM, const uvec& EI, const uvec& NEI) {
-    if(EM.is_empty()) return;
+template<sp_d T> void Factory<T>::assemble_mass(const Mat<T>& EM, const uvec& EI, const uvec& NEI, const uvec& REI) { this->assemble_matrix_helper(global_mass, EM, EI, NEI, REI); }
 
-    if(StorageScheme::BANDSYMM == storage_type || StorageScheme::SYMMPACK == storage_type) for(unsigned I = 0; I < NEI.n_elem; ++I) for(unsigned J = 0; J <= I; ++J) GM->unsafe_at(EI(NEI(I)), EI(NEI(J))) += EM(NEI(I), NEI(J));
-    else for(unsigned I = 0; I < EI.n_elem; ++I) for(unsigned J = 0; J < EI.n_elem; ++J) GM->unsafe_at(EI(J), EI(I)) += EM(J, I);
-}
+template<sp_d T> void Factory<T>::assemble_damping(const Mat<T>& EC, const uvec& EI, const uvec& NEI, const uvec& REI) { this->assemble_matrix_helper(global_damping, EC, EI, NEI, REI); }
 
-template<sp_d T> void Factory<T>::assemble_mass(const Mat<T>& EM, const uvec& EI) { this->assemble_matrix_helper(global_mass, EM, EI); }
+template<sp_d T> void Factory<T>::assemble_stiffness(const Mat<T>& EK, const uvec& EI, const uvec& NEI, const uvec& REI) { this->assemble_matrix_helper(global_stiffness, EK, EI, NEI, REI); }
 
-template<sp_d T> void Factory<T>::assemble_damping(const Mat<T>& EC, const uvec& EI) { this->assemble_matrix_helper(global_damping, EC, EI); }
-
-template<sp_d T> void Factory<T>::assemble_stiffness(const Mat<T>& EK, const uvec& EI) { this->assemble_matrix_helper(global_stiffness, EK, EI); }
-
-template<sp_d T> void Factory<T>::assemble_geometry(const Mat<T>& EG, const uvec& EI) { this->assemble_matrix_helper(global_geometry, EG, EI); }
-
-template<sp_d T> void Factory<T>::assemble_mass(const Mat<T>& EM, const uvec& EI, const uvec& NEI) { this->assemble_matrix_helper(global_mass, EM, EI, NEI); }
-
-template<sp_d T> void Factory<T>::assemble_damping(const Mat<T>& EC, const uvec& EI, const uvec& NEI) { this->assemble_matrix_helper(global_damping, EC, EI, NEI); }
-
-template<sp_d T> void Factory<T>::assemble_stiffness(const Mat<T>& EK, const uvec& EI, const uvec& NEI) { this->assemble_matrix_helper(global_stiffness, EK, EI, NEI); }
-
-template<sp_d T> void Factory<T>::assemble_geometry(const Mat<T>& EG, const uvec& EI, const uvec& NEI) { this->assemble_matrix_helper(global_geometry, EG, EI, NEI); }
+template<sp_d T> void Factory<T>::assemble_geometry(const Mat<T>& EG, const uvec& EI, const uvec& NEI, const uvec& REI) { this->assemble_matrix_helper(global_geometry, EG, EI, NEI, REI); }
 
 template<sp_d T> void Factory<T>::assemble_stiffness(const SpMat<T>& EK, const uvec& EI) {
     if(EK.is_empty()) return;

@@ -115,12 +115,12 @@ void Domain::assemble_inertial_force() const {
 
 void Domain::assemble_initial_mass() const {
     factory->clear_mass();
-    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_initial_mass(), I->get_dof_encoding(), I->get_dof_index());
+    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_initial_mass(), I->get_dof_encoding(), I->get_dof_index(), I->get_dof_reordered());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_mass(I->get_initial_mass(), I->get_dof_encoding(), I->get_dof_index());
+                factory->assemble_mass(I->get_initial_mass(), I->get_dof_encoding(), I->get_dof_index(), I->get_dof_reordered());
             });
         });
 
@@ -129,12 +129,12 @@ void Domain::assemble_initial_mass() const {
 
 void Domain::assemble_current_mass() const {
     factory->clear_mass();
-    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_current_mass(), I->get_dof_encoding(), I->get_dof_index());
+    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_current_mass(), I->get_dof_encoding(), I->get_dof_index(), I->get_dof_reordered());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_mass(I->get_current_mass(), I->get_dof_encoding(), I->get_dof_index());
+                factory->assemble_mass(I->get_current_mass(), I->get_dof_encoding(), I->get_dof_index(), I->get_dof_reordered());
             });
         });
 
@@ -143,12 +143,12 @@ void Domain::assemble_current_mass() const {
 
 void Domain::assemble_trial_mass() const {
     factory->clear_mass();
-    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_trial_mass(), I->get_dof_encoding(), I->get_dof_index());
+    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_trial_mass(), I->get_dof_encoding(), I->get_dof_index(), I->get_dof_reordered());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_mass(I->get_trial_mass(), I->get_dof_encoding(), I->get_dof_index());
+                factory->assemble_mass(I->get_trial_mass(), I->get_dof_encoding(), I->get_dof_index(), I->get_dof_reordered());
             });
         });
 
@@ -157,12 +157,12 @@ void Domain::assemble_trial_mass() const {
 
 void Domain::assemble_initial_damping() const {
     factory->clear_damping();
-    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_initial_damping(), I->get_dof_encoding(), I->get_dof_index());
+    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_initial_damping(), I->get_dof_encoding(), I->get_dof_index(), I->get_dof_reordered());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_damping(I->get_initial_damping(), I->get_dof_encoding(), I->get_dof_index());
+                factory->assemble_damping(I->get_initial_damping(), I->get_dof_encoding(), I->get_dof_index(), I->get_dof_reordered());
             });
         });
 
@@ -171,12 +171,12 @@ void Domain::assemble_initial_damping() const {
 
 void Domain::assemble_current_damping() const {
     factory->clear_damping();
-    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_current_damping(), I->get_dof_encoding(), I->get_dof_index());
+    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_current_damping(), I->get_dof_encoding(), I->get_dof_index(), I->get_dof_reordered());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_damping(I->get_current_damping(), I->get_dof_encoding(), I->get_dof_index());
+                factory->assemble_damping(I->get_current_damping(), I->get_dof_encoding(), I->get_dof_index(), I->get_dof_reordered());
             });
         });
 
@@ -185,12 +185,12 @@ void Domain::assemble_current_damping() const {
 
 void Domain::assemble_trial_damping() const {
     factory->clear_damping();
-    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_trial_damping(), I->get_dof_encoding(), I->get_dof_index());
+    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_trial_damping(), I->get_dof_encoding(), I->get_dof_index(), I->get_dof_reordered());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_damping(I->get_trial_damping(), I->get_dof_encoding(), I->get_dof_index());
+                factory->assemble_damping(I->get_trial_damping(), I->get_dof_encoding(), I->get_dof_index(), I->get_dof_reordered());
             });
         });
 
@@ -199,12 +199,12 @@ void Domain::assemble_trial_damping() const {
 
 void Domain::assemble_initial_stiffness() const {
     factory->clear_stiffness();
-    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_initial_stiffness(), I->get_dof_encoding(), I->get_dof_index());
+    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_initial_stiffness(), I->get_dof_encoding(), I->get_dof_index(), I->get_dof_reordered());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_stiffness(I->get_initial_stiffness(), I->get_dof_encoding(), I->get_dof_index());
+                factory->assemble_stiffness(I->get_initial_stiffness(), I->get_dof_encoding(), I->get_dof_index(), I->get_dof_reordered());
             });
         });
 
@@ -213,12 +213,12 @@ void Domain::assemble_initial_stiffness() const {
 
 void Domain::assemble_current_stiffness() const {
     factory->clear_stiffness();
-    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_current_stiffness(), I->get_dof_encoding(), I->get_dof_index());
+    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_current_stiffness(), I->get_dof_encoding(), I->get_dof_index(), I->get_dof_reordered());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_stiffness(I->get_current_stiffness(), I->get_dof_encoding(), I->get_dof_index());
+                factory->assemble_stiffness(I->get_current_stiffness(), I->get_dof_encoding(), I->get_dof_index(), I->get_dof_reordered());
             });
         });
 
@@ -227,12 +227,12 @@ void Domain::assemble_current_stiffness() const {
 
 void Domain::assemble_trial_stiffness() const {
     factory->clear_stiffness();
-    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_trial_stiffness(), I->get_dof_encoding(), I->get_dof_index());
+    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_trial_stiffness(), I->get_dof_encoding(), I->get_dof_index(), I->get_dof_reordered());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_stiffness(I->get_trial_stiffness(), I->get_dof_encoding(), I->get_dof_index());
+                factory->assemble_stiffness(I->get_trial_stiffness(), I->get_dof_encoding(), I->get_dof_index(), I->get_dof_reordered());
             });
         });
 
@@ -242,12 +242,12 @@ void Domain::assemble_trial_stiffness() const {
 void Domain::assemble_initial_geometry() const {
     if(!factory->is_nlgeom()) return;
     factory->clear_geometry();
-    if(color_map.empty() || is_sparse()) { for(const auto& I : element_pond.get()) if(I->is_nlgeom()) factory->assemble_geometry(I->get_initial_geometry(), I->get_dof_encoding(), I->get_dof_index()); }
+    if(color_map.empty() || is_sparse()) { for(const auto& I : element_pond.get()) if(I->is_nlgeom()) factory->assemble_geometry(I->get_initial_geometry(), I->get_dof_encoding(), I->get_dof_index(), I->get_dof_reordered()); }
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_geometry(I->get_initial_geometry(), I->get_dof_encoding(), I->get_dof_index());
+                factory->assemble_geometry(I->get_initial_geometry(), I->get_dof_encoding(), I->get_dof_index(), I->get_dof_reordered());
             });
         });
 
@@ -257,12 +257,12 @@ void Domain::assemble_initial_geometry() const {
 void Domain::assemble_current_geometry() const {
     if(!factory->is_nlgeom()) return;
     factory->clear_geometry();
-    if(color_map.empty() || is_sparse()) { for(const auto& I : element_pond.get()) if(I->is_nlgeom()) factory->assemble_geometry(I->get_current_geometry(), I->get_dof_encoding(), I->get_dof_index()); }
+    if(color_map.empty() || is_sparse()) { for(const auto& I : element_pond.get()) if(I->is_nlgeom()) factory->assemble_geometry(I->get_current_geometry(), I->get_dof_encoding(), I->get_dof_index(), I->get_dof_reordered()); }
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_geometry(I->get_current_geometry(), I->get_dof_encoding());
+                factory->assemble_geometry(I->get_current_geometry(), I->get_dof_encoding(), I->get_dof_index(), I->get_dof_reordered());
             });
         });
 
@@ -272,12 +272,12 @@ void Domain::assemble_current_geometry() const {
 void Domain::assemble_trial_geometry() const {
     if(!factory->is_nlgeom()) return;
     factory->clear_geometry();
-    if(color_map.empty() || is_sparse()) { for(const auto& I : element_pond.get()) if(I->is_nlgeom()) factory->assemble_geometry(I->get_trial_geometry(), I->get_dof_encoding(), I->get_dof_index()); }
+    if(color_map.empty() || is_sparse()) { for(const auto& I : element_pond.get()) if(I->is_nlgeom()) factory->assemble_geometry(I->get_trial_geometry(), I->get_dof_encoding(), I->get_dof_index(), I->get_dof_reordered()); }
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_geometry(I->get_trial_geometry(), I->get_dof_encoding(), I->get_dof_index());
+                factory->assemble_geometry(I->get_trial_geometry(), I->get_dof_encoding(), I->get_dof_index(), I->get_dof_reordered());
             });
         });
 
@@ -286,12 +286,12 @@ void Domain::assemble_trial_geometry() const {
 
 void Domain::assemble_mass_container() const {
     factory->clear_mass();
-    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_mass_container(), I->get_dof_encoding(), I->get_dof_index());
+    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_mass_container(), I->get_dof_encoding(), I->get_dof_index(), I->get_dof_reordered());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_mass(I->get_mass_container(), I->get_dof_encoding(), I->get_dof_index());
+                factory->assemble_mass(I->get_mass_container(), I->get_dof_encoding(), I->get_dof_index(), I->get_dof_reordered());
             });
         });
 
@@ -300,12 +300,12 @@ void Domain::assemble_mass_container() const {
 
 void Domain::assemble_stiffness_container() const {
     factory->clear_stiffness();
-    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_stiffness_container(), I->get_dof_encoding(), I->get_dof_index());
+    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_stiffness_container(), I->get_dof_encoding(), I->get_dof_index(), I->get_dof_reordered());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_stiffness(I->get_stiffness_container(), I->get_dof_encoding(), I->get_dof_index());
+                factory->assemble_stiffness(I->get_stiffness_container(), I->get_dof_encoding(), I->get_dof_index(), I->get_dof_reordered());
             });
         });
 

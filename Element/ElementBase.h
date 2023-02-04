@@ -104,6 +104,7 @@ public:
     [[nodiscard]] virtual bool if_update_stiffness() const = 0;
     [[nodiscard]] virtual bool if_update_geometry() const = 0;
 
+    [[nodiscard]] virtual const uvec& get_dof_reordered() const = 0;
     [[nodiscard]] virtual const uvec& get_dof_index() const = 0;
     [[nodiscard]] virtual const uvec& get_dof_encoding() const = 0;
     [[nodiscard]] virtual const uvec& get_node_encoding() const = 0;
