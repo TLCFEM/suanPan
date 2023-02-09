@@ -62,6 +62,7 @@ void Expression::print() {
 Mat<double> SimpleScalarExpression::evaluate(const Col<double>& in_x) {
     suanpan_assert([&] { if(x.n_elem != in_x.n_elem) throw std::runtime_error("input size mismatch"); });
 
+    std::scoped_lock lock{evaluate_mutex};
     x = in_x;
     return {expression.value()};
 }
@@ -69,6 +70,7 @@ Mat<double> SimpleScalarExpression::evaluate(const Col<double>& in_x) {
 Mat<double> SimpleScalarExpression::gradient(const Col<double>& in_x) {
     suanpan_assert([&] { if(x.n_elem != in_x.n_elem) throw std::runtime_error("input size mismatch"); });
 
+    std::scoped_lock lock{evaluate_mutex};
     x = in_x;
     Col<double> result(x.n_elem);
     for(uword I = 0; I < x.n_elem; ++I) result(I) = derivative(expression, x(I));
@@ -89,6 +91,7 @@ uword SimpleVectorExpression::output_size() const { return y.n_elem; }
 Mat<double> SimpleVectorExpression::evaluate(const Col<double>& in_x) {
     suanpan_assert([&] { if(x.n_elem != in_x.n_elem) throw std::runtime_error("input size mismatch"); });
 
+    std::scoped_lock lock{evaluate_mutex};
     x = in_x;
     // ReSharper disable once CppExpressionWithoutSideEffects
     expression.value();

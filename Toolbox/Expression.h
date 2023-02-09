@@ -38,6 +38,8 @@ class Expression : public Tag {
     std::string expression_text;
 
 protected:
+    std::mutex evaluate_mutex;
+
     Col<double> x;
 
     exprtk::expression<double> expression;
