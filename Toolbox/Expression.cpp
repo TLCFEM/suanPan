@@ -73,7 +73,7 @@ Mat<double> SimpleScalarExpression::gradient(const Col<double>& in_x) {
     std::scoped_lock lock{evaluate_mutex};
     x = in_x;
     Col<double> result(x.n_elem);
-    for(uword I = 0; I < x.n_elem; ++I) result(I) = derivative(expression, x(I));
+    for(uword I = 0; I < x.n_elem; ++I) result(I) = derivative(expression, x(I), 1E-12);
     return result;
 }
 

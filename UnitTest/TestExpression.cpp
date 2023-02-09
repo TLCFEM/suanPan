@@ -22,7 +22,7 @@ TEST_CASE("Simple Scalar Evaluation", "[Utility.Expression]") {
 
     REQUIRE(expression.compile("x^2+y^2+2*x*y") == true);
 
-    mat test_data = randn(2, 100);
+    mat test_data = randu(2, 100);
 
     suanpan_for(0llu, test_data.n_cols, [&](const uword I) {
         const auto &x = test_data(0, I), &y = test_data(1, I);
@@ -40,7 +40,7 @@ TEST_CASE("Simple Dot Evaluation", "[Utility.Expression]") {
 
     REQUIRE(expression.compile("sum(x)") == true);
 
-    mat test_data = randn(2, 100);
+    mat test_data = randu(2, 100);
 
     suanpan_for(0llu, test_data.n_cols, [&](const uword I) {
         const auto &x = test_data(0, I), &y = test_data(1, I);
@@ -57,7 +57,7 @@ TEST_CASE("Simple Vector Evaluation", "[Utility.Expression]") {
 
     REQUIRE(expression.compile("y[0]:=x[0]+x[1]+x[2];y[1]:=x[0]*x[1]*x[2];") == true);
 
-    mat test_data = randn(3, 100);
+    mat test_data = randu(3, 100);
 
     suanpan_for(0llu, test_data.n_cols, [&](const uword I) {
         const auto f = expression.evaluate(test_data.col(I));
