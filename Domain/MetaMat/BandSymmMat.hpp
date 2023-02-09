@@ -51,7 +51,7 @@ public:
     void unify(uword) override;
     void nullify(uword) override;
 
-    const T& operator()(uword, uword) const override;
+    T operator()(uword, uword) const override;
     T& unsafe_at(uword, uword) override;
     T& at(uword, uword) override;
 
@@ -68,35 +68,34 @@ template<sp_d T> BandSymmMat<T>::BandSymmMat(const uword in_size, const uword in
     , band(in_bandwidth)
     , m_rows(in_bandwidth + 1) {}
 
-template<sp_d T> unique_ptr<MetaMat<T>> BandSymmMat<T>::make_copy() { return std::make_unique<BandSymmMat<T>>(*this); }
+template<sp_d T> unique_ptr<MetaMat<T>> BandSymmMat<T>::make_copy() { return std::make_unique<BandSymmMat>(*this); }
 
 template<sp_d T> void BandSymmMat<T>::unify(const uword K) {
     nullify(K);
-    access::rw(this->memory[K * m_rows]) = 1.;
+    this->memory[K * m_rows] = 1.;
 }
 
 template<sp_d T> void BandSymmMat<T>::nullify(const uword K) {
-    suanpan_for(std::max(band, K) - band, K, [&](const uword I) { access::rw(this->memory[K - I + I * m_rows]) = 0.; });
+    suanpan_for(std::max(band, K) - band, K, [&](const uword I) { this->memory[K - I + I * m_rows] = 0.; });
     const auto t_factor = K * m_rows - K;
-    suanpan_for(K, std::min(this->n_rows, K + band + 1), [&](const uword I) { access::rw(this->memory[I + t_factor]) = 0.; });
+    suanpan_for(K, std::min(this->n_rows, K + band + 1), [&](const uword I) { this->memory[I + t_factor] = 0.; });
 
     this->factored = false;
 }
 
-template<sp_d T> const T& BandSymmMat<T>::operator()(const uword in_row, const uword in_col) const {
+template<sp_d T> T BandSymmMat<T>::operator()(const uword in_row, const uword in_col) const {
     if(in_row > band + in_col) return bin = 0.;
     return this->memory[in_row > in_col ? in_row - in_col + in_col * m_rows : in_col - in_row + in_row * m_rows];
 }
 
 template<sp_d T> T& BandSymmMat<T>::unsafe_at(const uword in_row, const uword in_col) {
     this->factored = false;
-    return access::rw(this->memory[in_row - in_col + in_col * m_rows]);
+    return this->memory[in_row - in_col + in_col * m_rows];
 }
 
 template<sp_d T> T& BandSymmMat<T>::at(const uword in_row, const uword in_col) {
     if(in_row > band + in_col || in_row < in_col) [[unlikely]] return bin = 0.;
-    this->factored = false;
-    return access::rw(this->memory[in_row - in_col + in_col * m_rows]);
+    return this->unsafe_at(in_row, in_col);
 }
 
 template<sp_d T> Mat<T> BandSymmMat<T>::operator*(const Mat<T>& X) const {

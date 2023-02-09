@@ -107,7 +107,7 @@ public:
 
     template<sp_d in_dt, sp_i in_it> csc_form& operator=(triplet_form<in_dt, in_it>&);
 
-    const data_t& operator()(const index_t in_row, const index_t in_col) const {
+    data_t operator()(const index_t in_row, const index_t in_col) const {
         if(in_row < n_rows && in_col < n_cols) for(auto I = col_ptr[in_col]; I < col_ptr[in_col + 1]; ++I) if(in_row == row_idx[I]) return val_idx[I];
         return access::rw(bin) = data_t(0);
     }

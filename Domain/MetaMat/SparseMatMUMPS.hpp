@@ -178,7 +178,7 @@ public:
 template<sp_d T> SparseMatMUMPS<T>::SparseMatMUMPS(const uword in_row, const uword in_col, const uword in_elem)
     : SparseMatBaseMUMPS<T>(in_row, in_col, in_elem, 0) {}
 
-template<sp_d T> unique_ptr<MetaMat<T>> SparseMatMUMPS<T>::make_copy() { return std::make_unique<SparseMatMUMPS<T>>(*this); }
+template<sp_d T> unique_ptr<MetaMat<T>> SparseMatMUMPS<T>::make_copy() { return std::make_unique<SparseMatMUMPS>(*this); }
 
 template<sp_d T> class SparseSymmMatMUMPS final : public SparseMatBaseMUMPS<T> {
 public:
@@ -190,7 +190,7 @@ public:
 template<sp_d T> SparseSymmMatMUMPS<T>::SparseSymmMatMUMPS(const uword in_row, const uword in_col, const uword in_elem)
     : SparseMatBaseMUMPS<T>(in_row, in_col, in_elem, 0) {}
 
-template<sp_d T> unique_ptr<MetaMat<T>> SparseSymmMatMUMPS<T>::make_copy() { return std::make_unique<SparseSymmMatMUMPS<T>>(*this); }
+template<sp_d T> unique_ptr<MetaMat<T>> SparseSymmMatMUMPS<T>::make_copy() { return std::make_unique<SparseSymmMatMUMPS>(*this); }
 
 #endif
 

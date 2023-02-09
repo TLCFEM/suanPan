@@ -76,7 +76,7 @@ public:
      * \brief Access element (read-only), returns zero if out-of-bound
      * \return value
      */
-    virtual const T& operator()(uword, uword) const = 0;
+    virtual T operator()(uword, uword) const = 0;
     /**
      * \brief Access element without bound check
      * \return value

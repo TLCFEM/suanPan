@@ -46,7 +46,7 @@ public:
     void unify(uword) override;
     void nullify(uword) override;
 
-    const T& operator()(uword, uword) const override;
+    T operator()(uword, uword) const override;
 
     T& at(uword, uword) override;
 
@@ -59,7 +59,7 @@ public:
 template<sp_d T> FullMat<T>::FullMat(const uword in_rows, const uword in_cols)
     : DenseMat<T>(in_rows, in_cols, in_rows * in_cols) {}
 
-template<sp_d T> unique_ptr<MetaMat<T>> FullMat<T>::make_copy() { return std::make_unique<FullMat<T>>(*this); }
+template<sp_d T> unique_ptr<MetaMat<T>> FullMat<T>::make_copy() { return std::make_unique<FullMat>(*this); }
 
 template<sp_d T> void FullMat<T>::unify(const uword K) {
     nullify(K);
@@ -73,11 +73,11 @@ template<sp_d T> void FullMat<T>::nullify(const uword K) {
     this->factored = false;
 }
 
-template<sp_d T> const T& FullMat<T>::operator()(const uword in_row, const uword in_col) const { return this->memory[in_row + in_col * this->n_rows]; }
+template<sp_d T> T FullMat<T>::operator()(const uword in_row, const uword in_col) const { return this->memory[in_row + in_col * this->n_rows]; }
 
 template<sp_d T> T& FullMat<T>::at(const uword in_row, const uword in_col) {
     this->factored = false;
-    return access::rw(this->memory[in_row + in_col * this->n_rows]);
+    return this->memory[in_row + in_col * this->n_rows];
 }
 
 template<sp_d T> Mat<T> FullMat<T>::operator*(const Mat<T>& B) const {

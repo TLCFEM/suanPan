@@ -70,7 +70,7 @@ template<sp_d T> SparseMatPARDISO<T>::SparseMatPARDISO(const uword in_row, const
     if(std::is_same_v<T, float>) iparm[27] = 1;
 }
 
-template<sp_d T> unique_ptr<MetaMat<T>> SparseMatPARDISO<T>::make_copy() { return std::make_unique<SparseMatPARDISO<T>>(*this); }
+template<sp_d T> unique_ptr<MetaMat<T>> SparseMatPARDISO<T>::make_copy() { return std::make_unique<SparseMatPARDISO>(*this); }
 
 template<sp_d T> int SparseMatPARDISO<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
     X.set_size(B.n_rows, B.n_cols);

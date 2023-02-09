@@ -32,15 +32,13 @@
 #include "MetaMat.hpp"
 
 template<sp_d T> class DenseMat : public MetaMat<T> {
-    void init();
-
 protected:
     podarray<int> pivot;
     podarray<float> s_memory; // float storage used in mixed precision algorithm
 
-    podarray<float> to_float();
+    std::unique_ptr<T[]> memory = nullptr;
 
-    const T* const memory = nullptr;
+    podarray<float> to_float();
 
 public:
     using MetaMat<T>::direct_solve;
@@ -50,7 +48,7 @@ public:
     DenseMat(DenseMat&&) noexcept;
     DenseMat& operator=(const DenseMat&);
     DenseMat& operator=(DenseMat&&) noexcept;
-    ~DenseMat() override;
+    ~DenseMat() override = default;
 
     [[nodiscard]] bool is_empty() const override;
     void zeros() override;
@@ -72,11 +70,6 @@ public:
     [[nodiscard]] int sign_det() const override;
 };
 
-template<sp_d T> void DenseMat<T>::init() {
-    if(nullptr != memory) memory::release(access::rw(memory));
-    access::rw(memory) = is_empty() ? nullptr : memory::acquire<T>(this->n_elem);
-}
-
 template<sp_d T> podarray<float> DenseMat<T>::to_float() {
     podarray<float> f_memory(this->n_elem);
 
@@ -86,34 +79,28 @@ template<sp_d T> podarray<float> DenseMat<T>::to_float() {
 }
 
 template<sp_d T> DenseMat<T>::DenseMat(const uword in_rows, const uword in_cols, const uword in_elem)
-    : MetaMat<T>(in_rows, in_cols, in_elem) {
-    init();
-    DenseMat<T>::zeros();
-}
+    : MetaMat<T>(in_rows, in_cols, in_elem)
+    , memory(std::unique_ptr<T[]>(new T[this->n_elem])) { DenseMat::zeros(); }
 
 template<sp_d T> DenseMat<T>::DenseMat(const DenseMat& old_mat)
     : MetaMat<T>(old_mat)
     , pivot(old_mat.pivot)
-    , s_memory(old_mat.s_memory) {
-    init();
-    if(nullptr != old_mat.memory) std::copy(old_mat.memory, old_mat.memory + old_mat.n_elem, DenseMat<T>::memptr());
-}
+    , s_memory(old_mat.s_memory)
+    , memory(std::unique_ptr<T[]>(new T[this->n_elem])) { if(nullptr != old_mat.memory) std::copy(old_mat.memory.get(), old_mat.memory.get() + old_mat.n_elem, DenseMat::memptr()); }
 
 template<sp_d T> DenseMat<T>::DenseMat(DenseMat&& old_mat) noexcept
     : MetaMat<T>(std::move(old_mat))
     , pivot(std::move(old_mat.pivot))
-    , s_memory(std::move(old_mat.s_memory)) {
-    access::rw(memory) = old_mat.memory;
-    access::rw(old_mat.memory) = nullptr;
-}
+    , s_memory(std::move(old_mat.s_memory))
+    , memory(std::move(old_mat.memory)) {}
 
 template<sp_d T> DenseMat<T>& DenseMat<T>::operator=(const DenseMat& old_mat) {
     if(this == &old_mat) return *this;
     MetaMat<T>::operator=(old_mat);
     pivot = old_mat.pivot;
     s_memory = old_mat.s_memory;
-    init();
-    if(nullptr != old_mat.memory) std::copy(old_mat.memory, old_mat.memory + old_mat.n_elem, memptr());
+    memory = std::unique_ptr<T[]>(new T[this->n_elem]);
+    if(nullptr != old_mat.memory) std::copy(old_mat.memory.get(), old_mat.memory.get() + old_mat.n_elem, memptr());
     return *this;
 }
 
@@ -122,12 +109,9 @@ template<sp_d T> DenseMat<T>& DenseMat<T>::operator=(DenseMat&& old_mat) noexcep
     MetaMat<T>::operator=(std::move(old_mat));
     pivot = std::move(old_mat.pivot);
     s_memory = std::move(old_mat.s_memory);
-    access::rw(memory) = old_mat.memory;
-    access::rw(old_mat.memory) = nullptr;
+    memory = std::move(old_mat.memory);
     return *this;
 }
-
-template<sp_d T> DenseMat<T>::~DenseMat() { if(nullptr != memory) memory::release(access::rw(memory)); }
 
 template<sp_d T> bool DenseMat<T>::is_empty() const { return 0 == this->n_elem; }
 
@@ -151,9 +135,9 @@ template<sp_d T> Col<T> DenseMat<T>::diag() const {
     return diag_vec;
 }
 
-template<sp_d T> const T* DenseMat<T>::memptr() const { return memory; }
+template<sp_d T> const T* DenseMat<T>::memptr() const { return memory.get(); }
 
-template<sp_d T> T* DenseMat<T>::memptr() { return const_cast<T*>(memory); }
+template<sp_d T> T* DenseMat<T>::memptr() { return memory.get(); }
 
 template<sp_d T> void DenseMat<T>::operator+=(const shared_ptr<MetaMat<T>>& M) {
     if(nullptr == M) return;

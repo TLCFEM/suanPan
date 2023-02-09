@@ -50,7 +50,7 @@ public:
     void unify(uword) override;
     void nullify(uword) override;
 
-    const T& operator()(uword, uword) const override;
+    T operator()(uword, uword) const override;
     T& unsafe_at(uword, uword) override;
     T& at(uword, uword) override;
 
@@ -66,32 +66,31 @@ template<sp_d T> SymmPackMat<T>::SymmPackMat(const uword in_size)
     : DenseMat<T>(in_size, in_size, (in_size + 1) * in_size / 2)
     , length(2 * in_size - 1) {}
 
-template<sp_d T> unique_ptr<MetaMat<T>> SymmPackMat<T>::make_copy() { return std::make_unique<SymmPackMat<T>>(*this); }
+template<sp_d T> unique_ptr<MetaMat<T>> SymmPackMat<T>::make_copy() { return std::make_unique<SymmPackMat>(*this); }
 
 template<sp_d T> void SymmPackMat<T>::unify(const uword K) {
     nullify(K);
-    access::rw(this->memory[(length - K + 2) * K / 2]) = 1.;
+    this->memory[(length - K + 2) * K / 2] = 1.;
 }
 
 template<sp_d T> void SymmPackMat<T>::nullify(const uword K) {
-    suanpan_for(0llu, K, [&](const uword I) { access::rw(this->memory[K + (length - I) * I / 2]) = 0.; });
+    suanpan_for(0llu, K, [&](const uword I) { this->memory[K + (length - I) * I / 2] = 0.; });
     const auto t_factor = (length - K) * K / 2;
-    suanpan_for(K, this->n_rows, [&](const uword I) { access::rw(this->memory[I + t_factor]) = 0.; });
+    suanpan_for(K, this->n_rows, [&](const uword I) { this->memory[I + t_factor] = 0.; });
 
     this->factored = false;
 }
 
-template<sp_d T> const T& SymmPackMat<T>::operator()(const uword in_row, const uword in_col) const { return this->memory[in_row >= in_col ? in_row + (length - in_col) * in_col / 2 : in_col + (length - in_row) * in_row / 2]; }
+template<sp_d T> T SymmPackMat<T>::operator()(const uword in_row, const uword in_col) const { return this->memory[in_row >= in_col ? in_row + (length - in_col) * in_col / 2 : in_col + (length - in_row) * in_row / 2]; }
 
 template<sp_d T> T& SymmPackMat<T>::unsafe_at(const uword in_row, const uword in_col) {
     this->factored = false;
-    return access::rw(this->memory[in_row + (length - in_col) * in_col / 2]);
+    return this->memory[in_row + (length - in_col) * in_col / 2];
 }
 
 template<sp_d T> T& SymmPackMat<T>::at(const uword in_row, const uword in_col) {
     if(in_row < in_col) [[unlikely]] return bin;
-    this->factored = false;
-    return access::rw(this->memory[in_row + (length - in_col) * in_col / 2]);
+    return this->unsafe_at(in_row, in_col);
 }
 
 template<sp_d T> Mat<T> SymmPackMat<T>::operator*(const Mat<T>& X) const {

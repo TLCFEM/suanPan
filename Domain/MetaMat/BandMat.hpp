@@ -53,7 +53,7 @@ public:
     void unify(uword) override;
     void nullify(uword) override;
 
-    const T& operator()(uword, uword) const override;
+    T operator()(uword, uword) const override;
     T& unsafe_at(uword, uword) override;
     T& at(uword, uword) override;
 
@@ -72,34 +72,33 @@ template<sp_d T> BandMat<T>::BandMat(const uword in_size, const uword in_l, cons
     , s_band(in_l + in_u)
     , m_rows(2 * in_l + in_u + 1) {}
 
-template<sp_d T> unique_ptr<MetaMat<T>> BandMat<T>::make_copy() { return std::make_unique<BandMat<T>>(*this); }
+template<sp_d T> unique_ptr<MetaMat<T>> BandMat<T>::make_copy() { return std::make_unique<BandMat>(*this); }
 
 template<sp_d T> void BandMat<T>::unify(const uword K) {
     nullify(K);
-    access::rw(this->memory[s_band + K * m_rows]) = 1.;
+    this->memory[s_band + K * m_rows] = 1.;
 }
 
 template<sp_d T> void BandMat<T>::nullify(const uword K) {
-    suanpan_for(std::max(K, u_band) - u_band, std::min(this->n_rows, K + l_band + 1), [&](const uword I) { access::rw(this->memory[I + s_band + K * (m_rows - 1)]) = 0.; });
-    suanpan_for(std::max(K, l_band) - l_band, std::min(this->n_cols, K + u_band + 1), [&](const uword I) { access::rw(this->memory[K + s_band + I * (m_rows - 1)]) = 0.; });
+    suanpan_for(std::max(K, u_band) - u_band, std::min(this->n_rows, K + l_band + 1), [&](const uword I) { this->memory[I + s_band + K * (m_rows - 1)] = 0.; });
+    suanpan_for(std::max(K, l_band) - l_band, std::min(this->n_cols, K + u_band + 1), [&](const uword I) { this->memory[K + s_band + I * (m_rows - 1)] = 0.; });
 
     this->factored = false;
 }
 
-template<sp_d T> const T& BandMat<T>::operator()(const uword in_row, const uword in_col) const {
+template<sp_d T> T BandMat<T>::operator()(const uword in_row, const uword in_col) const {
     if(in_row > in_col + l_band || in_row + u_band < in_col) return bin = 0.;
     return this->memory[in_row + s_band + in_col * (m_rows - 1)];
 }
 
 template<sp_d T> T& BandMat<T>::unsafe_at(const uword in_row, const uword in_col) {
     this->factored = false;
-    return access::rw(this->memory[in_row + s_band + in_col * (m_rows - 1)]);
+    return this->memory[in_row + s_band + in_col * (m_rows - 1)];
 }
 
 template<sp_d T> T& BandMat<T>::at(const uword in_row, const uword in_col) {
     if(in_row > in_col + l_band || in_row + u_band < in_col) return bin = 0.;
-    this->factored = false;
-    return access::rw(this->memory[in_row + s_band + in_col * (m_rows - 1)]);
+    return this->unsafe_at(in_row, in_col);
 }
 
 template<sp_d T> Mat<T> BandMat<T>::operator*(const Mat<T>& X) const {

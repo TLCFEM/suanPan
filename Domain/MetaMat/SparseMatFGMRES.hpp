@@ -119,7 +119,7 @@ public:
 template<sp_d T> SparseMatFGMRES<T>::SparseMatFGMRES(const uword in_row, const uword in_col, const uword in_elem)
     : SparseMatBaseFGMRES<T>(in_row, in_col, in_elem, false) {}
 
-template<sp_d T> unique_ptr<MetaMat<T>> SparseMatFGMRES<T>::make_copy() { return std::make_unique<SparseMatFGMRES<T>>(*this); }
+template<sp_d T> unique_ptr<MetaMat<T>> SparseMatFGMRES<T>::make_copy() { return std::make_unique<SparseMatFGMRES>(*this); }
 
 template<sp_d T> class SparseSymmMatFGMRES : public SparseMatBaseFGMRES<T> {
 public:
@@ -131,7 +131,7 @@ public:
 template<sp_d T> SparseSymmMatFGMRES<T>::SparseSymmMatFGMRES(const uword in_row, const uword in_col, const uword in_elem)
     : SparseMatBaseFGMRES<T>(in_row, in_col, in_elem, true) {}
 
-template<sp_d T> unique_ptr<MetaMat<T>> SparseSymmMatFGMRES<T>::make_copy() { return std::make_unique<SparseSymmMatFGMRES<T>>(*this); }
+template<sp_d T> unique_ptr<MetaMat<T>> SparseSymmMatFGMRES<T>::make_copy() { return std::make_unique<SparseSymmMatFGMRES>(*this); }
 
 #endif
 

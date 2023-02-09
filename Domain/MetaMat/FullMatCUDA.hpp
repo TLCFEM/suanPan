@@ -101,7 +101,7 @@ template<sp_d T> FullMatCUDA<T>::FullMatCUDA(const FullMatCUDA& other)
 
 template<sp_d T> FullMatCUDA<T>::~FullMatCUDA() { release(); }
 
-template<sp_d T> unique_ptr<MetaMat<T>> FullMatCUDA<T>::make_copy() { return make_unique<FullMatCUDA<T>>(*this); }
+template<sp_d T> unique_ptr<MetaMat<T>> FullMatCUDA<T>::make_copy() { return make_unique<FullMatCUDA>(*this); }
 
 template<sp_d T> int FullMatCUDA<T>::direct_solve(Mat<T>& X, Mat<T>&& B) { return direct_solve(X, B); }
 
