@@ -41,14 +41,14 @@ protected:
     podarray<float> to_float();
 
 public:
-    using MetaMat<T>::direct_solve;
-
     DenseMat(uword, uword, uword);
     DenseMat(const DenseMat&);
     DenseMat(DenseMat&&) noexcept;
     DenseMat& operator=(const DenseMat&);
     DenseMat& operator=(DenseMat&&) noexcept;
     ~DenseMat() override = default;
+
+    void unify(uword) override;
 
     [[nodiscard]] bool is_empty() const override;
     void zeros() override;
@@ -86,7 +86,7 @@ template<sp_d T> DenseMat<T>::DenseMat(const DenseMat& old_mat)
     : MetaMat<T>(old_mat)
     , pivot(old_mat.pivot)
     , s_memory(old_mat.s_memory)
-    , memory(std::unique_ptr<T[]>(new T[this->n_elem])) { if(nullptr != old_mat.memory) std::copy(old_mat.memory.get(), old_mat.memory.get() + old_mat.n_elem, DenseMat::memptr()); }
+    , memory(std::unique_ptr<T[]>(new T[this->n_elem])) { std::copy(old_mat.memory.get(), old_mat.memory.get() + old_mat.n_elem, DenseMat::memptr()); }
 
 template<sp_d T> DenseMat<T>::DenseMat(DenseMat&& old_mat) noexcept
     : MetaMat<T>(std::move(old_mat))
@@ -100,7 +100,7 @@ template<sp_d T> DenseMat<T>& DenseMat<T>::operator=(const DenseMat& old_mat) {
     pivot = old_mat.pivot;
     s_memory = old_mat.s_memory;
     memory = std::unique_ptr<T[]>(new T[this->n_elem]);
-    if(nullptr != old_mat.memory) std::copy(old_mat.memory.get(), old_mat.memory.get() + old_mat.n_elem, memptr());
+    std::copy(old_mat.memory.get(), old_mat.memory.get() + old_mat.n_elem, memptr());
     return *this;
 }
 
@@ -113,6 +113,11 @@ template<sp_d T> DenseMat<T>& DenseMat<T>::operator=(DenseMat&& old_mat) noexcep
     return *this;
 }
 
+template<sp_d T> void DenseMat<T>::unify(const uword K) {
+    this->nullify(K);
+    this->at(K, K) = 1.;
+}
+
 template<sp_d T> bool DenseMat<T>::is_empty() const { return 0 == this->n_elem; }
 
 template<sp_d T> void DenseMat<T>::zeros() {
@@ -122,8 +127,7 @@ template<sp_d T> void DenseMat<T>::zeros() {
 
 template<sp_d T> T DenseMat<T>::max() const {
     T max_value = T(1);
-    const auto t_size = std::min(this->n_rows, this->n_cols);
-    for(uword I = 0; I < t_size; ++I) if(const auto t_val = this->operator()(I, I); t_val > max_value) max_value = t_val;
+    for(uword I = 0; I < std::min(this->n_rows, this->n_cols); ++I) if(const auto t_val = this->operator()(I, I); t_val > max_value) max_value = t_val;
     return max_value;
 }
 

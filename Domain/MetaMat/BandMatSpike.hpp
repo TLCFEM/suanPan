@@ -42,7 +42,7 @@ template<sp_d T> class BandMatSpike final : public DenseMat<T> {
     const uword u_band;
     const uword m_rows; // memory block layout
 
-    podarray<int> SPIKE = podarray<int>(64);
+    podarray<int> SPIKE{64};
     podarray<T> WORK;
     podarray<float> SWORK;
 
@@ -56,7 +56,6 @@ public:
 
     unique_ptr<MetaMat<T>> make_copy() override;
 
-    void unify(uword) override;
     void nullify(uword) override;
 
     T operator()(uword, uword) const override;
@@ -90,11 +89,6 @@ template<sp_d T> BandMatSpike<T>::BandMatSpike(const uword in_size, const uword 
 
 template<sp_d T> unique_ptr<MetaMat<T>> BandMatSpike<T>::make_copy() { return std::make_unique<BandMatSpike>(*this); }
 
-template<sp_d T> void BandMatSpike<T>::unify(const uword K) {
-    nullify(K);
-    this->memory[u_band + K * m_rows] = 1.;
-}
-
 template<sp_d T> void BandMatSpike<T>::nullify(const uword K) {
     suanpan_for(std::max(K, u_band) - u_band, std::min(this->n_rows, K + l_band + 1), [&](const uword I) { this->memory[I + u_band + K * (m_rows - 1)] = 0.; });
     suanpan_for(std::max(K, l_band) - l_band, std::min(this->n_cols, K + u_band + 1), [&](const uword I) { this->memory[K + u_band + I * (m_rows - 1)] = 0.; });
@@ -103,7 +97,7 @@ template<sp_d T> void BandMatSpike<T>::nullify(const uword K) {
 }
 
 template<sp_d T> T BandMatSpike<T>::operator()(const uword in_row, const uword in_col) const {
-    if(in_row > in_col + l_band || in_row + u_band < in_col) return bin = 0.;
+    if(in_row > in_col + l_band || in_row + u_band < in_col) [[unlikely]] return bin = 0.;
     return this->memory[in_row + u_band + in_col * (m_rows - 1)];
 }
 
@@ -113,7 +107,7 @@ template<sp_d T> T& BandMatSpike<T>::unsafe_at(const uword in_row, const uword i
 }
 
 template<sp_d T> T& BandMatSpike<T>::at(const uword in_row, const uword in_col) {
-    if(in_row > in_col + l_band || in_row + u_band < in_col) return bin = 0.;
+    if(in_row > in_col + l_band || in_row + u_band < in_col) [[unlikely]] return bin = 0.;
     return this->unsafe_at(in_row, in_col);
 }
 

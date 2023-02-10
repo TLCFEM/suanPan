@@ -43,7 +43,6 @@ public:
 
     unique_ptr<MetaMat<T>> make_copy() override;
 
-    void unify(uword) override;
     void nullify(uword) override;
 
     T operator()(uword, uword) const override;
@@ -60,11 +59,6 @@ template<sp_d T> FullMat<T>::FullMat(const uword in_rows, const uword in_cols)
     : DenseMat<T>(in_rows, in_cols, in_rows * in_cols) {}
 
 template<sp_d T> unique_ptr<MetaMat<T>> FullMat<T>::make_copy() { return std::make_unique<FullMat>(*this); }
-
-template<sp_d T> void FullMat<T>::unify(const uword K) {
-    nullify(K);
-    at(K, K) = 1.;
-}
 
 template<sp_d T> void FullMat<T>::nullify(const uword K) {
     suanpan_for(0llu, this->n_rows, [&](const uword I) { at(I, K) = 0.; });

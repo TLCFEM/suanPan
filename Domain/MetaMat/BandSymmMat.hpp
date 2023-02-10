@@ -48,7 +48,6 @@ public:
 
     unique_ptr<MetaMat<T>> make_copy() override;
 
-    void unify(uword) override;
     void nullify(uword) override;
 
     T operator()(uword, uword) const override;
@@ -70,11 +69,6 @@ template<sp_d T> BandSymmMat<T>::BandSymmMat(const uword in_size, const uword in
 
 template<sp_d T> unique_ptr<MetaMat<T>> BandSymmMat<T>::make_copy() { return std::make_unique<BandSymmMat>(*this); }
 
-template<sp_d T> void BandSymmMat<T>::unify(const uword K) {
-    nullify(K);
-    this->memory[K * m_rows] = 1.;
-}
-
 template<sp_d T> void BandSymmMat<T>::nullify(const uword K) {
     suanpan_for(std::max(band, K) - band, K, [&](const uword I) { this->memory[K - I + I * m_rows] = 0.; });
     const auto t_factor = K * m_rows - K;
@@ -84,7 +78,7 @@ template<sp_d T> void BandSymmMat<T>::nullify(const uword K) {
 }
 
 template<sp_d T> T BandSymmMat<T>::operator()(const uword in_row, const uword in_col) const {
-    if(in_row > band + in_col) return bin = 0.;
+    if(in_row > band + in_col) [[unlikely]] return bin = 0.;
     return this->memory[in_row > in_col ? in_row - in_col + in_col * m_rows : in_col - in_row + in_row * m_rows];
 }
 

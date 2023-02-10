@@ -50,7 +50,6 @@ public:
 
     unique_ptr<MetaMat<T>> make_copy() override;
 
-    void unify(uword) override;
     void nullify(uword) override;
 
     T operator()(uword, uword) const override;
@@ -74,11 +73,6 @@ template<sp_d T> BandMat<T>::BandMat(const uword in_size, const uword in_l, cons
 
 template<sp_d T> unique_ptr<MetaMat<T>> BandMat<T>::make_copy() { return std::make_unique<BandMat>(*this); }
 
-template<sp_d T> void BandMat<T>::unify(const uword K) {
-    nullify(K);
-    this->memory[s_band + K * m_rows] = 1.;
-}
-
 template<sp_d T> void BandMat<T>::nullify(const uword K) {
     suanpan_for(std::max(K, u_band) - u_band, std::min(this->n_rows, K + l_band + 1), [&](const uword I) { this->memory[I + s_band + K * (m_rows - 1)] = 0.; });
     suanpan_for(std::max(K, l_band) - l_band, std::min(this->n_cols, K + u_band + 1), [&](const uword I) { this->memory[K + s_band + I * (m_rows - 1)] = 0.; });
@@ -87,7 +81,7 @@ template<sp_d T> void BandMat<T>::nullify(const uword K) {
 }
 
 template<sp_d T> T BandMat<T>::operator()(const uword in_row, const uword in_col) const {
-    if(in_row > in_col + l_band || in_row + u_band < in_col) return bin = 0.;
+    if(in_row > in_col + l_band || in_row + u_band < in_col) [[unlikely]]return bin = 0.;
     return this->memory[in_row + s_band + in_col * (m_rows - 1)];
 }
 
@@ -97,7 +91,7 @@ template<sp_d T> T& BandMat<T>::unsafe_at(const uword in_row, const uword in_col
 }
 
 template<sp_d T> T& BandMat<T>::at(const uword in_row, const uword in_col) {
-    if(in_row > in_col + l_band || in_row + u_band < in_col) return bin = 0.;
+    if(in_row > in_col + l_band || in_row + u_band < in_col) [[unlikely]] return bin = 0.;
     return this->unsafe_at(in_row, in_col);
 }
 
