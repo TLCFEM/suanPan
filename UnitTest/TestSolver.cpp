@@ -103,14 +103,14 @@ TEST_CASE("Iterative Solver Dense", "[Matrix.Solver]") {
         setting.iterative_solver = IterativeSolver::BICGSTAB;
 
         A.set_solver_setting(setting);
-        A.iterative_solve(x, C);
+        A.solve(x, C);
 
         REQUIRE(norm(solve(B, C) - x) <= 1E1 * setting.tolerance);
 
         setting.iterative_solver = IterativeSolver::GMRES;
 
         A.set_solver_setting(setting);
-        A.iterative_solve(x, C);
+        A.solve(x, C);
 
         REQUIRE(norm(solve(B, C) - x) <= 1E1 * setting.tolerance);
     }
@@ -136,7 +136,7 @@ TEST_CASE("Iterative Solver Sparse Mat", "[Matrix.Solver]") {
         A.zeros();
         for(auto J = B.begin(); J != B.end(); ++J) A.at(J.row(), J.col()) = *J;
         A.set_solver_setting(setting);
-        A.iterative_solve(x, C);
+        A.solve(x, C);
 
         REQUIRE(norm(spsolve(B, C) - x) <= 1E-12);
     }
@@ -166,7 +166,7 @@ TEST_CASE("Iterative Solver Dense Mat", "[Matrix.Solver]") {
                 else B(i, j) = 0.;
 
         A.set_solver_setting(setting);
-        A.iterative_solve(x, C);
+        A.solve(x, C);
 
         REQUIRE(norm(solve(B, C) - x) <= 1E-12);
     }

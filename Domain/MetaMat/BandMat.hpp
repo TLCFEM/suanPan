@@ -45,6 +45,9 @@ template<sp_d T> class BandMat final : public DenseMat<T> {
     int solve_trs(Mat<T>&, Mat<T>&&);
     int solve_trs(Mat<T>&, const Mat<T>&);
 
+    int direct_solve(Mat<T>&, Mat<T>&&) override;
+    int direct_solve(Mat<T>&, const Mat<T>&) override;
+
 public:
     BandMat(uword, uword, uword);
 
@@ -57,9 +60,6 @@ public:
     T& at(uword, uword) override;
 
     Mat<T> operator*(const Mat<T>&) const override;
-
-    int direct_solve(Mat<T>&, Mat<T>&&) override;
-    int direct_solve(Mat<T>&, const Mat<T>&) override;
 };
 
 template<sp_d T> T BandMat<T>::bin = 0.;

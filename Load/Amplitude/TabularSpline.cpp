@@ -59,7 +59,7 @@ void TabularSpline::initialize(const shared_ptr<DomainBase>& D) {
         b(I) = (dy(I) / dt(I) - dy(J) / dt(J)) / denom;
     });
 
-    m = system.solve(b);
+    system.solve(m, b);
 }
 
 double TabularSpline::get_amplitude(const double T) {

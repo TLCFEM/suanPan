@@ -38,6 +38,9 @@ template<sp_d T> class FullMat : public DenseMat<T> {
     int solve_trs(Mat<T>&, Mat<T>&&);
     int solve_trs(Mat<T>&, const Mat<T>&);
 
+    int direct_solve(Mat<T>&, Mat<T>&&) override;
+    int direct_solve(Mat<T>&, const Mat<T>&) override;
+
 public:
     FullMat(uword, uword);
 
@@ -50,9 +53,6 @@ public:
     T& at(uword, uword) override;
 
     Mat<T> operator*(const Mat<T>&) const override;
-
-    int direct_solve(Mat<T>&, Mat<T>&&) override;
-    int direct_solve(Mat<T>&, const Mat<T>&) override;
 };
 
 template<sp_d T> FullMat<T>::FullMat(const uword in_rows, const uword in_cols)

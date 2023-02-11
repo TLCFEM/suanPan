@@ -45,6 +45,9 @@ template<sp_d T> class SparseMatBaseMUMPS : public SparseMat<T> {
     void dealloc();
     void run();
 
+    int direct_solve(Mat<T>&, Mat<T>&&) override;
+    int direct_solve(Mat<T>&, const Mat<T>&) override;
+
 public:
     SparseMatBaseMUMPS(uword, uword, uword, int);
     SparseMatBaseMUMPS(const SparseMatBaseMUMPS&);
@@ -54,9 +57,6 @@ public:
     ~SparseMatBaseMUMPS() override;
 
     void zeros() override;
-
-    int direct_solve(Mat<T>&, Mat<T>&&) override;
-    int direct_solve(Mat<T>&, const Mat<T>&) override;
 
     [[nodiscard]] int sign_det() const override;
 };

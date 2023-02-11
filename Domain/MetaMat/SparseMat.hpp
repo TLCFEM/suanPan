@@ -34,7 +34,6 @@
 template<sp_d T> class SparseMat : public MetaMat<T> {
 public:
     using MetaMat<T>::triplet_mat;
-    using MetaMat<T>::direct_solve;
 
     SparseMat(uword, uword, uword = 0);
 
@@ -67,8 +66,6 @@ public:
 
     void csc_condense() override;
     void csr_condense() override;
-
-    int iterative_solve(Mat<T>&, const Mat<T>&) override;
 };
 
 template<sp_d T> SparseMat<T>::SparseMat(const uword in_row, const uword in_col, const uword in_elem)
@@ -150,11 +147,6 @@ template<sp_d T> int SparseMat<T>::sign_det() const { throw invalid_argument("no
 template<sp_d T> void SparseMat<T>::csc_condense() { triplet_mat.csc_condense(); }
 
 template<sp_d T> void SparseMat<T>::csr_condense() { triplet_mat.csr_condense(); }
-
-template<sp_d T> int SparseMat<T>::iterative_solve(Mat<T>& X, const Mat<T>& B) {
-    csc_condense();
-    return MetaMat<T>::iterative_solve(X, B);
-}
 
 #endif
 

@@ -50,11 +50,13 @@ int eig_solve(vec& eigval, mat& eigvec, const std::shared_ptr<MetaMat<double>>& 
         if(vec Y(WORKD.memptr() + IPNTR[1] - 1, N, false); -1 == IDO) {
             vec X(WORKD.memptr() + IPNTR[0] - 1, N, false);
             X = K * X;
-            Y = M->solve(X);
+            INFO = M->solve(Y, X);
+            if(0 != INFO) break;
         }
         else if(1 == IDO) {
             const vec X(WORKD.memptr() + IPNTR[2] - 1, N, false);
-            Y = M->solve(X);
+            INFO = M->solve(Y, X);
+            if(0 != INFO) break;
         }
         else if(2 == IDO) {
             const vec X(WORKD.memptr() + IPNTR[0] - 1, N, false);
@@ -115,11 +117,13 @@ int eig_solve(cx_vec& eigval, cx_mat& eigvec, const std::shared_ptr<MetaMat<doub
         if(vec Y(WORKD.memptr() + IPNTR[1] - 1, N, false); -1 == IDO) {
             vec X(WORKD.memptr() + IPNTR[0] - 1, N, false);
             X = M * X;
-            Y = K->solve(X);
+            INFO = K->solve(Y, X);
+            if(0 != INFO) break;
         }
         else if(1 == IDO) {
             const vec X(WORKD.memptr() + IPNTR[2] - 1, N, false);
-            Y = K->solve(X);
+            INFO = K->solve(Y, X);
+            if(0 != INFO) break;
         }
         else if(2 == IDO) {
             const vec X(WORKD.memptr() + IPNTR[0] - 1, N, false);

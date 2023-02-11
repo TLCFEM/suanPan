@@ -44,6 +44,8 @@ template<sp_d T> class SparseMatBaseFGMRES : public SparseMat<T> {
     podarray<double> dpar;
     podarray<double> work;
 
+    int direct_solve(Mat<T>&, const Mat<T>&) override;
+
 public:
     SparseMatBaseFGMRES(uword, uword, uword, bool);
     SparseMatBaseFGMRES(const SparseMatBaseFGMRES&) = default;
@@ -51,8 +53,6 @@ public:
     SparseMatBaseFGMRES& operator=(const SparseMatBaseFGMRES&) = delete;
     SparseMatBaseFGMRES& operator=(SparseMatBaseFGMRES&&) noexcept = delete;
     ~SparseMatBaseFGMRES() override;
-
-    int direct_solve(Mat<T>&, const Mat<T>&) override;
 };
 
 template<sp_d T> SparseMatBaseFGMRES<T>::SparseMatBaseFGMRES(const uword in_row, const uword in_col, const uword in_elem, const bool in_sym)

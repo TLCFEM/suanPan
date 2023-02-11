@@ -37,6 +37,30 @@
 template<typename T, typename U> concept ArmaContainer = std::is_floating_point_v<U> && (std::is_convertible_v<T, Mat<U>> || std::is_convertible_v<T, SpMat<U>>) ;
 
 template<sp_d T> class MetaMat {
+    template<ArmaContainer<T> C> Mat<T> direct_solve(const C& B) {
+        Mat<T> X;
+        if(0 != this->direct_solve(X, B)) X.reset();
+        return X;
+    }
+
+    template<ArmaContainer<T> C> Mat<T> direct_solve(C&& B) {
+        Mat<T> X;
+        if(0 != this->direct_solve(X, std::forward<C>(B))) X.reset();
+        return X;
+    }
+
+    virtual int direct_solve(Mat<T>&, const Mat<T>&) = 0;
+    virtual int direct_solve(Mat<T>&, Mat<T>&&);
+
+    int direct_solve(Mat<T>&, const SpMat<T>&);
+    int direct_solve(Mat<T>&, SpMat<T>&&);
+
+    Mat<T> iterative_solve(const Mat<T>&);
+    Mat<T> iterative_solve(const SpMat<T>&);
+
+    int iterative_solve(Mat<T>&, const Mat<T>&);
+    int iterative_solve(Mat<T>&, const SpMat<T>&);
+
 protected:
     bool factored = false;
 
@@ -101,55 +125,17 @@ public:
 
     virtual void operator*=(T) = 0;
 
-    template<ArmaContainer<T> C> Mat<T> solve(const C& B) {
-        if(IterativeSolver::NONE == this->setting.iterative_solver) return this->direct_solve(B);
-        return this->iterative_solve(B);
-    }
+    template<ArmaContainer<T> C> int solve(Mat<T>& X, const C& B) { return IterativeSolver::NONE == this->setting.iterative_solver ? this->direct_solve(X, B) : this->iterative_solve(X, B); }
 
-    template<ArmaContainer<T> C> Mat<T> solve(C&& B) {
-        if(IterativeSolver::NONE == this->setting.iterative_solver) return this->direct_solve(std::forward<C>(B));
-        return this->iterative_solve(std::forward<C>(B));
-    }
-
-    template<ArmaContainer<T> C> int solve(Mat<T>& X, const C& B) {
-        if(IterativeSolver::NONE == this->setting.iterative_solver) return this->direct_solve(X, B);
-        return this->iterative_solve(X, B);
-    }
-
-    template<ArmaContainer<T> C> int solve(Mat<T>& X, C&& B) {
-        if(IterativeSolver::NONE == this->setting.iterative_solver) return this->direct_solve(X, std::forward<C>(B));
-        return this->iterative_solve(X, std::forward<C>(B));
-    }
-
-    template<ArmaContainer<T> C> Mat<T> direct_solve(const C& B) {
-        Mat<T> X;
-        if(0 != this->direct_solve(X, B)) X.reset();
-        return X;
-    }
-
-    template<ArmaContainer<T> C> Mat<T> direct_solve(C&& B) {
-        Mat<T> X;
-        if(0 != this->direct_solve(X, std::forward<C>(B))) X.reset();
-        return X;
-    }
-
-    virtual int direct_solve(Mat<T>&, const Mat<T>&) = 0;
-    virtual int direct_solve(Mat<T>&, const SpMat<T>&);
-    virtual int direct_solve(Mat<T>&, Mat<T>&&);
-    virtual int direct_solve(Mat<T>&, SpMat<T>&&);
+    template<ArmaContainer<T> C> int solve(Mat<T>& X, C&& B) { return IterativeSolver::NONE == this->setting.iterative_solver ? this->direct_solve(X, std::forward<C>(B)) : this->iterative_solve(X, std::forward<C>(B)); }
 
     [[nodiscard]] virtual int sign_det() const = 0;
 
     void save(const char*);
 
-    virtual void csc_condense();
-    virtual void csr_condense();
+    virtual void csc_condense() {}
 
-    Mat<T> iterative_solve(const Mat<T>&);
-    Mat<T> iterative_solve(const SpMat<T>&);
-
-    virtual int iterative_solve(Mat<T>&, const Mat<T>&);
-    int iterative_solve(Mat<T>&, const SpMat<T>&);
+    virtual void csr_condense() {}
 
     [[nodiscard]] Col<T> evaluate(const Col<T>&) const;
 };
@@ -179,10 +165,6 @@ template<sp_d T> void MetaMat<T>::save(const char* name) {
         suanpan_error("Cannot save to file \"{}\".\n", name);
 }
 
-template<sp_d T> void MetaMat<T>::csc_condense() {}
-
-template<sp_d T> void MetaMat<T>::csr_condense() {}
-
 template<sp_d T> Mat<T> MetaMat<T>::iterative_solve(const Mat<T>& B) {
     Mat<T> X;
     if(SUANPAN_SUCCESS != this->iterative_solve(X, B)) X.reset();
@@ -192,6 +174,8 @@ template<sp_d T> Mat<T> MetaMat<T>::iterative_solve(const Mat<T>& B) {
 template<sp_d T> Mat<T> MetaMat<T>::iterative_solve(const SpMat<T>& B) { return this->iterative_solve(Mat<T>(B)); }
 
 template<sp_d T> int MetaMat<T>::iterative_solve(Mat<T>& X, const Mat<T>& B) {
+    this->csc_condense();
+
     X.zeros(arma::size(B));
 
     unique_ptr<Preconditioner<T>> preconditioner;

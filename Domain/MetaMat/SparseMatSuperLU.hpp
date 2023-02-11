@@ -56,8 +56,8 @@ template<sp_d T> class SparseMatSuperLU final : public SparseMat<T> {
 
     bool allocated = false;
 
-    template<sp_d ET> void alloc_supermatrix(csc_form<ET, int>&&);
-    void dealloc_supermatrix();
+    template<sp_d ET> void alloc(csc_form<ET, int>&&);
+    void dealloc();
 
     template<sp_d ET> void wrap_b(const Mat<ET>&);
     template<sp_d ET> void tri_solve(int&);
@@ -65,6 +65,9 @@ template<sp_d T> class SparseMatSuperLU final : public SparseMat<T> {
 
     int solve_trs(Mat<T>&, Mat<T>&&);
     int solve_trs(Mat<T>&, const Mat<T>&);
+
+    int direct_solve(Mat<T>&, Mat<T>&&) override;
+    int direct_solve(Mat<T>&, const Mat<T>&) override;
 
 public:
     SparseMatSuperLU(uword, uword, uword = 0);
@@ -77,13 +80,10 @@ public:
     void zeros() override;
 
     unique_ptr<MetaMat<T>> make_copy() override;
-
-    int direct_solve(Mat<T>&, Mat<T>&&) override;
-    int direct_solve(Mat<T>&, const Mat<T>&) override;
 };
 
-template<sp_d T> template<sp_d ET> void SparseMatSuperLU<T>::alloc_supermatrix(csc_form<ET, int>&& in) {
-    dealloc_supermatrix();
+template<sp_d T> template<sp_d ET> void SparseMatSuperLU<T>::alloc(csc_form<ET, int>&& in) {
+    dealloc();
 
     auto t_size = sizeof(ET) * in.n_elem;
     t_val = superlu_malloc(t_size);
@@ -112,7 +112,7 @@ template<sp_d T> template<sp_d ET> void SparseMatSuperLU<T>::alloc_supermatrix(c
     allocated = true;
 }
 
-template<sp_d T> void SparseMatSuperLU<T>::dealloc_supermatrix() {
+template<sp_d T> void SparseMatSuperLU<T>::dealloc() {
     if(!allocated) return;
 
     Destroy_SuperMatrix_Store(&A);
@@ -200,13 +200,13 @@ template<sp_d T> SparseMatSuperLU<T>::SparseMatSuperLU(const SparseMatSuperLU& o
 }
 
 template<sp_d T> SparseMatSuperLU<T>::~SparseMatSuperLU() {
-    dealloc_supermatrix();
+    dealloc();
     StatFree(&stat);
 }
 
 template<sp_d T> void SparseMatSuperLU<T>::zeros() {
     SparseMat<T>::zeros();
-    dealloc_supermatrix();
+    dealloc();
 }
 
 template<sp_d T> unique_ptr<MetaMat<T>> SparseMatSuperLU<T>::make_copy() { return std::make_unique<SparseMatSuperLU>(*this); }
@@ -219,7 +219,7 @@ template<sp_d T> int SparseMatSuperLU<T>::direct_solve(Mat<T>& out_mat, const Ma
     auto flag = 0;
 
     if(std::is_same_v<T, float> || Precision::FULL == this->setting.precision) {
-        alloc_supermatrix(csc_form<T, int>(this->triplet_mat));
+        alloc(csc_form<T, int>(this->triplet_mat));
 
         out_mat = in_mat;
 
@@ -230,7 +230,7 @@ template<sp_d T> int SparseMatSuperLU<T>::direct_solve(Mat<T>& out_mat, const Ma
         return flag;
     }
 
-    alloc_supermatrix(csc_form<float, int>(this->triplet_mat));
+    alloc(csc_form<float, int>(this->triplet_mat));
 
     const fmat f_mat(arma::size(in_mat), fill::none);
 
@@ -290,7 +290,7 @@ template<sp_d T> int SparseMatSuperLU<T>::direct_solve(Mat<T>& out_mat, Mat<T>&&
     auto flag = 0;
 
     if(std::is_same_v<T, float> || Precision::FULL == this->setting.precision) {
-        alloc_supermatrix(csc_form<T, int>(this->triplet_mat));
+        alloc(csc_form<T, int>(this->triplet_mat));
 
         wrap_b(in_mat);
 
@@ -301,7 +301,7 @@ template<sp_d T> int SparseMatSuperLU<T>::direct_solve(Mat<T>& out_mat, Mat<T>&&
         return flag;
     }
 
-    alloc_supermatrix(csc_form<float, int>(this->triplet_mat));
+    alloc(csc_form<float, int>(this->triplet_mat));
 
     const fmat f_mat(arma::size(in_mat), fill::none);
 

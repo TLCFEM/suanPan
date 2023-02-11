@@ -54,6 +54,8 @@ template<sp_d T> class SparseMatCUDA final : public SparseMat<T> {
     template<sp_d ET> void device_alloc(csr_form<ET, int>&&);
     void device_dealloc() const;
 
+    int direct_solve(Mat<T>&, const Mat<T>&) override;
+
 public:
     SparseMatCUDA(uword, uword, uword = 0);
     SparseMatCUDA(const SparseMatCUDA&);
@@ -63,8 +65,6 @@ public:
     ~SparseMatCUDA() override;
 
     unique_ptr<MetaMat<T>> make_copy() override;
-
-    int direct_solve(Mat<T>&, const Mat<T>&) override;
 };
 
 template<sp_d T> void SparseMatCUDA<T>::acquire() {

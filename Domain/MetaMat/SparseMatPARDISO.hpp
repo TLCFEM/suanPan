@@ -50,12 +50,12 @@ template<sp_d T> class SparseMatPARDISO final : public SparseMat<T> {
     int iparm[64];
     std::int64_t pt[64];
 
+    int direct_solve(Mat<T>&, const Mat<T>&) override;
+
 public:
     SparseMatPARDISO(uword, uword, uword = 0);
 
     unique_ptr<MetaMat<T>> make_copy() override;
-
-    int direct_solve(Mat<T>&, const Mat<T>&) override;
 };
 
 template<sp_d T> SparseMatPARDISO<T>::SparseMatPARDISO(const uword in_row, const uword in_col, const uword in_elem)

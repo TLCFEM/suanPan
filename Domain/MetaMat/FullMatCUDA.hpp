@@ -48,6 +48,9 @@ template<sp_d T> class FullMatCUDA final : public FullMat<T> {
     void acquire();
     void release() const;
 
+    int direct_solve(Mat<T>&, Mat<T>&&) override;
+    int direct_solve(Mat<T>&, const Mat<T>&) override;
+
 public:
     FullMatCUDA(uword, uword);
     FullMatCUDA(const FullMatCUDA&);
@@ -57,9 +60,6 @@ public:
     ~FullMatCUDA() override;
 
     unique_ptr<MetaMat<T>> make_copy() override;
-
-    int direct_solve(Mat<T>&, Mat<T>&&) override;
-    int direct_solve(Mat<T>&, const Mat<T>&) override;
 };
 
 template<sp_d T> void FullMatCUDA<T>::acquire() {
