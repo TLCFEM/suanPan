@@ -44,26 +44,25 @@ template<sp_d T> class SparseMatBaseFGMRES : public SparseMat<T> {
     podarray<double> dpar;
     podarray<double> work;
 
+protected:
     int direct_solve(Mat<T>&, const Mat<T>&) override;
 
 public:
-    SparseMatBaseFGMRES(uword, uword, uword, bool);
+    SparseMatBaseFGMRES(const uword in_row, const uword in_col, const uword in_elem, const bool in_sym)
+        : SparseMat<T>(in_row, in_col, in_elem)
+        , descr{in_sym ? SPARSE_MATRIX_TYPE_SYMMETRIC : SPARSE_MATRIX_TYPE_GENERAL, SPARSE_FILL_MODE_FULL, SPARSE_DIAG_NON_UNIT}
+        , ipar(128)
+        , dpar(128) {}
+
     SparseMatBaseFGMRES(const SparseMatBaseFGMRES&) = default;
     SparseMatBaseFGMRES(SparseMatBaseFGMRES&&) noexcept = delete;
     SparseMatBaseFGMRES& operator=(const SparseMatBaseFGMRES&) = delete;
     SparseMatBaseFGMRES& operator=(SparseMatBaseFGMRES&&) noexcept = delete;
-    ~SparseMatBaseFGMRES() override;
+
+    ~SparseMatBaseFGMRES() override {
+        mkl_free_buffers();
+    }
 };
-
-template<sp_d T> SparseMatBaseFGMRES<T>::SparseMatBaseFGMRES(const uword in_row, const uword in_col, const uword in_elem, const bool in_sym)
-    : SparseMat<T>(in_row, in_col, in_elem)
-    , descr{in_sym ? SPARSE_MATRIX_TYPE_SYMMETRIC : SPARSE_MATRIX_TYPE_GENERAL, SPARSE_FILL_MODE_FULL, SPARSE_DIAG_NON_UNIT}
-    , ipar(128)
-    , dpar(128) {}
-
-template<sp_d T> SparseMatBaseFGMRES<T>::~SparseMatBaseFGMRES() {
-    mkl_free_buffers();
-}
 
 template<sp_d T> int SparseMatBaseFGMRES<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
     const auto N = static_cast<int>(B.n_rows);
@@ -111,27 +110,19 @@ template<sp_d T> int SparseMatBaseFGMRES<T>::direct_solve(Mat<T>& X, const Mat<T
 
 template<sp_d T> class SparseMatFGMRES : public SparseMatBaseFGMRES<T> {
 public:
-    SparseMatFGMRES(uword, uword, uword = 0);
+    SparseMatFGMRES(const uword in_row, const uword in_col, const uword in_elem = 0)
+        : SparseMatBaseFGMRES<T>(in_row, in_col, in_elem, false) {}
 
-    unique_ptr<MetaMat<T>> make_copy() override;
+    unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SparseMatFGMRES>(*this); }
 };
-
-template<sp_d T> SparseMatFGMRES<T>::SparseMatFGMRES(const uword in_row, const uword in_col, const uword in_elem)
-    : SparseMatBaseFGMRES<T>(in_row, in_col, in_elem, false) {}
-
-template<sp_d T> unique_ptr<MetaMat<T>> SparseMatFGMRES<T>::make_copy() { return std::make_unique<SparseMatFGMRES>(*this); }
 
 template<sp_d T> class SparseSymmMatFGMRES : public SparseMatBaseFGMRES<T> {
 public:
-    SparseSymmMatFGMRES(uword, uword, uword = 0);
+    SparseSymmMatFGMRES(const uword in_row, const uword in_col, const uword in_elem = 0)
+        : SparseMatBaseFGMRES<T>(in_row, in_col, in_elem, true) {}
 
-    unique_ptr<MetaMat<T>> make_copy() override;
+    unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SparseSymmMatFGMRES>(*this); }
 };
-
-template<sp_d T> SparseSymmMatFGMRES<T>::SparseSymmMatFGMRES(const uword in_row, const uword in_col, const uword in_elem)
-    : SparseMatBaseFGMRES<T>(in_row, in_col, in_elem, true) {}
-
-template<sp_d T> unique_ptr<MetaMat<T>> SparseSymmMatFGMRES<T>::make_copy() { return std::make_unique<SparseSymmMatFGMRES>(*this); }
 
 #endif
 

@@ -37,9 +37,14 @@
 template<typename T, typename U> concept ArmaContainer = std::is_floating_point_v<U> && (std::is_convertible_v<T, Mat<U>> || std::is_convertible_v<T, SpMat<U>>) ;
 
 template<sp_d T> class MetaMat {
+protected:
+    bool factored = false;
+
+    SolverSetting<T> setting{};
+
     virtual int direct_solve(Mat<T>&, const Mat<T>&) = 0;
 
-    virtual int direct_solve(Mat<T>& X, Mat<T>&& B) { return this->direct_solve(X, B); }
+    virtual int direct_solve(Mat<T>&, Mat<T>&&) = 0;
 
     int direct_solve(Mat<T>& X, const SpMat<T>& B) { return this->direct_solve(X, Mat<T>(B)); }
 
@@ -48,11 +53,6 @@ template<sp_d T> class MetaMat {
     int iterative_solve(Mat<T>&, const Mat<T>&);
 
     int iterative_solve(Mat<T>& X, const SpMat<T>& B) { return this->iterative_solve(X, Mat<T>(B)); }
-
-protected:
-    bool factored = false;
-
-    SolverSetting<T> setting{};
 
 public:
     triplet_form<T, uword> triplet_mat;

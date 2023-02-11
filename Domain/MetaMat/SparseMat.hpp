@@ -32,6 +32,11 @@
 #include "MetaMat.hpp"
 
 template<sp_d T> class SparseMat : public MetaMat<T> {
+protected:
+    using MetaMat<T>::direct_solve;
+
+    int direct_solve(Mat<T>& X, Mat<T>&& B) override { return this->direct_solve(X, B); }
+
 public:
     SparseMat(const uword in_row, const uword in_col, const uword in_elem = 0)
         : MetaMat<T>(in_row, in_col, 0) { this->triplet_mat.init(in_elem); }
@@ -39,33 +44,24 @@ public:
     [[nodiscard]] bool is_empty() const override { return this->triplet_mat.is_empty(); }
 
     void zeros() override {
-        this->triplet_mat.zeros();
         this->factored = false;
+        this->triplet_mat.zeros();
     }
 
     void nullify(const uword idx) override {
-        using index_t = typename decltype(this->triplet_mat)::index_type;
-
-        const auto t_idx = static_cast<index_t>(idx);
-
-        suanpan_for(static_cast<index_t>(0), this->triplet_mat.n_elem, [&](const index_t I) { if(this->triplet_mat.row(I) == t_idx || this->triplet_mat.col(I) == t_idx) this->triplet_mat.val_mem()[I] = T(0); });
-
         this->factored = false;
+        suanpan_for(static_cast<uword>(0), this->triplet_mat.n_elem, [&](const uword I) { if(this->triplet_mat.row(I) == idx || this->triplet_mat.col(I) == idx) this->triplet_mat.val_mem()[I] = T(0); });
     }
 
     [[nodiscard]] T max() const override { return this->triplet_mat.max(); }
 
     [[nodiscard]] Col<T> diag() const override { return this->triplet_mat.diag(); }
 
-    T operator()(const uword in_row, const uword in_col) const override {
-        using index_t = typename decltype(this->triplet_mat)::index_type;
-        return this->triplet_mat(static_cast<index_t>(in_row), static_cast<index_t>(in_col));
-    }
+    T operator()(const uword in_row, const uword in_col) const override { return this->triplet_mat(in_row, in_col); }
 
     T& at(const uword in_row, const uword in_col) override {
         this->factored = false;
-        using index_t = typename decltype(this->triplet_mat)::index_type;
-        return this->triplet_mat.at(static_cast<index_t>(in_row), static_cast<index_t>(in_col));
+        return this->triplet_mat.at(in_row, in_col);
     }
 
     [[nodiscard]] const T* memptr() const override { throw invalid_argument("not supported"); }
@@ -75,30 +71,33 @@ public:
     void operator+=(const shared_ptr<MetaMat<T>>& in_mat) override {
         if(nullptr == in_mat) return;
         if(!in_mat->triplet_mat.is_empty()) return this->operator+=(in_mat->triplet_mat);
-        if(this->n_rows != in_mat->n_rows || this->n_cols != in_mat->n_cols) throw invalid_argument("size mismatch");
+        this->factored = false;
         for(uword I = 0llu; I < in_mat->n_rows; ++I) for(uword J = 0llu; J < in_mat->n_cols; ++J) if(const auto t_val = in_mat->operator()(I, J); !suanpan::approx_equal(T(0), t_val)) at(I, J) = t_val;
     }
 
     void operator-=(const shared_ptr<MetaMat<T>>& in_mat) override {
         if(nullptr == in_mat) return;
         if(!in_mat->triplet_mat.is_empty()) return this->operator-=(in_mat->triplet_mat);
-        if(this->n_rows != in_mat->n_rows || this->n_cols != in_mat->n_cols) throw invalid_argument("size mismatch");
+        this->factored = false;
         for(uword I = 0llu; I < in_mat->n_rows; ++I) for(uword J = 0llu; J < in_mat->n_cols; ++J) if(const auto t_val = in_mat->operator()(I, J); !suanpan::approx_equal(T(0), t_val)) at(I, J) = -t_val;
     }
 
     void operator+=(const triplet_form<T, uword>& in_mat) override {
-        this->triplet_mat += in_mat;
         this->factored = false;
+        this->triplet_mat += in_mat;
     }
 
     void operator-=(const triplet_form<T, uword>& in_mat) override {
-        this->triplet_mat -= in_mat;
         this->factored = false;
+        this->triplet_mat -= in_mat;
     }
 
     Mat<T> operator*(const Mat<T>& in_mat) const override { return this->triplet_mat * in_mat; }
 
-    void operator*=(const T scalar) override { this->triplet_mat *= scalar; }
+    void operator*=(const T scalar) override {
+        this->factored = false;
+        this->triplet_mat *= scalar;
+    }
 
     [[nodiscard]] int sign_det() const override { throw invalid_argument("not supported"); }
 

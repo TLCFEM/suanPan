@@ -33,6 +33,10 @@
 
 template<sp_d T> class DenseMat : public MetaMat<T> {
 protected:
+    using MetaMat<T>::direct_solve;
+
+    int direct_solve(Mat<T>& X, const Mat<T>& B) override { return this->direct_solve(X, Mat<T>(B)); }
+
     podarray<int> pivot;
     podarray<float> s_memory; // float storage used in mixed precision algorithm
 
@@ -40,9 +44,7 @@ protected:
 
     podarray<float> to_float() {
         podarray<float> f_memory(this->n_elem);
-
         suanpan_for(0llu, this->n_elem, [&](const uword I) { f_memory(I) = static_cast<float>(memory[I]); });
-
         return f_memory;
     }
 
@@ -65,8 +67,8 @@ public:
     [[nodiscard]] bool is_empty() const override { return 0 == this->n_elem; }
 
     void zeros() override {
-        arrayops::fill_zeros(memptr(), this->n_elem);
         this->factored = false;
+        arrayops::fill_zeros(memptr(), this->n_elem);
     }
 
     [[nodiscard]] T max() const override {
@@ -77,9 +79,7 @@ public:
 
     [[nodiscard]] Col<T> diag() const override {
         Col<T> diag_vec(std::min(this->n_rows, this->n_cols), fill::none);
-
         suanpan_for(0llu, diag_vec.n_elem, [&](const uword I) { diag_vec(I) = this->operator()(I, I); });
-
         return diag_vec;
     }
 
@@ -92,8 +92,8 @@ public:
         if(!M->triplet_mat.is_empty()) return this->operator+=(M->triplet_mat);
         if(this->n_rows != M->n_rows || this->n_cols != M->n_cols || this->n_elem != M->n_elem) throw invalid_argument("size mismatch");
         if(nullptr == M->memptr()) return;
-        arrayops::inplace_plus(memptr(), M->memptr(), this->n_elem);
         this->factored = false;
+        arrayops::inplace_plus(memptr(), M->memptr(), this->n_elem);
     }
 
     void operator-=(const shared_ptr<MetaMat<T>>& M) override {
@@ -101,13 +101,13 @@ public:
         if(!M->triplet_mat.is_empty()) return this->operator-=(M->triplet_mat);
         if(this->n_rows != M->n_rows || this->n_cols != M->n_cols || this->n_elem != M->n_elem) throw invalid_argument("size mismatch");
         if(nullptr == M->memptr()) return;
-        arrayops::inplace_minus(memptr(), M->memptr(), this->n_elem);
         this->factored = false;
+        arrayops::inplace_minus(memptr(), M->memptr(), this->n_elem);
     }
 
     void operator+=(const triplet_form<T, uword>& M) override {
         if(this->n_rows != M.n_rows || this->n_cols != M.n_cols) throw invalid_argument("size mismatch");
-
+        this->factored = false;
         const auto row = M.row_mem();
         const auto col = M.col_mem();
         const auto val = M.val_mem();
@@ -116,14 +116,17 @@ public:
 
     void operator-=(const triplet_form<T, uword>& M) override {
         if(this->n_rows != M.n_rows || this->n_cols != M.n_cols) throw invalid_argument("size mismatch");
-
+        this->factored = false;
         const auto row = M.row_mem();
         const auto col = M.col_mem();
         const auto val = M.val_mem();
         for(uword I = 0llu; I < M.n_elem; ++I) this->at(row[I], col[I]) -= val[I];
     }
 
-    void operator*=(const T value) override { arrayops::inplace_mul(memptr(), value, this->n_elem); }
+    void operator*=(const T value) override {
+        this->factored = false;
+        arrayops::inplace_mul(memptr(), value, this->n_elem);
+    }
 
     [[nodiscard]] int sign_det() const override {
         if(IterativeSolver::NONE != this->setting.iterative_solver) throw invalid_argument("analysis requires the sign of determinant but iterative solver does not support it");

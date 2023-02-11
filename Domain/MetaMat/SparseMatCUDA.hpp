@@ -48,71 +48,61 @@ template<sp_d T> class SparseMatCUDA final : public SparseMat<T> {
     void* d_col_idx = nullptr;
     void* d_row_ptr = nullptr;
 
-    void acquire();
-    void release() const;
+    void acquire() {
+        cusolverSpCreate(&handle);
+        cudaStreamCreate(&stream);
+        cusolverSpSetStream(handle, stream);
+        cusparseCreateMatDescr(&descr);
+        cusparseSetMatType(descr, CUSPARSE_MATRIX_TYPE_GENERAL);
+        cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO);
+        cudaMalloc(&d_row_ptr, sizeof(int) * (this->n_rows + 1));
+    }
 
-    template<sp_d ET> void device_alloc(csr_form<ET, int>&&);
-    void device_dealloc() const;
+    void release() const {
+        if(handle) cusolverSpDestroy(handle);
+        if(stream) cudaStreamDestroy(stream);
+        if(descr) cusparseDestroyMatDescr(descr);
+        if(d_row_ptr) cudaFree(d_row_ptr);
+    }
 
+    template<sp_d ET> void device_alloc(csr_form<ET, int>&& csr_mat) {
+        const size_t n_val = sizeof(ET) * csr_mat.n_elem;
+        const size_t n_col = sizeof(int) * csr_mat.n_elem;
+
+        cudaMalloc(&d_val_idx, n_val);
+        cudaMalloc(&d_col_idx, n_col);
+
+        cudaMemcpyAsync(d_val_idx, csr_mat.val_mem(), n_val, cudaMemcpyHostToDevice, stream);
+        cudaMemcpyAsync(d_col_idx, csr_mat.col_mem(), n_col, cudaMemcpyHostToDevice, stream);
+        cudaMemcpyAsync(d_row_ptr, csr_mat.row_mem(), sizeof(int) * (csr_mat.n_rows + 1llu), cudaMemcpyHostToDevice, stream);
+    }
+
+    void device_dealloc() const {
+        if(d_val_idx) cudaFree(d_val_idx);
+        if(d_col_idx) cudaFree(d_col_idx);
+    }
+
+protected:
     int direct_solve(Mat<T>&, const Mat<T>&) override;
 
 public:
-    SparseMatCUDA(uword, uword, uword = 0);
-    SparseMatCUDA(const SparseMatCUDA&);
+    SparseMatCUDA(const uword in_row, const uword in_col, const uword in_elem = 0)
+        : SparseMat<T>(in_row, in_col, in_elem) { acquire(); }
+
+    SparseMatCUDA(const SparseMatCUDA& other)
+        : SparseMat<T>(other) { acquire(); }
+
     SparseMatCUDA(SparseMatCUDA&&) noexcept = delete;
     SparseMatCUDA& operator=(const SparseMatCUDA&) = delete;
     SparseMatCUDA& operator=(SparseMatCUDA&&) noexcept = delete;
-    ~SparseMatCUDA() override;
 
-    unique_ptr<MetaMat<T>> make_copy() override;
+    ~SparseMatCUDA() override {
+        release();
+        device_dealloc();
+    }
+
+    unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SparseMatCUDA>(*this); }
 };
-
-template<sp_d T> void SparseMatCUDA<T>::acquire() {
-    cusolverSpCreate(&handle);
-    cudaStreamCreate(&stream);
-    cusolverSpSetStream(handle, stream);
-    cusparseCreateMatDescr(&descr);
-    cusparseSetMatType(descr, CUSPARSE_MATRIX_TYPE_GENERAL);
-    cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO);
-    cudaMalloc(&d_row_ptr, sizeof(int) * (this->n_rows + 1));
-}
-
-template<sp_d T> void SparseMatCUDA<T>::release() const {
-    if(handle) cusolverSpDestroy(handle);
-    if(stream) cudaStreamDestroy(stream);
-    if(descr) cusparseDestroyMatDescr(descr);
-    if(d_row_ptr) cudaFree(d_row_ptr);
-}
-
-template<sp_d T> template<sp_d ET> void SparseMatCUDA<T>::device_alloc(csr_form<ET, int>&& csr_mat) {
-    const size_t n_val = sizeof(ET) * csr_mat.n_elem;
-    const size_t n_col = sizeof(int) * csr_mat.n_elem;
-
-    cudaMalloc(&d_val_idx, n_val);
-    cudaMalloc(&d_col_idx, n_col);
-
-    cudaMemcpyAsync(d_val_idx, csr_mat.val_mem(), n_val, cudaMemcpyHostToDevice, stream);
-    cudaMemcpyAsync(d_col_idx, csr_mat.col_mem(), n_col, cudaMemcpyHostToDevice, stream);
-    cudaMemcpyAsync(d_row_ptr, csr_mat.row_mem(), sizeof(int) * (csr_mat.n_rows + 1llu), cudaMemcpyHostToDevice, stream);
-}
-
-template<sp_d T> void SparseMatCUDA<T>::device_dealloc() const {
-    if(d_val_idx) cudaFree(d_val_idx);
-    if(d_col_idx) cudaFree(d_col_idx);
-}
-
-template<sp_d T> SparseMatCUDA<T>::SparseMatCUDA(const uword in_row, const uword in_col, const uword in_elem)
-    : SparseMat<T>(in_row, in_col, in_elem) { acquire(); }
-
-template<sp_d T> SparseMatCUDA<T>::SparseMatCUDA(const SparseMatCUDA& other)
-    : SparseMat<T>(other) { acquire(); }
-
-template<sp_d T> SparseMatCUDA<T>::~SparseMatCUDA() {
-    release();
-    device_dealloc();
-}
-
-template<sp_d T> unique_ptr<MetaMat<T>> SparseMatCUDA<T>::make_copy() { return std::make_unique<SparseMatCUDA>(*this); }
 
 template<sp_d T> int SparseMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
     if(!this->factored) {
@@ -135,7 +125,7 @@ template<sp_d T> int SparseMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) 
     int singularity;
     auto code = 0;
 
-    if(std::is_same_v<T, float>) {
+    if constexpr(std::is_same_v<T, float>) {
         cudaMemcpyAsync(d_b, B.memptr(), n_rhs, cudaMemcpyHostToDevice, stream);
 
         for(auto I = 0llu; I < B.n_elem; I += B.n_rows) code += cusolverSpScsrlsvqr(handle, int(this->n_rows), int(this->triplet_mat.n_elem), descr, (float*)d_val_idx, (int*)d_row_ptr, (int*)d_col_idx, (float*)d_b + I, float(this->setting.tolerance), 3, (float*)d_x + I, &singularity);
@@ -158,11 +148,11 @@ template<sp_d T> int SparseMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) 
         cudaDeviceSynchronize();
     }
     else {
-        X = arma::zeros(B.n_rows, B.n_cols);
+        X = arma::zeros(arma::size(B));
 
         mat full_residual = B;
 
-        auto multiplier = norm(full_residual);
+        auto multiplier = arma::norm(full_residual);
 
         auto counter = 0u;
         while(counter++ < this->setting.iterative_refinement) {
