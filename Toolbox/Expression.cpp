@@ -65,7 +65,7 @@ ExpressionHolder& ExpressionHolder::operator=(const shared_ptr<Expression>& orig
 }
 
 ExpressionHolder::ExpressionHolder(const ExpressionHolder& old_holder)
-    : expression(old_holder.expression->make_copy()) {}
+    : expression(old_holder.expression ? old_holder.expression->make_copy() : nullptr) {}
 
 Expression* ExpressionHolder::operator->() const { return expression.get(); }
 
