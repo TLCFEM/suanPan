@@ -47,7 +47,6 @@ public:
 
     unique_ptr<MetaMat<T>> make_copy() override;
 
-    void unify(uword) override;
     void nullify(uword) override;
 
     T operator()(uword, uword) const override;
@@ -67,11 +66,6 @@ template<sp_d T> SymmPackMat<T>::SymmPackMat(const uword in_size)
     , length(2 * in_size - 1) {}
 
 template<sp_d T> unique_ptr<MetaMat<T>> SymmPackMat<T>::make_copy() { return std::make_unique<SymmPackMat>(*this); }
-
-template<sp_d T> void SymmPackMat<T>::unify(const uword K) {
-    nullify(K);
-    this->memory[(length - K + 2) * K / 2] = 1.;
-}
 
 template<sp_d T> void SymmPackMat<T>::nullify(const uword K) {
     suanpan_for(0llu, K, [&](const uword I) { this->memory[K + (length - I) * I / 2] = 0.; });
