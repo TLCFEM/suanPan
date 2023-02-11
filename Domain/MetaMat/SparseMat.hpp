@@ -47,7 +47,7 @@ public:
     [[nodiscard]] T max() const override;
     [[nodiscard]] Col<T> diag() const override;
 
-    const T& operator()(uword, uword) const override;
+    T operator()(uword, uword) const override;
     T& at(uword, uword) override;
 
     [[nodiscard]] const T* memptr() const override;
@@ -100,7 +100,7 @@ template<sp_d T> T SparseMat<T>::max() const { return triplet_mat.max(); }
 
 template<sp_d T> Col<T> SparseMat<T>::diag() const { return triplet_mat.diag(); }
 
-template<sp_d T> const T& SparseMat<T>::operator()(const uword in_row, const uword in_col) const {
+template<sp_d T> T SparseMat<T>::operator()(const uword in_row, const uword in_col) const {
     using index_t = typename decltype(triplet_mat)::index_type;
     return triplet_mat(static_cast<index_t>(in_row), static_cast<index_t>(in_col));
 }

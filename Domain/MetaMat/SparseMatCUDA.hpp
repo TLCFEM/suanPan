@@ -112,7 +112,7 @@ template<sp_d T> SparseMatCUDA<T>::~SparseMatCUDA() {
     device_dealloc();
 }
 
-template<sp_d T> unique_ptr<MetaMat<T>> SparseMatCUDA<T>::make_copy() { return std::make_unique<SparseMatCUDA<T>>(*this); }
+template<sp_d T> unique_ptr<MetaMat<T>> SparseMatCUDA<T>::make_copy() { return std::make_unique<SparseMatCUDA>(*this); }
 
 template<sp_d T> int SparseMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
     if(!this->factored) {
