@@ -33,7 +33,7 @@
 class CustomElastic1D final : public Material1D {
     const unsigned expression_tag;
 
-    shared_ptr<Expression> expression;
+    ExpressionHolder expression;
 
 public:
     CustomElastic1D(unsigned,   // tag

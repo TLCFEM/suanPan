@@ -38,7 +38,7 @@ class CustomHoffman final : public NonlinearHoffman {
 
     const unsigned k_tag;
 
-    shared_ptr<Expression> k_expression;
+    ExpressionHolder k_expression;
 
 public:
     CustomHoffman(unsigned,   // tag

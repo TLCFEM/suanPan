@@ -38,7 +38,7 @@ class CustomViscosity final : public NonlinearViscosity {
 
     const unsigned expression_tag;
 
-    shared_ptr<Expression> expression;
+    ExpressionHolder expression;
 
 public:
     CustomViscosity(unsigned, // tag

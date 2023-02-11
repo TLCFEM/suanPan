@@ -38,7 +38,7 @@ class CustomCC final : public NonlinearCamClay {
 
     const unsigned a_tag;
 
-    shared_ptr<Expression> a_expression;
+    ExpressionHolder a_expression;
 
 public:
     CustomCC(unsigned,   // tag

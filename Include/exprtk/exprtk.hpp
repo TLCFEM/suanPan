@@ -37314,18 +37314,23 @@ namespace exprtk
    {
       const T x_init = x;
       const T _2h    = T(2) * h;
-
-      x = x_init + _2h;
+      const T _3h    = T(3) * h;
+      
+      x = x_init - _3h;
       const T y0 = e.value();
-      x = x_init + h;
+      x = x_init - _2h;
       const T y1 = e.value();
       x = x_init - h;
       const T y2 = e.value();
-      x = x_init - _2h;
+      x = x_init + h;
       const T y3 = e.value();
+      x = x_init + _2h;
+      const T y4 = e.value();
+      x = x_init + _3h;
+      const T y5 = e.value();
       x = x_init;
 
-      return (-y0 + T(8) * (y1 - y2) + y3) / (T(12) * h);
+      return (y5 - y0 + T(9) * (y1 - y4) + T(45) * (y3 - y2)) / (T(60) * h);
    }
 
    template <typename T>

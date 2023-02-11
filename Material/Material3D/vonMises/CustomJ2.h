@@ -40,7 +40,7 @@ class CustomJ2 final : public NonlinearJ2 {
 
     const unsigned k_tag, h_tag;
 
-    shared_ptr<Expression> k_expression, h_expression;
+    ExpressionHolder k_expression, h_expression;
 
 public:
     CustomJ2(unsigned,   // tag

@@ -38,7 +38,7 @@ class CustomDP final : public NonlinearDruckerPrager {
 
     const unsigned c_tag;
 
-    shared_ptr<Expression> c_expression;
+    ExpressionHolder c_expression;
 
 public:
     CustomDP(unsigned,   // tag
