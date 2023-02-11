@@ -37,29 +37,17 @@
 template<typename T, typename U> concept ArmaContainer = std::is_floating_point_v<U> && (std::is_convertible_v<T, Mat<U>> || std::is_convertible_v<T, SpMat<U>>) ;
 
 template<sp_d T> class MetaMat {
-    template<ArmaContainer<T> C> Mat<T> direct_solve(const C& B) {
-        Mat<T> X;
-        if(0 != this->direct_solve(X, B)) X.reset();
-        return X;
-    }
-
-    template<ArmaContainer<T> C> Mat<T> direct_solve(C&& B) {
-        Mat<T> X;
-        if(0 != this->direct_solve(X, std::forward<C>(B))) X.reset();
-        return X;
-    }
-
     virtual int direct_solve(Mat<T>&, const Mat<T>&) = 0;
-    virtual int direct_solve(Mat<T>&, Mat<T>&&);
 
-    int direct_solve(Mat<T>&, const SpMat<T>&);
-    int direct_solve(Mat<T>&, SpMat<T>&&);
+    virtual int direct_solve(Mat<T>& X, Mat<T>&& B) { return this->direct_solve(X, B); }
 
-    Mat<T> iterative_solve(const Mat<T>&);
-    Mat<T> iterative_solve(const SpMat<T>&);
+    int direct_solve(Mat<T>& X, const SpMat<T>& B) { return this->direct_solve(X, Mat<T>(B)); }
+
+    int direct_solve(Mat<T>& X, SpMat<T>&& B) { return this->direct_solve(X, B); }
 
     int iterative_solve(Mat<T>&, const Mat<T>&);
-    int iterative_solve(Mat<T>&, const SpMat<T>&);
+
+    int iterative_solve(Mat<T>& X, const SpMat<T>& B) { return this->iterative_solve(X, Mat<T>(B)); }
 
 protected:
     bool factored = false;
@@ -73,24 +61,34 @@ public:
     const uword n_cols;
     const uword n_elem;
 
-    MetaMat(uword, uword, uword);
+    MetaMat(const uword in_rows, const uword in_cols, const uword in_elem)
+        : triplet_mat(in_rows, in_cols)
+        , n_rows(in_rows)
+        , n_cols(in_cols)
+        , n_elem(in_elem) {}
+
     MetaMat(const MetaMat&) = default;
     MetaMat(MetaMat&&) noexcept = delete;
     MetaMat& operator=(const MetaMat&) = delete;
     MetaMat& operator=(MetaMat&&) noexcept = delete;
     virtual ~MetaMat() = default;
 
-    void set_solver_setting(const SolverSetting<T>&);
-    [[nodiscard]] SolverSetting<T>& get_solver_setting();
+    void set_solver_setting(const SolverSetting<T>& SS) { setting = SS; }
 
-    void set_factored(bool);
+    [[nodiscard]] SolverSetting<T>& get_solver_setting() { return setting; }
+
+    void set_factored(const bool F) { factored = F; }
 
     [[nodiscard]] virtual bool is_empty() const = 0;
     virtual void zeros() = 0;
 
     virtual unique_ptr<MetaMat> make_copy() = 0;
 
-    virtual void unify(uword) = 0;
+    void unify(const uword K) {
+        this->nullify(K);
+        this->at(K, K) = T(1);
+    }
+
     virtual void nullify(uword) = 0;
 
     [[nodiscard]] virtual T max() const = 0;
@@ -105,7 +103,8 @@ public:
      * \brief Access element without bound check
      * \return value
      */
-    virtual T& unsafe_at(uword, uword);
+    virtual T& unsafe_at(const uword I, const uword J) { return this->at(I, J); }
+
     /**
      * \brief Access element with bound check
      * \return value
@@ -131,47 +130,17 @@ public:
 
     [[nodiscard]] virtual int sign_det() const = 0;
 
-    void save(const char*);
+    void save(const char* name) {
+        if(!to_mat(*this).save(name))
+            suanpan_error("Cannot save to file \"{}\".\n", name);
+    }
 
     virtual void csc_condense() {}
 
     virtual void csr_condense() {}
 
-    [[nodiscard]] Col<T> evaluate(const Col<T>&) const;
+    [[nodiscard]] Col<T> evaluate(const Col<T>& X) const { return this->operator*(X); }
 };
-
-template<sp_d T> MetaMat<T>::MetaMat(const uword in_rows, const uword in_cols, const uword in_elem)
-    : triplet_mat(in_rows, in_cols)
-    , n_rows(in_rows)
-    , n_cols(in_cols)
-    , n_elem(in_elem) {}
-
-template<sp_d T> void MetaMat<T>::set_solver_setting(const SolverSetting<T>& SS) { setting = SS; }
-
-template<sp_d T> SolverSetting<T>& MetaMat<T>::get_solver_setting() { return setting; }
-
-template<sp_d T> void MetaMat<T>::set_factored(const bool F) { factored = F; }
-
-template<sp_d T> T& MetaMat<T>::unsafe_at(const uword I, const uword J) { return this->at(I, J); }
-
-template<sp_d T> int MetaMat<T>::direct_solve(Mat<T>& X, const SpMat<T>& B) { return this->direct_solve(X, Mat<T>(B)); }
-
-template<sp_d T> int MetaMat<T>::direct_solve(Mat<T>& X, Mat<T>&& B) { return this->direct_solve(X, B); }
-
-template<sp_d T> int MetaMat<T>::direct_solve(Mat<T>& X, SpMat<T>&& B) { return this->direct_solve(X, B); }
-
-template<sp_d T> void MetaMat<T>::save(const char* name) {
-    if(!to_mat(*this).save(name))
-        suanpan_error("Cannot save to file \"{}\".\n", name);
-}
-
-template<sp_d T> Mat<T> MetaMat<T>::iterative_solve(const Mat<T>& B) {
-    Mat<T> X;
-    if(SUANPAN_SUCCESS != this->iterative_solve(X, B)) X.reset();
-    return X;
-}
-
-template<sp_d T> Mat<T> MetaMat<T>::iterative_solve(const SpMat<T>& B) { return this->iterative_solve(Mat<T>(B)); }
 
 template<sp_d T> int MetaMat<T>::iterative_solve(Mat<T>& X, const Mat<T>& B) {
     this->csc_condense();
@@ -212,10 +181,6 @@ template<sp_d T> int MetaMat<T>::iterative_solve(Mat<T>& X, const Mat<T>& B) {
 
     return 0 == code ? SUANPAN_SUCCESS : SUANPAN_FAIL;
 }
-
-template<sp_d T> int MetaMat<T>::iterative_solve(Mat<T>& X, const SpMat<T>& B) { return this->iterative_solve(X, Mat<T>(B)); }
-
-template<sp_d T> Col<T> MetaMat<T>::evaluate(const Col<T>& X) const { return this->operator*(X); }
 
 template<sp_d T> Mat<T> to_mat(const MetaMat<T>& in_mat) {
     Mat<T> out_mat(in_mat.n_rows, in_mat.n_cols);
