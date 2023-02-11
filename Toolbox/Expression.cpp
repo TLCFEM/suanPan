@@ -21,11 +21,12 @@
 std::mutex Expression::parser_mutex;
 exprtk::parser<double> Expression::parser; // NOLINT(cppcoreguidelines-interfaces-global-init)
 
-Expression::Expression(const unsigned tag, const std::string& variable_string)
-    : Tag(tag) {
+Expression::Expression(const unsigned tag, std::vector<std::string>&& variable_string)
+    : Tag(tag)
+    , variable_text_list(std::forward<std::vector<std::string>>(variable_string)) {
     symbol_table.add_constants();
 
-    const auto variable_list = suanpan::expression::split(variable_string);
+    const auto variable_list = suanpan::expression::split(variable_text_list[0]);
 
     x.zeros(std::accumulate(variable_list.cbegin(), variable_list.cend(), 0, [](const auto a, const auto b) { return a + b.second; }));
 
@@ -42,14 +43,13 @@ uword Expression::input_size() const { return x.n_elem; }
 
 uword Expression::output_size() const { return 1; }
 
-bool Expression::compile(const std::string& expression_string) {
+bool Expression::compile(const std::string_view& expression_string) {
     expression.register_symbol_table(symbol_table);
-    expression_text = expression_string;
     std::scoped_lock lock{parser_mutex};
-    return parser.compile(expression_string, expression);
+    return parser.compile(expression_text = expression_string, expression);
 }
 
-string Expression::error() { return parser.error(); }
+std::string Expression::error() { return parser.error(); }
 
 Mat<double> Expression::evaluate(const double in_x) { return evaluate(vec{in_x}); }
 
@@ -57,6 +57,27 @@ Mat<double> Expression::gradient(const double in_x) { return gradient(vec{in_x})
 
 void Expression::print() {
     suanpan_info("An expression represents \"{}\".", expression_text);
+}
+
+ExpressionHolder& ExpressionHolder::operator=(const shared_ptr<Expression>& original_expression) {
+    expression = original_expression->make_copy();
+    return *this;
+}
+
+ExpressionHolder::ExpressionHolder(const ExpressionHolder& old_holder)
+    : expression(old_holder.expression ? old_holder.expression->make_copy() : nullptr) {}
+
+Expression* ExpressionHolder::operator->() const { return expression.get(); }
+
+ExpressionHolder::operator bool() const { return expression != nullptr; }
+
+SimpleScalarExpression::SimpleScalarExpression(const unsigned tag, const std::string_view& input_string)
+    : Expression(tag, {std::string{input_string}}) {}
+
+unique_ptr<Expression> SimpleScalarExpression::make_copy() const {
+    auto copy = make_unique<SimpleScalarExpression>(get_tag(), variable_text_list[0]);
+    if(!expression_text.empty()) copy->compile(expression_text);
+    return copy;
 }
 
 Mat<double> SimpleScalarExpression::evaluate(const Col<double>& in_x) {
@@ -71,17 +92,23 @@ Mat<double> SimpleScalarExpression::gradient(const Col<double>& in_x) {
 
     x = in_x;
     Col<double> result(x.n_elem);
-    for(uword I = 0; I < x.n_elem; ++I) result(I) = derivative(expression, x(I));
+    for(uword I = 0; I < x.n_elem; ++I) result(I) = derivative(expression, x(I), 1E-4);
     return result;
 }
 
-SimpleVectorExpression::SimpleVectorExpression(const unsigned tag, const std::string& variable_string, const std::string& output_string)
-    : Expression(tag, variable_string) {
-    const auto variable_list = suanpan::expression::split(output_string);
+SimpleVectorExpression::SimpleVectorExpression(const unsigned tag, const std::string_view& input_string, const std::string_view& output_string)
+    : Expression(tag, {std::string{input_string}, std::string{output_string}}) {
+    const auto variable_list = suanpan::expression::split(variable_text_list[1]);
 
     y.zeros(variable_list[0].second);
 
     symbol_table.add_vector(variable_list[0].first, y.memptr(), y.n_elem);
+}
+
+unique_ptr<Expression> SimpleVectorExpression::make_copy() const {
+    auto copy = make_unique<SimpleVectorExpression>(get_tag(), variable_text_list[0], variable_text_list[1]);
+    if(!expression_text.empty()) copy->compile(expression_text);
+    return copy;
 }
 
 uword SimpleVectorExpression::output_size() const { return y.n_elem; }

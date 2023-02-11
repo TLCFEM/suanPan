@@ -35,7 +35,7 @@
 class CustomGurson1D final : public NonlinearGurson1D {
     const unsigned expression_tag;
 
-    shared_ptr<Expression> expression;
+    ExpressionHolder expression;
 
     [[nodiscard]] vec compute_hardening(double) const override;
 

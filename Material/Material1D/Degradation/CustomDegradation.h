@@ -35,7 +35,7 @@
 class CustomDegradation final : public Degradation {
     const unsigned expression_tag;
 
-    shared_ptr<Expression> expression;
+    ExpressionHolder expression;
 
     [[nodiscard]] podarray<double> compute_degradation(double) const override;
 

@@ -39,7 +39,7 @@ class CustomMises1D final : public NonlinearMises1D {
 
     const unsigned k_tag, h_tag;
 
-    shared_ptr<Expression> k_expression, h_expression;
+    ExpressionHolder k_expression, h_expression;
 
 public:
     CustomMises1D(unsigned,   // tag
