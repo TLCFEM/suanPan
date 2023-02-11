@@ -189,7 +189,7 @@ template<sp_d T> Mat<T> MetaMat<T>::iterative_solve(const Mat<T>& B) {
     return X;
 }
 
-template<sp_d T> Mat<T> MetaMat<T>::iterative_solve(const SpMat<T>& B) { return this->iterative_solve(mat(B)); }
+template<sp_d T> Mat<T> MetaMat<T>::iterative_solve(const SpMat<T>& B) { return this->iterative_solve(Mat<T>(B)); }
 
 template<sp_d T> int MetaMat<T>::iterative_solve(Mat<T>& X, const Mat<T>& B) {
     X.zeros(arma::size(B));
@@ -229,7 +229,7 @@ template<sp_d T> int MetaMat<T>::iterative_solve(Mat<T>& X, const Mat<T>& B) {
     return 0 == code ? SUANPAN_SUCCESS : SUANPAN_FAIL;
 }
 
-template<sp_d T> int MetaMat<T>::iterative_solve(Mat<T>& X, const SpMat<T>& B) { return this->iterative_solve(X, mat(B)); }
+template<sp_d T> int MetaMat<T>::iterative_solve(Mat<T>& X, const SpMat<T>& B) { return this->iterative_solve(X, Mat<T>(B)); }
 
 template<sp_d T> Col<T> MetaMat<T>::evaluate(const Col<T>& X) const { return this->operator*(X); }
 
