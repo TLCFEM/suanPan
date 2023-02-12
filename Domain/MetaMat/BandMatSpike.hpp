@@ -107,7 +107,7 @@ template<sp_d T> Mat<T> BandMatSpike<T>::operator*(const Mat<T>& X) const {
     const auto KL = static_cast<int>(l_band);
     const auto KU = static_cast<int>(u_band);
     const auto LDA = static_cast<int>(m_rows);
-    const auto INC = 1;
+    constexpr auto INC = 1;
     T ALPHA = T(1);
     T BETA = T(0);
 

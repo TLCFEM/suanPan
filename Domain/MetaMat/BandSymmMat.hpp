@@ -88,7 +88,7 @@ template<sp_d T> Mat<T> BandSymmMat<T>::operator*(const Mat<T>& X) const {
     const auto N = static_cast<int>(this->n_cols);
     const auto K = static_cast<int>(band);
     const auto LDA = static_cast<int>(m_rows);
-    const auto INC = 1;
+    constexpr auto INC = 1;
     T ALPHA = T(1);
     T BETA = T(0);
 

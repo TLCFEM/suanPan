@@ -82,7 +82,7 @@ public:
         : MetaMat<T>(old_mat)
         , pivot(old_mat.pivot)
         , s_memory(old_mat.s_memory)
-        , memory(std::unique_ptr<T[]>(new T[this->n_elem])) { std::copy(old_mat.memory.get(), old_mat.memory.get() + old_mat.n_elem, DenseMat::memptr()); }
+        , memory(std::unique_ptr<T[]>(new T[this->n_elem])) { suanpan_for(0llu, this->n_elem, [&](const uword I) { memory[I] = old_mat.memory[I]; }); }
 
     DenseMat(DenseMat&&) noexcept = delete;
     DenseMat& operator=(const DenseMat&) = delete;

@@ -110,7 +110,7 @@ template<sp_d T> int SparseMatBaseFGMRES<T>::direct_solve(Mat<T>& X, const Mat<T
     return 0;
 }
 
-template<sp_d T> class SparseMatFGMRES : public SparseMatBaseFGMRES<T> {
+template<sp_d T> class SparseMatFGMRES final : public SparseMatBaseFGMRES<T> {
 public:
     SparseMatFGMRES(const uword in_row, const uword in_col, const uword in_elem = 0)
         : SparseMatBaseFGMRES<T>(in_row, in_col, in_elem, false) {}
@@ -118,7 +118,7 @@ public:
     unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SparseMatFGMRES>(*this); }
 };
 
-template<sp_d T> class SparseSymmMatFGMRES : public SparseMatBaseFGMRES<T> {
+template<sp_d T> class SparseSymmMatFGMRES final : public SparseMatBaseFGMRES<T> {
 public:
     SparseSymmMatFGMRES(const uword in_row, const uword in_col, const uword in_elem = 0)
         : SparseMatBaseFGMRES<T>(in_row, in_col, in_elem, true) {}
