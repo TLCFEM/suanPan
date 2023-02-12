@@ -219,63 +219,79 @@ template<sp_d T> int SparseMatSuperLU<T>::direct_solve(Mat<T>& out_mat, Mat<T>&&
 
     auto flag = 0;
 
-    if(std::is_same_v<T, float> || Precision::FULL == this->setting.precision) {
-        alloc(csc_form<T, int>(this->triplet_mat));
+    if constexpr(std::is_same_v<T, float>) {
+        alloc(csc_form<float, int>(this->triplet_mat));
 
         wrap_b(in_mat);
 
-        full_solve<T>(flag);
+        full_solve<float>(flag);
 
         out_mat = std::move(in_mat);
+    }
+    else if(Precision::FULL == this->setting.precision) {
+        alloc(csc_form<double, int>(this->triplet_mat));
 
-        return flag;
+        wrap_b(in_mat);
+
+        full_solve<double>(flag);
+
+        out_mat = std::move(in_mat);
+    }
+    else {
+        alloc(csc_form<float, int>(this->triplet_mat));
+
+        const fmat f_mat(arma::size(in_mat), fill::none);
+
+        wrap_b(f_mat);
+
+        full_solve<float>(flag);
+
+        if(0 == flag) flag = solve_trs(out_mat, std::forward<Mat<T>>(in_mat));
     }
 
-    alloc(csc_form<float, int>(this->triplet_mat));
-
-    const fmat f_mat(arma::size(in_mat), fill::none);
-
-    wrap_b(f_mat);
-
-    full_solve<float>(flag);
-
-    return 0 == flag ? solve_trs(out_mat, std::forward<Mat<T>>(in_mat)) : flag;
+    return flag;
 }
 
 template<sp_d T> int SparseMatSuperLU<T>::solve_trs(Mat<T>& out_mat, Mat<T>&& in_mat) {
     auto flag = 0;
 
-    if(std::is_same_v<T, float> || Precision::FULL == this->setting.precision) {
+    if constexpr(std::is_same_v<T, float>) {
         wrap_b(in_mat);
-
-        tri_solve<T>(flag);
-
-        out_mat = std::move(in_mat);
-
-        return flag;
-    }
-
-    out_mat.zeros(arma::size(in_mat));
-
-    auto multiplier = arma::norm(in_mat);
-
-    auto counter = 0u;
-    while(counter++ < this->setting.iterative_refinement) {
-        if(multiplier < this->setting.tolerance) break;
-
-        auto residual = conv_to<fmat>::from(in_mat / multiplier);
-
-        wrap_b(residual);
 
         tri_solve<float>(flag);
 
-        if(0 != flag) break;
+        out_mat = std::move(in_mat);
+    }
+    else if(Precision::FULL == this->setting.precision) {
+        wrap_b(in_mat);
 
-        const mat incre = multiplier * conv_to<mat>::from(residual);
+        tri_solve<double>(flag);
 
-        out_mat += incre;
+        out_mat = std::move(in_mat);
+    }
+    else {
+        out_mat.zeros(arma::size(in_mat));
 
-        suanpan_debug("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier = norm(in_mat -= this->operator*(incre)));
+        auto multiplier = arma::norm(in_mat);
+
+        auto counter = 0u;
+        while(counter++ < this->setting.iterative_refinement) {
+            if(multiplier < this->setting.tolerance) break;
+
+            auto residual = conv_to<fmat>::from(in_mat / multiplier);
+
+            wrap_b(residual);
+
+            tri_solve<float>(flag);
+
+            if(0 != flag) break;
+
+            const mat incre = multiplier * conv_to<mat>::from(residual);
+
+            out_mat += incre;
+
+            suanpan_debug("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier = arma::norm(in_mat -= this->operator*(incre)));
+        }
     }
 
     return flag;

@@ -88,7 +88,7 @@ TEST_CASE("Iterative Solver Dense", "[Matrix.Solver]") {
         REQUIRE(A.n_rows == N);
         REQUIRE(A.n_cols == N);
 
-        mat B = randu(N, N) + eye(N, N) * 1E1;
+        mat B = randu(N, N) + eye(N, N) * 100;
 
         const vec C = randu<vec>(N);
         vec x;
@@ -108,6 +108,42 @@ TEST_CASE("Iterative Solver Dense", "[Matrix.Solver]") {
         REQUIRE(norm(solve(B, C) - x) <= 1E1 * setting.tolerance);
 
         setting.iterative_solver = IterativeSolver::GMRES;
+
+        A.set_solver_setting(setting);
+        A.solve(x, C);
+
+        REQUIRE(norm(solve(B, C) - x) <= 1E1 * setting.tolerance);
+    }
+}
+
+TEST_CASE("Iterative Solver Dense Float", "[Matrix.Solver]") {
+    for(auto I = 0; I < 100; ++I) {
+        const auto N = randi<uword>(distr_param(100, 200));
+        auto A = BandMat<float>(N, N, 3);
+        REQUIRE(A.n_rows == N);
+        REQUIRE(A.n_cols == N);
+
+        fmat B = randu<fmat>(N, N) + eye<fmat>(N, N) * 100;
+
+        const auto C = randu<fvec>(N);
+        fvec x;
+
+        A.zeros();
+        for(auto i = 0llu; i < N; ++i)
+            for(auto j = 0llu; j < N; ++j)
+                if(std::abs(static_cast<int>(i) - static_cast<int>(j)) <= 3) A.at(i, j) = B(i, j);
+                else B(i, j) = 0.f;
+
+        SolverSetting<float> setting;
+        setting.iterative_solver = IterativeSolver::BICGSTAB;
+
+        A.set_solver_setting(setting);
+        A.solve(x, C);
+
+        REQUIRE(norm(solve(B, C) - x) <= 1E1 * setting.tolerance);
+
+        setting.iterative_solver = IterativeSolver::GMRES;
+        setting.preconditioner_type = PreconditionerType::ILU;
 
         A.set_solver_setting(setting);
         A.solve(x, C);

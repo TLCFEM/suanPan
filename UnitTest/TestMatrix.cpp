@@ -1,54 +1,107 @@
 #include <Domain/MetaMat/MetaMat>
 #include "CatchHeader.h"
 
-template<typename MT, std::invocable T> void test_mat_solve(MT& A, const vec& D, const vec& C, T clear_mat) {
-    constexpr double tol = 1E-12;
+template<typename MT, typename ET, std::invocable T> void test_mat_solve(MT& A, const Mat<ET>& D, const Col<ET>& C, T clear_mat) {
+    constexpr auto tol = std::numeric_limits<ET>::epsilon() * 100;
 
-    vec E(C.n_elem);
+    Col<ET> E(C.n_elem);
 
     clear_mat();
 
     // full solve
     A.solve(E, C);
-    REQUIRE(norm(E - D) < tol);
+    REQUIRE(arma::norm<Col<ET>>(E - D) < tol);
 
     // factored solve
     A.solve(E, C);
-    REQUIRE(norm(E - D) < tol);
+    REQUIRE(arma::norm<Col<ET>>(E - D) < tol);
 
     clear_mat();
 
     // r-value full solve
-    A.solve(E, mat(C));
-    REQUIRE(norm(E - D) < tol);
+    A.solve(E, Mat<ET>(C));
+    REQUIRE(arma::norm<Col<ET>>(E - D) < tol);
 
     // r-value factored solve
-    A.solve(E, mat(C));
-    REQUIRE(norm(E - D) < tol);
+    A.solve(E, Mat<ET>(C));
+    REQUIRE(arma::norm<Col<ET>>(E - D) < tol);
 
     // mixed precision
     A.get_solver_setting().precision = Precision::MIXED;
-    A.get_solver_setting().tolerance = 1E-18;
+    A.get_solver_setting().tolerance = tol;
 
     clear_mat();
 
     // full solve
     A.solve(E, C);
-    REQUIRE(norm(E - D) < tol);
+    REQUIRE(arma::norm<Col<ET>>(E - D) < tol);
 
     // factored solve
     A.solve(E, C);
-    REQUIRE(norm(E - D) < tol);
+    REQUIRE(arma::norm<Col<ET>>(E - D) < tol);
 
     clear_mat();
 
     // r-value full solve
-    A.solve(E, mat(C));
-    REQUIRE(norm(E - D) < tol);
+    A.solve(E, Mat<ET>(C));
+    REQUIRE(arma::norm<Col<ET>>(E - D) < tol);
 
     // r-value factored solve
-    A.solve(E, mat(C));
-    REQUIRE(norm(E - D) < tol);
+    A.solve(E, Mat<ET>(C));
+    REQUIRE(arma::norm<Col<ET>>(E - D) < tol);
+}
+
+template<typename ET, std::invocable<u64> F> void test_dense_mat_setup(F new_mat) {
+    for(auto I = 0; I < 100; ++I) {
+        const auto N = randi<uword>(distr_param(100, 200));
+        auto A = new_mat(N);
+        REQUIRE(A.n_rows == N);
+        REQUIRE(A.n_cols == N);
+
+        auto B = randu<Mat<ET>>(N, N);
+        B = B + B.t() + eye<decltype(B)>(N, N) * 10;
+
+        auto clear_mat = [&] {
+            A.zeros();
+            for(auto i = 0llu; i < N; ++i)
+                for(auto j = 0llu; j < N; ++j)
+                    if(std::abs(static_cast<int>(i) - static_cast<int>(j)) <= 3) A.at(i, j) = B(i, j);
+                    else B(i, j) = ET(0);
+        };
+
+        const auto C = randu<Col<ET>>(N);
+
+        clear_mat();
+
+        REQUIRE(arma::norm<Col<ET>>(A * C - B * C) < std::numeric_limits<ET>::epsilon() * 1000);
+        REQUIRE(arma::norm<Mat<ET>>(A * B - B * B) < std::numeric_limits<ET>::epsilon() * 1000);
+
+        test_mat_solve(A, solve(B, C).eval(), C, clear_mat);
+    }
+}
+
+template<typename ET, std::invocable<u64> F> void test_sparse_mat_setup(F new_mat) {
+    for(auto I = 0; I < 100; ++I) {
+        const auto N = randi<uword>(distr_param(100, 200));
+        auto A = new_mat(N);
+        REQUIRE(A.n_rows == N);
+        REQUIRE(A.n_cols == N);
+
+        SpMat<ET> B = sprandu<SpMat<ET>>(N, N, .01) + speye<SpMat<ET>>(N, N) * 10;
+
+        auto clear_mat = [&] {
+            A.zeros();
+            for(auto J = B.begin(); J != B.end(); ++J) A.at(J.row(), J.col()) = *J;
+        };
+
+        const auto C = randu<Col<ET>>(N);
+
+        clear_mat();
+
+        REQUIRE(arma::norm<Col<ET>>(A * C - B * C) < std::numeric_limits<ET>::epsilon() * 1000);
+
+        test_mat_solve(A, spsolve(B, C), C, clear_mat);
+    }
 }
 
 template<typename MT, std::invocable T> void benchmark_mat_solve(string&& title, MT& A, const vec& C, const vec& E, T&& clear_mat) {
@@ -106,163 +159,29 @@ TEST_CASE("Mixed Precision", "[Matrix.Benchmark]") {
 #endif
 }
 
-TEST_CASE("FullMat", "[Matrix.Dense]") {
-    for(auto I = 0; I < 100; ++I) {
-        const auto N = randi<uword>(distr_param(100, 200));
-        auto A = FullMat<double>(N, N);
-        REQUIRE(A.n_rows == N);
-        REQUIRE(A.n_cols == N);
+TEST_CASE("FullMat", "[Matrix.Dense]") { test_dense_mat_setup<double>([](const u64 N) { return FullMat<double>(N, N); }); }
 
-        const mat B = randu<mat>(N, N) + eye(N, N) * 1E1;
+TEST_CASE("SymmPackMat", "[Matrix.Dense]") { test_dense_mat_setup<double>([](const u64 N) { return SymmPackMat<double>(N); }); }
 
-        auto clear_mat = [&] {
-            A.zeros();
-            for(auto i = 0llu; i < N; ++i) for(auto j = 0llu; j < N; ++j) A.at(i, j) = B(i, j);
-        };
+TEST_CASE("BandMat", "[Matrix.Dense]") { test_dense_mat_setup<double>([](const u64 N) { return BandMat<double>(N, N, 3); }); }
 
-        const vec C = randu<vec>(N);
+TEST_CASE("BandMatSpike", "[Matrix.Dense]") { test_dense_mat_setup<double>([](const u64 N) { return BandMatSpike<double>(N, N, 3); }); }
 
-        clear_mat();
+TEST_CASE("BandSymmMat", "[Matrix.Dense]") { test_dense_mat_setup<double>([](const u64 N) { return BandSymmMat<double>(N, 3); }); }
 
-        REQUIRE(norm(A * C - B * C) < 1E-12);
-        REQUIRE(norm(A * B - B * B) < 1E-12);
+TEST_CASE("FullMatFloat", "[Matrix.Dense]") { test_dense_mat_setup<float>([](const u64 N) { return FullMat<float>(N, N); }); }
 
-        test_mat_solve(A, solve(B, C), C, clear_mat);
-    }
-}
+TEST_CASE("SymmPackMatFloat", "[Matrix.Dense]") { test_dense_mat_setup<float>([](const u64 N) { return SymmPackMat<float>(N); }); }
 
-TEST_CASE("SymmPackMat", "[Matrix.Dense]") {
-    for(auto I = 0; I < 100; ++I) {
-        const auto N = randi<uword>(distr_param(100, 200));
-        auto A = SymmPackMat<double>(N);
-        REQUIRE(A.n_rows == N);
+TEST_CASE("BandMatFloat", "[Matrix.Dense]") { test_dense_mat_setup<float>([](const u64 N) { return BandMat<float>(N, N, 3); }); }
 
-        mat B = diagmat(randu<vec>(N)) + eye(N, N) * 1E1;
+TEST_CASE("BandMatSpikeFloat", "[Matrix.Dense]") { test_dense_mat_setup<float>([](const u64 N) { return BandMatSpike<float>(N, N, 3); }); }
 
-        auto clear_mat = [&] {
-            A.zeros();
-            for(auto i = 0llu; i < N; ++i) for(auto j = 0llu; j < N; ++j) A.at(i, j) = B(i, j);
-        };
+TEST_CASE("BandSymmMatFloat", "[Matrix.Dense]") { test_dense_mat_setup<float>([](const u64 N) { return BandSymmMat<float>(N, 3); }); }
 
-        const vec C = randu<vec>(N);
+TEST_CASE("SparseMatSuperLU", "[Matrix.Sparse]") { test_sparse_mat_setup<double>([](const u64 N) { return SparseMatSuperLU<double>(N, N); }); }
 
-        clear_mat();
-
-        REQUIRE(norm(A * C - B * C) < 1E-12);
-        REQUIRE(norm(A * B - B * B) < 1E-12);
-
-        test_mat_solve(A, solve(B, C), C, clear_mat);
-    }
-}
-
-TEST_CASE("BandMat", "[Matrix.Dense]") {
-    for(auto I = 0; I < 100; ++I) {
-        const auto N = randi<uword>(distr_param(100, 200));
-        auto A = BandMat<double>(N, N, 3);
-        REQUIRE(A.n_rows == N);
-        REQUIRE(A.n_cols == N);
-
-        mat B = randu(N, N) + eye(N, N) * 1E1;
-
-        auto clear_mat = [&] {
-            A.zeros();
-            for(auto i = 0llu; i < N; ++i)
-                for(auto j = 0llu; j < N; ++j)
-                    if(std::abs(static_cast<int>(i) - static_cast<int>(j)) <= 3) A.at(i, j) = B(i, j);
-                    else B(i, j) = 0.;
-        };
-
-        const vec C = randu<vec>(N);
-
-        clear_mat();
-
-        REQUIRE(norm(A * C - B * C) < 1E-12);
-        REQUIRE(norm(A * B - B * B) < 1E-12);
-
-        test_mat_solve(A, solve(B, C), C, clear_mat);
-    }
-}
-
-TEST_CASE("BandMatSpike", "[Matrix.Dense]") {
-    for(auto I = 0; I < 100; ++I) {
-        const auto N = randi<uword>(distr_param(100, 200));
-        auto A = BandMatSpike<double>(N, N, 3);
-        REQUIRE(A.n_rows == N);
-        REQUIRE(A.n_cols == N);
-
-        mat B = randu(N, N) + eye(N, N) * 1E1;
-
-        auto clear_mat = [&] {
-            A.zeros();
-            for(auto i = 0llu; i < N; ++i)
-                for(auto j = 0llu; j < N; ++j)
-                    if(std::abs(static_cast<int>(i) - static_cast<int>(j)) <= 3) A.at(i, j) = B(i, j);
-                    else B(i, j) = 0.;
-        };
-
-        const vec C = randu<vec>(N);
-
-        clear_mat();
-
-        REQUIRE(norm(A * C - B * C) < 1E-12);
-        REQUIRE(norm(A * B - B * B) < 1E-12);
-
-        test_mat_solve(A, solve(B, C), C, clear_mat);
-    }
-}
-
-TEST_CASE("BandSymmMat", "[Matrix.Dense]") {
-    for(auto I = 0; I < 100; ++I) {
-        const auto N = randi<uword>(distr_param(100, 200));
-        auto A = BandSymmMat<double>(N, 3);
-        REQUIRE(A.n_rows == N);
-        REQUIRE(A.n_cols == N);
-
-        mat B = randu(N, N);
-        B = B + B.t() + eye(N, N) * 1E1;
-
-        auto clear_mat = [&] {
-            A.zeros();
-            for(auto i = 0llu; i < N; ++i)
-                for(auto j = 0llu; j < N; ++j)
-                    if(std::abs(static_cast<int>(i) - static_cast<int>(j)) <= 3) A.at(i, j) = B(i, j);
-                    else B(i, j) = 0.;
-        };
-
-        const vec C = randu<vec>(N);
-
-        clear_mat();
-
-        REQUIRE(norm(A * C - B * C) < 1E-12);
-        REQUIRE(norm(A * B - B * B) < 1E-12);
-
-        test_mat_solve(A, solve(B, C), C, clear_mat);
-    }
-}
-
-TEST_CASE("SparseMatSuperLU", "[Matrix.Sparse]") {
-    for(auto I = 0; I < 100; ++I) {
-        const auto N = randi<uword>(distr_param(100, 200));
-        auto A = SparseMatSuperLU<double>(N, N);
-        REQUIRE(A.n_rows == N);
-        REQUIRE(A.n_cols == N);
-
-        sp_mat B = sprandu(N, N, .01) + speye(N, N) * 1E1;
-
-        auto clear_mat = [&] {
-            A.zeros();
-            for(auto J = B.begin(); J != B.end(); ++J) A.at(J.row(), J.col()) = *J;
-        };
-
-        const vec C = randu<vec>(N);
-
-        clear_mat();
-
-        REQUIRE(norm(A * C - B * C) < 1E-12);
-
-        test_mat_solve(A, spsolve(B, C), C, clear_mat);
-    }
-}
+TEST_CASE("SparseMatSuperLUFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<float>([](const u64 N) { return SparseMatSuperLU<float>(N, N); }); }
 
 TEST_CASE("SparseMatMUMPS", "[Matrix.Sparse]") {
     for(auto I = 0; I < 100; ++I) {
@@ -289,55 +208,15 @@ TEST_CASE("SparseMatMUMPS", "[Matrix.Sparse]") {
 }
 
 #ifdef SUANPAN_MKL
-TEST_CASE("SparseMatPARDISO", "[Matrix.Sparse]") {
-    for(auto I = 0; I < 100; ++I) {
-        const auto N = randi<uword>(distr_param(100, 200));
-        auto A = SparseMatPARDISO<double>(N, N);
-        REQUIRE(A.n_rows == N);
-        REQUIRE(A.n_cols == N);
+TEST_CASE("SparseMatPARDISO", "[Matrix.Sparse]") { test_sparse_mat_setup<double>([](const u64 N) { return SparseMatPARDISO<double>(N, N); }); }
 
-        sp_mat B = sprandu(N, N, .01) + speye(N, N) * 1E1;
-
-        auto clear_mat = [&] {
-            A.zeros();
-            for(auto J = B.begin(); J != B.end(); ++J) A.at(J.row(), J.col()) = *J;
-        };
-
-        const vec C = randu<vec>(N);
-
-        clear_mat();
-
-        REQUIRE(norm(A * C - B * C) < 1E-12);
-
-        test_mat_solve(A, spsolve(B, C), C, clear_mat);
-    }
-}
+TEST_CASE("SparseMatPARDISOFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<float>([](const u64 N) { return SparseMatPARDISO<float>(N, N); }); }
 #endif
 
 #ifdef SUANPAN_CUDA
-TEST_CASE("SparseMatCUDA", "[Matrix.Sparse]") {
-    for(auto I = 0; I < 100; ++I) {
-        const auto N = randi<uword>(distr_param(100, 200));
-        auto A = SparseMatCUDA<double>(N, N);
-        REQUIRE(A.n_rows == N);
-        REQUIRE(A.n_cols == N);
+TEST_CASE("SparseMatCUDA", "[Matrix.Sparse]") { test_sparse_mat_setup<double>([](const u64 N) { return SparseMatCUDA<double>(N, N); }); }
 
-        sp_mat B = sprandu(N, N, .01) + speye(N, N) * 1E1;
-
-        auto clear_mat = [&] {
-            A.zeros();
-            for(auto J = B.begin(); J != B.end(); ++J) A.at(J.row(), J.col()) = *J;
-        };
-
-        const vec C = randu<vec>(N);
-
-        clear_mat();
-
-        REQUIRE(norm(A * C - B * C) < 1E-12);
-
-        test_mat_solve(A, spsolve(B, C), C, clear_mat);
-    }
-}
+TEST_CASE("SparseMatCUDAFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<float>([](const u64 N) { return SparseMatCUDA<float>(N, N); }); }
 #endif
 
 TEST_CASE("Triplet/CSR/CSC Sparse", "[Matrix.Sparse]") {
