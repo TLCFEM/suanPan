@@ -38,6 +38,8 @@ template<sp_d T> class FullMat : public DenseMat<T> {
     int solve_trs(Mat<T>&, Mat<T>&&);
 
 protected:
+    using MetaMat<T>::direct_solve;
+
     int direct_solve(Mat<T>&, Mat<T>&&) override;
 
 public:
@@ -150,27 +152,11 @@ template<sp_d T> int FullMat<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
         arma_fortran(arma_dgetrs)(&TRAN, &N, &NRHS, (E*)this->memptr(), &N, this->pivot.memptr(), (E*)B.memptr(), &LDB, &INFO);
         X = std::move(B);
     }
-    else {
-        X = arma::zeros(arma::size(B));
-
-        auto multiplier = arma::norm(B);
-
-        auto counter = 0u;
-        while(counter++ < this->setting.iterative_refinement) {
-            if(multiplier < this->setting.tolerance) break;
-
-            auto residual = conv_to<fmat>::from(B / multiplier);
-
+    else
+        this->mixed_trs(X, std::forward<Mat<T>>(B), [&](fmat& residual) {
             arma_fortran(arma_sgetrs)(&TRAN, &N, &NRHS, this->s_memory.memptr(), &N, this->pivot.memptr(), residual.memptr(), &LDB, &INFO);
-            if(0 != INFO) break;
-
-            const mat incre = multiplier * conv_to<mat>::from(residual);
-
-            X += incre;
-
-            suanpan_debug("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier = arma::norm(B -= this->operator*(incre)));
-        }
-    }
+            return INFO;
+        });
 
     return INFO;
 }

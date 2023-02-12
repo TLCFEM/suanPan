@@ -51,6 +51,8 @@ template<sp_d T> class SparseMatPARDISO final : public SparseMat<T> {
     std::int64_t pt[64];
 
 protected:
+    using MetaMat<T>::direct_solve;
+
     int direct_solve(Mat<T>&, const Mat<T>&) override;
 
 public:

@@ -83,6 +83,8 @@ template<sp_d T> class SparseMatCUDA final : public SparseMat<T> {
     }
 
 protected:
+    using MetaMat<T>::direct_solve;
+
     int direct_solve(Mat<T>&, const Mat<T>&) override;
 
 public:
@@ -152,7 +154,7 @@ template<sp_d T> int SparseMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) 
 
         mat full_residual = B;
 
-        auto multiplier = arma::norm(full_residual);
+        auto multiplier = norm(full_residual);
 
         auto counter = 0u;
         while(counter++ < this->setting.iterative_refinement) {
