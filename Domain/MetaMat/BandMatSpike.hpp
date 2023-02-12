@@ -46,70 +46,56 @@ template<sp_d T> class BandMatSpike final : public DenseMat<T> {
     podarray<T> WORK;
     podarray<float> SWORK;
 
-    void init_spike();
+    void init_spike() {
+        auto N = static_cast<int>(this->n_rows);
+        auto KLU = static_cast<int>(std::max(l_band, u_band));
+
+        spikeinit_(SPIKE.memptr(), &N, &KLU);
+
+        std::is_same_v<T, float> ? sspike_tune_(SPIKE.memptr()) : dspike_tune_(SPIKE.memptr());
+    }
 
     int solve_trs(Mat<T>&, Mat<T>&&);
-    int solve_trs(Mat<T>&, const Mat<T>&);
+
+protected:
+    int direct_solve(Mat<T>&, Mat<T>&&) override;
 
 public:
-    BandMatSpike(uword, uword, uword);
+    BandMatSpike(const uword in_size, const uword in_l, const uword in_u)
+        : DenseMat<T>(in_size, in_size, (in_l + in_u + 1) * in_size)
+        , l_band(in_l)
+        , u_band(in_u)
+        , m_rows(in_l + in_u + 1) { init_spike(); }
 
-    unique_ptr<MetaMat<T>> make_copy() override;
+    unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<BandMatSpike>(*this); }
 
-    void nullify(uword) override;
+    void nullify(const uword K) override {
+        this->factored = false;
+        suanpan_for(std::max(K, u_band) - u_band, std::min(this->n_rows, K + l_band + 1), [&](const uword I) { this->memory[I + u_band + K * (m_rows - 1)] = T(0); });
+        suanpan_for(std::max(K, l_band) - l_band, std::min(this->n_cols, K + u_band + 1), [&](const uword I) { this->memory[K + u_band + I * (m_rows - 1)] = T(0); });
+    }
 
-    T operator()(uword, uword) const override;
-    T& unsafe_at(uword, uword) override;
-    T& at(uword, uword) override;
+    T operator()(const uword in_row, const uword in_col) const override {
+        if(in_row > in_col + l_band || in_row + u_band < in_col) [[unlikely]] return bin = T(0);
+        return this->memory[in_row + u_band + in_col * (m_rows - 1)];
+    }
+
+    T& unsafe_at(const uword in_row, const uword in_col) override {
+        this->factored = false;
+        return this->memory[in_row + u_band + in_col * (m_rows - 1)];
+    }
+
+    T& at(const uword in_row, const uword in_col) override {
+        if(in_row > in_col + l_band || in_row + u_band < in_col) [[unlikely]] return bin = T(0);
+        return this->unsafe_at(in_row, in_col);
+    }
 
     Mat<T> operator*(const Mat<T>&) const override;
 
-    int direct_solve(Mat<T>&, Mat<T>&&) override;
-    int direct_solve(Mat<T>&, const Mat<T>&) override;
-
-    [[nodiscard]] int sign_det() const override;
+    [[nodiscard]] int sign_det() const override { throw invalid_argument("not supported"); }
 };
 
-template<sp_d T> T BandMatSpike<T>::bin = 0.;
-
-template<sp_d T> void BandMatSpike<T>::init_spike() {
-    auto N = static_cast<int>(this->n_rows);
-    auto KLU = static_cast<int>(std::max(l_band, u_band));
-
-    spikeinit_(SPIKE.memptr(), &N, &KLU);
-
-    std::is_same_v<T, float> ? sspike_tune_(SPIKE.memptr()) : dspike_tune_(SPIKE.memptr());
-}
-
-template<sp_d T> BandMatSpike<T>::BandMatSpike(const uword in_size, const uword in_l, const uword in_u)
-    : DenseMat<T>(in_size, in_size, (in_l + in_u + 1) * in_size)
-    , l_band(in_l)
-    , u_band(in_u)
-    , m_rows(in_l + in_u + 1) { init_spike(); }
-
-template<sp_d T> unique_ptr<MetaMat<T>> BandMatSpike<T>::make_copy() { return std::make_unique<BandMatSpike>(*this); }
-
-template<sp_d T> void BandMatSpike<T>::nullify(const uword K) {
-    suanpan_for(std::max(K, u_band) - u_band, std::min(this->n_rows, K + l_band + 1), [&](const uword I) { this->memory[I + u_band + K * (m_rows - 1)] = 0.; });
-    suanpan_for(std::max(K, l_band) - l_band, std::min(this->n_cols, K + u_band + 1), [&](const uword I) { this->memory[K + u_band + I * (m_rows - 1)] = 0.; });
-
-    this->factored = false;
-}
-
-template<sp_d T> T BandMatSpike<T>::operator()(const uword in_row, const uword in_col) const {
-    if(in_row > in_col + l_band || in_row + u_band < in_col) [[unlikely]] return bin = 0.;
-    return this->memory[in_row + u_band + in_col * (m_rows - 1)];
-}
-
-template<sp_d T> T& BandMatSpike<T>::unsafe_at(const uword in_row, const uword in_col) {
-    this->factored = false;
-    return this->memory[in_row + u_band + in_col * (m_rows - 1)];
-}
-
-template<sp_d T> T& BandMatSpike<T>::at(const uword in_row, const uword in_col) {
-    if(in_row > in_col + l_band || in_row + u_band < in_col) [[unlikely]] return bin = 0.;
-    return this->unsafe_at(in_row, in_col);
-}
+template<sp_d T> T BandMatSpike<T>::bin = T(0);
 
 template<sp_d T> Mat<T> BandMatSpike<T>::operator*(const Mat<T>& X) const {
     Mat<T> Y(arma::size(X));
@@ -120,14 +106,14 @@ template<sp_d T> Mat<T> BandMatSpike<T>::operator*(const Mat<T>& X) const {
     const auto KU = static_cast<int>(u_band);
     const auto LDA = static_cast<int>(m_rows);
     const auto INC = 1;
-    T ALPHA = 1.;
-    T BETA = 0.;
+    T ALPHA = T(1);
+    T BETA = T(0);
 
-    if(std::is_same_v<T, float>) {
+    if constexpr(std::is_same_v<T, float>) {
         using E = float;
         suanpan_for(0llu, X.n_cols, [&](const uword I) { arma_fortran(arma_sgbmv)(&TRAN, &M, &N, &KL, &KU, (E*)&ALPHA, (E*)this->memptr(), &LDA, (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC); });
     }
-    else if(std::is_same_v<T, double>) {
+    else {
         using E = double;
         suanpan_for(0llu, X.n_cols, [&](const uword I) { arma_fortran(arma_dgbmv)(&TRAN, &M, &N, &KL, &KU, (E*)&ALPHA, (E*)this->memptr(), &LDA, (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC); });
     }
@@ -135,96 +121,20 @@ template<sp_d T> Mat<T> BandMatSpike<T>::operator*(const Mat<T>& X) const {
     return Y;
 }
 
-template<sp_d T> int BandMatSpike<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
-    if(!this->factored) {
-        auto N = static_cast<int>(this->n_rows);
-        auto KL = static_cast<int>(l_band);
-        auto KU = static_cast<int>(u_band);
-        auto LDAB = static_cast<int>(m_rows);
-        const auto KLU = std::max(l_band, u_band);
-        auto INFO = 0;
-
-        if(std::is_same_v<T, float>) {
-            using E = float;
-            WORK.zeros(KLU * KLU * SPIKE(9));
-            sspike_gbtrf_(SPIKE.memptr(), &N, &KL, &KU, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), &INFO);
-        }
-        else if(Precision::FULL == this->setting.precision) {
-            using E = double;
-            WORK.zeros(KLU * KLU * SPIKE(9));
-            dspike_gbtrf_(SPIKE.memptr(), &N, &KL, &KU, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), &INFO);
-        }
-        else {
-            this->s_memory = this->to_float();
-            SWORK.zeros(KLU * KLU * SPIKE(9));
-            sspike_gbtrf_(SPIKE.memptr(), &N, &KL, &KU, this->s_memory.mem, &LDAB, SWORK.memptr(), &INFO);
-        }
-
-        if(0 != INFO) {
-            suanpan_error("Error code {} received, the matrix is probably singular.\n", INFO);
-            return INFO;
-        }
-
-        this->factored = true;
-    }
-
-    return this->solve_trs(X, B);
-}
-
-template<sp_d T> int BandMatSpike<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
-    auto N = static_cast<int>(this->n_rows);
-    auto KL = static_cast<int>(l_band);
-    auto KU = static_cast<int>(u_band);
-    auto NRHS = static_cast<int>(B.n_cols);
-    auto LDAB = static_cast<int>(m_rows);
-    auto LDB = static_cast<int>(B.n_rows);
-
-    if(std::is_same_v<T, float>) {
-        using E = float;
-        X = B;
-        sspike_gbtrs_(SPIKE.memptr(), &TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), (E*)X.memptr(), &LDB);
-    }
-    else if(Precision::FULL == this->setting.precision) {
-        using E = double;
-        X = B;
-        dspike_gbtrs_(SPIKE.memptr(), &TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), (E*)X.memptr(), &LDB);
-    }
-    else {
-        X = arma::zeros(B.n_rows, B.n_cols);
-
-        mat full_residual = B;
-
-        auto multiplier = norm(full_residual);
-
-        auto counter = 0u;
-        while(counter++ < this->setting.iterative_refinement) {
-            if(multiplier < this->setting.tolerance) break;
-
-            auto residual = conv_to<fmat>::from(full_residual / multiplier);
-
-            sspike_gbtrs_(SPIKE.memptr(), &TRAN, &N, &KL, &KU, &NRHS, this->s_memory.memptr(), &LDAB, SWORK.memptr(), residual.memptr(), &LDB);
-
-            const mat incre = multiplier * conv_to<mat>::from(residual);
-
-            X += incre;
-
-            suanpan_debug("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier = arma::norm(full_residual -= this->operator*(incre)));
-        }
-    }
-
-    return SUANPAN_SUCCESS;
-}
-
 template<sp_d T> int BandMatSpike<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
     if(!this->factored) {
+        suanpan_assert([&] { if(this->n_rows != this->n_cols) throw invalid_argument("requires a square matrix"); });
+
+        auto INFO = 0;
+
         auto N = static_cast<int>(this->n_rows);
         auto KL = static_cast<int>(l_band);
         auto KU = static_cast<int>(u_band);
         auto LDAB = static_cast<int>(m_rows);
         const auto KLU = std::max(l_band, u_band);
-        auto INFO = 0;
+        this->factored = true;
 
-        if(std::is_same_v<T, float>) {
+        if constexpr(std::is_same_v<T, float>) {
             using E = float;
             WORK.zeros(KLU * KLU * SPIKE(9));
             sspike_gbtrf_(SPIKE.memptr(), &N, &KL, &KU, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), &INFO);
@@ -237,15 +147,13 @@ template<sp_d T> int BandMatSpike<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
         else {
             this->s_memory = this->to_float();
             SWORK.zeros(KLU * KLU * SPIKE(9));
-            sspike_gbtrf_(SPIKE.memptr(), &N, &KL, &KU, this->s_memory.mem, &LDAB, SWORK.memptr(), &INFO);
+            sspike_gbtrf_(SPIKE.memptr(), &N, &KL, &KU, this->s_memory.memptr(), &LDAB, SWORK.memptr(), &INFO);
         }
 
         if(0 != INFO) {
             suanpan_error("Error code {} received, the matrix is probably singular.\n", INFO);
             return INFO;
         }
-
-        this->factored = true;
     }
 
     return this->solve_trs(X, std::forward<Mat<T>>(B));
@@ -259,7 +167,7 @@ template<sp_d T> int BandMatSpike<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
     auto LDAB = static_cast<int>(m_rows);
     auto LDB = static_cast<int>(B.n_rows);
 
-    if(std::is_same_v<T, float>) {
+    if constexpr(std::is_same_v<T, float>) {
         using E = float;
         sspike_gbtrs_(SPIKE.memptr(), &TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), (E*)B.memptr(), &LDB);
         X = std::move(B);
@@ -270,9 +178,9 @@ template<sp_d T> int BandMatSpike<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
         X = std::move(B);
     }
     else {
-        X = arma::zeros(B.n_rows, B.n_cols);
+        X = arma::zeros(arma::size(B));
 
-        auto multiplier = norm(B);
+        auto multiplier = arma::norm(B);
 
         auto counter = 0u;
         while(counter++ < this->setting.iterative_refinement) {
@@ -292,8 +200,6 @@ template<sp_d T> int BandMatSpike<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
 
     return SUANPAN_SUCCESS;
 }
-
-template<sp_d T> int BandMatSpike<T>::sign_det() const { throw invalid_argument("not supported"); }
 
 #endif
 

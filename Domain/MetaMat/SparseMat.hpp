@@ -32,129 +32,79 @@
 #include "MetaMat.hpp"
 
 template<sp_d T> class SparseMat : public MetaMat<T> {
-public:
-    using MetaMat<T>::triplet_mat;
+protected:
     using MetaMat<T>::direct_solve;
 
-    SparseMat(uword, uword, uword = 0);
+    int direct_solve(Mat<T>& X, Mat<T>&& B) override { return this->direct_solve(X, B); }
 
-    [[nodiscard]] bool is_empty() const override;
-    void zeros() override;
+public:
+    SparseMat(const uword in_row, const uword in_col, const uword in_elem = 0)
+        : MetaMat<T>(in_row, in_col, 0) { this->triplet_mat.init(in_elem); }
 
-    void unify(uword) override;
-    void nullify(uword) override;
+    [[nodiscard]] bool is_empty() const override { return this->triplet_mat.is_empty(); }
 
-    [[nodiscard]] T max() const override;
-    [[nodiscard]] Col<T> diag() const override;
+    void zeros() override {
+        this->factored = false;
+        this->triplet_mat.zeros();
+    }
 
-    T operator()(uword, uword) const override;
-    T& at(uword, uword) override;
+    void nullify(const uword idx) override {
+        this->factored = false;
+        suanpan_for(static_cast<uword>(0), this->triplet_mat.n_elem, [&](const uword I) { if(this->triplet_mat.row(I) == idx || this->triplet_mat.col(I) == idx) this->triplet_mat.val_mem()[I] = T(0); });
+    }
 
-    [[nodiscard]] const T* memptr() const override;
-    T* memptr() override;
+    [[nodiscard]] T max() const override { return this->triplet_mat.max(); }
 
-    void operator+=(const shared_ptr<MetaMat<T>>&) override;
-    void operator-=(const shared_ptr<MetaMat<T>>&) override;
+    [[nodiscard]] Col<T> diag() const override { return this->triplet_mat.diag(); }
 
-    void operator+=(const triplet_form<T, uword>&) override;
-    void operator-=(const triplet_form<T, uword>&) override;
+    T operator()(const uword in_row, const uword in_col) const override { return this->triplet_mat(in_row, in_col); }
 
-    Mat<T> operator*(const Mat<T>&) const override;
+    T& at(const uword in_row, const uword in_col) override {
+        this->factored = false;
+        return this->triplet_mat.at(in_row, in_col);
+    }
 
-    void operator*=(T) override;
+    [[nodiscard]] const T* memptr() const override { throw invalid_argument("not supported"); }
 
-    [[nodiscard]] int sign_det() const override;
+    T* memptr() override { throw invalid_argument("not supported"); }
 
-    void csc_condense() override;
-    void csr_condense() override;
+    void operator+=(const shared_ptr<MetaMat<T>>& in_mat) override {
+        if(nullptr == in_mat) return;
+        if(!in_mat->triplet_mat.is_empty()) return this->operator+=(in_mat->triplet_mat);
+        this->factored = false;
+        for(uword I = 0llu; I < in_mat->n_rows; ++I) for(uword J = 0llu; J < in_mat->n_cols; ++J) if(const auto t_val = in_mat->operator()(I, J); !suanpan::approx_equal(T(0), t_val)) at(I, J) = t_val;
+    }
 
-    int iterative_solve(Mat<T>&, const Mat<T>&) override;
+    void operator-=(const shared_ptr<MetaMat<T>>& in_mat) override {
+        if(nullptr == in_mat) return;
+        if(!in_mat->triplet_mat.is_empty()) return this->operator-=(in_mat->triplet_mat);
+        this->factored = false;
+        for(uword I = 0llu; I < in_mat->n_rows; ++I) for(uword J = 0llu; J < in_mat->n_cols; ++J) if(const auto t_val = in_mat->operator()(I, J); !suanpan::approx_equal(T(0), t_val)) at(I, J) = -t_val;
+    }
+
+    void operator+=(const triplet_form<T, uword>& in_mat) override {
+        this->factored = false;
+        this->triplet_mat += in_mat;
+    }
+
+    void operator-=(const triplet_form<T, uword>& in_mat) override {
+        this->factored = false;
+        this->triplet_mat -= in_mat;
+    }
+
+    Mat<T> operator*(const Mat<T>& in_mat) const override { return this->triplet_mat * in_mat; }
+
+    void operator*=(const T scalar) override {
+        this->factored = false;
+        this->triplet_mat *= scalar;
+    }
+
+    [[nodiscard]] int sign_det() const override { throw invalid_argument("not supported"); }
+
+    void csc_condense() override { this->triplet_mat.csc_condense(); }
+
+    void csr_condense() override { this->triplet_mat.csr_condense(); }
 };
-
-template<sp_d T> SparseMat<T>::SparseMat(const uword in_row, const uword in_col, const uword in_elem)
-    : MetaMat<T>(in_row, in_col, 0) { triplet_mat.init(in_elem); }
-
-template<sp_d T> bool SparseMat<T>::is_empty() const { return triplet_mat.is_empty(); }
-
-template<sp_d T> void SparseMat<T>::zeros() {
-    triplet_mat.zeros();
-    this->factored = false;
-}
-
-template<sp_d T> void SparseMat<T>::unify(const uword idx) {
-    nullify(idx);
-    triplet_mat.at(idx, idx) = 1.;
-}
-
-template<sp_d T> void SparseMat<T>::nullify(const uword idx) {
-    using index_t = typename decltype(triplet_mat)::index_type;
-
-    const auto t_idx = static_cast<index_t>(idx);
-
-    suanpan_for(static_cast<index_t>(0), triplet_mat.n_elem, [&](const index_t I) { if(triplet_mat.row(I) == t_idx || triplet_mat.col(I) == t_idx) triplet_mat.val_mem()[I] = 0.; });
-
-    this->factored = false;
-}
-
-template<sp_d T> T SparseMat<T>::max() const { return triplet_mat.max(); }
-
-template<sp_d T> Col<T> SparseMat<T>::diag() const { return triplet_mat.diag(); }
-
-template<sp_d T> T SparseMat<T>::operator()(const uword in_row, const uword in_col) const {
-    using index_t = typename decltype(triplet_mat)::index_type;
-    return triplet_mat(static_cast<index_t>(in_row), static_cast<index_t>(in_col));
-}
-
-template<sp_d T> T& SparseMat<T>::at(const uword in_row, const uword in_col) {
-    this->factored = false;
-    using index_t = typename decltype(triplet_mat)::index_type;
-    return triplet_mat.at(static_cast<index_t>(in_row), static_cast<index_t>(in_col));
-}
-
-template<sp_d T> const T* SparseMat<T>::memptr() const { throw invalid_argument("not supported"); }
-
-template<sp_d T> T* SparseMat<T>::memptr() { throw invalid_argument("not supported"); }
-
-template<sp_d T> void SparseMat<T>::operator+=(const shared_ptr<MetaMat<T>>& in_mat) {
-    if(nullptr == in_mat) return;
-
-    if(!in_mat->triplet_mat.is_empty()) return this->operator+=(in_mat->triplet_mat);
-
-    for(uword I = 0llu; I < in_mat->n_rows; ++I) for(uword J = 0llu; J < in_mat->n_cols; ++J) if(const auto t_val = in_mat->operator()(I, J); !suanpan::approx_equal(0., t_val)) at(I, J) = t_val;
-}
-
-template<sp_d T> void SparseMat<T>::operator-=(const shared_ptr<MetaMat<T>>& in_mat) {
-    if(nullptr == in_mat) return;
-
-    if(!in_mat->triplet_mat.is_empty()) return this->operator-=(in_mat->triplet_mat);
-
-    for(uword I = 0llu; I < in_mat->n_rows; ++I) for(uword J = 0llu; J < in_mat->n_cols; ++J) if(const auto t_val = in_mat->operator()(I, J); !suanpan::approx_equal(0., t_val)) at(I, J) = -t_val;
-}
-
-template<sp_d T> void SparseMat<T>::operator+=(const triplet_form<T, uword>& in_mat) {
-    this->triplet_mat += in_mat;
-    this->factored = false;
-}
-
-template<sp_d T> void SparseMat<T>::operator-=(const triplet_form<T, uword>& in_mat) {
-    this->triplet_mat -= in_mat;
-    this->factored = false;
-}
-
-template<sp_d T> Mat<T> SparseMat<T>::operator*(const Mat<T>& in_mat) const { return triplet_mat * in_mat; }
-
-template<sp_d T> void SparseMat<T>::operator*=(const T scalar) { triplet_mat *= scalar; }
-
-template<sp_d T> int SparseMat<T>::sign_det() const { throw invalid_argument("not supported"); }
-
-template<sp_d T> void SparseMat<T>::csc_condense() { triplet_mat.csc_condense(); }
-
-template<sp_d T> void SparseMat<T>::csr_condense() { triplet_mat.csr_condense(); }
-
-template<sp_d T> int SparseMat<T>::iterative_solve(Mat<T>& X, const Mat<T>& B) {
-    csc_condense();
-    return MetaMat<T>::iterative_solve(X, B);
-}
 
 #endif
 
