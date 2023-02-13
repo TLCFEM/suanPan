@@ -2836,6 +2836,9 @@
     <ClInclude Include="..\..\..\Material\Material1D\Viscosity\CustomViscosity.h">
       <Filter>Material\Material1D\Viscosity</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\ResourceHolder.h">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\..\Resource\suanPan.rc" />

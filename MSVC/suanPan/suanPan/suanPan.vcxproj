@@ -969,6 +969,7 @@
     <ClInclude Include="..\..\..\Toolbox\IntegrationPlan.h" />
     <ClInclude Include="..\..\..\Toolbox\Quaternion.hpp" />
     <ClInclude Include="..\..\..\Toolbox\resampling.h" />
+    <ClInclude Include="..\..\..\Toolbox\ResourceHolder.h" />
     <ClInclude Include="..\..\..\Toolbox\response_spectrum.h" />
     <ClInclude Include="..\..\..\Toolbox\shape.h" />
     <ClInclude Include="..\..\..\Toolbox\sort_color.hpp" />

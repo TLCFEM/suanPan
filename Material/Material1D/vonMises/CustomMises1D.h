@@ -30,6 +30,7 @@
 
 #include <Material/Material1D/vonMises/NonlinearMises1D.h>
 #include <Toolbox/Expression.h>
+#include <Toolbox/ResourceHolder.h>
 
 class CustomMises1D final : public NonlinearMises1D {
     [[nodiscard]] double compute_k(double) const override;
@@ -39,7 +40,7 @@ class CustomMises1D final : public NonlinearMises1D {
 
     const unsigned k_tag, h_tag;
 
-    ExpressionHolder k_expression, h_expression;
+    ResourceHolder<Expression> k_expression, h_expression;
 
 public:
     CustomMises1D(unsigned,   // tag

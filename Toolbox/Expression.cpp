@@ -59,18 +59,6 @@ void Expression::print() {
     suanpan_info("An expression represents \"{}\".", expression_text);
 }
 
-ExpressionHolder& ExpressionHolder::operator=(const shared_ptr<Expression>& original_expression) {
-    expression = original_expression->make_copy();
-    return *this;
-}
-
-ExpressionHolder::ExpressionHolder(const ExpressionHolder& old_holder)
-    : expression(old_holder.expression ? old_holder.expression->make_copy() : nullptr) {}
-
-Expression* ExpressionHolder::operator->() const { return expression.get(); }
-
-ExpressionHolder::operator bool() const { return expression != nullptr; }
-
 SimpleScalarExpression::SimpleScalarExpression(const unsigned tag, const std::string_view& input_string)
     : Expression(tag, {std::string{input_string}}) {}
 

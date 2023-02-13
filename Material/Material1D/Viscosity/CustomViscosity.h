@@ -30,6 +30,7 @@
 
 #include "NonlinearViscosity.h"
 #include <Toolbox/Expression.h>
+#include <Toolbox/ResourceHolder.h>
 
 class CustomViscosity final : public NonlinearViscosity {
     [[nodiscard]] double compute_du(double, double) const override;
@@ -38,7 +39,7 @@ class CustomViscosity final : public NonlinearViscosity {
 
     const unsigned expression_tag;
 
-    ExpressionHolder expression;
+    ResourceHolder<Expression> expression;
 
 public:
     CustomViscosity(unsigned, // tag

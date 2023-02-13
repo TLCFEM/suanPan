@@ -15,44 +15,41 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class CustomElastic1D
- * @brief A 1D Elastic class using custom constitutive equation.
+ * @class ResourceHolder
  * @author tlc
- * @date 12/01/2023
- * @file CustomElastic1D.h
- * @addtogroup Material-1D
+ * @date 15/02/2023
+ * @file ResourceHolder.h
+ * @addtogroup Utility
  * @{
  */
 
-#ifndef CUSTOMELASTIC1D_H
-#define CUSTOMELASTIC1D_H
+#ifndef RESOURCEHOLDER_H
+#define RESOURCEHOLDER_H
 
-#include <Material/Material1D/Material1D.h>
-#include <Toolbox/Expression.h>
-#include <Toolbox/ResourceHolder.h>
+#include <memory>
 
-class CustomElastic1D final : public Material1D {
-    const unsigned expression_tag;
-
-    ResourceHolder<Expression> expression;
+template<typename T> class ResourceHolder final {
+    std::unique_ptr<T> object = nullptr;
 
 public:
-    CustomElastic1D(unsigned,   // tag
-                    unsigned,   // expression tag
-                    double = 0. // density
-    );
+    ResourceHolder() = default;
 
-    int initialize(const shared_ptr<DomainBase>&) override;
+    ResourceHolder& operator=(const std::shared_ptr<T>& original_object) {
+        object = original_object->make_copy();
+        return *this;
+    }
 
-    unique_ptr<Material> get_copy() override;
+    ResourceHolder(const ResourceHolder& old_holder)
+        : object(old_holder.object ? old_holder.object->make_copy() : nullptr) {}
 
-    int update_trial_status(const vec&) override;
+    ResourceHolder(ResourceHolder&&) noexcept = delete;
+    ResourceHolder& operator=(const ResourceHolder&) = delete;
+    ResourceHolder& operator=(ResourceHolder&&) noexcept = delete;
+    ~ResourceHolder() = default;
 
-    int clear_status() override;
-    int commit_status() override;
-    int reset_status() override;
+    T* operator->() const { return object.get(); }
 
-    void print() override;
+    explicit operator bool() const { return object != nullptr; }
 };
 
 #endif

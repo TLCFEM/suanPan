@@ -31,11 +31,12 @@
 
 #include "Degradation.h"
 #include <Toolbox/Expression.h>
+#include <Toolbox/ResourceHolder.h>
 
 class CustomDegradation final : public Degradation {
     const unsigned expression_tag;
 
-    ExpressionHolder expression;
+    ResourceHolder<Expression> expression;
 
     [[nodiscard]] podarray<double> compute_degradation(double) const override;
 

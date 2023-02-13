@@ -31,11 +31,12 @@
 
 #include "NonlinearGurson.h"
 #include <Toolbox/Expression.h>
+#include <Toolbox/ResourceHolder.h>
 
 class CustomGurson final : public NonlinearGurson {
     const unsigned expression_tag;
 
-    ExpressionHolder expression;
+    ResourceHolder<Expression> expression;
 
     [[nodiscard]] vec compute_hardening(double) const override;
 

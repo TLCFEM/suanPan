@@ -71,22 +71,6 @@ public:
     void print() override;
 };
 
-class ExpressionHolder final {
-    unique_ptr<Expression> expression = nullptr;
-
-public:
-    ExpressionHolder() = default;
-    ExpressionHolder& operator=(const shared_ptr<Expression>&);
-    ExpressionHolder(const ExpressionHolder&);
-    ExpressionHolder(ExpressionHolder&&) noexcept = delete;
-    ExpressionHolder& operator=(const ExpressionHolder&) = delete;
-    ExpressionHolder& operator=(ExpressionHolder&&) noexcept = delete;
-    ~ExpressionHolder() = default;
-
-    Expression* operator->() const;
-    explicit operator bool() const;
-};
-
 class SimpleScalarExpression final : public Expression {
 public:
     SimpleScalarExpression(unsigned, const std::string_view&);

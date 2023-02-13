@@ -31,6 +31,7 @@
 
 #include "NonlinearDruckerPrager.h"
 #include <Toolbox/Expression.h>
+#include <Toolbox/ResourceHolder.h>
 
 class CustomDP final : public NonlinearDruckerPrager {
     [[nodiscard]] double compute_c(double) const override;
@@ -38,7 +39,7 @@ class CustomDP final : public NonlinearDruckerPrager {
 
     const unsigned c_tag;
 
-    ExpressionHolder c_expression;
+    ResourceHolder<Expression> c_expression;
 
 public:
     CustomDP(unsigned,   // tag
