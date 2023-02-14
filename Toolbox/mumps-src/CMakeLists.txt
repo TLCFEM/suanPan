@@ -32,15 +32,38 @@ endif ()
 file(GLOB mumps_f "*.F")
 file(GLOB mumps_c "*.c")
 
-add_library(mumps_f_mod OBJECT lr_common.F dlr_type.F dmumps_struc_def.F dlr_stats.F front_data_mgt_m.F dmumps_lr_data_m.F dlr_core.F dmumps_comm_buffer.F)
+set(mumps_mod
+        lr_common.F
+        dlr_type.F
+        dmumps_struc_def.F
+        dlr_stats.F
+        front_data_mgt_m.F
+        dmumps_lr_data_m.F
+        dlr_core.F
+        dmumps_comm_buffer.F
+        )
+
+foreach (mod_src ${mumps_mod})
+    foreach (f_src ${mumps_f})
+        if (f_src MATCHES ${mod_src})
+            list(REMOVE_ITEM mumps_f ${f_src})
+            break()
+        endif ()
+    endforeach ()
+endforeach ()
+
+add_library(mumps_mod_lib OBJECT ${mumps_mod})
 add_library(mumps_f_lib OBJECT ${mumps_f})
 add_library(mumps_c_lib OBJECT ${mumps_c})
 
-add_dependencies(mumps_f_lib mumps_f_mod)
+add_dependencies(mumps_f_lib mumps_mod_lib)
 add_dependencies(mumps_f_lib metis)
 add_dependencies(mumps_c_lib metis)
 
-add_library(${PROJECT_NAME} ${LIBRARY_TYPE} $<TARGET_OBJECTS:mumps_f_lib> $<TARGET_OBJECTS:mumps_c_lib>)
+add_library(${PROJECT_NAME} ${LIBRARY_TYPE}
+        $<TARGET_OBJECTS:mumps_mod_lib>
+        $<TARGET_OBJECTS:mumps_f_lib>
+        $<TARGET_OBJECTS:mumps_c_lib>)
 
 target_link_libraries(${PROJECT_NAME} metis)
 

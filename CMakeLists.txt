@@ -49,6 +49,12 @@ add_executable(${PROJECT_NAME}
         "UnitTest/CMakeLists.txt"
         )
 
+if (MSVC)
+    target_compile_options(${PROJECT_NAME} PRIVATE "/bigobj")
+elseif (MINGW)
+    target_compile_options(${PROJECT_NAME} PRIVATE "-Wa,-mbig-obj")
+endif ()
+
 if (COMPILER_IDENTIFIER MATCHES "vs") # MSVC COMPILER
     target_sources(${PROJECT_NAME} PRIVATE "Resource/suanPan.rc")
 else ()
@@ -83,7 +89,7 @@ if (FORTRAN_STATUS)
     add_subdirectory(Toolbox/feast-src)
     add_subdirectory(Toolbox/mumps-src)
     add_subdirectory(Toolbox/fext)
-    target_link_libraries(${PROJECT_NAME} amd arpack mumps feast)
+    target_link_libraries(${PROJECT_NAME} fext)
     message("Linking additional amd arpack mumps feast")
 elseif (COMPILER_IDENTIFIER MATCHES "vs")
     target_link_libraries(${PROJECT_NAME} libfext)

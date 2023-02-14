@@ -243,6 +243,7 @@ else ()
     endif ()
 
     if (CMAKE_BUILD_TYPE MATCHES "Debug")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1")
         option(USE_ASAN "USE ADDRESS SANITIZER" OFF)
         if (USE_ASAN)
             message(STATUS "Using the address sanitizer with flags: -fsanitize=address,leak,undefined")
