@@ -183,29 +183,9 @@ TEST_CASE("SparseMatSuperLU", "[Matrix.Sparse]") { test_sparse_mat_setup<double>
 
 TEST_CASE("SparseMatSuperLUFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<float>([](const u64 N) { return SparseMatSuperLU<float>(N, N); }); }
 
-TEST_CASE("SparseMatMUMPS", "[Matrix.Sparse]") {
-    for(auto I = 0; I < 100; ++I) {
-        const auto N = randi<uword>(distr_param(100, 200));
-        auto A = SparseMatMUMPS<double>(N, N);
-        REQUIRE(A.n_rows == N);
-        REQUIRE(A.n_cols == N);
+TEST_CASE("SparseMatMUMPS", "[Matrix.Sparse]") { test_sparse_mat_setup<double>([](const u64 N) { return SparseMatMUMPS<double>(N, N); }); }
 
-        sp_mat B = sprandu(N, N, .01) + speye(N, N) * 1E1;
-
-        auto clear_mat = [&] {
-            A.zeros();
-            for(auto J = B.begin(); J != B.end(); ++J) A.at(J.row(), J.col()) = *J;
-        };
-
-        const vec C = randu<vec>(N);
-
-        clear_mat();
-
-        REQUIRE(norm(A * C - B * C) < 1E-12);
-
-        test_mat_solve(A, spsolve(B, C), C, clear_mat);
-    }
-}
+TEST_CASE("SparseMatMUMPSFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<float>([](const u64 N) { return SparseMatMUMPS<float>(N, N); }); }
 
 #ifdef SUANPAN_MKL
 TEST_CASE("SparseMatPARDISO", "[Matrix.Sparse]") { test_sparse_mat_setup<double>([](const u64 N) { return SparseMatPARDISO<double>(N, N); }); }

@@ -14,7 +14,6 @@ include_directories(.)
 add_compile_definitions(Add_)
 add_compile_definitions(pord)
 add_compile_definitions(metis)
-add_compile_definitions(MUMPS_ARITH=MUMPS_ARITH_d)
 
 add_compile_definitions(BLR_MT)
 if (USE_MKL)
@@ -37,10 +36,16 @@ set(mumps_mod
         dlr_type.F
         dmumps_struc_def.F
         dlr_stats.F
+        slr_type.F
+        smumps_struc_def.F
+        slr_stats.F
         front_data_mgt_m.F
         dmumps_lr_data_m.F
         dlr_core.F
         dmumps_comm_buffer.F
+        smumps_lr_data_m.F
+        slr_core.F
+        smumps_comm_buffer.F
         )
 
 foreach (mod_src ${mumps_mod})
@@ -51,6 +56,9 @@ foreach (mod_src ${mumps_mod})
         endif ()
     endforeach ()
 endforeach ()
+
+set_source_files_properties(dmumps_c.c PROPERTIES COMPILE_DEFINITIONS "MUMPS_ARITH=MUMPS_ARITH_d")
+set_source_files_properties(smumps_c.c PROPERTIES COMPILE_DEFINITIONS "MUMPS_ARITH=MUMPS_ARITH_s")
 
 add_library(mumps_mod_lib OBJECT ${mumps_mod})
 add_library(mumps_f_lib OBJECT ${mumps_f})

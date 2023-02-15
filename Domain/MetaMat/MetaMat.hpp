@@ -54,6 +54,31 @@ protected:
 
     int iterative_solve(Mat<T>& X, const SpMat<T>& B) { return this->iterative_solve(X, Mat<T>(B)); }
 
+    template<std::invocable<fmat&> F> int mixed_trs(mat& X, mat&& B, F trs) {
+        auto INFO = 0;
+
+        X = arma::zeros(size(B));
+
+        auto multiplier = norm(B);
+
+        auto counter = 0u;
+        while(counter++ < this->setting.iterative_refinement) {
+            if(multiplier < this->setting.tolerance) break;
+
+            auto residual = conv_to<fmat>::from(B / multiplier);
+
+            if(0 != (INFO = trs(residual))) break;
+
+            const mat incre = multiplier * conv_to<mat>::from(residual);
+
+            X += incre;
+
+            suanpan_debug("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier = arma::norm(B -= this->operator*(incre)));
+        }
+
+        return INFO;
+    }
+
 public:
     triplet_form<T, uword> triplet_mat;
 
