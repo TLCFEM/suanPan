@@ -46,9 +46,6 @@
     <ClCompile Include="..\..\..\Toolbox\mumps-src\multisector.c">
       <Filter>SRC</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_c.c">
-      <Filter>SRC</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_common.c">
       <Filter>SRC</Filter>
     </ClCompile>
@@ -113,6 +110,12 @@
       <Filter>SRC</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\mumps-src\tree.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\smumps_c.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\dmumps_c.c">
       <Filter>SRC</Filter>
     </ClCompile>
   </ItemGroup>

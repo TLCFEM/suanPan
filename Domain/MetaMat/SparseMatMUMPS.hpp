@@ -32,41 +32,52 @@
 #define SPARSEMATMUMPS_HPP
 
 #include <mumps/dmumps_c.h>
+#include <mumps/smumps_c.h>
 #include "SparseMat.hpp"
 
 template<sp_d T> class SparseMatBaseMUMPS : public SparseMat<T> {
     const int sym = 0;
 
-    DMUMPS_STRUC_C mumps_job{sym, 1, -1, -987654};
+    DMUMPS_STRUC_C dmumps_job{sym, 1, -1, -987654};
+    SMUMPS_STRUC_C smumps_job{sym, 1, -1, -987654};
+
+    triplet_form<float, int> s_mat;
 
     s32_vec l_irn, l_jrn;
 
-    int alloc() {
+    template<bool convert, typename ST,std::invocable<ST*> F, typename COO> int alloc(ST& mumps_job, F& mumps_c, COO& triplet_mat) {
         if(this->factored) return 0;
 
-        dealloc();
+        dealloc(mumps_job, mumps_c);
 
         this->factored = true;
 
-        this->triplet_mat.csc_condense();
-
         mumps_job.job = -1;
-        dmumps_c(&mumps_job);
+        mumps_c(&mumps_job);
 
-        mumps_job.n = static_cast<int>(this->triplet_mat.n_rows);
-        mumps_job.nnz = static_cast<int64_t>(this->triplet_mat.n_elem);
+        triplet_mat.csc_condense();
 
-        l_irn.set_size(mumps_job.nnz);
-        l_jrn.set_size(mumps_job.nnz);
+        if constexpr(convert) {
+            l_irn.set_size(triplet_mat.n_elem);
+            l_jrn.set_size(triplet_mat.n_elem);
 
-        suanpan_for(0, static_cast<int>(mumps_job.nnz), [&](const int I) {
-            l_irn[I] = static_cast<int>(this->triplet_mat.row(I) + 1);
-            l_jrn[I] = static_cast<int>(this->triplet_mat.col(I) + 1);
-        });
+            suanpan_for(0, static_cast<int>(triplet_mat.n_elem), [&](const int I) {
+                l_irn[I] = static_cast<int>(triplet_mat.row(I) + 1);
+                l_jrn[I] = static_cast<int>(triplet_mat.col(I) + 1);
+            });
 
-        mumps_job.irn = l_irn.memptr();
-        mumps_job.jcn = l_jrn.memptr();
-        mumps_job.a = this->triplet_mat.val_mem();
+            mumps_job.irn = l_irn.memptr();
+            mumps_job.jcn = l_jrn.memptr();
+        }
+        else {
+            mumps_job.irn = triplet_mat.row_mem();
+            mumps_job.jcn = triplet_mat.col_mem();
+        }
+
+        mumps_job.a = triplet_mat.val_mem();
+
+        mumps_job.n = static_cast<int>(triplet_mat.n_rows);
+        mumps_job.nnz = static_cast<int64_t>(triplet_mat.n_elem);
 
         mumps_job.icntl[0] = -1;
         mumps_job.icntl[1] = -1;
@@ -78,7 +89,7 @@ template<sp_d T> class SparseMatBaseMUMPS : public SparseMat<T> {
         mumps_job.icntl[34] = 1; // BLR
 
         mumps_job.job = 4;
-        dmumps_c(&mumps_job);
+        mumps_c(&mumps_job);
 
         if(0 != mumps_job.info[0])
             suanpan_error("Error code {} received.\n", mumps_job.info[0]);
@@ -86,30 +97,64 @@ template<sp_d T> class SparseMatBaseMUMPS : public SparseMat<T> {
         return mumps_job.info[0];
     }
 
-    void dealloc() {
+    template<typename ST,std::invocable<ST*> F> static void dealloc(ST& mumps_job, F& mumps_c) {
         if(3 != mumps_job.job) return;
         mumps_job.job = -2;
-        dmumps_c(&mumps_job);
+        mumps_c(&mumps_job);
     }
 
-    void run() {
+    template<typename ST,std::invocable<ST*> F> static void run(ST& mumps_job, F& mumps_c) {
         mumps_job.job = 3;
-        dmumps_c(&mumps_job);
+        mumps_c(&mumps_job);
     }
 
 protected:
     int direct_solve(Mat<T>& X, Mat<T>&& B) override {
-        if(const auto code = alloc(); 0 != code) return code;
+        int INFO;
 
-        mumps_job.rhs = B.memptr();
-        mumps_job.lrhs = static_cast<int>(B.n_rows);
-        mumps_job.nrhs = static_cast<int>(B.n_cols);
+        if constexpr(std::is_same_v<T, float>) {
+            if(0 != (INFO = alloc<true>(smumps_job, smumps_c, this->triplet_mat))) return INFO;
 
-        run();
+            smumps_job.rhs = B.memptr();
+            smumps_job.lrhs = static_cast<int>(B.n_rows);
+            smumps_job.nrhs = static_cast<int>(B.n_cols);
 
-        X = std::move(B);
+            run(smumps_job, smumps_c);
 
-        return mumps_job.info[0];
+            X = std::move(B);
+
+            INFO = smumps_job.info[0];
+        }
+        else if(Precision::FULL == this->setting.precision) {
+            if(0 != (INFO = alloc<true>(dmumps_job, dmumps_c, this->triplet_mat))) return INFO;
+
+            dmumps_job.rhs = B.memptr();
+            dmumps_job.lrhs = static_cast<int>(B.n_rows);
+            dmumps_job.nrhs = static_cast<int>(B.n_cols);
+
+            run(dmumps_job, dmumps_c);
+
+            X = std::move(B);
+
+            INFO = dmumps_job.info[0];
+        }
+        else {
+            if(!this->factored) s_mat = triplet_form<float, int>(this->triplet_mat, SparseBase::ONE, false);
+
+            if(0 != (INFO = alloc<false>(smumps_job, smumps_c, s_mat))) return INFO;
+
+            INFO = this->mixed_trs(X, std::forward<Mat<T>>(B), [&](fmat& residual) {
+                smumps_job.rhs = residual.memptr();
+                smumps_job.lrhs = static_cast<int>(residual.n_rows);
+                smumps_job.nrhs = static_cast<int>(residual.n_cols);
+
+                run(smumps_job, smumps_c);
+
+                return smumps_job.info[0];
+            });
+        }
+
+        return INFO;
     }
 
     int direct_solve(Mat<T>& X, const Mat<T>& B) override { return this->direct_solve(X, Mat<T>(B)); }
@@ -122,7 +167,8 @@ public:
     SparseMatBaseMUMPS(const SparseMatBaseMUMPS& other)
         : SparseMat<T>(other)
         , sym(other.sym)
-        , mumps_job{other.sym, 1, -1, -987654}
+        , dmumps_job{other.sym, 1, -1, -987654}
+        , smumps_job{other.sym, 1, -1, -987654}
         , l_irn(other.l_irn)
         , l_jrn(other.l_jrn) {}
 
@@ -130,16 +176,27 @@ public:
     SparseMatBaseMUMPS& operator=(const SparseMatBaseMUMPS&) = delete;
     SparseMatBaseMUMPS& operator=(SparseMatBaseMUMPS&&) noexcept = delete;
 
-    ~SparseMatBaseMUMPS() override { dealloc(); }
+    ~SparseMatBaseMUMPS() override {
+        dealloc(dmumps_job, dmumps_c);
+        dealloc(smumps_job, smumps_c);
+    }
 
     void zeros() override {
         SparseMat<T>::zeros();
-        dealloc();
+        dealloc(dmumps_job, dmumps_c);
+        dealloc(smumps_job, smumps_c);
     }
 
     [[nodiscard]] int sign_det() const override {
         if(IterativeSolver::NONE != this->setting.iterative_solver) throw invalid_argument("analysis requires the sign of determinant but iterative solver does not support it");
-        return mumps_job.rinfog[11] < 0. ? -1 : 1;
+
+        int det_sign;
+
+        if constexpr(std::is_same_v<T, float>) det_sign = smumps_job.rinfog[11] < 0. ? -1 : 1;
+        else if(Precision::FULL == this->setting.precision) det_sign = dmumps_job.rinfog[11] < 0. ? -1 : 1;
+        else det_sign = smumps_job.rinfog[11] < 0. ? -1 : 1;
+
+        return det_sign;
     }
 };
 
