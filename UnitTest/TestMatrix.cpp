@@ -104,10 +104,10 @@ template<typename ET, std::invocable<u64> F> void test_sparse_mat_setup(F new_ma
     }
 }
 
-template<typename MT, std::invocable T> void benchmark_mat_solve(string&& title, MT& A, const vec& C, const vec& E, T&& clear_mat) {
-    constexpr double tol = 1E-12;
+template<typename MT, typename ET, std::invocable T> void benchmark_mat_solve(string&& title, MT& A, const Col<ET>& C, const Mat<ET>& E, T&& clear_mat) {
+    constexpr auto tol = std::numeric_limits<ET>::epsilon() * 1000;
 
-    vec D;
+    Col<ET> D;
 
     BENCHMARK((title + " Full").c_str()) {
             clear_mat();
@@ -124,79 +124,176 @@ template<typename MT, std::invocable T> void benchmark_mat_solve(string&& title,
         };
 }
 
-template<typename T> void benchmark_mat_setup(const int I) {
-    sp_mat B = sprandu(I, I, .01);
-    B = B + B.t() + speye(I, I) * 1E1;
-    const vec C = randu<vec>(I);
+template<typename T> T create_new(u64) { throw std::runtime_error("unknown matrix"); }
 
-    auto A = T(I, I);
+template<> FullMat<double> create_new(const u64 N) { return {N, N}; }
+
+template<> SymmPackMat<double> create_new(const u64 N) { return SymmPackMat<double>{N}; }
+
+template<> BandMat<double> create_new(const u64 N) { return {N, N, 3}; }
+
+template<> BandMatSpike<double> create_new(const u64 N) { return {N, N, 3}; }
+
+template<> BandSymmMat<double> create_new(const u64 N) { return {N, 3}; }
+
+template<> SparseMatSuperLU<double> create_new(const u64 N) { return {N, N}; }
+
+template<> SparseMatMUMPS<double> create_new(const u64 N) { return {N, N}; }
+
+template<> SparseSymmMatMUMPS<double> create_new(const u64 N) { return {N, N}; }
+
+template<> FullMat<float> create_new(const u64 N) { return {N, N}; }
+
+template<> SymmPackMat<float> create_new(const u64 N) { return SymmPackMat<float>{N}; }
+
+template<> BandMat<float> create_new(const u64 N) { return {N, N, 3}; }
+
+template<> BandMatSpike<float> create_new(const u64 N) { return {N, N, 3}; }
+
+template<> BandSymmMat<float> create_new(const u64 N) { return {N, 3}; }
+
+template<> SparseMatSuperLU<float> create_new(const u64 N) { return {N, N}; }
+
+template<> SparseMatMUMPS<float> create_new(const u64 N) { return {N, N}; }
+
+#ifdef SUANPAN_MKL
+template<> SparseMatPARDISO<double> create_new(const u64 N) { return {N, N}; }
+
+template<> SparseMatPARDISO<float> create_new(const u64 N) { return {N, N}; }
+
+template<> SparseMatFGMRES<double> create_new(const u64 N) { return {N, N}; }
+
+template<> SparseSymmMatFGMRES<double> create_new(const u64 N) { return {N, N}; }
+#endif
+
+#ifdef SUANPAN_CUDA
+template<> FullMatCUDA<double> create_new(const u64 N) { return {N, N}; }
+
+template<> FullMatCUDA<float> create_new(const u64 N) { return {N, N}; }
+
+template<> SparseMatCUDA<double> create_new(const u64 N) { return {N, N}; }
+
+template<> SparseMatCUDA<float> create_new(const u64 N) { return {N, N}; }
+#endif
+
+template<typename T, typename ET> void benchmark_mat_setup(const int I) {
+    auto B = sprandu<SpMat<ET>>(I, I, .01);
+    B = B + B.t() + speye<SpMat<ET>>(I, I) * 1E1;
+
+    if constexpr(std::is_same_v<T, BandMat<double>> || std::is_same_v<T, BandMatSpike<double>> || std::is_same_v<T, BandSymmMat<double>>) {
+        std::vector<std::tuple<uword, uword>> to_erase;
+        to_erase.reserve(B.n_nonzero);
+        for(auto J = B.begin(); J != B.end(); ++J) if(std::abs(static_cast<int>(J.row()) - static_cast<int>(J.col())) > 3) to_erase.emplace_back(std::tuple{J.row(), J.col()});
+        for(const auto& [row,col] : to_erase) B.at(row, col) = 0.;
+    }
+
+    const auto C = randu<Col<ET>>(I);
+
+    auto A = create_new<T>(I);
 
     string title;
 
-    if(std::is_same_v<SparseMatSuperLU<double>, T>) title = "SuperLU ";
-    else if(std::is_same_v<FullMat<double>, T>) title = "Full ";
+    if(std::is_same_v<FullMat<double>, T>) title = "Full ";
+    else if(std::is_same_v<SymmPackMat<double>, T>) title = "SymmPack ";
+    else if(std::is_same_v<BandMat<double>, T>) title = "Band ";
+    else if(std::is_same_v<BandMatSpike<double>, T>) title = "BandSpike ";
+    else if(std::is_same_v<BandSymmMat<double>, T>) title = "BandSymm ";
+    else if(std::is_same_v<SparseMatMUMPS<double>, T>) title = "MUMPS ";
+    else if(std::is_same_v<SparseSymmMatMUMPS<double>, T>) title = "MUMPS Symm ";
+    else if(std::is_same_v<SparseMatSuperLU<double>, T>) title = "SuperLU ";
+#ifdef SUANPAN_MKL
+    else if(std::is_same_v<SparseMatPARDISO<double>, T>) title = "PARDISO ";
+    else if(std::is_same_v<SparseMatFGMRES<double>, T>) title = "FGMRES ";
+    else if(std::is_same_v<SparseSymmMatFGMRES<double>, T>) title = "FGMRES Symm ";
+#endif
 #ifdef SUANPAN_CUDA
     else if(std::is_same_v<FullMatCUDA<double>, T>) title = "Full CUDA ";
     else if(std::is_same_v<SparseMatCUDA<double>, T>) title = "Sparse CUDA ";
 #endif
 
-    benchmark_mat_solve(std::move(title += std::to_string(I)), A, C, spsolve(B, C), [&] {
+    title += "NNZ=" + std::to_string(B.n_nonzero) + " N=";
+
+    benchmark_mat_solve(std::move(title += std::to_string(I)), A, C, spsolve(B, C).eval(), [&] {
         A.zeros();
-        for(auto J = B.begin(); J != B.end(); ++J) A.at(J.row(), J.col()) = *J;
+        for(auto J = B.begin(); J != B.end(); ++J) A.at(J.col(), J.row()) = *J;
     });
 }
 
 TEST_CASE("Mixed Precision", "[Matrix.Benchmark]") {
-    for(auto I = 32; I < 1024; I *= 2) {
-        benchmark_mat_setup<SparseMatSuperLU<double>>(I);
-        benchmark_mat_setup<FullMat<double>>(I);
+    for(auto I = 0x0020; I < 0x0100; I *= 2) {
+        benchmark_mat_setup<FullMat<double>, double>(I);
+        benchmark_mat_setup<SymmPackMat<double>, double>(I);
+        benchmark_mat_setup<BandMat<double>, double>(I);
+        benchmark_mat_setup<BandMatSpike<double>, double>(I);
+        benchmark_mat_setup<BandSymmMat<double>, double>(I);
+        benchmark_mat_setup<SparseMatMUMPS<double>, double>(I);
+        benchmark_mat_setup<SparseSymmMatMUMPS<double>, double>(I);
+        benchmark_mat_setup<SparseMatSuperLU<double>, double>(I);
+#ifdef SUANPAN_MKL
+        benchmark_mat_setup<SparseMatPARDISO<double>, double>(I);
+        benchmark_mat_setup<SparseMatFGMRES<double>, double>(I);
+        benchmark_mat_setup<SparseSymmMatFGMRES<double>, double>(I);
+#endif
 #ifdef SUANPAN_CUDA
-        benchmark_mat_setup<SparseMatCUDA<double>>(I);
+        benchmark_mat_setup<SparseMatCUDA<double>, double>(I);
 #endif
     }
 #ifdef SUANPAN_CUDA
-    for(auto I = 0x0100; I < 0x2000; I *= 2) benchmark_mat_setup<FullMatCUDA<double>>(I);
+    for(auto I = 0x0100; I < 0x2000; I *= 2) benchmark_mat_setup<FullMatCUDA<double>, double>(I);
 #endif
 }
 
-TEST_CASE("FullMat", "[Matrix.Dense]") { test_dense_mat_setup<double>([](const u64 N) { return FullMat<double>(N, N); }); }
+TEST_CASE("Large Mixed Precision", "[Matrix.Benchmark]") {
+    for(auto I = 0x400; I < 0x500; I *= 2) {
+        benchmark_mat_setup<BandMat<double>, double>(I);
+        benchmark_mat_setup<BandMatSpike<double>, double>(I);
+        benchmark_mat_setup<BandSymmMat<double>, double>(I);
+        benchmark_mat_setup<SparseMatMUMPS<double>, double>(I);
+        benchmark_mat_setup<SparseSymmMatMUMPS<double>, double>(I);
+        benchmark_mat_setup<SparseMatSuperLU<double>, double>(I);
+    }
+}
 
-TEST_CASE("SymmPackMat", "[Matrix.Dense]") { test_dense_mat_setup<double>([](const u64 N) { return SymmPackMat<double>(N); }); }
+TEST_CASE("FullMat", "[Matrix.Dense]") { test_dense_mat_setup<double>(create_new<FullMat<double>>); }
 
-TEST_CASE("BandMat", "[Matrix.Dense]") { test_dense_mat_setup<double>([](const u64 N) { return BandMat<double>(N, N, 3); }); }
+TEST_CASE("SymmPackMat", "[Matrix.Dense]") { test_dense_mat_setup<double>(create_new<SymmPackMat<double>>); }
 
-TEST_CASE("BandMatSpike", "[Matrix.Dense]") { test_dense_mat_setup<double>([](const u64 N) { return BandMatSpike<double>(N, N, 3); }); }
+TEST_CASE("BandMat", "[Matrix.Dense]") { test_dense_mat_setup<double>(create_new<BandMat<double>>); }
 
-TEST_CASE("BandSymmMat", "[Matrix.Dense]") { test_dense_mat_setup<double>([](const u64 N) { return BandSymmMat<double>(N, 3); }); }
+TEST_CASE("BandMatSpike", "[Matrix.Dense]") { test_dense_mat_setup<double>(create_new<BandMatSpike<double>>); }
 
-TEST_CASE("FullMatFloat", "[Matrix.Dense]") { test_dense_mat_setup<float>([](const u64 N) { return FullMat<float>(N, N); }); }
+TEST_CASE("BandSymmMat", "[Matrix.Dense]") { test_dense_mat_setup<double>(create_new<BandSymmMat<double>>); }
 
-TEST_CASE("SymmPackMatFloat", "[Matrix.Dense]") { test_dense_mat_setup<float>([](const u64 N) { return SymmPackMat<float>(N); }); }
+TEST_CASE("FullMatFloat", "[Matrix.Dense]") { test_dense_mat_setup<float>(create_new<FullMat<float>>); }
 
-TEST_CASE("BandMatFloat", "[Matrix.Dense]") { test_dense_mat_setup<float>([](const u64 N) { return BandMat<float>(N, N, 3); }); }
+TEST_CASE("SymmPackMatFloat", "[Matrix.Dense]") { test_dense_mat_setup<float>(create_new<SymmPackMat<float>>); }
 
-TEST_CASE("BandMatSpikeFloat", "[Matrix.Dense]") { test_dense_mat_setup<float>([](const u64 N) { return BandMatSpike<float>(N, N, 3); }); }
+TEST_CASE("BandMatFloat", "[Matrix.Dense]") { test_dense_mat_setup<float>(create_new<BandMat<float>>); }
 
-TEST_CASE("BandSymmMatFloat", "[Matrix.Dense]") { test_dense_mat_setup<float>([](const u64 N) { return BandSymmMat<float>(N, 3); }); }
+TEST_CASE("BandMatSpikeFloat", "[Matrix.Dense]") { test_dense_mat_setup<float>(create_new<BandMatSpike<float>>); }
 
-TEST_CASE("SparseMatSuperLU", "[Matrix.Sparse]") { test_sparse_mat_setup<double>([](const u64 N) { return SparseMatSuperLU<double>(N, N); }); }
+TEST_CASE("BandSymmMatFloat", "[Matrix.Dense]") { test_dense_mat_setup<float>(create_new<BandSymmMat<float>>); }
 
-TEST_CASE("SparseMatSuperLUFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<float>([](const u64 N) { return SparseMatSuperLU<float>(N, N); }); }
+TEST_CASE("SparseMatSuperLU", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatSuperLU<double>>); }
 
-TEST_CASE("SparseMatMUMPS", "[Matrix.Sparse]") { test_sparse_mat_setup<double>([](const u64 N) { return SparseMatMUMPS<double>(N, N); }); }
+TEST_CASE("SparseMatSuperLUFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<float>(create_new<SparseMatSuperLU<float>>); }
 
-TEST_CASE("SparseMatMUMPSFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<float>([](const u64 N) { return SparseMatMUMPS<float>(N, N); }); }
+TEST_CASE("SparseMatMUMPS", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatMUMPS<double>>); }
+
+TEST_CASE("SparseMatMUMPSFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<float>(create_new<SparseMatMUMPS<float>>); }
 
 #ifdef SUANPAN_MKL
-TEST_CASE("SparseMatPARDISO", "[Matrix.Sparse]") { test_sparse_mat_setup<double>([](const u64 N) { return SparseMatPARDISO<double>(N, N); }); }
+TEST_CASE("SparseMatPARDISO", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatPARDISO<double>>); }
 
-TEST_CASE("SparseMatPARDISOFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<float>([](const u64 N) { return SparseMatPARDISO<float>(N, N); }); }
+TEST_CASE("SparseMatPARDISOFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<float>(create_new<SparseMatPARDISO<float>>); }
+
+TEST_CASE("SparseMatFGMRES", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatFGMRES<double>>); }
 #endif
 
 #ifdef SUANPAN_CUDA
-TEST_CASE("SparseMatCUDA", "[Matrix.Sparse]") { test_sparse_mat_setup<double>([](const u64 N) { return SparseMatCUDA<double>(N, N); }); }
+TEST_CASE("SparseMatCUDA", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatCUDA<double>>); }
 
-TEST_CASE("SparseMatCUDAFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<float>([](const u64 N) { return SparseMatCUDA<float>(N, N); }); }
+TEST_CASE("SparseMatCUDAFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<float>(create_new<SparseMatCUDA<float>>); }
 #endif
 
 TEST_CASE("Triplet/CSR/CSC Sparse", "[Matrix.Sparse]") {

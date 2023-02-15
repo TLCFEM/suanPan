@@ -23,7 +23,7 @@ jobs:
           go build Checker/updater.go
           sudo apt-get update && sudo apt-get install mesa-common-dev mesa-utils freeglut3-dev libglvnd-dev dpkg-dev xz-utils intel-oneapi-mkl-devel intel-oneapi-compiler-dpcpp-cpp intel-oneapi-compiler-fortran
           source /opt/intel/oneapi/setvars.sh
-          cmake -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icx -DCMAKE_Fortran_COMPILER=ifx -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.2/ -DUSE_MKL=ON -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DLINK_DYNAMIC_MKL=OFF -DCMAKE_INSTALL_PREFIX=suanPan-linux-mkl-vtk .
+          cmake -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx -DCMAKE_Fortran_COMPILER=ifx -DCMAKE_BUILD_TYPE=Debug -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.2/ -DUSE_MKL=ON -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DLINK_DYNAMIC_MKL=OFF -DCMAKE_INSTALL_PREFIX=suanPan-linux-mkl-vtk .
           make install -j"$(nproc)"
           make package
       - name: Test
@@ -62,7 +62,7 @@ jobs:
       - name: Compile
         run: |
           source /opt/intel/oneapi/setvars.sh
-          cmake -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icx -DCMAKE_Fortran_COMPILER=ifx -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.2/ -DUSE_MKL=ON -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DLINK_DYNAMIC_MKL=OFF .
+          cmake -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx -DCMAKE_Fortran_COMPILER=ifx -DCMAKE_BUILD_TYPE=Debug -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.2/ -DUSE_MKL=ON -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DLINK_DYNAMIC_MKL=OFF .
           make package -j"$(nproc)"
       - name: Test
         run: |

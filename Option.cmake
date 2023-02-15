@@ -43,7 +43,7 @@ elseif (CMAKE_SYSTEM_NAME MATCHES "Linux") # LINUX PLATFORM
     set(SP_EXTERNAL_LIB_PATH "linux")
     if (CMAKE_CXX_COMPILER_ID MATCHES "GNU") # GNU GCC COMPILER
         set(COMPILER_IDENTIFIER "gcc-linux")
-    elseif (CMAKE_CXX_COMPILER_ID MATCHES "IntelLLVM") # Intel COMPILER icx
+    elseif (CMAKE_CXX_COMPILER_ID MATCHES "IntelLLVM") # Intel COMPILER icpx
         set(COMPILER_IDENTIFIER "clang-linux")
     elseif (CMAKE_CXX_COMPILER_ID MATCHES "Intel") # Intel COMPILER Classic icc
         set(COMPILER_IDENTIFIER "gcc-linux")

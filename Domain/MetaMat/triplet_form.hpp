@@ -272,6 +272,8 @@ public:
     [[nodiscard]] triplet_form diagonal() const;
     [[nodiscard]] triplet_form strictly_upper() const;
     [[nodiscard]] triplet_form strictly_lower() const;
+    [[nodiscard]] triplet_form upper() const;
+    [[nodiscard]] triplet_form lower() const;
 };
 
 template<sp_d data_t, sp_i index_t> void triplet_form<data_t, index_t>::condense(const bool full) {
@@ -592,6 +594,22 @@ template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> triplet_form<d
     auto out_mat = *this;
 
     suanpan_for(index_t(0), out_mat.n_elem, [&](const index_t I) { out_mat.val_idx[I] *= out_mat.col(I) < out_mat.row(I); });
+
+    return out_mat;
+}
+
+template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> triplet_form<data_t, index_t>::upper() const {
+    auto out_mat = *this;
+
+    suanpan_for(index_t(0), out_mat.n_elem, [&](const index_t I) { out_mat.val_idx[I] *= out_mat.row(I) <= out_mat.col(I); });
+
+    return out_mat;
+}
+
+template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> triplet_form<data_t, index_t>::lower() const {
+    auto out_mat = *this;
+
+    suanpan_for(index_t(0), out_mat.n_elem, [&](const index_t I) { out_mat.val_idx[I] *= out_mat.col(I) <= out_mat.row(I); });
 
     return out_mat;
 }

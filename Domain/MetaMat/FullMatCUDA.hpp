@@ -54,7 +54,13 @@ template<sp_d T> class FullMatCUDA final : public FullMat<T> {
         cudaMemset(info, 0, sizeof(int));
         cudaMalloc(&ipiv, sizeof(int) * this->n_rows);
 
-        if(int bufferSize = 0; std::is_same_v<T, float> || Precision::MIXED == this->setting.precision) {
+        int bufferSize = 0;
+        if constexpr(std::is_same_v<T, float>) {
+            cudaMalloc(&d_A, sizeof(float) * this->n_elem);
+            cusolverDnSgetrf_bufferSize(handle, static_cast<int>(this->n_rows), static_cast<int>(this->n_cols), (float*)d_A, static_cast<int>(this->n_elem), &bufferSize);
+            cudaMalloc(&buffer, sizeof(float) * bufferSize);
+        }
+        else if(Precision::MIXED == this->setting.precision) {
             cudaMalloc(&d_A, sizeof(float) * this->n_elem);
             cusolverDnSgetrf_bufferSize(handle, static_cast<int>(this->n_rows), static_cast<int>(this->n_cols), (float*)d_A, static_cast<int>(this->n_elem), &bufferSize);
             cudaMalloc(&buffer, sizeof(float) * bufferSize);

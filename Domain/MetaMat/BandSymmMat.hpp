@@ -63,7 +63,7 @@ public:
     }
 
     T operator()(const uword in_row, const uword in_col) const override {
-        if(in_row > band + in_col) [[unlikely]] return bin = T(0);
+        if(in_row > band + in_col || in_col > in_row + band) [[unlikely]] return bin = T(0);
         return this->memory[in_row > in_col ? in_row - in_col + in_col * m_rows : in_col - in_row + in_row * m_rows];
     }
 
