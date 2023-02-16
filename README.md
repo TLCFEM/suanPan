@@ -127,6 +127,9 @@ on [Chocolatey](https://chocolatey.org/packages/suanpan), please use the followi
 3. It is recommended to use a modern terminal such as [Windows Terminal](https://github.com/microsoft/terminal)
    and [Fluent Terminal](https://github.com/felixse/FluentTerminal) for better output display.
 
+The Chocolatey repo available to you may not be up-to-date.
+If the latest version is not available, please try alternatives, such as portable binaries or scoop.
+
 [![asciicast](https://asciinema.org/a/491350.svg)](https://asciinema.org/a/491350)
 
 #### Scoop
@@ -153,6 +156,8 @@ Linux's users are recommended to obtain the binaries via snap or flatpak.
 #### Snap
 
 The snap supports visualization via VTK and uses Intel MKL for linear algebra.
+The edge channel is in sync with the dev branch.
+The stable channel is in sync with the master branch.
 
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/suanpan)
 
@@ -161,12 +166,16 @@ The snap supports visualization via VTK and uses Intel MKL for linear algebra.
 #### Flatpak
 
 Flatpak is also available if preferred.
+The beta channel is in sync with the dev branch.
+The stable channel is in sync with the master branch.
 
 <a href='https://flathub.org/apps/details/io.github.tlcfem.suanPan'><img width='200' alt='Download on Flathub' src='https://flathub.org/assets/badges/flathub-badge-en.svg'/></a>
 
 ```bash
 # add repo
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+# or the beta channel
+# flatpak remote-add --if-not-exists flathub-beta https://flathub.org/beta-repo/flathub-beta.flatpakrepo
 # install
 flatpak install flathub io.github.tlcfem.suanPan
 # define alias
