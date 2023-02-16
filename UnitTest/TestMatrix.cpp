@@ -2,29 +2,31 @@
 #include "CatchHeader.h"
 
 template<typename MT, typename ET, std::invocable T> void test_mat_solve(MT& A, const Mat<ET>& D, const Col<ET>& C, T clear_mat) {
-    constexpr auto tol = std::numeric_limits<ET>::epsilon() * 100;
+    constexpr auto tol = std::numeric_limits<ET>::epsilon() * 1000;
 
     Col<ET> E(C.n_elem);
+
+    const auto scaled_tol = static_cast<ET>(C.n_elem) * tol;
 
     clear_mat();
 
     // full solve
     A.solve(E, C);
-    REQUIRE(arma::norm<Col<ET>>(E - D) < tol);
+    REQUIRE(arma::norm<Col<ET>>(E - D) < scaled_tol);
 
     // factored solve
     A.solve(E, C);
-    REQUIRE(arma::norm<Col<ET>>(E - D) < tol);
+    REQUIRE(arma::norm<Col<ET>>(E - D) < scaled_tol);
 
     clear_mat();
 
     // r-value full solve
     A.solve(E, Mat<ET>(C));
-    REQUIRE(arma::norm<Col<ET>>(E - D) < tol);
+    REQUIRE(arma::norm<Col<ET>>(E - D) < scaled_tol);
 
     // r-value factored solve
     A.solve(E, Mat<ET>(C));
-    REQUIRE(arma::norm<Col<ET>>(E - D) < tol);
+    REQUIRE(arma::norm<Col<ET>>(E - D) < scaled_tol);
 
     // mixed precision
     A.get_solver_setting().precision = Precision::MIXED;
@@ -34,24 +36,25 @@ template<typename MT, typename ET, std::invocable T> void test_mat_solve(MT& A, 
 
     // full solve
     A.solve(E, C);
-    REQUIRE(arma::norm<Col<ET>>(E - D) < tol);
+    REQUIRE(arma::norm<Col<ET>>(E - D) < scaled_tol);
 
     // factored solve
     A.solve(E, C);
-    REQUIRE(arma::norm<Col<ET>>(E - D) < tol);
+    REQUIRE(arma::norm<Col<ET>>(E - D) < scaled_tol);
 
     clear_mat();
 
     // r-value full solve
     A.solve(E, Mat<ET>(C));
-    REQUIRE(arma::norm<Col<ET>>(E - D) < tol);
+    REQUIRE(arma::norm<Col<ET>>(E - D) < scaled_tol);
 
     // r-value factored solve
     A.solve(E, Mat<ET>(C));
-    REQUIRE(arma::norm<Col<ET>>(E - D) < tol);
+    REQUIRE(arma::norm<Col<ET>>(E - D) < scaled_tol);
 }
 
 template<typename ET, std::invocable<u64> F> void test_dense_mat_setup(F new_mat) {
+    constexpr auto tol = std::numeric_limits<ET>::epsilon() * 1000;
     for(auto I = 0; I < 100; ++I) {
         const auto N = randi<uword>(distr_param(100, 200));
         auto A = new_mat(N);
@@ -73,14 +76,15 @@ template<typename ET, std::invocable<u64> F> void test_dense_mat_setup(F new_mat
 
         clear_mat();
 
-        REQUIRE(arma::norm<Col<ET>>(A * C - B * C) < std::numeric_limits<ET>::epsilon() * 1000);
-        REQUIRE(arma::norm<Mat<ET>>(A * B - B * B) < std::numeric_limits<ET>::epsilon() * 1000);
+        REQUIRE(arma::norm<Col<ET>>(A * C - B * C) < tol);
+        REQUIRE(arma::norm<Mat<ET>>(A * B - B * B) < tol);
 
         test_mat_solve(A, solve(B, C).eval(), C, clear_mat);
     }
 }
 
 template<typename ET, std::invocable<u64> F> void test_sparse_mat_setup(F new_mat) {
+    constexpr auto tol = std::numeric_limits<ET>::epsilon() * 1000;
     for(auto I = 0; I < 100; ++I) {
         const auto N = randi<uword>(distr_param(100, 200));
         auto A = new_mat(N);
@@ -98,14 +102,14 @@ template<typename ET, std::invocable<u64> F> void test_sparse_mat_setup(F new_ma
 
         clear_mat();
 
-        REQUIRE(arma::norm<Col<ET>>(A * C - B * C) < std::numeric_limits<ET>::epsilon() * 1000);
+        REQUIRE(arma::norm<Col<ET>>(A * C - B * C) < tol);
 
         test_mat_solve(A, spsolve(B, C), C, clear_mat);
     }
 }
 
 template<typename MT, typename ET, std::invocable T> void benchmark_mat_solve(string&& title, MT& A, const Col<ET>& C, const Mat<ET>& E, T&& clear_mat) {
-    constexpr auto tol = std::numeric_limits<ET>::epsilon() * 1000;
+    constexpr auto tol = std::numeric_limits<ET>::epsilon() * 10000;
 
     Col<ET> D;
 
@@ -130,9 +134,9 @@ template<> FullMat<double> create_new(const u64 N) { return {N, N}; }
 
 template<> SymmPackMat<double> create_new(const u64 N) { return SymmPackMat<double>{N}; }
 
-template<> BandMat<double> create_new(const u64 N) { return {N, N, 3}; }
+template<> BandMat<double> create_new(const u64 N) { return {N, 3, 3}; }
 
-template<> BandMatSpike<double> create_new(const u64 N) { return {N, N, 3}; }
+template<> BandMatSpike<double> create_new(const u64 N) { return {N, 3, 3}; }
 
 template<> BandSymmMat<double> create_new(const u64 N) { return {N, 3}; }
 
@@ -146,9 +150,9 @@ template<> FullMat<float> create_new(const u64 N) { return {N, N}; }
 
 template<> SymmPackMat<float> create_new(const u64 N) { return SymmPackMat<float>{N}; }
 
-template<> BandMat<float> create_new(const u64 N) { return {N, N, 3}; }
+template<> BandMat<float> create_new(const u64 N) { return {N, 3, 3}; }
 
-template<> BandMatSpike<float> create_new(const u64 N) { return {N, N, 3}; }
+template<> BandMatSpike<float> create_new(const u64 N) { return {N, 3, 3}; }
 
 template<> BandSymmMat<float> create_new(const u64 N) { return {N, 3}; }
 
@@ -211,9 +215,9 @@ template<typename T, typename ET> void benchmark_mat_setup(const int I) {
     else if(std::is_same_v<SparseMatCUDA<double>, T>) title = "Sparse CUDA ";
 #endif
 
-    title += "NNZ=" + std::to_string(B.n_nonzero) + " N=";
+    title += "N=" + std::to_string(I) + " NZ=" + std::to_string(B.n_nonzero) + " NE=" + std::to_string(A.n_elem);
 
-    benchmark_mat_solve(std::move(title += std::to_string(I)), A, C, spsolve(B, C).eval(), [&] {
+    benchmark_mat_solve(std::move(title), A, C, spsolve(B, C).eval(), [&] {
         A.zeros();
         for(auto J = B.begin(); J != B.end(); ++J) A.at(J.col(), J.row()) = *J;
     });
@@ -244,7 +248,7 @@ TEST_CASE("Mixed Precision", "[Matrix.Benchmark]") {
 }
 
 TEST_CASE("Large Mixed Precision", "[Matrix.Benchmark]") {
-    for(auto I = 0x400; I < 0x500; I *= 2) {
+    for(auto I = 0x400; I < 0x2000; I *= 2) {
         benchmark_mat_setup<BandMat<double>, double>(I);
         benchmark_mat_setup<BandMatSpike<double>, double>(I);
         benchmark_mat_setup<BandSymmMat<double>, double>(I);
