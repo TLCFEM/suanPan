@@ -1391,8 +1391,7 @@ namespace Catch {
         Matches matches(m_filters.size());
         std::transform(m_filters.begin(), m_filters.end(), matches.begin(), [&](Filter const& filter) {
             std::vector<TestCaseHandle const*> currentMatches;
-            for(auto const& test : testCases)
-                if(isThrowSafe(test, config) && filter.matches(test.getTestCaseInfo())) currentMatches.emplace_back(&test);
+            for(auto const& test : testCases) if(isThrowSafe(test, config) && filter.matches(test.getTestCaseInfo())) currentMatches.emplace_back(&test);
             return FilterMatch{extractFilterName(filter), currentMatches};
         });
         return matches;
@@ -8192,8 +8191,7 @@ namespace Catch {
             }
 
             if(!result.getMessage().empty()) rss << result.getMessage() << '\n';
-            for(auto const& msg : stats.infoMessages)
-                if(msg.type == ResultWas::Info) rss << msg.message << '\n';
+            for(auto const& msg : stats.infoMessages) if(msg.type == ResultWas::Info) rss << msg.message << '\n';
 
             rss << "at " << result.getSourceInfo();
             xml.writeText(rss.str(), XmlFormatting::Newline);
@@ -8432,8 +8430,7 @@ namespace Catch {
 
             if(!result.getMessage().empty()) textRss << result.getMessage() << '\n';
 
-            for(auto const& msg : stats.infoMessages)
-                if(msg.type == ResultWas::Info) textRss << msg.message << '\n';
+            for(auto const& msg : stats.infoMessages) if(msg.type == ResultWas::Info) textRss << msg.message << '\n';
 
             textRss << "at " << result.getSourceInfo();
             xml.writeText(textRss.str(), XmlFormatting::Newline);
