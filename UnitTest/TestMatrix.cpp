@@ -171,6 +171,8 @@ template<> SparseSymmMatFGMRES<double> create_new(const u64 N) { return {N, N}; 
 #endif
 
 #ifdef SUANPAN_CUDA
+template<> BandMatCUDA<double> create_new(const u64 N) { return {N, 3, 3}; }
+
 template<> FullMatCUDA<double> create_new(const u64 N) { return {N, N}; }
 
 template<> FullMatCUDA<float> create_new(const u64 N) { return {N, N}; }
@@ -181,10 +183,14 @@ template<> SparseMatCUDA<float> create_new(const u64 N) { return {N, N}; }
 #endif
 
 template<typename T, typename ET> void benchmark_mat_setup(const int I) {
-    auto B = sprandu<SpMat<ET>>(I, I, .01);
+    auto B = sprandu<SpMat<ET>>(I, I, .02);
     B = B + B.t() + speye<SpMat<ET>>(I, I) * 1E1;
 
-    if constexpr(std::is_same_v<T, BandMat<double>> || std::is_same_v<T, BandMatSpike<double>> || std::is_same_v<T, BandSymmMat<double>>) {
+    if constexpr(std::is_same_v<T, BandMat<double>> || std::is_same_v<T, BandMatSpike<double>> || std::is_same_v<T, BandSymmMat<double>>
+#ifdef SUANPAN_CUDA
+        || std::is_same_v<T, BandMatCUDA<double>>
+#endif
+    ) {
         std::vector<std::tuple<uword, uword>> to_erase;
         to_erase.reserve(B.n_nonzero);
         for(auto J = B.begin(); J != B.end(); ++J) if(std::abs(static_cast<int>(J.row()) - static_cast<int>(J.col())) > 3) to_erase.emplace_back(std::tuple{J.row(), J.col()});
@@ -213,6 +219,7 @@ template<typename T, typename ET> void benchmark_mat_setup(const int I) {
 #ifdef SUANPAN_CUDA
     else if(std::is_same_v<FullMatCUDA<double>, T>) title = "Full CUDA ";
     else if(std::is_same_v<SparseMatCUDA<double>, T>) title = "Sparse CUDA ";
+    else if(std::is_same_v<BandMatCUDA<double>, T>) title = "Band CUDA ";
 #endif
 
     title += "N=" + std::to_string(I) + " NZ=" + std::to_string(B.n_nonzero) + " NE=" + std::to_string(A.n_elem);
@@ -240,6 +247,7 @@ TEST_CASE("Mixed Precision", "[Matrix.Benchmark]") {
 #endif
 #ifdef SUANPAN_CUDA
         benchmark_mat_setup<SparseMatCUDA<double>, double>(I);
+        benchmark_mat_setup<BandMatCUDA<double>, double>(I);
 #endif
     }
 #ifdef SUANPAN_CUDA
@@ -295,6 +303,8 @@ TEST_CASE("SparseMatFGMRES", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(
 #endif
 
 #ifdef SUANPAN_CUDA
+TEST_CASE("BandMatCUDA", "[Matrix.Dense]") { test_dense_mat_setup<double>(create_new<BandMatCUDA<double>>); }
+
 TEST_CASE("SparseMatCUDA", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatCUDA<double>>); }
 
 TEST_CASE("SparseMatCUDAFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<float>(create_new<SparseMatCUDA<float>>); }

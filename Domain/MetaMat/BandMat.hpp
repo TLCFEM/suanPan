@@ -32,19 +32,20 @@
 
 #include "DenseMat.hpp"
 
-template<sp_d T> class BandMat final : public DenseMat<T> {
+template<sp_d T> class BandMat : public DenseMat<T> {
     static constexpr char TRAN = 'N';
 
     static T bin;
 
-    const uword l_band;
-    const uword u_band;
     const uword s_band;
     const uword m_rows; // memory block layout
 
     int solve_trs(Mat<T>&, Mat<T>&&);
 
 protected:
+    const uword l_band;
+    const uword u_band;
+
     using MetaMat<T>::direct_solve;
 
     int direct_solve(Mat<T>&, Mat<T>&&) override;
@@ -52,10 +53,10 @@ protected:
 public:
     BandMat(const uword in_size, const uword in_l, const uword in_u)
         : DenseMat<T>(in_size, in_size, (2 * in_l + in_u + 1) * in_size)
-        , l_band(in_l)
-        , u_band(in_u)
         , s_band(in_l + in_u)
-        , m_rows(2 * in_l + in_u + 1) {}
+        , m_rows(2 * in_l + in_u + 1)
+        , l_band(in_l)
+        , u_band(in_u) {}
 
     unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<BandMat>(*this); }
 

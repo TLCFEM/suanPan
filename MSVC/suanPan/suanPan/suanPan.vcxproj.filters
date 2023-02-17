@@ -2839,6 +2839,9 @@
     <ClInclude Include="..\..\..\Toolbox\ResourceHolder.h">
       <Filter>Toolbox</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Domain\MetaMat\BandMatCUDA.hpp">
+      <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\..\Resource\suanPan.rc" />
