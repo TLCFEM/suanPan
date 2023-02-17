@@ -39,6 +39,7 @@ add_executable(${PROJECT_NAME}
         "suanPan.cpp"
         "Include/fmt/src/format.cc"
         "Include/whereami/whereami.c"
+        "Include/catch/catch_amalgamated.cpp"
         "Constraint/CMakeLists.txt"
         "Database/CMakeLists.txt"
         "Domain/CMakeLists.txt"

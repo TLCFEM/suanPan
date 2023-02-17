@@ -46,7 +46,7 @@ protected:
     const uword l_band;
     const uword u_band;
 
-    using MetaMat<T>::direct_solve;
+    using DenseMat<T>::direct_solve;
 
     int direct_solve(Mat<T>&, Mat<T>&&) override;
 

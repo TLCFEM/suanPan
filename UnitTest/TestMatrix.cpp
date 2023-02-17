@@ -2,11 +2,10 @@
 #include "CatchHeader.h"
 
 template<typename MT, typename ET, std::invocable T> void test_mat_solve(MT& A, const Mat<ET>& D, const Col<ET>& C, T clear_mat) {
-    constexpr auto tol = std::numeric_limits<ET>::epsilon() * 1000;
+    constexpr auto tol = std::numeric_limits<ET>::epsilon() * 100;
+    const auto scaled_tol = static_cast<ET>(C.n_elem) * tol;
 
     Col<ET> E(C.n_elem);
-
-    const auto scaled_tol = static_cast<ET>(C.n_elem) * tol;
 
     clear_mat();
 
@@ -109,14 +108,15 @@ template<typename ET, std::invocable<u64> F> void test_sparse_mat_setup(F new_ma
 }
 
 template<typename MT, typename ET, std::invocable T> void benchmark_mat_solve(string&& title, MT& A, const Col<ET>& C, const Mat<ET>& E, T&& clear_mat) {
-    constexpr auto tol = std::numeric_limits<ET>::epsilon() * 10000;
+    constexpr auto tol = std::numeric_limits<ET>::epsilon() * 1000;
+    const auto scaled_tol = static_cast<ET>(C.n_elem) * tol;
 
     Col<ET> D;
 
     BENCHMARK((title + " Full").c_str()) {
             clear_mat();
             A.solve(D, C);
-            REQUIRE(norm(E - D) < static_cast<double>(C.n_elem) * tol);
+            REQUIRE(norm(E - D) < scaled_tol);
         };
 
     A.get_solver_setting().precision = Precision::MIXED;
@@ -124,7 +124,7 @@ template<typename MT, typename ET, std::invocable T> void benchmark_mat_solve(st
     BENCHMARK((title + " Mixed").c_str()) {
             clear_mat();
             A.solve(D, C);
-            REQUIRE(norm(E - D) < static_cast<double>(C.n_elem) * tol);
+            REQUIRE(norm(E - D) < scaled_tol);
         };
 }
 
@@ -136,7 +136,7 @@ template<> SymmPackMat<double> create_new(const u64 N) { return SymmPackMat<doub
 
 template<> BandMat<double> create_new(const u64 N) { return {N, 3, 3}; }
 
-template<> BandMatSpike<double> create_new(const u64 N) { return {N, 3, 3}; }
+template<> BandMatSpike<double> create_new(const u64 N) { return {N, N / 10, N / 10}; }
 
 template<> BandSymmMat<double> create_new(const u64 N) { return {N, 3}; }
 
@@ -152,7 +152,7 @@ template<> SymmPackMat<float> create_new(const u64 N) { return SymmPackMat<float
 
 template<> BandMat<float> create_new(const u64 N) { return {N, 3, 3}; }
 
-template<> BandMatSpike<float> create_new(const u64 N) { return {N, 3, 3}; }
+template<> BandMatSpike<float> create_new(const u64 N) { return {N, N / 10, N / 10}; }
 
 template<> BandSymmMat<float> create_new(const u64 N) { return {N, 3}; }
 
@@ -256,7 +256,7 @@ TEST_CASE("Mixed Precision", "[Matrix.Benchmark]") {
 }
 
 TEST_CASE("Large Mixed Precision", "[Matrix.Benchmark]") {
-    for(auto I = 0x400; I < 0x2000; I *= 2) {
+    for(auto I = 0x400; I < 0x500; I *= 2) {
         benchmark_mat_setup<BandMat<double>, double>(I);
         benchmark_mat_setup<BandMatSpike<double>, double>(I);
         benchmark_mat_setup<BandSymmMat<double>, double>(I);

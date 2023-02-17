@@ -83,7 +83,7 @@ template<sp_d T> class BandMatCUDA final : public BandMat<T> {
     }
 
 protected:
-    using MetaMat<T>::direct_solve;
+    using BandMat<T>::direct_solve;
 
     int direct_solve(Mat<T>&, Mat<T>&&) override;
 

@@ -38,7 +38,7 @@ template<sp_d T> class FullMat : public DenseMat<T> {
     int solve_trs(Mat<T>&, Mat<T>&&);
 
 protected:
-    using MetaMat<T>::direct_solve;
+    using DenseMat<T>::direct_solve;
 
     int direct_solve(Mat<T>&, Mat<T>&&) override;
 

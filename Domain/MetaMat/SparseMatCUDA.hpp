@@ -83,7 +83,7 @@ template<sp_d T> class SparseMatCUDA final : public SparseMat<T> {
     }
 
 protected:
-    using MetaMat<T>::direct_solve;
+    using SparseMat<T>::direct_solve;
 
     int direct_solve(Mat<T>&, const Mat<T>&) override;
 

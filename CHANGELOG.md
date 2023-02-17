@@ -3,6 +3,13 @@
 ## known issues
 
 1. `MKL` includes outdated `FEAST`, the external names in `FEAST` library are modified to avoid linking error.
+2. The `SPIKE` solver may occasionally hang.
+3. The `MUMPS` solver throws segfaults with large matrices.
+
+## version 2.9
+
+1. matrix optimsation
+2. update `Catch2` to version `3.3.1`
 
 ## version 2.8
 
