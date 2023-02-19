@@ -184,7 +184,7 @@ echo "alias suanpan=\"flatpak run io.github.tlcfem.suanPan\"" >> ~/.bashrc
 
 #### Installation Packages
 
-Alternatively, download the RPM (Fedora 35) or DEB (Ubuntu 22.04) package from the release page. The packages may not be
+Alternatively, download the RPM (Fedora 36) or DEB (Ubuntu 22.04) package from the release page. The packages may not be
 compatible with older distributions (due to different version of `libstdc++`). It is also possible to compile the
 package via docker, check the dockerfiles under the `Script` folder, for any questions please open an issue.
 

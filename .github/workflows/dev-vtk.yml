@@ -7,6 +7,7 @@ on:
 jobs:
   ubuntu-openblas-vtk-dev:
     runs-on: ubuntu-22.04
+    timeout-minutes: 60
     steps:
       - name: Clone
         uses: actions/checkout@v3
@@ -33,6 +34,7 @@ jobs:
           path: suanPan-2.9.0-1.x86_64.deb
   macos-openblas-vtk-dev:
     runs-on: macos-11
+    timeout-minutes: 60
     steps:
       - name: Clone
         uses: actions/checkout@v3
@@ -55,6 +57,7 @@ jobs:
           ./suanPan-macos-openblas-vtk/bin/suanPan -v
   windows-openblas-vtk-dev:
     runs-on: windows-2022
+    timeout-minutes: 90
     steps:
       - name: Clone
         uses: actions/checkout@v3
