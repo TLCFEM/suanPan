@@ -34,6 +34,7 @@
 #include <future>
 #include <Domain/MetaMat/operator_times.hpp>
 #include <Toolbox/container.h>
+#include <Element/MappingDOF.h>
 
 enum class AnalysisType {
     NONE,
@@ -166,7 +167,7 @@ template<sp_d T> class Factory final {
     template<sp_d T1> friend unique_ptr<MetaMat<T1>> get_basic_container(const Factory<T1>*);
     template<sp_d T1> friend unique_ptr<MetaMat<T1>> get_matrix_container(const Factory<T1>*);
 
-    void assemble_matrix_helper(shared_ptr<MetaMat<T>>&, const Mat<T>&, const uvec&, const uvec&, const uvec&);
+    void assemble_matrix_helper(shared_ptr<MetaMat<T>>&, const Mat<T>&, const uvec&, const std::vector<MappingDOF>&);
 
 public:
     const bool initialized = false;
@@ -614,10 +615,10 @@ public:
     void assemble_damping_force(const Mat<T>&, const uvec&);
     void assemble_inertial_force(const Mat<T>&, const uvec&);
 
-    void assemble_mass(const Mat<T>&, const uvec&, const uvec&, const uvec&);
-    void assemble_damping(const Mat<T>&, const uvec&, const uvec&, const uvec&);
-    void assemble_stiffness(const Mat<T>&, const uvec&, const uvec&, const uvec&);
-    void assemble_geometry(const Mat<T>&, const uvec&, const uvec&, const uvec&);
+    void assemble_mass(const Mat<T>&, const uvec&, const std::vector<MappingDOF>&);
+    void assemble_damping(const Mat<T>&, const uvec&, const std::vector<MappingDOF>&);
+    void assemble_stiffness(const Mat<T>&, const uvec&, const std::vector<MappingDOF>&);
+    void assemble_geometry(const Mat<T>&, const uvec&, const std::vector<MappingDOF>&);
 
     void assemble_stiffness(const SpMat<T>&, const uvec&);
 
@@ -1819,20 +1820,20 @@ template<sp_d T> void Factory<T>::assemble_inertial_force(const Mat<T>& ER, cons
     for(auto I = 0llu; I < EI.n_elem; ++I) trial_inertial_force(EI(I)) += ER(I);
 }
 
-template<sp_d T> void Factory<T>::assemble_matrix_helper(shared_ptr<MetaMat<T>>& GM, const Mat<T>& EM, const uvec& EI, const uvec& NEI, const uvec& REI) {
+template<sp_d T> void Factory<T>::assemble_matrix_helper(shared_ptr<MetaMat<T>>& GM, const Mat<T>& EM, const uvec& EI, const std::vector<MappingDOF>& MAP) {
     if(EM.is_empty()) return;
 
-    if(StorageScheme::BANDSYMM == storage_type || StorageScheme::SYMMPACK == storage_type) for(auto I = 0llu; I < NEI.n_elem; ++I) for(auto J = I; J < NEI.n_elem; ++J) GM->unsafe_at(REI(J), REI(I)) += EM(NEI(J), NEI(I));
+    if(StorageScheme::BANDSYMM == storage_type || StorageScheme::SYMMPACK == storage_type) for(const auto [g_row, g_col, l_row, l_col] : MAP) GM->unsafe_at(g_row, g_col) += EM(l_row, l_col);
     else for(auto I = 0llu; I < EI.n_elem; ++I) for(auto J = 0llu; J < EI.n_elem; ++J) GM->unsafe_at(EI(J), EI(I)) += EM(J, I);
 }
 
-template<sp_d T> void Factory<T>::assemble_mass(const Mat<T>& EM, const uvec& EI, const uvec& NEI, const uvec& REI) { this->assemble_matrix_helper(global_mass, EM, EI, NEI, REI); }
+template<sp_d T> void Factory<T>::assemble_mass(const Mat<T>& EM, const uvec& EI, const std::vector<MappingDOF>& MAP) { this->assemble_matrix_helper(global_mass, EM, EI, MAP); }
 
-template<sp_d T> void Factory<T>::assemble_damping(const Mat<T>& EC, const uvec& EI, const uvec& NEI, const uvec& REI) { this->assemble_matrix_helper(global_damping, EC, EI, NEI, REI); }
+template<sp_d T> void Factory<T>::assemble_damping(const Mat<T>& EC, const uvec& EI, const std::vector<MappingDOF>& MAP) { this->assemble_matrix_helper(global_damping, EC, EI, MAP); }
 
-template<sp_d T> void Factory<T>::assemble_stiffness(const Mat<T>& EK, const uvec& EI, const uvec& NEI, const uvec& REI) { this->assemble_matrix_helper(global_stiffness, EK, EI, NEI, REI); }
+template<sp_d T> void Factory<T>::assemble_stiffness(const Mat<T>& EK, const uvec& EI, const std::vector<MappingDOF>& MAP) { this->assemble_matrix_helper(global_stiffness, EK, EI, MAP); }
 
-template<sp_d T> void Factory<T>::assemble_geometry(const Mat<T>& EG, const uvec& EI, const uvec& NEI, const uvec& REI) { this->assemble_matrix_helper(global_geometry, EG, EI, NEI, REI); }
+template<sp_d T> void Factory<T>::assemble_geometry(const Mat<T>& EG, const uvec& EI, const std::vector<MappingDOF>& MAP) { this->assemble_matrix_helper(global_geometry, EG, EI, MAP); }
 
 template<sp_d T> void Factory<T>::assemble_stiffness(const SpMat<T>& EK, const uvec& EI) {
     if(EK.is_empty()) return;

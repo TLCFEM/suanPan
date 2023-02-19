@@ -641,6 +641,7 @@
     <ClInclude Include="..\..\..\Element\ElementBase.h" />
     <ClInclude Include="..\..\..\Element\ElementParser.h" />
     <ClInclude Include="..\..\..\Element\ElementTemplate.h" />
+    <ClInclude Include="..\..\..\Element\MappingDOF.h" />
     <ClInclude Include="..\..\..\Element\MaterialElement.h" />
     <ClInclude Include="..\..\..\Element\Membrane\Axisymmetric\CAX3.h" />
     <ClInclude Include="..\..\..\Element\Membrane\Axisymmetric\CAX4.h" />

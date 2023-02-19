@@ -2848,6 +2848,9 @@
     <ClInclude Include="..\..\..\Toolbox\thread_pool.hpp">
       <Filter>Z</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Element\MappingDOF.h">
+      <Filter>Element</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\..\Resource\suanPan.rc" />

@@ -30,6 +30,7 @@
 
 #include <Domain/Tag.h>
 #include <Element/Visualisation/vtkBase.h>
+#include <Element/MappingDOF.h>
 
 class Node;
 class DomainBase;
@@ -104,10 +105,10 @@ public:
     [[nodiscard]] virtual bool if_update_stiffness() const = 0;
     [[nodiscard]] virtual bool if_update_geometry() const = 0;
 
-    [[nodiscard]] virtual const uvec& get_dof_reordered() const = 0;
-    [[nodiscard]] virtual const uvec& get_dof_index() const = 0;
     [[nodiscard]] virtual const uvec& get_dof_encoding() const = 0;
     [[nodiscard]] virtual const uvec& get_node_encoding() const = 0;
+
+    [[nodiscard]] virtual const std::vector<MappingDOF>& get_dof_mapping() const = 0;
 
     [[nodiscard]] virtual const uvec& get_material_tag() const = 0;
     [[nodiscard]] virtual const uvec& get_section_tag() const = 0;

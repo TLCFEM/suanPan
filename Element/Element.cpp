@@ -394,8 +394,11 @@ void Element::update_dof_encoding() {
         for(unsigned i = 0; i < num_dof; ++i) dof_encoding(idx++) = node_dof(i);
     }
 
-    dof_index = sort_index(dof_encoding);
-    dof_reordered = dof_encoding(dof_index);
+    dof_mapping.clear();
+    dof_mapping.reserve(num_size);
+    const uvec dof_index = sort_index(dof_encoding), dof_reordered = dof_encoding(dof_index);
+    for(auto I = 0llu; I < dof_index.n_elem; ++I) for(auto J = I; J < dof_index.n_elem; ++J) dof_mapping.emplace_back(MappingDOF{dof_reordered(J), dof_reordered(I), dof_index(J), dof_index(I)});
+    std::sort(dof_mapping.begin(), dof_mapping.end(), [](const MappingDOF& A, const MappingDOF& B) { return A.l_col == B.l_col ? A.l_row < B.l_row : A.l_col < B.l_col; });
 
     if(!dof_identifier.empty()) for(const auto& tmp_ptr : node_ptr) tmp_ptr.lock()->set_dof_identifier(dof_identifier);
 }
@@ -408,13 +411,11 @@ bool Element::if_update_stiffness() const { return update_stiffness; }
 
 bool Element::if_update_geometry() const { return update_geometry; }
 
-const uvec& Element::get_dof_reordered() const { return dof_reordered; }
-
-const uvec& Element::get_dof_index() const { return dof_index; }
-
 const uvec& Element::get_dof_encoding() const { return dof_encoding; }
 
 const uvec& Element::get_node_encoding() const { return node_encoding; }
+
+const std::vector<MappingDOF>& Element::get_dof_mapping() const { return dof_mapping; }
 
 const uvec& Element::get_material_tag() const { return material_tag; }
 
