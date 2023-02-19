@@ -2,14 +2,17 @@
 
 ## known issues
 
-1. `MKL` includes outdated `FEAST`, the external names in `FEAST` library are modified to avoid linking error.
-2. The `SPIKE` solver may occasionally hang.
+1. The `MKL` includes outdated `FEAST`, the external names in `FEAST` library are modified to avoid linking error.
+2. The `SPIKE` solver may occasionally hang, to circumvent, try to avoid mixing compilers from different vendors.
 3. The `MUMPS` solver throws segfaults with large matrices.
 
 ## version 2.9
 
 1. matrix optimsation
 2. update `Catch2` to version `3.3.1`
+3. update `TBB` to version `2021.8.0`
+4. add mixed precision algorithm for `MUMPS` solver [#119](https://github.com/TLCFEM/suanPan/pull/119)
+5. add `CustomDegradation`, `CustomGurson` and `CustomGurson1D` models
 
 ## version 2.8
 

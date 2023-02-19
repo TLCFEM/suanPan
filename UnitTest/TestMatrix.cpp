@@ -255,6 +255,13 @@ TEST_CASE("Mixed Precision", "[Matrix.Benchmark]") {
 #endif
 }
 
+#ifdef SUANPAN_CUDA
+TEST_CASE("Large BandMatCUDA", "[Matrix.Benchmark]") {
+    benchmark_mat_setup<BandMatCUDA<double>, double>(0x10000);
+    benchmark_mat_setup<BandMat<double>, double>(0x10000);
+}
+#endif
+
 TEST_CASE("Large Mixed Precision", "[Matrix.Benchmark]") {
     for(auto I = 0x400; I < 0x500; I *= 2) {
         benchmark_mat_setup<BandMat<double>, double>(I);
