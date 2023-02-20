@@ -13,6 +13,7 @@
 3. update `TBB` to version `2021.8.0`
 4. add mixed precision algorithm for `MUMPS` solver [#119](https://github.com/TLCFEM/suanPan/pull/119)
 5. add `CustomDegradation`, `CustomGurson` and `CustomGurson1D` models
+6. update `Armadillo` to version `12.0`
 
 ## version 2.8
 
