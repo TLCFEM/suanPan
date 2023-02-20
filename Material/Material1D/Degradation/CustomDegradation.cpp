@@ -18,7 +18,13 @@
 #include "CustomDegradation.h"
 #include <Domain/DomainBase.h>
 
-podarray<double> CustomDegradation::compute_degradation(const double t_strain) const { return podarray(expression->evaluate(t_strain).mem, 2); }
+podarray<double> CustomDegradation::compute_degradation(const double t_strain) const {
+    auto response = podarray<double>(2);
+    const auto t_response = expression->evaluate(t_strain);
+    for(auto I = 0llu; I < t_response.n_elem; ++I) response(I) = t_response(I);
+
+    return response;
+}
 
 CustomDegradation::CustomDegradation(const unsigned T, const unsigned MT, const unsigned ET)
     : Degradation(T, MT)

@@ -830,7 +830,7 @@ namespace arma
   #endif
   }
 
-
+#include "armadillo_shadow"
 
 #include "armadillo_bits/compiler_setup_post.hpp"
 
