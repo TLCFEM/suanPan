@@ -77,7 +77,7 @@ jobs:
           overwrite: true
   windows-openblas-vtk:
     runs-on: windows-2022
-    timeout-minutes: 70
+    timeout-minutes: 90
     steps:
       - name: Clone
         uses: actions/checkout@v3
@@ -105,6 +105,38 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: suanPan-win-openblas-vtk.7z
           asset_name: suanPan-win-openblas-vtk.7z
+          tag: ${{ env.SP_TIME }}
+          prerelease: true
+          overwrite: true
+  windows-openblas-vtk-no-avx:
+    runs-on: windows-2022
+    timeout-minutes: 90
+    steps:
+      - name: Clone
+        uses: actions/checkout@v3
+      - name: Install VTK
+        run: |
+          echo ("SP_TIME=daily-"+(get-date -format "yyyyMMddHH")) >> $env:GITHUB_ENV
+          C:/msys64/usr/bin/wget.exe https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.5-win.7z
+          7z x VTK-9.2.5-win.7z
+      - name: Golang
+        uses: actions/setup-go@v3
+      - name: Compile
+        run: |
+          go build Checker/updater.go
+          cmake -DCMAKE_BUILD_TYPE=Release -DUSE_AVX=OFF -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=D:/a/suanPan/suanPan/lib/cmake/vtk-9.2/ -DCMAKE_INSTALL_PREFIX=suanPan-win-openblas-vtk .
+          cmake --build . --target INSTALL --config Release
+      - name: Pack
+        run: |
+          cp updater.exe suanPan-win-openblas-vtk/bin
+          cd suanPan-win-openblas-vtk/bin
+          7z a ../../suanPan-win-openblas-vtk-no-avx.7z ./*
+      - name: Release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: suanPan-win-openblas-vtk-no-avx.7z
+          asset_name: suanPan-win-openblas-vtk-no-avx.7z
           tag: ${{ env.SP_TIME }}
           prerelease: true
           overwrite: true
