@@ -186,15 +186,15 @@ template<typename T, typename ET> void benchmark_mat_setup(const int I) {
     auto B = sprandu<SpMat<ET>>(I, I, .02);
     B = B + B.t() + speye<SpMat<ET>>(I, I) * 1E1;
 
-    if constexpr(std::is_same_v<T, BandMat<double>> || std::is_same_v<T, BandMatSpike<double>> || std::is_same_v<T, BandSymmMat<double>>
+    if constexpr(std::is_same_v<T, BandMat<ET>> || std::is_same_v<T, BandMatSpike<ET>> || std::is_same_v<T, BandSymmMat<ET>>
 #ifdef SUANPAN_CUDA
-        || std::is_same_v<T, BandMatCUDA<double>>
+        || std::is_same_v<T, BandMatCUDA<ET>>
 #endif
     ) {
         std::vector<std::tuple<uword, uword>> to_erase;
         to_erase.reserve(B.n_nonzero);
         for(auto J = B.begin(); J != B.end(); ++J) if(std::abs(static_cast<int>(J.row()) - static_cast<int>(J.col())) > 3) to_erase.emplace_back(std::tuple{J.row(), J.col()});
-        for(const auto& [row,col] : to_erase) B.at(row, col) = 0.;
+        for(const auto& [row, col] : to_erase) B.at(row, col) = 0.;
     }
 
     const auto C = randu<Col<ET>>(I);
@@ -203,23 +203,23 @@ template<typename T, typename ET> void benchmark_mat_setup(const int I) {
 
     string title;
 
-    if(std::is_same_v<FullMat<double>, T>) title = "Full ";
-    else if(std::is_same_v<SymmPackMat<double>, T>) title = "SymmPack ";
-    else if(std::is_same_v<BandMat<double>, T>) title = "Band ";
-    else if(std::is_same_v<BandMatSpike<double>, T>) title = "BandSpike ";
-    else if(std::is_same_v<BandSymmMat<double>, T>) title = "BandSymm ";
-    else if(std::is_same_v<SparseMatMUMPS<double>, T>) title = "MUMPS ";
-    else if(std::is_same_v<SparseSymmMatMUMPS<double>, T>) title = "MUMPS Symm ";
-    else if(std::is_same_v<SparseMatSuperLU<double>, T>) title = "SuperLU ";
+    if(std::is_same_v<FullMat<ET>, T>) title = "Full ";
+    else if(std::is_same_v<SymmPackMat<ET>, T>) title = "SymmPack ";
+    else if(std::is_same_v<BandMat<ET>, T>) title = "Band ";
+    else if(std::is_same_v<BandMatSpike<ET>, T>) title = "BandSpike ";
+    else if(std::is_same_v<BandSymmMat<ET>, T>) title = "BandSymm ";
+    else if(std::is_same_v<SparseMatMUMPS<ET>, T>) title = "MUMPS ";
+    else if(std::is_same_v<SparseSymmMatMUMPS<ET>, T>) title = "MUMPS Symm ";
+    else if(std::is_same_v<SparseMatSuperLU<ET>, T>) title = "SuperLU ";
 #ifdef SUANPAN_MKL
-    else if(std::is_same_v<SparseMatPARDISO<double>, T>) title = "PARDISO ";
-    else if(std::is_same_v<SparseMatFGMRES<double>, T>) title = "FGMRES ";
-    else if(std::is_same_v<SparseSymmMatFGMRES<double>, T>) title = "FGMRES Symm ";
+    else if(std::is_same_v<SparseMatPARDISO<ET>, T>) title = "PARDISO ";
+    else if(std::is_same_v<SparseMatFGMRES<ET>, T>) title = "FGMRES ";
+    else if(std::is_same_v<SparseSymmMatFGMRES<ET>, T>) title = "FGMRES Symm ";
 #endif
 #ifdef SUANPAN_CUDA
-    else if(std::is_same_v<FullMatCUDA<double>, T>) title = "Full CUDA ";
-    else if(std::is_same_v<SparseMatCUDA<double>, T>) title = "Sparse CUDA ";
-    else if(std::is_same_v<BandMatCUDA<double>, T>) title = "Band CUDA ";
+    else if(std::is_same_v<FullMatCUDA<ET>, T>) title = "Full CUDA ";
+    else if(std::is_same_v<SparseMatCUDA<ET>, T>) title = "Sparse CUDA ";
+    else if(std::is_same_v<BandMatCUDA<ET>, T>) title = "Band CUDA ";
 #endif
 
     title += "N=" + std::to_string(I) + " NZ=" + std::to_string(B.n_nonzero) + " NE=" + std::to_string(A.n_elem);
