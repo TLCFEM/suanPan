@@ -103,12 +103,11 @@ int LeeNewmark::process_constraint() {
 
     // this stiffness contains geometry, mass and damping which are handled in Newmark::assemble_matrix()
     auto& t_stiff = get_stiffness(factory);
-    auto& t_triplet = stiffness->triplet_mat;
 
     t_stiff->csc_condense();
 
     if(first_iteration) {
-        t_triplet.init((4 * n_damping + 2) * t_stiff->n_elem);
+        stiffness->triplet_mat.init((4 * n_damping + 2) * t_stiff->n_elem);
 
         initialize_mass(D);
     }

@@ -371,13 +371,11 @@ int LeeNewmarkFull::process_constraint() {
 
     const sp_i auto num_entry = 2 * t_stiff.n_elem;
 
-    auto& t_triplet = stiffness->triplet_mat;
-
     // global matrix needs to be assembled as long as it is the first iteration
     // or trial stiffness matrix is used
     if(first_iteration || StiffnessType::TRIAL == stiffness_type) {
         // preallocate memory
-        t_triplet.init(get_amplifier() * num_entry);
+        stiffness->triplet_mat.init(get_amplifier() * num_entry);
         // stiffness->zeros();
 
         // ! deal with mass matrix first
@@ -474,6 +472,7 @@ int LeeNewmarkFull::process_constraint() {
         update_residual();
 
         if(StiffnessType::TRIAL != stiffness_type) {
+            const auto& t_triplet = stiffness->triplet_mat;
             const auto& row = t_triplet.row_mem();
             const auto& col = t_triplet.col_mem();
             const auto& val = t_triplet.val_mem();
