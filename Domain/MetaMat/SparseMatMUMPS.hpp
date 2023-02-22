@@ -37,7 +37,7 @@
 #include "SparseMat.hpp"
 
 template<sp_d T> class SparseMatBaseMUMPS : public SparseMat<T> {
-    const int sym = 0;
+    const int sym;
 
     DMUMPS_STRUC_C dmumps_job{sym, 1, -1, -987654};
     SMUMPS_STRUC_C smumps_job{sym, 1, -1, -987654};
