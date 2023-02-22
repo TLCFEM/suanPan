@@ -37,7 +37,7 @@ jobs:
           path: suanPan-2.9.0-1.x86_64.deb
   fedora-mkl-vtk-dev:
     runs-on: ubuntu-22.04
-    timeout-minutes: 50
+    timeout-minutes: 60
     container: fedora:36
     steps:
       - name: Setup

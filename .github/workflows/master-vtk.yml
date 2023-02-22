@@ -7,7 +7,7 @@ on:
 jobs:
   ubuntu-openblas-vtk:
     runs-on: ubuntu-22.04
-    timeout-minutes: 50
+    timeout-minutes: 60
     steps:
       - name: Clone
         uses: actions/checkout@v3
@@ -41,7 +41,7 @@ jobs:
           overwrite: true
   macos-openblas-vtk:
     runs-on: macos-11
-    timeout-minutes: 50
+    timeout-minutes: 60
     steps:
       - name: Clone
         uses: actions/checkout@v3
@@ -72,6 +72,42 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: suanPan-macos-openblas-vtk.tar.gz
           asset_name: suanPan-macos-openblas-vtk.tar.gz
+          tag: ${{ env.SP_TIME }}
+          prerelease: true
+          overwrite: true
+  macos-openblas-vtk-no-avx:
+    runs-on: macos-11
+    timeout-minutes: 60
+    steps:
+      - name: Clone
+        uses: actions/checkout@v3
+      - name: Install VTK
+        run: |
+          echo "SP_TIME=daily-$(date +''%Y%m%d%H'')" >> $GITHUB_ENV
+          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.5-macos.tar.gz
+          tar xf VTK-9.2.5-macos.tar.gz
+      - name: Golang
+        uses: actions/setup-go@v3
+      - name: Compile
+        run: |
+          export CC=$(brew --prefix llvm@15)/bin/clang && export CXX=$(brew --prefix llvm@15)/bin/clang++ && export FC=gfortran-11
+          go build Checker/updater.go
+          brew install glfw glew libomp
+          cmake -DCMAKE_BUILD_TYPE=Release -DUSE_AVX=OFF -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.2/ -DCMAKE_INSTALL_PREFIX=suanPan-macos-openblas-vtk-no-avx .
+          make install -j4
+      - name: Pack
+        run: |
+          cp updater suanPan-macos-openblas-vtk-no-avx/bin
+          tar czf suanPan-macos-openblas-vtk-no-avx.tar.gz suanPan-macos-openblas-vtk-no-avx
+          export DYLD_LIBRARY_PATH=/Users/runner/work/suanPan/suanPan/suanPan-macos-openblas-vtk-no-avx/lib/
+          cd suanPan-macos-openblas-vtk-no-avx/bin
+          ./suanPan -v
+      - name: Release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: suanPan-macos-openblas-vtk-no-avx.tar.gz
+          asset_name: suanPan-macos-openblas-vtk-no-avx.tar.gz
           tag: ${{ env.SP_TIME }}
           prerelease: true
           overwrite: true
@@ -124,12 +160,12 @@ jobs:
       - name: Compile
         run: |
           go build Checker/updater.go
-          cmake -DCMAKE_BUILD_TYPE=Release -DUSE_AVX=OFF -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=D:/a/suanPan/suanPan/lib/cmake/vtk-9.2/ -DCMAKE_INSTALL_PREFIX=suanPan-win-openblas-vtk .
+          cmake -DCMAKE_BUILD_TYPE=Release -DUSE_AVX=OFF -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=D:/a/suanPan/suanPan/lib/cmake/vtk-9.2/ -DCMAKE_INSTALL_PREFIX=suanPan-win-openblas-vtk-no-avx .
           cmake --build . --target INSTALL --config Release
       - name: Pack
         run: |
-          cp updater.exe suanPan-win-openblas-vtk/bin
-          cd suanPan-win-openblas-vtk/bin
+          cp updater.exe suanPan-win-openblas-vtk-no-avx/bin
+          cd suanPan-win-openblas-vtk-no-avx/bin
           7z a ../../suanPan-win-openblas-vtk-no-avx.7z ./*
       - name: Release
         uses: svenstaro/upload-release-action@v2

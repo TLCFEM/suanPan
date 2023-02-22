@@ -75,13 +75,13 @@ jobs:
         run: |
           go build Checker/updater.go
           sudo apt-get update && sudo apt-get install mesa-common-dev mesa-utils freeglut3-dev libglvnd-dev intel-oneapi-mkl-devel dpkg-dev
-          cmake -DCMAKE_BUILD_TYPE=Release -DUSE_AVX=OFF -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.2/ -DUSE_MKL=ON -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DUSE_INTEL_OPENMP=OFF -DLINK_DYNAMIC_MKL=OFF -DCMAKE_INSTALL_PREFIX=suanPan-linux-mkl-vtk .
+          cmake -DCMAKE_BUILD_TYPE=Release -DUSE_AVX=OFF -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.2/ -DUSE_MKL=ON -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DUSE_INTEL_OPENMP=OFF -DLINK_DYNAMIC_MKL=OFF -DCMAKE_INSTALL_PREFIX=suanPan-linux-mkl-vtk-no-avx .
           make install -j"$(nproc)"
           make package
       - name: Pack
         run: |
-          cp updater suanPan-linux-mkl-vtk/bin
-          tar czf suanPan-linux-mkl-vtk-no-avx.tar.gz suanPan-linux-mkl-vtk
+          cp updater suanPan-linux-mkl-vtk-no-avx/bin
+          tar czf suanPan-linux-mkl-vtk-no-avx.tar.gz suanPan-linux-mkl-vtk-no-avx
       - name: Release
         uses: svenstaro/upload-release-action@v2
         with:
