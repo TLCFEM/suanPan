@@ -49,10 +49,8 @@ Name: "vcredist"; Description: "Include Microsoft Visual C++ Redistributable *.d
 
 [Files]
 Source: "..\..\suanPan\build\Release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#StoragePath}libifcoremd.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StoragePath}libiomp5md.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StoragePath}libmmd.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#StoragePath}svml_dispmd.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StoragePath}tbb12.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StoragePath}tbbmalloc.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StoragePath}tbbmalloc_proxy.dll"; DestDir: "{app}"; Flags: ignoreversion

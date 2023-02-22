@@ -511,3 +511,10 @@ TEST_CASE("Unify SparseMatPARDISO", "[Matrix.Utility]") { test_sparse_mat_unify(
 #ifdef SUANPAN_CUDA
 TEST_CASE("Unify SparseMatCUDA", "[Matrix.Utility]") { test_sparse_mat_unify(SparseMatCUDA<double>(10, 10)); }
 #endif
+
+TEST_CASE("Aligned Round", "[Matrix.Utility]") {
+    REQUIRE(0 == round_up<double>(0));
+    REQUIRE(0 == round_up<float>(0));
+    REQUIRE(8 == round_up<double>(8));
+    REQUIRE(16 == round_up<float>(8));
+}
