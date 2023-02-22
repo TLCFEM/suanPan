@@ -42,11 +42,11 @@ TEST_CASE("Chebyshev", "[Utility.Integration]") {
 double test_weighted_function(const double x) { return x * x + 2.; }
 
 TEST_CASE("Hermite", "[Utility.Integration]") {
-    for(auto I = 2u; I <= 6u; ++I)
+    for(auto I = 2u; I <= 20u; ++I)
         REQUIRE(Approx(test_integration(IntegrationPlan(1, I, IntegrationType::HERMITE), test_weighted_function)) == 4.43113);
 }
 
 TEST_CASE("Laguerre", "[Utility.Integration]") {
-    for(auto I = 2u; I <= 5u; ++I)
+    for(auto I = 2u; I <= 20u; ++I)
         REQUIRE(Approx(test_integration(IntegrationPlan(1, I, IntegrationType::LAGUERRE), test_weighted_function)) == 4);
 }
