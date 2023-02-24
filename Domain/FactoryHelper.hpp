@@ -46,6 +46,9 @@ template<sp_d T> unique_ptr<MetaMat<T>> get_basic_container(const Factory<T>* co
 #endif
 #ifdef SUANPAN_CUDA
         if(SolverType::CUDA == W->solver) return std::make_unique<SparseMatCUDA<T>>(W->n_size, W->n_size, W->n_elem);
+#ifdef SUANPAN_MAGMA
+        if(SolverType::MAGMA == W->solver) return std::make_unique<SparseMatMAGMA<T>>(W->n_size, W->n_size, W->magma_setting);
+#endif
 #endif
         return std::make_unique<SparseMatSuperLU<T>>(W->n_size, W->n_size, W->n_elem);
     case StorageScheme::SPARSESYMM:

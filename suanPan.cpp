@@ -22,6 +22,10 @@
 #include <Windows.h>
 #endif
 
+#ifdef SUANPAN_MAGMA
+#include <magma_auxiliary.h>
+#endif
+
 // ReSharper disable once CppParameterMayBeConst
 int main(int argc, char** argv) {
 #ifdef SUANPAN_WIN
@@ -32,11 +36,22 @@ int main(int argc, char** argv) {
     SetConsoleOutputCP(CP_UTF8);
 #endif
 
+#ifdef SUANPAN_MAGMA
+    magma_init();
+#endif
+
 #ifdef SUANPAN_DEBUG
+#ifdef SUANPAN_MAGMA
+    magma_print_environment();
+#endif
     argument_parser(argc, argv);
 #else
     try { argument_parser(argc, argv); }
     catch(const std::exception& e) { suanpan_fatal("Some unexpected error happens: {}, please file a bug report via https://github.com/TLCFEM/suanPan/issues.\n", e.what()); }
+#endif
+
+#ifdef SUANPAN_MAGMA
+    magma_finalize();
 #endif
 
     return SUANPAN_SUCCESS;

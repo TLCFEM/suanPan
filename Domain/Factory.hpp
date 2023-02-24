@@ -36,6 +36,10 @@
 #include <Toolbox/container.h>
 #include <Element/MappingDOF.h>
 
+#ifdef SUANPAN_MAGMA
+#include <magmasparse.h>
+#endif
+
 enum class AnalysisType {
     NONE,
     DISP,
@@ -61,7 +65,8 @@ enum class SolverType {
     MUMPS,
     CUDA,
     PARDISO,
-    FGMRES
+    FGMRES,
+    MAGMA
 };
 
 template<sp_d T> class Factory final {
@@ -75,6 +80,10 @@ template<sp_d T> class Factory final {
 
     AnalysisType analysis_type = AnalysisType::NONE;  // type of analysis
     StorageScheme storage_type = StorageScheme::FULL; // type of analysis
+
+#ifdef SUANPAN_MAGMA
+    magma_dopts magma_setting{};
+#endif
 
     bool nlgeom = false;
 
@@ -188,6 +197,12 @@ public:
 
     void set_solver_setting(const SolverSetting<double>&);
     [[nodiscard]] const SolverSetting<double>& get_solver_setting() const;
+
+#ifdef SUANPAN_MAGMA
+    void set_solver_setting(const magma_dopts& magma_opt) { magma_setting = magma_opt; }
+
+    [[nodiscard]] const magma_dopts& get_solver_setting() const { return magma_setting; }
+#endif
 
     void set_analysis_type(AnalysisType);
     [[nodiscard]] AnalysisType get_analysis_type() const;

@@ -61,6 +61,10 @@ protected:
     SolverType system_solver = SolverType::LAPACK;
     SolverSetting<double> setting{};
 
+#ifdef SUANPAN_MAGMA
+    magma_dopts magma_setting{};
+#endif
+
     weak_ptr<DomainBase> database;
     shared_ptr<Factory<double>> factory;
     shared_ptr<Solver> solver;
@@ -114,6 +118,9 @@ public:
     void set_precision(Precision);
     void set_tolerance(double);
     void set_refinement(unsigned);
+#ifdef SUANPAN_MAGMA
+    void set_magma_setting(const magma_dopts& magma_opt) { magma_setting = magma_opt; }
+#endif
 
     [[nodiscard]] double get_ini_step_size() const;
     [[nodiscard]] double get_min_step_size() const;

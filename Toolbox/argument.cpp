@@ -139,7 +139,7 @@ void print_header() {
     suanpan_info("+-----------------------------------------------------+\n");
     suanpan_info("|   __        __            suanPan is an open source |\n");
     suanpan_info("|  /  \\      |  \\              FEM framework (64-bit) |\n");
-    suanpan_info("|  \\__       |__/  __   __         {} ({}.{}.{}) |\n", SUANPAN_CODE, SUANPAN_MAJOR, SUANPAN_MINOR, SUANPAN_PATCH);
+    suanpan_info("|  \\__       |__/  __   __         {:>10} ({}.{}.{}) |\n", SUANPAN_CODE, SUANPAN_MAJOR, SUANPAN_MINOR, SUANPAN_PATCH);
     suanpan_info("|     \\ |  | |    |  \\ |  |         by tlc @ {} |\n", SUANPAN_REVISION);
     suanpan_info("|  \\__/ |__| |    |__X |  |       all rights reserved |\n");
     suanpan_info("|                              10.5281/zenodo.1285221 |\n");
@@ -281,6 +281,9 @@ void print_version() {
 #endif
 #ifdef SUANPAN_CUDA
     suanpan_info("    The GPCPU solvers are provided by CUDA. https://developer.nvidia.com/about-cuda/\n");
+#endif
+#ifdef SUANPAN_MAGMA
+    suanpan_info("    The GPCPU solvers are provided by MAGMA. https://icl.utk.edu/magma/\n");
 #endif
 #ifdef SUANPAN_MT
     suanpan_info("    The parallelisation support is implemented via TBB library. https://github.com/oneapi-src/oneTBB/\n");
