@@ -220,6 +220,23 @@ mat tensor::dev(mat&& in) {
     return std::move(in);
 }
 
+tensor::base::Base3D::Base3D(const vec3& G1, const vec3& G2, const vec3& G3)
+    : g1(G1)
+    , g2(G2)
+    , g3(G3) {
+    g.col(0) = g1;
+    g.col(1) = g2;
+    g.col(2) = g3;
+}
+
+std::tuple<vec3, vec3, vec3> tensor::base::Base3D::to_inverse() const {
+    const mat gmn = g * inv(g.t() * g);
+
+    return std::make_tuple(gmn.col(0), gmn.col(1), gmn.col(2));
+}
+
+vec3 tensor::base::unit_norm(const vec3& a1, const vec3& a2) { return normalise(cross(a1, a2)); }
+
 // transform deformation gradient to green strain
 mat tensor::strain::to_green(mat&& gradient) {
     if(gradient.n_elem == 9) {

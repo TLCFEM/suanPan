@@ -98,7 +98,20 @@ namespace tensor {
         double double_contraction(const vec&, const vec&);
         double double_contraction(vec&&, vec&&);
     } // namespace stress
-}     // namespace tensor
+
+    namespace base {
+        class Base3D {
+            const vec3 g1, g2, g3;
+            mat33 g;
+
+        public:
+            Base3D(const vec3&, const vec3&, const vec3&);
+            [[nodiscard]] std::tuple<vec3, vec3, vec3> to_inverse() const;
+        };
+
+        vec3 unit_norm(const vec3&, const vec3&);
+    }
+} // namespace tensor
 
 namespace transform {
     double atan2(const vec&);
