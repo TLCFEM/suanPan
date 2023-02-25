@@ -1,65 +1,122 @@
 #include <Domain/MetaMat/MetaMat>
 #include "CatchHeader.h"
 
-template<typename MT, std::invocable T> void test_mat_solve(MT& A, const vec& D, const vec& C, T clear_mat) {
-    constexpr double tol = 1E-12;
+template<typename MT, typename ET, std::invocable T> void test_mat_solve(MT& A, const Mat<ET>& D, const Col<ET>& C, T clear_mat) {
+    constexpr auto tol = std::numeric_limits<ET>::epsilon() * 100;
+    const auto scaled_tol = static_cast<ET>(C.n_elem) * tol;
 
-    vec E(C.n_elem);
+    Col<ET> E(C.n_elem);
 
     clear_mat();
 
     // full solve
     A.solve(E, C);
-    REQUIRE(norm(E - D) < tol);
+    REQUIRE(arma::norm<Col<ET>>(E - D) < scaled_tol);
 
     // factored solve
     A.solve(E, C);
-    REQUIRE(norm(E - D) < tol);
+    REQUIRE(arma::norm<Col<ET>>(E - D) < scaled_tol);
 
     clear_mat();
 
     // r-value full solve
-    A.solve(E, mat(C));
-    REQUIRE(norm(E - D) < tol);
+    A.solve(E, Mat<ET>(C));
+    REQUIRE(arma::norm<Col<ET>>(E - D) < scaled_tol);
 
     // r-value factored solve
-    A.solve(E, mat(C));
-    REQUIRE(norm(E - D) < tol);
+    A.solve(E, Mat<ET>(C));
+    REQUIRE(arma::norm<Col<ET>>(E - D) < scaled_tol);
 
     // mixed precision
     A.get_solver_setting().precision = Precision::MIXED;
-    A.get_solver_setting().tolerance = 1E-18;
+    A.get_solver_setting().tolerance = tol;
 
     clear_mat();
 
     // full solve
     A.solve(E, C);
-    REQUIRE(norm(E - D) < tol);
+    REQUIRE(arma::norm<Col<ET>>(E - D) < scaled_tol);
 
     // factored solve
     A.solve(E, C);
-    REQUIRE(norm(E - D) < tol);
+    REQUIRE(arma::norm<Col<ET>>(E - D) < scaled_tol);
 
     clear_mat();
 
     // r-value full solve
-    A.solve(E, mat(C));
-    REQUIRE(norm(E - D) < tol);
+    A.solve(E, Mat<ET>(C));
+    REQUIRE(arma::norm<Col<ET>>(E - D) < scaled_tol);
 
     // r-value factored solve
-    A.solve(E, mat(C));
-    REQUIRE(norm(E - D) < tol);
+    A.solve(E, Mat<ET>(C));
+    REQUIRE(arma::norm<Col<ET>>(E - D) < scaled_tol);
 }
 
-template<typename MT, std::invocable T> void benchmark_mat_solve(string&& title, MT& A, const vec& C, const vec& E, T&& clear_mat) {
-    constexpr double tol = 1E-12;
+template<typename ET, std::invocable<u64> F> void test_dense_mat_setup(F new_mat) {
+    constexpr auto tol = std::numeric_limits<ET>::epsilon() * 1000;
+    for(auto I = 0; I < 100; ++I) {
+        const auto N = randi<uword>(distr_param(100, 200));
+        auto A = new_mat(N);
+        REQUIRE(A.n_rows == N);
+        REQUIRE(A.n_cols == N);
 
-    vec D;
+        auto B = randu<Mat<ET>>(N, N);
+        B = B + B.t() + eye<decltype(B)>(N, N) * 10;
+
+        auto clear_mat = [&] {
+            A.zeros();
+            for(auto i = 0llu; i < N; ++i)
+                for(auto j = 0llu; j < N; ++j)
+                    if(std::abs(static_cast<int>(i) - static_cast<int>(j)) <= 3) A.at(i, j) = B(i, j);
+                    else B(i, j) = ET(0);
+        };
+
+        const auto C = randu<Col<ET>>(N);
+
+        clear_mat();
+
+        REQUIRE(arma::norm<Col<ET>>(A * C - B * C) < tol);
+        REQUIRE(arma::norm<Mat<ET>>(A * B - B * B) < tol);
+
+        test_mat_solve(A, solve(B, C).eval(), C, clear_mat);
+    }
+}
+
+template<typename ET, std::invocable<u64> F> void test_sparse_mat_setup(F new_mat) {
+    constexpr auto tol = std::numeric_limits<ET>::epsilon() * 1000;
+    for(auto I = 0; I < 100; ++I) {
+        const auto N = randi<uword>(distr_param(100, 200));
+        auto A = new_mat(N);
+        REQUIRE(A.n_rows == N);
+        REQUIRE(A.n_cols == N);
+
+        SpMat<ET> B = sprandu<SpMat<ET>>(N, N, .01) + speye<SpMat<ET>>(N, N) * 10;
+
+        auto clear_mat = [&] {
+            A.zeros();
+            for(auto J = B.begin(); J != B.end(); ++J) A.at(J.row(), J.col()) = *J;
+        };
+
+        const auto C = randu<Col<ET>>(N);
+
+        clear_mat();
+
+        REQUIRE(arma::norm<Col<ET>>(A * C - B * C) < tol);
+
+        test_mat_solve(A, spsolve(B, C), C, clear_mat);
+    }
+}
+
+template<typename MT, typename ET, std::invocable T> void benchmark_mat_solve(string&& title, MT& A, const Col<ET>& C, const Mat<ET>& E, T&& clear_mat) {
+    constexpr auto tol = std::numeric_limits<ET>::epsilon() * 1000;
+    const auto scaled_tol = static_cast<ET>(C.n_elem) * tol;
+
+    Col<ET> D;
 
     BENCHMARK((title + " Full").c_str()) {
             clear_mat();
             A.solve(D, C);
-            REQUIRE(norm(E - D) < static_cast<double>(C.n_elem) * tol);
+            REQUIRE(norm(E - D) < scaled_tol);
         };
 
     A.get_solver_setting().precision = Precision::MIXED;
@@ -67,277 +124,197 @@ template<typename MT, std::invocable T> void benchmark_mat_solve(string&& title,
     BENCHMARK((title + " Mixed").c_str()) {
             clear_mat();
             A.solve(D, C);
-            REQUIRE(norm(E - D) < static_cast<double>(C.n_elem) * tol);
+            REQUIRE(norm(E - D) < scaled_tol);
         };
 }
 
-template<typename T> void benchmark_mat_setup(const int I) {
-    sp_mat B = sprandu(I, I, .01);
-    B = B + B.t() + speye(I, I) * 1E1;
-    const vec C = randu<vec>(I);
+template<typename T> T create_new(u64) { throw std::runtime_error("unknown matrix"); }
 
-    auto A = T(I, I);
+template<> FullMat<double> create_new(const u64 N) { return {N, N}; }
+
+template<> SymmPackMat<double> create_new(const u64 N) { return SymmPackMat<double>{N}; }
+
+template<> BandMat<double> create_new(const u64 N) { return {N, 3, 3}; }
+
+template<> BandMatSpike<double> create_new(const u64 N) { return {N, N / 10, N / 10}; }
+
+template<> BandSymmMat<double> create_new(const u64 N) { return {N, 3}; }
+
+template<> SparseMatSuperLU<double> create_new(const u64 N) { return {N, N}; }
+
+template<> SparseMatMUMPS<double> create_new(const u64 N) { return {N, N}; }
+
+template<> SparseSymmMatMUMPS<double> create_new(const u64 N) { return {N, N}; }
+
+template<> FullMat<float> create_new(const u64 N) { return {N, N}; }
+
+template<> SymmPackMat<float> create_new(const u64 N) { return SymmPackMat<float>{N}; }
+
+template<> BandMat<float> create_new(const u64 N) { return {N, 3, 3}; }
+
+template<> BandMatSpike<float> create_new(const u64 N) { return {N, N / 10, N / 10}; }
+
+template<> BandSymmMat<float> create_new(const u64 N) { return {N, 3}; }
+
+template<> SparseMatSuperLU<float> create_new(const u64 N) { return {N, N}; }
+
+template<> SparseMatMUMPS<float> create_new(const u64 N) { return {N, N}; }
+
+#ifdef SUANPAN_MKL
+template<> SparseMatPARDISO<double> create_new(const u64 N) { return {N, N}; }
+
+template<> SparseMatPARDISO<float> create_new(const u64 N) { return {N, N}; }
+
+template<> SparseMatFGMRES<double> create_new(const u64 N) { return {N, N}; }
+
+template<> SparseSymmMatFGMRES<double> create_new(const u64 N) { return {N, N}; }
+#endif
+
+#ifdef SUANPAN_CUDA
+template<> BandMatCUDA<double> create_new(const u64 N) { return {N, 3, 3}; }
+
+template<> FullMatCUDA<double> create_new(const u64 N) { return {N, N}; }
+
+template<> FullMatCUDA<float> create_new(const u64 N) { return {N, N}; }
+
+template<> SparseMatCUDA<double> create_new(const u64 N) { return {N, N}; }
+
+template<> SparseMatCUDA<float> create_new(const u64 N) { return {N, N}; }
+#endif
+
+template<typename T, typename ET> void benchmark_mat_setup(const int I) {
+    auto B = sprandu<SpMat<ET>>(I, I, .02);
+    B = B + B.t() + speye<SpMat<ET>>(I, I) * 1E1;
+
+    if constexpr(std::is_same_v<T, BandMat<ET>> || std::is_same_v<T, BandMatSpike<ET>> || std::is_same_v<T, BandSymmMat<ET>>
+#ifdef SUANPAN_CUDA
+        || std::is_same_v<T, BandMatCUDA<ET>>
+#endif
+    ) {
+        std::vector<std::tuple<uword, uword>> to_erase;
+        to_erase.reserve(B.n_nonzero);
+        for(auto J = B.begin(); J != B.end(); ++J) if(std::abs(static_cast<int>(J.row()) - static_cast<int>(J.col())) > 3) to_erase.emplace_back(std::tuple{J.row(), J.col()});
+        for(const auto& [row, col] : to_erase) B.at(row, col) = 0.;
+    }
+
+    const auto C = randu<Col<ET>>(I);
+
+    auto A = create_new<T>(I);
 
     string title;
 
-    if(std::is_same_v<SparseMatSuperLU<double>, T>) title = "SuperLU ";
-    else if(std::is_same_v<FullMat<double>, T>) title = "Full ";
+    if(std::is_same_v<FullMat<ET>, T>) title = "Full ";
+    else if(std::is_same_v<SymmPackMat<ET>, T>) title = "SymmPack ";
+    else if(std::is_same_v<BandMat<ET>, T>) title = "Band ";
+    else if(std::is_same_v<BandMatSpike<ET>, T>) title = "BandSpike ";
+    else if(std::is_same_v<BandSymmMat<ET>, T>) title = "BandSymm ";
+    else if(std::is_same_v<SparseMatMUMPS<ET>, T>) title = "MUMPS ";
+    else if(std::is_same_v<SparseSymmMatMUMPS<ET>, T>) title = "MUMPS Symm ";
+    else if(std::is_same_v<SparseMatSuperLU<ET>, T>) title = "SuperLU ";
+#ifdef SUANPAN_MKL
+    else if(std::is_same_v<SparseMatPARDISO<ET>, T>) title = "PARDISO ";
+    else if(std::is_same_v<SparseMatFGMRES<ET>, T>) title = "FGMRES ";
+    else if(std::is_same_v<SparseSymmMatFGMRES<ET>, T>) title = "FGMRES Symm ";
+#endif
 #ifdef SUANPAN_CUDA
-    else if(std::is_same_v<FullMatCUDA<double>, T>) title = "Full CUDA ";
-    else if(std::is_same_v<SparseMatCUDA<double>, T>) title = "Sparse CUDA ";
+    else if(std::is_same_v<FullMatCUDA<ET>, T>) title = "Full CUDA ";
+    else if(std::is_same_v<SparseMatCUDA<ET>, T>) title = "Sparse CUDA ";
+    else if(std::is_same_v<BandMatCUDA<ET>, T>) title = "Band CUDA ";
 #endif
 
-    benchmark_mat_solve(std::move(title += std::to_string(I)), A, C, spsolve(B, C), [&] {
+    title += "N=" + std::to_string(I) + " NZ=" + std::to_string(B.n_nonzero) + " NE=" + std::to_string(A.n_elem);
+
+    benchmark_mat_solve(std::move(title), A, C, spsolve(B, C).eval(), [&] {
         A.zeros();
-        for(auto J = B.begin(); J != B.end(); ++J) A.at(J.row(), J.col()) = *J;
+        for(auto J = B.begin(); J != B.end(); ++J) A.at(J.col(), J.row()) = *J;
     });
 }
 
 TEST_CASE("Mixed Precision", "[Matrix.Benchmark]") {
-    for(auto I = 32; I < 1024; I *= 2) {
-        benchmark_mat_setup<SparseMatSuperLU<double>>(I);
-        benchmark_mat_setup<FullMat<double>>(I);
+    for(auto I = 0x0020; I < 0x0100; I *= 2) {
+        benchmark_mat_setup<FullMat<double>, double>(I);
+        benchmark_mat_setup<SymmPackMat<double>, double>(I);
+        benchmark_mat_setup<BandMat<double>, double>(I);
+        benchmark_mat_setup<BandMatSpike<double>, double>(I);
+        benchmark_mat_setup<BandSymmMat<double>, double>(I);
+        benchmark_mat_setup<SparseMatMUMPS<double>, double>(I);
+        benchmark_mat_setup<SparseSymmMatMUMPS<double>, double>(I);
+        benchmark_mat_setup<SparseMatSuperLU<double>, double>(I);
+#ifdef SUANPAN_MKL
+        benchmark_mat_setup<SparseMatPARDISO<double>, double>(I);
+        benchmark_mat_setup<SparseMatFGMRES<double>, double>(I);
+        benchmark_mat_setup<SparseSymmMatFGMRES<double>, double>(I);
+#endif
 #ifdef SUANPAN_CUDA
-        benchmark_mat_setup<SparseMatCUDA<double>>(I);
+        benchmark_mat_setup<SparseMatCUDA<double>, double>(I);
+        benchmark_mat_setup<BandMatCUDA<double>, double>(I);
 #endif
     }
 #ifdef SUANPAN_CUDA
-    for(auto I = 0x0100; I < 0x2000; I *= 2) benchmark_mat_setup<FullMatCUDA<double>>(I);
+    for(auto I = 0x0100; I < 0x2000; I *= 2) benchmark_mat_setup<FullMatCUDA<double>, double>(I);
 #endif
 }
 
-TEST_CASE("FullMat", "[Matrix.Dense]") {
-    for(auto I = 0; I < 100; ++I) {
-        const auto N = randi<uword>(distr_param(100, 200));
-        auto A = FullMat<double>(N, N);
-        REQUIRE(A.n_rows == N);
-        REQUIRE(A.n_cols == N);
+#ifdef SUANPAN_CUDA
+TEST_CASE("Large BandMatCUDA", "[Matrix.Benchmark]") {
+    benchmark_mat_setup<BandMatCUDA<double>, double>(0x10000);
+    benchmark_mat_setup<BandMat<double>, double>(0x10000);
+}
+#endif
 
-        const mat B = randu<mat>(N, N) + eye(N, N) * 1E1;
-
-        auto clear_mat = [&] {
-            A.zeros();
-            for(auto i = 0llu; i < N; ++i) for(auto j = 0llu; j < N; ++j) A.at(i, j) = B(i, j);
-        };
-
-        const vec C = randu<vec>(N);
-
-        clear_mat();
-
-        REQUIRE(norm(A * C - B * C) < 1E-12);
-        REQUIRE(norm(A * B - B * B) < 1E-12);
-
-        test_mat_solve(A, solve(B, C), C, clear_mat);
+TEST_CASE("Large Mixed Precision", "[Matrix.Benchmark]") {
+    for(auto I = 0x400; I < 0x500; I *= 2) {
+        benchmark_mat_setup<BandMat<double>, double>(I);
+        benchmark_mat_setup<BandMatSpike<double>, double>(I);
+        benchmark_mat_setup<BandSymmMat<double>, double>(I);
+        benchmark_mat_setup<SparseMatMUMPS<double>, double>(I);
+        benchmark_mat_setup<SparseSymmMatMUMPS<double>, double>(I);
+        benchmark_mat_setup<SparseMatSuperLU<double>, double>(I);
     }
 }
 
-TEST_CASE("SymmPackMat", "[Matrix.Dense]") {
-    for(auto I = 0; I < 100; ++I) {
-        const auto N = randi<uword>(distr_param(100, 200));
-        auto A = SymmPackMat<double>(N);
-        REQUIRE(A.n_rows == N);
+TEST_CASE("FullMat", "[Matrix.Dense]") { test_dense_mat_setup<double>(create_new<FullMat<double>>); }
 
-        mat B = diagmat(randu<vec>(N)) + eye(N, N) * 1E1;
+TEST_CASE("SymmPackMat", "[Matrix.Dense]") { test_dense_mat_setup<double>(create_new<SymmPackMat<double>>); }
 
-        auto clear_mat = [&] {
-            A.zeros();
-            for(auto i = 0llu; i < N; ++i) for(auto j = 0llu; j < N; ++j) A.at(i, j) = B(i, j);
-        };
+TEST_CASE("BandMat", "[Matrix.Dense]") { test_dense_mat_setup<double>(create_new<BandMat<double>>); }
 
-        const vec C = randu<vec>(N);
+TEST_CASE("BandMatSpike", "[Matrix.Dense]") { test_dense_mat_setup<double>(create_new<BandMatSpike<double>>); }
 
-        clear_mat();
+TEST_CASE("BandSymmMat", "[Matrix.Dense]") { test_dense_mat_setup<double>(create_new<BandSymmMat<double>>); }
 
-        REQUIRE(norm(A * C - B * C) < 1E-12);
-        REQUIRE(norm(A * B - B * B) < 1E-12);
+TEST_CASE("FullMatFloat", "[Matrix.Dense]") { test_dense_mat_setup<float>(create_new<FullMat<float>>); }
 
-        test_mat_solve(A, solve(B, C), C, clear_mat);
-    }
-}
+TEST_CASE("SymmPackMatFloat", "[Matrix.Dense]") { test_dense_mat_setup<float>(create_new<SymmPackMat<float>>); }
 
-TEST_CASE("BandMat", "[Matrix.Dense]") {
-    for(auto I = 0; I < 100; ++I) {
-        const auto N = randi<uword>(distr_param(100, 200));
-        auto A = BandMat<double>(N, N, 3);
-        REQUIRE(A.n_rows == N);
-        REQUIRE(A.n_cols == N);
+TEST_CASE("BandMatFloat", "[Matrix.Dense]") { test_dense_mat_setup<float>(create_new<BandMat<float>>); }
 
-        mat B = randu(N, N) + eye(N, N) * 1E1;
+TEST_CASE("BandMatSpikeFloat", "[Matrix.Dense]") { test_dense_mat_setup<float>(create_new<BandMatSpike<float>>); }
 
-        auto clear_mat = [&] {
-            A.zeros();
-            for(auto i = 0llu; i < N; ++i)
-                for(auto j = 0llu; j < N; ++j)
-                    if(std::abs(static_cast<int>(i) - static_cast<int>(j)) <= 3) A.at(i, j) = B(i, j);
-                    else B(i, j) = 0.;
-        };
+TEST_CASE("BandSymmMatFloat", "[Matrix.Dense]") { test_dense_mat_setup<float>(create_new<BandSymmMat<float>>); }
 
-        const vec C = randu<vec>(N);
+TEST_CASE("SparseMatSuperLU", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatSuperLU<double>>); }
 
-        clear_mat();
+TEST_CASE("SparseMatSuperLUFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<float>(create_new<SparseMatSuperLU<float>>); }
 
-        REQUIRE(norm(A * C - B * C) < 1E-12);
-        REQUIRE(norm(A * B - B * B) < 1E-12);
+TEST_CASE("SparseMatMUMPS", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatMUMPS<double>>); }
 
-        test_mat_solve(A, solve(B, C), C, clear_mat);
-    }
-}
-
-TEST_CASE("BandMatSpike", "[Matrix.Dense]") {
-    for(auto I = 0; I < 100; ++I) {
-        const auto N = randi<uword>(distr_param(100, 200));
-        auto A = BandMatSpike<double>(N, N, 3);
-        REQUIRE(A.n_rows == N);
-        REQUIRE(A.n_cols == N);
-
-        mat B = randu(N, N) + eye(N, N) * 1E1;
-
-        auto clear_mat = [&] {
-            A.zeros();
-            for(auto i = 0llu; i < N; ++i)
-                for(auto j = 0llu; j < N; ++j)
-                    if(std::abs(static_cast<int>(i) - static_cast<int>(j)) <= 3) A.at(i, j) = B(i, j);
-                    else B(i, j) = 0.;
-        };
-
-        const vec C = randu<vec>(N);
-
-        clear_mat();
-
-        REQUIRE(norm(A * C - B * C) < 1E-12);
-        REQUIRE(norm(A * B - B * B) < 1E-12);
-
-        test_mat_solve(A, solve(B, C), C, clear_mat);
-    }
-}
-
-TEST_CASE("BandSymmMat", "[Matrix.Dense]") {
-    for(auto I = 0; I < 100; ++I) {
-        const auto N = randi<uword>(distr_param(100, 200));
-        auto A = BandSymmMat<double>(N, 3);
-        REQUIRE(A.n_rows == N);
-        REQUIRE(A.n_cols == N);
-
-        mat B = randu(N, N);
-        B = B + B.t() + eye(N, N) * 1E1;
-
-        auto clear_mat = [&] {
-            A.zeros();
-            for(auto i = 0llu; i < N; ++i)
-                for(auto j = 0llu; j < N; ++j)
-                    if(std::abs(static_cast<int>(i) - static_cast<int>(j)) <= 3) A.at(i, j) = B(i, j);
-                    else B(i, j) = 0.;
-        };
-
-        const vec C = randu<vec>(N);
-
-        clear_mat();
-
-        REQUIRE(norm(A * C - B * C) < 1E-12);
-        REQUIRE(norm(A * B - B * B) < 1E-12);
-
-        test_mat_solve(A, solve(B, C), C, clear_mat);
-    }
-}
-
-TEST_CASE("SparseMatSuperLU", "[Matrix.Sparse]") {
-    for(auto I = 0; I < 100; ++I) {
-        const auto N = randi<uword>(distr_param(100, 200));
-        auto A = SparseMatSuperLU<double>(N, N);
-        REQUIRE(A.n_rows == N);
-        REQUIRE(A.n_cols == N);
-
-        sp_mat B = sprandu(N, N, .01) + speye(N, N) * 1E1;
-
-        auto clear_mat = [&] {
-            A.zeros();
-            for(auto J = B.begin(); J != B.end(); ++J) A.at(J.row(), J.col()) = *J;
-        };
-
-        const vec C = randu<vec>(N);
-
-        clear_mat();
-
-        REQUIRE(norm(A * C - B * C) < 1E-12);
-
-        test_mat_solve(A, spsolve(B, C), C, clear_mat);
-    }
-}
-
-TEST_CASE("SparseMatMUMPS", "[Matrix.Sparse]") {
-    for(auto I = 0; I < 100; ++I) {
-        const auto N = randi<uword>(distr_param(100, 200));
-        auto A = SparseMatMUMPS<double>(N, N);
-        REQUIRE(A.n_rows == N);
-        REQUIRE(A.n_cols == N);
-
-        sp_mat B = sprandu(N, N, .01) + speye(N, N) * 1E1;
-
-        auto clear_mat = [&] {
-            A.zeros();
-            for(auto J = B.begin(); J != B.end(); ++J) A.at(J.row(), J.col()) = *J;
-        };
-
-        const vec C = randu<vec>(N);
-
-        clear_mat();
-
-        REQUIRE(norm(A * C - B * C) < 1E-12);
-
-        test_mat_solve(A, spsolve(B, C), C, clear_mat);
-    }
-}
+TEST_CASE("SparseMatMUMPSFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<float>(create_new<SparseMatMUMPS<float>>); }
 
 #ifdef SUANPAN_MKL
-TEST_CASE("SparseMatPARDISO", "[Matrix.Sparse]") {
-    for(auto I = 0; I < 100; ++I) {
-        const auto N = randi<uword>(distr_param(100, 200));
-        auto A = SparseMatPARDISO<double>(N, N);
-        REQUIRE(A.n_rows == N);
-        REQUIRE(A.n_cols == N);
+TEST_CASE("SparseMatPARDISO", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatPARDISO<double>>); }
 
-        sp_mat B = sprandu(N, N, .01) + speye(N, N) * 1E1;
+TEST_CASE("SparseMatPARDISOFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<float>(create_new<SparseMatPARDISO<float>>); }
 
-        auto clear_mat = [&] {
-            A.zeros();
-            for(auto J = B.begin(); J != B.end(); ++J) A.at(J.row(), J.col()) = *J;
-        };
-
-        const vec C = randu<vec>(N);
-
-        clear_mat();
-
-        REQUIRE(norm(A * C - B * C) < 1E-12);
-
-        test_mat_solve(A, spsolve(B, C), C, clear_mat);
-    }
-}
+TEST_CASE("SparseMatFGMRES", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatFGMRES<double>>); }
 #endif
 
 #ifdef SUANPAN_CUDA
-TEST_CASE("SparseMatCUDA", "[Matrix.Sparse]") {
-    for(auto I = 0; I < 100; ++I) {
-        const auto N = randi<uword>(distr_param(100, 200));
-        auto A = SparseMatCUDA<double>(N, N);
-        REQUIRE(A.n_rows == N);
-        REQUIRE(A.n_cols == N);
+TEST_CASE("BandMatCUDA", "[Matrix.Dense]") { test_dense_mat_setup<double>(create_new<BandMatCUDA<double>>); }
 
-        sp_mat B = sprandu(N, N, .01) + speye(N, N) * 1E1;
+TEST_CASE("SparseMatCUDA", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatCUDA<double>>); }
 
-        auto clear_mat = [&] {
-            A.zeros();
-            for(auto J = B.begin(); J != B.end(); ++J) A.at(J.row(), J.col()) = *J;
-        };
-
-        const vec C = randu<vec>(N);
-
-        clear_mat();
-
-        REQUIRE(norm(A * C - B * C) < 1E-12);
-
-        test_mat_solve(A, spsolve(B, C), C, clear_mat);
-    }
-}
+TEST_CASE("SparseMatCUDAFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<float>(create_new<SparseMatCUDA<float>>); }
 #endif
 
 TEST_CASE("Triplet/CSR/CSC Sparse", "[Matrix.Sparse]") {
@@ -534,3 +511,10 @@ TEST_CASE("Unify SparseMatPARDISO", "[Matrix.Utility]") { test_sparse_mat_unify(
 #ifdef SUANPAN_CUDA
 TEST_CASE("Unify SparseMatCUDA", "[Matrix.Utility]") { test_sparse_mat_unify(SparseMatCUDA<double>(10, 10)); }
 #endif
+
+TEST_CASE("Aligned Round", "[Matrix.Utility]") {
+    REQUIRE(0 == round_up<double>(0));
+    REQUIRE(0 == round_up<float>(0));
+    REQUIRE(8 == round_up<double>(8));
+    REQUIRE(16 == round_up<float>(8));
+}

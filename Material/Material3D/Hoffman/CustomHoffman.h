@@ -31,6 +31,7 @@
 
 #include "NonlinearHoffman.h"
 #include <Toolbox/Expression.h>
+#include <Toolbox/ResourceHolder.h>
 
 class CustomHoffman final : public NonlinearHoffman {
     [[nodiscard]] double compute_k(double) const override;
@@ -38,7 +39,7 @@ class CustomHoffman final : public NonlinearHoffman {
 
     const unsigned k_tag;
 
-    shared_ptr<Expression> k_expression;
+    ResourceHolder<Expression> k_expression;
 
 public:
     CustomHoffman(unsigned,   // tag

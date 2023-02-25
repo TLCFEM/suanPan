@@ -32,75 +32,59 @@
 
 #include "DenseMat.hpp"
 
-template<sp_d T> class BandMat final : public DenseMat<T> {
+template<sp_d T> class BandMat : public DenseMat<T> {
     static constexpr char TRAN = 'N';
 
     static T bin;
 
-    const uword l_band;
-    const uword u_band;
     const uword s_band;
     const uword m_rows; // memory block layout
 
     int solve_trs(Mat<T>&, Mat<T>&&);
-    int solve_trs(Mat<T>&, const Mat<T>&);
 
-public:
-    BandMat(uword, uword, uword);
+protected:
+    const uword l_band;
+    const uword u_band;
 
-    unique_ptr<MetaMat<T>> make_copy() override;
-
-    void unify(uword) override;
-    void nullify(uword) override;
-
-    const T& operator()(uword, uword) const override;
-    T& unsafe_at(uword, uword) override;
-    T& at(uword, uword) override;
-
-    Mat<T> operator*(const Mat<T>&) const override;
+    using DenseMat<T>::direct_solve;
 
     int direct_solve(Mat<T>&, Mat<T>&&) override;
-    int direct_solve(Mat<T>&, const Mat<T>&) override;
+
+public:
+    BandMat(const uword in_size, const uword in_l, const uword in_u)
+        : DenseMat<T>(in_size, in_size, (2 * in_l + in_u + 1) * in_size)
+        , s_band(in_l + in_u)
+        , m_rows(2 * in_l + in_u + 1)
+        , l_band(in_l)
+        , u_band(in_u) {}
+
+    unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<BandMat>(*this); }
+
+    void nullify(const uword K) override {
+        this->factored = false;
+        suanpan_for(std::max(K, u_band) - u_band, std::min(this->n_rows, K + l_band + 1), [&](const uword I) { this->memory[I + s_band + K * (m_rows - 1)] = T(0); });
+        suanpan_for(std::max(K, l_band) - l_band, std::min(this->n_cols, K + u_band + 1), [&](const uword I) { this->memory[K + s_band + I * (m_rows - 1)] = T(0); });
+    }
+
+    T operator()(const uword in_row, const uword in_col) const override {
+        if(in_row > in_col + l_band || in_row + u_band < in_col) [[unlikely]] return bin = T(0);
+        return this->memory[in_row + s_band + in_col * (m_rows - 1)];
+    }
+
+    T& unsafe_at(const uword in_row, const uword in_col) override {
+        this->factored = false;
+        return this->memory[in_row + s_band + in_col * (m_rows - 1)];
+    }
+
+    T& at(const uword in_row, const uword in_col) override {
+        if(in_row > in_col + l_band || in_row + u_band < in_col) [[unlikely]] return bin = T(0);
+        return this->unsafe_at(in_row, in_col);
+    }
+
+    Mat<T> operator*(const Mat<T>&) const override;
 };
 
-template<sp_d T> T BandMat<T>::bin = 0.;
-
-template<sp_d T> BandMat<T>::BandMat(const uword in_size, const uword in_l, const uword in_u)
-    : DenseMat<T>(in_size, in_size, (2 * in_l + in_u + 1) * in_size)
-    , l_band(in_l)
-    , u_band(in_u)
-    , s_band(in_l + in_u)
-    , m_rows(2 * in_l + in_u + 1) {}
-
-template<sp_d T> unique_ptr<MetaMat<T>> BandMat<T>::make_copy() { return std::make_unique<BandMat<T>>(*this); }
-
-template<sp_d T> void BandMat<T>::unify(const uword K) {
-    nullify(K);
-    access::rw(this->memory[s_band + K * m_rows]) = 1.;
-}
-
-template<sp_d T> void BandMat<T>::nullify(const uword K) {
-    suanpan_for(std::max(K, u_band) - u_band, std::min(this->n_rows, K + l_band + 1), [&](const uword I) { access::rw(this->memory[I + s_band + K * (m_rows - 1)]) = 0.; });
-    suanpan_for(std::max(K, l_band) - l_band, std::min(this->n_cols, K + u_band + 1), [&](const uword I) { access::rw(this->memory[K + s_band + I * (m_rows - 1)]) = 0.; });
-
-    this->factored = false;
-}
-
-template<sp_d T> const T& BandMat<T>::operator()(const uword in_row, const uword in_col) const {
-    if(in_row > in_col + l_band || in_row + u_band < in_col) return bin = 0.;
-    return this->memory[in_row + s_band + in_col * (m_rows - 1)];
-}
-
-template<sp_d T> T& BandMat<T>::unsafe_at(const uword in_row, const uword in_col) {
-    this->factored = false;
-    return access::rw(this->memory[in_row + s_band + in_col * (m_rows - 1)]);
-}
-
-template<sp_d T> T& BandMat<T>::at(const uword in_row, const uword in_col) {
-    if(in_row > in_col + l_band || in_row + u_band < in_col) return bin = 0.;
-    this->factored = false;
-    return access::rw(this->memory[in_row + s_band + in_col * (m_rows - 1)]);
-}
+template<sp_d T> T BandMat<T>::bin = T(0);
 
 template<sp_d T> Mat<T> BandMat<T>::operator*(const Mat<T>& X) const {
     Mat<T> Y(arma::size(X));
@@ -110,108 +94,20 @@ template<sp_d T> Mat<T> BandMat<T>::operator*(const Mat<T>& X) const {
     const auto KL = static_cast<int>(l_band);
     const auto KU = static_cast<int>(u_band);
     const auto LDA = static_cast<int>(m_rows);
-    const auto INC = 1;
-    T ALPHA = 1.;
-    T BETA = 0.;
+    constexpr auto INC = 1;
+    T ALPHA = T(1);
+    T BETA = T(0);
 
-    if(std::is_same_v<T, float>) {
+    if constexpr(std::is_same_v<T, float>) {
         using E = float;
         suanpan_for(0llu, X.n_cols, [&](const uword I) { arma_fortran(arma_sgbmv)(&TRAN, &M, &N, &KL, &KU, (E*)&ALPHA, (E*)(this->memptr() + l_band), &LDA, (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC); });
     }
-    else if(std::is_same_v<T, double>) {
+    else {
         using E = double;
         suanpan_for(0llu, X.n_cols, [&](const uword I) { arma_fortran(arma_dgbmv)(&TRAN, &M, &N, &KL, &KU, (E*)&ALPHA, (E*)(this->memptr() + l_band), &LDA, (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC); });
     }
 
     return Y;
-}
-
-template<sp_d T> int BandMat<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
-    if(this->factored) return this->solve_trs(X, B);
-
-    suanpan_assert([&] { if(this->n_rows != this->n_cols) throw invalid_argument("requires a square matrix"); });
-
-    auto INFO = 0;
-
-    auto N = static_cast<int>(this->n_rows);
-    const auto KL = static_cast<int>(l_band);
-    const auto KU = static_cast<int>(u_band);
-    const auto NRHS = static_cast<int>(B.n_cols);
-    const auto LDAB = static_cast<int>(m_rows);
-    const auto LDB = static_cast<int>(B.n_rows);
-    this->pivot.zeros(N);
-    this->factored = true;
-
-    if(std::is_same_v<T, float>) {
-        using E = float;
-        X = B;
-        arma_fortran(arma_sgbsv)(&N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, this->pivot.memptr(), (E*)X.memptr(), &LDB, &INFO);
-    }
-    else if(Precision::FULL == this->setting.precision) {
-        using E = double;
-        X = B;
-        arma_fortran(arma_dgbsv)(&N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, this->pivot.memptr(), (E*)X.memptr(), &LDB, &INFO);
-    }
-    else {
-        this->s_memory = this->to_float();
-        arma_fortran(arma_sgbtrf)(&N, &N, &KL, &KU, this->s_memory.memptr(), &LDAB, this->pivot.memptr(), &INFO);
-        if(0 == INFO) INFO = this->solve_trs(X, B);
-    }
-
-    if(0 != INFO)
-        suanpan_error("Error code {} received, the matrix is probably singular.\n", INFO);
-
-    return INFO;
-}
-
-template<sp_d T> int BandMat<T>::solve_trs(Mat<T>& X, const Mat<T>& B) {
-    auto INFO = 0;
-
-    const auto N = static_cast<int>(this->n_rows);
-    const auto KL = static_cast<int>(l_band);
-    const auto KU = static_cast<int>(u_band);
-    const auto NRHS = static_cast<int>(B.n_cols);
-    const auto LDAB = static_cast<int>(m_rows);
-    const auto LDB = static_cast<int>(B.n_rows);
-
-    if(std::is_same_v<T, float>) {
-        using E = float;
-        X = B;
-        arma_fortran(arma_sgbtrs)(&TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, this->pivot.memptr(), (E*)X.memptr(), &LDB, &INFO);
-    }
-    else if(Precision::FULL == this->setting.precision) {
-        using E = double;
-        X = B;
-        arma_fortran(arma_dgbtrs)(&TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, this->pivot.memptr(), (E*)X.memptr(), &LDB, &INFO);
-    }
-    else {
-        X = arma::zeros(B.n_rows, B.n_cols);
-
-        mat full_residual = B;
-
-        auto multiplier = norm(full_residual);
-
-        auto counter = 0u;
-        while(counter++ < this->setting.iterative_refinement) {
-            if(multiplier < this->setting.tolerance) break;
-
-            auto residual = conv_to<fmat>::from(full_residual / multiplier);
-
-            arma_fortran(arma_sgbtrs)(&TRAN, &N, &KL, &KU, &NRHS, this->s_memory.memptr(), &LDAB, this->pivot.memptr(), residual.memptr(), &LDB, &INFO);
-            if(0 != INFO) break;
-
-            const mat incre = multiplier * conv_to<mat>::from(residual);
-
-            X += incre;
-
-            suanpan_debug("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier = arma::norm(full_residual -= this->operator*(incre)));
-        }
-    }
-
-    if(0 != INFO)
-        suanpan_error("Error code {} received, the matrix is probably singular.\n", INFO);
-
-    return INFO;
 }
 
 template<sp_d T> int BandMat<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
@@ -230,7 +126,7 @@ template<sp_d T> int BandMat<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
     this->pivot.zeros(N);
     this->factored = true;
 
-    if(std::is_same_v<T, float>) {
+    if constexpr(std::is_same_v<T, float>) {
         using E = float;
         arma_fortran(arma_sgbsv)(&N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, this->pivot.memptr(), (E*)B.memptr(), &LDB, &INFO);
         X = std::move(B);
@@ -262,7 +158,7 @@ template<sp_d T> int BandMat<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
     const auto LDAB = static_cast<int>(m_rows);
     const auto LDB = static_cast<int>(B.n_rows);
 
-    if(std::is_same_v<T, float>) {
+    if constexpr(std::is_same_v<T, float>) {
         using E = float;
         arma_fortran(arma_sgbtrs)(&TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, this->pivot.memptr(), (E*)B.memptr(), &LDB, &INFO);
         X = std::move(B);
@@ -272,27 +168,11 @@ template<sp_d T> int BandMat<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
         arma_fortran(arma_dgbtrs)(&TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, this->pivot.memptr(), (E*)B.memptr(), &LDB, &INFO);
         X = std::move(B);
     }
-    else {
-        X = arma::zeros(B.n_rows, B.n_cols);
-
-        auto multiplier = norm(B);
-
-        auto counter = 0u;
-        while(counter++ < this->setting.iterative_refinement) {
-            if(multiplier < this->setting.tolerance) break;
-
-            auto residual = conv_to<fmat>::from(B / multiplier);
-
+    else
+        this->mixed_trs(X, std::forward<Mat<T>>(B), [&](fmat& residual) {
             arma_fortran(arma_sgbtrs)(&TRAN, &N, &KL, &KU, &NRHS, this->s_memory.memptr(), &LDAB, this->pivot.memptr(), residual.memptr(), &LDB, &INFO);
-            if(0 != INFO) break;
-
-            const mat incre = multiplier * conv_to<mat>::from(residual);
-
-            X += incre;
-
-            suanpan_debug("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier = arma::norm(B -= this->operator*(incre)));
-        }
-    }
+            return INFO;
+        });
 
     if(0 != INFO)
         suanpan_error("Error code {} received, the matrix is probably singular.\n", INFO);

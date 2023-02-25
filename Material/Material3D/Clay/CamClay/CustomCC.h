@@ -31,6 +31,7 @@
 
 #include "NonlinearCamClay.h"
 #include <Toolbox/Expression.h>
+#include <Toolbox/ResourceHolder.h>
 
 class CustomCC final : public NonlinearCamClay {
     [[nodiscard]] double compute_a(double) const override;
@@ -38,7 +39,7 @@ class CustomCC final : public NonlinearCamClay {
 
     const unsigned a_tag;
 
-    shared_ptr<Expression> a_expression;
+    ResourceHolder<Expression> a_expression;
 
 public:
     CustomCC(unsigned,   // tag

@@ -45,11 +45,12 @@
 
 #include "NonlinearCDP.h"
 #include <Toolbox/Expression.h>
+#include <Toolbox/ResourceHolder.h>
 
 class CustomCDP final : public NonlinearCDP {
     const unsigned t_tag, c_tag;
 
-    shared_ptr<Expression> t_expression, c_expression;
+    ResourceHolder<Expression> t_expression, c_expression;
 
     [[nodiscard]] podarray<double> compute_tension_backbone(double) const override;
     [[nodiscard]] podarray<double> compute_compression_backbone(double) const override;

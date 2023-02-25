@@ -58,8 +58,8 @@ uword LeeNewmarkFull::get_total_size() const {
 void LeeNewmarkFull::update_stiffness() const {
     if(build_graph) {
         const auto t_size = get_total_size() / n_block;
-        access::rw(stiffness_graph).set_size(t_size, t_size);
-        access::rw(mass_graph).set_size(t_size, t_size);
+        stiffness_graph.set_size(t_size, t_size);
+        mass_graph.set_size(t_size, t_size);
     }
 
     auto IDX = n_block;
@@ -86,9 +86,9 @@ void LeeNewmarkFull::update_residual() const {
     // ! will be completed after calling the method to get residual
     vec trial_vel = -trial_internal;
     trial_vel.head(n_block) = factory->get_trial_velocity() / -C1;
-    access::rw(residual) = stiffness * trial_vel;
+    residual = stiffness * trial_vel;
     // ? may potentially improve performance
-    // access::rw(residual) = csr_form<double>(stiffness->triplet_mat) * trial_vel;
+    // residual = csr_form<double>(stiffness->triplet_mat) * trial_vel;
 
     // ! check in damping force
     auto fa = std::async([&] { get_trial_damping_force(factory) -= residual.head(n_block); });
@@ -101,9 +101,9 @@ void LeeNewmarkFull::update_residual() const {
     fc.get();
 }
 
-void LeeNewmarkFull::assemble_mass(const uword row_shift, const uword col_shift, const double scalar) const { assemble(access::rw(mass_graph), current_mass, row_shift, col_shift, scalar); }
+void LeeNewmarkFull::assemble_mass(const uword row_shift, const uword col_shift, const double scalar) const { assemble(mass_graph, current_mass, row_shift, col_shift, scalar); }
 
-void LeeNewmarkFull::assemble_stiffness(const uword row_shift, const uword col_shift, const double scalar) const { assemble(access::rw(stiffness_graph), current_stiffness, row_shift, col_shift, scalar); }
+void LeeNewmarkFull::assemble_stiffness(const uword row_shift, const uword col_shift, const double scalar) const { assemble(stiffness_graph, current_stiffness, row_shift, col_shift, scalar); }
 
 void LeeNewmarkFull::assemble_mass(const std::vector<uword>& row_shift, const std::vector<uword>& col_shift, const std::vector<double>& scalar) const {
     suanpan_assert([&] { if(scalar.size() != row_shift.size() || scalar.size() != col_shift.size()) throw invalid_argument("size mismatch detected"); });
@@ -371,13 +371,11 @@ int LeeNewmarkFull::process_constraint() {
 
     const sp_i auto num_entry = 2 * t_stiff.n_elem;
 
-    auto& t_triplet = stiffness->triplet_mat;
-
     // global matrix needs to be assembled as long as it is the first iteration
     // or trial stiffness matrix is used
     if(first_iteration || StiffnessType::TRIAL == stiffness_type) {
         // preallocate memory
-        t_triplet.init(get_amplifier() * num_entry);
+        stiffness->triplet_mat.init(get_amplifier() * num_entry);
         // stiffness->zeros();
 
         // ! deal with mass matrix first
@@ -474,6 +472,7 @@ int LeeNewmarkFull::process_constraint() {
         update_residual();
 
         if(StiffnessType::TRIAL != stiffness_type) {
+            const auto& t_triplet = stiffness->triplet_mat;
             const auto& row = t_triplet.row_mem();
             const auto& col = t_triplet.col_mem();
             const auto& val = t_triplet.val_mem();

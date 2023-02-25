@@ -29,11 +29,12 @@
 
 #include <Material/Material1D/Material1D.h>
 #include <Toolbox/Expression.h>
+#include <Toolbox/ResourceHolder.h>
 
 class CustomElastic1D final : public Material1D {
     const unsigned expression_tag;
 
-    shared_ptr<Expression> expression;
+    ResourceHolder<Expression> expression;
 
 public:
     CustomElastic1D(unsigned,   // tag

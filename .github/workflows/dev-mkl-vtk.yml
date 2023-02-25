@@ -7,6 +7,7 @@ on:
 jobs:
   ubuntu-mkl-vtk-dev:
     runs-on: ubuntu-22.04
+    timeout-minutes: 60
     steps:
       - name: Clone
         uses: actions/checkout@v3
@@ -23,7 +24,7 @@ jobs:
           go build Checker/updater.go
           sudo apt-get update && sudo apt-get install mesa-common-dev mesa-utils freeglut3-dev libglvnd-dev dpkg-dev xz-utils intel-oneapi-mkl-devel intel-oneapi-compiler-dpcpp-cpp intel-oneapi-compiler-fortran
           source /opt/intel/oneapi/setvars.sh
-          cmake -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icx -DCMAKE_Fortran_COMPILER=ifx -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.2/ -DUSE_MKL=ON -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DLINK_DYNAMIC_MKL=OFF -DCMAKE_INSTALL_PREFIX=suanPan-linux-mkl-vtk .
+          cmake -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx -DCMAKE_Fortran_COMPILER=ifx -DCMAKE_BUILD_TYPE=Debug -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.2/ -DUSE_MKL=ON -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DLINK_DYNAMIC_MKL=OFF -DCMAKE_INSTALL_PREFIX=suanPan-linux-mkl-vtk .
           make install -j"$(nproc)"
           make package
       - name: Test
@@ -32,10 +33,11 @@ jobs:
           ./suanPan-linux-mkl-vtk/bin/suanPan -v
       - uses: actions/upload-artifact@v3
         with:
-          name: suanPan-2.8.0-1.x86_64.deb
-          path: suanPan-2.8.0-1.x86_64.deb
+          name: suanPan-2.9.0-1.x86_64.deb
+          path: suanPan-2.9.0-1.x86_64.deb
   fedora-mkl-vtk-dev:
     runs-on: ubuntu-22.04
+    timeout-minutes: 60
     container: fedora:36
     steps:
       - name: Setup
@@ -62,14 +64,14 @@ jobs:
       - name: Compile
         run: |
           source /opt/intel/oneapi/setvars.sh
-          cmake -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icx -DCMAKE_Fortran_COMPILER=ifx -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.2/ -DUSE_MKL=ON -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DLINK_DYNAMIC_MKL=OFF .
+          cmake -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx -DCMAKE_Fortran_COMPILER=ifx -DCMAKE_BUILD_TYPE=Debug -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.2/ -DUSE_MKL=ON -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DLINK_DYNAMIC_MKL=OFF .
           make package -j"$(nproc)"
       - name: Test
         run: |
-          dnf install ./suanPan-2.8.0-1.x86_64.rpm -y
+          dnf install ./suanPan-2.9.0-1.x86_64.rpm -y
           suanPan -v
       - name: Upload
         uses: actions/upload-artifact@v3
         with:
-          name: suanPan-2.8.0-1.x86_64.rpm
-          path: suanPan-2.8.0-1.x86_64.rpm
+          name: suanPan-2.9.0-1.x86_64.rpm
+          path: suanPan-2.9.0-1.x86_64.rpm

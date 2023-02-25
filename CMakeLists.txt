@@ -39,6 +39,7 @@ add_executable(${PROJECT_NAME}
         "suanPan.cpp"
         "Include/fmt/src/format.cc"
         "Include/whereami/whereami.c"
+        "Include/catch/catch_amalgamated.cpp"
         "Constraint/CMakeLists.txt"
         "Database/CMakeLists.txt"
         "Domain/CMakeLists.txt"
@@ -48,6 +49,12 @@ add_executable(${PROJECT_NAME}
         "Toolbox/CMakeLists.txt"
         "UnitTest/CMakeLists.txt"
         )
+
+if (MSVC)
+    target_compile_options(${PROJECT_NAME} PRIVATE "/bigobj")
+elseif (MINGW)
+    target_compile_options(${PROJECT_NAME} PRIVATE "-Wa,-mbig-obj")
+endif ()
 
 if (COMPILER_IDENTIFIER MATCHES "vs") # MSVC COMPILER
     target_sources(${PROJECT_NAME} PRIVATE "Resource/suanPan.rc")
@@ -69,13 +76,7 @@ add_subdirectory(Step)
 add_subdirectory(Toolbox)
 add_subdirectory(UnitTest)
 
-target_link_libraries(${PROJECT_NAME}
-        Converger
-        Element
-        Material
-        Section
-        Solver
-        )
+target_link_libraries(${PROJECT_NAME} Element Material Section Solver)
 
 if (FORTRAN_STATUS)
     add_subdirectory(Toolbox/amd-src)
@@ -83,7 +84,7 @@ if (FORTRAN_STATUS)
     add_subdirectory(Toolbox/feast-src)
     add_subdirectory(Toolbox/mumps-src)
     add_subdirectory(Toolbox/fext)
-    target_link_libraries(${PROJECT_NAME} amd arpack mumps feast)
+    target_link_libraries(${PROJECT_NAME} fext)
     message("Linking additional amd arpack mumps feast")
 elseif (COMPILER_IDENTIFIER MATCHES "vs")
     target_link_libraries(${PROJECT_NAME} libfext)
@@ -115,19 +116,13 @@ if (COMPILER_IDENTIFIER MATCHES "(linux|mac)")
             endif ()
         else ()
             # cyclic dependency
+            set(MKL_CYC "")
             if (USE_INTEL_OPENMP)
-                target_link_libraries(${PROJECT_NAME}
-                        libmkl_intel_lp64.a libmkl_intel_thread.a libmkl_core.a
-                        libmkl_intel_lp64.a libmkl_intel_thread.a libmkl_core.a
-                        libmkl_intel_lp64.a libmkl_intel_thread.a libmkl_core.a
-                        iomp5 m)
+                set(MKL_CYC libmkl_intel_lp64.a libmkl_intel_thread.a libmkl_core.a iomp5)
             else ()
-                target_link_libraries(${PROJECT_NAME}
-                        libmkl_intel_lp64.a libmkl_gnu_thread.a libmkl_core.a
-                        libmkl_intel_lp64.a libmkl_gnu_thread.a libmkl_core.a
-                        libmkl_intel_lp64.a libmkl_gnu_thread.a libmkl_core.a
-                        gomp m)
+                set(MKL_CYC libmkl_intel_lp64.a libmkl_gnu_thread.a libmkl_core.a gomp)
             endif ()
+            target_link_libraries(${PROJECT_NAME} ${MKL_CYC} ${MKL_CYC} ${MKL_CYC} m)
         endif ()
     else ()
         target_link_libraries(${PROJECT_NAME} openblas)
@@ -147,7 +142,7 @@ elseif (COMPILER_IDENTIFIER MATCHES "vs")
         if (BUILD_SHARED)
             set(DSUFIX "_dll")
         endif ()
-        target_link_libraries(${PROJECT_NAME} mkl_intel_lp64${DSUFIX} mkl_intel_thread${DSUFIX} mkl_core${DSUFIX} libiomp5md)
+        target_link_libraries(${PROJECT_NAME} mkl_intel_lp64${DSUFIX} mkl_tbb_thread${DSUFIX} mkl_core${DSUFIX} libiomp5md libifcore svml_disp)
     else ()
         target_link_libraries(${PROJECT_NAME} libopenblas)
     endif ()
@@ -202,11 +197,7 @@ if (COMPILER_IDENTIFIER MATCHES "(linux|mac)")
             install(PROGRAMS ${MKL_FILES} DESTINATION lib)
             file(GLOB MKL_FILES ${MKLROOT}/lib/intel64/libmkl_def${DECOR}*${SUFFIX})
             install(PROGRAMS ${MKL_FILES} DESTINATION lib)
-            file(GLOB MKL_FILES ${MKLROOT}/lib/intel64/libmkl_avx${DECOR}*${SUFFIX})
-            install(PROGRAMS ${MKL_FILES} DESTINATION lib)
-            file(GLOB MKL_FILES ${MKLROOT}/lib/intel64/libmkl_avx2${DECOR}*${SUFFIX})
-            install(PROGRAMS ${MKL_FILES} DESTINATION lib)
-            file(GLOB MKL_FILES ${MKLROOT}/lib/intel64/libmkl_avx512${DECOR}*${SUFFIX})
+            file(GLOB MKL_FILES ${MKLROOT}/lib/intel64/libmkl_avx*${DECOR}*${SUFFIX})
             install(PROGRAMS ${MKL_FILES} DESTINATION lib)
             if (USE_INTEL_OPENMP)
                 file(GLOB MKL_FILES ${MKLROOT}/lib/intel64/libmkl_intel_thread${DECOR}*${SUFFIX})
@@ -248,17 +239,8 @@ elseif (COMPILER_IDENTIFIER MATCHES "win")
         install(FILES ${MKL_FILES} DESTINATION bin)
         file(GLOB MKL_FILES ${MKLROOT}/redist/intel64/mkl_avx*)
         install(FILES ${MKL_FILES} DESTINATION bin)
-        file(GLOB MKL_FILES ${MKLROOT}/redist/intel64/mkl_avx2*)
+        file(GLOB MKL_FILES ${MKLROOT}/redist/intel64/mkl_intel_thread.*)
         install(FILES ${MKL_FILES} DESTINATION bin)
-        file(GLOB MKL_FILES ${MKLROOT}/redist/intel64/mkl_avx512*)
-        install(FILES ${MKL_FILES} DESTINATION bin)
-        if (USE_INTEL_OPENMP)
-            file(GLOB MKL_FILES ${MKLROOT}/redist/intel64/mkl_intel*)
-            install(FILES ${MKL_FILES} DESTINATION bin)
-        else ()
-            file(GLOB MKL_FILES ${MKLROOT}/redist/intel64/mkl_intel*)
-            install(FILES ${MKL_FILES} DESTINATION bin)
-        endif ()
     else ()
         install(FILES Libs/win/libopenblas.dll DESTINATION bin)
     endif ()
@@ -276,15 +258,11 @@ elseif (COMPILER_IDENTIFIER MATCHES "vs")
             install(FILES ${MKL_FILES} DESTINATION bin)
             file(GLOB MKL_FILES ${MKLROOT}/redist/intel64/mkl_avx*)
             install(FILES ${MKL_FILES} DESTINATION bin)
-            file(GLOB MKL_FILES ${MKLROOT}/redist/intel64/mkl_avx2*)
-            install(FILES ${MKL_FILES} DESTINATION bin)
-            file(GLOB MKL_FILES ${MKLROOT}/redist/intel64/mkl_avx512*)
-            install(FILES ${MKL_FILES} DESTINATION bin)
-            if (USE_INTEL_OPENMP)
-                file(GLOB MKL_FILES ${MKLROOT}/redist/intel64/mkl_intel*)
+            if (BUILD_MULTITHREAD)
+                file(GLOB MKL_FILES ${MKLROOT}/redist/intel64/mkl_tbb_thread.*)
                 install(FILES ${MKL_FILES} DESTINATION bin)
             else ()
-                file(GLOB MKL_FILES ${MKLROOT}/redist/intel64/mkl_intel*)
+                file(GLOB MKL_FILES ${MKLROOT}/redist/intel64/mkl_intel_thread.*)
                 install(FILES ${MKL_FILES} DESTINATION bin)
             endif ()
         endif ()
@@ -353,7 +331,7 @@ if (CMAKE_SYSTEM_NAME MATCHES "Linux")
         set(CPACK_PACKAGE_ICON ${ROOT}/Resource/suanPan-ua.svg)
         set(CPACK_PACKAGE_RELEASE 1)
         set(CPACK_PACKAGE_VENDOR "tlcfem")
-        set(CPACK_PACKAGE_VERSION "2.8.0")
+        set(CPACK_PACKAGE_VERSION "2.9.0")
         set(CPACK_PACKAGE_DESCRIPTION "An Open Source, Parallel and Heterogeneous Finite Element Analysis Framework")
         set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/TLCFEM/suanPan")
 

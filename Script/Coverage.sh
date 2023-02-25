@@ -35,7 +35,7 @@ cp ../Example/Material/example .
 
 for file in $files; do
   echo "Processing $file ..."
-  time ./suanPan -f "$file" >>$log_file
+  time ./suanPan -f "$file" >>"$log_file"
 done
 
 {
@@ -44,10 +44,10 @@ done
   ./suanPan -nc -vb -t
   ./suanPan -nc -vb -np -t
   ./suanPan -v
-  ./suanPan -ctest
+  ./suanPan -ctest ~"Large Mixed Precision"
   ./suanPan -c -f ../Example/Misc/Converter/TEST.inp
   ./suanPan -s -f ../Example/Misc/Converter/TEST.inp
-} >>$log_file
+} >>"$log_file"
 
 rm ../Example/Misc/Converter/TEST_out.inp
 rm ../Example/Misc/Converter/TEST_out.supan

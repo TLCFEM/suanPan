@@ -7,6 +7,7 @@ on:
 jobs:
   ubuntu-openblas:
     runs-on: ubuntu-22.04
+    timeout-minutes: 60
     steps:
       - name: Clone
         uses: actions/checkout@v3
@@ -35,6 +36,7 @@ jobs:
           overwrite: true
   macos-openblas:
     runs-on: macos-11
+    timeout-minutes: 60
     steps:
       - name: Clone
         uses: actions/checkout@v3

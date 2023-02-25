@@ -18,6 +18,6 @@ else ()
     link_libraries(pthread gfortran quadmath openblas)
 endif ()
 
-add_library(${PROJECT_NAME} ${LIBRARY_TYPE} ${SUPERLU_SRC})
+add_library(${PROJECT_NAME} STATIC ${SUPERLU_SRC})
 
 message(STATUS "SUPERLU C_FLAGS: ${CMAKE_C_FLAGS}")

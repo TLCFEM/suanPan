@@ -189,7 +189,7 @@ public:
         init(in_elem);
     }
 
-    const data_t& operator()(const index_t row, const index_t col) const {
+    data_t operator()(const index_t row, const index_t col) const {
         for(index_t I = 0; I < n_elem; ++I) if(row == row_idx[I] && col == col_idx[I]) return val_idx[I];
         return access::rw(bin) = 0.;
     }
@@ -250,28 +250,30 @@ public:
         return out_mat;
     }
 
-    template<sp_d T2> triplet_form<data_t, index_t> operator*(T2) const;
-    template<sp_d T2> triplet_form<data_t, index_t> operator/(T2) const;
-    template<sp_d T2> triplet_form<data_t, index_t>& operator*=(T2);
-    template<sp_d T2> triplet_form<data_t, index_t>& operator/=(T2);
+    template<sp_d T2> triplet_form operator*(T2) const;
+    template<sp_d T2> triplet_form operator/(T2) const;
+    template<sp_d T2> triplet_form& operator*=(T2);
+    template<sp_d T2> triplet_form& operator/=(T2);
 
-    triplet_form<data_t, index_t> operator+(const triplet_form<data_t, index_t>& in_mat) const {
-        triplet_form<data_t, index_t> copy = *this;
+    triplet_form operator+(const triplet_form& in_mat) const {
+        triplet_form copy = *this;
         return copy += in_mat;
     }
 
-    triplet_form<data_t, index_t> operator-(const triplet_form<data_t, index_t>& in_mat) const {
-        triplet_form<data_t, index_t> copy = *this;
+    triplet_form operator-(const triplet_form& in_mat) const {
+        triplet_form copy = *this;
         return copy -= in_mat;
     }
 
-    triplet_form<data_t, index_t>& operator+=(const triplet_form<data_t, index_t>&);
-    triplet_form<data_t, index_t>& operator-=(const triplet_form<data_t, index_t>&);
+    triplet_form& operator+=(const triplet_form&);
+    triplet_form& operator-=(const triplet_form&);
 
     [[nodiscard]] Col<data_t> diag() const;
-    [[nodiscard]] triplet_form<data_t, index_t> diagonal() const;
-    [[nodiscard]] triplet_form<data_t, index_t> strictly_upper() const;
-    [[nodiscard]] triplet_form<data_t, index_t> strictly_lower() const;
+    [[nodiscard]] triplet_form diagonal() const;
+    [[nodiscard]] triplet_form strictly_upper() const;
+    [[nodiscard]] triplet_form strictly_lower() const;
+    [[nodiscard]] triplet_form upper() const;
+    [[nodiscard]] triplet_form lower() const;
 };
 
 template<sp_d data_t, sp_i index_t> void triplet_form<data_t, index_t>::condense(const bool full) {
@@ -390,13 +392,13 @@ template<sp_d data_t, sp_i index_t> data_t& triplet_form<data_t, index_t>::at(co
 }
 
 template<sp_d data_t, sp_i index_t> void triplet_form<data_t, index_t>::print() const {
-    suanpan_info("A sparse matrix in triplet form with size of {} by {}, the density of {:.3f}%.\n", static_cast<unsigned>(n_rows), static_cast<unsigned>(n_cols), static_cast<double>(n_elem) / static_cast<double>(n_rows) / static_cast<double>(n_cols) * 1E2);
+    suanpan_info("A sparse matrix in triplet form with size of {} by {}, the density of {:.3f}%.\n", n_rows, n_cols, static_cast<double>(n_elem) / static_cast<double>(n_rows) / static_cast<double>(n_cols) * 1E2);
     if(n_elem > index_t(1000)) {
         suanpan_info("More than 1000 elements exist.\n");
         return;
     }
     for(index_t I = 0; I < n_elem; ++I)
-        suanpan_info("({}, {}) ===> {:+.8E}\n", static_cast<unsigned>(row_idx[I]), static_cast<unsigned>(col_idx[I]), val_idx[I]);
+        suanpan_info("({}, {}) ===> {:+.8E}\n", row_idx[I], col_idx[I], val_idx[I]);
 }
 
 template<sp_d data_t, sp_i index_t> void triplet_form<data_t, index_t>::csr_sort() {
@@ -484,9 +486,9 @@ template<sp_d data_t, sp_i index_t> template<sp_d in_dt, sp_i in_it> void triple
 }
 
 template<sp_d data_t, sp_i index_t> template<sp_d T2> triplet_form<data_t, index_t> triplet_form<data_t, index_t>::operator*(const T2 scalar) const {
-    if(suanpan::approx_equal(T2(0), scalar)) return triplet_form<data_t, index_t>(n_rows, n_cols);
+    if(suanpan::approx_equal(T2(0), scalar)) return triplet_form(n_rows, n_cols);
 
-    triplet_form<data_t, index_t> copy = *this;
+    auto copy = *this;
 
     if(suanpan::approx_equal(T2(1), scalar)) return copy;
 
@@ -499,7 +501,7 @@ template<sp_d data_t, sp_i index_t> template<sp_d T2> triplet_form<data_t, index
 }
 
 template<sp_d data_t, sp_i index_t> template<sp_d T2> triplet_form<data_t, index_t> triplet_form<data_t, index_t>::operator/(const T2 scalar) const {
-    triplet_form<data_t, index_t> copy = *this;
+    auto copy = *this;
 
     if(suanpan::approx_equal(T2(1), scalar)) return copy;
 
@@ -534,7 +536,7 @@ template<sp_d data_t, sp_i index_t> template<sp_d T2> triplet_form<data_t, index
     return *this;
 }
 
-template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t>& triplet_form<data_t, index_t>::operator+=(const triplet_form<data_t, index_t>& in_mat) {
+template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t>& triplet_form<data_t, index_t>::operator+=(const triplet_form& in_mat) {
     if(in_mat.is_empty()) return *this;
 
     invalidate_sorting_flag();
@@ -550,7 +552,7 @@ template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t>& triplet_form<
     return *this;
 }
 
-template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t>& triplet_form<data_t, index_t>::operator-=(const triplet_form<data_t, index_t>& in_mat) {
+template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t>& triplet_form<data_t, index_t>::operator-=(const triplet_form& in_mat) {
     if(in_mat.is_empty()) return *this;
 
     invalidate_sorting_flag();
@@ -592,6 +594,22 @@ template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> triplet_form<d
     auto out_mat = *this;
 
     suanpan_for(index_t(0), out_mat.n_elem, [&](const index_t I) { out_mat.val_idx[I] *= out_mat.col(I) < out_mat.row(I); });
+
+    return out_mat;
+}
+
+template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> triplet_form<data_t, index_t>::upper() const {
+    auto out_mat = *this;
+
+    suanpan_for(index_t(0), out_mat.n_elem, [&](const index_t I) { out_mat.val_idx[I] *= out_mat.row(I) <= out_mat.col(I); });
+
+    return out_mat;
+}
+
+template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> triplet_form<data_t, index_t>::lower() const {
+    auto out_mat = *this;
+
+    suanpan_for(index_t(0), out_mat.n_elem, [&](const index_t I) { out_mat.val_idx[I] *= out_mat.col(I) <= out_mat.row(I); });
 
     return out_mat;
 }

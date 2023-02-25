@@ -7,6 +7,7 @@ on:
 jobs:
   ubuntu-mkl:
     runs-on: ubuntu-22.04
+    timeout-minutes: 60
     steps:
       - name: Clone
         uses: actions/checkout@v3

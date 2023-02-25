@@ -56,15 +56,19 @@ template<sp_d T> class SparseMatSuperLU final : public SparseMat<T> {
 
     bool allocated = false;
 
-    template<sp_d ET> void alloc_supermatrix(csc_form<ET, int>&&);
-    void dealloc_supermatrix();
+    template<sp_d ET> void alloc(csc_form<ET, int>&&);
+    void dealloc();
 
     template<sp_d ET> void wrap_b(const Mat<ET>&);
     template<sp_d ET> void tri_solve(int&);
     template<sp_d ET> void full_solve(int&);
 
     int solve_trs(Mat<T>&, Mat<T>&&);
-    int solve_trs(Mat<T>&, const Mat<T>&);
+
+protected:
+    int direct_solve(Mat<T>& out_mat, const Mat<T>& in_mat) override { return this->direct_solve(out_mat, Mat<T>(in_mat)); }
+
+    int direct_solve(Mat<T>&, Mat<T>&&) override;
 
 public:
     SparseMatSuperLU(uword, uword, uword = 0);
@@ -77,13 +81,10 @@ public:
     void zeros() override;
 
     unique_ptr<MetaMat<T>> make_copy() override;
-
-    int direct_solve(Mat<T>&, Mat<T>&&) override;
-    int direct_solve(Mat<T>&, const Mat<T>&) override;
 };
 
-template<sp_d T> template<sp_d ET> void SparseMatSuperLU<T>::alloc_supermatrix(csc_form<ET, int>&& in) {
-    dealloc_supermatrix();
+template<sp_d T> template<sp_d ET> void SparseMatSuperLU<T>::alloc(csc_form<ET, int>&& in) {
+    dealloc();
 
     auto t_size = sizeof(ET) * in.n_elem;
     t_val = superlu_malloc(t_size);
@@ -97,7 +98,7 @@ template<sp_d T> template<sp_d ET> void SparseMatSuperLU<T>::alloc_supermatrix(c
     t_col = (int*)superlu_malloc(t_size);
     memcpy(t_col, (void*)in.col_mem(), t_size);
 
-    if(std::is_same_v<ET, double>) {
+    if constexpr(std::is_same_v<ET, double>) {
         using E = double;
         dCreate_CompCol_Matrix(&A, in.n_rows, in.n_cols, in.n_elem, (E*)t_val, t_row, t_col, Stype_t::SLU_NC, Dtype_t::SLU_D, Mtype_t::SLU_GE);
     }
@@ -112,7 +113,7 @@ template<sp_d T> template<sp_d ET> void SparseMatSuperLU<T>::alloc_supermatrix(c
     allocated = true;
 }
 
-template<sp_d T> void SparseMatSuperLU<T>::dealloc_supermatrix() {
+template<sp_d T> void SparseMatSuperLU<T>::dealloc() {
     if(!allocated) return;
 
     Destroy_SuperMatrix_Store(&A);
@@ -134,7 +135,7 @@ template<sp_d T> void SparseMatSuperLU<T>::dealloc_supermatrix() {
 }
 
 template<sp_d T> template<sp_d ET> void SparseMatSuperLU<T>::wrap_b(const Mat<ET>& in_mat) {
-    if(std::is_same_v<ET, float>) {
+    if constexpr(std::is_same_v<ET, float>) {
         using E = float;
         sCreate_Dense_Matrix(&B, (int)in_mat.n_rows, (int)in_mat.n_cols, (E*)in_mat.memptr(), (int)in_mat.n_rows, Stype_t::SLU_DN, Dtype_t::SLU_S, Mtype_t::SLU_GE);
     }
@@ -200,87 +201,16 @@ template<sp_d T> SparseMatSuperLU<T>::SparseMatSuperLU(const SparseMatSuperLU& o
 }
 
 template<sp_d T> SparseMatSuperLU<T>::~SparseMatSuperLU() {
-    dealloc_supermatrix();
+    dealloc();
     StatFree(&stat);
 }
 
 template<sp_d T> void SparseMatSuperLU<T>::zeros() {
     SparseMat<T>::zeros();
-    dealloc_supermatrix();
+    dealloc();
 }
 
-template<sp_d T> unique_ptr<MetaMat<T>> SparseMatSuperLU<T>::make_copy() { return std::make_unique<SparseMatSuperLU<T>>(*this); }
-
-template<sp_d T> int SparseMatSuperLU<T>::direct_solve(Mat<T>& out_mat, const Mat<T>& in_mat) {
-    if(this->factored) return solve_trs(out_mat, in_mat);
-
-    this->factored = true;
-
-    auto flag = 0;
-
-    if(std::is_same_v<T, float> || Precision::FULL == this->setting.precision) {
-        alloc_supermatrix(csc_form<T, int>(this->triplet_mat));
-
-        out_mat = in_mat;
-
-        wrap_b(out_mat);
-
-        full_solve<T>(flag);
-
-        return flag;
-    }
-
-    alloc_supermatrix(csc_form<float, int>(this->triplet_mat));
-
-    const fmat f_mat(arma::size(in_mat), fill::none);
-
-    wrap_b(f_mat);
-
-    full_solve<float>(flag);
-
-    return 0 == flag ? solve_trs(out_mat, in_mat) : flag;
-}
-
-template<sp_d T> int SparseMatSuperLU<T>::solve_trs(Mat<T>& out_mat, const Mat<T>& in_mat) {
-    auto flag = 0;
-
-    if(std::is_same_v<T, float> || Precision::FULL == this->setting.precision) {
-        out_mat = in_mat;
-
-        wrap_b(out_mat);
-
-        tri_solve<T>(flag);
-
-        return flag;
-    }
-
-    out_mat.zeros(arma::size(in_mat));
-
-    mat full_residual = in_mat;
-
-    auto multiplier = norm(full_residual);
-
-    auto counter = 0u;
-    while(counter++ < this->setting.iterative_refinement) {
-        if(multiplier < this->setting.tolerance) break;
-
-        auto residual = conv_to<fmat>::from(full_residual / multiplier);
-
-        wrap_b(residual);
-
-        tri_solve<float>(flag);
-
-        if(0 != flag) break;
-
-        const mat incre = multiplier * conv_to<mat>::from(residual);
-
-        out_mat += incre;
-
-        suanpan_debug("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier = norm(full_residual -= this->operator*(incre)));
-    }
-
-    return flag;
-}
+template<sp_d T> unique_ptr<MetaMat<T>> SparseMatSuperLU<T>::make_copy() { return std::make_unique<SparseMatSuperLU>(*this); }
 
 template<sp_d T> int SparseMatSuperLU<T>::direct_solve(Mat<T>& out_mat, Mat<T>&& in_mat) {
     if(this->factored) return solve_trs(out_mat, std::forward<Mat<T>>(in_mat));
@@ -289,63 +219,79 @@ template<sp_d T> int SparseMatSuperLU<T>::direct_solve(Mat<T>& out_mat, Mat<T>&&
 
     auto flag = 0;
 
-    if(std::is_same_v<T, float> || Precision::FULL == this->setting.precision) {
-        alloc_supermatrix(csc_form<T, int>(this->triplet_mat));
+    if constexpr(std::is_same_v<T, float>) {
+        alloc(csc_form<float, int>(this->triplet_mat));
 
         wrap_b(in_mat);
 
-        full_solve<T>(flag);
+        full_solve<float>(flag);
 
         out_mat = std::move(in_mat);
+    }
+    else if(Precision::FULL == this->setting.precision) {
+        alloc(csc_form<double, int>(this->triplet_mat));
 
-        return flag;
+        wrap_b(in_mat);
+
+        full_solve<double>(flag);
+
+        out_mat = std::move(in_mat);
+    }
+    else {
+        alloc(csc_form<float, int>(this->triplet_mat));
+
+        const fmat f_mat(arma::size(in_mat), fill::none);
+
+        wrap_b(f_mat);
+
+        full_solve<float>(flag);
+
+        if(0 == flag) flag = solve_trs(out_mat, std::forward<Mat<T>>(in_mat));
     }
 
-    alloc_supermatrix(csc_form<float, int>(this->triplet_mat));
-
-    const fmat f_mat(arma::size(in_mat), fill::none);
-
-    wrap_b(f_mat);
-
-    full_solve<float>(flag);
-
-    return 0 == flag ? solve_trs(out_mat, std::forward<Mat<T>>(in_mat)) : flag;
+    return flag;
 }
 
 template<sp_d T> int SparseMatSuperLU<T>::solve_trs(Mat<T>& out_mat, Mat<T>&& in_mat) {
     auto flag = 0;
 
-    if(std::is_same_v<T, float> || Precision::FULL == this->setting.precision) {
+    if constexpr(std::is_same_v<T, float>) {
         wrap_b(in_mat);
-
-        tri_solve<T>(flag);
-
-        out_mat = std::move(in_mat);
-
-        return flag;
-    }
-
-    out_mat.zeros(arma::size(in_mat));
-
-    auto multiplier = arma::norm(in_mat);
-
-    auto counter = 0u;
-    while(counter++ < this->setting.iterative_refinement) {
-        if(multiplier < this->setting.tolerance) break;
-
-        auto residual = conv_to<fmat>::from(in_mat / multiplier);
-
-        wrap_b(residual);
 
         tri_solve<float>(flag);
 
-        if(0 != flag) break;
+        out_mat = std::move(in_mat);
+    }
+    else if(Precision::FULL == this->setting.precision) {
+        wrap_b(in_mat);
 
-        const mat incre = multiplier * conv_to<mat>::from(residual);
+        tri_solve<double>(flag);
 
-        out_mat += incre;
+        out_mat = std::move(in_mat);
+    }
+    else {
+        out_mat.zeros(arma::size(in_mat));
 
-        suanpan_debug("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier = norm(in_mat -= this->operator*(incre)));
+        auto multiplier = arma::norm(in_mat);
+
+        auto counter = 0u;
+        while(counter++ < this->setting.iterative_refinement) {
+            if(multiplier < this->setting.tolerance) break;
+
+            auto residual = conv_to<fmat>::from(in_mat / multiplier);
+
+            wrap_b(residual);
+
+            tri_solve<float>(flag);
+
+            if(0 != flag) break;
+
+            const mat incre = multiplier * conv_to<mat>::from(residual);
+
+            out_mat += incre;
+
+            suanpan_debug("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier = arma::norm(in_mat -= this->operator*(incre)));
+        }
     }
 
     return flag;

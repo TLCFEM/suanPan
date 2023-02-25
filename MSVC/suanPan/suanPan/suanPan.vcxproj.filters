@@ -202,6 +202,9 @@
     <Filter Include="Domain\Group">
       <UniqueIdentifier>{ea4086e5-ad87-4755-905a-5f572935c34d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Z">
+      <UniqueIdentifier>{da04bede-12e0-4fa7-8e1b-963193f71e72}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Constraint\BC\GroupMultiplierBC.cpp">
@@ -1429,9 +1432,6 @@
     <ClCompile Include="..\..\..\Material\Material1D\Elastic\Tanh1D.cpp">
       <Filter>Material\Material1D\Elastic</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Include\fmt\src\format.cc">
-      <Filter>Toolbox</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\tensor.cpp">
       <Filter>Toolbox</Filter>
     </ClCompile>
@@ -1442,9 +1442,6 @@
       <Filter>Toolbox</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\command.cpp">
-      <Filter>Toolbox</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Include\whereami\whereami.c">
       <Filter>Toolbox</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\UnitTest\TestExpression.cpp">
@@ -1476,6 +1473,27 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Material\Material3D\Clay\CamClay\CustomCC.cpp">
       <Filter>Material\Material3D\Clay\CamClay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\vonMises\CustomGurson1D.cpp">
+      <Filter>Material\Material1D\vonMises</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\vonMises\CustomGurson.cpp">
+      <Filter>Material\Material3D\vonMises</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Degradation\CustomDegradation.cpp">
+      <Filter>Material\Material1D\Degradation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Viscosity\CustomViscosity.cpp">
+      <Filter>Material\Material1D\Viscosity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Include\catch\catch_amalgamated.cpp">
+      <Filter>Z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Include\fmt\src\format.cc">
+      <Filter>Z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Include\whereami\whereami.c">
+      <Filter>Z</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2626,9 +2644,6 @@
     <ClInclude Include="..\..\..\Solver\Integrator\GSSSS.h">
       <Filter>Solver\Integrator</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Toolbox\thread_pool.hpp">
-      <Filter>Toolbox</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Domain\FactoryHelper.hpp">
       <Filter>Domain</Filter>
     </ClInclude>
@@ -2811,6 +2826,30 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material3D\Clay\CamClay\CustomCC.h">
       <Filter>Material\Material3D\Clay\CamClay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\vonMises\CustomGurson1D.h">
+      <Filter>Material\Material1D\vonMises</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\vonMises\CustomGurson.h">
+      <Filter>Material\Material3D\vonMises</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Degradation\CustomDegradation.h">
+      <Filter>Material\Material1D\Degradation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Viscosity\CustomViscosity.h">
+      <Filter>Material\Material1D\Viscosity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\ResourceHolder.h">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\MetaMat\BandMatCUDA.hpp">
+      <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\thread_pool.hpp">
+      <Filter>Z</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\MappingDOF.h">
+      <Filter>Element</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -35,23 +35,32 @@ class Expression : public Tag {
     static std::mutex parser_mutex;
     static exprtk::parser<double> parser;
 
-    std::string expression_text;
-
 protected:
     Col<double> x;
+
+    std::string expression_text;
+
+    std::vector<std::string> variable_text_list;
 
     exprtk::expression<double> expression;
 
     exprtk::symbol_table<double> symbol_table;
 
 public:
-    explicit Expression(unsigned, const std::string&);
+    Expression(unsigned, std::vector<std::string>&&);
+    Expression(const Expression&) = delete;
+    Expression(Expression&&) noexcept = delete;
+    Expression& operator=(const Expression&) = delete;
+    Expression& operator=(Expression&&) noexcept = delete;
+    ~Expression() override = default;
+
+    [[nodiscard]] virtual unique_ptr<Expression> make_copy() const = 0;
 
     [[nodiscard]] virtual uword input_size() const;
     [[nodiscard]] virtual uword output_size() const;
 
-    bool compile(const std::string&);
-    static string error();
+    bool compile(const std::string_view&);
+    static std::string error();
 
     Mat<double> evaluate(double);
     virtual Mat<double> evaluate(const Col<double>&) = 0;
@@ -62,20 +71,24 @@ public:
     void print() override;
 };
 
-class SimpleScalarExpression : public Expression {
+class SimpleScalarExpression final : public Expression {
 public:
-    using Expression::Expression;
+    SimpleScalarExpression(unsigned, const std::string_view&);
+
+    [[nodiscard]] unique_ptr<Expression> make_copy() const override;
 
     Mat<double> evaluate(const Col<double>&) override;
 
     Mat<double> gradient(const Col<double>&) override;
 };
 
-class SimpleVectorExpression : public Expression {
+class SimpleVectorExpression final : public Expression {
     Col<double> y;
 
 public:
-    SimpleVectorExpression(unsigned, const std::string&, const std::string&);
+    SimpleVectorExpression(unsigned, const std::string_view&, const std::string_view&);
+
+    [[nodiscard]] unique_ptr<Expression> make_copy() const override;
 
     [[nodiscard]] uword output_size() const override;
 

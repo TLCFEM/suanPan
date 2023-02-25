@@ -18,7 +18,8 @@
 #ifndef CATCHHEADER_H
 #define CATCHHEADER_H
 
-#define CATCH_CONFIG_ENABLE_BENCHMARKING
-#include <catch/catch.hpp>
+#include <catch/catch_amalgamated.hpp>
+
+using Catch::Approx;
 
 #endif

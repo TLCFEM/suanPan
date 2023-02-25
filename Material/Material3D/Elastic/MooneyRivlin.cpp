@@ -20,7 +20,13 @@
 
 const vec MooneyRivlin::weight{2., 2., 2., 1., 1., 1.};
 const vec MooneyRivlin::I1E{2., 2., 2., 0., 0., 0.};
-const mat MooneyRivlin::I2EE;
+const mat MooneyRivlin::I2EE = [] {
+    mat TI2EE(6, 6, fill::zeros);
+    TI2EE(span(0, 2), span(0, 2)).fill(4.);
+    TI2EE(0, 0) = TI2EE(1, 1) = TI2EE(2, 2) = 0.;
+    TI2EE(3, 3) = TI2EE(4, 4) = TI2EE(5, 5) = -2.;
+    return TI2EE;
+}();
 constexpr double MooneyRivlin::one_three = 1. / 3.;
 constexpr double MooneyRivlin::two_three = 2. * one_three;
 constexpr double MooneyRivlin::four_three = 2. * two_three;
@@ -32,14 +38,6 @@ MooneyRivlin::MooneyRivlin(const unsigned T, const double KK, const double AA, c
     , Material3D(T, R) {}
 
 int MooneyRivlin::initialize(const shared_ptr<DomainBase>&) {
-    if(I2EE.is_empty()) {
-        mat TI2EE(6, 6, fill::zeros);
-        TI2EE(span(0, 2), span(0, 2)).fill(4.);
-        TI2EE(0, 0) = TI2EE(1, 1) = TI2EE(2, 2) = 0.;
-        TI2EE(3, 3) = TI2EE(4, 4) = TI2EE(5, 5) = -2.;
-        access::rw(I2EE) = TI2EE;
-    }
-
     update_trial_status(zeros(6));
     current_stiffness = initial_stiffness = trial_stiffness;
 

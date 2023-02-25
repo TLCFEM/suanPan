@@ -77,22 +77,22 @@ public:
 
     void print() const;
 
-    template<sp_d T2> csr_form<data_t, index_t> operator*(const T2 scalar) const {
-        csr_form<data_t, index_t> copy = *this;
+    template<sp_d T2> csr_form operator*(const T2 scalar) const {
+        auto copy = *this;
         return copy *= scalar;
     }
 
-    template<sp_d T2> csr_form<data_t, index_t> operator/(const T2 scalar) const {
-        csr_form<data_t, index_t> copy = *this;
+    template<sp_d T2> csr_form operator/(const T2 scalar) const {
+        auto copy = *this;
         return copy /= scalar;
     }
 
-    template<sp_d T2> csr_form<data_t, index_t>& operator*=(const T2 scalar) {
+    template<sp_d T2> csr_form& operator*=(const T2 scalar) {
         suanpan_for_each(val_idx.get(), val_idx.get() + n_elem, [=](data_t& I) { I *= data_t(scalar); });
         return *this;
     }
 
-    template<sp_d T2> csr_form<data_t, index_t>& operator/=(const T2 scalar) {
+    template<sp_d T2> csr_form& operator/=(const T2 scalar) {
         suanpan_for_each(val_idx.get(), val_idx.get() + n_elem, [=](data_t& I) { I /= data_t(scalar); });
         return *this;
     }
@@ -101,7 +101,7 @@ public:
 
     template<sp_d in_dt, sp_i in_it> csr_form& operator=(triplet_form<in_dt, in_it>&);
 
-    const data_t& operator()(const index_t in_row, const index_t in_col) const {
+    data_t operator()(const index_t in_row, const index_t in_col) const {
         if(in_row < n_rows && in_col < n_cols) for(auto I = row_ptr[in_row]; I < row_ptr[in_row + 1]; ++I) if(in_col == col_idx[I]) return val_idx[I];
         return access::rw(bin) = data_t(0);
     }
@@ -161,7 +161,7 @@ template<sp_d data_t, sp_i index_t> csr_form<data_t, index_t>& csr_form<data_t, 
 }
 
 template<sp_d data_t, sp_i index_t> void csr_form<data_t, index_t>::print() const {
-    suanpan_info("A sparse matrix in triplet form with size of {} by {}, the sparsity of {:.3f}%.\n", static_cast<unsigned>(n_rows), static_cast<unsigned>(n_cols), 1E2 - static_cast<double>(n_elem) / static_cast<double>(n_rows) / static_cast<double>(n_cols) * 1E2);
+    suanpan_info("A sparse matrix in triplet form with size of {} by {}, the sparsity of {:.3f}%.\n", n_rows, n_cols, 1E2 - static_cast<double>(n_elem) / static_cast<double>(n_rows) / static_cast<double>(n_cols) * 1E2);
     if(n_elem > index_t(1000)) {
         suanpan_info("More than 1000 elements exist.\n");
         return;
@@ -170,7 +170,7 @@ template<sp_d data_t, sp_i index_t> void csr_form<data_t, index_t>::print() cons
     index_t c_idx = 1;
     for(index_t I = 0; I < n_elem; ++I) {
         if(I >= row_ptr[c_idx]) ++c_idx;
-        suanpan_info("({}, {}) ===> {:+.8E}\n", static_cast<unsigned>(c_idx) - 1, static_cast<unsigned>(col_idx[I]), val_idx[I]);
+        suanpan_info("({}, {}) ===> {:+.8E}\n", c_idx - 1, col_idx[I], val_idx[I]);
     }
 }
 

@@ -66,7 +66,7 @@ string suanpan::to_lower(string&& U) {
     return std::move(U);
 }
 
-std::vector<std::pair<string, unsigned>> suanpan::expression::split(const std::string& variable_string) {
+std::vector<std::pair<string, unsigned>> suanpan::expression::split(const std::string_view& variable_string) {
     std::vector<std::string> variable_list;
     auto I = variable_string.cbegin(), J = variable_string.cbegin();
     while(I != variable_string.cend()) {

@@ -50,27 +50,26 @@ template<sp_d T> class SparseMatPARDISO final : public SparseMat<T> {
     int iparm[64];
     std::int64_t pt[64];
 
-public:
-    SparseMatPARDISO(uword, uword, uword = 0);
-
-    unique_ptr<MetaMat<T>> make_copy() override;
+protected:
+    using SparseMat<T>::direct_solve;
 
     int direct_solve(Mat<T>&, const Mat<T>&) override;
+
+public:
+    SparseMatPARDISO(const uword in_row, const uword in_col, const uword in_elem = 0)
+        : SparseMat<T>(in_row, in_col, in_elem)
+        , iparm{}
+        , pt{} {
+        pardisoinit(pt, &mtype, iparm);
+
+        iparm[1] = 3;   // nested dissection algorithm
+        iparm[23] = 10; // parallel factorization
+        iparm[34] = 1;  // zero-based indexing
+        if(std::is_same_v<T, float>) iparm[27] = 1;
+    }
+
+    unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SparseMatPARDISO>(*this); }
 };
-
-template<sp_d T> SparseMatPARDISO<T>::SparseMatPARDISO(const uword in_row, const uword in_col, const uword in_elem)
-    : SparseMat<T>(in_row, in_col, in_elem)
-    , iparm{}
-    , pt{} {
-    pardisoinit(pt, &mtype, iparm);
-
-    iparm[1] = 3;   // nested dissection algorithm
-    iparm[23] = 10; // parallel factorization
-    iparm[34] = 1;  // zero-based indexing
-    if(std::is_same_v<T, float>) iparm[27] = 1;
-}
-
-template<sp_d T> unique_ptr<MetaMat<T>> SparseMatPARDISO<T>::make_copy() { return std::make_unique<SparseMatPARDISO<T>>(*this); }
 
 template<sp_d T> int SparseMatPARDISO<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
     X.set_size(B.n_rows, B.n_cols);

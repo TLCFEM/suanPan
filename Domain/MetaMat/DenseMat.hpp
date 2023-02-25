@@ -31,174 +31,115 @@
 
 #include "MetaMat.hpp"
 
-template<sp_d T> class DenseMat : public MetaMat<T> {
-    void init();
+template<sp_d T> uword round_up(const uword in_size) {
+    constexpr auto multiple = 64llu / sizeof(T);
+    return (in_size + multiple - 1llu) / multiple * multiple;
+}
 
+template<sp_d T> class DenseMat : public MetaMat<T> {
 protected:
+    using MetaMat<T>::direct_solve;
+
+    int direct_solve(Mat<T>& X, const Mat<T>& B) override { return this->direct_solve(X, Mat<T>(B)); }
+
     podarray<int> pivot;
     podarray<float> s_memory; // float storage used in mixed precision algorithm
 
-    podarray<float> to_float();
+    std::unique_ptr<T[]> memory = nullptr;
 
-    const T* const memory = nullptr;
+    podarray<float> to_float() {
+        podarray<float> f_memory(this->n_elem);
+        suanpan_for(0llu, this->n_elem, [&](const uword I) { f_memory(I) = static_cast<float>(memory[I]); });
+        return f_memory;
+    }
 
 public:
-    using MetaMat<T>::direct_solve;
+    DenseMat(const uword in_rows, const uword in_cols, const uword in_elem)
+        : MetaMat<T>(in_rows, in_cols, in_elem)
+        , memory(std::unique_ptr<T[]>(new T[this->n_elem])) { DenseMat::zeros(); }
 
-    DenseMat(uword, uword, uword);
-    DenseMat(const DenseMat&);
-    DenseMat(DenseMat&&) noexcept;
-    DenseMat& operator=(const DenseMat&);
-    DenseMat& operator=(DenseMat&&) noexcept;
-    ~DenseMat() override;
+    DenseMat(const DenseMat& old_mat)
+        : MetaMat<T>(old_mat)
+        , pivot(old_mat.pivot)
+        , s_memory(old_mat.s_memory)
+        , memory(std::unique_ptr<T[]>(new T[this->n_elem])) { suanpan_for(0llu, this->n_elem, [&](const uword I) { memory[I] = old_mat.memory[I]; }); }
 
-    [[nodiscard]] bool is_empty() const override;
-    void zeros() override;
+    DenseMat(DenseMat&&) noexcept = delete;
+    DenseMat& operator=(const DenseMat&) = delete;
+    DenseMat& operator=(DenseMat&&) noexcept = delete;
+    ~DenseMat() override = default;
 
-    [[nodiscard]] T max() const override;
-    [[nodiscard]] Col<T> diag() const override;
+    [[nodiscard]] bool is_empty() const override { return 0 == this->n_elem; }
 
-    const T* memptr() const override;
-    T* memptr() override;
+    void zeros() override {
+        this->factored = false;
+        arrayops::fill_zeros(memptr(), this->n_elem);
+    }
 
-    void operator+=(const shared_ptr<MetaMat<T>>&) override;
-    void operator-=(const shared_ptr<MetaMat<T>>&) override;
+    [[nodiscard]] T max() const override {
+        T max_value = T(1);
+        for(uword I = 0; I < std::min(this->n_rows, this->n_cols); ++I) if(const auto t_val = this->operator()(I, I); t_val > max_value) max_value = t_val;
+        return max_value;
+    }
 
-    void operator+=(const triplet_form<T, uword>&) override;
-    void operator-=(const triplet_form<T, uword>&) override;
+    [[nodiscard]] Col<T> diag() const override {
+        Col<T> diag_vec(std::min(this->n_rows, this->n_cols), fill::none);
+        suanpan_for(0llu, diag_vec.n_elem, [&](const uword I) { diag_vec(I) = this->operator()(I, I); });
+        return diag_vec;
+    }
 
-    void operator*=(T) override;
+    [[nodiscard]] const T* memptr() const override { return memory.get(); }
 
-    [[nodiscard]] int sign_det() const override;
+    T* memptr() override { return memory.get(); }
+
+    void operator+=(const shared_ptr<MetaMat<T>>& M) override {
+        if(nullptr == M) return;
+        if(!M->triplet_mat.is_empty()) return this->operator+=(M->triplet_mat);
+        if(this->n_rows != M->n_rows || this->n_cols != M->n_cols || this->n_elem != M->n_elem) throw invalid_argument("size mismatch");
+        if(nullptr == M->memptr()) return;
+        this->factored = false;
+        arrayops::inplace_plus(memptr(), M->memptr(), this->n_elem);
+    }
+
+    void operator-=(const shared_ptr<MetaMat<T>>& M) override {
+        if(nullptr == M) return;
+        if(!M->triplet_mat.is_empty()) return this->operator-=(M->triplet_mat);
+        if(this->n_rows != M->n_rows || this->n_cols != M->n_cols || this->n_elem != M->n_elem) throw invalid_argument("size mismatch");
+        if(nullptr == M->memptr()) return;
+        this->factored = false;
+        arrayops::inplace_minus(memptr(), M->memptr(), this->n_elem);
+    }
+
+    void operator+=(const triplet_form<T, uword>& M) override {
+        if(this->n_rows != M.n_rows || this->n_cols != M.n_cols) throw invalid_argument("size mismatch");
+        this->factored = false;
+        const auto row = M.row_mem();
+        const auto col = M.col_mem();
+        const auto val = M.val_mem();
+        for(uword I = 0llu; I < M.n_elem; ++I) this->at(row[I], col[I]) += val[I];
+    }
+
+    void operator-=(const triplet_form<T, uword>& M) override {
+        if(this->n_rows != M.n_rows || this->n_cols != M.n_cols) throw invalid_argument("size mismatch");
+        this->factored = false;
+        const auto row = M.row_mem();
+        const auto col = M.col_mem();
+        const auto val = M.val_mem();
+        for(uword I = 0llu; I < M.n_elem; ++I) this->at(row[I], col[I]) -= val[I];
+    }
+
+    void operator*=(const T value) override {
+        this->factored = false;
+        arrayops::inplace_mul(memptr(), value, this->n_elem);
+    }
+
+    [[nodiscard]] int sign_det() const override {
+        if(IterativeSolver::NONE != this->setting.iterative_solver) throw invalid_argument("analysis requires the sign of determinant but iterative solver does not support it");
+        auto det_sign = 1;
+        for(unsigned I = 0; I < pivot.n_elem; ++I) if((this->operator()(I, I) < T(0)) ^ (static_cast<int>(I) + 1 != pivot(I))) det_sign = -det_sign;
+        return det_sign;
+    }
 };
-
-template<sp_d T> void DenseMat<T>::init() {
-    if(nullptr != memory) memory::release(access::rw(memory));
-    access::rw(memory) = is_empty() ? nullptr : memory::acquire<T>(this->n_elem);
-}
-
-template<sp_d T> podarray<float> DenseMat<T>::to_float() {
-    podarray<float> f_memory(this->n_elem);
-
-    suanpan_for(0llu, this->n_elem, [&](const uword I) { f_memory(I) = static_cast<float>(memory[I]); });
-
-    return f_memory;
-}
-
-template<sp_d T> DenseMat<T>::DenseMat(const uword in_rows, const uword in_cols, const uword in_elem)
-    : MetaMat<T>(in_rows, in_cols, in_elem) {
-    init();
-    DenseMat<T>::zeros();
-}
-
-template<sp_d T> DenseMat<T>::DenseMat(const DenseMat& old_mat)
-    : MetaMat<T>(old_mat)
-    , pivot(old_mat.pivot)
-    , s_memory(old_mat.s_memory) {
-    init();
-    if(nullptr != old_mat.memory) std::copy(old_mat.memory, old_mat.memory + old_mat.n_elem, DenseMat<T>::memptr());
-}
-
-template<sp_d T> DenseMat<T>::DenseMat(DenseMat&& old_mat) noexcept
-    : MetaMat<T>(std::move(old_mat))
-    , pivot(std::move(old_mat.pivot))
-    , s_memory(std::move(old_mat.s_memory)) {
-    access::rw(memory) = old_mat.memory;
-    access::rw(old_mat.memory) = nullptr;
-}
-
-template<sp_d T> DenseMat<T>& DenseMat<T>::operator=(const DenseMat& old_mat) {
-    if(this == &old_mat) return *this;
-    MetaMat<T>::operator=(old_mat);
-    pivot = old_mat.pivot;
-    s_memory = old_mat.s_memory;
-    init();
-    if(nullptr != old_mat.memory) std::copy(old_mat.memory, old_mat.memory + old_mat.n_elem, memptr());
-    return *this;
-}
-
-template<sp_d T> DenseMat<T>& DenseMat<T>::operator=(DenseMat&& old_mat) noexcept {
-    if(this == &old_mat) return *this;
-    MetaMat<T>::operator=(std::move(old_mat));
-    pivot = std::move(old_mat.pivot);
-    s_memory = std::move(old_mat.s_memory);
-    access::rw(memory) = old_mat.memory;
-    access::rw(old_mat.memory) = nullptr;
-    return *this;
-}
-
-template<sp_d T> DenseMat<T>::~DenseMat() { if(nullptr != memory) memory::release(access::rw(memory)); }
-
-template<sp_d T> bool DenseMat<T>::is_empty() const { return 0 == this->n_elem; }
-
-template<sp_d T> void DenseMat<T>::zeros() {
-    arrayops::fill_zeros(memptr(), this->n_elem);
-    this->factored = false;
-}
-
-template<sp_d T> T DenseMat<T>::max() const {
-    T max_value = T(1);
-    const auto t_size = std::min(this->n_rows, this->n_cols);
-    for(uword I = 0; I < t_size; ++I) if(const auto t_val = this->operator()(I, I); t_val > max_value) max_value = t_val;
-    return max_value;
-}
-
-template<sp_d T> Col<T> DenseMat<T>::diag() const {
-    Col<T> diag_vec(std::min(this->n_rows, this->n_cols), fill::none);
-
-    suanpan_for(0llu, diag_vec.n_elem, [&](const uword I) { diag_vec(I) = this->operator()(I, I); });
-
-    return diag_vec;
-}
-
-template<sp_d T> const T* DenseMat<T>::memptr() const { return memory; }
-
-template<sp_d T> T* DenseMat<T>::memptr() { return const_cast<T*>(memory); }
-
-template<sp_d T> void DenseMat<T>::operator+=(const shared_ptr<MetaMat<T>>& M) {
-    if(nullptr == M) return;
-    if(!M->triplet_mat.is_empty()) return this->operator+=(M->triplet_mat);
-    if(this->n_rows != M->n_rows || this->n_cols != M->n_cols || this->n_elem != M->n_elem) return;
-    if(nullptr == M->memptr()) return;
-    arrayops::inplace_plus(memptr(), M->memptr(), this->n_elem);
-    this->factored = false;
-}
-
-template<sp_d T> void DenseMat<T>::operator-=(const shared_ptr<MetaMat<T>>& M) {
-    if(nullptr == M) return;
-    if(!M->triplet_mat.is_empty()) return this->operator-=(M->triplet_mat);
-    if(this->n_rows != M->n_rows || this->n_cols != M->n_cols || this->n_elem != M->n_elem) return;
-    if(nullptr == M->memptr()) return;
-    arrayops::inplace_minus(memptr(), M->memptr(), this->n_elem);
-    this->factored = false;
-}
-
-template<sp_d T> void DenseMat<T>::operator+=(const triplet_form<T, uword>& M) {
-    if(this->n_rows != M.n_rows || this->n_cols != M.n_cols) return;
-
-    const auto row = M.row_mem();
-    const auto col = M.col_mem();
-    const auto val = M.val_mem();
-    for(uword I = 0llu; I < M.n_elem; ++I) this->at(row[I], col[I]) += val[I];
-}
-
-template<sp_d T> void DenseMat<T>::operator-=(const triplet_form<T, uword>& M) {
-    if(this->n_rows != M.n_rows || this->n_cols != M.n_cols) return;
-
-    const auto row = M.row_mem();
-    const auto col = M.col_mem();
-    const auto val = M.val_mem();
-    for(uword I = 0llu; I < M.n_elem; ++I) this->at(row[I], col[I]) -= val[I];
-}
-
-template<sp_d T> void DenseMat<T>::operator*=(const T value) { arrayops::inplace_mul(memptr(), value, this->n_elem); }
-
-template<sp_d T> int DenseMat<T>::sign_det() const {
-    if(IterativeSolver::NONE != this->setting.iterative_solver) throw invalid_argument("analysis requires the sign of determinant but iterative solver does not support it");
-    auto det_sign = 1;
-    for(unsigned I = 0; I < pivot.n_elem; ++I) if((this->operator()(I, I) < 0.) ^ (static_cast<int>(I) + 1 != pivot(I))) det_sign = -det_sign;
-    return det_sign;
-}
 
 #endif
 

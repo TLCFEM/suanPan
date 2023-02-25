@@ -1,4 +1,3 @@
-#define CATCH_CONFIG_RUNNER
 #include "CatchTest.h"
 #include <Toolbox/utility.h>
 #include "CatchHeader.h"

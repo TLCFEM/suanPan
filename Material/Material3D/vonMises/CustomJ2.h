@@ -31,6 +31,7 @@
 
 #include "NonlinearJ2.h"
 #include <Toolbox/Expression.h>
+#include <Toolbox/ResourceHolder.h>
 
 class CustomJ2 final : public NonlinearJ2 {
     [[nodiscard]] double compute_k(double) const override;
@@ -40,7 +41,7 @@ class CustomJ2 final : public NonlinearJ2 {
 
     const unsigned k_tag, h_tag;
 
-    shared_ptr<Expression> k_expression, h_expression;
+    ResourceHolder<Expression> k_expression, h_expression;
 
 public:
     CustomJ2(unsigned,   // tag

@@ -4,6 +4,7 @@
 #include "SparseMat.hpp"
 
 #include "BandMat.hpp"
+#include "BandMatCUDA.hpp"
 #include "BandMatSpike.hpp"
 #include "BandSymmMat.hpp"
 #include "FullMat.hpp"

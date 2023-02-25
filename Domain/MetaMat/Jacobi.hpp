@@ -43,7 +43,7 @@ public:
 };
 
 template<sp_d data_t> Col<data_t> Jacobi<data_t>::apply(const Col<data_t>& in) {
-    vec out = in;
+    Col<data_t> out = in;
 
     for(auto I = 0llu; I < in.n_elem; I += diag_reciprocal.n_elem) out.subvec(I, arma::size(diag_reciprocal)) %= diag_reciprocal;
 

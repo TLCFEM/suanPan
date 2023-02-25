@@ -41,7 +41,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>Add_;pord;metis;MUMPS_ARITH=MUMPS_ARITH_d;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>Add_;pord;metis;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -62,6 +62,9 @@
     <ClCompile Include="..\..\..\Toolbox\mumps-src\bucket.c" />
     <ClCompile Include="..\..\..\Toolbox\mumps-src\ddbisect.c" />
     <ClCompile Include="..\..\..\Toolbox\mumps-src\ddcreate.c" />
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\dmumps_c.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MUMPS_ARITH=MUMPS_ARITH_d;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\mumps-src\dmumps_gpu.c" />
     <ClCompile Include="..\..\..\Toolbox\mumps-src\elapse.c" />
     <ClCompile Include="..\..\..\Toolbox\mumps-src\gbipart.c" />
@@ -72,7 +75,6 @@
     <ClCompile Include="..\..\..\Toolbox\mumps-src\minpriority.c" />
     <ClCompile Include="..\..\..\Toolbox\mumps-src\mpic.c" />
     <ClCompile Include="..\..\..\Toolbox\mumps-src\multisector.c" />
-    <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_c.c" />
     <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_common.c" />
     <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_config_file_C.c" />
     <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_io.c" />
@@ -92,6 +94,9 @@
     <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_thread.c" />
     <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_thread_affinity.c" />
     <ClCompile Include="..\..\..\Toolbox\mumps-src\nestdiss.c" />
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\smumps_c.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MUMPS_ARITH=MUMPS_ARITH_s;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\mumps-src\sort.c" />
     <ClCompile Include="..\..\..\Toolbox\mumps-src\symbfac.c" />
     <ClCompile Include="..\..\..\Toolbox\mumps-src\tree.c" />

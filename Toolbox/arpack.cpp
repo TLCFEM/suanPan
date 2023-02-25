@@ -47,17 +47,19 @@ int eig_solve(vec& eigval, mat& eigvec, const std::shared_ptr<MetaMat<double>>& 
     while(99 != IDO) {
         arma_fortran(arma_dsaupd)(&IDO, &BMAT, &N, WHICH, &NEV, &TOL, RESID.memptr(), &NCV, V.memptr(), &LDV, IPARAM.memptr(), IPNTR.memptr(), WORKD.memptr(), WORKL.memptr(), &LWORKL, &INFO);
         // ReSharper disable once CppEntityAssignedButNoRead
-        if(vec Y(WORKD.memptr() + IPNTR[1] - 1, N, false); -1 == IDO) {
-            vec X(WORKD.memptr() + IPNTR[0] - 1, N, false);
+        if(vec Y(WORKD.memptr() + IPNTR[1] - 1, N, false, true); -1 == IDO) {
+            vec X(WORKD.memptr() + IPNTR[0] - 1, N, false, true);
             X = K * X;
-            Y = M->solve(X);
+            INFO = M->solve(Y, X);
+            if(0 != INFO) break;
         }
         else if(1 == IDO) {
-            const vec X(WORKD.memptr() + IPNTR[2] - 1, N, false);
-            Y = M->solve(X);
+            const vec X(WORKD.memptr() + IPNTR[2] - 1, N, false, true);
+            INFO = M->solve(Y, X);
+            if(0 != INFO) break;
         }
         else if(2 == IDO) {
-            const vec X(WORKD.memptr() + IPNTR[0] - 1, N, false);
+            const vec X(WORKD.memptr() + IPNTR[0] - 1, N, false, true);
             Y = K * X;
         }
         else if(0 != INFO) break;
@@ -112,17 +114,19 @@ int eig_solve(cx_vec& eigval, cx_mat& eigvec, const std::shared_ptr<MetaMat<doub
     while(99 != IDO) {
         arma_fortran(arma_dnaupd)(&IDO, &BMAT, &N, WHICH, &NEV, &TOL, RESID.memptr(), &NCV, V.memptr(), &LDV, IPARAM.memptr(), IPNTR.memptr(), WORKD.memptr(), WORKL.memptr(), &LWORKL, &INFO);
         // ReSharper disable once CppEntityAssignedButNoRead
-        if(vec Y(WORKD.memptr() + IPNTR[1] - 1, N, false); -1 == IDO) {
-            vec X(WORKD.memptr() + IPNTR[0] - 1, N, false);
+        if(vec Y(WORKD.memptr() + IPNTR[1] - 1, N, false, true); -1 == IDO) {
+            vec X(WORKD.memptr() + IPNTR[0] - 1, N, false, true);
             X = M * X;
-            Y = K->solve(X);
+            INFO = K->solve(Y, X);
+            if(0 != INFO) break;
         }
         else if(1 == IDO) {
-            const vec X(WORKD.memptr() + IPNTR[2] - 1, N, false);
-            Y = K->solve(X);
+            const vec X(WORKD.memptr() + IPNTR[2] - 1, N, false, true);
+            INFO = K->solve(Y, X);
+            if(0 != INFO) break;
         }
         else if(2 == IDO) {
-            const vec X(WORKD.memptr() + IPNTR[0] - 1, N, false);
+            const vec X(WORKD.memptr() + IPNTR[0] - 1, N, false, true);
             Y = M * X;
         }
         else if(0 != INFO) break;

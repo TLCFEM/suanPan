@@ -33,6 +33,7 @@
     <CharacterSet>Unicode</CharacterSet>
     <PreferredToolArchitecture>x64</PreferredToolArchitecture>
     <UseInteloneMKL>Parallel</UseInteloneMKL>
+    <UseInteloneTBB>true</UseInteloneTBB>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -64,6 +65,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -85,6 +87,7 @@
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -259,6 +262,7 @@
     <ClCompile Include="..\..\..\Element\Utility\T3DL.cpp" />
     <ClCompile Include="..\..\..\Element\Visualisation\vtkBase.cpp" />
     <ClCompile Include="..\..\..\Element\Visualisation\vtkParser.cpp" />
+    <ClCompile Include="..\..\..\Include\catch\catch_amalgamated.cpp" />
     <ClCompile Include="..\..\..\Include\fmt\src\format.cc" />
     <ClCompile Include="..\..\..\Include\whereami\whereami.c" />
     <ClCompile Include="..\..\..\Load\Amplitude\Amplitude.cpp" />
@@ -290,6 +294,7 @@
     <ClCompile Include="..\..\..\Material\Material1D\Concrete\ConcreteExp.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Concrete\ConcreteTable.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Concrete\ConcreteTsai.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Degradation\CustomDegradation.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Degradation\Degradation.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Degradation\Dhakal.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Degradation\TrilinearDegradation.cpp" />
@@ -320,6 +325,7 @@
     <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\Trivial.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Material1D.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Viscosity\BilinearViscosity.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Viscosity\CustomViscosity.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Viscosity\Kelvin.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Viscosity\Maxwell.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Viscosity\NonlinearViscosity.cpp" />
@@ -328,6 +334,7 @@
     <ClCompile Include="..\..\..\Material\Material1D\vonMises\ArmstrongFrederick1D.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\vonMises\Bilinear1D.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\vonMises\BilinearMises1D.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\vonMises\CustomGurson1D.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\vonMises\CustomMises1D.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\vonMises\ExpGurson1D.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\vonMises\ExpMises1D.cpp" />
@@ -385,6 +392,7 @@
     <ClCompile Include="..\..\..\Material\Material3D\vonMises\ArmstrongFrederick.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\vonMises\BilinearJ2.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\vonMises\BilinearPeric.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\vonMises\CustomGurson.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\vonMises\CustomJ2.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\vonMises\ExpGurson.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\vonMises\ExpJ2.cpp" />
@@ -496,10 +504,7 @@
     <ClCompile Include="..\..\..\Toolbox\arpack.cpp" />
     <ClCompile Include="..\..\..\Toolbox\command.cpp" />
     <ClCompile Include="..\..\..\Toolbox\Converter.cpp" />
-    <ClCompile Include="..\..\..\Toolbox\Expression.cpp">
-      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
-    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\Expression.cpp" />
     <ClCompile Include="..\..\..\Toolbox\ExpressionParser.cpp" />
     <ClCompile Include="..\..\..\Toolbox\IntegrationPlan.cpp" />
     <ClCompile Include="..\..\..\Toolbox\resampling.cpp" />
@@ -586,6 +591,7 @@
     <ClInclude Include="..\..\..\Domain\Group\GroupGroup.h" />
     <ClInclude Include="..\..\..\Domain\Group\NodeGroup.h" />
     <ClInclude Include="..\..\..\Domain\MetaMat\BandMat.hpp" />
+    <ClInclude Include="..\..\..\Domain\MetaMat\BandMatCUDA.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\BandMatSpike.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\BandSymmMat.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\csc_form.hpp" />
@@ -635,6 +641,7 @@
     <ClInclude Include="..\..\..\Element\ElementBase.h" />
     <ClInclude Include="..\..\..\Element\ElementParser.h" />
     <ClInclude Include="..\..\..\Element\ElementTemplate.h" />
+    <ClInclude Include="..\..\..\Element\MappingDOF.h" />
     <ClInclude Include="..\..\..\Element\MaterialElement.h" />
     <ClInclude Include="..\..\..\Element\Membrane\Axisymmetric\CAX3.h" />
     <ClInclude Include="..\..\..\Element\Membrane\Axisymmetric\CAX4.h" />
@@ -747,6 +754,7 @@
     <ClInclude Include="..\..\..\Material\Material1D\Concrete\ConcreteExp.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Concrete\ConcreteTable.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Concrete\ConcreteTsai.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Degradation\CustomDegradation.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Degradation\Degradation.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Degradation\Dhakal.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Degradation\TrilinearDegradation.h" />
@@ -777,6 +785,7 @@
     <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\Trivial.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Material1D.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Viscosity\BilinearViscosity.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Viscosity\CustomViscosity.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Viscosity\Kelvin.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Viscosity\Maxwell.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Viscosity\NonlinearViscosity.h" />
@@ -785,6 +794,7 @@
     <ClInclude Include="..\..\..\Material\Material1D\vonMises\ArmstrongFrederick1D.h" />
     <ClInclude Include="..\..\..\Material\Material1D\vonMises\Bilinear1D.h" />
     <ClInclude Include="..\..\..\Material\Material1D\vonMises\BilinearMises1D.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\vonMises\CustomGurson1D.h" />
     <ClInclude Include="..\..\..\Material\Material1D\vonMises\CustomMises1D.h" />
     <ClInclude Include="..\..\..\Material\Material1D\vonMises\ExpGurson1D.h" />
     <ClInclude Include="..\..\..\Material\Material1D\vonMises\ExpMises1D.h" />
@@ -842,6 +852,7 @@
     <ClInclude Include="..\..\..\Material\Material3D\vonMises\ArmstrongFrederick.h" />
     <ClInclude Include="..\..\..\Material\Material3D\vonMises\BilinearJ2.h" />
     <ClInclude Include="..\..\..\Material\Material3D\vonMises\BilinearPeric.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\vonMises\CustomGurson.h" />
     <ClInclude Include="..\..\..\Material\Material3D\vonMises\CustomJ2.h" />
     <ClInclude Include="..\..\..\Material\Material3D\vonMises\ExpGurson.h" />
     <ClInclude Include="..\..\..\Material\Material3D\vonMises\ExpJ2.h" />
@@ -961,6 +972,7 @@
     <ClInclude Include="..\..\..\Toolbox\IntegrationPlan.h" />
     <ClInclude Include="..\..\..\Toolbox\Quaternion.hpp" />
     <ClInclude Include="..\..\..\Toolbox\resampling.h" />
+    <ClInclude Include="..\..\..\Toolbox\ResourceHolder.h" />
     <ClInclude Include="..\..\..\Toolbox\response_spectrum.h" />
     <ClInclude Include="..\..\..\Toolbox\shape.h" />
     <ClInclude Include="..\..\..\Toolbox\sort_color.hpp" />

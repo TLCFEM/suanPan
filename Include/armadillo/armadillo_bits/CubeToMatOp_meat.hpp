@@ -33,9 +33,9 @@ CubeToMatOp<T1, op_type>::CubeToMatOp(const T1& in_m)
 
 template<typename T1, typename op_type>
 inline
-CubeToMatOp<T1, op_type>::CubeToMatOp(const T1& in_m, const typename T1::elem_type in_aux)
+CubeToMatOp<T1, op_type>::CubeToMatOp(const T1& in_m, const uword in_aux_uword)
   : m(in_m)
-  , aux(in_aux)
+  , aux_uword(in_aux_uword)
   {
   arma_extra_debug_sigprint();
   }
