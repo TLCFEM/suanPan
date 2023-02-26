@@ -65,6 +65,9 @@ int Step::initialize() {
 
     factory->set_solver_type(system_solver);
     factory->set_solver_setting(setting);
+#ifdef SUANPAN_MAGMA
+    factory->set_solver_setting(magma_setting);
+#endif
 
     return 0;
 }

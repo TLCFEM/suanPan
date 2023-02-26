@@ -56,6 +56,9 @@
 #ifdef SUANPAN_MKL
 #include <Domain/MetaMat/SparseMatFGMRES.hpp>
 #endif
+#ifdef SUANPAN_MAGMA
+#include <Domain/MetaMat/SparseMatMAGMA.hpp>
+#endif
 #ifdef SUANPAN_WIN
 #include <Windows.h>
 #endif
@@ -1356,6 +1359,12 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
         else if(is_equal(value, "MUMPS")) t_step->set_system_solver(SolverType::MUMPS);
 #ifdef SUANPAN_CUDA
         else if(is_equal(value, "CUDA")) t_step->set_system_solver(SolverType::CUDA);
+#ifdef SUANPAN_MAGMA
+        else if(is_equal(value, "MAGMA")) {
+            t_step->set_system_solver(SolverType::MAGMA);
+            t_step->set_magma_setting(magma_parse_opts<magma_dopts>(command));
+        }
+#endif
 #endif
 #ifdef SUANPAN_MKL
         else if(is_equal(value, "PARDISO")) t_step->set_system_solver(SolverType::PARDISO);

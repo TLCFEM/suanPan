@@ -42,6 +42,12 @@
 #define ARMA_USE_HDF5
 #endif
 
+#ifdef SUANPAN_MAGMA
+#ifndef SUANPAN_CUDA
+#undef SUANPAN_MAGMA
+#endif
+#endif
+
 // SUANPAN_WIN
 // WIN32 _WIN32 __WIN32 __WIN32__ --> MSVC GCC
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) || defined(__WIN32__)

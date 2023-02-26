@@ -2851,6 +2851,9 @@
     <ClInclude Include="..\..\..\Element\MappingDOF.h">
       <Filter>Element</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Domain\MetaMat\SparseMatMAGMA.hpp">
+      <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\..\Resource\suanPan.rc" />

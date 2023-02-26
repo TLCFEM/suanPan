@@ -282,6 +282,9 @@ void print_version() {
 #ifdef SUANPAN_CUDA
     suanpan_info("    The GPCPU solvers are provided by CUDA. https://developer.nvidia.com/about-cuda/\n");
 #endif
+#ifdef SUANPAN_MAGMA
+    suanpan_info("    The GPCPU solvers are provided by MAGMA. https://icl.utk.edu/magma/\n");
+#endif
 #ifdef SUANPAN_MT
     suanpan_info("    The parallelisation support is implemented via TBB library. https://github.com/oneapi-src/oneTBB/\n");
 #endif

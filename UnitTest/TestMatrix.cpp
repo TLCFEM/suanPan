@@ -180,6 +180,18 @@ template<> FullMatCUDA<float> create_new(const u64 N) { return {N, N}; }
 template<> SparseMatCUDA<double> create_new(const u64 N) { return {N, N}; }
 
 template<> SparseMatCUDA<float> create_new(const u64 N) { return {N, N}; }
+
+#ifdef SUANPAN_MAGMA
+template<> SparseMatMAGMA<double> create_new(const u64 N) {
+    istringstream dummy{"--verbose 1"};
+    return {N, N, magma_parse_opts<magma_dopts>(dummy)};
+}
+
+template<> SparseMatMAGMA<float> create_new(const u64 N) {
+    istringstream dummy{"--verbose 1"};
+    return {N, N, magma_parse_opts<magma_sopts>(dummy)};
+}
+#endif
 #endif
 
 template<typename T, typename ET> void benchmark_mat_setup(const int I) {
@@ -220,6 +232,9 @@ template<typename T, typename ET> void benchmark_mat_setup(const int I) {
     else if(std::is_same_v<FullMatCUDA<ET>, T>) title = "Full CUDA ";
     else if(std::is_same_v<SparseMatCUDA<ET>, T>) title = "Sparse CUDA ";
     else if(std::is_same_v<BandMatCUDA<ET>, T>) title = "Band CUDA ";
+#ifdef SUANPAN_MAGMA
+    else if(std::is_same_v<SparseMatMAGMA<ET>, T>) title = "Magma ";
+#endif
 #endif
 
     title += "N=" + std::to_string(I) + " NZ=" + std::to_string(B.n_nonzero) + " NE=" + std::to_string(A.n_elem);
@@ -315,6 +330,19 @@ TEST_CASE("BandMatCUDA", "[Matrix.Dense]") { test_dense_mat_setup<double>(create
 TEST_CASE("SparseMatCUDA", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatCUDA<double>>); }
 
 TEST_CASE("SparseMatCUDAFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<float>(create_new<SparseMatCUDA<float>>); }
+
+#ifdef SUANPAN_MAGMA
+TEST_CASE("SparseMatMAGMA", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatMAGMA<double>>); }
+
+TEST_CASE("SparseMatMAGMAFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<float>(create_new<SparseMatMAGMA<float>>); }
+
+TEST_CASE("Large CUDA Sparse", "[Matrix.Benchmark]") {
+    benchmark_mat_setup<SparseMatPARDISO<double>, double>(0x400);
+    benchmark_mat_setup<BandSymmMat<double>, double>(0x2976);
+    benchmark_mat_setup<SparseMatMAGMA<double>, double>(0x400);
+    benchmark_mat_setup<SparseMatMAGMA<float>, float>(0x400);
+}
+#endif
 #endif
 
 TEST_CASE("Triplet/CSR/CSC Sparse", "[Matrix.Sparse]") {
