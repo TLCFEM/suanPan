@@ -201,7 +201,7 @@ public:
 #ifdef SUANPAN_MAGMA
     void set_solver_setting(const magma_dopts& magma_opt) { magma_setting = magma_opt; }
 
-    [[nodiscard]] const magma_dopts& get_solver_setting() const { return magma_setting; }
+    [[nodiscard]] const magma_dopts& get_magma_setting() const { return magma_setting; }
 #endif
 
     void set_analysis_type(AnalysisType);
