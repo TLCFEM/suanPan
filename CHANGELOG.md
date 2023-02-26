@@ -6,6 +6,10 @@
 2. The `SPIKE` solver may occasionally hang, to circumvent, try to avoid mixing compilers from different vendors.
 3. The `MUMPS` solver throws segfaults with large matrices.
 
+## version 3.0
+
+1. add `MAGMA` based GPU sparse solver [#123](https://github.com/TLCFEM/suanPan/pull/123)
+
 ## version 2.9
 
 1. matrix optimsation
