@@ -30,8 +30,8 @@ jobs:
           ./suanPan-linux-openblas-vtk/bin/suanPan -v
       - uses: actions/upload-artifact@v3
         with:
-          name: suanPan-2.9.0-1.x86_64.deb
-          path: suanPan-2.9.0-1.x86_64.deb
+          name: suanPan-3.0.0-1.x86_64.deb
+          path: suanPan-3.0.0-1.x86_64.deb
   macos-openblas-vtk-dev:
     runs-on: macos-11
     timeout-minutes: 60
