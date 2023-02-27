@@ -57,7 +57,7 @@ jobs:
           ./suanPan-macos-openblas-vtk/bin/suanPan -v
   windows-openblas-vtk-dev:
     runs-on: windows-2022
-    timeout-minutes: 90
+    timeout-minutes: 100
     steps:
       - name: Clone
         uses: actions/checkout@v3

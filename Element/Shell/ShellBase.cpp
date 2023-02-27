@@ -48,10 +48,10 @@ mat ShellBase::reshuffle(const mat& membrane_stiffness, const mat& plate_stiffne
 
     mat total_stiffness(t_size, t_size, fill::zeros);
 
-    for(auto I = 0llu, K = 0llu; I < t_size; I += 6llu, K += 3llu) {
-        const span M(K, K + 2llu);
-        for(auto J = 0llu, L = 0llu; J < t_size; J += 6llu, L += 3llu) {
-            const span N(L, L + 2llu);
+    for(auto J = 0llu, L = 0llu; J < t_size; J += 6llu, L += 3llu) {
+        const span N(L, L + 2llu);
+        for(auto I = 0llu, K = 0llu; I < t_size; I += 6llu, K += 3llu) {
+            const span M(K, K + 2llu);
             total_stiffness(I + m_dof, J + m_dof) = membrane_stiffness(M, N);
             total_stiffness(I + p_dof, J + p_dof) = plate_stiffness(M, N);
         }
