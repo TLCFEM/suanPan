@@ -86,8 +86,8 @@ public:
 };
 
 class CSMQ5 final : public CSMQ {
-    inline static const uvec t_dof{0, 1, 3, 4, 6, 7, 9, 10, 12, 13};
-    inline static const uvec r_dof{2, 5, 8, 11, 14};
+    static const uvec t_dof;
+    static const uvec r_dof;
 
     const uvec& get_translation_dof() override;
     const uvec& get_rotation_dof() override;
@@ -102,8 +102,8 @@ public:
 };
 
 class CSMQ6 final : public CSMQ {
-    inline static const uvec t_dof{0, 1, 3, 4, 6, 7, 9, 10, 12, 13, 15, 16};
-    inline static const uvec r_dof{2, 5, 8, 11, 14, 17};
+    static const uvec t_dof;
+    static const uvec r_dof;
 
     const uvec& get_translation_dof() override;
     const uvec& get_rotation_dof() override;
@@ -118,8 +118,8 @@ public:
 };
 
 class CSMQ7 final : public CSMQ {
-    inline static const uvec t_dof{0, 1, 3, 4, 6, 7, 9, 10, 12, 13, 15, 16, 18, 19};
-    inline static const uvec r_dof{2, 5, 8, 11, 14, 17, 20};
+    static const uvec t_dof;
+    static const uvec r_dof;
 
     const uvec& get_translation_dof() override;
     const uvec& get_rotation_dof() override;

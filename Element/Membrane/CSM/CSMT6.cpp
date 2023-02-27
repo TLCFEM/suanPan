@@ -23,6 +23,9 @@
 #include <Toolbox/shape.h>
 #include <Toolbox/utility.h>
 
+const uvec CSMT6::t_dof{0, 1, 3, 4, 6, 7, 9, 10, 12, 13, 15, 16};
+const uvec CSMT6::r_dof{2, 5, 8, 11, 14, 17};
+
 CSMT6::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M)
     : coor(std::forward<vec>(C))
     , weight(W)

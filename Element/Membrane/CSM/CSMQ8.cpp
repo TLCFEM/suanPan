@@ -23,6 +23,9 @@
 #include <Toolbox/shape.h>
 #include <Toolbox/utility.h>
 
+const uvec CSMQ8::t_dof{0, 1, 3, 4, 6, 7, 9, 10, 12, 13, 15, 16, 18, 19, 21, 22};
+const uvec CSMQ8::r_dof{2, 5, 8, 11, 14, 17, 20, 23};
+
 CSMQ8::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M)
     : coor(std::forward<vec>(C))
     , weight(W)

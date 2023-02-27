@@ -43,8 +43,8 @@ class CSMQ4 final : public MaterialElement2D {
 
     static constexpr unsigned m_node = 4, m_dof = 3, m_size = m_dof * m_node;
 
-    inline static const uvec t_dof{0, 1, 3, 4, 6, 7, 9, 10};
-    inline static const uvec r_dof{2, 5, 8, 11};
+    static const uvec t_dof;
+    static const uvec r_dof;
 
     const double thickness;
 
