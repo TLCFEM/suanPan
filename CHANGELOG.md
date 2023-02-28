@@ -9,6 +9,7 @@
 ## version 3.0
 
 1. add `MAGMA` based GPU sparse solver [#123](https://github.com/TLCFEM/suanPan/pull/123)
+2. add nonlinear transformation for shell elements [#124](https://github.com/TLCFEM/suanPan/pull/124)
 
 ## version 2.9
 
