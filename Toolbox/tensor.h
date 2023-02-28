@@ -110,7 +110,11 @@ namespace tensor {
         };
 
         vec3 unit_norm(const vec3&, const vec3&);
-    }
+    } // namespace base
+
+    mat diff_unit(const vec&);
+
+    mat diff_triad(const vec3&, const vec3&, const vec3&);
 } // namespace tensor
 
 namespace transform {
@@ -131,6 +135,10 @@ namespace transform {
     }
 
     template<typename T> Mat<T> skew_symm(const subview_col<T>& R) { return skew_symm(R.eval()); }
+
+    template<typename T, typename eop_type> mat skew_symm(const eOp<T, eop_type>& R) { return skew_symm(R.eval()); }
+
+    template<typename T, typename op_type> mat skew_symm(const Op<T, op_type>& R) { return skew_symm(R.eval()); }
 
     template<typename T> Mat<T> rodrigues(const Mat<T>& R) { return arma::expmat(transform::skew_symm(R)); }
 

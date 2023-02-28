@@ -1308,7 +1308,13 @@ void new_dkts3(unique_ptr<Element>& return_obj, istringstream& command) {
         return;
     }
 
-    return_obj = make_unique<DKTS3>(tag, std::move(node_tag), material_tag, thickness, num_ip);
+    string nlgeom = "false";
+    if(!get_optional_input(command, nlgeom)) {
+        suanpan_error("A valid nlgeom switch is required.\n");
+        return;
+    }
+
+    return_obj = make_unique<DKTS3>(tag, std::move(node_tag), material_tag, thickness, num_ip, is_true(nlgeom));
 }
 
 void new_embedded(unique_ptr<Element>& return_obj, istringstream& command, const unsigned dof) {

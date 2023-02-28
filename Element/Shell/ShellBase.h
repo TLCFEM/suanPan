@@ -38,17 +38,24 @@ protected:
 
     static vec reshuffle(const vec&, const vec&);
     static mat reshuffle(const mat&, const mat&);
+    static mat reshuffle(const mat&);
 
     mat trans_mat;
 
     void direction_cosine();
     [[nodiscard]] mat get_local_coordinate() const;
+
     vec& transform_from_local_to_global(vec&) const;
     vec& transform_from_global_to_local(vec&) const;
     mat& transform_from_local_to_global(mat&) const;
+
     vec transform_from_local_to_global(vec&&) const;
     vec transform_from_global_to_local(vec&&) const;
     mat transform_from_local_to_global(mat&&) const;
+
+    vec transform_from_global_to_local(const vec&) const;
+
+    [[nodiscard]] mat transform_to_global_geometry(const mat&, const vec&, const vec&) const;
 
 public:
     using MaterialElement2D::MaterialElement2D;

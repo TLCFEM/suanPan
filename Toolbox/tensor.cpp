@@ -220,6 +220,50 @@ mat tensor::dev(mat&& in) {
     return std::move(in);
 }
 
+// takes an arbitrary vector v and compute the differentiation of normalise(v).
+mat tensor::diff_unit(const vec& v) {
+    const auto n = normalise(v);
+    return (eye(v.n_elem, v.n_elem) - n * n.t()) / norm(v);
+}
+
+mat tensor::diff_triad(const vec3& x1, const vec3& x2, const vec3& x3) {
+    const vec3 e1 = x2 - x1;
+    const vec3 e2 = x3 - x1;
+    const vec3 e3 = cross(e1, e2);
+
+    const mat dn1 = diff_unit(e1);
+    const mat& dn1dx2 = dn1;
+    const mat dn1dx1 = -dn1;
+
+    const mat dn3 = diff_unit(e3);
+    const mat dn3de2 = dn3 * transform::skew_symm(e1);
+    const mat dn3de1 = dn3 * transform::skew_symm(-e2);
+
+    const mat dn3dx1 = -dn3de2 - dn3de1;
+    const mat& dn3dx2 = dn3de1;
+    const mat& dn3dx3 = dn3de2;
+
+    // const vec3 n2 = cross(n3, n1);
+    const mat dn2dn1 = transform::skew_symm(normalise(e3));
+    const mat dn2dn3 = transform::skew_symm(-normalise(e1));
+
+    mat triad(9, 9, fill::none);
+    const span a(0, 2), b(3, 5), c(6, 8);
+    triad(a, a) = dn1dx1;
+    triad(a, b) = dn1dx2;
+    triad(a, c).fill(0.);
+
+    triad(b, a) = dn2dn1 * dn1dx1 + dn2dn3 * dn3dx1; // dn2dx1
+    triad(b, b) = dn2dn1 * dn1dx2 + dn2dn3 * dn3dx2; // dn2dx2
+    triad(b, c) = dn2dn3 * dn3dx3;                   // dn2dx3
+
+    triad(c, a) = dn3dx1;
+    triad(c, b) = dn3dx2;
+    triad(c, c) = dn3dx3;
+
+    return triad;
+}
+
 tensor::base::Base3D::Base3D(const vec3& G1, const vec3& G2, const vec3& G3)
     : g1(G1)
     , g2(G2)

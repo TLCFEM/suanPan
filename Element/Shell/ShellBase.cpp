@@ -17,6 +17,7 @@
 
 #include "ShellBase.h"
 #include <Domain/Node.h>
+#include <Toolbox/tensor.h>
 
 const uvec ShellBase::m_dof{0, 1, 5};
 const uvec ShellBase::p_dof{2, 3, 4};
@@ -60,13 +61,44 @@ mat ShellBase::reshuffle(const mat& membrane_stiffness, const mat& plate_stiffne
     return total_stiffness;
 }
 
+mat ShellBase::reshuffle(const mat& membrane_stiffness) {
+    suanpan_assert([&] {
+        if(membrane_stiffness.n_cols != membrane_stiffness.n_rows) throw invalid_argument("size conflicts");
+    });
+
+    const auto t_size = 2 * membrane_stiffness.n_cols;
+
+    mat total_stiffness(t_size, t_size, fill::zeros);
+
+    for(auto J = 0llu, L = 0llu; J < t_size; J += 6llu, L += 3llu) {
+        const span N(L, L + 2llu);
+        for(auto I = 0llu, K = 0llu; I < t_size; I += 6llu, K += 3llu) {
+            const span M(K, K + 2llu);
+            total_stiffness(I + m_dof, J + m_dof) = membrane_stiffness(M, N);
+        }
+    }
+
+    return total_stiffness;
+}
+
 void ShellBase::direction_cosine() {
+    if(!is_nlgeom() && !trans_mat.is_empty()) return;
+
     const mat coor = get_coordinate(3).t();
 
     trans_mat.set_size(3, 3);
 
-    trans_mat.col(0) = normalise(coor.col(1) - coor.col(0));
-    trans_mat.col(2) = normalise(cross(trans_mat.col(0), coor.col(2) - coor.col(0)));
+    vec x1 = coor.col(1) - coor.col(0);
+    vec x2 = coor.col(2) - coor.col(0);
+
+    if(is_nlgeom()) {
+        const vec disp = get_trial_displacement();
+        x1 += disp.rows(6, 8) - disp.rows(0, 2);
+        x2 += disp.rows(12, 14) - disp.rows(0, 2);
+    }
+
+    trans_mat.col(0) = normalise(x1);
+    trans_mat.col(2) = normalise(cross(x1, x2));
     trans_mat.col(1) = cross(trans_mat.col(2), trans_mat.col(0));
 }
 
@@ -106,4 +138,39 @@ vec ShellBase::transform_from_local_to_global(vec&& resistance) const { return s
 
 vec ShellBase::transform_from_global_to_local(vec&& displacement) const { return std::move(transform_from_global_to_local(displacement)); }
 
+vec ShellBase::transform_from_global_to_local(const vec& displacement) const {
+    auto transformed = displacement;
+    transform_from_global_to_local(transformed);
+    return transformed;
+}
+
 mat ShellBase::transform_from_local_to_global(mat&& stiffness) const { return std::move(transform_from_local_to_global(stiffness)); }
+
+mat ShellBase::transform_to_global_geometry(const mat& stiffness, const vec& resistance, const vec& displacement) const {
+    static const span a(0, 2), b(3, 5), c(6, 8);
+    static const uvec d{0, 1, 2, 6, 7, 8, 12, 13, 14};
+
+    const mat coor = get_coordinate(3).t();
+    const vec3 x1 = coor.col(0) + displacement(span(0, 2));
+    const vec3 x2 = coor.col(1) + displacement(span(6, 8));
+    const vec3 x3 = coor.col(2) + displacement(span(12, 14));
+    const auto diff_triad = tensor::diff_triad(x1, x2, x3);
+
+    mat left(size(stiffness), fill::zeros), right(size(stiffness), fill::zeros);
+
+    for(auto I = 0llu, J = 1llu, K = 2llu; I < resistance.n_elem; I += 3llu, J += 3llu, K += 3llu) {
+        left(uvec{I, J, K}, d) = resistance(I) * diff_triad.rows(a) + resistance(J) * diff_triad.rows(b) + resistance(K) * diff_triad.rows(c);
+        const vec nodal_disp = displacement(span(I, K));
+        right(d, uvec{I}) = diff_triad.rows(a).t() * nodal_disp;
+        right(d, uvec{J}) = diff_triad.rows(b).t() * nodal_disp;
+        right(d, uvec{K}) = diff_triad.rows(c).t() * nodal_disp;
+    }
+
+    mat global_trans(size(stiffness), fill::zeros);
+    for(auto I = 0llu, J = 2llu; I < stiffness.n_cols; I += 3llu, J += 3llu) {
+        const span t_span(I, J);
+        global_trans(t_span, t_span) = trans_mat;
+    }
+
+    return left + global_trans * stiffness * right.t();
+}

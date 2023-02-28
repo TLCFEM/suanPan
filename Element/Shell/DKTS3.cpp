@@ -123,8 +123,8 @@ field<mat> DKTS3::form_transform(const mat& C) {
     return {BMX, BMY, BPX, BPY};
 }
 
-DKTS3::DKTS3(const unsigned T, uvec&& N, const unsigned M, const double TH, const unsigned IP)
-    : ShellBase(T, s_node, s_dof, std::forward<uvec>(N), uvec{M}, false, {DOF::U1, DOF::U2, DOF::U3, DOF::UR1, DOF::UR2, DOF::UR3})
+DKTS3::DKTS3(const unsigned T, uvec&& N, const unsigned M, const double TH, const unsigned IP, const bool NL)
+    : ShellBase(T, s_node, s_dof, std::forward<uvec>(N), uvec{M}, NL, {DOF::U1, DOF::U2, DOF::U3, DOF::UR1, DOF::UR2, DOF::UR3})
     , thickness(TH)
     , num_ip(IP > 20 ? 20 : IP) {}
 
@@ -183,8 +183,11 @@ int DKTS3::initialize(const shared_ptr<DomainBase>& D) {
 }
 
 int DKTS3::update_status() {
+    direction_cosine();
+
     // separate displacement vector
-    const auto t_disp = transform_from_global_to_local(get_trial_displacement());
+    const auto g_disp = get_trial_displacement();
+    const auto t_disp = transform_from_global_to_local(g_disp);
     vec9 m_disp, p_disp;
     for(unsigned I = 0, J = 0; I < s_size; I += s_dof, J += 3) {
         const span t_span(J, J + 2llu);
@@ -221,21 +224,28 @@ int DKTS3::update_status() {
         p_stiffness += I.BP.t() * t_stiffness * I.BP;
     }
 
-    trial_resistance = transform_from_local_to_global(reshuffle(m_resistance, p_resistance));
-    trial_stiffness = transform_from_local_to_global(reshuffle(m_stiffness, p_stiffness));
+    trial_resistance = reshuffle(m_resistance, p_resistance);
+    trial_stiffness = reshuffle(m_stiffness, p_stiffness);
+
+    if(is_nlgeom()) trial_geometry = transform_to_global_geometry(trial_stiffness, trial_resistance, g_disp);
+
+    transform_from_local_to_global(trial_resistance);
+    transform_from_local_to_global(trial_stiffness);
 
     return SUANPAN_SUCCESS;
 }
 
 int DKTS3::commit_status() {
     auto code = 0;
-    for(const auto& I : int_pt) for(const auto& J : I.sec_int_pt) code += J.s_material->commit_status();
+    for(const auto& I : int_pt)
+        for(const auto& J : I.sec_int_pt) code += J.s_material->commit_status();
     return code;
 }
 
 int DKTS3::clear_status() {
     auto code = 0;
-    for(const auto& I : int_pt) for(const auto& J : I.sec_int_pt) code += J.s_material->clear_status();
+    for(const auto& I : int_pt)
+        for(const auto& J : I.sec_int_pt) code += J.s_material->clear_status();
     return code;
 }
 
