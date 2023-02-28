@@ -237,15 +237,13 @@ int DKTS3::update_status() {
 
 int DKTS3::commit_status() {
     auto code = 0;
-    for(const auto& I : int_pt)
-        for(const auto& J : I.sec_int_pt) code += J.s_material->commit_status();
+    for(const auto& I : int_pt) for(const auto& J : I.sec_int_pt) code += J.s_material->commit_status();
     return code;
 }
 
 int DKTS3::clear_status() {
     auto code = 0;
-    for(const auto& I : int_pt)
-        for(const auto& J : I.sec_int_pt) code += J.s_material->clear_status();
+    for(const auto& I : int_pt) for(const auto& J : I.sec_int_pt) code += J.s_material->clear_status();
     return code;
 }
 

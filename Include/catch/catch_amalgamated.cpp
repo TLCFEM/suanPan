@@ -2992,8 +2992,8 @@ namespace Catch {
     } // namespace Catch
 
 #elif defined(CATCH_PLATFORM_LINUX)
-    #include <fstream>
-    #include <string>
+#include <fstream>
+#include <string>
 
     namespace Catch{
         // The standard POSIX way of detecting a debugger is to attempt to
@@ -3736,12 +3736,12 @@ namespace Catch {
 
 #if defined(CATCH_CONFIG_NEW_CAPTURE)
 #if defined(_MSC_VER)
-    #include <io.h>      //_dup and _dup2
-    #define dup _dup
-    #define dup2 _dup2
-    #define fileno _fileno
+#include <io.h>      //_dup and _dup2
+#define dup _dup
+#define dup2 _dup2
+#define fileno _fileno
 #else
-    #include <unistd.h>  // dup and dup2
+#include <unistd.h>  // dup and dup2
 #endif
 #endif
 
@@ -3853,9 +3853,9 @@ namespace Catch {
 
 #if defined(CATCH_CONFIG_NEW_CAPTURE)
 #if defined(_MSC_VER)
-    #undef dup
-    #undef dup2
-    #undef fileno
+#undef dup
+#undef dup2
+#undef fileno
 #endif
 #endif
 

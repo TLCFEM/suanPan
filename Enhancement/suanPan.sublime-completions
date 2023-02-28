@@ -3517,25 +3517,25 @@
       "trigger": "DCP4"
     },
     {
-      "contents": "element DKT3 ${1:(1)} ${2:(2...4)} ${5:(5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2...4) int, node i, j, k\n# (5) int, material tag\n# (6) double, thickness\n# [7] int, numer of integration points, default: 3",
+      "contents": "element DKT3 ${1:(1)} ${2:(2...4)} ${5:(5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2...4) int, node i, j, k\n# (5) int, material tag\n# (6) double, thickness\n# [7] int, number of integration points, default: 3",
       "details": "DKT Triangle Plate",
       "kind": "type",
       "trigger": "DKT3"
     },
     {
-      "contents": "element DKT4 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)} ${8:[8]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# (7) double, thickness\n# [8] int, numer of integration points along thickness, default: 3",
+      "contents": "element DKT4 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)} ${8:[8]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# (7) double, thickness\n# [8] int, number of integration points along thickness, default: 3",
       "details": "DKT Quadrilateral Plate",
       "kind": "type",
       "trigger": "DKT4"
     },
     {
-      "contents": "element DKTS3 ${1:(1)} ${2:(2...4)} ${5:(5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2...4) int, node i, j, k\n# (5) int, material tag\n# (6) double, thickness\n# [7] int, numer of integration points, default: 3",
+      "contents": "element DKTS3 ${1:(1)} ${2:(2...4)} ${5:(5)} ${6:(6)} ${7:[7]} ${8:[8]}\n# (1) int, unique element tag\n# (2...4) int, node i, j, k\n# (5) int, material tag\n# (6) double, thickness\n# [7] int, number of integration points, default: 3\n# [7] bool, nonlinear geometry switch, default: false",
       "details": "DKT Triangle Shell",
       "kind": "type",
       "trigger": "DKTS3"
     },
     {
-      "contents": "element DKTS4 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)} ${8:[8]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# (7) double, thickness\n# [8] int, numer of integration points, default: 3",
+      "contents": "element DKTS4 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)} ${8:[8]} ${9:[9]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# (7) double, thickness\n# [8] int, number of integration points, default: 3\n# [9] bool, nonlinear geometry switch, default: false",
       "details": "DKT Quadrilateral Shell",
       "kind": "type",
       "trigger": "DKTS4"
@@ -6726,7 +6726,7 @@
       "trigger": "S3X7.5"
     },
     {
-      "contents": "element S4 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# (7) double, thickness",
+      "contents": "element S4 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)} ${8:[8]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# (7) double, thickness\n# [8] bool, nonlinear geometry switch, default: false",
       "details": "Four Node Shell Element",
       "kind": "type",
       "trigger": "S4"
@@ -6840,7 +6840,7 @@
       "trigger": "SGCMQL"
     },
     {
-      "contents": "element SGCMS ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# (7) double, thickness",
+      "contents": "element SGCMS ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)} ${8:[8]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# (7) double, thickness\n# [8] bool, nonlinear geometry switch, default: false",
       "details": "Simplified Generalized Conforming Mixed Shell Element",
       "kind": "type",
       "trigger": "SGCMS"

@@ -134,11 +134,9 @@ namespace transform {
         return S;
     }
 
-    template<typename T> Mat<T> skew_symm(const subview_col<T>& R) { return skew_symm(R.eval()); }
+    template<typename T> concept HasEval = requires(const T& x) { { x.eval() } -> std::convertible_to<mat>; };
 
-    template<typename T, typename eop_type> mat skew_symm(const eOp<T, eop_type>& R) { return skew_symm(R.eval()); }
-
-    template<typename T, typename op_type> mat skew_symm(const Op<T, op_type>& R) { return skew_symm(R.eval()); }
+    template<HasEval T> mat skew_symm(const T& R) { return skew_symm(R.eval()); }
 
     template<typename T> Mat<T> rodrigues(const Mat<T>& R) { return arma::expmat(transform::skew_symm(R)); }
 

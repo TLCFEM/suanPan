@@ -61,26 +61,6 @@ mat ShellBase::reshuffle(const mat& membrane_stiffness, const mat& plate_stiffne
     return total_stiffness;
 }
 
-mat ShellBase::reshuffle(const mat& membrane_stiffness) {
-    suanpan_assert([&] {
-        if(membrane_stiffness.n_cols != membrane_stiffness.n_rows) throw invalid_argument("size conflicts");
-    });
-
-    const auto t_size = 2 * membrane_stiffness.n_cols;
-
-    mat total_stiffness(t_size, t_size, fill::zeros);
-
-    for(auto J = 0llu, L = 0llu; J < t_size; J += 6llu, L += 3llu) {
-        const span N(L, L + 2llu);
-        for(auto I = 0llu, K = 0llu; I < t_size; I += 6llu, K += 3llu) {
-            const span M(K, K + 2llu);
-            total_stiffness(I + m_dof, J + m_dof) = membrane_stiffness(M, N);
-        }
-    }
-
-    return total_stiffness;
-}
-
 void ShellBase::direction_cosine() {
     if(!is_nlgeom() && !trans_mat.is_empty()) return;
 
@@ -133,10 +113,6 @@ mat& ShellBase::transform_from_local_to_global(mat& stiffness) const {
 
     return stiffness = global_trans * stiffness * global_trans.t();
 }
-
-vec ShellBase::transform_from_local_to_global(vec&& resistance) const { return std::move(transform_from_local_to_global(resistance)); }
-
-vec ShellBase::transform_from_global_to_local(vec&& displacement) const { return std::move(transform_from_global_to_local(displacement)); }
 
 vec ShellBase::transform_from_global_to_local(const vec& displacement) const {
     auto transformed = displacement;

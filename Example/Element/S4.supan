@@ -156,14 +156,13 @@ cload 1 0 -1 3 57
 step static 1
 set ini_step_size 1
 set fixed_step_size 1
-# set symm_mat 0
 # set sparse_mat 0
 
 converger RelIncreDisp 1 1E-8 10 1
 
 analyze
 
-# 0 0 -5.4091E-03 -3.7497E-16 6.3261E-16 0 0
+# -2.1926e-06  2.1933e-06 -4.6631e-03  1.7015e-04  1.7065e-04 -1.4934e-10
 peek node 57
 
 peek element 400

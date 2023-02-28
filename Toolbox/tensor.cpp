@@ -232,7 +232,7 @@ mat tensor::diff_triad(const vec3& x1, const vec3& x2, const vec3& x3) {
     const vec3 e3 = cross(e1, e2);
 
     const mat dn1 = diff_unit(e1);
-    const mat& dn1dx2 = dn1;
+    const auto& dn1dx2 = dn1;
     const mat dn1dx1 = -dn1;
 
     const mat dn3 = diff_unit(e3);
@@ -240,15 +240,15 @@ mat tensor::diff_triad(const vec3& x1, const vec3& x2, const vec3& x3) {
     const mat dn3de1 = dn3 * transform::skew_symm(-e2);
 
     const mat dn3dx1 = -dn3de2 - dn3de1;
-    const mat& dn3dx2 = dn3de1;
-    const mat& dn3dx3 = dn3de2;
+    const auto& dn3dx2 = dn3de1;
+    const auto& dn3dx3 = dn3de2;
 
     // const vec3 n2 = cross(n3, n1);
     const mat dn2dn1 = transform::skew_symm(normalise(e3));
     const mat dn2dn3 = transform::skew_symm(-normalise(e1));
 
     mat triad(9, 9, fill::none);
-    const span a(0, 2), b(3, 5), c(6, 8);
+    static const span a(0, 2), b(3, 5), c(6, 8);
     triad(a, a) = dn1dx1;
     triad(a, b) = dn1dx2;
     triad(a, c).fill(0.);
