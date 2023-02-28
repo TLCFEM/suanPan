@@ -91,3 +91,43 @@ TEST_CASE("Basic Quantities", "[Utility.Tensor]") {
 
     transform::compute_jacobian_principal_to_nominal(randn(2, 2));
 }
+
+TEST_CASE("Base Conversion", "[Utility.Tensor]") {
+    const vec3 g1{2, 0, 0}, g2{1, 1, 0}, g3{1, 2, 3};
+    const auto g = base::Base3D(g1, g2, g3);
+    const auto [g1_, g2_, g3_] = g.to_inverse();
+
+    REQUIRE(Approx(g1_(0)).margin(1E-15) == .5);
+    REQUIRE(Approx(g1_(1)).margin(1E-15) == -.5);
+    REQUIRE(Approx(g1_(2)).margin(1E-15) == 1. / 6.);
+    REQUIRE(Approx(g2_(0)).margin(1E-15) == 0.);
+    REQUIRE(Approx(g2_(1)).margin(1E-15) == 1.);
+    REQUIRE(Approx(g2_(2)).margin(1E-15) == -2. / 3.);
+    REQUIRE(Approx(g3_(0)).margin(1E-15) == 0.);
+    REQUIRE(Approx(g3_(1)).margin(1E-15) == 0.);
+    REQUIRE(Approx(g3_(2)).margin(1E-15) == 1. / 3.);
+}
+
+TEST_CASE("Curvature Tensor", "[Utility.Tensor]") {
+    for(auto I = 0; I < 100; ++I) {
+        const auto z = randn(2);
+        const vec3 a1{1., 0., z(0)}, a2{0., 1., -z(1)};
+        const auto a3 = base::unit_norm(a1, a2);
+        const auto t = 1. / sqrt(1. + accu(square(z)));
+        mat22 b(fill::zeros);
+        b(0, 0) = dot(a3, vec{0., 0., 1.});
+        b(1, 1) = dot(a3, vec{0., 0., -1.});
+        REQUIRE(Approx(b(0, 0)).margin(1E-15) == t);
+        REQUIRE(Approx(b(1, 1)).margin(1E-15) == -t);
+        mat22 a;
+        a(0, 0) = dot(a1, a1);
+        a(1, 1) = dot(a2, a2);
+        a(0, 1) = dot(a1, a2);
+        a(1, 0) = a(0, 1);
+        const mat22 c = b * solve(a, b);
+        REQUIRE(Approx(c(0, 0)).margin(1E-15) == (1. + z(1) * z(1)) * pow(t, 4.));
+        REQUIRE(Approx(c(1, 1)).margin(1E-15) == (1. + z(0) * z(0)) * pow(t, 4.));
+        REQUIRE(Approx(c(0, 1)).margin(1E-15) == -z(0) * z(1) * pow(t, 4.));
+        REQUIRE(Approx(c(1, 0)).margin(1E-15) == -z(0) * z(1) * pow(t, 4.));
+    }
+}

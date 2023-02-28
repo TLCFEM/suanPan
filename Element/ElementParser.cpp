@@ -1308,7 +1308,13 @@ void new_dkts3(unique_ptr<Element>& return_obj, istringstream& command) {
         return;
     }
 
-    return_obj = make_unique<DKTS3>(tag, std::move(node_tag), material_tag, thickness, num_ip);
+    string nlgeom = "false";
+    if(!get_optional_input(command, nlgeom)) {
+        suanpan_error("A valid nlgeom switch is required.\n");
+        return;
+    }
+
+    return_obj = make_unique<DKTS3>(tag, std::move(node_tag), material_tag, thickness, num_ip, is_true(nlgeom));
 }
 
 void new_embedded(unique_ptr<Element>& return_obj, istringstream& command, const unsigned dof) {
@@ -1713,7 +1719,13 @@ void new_sgcms(unique_ptr<Element>& return_obj, istringstream& command) {
         return;
     }
 
-    return_obj = make_unique<SGCMS>(tag, std::move(node_tag), material_tag, thickness);
+    string nlgeom = "false";
+    if(!get_optional_input(command, nlgeom)) {
+        suanpan_error("A valid nlgeom switch is required.\n");
+        return;
+    }
+
+    return_obj = make_unique<SGCMS>(tag, std::move(node_tag), material_tag, thickness, is_true(nlgeom));
 }
 
 void new_gq12(unique_ptr<Element>& return_obj, istringstream& command) {
@@ -2089,7 +2101,13 @@ void new_s4(unique_ptr<Element>& return_obj, istringstream& command) {
         return;
     }
 
-    return_obj = make_unique<S4>(tag, std::move(node_tag), material_tag, thickness);
+    string nlgeom = "false";
+    if(!get_optional_input(command, nlgeom)) {
+        suanpan_error("A valid nlgeom switch is required.\n");
+        return;
+    }
+
+    return_obj = make_unique<S4>(tag, std::move(node_tag), material_tag, thickness, is_true(nlgeom));
 }
 
 void new_singlesection2d(unique_ptr<Element>& return_obj, istringstream& command) {

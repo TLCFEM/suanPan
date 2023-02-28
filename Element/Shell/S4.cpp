@@ -38,8 +38,8 @@ S4::IntegrationPoint::IntegrationPoint(vec&& C)
     , BM(3, s_size / 2, fill::zeros)
     , BP(3, s_size / 2, fill::zeros) {}
 
-S4::S4(const unsigned T, uvec&& N, const unsigned M, const double TH)
-    : ShellBase(T, s_node, s_dof, std::forward<uvec>(N), uvec{M}, false, {DOF::U1, DOF::U2, DOF::U3, DOF::UR1, DOF::UR2, DOF::UR3})
+S4::S4(const unsigned T, uvec&& N, const unsigned M, const double TH, const bool NL)
+    : ShellBase(T, s_node, s_dof, std::forward<uvec>(N), uvec{M}, NL, {DOF::U1, DOF::U2, DOF::U3, DOF::UR1, DOF::UR2, DOF::UR3})
     , thickness(TH) {}
 
 int S4::initialize(const shared_ptr<DomainBase>& D) {
@@ -154,10 +154,12 @@ int S4::initialize(const shared_ptr<DomainBase>& D) {
 }
 
 int S4::update_status() {
+    direction_cosine();
+
     // separate displacement vector
-    vec t_disp;
+    const auto g_disp = get_trial_displacement();
+    const auto t_disp = transform_from_global_to_local(g_disp);
     vec::fixed<12> m_disp, p_disp;
-    transform_from_global_to_local(t_disp = get_trial_displacement());
     for(unsigned I = 0, J = 0; I < s_size; I += s_dof, J += 3) {
         const span t_span(J, J + 2llu);
         m_disp(t_span) = t_disp(I + m_dof);
@@ -196,8 +198,13 @@ int S4::update_status() {
         p_stiffness += I.BP.t() * t_stiffness * I.BP;
     }
 
-    transform_from_local_to_global(trial_resistance = reshuffle(m_resistance, p_resistance));
-    transform_from_local_to_global(trial_stiffness = reshuffle(m_stiffness, p_stiffness));
+    trial_resistance = reshuffle(m_resistance, p_resistance);
+    trial_stiffness = reshuffle(m_stiffness, p_stiffness);
+
+    if(is_nlgeom()) trial_geometry = transform_to_global_geometry(trial_stiffness, trial_resistance, g_disp);
+
+    transform_from_local_to_global(trial_resistance);
+    transform_from_local_to_global(trial_stiffness);
 
     return SUANPAN_SUCCESS;
 }
