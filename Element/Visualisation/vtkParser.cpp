@@ -133,10 +133,10 @@ int vtk_parser(const shared_ptr<DomainBase>& domain, istringstream& command) {
     case OutputType::U:
     case OutputType::V:
     case OutputType::A:
-        domain->insert(make_shared<std::future<void>>(std::async(std::launch::async, vtk_plot_node_quantity, std::cref(domain), plot_info)));
+        domain->insert(make_unique<std::future<void>>(std::async(std::launch::async, vtk_plot_node_quantity, std::cref(domain), plot_info)));
         break;
     default:
-        domain->insert(make_shared<std::future<void>>(std::async(std::launch::async, vtk_plot_element_quantity, std::cref(domain), plot_info)));
+        domain->insert(make_unique<std::future<void>>(std::async(std::launch::async, vtk_plot_element_quantity, std::cref(domain), plot_info)));
     }
 
     return SUANPAN_SUCCESS;
@@ -189,8 +189,7 @@ void vtk_plot_node_quantity(const shared_ptr<DomainBase>& domain, vtkInfo config
     else if(config.save_file) {
         grid->GetPointData()->SetScalars(data);
         grid->GetPointData()->SetActiveScalars(vtk_get_name(config.type));
-        auto writer = std::thread(vtk_save, std::move(grid), config);
-        writer.detach();
+        domain->insert(make_unique<std::future<void>>(std::async(std::launch::async, vtk_save, std::move(grid), std::move(config))));
     }
     else {
         const auto sub_data = vtkSmartPointer<vtkDoubleArray>::New();
@@ -263,8 +262,7 @@ void vtk_plot_element_quantity(const shared_ptr<DomainBase>& domain, vtkInfo con
     else if(config.save_file) {
         grid->GetPointData()->SetScalars(data);
         grid->GetPointData()->SetActiveScalars(vtk_get_name(config.type));
-        auto writer = std::thread(vtk_save, std::move(grid), config);
-        writer.detach();
+        domain->insert(make_unique<std::future<void>>(std::async(std::launch::async, vtk_save, std::move(grid), std::move(config))));
     }
     else {
         const auto sub_data = vtkSmartPointer<vtkDoubleArray>::New();
