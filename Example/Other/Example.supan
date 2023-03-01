@@ -40,4 +40,10 @@ command
 
 qrcode
 
+sleep
+
+sleep 500
+
+sleep 1s
+
 exit

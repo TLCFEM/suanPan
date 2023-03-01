@@ -550,6 +550,13 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
         return SUANPAN_SUCCESS;
     }
 
+    if(is_equal(command_id, "sleep")) {
+        if(auto t = 1000ll; get_optional_input(command, t)) std::this_thread::sleep_for(std::chrono::milliseconds(t));
+        else
+            suanpan_error("A positive integer in milliseconds is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
     if(is_equal(command_id, "help")) {
         print_helper();
         return SUANPAN_SUCCESS;
