@@ -14838,7 +14838,13 @@
       "trigger": "node"
     },
     {
-      "contents": "",
+      "contents": "customnodegroup ${1:(1)} ${2:(2)}\n# (1) integer, unique tag\n# (2) integer, tag of expression",
+      "details": "",
+      "kind": "type",
+      "trigger": "customnodegroup"
+    },
+    {
+      "contents": "nodegroup ${1:(1)} ${2:(2...)}\n# (1) integer, unique tag\n# (2...) integer, tags of nodes to be included",
       "details": "",
       "kind": "type",
       "trigger": "nodegroup"

@@ -153,6 +153,7 @@
     <ClCompile Include="..\..\..\Domain\DomainHelper.cpp" />
     <ClCompile Include="..\..\..\Domain\DomainState.cpp" />
     <ClCompile Include="..\..\..\Domain\ExternalModule.cpp" />
+    <ClCompile Include="..\..\..\Domain\Group\CustomNodeGroup.cpp" />
     <ClCompile Include="..\..\..\Domain\Group\ElementGroup.cpp" />
     <ClCompile Include="..\..\..\Domain\Group\Group.cpp" />
     <ClCompile Include="..\..\..\Domain\Group\GroupGroup.cpp" />
@@ -586,6 +587,7 @@
     <ClInclude Include="..\..\..\Domain\ExternalModule.h" />
     <ClInclude Include="..\..\..\Domain\Factory.hpp" />
     <ClInclude Include="..\..\..\Domain\FactoryHelper.hpp" />
+    <ClInclude Include="..\..\..\Domain\Group\CustomNodeGroup.h" />
     <ClInclude Include="..\..\..\Domain\Group\ElementGroup.h" />
     <ClInclude Include="..\..\..\Domain\Group\Group.h" />
     <ClInclude Include="..\..\..\Domain\Group\GroupGroup.h" />
