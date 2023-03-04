@@ -11,6 +11,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         Group/Group.cpp
         Group/GroupGroup.cpp
         Group/NodeGroup.cpp
+        Group/CustomNodeGroup.cpp
         Node.cpp
         Storage.hpp
         Tag.cpp

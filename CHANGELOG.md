@@ -11,6 +11,7 @@
 1. add `MAGMA` based GPU sparse solver [#123](https://github.com/TLCFEM/suanPan/pull/123)
 2. add nonlinear transformation for shell elements [#124](https://github.com/TLCFEM/suanPan/pull/124)
 3. update `VTK` to version `9.2.6`
+4. add `CustomNodeGroup` [#126](https://github.com/TLCFEM/suanPan/pull/126)
 
 ## version 2.9
 
