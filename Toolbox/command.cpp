@@ -27,6 +27,7 @@
 #include <Domain/Group/ElementGroup.h>
 #include <Domain/Group/GroupGroup.h>
 #include <Domain/Group/NodeGroup.h>
+#include <Domain/Group/CustomNodeGroup.h>
 #include <Domain/Node.h>
 #include <Element/Element.h>
 #include <Element/ElementParser.h>
@@ -449,6 +450,7 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     if(is_equal(command_id, "step")) return create_new_step(domain, command);
 
     if(is_equal(command_id, "nodegroup")) return create_new_nodegroup(domain, command);
+    if(is_equal(command_id, "customnodegroup")) return create_new_customnodegroup(domain, command);
     if(is_equal(command_id, "elementgroup")) return create_new_elementgroup(domain, command);
     if(is_equal(command_id, "groupgroup")) return create_new_groupgroup(domain, command);
     if(is_equal(command_id, "generate")) return create_new_generate(domain, command);
@@ -926,6 +928,19 @@ int create_new_nodegroup(const shared_ptr<DomainBase>& domain, istringstream& co
 
     if(!domain->insert(make_shared<NodeGroup>(tag, value_pool)))
         suanpan_error("Fail to create new node group.\n");
+
+    return SUANPAN_SUCCESS;
+}
+
+int create_new_customnodegroup(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned tag, expression;
+    if(!get_input(command, tag, expression)) {
+        suanpan_error("A valid tag is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    if(!domain->insert(make_shared<CustomNodeGroup>(tag, expression)))
+        suanpan_error("Fail to create new custom node group.\n");
 
     return SUANPAN_SUCCESS;
 }
@@ -1606,6 +1621,7 @@ int print_command() {
     suanpan_info(format, "command", "list all commands");
     suanpan_info(format, "converger", "define converger");
     suanpan_info(format, "criterion", "define stopping criterion");
+    suanpan_info(format, "customnodegroup", "define group containing node tags");
     suanpan_info(format, "delete/erase/remove", "delete objects");
     suanpan_info(format, "disable/mute", "disable objects");
     suanpan_info(format, "disp/displacement/dispload", "define displacement load");

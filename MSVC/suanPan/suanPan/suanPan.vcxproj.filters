@@ -1495,6 +1495,9 @@
     <ClCompile Include="..\..\..\Include\whereami\whereami.c">
       <Filter>Z</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Domain\Group\CustomNodeGroup.cpp">
+      <Filter>Domain\Group</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2853,6 +2856,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Domain\MetaMat\SparseMatMAGMA.hpp">
       <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\Group\CustomNodeGroup.h">
+      <Filter>Domain\Group</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

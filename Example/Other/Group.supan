@@ -162,6 +162,10 @@ generatebyrule nodegroup 2 1 1 0
 
 generate nodegroup 3 1 5 121
 
+expression SimpleScalar 1 x if(x==0)1;else-1;
+
+customnodegroup 4 1
+
 groupmultiplierbc 1 P 2
 
 groupcload 1 0 2 2 1
@@ -183,6 +187,8 @@ analyze
 peek node 117
 
 peek element 1
+
+peek group 4
 
 reset
 clear

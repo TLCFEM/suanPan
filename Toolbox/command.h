@@ -53,6 +53,7 @@ int protect_object(const shared_ptr<DomainBase>&, istringstream&);
 
 int create_new_external_module(const shared_ptr<DomainBase>&, istringstream&);
 int create_new_nodegroup(const shared_ptr<DomainBase>&, istringstream&);
+int create_new_customnodegroup(const shared_ptr<DomainBase>&, istringstream&);
 int create_new_elementgroup(const shared_ptr<DomainBase>&, istringstream&);
 int create_new_generate(const shared_ptr<DomainBase>&, istringstream&);
 int create_new_generatebyrule(const shared_ptr<DomainBase>&, istringstream&);

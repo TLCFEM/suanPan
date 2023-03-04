@@ -15,27 +15,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class GroupGroup
- * @brief The GroupGroup class.
+ * @class CustomNodeGroup
+ * @brief The CustomNodeGroup class.
  *
  * @author tlc
- * @date 30/06/2020
+ * @date 04/03/2023
  * @version 0.1.0
- * @file GroupGroup.h
+ * @file CustomNodeGroup.h
  * @addtogroup Group
  * @{
  */
 
-#ifndef GROUPGROUP_H
-#define GROUPGROUP_H
+#ifndef CUSTOMNODEGROUP_H
+#define CUSTOMNODEGROUP_H
 
 #include "Group.h"
+#include <Toolbox/Expression.h>
+#include <Toolbox/ResourceHolder.h>
 
-class GroupGroup final : public Group {
-    const uvec group_tag;
+class CustomNodeGroup final : public Group {
+    const unsigned expression_tag;
+
+    ResourceHolder<Expression> expression;
 
 public:
-    GroupGroup(unsigned, uvec&&);
+    CustomNodeGroup(unsigned, unsigned);
 
     void initialize(const shared_ptr<DomainBase>&) override;
 };
