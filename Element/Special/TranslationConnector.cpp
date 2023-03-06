@@ -67,15 +67,3 @@ int TranslationConnector::update_status() {
 
     return SUANPAN_SUCCESS;
 }
-
-int TranslationConnector::clear_status() { return SUANPAN_SUCCESS; }
-
-int TranslationConnector::commit_status() { return SUANPAN_SUCCESS; }
-
-int TranslationConnector::reset_status() { return SUANPAN_SUCCESS; }
-
-TranslationConnector2D::TranslationConnector2D(const unsigned T, uvec&& N, const double P)
-    : TranslationConnector(T, std::forward<uvec>(N), 2u, P) {}
-
-TranslationConnector3D::TranslationConnector3D(const unsigned T, uvec&& N, const double P)
-    : TranslationConnector(T, std::forward<uvec>(N), 3u, P) {}

@@ -14826,6 +14826,18 @@
       "trigger": "nobar"
     },
     {
+      "contents": "element TranslationConnector2D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) integer, unique element tag\n# (2) integer, node i\n# (3) integer, node j\n# (4) integer, node k",
+      "details": "Define 2D Translation Connector",
+      "kind": "type",
+      "trigger": "TranslationConnector2D"
+    },
+    {
+      "contents": "element TranslationConnector3D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) integer, unique element tag\n# (2) integer, node i\n# (3) integer, node j\n# (4) integer, node k",
+      "details": "Define 3D Translation Connector",
+      "kind": "type",
+      "trigger": "TranslationConnector3D"
+    },
+    {
       "contents": "node ${1:(1)} ${2:(2...)}\n# (1) integer, unique node tag\n# (2...) double, coordinates",
       "details": "Define Node",
       "kind": "type",

@@ -52,19 +52,24 @@ public:
     int initialize(const shared_ptr<DomainBase>&) override;
 
     int update_status() override;
-    int clear_status() override;
-    int commit_status() override;
-    int reset_status() override;
+
+    int clear_status() override { return SUANPAN_SUCCESS; }
+
+    int commit_status() override { return SUANPAN_SUCCESS; }
+
+    int reset_status() override { return SUANPAN_SUCCESS; }
 };
 
 class TranslationConnector2D final : public TranslationConnector {
 public:
-    TranslationConnector2D(unsigned, uvec&&, double);
+    TranslationConnector2D(const unsigned T, uvec&& N, const double P)
+        : TranslationConnector(T, std::forward<uvec>(N), 2u, P) {}
 };
 
 class TranslationConnector3D final : public TranslationConnector {
 public:
-    TranslationConnector3D(unsigned, uvec&&, double);
+    TranslationConnector3D(const unsigned T, uvec&& N, const double P)
+        : TranslationConnector(T, std::forward<uvec>(N), 3u, P) {}
 };
 
 #endif
