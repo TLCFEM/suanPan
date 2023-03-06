@@ -12,6 +12,7 @@
 2. add nonlinear transformation for shell elements [#124](https://github.com/TLCFEM/suanPan/pull/124)
 3. update `VTK` to version `9.2.6`
 4. add `CustomNodeGroup` [#126](https://github.com/TLCFEM/suanPan/pull/126)
+5. add `TranslationConnector` [#127](https://github.com/TLCFEM/suanPan/pull/127)
 
 ## version 2.9
 

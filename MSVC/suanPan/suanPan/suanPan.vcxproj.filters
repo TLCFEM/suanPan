@@ -1498,6 +1498,9 @@
     <ClCompile Include="..\..\..\Domain\Group\CustomNodeGroup.cpp">
       <Filter>Domain\Group</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Element\Special\TranslationConnector.cpp">
+      <Filter>Element\Special</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2859,6 +2862,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Domain\Group\CustomNodeGroup.h">
       <Filter>Domain\Group</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Special\TranslationConnector.h">
+      <Filter>Element\Special</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

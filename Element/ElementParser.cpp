@@ -2390,6 +2390,29 @@ void new_tie(unique_ptr<Element>& return_obj, istringstream& command) {
     return_obj = make_unique<Tie>(tag, node_tag, dof_tag, weight_tag, magnitude, penalty);
 }
 
+void new_translationconnector(unique_ptr<Element>& return_obj, istringstream& command, const unsigned S) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    uvec nodes(3);
+    if(!get_input(command, nodes)) {
+        suanpan_error("Three valid nodes are required.\n");
+        return;
+    }
+
+    double penalty;
+    if(!get_input(command, penalty)) {
+        suanpan_error("A valid penalty is required.\n");
+        return;
+    }
+
+    if(2u == S) return_obj = make_unique<TranslationConnector2D>(tag, std::move(nodes), penalty);
+    else return_obj = make_unique<TranslationConnector3D>(tag, std::move(nodes), penalty);
+}
+
 void new_patchquad(unique_ptr<Element>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -2791,6 +2814,8 @@ int create_new_element(const shared_ptr<DomainBase>& domain, istringstream& comm
     else if(is_equal(element_id, "T3D2")) new_t3d2(new_element, command);
     else if(is_equal(element_id, "T3D2S")) new_t3d2s(new_element, command);
     else if(is_equal(element_id, "Tie")) new_tie(new_element, command);
+    else if(is_equal(element_id, "TranslationConnector2D")) new_translationconnector(new_element, command, 2u);
+    else if(is_equal(element_id, "TranslationConnector3D")) new_translationconnector(new_element, command, 3u);
     else if(is_equal(element_id, "PatchQuad")) new_patchquad(new_element, command);
     else if(is_equal(element_id, "PatchCube")) new_patchcube(new_element, command);
     else load::object(new_element, domain, element_id, command);
