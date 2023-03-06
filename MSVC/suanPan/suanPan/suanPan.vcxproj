@@ -241,6 +241,7 @@
     <ClCompile Include="..\..\..\Element\Special\Spring01.cpp" />
     <ClCompile Include="..\..\..\Element\Special\Spring02.cpp" />
     <ClCompile Include="..\..\..\Element\Special\Tie.cpp" />
+    <ClCompile Include="..\..\..\Element\Special\TranslationConnector2D.cpp" />
     <ClCompile Include="..\..\..\Element\Truss\T2D2.cpp" />
     <ClCompile Include="..\..\..\Element\Truss\T2D2S.cpp" />
     <ClCompile Include="..\..\..\Element\Truss\T3D2.cpp" />
@@ -704,6 +705,7 @@
     <ClInclude Include="..\..\..\Element\Special\Spring01.h" />
     <ClInclude Include="..\..\..\Element\Special\Spring02.h" />
     <ClInclude Include="..\..\..\Element\Special\Tie.h" />
+    <ClInclude Include="..\..\..\Element\Special\TranslationConnector2D.h" />
     <ClInclude Include="..\..\..\Element\Truss\T2D2.h" />
     <ClInclude Include="..\..\..\Element\Truss\T2D2S.h" />
     <ClInclude Include="..\..\..\Element\Truss\T3D2.h" />
