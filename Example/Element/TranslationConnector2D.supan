@@ -3,31 +3,31 @@ node 1 0 0
 node 2 1 0
 node 3 -1 -.5
 node 4 0 -.5
-node 5 0 .5
+node 5 0 .8
 node 6 -1 .5
 
-material Elastic1D 1 10 1E-4
+material Elastic1D 1 1000 1E-4
 material Elastic2D 2 10 .2
 
 section Rectangle2D 1 12 1 1
 
-element B21 1 1 2 1 6 1
+element T2D2 1 1 2 1 100
 element CP4 2 3 4 5 6 2
-element TranslationConnector2D 3 4 5 1 1E4
+element TranslationConnector2D 3 4 5 1 1E6
 
 fix 1 P 3 6
-fix 2 3 1
+fix 2 2 2
 
-cload 1 0 1 2 2
+cload 1 0 1 1 2
 
 step static 1 1
-set ini_step_size .1
+set ini_step_size 1
 set fixed_step_size true
 
 converger RelIncreDisp 1 1E-8 5 1
 
 analyze
 
-peek node 2
+peek node 4 5 1 2
 
 exit

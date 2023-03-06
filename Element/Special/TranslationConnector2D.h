@@ -40,8 +40,6 @@ class TranslationConnector2D final : public Element {
 
     const double s_near{0.}, s_far{0.};
 
-    void update_position();
-
 public:
     TranslationConnector2D(unsigned, uvec&&, double = 1E8);
 
