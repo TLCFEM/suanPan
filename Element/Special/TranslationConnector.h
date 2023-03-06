@@ -15,33 +15,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class TranslationConnector2D
- * @brief A TranslationConnector2D class.
+ * @class TranslationConnector
+ * @brief A TranslationConnector class.
  *
- * The TranslationConnector2D class.
+ * The TranslationConnector class.
  *
  * @author tlc
  * @date 06/03/2023
  * @version 0.1.0
- * @file TranslationConnector2D.h
+ * @file TranslationConnector.h
  * @addtogroup Constraint
  * @{
  */
 
-#ifndef TRANSLATIONCONNECTOR2D_H
-#define TRANSLATIONCONNECTOR2D_H
+#ifndef TRANSLATIONCONNECTOR_H
+#define TRANSLATIONCONNECTOR_H
 
 #include <Element/Element.h>
 
-class TranslationConnector2D final : public Element {
-    static const unsigned c_node = 3, c_dof = 2, c_size = c_node * c_dof;
+class TranslationConnector : public Element {
+    static const unsigned c_node = 3;
+
+    const unsigned c_dof;
+
+    const unsigned c_size = c_node * c_dof;
+
+    const span sa, sb, sc;
 
     const double alpha;
 
     const double s_near{0.}, s_far{0.};
 
 public:
-    TranslationConnector2D(unsigned, uvec&&, double = 1E8);
+    TranslationConnector(unsigned, uvec&&, unsigned, double);
 
     int initialize(const shared_ptr<DomainBase>&) override;
 
@@ -49,6 +55,16 @@ public:
     int clear_status() override;
     int commit_status() override;
     int reset_status() override;
+};
+
+class TranslationConnector2D final : public TranslationConnector {
+public:
+    TranslationConnector2D(unsigned, uvec&&, double);
+};
+
+class TranslationConnector3D final : public TranslationConnector {
+public:
+    TranslationConnector3D(unsigned, uvec&&, double);
 };
 
 #endif
