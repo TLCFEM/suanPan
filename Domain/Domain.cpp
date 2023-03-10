@@ -38,7 +38,6 @@
 #include <Toolbox/sort_rcm.h>
 #include <Toolbox/Expression.h>
 #include <numeric>
-#include <array>
 
 Domain::Domain(const unsigned T)
     : DomainBase(T)

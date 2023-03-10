@@ -42,6 +42,8 @@ peek node 2 3
 
 peek element 1
 
+peek statistics
+
 reset
 clear
 exit

@@ -315,9 +315,6 @@
     <ClCompile Include="..\..\..\Domain\Domain.cpp">
       <Filter>Domain</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Domain\DomainBase.cpp">
-      <Filter>Domain</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Domain\ExternalModule.cpp">
       <Filter>Domain</Filter>
     </ClCompile>

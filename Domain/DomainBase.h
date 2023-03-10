@@ -89,13 +89,20 @@ enum class ColorMethod {
     MIS
 };
 
-enum class ModalAttribute: size_t {
+enum class ModalAttribute : size_t {
     LinearSystem
+};
+
+enum class Statistics : size_t {
+    TrialUpdate,
+    SystemSolving
 };
 
 class DomainBase : public Tag {
 public:
-    explicit DomainBase(unsigned);
+    explicit DomainBase(const unsigned T)
+        : Tag(T) {}
+
     DomainBase(const DomainBase&) = delete;            // copy forbidden
     DomainBase(DomainBase&&) = delete;                 // move forbidden
     DomainBase& operator=(const DomainBase&) = delete; // assign forbidden

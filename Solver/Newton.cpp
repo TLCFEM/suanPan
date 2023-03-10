@@ -17,7 +17,7 @@
 
 #include "Newton.h"
 #include <Converger/Converger.h>
-#include <Domain/DomainBase.h>
+#include <Domain/Domain.h>
 #include <Domain/FactoryHelper.hpp>
 #include <Solver/Integrator/Integrator.h>
 
@@ -41,6 +41,8 @@ int Newton::analyze() {
     vec samurai, pre_samurai;
 
     auto aitken = false;
+
+    wall_clock t_clock;
 
     while(true) {
         // update for nodes and elements
@@ -69,7 +71,9 @@ int Newton::analyze() {
         }
 
         // call solver
+        t_clock.tic();
         auto flag = G->solve(samurai, G->get_force_residual());
+        update_statistics<Statistics::SystemSolving>(D, t_clock.toc());
 
         suanpan_assert([&] {
             if(!samurai.is_finite()) {

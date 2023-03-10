@@ -30,6 +30,7 @@
 
 #include <Domain/DomainBase.h>
 #include <Domain/Storage.hpp>
+#include <array>
 
 using ExternalModuleQueue = std::vector<shared_ptr<ExternalModule>>;
 using ThreadQueue = std::vector<shared_ptr<future<void>>>;
@@ -77,6 +78,8 @@ class Domain final : public DomainBase, public std::enable_shared_from_this<Doma
     std::vector<std::vector<unsigned>> color_map;
 
     std::vector<bool> attribute;
+
+    mutable std::array<double, 2> statistics{};
 
 public:
     explicit Domain(unsigned = 0);
@@ -391,8 +394,16 @@ public:
     void clear_status() override;
     void reset_status() const override;
 
+    template<Statistics T> void update_statistics(const double value) const { statistics[static_cast<size_t>(T)] += value; }
+
+    template<Statistics T> double get_statistics() const { return statistics[static_cast<size_t>(T)]; }
+
     void save(string) override;
 };
+
+template<Statistics T> void update_statistics(const shared_ptr<DomainBase>& D, const double value) { std::dynamic_pointer_cast<Domain>(D)->update_statistics<T>(value); }
+
+template<Statistics T> double get_statistics(const shared_ptr<DomainBase>& D) { return std::dynamic_pointer_cast<Domain>(D)->get_statistics<T>(); }
 
 #endif
 

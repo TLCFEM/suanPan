@@ -1,7 +1,6 @@
 target_sources(${PROJECT_NAME} PRIVATE
         ConditionalModifier.cpp
         Domain.cpp
-        DomainBase.cpp
         DomainHelper.cpp
         DomainState.cpp
         ExternalModule.cpp
