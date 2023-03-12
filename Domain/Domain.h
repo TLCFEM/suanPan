@@ -79,7 +79,7 @@ class Domain final : public DomainBase, public std::enable_shared_from_this<Doma
 
     std::vector<bool> attribute;
 
-    mutable std::array<double, 2> statistics{};
+    mutable std::array<double, 5> statistics{};
 
 public:
     explicit Domain(unsigned = 0);
@@ -394,16 +394,12 @@ public:
     void clear_status() override;
     void reset_status() const override;
 
-    template<Statistics T> void update_statistics(const double value) const { statistics[static_cast<size_t>(T)] += value; }
+    void update(const Statistics T, const double value) const override { statistics[static_cast<size_t>(T)] += value; }
 
-    template<Statistics T> double get_statistics() const { return statistics[static_cast<size_t>(T)]; }
+    double stats(const Statistics T) const override { return statistics[static_cast<size_t>(T)]; }
 
     void save(string) override;
 };
-
-template<Statistics T> void update_statistics(const shared_ptr<DomainBase>& D, const double value) { std::dynamic_pointer_cast<Domain>(D)->update_statistics<T>(value); }
-
-template<Statistics T> double get_statistics(const shared_ptr<DomainBase>& D) { return std::dynamic_pointer_cast<Domain>(D)->get_statistics<T>(); }
 
 #endif
 

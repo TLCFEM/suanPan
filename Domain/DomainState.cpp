@@ -326,7 +326,7 @@ int Domain::update_trial_status() const {
     std::atomic_int code = 0;
     suanpan::for_all(element_pond.get(), [&](const shared_ptr<Element>& t_element) { code += t_element->update_status(); });
 
-    update_statistics<Statistics::TrialUpdate>(t_clock.toc());
+    update(Statistics::UpdateStatus, t_clock.toc());
 
     return code;
 }

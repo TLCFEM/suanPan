@@ -1551,8 +1551,11 @@ int print_info(const shared_ptr<DomainBase>& domain, istringstream& command) {
     else if(is_equal(object_type, "num_threads"))
         suanpan_info("SUANPAN_NUM_THREADS: {}\n", SUANPAN_NUM_THREADS);
     else if(is_equal(object_type, "statistics") || is_equal(object_type, "stats")) {
-        suanpan_info("\nUpdating element trial status used: {:.5E} s.", get_statistics<Statistics::TrialUpdate>(domain));
-        suanpan_info("\nSolving global system used: {:.5E} s.\n", get_statistics<Statistics::SystemSolving>(domain));
+        suanpan_info("\nUpdating element trial status used:\n\t{:.5E} s.", domain->stats<Statistics::UpdateStatus>());
+        suanpan_info("\nAssembling global vector used:\n\t{:.5E} s.", domain->stats<Statistics::AssembleVector>());
+        suanpan_info("\nAssembling global system used:\n\t{:.5E} s.", domain->stats<Statistics::AssembleMatrix>());
+        suanpan_info("\nProcessing constraints used:\n\t{:.5E} s.", domain->stats<Statistics::ProcessConstraint>());
+        suanpan_info("\nSolving global system used:\n\t{:.5E} s.\n", domain->stats<Statistics::SolveSystem>());
     }
 
     return SUANPAN_SUCCESS;
