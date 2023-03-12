@@ -270,7 +270,7 @@ and [Szip](https://support.hdfgroup.org/doc_resource/SZIP/). Additional tools ma
 
 ## How To Compile
 
-Please refer to the corresponding [page](https://github.com/TLCFEM/suanPan-manual/blob/dev/docs/Tutorial/Compile.md) in
+Please refer to the corresponding [page](https://tlcfem.github.io/suanPan-manual/2latest/Basic/Compile/) in
 manual for details.
 
 ## Happy Modelling
