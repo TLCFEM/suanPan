@@ -31,23 +31,21 @@ set fixed_step_size 1
 set symm_mat 0
 set linear_system
 
-integrator Tchamwa 1
-
 converger RelIncreAcc 1 1E-10 10 0
 
 analyze
 
 # Node 2:
 # Coordinate:
-# 0 -2.0000
+#   0.0000e+00 -2.0000e+00
 # Displacement:
-# -1.8359 2.7823
+#  -1.9318e+00  2.4992e+00
 # Resistance:
-# 7.6666e+03 -1.1685e+04
+#   7.4712e+03 -7.6830e+03
 # Velocity:
-# 0.4647 -1.8641
+#   1.0814e+00  1.1361e+00
 # Acceleration:
-# -3.8333e+02 5.7425e+02
+#  -3.7356e+02  3.7415e+02
 peek node 1 2 3 4
 
 peek integrator 1

@@ -25,6 +25,7 @@
 #include <Solver/MPDC.h>
 #include <Solver/Newton.h>
 #include <Solver/Ramm.h>
+#include <Solver/Integrator/Tchamwa.h>
 
 Dynamic::Dynamic(const unsigned T, const double P, const IntegratorType AT)
     : Step(T, P)
@@ -44,7 +45,10 @@ int Dynamic::initialize() {
     tester->set_domain(t_domain);
 
     // integrator
-    if(nullptr == modifier) modifier = make_shared<Newmark>();
+    if(nullptr == modifier) {
+        if(IntegratorType::Implicit == analysis_type) modifier = make_shared<Newmark>();
+        else modifier = make_shared<Tchamwa>(0, .8);
+    }
     else if(IntegratorType::Implicit == analysis_type) {
         if(IntegratorType::Implicit != modifier->type()) {
             suanpan_error("An implicit integrator is required.\n");
