@@ -46,9 +46,11 @@ int Newton::analyze() {
 
     while(true) {
         // update for nodes and elements
+        t_clock.tic();
         if(SUANPAN_SUCCESS != G->update_trial_status()) return SUANPAN_FAIL;
         // process modifiers
         if(SUANPAN_SUCCESS != G->process_modifier()) return SUANPAN_FAIL;
+        D->update<Statistics::UpdateStatus>(t_clock.toc());
         // assemble resistance
         t_clock.tic();
         G->assemble_resistance();

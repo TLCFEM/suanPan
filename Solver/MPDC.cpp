@@ -27,33 +27,47 @@ int MPDC::analyze() {
 
     mat disp_a;
 
+    wall_clock t_clock;
+
     // iteration counter
     unsigned counter = 0;
 
     while(true) {
         // update for nodes and elements
+        t_clock.tic();
         if(SUANPAN_SUCCESS != G->update_trial_status()) return SUANPAN_FAIL;
         // process modifiers
         if(SUANPAN_SUCCESS != G->process_modifier()) return SUANPAN_FAIL;
+        D->update<Statistics::UpdateStatus>(t_clock.toc());
         // assemble resistance
+        t_clock.tic();
         G->assemble_resistance();
+        D->update<Statistics::AssembleVector>(t_clock.toc());
 
         if(constant_matrix()) {
             // some loads may have resistance
+            t_clock.tic();
             if(SUANPAN_SUCCESS != G->process_load_resistance()) return SUANPAN_FAIL;
             // some constraints may have resistance
             if(SUANPAN_SUCCESS != G->process_constraint_resistance()) return SUANPAN_FAIL;
+            D->update<Statistics::ProcessConstraint>(t_clock.toc());
         }
         else {
             // assemble stiffness
+            t_clock.tic();
             G->assemble_matrix();
+            D->update<Statistics::AssembleMatrix>(t_clock.toc());
             // process loads
+            t_clock.tic();
             if(SUANPAN_SUCCESS != G->process_load()) return SUANPAN_FAIL;
             // process constraints
             if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
+            D->update<Statistics::ProcessConstraint>(t_clock.toc());
             // indicate the global matrix has been assembled
             G->set_matrix_assembled_switch(true);
         }
+
+        t_clock.tic();
 
         // solve ninja
         if(SUANPAN_SUCCESS != G->solve(samurai, G->get_displacement_residual())) return SUANPAN_FAIL;
@@ -73,6 +87,8 @@ int MPDC::analyze() {
         const vec incre_lambda = solve(mat(disp_a.rows(idx)), W->get_trial_settlement()(idx) - G->get_trial_displacement()(idx) - samurai.rows(idx));
 
         samurai += disp_a * incre_lambda;
+
+        D->update<Statistics::SolveSystem>(t_clock.toc());
 
         // avoid machine error accumulation
         G->erase_machine_error(samurai);

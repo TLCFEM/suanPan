@@ -320,14 +320,8 @@ int Domain::update_trial_status() const {
     if(AnalysisType::DYNAMICS == factory->get_analysis_type()) suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_status(trial_displacement, trial_velocity, trial_acceleration); });
     else suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_status(trial_displacement); });
 
-    wall_clock t_clock;
-    t_clock.tic();
-
     std::atomic_int code = 0;
     suanpan::for_all(element_pond.get(), [&](const shared_ptr<Element>& t_element) { code += t_element->update_status(); });
-
-    update(Statistics::UpdateStatus, t_clock.toc());
-
     return code;
 }
 
