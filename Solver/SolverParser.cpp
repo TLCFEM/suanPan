@@ -186,6 +186,25 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
 
             if(domain->insert(make_shared<WilsonPenzienNewmark>(tag, damping_coef, alpha, beta))) code = 1;
         }
+        else if(is_equal(integrator_type, "NonviscousNewmark")) {
+            vector<double> m, s;
+
+            while(!command.eof()) {
+                double t_para;
+                if(!get_input(command, t_para)) {
+                    suanpan_error("A valid damping coefficient is required.\n");
+                    return SUANPAN_SUCCESS;
+                }
+                m.emplace_back(t_para);
+                if(!get_input(command, t_para)) {
+                    suanpan_error("A valid damping coefficient is required.\n");
+                    return SUANPAN_SUCCESS;
+                }
+                s.emplace_back(t_para);
+            }
+
+            if(domain->insert(make_shared<NonviscousNewmark>(tag, alpha, beta, std::move(m), std::move(s)))) code = 1;
+        }
     }
     else if(is_equal(integrator_type, "GeneralizedAlpha") || is_equal(integrator_type, "GeneralisedAlpha")) {
         vector<double> pool;

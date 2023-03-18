@@ -1,0 +1,54 @@
+# A TEST MODEL FOR NONVISCOUS DAMPING MODEL
+
+node 1 0 0
+node 2 1 0
+
+material Bilinear1D 1 100 1 .05 1. 1E-2
+
+element T2D2 1 1 2 1 1
+element Mass 2 2 100 1
+
+fix 1 1 1
+fix 2 2 1 2
+
+hdf5recorder 1 Node U1 2
+hdf5recorder 2 Node RF1 2
+
+step static 1 1
+set ini_step_size .1
+set fixed_step_size 1
+
+displacement 1 0 .012 1 2
+
+converger RelIncreDisp 1 1E-10 3 1
+
+step dynamic 2 6
+set ini_step_size .01
+set fixed_step_size 1
+
+integrator NonviscousNewmark 1 .25 .5 8. 2. 4. 1.
+
+converger RelIncreDisp 2 1E-10 10 1
+
+analyze
+
+# Node 2:
+# Coordinate:
+#   1.0000e+00  0.0000e+00
+# Displacement:
+#   9.4156e-03  0.0000e+00
+# Resistance:
+#   7.5156e-01  0.0000e+00
+# Velocity:
+#   2.2982e-03  0.0000e+00
+# Acceleration:
+#  -7.6991e-03  0.0000e+00
+peek node 2
+
+# save recorder 1 2
+
+peek integrator 1
+
+reset
+clear
+exit

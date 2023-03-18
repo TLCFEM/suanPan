@@ -482,6 +482,7 @@
     <ClCompile Include="..\..\..\Solver\Integrator\LeeNewmarkBase.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\LeeNewmarkFull.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\Newmark.cpp" />
+    <ClCompile Include="..\..\..\Solver\Integrator\NonviscousNewmark.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\OALTS.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\RayleighNewmark.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\Tchamwa.cpp" />
@@ -946,6 +947,7 @@
     <ClInclude Include="..\..\..\Solver\Integrator\LeeNewmarkBase.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\LeeNewmarkFull.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\Newmark.h" />
+    <ClInclude Include="..\..\..\Solver\Integrator\NonviscousNewmark.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\OALTS.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\RayleighNewmark.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\Tchamwa.h" />
