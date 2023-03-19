@@ -9,6 +9,7 @@ set(Integrator
         Integrator/LeeNewmarkBase.cpp
         Integrator/LeeNewmarkFull.cpp
         Integrator/Newmark.cpp
+        Integrator/NonviscousNewmark.cpp
         Integrator/OALTS.cpp
         Integrator/RayleighNewmark.cpp
         Integrator/Tchamwa.cpp

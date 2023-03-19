@@ -9,6 +9,7 @@
 #include "LeeNewmarkBase.h"
 #include "LeeNewmarkFull.h"
 #include "Newmark.h"
+#include "NonviscousNewmark.h"
 #include "OALTS.h"
 #include "RayleighNewmark.h"
 #include "Tchamwa.h"

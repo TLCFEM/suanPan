@@ -31,6 +31,8 @@ set fixed_step_size 1
 set symm_mat 0
 set linear_system
 
+integrator Tchamwa 1 .8
+
 converger RelIncreAcc 1 1E-10 10 0
 
 analyze

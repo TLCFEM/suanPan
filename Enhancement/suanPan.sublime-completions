@@ -6174,6 +6174,12 @@
       "trigger": "Newmark"
     },
     {
+      "contents": "integrator NonviscousNewmark ${1:(1)} ${2:(2)} ${3:(3)} (${4:(4)} ${5:(5)})...\n# (1) int, unique tag\n# (2) double, alpha, typical: 0.25\n# (3) double, beta, typical: 0.5\n# (4) double, m\n# (5) double, s",
+      "details": "Newmark Method With Nonviscous Damping",
+      "kind": "type",
+      "trigger": "NonviscousNewmark"
+    },
+    {
       "contents": "",
       "details": "",
       "kind": "type",

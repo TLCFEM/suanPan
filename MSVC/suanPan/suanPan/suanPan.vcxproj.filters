@@ -1498,6 +1498,9 @@
     <ClCompile Include="..\..\..\Element\Special\TranslationConnector.cpp">
       <Filter>Element\Special</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\NonviscousNewmark.cpp">
+      <Filter>Solver\Integrator</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2862,6 +2865,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Element\Special\TranslationConnector.h">
       <Filter>Element\Special</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\NonviscousNewmark.h">
+      <Filter>Solver\Integrator</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
