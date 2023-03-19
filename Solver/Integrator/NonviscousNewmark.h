@@ -34,25 +34,26 @@
 #include "Newmark.h"
 
 class NonviscousNewmark : public Newmark {
-    const vec m, s;
+    const cx_vec m, s;
 
-    mat trial_damping, current_damping;
+    cx_vec s_para, m_para;
 
-    mat get_residual() const;
+    double accu_para{0.};
+
+    cx_mat current_damping;
 
 public:
-    explicit NonviscousNewmark(unsigned, double, double, vec&&, vec&&);
+    explicit NonviscousNewmark(unsigned, double, double, cx_vec&&, cx_vec&&);
 
     int initialize() override;
 
     void assemble_resistance() override;
     void assemble_matrix() override;
 
-    int update_internal(const mat&) override;
+    void update_parameter(double) override;
 
     void commit_status() override;
     void clear_status() override;
-    void reset_status() override;
 
     void print() override;
 };

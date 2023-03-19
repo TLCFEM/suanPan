@@ -23,10 +23,11 @@ displacement 1 0 .012 1 2
 converger RelIncreDisp 1 1E-10 3 1
 
 step dynamic 2 6
-set ini_step_size .01
+set ini_step_size .02
 set fixed_step_size 1
 
-integrator NonviscousNewmark 1 .25 .5 8. 2. 4. 1.
+integrator NonviscousNewmark 1 .25 .5 8. 0 2. 0 4. 0 1. 1
+integrator NonviscousNewmark 1 .25 .5 8. 0 2. 0 4. 0 1. 0
 
 converger RelIncreDisp 2 1E-10 10 1
 
@@ -36,13 +37,13 @@ analyze
 # Coordinate:
 #   1.0000e+00  0.0000e+00
 # Displacement:
-#   9.4156e-03  0.0000e+00
+#   1.0193e-02  0.0000e+00
 # Resistance:
-#   7.5156e-01  0.0000e+00
+#   8.2929e-01  0.0000e+00
 # Velocity:
-#   2.2982e-03  0.0000e+00
+#   1.7389e-03  0.0000e+00
 # Acceleration:
-#  -7.6991e-03  0.0000e+00
+#  -8.6931e-03  0.0000e+00
 peek node 2
 
 # save recorder 1 2

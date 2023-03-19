@@ -253,6 +253,8 @@ public:
     void set_ninja(const Col<T>&);
     void set_sushi(const Col<T>&);
 
+    void update_sushi_by(const Col<T>&);
+
     void set_mpc(unsigned);
 
     void set_reference_load(const SpMat<T>&);
@@ -865,6 +867,8 @@ template<sp_d T> void Factory<T>::initialize_eigen() {
 template<sp_d T> void Factory<T>::set_ninja(const Col<T>& N) { ninja = N; }
 
 template<sp_d T> void Factory<T>::set_sushi(const Col<T>& S) { sushi = S; }
+
+template<sp_d T> void Factory<T>::update_sushi_by(const Col<T>& S) { sushi += S; }
 
 template<sp_d T> void Factory<T>::set_mpc(const unsigned S) {
     n_mpc = S;

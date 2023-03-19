@@ -19,21 +19,15 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
-mat NonviscousNewmark::get_residual() const {
-    auto& W = get_domain()->get_factory();
-
-    return trial_damping - current_damping * diagmat(C5 / (C5 + s)) - W->get_trial_velocity() * (m / (C5 + s)).t();
-}
-
-NonviscousNewmark::NonviscousNewmark(const unsigned T, const double A, const double B, vec&& M, vec&& S)
+NonviscousNewmark::NonviscousNewmark(const unsigned T, const double A, const double B, cx_vec&& M, cx_vec&& S)
     : Newmark(T, A, B)
-    , m(std::forward<vec>(M))
-    , s(std::forward<vec>(S)) {}
+    , m(std::forward<cx_vec>(M))
+    , s(std::forward<cx_vec>(S)) {}
 
 int NonviscousNewmark::initialize() {
     auto& W = get_domain()->get_factory();
 
-    trial_damping = current_damping.zeros(W->get_size(), m.n_elem);
+    current_damping.zeros(W->get_size(), m.n_elem);
 
     return Newmark::initialize();
 }
@@ -43,38 +37,46 @@ void NonviscousNewmark::assemble_resistance() {
 
     auto& W = get_domain()->get_factory();
 
-    W->set_sushi(W->get_sushi() + sum(trial_damping, 1) - sum(get_residual(), 1));
+    const vec trial_damping_force = real(current_damping * s_para + accu_para * (W->get_current_velocity() + W->get_trial_velocity()));
+
+    W->update_trial_damping_force_by(trial_damping_force);
+
+    W->update_sushi_by(trial_damping_force);
 }
 
 void NonviscousNewmark::assemble_matrix() {
     Newmark::assemble_matrix();
 
     auto& W = get_domain()->get_factory();
+    const auto& t_stiffness = W->get_stiffness();
 
-    const auto damping_diag = C1 * accu(m / (C5 + s));
+    const auto damping_diag = C1 * accu_para;
 
-    for(auto I = 0u; I < W->get_size(); ++I) W->get_stiffness()->unsafe_at(I, I) += damping_diag;
+    if(const auto t_scheme = W->get_storage_scheme(); StorageScheme::SPARSE == t_scheme || StorageScheme::SPARSESYMM == t_scheme) for(auto I = 0u; I < W->get_size(); ++I) t_stiffness->unsafe_at(I, I) += damping_diag;
+    else suanpan_for(0u, W->get_size(), [&](const unsigned I) { t_stiffness->unsafe_at(I, I) += damping_diag; });
 }
 
-int NonviscousNewmark::update_internal(const mat& samurai) {
-    trial_damping += C1 * samurai * (m / (C5 + s)).t() - get_residual();
+void NonviscousNewmark::update_parameter(const double DT) {
+    Newmark::update_parameter(DT);
 
-    return SUANPAN_SUCCESS;
+    const auto t_para = 2. / DT;
+    s_para = (t_para - s) / (t_para + s);
+    m_para = m / (t_para + s);
+    accu_para = accu(m_para).real();
 }
 
 void NonviscousNewmark::commit_status() {
-    current_damping = trial_damping;
+    auto& W = get_domain()->get_factory();
+
+    current_damping *= diagmat(s_para);
+    current_damping += (W->get_current_velocity() + W->get_trial_velocity()) * m_para.t();
+
     Newmark::commit_status();
 }
 
 void NonviscousNewmark::clear_status() {
-    trial_damping = current_damping.zeros();
+    current_damping.zeros();
     Newmark::clear_status();
-}
-
-void NonviscousNewmark::reset_status() {
-    trial_damping = current_damping;
-    Newmark::reset_status();
 }
 
 void NonviscousNewmark::print() {
