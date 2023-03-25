@@ -7362,10 +7362,16 @@
       "trigger": "TableGurson"
     },
     {
-      "contents": "",
-      "details": "",
+      "contents": "amplitude Tabular ${1:(1)} ${2:(2)}\n# (1) int, unique amplitude tag\n# (2) string, file name of tabular data",
+      "details": "Amplitude Using Tabular Data",
       "kind": "type",
       "trigger": "Tabular"
+    },
+    {
+      "contents": "amplitude Custom ${1:(1)} ${2:(2)}\n# (1) int, unique amplitude tag\n# (2) int, expression tag",
+      "details": "Amplitude Using Custom Function",
+      "kind": "type",
+      "trigger": "Custom"
     },
     {
       "contents": "material Tanh1D ${1:(1)} ${2:(2)} ${3:[3]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# [3] double, density, default: 0.0",

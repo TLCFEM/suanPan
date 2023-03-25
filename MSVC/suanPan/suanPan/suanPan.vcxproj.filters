@@ -1501,6 +1501,9 @@
     <ClCompile Include="..\..\..\Solver\Integrator\NonviscousNewmark.cpp">
       <Filter>Solver\Integrator</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Load\Amplitude\CustomAmplitude.cpp">
+      <Filter>Load\Amplitude</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2868,6 +2871,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Solver\Integrator\NonviscousNewmark.h">
       <Filter>Solver\Integrator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Load\Amplitude\CustomAmplitude.h">
+      <Filter>Load\Amplitude</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

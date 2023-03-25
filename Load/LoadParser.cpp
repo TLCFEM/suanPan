@@ -264,13 +264,8 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& co
         domain->insert(make_shared<TabularSpline>(tag, std::move(file_name), step_tag));
     }
     else if(is_equal(amplitude_type, "Decay")) {
-        double A;
-        if(!get_input(command, A)) {
-            suanpan_error("A valid value is required.\n");
-            return SUANPAN_SUCCESS;
-        }
-        double TD;
-        if(!get_input(command, TD)) {
+        double A, TD;
+        if(!get_input(command, A, TD)) {
             suanpan_error("A valid value is required.\n");
             return SUANPAN_SUCCESS;
         }
@@ -289,6 +284,14 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& co
         uword t_tag;
         while(get_input(command, t_tag)) tag_pool.emplace_back(t_tag);
         domain->insert(make_shared<Combine>(tag, uvec(tag_pool), step_tag));
+    }
+    else if(is_equal(amplitude_type, "Custom")) {
+        unsigned expression;
+        if(!get_input(command, expression)) {
+            suanpan_error("A valid expression tag is required.\n");
+            return SUANPAN_SUCCESS;
+        }
+        domain->insert(make_shared<CustomAmplitude>(tag, expression, step_tag));
     }
     else if(is_equal(amplitude_type, "Modulated") || is_equal(amplitude_type, "Sine") || is_equal(amplitude_type, "Cosine")) {
         double W;
