@@ -1,5 +1,6 @@
 target_sources(${PROJECT_NAME} PRIVATE
         Amplitude.cpp
+        CustomAmplitude.cpp
         Combine.cpp
         Constant.cpp
         Cosine.cpp

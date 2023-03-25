@@ -270,6 +270,7 @@
     <ClCompile Include="..\..\..\Load\Amplitude\Combine.cpp" />
     <ClCompile Include="..\..\..\Load\Amplitude\Constant.cpp" />
     <ClCompile Include="..\..\..\Load\Amplitude\Cosine.cpp" />
+    <ClCompile Include="..\..\..\Load\Amplitude\CustomAmplitude.cpp" />
     <ClCompile Include="..\..\..\Load\Amplitude\Decay.cpp" />
     <ClCompile Include="..\..\..\Load\Amplitude\Linear.cpp" />
     <ClCompile Include="..\..\..\Load\Amplitude\Modulated.cpp" />
@@ -733,6 +734,7 @@
     <ClInclude Include="..\..\..\Load\Amplitude\Combine.h" />
     <ClInclude Include="..\..\..\Load\Amplitude\Constant.h" />
     <ClInclude Include="..\..\..\Load\Amplitude\Cosine.h" />
+    <ClInclude Include="..\..\..\Load\Amplitude\CustomAmplitude.h" />
     <ClInclude Include="..\..\..\Load\Amplitude\Decay.h" />
     <ClInclude Include="..\..\..\Load\Amplitude\Linear.h" />
     <ClInclude Include="..\..\..\Load\Amplitude\Modulated.h" />
