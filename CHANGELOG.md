@@ -13,6 +13,7 @@
 3. update `VTK` to version `9.2.6`
 4. add `CustomNodeGroup` [#126](https://github.com/TLCFEM/suanPan/pull/126)
 5. add `TranslationConnector` [#127](https://github.com/TLCFEM/suanPan/pull/127)
+6. add `CustomAmplitude` [#129](https://github.com/TLCFEM/suanPan/pull/129)
 
 ## version 2.9
 
