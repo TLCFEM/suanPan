@@ -1504,6 +1504,9 @@
     <ClCompile Include="..\..\..\Load\Amplitude\CustomAmplitude.cpp">
       <Filter>Load\Amplitude</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Viscosity\Nonviscous01.cpp">
+      <Filter>Material\Material1D\Viscosity</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2874,6 +2877,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Load\Amplitude\CustomAmplitude.h">
       <Filter>Load\Amplitude</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Viscosity\Nonviscous01.h">
+      <Filter>Material\Material1D\Viscosity</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
