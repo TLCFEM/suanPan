@@ -93,3 +93,18 @@ vector<vec> Damper01::record(const OutputType P) { return damper->record(P); }
 void Damper01::print() {
     suanpan_info("A viscous damper element using displacement and velocity as basic quantities.\n");
 }
+
+int Damper05::update_status() {
+    if(const auto t_vec = get_trial_velocity(); SUANPAN_SUCCESS != damper->update_trial_status(0., dot(direction_cosine, t_vec(JS) - t_vec(IS)))) return SUANPAN_FAIL;
+
+    trial_damping_force.set_size(d_size);
+    trial_damping_force(JS) = direction_cosine * damper->get_trial_stress();
+    trial_damping_force(IS) = -trial_damping_force(JS);
+
+    trial_damping(IS, IS) = direction_cosine * damper->get_trial_damping() * direction_cosine.t();
+    trial_damping(IS, JS) = -trial_damping(IS, IS);
+    trial_damping(JS, JS) = trial_damping(IS, IS);
+    trial_damping(JS, IS) = trial_damping(IS, JS);
+
+    return SUANPAN_SUCCESS;
+}

@@ -15,63 +15,53 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class Damper01
- * @brief A Damper01 class.
- *
- * Using quadrant damper and displacement and velocity as basic input.
- *
+ * @class Nonviscous01
+ * @brief A 1D Viscosity class.
  * @author tlc
- * @date 23/07/2018
- * @file Damper01.h
- * @addtogroup Special
- * @ingroup Element
+ * @date 28/03/2023
+ * @version 0.2.0
+ * @file Nonviscous01.h
+ * @addtogroup Material-1D
  * @{
  */
 
-#ifndef DAMPER01_H
-#define DAMPER01_H
+#ifndef NONVISCOUS01_H
+#define NONVISCOUS01_H
 
-#include <Element/MaterialElement.h>
+#include <Material/Material1D/Material1D.h>
 
-class Damper01 : public MaterialElement1D {
-    static constexpr unsigned d_node = 2;
+struct DataNonviscous01 {
+    const cx_vec m, s;
+};
 
-    const unsigned d_dof;
+class Nonviscous01 final : DataNonviscous01, public Material1D {
+    const double* incre_time = nullptr;
 
-protected:
-    const unsigned d_size = d_dof * d_node;
+    cx_vec complex_damping;
 
-    const uvec IS, JS;
-
-    const vec direction_cosine;
-
-    unique_ptr<Material> damper;
+    double accu_para{0.};
+    cx_vec s_para, m_para;
 
 public:
-    Damper01(unsigned, // tag
-             uvec&&,   // node tag
-             unsigned, // damper tag
-             unsigned  // dimension
+    Nonviscous01(unsigned, // tag
+                 cx_vec&&, // m
+                 cx_vec&&  // s
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 
-    int update_status() override;
+    unique_ptr<Material> get_copy() override;
 
-    int commit_status() override;
+    int update_trial_status(const vec&) override;
+    int update_trial_status(const vec&, const vec&) override;
+
     int clear_status() override;
+    int commit_status() override;
     int reset_status() override;
 
     vector<vec> record(OutputType) override;
 
     void print() override;
-};
-
-class Damper05 final : public Damper01 {
-public:
-    using Damper01::Damper01;
-
-    int update_status() override;
 };
 
 #endif

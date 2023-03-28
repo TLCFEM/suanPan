@@ -38,6 +38,7 @@ set(M1D
         Material1D/Viscosity/Kelvin.cpp
         Material1D/Viscosity/Maxwell.cpp
         Material1D/Viscosity/NonlinearViscosity.cpp
+        Material1D/Viscosity/Nonviscous01.cpp
         Material1D/Viscosity/Viscosity01.cpp
         Material1D/Viscosity/Viscosity02.cpp
         Material1D/vonMises/ArmstrongFrederick1D.cpp

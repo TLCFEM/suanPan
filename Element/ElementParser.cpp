@@ -1061,6 +1061,28 @@ void new_damper02(unique_ptr<Element>& return_obj, istringstream& command, const
     return_obj = make_unique<Damper02>(tag, std::move(node_tag), damper_tag, spring_tag, is_true(use_matrix), proceed, beta, dimension);
 }
 
+void new_damper05(unique_ptr<Element>& return_obj, istringstream& command, const unsigned dimension) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    uvec node_tag(2);
+    if(!get_input(command, node_tag)) {
+        suanpan_error("Two valid nodes are required.\n");
+        return;
+    }
+
+    unsigned damper_tag;
+    if(!get_input(command, damper_tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    return_obj = make_unique<Damper05>(tag, std::move(node_tag), damper_tag, dimension);
+}
+
 void new_dc3d4(unique_ptr<Element>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -2772,6 +2794,8 @@ int create_new_element(const shared_ptr<DomainBase>& domain, istringstream& comm
     else if(is_equal(element_id, "Damper02")) new_damper02(new_element, command, 2);
     else if(is_equal(element_id, "Damper03")) new_damper01(new_element, command, 3);
     else if(is_equal(element_id, "Damper04")) new_damper02(new_element, command, 3);
+    else if(is_equal(element_id, "Damper05")) new_damper05(new_element, command, 2);
+    else if(is_equal(element_id, "Damper06")) new_damper05(new_element, command, 3);
     else if(is_equal(element_id, "DC3D4")) new_dc3d4(new_element, command);
     else if(is_equal(element_id, "DC3D8")) new_dc3d8(new_element, command);
     else if(is_equal(element_id, "DCP3")) new_dcp3(new_element, command);

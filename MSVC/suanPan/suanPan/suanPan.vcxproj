@@ -331,6 +331,7 @@
     <ClCompile Include="..\..\..\Material\Material1D\Viscosity\Kelvin.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Viscosity\Maxwell.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Viscosity\NonlinearViscosity.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Viscosity\Nonviscous01.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Viscosity\Viscosity01.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Viscosity\Viscosity02.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\vonMises\ArmstrongFrederick1D.cpp" />
@@ -796,6 +797,7 @@
     <ClInclude Include="..\..\..\Material\Material1D\Viscosity\Kelvin.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Viscosity\Maxwell.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Viscosity\NonlinearViscosity.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Viscosity\Nonviscous01.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Viscosity\Viscosity01.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Viscosity\Viscosity02.h" />
     <ClInclude Include="..\..\..\Material\Material1D\vonMises\ArmstrongFrederick1D.h" />
