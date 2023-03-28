@@ -13,8 +13,8 @@ element Damper05 3 1 2 2
 fix 1 1 1
 fix 2 2 1 2
 
-hdf5recorder 1 Node U1 2
-hdf5recorder 2 Node RF1 2
+hdf5recorder 1 Element S 3
+hdf5recorder 2 Element V 3
 
 initial displacement .012 1 2
 
@@ -41,7 +41,7 @@ peek node 2
 
 # save recorder 1 2
 
-peek integrator 1
+peek material 2
 
 reset
 clear
