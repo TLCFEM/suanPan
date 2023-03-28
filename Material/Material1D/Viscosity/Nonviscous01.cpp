@@ -32,7 +32,8 @@ int Nonviscous01::initialize(const shared_ptr<DomainBase>& D) {
     s_para.zeros(m.n_elem);
     m_para.zeros(m.n_elem);
 
-    trial_damping = current_damping = initial_damping = accu(m / (2. / D->get_current_step()->get_ini_step_size() + s)).real();
+    const auto ini_time = D->get_current_step()->get_ini_step_size();
+    trial_damping = current_damping = initial_damping = accu(ini_time * m / (2. + ini_time * s)).real();
 
     trial_strain_rate = current_strain_rate.zeros(1);
 
@@ -49,11 +50,11 @@ int Nonviscous01::update_trial_status(const vec&) {
 int Nonviscous01::update_trial_status(const vec&, const vec& t_strain_rate) {
     incre_strain_rate = (trial_strain_rate = t_strain_rate) - current_strain_rate;
 
-    if(incre_strain_rate(0) <= datum::eps) return SUANPAN_SUCCESS;
+    if(fabs(incre_strain_rate(0)) <= datum::eps) return SUANPAN_SUCCESS;
 
-    const auto t_para = 2. / *incre_time;
-    s_para = (t_para - s) / (t_para + s);
-    m_para = m / (t_para + s);
+    const auto t_para = *incre_time * s;
+    s_para = (2. - t_para) / (2. + t_para);
+    m_para = *incre_time * m / (2. + t_para);
     accu_para = accu(m_para).real();
 
     trial_stress = real(dot(complex_damping, s_para) + accu_para * (current_strain_rate + trial_strain_rate));

@@ -3,7 +3,7 @@
 node 1 0 0
 node 2 1 0
 
-material Bilinear1D 1 100 1 .05 1. 1E-2
+material Elastic1D 1 100 1E-2
 material Nonviscous01 2 8. 0 2. 0 4. 0 1. 0
 
 element T2D2 1 1 2 1 1
@@ -30,13 +30,13 @@ analyze
 # Coordinate:
 #   1.0000e+00  0.0000e+00
 # Displacement:
-#   1.0193e-02  0.0000e+00
+#   9.8525e-03  0.0000e+00
 # Resistance:
-#   8.2929e-01  0.0000e+00
+#   9.8525e-01  0.0000e+00
 # Velocity:
-#   1.7389e-03  0.0000e+00
+#   2.0563e-03  0.0000e+00
 # Acceleration:
-#  -8.6931e-03  0.0000e+00
+#  -1.0331e-02  0.0000e+00
 peek node 2
 
 # save recorder 1 2

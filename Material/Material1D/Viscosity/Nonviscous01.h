@@ -35,9 +35,7 @@ struct DataNonviscous01 {
 };
 
 class Nonviscous01 final : DataNonviscous01, public Material1D {
-    static constexpr double unit_time = 1.;
-
-    const double* incre_time = &unit_time;
+    const double* incre_time = nullptr;
 
     cx_vec complex_damping;
 
