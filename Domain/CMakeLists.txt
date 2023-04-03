@@ -5,7 +5,6 @@ target_sources(${PROJECT_NAME} PRIVATE
         DomainState.cpp
         ExternalModule.cpp
         Factory.hpp
-        FactoryHelper.hpp
         Group/ElementGroup.cpp
         Group/Group.cpp
         Group/GroupGroup.cpp

@@ -20,10 +20,10 @@
 #include <Domain/Node.h>
 #include <Element/Element.h>
 #include <Load/Load.h>
-#include <Domain/FactoryHelper.hpp>
+#include <Domain/Factory.hpp>
 
 void Domain::update_current_resistance() const {
-    get_trial_resistance(factory).zeros();
+    factory->modify_trial_resistance().zeros();
     if(color_map.empty()) for(const auto& I : element_pond.get()) factory->assemble_resistance(I->get_current_resistance(), I->get_dof_encoding());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
@@ -37,7 +37,7 @@ void Domain::update_current_resistance() const {
 }
 
 void Domain::update_current_damping_force() const {
-    get_trial_damping_force(factory).zeros();
+    factory->modify_trial_damping_force().zeros();
     if(color_map.empty()) for(const auto& I : element_pond.get()) factory->assemble_damping_force(I->get_current_damping_force(), I->get_dof_encoding());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
@@ -50,7 +50,7 @@ void Domain::update_current_damping_force() const {
 }
 
 void Domain::update_current_inertial_force() const {
-    get_trial_inertial_force(factory).zeros();
+    factory->modify_trial_inertial_force().zeros();
     if(color_map.empty()) for(const auto& I : element_pond.get()) factory->assemble_inertial_force(I->get_current_inertial_force(), I->get_dof_encoding());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
@@ -63,7 +63,7 @@ void Domain::update_current_inertial_force() const {
 }
 
 void Domain::assemble_resistance() const {
-    auto& trial_resistance = get_trial_resistance(factory).zeros();
+    auto& trial_resistance = factory->modify_trial_resistance().zeros();
     if(color_map.empty()) for(const auto& I : element_pond.get()) factory->assemble_resistance(I->get_trial_resistance(), I->get_dof_encoding());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
@@ -80,7 +80,7 @@ void Domain::assemble_resistance() const {
 }
 
 void Domain::assemble_damping_force() const {
-    auto& trial_damping_force = get_trial_damping_force(factory).zeros();
+    auto& trial_damping_force = factory->modify_trial_damping_force().zeros();
     if(color_map.empty()) for(const auto& I : element_pond.get()) factory->assemble_damping_force(I->get_trial_damping_force(), I->get_dof_encoding());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
@@ -97,7 +97,7 @@ void Domain::assemble_damping_force() const {
 }
 
 void Domain::assemble_inertial_force() const {
-    auto& trial_inertial_force = get_trial_inertial_force(factory).zeros();
+    auto& trial_inertial_force = factory->modify_trial_inertial_force().zeros();
     if(color_map.empty()) for(const auto& I : element_pond.get()) factory->assemble_inertial_force(I->get_trial_inertial_force(), I->get_dof_encoding());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {

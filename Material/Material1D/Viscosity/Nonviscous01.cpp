@@ -18,7 +18,7 @@
 #include "Nonviscous01.h"
 #include <Recorder/OutputType.h>
 #include <Domain/DomainBase.h>
-#include <Domain/FactoryHelper.hpp>
+#include <Domain/Factory.hpp>
 #include <Step/Step.h>
 
 Nonviscous01::Nonviscous01(const unsigned T, cx_vec&& M, cx_vec&& S)
@@ -26,7 +26,7 @@ Nonviscous01::Nonviscous01(const unsigned T, cx_vec&& M, cx_vec&& S)
     , Material1D(T, 0.) {}
 
 int Nonviscous01::initialize(const shared_ptr<DomainBase>& D) {
-    if(nullptr != D) incre_time = &get_incre_time(D->get_factory());
+    if(nullptr != D) incre_time = &D->get_factory()->modify_incre_time();
 
     complex_damping.zeros(m.n_elem);
     s_para.zeros(m.n_elem);

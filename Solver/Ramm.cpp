@@ -18,7 +18,7 @@
 #include "Ramm.h"
 #include <Converger/Converger.h>
 #include <Domain/DomainBase.h>
-#include <Domain/FactoryHelper.hpp>
+#include <Domain/Factory.hpp>
 #include <Solver/Integrator/Integrator.h>
 
 Ramm::Ramm(const unsigned T, const double L, const bool F)
@@ -65,7 +65,7 @@ int Ramm::analyze() {
             mat right, kernel;
             auto& border = W->get_auxiliary_stiffness();
             if(SUANPAN_SUCCESS != G->solve(right, border)) return SUANPAN_FAIL;
-            auto& aux_lambda = get_auxiliary_lambda(W);
+            auto& aux_lambda = W->modify_auxiliary_lambda();
             if(!solve(aux_lambda, kernel = border.t() * right.head_rows(n_size), border.t() * samurai.head(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
             samurai -= right * aux_lambda;
             disp_a -= right * solve(kernel, border.t() * disp_a.head_rows(n_size));

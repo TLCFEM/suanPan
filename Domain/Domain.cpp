@@ -20,7 +20,7 @@
 #include <Constraint/Criterion/Criterion.h>
 #include <Converger/Converger.h>
 #include <Database/Database.h>
-#include <Domain/FactoryHelper.hpp>
+#include <Domain/Factory.hpp>
 #include <Domain/Group/Group.h>
 #include <Domain/Node.h>
 #include <Element/Element.h>
@@ -1064,7 +1064,7 @@ int Domain::initialize_reference() {
     factory->set_trial_settlement(ref_settlement);
     factory->set_current_settlement(ref_settlement);
     factory->initialize_load_factor();
-    auto& ref_load = get_reference_load(factory);
+    auto& ref_load = factory->modify_reference_load();
     for(uword I = 0; I < ref_dof.n_elem; ++I) ref_load(ref_dof(I), I) = 1.;
 
     return SUANPAN_SUCCESS;
@@ -1073,10 +1073,10 @@ int Domain::initialize_reference() {
 int Domain::process_load(const bool full) {
     loaded_dofs.clear();
 
-    auto& trial_load = get_trial_load(factory);
+    auto& trial_load = factory->modify_trial_load();
     if(!trial_load.empty()) trial_load.zeros();
 
-    auto& trial_settlement = get_trial_settlement(factory);
+    auto& trial_settlement = factory->modify_trial_settlement();
     if(!trial_settlement.empty()) trial_settlement.zeros();
 
     const auto process_handler = full ? std::mem_fn(&Load::process) : std::mem_fn(&Load::process_resistance);
@@ -1118,7 +1118,7 @@ int Domain::process_constraint(const bool full) {
     restrained_dofs.clear();
     constrained_dofs.clear();
 
-    auto& constraint_resistance = get_trial_constraint_resistance(factory);
+    auto& constraint_resistance = factory->modify_trial_constraint_resistance();
     constraint_resistance.zeros();
 
     const auto process_handler = full ? std::mem_fn(&Constraint::process) : std::mem_fn(&Constraint::process_resistance);
@@ -1156,10 +1156,10 @@ int Domain::process_constraint(const bool full) {
         ++previous_it;
     }
 
-    auto& t_encoding = get_auxiliary_encoding(factory);
-    auto& t_resistance = get_auxiliary_resistance(factory);
-    auto& t_load = get_auxiliary_load(factory);
-    auto& t_stiffness = get_auxiliary_stiffness(factory);
+    auto& t_encoding = factory->modify_auxiliary_encoding();
+    auto& t_resistance = factory->modify_auxiliary_resistance();
+    auto& t_load = factory->modify_auxiliary_load();
+    auto& t_stiffness = factory->modify_auxiliary_stiffness();
 
     suanpan::for_all(constraint_register, [&](const std::pair<shared_ptr<Constraint>, std::array<unsigned, 2>>& t_register) {
         const auto& t_constraint = t_register.first;

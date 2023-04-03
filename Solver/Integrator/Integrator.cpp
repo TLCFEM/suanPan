@@ -17,7 +17,7 @@
 
 #include "Integrator.h"
 #include <Domain/DomainBase.h>
-#include <Domain/FactoryHelper.hpp>
+#include <Domain/Factory.hpp>
 
 Integrator::Integrator(const unsigned T)
     : Tag(T) {}
@@ -278,7 +278,7 @@ void Integrator::erase_machine_error(vec& ninja) const {
     auto& W = D->get_factory();
 
     D->erase_machine_error(ninja);
-    get_ninja(W) = ninja.head(W->get_size());
+    W->modify_ninja() = ninja.head(W->get_size());
 }
 
 void Integrator::stage_and_commit_status() {
