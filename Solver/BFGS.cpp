@@ -18,7 +18,7 @@
 #include "BFGS.h"
 #include <Converger/Converger.h>
 #include <Domain/DomainBase.h>
-#include <Domain/FactoryHelper.hpp>
+#include <Domain/Factory.hpp>
 #include <Solver/Integrator/Integrator.h>
 
 BFGS::BFGS(const unsigned T, const unsigned MH)
@@ -39,7 +39,7 @@ int BFGS::analyze() {
     unsigned counter = 0;
 
     // lambda alias
-    auto& aux_lambda = get_auxiliary_lambda(W);
+    auto& aux_lambda = W->modify_auxiliary_lambda();
     vec samurai, residual;
 
     // clear container

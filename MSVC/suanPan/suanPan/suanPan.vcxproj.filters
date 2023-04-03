@@ -2656,9 +2656,6 @@
     <ClInclude Include="..\..\..\Solver\Integrator\GSSSS.h">
       <Filter>Solver\Integrator</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Domain\FactoryHelper.hpp">
-      <Filter>Domain</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Toolbox\sync_ostream.h">
       <Filter>Toolbox</Filter>
     </ClInclude>

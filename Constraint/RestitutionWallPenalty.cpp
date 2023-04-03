@@ -17,7 +17,7 @@
 
 #include "RestitutionWallPenalty.h"
 #include <Domain/DomainBase.h>
-#include <Domain/FactoryHelper.hpp>
+#include <Domain/Factory.hpp>
 #include <Solver/Integrator/Integrator.h>
 #include <Step/Step.h>
 
@@ -87,7 +87,7 @@ int RestitutionWallPenalty::process(const shared_ptr<DomainBase>& D) {
 void RestitutionWallPenalty::stage(const shared_ptr<DomainBase>& D) {
     auto& W = D->get_factory();
 
-    auto trial_acceleration = get_trial_acceleration(W);
+    auto trial_acceleration = W->modify_trial_acceleration();
     for(const auto& I : node_pool) {
         auto t_acceleration = I->get_trial_acceleration();
         t_acceleration.head(n_dim) = trial_acceleration_handler(I) - dot(incre_acceleration_handler(I), outer_norm) * outer_norm;

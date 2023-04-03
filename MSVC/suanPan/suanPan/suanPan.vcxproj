@@ -589,7 +589,6 @@
     <ClInclude Include="..\..\..\Domain\DomainBase.h" />
     <ClInclude Include="..\..\..\Domain\ExternalModule.h" />
     <ClInclude Include="..\..\..\Domain\Factory.hpp" />
-    <ClInclude Include="..\..\..\Domain\FactoryHelper.hpp" />
     <ClInclude Include="..\..\..\Domain\Group\CustomNodeGroup.h" />
     <ClInclude Include="..\..\..\Domain\Group\ElementGroup.h" />
     <ClInclude Include="..\..\..\Domain\Group\Group.h" />
