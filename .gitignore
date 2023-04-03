@@ -42,6 +42,7 @@ $RECYCLE.BIN/
 /MSVC/suanPan/superlu/x64/*
 /MSVC/suanPan/superlumt/x64/*
 venv
+.cache
 
 # Windows shortcuts
 *.lnk
