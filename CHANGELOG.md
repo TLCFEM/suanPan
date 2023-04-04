@@ -14,6 +14,7 @@
 4. add `CustomNodeGroup` [#126](https://github.com/TLCFEM/suanPan/pull/126)
 5. add `TranslationConnector` [#127](https://github.com/TLCFEM/suanPan/pull/127)
 6. add `CustomAmplitude` [#129](https://github.com/TLCFEM/suanPan/pull/129)
+7. update `Armadillo` to version `12.2` [#134](https://github.com/TLCFEM/suanPan/pull/134)
 
 ## version 2.9
 

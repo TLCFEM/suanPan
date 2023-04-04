@@ -36,7 +36,7 @@ is targeted to provide an efficient, concise, flexible and reliable FEM simulati
 as [ABAQUS UNIFIED FEA](https://www.3ds.com/products-services/simulia/products/abaqus/), [ANSYS](http://www.ansys.com/)
 and [OpenSees](http://opensees.berkeley.edu/).
 
-Please check documentation [here](https://tlcfem.github.io/suanPan-manual/latest/) for command references. Please consider starring ⭐ the project!
+Please check the documentation [here](https://tlcfem.github.io/suanPan-manual/latest/) for command references. Please star ⭐ the project!
 
 ## Features
 
@@ -74,7 +74,7 @@ Or on Windows,
 .\suanPan.exe
 ```
 
-First time user can use `overview` command to go through a quick introduction.
+First time users can use `overview` command to go through a quick introduction.
 
 ```text
 +-----------------------------------------------------+
@@ -151,7 +151,7 @@ It is also possible to use [Scoop](https://scoop.sh/) to install the package.
 
 ### Linux
 
-Linux's users are recommended to obtain the binaries via snap or flatpak.
+Linux users are recommended to obtain the binaries via `snap` or `flatpak`.
 
 #### Snap
 
@@ -185,7 +185,7 @@ echo "alias suanpan=\"flatpak run io.github.tlcfem.suanPan\"" >> ~/.bashrc
 #### Installation Packages
 
 Alternatively, download the RPM (Fedora 36) or DEB (Ubuntu 22.04) package from the release page. The packages may not be
-compatible with older distributions (due to different version of `libstdc++`). It is also possible to compile the
+compatible with older distributions (due to different versions of `libstdc++`). It is also possible to compile the
 package via docker, check the dockerfiles under the `Script` folder, for any questions please open an issue.
 
 ### Other Platforms
@@ -197,7 +197,7 @@ A few flavors are available:
 
 1. `vtk` --- visualization support is enabled, with this you can record VTK files for postprocessing, however, OpenGL
    may be missing on server systems
-2. `mkl` --- linear algebra operations are offloaded to MKL, which gives optimal performance on Intel chips
+2. `mkl` --- linear algebra operations are offloaded to MKL, which gives the optimal performance on Intel chips
 3. `openblas` --- linear algebra operations are offloaded to OpenBLAS, which may outperform MKL on AMD platforms
 
 Advanced users can compile the program from source by themselves in order to enable GPU based solvers which require
@@ -220,7 +220,7 @@ sudo apt install libglu1-mesa-dev freeglut3-dev mesa-common-dev libglvnd-dev
 
 ### Automation Related
 
-On Windows, a batch file named as `AddAssociation.bat` is provided in the archive. It provides file associations and
+On Windows, a batch file named `AddAssociation.bat` is provided in the archive. It provides file associations and
 prepares a proper working environment (build system, autocompletion, highlighting)
 with [Sublime Text](https://www.sublimetext.com/). It also adds file associations with `.sp` and `.supan` files, please
 run the `AddAssociation.bat` file with administrator privilege. [Sublime Text](https://www.sublimetext.com/)
@@ -254,7 +254,7 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**VTK**](https://vtk.org/) version 9.2.6
 - [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 12.0
 - [**MAGMA**](https://icl.utk.edu/magma/)
-- [**Armadillo**](http://arma.sourceforge.net/) version 12.0
+- [**Armadillo**](http://arma.sourceforge.net/) version 12.2
 - [**ensmallen**](https://ensmallen.org/) version 2.19.0
 - [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2023.0.0
 - [**Catch2**](https://github.com/catchorg/Catch2) version 3.3.1
@@ -271,11 +271,11 @@ and [Szip](https://support.hdfgroup.org/doc_resource/SZIP/). Additional tools ma
 ## How To Compile
 
 Please refer to the corresponding [page](https://tlcfem.github.io/suanPan-manual/2latest/Basic/Compile/) in
-manual for details.
+the manual for details.
 
 ## Happy Modelling
 
-![an example of simulation of particle collision](Resource/particle-collision.gif)
+![an example simulation of particle collision](Resource/particle-collision.gif)
 
 ## Licence
 
