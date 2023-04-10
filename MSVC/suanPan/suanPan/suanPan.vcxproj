@@ -300,6 +300,7 @@
     <ClCompile Include="..\..\..\Material\Material1D\Degradation\Degradation.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Degradation\Dhakal.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Degradation\TrilinearDegradation.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Elastic\AsymmElastic1D.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Elastic\BilinearElastic1D.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Elastic\CustomElastic1D.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Elastic\Elastic1D.cpp" />
@@ -765,6 +766,7 @@
     <ClInclude Include="..\..\..\Material\Material1D\Degradation\Degradation.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Degradation\Dhakal.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Degradation\TrilinearDegradation.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Elastic\AsymmElastic1D.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Elastic\BilinearElastic1D.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Elastic\CustomElastic1D.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Elastic\Elastic1D.h" />
