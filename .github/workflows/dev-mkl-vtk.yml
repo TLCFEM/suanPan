@@ -22,7 +22,7 @@ jobs:
       - name: Compile
         run: |
           go build Checker/updater.go
-          sudo apt-get update && sudo apt-get install mesa-common-dev mesa-utils freeglut3-dev libglvnd-dev dpkg-dev xz-utils intel-oneapi-mkl-devel intel-oneapi-compiler-dpcpp-cpp intel-oneapi-compiler-fortran
+          sudo apt-get update && sudo apt-get install mesa-common-dev mesa-utils freeglut3-dev libglvnd-dev dpkg-dev xz-utils intel-oneapi-mkl-devel-2023.0.0 intel-oneapi-compiler-dpcpp-cpp-2023.0.0 intel-oneapi-compiler-fortran-2023.0.0
           source /opt/intel/oneapi/setvars.sh
           cmake -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx -DCMAKE_Fortran_COMPILER=ifx -DCMAKE_BUILD_TYPE=Debug -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.2/ -DUSE_MKL=ON -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DLINK_DYNAMIC_MKL=OFF -DCMAKE_INSTALL_PREFIX=suanPan-linux-mkl-vtk .
           make install -j"$(nproc)"
