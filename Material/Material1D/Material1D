@@ -6,6 +6,7 @@
 #include "Degradation/Degradation.h"
 #include "Degradation/Dhakal.h"
 #include "Degradation/TrilinearDegradation.h"
+#include "Elastic/AsymmElastic1D.h"
 #include "Elastic/BilinearElastic1D.h"
 #include "Elastic/CustomElastic1D.h"
 #include "Elastic/Elastic1D.h"

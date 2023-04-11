@@ -15,6 +15,7 @@
 5. add `TranslationConnector` [#127](https://github.com/TLCFEM/suanPan/pull/127)
 6. add `CustomAmplitude` [#129](https://github.com/TLCFEM/suanPan/pull/129)
 7. update `Armadillo` to version `12.2` [#134](https://github.com/TLCFEM/suanPan/pull/134)
+8. add `AsymmElastic1D` [#135](https://github.com/TLCFEM/suanPan/pull/135)
 
 ## version 2.9
 

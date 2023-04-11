@@ -57,7 +57,7 @@ jobs:
           export CC=$(brew --prefix llvm@15)/bin/clang && export CXX=$(brew --prefix llvm@15)/bin/clang++ && export FC=gfortran-11
           go build Checker/updater.go
           brew install glfw glew libomp
-          cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.2/ -DCMAKE_INSTALL_PREFIX=suanPan-macos-openblas-vtk .
+          cmake -DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=/usr/local/Cellar/libomp/16.0.0/include -DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=/usr/local/Cellar/libomp/16.0.0/include -DCMAKE_Fortran_STANDARD_INCLUDE_DIRECTORIES=/usr/local/Cellar/libomp/16.0.0/include -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.2/ -DCMAKE_INSTALL_PREFIX=suanPan-macos-openblas-vtk .
           make install -j4
       - name: Pack
         run: |
@@ -93,7 +93,7 @@ jobs:
           export CC=$(brew --prefix llvm@15)/bin/clang && export CXX=$(brew --prefix llvm@15)/bin/clang++ && export FC=gfortran-11
           go build Checker/updater.go
           brew install glfw glew libomp
-          cmake -DCMAKE_BUILD_TYPE=Release -DUSE_AVX=OFF -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.2/ -DCMAKE_INSTALL_PREFIX=suanPan-macos-openblas-vtk-no-avx .
+          cmake -DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=/usr/local/Cellar/libomp/16.0.0/include -DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=/usr/local/Cellar/libomp/16.0.0/include -DCMAKE_Fortran_STANDARD_INCLUDE_DIRECTORIES=/usr/local/Cellar/libomp/16.0.0/include -DCMAKE_BUILD_TYPE=Release -DUSE_AVX=OFF -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.2/ -DCMAKE_INSTALL_PREFIX=suanPan-macos-openblas-vtk-no-avx .
           make install -j4
       - name: Pack
         run: |

@@ -1,0 +1,5 @@
+material AsymmElastic1D 1 100 200
+
+materialTest1D 1 1E-2 15 3 13 20 30 40 5 15 10 40 100
+
+exit

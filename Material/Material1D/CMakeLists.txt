@@ -7,6 +7,7 @@ set(M1D
         Material1D/Degradation/Degradation.cpp
         Material1D/Degradation/Dhakal.cpp
         Material1D/Degradation/TrilinearDegradation.cpp
+        Material1D/Elastic/AsymmElastic1D.cpp
         Material1D/Elastic/BilinearElastic1D.cpp
         Material1D/Elastic/CustomElastic1D.cpp
         Material1D/Elastic/Elastic1D.cpp

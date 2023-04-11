@@ -3625,6 +3625,12 @@
       "trigger": "Elastic1D"
     },
     {
+      "contents": "material AsymmElastic1D ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]}\n# (1) int, unique material tag\n# (2) double, tension elastic modulus\n# (3) double, compression elastic modulus\n# [4] double, density, default: 0.0",
+      "details": "Uniaxial Elastic Material",
+      "kind": "type",
+      "trigger": "AsymmElastic1D"
+    },
+    {
       "contents": "",
       "details": "",
       "kind": "type",

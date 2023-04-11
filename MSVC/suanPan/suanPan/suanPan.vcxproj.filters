@@ -1507,6 +1507,9 @@
     <ClCompile Include="..\..\..\Material\Material1D\Viscosity\Nonviscous01.cpp">
       <Filter>Material\Material1D\Viscosity</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Elastic\AsymmElastic1D.cpp">
+      <Filter>Material\Material1D\Elastic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2877,6 +2880,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material1D\Viscosity\Nonviscous01.h">
       <Filter>Material\Material1D\Viscosity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Elastic\AsymmElastic1D.h">
+      <Filter>Material\Material1D\Elastic</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
