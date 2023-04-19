@@ -283,7 +283,7 @@ protected:
     int direct_solve(Mat<T>&, Mat<T>&&) override;
 
 public:
-    SparseMatMAGMA(const uword in_row, const uword in_col, const std::variant<magma_dopts, magma_sopts> in_opts, const uword in_elem = 0)
+    SparseMatMAGMA(const uword in_row, const uword in_col, const std::variant<magma_dopts, magma_sopts>& in_opts, const uword in_elem = 0)
         : SparseMat<T>(in_row, in_col, in_elem) {
         magma_queue_create(0, &queue);
         if constexpr(std::is_same_v<T, float>) {
