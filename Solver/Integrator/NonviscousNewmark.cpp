@@ -59,9 +59,9 @@ void NonviscousNewmark::assemble_matrix() {
 void NonviscousNewmark::update_parameter(const double DT) {
     Newmark::update_parameter(DT);
 
-    const auto t_para = 2. / DT;
-    s_para = (t_para - s) / (t_para + s);
-    m_para = m / (t_para + s);
+    const cx_vec t_para = 2. / DT + s;
+    s_para = (t_para - 2. * s) / t_para;
+    m_para = m / t_para;
     accu_para = accu(m_para).real();
 }
 

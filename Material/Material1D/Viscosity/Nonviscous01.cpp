@@ -52,9 +52,9 @@ int Nonviscous01::update_trial_status(const vec&, const vec& t_strain_rate) {
 
     if(fabs(incre_strain_rate(0)) <= datum::eps) return SUANPAN_SUCCESS;
 
-    const auto t_para = *incre_time * s;
-    s_para = (2. - t_para) / (2. + t_para);
-    m_para = *incre_time * m / (2. + t_para);
+    const cx_vec t_para = 2. + *incre_time * s;
+    s_para = (4. - t_para) / t_para;
+    m_para = *incre_time * m / t_para;
     accu_para = accu(m_para).real();
 
     trial_stress = real(dot(complex_damping, s_para) + accu_para * (current_strain_rate + trial_strain_rate));
