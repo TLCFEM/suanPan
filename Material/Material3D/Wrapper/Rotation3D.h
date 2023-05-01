@@ -29,11 +29,12 @@
 #define ROTATION3D_H
 
 #include <Material/Material3D/Material3D.h>
+#include <Toolbox/ResourceHolder.h>
 
 class Rotation3D final : public Material3D {
     const unsigned mat_tag;
 
-    unique_ptr<Material> mat_obj;
+    ResourceHolder<Material> mat_obj;
 
     mat trans_mat;
 
@@ -49,11 +50,6 @@ public:
     Rotation3D(unsigned, // tag
                unsigned, // mat tag
                mat&&);
-    Rotation3D(const Rotation3D&);
-    Rotation3D(Rotation3D&&) = delete;
-    Rotation3D& operator=(const Rotation3D&) = delete;
-    Rotation3D& operator=(Rotation3D&&) = delete;
-    ~Rotation3D() override = default;
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

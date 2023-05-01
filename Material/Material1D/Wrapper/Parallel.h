@@ -34,20 +34,16 @@
 #define PARALLEL_H
 
 #include <Material/Material1D/Material1D.h>
+#include <Toolbox/ResourceHolder.h>
 
 class Parallel final : public Material1D {
     const uvec mat_tag;
-    vector<unique_ptr<Material>> mat_pool;
+    vector<ResourceHolder<Material>> mat_pool;
 
 public:
     Parallel(unsigned, // tag
              uvec&&    // material tag pool
     );
-    Parallel(const Parallel&);
-    Parallel(Parallel&&) = delete;
-    Parallel& operator=(const Parallel&) = delete;
-    Parallel& operator=(Parallel&&) = delete;
-    ~Parallel() override = default;
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

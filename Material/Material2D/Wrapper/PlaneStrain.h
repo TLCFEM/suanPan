@@ -29,6 +29,7 @@
 #define PLANESTRAIN_H
 
 #include <Material/Material2D/Material2D.h>
+#include <Toolbox/ResourceHolder.h>
 
 class PlaneStrain final : public Material2D {
     static const uvec F;
@@ -37,18 +38,13 @@ class PlaneStrain final : public Material2D {
 
     const unsigned base_tag;
 
-    unique_ptr<Material> base;
+    ResourceHolder<Material> base;
 
 public:
     PlaneStrain(unsigned, // tag
                 unsigned, // 3D material tag
                 unsigned  // type
     );
-    PlaneStrain(const PlaneStrain&);
-    PlaneStrain(PlaneStrain&&) = delete;
-    PlaneStrain& operator=(const PlaneStrain&) = delete;
-    PlaneStrain& operator=(PlaneStrain&&) = delete;
-    ~PlaneStrain() override = default;
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

@@ -29,6 +29,7 @@
 #define MAXWELL_H
 
 #include <Material/Material1D/Material1D.h>
+#include <Toolbox/ResourceHolder.h>
 
 class Maxwell final : public Material1D {
     static constexpr unsigned max_iteration = 20;
@@ -43,7 +44,7 @@ class Maxwell final : public Material1D {
 
     double beta;
 
-    unique_ptr<Material> damper, spring;
+    ResourceHolder<Material> damper, spring;
 
 public:
     Maxwell(unsigned,     // tag
@@ -53,11 +54,6 @@ public:
             unsigned = 0, // if to process when fails to converge
             double = 0.   // beta
     );
-    Maxwell(const Maxwell&);
-    Maxwell(Maxwell&&) = delete;
-    Maxwell& operator=(const Maxwell&) = delete;
-    Maxwell& operator=(Maxwell&&) = delete;
-    ~Maxwell() override = default;
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

@@ -24,13 +24,6 @@ Kelvin::Kelvin(const unsigned T, const unsigned DT, const unsigned ST)
     , damper_tag(DT)
     , spring_tag(ST) {}
 
-Kelvin::Kelvin(const Kelvin& old_obj)
-    : Material1D(old_obj)
-    , damper_tag(old_obj.damper_tag)
-    , spring_tag(old_obj.spring_tag)
-    , damper(suanpan::make_copy(old_obj.damper))
-    , spring(suanpan::make_copy(old_obj.spring)) {}
-
 int Kelvin::initialize(const shared_ptr<DomainBase>& D) {
     damper = suanpan::initialized_material_copy(D, damper_tag);
     spring = suanpan::initialized_material_copy(D, spring_tag);

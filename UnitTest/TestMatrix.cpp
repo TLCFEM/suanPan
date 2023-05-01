@@ -114,18 +114,18 @@ template<typename MT, typename ET, std::invocable T> void benchmark_mat_solve(st
     Col<ET> D;
 
     BENCHMARK((title + " Full").c_str()) {
-            clear_mat();
-            A.solve(D, C);
-            REQUIRE(norm(E - D) < scaled_tol);
-        };
+        clear_mat();
+        A.solve(D, C);
+        REQUIRE(norm(E - D) < scaled_tol);
+    };
 
     A.get_solver_setting().precision = Precision::MIXED;
 
     BENCHMARK((title + " Mixed").c_str()) {
-            clear_mat();
-            A.solve(D, C);
-            REQUIRE(norm(E - D) < scaled_tol);
-        };
+        clear_mat();
+        A.solve(D, C);
+        REQUIRE(norm(E - D) < scaled_tol);
+    };
 }
 
 template<typename T> T create_new(u64) { throw std::runtime_error("unknown matrix"); }
@@ -389,16 +389,16 @@ TEST_CASE("Benchmark Triplet Assembly", "[Matrix.Sparse]") {
 
     for(auto J = 2; J != REPEAT; J *= 2)
         BENCHMARK(string("Assemble " + std::to_string(J)).c_str()) {
-                triplet_form<double, uword> C(N + REPEAT, N + REPEAT, B.n_elem * REPEAT);
+            triplet_form<double, uword> C(N + REPEAT, N + REPEAT, B.n_elem * REPEAT);
 
-                for(auto I = 0; I < J; ++I) C.assemble(B, I, I, randu<double>());
+            for(auto I = 0; I < J; ++I) C.assemble(B, I, I, randu<double>());
 
-                REQUIRE(C.n_elem == NNZ * J);
+            REQUIRE(C.n_elem == NNZ * J);
 
-                C.csc_condense();
+            C.csc_condense();
 
-                return C;
-            };
+            return C;
+        };
 }
 
 TEST_CASE("Triplet/CSR/CSC Conversion", "[Matrix.Sparse]") {

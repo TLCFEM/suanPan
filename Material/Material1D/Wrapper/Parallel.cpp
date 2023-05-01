@@ -22,10 +22,6 @@ Parallel::Parallel(const unsigned T, uvec&& MT)
     : Material1D(T, 0.)
     , mat_tag(std::forward<uvec>(MT)) {}
 
-Parallel::Parallel(const Parallel& old_obj)
-    : Material1D(old_obj)
-    , mat_tag(old_obj.mat_tag) { for(const auto& I : old_obj.mat_pool) mat_pool.emplace_back(I->get_copy()); }
-
 int Parallel::initialize(const shared_ptr<DomainBase>& D) {
     mat_pool.clear();
     mat_pool.reserve(mat_tag.n_elem);

@@ -29,22 +29,18 @@
 #define KELVIN_H
 
 #include <Material/Material1D/Material1D.h>
+#include <Toolbox/ResourceHolder.h>
 
 class Kelvin final : public Material1D {
     const unsigned damper_tag, spring_tag;
 
-    unique_ptr<Material> damper, spring;
+    ResourceHolder<Material> damper, spring;
 
 public:
     Kelvin(unsigned, // tag
            unsigned, // damper tag
            unsigned  // spring tag
     );
-    Kelvin(const Kelvin&);
-    Kelvin(Kelvin&&) = delete;
-    Kelvin& operator=(const Kelvin&) = delete;
-    Kelvin& operator=(Kelvin&&) = delete;
-    ~Kelvin() override = default;
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

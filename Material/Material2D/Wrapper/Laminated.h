@@ -29,21 +29,17 @@
 #define LAMINATED_H
 
 #include <Material/Material2D/Material2D.h>
+#include <Toolbox/ResourceHolder.h>
 
 class Laminated final : public Material2D {
     const uvec mat_tag;
 
-    std::vector<unique_ptr<Material>> mat_pool;
+    std::vector<ResourceHolder<Material>> mat_pool;
 
 public:
     Laminated(unsigned, // tag
               uvec&&    // mat tag
     );
-    Laminated(const Laminated&);
-    Laminated(Laminated&&) = delete;
-    Laminated& operator=(const Laminated&) = delete;
-    Laminated& operator=(Laminated&&) = delete;
-    ~Laminated() override = default;
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

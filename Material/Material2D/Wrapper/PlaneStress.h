@@ -29,6 +29,7 @@
 #define PLANESTRESS_H
 
 #include <Material/Material2D/Material2D.h>
+#include <Toolbox/ResourceHolder.h>
 
 class PlaneStress final : public Material2D {
     static const uvec F1, F2;
@@ -39,7 +40,7 @@ class PlaneStress final : public Material2D {
 
     const bool use_full_matrix;
 
-    unique_ptr<Material> base;
+    ResourceHolder<Material> base;
 
     vec trial_full_strain, current_full_strain;
 
@@ -50,11 +51,6 @@ public:
                 unsigned,     // 3D material tag
                 unsigned = 1, // max iteration
                 bool = false);
-    PlaneStress(const PlaneStress&);
-    PlaneStress(PlaneStress&&) = delete;
-    PlaneStress& operator=(const PlaneStress&) = delete;
-    PlaneStress& operator=(PlaneStress&&) = delete;
-    ~PlaneStress() override = default;
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

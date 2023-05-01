@@ -34,7 +34,7 @@ jobs:
           path: suanPan-3.0.0-1.x86_64.deb
   macos-openblas-vtk-dev:
     runs-on: macos-11
-    timeout-minutes: 60
+    timeout-minutes: 100
     steps:
       - name: Clone
         uses: actions/checkout@v3

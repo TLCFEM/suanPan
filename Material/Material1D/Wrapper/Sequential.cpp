@@ -25,12 +25,6 @@ Sequential::Sequential(const unsigned T, uvec&& MT)
     , mat_size(MT.n_elem - 1)
     , mat_tag(std::forward<uvec>(MT)) {}
 
-Sequential::Sequential(const Sequential& old_obj)
-    : Material1D(old_obj)
-    , mat_size(old_obj.mat_size)
-    , mat_tag(old_obj.mat_tag)
-    , jacobian(old_obj.jacobian) { for(const auto& I : old_obj.mat_pool) mat_pool.emplace_back(I->get_copy()); }
-
 int Sequential::initialize(const shared_ptr<DomainBase>& D) {
     mat_pool.clear();
     mat_pool.reserve(mat_tag.n_elem);

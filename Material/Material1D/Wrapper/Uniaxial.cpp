@@ -28,14 +28,6 @@ Uniaxial::Uniaxial(const unsigned T, const unsigned BT, const unsigned MI)
     , base_tag(BT)
     , max_iteration(MI) {}
 
-Uniaxial::Uniaxial(const Uniaxial& old_obj)
-    : Material1D(old_obj)
-    , base_tag(old_obj.base_tag)
-    , max_iteration(old_obj.max_iteration)
-    , base(suanpan::make_copy(old_obj.base))
-    , trial_full_strain(old_obj.trial_full_strain)
-    , current_full_strain(old_obj.current_full_strain) {}
-
 int Uniaxial::initialize(const shared_ptr<DomainBase>& D) {
     base = suanpan::initialized_material_copy(D, base_tag);
 

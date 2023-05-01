@@ -54,7 +54,7 @@ public:
     Expression& operator=(Expression&&) noexcept = delete;
     ~Expression() override = default;
 
-    [[nodiscard]] virtual unique_ptr<Expression> make_copy() const = 0;
+    [[nodiscard]] virtual unique_ptr<Expression> get_copy() const = 0;
 
     [[nodiscard]] virtual uword input_size() const;
     [[nodiscard]] virtual uword output_size() const;
@@ -75,7 +75,7 @@ class SimpleScalarExpression final : public Expression {
 public:
     SimpleScalarExpression(unsigned, const std::string_view&);
 
-    [[nodiscard]] unique_ptr<Expression> make_copy() const override;
+    [[nodiscard]] unique_ptr<Expression> get_copy() const override;
 
     Mat<double> evaluate(const Col<double>&) override;
 
@@ -88,7 +88,7 @@ class SimpleVectorExpression final : public Expression {
 public:
     SimpleVectorExpression(unsigned, const std::string_view&, const std::string_view&);
 
-    [[nodiscard]] unique_ptr<Expression> make_copy() const override;
+    [[nodiscard]] unique_ptr<Expression> get_copy() const override;
 
     [[nodiscard]] uword output_size() const override;
 

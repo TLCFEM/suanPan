@@ -62,7 +62,7 @@ void Expression::print() {
 SimpleScalarExpression::SimpleScalarExpression(const unsigned tag, const std::string_view& input_string)
     : Expression(tag, {std::string{input_string}}) {}
 
-unique_ptr<Expression> SimpleScalarExpression::make_copy() const {
+unique_ptr<Expression> SimpleScalarExpression::get_copy() const {
     auto copy = make_unique<SimpleScalarExpression>(get_tag(), variable_text_list[0]);
     if(!expression_text.empty()) copy->compile(expression_text);
     return copy;
@@ -93,7 +93,7 @@ SimpleVectorExpression::SimpleVectorExpression(const unsigned tag, const std::st
     symbol_table.add_vector(variable_list[0].first, y.memptr(), y.n_elem);
 }
 
-unique_ptr<Expression> SimpleVectorExpression::make_copy() const {
+unique_ptr<Expression> SimpleVectorExpression::get_copy() const {
     auto copy = make_unique<SimpleVectorExpression>(get_tag(), variable_text_list[0], variable_text_list[1]);
     if(!expression_text.empty()) copy->compile(expression_text);
     return copy;

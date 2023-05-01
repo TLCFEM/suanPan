@@ -36,7 +36,7 @@ jobs:
           overwrite: true
   macos-openblas:
     runs-on: macos-11
-    timeout-minutes: 60
+    timeout-minutes: 100
     steps:
       - name: Clone
         uses: actions/checkout@v3

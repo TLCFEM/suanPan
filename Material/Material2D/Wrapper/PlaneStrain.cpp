@@ -26,13 +26,6 @@ PlaneStrain::PlaneStrain(const unsigned T, const unsigned BT, const unsigned ST)
     , FB(0 == ST ? std::initializer_list<uword>{} : 1 == ST ? std::initializer_list<uword>{2, 5} : std::initializer_list<uword>{2, 4})
     , base_tag(BT) {}
 
-PlaneStrain::PlaneStrain(const PlaneStrain& old_obj)
-    : Material2D(old_obj)
-    , FA(old_obj.FA)
-    , FB(old_obj.FB)
-    , base_tag(old_obj.base_tag)
-    , base(suanpan::make_copy(old_obj.base)) {}
-
 int PlaneStrain::initialize(const shared_ptr<DomainBase>& D) {
     base = suanpan::initialized_material_copy(D, base_tag);
 

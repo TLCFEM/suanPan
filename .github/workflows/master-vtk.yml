@@ -41,7 +41,7 @@ jobs:
           overwrite: true
   macos-openblas-vtk:
     runs-on: macos-11
-    timeout-minutes: 60
+    timeout-minutes: 100
     steps:
       - name: Clone
         uses: actions/checkout@v3
@@ -77,7 +77,7 @@ jobs:
           overwrite: true
   macos-openblas-vtk-no-avx:
     runs-on: macos-11
-    timeout-minutes: 60
+    timeout-minutes: 100
     steps:
       - name: Clone
         uses: actions/checkout@v3

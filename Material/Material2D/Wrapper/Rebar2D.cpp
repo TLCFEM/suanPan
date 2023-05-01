@@ -17,7 +17,6 @@
 
 #include "Rebar2D.h"
 #include <Domain/DomainBase.h>
-#include <Toolbox/tensor.h>
 
 Rebar2D::Rebar2D(const unsigned T, const unsigned XT, const unsigned YT, const double RX, const double RY)
     : Material2D(T, PlaneType::S, 0.)
@@ -25,15 +24,6 @@ Rebar2D::Rebar2D(const unsigned T, const unsigned XT, const unsigned YT, const d
     , tag_y(YT)
     , ratio_x(RX)
     , ratio_y(RY) {}
-
-Rebar2D::Rebar2D(const Rebar2D& old_obj)
-    : Material2D(old_obj)
-    , tag_x(old_obj.tag_x)
-    , tag_y(old_obj.tag_y)
-    , ratio_x(old_obj.ratio_x)
-    , ratio_y(old_obj.ratio_y)
-    , rebar_x(suanpan::make_copy(old_obj.rebar_x))
-    , rebar_y(suanpan::make_copy(old_obj.rebar_y)) {}
 
 int Rebar2D::initialize(const shared_ptr<DomainBase>& D) {
     rebar_x = suanpan::initialized_material_copy(D, tag_x);
