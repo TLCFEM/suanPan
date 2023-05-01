@@ -29,24 +29,20 @@
 #define SUBSTEPPING_H
 
 #include <Material/Material.h>
+#include <Toolbox/ResourceHolder.h>
 
 class Substepping final : public Material {
     const unsigned max_iteration;
 
     const unsigned mat_tag;
 
-    unique_ptr<Material> trial_mat_obj, current_mat_obj;
+    ResourceHolder<Material> trial_mat_obj, current_mat_obj;
 
 public:
     Substepping(unsigned, // tag
                 unsigned, // mat tag
                 unsigned  // max iteration
     );
-    Substepping(const Substepping&);
-    Substepping(Substepping&&) = delete;
-    Substepping& operator=(const Substepping&) = delete;
-    Substepping& operator=(Substepping&&) = delete;
-    ~Substepping() override = default;
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

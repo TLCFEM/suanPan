@@ -23,13 +23,6 @@ Substepping::Substepping(const unsigned T, const unsigned MT, const unsigned MI)
     , max_iteration(MI)
     , mat_tag(MT) {}
 
-Substepping::Substepping(const Substepping& old_obj)
-    : Material(old_obj)
-    , max_iteration(old_obj.max_iteration)
-    , mat_tag(old_obj.mat_tag)
-    , trial_mat_obj(suanpan::make_copy(old_obj.trial_mat_obj))
-    , current_mat_obj(suanpan::make_copy(old_obj.current_mat_obj)) {}
-
 int Substepping::initialize(const shared_ptr<DomainBase>& D) {
     current_mat_obj = suanpan::initialized_material_copy(D, mat_tag);
 

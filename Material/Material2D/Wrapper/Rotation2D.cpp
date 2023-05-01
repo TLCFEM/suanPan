@@ -24,12 +24,6 @@ Rotation2D::Rotation2D(const unsigned T, const unsigned MT, const double A)
     , mat_tag(MT)
     , trans_mat(transform::strain::trans(A)) {}
 
-Rotation2D::Rotation2D(const Rotation2D& old_obj)
-    : Material2D(old_obj)
-    , mat_tag(old_obj.mat_tag)
-    , mat_obj(suanpan::make_copy(old_obj.mat_obj))
-    , trans_mat(old_obj.trans_mat) {}
-
 int Rotation2D::initialize(const shared_ptr<DomainBase>& D) {
     mat_obj = suanpan::initialized_material_copy(D, mat_tag);
 

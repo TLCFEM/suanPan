@@ -28,17 +28,6 @@ Maxwell::Maxwell(const unsigned T, const unsigned DT, const unsigned ST, const b
     , use_matrix(UM)
     , beta(std::min(std::max(0., std::fabs(BT)), 1.)) { access::rw(tolerance) = 1E-12; }
 
-Maxwell::Maxwell(const Maxwell& old_obj)
-    : Material1D(old_obj)
-    , incre_time(old_obj.incre_time)
-    , damper_tag(old_obj.damper_tag)
-    , spring_tag(old_obj.spring_tag)
-    , proceed(old_obj.proceed)
-    , use_matrix(old_obj.use_matrix)
-    , beta(old_obj.beta)
-    , damper(suanpan::make_copy(old_obj.damper))
-    , spring(suanpan::make_copy(old_obj.spring)) {}
-
 int Maxwell::initialize(const shared_ptr<DomainBase>& D) {
     damper = suanpan::initialized_material_copy(D, damper_tag);
     spring = suanpan::initialized_material_copy(D, spring_tag);

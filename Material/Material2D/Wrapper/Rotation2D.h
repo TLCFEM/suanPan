@@ -29,11 +29,12 @@
 #define ROTATION2D_H
 
 #include <Material/Material2D/Material2D.h>
+#include <Toolbox/ResourceHolder.h>
 
 class Rotation2D final : public Material2D {
     const unsigned mat_tag;
 
-    unique_ptr<Material> mat_obj;
+    ResourceHolder<Material> mat_obj;
 
     mat trans_mat;
 
@@ -42,11 +43,6 @@ public:
                unsigned, // mat tag
                double    // Euler angle
     );
-    Rotation2D(const Rotation2D&);
-    Rotation2D(Rotation2D&&) = delete;
-    Rotation2D& operator=(const Rotation2D&) = delete;
-    Rotation2D& operator=(Rotation2D&&) = delete;
-    ~Rotation2D() override = default;
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

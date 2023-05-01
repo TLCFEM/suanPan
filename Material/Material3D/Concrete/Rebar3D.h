@@ -29,6 +29,7 @@
 #define REBAR3D_H
 
 #include <Material/Material3D/Material3D.h>
+#include <Toolbox/ResourceHolder.h>
 
 class Rebar3D final : public Material3D {
     const unsigned tag_x, tag_y, tag_z;
@@ -37,7 +38,7 @@ class Rebar3D final : public Material3D {
 
     const mat trans_mat;
 
-    unique_ptr<Material> rebar_x, rebar_y, rebar_z;
+    ResourceHolder<Material> rebar_x, rebar_y, rebar_z;
 
 public:
     Rebar3D(unsigned,   // tag
@@ -49,11 +50,6 @@ public:
             double,     // reinforcement ratio along z axis
             double = 0. // inclination
     );
-    Rebar3D(const Rebar3D&);
-    Rebar3D(Rebar3D&&) = delete;
-    Rebar3D& operator=(const Rebar3D&) = delete;
-    Rebar3D& operator=(Rebar3D&&) = delete;
-    ~Rebar3D() override = default;
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

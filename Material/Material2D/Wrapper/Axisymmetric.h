@@ -29,6 +29,7 @@
 #define AXISYMMETRIC_H
 
 #include <Material/Material2D/Material2D.h>
+#include <Toolbox/ResourceHolder.h>
 
 using std::array;
 
@@ -37,7 +38,7 @@ class Axisymmetric final : public Material2D {
 
     const unsigned base_tag;
 
-    unique_ptr<Material> base;
+    ResourceHolder<Material> base;
 
     vec full_strain;
 
@@ -45,7 +46,6 @@ public:
     Axisymmetric(unsigned, // tag
                  unsigned  // 3D material tag
     );
-    Axisymmetric(const Axisymmetric&);
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

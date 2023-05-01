@@ -18,7 +18,6 @@
 #include "Rebar3D.h"
 #include <Domain/DomainBase.h>
 #include <Material/Material1D/Material1D.h>
-#include <Toolbox/tensor.h>
 
 Rebar3D::Rebar3D(const unsigned T, const unsigned XT, const unsigned YT, const unsigned ZT, const double XR, const double YR, const double ZR, const double R)
     : Material3D(T, R)
@@ -28,18 +27,6 @@ Rebar3D::Rebar3D(const unsigned T, const unsigned XT, const unsigned YT, const u
     , ratio_x(XR)
     , ratio_y(YR)
     , ratio_z(ZR) {}
-
-Rebar3D::Rebar3D(const Rebar3D& P)
-    : Material3D(P)
-    , tag_x(P.tag_x)
-    , tag_y(P.tag_y)
-    , tag_z(P.tag_z)
-    , ratio_x(P.ratio_x)
-    , ratio_y(P.ratio_y)
-    , ratio_z(P.ratio_z)
-    , rebar_x(suanpan::make_copy(P.rebar_x))
-    , rebar_y(suanpan::make_copy(P.rebar_y))
-    , rebar_z(suanpan::make_copy(P.rebar_z)) {}
 
 int Rebar3D::initialize(const shared_ptr<DomainBase>& D) {
     rebar_x = suanpan::initialized_material_copy(D, tag_x);
