@@ -17,6 +17,7 @@
 7. update `Armadillo` to version `12.2` [#134](https://github.com/TLCFEM/suanPan/pull/134)
 8. add `AsymmElastic1D` [#135](https://github.com/TLCFEM/suanPan/pull/135)
 9. update `TBB` to version `2021.9.0`
+10. experimental sparse solver support via `MAGMA`
 
 ## version 2.9
 
