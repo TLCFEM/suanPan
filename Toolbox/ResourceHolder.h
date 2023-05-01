@@ -28,7 +28,8 @@
 
 #include <memory>
 
-template<typename T> class ResourceHolder final {
+template<typename T> requires requires(T* copyable) { copyable->get_copy(); }
+class ResourceHolder final {
     std::unique_ptr<T> object = nullptr;
 
 public:
