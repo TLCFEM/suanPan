@@ -285,6 +285,8 @@ protected:
 public:
     SparseMatMAGMA(const uword in_row, const uword in_col, const std::variant<magma_dopts, magma_sopts>& in_opts, const uword in_elem = 0)
         : SparseMat<T>(in_row, in_col, in_elem) {
+        magma_init();
+        if(SUANPAN_VERBOSE) magma_print_environment();
         magma_queue_create(0, &queue);
         if constexpr(std::is_same_v<T, float>) {
             sopts = std::get<magma_sopts>(in_opts);
@@ -315,6 +317,7 @@ public:
         magma_dmfree(&b_d, queue);
         magma_dmfree(&A_d, queue);
         magma_queue_destroy(queue);
+        magma_finalize();
     }
 
     unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SparseMatMAGMA>(*this); }
