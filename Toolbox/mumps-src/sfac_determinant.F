@@ -1,14 +1,15 @@
 C
-C  This file is part of MUMPS 5.2.1, released
-C  on Fri Jun 14 14:46:05 UTC 2019
+C  This file is part of MUMPS 5.6.0, released
+C  on Wed Apr 19 15:50:57 UTC 2023
 C
 C
-C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license:
-C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+C  released under the CeCILL-C license 
+C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
       SUBROUTINE SMUMPS_UPDATEDETER(PIV, DETER, NEXP)
       IMPLICIT NONE
@@ -60,6 +61,9 @@ C
             K=1
             DO WHILE ( I .LT. IMX )
               CALL SMUMPS_UPDATEDETER(A(I),DETER,NEXP)
+              IF (SYM.EQ.1) THEN
+               CALL SMUMPS_UPDATEDETER(A(I),DETER,NEXP)
+              ENDIF
               IF (SYM.NE.1) THEN 
                 IF (IPIV(ILOC+K) .NE. IBLOCK*BLOCK_SIZE+K) THEN
                   DETER = -DETER
@@ -113,7 +117,7 @@ C
       END SUBROUTINE SMUMPS_DETER_REDUCTION
       SUBROUTINE SMUMPS_DETERREDUCE_FUNC(INV, INOUTV, NEL, DATATYPE)
       IMPLICIT NONE
-#if defined(WORKAROUNDINTELILP64MPI2INTEGER)
+#if defined(WORKAROUNDINTELILP64MPI2INTEGER) || defined(WORKAROUNDILP64MPICUSTOMREDUCE)
       INTEGER(4), INTENT(IN)    :: NEL, DATATYPE
 #else
       INTEGER, INTENT(IN)    :: NEL, DATATYPE
@@ -173,3 +177,51 @@ C
       ENDIF
       RETURN
       END SUBROUTINE SMUMPS_DETER_SIGN_PERM
+      SUBROUTINE SMUMPS_PAR_ROOT_MINMAX_PIV_UPD (
+     &                      BLOCK_SIZE,IPIV,
+     &                      MYROW, MYCOL, NPROW, NPCOL,
+     &                      A, LOCAL_M, LOCAL_N, N, MYID,
+     &                      DKEEP, KEEP, SYM)
+       USE SMUMPS_FAC_FRONT_AUX_M, 
+     &      ONLY : SMUMPS_UPDATE_MINMAX_PIVOT 
+      IMPLICIT NONE
+      INTEGER, intent (in)    :: BLOCK_SIZE, NPROW, NPCOL,
+     &                           LOCAL_M, LOCAL_N, N, SYM
+      INTEGER, intent (in)    :: MYROW, MYCOL, MYID, IPIV(LOCAL_M)
+      REAL, intent(in) :: A(*)
+      REAL, INTENT(INOUT) :: DKEEP(230)
+      INTEGER, INTENT(IN) :: KEEP(500)
+      INTEGER  I,IMX,DI,NBLOCK,IBLOCK,ILOC,JLOC,
+     &         ROW_PROC,COL_PROC, K
+      REAL :: ABSPIVOT
+      DI = LOCAL_M + 1 
+      NBLOCK = ( N - 1 ) / BLOCK_SIZE
+      DO IBLOCK = 0, NBLOCK
+        ROW_PROC = mod( IBLOCK, NPROW ) 
+        IF ( MYROW.EQ.ROW_PROC ) THEN
+          COL_PROC = mod( IBLOCK, NPCOL )
+          IF ( MYCOL.EQ.COL_PROC ) THEN
+            ILOC = ( IBLOCK / NPROW ) * BLOCK_SIZE
+            JLOC = ( IBLOCK / NPCOL ) * BLOCK_SIZE
+            I   =   ILOC + JLOC *  LOCAL_M + 1
+            IMX = min(ILOC+BLOCK_SIZE,LOCAL_M)
+     &            + (min(JLOC+BLOCK_SIZE,LOCAL_N)-1)*LOCAL_M
+     &            + 1
+            K=1
+            DO WHILE ( I .LT. IMX )
+             IF (SYM.NE.1) THEN
+              ABSPIVOT =  abs(A(I))
+             ELSE
+              ABSPIVOT =  abs(A(I)*A(I))
+             ENDIF
+             CALL SMUMPS_UPDATE_MINMAX_PIVOT 
+     &           ( ABSPIVOT,
+     &             DKEEP, KEEP, .FALSE.)
+              K = K + 1
+              I = I + DI
+            END DO
+          END IF
+        END IF
+      END DO
+      RETURN
+      END SUBROUTINE SMUMPS_PAR_ROOT_MINMAX_PIV_UPD

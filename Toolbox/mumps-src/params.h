@@ -17,3 +17,4 @@
 #define MAX_SEPS              255   /* max. number of separators */
 #define MIN_DOMAINS           100   /* min. number of domains in a decomp. */
 #define MAX_COARSENING_STEPS  10    /* max. number of generated dom. decomp. */
+

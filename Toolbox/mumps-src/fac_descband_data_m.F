@@ -1,14 +1,15 @@
 C
-C  This file is part of MUMPS 5.2.1, released
-C  on Fri Jun 14 14:46:05 UTC 2019
+C  This file is part of MUMPS 5.6.0, released
+C  on Wed Apr 19 15:50:57 UTC 2023
 C
 C
-C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license:
-C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+C  released under the CeCILL-C license 
+C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
        MODULE MUMPS_FAC_DESCBAND_DATA_M
        IMPLICIT NONE
@@ -104,10 +105,10 @@ C
        END SUBROUTINE MUMPS_FDBD_SAVE_DESCBAND
        SUBROUTINE MUMPS_FDBD_RETRIEVE_DESCBAND(IWHANDLER,DESCBAND_STRUC)
        INTEGER, INTENT(IN) :: IWHANDLER
-#if defined(MUMPS_F2003)
-       TYPE (DESCBAND_STRUC_T), POINTER, INTENT(OUT) :: DESCBAND_STRUC
-#else
+#if defined(MUMPS_NOF2003)
        TYPE (DESCBAND_STRUC_T), POINTER :: DESCBAND_STRUC
+#else
+       TYPE (DESCBAND_STRUC_T), POINTER, INTENT(OUT) :: DESCBAND_STRUC
 #endif
        DESCBAND_STRUC => FDBD_ARRAY(IWHANDLER)
        RETURN

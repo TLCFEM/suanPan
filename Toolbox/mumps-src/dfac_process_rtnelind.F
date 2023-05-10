@@ -1,14 +1,15 @@
 C
-C  This file is part of MUMPS 5.2.1, released
-C  on Fri Jun 14 14:46:05 UTC 2019
+C  This file is part of MUMPS 5.6.0, released
+C  on Wed Apr 19 15:50:57 UTC 2023
 C
 C
-C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license:
-C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+C  released under the CeCILL-C license 
+C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
       SUBROUTINE DMUMPS_PROCESS_RTNELIND( ROOT, 
      &    INODE, NELIM, NSLAVES, ROW_LIST,
@@ -62,7 +63,8 @@ C
       IROOT        = KEEP(38)
       NSTK_S(STEP(IROOT))= NSTK_S(STEP(IROOT)) - 1
       KEEP(42) = KEEP(42) + NELIM
-      TYPE_INODE= MUMPS_TYPENODE(PROCNODE_STEPS(STEP(INODE)), SLAVEF)
+      TYPE_INODE= MUMPS_TYPENODE( PROCNODE_STEPS(STEP(INODE)),
+     &                            KEEP(199) )
       IF (TYPE_INODE.EQ.1) THEN 
         IF (NELIM.EQ.0) THEN
          KEEP(41) = KEEP(41) + 1
@@ -86,7 +88,7 @@ C
      &   LRLU, IPTRLU,IWPOS,IWPOSCB, SLAVEF, PROCNODE_STEPS, DAD,
      &   PTRIST,PTRAST,STEP, PIMASTER, PAMASTER,
      &   NOINT, NOREAL, INODE, S_NOTFREE, .TRUE.,
-     &   COMP, LRLUS, IFLAG, IERROR
+     &   COMP, LRLUS, KEEP8(67), IFLAG, IERROR
      &      )
        IF ( IFLAG .LT. 0 ) THEN
          WRITE(*,*) ' Failure in int space allocation in CB area ',
@@ -114,7 +116,8 @@ C
       ENDIF
       IF (NSTK_S(STEP(IROOT)) .EQ. 0 ) THEN
           CALL DMUMPS_INSERT_POOL_N(N, IPOOL, LPOOL, PROCNODE_STEPS,
-     &         SLAVEF, KEEP(28), KEEP(76), KEEP(80), KEEP(47),
+     &         SLAVEF, KEEP(199),
+     &         KEEP(28), KEEP(76), KEEP(80), KEEP(47),
      &         STEP, IROOT )
           IF (KEEP(47) .GE. 3) THEN
              CALL DMUMPS_LOAD_POOL_UPD_NEW_POOL(

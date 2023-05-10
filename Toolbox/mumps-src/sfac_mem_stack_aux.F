@@ -1,32 +1,44 @@
 C
-C  This file is part of MUMPS 5.2.1, released
-C  on Fri Jun 14 14:46:05 UTC 2019
+C  This file is part of MUMPS 5.6.0, released
+C  on Wed Apr 19 15:50:57 UTC 2023
 C
 C
-C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license:
-C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+C  released under the CeCILL-C license 
+C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
-      SUBROUTINE SMUMPS_COMPACT_FACTORS(A, LDA, NPIV, NBROW, K50,
-     &           SIZEA )
+      SUBROUTINE SMUMPS_COMPACT_FACTORS(A, LDA, NPIV, NBROW, KEEP,
+     &           SIZEA, IW )
       IMPLICIT NONE
-      INTEGER LDA, NPIV, NBROW, K50
+      INTEGER,    INTENT(IN) :: LDA, NPIV, NBROW
       INTEGER(8), INTENT(IN) :: SIZEA
-      REAL A(SIZEA)
+      INTEGER, INTENT(IN) :: IW( NPIV )
+      INTEGER :: KEEP(500)
+      REAL :: A(SIZEA)
       INTEGER(8) :: IOLD, INEW, J8
       INTEGER I , ILAST
       INTEGER NBROW_L_RECTANGLE_TO_MOVE
-      IF ((NPIV.EQ.0).OR.(LDA.EQ.NPIV)) GOTO 500
-      IF ( K50.NE.0 ) THEN
-        IOLD = int(LDA  + 1,8)
-        INEW = int(NPIV + 1,8)
-        IF (IOLD .EQ. INEW ) THEN
-          INEW = INEW + int(NPIV,8) * int(NPIV - 1,8)
-          IOLD = IOLD + int(LDA,8) * int(NPIV - 1,8)
-        ELSE
+      INTEGER :: ICOL_BEG, ICOL_END, NBPANELS, NB_TARGET
+      INTEGER :: NBCOLS_PANEL, NBROWS_PANEL
+      IF ( NPIV .EQ. 0 ) GOTO 500
+      NB_TARGET = NPIV
+      IF ( KEEP(459) .GT. 1 .AND. KEEP(50) .NE. 0 ) THEN
+        CALL MUMPS_LDLTPANEL_NBTARGET( NPIV, NB_TARGET, KEEP )
+      ENDIF
+      IF ( KEEP(50) .EQ.0 .OR. NB_TARGET .EQ. NPIV ) THEN
+        IF (LDA.EQ.NPIV) GOTO 500
+        IF ( KEEP(50) .NE. 0 ) THEN
+          IOLD = int(LDA  + 1,8)
+          INEW = int(NPIV + 1,8)
+          IF (IOLD .EQ. INEW ) THEN
+            WRITE(*,*) " Internal error in SMUMPS_COMPACT_FACTORS",
+     &      IOLD, INEW, NPIV
+            CALL MUMPS_ABORT()
+          ENDIF
           DO I = 1, NPIV - 1
             IF ( I .LE. NPIV-2 ) THEN
               ILAST = I+1
@@ -39,12 +51,39 @@ C
             INEW = INEW + int(NPIV,8)
             IOLD = IOLD + int(LDA,8)
           END DO
+          NBROW_L_RECTANGLE_TO_MOVE = NBROW
+        ELSE 
+          INEW = 1_8 + int(NPIV,8) * int(LDA + 1,8)
+          IOLD = 1_8 + int(LDA,8) * int(NPIV +1,8)
+          NBROW_L_RECTANGLE_TO_MOVE = NBROW - 1
         ENDIF
+      ELSE
+        ICOL_BEG = 1               
+        NBPANELS  = 0
+        INEW = 1_8
+        NBROWS_PANEL = NPIV
+        DO WHILE ( ICOL_BEG .LE. NPIV )
+          NBPANELS=NBPANELS + 1
+          ICOL_END = min(NB_TARGET * NBPANELS, NPIV)
+          IF ( IW( ICOL_END ) < 0 ) THEN 
+            ICOL_END = ICOL_END + 1
+          ENDIF
+          NBCOLS_PANEL = ICOL_END - ICOL_BEG + 1
+          IOLD = int(ICOL_BEG-1,8) * int(LDA,8) + int(ICOL_BEG,8)
+          DO I =1, NBROWS_PANEL
+            IF (IOLD .NE. INEW) THEN
+              DO J8=0, min(I+1, NBCOLS_PANEL)-1 
+              A(INEW+J8) = A(IOLD+J8)
+              ENDDO
+            ENDIF
+            INEW = INEW + int(NBCOLS_PANEL,8)
+            IOLD = IOLD + int(LDA,8)
+          ENDDO
+          NBROWS_PANEL = NBROWS_PANEL - NBCOLS_PANEL
+          ICOL_BEG = ICOL_END + 1
+        ENDDO
+        IOLD = 1_8 + int(LDA,8)*int(NPIV,8)
         NBROW_L_RECTANGLE_TO_MOVE = NBROW
-      ELSE 
-        INEW = 1_8 + int(NPIV,8) * int(LDA + 1,8)
-        IOLD = 1_8 + int(LDA,8) * int(NPIV +1,8)
-        NBROW_L_RECTANGLE_TO_MOVE = NBROW - 1
       ENDIF
       DO I = 1, NBROW_L_RECTANGLE_TO_MOVE
          DO J8 = 0_8, int(NPIV - 1,8)
@@ -173,10 +212,10 @@ C
       APOS_ini = POSELT + int(NPIV+NBROW_SEND,8)* LDA8 + int(NPIV,8)
 !$OMP PARALLEL DO PRIVATE(J, NPOS, APOS) IF (NBROW_STACK > KEEP(360))
       DO I = 1, NBROW_STACK
-         IF (PACKED_CB) THEN
+        IF (PACKED_CB) THEN
             NPOS = NPOS_ini + int(I-1,8) * int(I,8)/2_8 +
      &             int(I-1,8) * int(NBROW_SEND,8)
-         ELSE
+        ELSE
             NPOS = NPOS_ini + int(I-1,8) * int(NBCOL_STACK,8)
         ENDIF
         APOS  =  APOS_ini + int(I-1,8) * LDA8

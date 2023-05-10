@@ -1,14 +1,15 @@
 C
-C  This file is part of MUMPS 5.2.1, released
-C  on Fri Jun 14 14:46:05 UTC 2019
+C  This file is part of MUMPS 5.6.0, released
+C  on Wed Apr 19 15:50:57 UTC 2023
 C
 C
-C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license:
-C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+C  released under the CeCILL-C license 
+C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
       SUBROUTINE DMUMPS_FREE_BLOCK_CB_STATIC(
      &       SSARBR, MYID, N, IPOSBLOCK,
@@ -16,6 +17,7 @@ C
      &       LRLU, LRLUS, IPTRLU,
      &       IWPOSCB, LA, KEEP, KEEP8, IN_PLACE_STATS
      &     )
+!$    USE OMP_LIB
       USE DMUMPS_LOAD
       IMPLICIT NONE
       INTEGER IPOSBLOCK,
@@ -27,11 +29,9 @@ C
       INTEGER MYID
       LOGICAL SSARBR
       INTEGER SIZFI_BLOCK, SIZFI
-      INTEGER IPOSSHIFT
       INTEGER(8) :: SIZFR, SIZFR_BLOCK, SIZFR_BLOCK_EFF,
      &              SIZEHOLE, MEM_INC, DYNSIZE_BLOCK
       INCLUDE 'mumps_headers.h'
-      IPOSSHIFT = IPOSBLOCK + KEEP(IXSZ)
       SIZFI_BLOCK=IW(IPOSBLOCK+XXI)
       CALL MUMPS_GETI8( SIZFR_BLOCK, IW(IPOSBLOCK+XXR) )
       CALL MUMPS_GETI8( DYNSIZE_BLOCK,IW(IPOSBLOCK+XXD) )
@@ -47,8 +47,14 @@ C
         SIZFR_BLOCK_EFF = SIZFR_BLOCK - SIZEHOLE
       ENDIF
       IF (.NOT. IN_PLACE_STATS) THEN
-           LRLUS   = LRLUS + SIZFR_BLOCK_EFF
+         LRLUS   = LRLUS + SIZFR_BLOCK_EFF
+         IF (KEEP(405) .EQ. 0) THEN
            KEEP8(69) = KEEP8(69) - SIZFR_BLOCK_EFF
+         ELSE
+!$OMP      ATOMIC UPDATE
+           KEEP8(69) = KEEP8(69) - SIZFR_BLOCK_EFF
+!$OMP      END ATOMIC
+         ENDIF
       ENDIF
       IF ( IPOSBLOCK .eq. IWPOSCB + 1 ) THEN
          IPTRLU  = IPTRLU  + SIZFR_BLOCK
@@ -61,7 +67,6 @@ C
          CALL DMUMPS_LOAD_MEM_UPDATE(SSARBR,.FALSE.,
      &         LA-LRLUS,0_8,MEM_INC,KEEP,KEEP8,LRLUS)
  90      IF ( IWPOSCB .eq. LIW ) GO TO 100
-         IPOSSHIFT = IWPOSCB + KEEP(IXSZ)
          SIZFI = IW( IWPOSCB+1+XXI )
          CALL MUMPS_GETI8( SIZFR, IW(IWPOSCB+1+XXR) )
          IF ( IW( IWPOSCB+1+XXS ) .EQ. S_FREE ) THEN

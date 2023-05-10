@@ -1,21 +1,22 @@
 C
-C  This file is part of MUMPS 5.2.1, released
-C  on Fri Jun 14 14:46:05 UTC 2019
+C  This file is part of MUMPS 5.6.0, released
+C  on Wed Apr 19 15:50:57 UTC 2023
 C
 C
-C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license:
-C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+C  released under the CeCILL-C license 
+C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
-      SUBROUTINE MUMPS_SET_ORDERING(N, SYM, NPROCS, IORD,
-     &                       symmetry, NBQD, AvgDens,
+      SUBROUTINE MUMPS_SET_ORDERING(N, KEEP, SYM, NPROCS, IORD,
+     &                       NBQD, AvgDens,
      &                       PROK, MP)
       IMPLICIT NONE
-      INTEGER, intent(in)    :: N, NPROCS, SYM
-      INTEGER, intent(in)    :: symmetry, NBQD, AvgDens, MP
+      INTEGER, intent(in)    :: N, KEEP(500), NPROCS, SYM
+      INTEGER, intent(in)    :: NBQD, AvgDens, MP
       LOGICAL, intent(in)    :: PROK
       INTEGER, intent(inout) :: IORD
       INTEGER MAXQD
@@ -43,6 +44,11 @@ C
         IORD = 7
       END IF
 #endif
+      IF (IORD.EQ.4.AND.N.EQ.1) THEN
+        IF (PROK) WRITE(MP,*)
+     &  'WARNING: PORD not available for matrices of order 1'
+       IORD=0
+      ENDIF
       IF (IORD.EQ.7) THEN
         IF (SYM.NE.0) THEN
           IF ( N.LE.SMALLSYM ) THEN 
@@ -90,5 +96,6 @@ C
           ENDIF
         ENDIF
       ENDIF
+      IF (IORD.EQ.4.AND.N.EQ.1) IORD=0
       RETURN
       END SUBROUTINE MUMPS_SET_ORDERING

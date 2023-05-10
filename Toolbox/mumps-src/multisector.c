@@ -61,230 +61,246 @@ Methods in lib/multisector.c:
 
 #include "space.h"
 
+
 /*****************************************************************************
 ******************************************************************************/
-multisector_t* newMultisector(graph_t* G) {
-	multisector_t* ms;
+multisector_t*
+newMultisector(graph_t *G)
+{ multisector_t *ms;
 
-	mymalloc(ms, 1, multisector_t);
-	mymalloc(ms->stage, G->nvtx, PORD_INT);
+  mymalloc(ms, 1, multisector_t);
+  mymalloc(ms->stage, G->nvtx, PORD_INT);
 
-	ms->G = G;
-	ms->nstages = 0;
-	ms->nnodes = 0;
-	ms->totmswght = 0;
+  ms->G = G;
+  ms->nstages = 0;
+  ms->nnodes = 0;
+  ms->totmswght = 0;
 
-	return (ms);
+  return(ms);
 }
 
+
 /*****************************************************************************
 ******************************************************************************/
-void freeMultisector(multisector_t* ms) {
-	free(ms->stage);
-	free(ms);
+void
+freeMultisector(multisector_t *ms)
+{
+  free(ms->stage);
+  free(ms);
 }
 
+
 /*****************************************************************************
 ******************************************************************************/
-multisector_t* trivialMultisector(graph_t* G) {
-	multisector_t* ms;
-	PORD_INT *stage, nvtx, u;
+multisector_t*
+trivialMultisector(graph_t *G)
+{ multisector_t *ms;
+  PORD_INT           *stage, nvtx, u;
+  
+  /* ----------------------------------------------------------------- 
+     allocate memory for the multisector object and init. stage vector
+     ----------------------------------------------------------------- */
+  nvtx = G->nvtx;
+  ms = newMultisector(G);
+  stage = ms->stage;
 
-	/* ----------------------------------------------------------------- 
-	   allocate memory for the multisector object and init. stage vector
-	   ----------------------------------------------------------------- */
-	nvtx = G->nvtx;
-	ms = newMultisector(G);
-	stage = ms->stage;
+  for (u = 0; u < nvtx; u++)
+    stage[u] = 0;                      /* no vertex belongs to a separator */
 
-	for(u = 0; u < nvtx; u++) stage[u] = 0; /* no vertex belongs to a separator */
+  /* -------------------------------
+     finalize the multisector object
+     ------------------------------- */
+  ms->nstages = 1;
+  ms->nnodes = 0;
+  ms->totmswght = 0;
 
-	/* -------------------------------
-	   finalize the multisector object
-	   ------------------------------- */
-	ms->nstages = 1;
-	ms->nnodes = 0;
-	ms->totmswght = 0;
-
-	return (ms);
+  return(ms);
 }
 
+
 /*****************************************************************************
 ******************************************************************************/
-multisector_t* constructMultisector(graph_t* G, options_t* options, timings_t* cpus) {
-	multisector_t* ms;
-	nestdiss_t* ndroot;
-	PORD_INT *map, nvtx, ordtype;
+multisector_t*
+constructMultisector(graph_t *G, options_t* options, timings_t *cpus)
+{ multisector_t *ms;
+  nestdiss_t    *ndroot;
+  PORD_INT           *map, nvtx, ordtype;
 
-	nvtx = G->nvtx;
+  nvtx = G->nvtx;
 
-	/* ------------------------------
-	   check number of nodes in graph
-	   ------------------------------ */
-	/* -----------------------------------
-	   JY: inserted the condition
-	   "&& (options[OPTION_MSGLVL] > 0)"
-	   below, to avoid systematic printing
-	   ----------------------------------- */
-	if((nvtx <= MIN_NODES) && (options[OPTION_ORDTYPE] != MINIMUM_PRIORITY)
-		&& (options[OPTION_MSGLVL] > 0)) {
-		printf("\nWarning in constructMultisector\n"
-		       "  graph has less than %d nodes, skipping separator construction\n\n",
-		       MIN_NODES);
-		options[OPTION_ORDTYPE] = MINIMUM_PRIORITY;
-	}
-	/* --------------------------------------------------------
-	   determine the multisector according to the ordering type
-	   -------------------------------------------------------- */
-	ordtype = options[OPTION_ORDTYPE];
-	switch(ordtype) {
-	case MINIMUM_PRIORITY:
-		ms = trivialMultisector(G);
-		break;
+  /* ------------------------------
+     check number of nodes in graph
+     ------------------------------ */
+  /* -----------------------------------
+     JY: inserted the condition
+     "&& (options[OPTION_MSGLVL] > 0)"
+     below, to avoid systematic printing
+     ----------------------------------- */
+    if ((nvtx <= MIN_NODES) && (options[OPTION_ORDTYPE] != MINIMUM_PRIORITY)
+        && (options[OPTION_MSGLVL] > 0))
+   { printf("\nWarning in constructMultisector\n"
+         "  graph has less than %d nodes, skipping separator construction\n\n",
+         MIN_NODES);
+     options[OPTION_ORDTYPE] = MINIMUM_PRIORITY;
+   }
+  /* --------------------------------------------------------
+     determine the multisector according to the ordering type
+     -------------------------------------------------------- */
+  ordtype = options[OPTION_ORDTYPE];
+   switch(ordtype)
+   { case MINIMUM_PRIORITY:
+       ms = trivialMultisector(G);
+       break;
 
-	case INCOMPLETE_ND:
-	case MULTISECTION:
-	case TRISTAGE_MULTISECTION:
-		mymalloc(map, nvtx, PORD_INT);
-		ndroot = setupNDroot(G, map);
-		buildNDtree(ndroot, options, cpus);
-		if(ordtype == MULTISECTION) ms = extractMS2stage(ndroot);
-		else ms = extractMSmultistage(ndroot);
-		freeNDtree(ndroot);
-		freeNDnode(ndroot);
-		free(map);
-		break;
+     case INCOMPLETE_ND:
+     case MULTISECTION:
+     case TRISTAGE_MULTISECTION:
+       mymalloc(map, nvtx, PORD_INT);
+       ndroot = setupNDroot(G, map);
+       buildNDtree(ndroot, options, cpus);
+       if (ordtype == MULTISECTION)
+         ms = extractMS2stage(ndroot);
+       else
+         ms = extractMSmultistage(ndroot);
+       freeNDtree(ndroot);
+       freeNDnode(ndroot);
+       free(map);
+       break;
 
-	default:
-		fprintf(stderr, "\nError in function constructMultisector\n"
-		        "  unrecognized ordering type %d\n", ordtype);
-		quit();
-	}
-	return (ms);
+     default:
+       fprintf(stderr, "\nError in function constructMultisector\n"
+            "  unrecognized ordering type %d\n", ordtype);
+       quit();
+   }
+  return(ms);
 }
 
+  
 /*****************************************************************************
 ******************************************************************************/
-multisector_t* extractMS2stage(nestdiss_t* ndroot) {
-	multisector_t* ms;
-	nestdiss_t *nd, *parent;
-	PORD_INT *stage, *intvertex, *intcolor;
-	PORD_INT nvint, nnodes, totmswght, i;
+multisector_t*
+extractMS2stage(nestdiss_t *ndroot)
+{ multisector_t *ms;
+  nestdiss_t    *nd, *parent;
+  PORD_INT           *stage, *intvertex, *intcolor;
+  PORD_INT           nvint, nnodes, totmswght, i;
 
-	/* ----------------------------------------------------------------- 
-	   allocate memory for the multisector object and init. stage vector
-	   ----------------------------------------------------------------- */
-	ms = trivialMultisector(ndroot->G);
-	stage = ms->stage;
+  /* ----------------------------------------------------------------- 
+     allocate memory for the multisector object and init. stage vector
+     ----------------------------------------------------------------- */
+  ms = trivialMultisector(ndroot->G);
+  stage = ms->stage;
 
-	/* ------------------------------------------------------------
-	   extract the stages of the separator vertices:
-	   stage[u] = 1, iff u belongs to a separator
-	   ------------------------------------------------------------ */
-	nnodes = totmswght = 0;
-	for(nd = ndroot; nd->childB != NULL; nd = nd->childB);
-	while(nd != ndroot) {
-		parent = nd->parent;
-		if((parent == NULL) || (parent->childB == NULL)
-			|| (parent->childW == NULL)) {
-			fprintf(stderr, "\nError in function extractMS2stage\n"
-			        "  nested dissection tree corrupted\n");
-			quit();
-		}
-		if(parent->childB == nd) /* left subtree of parent visited */
-			for(nd = parent->childW; nd->childB != NULL; nd = nd->childB);
-		else /* right subtree of parent visited */
-		{
-			nd = parent; /* extract the separator of parent */
-			totmswght += nd->cwght[GRAY];
-			nvint = nd->nvint;
-			intvertex = nd->intvertex;
-			intcolor = nd->intcolor;
-			for(i = 0; i < nvint; i++)
-				if(intcolor[i] == GRAY) {
-					nnodes++;
-					stage[intvertex[i]] = 1;
-				}
-		}
-	}
+  /* ------------------------------------------------------------
+     extract the stages of the separator vertices:
+     stage[u] = 1, iff u belongs to a separator
+     ------------------------------------------------------------ */
+  nnodes = totmswght = 0;
+  for (nd = ndroot; nd->childB != NULL; nd = nd->childB);
+  while (nd != ndroot)
+   { parent = nd->parent;
+     if ((parent == NULL) || (parent->childB == NULL)
+        || (parent->childW == NULL))
+       { fprintf(stderr, "\nError in function extractMS2stage\n"
+              "  nested dissection tree corrupted\n");
+         quit();
+       }
+      if (parent->childB == nd)        /* left subtree of parent visited */
+        for (nd = parent->childW; nd->childB != NULL; nd = nd->childB);
+      else                             /* right subtree of parent visited */
+       { nd = parent;                  /* extract the separator of parent */
+         totmswght += nd->cwght[GRAY];
+         nvint = nd->nvint;
+         intvertex = nd->intvertex;
+         intcolor = nd->intcolor;
+         for (i = 0; i < nvint; i++)
+           if (intcolor[i] == GRAY)
+            { nnodes++;
+              stage[intvertex[i]] = 1;
+            }
+       }
+   }
 
-	/* ------------------------------------------
-	   finalize the multisector object and return
-	   ------------------------------------------ */
-	ms->nstages = 2;
-	ms->nnodes = nnodes;
-	ms->totmswght = totmswght;
+  /* ------------------------------------------
+     finalize the multisector object and return
+     ------------------------------------------ */
+  ms->nstages = 2;
+  ms->nnodes = nnodes;
+  ms->totmswght = totmswght;
 
-	return (ms);
+  return(ms);
 }
 
+  
 /*****************************************************************************
 ******************************************************************************/
-multisector_t* extractMSmultistage(nestdiss_t* ndroot) {
-	multisector_t* ms;
-	nestdiss_t *nd, *parent;
-	PORD_INT *stage, *intvertex, *intcolor;
-	PORD_INT nvtx, nvint, maxstage, istage, nnodes, totmswght, i, u;
+multisector_t*
+extractMSmultistage(nestdiss_t *ndroot)
+{ multisector_t *ms;
+  nestdiss_t    *nd, *parent;
+  PORD_INT           *stage, *intvertex, *intcolor;
+  PORD_INT           nvtx, nvint, maxstage, istage, nnodes, totmswght, i, u;
 
-	/* -----------------------------------------------------------------
-	   allocate memory for the multisector object and init. stage vector
-	   ----------------------------------------------------------------- */
-	ms = trivialMultisector(ndroot->G);
-	stage = ms->stage;
+  /* -----------------------------------------------------------------
+     allocate memory for the multisector object and init. stage vector
+     ----------------------------------------------------------------- */
+  ms = trivialMultisector(ndroot->G);
+  stage = ms->stage;
 
-	/* ------------------------------------------------------------
-	   extract the stages of the separator vertices:
-	   stage[u] = i, i>0, iff u belongs to a separator in depth i-1
-	   ------------------------------------------------------------ */
-	maxstage = nnodes = totmswght = 0;
-	for(nd = ndroot; nd->childB != NULL; nd = nd->childB);
-	while(nd != ndroot) {
-		parent = nd->parent;
-		if((parent == NULL) || (parent->childB == NULL)
-			|| (parent->childW == NULL)) {
-			fprintf(stderr, "\nError in function extractMSmultistage\n"
-			        "  nested dissection tree corrupted\n");
-			quit();
-		}
-		if(parent->childB == nd) /* left subtree of parent visited */
-			for(nd = parent->childW; nd->childB != NULL; nd = nd->childB);
-		else /* right subtree of parent visited */
-		{
-			nd = parent;            /* extract the separator of parent */
-			istage = nd->depth + 1; /* sep. vertices belong to this stage */
-			maxstage = max(maxstage, istage);
-			totmswght += nd->cwght[GRAY];
-			nvint = nd->nvint;
-			intvertex = nd->intvertex;
-			intcolor = nd->intcolor;
-			for(i = 0; i < nvint; i++)
-				if(intcolor[i] == GRAY) {
-					nnodes++;
-					stage[intvertex[i]] = istage;
-				}
-		}
-	}
+  /* ------------------------------------------------------------
+     extract the stages of the separator vertices:
+     stage[u] = i, i>0, iff u belongs to a separator in depth i-1
+     ------------------------------------------------------------ */
+  maxstage = nnodes = totmswght = 0;
+  for (nd = ndroot; nd->childB != NULL; nd = nd->childB);
+  while (nd != ndroot)
+   { parent = nd->parent;
+     if ((parent == NULL) || (parent->childB == NULL)
+        || (parent->childW == NULL))
+       { fprintf(stderr, "\nError in function extractMSmultistage\n"
+              "  nested dissection tree corrupted\n");
+         quit();
+       }
+      if (parent->childB == nd)        /* left subtree of parent visited */
+        for (nd = parent->childW; nd->childB != NULL; nd = nd->childB);
+      else                             /* right subtree of parent visited */
+       { nd = parent;                  /* extract the separator of parent */
+         istage = nd->depth + 1;       /* sep. vertices belong to this stage */
+         maxstage = max(maxstage, istage);
+         totmswght += nd->cwght[GRAY];
+         nvint = nd->nvint;
+         intvertex = nd->intvertex;
+         intcolor = nd->intcolor;
+         for (i = 0; i < nvint; i++)
+           if (intcolor[i] == GRAY)
+            { nnodes++;
+              stage[intvertex[i]] = istage;
+            }
+       }
+   }
 
-	/* --------------------------------------------------------------------
-	   we have: stage[u] = 0 => u belongs to a domain
-	            stage[u] = 1 => u belongs to the root separator (depth = 0)
-	               :
-	            stage[u] = maxstage => u belongs to a leaf separator
-	   but we must eliminate the separators in a bottom-up fashion; we like
-	   to have: stage[u] = 0 => u belongs to a domain
-	            stage[u] = 1 => u belongs to a leaf separator
-	               :
-	            stage[u] = maxstage => u belongs to the root separator
-	   -------------------------------------------------------------------- */
-	nvtx = ndroot->G->nvtx;
-	for(u = 0; u < nvtx; u++) if(stage[u] > 0) stage[u] = maxstage - stage[u] + 1;
+  /* --------------------------------------------------------------------
+     we have: stage[u] = 0 => u belongs to a domain
+              stage[u] = 1 => u belongs to the root separator (depth = 0)
+                 :
+              stage[u] = maxstage => u belongs to a leaf separator
+     but we must eliminate the separators in a bottom-up fashion; we like
+     to have: stage[u] = 0 => u belongs to a domain
+              stage[u] = 1 => u belongs to a leaf separator
+                 :
+              stage[u] = maxstage => u belongs to the root separator
+     -------------------------------------------------------------------- */
+  nvtx = ndroot->G->nvtx;
+  for (u = 0; u < nvtx; u++)
+    if (stage[u] > 0)
+      stage[u] = maxstage - stage[u] + 1;
 
-	/* ------------------------------------------
-	   finalize the multisector object and return
-	   ------------------------------------------ */
-	ms->nstages = maxstage + 1;
-	ms->nnodes = nnodes;
-	ms->totmswght = totmswght;
+  /* ------------------------------------------
+     finalize the multisector object and return
+     ------------------------------------------ */
+  ms->nstages = maxstage + 1;
+  ms->nnodes = nnodes;
+  ms->totmswght = totmswght;
 
-	return (ms);
+  return(ms);
 }

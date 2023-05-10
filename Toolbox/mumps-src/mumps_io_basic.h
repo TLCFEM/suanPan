@@ -1,15 +1,16 @@
 /*
  *
- *  This file is part of MUMPS 5.2.1, released
- *  on Fri Jun 14 14:46:05 UTC 2019
+ *  This file is part of MUMPS 5.6.0, released
+ *  on Wed Apr 19 15:50:57 UTC 2023
  *
  *
- *  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+ *  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
  *  Mumps Technologies, University of Bordeaux.
  *
  *  This version of MUMPS is provided to you free of charge. It is
- *  released under the CeCILL-C license:
- *  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+ *  released under the CeCILL-C license 
+ *  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+ *  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
  *
  */
 #ifndef MUMPS_IO_BASIC_H
@@ -33,7 +34,6 @@
 # endif
 #endif
 #define MAX_FILE_SIZE 1879048192 /* (2^31)-1-(2^27) */
-/* #define MAX_FILE_SIZE 1000000 */ /* (2^31)-1-(2^27) */
 /*                                                      */
 /* Important Note :                                     */
 /* ================                                     */
@@ -74,35 +74,32 @@
 #endif
 /* #define NB_FILE_TYPE_FACTO 1 */
 /* #define NB_FILE_TYPE_SOLVE 1 */
-#define my_max(x,y) ( (x) > (y) ? (x) : (y) )
+#define my_max(x,y) ( (x) > (y) ? (x) : (y) ) 
 #define my_ceil(x) ( (MUMPS_INT)(x) >= (x) ? (MUMPS_INT)(x) : ( (MUMPS_INT)(x) + 1 ) )
-
-typedef struct __mumps_file_struct {
-	MUMPS_INT write_pos;
-	MUMPS_INT current_pos;
-	MUMPS_INT is_opened;
+typedef struct __mumps_file_struct{
+  MUMPS_INT write_pos;
+  MUMPS_INT current_pos;
+  MUMPS_INT is_opened;
 #if ! defined (MUMPS_WIN32)
   MUMPS_INT file;
 #else
-	FILE* file;
+  FILE* file;
 #endif
-	char name[351]; /* Should be large enough to hold tmpdir, prefix, suffix */
-} mumps_file_struct;
-
-typedef struct __mumps_file_type {
+  char name[351]; /* Should be large enough to hold tmpdir, prefix, suffix */
+}mumps_file_struct;
+typedef struct __mumps_file_type{
 #if ! defined (MUMPS_WIN32)
   MUMPS_INT mumps_flag_open;
 #else
-	char mumps_flag_open[6];
+  char mumps_flag_open[6];
 #endif
-	MUMPS_INT mumps_io_current_file_number;
-	MUMPS_INT mumps_io_last_file_opened;
-	MUMPS_INT mumps_io_nb_file_opened;
-	MUMPS_INT mumps_io_nb_file;
-	mumps_file_struct* mumps_io_pfile_pointer_array;
-	mumps_file_struct* mumps_io_current_file;
-} mumps_file_type;
-
+  MUMPS_INT mumps_io_current_file_number;
+  MUMPS_INT mumps_io_last_file_opened;
+  MUMPS_INT mumps_io_nb_file_opened;
+  MUMPS_INT mumps_io_nb_file;
+  mumps_file_struct* mumps_io_pfile_pointer_array;
+  mumps_file_struct* mumps_io_current_file;
+}mumps_file_type;
 /* Exported global variables */
 #if ! defined (MUMPS_WIN32)
 # if defined (WITH_PFUNC) && ! defined (WITHOUT_PTHREAD)
@@ -138,40 +135,40 @@ extern MUMPS_INT mumps_io_nb_file_type;
 /* Exported functions */
 MUMPS_INT mumps_set_file(MUMPS_INT type,MUMPS_INT file_number_arg);
 void mumps_update_current_file_position(mumps_file_struct* file_arg);
-MUMPS_INT mumps_compute_where_to_write(const double to_be_written, const MUMPS_INT type, long long vaddr, size_t already_written);
-MUMPS_INT mumps_prepare_pointers_for_write(double to_be_written,MUMPS_INT* pos_in_file, MUMPS_INT* file_number, const MUMPS_INT type, long long vaddr, size_t already_written);
-MUMPS_INT mumps_io_do_write_block(void* address_block, long long block_size,MUMPS_INT* type, long long vaddr,MUMPS_INT* ierr);
-MUMPS_INT mumps_io_do_read_block(void* address_block, long long block_size,MUMPS_INT* type, long long vaddr,MUMPS_INT* ierr);
-MUMPS_INT mumps_compute_nb_concerned_files(long long block_size,MUMPS_INT* nb_concerned_files, long long vaddr);
-MUMPS_INLINE MUMPS_INT mumps_gen_file_info(long long vaddr, MUMPS_INT* pos, MUMPS_INT* file);
+MUMPS_INT mumps_compute_where_to_write(const double to_be_written,const MUMPS_INT type,long long vaddr,size_t already_written);
+MUMPS_INT mumps_prepare_pointers_for_write(double to_be_written,MUMPS_INT * pos_in_file, MUMPS_INT * file_number,const MUMPS_INT type,long long vaddr,size_t already_written);
+MUMPS_INT mumps_io_do_write_block(void * address_block,long long block_size,MUMPS_INT * type,long long vaddr,MUMPS_INT * ierr);
+MUMPS_INT mumps_io_do_read_block(void * address_block,long long block_size,MUMPS_INT * type,long long vaddr,MUMPS_INT * ierr);
+MUMPS_INT mumps_compute_nb_concerned_files(long long block_size,MUMPS_INT * nb_concerned_files,long long vaddr);
+MUMPS_INLINE MUMPS_INT mumps_gen_file_info(long long vaddr, MUMPS_INT * pos, MUMPS_INT * file);
 MUMPS_INT mumps_free_file_pointers(MUMPS_INT* step);
-MUMPS_INT mumps_init_file_structure(MUMPS_INT* _myid, long long* total_size_io,MUMPS_INT* size_element,MUMPS_INT* nb_file_type,MUMPS_INT* flag_tab);
-MUMPS_INT mumps_init_file_name(char* mumps_dir, char* mumps_file,MUMPS_INT* mumps_dim_dir,MUMPS_INT* mumps_dim_file,MUMPS_INT* _myid);
+MUMPS_INT mumps_init_file_structure(MUMPS_INT *_myid, long long *total_size_io,MUMPS_INT *size_element,MUMPS_INT *nb_file_type,MUMPS_INT *flag_tab);
+MUMPS_INT mumps_init_file_name(char* mumps_dir,char* mumps_file,MUMPS_INT* mumps_dim_dir,MUMPS_INT* mumps_dim_file,MUMPS_INT* _myid);
 void mumps_io_init_file_struct(MUMPS_INT* nb,MUMPS_INT which);
 MUMPS_INT mumps_io_alloc_file_struct(MUMPS_INT* nb,MUMPS_INT which);
 MUMPS_INT mumps_io_get_nb_files(MUMPS_INT* nb_files, const MUMPS_INT* type);
-MUMPS_INT mumps_io_get_file_name(MUMPS_INT* indice, char* name,MUMPS_INT* length,MUMPS_INT* type);
-MUMPS_INT mumps_io_alloc_pointers(MUMPS_INT* nb_file_type, MUMPS_INT* dim);
+MUMPS_INT mumps_io_get_file_name(MUMPS_INT* indice,char* name,MUMPS_INT* length,MUMPS_INT* type);
+MUMPS_INT mumps_io_alloc_pointers(MUMPS_INT * nb_file_type, MUMPS_INT * dim);
 MUMPS_INT mumps_io_init_vars(MUMPS_INT* myid_arg,MUMPS_INT* size_element,MUMPS_INT* async_arg);
-MUMPS_INT mumps_io_set_file_name(MUMPS_INT* indice, char* name,MUMPS_INT* length,MUMPS_INT* type);
+MUMPS_INT mumps_io_set_file_name(MUMPS_INT* indice,char* name,MUMPS_INT* length,MUMPS_INT* type);
 MUMPS_INT mumps_io_open_files_for_read();
 MUMPS_INT mumps_io_set_last_file(MUMPS_INT* dim,MUMPS_INT* type);
-MUMPS_INT mumps_io_write__(void* file, void* loc_add, size_t write_size, MUMPS_INT where,MUMPS_INT type);
+MUMPS_INT mumps_io_write__(void *file, void *loc_add, size_t write_size, MUMPS_INT where,MUMPS_INT type);
 #if ! defined (MUMPS_WIN32)
 MUMPS_INT mumps_io_write_os_buff__(void *file, void *loc_add, size_t write_size, MUMPS_INT where);
 MUMPS_INT mumps_io_write_direct_io__(void *file, void *loc_addr, size_t write_size, MUMPS_INT where,MUMPS_INT type);
 MUMPS_INT mumps_io_flush_write__(MUMPS_INT type);
 #else
-MUMPS_INT mumps_io_write_win32__(void* file, void* loc_add, size_t write_size, MUMPS_INT where);
+MUMPS_INT mumps_io_write_win32__(void *file, void *loc_add, size_t write_size, MUMPS_INT where);
 #endif
-MUMPS_INT mumps_io_read__(void* file, void* loc_addr, size_t size,MUMPS_INT local_offset,MUMPS_INT type);
+MUMPS_INT mumps_io_read__(void * file,void * loc_addr,size_t size,MUMPS_INT local_offset,MUMPS_INT type);
 #if ! defined (MUMPS_WIN32)
 MUMPS_INT mumps_io_read_os_buff__(void * file,void * loc_addr,size_t size,MUMPS_INT local_offset);
 MUMPS_INT mumps_io_read_direct_io__(void * file,void * loc_addr,size_t size,MUMPS_INT local_offset,MUMPS_INT type);
 #else
-MUMPS_INT mumps_io_read_win32__(void* file, void* loc_addr, size_t size,MUMPS_INT local_offset);
+MUMPS_INT mumps_io_read_win32__(void * file,void * loc_addr,size_t size,MUMPS_INT local_offset);
 #endif
-MUMPS_INT mumps_compute_file_size(void* file, size_t* size);
+MUMPS_INT mumps_compute_file_size(void *file,size_t *size);
 #if ! defined (MUMPS_WIN32) && ! defined (WITHOUT_PTHREAD)
 # if defined (WITH_PFUNC)
 MUMPS_INT mumps_io_protect_pointers();
