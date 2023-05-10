@@ -1,15 +1,20 @@
 C
-C  This file is part of MUMPS 5.2.1, released
-C  on Fri Jun 14 14:46:05 UTC 2019
+C  This file is part of MUMPS 5.6.0, released
+C  on Wed Apr 19 15:50:57 UTC 2023
 C
 C
-C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license:
-C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+C  released under the CeCILL-C license 
+C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
+C
+C Note: the last routine of this file, xMUMPS_TRUNCATED_RRQR is derived from
+C the LAPACK package, for which BSD 3-clause license applies 
+C (see header of the routine).
       MODULE DMUMPS_LR_CORE
       USE MUMPS_LR_COMMON
       USE DMUMPS_LR_TYPE
@@ -18,35 +23,30 @@ C
 !$    USE OMP_LIB
       IMPLICIT NONE
       CONTAINS
-      SUBROUTINE INIT_LRB(LRB_OUT,K,KSVD,M,N,ISLR)
-        TYPE(LRB_TYPE), INTENT(OUT) :: LRB_OUT
-        INTEGER,INTENT(IN) :: K,KSVD,M,N
-        LOGICAL,INTENT(IN) :: ISLR
+      SUBROUTINE INIT_LRB(LRB_OUT,K,M,N,ISLR)
 C This routine simply initializes a LR block but does NOT allocate it
+C (allocation occurs somewhere else)
+        TYPE(LRB_TYPE), INTENT(OUT) :: LRB_OUT
+        INTEGER,INTENT(IN) :: K,M,N
+        LOGICAL,INTENT(IN) :: ISLR
         LRB_OUT%M = M
         LRB_OUT%N = N
         LRB_OUT%K = K
-        LRB_OUT%KSVD = KSVD
         LRB_OUT%ISLR = ISLR
         NULLIFY(LRB_OUT%Q)
         NULLIFY(LRB_OUT%R)
-        IF (ISLR) THEN
-          LRB_OUT%LRFORM = 1
-        ELSE 
-          LRB_OUT%LRFORM = 0
-        ENDIF
       END SUBROUTINE INIT_LRB
 C
 C
       SUBROUTINE IS_FRONT_BLR_CANDIDATE(INODE, NIV, NFRONT, NASS, 
      &                    BLRON, K489,
      &                    K490, K491, K492, K20, K60, IDAD, K38,
-     &                    LRSTATUS, N, LRGROUPS)
+     &                    LRSTATUS, K280, LRGROUPS)
         INTEGER,INTENT(IN) :: INODE, NFRONT, NASS, BLRON, K489, K490,
      &                        K491, K492, NIV, K20, K60, IDAD, K38
         INTEGER,INTENT(OUT):: LRSTATUS 
-        INTEGER, INTENT(IN):: N
-        INTEGER, INTENT(IN), OPTIONAL :: LRGROUPS(N)
+        INTEGER, INTENT(IN):: K280
+        INTEGER, INTENT(IN), OPTIONAL :: LRGROUPS(K280)
 C
 C     Local variables
         LOGICAL :: COMPRESS_PANEL, COMPRESS_CB
@@ -107,9 +107,9 @@ C
         ENDIF
       RETURN
       END SUBROUTINE IS_FRONT_BLR_CANDIDATE
-      SUBROUTINE ALLOC_LRB(LRB_OUT,K,KSVD,M,N,ISLR,IFLAG,IERROR,KEEP8)
+      SUBROUTINE ALLOC_LRB(LRB_OUT,K,M,N,ISLR,IFLAG,IERROR,KEEP8)
         TYPE(LRB_TYPE), INTENT(OUT) :: LRB_OUT
-        INTEGER,INTENT(IN) :: K,KSVD,M,N
+        INTEGER,INTENT(IN) :: K,M,N
         INTEGER,INTENT(INOUT) :: IFLAG, IERROR
         LOGICAL,INTENT(IN) :: ISLR
         INTEGER(8) :: KEEP8(150)
@@ -119,18 +119,11 @@ C
         LRB_OUT%M = M
         LRB_OUT%N = N
         LRB_OUT%K = K
-        LRB_OUT%KSVD = KSVD
         LRB_OUT%ISLR = ISLR
-        IF (ISLR) THEN
-          LRB_OUT%LRFORM = 1
-        ELSE 
-          LRB_OUT%LRFORM = 0
-        ENDIF
         IF ((M.EQ.0).OR.(N.EQ.0)) THEN 
-C        "ceinture et bretelles"
          nullify(LRB_OUT%Q)
          nullify(LRB_OUT%R)
-         IF (M.NE.0.or.N.NE.0) RETURN
+         RETURN
         ENDIF
         IF (ISLR) THEN
           IF (K.EQ.0) THEN
@@ -158,27 +151,12 @@ C        "ceinture et bretelles"
         ELSE
           MEM = M*N
         ENDIF
-#if defined(BLR_MT)          
-!$OMP CRITICAL(keep8_cri)
-#endif          
-        KEEP8(69) = KEEP8(69) + int(MEM,8)
-        KEEP8(68) = max(KEEP8(69), KEEP8(68))
-        KEEP8(71) = KEEP8(71) + int(MEM,8)
-        KEEP8(70) = max(KEEP8(71), KEEP8(70))
-#if ! defined(NODYNAMICCB)
-        KEEP8(74) = max(KEEP8(74), KEEP8(71)+KEEP8(73))
-        IF ( KEEP8(74) .GT. KEEP8(75) ) THEN
-             IFLAG = -19
-             CALL MUMPS_SET_IERROR(
-     &             (KEEP8(74)-KEEP8(75)), IERROR)
-        ENDIF
-#endif
-#if defined(BLR_MT)          
-!$OMP END CRITICAL(keep8_cri)
-#endif          
+        CALL MUMPS_DM_FAC_UPD_DYN_MEMCNTS(int(MEM,8),
+     &        .TRUE., KEEP8, IFLAG, IERROR, .TRUE., .TRUE.)
+      RETURN
       END SUBROUTINE ALLOC_LRB
       SUBROUTINE ALLOC_LRB_FROM_ACC(ACC_LRB, LRB_OUT, K, M, N, LorU,
-     &                        IFLAG, IERROR, KEEP8)
+     &                          IFLAG, IERROR, KEEP8)
         TYPE(LRB_TYPE), INTENT(IN) :: ACC_LRB
         TYPE(LRB_TYPE), INTENT(OUT) :: LRB_OUT
         INTEGER,INTENT(IN) :: K, M, N, LorU
@@ -186,18 +164,18 @@ C        "ceinture et bretelles"
         INTEGER(8) :: KEEP8(150)
         INTEGER :: I
         IF (LorU.EQ.1) THEN
-          CALL ALLOC_LRB(LRB_OUT,K,K,M,N,.TRUE.,IFLAG,IERROR,KEEP8)
+          CALL ALLOC_LRB(LRB_OUT,K,M,N,.TRUE.,IFLAG,IERROR,KEEP8)
           IF (IFLAG.LT.0) RETURN
           DO I=1,K
             LRB_OUT%Q(1:M,I) = ACC_LRB%Q(1:M,I)
             LRB_OUT%R(I,1:N) = -ACC_LRB%R(I,1:N)
           ENDDO
         ELSE
-          CALL ALLOC_LRB(LRB_OUT,K,K,N,M,.TRUE.,IFLAG,IERROR,KEEP8)
+          CALL ALLOC_LRB(LRB_OUT,K,N,M,.TRUE.,IFLAG,IERROR,KEEP8)
           IF (IFLAG.LT.0) RETURN
           DO I=1,K
-            LRB_OUT%Q(1:N,I) = -ACC_LRB%R(I,1:N)
-            LRB_OUT%R(I,1:M) = ACC_LRB%Q(1:M,I)
+            LRB_OUT%Q(1:N,I) = ACC_LRB%R(I,1:N)
+            LRB_OUT%R(I,1:M) = -ACC_LRB%Q(1:M,I)
           ENDDO
         ENDIF
       END SUBROUTINE ALLOC_LRB_FROM_ACC
@@ -210,7 +188,6 @@ C        "ceinture et bretelles"
         INTEGER :: I, INEW, MINSIZE, NEW_NPARTSASS, allocok
         LOGICAL :: ONLYCB, TRACE
         INTEGER, INTENT(IN) :: K472
-C FIXME: return IFLAG and IERROR 
         INTEGER :: IBCKSZ2,IFLAG,IERROR
         ALLOCATE(NEW_CUT(max(NPARTSASS,1)+NPARTSCB+1),stat=allocok)
         IF (allocok > 0) THEN
@@ -331,23 +308,24 @@ C           but BLR_L is stored by columns
      &                 A(POSELT_LOCAL), LDA,
      &                 LR_BLOCK_PTR(1,1), M)
           IF (LorU.EQ.0) THEN
-C               Now apply D scaling              
-            DPOS = POSELT_LOCAL
-            I = 1
-            DO
-            IF(I .GT. N) EXIT
+C           Now apply D scaling              
             IF (.NOT.present(OFFSET_IW)) THEN
               write(*,*) 'Internal error in ',
      &             'DMUMPS_LRTRSM' 
               CALL MUMPS_ABORT()
             ENDIF
+            DPOS = POSELT_LOCAL
+            I = 1
+            DO
+            IF(I .GT. N) EXIT
             IF(IW(OFFSET_IW+I-1) .GT. 0) THEN
-C                 1x1 pivot
+C             1x1 pivot
               A11 = ONE/A(DPOS)
               CALL dscal(M, A11, LR_BLOCK_PTR(1,I), 1)
               DPOS = DPOS + int(LDA + 1,8)
               I = I+1
             ELSE
+C             2x2 pivot
               POSPV1 = DPOS
               POSPV2 = DPOS+ int(LDA + 1,8)
               OFFDAG = POSPV1+1_8
@@ -371,12 +349,12 @@ C                 1x1 pivot
           ENDIF
         ENDIF
       ENDIF
-      CALL UPDATE_FLOP_STATS_TRSM(LRB, NIV, LorU)
+      CALL UPD_FLOP_TRSM(LRB, LorU)
       END SUBROUTINE DMUMPS_LRTRSM
       SUBROUTINE DMUMPS_LRGEMM_SCALING(LRB, SCALED, A, LA, DIAG, 
      &          LD_DIAG, IW2, POSELTT, NFRONT, BLOCK, MAXI_CLUSTER) 
 C This routine does the scaling (for the symmetric case) before 
-C computing the LR product (done in DMUMPS_LRGEMM3)        
+C computing the LR product (done in DMUMPS_LRGEMM4)        
         TYPE(LRB_TYPE),INTENT(IN) :: LRB
         INTEGER(8), intent(in)  :: LA
         DOUBLE PRECISION, intent(inout)  :: A(LA)
@@ -388,9 +366,9 @@ C computing the LR product (done in DMUMPS_LRGEMM3)
         DOUBLE PRECISION, intent(inout)  :: BLOCK(MAXI_CLUSTER)
         INTEGER :: J, NROWS
         DOUBLE PRECISION :: PIV1, PIV2, OFFDIAG
-        IF (LRB%LRFORM.EQ.1) THEN
+        IF (LRB%ISLR) THEN
             NROWS = LRB%K
-        ELSE ! Full Rank Block
+        ELSE 
             NROWS = LRB%M
         ENDIF
         J = 1
@@ -412,521 +390,97 @@ C computing the LR product (done in DMUMPS_LRGEMM3)
             ENDIF
         END DO
       END SUBROUTINE DMUMPS_LRGEMM_SCALING
-      SUBROUTINE DMUMPS_LRGEMM3(TRANSB1, TRANSB2, ALPHA,
-     &           LRB1, LRB2, BETA, A, LA, POSELTT, NFRONT, SYM, NIV,
+      SUBROUTINE DMUMPS_LRGEMM4(ALPHA,
+     &           LRB1, LRB2, BETA,
+     &           A, LA, POSELTT, NFRONT, SYM, 
      &           IFLAG, IERROR,
-     &           COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT, KPERCENT,
-     &           RANK, BUILDQ,
-     &           DIAG, LD_DIAG, IW2, BLOCK, MAXI_CLUSTER)
-C                    
-CC                   
-        TYPE(LRB_TYPE),INTENT(IN) :: LRB1,LRB2
-        INTEGER(8), intent(in)  :: LA
-        DOUBLE PRECISION, intent(inout)  :: A(LA)
-        INTEGER,INTENT(IN) :: NFRONT, SYM, NIV, TOL_OPT
-        INTEGER,INTENT(INOUT) :: IFLAG, IERROR
-        INTEGER(8), INTENT(IN) :: POSELTT
-        DOUBLE PRECISION, INTENT(IN), OPTIONAL :: DIAG(*)
-        INTEGER,INTENT(IN), OPTIONAL :: LD_DIAG, IW2(*)
-        INTEGER, INTENT(IN), OPTIONAL :: MAXI_CLUSTER
-        CHARACTER(len=1),INTENT(IN) :: TRANSB1, TRANSB2
-        INTEGER,intent(in) :: COMPRESS_MID_PRODUCT, KPERCENT
-        DOUBLE PRECISION, intent(in) :: TOLEPS
-        DOUBLE PRECISION :: ALPHA,BETA
-        DOUBLE PRECISION, intent(inout), OPTIONAL :: BLOCK(*)
-        DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:,:) :: XY_YZ
-        DOUBLE PRECISION, ALLOCATABLE, TARGET, DIMENSION(:,:) :: XQ, R_Y
-        DOUBLE PRECISION, POINTER, DIMENSION(:,:) :: X, Y, Y1, Y2, Z
-        CHARACTER(len=1) :: SIDE, TRANSX, TRANSY, TRANSZ
-        INTEGER :: M_X, K_XY, K_YZ, N_Z, LDX, LDY, LDY1, LDY2, LDZ, K_Y
-        INTEGER :: I, J, RANK, MAXRANK, INFO, LWORK
-        LOGICAL :: BUILDQ
-        DOUBLE PRECISION,    ALLOCATABLE :: RWORK_RRQR(:)
-        DOUBLE PRECISION, ALLOCATABLE :: WORK_RRQR(:), TAU_RRQR(:), 
-     &                          Y_RRQR(:,:)
-        INTEGER, ALLOCATABLE :: JPVT_RRQR(:)
-        INTEGER :: T1, T2, CR
-        INTEGER :: allocok, MREQ
-        DOUBLE PRECISION :: LOC_UPDT_TIME_OUT, LOC_RMB_TIME
-        DOUBLE PRECISION, EXTERNAL ::dnrm2
-        DOUBLE PRECISION :: ONE, MONE, ZERO
-        PARAMETER (ONE = 1.0D0, MONE=-1.0D0)
-        PARAMETER (ZERO=0.0D0)
-        IF (LRB2%M.EQ.0) THEN
-          write(*,*) "Internal error in DMUMPS_LRGEMM3, LRB2%M=0"
-          CALL MUMPS_ABORT()
-        ENDIF
-        IF ((SYM.NE.0).AND.((TRANSB1.NE.'N').OR.(TRANSB2.NE.'T'))) THEN
-            WRITE(*,*) "SYM > 0 and (", TRANSB1, ",", TRANSB2,
-     &                ") parameters found. Symmetric LRGEMM is only ",
-     &                 "compatible with (N,T) parameters"
-            CALL MUMPS_ABORT()
-        ENDIF
-        RANK = 0
-        BUILDQ = .FALSE.
-        IF ((LRB1%LRFORM==1).AND.(LRB2%LRFORM==1)) THEN
-            IF ((LRB1%K.EQ.0).OR.(LRB2%K.EQ.0)) THEN
-              GOTO 700
-            ENDIF
-            allocate(Y(LRB1%K,LRB2%K),stat=allocok)
-            IF (allocok > 0) THEN
-              MREQ = LRB1%K*LRB2%K
-              GOTO 860
-            ENDIF
-            IF (TRANSB1 == 'N') THEN
-                X    => LRB1%Q
-                LDX  =  LRB1%M
-                M_X  =  LRB1%M 
-                K_Y  =  LRB1%N
-                IF (SYM .EQ. 0) THEN
-                    Y1  => LRB1%R
-                ELSE
-                    allocate(Y1(LRB1%K,LRB1%N),stat=allocok)
-                    IF (allocok > 0) THEN
-                      MREQ = LRB1%K*LRB1%N
-                      GOTO 860
-                    ENDIF
-                    DO J=1,LRB1%N
-                        DO I=1,LRB1%K
-                            Y1(I,J) = LRB1%R(I,J)
-                        ENDDO
-                    ENDDO
-                    CALL DMUMPS_LRGEMM_SCALING(LRB1, Y1, A, LA, DIAG,
-     &                     LD_DIAG, IW2, POSELTT, NFRONT, BLOCK, 
-     &                     MAXI_CLUSTER) 
-                ENDIF
-                LDY1 =  LRB1%K
-            ELSE  !TRANSB1 == 'T'
-                M_X  =  LRB1%N
-                X    => LRB1%R
-                LDX  =  LRB1%K
-                K_Y  =  LRB1%M
-                Y1   => LRB1%Q
-                LDY1 =  LRB1%M
-            ENDIF
-            IF (TRANSB2 == 'N') THEN
-                Z    => LRB2%R
-                LDZ  =  LRB2%K
-                N_Z  =  LRB2%N
-                Y2   => LRB2%Q
-                LDY2 =  LRB2%M
-            ELSE  !TRANSB2 == 'T'
-                N_Z  =  LRB2%M
-                Z    => LRB2%Q
-                LDZ  =  LRB2%M
-                Y2   => LRB2%R
-                LDY2 =  LRB2%K
-            ENDIF
-            TRANSZ = TRANSB2
-            CALL dgemm(TRANSB1 , TRANSB2 , LRB1%K , LRB2%K, K_Y, ONE,
-     &            Y1(1,1), LDY1, Y2(1,1), LDY2, ZERO, Y(1,1), LRB1%K )
-            CALL SYSTEM_CLOCK(T1,CR)
-            IF (COMPRESS_MID_PRODUCT.GE.1) THEN 
-                LWORK = LRB2%K*(LRB2%K+1)
-                allocate(Y_RRQR(LRB1%K,LRB2%K),
-     &               WORK_RRQR(LWORK), RWORK_RRQR(2*LRB2%K), 
-     &               TAU_RRQR(MIN(LRB1%K,LRB2%K)),
-     &               JPVT_RRQR(LRB2%K),stat=allocok)
-                IF (allocok > 0) THEN
-                  MREQ = LRB1%K*LRB2%K + LWORK + 2*LRB2%K +
-     &                   MIN(LRB1%K,LRB2%K) + LRB2%K
-                  GOTO 860
-                ENDIF
-                DO J=1,LRB2%K
-                    DO I=1,LRB1%K
-                        Y_RRQR(I,J) = Y(I,J)
-                    ENDDO
-                ENDDO
-                MAXRANK = MIN(LRB1%K, LRB2%K)-1
-                MAXRANK = max (1, int((MAXRANK*KPERCENT/100)))
-                JPVT_RRQR = 0
-                CALL DMUMPS_TRUNCATED_RRQR(LRB1%K, LRB2%K, Y_RRQR(1,1),
-     &               LRB1%K, JPVT_RRQR, TAU_RRQR, WORK_RRQR,
-     &               LRB2%K, RWORK_RRQR, TOLEPS, TOL_OPT, RANK, 
-     &               MAXRANK, INFO)
-                IF (RANK.GT.MAXRANK) THEN 
-                    deallocate(Y_RRQR, WORK_RRQR, RWORK_RRQR, TAU_RRQR,
-     &                     JPVT_RRQR)
-                    BUILDQ = .FALSE.
-                ELSE
-                    BUILDQ = .TRUE.
-                ENDIF
-                IF (BUILDQ) THEN
-                  IF (RANK.EQ.0) THEN
-                    deallocate(
-     &                     Y_RRQR, 
-     &                   Y,WORK_RRQR, RWORK_RRQR, TAU_RRQR, JPVT_RRQR) 
-C                   GOTO 870 not ok because BUILDQ .EQV. true
-C                   would try to free XQ and R_Y that are not allocated
-C                   in that case. So we free Y1 now if it was allocated. 
-                    IF ((TRANSB1=='N').AND.(SYM .NE. 0)) deallocate(Y1)
-                    GOTO 700
-                  ELSE
-                    allocate(XQ(M_X,RANK), R_Y(RANK,LRB2%K),
-     &                       stat=allocok)
-                    IF (allocok > 0) THEN
-                      MREQ = M_X*RANK + RANK*LRB2%K
-                      GOTO 860
-                    ENDIF
-                    DO J=1, LRB2%K
-                       R_Y(1:MIN(RANK,J),JPVT_RRQR(J)) =
-     &                   Y_RRQR(1:MIN(RANK,J),J)
-                       IF(J.LT.RANK) R_Y(MIN(RANK,J)+1:
-     &                   RANK,JPVT_RRQR(J))= ZERO
-                    END DO
-C                   LWORK=LRB2%K*(LRB2%K+1), with LRB2%K>RANK
-C                   large enough for dorgqr
-                    CALL dorgqr 
-     &                  (LRB1%K, RANK, RANK, Y_RRQR(1,1),
-     &                  LRB1%K, TAU_RRQR(1),  
-     &                  WORK_RRQR(1), LWORK, INFO )
-                    CALL dgemm(TRANSB1, 'N', M_X, RANK, LRB1%K, ONE,
-     &                    X(1,1), LDX, Y_RRQR(1,1), LRB1%K, ZERO, 
-     &                    XQ(1,1), M_X)
-                    deallocate(Y_RRQR, WORK_RRQR, RWORK_RRQR, TAU_RRQR, 
-     &                         JPVT_RRQR)   
-                    nullify(X)
-                    X      => XQ
-                    LDX    =  M_X
-                    K_XY   =  RANK
-                    TRANSX =  'N'
-                    deallocate(Y)
-                    nullify(Y)
-                    Y      => R_Y
-                    LDY    =  RANK
-                    K_YZ   =  LRB2%K
-                    TRANSY =  'N'
-                    SIDE   = 'R'
-                  ENDIF
-                ENDIF
-            ENDIF
-            CALL SYSTEM_CLOCK(T2,CR)
-            LOC_RMB_TIME = dble(T2-T1)/dble(CR)
-            CALL UPDATE_RMB_TIME(LOC_RMB_TIME)
-            IF (.NOT.BUILDQ) THEN 
-                LDY    = LRB1%K
-                K_XY   = LRB1%K
-                K_YZ   = LRB2%K
-                TRANSX = TRANSB1
-                TRANSY = 'N'
-                IF (LRB1%K .GE. LRB2%K) THEN
-                    SIDE = 'L'
-                ELSE ! LRB1%K < LRB2%K
-                    SIDE = 'R'
-                ENDIF
-            ENDIF
-        ENDIF
-        IF ((LRB1%LRFORM==1).AND.(LRB2%LRFORM==0)) THEN 
-            IF (LRB1%K.EQ.0) THEN
-              GOTO 700
-            ENDIF
-            SIDE   =  'R'
-            K_XY   =  LRB1%K
-            TRANSX =  TRANSB1 
-            TRANSY =  TRANSB1 
-            Z      => LRB2%Q 
-            LDZ    =  LRB2%M
-            TRANSZ =  TRANSB2 
-            IF (TRANSB1 == 'N') THEN
-                X   => LRB1%Q
-                LDX =  LRB1%M
-                M_X =  LRB1%M
-                LDY =  LRB1%K
-                IF (SYM .EQ. 0) THEN
-                    Y   => LRB1%R
-                ELSE
-                    allocate(Y(LRB1%K,LRB1%N),stat=allocok)
-                    IF (allocok > 0) THEN
-                      MREQ = LRB1%K*LRB1%N
-                      GOTO 860
-                    ENDIF
-                    DO J=1,LRB1%N
-                        DO I=1,LRB1%K
-                            Y(I,J) = LRB1%R(I,J)
-                        ENDDO
-                    ENDDO
-                    CALL DMUMPS_LRGEMM_SCALING(LRB1, Y, A, LA, DIAG,
-     &                     LD_DIAG, IW2, POSELTT, NFRONT, BLOCK, 
-     &                     MAXI_CLUSTER) 
-                ENDIF
-            ELSE ! TRANSB1 == 'T'
-                X   => LRB1%R
-                LDX =  LRB1%K
-                M_X =  LRB1%N
-                Y   => LRB1%Q
-                LDY =  LRB1%M
-            ENDIF
-            IF (TRANSB2 == 'N') THEN
-                K_YZ = LRB2%M
-                N_Z  = LRB2%N
-            ELSE ! TRANSB2 == 'T'
-                K_YZ = LRB2%N
-                N_Z  = LRB2%M
-            ENDIF
-        ENDIF
-        IF ((LRB1%LRFORM==0).AND.(LRB2%LRFORM==1)) THEN 
-            IF (LRB2%K.EQ.0) THEN
-              GOTO 700
-            ENDIF
-            SIDE   =  'L'
-            K_YZ   =  LRB2%K
-            X      => LRB1%Q 
-            LDX    =  LRB1%M
-            TRANSX =  TRANSB1 
-            TRANSY =  TRANSB2 
-            TRANSZ =  TRANSB2 
-            IF (TRANSB1 == 'N') THEN
-                M_X  = LRB1%M
-                K_XY = LRB1%N
-            ELSE ! TRANSB1 == 'T'
-                M_X  = LRB1%N
-                K_XY = LRB1%M
-            ENDIF
-            IF (TRANSB2 == 'N') THEN
-                Y   => LRB2%Q
-                LDY =  LRB2%M
-                Z   => LRB2%R
-                LDZ =  LRB2%K
-                N_Z =  LRB2%N
-            ELSE ! TRANSB2 == 'T'
-                IF (SYM .EQ. 0) THEN
-                    Y  => LRB2%R
-                ELSE
-                    allocate(Y(LRB2%K,LRB2%N),stat=allocok)
-                    IF (allocok > 0) THEN
-                      MREQ = LRB2%K*LRB2%N
-                      GOTO 860
-                    ENDIF
-                    DO J=1,LRB2%N
-                        DO I=1,LRB2%K
-                            Y(I,J) = LRB2%R(I,J)
-                        ENDDO
-                    ENDDO
-                    CALL DMUMPS_LRGEMM_SCALING(LRB2, Y, A, LA, DIAG,
-     &                     LD_DIAG, IW2, POSELTT, NFRONT, BLOCK, 
-     &                     MAXI_CLUSTER) 
-                ENDIF
-                LDY =  LRB2%K
-                Z   => LRB2%Q
-                LDZ =  LRB2%M
-                N_Z =  LRB2%M
-            ENDIF
-        ENDIF
-        IF ((LRB1%LRFORM==0).AND.(LRB2%LRFORM==0)) THEN 
-            IF (SYM .EQ. 0) THEN
-                X => LRB1%Q
-            ELSE
-                allocate(X(LRB1%M,LRB1%N),stat=allocok)
-                IF (allocok > 0) THEN
-                  MREQ = LRB1%M*LRB1%N
-                  GOTO 860
-                ENDIF
-                DO J=1,LRB1%N
-                    DO I=1,LRB1%M
-                        X(I,J) = LRB1%Q(I,J)
-                    ENDDO
-                ENDDO
-                CALL DMUMPS_LRGEMM_SCALING(LRB1, X, A, LA, DIAG,
-     &                   LD_DIAG, IW2, POSELTT, NFRONT, BLOCK, 
-     &                   MAXI_CLUSTER) 
-            ENDIF
-            SIDE   =  'N'
-            LDX    =  LRB1%M
-            TRANSX =  TRANSB1
-            Z      => LRB2%Q
-            LDZ    =  LRB2%M
-            TRANSZ =  TRANSB2
-            IF (TRANSB1 == 'N') THEN
-                M_X  = LRB1%M
-                K_XY = LRB1%N  
-            ELSE ! TRANSB1 == 'T'
-                M_X  = LRB1%N
-                K_XY = LRB1%M  
-            ENDIF
-            IF (TRANSB2 == 'N') THEN
-                N_Z =  LRB2%N
-            ELSE ! TRANSB2 == 'T'
-                N_Z =  LRB2%M
-            ENDIF
-        ENDIF
-        IF (SIDE == 'L') THEN ! LEFT: XY_YZ = X*Y; A = XY_YZ*Z
-            allocate(XY_YZ(M_X,K_YZ),stat=allocok)
-            IF (allocok > 0) THEN
-              MREQ = M_X*K_YZ
-              GOTO 860
-            ENDIF
-            CALL dgemm(TRANSX , TRANSY , M_X , K_YZ, K_XY, ONE,
-     &             X(1,1), LDX, Y(1,1), LDY, ZERO, XY_YZ(1,1), M_X)
-            CALL SYSTEM_CLOCK(T1)
-            CALL dgemm('N', TRANSZ, M_X, N_Z, K_YZ, ALPHA,
-     &             XY_YZ(1,1), M_X, Z(1,1), LDZ, BETA, A(POSELTT),
-     &             NFRONT)
-            CALL SYSTEM_CLOCK(T2,CR)
-            LOC_UPDT_TIME_OUT = dble(T2-T1)/dble(CR)
-            CALL UPDATE_UPDT_TIME_OUT(LOC_UPDT_TIME_OUT)
-            deallocate(XY_YZ)
-        ELSEIF (SIDE == 'R') THEN ! RIGHT: XY_YZ = Y*Z; A = X*XY_YZ
-            allocate(XY_YZ(K_XY,N_Z),stat=allocok)
-            IF (allocok > 0) THEN
-              MREQ = K_XY*N_Z
-              GOTO 860
-            ENDIF
-            CALL dgemm(TRANSY , TRANSZ , K_XY , N_Z, K_YZ, ONE,
-     &             Y(1,1), LDY, Z(1,1), LDZ, ZERO, XY_YZ(1,1), K_XY)
-            CALL SYSTEM_CLOCK(T1)
-            CALL dgemm(TRANSX, 'N', M_X, N_Z, K_XY, ALPHA,
-     &             X(1,1), LDX, XY_YZ(1,1), K_XY, BETA, A(POSELTT),
-     &             NFRONT)
-            CALL SYSTEM_CLOCK(T2,CR)
-            LOC_UPDT_TIME_OUT = dble(T2-T1)/dble(CR)
-            CALL UPDATE_UPDT_TIME_OUT(LOC_UPDT_TIME_OUT)
-            deallocate(XY_YZ)
-        ELSE ! SIDE == 'N' : NONE; A = X*Z
-          CALL dgemm(TRANSX, TRANSZ, M_X, N_Z, K_XY, ALPHA,
-     &             X(1,1), LDX, Z(1,1), LDZ, BETA, A(POSELTT),
-     &             NFRONT)
-        ENDIF
-        GOTO 870
-  860 CONTINUE        
-C       Alloc NOT ok!!        
-        write(*,*) 'Allocation problem in BLR routine DMUMPS_LRGEMM3: ',
-     &    'not enough memory? memory requested = ' , MREQ        
-        IFLAG  = -13
-        IERROR = MREQ
-        RETURN
-  870 CONTINUE       
-C       Alloc ok!!        
-        IF ((LRB1%LRFORM==0).AND.(LRB2%LRFORM==0)) THEN 
-            IF (SYM .NE. 0) deallocate(X)
-        ELSEIF ((LRB1%LRFORM==0).AND.(LRB2%LRFORM==1)) THEN 
-            IF (SYM .NE. 0) deallocate(Y)
-        ELSEIF ((LRB1%LRFORM==1).AND.(LRB2%LRFORM==0)) THEN 
-            IF (SYM .NE. 0) deallocate(Y)
-        ELSE ! 1 AND 1
-            IF ((TRANSB1=='N').AND.(SYM .NE. 0)) deallocate(Y1)
-            IF ((COMPRESS_MID_PRODUCT.GE.1).AND.BUILDQ) THEN
-                deallocate(XQ)
-                deallocate(R_Y)
-            ELSE
-                deallocate(Y)
-            ENDIF
-        ENDIF
- 700    CONTINUE       
-      END SUBROUTINE DMUMPS_LRGEMM3
-      SUBROUTINE DMUMPS_LRGEMM3_LUA(TRANSB1, TRANSB2, ALPHA,
-     &           LRB1, LRB2, BETA, LRB3, MAXI_CLUSTER, MAXI_RANK, K480, 
-     &           A, LA, POSELTT, NFRONT, SYM, NIV,
-     &           IFLAG, IERROR,
-     &           COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT, KPERCENT,
-     &           RANK, BUILDQ,
+     &           MIDBLK_COMPRESS, TOLEPS, TOL_OPT, KPERCENT,
+     &           RANK, BUILDQ, 
+     &           LUA_ACTIVATED, 
+C Start of OPTIONAL arguments        
+     &           LorU,
+     &           LRB3, MAXI_RANK, 
+     &           MAXI_CLUSTER,
      &           DIAG, LD_DIAG, IW2, BLOCK
      &           )
 C
 CC
         TYPE(LRB_TYPE),INTENT(IN) :: LRB1,LRB2
-        TYPE(LRB_TYPE),INTENT(INOUT) :: LRB3
         INTEGER(8), intent(in)  :: LA
         DOUBLE PRECISION, intent(inout)  :: A(LA)
-        INTEGER,INTENT(IN) :: NFRONT, SYM, NIV, TOL_OPT
+        INTEGER,INTENT(IN) :: NFRONT, SYM, TOL_OPT
         INTEGER,INTENT(INOUT) :: IFLAG, IERROR
-        INTEGER,INTENT(IN) :: MAXI_CLUSTER, MAXI_RANK, K480
         INTEGER(8), INTENT(IN) :: POSELTT
         DOUBLE PRECISION, INTENT(IN), OPTIONAL :: DIAG(*)
         INTEGER,INTENT(IN), OPTIONAL :: LD_DIAG, IW2(*)
-        CHARACTER(len=1),INTENT(IN) :: TRANSB1, TRANSB2
-        INTEGER,intent(in) :: COMPRESS_MID_PRODUCT, KPERCENT
+        INTEGER,intent(in) :: MIDBLK_COMPRESS, KPERCENT
         DOUBLE PRECISION, intent(in) :: TOLEPS
         DOUBLE PRECISION :: ALPHA,BETA
+        LOGICAL, INTENT(OUT) :: BUILDQ
         DOUBLE PRECISION, intent(inout), OPTIONAL  :: BLOCK(*)
+        INTEGER, INTENT(IN), OPTIONAL :: LorU
+        LOGICAL, INTENT(IN) :: LUA_ACTIVATED
+        INTEGER, INTENT(IN), OPTIONAL :: MAXI_CLUSTER
+        INTEGER, INTENT(IN), OPTIONAL :: MAXI_RANK
+        TYPE(LRB_TYPE), INTENT(INOUT), OPTIONAL :: LRB3
         DOUBLE PRECISION, POINTER, DIMENSION(:,:) :: XY_YZ
         DOUBLE PRECISION, ALLOCATABLE, TARGET, DIMENSION(:,:) :: XQ, R_Y
         DOUBLE PRECISION, POINTER, DIMENSION(:,:) :: X, Y, Y1, Y2, Z
-        CHARACTER(len=1) :: SIDE, TRANSX, TRANSY, TRANSZ
-        INTEGER :: M_X, K_XY, K_YZ, N_Z, LDX, LDY, LDY1, LDY2, LDZ, K_Y
+        CHARACTER(len=1) :: SIDE, TRANSY
+        INTEGER :: K_XY, K_YZ, LDY, LDY1, LDY2, K_Y
         INTEGER :: LDXY_YZ, SAVE_K
         INTEGER :: I, J, RANK, MAXRANK, INFO, LWORK
-        LOGICAL :: BUILDQ
         DOUBLE PRECISION,    ALLOCATABLE :: RWORK_RRQR(:)
         DOUBLE PRECISION, ALLOCATABLE :: WORK_RRQR(:), TAU_RRQR(:), 
      &                          Y_RRQR(:,:)
         INTEGER, ALLOCATABLE :: JPVT_RRQR(:)
-        INTEGER :: T1, T2, CR
         INTEGER :: allocok, MREQ
-        DOUBLE PRECISION :: LOC_UPDT_TIME_OUT, LOC_RMB_TIME
         DOUBLE PRECISION, EXTERNAL ::dnrm2
         DOUBLE PRECISION :: ONE, MONE, ZERO
         PARAMETER (ONE = 1.0D0, MONE=-1.0D0)
         PARAMETER (ZERO=0.0D0)
-        IF (LRB2%M.EQ.0) THEN
-          write(*,*) "Internal error in DMUMPS_LRGEMM3_LUA, LRB2%M=0"
-          CALL MUMPS_ABORT()
+        IF (LRB1%M.EQ.0) THEN
+          RETURN
         ENDIF
-        IF ((SYM.NE.0).AND.((TRANSB1.NE.'N').OR.(TRANSB2.NE.'T'))) THEN
-            WRITE(*,*) "SYM > 0 and (", TRANSB1, ",", TRANSB2,
-     &                ") parameters found. Symmetric LRGEMM is only ",
-     &                 "compatible with (N,T) parameters"
-            CALL MUMPS_ABORT()
+        IF (LRB2%M.EQ.0) THEN
         ENDIF
         RANK = 0
         BUILDQ = .FALSE.
-        IF ((LRB1%LRFORM==1).AND.(LRB2%LRFORM==1)) THEN
+        IF (LRB1%ISLR.AND.LRB2%ISLR) THEN
             IF ((LRB1%K.EQ.0).OR.(LRB2%K.EQ.0)) THEN
               GOTO 1200
             ENDIF
-            allocate(Y(LRB1%K,LRB2%K),stat=allocok)
-            IF (allocok > 0) THEN
-              MREQ = LRB1%K*LRB2%K
-              GOTO 1570
-            ENDIF
-            IF (TRANSB1 == 'N') THEN
-                X    => LRB1%Q
-                LDX  =  LRB1%M
-                M_X  =  LRB1%M 
-                K_Y  =  LRB1%N
-                IF (SYM .EQ. 0) THEN
-                    Y1  => LRB1%R
-                ELSE
-                    allocate(Y1(LRB1%K,LRB1%N),stat=allocok)
-                    IF (allocok > 0) THEN
-                      MREQ = LRB1%K*LRB1%N
-                      GOTO 1570
-                    ENDIF
-                    DO J=1,LRB1%N
-                        DO I=1,LRB1%K
-                            Y1(I,J) = LRB1%R(I,J)
-                        ENDDO
-                    ENDDO
-                    CALL DMUMPS_LRGEMM_SCALING(LRB1, Y1, A, LA, DIAG,
-     &                     LD_DIAG, IW2, POSELTT, NFRONT, BLOCK, 
-     &                     MAXI_CLUSTER) 
+                allocate(Y(LRB1%K,LRB2%K),stat=allocok)
+                IF (allocok > 0) THEN
+                    MREQ = LRB1%K*LRB2%K
+                    GOTO 1570
                 ENDIF
-                LDY1 =  LRB1%K
-            ELSE  !TRANSB1 == 'T'
-                M_X  =  LRB1%N
-                X    => LRB1%R
-                LDX  =  LRB1%K
-                K_Y  =  LRB1%M
-                Y1   => LRB1%Q
-                LDY1 =  LRB1%M
+            X    => LRB1%Q
+            K_Y  =  LRB1%N
+            IF (SYM .EQ. 0) THEN
+                Y1  => LRB1%R
+            ELSE
+                allocate(Y1(LRB1%K,LRB1%N),stat=allocok)
+                IF (allocok > 0) THEN
+                  MREQ = LRB1%K*LRB1%N
+                  GOTO 1570
+                ENDIF
+                DO J=1,LRB1%N
+                    DO I=1,LRB1%K
+                        Y1(I,J) = LRB1%R(I,J)
+                    ENDDO
+                ENDDO
+                CALL DMUMPS_LRGEMM_SCALING(LRB1, Y1, A, LA, DIAG,
+     &                 LD_DIAG, IW2, POSELTT, NFRONT, BLOCK, 
+     &                 MAXI_CLUSTER) 
             ENDIF
-            IF (TRANSB2 == 'N') THEN
-                Z    => LRB2%R
-                LDZ  =  LRB2%K
-                N_Z  =  LRB2%N
-                Y2   => LRB2%Q
-                LDY2 =  LRB2%M
-            ELSE  !TRANSB2 == 'T'
-                N_Z  =  LRB2%M
-                Z    => LRB2%Q
-                LDZ  =  LRB2%M
-                Y2   => LRB2%R
-                LDY2 =  LRB2%K
-            ENDIF
-            TRANSZ = TRANSB2
-            CALL dgemm(TRANSB1 , TRANSB2 , LRB1%K , LRB2%K, K_Y, ONE,
+            LDY1 =  LRB1%K
+            Z    => LRB2%Q
+            Y2   => LRB2%R
+            LDY2 =  LRB2%K
+             CALL dgemm('N', 'T', LRB1%K, LRB2%K, K_Y, ONE,
      &            Y1(1,1), LDY1, Y2(1,1), LDY2, ZERO, Y(1,1), LRB1%K )
-            CALL SYSTEM_CLOCK(T1,CR)
-            IF (COMPRESS_MID_PRODUCT.GE.1) THEN 
+            IF (MIDBLK_COMPRESS.GE.1) THEN 
                 LWORK = LRB2%K*(LRB2%K+1)
                 allocate(Y_RRQR(LRB1%K,LRB2%K),
      &               WORK_RRQR(LWORK), RWORK_RRQR(2*LRB2%K), 
@@ -948,7 +502,8 @@ CC
                 CALL DMUMPS_TRUNCATED_RRQR(LRB1%K, LRB2%K, Y_RRQR(1,1),
      &               LRB1%K, JPVT_RRQR, TAU_RRQR, WORK_RRQR,
      &               LRB2%K, RWORK_RRQR, TOLEPS, TOL_OPT, RANK, 
-     &               MAXRANK, INFO)
+     &               MAXRANK, INFO,
+     &               BUILDQ)
                 IF (RANK.GT.MAXRANK) THEN 
                     deallocate(Y_RRQR, WORK_RRQR, RWORK_RRQR, TAU_RRQR,
      &                     JPVT_RRQR)
@@ -958,19 +513,20 @@ CC
                 ENDIF
                 IF (BUILDQ) THEN
                   IF (RANK.EQ.0) THEN
-                    deallocate(
-     &                     Y_RRQR, 
-     &                   Y,WORK_RRQR, RWORK_RRQR, TAU_RRQR, JPVT_RRQR) 
+                    deallocate(Y_RRQR, WORK_RRQR, RWORK_RRQR, TAU_RRQR, 
+     &                         JPVT_RRQR) 
+                      deallocate(Y)
+                    nullify(Y)
 C                   GOTO 1580 not ok because BUILDQ .EQV. true
 C                   would try to free XQ and R_Y that are not allocated
 C                   in that case. So we free Y1 now if it was allocated. 
-                    IF ((TRANSB1=='N').AND.(SYM .NE. 0)) deallocate(Y1)
+                    IF (SYM .NE. 0) deallocate(Y1)
                     GOTO 1200
                   ELSE
-                    allocate(XQ(M_X,RANK), R_Y(RANK,LRB2%K),
+                    allocate(XQ(LRB1%M,RANK), R_Y(RANK,LRB2%K),
      &                       stat=allocok)
                     IF (allocok > 0) THEN
-                      MREQ = M_X*RANK + RANK*LRB2%K
+                      MREQ = LRB1%M*RANK + RANK*LRB2%K
                       GOTO 1570
                     ENDIF
                     DO J=1, LRB2%K
@@ -985,17 +541,15 @@ C                   large enough for dorgqr
      &                  (LRB1%K, RANK, RANK, Y_RRQR(1,1),
      &                  LRB1%K, TAU_RRQR(1),  
      &                  WORK_RRQR(1), LWORK, INFO )
-                    CALL dgemm(TRANSB1, 'N', M_X, RANK, LRB1%K, ONE,
-     &                    X(1,1), LDX, Y_RRQR(1,1), LRB1%K, ZERO, 
-     &                    XQ(1,1), M_X)
+                    CALL dgemm('N', 'N', LRB1%M, RANK, LRB1%K, ONE,
+     &                    X(1,1), LRB1%M, Y_RRQR(1,1), LRB1%K, ZERO, 
+     &                    XQ(1,1), LRB1%M)
                     deallocate(Y_RRQR, WORK_RRQR, RWORK_RRQR, TAU_RRQR, 
      &                         JPVT_RRQR)   
                     nullify(X)
                     X      => XQ
-                    LDX    =  M_X
                     K_XY   =  RANK
-                    TRANSX =  'N'
-                    deallocate(Y)
+                      deallocate(Y)
                     nullify(Y)
                     Y      => R_Y
                     LDY    =  RANK
@@ -1005,119 +559,77 @@ C                   large enough for dorgqr
                   ENDIF
                 ENDIF
             ENDIF
-            CALL SYSTEM_CLOCK(T2,CR)
-            LOC_RMB_TIME = dble(T2-T1)/dble(CR)
-            CALL UPDATE_RMB_TIME(LOC_RMB_TIME)
             IF (.NOT.BUILDQ) THEN 
-                LDY    = LRB1%K
+                  LDY    = LRB1%K
                 K_XY   = LRB1%K
                 K_YZ   = LRB2%K
-                TRANSX = TRANSB1
                 TRANSY = 'N'
                 IF (LRB1%K .GE. LRB2%K) THEN
                     SIDE = 'L'
-                ELSE ! LRB1%K < LRB2%K
+                ELSE 
                     SIDE = 'R'
                 ENDIF
             ENDIF
         ENDIF
-        IF ((LRB1%LRFORM==1).AND.(LRB2%LRFORM==0)) THEN 
+        IF (LRB1%ISLR.AND.(.NOT.LRB2%ISLR)) THEN 
             IF (LRB1%K.EQ.0) THEN
               GOTO 1200
             ENDIF
             SIDE   =  'R'
             K_XY   =  LRB1%K
-            TRANSX =  TRANSB1 
-            TRANSY =  TRANSB1 
+            TRANSY =  'N' 
             Z      => LRB2%Q 
-            LDZ    =  LRB2%M
-            TRANSZ =  TRANSB2 
-            IF (TRANSB1 == 'N') THEN
-                X   => LRB1%Q
-                LDX =  LRB1%M
-                M_X =  LRB1%M
-                LDY =  LRB1%K
-                IF (SYM .EQ. 0) THEN
-                    Y   => LRB1%R
-                ELSE
-                    allocate(Y(LRB1%K,LRB1%N),stat=allocok)
-                    IF (allocok > 0) THEN
-                      MREQ = LRB1%K*LRB1%N
-                      GOTO 1570
-                    ENDIF
-                    DO J=1,LRB1%N
-                        DO I=1,LRB1%K
-                            Y(I,J) = LRB1%R(I,J)
-                        ENDDO
-                    ENDDO
-                    CALL DMUMPS_LRGEMM_SCALING(LRB1, Y, A, LA, DIAG,
-     &                     LD_DIAG, IW2, POSELTT, NFRONT, BLOCK, 
-     &                     MAXI_CLUSTER) 
-                ENDIF
-            ELSE ! TRANSB1 == 'T'
-                X   => LRB1%R
-                LDX =  LRB1%K
-                M_X =  LRB1%N
-                Y   => LRB1%Q
-                LDY =  LRB1%M
+            X   => LRB1%Q
+            LDY =  LRB1%K
+            IF (SYM .EQ. 0) THEN
+              Y   => LRB1%R
+            ELSE
+              allocate(Y(LRB1%K,LRB1%N),stat=allocok)
+              IF (allocok > 0) THEN
+                MREQ = LRB1%K*LRB1%N
+                GOTO 1570
+              ENDIF
+              DO J=1,LRB1%N
+                  DO I=1,LRB1%K
+                      Y(I,J) = LRB1%R(I,J)
+                  ENDDO
+              ENDDO
+              CALL DMUMPS_LRGEMM_SCALING(LRB1, Y, A, LA, DIAG,
+     &               LD_DIAG, IW2, POSELTT, NFRONT, BLOCK, 
+     &               MAXI_CLUSTER) 
             ENDIF
-            IF (TRANSB2 == 'N') THEN
-                K_YZ = LRB2%M
-                N_Z  = LRB2%N
-            ELSE ! TRANSB2 == 'T'
-                K_YZ = LRB2%N
-                N_Z  = LRB2%M
-            ENDIF
+            K_YZ = LRB2%N
         ENDIF
-        IF ((LRB1%LRFORM==0).AND.(LRB2%LRFORM==1)) THEN 
+        IF ((.NOT.LRB1%ISLR).AND.LRB2%ISLR) THEN 
             IF (LRB2%K.EQ.0) THEN
               GOTO 1200
             ENDIF
             SIDE   =  'L'
             K_YZ   =  LRB2%K
             X      => LRB1%Q 
-            LDX    =  LRB1%M
-            TRANSX =  TRANSB1 
-            TRANSY =  TRANSB2 
-            TRANSZ =  TRANSB2 
-            IF (TRANSB1 == 'N') THEN
-                M_X  = LRB1%M
-                K_XY = LRB1%N
-            ELSE ! TRANSB1 == 'T'
-                M_X  = LRB1%N
-                K_XY = LRB1%M
-            ENDIF
-            IF (TRANSB2 == 'N') THEN
-                Y   => LRB2%Q
-                LDY =  LRB2%M
-                Z   => LRB2%R
-                LDZ =  LRB2%K
-                N_Z =  LRB2%N
-            ELSE ! TRANSB2 == 'T'
-                IF (SYM .EQ. 0) THEN
-                    Y  => LRB2%R
-                ELSE
-                    allocate(Y(LRB2%K,LRB2%N),stat=allocok)
-                    IF (allocok > 0) THEN
-                      MREQ = LRB2%K*LRB2%N
-                      GOTO 1570
-                    ENDIF
-                    DO J=1,LRB2%N
-                        DO I=1,LRB2%K
-                            Y(I,J) = LRB2%R(I,J)
-                        ENDDO
-                    ENDDO
-                    CALL DMUMPS_LRGEMM_SCALING(LRB2, Y, A, LA, DIAG,
-     &                     LD_DIAG, IW2, POSELTT, NFRONT, BLOCK, 
-     &                     MAXI_CLUSTER) 
+            TRANSY =  'T' 
+            K_XY = LRB1%N
+            IF (SYM .EQ. 0) THEN
+                Y  => LRB2%R
+            ELSE
+                allocate(Y(LRB2%K,LRB2%N),stat=allocok)
+                IF (allocok > 0) THEN
+                  MREQ = LRB2%K*LRB2%N
+                  GOTO 1570
                 ENDIF
-                LDY =  LRB2%K
-                Z   => LRB2%Q
-                LDZ =  LRB2%M
-                N_Z =  LRB2%M
+                DO J=1,LRB2%N
+                    DO I=1,LRB2%K
+                        Y(I,J) = LRB2%R(I,J)
+                    ENDDO
+                ENDDO
+                CALL DMUMPS_LRGEMM_SCALING(LRB2, Y, A, LA, DIAG,
+     &                 LD_DIAG, IW2, POSELTT, NFRONT, BLOCK, 
+     &                 MAXI_CLUSTER) 
             ENDIF
+            LDY =  LRB2%K
+            Z   => LRB2%Q
         ENDIF
-        IF ((LRB1%LRFORM==0).AND.(LRB2%LRFORM==0)) THEN 
+        IF ((.NOT.LRB1%ISLR).AND.(.NOT.LRB2%ISLR)) THEN 
             IF (SYM .EQ. 0) THEN
                 X => LRB1%Q
             ELSE
@@ -1136,149 +648,115 @@ C                   large enough for dorgqr
      &                   MAXI_CLUSTER) 
             ENDIF
             SIDE   =  'N'
-            LDX    =  LRB1%M
-            TRANSX =  TRANSB1
             Z      => LRB2%Q
-            LDZ    =  LRB2%M
-            TRANSZ =  TRANSB2
-            IF (TRANSB1 == 'N') THEN
-                M_X  = LRB1%M
-                K_XY = LRB1%N  
-            ELSE ! TRANSB1 == 'T'
-                M_X  = LRB1%N
-                K_XY = LRB1%M  
-            ENDIF
-            IF (TRANSB2 == 'N') THEN
-                N_Z =  LRB2%N
-            ELSE ! TRANSB2 == 'T'
-                N_Z =  LRB2%M
-            ENDIF
+            K_XY = LRB1%N  
         ENDIF
-        SAVE_K = LRB3%K
-        IF (SIDE == 'L') THEN
-          LRB3%K = LRB3%K+K_YZ
-        ELSEIF (SIDE == 'R') THEN 
-          LRB3%K = LRB3%K+K_XY
+        IF (LUA_ACTIVATED) THEN
+          SAVE_K = LRB3%K
+          IF (SIDE == 'L') THEN
+            LRB3%K = LRB3%K+K_YZ
+          ELSEIF (SIDE == 'R') THEN 
+            LRB3%K = LRB3%K+K_XY
+          ENDIF
         ENDIF
         IF (SIDE == 'L') THEN ! LEFT: XY_YZ = X*Y; A = XY_YZ*Z
-            IF (K480.LT.3) THEN
-              allocate(XY_YZ(M_X,K_YZ),stat=allocok)
+            IF (.NOT.LUA_ACTIVATED) THEN
+              allocate(XY_YZ(LRB1%M,K_YZ),stat=allocok)
               IF (allocok > 0) THEN
-                MREQ = M_X*K_YZ
+                MREQ = LRB1%M*K_YZ
                 GOTO 1570
               ENDIF
-              LDXY_YZ = M_X
+              LDXY_YZ = LRB1%M
             ELSE
                IF (SAVE_K+K_YZ.GT.MAXI_RANK) THEN
-                write(*,*) 'Internal error in DMUMPS_LRGEMM3_LUA 1a',
+                write(*,*) 'Internal error in DMUMPS_LRGEMM4 1a',
      &           'K_ACC+K_CUR>K_MAX:',SAVE_K,K_YZ,MAXI_RANK
                 CALL MUMPS_ABORT()
               ENDIF
-              IF (LRB3%M.NE.M_X) THEN
-                write(*,*) 'Internal error in DMUMPS_LRGEMM3_LUA 1b',
-     &           'M_X =/= LRB3%M',M_X,LRB3%M
+              IF (LRB3%M.NE.LRB1%M) THEN
+                write(*,*) 'Internal error in DMUMPS_LRGEMM4 1b',
+     &           'LRB1%M =/= LRB3%M',LRB1%M,LRB3%M
                 CALL MUMPS_ABORT()
               ENDIF
-              XY_YZ => LRB3%Q(1:M_X,SAVE_K+1:SAVE_K+K_YZ)
+              XY_YZ => LRB3%Q(1:LRB1%M,SAVE_K+1:SAVE_K+K_YZ)
               LDXY_YZ = MAXI_CLUSTER
-              IF (TRANSZ == 'N') THEN
-                DO I=1,K_YZ
-                  LRB3%R(SAVE_K+I,1:N_Z) = Z(I,1:N_Z)
-                ENDDO
-              ELSE ! TRANSZ == 'T'
-                DO I=1,K_YZ
-                  LRB3%R(SAVE_K+I,1:N_Z) = Z(1:N_Z,I)
-                ENDDO
-              ENDIF
+              DO I=1,K_YZ
+                LRB3%R(SAVE_K+I,1:LRB2%M) = Z(1:LRB2%M,I)
+              ENDDO
             ENDIF
-            CALL dgemm(TRANSX , TRANSY , M_X , K_YZ, K_XY, ONE,
-     &             X(1,1), LDX, Y(1,1), LDY, ZERO, XY_YZ(1,1), LDXY_YZ)
-            IF (K480.LT.3) THEN
-              CALL SYSTEM_CLOCK(T1)
-              CALL dgemm('N', TRANSZ, M_X, N_Z, K_YZ, ALPHA,
-     &               XY_YZ(1,1), M_X, Z(1,1), LDZ, BETA, A(POSELTT),
-     &               NFRONT)
-              CALL SYSTEM_CLOCK(T2,CR)
-              LOC_UPDT_TIME_OUT = dble(T2-T1)/dble(CR)
-              CALL UPDATE_UPDT_TIME_OUT(LOC_UPDT_TIME_OUT)
+            CALL dgemm('N', TRANSY, LRB1%M, K_YZ, K_XY, ONE,
+     &             X(1,1), LRB1%M, Y(1,1), LDY, ZERO, XY_YZ(1,1), 
+     &             LDXY_YZ)
+            IF (.NOT.LUA_ACTIVATED) THEN
+              CALL dgemm('N', 'T', LRB1%M, LRB2%M, K_YZ, ALPHA,
+     &               XY_YZ(1,1), LRB1%M, Z(1,1), LRB2%M, BETA, 
+     &               A(POSELTT), NFRONT)
               deallocate(XY_YZ)
             ENDIF
         ELSEIF (SIDE == 'R') THEN ! RIGHT: XY_YZ = Y*Z; A = X*XY_YZ
-            IF (K480.LT.3) THEN
-              allocate(XY_YZ(K_XY,N_Z),stat=allocok)
+            IF (.NOT.LUA_ACTIVATED) THEN
+              allocate(XY_YZ(K_XY,LRB2%M),stat=allocok)
               IF (allocok > 0) THEN
-                MREQ = K_XY*N_Z
+                MREQ = K_XY*LRB2%M
                 GOTO 1570
               ENDIF
               LDXY_YZ = K_XY
             ELSE
                IF (SAVE_K+K_XY.GT.MAXI_RANK) THEN
-                write(*,*) 'Internal error in DMUMPS_LRGEMM3_LUA 2a',
+                write(*,*) 'Internal error in DMUMPS_LRGEMM4 2a',
      &           'K_ACC+K_CUR>K_MAX:',SAVE_K,K_XY,MAXI_RANK
                 CALL MUMPS_ABORT()
               ENDIF
-              IF (LRB3%N.NE.N_Z) THEN
-                write(*,*) 'Internal error in DMUMPS_LRGEMM3_LUA 2b',
-     &           'N_Z =/= LRB3%N',N_Z,LRB3%N
+              IF (LRB3%N.NE.LRB2%M) THEN
+                write(*,*) 'Internal error in DMUMPS_LRGEMM4 2b',
+     &           'LRB2%M =/= LRB3%N',LRB2%M,LRB3%N
                 CALL MUMPS_ABORT()
               ENDIF
-              XY_YZ => LRB3%R(SAVE_K+1:SAVE_K+K_XY,1:N_Z)
+              XY_YZ => LRB3%R(SAVE_K+1:SAVE_K+K_XY,1:LRB2%M)
               LDXY_YZ = MAXI_RANK
-              IF (TRANSX == 'N') THEN
-                DO I=1,K_XY
-                  LRB3%Q(1:M_X,SAVE_K+I) = X(1:M_X,I)
-                ENDDO
-              ELSE ! TRANSX == 'T'
-                DO I=1,K_XY
-                  LRB3%Q(1:M_X,SAVE_K+I) = X(I,1:M_X)
-                ENDDO
-              ENDIF
+              DO I=1,K_XY
+                LRB3%Q(1:LRB1%M,SAVE_K+I) = X(1:LRB1%M,I)
+              ENDDO
             ENDIF
-            CALL dgemm(TRANSY , TRANSZ , K_XY , N_Z, K_YZ, ONE,
-     &             Y(1,1), LDY, Z(1,1), LDZ, ZERO, XY_YZ(1,1), LDXY_YZ)
-            IF (K480.LT.3) THEN
-              CALL SYSTEM_CLOCK(T1)
-              CALL dgemm(TRANSX, 'N', M_X, N_Z, K_XY, ALPHA,
-     &               X(1,1), LDX, XY_YZ(1,1), K_XY, BETA, A(POSELTT),
+            CALL dgemm(TRANSY, 'T', K_XY, LRB2%M, K_YZ, ONE,
+     &             Y(1,1), LDY, Z(1,1), LRB2%M, ZERO, XY_YZ(1,1), 
+     &             LDXY_YZ)
+            IF (.NOT.LUA_ACTIVATED) THEN
+              CALL dgemm('N', 'N', LRB1%M, LRB2%M, K_XY, ALPHA,
+     &               X(1,1), LRB1%M, XY_YZ(1,1), K_XY, BETA, A(POSELTT),
      &               NFRONT)
-              CALL SYSTEM_CLOCK(T2,CR)
-              LOC_UPDT_TIME_OUT = dble(T2-T1)/dble(CR)
-              CALL UPDATE_UPDT_TIME_OUT(LOC_UPDT_TIME_OUT)
               deallocate(XY_YZ)
             ENDIF
         ELSE ! SIDE == 'N' : NONE; A = X*Z
-          CALL dgemm(TRANSX, TRANSZ, M_X, N_Z, K_XY, ALPHA,
-     &             X(1,1), LDX, Z(1,1), LDZ, BETA, A(POSELTT),
+          CALL dgemm('N', 'T', LRB1%M, LRB2%M, K_XY, ALPHA,
+     &             X(1,1), LRB1%M, Z(1,1), LRB2%M, BETA, A(POSELTT),
      &             NFRONT)
         ENDIF
         GOTO 1580
  1570 CONTINUE        
 C       Alloc NOT ok!!        
-        write(*,*) 'Allocation problem in BLR routine 
-     &    DMUMPS_LRGEMM3_LUA: ',
-     &    'not enough memory? memory requested = ' , MREQ        
         IFLAG  = -13
         IERROR = MREQ
         RETURN
  1580 CONTINUE       
 C       Alloc ok!!        
-        IF ((LRB1%LRFORM==0).AND.(LRB2%LRFORM==0)) THEN 
+        IF ((.NOT.LRB1%ISLR).AND.(.NOT.LRB2%ISLR)) THEN 
             IF (SYM .NE. 0) deallocate(X)
-        ELSEIF ((LRB1%LRFORM==0).AND.(LRB2%LRFORM==1)) THEN 
+        ELSEIF ((.NOT.LRB1%ISLR).AND.LRB2%ISLR) THEN 
             IF (SYM .NE. 0) deallocate(Y)
-        ELSEIF ((LRB1%LRFORM==1).AND.(LRB2%LRFORM==0)) THEN 
+        ELSEIF (LRB1%ISLR.AND.(.NOT.LRB2%ISLR)) THEN 
             IF (SYM .NE. 0) deallocate(Y)
-        ELSE ! 1 AND 1
-            IF ((TRANSB1=='N').AND.(SYM .NE. 0)) deallocate(Y1)
-            IF ((COMPRESS_MID_PRODUCT.GE.1).AND.BUILDQ) THEN
+        ELSE
+            IF (SYM .NE. 0) deallocate(Y1)
+            IF ((MIDBLK_COMPRESS.GE.1).AND.BUILDQ) THEN
                 deallocate(XQ)
                 deallocate(R_Y)
             ELSE
-                deallocate(Y)
+                  deallocate(Y)
             ENDIF
         ENDIF
  1200 CONTINUE       
-      END SUBROUTINE DMUMPS_LRGEMM3_LUA
+      END SUBROUTINE DMUMPS_LRGEMM4
       SUBROUTINE DMUMPS_DECOMPRESS_ACC(ACC_LRB, MAXI_CLUSTER, 
      &           MAXI_RANK, A, LA, POSELTT, NFRONT, NIV, LorU, 
      &           COUNT_FLOPS)
@@ -1291,8 +769,6 @@ C       Alloc ok!!
         LOGICAL, OPTIONAL :: COUNT_FLOPS
         LOGICAL  :: COUNT_FLOPS_LOC
         INTEGER  :: LorU
-        INTEGER :: T1, T2, CR
-        DOUBLE PRECISION :: LOC_UPDT_TIME_OUT
         DOUBLE PRECISION :: ONE, MONE, ZERO
         PARAMETER (ONE = 1.0D0, MONE=-1.0D0)
         PARAMETER (ZERO=0.0D0)
@@ -1301,19 +777,14 @@ C       Alloc ok!!
         ELSE
           COUNT_FLOPS_LOC=.TRUE.
         ENDIF
-        CALL SYSTEM_CLOCK(T1)
         CALL dgemm('N', 'N', ACC_LRB%M, ACC_LRB%N, ACC_LRB%K,
      &         MONE, ACC_LRB%Q(1,1), MAXI_CLUSTER, ACC_LRB%R(1,1), 
      &         MAXI_RANK, ONE, A(POSELTT), NFRONT)
-        CALL SYSTEM_CLOCK(T2,CR)
-        LOC_UPDT_TIME_OUT = dble(T2-T1)/dble(CR)
-        CALL UPDATE_UPDT_TIME_OUT(LOC_UPDT_TIME_OUT)
-        IF (COUNT_FLOPS_LOC) CALL UPDATE_FLOP_STATS_DEC_ACC(ACC_LRB,NIV)
         ACC_LRB%K = 0
       END SUBROUTINE DMUMPS_DECOMPRESS_ACC
       SUBROUTINE DMUMPS_COMPRESS_FR_UPDATES(ACC_LRB, MAXI_CLUSTER, 
      &          MAXI_RANK, A, LA, POSELTT, NFRONT, NIV,
-     &          TOLEPS, TOL_OPT, KPERCENT, BUILDQ, LorU)
+     &          TOLEPS, TOL_OPT, KPERCENT, BUILDQ, LorU, CB_COMPRESS)
         TYPE(LRB_TYPE),INTENT(INOUT) :: ACC_LRB
         INTEGER(8), intent(in)  :: LA
         DOUBLE PRECISION, intent(inout)  :: A(LA)
@@ -1322,14 +793,13 @@ C       Alloc ok!!
         INTEGER(8), INTENT(IN) :: POSELTT
         DOUBLE PRECISION, intent(in) :: TOLEPS
         LOGICAL, INTENT(OUT) :: BUILDQ
+        LOGICAL, INTENT(IN) :: CB_COMPRESS
         DOUBLE PRECISION,    ALLOCATABLE :: RWORK_RRQR(:)
         DOUBLE PRECISION, ALLOCATABLE :: WORK_RRQR(:), TAU_RRQR(:)
         INTEGER, ALLOCATABLE :: JPVT_RRQR(:)
         INTEGER :: INFO, RANK, MAXRANK, LWORK
-        INTEGER :: T1, T2, CR
         INTEGER :: I, J, M, N
         INTEGER :: allocok, MREQ
-        DOUBLE PRECISION :: LOC_RECOMPRESS_TIME
         DOUBLE PRECISION :: ONE, MONE, ZERO
         PARAMETER (ONE = 1.0D0, MONE=-1.0D0)
         PARAMETER (ZERO=0.0D0)
@@ -1338,7 +808,6 @@ C       Alloc ok!!
               MAXRANK = floor(dble(M*N)/dble(M+N))
               MAXRANK = max (1, int((MAXRANK*KPERCENT/100)))
               LWORK = N*(N+1)
-              CALL SYSTEM_CLOCK(T1)
               allocate(WORK_RRQR(LWORK), RWORK_RRQR(2*N), 
      &             TAU_RRQR(N),
      &             JPVT_RRQR(N), stat=allocok)
@@ -1356,8 +825,8 @@ C       Alloc ok!!
      &               MAXI_CLUSTER, JPVT_RRQR(1), TAU_RRQR(1), 
      &               WORK_RRQR(1),
      &               N, RWORK_RRQR(1), TOLEPS, TOL_OPT, 
-     &               RANK, MAXRANK, INFO)
-              BUILDQ = (RANK.LE.MAXRANK)
+     &               RANK, MAXRANK, INFO,
+     &               BUILDQ)
               IF (BUILDQ) THEN
                 DO J=1, N
                    ACC_LRB%R(1:MIN(RANK,J),JPVT_RRQR(J)) =
@@ -1374,17 +843,15 @@ C       Alloc ok!!
      &              POSELTT+int(I-1,8)*int(NFRONT,8)+int(M-1,8) ) = ZERO
                 END DO  
                 ACC_LRB%K = RANK
-                CALL UPDATE_FLOP_STATS_DEMOTE(ACC_LRB,NIV)
+                CALL UPD_FLOP_COMPRESS(ACC_LRB, CB_COMPRESS=CB_COMPRESS)
               ELSE
                 ACC_LRB%K = RANK
                 ACC_LRB%ISLR = .FALSE.
-                CALL UPDATE_FLOP_STATS_DEMOTE(ACC_LRB,NIV)
+                CALL UPD_FLOP_COMPRESS(ACC_LRB, CB_COMPRESS=CB_COMPRESS)
                 ACC_LRB%ISLR = .TRUE.
                 ACC_LRB%K = 0
               ENDIF
               deallocate(JPVT_RRQR, TAU_RRQR, WORK_RRQR, RWORK_RRQR)
-              CALL SYSTEM_CLOCK(T2,CR)
-              LOC_RECOMPRESS_TIME = dble(T2-T1)/dble(CR)
               RETURN
  100        CONTINUE        
 C     Alloc NOT ok!!
@@ -1396,7 +863,7 @@ C     Alloc NOT ok!!
       END SUBROUTINE DMUMPS_COMPRESS_FR_UPDATES
       SUBROUTINE DMUMPS_RECOMPRESS_ACC(ACC_LRB, MAXI_CLUSTER, 
      &          MAXI_RANK, A, LA, POSELTT, NFRONT, NIV,
-     &          COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT, KPERCENT_RMB, 
+     &          MIDBLK_COMPRESS, TOLEPS, TOL_OPT, KPERCENT_RMB, 
      &          KPERCENT_LUA, NEW_ACC_RANK)
         TYPE(LRB_TYPE),INTENT(INOUT) :: ACC_LRB
         INTEGER(8), intent(in)  :: LA
@@ -1406,7 +873,7 @@ C     Alloc NOT ok!!
         INTEGER,INTENT(IN) :: MAXI_CLUSTER, MAXI_RANK, KPERCENT_LUA
         INTEGER,INTENT(INOUT) :: NEW_ACC_RANK
         INTEGER(8), INTENT(IN) :: POSELTT
-        INTEGER,intent(in) :: COMPRESS_MID_PRODUCT, KPERCENT_RMB
+        INTEGER,intent(in) :: MIDBLK_COMPRESS, KPERCENT_RMB
         DOUBLE PRECISION, intent(in) :: TOLEPS
         DOUBLE PRECISION,    ALLOCATABLE :: RWORK_RRQR(:)
         DOUBLE PRECISION, ALLOCATABLE :: WORK_RRQR(:), TAU_RRQR(:)
@@ -1416,10 +883,8 @@ C     Alloc NOT ok!!
         TYPE(LRB_TYPE)       :: LRB1, LRB2
         INTEGER :: INFO, RANK1, RANK2, RANK, MAXRANK, LWORK
         LOGICAL :: BUILDQ, BUILDQ1, BUILDQ2, SKIP1, SKIP2
-        INTEGER :: T1, T2, CR
         INTEGER :: I, J, M, N, K
         INTEGER :: allocok, MREQ
-        DOUBLE PRECISION :: LOC_RECOMPRESS_TIME
         DOUBLE PRECISION :: ONE, MONE, ZERO
         PARAMETER (ONE = 1.0D0, MONE=-1.0D0)
         PARAMETER (ZERO=0.0D0)
@@ -1433,11 +898,10 @@ C     Alloc NOT ok!!
               MAXRANK = K-1
               MAXRANK = max (1, int((MAXRANK*KPERCENT_LUA/100)))
               LWORK = K*(K+1)
-              CALL SYSTEM_CLOCK(T1)
               IF (.FALSE.) THEN
                 CALL DMUMPS_RECOMPRESS_ACC_V2(ACC_LRB,
      &                 MAXI_CLUSTER, MAXI_RANK, A, LA, POSELTT,
-     &                 NFRONT, NIV, COMPRESS_MID_PRODUCT, TOLEPS,
+     &                 NFRONT, NIV, MIDBLK_COMPRESS, TOLEPS,
      &                 TOL_OPT, KPERCENT_RMB, KPERCENT_LUA, 
      &                 NEW_ACC_RANK)
                 K = ACC_LRB%K
@@ -1469,8 +933,8 @@ C     Alloc NOT ok!!
                 CALL DMUMPS_TRUNCATED_RRQR(M, K, Q1(1,1),
      &               M, JPVT_RRQR(1), TAU_RRQR(1), WORK_RRQR(1),
      &               K, RWORK_RRQR(1), TOLEPS, TOL_OPT, RANK1, 
-     &               MAXRANK, INFO)
-                BUILDQ1 = (RANK1.LE.MAXRANK)
+     &               MAXRANK, INFO,
+     &               BUILDQ1)
               ENDIF
               IF (BUILDQ1) THEN
                   allocate(R1(RANK1,K), stat=allocok)
@@ -1501,8 +965,8 @@ C     Alloc NOT ok!!
                 CALL DMUMPS_TRUNCATED_RRQR(N, K, Q2(1,1),
      &               N, JPVT_RRQR(1), TAU_RRQR(1), WORK_RRQR(1),
      &               K, RWORK_RRQR(1), TOLEPS, TOL_OPT, 
-     &               RANK2, MAXRANK, INFO)
-                BUILDQ2 = (RANK2.LE.MAXRANK)
+     &               RANK2, MAXRANK, INFO,
+     &               BUILDQ2)
               ENDIF
               IF (BUILDQ2) THEN
                   allocate(R2(RANK2,K), stat=allocok)
@@ -1521,8 +985,8 @@ C     Alloc NOT ok!!
      &                N, TAU_RRQR(1),  
      &                WORK_RRQR(1), LWORK, INFO )
               ENDIF
-              CALL INIT_LRB(LRB1,RANK1,RANK1,M,K,BUILDQ1)
-              CALL INIT_LRB(LRB2,RANK2,RANK2,N,K,BUILDQ2)
+              CALL INIT_LRB(LRB1,RANK1,M,K,BUILDQ1)
+              CALL INIT_LRB(LRB2,RANK2,N,K,BUILDQ2)
               IF (BUILDQ1.OR.BUILDQ2) THEN
                 IF (BUILDQ1) THEN
                   LRB1%R => R1
@@ -1545,22 +1009,21 @@ C     Alloc NOT ok!!
                 ENDIF
                 LRB2%Q => Q2
                 ACC_LRB%K = 0
-                CALL DMUMPS_LRGEMM3_LUA('N', 'T', MONE, LRB1, LRB2, ONE,
-     &             ACC_LRB, MAXI_CLUSTER, MAXI_RANK, 4, ! K480
-     &             A, LA, POSELTT, NFRONT, 0, NIV, ! SYM = 0
-     &             IFLAG, IERROR,
-     &             COMPRESS_MID_PRODUCT-1, TOLEPS, TOL_OPT, 
+                CALL DMUMPS_LRGEMM4(MONE, LRB1, LRB2, ONE,
+     &             A, LA, POSELTT, NFRONT, 0, IFLAG, IERROR,
+     &             MIDBLK_COMPRESS-1, TOLEPS, TOL_OPT, 
      &             KPERCENT_RMB, 
-     &             RANK, BUILDQ)     
+     &             RANK, BUILDQ, .TRUE., LRB3=ACC_LRB,
+     &             MAXI_RANK=MAXI_RANK, MAXI_CLUSTER=MAXI_CLUSTER)
                 IF (IFLAG.LT.0) GOTO 100
-                CALL UPDATE_FLOP_STATS_LRB_PRODUCT(LRB1, LRB2, 'N', 'T',
-     &                  NIV, 1, RANK, BUILDQ,
-     &                  K480=4,REC_ACC_IN=.TRUE.) ! special case
+                CALL UPD_FLOP_UPDATE(LRB1, LRB2, 
+     &                  MIDBLK_COMPRESS-1, RANK, BUILDQ,
+     &                  .TRUE., .FALSE., REC_ACC=.TRUE.) 
               ENDIF
               IF (.NOT. SKIP1)
-     &          CALL UPDATE_FLOP_STATS_DEMOTE(LRB1,NIV,REC_ACC=.TRUE.)
+     &          CALL UPD_FLOP_COMPRESS(LRB1, REC_ACC=.TRUE.)
               IF (.NOT. SKIP2)
-     &          CALL UPDATE_FLOP_STATS_DEMOTE(LRB2,NIV,REC_ACC=.TRUE.)
+     &          CALL UPD_FLOP_COMPRESS(LRB2, REC_ACC=.TRUE.)
               deallocate(Q1,Q2)
               IF (BUILDQ1) deallocate(R1)
               IF (BUILDQ2) deallocate(R2)
@@ -1572,8 +1035,6 @@ C     Alloc NOT ok!!
               ENDIF
  1600         CONTINUE              
               NEW_ACC_RANK = 0
-              CALL SYSTEM_CLOCK(T2,CR)
-              LOC_RECOMPRESS_TIME = dble(T2-T1)/dble(CR)
               RETURN
  100          CONTINUE
 C     Alloc NOT ok!!
@@ -1585,7 +1046,7 @@ C     Alloc NOT ok!!
       END SUBROUTINE DMUMPS_RECOMPRESS_ACC
       RECURSIVE SUBROUTINE DMUMPS_RECOMPRESS_ACC_NARYTREE(
      &          ACC_LRB, MAXI_CLUSTER, MAXI_RANK, A, LA, POSELTT, KEEP8,
-     &          NFRONT, NIV, COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT, 
+     &          NFRONT, NIV, MIDBLK_COMPRESS, TOLEPS, TOL_OPT, 
      &          KPERCENT_RMB,
      &          KPERCENT_LUA, K478, RANK_LIST, POS_LIST, NB_NODES,
      &          LEVEL, ACC_TMP)
@@ -1597,7 +1058,7 @@ C     Alloc NOT ok!!
         INTEGER,INTENT(IN) :: MAXI_CLUSTER, MAXI_RANK, KPERCENT_LUA
         INTEGER(8), INTENT(IN) :: POSELTT
         INTEGER(8) :: KEEP8(150)
-        INTEGER,intent(in) :: COMPRESS_MID_PRODUCT, KPERCENT_RMB
+        INTEGER,intent(in) :: MIDBLK_COMPRESS, KPERCENT_RMB
         DOUBLE PRECISION, intent(in) :: TOLEPS
         INTEGER,INTENT(IN) :: K478, NB_NODES, LEVEL
         INTEGER,INTENT(INOUT) :: RANK_LIST(NB_NODES), POS_LIST(NB_NODES)
@@ -1644,7 +1105,7 @@ C     Alloc NOT ok!!
               ENDIF
               NODE_RANK = NODE_RANK+RANK_LIST(IOFF+I)
             ENDDO
-            CALL INIT_LRB(LRB,NODE_RANK,NODE_RANK,M,N,.TRUE.)
+            CALL INIT_LRB(LRB,NODE_RANK,M,N,.TRUE.)
             IF (.NOT.RESORT.OR.LEVEL.EQ.0) THEN
               LRB%Q => ACC_LRB%Q(1:M,CURPOS:CURPOS+NODE_RANK)
               LRB%R => ACC_LRB%R(CURPOS:CURPOS+NODE_RANK,1:N)
@@ -1656,7 +1117,7 @@ C     Alloc NOT ok!!
             IF (NEW_ACC_RANK.GT.0) THEN
               CALL DMUMPS_RECOMPRESS_ACC(LRB,
      &             MAXI_CLUSTER, MAXI_RANK, A, LA, POSELTT,
-     &             NFRONT, NIV, COMPRESS_MID_PRODUCT, TOLEPS, 
+     &             NFRONT, NIV, MIDBLK_COMPRESS, TOLEPS, 
      &             TOL_OPT, KPERCENT_RMB, KPERCENT_LUA, NEW_ACC_RANK)
             ENDIF
             RANK_LIST_NEW(J) = LRB%K
@@ -1670,7 +1131,7 @@ C     Alloc NOT ok!!
         IF (NB_NODES_NEW.GT.1) THEN
           IF (RESORT) THEN
             KTOT = SUM(RANK_LIST_NEW)
-            CALL INIT_LRB(ACC_NEW,KTOT,KTOT,M,N,.TRUE.)
+            CALL INIT_LRB(ACC_NEW,KTOT,M,N,.TRUE.)
             ALLOCATE(ACC_NEW%Q(MAXI_CLUSTER,MAXI_RANK),
      &           ACC_NEW%R(MAXI_RANK,MAXI_CLUSTER), stat=allocok)
             IF (allocok > 0) THEN
@@ -1697,18 +1158,18 @@ C     Alloc NOT ok!!
               CURPOS = CURPOS + RANK_LIST_NEW(J)
             ENDDO
             IF (LEVEL.GT.0) THEN
-              CALL DEALLOC_LRB(ACC_TMP, KEEP8)
+              CALL DEALLOC_LRB(ACC_TMP, KEEP8, 4)
             ENDIF
             CALL DMUMPS_RECOMPRESS_ACC_NARYTREE(ACC_LRB,
      &               MAXI_CLUSTER, MAXI_RANK, A, LA, POSELTT, KEEP8,
-     &               NFRONT, NIV, COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT,
+     &               NFRONT, NIV, MIDBLK_COMPRESS, TOLEPS, TOL_OPT,
      &               KPERCENT_RMB, KPERCENT_LUA, K478, 
      &               RANK_LIST_NEW, POS_LIST_NEW, NB_NODES_NEW,
      &               LEVEL+1, ACC_NEW)
           ELSE
             CALL DMUMPS_RECOMPRESS_ACC_NARYTREE(ACC_LRB,
      &               MAXI_CLUSTER, MAXI_RANK, A, LA, POSELTT, KEEP8,
-     &               NFRONT, NIV, COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT,
+     &               NFRONT, NIV, MIDBLK_COMPRESS, TOLEPS, TOL_OPT,
      &               KPERCENT_RMB, KPERCENT_LUA, K478, 
      &               RANK_LIST_NEW, POS_LIST_NEW, NB_NODES_NEW, LEVEL+1)
           ENDIF
@@ -1727,14 +1188,14 @@ C     Alloc NOT ok!!
                    ACC_LRB%R(L,I) = ACC_TMP%R(L,I)
                 ENDDO
             ENDDO
-            CALL DEALLOC_LRB(ACC_TMP, KEEP8)
+            CALL DEALLOC_LRB(ACC_TMP, KEEP8, 4)
           ENDIF
         ENDIF
         DEALLOCATE(RANK_LIST_NEW, POS_LIST_NEW)
       END SUBROUTINE DMUMPS_RECOMPRESS_ACC_NARYTREE
       SUBROUTINE DMUMPS_RECOMPRESS_ACC_V2(ACC_LRB, MAXI_CLUSTER,
      &          MAXI_RANK, A, LA, POSELTT, NFRONT, NIV,
-     &          COMPRESS_MID_PRODUCT, TOLEPS, TOL_OPT, KPERCENT_RMB, 
+     &          MIDBLK_COMPRESS, TOLEPS, TOL_OPT, KPERCENT_RMB, 
      &          KPERCENT_LUA, NEW_ACC_RANK)
         TYPE(LRB_TYPE),INTENT(INOUT) :: ACC_LRB
         INTEGER(8), intent(in)  :: LA
@@ -1743,7 +1204,7 @@ C     Alloc NOT ok!!
         INTEGER,INTENT(IN) :: MAXI_CLUSTER, MAXI_RANK, KPERCENT_LUA
         INTEGER,INTENT(INOUT) :: NEW_ACC_RANK
         INTEGER(8), INTENT(IN) :: POSELTT
-        INTEGER,intent(in) :: COMPRESS_MID_PRODUCT, KPERCENT_RMB
+        INTEGER,intent(in) :: MIDBLK_COMPRESS, KPERCENT_RMB
         DOUBLE PRECISION, intent(in) :: TOLEPS
         DOUBLE PRECISION,    ALLOCATABLE :: RWORK_RRQR(:)
         DOUBLE PRECISION, ALLOCATABLE :: WORK_RRQR(:), TAU_RRQR(:)
@@ -1785,8 +1246,8 @@ C     Alloc NOT ok!!
               CALL DMUMPS_TRUNCATED_RRQR(M, K, Q1(1,1),
      &               M, JPVT_RRQR(1), TAU_RRQR(1), WORK_RRQR(1),
      &               K, RWORK_RRQR(1), TOLEPS, TOL_OPT, 
-     &               RANK1, MAXRANK, INFO)
-              BUILDQ1 = (RANK1.LE.MAXRANK)
+     &               RANK1, MAXRANK, INFO,
+     &               BUILDQ1)
               IF (BUILDQ1) THEN
                 allocate(Q2(N,K), stat=allocok)
                 IF (allocok > 0) THEN
@@ -1830,7 +1291,6 @@ C     Alloc NOT ok!!
               ENDIF
               deallocate(PROJ)
               deallocate(Q1, JPVT_RRQR, TAU_RRQR, WORK_RRQR, RWORK_RRQR)
-              CALL UPDATE_FLOP_STATS_REC_ACC(ACC_LRB,NIV,K1,K,BUILDQ1)
               RETURN
  100          CONTINUE
 C     Alloc NOT ok!!
@@ -1843,7 +1303,7 @@ C     Alloc NOT ok!!
       SUBROUTINE MAX_CLUSTER(CUT,CUT_SIZE,MAXI_CLUSTER)
         INTEGER, intent(in) :: CUT_SIZE
         INTEGER, intent(out) :: MAXI_CLUSTER
-        INTEGER, POINTER, DIMENSION(:) :: CUT
+        INTEGER, DIMENSION(:), intent(in) :: CUT
         INTEGER :: I
         MAXI_CLUSTER = 0
         DO I = 1, CUT_SIZE
@@ -1853,14 +1313,14 @@ C     Alloc NOT ok!!
         END DO
       END SUBROUTINE MAX_CLUSTER
       SUBROUTINE DMUMPS_GET_LUA_ORDER(NB_BLOCKS, ORDER, RANK, IWHANDLER,
-     &                       SYM, FS_OR_CB, I, J, FR_BLOCKS, 
+     &                       SYM, FS_OR_CB, I, J, FRFR_UPDATES, 
      &                       LBANDSLAVE_IN, K474, BLR_U_COL)
 C     -----------
 C     Parameters
 C     -----------
         INTEGER, INTENT(IN) :: NB_BLOCKS, IWHANDLER, SYM, FS_OR_CB, I, J
         INTEGER, INTENT(OUT) :: ORDER(NB_BLOCKS), RANK(NB_BLOCKS), 
-     &                          FR_BLOCKS
+     &                          FRFR_UPDATES
         LOGICAL, OPTIONAL, INTENT(IN) :: LBANDSLAVE_IN
         INTEGER, OPTIONAL, INTENT(IN) :: K474
         TYPE(LRB_TYPE), POINTER, OPTIONAL :: BLR_U_COL(:)
@@ -1880,7 +1340,7 @@ C     -----------
      &     'SYM, FS_OR_CB, J = ',SYM,FS_OR_CB,J
           CALL MUMPS_ABORT()
         ENDIF
-        FR_BLOCKS = 0
+        FRFR_UPDATES = 0
         DO K = 1, NB_BLOCKS
           ORDER(K) = K
           IF (FS_OR_CB.EQ.0) THEN ! FS
@@ -1928,7 +1388,7 @@ C     -----------
               RANK(K) = BLR_U(IND_U)%K
             ELSE
               RANK(K) = -1
-              FR_BLOCKS = FR_BLOCKS + 1
+              FRFR_UPDATES = FRFR_UPDATES + 1
             ENDIF
           ENDIF
         ENDDO
@@ -1970,10 +1430,6 @@ C
      &        IBIS, IBIS_END, FIRST_ROW, LAST_ROW, FIRST_COL, LAST_COL,
      &        SON_LDA
         DOUBLE PRECISION :: PROMOTE_COST
-        INTEGER T1, T2, COUNT_RATE
-#if defined(BLR_MT)         
-!$      INTEGER :: OMP_NUM
-#endif
         DOUBLE PRECISION :: ONE, ZERO
         PARAMETER (ONE = 1.0D0)
         PARAMETER (ZERO = 0.0D0)
@@ -1990,17 +1446,13 @@ C
         ELSE
           IBIS_END = NB_INCB*(NB_INCB+1)/2
         ENDIF
-        CALL SYSTEM_CLOCK(T1)
-#if defined(BLR_MT)         
+#if ! defined(BLR_NOOPENMP)
 !$OMP PARALLEL         
 !$OMP DO PRIVATE(IBIS, I, J, M, N, SON_LA, SON_LDA, FIRST_ROW,
-!$OMP&           LAST_ROW, FIRST_COL, LAST_COL, LRB, SON_A, II, KK,
-!$OMP&           APOS, IACHK, KK1, JJ2, PROMOTE_COST)
+!$OMP&         LAST_ROW, FIRST_COL, LAST_COL, LRB, SON_A, II, KK,
+!$OMP&         APOS, IACHK, KK1, JJ2, PROMOTE_COST, allocok, SON_APOS)
 #endif
         DO IBIS = 1,IBIS_END
-#if defined(BLR_MT)
-!$        OMP_NUM = OMP_GET_THREAD_NUM()
-#endif
 C         Determining I,J from IBIS
           IF (SYM.EQ.0) THEN
             I = (IBIS-1)/NB_INCB+1
@@ -2026,16 +1478,14 @@ C           first CB block, add NELIM because FIRST_ROW starts at NELIM+1
           SON_LA    = M*N
           SON_LDA   = N
           LRB => CB_LRB(I-NB_INASM,J-NB_INASM)
-C FIXME allocate only once of size MAXI_CLUSTER ?
           IF (LRB%ISLR.AND.LRB%K.EQ.0) THEN
 C           No need to perform extend-add              
-            CALL DEALLOC_LRB(LRB, KEEP8)
+            CALL DEALLOC_LRB(LRB, KEEP8, KEEP(34))
             NULLIFY(LRB)
             CYCLE
           ENDIF
           allocate(SON_A(SON_LA),stat=allocok)
           IF (allocok.GT.0) THEN
-C     FIXME propagate error
             write(*,*) 'Not enough memory in DMUMPS_BLR_ASM_NIV1',
      &     ", Memory requested = ", SON_LA
             CALL MUMPS_ABORT()
@@ -2045,10 +1495,8 @@ C         decompress block
             CALL dgemm('T', 'T', N, M, LRB%K, ONE, LRB%R(1,1), LRB%K,
      &                 LRB%Q(1,1), M, ZERO, SON_A(SON_APOS), SON_LDA)
             PROMOTE_COST = 2.0D0*M*N*LRB%K
-            CALL UPDATE_FLOP_STATS_PROMOTE(PROMOTE_COST,2)
+            CALL UPD_FLOP_DECOMPRESS(PROMOTE_COST, .TRUE.)
           ELSE
-C FIXME copy from 2D array LRB%Q to 1D array SON_A could be skipped with
-C a bit of work ...
             IF (I.EQ.J.AND.SYM.NE.0) THEN
 C             Diag block and LDLT, copy only lower half              
              IF (J-NB_INASM.EQ.1.AND.NELIM.GT.0) THEN
@@ -2081,7 +1529,7 @@ C             with NELIM more cols than rows
             ENDIF
           ENDIF
 C         Deallocate block
-          CALL DEALLOC_LRB(LRB, KEEP8)
+          CALL DEALLOC_LRB(LRB, KEEP8, KEEP(34))
           NULLIFY(LRB)
 C         extend add in father                           
           IF (SYM.NE.0.AND.J-NB_INASM.EQ.1.AND.NELIM.GT.0) THEN
@@ -2112,7 +1560,7 @@ C                 below index to cover this case.
                   ENDDO
                 ELSE
                   APOS = POSEL1 + int(SON_IW(KK+K1-1)-1,8)*NFRONT8
-                  DO KK1 = FIRST_COL, LAST_COL
+                  DO KK1 = FIRST_COL, min(LAST_COL,KK)
                    JJ2 = APOS + int(SON_IW(K1+KK1-1),8) - 1_8
                    A(JJ2) = A(JJ2) + SON_A(IACHK + int(KK1-FIRST_COL,8))
                   ENDDO
@@ -2140,27 +1588,26 @@ C               LDLT diag block: assemble only lower half
 C         Deallocate SON_A
           DEALLOCATE(SON_A)
         ENDDO
-#if defined(BLR_MT)         
+#if ! defined(BLR_NOOPENMP)
 !$OMP END DO
 !$OMP END PARALLEL         
 #endif
-        CALL SYSTEM_CLOCK(T2,COUNT_RATE)
-        ACC_DEC_ASM1_TIME = ACC_DEC_ASM1_TIME +
-     &                  dble(T2-T1)/dble(COUNT_RATE)
         CALL DMUMPS_BLR_FREE_CB_LRB(IWHANDLER,
 C          Only CB_LRB structure is left to deallocate
-     &             .TRUE., 
-     &             KEEP8)
+     &             .TRUE., KEEP8, KEEP(34))
         IF ((KEEP(486).EQ.3).OR.KEEP(486).EQ.0) THEN
 C        Case of FR solve: the BLR structure could not be freed
 C        in DMUMPS_END_FACTO_SLAVE and should be freed here
 C        Not reachable in case of error: set INFO1 to 0
-         CALL DMUMPS_BLR_END_FRONT(IWHANDLER, 0, KEEP8)
+         CALL DMUMPS_BLR_END_FRONT(IWHANDLER, 0, KEEP8, KEEP(34),
+     &                             MTK405=KEEP(405))
         ENDIF
       END SUBROUTINE DMUMPS_BLR_ASM_NIV1
       END MODULE DMUMPS_LR_CORE
+C --------------------------------------------------------------------
       SUBROUTINE DMUMPS_TRUNCATED_RRQR( M, N, A, LDA, JPVT, TAU, WORK,
-     &     LDW, RWORK, TOLEPS, TOL_OPT, RANK, MAXRANK, INFO)
+     &     LDW, RWORK, TOLEPS, TOL_OPT, RANK, MAXRANK, INFO,
+     &     ISLR)
 C     This routine computes a Rank-Revealing QR factorization of a dense
 C     matrix A. The factorization is truncated when the absolute value of
 C     a diagonal coefficient of the R factor becomes smaller than a
@@ -2174,12 +1621,50 @@ C     applying a minor modification to the outer factorization loop in
 C     order to stop computations as soon as possible when the required
 C     accuracy is reached.
 C
-C     The authors of the LAPACK library are:
-C     - Univ. of Tennessee 
-C     - Univ. of California Berkeley 
-C     - Univ. of Colorado Denver 
-C     - NAG Ltd. 
+C     Copyright (c) 1992-2017 The University of Tennessee and The 
+C     University of Tennessee Research Foundation.  All rights reserved.
+C     Copyright (c) 2000-2017 The University of California Berkeley. 
+C     All rights reserved.
+C     Copyright (c) 2006-2017 The University of Colorado Denver.  
+C     All rights reserved.
+C
+C     Redistribution and use in source and binary forms, with or without
+C     modification, are permitted provided that the following conditions
+C     are met:
+C
+C      - Redistributions of source code must retain the above copyright
+C        notice, this list of conditions and the following disclaimer.
+C
+C      - Redistributions in binary form must reproduce the above 
+C        copyright notice, this list of conditions and the following 
+C        disclaimer listed in this license in the documentation and/or 
+C        other materials provided with the distribution.
+C
+C      - Neither the name of the copyright holders nor the names of its
+C        contributors may be used to endorse or promote products derived from
+C        this software without specific prior written permission.
+C
+C      The copyright holders provide no reassurances that the source code
+C      provided does not infringe any patent, copyright, or any other
+C      intellectual property rights of third parties.  The copyright holders
+C      disclaim any liability to any recipient for claims brought against
+C      recipient by any third party for infringement of that parties
+C      intellectual property rights.
+C
+C      THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+C      "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+C      LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+C      A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+C      OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+C      SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+C      LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+C      DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+C      THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+C      (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+C      OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+C
       IMPLICIT NONE
+C
       INTEGER            ::  INFO, LDA, LDW, M, N, RANK, MAXRANK
 C     TOL_OPT controls the tolerance option used      
 C       >0 => use 2-norm (||.||_X = ||.||_2)
@@ -2198,6 +1683,7 @@ C        ||B_{I(k+1:end),J{k+1:end}}||_X <= TOLEPS*sqrt(||B_{I,I}||_2*||B_{J,J}|
       DOUBLE PRECISION               ::  RWORK(*)
       DOUBLE PRECISION            ::  A(LDA,*), TAU(*)
       DOUBLE PRECISION            ::  WORK(LDW,*)
+      LOGICAL            ::  ISLR
       DOUBLE PRECISION               ::  TOLEPS_EFF, TRUNC_ERR
       INTEGER, PARAMETER ::  INB=1, INBMIN=2
       INTEGER            :: J, JB, MINMN, NB
@@ -2205,6 +1691,7 @@ C        ||B_{I(k+1:end),J{k+1:end}}||_X <= TOLEPS*sqrt(||B_{I,I}||_2*||B_{J,J}|
       INTEGER            :: LSTICC, PVT, K, RK
       DOUBLE PRECISION               :: TEMP, TEMP2, TOL3Z
       DOUBLE PRECISION            :: AKK
+      LOGICAL INADMISSIBLE
       DOUBLE PRECISION, PARAMETER    :: RZERO=0.0D+0, RONE=1.0D+0
       DOUBLE PRECISION :: ZERO
       DOUBLE PRECISION :: ONE
@@ -2218,6 +1705,7 @@ C        ||B_{I(k+1:end),J{k+1:end}}||_X <= TOLEPS*sqrt(||B_{I,I}||_2*||B_{J,J}|
       EXTERNAL           dgemm, dgemv, dlarfg, dswap
       DOUBLE PRECISION, EXTERNAL :: dnrm2
       INFO = 0
+      ISLR = .FALSE.
       IF( M.LT.0 ) THEN
          INFO = -1
       ELSE IF( N.LT.0 ) THEN
@@ -2231,7 +1719,7 @@ C        ||B_{I(k+1:end),J{k+1:end}}||_X <= TOLEPS*sqrt(||B_{I,I}||_2*||B_{J,J}|
          END IF
       END IF
       IF( INFO.NE.0 ) THEN
-         CALL XERBLA( 'CGEQP3', -INFO )
+         WRITE(*,999) -INFO
          RETURN
       END IF
       MINMN = MIN(M,N)
@@ -2297,12 +1785,15 @@ C           ELSE
 C             TRUNC_ERR has been already computed at previous step
             ENDIF
             IF(TRUNC_ERR.LT.TOLEPS_EFF) THEN
-               RANK = RK-1
-               RETURN
-            END IF
-            IF (RK.GT.MAXRANK) THEN
+              RANK = RK-1
+              ISLR = .TRUE.  
+              RETURN
+            ENDIF
+              INADMISSIBLE = (RK.GT.MAXRANK)
+            IF (INADMISSIBLE) THEN
                RANK = RK
                INFO = RK
+               ISLR = .FALSE.
                RETURN
             END IF
             IF( PVT.NE.RK ) THEN
@@ -2349,7 +1840,8 @@ C              F( J, K ) = ZERO
                WORK( J, K+1 ) = ZERO
             END DO
 *     Incremental updating of F:
-*     F(1:N,K) := F(1:N-OFFSET,K) - tau(RK)*F(1:N,1:K-1)*A(RK:M,OFFSET+1:RK-1)**H*A(RK:M,RK).
+*     F(1:N,K) := F(1:N-OFFSET,K) - 
+*             tau(RK)*F(1:N,1:K-1)*A(RK:M,OFFSET+1:RK-1)**H*A(RK:M,RK).
             IF( K.GT.1 ) THEN
                CALL dgemv( 'Transpose', M-RK+1, K-1, -TAU(RK),
      &              A(RK,OFFSET+1), LDA, A(RK,RK), 1, ZERO,
@@ -2434,4 +1926,8 @@ C          TRUNC_ERR = dnrm2( N-RK, VN1( RK+1 ), 1 )
          ENDIF
       END DO
       RANK = RK
+        ISLR = .NOT.(RK.GT.MAXRANK)
+      RETURN
+ 999  FORMAT ('On entry to DMUMPS_TRUNCATED_RRQR, parameter number',
+     &            I2,' had an illegal value')
       END SUBROUTINE DMUMPS_TRUNCATED_RRQR

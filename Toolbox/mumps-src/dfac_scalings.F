@@ -1,14 +1,15 @@
 C
-C  This file is part of MUMPS 5.2.1, released
-C  on Fri Jun 14 14:46:05 UTC 2019
+C  This file is part of MUMPS 5.6.0, released
+C  on Wed Apr 19 15:50:57 UTC 2023
 C
 C
-C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license:
-C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+C  released under the CeCILL-C license 
+C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
        SUBROUTINE DMUMPS_FAC_A(N, NZ8, NSCA, 
      &      ASPK, IRN, ICN, COLSCA, ROWSCA, WK, LWK8, WK_REAL,
@@ -268,7 +269,8 @@ C
      &  WRITE(MPRINT,'(A)') '  END OF ROW SCALING'
       RETURN
       END SUBROUTINE DMUMPS_FAC_X
-      SUBROUTINE DMUMPS_ANORMINF( id,  ANORMINF, LSCAL )
+      SUBROUTINE DMUMPS_ANORMINF( id,  ANORMINF, LSCAL, 
+     &            EFF_SIZE_SCHUR )
       USE DMUMPS_STRUC_DEF
       IMPLICIT NONE
       INCLUDE 'mpif.h'
@@ -276,21 +278,17 @@ C
       PARAMETER( MASTER = 0 )
       TYPE(DMUMPS_STRUC), TARGET :: id
       DOUBLE PRECISION, INTENT(OUT) :: ANORMINF
-      LOGICAL :: LSCAL
-      INTEGER, DIMENSION (:), POINTER :: KEEP,INFO
-      INTEGER(8), DIMENSION (:), POINTER :: KEEP8
+      LOGICAL, INTENT(IN)  :: LSCAL
+      INTEGER, INTENT(IN)  :: EFF_SIZE_SCHUR
       LOGICAL :: I_AM_SLAVE
       DOUBLE PRECISION DUMMY(1)
       DOUBLE PRECISION ZERO
       PARAMETER( ZERO = 0.0D0)
       DOUBLE PRECISION, ALLOCATABLE :: SUMR(:), SUMR_LOC(:)
       INTEGER :: allocok, MTYPE, I
-      INFO =>id%INFO
-      KEEP =>id%KEEP
-      KEEP8 =>id%KEEP8
       I_AM_SLAVE = ( id%MYID .ne. MASTER  .OR.
      &             ( id%MYID .eq. MASTER .AND.
-     &               KEEP(46) .eq. 1 ) )
+     &               id%KEEP(46) .eq. 1 ) )
       IF (id%MYID .EQ. MASTER) THEN
        ALLOCATE( SUMR( id%N ), stat =allocok )
        IF (allocok .GT.0 ) THEN
@@ -299,20 +297,22 @@ C
         RETURN
        ENDIF
       ENDIF
-      IF ( KEEP(54) .eq. 0 ) THEN
+      IF ( id%KEEP(54) .eq. 0 ) THEN
           IF (id%MYID .EQ. MASTER) THEN
-            IF (KEEP(55).EQ.0) THEN
+            IF (id%KEEP(55).EQ.0) THEN
              IF (.NOT.LSCAL) THEN
               CALL DMUMPS_SOL_X(id%A(1),
      &          id%KEEP8(28), id%N,
      &          id%IRN(1), id%JCN(1),
-     &          SUMR, KEEP(1),KEEP8(1) )
+     &          SUMR, id%KEEP(1),id%KEEP8(1),
+     &          EFF_SIZE_SCHUR, id%SYM_PERM(1) )
              ELSE
               CALL DMUMPS_SCAL_X(id%A(1),
      &          id%KEEP8(28), id%N,
      &          id%IRN(1), id%JCN(1), 
-     &          SUMR, KEEP(1), KEEP8(1),
-     &          id%COLSCA(1))
+     &          SUMR, id%KEEP(1), id%KEEP8(1),
+     &          id%COLSCA(1), 
+     &          EFF_SIZE_SCHUR, id%SYM_PERM(1) )
              ENDIF
             ELSE
              MTYPE = 1
@@ -321,14 +321,14 @@ C
      &           id%NELT, id%ELTPTR(1),
      &           id%LELTVAR, id%ELTVAR(1),
      &           id%KEEP8(30), 
-     &           id%A_ELT(1), SUMR, KEEP(1),KEEP8(1) )
+     &           id%A_ELT(1), SUMR, id%KEEP(1),id%KEEP8(1) )
              ELSE
               CALL DMUMPS_SOL_SCALX_ELT(MTYPE, id%N,
      &           id%NELT, id%ELTPTR(1),
      &           id%LELTVAR, id%ELTVAR(1),
      &           id%KEEP8(30), 
      &           id%A_ELT(1),
-     &           SUMR, KEEP(1),KEEP8(1), id%COLSCA(1))
+     &           SUMR, id%KEEP(1), id%KEEP8(1), id%COLSCA(1))
              ENDIF
             ENDIF
           ENDIF
@@ -345,13 +345,15 @@ C
               CALL DMUMPS_SOL_X(id%A_loc(1),
      &          id%KEEP8(29), id%N,
      &          id%IRN_loc(1), id%JCN_loc(1), 
-     &          SUMR_LOC, id%KEEP(1),id%KEEP8(1) )
+     &          SUMR_LOC, id%KEEP(1),id%KEEP8(1), 
+     &          EFF_SIZE_SCHUR, id%SYM_PERM(1) )
            ELSE
               CALL DMUMPS_SCAL_X(id%A_loc(1),
      &          id%KEEP8(29), id%N,
      &          id%IRN_loc(1), id%JCN_loc(1), 
      &          SUMR_LOC, id%KEEP(1),id%KEEP8(1),
-     &          id%COLSCA(1))
+     &          id%COLSCA(1),
+     &          EFF_SIZE_SCHUR, id%SYM_PERM(1) )
            ENDIF
           ELSE
            SUMR_LOC = ZERO
@@ -368,7 +370,7 @@ C
         DEALLOCATE (SUMR_LOC)
       ENDIF
       IF ( id%MYID .eq. MASTER ) THEN
-       ANORMINF = dble(ZERO)
+        ANORMINF = dble(ZERO)
         IF (LSCAL) THEN
          DO I = 1, id%N
           ANORMINF = max(abs(id%ROWSCA(I) * SUMR(I)), 

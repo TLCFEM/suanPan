@@ -8,7 +8,7 @@
 
 ## version 3.0
 
-1. add `MAGMA` based GPU sparse solver [#123](https://github.com/TLCFEM/suanPan/pull/123)
+1. add experimental `MAGMA` based GPU sparse solver [#123](https://github.com/TLCFEM/suanPan/pull/123)
 2. add nonlinear transformation for shell elements [#124](https://github.com/TLCFEM/suanPan/pull/124)
 3. update `VTK` to version `9.2.6`
 4. add `CustomNodeGroup` [#126](https://github.com/TLCFEM/suanPan/pull/126)
@@ -17,7 +17,7 @@
 7. update `Armadillo` to version `12.2` [#134](https://github.com/TLCFEM/suanPan/pull/134)
 8. add `AsymmElastic1D` [#135](https://github.com/TLCFEM/suanPan/pull/135)
 9. update `TBB` to version `2021.9.0`
-10. experimental sparse solver support via `MAGMA`
+10. update `MUMPS` to version `5.6.0`
 
 ## version 2.9
 

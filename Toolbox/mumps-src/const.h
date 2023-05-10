@@ -101,17 +101,17 @@
 
 /* size/indices for timing array in sequential numerical factorization */
 #define NUMFAC_TIME_SLOTS 4
-
+ 
 #define TIME_INITFRONT    0
 #define TIME_EXADD        1
 #define TIME_KERNEL       2
 #define TIME_INITUPD      3
 
 /* size/indices for timing array in parallel numerical factorization */
-#define NUMFACPAR_TIME_SLOTS 9
-
-#define TIME_INITFRONT       0
-#define TIME_EXADD           1
+#define NUMFACPAR_TIME_SLOTS 9    
+ 
+#define TIME_INITFRONT       0    
+#define TIME_EXADD           1    
 #define TIME_KERNEL          2
 #define TIME_INITUPD         3
 #define TIME_EXCHANGE        4

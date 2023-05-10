@@ -1,14 +1,15 @@
 C
-C  This file is part of MUMPS 5.2.1, released
-C  on Fri Jun 14 14:46:05 UTC 2019
+C  This file is part of MUMPS 5.6.0, released
+C  on Wed Apr 19 15:50:57 UTC 2023
 C
 C
-C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license:
-C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+C  released under the CeCILL-C license 
+C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
       SUBROUTINE SMUMPS_ANA_F_ELT(N, NELT, ELTPTR, ELTVAR, LIW,
      &            IKEEP, 
@@ -45,6 +46,8 @@ C
       INTEGER(8) :: K79REF
       PARAMETER(K79REF=12000000_8)
       LOGICAL SPLITROOT
+      INTEGER, PARAMETER :: LIDUMMY = 1
+      INTEGER :: IDUMMY(1) 
       INTEGER, DIMENSION(:), ALLOCATABLE :: IW
       INTEGER, DIMENSION(:), ALLOCATABLE :: IW2
       INTEGER, DIMENSION(:), ALLOCATABLE :: PARENT
@@ -67,9 +70,6 @@ C
      &         SMUMPS_ANA_K,
      &         SMUMPS_ANA_LNEW, SMUMPS_ANA_M,
      &         MUMPS_AMD_ELT
-#if defined(OLDDFS)
-      EXTERNAL SMUMPS_ANA_L
-#endif
         ALLOCATE( IW ( LIW ), stat = allocok )
         IF ( allocok .GT. 0 ) THEN
           INFO( 1 ) = -7
@@ -254,7 +254,7 @@ C
            GOTO 90
          ENDIF
          IF (METIS_IDX_SIZE .EQ. 32) THEN
-           CALL MUMPS_METIS_NODEND_MIXEDto32(N, IPE8, IW2(1),
+           CALL MUMPS_METIS_NODEND_MIXEDto32(N, IPE8, IW2,
 #if defined(metis4) || defined(parmetis3)
      &          NUMFLAG,  
 #else
@@ -263,7 +263,7 @@ C
      &          METIS_OPTIONS(1), OPT_METIS_SIZE,
      &          IKEEP(1:N,2), IKEEP(1:N,1), INFO(1), LP, LPOK)
          ELSE IF (METIS_IDX_SIZE .EQ. 64) THEN
-           CALL MUMPS_METIS_NODEND_MIXEDto64(N, IPE8, IW2(1),
+           CALL MUMPS_METIS_NODEND_MIXEDto64(N, IPE8, IW2,
 #if defined(metis4) || defined(parmetis3)
      &          NUMFLAG, 
 #else
@@ -330,19 +330,14 @@ C
      &    IKEEP(1,2), IW(L1),
      &    IW(L2), NCMPA, ITEMP, IWtemp)
       ENDIF
-#if defined(OLDDFS)
-      CALL SMUMPS_ANA_L(N, IWtemp, IW(L1), IKEEP, IKEEP(1,2),
-     &     IKEEP(1,3),
-     &     NFSIZ, INFO(6), FILS, FRERE, IWtemp(1,3), NEMIN, KEEP(60))
-#else
       CALL SMUMPS_ANA_LNEW(N, IWtemp, IW(L1), IKEEP, IKEEP(1,2),
      &     IKEEP(1,3),
      &     NFSIZ, IWtemp(1,2), 
      &     INFO(6), FILS, FRERE, IWtemp(1,3), NEMIN, 
      &     IW(L2),  KEEP(60), KEEP(20), KEEP(38),
      &     IW2,KEEP(104),IW(L2+N),KEEP(50),
-     &     ICNTL(13), KEEP(37), NSLAVES, KEEP(250).EQ.1)
-#endif
+     &     ICNTL(13), KEEP(37), KEEP(197), NSLAVES, KEEP(250).EQ.1,
+     &     .FALSE., IDUMMY, LIDUMMY)
       DEALLOCATE(IW2)
       IF (KEEP(60).NE.0) THEN
          IF (KEEP(60)==1) THEN
@@ -369,7 +364,7 @@ C
       CALL SMUMPS_ANA_M(IKEEP(1,2),
      &  IWtemp(1,3), INFO(6),
      &  INFO(5), KEEP(2),KEEP(50),
-     &  KEEP(101), KEEP(108),KEEP(5),
+     &  KEEP8(101), KEEP(108),KEEP(5),
      &  KEEP(6), KEEP(226), KEEP(253))
       IF ( KEEP(53) .NE. 0 ) THEN
         CALL MUMPS_MAKE1ROOT( N, FRERE, FILS, NFSIZ, KEEP(20) )
@@ -379,9 +374,7 @@ C
           CALL SMUMPS_SET_K821_SURFACE(KEEP8(21), KEEP(2),
      &    KEEP(48), KEEP(50), NSLAVES)
       END IF
-      IF (KEEP(210).LT.0.OR.KEEP(210).GT.2) KEEP(210)=0
-      IF (KEEP(210).EQ.0.AND.KEEP(201).GT.0) KEEP(210)=1 
-      IF (KEEP(210).EQ.0.AND.KEEP(201).EQ.0) KEEP(210)=2 
+      IF (KEEP(210).LT.1.OR.KEEP(210).GT.2) KEEP(210)=2
       IF (KEEP(210).EQ.2) KEEP8(79)=huge(KEEP8(79))
       IF (KEEP(210).EQ.1.AND.KEEP8(79).LE.0_8) THEN
         KEEP8(79)=K79REF * int(NSLAVES,8)
@@ -390,7 +383,9 @@ C
        IF (KEEP(210).EQ.1) THEN
         SPLITROOT = .FALSE. 
         IF ( KEEP(62).GE.1) THEN
-          CALL SMUMPS_CUTNODES(N, FRERE, FILS, NFSIZ,INFO(6),
+          IDUMMY(1)= -1
+          CALL SMUMPS_CUTNODES(N, FRERE, FILS, NFSIZ,
+     &                       IDUMMY, LIDUMMY, INFO(6),
      &                       NSLAVES, KEEP,KEEP8, SPLITROOT,
      &                       MP, LDIAG, INFO(1), INFO(2))
           IF (INFO(1).LT.0) GOTO 90 
@@ -401,14 +396,21 @@ C
         ENDIF
        ENDIF
       ENDIF
-      SPLITROOT = ((ICNTL(13).GT.0 .AND. NSLAVES.GT.ICNTL(13)) .OR.
-     &     ICNTL(13).EQ.-1 )
+      SPLITROOT = ICNTL(13) .EQ. -1
+#if defined(NOSCALAPACK)
+      SPLITROOT = SPLITROOT .OR. NSLAVES.GT.0
+#else
+      SPLITROOT = SPLITROOT .OR.
+     &            (ICNTL(13).GT.0 .AND. NSLAVES .GT. ICNTL(13))
+#endif
       IF (KEEP(53) .NE. 0) THEN
          SPLITROOT = .TRUE.
       ENDIF
       SPLITROOT = (SPLITROOT.AND.( (KEEP(60).EQ.0) ))
       IF (SPLITROOT) THEN
-         CALL SMUMPS_CUTNODES(N, FRERE, FILS, NFSIZ,INFO(6),
+         IDUMMY(1) = -1
+         CALL SMUMPS_CUTNODES(N, FRERE, FILS, NFSIZ,
+     &                    IDUMMY, LIDUMMY, INFO(6),
      &                    NSLAVES, KEEP,KEEP8, SPLITROOT,
      &                    MP, LDIAG, INFO(1), INFO(2))
          IF (INFO(1).LT.0) GOTO 90 
@@ -729,22 +731,26 @@ C
       INTEGER(8) :: IPTRI8, IPTRR8, NVAR8
       INTEGER ELT, I, K
       INTEGER TYPE_PARALL, ITYPE, IRANK
+      LOGICAL :: EARLYT3ROOTINS
       TYPE_PARALL = KEEP(46)
       PTRAIW( 1:NELT ) = 0_8
+      EARLYT3ROOTINS = KEEP(200) .EQ.0
+     &        .OR.  ( KEEP(200) .LT. 0 .AND. KEEP(400) .EQ. 0 )
       DO I = 1, N
         IF (STEP(I).LT.0) CYCLE
-        ITYPE = MUMPS_TYPENODE( PROCNODE(abs(STEP(I))), SLAVEF )
-        IRANK = MUMPS_PROCNODE( PROCNODE(abs(STEP(I))), SLAVEF )
+        ITYPE = MUMPS_TYPENODE( PROCNODE(abs(STEP(I))), KEEP(199) )
+        IRANK = MUMPS_PROCNODE( PROCNODE(abs(STEP(I))), KEEP(199) )
         IF ( TYPE_PARALL .eq. 0 ) THEN
           IRANK = IRANK + 1
         END IF
         IF ( (ITYPE .EQ. 2) .OR.
+     &       (ITYPE .EQ. 3 .AND. .NOT. EARLYT3ROOTINS ) .OR.
      &       (ITYPE .EQ. 1 .AND. IRANK .EQ. MYID) ) THEN
           DO K = FRTPTR(I),FRTPTR(I+1)-1
             ELT = FRTELT(K)
             PTRAIW( ELT ) = PTRARW(ELT+1) - PTRARW(ELT)
           ENDDO
-        ELSE 
+        ELSE  
         END IF
       END DO
       IPTRI8 = 1_8
@@ -795,19 +801,25 @@ C
       KEEP8(26) = IPTRR8 - 1_8
       RETURN
       END SUBROUTINE SMUMPS_ANA_DIST_ELEMENTS
-      SUBROUTINE SMUMPS_ELTPROC( N, NELT, ELTPROC, SLAVEF, PROCNODE )
+      SUBROUTINE SMUMPS_ELTPROC( N, NELT, ELTPROC, SLAVEF, PROCNODE,
+     &                           KEEP)
       IMPLICIT NONE
-      INTEGER N, NELT, SLAVEF
-      INTEGER PROCNODE( N ), ELTPROC( NELT )
-      INTEGER ELT, I, ITYPE, MUMPS_TYPENODE, MUMPS_PROCNODE
-      EXTERNAL MUMPS_TYPENODE, MUMPS_PROCNODE
+      INTEGER, INTENT(IN)    :: N, NELT, SLAVEF
+      INTEGER, INTENT(IN)    :: PROCNODE( N )
+      INTEGER, INTENT(INOUT) :: ELTPROC( NELT )
+      INTEGER                :: KEEP(500)
+      INTEGER ELT, I, ITYPE
+      LOGICAL :: EARLYT3ROOTINS 
+      INTEGER, EXTERNAL :: MUMPS_TYPENODE, MUMPS_PROCNODE
+      EARLYT3ROOTINS = KEEP(200) .EQ.0
+     &        .OR.  ( KEEP(200) .LT. 0 .AND. KEEP(400) .EQ. 0 )
       DO ELT = 1, NELT
           I = ELTPROC(ELT)
           IF ( I .NE. 0) THEN
-           ITYPE = MUMPS_TYPENODE(PROCNODE(I),SLAVEF)
+           ITYPE = MUMPS_TYPENODE(PROCNODE(I),KEEP(199))
            IF (ITYPE.EQ.1) THEN
-             ELTPROC(ELT) = MUMPS_PROCNODE(PROCNODE(I),SLAVEF)
-           ELSE IF (ITYPE.EQ.2) THEN
+             ELTPROC(ELT) = MUMPS_PROCNODE(PROCNODE(I),KEEP(199))
+           ELSE IF ( ITYPE.EQ.2 .OR. .NOT. EARLYT3ROOTINS ) THEN
              ELTPROC(ELT) = -1
            ELSE
             ELTPROC(ELT) = -2

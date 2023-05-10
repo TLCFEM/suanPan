@@ -1,14 +1,15 @@
 C
-C  This file is part of MUMPS 5.2.1, released
-C  on Fri Jun 14 14:46:05 UTC 2019
+C  This file is part of MUMPS 5.6.0, released
+C  on Wed Apr 19 15:50:57 UTC 2023
 C
 C
-C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license:
-C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+C  released under the CeCILL-C license 
+C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
       SUBROUTINE DMUMPS_ELT_DISTRIB(
      &            N, NELT, NA_ELT8,
@@ -49,9 +50,8 @@ C
       INTEGER NBRECORDS, NBUF
       INTEGER(8) :: RECV_IELTPTR8
       INTEGER(8) :: RECV_RELTPTR8
-      INTEGER INODE
       INTEGER(8) :: IELTPTR8, RELTPTR8
-      LOGICAL FINI, PROKG, I_AM_SLAVE
+      LOGICAL FINI, PROKG, I_AM_SLAVE, EARLYT3ROOTINS
       INTEGER(8) :: PTR_ROOT
       INTEGER LOCAL_M, LOCAL_N, LP, IBEG, IGLOB, JGLOB
       INTEGER ARROW_ROOT
@@ -70,8 +70,6 @@ C
       DOUBLE PRECISION, DIMENSION( : ), ALLOCATABLE :: TEMP_ELT_R
       INTEGER, DIMENSION( : ), ALLOCATABLE :: TEMP_ELT_I
       INTEGER(8), DIMENSION( : ), ALLOCATABLE :: ELROOTPOS8
-      INTEGER, DIMENSION( : ), ALLOCATABLE, TARGET :: RG2LALLOC
-      INTEGER, DIMENSION( : ), POINTER     :: RG2L
       MPG = id%ICNTL(3)
       LP  = id%ICNTL(1)
       I_AM_SLAVE = ( KEEP(46) .eq. 1 .or. MYID .ne.MASTER )
@@ -79,6 +77,8 @@ C
       PROKG   = (PROKG.AND.(id%ICNTL(4).GE.2))
       KEEP(49) = 0
       ARROW_ROOT = 0
+      EARLYT3ROOTINS = KEEP(200) .EQ.0
+     &        .OR.  ( KEEP(200) .LT. 0 .AND. KEEP(400) .EQ. 0 )
       IF ( MYID .eq. MASTER ) THEN
         IF ( KEEP(46) .eq. 0 ) THEN
           NBUF = SLAVEF
@@ -130,31 +130,15 @@ C
         END IF
         IF ( KEEP(38) .ne. 0 ) THEN
           NBELROOT = FRTPTR(KEEP(38)+1)-FRTPTR(KEEP(38))
-          ALLOCATE( ELROOTPOS8( max(NBELROOT,1) ),
+          IF ( EARLYT3ROOTINS ) THEN
+            ALLOCATE( ELROOTPOS8( max(NBELROOT,1) ),
      &              stat = allocok )
-          IF ( allocok .gt. 0 ) THEN
+            IF ( allocok .gt. 0 ) THEN
               id%INFO(1) = -13
               id%INFO(2) = NBELROOT
               GOTO 100
-          END IF
-          IF (KEEP(46) .eq. 0 ) THEN
-           ALLOCATE( RG2LALLOC( N ), stat = allocok )
-           IF ( allocok .gt. 0 ) THEN
-               id%INFO(1) = -13
-               id%INFO(2) = N
-               GOTO 100
-           END IF
-           INODE = KEEP(38)
-           I     = 1
-           DO WHILE ( INODE .GT. 0 )
-             RG2LALLOC( INODE ) = I
-             INODE = FILS( INODE )
-             I = I + 1
-           END DO
-           RG2L => RG2LALLOC
-          ELSE 
-           RG2L => root%RG2L_ROW
-          END IF
+            END IF
+          ENDIF
         END IF
         DO I = 1, NBUF
           BUFI( 1, I ) = 0
@@ -182,7 +166,7 @@ C
           END IF
           DEST = id%ELTPROC( IEL )
           IF ( DEST .eq. -2 ) THEN
-            NBELROOT = NBELROOT + 1
+            NBELROOT   = NBELROOT   + 1
             FRTELT( FRTPTR(KEEP(38)) + NBELROOT - 1 ) = IEL
             ELROOTPOS8( NBELROOT ) = RELTPTR8
             GOTO 200
@@ -282,25 +266,12 @@ C
      &       .and. RECV_RELTPTR8 .eq. RELPTR_LOC8( NELT+1 ) )
         END DO
       END IF
-      IF ( KEEP(38) .NE. 0 ) THEN
-         IF ( I_AM_SLAVE .and. root%yes ) THEN
-          IF (KEEP(60)==0) THEN
-           LOCAL_M = numroc( root%ROOT_SIZE, root%MBLOCK,
-     &             root%MYROW, 0, root%NPROW )
-           LOCAL_M = max( 1, LOCAL_M )
-           LOCAL_N = numroc( root%ROOT_SIZE, root%NBLOCK,
-     &               root%MYCOL, 0, root%NPCOL )
-           PTR_ROOT = LA - int(LOCAL_M,8) * int(LOCAL_N,8) + 1_8
-           IF ( PTR_ROOT .LE. LA ) THEN
-             A( PTR_ROOT:LA ) = ZERO
-           END IF
-          ELSE
-           DO I = 1, root%SCHUR_NLOC
-            root%SCHUR_POINTER((I-1)*root%SCHUR_LLD+1:
-     &      (I-1)*root%SCHUR_LLD+root%SCHUR_MLOC)=ZERO
-           ENDDO
-          ENDIF
-         END IF
+      IF ( KEEP(38) .NE. 0 .AND. EARLYT3ROOTINS ) THEN
+        IF ( I_AM_SLAVE .and. root%yes ) THEN
+          CALL DMUMPS_GET_ROOT_INFO(root,
+     &                              LOCAL_M, LOCAL_N, PTR_ROOT, LA)
+          CALL DMUMPS_SET_ROOT_TO_ZERO(root, KEEP, A, LA)
+        END IF
         IF ( MYID .NE. MASTER ) THEN
           ALLOCATE( BUFI( NBRECORDS * 2 + 1, 1 ), stat = allocok )
           IF ( allocok .GT. 0 ) THEN
@@ -322,7 +293,7 @@ C
           IELT = FRTELT( IPTR )
           SIZEI = id%ELTPTR( IELT + 1 ) - id%ELTPTR( IELT )
           DO I = 1, SIZEI
-            TEMP_ELT_I( I ) = RG2L
+            TEMP_ELT_I( I ) = root%RG2L
      &              ( id%ELTVAR( id%ELTPTR(IELT) + I - 1 ) )
           END DO
           IVALPTR8 = ELROOTPOS8( IPTR - FRTPTR(KEEP(38)) + 1 ) - 1
@@ -364,13 +335,13 @@ C
                 DEST = IROW_GRID * root%NPCOL + JCOL_GRID
               END IF
               IF ( DEST .eq. MASTER ) THEN
-                ARROW_ROOT = ARROW_ROOT + 1
                 ILOCROOT = root%MBLOCK * ( ( IPOSROOT - 1 ) /
      &                 ( root%MBLOCK * root%NPROW ) )
      &               + mod( IPOSROOT - 1, root%MBLOCK ) + 1
                 JLOCROOT = root%NBLOCK * ( ( JPOSROOT - 1 ) /
      &                 ( root%NBLOCK * root%NPCOL ) )
      &               + mod( JPOSROOT - 1, root%NBLOCK ) + 1
+              ARROW_ROOT = ARROW_ROOT + 1
               IF (KEEP(60)==0) THEN
                 A( PTR_ROOT
      &             + int(JLOCROOT - 1,8) * int(LOCAL_M,8)
@@ -389,9 +360,9 @@ C
      &          + VAL
               ENDIF
               ELSE
-                CALL DMUMPS_ARROW_FILL_SEND_BUF(
+                CALL DMUMPS_ARROW_FILL_SEND_BUF_ELT(
      &          IPOSROOT, JPOSROOT, VAL, DEST, BUFI, BUFR, NBRECORDS,
-     &          NBUF, LP, COMM, KEEP(46) )
+     &          NBUF, LP, COMM )
               END IF
               K8 = K8 + 1_8
             END DO
@@ -408,6 +379,7 @@ C
      &                ARROWHEAD,
      &                COMM, STATUS, IERR_MPI )
             NB_REC = BUFI(1,1)
+            ARROW_ROOT = ARROW_ROOT + NB_REC
             IF (NB_REC.LE.0) THEN
               FINI = .TRUE.
               NB_REC = -NB_REC
@@ -416,7 +388,6 @@ C
             CALL MPI_RECV( BUFR(1,1), NBRECORDS, MPI_DOUBLE_PRECISION,
      &                     MASTER, ARROWHEAD,
      &                     COMM, STATUS, IERR_MPI )
-            ARROW_ROOT = ARROW_ROOT + NB_REC
             DO IREC = 1, NB_REC
               IPOSROOT = BUFI( IREC * 2, 1 )
               JPOSROOT = BUFI( IREC * 2 + 1, 1 )
@@ -451,12 +422,7 @@ C
       IF ( MYID .eq. MASTER ) THEN
         DEALLOCATE( BUFI )
         DEALLOCATE( BUFR )
-        IF (KEEP(38).ne.0) THEN 
-          DEALLOCATE(ELROOTPOS8)
-          IF (KEEP(46) .eq. 0 ) THEN
-             DEALLOCATE(RG2LALLOC)
-          ENDIF
-        ENDIF
+        IF (allocated(ELROOTPOS8)) DEALLOCATE(ELROOTPOS8)
         DEALLOCATE( TEMP_ELT_I )
       END IF
       KEEP(49) = ARROW_ROOT

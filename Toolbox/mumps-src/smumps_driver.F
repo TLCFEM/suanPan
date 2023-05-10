@@ -1,14 +1,15 @@
 C
-C  This file is part of MUMPS 5.2.1, released
-C  on Fri Jun 14 14:46:05 UTC 2019
+C  This file is part of MUMPS 5.6.0, released
+C  on Wed Apr 19 15:50:57 UTC 2023
 C
 C
-C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license:
-C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+C  released under the CeCILL-C license 
+C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
 C  ===========================
 C  FORTRAN 90 Driver for SMUMPS
@@ -55,6 +56,7 @@ C        -Out-of-Core factorization and solution
 C        -Solution phase:
 C          -Multiple Right-Hand-sides (RHS)
 C          -Sparse RHS
+C          -Distributed RHS
 C          -Computation of selected entries of the inverse of 
 C           original matrix.
 C        - Block Low-Rank (BLR) approximation based factorization
@@ -77,7 +79,8 @@ C -----------
 C
 C  P. Amestoy, J.-Y. L'Excellent, G. Moreau, On exploiting sparsity of 
 C    multiple right-hand sides in sparse direct solvers,
-C    SIAM Journal on Scientific Computing, to appear (2019)
+C    SIAM Journal on Scientific Computing, volume 41, number 2,
+C    pages A269-A291 (2019)
 C
 C  G. Moreau, PhD Thesis, ENS-Lyon, University of Lyon,  
 C    On the solution phase of direct methods for sparse linear systems
@@ -94,9 +97,9 @@ C    scalability, November 2017.
 C
 C  S. de la Kethulle de Ryhove, P. Jaysaval and D.V. Shantsev, 
 C    P. R. Amestoy, J.-Y. L'Excellent and T. Mary, 
-C    Large-scale 3D Controlled source EM modeling with a 
-C    Block Low-Rank MUMPS solver, Geophysical Journal International,
-C    volume 209, number 3, pages 1558-1571.
+C    Large-scale 3D EM modeling with a Block Low-Rank MUMPS solver, 
+C    Geophysical Journal International, volume 209, number 3, 
+C    pages 1558-1571 (2017) .
 C
 C  P. Amestoy, A. Buttari, J.-Y. L'Excellent and T. Mary, 
 C    On the complexity of the Block Low-Rank multifrontal factorization, 
@@ -580,7 +583,8 @@ C
       INTEGER JOBMIN, JOBMAX, OLDJOB
 !$    INTEGER NOMP, NOMPMIN, NOMPMAX
       INTEGER I, J, MP, LP, MPG, KEEP235SAVE, KEEP242SAVE,
-     &        KEEP243SAVE, KEEP495SAVE, KEEP497SAVE
+     &        KEEP243SAVE, KEEP495SAVE, KEEP497SAVE,
+     &        KEEP77SAVE, KEEP83SAVE, KEEP91SAVE
       INTEGER(8) :: I8
       LOGICAL LANA, LFACTO, LSOLVE, PROK, LPOK, FLAG, PROKG
       LOGICAL NOERRORBEFOREPERM
@@ -598,6 +602,21 @@ C     TIMINGS
       INTEGER(8) :: FILE_SIZE,STRUC_SIZE
       INTEGER:: ICNTL16_LOC
 !$    INTEGER:: PREVIOUS_OMP_THREADS_NUM
+      IF (id%JOB .EQ. -200) THEN
+C       -----------------
+C       QUICK TERMINATION:
+C       -----------------
+C       In case of very serious error that cannot be recovered
+C       (example MPI crash, signal to kill a process, etc.),
+C       a user error handler may want to call MUMPS with
+C       JOB=-200 to just suppress the existing OOC files (if any)
+C       before terminating the application and killing all
+C       processes. No checks are performed in this case,
+C       data is not freed and MPI should not be called
+C       (since MPI might no longer work)
+        CALL SMUMPS_OOC_CLEAN_FILES(id,IERR)
+        RETURN
+      ENDIF
       NOERRORBEFOREPERM = .FALSE.
       UNS_PERM_DONE = .FALSE.
       LANA  = .FALSE.
@@ -615,6 +634,8 @@ C     -----------------------------------
       IF ( .NOT. FLAG ) THEN
         id%INFO(1) = -23
         id%INFO(2) =   0
+        id%INFOG(1) = -23
+        id%INFOG(2) =   0
         WRITE(6,990)
  990  FORMAT(' Unrecoverable Error in SMUMPS initialization: ',
      &       ' MPI is not running.')
@@ -653,6 +674,8 @@ C
 C     Check value of JOB and previous value of JOB
 C
       IF ((JOB.LT.-3.OR.JOB.EQ.0.OR.JOB.GT.8)
+     &    .AND. JOB.NE.9
+     &    .AND. JOB.NE.-4
      &  ) THEN
 C       Out of range value
         id%INFO(1) = -3 
@@ -694,12 +717,24 @@ C     ----------------------------------
      &    (JOB.EQ.5).OR.(JOB.EQ.6)) LFACTO = .TRUE.
       IF ((JOB.EQ.3).OR.(JOB.EQ.5).OR.
      &    (JOB.EQ.6))               LSOLVE = .TRUE.
+      IF ( LANA .OR. LFACTO ) THEN 
+       id%KEEP(417) = id%ICNTL(51) 
+       CALL MPI_BCAST( id%KEEP(417 ), 1, MPI_INTEGER,
+     &                MASTER, id%C OMM, IERR )
+      ENDIF                        
       IF ( LANA .OR. LFACTO .OR. LSOLVE) THEN
+        IF (id%KEEP(50).NE.0) id%KEEP(202)=0
 C       Set some specific experimental KEEP entries,
 C       Value defined on MASTER is the reference
         CALL MPI_BCAST( id%KEEP(370), 2, MPI_INTEGER, MASTER, id%COMM,
      &         IERR )
         IF (LANA) THEN
+           KEEP77SAVE = id%KEEP(77)
+           KEEP83SAVE = id%KEEP(83)
+           KEEP91SAVE = id%KEEP(91)
+           id%KEEP(198) = 0
+           CALL MPI_BCAST( id%KEEP(198), 1, MPI_INTEGER, MASTER, 
+     &          id%COMM, IERR )
           IF (id%KEEP(370) .EQ. 1) THEN     
             id%KEEP(77)=0
             id%KEEP(78)=0
@@ -713,37 +748,47 @@ C       Value defined on MASTER is the reference
             ENDIF
           ENDIF
           IF (LFACTO) THEN
-            id%KEEP(351) = 1 
             id%KEEP(206) = 2 
-            id%KEEP(378) = 1
           ENDIF
           IF (LSOLVE) THEN
-            id%KEEP(350) = 2 
+C           Nothing for the moment
+          ENDIF
+        ENDIF
+        IF (LANA) THEN
+          IF (id%KEEP(198).NE.0) THEN
+            id%KEEP(77)=0
+            id%KEEP(78)=0
+            id%KEEP(375)=1           
+            IF ((id%KEEP(50).EQ.0) .AND. (id%NSLAVES.GT.1)) THEN
+              id%KEEP(376) = 1
+            ENDIF
+            IF (id%KEEP(198).EQ.2) THEN
+             id%KEEP(83) = 0
+             id%KEEP(91) = 0
+            ENDIF
           ENDIF
         ENDIF
       ENDIF ! LANA .OR. LFACTO .OR. LSOLVE
       IF (LANA) THEN
 C       Decode NZ / NNZ into KEEP8(28) now
 C       since we may want to print it.
-C       NZ and NNZ only accessed at analysis
-C       phase
+C       NZ and NNZ only accessed at analysis phase
+C       In case of distributed matrix with ICNLT(18)=1,2 then 
+C       NZ/NNZ is the size of the centralized structure
         CALL MUMPS_GET_NNZ_INTERNAL( id%NNZ, id%NZ, id%KEEP8(28) )
       ENDIF
 C     Also decode NNZ_loc in the same way
       IF (LANA .OR. LFACTO) THEN
 C       NZ_loc/NNZ_loc may be accessed both analysis
 C       and factorization:
-        IF (id%NNZ_loc > 0_8) THEN
-          id%KEEP8(29) = id%NNZ_loc
-        ELSE
-          id%KEEP8(29) = int(id%NZ_loc, 8)
-        ENDIF
+        CALL MUMPS_GET_NNZ_INTERNAL( id%NNZ_loc, id%NZ_loc,
+     &                               id%KEEP8(29))
       ENDIF
-C
 C
       IF (JOB.EQ.-2.OR.JOB.EQ.1.OR.JOB.EQ.2.OR.JOB.EQ.3.OR.
      &    JOB.EQ.4.OR.JOB.EQ.5.OR.JOB.EQ.6
      &     .OR.JOB.EQ.7.OR.JOB.EQ.8.OR.JOB.EQ.-3
+     *     .OR. JOB.EQ.9 ! LATER .OR.JOB.EQ.10
      &     ) THEN
 C       Value of JOB is correct and differnet from -1
 C       ICNTL should have been initialized and can be used
@@ -767,7 +812,11 @@ C       -----------------------------
      &          IERR )
 !$      IF (ICNTL16_LOC .GT. 0) THEN
 !$        PREVIOUS_OMP_THREADS_NUM = omp_get_max_threads()
+#if defined(WORKAROUNDINTELILP64OPENMPLIMITATION)
+!$        CALL omp_set_num_threads(int(ICNTL16_LOC,4))
+#else
 !$        CALL omp_set_num_threads(ICNTL16_LOC)
+#endif
 !$      ENDIF
 C       -----------------------------
 C       Check if number of threads is
@@ -830,6 +879,17 @@ C          MPI and OpenMP information
      &                 id%NPROCS, ', without OMP'
 !$         ENDIF
           IF (JOB.GE.1 .AND. JOB.LE.6) THEN
+            IF ( id%KEEP(370).EQ.1.OR.id%KEEP(371).EQ.1) THEN
+              WRITE(MPG, 99996) id%KEEP(370), id%KEEP(371)
+            ENDIF
+99996       FORMAT(/'Advanced settings:'/
+     &       '   KEEP(370) Static mapping              =',I10/
+     &       '   KEEP(371) Advanced optimizations      =',I10)
+            IF (id%KEEP(401) .GE. 1) THEN
+              WRITE(MPG, 99997) id%KEEP(401)
+            ENDIF
+99997       FORMAT('L0 thread based multithreading setting:'/
+     &       '   KEEP(401) (>=1 : ON)                  =',I10)
             WRITE(MPG, '(A)')
           ENDIF
         ENDIF
@@ -986,6 +1046,40 @@ C
         IF ( id%INFO(1) .LT. 0 ) GOTO 499
         GOTO 500
       ENDIF
+C----------------------------------------------------------------
+C
+C     JOB =  9 : fill IRHS_loc
+C
+C----------------------------------------------------------------
+      IF (JOB.EQ.9) THEN
+C       Check that factorization was performed
+        IF ( OLDJOB .LT. 2 ) THEN
+          id%INFO(1)=-3
+          id%INFO(2)=JOB
+        ELSE
+          CALL SMUMPS_SOL_INIT_IRHS_loc(id)
+        ENDIF
+        IF ( id%INFO(1) .LT. 0 ) GOTO 499
+        GOTO 500
+      ENDIF
+C----------------------------------------------------------------
+C
+C     JOB = -4 : Free data associated to factorization
+C
+C----------------------------------------------------------------
+      IF (JOB.EQ.-4) THEN
+C       Allowed if last factorization failed, i.e. OLDJOB=1
+        IF (OLDJOB .LT. 1) THEN
+          id%INFO(1)=-3
+          id%INFO(2)=JOB
+        ELSE
+          CALL SMUMPS_FREE_DATA_FACTO(id)
+C         Reset last successful phase
+          OLDJOB=min(OLDJOB, 1)
+        ENDIF
+        IF ( id%INFO(1) .LT .0 ) GOTO 499
+        GOTO 500
+      ENDIF
 C
 C----------------------------------------------------------------
 C
@@ -1034,21 +1128,10 @@ C
           id%INFO(2) = JOB
           GOTO 499
         END IF
-        IF ( OLDJOB .GE. 2 ) THEN
-C         -----------------------------------------
-C         Previous step was factorization or solve.
-C         As analysis is now performed, deallocate
-C         at least some big arrays from facto.
-C         -----------------------------------------
-          IF (associated(id%IS)) THEN
-            DEALLOCATE  (id%IS)
-            NULLIFY     (id%IS)
-          END IF
-          IF (associated(id%S)) THEN
-            DEALLOCATE  (id%S)
-            NULLIFY     (id%S)
-          END IF
-        END IF   
+C       Free data associated to previous analysis/facto/solve   
+        IF (OLDJOB .NE. -1) THEN
+          CALL SMUMPS_FREE_DATA_ANAFACSOL(id)
+        ENDIF
       END IF
       IF ( LFACTO ) THEN
 C        ------------------------------------
@@ -1060,6 +1143,11 @@ C        ------------------------------------
             id%INFO(2) = JOB
             GOTO 499
          END IF
+C        --------------------------
+C        Free data from previous
+C        factorization-solve phases
+C        --------------------------
+           CALL SMUMPS_FREE_DATA_FACTO(id)
       END IF
       IF ( LSOLVE ) THEN
 C        -------------------------------
@@ -1133,14 +1221,7 @@ C-       ANALYSIS : Max-Trans, Analysis, Distribution
 C-
 C-----------------------------------------------------
 C
-C        Few checks + allocations
-C
-C        IS1 :allocated on the master now, will be allocated on
-C             the slaves later
-C        IS : will be allocated on the slaves later
-C        PROCNODE : on the master only,
-C             because slave does not know N yet.
-C             Will be allocated in analysis for the slave.
+C        Few checks
 C
 C        For assembled entry: 
 C        IRN, JCN : check that they have been allocated by the
@@ -1185,68 +1266,6 @@ C     icntl(6), (7) and (12) to not done/chosen
           id%INFOG(7) = -9999
           id%INFOG(23) = 0
           id%INFOG(24) = 1
-          IF (associated(id%IS1)) THEN
-            DEALLOCATE(id%IS1)
-            NULLIFY(id%IS1)
-          ENDIF
-C         -------------------------------------------
-C         Allocate array IS1 for analysis of size:
-C          - assembled entry: 10 * N or 11 * N
-C                             depending on max-trans
-C          - element entry: 7 * N + 3 * NELT + 3
-C                           max-trans not allowed
-C         -------------------------------------------
-          IF ( id%ICNTL(5) .NE. 1 ) THEN ! assembled matrix
-            IF ( id%KEEP(50) .NE. 1 
-     &           .AND. (
-     &           (id%ICNTL(6) .NE. 0 .AND. id%ICNTL(7) .NE.1)
-     &           .OR.
-     &           id%ICNTL(12) .NE. 1) ) THEN
-              id%MAXIS1 = 7 * id%N
-            ELSE
-              id%MAXIS1 = 6 * id%N
-            END IF
-          ELSE
-            id%MAXIS1 = 6 * id%N
-          ENDIF
-          ALLOCATE( id%IS1(id%MAXIS1), stat=IERR )
-          IF (IERR.gt.0) THEN
-            id%INFO(1) = -7
-            id%INFO(2) = id%MAXIS1
-            IF ( LPOK ) WRITE(LP,'(A)')
-     &      ' Problem in allocating work array for analysis'
-            GO TO 100
-          END IF
-C
-C         ----------------------
-C         Allocate PROCNODE(1:N)
-C         ----------------------
-          IF ( associated( id%PROCNODE ) )
-     &         DEALLOCATE( id%PROCNODE )
-          ALLOCATE( id%PROCNODE(id%N), stat=IERR )
-          IF (IERR.gt.0) THEN
-            id%INFO(1) = -7
-            id%INFO(2) = id%N
-            IF ( LPOK ) WRITE(LP,'(A)')
-     &        'Problem in allocating work array PROCNODE'
-            GOTO 100
-          END IF
-          id%PROCNODE(1:id%N) = 0
-C         ---------------------------------------
-C         Element entry: allocate ELTPROC(1:NELT)
-C         ---------------------------------------
-          IF ( id%ICNTL(5) .EQ. 1 ) THEN ! Elemental matrix
-            IF ( associated( id%ELTPROC ) )
-     &           DEALLOCATE( id%ELTPROC )
-            ALLOCATE( id%ELTPROC(id%NELT), stat=IERR )
-            IF (IERR.gt.0) THEN
-              id%INFO(1) = -7
-              id%INFO(2) = id%NELT
-              IF ( LPOK ) WRITE(LP,'(A)')
-     &          'Problem in allocating work array ELTPROC'
-              GOTO 100
-            END IF
-          END IF
 C         ---------------------------------------------------
 C         Assembled centralized entry: check input parameters
 C         IRN/JCN
@@ -1259,26 +1278,26 @@ C         ---------------------------------------------------
               IF ( .not. associated( id%IRN ) ) THEN
                 id%INFO(1) = -22
                 id%INFO(2) = 1
-#if defined(MUMPS_F2003)
-              ELSE IF ( size( id%IRN, KIND=8 ) < id%KEEP8(28) ) THEN
-#else
-C             size with kind=8 output not available. One can still
-C             check that if NZ can be stored in a 32-bit integer,
+#if defined(MUMPS_NOF2003)
+C             size with kind=8 output not available before f2003. One can
+C             still check that if NZ can be stored in a 32-bit integer,
 C             the 32-bit size(id%IRN) is large enough
               ELSE IF ( id%KEEP8(28) .LE. int(huge(id%NZ),8) .AND.
      &                  size(id%IRN) < int(id%KEEP8(28)) ) THEN
+#else
+              ELSE IF ( size( id%IRN, KIND=8 ) < id%KEEP8(28) ) THEN
 #endif
                 id%INFO(1) = -22
                 id%INFO(2) = 1
               ELSE IF ( .not. associated( id%JCN ) ) THEN
                 id%INFO(1) = -22
                 id%INFO(2) = 2
-#if defined(MUMPS_F2003)
-              ELSE IF ( size( id%JCN, KIND=8 ) < id%KEEP8(28) ) THEN
-#else
+#if defined(MUMPS_NOF2003)
 C             Same as for IRN above
               ELSE IF ( id%KEEP8(28) .LE. int(huge(id%NZ),8) .AND.
      &                  size(id%JCN) < int(id%KEEP8(28)) ) THEN
+#else
+              ELSE IF ( size( id%JCN, KIND=8 ) < id%KEEP8(28) ) THEN
 #endif
                 id%INFO(1) = -22
                 id%INFO(2) = 2
@@ -1344,35 +1363,97 @@ C       -----------------------------------------
           id%DKEEP(71)=0.0E0
           CALL MUMPS_SECDEB(TIMEG)
         END IF 
-C        -------------------------------------------
-C        Set scaling option for analysis in KEEP(52)
-C        -------------------------------------------
-        id%KEEP(52) = id%ICNTL(8)
+C       -------------------------------------------------
+C       Set scaling option for analysis in KEEP(52)
+C       (ICNTL(8) only defined on host at analysis phase)
+C       -------------------------------------------------
+        IF (id%MYID.EQ.MASTER) THEN
+C{
+         id%KEEP(52) = id%ICNTL(8)
 C        Out-of-range values => automatic choice
-        IF ( id%KEEP(52) .GT. 8 .OR. id%KEEP(52).LT.-2)
+         IF ( id%KEEP(52) .GT. 8 .OR. id%KEEP(52).LT.-2)
      &       id%KEEP(52) = 77
-        IF ( id%KEEP(52) .EQ. 2 .OR. id%KEEP(52).EQ.5 
+         IF ( id%KEEP(52) .EQ. 2 .OR. id%KEEP(52).EQ.5 
      &       .OR. id%KEEP(52) .EQ. 6 )
      &       id%KEEP(52) = 77
-        IF ((id%KEEP(52).EQ.77).AND.(id%KEEP(50).EQ.1)) THEN
-         ! for SPD matrices default is no scaling
-          id%KEEP(52) = 0
-        ENDIF
-        IF ( id%KEEP(52).EQ.77 .OR. id%KEEP(52).LE.-2) THEN 
+         IF ((id%KEEP(52).EQ.77).AND.(id%KEEP(50).EQ.1)) THEN
+          ! for SPD matrices default is no scaling
+           id%KEEP(52) = 0
+         ENDIF
+         IF ( id%KEEP(52).EQ.77 .OR. id%KEEP(52).LE.-2) THEN 
 C          -- suppress scaling computed during analysis 
 C          -- if centralized matrix is not associated
           IF (.not.associated(id%A)) id%KEEP(52) = 0
+         ENDIF
+C        deactivate analysis scaling if scaling given
+         IF(id%KEEP(52) .EQ. -1) id%KEEP(52) = 0
+C
+C        deactivate analysis scaling if 
+C        permutation to zero-free diagonal not requested
+         IF (id%ICNTL(6).EQ.0) id%KEEP(52) = 0
+C        deactivate analysis scaling for SPD matrices
+         IF (id%KEEP(50).EQ.1) id%KEEP(52) = 0
+C
+         IF (id%KEEP(52).EQ.-2) THEN
+C        deallocate scalings in case of ordering allocated/computed 
+C        during analysis. This is needed because in case of 
+C        KEEP(52)=-2 then one cannot be sure that 
+C        scaling will be effectivly computed during analysis
+C        Thus to test if scaling was effectively allocated/computed
+C        during analysis after SMUMPS_ANA_DRIVER one must
+C        be sure that scaling arrays are nullified.
+           IF ( associated(id%COLSCA)) THEN
+                DEALLOCATE( id%COLSCA )
+                NULLIFY(id%COLSCA)
+           ENDIF
+           IF ( associated(id%ROWSCA)) THEN
+                DEALLOCATE( id%ROWSCA )
+                NULLIFY(id%ROWSCA)
+           ENDIF
+         ENDIF
+C     
+C}
         ENDIF
-C deactivate analysis scaling if scaling given
-        IF(id%KEEP(52) .EQ. -1) id%KEEP(52) = 0
+C
+C       ANALYSIS PHASE:
         CALL SMUMPS_ANA_DRIVER( id )
-C Save scaling option in INFOG(33)
+C       restore values
+        id%KEEP(77) =  KEEP77SAVE 
+        id%KEEP(83) =  KEEP83SAVE
+        id%KEEP(91) =  KEEP91SAVE
+C
+C Check and save scaling option in INFOG(33)
         IF (id%MYID .eq. MASTER) THEN
+C{
+          IF (id%KEEP(52).EQ.0) id%INFOG(33)=id%ICNTL(8)
+          IF (id%KEEP(52).EQ.-2) THEN
+C         Scaling should have been computed during analysis
+           IF (.not.associated(id%COLSCA).OR.
+     &         .not.associated(id%ROWSCA)
+     &        ) THEN
+C            scaling was not computed reset KEEP(52)
+C            the user can then decide during factorization
+C            to activate scaling
+             id%KEEP(52) =0
+             id%INFOG(33)=0
+             IF ( MPG .GT. 0 ) THEN
+                WRITE(MPG,'(A)') 
+     &          ' Warning;  scaling was not computed during analysis'
+             ENDIF
+             IF ( associated(id%COLSCA)) THEN
+                  DEALLOCATE( id%COLSCA )
+                  NULLIFY(id%COLSCA)
+             ENDIF
+             IF ( associated(id%ROWSCA)) THEN
+                  DEALLOCATE( id%ROWSCA )
+                  NULLIFY(id%ROWSCA)
+             ENDIF
+           ENDIF
+          ENDIF
           IF (id%KEEP(52) .NE. 0) THEN
             id%INFOG(33)=id%KEEP(52)
-          ELSE
-            id%INFOG(33)=id%ICNTL(8)
           ENDIF
+C}
         ENDIF
 C       return value of ICNTL(12) effectively used
 C       that was saved on the master in KEEP(95)
@@ -1417,6 +1498,10 @@ C-      CHECKS, SCALING, ARROWHEAD + FACTORIZATION PHASE
 C-
 C-------------------------------------------------------
 C
+C Broadcast the value of KEEP(125) to decide if performing 
+C the scaling with the Schur complement feature. 
+        CALL MPI_BCAST( id%KEEP(125), 1, MPI_INTEGER, MASTER, id%COMM,
+     &       IERR )
         IF ( id%MYID .EQ. MASTER ) THEN
 C         -------------------------
 C         Check if Schur complement
@@ -1432,7 +1517,7 @@ C              setting a static pointer with a routine with
 C              implicit interface, and then copying this pointer
 C              into id%SCHUR.
                CALL SMUMPS_SET_TMP_PTR(id%SCHUR_CINTERFACE(1),
-     &         id%SIZE_SCHUR*id%SIZE_SCHUR)
+     &         int(id%SIZE_SCHUR,8)*int(id%SIZE_SCHUR,8))
                CALL SMUMPS_GET_TMP_PTR(id%SCHUR)
                NULLIFY(id%SCHUR_CINTERFACE)
              ENDIF
@@ -1461,39 +1546,39 @@ C     Assembled entry
                 IF ( .not. associated( id%IRN ) ) THEN
                    id%INFO(1) = -22
                    id%INFO(2) = 1
-#if defined(MUMPS_F2003)
-                ELSE IF ( size( id%IRN, KIND=8 ) < id%KEEP8(28) ) THEN
-#else
+#if defined(MUMPS_NOF2003)
 C     size with kind=8 output not available. One can still
 C     check that if NZ can be stored in a 32-bit integer,
 C     the 32-bit size(id%IRN) (which we then assume not
 C     to overflow...) is large enough
                 ELSE IF ( id%KEEP8(28) .LE. int(huge(id%NZ),8) .AND.
      &                  size(id%IRN) < int(id%KEEP8(28)) ) THEN
+#else
+                ELSE IF ( size( id%IRN, KIND=8 ) < id%KEEP8(28) ) THEN
 #endif
                    id%INFO(1) = -22
                    id%INFO(2) = 1
                 ELSE IF ( .not. associated( id%JCN ) ) THEN
                    id%INFO(1) = -22
                    id%INFO(2) = 2
-#if defined(MUMPS_F2003)
-                ELSE IF ( size( id%JCN, KIND=8 ) < id%KEEP8(28) ) THEN
-#else
+#if defined(MUMPS_NOF2003)
 C     Same as for IRN above
                 ELSE IF ( id%KEEP8(28) .LE. int(huge(id%NZ),8) .AND.
      &                  size(id%JCN) < int(id%KEEP8(28)) ) THEN
+#else
+                ELSE IF ( size( id%JCN, KIND=8 ) < id%KEEP8(28) ) THEN
 #endif
                    id%INFO(1) = -22
                    id%INFO(2) = 2
                 ELSEIF ( .not. associated( id%A ) ) THEN
                    id%INFO( 1 ) = -22
                    id%INFO( 2 ) = 4
-#if defined(MUMPS_F2003)
-                ELSE IF ( size( id%A, KIND=8 ) < id%KEEP8(28) ) THEN
-#else
+#if defined(MUMPS_NOF2003)
 C     Same as for IRN/JCN above
                 ELSE IF ( id%KEEP8(28) .LE. int(huge(id%NZ),8) .AND.
      &                  size( id%A ) < int(id%KEEP8(28)) ) THEN
+#else
+                ELSE IF ( size( id%A, KIND=8 ) < id%KEEP8(28) ) THEN
 #endif
                    id%INFO( 1 ) = -22
                    id%INFO( 2 ) = 4
@@ -1516,11 +1601,11 @@ C     Element entry
                    id%INFO( 1 ) = -22
                    id%INFO( 2 ) = 4
                 ELSE 
-#if defined(MUMPS_F2003)
-                   IF ( size( id%A_ELT, KIND=8 ) < id%KEEP8(30) ) THEN
-#else
+#if defined(MUMPS_NOF2003)
                    IF ( id%KEEP8(30) < int(huge(id%NZ),8) .AND.
      &                     size( id%A_ELT ) < int(id%KEEP8(30)) ) THEN
+#else
+                   IF ( size( id%A_ELT, KIND=8 ) < id%KEEP8(30) ) THEN
 #endif
                       id%INFO( 1 ) = -22
                       id%INFO( 2 ) = 4
@@ -1543,17 +1628,10 @@ C         ----------------------
 C         ========================================
 C         Decode and set scaling options for facto
 C         ========================================
-          IF( id%KEEP(52) .EQ. -2 .AND. id%ICNTL(8) .NE. -2 .AND.
-     &        id%ICNTL(8).NE. 77 ) THEN
-             IF ( MPG .GT. 0 ) THEN
-                WRITE(MPG,'(A)') ' ** WARNING : SCALING'
-                WRITE(MPG,'(A)') 
-     &               ' ** scaling already computed during analysis'
-                WRITE(MPG,'(A)') 
-     &               ' ** keeping the scaling from the analysis'
-             ENDIF
-          ENDIF
-          IF (id%KEEP(52) .NE. -2) THEN
+          IF (.NOT. ((id%KEEP(52).EQ.-2).AND.(id%ICNTL(8).EQ.77)) ) 
+     &    THEN
+C           if scaling was computed during analysis and automatic
+C           choice of scaling then we do not recompute scaling
             id%KEEP(52)=id%ICNTL(8)
           ENDIF
           IF ( id%KEEP(52) .GT. 8 .OR. id%KEEP(52).LT.-2)
@@ -1579,24 +1657,21 @@ C         ========================================
      &               ' ** column scaling has to be permuted'
              ENDIF 
           ENDIF
-C
-          IF ( id%KEEP( 19 ) .ne. 0 .and. id%KEEP( 52 ).ne. 0 ) THEN
-            IF ( MPG .GT. 0 ) THEN
-              WRITE(MPG,'(A)') ' ** Warning: Scaling not applied.'
-              WRITE(MPG,'(A)') ' ** (incompatibility with null space)'
-            END IF
-            id%KEEP(52) = 0
-          END IF
-C         ------------------------
-C         If Schur has been asked
-C         for, scaling is disabled
-C         ------------------------
-          IF ( id%KEEP(60) .ne. 0 .and. id%KEEP(52) .ne. 0 ) THEN
-            id%KEEP(52) = 0
-            IF ( MPG .GT. 0 .AND. id%ICNTL(8) .NE. 0 ) THEN
-              WRITE(MPG,'(A)') ' ** Warning: Scaling not applied.'
-              WRITE(MPG,'(A)') ' ** (incompatibility with Schur)'
-            END IF
+C         -----------------------------------
+C         If Schur has been asked for
+C         choose to disable or enable scaling 
+C         ----------------------------------
+          IF (id%KEEP(125).EQ.0) THEN
+C            ------------------------
+C              scaling is disabled
+C            ------------------------
+             IF ( id%KEEP(60) .ne. 0 .and. id%KEEP(52) .ne. 0 ) THEN
+               id%KEEP(52) = 0
+               IF ( MPG .GT. 0 .AND. id%ICNTL(8) .NE. 0 ) THEN
+                 WRITE(MPG,'(A)') ' ** Warning: scaling not applied.'
+                 WRITE(MPG,'(A)') ' ** (disabled with Schur)'
+               END IF
+             END IF
           END IF
 C         -------------------------------
 C         If matrix is distributed on
@@ -1609,7 +1684,7 @@ C         -------------------------------
              id%KEEP(52) = 0
              IF ( MPG .GT. 0 .and. id%ICNTL(8) .ne. 0 ) THEN
                WRITE(MPG,'(A)')
-     &         ' ** Warning: This scaling option not available'
+     &         ' ** Warning: requested scaling option not available'
                WRITE(MPG,'(A)') ' ** for distributed matrix entry'
              END IF
           END IF
@@ -1629,7 +1704,7 @@ C         ------------------------------------
      &            id%KEEP(52).ne. 77) THEN
               IF ( MPG .GT. 0 ) THEN
                 WRITE(MPG,'(A)')
-     &  ' ** Warning: Scaling option n.a. for symmetric matrix'
+     &  ' ** Warning: scaling option n.a. for symmetric matrix'
               END IF
               id%KEEP(52) = 0
             END IF
@@ -1642,7 +1717,7 @@ C         ----------------------------------
      &        ( id%KEEP(52) .gt. 0 ) ) THEN
             id%KEEP(52) = 0
             IF ( MPG .GT. 0 ) THEN
-              WRITE(MPG,'(A)') ' ** Warning: Scaling not applied.'
+              WRITE(MPG,'(A)') ' ** Warning: scaling not applied.'
               WRITE(MPG,'(A)')
      &        ' ** (only user scaling av. for elt. entry)'
             END IF
@@ -1670,6 +1745,9 @@ C  Allocate -- if required,
 C  ROWSCA and COLSCA on the master
 C
 C  Allocation of scaling arrays.
+C  IF (KEEP(52)==-2 then scaling should have been allocated
+C  and computed during analysis
+C
 C  If ICNTL(8) == -1, ROWSCA and COLSCA must have been associated and
 C  filled by the user. If ICNTL(8) is >0 and <= 8, the scaling is
 C  computed at the beginning of SMUMPS_FAC_DRIVER and is allocated now.
@@ -1683,10 +1761,12 @@ C
             ALLOCATE( id%COLSCA(id%N), stat=IERR)
             IF (IERR .GT.0) THEN
                id%INFO(1)=-13
+               id%INFO(2)=id%N
             ENDIF
             ALLOCATE( id%ROWSCA(id%N), stat=IERR)
             IF (IERR .GT.0) THEN
                id%INFO(1)=-13
+               id%INFO(2)=id%N
             ENDIF
           END IF
 C
@@ -1699,13 +1779,13 @@ C
           END IF
           IF (IERR .GT.0) THEN
              id%INFO(1)=-13
+             id%INFO(2)=1
           ENDIF
           IF (.NOT. associated(id%ROWSCA))
      &    ALLOCATE( id%ROWSCA(1), stat=IERR)
           IF (IERR .GT.0) THEN
-             id%INFO(1)=-13
-          ENDIF
-          IF ( id%INFO(1) .eq. -13 ) THEN
+            id%INFO(1)=-13
+            id%INFO(2)=1
             IF ( LPOK ) WRITE(LP,'(A)')
      &         'Problems in allocations before facto'
             GOTO 200
@@ -1732,39 +1812,39 @@ C       Check distributed matrices on all processors.
            IF ( .not. associated( id%IRN_loc ) ) THEN
               id%INFO(1) = -22
               id%INFO(2) = 16
-#if defined(MUMPS_F2003)
-           ELSE IF ( size( id%IRN_loc, KIND=8 ) < id%KEEP8(29) ) THEN
-#else
+#if defined(MUMPS_NOF2003)
 C     size with kind=8 output not available. One can still
 C     check that if NZ_loc can be stored in a 32-bit integer,
 C     the 32-bit size(id%IRN_loc) (which we then assume not
 C     to overflow...) is large enough
            ELSE IF ( id%KEEP8(29) .LE. int(huge(id%NZ_loc),8) .AND.
      &             size(id%IRN_loc) < int(id%KEEP8(29)) ) THEN
+#else
+           ELSE IF ( size( id%IRN_loc, KIND=8 ) < id%KEEP8(29) ) THEN
 #endif
               id%INFO(1) = -22
               id%INFO(2) = 16
            ELSE IF ( .not. associated( id%JCN_loc ) ) THEN
               id%INFO(1) = -22
               id%INFO(2) = 16
-#if defined(MUMPS_F2003)
-           ELSE IF ( size( id%JCN_loc, KIND=8 ) < id%KEEP8(29) ) THEN
-#else
+#if defined(MUMPS_NOF2003)
 C     Same as for IRN_loc above
            ELSE IF ( id%KEEP8(29) .LE. int(huge(id%NZ_loc),8) .AND.
      &             size(id%JCN_loc) < int(id%KEEP8(29)) ) THEN
+#else
+           ELSE IF ( size( id%JCN_loc, KIND=8 ) < id%KEEP8(29) ) THEN
 #endif
               id%INFO(1) = -22
               id%INFO(2) = 16
            ELSEIF ( .not. associated( id%A_loc ) ) THEN
               id%INFO( 1 ) = -22
               id%INFO( 2 ) = 16
-#if defined(MUMPS_F2003)
-           ELSE IF ( size( id%A_loc, KIND=8 ) < id%KEEP8(29) ) THEN
-#else
+#if defined(MUMPS_NOF2003)
 C     Same as for IRN_loc/JCN_loc above
            ELSE IF ( id%KEEP8(29) .LE. int(huge(id%NZ_loc),8) .AND.
      &             size( id%A_loc ) < int(id%KEEP8(29)) ) THEN
+#else
+           ELSE IF ( size( id%A_loc, KIND=8 ) < id%KEEP8(29) ) THEN
 #endif
               id%INFO( 1 ) = -22
               id%INFO( 2 ) = 16
@@ -1786,8 +1866,8 @@ C    &          id%root%SCHUR_MLOC)
 C             Instead, we set a temporary
 C             pointer and then retrieve it
               CALL SMUMPS_SET_TMP_PTR(id%SCHUR_CINTERFACE(1),
-     &         id%SCHUR_LLD*(id%root%SCHUR_NLOC-1)+
-     &         id%root%SCHUR_MLOC)
+     &         int(id%SCHUR_LLD,8)*int(id%root%SCHUR_NLOC-1,8)+
+     &         int(id%root%SCHUR_MLOC,8))
               CALL SMUMPS_GET_TMP_PTR(id%SCHUR)
               NULLIFY(id%SCHUR_CINTERFACE)
             ENDIF
@@ -1826,8 +1906,7 @@ C              we will use within SMUMPS here.
                   ALLOCATE(id%root%SCHUR_POINTER(1), stat=IERR)
                   IF (IERR .GT.0) THEN
                      id%INFO(1)=-13
-                  ENDIF
-                  IF ( id%INFO(1) .eq. -13 ) THEN
+                     id%INFO(2)=1
                      IF ( LPOK ) THEN
                         WRITE(LP,'(A)')
      &                       'Problems in allocations before facto'
@@ -1866,34 +1945,25 @@ C       (Case of repeated factorizations).
               ENDIF
            ENDIF
         ENDIF
-C     root%RG2L_ROW and root%RG2L_COL
-C     are not used outside of the facto
-        IF (associated(id%root%RG2L_ROW))THEN
-           DEALLOCATE(id%root%RG2L_ROW)
-           NULLIFY(id%root%RG2L_ROW)
-        ENDIF
-        IF (associated(id%root%RG2L_COL))THEN
-           DEALLOCATE(id%root%RG2L_COL)
-           NULLIFY(id%root%RG2L_COL)
-        ENDIF
         IF (id%MYID .eq. MASTER) THEN
            CALL MUMPS_SECFIN(TIMEG)
            id%DKEEP(91) = real(TIMEG)
         ENDIF
         IF (PROKG) THEN
             WRITE( MPG,'(/A,F12.4)')
-     &         ' Elapsed time in factorization driver= ', TIMEG
+     &        ' Elapsed time in factorization driver               =', 
+     &        TIMEG
         END IF 
 C
 C       Check for errors after FACTO
 C       (it was propagated inside)
         IF(id%INFO(1).LT.0) THEN
-C     Free id%S if facto failed     
-           if (associated(id%S))  then 
-              DEALLOCATE(id%S)
-              NULLIFY(id%S)
-           endif
-           GO TO 499
+C         -------------------------------------------------------
+C         Free data from this factorization. Since factorization
+C         fails, factors, etc. can not be used to perform a solve
+C         -------------------------------------------------------
+          CALL SMUMPS_FREE_DATA_FACTO(id)
+          GO TO 499
         ENDIF
 C
 C       Update last successful step
@@ -1999,14 +2069,6 @@ C
       IF (LPOK) WRITE (LP,99994) id%INFO(2)
 *
 500   CONTINUE
-      IF (associated(id%IS1)) THEN
-        DEALLOCATE(id%IS1)
-        NULLIFY(id%IS1)
-      ENDIF
-      IF (associated(id%PROCNODE)) THEN
-        DEALLOCATE(id%PROCNODE)
-        NULLIFY(id%PROCNODE)
-      ENDIF
 #if ! defined(LARGEMATRICES)
 C     ---------------------------------
 C     Permute JCN on output to SMUMPS if
@@ -2063,6 +2125,12 @@ C     --------------------------------
             id%DKEEP(70) = real(TIMETOTAL)
          ENDIF
       ENDIF
+C     ------------------------------------------------------------
+C     SCHUR_CINTERFACE is no longer needed. It will be set again
+C     the next time MUMPS is entered through its C interface.
+C     ------------------------------------------------------------
+      NULLIFY(id%SCHUR_CINTERFACE)
+C
 *=======================
 * Compute space for save
 *=======================
@@ -2080,7 +2148,11 @@ C     --------------------------------
          id%RINFOG(18)=REAL(id%KEEP8(58))/1E6
       ENDIF
 !$    IF (ICNTL16_LOC .GT. 0) THEN
+#if defined(WORKAROUNDINTELILP64OPENMPLIMITATION)
+!$      CALL omp_set_num_threads(int(PREVIOUS_OMP_THREADS_NUM,4))
+#else
 !$      CALL omp_set_num_threads(PREVIOUS_OMP_THREADS_NUM)
+#endif
 !$      ICNTL16_LOC = 0
 !$    ENDIF
 *===============
@@ -2132,18 +2204,27 @@ C
       INTEGER :: TMP1(2),TMP(2)
 #endif
       INTEGER ROOT, IERR
-      INTEGER MASTER
+      INTEGER MASTER, WARNING_COUNT
       PARAMETER (MASTER=0)
 C
 C
-      IF ( INFO(1) .ge. 0  .and. INFO(2) .ge. 0 ) THEN
+      IF ( INFO(1) .ge. 0 ) THEN
 C
 C       This can only happen if the phase was successful
 C       on all procs. If one proc failed, then all other
 C       procs would have INFO(1)=-1.
 C
+        IF (INFO(1) .GT.0) THEN
+          WARNING_COUNT=1
+        ELSE
+          WARNING_COUNT=0
+        ENDIF
         INFOG(1) = INFO(1)
         INFOG(2) = INFO(2)
+        CALL MPI_ALLREDUCE(WARNING_COUNT, INFOG(2), 1,MPI_INTEGER,
+     &  MPI_SUM, COMM, IERR)
+        CALL MPI_ALLREDUCE(INFO(1),INFOG(1),1, MPI_INTEGER,
+     &  MPI_BOR, COMM, IERR)
       ELSE
 C       ---------------------
 C       Find who has smallest
@@ -2167,8 +2248,12 @@ C
      &               MASTER, COMM, IERR )
       RETURN
       END SUBROUTINE SMUMPS_SET_INFOG
-      SUBROUTINE SMUMPS_PRINT_ICNTL(id, LP)
+C--------------------------------------------------------------------
+      SUBROUTINE SMUMPS_PRINT_ICNTL (id, LP)
       USE SMUMPS_STRUC_DEF
+*
+* Purpose: 
+*   Print main control parameters CNTL and ICNTL 
 *
 *  ==========
 *  Parameters
@@ -2178,11 +2263,13 @@ C
 ** Local Variables
       INTEGER, POINTER :: JOB 
       INTEGER,DIMENSION(:),POINTER::ICNTL
+      REAL,   DIMENSION(:),POINTER::CNTL
       INTEGER MASTER
       PARAMETER( MASTER = 0 )
       IF (LP.LE.0) RETURN
       JOB=>id%JOB
       ICNTL=>id%ICNTL
+      CNTL=>id%CNTL
       IF (id%MYID.EQ.MASTER) THEN
          SELECT CASE (JOB)
          CASE(1);
@@ -2190,10 +2277,14 @@ C
            WRITE (LP,990) ICNTL(1),ICNTL(2),ICNTL(3),ICNTL(4)
            IF (id%SYM.EQ.2) THEN
             WRITE (LP,991) ICNTL(5),ICNTL(6),ICNTL(7),ICNTL(12),
-     &          ICNTL(13),ICNTL(18),ICNTL(19),ICNTL(22)
+     &          ICNTL(13),
+     &          ICNTL(15),
+     &          ICNTL(18),ICNTL(19),ICNTL(22),ICNTL(58)
            ELSE
             WRITE (LP,891) ICNTL(5),ICNTL(6),ICNTL(7),
-     &          ICNTL(13),ICNTL(18),ICNTL(19),ICNTL(22)
+     &          ICNTL(13),
+     &          ICNTL(15),
+     &          ICNTL(18),ICNTL(19),ICNTL(22),ICNTL(58)
            ENDIF
            IF ((ICNTL(6).EQ.5).OR.(ICNTL(6).EQ.6).OR.
      &          (ICNTL(12).NE.1) )  THEN
@@ -2204,9 +2295,12 @@ C
            WRITE (LP,993) ICNTL(14)
          CASE(2);
            WRITE (LP,980) 
+           WRITE (LP,981) CNTL(1), CNTL(3), CNTL(4), CNTL(5), CNTL(7)
            WRITE (LP,990) ICNTL(1),ICNTL(2),ICNTL(3),ICNTL(4)
            WRITE (LP,992) ICNTL(8)
-           WRITE (LP,993) ICNTL(14)
+           WRITE (LP,993) ICNTL(14) 
+           WRITE (LP,923) ICNTL(24), ICNTL(31), ICNTL(32), ICNTL(33),
+     &                    ICNTL(35), ICNTL(36), ICNTL(49)
          CASE(3);
            WRITE (LP,980)
            WRITE (LP,990) ICNTL(1),ICNTL(2),ICNTL(3),ICNTL(4)
@@ -2214,34 +2308,49 @@ C
      &     ICNTL(9),ICNTL(10),ICNTL(11),ICNTL(20),ICNTL(21)
          CASE(4);
            WRITE (LP,980) 
+           WRITE (LP,981) CNTL(1), CNTL(3), CNTL(4), CNTL(5), CNTL(7)
            WRITE (LP,990) ICNTL(1),ICNTL(2),ICNTL(3),ICNTL(4)
            WRITE (LP,992) ICNTL(8)
            IF (id%ICNTL(19).NE.0)
      &      WRITE(LP,998) id%SIZE_SCHUR
            WRITE (LP,993) ICNTL(14)
+           WRITE (LP,923) ICNTL(24), ICNTL(31), ICNTL(32), ICNTL(33),
+     &                    ICNTL(35), ICNTL(36), ICNTL(49)
          CASE(5);
            WRITE (LP,980) 
+           WRITE (LP,981) CNTL(1), CNTL(3), CNTL(4), CNTL(5), CNTL(7)
            WRITE (LP,990) ICNTL(1),ICNTL(2),ICNTL(3),ICNTL(4)
            IF (id%SYM.EQ.2) THEN
             WRITE (LP,991) ICNTL(5),ICNTL(6),ICNTL(7),ICNTL(12),
-     &          ICNTL(13),ICNTL(18),ICNTL(19),ICNTL(22)
+     &          ICNTL(13),
+     &          ICNTL(15),
+     &          ICNTL(18),ICNTL(19),ICNTL(22),ICNTL(58)
            ELSE
             WRITE (LP,891) ICNTL(5),ICNTL(6),ICNTL(7),
-     &          ICNTL(13),ICNTL(18),ICNTL(19),ICNTL(22)
+     &          ICNTL(13),
+     &          ICNTL(15),
+     &          ICNTL(18),ICNTL(19),ICNTL(22),ICNTL(58)
            ENDIF
            WRITE (LP,992) ICNTL(8)
            WRITE (LP,993) ICNTL(14)
            WRITE (LP,995)
      &     ICNTL(9),ICNTL(10),ICNTL(11),ICNTL(20),ICNTL(21)
+           WRITE (LP,923) ICNTL(24), ICNTL(31), ICNTL(32), ICNTL(33),
+     &                    ICNTL(35), ICNTL(36), ICNTL(49)
          CASE(6);
            WRITE (LP,980)
+           WRITE (LP,981) CNTL(1), CNTL(3), CNTL(4), CNTL(5), CNTL(7)
            WRITE (LP,990) ICNTL(1),ICNTL(2),ICNTL(3),ICNTL(4)
            IF (id%SYM.EQ.2) THEN
             WRITE (LP,991) ICNTL(5),ICNTL(6),ICNTL(7),ICNTL(12),
-     &          ICNTL(13),ICNTL(18),ICNTL(19),ICNTL(22)
+     &          ICNTL(13),
+     &          ICNTL(15),
+     &          ICNTL(18),ICNTL(19),ICNTL(22),ICNTL(58)
            ELSE
             WRITE (LP,891) ICNTL(5),ICNTL(6),ICNTL(7),
-     &          ICNTL(13),ICNTL(18),ICNTL(19),ICNTL(22)
+     &          ICNTL(13),
+     &          ICNTL(15),
+     &          ICNTL(18),ICNTL(19),ICNTL(22),ICNTL(58)
            ENDIF
            IF (id%ICNTL(19).NE.0)
      &      WRITE(LP,998) id%SIZE_SCHUR
@@ -2249,9 +2358,17 @@ C
            WRITE (LP,995)
      &     ICNTL(9),ICNTL(10),ICNTL(11),ICNTL(20),ICNTL(21)
            WRITE (LP,993) ICNTL(14)
+           WRITE (LP,923) ICNTL(24), ICNTL(31), ICNTL(32), ICNTL(33),
+     &                    ICNTL(35), ICNTL(36), ICNTL(49)
         END SELECT
       ENDIF
  980  FORMAT (/'***********CONTROL PARAMETERS (ICNTL)**************'/)
+ 981  FORMAT (
+     &     ' CNTL(1)   Threshold for numerical pivoting        =',D16.4/
+     &     ' CNTL(3)   Null pivot detection threshold          =',D16.4/
+     &     ' CNTL(4)   Threshold for static pivoting           =',D16.4/
+     &     ' CNTL(5)   Fixation for null pivots                =',D16.4/
+     &     ' CNTL(7)   Dropping threshold for BLR compression  =',D16.4)
  990  FORMAT (
      &     'ICNTL(1)   Output stream for error messages        =',I10/
      &     'ICNTL(2)   Output stream for diagnostic messages   =',I10/
@@ -2263,29 +2380,41 @@ C
      &     'ICNTL(7)   Ordering                                =',I10/
      &     'ICNTL(12)  LDLT ordering strat ( keep(95) )        =',I10/
      &     'ICNTL(13)  Parallel root (0=on, 1=off)             =',I10/
+     &     'ICNTL(15)  Analysis by block                       =',I10/
      &     'ICNTL(18)  Distributed matrix  ( keep(54) )        =',I10/
      &     'ICNTL(19)  Schur option ( keep(60) 0=off,else=on ) =',I10/
-     &     'ICNTL(22)  Out-off-core option (0=Off, >0=ON)      =',I10)
+     &     'ICNTL(22)  Out-of-core option (1=on, off otherwise)=',I10/
+     &     'ICNTL(58)  Symbolic factorization option           =',I10)
  891  FORMAT (
      &     'ICNTL(5)   Matrix format  ( keep(55) )             =',I10/
      &     'ICNTL(6)   Maximum transversal  ( keep(23) )       =',I10/
      &     'ICNTL(7)   Ordering                                =',I10/
      &     'ICNTL(13)  Parallel root (0=on, 1=off)             =',I10/
+     &     'ICNTL(15)  Analysis by block                       =',I10/
      &     'ICNTL(18)  Distributed matrix  ( keep(54) )        =',I10/
      &     'ICNTL(19)  Schur option ( keep(60) 0=off,else=on ) =',I10/
-     &     'ICNTL(22)  Out-off-core option (0=Off, >0=ON)      =',I10)
+     &     'ICNTL(22)  Out-of-core option (1=on, off otherwise)=',I10/
+     &     'ICNTL(58)  Symbolic factorization option           =',I10)
  992  FORMAT (
      &     'ICNTL(8)   Scaling strategy                        =',I10)
+ 923  FORMAT (
+     &     'ICNTL(24)  Null pivot detection (0=off)            =',I10/
+     &     'ICNTL(31)  Discard factors (0=off, else=on)        =',I10/
+     &     'ICNTL(32)  Forward elimination during facto (0=off)=',I10/
+     &     'ICNTL(33)  Compute determinant (0=off)             =',I10/
+     &     'ICNTL(35)  Block Low Rank (BLR, 0=off >0=on)       =',I10/
+     &     'ICNTL(36)  BLR variant                             =',I10/
+     &     'ICNTL(49)  Compact workarray S (end of facto.)     =',I10)
  993  FORMAT (
      &     'ICNTL(14)  Percent of memory increase              =',I10)
  995  FORMAT (
      &     'ICNTL(9)   Solve A x=b (1) or A''x = b (else)       =',I10/
      &     'ICNTL(10)  Max steps iterative refinement          =',I10/
      &     'ICNTL(11)  Error analysis (1=all,2=some,else=off)  =',I10/
-     &     'ICNTL(20)  Dense (0) or sparse (1,2,3) RHS         =',I10/
+     &     'ICNTL(20)  Den.(0)/sparse(1,2,3)/dist.(10,11) RHS  =',I10/
      &     'ICNTL(21)  Gathered (0) or distributed(1) solution =',I10)
  998  FORMAT (
-     &     '      Size of SCHUR matrix (SIZE_SHUR)             =',I10)
+     &     '           Size of SCHUR matrix (SIZE_SCHUR)       =',I10)
       END SUBROUTINE SMUMPS_PRINT_ICNTL
 C--------------------------------------------------------------------
       SUBROUTINE SMUMPS_PRINT_KEEP(id, LP)
@@ -2383,7 +2512,7 @@ C--------------------------------------------------------------------
      &     'ICNTL(13)  Parallel root (0=on, 1=off)             =',I10/
      &     'ICNTL(18)  Distributed matrix  ( keep(54) )        =',I10/
      &     'ICNTL(19)  Schur option ( keep(60) 0=off,else=on ) =',I10/
-     &     'ICNTL(22)  Out-off-core option (0=Off, >0=ON)      =',I10)
+     &     'ICNTL(22)  Out-of-core option (1=on, off otherwise)=',I10)
  992  FORMAT (
      &     'ICNTL(8)   Scaling strategy ( keep(52) )           =',I10)
  993  FORMAT (
@@ -2392,7 +2521,7 @@ C--------------------------------------------------------------------
      &     'ICNTL(9)   Solve A x=b (1) or A''x = b (else)       =',I10/
      &     'ICNTL(10)  Max steps iterative refinement          =',I10/
      &     'ICNTL(11)  Error analysis ( 0= off, else=on)       =',I10/
-     &     'ICNTL(20)  Dense (0) or sparse (1,2,3) RHS         =',I10/
+     &     'ICNTL(20)  Den.(0)/sparse(1,2,3)/dist.(10,11) RHS  =',I10/
      &     'ICNTL(21)  Gathered (0) or distributed(1) solution =',I10)
       END SUBROUTINE SMUMPS_PRINT_KEEP
       SUBROUTINE SMUMPS_CHECK_DENSE_RHS
@@ -2434,16 +2563,16 @@ C
                   idINFO( 1 ) = -26
                   idINFO( 2 ) = idLRHS
       ELSE IF 
-#if defined(MUMPS_F2003)
-     &      (size(idRHS,kind=8) <
-     &       int(idNRHS,8)*int(idLRHS,8)-idLRHS+idN)
-#else
+#if defined(MUMPS_NOF2003)
 C           size with kind=8 not available. One can still
 C           perform the check if minimal size small enough.
      &      (int(idNRHS,8)*int(idLRHS,8)-idLRHS+idN
      &                                           .LE. int(huge(idN),8)
      &      .and.
      &      size(idRHS) < int(int(idNRHS,8)*int(idLRHS,8)-idLRHS+idN))
+#else
+     &      (size(idRHS,kind=8) <
+     &       int(idNRHS,8)*int(idLRHS,8)-idLRHS+idN)
 #endif
      &            THEN
                   idINFO( 1 ) = -22

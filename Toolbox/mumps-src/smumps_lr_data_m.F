@@ -1,14 +1,15 @@
 C
-C  This file is part of MUMPS 5.2.1, released
-C  on Fri Jun 14 14:46:05 UTC 2019
+C  This file is part of MUMPS 5.6.0, released
+C  on Wed Apr 19 15:50:57 UTC 2023
 C
 C
-C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license:
-C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+C  released under the CeCILL-C license 
+C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
       MODULE SMUMPS_LR_DATA_M
       USE SMUMPS_LR_TYPE
@@ -19,10 +20,10 @@ C
      &  SMUMPS_BLR_SAVE_INIT,
      &  SMUMPS_BLR_SAVE_PANEL_LORU, SMUMPS_BLR_RETRIEVE_BEGS_BLR_L,
      &  SMUMPS_BLR_SAVE_BEGS_BLR_C, SMUMPS_BLR_RETRIEVE_BEGS_BLR_C,
-     &  SMUMPS_BLR_RETRIEVE_PANEL_L, SMUMPS_BLR_RETRIEVE_PANEL_LORU,
+     &  SMUMPS_BLR_DEC_AND_RETRIEVE_L, SMUMPS_BLR_RETRIEVE_PANEL_LORU,
      &  SMUMPS_BLR_DEC_AND_TRYFREE_L, SMUMPS_BLR_TRY_FREE_PANEL, 
      &  SMUMPS_BLR_FREE_CB_LRB, SMUMPS_BLR_FREE_ALL_PANELS,
-     &  SMUMPS_BLR_FREE_PANEL, SMUMPS_BLR_SAVE_CB_LRB,
+     &  SMUMPS_BLR_SAVE_CB_LRB,
      &  SMUMPS_BLR_RETRIEVE_CB_LRB, SMUMPS_BLR_RETRIEVE_BEGSBLR_STA,
      &  SMUMPS_BLR_SAVE_BEGS_BLR_DYN, SMUMPS_BLR_RETRIEVE_BEGSBLR_DYN,
      &  SMUMPS_BLR_RETRIEVE_NB_PANELS, SMUMPS_BLR_EMPTY_PANEL_LORU,
@@ -30,7 +31,7 @@ C
      &  SMUMPS_BLR_SAVE_M_ARRAY, SMUMPS_BLR_RETRIEVE_M_ARRAY,
      &  SMUMPS_BLR_FREE_M_ARRAY
      &  , SMUMPS_BLR_STRUC_TO_MOD, SMUMPS_BLR_MOD_TO_STRUC, BLR_ARRAY
-#if ! defined(MUMPS_F2003)
+#if defined(MUMPS_NOF2003)
      &  , BLR_STRUC_T, blr_panel_type, diag_block_type
 #endif
      &  , SMUMPS_BLR_SAVE_DIAG_BLOCK, SMUMPS_BLR_RETRIEVE_DIAG_BLOCK
@@ -47,7 +48,7 @@ C
          TYPE(blr_panel_type), DIMENSION (:), POINTER  :: PANELS_L 
          TYPE(blr_panel_type), DIMENSION (:), POINTER  :: PANELS_U
          TYPE(LRB_TYPE), pointer :: CB_LRB(:,:)
-         TYPE(diag_block_type), DIMENSION (:), POINTER  :: DIAG_BLOCKS
+         TYPE(diag_block_type), DIMENSION (:), POINTER :: DIAG_BLOCKS
          INTEGER, DIMENSION(:), POINTER :: BEGS_BLR_STATIC
          INTEGER, DIMENSION(:), POINTER :: BEGS_BLR_DYNAMIC 
          INTEGER, DIMENSION(:), POINTER :: BEGS_BLR_L
@@ -94,15 +95,13 @@ C
        ENDDO
        RETURN
        END SUBROUTINE SMUMPS_BLR_INIT_MODULE
-       SUBROUTINE SMUMPS_BLR_END_MODULE(INFO1, KEEP8
+       SUBROUTINE SMUMPS_BLR_END_MODULE(INFO1, KEEP8, K34
      &             , LRSOLVE_ACT_OPT
      &            )
-       INTEGER, INTENT(IN) :: INFO1
+       INTEGER, INTENT(IN) :: INFO1, K34
        LOGICAL, OPTIONAL, INTENT(IN) :: LRSOLVE_ACT_OPT
        INTEGER(8) :: KEEP8(150)
        INTEGER :: I, ILOOP
-       LOGICAL :: IS_FIXME_ALREADY_PRINTED  
-       IS_FIXME_ALREADY_PRINTED = .FALSE.
        IF (.NOT. associated(BLR_ARRAY)) THEN
          WRITE(*,*) "Internal error 1 in SMUMPS_BLR_END_MODULE"
          CALL MUMPS_ABORT()
@@ -111,15 +110,15 @@ C
          ILOOP= I
          IF (associated(BLR_ARRAY(I)%PANELS_L).OR.
      &       associated(BLR_ARRAY(I)%PANELS_U).OR.
-     &       associated(BLR_ARRAY(I)%CB_LRB)
-     &       .OR.associated(BLR_ARRAY(I)%DIAG_BLOCKS)
+     &       associated(BLR_ARRAY(I)%CB_LRB).OR.
+     &       associated(BLR_ARRAY(I)%DIAG_BLOCKS)
      &      ) THEN
            IF (present(LRSOLVE_ACT_OPT)) THEN
-             CALL SMUMPS_BLR_END_FRONT(ILOOP, INFO1, KEEP8
+             CALL SMUMPS_BLR_END_FRONT(ILOOP, INFO1, KEEP8, K34
      &                              , LRSOLVE_ACT_OPT
      &                              )
            ELSE
-             CALL SMUMPS_BLR_END_FRONT(ILOOP, INFO1, KEEP8 )
+             CALL SMUMPS_BLR_END_FRONT(ILOOP, INFO1, KEEP8, K34 )
            ENDIF
          ENDIF
        ENDDO
@@ -128,11 +127,11 @@ C
        RETURN
        END SUBROUTINE SMUMPS_BLR_END_MODULE
        SUBROUTINE SMUMPS_BLR_MOD_TO_STRUC(id_BLRARRAY_ENCODING)
-#      if defined(MUMPS_F2003)
+#      if defined(MUMPS_NOF2003)
+       CHARACTER, DIMENSION(:), POINTER :: id_BLRARRAY_ENCODING
+#      else
        CHARACTER, DIMENSION(:), POINTER, intent(inout) ::
      &                                            id_BLRARRAY_ENCODING
-#      else
-       CHARACTER, DIMENSION(:), POINTER :: id_BLRARRAY_ENCODING
 #      endif
        CHARACTER :: CHAR_ARRAY(1)
        INTEGER :: CHAR_LENGTH, IERR
@@ -153,11 +152,11 @@ C
        RETURN
        END SUBROUTINE SMUMPS_BLR_MOD_TO_STRUC
        SUBROUTINE SMUMPS_BLR_STRUC_TO_MOD(id_BLRARRAY_ENCODING)
-#      if defined(MUMPS_F2003)
+#      if defined(MUMPS_NOF2003)
+       CHARACTER, DIMENSION(:), POINTER :: id_BLRARRAY_ENCODING
+#      else
        CHARACTER, DIMENSION(:), POINTER, intent(inout) ::
      &                                            id_BLRARRAY_ENCODING
-#      else
-       CHARACTER, DIMENSION(:), POINTER :: id_BLRARRAY_ENCODING
 #      endif
        TYPE (BLR_ARRAY_T) :: BLR_ARRAY_VAR
        IF (.NOT.associated(id_BLRARRAY_ENCODING)) THEN
@@ -170,14 +169,29 @@ C
        RETURN
        END SUBROUTINE SMUMPS_BLR_STRUC_TO_MOD
        SUBROUTINE SMUMPS_BLR_INIT_FRONT(IWHANDLER, 
-     &                       INFO)
+     &                       INFO, MTK405)
        USE MUMPS_FRONT_DATA_MGT_M, ONLY : MUMPS_FDM_START_IDX
+!$    USE OMP_LIB
        INTEGER, INTENT(INOUT) :: IWHANDLER, INFO(2)
+       INTEGER, INTENT(IN), OPTIONAL    :: MTK405
        TYPE(BLR_STRUC_T), POINTER, DIMENSION(:) :: BLR_ARRAY_TMP
        INTEGER :: OLD_SIZE, NEW_SIZE
        INTEGER :: I
        INTEGER :: IERR
-       CALL MUMPS_FDM_START_IDX('F', 'INITF', IWHANDLER, INFO)
+       LOGICAL :: NEEDS_THREAD_SAFETY
+       NEEDS_THREAD_SAFETY = .FALSE.
+       IF (present(MTK405)) THEN
+         IF (MTK405 .EQ. 1 ) THEN
+           NEEDS_THREAD_SAFETY = .TRUE.
+         ENDIF
+       ENDIF
+       IF ( NEEDS_THREAD_SAFETY ) THEN
+!$OMP CRITICAL(critical_blr_idx)
+         CALL MUMPS_FDM_START_IDX('F', 'INITF', IWHANDLER, INFO)
+!$OMP END CRITICAL(critical_blr_idx)
+       ELSE
+         CALL MUMPS_FDM_START_IDX('F', 'INITF', IWHANDLER, INFO)
+       ENDIF
        IF (IWHANDLER > size(BLR_ARRAY)) THEN
          OLD_SIZE = size(BLR_ARRAY)
          NEW_SIZE = max( (OLD_SIZE * 3) / 2 + 1, IWHANDLER)
@@ -185,7 +199,7 @@ C
          IF (IERR.GT.0) THEN
            INFO(1)=-13
            INFO(2)=NEW_SIZE
-           RETURN
+           GOTO 500
          ENDIF
          DO I=1, OLD_SIZE
            BLR_ARRAY_TMP(I)=BLR_ARRAY(I)
@@ -207,6 +221,7 @@ C
          DEALLOCATE(BLR_ARRAY)
          BLR_ARRAY => BLR_ARRAY_TMP
          NULLIFY(BLR_ARRAY_TMP)
+  500   CONTINUE
        ENDIF
        RETURN
        END SUBROUTINE SMUMPS_BLR_INIT_FRONT
@@ -215,7 +230,6 @@ C
      &                       NB_PANELS,
      &                       BEGS_BLR_L, BEGS_BLR_COL, 
      &                       NB_ACCESSES_INIT, INFO)
-       USE MUMPS_FRONT_DATA_MGT_M, ONLY : MUMPS_FDM_START_IDX
        LOGICAL, INTENT(IN) :: IsSYM, IsT2, IsSLAVE
        INTEGER, INTENT(IN) :: NB_PANELS, IWHANDLER
        INTEGER, INTENT(INOUT) :: INFO(2)
@@ -293,10 +307,10 @@ C
         DO I=1,NB_PANELS
            NULLIFY(BLR_ARRAY(IWHANDLER)%PANELS_L(I)%LRB_PANEL)
            IF (.NOT.IsSYM) THEN
-            NULLIFY(BLR_ARRAY(IWHANDLER)%PANELS_U(I)%LRB_PANEL)
+             NULLIFY(BLR_ARRAY(IWHANDLER)%PANELS_U(I)%LRB_PANEL)
            ENDIF
            IF (.NOT.IsSLAVE) THEN
-            NULLIFY(BLR_ARRAY(IWHANDLER)%DIAG_BLOCKS(I)%DIAG_BLOCK)
+             NULLIFY(BLR_ARRAY(IWHANDLER)%DIAG_BLOCKS(I)%DIAG_BLOCK)
            ENDIF
         ENDDO
        ENDIF
@@ -321,22 +335,31 @@ C
        ENDIF
        RETURN
        END SUBROUTINE SMUMPS_BLR_SAVE_INIT
-       SUBROUTINE SMUMPS_BLR_END_FRONT(IWHANDLER, INFO1, KEEP8
-     &             , LRSOLVE_ACT_OPT
-     &            )
+       SUBROUTINE SMUMPS_BLR_END_FRONT(IWHANDLER, INFO1, KEEP8, K34
+     &             , LRSOLVE_ACT_OPT, MTK405 )
        USE MUMPS_FRONT_DATA_MGT_M, ONLY : MUMPS_FDM_END_IDX
        INTEGER, INTENT(INOUT) :: IWHANDLER
        INTEGER, INTENT(IN) :: INFO1
        INTEGER(8) :: KEEP8(150)
+       INTEGER, INTENT(IN) :: K34
        LOGICAL, OPTIONAL, INTENT(IN) :: LRSOLVE_ACT_OPT
+       INTEGER, OPTIONAL, INTENT(IN) :: MTK405
        INTEGER :: IPANEL, JPANEL
+       INTEGER(8) :: MEM_FREED
+       INTEGER :: IDUMMY, JDUMMY
        TYPE(blr_panel_type), POINTER  :: THEPANEL
-       LOGICAL :: LRSOLVE_ACT
+       LOGICAL :: LRSOLVE_ACT, NEEDS_THREAD_SAFETY
        TYPE(diag_block_type), POINTER  :: THEBLOCK
        LRSOLVE_ACT = .FALSE.
        IF (present(LRSOLVE_ACT_OPT)) LRSOLVE_ACT = LRSOLVE_ACT_OPT
        IF (IWHANDLER.LE.0) THEN 
         RETURN
+       ENDIF
+       NEEDS_THREAD_SAFETY = .FALSE.
+       IF (present(MTK405)) THEN
+         IF (MTK405 .EQ. 1 ) THEN
+           NEEDS_THREAD_SAFETY = .TRUE.
+         ENDIF
        ENDIF
        IF (IWHANDLER .GT. size(BLR_ARRAY)) THEN
         RETURN
@@ -359,7 +382,7 @@ C
                CALL MUMPS_ABORT()
              ELSE
                CALL DEALLOC_BLR_PANEL(THEPANEL%LRB_PANEL,
-     &          size(THEPANEL%LRB_PANEL), KEEP8)
+     &          size(THEPANEL%LRB_PANEL), KEEP8, K34)
                THEPANEL%NB_ACCESSES_LEFT = PANELS_FREED
              ENDIF
              DEALLOCATE(THEPANEL%LRB_PANEL)
@@ -384,7 +407,7 @@ C
              CALL MUMPS_ABORT()
              ELSE
                CALL DEALLOC_BLR_PANEL(THEPANEL%LRB_PANEL,
-     &          size(THEPANEL%LRB_PANEL), KEEP8)
+     &          size(THEPANEL%LRB_PANEL), KEEP8, K34)
                THEPANEL%NB_ACCESSES_LEFT = PANELS_FREED 
              ENDIF
              DEALLOCATE(THEPANEL%LRB_PANEL)
@@ -397,29 +420,35 @@ C
          ENDIF
         ENDIF   
         IF (.NOT.BLR_ARRAY(IWHANDLER)%IsSLAVE) THEN
-         DO IPANEL = 1, size(BLR_ARRAY(IWHANDLER)%DIAG_BLOCKS)
-           THEBLOCK => BLR_ARRAY(IWHANDLER)%DIAG_BLOCKS(IPANEL)
-           IF (associated(THEBLOCK%DIAG_BLOCK)) THEN
-             IF (INFO1 .GE. 0 
-     &            .AND..NOT.LRSOLVE_ACT
-     &          ) THEN
-             WRITE(*,*) " Internal Error 3 in MUMPS_BLR_END_FRONT ",
-     &          IWHANDLER, "NB_ACCESSES_INIT=", 
-     &          BLR_ARRAY(IWHANDLER)%NB_ACCESSES_INIT, 
-     &          "Pointer to panel number ",IPANEL," still associated"
-             CALL MUMPS_ABORT()
-            ELSE
-              KEEP8(71) = KEEP8(71) - int(size(THEBLOCK%DIAG_BLOCK),8)
-              KEEP8(69) = KEEP8(69) - int(size(THEBLOCK%DIAG_BLOCK),8)
-              DEALLOCATE(THEBLOCK%DIAG_BLOCK)
-              NULLIFY(THEBLOCK%DIAG_BLOCK)
+          MEM_FREED = 0_8
+          DO IPANEL = 1, size(BLR_ARRAY(IWHANDLER)%DIAG_BLOCKS)
+            THEBLOCK => BLR_ARRAY(IWHANDLER)%DIAG_BLOCKS(IPANEL)
+            IF (associated(THEBLOCK%DIAG_BLOCK)) THEN
+              IF (INFO1 .GE. 0 
+     &             .AND..NOT.LRSOLVE_ACT
+     &           ) THEN
+              WRITE(*,*) " Internal Error 3 in MUMPS_BLR_END_FRONT ",
+     &           IWHANDLER, "NB_ACCESSES_INIT=", 
+     &           BLR_ARRAY(IWHANDLER)%NB_ACCESSES_INIT, 
+     &           "Pointer to panel number ",IPANEL," still associated"
+              CALL MUMPS_ABORT()
+              ELSE
+                DEALLOCATE    (THEBLOCK%DIAG_BLOCK)
+                NULLIFY       (THEBLOCK%DIAG_BLOCK)
+                MEM_FREED = MEM_FREED + int(size(THEBLOCK%DIAG_BLOCK),8)
+              ENDIF
             ENDIF
-           ENDIF
-         ENDDO
-         IF (associated(BLR_ARRAY(IWHANDLER)%DIAG_BLOCKS)) THEN
-          DEALLOCATE(BLR_ARRAY(IWHANDLER)%DIAG_BLOCKS)
-          NULLIFY(BLR_ARRAY(IWHANDLER)%DIAG_BLOCKS)
-         ENDIF
+          ENDDO
+          IF ( MEM_FREED .GT. 0_8 ) THEN
+            CALL MUMPS_DM_FAC_UPD_DYN_MEMCNTS(-MEM_FREED,
+     &        NEEDS_THREAD_SAFETY, KEEP8, 
+     &        IDUMMY, JDUMMY,  
+     &        .TRUE., .TRUE.)
+          ENDIF
+          IF (associated(BLR_ARRAY(IWHANDLER)%DIAG_BLOCKS)) THEN
+            DEALLOCATE(BLR_ARRAY(IWHANDLER)%DIAG_BLOCKS)
+            NULLIFY(BLR_ARRAY(IWHANDLER)%DIAG_BLOCKS)
+          ENDIF
         ENDIF   
         IF (.NOT.BLR_ARRAY(IWHANDLER)%IsT2.OR.
      &           BLR_ARRAY(IWHANDLER)%IsSLAVE) THEN
@@ -434,7 +463,8 @@ C
               DO IPANEL = 1, size(BLR_ARRAY(IWHANDLER)%CB_LRB,1)
               DO JPANEL = 1, size(BLR_ARRAY(IWHANDLER)%CB_LRB,2)
                 CALL DEALLOC_LRB(
-     &             BLR_ARRAY(IWHANDLER)%CB_LRB(IPANEL,JPANEL), KEEP8)
+     &                 BLR_ARRAY(IWHANDLER)%CB_LRB(IPANEL,JPANEL),
+     &                 KEEP8, K34)
               ENDDO
               ENDDO
               DEALLOCATE(BLR_ARRAY(IWHANDLER)%CB_LRB)
@@ -466,7 +496,13 @@ C
           DEALLOCATE(BLR_ARRAY(IWHANDLER)%M_ARRAY)
           NULLIFY(BLR_ARRAY(IWHANDLER)%M_ARRAY)
        ENDIF
-       CALL MUMPS_FDM_END_IDX('F', 'ENDF', IWHANDLER)
+       IF (NEEDS_THREAD_SAFETY) THEN
+!$OMP    CRITICAL(critical_blr_idx)
+         CALL MUMPS_FDM_END_IDX('F', 'ENDF', IWHANDLER)
+!$OMP    END CRITICAL(critical_blr_idx)
+       ELSE
+         CALL MUMPS_FDM_END_IDX('F', 'ENDF', IWHANDLER)
+       ENDIF
        RETURN
        END SUBROUTINE SMUMPS_BLR_END_FRONT
        SUBROUTINE SMUMPS_BLR_SAVE_PANEL_LORU (
@@ -491,10 +527,10 @@ C
        END SUBROUTINE SMUMPS_BLR_SAVE_PANEL_LORU
        SUBROUTINE SMUMPS_BLR_SAVE_CB_LRB (
      &    IWHANDLER, CB_LRB )
-#if defined(MUMPS_F2003)
-       TYPE(LRB_TYPE), POINTER, INTENT(IN) :: CB_LRB(:,:)
-#else       
+#if defined(MUMPS_NOF2003)
        TYPE(LRB_TYPE), POINTER :: CB_LRB(:,:)
+#else       
+       TYPE(LRB_TYPE), POINTER, INTENT(IN) :: CB_LRB(:,:)
 #endif       
        INTEGER, INTENT(IN) :: IWHANDLER
        IF ( IWHANDLER .GT. size(BLR_ARRAY) .OR. IWHANDLER .LE. 0 ) THEN
@@ -566,10 +602,10 @@ C
        SUBROUTINE SMUMPS_BLR_RETRIEVE_BEGS_BLR_L 
      &            ( IWHANDLER, BEGS_BLR_L )
        INTEGER, INTENT(IN) :: IWHANDLER
-#if defined(MUMPS_F2003)
-       INTEGER, POINTER, DIMENSION(:), INTENT(OUT) :: BEGS_BLR_L
-#else
+#if defined(MUMPS_NOF2003)
        INTEGER, POINTER, DIMENSION(:) :: BEGS_BLR_L
+#else
+       INTEGER, POINTER, DIMENSION(:), INTENT(OUT) :: BEGS_BLR_L
 #endif
        IF ( IWHANDLER .GT. size(BLR_ARRAY) .OR. IWHANDLER .LE. 0 ) THEN
          WRITE(*,*) 
@@ -582,10 +618,10 @@ C
        SUBROUTINE SMUMPS_BLR_RETRIEVE_BEGSBLR_STA
      &            ( IWHANDLER, BEGS_BLR_STATIC )
        INTEGER, INTENT(IN) :: IWHANDLER
-#if defined(MUMPS_F2003)
-       INTEGER, POINTER, DIMENSION(:), INTENT(OUT) :: BEGS_BLR_STATIC
-#else
+#if defined(MUMPS_NOF2003)
        INTEGER, POINTER, DIMENSION(:) :: BEGS_BLR_STATIC
+#else
+       INTEGER, POINTER, DIMENSION(:), INTENT(OUT) :: BEGS_BLR_STATIC
 #endif
        IF ( IWHANDLER .GT. size(BLR_ARRAY) .OR. IWHANDLER .LE. 0 ) THEN
          WRITE(*,*) 
@@ -598,10 +634,10 @@ C
        SUBROUTINE SMUMPS_BLR_RETRIEVE_BEGSBLR_DYN
      &            ( IWHANDLER, BEGS_BLR_DYNAMIC )
        INTEGER, INTENT(IN) :: IWHANDLER
-#if defined(MUMPS_F2003)
-       INTEGER, POINTER, DIMENSION(:), INTENT(OUT) :: BEGS_BLR_DYNAMIC
-#else
+#if defined(MUMPS_NOF2003)
        INTEGER, POINTER, DIMENSION(:) :: BEGS_BLR_DYNAMIC
+#else
+       INTEGER, POINTER, DIMENSION(:), INTENT(OUT) :: BEGS_BLR_DYNAMIC
 #endif
        IF ( IWHANDLER .GT. size(BLR_ARRAY) .OR. IWHANDLER .LE. 0 ) THEN
          WRITE(*,*) 
@@ -615,10 +651,10 @@ C
      &            ( IWHANDLER, BEGS_BLR_COL, NB_PANELS )
        INTEGER, INTENT(IN)  :: IWHANDLER
        INTEGER, INTENT(OUT) :: NB_PANELS
-#if defined(MUMPS_F2003)
-       INTEGER, POINTER, DIMENSION(:), INTENT(OUT) :: BEGS_BLR_COL
-#else
+#if defined(MUMPS_NOF2003)
        INTEGER, POINTER, DIMENSION(:) :: BEGS_BLR_COL
+#else
+       INTEGER, POINTER, DIMENSION(:), INTENT(OUT) :: BEGS_BLR_COL
 #endif
        IF ( IWHANDLER .GT. size(BLR_ARRAY) .OR. IWHANDLER .LE. 0 ) THEN
          WRITE(*,*) 
@@ -641,31 +677,31 @@ C
        NB_PANELS = BLR_ARRAY(IWHANDLER)%NB_PANELS
        RETURN
        END SUBROUTINE SMUMPS_BLR_RETRIEVE_NB_PANELS
-       SUBROUTINE SMUMPS_BLR_RETRIEVE_PANEL_L(IWHANDLER, IPANEL,
+       SUBROUTINE SMUMPS_BLR_DEC_AND_RETRIEVE_L(IWHANDLER, IPANEL,
      &                                      BEGS_BLR_L, THELRBPANEL)
        INTEGER, INTENT(IN) :: IWHANDLER
        INTEGER, INTENT(IN) :: IPANEL
-#if defined(MUMPS_F2003)
-       INTEGER, POINTER, DIMENSION(:), INTENT(OUT) :: BEGS_BLR_L
-       TYPE(LRB_TYPE), INTENT(OUT), DIMENSION(:), POINTER :: THELRBPANEL
-#else
+#if defined(MUMPS_NOF2003)
        INTEGER, POINTER, DIMENSION(:) :: BEGS_BLR_L
        TYPE(LRB_TYPE), POINTER, DIMENSION(:) :: THELRBPANEL
+#else
+       INTEGER, POINTER, DIMENSION(:), INTENT(OUT) :: BEGS_BLR_L
+       TYPE(LRB_TYPE), INTENT(OUT), DIMENSION(:), POINTER :: THELRBPANEL
 #endif
        IF ( IWHANDLER .GT. size(BLR_ARRAY) .OR. IWHANDLER .LE. 0 ) THEN
-         WRITE(*,*) "Internal error 1 in SMUMPS_BLR_RETRIEVE_PANEL_L",
+         WRITE(*,*) "Internal error 1 in SMUMPS_BLR_DEC_AND_RETRIEVE_L",
      &    "IPANEL=", IPANEL
          CALL MUMPS_ABORT()
        ENDIF
        IF ( .NOT. associated(BLR_ARRAY(IWHANDLER)%PANELS_L)) THEN
-         WRITE(*,*) "Internal error 2 in SMUMPS_BLR_RETRIEVE_PANEL_L",
+         WRITE(*,*) "Internal error 2 in SMUMPS_BLR_DEC_AND_RETRIEVE_L",
      &    "IPANEL=", IPANEL
          CALL MUMPS_ABORT()
        ENDIF
        IF ( .NOT.
      & associated(BLR_ARRAY(IWHANDLER)%PANELS_L(IPANEL)%LRB_PANEL) )
      &      THEN
-         WRITE(*,*) "Internal error 3 in SMUMPS_BLR_RETRIEVE_PANEL_L",
+         WRITE(*,*) "Internal error 3 in SMUMPS_BLR_DEC_AND_RETRIEVE_L",
      &    "IPANEL=", IPANEL
          CALL MUMPS_ABORT()
        ENDIF
@@ -675,7 +711,7 @@ C
        BLR_ARRAY(IWHANDLER)%PANELS_L(IPANEL)%NB_ACCESSES_LEFT = 
      & BLR_ARRAY(IWHANDLER)%PANELS_L(IPANEL)%NB_ACCESSES_LEFT - 1
        RETURN
-       END SUBROUTINE SMUMPS_BLR_RETRIEVE_PANEL_L
+       END SUBROUTINE SMUMPS_BLR_DEC_AND_RETRIEVE_L
        LOGICAL FUNCTION SMUMPS_BLR_EMPTY_PANEL_LORU
      & (IWHANDLER, LorU, IPANEL)
        INTEGER, INTENT(IN) :: LorU, IPANEL, IWHANDLER
@@ -712,10 +748,10 @@ C
        INTEGER, INTENT(IN) :: IWHANDLER
        INTEGER, INTENT(IN) :: LORU 
        INTEGER, INTENT(IN) :: IPANEL
-#if defined(MUMPS_F2003)
-       TYPE(LRB_TYPE), INTENT(OUT), DIMENSION(:), POINTER :: THELRBPANEL
-#else
+#if defined(MUMPS_NOF2003)
        TYPE(LRB_TYPE), POINTER, DIMENSION(:) :: THELRBPANEL
+#else
+       TYPE(LRB_TYPE), INTENT(OUT), DIMENSION(:), POINTER :: THELRBPANEL
 #endif
        IF ( IWHANDLER .GT. size(BLR_ARRAY) .OR. IWHANDLER .LE. 0 ) THEN
          WRITE(*,*) 
@@ -727,7 +763,7 @@ C
           IF ( .NOT. associated(BLR_ARRAY(IWHANDLER)%PANELS_L)) THEN
          WRITE(*,*) 
      &    "Internal error 2 in SMUMPS_BLR_RETRIEVE_PANEL_LORU",
-     &    "IWHANDLER=", IWHANDLER
+     &    " IWHANDLER=", IWHANDLER
          CALL MUMPS_ABORT()
         ENDIF
         IF ( .NOT.
@@ -735,18 +771,16 @@ C
      &       THEN
          WRITE(*,*) 
      &    "Internal error 3 in SMUMPS_BLR_RETRIEVE_PANEL_LORU",
-     &    "IPANEL=", IPANEL
+     &    " IPANEL=", IPANEL
          CALL MUMPS_ABORT()
         ENDIF
         THELRBPANEL =>
      &        BLR_ARRAY(IWHANDLER)%PANELS_L(IPANEL)%LRB_PANEL
-        BLR_ARRAY(IWHANDLER)%PANELS_L(IPANEL)%NB_ACCESSES_LEFT = 
-     &  BLR_ARRAY(IWHANDLER)%PANELS_L(IPANEL)%NB_ACCESSES_LEFT - 1
        ELSE
           IF ( .NOT. associated(BLR_ARRAY(IWHANDLER)%PANELS_U)) THEN
          WRITE(*,*) 
      &    "Internal error 4 in SMUMPS_BLR_RETRIEVE_PANEL_LORU",
-     &    "IWHANDLER=", IWHANDLER
+     &    " IWHANDLER=", IWHANDLER
          CALL MUMPS_ABORT()
         ENDIF
         IF ( .NOT.
@@ -754,13 +788,11 @@ C
      &       THEN
          WRITE(*,*) 
      &    "Internal error 5 in SMUMPS_BLR_RETRIEVE_PANEL_LORU",
-     &    "IPANEL=", IPANEL
+     &    " IPANEL=", IPANEL
          CALL MUMPS_ABORT()
         ENDIF
         THELRBPANEL =>
      &        BLR_ARRAY(IWHANDLER)%PANELS_U(IPANEL)%LRB_PANEL
-        BLR_ARRAY(IWHANDLER)%PANELS_U(IPANEL)%NB_ACCESSES_LEFT = 
-     &  BLR_ARRAY(IWHANDLER)%PANELS_U(IPANEL)%NB_ACCESSES_LEFT - 1
        ENDIF
        RETURN
        END SUBROUTINE SMUMPS_BLR_RETRIEVE_PANEL_LORU
@@ -769,10 +801,10 @@ C
      &                           THEBLOCK)
        INTEGER, INTENT(IN) :: IWHANDLER
        INTEGER, INTENT(IN) :: IPANEL
-#if defined(MUMPS_F2003)
-       REAL, POINTER, INTENT(OUT)  :: THEBLOCK(:)
-#else
+#if defined(MUMPS_NOF2003)
        REAL, POINTER :: THEBLOCK(:)
+#else
+       REAL, POINTER, INTENT(OUT) :: THEBLOCK(:)
 #endif
        IF ( IWHANDLER .GT. size(BLR_ARRAY) .OR. IWHANDLER .LE. 0 ) THEN
          WRITE(*,*) 
@@ -787,7 +819,7 @@ C
          CALL MUMPS_ABORT()
        ENDIF
        IF ( .NOT.
-     &  associated(BLR_ARRAY(IWHANDLER)%DIAG_BLOCKS(IPANEL)%DIAG_BLOCK))
+     & associated(BLR_ARRAY(IWHANDLER)%DIAG_BLOCKS(IPANEL)%DIAG_BLOCK))
      &      THEN
          WRITE(*,*) 
      &    "Internal error 3 in SMUMPS_BLR_RETRIEVE_DIAG_BLOCK",
@@ -801,10 +833,10 @@ C
        SUBROUTINE SMUMPS_BLR_RETRIEVE_CB_LRB
      &                          (IWHANDLER, THECB)
        INTEGER, INTENT(IN) :: IWHANDLER
-#if defined(MUMPS_F2003)
-       TYPE(LRB_TYPE), POINTER, INTENT(OUT) :: THECB(:,:)
-#else
+#if defined(MUMPS_NOF2003)
        TYPE(LRB_TYPE), POINTER :: THECB(:,:)
+#else
+       TYPE(LRB_TYPE), POINTER, INTENT(OUT) :: THECB(:,:)
 #endif
        IF ( IWHANDLER .GT. size(BLR_ARRAY) .OR. IWHANDLER .LE. 0 ) THEN
          WRITE(*,*) "Internal error 1 in SMUMPS_BLR_RETRIEVE_CB_LRB"
@@ -867,10 +899,10 @@ C
        SUBROUTINE SMUMPS_BLR_RETRIEVE_M_ARRAY ( IWHANDLER, M_ARRAY)
        IMPLICIT NONE
        INTEGER, INTENT(IN) ::  IWHANDLER
-#if defined(MUMPS_F2003)
-       REAL, DIMENSION(:), POINTER, INTENT(OUT) :: M_ARRAY
-#else
+#if defined(MUMPS_NOF2003)
        REAL, DIMENSION(:), POINTER :: M_ARRAY
+#else
+       REAL, DIMENSION(:), POINTER, INTENT(OUT) :: M_ARRAY
 #endif
        IF ( IWHANDLER .GT. size(BLR_ARRAY) .OR. IWHANDLER .LE. 0 ) THEN
           WRITE(*,*) "Internal error 1 in SMUMPS_BLR_RETRIEVE_M_ARRAY"
@@ -894,9 +926,9 @@ C
        RETURN
        END SUBROUTINE SMUMPS_BLR_FREE_M_ARRAY
        SUBROUTINE SMUMPS_BLR_DEC_AND_TRYFREE_L( IWHANDLER, IPANEL,
-     &                            KEEP8)      
+     &                            KEEP8, K34)      
        IMPLICIT NONE
-       INTEGER, INTENT(IN) :: IWHANDLER, IPANEL
+       INTEGER, INTENT(IN) :: IWHANDLER, IPANEL, K34
        INTEGER(8) :: KEEP8(150)
        IF (IWHANDLER.LE.0) RETURN
        IF ( BLR_ARRAY(IWHANDLER)%NB_ACCESSES_INIT.LT.0)
@@ -904,14 +936,15 @@ C
        BLR_ARRAY(IWHANDLER)%PANELS_L(IPANEL)%NB_ACCESSES_LEFT = 
      & BLR_ARRAY(IWHANDLER)%PANELS_L(IPANEL)%NB_ACCESSES_LEFT - 1
        CALL SMUMPS_BLR_TRY_FREE_PANEL (IWHANDLER, IPANEL,
-     &                   KEEP8)
+     &                   KEEP8, K34)
        RETURN
        END SUBROUTINE SMUMPS_BLR_DEC_AND_TRYFREE_L
        SUBROUTINE SMUMPS_BLR_TRY_FREE_PANEL( IWHANDLER, IPANEL, 
-     &           KEEP8)
+     &           KEEP8, K34 )
        IMPLICIT NONE
        INTEGER, INTENT(IN) :: IWHANDLER, IPANEL
        INTEGER(8) :: KEEP8(150)
+       INTEGER, INTENT(IN)    :: K34
        TYPE(blr_panel_type), POINTER  :: THEPANEL
        IF (IWHANDLER.LE.0) RETURN
        IF ( BLR_ARRAY(IWHANDLER)%NB_ACCESSES_INIT.LT.0)
@@ -921,7 +954,7 @@ C
          IF (associated(THEPANEL%LRB_PANEL)) THEN
           IF (size(THEPANEL%LRB_PANEL) .GT.0) THEN
            CALL DEALLOC_BLR_PANEL(THEPANEL%LRB_PANEL,
-     &        size(THEPANEL%LRB_PANEL), KEEP8)
+     &        size(THEPANEL%LRB_PANEL), KEEP8, K34)
           ENDIF
           DEALLOCATE(THEPANEL%LRB_PANEL)
           NULLIFY(THEPANEL%LRB_PANEL)
@@ -931,9 +964,9 @@ C
        RETURN
        END SUBROUTINE SMUMPS_BLR_TRY_FREE_PANEL
        SUBROUTINE SMUMPS_BLR_FREE_CB_LRB ( IWHANDLER, FREE_ONLY_STRUCT,
-     &                                     KEEP8 )
+     &                                     KEEP8, K34 )
        IMPLICIT NONE
-       INTEGER, INTENT(IN) :: IWHANDLER
+       INTEGER, INTENT(IN) :: IWHANDLER, K34
        LOGICAL, INTENT(IN) :: FREE_ONLY_STRUCT
        INTEGER(8) :: KEEP8(150)
        TYPE(LRB_TYPE), POINTER  :: CB_LRB(:,:)
@@ -953,7 +986,9 @@ C
          DO IPANEL = 1,size(CB_LRB,1)
          DO JPANEL = 1,size(CB_LRB,2)
            THELRB => CB_LRB(IPANEL,JPANEL)
-           IF (associated(THELRB)) CALL DEALLOC_LRB(THELRB,KEEP8)
+           IF (associated(THELRB)) THEN
+             CALL DEALLOC_LRB(THELRB, KEEP8, K34)
+           ENDIF
          ENDDO
          ENDDO
        ENDIF
@@ -962,13 +997,15 @@ C
        RETURN
        END SUBROUTINE SMUMPS_BLR_FREE_CB_LRB
        SUBROUTINE SMUMPS_BLR_FREE_ALL_PANELS ( IWHANDLER, 
-     &         LorU, KEEP8)
+     &         LorU, KEEP8, K34)
        IMPLICIT NONE
-       INTEGER, INTENT(IN) :: IWHANDLER, LorU
+       INTEGER, INTENT(IN) :: IWHANDLER, LorU, K34
        INTEGER(8) :: KEEP8(150)
        INTEGER             :: IPANEL
+       INTEGER             :: IDUMMY, JDUMMY
        TYPE(blr_panel_type), POINTER  :: THEPANEL
        TYPE(diag_block_type), POINTER  :: THEBLOCK
+       INTEGER(8) :: MEM_FREED
        IF (IWHANDLER.LE.0) RETURN
        IF (BLR_ARRAY(IWHANDLER)%NB_ACCESSES_INIT.EQ.
      &      PANELS_NOTUSED) RETURN
@@ -979,7 +1016,7 @@ C
            IF (associated(THEPANEL%LRB_PANEL)) THEN
             IF (size(THEPANEL%LRB_PANEL) .GT.0) THEN
              CALL DEALLOC_BLR_PANEL(THEPANEL%LRB_PANEL,
-     &          size(THEPANEL%LRB_PANEL), KEEP8)
+     &          size(THEPANEL%LRB_PANEL), KEEP8, K34)
             ENDIF
             DEALLOCATE(THEPANEL%LRB_PANEL)
             NULLIFY(THEPANEL%LRB_PANEL)
@@ -995,7 +1032,7 @@ C
           IF (associated(THEPANEL%LRB_PANEL)) THEN
            IF (size(THEPANEL%LRB_PANEL) .GT.0) THEN
             CALL DEALLOC_BLR_PANEL(THEPANEL%LRB_PANEL,
-     &        size(THEPANEL%LRB_PANEL), KEEP8)
+     &        size(THEPANEL%LRB_PANEL), KEEP8, K34)
            ENDIF
            DEALLOCATE(THEPANEL%LRB_PANEL)
            NULLIFY(THEPANEL%LRB_PANEL)
@@ -1006,76 +1043,25 @@ C
        ENDIF
        IF (.NOT.BLR_ARRAY(IWHANDLER)%IsSLAVE) THEN
          IF (associated(BLR_ARRAY(IWHANDLER)%DIAG_BLOCKS)) THEN
-         DO IPANEL = 1, size(BLR_ARRAY(IWHANDLER)%DIAG_BLOCKS)
-           THEBLOCK => BLR_ARRAY(IWHANDLER)%DIAG_BLOCKS(IPANEL)
-           IF (associated(THEBLOCK%DIAG_BLOCK)) THEN
-             KEEP8(71) = KEEP8(71) - int(size(THEBLOCK%DIAG_BLOCK),8)
-             KEEP8(69) = KEEP8(69) - int(size(THEBLOCK%DIAG_BLOCK),8)
-             DEALLOCATE(THEBLOCK%DIAG_BLOCK)
-             NULLIFY(THEBLOCK%DIAG_BLOCK)
+           MEM_FREED = 0_8
+           DO IPANEL = 1, size(BLR_ARRAY(IWHANDLER)%DIAG_BLOCKS)
+             THEBLOCK => BLR_ARRAY(IWHANDLER)%DIAG_BLOCKS(IPANEL)
+             IF (associated(THEBLOCK%DIAG_BLOCK)) THEN
+               DEALLOCATE(THEBLOCK%DIAG_BLOCK)
+               NULLIFY   (THEBLOCK%DIAG_BLOCK)
+               MEM_FREED = MEM_FREED + int(size(THEBLOCK%DIAG_BLOCK),8)
+             ENDIF
+           ENDDO
+           IF (MEM_FREED .GT. 0 ) THEN
+             CALL MUMPS_DM_FAC_UPD_DYN_MEMCNTS(-MEM_FREED,
+     &        .TRUE., KEEP8, 
+     &        IDUMMY, JDUMMY, 
+     &        .TRUE., .TRUE.)
            ENDIF
-         ENDDO
          ENDIF
        ENDIF
        RETURN
        END SUBROUTINE SMUMPS_BLR_FREE_ALL_PANELS
-       SUBROUTINE SMUMPS_BLR_FREE_PANEL( IWHANDLER, LORU, IPANEL,
-     &                 KEEP8)
-       IMPLICIT NONE
-       INTEGER, INTENT(IN) :: IWHANDLER, IPANEL
-       INTEGER, INTENT(IN) :: LORU
-       INTEGER(8) :: KEEP8(150)
-       TYPE(blr_panel_type), POINTER  :: THEPANEL
-       TYPE(diag_block_type), POINTER  :: THEBLOCK
-       IF (IWHANDLER.LE.0) RETURN
-       IF (LORU.EQ.0.or.LORU.EQ.1) THEN
-        IF (LORU.EQ.0) THEN
-         THEPANEL => BLR_ARRAY(IWHANDLER)%PANELS_L(IPANEL)
-        ELSE 
-         THEPANEL => BLR_ARRAY(IWHANDLER)%PANELS_U(IPANEL)
-        ENDIF
-        IF (associated(THEPANEL%LRB_PANEL)) THEN
-          IF (size(THEPANEL%LRB_PANEL) .GT.0) THEN
-            CALL DEALLOC_BLR_PANEL(THEPANEL%LRB_PANEL,
-     &        size(THEPANEL%LRB_PANEL), KEEP8)
-          ENDIF
-          DEALLOCATE(THEPANEL%LRB_PANEL)
-          NULLIFY(THEPANEL%LRB_PANEL)
-         ENDIF
-         THEPANEL%NB_ACCESSES_LEFT = PANELS_FREED 
-       ELSE
-         THEPANEL => BLR_ARRAY(IWHANDLER)%PANELS_L(IPANEL)
-         IF (associated(THEPANEL%LRB_PANEL)) THEN
-           IF (size(THEPANEL%LRB_PANEL) .GT.0) THEN
-             CALL DEALLOC_BLR_PANEL(THEPANEL%LRB_PANEL,
-     &        size(THEPANEL%LRB_PANEL), KEEP8)
-           ENDIF
-           DEALLOCATE(THEPANEL%LRB_PANEL)
-           NULLIFY(THEPANEL%LRB_PANEL)
-         ENDIF
-         THEPANEL%NB_ACCESSES_LEFT = PANELS_FREED 
-         THEPANEL => BLR_ARRAY(IWHANDLER)%PANELS_U(IPANEL)
-         IF (associated(THEPANEL%LRB_PANEL)) THEN
-           IF (size(THEPANEL%LRB_PANEL) .GT.0) THEN
-             CALL DEALLOC_BLR_PANEL(THEPANEL%LRB_PANEL,
-     &        size(THEPANEL%LRB_PANEL), KEEP8)
-           ENDIF
-           DEALLOCATE(THEPANEL%LRB_PANEL)
-           NULLIFY(THEPANEL%LRB_PANEL)
-         ENDIF
-         THEPANEL%NB_ACCESSES_LEFT = PANELS_FREED 
-       ENDIF
-       IF (.NOT.BLR_ARRAY(IWHANDLER)%IsSLAVE) THEN
-         THEBLOCK => BLR_ARRAY(IWHANDLER)%DIAG_BLOCKS(IPANEL)
-         IF (associated(THEBLOCK%DIAG_BLOCK)) THEN
-           KEEP8(71) = KEEP8(71) - int(size(THEBLOCK%DIAG_BLOCK),8)
-           KEEP8(69) = KEEP8(69) - int(size(THEBLOCK%DIAG_BLOCK),8)
-           DEALLOCATE(THEBLOCK%DIAG_BLOCK)
-           NULLIFY(THEBLOCK%DIAG_BLOCK)
-         ENDIF
-       ENDIF
-       RETURN
-       END SUBROUTINE SMUMPS_BLR_FREE_PANEL
       SUBROUTINE SMUMPS_SAVE_RESTORE_BLR(id_BLRARRAY_ENCODING
      &                 ,unit,MYID,mode
      &                 ,SIZE_GEST,SIZE_VARIABLES
@@ -1096,6 +1082,7 @@ C
       INTEGER:: j1,NbRecords,NbSubRecords,size_array1,dummy,allocok,err
       INTEGER:: SIZE_GEST_BLR_ARRAY,SIZE_GEST_BLR_ARRAY_j1
       INTEGER(8):: SIZE_VARIABLES_BLR_ARRAY,SIZE_VARIABLES_BLR_ARRAY_j1
+      INTEGER(4) :: I4
       NbRecords=0
       SIZE_GEST_BLR_ARRAY=0
       SIZE_GEST_BLR_ARRAY_j1=0
@@ -1223,14 +1210,14 @@ C
          endif
       endif
       if(trim(mode).EQ."memory_save") then
-         NbSubRecords=int(SIZE_VARIABLES/huge(0))
+         NbSubRecords=int(SIZE_VARIABLES/huge(I4))
          IF(NbSubRecords.GT.0) then
             NbRecords=NbRecords+NbSubRecords
          ENDIF
       elseif(trim(mode).EQ."save") then
          size_written=size_written+SIZE_VARIABLES
      &        +int(SIZE_GEST,kind=8)
-#if !defined(MUMPS_F2003)
+#if defined(MUMPS_NOF2003)
          size_written=size_written
      &        +int(2*SIZE_INT*NbRecords,kind=8)
 #endif
@@ -1238,7 +1225,7 @@ C
          size_allocated=size_allocated+SIZE_VARIABLES
          size_read=size_read+SIZE_VARIABLES
      &        +int(SIZE_GEST,kind=8)
-#if !defined(MUMPS_F2003)
+#if defined(MUMPS_NOF2003)
          size_read=size_read
      &        +int(2*SIZE_INT*NbRecords,kind=8)
 #endif
@@ -1246,7 +1233,7 @@ C
       if(trim(mode).EQ."memory_save") then
          SIZE_VARIABLES=SIZE_VARIABLES+SIZE_VARIABLES_BLR_ARRAY
          SIZE_GEST=SIZE_GEST+SIZE_GEST_BLR_ARRAY
-#if !defined(MUMPS_F2003)
+#if defined(MUMPS_NOF2003)
          SIZE_GEST=SIZE_GEST+2*SIZE_INT*NbRecords
 #endif
       endif
@@ -1273,14 +1260,18 @@ C
       INTEGER(8),intent(INOUT):: size_read,size_allocated,size_written
       INTEGER :: NBVARIABLES_BLR_STRUC_T
       PARAMETER (NBVARIABLES_BLR_STRUC_T = 15)
-      CHARACTER(len=100), dimension(NBVARIABLES_BLR_STRUC_T)::
+      CHARACTER(len=30), dimension(NBVARIABLES_BLR_STRUC_T)::
      &     VARIABLES_BLR_STRUC_T
+      CHARACTER(len=30) :: TMP_STRING
       INTEGER(8),dimension(NBVARIABLES_BLR_STRUC_T)::
      &     SIZE_VARIABLES_BLR_STRUC_T
       INTEGER,dimension(NBVARIABLES_BLR_STRUC_T)::SIZE_GEST_BLR_STRUC_T
       INTEGER,dimension(NBVARIABLES_BLR_STRUC_T)::NbRecords_BLR_STRUC_T
       INTEGER:: size_array1,size_array2,dummy,allocok
-      INTEGER:: err,i1,j1,j2,NbSubRecords,Local_NbRecords
+      INTEGER:: err,i1,j1,j2,NbSubRecords
+#if defined(MUMPS_NOF2003)
+      INTEGER:: Local_NbRecords
+#endif
       INTEGER::SIZE_GEST_PANELS_L,SIZE_GEST_PANELS_L_j1
       INTEGER(8)::SIZE_VARIABLES_PANELS_L,SIZE_VARIABLES_PANELS_L_j1
       INTEGER::SIZE_GEST_PANELS_U,SIZE_GEST_PANELS_U_j1
@@ -1290,6 +1281,7 @@ C
       INTEGER::SIZE_GEST_DIAG_BLOCKS,SIZE_GEST_DIAG_BLOCKS_j1
       INTEGER(8)::SIZE_VARIABLES_DIAG_BLOCKS
       INTEGER(8)::SIZE_VARIABLES_DIAG_BLOCKS_j1
+      INTEGER(4)::I4
       VARIABLES_BLR_STRUC_T(1)="IsSYM"
       VARIABLES_BLR_STRUC_T(2)="IsT2"
       VARIABLES_BLR_STRUC_T(3)="IsSLAVE"
@@ -1325,7 +1317,8 @@ C
       SIZE_VARIABLES_DIAG_BLOCKS=0_8
       SIZE_VARIABLES_DIAG_BLOCKS_j1=0_8
       DO i1=1,NBVARIABLES_BLR_STRUC_T 
-         SELECT CASE(trim(adjustl(VARIABLES_BLR_STRUC_T(i1))))
+         TMP_STRING = VARIABLES_BLR_STRUC_T(i1)
+         SELECT CASE(TMP_STRING)
          CASE("IsSYM")
             NbRecords_BLR_STRUC_T(i1)=1
             if(trim(mode).EQ."memory_save") then
@@ -2259,7 +2252,7 @@ C
          CASE DEFAULT
          END SELECT
          if(trim(mode).EQ."memory_save") then
-            NbSubRecords=int(SIZE_VARIABLES_BLR_STRUC_T(i1)/huge(0))
+            NbSubRecords=int(SIZE_VARIABLES_BLR_STRUC_T(i1)/huge(I4))
             IF(NbSubRecords.GT.0) then
                NbRecords_BLR_STRUC_T(i1)=NbRecords_BLR_STRUC_T(i1)
      &              +NbSubRecords
@@ -2267,7 +2260,7 @@ C
          elseif(trim(mode).EQ."save") then
             size_written=size_written+SIZE_VARIABLES_BLR_STRUC_T(i1)
      &           +int(SIZE_GEST_BLR_STRUC_T(i1),kind=8)
-#if !defined(MUMPS_F2003)
+#if defined(MUMPS_NOF2003)
             size_written=size_written
      &           +int(2*SIZE_INT*NbRecords_BLR_STRUC_T(i1),kind=8)
 #endif
@@ -2276,7 +2269,7 @@ C
      &           SIZE_VARIABLES_BLR_STRUC_T(i1)
             size_read=size_read+SIZE_VARIABLES_BLR_STRUC_T(i1)
      &           +int(SIZE_GEST_BLR_STRUC_T(i1),kind=8)
-#if !defined(MUMPS_F2003)
+#if defined(MUMPS_NOF2003)
             size_read=size_read
      &           +int(2*SIZE_INT*NbRecords_BLR_STRUC_T(i1),kind=8)
 #endif
@@ -2293,7 +2286,7 @@ C
      &        +SIZE_GEST_PANELS_U
      &        +SIZE_GEST_CB_LRB
      &        +SIZE_GEST_DIAG_BLOCKS
-#if !defined(MUMPS_F2003)
+#if defined(MUMPS_NOF2003)
          Local_NbRecords=sum(NbRecords_BLR_STRUC_T)
          Local_SIZE_GEST=Local_SIZE_GEST+2*SIZE_INT*Local_NbRecords
 #endif
@@ -2319,9 +2312,10 @@ C
       INTEGER(8),intent(IN) :: TOTAL_FILE_SIZE,TOTAL_STRUC_SIZE
       INTEGER(8),intent(INOUT):: size_read,size_allocated,size_written
       INTEGER :: NBVARIABLES_LRB_TYPE
-      PARAMETER (NBVARIABLES_LRB_TYPE = 8)
-      CHARACTER(len=100), dimension(NBVARIABLES_LRB_TYPE)::
+      PARAMETER (NBVARIABLES_LRB_TYPE = 6)
+      CHARACTER(len=30), dimension(NBVARIABLES_LRB_TYPE)::
      &     VARIABLES_LRB_TYPE
+      CHARACTER(len=30) :: TMP_STRING
       INTEGER(8),dimension(NBVARIABLES_LRB_TYPE)::
      &     SIZE_VARIABLES_LRB_TYPE
       INTEGER,dimension(NBVARIABLES_LRB_TYPE)::
@@ -2329,20 +2323,23 @@ C
       INTEGER,dimension(NBVARIABLES_LRB_TYPE)::
      &     NbRecords_LRB_TYPE
       INTEGER:: size_array1,size_array2,dummy,allocok
-      INTEGER:: err,i1,NbSubRecords,Local_NbRecords
+      INTEGER:: err,i1,NbSubRecords
+#if defined(MUMPS_NOF2003)
+      INTEGER:: Local_NbRecords
+#endif
+      INTEGER(4) ::I4
       VARIABLES_LRB_TYPE(1)="Q"
       VARIABLES_LRB_TYPE(2)="R"
-      VARIABLES_LRB_TYPE(3)="LRFORM"
-      VARIABLES_LRB_TYPE(4)="K"
-      VARIABLES_LRB_TYPE(5)="M"
-      VARIABLES_LRB_TYPE(6)="N"
-      VARIABLES_LRB_TYPE(7)="KSVD"
-      VARIABLES_LRB_TYPE(8)="ISLR"
+      VARIABLES_LRB_TYPE(3)="K"
+      VARIABLES_LRB_TYPE(4)="M"
+      VARIABLES_LRB_TYPE(5)="N"
+      VARIABLES_LRB_TYPE(6)="ISLR"
       SIZE_VARIABLES_LRB_TYPE(:)=0_8
       SIZE_GEST_LRB_TYPE(:)=0
       NbRecords_LRB_TYPE(:)=0
       DO i1=1,NBVARIABLES_LRB_TYPE
-         SELECT CASE(trim(adjustl(VARIABLES_LRB_TYPE(i1))))
+         TMP_STRING = VARIABLES_LRB_TYPE(i1)
+         SELECT CASE(TMP_STRING)
          CASE("Q")
             NbRecords_LRB_TYPE(i1)=2
             if(trim(mode).EQ."memory_save") then
@@ -2501,29 +2498,6 @@ C
                endif
                IF ( INFO(1) .LT. 0 ) GOTO 300
             endif
-         CASE("LRFORM")
-            NbRecords_LRB_TYPE(i1)=1
-            if(trim(mode).EQ."memory_save") then
-               SIZE_VARIABLES_LRB_TYPE(i1)=SIZE_INT
-            elseif(trim(mode).EQ."save") then
-               SIZE_VARIABLES_LRB_TYPE(i1)=SIZE_INT
-               write(unit,iostat=err) LRB_T%LRFORM
-               if(err.ne.0) then
-                  INFO(1) = -72
-                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
-     &                 INFO(2))
-               endif
-               IF ( INFO(1) .LT. 0 ) GOTO 300
-            elseif(trim(mode).EQ."restore") then
-               SIZE_VARIABLES_LRB_TYPE(i1)=SIZE_INT
-               read(unit,iostat=err) LRB_T%LRFORM
-               if(err.ne.0) THEN
-                  INFO(1) = -75
-                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
-     &                 ,INFO(2))
-               endif 
-               IF ( INFO(1) .LT. 0 ) GOTO 300
-            endif
          CASE("K")
             NbRecords_LRB_TYPE(i1)=1
             if(trim(mode).EQ."memory_save") then
@@ -2593,29 +2567,6 @@ C
                endif 
                IF ( INFO(1) .LT. 0 ) GOTO 300
             endif
-         CASE("KSVD")
-            NbRecords_LRB_TYPE(i1)=1
-            if(trim(mode).EQ."memory_save") then
-               SIZE_VARIABLES_LRB_TYPE(i1)=SIZE_INT
-            elseif(trim(mode).EQ."save") then
-               SIZE_VARIABLES_LRB_TYPE(i1)=SIZE_INT
-               write(unit,iostat=err) LRB_T%KSVD
-               if(err.ne.0) then
-                  INFO(1) = -72
-                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
-     &                 INFO(2))
-               endif
-               IF ( INFO(1) .LT. 0 ) GOTO 300
-            elseif(trim(mode).EQ."restore") then
-               SIZE_VARIABLES_LRB_TYPE(i1)=SIZE_INT
-               read(unit,iostat=err) LRB_T%KSVD
-               if(err.ne.0) THEN
-                  INFO(1) = -75
-                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
-     &                 ,INFO(2))
-               endif 
-               IF ( INFO(1) .LT. 0 ) GOTO 300
-            endif
          CASE("ISLR")
             NbRecords_LRB_TYPE(i1)=1
             if(trim(mode).EQ."memory_save") then
@@ -2642,7 +2593,7 @@ C
          CASE DEFAULT
          END SELECT
          if(trim(mode).EQ."memory_save") then
-            NbSubRecords=int(SIZE_VARIABLES_LRB_TYPE(i1)/huge(0))
+            NbSubRecords=int(SIZE_VARIABLES_LRB_TYPE(i1)/huge(I4))
             IF(NbSubRecords.GT.0) then
                NbRecords_LRB_TYPE(i1)=
      &              NbRecords_LRB_TYPE(i1)
@@ -2651,7 +2602,7 @@ C
          elseif(trim(mode).EQ."save") then
             size_written=size_written+SIZE_VARIABLES_LRB_TYPE(i1)
      &           +int(SIZE_GEST_LRB_TYPE(i1),kind=8)
-#if !defined(MUMPS_F2003)
+#if defined(MUMPS_NOF2003)
             size_written=size_written
      &           +int(2*SIZE_INT*NbRecords_LRB_TYPE(i1),kind=8)
 #endif
@@ -2660,7 +2611,7 @@ C
      &           SIZE_VARIABLES_LRB_TYPE(i1)
             size_read=size_read+SIZE_VARIABLES_LRB_TYPE(i1)
      &           +int(SIZE_GEST_LRB_TYPE(i1),kind=8)
-#if !defined(MUMPS_F2003)
+#if defined(MUMPS_NOF2003)
             size_read=size_read
      &           +int(2*SIZE_INT*NbRecords_LRB_TYPE(i1),kind=8)
 #endif
@@ -2669,7 +2620,7 @@ C
       if(trim(mode).EQ."memory_save") then
          Local_SIZE_VARIABLES=sum(SIZE_VARIABLES_LRB_TYPE)
          Local_SIZE_GEST=sum(SIZE_GEST_LRB_TYPE)
-#if !defined(MUMPS_F2003)
+#if defined(MUMPS_NOF2003)
          Local_NbRecords=sum(NbRecords_LRB_TYPE)
          Local_SIZE_GEST=Local_SIZE_GEST+2*SIZE_INT*Local_NbRecords
 #endif
@@ -2696,8 +2647,9 @@ C
       INTEGER(8),intent(INOUT):: size_read,size_allocated,size_written
       INTEGER :: NBVARIABLES_BLR_PANEL_TYPE
       PARAMETER (NBVARIABLES_BLR_PANEL_TYPE = 2)
-      CHARACTER(len=100), dimension(NBVARIABLES_BLR_PANEL_TYPE)::
+      CHARACTER(len=30), dimension(NBVARIABLES_BLR_PANEL_TYPE)::
      &     VARIABLES_BLR_PANEL_TYPE
+      CHARACTER(len=30) :: TMP_STRING
       INTEGER(8),dimension(NBVARIABLES_BLR_PANEL_TYPE)::
      &     SIZE_VARIABLES_BLR_PANEL_TYPE
       INTEGER,dimension(NBVARIABLES_BLR_PANEL_TYPE)::
@@ -2705,9 +2657,13 @@ C
       INTEGER,dimension(NBVARIABLES_BLR_PANEL_TYPE)::
      &     NbRecords_BLR_PANEL_TYPE
       INTEGER:: size_array1,dummy,allocok
-      INTEGER:: err,i1,j1,NbSubRecords,Local_NbRecords
+      INTEGER:: err,i1,j1,NbSubRecords
+#if defined(MUMPS_NOF2003)
+      INTEGER:: Local_NbRecords
+#endif
       INTEGER:: SIZE_GEST_LRB_PANEL_j1,SIZE_GEST_LRB_PANEL
       INTEGER(8)::SIZE_VARIABLES_LRB_PANEL_j1,SIZE_VARIABLES_LRB_PANEL
+      INTEGER(4)::I4
       VARIABLES_BLR_PANEL_TYPE(1)="NB_ACCESSES_LEFT"
       VARIABLES_BLR_PANEL_TYPE(2)="LRB_PANEL"
       SIZE_VARIABLES_BLR_PANEL_TYPE(:)=0_8
@@ -2718,7 +2674,8 @@ C
       SIZE_VARIABLES_LRB_PANEL_j1=0_8
       SIZE_VARIABLES_LRB_PANEL=0_8
       DO i1=1,NBVARIABLES_BLR_PANEL_TYPE
-         SELECT CASE(trim(adjustl(VARIABLES_BLR_PANEL_TYPE(i1))))
+         TMP_STRING = VARIABLES_BLR_PANEL_TYPE(i1)
+         SELECT CASE(TMP_STRING)
          CASE("NB_ACCESSES_LEFT")
             NbRecords_BLR_PANEL_TYPE(i1)=1
             if(trim(mode).EQ."memory_save") then
@@ -2863,7 +2820,7 @@ C
          CASE DEFAULT
          END SELECT
          if(trim(mode).EQ."memory_save") then
-            NbSubRecords=int(SIZE_VARIABLES_BLR_PANEL_TYPE(i1)/huge(0))
+            NbSubRecords=int(SIZE_VARIABLES_BLR_PANEL_TYPE(i1)/huge(I4))
             IF(NbSubRecords.GT.0) then
                NbRecords_BLR_PANEL_TYPE(i1)=
      &              NbRecords_BLR_PANEL_TYPE(i1)
@@ -2872,7 +2829,7 @@ C
          elseif(trim(mode).EQ."save") then
             size_written=size_written+SIZE_VARIABLES_BLR_PANEL_TYPE(i1)
      &           +int(SIZE_GEST_BLR_PANEL_TYPE(i1),kind=8)
-#if !defined(MUMPS_F2003)
+#if defined(MUMPS_NOF2003)
             size_written=size_written
      &           +int(2*SIZE_INT*NbRecords_BLR_PANEL_TYPE(i1),kind=8)
 #endif
@@ -2881,7 +2838,7 @@ C
      &           SIZE_VARIABLES_BLR_PANEL_TYPE(i1)
             size_read=size_read+SIZE_VARIABLES_BLR_PANEL_TYPE(i1)
      &           +int(SIZE_GEST_BLR_PANEL_TYPE(i1),kind=8)
-#if !defined(MUMPS_F2003)
+#if defined(MUMPS_NOF2003)
             size_read=size_read
      &           +int(2*SIZE_INT*NbRecords_BLR_PANEL_TYPE(i1),kind=8)
 #endif
@@ -2892,7 +2849,7 @@ C
      &        SIZE_VARIABLES_LRB_PANEL
          Local_SIZE_GEST=sum(SIZE_GEST_BLR_PANEL_TYPE)+
      &        SIZE_GEST_LRB_PANEL
-#if !defined(MUMPS_F2003)
+#if defined(MUMPS_NOF2003)
          Local_NbRecords=sum(NbRecords_BLR_PANEL_TYPE)
          Local_SIZE_GEST=Local_SIZE_GEST+2*SIZE_INT*Local_NbRecords
 #endif
@@ -2919,8 +2876,9 @@ C
       INTEGER(8),intent(INOUT):: size_read,size_allocated,size_written
       INTEGER :: NBVARIABLES_DIAG_BLOCK_TYPE
       PARAMETER (NBVARIABLES_DIAG_BLOCK_TYPE = 1)
-      CHARACTER(len=100), dimension(NBVARIABLES_DIAG_BLOCK_TYPE)::
+      CHARACTER(len=30), dimension(NBVARIABLES_DIAG_BLOCK_TYPE)::
      &     VARIABLES_DIAG_BLOCK_TYPE
+      CHARACTER(len=30) :: TMP_STRING
       INTEGER(8),dimension(NBVARIABLES_DIAG_BLOCK_TYPE)::
      &     SIZE_VARIABLES_DIAG_BLOCK_TYPE
       INTEGER,dimension(NBVARIABLES_DIAG_BLOCK_TYPE)::
@@ -2928,13 +2886,18 @@ C
       INTEGER,dimension(NBVARIABLES_DIAG_BLOCK_TYPE)::
      &     NbRecords_DIAG_BLOCK_TYPE
       INTEGER:: size_array1,dummy,allocok
-      INTEGER:: err,i1,NbSubRecords,Local_NbRecords
+      INTEGER:: err,i1,NbSubRecords
+#if defined(MUMPS_NOF2003)
+      INTEGER:: Local_NbRecords
+#endif
+      INTEGER(4) :: I4
       VARIABLES_DIAG_BLOCK_TYPE(1)="DIAG_BLOCK"
       SIZE_VARIABLES_DIAG_BLOCK_TYPE(:)=0_8
       SIZE_GEST_DIAG_BLOCK_TYPE(:)=0
       NbRecords_DIAG_BLOCK_TYPE(:)=0
       DO i1=1,NBVARIABLES_DIAG_BLOCK_TYPE
-         SELECT CASE(trim(adjustl(VARIABLES_DIAG_BLOCK_TYPE(i1))))
+         TMP_STRING = VARIABLES_DIAG_BLOCK_TYPE(i1)
+         SELECT CASE(TMP_STRING)
          CASE("DIAG_BLOCK")
             NbRecords_DIAG_BLOCK_TYPE(i1)=2
             if(trim(mode).EQ."memory_save") then
@@ -3003,21 +2966,22 @@ C
                      CALL MUMPS_SETI8TOI4(
      &                    TOTAL_STRUC_SIZE-size_allocated
      &                    ,INFO(2))
+                     GOTO 200
                   endif
                   read(unit,iostat=err) DIAG_BLOCK_T%DIAG_BLOCK
                endif
-               IF ( INFO(1) .LT. 0 ) GOTO 200
                if(err.ne.0) THEN
                   INFO(1) = -75
                   CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
      &                 ,INFO(2))
+                  GOTO 200
                endif
-               IF ( INFO(1) .LT. 0 ) GOTO 200
             endif
          CASE DEFAULT
          END SELECT
          if(trim(mode).EQ."memory_save") then
-            NbSubRecords=int(SIZE_VARIABLES_DIAG_BLOCK_TYPE(i1)/huge(0))
+            NbSubRecords=int(SIZE_VARIABLES_DIAG_BLOCK_TYPE(i1)/
+     &      huge(I4))
             IF(NbSubRecords.GT.0) then
                NbRecords_DIAG_BLOCK_TYPE(i1)=
      &              NbRecords_DIAG_BLOCK_TYPE(i1)
@@ -3026,7 +2990,7 @@ C
          elseif(trim(mode).EQ."save") then
             size_written=size_written+SIZE_VARIABLES_DIAG_BLOCK_TYPE(i1)
      &           +int(SIZE_GEST_DIAG_BLOCK_TYPE(i1),kind=8)
-#if !defined(MUMPS_F2003)
+#if defined(MUMPS_NOF2003)
             size_written=size_written
      &           +int(2*SIZE_INT*NbRecords_DIAG_BLOCK_TYPE(i1),kind=8)
 #endif
@@ -3035,7 +2999,7 @@ C
      &           SIZE_VARIABLES_DIAG_BLOCK_TYPE(i1)
             size_read=size_read+SIZE_VARIABLES_DIAG_BLOCK_TYPE(i1)
      &           +int(SIZE_GEST_DIAG_BLOCK_TYPE(i1),kind=8)
-#if !defined(MUMPS_F2003)
+#if defined(MUMPS_NOF2003)
             size_read=size_read
      &           +int(2*SIZE_INT*NbRecords_DIAG_BLOCK_TYPE(i1),kind=8)
 #endif
@@ -3044,7 +3008,7 @@ C
       if(trim(mode).EQ."memory_save") then
          Local_SIZE_VARIABLES=sum(SIZE_VARIABLES_DIAG_BLOCK_TYPE)
          Local_SIZE_GEST=sum(SIZE_GEST_DIAG_BLOCK_TYPE)
-#if !defined(MUMPS_F2003)
+#if defined(MUMPS_NOF2003)
          Local_NbRecords=sum(NbRecords_DIAG_BLOCK_TYPE)
          Local_SIZE_GEST=Local_SIZE_GEST+2*SIZE_INT*Local_NbRecords
 #endif

@@ -1,14 +1,15 @@
 C
-C  This file is part of MUMPS 5.2.1, released
-C  on Fri Jun 14 14:46:05 UTC 2019
+C  This file is part of MUMPS 5.6.0, released
+C  on Wed Apr 19 15:50:57 UTC 2023
 C
 C
-C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license:
-C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+C  released under the CeCILL-C license 
+C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
       SUBROUTINE DMUMPS_PROCESS_MASTER2(MYID,BUFR, LBUFR, 
      &     LBUFR_BYTES,
@@ -22,6 +23,7 @@ C
      &     ND, FILS, DAD, FRERE, ITLOC, RHS_MUMPS,
      &     ISTEP_TO_INIV2, TAB_POS_IN_PERE )
       USE DMUMPS_LOAD
+      USE DMUMPS_DYNAMIC_MEMORY_M, ONLY : DMUMPS_DM_SET_PTR
       IMPLICIT NONE
       INCLUDE 'mpif.h'
       INTEGER IERR
@@ -59,6 +61,8 @@ C
       INTEGER NOREAL_PACKET
       LOGICAL PERETYPE2
       INCLUDE 'mumps_headers.h'
+      DOUBLE PRECISION, POINTER, DIMENSION(:) :: SON_A
+      INTEGER(8) :: DYN_SIZE
       INTEGER  MUMPS_TYPENODE
       EXTERNAL MUMPS_TYPENODE
       POSITION = 0
@@ -97,7 +101,7 @@ C
      &   LRLU, IPTRLU,IWPOS,IWPOSCB, SLAVEF, PROCNODE_STEPS, DAD,
      &   PTRIST,PTRAST,STEP, PIMASTER, PAMASTER,
      &   NOINT, NOREAL, ISON, S_NOTFREE, .TRUE.,
-     &   COMP, LRLUS, IFLAG, IERROR
+     &   COMP, LRLUS, KEEP8(67), IFLAG, IERROR
      &     )
         IF ( IFLAG .LT. 0 ) THEN
           RETURN
@@ -140,18 +144,29 @@ C
         ENDIF
       ENDIF
       IF (NOREAL_PACKET.GT.0) THEN
-        CALL MPI_UNPACK(BUFR, LBUFR_BYTES, POSITION,
-     &        A(PAMASTER(STEP(ISON)) +
-     &        int(NBROWS_ALREADY_SENT,8) * int(NCOL_EFF,8)),
-     &        NOREAL_PACKET, MPI_DOUBLE_PRECISION, COMM, IERR)
+        CALL MUMPS_GETI8(DYN_SIZE, IW(PIMASTER(STEP(ISON))+XXD))
+        IF ( DYN_SIZE .GT. 0_8 ) THEN
+          CALL DMUMPS_DM_SET_PTR( PAMASTER(STEP(ISON)),
+     &                            DYN_SIZE, SON_A )
+          CALL MPI_UNPACK( BUFR, LBUFR_BYTES, POSITION,
+     &        SON_A( 1_8 +
+     &        int(NBROWS_ALREADY_SENT,8) * int(NCOL_EFF,8) ),
+     &        NOREAL_PACKET, MPI_DOUBLE_PRECISION, COMM, IERR )
+        ELSE
+          CALL MPI_UNPACK( BUFR, LBUFR_BYTES, POSITION,
+     &        A( PAMASTER(STEP(ISON)) +
+     &        int(NBROWS_ALREADY_SENT,8) * int(NCOL_EFF,8) ),
+     &        NOREAL_PACKET, MPI_DOUBLE_PRECISION, COMM, IERR )
+        ENDIF
       ENDIF
       IF ( NBROWS_ALREADY_SENT + NBROWS_PACKET .EQ. NROW ) THEN
         PERETYPE2 = ( MUMPS_TYPENODE(PROCNODE_STEPS(STEP(IFATH)),
-     &              SLAVEF) .EQ. 2 )
+     &                KEEP(199)) .EQ. 2 )
         NSTK_S( STEP(IFATH ))       = NSTK_S( STEP(IFATH) ) - 1
         IF ( NSTK_S( STEP(IFATH)) .EQ. 0 ) THEN
           CALL DMUMPS_INSERT_POOL_N(N, IPOOL, LPOOL, PROCNODE_STEPS,
-     &         SLAVEF, KEEP(28), KEEP(76), KEEP(80), KEEP(47),
+     &         SLAVEF, KEEP(199),
+     &         KEEP(28), KEEP(76), KEEP(80), KEEP(47),
      &         STEP, IFATH )
           IF (KEEP(47) .GE. 3) THEN
              CALL DMUMPS_LOAD_POOL_UPD_NEW_POOL(
@@ -160,7 +175,7 @@ C
      &            MYID, STEP, N, ND, FILS )
           ENDIF
           CALL MUMPS_ESTIM_FLOPS( IFATH, N, PROCNODE_STEPS,
-     &                            SLAVEF, ND,
+     &                            KEEP(199), ND,
      &                            FILS,FRERE, STEP, PIMASTER,
      &                            KEEP(28), KEEP(50), KEEP(253),
      &                            FLOP1,IW, LIW, KEEP(IXSZ) )
