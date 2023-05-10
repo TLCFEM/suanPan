@@ -15,6 +15,8 @@
 	<Files>
 		<Filter Name="SRC" Filter="f90;for;f;fpp;ftn;def;odl;idl">
 		<File RelativePath="..\..\..\Toolbox\mumps-src\ana_AMDMF.F"/>
+		<File RelativePath="..\..\..\Toolbox\mumps-src\ana_blk.F"/>
+		<File RelativePath="..\..\..\Toolbox\mumps-src\ana_blk_m.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\ana_omp_m.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\ana_orderings.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\ana_orderings_wrappers_m.F"/>
@@ -76,6 +78,8 @@
 		<File RelativePath="..\..\..\Toolbox\mumps-src\dfac_scalings.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\dfac_scalings_simScale_util.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\dfac_scalings_simScaleAbs.F"/>
+		<File RelativePath="..\..\..\Toolbox\mumps-src\dfac_sispointers_m.F"/>
+		<File RelativePath="..\..\..\Toolbox\mumps-src\dfac_sol_l0omp_m.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\dfac_sol_pool.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\dfac_type3_symmetrize.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\dini_defaults.F"/>
@@ -90,6 +94,7 @@
 		<File RelativePath="..\..\..\Toolbox\mumps-src\dmumps_iXamax.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\dmumps_load.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\dmumps_lr_data_m.F"/>
+		<File RelativePath="..\..\..\Toolbox\mumps-src\dmumps_mpi3_mod.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\dmumps_ooc.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\dmumps_ooc_buffer.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\dmumps_save_restore.F"/>
@@ -110,6 +115,7 @@
 		<File RelativePath="..\..\..\Toolbox\mumps-src\dsol_fwd_aux.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\dsol_lr.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\dsol_matvec.F"/>
+		<File RelativePath="..\..\..\Toolbox\mumps-src\dsol_omp_m.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\dsol_root_parallel.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\dstatic_ptr_m.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\dtools.F"/>
@@ -129,6 +135,7 @@
 		<File RelativePath="..\..\..\Toolbox\mumps-src\mumps_memory_mod.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\mumps_mpitoomp_m.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\mumps_ooc_common.F"/>
+		<File RelativePath="..\..\..\Toolbox\mumps-src\mumps_pivnul_mod.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\mumps_print_defined.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\mumps_static_mapping.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\mumps_type2_blocking.F"/>
@@ -191,6 +198,8 @@
 		<File RelativePath="..\..\..\Toolbox\mumps-src\sfac_scalings.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\sfac_scalings_simScale_util.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\sfac_scalings_simScaleAbs.F"/>
+		<File RelativePath="..\..\..\Toolbox\mumps-src\sfac_sispointers_m.F"/>
+		<File RelativePath="..\..\..\Toolbox\mumps-src\sfac_sol_l0omp_m.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\sfac_sol_pool.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\sfac_type3_symmetrize.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\sini_defaults.F"/>
@@ -205,6 +214,7 @@
 		<File RelativePath="..\..\..\Toolbox\mumps-src\smumps_iXamax.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\smumps_load.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\smumps_lr_data_m.F"/>
+		<File RelativePath="..\..\..\Toolbox\mumps-src\smumps_mpi3_mod.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\smumps_ooc.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\smumps_ooc_buffer.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\smumps_save_restore.F"/>
@@ -225,6 +235,7 @@
 		<File RelativePath="..\..\..\Toolbox\mumps-src\ssol_fwd_aux.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\ssol_lr.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\ssol_matvec.F"/>
+		<File RelativePath="..\..\..\Toolbox\mumps-src\ssol_omp_m.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\ssol_root_parallel.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\sstatic_ptr_m.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\stools.F"/>

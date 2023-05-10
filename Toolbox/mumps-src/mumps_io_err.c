@@ -19,6 +19,10 @@
 #if defined( MUMPS_WIN32 )
 # include <string.h>
 #endif
+
+#ifdef _WIN32
+#define strdup _strdup
+#endif
 /* Exported global variables */
 char* mumps_err;
 MUMPS_INT* dim_mumps_err;
