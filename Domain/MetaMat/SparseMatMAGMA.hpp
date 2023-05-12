@@ -65,7 +65,6 @@ template<typename T> T magma_parse_opts(istringstream& command) requires (std::i
     opts.precond_par.restart = 10;
     opts.precond_par.levels = 0;
     opts.precond_par.sweeps = 5;
-    opts.precond_par.maxiter = 1;
     opts.precond_par.pattern = 1;
 
     int basic = 0;
