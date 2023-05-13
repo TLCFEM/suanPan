@@ -17,7 +17,7 @@
 
 #include "FEAST.h"
 #include <Domain/DomainBase.h>
-#include <Domain/FactoryHelper.hpp>
+#include <Domain/Factory.hpp>
 #include <Solver/Integrator/Integrator.h>
 #include <feast/feast.h>
 
@@ -87,8 +87,8 @@ int FEAST::linear_solve(const shared_ptr<LongFactory>& W) const {
         return SUANPAN_FAIL;
     }
 
-    get_eigenvalue(W) = vec(E.data(), output[2]);
-    get_eigenvector(W) = mat(X.data(), N, output[2]);
+    W->modify_eigenvalue() = vec(E.data(), output[2]);
+    W->modify_eigenvector() = mat(X.data(), N, output[2]);
 
     return SUANPAN_SUCCESS;
 }
@@ -174,12 +174,12 @@ int FEAST::quadratic_solve(const shared_ptr<LongFactory>& W) const {
         return SUANPAN_FAIL;
     }
 
-    auto& eigval = get_eigenvalue(W);
+    auto& eigval = W->modify_eigenvalue();
     eigval.set_size(output[2]);
 
     for(uword I = 0; I < eigval.n_elem; ++I) eigval(I) = E[2 * I];
 
-    auto& eigvec = get_eigenvector(W);
+    auto& eigvec = W->modify_eigenvector();
     eigvec.resize(N, output[2]);
 
     for(uword I = 0; I < eigvec.n_elem; ++I) eigvec(I) = X[2 * I];

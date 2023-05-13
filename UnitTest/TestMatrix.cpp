@@ -114,18 +114,18 @@ template<typename MT, typename ET, std::invocable T> void benchmark_mat_solve(st
     Col<ET> D;
 
     BENCHMARK((title + " Full").c_str()) {
-            clear_mat();
-            A.solve(D, C);
-            REQUIRE(norm(E - D) < scaled_tol);
-        };
+        clear_mat();
+        A.solve(D, C);
+        REQUIRE(norm(E - D) < scaled_tol);
+    };
 
     A.get_solver_setting().precision = Precision::MIXED;
 
     BENCHMARK((title + " Mixed").c_str()) {
-            clear_mat();
-            A.solve(D, C);
-            REQUIRE(norm(E - D) < scaled_tol);
-        };
+        clear_mat();
+        A.solve(D, C);
+        REQUIRE(norm(E - D) < scaled_tol);
+    };
 }
 
 template<typename T> T create_new(u64) { throw std::runtime_error("unknown matrix"); }
@@ -180,6 +180,18 @@ template<> FullMatCUDA<float> create_new(const u64 N) { return {N, N}; }
 template<> SparseMatCUDA<double> create_new(const u64 N) { return {N, N}; }
 
 template<> SparseMatCUDA<float> create_new(const u64 N) { return {N, N}; }
+
+#ifdef SUANPAN_MAGMA
+template<> SparseMatMAGMA<double> create_new(const u64 N) {
+    istringstream dummy{"--verbose 1"};
+    return {N, N, magma_parse_opts<magma_dopts>(dummy)};
+}
+
+template<> SparseMatMAGMA<float> create_new(const u64 N) {
+    istringstream dummy{"--verbose 1"};
+    return {N, N, magma_parse_opts<magma_sopts>(dummy)};
+}
+#endif
 #endif
 
 template<typename T, typename ET> void benchmark_mat_setup(const int I) {
@@ -220,6 +232,9 @@ template<typename T, typename ET> void benchmark_mat_setup(const int I) {
     else if(std::is_same_v<FullMatCUDA<ET>, T>) title = "Full CUDA ";
     else if(std::is_same_v<SparseMatCUDA<ET>, T>) title = "Sparse CUDA ";
     else if(std::is_same_v<BandMatCUDA<ET>, T>) title = "Band CUDA ";
+#ifdef SUANPAN_MAGMA
+    else if(std::is_same_v<SparseMatMAGMA<ET>, T>) title = "Magma ";
+#endif
 #endif
 
     title += "N=" + std::to_string(I) + " NZ=" + std::to_string(B.n_nonzero) + " NE=" + std::to_string(A.n_elem);
@@ -315,6 +330,19 @@ TEST_CASE("BandMatCUDA", "[Matrix.Dense]") { test_dense_mat_setup<double>(create
 TEST_CASE("SparseMatCUDA", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatCUDA<double>>); }
 
 TEST_CASE("SparseMatCUDAFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<float>(create_new<SparseMatCUDA<float>>); }
+
+#ifdef SUANPAN_MAGMA
+TEST_CASE("SparseMatMAGMA", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatMAGMA<double>>); }
+
+TEST_CASE("SparseMatMAGMAFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<float>(create_new<SparseMatMAGMA<float>>); }
+
+TEST_CASE("Large CUDA Sparse", "[Matrix.Benchmark]") {
+    benchmark_mat_setup<SparseMatPARDISO<double>, double>(0x400);
+    benchmark_mat_setup<BandSymmMat<double>, double>(0x2976);
+    benchmark_mat_setup<SparseMatMAGMA<double>, double>(0x400);
+    benchmark_mat_setup<SparseMatMAGMA<float>, float>(0x400);
+}
+#endif
 #endif
 
 TEST_CASE("Triplet/CSR/CSC Sparse", "[Matrix.Sparse]") {
@@ -361,16 +389,16 @@ TEST_CASE("Benchmark Triplet Assembly", "[Matrix.Sparse]") {
 
     for(auto J = 2; J != REPEAT; J *= 2)
         BENCHMARK(string("Assemble " + std::to_string(J)).c_str()) {
-                triplet_form<double, uword> C(N + REPEAT, N + REPEAT, B.n_elem * REPEAT);
+            triplet_form<double, uword> C(N + REPEAT, N + REPEAT, B.n_elem * REPEAT);
 
-                for(auto I = 0; I < J; ++I) C.assemble(B, I, I, randu<double>());
+            for(auto I = 0; I < J; ++I) C.assemble(B, I, I, randu<double>());
 
-                REQUIRE(C.n_elem == NNZ * J);
+            REQUIRE(C.n_elem == NNZ * J);
 
-                C.csc_condense();
+            C.csc_condense();
 
-                return C;
-            };
+            return C;
+        };
 }
 
 TEST_CASE("Triplet/CSR/CSC Conversion", "[Matrix.Sparse]") {

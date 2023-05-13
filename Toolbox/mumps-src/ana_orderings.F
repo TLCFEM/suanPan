@@ -1,10 +1,8 @@
 C =========================================================
-C This file includes various modifications of an original 
-C LGPL/ CeCILL-C compatible 
-C code implementing the Approximate Minimum Degree ordering
 C 
-C  The main reference for the approach used in routine
-C  MUMPS_ANA_H is
+C  This file includes various modifications of an original 
+C  routine MUMPS_ANA_H. The main reference for the approach 
+C  used in this routine is
 C   Patrick Amestoy, Timothy A. Davis, and Iain S. Duff,
 C    "An approximate minimum degree ordering algorithm,"
 C    SIAM J. Matrix Analysis  vol 17, pages=886--905 (1996)
@@ -13,21 +11,38 @@ C
 C    AMD, Copyright (c), 1996-2016, Timothy A. Davis,
 C    Patrick R. Amestoy, and Iain S. Duff.  All Rights Reserved.
 C    Used in MUMPS under the BSD 3-clause license.
-C    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
-C    CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, 
-C    BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND 
-C    FITNESS FOR A PARTICULAR PURPOSE
-C    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR 
-C    ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-C    DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-C    OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
-C    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
-C    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
-C    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
-C    POSSIBILITY OF SUCH DAMAGE.
 C
 C All other routines are modifications of this original routine
-C done by MUMPS developers over the years (1996-2012).
+C done by MUMPS developers over the years (1996-2020) and are 
+C used in MUMPS under the BSD 3-clause license.
+C
+C BSD 3-clause licence:
+C Redistribution and use in source and binary forms, with or without
+C modification, are permitted provided that the following conditions 
+C are met:
+C  * Redistributions of source code must retain the above copyright
+C    notice, this list of conditions and the following disclaimer.
+C  * Redistributions in binary form must reproduce the above 
+C    copyright notice, this list of conditions and the following 
+C    disclaimer in the documentation and/or other materials provided 
+C    with the distribution.
+C  * Neither the name of the University of California, Berkeley nor 
+C    the names of its contributors may be used to endorse or promote 
+C    products derived from this software without specific prior 
+C    written permission.
+C    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+C    CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+C    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+C    MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+C    DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+C    CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+C    SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+C    NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+C    LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
+C    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+C    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
+C    OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
+C    EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 C
 C   MUMPS_AMD_ELT is a modification 
 C   designed to handle amalgamated and compressed
@@ -142,37 +157,49 @@ C               degree update within MUMPS_ANA_H is element-based, not
 C               variable-based.  It is thus not well-suited for use
 C               with incomplete degree update or multiple elimination.
 C
-      SUBROUTINE MUMPS_ANA_H(N, IWLEN, PE, PFREE, LEN, IW, NV, ELEN,
+C-----------------------------------------------------------------------
+      SUBROUTINE MUMPS_ANA_H(TOTEL, COMPUTE_PERM,
+     &                   N, IWLEN, PE, PFREE, LEN, IW, NV, ELEN,
      &                   LAST, NCMPA, DEGREE, HEAD, NEXT, W, PARENT)
-C
 C 
 C    Restrictive integer 64 bit variant :
 C    it is assumed that IW array size can exceed 32-bit integer
-C 
+C
 C     Input not modified
-      INTEGER, INTENT(IN)     :: N
+      INTEGER, INTENT(IN)     :: TOTEL, N
       INTEGER(8), INTENT(IN)  :: IWLEN
+      LOGICAL, INTENT(IN)     :: COMPUTE_PERM
 C     Input undefined on output 
       INTEGER, INTENT(INOUT)  :: LEN(N), IW(IWLEN)
 C 
 C     Output only 
       INTEGER, INTENT(OUT)   :: NCMPA
-      INTEGER, INTENT(OUT)   :: NV(N), ELEN(N), LAST(N), PARENT(N)
+      INTEGER, INTENT(OUT)   :: ELEN(N), LAST(N), PARENT(N)
 C 
 C     Input/output
       INTEGER(8), INTENT(INOUT) :: PFREE
       INTEGER(8), INTENT(INOUT) :: PE(N)
+C     NV also meaningful as input to encode compressed graphs
+      INTEGER, INTENT(INOUT) :: NV(N)
 C 
 C     Internal Workspace only
-      INTEGER         :: NEXT(N), DEGREE(N), HEAD(N), W(N)
+      INTEGER         :: NEXT(N), DEGREE(N), HEAD(TOTEL), W(N)
 C ---------------------
 C Interface Description
 C ---------------------
 C INPUT ARGUMENTS (unaltered):
 C-----------------------------
-C n:    The matrix order.
-C
-C       Restriction:  n .ge. 1
+C n     : The matrix order.
+C         number of supervariables if compress/blocked format
+C         Restriction:  n .ge. 1
+C totel : Number of variables to eliminate
+C         In case of blocked format:
+C         each variable i is a supervariable of size nv(i)
+C         totel is computed as the sum(nv(i)) for i \in [1:n]
+C         the algorithm stops when totel variables are
+C         eliminated.
+C compute_perm : indicates if permutations should be computed 
+C         on output in last/elen 
 C iwlen:        The length of iw (1..iwlen).  On input, the matrix is
 C       stored in iw (1..pfree-1).  However, iw (1..iwlen) should be
 C       slightly larger than what is required to hold the matrix, at
@@ -227,7 +254,7 @@ C       If nv (i) .gt. 0, then i represents a node in the assembly tree,
 C       and the parent of i is -pe (i), or zero if i is a root.
 C       If nv (i) = 0, then (i,-pe (i)) represents an edge in a
 C       subtree, the root of which is a node in the assembly tree.
-C pfree:        On input, the matrix is stored in iw (1..pfree-1) and
+C pfree:On input, the matrix is stored in iw (1..pfree-1) and
 C       the rest of the array iw is free.
 C       During execution, additional data is placed in iw, and pfree
 C       is modified so that components  of iw from pfree are free.
@@ -237,6 +264,17 @@ C       ncmpa is zero, then pfree (on output) is less than or equal to
 C       iwlen, and the space iw (pfree+1 ... iwlen) was not used.
 C       Otherwise, pfree (on output) is greater than iwlen, and all the
 C       memory in iw was used.
+C nv:   On input, encoding of compressed graph:
+C       if nv(1) = -1 then graph is not compressed otherwise
+C       nv(I) holds the weight of node I. 
+C       During execution, abs (nv (i)) is equal to the number of rows
+C       that are represented by the principal supervariable i.  If i is
+C       a nonprincipal variable, then nv (i) = 0.  
+C       nv (i) .lt. 0 signifies that i is a
+C       principal variable in the pattern Lme of the current pivot
+C       element me.  
+C       On output, nv (e) holds the true degree of element
+C       e at the time it was created (including the diagonal part).
 C-----------------------------------------------------------------------
 C INPUT/MODIFIED (undefined on output):
 C-----------------------------------------------------------------------
@@ -295,13 +333,6 @@ C       The contents of iw are undefined on output.
 C-----------------------------------------------------------------------
 C OUTPUT (need not be set on input):
 C-----------------------------------------------------------------------
-C nv:   During execution, abs (nv (i)) is equal to the number of rows
-C       that are represented by the principal supervariable i.  If i is
-C       a nonprincipal variable, then nv (i) = 0.  Initially,
-C       nv (i) = 1 for all i.  nv (i) .lt. 0 signifies that i is a
-C       principal variable in the pattern Lme of the current pivot
-C       element me.  On output, nv (e) holds the true degree of element
-C       e at the time it was created (including the diagonal part).
 C elen: 
 C       See the description of iw above.  At the start of execution,
 C       elen (i) is set to zero.  During execution, elen (i) is the
@@ -465,6 +496,7 @@ C pme1:       the current element, me, is stored in iw (pme1...pme2)
 C pme2:       the end of the current element
 C pn:         pointer into a "clean" variable, also used to compress
 C psrc:       source pointer, for compression
+      LOGICAL COMPRESS
 C-----------------------------------------------------------------------
 C  FUNCTIONS CALLED:
 C-----------------------------------------------------------------------
@@ -481,14 +513,34 @@ C=======================================================================
       DMAX = 0
       MEM = PFREE - 1
       MAXMEM = MEM
-      DO 10 I = 1, N
+      DO I = 1, N
         LAST (I) = 0
         HEAD (I) = 0
-        NV (I) = 1
         W (I) = 1
         ELEN (I) = 0
-        DEGREE (I) = LEN (I)
-   10 CONTINUE
+      ENDDO
+      DO I = 1, TOTEL
+        HEAD(I) = 0
+      ENDDO
+      IF(NV(1) .LT. 0) THEN
+         COMPRESS = .FALSE.
+      ELSE
+         COMPRESS = .TRUE.
+      ENDIF
+      IF (COMPRESS) THEN
+         DO I=1,N
+            DEGREE(I) = 0
+            DO P= PE(I) , PE(I)+int(LEN(I)-1,8)
+               DEGREE(I) = DEGREE(I) + NV(IW(P))
+            ENDDO
+         ENDDO
+      ELSE
+         DO I=1,N
+            NV(I) = 1
+            DEGREE (I) = LEN (I)
+         ENDDO
+      ENDIF
+C
 C     ----------------------------------------------------------------
 C     initialize degree lists and eliminate rows with no off-diag. nz.
 C     ----------------------------------------------------------------
@@ -507,7 +559,7 @@ C         ----------------------------------------------------------
 C         we have a variable that can be eliminated at once because
 C         there is no off-diagonal non-zero in its row.
 C         ----------------------------------------------------------
-          NEL = NEL + 1
+            NEL = NEL + NV(I)
           ELEN (I) = -NEL
           PE (I) = 0
           W (I) = 0
@@ -516,14 +568,14 @@ C         ----------------------------------------------------------
 C =====================================================================
 C  WHILE (selecting pivots) DO
 C =====================================================================
-   30 IF (NEL .LT. N) THEN
+   30 IF (NEL .LT. TOTEL) THEN
 C =====================================================================
 C  GET PIVOT OF MINIMUM DEGREE
 C ======================================================================
 C       -------------------------------------------------------------
 C       find next supervariable for elimination
 C       -------------------------------------------------------------
-        DO 40 DEG = MINDEG, N
+        DO 40 DEG = MINDEG, TOTEL
           ME = HEAD (DEG)
           IF (ME .GT. 0) GO TO 50
    40   CONTINUE
@@ -1023,7 +1075,7 @@ C=======================================================================
 C  RESTORE DEGREE LISTS AND REMOVE NONPRINCIPAL SUPERVAR. FROM ELEMENT
 C=======================================================================
         P = PME1
-        NLEFT = N - NEL
+        NLEFT = TOTEL - NEL
         DO 260 PME = PME1, PME2
           I = IW (PME)
           NVI = -NV (I)
@@ -1080,7 +1132,7 @@ C       END WHILE (selecting pivots)
       ENDIF
 C=======================================================================
 C=======================================================================
-C  COMPUTE THE PERMUTATION VECTORS
+C     COMPUTE THE PERMUTATION VECTORS and update TREE
 C=======================================================================
 C     ----------------------------------------------------------------
 C     The time taken by the following code is O(n).  At this
@@ -1136,15 +1188,49 @@ C         leave elen (e) negative, so we know it is an element
           ELEN (E) = -K
         ENDIF
   290 CONTINUE
+C
+      IF (COMPUTE_PERM) THEN
 C     ----------------------------------------------------------------
 C     reset the inverse permutation (elen (1..n)) to be positive,
 C     and compute the permutation (last (1..n)).
 C     ----------------------------------------------------------------
-      DO 300 I = 1, N
-        K = abs (ELEN (I))
-        LAST (K) = I
-        ELEN (I) = K
-  300 CONTINUE
+      IF(COMPRESS) THEN
+        LAST(1:N) = 0
+        HEAD(1:TOTEL-N)=0  
+        DO I = 1, N
+          K = abs (ELEN (I))
+          IF ( K <= N ) THEN
+            LAST (K) = I
+          ELSE
+            HEAD(K-N)=I
+          ENDIF
+        ENDDO
+        I = 1
+        DO K = 1, N
+          IF(LAST (K) .NE. 0) THEN
+            LAST(I) = LAST(K)
+            ELEN(LAST(K)) = I
+            I = I + 1
+          ENDIF
+        ENDDO
+        DO K = N+1, TOTEL
+          IF (HEAD(K-N) .NE. 0) THEN
+            LAST(I)=HEAD(K-N)
+            ELEN(HEAD(K-N)) = I
+            I = I + 1
+          ENDIF
+        END DO
+      ELSE
+        DO 300 I = 1, N
+          K = abs (ELEN (I))
+          LAST (K) = I
+          ELEN (I) = K
+  300   CONTINUE
+       ENDIF
+C=======================================================================
+C      END OF COMPUTING PERMUTATIONS
+C=======================================================================
+       ENDIF
 C=======================================================================
 C  RETURN THE MEMORY USAGE IN IW
 C=======================================================================
@@ -1162,7 +1248,6 @@ C     Save IPE in PARENT array
 C===============================
       RETURN
       END SUBROUTINE MUMPS_ANA_H
-C-----------------------------------------------------------------------
 C-----------------------------------------------------------------------
 C MUMPS_AMD_ELT: modified version of reference AMD routine MUMPS_ANA_H
 C capable of processing already amalgamated or compressed graph. 
@@ -2548,6 +2633,8 @@ C                     matrix, excluding the diagonal.
 C           negative (<0) : i \in V1, and 
 C                     -len(i) hold the number of entries in row i of the
 C                     matrix, excluding the diagonal.
+C                     len(i) = - | Adj(i) | if i \in V1                    
+C                              or -N -1 if  | Adj(i) | = 0 and i \in V1 
 C       The contents of len (1..n)
 C       are undefined on output.
 C iw:   On input, iw (1..pfree-1) holds the description of each row i
@@ -2875,7 +2962,7 @@ C         ----------------------------------------------------------
 C         we have a variable that can be eliminated at once because
 C         there is no off-diagonal non-zero in its row.
 C         ----------------------------------------------------------
-          NEL = NEL + 1
+          NEL = NEL + NV(I)
           ELEN (I) = -NEL
           PE (I) = 0_8
           W (I) = 0
@@ -2904,7 +2991,7 @@ C       -------------------------------------------------------------
    50   MINDEG = DEG
 C begin HALO
         IF (ME.LE.0) THEN
-          write (*,*) ' Error 1 in HALO_AMD '
+          write (*,*) ' ERROR 1 in HALO_AMD '
 C         return to calling program with error return
           NCMPA = -N
           GOTO 500
@@ -3503,7 +3590,7 @@ C          2/ perform mass elimination of all dense rows
    51      MINDEG = DEG
 C
            IF (ME.NE.LISTVAR_SCHUR(1)) THEN
-             write(6,*) ' error 1 in MUMPS_HAMD '
+             write(6,*) ' ERROR 2 in MUMPS_HAMD '
              write(6,*) ' wrong principal var for Schur !!'
              NCMPA = -N - 2
              CALL MUMPS_ABORT()
@@ -3533,9 +3620,8 @@ C end HALO V2
 C
 C begin HALO
            IF (NEL.NE.N) THEN
-         write(*,*) ' Error 2 in MUMPS_HAMD NEL, N=', NEL,N
+         write(*,*) ' ERROR 2 in MUMPS_HAMD NEL, N=', NEL,N
          NCMPA = -N - 1
-         CALL MUMPS_ABORT()
         ENDIF
       ENDIF
 C end HALO
@@ -3633,15 +3719,23 @@ C
 C   Restrictive integer 64 bit variant :
 C   it is assumed that IW array size can exceed 32-bit integer
 C
-      SUBROUTINE MUMPS_HAMF4(N, NBBUCK, 
+      SUBROUTINE MUMPS_HAMF4
+     &           (NORIG, N, COMPUTE_PERM, NBBUCK, 
      &                   IWLEN, PE, PFREE, LEN, IW, NV, ELEN,
-     &                   LAST, NCMPA, DEGREE, WF, NEXT, W, HEAD,
-     &                   PARENT)
+     &                   LAST, NCMPA, DEGREE, WF, NEXT, W, HEAD
+     &                   , PARENT
+     &                   )
       IMPLICIT NONE
 C
 C Parameters
 C    Input not modified
-      INTEGER, INTENT(IN)    :: N, NBBUCK
+C    N : number of nodes in the complete graph including halo
+C    NORIG :
+C       if compressed graph (nv(1).ne-1) then
+C         NORIG is the sum(nv(i)) for i \in [1:N]
+C       else NORIG = N 
+      INTEGER, INTENT(IN)    :: NORIG, N, NBBUCK
+      LOGICAL, INTENT(IN)     :: COMPUTE_PERM
       INTEGER(8), INTENT(IN) :: IWLEN
 C     Input undefined on output 
       INTEGER, INTENT(INOUT)  :: LEN(N), IW(IWLEN)
@@ -3650,7 +3744,8 @@ C     NV also meaningful as input to encode compressed graphs
 C 
 C     Output only 
       INTEGER, INTENT(OUT)   :: NCMPA
-      INTEGER, INTENT(OUT)   :: ELEN(N), LAST(N), PARENT(N)
+      INTEGER, INTENT(OUT)   :: ELEN(N), LAST(N)
+      INTEGER, INTENT(OUT)   :: PARENT(N)
 C 
 C     Input/output
       INTEGER(8), INTENT(INOUT) :: PFREE
@@ -3677,13 +3772,19 @@ C    is therefore of order n.
 C
 C  The arrays NV(N) and PE(N) give a description of the 
 C  assembly tree. 
+C  Note that on output 
+C   INTEGER(8) PE array is copied on output into
+C   INTEGER PARENT array
 C  
 C   1/ Description of array nv(N) (on OUTPUT)
 C    nv(i)=0 i is a secondary variable 
-C    N+1> nv(i) >0 i is a principal variable, nv(i) holds the 
+C    nv(i) >0 i is a principal variable, nv(i) holds the 
 C                  the number of elements in column i of L (true degree of i)
+C    With compressed graph (nv(1).ne.-1 on input), 
+C    nv(i) can be greater than N since degree can be as large as NORIG
 C
 C   2/ Description of array PE(N) (on OUTPUT)
+C       Note that on 
 C       pe(i) = -(father of variable/node i) in the elimination tree:
 C       If nv (i) .gt. 0, then i represents a node in the assembly tree,
 C       and the parent of i is -pe (i), or zero if i is a root.
@@ -3732,9 +3833,8 @@ C            edges effectively provided in the adjacency list of i.
 C          On input :
 c          ********
 C            Nodes INODE in V1 are flagged with len(INODE) = -degree 
-C            modif version HALO V3 (August 1998): 
-C                                 if len(i) =0 and i \in V1 then 
-C                                 len(i) must be set on input to -N-1
+C                           if len(i) =0 and i \in V1 then 
+C                           len(i) must be set on input to -NORIG-1
 C          ERROR return (negative values in ncmpa)
 C          ************
 C            negative value in ncmpa indicates an error detected 
@@ -3775,6 +3875,8 @@ C INPUT ARGUMENTS (unaltered):
 C-----------------------------------------------------------------------
 C n:    The matrix order.
 C       Restriction:  n .ge. 1
+C compute_perm : indicates if permutations should be computed 
+C         on output in last/elen 
 C iwlen:        The length of iw (1..iwlen).  On input, the matrix is
 C       stored in iw (1..pfree-1).  However, iw (1..iwlen) should be
 C       slightly larger than what is required to hold the matrix, at
@@ -3854,7 +3956,7 @@ C       element me.  On output, nv (e) holds the true degree of element
 C       e at the time it was created (including the diagonal part).
 C begin HALO
 C       On output, nv(I) can be used to find node in set V1.
-C       Not true anymore : ( nv(I) = N+1 characterizes nodes in V1. 
+C       Not true anymore : ( nv(I) = N+1 characterizes nodes in V1
 C                 instead nodes in V1 are considered as a dense root node )
 C end HALO
 C-----------------------------------------------------------------------
@@ -3929,9 +4031,9 @@ C       becomes an element, elen (e) = -nel is set, where nel is the
 C       current step of factorization.  elen (i) = 0 is done when i
 C       becomes nonprincipal.
 C
-C       For variables, elen (i) .ge. 0 holds until just before the
-C       permutation vectors are computed.  For elements,
-C       elen (e) .lt. 0 holds.
+C       For variables, elen (i) .ge. 0 holds 
+C       until just before the permutation vectors are computed.  
+C       For elements, elen (e) .lt. 0 holds.
 C
 C       On output elen (1..n) holds the inverse permutation (the same
 C       as the 'INVP' argument in Sparspak).  That is, if k = elen (i),
@@ -3973,7 +4075,8 @@ C       to |Le \ Lme|.  If e is an element, then degree (e) holds |Le|,
 C       which is the degree of the off-diagonal part of the element e
 C       (not including the diagonal part).
 C begin HALO
-C       degree(I) = n+1 indicates that i belongs to V1
+C       while processing variables degree(I) =   -NBBUCK-1 (=N2) 
+C                                  indicates that i belongs to V1
 C end HALO
 C
 C head: head is used for degree lists.  head (deg) is the first
@@ -4031,7 +4134,8 @@ C-----------------------------------------------------------------------
      &        ILAST, INEXT, J, JLAST, JNEXT, K, KNT1, KNT2, KNT3,
      &        LENJ, LN, ME, MINDEG, NEL,
      &        NLEFT, NVI, NVJ, NVPIV, SLENME, WE, WFLG, WNVI, X,
-     &        NBFLAG, NREAL, LASTD, NELME, WF3, WF4, N2, PAS
+     &        NBFLAG, LASTD, NELME, WF3, WF4, N2, PAS
+      INTEGER :: NLEFT_V1
        INTEGER KNT1_UPDATED, KNT2_UPDATED
        INTEGER(8) :: MAXMEM, MEM, NEWMEM
        INTEGER    :: MAXINT_N
@@ -4140,6 +4244,7 @@ C
       MEM = PFREE - 1
       MAXMEM = MEM
       MINDEG = 0
+      NLEFT_V1 = 0
 C
       NBFLAG = 0
       LASTD  = 0
@@ -4161,7 +4266,8 @@ C        NV(I) = 1
             IF (LEN(I).LT.0) THEN 
                DEGREE (I) = N2
                NBFLAG     = NBFLAG +1
-               IF (LEN(I).EQ.-N-1) THEN
+               NLEFT_V1   = NLEFT_V1 + NV(I)
+               IF (LEN(I).EQ.-NORIG-1) THEN
 C     variable in V1 with empty adj list 
                   LEN (I)    = 0
 C     Because of compress, we force skipping this
@@ -4186,6 +4292,7 @@ C     DEGREE (I) = LEN (I)
             IF (LEN(I).LT.0) THEN 
                DEGREE (I) = N2
                NBFLAG     = NBFLAG +1
+               NLEFT_V1   = NLEFT_V1 + NV(I)
                IF (LEN(I).EQ.-N-1) THEN
                   LEN (I)    = 0
 C     Because of compress, we force skipping this
@@ -4203,8 +4310,6 @@ C     end HALO V3
       ENDIF
 C
 C
-C     number of entries to be ordered.
-      NREAL = N - NBFLAG
 C     ----------------------------------------------------------------
 C     initialize degree lists and eliminate rows with no off-diag. nz.
 C     ----------------------------------------------------------------
@@ -4236,8 +4341,8 @@ C
         IF (DEG .GT. 0) THEN
           WF(I) = DEG
 C   version 1
-           IF (DEG.GT.N) THEN
-            DEG = min(((DEG-N)/PAS) + N , NBBUCK)
+           IF (DEG.GT.NORIG) THEN
+            DEG = min(((DEG-NORIG)/PAS) + NORIG, NBBUCK)
            ENDIF
 C           Note that if deg=0 then 
 C           No fill-in will occur, 
@@ -4265,7 +4370,7 @@ C
 C=======================================================================
 C  WHILE (selecting pivots) DO
 C=======================================================================
-      NLEFT = TOTEL-NEL
+      NLEFT = TOTEL-NEL + NLEFT_V1
 C=======================================================================
 C =====================================================================
    30 IF (NEL .LT. TOTEL) THEN
@@ -4284,7 +4389,7 @@ C       -------------------------------------------------------------
           NCMPA = -N
           CALL MUMPS_ABORT()
         ENDIF
-       IF (DEG.GT.N) THEN
+       IF (DEG.GT.NORIG) THEN
 C        -------------------------------
 C        Linear search to find variable 
 C        with best score in the list
@@ -4373,8 +4478,8 @@ C             ----------------------------------------------------
                 NEXT (ILAST) = INEXT
               ELSE
 C               i is at the head of the degree list
-                IF (WF(I).GT.N) THEN
-                 DEG = min(((WF(I)-N)/PAS) + N , NBBUCK)
+                IF (WF(I).GT.NORIG) THEN
+                 DEG = min(((WF(I)-NORIG)/PAS) + NORIG, NBBUCK)
                 ELSE
                  DEG = WF(I)
                 ENDIF
@@ -4507,8 +4612,8 @@ C               -------------------------------------------------
                 IF (ILAST .NE. 0) THEN
                   NEXT (ILAST) = INEXT
                 ELSE
-                  IF (WF(I).GT.N) THEN
-                   DEG = min(((WF(I)-N)/PAS) + N , NBBUCK)
+                  IF (WF(I).GT.NORIG) THEN
+                   DEG = min(((WF(I)-NORIG)/PAS) + NORIG , NBBUCK)
                   ELSE
                    DEG = WF(I)
                   ENDIF
@@ -4845,7 +4950,7 @@ C=======================================================================
 C  RESTORE DEGREE LISTS AND REMOVE NONPRINCIPAL SUPERVAR. FROM ELEMENT
 C=======================================================================
         P = PME1
-        NLEFT = TOTEL - NEL
+        NLEFT = TOTEL - NEL + NLEFT_V1
         DO 260 PME = PME1, PME2
           I = IW (PME)
           NVI = -NV (I)
@@ -4859,7 +4964,6 @@ C           compute the external degree (add size of current elem)
 C           -------------------------------------------------------
 C--------------------------
 C--------------------------
-            DEG = min (DEGREE (I) + DEGME - NVI, NLEFT - NVI)
             IF (DEGREE (I) + DEGME .GT. NLEFT ) THEN
 C
               DEG = DEGREE(I)
@@ -4889,8 +4993,8 @@ C
             ENDIF
             WF(I) = max(1,WF(I))
             DEG = WF(I)
-            IF (DEG.GT.N) THEN
-              DEG = min(((DEG-N)/PAS) + N , NBBUCK)
+            IF (DEG.GT.NORIG) THEN
+              DEG = min(((DEG-NORIG)/PAS) + NORIG, NBBUCK)
             ENDIF
             INEXT = HEAD (DEG)
             IF (INEXT .NE. 0) LAST (INEXT) = I
@@ -4937,7 +5041,7 @@ C       END WHILE (selecting pivots)
       ENDIF
 C=======================================================================
 C begin HALO V2
-      IF (NEL.LT.N) THEN 
+      IF (NEL.LT.NORIG) THEN 
 C
 C     All possible pivots (not flagged have been eliminated).
 C     We amalgamate all flagged variables at the root and 
@@ -4969,16 +5073,16 @@ C            Correct value of NV is (secondary variable)
 C          ME is the root node
            ELEN(ME) = NELME
 C          Correct value of NV is (principal variable)
-           NV(ME)   = N-NREAL
+           NV(ME)   = NBFLAG
            PE(ME)   = 0_8
-        IF (NEL.NE.N) THEN
-         NCMPA = -N - 1
+        IF (NEL.NE.NORIG) THEN
+         NCMPA = -NORIG - 1
          GOTO 500
         ENDIF
       ENDIF
 C end HALO
 C=======================================================================
-C  COMPUTE THE PERMUTATION VECTORS
+C  COMPUTE THE PERMUTATION VECTORS and update TREE
 C=======================================================================
 C     ----------------------------------------------------------------
 C     The time taken by the following code is O(n).  At this
@@ -5034,6 +5138,7 @@ C         leave elen (e) negative, so we know it is an element
           ELEN (E) = -K
         ENDIF
   290 CONTINUE
+      IF (COMPUTE_PERM) THEN
 C     ----------------------------------------------------------------
 C     reset the inverse permutation (elen (1..n)) to be positive,
 C     and compute the pivot order (last (1..n)).
@@ -5050,13 +5155,13 @@ C       interface level, we need another array to store
 C       the inverse of ELEN for entries greater than N
 C       We use DEGREE.
         LAST(1:N) = 0
-        DEGREE(1:TOTEL-N)=0
+        HEAD(1:TOTEL-N)=0
         DO I = 1, N
           K = abs (ELEN (I))
           IF ( K <= N ) THEN
             LAST (K) = I
           ELSE
-            DEGREE(K-N)=I
+            HEAD(K-N)=I
           ENDIF
         ENDDO
         I = 1
@@ -5068,9 +5173,9 @@ C       We use DEGREE.
           ENDIF
         ENDDO
         DO K = N+1, TOTEL
-          IF (DEGREE(K-N) .NE. 0) THEN
-            LAST(I)=DEGREE(K-N)
-            ELEN(DEGREE(K-N)) = I
+          IF (HEAD(K-N) .NE. 0) THEN
+            LAST(I)=HEAD(K-N)
+            ELEN(HEAD(K-N)) = I
             I = I + 1
           ENDIF
         END DO
@@ -5082,6 +5187,7 @@ C       We use DEGREE.
 300     CONTINUE
       ENDIF
 C end COMPRESS
+      ENDIF
 C=======================================================================
 C  RETURN THE MEMORY USAGE IN IW
 C=======================================================================
@@ -5118,22 +5224,23 @@ C Date 1997
 C ---------
 C
       SUBROUTINE MUMPS_QAMD
-     &                (TOTEL, IVersion, THRESH, NDENSE, 
+     &                (TOTEL, COMPUTE_PERM, IVersion, THRESH, NDENSE, 
      &                 N, IWLEN, PE, PFREE, LEN, IW, NV, 
      &                 ELEN, LAST, NCMPA, DEGREE, HEAD, NEXT, W,
      &                 PARENT) 
-      INTEGER, INTENT(IN)    ::  TOTEL
-      INTEGER, INTENT(IN)    :: N
+C    Input not modified
+      INTEGER, INTENT(IN)    :: TOTEL, N
+      LOGICAL, INTENT(IN)    :: COMPUTE_PERM
       INTEGER, INTENT(IN)    :: IVersion, THRESH
       INTEGER(8), INTENT(IN) :: IWLEN
       INTEGER, INTENT(INOUT)  :: LEN(N), IW(IWLEN)
-C     NV meaningful as input to encode compressed graphs
-      INTEGER, INTENT(INOUT)  :: NV(N)
       INTEGER, INTENT(OUT)   :: NCMPA
-      INTEGER, INTENT(OUT)   :: ELEN(N), LAST(TOTEL), 
-     &                          PARENT(N)
+      INTEGER, INTENT(OUT)   :: ELEN(N), PARENT(N)
+      INTEGER, INTENT(OUT)   :: LAST(N)
       INTEGER(8), INTENT(INOUT) :: PFREE
       INTEGER(8), INTENT(INOUT) :: PE(N)
+C     NV also meaningful as input to encode compressed graphs
+      INTEGER, INTENT(INOUT)  :: NV(N)
       INTEGER, INTENT(OUT) :: NEXT(N), DEGREE(N), HEAD(TOTEL), W(N)
       INTEGER, INTENT(OUT) :: NDENSE(N)
 C The input integer parameter THRESH defines the quasi density:
@@ -5191,9 +5298,17 @@ C   some matrices.
 C-----------------------------------------------------------------------
 C INPUT ARGUMENTS (unaltered):
 C-----------------------------------------------------------------------
-C n:    The matrix order.
-C
-C       Restriction:  n .ge. 1
+C n     : The matrix order.
+C         number of supervariables if compress/blocked format
+C         Restriction:  n .ge. 1
+C totel : Number of variables to eliminate
+C         In case of blocked format:
+C         each variable i is a supervariable of size nv(i)
+C         totel is computed as the sum(nv(i)) for i \in [1:n]
+C         the algorithm stops when totel variables are
+C         eliminated.
+C compute_perm : indicates if permutations should be computed 
+C         on output in last/elen 
 C iwlen:        The length of iw (1..iwlen).  On input, the matrix is
 C       stored in iw (1..pfree-1).  However, iw (1..iwlen) should be
 C       slightly larger than what is required to hold the matrix, at
@@ -5262,15 +5377,16 @@ C       iwlen, and the space iw (pfree+1 ... iwlen) was not used.
 C       Otherwise, pfree (on output) is greater than iwlen, and all the
 C       memory in iw was used.
 C
-C nv: On input, encoding of compressed graph:
-C        if NV(1) = -1 then graph is not compressed otherwise
-C        NV(I) holds the weight of node I. 
+C nv:   On input, encoding of compressed graph:
+C       if nv(1) = -1 then graph is not compressed otherwise
+C       nv(I) holds the weight of node I. 
 C       During execution, abs (nv (i)) is equal to the number of rows
 C       that are represented by the principal supervariable i.  If i is
-C       a nonprincipal variable, then nv (i) = 0.  Initially,
-C       nv (i) = 1 for all i.  nv (i) .lt. 0 signifies that i is a
+C       a nonprincipal variable, then nv (i) = 0.  
+C       nv (i) .lt. 0 signifies that i is a
 C       principal variable in the pattern Lme of the current pivot
-C       element me.  On output, nv (e) holds the true degree of element
+C       element me.  
+C       On output, nv (e) holds the true degree of element
 C       e at the time it was created (including the diagonal part).
 C begin HALO
 C       On output, nv(I) can be used to find node in set V1.
@@ -5506,11 +5622,11 @@ C pme1:       the current element, me, is stored in iw (pme1...pme2)
 C pme2:       the end of the current element
 C pn:         pointer into a "clean" variable, also used to compress
 C psrc:       source pointer, for compression
+      LOGICAL COMPRESS
 C-----------------------------------------------------------------------
 C  FUNCTIONS CALLED:
 C-----------------------------------------------------------------------
       INTRINSIC max, min, mod
-      LOGICAL COMPRESS
 C=======================================================================
 C  INITIALIZATIONS
 C=======================================================================
@@ -5551,38 +5667,32 @@ C      exactly dense rows only
       DMAX = 0
       MEM = PFREE - 1
       MAXMEM = MEM
-      DO 10 I = 1, N
+      DO I = 1, N
         NDENSE(I)= 0
-        LAST (I) = 0
-        HEAD (I) = 0
-C        NV (I) = 1
-C        DEGREE (I) = LEN (I)
         W (I) = 1
         ELEN (I) = 0
-   10 CONTINUE
-      HEAD(N:TOTEL) = 0
-      LAST(N:TOTEL) = 0
+        LAST(I) = 0
+      ENDDO
+      DO I = 1, TOTEL
+        HEAD(I) = 0
+      ENDDO
       IF(NV(1) .LT. 0) THEN
          COMPRESS = .FALSE.
       ELSE
          COMPRESS = .TRUE.
       ENDIF
-      IF(COMPRESS) THEN
-C         TOTEL = 0
+      IF (COMPRESS) THEN
          DO I=1,N
-C            TOTEL = TOTEL + NV(I)
             DEGREE(I) = 0
             DO P= PE(I) , PE(I)+int(LEN(I)-1,8)
                DEGREE(I) = DEGREE(I) + NV(IW(P))
             ENDDO
-C     DEGREE (I) = LEN (I)
          ENDDO
       ELSE
          DO I=1,N
             NV(I) = 1
             DEGREE (I) = LEN (I)
          ENDDO
-C         TOTEL = N
       ENDIF
 C     ----------------------------------------------------------------
 C     initialize degree lists and eliminate rows with no off-diag. nz.
@@ -5599,7 +5709,7 @@ C         test for row density
             IF ( (THRESM.GE.0) .AND.
      &           (DEG+NV(I).GE.THRESM) ) THEN
 C           I will be inserted in the degree list of N
-               NBD = NBD+1
+               NBD = NBD+NV(I)
                IF (DEG+NV(I).NE.TOTEL-NEL) THEN
                   DEGREE(I) = DEGREE(I)+TOTEL+1
 C            insert I at the beginning of degree list of n
@@ -5611,7 +5721,7 @@ C            insert I at the beginning of degree list of n
                   LAST(I)  = 0
                   IF (LASTD.EQ.0) LASTD=I
                ELSE
-                  NBED = NBED+1
+                  NBED = NBED+NV(I)
                   DEGREE(I) = TOTEL+1
 C            insert I at the end of degree list of n
                   DEG = TOTEL
@@ -5654,7 +5764,6 @@ C
 C=======================================================================
 C  WHILE (selecting pivots) DO
 C=======================================================================
-          NLEFT = TOTEL - NEL
  30       IF (NEL .LT. TOTEL) THEN
 C=======================================================================
 C  GET PIVOT OF MINIMUM DEGREE
@@ -5706,7 +5815,7 @@ C           ----------------------------------------------------------
             P2 = P1 + int(LEN(ME) -1,8)
 C           PLN-1 holds the pointer in IW to the last elet/var in adj list
 C              of ME.  LEN(ME) will then be set to PLN-P1
-C           PELN-1 hold the pointer in IW to the last elet in in adj list
+C           PELN-1 hold the pointer in IW to the last elet in adj list
 C              of ME.  ELEN(ME) will then be set to PELN-P1
 C           element adjacent to ME
             PLN       = P1
@@ -6505,7 +6614,7 @@ C       END WHILE (selecting pivots)
 C=======================================================================
   265 CONTINUE
 C=======================================================================
-C  COMPUTE THE PERMUTATION VECTORS
+C  COMPUTE THE PERMUTATION VECTORS and update TREE
 C=======================================================================
 C     ----------------------------------------------------------------
 C     The time taken by the following code is O(n).  At this
@@ -6561,19 +6670,20 @@ C         leave elen (e) negative, so we know it is an element
           ELEN (E) = -K
         ENDIF
   290 CONTINUE
+      IF (COMPUTE_PERM) THEN
 C     ----------------------------------------------------------------
 C     reset the inverse permutation (elen (1..n)) to be positive,
 C     and compute the permutation (last (1..n)).
 C     ----------------------------------------------------------------
       IF(COMPRESS) THEN
         LAST(1:N) = 0
-        DEGREE(1:TOTEL-N)=0
+        HEAD(1:TOTEL-N)=0  
         DO I = 1, N
           K = abs (ELEN (I))
           IF ( K <= N ) THEN
             LAST (K) = I
           ELSE
-            DEGREE(K-N)=I
+            HEAD(K-N)=I
           ENDIF
         ENDDO
         I = 1
@@ -6585,9 +6695,9 @@ C     ----------------------------------------------------------------
           ENDIF
         ENDDO
         DO K = N+1, TOTEL
-          IF (DEGREE(K-N) .NE. 0) THEN
-            LAST(I)=DEGREE(K-N)
-            ELEN(DEGREE(K-N)) = I
+          IF (HEAD(K-N) .NE. 0) THEN
+            LAST(I)=HEAD(K-N)
+            ELEN(HEAD(K-N)) = I
             I = I + 1
           ENDIF
         END DO
@@ -6598,6 +6708,10 @@ C     ----------------------------------------------------------------
             ELEN (I) = K
  300     CONTINUE
       ENDIF
+C=======================================================================
+C      END OF COMPUTING PERMUTATIONS
+C=======================================================================
+       ENDIF
 C=======================================================================
 C  RETURN THE MEMORY USAGE IN IW
 C=======================================================================
@@ -6869,6 +6983,8 @@ C                     matrix, excluding the diagonal.
 C           negative (<0) : i \in V1, and 
 C                     -len(i) hold the number of entries in row i of the
 C                     matrix, excluding the diagonal.
+C                     len(i) = - | Adj(i) | if i \in V1                    
+C                              or -N -1 if  | Adj(i) | = 0 and i \in V1 
 C       The contents of len (1..n)
 C       are undefined on output.
 C iw:   On input, iw (1..pfree-1) holds the description of each row i
@@ -7079,7 +7195,7 @@ C we:         w (e)
 C wflg:       used for flagging the w array.  See description of iw.
 C wnvi:       wflg - nv (i)
 C x:          either a supervariable or an element
-C wf3:  off diagoanl block area
+C wf3:  off diagonal block area
 C wf4:  diagonal block area
 C mf : Minimum fill
 C begin HALO
@@ -7549,7 +7665,6 @@ C                 i is at the head of the degree list
             IF (E .NE. ME) THEN
 C             set tree pointer and flag to indicate element e is
 C             absorbed into new element me (the parent of e is me)
-C               write(*,*) 'ME father of E',ME,E
               PE (E) = int(-ME,8)
               W (E) = 0
             ENDIF
@@ -7567,7 +7682,6 @@ C       degme holds the external degree of new element
         DEGREE (ME) = DEGME
         PE (ME) = PME1
         LEN (ME) = int(PME2 - PME1 + 1_8)
-C        write(*,*) 'ME',ME,'DEG',DEGME,'LP =',IW(PME1:PME2)
 C       -------------------------------------------------------------
 C       make sure that wflg is not too large.  With the current
 C       value of wflg, wflg+n must not cause integer overflow
@@ -7704,6 +7818,15 @@ C           There is nothing left of this node except for an
 C           edge to the current pivot element.  elen (i) is 1,
 C           and there are no variables adjacent to node i.
 C           Absorb i into the current pivot element, me.
+             TOTO = I
+ 5911        IF(TOTO .NE. 0) THEN
+                J = CONSTRAINT(TOTO)
+                IF(J .GT. 0) THEN
+                   CONSTRAINT(J) = 0
+                ENDIF
+                TOTO = THESON(TOTO)
+                GOTO 5911
+             ENDIF
             PE (I) = int(-ME,8)
             NVI = -NV (I)
             DEGME = DEGME - NVI
@@ -8008,7 +8131,7 @@ C       END WHILE (selecting pivots)
       ENDIF
 C=======================================================================
 C begin HALO V2
-      IF (NEL.LT.N) THEN 
+      IF (NBFLAG.GT.0) THEN
 C
 C     All possible pivots (not flagged have been eliminated).
 C     We amalgamate all flagged variables at the root and 
@@ -8043,10 +8166,6 @@ C          Correct value of NV is (principal variable)
            NV(ME)   = N-NREAL
            PE(ME)   = 0_8
 C
-        IF (NEL.NE.N) THEN
-         NCMPA = -N - 1
-         GOTO 500
-        ENDIF
       ENDIF
 C end HALO
 C=======================================================================
@@ -8160,7 +8279,7 @@ C     occurred, and iw (maxmem+1 ... iwlen) was unused.  Otherwise
 C     compressions did occur, and iwlen would have had to have been
 C     greater than or equal to maxmem for no compressions to occur.
 C     Return the value of maxmem in the pfree argument.
- 500  PFREE = MAXMEM
+      PFREE = MAXMEM
 C===============================
 C     Save PE in PARENT array
       DO I=1,N
@@ -8177,13 +8296,13 @@ C a schur area.
 C ---------
       SUBROUTINE MUMPS_SYMQAMD
      &                ( THRESH, NDENSE, 
-     &                 N, IWLEN, PE, PFREE, LEN, IW, NV, 
+     &                 N, TOTEL, IWLEN, PE, PFREE, LEN, IW, NV, 
      &                 ELEN, LAST, NCMPA, DEGREE, HEAD, NEXT, W, 
      &                 PERM, LISTVAR_SCHUR, SIZE_SCHUR, 
      &                 AGG6, PARENT ) 
       IMPLICIT NONE
 C     Input not modified
-      INTEGER, INTENT(IN)    :: N, SIZE_SCHUR
+      INTEGER, INTENT(IN)    :: N, TOTEL, SIZE_SCHUR
       LOGICAL, INTENT(IN)    :: AGG6
       INTEGER, INTENT(IN)    :: THRESH
       INTEGER(8), INTENT(IN) :: IWLEN
@@ -8193,16 +8312,18 @@ C     Input undefined on output
 C 
 C     Output only 
       INTEGER, INTENT(OUT)   :: NCMPA
-      INTEGER, INTENT(OUT)   :: NV(N), ELEN(N), LAST(N), PARENT(N)
+      INTEGER, INTENT(OUT)   :: ELEN(N), LAST(TOTEL), PARENT(N)
 C 
 C     Input/output
+      INTEGER, INTENT(INOUT)    :: NV(N)
       INTEGER(8), INTENT(INOUT) :: PFREE
       INTEGER(8), INTENT(INOUT) :: PE(N)
       INTEGER, INTENT(INOUT)    :: PERM(N)
 C 
 C     Internal Workspace only
       INTEGER, INTENT(OUT) :: NDENSE(N), DEGREE(N), 
-     &                        HEAD(N), NEXT(N), W(N)
+     &                        HEAD(TOTEL), NEXT(N), W(N)
+CPA2JY: FIXME should HEAD/LAST (N) instead of TOTEL ?
 C
 C  =======================
 C  INTERFACE DOCUMENTATION
@@ -8213,7 +8334,9 @@ C   available in the
 C   PREVIOUS DOCUMENTATION
 C   section)
 C
-C N (in): the size of the matrix
+C N (in): the size of the matrix 
+C         number of supervariables if blocked format
+C TOTEL (in) : Number of variables to eliminate
 C
 C IWLEN (in): the length of the workspace IW
 C
@@ -8240,7 +8363,18 @@ C
 C       On output:  (PE is copied on output into PARENT array)
 C
 C  
-C NV(out): - if i is a principal variable, NV(i) is the size of the front
+C NV(inout): 
+C          On input:  encoding of a blocked matrix 
+C            if NV(1).NE.-1 then NV(I) holds the weight of node I. 
+C          During execution, 
+C            abs (nv (i)) is equal to the number of rows
+C            that are represented by the principal supervariable i.  
+C            If i is a nonprincipal variable, then nv (i) = 0.  
+C            nv (i) .lt. 0 signifies that i is a
+C            principal variable in the pattern Lme of the current pivot
+C            element me. 
+C          On output: 
+C          - if i is a principal variable, NV(i) is the size of the front
 C          in the multifrontal terminology.
 C          - if i is a secondary variable, NV(i)=0
 C
@@ -8279,10 +8413,15 @@ C      permutation on output. Not sure what it contains for the Schur
 C      variables.
 C      (it should be ok for the Schur too).
 C
-C LAST (out) used internally as working space; 
+C LAST  used internally as working space; 
 C       On output, last (1..n) holds the permutation,  i = last (k), then
 C       row i is the kth pivot row.
-C FIXME : Not seems not to be used on output
+C       Not used on output and 
+C       Computation has been suppressed 
+C       since in the context of blocked matrix format
+C       one cannot so easily compute last out of elen 
+C       (see end of MUMPS_QAMD in case of COMRPESS, 
+C       because elen(i) \in [1:TOTEL] and not \in [1:N])
 C
 C AGG6 (in): controls if aggressive absorption should be authorized.
 C
@@ -8598,6 +8737,7 @@ C     ThresMin  holds minimum value of THRESH
       INTEGER(8) MAXMEM, MEM, NEWMEM
       INTEGER :: MAXINT_N
       INTEGER(8) :: HASH, HMOD 
+      LOGICAL :: COMPRESS
 C deg:        the degree of a variable or element
 C degme:      size, |Lme|, of the current element, me (= degree (me))
 C dext:       external degree, |Le \ Lme|, of some element e
@@ -8670,7 +8810,7 @@ C=======================================================================
            ELEN(1) = 1
            LAST(1) = 1
            PE(1) = 0_8
-           NV(1) = 1
+           IF (NV(1).LT.0) NV(1) = 1
            NCMPA = 0
            PARENT(1) = 0
            RETURN
@@ -8717,12 +8857,6 @@ C           (To be Tested it seperately)
              ThresMin  = N
              ThresPrev = N
       ELSE
-COLD         THRESM    = max(int(sqrt(dble(N)))+N/8+1, THRESM)
-COLD         THRESM    = max(THRESM,1)
-COLD         ThresMin  = max( THRESM / 8, 1)
-COLD         ThresPrev = THRESM
-COLD    ENDIF
-COLD    ThresMinINIT = ThresMin
              THRESM    = max(int(31*N/32),THRESM)
              THRESM    = max(THRESM,1)
 C
@@ -8746,7 +8880,7 @@ C
       ENDIF  ! test on SchurON
 C
       ThresMinINIT = ThresMin/4
-      THD_AGG = max(128, min(N/2048, 1024))
+      THD_AGG = max(128, min(TOTEL/2048, 1024))
       IF (THRESM.GT.0) THEN
        IF ((THRESM.GT.N).OR.(THRESM.LT.2)) THEN 
 C      exactly dense rows only
@@ -8758,7 +8892,7 @@ C      exactly dense rows only
       NBED  = 0
       NBDM  = 0
       WFLG = 2
-      MAXINT_N=huge(WFLG)-N
+      MAXINT_N=huge(WFLG)-TOTEL
       MINDEG = 1
       NCMPA = 0
       NEL = 0
@@ -8766,15 +8900,36 @@ C      exactly dense rows only
       DMAX = 0
       MEM = PFREE - 1
       MAXMEM = MEM
-      DO 10 I = 1, N
+      DO I = 1, N
         NDENSE(I)= 0
-        LAST (I) = 0
-        HEAD (I) = 0
-        NV (I) = 1
         W (I) = 1
         ELEN (I) = 0
-        DEGREE (I) = LEN (I)
-   10 CONTINUE
+C        NV (I) = 1
+C        DEGREE (I) = LEN (I)
+      ENDDO
+      DO I=1, N
+        LAST (I) = 0
+        HEAD (I) = 0
+      ENDDO
+C     initialize degree
+      IF(NV(1) .LT. 0) THEN
+         COMPRESS = .FALSE.
+      ELSE
+         COMPRESS = .TRUE.
+      ENDIF
+      IF (COMPRESS) THEN
+         DO I=1,N
+            DEGREE(I) = 0
+            DO P= PE(I) , PE(I)+int(LEN(I)-1,8)
+               DEGREE(I) = DEGREE(I) + NV(IW(P))
+            ENDDO
+         ENDDO
+      ELSE
+         DO I=1,N
+            NV(I) = 1
+            DEGREE (I) = LEN (I)
+         ENDDO
+      ENDIF
 C     ----------------------------------------------------------------
 C     initialize degree lists and eliminate rows with no off-diag. nz.
 C     ----------------------------------------------------------------
@@ -8795,10 +8950,10 @@ C         test for row density
           IF ( (THRESM.GT.0) .AND.
      &         (FDEG .GT.THRESM) ) THEN
 C           I will be inserted in the degree list of N
-            NBD = NBD+1
+            NBD = NBD+NV(I)
             IF (FDEG.NE.N+1) THEN
 C
-             DEGREE(I) = DEGREE(I)+N+2
+             DEGREE(I) = DEGREE(I)+TOTEL+2
 C            insert I at the beginning of degree list of n
              DEG = N
              INEXT = HEAD (DEG)
@@ -8811,8 +8966,8 @@ C            insert I at the beginning of degree list of n
 C            Only Schur variables are concerned here
 C            Property: LISTVAR_SCHUR (1) will 
 C            be first in the list of schur variables
-             NBED = NBED+1
-             DEGREE(I) = N+1
+             NBED = NBED+NV(I)
+             DEGREE(I) = TOTEL+1
 C            insert I at the end of degree list of n
              DEG = N
              IF (LASTD.EQ.0) THEN
@@ -8840,7 +8995,7 @@ C         ----------------------------------------------------------
 C         we have a variable that can be eliminated at once because
 C         there is no off-diagonal non-zero in its row.
 C         ----------------------------------------------------------
-          NEL = NEL + 1
+          NEL = NEL + NV(I)
           ELEN (I) = -NEL
           PE (I) = 0_8
           W (I) = 0
@@ -8853,7 +9008,7 @@ C
 C=======================================================================
 C  WHILE (selecting pivots) DO
 C=======================================================================
-   30 IF (NEL .LT. N) THEN
+   30 IF (NEL .LT. TOTEL) THEN
 C=======================================================================
 C  GET PIVOT OF MINIMUM DEGREE
 C=======================================================================
@@ -8877,7 +9032,7 @@ C       -------------------------------------------------------------
            MINDEG = N
            GOTO 30
         ENDIF
-        IF (DEGREE(ME).LE.N)  THEN
+        IF (DEGREE(ME).LE.TOTEL)  THEN
 C       -------------------------------------------------------------
 C       remove chosen variable from link list
 C       -------------------------------------------------------------
@@ -8887,12 +9042,12 @@ C       -------------------------------------------------------------
         ELSE
 C
 C         Because of restarting forced even if 
-C         variable (not yest quasi dense) but of 
-C         value of perm larger thatn thresm still
+C         variable (not yet quasi dense) but of 
+C         value of perm larger than thresm still
 C         to be eliminated we have to reset MINDEB to 1
           MINDEG = 1
           NBDM = max(NBDM,NBD)
-          IF (DEGREE(ME).GT.N+1) THEN
+          IF (DEGREE(ME).GT.TOTEL+1) THEN
             IF (WFLG .GT. MAXINT_N) THEN
              DO  52 X = 1, N
               IF (W (X) .NE. 0) W (X) = 1
@@ -8968,7 +9123,7 @@ C              E is a dense row
               ENDIF
   55        CONTINUE
 C           ----------------------------------------------
-C           DEGREE(ME)-(N+2) holds last external degree computed
+C           DEGREE(ME)-(TOTEL+2) holds last external degree computed
 C           when Me was detected as dense
 C           NDENSE(ME) is the exact external degree of ME
 C           ----------------------------------------------
@@ -8992,7 +9147,7 @@ C           process next quasi dense row
 C           ------------------------------
             ME    = INEXT
             IF (ME.NE.0) THEN
-              IF (DEGREE(ME).GT.(N+1) ) GOTO 51
+              IF (DEGREE(ME).GT.(TOTEL+1) ) GOTO 51
             ENDIF
             HEAD (N) = ME
 C           ---------------------------------------
@@ -9016,7 +9171,7 @@ C
           ENDIF
 C         -------------------------------------------------------------
 C         -------------------------------------------------------------
-          IF (DEGREE(ME).EQ.N+1) THEN
+          IF (DEGREE(ME).EQ.TOTEL+1) THEN
 C         we have only  exactly "dense" rows that we
 C         amalgamate at the root node
              IF (NBD.NE.NBED) THEN
@@ -9027,13 +9182,11 @@ C         amalgamate at the root node
            NELME    = -(NEL+1)
            DO 59 X=1,N
             IF ((PE(X).GT.0) .AND. (ELEN(X).LT.0)) THEN
-              PE(X) = int(-LISTVAR_SCHUR(1),8)
-            ELSE IF ((PE(X).GT.0) .AND. (ELEN(X).LT.0)) THEN
 C            X is an unabsorbed element
 C            -- Force sons to be linked to first node in Schur
              PE(X) = int(-LISTVAR_SCHUR(1),8)
 C            W(X) = 0 could be suppressed ?? check it
-            ELSEIF (DEGREE(X).EQ.N+1) THEN
+            ELSEIF (DEGREE(X).EQ.TOTEL+1) THEN
 C            X is a dense row, absorb it in ME (mass elimination)
              NEL   = NEL + NV(X)
              PE(X) = int(-ME,8)
@@ -9043,7 +9196,7 @@ C            X is a dense row, absorb it in ME (mass elimination)
             ENDIF
    59      CONTINUE
            IF (NbSchur.NE.SIZE_SCHUR_LOC) then
-             write(6,*) ' Internal error 2 in QAMD :',
+             write(6,*) ' Internal error 2 in MUMPS_SYMQAMD:',
      &         ' Schur size expected:',SIZE_SCHUR_LOC, 'Real:', NbSchur
              CALL MUMPS_ABORT()
            ENDIF
@@ -9052,13 +9205,12 @@ C          ME is the root node
            NV(ME)   = NBD
            PE(ME)   = 0_8
            IF (NEL.NE.N) THEN
-            write(6,*) 'Internal ERROR 2 detected in QAMD'
+            write(6,*) 'Internal error 3 detected in MUMPS_SYMQAMD:'
             write(6,*) ' NEL not equal to N: N, NEL =',N,NEL
             CALL MUMPS_ABORT()
            ENDIF
            IF (ME.NE. LISTVAR_SCHUR(1)) THEN
 C          -- Set all node in Schur list to point to LISTVAR_SCHUR(1)
-C             write(6,*) 'NV(me)=', nv(me)
              DO I=1, SIZE_SCHUR_LOC
                PE(LISTVAR_SCHUR(I)) = int(-LISTVAR_SCHUR(1),8)
              ENDDO
@@ -9118,7 +9270,7 @@ C             ----------------------------------------------------
 C             remove variable i from degree list.
 C             ----------------------------------------------------
 C             only done for non "dense" rows
-              IF (DEGREE(I).LE.N) THEN
+              IF (DEGREE(I).LE.TOTEL) THEN
               ILAST = LAST (I)
               INEXT = NEXT (I)
               IF (INEXT .NE. 0) LAST (INEXT) = ILAST
@@ -9250,7 +9402,7 @@ C               -------------------------------------------------
 C               remove variable i from degree link list
 C               -------------------------------------------------
 C             only done for non "dense" rows
-                IF (DEGREE(I).LE.N) THEN
+                IF (DEGREE(I).LE.TOTEL) THEN
                 ILAST = LAST (I)
                 INEXT = NEXT (I)
                 IF (INEXT .NE. 0) LAST (INEXT) = ILAST
@@ -9318,7 +9470,7 @@ C       which is true when only exactly dense rows have been selected.
 C       -------------------------------------------------------------
         DO 150 PME = PME1, PME2
           I = IW (PME)
-          IF (DEGREE(I).GT.N) GOTO 150
+          IF (DEGREE(I).GT.TOTEL) GOTO 150
           ELN = ELEN (I)
           IF (ELN .GT. 0) THEN
 C           note that nv (i) has been negated to denote i in Lme:
@@ -9352,7 +9504,7 @@ C       -------------------------------------------------------------
         AGG6_loc = (AGG6 .OR. (DEGREE(ME) .LT. THD_AGG))
         DO 180 PME = PME1, PME2
           I = IW (PME)
-          IF (DEGREE(I).GT.N) GOTO 180
+          IF (DEGREE(I).GT.TOTEL) GOTO 180
           P1 = PE (I)
           P2 = P1 + int(ELEN (I) - 1,8)
           PN = P1
@@ -9407,7 +9559,7 @@ C         ----------------------------------------------------------
 C             j is unabsorbed, and not in Lme.
 C             add to degree and add to new list
 C             add degree only of non-dense rows.
-              IF (DEGREE(J).LE.N) DEG=DEG+NVJ
+              IF (DEGREE(J).LE.TOTEL) DEG=DEG+NVJ
               IW (PN) = J
               PN = PN + 1
               HASH = HASH + int(J,kind=8)
@@ -9491,7 +9643,7 @@ C  SUPERVARIABLE DETECTION
 C=======================================================================
         DO 250 PME = PME1, PME2
           I = IW (PME)
-          IF ( (NV(I).LT.0) .AND. (DEGREE(I).LE.N) ) THEN
+          IF ( (NV(I).LT.0) .AND. (DEGREE(I).LE.TOTEL) ) THEN
 C           only done for nondense rows
 C           i is a principal variable in Lme
 C           -------------------------------------------------------
@@ -9602,7 +9754,7 @@ C       ------------------------------
           THRESM = max(ThresMin, THRESM-NVPIV)
         ENDIF
         P = PME1
-        NLEFT = N - NEL
+        NLEFT = TOTEL - NEL
         DO 260 PME = PME1, PME2
           I = IW (PME)
           NVI = -NV (I)
@@ -9610,7 +9762,7 @@ C       ------------------------------
 C           i is a principal variable in Lme
 C           restore nv (i) to signify that i is principal
             NV (I) = NVI
-            IF (DEGREE(I).LE.N) THEN
+            IF (DEGREE(I).LE.TOTEL) THEN
 C           -------------------------------------------------------
 C           compute the external degree (add size of current elem)
 C           -------------------------------------------------------
@@ -9626,7 +9778,7 @@ C           -------------------
 C             relaxed dense row detection
                IDENSE = .TRUE.
 C
-               DEGREE(I) = DEGREE(I)+N+2
+               DEGREE(I) = DEGREE(I)+TOTEL+2
              ENDIF
              IF (IDENSE) THEN
 C            update NDENSE of all elements in the list of element
@@ -9766,7 +9918,8 @@ C     and compute the permutation (last (1..n)).
 C     ----------------------------------------------------------------
       DO 300 I = 1, N
         K = abs (ELEN (I))
-        LAST (K) = I
+C        LAST (K) = I
+C        LAST (K) = I
         ELEN (I) = K
   300 CONTINUE
       IF (.NOT.SchurON) THEN

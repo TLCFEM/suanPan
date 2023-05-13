@@ -17,7 +17,7 @@
 
 #include "Arnoldi.h"
 #include <Domain/DomainBase.h>
-#include <Domain/FactoryHelper.hpp>
+#include <Domain/Factory.hpp>
 #include <Solver/Integrator/Integrator.h>
 #include <Toolbox/arpack.h>
 
@@ -52,7 +52,7 @@ int Arnoldi::analyze() {
     const auto factor = 1E-12 * t_mass->max();
     for(auto I = 0llu; I < t_mass->n_rows; ++I) t_mass->at(I, I) += factor;
 
-    return eig_solve(get_eigenvalue(W), get_eigenvector(W), W->get_stiffness(), t_mass, eigen_num, 'L' == eigen_type ? "LM" : "SM");
+    return eig_solve(W->modify_eigenvalue(), W->modify_eigenvector(), W->get_stiffness(), t_mass, eigen_num, 'L' == eigen_type ? "LM" : "SM");
 }
 
 void Arnoldi::print() {

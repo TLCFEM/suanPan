@@ -1,15 +1,16 @@
 /*
  *
- *  This file is part of MUMPS 5.2.1, released
- *  on Fri Jun 14 14:46:05 UTC 2019
+ *  This file is part of MUMPS 5.6.0, released
+ *  on Wed Apr 19 15:50:57 UTC 2023
  *
  *
- *  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+ *  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
  *  Mumps Technologies, University of Bordeaux.
  *
  *  This version of MUMPS is provided to you free of charge. It is
- *  released under the CeCILL-C license:
- *  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+ *  released under the CeCILL-C license 
+ *  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+ *  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
  *
  */
 #include "mumps_io_basic.h"
@@ -195,13 +196,16 @@ MUMPS_INT mumps_test_request_th(MUMPS_INT* request_id,MUMPS_INT *flag){
   return 0;
 }
 MUMPS_INT mumps_wait_req_sem_th(MUMPS_INT *request_id){
-  MUMPS_INT i,j;
+  MUMPS_INT i,j,nb_active_loc;
+  pthread_mutex_lock(&io_mutex);
+  nb_active_loc=nb_active;
   j=first_active;
   for(i=0;i<nb_active;i++){
     if(io_queue[j].req_num==*request_id) break;
     j=(j+1)%MAX_IO;
   }
-  if(i<nb_active){
+  pthread_mutex_unlock(&io_mutex);
+  if(i<nb_active_loc){
     mumps_wait_sem(&(io_queue[j].int_local_cond),&(io_queue[j].local_cond));
   }
   return 0;
@@ -330,6 +334,7 @@ MUMPS_INT mumps_low_level_init_ooc_c_th(MUMPS_INT* async, MUMPS_INT* ierr){
       finished_requests_id[i]=-9999;
       finished_requests_inode[i]=-9999;
     }
+    ret_code=0;
     if(with_sem){
       switch(with_sem){
       case 2:

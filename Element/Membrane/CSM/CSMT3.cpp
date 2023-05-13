@@ -20,6 +20,9 @@
 #include <Material/Material2D/Material2D.h>
 #include <Toolbox/utility.h>
 
+const uvec CSMT3::t_dof{0, 1, 3, 4, 6, 7};
+const uvec CSMT3::r_dof{2, 5, 8};
+
 CSMT3::IntegrationPoint::IntegrationPoint(rowvec&& C, const double W, unique_ptr<Material>&& M)
     : coor(std::forward<rowvec>(C))
     , weight(W)

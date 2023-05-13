@@ -7,18 +7,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\Toolbox\mumps-src\bucket.c">
-      <Filter>SRC</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\mumps-src\ddbisect.c">
-      <Filter>SRC</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\mumps-src\ddcreate.c">
-      <Filter>SRC</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\mumps-src\dmumps_gpu.c">
-      <Filter>SRC</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\mumps-src\elapse.c">
       <Filter>SRC</Filter>
     </ClCompile>
@@ -44,6 +32,9 @@
       <Filter>SRC</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\mumps-src\multisector.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_addr.c">
       <Filter>SRC</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_common.c">
@@ -79,6 +70,9 @@
     <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_pord.c">
       <Filter>SRC</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_register_thread.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_save_restore_C.c">
       <Filter>SRC</Filter>
     </ClCompile>
@@ -91,9 +85,6 @@
     <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_scotch64.c">
       <Filter>SRC</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_size.c">
-      <Filter>SRC</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_thread.c">
       <Filter>SRC</Filter>
     </ClCompile>
@@ -101,6 +92,12 @@
       <Filter>SRC</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\mumps-src\nestdiss.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\smumps_c.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\smumps_gpu.c">
       <Filter>SRC</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\mumps-src\sort.c">
@@ -112,10 +109,19 @@
     <ClCompile Include="..\..\..\Toolbox\mumps-src\tree.c">
       <Filter>SRC</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\mumps-src\smumps_c.c">
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\bucket.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\ddbisect.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\ddcreate.c">
       <Filter>SRC</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\mumps-src\dmumps_c.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\dmumps_gpu.c">
       <Filter>SRC</Filter>
     </ClCompile>
   </ItemGroup>

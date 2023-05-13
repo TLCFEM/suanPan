@@ -17,7 +17,7 @@
 
 #include "LeeNewmarkFull.h"
 #include <Domain/DomainBase.h>
-#include <Domain/FactoryHelper.hpp>
+#include <Domain/Factory.hpp>
 
 /**
  * \brief compute an approximation of the number of additional blocks
@@ -91,10 +91,10 @@ void LeeNewmarkFull::update_residual() const {
     // residual = csr_form<double>(stiffness->triplet_mat) * trial_vel;
 
     // ! check in damping force
-    auto fa = std::async([&] { get_trial_damping_force(factory) -= residual.head(n_block); });
-    auto fb = std::async([&] { get_incre_damping_force(factory) -= residual.head(n_block); });
+    auto fa = std::async([&] { factory->modify_trial_damping_force() -= residual.head(n_block); });
+    auto fb = std::async([&] { factory->modify_incre_damping_force() -= residual.head(n_block); });
     // ! update left-hand side
-    auto fc = std::async([&] { get_sushi(factory) -= residual.head(n_block); });
+    auto fc = std::async([&] { factory->modify_sushi() -= residual.head(n_block); });
 
     fa.get();
     fb.get();

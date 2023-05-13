@@ -1122,7 +1122,7 @@ namespace Catch {
     namespace {
         using TCP_underlying_type = uint8_t;
         static_assert(sizeof(TestCaseProperties) == sizeof(TCP_underlying_type),
-            "The size of the TestCaseProperties is different from the assumed size");
+                      "The size of the TestCaseProperties is different from the assumed size");
 
         TestCaseProperties operator|(TestCaseProperties lhs, TestCaseProperties rhs) {
             return static_cast<TestCaseProperties>(
@@ -1145,7 +1145,7 @@ namespace Catch {
 
         bool applies(TestCaseProperties tcp) {
             static_assert(static_cast<TCP_underlying_type>(TestCaseProperties::None) == 0,
-                "TestCaseProperties::None must be equal to 0");
+                          "TestCaseProperties::None must be equal to 0");
             return tcp != TestCaseProperties::None;
         }
 
@@ -1660,7 +1660,7 @@ namespace Catch {
         Totals diff = *this - prevTotals;
         if(diff.assertions.failed > 0) ++diff.testCases.failed;
         else if(diff.assertions.failedButOk > 0) ++diff.testCases.failedButOk;
-        else if(diff.assertions.skipped > 0) ++ diff.testCases.skipped;
+        else if(diff.assertions.skipped > 0) ++diff.testCases.skipped;
         else ++diff.testCases.passed;
         return diff;
     }
@@ -2992,8 +2992,8 @@ namespace Catch {
     } // namespace Catch
 
 #elif defined(CATCH_PLATFORM_LINUX)
-    #include <fstream>
-    #include <string>
+#include <fstream>
+#include <string>
 
     namespace Catch{
         // The standard POSIX way of detecting a debugger is to attempt to
@@ -3736,12 +3736,12 @@ namespace Catch {
 
 #if defined(CATCH_CONFIG_NEW_CAPTURE)
 #if defined(_MSC_VER)
-    #include <io.h>      //_dup and _dup2
-    #define dup _dup
-    #define dup2 _dup2
-    #define fileno _fileno
+#include <io.h>      //_dup and _dup2
+#define dup _dup
+#define dup2 _dup2
+#define fileno _fileno
 #else
-    #include <unistd.h>  // dup and dup2
+#include <unistd.h>  // dup and dup2
 #endif
 #endif
 
@@ -3853,9 +3853,9 @@ namespace Catch {
 
 #if defined(CATCH_CONFIG_NEW_CAPTURE)
 #if defined(_MSC_VER)
-    #undef dup
-    #undef dup2
-    #undef fileno
+#undef dup
+#undef dup2
+#undef fileno
 #endif
 #endif
 
@@ -4046,7 +4046,7 @@ namespace Catch {
             auto findNextSeparator = [&reporterSpec](size_t startPos) {
                 static_assert(
                     separatorSize == 2,
-                    "The code below currently assumes 2 char separator" );
+                    "The code below currently assumes 2 char separator");
 
                 auto currentPos = startPos;
                 do {
@@ -6026,7 +6026,7 @@ namespace Catch {
         // Apostrophe escaping not necessary if we always use " to write attributes
         // (see: http://www.w3.org/TR/xml/#syntax)
 
-        for(std::size_t idx = 0; idx < m_str.size(); ++ idx) {
+        for(std::size_t idx = 0; idx < m_str.size(); ++idx) {
             unsigned char c = static_cast<unsigned char>(m_str[idx]);
             switch(c) {
             case '<':

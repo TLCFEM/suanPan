@@ -29,21 +29,17 @@
 #define STACKED_H
 
 #include <Material/Material3D/Material3D.h>
+#include <Toolbox/ResourceHolder.h>
 
 class Stacked final : public Material3D {
     const uvec mat_tag;
 
-    std::vector<unique_ptr<Material>> mat_pool;
+    std::vector<ResourceHolder<Material>> mat_pool;
 
 public:
     Stacked(unsigned, // tag
             uvec&&    // mat tag
     );
-    Stacked(const Stacked&);
-    Stacked(Stacked&&) = delete;
-    Stacked& operator=(const Stacked&) = delete;
-    Stacked& operator=(Stacked&&) = delete;
-    ~Stacked() override = default;
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

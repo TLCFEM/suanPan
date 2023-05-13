@@ -29,13 +29,14 @@
 #define REBAR2D_H
 
 #include <Material/Material2D/Material2D.h>
+#include <Toolbox/ResourceHolder.h>
 
 class Rebar2D final : public Material2D {
     const unsigned tag_x, tag_y;
 
     const double ratio_x, ratio_y;
 
-    unique_ptr<Material> rebar_x, rebar_y;
+    ResourceHolder<Material> rebar_x, rebar_y;
 
 public:
     Rebar2D(unsigned, // tag
@@ -44,11 +45,6 @@ public:
             double,   // reinforcement ratio along x axis
             double    // reinforcement ratio along y axis
     );
-    Rebar2D(const Rebar2D&);
-    Rebar2D(Rebar2D&&) noexcept = delete;
-    Rebar2D& operator=(const Rebar2D&) = delete;
-    Rebar2D& operator=(Rebar2D&&) noexcept = delete;
-    ~Rebar2D() override = default;
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

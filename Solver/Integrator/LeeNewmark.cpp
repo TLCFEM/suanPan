@@ -17,7 +17,7 @@
 
 #include "LeeNewmark.h"
 #include <Domain/DomainBase.h>
-#include <Domain/FactoryHelper.hpp>
+#include <Domain/Factory.hpp>
 
 uword LeeNewmark::get_total_size() const { return n_damping * n_block + n_block; }
 
@@ -61,8 +61,8 @@ void LeeNewmark::initialize_mass(const shared_ptr<DomainBase>&) {
 }
 
 void LeeNewmark::initialize_stiffness(const shared_ptr<DomainBase>& D) {
-    auto& t_stiff = get_stiffness(factory);
-    auto& t_geometry = get_geometry(factory);
+    auto& t_stiff = factory->modify_stiffness();
+    auto& t_geometry = factory->modify_geometry();
 
     auto fa = std::async([&] {
         current_stiffness.swap(t_stiff);
@@ -102,7 +102,7 @@ int LeeNewmark::process_constraint() {
     if(SUANPAN_SUCCESS != LeeNewmarkBase::process_constraint()) return SUANPAN_FAIL;
 
     // this stiffness contains geometry, mass and damping which are handled in Newmark::assemble_matrix()
-    auto& t_stiff = get_stiffness(factory);
+    auto& t_stiff = factory->modify_stiffness();
 
     t_stiff->csc_condense();
 
@@ -176,7 +176,7 @@ void LeeNewmark::print() {
 }
 
 void LeeElementalNewmark::initialize_mass(const shared_ptr<DomainBase>& D) {
-    auto& t_mass = get_mass(factory);
+    auto& t_mass = factory->modify_mass();
 
     current_mass.swap(t_mass);
     D->assemble_mass_container();
@@ -189,7 +189,7 @@ void LeeElementalNewmark::initialize_mass(const shared_ptr<DomainBase>& D) {
 }
 
 void LeeElementalNewmark::initialize_stiffness(const shared_ptr<DomainBase>& D) {
-    auto& t_stiff = get_stiffness(factory);
+    auto& t_stiff = factory->modify_stiffness();
 
     current_stiffness.swap(t_stiff);
     D->assemble_stiffness_container();

@@ -1,23 +1,24 @@
 C
-C  This file is part of MUMPS 5.2.1, released
-C  on Fri Jun 14 14:46:05 UTC 2019
+C  This file is part of MUMPS 5.6.0, released
+C  on Wed Apr 19 15:50:57 UTC 2023
 C
 C
-C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license:
-C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+C  released under the CeCILL-C license 
+C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
       SUBROUTINE MUMPS_ESTIM_FLOPS( INODE, N, PROCNODE_STEPS,
-     &           SLAVEF,
+     &           KEEP199,
      &           ND, FILS, FRERE_STEPS, STEP, PIMASTER,
      &           KEEP28, KEEP50, KEEP253,
      &           FLOP1,
      &           IW, LIW, XSIZE )
       IMPLICIT NONE
-      INTEGER INODE, N, KEEP50, LIW, SLAVEF, KEEP28, KEEP253
+      INTEGER INODE, N, KEEP50, LIW, KEEP199, KEEP28, KEEP253
       INTEGER PROCNODE_STEPS(KEEP28), ND(KEEP28),
      &        FILS(N), FRERE_STEPS(KEEP28),
      &        STEP(N), 
@@ -25,7 +26,7 @@ C
      &  IW( LIW )
       INTEGER XSIZE
       DOUBLE PRECISION FLOP1
-      INTEGER NUMORG, IN, NASS, IFSON, NUMSTK, NFRONT, NPIV, NCB, 
+      INTEGER NUMORG, IN, NASS, IFSON, NUMSTK, NFRONT, NPIV,
      &        LEVEL, ISON
       LOGICAL MUMPS_IN_OR_ROOT_SSARBR
       INTEGER MUMPS_TYPENODE
@@ -33,7 +34,7 @@ C
       INCLUDE 'mumps_headers.h'
       FLOP1 = 0.0D0
       IF (MUMPS_IN_OR_ROOT_SSARBR(PROCNODE_STEPS(STEP(INODE)),
-     &                SLAVEF) ) RETURN
+     &                KEEP199) ) RETURN
       IN     = INODE
       NUMORG = 0
    10 NUMORG = NUMORG + 1
@@ -50,8 +51,7 @@ C
       IF (ISON .GT. 0) GOTO 20
    30 NFRONT = ND(STEP(INODE)) + NASS + KEEP253
       NPIV  = NASS + NUMORG
-      NCB   = NFRONT - NPIV
-      LEVEL = MUMPS_TYPENODE(PROCNODE_STEPS(STEP(INODE)),SLAVEF)
+      LEVEL = MUMPS_TYPENODE(PROCNODE_STEPS(STEP(INODE)),KEEP199)
       CALL MUMPS_GET_FLOPS_COST(NFRONT,NPIV,NPIV,KEEP50,LEVEL,FLOP1)
       RETURN
       END SUBROUTINE MUMPS_ESTIM_FLOPS
@@ -114,3 +114,22 @@ C
       ENDIF
       RETURN
       END SUBROUTINE MUMPS_GET_FLOPS_COST
+      SUBROUTINE MUMPS_PRINT_STILL_ACTIVE(MYID, KEEP, DKEEP17, OPELIW, 
+     &                        OPLAST_PRINTED, MPA)
+      IMPLICIT NONE
+      INTEGER, intent(in)             :: KEEP (500), MYID, MPA
+      DOUBLE PRECISION                :: DKEEP17
+      DOUBLE PRECISION, intent(in)    :: OPELIW
+      DOUBLE PRECISION, intent(inout) :: OPLAST_PRINTED
+      IF (MPA.GT.0) THEN
+        IF ( (OPELIW-OPLAST_PRINTED).GT. DKEEP17) THEN
+         WRITE(MPA,'(A,I6,A,A,1PD10.3)')
+     &   ' ... MPI process', MYID, 
+     &   ': theoretical number of flops locally performed',
+     &   ' so far        = ',
+     &    OPELIW
+         OPLAST_PRINTED = OPELIW
+        ENDIF
+      ENDIF
+      RETURN
+      END SUBROUTINE MUMPS_PRINT_STILL_ACTIVE

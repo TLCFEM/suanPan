@@ -33,10 +33,12 @@
 
 #include <Element/MaterialElement.h>
 
-class Damper01 final : public MaterialElement1D {
+class Damper01 : public MaterialElement1D {
     static constexpr unsigned d_node = 2;
 
     const unsigned d_dof;
+
+protected:
     const unsigned d_size = d_dof * d_node;
 
     const uvec IS, JS;
@@ -63,6 +65,13 @@ public:
     vector<vec> record(OutputType) override;
 
     void print() override;
+};
+
+class Damper05 final : public Damper01 {
+public:
+    using Damper01::Damper01;
+
+    int update_status() override;
 };
 
 #endif

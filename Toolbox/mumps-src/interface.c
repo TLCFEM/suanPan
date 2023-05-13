@@ -10,6 +10,7 @@
 /
 ******************************************************************************/
 
+
 #include "space.h"
 
 /*****************************************************************************
@@ -42,128 +43,132 @@
         tree T; permutation vectors perm, invp can be extracted from T by
         calling function permFromElimTree(T, perm, invp)
 ******************************************************************************/
-elimtree_t* SPACE_ordering(graph_t* G, options_t* options, timings_t* cpus) {
-	graph_t* Gc;
-	multisector_t* ms;
-	minprior_t* minprior;
-	elimtree_t *T, *T2;
-	timings_t cpusOrd[ORD_TIME_SLOTS];
-	options_t default_options[] = {
-		SPACE_ORDTYPE, SPACE_NODE_SELECTION1,
-		SPACE_NODE_SELECTION2, SPACE_NODE_SELECTION3,
-		SPACE_DOMAIN_SIZE, SPACE_MSGLVL
-	};
-	PORD_INT *vtxmap, istage, totnstep, totnzf;
-	FLOAT totops;
+elimtree_t*
+SPACE_ordering(graph_t *G, options_t *options, timings_t *cpus)
+{ graph_t       *Gc;
+  multisector_t *ms;
+  minprior_t    *minprior;
+  elimtree_t    *T, *T2;
+  timings_t	cpusOrd[ORD_TIME_SLOTS];
+  options_t     default_options[] = { SPACE_ORDTYPE, SPACE_NODE_SELECTION1,
+                       SPACE_NODE_SELECTION2, SPACE_NODE_SELECTION3,
+                       SPACE_DOMAIN_SIZE, SPACE_MSGLVL };
+  PORD_INT           *vtxmap, istage, totnstep, totnzf;
+  FLOAT         totops;
 
-	/* --------------------------------------------------
-	   set default options, if no other options specified
-	   -------------------------------------------------- */
-	if(options == NULL) options = default_options;
+  /* --------------------------------------------------
+     set default options, if no other options specified
+     -------------------------------------------------- */
+  if (options == NULL)
+    options = default_options;
 
-	/* ----------------
-	   reset all timers
-	   ---------------- */
-	pord_resettimer(cpusOrd[TIME_COMPRESS]);
-	pord_resettimer(cpusOrd[TIME_MS]);
-	pord_resettimer(cpusOrd[TIME_MULTILEVEL]);
-	pord_resettimer(cpusOrd[TIME_INITDOMDEC]);
-	pord_resettimer(cpusOrd[TIME_COARSEDOMDEC]);
-	pord_resettimer(cpusOrd[TIME_INITSEP]);
-	pord_resettimer(cpusOrd[TIME_REFINESEP]);
-	pord_resettimer(cpusOrd[TIME_SMOOTH]);
-	pord_resettimer(cpusOrd[TIME_BOTTOMUP]);
-	pord_resettimer(cpusOrd[TIME_UPDADJNCY]);
-	pord_resettimer(cpusOrd[TIME_FINDINODES]);
-	pord_resettimer(cpusOrd[TIME_UPDSCORE]);
+  /* ----------------
+     reset all timers
+     ---------------- */
+  pord_resettimer(cpusOrd[TIME_COMPRESS]);
+  pord_resettimer(cpusOrd[TIME_MS]);
+  pord_resettimer(cpusOrd[TIME_MULTILEVEL]);
+  pord_resettimer(cpusOrd[TIME_INITDOMDEC]);
+  pord_resettimer(cpusOrd[TIME_COARSEDOMDEC]);
+  pord_resettimer(cpusOrd[TIME_INITSEP]);
+  pord_resettimer(cpusOrd[TIME_REFINESEP]);
+  pord_resettimer(cpusOrd[TIME_SMOOTH]);
+  pord_resettimer(cpusOrd[TIME_BOTTOMUP]);
+  pord_resettimer(cpusOrd[TIME_UPDADJNCY]);
+  pord_resettimer(cpusOrd[TIME_FINDINODES]);
+  pord_resettimer(cpusOrd[TIME_UPDSCORE]);
 
-	/* ------------------
-	   compress the graph
-	   ------------------ */
-	pord_starttimer(cpusOrd[TIME_COMPRESS]);
-	mymalloc(vtxmap, G->nvtx, PORD_INT);
-	Gc = compressGraph(G, vtxmap);
-	pord_stoptimer(cpusOrd[TIME_COMPRESS]);
+  /* ------------------
+     compress the graph
+     ------------------ */
+  pord_starttimer(cpusOrd[TIME_COMPRESS]);
+  mymalloc(vtxmap, G->nvtx, PORD_INT);
+  Gc = compressGraph(G, vtxmap);
+  pord_stoptimer(cpusOrd[TIME_COMPRESS]);
 
-	if(Gc != NULL) {
-		if(options[OPTION_MSGLVL] > 0)
-			printf("compressed graph constructed (#nodes %d, #edges %d)\n",
-			       Gc->nvtx, Gc->nedges >> 1);
-	}
-	else {
-		Gc = G;
-		free(vtxmap);
-		if(options[OPTION_MSGLVL] > 0) printf("no compressed graph constructed\n");
-	}
+  if (Gc != NULL)
+   { if (options[OPTION_MSGLVL] > 0)
+       printf("compressed graph constructed (#nodes %d, #edges %d)\n",
+              Gc->nvtx, Gc->nedges >> 1);
+   }
+  else
+   { Gc = G;
+     free(vtxmap);
+     if (options[OPTION_MSGLVL] > 0)
+       printf("no compressed graph constructed\n");
+   }
 
-	/* -------------------
-	   compute multisector
-	   ------------------- */
+  /* -------------------
+     compute multisector
+     ------------------- */
+  
+  
+  pord_starttimer(cpusOrd[TIME_MS]);
+  ms = constructMultisector(Gc, options, cpusOrd);
+  pord_stoptimer(cpusOrd[TIME_MS]);
+	
 
-	pord_starttimer(cpusOrd[TIME_MS]);
-	ms = constructMultisector(Gc, options, cpusOrd);
-	pord_stoptimer(cpusOrd[TIME_MS]);
+  if (options[OPTION_MSGLVL] > 0)
+    printf("quality of multisector: #stages %d, #nodes %d, weight %d\n",
+           ms->nstages, ms->nnodes, ms->totmswght);
 
-	if(options[OPTION_MSGLVL] > 0)
-		printf("quality of multisector: #stages %d, #nodes %d, weight %d\n",
-		       ms->nstages, ms->nnodes, ms->totmswght);
+  /* ---------------------------------
+     compute minimum priority ordering
+     --------------------------------- */
+  pord_starttimer(cpusOrd[TIME_BOTTOMUP])
+  minprior = setupMinPriority(ms);
+  T = orderMinPriority(minprior, options, cpusOrd);
+  pord_stoptimer(cpusOrd[TIME_BOTTOMUP]);
 
-	/* ---------------------------------
-	   compute minimum priority ordering
-	   --------------------------------- */
-	pord_starttimer(cpusOrd[TIME_BOTTOMUP])
-	minprior = setupMinPriority(ms);
-	T = orderMinPriority(minprior, options, cpusOrd);
-	pord_stoptimer(cpusOrd[TIME_BOTTOMUP]);
+  if (options[OPTION_MSGLVL] > 0)
+   { totnstep = totnzf = 0;
+     totops = 0.0;
+     for (istage = 0; istage < ms->nstages; istage++)
+      { totnstep += minprior->stageinfo[istage].nstep;
+        totnzf   += minprior->stageinfo[istage].nzf;
+        totops   += minprior->stageinfo[istage].ops;
+      }
+     printf("quality of ordering: #steps %d, nzl %d, ops %e\n", totnstep,
+            totnzf, totops);
+   }
 
-	if(options[OPTION_MSGLVL] > 0) {
-		totnstep = totnzf = 0;
-		totops = 0.0;
-		for(istage = 0; istage < ms->nstages; istage++) {
-			totnstep += minprior->stageinfo[istage].nstep;
-			totnzf += minprior->stageinfo[istage].nzf;
-			totops += minprior->stageinfo[istage].ops;
-		}
-		printf("quality of ordering: #steps %d, nzl %d, ops %e\n", totnstep,
-		       totnzf, totops);
-	}
+  /* -----------------------
+     expand elimination tree
+     ----------------------- */
+  if (Gc != G)
+   { T2 = expandElimTree(T, vtxmap, G->nvtx);
+     freeElimTree(T);
+     freeGraph(Gc);
+     free(vtxmap);
+   }
+  else T2 = T;
 
-	/* -----------------------
-	   expand elimination tree
-	   ----------------------- */
-	if(Gc != G) {
-		T2 = expandElimTree(T, vtxmap, G->nvtx);
-		freeElimTree(T);
-		freeGraph(Gc);
-		free(vtxmap);
-	}
-	else T2 = T;
+  /* --------------------------------------------------
+     pull back timing results, if vector cpus available
+     -------------------------------------------------- */
+  if (cpus != NULL)
+   { cpus[0]  = cpusOrd[TIME_COMPRESS];
+     cpus[1]  = cpusOrd[TIME_MS];
+     cpus[2]  = cpusOrd[TIME_MULTILEVEL];
+     cpus[3]  = cpusOrd[TIME_INITDOMDEC];
+     cpus[4]  = cpusOrd[TIME_COARSEDOMDEC];
+     cpus[5]  = cpusOrd[TIME_INITSEP];
+     cpus[6]  = cpusOrd[TIME_REFINESEP];
+     cpus[7]  = cpusOrd[TIME_SMOOTH];
+     cpus[8]  = cpusOrd[TIME_BOTTOMUP];
+     cpus[9]  = cpusOrd[TIME_UPDADJNCY];
+     cpus[10] = cpusOrd[TIME_FINDINODES];
+     cpus[11] = cpusOrd[TIME_UPDSCORE];
+   }
 
-	/* --------------------------------------------------
-	   pull back timing results, if vector cpus available
-	   -------------------------------------------------- */
-	if(cpus != NULL) {
-		cpus[0] = cpusOrd[TIME_COMPRESS];
-		cpus[1] = cpusOrd[TIME_MS];
-		cpus[2] = cpusOrd[TIME_MULTILEVEL];
-		cpus[3] = cpusOrd[TIME_INITDOMDEC];
-		cpus[4] = cpusOrd[TIME_COARSEDOMDEC];
-		cpus[5] = cpusOrd[TIME_INITSEP];
-		cpus[6] = cpusOrd[TIME_REFINESEP];
-		cpus[7] = cpusOrd[TIME_SMOOTH];
-		cpus[8] = cpusOrd[TIME_BOTTOMUP];
-		cpus[9] = cpusOrd[TIME_UPDADJNCY];
-		cpus[10] = cpusOrd[TIME_FINDINODES];
-		cpus[11] = cpusOrd[TIME_UPDSCORE];
-	}
-
-	/* ----------------------
-	   free memory and return
-	   ---------------------- */
-	freeMultisector(ms);
-	freeMinPriority(minprior);
-	return (T2);
+  /* ----------------------
+     free memory and return
+     ---------------------- */
+  freeMultisector(ms);
+  freeMinPriority(minprior);
+  return(T2);
 }
+
 
 #if defined(cleaned_version)
 /*****************************************************************************

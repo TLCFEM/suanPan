@@ -18,7 +18,7 @@
 #include "ArcLength.h"
 #include <Converger/AbsIncreDisp.h>
 #include <Domain/Domain.h>
-#include <Domain/FactoryHelper.hpp>
+#include <Domain/Factory.hpp>
 #include <Domain/Node.h>
 #include <Solver/Integrator/Integrator.h>
 #include <Solver/Ramm.h>
@@ -61,7 +61,7 @@ int ArcLength::initialize() {
     factory->set_reference_size(1);
     factory->initialize_load_factor();
 
-    get_reference_load(factory)(t_domain->get_node(node)->get_reordered_dof().at(dof - 1)) = magnitude;
+    factory->modify_reference_load()(t_domain->get_node(node)->get_reordered_dof().at(dof - 1)) = magnitude;
 
     return SUANPAN_SUCCESS;
 }

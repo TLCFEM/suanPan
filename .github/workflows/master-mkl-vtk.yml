@@ -16,8 +16,8 @@ jobs:
           echo "SP_TIME=daily-$(date +''%Y%m%d%H'')" >> $GITHUB_ENV
           wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
           echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
-          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.5-linux.tar.gz
-          tar xf VTK-9.2.5-linux.tar.gz
+          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.6-linux.tar.gz
+          tar xf VTK-9.2.6-linux.tar.gz
       - name: Golang
         uses: actions/setup-go@v3
       - name: Compile
@@ -33,7 +33,7 @@ jobs:
           tar czf suanPan-linux-mkl-vtk.tar.gz suanPan-linux-mkl-vtk
       - name: Test
         run: |
-          sudo apt-get install ./suanPan-2.9.0-1.x86_64.deb -y
+          sudo apt-get install ./suanPan-3.0.0-1.x86_64.deb -y
           suanPan -v
           export LD_LIBRARY_PATH=/home/runner/work/suanPan/suanPan/suanPan-linux-mkl-vtk/lib
           cd suanPan-linux-mkl-vtk/bin
@@ -51,8 +51,8 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: suanPan-2.9.0-1.x86_64.deb
-          asset_name: suanPan-2.9.0-1.x86_64.deb
+          file: suanPan-3.0.0-1.x86_64.deb
+          asset_name: suanPan-3.0.0-1.x86_64.deb
           tag: ${{ env.SP_TIME }}
           prerelease: true
           overwrite: true
@@ -67,8 +67,8 @@ jobs:
           echo "SP_TIME=daily-$(date +''%Y%m%d%H'')" >> $GITHUB_ENV
           wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
           echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
-          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.5-linux.tar.gz
-          tar xf VTK-9.2.5-linux.tar.gz
+          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.6-linux.tar.gz
+          tar xf VTK-9.2.6-linux.tar.gz
       - name: Golang
         uses: actions/setup-go@v3
       - name: Compile
@@ -116,22 +116,22 @@ jobs:
         uses: actions/checkout@v3
       - name: Install MKL VTK
         run: |
-          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.5-linux.tar.gz
-          tar xf VTK-9.2.5-linux.tar.gz
+          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.6-linux.tar.gz
+          tar xf VTK-9.2.6-linux.tar.gz
       - name: Compile
         run: |
           cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.2/ -DUSE_MKL=ON -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DUSE_INTEL_OPENMP=OFF -DLINK_DYNAMIC_MKL=OFF .
           make package -j"$(nproc)"
       - name: Test
         run: |
-          dnf install ./suanPan-2.9.0-1.x86_64.rpm -y
+          dnf install ./suanPan-3.0.0-1.x86_64.rpm -y
           suanPan -v
       - name: RPM
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: suanPan-2.9.0-1.x86_64.rpm
-          asset_name: suanPan-2.9.0-1.x86_64.rpm
+          file: suanPan-3.0.0-1.x86_64.rpm
+          asset_name: suanPan-3.0.0-1.x86_64.rpm
           tag: ${{ env.SP_TIME }}
           prerelease: true
           overwrite: true

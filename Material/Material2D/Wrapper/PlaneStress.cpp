@@ -43,15 +43,6 @@ PlaneStress::PlaneStress(const unsigned T, const unsigned BT, const unsigned MI,
     , max_iteration(MI)
     , use_full_matrix(FM) { access::rw(tolerance) = 1E-12; }
 
-PlaneStress::PlaneStress(const PlaneStress& old_obj)
-    : Material2D(old_obj)
-    , base_tag(old_obj.base_tag)
-    , max_iteration(old_obj.max_iteration)
-    , use_full_matrix(old_obj.use_full_matrix)
-    , base(suanpan::make_copy(old_obj.base))
-    , trial_full_strain(old_obj.trial_full_strain)
-    , current_full_strain(old_obj.current_full_strain) {}
-
 int PlaneStress::initialize(const shared_ptr<DomainBase>& D) {
     base = suanpan::initialized_material_copy(D, base_tag);
 

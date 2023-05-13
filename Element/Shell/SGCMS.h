@@ -65,10 +65,11 @@ class SGCMS final : public ShellBase {
     static mat form_displacement_dn(const mat&, const mat&);
 
 public:
-    SGCMS(unsigned,   // tag
-          uvec&&,     // node tag
-          unsigned,   // material tag
-          double = 1. // thickness
+    SGCMS(unsigned,    // tag
+          uvec&&,      // node tag
+          unsigned,    // material tag
+          double = 1., // thickness
+          bool = false // non-linear geometry switch
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

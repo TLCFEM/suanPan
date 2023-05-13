@@ -11,4 +11,5 @@ set(Special
         Special/Spring01.cpp
         Special/Spring02.cpp
         Special/Tie.cpp
+        Special/TranslationConnector.cpp
         )

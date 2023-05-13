@@ -19,6 +19,7 @@
 #define SYNC_OSTREAM_H
 
 #include <mutex>
+#include <ostream>
 
 class sync_ostream {
     std::unique_lock<std::mutex> print_lock;

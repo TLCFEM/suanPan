@@ -7,6 +7,7 @@ set(M1D
         Material1D/Degradation/Degradation.cpp
         Material1D/Degradation/Dhakal.cpp
         Material1D/Degradation/TrilinearDegradation.cpp
+        Material1D/Elastic/AsymmElastic1D.cpp
         Material1D/Elastic/BilinearElastic1D.cpp
         Material1D/Elastic/CustomElastic1D.cpp
         Material1D/Elastic/Elastic1D.cpp
@@ -38,6 +39,7 @@ set(M1D
         Material1D/Viscosity/Kelvin.cpp
         Material1D/Viscosity/Maxwell.cpp
         Material1D/Viscosity/NonlinearViscosity.cpp
+        Material1D/Viscosity/Nonviscous01.cpp
         Material1D/Viscosity/Viscosity01.cpp
         Material1D/Viscosity/Viscosity02.cpp
         Material1D/vonMises/ArmstrongFrederick1D.cpp

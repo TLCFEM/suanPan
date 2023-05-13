@@ -22,14 +22,6 @@ Stacked::Stacked(const unsigned T, uvec&& MT)
     : Material3D(T, 0.)
     , mat_tag(std::forward<uvec>(MT)) {}
 
-Stacked::Stacked(const Stacked& old_obj)
-    : Material3D(old_obj)
-    , mat_tag(old_obj.mat_tag) {
-    mat_pool.clear();
-    mat_pool.reserve(old_obj.mat_pool.size());
-    for(const auto& I : old_obj.mat_pool) mat_pool.emplace_back(I->get_copy());
-}
-
 int Stacked::initialize(const shared_ptr<DomainBase>& D) {
     initial_stiffness.zeros(6, 6);
     mat_pool.clear();

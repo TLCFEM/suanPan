@@ -18,7 +18,7 @@
 #include "Newton.h"
 #include <Converger/Converger.h>
 #include <Domain/DomainBase.h>
-#include <Domain/FactoryHelper.hpp>
+#include <Domain/Factory.hpp>
 #include <Solver/Integrator/Integrator.h>
 
 Newton::Newton(const unsigned T, const bool IS)
@@ -42,33 +42,47 @@ int Newton::analyze() {
 
     auto aitken = false;
 
+    wall_clock t_clock;
+
     while(true) {
         // update for nodes and elements
+        t_clock.tic();
         if(SUANPAN_SUCCESS != G->update_trial_status()) return SUANPAN_FAIL;
         // process modifiers
         if(SUANPAN_SUCCESS != G->process_modifier()) return SUANPAN_FAIL;
+        D->update<Statistics::UpdateStatus>(t_clock.toc());
         // assemble resistance
+        t_clock.tic();
         G->assemble_resistance();
+        D->update<Statistics::AssembleVector>(t_clock.toc());
 
         if((initial_stiffness && counter != 0) || constant_matrix()) {
             // some loads may have resistance
+            t_clock.tic();
             if(SUANPAN_SUCCESS != G->process_load_resistance()) return SUANPAN_FAIL;
             // some constraints may have resistance
             if(SUANPAN_SUCCESS != G->process_constraint_resistance()) return SUANPAN_FAIL;
+            D->update<Statistics::ProcessConstraint>(t_clock.toc());
         }
         else {
             // first iteration
             // assemble stiffness
+            t_clock.tic();
             G->assemble_matrix();
+            D->update<Statistics::AssembleMatrix>(t_clock.toc());
             // process loads
+            t_clock.tic();
             if(SUANPAN_SUCCESS != G->process_load()) return SUANPAN_FAIL;
             // process constraints
             if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
+            D->update<Statistics::ProcessConstraint>(t_clock.toc());
             // indicate the global matrix has been assembled
             G->set_matrix_assembled_switch(true);
         }
 
         // call solver
+        t_clock.tic();
+
         auto flag = G->solve(samurai, G->get_force_residual());
 
         suanpan_assert([&] {
@@ -89,10 +103,12 @@ int Newton::analyze() {
             auto& border = W->get_auxiliary_stiffness();
             mat right;
             if(SUANPAN_SUCCESS != G->solve(right, border)) return SUANPAN_FAIL;
-            auto& aux_lambda = get_auxiliary_lambda(W);
+            auto& aux_lambda = W->modify_auxiliary_lambda();
             if(!solve(aux_lambda, border.t() * right.head_rows(n_size), border.t() * samurai.head(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
             samurai -= right * aux_lambda;
         }
+
+        D->update<Statistics::SolveSystem>(t_clock.toc());
 
         if(initial_stiffness) {
             if(!aitken) {

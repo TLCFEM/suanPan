@@ -22,7 +22,7 @@
  * @date 21/05/2020
  * @version 0.1.0
  * @file ElementGroup.h
- * @addto Domain
+ * @addtogroup Group
  * @{
  */
 

@@ -1,20 +1,41 @@
 C
-C  This file is part of MUMPS 5.2.1, released
-C  on Fri Jun 14 14:46:05 UTC 2019
+C  This file is part of MUMPS 5.6.0, released
+C  on Wed Apr 19 15:50:57 UTC 2023
 C
 C
-C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license:
-C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+C  released under the CeCILL-C license 
+C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
 C -----------------------------------------
 C  This file contains the definition
 C  of all tags.
 C -----------------------------------------
 C
+C ---------------
+C  Tags for L0OMP 
+C ---------------
+      INTEGER F_IPOOLAFTER, F_PHYS_L0
+      PARAMETER ( F_IPOOLAFTER = 60, F_PHYS_L0 = 61 )
+C -----------------
+C  Tag for grouping
+C -----------------
+      INTEGER GROUPING
+      PARAMETER ( GROUPING = 50 )
+C ----------------------------------------------
+C  Tag for LMAT distribution (analysis by block)
+C      and for gathering graph
+C ----------------------------------------------
+      INTEGER LMATDIST, GATHERG_NZG, GATHERG_NB, 
+     &        GATHERG_FIRST, GATHERG_IPE, GATHERG_ADJ, 
+     &        CENT_AFTER_PARAORD
+      PARAMETER ( LMATDIST = 43, GATHERG_NZG=44, GATHERG_NB=45,
+     &        GATHERG_FIRST=46, GATHERG_IPE=47, GATHERG_ADJ= 48, 
+     &        CENT_AFTER_PARAORD=49)
 C -----------------------------------------
 C  Tag for arrowheads distribution
 C -----------------------------------------
@@ -87,15 +108,16 @@ C -----------------------------------------
      &           ScatterRhsR  = 55,
      &           DistRhsI     = 51,
      &           DistRhsR     = 52)
+      INTEGER, PARAMETER :: TAG_WAKEUP = 53
       INTEGER, PARAMETER :: DIST_RHS_INT    = 56
       INTEGER, PARAMETER :: DIST_RHS_SCALAR = 57
 C -----------------------------------------
 C   Tags for backsolve
 C -----------------------------------------
-      INTEGER FEUILLE,
+      INTEGER TERMBWD,
      &        BACKSLV_UPDATERHS,
      &        BACKSLV_MASTER2SLAVE
-      PARAMETER( FEUILLE = 21,
+      PARAMETER( TERMBWD = 21,
      &           BACKSLV_UPDATERHS = 22,
      &           BACKSLV_MASTER2SLAVE = 23 )
 C ------------------------

@@ -186,6 +186,41 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
 
             if(domain->insert(make_shared<WilsonPenzienNewmark>(tag, damping_coef, alpha, beta))) code = 1;
         }
+        else if(is_equal(integrator_type, "NonviscousNewmark")) {
+            vector<double> m_r, s_r, m_i, s_i;
+
+            while(!command.eof()) {
+                double t_para;
+                if(!get_input(command, t_para)) {
+                    suanpan_error("A valid damping coefficient is required.\n");
+                    return SUANPAN_SUCCESS;
+                }
+                m_r.emplace_back(t_para);
+                if(!get_input(command, t_para)) {
+                    suanpan_error("A valid damping coefficient is required.\n");
+                    return SUANPAN_SUCCESS;
+                }
+                m_i.emplace_back(t_para);
+                if(!get_input(command, t_para)) {
+                    suanpan_error("A valid damping coefficient is required.\n");
+                    return SUANPAN_SUCCESS;
+                }
+                s_r.emplace_back(t_para);
+                if(!get_input(command, t_para)) {
+                    suanpan_error("A valid damping coefficient is required.\n");
+                    return SUANPAN_SUCCESS;
+                }
+                s_i.emplace_back(t_para);
+            }
+
+            auto m_imag = vec{m_i}, s_imag = vec{s_i};
+            if(accu(m_imag) + accu(s_imag) > 1E-10) {
+                suanpan_error("Parameters should be conjugate pairs.\n");
+                return SUANPAN_SUCCESS;
+            }
+
+            if(domain->insert(make_shared<NonviscousNewmark>(tag, alpha, beta, cx_vec{vec{m_r}, m_imag}, cx_vec{vec{s_r}, s_imag}))) code = 1;
+        }
     }
     else if(is_equal(integrator_type, "GeneralizedAlpha") || is_equal(integrator_type, "GeneralisedAlpha")) {
         vector<double> pool;

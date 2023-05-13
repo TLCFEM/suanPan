@@ -1,14 +1,15 @@
 C
-C  This file is part of MUMPS 5.2.1, released
-C  on Fri Jun 14 14:46:05 UTC 2019
+C  This file is part of MUMPS 5.6.0, released
+C  on Wed Apr 19 15:50:57 UTC 2023
 C
 C
-C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license:
-C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+C  released under the CeCILL-C license 
+C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
       MODULE DMUMPS_SAVE_RESTORE
       USE DMUMPS_STRUC_DEF
@@ -31,7 +32,7 @@ C
       CHARACTER :: READ_ARITH
       LOGICAL :: READ_INT_TYPE_64
       CHARACTER(len=23) :: READ_HASH
-      LOGICAL :: FORTRAN_VERSION_OK,UNIT_OK,UNIT_OP
+      LOGICAL :: FORTRAN_VERSION_OK
       LOGICAL :: SAME_OOC
       INTEGER :: ICNTL34, MAX_LENGTH, FLAG_SAME, SUM_FLAG_SAME
       TYPE (DMUMPS_STRUC) :: localid
@@ -40,11 +41,10 @@ C
       CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
      &     id%COMM, id%MYID )
       IF ( id%INFO(1) .LT. 0 ) RETURN
-      fileunit = 40
-      inquire (UNIT=fileunit,exist=UNIT_OK,opened=UNIT_OP)
-      IF(.NOT.UNIT_OK .OR. UNIT_OP) THEN
+      CALL MUMPS_FIND_UNIT(fileunit)
+      IF ( fileunit .EQ. -1 ) THEN
          id%INFO(1) = -79
-         id%INFO(2) = fileunit
+         id%INFO(2) = 0
       ENDIF
       CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
      &     id%COMM, id%MYID )
@@ -53,7 +53,7 @@ C
      &     id%COMM, id%MYID )
       IF ( id%INFO(1) .LT. 0 ) RETURN
       open(UNIT=fileunit,FILE=RESTOREFILE
-#if defined(MUMPS_F2003)
+#if ! defined(MUMPS_NOF2003)
      &     ,ACCESS="stream"
 #endif
      &     ,STATUS='old',FORM='unformatted',IOSTAT=ierr)
@@ -155,10 +155,9 @@ C
       INTEGER,allocatable, dimension(:)::SIZE_GEST_ROOT
       INTEGER:: INFO1,INFO2,INFOG1,INFOG2,allocok
       INTEGER(8) :: TOTAL_FILE_SIZE,TOTAL_STRUC_SIZE
-      LOGICAL :: UNIT_OK,UNIT_OP
       TYPE (DMUMPS_STRUC) :: localid
-      NBVARIABLES=182
-      NBVARIABLES_ROOT=35
+      NBVARIABLES=188
+      NBVARIABLES_ROOT=33
       allocate(SIZE_VARIABLES(NBVARIABLES),  stat=allocok)
       if (allocok .GT. 0) THEN
        localid%INFO(1)  =-13
@@ -203,17 +202,16 @@ C
       INFOG2 = -999
       CALL DMUMPS_GET_SAVE_FILES(localid,restore_file_ooc,INFO_FILE)
       IF ( localid%INFO(1) .LT. 0 ) RETURN
-      IN=50
-      inquire(UNIT=IN,exist=UNIT_OK,opened=UNIT_OP)
-      IF(.NOT.UNIT_OK .OR. UNIT_OP) THEN
+      CALL MUMPS_FIND_UNIT(IN)
+      IF ( IN .EQ. -1 ) THEN
          localid%INFO(1) = -79
-         localid%INFO(2) = IN
+         localid%INFO(2) = 0
       ENDIF
       CALL MUMPS_PROPINFO( localid%ICNTL(1), localid%INFO(1),
      &     localid%COMM, localid%MYID )
       IF ( localid%INFO(1) .LT. 0 ) RETURN
       open(UNIT=IN,FILE=restore_file_ooc
-#if defined(MUMPS_F2003)
+#if ! defined(MUMPS_NOF2003)
      &     ,ACCESS="stream"
 #endif
      &     ,STATUS='old',form='unformatted',iostat=ierr)
@@ -245,8 +243,8 @@ C
       INTEGER :: INFO1,INFO2,INFOG1,INFOG2,allocok
       INTEGER(8) :: TOTAL_FILE_SIZE,TOTAL_STRUC_SIZE
       TYPE (DMUMPS_STRUC) :: id
-      NBVARIABLES=182
-      NBVARIABLES_ROOT=35
+      NBVARIABLES=188
+      NBVARIABLES_ROOT=33
       allocate(SIZE_VARIABLES(NBVARIABLES),  stat=allocok)
       if (allocok .GT. 0) THEN
        id%INFO(1)  =-13
@@ -309,7 +307,7 @@ C
       INTEGER,allocatable, dimension(:)::SIZE_GEST_ROOT
       INTEGER:: INFO1,INFO2,INFOG1,INFOG2,MPG
       INTEGER(8) :: TOTAL_FILE_SIZE,TOTAL_STRUC_SIZE
-      LOGICAL :: PROKG,UNIT_OK,UNIT_OP
+      LOGICAL :: PROKG
       INTEGER :: I,J,K,H,allocok
       CHARACTER(len=1) :: TMP_OOC_NAMES(350)
       TYPE (DMUMPS_STRUC) :: id
@@ -323,8 +321,8 @@ C
       id%INFOG(2)=0
       MPG= id%ICNTL(3)
       PROKG   = ( MPG .GT. 0 .and. id%MYID .eq. 0 )
-      NBVARIABLES=182
-      NBVARIABLES_ROOT=35
+      NBVARIABLES=188
+      NBVARIABLES_ROOT=33
       allocate(SIZE_VARIABLES(NBVARIABLES),  stat=allocok)
       if (allocok .GT. 0) THEN
        id%INFO(1)  =-13
@@ -379,17 +377,16 @@ C
       CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
      &     id%COMM, id%MYID )
       IF ( id%INFO(1) .LT. 0 ) RETURN
-      OUT=60
-      inquire (UNIT=OUT,exist=UNIT_OK,opened=UNIT_OP)
-      IF(.NOT.UNIT_OK .OR. UNIT_OP) THEN
+      CALL MUMPS_FIND_UNIT(OUT)
+      IF ( OUT .EQ. -1 ) THEN
          id%INFO(1) = -79
-         id%INFO(2) = OUT
+         id%INFO(2) = 0
       ENDIF
       CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
      &     id%COMM, id%MYID )
       IF ( id%INFO(1) .LT. 0 ) RETURN
       open(UNIT=OUT,FILE=SAVE_FILE
-#if defined(MUMPS_F2003)
+#if ! defined(MUMPS_NOF2003)
      &     ,ACCESS="stream"
 #endif
      &     ,STATUS='new',form='unformatted',iostat=ierr)
@@ -408,11 +405,10 @@ C
       CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
      &     id%COMM, id%MYID )
       IF ( id%INFO(1) .LT. 0 ) RETURN
-      OUTINFO=70
-      inquire (UNIT=OUTINFO,exist=UNIT_OK,opened=UNIT_OP)
-      IF(.NOT.UNIT_OK .OR. UNIT_OP) THEN
+      CALL MUMPS_FIND_UNIT(OUTINFO)
+      IF ( OUTINFO .EQ. -1 ) THEN
          id%INFO(1) = -79
-         id%INFO(2) = OUTINFO
+         id%INFO(2) = 0
       ENDIF
       CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
      &     id%COMM, id%MYID )
@@ -430,17 +426,19 @@ C
      &     ,NBVARIABLES_ROOT,SIZE_VARIABLES_ROOT,SIZE_GEST_ROOT
      &     ,TOTAL_FILE_SIZE,TOTAL_STRUC_SIZE
      &     ,INFO1,INFO2,INFOG1,INFOG2)
-      if(id%INFO(1).EQ.0) then
-         id%INFO(1)=INFO1
-         id%INFO(2)=INFO2
-         id%INFOG(1)=INFOG1
-         id%INFOG(2)=INFOG2
-         CLOSE(OUT)
-         if(id%INFO(1).NE.0) then
-            write(MPG,*) "Warning: "
+      if (id%INFO(1).EQ.0) then
+        id%INFO(1)=INFO1
+        id%INFO(2)=INFO2
+        id%INFOG(1)=INFOG1
+        id%INFOG(2)=INFOG2
+        CLOSE(OUT)
+        if(id%INFOG(1).NE.0) then
+           if (PROKG) THEN
+             write(MPG,*) "Warning: "
      &           ,"saved instance has negative INFO(1):"
-     &           , id%INFO(1)
-         endif
+     &           , id%INFOG(1)
+           endif
+        endif
         IF(PROKG) THEN
            write(MPG,*) "Save done successfully"
            IF(id%KEEP(201).EQ.1) THEN
@@ -475,8 +473,8 @@ C
         ELSE
            write(OUTINFO,*) "With a default integer size of 32 bits"
         ENDIF
-#if defined(MUMPS_F2003)
-        write(OUTINFO,*) "Using MUMPS_F2003"
+#if defined(MUMPS_NOF2003)
+        write(OUTINFO,*) "Using MUMPS_NOF2003"
 #endif        
         write(OUTINFO,*) ''
         write(OUTINFO,*) "The corresponding save file is:"
@@ -519,12 +517,12 @@ C
       INTEGER,allocatable, dimension(:)::SIZE_GEST_ROOT
       INTEGER:: INFO1,INFO2,INFOG1,INFOG2,MPG,MP,JOB
       INTEGER(8) :: TOTAL_FILE_SIZE,TOTAL_STRUC_SIZE
-      LOGICAL :: PROKG,UNIT_OK,UNIT_OP
+      LOGICAL :: PROKG
       INTEGER :: I,J,K,H,allocok
       CHARACTER(len=1) :: TMP_OOC_NAMES(350)
       TYPE (DMUMPS_STRUC) :: id
-      NBVARIABLES=182
-      NBVARIABLES_ROOT=35
+      NBVARIABLES=188
+      NBVARIABLES_ROOT=33
       allocate(SIZE_VARIABLES(NBVARIABLES),  stat=allocok)
       if (allocok .GT. 0) THEN
        id%INFO(1)  =-13
@@ -570,17 +568,16 @@ C
       INFOG2 = -999
       CALL DMUMPS_GET_SAVE_FILES(id,restore_file,INFO_FILE)
       IF ( id%INFO(1) .LT. 0 ) RETURN
-      IN=80
-      inquire (UNIT=IN,exist=UNIT_OK,opened=UNIT_OP)
-      IF(.NOT.UNIT_OK .OR. UNIT_OP) THEN
+      CALL MUMPS_FIND_UNIT(IN)
+      IF ( IN .EQ. -1 ) THEN
          id%INFO(1) = -79
-         id%INFO(2) = IN
+         id%INFO(2) = 0
       ENDIF
       CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
      &     id%COMM, id%MYID )
       IF ( id%INFO(1) .LT. 0 ) RETURN
       open(UNIT=IN,FILE=restore_file
-#if defined(MUMPS_F2003)
+#if ! defined(MUMPS_NOF2003)
      &     ,ACCESS="stream"
 #endif
      &     ,STATUS='old',form='unformatted',iostat=ierr)
@@ -604,10 +601,10 @@ C
          id%INFO(2)=INFO2
          id%INFOG(1)=INFOG1
          id%INFOG(2)=INFOG2
-         if(id%INFO(1).NE.0) then
+         if(id%INFOG(1).NE.0) then
             write(MPG,*) "Warning: "
-     &           ,"restored instance has negative INFO(1):"
-     &           , id%INFO(1)
+     &           ,"restored instance has negative INFOG(1):"
+     &           , id%INFOG(1)
          endif
          if(MP.GT.0) then
             JOB=id%KEEP(40)+456789
@@ -655,6 +652,8 @@ C
      &     ,NBVARIABLES_ROOT,SIZE_VARIABLES_ROOT,SIZE_GEST_ROOT
      &     ,TOTAL_FILE_SIZE,TOTAL_STRUC_SIZE
      &     ,INFO1,INFO2,INFOG1,INFOG2)
+      USE DMUMPS_FACSOL_L0OMP_M, ONLY : DMUMPS_SAVE_RESTORE_L0FACARRAY
+      IMPLICIT NONE
       INCLUDE 'mpif.h'
       INTEGER,intent(in)::unit,NBVARIABLES,NBVARIABLES_ROOT
       CHARACTER(len=*),intent(in) :: mode
@@ -665,8 +664,9 @@ C
       INTEGER(8) :: TOTAL_FILE_SIZE,TOTAL_STRUC_SIZE
       INTEGER:: INFO1,INFO2,INFOG1,INFOG2
       INTEGER:: j,i1,i2,err,ierr
-      CHARACTER(len=100), allocatable, dimension(:)::VARIABLES
-      CHARACTER(len=100), allocatable, dimension(:)::VARIABLES_ROOT
+      CHARACTER(len=30), allocatable, dimension(:)::VARIABLES
+      CHARACTER(len=30), allocatable, dimension(:)::VARIABLES_ROOT
+      CHARACTER(len=30) :: TMP_STRING1, TMP_STRING2
       CHARACTER :: ARITH,READ_ARITH
       INTEGER(8) :: size_written,gest_size,WRITTEN_STRUC_SIZE
       INTEGER:: SIZE_INT, SIZE_INT8, SIZE_RL_OR_DBL, SIZE_ARITH_DEP
@@ -692,8 +692,11 @@ C
       LOGICAL:: BASIC_CHECK
       LOGICAL :: FORTRAN_VERSION_OK
       CHARACTER(len=1) :: TMP_OOC_NAMES(350)
-      INTEGER(8)::SIZE_VARIABLES_BLR,SIZE_VARIABLES_FRONT_DATA
-      INTEGER::SIZE_GEST_BLR,SIZE_GEST_FRONT_DATA
+      INTEGER(8)::SIZE_VARIABLES_BLR,SIZE_VARIABLES_FRONT_DATA,
+     &            SIZE_VARIABLES_L0FAC
+      INTEGER::SIZE_GEST_BLR,SIZE_GEST_FRONT_DATA,SIZE_GEST_L0FAC
+      INTEGER :: KEEP410_SAVE, KEEP411_SAVE 
+      INTEGER(4) :: I4
       TYPE (DMUMPS_STRUC) :: id
       allocate(VARIABLES(NBVARIABLES),  stat=allocok)
       if (allocok .GT. 0) THEN
@@ -703,24 +706,30 @@ C
       CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
      &     id%COMM, id%MYID )
       IF ( id%INFO(1) .LT. 0 ) GOTO 100
-      VARIABLES(182)="ASSOCIATED_OOC_FILES"
-      VARIABLES(181)="NB_SINGULAR_VALUES"
-      VARIABLES(180)="SINGULAR_VALUES"
-      VARIABLES(179)="MPITOOMP_PROCS_MAP"
-      VARIABLES(178)="L0_OMP_MAPPING"
-      VARIABLES(177)="PTR_LEAFS_L0_OMP"
-      VARIABLES(176)="PERM_L0_OMP"
-      VARIABLES(175)="VIRT_L0_OMP"
-      VARIABLES(174)="PHYS_L0_OMP"
-      VARIABLES(173)="IPOOL_AFTER_L0_OMP"
-      VARIABLES(172)="IPOOL_BEFORE_L0_OMP"
-      VARIABLES(171)="THREAD_LA"
-      VARIABLES(170)="pad15"
-      VARIABLES(169)="LL0_OMP_MAPPING"
-      VARIABLES(168)="L_VIRT_L0_OMP"
-      VARIABLES(167)="L_PHYS_L0_OMP"
-      VARIABLES(166)="LPOOL_BEFORE_L0_OMP"
-      VARIABLES(165)="LPOOL_AFTER_L0_OMP"
+      VARIABLES(188)="ASSOCIATED_OOC_FILES"
+      VARIABLES(187)="pad16"
+      VARIABLES(186)="Deficiency"
+      VARIABLES(185)="NB_SINGULAR_VALUES"
+      VARIABLES(184)="SINGULAR_VALUES"
+      VARIABLES(183)="MPITOOMP_PROCS_MAP"
+      VARIABLES(182)="L0_OMP_MAPPING"
+      VARIABLES(181)="PTR_LEAFS_L0_OMP"
+      VARIABLES(180)="PERM_L0_OMP"
+      VARIABLES(179)="VIRT_L0_OMP_MAPPING"
+      VARIABLES(178)="VIRT_L0_OMP"
+      VARIABLES(177)="PHYS_L0_OMP"
+      VARIABLES(176)="IPOOL_A_L0_OMP"
+      VARIABLES(175)="IPOOL_B_L0_OMP"
+      VARIABLES(174)="I8_L0_OMP"
+      VARIABLES(173)="I4_L0_OMP"
+      VARIABLES(172)="THREAD_LA"
+      VARIABLES(171)="LL0_OMP_FACTORS"
+      VARIABLES(170)="LL0_OMP_MAPPING"
+      VARIABLES(169)="L_VIRT_L0_OMP"
+      VARIABLES(168)="L_PHYS_L0_OMP"
+      VARIABLES(167)="LPOOL_B_L0_OMP"
+      VARIABLES(166)="LPOOL_A_L0_OMP"
+      VARIABLES(165)="L0_OMP_FACTORS"
       VARIABLES(164)="BLRARRAY_ENCODING"
       VARIABLES(163)="FDM_F_ENCODING"
       VARIABLES(162)="pad13"
@@ -774,90 +783,90 @@ C
       VARIABLES(114)="ELTPROC"
       VARIABLES(113)="LELTVAR"
       VARIABLES(112)="NELT_loc"
-      VARIABLES(111)="DBLARR"
-      VARIABLES(110)="INTARR"
-      VARIABLES(109)="PROCNODE"
-      VARIABLES(108)="S"
-      VARIABLES(107)="PTRFAC"
-      VARIABLES(106)="PTLUST_S"
-      VARIABLES(105)="PROCNODE_STEPS"
-      VARIABLES(104)="NA"
-      VARIABLES(103)="PTRAR"
-      VARIABLES(102)="FRTELT"
-      VARIABLES(101)="FRTPTR"
-      VARIABLES(100)="FILS"
-      VARIABLES(99)="DAD_STEPS"
-      VARIABLES(98)="FRERE_STEPS"
-      VARIABLES(97)="Step2node"
-      VARIABLES(96)="ND_STEPS"
-      VARIABLES(95)="NE_STEPS"
-      VARIABLES(94)="STEP"
-      VARIABLES(93)="NBSA"
-      VARIABLES(92)="LNA"
-      VARIABLES(91)="KEEP"
-      VARIABLES(90)="Deficiency"
-      VARIABLES(89)="MAXIS1"
-      VARIABLES(88)="IS1"
-      VARIABLES(87)="IS"
-      VARIABLES(86)="BUFR"
-      VARIABLES(85)="LBUFR_BYTES"
-      VARIABLES(84)="LBUFR"
-      VARIABLES(83)="ASS_IRECV"
-      VARIABLES(82)="NSLAVES"
-      VARIABLES(81)="NPROCS"
-      VARIABLES(80)="MYID"
-      VARIABLES(79)="COMM_LOAD"
-      VARIABLES(78)="MYID_NODES"
-      VARIABLES(77)="COMM_NODES"
-      VARIABLES(76)="INST_Number"
-      VARIABLES(75)="MAX_SURF_MASTER"
-      VARIABLES(74)="KEEP8"
-      VARIABLES(73)="pad8"
-      VARIABLES(72)="SAVE_PREFIX"
-      VARIABLES(71)="SAVE_DIR"
-      VARIABLES(70)="WRITE_PROBLEM"
-      VARIABLES(69)="OOC_PREFIX"
-      VARIABLES(68)="OOC_TMPDIR"
-      VARIABLES(67)="VERSION_NUMBER"
-      VARIABLES(66)="MAPPING"
-      VARIABLES(65)="LISTVAR_SCHUR"
-      VARIABLES(64)="SCHUR_CINTERFACE"
-      VARIABLES(63)="SCHUR"
-      VARIABLES(62)="SIZE_SCHUR"
-      VARIABLES(61)="SCHUR_LLD"
-      VARIABLES(60)="SCHUR_NLOC"
-      VARIABLES(59)="SCHUR_MLOC"
-      VARIABLES(58)="NBLOCK"
-      VARIABLES(57)="MBLOCK"
-      VARIABLES(56)="NPCOL"
-      VARIABLES(55)="NPROW"
-      VARIABLES(54)="UNS_PERM"
-      VARIABLES(53)="SYM_PERM"
-      VARIABLES(52)="METIS_OPTIONS"
-      VARIABLES(51)="RINFOG"
-      VARIABLES(50)="RINFO"
-      VARIABLES(49)="CNTL"
-      VARIABLES(48)="COST_SUBTREES"
-      VARIABLES(47)="INFOG"
-      VARIABLES(46)="INFO"
-      VARIABLES(45)="ICNTL"
-      VARIABLES(44)="pad5"
-      VARIABLES(43)="LSOL_loc"
-      VARIABLES(42)="LREDRHS"
-      VARIABLES(41)="LRHS_loc"
-      VARIABLES(40)="Nloc_RHS"
-      VARIABLES(39)="NZ_RHS"
-      VARIABLES(38)="NRHS"
-      VARIABLES(37)="LRHS"
-      VARIABLES(36)="IRHS_loc"
-      VARIABLES(35)="ISOL_loc"
-      VARIABLES(34)="IRHS_PTR"
-      VARIABLES(33)="IRHS_SPARSE"
-      VARIABLES(32)="RHS_loc"
-      VARIABLES(31)="SOL_loc"
-      VARIABLES(30)="RHS_SPARSE"
-      VARIABLES(29)="REDRHS"
-      VARIABLES(28)="RHS"
+      VARIABLES(111)="PROCNODE"
+      VARIABLES(110)="S"
+      VARIABLES(109)="PTRFAC"
+      VARIABLES(108)="PTLUST_S"
+      VARIABLES(107)="Step2node"
+      VARIABLES(106)="PROCNODE_STEPS"
+      VARIABLES(105)="NA"
+      VARIABLES(104)="PTRDEBARR"
+      VARIABLES(103)="NINROWARR"
+      VARIABLES(102)="NINCOLARR"
+      VARIABLES(101)="PTR8ARR"
+      VARIABLES(100)="PTRAR"
+      VARIABLES(99)="FRTELT"
+      VARIABLES(98)="FRTPTR"
+      VARIABLES(97)="FILS"
+      VARIABLES(96)="DAD_STEPS"
+      VARIABLES(95)="FRERE_STEPS"
+      VARIABLES(94)="ND_STEPS"
+      VARIABLES(93)="NE_STEPS"
+      VARIABLES(92)="STEP"
+      VARIABLES(91)="NBSA"
+      VARIABLES(90)="LNA"
+      VARIABLES(89)="KEEP"
+      VARIABLES(88)="IS"
+      VARIABLES(87)="ASS_IRECV"
+      VARIABLES(86)="NSLAVES"
+      VARIABLES(85)="NPROCS"
+      VARIABLES(84)="MYID"
+      VARIABLES(83)="COMM_LOAD"
+      VARIABLES(82)="MYID_NODES"
+      VARIABLES(81)="COMM_NODES"
+      VARIABLES(80)="INST_Number"
+      VARIABLES(79)="MAX_SURF_MASTER"
+      VARIABLES(78)="KEEP8"
+      VARIABLES(77)="pad7"
+      VARIABLES(76)="SAVE_PREFIX"
+      VARIABLES(75)="SAVE_DIR"
+      VARIABLES(74)="WRITE_PROBLEM"
+      VARIABLES(73)="OOC_PREFIX"
+      VARIABLES(72)="OOC_TMPDIR"
+      VARIABLES(71)="VERSION_NUMBER"
+      VARIABLES(70)="MAPPING"
+      VARIABLES(69)="LISTVAR_SCHUR"
+      VARIABLES(68)="SCHUR_CINTERFACE"
+      VARIABLES(67)="SCHUR"
+      VARIABLES(66)="SIZE_SCHUR"
+      VARIABLES(65)="SCHUR_LLD"
+      VARIABLES(64)="SCHUR_NLOC"
+      VARIABLES(63)="SCHUR_MLOC"
+      VARIABLES(62)="NBLOCK"
+      VARIABLES(61)="MBLOCK"
+      VARIABLES(60)="NPCOL"
+      VARIABLES(59)="NPROW"
+      VARIABLES(58)="UNS_PERM"
+      VARIABLES(57)="SYM_PERM"
+      VARIABLES(56)="METIS_OPTIONS"
+      VARIABLES(55)="RINFOG"
+      VARIABLES(54)="RINFO"
+      VARIABLES(53)="CNTL"
+      VARIABLES(52)="COST_SUBTREES"
+      VARIABLES(51)="INFOG"
+      VARIABLES(50)="INFO"
+      VARIABLES(49)="ICNTL"
+      VARIABLES(48)="pad6"
+      VARIABLES(47)="LSOL_loc"
+      VARIABLES(46)="LREDRHS"
+      VARIABLES(45)="LRHS_loc"
+      VARIABLES(44)="Nloc_RHS"
+      VARIABLES(43)="NZ_RHS"
+      VARIABLES(42)="NRHS"
+      VARIABLES(41)="LRHS"
+      VARIABLES(40)="IRHS_loc"
+      VARIABLES(39)="ISOL_loc"
+      VARIABLES(38)="IRHS_PTR"
+      VARIABLES(37)="IRHS_SPARSE"
+      VARIABLES(36)="RHS_loc"
+      VARIABLES(35)="SOL_loc"
+      VARIABLES(34)="RHS_SPARSE"
+      VARIABLES(33)="REDRHS"
+      VARIABLES(32)="RHS"
+      VARIABLES(31)="BLKVAR"
+      VARIABLES(30)="BLKPTR"
+      VARIABLES(29)="pad5"
+      VARIABLES(28)="NBLK"
       VARIABLES(27)="PERM_IN"
       VARIABLES(26)="pad4"
       VARIABLES(25)="A_ELT"
@@ -893,25 +902,23 @@ C
       CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
      &        id%COMM, id%MYID )
       IF ( id%INFO(1) .LT. 0 ) GOTO 100
-      VARIABLES_ROOT(35)="rootpad4"
-      VARIABLES_ROOT(34)="NB_SINGULAR_VALUES"
-      VARIABLES_ROOT(33)="SINGULAR_VALUES"
-      VARIABLES_ROOT(32)="SVD_VT"
-      VARIABLES_ROOT(31)="SVD_U"
-      VARIABLES_ROOT(30)="gridinit_done"
-      VARIABLES_ROOT(29)="yes"
-      VARIABLES_ROOT(28)="rootpad3"
-      VARIABLES_ROOT(27)="QR_RCOND"
-      VARIABLES_ROOT(26)="rootpad"
-      VARIABLES_ROOT(25)="RHS_ROOT"
+      VARIABLES_ROOT(33)="rootpad4"
+      VARIABLES_ROOT(32)="NB_SINGULAR_VALUES"
+      VARIABLES_ROOT(31)="SINGULAR_VALUES"
+      VARIABLES_ROOT(30)="SVD_VT"
+      VARIABLES_ROOT(29)="SVD_U"
+      VARIABLES_ROOT(28)="gridinit_done"
+      VARIABLES_ROOT(27)="yes"
+      VARIABLES_ROOT(26)="rootpad3"
+      VARIABLES_ROOT(25)="QR_RCOND"
       VARIABLES_ROOT(24)="rootpad2"
-      VARIABLES_ROOT(23)="QR_TAU"
-      VARIABLES_ROOT(22)="SCHUR_POINTER"
-      VARIABLES_ROOT(21)="RHS_CNTR_MASTER_ROOT"
-      VARIABLES_ROOT(20)="rootpad1"
-      VARIABLES_ROOT(19)="IPIV"
-      VARIABLES_ROOT(18)="RG2L_COL"
-      VARIABLES_ROOT(17)="RG2L_ROW"
+      VARIABLES_ROOT(23)="RHS_ROOT"
+      VARIABLES_ROOT(22)="rootpad1"
+      VARIABLES_ROOT(21)="QR_TAU"
+      VARIABLES_ROOT(20)="SCHUR_POINTER"
+      VARIABLES_ROOT(19)="RHS_CNTR_MASTER_ROOT"
+      VARIABLES_ROOT(18)="IPIV"
+      VARIABLES_ROOT(17)="RG2L"
       VARIABLES_ROOT(16)="rootpad0"
       VARIABLES_ROOT(15)="LPIV"
       VARIABLES_ROOT(14)="CNTXT_BLACS"
@@ -950,6 +957,8 @@ C
       SIZE_GEST_BLR=0
       SIZE_VARIABLES_FRONT_DATA=0_8
       SIZE_GEST_FRONT_DATA=0
+      SIZE_VARIABLES_L0FAC=0
+      SIZE_GEST_L0FAC=0
       if(trim(mode).EQ."memory_save") then
       elseif(trim(mode).EQ."save") then
          write(unit,iostat=err) "MUMPS"
@@ -962,7 +971,7 @@ C
      &        id%COMM, id%MYID )
          IF ( id%INFO(1) .LT. 0 ) GOTO 100
          size_written=size_written+int(5*SIZE_CHARACTER,kind=8)
-#if !defined(MUMPS_F2003)
+#if defined(MUMPS_NOF2003)
          size_written=size_written
      &        +int(2*id%KEEP(34)*1,kind=8)
 #endif
@@ -981,7 +990,7 @@ C
      &        id%COMM, id%MYID )
          IF ( id%INFO(1) .LT. 0 ) GOTO 100
          size_written=size_written+int(23*SIZE_CHARACTER,kind=8)
-#if !defined(MUMPS_F2003)
+#if defined(MUMPS_NOF2003)
          size_written=size_written
      &        +int(2*id%KEEP(34)*1,kind=8)
 #endif
@@ -995,7 +1004,7 @@ C
      &        id%COMM, id%MYID )
          IF ( id%INFO(1) .LT. 0 ) GOTO 100
          size_written=size_written+int(2*SIZE_INT8,kind=8)
-#if !defined(MUMPS_F2003)
+#if defined(MUMPS_NOF2003)
          size_written=size_written
      &        +int(2*id%KEEP(34)*1,kind=8)
 #endif
@@ -1010,7 +1019,7 @@ C
      &        id%COMM, id%MYID )
          IF ( id%INFO(1) .LT. 0 ) GOTO 100
          size_written=size_written+int(1,kind=8)
-#if !defined(MUMPS_F2003)
+#if defined(MUMPS_NOF2003)
          size_written=size_written
      &        +int(2*id%KEEP(34)*1,kind=8)
 #endif
@@ -1024,7 +1033,7 @@ C
      &        id%COMM, id%MYID )
          IF ( id%INFO(1) .LT. 0 ) GOTO 100
          size_written=size_written+int(3*SIZE_INT,kind=8)
-#if !defined(MUMPS_F2003)
+#if defined(MUMPS_NOF2003)
          size_written=size_written
      &        +int(2*id%KEEP(34)*1,kind=8)
 #endif
@@ -1043,7 +1052,7 @@ C
      &        id%COMM, id%MYID )
          IF ( id%INFO(1) .LT. 0 ) GOTO 100
          size_written=size_written+int(SIZE_LOGICAL,kind=8)
-#if !defined(MUMPS_F2003)
+#if defined(MUMPS_NOF2003)
          size_written=size_written
      &        +int(2*id%KEEP(34)*1,kind=8)
 #endif
@@ -1059,7 +1068,7 @@ C
      &           id%COMM, id%MYID )
             IF ( id%INFO(1) .LT. 0 ) GOTO 100
             size_written=size_written+int(SIZE_INT,kind=8)
-#if !defined(MUMPS_F2003)
+#if defined(MUMPS_NOF2003)
             size_written=size_written
      &           +int(2*id%KEEP(34)*1,kind=8)
 #endif
@@ -1077,7 +1086,7 @@ C
             IF ( id%INFO(1) .LT. 0 ) GOTO 100
             size_written=size_written
      &           +int(id%OOC_FILE_NAME_LENGTH(1)*SIZE_CHARACTER,kind=8)
-#if !defined(MUMPS_F2003)
+#if defined(MUMPS_NOF2003)
             size_written=size_written
      &           +int(2*id%KEEP(34)*1,kind=8)
 #endif
@@ -1092,7 +1101,7 @@ C
      &           id%COMM, id%MYID )
             IF ( id%INFO(1) .LT. 0 ) GOTO 100
             size_written=size_written+int(SIZE_INT,kind=8)
-#if !defined(MUMPS_F2003)
+#if defined(MUMPS_NOF2003)
             size_written=size_written
      &           +int(2*id%KEEP(34)*1,kind=8)
 #endif
@@ -1106,7 +1115,7 @@ C
      &           id%COMM, id%MYID )
             IF ( id%INFO(1) .LT. 0 ) GOTO 100
             size_written=size_written+int(SIZE_INT,kind=8)
-#if !defined(MUMPS_F2003)
+#if defined(MUMPS_NOF2003)
             size_written=size_written
      &           +int(2*id%KEEP(34)*1,kind=8)
 #endif
@@ -1149,7 +1158,8 @@ C
       endif
       DO j=1,size(OOC_INDICES)
          i1=OOC_INDICES(j)
-         SELECT CASE(trim(adjustl(VARIABLES(i1))))
+         TMP_STRING1 = VARIABLES(i1)
+         SELECT CASE(TMP_STRING1)
          CASE("OOC_NB_FILES")
             NbRecords(i1)=2
             if(trim(mode).EQ."memory_save") then
@@ -1327,7 +1337,8 @@ C
      &                 stat=allocok)
                   if (allocok .GT. 0) THEN
                      id%INFO(1) = -78
-                     CALL MUMPS_SETI8TOI4(size_array1*size_array2
+                     CALL MUMPS_SETI8TOI4(
+     &                    TOTAL_STRUC_SIZE-size_allocated
      &                    ,id%INFO(2))
                   endif
                   read(unit,iostat=err) id%OOC_FILE_NAMES
@@ -1435,7 +1446,8 @@ C
          goto 200
       endif
       DO i1=1,NBVARIABLES 
-         SELECT CASE(trim(adjustl(VARIABLES(i1))))
+         TMP_STRING1 = VARIABLES(i1)
+         SELECT CASE(TMP_STRING1)
          CASE("COMM")
             if(trim(mode).EQ."memory_save") then
                DIFF_SIZE_ALLOC_READ(i1)=SIZE_INT
@@ -1758,7 +1770,11 @@ C
                IF ( id%INFO(1) .LT. 0 ) GOTO 100
             elseif(trim(mode).EQ."restore") then
                SIZE_VARIABLES(i1)=SIZE_INT*size(id%KEEP,1)
+               KEEP410_SAVE = id%KEEP(410)
+               KEEP411_SAVE = id%KEEP(411)
                read(unit,iostat=err) id%KEEP
+               id%KEEP(410) = KEEP410_SAVE
+               id%KEEP(411) = KEEP411_SAVE
                if(err.ne.0) THEN
                   id%INFO(1) = -75
                   CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
@@ -2090,10 +2106,38 @@ C
      &              id%COMM, id%MYID )
                IF ( id%INFO(1) .LT. 0 ) GOTO 100
             endif
+         CASE("NBLK")
+            NbRecords(i1)=1
+            if(trim(mode).EQ."memory_save") then
+               SIZE_VARIABLES(i1)=SIZE_INT
+            elseif(trim(mode).EQ."save") then
+               write(unit,iostat=err) id%NBLK
+               if(err.ne.0) then
+                  id%INFO(1) = -72
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                 id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+            elseif(trim(mode).EQ."restore") then
+               SIZE_VARIABLES(i1)=SIZE_INT
+               read(unit,iostat=err) id%NBLK
+               if(err.ne.0) THEN
+                  id%INFO(1) = -75
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
+     &                 ,id%INFO(2))
+               endif 
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+            endif
          CASE("ELTPTR")
          CASE("ELTVAR")
          CASE("A_ELT")
          CASE("PERM_IN")
+         CASE("BLKPTR")
+         CASE("BLKVAR")
          CASE("RHS")
          CASE("REDRHS")
          CASE("RHS_SPARSE")
@@ -2236,87 +2280,9 @@ C
                IF ( id%INFO(1) .LT. 0 ) GOTO 100
             endif
          CASE("SYM_PERM")
-            NbRecords(i1)=2
-            if(trim(mode).EQ."memory_save") then
-               NbRecords(i1)=2
-               IF(associated(id%SYM_PERM)) THEN
-                  SIZE_GEST(i1)=SIZE_INT
-                  SIZE_VARIABLES(i1)=size(id%SYM_PERM,1)*SIZE_INT
-               ELSE
-                  SIZE_GEST(i1)=SIZE_INT*2
-                  SIZE_VARIABLES(i1)=0_8
-               ENDIF
-            elseif(trim(mode).EQ."save") then
-               IF(associated(id%SYM_PERM)) THEN
-                  write(unit,iostat=err) size(id%SYM_PERM,1)
-                  if(err.ne.0) then
-                     id%INFO(1) = -72
-                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
-     &                    id%INFO(2))
-                  endif
-                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
-     &              id%COMM, id%MYID )
-                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
-                  write(unit,iostat=err) id%SYM_PERM
-               ELSE
-                  write(unit,iostat=err) -999
-                  if(err.ne.0) then
-                     id%INFO(1) = -72
-                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
-     &                    id%INFO(2))
-                  endif
-                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
-     &                 id%COMM, id%MYID )
-                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
-                  write(unit,iostat=err) -999
-               ENDIF 
-               if(err.ne.0) then
-                  id%INFO(1) = -72
-                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
-     &                 id%INFO(2))
-               endif
-               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
-     &              id%COMM, id%MYID )
-               IF ( id%INFO(1) .LT. 0 ) GOTO 100
-            elseif(trim(mode).EQ."restore") then
-               nullify(id%SYM_PERM)
-               read(unit,iostat=err) size_array1
-               if(err.ne.0) THEN
-                  id%INFO(1) = -75
-                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
-     &                 ,id%INFO(2))
-               endif
-               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
-     &              id%COMM, id%MYID )
-               IF ( id%INFO(1) .LT. 0 ) GOTO 100
-               if(size_array1.EQ.-999) then
-                  SIZE_GEST(i1)=SIZE_INT*2
-                  SIZE_VARIABLES(i1)=0_8
-                  read(unit,iostat=err) dummy
-               else
-                  SIZE_GEST(i1)=SIZE_INT
-                  SIZE_VARIABLES(i1)=size_array1*SIZE_INT
-                  allocate(id%SYM_PERM(size_array1), stat=allocok)
-                  if (allocok .GT. 0) THEN
-                     id%INFO(1) = -78
-                     CALL MUMPS_SETI8TOI4(
-     &                    TOTAL_STRUC_SIZE-size_allocated
-     &                    ,id%INFO(2))
-                  endif
-                  read(unit,iostat=err) id%SYM_PERM
-               endif
-               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
-     &              id%COMM, id%MYID )
-               IF ( id%INFO(1) .LT. 0 ) GOTO 100
-               if(err.ne.0) THEN
-                  id%INFO(1) = -75
-                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
-     &                 ,id%INFO(2))
-               endif
-               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
-     &              id%COMM, id%MYID )
-               IF ( id%INFO(1) .LT. 0 ) GOTO 100
-            endif
+            CALL DMUMPS_SAVE_INT_SHPTR_ARRAY(id%SYM_PERM
+     &           ) 
+            IF (id%INFO(1) .LT. 0 ) GOTO 100
          CASE("UNS_PERM")
             NbRecords(i1)=2
             if(trim(mode).EQ."memory_save") then
@@ -2675,8 +2641,8 @@ C
                   if (allocok .GT. 0) THEN
                      id%INFO(1) = -78
                      CALL MUMPS_SETI8TOI4(
-     &                       TOTAL_STRUC_SIZE-size_allocated
-     &                       ,id%INFO(2))
+     &                    TOTAL_STRUC_SIZE-size_allocated
+     &                    ,id%INFO(2))
                   endif
                   read(unit,iostat=err) id%MAPPING
                endif
@@ -3003,59 +2969,6 @@ C
      &              id%COMM, id%MYID )
                IF ( id%INFO(1) .LT. 0 ) GOTO 100
             endif  
-         CASE("LBUFR")
-            NbRecords(i1)=1
-            if(trim(mode).EQ."memory_save") then
-               SIZE_VARIABLES(i1)=SIZE_INT
-            elseif(trim(mode).EQ."save") then
-               write(unit,iostat=err) id%LBUFR
-               if(err.ne.0) then
-                  id%INFO(1) = -72
-                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
-     &                 id%INFO(2))
-               endif
-               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
-     &              id%COMM, id%MYID )
-               IF ( id%INFO(1) .LT. 0 ) GOTO 100
-            elseif(trim(mode).EQ."restore") then
-               SIZE_VARIABLES(i1)=SIZE_INT
-               read(unit,iostat=err) id%LBUFR
-               if(err.ne.0) THEN
-                  id%INFO(1) = -75
-                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
-     &                 ,id%INFO(2))
-               endif 
-               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
-     &              id%COMM, id%MYID )
-               IF ( id%INFO(1) .LT. 0 ) GOTO 100
-            endif
-         CASE("LBUFR_BYTES")
-            NbRecords(i1)=1
-            if(trim(mode).EQ."memory_save") then
-               SIZE_VARIABLES(i1)=SIZE_INT
-            elseif(trim(mode).EQ."save") then
-               write(unit,iostat=err) id%LBUFR_BYTES
-               if(err.ne.0) then
-                  id%INFO(1) = -72
-                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
-     &                 id%INFO(2))
-               endif
-               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
-     &              id%COMM, id%MYID )
-               IF ( id%INFO(1) .LT. 0 ) GOTO 100
-            elseif(trim(mode).EQ."restore") then
-               SIZE_VARIABLES(i1)=SIZE_INT
-               read(unit,iostat=err) id%LBUFR_BYTES
-               if(err.ne.0) THEN
-                  id%INFO(1) = -75
-                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
-     &                 ,id%INFO(2))
-               endif 
-               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
-     &              id%COMM, id%MYID )
-               IF ( id%INFO(1) .LT. 0 ) GOTO 100
-            endif
-         CASE("BUFR")
          CASE("IS")
             NbRecords(i1)=2
             if(trim(mode).EQ."memory_save") then
@@ -3143,33 +3056,6 @@ C
      &              id%COMM, id%MYID )
                IF ( id%INFO(1) .LT. 0 ) GOTO 100
             endif
-         CASE("IS1")
-         CASE("MAXIS1")
-            NbRecords(i1)=1
-            if(trim(mode).EQ."memory_save") then
-               SIZE_VARIABLES(i1)=SIZE_INT
-            elseif(trim(mode).EQ."save") then
-               write(unit,iostat=err) id%MAXIS1
-               if(err.ne.0) then
-                  id%INFO(1) = -72
-                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
-     &                 id%INFO(2))
-               endif
-               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
-     &              id%COMM, id%MYID )
-               IF ( id%INFO(1) .LT. 0 ) GOTO 100
-            elseif(trim(mode).EQ."restore") then
-               SIZE_VARIABLES(i1)=SIZE_INT
-               read(unit,iostat=err) id%MAXIS1
-               if(err.ne.0) THEN
-                  id%INFO(1) = -75
-                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
-     &                 ,id%INFO(2))
-               endif 
-               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
-     &              id%COMM, id%MYID )
-               IF ( id%INFO(1) .LT. 0 ) GOTO 100
-            endif
          CASE("Deficiency")
             NbRecords(i1)=1
             if(trim(mode).EQ."memory_save") then
@@ -3249,85 +3135,9 @@ C
                IF ( id%INFO(1) .LT. 0 ) GOTO 100
             endif
          CASE("STEP")
-            NbRecords(i1)=2
-            if(trim(mode).EQ."memory_save") then
-               IF(associated(id%STEP)) THEN
-                  SIZE_GEST(i1)=SIZE_INT
-                  SIZE_VARIABLES(i1)=size(id%STEP,1)*SIZE_INT
-               ELSE
-                  SIZE_GEST(i1)=SIZE_INT*2
-                  SIZE_VARIABLES(i1)=0_8
-               ENDIF
-            elseif(trim(mode).EQ."save") then
-               IF(associated(id%STEP)) THEN
-                  write(unit,iostat=err) size(id%STEP,1)
-                  if(err.ne.0) then
-                     id%INFO(1) = -72
-                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
-     &                    id%INFO(2))
-                  endif
-                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
-     &                 id%COMM, id%MYID )
-                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
-                  write(unit,iostat=err) id%STEP
-               ELSE
-                  write(unit,iostat=err) -999
-                  if(err.ne.0) then
-                     id%INFO(1) = -72
-                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
-     &                    id%INFO(2))
-                  endif
-                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
-     &                 id%COMM, id%MYID )
-                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
-                  write(unit,iostat=err) -999
-               ENDIF 
-               if(err.ne.0) then
-                  id%INFO(1) = -72
-                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
-     &                 id%INFO(2))
-               endif
-               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
-     &              id%COMM, id%MYID )
-               IF ( id%INFO(1) .LT. 0 ) GOTO 100
-            elseif(trim(mode).EQ."restore") then
-               nullify(id%STEP)
-               read(unit,iostat=err) size_array1
-               if(err.ne.0) THEN
-                  id%INFO(1) = -75
-                  CALL MUMPS_SETI8TOI4(SIZE_VARIABLES(i1),id%INFO(2))
-               endif
-               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
-     &              id%COMM, id%MYID )
-               IF ( id%INFO(1) .LT. 0 ) GOTO 100
-               if(size_array1.EQ.-999) then
-                  SIZE_GEST(i1)=SIZE_INT*2
-                  SIZE_VARIABLES(i1)=0_8
-                  read(unit,iostat=err) dummy
-               else
-                  SIZE_GEST(i1)=SIZE_INT
-                  SIZE_VARIABLES(i1)=size_array1*SIZE_INT
-                  allocate(id%STEP(size_array1), stat=allocok)
-                  if (allocok .GT. 0) THEN
-                     id%INFO(1) = -78
-                     CALL MUMPS_SETI8TOI4(
-     &                       TOTAL_STRUC_SIZE-size_allocated
-     &                       ,id%INFO(2))
-                  endif
-                  read(unit,iostat=err) id%STEP
-               endif
-               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
-     &              id%COMM, id%MYID )
-               IF ( id%INFO(1) .LT. 0 ) GOTO 100
-               if(err.ne.0) THEN
-                  id%INFO(1) = -75
-                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
-     &                 ,id%INFO(2))
-               endif
-               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
-     &              id%COMM, id%MYID )
-               IF ( id%INFO(1) .LT. 0 ) GOTO 100
-            endif
+            CALL DMUMPS_SAVE_INT_SHPTR_ARRAY(id%STEP
+     &           ) 
+            IF (id%INFO(1) .LT. 0 ) GOTO 100
          CASE("NE_STEPS")
             NbRecords(i1)=2
             if(trim(mode).EQ."memory_save") then
@@ -3392,8 +3202,8 @@ C
                   if (allocok .GT. 0) THEN
                      id%INFO(1) = -78
                      CALL MUMPS_SETI8TOI4(
-     &                       TOTAL_STRUC_SIZE-size_allocated
-     &                       ,id%INFO(2))
+     &                    TOTAL_STRUC_SIZE-size_allocated
+     &                    ,id%INFO(2))
                   endif
                   read(unit,iostat=err) id%NE_STEPS
                endif
@@ -3473,8 +3283,8 @@ C
                   if (allocok .GT. 0) THEN
                      id%INFO(1) = -78
                      CALL MUMPS_SETI8TOI4(
-     &                       TOTAL_STRUC_SIZE-size_allocated
-     &                       ,id%INFO(2))
+     &                    TOTAL_STRUC_SIZE-size_allocated
+     &                    ,id%INFO(2))
                   endif
                   read(unit,iostat=err) id%ND_STEPS
                endif
@@ -3554,8 +3364,8 @@ C
                   if (allocok .GT. 0) THEN
                      id%INFO(1) = -78
                      CALL MUMPS_SETI8TOI4(
-     &                       TOTAL_STRUC_SIZE-size_allocated
-     &                       ,id%INFO(2))
+     &                    TOTAL_STRUC_SIZE-size_allocated
+     &                    ,id%INFO(2))
                   endif
                   read(unit,iostat=err) id%Step2node
                endif
@@ -3734,18 +3544,22 @@ C
                IF ( id%INFO(1) .LT. 0 ) GOTO 100
             endif
          CASE("FILS")
+            CALL DMUMPS_SAVE_INT_SHPTR_ARRAY(id%FILS
+     &           ) 
+            IF ( id%INFO(1) .LT. 0 ) GOTO 100
+         CASE("PTR8ARR")
             NbRecords(i1)=2
             if(trim(mode).EQ."memory_save") then
-               IF(associated(id%FILS)) THEN
+               IF(associated(id%PTR8ARR)) THEN
                   SIZE_GEST(i1)=SIZE_INT
-                  SIZE_VARIABLES(i1)=size(id%FILS,1)*SIZE_INT
+                  SIZE_VARIABLES(i1)=size(id%PTR8ARR,1)*SIZE_INT8
                ELSE
                   SIZE_GEST(i1)=SIZE_INT*2
                   SIZE_VARIABLES(i1)=0_8
                ENDIF
             elseif(trim(mode).EQ."save") then
-               IF(associated(id%FILS)) THEN
-                  write(unit,iostat=err) size(id%FILS,1)
+               IF(associated(id%PTR8ARR)) THEN
+                  write(unit,iostat=err) size(id%PTR8ARR,1)
                   if(err.ne.0) then
                      id%INFO(1) = -72
                      CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
@@ -3754,7 +3568,90 @@ C
                   CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
      &                 id%COMM, id%MYID )
                   IF ( id%INFO(1) .LT. 0 ) GOTO 100
-                  write(unit,iostat=err) id%FILS
+                  write(unit,iostat=err) id%PTR8ARR
+               ELSE
+                  write(unit,iostat=err) -999
+                  if(err.ne.0) then
+                     id%INFO(1) = -72
+                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                    id%INFO(2))
+                  endif
+                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &                 id%COMM, id%MYID )
+                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
+                  write(unit,iostat=err) -999
+               ENDIF 
+               if(err.ne.0) then
+                  id%INFO(1) = -72
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                 id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+               NbRecords(i1)=2
+            elseif(trim(mode).EQ."restore") then
+               nullify(id%PTR8ARR)
+               read(unit,iostat=err) size_array1
+               if(err.ne.0) THEN
+                  id%INFO(1) = -75
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
+     &                 ,id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+               if(size_array1.EQ.-999) then
+                  SIZE_GEST(i1)=SIZE_INT*2
+                  SIZE_VARIABLES(i1)=0_8
+                  read(unit,iostat=err) dummy
+               else
+                  SIZE_GEST(i1)=SIZE_INT
+                  SIZE_VARIABLES(i1)=size_array1*SIZE_INT8
+                  allocate(id%PTR8ARR(size_array1), stat=allocok)
+                  if (allocok .GT. 0) THEN
+                     id%INFO(1) = -78
+                     CALL MUMPS_SETI8TOI4(
+     &                    TOTAL_STRUC_SIZE-size_allocated
+     &                    ,id%INFO(2))
+                  endif
+                  read(unit,iostat=err) id%PTR8ARR
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+               if(err.ne.0) THEN
+                  id%INFO(1) = -75
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
+     &                 ,id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+            endif
+         CASE("NINCOLARR")
+            NbRecords(i1)=2
+            if(trim(mode).EQ."memory_save") then
+               NbRecords(i1)=2
+               IF(associated(id%NINCOLARR)) THEN
+                  SIZE_GEST(i1)=SIZE_INT
+                  SIZE_VARIABLES(i1)=size(id%NINCOLARR,1)*SIZE_INT
+               ELSE
+                  SIZE_GEST(i1)=SIZE_INT*2
+                  SIZE_VARIABLES(i1)=0_8
+               ENDIF
+            elseif(trim(mode).EQ."save") then
+               IF(associated(id%NINCOLARR)) THEN
+                  write(unit,iostat=err) size(id%NINCOLARR,1)
+                  if(err.ne.0) then
+                     id%INFO(1) = -72
+                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                    id%INFO(2))
+                  endif
+                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &                 id%COMM, id%MYID )
+                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
+                  write(unit,iostat=err) id%NINCOLARR
                ELSE
                   write(unit,iostat=err) -999
                   if(err.ne.0) then
@@ -3776,7 +3673,7 @@ C
      &              id%COMM, id%MYID )
                IF ( id%INFO(1) .LT. 0 ) GOTO 100
             elseif(trim(mode).EQ."restore") then
-               nullify(id%FILS)
+               nullify(id%NINCOLARR)
                read(unit,iostat=err) size_array1
                if(err.ne.0) THEN
                   id%INFO(1) = -75
@@ -3793,14 +3690,178 @@ C
                else
                   SIZE_GEST(i1)=SIZE_INT
                   SIZE_VARIABLES(i1)=size_array1*SIZE_INT
-                  allocate(id%FILS(size_array1), stat=allocok)
+                  allocate(id%NINCOLARR(size_array1), stat=allocok)
                   if (allocok .GT. 0) THEN
                      id%INFO(1) = -78
                      CALL MUMPS_SETI8TOI4(
      &                    TOTAL_STRUC_SIZE-size_allocated
      &                    ,id%INFO(2))
                   endif
-                  read(unit,iostat=err) id%FILS
+                  read(unit,iostat=err) id%NINCOLARR
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+               if(err.ne.0) THEN
+                  id%INFO(1) = -75
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
+     &                 ,id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+            endif
+         CASE("NINROWARR")
+            NbRecords(i1)=2
+            if(trim(mode).EQ."memory_save") then
+               NbRecords(i1)=2
+               IF(associated(id%NINROWARR)) THEN
+                  SIZE_GEST(i1)=SIZE_INT
+                  SIZE_VARIABLES(i1)=size(id%NINROWARR,1)*SIZE_INT
+               ELSE
+                  SIZE_GEST(i1)=SIZE_INT*2
+                  SIZE_VARIABLES(i1)=0_8
+               ENDIF
+            elseif(trim(mode).EQ."save") then
+               IF(associated(id%NINROWARR)) THEN
+                  write(unit,iostat=err) size(id%NINROWARR,1)
+                  if(err.ne.0) then
+                     id%INFO(1) = -72
+                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                    id%INFO(2))
+                  endif
+                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &                 id%COMM, id%MYID )
+                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
+                  write(unit,iostat=err) id%NINROWARR
+               ELSE
+                  write(unit,iostat=err) -999
+                  if(err.ne.0) then
+                     id%INFO(1) = -72
+                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                    id%INFO(2))
+                  endif
+                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &                 id%COMM, id%MYID )
+                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
+                  write(unit,iostat=err) -999
+               ENDIF 
+               if(err.ne.0) then
+                  id%INFO(1) = -72
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                 id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+            elseif(trim(mode).EQ."restore") then
+               nullify(id%NINROWARR)
+               read(unit,iostat=err) size_array1
+               if(err.ne.0) THEN
+                  id%INFO(1) = -75
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
+     &                 ,id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+               if(size_array1.EQ.-999) then
+                  SIZE_GEST(i1)=SIZE_INT*2
+                  SIZE_VARIABLES(i1)=0_8
+                  read(unit,iostat=err) dummy
+               else
+                  SIZE_GEST(i1)=SIZE_INT
+                  SIZE_VARIABLES(i1)=size_array1*SIZE_INT
+                  allocate(id%NINROWARR(size_array1), stat=allocok)
+                  if (allocok .GT. 0) THEN
+                     id%INFO(1) = -78
+                     CALL MUMPS_SETI8TOI4(
+     &                    TOTAL_STRUC_SIZE-size_allocated
+     &                    ,id%INFO(2))
+                  endif
+                  read(unit,iostat=err) id%NINROWARR
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+               if(err.ne.0) THEN
+                  id%INFO(1) = -75
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
+     &                 ,id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+            endif
+         CASE("PTRDEBARR")
+            NbRecords(i1)=2
+            if(trim(mode).EQ."memory_save") then
+               NbRecords(i1)=2
+               IF(associated(id%PTRDEBARR)) THEN
+                  SIZE_GEST(i1)=SIZE_INT
+                  SIZE_VARIABLES(i1)=size(id%PTRDEBARR,1)*SIZE_INT
+               ELSE
+                  SIZE_GEST(i1)=SIZE_INT*2
+                  SIZE_VARIABLES(i1)=0_8
+               ENDIF
+            elseif(trim(mode).EQ."save") then
+               IF(associated(id%PTRDEBARR)) THEN
+                  write(unit,iostat=err) size(id%PTRDEBARR,1)
+                  if(err.ne.0) then
+                     id%INFO(1) = -72
+                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                    id%INFO(2))
+                  endif
+                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &                 id%COMM, id%MYID )
+                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
+                  write(unit,iostat=err) id%PTRDEBARR
+               ELSE
+                  write(unit,iostat=err) -999
+                  if(err.ne.0) then
+                     id%INFO(1) = -72
+                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                    id%INFO(2))
+                  endif
+                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &                 id%COMM, id%MYID )
+                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
+                  write(unit,iostat=err) -999
+               ENDIF 
+               if(err.ne.0) then
+                  id%INFO(1) = -72
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                 id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+            elseif(trim(mode).EQ."restore") then
+               nullify(id%PTRDEBARR)
+               read(unit,iostat=err) size_array1
+               if(err.ne.0) THEN
+                  id%INFO(1) = -75
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
+     &                 ,id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+               if(size_array1.EQ.-999) then
+                  SIZE_GEST(i1)=SIZE_INT*2
+                  SIZE_VARIABLES(i1)=0_8
+                  read(unit,iostat=err) dummy
+               else
+                  SIZE_GEST(i1)=SIZE_INT
+                  SIZE_VARIABLES(i1)=size_array1*SIZE_INT
+                  allocate(id%PTRDEBARR(size_array1), stat=allocok)
+                  if (allocok .GT. 0) THEN
+                     id%INFO(1) = -78
+                     CALL MUMPS_SETI8TOI4(
+     &                    TOTAL_STRUC_SIZE-size_allocated
+     &                    ,id%INFO(2))
+                  endif
+                  read(unit,iostat=err) id%PTRDEBARR
                endif
                CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
      &              id%COMM, id%MYID )
@@ -4440,7 +4501,9 @@ C
                   allocate(id%S(1:size_array_INT8_1), stat=allocok)
                   if (allocok .GT. 0) THEN
                      id%INFO(1) = -78
-                     CALL MUMPS_SETI8TOI4(size_array_INT8_1,id%INFO(2))
+                     CALL MUMPS_SETI8TOI4(
+     &                    TOTAL_STRUC_SIZE-size_allocated
+     &                    ,id%INFO(2))
                   endif
                   read(unit,iostat=err) id%S(1:size_array_INT8_2)
                endif
@@ -4457,88 +4520,6 @@ C
                IF ( id%INFO(1) .LT. 0 ) GOTO 100
             endif
          CASE("PROCNODE")
-         CASE("INTARR")
-            NbRecords(i1)=2
-            if(trim(mode).EQ."memory_save") then
-               IF(associated(id%INTARR)) THEN
-                  SIZE_GEST(i1)=SIZE_INT8
-                  SIZE_VARIABLES(i1)=id%KEEP8(27)*SIZE_INT
-               ELSE
-                  SIZE_GEST(i1)=SIZE_INT8+SIZE_INT
-                  SIZE_VARIABLES(i1)=0_8
-               ENDIF
-            elseif(trim(mode).EQ."save") then
-               IF(associated(id%INTARR)) THEN
-                  write(unit,iostat=err) id%KEEP8(27)
-                  if(err.ne.0) then
-                     id%INFO(1) = -72
-                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
-     &                    id%INFO(2))
-                  endif
-                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
-     &                 id%COMM, id%MYID )
-                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
-                  write(unit,iostat=err) id%INTARR
-               ELSE
-                  write(unit,iostat=err) int(-999,8)
-                  if(err.ne.0) then
-                     id%INFO(1) = -72
-                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
-     &                    id%INFO(2))
-                  endif
-                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
-     &                 id%COMM, id%MYID )
-                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
-                  write(unit,iostat=err) -999
-               ENDIF 
-               if(err.ne.0) then
-                  id%INFO(1) = -72
-                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
-     &                 id%INFO(2))
-               endif
-               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
-     &              id%COMM, id%MYID )
-               IF ( id%INFO(1) .LT. 0 ) GOTO 100
-            elseif(trim(mode).EQ."restore") then
-               nullify(id%INTARR)
-               read(unit,iostat=err) size_array_INT8_1
-               if(err.ne.0) THEN
-                  id%INFO(1) = -75
-                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
-     &                 ,id%INFO(2))
-               endif
-               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
-     &              id%COMM, id%MYID )
-               IF ( id%INFO(1) .LT. 0 ) GOTO 100
-               if(size_array_INT8_1.EQ.int(-999,8)) then
-                  SIZE_GEST(i1)=SIZE_INT8+SIZE_INT
-                  SIZE_VARIABLES(i1)=0_8
-                  read(unit,iostat=err) dummy
-               else
-                  SIZE_GEST(i1)=SIZE_INT8
-                  SIZE_VARIABLES(i1)=size_array_INT8_1*SIZE_INT
-                  allocate(id%INTARR(size_array_INT8_1), stat=allocok)
-                  if (allocok .GT. 0) THEN
-                     id%INFO(1) = -78
-                     CALL MUMPS_SETI8TOI4(
-     &                    TOTAL_STRUC_SIZE-size_allocated
-     &                    ,id%INFO(2))
-                  endif
-                  read(unit,iostat=err) id%INTARR
-               endif
-               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
-     &              id%COMM, id%MYID )
-               IF ( id%INFO(1) .LT. 0 ) GOTO 100
-               if(err.ne.0) THEN
-                  id%INFO(1) = -75
-                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
-     &                 ,id%INFO(2))
-               endif
-               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
-     &              id%COMM, id%MYID )
-               IF ( id%INFO(1) .LT. 0 ) GOTO 100
-            endif
-         CASE("DBLARR")
          CASE("NELT_loc")
             NbRecords(i1)=1
             if(trim(mode).EQ."memory_save") then
@@ -4672,6 +4653,174 @@ C
      &              id%COMM, id%MYID )
                IF ( id%INFO(1) .LT. 0 ) GOTO 100
             endif
+         CASE("I4_L0_OMP")
+            NbRecords(i1)=2
+            if(trim(mode).EQ."memory_save") then
+               IF(associated(id%I4_L0_OMP)) THEN
+                  SIZE_GEST(i1)=SIZE_INT*2
+                  SIZE_VARIABLES(i1)=size(id%I4_L0_OMP,1)
+     &                 *size(id%I4_L0_OMP,2)*SIZE_INT
+               ELSE
+                  SIZE_GEST(i1)=SIZE_INT*3
+                  SIZE_VARIABLES(i1)=0_8
+               ENDIF
+            elseif(trim(mode).EQ."save") then
+               IF(associated(id%I4_L0_OMP)) THEN
+                  write(unit,iostat=err) size(id%I4_L0_OMP,1)
+     &                 ,size(id%I4_L0_OMP,2)
+                  if(err.ne.0) then
+                     id%INFO(1) = -72
+                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                    id%INFO(2))
+                  endif
+                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &                 id%COMM, id%MYID )
+                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
+                  write(unit,iostat=err) id%I4_L0_OMP
+               ELSE
+                  write(unit,iostat=err) -999,-998
+                  if(err.ne.0) then
+                     id%INFO(1) = -72
+                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                    id%INFO(2))
+                  endif
+                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &                 id%COMM, id%MYID )
+                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
+                  write(unit,iostat=err) -999
+               ENDIF 
+               if(err.ne.0) then
+                  id%INFO(1) = -72
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                 id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+            elseif(trim(mode).EQ."restore") then
+               nullify(id%I4_L0_OMP)
+               read(unit,iostat=err) size_array1,size_array2
+               if(err.ne.0) THEN
+                  id%INFO(1) = -75
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
+     &                 ,id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+               if(size_array1.EQ.-999) then
+                  SIZE_GEST(i1)=SIZE_INT*3
+                  SIZE_VARIABLES(i1)=0_8
+                  read(unit,iostat=err) dummy
+               else
+                  SIZE_GEST(i1)=SIZE_INT*2
+                  SIZE_VARIABLES(i1)=size_array1*size_array2*SIZE_INT
+                  allocate(id%I4_L0_OMP(size_array1,size_array2)
+     &                 , stat=allocok)
+                  if (allocok .GT. 0) THEN
+                     id%INFO(1) = -78
+                     CALL MUMPS_SETI8TOI4(
+     &                    TOTAL_STRUC_SIZE-size_allocated
+     &                    ,id%INFO(2))
+                  endif
+                  read(unit,iostat=err) id%I4_L0_OMP
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+               if(err.ne.0) THEN
+                  id%INFO(1) = -75
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
+     &                 ,id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+            endif
+         CASE("I8_L0_OMP")
+            NbRecords(i1)=2
+            if(trim(mode).EQ."memory_save") then
+               IF(associated(id%I8_L0_OMP)) THEN
+                  SIZE_GEST(i1)=SIZE_INT*2
+                  SIZE_VARIABLES(i1)=size(id%I8_L0_OMP,1)
+     &                 *size(id%I8_L0_OMP,2)*SIZE_INT8
+               ELSE
+                  SIZE_GEST(i1)=SIZE_INT*3
+                  SIZE_VARIABLES(i1)=0_8
+               ENDIF
+            elseif(trim(mode).EQ."save") then
+               IF(associated(id%I8_L0_OMP)) THEN
+                  write(unit,iostat=err) size(id%I8_L0_OMP,1)
+     &                 ,size(id%I8_L0_OMP,2)
+                  if(err.ne.0) then
+                     id%INFO(1) = -72
+                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                    id%INFO(2))
+                  endif
+                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &                 id%COMM, id%MYID )
+                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
+                  write(unit,iostat=err) id%I8_L0_OMP
+               ELSE
+                  write(unit,iostat=err) -999,-998
+                  if(err.ne.0) then
+                     id%INFO(1) = -72
+                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                    id%INFO(2))
+                  endif
+                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &                 id%COMM, id%MYID )
+                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
+                  write(unit,iostat=err) -999
+               ENDIF 
+               if(err.ne.0) then
+                  id%INFO(1) = -72
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                 id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+            elseif(trim(mode).EQ."restore") then
+               nullify(id%I8_L0_OMP)
+               read(unit,iostat=err) size_array1,size_array2
+               if(err.ne.0) THEN
+                  id%INFO(1) = -75
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
+     &                 ,id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+               if(size_array1.EQ.-999) then
+                  SIZE_GEST(i1)=SIZE_INT*3
+                  SIZE_VARIABLES(i1)=0_8
+                  read(unit,iostat=err) dummy
+               else
+                  SIZE_GEST(i1)=SIZE_INT*2
+                  SIZE_VARIABLES(i1)=size_array1*size_array2*SIZE_INT8
+                  allocate(id%I8_L0_OMP(size_array1,size_array2)
+     &                 , stat=allocok)
+                  if (allocok .GT. 0) THEN
+                     id%INFO(1) = -78
+                     CALL MUMPS_SETI8TOI4(
+     &                    TOTAL_STRUC_SIZE-size_allocated
+     &                    ,id%INFO(2))
+                  endif
+                  read(unit,iostat=err) id%I8_L0_OMP
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+               if(err.ne.0) THEN
+                  id%INFO(1) = -75
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
+     &                 ,id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+            endif
          CASE("CANDIDATES")
             NbRecords(i1)=2
             if(trim(mode).EQ."memory_save") then
@@ -4738,7 +4887,8 @@ C
      &                 , stat=allocok)
                   if (allocok .GT. 0) THEN
                      id%INFO(1) = -78
-                     CALL MUMPS_SETI8TOI4(size_array1*size_array2
+                     CALL MUMPS_SETI8TOI4(
+     &                    TOTAL_STRUC_SIZE-size_allocated
      &                    ,id%INFO(2))
                   endif
                   read(unit,iostat=err) id%CANDIDATES
@@ -4983,7 +5133,8 @@ C
      &                 , stat=allocok)
                   if (allocok .GT. 0) THEN
                      id%INFO(1) = -78
-                     CALL MUMPS_SETI8TOI4(size_array1*size_array2
+                     CALL MUMPS_SETI8TOI4(
+     &                    TOTAL_STRUC_SIZE-size_allocated
      &                    ,id%INFO(2))
                   endif
                   read(unit,iostat=err) id%TAB_POS_IN_PERE
@@ -6268,7 +6419,8 @@ C
      &                 ,size_array2), stat=allocok)
                   if (allocok .GT. 0) THEN
                      id%INFO(1) = -78
-                     CALL MUMPS_SETI8TOI4(size_array1*size_array2
+                     CALL MUMPS_SETI8TOI4(
+     &                    TOTAL_STRUC_SIZE-size_allocated
      &                    ,id%INFO(2))
                   endif
                   read(unit,iostat=err) id%OOC_INODE_SEQUENCE
@@ -6351,7 +6503,8 @@ C
      &                 ,size_array2), stat=allocok)
                   if (allocok .GT. 0) THEN
                      id%INFO(1) = -78
-                     CALL MUMPS_SETI8TOI4(size_array1*size_array2
+                     CALL MUMPS_SETI8TOI4(
+     &                    TOTAL_STRUC_SIZE-size_allocated
      &                    ,id%INFO(2))
                   endif
                   read(unit,iostat=err) id%OOC_SIZE_OF_BLOCK
@@ -6434,7 +6587,8 @@ C
      &                 stat=allocok)
                   if (allocok .GT. 0) THEN
                      id%INFO(1) = -78
-                     CALL MUMPS_SETI8TOI4(size_array1*size_array2
+                     CALL MUMPS_SETI8TOI4(
+     &                    TOTAL_STRUC_SIZE-size_allocated
      &                    ,id%INFO(2))
                   endif
                   read(unit,iostat=err) id%OOC_VADDR
@@ -6784,7 +6938,8 @@ C
             endif
          CASE("root")
             DO i2=1,NBVARIABLES_ROOT
-               SELECT CASE(VARIABLES_ROOT(i2))
+            TMP_STRING2 = VARIABLES_ROOT(i2)
+            SELECT CASE(TMP_STRING2)
             CASE("MBLOCK")
                NbRecords_ROOT(i2)=1
                if(trim(mode).EQ."memory_save") then
@@ -7178,8 +7333,7 @@ C
      &                 id%COMM, id%MYID )
                   IF ( id%INFO(1) .LT. 0 ) GOTO 100
                endif
-            CASE("RG2L_ROW")
-            CASE("RG2L_COL")
+            CASE("RG2L")
             CASE("IPIV")
                NbRecords_ROOT(i2)=2
                if(trim(mode).EQ."memory_save") then
@@ -7332,10 +7486,10 @@ C
                      allocate(id%root%RHS_CNTR_MASTER_ROOT(size_array1), 
      &                    stat=allocok)
                      if (allocok .GT. 0) THEN
-                     id%INFO(1) = -78
-                     CALL MUMPS_SETI8TOI4(
-     &                    TOTAL_STRUC_SIZE-size_allocated
-     &                    ,id%INFO(2))
+                        id%INFO(1) = -78
+                        CALL MUMPS_SETI8TOI4(
+     &                       TOTAL_STRUC_SIZE-size_allocated
+     &                       ,id%INFO(2))
                      endif
                      read(unit,iostat=err) id%root%RHS_CNTR_MASTER_ROOT
                   endif
@@ -7422,7 +7576,8 @@ C
      &                    stat=allocok)
                      if (allocok .GT. 0) THEN
                         id%INFO(1) = -78
-                        CALL MUMPS_SETI8TOI4(size_array1*size_array2
+                        CALL MUMPS_SETI8TOI4(
+     &                       TOTAL_STRUC_SIZE-size_allocated
      &                       ,id%INFO(2))
                      endif
                      read(unit,iostat=err) id%root%RHS_ROOT
@@ -7551,14 +7706,14 @@ C
             CASE DEFAULT
             END SELECT
             if(trim(mode).EQ."memory_save") then
-               NbSubRecords=int(SIZE_VARIABLES_ROOT(i2)/huge(0))
+               NbSubRecords=int(SIZE_VARIABLES_ROOT(i2)/huge(I4))
                IF(NbSubRecords.GT.0) then
                   NbRecords_ROOT(i2)=NbRecords_ROOT(i2)+NbSubRecords
                ENDIF
             elseif(trim(mode).EQ."save") then
                size_written=size_written+SIZE_VARIABLES_ROOT(i2)
      &              +SIZE_GEST_ROOT(i2)
-#if !defined(MUMPS_F2003)
+#if defined(MUMPS_NOF2003)
                size_written=size_written
      &              +int(2*id%KEEP(34)*NbRecords_ROOT(i2),kind=8)
 #endif
@@ -7567,7 +7722,7 @@ C
      &              DIFF_SIZE_ALLOC_READ_ROOT(i2)
                size_read=size_read+SIZE_VARIABLES_ROOT(i2)
      &              +int(SIZE_GEST_ROOT(i2),kind=8)
-#if !defined(MUMPS_F2003)
+#if defined(MUMPS_NOF2003)
                size_read=size_read
      &              +int(2*id%KEEP(34)*NbRecords_ROOT(i2),kind=8)
 #endif
@@ -7601,86 +7756,9 @@ C
                IF ( id%INFO(1) .LT. 0 ) GOTO 100
             endif
         CASE("LRGROUPS")
-           NbRecords(i1)=2
-            if(trim(mode).EQ."memory_save") then
-               IF(associated(id%LRGROUPS)) THEN
-                  SIZE_GEST(i1)=SIZE_INT
-                  SIZE_VARIABLES(i1)=size(id%LRGROUPS,1)*SIZE_INT
-               ELSE
-                  SIZE_GEST(i1)=SIZE_INT*2
-                  SIZE_VARIABLES(i1)=0_8
-               ENDIF
-            elseif(trim(mode).EQ."save") then
-               IF(associated(id%LRGROUPS)) THEN
-                  write(unit,iostat=err) size(id%LRGROUPS,1)
-                  if(err.ne.0) then
-                     id%INFO(1) = -72
-                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
-     &                    id%INFO(2))
-                  endif
-                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
-     &                 id%COMM, id%MYID )
-                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
-                  write(unit,iostat=err) id%LRGROUPS
-               ELSE
-                  write(unit,iostat=err) -999
-                  if(err.ne.0) then
-                     id%INFO(1) = -72
-                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
-     &                    id%INFO(2))
-                  endif
-                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
-     &                 id%COMM, id%MYID )
-                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
-                  write(unit,iostat=err) -999
-               ENDIF 
-               if(err.ne.0) then
-                  id%INFO(1) = -72
-                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
-     &                 id%INFO(2))
-               endif
-               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
-     &              id%COMM, id%MYID )
-               IF ( id%INFO(1) .LT. 0 ) GOTO 100
-            elseif(trim(mode).EQ."restore") then
-               nullify(id%LRGROUPS)
-               read(unit,iostat=err) size_array1
-               if(err.ne.0) THEN
-                  id%INFO(1) = -75
-                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
-     &                 ,id%INFO(2))
-               endif
-               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
-     &              id%COMM, id%MYID )
-               IF ( id%INFO(1) .LT. 0 ) GOTO 100
-               if(size_array1.EQ.-999) then
-                  SIZE_GEST(i1)=SIZE_INT*2
-                  SIZE_VARIABLES(i1)=0_8
-                  read(unit,iostat=err) dummy
-               else
-                  SIZE_GEST(i1)=SIZE_INT
-                  SIZE_VARIABLES(i1)=size_array1*SIZE_INT
-                  allocate(id%LRGROUPS(size_array1), stat=allocok)
-                  if (allocok .GT. 0) THEN
-                     id%INFO(1) = -78
-                     CALL MUMPS_SETI8TOI4(
-     &                    TOTAL_STRUC_SIZE-size_allocated
-     &                    ,id%INFO(2))
-                  endif
-                  read(unit,iostat=err) id%LRGROUPS
-               endif
-               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
-     &              id%COMM, id%MYID )
-               IF ( id%INFO(1) .LT. 0 ) GOTO 100
-               if(err.ne.0) THEN
-                  id%INFO(1) = -75
-                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
-     &                 ,id%INFO(2))
-               endif
-               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
-     &              id%COMM, id%MYID )
-               IF ( id%INFO(1) .LT. 0 ) GOTO 100
-            endif
+            CALL DMUMPS_SAVE_INT_SHPTR_ARRAY(id%LRGROUPS
+     &           ) 
+            IF (id%INFO(1) .LT. 0 ) GOTO 100
          CASE("FDM_F_ENCODING")
             NbRecords(i1)=1
             SIZE_GEST(i1)=SIZE_INT
@@ -7705,14 +7783,12 @@ C
                   CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
      &                 id%COMM, id%MYID )
                   IF ( id%INFO(1) .LT. 0 ) GOTO 100
-                  write(*,*) "size_written before save",size_written
                   CALL MUMPS_SAVE_RESTORE_FRONT_DATA(id%FDM_F_ENCODING
      &                 ,unit,id%MYID,"save"
      &                 ,SIZE_GEST_FRONT_DATA,SIZE_VARIABLES_FRONT_DATA
      &                 ,SIZE_INT,TOTAL_FILE_SIZE,TOTAL_STRUC_SIZE
      &                 ,size_read,size_allocated,size_written
      &                 ,id%INFO(1))
-                  write(*,*) "size_written after save",size_written
                ELSE
                   write(unit,iostat=err) -999
                   if(err.ne.0) then
@@ -7788,7 +7864,6 @@ C
                   CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
      &                 id%COMM, id%MYID )
                   IF ( id%INFO(1) .LT. 0 ) GOTO 100
-                  write(*,*) "size_written before save",size_written
                   CALL DMUMPS_SAVE_RESTORE_BLR(id%BLRARRAY_ENCODING
      &                 ,unit,id%MYID,"save"
      &                 ,SIZE_GEST_BLR,SIZE_VARIABLES_BLR
@@ -7796,7 +7871,6 @@ C
      &                 ,TOTAL_FILE_SIZE,TOTAL_STRUC_SIZE
      &                 ,size_read,size_allocated,size_written
      &                 ,id%INFO(1))
-                  write(*,*) "size_written after save",size_written
                ELSE
                   write(unit,iostat=err) -999
                   if(err.ne.0) then
@@ -7848,13 +7922,24 @@ C
      &              id%COMM, id%MYID )
                IF ( id%INFO(1) .LT. 0 ) GOTO 100
             endif
+         CASE("L0_OMP_FACTORS")
+            NbRecords(i1)     =0   
+            SIZE_GEST(i1)     =0   
+            SIZE_VARIABLES(i1)=0_8 
+            CALL DMUMPS_SAVE_RESTORE_L0FACARRAY(id%L0_OMP_FACTORS
+     &                 ,unit,id%MYID,trim(mode)
+     &                 ,SIZE_GEST_L0FAC,SIZE_VARIABLES_L0FAC
+     &                 ,SIZE_INT, SIZE_INT8, SIZE_ARITH_DEP
+     &                 ,TOTAL_FILE_SIZE,TOTAL_STRUC_SIZE
+     &                 ,size_read,size_allocated,size_written
+     &                 ,id%INFO(1))                 
          CASE("SCHED_SBTR")
-         CASE("LPOOL_AFTER_L0_OMP")
+         CASE("LPOOL_A_L0_OMP")
             NbRecords(i1)=1
             if(trim(mode).EQ."memory_save") then
                SIZE_VARIABLES(i1)=SIZE_INT
             elseif(trim(mode).EQ."save") then
-               write(unit,iostat=err) id%LPOOL_AFTER_L0_OMP
+               write(unit,iostat=err) id%LPOOL_A_L0_OMP
                if(err.ne.0) then
                   id%INFO(1) = -72
                   CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
@@ -7865,7 +7950,7 @@ C
                IF ( id%INFO(1) .LT. 0 ) GOTO 100
             elseif(trim(mode).EQ."restore") then
                SIZE_VARIABLES(i1)=SIZE_INT
-               read(unit,iostat=err) id%LPOOL_AFTER_L0_OMP
+               read(unit,iostat=err) id%LPOOL_A_L0_OMP
                if(err.ne.0) THEN
                   id%INFO(1) = -75
                   CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
@@ -7875,12 +7960,12 @@ C
      &              id%COMM, id%MYID )
                IF ( id%INFO(1) .LT. 0 ) GOTO 100
             endif
-         CASE("LPOOL_BEFORE_L0_OMP")
+         CASE("LPOOL_B_L0_OMP")
             NbRecords(i1)=1
             if(trim(mode).EQ."memory_save") then
                SIZE_VARIABLES(i1)=SIZE_INT
             elseif(trim(mode).EQ."save") then
-               write(unit,iostat=err) id%LPOOL_BEFORE_L0_OMP
+               write(unit,iostat=err) id%LPOOL_B_L0_OMP
                if(err.ne.0) then
                   id%INFO(1) = -72
                   CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
@@ -7891,7 +7976,7 @@ C
                IF ( id%INFO(1) .LT. 0 ) GOTO 100
             elseif(trim(mode).EQ."restore") then
                SIZE_VARIABLES(i1)=SIZE_INT
-               read(unit,iostat=err) id%LPOOL_BEFORE_L0_OMP
+               read(unit,iostat=err) id%LPOOL_B_L0_OMP
                if(err.ne.0) THEN
                   id%INFO(1) = -75
                   CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
@@ -7979,6 +8064,32 @@ C
      &              id%COMM, id%MYID )
                IF ( id%INFO(1) .LT. 0 ) GOTO 100
             endif
+         CASE("LL0_OMP_FACTORS")
+            NbRecords(i1)=1
+            if(trim(mode).EQ."memory_save") then
+               SIZE_VARIABLES(i1)=SIZE_INT
+            elseif(trim(mode).EQ."save") then
+               write(unit,iostat=err) id%LL0_OMP_FACTORS
+               if(err.ne.0) then
+                  id%INFO(1) = -72
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                 id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+            elseif(trim(mode).EQ."restore") then
+               SIZE_VARIABLES(i1)=SIZE_INT
+               read(unit,iostat=err) id%LL0_OMP_FACTORS
+               if(err.ne.0) THEN
+                  id%INFO(1) = -75
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
+     &                 ,id%INFO(2))
+               endif 
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+            endif
          CASE("THREAD_LA")
             NbRecords(i1)=1
             if(trim(mode).EQ."memory_save") then
@@ -8005,13 +8116,664 @@ C
      &              id%COMM, id%MYID )
                IF ( id%INFO(1) .LT. 0 ) GOTO 100
             endif
-         CASE("IPOOL_AFTER_L0_OMP")
-         CASE("IPOOL_BEFORE_L0_OMP")
+         CASE("IPOOL_A_L0_OMP")
+            NbRecords(i1)=2
+            if(trim(mode).EQ."memory_save") then
+               IF(associated(id%IPOOL_A_L0_OMP)) THEN
+                  SIZE_GEST(i1)=SIZE_INT
+                  SIZE_VARIABLES(i1)=
+     &                 size(id%IPOOL_A_L0_OMP,1)*SIZE_INT
+               ELSE
+                  SIZE_GEST(i1)=SIZE_INT*2
+                  SIZE_VARIABLES(i1)=0_8
+               ENDIF
+            elseif(trim(mode).EQ."save") then
+               IF(associated(id%IPOOL_A_L0_OMP)) THEN
+                  write(unit,iostat=err) size(id%IPOOL_A_L0_OMP,1)
+                  if(err.ne.0) then
+                     id%INFO(1) = -72
+                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                    id%INFO(2))
+                  endif
+                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &                 id%COMM, id%MYID )
+                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
+                  write(unit,iostat=err) id%IPOOL_A_L0_OMP
+               ELSE
+                  write(unit,iostat=err) -999
+                  if(err.ne.0) then
+                     id%INFO(1) = -72
+                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                    id%INFO(2))
+                  endif
+                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &                 id%COMM, id%MYID )
+                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
+                  write(unit,iostat=err) -999
+               ENDIF 
+               if(err.ne.0) then
+                  id%INFO(1) = -72
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                 id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+            elseif(trim(mode).EQ."restore") then
+               nullify(id%IPOOL_A_L0_OMP)
+               read(unit,iostat=err) size_array1
+               if(err.ne.0) THEN
+                  id%INFO(1) = -75
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
+     &                 ,id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+               if(size_array1.EQ.-999) then
+                  SIZE_GEST(i1)=SIZE_INT*2
+                  SIZE_VARIABLES(i1)=0_8
+                  read(unit,iostat=err) dummy
+               else
+                  SIZE_GEST(i1)=SIZE_INT
+                  SIZE_VARIABLES(i1)=size_array1*SIZE_INT
+                  allocate(id%IPOOL_A_L0_OMP(size_array1), 
+     &                 stat=allocok)
+                  if (allocok .GT. 0) THEN
+                     id%INFO(1) = -78
+                     CALL MUMPS_SETI8TOI4(
+     &                    TOTAL_STRUC_SIZE-size_allocated
+     &                    ,id%INFO(2))
+                  endif
+                  read(unit,iostat=err) id%IPOOL_A_L0_OMP
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+               if(err.ne.0) THEN
+                  id%INFO(1) = -75
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
+     &                 ,id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+            endif
+         CASE("IPOOL_B_L0_OMP")
+            NbRecords(i1)=2
+            if(trim(mode).EQ."memory_save") then
+               IF(associated(id%IPOOL_B_L0_OMP)) THEN
+                  SIZE_GEST(i1)=SIZE_INT
+                  SIZE_VARIABLES(i1)=
+     &                 size(id%IPOOL_B_L0_OMP,1)*SIZE_INT
+               ELSE
+                  SIZE_GEST(i1)=SIZE_INT*2
+                  SIZE_VARIABLES(i1)=0_8
+               ENDIF
+            elseif(trim(mode).EQ."save") then
+               IF(associated(id%IPOOL_B_L0_OMP)) THEN
+                  write(unit,iostat=err) size(id%IPOOL_B_L0_OMP,1)
+                  if(err.ne.0) then
+                     id%INFO(1) = -72
+                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                    id%INFO(2))
+                  endif
+                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &                 id%COMM, id%MYID )
+                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
+                  write(unit,iostat=err) id%IPOOL_B_L0_OMP
+               ELSE
+                  write(unit,iostat=err) -999
+                  if(err.ne.0) then
+                     id%INFO(1) = -72
+                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                    id%INFO(2))
+                  endif
+                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &                 id%COMM, id%MYID )
+                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
+                  write(unit,iostat=err) -999
+               ENDIF 
+               if(err.ne.0) then
+                  id%INFO(1) = -72
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                 id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+            elseif(trim(mode).EQ."restore") then
+               nullify(id%IPOOL_B_L0_OMP)
+               read(unit,iostat=err) size_array1
+               if(err.ne.0) THEN
+                  id%INFO(1) = -75
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
+     &                 ,id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+               if(size_array1.EQ.-999) then
+                  SIZE_GEST(i1)=SIZE_INT*2
+                  SIZE_VARIABLES(i1)=0_8
+                  read(unit,iostat=err) dummy
+               else
+                  SIZE_GEST(i1)=SIZE_INT
+                  SIZE_VARIABLES(i1)=size_array1*SIZE_INT
+                  allocate(id%IPOOL_B_L0_OMP(size_array1), 
+     &                 stat=allocok)
+                  if (allocok .GT. 0) THEN
+                     id%INFO(1) = -78
+                     CALL MUMPS_SETI8TOI4(
+     &                    TOTAL_STRUC_SIZE-size_allocated
+     &                    ,id%INFO(2))
+                  endif
+                  read(unit,iostat=err) id%IPOOL_B_L0_OMP
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+               if(err.ne.0) THEN
+                  id%INFO(1) = -75
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
+     &                 ,id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+            endif
          CASE("PHYS_L0_OMP")
+            NbRecords(i1)=2
+            if(trim(mode).EQ."memory_save") then
+               IF(associated(id%PHYS_L0_OMP)) THEN
+                  SIZE_GEST(i1)=SIZE_INT
+                  SIZE_VARIABLES(i1)=
+     &                 size(id%PHYS_L0_OMP,1)*SIZE_INT
+               ELSE
+                  SIZE_GEST(i1)=SIZE_INT*2
+                  SIZE_VARIABLES(i1)=0_8
+               ENDIF
+            elseif(trim(mode).EQ."save") then
+               IF(associated(id%PHYS_L0_OMP)) THEN
+                  write(unit,iostat=err) size(id%PHYS_L0_OMP,1)
+                  if(err.ne.0) then
+                     id%INFO(1) = -72
+                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                    id%INFO(2))
+                  endif
+                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &                 id%COMM, id%MYID )
+                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
+                  write(unit,iostat=err) id%PHYS_L0_OMP
+               ELSE
+                  write(unit,iostat=err) -999
+                  if(err.ne.0) then
+                     id%INFO(1) = -72
+                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                    id%INFO(2))
+                  endif
+                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &                 id%COMM, id%MYID )
+                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
+                  write(unit,iostat=err) -999
+               ENDIF 
+               if(err.ne.0) then
+                  id%INFO(1) = -72
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                 id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+            elseif(trim(mode).EQ."restore") then
+               nullify(id%PHYS_L0_OMP)
+               read(unit,iostat=err) size_array1
+               if(err.ne.0) THEN
+                  id%INFO(1) = -75
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
+     &                 ,id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+               if(size_array1.EQ.-999) then
+                  SIZE_GEST(i1)=SIZE_INT*2
+                  SIZE_VARIABLES(i1)=0_8
+                  read(unit,iostat=err) dummy
+               else
+                  SIZE_GEST(i1)=SIZE_INT
+                  SIZE_VARIABLES(i1)=size_array1*SIZE_INT
+                  allocate(id%PHYS_L0_OMP(size_array1), stat=allocok)
+                  if (allocok .GT. 0) THEN
+                     id%INFO(1) = -78
+                     CALL MUMPS_SETI8TOI4(
+     &                    TOTAL_STRUC_SIZE-size_allocated
+     &                    ,id%INFO(2))
+                  endif
+                  read(unit,iostat=err) id%PHYS_L0_OMP
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+               if(err.ne.0) THEN
+                  id%INFO(1) = -75
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
+     &                 ,id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+            endif
          CASE("VIRT_L0_OMP")
+            NbRecords(i1)=2
+            if(trim(mode).EQ."memory_save") then
+               IF(associated(id%VIRT_L0_OMP)) THEN
+                  SIZE_GEST(i1)=SIZE_INT
+                  SIZE_VARIABLES(i1)=size(id%VIRT_L0_OMP,1)*SIZE_INT
+               ELSE
+                  SIZE_GEST(i1)=SIZE_INT*2
+                  SIZE_VARIABLES(i1)=0_8
+               ENDIF
+            elseif(trim(mode).EQ."save") then
+               IF(associated(id%VIRT_L0_OMP)) THEN
+                  write(unit,iostat=err) size(id%VIRT_L0_OMP,1)
+                  if(err.ne.0) then
+                     id%INFO(1) = -72
+                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                    id%INFO(2))
+                  endif
+                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &                 id%COMM, id%MYID )
+                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
+                  write(unit,iostat=err) id%VIRT_L0_OMP
+               ELSE
+                  write(unit,iostat=err) -999
+                  if(err.ne.0) then
+                     id%INFO(1) = -72
+                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                    id%INFO(2))
+                  endif
+                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &                 id%COMM, id%MYID )
+                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
+                  write(unit,iostat=err) -999
+               ENDIF 
+               if(err.ne.0) then
+                  id%INFO(1) = -72
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                 id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+            elseif(trim(mode).EQ."restore") then
+               nullify(id%VIRT_L0_OMP)
+               read(unit,iostat=err) size_array1
+               if(err.ne.0) THEN
+                  id%INFO(1) = -75
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
+     &                 ,id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+               if(size_array1.EQ.-999) then
+                  SIZE_GEST(i1)=SIZE_INT*2
+                  SIZE_VARIABLES(i1)=0_8
+                  read(unit,iostat=err) dummy
+               else
+                  SIZE_GEST(i1)=SIZE_INT
+                  SIZE_VARIABLES(i1)=size_array1*SIZE_INT
+                  allocate(id%VIRT_L0_OMP(size_array1), stat=allocok)
+                  if (allocok .GT. 0) THEN
+                     id%INFO(1) = -78
+                     CALL MUMPS_SETI8TOI4(
+     &                    TOTAL_STRUC_SIZE-size_allocated
+     &                    ,id%INFO(2))
+                  endif
+                  read(unit,iostat=err) id%VIRT_L0_OMP
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+               if(err.ne.0) THEN
+                  id%INFO(1) = -75
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
+     &                 ,id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+            endif
+         CASE("VIRT_L0_OMP_MAPPING")
+            NbRecords(i1)=2
+            if(trim(mode).EQ."memory_save") then
+               IF(associated(id%VIRT_L0_OMP_MAPPING)) THEN
+                  SIZE_GEST(i1)=SIZE_INT
+                  SIZE_VARIABLES(i1)=size(id%VIRT_L0_OMP_MAPPING,1)
+     &                              *SIZE_INT
+               ELSE
+                  SIZE_GEST(i1)=SIZE_INT*2
+                  SIZE_VARIABLES(i1)=0_8
+               ENDIF
+            elseif(trim(mode).EQ."save") then
+               IF(associated(id%VIRT_L0_OMP_MAPPING)) THEN
+                  write(unit,iostat=err) size(id%VIRT_L0_OMP_MAPPING,1)
+                  if(err.ne.0) then
+                     id%INFO(1) = -72
+                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                    id%INFO(2))
+                  endif
+                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &                 id%COMM, id%MYID )
+                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
+                  write(unit,iostat=err) id%VIRT_L0_OMP_MAPPING
+               ELSE
+                  write(unit,iostat=err) -999
+                  if(err.ne.0) then
+                     id%INFO(1) = -72
+                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                    id%INFO(2))
+                  endif
+                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &                 id%COMM, id%MYID )
+                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
+                  write(unit,iostat=err) -999
+               ENDIF 
+               if(err.ne.0) then
+                  id%INFO(1) = -72
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                 id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+            elseif(trim(mode).EQ."restore") then
+               nullify(id%VIRT_L0_OMP_MAPPING)
+               read(unit,iostat=err) size_array1
+               if(err.ne.0) THEN
+                  id%INFO(1) = -75
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
+     &                 ,id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+               if(size_array1.EQ.-999) then
+                  SIZE_GEST(i1)=SIZE_INT*2
+                  SIZE_VARIABLES(i1)=0_8
+                  read(unit,iostat=err) dummy
+               else
+                  SIZE_GEST(i1)=SIZE_INT
+                  SIZE_VARIABLES(i1)=size_array1*SIZE_INT
+                  allocate(id%VIRT_L0_OMP_MAPPING(size_array1),
+     &                     stat=allocok)
+                  if (allocok .GT. 0) THEN
+                     id%INFO(1) = -78
+                     CALL MUMPS_SETI8TOI4(
+     &                    TOTAL_STRUC_SIZE-size_allocated
+     &                    ,id%INFO(2))
+                  endif
+                  read(unit,iostat=err) id%VIRT_L0_OMP_MAPPING
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+               if(err.ne.0) THEN
+                  id%INFO(1) = -75
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
+     &                 ,id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+            endif
          CASE("PERM_L0_OMP")
+            NbRecords(i1)=2
+            if(trim(mode).EQ."memory_save") then
+               IF(associated(id%PERM_L0_OMP)) THEN
+                  SIZE_GEST(i1)=SIZE_INT
+                  SIZE_VARIABLES(i1)=size(id%PERM_L0_OMP,1)*SIZE_INT
+               ELSE
+                  SIZE_GEST(i1)=SIZE_INT*2
+                  SIZE_VARIABLES(i1)=0_8
+               ENDIF
+            elseif(trim(mode).EQ."save") then
+               IF(associated(id%PERM_L0_OMP)) THEN
+                  write(unit,iostat=err) size(id%PERM_L0_OMP,1)
+                  if(err.ne.0) then
+                     id%INFO(1) = -72
+                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                    id%INFO(2))
+                  endif
+                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &                 id%COMM, id%MYID )
+                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
+                  write(unit,iostat=err) id%PERM_L0_OMP
+               ELSE
+                  write(unit,iostat=err) -999
+                  if(err.ne.0) then
+                     id%INFO(1) = -72
+                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                    id%INFO(2))
+                  endif
+                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &                 id%COMM, id%MYID )
+                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
+                  write(unit,iostat=err) -999
+               ENDIF 
+               if(err.ne.0) then
+                  id%INFO(1) = -72
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                 id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+            elseif(trim(mode).EQ."restore") then
+               nullify(id%PERM_L0_OMP)
+               read(unit,iostat=err) size_array1
+               if(err.ne.0) THEN
+                  id%INFO(1) = -75
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
+     &                 ,id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+               if(size_array1.EQ.-999) then
+                  SIZE_GEST(i1)=SIZE_INT*2
+                  SIZE_VARIABLES(i1)=0_8
+                  read(unit,iostat=err) dummy
+               else
+                  SIZE_GEST(i1)=SIZE_INT
+                  SIZE_VARIABLES(i1)=size_array1*SIZE_INT
+                  allocate(id%PERM_L0_OMP(size_array1), stat=allocok)
+                  if (allocok .GT. 0) THEN
+                     id%INFO(1) = -78
+                     CALL MUMPS_SETI8TOI4(
+     &                    TOTAL_STRUC_SIZE-size_allocated
+     &                    ,id%INFO(2))
+                  endif
+                  read(unit,iostat=err) id%PERM_L0_OMP
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+               if(err.ne.0) THEN
+                  id%INFO(1) = -75
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
+     &                 ,id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+            endif
          CASE("PTR_LEAFS_L0_OMP")
+            NbRecords(i1)=2
+            if(trim(mode).EQ."memory_save") then
+               IF(associated(id%PTR_LEAFS_L0_OMP)) THEN
+                  SIZE_GEST(i1)=SIZE_INT
+                  SIZE_VARIABLES(i1)=
+     &                 size(id%PTR_LEAFS_L0_OMP,1)*SIZE_INT
+               ELSE
+                  SIZE_GEST(i1)=SIZE_INT*2
+                  SIZE_VARIABLES(i1)=0_8
+               ENDIF
+            elseif(trim(mode).EQ."save") then
+               IF(associated(id%PTR_LEAFS_L0_OMP)) THEN
+                  write(unit,iostat=err) size(id%PTR_LEAFS_L0_OMP,1)
+                  if(err.ne.0) then
+                     id%INFO(1) = -72
+                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                    id%INFO(2))
+                  endif
+                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &                 id%COMM, id%MYID )
+                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
+                  write(unit,iostat=err) id%PTR_LEAFS_L0_OMP
+               ELSE
+                  write(unit,iostat=err) -999
+                  if(err.ne.0) then
+                     id%INFO(1) = -72
+                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                    id%INFO(2))
+                  endif
+                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &                 id%COMM, id%MYID )
+                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
+                  write(unit,iostat=err) -999
+               ENDIF 
+               if(err.ne.0) then
+                  id%INFO(1) = -72
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                 id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+            elseif(trim(mode).EQ."restore") then
+               nullify(id%PTR_LEAFS_L0_OMP)
+               read(unit,iostat=err) size_array1
+               if(err.ne.0) THEN
+                  id%INFO(1) = -75
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
+     &                 ,id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+               if(size_array1.EQ.-999) then
+                  SIZE_GEST(i1)=SIZE_INT*2
+                  SIZE_VARIABLES(i1)=0_8
+                  read(unit,iostat=err) dummy
+               else
+                  SIZE_GEST(i1)=SIZE_INT
+                  SIZE_VARIABLES(i1)=size_array1*SIZE_INT
+                  allocate(id%PTR_LEAFS_L0_OMP(size_array1), 
+     &                 stat=allocok)
+                  if (allocok .GT. 0) THEN
+                     id%INFO(1) = -78
+                     CALL MUMPS_SETI8TOI4(
+     &                    TOTAL_STRUC_SIZE-size_allocated
+     &                    ,id%INFO(2))
+                  endif
+                  read(unit,iostat=err) id%PTR_LEAFS_L0_OMP
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+               if(err.ne.0) THEN
+                  id%INFO(1) = -75
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
+     &                 ,id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+            endif
          CASE("L0_OMP_MAPPING")
+            NbRecords(i1)=2
+            if(trim(mode).EQ."memory_save") then
+               IF(associated(id%L0_OMP_MAPPING)) THEN
+                  SIZE_GEST(i1)=SIZE_INT
+                  SIZE_VARIABLES(i1)=
+     &                 size(id%L0_OMP_MAPPING,1)*SIZE_INT
+               ELSE
+                  SIZE_GEST(i1)=SIZE_INT*2
+                  SIZE_VARIABLES(i1)=0_8
+               ENDIF
+            elseif(trim(mode).EQ."save") then
+               IF(associated(id%L0_OMP_MAPPING)) THEN
+                  write(unit,iostat=err) size(id%L0_OMP_MAPPING,1)
+                  if(err.ne.0) then
+                     id%INFO(1) = -72
+                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                    id%INFO(2))
+                  endif
+                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &                 id%COMM, id%MYID )
+                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
+                  write(unit,iostat=err) id%L0_OMP_MAPPING
+               ELSE
+                  write(unit,iostat=err) -999
+                  if(err.ne.0) then
+                     id%INFO(1) = -72
+                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                    id%INFO(2))
+                  endif
+                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &                 id%COMM, id%MYID )
+                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
+                  write(unit,iostat=err) -999
+               ENDIF 
+               if(err.ne.0) then
+                  id%INFO(1) = -72
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                 id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+            elseif(trim(mode).EQ."restore") then
+               nullify(id%L0_OMP_MAPPING)
+               read(unit,iostat=err) size_array1
+               if(err.ne.0) THEN
+                  id%INFO(1) = -75
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
+     &                 ,id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+               if(size_array1.EQ.-999) then
+                  SIZE_GEST(i1)=SIZE_INT*2
+                  SIZE_VARIABLES(i1)=0_8
+                  read(unit,iostat=err) dummy
+               else
+                  SIZE_GEST(i1)=SIZE_INT
+                  SIZE_VARIABLES(i1)=size_array1*SIZE_INT
+                  allocate(id%L0_OMP_MAPPING(size_array1), stat=allocok)
+                  if (allocok .GT. 0) THEN
+                     id%INFO(1) = -78
+                     CALL MUMPS_SETI8TOI4(
+     &                    TOTAL_STRUC_SIZE-size_allocated
+     &                    ,id%INFO(2))
+                  endif
+                  read(unit,iostat=err) id%L0_OMP_MAPPING
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+               if(err.ne.0) THEN
+                  id%INFO(1) = -75
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
+     &                 ,id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+            endif
          CASE("SINGULAR_VALUES")
         CASE("NB_SINGULAR_VALUES")
            NbRecords(i1)=1
@@ -8208,19 +8970,19 @@ C
      &              id%COMM, id%MYID )
                IF ( id%INFO(1) .LT. 0 ) GOTO 100
             endif      
-      CASE("pad0","pad1","pad2","pad3","pad4","pad5","pad8","pad11",
-     &          "pad111", "pad12","pad13","pad14","pad15")
+      CASE("pad0","pad1","pad2","pad3","pad4","pad5","pad6","pad7",
+     &     "pad11","pad111", "pad12","pad13","pad14","pad15","pad16")
       CASE DEFAULT
       END SELECT
       if(trim(mode).EQ."memory_save") then
-         NbSubRecords=int(SIZE_VARIABLES(i1)/huge(0))
+         NbSubRecords=int(SIZE_VARIABLES(i1)/huge(I4))
          IF(NbSubRecords.GT.0) then
             NbRecords(i1)=NbRecords(i1)+NbSubRecords
          ENDIF
       elseif(trim(mode).EQ."save") then
          size_written=size_written+SIZE_VARIABLES(i1)
      &        +int(SIZE_GEST(i1),kind=8)
-#if !defined(MUMPS_F2003)
+#if defined(MUMPS_NOF2003)
          size_written=size_written
      &        +int(2*id%KEEP(34)*NbRecords(i1),kind=8)
 #endif
@@ -8229,7 +8991,7 @@ C
      &        DIFF_SIZE_ALLOC_READ(i1)
          size_read=size_read+SIZE_VARIABLES(i1)
      &        +int(SIZE_GEST(i1),kind=8)
-#if !defined(MUMPS_F2003)
+#if defined(MUMPS_NOF2003)
          size_read=size_read
      &        +int(2*id%KEEP(34)*NbRecords(i1),kind=8)
 #endif
@@ -8239,12 +9001,14 @@ C
  200  continue
       if(trim(mode).EQ."memory_save") then
          WRITTEN_STRUC_SIZE=sum(SIZE_VARIABLES)+sum(SIZE_VARIABLES_ROOT)
-     &        +SIZE_VARIABLES_BLR+SIZE_VARIABLES_FRONT_DATA
+     &        +SIZE_VARIABLES_BLR+SIZE_VARIABLES_FRONT_DATA+
+     &         SIZE_VARIABLES_L0FAC
          TOTAL_STRUC_SIZE=WRITTEN_STRUC_SIZE
      &        +sum(DIFF_SIZE_ALLOC_READ)
      &        +sum(DIFF_SIZE_ALLOC_READ_ROOT)
          gest_size=sum(SIZE_GEST)+sum(SIZE_GEST_ROOT)
      &        +SIZE_GEST_BLR+SIZE_GEST_FRONT_DATA
+     &        +SIZE_GEST_L0FAC
      &        +int(5*SIZE_CHARACTER,kind=8)
      &        +int(23*SIZE_CHARACTER,kind=8)
      &        +int(2*SIZE_INT8,kind=8)+int(1,kind=8)
@@ -8257,27 +9021,119 @@ C
          ELSE
             gest_size=gest_size+int(2*SIZE_INT,kind=8)
          ENDIF
-#if !defined(MUMPS_F2003)
+#if defined(MUMPS_NOF2003)
          tot_NbRecords=sum(NbRecords)+sum(NbRecords_ROOT)+8
          gest_size=gest_size+int(2*id%KEEP(34)*tot_NbRecords,kind=8)
 #endif
          TOTAL_FILE_SIZE=WRITTEN_STRUC_SIZE+gest_size
       elseif(trim(mode).EQ."save") then
       elseif(trim(mode).EQ."restore") then
+#if ! defined(NOSCALAPACK)
          if(id%root%gridinit_done) then
             id%root%CNTXT_BLACS = id%COMM_NODES
             CALL blacs_gridinit( id%root%CNTXT_BLACS, 'R',
      &           id%root%NPROW, id%root%NPCOL )
             id%root%gridinit_done = .TRUE.
+            id%root%DESCRIPTOR(2) = id%root%CNTXT_BLACS
          endif
+#endif
       elseif(trim(mode).EQ."fake_restore") then
       elseif(trim(mode).EQ."restore_ooc") then
       endif
  100  continue
       deallocate(VARIABLES, VARIABLES_ROOT)
       RETURN
+      CONTAINS
+      SUBROUTINE DMUMPS_SAVE_INT_SHPTR_ARRAY(id_INTPTR
+     &  )
+      INTEGER, POINTER, DIMENSION(:) :: id_INTPTR
+            NbRecords(i1)=2
+            if(trim(mode).EQ."memory_save") then
+               IF(associated(id_INTPTR)
+     &            ) THEN
+                  SIZE_GEST(i1)=SIZE_INT
+                  SIZE_VARIABLES(i1)=size(id_INTPTR,1)*SIZE_INT
+               ELSE
+                  SIZE_GEST(i1)=SIZE_INT*2
+                  SIZE_VARIABLES(i1)=0_8
+               ENDIF
+            elseif(trim(mode).EQ."save") then
+               IF(associated(id_INTPTR)
+     &            ) THEN
+                  write(unit,iostat=err) size(id_INTPTR,1)
+                  if(err.ne.0) then
+                     id%INFO(1) = -72
+                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                    id%INFO(2))
+                  endif
+                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &                 id%COMM, id%MYID )
+                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
+                  write(unit,iostat=err) id_INTPTR
+               ELSE
+                  write(unit,iostat=err) -999
+                  if(err.ne.0) then
+                     id%INFO(1) = -72
+                     CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                    id%INFO(2))
+                  endif
+                  CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &                 id%COMM, id%MYID )
+                  IF ( id%INFO(1) .LT. 0 ) GOTO 100
+                  write(unit,iostat=err) -999
+               ENDIF 
+               if(err.ne.0) then
+                  id%INFO(1) = -72
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_written,
+     &                 id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+            elseif(trim(mode).EQ."restore") then
+               nullify(id_INTPTR)
+               read(unit,iostat=err) size_array1
+               if(err.ne.0) THEN
+                  id%INFO(1) = -75
+                  CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
+     &                 ,id%INFO(2))
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+               if(size_array1.EQ.-999) then
+                  SIZE_GEST(i1)=SIZE_INT*2
+                  SIZE_VARIABLES(i1)=0_8
+                  read(unit,iostat=err) dummy
+                  if(err.ne.0) THEN
+                    id%INFO(1) = -75
+                    CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
+     &                   ,id%INFO(2))
+                  endif
+               else
+                  SIZE_GEST(i1)=SIZE_INT
+                  SIZE_VARIABLES(i1)=size_array1*SIZE_INT
+                  allocate(id_INTPTR(size_array1), stat=allocok)
+                  if (allocok .GT. 0) THEN
+                     id%INFO(1) = -78
+                     CALL MUMPS_SETI8TOI4(
+     &                    TOTAL_STRUC_SIZE-size_allocated
+     &                    ,id%INFO(2))
+                  else
+                    read(unit,iostat=err) id_INTPTR
+                    if(err.ne.0) THEN
+                      id%INFO(1) = -75
+                      CALL MUMPS_SETI8TOI4(TOTAL_FILE_SIZE-size_read
+     &                     ,id%INFO(2))
+                    endif
+                  endif
+               endif
+               CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &              id%COMM, id%MYID )
+               IF ( id%INFO(1) .LT. 0 ) GOTO 100
+            endif
+ 100  CONTINUE
+      RETURN
+      END SUBROUTINE DMUMPS_SAVE_INT_SHPTR_ARRAY
       END SUBROUTINE DMUMPS_SAVE_RESTORE_STRUCTURE
       END MODULE DMUMPS_SAVE_RESTORE
-      SUBROUTINE DMUMPS_SAVE_RESTORE_RETURN()
-      RETURN
-      END SUBROUTINE DMUMPS_SAVE_RESTORE_RETURN

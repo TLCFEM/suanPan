@@ -1,15 +1,16 @@
 /*
  *
- *  This file is part of MUMPS 5.2.1, released
- *  on Fri Jun 14 14:46:05 UTC 2019
+ *  This file is part of MUMPS 5.6.0, released
+ *  on Wed Apr 19 15:50:57 UTC 2023
  *
  *
- *  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+ *  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
  *  Mumps Technologies, University of Bordeaux.
  *
  *  This version of MUMPS is provided to you free of charge. It is
- *  released under the CeCILL-C license:
- *  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+ *  released under the CeCILL-C license 
+ *  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+ *  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
  *
  */
 #ifndef MUMPS_METIS_H
@@ -26,6 +27,15 @@ MUMPS_PARMETIS(MUMPS_INT *first,      MUMPS_INT *vertloctab,
                MUMPS_INT *options,    MUMPS_INT *order,
                MUMPS_INT *sizes,      MUMPS_INT *comm,
                MUMPS_INT *ierr);
+#define MUMPS_PARMETIS_VWGT \
+  F_SYMBOL(parmetis_vwgt,PARMETIS_VWGT)
+void MUMPS_CALL
+MUMPS_PARMETIS_VWGT(MUMPS_INT *first,      MUMPS_INT *vertloctab,
+               MUMPS_INT *edgeloctab, MUMPS_INT *numflag,
+               MUMPS_INT *options,    MUMPS_INT *order,
+               MUMPS_INT *sizes,      MUMPS_INT *comm,
+               MUMPS_INT *vwgt,
+               MUMPS_INT *ierr);
 #endif
 #if defined(parmetis) || defined(metis) || defined(parmetis3) || defined(metis4)
 #define MUMPS_METIS_KWAY \
@@ -34,5 +44,11 @@ void MUMPS_CALL
 MUMPS_METIS_KWAY(MUMPS_INT *n,     MUMPS_INT *iptr,
                  MUMPS_INT *jcn,   MUMPS_INT *k,
                  MUMPS_INT *part);
+#define MUMPS_METIS_KWAY_AB \
+  F_SYMBOL(metis_kway_ab,METIS_KWAY_AB)
+void MUMPS_CALL
+MUMPS_METIS_KWAY_AB(MUMPS_INT *n,     MUMPS_INT *iptr,
+                 MUMPS_INT *jcn,   MUMPS_INT *k,
+                 MUMPS_INT *part,  MUMPS_INT *vwgt);
 #endif
 #endif

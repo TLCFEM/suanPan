@@ -1,14 +1,15 @@
 C
-C  This file is part of MUMPS 5.2.1, released
-C  on Fri Jun 14 14:46:05 UTC 2019
+C  This file is part of MUMPS 5.6.0, released
+C  on Wed Apr 19 15:50:57 UTC 2023
 C
 C
-C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license:
-C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+C  released under the CeCILL-C license 
+C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
       SUBROUTINE DMUMPS_PROCESS_NODE( MYID,KEEP,KEEP8,DKEEP,
      &           BUFR, LBUFR, LBUFR_BYTES,
@@ -18,6 +19,7 @@ C
      &           NSTK_S, COMP,
      &           FPERE, FLAG, IFLAG, IERROR, COMM,
      &           ITLOC, RHS_MUMPS )
+      USE DMUMPS_DYNAMIC_MEMORY_M, ONLY : DMUMPS_DM_SET_PTR
       IMPLICIT NONE
       INCLUDE 'mpif.h'
       INTEGER IERR
@@ -49,6 +51,8 @@ C
       INTEGER NBROWS_ALREADY_SENT, NBROWS_PACKET
       INCLUDE 'mumps_headers.h'
       LOGICAL PACKED_CB
+      DOUBLE PRECISION, POINTER, DIMENSION(:) :: SON_A
+      INTEGER(8) :: DYN_SIZE
       FLAG = .FALSE.
       POSITION = 0
       CALL MPI_UNPACK(BUFR, LBUFR_BYTES, POSITION,
@@ -80,7 +84,7 @@ C
      &  LRLU, IPTRLU,IWPOS,IWPOSCB, SLAVEF, PROCNODE_STEPS, DAD,
      &  PTRIST,PTRAST,STEP, PIMASTER, PAMASTER,
      &  LREQ, LREQCB, FINODE, S_NOTFREE, .TRUE.,
-     &  COMP, LRLUS, IFLAG, IERROR
+     &  COMP, LRLUS, KEEP8(67), IFLAG, IERROR
      &     )
         IF ( IFLAG .LT. 0 ) RETURN
         PIMASTER(STEP( FINODE )) = IWPOSCB + 1
@@ -100,12 +104,20 @@ C
         SIZE_PACKET = NBROWS_PACKET * FLCONT
       ENDIF
       IF (NBROWS_PACKET.NE.0) THEN
-        IF ( LREQCB .ne. 0_8 ) THEN
-        IPOS_NODE = PAMASTER(STEP(FINODE))-1_8
-        CALL MPI_UNPACK(BUFR, LBUFR_BYTES, POSITION,
-     &        A(IPOS_NODE + 1_8 + ISHIFT_PACKET),
-     &        SIZE_PACKET, MPI_DOUBLE_PRECISION, COMM, IERR)
-        END IF
+        CALL MUMPS_GETI8(DYN_SIZE, IW(PIMASTER(STEP(FINODE))+XXD))
+        IF (DYN_SIZE .GT. 0_8) THEN
+          CALL DMUMPS_DM_SET_PTR( PAMASTER(STEP(FINODE)),
+     &                            DYN_SIZE, SON_A )
+          IPOS_NODE = 1_8
+          CALL MPI_UNPACK(BUFR, LBUFR_BYTES, POSITION,
+     &         SON_A(IPOS_NODE + ISHIFT_PACKET),
+     &         SIZE_PACKET, MPI_DOUBLE_PRECISION, COMM, IERR)
+        ELSE
+          IPOS_NODE = PAMASTER(STEP(FINODE))
+          CALL MPI_UNPACK(BUFR, LBUFR_BYTES, POSITION,
+     &         A(IPOS_NODE + ISHIFT_PACKET),
+     &         SIZE_PACKET, MPI_DOUBLE_PRECISION, COMM, IERR)
+        ENDIF
       ENDIF
       IF (NBROWS_ALREADY_SENT+NBROWS_PACKET == FLCONT) THEN
         NSTK_S(STEP(FPERE)) = NSTK_S(STEP(FPERE)) - 1

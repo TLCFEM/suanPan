@@ -1,14 +1,15 @@
 C
-C  This file is part of MUMPS 5.2.1, released
-C  on Fri Jun 14 14:46:05 UTC 2019
+C  This file is part of MUMPS 5.6.0, released
+C  on Wed Apr 19 15:50:57 UTC 2023
 C
 C
-C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license:
-C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+C  released under the CeCILL-C license 
+C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
       MODULE MUMPS_LR_COMMON
       IMPLICIT NONE
@@ -17,6 +18,17 @@ C
         INTEGER, INTENT(IN) :: MAXSIZE, NASS, K472
         INTEGER, INTENT(OUT) :: IBCKSZ
         IF (K472.EQ.1) THEN
+#if defined(__ve__)
+          IF (NASS.LE.1000) THEN
+            IBCKSZ = 256
+          ELSEIF (NASS.GT.1000.AND.NASS.LE.5000) THEN
+            IBCKSZ = 384
+          ELSEIF (NASS.GT.5000.AND.NASS.LE.10000) THEN
+            IBCKSZ = 512
+          ELSE
+            IBCKSZ = 512
+          ENDIF
+#else
           IF (NASS.LE.1000) THEN
             IBCKSZ = 128
           ELSEIF (NASS.GT.1000.AND.NASS.LE.5000) THEN
@@ -26,6 +38,7 @@ C
           ELSE
             IBCKSZ = 512
           ENDIF
+#endif
           IBCKSZ = min(IBCKSZ,MAXSIZE)
         ELSE
           IBCKSZ = MAXSIZE

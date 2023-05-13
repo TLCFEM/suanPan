@@ -1,15 +1,16 @@
 /*
  *
- *  This file is part of MUMPS 5.2.1, released
- *  on Fri Jun 14 14:46:05 UTC 2019
+ *  This file is part of MUMPS 5.6.0, released
+ *  on Wed Apr 19 15:50:57 UTC 2023
  *
  *
- *  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+ *  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
  *  Mumps Technologies, University of Bordeaux.
  *
  *  This version of MUMPS is provided to you free of charge. It is
- *  released under the CeCILL-C license:
- *  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+ *  released under the CeCILL-C license 
+ *  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+ *  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
  *
  */
 #include <stdio.h>  /* For NULL constant (stddef.h) and debug printings */
@@ -32,6 +33,8 @@ MUMPS_PARMETIS(MUMPS_INT *first,      MUMPS_INT *vertloctab,
                MUMPS_INT *sizes,      MUMPS_INT *comm,
                MUMPS_INT *ierr)
 {
+/* FIXME: ANA_BLK, to provide weights one should use ParMETIS_V32_NodeND and 
+   not  ParMETIS_V3_NodeND which is a wrapper to ParMETIS_V32_NodeND */
   MPI_Comm  int_comm;
   int iierr;
   int_comm = MPI_Comm_f2c(*comm);
@@ -45,7 +48,45 @@ MUMPS_PARMETIS(MUMPS_INT *first,      MUMPS_INT *vertloctab,
         *ierr=1;
 #  else
       /* SHOULD NEVER BE CALLED */
-      printf("** Error: ParMETIS version >= 4, IDXTYPE WIDTH !=64, but MUMPS_PARMETIS_64 was called\n");
+      printf("** Error: ParMETIS version >= 4, IDXTYPE WIDTH =64, but MUMPS_PARMETIS was called\n");
+      *ierr=1;
+#  endif
+#endif
+  return;
+}
+void MUMPS_CALL
+MUMPS_PARMETIS_VWGT(MUMPS_INT *first,      MUMPS_INT *vertloctab,
+               MUMPS_INT *edgeloctab, MUMPS_INT *numflag,
+               MUMPS_INT *options,    MUMPS_INT *order,
+               MUMPS_INT *sizes,      MUMPS_INT *comm,
+               MUMPS_INT *vwgt,
+               MUMPS_INT *ierr)
+{
+/* with weights one should use ParMETIS_V32_NodeND and 
+   not  ParMETIS_V3_NodeND which is a wrapper to ParMETIS_V32_NodeND */
+  MPI_Comm  int_comm;
+  int iierr;
+  int_comm = MPI_Comm_f2c(*comm);
+#if defined(parmetis3)
+/* vwgt not used */
+  ParMETIS_V3_NodeND(first, vertloctab, edgeloctab, numflag, options, order, sizes, &int_comm);
+#elif defined(parmetis)
+#  if (IDXTYPEWIDTH == 32)
+      *ierr=0;
+/* int ParMETIS V32 NodeND (
+idx t *vtxdist, idx t *xadj, idx t *adjncy, idx t *vwgt, idx t *numflag, idx t *mtype,
+idx t *rtype, idx t *p nseps, int *s nseps, real t *ubfrac, idx t *seed, idx t *dbglvl,
+idx t *order, idx t *sizes, MPI Comm *comm
+)
+*/
+      iierr=ParMETIS_V32_NodeND(first, vertloctab, edgeloctab, vwgt, numflag, 
+                                NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
+                                order, sizes, &int_comm);
+      if(iierr != METIS_OK)
+        *ierr=1;
+#  else
+      /* SHOULD NEVER BE CALLED */
+      printf("** Error: ParMETIS version >= 4, IDXTYPE WIDTH =64, but MUMPS_PARMETIS_VWGT was called\n");
       *ierr=1;
 #  endif
 #endif
@@ -104,6 +145,52 @@ MUMPS_METIS_KWAY(MUMPS_INT *n,     MUMPS_INT *iptr,
 #  else
   /* SHOULD NEVER BE CALLED */
   printf("** Error: METIS version >= 4, IDXTYPE WIDTH !=32, but MUMPS_METIS_KWAY was called\n");
+  ierr=1;
+#  endif
+#endif
+  return;
+ }
+/* Interface for metis k-way partitioning with standard ints and weights on vertices*/
+void MUMPS_CALL
+MUMPS_METIS_KWAY_AB(MUMPS_INT *n,     MUMPS_INT *iptr,
+                 MUMPS_INT *jcn,   MUMPS_INT *k,
+                 MUMPS_INT *part, MUMPS_INT *vwgt)
+/* n     -- the size of the graph to be partitioned
+   iptr  -- pointer to the beginning of each node's adjacency list
+   jcn   -- jcn[iptr[i]:iptr[i+1]-1] contains the list of neighbors of node i
+   k     -- the number of parts
+   part  -- part[i] is the part node i belongs to 
+   vwgt  -- weights of the vertices*/
+ {
+#if defined(metis4) || defined(parmetis3)
+  MUMPS_INT numflag, edgecut, wgtflag, options[8];
+  options[0] = 0;
+  /* unweighted partitioning */
+  wgtflag    = 0;
+  /* Use 1-based fortran numbering */
+  numflag    = 1;
+/* void METIS_PartGraphKway(int *, idxtype *, idxtype *, idxtype *, idxtype *, int *, int *, int *, int *, int *, idxtype *); */
+  METIS_PartGraphKway(n, iptr, jcn,
+                      vwgt, NULL, &wgtflag,
+                      &numflag, k,
+                      options, &edgecut,
+                      part);
+#else /* METIS >= 5 */
+  int ierr;
+#  if (IDXTYPEWIDTH == 32)
+  MUMPS_INT ncon, edgecut, options[40];
+  ierr=METIS_SetDefaultOptions(options);
+  options[0]  = 0;
+  /* Use 1-based fortran numbering */
+  options[17] = 1;
+  ncon        = 1;
+  ierr = METIS_PartGraphKway(n, &ncon, iptr, jcn,
+                             vwgt, NULL, NULL,
+                             k, NULL, NULL, options,
+                             &edgecut, part);
+#  else
+  /* SHOULD NEVER BE CALLED */
+  printf("** Error: METIS version >= 4, IDXTYPE WIDTH !=32, but MUMPS_METIS_KWAY_AB was called\n");
   ierr=1;
 #  endif
 #endif

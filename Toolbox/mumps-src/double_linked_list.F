@@ -1,16 +1,17 @@
 C
-C  This file is part of MUMPS 5.2.1, released
-C  on Fri Jun 14 14:46:05 UTC 2019
+C  This file is part of MUMPS 5.6.0, released
+C  on Wed Apr 19 15:50:57 UTC 2023
 C
 C
-C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license:
-C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+C  released under the CeCILL-C license 
+C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
-       MODULE IDLL
+      MODULE MUMPS_IDLL
       IMPLICIT NONE
       TYPE IDLL_NODE_T
           TYPE ( IDLL_NODE_T ), POINTER :: NEXT, PREV
@@ -22,10 +23,10 @@ C
       CONTAINS
       FUNCTION IDLL_CREATE(DLL)
           INTEGER :: IDLL_CREATE
-#if defined(MUMPS_F2003)
-          TYPE ( IDLL_T ), POINTER, INTENT ( OUT ) :: DLL
-#else
+#if defined(MUMPS_NOF2003)
           TYPE ( IDLL_T ), POINTER :: DLL
+#else
+          TYPE ( IDLL_T ), POINTER, INTENT ( OUT ) :: DLL
 #endif
           INTEGER IERR
           ALLOCATE ( DLL, STAT=IERR )
@@ -40,10 +41,10 @@ C
       END FUNCTION IDLL_CREATE
       FUNCTION IDLL_DESTROY(DLL)
           INTEGER :: IDLL_DESTROY
-#if defined(MUMPS_F2003)
-          TYPE ( IDLL_T ), POINTER, INTENT ( OUT ) :: DLL
-#else
+#if defined(MUMPS_NOF2003)
           TYPE ( IDLL_T ), POINTER :: DLL
+#else
+          TYPE ( IDLL_T ), POINTER, INTENT ( OUT ) :: DLL
 #endif
           TYPE ( IDLL_NODE_T ), POINTER :: AUX
           IF ( .NOT. associated ( DLL ) ) THEN
@@ -60,10 +61,10 @@ C
       END FUNCTION IDLL_DESTROY
       FUNCTION IDLL_PUSH_FRONT(DLL, ELMT)
           INTEGER :: IDLL_PUSH_FRONT
-#if defined(MUMPS_F2003)
-          TYPE ( IDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
-#else
+#if defined(MUMPS_NOF2003)
           TYPE ( IDLL_T ), POINTER :: DLL
+#else
+          TYPE ( IDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
 #endif
           INTEGER, INTENT ( IN ) :: ELMT
           TYPE ( IDLL_NODE_T ), POINTER :: NODE
@@ -91,10 +92,10 @@ C
       END FUNCTION IDLL_PUSH_FRONT
       FUNCTION IDLL_POP_FRONT(DLL, ELMT)
           INTEGER :: IDLL_POP_FRONT
-#if defined(MUMPS_F2003)
-          TYPE ( IDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
-#else
+#if defined(MUMPS_NOF2003)
           TYPE ( IDLL_T ), POINTER :: DLL
+#else
+          TYPE ( IDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
 #endif
           INTEGER, INTENT ( OUT ) :: ELMT
           TYPE ( IDLL_NODE_T ), POINTER :: AUX
@@ -120,10 +121,10 @@ C
       END FUNCTION IDLL_POP_FRONT
       FUNCTION IDLL_PUSH_BACK(DLL, ELMT)
           INTEGER :: IDLL_PUSH_BACK
-#if defined(MUMPS_F2003)
-          TYPE ( IDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
-#else
+#if defined(MUMPS_NOF2003)
           TYPE ( IDLL_T ), POINTER :: DLL
+#else
+          TYPE ( IDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
 #endif
           INTEGER, INTENT ( IN ) :: ELMT
           TYPE ( IDLL_NODE_T ), POINTER :: NODE
@@ -151,10 +152,10 @@ C
       END FUNCTION IDLL_PUSH_BACK
       FUNCTION IDLL_POP_BACK(DLL, ELMT)
           INTEGER :: IDLL_POP_BACK
-#if defined(MUMPS_F2003)
-          TYPE ( IDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
-#else
+#if defined(MUMPS_NOF2003)
           TYPE ( IDLL_T ), POINTER :: DLL
+#else
+          TYPE ( IDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
 #endif
           INTEGER, INTENT ( OUT ) :: ELMT
           TYPE ( IDLL_NODE_T ), POINTER :: AUX
@@ -180,10 +181,10 @@ C
       END FUNCTION IDLL_POP_BACK
       FUNCTION IDLL_INSERT(DLL, POS, ELMT)
           INTEGER :: IDLL_INSERT
-#if defined(MUMPS_F2003)
-          TYPE ( IDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
-#else
+#if defined(MUMPS_NOF2003)
           TYPE ( IDLL_T ), POINTER :: DLL
+#else
+          TYPE ( IDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
 #endif
           INTEGER, INTENT ( IN ) :: POS, ELMT
           TYPE ( IDLL_NODE_T ), POINTER :: NODE
@@ -241,12 +242,12 @@ C
       END FUNCTION IDLL_INSERT
       FUNCTION IDLL_INSERT_BEFORE(DLL, NODE_AFTER, ELMT)
           INTEGER :: IDLL_INSERT_BEFORE
-#if defined(MUMPS_F2003)
-          TYPE ( IDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
-          TYPE ( IDLL_NODE_T ), POINTER, INTENT ( IN ) :: NODE_AFTER
-#else
+#if defined(MUMPS_NOF2003)
           TYPE ( IDLL_T ), POINTER :: DLL
           TYPE ( IDLL_NODE_T ), POINTER :: NODE_AFTER
+#else
+          TYPE ( IDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
+          TYPE ( IDLL_NODE_T ), POINTER, INTENT ( IN ) :: NODE_AFTER
 #endif
           INTEGER, INTENT ( IN ) :: ELMT
           TYPE ( IDLL_NODE_T ), POINTER :: NODE_BEFORE
@@ -272,12 +273,12 @@ C
       END FUNCTION IDLL_INSERT_BEFORE
       FUNCTION IDLL_INSERT_AFTER(DLL, NODE_BEFORE, ELMT)
           INTEGER :: IDLL_INSERT_AFTER
-#if defined(MUMPS_F2003)
-          TYPE ( IDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
-          TYPE ( IDLL_NODE_T ), POINTER, INTENT ( IN ) :: NODE_BEFORE
-#else
+#if defined(MUMPS_NOF2003)
           TYPE ( IDLL_T ), POINTER :: DLL
           TYPE ( IDLL_NODE_T ), POINTER :: NODE_BEFORE
+#else
+          TYPE ( IDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
+          TYPE ( IDLL_NODE_T ), POINTER, INTENT ( IN ) :: NODE_BEFORE
 #endif
           INTEGER, INTENT ( IN ) :: ELMT
           TYPE ( IDLL_NODE_T ), POINTER :: NODE_AFTER
@@ -303,10 +304,10 @@ C
       END FUNCTION IDLL_INSERT_AFTER
       FUNCTION IDLL_LOOKUP (DLL, POS, ELMT)
           INTEGER :: IDLL_LOOKUP
-#if defined(MUMPS_F2003)
-          TYPE ( IDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
-#else
+#if defined(MUMPS_NOF2003)
           TYPE ( IDLL_T ), POINTER :: DLL
+#else
+          TYPE ( IDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
 #endif
           INTEGER, INTENT ( IN ) :: POS
           INTEGER, INTENT ( OUT ) :: ELMT
@@ -335,10 +336,10 @@ C
       END FUNCTION IDLL_LOOKUP
       FUNCTION IDLL_REMOVE_POS(DLL, POS, ELMT)
           INTEGER :: IDLL_REMOVE_POS
-#if defined(MUMPS_F2003)
-          TYPE ( IDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
-#else
+#if defined(MUMPS_NOF2003)
           TYPE ( IDLL_T ), POINTER :: DLL
+#else
+          TYPE ( IDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
 #endif
           INTEGER, INTENT ( IN ) :: POS
           INTEGER, INTENT ( OUT ) :: ELMT
@@ -383,10 +384,10 @@ C
       END FUNCTION IDLL_REMOVE_POS
       FUNCTION IDLL_REMOVE_ELMT(DLL, ELMT, POS)
           INTEGER :: IDLL_REMOVE_ELMT
-#if defined(MUMPS_F2003)
-          TYPE ( IDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
-#else
+#if defined(MUMPS_NOF2003)
           TYPE ( IDLL_T ), POINTER :: DLL
+#else
+          TYPE ( IDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
 #endif
           INTEGER, INTENT ( IN ) :: ELMT
           INTEGER, INTENT ( OUT ) :: POS
@@ -431,18 +432,18 @@ C
       END FUNCTION IDLL_REMOVE_ELMT
       FUNCTION IDLL_LENGTH(DLL)
           INTEGER :: IDLL_LENGTH
-#if defined(MUMPS_F2003)
-          TYPE ( IDLL_T ), POINTER, INTENT ( IN ) :: DLL
-#else
+#if defined(MUMPS_NOF2003)
           TYPE ( IDLL_T ), POINTER :: DLL
+#else
+          TYPE ( IDLL_T ), POINTER, INTENT ( IN ) :: DLL
 #endif
           INTEGER :: LENGTH
           TYPE ( IDLL_NODE_T ), POINTER :: AUX
+          LENGTH = 0
           IF ( .NOT. associated ( DLL ) ) THEN
               IDLL_LENGTH = -1
               RETURN
           END IF
-          LENGTH = 0
           AUX => DLL%FRONT
           DO WHILE ( associated ( AUX ) )
               LENGTH = LENGTH + 1
@@ -452,12 +453,12 @@ C
       END FUNCTION IDLL_LENGTH
       FUNCTION IDLL_ITERATOR_BEGIN(DLL, PTR)
           INTEGER :: IDLL_ITERATOR_BEGIN
-#if defined(MUMPS_F2003)
-          TYPE ( IDLL_T ), POINTER, INTENT ( IN ) :: DLL
-          TYPE ( IDLL_NODE_T ), POINTER, INTENT ( OUT ) :: PTR
-#else
+#if defined(MUMPS_NOF2003)
           TYPE ( IDLL_T ), POINTER  :: DLL
           TYPE ( IDLL_NODE_T ), POINTER :: PTR
+#else
+          TYPE ( IDLL_T ), POINTER, INTENT ( IN ) :: DLL
+          TYPE ( IDLL_NODE_T ), POINTER, INTENT ( OUT ) :: PTR
 #endif
           IF ( .NOT. associated ( DLL ) ) THEN
               IDLL_ITERATOR_BEGIN = -1
@@ -468,12 +469,12 @@ C
       END FUNCTION IDLL_ITERATOR_BEGIN
       FUNCTION IDLL_ITERATOR_END(DLL, PTR)
           INTEGER :: IDLL_ITERATOR_END
-#if defined(MUMPS_F2003)
-          TYPE ( IDLL_T ), POINTER, INTENT ( IN ) :: DLL
-          TYPE ( IDLL_NODE_T ), POINTER, INTENT ( OUT ) :: PTR
-#else
+#if defined(MUMPS_NOF2003)
           TYPE ( IDLL_T ), POINTER :: DLL
           TYPE ( IDLL_NODE_T ), POINTER :: PTR
+#else
+          TYPE ( IDLL_T ), POINTER, INTENT ( IN ) :: DLL
+          TYPE ( IDLL_NODE_T ), POINTER, INTENT ( OUT ) :: PTR
 #endif
           IF ( .NOT. associated ( DLL ) ) THEN
               IDLL_ITERATOR_END = -1
@@ -484,21 +485,21 @@ C
       END FUNCTION IDLL_ITERATOR_END
       FUNCTION IDLL_IS_EMPTY(DLL)
           LOGICAL :: IDLL_IS_EMPTY
-#if defined(MUMPS_F2003)
-          TYPE ( IDLL_T ), POINTER, INTENT ( IN ) :: DLL
-#else
+#if defined(MUMPS_NOF2003)
           TYPE ( IDLL_T ), POINTER :: DLL
+#else
+          TYPE ( IDLL_T ), POINTER, INTENT ( IN ) :: DLL
 #endif
           IDLL_IS_EMPTY = ( associated ( DLL%FRONT ) )
       END FUNCTION IDLL_IS_EMPTY
       FUNCTION IDLL_2_ARRAY(DLL, ARRAY, LENGTH)
           INTEGER :: IDLL_2_ARRAY
-#if defined(MUMPS_F2003)
-          TYPE ( IDLL_T ), POINTER, INTENT ( IN ) :: DLL
-          INTEGER, POINTER, DIMENSION (:), INTENT ( OUT ) :: ARRAY
-#else
+#if defined(MUMPS_NOF2003)
           TYPE ( IDLL_T ), POINTER :: DLL
           INTEGER, POINTER, DIMENSION (:) :: ARRAY
+#else
+          TYPE ( IDLL_T ), POINTER, INTENT ( IN ) :: DLL
+          INTEGER, POINTER, DIMENSION (:), INTENT ( OUT ) :: ARRAY
 #endif
           INTEGER, INTENT ( OUT ) :: LENGTH
           TYPE ( IDLL_NODE_T ), POINTER :: AUX
@@ -508,7 +509,7 @@ C
               RETURN
           END IF
           LENGTH = IDLL_LENGTH(DLL)
-          ALLOCATE ( ARRAY ( LENGTH ), STAT=IERR )
+          ALLOCATE ( ARRAY ( max(1,LENGTH) ), STAT=IERR )
           IF ( IERR .NE. 0 ) THEN
               IDLL_2_ARRAY = -2
               RETURN
@@ -522,8 +523,8 @@ C
           END DO
           IDLL_2_ARRAY = 0
       END FUNCTION IDLL_2_ARRAY
-      END MODULE IDLL
-      MODULE DDLL
+      END MODULE MUMPS_IDLL
+      MODULE MUMPS_DDLL
       IMPLICIT NONE
       TYPE DDLL_NODE_T
           TYPE ( DDLL_NODE_T ), POINTER :: NEXT, PREV
@@ -535,10 +536,10 @@ C
       CONTAINS
       FUNCTION DDLL_CREATE(DLL)
           INTEGER :: DDLL_CREATE
-#if defined(MUMPS_F2003)
-          TYPE ( DDLL_T ), POINTER, INTENT ( OUT ) :: DLL
-#else
+#if defined(MUMPS_NOF2003)
           TYPE ( DDLL_T ), POINTER :: DLL
+#else
+          TYPE ( DDLL_T ), POINTER, INTENT ( OUT ) :: DLL
 #endif
           INTEGER IERR
           ALLOCATE ( DLL, STAT=IERR )
@@ -553,10 +554,10 @@ C
       END FUNCTION DDLL_CREATE
       FUNCTION DDLL_DESTROY(DLL)
           INTEGER :: DDLL_DESTROY
-#if defined(MUMPS_F2003)
-          TYPE ( DDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
-#else
+#if defined(MUMPS_NOF2003)
           TYPE ( DDLL_T ), POINTER :: DLL
+#else
+          TYPE ( DDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
 #endif
           TYPE ( DDLL_NODE_T ), POINTER :: AUX
           IF ( .NOT. associated ( DLL ) ) THEN
@@ -573,10 +574,10 @@ C
       END FUNCTION DDLL_DESTROY
       FUNCTION DDLL_PUSH_FRONT(DLL, ELMT)
           INTEGER :: DDLL_PUSH_FRONT
-#if defined(MUMPS_F2003)
-          TYPE ( DDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
-#else
+#if defined(MUMPS_NOF2003)
           TYPE ( DDLL_T ), POINTER :: DLL
+#else
+          TYPE ( DDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
 #endif
           DOUBLE PRECISION, INTENT ( IN ) :: ELMT
           TYPE ( DDLL_NODE_T ), POINTER :: NODE
@@ -604,10 +605,10 @@ C
       END FUNCTION DDLL_PUSH_FRONT
       FUNCTION DDLL_POP_FRONT(DLL, ELMT)
           INTEGER :: DDLL_POP_FRONT
-#if defined(MUMPS_F2003)
-          TYPE ( DDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
-#else
+#if defined(MUMPS_NOF2003)
           TYPE ( DDLL_T ), POINTER :: DLL
+#else
+          TYPE ( DDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
 #endif
           DOUBLE PRECISION, INTENT ( OUT ) :: ELMT
           TYPE ( DDLL_NODE_T ), POINTER :: AUX
@@ -633,10 +634,10 @@ C
       END FUNCTION DDLL_POP_FRONT
       FUNCTION DDLL_PUSH_BACK(DLL, ELMT)
           INTEGER :: DDLL_PUSH_BACK
-#if defined(MUMPS_F2003)
-          TYPE ( DDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
-#else
+#if defined(MUMPS_NOF2003)
           TYPE ( DDLL_T ), POINTER :: DLL
+#else
+          TYPE ( DDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
 #endif
           DOUBLE PRECISION, INTENT ( IN ) :: ELMT
           TYPE ( DDLL_NODE_T ), POINTER :: NODE
@@ -664,10 +665,10 @@ C
       END FUNCTION DDLL_PUSH_BACK
       FUNCTION DDLL_POP_BACK(DLL, ELMT)
           INTEGER :: DDLL_POP_BACK
-#if defined(MUMPS_F2003)
-          TYPE ( DDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
-#else
+#if defined(MUMPS_NOF2003)
           TYPE ( DDLL_T ), POINTER :: DLL
+#else
+          TYPE ( DDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
 #endif
           DOUBLE PRECISION, INTENT ( OUT ) :: ELMT
           TYPE ( DDLL_NODE_T ), POINTER :: AUX
@@ -693,10 +694,10 @@ C
       END FUNCTION DDLL_POP_BACK
       FUNCTION DDLL_INSERT(DLL, POS, ELMT)
           INTEGER :: DDLL_INSERT
-#if defined(MUMPS_F2003)
-          TYPE ( DDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
-#else
+#if defined(MUMPS_NOF2003)
           TYPE ( DDLL_T ), POINTER :: DLL
+#else
+          TYPE ( DDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
 #endif
           INTEGER, INTENT ( IN ) :: POS
           DOUBLE PRECISION , INTENT ( IN ) :: ELMT
@@ -755,12 +756,12 @@ C
       END FUNCTION DDLL_INSERT
       FUNCTION DDLL_INSERT_BEFORE(DLL, NODE_AFTER, ELMT)
           INTEGER :: DDLL_INSERT_BEFORE
-#if defined(MUMPS_F2003)
-          TYPE ( DDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
-          TYPE ( DDLL_NODE_T ), POINTER, INTENT ( IN ) :: NODE_AFTER
-#else
+#if defined(MUMPS_NOF2003)
           TYPE ( DDLL_T ), POINTER :: DLL
           TYPE ( DDLL_NODE_T ), POINTER :: NODE_AFTER
+#else
+          TYPE ( DDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
+          TYPE ( DDLL_NODE_T ), POINTER, INTENT ( IN ) :: NODE_AFTER
 #endif
           DOUBLE PRECISION, INTENT ( IN ) :: ELMT
           TYPE ( DDLL_NODE_T ), POINTER :: NODE_BEFORE
@@ -786,12 +787,12 @@ C
       END FUNCTION DDLL_INSERT_BEFORE
       FUNCTION DDLL_INSERT_AFTER(DLL, NODE_BEFORE, ELMT)
           INTEGER :: DDLL_INSERT_AFTER
-#if defined(MUMPS_F2003)
-          TYPE ( DDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
-          TYPE ( DDLL_NODE_T ), POINTER, INTENT ( IN ) :: NODE_BEFORE
-#else
+#if defined(MUMPS_NOF2003)
           TYPE ( DDLL_T ), POINTER :: DLL
           TYPE ( DDLL_NODE_T ), POINTER :: NODE_BEFORE
+#else
+          TYPE ( DDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
+          TYPE ( DDLL_NODE_T ), POINTER, INTENT ( IN ) :: NODE_BEFORE
 #endif
           DOUBLE PRECISION, INTENT ( IN ) :: ELMT
           TYPE ( DDLL_NODE_T ), POINTER :: NODE_AFTER
@@ -817,10 +818,10 @@ C
       END FUNCTION DDLL_INSERT_AFTER
       FUNCTION DDLL_LOOKUP (DLL, POS, ELMT)
           INTEGER :: DDLL_LOOKUP
-#if defined(MUMPS_F2003)
-          TYPE ( DDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
-#else
+#if defined(MUMPS_NOF2003)
           TYPE ( DDLL_T ), POINTER :: DLL
+#else
+          TYPE ( DDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
 #endif
           INTEGER, INTENT ( IN ) :: POS
           DOUBLE PRECISION, INTENT ( OUT ) :: ELMT
@@ -849,10 +850,10 @@ C
       END FUNCTION DDLL_LOOKUP
       FUNCTION DDLL_REMOVE_POS(DLL, POS, ELMT)
           INTEGER :: DDLL_REMOVE_POS
-#if defined(MUMPS_F2003)
-          TYPE ( DDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
-#else
+#if defined(MUMPS_NOF2003)
           TYPE ( DDLL_T ), POINTER :: DLL
+#else
+          TYPE ( DDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
 #endif
           INTEGER, INTENT ( IN ) :: POS
           DOUBLE PRECISION, INTENT ( OUT ) :: ELMT
@@ -897,10 +898,10 @@ C
       END FUNCTION DDLL_REMOVE_POS
       FUNCTION DDLL_REMOVE_ELMT(DLL, ELMT, POS)
           INTEGER :: DDLL_REMOVE_ELMT
-#if defined(MUMPS_F2003)
-          TYPE ( DDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
-#else
+#if defined(MUMPS_NOF2003)
           TYPE ( DDLL_T ), POINTER :: DLL
+#else
+          TYPE ( DDLL_T ), POINTER, INTENT ( INOUT ) :: DLL
 #endif
           DOUBLE PRECISION, INTENT ( IN ) :: ELMT
           INTEGER, INTENT ( OUT ) :: POS
@@ -945,10 +946,10 @@ C
       END FUNCTION DDLL_REMOVE_ELMT
       FUNCTION DDLL_LENGTH(DLL)
           INTEGER :: DDLL_LENGTH
-#if defined(MUMPS_F2003)
-          TYPE ( DDLL_T ), POINTER, INTENT ( IN ) :: DLL
-#else
+#if defined(MUMPS_NOF2003)
           TYPE ( DDLL_T ), POINTER :: DLL
+#else
+          TYPE ( DDLL_T ), POINTER, INTENT ( IN ) :: DLL
 #endif
           INTEGER :: LENGTH
           TYPE ( DDLL_NODE_T ), POINTER :: AUX
@@ -966,12 +967,12 @@ C
       END FUNCTION DDLL_LENGTH
       FUNCTION DDLL_ITERATOR_BEGIN(DLL, PTR)
           INTEGER :: DDLL_ITERATOR_BEGIN
-#if defined(MUMPS_F2003)
-          TYPE ( DDLL_T ), POINTER, INTENT ( IN ) :: DLL
-          TYPE ( DDLL_NODE_T ), POINTER, INTENT ( OUT ) :: PTR
-#else
+#if defined(MUMPS_NOF2003)
           TYPE ( DDLL_T ), POINTER :: DLL
           TYPE ( DDLL_NODE_T ), POINTER :: PTR
+#else
+          TYPE ( DDLL_T ), POINTER, INTENT ( IN ) :: DLL
+          TYPE ( DDLL_NODE_T ), POINTER, INTENT ( OUT ) :: PTR
 #endif
           IF ( .NOT. associated ( DLL ) ) THEN
               DDLL_ITERATOR_BEGIN = -1
@@ -982,12 +983,12 @@ C
       END FUNCTION DDLL_ITERATOR_BEGIN
       FUNCTION DDLL_ITERATOR_END(DLL, PTR)
           INTEGER :: DDLL_ITERATOR_END
-#if defined(MUMPS_F2003)
-          TYPE ( DDLL_T ), POINTER, INTENT ( IN ) :: DLL
-          TYPE ( DDLL_NODE_T ), POINTER, INTENT ( OUT ) :: PTR
-#else
+#if defined(MUMPS_NOF2003)
           TYPE ( DDLL_T ), POINTER :: DLL
           TYPE ( DDLL_NODE_T ), POINTER :: PTR
+#else
+          TYPE ( DDLL_T ), POINTER, INTENT ( IN ) :: DLL
+          TYPE ( DDLL_NODE_T ), POINTER, INTENT ( OUT ) :: PTR
 #endif
           IF ( .NOT. associated ( DLL ) ) THEN
               DDLL_ITERATOR_END = -1
@@ -998,21 +999,21 @@ C
       END FUNCTION DDLL_ITERATOR_END
       FUNCTION DDLL_IS_EMPTY(DLL)
           LOGICAL :: DDLL_IS_EMPTY
-#if defined(MUMPS_F2003)
-          TYPE ( DDLL_T ), POINTER, INTENT ( IN ) :: DLL
-#else
+#if defined(MUMPS_NOF2003)
           TYPE ( DDLL_T ), POINTER :: DLL
+#else
+          TYPE ( DDLL_T ), POINTER, INTENT ( IN ) :: DLL
 #endif
           DDLL_IS_EMPTY = ( associated ( DLL%FRONT ) )
       END FUNCTION DDLL_IS_EMPTY
       FUNCTION DDLL_2_ARRAY(DLL, ARRAY, LENGTH)
           INTEGER :: DDLL_2_ARRAY
-#if defined(MUMPS_F2003)
-          TYPE ( DDLL_T ), POINTER, INTENT ( IN ) :: DLL
-          DOUBLE PRECISION, POINTER, DIMENSION(:), INTENT(OUT) :: ARRAY
-#else
+#if defined(MUMPS_NOF2003)
           TYPE ( DDLL_T ), POINTER :: DLL
           DOUBLE PRECISION, POINTER, DIMENSION(:) :: ARRAY
+#else
+          TYPE ( DDLL_T ), POINTER, INTENT ( IN ) :: DLL
+          DOUBLE PRECISION, POINTER, DIMENSION(:), INTENT(OUT) :: ARRAY
 #endif
           INTEGER, INTENT ( OUT ) :: LENGTH
           TYPE ( DDLL_NODE_T ), POINTER :: AUX
@@ -1022,8 +1023,7 @@ C
               RETURN
           END IF
           LENGTH = DDLL_LENGTH(DLL)
-          I = DDLL_LENGTH(DLL)
-          ALLOCATE ( ARRAY ( I ), STAT=IERR )
+          ALLOCATE ( ARRAY ( max(1,LENGTH) ), STAT=IERR )
           IF ( IERR .NE. 0 ) THEN
               DDLL_2_ARRAY = -2
               RETURN
@@ -1037,4 +1037,4 @@ C
           END DO
           DDLL_2_ARRAY = 0
       END FUNCTION DDLL_2_ARRAY
-      END MODULE DDLL
+      END MODULE MUMPS_DDLL

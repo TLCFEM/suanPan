@@ -6,6 +6,19 @@
 2. The `SPIKE` solver may occasionally hang, to circumvent, try to avoid mixing compilers from different vendors.
 3. The `MUMPS` solver throws segfaults with large matrices.
 
+## version 3.0
+
+1. add experimental `MAGMA` based GPU sparse solver [#123](https://github.com/TLCFEM/suanPan/pull/123)
+2. add nonlinear transformation for shell elements [#124](https://github.com/TLCFEM/suanPan/pull/124)
+3. update `VTK` to version `9.2.6`
+4. add `CustomNodeGroup` [#126](https://github.com/TLCFEM/suanPan/pull/126)
+5. add `TranslationConnector` [#127](https://github.com/TLCFEM/suanPan/pull/127)
+6. add `CustomAmplitude` [#129](https://github.com/TLCFEM/suanPan/pull/129)
+7. update `Armadillo` to version `12.2` [#134](https://github.com/TLCFEM/suanPan/pull/134)
+8. add `AsymmElastic1D` [#135](https://github.com/TLCFEM/suanPan/pull/135)
+9. update `TBB` to version `2021.9.0`
+10. update `MUMPS` to version `5.6.0`
+
 ## version 2.9
 
 1. matrix optimsation

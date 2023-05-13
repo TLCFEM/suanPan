@@ -98,7 +98,24 @@ namespace tensor {
         double double_contraction(const vec&, const vec&);
         double double_contraction(vec&&, vec&&);
     } // namespace stress
-}     // namespace tensor
+
+    namespace base {
+        class Base3D {
+            const vec3 g1, g2, g3;
+            mat33 g;
+
+        public:
+            Base3D(const vec3&, const vec3&, const vec3&);
+            [[nodiscard]] std::tuple<vec3, vec3, vec3> to_inverse() const;
+        };
+
+        vec3 unit_norm(const vec3&, const vec3&);
+    } // namespace base
+
+    mat diff_unit(const vec&);
+
+    mat diff_triad(const vec3&, const vec3&, const vec3&);
+} // namespace tensor
 
 namespace transform {
     double atan2(const vec&);
@@ -117,7 +134,9 @@ namespace transform {
         return S;
     }
 
-    template<typename T> Mat<T> skew_symm(const subview_col<T>& R) { return skew_symm(R.eval()); }
+    template<typename T> concept HasEval = requires(const T& x) { { x.eval() } -> std::convertible_to<mat>; };
+
+    template<HasEval T> mat skew_symm(const T& R) { return skew_symm(R.eval()); }
 
     template<typename T> Mat<T> rodrigues(const Mat<T>& R) { return arma::expmat(transform::skew_symm(R)); }
 

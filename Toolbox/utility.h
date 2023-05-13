@@ -114,6 +114,7 @@ bool is_equal(const char*, const char*);
 bool is_equal(char, char);
 bool is_equal(int, char);
 bool is_equal(const string&, const char*);
+bool is_equal(const char*, const string&);
 bool is_equal(const string&, const string&);
 
 bool if_contain(const string&, const char*);

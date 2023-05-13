@@ -29,6 +29,7 @@
 #define UNIAXIAL_H
 
 #include <Material/Material1D/Material1D.h>
+#include <Toolbox/ResourceHolder.h>
 
 class Uniaxial final : public Material1D {
     static const uvec F1, F2;
@@ -37,7 +38,7 @@ class Uniaxial final : public Material1D {
 
     const unsigned max_iteration;
 
-    unique_ptr<Material> base;
+    ResourceHolder<Material> base;
 
     vec trial_full_strain, current_full_strain;
 
@@ -48,11 +49,6 @@ public:
              unsigned,    // 3D material tag
              unsigned = 1 // max iteration
     );
-    Uniaxial(const Uniaxial&);
-    Uniaxial(Uniaxial&&) = delete;
-    Uniaxial& operator=(const Uniaxial&) = delete;
-    Uniaxial& operator=(Uniaxial&&) = delete;
-    ~Uniaxial() override = default;
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

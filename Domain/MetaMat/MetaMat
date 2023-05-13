@@ -14,6 +14,7 @@
 #include "SparseMatMUMPS.hpp"
 #include "SparseMatPARDISO.hpp"
 #include "SparseMatSuperLU.hpp"
+#include "SparseMatMAGMA.hpp"
 #include "SymmPackMat.hpp"
 
 // my sparse implementation

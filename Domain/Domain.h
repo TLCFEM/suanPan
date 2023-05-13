@@ -30,6 +30,7 @@
 
 #include <Domain/DomainBase.h>
 #include <Domain/Storage.hpp>
+#include <array>
 
 using ExternalModuleQueue = std::vector<shared_ptr<ExternalModule>>;
 using ThreadQueue = std::vector<shared_ptr<future<void>>>;
@@ -77,6 +78,8 @@ class Domain final : public DomainBase, public std::enable_shared_from_this<Doma
     std::vector<std::vector<unsigned>> color_map;
 
     std::vector<bool> attribute;
+
+    mutable std::array<double, 5> statistics{};
 
 public:
     explicit Domain(unsigned = 0);
@@ -390,6 +393,10 @@ public:
     void commit_status() const override;
     void clear_status() override;
     void reset_status() const override;
+
+    void update(const Statistics T, const double value) const override { statistics[static_cast<size_t>(T)] += value; }
+
+    double stats(const Statistics T) const override { return statistics[static_cast<size_t>(T)]; }
 
     void save(string) override;
 };

@@ -17,7 +17,7 @@
 
 #include "LeeNewmarkBase.h"
 #include <Domain/DomainBase.h>
-#include <Domain/FactoryHelper.hpp>
+#include <Domain/Factory.hpp>
 
 int LeeNewmarkBase::erase_top_left_block() const {
     auto& t_triplet = stiffness->triplet_mat;

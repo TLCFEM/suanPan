@@ -1330,6 +1330,30 @@ void new_tanh1d(unique_ptr<Material>& return_obj, istringstream& command) {
     return_obj = make_unique<Tanh1D>(tag, elastic_modulus, density);
 }
 
+void new_asymmelastic1d(unique_ptr<Material>& return_obj, istringstream& command) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    double t_elastic_modulus, c_elastic_modulus;
+    if(!get_input(command, t_elastic_modulus, c_elastic_modulus)) {
+        suanpan_error("A valid elastic modulus is required.\n");
+        return;
+    }
+
+    auto density = 0.;
+    if(command.eof())
+        suanpan_debug("Zero density assumed.\n");
+    else if(!get_input(command, density)) {
+        suanpan_error("A valid density is required.\n");
+        return;
+    }
+
+    return_obj = make_unique<AsymmElastic1D>(tag, t_elastic_modulus, c_elastic_modulus, density);
+}
+
 void new_elastic1d(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -2406,6 +2430,36 @@ void new_nle3d01(unique_ptr<Material>& return_obj, istringstream& command) {
     return_obj = make_unique<NLE3D01>(tag, pool(0), pool(1), pool(2), pool(3), density);
 }
 
+void new_nonviscous01(unique_ptr<Material>& return_obj, istringstream& command) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    vector<double> m_r, s_r, m_i, s_i;
+
+    while(!command.eof()) {
+        double a, b, c, d;
+        if(!get_input(command, a, b, c, d)) {
+            suanpan_error("A valid damping coefficient is required.\n");
+            return;
+        }
+        m_r.emplace_back(a);
+        m_i.emplace_back(b);
+        s_r.emplace_back(c);
+        s_i.emplace_back(d);
+    }
+
+    auto m_imag = vec{m_i}, s_imag = vec{s_i};
+    if(accu(m_imag) + accu(s_imag) > 1E-10) {
+        suanpan_error("Parameters should be conjugate pairs.\n");
+        return;
+    }
+
+    return_obj = make_unique<Nonviscous01>(tag, cx_vec{vec{m_r}, m_imag}, cx_vec{vec{s_r}, s_imag});
+}
+
 void new_orthotropicelastic3d(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -3292,6 +3346,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "CustomMises1D")) new_custommises1d(new_material, command);
     else if(is_equal(material_id, "DafaliasManzari")) new_dafaliasmanzari(new_material, command);
     else if(is_equal(material_id, "Dhakal")) new_dhakal(new_material, command);
+    else if(is_equal(material_id, "AsymmElastic1D")) new_asymmelastic1d(new_material, command);
     else if(is_equal(material_id, "Elastic1D")) new_elastic1d(new_material, command);
     else if(is_equal(material_id, "Elastic2D")) new_elastic2d(new_material, command);
     else if(is_equal(material_id, "Elastic3D")) new_isotropicelastic3d(new_material, command);
@@ -3320,6 +3375,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "MultilinearPO")) new_multilinearpo(new_material, command);
     else if(is_equal(material_id, "NLE1D01")) new_nle1d01(new_material, command);
     else if(is_equal(material_id, "NLE3D01")) new_nle3d01(new_material, command);
+    else if(is_equal(material_id, "Nonviscous01")) new_nonviscous01(new_material, command);
     else if(is_equal(material_id, "OrthotropicElastic3D")) new_orthotropicelastic3d(new_material, command);
     else if(is_equal(material_id, "ParabolicCC")) new_paraboliccc(new_material, command);
     else if(is_equal(material_id, "Parallel")) new_parallel(new_material, command);

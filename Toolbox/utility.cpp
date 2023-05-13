@@ -103,6 +103,8 @@ bool is_equal(const int A, const char B) { return tolower(A) == tolower(static_c
 
 bool is_equal(const string& A, const char* B) { return is_equal(A.c_str(), B); }
 
+bool is_equal(const char* A, const string& B) { return is_equal(A, B.c_str()); }
+
 bool is_equal(const string& A, const string& B) { return is_equal(A.c_str(), B.c_str()); }
 
 bool if_contain(const string& A, const char* B) { return A.find(B) != string::npos; }

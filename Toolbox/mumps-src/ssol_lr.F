@@ -1,17 +1,19 @@
 C
-C  This file is part of MUMPS 5.2.1, released
-C  on Fri Jun 14 14:46:05 UTC 2019
+C  This file is part of MUMPS 5.6.0, released
+C  on Wed Apr 19 15:50:57 UTC 2023
 C
 C
-C  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
-C  released under the CeCILL-C license:
-C  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+C  released under the CeCILL-C license 
+C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
       MODULE SMUMPS_SOL_LR
       USE SMUMPS_LR_TYPE
+      USE SMUMPS_LR_CORE
       USE SMUMPS_LR_STATS
       USE SMUMPS_LR_DATA_M, only: BLR_ARRAY
       IMPLICIT NONE
@@ -24,25 +26,22 @@ C
      &     PPIV_INIT, PCB_INIT, 
      &     RHSCOMP, LRHSCOMP, NRHS, 
      &     POSINRHSCOMP_FWD, JBDEB, JBFIN, 
-     &     MTYPE, KEEP, OOCWRITE_COMPATIBLE_WITH_BLR,
+     &     MTYPE, KEEP, KEEP8, OOCWRITE_COMPATIBLE_WITH_BLR,
      &     IFLAG, IERROR )
        INTEGER, INTENT(IN) :: INODE, N, IWHDLR, NPIV_GLOBAL, NSLAVES
        INTEGER, INTENT(IN) :: MTYPE, LIELL, KEEP(500)
+       INTEGER(8), INTENT(IN) :: KEEP8(150)
        INTEGER, INTENT(IN) :: LIW, IPOS_INIT, LRHSCOMP
        INTEGER, INTENT(IN) :: IW(LIW), POSINRHSCOMP_FWD(N)
        INTEGER(8), INTENT(IN) :: LWCB, PPIV_INIT, PCB_INIT
        INTEGER, INTENT(IN) :: LD_WCBPIV, LD_WCBCB, NRHS, JBDEB, JBFIN
        REAL, INTENT(INOUT) :: WCB(LWCB)
        INTEGER, INTENT(INOUT) :: IFLAG, IERROR
-#if defined(RHSCOMP_BYROWS)
-       REAL, INTENT(INOUT) :: RHSCOMP(NRHS, LRHSCOMP)
-#else
        REAL, INTENT(INOUT) :: RHSCOMP(LRHSCOMP, NRHS)
-#endif
        LOGICAL, INTENT(IN)    :: OOCWRITE_COMPATIBLE_WITH_BLR
         INTEGER :: I, NPARTSASS, NB_BLR , NELIM, LDADIAG,
      &             DIAGSIZ_DYN, DIAGSIZ_STA, IBEG_BLR, IEND_BLR,
-     &             LD_CB, NELIM_GLOBAL, NRHS_B, IPOS, KCB
+     &             LD_CB, NRHS_B, IPOS, KCB
         INTEGER(8) :: PPIV, PCB
         INTEGER    :: LAST_BLR
         REAL, POINTER, DIMENSION(:) :: DIAG
@@ -73,9 +72,6 @@ C
         ENDIF
       IPOS = IPOS_INIT
       PPIV = PPIV_INIT 
-      NELIM_GLOBAL = 
-     &    BLR_ARRAY(IWHDLR)%BEGS_BLR_STATIC(NPARTSASS+1) 
-     &  - BLR_ARRAY(IWHDLR)%BEGS_BLR_DYNAMIC(NPARTSASS+1) 
       DO I=1, NPARTSASS
         IBEG_BLR = BLR_ARRAY(IWHDLR)%BEGS_BLR_DYNAMIC(I)
         IEND_BLR = BLR_ARRAY(IWHDLR)%BEGS_BLR_DYNAMIC(I+1) -1
@@ -104,10 +100,6 @@ C
          CALL SMUMPS_SOLVE_FWD_TRSOLVE (DIAG(1), int(size(DIAG),8), 1_8,
      &         DIAGSIZ_DYN , LDADIAG, NRHS_B, WCB, LWCB, NPIV_GLOBAL,
      &         PPIV, MTYPE, KEEP)
-#if defined(BLR_MT)
-!$OMP PARALLEL
-!$OMP SINGLE
-#endif 
          IF (NELIM.GT.0) THEN
            KCB = int(PCB-PPIV_INIT+1)
            IF (IEND_BLR.EQ.NPIV_GLOBAL) THEN 
@@ -158,9 +150,6 @@ C
              ENDIF
            ENDIF
          ENDIF
-#if defined(BLR_MT)
-!$OMP END SINGLE NOWAIT
-#endif 
         CALL SMUMPS_SOL_FWD_BLR_UPDATE (
      &        WCB, LWCB, 1, LD_WCBPIV, PPIV_INIT, 1,
      &        WCB, LWCB, LD_WCBCB, PCB_INIT,
@@ -168,13 +157,11 @@ C
      &        NRHS_B, NPIV_GLOBAL,
      &        BLR_PANEL, LAST_BLR, I,
      &        BLR_ARRAY(IWHDLR)%BEGS_BLR_STATIC,
+     &        KEEP8, KEEP(34), KEEP(450), KEEP(451),
      &        .FALSE.,   
      &        IFLAG, IERROR)
-#if defined(BLR_MT)
-!$OMP END PARALLEL         
-#endif 
         IF (IFLAG.LT.0) RETURN
-        CALL SMUMPS_SOLVE_LD_AND_RELOAD (
+        CALL SMUMPS_SOL_LD_AND_RELOAD_PANEL (
      &  INODE, N, DIAGSIZ_DYN, LIELL, NELIM, NSLAVES,
      &  PPIV,
      &  IW, IPOS, LIW, 
@@ -182,7 +169,8 @@ C
      &  WCB, LWCB, LD_WCBPIV, 
      &  RHSCOMP, LRHSCOMP, NRHS, 
      &  POSINRHSCOMP_FWD, JBDEB, JBFIN, 
-     &  MTYPE, KEEP, OOCWRITE_COMPATIBLE_WITH_BLR
+     &  MTYPE, KEEP, OOCWRITE_COMPATIBLE_WITH_BLR,
+     &  .TRUE.  
      &  )
         PPIV = PPIV +  int(DIAGSIZ_DYN,8)
         IPOS = IPOS + DIAGSIZ_DYN
@@ -195,9 +183,10 @@ C
      &     LDX, LDY,
      &     PTRX_INIT, PTRY_INIT, 
      &     JBDEB, JBFIN, 
-     &     MTYPE, KEEP, IFLAG, IERROR )
+     &     MTYPE, KEEP, KEEP8, IFLAG, IERROR )
        INTEGER, INTENT(IN) :: INODE, IWHDLR, NPIV_GLOBAL
        INTEGER, INTENT(IN) :: MTYPE, KEEP(500)
+       INTEGER(8), INTENT(IN) :: KEEP8(150)
        INTEGER(8), INTENT(IN) :: LWCB, PTRX_INIT, PTRY_INIT
        INTEGER, INTENT(IN) :: LDX, LDY, JBDEB, JBFIN
        REAL, INTENT(INOUT) :: WCB(LWCB)
@@ -223,9 +212,6 @@ C
       DO I = 1, NPARTSASS
         BLR_PANEL => BLR_ARRAY(IWHDLR)%PANELS_L(I)%LRB_PANEL
         IF (associated(BLR_PANEL)) THEN
-#if defined(BLR_MT)
-!$OMP PARALLEL
-#endif 
           IF (MTYPE.EQ.1) THEN 
             CALL SMUMPS_SOL_FWD_BLR_UPDATE (
      &          WCB, LWCB, 1, LDX, -99999_8, 1,
@@ -234,7 +220,8 @@ C
      &          NRHS_B, NPIV_GLOBAL,
      &          BLR_PANEL, NB_BLR, 0, 
      &          BLR_ARRAY(IWHDLR)%BEGS_BLR_STATIC(2:NB_BLR+2),
-     &          .TRUE., IFLAG, IERROR )
+     &          KEEP8, KEEP(34), KEEP(450), KEEP(451), .TRUE., 
+     &          IFLAG, IERROR )
           ELSE 
             CALL SMUMPS_SOL_BWD_BLR_UPDATE (
      &          WCB, LWCB, 1, LDY, -99999_8, 1,
@@ -243,11 +230,10 @@ C
      &          NRHS_B, NPIV_GLOBAL,
      &          BLR_PANEL, NB_BLR, 0, 
      &          BLR_ARRAY(IWHDLR)%BEGS_BLR_STATIC(2:NB_BLR+2),
-     &          .TRUE., IFLAG, IERROR )
+     &          KEEP8, KEEP(34), KEEP(450), KEEP(451),
+     &          .TRUE.,
+     &          IFLAG, IERROR )
           ENDIF
-#if defined(BLR_MT)
-!$OMP END PARALLEL
-#endif
           IF (MTYPE .EQ. 1) THEN
             PTRX = PTRX + BLR_PANEL(1)%N
           ELSE
@@ -265,33 +251,54 @@ C
      &        NRHS_B, NPIV,
      &        BLR_PANEL, LAST_BLR,
      &        CURRENT_BLR, BEGS_BLR_STATIC,
-     &        IS_T2_SLAVE, IFLAG, IERROR )
+     &        KEEP8, K34, K450, K451, IS_T2_SLAVE, IFLAG, IERROR )
 !$    USE OMP_LIB
       INTEGER(8), INTENT(IN) :: LPIV, LCB, POSPIV, POSCB, POSDIAG
       INTEGER, INTENT(IN)    :: LPIVCOL, POSPIVCOL
       REAL, INTENT(INOUT) :: ARRAYPIV(LPIV,LPIVCOL)
       REAL, INTENT(INOUT) :: ARRAYCB(LCB)
       INTEGER, INTENT(IN)    :: LAST_BLR, NRHS_B,  LDPIV, LDCB,
-     &                          CURRENT_BLR, NPIV
+     &                          CURRENT_BLR, NPIV, K34, K450, K451
       TYPE(LRB_TYPE), TARGET,INTENT(IN) ::
      &                           BLR_PANEL(:)
       INTEGER :: BEGS_BLR_STATIC(:)
       LOGICAL, INTENT(IN) :: IS_T2_SLAVE
+      INTEGER(8), INTENT(IN) :: KEEP8(150)
       INTEGER, INTENT(INOUT) :: IFLAG, IERROR
       INTEGER :: I, K, M, N, IBEG_BLOCK, IEND_BLOCK
+      INTEGER :: KMAX
       INTEGER(8) :: POSBLOCK
       INTEGER :: allocok
       TYPE(LRB_TYPE), POINTER :: LRB
-      REAL, ALLOCATABLE,DIMENSION(:,:) :: TEMP_BLOCK
+      REAL, ALLOCATABLE,DIMENSION(:) :: TEMP_BLOCK
       REAL :: ONE, MONE, ZERO
       PARAMETER (ONE = 1.0E0, MONE=-1.0E0)
       PARAMETER (ZERO=0.0E0)
-#if defined(BLR_MT)
-      INTEGER :: CHUNK
-#endif
-#if defined(BLR_MT) 
-        CHUNK = 1
-!$OMP DO SCHEDULE(DYNAMIC,CHUNK)
+      KMAX = -1
+      DO I = CURRENT_BLR+1, LAST_BLR
+        KMAX = max(KMAX, BLR_PANEL(I-CURRENT_BLR)%K)
+      ENDDO
+#if ! defined(BLR_NOOPENMP)
+!$OMP PARALLEL PRIVATE(TEMP_BLOCK, allocok
+!$OMP& )
+#endif 
+      IF (KMAX.GT.0) THEN
+        allocate(TEMP_BLOCK(KMAX*NRHS_B), stat=allocok )
+        IF (allocok .GT. 0) THEN
+          IFLAG  = -13
+          IERROR = NRHS_B * KMAX
+          write(*,*) 'Allocation problem in BLR routine 
+     &    SMUMPS_SOL_FWD_BLR_UPDATE: ',
+     &    'not enough memory? memory requested = ', IERROR
+        ENDIF
+      ENDIF
+#if ! defined(BLR_NOOPENMP)
+!$OMP BARRIER
+#endif 
+#if ! defined(BLR_NOOPENMP)
+!$OMP DO SCHEDULE(DYNAMIC,1)
+!$OMP& PRIVATE(IBEG_BLOCK, IEND_BLOCK, LRB, K, M, N,
+!$OMP&         POSBLOCK)
 #endif
         DO I = CURRENT_BLR+1, LAST_BLR
           IF (IFLAG.LT.0) CYCLE
@@ -303,46 +310,36 @@ C
           M = LRB%M
           N = LRB%N 
           IF (LRB%ISLR) THEN
-             IF (K.GT.0) THEN
-               allocate(TEMP_BLOCK( K, NRHS_B ), stat=allocok )
-               IF (allocok .GT. 0) THEN
-                 IFLAG  = -13
-                 IERROR = NRHS_B * K
-                 write(*,*) 'Allocation problem in BLR routine 
-     &         SMUMPS_SOL_FWD_BLR_UPDATE: ',
-     &         'not enough memory? memory requested = ', IERROR
-                 CYCLE
-               ENDIF
-               CALL sgemm('N', 'N', K, NRHS_B, N, ONE,
+            IF (K.GT.0) THEN
+                CALL sgemm('N', 'N', K, NRHS_B, N, ONE,
      &                LRB%R(1,1), K, ARRAYPIV(POSDIAG,POSPIVCOL), LDPIV,
-     &                ZERO, TEMP_BLOCK, K) 
-               IF (IS_T2_SLAVE) THEN
-                 POSBLOCK = POSCB+int(IBEG_BLOCK-1,8)
-                 CALL sgemm('N', 'N', M, NRHS_B, K, MONE,
-     &              LRB%Q(1,1), M, TEMP_BLOCK, K,
+     &                ZERO, TEMP_BLOCK(1), K) 
+                IF (IS_T2_SLAVE) THEN
+                  POSBLOCK = POSCB+int(IBEG_BLOCK-1,8)
+                  CALL sgemm('N', 'N', M, NRHS_B, K, MONE,
+     &              LRB%Q(1,1), M, TEMP_BLOCK(1), K,
      &              ONE, ARRAYCB(POSBLOCK), LDCB) 
-               ELSEIF (IBEG_BLOCK.LE.NPIV.AND.IEND_BLOCK.GT.NPIV) THEN
-                 POSBLOCK = POSPIV+int(IBEG_BLOCK-1,8)
-                 CALL sgemm('N', 'N', NPIV-IBEG_BLOCK+1, NRHS_B, K,
-     &              MONE, LRB%Q(1,1), M, TEMP_BLOCK, K,
+                ELSEIF (IBEG_BLOCK.LE.NPIV.AND.IEND_BLOCK.GT.NPIV) THEN
+                  POSBLOCK = POSPIV+int(IBEG_BLOCK-1,8)
+                  CALL sgemm('N', 'N', NPIV-IBEG_BLOCK+1, NRHS_B, K,
+     &              MONE, LRB%Q(1,1), M, TEMP_BLOCK(1), K,
      &              ONE, ARRAYPIV(POSBLOCK,POSPIVCOL), LDPIV) 
-                 CALL sgemm('N', 'N', IBEG_BLOCK+M-NPIV-1, NRHS_B, K, 
-     &              MONE, LRB%Q(NPIV-IBEG_BLOCK+2,1), M, TEMP_BLOCK, K,
-     &              ONE, ARRAYCB(POSCB), LDCB) 
-               ELSEIF (IBEG_BLOCK.LE.NPIV) THEN
-                 POSBLOCK = POSPIV+int(IBEG_BLOCK-1,8)
-                 CALL sgemm('N', 'N', M, NRHS_B, K, MONE,
-     &              LRB%Q(1,1), M, TEMP_BLOCK, K,
+                  CALL sgemm('N', 'N', IBEG_BLOCK+M-NPIV-1, NRHS_B, K, 
+     &              MONE, LRB%Q(NPIV-IBEG_BLOCK+2,1), M, TEMP_BLOCK(1),
+     &              K, ONE, ARRAYCB(POSCB), LDCB) 
+                ELSEIF (IBEG_BLOCK.LE.NPIV) THEN
+                  POSBLOCK = POSPIV+int(IBEG_BLOCK-1,8)
+                  CALL sgemm('N', 'N', M, NRHS_B, K, MONE,
+     &              LRB%Q(1,1), M, TEMP_BLOCK(1), K,
      &              ONE, ARRAYPIV(POSBLOCK,POSPIVCOL), LDPIV) 
-               ELSE
-                 POSBLOCK = POSCB+int(IBEG_BLOCK-1-NPIV,8)
-                 CALL sgemm('N', 'N', M, NRHS_B, K, MONE,
-     &              LRB%Q(1,1), M, TEMP_BLOCK, K,
+                ELSE
+                  POSBLOCK = POSCB+int(IBEG_BLOCK-1-NPIV,8)
+                  CALL sgemm('N', 'N', M, NRHS_B, K, MONE,
+     &              LRB%Q(1,1), M, TEMP_BLOCK(1), K,
      &              ONE, ARRAYCB(POSBLOCK), LDCB) 
-               ENDIF
-               deallocate(TEMP_BLOCK)
-             ENDIF
-          ELSE
+                ENDIF
+            ENDIF 
+          ELSE 
             IF (IS_T2_SLAVE) THEN
               POSBLOCK = POSCB + int(IBEG_BLOCK-1,8)
               CALL sgemm('N', 'N', M, NRHS_B, N, MONE,
@@ -370,20 +367,27 @@ C
             ENDIF
           ENDIF
         ENDDO
-#if defined(BLR_MT) 
+#if ! defined(BLR_NOOPENMP)
 !$OMP END DO
 #endif
-      RETURN
+        IF (KMAX.GT.0) THEN
+          IF (allocated(TEMP_BLOCK)) deallocate(TEMP_BLOCK)
+        ENDIF
+#if ! defined(BLR_NOOPENMP)
+!$OMP END PARALLEL         
+#endif 
+        RETURN
       END SUBROUTINE SMUMPS_SOL_FWD_BLR_UPDATE
       SUBROUTINE SMUMPS_SOL_BWD_LR_SU 
      &   ( INODE, IWHDLR, NPIV_GLOBAL, NSLAVES,
      &     LIELL, WCB, LWCB, NRHS_B, PTWCB,
      &     RHSCOMP, LRHSCOMP, NRHS,
      &     IPOSINRHSCOMP, JBDEB, 
-     &     MTYPE, KEEP,
+     &     MTYPE, KEEP, KEEP8,
      &     IFLAG, IERROR )
        INTEGER, INTENT(IN) :: INODE, IWHDLR, NPIV_GLOBAL, NSLAVES
        INTEGER, INTENT(IN) :: MTYPE, LIELL, KEEP(500)
+       INTEGER(8), INTENT(IN) :: KEEP8(150)
        INTEGER, INTENT(IN) :: IPOSINRHSCOMP, JBDEB, LRHSCOMP, NRHS
        INTEGER(8), INTENT(IN) :: LWCB, PTWCB
        INTEGER, INTENT(IN) ::  NRHS_B
@@ -393,8 +397,8 @@ C
         INTEGER :: I, NPARTSASS, NB_BLR, LAST_BLR, 
      &             NELIM_PANEL, LD_WCB,
      &             DIAGSIZ_DYN, DIAGSIZ_STA, LDADIAG,
-     &             IEND_BLR, IBEG_BLR, PCBINRHSCOMP
-        INTEGER(8) :: PCB_LAST, PWCB
+     &             IEND_BLR, IBEG_BLR
+        INTEGER(8) :: PWCB
         INTEGER    :: IPIV_PANEL
         REAL, POINTER, DIMENSION(:) :: DIAG
         TYPE(LRB_TYPE), POINTER, DIMENSION(:) :: BLR_PANEL
@@ -416,10 +420,13 @@ C
            WRITE(6,*) " Internal error in SMUMPS_SOL_FWD_SU_MASTER"
          ENDIF
         ENDIF
-      PCBINRHSCOMP= IPOSINRHSCOMP + NPIV_GLOBAL
-      PCB_LAST    = PTWCB + int(LIELL ,8)  
       PWCB        = PTWCB + int(NPIV_GLOBAL,8)
       LD_WCB      = LIELL
+      IF (KEEP(50).EQ.0 .AND. NSLAVES.GT.0 .AND. MTYPE.NE.1) THEN
+        LAST_BLR = NPARTSASS
+      ELSE
+        LAST_BLR = NB_BLR
+      ENDIF
       DO I=NPARTSASS,1,-1
         IBEG_BLR = BLR_ARRAY(IWHDLR)%BEGS_BLR_DYNAMIC(I)
         IEND_BLR =  BLR_ARRAY(IWHDLR)%BEGS_BLR_DYNAMIC(I+1) -1
@@ -432,7 +439,7 @@ C
         ELSE
          LDADIAG = DIAGSIZ_STA
         ENDIF 
-        IF (DIAGSIZ_DYN.EQ.0) CYCLE
+        IF (DIAGSIZ_DYN.EQ.0) GOTO 1000
         NELIM_PANEL = DIAGSIZ_STA - DIAGSIZ_DYN
          IPIV_PANEL = IPOSINRHSCOMP + IBEG_BLR -1
          IF ( MTYPE .EQ. 1 .AND. KEEP(50).EQ.0) THEN
@@ -440,14 +447,6 @@ C
          ELSE
           BLR_PANEL => BLR_ARRAY(IWHDLR)%PANELS_L(I)%LRB_PANEL
          END IF
-        IF (KEEP(50).EQ.0 .AND. NSLAVES.GT.0 .AND. MTYPE.NE.1) THEN
-          LAST_BLR = NPARTSASS
-        ELSE
-          LAST_BLR = NB_BLR
-        ENDIF
-#if defined(BLR_MT)
-!$OMP PARALLEL         
-#endif
         CALL SMUMPS_SOL_BWD_BLR_UPDATE ( 
      &        RHSCOMP, int(LRHSCOMP,8), NRHS, LRHSCOMP, 
      &        int(IPOSINRHSCOMP,8), JBDEB,
@@ -456,10 +455,9 @@ C
      &        NRHS_B, NPIV_GLOBAL,
      &        BLR_PANEL, LAST_BLR,
      &        I, BLR_ARRAY(IWHDLR)%BEGS_BLR_STATIC,
-     &        .FALSE., IFLAG, IERROR)
-#if defined(BLR_MT)
-!$OMP END PARALLEL         
-#endif 
+     &        KEEP8, KEEP(34), KEEP(450), KEEP(451),
+     &        .FALSE., 
+     &        IFLAG, IERROR)
         IF (IFLAG.LT.0) RETURN
          DIAG =>  BLR_ARRAY(IWHDLR)%DIAG_BLOCKS(I)%DIAG_BLOCK
          IF (NELIM_PANEL.GT.0) THEN
@@ -526,6 +524,7 @@ C
      &         RHSCOMP, LRHSCOMP, NRHS,
      &         IPIV_PANEL, JBDEB, 
      &         MTYPE, KEEP )
+ 1000 CONTINUE         
       ENDDO  
       RETURN
       END SUBROUTINE SMUMPS_SOL_BWD_LR_SU
@@ -536,7 +535,7 @@ C
      &        NRHS_B, NPIV,
      &        BLR_PANEL, LAST_BLR, CURRENT_BLR,
      &        BEGS_BLR_STATIC,
-     &        IS_T2_SLAVE,
+     &        KEEP8, K34, K450, K451, IS_T2_SLAVE,
      &        IFLAG, IERROR)
 !$    USE OMP_LIB
       INTEGER(8), INTENT(IN) :: LPIV, LCB, POSPIV, POSCB, POSDIAG
@@ -544,26 +543,60 @@ C
       REAL, INTENT(INOUT) :: ARRAYPIV(LPIV,LPIVCOL)
       REAL, INTENT(INOUT) :: ARRAYCB(LCB)
       INTEGER, INTENT(IN)    :: LAST_BLR, NRHS_B,  LDPIV, LDCB,
-     &                          CURRENT_BLR, NPIV
+     &                          CURRENT_BLR, NPIV, K34, K450, K451
       TYPE(LRB_TYPE), TARGET,INTENT(IN) ::
      &                          BLR_PANEL(:)
+      INTEGER(8), INTENT(IN) :: KEEP8(150)
       LOGICAL, INTENT(IN)    :: IS_T2_SLAVE
       INTEGER :: BEGS_BLR_STATIC(:)
       INTEGER, INTENT(INOUT) :: IFLAG, IERROR
       INTEGER :: I, K, M, N, IBEG_BLOCK, IEND_BLOCK
+      INTEGER :: KMAX
       INTEGER(8) :: POSBLOCK
       TYPE(LRB_TYPE), POINTER :: LRB
-      REAL, ALLOCATABLE,DIMENSION(:,:) :: TEMP_BLOCK
+      REAL, ALLOCATABLE, DIMENSION(:) :: TEMP_BLOCK
+      REAL, ALLOCATABLE, DIMENSION(:) :: DEST_ARRAY
       INTEGER :: allocok
       REAL :: ONE, MONE, ZERO
       PARAMETER (ONE = 1.0E0, MONE=-1.0E0)
       PARAMETER (ZERO=0.0E0)
-#if defined(BLR_MT)
-      INTEGER :: CHUNK
-#endif
-#if defined(BLR_MT) 
-        CHUNK = 1
-!$OMP DO SCHEDULE(DYNAMIC,CHUNK)
+      KMAX = -1
+      DO I = CURRENT_BLR+1, LAST_BLR
+        KMAX = max(KMAX, BLR_PANEL(I-CURRENT_BLR)%K)
+      ENDDO
+      IF (CURRENT_BLR.LT.LAST_BLR) THEN 
+        N = BLR_PANEL(1)%N
+      ELSE
+        RETURN
+      ENDIF
+      allocate(DEST_ARRAY(N*NRHS_B),stat=allocok)
+      IF (allocok .GT. 0) THEN
+        IFLAG = -13
+        IERROR = N * NRHS_B
+        GOTO 100
+      ENDIF
+      DEST_ARRAY = ZERO
+#if ! defined(BLR_NOOPENMP)
+!$OMP PARALLEL PRIVATE(TEMP_BLOCK, allocok
+!$OMP& )
+#endif 
+      IF (KMAX.GT.0) THEN
+        allocate(TEMP_BLOCK(KMAX*NRHS_B), stat=allocok )
+        IF (allocok .GT. 0) THEN
+          IFLAG  = -13
+          IERROR = NRHS_B * KMAX
+          write(*,*) 'Allocation problem in BLR routine 
+     &    SMUMPS_SOL_BWD_BLR_UPDATE: ',
+     &    'not enough memory? memory requested = ', IERROR
+        ENDIF
+      ENDIF
+#if ! defined(BLR_NOOPENMP)
+!$OMP BARRIER
+#endif 
+#if ! defined(BLR_NOOPENMP)
+!$OMP DO SCHEDULE(DYNAMIC,1)
+!$OMP& PRIVATE(IBEG_BLOCK, IEND_BLOCK, LRB, K, M, POSBLOCK)
+!$OMP& REDUCTION(+:DEST_ARRAY)
 #endif
         DO I = CURRENT_BLR+1, LAST_BLR
           IF (IFLAG.LT.0) CYCLE
@@ -572,97 +605,93 @@ C
           LRB => BLR_PANEL(I-CURRENT_BLR)
           K = LRB%K 
           M = LRB%M   
-          N = LRB%N   
           IF (LRB%ISLR) THEN
             IF (K.GT.0) THEN
-              allocate(TEMP_BLOCK( K, NRHS_B ), stat=allocok )
-              IF (allocok .GT. 0) THEN
-                IFLAG  = -13
-                IERROR = NRHS_B * K
-                write(*,*) 'Allocation problem in BLR routine 
-     &         SMUMPS_SOL_BWD_BLR_UPDATE: ',
-     &         'not enough memory? memory requested = ', IERROR
-                CYCLE
-              ENDIF
-              IF (IS_T2_SLAVE) THEN
-                POSBLOCK = POSCB +int(IBEG_BLOCK-1,8)
-                CALL sgemm('T', 'N', K, NRHS_B, M, ONE,
+                IF (IS_T2_SLAVE) THEN
+                  POSBLOCK = POSCB +int(IBEG_BLOCK-1,8)
+                  CALL sgemm('T', 'N', K, NRHS_B, M, ONE,
      &              LRB%Q(1,1), M,  
      &              ARRAYCB(POSBLOCK), LDCB, ZERO, 
-     &              TEMP_BLOCK, K)
-              ELSE IF (IBEG_BLOCK.LE.NPIV.AND.IEND_BLOCK.GT.NPIV) THEN
-                POSBLOCK = POSPIV+int(IBEG_BLOCK-1,8)
-                CALL sgemm('T', 'N', K, NRHS_B, NPIV-IBEG_BLOCK+1, ONE,
-     &              LRB%Q(1,1), M,  
+     &              TEMP_BLOCK(1), K)
+                ELSEIF (IBEG_BLOCK.LE.NPIV.AND.IEND_BLOCK.GT.NPIV) THEN
+                  POSBLOCK = POSPIV+int(IBEG_BLOCK-1,8)
+                  CALL sgemm('T', 'N', K, NRHS_B, NPIV-IBEG_BLOCK+1,
+     &              ONE, LRB%Q(1,1), M,  
      &              ARRAYPIV(POSBLOCK,POSPIVCOL), LDPIV,
-     &              ZERO, TEMP_BLOCK, K)
-                CALL sgemm('T', 'N', K, NRHS_B, IBEG_BLOCK+M-NPIV-1,
+     &              ZERO, TEMP_BLOCK(1), K)
+                  CALL sgemm('T', 'N', K, NRHS_B, IBEG_BLOCK+M-NPIV-1,
      &              ONE, LRB%Q(NPIV-IBEG_BLOCK+2,1), M,  
      &              ARRAYCB(POSCB), LDCB, 
      &              ONE,  
-     &              TEMP_BLOCK, K)
-              ELSEIF (IBEG_BLOCK.LE.NPIV) THEN
-                POSBLOCK = POSPIV+int(IBEG_BLOCK-1,8)
-                CALL sgemm('T', 'N', K, NRHS_B, M, ONE,
+     &              TEMP_BLOCK(1), K)
+                ELSEIF (IBEG_BLOCK.LE.NPIV) THEN
+                  POSBLOCK = POSPIV+int(IBEG_BLOCK-1,8)
+                  CALL sgemm('T', 'N', K, NRHS_B, M, ONE,
      &              LRB%Q(1,1), M,  
      &              ARRAYPIV(POSBLOCK,POSPIVCOL), LDPIV,
-     &              ZERO, TEMP_BLOCK, K)
-              ELSE
-                POSBLOCK = POSCB+int(IBEG_BLOCK-1-NPIV,8)
-                CALL sgemm('T', 'N', K, NRHS_B, M, ONE,
+     &              ZERO, TEMP_BLOCK(1), K)
+                ELSE
+                  POSBLOCK = POSCB+int(IBEG_BLOCK-1-NPIV,8)
+                  CALL sgemm('T', 'N', K, NRHS_B, M, ONE,
      &              LRB%Q(1,1), M,  
      &              ARRAYCB(POSBLOCK), LDCB, ZERO, 
-     &              TEMP_BLOCK, K)
-              ENDIF
-#if defined(BLR_MT) 
-!$OMP CRITICAL(bwd_lrsolve_cri)
-#endif
-              CALL sgemm('T', 'N', N, NRHS_B, K, MONE,
+     &              TEMP_BLOCK(1), K)
+                ENDIF
+                CALL sgemm('T', 'N', N, NRHS_B, K, MONE,
      &            LRB%R(1,1), K, 
-     &            TEMP_BLOCK, K, ONE,
-     &            ARRAYPIV(POSDIAG,POSPIVCOL), LDPIV)
-#if defined(BLR_MT) 
-!$OMP END CRITICAL(bwd_lrsolve_cri)
-#endif
-              deallocate(TEMP_BLOCK)
-            ENDIF
-          ELSE
-#if defined(BLR_MT) 
-!$OMP CRITICAL(bwd_lrsolve_cri)
-#endif
+     &            TEMP_BLOCK(1), K, ONE,
+     &            DEST_ARRAY(1), N)
+            ENDIF 
+          ELSE 
             IF (IS_T2_SLAVE) THEN
               POSBLOCK = POSCB+int(IBEG_BLOCK-1,8)
               CALL sgemm('T', 'N', N, NRHS_B, M, MONE,
      &              LRB%Q(1,1), M,  ARRAYCB(POSBLOCK), LDCB,
-     &              ONE, ARRAYPIV(POSDIAG,POSPIVCOL), LDPIV)
-            ELSE IF (IBEG_BLOCK.LE.NPIV.AND.IEND_BLOCK.GT.NPIV) THEN
+     &              ONE, DEST_ARRAY(1), N)
+            ELSEIF (IBEG_BLOCK.LE.NPIV.AND.IEND_BLOCK.GT.NPIV) THEN
               POSBLOCK = POSPIV+int(IBEG_BLOCK-1,8)
               CALL sgemm('T', 'N', N, NRHS_B, NPIV-IBEG_BLOCK+1, MONE,
      &              LRB%Q(1,1), M,  ARRAYPIV(POSBLOCK,POSPIVCOL), LDPIV,
-     &              ONE, ARRAYPIV(POSDIAG,POSPIVCOL), LDPIV)
+     &              ONE, DEST_ARRAY(1), N)
               CALL sgemm('T', 'N', N, NRHS_B, IBEG_BLOCK+M-NPIV-1, MONE,
      &              LRB%Q(NPIV-IBEG_BLOCK+2,1), M,  ARRAYCB(POSCB), 
-     &              LDCB, ONE, ARRAYPIV(POSDIAG,POSPIVCOL), LDPIV)
+     &              LDCB, ONE, DEST_ARRAY(1), N)
             ELSEIF (IBEG_BLOCK.LE.NPIV) THEN
               POSBLOCK = POSPIV+int(IBEG_BLOCK-1,8)
               CALL sgemm('T', 'N', N, NRHS_B, M, MONE,
      &              LRB%Q(1,1), M,  ARRAYPIV(POSBLOCK,POSPIVCOL), LDPIV,
-     &              ONE, ARRAYPIV(POSDIAG,POSPIVCOL), LDPIV)
+     &              ONE, DEST_ARRAY(1), N)
             ELSE
               POSBLOCK = POSCB+int(IBEG_BLOCK-1-NPIV,8)
               CALL sgemm('T', 'N', N, NRHS_B, M, MONE,
      &              LRB%Q(1,1), M,  ARRAYCB(POSBLOCK), LDCB,
-     &              ONE, ARRAYPIV(POSDIAG,POSPIVCOL), LDPIV)
+     &              ONE, DEST_ARRAY(1), N)
             ENDIF
-#if defined(BLR_MT) 
-!$OMP END CRITICAL(bwd_lrsolve_cri)
-#endif
           ENDIF
         ENDDO
-#if defined(BLR_MT) 
+#if ! defined(BLR_NOOPENMP)
 !$OMP END DO
 #endif
-      RETURN
+        IF (KMAX.GT.0) THEN
+          IF (allocated(TEMP_BLOCK)) deallocate(TEMP_BLOCK)
+        ENDIF
+#if ! defined(BLR_NOOPENMP)
+!$OMP END PARALLEL
+#endif 
+        IF (IS_T2_SLAVE) THEN
+          DO I=1,NRHS_B
+            call saxpy(N, ONE, DEST_ARRAY((I-1)*N+1), 1,
+     &                 ARRAYPIV(POSDIAG+(I-1)*LDPIV,POSPIVCOL), 1)
+          ENDDO
+        ELSE
+          DO I=1,NRHS_B
+            call saxpy(N, ONE, DEST_ARRAY((I-1)*N+1), 1,
+     &                 ARRAYPIV(POSDIAG,POSPIVCOL+I-1), 1)
+          ENDDO
+        ENDIF
+ 100    CONTINUE
+        IF (allocated(DEST_ARRAY)) DEALLOCATE(DEST_ARRAY)
+        RETURN
       END SUBROUTINE SMUMPS_SOL_BWD_BLR_UPDATE
       END MODULE SMUMPS_SOL_LR
       SUBROUTINE SMUMPS_SOLVE_BWD_LR_TRSOLVE (

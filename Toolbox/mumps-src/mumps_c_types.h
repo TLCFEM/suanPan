@@ -1,15 +1,16 @@
 /*
  *
- *  This file is part of MUMPS 5.2.1, released
- *  on Fri Jun 14 14:46:05 UTC 2019
+ *  This file is part of MUMPS 5.6.0, released
+ *  on Wed Apr 19 15:50:57 UTC 2023
  *
  *
- *  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+ *  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
  *  Mumps Technologies, University of Bordeaux.
  *
  *  This version of MUMPS is provided to you free of charge. It is
- *  released under the CeCILL-C license:
- *  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+ *  released under the CeCILL-C license
+ *  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+ *  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
  *
  */
 
@@ -17,11 +18,8 @@
 #define MUMPS_C_TYPES_H
 
 #include <stdint.h>
-#ifdef INTSIZE64
-#define MUMPS_INT int64_t
-#else
+
 #define MUMPS_INT int
-#endif
 
 #define MUMPS_INT8 int64_t
 
@@ -33,11 +31,10 @@
 
 /* Complex datatypes */
 typedef struct {
-	float r, i;
+    float r, i;
 } mumps_complex;
-
 typedef struct {
-	double r, i;
+    double r, i;
 } mumps_double_complex;
 
 #define CMUMPS_COMPLEX mumps_complex

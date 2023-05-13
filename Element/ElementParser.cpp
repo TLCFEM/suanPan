@@ -1061,6 +1061,28 @@ void new_damper02(unique_ptr<Element>& return_obj, istringstream& command, const
     return_obj = make_unique<Damper02>(tag, std::move(node_tag), damper_tag, spring_tag, is_true(use_matrix), proceed, beta, dimension);
 }
 
+void new_damper05(unique_ptr<Element>& return_obj, istringstream& command, const unsigned dimension) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    uvec node_tag(2);
+    if(!get_input(command, node_tag)) {
+        suanpan_error("Two valid nodes are required.\n");
+        return;
+    }
+
+    unsigned damper_tag;
+    if(!get_input(command, damper_tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    return_obj = make_unique<Damper05>(tag, std::move(node_tag), damper_tag, dimension);
+}
+
 void new_dc3d4(unique_ptr<Element>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -1308,7 +1330,13 @@ void new_dkts3(unique_ptr<Element>& return_obj, istringstream& command) {
         return;
     }
 
-    return_obj = make_unique<DKTS3>(tag, std::move(node_tag), material_tag, thickness, num_ip);
+    string nlgeom = "false";
+    if(!get_optional_input(command, nlgeom)) {
+        suanpan_error("A valid nlgeom switch is required.\n");
+        return;
+    }
+
+    return_obj = make_unique<DKTS3>(tag, std::move(node_tag), material_tag, thickness, num_ip, is_true(nlgeom));
 }
 
 void new_embedded(unique_ptr<Element>& return_obj, istringstream& command, const unsigned dof) {
@@ -1713,7 +1741,13 @@ void new_sgcms(unique_ptr<Element>& return_obj, istringstream& command) {
         return;
     }
 
-    return_obj = make_unique<SGCMS>(tag, std::move(node_tag), material_tag, thickness);
+    string nlgeom = "false";
+    if(!get_optional_input(command, nlgeom)) {
+        suanpan_error("A valid nlgeom switch is required.\n");
+        return;
+    }
+
+    return_obj = make_unique<SGCMS>(tag, std::move(node_tag), material_tag, thickness, is_true(nlgeom));
 }
 
 void new_gq12(unique_ptr<Element>& return_obj, istringstream& command) {
@@ -2089,7 +2123,13 @@ void new_s4(unique_ptr<Element>& return_obj, istringstream& command) {
         return;
     }
 
-    return_obj = make_unique<S4>(tag, std::move(node_tag), material_tag, thickness);
+    string nlgeom = "false";
+    if(!get_optional_input(command, nlgeom)) {
+        suanpan_error("A valid nlgeom switch is required.\n");
+        return;
+    }
+
+    return_obj = make_unique<S4>(tag, std::move(node_tag), material_tag, thickness, is_true(nlgeom));
 }
 
 void new_singlesection2d(unique_ptr<Element>& return_obj, istringstream& command) {
@@ -2370,6 +2410,29 @@ void new_tie(unique_ptr<Element>& return_obj, istringstream& command) {
     }
 
     return_obj = make_unique<Tie>(tag, node_tag, dof_tag, weight_tag, magnitude, penalty);
+}
+
+void new_translationconnector(unique_ptr<Element>& return_obj, istringstream& command, const unsigned S) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    uvec nodes(3);
+    if(!get_input(command, nodes)) {
+        suanpan_error("Three valid nodes are required.\n");
+        return;
+    }
+
+    double penalty;
+    if(!get_input(command, penalty)) {
+        suanpan_error("A valid penalty is required.\n");
+        return;
+    }
+
+    if(2u == S) return_obj = make_unique<TranslationConnector2D>(tag, std::move(nodes), penalty);
+    else return_obj = make_unique<TranslationConnector3D>(tag, std::move(nodes), penalty);
 }
 
 void new_patchquad(unique_ptr<Element>& return_obj, istringstream& command) {
@@ -2731,6 +2794,8 @@ int create_new_element(const shared_ptr<DomainBase>& domain, istringstream& comm
     else if(is_equal(element_id, "Damper02")) new_damper02(new_element, command, 2);
     else if(is_equal(element_id, "Damper03")) new_damper01(new_element, command, 3);
     else if(is_equal(element_id, "Damper04")) new_damper02(new_element, command, 3);
+    else if(is_equal(element_id, "Damper05")) new_damper05(new_element, command, 2);
+    else if(is_equal(element_id, "Damper06")) new_damper05(new_element, command, 3);
     else if(is_equal(element_id, "DC3D4")) new_dc3d4(new_element, command);
     else if(is_equal(element_id, "DC3D8")) new_dc3d8(new_element, command);
     else if(is_equal(element_id, "DCP3")) new_dcp3(new_element, command);
@@ -2773,6 +2838,8 @@ int create_new_element(const shared_ptr<DomainBase>& domain, istringstream& comm
     else if(is_equal(element_id, "T3D2")) new_t3d2(new_element, command);
     else if(is_equal(element_id, "T3D2S")) new_t3d2s(new_element, command);
     else if(is_equal(element_id, "Tie")) new_tie(new_element, command);
+    else if(is_equal(element_id, "TranslationConnector2D")) new_translationconnector(new_element, command, 2u);
+    else if(is_equal(element_id, "TranslationConnector3D")) new_translationconnector(new_element, command, 3u);
     else if(is_equal(element_id, "PatchQuad")) new_patchquad(new_element, command);
     else if(is_equal(element_id, "PatchCube")) new_patchcube(new_element, command);
     else load::object(new_element, domain, element_id, command);

@@ -29,10 +29,10 @@
 #include <suanPan.h>
 
 #ifdef SUANPAN_MT
-#include <tbb/concurrent_set.h>
-#include <tbb/concurrent_map.h>
-#include <tbb/concurrent_unordered_set.h>
-#include <tbb/concurrent_unordered_map.h>
+#include <oneapi/tbb/concurrent_set.h>
+#include <oneapi/tbb/concurrent_map.h>
+#include <oneapi/tbb/concurrent_unordered_set.h>
+#include <oneapi/tbb/concurrent_unordered_map.h>
 
 namespace suanpan {
     template<typename T> using vector = tbb::concurrent_vector<T>;

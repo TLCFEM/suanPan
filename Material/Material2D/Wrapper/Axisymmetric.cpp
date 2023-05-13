@@ -25,12 +25,6 @@ Axisymmetric::Axisymmetric(const unsigned T, const unsigned BT)
     , base_tag(BT)
     , full_strain(6, fill::zeros) {}
 
-Axisymmetric::Axisymmetric(const Axisymmetric& old_obj)
-    : Material2D(old_obj)
-    , base_tag(old_obj.base_tag)
-    , base(suanpan::make_copy(old_obj.base))
-    , full_strain(old_obj.full_strain) {}
-
 int Axisymmetric::initialize(const shared_ptr<DomainBase>& D) {
     base = suanpan::initialized_material_copy(D, base_tag);
 

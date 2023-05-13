@@ -60,10 +60,11 @@ class S4 final : public ShellBase {
     vector<IntegrationPoint> int_pt;
 
 public:
-    S4(unsigned,   // tag
-       uvec&&,     // node tag
-       unsigned,   // material tag
-       double = 1. // thickness
+    S4(unsigned,    // tag
+       uvec&&,      // node tag
+       unsigned,    // material tag
+       double = 1., // thickness
+       bool = false // non-linear geometry switch
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

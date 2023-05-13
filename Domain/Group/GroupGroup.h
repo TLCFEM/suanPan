@@ -22,7 +22,7 @@
  * @date 30/06/2020
  * @version 0.1.0
  * @file GroupGroup.h
- * @addtoGroupGroup Domain
+ * @addtogroup Group
  * @{
  */
 

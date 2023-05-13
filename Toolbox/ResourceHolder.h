@@ -28,21 +28,26 @@
 
 #include <memory>
 
-template<typename T> class ResourceHolder final {
+template<typename T> requires requires(T* copyable) { copyable->get_copy(); }
+class ResourceHolder final {
     std::unique_ptr<T> object = nullptr;
 
 public:
     ResourceHolder() = default;
 
+    explicit ResourceHolder(std::unique_ptr<T>&& obj)
+        : object(std::forward<std::unique_ptr<T>>(obj)) {}
+
     ResourceHolder& operator=(const std::shared_ptr<T>& original_object) {
-        object = original_object->make_copy();
+        object = original_object->get_copy();
         return *this;
     }
 
     ResourceHolder(const ResourceHolder& old_holder)
-        : object(old_holder.object ? old_holder.object->make_copy() : nullptr) {}
+        : object(old_holder.object ? old_holder.object->get_copy() : nullptr) {}
 
-    ResourceHolder(ResourceHolder&&) noexcept = delete;
+    ResourceHolder(ResourceHolder&& old_holder) noexcept { object = std::move(old_holder.object); }
+
     ResourceHolder& operator=(const ResourceHolder&) = delete;
     ResourceHolder& operator=(ResourceHolder&&) noexcept = delete;
     ~ResourceHolder() = default;
@@ -50,6 +55,12 @@ public:
     T* operator->() const { return object.get(); }
 
     explicit operator bool() const { return object != nullptr; }
+
+    bool operator==(const ResourceHolder& other) const { return object == other.object; }
+
+    bool operator==(const T& other) const { return object == other; }
+
+    bool operator==(std::nullptr_t null) const { return object == null; }
 };
 
 #endif

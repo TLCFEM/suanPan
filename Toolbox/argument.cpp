@@ -35,10 +35,10 @@
 using std::ifstream;
 using std::ofstream;
 
-constexpr auto SUANPAN_MAJOR = 2;
-constexpr auto SUANPAN_MINOR = 9;
+constexpr auto SUANPAN_MAJOR = 3;
+constexpr auto SUANPAN_MINOR = 0;
 constexpr auto SUANPAN_PATCH = 0;
-constexpr auto SUANPAN_CODE = "Betelgeuse";
+constexpr auto SUANPAN_CODE = "Canopus";
 
 bool SUANPAN_PRINT = true;
 bool SUANPAN_COLOR = true;
@@ -139,7 +139,7 @@ void print_header() {
     suanpan_info("+-----------------------------------------------------+\n");
     suanpan_info("|   __        __            suanPan is an open source |\n");
     suanpan_info("|  /  \\      |  \\              FEM framework (64-bit) |\n");
-    suanpan_info("|  \\__       |__/  __   __         {} ({}.{}.{}) |\n", SUANPAN_CODE, SUANPAN_MAJOR, SUANPAN_MINOR, SUANPAN_PATCH);
+    suanpan_info("|  \\__       |__/  __   __         {:>10} ({}.{}.{}) |\n", SUANPAN_CODE, SUANPAN_MAJOR, SUANPAN_MINOR, SUANPAN_PATCH);
     suanpan_info("|     \\ |  | |    |  \\ |  |         by tlc @ {} |\n", SUANPAN_REVISION);
     suanpan_info("|  \\__/ |__| |    |__X |  |       all rights reserved |\n");
     suanpan_info("|                              10.5281/zenodo.1285221 |\n");
@@ -282,6 +282,9 @@ void print_version() {
 #ifdef SUANPAN_CUDA
     suanpan_info("    The GPCPU solvers are provided by CUDA. https://developer.nvidia.com/about-cuda/\n");
 #endif
+#ifdef SUANPAN_MAGMA
+    suanpan_info("    The GPCPU solvers are provided by MAGMA. https://icl.utk.edu/magma/\n");
+#endif
 #ifdef SUANPAN_MT
     suanpan_info("    The parallelisation support is implemented via TBB library. https://github.com/oneapi-src/oneTBB/\n");
 #endif
@@ -289,7 +292,7 @@ void print_version() {
     suanpan_info("    The visualisation support is implemented via VTK library. https://vtk.org/\n");
 #endif
     suanpan_info("\nPlease join gitter for any feedback. https://gitter.im/suanPan-dev/community/\n");
-    suanpan_info("\n\n[From Wikipedia] Betelgeuse is usually the tenth-brightest star in the night sky and, after Rigel, the second-brightest in the constellation of Orion. It is a distinctly reddish semiregular variable star whose apparent magnitude has the widest range displayed by any first-magnitude star.\n\n");
+    suanpan_info("\n\n[From Wikipedia] Located approximately 310 light-years away from the Sun, Canopus is a bright giant with a spectral type of A9, which means that it appears white to the naked eye. It has a luminosity that is over 10,000 times that of the Sun, is eight times as massive, and has expanded to 71 times the radius of the Sun. The enlarged photosphere has an effective temperature of approximately 7,400 K. Canopus is currently in the blue loop phase of its evolution, undergoing core helium burning after exhausting the hydrogen in its core and passing through the red-giant branch. It is also a source of X-rays, which are likely being emitted from its corona.\n\n");
 }
 
 void print_helper() {

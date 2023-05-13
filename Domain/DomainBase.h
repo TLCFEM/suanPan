@@ -89,13 +89,23 @@ enum class ColorMethod {
     MIS
 };
 
-enum class ModalAttribute: size_t {
+enum class ModalAttribute : size_t {
     LinearSystem
+};
+
+enum class Statistics : size_t {
+    UpdateStatus,
+    AssembleVector,
+    AssembleMatrix,
+    ProcessConstraint,
+    SolveSystem
 };
 
 class DomainBase : public Tag {
 public:
-    explicit DomainBase(unsigned);
+    explicit DomainBase(const unsigned T)
+        : Tag(T) {}
+
     DomainBase(const DomainBase&) = delete;            // copy forbidden
     DomainBase(DomainBase&&) = delete;                 // move forbidden
     DomainBase& operator=(const DomainBase&) = delete; // assign forbidden
@@ -406,6 +416,14 @@ public:
     virtual void commit_status() const = 0;
     virtual void clear_status() = 0;
     virtual void reset_status() const = 0;
+
+    template<Statistics T> void update(const double value) const { update(T, value); }
+
+    template<Statistics T> [[nodiscard]] double stats() const { return stats(T); }
+
+    virtual void update(Statistics, double) const = 0;
+
+    [[nodiscard]] virtual double stats(Statistics) const = 0;
 
     virtual void save(string) = 0;
 };

@@ -34,24 +34,20 @@
 #define SEQUENTIAL_H
 
 #include <Material/Material1D/Material1D.h>
+#include <Toolbox/ResourceHolder.h>
 
 class Sequential final : public Material1D {
     static const unsigned max_iteration;
 
     const uword mat_size;
     const uvec mat_tag;
-    vector<unique_ptr<Material>> mat_pool;
+    vector<ResourceHolder<Material>> mat_pool;
     mat jacobian;
 
 public:
     Sequential(unsigned, // tag
                uvec&&    // material tag pool
     );
-    Sequential(const Sequential&);
-    Sequential(Sequential&&) = delete;
-    Sequential& operator=(const Sequential&) = delete;
-    Sequential& operator=(Sequential&&) = delete;
-    ~Sequential() override = default;
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

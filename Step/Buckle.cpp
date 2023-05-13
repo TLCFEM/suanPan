@@ -18,7 +18,7 @@
 #include "Buckle.h"
 #include <Converger/AbsIncreDisp.h>
 #include <Domain/DomainBase.h>
-#include <Domain/FactoryHelper.hpp>
+#include <Domain/Factory.hpp>
 #include <Solver/Integrator/Integrator.h>
 #include <Solver/Newton.h>
 #include <Toolbox/arpack.h>
@@ -69,7 +69,7 @@ int Buckle::analyze() {
     const shared_ptr t_geometry = W->get_geometry()->make_copy();
     t_geometry *= -1.;
 
-    if(eig_solve(get_eigenvalue(W), get_eigenvector(W), W->get_stiffness(), t_geometry, 1, "SM") != SUANPAN_SUCCESS) return SUANPAN_FAIL;
+    if(eig_solve(W->modify_eigenvalue(), W->modify_eigenvector(), W->get_stiffness(), t_geometry, 1, "SM") != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 
     suanpan_info("\nBuckling load multiplier: {:.8E}.\n", W->get_eigenvalue().at(0));
 

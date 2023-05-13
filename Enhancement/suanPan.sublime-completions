@@ -3517,25 +3517,25 @@
       "trigger": "DCP4"
     },
     {
-      "contents": "element DKT3 ${1:(1)} ${2:(2...4)} ${5:(5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2...4) int, node i, j, k\n# (5) int, material tag\n# (6) double, thickness\n# [7] int, numer of integration points, default: 3",
+      "contents": "element DKT3 ${1:(1)} ${2:(2...4)} ${5:(5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2...4) int, node i, j, k\n# (5) int, material tag\n# (6) double, thickness\n# [7] int, number of integration points, default: 3",
       "details": "DKT Triangle Plate",
       "kind": "type",
       "trigger": "DKT3"
     },
     {
-      "contents": "element DKT4 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)} ${8:[8]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# (7) double, thickness\n# [8] int, numer of integration points along thickness, default: 3",
+      "contents": "element DKT4 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)} ${8:[8]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# (7) double, thickness\n# [8] int, number of integration points along thickness, default: 3",
       "details": "DKT Quadrilateral Plate",
       "kind": "type",
       "trigger": "DKT4"
     },
     {
-      "contents": "element DKTS3 ${1:(1)} ${2:(2...4)} ${5:(5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2...4) int, node i, j, k\n# (5) int, material tag\n# (6) double, thickness\n# [7] int, numer of integration points, default: 3",
+      "contents": "element DKTS3 ${1:(1)} ${2:(2...4)} ${5:(5)} ${6:(6)} ${7:[7]} ${8:[8]}\n# (1) int, unique element tag\n# (2...4) int, node i, j, k\n# (5) int, material tag\n# (6) double, thickness\n# [7] int, number of integration points, default: 3\n# [7] bool, nonlinear geometry switch, default: false",
       "details": "DKT Triangle Shell",
       "kind": "type",
       "trigger": "DKTS3"
     },
     {
-      "contents": "element DKTS4 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)} ${8:[8]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# (7) double, thickness\n# [8] int, numer of integration points, default: 3",
+      "contents": "element DKTS4 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)} ${8:[8]} ${9:[9]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# (7) double, thickness\n# [8] int, number of integration points, default: 3\n# [9] bool, nonlinear geometry switch, default: false",
       "details": "DKT Quadrilateral Shell",
       "kind": "type",
       "trigger": "DKTS4"
@@ -3623,6 +3623,12 @@
       "details": "Uniaxial Elastic Material",
       "kind": "type",
       "trigger": "Elastic1D"
+    },
+    {
+      "contents": "material AsymmElastic1D ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]}\n# (1) int, unique material tag\n# (2) double, tension elastic modulus\n# (3) double, compression elastic modulus\n# [4] double, density, default: 0.0",
+      "details": "Uniaxial Elastic Material",
+      "kind": "type",
+      "trigger": "AsymmElastic1D"
     },
     {
       "contents": "",
@@ -6174,6 +6180,12 @@
       "trigger": "Newmark"
     },
     {
+      "contents": "integrator NonviscousNewmark ${1:(1)} ${2:(2)} ${3:(3)} (${4:(4)} ${5:(5)})...\n# (1) int, unique tag\n# (2) double, alpha, typical: 0.25\n# (3) double, beta, typical: 0.5\n# (4) double, m\n# (5) double, s",
+      "details": "Newmark Method With Nonviscous Damping",
+      "kind": "type",
+      "trigger": "NonviscousNewmark"
+    },
+    {
       "contents": "",
       "details": "",
       "kind": "type",
@@ -6726,7 +6738,7 @@
       "trigger": "S3X7.5"
     },
     {
-      "contents": "element S4 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# (7) double, thickness",
+      "contents": "element S4 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)} ${8:[8]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# (7) double, thickness\n# [8] bool, nonlinear geometry switch, default: false",
       "details": "Four Node Shell Element",
       "kind": "type",
       "trigger": "S4"
@@ -6840,7 +6852,7 @@
       "trigger": "SGCMQL"
     },
     {
-      "contents": "element SGCMS ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# (7) double, thickness",
+      "contents": "element SGCMS ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)} ${8:[8]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# (7) double, thickness\n# [8] bool, nonlinear geometry switch, default: false",
       "details": "Simplified Generalized Conforming Mixed Shell Element",
       "kind": "type",
       "trigger": "SGCMS"
@@ -7356,10 +7368,16 @@
       "trigger": "TableGurson"
     },
     {
-      "contents": "",
-      "details": "",
+      "contents": "amplitude Tabular ${1:(1)} ${2:(2)}\n# (1) int, unique amplitude tag\n# (2) string, file name of tabular data",
+      "details": "Amplitude Using Tabular Data",
       "kind": "type",
       "trigger": "Tabular"
+    },
+    {
+      "contents": "amplitude Custom ${1:(1)} ${2:(2)}\n# (1) int, unique amplitude tag\n# (2) int, expression tag",
+      "details": "Amplitude Using Custom Function",
+      "kind": "type",
+      "trigger": "Custom"
     },
     {
       "contents": "material Tanh1D ${1:(1)} ${2:(2)} ${3:[3]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# [3] double, density, default: 0.0",
@@ -14826,6 +14844,18 @@
       "trigger": "nobar"
     },
     {
+      "contents": "element TranslationConnector2D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) integer, unique element tag\n# (2) integer, node i\n# (3) integer, node j\n# (4) integer, node k",
+      "details": "Define 2D Translation Connector",
+      "kind": "type",
+      "trigger": "TranslationConnector2D"
+    },
+    {
+      "contents": "element TranslationConnector3D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) integer, unique element tag\n# (2) integer, node i\n# (3) integer, node j\n# (4) integer, node k",
+      "details": "Define 3D Translation Connector",
+      "kind": "type",
+      "trigger": "TranslationConnector3D"
+    },
+    {
       "contents": "node ${1:(1)} ${2:(2...)}\n# (1) integer, unique node tag\n# (2...) double, coordinates",
       "details": "Define Node",
       "kind": "type",
@@ -14838,7 +14868,13 @@
       "trigger": "node"
     },
     {
-      "contents": "",
+      "contents": "customnodegroup ${1:(1)} ${2:(2)}\n# (1) integer, unique tag\n# (2) integer, tag of expression",
+      "details": "",
+      "kind": "type",
+      "trigger": "customnodegroup"
+    },
+    {
+      "contents": "nodegroup ${1:(1)} ${2:(2...)}\n# (1) integer, unique tag\n# (2...) integer, tags of nodes to be included",
       "details": "",
       "kind": "type",
       "trigger": "nodegroup"

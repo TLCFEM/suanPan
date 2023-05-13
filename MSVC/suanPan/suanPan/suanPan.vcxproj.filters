@@ -315,9 +315,6 @@
     <ClCompile Include="..\..\..\Domain\Domain.cpp">
       <Filter>Domain</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Domain\DomainBase.cpp">
-      <Filter>Domain</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Domain\ExternalModule.cpp">
       <Filter>Domain</Filter>
     </ClCompile>
@@ -1495,6 +1492,24 @@
     <ClCompile Include="..\..\..\Include\whereami\whereami.c">
       <Filter>Z</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Domain\Group\CustomNodeGroup.cpp">
+      <Filter>Domain\Group</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Special\TranslationConnector.cpp">
+      <Filter>Element\Special</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\NonviscousNewmark.cpp">
+      <Filter>Solver\Integrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Load\Amplitude\CustomAmplitude.cpp">
+      <Filter>Load\Amplitude</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Viscosity\Nonviscous01.cpp">
+      <Filter>Material\Material1D\Viscosity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Elastic\AsymmElastic1D.cpp">
+      <Filter>Material\Material1D\Elastic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2644,9 +2659,6 @@
     <ClInclude Include="..\..\..\Solver\Integrator\GSSSS.h">
       <Filter>Solver\Integrator</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Domain\FactoryHelper.hpp">
-      <Filter>Domain</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Toolbox\sync_ostream.h">
       <Filter>Toolbox</Filter>
     </ClInclude>
@@ -2850,6 +2862,27 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Element\MappingDOF.h">
       <Filter>Element</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\MetaMat\SparseMatMAGMA.hpp">
+      <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\Group\CustomNodeGroup.h">
+      <Filter>Domain\Group</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Special\TranslationConnector.h">
+      <Filter>Element\Special</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\NonviscousNewmark.h">
+      <Filter>Solver\Integrator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Load\Amplitude\CustomAmplitude.h">
+      <Filter>Load\Amplitude</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Viscosity\Nonviscous01.h">
+      <Filter>Material\Material1D\Viscosity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Elastic\AsymmElastic1D.h">
+      <Filter>Material\Material1D\Elastic</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

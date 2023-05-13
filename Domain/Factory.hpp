@@ -32,9 +32,13 @@
 #define FACTORY_HPP
 
 #include <future>
-#include <Domain/MetaMat/operator_times.hpp>
 #include <Toolbox/container.h>
 #include <Element/MappingDOF.h>
+#include <Domain/MetaMat/MetaMat>
+
+#ifdef SUANPAN_MAGMA
+#include <magmasparse.h>
+#endif
 
 enum class AnalysisType {
     NONE,
@@ -61,7 +65,8 @@ enum class SolverType {
     MUMPS,
     CUDA,
     PARDISO,
-    FGMRES
+    FGMRES,
+    MAGMA
 };
 
 template<sp_d T> class Factory final {
@@ -75,6 +80,10 @@ template<sp_d T> class Factory final {
 
     AnalysisType analysis_type = AnalysisType::NONE;  // type of analysis
     StorageScheme storage_type = StorageScheme::FULL; // type of analysis
+
+#ifdef SUANPAN_MAGMA
+    magma_dopts magma_setting{};
+#endif
 
     bool nlgeom = false;
 
@@ -164,8 +173,8 @@ template<sp_d T> class Factory final {
 
     Mat<T> eigenvector; // eigenvectors
 
-    template<sp_d T1> friend unique_ptr<MetaMat<T1>> get_basic_container(const Factory<T1>*);
-    template<sp_d T1> friend unique_ptr<MetaMat<T1>> get_matrix_container(const Factory<T1>*);
+    unique_ptr<MetaMat<T>> get_basic_container();
+    unique_ptr<MetaMat<T>> get_matrix_container();
 
     void assemble_matrix_helper(shared_ptr<MetaMat<T>>&, const Mat<T>&, const uvec&, const std::vector<MappingDOF>&);
 
@@ -188,6 +197,12 @@ public:
 
     void set_solver_setting(const SolverSetting<double>&);
     [[nodiscard]] const SolverSetting<double>& get_solver_setting() const;
+
+#ifdef SUANPAN_MAGMA
+    void set_solver_setting(const magma_dopts& magma_opt) { magma_setting = magma_opt; }
+
+    [[nodiscard]] const magma_dopts& get_magma_setting() const { return magma_setting; }
+#endif
 
     void set_analysis_type(AnalysisType);
     [[nodiscard]] AnalysisType get_analysis_type() const;
@@ -237,6 +252,8 @@ public:
 
     void set_ninja(const Col<T>&);
     void set_sushi(const Col<T>&);
+
+    void update_sushi_by(const Col<T>&);
 
     void set_mpc(unsigned);
 
@@ -469,76 +486,76 @@ public:
 
     /*************************FRIEND*************************/
 
-    template<sp_d T1> friend Col<T1>& get_ninja(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_sushi(const shared_ptr<Factory<T1>>&);
+    Col<T>& modify_ninja();
+    Col<T>& modify_sushi();
 
-    template<sp_d T1> friend suanpan::set<uword>& get_reference_dof(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend SpMat<T1>& get_reference_load(const shared_ptr<Factory<T1>>&);
+    suanpan::set<uword>& modify_reference_dof();
+    SpMat<T>& modify_reference_load();
 
-    template<sp_d T1> friend uvec& get_auxiliary_encoding(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_auxiliary_lambda(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_auxiliary_resistance(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_auxiliary_load(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend SpMat<T1>& get_auxiliary_stiffness(const shared_ptr<Factory<T1>>&);
+    uvec& modify_auxiliary_encoding();
+    Col<T>& modify_auxiliary_lambda();
+    Col<T>& modify_auxiliary_resistance();
+    Col<T>& modify_auxiliary_load();
+    SpMat<T>& modify_auxiliary_stiffness();
 
-    template<sp_d T1> friend SpCol<T1>& get_trial_constraint_resistance(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend SpCol<T1>& get_current_constraint_resistance(const shared_ptr<Factory<T1>>&);
+    SpCol<T>& modify_trial_constraint_resistance();
+    SpCol<T>& modify_current_constraint_resistance();
 
-    template<sp_d T1> friend T1& get_trial_time(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_trial_load_factor(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_trial_load(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_trial_settlement(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_trial_resistance(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_trial_damping_force(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_trial_inertial_force(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_trial_displacement(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_trial_velocity(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_trial_acceleration(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_trial_temperature(const shared_ptr<Factory<T1>>&);
+    T& modify_trial_time();
+    Col<T>& modify_trial_load_factor();
+    Col<T>& modify_trial_load();
+    Col<T>& modify_trial_settlement();
+    Col<T>& modify_trial_resistance();
+    Col<T>& modify_trial_damping_force();
+    Col<T>& modify_trial_inertial_force();
+    Col<T>& modify_trial_displacement();
+    Col<T>& modify_trial_velocity();
+    Col<T>& modify_trial_acceleration();
+    Col<T>& modify_trial_temperature();
 
-    template<sp_d T1> friend T1& get_incre_time(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_incre_load_factor(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_incre_load(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_incre_settlement(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_incre_resistance(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_incre_damping_force(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_incre_inertial_force(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_incre_displacement(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_incre_velocity(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_incre_acceleration(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_incre_temperature(const shared_ptr<Factory<T1>>&);
+    T& modify_incre_time();
+    Col<T>& modify_incre_load_factor();
+    Col<T>& modify_incre_load();
+    Col<T>& modify_incre_settlement();
+    Col<T>& modify_incre_resistance();
+    Col<T>& modify_incre_damping_force();
+    Col<T>& modify_incre_inertial_force();
+    Col<T>& modify_incre_displacement();
+    Col<T>& modify_incre_velocity();
+    Col<T>& modify_incre_acceleration();
+    Col<T>& modify_incre_temperature();
 
-    template<sp_d T1> friend T1& get_current_time(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_current_load_factor(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_current_load(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_current_settlement(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_current_resistance(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_current_damping_force(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_current_inertial_force(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_current_displacement(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_current_velocity(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_current_acceleration(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_current_temperature(const shared_ptr<Factory<T1>>&);
+    T& modify_current_time();
+    Col<T>& modify_current_load_factor();
+    Col<T>& modify_current_load();
+    Col<T>& modify_current_settlement();
+    Col<T>& modify_current_resistance();
+    Col<T>& modify_current_damping_force();
+    Col<T>& modify_current_inertial_force();
+    Col<T>& modify_current_displacement();
+    Col<T>& modify_current_velocity();
+    Col<T>& modify_current_acceleration();
+    Col<T>& modify_current_temperature();
 
-    template<sp_d T1> friend T1& get_pre_time(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_pre_load_factor(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_pre_load(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_pre_settlement(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_pre_resistance(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_pre_damping_force(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_pre_inertial_force(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_pre_displacement(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_pre_velocity(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_pre_acceleration(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Col<T1>& get_pre_temperature(const shared_ptr<Factory<T1>>&);
+    T& modify_pre_time();
+    Col<T>& modify_pre_load_factor();
+    Col<T>& modify_pre_load();
+    Col<T>& modify_pre_settlement();
+    Col<T>& modify_pre_resistance();
+    Col<T>& modify_pre_damping_force();
+    Col<T>& modify_pre_inertial_force();
+    Col<T>& modify_pre_displacement();
+    Col<T>& modify_pre_velocity();
+    Col<T>& modify_pre_acceleration();
+    Col<T>& modify_pre_temperature();
 
-    template<sp_d T1> friend shared_ptr<MetaMat<T1>>& get_mass(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend shared_ptr<MetaMat<T1>>& get_damping(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend shared_ptr<MetaMat<T1>>& get_stiffness(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend shared_ptr<MetaMat<T1>>& get_geometry(const shared_ptr<Factory<T1>>&);
+    shared_ptr<MetaMat<T>>& modify_mass();
+    shared_ptr<MetaMat<T>>& modify_damping();
+    shared_ptr<MetaMat<T>>& modify_stiffness();
+    shared_ptr<MetaMat<T>>& modify_geometry();
 
-    template<sp_d T1> friend Col<T1>& get_eigenvalue(const shared_ptr<Factory<T1>>&);
-    template<sp_d T1> friend Mat<T1>& get_eigenvector(const shared_ptr<Factory<T1>>&);
+    Col<T>& modify_eigenvalue();
+    Mat<T>& modify_eigenvector();
 
     /*************************STATUS*************************/
 
@@ -640,7 +657,10 @@ template<sp_d T> void Factory<T>::set_size(const unsigned D) {
 
 template<sp_d T> unsigned Factory<T>::get_size() const { return n_size; }
 
-template<sp_d T> void Factory<T>::set_entry(const uword N) { n_elem = N; }
+template<sp_d T> void Factory<T>::set_entry(const uword N) {
+    n_elem = N;
+    if(n_elem > std::numeric_limits<int>::max()) throw invalid_argument("too many elements");
+}
 
 template<sp_d T> uword Factory<T>::get_entry() const { return n_elem; }
 
@@ -830,16 +850,16 @@ template<sp_d T> void Factory<T>::initialize_auxiliary_resistance() {
     current_constraint_resistance.zeros(n_size);
 }
 
-template<sp_d T> void Factory<T>::initialize_mass() { global_mass = get_matrix_container(this); }
+template<sp_d T> void Factory<T>::initialize_mass() { global_mass = get_matrix_container(); }
 
-template<sp_d T> void Factory<T>::initialize_damping() { global_damping = get_matrix_container(this); }
+template<sp_d T> void Factory<T>::initialize_damping() { global_damping = get_matrix_container(); }
 
-template<sp_d T> void Factory<T>::initialize_stiffness() { global_stiffness = get_matrix_container(this); }
+template<sp_d T> void Factory<T>::initialize_stiffness() { global_stiffness = get_matrix_container(); }
 
 template<sp_d T> void Factory<T>::initialize_geometry() {
     if(!nlgeom) return;
 
-    global_geometry = get_matrix_container(this);
+    global_geometry = get_matrix_container();
 }
 
 template<sp_d T> void Factory<T>::initialize_eigen() {
@@ -851,6 +871,8 @@ template<sp_d T> void Factory<T>::set_ninja(const Col<T>& N) { ninja = N; }
 
 template<sp_d T> void Factory<T>::set_sushi(const Col<T>& S) { sushi = S; }
 
+template<sp_d T> void Factory<T>::update_sushi_by(const Col<T>& S) { sushi += S; }
+
 template<sp_d T> void Factory<T>::set_mpc(const unsigned S) {
     n_mpc = S;
     auxiliary_encoding.zeros(n_mpc);
@@ -860,94 +882,6 @@ template<sp_d T> void Factory<T>::set_mpc(const unsigned S) {
 }
 
 template<sp_d T> void Factory<T>::set_reference_load(const SpMat<T>& L) { reference_load = L; }
-
-template<sp_d T> void Factory<T>::set_trial_time(const T M) { trial_time = M; }
-
-template<sp_d T> void Factory<T>::set_trial_load_factor(const Col<T>& L) { trial_load_factor = L; }
-
-template<sp_d T> void Factory<T>::set_trial_load(const Col<T>& L) { trial_load = L; }
-
-template<sp_d T> void Factory<T>::set_trial_settlement(const Col<T>& S) { trial_settlement = S; }
-
-template<sp_d T> void Factory<T>::set_trial_resistance(const Col<T>& R) { trial_resistance = R; }
-
-template<sp_d T> void Factory<T>::set_trial_damping_force(const Col<T>& R) { trial_damping_force = R; }
-
-template<sp_d T> void Factory<T>::set_trial_inertial_force(const Col<T>& R) { trial_inertial_force = R; }
-
-template<sp_d T> void Factory<T>::set_trial_displacement(const Col<T>& D) { trial_displacement = D; }
-
-template<sp_d T> void Factory<T>::set_trial_velocity(const Col<T>& V) { trial_velocity = V; }
-
-template<sp_d T> void Factory<T>::set_trial_acceleration(const Col<T>& A) { trial_acceleration = A; }
-
-template<sp_d T> void Factory<T>::set_trial_temperature(const Col<T>& M) { trial_temperature = M; }
-
-template<sp_d T> void Factory<T>::set_incre_time(const T M) { incre_time = M; }
-
-template<sp_d T> void Factory<T>::set_incre_load_factor(const Col<T>& L) { incre_load_factor = L; }
-
-template<sp_d T> void Factory<T>::set_incre_load(const Col<T>& L) { incre_load = L; }
-
-template<sp_d T> void Factory<T>::set_incre_settlement(const Col<T>& S) { incre_settlement = S; }
-
-template<sp_d T> void Factory<T>::set_incre_resistance(const Col<T>& R) { incre_resistance = R; }
-
-template<sp_d T> void Factory<T>::set_incre_damping_force(const Col<T>& R) { incre_damping_force = R; }
-
-template<sp_d T> void Factory<T>::set_incre_inertial_force(const Col<T>& R) { incre_inertial_force = R; }
-
-template<sp_d T> void Factory<T>::set_incre_displacement(const Col<T>& D) { incre_displacement = D; }
-
-template<sp_d T> void Factory<T>::set_incre_velocity(const Col<T>& V) { incre_velocity = V; }
-
-template<sp_d T> void Factory<T>::set_incre_acceleration(const Col<T>& A) { incre_acceleration = A; }
-
-template<sp_d T> void Factory<T>::set_incre_temperature(const Col<T>& M) { incre_temperature = M; }
-
-template<sp_d T> void Factory<T>::set_current_time(const T M) { current_time = M; }
-
-template<sp_d T> void Factory<T>::set_current_load_factor(const Col<T>& L) { current_load_factor = L; }
-
-template<sp_d T> void Factory<T>::set_current_load(const Col<T>& L) { current_load = L; }
-
-template<sp_d T> void Factory<T>::set_current_settlement(const Col<T>& S) { current_settlement = S; }
-
-template<sp_d T> void Factory<T>::set_current_resistance(const Col<T>& R) { current_resistance = R; }
-
-template<sp_d T> void Factory<T>::set_current_damping_force(const Col<T>& R) { current_damping_force = R; }
-
-template<sp_d T> void Factory<T>::set_current_inertial_force(const Col<T>& R) { current_inertial_force = R; }
-
-template<sp_d T> void Factory<T>::set_current_displacement(const Col<T>& D) { current_displacement = D; }
-
-template<sp_d T> void Factory<T>::set_current_velocity(const Col<T>& V) { current_velocity = V; }
-
-template<sp_d T> void Factory<T>::set_current_acceleration(const Col<T>& A) { current_acceleration = A; }
-
-template<sp_d T> void Factory<T>::set_current_temperature(const Col<T>& M) { current_temperature = M; }
-
-template<sp_d T> void Factory<T>::set_pre_time(const T M) { pre_time = M; }
-
-template<sp_d T> void Factory<T>::set_pre_load_factor(const Col<T>& L) { pre_load_factor = L; }
-
-template<sp_d T> void Factory<T>::set_pre_load(const Col<T>& L) { pre_load = L; }
-
-template<sp_d T> void Factory<T>::set_pre_settlement(const Col<T>& S) { pre_settlement = S; }
-
-template<sp_d T> void Factory<T>::set_pre_resistance(const Col<T>& R) { pre_resistance = R; }
-
-template<sp_d T> void Factory<T>::set_pre_damping_force(const Col<T>& R) { pre_damping_force = R; }
-
-template<sp_d T> void Factory<T>::set_pre_inertial_force(const Col<T>& R) { pre_inertial_force = R; }
-
-template<sp_d T> void Factory<T>::set_pre_displacement(const Col<T>& D) { pre_displacement = D; }
-
-template<sp_d T> void Factory<T>::set_pre_velocity(const Col<T>& V) { pre_velocity = V; }
-
-template<sp_d T> void Factory<T>::set_pre_acceleration(const Col<T>& A) { pre_acceleration = A; }
-
-template<sp_d T> void Factory<T>::set_pre_temperature(const Col<T>& M) { pre_temperature = M; }
 
 template<sp_d T> void Factory<T>::set_mass(const shared_ptr<MetaMat<T>>& M) { global_mass = M; }
 
@@ -993,94 +927,6 @@ template<sp_d T> T Factory<T>::get_complementary_energy() { return complementary
 
 template<sp_d T> const Col<T>& Factory<T>::get_momentum() { return momentum; }
 
-template<sp_d T> T Factory<T>::get_trial_time() const { return trial_time; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_trial_load_factor() const { return trial_load_factor; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_trial_load() const { return trial_load; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_trial_settlement() const { return trial_settlement; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_trial_resistance() const { return trial_resistance; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_trial_damping_force() const { return trial_damping_force; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_trial_inertial_force() const { return trial_inertial_force; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_trial_displacement() const { return trial_displacement; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_trial_velocity() const { return trial_velocity; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_trial_acceleration() const { return trial_acceleration; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_trial_temperature() const { return trial_temperature; }
-
-template<sp_d T> T Factory<T>::get_incre_time() const { return incre_time; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_incre_load_factor() const { return incre_load_factor; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_incre_load() const { return incre_load; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_incre_settlement() const { return incre_settlement; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_incre_resistance() const { return incre_resistance; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_incre_damping_force() const { return incre_damping_force; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_incre_inertial_force() const { return incre_inertial_force; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_incre_displacement() const { return incre_displacement; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_incre_velocity() const { return incre_velocity; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_incre_acceleration() const { return incre_acceleration; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_incre_temperature() const { return incre_temperature; }
-
-template<sp_d T> T Factory<T>::get_current_time() const { return current_time; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_current_load_factor() const { return current_load_factor; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_current_load() const { return current_load; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_current_settlement() const { return current_settlement; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_current_resistance() const { return current_resistance; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_current_damping_force() const { return current_damping_force; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_current_inertial_force() const { return current_inertial_force; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_current_displacement() const { return current_displacement; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_current_velocity() const { return current_velocity; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_current_acceleration() const { return current_acceleration; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_current_temperature() const { return current_temperature; }
-
-template<sp_d T> T Factory<T>::get_pre_time() const { return pre_time; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_pre_load_factor() const { return pre_load_factor; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_pre_load() const { return pre_load; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_pre_settlement() const { return pre_settlement; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_pre_resistance() const { return pre_resistance; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_pre_damping_force() const { return pre_damping_force; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_pre_inertial_force() const { return pre_inertial_force; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_pre_displacement() const { return pre_displacement; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_pre_velocity() const { return pre_velocity; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_pre_acceleration() const { return pre_acceleration; }
-
-template<sp_d T> const Col<T>& Factory<T>::get_pre_temperature() const { return pre_temperature; }
-
 template<sp_d T> const shared_ptr<MetaMat<T>>& Factory<T>::get_mass() const { return global_mass; }
 
 template<sp_d T> const shared_ptr<MetaMat<T>>& Factory<T>::get_damping() const { return global_damping; }
@@ -1114,336 +960,6 @@ template<sp_d T> std::mutex& Factory<T>::get_geometry_mutex() { return global_mu
 template<sp_d T> const Col<T>& Factory<T>::get_eigenvalue() const { return eigenvalue; }
 
 template<sp_d T> const Mat<T>& Factory<T>::get_eigenvector() const { return eigenvector; }
-
-template<sp_d T> void Factory<T>::update_trial_time(const T M) {
-    trial_time = M;
-    incre_time = trial_time - current_time;
-}
-
-template<sp_d T> void Factory<T>::update_trial_load_factor(const Col<T>& L) {
-    trial_load_factor = L;
-    incre_load_factor = trial_load_factor - current_load_factor;
-}
-
-template<sp_d T> void Factory<T>::update_trial_load(const Col<T>& L) {
-    trial_load = L;
-    incre_load = trial_load - current_load;
-}
-
-template<sp_d T> void Factory<T>::update_trial_settlement(const Col<T>& S) {
-    trial_settlement = S;
-    incre_settlement = trial_settlement - current_settlement;
-}
-
-template<sp_d T> void Factory<T>::update_trial_resistance(const Col<T>& R) {
-    trial_resistance = R;
-    incre_resistance = trial_resistance - current_resistance;
-}
-
-template<sp_d T> void Factory<T>::update_trial_damping_force(const Col<T>& R) {
-    trial_damping_force = R;
-    incre_damping_force = trial_damping_force - current_damping_force;
-}
-
-template<sp_d T> void Factory<T>::update_trial_inertial_force(const Col<T>& R) {
-    trial_inertial_force = R;
-    incre_inertial_force = trial_inertial_force - current_inertial_force;
-}
-
-template<sp_d T> void Factory<T>::update_trial_displacement(const Col<T>& D) {
-    trial_displacement = D;
-    incre_displacement = trial_displacement - current_displacement;
-}
-
-template<sp_d T> void Factory<T>::update_trial_velocity(const Col<T>& V) {
-    trial_velocity = V;
-    incre_velocity = trial_velocity - current_velocity;
-}
-
-template<sp_d T> void Factory<T>::update_trial_acceleration(const Col<T>& A) {
-    trial_acceleration = A;
-    incre_acceleration = trial_acceleration - current_acceleration;
-}
-
-template<sp_d T> void Factory<T>::update_trial_temperature(const Col<T>& M) {
-    trial_temperature = M;
-    incre_temperature = trial_temperature - current_temperature;
-}
-
-template<sp_d T> void Factory<T>::update_incre_time(const T M) {
-    incre_time = M;
-    trial_time = current_time + incre_time;
-}
-
-template<sp_d T> void Factory<T>::update_incre_load_factor(const Col<T>& L) {
-    incre_load_factor = L;
-    trial_load_factor = current_load_factor + incre_load_factor;
-}
-
-template<sp_d T> void Factory<T>::update_incre_load(const Col<T>& L) {
-    incre_load = L;
-    trial_load = current_load + incre_load;
-}
-
-template<sp_d T> void Factory<T>::update_incre_settlement(const Col<T>& S) {
-    incre_settlement = S;
-    trial_settlement = current_settlement + incre_settlement;
-}
-
-template<sp_d T> void Factory<T>::update_incre_resistance(const Col<T>& R) {
-    incre_resistance = R;
-    trial_resistance = current_resistance + incre_resistance;
-}
-
-template<sp_d T> void Factory<T>::update_incre_damping_force(const Col<T>& R) {
-    incre_damping_force = R;
-    trial_damping_force = current_damping_force + incre_damping_force;
-}
-
-template<sp_d T> void Factory<T>::update_incre_inertial_force(const Col<T>& R) {
-    incre_inertial_force = R;
-    trial_inertial_force = current_inertial_force + incre_inertial_force;
-}
-
-template<sp_d T> void Factory<T>::update_incre_displacement(const Col<T>& D) {
-    incre_displacement = D;
-    trial_displacement = current_displacement + incre_displacement;
-}
-
-template<sp_d T> void Factory<T>::update_incre_velocity(const Col<T>& V) {
-    incre_velocity = V;
-    trial_velocity = current_velocity + incre_velocity;
-}
-
-template<sp_d T> void Factory<T>::update_incre_acceleration(const Col<T>& A) {
-    incre_acceleration = A;
-    trial_acceleration = current_acceleration + incre_acceleration;
-}
-
-template<sp_d T> void Factory<T>::update_incre_temperature(const Col<T>& M) {
-    incre_temperature = M;
-    trial_temperature = current_temperature + incre_temperature;
-}
-
-template<sp_d T> void Factory<T>::update_current_time(const T M) {
-    trial_time = current_time = M;
-    incre_time = T(0);
-}
-
-template<sp_d T> void Factory<T>::update_current_load_factor(const Col<T>& L) {
-    trial_load_factor = current_load_factor = L;
-    incre_load_factor.zeros();
-}
-
-template<sp_d T> void Factory<T>::update_current_load(const Col<T>& L) {
-    trial_load = current_load = L;
-    incre_load.zeros();
-}
-
-template<sp_d T> void Factory<T>::update_current_settlement(const Col<T>& S) {
-    trial_settlement = current_settlement = S;
-    incre_settlement.zeros();
-}
-
-template<sp_d T> void Factory<T>::update_current_resistance(const Col<T>& R) {
-    trial_resistance = current_resistance = R;
-    incre_resistance.zeros();
-}
-
-template<sp_d T> void Factory<T>::update_current_damping_force(const Col<T>& R) {
-    trial_damping_force = current_damping_force = R;
-    incre_damping_force.zeros();
-}
-
-template<sp_d T> void Factory<T>::update_current_inertial_force(const Col<T>& R) {
-    trial_inertial_force = current_inertial_force = R;
-    incre_inertial_force.zeros();
-}
-
-template<sp_d T> void Factory<T>::update_current_displacement(const Col<T>& D) {
-    trial_displacement = current_displacement = D;
-    incre_displacement.zeros();
-}
-
-template<sp_d T> void Factory<T>::update_current_velocity(const Col<T>& V) {
-    trial_velocity = current_velocity = V;
-    incre_velocity.zeros();
-}
-
-template<sp_d T> void Factory<T>::update_current_acceleration(const Col<T>& A) {
-    trial_acceleration = current_acceleration = A;
-    incre_acceleration.zeros();
-}
-
-template<sp_d T> void Factory<T>::update_current_temperature(const Col<T>& M) {
-    trial_temperature = current_temperature = M;
-    incre_temperature.zeros();
-}
-
-template<sp_d T> void Factory<T>::update_trial_time_by(const T M) {
-    trial_time += M;
-    incre_time = trial_time - current_time;
-}
-
-template<sp_d T> void Factory<T>::update_trial_load_factor_by(const Col<T>& L) {
-    trial_load_factor += L;
-    incre_load_factor = trial_load_factor - current_load_factor;
-}
-
-template<sp_d T> void Factory<T>::update_trial_load_by(const Col<T>& L) {
-    trial_load += L;
-    incre_load = trial_load - current_load;
-}
-
-template<sp_d T> void Factory<T>::update_trial_settlement_by(const Col<T>& S) {
-    trial_settlement += S;
-    incre_settlement = trial_settlement - current_settlement;
-}
-
-template<sp_d T> void Factory<T>::update_trial_resistance_by(const Col<T>& R) {
-    trial_resistance += R;
-    incre_resistance = trial_resistance - current_resistance;
-}
-
-template<sp_d T> void Factory<T>::update_trial_damping_force_by(const Col<T>& R) {
-    trial_damping_force += R;
-    incre_damping_force = trial_damping_force - current_damping_force;
-}
-
-template<sp_d T> void Factory<T>::update_trial_inertial_force_by(const Col<T>& R) {
-    trial_inertial_force += R;
-    incre_inertial_force = trial_inertial_force - current_inertial_force;
-}
-
-template<sp_d T> void Factory<T>::update_trial_displacement_by(const Col<T>& D) {
-    trial_displacement += D;
-    incre_displacement = trial_displacement - current_displacement;
-}
-
-template<sp_d T> void Factory<T>::update_trial_velocity_by(const Col<T>& V) {
-    trial_velocity += V;
-    incre_velocity = trial_velocity - current_velocity;
-}
-
-template<sp_d T> void Factory<T>::update_trial_acceleration_by(const Col<T>& A) {
-    trial_acceleration += A;
-    incre_acceleration = trial_acceleration - current_acceleration;
-}
-
-template<sp_d T> void Factory<T>::update_trial_temperature_by(const Col<T>& M) {
-    trial_temperature += M;
-    incre_temperature = trial_temperature - current_temperature;
-}
-
-template<sp_d T> void Factory<T>::update_incre_time_by(const T M) {
-    incre_time += M;
-    trial_time = current_time + incre_time;
-}
-
-template<sp_d T> void Factory<T>::update_incre_load_factor_by(const Col<T>& L) {
-    incre_load_factor += L;
-    trial_load_factor = current_load_factor + incre_load_factor;
-}
-
-template<sp_d T> void Factory<T>::update_incre_load_by(const Col<T>& L) {
-    incre_load += L;
-    trial_load = current_load + incre_load;
-}
-
-template<sp_d T> void Factory<T>::update_incre_settlement_by(const Col<T>& S) {
-    incre_settlement += S;
-    trial_settlement = current_settlement + incre_settlement;
-}
-
-template<sp_d T> void Factory<T>::update_incre_resistance_by(const Col<T>& R) {
-    incre_resistance += R;
-    trial_resistance = current_resistance + incre_resistance;
-}
-
-template<sp_d T> void Factory<T>::update_incre_damping_force_by(const Col<T>& R) {
-    incre_damping_force += R;
-    trial_damping_force = current_damping_force + incre_damping_force;
-}
-
-template<sp_d T> void Factory<T>::update_incre_inertial_force_by(const Col<T>& R) {
-    incre_inertial_force += R;
-    trial_inertial_force = current_inertial_force + incre_inertial_force;
-}
-
-template<sp_d T> void Factory<T>::update_incre_displacement_by(const Col<T>& D) {
-    incre_displacement += D;
-    trial_displacement = current_displacement + incre_displacement;
-}
-
-template<sp_d T> void Factory<T>::update_incre_velocity_by(const Col<T>& V) {
-    incre_velocity += V;
-    trial_velocity = current_velocity + incre_velocity;
-}
-
-template<sp_d T> void Factory<T>::update_incre_acceleration_by(const Col<T>& A) {
-    incre_acceleration += A;
-    trial_acceleration = current_acceleration + incre_acceleration;
-}
-
-template<sp_d T> void Factory<T>::update_incre_temperature_by(const Col<T>& M) {
-    incre_temperature += M;
-    trial_temperature = current_temperature + incre_temperature;
-}
-
-template<sp_d T> void Factory<T>::update_current_time_by(const T M) {
-    trial_time = current_time += M;
-    incre_time = 0.;
-}
-
-template<sp_d T> void Factory<T>::update_current_load_factor_by(const Col<T>& L) {
-    trial_load_factor = current_load_factor += L;
-    incre_load_factor.zeros();
-}
-
-template<sp_d T> void Factory<T>::update_current_load_by(const Col<T>& L) {
-    trial_load = current_load += L;
-    incre_load.zeros();
-}
-
-template<sp_d T> void Factory<T>::update_current_settlement_by(const Col<T>& S) {
-    trial_settlement = current_settlement += S;
-    incre_settlement.zeros();
-}
-
-template<sp_d T> void Factory<T>::update_current_resistance_by(const Col<T>& R) {
-    trial_resistance = current_resistance += R;
-    incre_resistance.zeros();
-}
-
-template<sp_d T> void Factory<T>::update_current_damping_force_by(const Col<T>& R) {
-    trial_damping_force = current_damping_force += R;
-    incre_damping_force.zeros();
-}
-
-template<sp_d T> void Factory<T>::update_current_inertial_force_by(const Col<T>& R) {
-    trial_inertial_force = current_inertial_force += R;
-    incre_inertial_force.zeros();
-}
-
-template<sp_d T> void Factory<T>::update_current_displacement_by(const Col<T>& D) {
-    trial_displacement = current_displacement += D;
-    incre_displacement.zeros();
-}
-
-template<sp_d T> void Factory<T>::update_current_velocity_by(const Col<T>& V) {
-    trial_velocity = current_velocity += V;
-    incre_velocity.zeros();
-}
-
-template<sp_d T> void Factory<T>::update_current_acceleration_by(const Col<T>& A) {
-    trial_acceleration = current_acceleration += A;
-    incre_acceleration.zeros();
-}
-
-template<sp_d T> void Factory<T>::update_current_temperature_by(const Col<T>& M) {
-    trial_temperature = current_temperature += M;
-    incre_temperature.zeros();
-}
 
 template<sp_d T> void Factory<T>::commit_energy() {
     auto se = std::async([&] { if(!trial_resistance.empty() && !incre_displacement.empty()) strain_energy += .5 * dot(trial_resistance + current_resistance, incre_displacement); });
@@ -1842,6 +1358,680 @@ template<sp_d T> void Factory<T>::assemble_stiffness(const SpMat<T>& EK, const u
 
 template<sp_d T> void Factory<T>::print() const {
     suanpan_info("A Factory object with size of {}.\n", n_size);
+}
+
+template<sp_d T> unique_ptr<MetaMat<T>> Factory<T>::get_basic_container() {
+    switch(storage_type) {
+    case StorageScheme::FULL:
+#ifdef SUANPAN_CUDA
+        if(SolverType::CUDA == solver) return std::make_unique<FullMatCUDA<T>>(n_size, n_size);
+#endif
+        return std::make_unique<FullMat<T>>(n_size, n_size);
+    case StorageScheme::BAND:
+        if(SolverType::SPIKE == solver) return std::make_unique<BandMatSpike<T>>(n_size, n_lobw, n_upbw);
+        return std::make_unique<BandMat<T>>(n_size, n_lobw, n_upbw);
+    case StorageScheme::BANDSYMM:
+        return std::make_unique<BandSymmMat<T>>(n_size, n_lobw);
+    case StorageScheme::SYMMPACK:
+        return std::make_unique<SymmPackMat<T>>(n_size);
+    case StorageScheme::SPARSE:
+        if(SolverType::MUMPS == solver) return std::make_unique<SparseMatMUMPS<T>>(n_size, n_size, n_elem);
+        if(SolverType::SUPERLU == solver) return std::make_unique<SparseMatSuperLU<T>>(n_size, n_size, n_elem);
+#ifdef SUANPAN_MKL
+        if(SolverType::PARDISO == solver) return std::make_unique<SparseMatPARDISO<T>>(n_size, n_size, n_elem);
+        if(SolverType::FGMRES == solver) return std::make_unique<SparseMatFGMRES<T>>(n_size, n_size, n_elem);
+#endif
+#ifdef SUANPAN_CUDA
+        if(SolverType::CUDA == solver) return std::make_unique<SparseMatCUDA<T>>(n_size, n_size, n_elem);
+#ifdef SUANPAN_MAGMA
+        if(SolverType::MAGMA == solver) return std::make_unique<SparseMatMAGMA<T>>(n_size, n_size, magma_setting);
+#endif
+#endif
+        return std::make_unique<SparseMatSuperLU<T>>(n_size, n_size, n_elem);
+    case StorageScheme::SPARSESYMM:
+#ifdef SUANPAN_MKL
+        if(SolverType::FGMRES == solver) return std::make_unique<SparseSymmMatFGMRES<T>>(n_size, n_size, n_elem);
+#endif
+        return std::make_unique<SparseSymmMatMUMPS<T>>(n_size, n_size, n_elem);
+    default:
+        throw invalid_argument("need a proper storage scheme");
+    }
+}
+
+template<sp_d T> unique_ptr<MetaMat<T>> Factory<T>::get_matrix_container() {
+    auto global_mat = get_basic_container();
+
+    global_mat->set_solver_setting(setting);
+
+    return global_mat;
+}
+
+template<sp_d T> shared_ptr<MetaMat<T>>& Factory<T>::modify_mass() { return global_mass; }
+
+template<sp_d T> shared_ptr<MetaMat<T>>& Factory<T>::modify_damping() { return global_damping; }
+
+template<sp_d T> shared_ptr<MetaMat<T>>& Factory<T>::modify_stiffness() { return global_stiffness; }
+
+template<sp_d T> shared_ptr<MetaMat<T>>& Factory<T>::modify_geometry() { return global_geometry; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_ninja() { return ninja; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_sushi() { return sushi; }
+
+template<sp_d T> suanpan::set<uword>& Factory<T>::modify_reference_dof() { return reference_dof; }
+
+template<sp_d T> SpMat<T>& Factory<T>::modify_reference_load() { return reference_load; }
+
+template<sp_d T> uvec& Factory<T>::modify_auxiliary_encoding() { return auxiliary_encoding; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_auxiliary_lambda() { return auxiliary_lambda; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_auxiliary_resistance() { return auxiliary_resistance; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_auxiliary_load() { return auxiliary_load; }
+
+template<sp_d T> SpMat<T>& Factory<T>::modify_auxiliary_stiffness() { return auxiliary_stiffness; }
+
+template<sp_d T> SpCol<T>& Factory<T>::modify_trial_constraint_resistance() { return trial_constraint_resistance; }
+
+template<sp_d T> SpCol<T>& Factory<T>::modify_current_constraint_resistance() { return current_constraint_resistance; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_eigenvalue() { return eigenvalue; }
+
+template<sp_d T> Mat<T>& Factory<T>::modify_eigenvector() { return eigenvector; }
+
+template<sp_d T> void Factory<T>::set_trial_time(const T M) { trial_time = M; }
+
+template<sp_d T> void Factory<T>::set_trial_load_factor(const Col<T>& L) { trial_load_factor = L; }
+
+template<sp_d T> void Factory<T>::set_trial_load(const Col<T>& L) { trial_load = L; }
+
+template<sp_d T> void Factory<T>::set_trial_settlement(const Col<T>& S) { trial_settlement = S; }
+
+template<sp_d T> void Factory<T>::set_trial_resistance(const Col<T>& R) { trial_resistance = R; }
+
+template<sp_d T> void Factory<T>::set_trial_damping_force(const Col<T>& R) { trial_damping_force = R; }
+
+template<sp_d T> void Factory<T>::set_trial_inertial_force(const Col<T>& R) { trial_inertial_force = R; }
+
+template<sp_d T> void Factory<T>::set_trial_displacement(const Col<T>& D) { trial_displacement = D; }
+
+template<sp_d T> void Factory<T>::set_trial_velocity(const Col<T>& V) { trial_velocity = V; }
+
+template<sp_d T> void Factory<T>::set_trial_acceleration(const Col<T>& A) { trial_acceleration = A; }
+
+template<sp_d T> void Factory<T>::set_trial_temperature(const Col<T>& M) { trial_temperature = M; }
+
+template<sp_d T> void Factory<T>::set_incre_time(const T M) { incre_time = M; }
+
+template<sp_d T> void Factory<T>::set_incre_load_factor(const Col<T>& L) { incre_load_factor = L; }
+
+template<sp_d T> void Factory<T>::set_incre_load(const Col<T>& L) { incre_load = L; }
+
+template<sp_d T> void Factory<T>::set_incre_settlement(const Col<T>& S) { incre_settlement = S; }
+
+template<sp_d T> void Factory<T>::set_incre_resistance(const Col<T>& R) { incre_resistance = R; }
+
+template<sp_d T> void Factory<T>::set_incre_damping_force(const Col<T>& R) { incre_damping_force = R; }
+
+template<sp_d T> void Factory<T>::set_incre_inertial_force(const Col<T>& R) { incre_inertial_force = R; }
+
+template<sp_d T> void Factory<T>::set_incre_displacement(const Col<T>& D) { incre_displacement = D; }
+
+template<sp_d T> void Factory<T>::set_incre_velocity(const Col<T>& V) { incre_velocity = V; }
+
+template<sp_d T> void Factory<T>::set_incre_acceleration(const Col<T>& A) { incre_acceleration = A; }
+
+template<sp_d T> void Factory<T>::set_incre_temperature(const Col<T>& M) { incre_temperature = M; }
+
+template<sp_d T> void Factory<T>::set_current_time(const T M) { current_time = M; }
+
+template<sp_d T> void Factory<T>::set_current_load_factor(const Col<T>& L) { current_load_factor = L; }
+
+template<sp_d T> void Factory<T>::set_current_load(const Col<T>& L) { current_load = L; }
+
+template<sp_d T> void Factory<T>::set_current_settlement(const Col<T>& S) { current_settlement = S; }
+
+template<sp_d T> void Factory<T>::set_current_resistance(const Col<T>& R) { current_resistance = R; }
+
+template<sp_d T> void Factory<T>::set_current_damping_force(const Col<T>& R) { current_damping_force = R; }
+
+template<sp_d T> void Factory<T>::set_current_inertial_force(const Col<T>& R) { current_inertial_force = R; }
+
+template<sp_d T> void Factory<T>::set_current_displacement(const Col<T>& D) { current_displacement = D; }
+
+template<sp_d T> void Factory<T>::set_current_velocity(const Col<T>& V) { current_velocity = V; }
+
+template<sp_d T> void Factory<T>::set_current_acceleration(const Col<T>& A) { current_acceleration = A; }
+
+template<sp_d T> void Factory<T>::set_current_temperature(const Col<T>& M) { current_temperature = M; }
+
+template<sp_d T> void Factory<T>::set_pre_time(const T M) { pre_time = M; }
+
+template<sp_d T> void Factory<T>::set_pre_load_factor(const Col<T>& L) { pre_load_factor = L; }
+
+template<sp_d T> void Factory<T>::set_pre_load(const Col<T>& L) { pre_load = L; }
+
+template<sp_d T> void Factory<T>::set_pre_settlement(const Col<T>& S) { pre_settlement = S; }
+
+template<sp_d T> void Factory<T>::set_pre_resistance(const Col<T>& R) { pre_resistance = R; }
+
+template<sp_d T> void Factory<T>::set_pre_damping_force(const Col<T>& R) { pre_damping_force = R; }
+
+template<sp_d T> void Factory<T>::set_pre_inertial_force(const Col<T>& R) { pre_inertial_force = R; }
+
+template<sp_d T> void Factory<T>::set_pre_displacement(const Col<T>& D) { pre_displacement = D; }
+
+template<sp_d T> void Factory<T>::set_pre_velocity(const Col<T>& V) { pre_velocity = V; }
+
+template<sp_d T> void Factory<T>::set_pre_acceleration(const Col<T>& A) { pre_acceleration = A; }
+
+template<sp_d T> void Factory<T>::set_pre_temperature(const Col<T>& M) { pre_temperature = M; }
+
+template<sp_d T> T Factory<T>::get_trial_time() const { return trial_time; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_trial_load_factor() const { return trial_load_factor; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_trial_load() const { return trial_load; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_trial_settlement() const { return trial_settlement; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_trial_resistance() const { return trial_resistance; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_trial_damping_force() const { return trial_damping_force; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_trial_inertial_force() const { return trial_inertial_force; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_trial_displacement() const { return trial_displacement; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_trial_velocity() const { return trial_velocity; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_trial_acceleration() const { return trial_acceleration; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_trial_temperature() const { return trial_temperature; }
+
+template<sp_d T> T Factory<T>::get_incre_time() const { return incre_time; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_incre_load_factor() const { return incre_load_factor; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_incre_load() const { return incre_load; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_incre_settlement() const { return incre_settlement; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_incre_resistance() const { return incre_resistance; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_incre_damping_force() const { return incre_damping_force; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_incre_inertial_force() const { return incre_inertial_force; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_incre_displacement() const { return incre_displacement; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_incre_velocity() const { return incre_velocity; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_incre_acceleration() const { return incre_acceleration; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_incre_temperature() const { return incre_temperature; }
+
+template<sp_d T> T Factory<T>::get_current_time() const { return current_time; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_current_load_factor() const { return current_load_factor; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_current_load() const { return current_load; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_current_settlement() const { return current_settlement; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_current_resistance() const { return current_resistance; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_current_damping_force() const { return current_damping_force; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_current_inertial_force() const { return current_inertial_force; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_current_displacement() const { return current_displacement; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_current_velocity() const { return current_velocity; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_current_acceleration() const { return current_acceleration; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_current_temperature() const { return current_temperature; }
+
+template<sp_d T> T Factory<T>::get_pre_time() const { return pre_time; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_pre_load_factor() const { return pre_load_factor; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_pre_load() const { return pre_load; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_pre_settlement() const { return pre_settlement; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_pre_resistance() const { return pre_resistance; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_pre_damping_force() const { return pre_damping_force; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_pre_inertial_force() const { return pre_inertial_force; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_pre_displacement() const { return pre_displacement; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_pre_velocity() const { return pre_velocity; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_pre_acceleration() const { return pre_acceleration; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_pre_temperature() const { return pre_temperature; }
+
+template<sp_d T> T& Factory<T>::modify_trial_time() { return trial_time; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_trial_load_factor() { return trial_load_factor; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_trial_load() { return trial_load; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_trial_settlement() { return trial_settlement; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_trial_resistance() { return trial_resistance; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_trial_damping_force() { return trial_damping_force; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_trial_inertial_force() { return trial_inertial_force; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_trial_displacement() { return trial_displacement; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_trial_velocity() { return trial_velocity; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_trial_acceleration() { return trial_acceleration; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_trial_temperature() { return trial_temperature; }
+
+template<sp_d T> T& Factory<T>::modify_incre_time() { return incre_time; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_incre_load_factor() { return incre_load_factor; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_incre_load() { return incre_load; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_incre_settlement() { return incre_settlement; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_incre_resistance() { return incre_resistance; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_incre_damping_force() { return incre_damping_force; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_incre_inertial_force() { return incre_inertial_force; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_incre_displacement() { return incre_displacement; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_incre_velocity() { return incre_velocity; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_incre_acceleration() { return incre_acceleration; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_incre_temperature() { return incre_temperature; }
+
+template<sp_d T> T& Factory<T>::modify_current_time() { return current_time; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_current_load_factor() { return current_load_factor; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_current_load() { return current_load; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_current_settlement() { return current_settlement; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_current_resistance() { return current_resistance; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_current_damping_force() { return current_damping_force; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_current_inertial_force() { return current_inertial_force; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_current_displacement() { return current_displacement; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_current_velocity() { return current_velocity; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_current_acceleration() { return current_acceleration; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_current_temperature() { return current_temperature; }
+
+template<sp_d T> T& Factory<T>::modify_pre_time() { return pre_time; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_pre_load_factor() { return pre_load_factor; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_pre_load() { return pre_load; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_pre_settlement() { return pre_settlement; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_pre_resistance() { return pre_resistance; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_pre_damping_force() { return pre_damping_force; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_pre_inertial_force() { return pre_inertial_force; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_pre_displacement() { return pre_displacement; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_pre_velocity() { return pre_velocity; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_pre_acceleration() { return pre_acceleration; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_pre_temperature() { return pre_temperature; }
+
+template<sp_d T> void Factory<T>::update_trial_time(const T M) {
+    trial_time = M;
+    incre_time = trial_time - current_time;
+}
+
+template<sp_d T> void Factory<T>::update_trial_load_factor(const Col<T>& L) {
+    trial_load_factor = L;
+    incre_load_factor = trial_load_factor - current_load_factor;
+}
+
+template<sp_d T> void Factory<T>::update_trial_load(const Col<T>& L) {
+    trial_load = L;
+    incre_load = trial_load - current_load;
+}
+
+template<sp_d T> void Factory<T>::update_trial_settlement(const Col<T>& S) {
+    trial_settlement = S;
+    incre_settlement = trial_settlement - current_settlement;
+}
+
+template<sp_d T> void Factory<T>::update_trial_resistance(const Col<T>& R) {
+    trial_resistance = R;
+    incre_resistance = trial_resistance - current_resistance;
+}
+
+template<sp_d T> void Factory<T>::update_trial_damping_force(const Col<T>& R) {
+    trial_damping_force = R;
+    incre_damping_force = trial_damping_force - current_damping_force;
+}
+
+template<sp_d T> void Factory<T>::update_trial_inertial_force(const Col<T>& R) {
+    trial_inertial_force = R;
+    incre_inertial_force = trial_inertial_force - current_inertial_force;
+}
+
+template<sp_d T> void Factory<T>::update_trial_displacement(const Col<T>& D) {
+    trial_displacement = D;
+    incre_displacement = trial_displacement - current_displacement;
+}
+
+template<sp_d T> void Factory<T>::update_trial_velocity(const Col<T>& V) {
+    trial_velocity = V;
+    incre_velocity = trial_velocity - current_velocity;
+}
+
+template<sp_d T> void Factory<T>::update_trial_acceleration(const Col<T>& A) {
+    trial_acceleration = A;
+    incre_acceleration = trial_acceleration - current_acceleration;
+}
+
+template<sp_d T> void Factory<T>::update_trial_temperature(const Col<T>& M) {
+    trial_temperature = M;
+    incre_temperature = trial_temperature - current_temperature;
+}
+
+template<sp_d T> void Factory<T>::update_incre_time(const T M) {
+    incre_time = M;
+    trial_time = current_time + incre_time;
+}
+
+template<sp_d T> void Factory<T>::update_incre_load_factor(const Col<T>& L) {
+    incre_load_factor = L;
+    trial_load_factor = current_load_factor + incre_load_factor;
+}
+
+template<sp_d T> void Factory<T>::update_incre_load(const Col<T>& L) {
+    incre_load = L;
+    trial_load = current_load + incre_load;
+}
+
+template<sp_d T> void Factory<T>::update_incre_settlement(const Col<T>& S) {
+    incre_settlement = S;
+    trial_settlement = current_settlement + incre_settlement;
+}
+
+template<sp_d T> void Factory<T>::update_incre_resistance(const Col<T>& R) {
+    incre_resistance = R;
+    trial_resistance = current_resistance + incre_resistance;
+}
+
+template<sp_d T> void Factory<T>::update_incre_damping_force(const Col<T>& R) {
+    incre_damping_force = R;
+    trial_damping_force = current_damping_force + incre_damping_force;
+}
+
+template<sp_d T> void Factory<T>::update_incre_inertial_force(const Col<T>& R) {
+    incre_inertial_force = R;
+    trial_inertial_force = current_inertial_force + incre_inertial_force;
+}
+
+template<sp_d T> void Factory<T>::update_incre_displacement(const Col<T>& D) {
+    incre_displacement = D;
+    trial_displacement = current_displacement + incre_displacement;
+}
+
+template<sp_d T> void Factory<T>::update_incre_velocity(const Col<T>& V) {
+    incre_velocity = V;
+    trial_velocity = current_velocity + incre_velocity;
+}
+
+template<sp_d T> void Factory<T>::update_incre_acceleration(const Col<T>& A) {
+    incre_acceleration = A;
+    trial_acceleration = current_acceleration + incre_acceleration;
+}
+
+template<sp_d T> void Factory<T>::update_incre_temperature(const Col<T>& M) {
+    incre_temperature = M;
+    trial_temperature = current_temperature + incre_temperature;
+}
+
+template<sp_d T> void Factory<T>::update_current_time(const T M) {
+    trial_time = current_time = M;
+    incre_time = T(0);
+}
+
+template<sp_d T> void Factory<T>::update_current_load_factor(const Col<T>& L) {
+    trial_load_factor = current_load_factor = L;
+    incre_load_factor.zeros();
+}
+
+template<sp_d T> void Factory<T>::update_current_load(const Col<T>& L) {
+    trial_load = current_load = L;
+    incre_load.zeros();
+}
+
+template<sp_d T> void Factory<T>::update_current_settlement(const Col<T>& S) {
+    trial_settlement = current_settlement = S;
+    incre_settlement.zeros();
+}
+
+template<sp_d T> void Factory<T>::update_current_resistance(const Col<T>& R) {
+    trial_resistance = current_resistance = R;
+    incre_resistance.zeros();
+}
+
+template<sp_d T> void Factory<T>::update_current_damping_force(const Col<T>& R) {
+    trial_damping_force = current_damping_force = R;
+    incre_damping_force.zeros();
+}
+
+template<sp_d T> void Factory<T>::update_current_inertial_force(const Col<T>& R) {
+    trial_inertial_force = current_inertial_force = R;
+    incre_inertial_force.zeros();
+}
+
+template<sp_d T> void Factory<T>::update_current_displacement(const Col<T>& D) {
+    trial_displacement = current_displacement = D;
+    incre_displacement.zeros();
+}
+
+template<sp_d T> void Factory<T>::update_current_velocity(const Col<T>& V) {
+    trial_velocity = current_velocity = V;
+    incre_velocity.zeros();
+}
+
+template<sp_d T> void Factory<T>::update_current_acceleration(const Col<T>& A) {
+    trial_acceleration = current_acceleration = A;
+    incre_acceleration.zeros();
+}
+
+template<sp_d T> void Factory<T>::update_current_temperature(const Col<T>& M) {
+    trial_temperature = current_temperature = M;
+    incre_temperature.zeros();
+}
+
+template<sp_d T> void Factory<T>::update_trial_time_by(const T M) {
+    trial_time += M;
+    incre_time = trial_time - current_time;
+}
+
+template<sp_d T> void Factory<T>::update_trial_load_factor_by(const Col<T>& L) {
+    trial_load_factor += L;
+    incre_load_factor = trial_load_factor - current_load_factor;
+}
+
+template<sp_d T> void Factory<T>::update_trial_load_by(const Col<T>& L) {
+    trial_load += L;
+    incre_load = trial_load - current_load;
+}
+
+template<sp_d T> void Factory<T>::update_trial_settlement_by(const Col<T>& S) {
+    trial_settlement += S;
+    incre_settlement = trial_settlement - current_settlement;
+}
+
+template<sp_d T> void Factory<T>::update_trial_resistance_by(const Col<T>& R) {
+    trial_resistance += R;
+    incre_resistance = trial_resistance - current_resistance;
+}
+
+template<sp_d T> void Factory<T>::update_trial_damping_force_by(const Col<T>& R) {
+    trial_damping_force += R;
+    incre_damping_force = trial_damping_force - current_damping_force;
+}
+
+template<sp_d T> void Factory<T>::update_trial_inertial_force_by(const Col<T>& R) {
+    trial_inertial_force += R;
+    incre_inertial_force = trial_inertial_force - current_inertial_force;
+}
+
+template<sp_d T> void Factory<T>::update_trial_displacement_by(const Col<T>& D) {
+    trial_displacement += D;
+    incre_displacement = trial_displacement - current_displacement;
+}
+
+template<sp_d T> void Factory<T>::update_trial_velocity_by(const Col<T>& V) {
+    trial_velocity += V;
+    incre_velocity = trial_velocity - current_velocity;
+}
+
+template<sp_d T> void Factory<T>::update_trial_acceleration_by(const Col<T>& A) {
+    trial_acceleration += A;
+    incre_acceleration = trial_acceleration - current_acceleration;
+}
+
+template<sp_d T> void Factory<T>::update_trial_temperature_by(const Col<T>& M) {
+    trial_temperature += M;
+    incre_temperature = trial_temperature - current_temperature;
+}
+
+template<sp_d T> void Factory<T>::update_incre_time_by(const T M) {
+    incre_time += M;
+    trial_time = current_time + incre_time;
+}
+
+template<sp_d T> void Factory<T>::update_incre_load_factor_by(const Col<T>& L) {
+    incre_load_factor += L;
+    trial_load_factor = current_load_factor + incre_load_factor;
+}
+
+template<sp_d T> void Factory<T>::update_incre_load_by(const Col<T>& L) {
+    incre_load += L;
+    trial_load = current_load + incre_load;
+}
+
+template<sp_d T> void Factory<T>::update_incre_settlement_by(const Col<T>& S) {
+    incre_settlement += S;
+    trial_settlement = current_settlement + incre_settlement;
+}
+
+template<sp_d T> void Factory<T>::update_incre_resistance_by(const Col<T>& R) {
+    incre_resistance += R;
+    trial_resistance = current_resistance + incre_resistance;
+}
+
+template<sp_d T> void Factory<T>::update_incre_damping_force_by(const Col<T>& R) {
+    incre_damping_force += R;
+    trial_damping_force = current_damping_force + incre_damping_force;
+}
+
+template<sp_d T> void Factory<T>::update_incre_inertial_force_by(const Col<T>& R) {
+    incre_inertial_force += R;
+    trial_inertial_force = current_inertial_force + incre_inertial_force;
+}
+
+template<sp_d T> void Factory<T>::update_incre_displacement_by(const Col<T>& D) {
+    incre_displacement += D;
+    trial_displacement = current_displacement + incre_displacement;
+}
+
+template<sp_d T> void Factory<T>::update_incre_velocity_by(const Col<T>& V) {
+    incre_velocity += V;
+    trial_velocity = current_velocity + incre_velocity;
+}
+
+template<sp_d T> void Factory<T>::update_incre_acceleration_by(const Col<T>& A) {
+    incre_acceleration += A;
+    trial_acceleration = current_acceleration + incre_acceleration;
+}
+
+template<sp_d T> void Factory<T>::update_incre_temperature_by(const Col<T>& M) {
+    incre_temperature += M;
+    trial_temperature = current_temperature + incre_temperature;
+}
+
+template<sp_d T> void Factory<T>::update_current_time_by(const T M) {
+    trial_time = current_time += M;
+    incre_time = 0.;
+}
+
+template<sp_d T> void Factory<T>::update_current_load_factor_by(const Col<T>& L) {
+    trial_load_factor = current_load_factor += L;
+    incre_load_factor.zeros();
+}
+
+template<sp_d T> void Factory<T>::update_current_load_by(const Col<T>& L) {
+    trial_load = current_load += L;
+    incre_load.zeros();
+}
+
+template<sp_d T> void Factory<T>::update_current_settlement_by(const Col<T>& S) {
+    trial_settlement = current_settlement += S;
+    incre_settlement.zeros();
+}
+
+template<sp_d T> void Factory<T>::update_current_resistance_by(const Col<T>& R) {
+    trial_resistance = current_resistance += R;
+    incre_resistance.zeros();
+}
+
+template<sp_d T> void Factory<T>::update_current_damping_force_by(const Col<T>& R) {
+    trial_damping_force = current_damping_force += R;
+    incre_damping_force.zeros();
+}
+
+template<sp_d T> void Factory<T>::update_current_inertial_force_by(const Col<T>& R) {
+    trial_inertial_force = current_inertial_force += R;
+    incre_inertial_force.zeros();
+}
+
+template<sp_d T> void Factory<T>::update_current_displacement_by(const Col<T>& D) {
+    trial_displacement = current_displacement += D;
+    incre_displacement.zeros();
+}
+
+template<sp_d T> void Factory<T>::update_current_velocity_by(const Col<T>& V) {
+    trial_velocity = current_velocity += V;
+    incre_velocity.zeros();
+}
+
+template<sp_d T> void Factory<T>::update_current_acceleration_by(const Col<T>& A) {
+    trial_acceleration = current_acceleration += A;
+    incre_acceleration.zeros();
+}
+
+template<sp_d T> void Factory<T>::update_current_temperature_by(const Col<T>& M) {
+    trial_temperature = current_temperature += M;
+    incre_temperature.zeros();
 }
 
 #endif // FACTORY_HPP

@@ -27,6 +27,7 @@
 #include <Domain/Group/ElementGroup.h>
 #include <Domain/Group/GroupGroup.h>
 #include <Domain/Group/NodeGroup.h>
+#include <Domain/Group/CustomNodeGroup.h>
 #include <Domain/Node.h>
 #include <Element/Element.h>
 #include <Element/ElementParser.h>
@@ -55,6 +56,9 @@
 #include <thread>
 #ifdef SUANPAN_MKL
 #include <Domain/MetaMat/SparseMatFGMRES.hpp>
+#endif
+#ifdef SUANPAN_MAGMA
+#include <Domain/MetaMat/SparseMatMAGMA.hpp>
 #endif
 #ifdef SUANPAN_WIN
 #include <Windows.h>
@@ -446,6 +450,7 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     if(is_equal(command_id, "step")) return create_new_step(domain, command);
 
     if(is_equal(command_id, "nodegroup")) return create_new_nodegroup(domain, command);
+    if(is_equal(command_id, "customnodegroup")) return create_new_customnodegroup(domain, command);
     if(is_equal(command_id, "elementgroup")) return create_new_elementgroup(domain, command);
     if(is_equal(command_id, "groupgroup")) return create_new_groupgroup(domain, command);
     if(is_equal(command_id, "generate")) return create_new_generate(domain, command);
@@ -544,6 +549,13 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
             if(0 != code.value())
                 suanpan_error("Fail to set path \"{}\"\n", code.category().message(code.value()));
         }
+        return SUANPAN_SUCCESS;
+    }
+
+    if(is_equal(command_id, "sleep")) {
+        if(auto t = 1000ll; get_optional_input(command, t)) std::this_thread::sleep_for(std::chrono::milliseconds(t));
+        else
+            suanpan_error("A positive integer in milliseconds is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -916,6 +928,19 @@ int create_new_nodegroup(const shared_ptr<DomainBase>& domain, istringstream& co
 
     if(!domain->insert(make_shared<NodeGroup>(tag, value_pool)))
         suanpan_error("Fail to create new node group.\n");
+
+    return SUANPAN_SUCCESS;
+}
+
+int create_new_customnodegroup(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    unsigned tag, expression;
+    if(!get_input(command, tag, expression)) {
+        suanpan_error("A valid tag is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    if(!domain->insert(make_shared<CustomNodeGroup>(tag, expression)))
+        suanpan_error("Fail to create new custom node group.\n");
 
     return SUANPAN_SUCCESS;
 }
@@ -1356,6 +1381,12 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
         else if(is_equal(value, "MUMPS")) t_step->set_system_solver(SolverType::MUMPS);
 #ifdef SUANPAN_CUDA
         else if(is_equal(value, "CUDA")) t_step->set_system_solver(SolverType::CUDA);
+#ifdef SUANPAN_MAGMA
+        else if(is_equal(value, "MAGMA")) {
+            t_step->set_system_solver(SolverType::MAGMA);
+            t_step->set_magma_setting(magma_parse_opts<magma_dopts>(command));
+        }
+#endif
 #endif
 #ifdef SUANPAN_MKL
         else if(is_equal(value, "PARDISO")) t_step->set_system_solver(SolverType::PARDISO);
@@ -1519,6 +1550,13 @@ int print_info(const shared_ptr<DomainBase>& domain, istringstream& command) {
         suanpan_info("{}\n", SUANPAN_OUTPUT.generic_string());
     else if(is_equal(object_type, "num_threads"))
         suanpan_info("SUANPAN_NUM_THREADS: {}\n", SUANPAN_NUM_THREADS);
+    else if(is_equal(object_type, "statistics") || is_equal(object_type, "stats")) {
+        suanpan_info("\nUpdating element trial status used:\n\t{:.5E} s.", domain->stats<Statistics::UpdateStatus>());
+        suanpan_info("\nAssembling global vector used:\n\t{:.5E} s.", domain->stats<Statistics::AssembleVector>());
+        suanpan_info("\nAssembling global system used:\n\t{:.5E} s.", domain->stats<Statistics::AssembleMatrix>());
+        suanpan_info("\nProcessing constraints used:\n\t{:.5E} s.", domain->stats<Statistics::ProcessConstraint>());
+        suanpan_info("\nSolving global system used:\n\t{:.5E} s.\n", domain->stats<Statistics::SolveSystem>());
+    }
 
     return SUANPAN_SUCCESS;
 }
@@ -1590,6 +1628,7 @@ int print_command() {
     suanpan_info(format, "command", "list all commands");
     suanpan_info(format, "converger", "define converger");
     suanpan_info(format, "criterion", "define stopping criterion");
+    suanpan_info(format, "customnodegroup", "define group containing node tags");
     suanpan_info(format, "delete/erase/remove", "delete objects");
     suanpan_info(format, "disable/mute", "disable objects");
     suanpan_info(format, "disp/displacement/dispload", "define displacement load");

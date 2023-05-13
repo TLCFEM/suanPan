@@ -21,7 +21,7 @@
 #include <Toolbox/utility.h>
 #include "SolverSetting.hpp"
 
-template<typename T, typename data_t> concept HasEvaluate = requires(T* t, const Col<data_t>& x) { { t->evaluate(x) } -> std::convertible_to<Col<data_t>> ; };
+template<typename T, typename data_t> concept HasEvaluate = requires(T* t, const Col<data_t>& x) { { t->evaluate(x) } -> std::convertible_to<Col<data_t>>; };
 
 template<sp_d data_t, HasEvaluate<data_t> System> int GMRES(const System* system, Col<data_t>& x, const Col<data_t>& b, SolverSetting<data_t>& setting) {
     constexpr sp_d auto ZERO = data_t(0);

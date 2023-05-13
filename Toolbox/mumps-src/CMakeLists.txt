@@ -15,7 +15,6 @@ add_compile_definitions(Add_)
 add_compile_definitions(pord)
 add_compile_definitions(metis)
 
-add_compile_definitions(BLR_MT)
 if (USE_MKL)
     add_compile_definitions(GEMMT_AVAILABLE)
 endif ()
