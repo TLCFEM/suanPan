@@ -14,27 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-/**
- * @fn SectionTester
- * @brief A SectionTester function.
- * @author tlc
- * @date 20/05/2023
- * @version 0.1.0
- * @file SectionTester.h
- * @addtogroup Utility
- * @{
- */
 
-#ifndef SECTIONTESTER_H
-#define SECTIONTESTER_H
+#ifndef MISC_H
+#define MISC_H
 
-#include <memory>
+#include <suanPan.h>
 
-class DomainBase;
-
-int test_section2d(const std::shared_ptr<DomainBase>&, std::istringstream&);
-int test_section_by_deformation_history(const std::shared_ptr<DomainBase>&, std::istringstream&);
+void save_result(const mat&);
+void save_gnuplot();
 
 #endif
-
-//! @}

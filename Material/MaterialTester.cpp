@@ -18,6 +18,7 @@
 #include "MaterialTester.h"
 #include <Domain/DomainBase.h>
 #include <Material/Material.h>
+#include <Toolbox/misc.h>
 #include <Toolbox/utility.h>
 
 bool initialise_material(const shared_ptr<DomainBase>& domain, const unique_ptr<Material>& obj, const uword size) {
@@ -41,32 +42,6 @@ bool initialise_material(const shared_ptr<DomainBase>& domain, const unique_ptr<
     }
 
     return true;
-}
-
-void save_result(const mat& result) {
-#ifdef SUANPAN_HDF5
-    if(!result.save("RESULT.h5", hdf5_binary_trans))
-        suanpan_error("Fail to save to file.\n");
-#else
-    if(!result.save("RESULT.txt", raw_ascii))
-        suanpan_error("Fail to save to file.\n");
-#endif
-}
-
-void save_gnuplot() {
-    if(std::ofstream gnuplot("RESULT.plt"); gnuplot.is_open()) {
-        gnuplot << "reset\n";
-        gnuplot << "set term tikz size 14cm,10cm\n";
-        gnuplot << "set output \"RESULT.tex\"\n";
-        gnuplot << "unset key\n";
-        gnuplot << "set xrange [*:*]\n";
-        gnuplot << "set yrange [*:*]\n";
-        gnuplot << "set xlabel \"input\"\n";
-        gnuplot << "set ylabel \"output\"\n";
-        gnuplot << "set grid\n";
-        gnuplot << "plot \"RESULT.txt\" u 1:2 w l lw 2\n";
-        gnuplot << "set output\n";
-    }
 }
 
 mat material_tester(const unique_ptr<Material>& obj, const std::vector<unsigned>& idx, const vec& incre) {
