@@ -472,6 +472,7 @@
     <ClCompile Include="..\..\..\Section\SectionParser.cpp" />
     <ClCompile Include="..\..\..\Section\SectionShell\Homogeneous.cpp" />
     <ClCompile Include="..\..\..\Section\SectionShell\SectionShell.cpp" />
+    <ClCompile Include="..\..\..\Section\SectionTester.cpp" />
     <ClCompile Include="..\..\..\Solver\Arnoldi.cpp" />
     <ClCompile Include="..\..\..\Solver\BFGS.cpp" />
     <ClCompile Include="..\..\..\Solver\FEAST.cpp" />
@@ -512,6 +513,7 @@
     <ClCompile Include="..\..\..\Toolbox\Expression.cpp" />
     <ClCompile Include="..\..\..\Toolbox\ExpressionParser.cpp" />
     <ClCompile Include="..\..\..\Toolbox\IntegrationPlan.cpp" />
+    <ClCompile Include="..\..\..\Toolbox\misc.cpp" />
     <ClCompile Include="..\..\..\Toolbox\resampling.cpp" />
     <ClCompile Include="..\..\..\Toolbox\sort_rcm.cpp" />
     <ClCompile Include="..\..\..\Toolbox\sync_ostream.cpp" />
@@ -939,6 +941,7 @@
     <ClInclude Include="..\..\..\Section\SectionParser.h" />
     <ClInclude Include="..\..\..\Section\SectionShell\Homogeneous.h" />
     <ClInclude Include="..\..\..\Section\SectionShell\SectionShell.h" />
+    <ClInclude Include="..\..\..\Section\SectionTester.h" />
     <ClInclude Include="..\..\..\Solver\Arnoldi.h" />
     <ClInclude Include="..\..\..\Solver\BFGS.h" />
     <ClInclude Include="..\..\..\Solver\FEAST.h" />
@@ -981,6 +984,7 @@
     <ClInclude Include="..\..\..\Toolbox\ExpressionParser.h" />
     <ClInclude Include="..\..\..\Toolbox\LBFGS.hpp" />
     <ClInclude Include="..\..\..\Toolbox\IntegrationPlan.h" />
+    <ClInclude Include="..\..\..\Toolbox\misc.h" />
     <ClInclude Include="..\..\..\Toolbox\Quaternion.hpp" />
     <ClInclude Include="..\..\..\Toolbox\resampling.h" />
     <ClInclude Include="..\..\..\Toolbox\ResourceHolder.h" />

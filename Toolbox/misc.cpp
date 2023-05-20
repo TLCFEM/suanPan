@@ -42,4 +42,3 @@ void save_gnuplot() {
         gnuplot << "set output\n";
     }
 }
-

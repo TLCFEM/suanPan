@@ -22,6 +22,7 @@
 #include <Toolbox/utility.h>
 
 bool initialise_material(const shared_ptr<DomainBase>& domain, const unique_ptr<Material>& obj, const uword size) {
+    domain->initialize_material();
     if(!obj->is_initialized()) {
         if(SUANPAN_SUCCESS != obj->initialize_base(domain)) return false;
         if(SUANPAN_SUCCESS != obj->initialize(domain)) return false;
