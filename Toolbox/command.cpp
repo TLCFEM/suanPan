@@ -24,10 +24,10 @@
 #include <Converger/ConvergerParser.h>
 #include <Domain/Domain.h>
 #include <Domain/ExternalModule.h>
+#include <Domain/Group/CustomNodeGroup.h>
 #include <Domain/Group/ElementGroup.h>
 #include <Domain/Group/GroupGroup.h>
 #include <Domain/Group/NodeGroup.h>
-#include <Domain/Group/CustomNodeGroup.h>
 #include <Domain/Node.h>
 #include <Element/Element.h>
 #include <Element/ElementParser.h>
@@ -41,6 +41,7 @@
 #include <Recorder/Recorder.h>
 #include <Recorder/RecorderParser.h>
 #include <Section/SectionParser.h>
+#include <Section/SectionTester.h>
 #include <Solver/Integrator/Integrator.h>
 #include <Solver/Solver.h>
 #include <Solver/SolverParser.h>
@@ -513,6 +514,9 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     if(is_equal(command_id, "materialtestbyloadwithbase3d")) return test_material_by_load_with_base3d(domain, command);
     if(is_equal(command_id, "materialtestbystrainhistory")) return test_material_by_strain_history(domain, command);
     if(is_equal(command_id, "materialtestbystresshistory")) return test_material_by_stress_history(domain, command);
+
+    if(is_equal(command_id, "sectiontest2d")) return test_section2d(domain, command);
+    if(is_equal(command_id, "sectiontestbydeformationhistory")) return test_section_by_deformation_history(domain, command);
 
     if(is_equal(command_id, "qrcode")) {
         qrcode();

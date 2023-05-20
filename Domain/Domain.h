@@ -341,6 +341,10 @@ public:
     int initialize_constraint() override;
     // initialize constraints for each step
     int initialize_reference() override;
+    // initialize maerials for each step
+    int initialize_material() override;
+    // initialize sections for each step
+    int initialize_section() override;
     // process loads and constraints
     [[nodiscard]] int process_load(bool) override;
     [[nodiscard]] int process_constraint(bool) override;
