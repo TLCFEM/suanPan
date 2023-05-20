@@ -14751,6 +14751,24 @@
       "contents": "",
       "details": "",
       "kind": "type",
+      "trigger": "sectiontest1d"
+    },
+    {
+      "contents": "",
+      "details": "",
+      "kind": "type",
+      "trigger": "sectiontest2d"
+    },
+    {
+      "contents": "",
+      "details": "",
+      "kind": "type",
+      "trigger": "sectiontest3d"
+    },
+    {
+      "contents": "",
+      "details": "",
+      "kind": "type",
       "trigger": "materialtestbyload1d"
     },
     {
@@ -14782,6 +14800,12 @@
       "details": "",
       "kind": "type",
       "trigger": "materialtestbystresshistory"
+    },
+    {
+      "contents": "",
+      "details": "",
+      "kind": "type",
+      "trigger": "sectiontestbydeformationhistory"
     },
     {
       "contents": "",

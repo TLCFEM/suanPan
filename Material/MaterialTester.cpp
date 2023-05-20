@@ -282,14 +282,14 @@ mat material_tester_by_stress_history(const unique_ptr<Material>& obj, const mat
     return response;
 }
 
-int test_material1d(const shared_ptr<DomainBase>& domain, istringstream& command) {
+int test_material(const shared_ptr<DomainBase>& domain, istringstream& command, const unsigned size) {
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
         suanpan_error("A valid material tag is required.\n");
         return SUANPAN_SUCCESS;
     }
 
-    double incre;
+    vec incre(size);
     if(!get_input(command, incre)) {
         suanpan_error("A valid step size is required.\n");
         return SUANPAN_SUCCESS;
@@ -303,67 +303,11 @@ int test_material1d(const shared_ptr<DomainBase>& domain, istringstream& command
 
     const auto material = domain->get_material(material_tag)->get_copy();
 
-    if(!initialise_material(domain, material, 1)) return SUANPAN_SUCCESS;
-
-    save_result(material_tester(material, load_step, {incre}));
-
-    save_gnuplot();
-
-    return SUANPAN_SUCCESS;
-}
-
-int test_material2d(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    vec incre(3);
-    if(!get_input(command, incre)) {
-        suanpan_error("A valid step size is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    std::vector<unsigned> load_step;
-    int step;
-    while(get_input(command, step)) load_step.push_back(static_cast<unsigned>(std::abs(step)));
-
-    if(!domain->find_material(material_tag)) return SUANPAN_SUCCESS;
-
-    const auto material = domain->get_material(material_tag)->get_copy();
-
-    if(!initialise_material(domain, material, incre.n_elem)) return SUANPAN_SUCCESS;
+    if(!initialise_material(domain, material, size)) return SUANPAN_SUCCESS;
 
     save_result(material_tester(material, load_step, incre));
 
-    return SUANPAN_SUCCESS;
-}
-
-int test_material3d(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    vec incre(6);
-    if(!get_input(command, incre)) {
-        suanpan_error("A valid step size is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    std::vector<unsigned> load_step;
-    int step;
-    while(get_input(command, step)) load_step.push_back(static_cast<unsigned>(std::abs(step)));
-
-    if(!domain->find_material(material_tag)) return SUANPAN_SUCCESS;
-
-    const auto material = domain->get_material(material_tag)->get_copy();
-
-    if(!initialise_material(domain, material, incre.n_elem)) return SUANPAN_SUCCESS;
-
-    save_result(material_tester(material, load_step, incre));
+    if(1 == size) save_gnuplot();
 
     return SUANPAN_SUCCESS;
 }
@@ -402,14 +346,14 @@ int test_material_with_base3d(const shared_ptr<DomainBase>& domain, istringstrea
     return SUANPAN_SUCCESS;
 }
 
-int test_material_by_load1d(const shared_ptr<DomainBase>& domain, istringstream& command) {
+int test_material_by_load(const shared_ptr<DomainBase>& domain, istringstream& command, const unsigned size) {
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
         suanpan_error("A valid material tag is required.\n");
         return SUANPAN_SUCCESS;
     }
 
-    double incre;
+    vec incre(size);
     if(!get_input(command, incre)) {
         suanpan_error("A valid step size is required.\n");
         return SUANPAN_SUCCESS;
@@ -423,67 +367,11 @@ int test_material_by_load1d(const shared_ptr<DomainBase>& domain, istringstream&
 
     const auto material = domain->get_material(material_tag)->get_copy();
 
-    if(!initialise_material(domain, material, 1)) return SUANPAN_SUCCESS;
+    if(!initialise_material(domain, material, size)) return SUANPAN_SUCCESS;
 
     save_result(material_tester_by_load(material, load_step, {incre}));
 
-    save_gnuplot();
-
-    return SUANPAN_SUCCESS;
-}
-
-int test_material_by_load2d(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    vec incre(3);
-    if(!get_input(command, incre)) {
-        suanpan_error("A valid step size is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    std::vector<unsigned> load_step;
-    int step;
-    while(get_input(command, step)) load_step.push_back(static_cast<unsigned>(std::abs(step)));
-
-    if(!domain->find_material(material_tag)) return SUANPAN_SUCCESS;
-
-    const auto material = domain->get_material(material_tag)->get_copy();
-
-    if(!initialise_material(domain, material, incre.n_elem)) return SUANPAN_SUCCESS;
-
-    save_result(material_tester_by_load(material, load_step, incre));
-
-    return SUANPAN_SUCCESS;
-}
-
-int test_material_by_load3d(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    vec incre(6);
-    if(!get_input(command, incre)) {
-        suanpan_error("A valid step size is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    std::vector<unsigned> load_step;
-    int step;
-    while(get_input(command, step)) load_step.push_back(static_cast<unsigned>(std::abs(step)));
-
-    if(!domain->find_material(material_tag)) return SUANPAN_SUCCESS;
-
-    const auto material = domain->get_material(material_tag)->get_copy();
-
-    if(!initialise_material(domain, material, incre.n_elem)) return SUANPAN_SUCCESS;
-
-    save_result(material_tester_by_load(material, load_step, incre));
+    if(1 == size) save_gnuplot();
 
     return SUANPAN_SUCCESS;
 }

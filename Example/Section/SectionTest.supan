@@ -1,0 +1,9 @@
+material Bilinear1D 1 29 0.05 0.01
+
+section US2D W21X68 1 1
+
+sectiontest2d 1 1E-3 0 100
+
+sectiontestbydeformationhistory 1 HIST
+
+exit

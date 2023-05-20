@@ -32,7 +32,7 @@
 
 class DomainBase;
 
-int test_section2d(const std::shared_ptr<DomainBase>&, std::istringstream&);
+int test_section(const std::shared_ptr<DomainBase>&, std::istringstream&, unsigned);
 int test_section_by_deformation_history(const std::shared_ptr<DomainBase>&, std::istringstream&);
 
 #endif

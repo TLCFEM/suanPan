@@ -29,20 +29,10 @@ bool initialise_section(const shared_ptr<DomainBase>& domain, const unique_ptr<S
         obj->set_initialized(true);
     }
 
-    if(obj->get_section_type() == SectionType::D1 && 1 != size) {
-        suanpan_error("The tester cannot be applied to the given section model.\n");
-        return false;
-    }
-    if(obj->get_section_type() == SectionType::D2 && 2 != size) {
-        suanpan_error("The tester cannot be applied to the given section model.\n");
-        return false;
-    }
-    if(obj->get_section_type() == SectionType::D3 && 3 != size) {
-        suanpan_error("The tester cannot be applied to the given section model.\n");
-        return false;
-    }
+    if(static_cast<uword>(obj->get_section_type()) == size) return true;
 
-    return true;
+    suanpan_error("The tester cannot be applied to the given section model.\n");
+    return false;
 }
 
 mat section_tester(const unique_ptr<Section>& obj, const std::vector<unsigned>& idx, const vec& incre) {
@@ -95,14 +85,14 @@ mat section_tester_by_deformation_history(const unique_ptr<Section>& obj, const 
     return response;
 }
 
-int test_section2d(const shared_ptr<DomainBase>& domain, istringstream& command) {
+int test_section(const shared_ptr<DomainBase>& domain, istringstream& command, const unsigned size) {
     unsigned section_tag;
     if(!get_input(command, section_tag)) {
         suanpan_error("A valid section tag is required.\n");
         return SUANPAN_SUCCESS;
     }
 
-    vec incre(2);
+    vec incre(size);
     if(!get_input(command, incre)) {
         suanpan_error("A valid step size is required.\n");
         return SUANPAN_SUCCESS;
@@ -116,7 +106,7 @@ int test_section2d(const shared_ptr<DomainBase>& domain, istringstream& command)
 
     const auto section = domain->get_section(section_tag)->get_copy();
 
-    if(!initialise_section(domain, section, incre.n_elem)) return SUANPAN_SUCCESS;
+    if(!initialise_section(domain, section, size)) return SUANPAN_SUCCESS;
 
     save_result(section_tester(section, load_step, incre));
 
