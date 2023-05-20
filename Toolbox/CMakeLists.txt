@@ -11,4 +11,5 @@ target_sources(${PROJECT_NAME} PRIVATE
         resampling.cpp
         Expression.cpp
         ExpressionParser.cpp
+        misc.cpp
         )

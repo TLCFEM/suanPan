@@ -1510,6 +1510,12 @@
     <ClCompile Include="..\..\..\Material\Material1D\Elastic\AsymmElastic1D.cpp">
       <Filter>Material\Material1D\Elastic</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionTester.cpp">
+      <Filter>Section</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\misc.cpp">
+      <Filter>Toolbox</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2883,6 +2889,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material1D\Elastic\AsymmElastic1D.h">
       <Filter>Material\Material1D\Elastic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionTester.h">
+      <Filter>Section</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\misc.h">
+      <Filter>Toolbox</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

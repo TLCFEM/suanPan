@@ -15,29 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @fn MaterialTester
- * @brief A MaterialTester function.
+ * @fn SectionTester
+ * @brief A SectionTester function.
  * @author tlc
- * @date 04/01/2023
- * @version 0.3.0
- * @file MaterialTester.h
+ * @date 20/05/2023
+ * @version 0.1.0
+ * @file SectionTester.h
  * @addtogroup Utility
  * @{
  */
 
-#ifndef MATERIALTESTER_H
-#define MATERIALTESTER_H
+#ifndef SECTIONTESTER_H
+#define SECTIONTESTER_H
 
 #include <memory>
 
 class DomainBase;
 
-int test_material(const std::shared_ptr<DomainBase>&, std::istringstream&, unsigned);
-int test_material_with_base3d(const std::shared_ptr<DomainBase>&, std::istringstream&);
-int test_material_by_load(const std::shared_ptr<DomainBase>&, std::istringstream&, unsigned);
-int test_material_by_load_with_base3d(const std::shared_ptr<DomainBase>&, std::istringstream&);
-int test_material_by_strain_history(const std::shared_ptr<DomainBase>&, std::istringstream&);
-int test_material_by_stress_history(const std::shared_ptr<DomainBase>&, std::istringstream&);
+int test_section(const std::shared_ptr<DomainBase>&, std::istringstream&, unsigned);
+int test_section_by_deformation_history(const std::shared_ptr<DomainBase>&, std::istringstream&);
 
 #endif
 

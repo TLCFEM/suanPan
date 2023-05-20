@@ -24,10 +24,10 @@
 #include <Converger/ConvergerParser.h>
 #include <Domain/Domain.h>
 #include <Domain/ExternalModule.h>
+#include <Domain/Group/CustomNodeGroup.h>
 #include <Domain/Group/ElementGroup.h>
 #include <Domain/Group/GroupGroup.h>
 #include <Domain/Group/NodeGroup.h>
-#include <Domain/Group/CustomNodeGroup.h>
 #include <Domain/Node.h>
 #include <Element/Element.h>
 #include <Element/ElementParser.h>
@@ -41,6 +41,7 @@
 #include <Recorder/Recorder.h>
 #include <Recorder/RecorderParser.h>
 #include <Section/SectionParser.h>
+#include <Section/SectionTester.h>
 #include <Solver/Integrator/Integrator.h>
 #include <Solver/Solver.h>
 #include <Solver/SolverParser.h>
@@ -503,16 +504,21 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     if(is_equal(command_id, "finiterestitutionwall") || is_equal(command_id, "finiterestitutionwallpenalty")) return constraint_handler();
     if(is_equal(command_id, "mpc")) return constraint_handler();
 
-    if(is_equal(command_id, "materialtest1d")) return test_material1d(domain, command);
-    if(is_equal(command_id, "materialtest2d")) return test_material2d(domain, command);
-    if(is_equal(command_id, "materialtest3d")) return test_material3d(domain, command);
+    if(is_equal(command_id, "materialtest1d")) return test_material(domain, command, 1);
+    if(is_equal(command_id, "materialtest2d")) return test_material(domain, command, 3);
+    if(is_equal(command_id, "materialtest3d")) return test_material(domain, command, 6);
     if(is_equal(command_id, "materialtestwithbase3d")) return test_material_with_base3d(domain, command);
-    if(is_equal(command_id, "materialtestbyload1d")) return test_material_by_load1d(domain, command);
-    if(is_equal(command_id, "materialtestbyload2d")) return test_material_by_load2d(domain, command);
-    if(is_equal(command_id, "materialtestbyload3d")) return test_material_by_load3d(domain, command);
+    if(is_equal(command_id, "materialtestbyload1d")) return test_material_by_load(domain, command, 1);
+    if(is_equal(command_id, "materialtestbyload2d")) return test_material_by_load(domain, command, 3);
+    if(is_equal(command_id, "materialtestbyload3d")) return test_material_by_load(domain, command, 6);
     if(is_equal(command_id, "materialtestbyloadwithbase3d")) return test_material_by_load_with_base3d(domain, command);
     if(is_equal(command_id, "materialtestbystrainhistory")) return test_material_by_strain_history(domain, command);
     if(is_equal(command_id, "materialtestbystresshistory")) return test_material_by_stress_history(domain, command);
+
+    if(is_equal(command_id, "sectiontest1d")) return test_section(domain, command, 1);
+    if(is_equal(command_id, "sectiontest2d")) return test_section(domain, command, 2);
+    if(is_equal(command_id, "sectiontest3d")) return test_section(domain, command, 3);
+    if(is_equal(command_id, "sectiontestbydeformationhistory")) return test_section_by_deformation_history(domain, command);
 
     if(is_equal(command_id, "qrcode")) {
         qrcode();

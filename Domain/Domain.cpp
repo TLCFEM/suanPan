@@ -910,39 +910,8 @@ int Domain::initialize() {
     suanpan::for_all(amplitude_pond, [&](const std::pair<unsigned, shared_ptr<Amplitude>>& t_amplitude) { t_amplitude.second->initialize(shared_from_this()); });
     amplitude_pond.update();
 
-    suanpan::set<unsigned> remove_list;
-
-    remove_list.clear();
-    suanpan::for_all(material_pond, [&](const std::pair<unsigned, shared_ptr<Material>>& t_material) {
-        if(t_material.second->is_initialized() || !t_material.second->is_active()) return;
-
-        // if fail to initialize, the material is invalid, remove it from the model
-        if(SUANPAN_SUCCESS != t_material.second->initialize_base(shared_from_this()) || SUANPAN_SUCCESS != t_material.second->initialize(shared_from_this())) {
-            disable_material(t_material.first);
-            remove_list.insert(t_material.first);
-            return;
-        }
-
-        t_material.second->set_initialized(true);
-    });
-    for(const auto I : remove_list) erase_material(I);
-    material_pond.update();
-
-    remove_list.clear();
-    suanpan::for_all(section_pond, [&](const std::pair<unsigned, shared_ptr<Section>>& t_section) {
-        if(t_section.second->is_initialized() || !t_section.second->is_active()) return;
-
-        // if fail to initialize, the section is invalid, remove it from the model
-        if(SUANPAN_SUCCESS != t_section.second->initialize_base(shared_from_this()) || SUANPAN_SUCCESS != t_section.second->initialize(shared_from_this())) {
-            disable_section(t_section.first);
-            remove_list.insert(t_section.first);
-            return;
-        }
-
-        t_section.second->set_initialized(true);
-    });
-    for(const auto I : remove_list) erase_section(I);
-    section_pond.update();
+    initialize_material();
+    initialize_section();
 
     // set dof number to zero before first initialisation of elements
     suanpan::for_all(node_pond, [](const std::pair<unsigned, shared_ptr<Node>>& t_node) {
@@ -955,6 +924,8 @@ int Domain::initialize() {
     // groups reply on nodes
     suanpan::for_all(group_pond, [&](const std::pair<unsigned, shared_ptr<Group>>& t_group) { t_group.second->initialize(shared_from_this()); });
     group_pond.update();
+
+    suanpan::set<unsigned> remove_list;
 
     // element may reply on groups
     remove_list.clear();
@@ -1066,6 +1037,50 @@ int Domain::initialize_reference() {
     factory->initialize_load_factor();
     auto& ref_load = factory->modify_reference_load();
     for(uword I = 0; I < ref_dof.n_elem; ++I) ref_load(ref_dof(I), I) = 1.;
+
+    return SUANPAN_SUCCESS;
+}
+
+int Domain::initialize_material() {
+    suanpan::set<unsigned> remove_list;
+
+    remove_list.clear();
+    suanpan::for_all(material_pond, [&](const std::pair<unsigned, shared_ptr<Material>>& t_material) {
+        if(t_material.second->is_initialized() || !t_material.second->is_active()) return;
+
+        // if fail to initialize, the material is invalid, remove it from the model
+        if(SUANPAN_SUCCESS != t_material.second->initialize_base(shared_from_this()) || SUANPAN_SUCCESS != t_material.second->initialize(shared_from_this())) {
+            disable_material(t_material.first);
+            remove_list.insert(t_material.first);
+            return;
+        }
+
+        t_material.second->set_initialized(true);
+    });
+    for(const auto I : remove_list) erase_material(I);
+    material_pond.update();
+
+    return SUANPAN_SUCCESS;
+}
+
+int Domain::initialize_section() {
+    suanpan::set<unsigned> remove_list;
+
+    remove_list.clear();
+    suanpan::for_all(section_pond, [&](const std::pair<unsigned, shared_ptr<Section>>& t_section) {
+        if(t_section.second->is_initialized() || !t_section.second->is_active()) return;
+
+        // if fail to initialize, the section is invalid, remove it from the model
+        if(SUANPAN_SUCCESS != t_section.second->initialize_base(shared_from_this()) || SUANPAN_SUCCESS != t_section.second->initialize(shared_from_this())) {
+            disable_section(t_section.first);
+            remove_list.insert(t_section.first);
+            return;
+        }
+
+        t_section.second->set_initialized(true);
+    });
+    for(const auto I : remove_list) erase_section(I);
+    section_pond.update();
 
     return SUANPAN_SUCCESS;
 }

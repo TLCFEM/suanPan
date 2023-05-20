@@ -14,31 +14,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-/**
- * @fn MaterialTester
- * @brief A MaterialTester function.
- * @author tlc
- * @date 04/01/2023
- * @version 0.3.0
- * @file MaterialTester.h
- * @addtogroup Utility
- * @{
- */
 
-#ifndef MATERIALTESTER_H
-#define MATERIALTESTER_H
+#include "misc.h"
 
-#include <memory>
-
-class DomainBase;
-
-int test_material(const std::shared_ptr<DomainBase>&, std::istringstream&, unsigned);
-int test_material_with_base3d(const std::shared_ptr<DomainBase>&, std::istringstream&);
-int test_material_by_load(const std::shared_ptr<DomainBase>&, std::istringstream&, unsigned);
-int test_material_by_load_with_base3d(const std::shared_ptr<DomainBase>&, std::istringstream&);
-int test_material_by_strain_history(const std::shared_ptr<DomainBase>&, std::istringstream&);
-int test_material_by_stress_history(const std::shared_ptr<DomainBase>&, std::istringstream&);
-
+void save_result(const mat& result) {
+#ifdef SUANPAN_HDF5
+    if(!result.save("RESULT.h5", hdf5_binary_trans))
+        suanpan_error("Fail to save to file.\n");
+#else
+    if(!result.save("RESULT.txt", raw_ascii))
+        suanpan_error("Fail to save to file.\n");
 #endif
+}
 
-//! @}
+void save_gnuplot() {
+    if(std::ofstream gnuplot("RESULT.plt"); gnuplot.is_open()) {
+        gnuplot << "reset\n";
+        gnuplot << "set term tikz size 14cm,10cm\n";
+        gnuplot << "set output \"RESULT.tex\"\n";
+        gnuplot << "unset key\n";
+        gnuplot << "set xrange [*:*]\n";
+        gnuplot << "set yrange [*:*]\n";
+        gnuplot << "set xlabel \"input\"\n";
+        gnuplot << "set ylabel \"output\"\n";
+        gnuplot << "set grid\n";
+        gnuplot << "plot \"RESULT.txt\" u 1:2 w l lw 2\n";
+        gnuplot << "set output\n";
+    }
+}
