@@ -122,10 +122,10 @@ template<sp_d T> Mat<T> response_spectrum(const T damping_ratio, const T interva
     Mat<T> spectrum(3, period.n_elem, fill::none);
 
     suanpan_for(0llu, period.n_elem, [&](const uword I) {
-        if(!suanpan::approx_equal(period(I), 0., 10000)) [[likely]] spectrum.col(I) = Oscillator(datum::tau / period(I), damping_ratio).compute_maximum_response(interval, motion);
+        if(!suanpan::approx_equal(period(I), T(0), 10000)) [[likely]] spectrum.col(I) = Oscillator(datum::tau / period(I), damping_ratio).compute_maximum_response(interval, motion);
         else [[unlikely]]
         {
-            spectrum.col(I)(0) = spectrum.col(I)(1) = 0.;
+            spectrum.col(I)(0) = spectrum.col(I)(1) = T(0);
             spectrum.col(I)(2) = std::max(std::abs(motion.max()), std::abs(motion.min()));
         }
     });
@@ -146,7 +146,7 @@ template<sp_d T> Mat<T> response_spectrum(const T damping_ratio, const T interva
 template<sp_d T> Mat<T> sdof_response(const T damping_ratio, const T interval, const T freq, const Col<T>& motion) {
     Oscillator system(freq * datum::tau, damping_ratio);
 
-    return arma::join_rows(interval * regspace(0., static_cast<double>(motion.n_elem) - 1.), system.compute_response(interval, motion));
+    return arma::join_rows(interval * arma::regspace<Col<T>>(T(0), static_cast<double>(motion.n_elem) - T(1)), system.compute_response(interval, motion));
 }
 
 #endif
