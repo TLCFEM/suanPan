@@ -72,6 +72,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "solver.pardiso", "solver.pa
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solver", "Solver", "{D3CDFAA6-B90F-4A9D-A6EF-6F305C1DC35E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tester.pardiso", "tester.pardiso\tester.pardiso.vcxproj", "{A6186ED5-2B8D-4860-A834-D5C2556184AF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -128,6 +130,10 @@ Global
 		{9345BA22-3569-4461-8E02-0BD507AD6B5A}.Debug|x64.Build.0 = Debug|x64
 		{9345BA22-3569-4461-8E02-0BD507AD6B5A}.Release|x64.ActiveCfg = Release|x64
 		{9345BA22-3569-4461-8E02-0BD507AD6B5A}.Release|x64.Build.0 = Release|x64
+		{A6186ED5-2B8D-4860-A834-D5C2556184AF}.Debug|x64.ActiveCfg = Debug|x64
+		{A6186ED5-2B8D-4860-A834-D5C2556184AF}.Debug|x64.Build.0 = Debug|x64
+		{A6186ED5-2B8D-4860-A834-D5C2556184AF}.Release|x64.ActiveCfg = Release|x64
+		{A6186ED5-2B8D-4860-A834-D5C2556184AF}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -149,6 +155,7 @@ Global
 		{586A1344-459A-4BEB-89D8-08FD37DED320} = {0356706B-BEA9-4D7C-A653-CEEAE41865BA}
 		{31EA0BFE-5ADF-4CA5-808F-C3AB41E4AFE0} = {86C5CA2F-6514-413E-AC69-0DD78BBB9C33}
 		{9345BA22-3569-4461-8E02-0BD507AD6B5A} = {D3CDFAA6-B90F-4A9D-A6EF-6F305C1DC35E}
+		{A6186ED5-2B8D-4860-A834-D5C2556184AF} = {D3CDFAA6-B90F-4A9D-A6EF-6F305C1DC35E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E248FAF2-3C38-4DAB-A5B2-FD55C38305DE}

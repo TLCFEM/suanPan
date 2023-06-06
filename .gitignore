@@ -42,6 +42,7 @@ $RECYCLE.BIN/
 /MSVC/suanPan/superlu/x64/*
 /MSVC/suanPan/superlumt/x64/*
 /MSVC/suanPan/solver.pardiso/x64/*
+/MSVC/suanPan/tester.pardiso/x64/*
 venv
 .cache
 
