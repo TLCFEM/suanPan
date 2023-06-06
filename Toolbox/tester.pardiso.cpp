@@ -26,10 +26,8 @@ int main(int argc, char* argv[]) {
 
     int NUM_NODE = 4;
 
-    MPI_Comm intercomm;
-    MPI_Comm_spawn(
-        "solver.pardiso", MPI_ARGV_NULL, NUM_NODE, MPI_INFO_NULL, 0, MPI_COMM_SELF, &intercomm,
-        MPI_ERRCODES_IGNORE);
+    MPI_Comm comm;
+    MPI_Comm_spawn("solver.pardiso", MPI_ARGV_NULL, NUM_NODE, MPI_INFO_NULL, 0, MPI_COMM_SELF, &comm, MPI_ERRCODES_IGNORE);
 
     int iparm[64 + 7] = {0};
     int config[7] = {0};
@@ -42,13 +40,13 @@ int main(int argc, char* argv[]) {
     config[5] = 5;
     config[6] = 13;
 
-    const auto n = &config[5];
-    const auto nnz = &config[6];
+    const auto n = config[5];
+    const auto nnz = config[6];
 
-    std::unique_ptr<int[]> ia(new int[*n + 1]);
-    std::unique_ptr<int[]> ja(new int[*nnz]);
-    std::unique_ptr<double[]> a(new double[*nnz]);
-    std::unique_ptr<double[]> b(new double[*n]);
+    std::unique_ptr<int[]> ia(new int[n + 1]);
+    std::unique_ptr<int[]> ja(new int[nnz]);
+    std::unique_ptr<double[]> a(new double[nnz]);
+    std::unique_ptr<double[]> b(new double[n]);
 
     ia[0] = 1;
     ia[1] = 4;
@@ -83,7 +81,7 @@ int main(int argc, char* argv[]) {
     a[11] = 8.0;
     a[12] = -5.0;
 
-    for(int i = 0; i < *n; i++) b[i] = 1.0;
+    for(int i = 0; i < n; i++) b[i] = 1.0;
 
     iparm[0] = 1;   /* Solver default parameters overriden with provided by iparm */
     iparm[1] = 2;   /* Use METIS for fill-in reordering */
@@ -98,20 +96,20 @@ int main(int argc, char* argv[]) {
     iparm[39] = 0;  /* Input: matrix/rhs/solution stored on master */
 
     std::unique_ptr<MPI_Request[]> requests(new MPI_Request[NUM_NODE + 5]);
-    for(auto I = 0; I < NUM_NODE; ++I) MPI_Isend(&config, 7, MPI_INT, I, 0, intercomm, &requests[I]);
-    MPI_Isend(&iparm, 64, MPI_INT, 0, 0, intercomm, &requests[NUM_NODE]);
-    MPI_Isend(ia.get(), *n + 1, MPI_INT, 0, 0, intercomm, &requests[NUM_NODE + 1]);
-    MPI_Isend(ja.get(), *nnz, MPI_INT, 0, 0, intercomm, &requests[NUM_NODE + 2]);
-    MPI_Isend(a.get(), *nnz, MPI_DOUBLE, 0, 0, intercomm, &requests[NUM_NODE + 3]);
-    MPI_Isend(b.get(), *n, MPI_DOUBLE, 0, 0, intercomm, &requests[NUM_NODE + 4]);
+    for(auto I = 0; I < NUM_NODE; ++I) MPI_Isend(&config, 7, MPI_INT, I, 0, comm, &requests[I]);
+    MPI_Isend(&iparm, 64, MPI_INT, 0, 0, comm, &requests[NUM_NODE]);
+    MPI_Isend(ia.get(), n + 1, MPI_INT, 0, 0, comm, &requests[NUM_NODE + 1]);
+    MPI_Isend(ja.get(), nnz, MPI_INT, 0, 0, comm, &requests[NUM_NODE + 2]);
+    MPI_Isend(a.get(), nnz, MPI_DOUBLE, 0, 0, comm, &requests[NUM_NODE + 3]);
+    MPI_Isend(b.get(), n, MPI_DOUBLE, 0, 0, comm, &requests[NUM_NODE + 4]);
 
     MPI_Waitall(NUM_NODE + 5, requests.get(), MPI_STATUSES_IGNORE);
 
-    MPI_Recv(b.get(), *n, MPI_DOUBLE, 0, 0, intercomm, MPI_STATUS_IGNORE);
+    MPI_Recv(b.get(), n, MPI_DOUBLE, 0, 0, comm, MPI_STATUS_IGNORE);
 
     MPI_Finalize();
 
-    for(int i = 0; i < *n; i++) printf("x[%d] = %f\n", i, b[i]);
+    // for(int i = 0; i < n; i++) printf("x[%d] = %f\n", i, b[i]);
 
     return 0;
 }
