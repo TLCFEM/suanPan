@@ -32,7 +32,7 @@ int main(int argc, char** argv) {
     if(MPI_SUCCESS != error) return finalise(error);
 
     int rank;
-    error = MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    error = MPI_Comm_rank(MPI_COMM_SELF, &rank);
     if(MPI_SUCCESS != error) return finalise(error);
 
     MPI_Comm parent;
@@ -69,7 +69,7 @@ int main(int argc, char** argv) {
 
     int64_t pt[64] = {0};
 
-    const int comm = MPI_Comm_c2f(MPI_COMM_WORLD);
+    const int comm = MPI_Comm_c2f(MPI_COMM_SELF);
 
     int phase = 13;
     cluster_sparse_solver(&pt, maxfct, mnum, mtype, &phase, n, a.get(), ia.get(), ja.get(), nullptr, nrhs, iparm, msglvl, b.get(), x.get(), &comm, &error);
