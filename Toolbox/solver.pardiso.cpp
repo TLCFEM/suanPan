@@ -69,7 +69,7 @@ int main(int argc, char** argv) {
 
     int64_t pt[64] = {0};
 
-    constexpr int comm = MPI_Comm_c2f(MPI_COMM_WORLD);
+    const int comm = MPI_Comm_c2f(MPI_COMM_WORLD);
 
     int phase = 13;
     cluster_sparse_solver(&pt, maxfct, mnum, mtype, &phase, n, a.get(), ia.get(), ja.get(), nullptr, nrhs, iparm, msglvl, b.get(), x.get(), &comm, &error);

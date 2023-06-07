@@ -24,7 +24,7 @@
 int main(int argc, char* argv[]) {
     MPI_Init(&argc, &argv);
 
-    int NUM_NODE = 4;
+    int NUM_NODE = 2;
 
     MPI_Comm comm;
     MPI_Comm_spawn("solver.pardiso", MPI_ARGV_NULL, NUM_NODE, MPI_INFO_NULL, 0, MPI_COMM_SELF, &comm, MPI_ERRCODES_IGNORE);
