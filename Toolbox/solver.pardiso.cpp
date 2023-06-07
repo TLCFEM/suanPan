@@ -35,13 +35,14 @@ int main(int argc, char** argv) {
     error = MPI_Comm_rank(MPI_COMM_SELF, &rank);
     if(MPI_SUCCESS != error) return finalise(error);
 
-    MPI_Comm parent;
+    MPI_Comm parent, remote;
     error = MPI_Comm_get_parent(&parent);
+    if(MPI_SUCCESS != error) return finalise(error);
+    error = MPI_Intercomm_merge(parent, 0, &remote);
     if(MPI_SUCCESS != error) return finalise(error);
 
     int config[7] = {0};
-
-    MPI_Recv(&config, 7, MPI_INT, 0, 0, parent, MPI_STATUS_IGNORE);
+    MPI_Bcast(&config, 7, MPI_INT, 0, remote);
 
     const auto mtype = &config[0];
     const auto nrhs = &config[1];

@@ -24,10 +24,10 @@
 int main(int argc, char* argv[]) {
     MPI_Init(&argc, &argv);
 
-    int NUM_NODE = 2;
+    int NUM_NODE = 4;
 
-    MPI_Comm comm;
-    MPI_Comm_spawn("solver.pardiso", MPI_ARGV_NULL, NUM_NODE, MPI_INFO_NULL, 0, MPI_COMM_SELF, &comm, MPI_ERRCODES_IGNORE);
+    MPI_Comm worker;
+    MPI_Comm_spawn("solver.pardiso", MPI_ARGV_NULL, NUM_NODE, MPI_INFO_NULL, 0, MPI_COMM_SELF, &worker, MPI_ERRCODES_IGNORE);
 
     int iparm[64 + 7] = {0};
     int config[7] = {0};
@@ -95,17 +95,19 @@ int main(int argc, char* argv[]) {
     iparm[26] = 0;  /* Check input data for correctness */
     iparm[39] = 0;  /* Input: matrix/rhs/solution stored on master */
 
-    std::unique_ptr<MPI_Request[]> requests(new MPI_Request[NUM_NODE + 5]);
-    for(auto I = 0; I < NUM_NODE; ++I) MPI_Isend(&config, 7, MPI_INT, I, 0, comm, &requests[I]);
-    MPI_Isend(&iparm, 64, MPI_INT, 0, 0, comm, &requests[NUM_NODE]);
-    MPI_Isend(ia.get(), n + 1, MPI_INT, 0, 0, comm, &requests[NUM_NODE + 1]);
-    MPI_Isend(ja.get(), nnz, MPI_INT, 0, 0, comm, &requests[NUM_NODE + 2]);
-    MPI_Isend(a.get(), nnz, MPI_DOUBLE, 0, 0, comm, &requests[NUM_NODE + 3]);
-    MPI_Isend(b.get(), n, MPI_DOUBLE, 0, 0, comm, &requests[NUM_NODE + 4]);
+    MPI_Comm remote;
+    MPI_Intercomm_merge(worker, 0, &remote);
+    MPI_Bcast(&config, 7, MPI_INT, 0, remote);
 
-    MPI_Waitall(NUM_NODE + 5, requests.get(), MPI_STATUSES_IGNORE);
+    std::unique_ptr<MPI_Request[]> requests(new MPI_Request[5]);
+    MPI_Isend(&iparm, 64, MPI_INT, 0, 0, worker, &requests[0]);
+    MPI_Isend(ia.get(), n + 1, MPI_INT, 0, 0, worker, &requests[1]);
+    MPI_Isend(ja.get(), nnz, MPI_INT, 0, 0, worker, &requests[2]);
+    MPI_Isend(a.get(), nnz, MPI_DOUBLE, 0, 0, worker, &requests[3]);
+    MPI_Isend(b.get(), n, MPI_DOUBLE, 0, 0, worker, &requests[4]);
+    MPI_Waitall(5, requests.get(), MPI_STATUSES_IGNORE);
 
-    MPI_Recv(b.get(), n, MPI_DOUBLE, 0, 0, comm, MPI_STATUS_IGNORE);
+    MPI_Recv(b.get(), n, MPI_DOUBLE, 0, 0, worker, MPI_STATUS_IGNORE);
 
     MPI_Finalize();
 
