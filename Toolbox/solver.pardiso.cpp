@@ -23,7 +23,8 @@
 #include <memory>
 
 int finalise(int64_t error) {
-    error += MPI_Finalize();
+    if(0 == error) error = MPI_Finalize();
+    else MPI_Finalize();
     return static_cast<int>(error);
 }
 
@@ -32,7 +33,7 @@ int main(int argc, char** argv) {
     if(MPI_SUCCESS != error) return finalise(error);
 
     int rank;
-    error = MPI_Comm_rank(MPI_COMM_SELF, &rank);
+    error = MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     if(MPI_SUCCESS != error) return finalise(error);
 
     MPI_Comm parent, remote;
@@ -41,8 +42,9 @@ int main(int argc, char** argv) {
     error = MPI_Intercomm_merge(parent, 0, &remote);
     if(MPI_SUCCESS != error) return finalise(error);
 
-    int config[7] = {0};
-    MPI_Bcast(&config, 7, MPI_INT, 0, remote);
+    int config[7];
+    error = MPI_Bcast(&config, 7, MPI_INT, 0, remote);
+    if(MPI_SUCCESS != error) return finalise(error);
 
     const auto mtype = &config[0];
     const auto nrhs = &config[1];
@@ -53,7 +55,7 @@ int main(int argc, char** argv) {
     const auto nnz = config[6];
     const auto np = *n + 1;
 
-    int iparm[64] = {0};
+    int iparm[64];
 
     const std::unique_ptr<int[]> ia(new int[np]), ja(new int[nnz]);
     const std::unique_ptr<double[]> a(new double[nnz]), b(new double[*n]), x(new double[*n]);
@@ -66,11 +68,24 @@ int main(int argc, char** argv) {
         MPI_Irecv(a.get(), nnz, MPI_DOUBLE, 0, 0, parent, &requests[3]);
         MPI_Irecv(b.get(), *n, MPI_DOUBLE, 0, 0, parent, &requests[4]);
         MPI_Waitall(5, requests.get(), MPI_STATUSES_IGNORE);
+
+        iparm[0] = 1;   /* Solver default parameters overriden with provided by iparm */
+        iparm[1] = 2;   /* Use METIS for fill-in reordering */
+        iparm[5] = 0;   /* Write solution into x */
+        iparm[7] = 2;   /* Max number of iterative refinement steps */
+        iparm[9] = 13;  /* Perturb the pivot elements with 1E-13 */
+        iparm[10] = 1;  /* Use nonsymmetric permutation and scaling MPS */
+        iparm[12] = 1;  /* Switch on Maximum Weighted Matching algorithm (default for non-symmetric) */
+        iparm[17] = -1; /* Output: Number of nonzeros in the factor LU */
+        iparm[18] = -1; /* Output: Mflops for LU factorization */
+        iparm[26] = 0;  /* Check input data for correctness */
+        iparm[39] = 0;  /* Input: matrix/rhs/solution stored on master */
     }
 
     int64_t pt[64] = {0};
 
-    const int comm = MPI_Comm_c2f(MPI_COMM_SELF);
+    // ReSharper disable once CppVariableCanBeMadeConstexpr
+    const int comm = MPI_Comm_c2f(MPI_COMM_WORLD);
 
     int phase = 13;
     cluster_sparse_solver(&pt, maxfct, mnum, mtype, &phase, n, a.get(), ia.get(), ja.get(), nullptr, nrhs, iparm, msglvl, b.get(), x.get(), &comm, &error);

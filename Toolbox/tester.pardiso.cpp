@@ -24,19 +24,19 @@
 int main(int argc, char* argv[]) {
     MPI_Init(&argc, &argv);
 
-    int NUM_NODE = 4;
+    constexpr int NUM_NODE = 6;
 
     MPI_Comm worker;
     MPI_Comm_spawn("solver.pardiso", MPI_ARGV_NULL, NUM_NODE, MPI_INFO_NULL, 0, MPI_COMM_SELF, &worker, MPI_ERRCODES_IGNORE);
 
-    int iparm[64 + 7] = {0};
-    int config[7] = {0};
+    int iparm[64] = {0};
+    int config[7];
 
     config[0] = 11;
     config[1] = 1;
     config[2] = 1;
     config[3] = 1;
-    config[4] = 0;
+    config[4] = 1;
     config[5] = 5;
     config[6] = 13;
 
@@ -82,18 +82,6 @@ int main(int argc, char* argv[]) {
     a[12] = -5.0;
 
     for(int i = 0; i < n; i++) b[i] = 1.0;
-
-    iparm[0] = 1;   /* Solver default parameters overriden with provided by iparm */
-    iparm[1] = 2;   /* Use METIS for fill-in reordering */
-    iparm[5] = 0;   /* Write solution into x */
-    iparm[7] = 2;   /* Max number of iterative refinement steps */
-    iparm[9] = 13;  /* Perturb the pivot elements with 1E-13 */
-    iparm[10] = 1;  /* Use nonsymmetric permutation and scaling MPS */
-    iparm[12] = 1;  /* Switch on Maximum Weighted Matching algorithm (default for non-symmetric) */
-    iparm[17] = -1; /* Output: Number of nonzeros in the factor LU */
-    iparm[18] = -1; /* Output: Mflops for LU factorization */
-    iparm[26] = 0;  /* Check input data for correctness */
-    iparm[39] = 0;  /* Input: matrix/rhs/solution stored on master */
 
     MPI_Comm remote;
     MPI_Intercomm_merge(worker, 0, &remote);
