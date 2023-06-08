@@ -32,13 +32,13 @@ int main(int argc, char* argv[]) {
     int iparm[64] = {0};
     int config[7];
 
-    config[0] = 11;
-    config[1] = 1;
-    config[2] = 1;
-    config[3] = 1;
-    config[4] = 1;
-    config[5] = 5;
-    config[6] = 13;
+    config[0] = 11; // mtype
+    config[1] = 1;  // nrhs
+    config[2] = 1;  // maxfct
+    config[3] = 1;  // mnum
+    config[4] = 0;  // msglvl
+    config[5] = 5;  // n
+    config[6] = 13; // nnz
 
     const auto n = config[5];
     const auto nnz = config[6];
@@ -95,7 +95,9 @@ int main(int argc, char* argv[]) {
     MPI_Isend(b.get(), n, MPI_DOUBLE, 0, 0, worker, &requests[4]);
     MPI_Waitall(5, requests.get(), MPI_STATUSES_IGNORE);
 
-    MPI_Recv(b.get(), n, MPI_DOUBLE, 0, 0, worker, MPI_STATUS_IGNORE);
+    int error = -1;
+    MPI_Recv(&error, 1, MPI_INT, 0, 0, worker, MPI_STATUS_IGNORE);
+    if(0 == error) MPI_Recv(b.get(), n, MPI_DOUBLE, 0, 0, worker, MPI_STATUS_IGNORE);
 
     MPI_Finalize();
 
