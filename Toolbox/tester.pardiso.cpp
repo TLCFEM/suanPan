@@ -21,16 +21,14 @@
 #include <mpi.h>
 #include <memory>
 
-int main(int argc, char* argv[]) {
-    MPI_Init(&argc, &argv);
-
+void run() {
     constexpr int NUM_NODE = 6;
 
     MPI_Comm worker;
     MPI_Comm_spawn("solver.pardiso", MPI_ARGV_NULL, NUM_NODE, MPI_INFO_NULL, 0, MPI_COMM_SELF, &worker, MPI_ERRCODES_IGNORE);
 
     int iparm[64] = {0};
-    int config[7];
+    int config[8];
 
     config[0] = 11; // mtype
     config[1] = 1;  // nrhs
@@ -39,6 +37,7 @@ int main(int argc, char* argv[]) {
     config[4] = 0;  // msglvl
     config[5] = 5;  // n
     config[6] = 13; // nnz
+    config[7] = 1;
 
     const auto n = config[5];
     const auto nnz = config[6];
@@ -85,7 +84,7 @@ int main(int argc, char* argv[]) {
 
     MPI_Comm remote;
     MPI_Intercomm_merge(worker, 0, &remote);
-    MPI_Bcast(&config, 7, MPI_INT, 0, remote);
+    MPI_Bcast(&config, 8, MPI_INT, 0, remote);
 
     std::unique_ptr<MPI_Request[]> requests(new MPI_Request[5]);
     MPI_Isend(&iparm, 64, MPI_INT, 0, 0, worker, &requests[0]);
@@ -99,9 +98,15 @@ int main(int argc, char* argv[]) {
     MPI_Recv(&error, 1, MPI_INT, 0, 0, worker, MPI_STATUS_IGNORE);
     if(0 == error) MPI_Recv(b.get(), n, MPI_DOUBLE, 0, 0, worker, MPI_STATUS_IGNORE);
 
-    MPI_Finalize();
-
     for(int i = 0; i < n; i++) printf("x[%d] = %f\n", i, b[i]);
+}
+
+int main(int argc, char* argv[]) {
+    MPI_Init(&argc, &argv);
+
+    for(auto I = 0; I < 10; ++I) run();
+
+    MPI_Finalize();
 
     return 0;
 }
