@@ -32,7 +32,7 @@
 #ifndef SPARSEMATMPI_HPP
 #define SPARSEMATMPI_HPP
 
-#ifdef SUANPAN_MPI
+#if defined(SUANPAN_MPI) && defined(SUANPAN_MKL)
 
 #include <mpi.h>
 
