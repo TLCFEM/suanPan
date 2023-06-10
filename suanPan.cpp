@@ -25,7 +25,8 @@
 #ifdef SUANPAN_MPI
 #include <mpi.h>
 #else
-int MPI_Init(int* argc, char*** argv) { return 0; }
+int MPI_Init(int*, char***) { return 0; }
+
 int MPI_Finalize() { return 0; }
 #endif
 

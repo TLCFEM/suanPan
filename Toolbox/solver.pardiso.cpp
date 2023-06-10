@@ -25,7 +25,7 @@
 int main(int argc, char** argv) {
     int error = 0, rank = -1;
     MPI_Comm parent, remote;
-    int config[7];
+    int config[8];
 
     const auto mtype = &config[0];
     const auto nrhs = &config[1];
