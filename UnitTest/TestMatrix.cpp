@@ -230,16 +230,12 @@ template<typename T, typename ET> void benchmark_mat_setup(const int I) {
     else if(std::is_same_v<SparseSymmMatMUMPS<ET>, T>) title = "MUMPS Symm ";
     else if(std::is_same_v<SparseMatSuperLU<ET>, T>) title = "SuperLU ";
 #ifdef SUANPAN_MKL
-    else if(std::is_same_v<SparseMatPARDISO<ET>, T>)
-        title = "PARDISO ";
+    else if(std::is_same_v<SparseMatPARDISO<ET>, T>) title = "PARDISO ";
 #ifdef SUANPAN_MPI
-    else if(std::is_same_v<SparseMatMPIPARDISO<ET>, T>)
-        title = "MPI PARDISO ";
+    else if(std::is_same_v<SparseMatMPIPARDISO<ET>, T>) title = "MPI PARDISO ";
 #endif
-    else if(std::is_same_v<SparseMatFGMRES<ET>, T>)
-        title = "FGMRES ";
-    else if(std::is_same_v<SparseSymmMatFGMRES<ET>, T>)
-        title = "FGMRES Symm ";
+    else if(std::is_same_v<SparseMatFGMRES<ET>, T>) title = "FGMRES ";
+    else if(std::is_same_v<SparseSymmMatFGMRES<ET>, T>) title = "FGMRES Symm ";
 #endif
 #ifdef SUANPAN_CUDA
     else if(std::is_same_v<FullMatCUDA<ET>, T>) title = "Full CUDA ";

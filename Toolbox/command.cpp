@@ -1305,32 +1305,28 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
         return SUANPAN_SUCCESS;
     }
     if(is_equal(property_id, "num_threads")) {
-        if(int value; get_input(command, value))
-            SUANPAN_NUM_THREADS = value;
+        if(int value; get_input(command, value)) SUANPAN_NUM_THREADS = value;
         else
             suanpan_error("A valid value is required.\n");
 
         return SUANPAN_SUCCESS;
     }
     if(is_equal(property_id, "num_nodes")) {
-        if(int value; get_input(command, value))
-            SUANPAN_NUM_NODES = value;
+        if(int value; get_input(command, value)) SUANPAN_NUM_NODES = value;
         else
             suanpan_error("A valid value is required.\n");
 
         return SUANPAN_SUCCESS;
     }
     if(is_equal(property_id, "screen_output")) {
-        if(string value; get_input(command, value))
-            SUANPAN_PRINT = is_true(value);
+        if(string value; get_input(command, value)) SUANPAN_PRINT = is_true(value);
         else
             suanpan_error("A valid value is required.\n");
 
         return SUANPAN_SUCCESS;
     }
     if(is_equal(property_id, "verbose_output")) {
-        if(string value; get_input(command, value))
-            SUANPAN_VERBOSE = is_true(value);
+        if(string value; get_input(command, value)) SUANPAN_VERBOSE = is_true(value);
         else
             suanpan_error("A valid value is required.\n");
 
