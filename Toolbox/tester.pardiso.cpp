@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+#include <iostream>
 #ifdef SUANPAN_MKL
 
 #include <cstdio>
@@ -86,13 +87,13 @@ void run() {
     MPI_Intercomm_merge(worker, 0, &remote);
     MPI_Bcast(&config, 8, MPI_INT, 0, remote);
 
-    std::unique_ptr<MPI_Request[]> requests(new MPI_Request[5]);
+    MPI_Request requests[5];
     MPI_Isend(&iparm, 64, MPI_INT, 0, 0, worker, &requests[0]);
     MPI_Isend(ia.get(), n + 1, MPI_INT, 0, 0, worker, &requests[1]);
     MPI_Isend(ja.get(), nnz, MPI_INT, 0, 0, worker, &requests[2]);
     MPI_Isend(a.get(), nnz, MPI_DOUBLE, 0, 0, worker, &requests[3]);
     MPI_Isend(b.get(), n, MPI_DOUBLE, 0, 0, worker, &requests[4]);
-    MPI_Waitall(5, requests.get(), MPI_STATUSES_IGNORE);
+    MPI_Waitall(5, requests, MPI_STATUSES_IGNORE);
 
     int error = -1;
     MPI_Recv(&error, 1, MPI_INT, 0, 0, worker, MPI_STATUS_IGNORE);
@@ -104,7 +105,10 @@ void run() {
 int main(int argc, char* argv[]) {
     MPI_Init(&argc, &argv);
 
-    for(auto I = 0; I < 10; ++I) run();
+    for(auto I = 0; I < 10; ++I) {
+        std::cout << "run " << I << '\n';
+        run();
+    }
 
     MPI_Finalize();
 

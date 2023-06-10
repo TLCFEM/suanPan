@@ -78,13 +78,13 @@ int main(int argc, char** argv) {
     x = std::make_unique<double[]>(nb);
 
     if(0 == rank) {
-        std::unique_ptr<MPI_Request[]> requests(new MPI_Request[5]);
+        MPI_Request requests[5];
         MPI_Irecv(&iparm, 64, MPI_INT, 0, 0, parent, &requests[0]);
         MPI_Irecv(ia.get(), np, MPI_INT, 0, 0, parent, &requests[1]);
         MPI_Irecv(ja.get(), *nnz, MPI_INT, 0, 0, parent, &requests[2]);
         MPI_Irecv(a.get(), *nnz, *float_type > 0 ? MPI_DOUBLE : MPI_FLOAT, 0, 0, parent, &requests[3]);
         MPI_Irecv(b.get(), nb, *float_type > 0 ? MPI_DOUBLE : MPI_FLOAT, 0, 0, parent, &requests[4]);
-        MPI_Waitall(5, requests.get(), MPI_STATUSES_IGNORE);
+        MPI_Waitall(5, requests, MPI_STATUSES_IGNORE);
 
         iparm[0] = 1;                      /* Solver default parameters overriden with provided by iparm */
         iparm[1] = 2;                      /* Use METIS for fill-in reordering */
