@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
     SetConsoleOutputCP(CP_UTF8);
 #endif
 
-    MPI_Init(&argc, &argv);
+    MPI_Init(nullptr, nullptr);
 
 #ifdef SUANPAN_DEBUG
     argument_parser(argc, argv);

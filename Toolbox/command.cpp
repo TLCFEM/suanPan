@@ -70,6 +70,7 @@ using std::string;
 using std::vector;
 
 int SUANPAN_NUM_THREADS = std::max(1, static_cast<int>(std::thread::hardware_concurrency()));
+int SUANPAN_NUM_NODES = SUANPAN_NUM_THREADS;
 fs::path SUANPAN_OUTPUT = fs::current_path();
 extern fs::path SUANPAN_EXE;
 
@@ -1304,21 +1305,32 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
         return SUANPAN_SUCCESS;
     }
     if(is_equal(property_id, "num_threads")) {
-        if(int value; get_input(command, value)) SUANPAN_NUM_THREADS = value;
+        if(int value; get_input(command, value))
+            SUANPAN_NUM_THREADS = value;
+        else
+            suanpan_error("A valid value is required.\n");
+
+        return SUANPAN_SUCCESS;
+    }
+    if(is_equal(property_id, "num_nodes")) {
+        if(int value; get_input(command, value))
+            SUANPAN_NUM_NODES = value;
         else
             suanpan_error("A valid value is required.\n");
 
         return SUANPAN_SUCCESS;
     }
     if(is_equal(property_id, "screen_output")) {
-        if(string value; get_input(command, value)) SUANPAN_PRINT = is_true(value);
+        if(string value; get_input(command, value))
+            SUANPAN_PRINT = is_true(value);
         else
             suanpan_error("A valid value is required.\n");
 
         return SUANPAN_SUCCESS;
     }
     if(is_equal(property_id, "verbose_output")) {
-        if(string value; get_input(command, value)) SUANPAN_VERBOSE = is_true(value);
+        if(string value; get_input(command, value))
+            SUANPAN_VERBOSE = is_true(value);
         else
             suanpan_error("A valid value is required.\n");
 
@@ -1556,6 +1568,8 @@ int print_info(const shared_ptr<DomainBase>& domain, istringstream& command) {
         suanpan_info("{}\n", SUANPAN_OUTPUT.generic_string());
     else if(is_equal(object_type, "num_threads"))
         suanpan_info("SUANPAN_NUM_THREADS: {}\n", SUANPAN_NUM_THREADS);
+    else if(is_equal(object_type, "num_nodes"))
+        suanpan_info("SUANPAN_NUM_NODES: {}\n", SUANPAN_NUM_NODES);
     else if(is_equal(object_type, "statistics") || is_equal(object_type, "stats")) {
         suanpan_info("\nUpdating element trial status used:\n\t{:.5E} s.", domain->stats<Statistics::UpdateStatus>());
         suanpan_info("\nAssembling global vector used:\n\t{:.5E} s.", domain->stats<Statistics::AssembleVector>());
