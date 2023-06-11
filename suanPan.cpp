@@ -22,6 +22,14 @@
 #include <Windows.h>
 #endif
 
+#ifdef SUANPAN_MPI
+#include <mpi.h>
+#else
+int MPI_Init_thread(int*, char***, int, int*) { return 0; }
+
+int MPI_Finalize() { return 0; }
+#endif
+
 // ReSharper disable once CppParameterMayBeConst
 int main(int argc, char** argv) {
 #ifdef SUANPAN_WIN
@@ -32,12 +40,17 @@ int main(int argc, char** argv) {
     SetConsoleOutputCP(CP_UTF8);
 #endif
 
+    int provided;
+    MPI_Init_thread(nullptr, nullptr, 1, &provided);
+
 #ifdef SUANPAN_DEBUG
     argument_parser(argc, argv);
 #else
     try { argument_parser(argc, argv); }
     catch(const std::exception& e) { suanpan_fatal("Some unexpected error happens: {}, please file a bug report via https://github.com/TLCFEM/suanPan/issues.\n", e.what()); }
 #endif
+
+    MPI_Finalize();
 
     return SUANPAN_SUCCESS;
 }

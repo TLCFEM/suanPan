@@ -12,6 +12,7 @@
 #include "SparseMatCUDA.hpp"
 #include "SparseMatFGMRES.hpp"
 #include "SparseMatMUMPS.hpp"
+#include "SparseMatMPI.hpp"
 #include "SparseMatPARDISO.hpp"
 #include "SparseMatSuperLU.hpp"
 #include "SparseMatMAGMA.hpp"

@@ -46,6 +46,8 @@ set(mumps_mod
         slr_core.F
         smumps_comm_buffer.F
         )
+set(mumps_mpi_c elapse.c mpic.c)
+set(mumps_mpi_f mpi.F)
 
 foreach (mod_src ${mumps_mod})
     foreach (f_src ${mumps_f})
@@ -55,6 +57,10 @@ foreach (mod_src ${mumps_mod})
         endif ()
     endforeach ()
 endforeach ()
+
+list(REMOVE_ITEM mumps_f mpi.F)
+list(REMOVE_ITEM mumps_c elapse.c)
+list(REMOVE_ITEM mumps_c mpic.c)
 
 set_source_files_properties(dmumps_c.c PROPERTIES COMPILE_DEFINITIONS "MUMPS_ARITH=MUMPS_ARITH_d")
 set_source_files_properties(smumps_c.c PROPERTIES COMPILE_DEFINITIONS "MUMPS_ARITH=MUMPS_ARITH_s")
@@ -67,10 +73,21 @@ add_dependencies(mumps_f_lib mumps_mod_lib)
 add_dependencies(mumps_f_lib metis)
 add_dependencies(mumps_c_lib metis)
 
-add_library(${PROJECT_NAME} ${LIBRARY_TYPE}
-        $<TARGET_OBJECTS:mumps_mod_lib>
-        $<TARGET_OBJECTS:mumps_f_lib>
-        $<TARGET_OBJECTS:mumps_c_lib>)
+if (USE_MPI)
+    add_library(${PROJECT_NAME} ${LIBRARY_TYPE}
+            $<TARGET_OBJECTS:mumps_mod_lib>
+            $<TARGET_OBJECTS:mumps_f_lib>
+            $<TARGET_OBJECTS:mumps_c_lib>)
+else ()
+    add_library(mumps_mpi_f_lib OBJECT ${mumps_mpi_f})
+    add_library(mumps_mpi_c_lib OBJECT ${mumps_mpi_c})
+    add_library(${PROJECT_NAME} ${LIBRARY_TYPE}
+            $<TARGET_OBJECTS:mumps_mod_lib>
+            $<TARGET_OBJECTS:mumps_mpi_f_lib>
+            $<TARGET_OBJECTS:mumps_mpi_c_lib>
+            $<TARGET_OBJECTS:mumps_f_lib>
+            $<TARGET_OBJECTS:mumps_c_lib>)
+endif ()
 
 target_link_libraries(${PROJECT_NAME} metis)
 

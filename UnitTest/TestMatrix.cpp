@@ -165,6 +165,12 @@ template<> SparseMatPARDISO<double> create_new(const u64 N) { return {N, N}; }
 
 template<> SparseMatPARDISO<float> create_new(const u64 N) { return {N, N}; }
 
+#ifdef SUANPAN_MPI
+template<> SparseMatMPIPARDISO<double> create_new(const u64 N) { return {N, N}; }
+
+template<> SparseMatMPIPARDISO<float> create_new(const u64 N) { return {N, N}; }
+#endif
+
 template<> SparseMatFGMRES<double> create_new(const u64 N) { return {N, N}; }
 
 template<> SparseSymmMatFGMRES<double> create_new(const u64 N) { return {N, N}; }
@@ -225,6 +231,9 @@ template<typename T, typename ET> void benchmark_mat_setup(const int I) {
     else if(std::is_same_v<SparseMatSuperLU<ET>, T>) title = "SuperLU ";
 #ifdef SUANPAN_MKL
     else if(std::is_same_v<SparseMatPARDISO<ET>, T>) title = "PARDISO ";
+#ifdef SUANPAN_MPI
+    else if(std::is_same_v<SparseMatMPIPARDISO<ET>, T>) title = "MPI PARDISO ";
+#endif
     else if(std::is_same_v<SparseMatFGMRES<ET>, T>) title = "FGMRES ";
     else if(std::is_same_v<SparseSymmMatFGMRES<ET>, T>) title = "FGMRES Symm ";
 #endif
@@ -322,6 +331,10 @@ TEST_CASE("SparseMatPARDISO", "[Matrix.Sparse]") { test_sparse_mat_setup<double>
 TEST_CASE("SparseMatPARDISOFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<float>(create_new<SparseMatPARDISO<float>>); }
 
 TEST_CASE("SparseMatFGMRES", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatFGMRES<double>>); }
+
+#ifdef SUANPAN_MPI
+TEST_CASE("SparseMatMPIPARDISO", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatMPIPARDISO<double>>); }
+#endif
 #endif
 
 #ifdef SUANPAN_CUDA
