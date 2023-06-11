@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include <iostream>
 #ifdef SUANPAN_MKL
 
 #include <cstdio>
 #include <mpi.h>
 #include <memory>
+#include <iostream>
 
 void run() {
     constexpr int NUM_NODE = 6;
@@ -117,6 +117,6 @@ int main(int argc, char* argv[]) {
 
 #else
 
-int main(int argc, char* argv[]) { return 0; }
+int main(int, char**) { return 0; }
 
 #endif
