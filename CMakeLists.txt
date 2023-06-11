@@ -133,6 +133,7 @@ if (USE_MPI)
     else ()
         target_link_libraries(${PROJECT_NAME} impi impicxx)
     endif ()
+    add_dependencies(${PROJECT_NAME} solver.pardiso)
 endif ()
 
 if (COMPILER_IDENTIFIER MATCHES "(linux|mac)")
