@@ -4,6 +4,8 @@ project(superlumt C)
 
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../../Libs)
 
+include(../../Driver.cmake)
+
 file(GLOB SUPERLUMT_SRC "*.c")
 
 add_compile_definitions(NDEBUG)
@@ -14,12 +16,10 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     add_compile_definitions(__OPENMP)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W0 /openmp")
     set_source_files_properties(await.c PROPERTIES COMPILE_FLAGS "/Od")
-    link_libraries(libopenblas)
 else ()
     add_compile_definitions(__PTHREAD)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
     set_source_files_properties(await.c PROPERTIES COMPILE_FLAGS "-O0")
-    link_libraries(pthread gfortran quadmath openblas)
 endif ()
 
 add_library(${PROJECT_NAME} ${LIBRARY_TYPE} ${SUPERLUMT_SRC})
