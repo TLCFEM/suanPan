@@ -7,7 +7,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\Toolbox\solver.pardiso.cpp">
+    <ClCompile Include="..\..\..\MPI\solver.pardiso.cpp">
       <Filter>SRC</Filter>
     </ClCompile>
   </ItemGroup>
