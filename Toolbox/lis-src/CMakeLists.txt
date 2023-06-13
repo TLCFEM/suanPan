@@ -10,6 +10,8 @@ file(GLOB_RECURSE lis_src **/*.c)
 
 include_directories(include)
 
+add_compile_definitions(USE_VEC_COMP)
+
 if (USE_MPI)
     add_compile_definitions(USE_MPI)
 endif ()
