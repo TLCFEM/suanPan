@@ -24,7 +24,6 @@
    POSSIBILITY OF SUCH DAMAGE.
 */
 
-
 #ifndef __LIS_PRECISION_H__
 #define __LIS_PRECISION_H__
 
@@ -35,7 +34,7 @@
 #define SPLITTER 134217729.0
 
 #ifndef USE_QUAD_PRECISION
-	#define LIS_QUAD_DECLAR			
+#define LIS_QUAD_DECLAR			
 #else
 #ifdef USE_SSE2
 	#define LIS_QUAD_DECLAR __m128d bh,ch,sh,wh,th,bl,cl,sl,wl,tl,p1,p2,t0,t1,t2,eh
@@ -116,8 +115,7 @@
 #define LIS_QUAD_SPLIT(b,b_hi,b_lo)   \
 				tq     = SPLITTER * (b); \
 				(b_hi) = tq - (tq-(b));  \
-				(b_lo) = (b) - (b_hi);   \
-
+				(b_lo) = (b) - (b_hi);
 /**********************************************************
  * LIS_QUAD_TWO_PROD(a,b,r,e)                             *
  **********************************************************
@@ -1019,11 +1017,7 @@
 				LIS_QUAD_ADD2_SSE2_CORE; \
 				LIS_QUAD_ADD2_SSE2_STORE((d_hi),(d_lo))
 
-
-
-
-
-extern double *lis_quad_scalar_tmp;
+extern double* lis_quad_scalar_tmp;
 
 #define LIS_QUAD_SCALAR_MALLOC(s,pos,num) \
 				(s).hi = &lis_quad_scalar_tmp[2*(pos)]; \
@@ -1034,22 +1028,22 @@ extern "C"
 {
 #endif
 
-extern void lis_quad_x87_fpu_init(LIS_UNSIGNED_INT *cw_old);
+extern void lis_quad_x87_fpu_init(LIS_UNSIGNED_INT* cw_old);
 extern void lis_quad_x87_fpu_finalize(LIS_UNSIGNED_INT cw);
 
-extern void lis_quad_minus(LIS_QUAD *a);
-extern void lis_quad_zero(LIS_QUAD *a);
-extern void lis_quad_one(LIS_QUAD *a);
-extern void lis_quad_min(LIS_QUAD *a, LIS_QUAD *b, LIS_QUAD *c);
-extern void lis_quad_max(LIS_QUAD *a, LIS_QUAD *b, LIS_QUAD *c);
+extern void lis_quad_minus(LIS_QUAD* a);
+extern void lis_quad_zero(LIS_QUAD* a);
+extern void lis_quad_one(LIS_QUAD* a);
+extern void lis_quad_min(LIS_QUAD* a, LIS_QUAD* b, LIS_QUAD* c);
+extern void lis_quad_max(LIS_QUAD* a, LIS_QUAD* b, LIS_QUAD* c);
 
-extern void lis_quad_add(LIS_QUAD *a, const LIS_QUAD *b, const LIS_QUAD *c);
-extern void lis_quad_sub(LIS_QUAD *a, const LIS_QUAD *b, const LIS_QUAD *c);
-extern void lis_quad_mul(LIS_QUAD *a, const LIS_QUAD *b, const LIS_QUAD *c);
-extern void lis_quad_mul_dd_d(LIS_QUAD *a, const LIS_QUAD *b, const double c);
-extern void lis_quad_sqr(LIS_QUAD *a, const LIS_QUAD *b);
-extern void lis_quad_div(LIS_QUAD *a, const LIS_QUAD *b, const LIS_QUAD *c);
-extern LIS_INT  lis_quad_sqrt(LIS_QUAD *a, const LIS_QUAD *b);
+extern void lis_quad_add(LIS_QUAD* a, const LIS_QUAD* b, const LIS_QUAD* c);
+extern void lis_quad_sub(LIS_QUAD* a, const LIS_QUAD* b, const LIS_QUAD* c);
+extern void lis_quad_mul(LIS_QUAD* a, const LIS_QUAD* b, const LIS_QUAD* c);
+extern void lis_quad_mul_dd_d(LIS_QUAD* a, const LIS_QUAD* b, const double c);
+extern void lis_quad_sqr(LIS_QUAD* a, const LIS_QUAD* b);
+extern void lis_quad_div(LIS_QUAD* a, const LIS_QUAD* b, const LIS_QUAD* c);
+extern LIS_INT lis_quad_sqrt(LIS_QUAD* a, const LIS_QUAD* b);
 
 #ifdef __cplusplus
 }

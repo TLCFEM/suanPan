@@ -55,84 +55,78 @@
 
 #undef __FUNC__
 #define __FUNC__ "lis_precon_create_ssor"
-LIS_INT lis_precon_create_ssor(LIS_SOLVER solver, LIS_PRECON precon)
-{
-	LIS_INT	err;
-	LIS_SCALAR w;
-	LIS_MATRIX A;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_precon_create_ssor(LIS_SOLVER solver, LIS_PRECON precon) {
+    LIS_INT err;
+    LIS_SCALAR w;
+    LIS_MATRIX A;
 
-	A   = solver->A;
-	w   = solver->params[LIS_PARAMS_SSOR_OMEGA-LIS_OPTIONS_LEN];
+    LIS_DEBUG_FUNC_IN;
 
-	err = lis_matrix_convert_self(solver);
-	if( err ) return err;
+    A = solver->A;
+    w = solver->params[LIS_PARAMS_SSOR_OMEGA - LIS_OPTIONS_LEN];
 
-	err = lis_matrix_split(A);
-	if( err )
-	{
-		return err;
-	}
-	if( A->use_wd!=LIS_SOLVER_SOR )
-	{
-		if( !A->WD )
-		{
-			err = lis_matrix_diag_duplicate(A->D,&A->WD);
-			if( err ) return err;
-		}
-		lis_matrix_diag_copy(A->D,A->WD);
-		lis_matrix_diag_scale(w,A->WD);
-		lis_matrix_diag_inverse(A->WD);
-		A->use_wd = LIS_SOLVER_SOR;
-	}
+    err = lis_matrix_convert_self(solver);
+    if(err) return err;
 
-	precon->A       = A;
-	precon->is_copy = LIS_FALSE;
+    err = lis_matrix_split(A);
+    if(err) { return err; }
+    if(A->use_wd != LIS_SOLVER_SOR) {
+        if(!A->WD) {
+            err = lis_matrix_diag_duplicate(A->D, &A->WD);
+            if(err) return err;
+        }
+        lis_matrix_diag_copy(A->D, A->WD);
+        lis_matrix_diag_scale(w, A->WD);
+        lis_matrix_diag_inverse(A->WD);
+        A->use_wd = LIS_SOLVER_SOR;
+    }
 
-	LIS_DEBUG_FUNC_OUT;
+    precon->A = A;
+    precon->is_copy = LIS_FALSE;
+
+    LIS_DEBUG_FUNC_OUT;
     return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_psolve_ssor"
-LIS_INT lis_psolve_ssor(LIS_SOLVER solver, LIS_VECTOR B, LIS_VECTOR X)
-{
-	LIS_MATRIX A;
 
-	/*
-	 *  Mx = b
-	 *  M  = (D/w + L) * (I + w*D^-1 * U)
-	 */
+LIS_INT lis_psolve_ssor(LIS_SOLVER solver, LIS_VECTOR B, LIS_VECTOR X) {
+    LIS_MATRIX A;
 
-	LIS_DEBUG_FUNC_IN;
+    /*
+     *  Mx = b
+     *  M  = (D/w + L) * (I + w*D^-1 * U)
+     */
 
-	A = solver->precon->A;
+    LIS_DEBUG_FUNC_IN;
 
-	lis_matrix_solve(A,B,X,LIS_MATRIX_SSOR);
+    A = solver->precon->A;
 
+    lis_matrix_solve(A, B, X,LIS_MATRIX_SSOR);
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_psolveh_ssor"
-LIS_INT lis_psolveh_ssor(LIS_SOLVER solver, LIS_VECTOR B, LIS_VECTOR X)
-{
-	LIS_MATRIX A;
 
-	/*
-	 *  M'x = b
-	 *  M'  = (I + U' * w*D^-1) * (D/w + L')
-	 */
+LIS_INT lis_psolveh_ssor(LIS_SOLVER solver, LIS_VECTOR B, LIS_VECTOR X) {
+    LIS_MATRIX A;
 
-	LIS_DEBUG_FUNC_IN;
+    /*
+     *  M'x = b
+     *  M'  = (I + U' * w*D^-1) * (D/w + L')
+     */
 
-	A = solver->precon->A;
+    LIS_DEBUG_FUNC_IN;
 
-	lis_matrix_solveh(A,B,X,LIS_MATRIX_SSOR);
+    A = solver->precon->A;
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    lis_matrix_solveh(A, B, X,LIS_MATRIX_SSOR);
+
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }

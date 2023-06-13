@@ -70,212 +70,195 @@
 #define NWORK 2
 #undef __FUNC__
 #define __FUNC__ "lis_eii_check_params"
-LIS_INT lis_eii_check_params(LIS_ESOLVER esolver)
-{
-	LIS_DEBUG_FUNC_IN;
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+
+LIS_INT lis_eii_check_params(LIS_ESOLVER esolver) {
+    LIS_DEBUG_FUNC_IN;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_eii_malloc_work"
-LIS_INT lis_eii_malloc_work(LIS_ESOLVER esolver)
-{
-	LIS_VECTOR *work;
-	LIS_INT	i,j,worklen,err;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_eii_malloc_work(LIS_ESOLVER esolver) {
+    LIS_VECTOR* work;
+    LIS_INT i, j, worklen, err;
 
-	worklen = NWORK;
-	work    = (LIS_VECTOR *)lis_malloc( worklen*sizeof(LIS_VECTOR),"lis_eii_malloc_work::work" );
-	if( work==NULL )
-	{
-		LIS_SETERR_MEM(worklen*sizeof(LIS_VECTOR));
-		return LIS_ERR_OUT_OF_MEMORY;
-	}
-	if( esolver->eprecision==LIS_PRECISION_DEFAULT )
-	{
-		for(i=0;i<worklen;i++)
-		{
-			err = lis_vector_duplicate(esolver->A,&work[i]);
-			if( err ) break;
-		}
-	}
-	else
-	{
-		for(i=0;i<worklen;i++)
-		{
-			err = lis_vector_duplicateex(LIS_PRECISION_QUAD,esolver->A,&work[i]);
-			if( err ) break;
-		}
-	}
-	if( i<worklen )
-	{
-		for(j=0;j<i;j++) lis_vector_destroy(work[j]);
-		lis_free(work);
-		return err;
-	}
-	esolver->worklen = worklen;
-	esolver->work    = work;
+    LIS_DEBUG_FUNC_IN;
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    worklen = NWORK;
+    work = (LIS_VECTOR*)lis_malloc(worklen * sizeof(LIS_VECTOR), "lis_eii_malloc_work::work");
+    if(work == NULL) {
+        LIS_SETERR_MEM(worklen*sizeof(LIS_VECTOR));
+        return LIS_ERR_OUT_OF_MEMORY;
+    }
+    if(esolver->eprecision == LIS_PRECISION_DEFAULT) {
+        for(i = 0; i < worklen; i++) {
+            err = lis_vector_duplicate(esolver->A, &work[i]);
+            if(err) break;
+        }
+    }
+    else {
+        for(i = 0; i < worklen; i++) {
+            err = lis_vector_duplicateex(LIS_PRECISION_QUAD, esolver->A, &work[i]);
+            if(err) break;
+        }
+    }
+    if(i < worklen) {
+        for(j = 0; j < i; j++) lis_vector_destroy(work[j]);
+        lis_free(work);
+        return err;
+    }
+    esolver->worklen = worklen;
+    esolver->work = work;
+
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_eii"
-LIS_INT lis_eii(LIS_ESOLVER esolver)
-{
-  LIS_Comm comm;  
-  LIS_MATRIX A;
-  LIS_VECTOR v;
-  LIS_SCALAR theta;  
-  LIS_SCALAR oshift,ishift;
-  LIS_INT emaxiter;
-  LIS_REAL tol;
-  LIS_INT iter,iter2,output;
-  LIS_REAL nrm2,resid;
-  LIS_VECTOR y,q;
-  LIS_SOLVER solver;
-  double time,itime,ptime,p_c_time,p_i_time;
 
-  LIS_INT err;
-  LIS_PRECON precon;
-  LIS_INT nsol, precon_type;
-  char solvername[128], preconname[128];
+LIS_INT lis_eii(LIS_ESOLVER esolver) {
+    LIS_Comm comm;
+    LIS_MATRIX A;
+    LIS_VECTOR v;
+    LIS_SCALAR theta;
+    LIS_SCALAR oshift, ishift;
+    LIS_INT emaxiter;
+    LIS_REAL tol;
+    LIS_INT iter, iter2, output;
+    LIS_REAL nrm2, resid;
+    LIS_VECTOR y, q;
+    LIS_SOLVER solver;
+    double time, itime, ptime, p_c_time, p_i_time;
 
-  LIS_DEBUG_FUNC_IN;
+    LIS_INT err;
+    LIS_PRECON precon;
+    LIS_INT nsol, precon_type;
+    char solvername[128], preconname[128];
 
-  comm = LIS_COMM_WORLD;
+    LIS_DEBUG_FUNC_IN;
 
-  emaxiter = esolver->options[LIS_EOPTIONS_MAXITER];
-  tol = esolver->params[LIS_EPARAMS_RESID - LIS_EOPTIONS_LEN];
+    comm = LIS_COMM_WORLD;
+
+    emaxiter = esolver->options[LIS_EOPTIONS_MAXITER];
+    tol = esolver->params[LIS_EPARAMS_RESID - LIS_EOPTIONS_LEN];
 #ifdef _COMPLEX
   oshift = esolver->params[LIS_EPARAMS_SHIFT - LIS_EOPTIONS_LEN] + esolver->params[LIS_EPARAMS_SHIFT_IM - LIS_EOPTIONS_LEN] * _Complex_I;
 #else
-  oshift = esolver->params[LIS_EPARAMS_SHIFT - LIS_EOPTIONS_LEN];
-#endif	
-  ishift = esolver->ishift;
-  output  = esolver->options[LIS_EOPTIONS_OUTPUT];
+    oshift = esolver->params[LIS_EPARAMS_SHIFT - LIS_EOPTIONS_LEN];
+#endif
+    ishift = esolver->ishift;
+    output = esolver->options[LIS_EOPTIONS_OUTPUT];
 
-  A = esolver->A;
-  v = esolver->x;
-  if (esolver->options[LIS_EOPTIONS_INITGUESS_ONES] ) 
-    {
-      lis_vector_set_all(1.0,v);
-    }
-  y = esolver->work[0];
-  q = esolver->work[1];
+    A = esolver->A;
+    v = esolver->x;
+    if(esolver->options[LIS_EOPTIONS_INITGUESS_ONES]) { lis_vector_set_all(1.0, v); }
+    y = esolver->work[0];
+    q = esolver->work[1];
 
-  if ( esolver->ishift != 0.0 ) oshift = ishift;
-  if ( oshift != 0.0 ) lis_matrix_shift_diagonal(A, oshift);
+    if(esolver->ishift != 0.0) oshift = ishift;
+    if(oshift != 0.0) lis_matrix_shift_diagonal(A, oshift);
 
-  if( output )
-    {
+    if(output) {
 #ifdef _COMPLEX
       lis_printf(comm,"shift                 : (%e, %e)\n", (double)creal(oshift), (double)cimag(oshift));      
 #else
-      lis_printf(comm,"shift                 : %e\n", (double)oshift);
+        lis_printf(comm, "shift                 : %e\n", (double)oshift);
 #endif
     }
-  
-  lis_solver_create(&solver);
-  lis_solver_set_option("-i bicg -p none",solver);
-  err = lis_solver_set_optionC(solver);
-  CHKERR(err);
-  lis_solver_get_solver(solver, &nsol);
-  lis_solver_get_precon(solver, &precon_type);
-  lis_solver_get_solvername(nsol, solvername);
-  lis_solver_get_preconname(precon_type, preconname);
-  if( output )
-    {
-      lis_printf(comm,"linear solver         : %s\n", solvername);
-      lis_printf(comm,"preconditioner        : %s\n", preconname);
+
+    lis_solver_create(&solver);
+    lis_solver_set_option("-i bicg -p none", solver);
+    err = lis_solver_set_optionC(solver);
+    CHKERR(err);
+    lis_solver_get_solver(solver, &nsol);
+    lis_solver_get_precon(solver, &precon_type);
+    lis_solver_get_solvername(nsol, solvername);
+    lis_solver_get_preconname(precon_type, preconname);
+    if(output) {
+        lis_printf(comm, "linear solver         : %s\n", solvername);
+        lis_printf(comm, "preconditioner        : %s\n", preconname);
     }
 
-  /* create preconditioner */
-  solver->A = A;
-  err = lis_precon_create(solver, &precon);
-  if( err )
-    {
-      lis_solver_work_destroy(solver);
-      solver->retcode = err;
-      return err;
+    /* create preconditioner */
+    solver->A = A;
+    err = lis_precon_create(solver, &precon);
+    if(err) {
+        lis_solver_work_destroy(solver);
+        solver->retcode = err;
+        return err;
     }
 
-  iter=0;
-  while (iter<emaxiter)
-    {
-      iter = iter+1;
+    iter = 0;
+    while(iter < emaxiter) {
+        iter = iter + 1;
 
-      /* v = v / ||v||_2 */
-      lis_vector_nrm2(v, &nrm2);
-      lis_vector_scale(1.0/nrm2, v);
+        /* v = v / ||v||_2 */
+        lis_vector_nrm2(v, &nrm2);
+        lis_vector_scale(1.0 / nrm2, v);
 
-      /* y = A^-1 * v */
-      err = lis_solve_kernel(A, v, y, solver, precon);
-      if( err )
-	{
-	  lis_solver_work_destroy(solver);	  
-	  solver->retcode = err;
-	  return err;
-	}
-      lis_solver_get_iter(solver, &iter2);
+        /* y = A^-1 * v */
+        err = lis_solve_kernel(A, v, y, solver, precon);
+        if(err) {
+            lis_solver_work_destroy(solver);
+            solver->retcode = err;
+            return err;
+        }
+        lis_solver_get_iter(solver, &iter2);
 
-      /* theta = <v,y> */
-      lis_vector_dot(v, y, &theta);
+        /* theta = <v,y> */
+        lis_vector_dot(v, y, &theta);
 
-      /* resid = ||y - theta * v||_2 / |theta| */
-      lis_vector_axpyz(-theta, v, y, q); 
-      lis_vector_nrm2(q, &resid); 
-      resid = resid / fabs(theta);
+        /* resid = ||y - theta * v||_2 / |theta| */
+        lis_vector_axpyz(-theta, v, y, q);
+        lis_vector_nrm2(q, &resid);
+        resid = resid / fabs(theta);
 
-      /* v = y */
-      lis_vector_copy(y, v);
+        /* v = y */
+        lis_vector_copy(y, v);
 
-      /* convergence check */
-      lis_solver_get_timeex(solver,&time,&itime,&ptime,&p_c_time,&p_i_time);
-      esolver->ptime += solver->ptime;
-      esolver->itime += solver->itime;
-      esolver->p_c_time += solver->p_c_time;
-      esolver->p_i_time += solver->p_i_time;
+        /* convergence check */
+        lis_solver_get_timeex(solver, &time, &itime, &ptime, &p_c_time, &p_i_time);
+        esolver->ptime += solver->ptime;
+        esolver->itime += solver->itime;
+        esolver->p_c_time += solver->p_c_time;
+        esolver->p_i_time += solver->p_i_time;
 
-      if( output )
-	{
-	  if( output & LIS_EPRINT_MEM ) esolver->rhistory[iter] = resid;
-	  if( output & LIS_EPRINT_OUT ) lis_print_rhistory(comm,iter,resid);
-	}
+        if(output) {
+            if(output & LIS_EPRINT_MEM) esolver->rhistory[iter] = resid;
+            if(output & LIS_EPRINT_OUT) lis_print_rhistory(comm, iter, resid);
+        }
 
-      if( tol >= resid ) 
-	{
-	  esolver->retcode    = LIS_SUCCESS;
-	  esolver->iter[0]    = iter;
-	  esolver->resid[0]   = resid;
-	  esolver->evalue[0]  = 1.0/theta + oshift;
-	  lis_vector_nrm2(v, &nrm2);
-	  lis_vector_scale(1.0/nrm2, v);
-	  if ( oshift != 0.0 ) lis_matrix_shift_diagonal(A, -oshift);
-	  lis_precon_destroy(precon);
-	  lis_solver_destroy(solver); 
-	  LIS_DEBUG_FUNC_OUT;
-	  return LIS_SUCCESS;
-	}
+        if(tol >= resid) {
+            esolver->retcode = LIS_SUCCESS;
+            esolver->iter[0] = iter;
+            esolver->resid[0] = resid;
+            esolver->evalue[0] = 1.0 / theta + oshift;
+            lis_vector_nrm2(v, &nrm2);
+            lis_vector_scale(1.0 / nrm2, v);
+            if(oshift != 0.0) lis_matrix_shift_diagonal(A, -oshift);
+            lis_precon_destroy(precon);
+            lis_solver_destroy(solver);
+            LIS_DEBUG_FUNC_OUT;
+            return LIS_SUCCESS;
+        }
     }
 
-  lis_precon_destroy(precon);
+    lis_precon_destroy(precon);
 
-  esolver->retcode    = LIS_MAXITER;
-  esolver->iter[0]    = iter;
-  esolver->resid[0]   = resid;
-  esolver->evalue[0]  = 1.0/theta + oshift;
-  lis_vector_nrm2(v, &nrm2);
-  lis_vector_scale(1.0/nrm2, v);
-  if ( oshift != 0.0 ) lis_matrix_shift_diagonal(A, -oshift);
-  lis_solver_destroy(solver); 
-  LIS_DEBUG_FUNC_OUT;
-  return LIS_MAXITER;
+    esolver->retcode = LIS_MAXITER;
+    esolver->iter[0] = iter;
+    esolver->resid[0] = resid;
+    esolver->evalue[0] = 1.0 / theta + oshift;
+    lis_vector_nrm2(v, &nrm2);
+    lis_vector_scale(1.0 / nrm2, v);
+    if(oshift != 0.0) lis_matrix_shift_diagonal(A, -oshift);
+    lis_solver_destroy(solver);
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_MAXITER;
 }
-
 
 /***************************************
  * Generalized Inverse Iteration       *
@@ -300,221 +283,204 @@ LIS_INT lis_eii(LIS_ESOLVER esolver)
 #define NWORK 3
 #undef __FUNC__
 #define __FUNC__ "lis_egii_check_params"
-LIS_INT lis_egii_check_params(LIS_ESOLVER esolver)
-{
-	LIS_DEBUG_FUNC_IN;
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+
+LIS_INT lis_egii_check_params(LIS_ESOLVER esolver) {
+    LIS_DEBUG_FUNC_IN;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_egii_malloc_work"
-LIS_INT lis_egii_malloc_work(LIS_ESOLVER esolver)
-{
-	LIS_VECTOR *work;
-	LIS_INT	i,j,worklen,err;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_egii_malloc_work(LIS_ESOLVER esolver) {
+    LIS_VECTOR* work;
+    LIS_INT i, j, worklen, err;
 
-	worklen = NWORK;
-	work    = (LIS_VECTOR *)lis_malloc( worklen*sizeof(LIS_VECTOR),"lis_egii_malloc_work::work" );
-	if( work==NULL )
-	{
-		LIS_SETERR_MEM(worklen*sizeof(LIS_VECTOR));
-		return LIS_ERR_OUT_OF_MEMORY;
-	}
-	if( esolver->eprecision==LIS_PRECISION_DEFAULT )
-	{
-		for(i=0;i<worklen;i++)
-		{
-			err = lis_vector_duplicate(esolver->A,&work[i]);
-			if( err ) break;
-		}
-	}
-	else
-	{
-		for(i=0;i<worklen;i++)
-		{
-			err = lis_vector_duplicateex(LIS_PRECISION_QUAD,esolver->A,&work[i]);
-			if( err ) break;
-		}
-	}
-	if( i<worklen )
-	{
-		for(j=0;j<i;j++) lis_vector_destroy(work[j]);
-		lis_free(work);
-		return err;
-	}
-	esolver->worklen = worklen;
-	esolver->work    = work;
+    LIS_DEBUG_FUNC_IN;
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    worklen = NWORK;
+    work = (LIS_VECTOR*)lis_malloc(worklen * sizeof(LIS_VECTOR), "lis_egii_malloc_work::work");
+    if(work == NULL) {
+        LIS_SETERR_MEM(worklen*sizeof(LIS_VECTOR));
+        return LIS_ERR_OUT_OF_MEMORY;
+    }
+    if(esolver->eprecision == LIS_PRECISION_DEFAULT) {
+        for(i = 0; i < worklen; i++) {
+            err = lis_vector_duplicate(esolver->A, &work[i]);
+            if(err) break;
+        }
+    }
+    else {
+        for(i = 0; i < worklen; i++) {
+            err = lis_vector_duplicateex(LIS_PRECISION_QUAD, esolver->A, &work[i]);
+            if(err) break;
+        }
+    }
+    if(i < worklen) {
+        for(j = 0; j < i; j++) lis_vector_destroy(work[j]);
+        lis_free(work);
+        return err;
+    }
+    esolver->worklen = worklen;
+    esolver->work = work;
+
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_egii"
-LIS_INT lis_egii(LIS_ESOLVER esolver)
-{
-  LIS_Comm comm;  
-  LIS_MATRIX A,B;
-  LIS_VECTOR v;
-  LIS_SCALAR eta,theta;
-  LIS_SCALAR oshift,ishift;
-  LIS_INT emaxiter;
-  LIS_REAL tol;
-  LIS_INT iter,iter2,output;
-  LIS_REAL nrm2,resid;
-  LIS_VECTOR w,y,q;
-  LIS_SOLVER solver;
-  double time,itime,ptime,p_c_time,p_i_time;
 
-  LIS_INT err;
-  LIS_PRECON precon;
-  LIS_INT nsol, precon_type;
-  char solvername[128], preconname[128];
+LIS_INT lis_egii(LIS_ESOLVER esolver) {
+    LIS_Comm comm;
+    LIS_MATRIX A, B;
+    LIS_VECTOR v;
+    LIS_SCALAR eta, theta;
+    LIS_SCALAR oshift, ishift;
+    LIS_INT emaxiter;
+    LIS_REAL tol;
+    LIS_INT iter, iter2, output;
+    LIS_REAL nrm2, resid;
+    LIS_VECTOR w, y, q;
+    LIS_SOLVER solver;
+    double time, itime, ptime, p_c_time, p_i_time;
 
-  LIS_DEBUG_FUNC_IN;
+    LIS_INT err;
+    LIS_PRECON precon;
+    LIS_INT nsol, precon_type;
+    char solvername[128], preconname[128];
 
-  comm = LIS_COMM_WORLD;
+    LIS_DEBUG_FUNC_IN;
 
-  emaxiter = esolver->options[LIS_EOPTIONS_MAXITER];
-  tol = esolver->params[LIS_EPARAMS_RESID - LIS_EOPTIONS_LEN];
+    comm = LIS_COMM_WORLD;
+
+    emaxiter = esolver->options[LIS_EOPTIONS_MAXITER];
+    tol = esolver->params[LIS_EPARAMS_RESID - LIS_EOPTIONS_LEN];
 #ifdef _COMPLEX
   oshift = esolver->params[LIS_EPARAMS_SHIFT - LIS_EOPTIONS_LEN] + esolver->params[LIS_EPARAMS_SHIFT_IM - LIS_EOPTIONS_LEN] * _Complex_I;
 #else
-  oshift = esolver->params[LIS_EPARAMS_SHIFT - LIS_EOPTIONS_LEN];
-#endif	
-  ishift = esolver->ishift;
-  output  = esolver->options[LIS_EOPTIONS_OUTPUT];
+    oshift = esolver->params[LIS_EPARAMS_SHIFT - LIS_EOPTIONS_LEN];
+#endif
+    ishift = esolver->ishift;
+    output = esolver->options[LIS_EOPTIONS_OUTPUT];
 
-  A = esolver->A;
-  B = esolver->B;  
-  v = esolver->x;
-  if (esolver->options[LIS_EOPTIONS_INITGUESS_ONES] ) 
-    {
-      lis_vector_set_all(1.0,v);
-    }
-  w = esolver->work[0];
-  y = esolver->work[1];
-  q = esolver->work[2];
+    A = esolver->A;
+    B = esolver->B;
+    v = esolver->x;
+    if(esolver->options[LIS_EOPTIONS_INITGUESS_ONES]) { lis_vector_set_all(1.0, v); }
+    w = esolver->work[0];
+    y = esolver->work[1];
+    q = esolver->work[2];
 
-  if ( esolver->ishift != 0.0 ) oshift = ishift;
-  if ( oshift != 0.0 ) lis_matrix_shift_matrix(A, B, oshift);
+    if(esolver->ishift != 0.0) oshift = ishift;
+    if(oshift != 0.0) lis_matrix_shift_matrix(A, B, oshift);
 
-  if( output )
-    {
+    if(output) {
 #ifdef _COMPLEX
       lis_printf(comm,"shift                 : (%e, %e)\n", (double)creal(oshift), (double)cimag(oshift));
 #else
-      lis_printf(comm,"shift                 : %e\n", (double)oshift);
+        lis_printf(comm, "shift                 : %e\n", (double)oshift);
 #endif
     }
-  
-  lis_solver_create(&solver);
-  lis_solver_set_option("-i bicg -p none",solver);
-  err = lis_solver_set_optionC(solver);
-  CHKERR(err);
-  lis_solver_get_solver(solver, &nsol);
-  lis_solver_get_precon(solver, &precon_type);
-  lis_solver_get_solvername(nsol, solvername);
-  lis_solver_get_preconname(precon_type, preconname);
-  if( output )
-    {
-      lis_printf(comm,"linear solver         : %s\n", solvername);
-      lis_printf(comm,"preconditioner        : %s\n", preconname);
+
+    lis_solver_create(&solver);
+    lis_solver_set_option("-i bicg -p none", solver);
+    err = lis_solver_set_optionC(solver);
+    CHKERR(err);
+    lis_solver_get_solver(solver, &nsol);
+    lis_solver_get_precon(solver, &precon_type);
+    lis_solver_get_solvername(nsol, solvername);
+    lis_solver_get_preconname(precon_type, preconname);
+    if(output) {
+        lis_printf(comm, "linear solver         : %s\n", solvername);
+        lis_printf(comm, "preconditioner        : %s\n", preconname);
     }
 
-  /* create preconditioner */
-  solver->A = A;
-  err = lis_precon_create(solver, &precon);
-  if( err )
-    {
-      lis_solver_work_destroy(solver);
-      solver->retcode = err;
-      return err;
+    /* create preconditioner */
+    solver->A = A;
+    err = lis_precon_create(solver, &precon);
+    if(err) {
+        lis_solver_work_destroy(solver);
+        solver->retcode = err;
+        return err;
     }
 
-  iter=0;
-  while (iter<emaxiter)
-    {
-      iter = iter+1;
+    iter = 0;
+    while(iter < emaxiter) {
+        iter = iter + 1;
 
-      /* v = v / ||v||_2 */
-      lis_vector_nrm2(v, &nrm2);
-      lis_vector_scale(1.0/nrm2, v);
+        /* v = v / ||v||_2 */
+        lis_vector_nrm2(v, &nrm2);
+        lis_vector_scale(1.0 / nrm2, v);
 
-      /* w = B * v */
-      lis_matvec(B, v, w);
+        /* w = B * v */
+        lis_matvec(B, v, w);
 
-      /* v = v / <w,v>^1/2, w = w / <w,v>^1/2 */
-      lis_vector_dot(w, v, &eta);
-      eta = sqrt(eta);
-      lis_vector_scale(1.0/eta, v);
-      lis_vector_scale(1.0/eta, w);
+        /* v = v / <w,v>^1/2, w = w / <w,v>^1/2 */
+        lis_vector_dot(w, v, &eta);
+        eta = sqrt(eta);
+        lis_vector_scale(1.0 / eta, v);
+        lis_vector_scale(1.0 / eta, w);
 
-      /* y = A^-1 * w */
-      err = lis_solve_kernel(A, w, y, solver, precon);
-      if( err )
-	{
-	  lis_solver_work_destroy(solver);	  
-	  solver->retcode = err;
-	  return err;
-	}
-      lis_solver_get_iter(solver,&iter2);
+        /* y = A^-1 * w */
+        err = lis_solve_kernel(A, w, y, solver, precon);
+        if(err) {
+            lis_solver_work_destroy(solver);
+            solver->retcode = err;
+            return err;
+        }
+        lis_solver_get_iter(solver, &iter2);
 
-      /* theta = <w,y> */
-      lis_vector_dot(w, y, &theta);
+        /* theta = <w,y> */
+        lis_vector_dot(w, y, &theta);
 
-      /* resid = ||y - theta * v||_2 / |theta| */
+        /* resid = ||y - theta * v||_2 / |theta| */
 
-      lis_vector_axpyz(-theta, v, y, q); 
-      lis_vector_nrm2(q, &resid); 
-      resid = resid / fabs(theta);
+        lis_vector_axpyz(-theta, v, y, q);
+        lis_vector_nrm2(q, &resid);
+        resid = resid / fabs(theta);
 
-      /* v = y */
-      lis_vector_copy(y, v);
+        /* v = y */
+        lis_vector_copy(y, v);
 
-      /* convergence check */
-      lis_solver_get_timeex(solver,&time,&itime,&ptime,&p_c_time,&p_i_time);
-      esolver->ptime += solver->ptime;
-      esolver->itime += solver->itime;
-      esolver->p_c_time += solver->p_c_time;
-      esolver->p_i_time += solver->p_i_time;
+        /* convergence check */
+        lis_solver_get_timeex(solver, &time, &itime, &ptime, &p_c_time, &p_i_time);
+        esolver->ptime += solver->ptime;
+        esolver->itime += solver->itime;
+        esolver->p_c_time += solver->p_c_time;
+        esolver->p_i_time += solver->p_i_time;
 
-      if( output )
-	{
-	  if( output & LIS_EPRINT_MEM ) esolver->rhistory[iter] = resid;
-	  if( output & LIS_EPRINT_OUT ) lis_print_rhistory(comm,iter,resid);
-	}
+        if(output) {
+            if(output & LIS_EPRINT_MEM) esolver->rhistory[iter] = resid;
+            if(output & LIS_EPRINT_OUT) lis_print_rhistory(comm, iter, resid);
+        }
 
-      if( tol >= resid ) 
-	{
-	  esolver->retcode    = LIS_SUCCESS;
-	  esolver->iter[0]    = iter;
-	  esolver->resid[0]   = resid;
-	  esolver->evalue[0]  = 1.0/theta + oshift;
-	  lis_vector_nrm2(v, &nrm2);
-	  lis_vector_scale(1.0/nrm2, v);
-	  if ( oshift != 0.0 ) lis_matrix_shift_matrix(A, B, -oshift);
-	  lis_precon_destroy(precon);
-	  lis_solver_destroy(solver); 
-	  LIS_DEBUG_FUNC_OUT;
-	  return LIS_SUCCESS;
-	}
+        if(tol >= resid) {
+            esolver->retcode = LIS_SUCCESS;
+            esolver->iter[0] = iter;
+            esolver->resid[0] = resid;
+            esolver->evalue[0] = 1.0 / theta + oshift;
+            lis_vector_nrm2(v, &nrm2);
+            lis_vector_scale(1.0 / nrm2, v);
+            if(oshift != 0.0) lis_matrix_shift_matrix(A, B, -oshift);
+            lis_precon_destroy(precon);
+            lis_solver_destroy(solver);
+            LIS_DEBUG_FUNC_OUT;
+            return LIS_SUCCESS;
+        }
     }
 
-  lis_precon_destroy(precon);
+    lis_precon_destroy(precon);
 
-  esolver->retcode    = LIS_MAXITER;
-  esolver->iter[0]    = iter;
-  esolver->resid[0]   = resid;
-  esolver->evalue[0]  = 1.0/theta + oshift;
-  lis_vector_nrm2(v, &nrm2);
-  lis_vector_scale(1.0/nrm2, v);
-  if ( oshift != 0.0 ) lis_matrix_shift_matrix(A, B, -oshift);
-  lis_solver_destroy(solver); 
-  LIS_DEBUG_FUNC_OUT;
-  return LIS_MAXITER;
+    esolver->retcode = LIS_MAXITER;
+    esolver->iter[0] = iter;
+    esolver->resid[0] = resid;
+    esolver->evalue[0] = 1.0 / theta + oshift;
+    lis_vector_nrm2(v, &nrm2);
+    lis_vector_scale(1.0 / nrm2, v);
+    if(oshift != 0.0) lis_matrix_shift_matrix(A, B, -oshift);
+    lis_solver_destroy(solver);
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_MAXITER;
 }
-

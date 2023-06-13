@@ -50,7 +50,6 @@
 #endif
 #include "lislib.h"
 
-
 #ifdef USE_QUAD_PRECISION
 void lis_matvec_csr_mp(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 {
@@ -69,41 +68,41 @@ void lis_matvec_csr_mp(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 	yl    = Y->value_lo;
 	if( A->is_splited )
 	{
-		#ifdef _OPENMP
-		#ifndef USE_SSE2
+#ifdef _OPENMP
+#ifndef USE_SSE2
 			#pragma omp parallel for private(i,j,is,ie,j0,p1,p2,tq,bhi,blo,chi,clo,sh,sl,th,tl,eh,el)
-		#else
+#else
 			#pragma omp parallel for private(i,j,is,ie,j0,bh,ch,sh,wh,th,bl,cl,sl,wl,tl,p1,p2,t0,t1,t2,eh)
-		#endif
-		#endif
+#endif
+#endif
 		for(i=0;i<n;i++)
 		{
-			#ifndef USE_SSE2
+#ifndef USE_SSE2
 				LIS_QUAD_MULD(y[i],yl[i],x[i],xl[i],A->D->value[i]);
-			#else
+#else
 				LIS_QUAD_MULD_SSE2(y[i],yl[i],x[i],xl[i],A->D->value[i]);
-			#endif
+#endif
 			is = A->L->ptr[i];
 			ie = A->L->ptr[i+1];
 			for(j=is;j<ie-0;j+=1)
 			{
 				j0 = A->L->index[j+0];
-				#ifndef USE_SSE2
+#ifndef USE_SSE2
 					LIS_QUAD_FMAD(y[i],yl[i],y[i],yl[i],x[j0],xl[j0],A->L->value[j]);
-				#else
+#else
 					LIS_QUAD_FMAD_SSE2(y[i],yl[i],y[i],yl[i],x[j0],xl[j0],A->L->value[j]);
-				#endif
+#endif
 			}
 			is = A->U->ptr[i];
 			ie = A->U->ptr[i+1];
 			for(j=is;j<ie-0;j+=1)
 			{
 				j0 = A->U->index[j+0];
-				#ifndef USE_SSE2
+#ifndef USE_SSE2
 					LIS_QUAD_FMAD(y[i],yl[i],y[i],yl[i],x[j0],xl[j0],A->U->value[j]);
-				#else
+#else
 					LIS_QUAD_FMAD_SSE2(y[i],yl[i],y[i],yl[i],x[j0],xl[j0],A->U->value[j]);
-				#endif
+#endif
 			}
 		}
 	}
@@ -111,13 +110,13 @@ void lis_matvec_csr_mp(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 	{
 		jj0 = A->index;
 		vv0 = A->value;
-		#ifdef _OPENMP
-		#ifndef USE_SSE2
+#ifdef _OPENMP
+#ifndef USE_SSE2
 			#pragma omp parallel for private(i,j,is,ie,j0,p1,p2,tq,bhi,blo,chi,clo,sh,sl,th,tl,eh,el)
-		#else
+#else
 			#pragma omp parallel for private(i,j,is,ie,j0,bh,ch,sh,wh,th,bl,cl,sl,wl,tl,p1,p2,t0,t1,t2,eh)
-		#endif
-		#endif
+#endif
+#endif
 		for(i=0;i<n;i++)
 		{
 			y[i] = yl[i] = 0.0;
@@ -127,11 +126,11 @@ void lis_matvec_csr_mp(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 			for(j=is;j<ie-0;j+=1)
 			{
 				j0 = jj0[j+0];
-				#ifndef USE_SSE2
+#ifndef USE_SSE2
 					LIS_QUAD_FMAD(y[i],yl[i],y[i],yl[i],x[j0],xl[j0],vv0[j]);
-				#else
+#else
 					LIS_QUAD_FMAD_SSE2(y[i],yl[i],y[i],yl[i],x[j0],xl[j0],vv0[j]);
-				#endif
+#endif
 			}
 		}
 	}
@@ -155,20 +154,20 @@ void lis_matvec_csr_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 	yl    = Y->value_lo;
 	if( A->is_splited )
 	{
-		#ifdef _OPENMP
-		#ifndef USE_SSE2
+#ifdef _OPENMP
+#ifndef USE_SSE2
 			#pragma omp parallel for private(i,j,is,ie,j0,j1,tt,p1,p2,tq,bhi,blo,chi,clo,sh,sl,th,tl,eh,el)
-		#else
+#else
 			#pragma omp parallel for private(i,j,is,ie,j0,j1,tt,bh,ch,sh,wh,th,bl,cl,sl,wl,tl,p1,p2,t0,t1,t2,eh)
-		#endif
-		#endif
+#endif
+#endif
 		for(i=0;i<n;i++)
 		{
-			#ifndef USE_SSE2
+#ifndef USE_SSE2
 				LIS_QUAD_MULD(y[i],yl[i],x[i],xl[i],A->D->value[i]);
-			#else
+#else
 				LIS_QUAD_MULD_SSE2(y[i],yl[i],x[i],xl[i],A->D->value[i]);
-			#endif
+#endif
 
 			tt.hi[0] = tt.hi[1] = tt.lo[0] = tt.lo[1] = 0.0;
 			is = A->L->ptr[i];
@@ -177,16 +176,16 @@ void lis_matvec_csr_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 			{
 				j0 = A->L->index[j+0];
 				j1 = A->L->index[j+1];
-				#ifdef USE_SSE2
+#ifdef USE_SSE2
 					LIS_QUAD_FMAD2_SSE2_LDSD(tt.hi[0],tt.lo[0],tt.hi[0],tt.lo[0],x[j0],xl[j0],x[j1],xl[j1],A->L->value[j]);
-				#endif
+#endif
 			}
 			for(;j<ie;j++)
 			{
 				j0 = A->L->index[j+0];
-				#ifdef USE_SSE2
+#ifdef USE_SSE2
 					LIS_QUAD_FMAD_SSE2(y[i],yl[i],y[i],yl[i],x[j0],xl[j0],A->L->value[j]);
-				#endif
+#endif
 			}
 			is = A->U->ptr[i];
 			ie = A->U->ptr[i+1];
@@ -194,34 +193,34 @@ void lis_matvec_csr_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 			{
 				j0 = A->U->index[j+0];
 				j1 = A->U->index[j+1];
-				#ifdef USE_SSE2
+#ifdef USE_SSE2
 					LIS_QUAD_FMAD2_SSE2_LDSD(tt.hi[0],tt.lo[0],tt.hi[0],tt.lo[0],x[j0],xl[j0],x[j1],xl[j1],A->U->value[j]);
-				#endif
+#endif
 			}
 			for(;j<ie;j++)
 			{
 				j0 = A->U->index[j+0];
-				#ifdef USE_SSE2
+#ifdef USE_SSE2
 					LIS_QUAD_FMAD_SSE2(y[i],yl[i],y[i],yl[i],x[j0],xl[j0],A->U->value[j]);
-				#endif
+#endif
 			}
-			#ifdef USE_SSE2
+#ifdef USE_SSE2
 				LIS_QUAD_ADD_SSE2(y[i],yl[i],y[i],yl[i],tt.hi[0],tt.lo[0]);
 				LIS_QUAD_ADD_SSE2(y[i],yl[i],y[i],yl[i],tt.hi[1],tt.lo[1]);
-			#endif
+#endif
 		}
 	}
 	else
 	{
 		jj0 = A->index;
 		vv0 = A->value;
-		#ifdef _OPENMP
-		#ifndef USE_SSE2
+#ifdef _OPENMP
+#ifndef USE_SSE2
 			#pragma omp parallel for private(i,j,is,ie,j0,j1,tt,p1,p2,tq,bhi,blo,chi,clo,sh,sl,th,tl,eh,el)
-		#else
+#else
 			#pragma omp parallel for private(i,j,is,ie,j0,j1,tt,bh,ch,sh,wh,th,bl,cl,sl,wl,tl,p1,p2,t0,t1,t2,eh)
-		#endif
-		#endif
+#endif
+#endif
 		for(i=0;i<n;i++)
 		{
 			tt.hi[0] = tt.hi[1] = tt.lo[0] = tt.lo[1] = 0.0;
@@ -232,19 +231,19 @@ void lis_matvec_csr_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 			{
 				j0 = jj0[j+0];
 				j1 = jj0[j+1];
-				#ifdef USE_SSE2
+#ifdef USE_SSE2
 					LIS_QUAD_FMAD2_SSE2_LDSD(tt.hi[0],tt.lo[0],tt.hi[0],tt.lo[0],x[j0],xl[j0],x[j1],xl[j1],vv0[j]);
-				#endif
+#endif
 			}
-			#ifdef USE_SSE2
+#ifdef USE_SSE2
 				LIS_QUAD_ADD_SSE2(y[i],yl[i],tt.hi[0],tt.lo[0],tt.hi[1],tt.lo[1]);
-			#endif
+#endif
 			for(;j<ie;j++)
 			{
 				j0 = jj0[j+0];
-				#ifdef USE_SSE2
+#ifdef USE_SSE2
 					LIS_QUAD_FMAD_SSE2(y[i],yl[i],y[i],yl[i],x[j0],xl[j0],vv0[j]);
-				#endif
+#endif
 			}
 		}
 	}
@@ -256,10 +255,10 @@ void lis_matvech_csr_mp(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 	LIS_INT	n,np;
 	LIS_QUAD_PTR tt0;
 	LIS_SCALAR *x,*y,*xl,*yl;
-	#ifdef _OPENMP
+#ifdef _OPENMP
 		LIS_INT k,nprocs;
 		LIS_SCALAR *ww,*wwl;
-	#endif
+#endif
 	LIS_QUAD_DECLAR;
 
 	n    = A->n;
@@ -272,15 +271,15 @@ void lis_matvech_csr_mp(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 	tt0.lo = &X->work[1];
 	if( A->is_splited )
 	{
-		#ifdef _OPENMP
+#ifdef _OPENMP
 			nprocs = omp_get_max_threads();
 			ww  = (LIS_SCALAR *)lis_malloc( 2*nprocs*np*sizeof(LIS_SCALAR),"lis_matvech_csr_mp::ww" );
 			wwl = &ww[nprocs*np];
-			#ifndef USE_SSE2
+#ifndef USE_SSE2
 				#pragma omp parallel private(i,j,js,je,jj,k,p1,p2,tq,bhi,blo,chi,clo,sh,sl,th,tl,eh,el)
-			#else
+#else
 				#pragma omp parallel private(i,j,js,je,jj,k,bh,ch,sh,wh,th,bl,cl,sl,wl,tl,p1,p2,t0,t1,t2,eh)
-			#endif
+#endif
 			{
 				k = omp_get_thread_num();
 				#pragma omp for
@@ -297,51 +296,51 @@ void lis_matvech_csr_mp(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 					for(j=js;j<je;j++)
 					{
 						jj  = k*np+A->L->index[j];
-						#ifndef USE_SSE2
+#ifndef USE_SSE2
 							LIS_QUAD_FMAD(ww[jj],wwl[jj],ww[jj],wwl[jj],x[i],xl[i],A->L->value[j]);
-						#else
+#else
 							LIS_QUAD_FMAD_SSE2(ww[jj],wwl[jj],ww[jj],wwl[jj],x[i],xl[i],A->L->value[j]);
-						#endif
+#endif
 					}
 					js = A->U->ptr[i];
 					je = A->U->ptr[i+1];
 					for(j=js;j<je;j++)
 					{
 						jj  = k*np+A->U->index[j];
-						#ifndef USE_SSE2
+#ifndef USE_SSE2
 						LIS_QUAD_FMAD(ww[jj],wwl[jj],ww[jj],wwl[jj],x[i],xl[i],A->U->value[j]);
-						#else
+#else
 							LIS_QUAD_FMAD_SSE2(ww[jj],wwl[jj],ww[jj],wwl[jj],x[i],xl[i],A->U->value[j]);
-						#endif
+#endif
 					}
 				}
 				#pragma omp for 
 				for(i=0;i<np;i++)
 				{
-					#ifndef USE_SSE2
+#ifndef USE_SSE2
 					LIS_QUAD_MULD(y[i],yl[i],x[i],xl[i],A->D->value[i]);
-					#else
+#else
 						LIS_QUAD_MULD_SSE2(y[i],yl[i],x[i],xl[i],A->D->value[i]);
-					#endif
+#endif
 					for(j=0;j<nprocs;j++)
 					{
-						#ifndef USE_SSE2
+#ifndef USE_SSE2
 							LIS_QUAD_ADD(y[i],yl[i],y[i],yl[i],ww[j*np+i],wwl[j*np+i]);
-						#else
+#else
 							LIS_QUAD_ADD_SSE2(y[i],yl[i],y[i],yl[i],ww[j*np+i],wwl[j*np+i]);
-						#endif
+#endif
 					}
 				}
 			}
 			lis_free(ww);
-		#else
+#else
 			for(i=0; i<np; i++)
 			{
-				#ifndef USE_SSE2
+#ifndef USE_SSE2
 				LIS_QUAD_MULD(y[i],yl[i],x[i],xl[i],A->D->value[i]);
-				#else
+#else
 				LIS_QUAD_MULD_SSE2(y[i],yl[i],x[i],xl[i],A->D->value[i]);
-				#endif
+#endif
 			}
 			for(i=0; i<n; i++)
 			{
@@ -350,37 +349,37 @@ void lis_matvech_csr_mp(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 				for(j=js;j<je;j++)
 				{
 					jj  = A->L->index[j];
-					#ifndef USE_SSE2
+#ifndef USE_SSE2
 						LIS_QUAD_FMAD(y[jj],yl[jj],y[jj],yl[jj],x[i],xl[i],A->L->value[j]);
-					#else
+#else
 						LIS_QUAD_FMAD_SSE2(y[jj],yl[jj],y[jj],yl[jj],x[i],xl[i],A->L->value[j]);
-					#endif
+#endif
 				}
 				js = A->U->ptr[i];
 				je = A->U->ptr[i+1];
 				for(j=js;j<je;j++)
 				{
 					jj  = A->U->index[j];
-					#ifndef USE_SSE2
+#ifndef USE_SSE2
 						LIS_QUAD_FMAD(y[jj],yl[jj],y[jj],yl[jj],x[i],xl[i],A->U->value[j]);
-					#else
+#else
 						LIS_QUAD_FMAD_SSE2(y[jj],yl[jj],y[jj],yl[jj],x[i],xl[i],A->U->value[j]);
-					#endif
+#endif
 				}
 			}
-		#endif
+#endif
 	}
 	else
 	{
-		#ifdef _OPENMP
+#ifdef _OPENMP
 			nprocs = omp_get_max_threads();
 			ww  = (LIS_SCALAR *)lis_malloc( 2*nprocs*np*sizeof(LIS_SCALAR),"lis_matvech_csr_mp::ww" );
 			wwl = &ww[nprocs*np];
-			#ifndef USE_SSE2
+#ifndef USE_SSE2
 				#pragma omp parallel private(i,j,js,je,jj,k,p1,p2,tq,bhi,blo,chi,clo,sh,sl,th,tl,eh,el)
-			#else
+#else
 				#pragma omp parallel private(i,j,js,je,jj,k,bh,ch,sh,wh,th,bl,cl,sl,wl,tl,p1,p2,t0,t1,t2,eh)
-			#endif
+#endif
 			{
 				k = omp_get_thread_num();
 				#pragma omp for
@@ -397,11 +396,11 @@ void lis_matvech_csr_mp(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 					for(j=js;j<je;j++)
 					{
 						jj  = k*np+A->index[j];
-						#ifndef USE_SSE2
+#ifndef USE_SSE2
 							LIS_QUAD_FMAD(ww[jj],wwl[jj],ww[jj],wwl[jj],x[i],xl[i],A->value[j]);
-						#else
+#else
 							LIS_QUAD_FMAD_SSE2(ww[jj],wwl[jj],ww[jj],wwl[jj],x[i],xl[i],A->value[j]);
-						#endif
+#endif
 					}
 				}
 				#pragma omp for 
@@ -410,16 +409,16 @@ void lis_matvech_csr_mp(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 					y[i] = yl[i] = 0.0;
 					for(j=0;j<nprocs;j++)
 					{
-						#ifndef USE_SSE2
+#ifndef USE_SSE2
 							LIS_QUAD_ADD(y[i],yl[i],y[i],yl[i],ww[j*np+i],wwl[j*np+i]);
-						#else
+#else
 							LIS_QUAD_ADD_SSE2(y[i],yl[i],y[i],yl[i],ww[j*np+i],wwl[j*np+i]);
-						#endif
+#endif
 					}
 				}
 			}
 			lis_free(ww);
-		#else
+#else
 			for(i=0; i<np; i++)
 			{
 				y[i]  = 0.0;
@@ -434,14 +433,14 @@ void lis_matvech_csr_mp(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 				for(j=js;j<je;j++)
 				{
 					jj  = A->index[j];
-					#ifndef USE_SSE2
+#ifndef USE_SSE2
 						LIS_QUAD_FMAD(y[jj],yl[jj],y[jj],yl[jj],tt0.hi[0],tt0.lo[0],A->value[j]);
-					#else
+#else
 						LIS_QUAD_FMAD_SSE2(y[jj],yl[jj],y[jj],yl[jj],tt0.hi[0],tt0.lo[0],A->value[j]);
-					#endif
+#endif
 				}
 			}
-		#endif
+#endif
 	}
 }
 
@@ -451,10 +450,10 @@ void lis_matvech_csr_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 	LIS_INT	n,np;
 	LIS_QUAD_PTR tt0;
 	LIS_SCALAR *x,*y,*xl,*yl;
-	#ifdef _OPENMP
+#ifdef _OPENMP
 		LIS_INT k,nprocs;
 		LIS_SCALAR *ww,*wwl;
-	#endif
+#endif
 	LIS_QUAD_DECLAR;
 
 	n    = A->n;
@@ -467,25 +466,25 @@ void lis_matvech_csr_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 	tt0.lo = &X->work[2];
 	if( A->is_splited )
 	{
-		#ifdef _OPENMP
+#ifdef _OPENMP
 			nprocs = omp_get_max_threads();
 			ww  = (LIS_SCALAR *)lis_malloc( 2*nprocs*np*sizeof(LIS_SCALAR), "lis_matvech_csr_mp2::ww" );
 			wwl = &ww[nprocs*np];
-			#ifndef USE_SSE2
+#ifndef USE_SSE2
 				#pragma omp parallel private(i,j,js,je,j0,j1,k,p1,p2,tq,bhi,blo,chi,clo,sh,sl,th,tl,eh,el)
-			#else
+#else
 				#pragma omp parallel private(i,j,js,je,j0,j1,k,bh,ch,sh,wh,th,bl,cl,sl,wl,tl,p1,p2,t0,t1,t2,eh)
-			#endif
+#endif
 			{
 				k = omp_get_thread_num();
 				#pragma omp for
 				for(i=0; i<np; i++)
 				{
-					#ifndef USE_SSE2
+#ifndef USE_SSE2
 					LIS_QUAD_MULD(ww[i],wwl[i],x[i],xl[i],A->D->value[i]);
-					#else
+#else
 					LIS_QUAD_MULD_SSE2(ww[i],wwl[i],x[i],xl[i],A->D->value[i]);
-					#endif
+#endif
 				}
 				#pragma omp for 
 				for(i=0; i<n; i++)
@@ -496,16 +495,16 @@ void lis_matvech_csr_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 					{
 						j0  = k*np + A->L->index[j];
 						j1  = k*np + A->L->index[j+1];
-						#ifdef USE_SSE2
+#ifdef USE_SSE2
 							LIS_QUAD_FMAD2_SSE2_STSD(ww[j0],wwl[j0],ww[j1],wwl[j1],ww[j0],wwl[j0],ww[j1],wwl[j1],x[i],xl[i],x[i],xl[i],A->L->value[j]);
-						#endif
+#endif
 					}
 					for(;j<je;j++)
 					{
 						j0  = A->L->index[j];
-						#ifdef USE_SSE2
+#ifdef USE_SSE2
 							LIS_QUAD_FMAD_SSE2(ww[j0],wwl[j0],ww[j0],wwl[j0],x[i],xl[i],A->L->value[j]);
-						#endif
+#endif
 					}
 					js = A->U->ptr[i];
 					je = A->U->ptr[i+1];
@@ -513,16 +512,16 @@ void lis_matvech_csr_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 					{
 						j0  = k*np + A->U->index[j];
 						j1  = k*np + A->U->index[j+1];
-						#ifdef USE_SSE2
+#ifdef USE_SSE2
 							LIS_QUAD_FMAD2_SSE2_STSD(ww[j0],wwl[j0],ww[j1],wwl[j1],ww[j0],wwl[j0],ww[j1],wwl[j1],x[i],xl[i],x[i],xl[i],A->U->value[j]);
-						#endif
+#endif
 					}
 					for(;j<je;j++)
 					{
 						j0  = A->U->index[j];
-						#ifdef USE_SSE2
+#ifdef USE_SSE2
 							LIS_QUAD_FMAD_SSE2(ww[j0],wwl[j0],ww[j0],wwl[j0],x[i],xl[i],A->U->value[j]);
-						#endif
+#endif
 					}
 				}
 				#pragma omp for 
@@ -531,21 +530,21 @@ void lis_matvech_csr_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 					y[i] = yl[i] = 0.0;
 					for(j=0;j<nprocs;j++)
 					{
-						#ifdef USE_SSE2
+#ifdef USE_SSE2
 							LIS_QUAD_ADD_SSE2(y[i],yl[i],y[i],yl[i],ww[j*np+i],wwl[j*np+i]);
-						#endif
+#endif
 					}
 				}
 			}
 			lis_free(ww);
-		#else
+#else
 			for(i=0; i<np; i++)
 			{
-				#ifndef USE_SSE2
+#ifndef USE_SSE2
 			  	LIS_QUAD_MULD(y[i],yl[i],x[i],xl[i],A->D->value[i]);
-				#else
+#else
 				LIS_QUAD_MULD_SSE2(y[i],yl[i],x[i],xl[i],A->D->value[i]);
-				#endif
+#endif
 			}
 			for(i=0; i<n; i++)
 			{
@@ -555,16 +554,16 @@ void lis_matvech_csr_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 				{
 					j0  = A->L->index[j];
 					j1  = A->L->index[j+1];
-					#ifdef USE_SSE2
+#ifdef USE_SSE2
 						LIS_QUAD_FMAD2_SSE2_STSD(y[j0],yl[j0],y[j1],yl[j1],y[j0],yl[j0],y[j1],yl[j1],x[i],xl[i],x[i],xl[i],A->L->value[j]);
-					#endif
+#endif
 				}
 				for(;j<je;j++)
 				{
 					j0  = A->L->index[j];
-					#ifdef USE_SSE2
+#ifdef USE_SSE2
 						LIS_QUAD_FMAD_SSE2(y[j0],yl[j0],y[j0],yl[j0],tt0.hi[0],tt0.lo[0],A->L->value[j]);
-					#endif
+#endif
 				}
 				js = A->U->ptr[i];
 				je = A->U->ptr[i+1];
@@ -572,31 +571,31 @@ void lis_matvech_csr_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 				{
 					j0  = A->U->index[j];
 					j1  = A->U->index[j+1];
-					#ifdef USE_SSE2
+#ifdef USE_SSE2
 						LIS_QUAD_FMAD2_SSE2_STSD(y[j0],yl[j0],y[j1],yl[j1],y[j0],yl[j0],y[j1],yl[j1],x[i],xl[i],x[i],xl[i],A->U->value[j]);
-					#endif
+#endif
 				}
 				for(;j<je;j++)
 				{
 					j0  = A->U->index[j];
-					#ifdef USE_SSE2
+#ifdef USE_SSE2
 						LIS_QUAD_FMAD_SSE2(y[j0],yl[j0],y[j0],yl[j0],tt0.hi[0],tt0.lo[0],A->U->value[j]);
-					#endif
+#endif
 				}
 			}
-		#endif
+#endif
 	}
 	else
 	{
-		#ifdef _OPENMP
+#ifdef _OPENMP
 			nprocs = omp_get_max_threads();
 			ww  = (LIS_SCALAR *)lis_malloc( 2*nprocs*np*sizeof(LIS_SCALAR), "lis_matvech_csr_mp2::ww" );
 			wwl = &ww[nprocs*np];
-			#ifndef USE_SSE2
+#ifndef USE_SSE2
 				#pragma omp parallel private(i,j,js,je,j0,j1,k,p1,p2,tq,bhi,blo,chi,clo,sh,sl,th,tl,eh,el)
-			#else
+#else
 				#pragma omp parallel private(i,j,js,je,j0,j1,k,bh,ch,sh,wh,th,bl,cl,sl,wl,tl,p1,p2,t0,t1,t2,eh)
-			#endif
+#endif
 			{
 				k = omp_get_thread_num();
 				#pragma omp for
@@ -614,16 +613,16 @@ void lis_matvech_csr_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 					{
 						j0  = k*np + A->index[j];
 						j1  = k*np + A->index[j+1];
-						#ifdef USE_SSE2
+#ifdef USE_SSE2
 							LIS_QUAD_FMAD2_SSE2_STSD(ww[j0],wwl[j0],ww[j1],wwl[j1],ww[j0],wwl[j0],ww[j1],wwl[j1],x[i],xl[i],x[i],xl[i],A->value[j]);
-						#endif
+#endif
 					}
 					for(;j<je;j++)
 					{
 						j0  = A->index[j];
-						#ifdef USE_SSE2
+#ifdef USE_SSE2
 							LIS_QUAD_FMAD_SSE2(ww[j0],wwl[j0],ww[j0],wwl[j0],x[i],xl[i],A->value[j]);
-						#endif
+#endif
 					}
 				}
 				#pragma omp for 
@@ -632,14 +631,14 @@ void lis_matvech_csr_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 					y[i] = yl[i] = 0.0;
 					for(j=0;j<nprocs;j++)
 					{
-						#ifdef USE_SSE2
+#ifdef USE_SSE2
 							LIS_QUAD_ADD_SSE2(y[i],yl[i],y[i],yl[i],ww[j*np+i],wwl[j*np+i]);
-						#endif
+#endif
 					}
 				}
 			}
 			lis_free(ww);
-		#else
+#else
 			for(i=0; i<np; i++)
 			{
 				y[i]  = 0.0;
@@ -653,19 +652,19 @@ void lis_matvech_csr_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 				{
 					j0  = A->index[j];
 					j1  = A->index[j+1];
-					#ifdef USE_SSE2
+#ifdef USE_SSE2
 						LIS_QUAD_FMAD2_SSE2_STSD(y[j0],yl[j0],y[j1],yl[j1],y[j0],yl[j0],y[j1],yl[j1],x[i],xl[i],x[i],xl[i],A->value[j]);
-					#endif
+#endif
 				}
 				for(;j<je;j++)
 				{
 					j0  = A->index[j];
-					#ifdef USE_SSE2
+#ifdef USE_SSE2
 						LIS_QUAD_FMAD_SSE2(y[j0],yl[j0],y[j0],yl[j0],x[i],xl[i],A->value[j]);
-					#endif
+#endif
 				}
 			}
-		#endif
+#endif
 	}
 }
 #endif
@@ -677,10 +676,10 @@ void lis_matvec_csc_mp(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 	LIS_INT	n,np;
 	LIS_QUAD_PTR tt0;
 	LIS_SCALAR *x,*y,*xl,*yl;
-	#ifdef _OPENMP
+#ifdef _OPENMP
 		LIS_INT k,nprocs;
 		LIS_SCALAR *ww,*wwl;
-	#endif
+#endif
 	LIS_QUAD_DECLAR;
 
 	n    = A->n;
@@ -693,15 +692,15 @@ void lis_matvec_csc_mp(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 	tt0.lo = &X->work[1];
 	if( A->is_splited )
 	{
-		#ifdef _OPENMP
+#ifdef _OPENMP
 			nprocs = omp_get_max_threads();
 			ww  = (LIS_SCALAR *)lis_malloc( 2*nprocs*np*sizeof(LIS_SCALAR),"lis_matvec_csr_mp::ww" );
 			wwl = &ww[nprocs*np];
-			#ifndef USE_SSE2
+#ifndef USE_SSE2
 				#pragma omp parallel private(i,j,js,je,jj,k,p1,p2,tq,bhi,blo,chi,clo,sh,sl,th,tl,eh,el)
-			#else
+#else
 				#pragma omp parallel private(i,j,js,je,jj,k,bh,ch,sh,wh,th,bl,cl,sl,wl,tl,p1,p2,t0,t1,t2,eh)
-			#endif
+#endif
 			{
 				k = omp_get_thread_num();
 				#pragma omp for
@@ -718,51 +717,51 @@ void lis_matvec_csc_mp(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 					for(j=js;j<je;j++)
 					{
 						jj  = k*np+A->L->index[j];
-						#ifndef USE_SSE2
+#ifndef USE_SSE2
 							LIS_QUAD_FMAD(ww[jj],wwl[jj],ww[jj],wwl[jj],x[i],xl[i],A->L->value[j]);
-						#else
+#else
 							LIS_QUAD_FMAD_SSE2(ww[jj],wwl[jj],ww[jj],wwl[jj],x[i],xl[i],A->L->value[j]);
-						#endif
+#endif
 					}
 					js = A->U->ptr[i];
 					je = A->U->ptr[i+1];
 					for(j=js;j<je;j++)
 					{
 						jj  = k*np+A->U->index[j];
-						#ifndef USE_SSE2
+#ifndef USE_SSE2
 							LIS_QUAD_FMAD(ww[jj],wwl[jj],ww[jj],wwl[jj],x[i],xl[i],A->U->value[j]);
-						#else
+#else
 							LIS_QUAD_FMAD_SSE2(ww[jj],wwl[jj],ww[jj],wwl[jj],x[i],xl[i],A->U->value[j]);
-						#endif
+#endif
 					}
 				}
 				#pragma omp for 
 				for(i=0;i<n;i++)
 				{
-					#ifndef USE_SSE2
+#ifndef USE_SSE2
 						LIS_QUAD_MULD(y[i],yl[i],x[i],xl[i],A->D->value[i]);
-					#else
+#else
 						LIS_QUAD_MULD_SSE2(y[i],yl[i],x[i],xl[i],A->D->value[i]);
-					#endif
+#endif
 					for(j=0;j<nprocs;j++)
 					{
-						#ifndef USE_SSE2
+#ifndef USE_SSE2
 							LIS_QUAD_ADD(y[i],yl[i],y[i],yl[i],ww[j*np+i],wwl[j*np+i]);
-						#else
+#else
 							LIS_QUAD_ADD_SSE2(y[i],yl[i],y[i],yl[i],ww[j*np+i],wwl[j*np+i]);
-						#endif
+#endif
 					}
 				}
 			}
 			lis_free(ww);
-		#else
+#else
 			for(i=0; i<n; i++)
 			{
-				#ifndef USE_SSE2
+#ifndef USE_SSE2
 					LIS_QUAD_MULD(y[i],yl[i],x[i],xl[i],A->D->value[i]);
-				#else
+#else
 					LIS_QUAD_MULD_SSE2(y[i],yl[i],x[i],xl[i],A->D->value[i]);
-				#endif
+#endif
 			}
 			for(i=0; i<np; i++)
 			{
@@ -771,37 +770,37 @@ void lis_matvec_csc_mp(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 				for(j=js;j<je;j++)
 				{
 					jj  = A->L->index[j];
-					#ifndef USE_SSE2
+#ifndef USE_SSE2
 						LIS_QUAD_FMAD(y[jj],yl[jj],y[jj],yl[jj],x[i],xl[i],A->L->value[j]);
-					#else
+#else
 						LIS_QUAD_FMAD_SSE2(y[jj],yl[jj],y[jj],yl[jj],x[i],xl[i],A->L->value[j]);
-					#endif
+#endif
 				}
 				js = A->U->ptr[i];
 				je = A->U->ptr[i+1];
 				for(j=js;j<je;j++)
 				{
 					jj  = A->U->index[j];
-					#ifndef USE_SSE2
+#ifndef USE_SSE2
 						LIS_QUAD_FMAD(y[jj],yl[jj],y[jj],yl[jj],x[i],xl[i],A->U->value[j]);
-					#else
+#else
 						LIS_QUAD_FMAD_SSE2(y[jj],yl[jj],y[jj],yl[jj],x[i],xl[i],A->U->value[j]);
-					#endif
+#endif
 				}
 			}
-		#endif
+#endif
 	}
 	else
 	{
-		#ifdef _OPENMP
+#ifdef _OPENMP
 			nprocs = omp_get_max_threads();
 			ww  = (LIS_SCALAR *)lis_malloc( 2*nprocs*np*sizeof(LIS_SCALAR),"lis_matvec_csr_mp::ww" );
 			wwl = &ww[nprocs*np];
-			#ifndef USE_SSE2
+#ifndef USE_SSE2
 				#pragma omp parallel private(i,j,js,je,jj,k,p1,p2,tq,bhi,blo,chi,clo,sh,sl,th,tl,eh,el)
-			#else
+#else
 				#pragma omp parallel private(i,j,js,je,jj,k,bh,ch,sh,wh,th,bl,cl,sl,wl,tl,p1,p2,t0,t1,t2,eh)
-			#endif
+#endif
 			{
 				k = omp_get_thread_num();
 				#pragma omp for
@@ -818,11 +817,11 @@ void lis_matvec_csc_mp(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 					for(j=js;j<je;j++)
 					{
 						jj  = k*np+A->L->index[j];
-						#ifndef USE_SSE2
+#ifndef USE_SSE2
 							LIS_QUAD_FMAD(ww[jj],wwl[jj],ww[jj],wwl[jj],x[i],xl[i],A->L->value[j]);
-						#else
+#else
 							LIS_QUAD_FMAD_SSE2(ww[jj],wwl[jj],ww[jj],wwl[jj],x[i],xl[i],A->L->value[j]);
-						#endif
+#endif
 					}
 				}
 				#pragma omp for 
@@ -831,16 +830,16 @@ void lis_matvec_csc_mp(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 					y[i] = yl[i] = 0.0;
 					for(j=0;j<nprocs;j++)
 					{
-						#ifndef USE_SSE2
+#ifndef USE_SSE2
 							LIS_QUAD_ADD(y[i],yl[i],y[i],yl[i],ww[j*np+i],wwl[j*np+i]);
-						#else
+#else
 							LIS_QUAD_ADD_SSE2(y[i],yl[i],y[i],yl[i],ww[j*np+i],wwl[j*np+i]);
-						#endif
+#endif
 					}
 				}
 			}
 			lis_free(ww);
-		#else
+#else
 			for(i=0; i<n; i++)
 			{
 				y[i]  = 0.0;
@@ -855,14 +854,14 @@ void lis_matvec_csc_mp(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 				for(j=js;j<je;j++)
 				{
 					jj  = A->index[j];
-					#ifndef USE_SSE2
+#ifndef USE_SSE2
 						LIS_QUAD_FMAD(y[jj],yl[jj],y[jj],yl[jj],tt0.hi[0],tt0.lo[0],A->value[j]);
-					#else
+#else
 						LIS_QUAD_FMAD_SSE2(y[jj],yl[jj],y[jj],yl[jj],tt0.hi[0],tt0.lo[0],A->value[j]);
-					#endif
+#endif
 				}
 			}
-		#endif
+#endif
 	}
 }
 
@@ -872,10 +871,10 @@ void lis_matvec_csc_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 	LIS_INT	n,np;
 	LIS_QUAD_PTR tt0;
 	LIS_SCALAR *x,*y,*xl,*yl;
-	#ifdef _OPENMP
+#ifdef _OPENMP
 		LIS_INT k,nprocs;
 		LIS_SCALAR *ww,*wwl;
-	#endif
+#endif
 	LIS_QUAD_DECLAR;
 
 	n    = A->n;
@@ -888,15 +887,15 @@ void lis_matvec_csc_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 	tt0.lo = &X->work[2];
 	if( A->is_splited )
 	{
-		#ifdef _OPENMP
+#ifdef _OPENMP
 			nprocs = omp_get_max_threads();
 			ww  = (LIS_SCALAR *)lis_malloc( 2*nprocs*np*sizeof(LIS_SCALAR), "lis_matvec_csr_mp2::ww" );
 			wwl = &ww[nprocs*np];
-			#ifndef USE_SSE2
+#ifndef USE_SSE2
 				#pragma omp parallel private(i,j,js,je,j0,j1,k,p1,p2,tq,bhi,blo,chi,clo,sh,sl,th,tl,eh,el)
-			#else
+#else
 				#pragma omp parallel private(i,j,js,je,j0,j1,k,bh,ch,sh,wh,th,bl,cl,sl,wl,tl,p1,p2,t0,t1,t2,eh)
-			#endif
+#endif
 			{
 				k = omp_get_thread_num();
 				#pragma omp for
@@ -914,16 +913,16 @@ void lis_matvec_csc_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 					{
 						j0  = k*np + A->index[j];
 						j1  = k*np + A->index[j+1];
-						#ifdef USE_SSE2
+#ifdef USE_SSE2
 							LIS_QUAD_FMAD2_SSE2_STSD(ww[j0],wwl[j0],ww[j1],wwl[j1],ww[j0],wwl[j0],ww[j1],wwl[j1],x[i],xl[i],x[i],xl[i],A->value[j]);
-						#endif
+#endif
 					}
 					for(;j<je;j++)
 					{
 						j0  = A->index[j];
-						#ifdef USE_SSE2
+#ifdef USE_SSE2
 							LIS_QUAD_FMAD_SSE2(ww[j0],wwl[j0],ww[j0],wwl[j0],x[i],xl[i],A->value[j]);
-						#endif
+#endif
 					}
 				}
 				#pragma omp for 
@@ -932,21 +931,21 @@ void lis_matvec_csc_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 					y[i] = yl[i] = 0.0;
 					for(j=0;j<nprocs;j++)
 					{
-						#ifdef USE_SSE2
+#ifdef USE_SSE2
 							LIS_QUAD_ADD_SSE2(y[i],yl[i],y[i],yl[i],ww[j*np+i],wwl[j*np+i]);
-						#endif
+#endif
 					}
 				}
 			}
 			lis_free(ww);
-		#else
+#else
 			for(i=0; i<n; i++)
 			{
-				#ifndef USE_SSE2
+#ifndef USE_SSE2
 					LIS_QUAD_MULD(y[i],yl[i],x[i],xl[i],A->D->value[i]);
-				#else
+#else
 					LIS_QUAD_MULD_SSE2(y[i],yl[i],x[i],xl[i],A->D->value[i]);
-				#endif
+#endif
 			}
 			for(i=0; i<np; i++)
 			{
@@ -956,16 +955,16 @@ void lis_matvec_csc_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 				{
 					j0  = A->L->index[j];
 					j1  = A->L->index[j+1];
-					#ifdef USE_SSE2
+#ifdef USE_SSE2
 						LIS_QUAD_FMAD2_SSE2_STSD(y[j0],yl[j0],y[j1],yl[j1],y[j0],yl[j0],y[j1],yl[j1],x[i],xl[i],x[i],xl[i],A->L->value[j]);
-					#endif
+#endif
 				}
 				for(;j<je;j++)
 				{
 					j0  = A->L->index[j];
-					#ifdef USE_SSE2
+#ifdef USE_SSE2
 						LIS_QUAD_FMAD_SSE2(y[j0],yl[j0],y[j0],yl[j0],tt0.hi[0],tt0.lo[0],A->L->value[j]);
-					#endif
+#endif
 				}
 				js = A->U->ptr[i];
 				je = A->U->ptr[i+1];
@@ -973,31 +972,31 @@ void lis_matvec_csc_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 				{
 					j0  = A->U->index[j];
 					j1  = A->U->index[j+1];
-					#ifdef USE_SSE2
+#ifdef USE_SSE2
 						LIS_QUAD_FMAD2_SSE2_STSD(y[j0],yl[j0],y[j1],yl[j1],y[j0],yl[j0],y[j1],yl[j1],x[i],xl[i],x[i],xl[i],A->U->value[j]);
-					#endif
+#endif
 				}
 				for(;j<je;j++)
 				{
 					j0  = A->U->index[j];
-					#ifdef USE_SSE2
+#ifdef USE_SSE2
 						LIS_QUAD_FMAD_SSE2(y[j0],yl[j0],y[j0],yl[j0],tt0.hi[0],tt0.lo[0],A->U->value[j]);
-					#endif
+#endif
 				}
 			}
-		#endif
+#endif
 	}
 	else
 	{
-		#ifdef _OPENMP
+#ifdef _OPENMP
 			nprocs = omp_get_max_threads();
 			ww  = (LIS_SCALAR *)lis_malloc( 2*nprocs*np*sizeof(LIS_SCALAR), "lis_matvec_csr_mp2::ww" );
 			wwl = &ww[nprocs*np];
-			#ifndef USE_SSE2
+#ifndef USE_SSE2
 				#pragma omp parallel private(i,j,js,je,j0,j1,k,p1,p2,tq,bhi,blo,chi,clo,sh,sl,th,tl,eh,el)
-			#else
+#else
 				#pragma omp parallel private(i,j,js,je,j0,j1,k,bh,ch,sh,wh,th,bl,cl,sl,wl,tl,p1,p2,t0,t1,t2,eh)
-			#endif
+#endif
 			{
 				k = omp_get_thread_num();
 				#pragma omp for
@@ -1015,16 +1014,16 @@ void lis_matvec_csc_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 					{
 						j0  = k*np + A->index[j];
 						j1  = k*np + A->index[j+1];
-						#ifdef USE_SSE2
+#ifdef USE_SSE2
 							LIS_QUAD_FMAD2_SSE2_STSD(ww[j0],wwl[j0],ww[j1],wwl[j1],ww[j0],wwl[j0],ww[j1],wwl[j1],x[i],xl[i],x[i],xl[i],A->value[j]);
-						#endif
+#endif
 					}
 					for(;j<je;j++)
 					{
 						j0  = A->index[j];
-						#ifdef USE_SSE2
+#ifdef USE_SSE2
 							LIS_QUAD_FMAD_SSE2(ww[j0],wwl[j0],ww[j0],wwl[j0],x[i],xl[i],A->value[j]);
-						#endif
+#endif
 					}
 				}
 				#pragma omp for 
@@ -1033,14 +1032,14 @@ void lis_matvec_csc_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 					y[i] = yl[i] = 0.0;
 					for(j=0;j<nprocs;j++)
 					{
-						#ifdef USE_SSE2
+#ifdef USE_SSE2
 							LIS_QUAD_ADD_SSE2(y[i],yl[i],y[i],yl[i],ww[j*np+i],wwl[j*np+i]);
-						#endif
+#endif
 					}
 				}
 			}
 			lis_free(ww);
-		#else
+#else
 			for(i=0; i<n; i++)
 			{
 				y[i]  = 0.0;
@@ -1054,19 +1053,19 @@ void lis_matvec_csc_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 				{
 					j0  = A->index[j];
 					j1  = A->index[j+1];
-					#ifdef USE_SSE2
+#ifdef USE_SSE2
 						LIS_QUAD_FMAD2_SSE2_STSD(y[j0],yl[j0],y[j1],yl[j1],y[j0],yl[j0],y[j1],yl[j1],x[i],xl[i],x[i],xl[i],A->value[j]);
-					#endif
+#endif
 				}
 				for(;j<je;j++)
 				{
 					j0  = A->index[j];
-					#ifdef USE_SSE2
+#ifdef USE_SSE2
 						LIS_QUAD_FMAD_SSE2(y[j0],yl[j0],y[j0],yl[j0],x[i],xl[i],A->value[j]);
-					#endif
+#endif
 				}
 			}
-		#endif
+#endif
 	}
 }
 
@@ -1087,41 +1086,41 @@ void lis_matvech_csc_mp(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 	yl    = Y->value_lo;
 	if( A->is_splited )
 	{
-		#ifdef _OPENMP
-		#ifndef USE_SSE2
+#ifdef _OPENMP
+#ifndef USE_SSE2
 			#pragma omp parallel for private(i,j,is,ie,j0,p1,p2,tq,bhi,blo,chi,clo,sh,sl,th,tl,eh,el)
-		#else
+#else
 			#pragma omp parallel for private(i,j,is,ie,j0,bh,ch,sh,wh,th,bl,cl,sl,wl,tl,p1,p2,t0,t1,t2,eh)
-		#endif
-		#endif
+#endif
+#endif
 		for(i=0;i<np;i++)
 		{
-			#ifndef USE_SSE2
+#ifndef USE_SSE2
 		  		LIS_QUAD_MULD(y[i],yl[i],x[i],xl[i],A->D->value[i]);
-			#else
+#else
 				LIS_QUAD_MULD_SSE2(y[i],yl[i],x[i],xl[i],A->D->value[i]);
-			#endif
+#endif
 			is = A->L->ptr[i];
 			ie = A->L->ptr[i+1];
 			for(j=is;j<ie-0;j+=1)
 			{
 				j0 = A->L->index[j+0];
-				#ifndef USE_SSE2
+#ifndef USE_SSE2
 					LIS_QUAD_FMAD(y[i],yl[i],y[i],yl[i],x[j0],xl[j0],A->L->value[j]);
-				#else
+#else
 					LIS_QUAD_FMAD_SSE2(y[i],yl[i],y[i],yl[i],x[j0],xl[j0],A->L->value[j]);
-				#endif
+#endif
 			}
 			is = A->U->ptr[i];
 			ie = A->U->ptr[i+1];
 			for(j=is;j<ie-0;j+=1)
 			{
 				j0 = A->U->index[j+0];
-				#ifndef USE_SSE2
+#ifndef USE_SSE2
 					LIS_QUAD_FMAD(y[i],yl[i],y[i],yl[i],x[j0],xl[j0],A->U->value[j]);
-				#else
+#else
 					LIS_QUAD_FMAD_SSE2(y[i],yl[i],y[i],yl[i],x[j0],xl[j0],A->U->value[j]);
-				#endif
+#endif
 			}
 		}
 	}
@@ -1129,13 +1128,13 @@ void lis_matvech_csc_mp(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 	{
 		jj0 = A->index;
 		vv0 = A->value;
-		#ifdef _OPENMP
-		#ifndef USE_SSE2
+#ifdef _OPENMP
+#ifndef USE_SSE2
 			#pragma omp parallel for private(i,j,is,ie,j0,p1,p2,tq,bhi,blo,chi,clo,sh,sl,th,tl,eh,el)
-		#else
+#else
 			#pragma omp parallel for private(i,j,is,ie,j0,bh,ch,sh,wh,th,bl,cl,sl,wl,tl,p1,p2,t0,t1,t2,eh)
-		#endif
-		#endif
+#endif
+#endif
 		for(i=0;i<np;i++)
 		{
 			y[i] = yl[i] = 0.0;
@@ -1145,11 +1144,11 @@ void lis_matvech_csc_mp(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 			for(j=is;j<ie-0;j+=1)
 			{
 				j0 = jj0[j+0];
-				#ifndef USE_SSE2
+#ifndef USE_SSE2
 					LIS_QUAD_FMAD(y[i],yl[i],y[i],yl[i],x[j0],xl[j0],vv0[j]);
-				#else
+#else
 					LIS_QUAD_FMAD_SSE2(y[i],yl[i],y[i],yl[i],x[j0],xl[j0],vv0[j]);
-				#endif
+#endif
 			}
 		}
 	}
@@ -1173,20 +1172,20 @@ void lis_matvech_csc_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 	yl    = Y->value_lo;
 	if( A->is_splited )
 	{
-		#ifdef _OPENMP
-		#ifndef USE_SSE2
+#ifdef _OPENMP
+#ifndef USE_SSE2
 			#pragma omp parallel for private(i,j,is,ie,j0,j1,tt,p1,p2,tq,bhi,blo,chi,clo,sh,sl,th,tl,eh,el)
-		#else
+#else
 			#pragma omp parallel for private(i,j,is,ie,j0,j1,tt,bh,ch,sh,wh,th,bl,cl,sl,wl,tl,p1,p2,t0,t1,t2,eh)
-		#endif
-		#endif
+#endif
+#endif
 		for(i=0;i<np;i++)
 		{
-			#ifndef USE_SSE2
+#ifndef USE_SSE2
 				LIS_QUAD_MULD(y[i],yl[i],x[i],xl[i],A->D->value[i]);
-			#else
+#else
 				LIS_QUAD_MULD_SSE2(y[i],yl[i],x[i],xl[i],A->D->value[i]);
-			#endif
+#endif
 
 			tt.hi[0] = tt.hi[1] = tt.lo[0] = tt.lo[1] = 0.0;
 			is = A->L->ptr[i];
@@ -1195,16 +1194,16 @@ void lis_matvech_csc_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 			{
 				j0 = A->L->index[j+0];
 				j1 = A->L->index[j+1];
-				#ifdef USE_SSE2
+#ifdef USE_SSE2
 					LIS_QUAD_FMAD2_SSE2_LDSD(tt.hi[0],tt.lo[0],tt.hi[0],tt.lo[0],x[j0],xl[j0],x[j1],xl[j1],A->L->value[j]);
-				#endif
+#endif
 			}
 			for(;j<ie;j++)
 			{
 				j0 = A->L->index[j+0];
-				#ifdef USE_SSE2
+#ifdef USE_SSE2
 					LIS_QUAD_FMAD_SSE2(y[i],yl[i],y[i],yl[i],x[j0],xl[j0],A->L->value[j]);
-				#endif
+#endif
 			}
 			is = A->U->ptr[i];
 			ie = A->U->ptr[i+1];
@@ -1212,34 +1211,34 @@ void lis_matvech_csc_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 			{
 				j0 = A->U->index[j+0];
 				j1 = A->U->index[j+1];
-				#ifdef USE_SSE2
+#ifdef USE_SSE2
 					LIS_QUAD_FMAD2_SSE2_LDSD(tt.hi[0],tt.lo[0],tt.hi[0],tt.lo[0],x[j0],xl[j0],x[j1],xl[j1],A->U->value[j]);
-				#endif
+#endif
 			}
 			for(;j<ie;j++)
 			{
 				j0 = A->U->index[j+0];
-				#ifdef USE_SSE2
+#ifdef USE_SSE2
 					LIS_QUAD_FMAD_SSE2(y[i],yl[i],y[i],yl[i],x[j0],xl[j0],A->U->value[j]);
-				#endif
+#endif
 			}
-			#ifdef USE_SSE2
+#ifdef USE_SSE2
 				LIS_QUAD_ADD_SSE2(y[i],yl[i],y[i],yl[i],tt.hi[0],tt.lo[0]);
 				LIS_QUAD_ADD_SSE2(y[i],yl[i],y[i],yl[i],tt.hi[1],tt.lo[1]);
-			#endif
+#endif
 		}
 	}
 	else
 	{
 		jj0 = A->index;
 		vv0 = A->value;
-		#ifdef _OPENMP
-		#ifndef USE_SSE2
+#ifdef _OPENMP
+#ifndef USE_SSE2
 			#pragma omp parallel for private(i,j,is,ie,j0,j1,tt,p1,p2,tq,bhi,blo,chi,clo,sh,sl,th,tl,eh,el)
-		#else
+#else
 			#pragma omp parallel for private(i,j,is,ie,j0,j1,tt,bh,ch,sh,wh,th,bl,cl,sl,wl,tl,p1,p2,t0,t1,t2,eh)
-		#endif
-		#endif
+#endif
+#endif
 		for(i=0;i<np;i++)
 		{
 			tt.hi[0] = tt.hi[1] = tt.lo[0] = tt.lo[1] = 0.0;
@@ -1250,19 +1249,19 @@ void lis_matvech_csc_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 			{
 				j0 = jj0[j+0];
 				j1 = jj0[j+1];
-				#ifdef USE_SSE2
+#ifdef USE_SSE2
 					LIS_QUAD_FMAD2_SSE2_LDSD(tt.hi[0],tt.lo[0],tt.hi[0],tt.lo[0],x[j0],xl[j0],x[j1],xl[j1],vv0[j]);
-				#endif
+#endif
 			}
-			#ifdef USE_SSE2
+#ifdef USE_SSE2
 				LIS_QUAD_ADD_SSE2(y[i],yl[i],tt.hi[0],tt.lo[0],tt.hi[1],tt.lo[1]);
-			#endif
+#endif
 			for(;j<ie;j++)
 			{
 				j0 = jj0[j+0];
-				#ifdef USE_SSE2
+#ifdef USE_SSE2
 					LIS_QUAD_FMAD_SSE2(y[i],yl[i],y[i],yl[i],x[j0],xl[j0],vv0[j]);
-				#endif
+#endif
 			}
 		}
 	}

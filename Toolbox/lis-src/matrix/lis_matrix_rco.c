@@ -55,527 +55,455 @@
 
 #undef __FUNC__
 #define __FUNC__ "lis_matrix_create_rco"
-LIS_INT lis_matrix_create_rco(LIS_INT local_n, LIS_INT global_n, LIS_Comm comm, LIS_INT annz, LIS_INT *nnz, LIS_MATRIX *Amat)
-{
-	LIS_INT nprocs,my_rank;
-	LIS_INT is,ie,err;
-	LIS_INT i,k;
-	LIS_INT *ranges;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_matrix_create_rco(LIS_INT local_n, LIS_INT global_n, LIS_Comm comm, LIS_INT annz, LIS_INT* nnz, LIS_MATRIX* Amat) {
+    LIS_INT nprocs, my_rank;
+    LIS_INT is, ie, err;
+    LIS_INT i, k;
+    LIS_INT* ranges;
 
-	*Amat = NULL;
+    LIS_DEBUG_FUNC_IN;
 
-	if( global_n>0 && local_n>global_n )
-	{
-		LIS_SETERR2(LIS_ERR_ILL_ARG,"local n(=%D) is larger than global n(=%D)\n",local_n,global_n);
-		return LIS_ERR_ILL_ARG;
-	}
-	if( local_n<0 || global_n<0 )
-	{
-		LIS_SETERR2(LIS_ERR_ILL_ARG,"local n(=%D) or global n(=%D) are less than 0\n",local_n,global_n);
-		return LIS_ERR_ILL_ARG;
-	}
-	if( local_n==0 && global_n==0 )
-	{
-		LIS_SETERR2(LIS_ERR_ILL_ARG,"local n(=%D) and global n(=%D) are 0\n",local_n,global_n);
-		return LIS_ERR_ILL_ARG;
-	}
+    *Amat = NULL;
 
-	*Amat = (LIS_MATRIX)lis_malloc( sizeof(struct LIS_MATRIX_STRUCT),"lis_matrix_create_rco::Amat" );
-	if( NULL==*Amat )
-	{
-		LIS_SETERR_MEM(sizeof(struct LIS_MATRIX_STRUCT));
-		return LIS_OUT_OF_MEMORY;
-	}
-	lis_matrix_init(Amat);
+    if(global_n > 0 && local_n > global_n) {
+        LIS_SETERR2(LIS_ERR_ILL_ARG, "local n(=%D) is larger than global n(=%D)\n", local_n, global_n);
+        return LIS_ERR_ILL_ARG;
+    }
+    if(local_n < 0 || global_n < 0) {
+        LIS_SETERR2(LIS_ERR_ILL_ARG, "local n(=%D) or global n(=%D) are less than 0\n", local_n, global_n);
+        return LIS_ERR_ILL_ARG;
+    }
+    if(local_n == 0 && global_n == 0) {
+        LIS_SETERR2(LIS_ERR_ILL_ARG, "local n(=%D) and global n(=%D) are 0\n", local_n, global_n);
+        return LIS_ERR_ILL_ARG;
+    }
 
-	err = lis_ranges_create(comm,&local_n,&global_n,&ranges,&is,&ie,&nprocs,&my_rank);
-	if( err )
-	{
-		lis_matrix_destroy(*Amat);
-		*Amat = NULL;
-		return err;
-	}
-	(*Amat)->ranges      = ranges;
+    *Amat = (LIS_MATRIX)lis_malloc(sizeof(struct LIS_MATRIX_STRUCT), "lis_matrix_create_rco::Amat");
+    if(NULL == *Amat) {
+        LIS_SETERR_MEM(sizeof(struct LIS_MATRIX_STRUCT));
+        return LIS_OUT_OF_MEMORY;
+    }
+    lis_matrix_init(Amat);
 
-	(*Amat)->w_nnz  = (LIS_INT *)lis_malloc(local_n*sizeof(LIS_INT),"lis_matrix_create_rco::Amat->w_nnz");
-	if( (*Amat)->w_nnz==NULL )
-	{
-		LIS_SETERR_MEM(local_n*sizeof(LIS_INT));
-		return LIS_OUT_OF_MEMORY;
-	}
-	if( nnz==NULL )
-	{
-		(*Amat)->w_annz = annz;
-		for(k=0;k<local_n;k++) (*Amat)->w_nnz[k] = (*Amat)->w_annz;
-	}
-	else
-	{
-		i = 0;
-		for(k=0;k<local_n;k++)
-		{
-			(*Amat)->w_nnz[k]  = nnz[k];
-			i                 += nnz[k];
-		}
-		(*Amat)->w_annz = i/local_n;
-	}
-	err = lis_matrix_malloc_rco(local_n,(*Amat)->w_nnz,&(*Amat)->w_row,&(*Amat)->w_index,&(*Amat)->w_value);
-	if( err )
-	{
-		lis_free((*Amat)->w_nnz);
-		return err;
-	}
-	(*Amat)->status = LIS_MATRIX_ASSEMBLING;
+    err = lis_ranges_create(comm, &local_n, &global_n, &ranges, &is, &ie, &nprocs, &my_rank);
+    if(err) {
+        lis_matrix_destroy(*Amat);
+        *Amat = NULL;
+        return err;
+    }
+    (*Amat)->ranges = ranges;
 
-	(*Amat)->n           = local_n;
-	(*Amat)->gn          = global_n;
-	(*Amat)->np          = local_n;
-	(*Amat)->comm        = comm;
-	(*Amat)->my_rank     = my_rank;
-	(*Amat)->nprocs      = nprocs;
-	(*Amat)->is          = is;
-	(*Amat)->ie          = ie;
+    (*Amat)->w_nnz = (LIS_INT*)lis_malloc(local_n * sizeof(LIS_INT), "lis_matrix_create_rco::Amat->w_nnz");
+    if((*Amat)->w_nnz == NULL) {
+        LIS_SETERR_MEM(local_n*sizeof(LIS_INT));
+        return LIS_OUT_OF_MEMORY;
+    }
+    if(nnz == NULL) {
+        (*Amat)->w_annz = annz;
+        for(k = 0; k < local_n; k++) (*Amat)->w_nnz[k] = (*Amat)->w_annz;
+    }
+    else {
+        i = 0;
+        for(k = 0; k < local_n; k++) {
+            (*Amat)->w_nnz[k] = nnz[k];
+            i += nnz[k];
+        }
+        (*Amat)->w_annz = i / local_n;
+    }
+    err = lis_matrix_malloc_rco(local_n, (*Amat)->w_nnz, &(*Amat)->w_row, &(*Amat)->w_index, &(*Amat)->w_value);
+    if(err) {
+        lis_free((*Amat)->w_nnz);
+        return err;
+    }
+    (*Amat)->status = LIS_MATRIX_ASSEMBLING;
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    (*Amat)->n = local_n;
+    (*Amat)->gn = global_n;
+    (*Amat)->np = local_n;
+    (*Amat)->comm = comm;
+    (*Amat)->my_rank = my_rank;
+    (*Amat)->nprocs = nprocs;
+    (*Amat)->is = is;
+    (*Amat)->ie = ie;
+
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_matrix_malloc_rco"
-LIS_INT lis_matrix_malloc_rco(LIS_INT n, LIS_INT nnz[], LIS_INT **row, LIS_INT ***index, LIS_SCALAR ***value)
-{
-	LIS_INT	i,j;
-	LIS_INT *w_row,**w_index;
-	LIS_SCALAR **w_value;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_matrix_malloc_rco(LIS_INT n, LIS_INT nnz[], LIS_INT** row, LIS_INT*** index, LIS_SCALAR*** value) {
+    LIS_INT i, j;
+    LIS_INT *w_row, **w_index;
+    LIS_SCALAR** w_value;
 
-	w_row     = NULL;
-	w_index   = NULL;
-	w_value   = NULL;
+    LIS_DEBUG_FUNC_IN;
 
-	w_row = (LIS_INT *)lis_malloc( n*sizeof(LIS_INT),"lis_matrix_malloc_rco::w_row" );
-	if( w_row==NULL )
-	{
-		LIS_SETERR_MEM(n*sizeof(LIS_INT));
-		return LIS_OUT_OF_MEMORY;
-	}
-	w_index = (LIS_INT **)lis_malloc( n*sizeof(LIS_INT *),"lis_matrix_malloc_rco::w_index" );
-	if( w_index==NULL )
-	{
-		LIS_SETERR_MEM(n*sizeof(LIS_INT *));
-		lis_free2(3,w_row,w_index,w_value);
-		return LIS_OUT_OF_MEMORY;
-	}
-	w_value = (LIS_SCALAR **)lis_malloc( n*sizeof(LIS_SCALAR *),"lis_matrix_malloc_rco::w_value" );
-	if( w_value==NULL )
-	{
-		LIS_SETERR_MEM(n*sizeof(LIS_SCALAR *));
-		lis_free2(3,w_row,w_index,w_value);
-		return LIS_OUT_OF_MEMORY;
-	}
-	if( nnz!=NULL )
-	{
-		for(i=0;i<n;i++)
-		{
-			w_index[i] = NULL;
-			w_value[i] = NULL;
-			if( nnz[i]==0 ) continue;
-			w_index[i] = (LIS_INT *)lis_malloc( nnz[i]*sizeof(LIS_INT),"lis_matrix_malloc_rco::w_index[i]" );
-			if( w_index[i]==NULL )
-			{
-				LIS_SETERR_MEM(nnz[i]*sizeof(LIS_INT));
-				break;
-			}
-			w_value[i] = (LIS_SCALAR *)lis_malloc( nnz[i]*sizeof(LIS_SCALAR),"lis_matrix_malloc_rco::w_value[i]" );
-			if( w_value[i]==NULL )
-			{
-				LIS_SETERR_MEM(nnz[i]*sizeof(LIS_SCALAR));
-				break;
-			}
-		}
-		if(i<n)
-		{
-			for(j=0;j<i;j++)
-			{
-				if( w_index[i] ) lis_free(w_index[i]);
-				if( w_value[i] ) lis_free(w_value[i]);
-			}
-			lis_free2(3,w_row,w_index,w_value);
-			return LIS_OUT_OF_MEMORY;
-		}
-	}
-	#ifdef _OPENMP
+    w_row = NULL;
+    w_index = NULL;
+    w_value = NULL;
+
+    w_row = (LIS_INT*)lis_malloc(n * sizeof(LIS_INT), "lis_matrix_malloc_rco::w_row");
+    if(w_row == NULL) {
+        LIS_SETERR_MEM(n*sizeof(LIS_INT));
+        return LIS_OUT_OF_MEMORY;
+    }
+    w_index = (LIS_INT**)lis_malloc(n * sizeof(LIS_INT*), "lis_matrix_malloc_rco::w_index");
+    if(w_index == NULL) {
+        LIS_SETERR_MEM(n*sizeof(LIS_INT *));
+        lis_free2(3, w_row, w_index, w_value);
+        return LIS_OUT_OF_MEMORY;
+    }
+    w_value = (LIS_SCALAR**)lis_malloc(n * sizeof(LIS_SCALAR*), "lis_matrix_malloc_rco::w_value");
+    if(w_value == NULL) {
+        LIS_SETERR_MEM(n*sizeof(LIS_SCALAR *));
+        lis_free2(3, w_row, w_index, w_value);
+        return LIS_OUT_OF_MEMORY;
+    }
+    if(nnz != NULL) {
+        for(i = 0; i < n; i++) {
+            w_index[i] = NULL;
+            w_value[i] = NULL;
+            if(nnz[i] == 0) continue;
+            w_index[i] = (LIS_INT*)lis_malloc(nnz[i] * sizeof(LIS_INT), "lis_matrix_malloc_rco::w_index[i]");
+            if(w_index[i] == NULL) {
+                LIS_SETERR_MEM(nnz[i]*sizeof(LIS_INT));
+                break;
+            }
+            w_value[i] = (LIS_SCALAR*)lis_malloc(nnz[i] * sizeof(LIS_SCALAR), "lis_matrix_malloc_rco::w_value[i]");
+            if(w_value[i] == NULL) {
+                LIS_SETERR_MEM(nnz[i]*sizeof(LIS_SCALAR));
+                break;
+            }
+        }
+        if(i < n) {
+            for(j = 0; j < i; j++) {
+                if(w_index[i]) lis_free(w_index[i]);
+                if(w_value[i]) lis_free(w_value[i]);
+            }
+            lis_free2(3, w_row, w_index, w_value);
+            return LIS_OUT_OF_MEMORY;
+        }
+    }
+#ifdef _OPENMP
 	#pragma omp parallel for private(i)
-	#endif
-	for(i=0;i<n;i++) w_row[i] = 0;
-	*row   = w_row;
-	*index = w_index;
-	*value = w_value;
+#endif
+    for(i = 0; i < n; i++) w_row[i] = 0;
+    *row = w_row;
+    *index = w_index;
+    *value = w_value;
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_matrix_realloc_rco"
-LIS_INT lis_matrix_realloc_rco(LIS_INT row, LIS_INT nnz, LIS_INT ***index, LIS_SCALAR ***value)
-{
-	LIS_INT **w_index;
-	LIS_SCALAR **w_value;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_matrix_realloc_rco(LIS_INT row, LIS_INT nnz, LIS_INT*** index, LIS_SCALAR*** value) {
+    LIS_INT** w_index;
+    LIS_SCALAR** w_value;
 
-	w_index = *index;
-	w_value = *value;
+    LIS_DEBUG_FUNC_IN;
 
-	w_index[row] = (LIS_INT *)lis_realloc(w_index[row],nnz*sizeof(LIS_INT));
-	if( w_index[row]==NULL )
-	{
-		LIS_SETERR_MEM(nnz*sizeof(LIS_INT));
-		return LIS_OUT_OF_MEMORY;
-	}
-	w_value[row] = (LIS_SCALAR *)lis_realloc(w_value[row],nnz*sizeof(LIS_SCALAR));
-	if( w_value[row]==NULL )
-	{
-		LIS_SETERR_MEM(nnz*sizeof(LIS_SCALAR));
-		return LIS_OUT_OF_MEMORY;
-	}
-	*index = w_index;
-	*value = w_value;
+    w_index = *index;
+    w_value = *value;
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    w_index[row] = (LIS_INT*)lis_realloc(w_index[row], nnz * sizeof(LIS_INT));
+    if(w_index[row] == NULL) {
+        LIS_SETERR_MEM(nnz*sizeof(LIS_INT));
+        return LIS_OUT_OF_MEMORY;
+    }
+    w_value[row] = (LIS_SCALAR*)lis_realloc(w_value[row], nnz * sizeof(LIS_SCALAR));
+    if(w_value[row] == NULL) {
+        LIS_SETERR_MEM(nnz*sizeof(LIS_SCALAR));
+        return LIS_OUT_OF_MEMORY;
+    }
+    *index = w_index;
+    *value = w_value;
+
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_matrix_convert_rco2csr"
-LIS_INT lis_matrix_convert_rco2csr(LIS_MATRIX Ain, LIS_MATRIX Aout)
-{
-	LIS_INT i,j,k,n,nnz,err;
-	LIS_INT *ptr,*index;
-	LIS_SCALAR *value;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_matrix_convert_rco2csr(LIS_MATRIX Ain, LIS_MATRIX Aout) {
+    LIS_INT i, j, k, n, nnz, err;
+    LIS_INT *ptr, *index;
+    LIS_SCALAR* value;
 
-	ptr     = NULL;
-	index   = NULL;
-	value   = NULL;
+    LIS_DEBUG_FUNC_IN;
 
-	n       = Ain->n;
-	nnz     = 0;
-	#ifdef _OPENMP
+    ptr = NULL;
+    index = NULL;
+    value = NULL;
+
+    n = Ain->n;
+    nnz = 0;
+#ifdef _OPENMP
 	#pragma omp parallel for reduction(+:nnz) private(i)
-	#endif
-	for(i=0;i<n;i++)
-	{
-		nnz += Ain->w_row[i];
-	}
+#endif
+    for(i = 0; i < n; i++) { nnz += Ain->w_row[i]; }
 
-	err = lis_matrix_malloc_csr(n,nnz,&ptr,&index,&value);
-	if( err )
-	{
-		return err;
-	}
+    err = lis_matrix_malloc_csr(n, nnz, &ptr, &index, &value);
+    if(err) { return err; }
 
-	#ifdef _NUMA
+#ifdef _NUMA
 		#pragma omp parallel for private(i)
 		for(i=0;i<n+1;i++) ptr[i] = 0;
-	#else
-		ptr[0] = 0;
-	#endif
-	for(i=0;i<n;i++)
-	{
-		ptr[i+1] = ptr[i] + Ain->w_row[i];
-	}
-	#ifdef _OPENMP
+#else
+    ptr[0] = 0;
+#endif
+    for(i = 0; i < n; i++) { ptr[i + 1] = ptr[i] + Ain->w_row[i]; }
+#ifdef _OPENMP
 	#pragma omp parallel for private(i,j,k)
-	#endif
-	for(i=0;i<n;i++)
-	{
-		k = ptr[i];
-		for(j=0;j<Ain->w_row[i];j++)
-		{
-			index[k] = Ain->w_index[i][j];
-			value[k] = Ain->w_value[i][j];
-			k++;
-		}
-	}
+#endif
+    for(i = 0; i < n; i++) {
+        k = ptr[i];
+        for(j = 0; j < Ain->w_row[i]; j++) {
+            index[k] = Ain->w_index[i][j];
+            value[k] = Ain->w_value[i][j];
+            k++;
+        }
+    }
 
-	err = lis_matrix_set_csr(nnz,ptr,index,value,Aout);
-	if( err )
-	{
-		lis_free2(3,ptr,index,value);
-		return err;
-	}
-	err = lis_matrix_assemble(Aout);
-	if( err )
-	{
-		lis_matrix_storage_destroy(Aout);
-		return err;
-	}
+    err = lis_matrix_set_csr(nnz, ptr, index, value, Aout);
+    if(err) {
+        lis_free2(3, ptr, index, value);
+        return err;
+    }
+    err = lis_matrix_assemble(Aout);
+    if(err) {
+        lis_matrix_storage_destroy(Aout);
+        return err;
+    }
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_matrix_convert_rco2bsr"
-LIS_INT lis_matrix_convert_rco2bsr(LIS_MATRIX Ain, LIS_MATRIX Aout)
-{
-	LIS_INT i,j,k,n,gn,nnz,bnnz,nr,nc,bnr,bnc,err;
-	LIS_INT ii,jj,kk,bj,jpos,ij,kv,bi;
-	LIS_INT *iw,*iw2;
-	LIS_INT *bptr,*bindex;
-	LIS_SCALAR *value;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_matrix_convert_rco2bsr(LIS_MATRIX Ain, LIS_MATRIX Aout) {
+    LIS_INT i, j, k, n, gn, nnz, bnnz, nr, nc, bnr, bnc, err;
+    LIS_INT ii, jj, kk, bj, jpos, ij, kv, bi;
+    LIS_INT *iw, *iw2;
+    LIS_INT *bptr, *bindex;
+    LIS_SCALAR* value;
 
-	bnr     = Ain->conv_bnr;
-	bnc     = Ain->conv_bnc;
-	n       = Ain->n;
-	gn      = Ain->gn;
-	nr      = 1 + (n-1)/bnr;
-	nc      = 1 + (gn-1)/bnc;
-	bptr    = NULL;
-	bindex  = NULL;
-	value   = NULL;
-	iw      = NULL;
-	iw2     = NULL;
+    LIS_DEBUG_FUNC_IN;
 
+    bnr = Ain->conv_bnr;
+    bnc = Ain->conv_bnc;
+    n = Ain->n;
+    gn = Ain->gn;
+    nr = 1 + (n - 1) / bnr;
+    nc = 1 + (gn - 1) / bnc;
+    bptr = NULL;
+    bindex = NULL;
+    value = NULL;
+    iw = NULL;
+    iw2 = NULL;
 
-	bptr = (LIS_INT *)lis_malloc( (nr+1)*sizeof(LIS_INT),"lis_matrix_convert_rco2bsr::bptr" );
-	if( bptr==NULL )
-	{
-		LIS_SETERR_MEM((nr+1)*sizeof(LIS_INT));
-		lis_free2(5,bptr,bindex,value,iw,iw2);
-		return LIS_OUT_OF_MEMORY;
-	}
+    bptr = (LIS_INT*)lis_malloc((nr + 1) * sizeof(LIS_INT), "lis_matrix_convert_rco2bsr::bptr");
+    if(bptr == NULL) {
+        LIS_SETERR_MEM((nr+1)*sizeof(LIS_INT));
+        lis_free2(5, bptr, bindex, value, iw, iw2);
+        return LIS_OUT_OF_MEMORY;
+    }
 
-	#ifdef _OPENMP
+#ifdef _OPENMP
 	#pragma omp parallel private(i,k,ii,j,bj,kk,ij,jj,iw,iw2,kv,jpos)
-	#endif
-	{
-		iw    = (LIS_INT *)lis_malloc( nc*sizeof(LIS_INT),"lis_matrix_convert_rco2bsr::iw" );
-		iw2   = (LIS_INT *)lis_malloc( nc*sizeof(LIS_INT),"lis_matrix_convert_rco2bsr::iw2" );
-		memset(iw,0,nc*sizeof(LIS_INT));
+#endif
+    {
+        iw = (LIS_INT*)lis_malloc(nc * sizeof(LIS_INT), "lis_matrix_convert_rco2bsr::iw");
+        iw2 = (LIS_INT*)lis_malloc(nc * sizeof(LIS_INT), "lis_matrix_convert_rco2bsr::iw2");
+        memset(iw, 0, nc * sizeof(LIS_INT));
 
-		#ifdef _OPENMP
+#ifdef _OPENMP
 		#pragma omp for
-		#endif
-		for(i=0;i<nr;i++)
-		{
-			k = 0;
-			kk   = bnr*i;
-			jj   = 0;
-			for(ii=0;ii+kk<n&&ii<bnr;ii++)
-			{
-				for(j=0;j<Ain->w_row[kk+ii];j++)
-				{
-					bj   = Ain->w_index[kk+ii][j]/bnc;
-					jpos = iw[bj];
-					if( jpos==0 )
-					{
-						iw[bj] = 1;
-						iw2[jj] = bj;
-						jj++;
-					}
-				}
-			}
-			for(bj=0;bj<jj;bj++)
-			{
-				k++;
-				ii = iw2[bj];
-				iw[ii]=0;
-			}
-			bptr[i+1] = k;
-		}
-		lis_free(iw);
-		lis_free(iw2);
-	}
+#endif
+        for(i = 0; i < nr; i++) {
+            k = 0;
+            kk = bnr * i;
+            jj = 0;
+            for(ii = 0; ii + kk < n && ii < bnr; ii++) {
+                for(j = 0; j < Ain->w_row[kk + ii]; j++) {
+                    bj = Ain->w_index[kk + ii][j] / bnc;
+                    jpos = iw[bj];
+                    if(jpos == 0) {
+                        iw[bj] = 1;
+                        iw2[jj] = bj;
+                        jj++;
+                    }
+                }
+            }
+            for(bj = 0; bj < jj; bj++) {
+                k++;
+                ii = iw2[bj];
+                iw[ii] = 0;
+            }
+            bptr[i + 1] = k;
+        }
+        lis_free(iw);
+        lis_free(iw2);
+    }
 
-	bptr[0] = 0;
-	for(i=0;i<nr;i++)
-	{
-		bptr[i+1] += bptr[i];
-	}
-	bnnz = bptr[nr];
-	nnz  = bnnz*bnr*bnc;
-	
-	bindex = (LIS_INT *)lis_malloc( bnnz*sizeof(LIS_INT),"lis_matrix_convert_rco2bsr::bindex" );
-	if( bindex==NULL )
-	{
-		LIS_SETERR_MEM((nr+1)*sizeof(LIS_INT));
-		lis_free2(3,bptr,bindex,value);
-		return LIS_OUT_OF_MEMORY;
-	}
-	value = (LIS_SCALAR *)lis_malloc( nnz*sizeof(LIS_SCALAR),"lis_matrix_convert_rco2bsr::value" );
-	if( value==NULL )
-	{
-		LIS_SETERR_MEM(nnz*sizeof(LIS_SCALAR));
-		lis_free2(3,bptr,bindex,value);
-		return LIS_OUT_OF_MEMORY;
-	}
+    bptr[0] = 0;
+    for(i = 0; i < nr; i++) { bptr[i + 1] += bptr[i]; }
+    bnnz = bptr[nr];
+    nnz = bnnz * bnr * bnc;
 
-	/* convert bsr */
-	#ifdef _OPENMP
+    bindex = (LIS_INT*)lis_malloc(bnnz * sizeof(LIS_INT), "lis_matrix_convert_rco2bsr::bindex");
+    if(bindex == NULL) {
+        LIS_SETERR_MEM((nr+1)*sizeof(LIS_INT));
+        lis_free2(3, bptr, bindex, value);
+        return LIS_OUT_OF_MEMORY;
+    }
+    value = (LIS_SCALAR*)lis_malloc(nnz * sizeof(LIS_SCALAR), "lis_matrix_convert_rco2bsr::value");
+    if(value == NULL) {
+        LIS_SETERR_MEM(nnz*sizeof(LIS_SCALAR));
+        lis_free2(3, bptr, bindex, value);
+        return LIS_OUT_OF_MEMORY;
+    }
+
+    /* convert bsr */
+#ifdef _OPENMP
 	#pragma omp parallel private(bi,i,ii,k,j,bj,jpos,kv,kk,ij,jj,iw)
-	#endif
-	{
-		iw = (LIS_INT *)lis_malloc( nc*sizeof(LIS_INT),"lis_matrix_convert_rco2bsr::iw" );
-		memset(iw,0,nc*sizeof(LIS_INT));
+#endif
+    {
+        iw = (LIS_INT*)lis_malloc(nc * sizeof(LIS_INT), "lis_matrix_convert_rco2bsr::iw");
+        memset(iw, 0, nc * sizeof(LIS_INT));
 
-		#ifdef _OPENMP
+#ifdef _OPENMP
 		#pragma omp for
-		#endif
-		for(bi=0;bi<nr;bi++)
-		{
-			i  = bi*bnr;
-			ii = 0;
-			kk = bptr[bi];
-			while( i+ii<n && ii<=bnr-1 )
-			{
-				for( k=0;k<Ain->w_row[i+ii];k++)
-				{
-					j    = Ain->w_index[i+ii][k];
-					bj   = j/bnc;
-					j    = j%bnc;
-					jpos = iw[bj];
-					if( jpos==0 )
-					{
-						kv     = kk * bnr * bnc;
-						iw[bj] = kv+1;
-						bindex[kk]  = bj;
-						for(jj=0;jj<bnr*bnc;jj++) value[kv+jj] = 0.0;
-						ij = j*bnr + ii;
-						value[kv+ij]   = Ain->w_value[i+ii][k];
-						kk = kk+1;
-					}
-					else
-					{
-						ij = j*bnr + ii;
-						value[jpos+ij-1]   = Ain->w_value[i+ii][k];
-					}
-				}
-				ii = ii+1;
-			}
-			for(j=bptr[bi];j<bptr[bi+1];j++)
-			{
-				iw[bindex[j]] = 0;
-			}
-		}
-		lis_free(iw);
-	}
+#endif
+        for(bi = 0; bi < nr; bi++) {
+            i = bi * bnr;
+            ii = 0;
+            kk = bptr[bi];
+            while(i + ii < n && ii <= bnr - 1) {
+                for(k = 0; k < Ain->w_row[i + ii]; k++) {
+                    j = Ain->w_index[i + ii][k];
+                    bj = j / bnc;
+                    j = j % bnc;
+                    jpos = iw[bj];
+                    if(jpos == 0) {
+                        kv = kk * bnr * bnc;
+                        iw[bj] = kv + 1;
+                        bindex[kk] = bj;
+                        for(jj = 0; jj < bnr * bnc; jj++) value[kv + jj] = 0.0;
+                        ij = j * bnr + ii;
+                        value[kv + ij] = Ain->w_value[i + ii][k];
+                        kk = kk + 1;
+                    }
+                    else {
+                        ij = j * bnr + ii;
+                        value[jpos + ij - 1] = Ain->w_value[i + ii][k];
+                    }
+                }
+                ii = ii + 1;
+            }
+            for(j = bptr[bi]; j < bptr[bi + 1]; j++) { iw[bindex[j]] = 0; }
+        }
+        lis_free(iw);
+    }
 
-	err = lis_matrix_set_bsr(bnr,bnc,bnnz,bptr,bindex,value,Aout);
-	if( err )
-	{
-		lis_free2(3,bptr,bindex,value);
-		return err;
-	}
-	err = lis_matrix_assemble(Aout);
-	if( err )
-	{
-		lis_matrix_storage_destroy(Aout);
-		return err;
-	}
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    err = lis_matrix_set_bsr(bnr, bnc, bnnz, bptr, bindex, value, Aout);
+    if(err) {
+        lis_free2(3, bptr, bindex, value);
+        return err;
+    }
+    err = lis_matrix_assemble(Aout);
+    if(err) {
+        lis_matrix_storage_destroy(Aout);
+        return err;
+    }
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_matrix_convert_rco2csc"
-LIS_INT lis_matrix_convert_rco2csc(LIS_MATRIX Ain, LIS_MATRIX Aout)
-{
-	LIS_INT i,j,k,l,n,nnz,err;
-	LIS_INT *ptr,*index,*iw;
-	LIS_SCALAR *value;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_matrix_convert_rco2csc(LIS_MATRIX Ain, LIS_MATRIX Aout) {
+    LIS_INT i, j, k, l, n, nnz, err;
+    LIS_INT *ptr, *index, *iw;
+    LIS_SCALAR* value;
 
-	ptr     = NULL;
-	index   = NULL;
-	value   = NULL;
-	iw      = NULL;
-	n       = Ain->n;
+    LIS_DEBUG_FUNC_IN;
 
+    ptr = NULL;
+    index = NULL;
+    value = NULL;
+    iw = NULL;
+    n = Ain->n;
 
-	iw = (LIS_INT *)lis_malloc(n*sizeof(LIS_INT),"lis_matrix_convert_rco2csc::iw");
-	if( iw==NULL )
-	{
-		LIS_SETERR_MEM(n*sizeof(LIS_INT));
-		lis_free2(4,ptr,index,value,iw);
-		return LIS_OUT_OF_MEMORY;
-	}
-	ptr = (LIS_INT *)lis_malloc((n+1)*sizeof(LIS_INT),"lis_matrix_convert_rco2csc::ptr");
-	if( ptr==NULL )
-	{
-		LIS_SETERR_MEM((n+1)*sizeof(LIS_INT));
-		lis_free2(4,ptr,index,value,iw);
-		return LIS_OUT_OF_MEMORY;
-	}
+    iw = (LIS_INT*)lis_malloc(n * sizeof(LIS_INT), "lis_matrix_convert_rco2csc::iw");
+    if(iw == NULL) {
+        LIS_SETERR_MEM(n*sizeof(LIS_INT));
+        lis_free2(4, ptr, index, value, iw);
+        return LIS_OUT_OF_MEMORY;
+    }
+    ptr = (LIS_INT*)lis_malloc((n + 1) * sizeof(LIS_INT), "lis_matrix_convert_rco2csc::ptr");
+    if(ptr == NULL) {
+        LIS_SETERR_MEM((n+1)*sizeof(LIS_INT));
+        lis_free2(4, ptr, index, value, iw);
+        return LIS_OUT_OF_MEMORY;
+    }
 
-	for(i=0;i<n;i++) iw[i] = 0;
-	for(i=0;i<n;i++)
-	{
-		for(j=0;j<Ain->w_row[i];j++)
-		{
-			iw[Ain->w_index[i][j]]++;
-		}
-	}
-	ptr[0] = 0;
-	for(i=0;i<n;i++)
-	{
-		ptr[i+1] = ptr[i] + iw[i];
-		iw[i]    = ptr[i];
-	}
-	nnz = ptr[n];
+    for(i = 0; i < n; i++) iw[i] = 0;
+    for(i = 0; i < n; i++) { for(j = 0; j < Ain->w_row[i]; j++) { iw[Ain->w_index[i][j]]++; } }
+    ptr[0] = 0;
+    for(i = 0; i < n; i++) {
+        ptr[i + 1] = ptr[i] + iw[i];
+        iw[i] = ptr[i];
+    }
+    nnz = ptr[n];
 
-	index = (LIS_INT *)lis_malloc( nnz*sizeof(LIS_INT),"lis_matrix_convert_rco2csc::index" );
-	if( index==NULL )
-	{
-		LIS_SETERR_MEM(nnz*sizeof(LIS_INT));
-		lis_free2(4,ptr,index,value,iw);
-		return LIS_OUT_OF_MEMORY;
-	}
-	value = (LIS_SCALAR *)lis_malloc( nnz*sizeof(LIS_SCALAR),"lis_matrix_convert_rco2csc::value" );
-	if( value==NULL )
-	{
-		LIS_SETERR_MEM(nnz*sizeof(LIS_SCALAR));
-		lis_free2(4,ptr,index,value,iw);
-		return LIS_OUT_OF_MEMORY;
-	}
+    index = (LIS_INT*)lis_malloc(nnz * sizeof(LIS_INT), "lis_matrix_convert_rco2csc::index");
+    if(index == NULL) {
+        LIS_SETERR_MEM(nnz*sizeof(LIS_INT));
+        lis_free2(4, ptr, index, value, iw);
+        return LIS_OUT_OF_MEMORY;
+    }
+    value = (LIS_SCALAR*)lis_malloc(nnz * sizeof(LIS_SCALAR), "lis_matrix_convert_rco2csc::value");
+    if(value == NULL) {
+        LIS_SETERR_MEM(nnz*sizeof(LIS_SCALAR));
+        lis_free2(4, ptr, index, value, iw);
+        return LIS_OUT_OF_MEMORY;
+    }
 
-	for(i=0;i<n;i++)
-	{
-		for(j=0;j<Ain->w_row[i];j++)
-		{
-			k        = Ain->w_index[i][j];
-			l        = iw[k];
-			value[l] = Ain->w_value[i][j];
-			index[l] = i;
-			iw[k]++;
-		}
-	}
+    for(i = 0; i < n; i++) {
+        for(j = 0; j < Ain->w_row[i]; j++) {
+            k = Ain->w_index[i][j];
+            l = iw[k];
+            value[l] = Ain->w_value[i][j];
+            index[l] = i;
+            iw[k]++;
+        }
+    }
 
-	err = lis_matrix_set_csc(nnz,ptr,index,value,Aout);
-	if( err )
-	{
-		lis_free2(4,ptr,index,value,iw);
-		return err;
-	}
-	err = lis_matrix_assemble(Aout);
-	if( err )
-	{
-		lis_matrix_storage_destroy(Aout);
-		return err;
-	}
+    err = lis_matrix_set_csc(nnz, ptr, index, value, Aout);
+    if(err) {
+        lis_free2(4, ptr, index, value, iw);
+        return err;
+    }
+    err = lis_matrix_assemble(Aout);
+    if(err) {
+        lis_matrix_storage_destroy(Aout);
+        return err;
+    }
 
-	lis_free(iw);
+    lis_free(iw);
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 /*

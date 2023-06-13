@@ -84,17 +84,17 @@ void c_clear_matrix_ptr_bar(char *bar)
 
 #undef __FUNC__
 #define __FUNC__ "lis_precon_create_saamg"
-LIS_INT lis_precon_create_saamg(LIS_SOLVER solver, LIS_PRECON precon)
-{
+
+LIS_INT lis_precon_create_saamg(LIS_SOLVER solver, LIS_PRECON precon) {
 #if defined(USE_SAAMG)
 	LIS_MATRIX A,B;
 	LIS_COMMTABLE table;
 	LIS_INT	unsym,sol;
 	LIS_INT	err;
 	LIS_REAL theta; 
-	#ifdef USE_MPI
+#ifdef USE_MPI
 		LIS_MPI_Fint comm;
-	#endif
+#endif
 
 	LIS_DEBUG_FUNC_IN;
 
@@ -137,7 +137,7 @@ LIS_INT lis_precon_create_saamg(LIS_SOLVER solver, LIS_PRECON precon)
 	
 	lis_matrix_split(A);
 
-	#ifdef USE_MPI
+#ifdef USE_MPI
 		comm = MPI_Comm_c2f(A->comm);
 		lis_send_recv(A->commtable,A->D->value);
 		table = A->commtable;
@@ -161,7 +161,7 @@ LIS_INT lis_precon_create_saamg(LIS_SOLVER solver, LIS_PRECON precon)
 				&table->imnnz,&table->exnnz,
 				&comm, &precon->level_num,&precon->wsize, &theta);
 		}
-	#else
+#else
 		if( !unsym )
 		{
 			(*(void (*)())f_data_creation_ptr)(&A->n,&A->L->nnz,&A->U->nnz,
@@ -174,17 +174,17 @@ LIS_INT lis_precon_create_saamg(LIS_SOLVER solver, LIS_PRECON precon)
 				A->D->value,A->L->value,A->L->ptr,A->L->index,
 				A->U->value, A->U->ptr, A->U->index, &precon->level_num, &theta);
 		}
-	#endif
+#endif
 
 	LIS_DEBUG_FUNC_OUT;
     return LIS_SUCCESS;
 #else
-	LIS_DEBUG_FUNC_IN;
+    LIS_DEBUG_FUNC_IN;
 
-    precon->A       = solver->A;
+    precon->A = solver->A;
     precon->is_copy = LIS_FALSE;
 
-	LIS_DEBUG_FUNC_OUT;
+    LIS_DEBUG_FUNC_OUT;
     return LIS_SUCCESS;
 #endif
 }
@@ -192,8 +192,8 @@ LIS_INT lis_precon_create_saamg(LIS_SOLVER solver, LIS_PRECON precon)
 /*NEH support for extended "solve_kernel" workflow*/
 #undef __FUNC__
 #define __FUNC__ "lis_precon_psd_create_saamg"
-LIS_INT lis_precon_psd_create_saamg(LIS_SOLVER solver, LIS_PRECON precon)
-{
+
+LIS_INT lis_precon_psd_create_saamg(LIS_SOLVER solver, LIS_PRECON precon) {
 #if defined(USE_SAAMG)
 	LIS_MATRIX A,B;
 	LIS_INT	err;
@@ -232,12 +232,12 @@ LIS_INT lis_precon_psd_create_saamg(LIS_SOLVER solver, LIS_PRECON precon)
 	LIS_DEBUG_FUNC_OUT;
     return LIS_SUCCESS;
 #else
-	LIS_DEBUG_FUNC_IN;
+    LIS_DEBUG_FUNC_IN;
 
-    precon->A       = solver->A;
+    precon->A = solver->A;
     precon->is_copy = LIS_FALSE;
 
-	LIS_DEBUG_FUNC_OUT;
+    LIS_DEBUG_FUNC_OUT;
     return LIS_SUCCESS;
 #endif
 }
@@ -245,17 +245,17 @@ LIS_INT lis_precon_psd_create_saamg(LIS_SOLVER solver, LIS_PRECON precon)
 /*NEH support for extended "solve_kernel" workflow*/
 #undef __FUNC__
 #define __FUNC__ "lis_precon_psd_update_saamg"
-LIS_INT lis_precon_psd_update_saamg(LIS_SOLVER solver, LIS_PRECON precon)
-{
+
+LIS_INT lis_precon_psd_update_saamg(LIS_SOLVER solver, LIS_PRECON precon) {
 #if defined(USE_SAAMG)
 	LIS_MATRIX A;
 	LIS_COMMTABLE table;
     LIS_INT	unsym,sol;
 	LIS_INT	err;
 	LIS_REAL theta; 
-	#ifdef USE_MPI
+#ifdef USE_MPI
 		LIS_MPI_Fint comm;
-	#endif
+#endif
 
 	LIS_DEBUG_FUNC_IN;
 
@@ -274,7 +274,7 @@ LIS_INT lis_precon_psd_update_saamg(LIS_SOLVER solver, LIS_PRECON precon)
 
     lis_matrix_split_update(A);
 
-	#ifdef USE_MPI
+#ifdef USE_MPI
 		comm = MPI_Comm_c2f(A->comm);
 		lis_send_recv(A->commtable,A->D->value); // this line should probably only be in the "update" version . . .
 		table = A->commtable;
@@ -298,7 +298,7 @@ LIS_INT lis_precon_psd_update_saamg(LIS_SOLVER solver, LIS_PRECON precon)
 				&table->imnnz,&table->exnnz,
 				&comm, &precon->level_num,&precon->wsize, &theta);
 		}
-	#else
+#else
 		if( !unsym )
 		{
 			(*(void (*)())f_data_creation_ptr)(&A->n,&A->L->nnz,&A->U->nnz,
@@ -311,7 +311,7 @@ LIS_INT lis_precon_psd_update_saamg(LIS_SOLVER solver, LIS_PRECON precon)
 				A->D->value,A->L->value,A->L->ptr,A->L->index,
 				A->U->value, A->U->ptr, A->U->index, &precon->level_num, &theta);
 		}
-	#endif
+#endif
 
 	LIS_DEBUG_FUNC_OUT;
 #endif
@@ -320,76 +320,76 @@ LIS_INT lis_precon_psd_update_saamg(LIS_SOLVER solver, LIS_PRECON precon)
 
 #undef __FUNC__
 #define __FUNC__ "lis_psolve_saamg"
-LIS_INT lis_psolve_saamg(LIS_SOLVER solver, LIS_VECTOR b, LIS_VECTOR x)
-{
+
+LIS_INT lis_psolve_saamg(LIS_SOLVER solver, LIS_VECTOR b, LIS_VECTOR x) {
 #if defined(USE_SAAMG)
 	LIS_INT	n;
 	LIS_PRECON precon;
 	LIS_MATRIX A;
-	#ifdef USE_MPI
+#ifdef USE_MPI
 		LIS_MPI_Fint comm;
-	#endif
+#endif
 
 	LIS_DEBUG_FUNC_IN;
 
 	precon = solver->precon;
 	A      = solver->A;
 
-	#ifdef USE_MPI
+#ifdef USE_MPI
 		comm = MPI_Comm_c2f(A->comm);
 		n = b->np;
 		 (*(void (*)())f_v_cycle_ptr)(b->value,x->value,precon->temp->value,&precon->level_num,
 			 &comm,A->commtable->ws,A->commtable->wr,&n,&precon->wsize);
-	#else
+#else
 		n = b->n;
 		 (*(void (*)())f_v_cycle_ptr)(&n,b->value,x->value,&precon->level_num,precon->temp->value);
-	#endif
+#endif
 	LIS_DEBUG_FUNC_OUT;
 	return LIS_SUCCESS;
 #else
-	LIS_DEBUG_FUNC_IN;
+    LIS_DEBUG_FUNC_IN;
 
-	lis_vector_copy(b,x);
+    lis_vector_copy(b, x);
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 #endif
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_psolveh_saamg"
-LIS_INT lis_psolveh_saamg(LIS_SOLVER solver, LIS_VECTOR b, LIS_VECTOR x)
-{
+
+LIS_INT lis_psolveh_saamg(LIS_SOLVER solver, LIS_VECTOR b, LIS_VECTOR x) {
 #if defined(USE_SAAMG)
 	LIS_INT	n;
 	LIS_PRECON precon;
 	LIS_MATRIX A;
-	#ifdef USE_MPI
+#ifdef USE_MPI
 		LIS_MPI_Fint comm;
-	#endif
+#endif
 
 	LIS_DEBUG_FUNC_IN;
 
 	A      = solver->A;
 	precon = solver->precon;
 
-	#ifdef USE_MPI
+#ifdef USE_MPI
 		comm = MPI_Comm_c2f(A->comm);
 		n = b->np;
 		 (*(void (*)())f_v_cycle_ptr)(b->value,x->value,precon->temp->value,&precon->level_num,
 			 &comm,A->commtable->ws,A->commtable->wr,&n,&precon->wsize);
-	#else
+#else
 		n = b->n;
 		 (*(void (*)())f_v_cycle_ptr)(&n,b->value,x->value,&precon->level_num,precon->temp->value);
-	#endif
+#endif
 	LIS_DEBUG_FUNC_OUT;
 	return LIS_SUCCESS;
 #else
-	LIS_DEBUG_FUNC_IN;
+    LIS_DEBUG_FUNC_IN;
 
-	lis_vector_copy(b,x);
+    lis_vector_copy(b, x);
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 #endif
 }

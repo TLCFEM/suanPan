@@ -56,134 +56,126 @@
  ************************************************/
 #undef __FUNC__
 #define __FUNC__ "lis_jacobi_check_params"
-LIS_INT lis_jacobi_check_params(LIS_SOLVER solver)
-{
-	LIS_DEBUG_FUNC_IN;
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+
+LIS_INT lis_jacobi_check_params(LIS_SOLVER solver) {
+    LIS_DEBUG_FUNC_IN;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_jacobi_malloc_work"
-LIS_INT lis_jacobi_malloc_work(LIS_SOLVER solver)
-{
-	LIS_VECTOR *work;
-	LIS_INT	i,j,worklen,err;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_jacobi_malloc_work(LIS_SOLVER solver) {
+    LIS_VECTOR* work;
+    LIS_INT i, j, worklen, err;
 
-	worklen = NWORK;
-	work    = (LIS_VECTOR *)lis_malloc( worklen*sizeof(LIS_VECTOR),"lis_jacobi_malloc_work::work" );
-	if( work==NULL )
-	{
-		LIS_SETERR_MEM(worklen*sizeof(LIS_VECTOR));
-		return LIS_ERR_OUT_OF_MEMORY;
-	}
-	if( solver->precision==LIS_PRECISION_DEFAULT )
-	{
-		for(i=0;i<worklen;i++)
-		{
-			err = lis_vector_duplicate(solver->A,&work[i]);
-			if( err ) break;
-		}
-	}
-	else
-	{
-		for(i=0;i<worklen;i++)
-		{
-			err = lis_vector_duplicateex(LIS_PRECISION_QUAD,solver->A,&work[i]);
-			if( err ) break;
-		}
-	}
-	if( i<worklen )
-	{
-		for(j=0;j<i;j++) lis_vector_destroy(work[j]);
-		lis_free(work);
-		return err;
-	}
-	solver->worklen = worklen;
-	solver->work    = work;
+    LIS_DEBUG_FUNC_IN;
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    worklen = NWORK;
+    work = (LIS_VECTOR*)lis_malloc(worklen * sizeof(LIS_VECTOR), "lis_jacobi_malloc_work::work");
+    if(work == NULL) {
+        LIS_SETERR_MEM(worklen*sizeof(LIS_VECTOR));
+        return LIS_ERR_OUT_OF_MEMORY;
+    }
+    if(solver->precision == LIS_PRECISION_DEFAULT) {
+        for(i = 0; i < worklen; i++) {
+            err = lis_vector_duplicate(solver->A, &work[i]);
+            if(err) break;
+        }
+    }
+    else {
+        for(i = 0; i < worklen; i++) {
+            err = lis_vector_duplicateex(LIS_PRECISION_QUAD, solver->A, &work[i]);
+            if(err) break;
+        }
+    }
+    if(i < worklen) {
+        for(j = 0; j < i; j++) lis_vector_destroy(work[j]);
+        lis_free(work);
+        return err;
+    }
+    solver->worklen = worklen;
+    solver->work = work;
+
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_jacobi"
-LIS_INT lis_jacobi(LIS_SOLVER solver)
-{
-	LIS_Comm comm;  
-	LIS_MATRIX A;
-	LIS_VECTOR b,x;
-	LIS_VECTOR d,r,t,s;
-	LIS_REAL bnrm2,nrm2,tol;
-	LIS_INT iter,maxiter,output;
-	double time,ptime;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_jacobi(LIS_SOLVER solver) {
+    LIS_Comm comm;
+    LIS_MATRIX A;
+    LIS_VECTOR b, x;
+    LIS_VECTOR d, r, t, s;
+    LIS_REAL bnrm2, nrm2, tol;
+    LIS_INT iter, maxiter, output;
+    double time, ptime;
 
-	A       = solver->A;
-	b       = solver->b;
-	x       = solver->x;
-	maxiter = solver->options[LIS_OPTIONS_MAXITER];
-	output  = solver->options[LIS_OPTIONS_OUTPUT];
-	tol     = solver->params[LIS_PARAMS_RESID-LIS_OPTIONS_LEN];
-	ptime   = 0.0;
+    LIS_DEBUG_FUNC_IN;
 
-	r       = solver->work[0];
-	t       = solver->work[1];
-	s       = solver->work[2];
-	d       = solver->work[3];
+    comm = LIS_COMM_WORLD;
 
-	lis_vector_nrm2(b,&bnrm2);
-	bnrm2   = 1.0 / bnrm2;
+    A = solver->A;
+    b = solver->b;
+    x = solver->x;
+    maxiter = solver->options[LIS_OPTIONS_MAXITER];
+    output = solver->options[LIS_OPTIONS_OUTPUT];
+    tol = solver->params[LIS_PARAMS_RESID - LIS_OPTIONS_LEN];
+    ptime = 0.0;
 
-	lis_matrix_get_diagonal(A,d);
-	lis_vector_reciprocal(d);
+    r = solver->work[0];
+    t = solver->work[1];
+    s = solver->work[2];
+    d = solver->work[3];
 
-	for( iter=1; iter<=maxiter; iter++ )
-	{
-		/* x += D^{-1}(b - Ax) */
-		time = lis_wtime();
-		lis_psolve(solver,x,s);
-		ptime += lis_wtime() - time;
-		lis_matvec(A,s,t);
-/*		lis_matvec(A,x,t);*/
-		lis_vector_axpyz(-1,t,b,r);
-		lis_vector_nrm2(r,&nrm2);
-		lis_vector_pmul(r,d,r);
-		lis_vector_axpy(1,r,x);
+    lis_vector_nrm2(b, &bnrm2);
+    bnrm2 = 1.0 / bnrm2;
 
-		/* convergence check */
-		nrm2 = nrm2 * bnrm2;
+    lis_matrix_get_diagonal(A, d);
+    lis_vector_reciprocal(d);
 
-		if( output )
-		{
-			if( output & LIS_PRINT_MEM ) solver->rhistory[iter] = nrm2;
-			if( output & LIS_PRINT_OUT ) lis_print_rhistory(comm,iter,nrm2);
-		}
+    for(iter = 1; iter <= maxiter; iter++) {
+        /* x += D^{-1}(b - Ax) */
+        time = lis_wtime();
+        lis_psolve(solver, x, s);
+        ptime += lis_wtime() - time;
+        lis_matvec(A, s, t);
+        /*		lis_matvec(A,x,t);*/
+        lis_vector_axpyz(-1, t, b, r);
+        lis_vector_nrm2(r, &nrm2);
+        lis_vector_pmul(r, d, r);
+        lis_vector_axpy(1, r, x);
 
-		if( tol >= nrm2 )
-		{
-			time = lis_wtime();
-			lis_psolve(solver,x,s);
-			ptime += lis_wtime() - time;
-			lis_vector_copy(s,x);
-			solver->retcode    = LIS_SUCCESS;
-			solver->iter       = iter;
-			solver->resid      = nrm2;
-			solver->ptime      = ptime;
-			LIS_DEBUG_FUNC_OUT;
-			return LIS_SUCCESS;
-		}
-	}
+        /* convergence check */
+        nrm2 = nrm2 * bnrm2;
 
-	lis_psolve(solver,x,s);
-	lis_vector_copy(s,x);
-	solver->retcode   = LIS_MAXITER;
-	solver->iter      = iter;
-	solver->resid     = nrm2;
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_MAXITER;
+        if(output) {
+            if(output & LIS_PRINT_MEM) solver->rhistory[iter] = nrm2;
+            if(output & LIS_PRINT_OUT) lis_print_rhistory(comm, iter, nrm2);
+        }
+
+        if(tol >= nrm2) {
+            time = lis_wtime();
+            lis_psolve(solver, x, s);
+            ptime += lis_wtime() - time;
+            lis_vector_copy(s, x);
+            solver->retcode = LIS_SUCCESS;
+            solver->iter = iter;
+            solver->resid = nrm2;
+            solver->ptime = ptime;
+            LIS_DEBUG_FUNC_OUT;
+            return LIS_SUCCESS;
+        }
+    }
+
+    lis_psolve(solver, x, s);
+    lis_vector_copy(s, x);
+    solver->retcode = LIS_MAXITER;
+    solver->iter = iter;
+    solver->resid = nrm2;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_MAXITER;
 }
-

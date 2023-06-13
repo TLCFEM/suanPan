@@ -53,62 +53,61 @@
 
 #undef __FUNC__
 #define __FUNC__ "lis_matrix_g2l"
-LIS_INT lis_matrix_g2l(LIS_MATRIX A)
-{
-	LIS_INT err;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_matrix_g2l(LIS_MATRIX A) {
+    LIS_INT err;
 
-	switch( A->matrix_type )
-	{
-	case LIS_MATRIX_CSR:
-		err = lis_matrix_g2l_csr(A);
-		break;
-	case LIS_MATRIX_RCO:
-		err = lis_matrix_g2l_rco(A);
-		break;
-/*
-	case LIS_MATRIX_CCS:
-		err = lis_matrix_g2l_csr(A);
-		break;
-	case LIS_MATRIX_MSR:
-		err = lis_matrix_g2l_msr(A);
-		break;
-	case LIS_MATRIX_DIA:
-		err = lis_matrix_g2l_dia(A);
-		break;
-	case LIS_MATRIX_ELL:
-		err = lis_matrix_g2l_ell(A);
-		break;
-	case LIS_MATRIX_JAD:
-		err = lis_matrix_g2l_jad(A);
-		break;
-	case LIS_MATRIX_BJD:
-		err = lis_matrix_g2l_bjd(A);
-		break;
-	case LIS_MATRIX_BSR:
-		err = lis_matrix_g2l_bsr(A);
-		break;
-	case LIS_MATRIX_BSC:
-		err = lis_matrix_g2l_bsc(A);
-		break;
-	case LIS_MATRIX_VBR:
-		err = lis_matrix_g2l_vbr(A);
-		break;
-	case LIS_MATRIX_DNS:
-		err = lis_matrix_g2l_dns(A);
-		break;
-	case LIS_MATRIX_COO:
-		err = lis_matrix_g2l_coo(A);
-		break;
-*/
-	default:
-		LIS_SETERR_IMP;
-		return LIS_ERR_NOT_IMPLEMENTED;
-	}
+    LIS_DEBUG_FUNC_IN;
 
-	LIS_DEBUG_FUNC_OUT;
-	return err;
+    switch(A->matrix_type) {
+    case LIS_MATRIX_CSR:
+        err = lis_matrix_g2l_csr(A);
+        break;
+    case LIS_MATRIX_RCO:
+        err = lis_matrix_g2l_rco(A);
+        break;
+    /*
+        case LIS_MATRIX_CCS:
+            err = lis_matrix_g2l_csr(A);
+            break;
+        case LIS_MATRIX_MSR:
+            err = lis_matrix_g2l_msr(A);
+            break;
+        case LIS_MATRIX_DIA:
+            err = lis_matrix_g2l_dia(A);
+            break;
+        case LIS_MATRIX_ELL:
+            err = lis_matrix_g2l_ell(A);
+            break;
+        case LIS_MATRIX_JAD:
+            err = lis_matrix_g2l_jad(A);
+            break;
+        case LIS_MATRIX_BJD:
+            err = lis_matrix_g2l_bjd(A);
+            break;
+        case LIS_MATRIX_BSR:
+            err = lis_matrix_g2l_bsr(A);
+            break;
+        case LIS_MATRIX_BSC:
+            err = lis_matrix_g2l_bsc(A);
+            break;
+        case LIS_MATRIX_VBR:
+            err = lis_matrix_g2l_vbr(A);
+            break;
+        case LIS_MATRIX_DNS:
+            err = lis_matrix_g2l_dns(A);
+            break;
+        case LIS_MATRIX_COO:
+            err = lis_matrix_g2l_coo(A);
+            break;
+    */
+    default:
+        LIS_SETERR_IMP;
+        return LIS_ERR_NOT_IMPLEMENTED;
+    }
+
+    LIS_DEBUG_FUNC_OUT;
+    return err;
 }
 
 #if 0
@@ -203,10 +202,10 @@ LIS_INT lis_matrix_g2l_csr(LIS_MATRIX A)
 				A->index[j] = lis_hashtable_get_value(g2l_map,jj);
 			}
 		}
-		#if 0
+#if 0
 			j = A->ptr[i];
 			lis_sort_iid(j,A->ptr[i+1]-1,l_index,A->index,A->value);
-		#endif
+#endif
 	}
 	A->np       = np;
 	A->l2g_map  = l2g_map;
@@ -219,212 +218,163 @@ LIS_INT lis_matrix_g2l_csr(LIS_MATRIX A)
 #else
 #undef __FUNC__
 #define __FUNC__ "lis_matrix_g2l_csr"
-LIS_INT lis_matrix_g2l_csr(LIS_MATRIX A)
-{
-	LIS_INT i,j,jj,k;
-	LIS_INT n,gn,np,ns;
-	LIS_INT is,ie;
-	LIS_INT *g2l_map;
-	LIS_INT *l2g_map;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_matrix_g2l_csr(LIS_MATRIX A) {
+    LIS_INT i, j, jj, k;
+    LIS_INT n, gn, np, ns;
+    LIS_INT is, ie;
+    LIS_INT* g2l_map;
+    LIS_INT* l2g_map;
 
-	n       = A->n;
-	gn      = A->gn;
-	is      = A->is;
-	ie      = A->ie;
-	np      = n;
-	g2l_map = NULL;
-	l2g_map = NULL;
+    LIS_DEBUG_FUNC_IN;
 
-	g2l_map = (LIS_INT *)lis_malloc( gn*sizeof(LIS_INT),"lis_matrix_g2l_csr::g2l_map" );
-	if( g2l_map==NULL )
-	{
-		LIS_SETERR_MEM(gn*sizeof(LIS_INT));
-		return LIS_OUT_OF_MEMORY;
-	}
+    n = A->n;
+    gn = A->gn;
+    is = A->is;
+    ie = A->ie;
+    np = n;
+    g2l_map = NULL;
+    l2g_map = NULL;
 
-	/* check np */
-	for(i=0;i<gn;i++) g2l_map[i] = 0;
-	for(i=0;i<n;i++)
-	{
-		for(j=A->ptr[i];j<A->ptr[i+1];j++)
-		{
-			jj = A->index[j];
-			if( jj<is || jj>=ie )
-			{
-				if( g2l_map[jj]==0 )
-				{
-					np++;
-					g2l_map[jj]  = 1;
-				}
-			}
-		}
-	}
+    g2l_map = (LIS_INT*)lis_malloc(gn * sizeof(LIS_INT), "lis_matrix_g2l_csr::g2l_map");
+    if(g2l_map == NULL) {
+        LIS_SETERR_MEM(gn*sizeof(LIS_INT));
+        return LIS_OUT_OF_MEMORY;
+    }
 
-	l2g_map = (LIS_INT *)lis_malloc( (np-n)*sizeof(LIS_INT),"lis_matrix_g2l_csr::l2g_map" );
-	if( g2l_map==NULL )
-	{
-		lis_free(g2l_map);
-		LIS_SETERR_MEM((np-n)*sizeof(LIS_INT));
-		return LIS_OUT_OF_MEMORY;
-	}
+    /* check np */
+    for(i = 0; i < gn; i++) g2l_map[i] = 0;
+    for(i = 0; i < n; i++) {
+        for(j = A->ptr[i]; j < A->ptr[i + 1]; j++) {
+            jj = A->index[j];
+            if(jj < is || jj >= ie) {
+                if(g2l_map[jj] == 0) {
+                    np++;
+                    g2l_map[jj] = 1;
+                }
+            }
+        }
+    }
 
-	/* make l2g_map */
-	ns = 0;
-	for(i=0;i<gn;i++)
-	{
-		if( g2l_map[i]==1 )
-		{
-			if( i<is || i>=ie )
-			{
-				l2g_map[ns++] = i;
-			}
-		}
-	}
-/*	lis_sort_i(0,ns-1,l2g_map);*/
+    l2g_map = (LIS_INT*)lis_malloc((np - n) * sizeof(LIS_INT), "lis_matrix_g2l_csr::l2g_map");
+    if(g2l_map == NULL) {
+        lis_free(g2l_map);
+        LIS_SETERR_MEM((np-n)*sizeof(LIS_INT));
+        return LIS_OUT_OF_MEMORY;
+    }
 
-	/* global index => local index */
-	k = n;
-	for(i=0;i<ns;i++)
-	{
-		jj          = l2g_map[i];
-		g2l_map[jj] = k++;
-	}
-	for(i=0;i<n;i++)
-	{
-		for(j=A->ptr[i];j<A->ptr[i+1];j++)
-		{
-			jj = A->index[j];
-			if( jj>=is && jj<ie )
-			{
-				A->index[j] = jj - is;
-			}
-			else
-			{
-				A->index[j] = g2l_map[jj];
-			}
-		}
-		#if 0
+    /* make l2g_map */
+    ns = 0;
+    for(i = 0; i < gn; i++) { if(g2l_map[i] == 1) { if(i < is || i >= ie) { l2g_map[ns++] = i; } } }
+    /*	lis_sort_i(0,ns-1,l2g_map);*/
+
+    /* global index => local index */
+    k = n;
+    for(i = 0; i < ns; i++) {
+        jj = l2g_map[i];
+        g2l_map[jj] = k++;
+    }
+    for(i = 0; i < n; i++) {
+        for(j = A->ptr[i]; j < A->ptr[i + 1]; j++) {
+            jj = A->index[j];
+            if(jj >= is && jj < ie) { A->index[j] = jj - is; }
+            else { A->index[j] = g2l_map[jj]; }
+        }
+#if 0
 			j = A->ptr[i];
 			lis_sort_iid(j,A->ptr[i+1]-1,l_index,A->index,A->value);
-		#endif
-	}
-	A->np       = np;
-	A->l2g_map  = l2g_map;
+#endif
+    }
+    A->np = np;
+    A->l2g_map = l2g_map;
 
-	lis_free(g2l_map);
+    lis_free(g2l_map);
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 #endif
 
 #undef __FUNC__
 #define __FUNC__ "lis_matrix_g2l_rco"
-LIS_INT lis_matrix_g2l_rco(LIS_MATRIX A)
-{
-	LIS_INT i,j,jj,k;
-	LIS_INT n,gn,np,ns;
-	LIS_INT is,ie;
-	LIS_INT *g2l_map;
-	LIS_INT *l2g_map;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_matrix_g2l_rco(LIS_MATRIX A) {
+    LIS_INT i, j, jj, k;
+    LIS_INT n, gn, np, ns;
+    LIS_INT is, ie;
+    LIS_INT* g2l_map;
+    LIS_INT* l2g_map;
 
-	n       = A->n;
-	gn      = A->gn;
-	is      = A->is;
-	ie      = A->ie;
-	np      = n;
-	g2l_map = NULL;
-	l2g_map = NULL;
+    LIS_DEBUG_FUNC_IN;
 
-	g2l_map = (LIS_INT *)lis_malloc( gn*sizeof(LIS_INT),"lis_matrix_g2l_rco::g2l_map" );
-	if( g2l_map==NULL )
-	{
-		LIS_SETERR_MEM(gn*sizeof(LIS_INT));
-		return LIS_OUT_OF_MEMORY;
-	}
+    n = A->n;
+    gn = A->gn;
+    is = A->is;
+    ie = A->ie;
+    np = n;
+    g2l_map = NULL;
+    l2g_map = NULL;
 
-	/* check np */
-	for(i=0;i<gn;i++) g2l_map[i] = 0;
-	for(i=0;i<n;i++)
-	{
-		for(j=0;j<A->w_row[i];j++)
-		{
-			jj = A->w_index[i][j];
-			if( jj<is || jj>=ie )
-			{
-				if( g2l_map[jj]==0 )
-				{
-					np++;
-					g2l_map[jj]  = 1;
-				}
-			}
-		}
-	}
+    g2l_map = (LIS_INT*)lis_malloc(gn * sizeof(LIS_INT), "lis_matrix_g2l_rco::g2l_map");
+    if(g2l_map == NULL) {
+        LIS_SETERR_MEM(gn*sizeof(LIS_INT));
+        return LIS_OUT_OF_MEMORY;
+    }
 
-	l2g_map = (LIS_INT *)lis_malloc( (np-n)*sizeof(LIS_INT),"lis_matrix_g2l_rco::l2g_map" );
-	if( l2g_map==NULL )
-	{
-		lis_free(g2l_map);
-		LIS_SETERR_MEM((np-n)*sizeof(LIS_INT));
-		return LIS_OUT_OF_MEMORY;
-	}
+    /* check np */
+    for(i = 0; i < gn; i++) g2l_map[i] = 0;
+    for(i = 0; i < n; i++) {
+        for(j = 0; j < A->w_row[i]; j++) {
+            jj = A->w_index[i][j];
+            if(jj < is || jj >= ie) {
+                if(g2l_map[jj] == 0) {
+                    np++;
+                    g2l_map[jj] = 1;
+                }
+            }
+        }
+    }
 
-	/* make l2g_map */
-	ns = 0;
-	for(i=0;i<gn;i++)
-	{
-		if( g2l_map[i]==1 )
-		{
-			if( i<is || i>=ie )
-			{
-				l2g_map[ns++] = i;
-			}
-		}
-	}
-/*	lis_sort_i(0,ns-1,l2g_map);*/
+    l2g_map = (LIS_INT*)lis_malloc((np - n) * sizeof(LIS_INT), "lis_matrix_g2l_rco::l2g_map");
+    if(l2g_map == NULL) {
+        lis_free(g2l_map);
+        LIS_SETERR_MEM((np-n)*sizeof(LIS_INT));
+        return LIS_OUT_OF_MEMORY;
+    }
 
-	/* global index => local index */
-	k = n;
-	for(i=0;i<ns;i++)
-	{
-		jj          = l2g_map[i];
-		g2l_map[jj] = k++;
-	}
-	for(i=0;i<n;i++)
-	{
-		for(j=0;j<A->w_row[i];j++)
-		{
-			jj = A->w_index[i][j];
-			if( jj>=is && jj<ie )
-			{
-				A->w_index[i][j] = jj - is;
-			}
-			else
-			{
-				A->w_index[i][j] = g2l_map[jj];
-			}
-		}
-	}
-	A->np       = np;
-	A->l2g_map  = l2g_map;
+    /* make l2g_map */
+    ns = 0;
+    for(i = 0; i < gn; i++) { if(g2l_map[i] == 1) { if(i < is || i >= ie) { l2g_map[ns++] = i; } } }
+    /*	lis_sort_i(0,ns-1,l2g_map);*/
 
-	lis_free(g2l_map);
+    /* global index => local index */
+    k = n;
+    for(i = 0; i < ns; i++) {
+        jj = l2g_map[i];
+        g2l_map[jj] = k++;
+    }
+    for(i = 0; i < n; i++) {
+        for(j = 0; j < A->w_row[i]; j++) {
+            jj = A->w_index[i][j];
+            if(jj >= is && jj < ie) { A->w_index[i][j] = jj - is; }
+            else { A->w_index[i][j] = g2l_map[jj]; }
+        }
+    }
+    A->np = np;
+    A->l2g_map = l2g_map;
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    lis_free(g2l_map);
+
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_commtable_destroy"
-void lis_commtable_destroy(LIS_COMMTABLE table)
-{
-	if( table )
-	{
-		#ifdef USE_MPI
+
+void lis_commtable_destroy(LIS_COMMTABLE table) {
+    if(table) {
+#ifdef USE_MPI
 			if( table->export_index ) lis_free( table->export_index );
 			if( table->import_index ) lis_free( table->import_index );
 			if( table->export_ptr ) lis_free( table->export_ptr );
@@ -434,16 +384,16 @@ void lis_commtable_destroy(LIS_COMMTABLE table)
 			if( table->sta1 ) lis_free( table->sta1 );
 			if( table->sta2 ) lis_free( table->sta2 );
 			if( table->neibpe ) lis_free( table->neibpe );
-			#ifndef USE_OVERLAP
+#ifndef USE_OVERLAP
 				if( table->ws ) lis_free( table->ws );
 				if( table->wr ) lis_free( table->wr );
-			#else
+#else
 				if( table->ws ) MPI_Free_mem( table->ws );
 				if( table->wr ) MPI_Free_mem( table->wr );
-			#endif
-		#endif
-		lis_free(table);
-	}
+#endif
+#endif
+        lis_free(table);
+    }
 }
 
 #ifdef USE_MPI
@@ -495,19 +445,19 @@ LIS_INT lis_commtable_duplicate(LIS_COMMTABLE tin, LIS_COMMTABLE *tout)
 		if( import_index==NULL ) break;
 		export_index  = (LIS_INT *)lis_malloc(exnnz*sizeof(LIS_INT),"lis_commtable_duplicate::export_index");
 		if( export_index==NULL ) break;
-		#ifndef USE_OVERLAP
+#ifndef USE_OVERLAP
 			ws = (LIS_SCALAR *)lis_malloc( wssize*sizeof(LIS_SCALAR),"lis_commtable_duplicate::ws" );
-		#else
+#else
 			ws = NULL;
 			MPI_Alloc_mem(wssize*sizeof(LIS_SCALAR),MPI_INFO_NULL,&ws);
-		#endif
+#endif
 		if( ws==NULL ) break;
-		#ifndef USE_OVERLAP
+#ifndef USE_OVERLAP
 			wr = (LIS_SCALAR *)lis_malloc( wrsize*sizeof(LIS_SCALAR),"lis_commtable_duplicate::wr" );
-		#else
+#else
 			wr = NULL;
 			MPI_Alloc_mem(wrsize*sizeof(LIS_SCALAR),MPI_INFO_NULL,&wr);
-		#endif
+#endif
 		if( wr==NULL ) break;
 		req1 = (MPI_Request *)lis_malloc( neibpetot*sizeof(MPI_Request),"lis_commtable_duplicate::req1" );
 		if( req1==NULL ) break;
@@ -531,13 +481,13 @@ LIS_INT lis_commtable_duplicate(LIS_COMMTABLE tin, LIS_COMMTABLE *tout)
 		if( req2 ) lis_free(req2);
 		if( sta2 ) lis_free(sta2);
 		if( tout ) lis_free(tout);
-		#ifndef USE_OVERLAP
+#ifndef USE_OVERLAP
 			if( ws ) lis_free(ws);
 			if( wr ) lis_free(wr);
-		#else
+#else
 			if( ws ) MPI_Free_mem(ws);
 			if( wr ) MPI_Free_mem(wr);
-		#endif
+#endif
 		printf("out of memory\n");
 		return LIS_OUT_OF_MEMORY;
 	}
@@ -763,30 +713,30 @@ LIS_INT lis_commtable_create(LIS_MATRIX A)
 		import_index[i] = n++;
 	}
 
-	#ifndef USE_QUAD_PRECISION
+#ifndef USE_QUAD_PRECISION
 		wssize = export_ptr[neibpetot];
 		wrsize = import_ptr[neibpetot];
-	#else
+#else
 		wssize = export_ptr[neibpetot]*2;
 		wrsize = import_ptr[neibpetot]*2;
-	#endif
-	#ifndef USE_OVERLAP
+#endif
+#ifndef USE_OVERLAP
 		ws = (LIS_SCALAR *)lis_malloc( wssize*sizeof(LIS_SCALAR),"lis_commtable_create::ws" );
-	#else
+#else
 		ws = NULL;
 		MPI_Alloc_mem(wssize*sizeof(LIS_SCALAR),MPI_INFO_NULL,&ws);
-	#endif
+#endif
 	if( ws==NULL )
 	{
 		LIS_SETERR_MEM(wssize*sizeof(LIS_INT));
 		return LIS_OUT_OF_MEMORY;
 	}
-	#ifndef USE_OVERLAP
+#ifndef USE_OVERLAP
 		wr = (LIS_SCALAR *)lis_malloc( wrsize*sizeof(LIS_SCALAR),"lis_commtable_create::wr" );
-	#else
+#else
 		wr = NULL;
 		MPI_Alloc_mem(wrsize*sizeof(LIS_SCALAR),MPI_INFO_NULL,&wr);
-	#endif
+#endif
 	if( wr==NULL )
 	{
 		LIS_SETERR_MEM(wrsize*sizeof(LIS_INT));

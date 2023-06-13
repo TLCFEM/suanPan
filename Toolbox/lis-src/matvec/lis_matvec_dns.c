@@ -47,56 +47,45 @@
 #endif
 #include "lislib.h"
 
-void lis_matvec_dns(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[])
-{
-	LIS_INT i,j,is,ie;
-	LIS_INT np,n,nprocs,my_rank;
+void lis_matvec_dns(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
+    LIS_INT i, j, is, ie;
+    LIS_INT np, n, nprocs, my_rank;
 
-	n = A->n;
-	np = A->np;
-	#ifdef _OPENMP
+    n = A->n;
+    np = A->np;
+#ifdef _OPENMP
 		nprocs  = omp_get_max_threads();
-	#else
-		nprocs  = 1;
-	#endif
-	#ifdef _OPENMP
+#else
+    nprocs = 1;
+#endif
+#ifdef _OPENMP
 	#pragma omp parallel private(i,j,is,ie,my_rank)
-	#endif
-	{
-		#ifdef _OPENMP
+#endif
+    {
+#ifdef _OPENMP
 			my_rank = omp_get_thread_num();
-		#else
-			my_rank = 0;
-		#endif
-		LIS_GET_ISIE(my_rank,nprocs,n,is,ie);
+#else
+        my_rank = 0;
+#endif
+        LIS_GET_ISIE(my_rank, nprocs, n, is, ie);
 
-		for(i=is;i<ie;i++)
-		{
-			y[i] = 0;
-		}
-		for(j=0;j<np;j++)
-		{
-			for(i=is;i<ie;i++)
-			{
-				y[i] += A->value[j*n+i] * x[j];
-			}
-		}
-	}
+        for(i = is; i < ie; i++) { y[i] = 0; }
+        for(j = 0; j < np; j++) { for(i = is; i < ie; i++) { y[i] += A->value[j * n + i] * x[j]; } }
+    }
 }
 
-void lis_matvech_dns(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[])
-{
-	LIS_INT i,j;
-	LIS_INT np,n;
-	LIS_SCALAR t;
-	#ifdef _OPENMP
+void lis_matvech_dns(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
+    LIS_INT i, j;
+    LIS_INT np, n;
+    LIS_SCALAR t;
+#ifdef _OPENMP
 		LIS_INT is,ie,nprocs,my_rank;
 		LIS_SCALAR *w;
-	#endif
+#endif
 
-	n  = A->n;
-	np = A->np;
-	#ifdef _OPENMP
+    n = A->n;
+    np = A->np;
+#ifdef _OPENMP
 		nprocs = omp_get_max_threads();
 		w = (LIS_SCALAR *)lis_malloc( nprocs*np*sizeof(LIS_SCALAR),"lis_matvech_dns::w" );
 		#pragma omp parallel private(i,j,t,is,ie,my_rank)
@@ -126,15 +115,11 @@ void lis_matvech_dns(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[])
 			}
 		}
 		lis_free(w);
-	#else
-		for(j=0;j<np;j++)
-		{
-			t = 0.0;
-			for(i=0;i<n;i++)
-			{
-				t += conj(A->value[j*n+i]) * x[i];
-			}
-			y[j] = t;
-		}
-	#endif
+#else
+    for(j = 0; j < np; j++) {
+        t = 0.0;
+        for(i = 0; i < n; i++) { t += conj(A->value[j*n+i]) * x[i]; }
+        y[j] = t;
+    }
+#endif
 }

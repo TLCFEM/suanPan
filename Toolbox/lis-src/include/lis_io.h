@@ -24,7 +24,6 @@
    POSSIBILITY OF SUCH DAMAGE.
 */
 
-
 #ifndef __LIS_MATRIX_IO_H__
 #define __LIS_MATRIX_IO_H__
 
@@ -82,36 +81,33 @@
 #define LIS_INPUT_UINDEX 16
 #define LIS_INPUT_UVALUE 17
 
-typedef struct
-{
-	char filename[1024];
-	LIS_INT fileformat;
-	LIS_INT matrix_type_in;
-	LIS_INT matrix_type_out;
-	LIS_INT is_matrix_split;
-	LIS_INT is_array_zero_cut;
-	LIS_INT is_solution;
-	LIS_INT is_rhs;
-	LIS_INT array_base_ptr;
-	LIS_INT array_base_index;
-	LIS_INT precision;
-	LIS_INT param_len;
-	LIS_INT array_len;
-	LIS_INT param_order[9];
-	LIS_INT array_order[9];
+typedef struct {
+    char filename[1024];
+    LIS_INT fileformat;
+    LIS_INT matrix_type_in;
+    LIS_INT matrix_type_out;
+    LIS_INT is_matrix_split;
+    LIS_INT is_array_zero_cut;
+    LIS_INT is_solution;
+    LIS_INT is_rhs;
+    LIS_INT array_base_ptr;
+    LIS_INT array_base_index;
+    LIS_INT precision;
+    LIS_INT param_len;
+    LIS_INT array_len;
+    LIS_INT param_order[9];
+    LIS_INT array_order[9];
 } LIS_MATRIX_INPUT_OPTION;
 
-typedef struct
-{
-	LIS_INT i;
-	LIS_SCALAR value;
+typedef struct {
+    LIS_INT i;
+    LIS_SCALAR value;
 } LIS_MM_VECFMT;
 
-typedef struct
-{
-	LIS_INT i;
-	LIS_INT j;
-	LIS_SCALAR value;
+typedef struct {
+    LIS_INT i;
+    LIS_INT j;
+    LIS_SCALAR value;
 } LIS_MM_MATFMT;
 
 #ifdef __cplusplus
@@ -123,39 +119,38 @@ extern "C"
 /* Matrix Input             */
 /****************************/
 
-	extern LIS_INT lis_input_mm(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE *file);
-	extern LIS_INT lis_input_mm_banner(FILE *file, LIS_INT *mmfmt, LIS_INT *mmtype, LIS_INT *mmstruct);  
-	extern LIS_INT lis_input_mm_dns(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE *file, LIS_INT mmtype);
-	extern LIS_INT lis_input_mm_csr(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE *file, LIS_INT mmtype, LIS_INT mmstruct);
-	extern LIS_INT lis_input_hb(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE *file);
-       	extern LIS_INT lis_input_hb_csr(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE *file);
+extern LIS_INT lis_input_mm(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file);
+extern LIS_INT lis_input_mm_banner(FILE* file, LIS_INT* mmfmt, LIS_INT* mmtype, LIS_INT* mmstruct);
+extern LIS_INT lis_input_mm_dns(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file, LIS_INT mmtype);
+extern LIS_INT lis_input_mm_csr(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file, LIS_INT mmtype, LIS_INT mmstruct);
+extern LIS_INT lis_input_hb(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file);
+extern LIS_INT lis_input_hb_csr(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file);
 
 /****************************/
 /* Matrix Output            */
 /****************************/
 
-	extern LIS_INT lis_output_mm_csr(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, LIS_INT format, char *path);
-	extern LIS_INT lis_output_mm_csc(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, LIS_INT format, char *path);
+extern LIS_INT lis_output_mm_csr(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, LIS_INT format, char* path);
+extern LIS_INT lis_output_mm_csc(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, LIS_INT format, char* path);
 
 /****************************/
 /* Vector Input             */
 /****************************/
 
-	extern LIS_INT lis_input_vector_plain(LIS_VECTOR v, FILE *file);
-	extern LIS_INT lis_input_vector_mm(LIS_VECTOR v, FILE *file);
-	extern LIS_INT lis_input_vector_lis(LIS_VECTOR v, char *filename, FILE *file);
-	extern LIS_INT lis_input_vector_lis_ascii(LIS_VECTOR v, FILE *file);
-	extern LIS_INT lis_fscan_int(LIS_INT n, FILE *file, LIS_INT val[], LIS_INT origin);
-	extern LIS_INT lis_fscan_scalar(LIS_INT n, FILE *file, LIS_SCALAR val[]);
+extern LIS_INT lis_input_vector_plain(LIS_VECTOR v, FILE* file);
+extern LIS_INT lis_input_vector_mm(LIS_VECTOR v, FILE* file);
+extern LIS_INT lis_input_vector_lis(LIS_VECTOR v, char* filename, FILE* file);
+extern LIS_INT lis_input_vector_lis_ascii(LIS_VECTOR v, FILE* file);
+extern LIS_INT lis_fscan_int(LIS_INT n, FILE* file, LIS_INT val[], LIS_INT origin);
+extern LIS_INT lis_fscan_scalar(LIS_INT n, FILE* file, LIS_SCALAR val[]);
 
 /****************************/
 /* Vector Output            */
 /****************************/
 
-	extern LIS_INT lis_output_vector_plain(LIS_VECTOR v, char *path);
-	extern LIS_INT lis_output_vector_mm(LIS_VECTOR v, char *path);
-	extern LIS_INT lis_output_vector_lis_ascii(LIS_VECTOR v, char *path);
-
+extern LIS_INT lis_output_vector_plain(LIS_VECTOR v, char* path);
+extern LIS_INT lis_output_vector_mm(LIS_VECTOR v, char* path);
+extern LIS_INT lis_output_vector_lis_ascii(LIS_VECTOR v, char* path);
 
 #ifdef __cplusplus
 }

@@ -95,7 +95,7 @@ LIS_INT lis_vector_axpyex_mmm(LIS_QUAD_PTR alpha, LIS_VECTOR vx, LIS_VECTOR vy)
 	yl  = vy->value_lo;
 	aa.hi = &vx->work[4];
 	aa.lo = &vx->work[6];
-	#ifndef USE_FMA2_SSE2
+#ifndef USE_FMA2_SSE2
 	    #pragma cdir nodep
 	    #pragma _NEC ivdep
 		#pragma omp parallel for private(i,p1,p2,tq,bhi,blo,chi,clo,sh,sl,th,tl,eh,el)
@@ -103,24 +103,24 @@ LIS_INT lis_vector_axpyex_mmm(LIS_QUAD_PTR alpha, LIS_VECTOR vx, LIS_VECTOR vy)
 		{
 			LIS_QUAD_FMA(y[i],yl[i],y[i],yl[i],alpha.hi[0],alpha.lo[0],x[i],xl[i]);
 		}
-	#else
-		#ifdef _OPENMP
+#else
+#ifdef _OPENMP
 			nprocs = omp_get_max_threads();
-		#else
+#else
 			nprocs = 1;
-		#endif
+#endif
 		aa.hi[0] = aa.hi[1] = alpha.hi[0];
 		aa.lo[0] = aa.lo[1] = alpha.lo[0];
 
-		#ifdef _OPENMP
+#ifdef _OPENMP
 		#pragma omp parallel private(i,bh,ch,sh,wh,th,bl,cl,sl,wl,tl,p1,p2,t0,t1,t2,eh,is,ie,my_rank)
-		#endif
+#endif
 		{
-			#ifdef _OPENMP
+#ifdef _OPENMP
 				my_rank = omp_get_thread_num();
-			#else
+#else
 				my_rank = 0;
-			#endif
+#endif
 			LIS_GET_ISIE(my_rank,nprocs,n,is,ie);
 			for(i=is;i<ie-1;i+=2)
 			{
@@ -131,7 +131,7 @@ LIS_INT lis_vector_axpyex_mmm(LIS_QUAD_PTR alpha, LIS_VECTOR vx, LIS_VECTOR vy)
 				LIS_QUAD_FMA_SSE2(y[i],yl[i],y[i],yl[i],alpha.hi[0],alpha.lo[0],x[i],xl[i]);
 			}
 		}
-	#endif
+#endif
 
 	LIS_DEBUG_FUNC_OUT;
 	return LIS_SUCCESS;
@@ -158,7 +158,7 @@ LIS_INT lis_vector_axpyzex_mmmm(LIS_QUAD_PTR alpha, LIS_VECTOR vx, LIS_VECTOR vy
 	zl   = vz->value_lo;
 	aa.hi = &vx->work[4];
 	aa.lo = &vx->work[6];
-	#ifndef USE_FMA2_SSE2
+#ifndef USE_FMA2_SSE2
 	    #pragma cdir nodep
 	    #pragma _NEC ivdep	
 		#pragma omp parallel for private(i,p1,p2,tq,bhi,blo,chi,clo,sh,sl,th,tl,eh,el)
@@ -166,24 +166,24 @@ LIS_INT lis_vector_axpyzex_mmmm(LIS_QUAD_PTR alpha, LIS_VECTOR vx, LIS_VECTOR vy
 		{
 			LIS_QUAD_FMA(z[i],zl[i],y[i],yl[i],alpha.hi[0],alpha.lo[0],x[i],xl[i]);
 		}
-	#else
-		#ifdef _OPENMP
+#else
+#ifdef _OPENMP
 			nprocs = omp_get_max_threads();
-		#else
+#else
 			nprocs = 1;
-		#endif
+#endif
 		aa.hi[0] = aa.hi[1] = alpha.hi[0];
 		aa.lo[0] = aa.lo[1] = alpha.lo[0];
 
-		#ifdef _OPENMP
+#ifdef _OPENMP
 		#pragma omp parallel private(i,bh,ch,sh,wh,th,bl,cl,sl,wl,tl,p1,p2,t0,t1,t2,eh,is,ie,my_rank)
-		#endif
+#endif
 		{
-			#ifdef _OPENMP
+#ifdef _OPENMP
 				my_rank = omp_get_thread_num();
-			#else
+#else
 				my_rank = 0;
-			#endif
+#endif
 			LIS_GET_ISIE(my_rank,nprocs,n,is,ie);
 			for(i=is;i<ie-1;i+=2)
 			{
@@ -194,7 +194,7 @@ LIS_INT lis_vector_axpyzex_mmmm(LIS_QUAD_PTR alpha, LIS_VECTOR vx, LIS_VECTOR vy
 				LIS_QUAD_FMA_SSE2(z[i],zl[i],y[i],yl[i],alpha.hi[0],alpha.lo[0],x[i],xl[i]);
 			}
 		}
-	#endif
+#endif
 
 	LIS_DEBUG_FUNC_OUT;
 	return LIS_SUCCESS;
@@ -218,7 +218,7 @@ LIS_INT lis_vector_xpayex_mmm(LIS_VECTOR vx, LIS_QUAD_PTR alpha, LIS_VECTOR vy)
 	yl  = vy->value_lo;
 	aa.hi = &vx->work[4];
 	aa.lo = &vx->work[6];
-	#ifndef USE_FMA2_SSE2
+#ifndef USE_FMA2_SSE2
 	    #pragma cdir nodep
 	    #pragma _NEC ivdep	
 		#pragma omp parallel for private(i,p1,p2,tq,bhi,blo,chi,clo,sh,sl,th,tl,eh,el)
@@ -226,24 +226,24 @@ LIS_INT lis_vector_xpayex_mmm(LIS_VECTOR vx, LIS_QUAD_PTR alpha, LIS_VECTOR vy)
 		{
 			LIS_QUAD_FMA(y[i],yl[i],x[i],xl[i],alpha.hi[0],alpha.lo[0],y[i],yl[i]);
 		}
-	#else
-		#ifdef _OPENMP
+#else
+#ifdef _OPENMP
 			nprocs = omp_get_max_threads();
-		#else
+#else
 			nprocs = 1;
-		#endif
+#endif
 		aa.hi[0] = aa.hi[1] = alpha.hi[0];
 		aa.lo[0] = aa.lo[1] = alpha.lo[0];
 
-		#ifdef _OPENMP
+#ifdef _OPENMP
 		#pragma omp parallel private(i,bh,ch,sh,wh,th,bl,cl,sl,wl,tl,p1,p2,t0,t1,t2,eh,is,ie,my_rank)
-		#endif
+#endif
 		{
-			#ifdef _OPENMP
+#ifdef _OPENMP
 				my_rank = omp_get_thread_num();
-			#else
+#else
 				my_rank = 0;
-			#endif
+#endif
 			LIS_GET_ISIE(my_rank,nprocs,n,is,ie);
 			for(i=is;i<ie-1;i+=2)
 			{
@@ -254,7 +254,7 @@ LIS_INT lis_vector_xpayex_mmm(LIS_VECTOR vx, LIS_QUAD_PTR alpha, LIS_VECTOR vy)
 				LIS_QUAD_FMA_SSE2(y[i],yl[i],x[i],xl[i],alpha.hi[0],alpha.lo[0],y[i],yl[i]);
 			}
 		}
-	#endif
+#endif
 
 	LIS_DEBUG_FUNC_OUT;
 	return LIS_SUCCESS;
@@ -267,13 +267,13 @@ LIS_INT lis_vector_dotex_mmm(LIS_VECTOR vx, LIS_VECTOR vy, LIS_QUAD_PTR *val)
 	LIS_INT i,n;
 	LIS_SCALAR *x,*y,*xl,*yl;
 	LIS_QUAD_PTR dotm2,dotm,tmpm;
-	#ifdef _OPENMP
+#ifdef _OPENMP
 		LIS_INT is,ie,nprocs,my_rank;
 		LIS_SCALAR *gt;
-	#endif
-	#ifdef USE_MPI
+#endif
+#ifdef USE_MPI
 		MPI_Comm comm;
-	#endif
+#endif
 	LIS_QUAD_DECLAR;
 
 	LIS_DEBUG_FUNC_IN;
@@ -289,29 +289,29 @@ LIS_INT lis_vector_dotex_mmm(LIS_VECTOR vx, LIS_VECTOR vy, LIS_QUAD_PTR *val)
 	dotm.lo = &vx->work[9];
 	tmpm.hi = &vx->work[10];
 	tmpm.lo = &vx->work[11];
-	#ifndef NO_ERROR_CHECK
+#ifndef NO_ERROR_CHECK
 		if( n!=vy->n )
 		{
 			LIS_SETERR(LIS_ERR_ILL_ARG,"length of vector x and y is not equal\n");
 			return LIS_ERR_ILL_ARG;
 		}
-	#endif
+#endif
 
-	#ifdef USE_MPI
+#ifdef USE_MPI
 		comm   = vx->comm;
-	#endif
-	#ifdef _OPENMP
+#endif
+#ifdef _OPENMP
 		gt     = lis_vec_tmp;
 		nprocs = omp_get_max_threads();
-		#ifndef USE_SSE2
+#ifndef USE_SSE2
 			#pragma omp parallel private(i,p1,p2,tq,bhi,blo,chi,clo,sh,th,sl,tl,eh,el,is,ie,my_rank)
-		#else
+#else
 			#pragma omp parallel private(i,bh,ch,sh,wh,th,bl,cl,sl,wl,tl,p1,p2,t0,t1,t2,eh,is,ie,my_rank)
-		#endif
+#endif
 		{
 			my_rank = omp_get_thread_num();
 			LIS_GET_ISIE(my_rank,nprocs,n,is,ie);
-			#ifndef USE_FMA2_SSE2
+#ifndef USE_FMA2_SSE2
 				gt[my_rank*LIS_VEC_TMP_PADD] = gt[my_rank*LIS_VEC_TMP_PADD+1] = 0.0;
 				#pragma cdir nodep
 				#pragma _NEC ivdep
@@ -319,13 +319,13 @@ LIS_INT lis_vector_dotex_mmm(LIS_VECTOR vx, LIS_VECTOR vy, LIS_QUAD_PTR *val)
 				{
 					LIS_QUAD_FMA(gt[my_rank*LIS_VEC_TMP_PADD],gt[my_rank*LIS_VEC_TMP_PADD+1],gt[my_rank*LIS_VEC_TMP_PADD],gt[my_rank*LIS_VEC_TMP_PADD+1],y[i],yl[i],x[i],xl[i]);
 				}
-			#else
+#else
 				gt[my_rank*LIS_VEC_TMP_PADD  ] = gt[my_rank*LIS_VEC_TMP_PADD+1] = 0.0;
 				gt[my_rank*LIS_VEC_TMP_PADD+2] = gt[my_rank*LIS_VEC_TMP_PADD+3] = 0.0;
-				#ifdef USE_VEC_COMP
+#ifdef USE_VEC_COMP
 				#pragma cdir nodep
 				#pragma _NEC ivdep
-				#endif
+#endif
 				for(i=is;i<ie-1;i+=2)
 				{
 					LIS_QUAD_FMA2_SSE2(gt[my_rank*LIS_VEC_TMP_PADD],gt[my_rank*LIS_VEC_TMP_PADD+2],gt[my_rank*LIS_VEC_TMP_PADD],gt[my_rank*LIS_VEC_TMP_PADD+2],y[i],yl[i],x[i],xl[i]);
@@ -335,19 +335,19 @@ LIS_INT lis_vector_dotex_mmm(LIS_VECTOR vx, LIS_VECTOR vy, LIS_QUAD_PTR *val)
 				{
 					LIS_QUAD_FMA_SSE2(gt[my_rank*LIS_VEC_TMP_PADD],gt[my_rank*LIS_VEC_TMP_PADD+1],gt[my_rank*LIS_VEC_TMP_PADD],gt[my_rank*LIS_VEC_TMP_PADD+1],y[i],yl[i],x[i],xl[i]);
 				}
-			#endif
+#endif
 		}
 		dotm.hi[0] = dotm.lo[0] = 0.0;
 		for(i=0;i<nprocs;i++)
 		{
-			#ifndef USE_SSE2
+#ifndef USE_SSE2
 				LIS_QUAD_ADD(dotm.hi[0],dotm.lo[0],dotm.hi[0],dotm.lo[0],gt[i*LIS_VEC_TMP_PADD],gt[i*LIS_VEC_TMP_PADD+1]);
-			#else
+#else
 				LIS_QUAD_ADD_SSE2(dotm.hi[0],dotm.lo[0],dotm.hi[0],dotm.lo[0],gt[i*LIS_VEC_TMP_PADD],gt[i*LIS_VEC_TMP_PADD+1]);
-			#endif
+#endif
 		}
-	#else
-		#ifndef USE_FMA2_SSE2
+#else
+#ifndef USE_FMA2_SSE2
 			dotm.hi[0] = dotm.lo[0] = 0.0;
 			#pragma cdir nodep
 			#pragma _NEC ivdep
@@ -355,7 +355,7 @@ LIS_INT lis_vector_dotex_mmm(LIS_VECTOR vx, LIS_VECTOR vy, LIS_QUAD_PTR *val)
 			{
 				LIS_QUAD_FMA(dotm.hi[0],dotm.lo[0],dotm.hi[0],dotm.lo[0],y[i],yl[i],x[i],xl[i]);
 			}
-		#else
+#else
 			dotm2.hi[0] = dotm2.hi[1] = 0.0;
 			dotm2.lo[0] = dotm2.lo[1] = 0.0;
 			for(i=0;i<n-1;i+=2)
@@ -367,16 +367,16 @@ LIS_INT lis_vector_dotex_mmm(LIS_VECTOR vx, LIS_VECTOR vy, LIS_QUAD_PTR *val)
 			{
 				LIS_QUAD_FMA_SSE2(dotm.hi[0],dotm.lo[0],dotm.hi[0],dotm.lo[0],y[i],yl[i],x[i],xl[i]);
 			}
-		#endif
-	#endif
-	#ifdef USE_MPI
+#endif
+#endif
+#ifdef USE_MPI
 		MPI_Allreduce(dotm.hi,tmpm.hi,1,LIS_MPI_MSCALAR,LIS_MPI_MSUM,comm);
 		val->hi[0] = tmpm.hi[0];
 		val->lo[0] = tmpm.lo[0];
-	#else
+#else
 		val->hi[0] = dotm.hi[0];
 		val->lo[0] = dotm.lo[0];
-	#endif
+#endif
 
 	LIS_DEBUG_FUNC_OUT;
 	return LIS_SUCCESS;
@@ -389,13 +389,13 @@ LIS_INT lis_vector_nrm2ex_mm(LIS_VECTOR vx, LIS_QUAD_PTR *val)
 	LIS_INT i,n;
 	LIS_SCALAR *x,*xl;
 	LIS_QUAD_PTR dotm2,dotm,tmpm;
-	#ifdef _OPENMP
+#ifdef _OPENMP
 		LIS_INT is,ie,nprocs,my_rank;
 		LIS_SCALAR *gt;
-	#endif
-	#ifdef USE_MPI
+#endif
+#ifdef USE_MPI
 		MPI_Comm comm;
-	#endif
+#endif
 	LIS_QUAD_DECLAR;
 
 	LIS_DEBUG_FUNC_IN;
@@ -409,21 +409,21 @@ LIS_INT lis_vector_nrm2ex_mm(LIS_VECTOR vx, LIS_QUAD_PTR *val)
 	dotm.lo = &vx->work[9];
 	tmpm.hi = &vx->work[10];
 	tmpm.lo = &vx->work[11];
-	#ifdef USE_MPI
+#ifdef USE_MPI
 		comm   = vx->comm;
-	#endif
-	#ifdef _OPENMP
+#endif
+#ifdef _OPENMP
 		gt     = lis_vec_tmp;
 		nprocs = omp_get_max_threads();
-		#ifndef USE_SSE2
+#ifndef USE_SSE2
 			#pragma omp parallel private(i,is,ie,my_rank,p1,p2,tq,bhi,blo,chi,clo,sh,eh,sl,el,th,tl)
-		#else
+#else
 			#pragma omp parallel private(i,bh,ch,sh,wh,th,bl,cl,sl,wl,tl,p1,p2,t0,t1,t2,eh,is,ie,my_rank)
-		#endif
+#endif
 		{
 			my_rank = omp_get_thread_num();
 			LIS_GET_ISIE(my_rank,nprocs,n,is,ie);
-			#ifndef USE_FMA2_SSE2
+#ifndef USE_FMA2_SSE2
 				gt[my_rank*LIS_VEC_TMP_PADD] = gt[my_rank*LIS_VEC_TMP_PADD+1] = 0.0;
 				#pragma cdir nodep
 				#pragma _NEC ivdep
@@ -431,13 +431,13 @@ LIS_INT lis_vector_nrm2ex_mm(LIS_VECTOR vx, LIS_QUAD_PTR *val)
 				{
 					LIS_QUAD_FSA(gt[my_rank*LIS_VEC_TMP_PADD],gt[my_rank*LIS_VEC_TMP_PADD+1],gt[my_rank*LIS_VEC_TMP_PADD],gt[my_rank*LIS_VEC_TMP_PADD+1],x[i],xl[i]);
 				}
-			#else
+#else
 				gt[my_rank*LIS_VEC_TMP_PADD  ] = gt[my_rank*LIS_VEC_TMP_PADD+1] = 0.0;
 				gt[my_rank*LIS_VEC_TMP_PADD+2] = gt[my_rank*LIS_VEC_TMP_PADD+3] = 0.0;
-				#ifdef USE_VEC_COMP
+#ifdef USE_VEC_COMP
 				#pragma cdir nodep
 				#pragma _NEC ivdep
-				#endif
+#endif
 				for(i=is;i<ie-1;i+=2)
 				{
 					LIS_QUAD_FSA2_SSE2(gt[my_rank*LIS_VEC_TMP_PADD],gt[my_rank*LIS_VEC_TMP_PADD+2],gt[my_rank*LIS_VEC_TMP_PADD],gt[my_rank*LIS_VEC_TMP_PADD+2],x[i],xl[i]);
@@ -447,19 +447,19 @@ LIS_INT lis_vector_nrm2ex_mm(LIS_VECTOR vx, LIS_QUAD_PTR *val)
 				{
 					LIS_QUAD_FSA_SSE2(gt[my_rank*LIS_VEC_TMP_PADD],gt[my_rank*LIS_VEC_TMP_PADD+1],gt[my_rank*LIS_VEC_TMP_PADD],gt[my_rank*LIS_VEC_TMP_PADD+1],x[i],xl[i]);
 				}
-			#endif
+#endif
 		}
 		dotm.hi[0] = dotm.lo[0] = 0.0;
 		for(i=0;i<nprocs;i++)
 		{
-			#ifndef USE_SSE2
+#ifndef USE_SSE2
 				LIS_QUAD_ADD(dotm.hi[0],dotm.lo[0],dotm.hi[0],dotm.lo[0],gt[i*LIS_VEC_TMP_PADD],gt[i*LIS_VEC_TMP_PADD+1]);
-			#else
+#else
 				LIS_QUAD_ADD_SSE2(dotm.hi[0],dotm.lo[0],dotm.hi[0],dotm.lo[0],gt[i*LIS_VEC_TMP_PADD],gt[i*LIS_VEC_TMP_PADD+1]);
-			#endif
+#endif
 		}
-	#else
-		#ifndef USE_FMA2_SSE2
+#else
+#ifndef USE_FMA2_SSE2
 			dotm.hi[0] = dotm.lo[0] = 0.0;
 			#pragma cdir nodep
 			#pragma _NEC ivdep
@@ -467,7 +467,7 @@ LIS_INT lis_vector_nrm2ex_mm(LIS_VECTOR vx, LIS_QUAD_PTR *val)
 			{
 				LIS_QUAD_FSA(dotm.hi[0],dotm.lo[0],dotm.hi[0],dotm.lo[0],x[i],xl[i]);
 			}
-		#else
+#else
 			dotm2.hi[0] = dotm2.hi[1] = 0.0;
 			dotm2.lo[0] = dotm2.lo[1] = 0.0;
 			for(i=0;i<n-1;i+=2)
@@ -479,22 +479,22 @@ LIS_INT lis_vector_nrm2ex_mm(LIS_VECTOR vx, LIS_QUAD_PTR *val)
 			{
 				LIS_QUAD_FSA_SSE2(dotm.hi[0],dotm.lo[0],dotm.hi[0],dotm.lo[0],x[i],xl[i]);
 			}
-		#endif
-	#endif
-	#ifdef USE_MPI
+#endif
+#endif
+#ifdef USE_MPI
 		MPI_Allreduce(dotm.hi,tmpm.hi,1,LIS_MPI_MSCALAR,LIS_MPI_MSUM,comm);
-		#ifndef USE_SSE2
+#ifndef USE_SSE2
 			LIS_QUAD_SQRT(val->hi[0],val->lo[0],tmpm.hi[0],tmpm.lo[0]);
-		#else
+#else
 			LIS_QUAD_SQRT_SSE2(val->hi[0],val->lo[0],tmpm.hi[0],tmpm.lo[0]);
-		#endif
-	#else
-		#ifndef USE_SSE2
+#endif
+#else
+#ifndef USE_SSE2
 			LIS_QUAD_SQRT(val->hi[0],val->lo[0],dotm.hi[0],dotm.lo[0]);
-		#else
+#else
 			LIS_QUAD_SQRT_SSE2(val->hi[0],val->lo[0],dotm.hi[0],dotm.lo[0]);
-		#endif
-	#endif
+#endif
+#endif
 
 	LIS_DEBUG_FUNC_OUT;
 	return LIS_SUCCESS;
@@ -514,13 +514,13 @@ LIS_INT lis_vector_copyex_mm(LIS_VECTOR vx, LIS_VECTOR vy)
 	y   = vy->value;
 	xl  = vx->value_lo;
 	yl  = vy->value_lo;
-	#ifdef USE_VEC_COMP
+#ifdef USE_VEC_COMP
     #pragma cdir nodep
     #pragma _NEC ivdep	
-	#endif
-	#ifdef _OPENMP
+#endif
+#ifdef _OPENMP
 	#pragma omp parallel for private(i)
-	#endif
+#endif
 	for(i=0; i<n; i++)
 	{
 		y[i]  = x[i];
@@ -543,13 +543,13 @@ LIS_INT lis_vector_copyex_nm(LIS_VECTOR vx, LIS_VECTOR vy)
 	x   = vx->value;
 	y   = vy->value;
 	yl  = vy->value_lo;
-	#ifdef USE_VEC_COMP
+#ifdef USE_VEC_COMP
     #pragma cdir nodep
     #pragma _NEC ivdep
-	#endif
-	#ifdef _OPENMP
+#endif
+#ifdef _OPENMP
 	#pragma omp parallel for private(i)
-	#endif
+#endif
 	for(i=0; i<n; i++)
 	{
 		y[i]  = x[i];
@@ -571,13 +571,13 @@ LIS_INT lis_vector_copyex_mn(LIS_VECTOR vx, LIS_VECTOR vy)
 	n = vx->n;
 	x   = vx->value;
 	y   = vy->value;
-	#ifdef USE_VEC_COMP
+#ifdef USE_VEC_COMP
     #pragma cdir nodep
     #pragma _NEC ivdep	
-	#endif
-	#ifdef _OPENMP
+#endif
+#ifdef _OPENMP
 	#pragma omp parallel for private(i)
-	#endif
+#endif
 	for(i=0; i<n; i++)
 	{
 		y[i]  = x[i];
@@ -601,38 +601,38 @@ LIS_INT lis_vector_scaleex_nm(LIS_SCALAR alpha, LIS_VECTOR vx)
 	x  = vx->value;
 	xl = vx->value_lo;
 	aa = vx->work;
-	#ifndef USE_FMA2_SSE2
+#ifndef USE_FMA2_SSE2
 	    #pragma cdir nodep
 	    #pragma _NEC ivdep	
-		#ifndef USE_SSE2
+#ifndef USE_SSE2
 			#pragma omp parallel for private(i,p1,p2,tq,bhi,blo,chi,clo,sh,eh,sl,el,th,tl)
-		#else
+#else
 			#pragma omp parallel for private(i,bh,ch,sh,th,bl,sl,tl,p1,p2,t0,t1,t2,is,ie,my_rank)
-		#endif
+#endif
 		for(i=0; i<n; i++)
 		{
 			LIS_QUAD_MULD(x[i],xl[i],x[i],xl[i],alpha);
 		}
-	#else
-		#ifdef _OPENMP
+#else
+#ifdef _OPENMP
 			nprocs = omp_get_max_threads();
-		#else
+#else
 			nprocs = 1;
-		#endif
+#endif
 		aa[0] = aa[1] = alpha;
-		#ifdef _OPENMP
-		#ifndef USE_SSE2
+#ifdef _OPENMP
+#ifndef USE_SSE2
 			#pragma omp parallel private(i,is,ie,my_rank,p1,p2,tq,bhi,blo,chi,clo,sh,eh,sl,el,th,tl)
-		#else
+#else
 			#pragma omp parallel private(i,bh,ch,sh,wh,th,bl,cl,sl,wl,tl,p1,p2,t0,t1,t2,eh,is,ie,my_rank)
-		#endif
-		#endif
+#endif
+#endif
 		{
-			#ifdef _OPENMP
+#ifdef _OPENMP
 				my_rank = omp_get_thread_num();
-			#else
+#else
 				my_rank = 0;
-			#endif
+#endif
 			LIS_GET_ISIE(my_rank,nprocs,n,is,ie);
 			for(i=is;i<ie-1;i+=2)
 			{
@@ -643,7 +643,7 @@ LIS_INT lis_vector_scaleex_nm(LIS_SCALAR alpha, LIS_VECTOR vx)
 				LIS_QUAD_MULD_SSE2(x[i],xl[i],x[i],xl[i],alpha);
 			}
 		}
-	#endif
+#endif
 	LIS_DEBUG_FUNC_OUT;
 	return LIS_SUCCESS;
 }
@@ -664,7 +664,7 @@ LIS_INT lis_vector_scaleex_mm(LIS_QUAD_PTR alpha, LIS_VECTOR vx)
 	xl = vx->value_lo;
 	aa.hi = &vx->work[0];
 	aa.lo = &vx->work[2];
-	#ifndef USE_FMA2_SSE2
+#ifndef USE_FMA2_SSE2
 	    #pragma cdir nodep
 	    #pragma _NEC ivdep		    	
 		#pragma omp parallel for private(i,p1,p2,tq,bhi,blo,chi,clo,sh,eh,sl,el,th,tl)
@@ -672,23 +672,23 @@ LIS_INT lis_vector_scaleex_mm(LIS_QUAD_PTR alpha, LIS_VECTOR vx)
 		{
 			LIS_QUAD_MUL(x[i],xl[i],x[i],xl[i],alpha.hi[0],alpha.lo[0]);
 		}
-	#else
-		#ifdef _OPENMP
+#else
+#ifdef _OPENMP
 			nprocs = omp_get_max_threads();
-		#else
+#else
 			nprocs = 1;
-		#endif
+#endif
 		aa.hi[0] = aa.hi[1] = alpha.hi[0];
 		aa.lo[0] = aa.lo[1] = alpha.lo[0];
-		#ifdef _OPENMP
+#ifdef _OPENMP
 		#pragma omp parallel private(i,bh,ch,sh,wh,th,bl,cl,sl,wl,tl,p1,p2,t0,t1,t2,eh,is,ie,my_rank)
-		#endif
+#endif
 		{
-			#ifdef _OPENMP
+#ifdef _OPENMP
 				my_rank = omp_get_thread_num();
-			#else
+#else
 				my_rank = 0;
-			#endif
+#endif
 			LIS_GET_ISIE(my_rank,nprocs,n,is,ie);
 			for(i=is;i<ie-1;i+=2)
 			{
@@ -699,7 +699,7 @@ LIS_INT lis_vector_scaleex_mm(LIS_QUAD_PTR alpha, LIS_VECTOR vx)
 				LIS_QUAD_MUL_SSE2(x[i],xl[i],x[i],xl[i],aa.hi[0],aa.lo[0]);
 			}
 		}
-	#endif
+#endif
 	LIS_DEBUG_FUNC_OUT;
 	return LIS_SUCCESS;
 }
@@ -716,13 +716,13 @@ LIS_INT lis_vector_set_allex_nm(LIS_SCALAR alpha, LIS_VECTOR vx)
 	n   = vx->n;
 	x   = vx->value;
 	xl  = vx->value_lo;
-	#ifdef USE_VEC_COMP
+#ifdef USE_VEC_COMP
 	#pragma cdir nodep
 	#pragma _NEC ivdep
-	#endif
-	#ifdef _OPENMP
+#endif
+#ifdef _OPENMP
 	#pragma omp parallel for private(i)
-	#endif
+#endif
 	for(i=0; i<n; i++)
 	{
 		x[i]  = alpha;
@@ -749,24 +749,24 @@ LIS_INT lis_vector_reciprocalex_m(LIS_VECTOR vx)
 	xl  = vx->value_lo;
 	one_hi = 1.0;
 	one_lo = 0.0;
-	#ifdef USE_VEC_COMP
+#ifdef USE_VEC_COMP
     #pragma cdir nodep
     #pragma _NEC ivdep		
-	#endif
-	#ifdef _OPENMP
-	#ifndef USE_SSE2
+#endif
+#ifdef _OPENMP
+#ifndef USE_SSE2
 		#pragma omp parallel for private(i,p1,p2,tq,bhi,blo,chi,clo,sh,eh,sl,el,th,tl)
-	#else
+#else
 		#pragma omp parallel private(i,bh,ch,sh,wh,th,bl,cl,sl,wl,tl,p1,p2,t0,t1,t2,eh)
-	#endif
-	#endif
+#endif
+#endif
 	for(i=0; i<n; i++)
 	{
-		#ifndef USE_SSE2
+#ifndef USE_SSE2
 			LIS_QUAD_DIV(x[i],xl[i],one_hi,one_lo,x[i],xl[i]);
-		#else
+#else
 			LIS_QUAD_DIV_SSE2(x[i],xl[i],one_hi,one_lo,x[i],xl[i]);
-		#endif
+#endif
 	}
 	LIS_DEBUG_FUNC_OUT;
 	return LIS_SUCCESS;
@@ -784,11 +784,11 @@ void lis_mpi_msum(LIS_QUAD *invec, LIS_QUAD *inoutvec, LIS_INT *len, MPI_Datatyp
 
 	for(i=0;i<*len;i++)
 	{
-		#ifndef USE_SSE2
+#ifndef USE_SSE2
 			LIS_QUAD_ADD(inoutvec[i].hi,inoutvec[i].lo,inoutvec[i].hi,inoutvec[i].lo,invec[i].hi,invec[i].lo);
-		#else
+#else
 			LIS_QUAD_ADD_SSE2(inoutvec[i].hi,inoutvec[i].lo,inoutvec[i].hi,inoutvec[i].lo,invec[i].hi,invec[i].lo);
-		#endif
+#endif
 	}
 
 	LIS_DEBUG_FUNC_OUT;
@@ -892,11 +892,11 @@ LIS_INT lis_reduce_mp(LIS_COMMTABLE commtable, LIS_VECTOR X)
 		for(i=0;i<inum;i++)
 		{
 			/*x[commtable->export_index[i]] += ws[i];*/
-			#ifndef USE_SSE2
+#ifndef USE_SSE2
 				LIS_QUAD_ADD(x[commtable->export_index[is+i]],xl[commtable->export_index[is+i]],x[commtable->export_index[is+i]],xl[commtable->export_index[is+i]],ws[is*2+i],ws[is*2+inum+i]);
-			#else
+#else
 				LIS_QUAD_ADD_SSE2(x[commtable->export_index[is+i]],xl[commtable->export_index[is+i]],x[commtable->export_index[is+i]],xl[commtable->export_index[is+i]],ws[is*2+i],ws[is*2+inum+i]);
-			#endif
+#endif
 		}
 	}
 	MPI_Waitall(neibpetot, commtable->req1, commtable->sta1);

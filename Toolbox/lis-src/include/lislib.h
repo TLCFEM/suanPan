@@ -24,7 +24,6 @@
    POSSIBILITY OF SUCH DAMAGE.
 */
 
-
 #ifndef __LISLIB_H__
 #define __LISLIB_H__
 

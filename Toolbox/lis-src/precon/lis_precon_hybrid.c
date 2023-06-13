@@ -58,52 +58,46 @@ extern LIS_SOLVER_EXECUTE lis_solver_execute[];
 
 #undef __FUNC__
 #define __FUNC__ "lis_precon_create_hybrid"
-LIS_INT lis_precon_create_hybrid(LIS_SOLVER solver, LIS_PRECON precon)
-{
-        LIS_INT	nsolver, maxiter, precision;
-	LIS_INT	err;
-	LIS_REAL *rhistory;
-	LIS_VECTOR xx;
-	LIS_SOLVER psolver;
-	LIS_MATRIX A;
-	LIS_PRECON pprecon;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_precon_create_hybrid(LIS_SOLVER solver, LIS_PRECON precon) {
+    LIS_INT nsolver, maxiter, precision;
+    LIS_INT err;
+    LIS_REAL* rhistory;
+    LIS_VECTOR xx;
+    LIS_SOLVER psolver;
+    LIS_MATRIX A;
+    LIS_PRECON pprecon;
 
+    LIS_DEBUG_FUNC_IN;
 
-	A           = solver->A;
+    A = solver->A;
 
     err = lis_solver_create(&psolver);
-	if( err )
-	{
-		return err;
-	}
+    if(err) { return err; }
 
-	psolver->params[LIS_PARAMS_RESID-LIS_OPTIONS_LEN] = solver->params[LIS_PARAMS_PRESID-LIS_OPTIONS_LEN];
-	psolver->params[LIS_PARAMS_SSOR_OMEGA-LIS_OPTIONS_LEN] = solver->params[LIS_PARAMS_POMEGA-LIS_OPTIONS_LEN];
-	psolver->options[LIS_OPTIONS_MAXITER]             = solver->options[LIS_OPTIONS_PMAXITER];
-	psolver->options[LIS_OPTIONS_ELL]                 = solver->options[LIS_OPTIONS_PELL];
-	psolver->options[LIS_OPTIONS_RESTART]             = solver->options[LIS_OPTIONS_PRESTART];
-	psolver->options[LIS_OPTIONS_OUTPUT]              = 0;
-	psolver->options[LIS_OPTIONS_SOLVER]              = solver->options[LIS_OPTIONS_PSOLVER];
-	psolver->options[LIS_OPTIONS_PRECON]              = solver->options[LIS_OPTIONS_PPRECON];
-	psolver->options[LIS_OPTIONS_INITGUESS_ZEROS]     = solver->options[LIS_OPTIONS_INITGUESS_ZEROS];
-	psolver->options[LIS_OPTIONS_PRECISION]           = solver->options[LIS_OPTIONS_PRECISION];
-	psolver->A                                        = solver->A;
-	psolver->Ah                                       = solver->Ah;
-	psolver->precision                                = solver->precision;
+    psolver->params[LIS_PARAMS_RESID - LIS_OPTIONS_LEN] = solver->params[LIS_PARAMS_PRESID - LIS_OPTIONS_LEN];
+    psolver->params[LIS_PARAMS_SSOR_OMEGA - LIS_OPTIONS_LEN] = solver->params[LIS_PARAMS_POMEGA - LIS_OPTIONS_LEN];
+    psolver->options[LIS_OPTIONS_MAXITER] = solver->options[LIS_OPTIONS_PMAXITER];
+    psolver->options[LIS_OPTIONS_ELL] = solver->options[LIS_OPTIONS_PELL];
+    psolver->options[LIS_OPTIONS_RESTART] = solver->options[LIS_OPTIONS_PRESTART];
+    psolver->options[LIS_OPTIONS_OUTPUT] = 0;
+    psolver->options[LIS_OPTIONS_SOLVER] = solver->options[LIS_OPTIONS_PSOLVER];
+    psolver->options[LIS_OPTIONS_PRECON] = solver->options[LIS_OPTIONS_PPRECON];
+    psolver->options[LIS_OPTIONS_INITGUESS_ZEROS] = solver->options[LIS_OPTIONS_INITGUESS_ZEROS];
+    psolver->options[LIS_OPTIONS_PRECISION] = solver->options[LIS_OPTIONS_PRECISION];
+    psolver->A = solver->A;
+    psolver->Ah = solver->Ah;
+    psolver->precision = solver->precision;
 
-	nsolver     = psolver->options[LIS_OPTIONS_SOLVER];
-	maxiter     = psolver->options[LIS_OPTIONS_MAXITER];
-	precision   = psolver->options[LIS_OPTIONS_PRECISION];
-	A           = psolver->A;
+    nsolver = psolver->options[LIS_OPTIONS_SOLVER];
+    maxiter = psolver->options[LIS_OPTIONS_MAXITER];
+    precision = psolver->options[LIS_OPTIONS_PRECISION];
+    A = psolver->A;
 
-
-
-	/* create initial vector */
-	#ifndef USE_QUAD_PRECISION
-		err = lis_vector_duplicate(A,&xx);
-	#else
+    /* create initial vector */
+#ifndef USE_QUAD_PRECISION
+    err = lis_vector_duplicate(A, &xx);
+#else
 		if( precision==LIS_PRECISION_DOUBLE )
 		{
 			err = lis_vector_duplicate(A,&xx);
@@ -112,200 +106,189 @@ LIS_INT lis_precon_create_hybrid(LIS_SOLVER solver, LIS_PRECON precon)
 		{
 			err = lis_vector_duplicateex(LIS_PRECISION_QUAD,A,&xx);
 		}
-	#endif
-	if( err )
-	{
-		solver->retcode = err;
-		return err;
-	}
+#endif
+    if(err) {
+        solver->retcode = err;
+        return err;
+    }
 
-	/* create residual history vector */
-	rhistory = (LIS_REAL *)lis_malloc((maxiter+2)*sizeof(LIS_REAL),"lis_precon_create_hybrid::rhistory");
-	if( rhistory==NULL )
-	{
-		LIS_SETERR_MEM((maxiter+2)*sizeof(LIS_SCALAR));
-		lis_vector_destroy(xx);
-		solver->retcode = err;
-		return err;
-	}
+    /* create residual history vector */
+    rhistory = (LIS_REAL*)lis_malloc((maxiter + 2) * sizeof(LIS_REAL), "lis_precon_create_hybrid::rhistory");
+    if(rhistory == NULL) {
+        LIS_SETERR_MEM((maxiter+2)*sizeof(LIS_SCALAR));
+        lis_vector_destroy(xx);
+        solver->retcode = err;
+        return err;
+    }
 
-	/* create preconditioner */
-	err = lis_precon_create(psolver, &pprecon);
-	if( err )
-	{
-		lis_vector_destroy(xx);
-		lis_solver_work_destroy(psolver);
-		lis_free(rhistory);
-		solver->retcode = err;
-		return err;
-	}
+    /* create preconditioner */
+    err = lis_precon_create(psolver, &pprecon);
+    if(err) {
+        lis_vector_destroy(xx);
+        lis_solver_work_destroy(psolver);
+        lis_free(rhistory);
+        solver->retcode = err;
+        return err;
+    }
 
-	/* create work vector */
-	err = lis_solver_malloc_work[nsolver](psolver);
-	if( err )
-	{
-		lis_vector_destroy(xx);
-		lis_precon_destroy(pprecon);
-		solver->retcode = err;
-		return err;
-	}
+    /* create work vector */
+    err = lis_solver_malloc_work[nsolver](psolver);
+    if(err) {
+        lis_vector_destroy(xx);
+        lis_precon_destroy(pprecon);
+        solver->retcode = err;
+        return err;
+    }
 
+    psolver->x = xx;
+    psolver->precon = pprecon;
+    psolver->rhistory = rhistory;
+    precon->solver = psolver;
 
-	psolver->x        = xx;
-	psolver->precon   = pprecon;
-	psolver->rhistory = rhistory;
-	precon->solver    = psolver;
-
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_psolve_hybrid"
-LIS_INT lis_psolve_hybrid(LIS_SOLVER solver, LIS_VECTOR B, LIS_VECTOR X)
-{
-	LIS_VECTOR xx;
-	LIS_SOLVER solver2;
-	LIS_INT	nsolver;
-	LIS_PRECON precon;
 
-	/*
-	 *  Mx = b
-	 *  M  = A
-	 */
+LIS_INT lis_psolve_hybrid(LIS_SOLVER solver, LIS_VECTOR B, LIS_VECTOR X) {
+    LIS_VECTOR xx;
+    LIS_SOLVER solver2;
+    LIS_INT nsolver;
+    LIS_PRECON precon;
 
-	LIS_DEBUG_FUNC_IN;
+    /*
+     *  Mx = b
+     *  M  = A
+     */
 
-	precon      = solver->precon;
-	solver2     = precon->solver;
-	xx          = precon->solver->x;
-	nsolver     = solver2->options[LIS_OPTIONS_SOLVER];
-	solver2->b  = B;
+    LIS_DEBUG_FUNC_IN;
 
-	if( solver2->options[LIS_OPTIONS_INITGUESS_ZEROS] )
-	{
-		#ifdef USE_QUAD_PRECISION
+    precon = solver->precon;
+    solver2 = precon->solver;
+    xx = precon->solver->x;
+    nsolver = solver2->options[LIS_OPTIONS_SOLVER];
+    solver2->b = B;
+
+    if(solver2->options[LIS_OPTIONS_INITGUESS_ZEROS]) {
+#ifdef USE_QUAD_PRECISION
 		if( solver->precision==LIS_PRECISION_DEFAULT )
 		{
-		#endif
-			lis_vector_set_all(0,xx);
-		#ifdef USE_QUAD_PRECISION
+#endif
+        lis_vector_set_all(0, xx);
+#ifdef USE_QUAD_PRECISION
 		}
 		else
 		{
 			lis_vector_set_allex_nm(0,xx);
 		}
-		#endif
-	}
-	else
-	{
-		#ifdef USE_QUAD_PRECISION
+#endif
+    }
+    else {
+#ifdef USE_QUAD_PRECISION
 		if( solver->precision==LIS_PRECISION_DEFAULT )
 		{
-		#endif
-			lis_vector_copy(B,xx);
-		#ifdef USE_QUAD_PRECISION
+#endif
+        lis_vector_copy(B, xx);
+#ifdef USE_QUAD_PRECISION
 		}
 		else
 		{
 			lis_vector_copyex_mm(B,xx);
 		}
-		#endif
-	}
+#endif
+    }
 
-	/* execute solver */
-	lis_solver_execute[nsolver](solver2);
-	#ifdef USE_QUAD_PRECISION
+    /* execute solver */
+    lis_solver_execute[nsolver](solver2);
+#ifdef USE_QUAD_PRECISION
 	if( solver->precision==LIS_PRECISION_DEFAULT )
 	{
-	#endif
-		lis_vector_copy(solver2->x,X);
-	#ifdef USE_QUAD_PRECISION
+#endif
+    lis_vector_copy(solver2->x, X);
+#ifdef USE_QUAD_PRECISION
 	}
 	else
 	{
 		lis_vector_copyex_mm(solver2->x,X);
 	}
-	#endif
+#endif
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_psolveh_hybrid"
-LIS_INT lis_psolveh_hybrid(LIS_SOLVER solver, LIS_VECTOR B, LIS_VECTOR X)
-{
-	LIS_VECTOR xx;
-	LIS_SOLVER solver2;
-	LIS_INT	nsolver;
-	LIS_PRECON precon;
 
-	/*
-	 *  Mx = b
-	 *  M  = A
-	 */
+LIS_INT lis_psolveh_hybrid(LIS_SOLVER solver, LIS_VECTOR B, LIS_VECTOR X) {
+    LIS_VECTOR xx;
+    LIS_SOLVER solver2;
+    LIS_INT nsolver;
+    LIS_PRECON precon;
 
-	LIS_DEBUG_FUNC_IN;
+    /*
+     *  Mx = b
+     *  M  = A
+     */
 
-	precon      = solver->precon;
-	solver2     = precon->solver;
-	xx          = precon->solver->x;
-	nsolver     = solver2->options[LIS_OPTIONS_SOLVER];
-	solver2->b  = B;
-	LIS_MATVEC  = lis_matvech;
-	LIS_MATVECH = lis_matvec;
+    LIS_DEBUG_FUNC_IN;
 
-	if( solver2->options[LIS_OPTIONS_INITGUESS_ZEROS] )
-	{
-		#ifdef USE_QUAD_PRECISION
+    precon = solver->precon;
+    solver2 = precon->solver;
+    xx = precon->solver->x;
+    nsolver = solver2->options[LIS_OPTIONS_SOLVER];
+    solver2->b = B;
+    LIS_MATVEC = lis_matvech;
+    LIS_MATVECH = lis_matvec;
+
+    if(solver2->options[LIS_OPTIONS_INITGUESS_ZEROS]) {
+#ifdef USE_QUAD_PRECISION
 		if( solver->precision==LIS_PRECISION_DEFAULT )
 		{
-		#endif
-			lis_vector_set_all(0,xx);
-		#ifdef USE_QUAD_PRECISION
+#endif
+        lis_vector_set_all(0, xx);
+#ifdef USE_QUAD_PRECISION
 		}
 		else
 		{
 			lis_vector_set_allex_nm(0,xx);
 		}
-		#endif
-	}
-	else
-	{
-		#ifdef USE_QUAD_PRECISION
+#endif
+    }
+    else {
+#ifdef USE_QUAD_PRECISION
 		if( solver->precision==LIS_PRECISION_DEFAULT )
 		{
-		#endif
-			lis_vector_copy(B,xx);
-		#ifdef USE_QUAD_PRECISION
+#endif
+        lis_vector_copy(B, xx);
+#ifdef USE_QUAD_PRECISION
 		}
 		else
 		{
 			lis_vector_copyex_mm(B,xx);
 		}
-		#endif
-	}
+#endif
+    }
 
-	/* execute solver */
-	lis_solver_execute[nsolver](solver2);
-	#ifdef USE_QUAD_PRECISION
+    /* execute solver */
+    lis_solver_execute[nsolver](solver2);
+#ifdef USE_QUAD_PRECISION
 	if( solver->precision==LIS_PRECISION_DEFAULT )
 	{
-	#endif
-		lis_vector_copy(solver2->x,X);
-	#ifdef USE_QUAD_PRECISION
+#endif
+    lis_vector_copy(solver2->x, X);
+#ifdef USE_QUAD_PRECISION
 	}
 	else
 	{
 		lis_vector_copyex_mm(solver2->x,X);
 	}
-	#endif
-	LIS_MATVEC  = lis_matvec;
-	LIS_MATVECH = lis_matvech;
+#endif
+    LIS_MATVEC = lis_matvec;
+    LIS_MATVECH = lis_matvech;
 
-
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
-

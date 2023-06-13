@@ -41,8 +41,8 @@
 #include <stdarg.h>
 #include <time.h>
 
-#ifdef WIN32
-	#include <windows.h>
+#if defined(WIN32) || defined(_WIN32)
+#include <windows.h>
 #else
 	#include <sys/time.h>
 #endif
@@ -81,14 +81,12 @@ double lis_wtime(void)
 #else
 #ifdef WIN32
 static LARGE_INTEGER t = {0, 0};
-double lis_wtime(void)
-{
 
-  LARGE_INTEGER l;
-  if (t.QuadPart == 0)
-    QueryPerformanceFrequency(&t);
-  QueryPerformanceCounter(&l);
-  return (double)l.QuadPart / (double)t.QuadPart;
+double lis_wtime(void) {
+    LARGE_INTEGER l;
+    if(t.QuadPart == 0) QueryPerformanceFrequency(&t);
+    QueryPerformanceCounter(&l);
+    return (double)l.QuadPart / (double)t.QuadPart;
 }
 #else
 #ifdef HAVE_CLOCK_GETTIME
@@ -117,13 +115,12 @@ double lis_wtime(void)
 #endif
 
 #ifdef WIN32
-void lis_date(char *date)
-{
-	SYSTEMTIME now;
-	GetLocalTime(&now);
-	sprintf(date, "%04d%02d%02d%02d%02d%02d",
-        now.wYear, now.wMonth, now.wDay,
-        now.wHour, now.wMinute, now.wSecond);
+void lis_date(char* date) {
+    SYSTEMTIME now;
+    GetLocalTime(&now);
+    sprintf(date, "%04d%02d%02d%02d%02d%02d",
+            now.wYear, now.wMonth, now.wDay,
+            now.wHour, now.wMinute, now.wSecond);
 }
 #else
 void lis_date(char *date)

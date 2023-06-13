@@ -72,166 +72,154 @@
 #define NWORK 4
 #undef __FUNC__
 #define __FUNC__ "lis_cg_check_params"
-LIS_INT lis_cg_check_params(LIS_SOLVER solver)
-{
-	LIS_DEBUG_FUNC_IN;
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+
+LIS_INT lis_cg_check_params(LIS_SOLVER solver) {
+    LIS_DEBUG_FUNC_IN;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_cg_malloc_work"
-LIS_INT lis_cg_malloc_work(LIS_SOLVER solver)
-{
-	LIS_VECTOR *work;
-	LIS_INT	i,j,worklen,err;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_cg_malloc_work(LIS_SOLVER solver) {
+    LIS_VECTOR* work;
+    LIS_INT i, j, worklen, err;
 
-	worklen = NWORK;
-	work    = (LIS_VECTOR *)lis_malloc( worklen*sizeof(LIS_VECTOR),"lis_cg_malloc_work::work" );
-	if( work==NULL )
-	{
-		LIS_SETERR_MEM(worklen*sizeof(LIS_VECTOR));
-		return LIS_ERR_OUT_OF_MEMORY;
-	}
-	if( solver->precision==LIS_PRECISION_DEFAULT )
-	{
-		for(i=0;i<worklen;i++)
-		{
-			err = lis_vector_duplicate(solver->A,&work[i]);
-			if( err ) break;
-		}
-	}
-	else
-	{
-		for(i=0;i<worklen;i++)
-		{
-			err = lis_vector_duplicateex(LIS_PRECISION_QUAD,solver->A,&work[i]);
-			if( err ) break;
-		}
-	}
-	if( i<worklen )
-	{
-		for(j=0;j<i;j++) lis_vector_destroy(work[j]);
-		lis_free(work);
-		return err;
-	}
-	solver->worklen = worklen;
-	solver->work    = work;
+    LIS_DEBUG_FUNC_IN;
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    worklen = NWORK;
+    work = (LIS_VECTOR*)lis_malloc(worklen * sizeof(LIS_VECTOR), "lis_cg_malloc_work::work");
+    if(work == NULL) {
+        LIS_SETERR_MEM(worklen*sizeof(LIS_VECTOR));
+        return LIS_ERR_OUT_OF_MEMORY;
+    }
+    if(solver->precision == LIS_PRECISION_DEFAULT) {
+        for(i = 0; i < worklen; i++) {
+            err = lis_vector_duplicate(solver->A, &work[i]);
+            if(err) break;
+        }
+    }
+    else {
+        for(i = 0; i < worklen; i++) {
+            err = lis_vector_duplicateex(LIS_PRECISION_QUAD, solver->A, &work[i]);
+            if(err) break;
+        }
+    }
+    if(i < worklen) {
+        for(j = 0; j < i; j++) lis_vector_destroy(work[j]);
+        lis_free(work);
+        return err;
+    }
+    solver->worklen = worklen;
+    solver->work = work;
+
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_cg"
-LIS_INT lis_cg(LIS_SOLVER solver)
-{
-	LIS_Comm comm;  
-	LIS_MATRIX A;
-	LIS_VECTOR x;
-	LIS_VECTOR r,z,p,q;
-	LIS_SCALAR alpha, beta, rho, rho_old;
-	LIS_SCALAR dot_pq;
-	LIS_REAL bnrm2, nrm2, tol;
-	LIS_INT iter,maxiter,output,conv;
-	double time,ptime;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_cg(LIS_SOLVER solver) {
+    LIS_Comm comm;
+    LIS_MATRIX A;
+    LIS_VECTOR x;
+    LIS_VECTOR r, z, p, q;
+    LIS_SCALAR alpha, beta, rho, rho_old;
+    LIS_SCALAR dot_pq;
+    LIS_REAL bnrm2, nrm2, tol;
+    LIS_INT iter, maxiter, output, conv;
+    double time, ptime;
 
-	comm = LIS_COMM_WORLD;
+    LIS_DEBUG_FUNC_IN;
 
-	A       = solver->A;
-	x       = solver->x;
-	maxiter = solver->options[LIS_OPTIONS_MAXITER];
-	output  = solver->options[LIS_OPTIONS_OUTPUT];
-	conv    = solver->options[LIS_OPTIONS_CONV_COND];
-	ptime   = 0.0;
+    comm = LIS_COMM_WORLD;
 
+    A = solver->A;
+    x = solver->x;
+    maxiter = solver->options[LIS_OPTIONS_MAXITER];
+    output = solver->options[LIS_OPTIONS_OUTPUT];
+    conv = solver->options[LIS_OPTIONS_CONV_COND];
+    ptime = 0.0;
 
-	z       = solver->work[0];
-	q       = solver->work[1];
-	r       = solver->work[2];
-	p       = solver->work[3];
-	rho_old = (LIS_SCALAR)1.0;
-	beta    = (LIS_SCALAR)0.0;
+    z = solver->work[0];
+    q = solver->work[1];
+    r = solver->work[2];
+    p = solver->work[3];
+    rho_old = (LIS_SCALAR)1.0;
+    beta = (LIS_SCALAR)0.0;
 
-	if( lis_solver_get_initial_residual(solver,NULL,NULL,r,&bnrm2) )
-	{
-		LIS_DEBUG_FUNC_OUT;
-		return LIS_SUCCESS;
-	}
-	tol     = solver->tol;
+    if(lis_solver_get_initial_residual(solver,NULL,NULL, r, &bnrm2)) {
+        LIS_DEBUG_FUNC_OUT;
+        return LIS_SUCCESS;
+    }
+    tol = solver->tol;
 
-	lis_vector_set_all(0.0,p);
-	
-	for( iter=1; iter<=maxiter; iter++ )
-	{
-		/* z = M^-1 * r */
-		time = lis_wtime();
-		lis_psolve(solver,r,z);
-		ptime += lis_wtime() - time;
- 
-		/* rho = <r,z> */
-		lis_vector_dot(r,z,&rho);
+    lis_vector_set_all(0.0, p);
 
-		/* beta = rho / rho_old */
-		beta = rho / rho_old;
+    for(iter = 1; iter <= maxiter; iter++) {
+        /* z = M^-1 * r */
+        time = lis_wtime();
+        lis_psolve(solver, r, z);
+        ptime += lis_wtime() - time;
 
-		/* p = z + beta*p       */
-		lis_vector_xpay(z,beta,p);
-		
-		/* q = Ap */
-		lis_matvec(A,p,q);
-		
-		/* dot_pq = <p,q> */
-		lis_vector_dot(p,q,&dot_pq);
+        /* rho = <r,z> */
+        lis_vector_dot(r, z, &rho);
 
-		/* breakdown check */
-		if( dot_pq==0.0 )
-		{
-			solver->retcode   = LIS_BREAKDOWN;
-			solver->iter      = iter;
-			solver->resid     = nrm2;
-			LIS_DEBUG_FUNC_OUT;
-			return LIS_BREAKDOWN;
-		}
-		
-		/* alpha = rho / dot_pq */
-		alpha = rho / dot_pq;
-		
-		/* x = x + alpha*p */
-		lis_vector_axpy(alpha,p,x);
-		
-		/* r = r - alpha*q */
-		lis_vector_axpy(-alpha,q,r);
+        /* beta = rho / rho_old */
+        beta = rho / rho_old;
 
-		/* convergence check */
-		lis_solver_get_residual[conv](r,solver,&nrm2);
-		if( output )
-		{
-			if( output & LIS_PRINT_MEM ) solver->rhistory[iter] = nrm2;
-			if( output & LIS_PRINT_OUT ) lis_print_rhistory(comm,iter,nrm2);
-		}
-		
-		if( tol >= nrm2 )
-		{
-			solver->retcode    = LIS_SUCCESS;
-			solver->iter       = iter;
-			solver->resid      = nrm2;
-			solver->ptime      = ptime;
-			LIS_DEBUG_FUNC_OUT;
-			return LIS_SUCCESS;
-		}
-		rho_old = rho;
-	}
+        /* p = z + beta*p       */
+        lis_vector_xpay(z, beta, p);
 
-	solver->retcode   = LIS_MAXITER;
-	solver->iter      = iter;
-	solver->resid     = nrm2;
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_MAXITER;
+        /* q = Ap */
+        lis_matvec(A, p, q);
+
+        /* dot_pq = <p,q> */
+        lis_vector_dot(p, q, &dot_pq);
+
+        /* breakdown check */
+        if(dot_pq == 0.0) {
+            solver->retcode = LIS_BREAKDOWN;
+            solver->iter = iter;
+            solver->resid = nrm2;
+            LIS_DEBUG_FUNC_OUT;
+            return LIS_BREAKDOWN;
+        }
+
+        /* alpha = rho / dot_pq */
+        alpha = rho / dot_pq;
+
+        /* x = x + alpha*p */
+        lis_vector_axpy(alpha, p, x);
+
+        /* r = r - alpha*q */
+        lis_vector_axpy(-alpha, q, r);
+
+        /* convergence check */
+        lis_solver_get_residual[conv](r, solver, &nrm2);
+        if(output) {
+            if(output & LIS_PRINT_MEM) solver->rhistory[iter] = nrm2;
+            if(output & LIS_PRINT_OUT) lis_print_rhistory(comm, iter, nrm2);
+        }
+
+        if(tol >= nrm2) {
+            solver->retcode = LIS_SUCCESS;
+            solver->iter = iter;
+            solver->resid = nrm2;
+            solver->ptime = ptime;
+            LIS_DEBUG_FUNC_OUT;
+            return LIS_SUCCESS;
+        }
+        rho_old = rho;
+    }
+
+    solver->retcode = LIS_MAXITER;
+    solver->iter = iter;
+    solver->resid = nrm2;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_MAXITER;
 }
 
 #ifdef USE_QUAD_PRECISION
@@ -575,167 +563,154 @@ LIS_INT lis_cg_switch(LIS_SOLVER solver)
 #define NWORK 4
 #undef __FUNC__
 #define __FUNC__ "lis_cocg_check_params"
-LIS_INT lis_cocg_check_params(LIS_SOLVER solver)
-{
-	LIS_DEBUG_FUNC_IN;
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+
+LIS_INT lis_cocg_check_params(LIS_SOLVER solver) {
+    LIS_DEBUG_FUNC_IN;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_cocg_malloc_work"
-LIS_INT lis_cocg_malloc_work(LIS_SOLVER solver)
-{
-	LIS_VECTOR *work;
-	LIS_INT	i,j,worklen,err;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_cocg_malloc_work(LIS_SOLVER solver) {
+    LIS_VECTOR* work;
+    LIS_INT i, j, worklen, err;
 
-	worklen = NWORK;
-	work    = (LIS_VECTOR *)lis_malloc( worklen*sizeof(LIS_VECTOR),"lis_cocg_malloc_work::work" );
-	if( work==NULL )
-	{
-		LIS_SETERR_MEM(worklen*sizeof(LIS_VECTOR));
-		return LIS_ERR_OUT_OF_MEMORY;
-	}
-	if( solver->precision==LIS_PRECISION_DEFAULT )
-	{
-		for(i=0;i<worklen;i++)
-		{
-			err = lis_vector_duplicate(solver->A,&work[i]);
-			if( err ) break;
-		}
-	}
-	else
-	{
-		for(i=0;i<worklen;i++)
-		{
-			err = lis_vector_duplicateex(LIS_PRECISION_QUAD,solver->A,&work[i]);
-			if( err ) break;
-		}
-	}
-	if( i<worklen )
-	{
-		for(j=0;j<i;j++) lis_vector_destroy(work[j]);
-		lis_free(work);
-		return err;
-	}
-	solver->worklen = worklen;
-	solver->work    = work;
+    LIS_DEBUG_FUNC_IN;
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    worklen = NWORK;
+    work = (LIS_VECTOR*)lis_malloc(worklen * sizeof(LIS_VECTOR), "lis_cocg_malloc_work::work");
+    if(work == NULL) {
+        LIS_SETERR_MEM(worklen*sizeof(LIS_VECTOR));
+        return LIS_ERR_OUT_OF_MEMORY;
+    }
+    if(solver->precision == LIS_PRECISION_DEFAULT) {
+        for(i = 0; i < worklen; i++) {
+            err = lis_vector_duplicate(solver->A, &work[i]);
+            if(err) break;
+        }
+    }
+    else {
+        for(i = 0; i < worklen; i++) {
+            err = lis_vector_duplicateex(LIS_PRECISION_QUAD, solver->A, &work[i]);
+            if(err) break;
+        }
+    }
+    if(i < worklen) {
+        for(j = 0; j < i; j++) lis_vector_destroy(work[j]);
+        lis_free(work);
+        return err;
+    }
+    solver->worklen = worklen;
+    solver->work = work;
+
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_cocg"
-LIS_INT lis_cocg(LIS_SOLVER solver)
-{
-	LIS_Comm comm;  
-	LIS_MATRIX A;
-	LIS_VECTOR x;
-	LIS_VECTOR r,z,p,q;
-	LIS_SCALAR alpha, beta, rho, rho_old;
-	LIS_SCALAR dot_pq;
-	LIS_REAL bnrm2, nrm2, tol;
-	LIS_INT iter,maxiter,output,conv;
-	double time,ptime;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_cocg(LIS_SOLVER solver) {
+    LIS_Comm comm;
+    LIS_MATRIX A;
+    LIS_VECTOR x;
+    LIS_VECTOR r, z, p, q;
+    LIS_SCALAR alpha, beta, rho, rho_old;
+    LIS_SCALAR dot_pq;
+    LIS_REAL bnrm2, nrm2, tol;
+    LIS_INT iter, maxiter, output, conv;
+    double time, ptime;
 
-	comm = LIS_COMM_WORLD;
+    LIS_DEBUG_FUNC_IN;
 
-	A       = solver->A;
-	x       = solver->x;
-	maxiter = solver->options[LIS_OPTIONS_MAXITER];
-	output  = solver->options[LIS_OPTIONS_OUTPUT];
-	conv    = solver->options[LIS_OPTIONS_CONV_COND];
-	ptime   = 0.0;
+    comm = LIS_COMM_WORLD;
 
+    A = solver->A;
+    x = solver->x;
+    maxiter = solver->options[LIS_OPTIONS_MAXITER];
+    output = solver->options[LIS_OPTIONS_OUTPUT];
+    conv = solver->options[LIS_OPTIONS_CONV_COND];
+    ptime = 0.0;
 
-	z       = solver->work[0];
-	q       = solver->work[1];
-	r       = solver->work[2];
-	p       = solver->work[3];
-	rho_old = (LIS_SCALAR)1.0;
-	beta    = (LIS_SCALAR)0.0;
+    z = solver->work[0];
+    q = solver->work[1];
+    r = solver->work[2];
+    p = solver->work[3];
+    rho_old = (LIS_SCALAR)1.0;
+    beta = (LIS_SCALAR)0.0;
 
+    if(lis_solver_get_initial_residual(solver,NULL,NULL, r, &bnrm2)) {
+        LIS_DEBUG_FUNC_OUT;
+        return LIS_SUCCESS;
+    }
+    tol = solver->tol;
 
-	if( lis_solver_get_initial_residual(solver,NULL,NULL,r,&bnrm2) )
-	{
-		LIS_DEBUG_FUNC_OUT;
-		return LIS_SUCCESS;
-	}
-	tol     = solver->tol;
+    lis_vector_set_all(0.0, p);
 
-	lis_vector_set_all(0.0,p);
-	
-	for( iter=1; iter<=maxiter; iter++ )
-	{
-		/* z = M^-1 * r */
-		time = lis_wtime();
-		lis_psolve(solver,r,z);
-		ptime += lis_wtime() - time;
+    for(iter = 1; iter <= maxiter; iter++) {
+        /* z = M^-1 * r */
+        time = lis_wtime();
+        lis_psolve(solver, r, z);
+        ptime += lis_wtime() - time;
 
-		/* rho = <r,z> */
-		lis_vector_nhdot(r,z,&rho);
+        /* rho = <r,z> */
+        lis_vector_nhdot(r, z, &rho);
 
-		/* beta = rho / rho_old */
-		beta = rho / rho_old;
+        /* beta = rho / rho_old */
+        beta = rho / rho_old;
 
-		/* p = z + beta*p       */
-		lis_vector_xpay(z,beta,p);
-		
-		/* q = Ap */
-		lis_matvec(A,p,q);
-		
-		/* dot_pq = <p,q> */
-		lis_vector_nhdot(p,q,&dot_pq);
+        /* p = z + beta*p       */
+        lis_vector_xpay(z, beta, p);
 
-		/* breakdown check */
-		if( dot_pq==0.0 )
-		{
-			solver->retcode   = LIS_BREAKDOWN;
-			solver->iter      = iter;
-			solver->resid     = nrm2;
-			LIS_DEBUG_FUNC_OUT;
-			return LIS_BREAKDOWN;
-		}
-		
-		/* alpha = rho / dot_pq */
-		alpha = rho / dot_pq;
-		
-		/* x = x + alpha*p */
-		lis_vector_axpy(alpha,p,x);
-		
-		/* r = r - alpha*q */
-		lis_vector_axpy(-alpha,q,r);
+        /* q = Ap */
+        lis_matvec(A, p, q);
 
-		/* convergence check */
-		lis_solver_get_residual[conv](r,solver,&nrm2);
-		if( output )
-		{
-			if( output & LIS_PRINT_MEM ) solver->rhistory[iter] = nrm2;
-			if( output & LIS_PRINT_OUT ) lis_print_rhistory(comm,iter,nrm2);
-		}
-		
-		if( tol >= nrm2 )
-		{
-			solver->retcode    = LIS_SUCCESS;
-			solver->iter       = iter;
-			solver->resid      = nrm2;
-			solver->ptime      = ptime;
-			LIS_DEBUG_FUNC_OUT;
-			return LIS_SUCCESS;
-		}
-		rho_old = rho;
-	}
+        /* dot_pq = <p,q> */
+        lis_vector_nhdot(p, q, &dot_pq);
 
-	solver->retcode   = LIS_MAXITER;
-	solver->iter      = iter;
-	solver->resid     = nrm2;
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_MAXITER;
+        /* breakdown check */
+        if(dot_pq == 0.0) {
+            solver->retcode = LIS_BREAKDOWN;
+            solver->iter = iter;
+            solver->resid = nrm2;
+            LIS_DEBUG_FUNC_OUT;
+            return LIS_BREAKDOWN;
+        }
+
+        /* alpha = rho / dot_pq */
+        alpha = rho / dot_pq;
+
+        /* x = x + alpha*p */
+        lis_vector_axpy(alpha, p, x);
+
+        /* r = r - alpha*q */
+        lis_vector_axpy(-alpha, q, r);
+
+        /* convergence check */
+        lis_solver_get_residual[conv](r, solver, &nrm2);
+        if(output) {
+            if(output & LIS_PRINT_MEM) solver->rhistory[iter] = nrm2;
+            if(output & LIS_PRINT_OUT) lis_print_rhistory(comm, iter, nrm2);
+        }
+
+        if(tol >= nrm2) {
+            solver->retcode = LIS_SUCCESS;
+            solver->iter = iter;
+            solver->resid = nrm2;
+            solver->ptime = ptime;
+            LIS_DEBUG_FUNC_OUT;
+            return LIS_SUCCESS;
+        }
+        rho_old = rho;
+    }
+
+    solver->retcode = LIS_MAXITER;
+    solver->iter = iter;
+    solver->resid = nrm2;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_MAXITER;
 }
 
 /***************************************
@@ -764,179 +739,166 @@ LIS_INT lis_cocg(LIS_SOLVER solver)
 #define NWORK 6
 #undef __FUNC__
 #define __FUNC__ "lis_cr_check_params"
-LIS_INT lis_cr_check_params(LIS_SOLVER solver)
-{
-	LIS_DEBUG_FUNC_IN;
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+
+LIS_INT lis_cr_check_params(LIS_SOLVER solver) {
+    LIS_DEBUG_FUNC_IN;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_cr_malloc_work"
-LIS_INT lis_cr_malloc_work(LIS_SOLVER solver)
-{
-	LIS_VECTOR *work;
-	LIS_INT	i,j,worklen,err;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_cr_malloc_work(LIS_SOLVER solver) {
+    LIS_VECTOR* work;
+    LIS_INT i, j, worklen, err;
 
-	worklen = NWORK;
-	work    = (LIS_VECTOR *)lis_malloc( worklen*sizeof(LIS_VECTOR),"lis_cr_malloc_work::work" );
-	if( work==NULL )
-	{
-		LIS_SETERR_MEM(worklen*sizeof(LIS_VECTOR));
-		return LIS_ERR_OUT_OF_MEMORY;
-	}
-	if( solver->precision==LIS_PRECISION_DEFAULT )
-	{
-		for(i=0;i<worklen;i++)
-		{
-			err = lis_vector_duplicate(solver->A,&work[i]);
-			if( err ) break;
-		}
-	}
-	else
-	{
-		for(i=0;i<worklen;i++)
-		{
-			err = lis_vector_duplicateex(LIS_PRECISION_QUAD,solver->A,&work[i]);
-			if( err ) break;
-		}
-	}
-	if( i<worklen )
-	{
-		for(j=0;j<i;j++) lis_vector_destroy(work[j]);
-		lis_free(work);
-		return err;
-	}
-	solver->worklen = worklen;
-	solver->work    = work;
+    LIS_DEBUG_FUNC_IN;
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    worklen = NWORK;
+    work = (LIS_VECTOR*)lis_malloc(worklen * sizeof(LIS_VECTOR), "lis_cr_malloc_work::work");
+    if(work == NULL) {
+        LIS_SETERR_MEM(worklen*sizeof(LIS_VECTOR));
+        return LIS_ERR_OUT_OF_MEMORY;
+    }
+    if(solver->precision == LIS_PRECISION_DEFAULT) {
+        for(i = 0; i < worklen; i++) {
+            err = lis_vector_duplicate(solver->A, &work[i]);
+            if(err) break;
+        }
+    }
+    else {
+        for(i = 0; i < worklen; i++) {
+            err = lis_vector_duplicateex(LIS_PRECISION_QUAD, solver->A, &work[i]);
+            if(err) break;
+        }
+    }
+    if(i < worklen) {
+        for(j = 0; j < i; j++) lis_vector_destroy(work[j]);
+        lis_free(work);
+        return err;
+    }
+    solver->worklen = worklen;
+    solver->work = work;
+
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_cr"
-LIS_INT lis_cr(LIS_SOLVER solver)
-{
-	LIS_Comm comm;  
-	LIS_MATRIX A;
-	LIS_VECTOR x;
-	LIS_VECTOR r,z,p,q, qtld, az;
-	LIS_SCALAR alpha, beta, rho;
-	LIS_SCALAR dot_rq, dot_zq;
-	LIS_REAL bnrm2, nrm2, tol;
-	LIS_INT iter,maxiter,output,conv;
-	double time,ptime;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_cr(LIS_SOLVER solver) {
+    LIS_Comm comm;
+    LIS_MATRIX A;
+    LIS_VECTOR x;
+    LIS_VECTOR r, z, p, q, qtld, az;
+    LIS_SCALAR alpha, beta, rho;
+    LIS_SCALAR dot_rq, dot_zq;
+    LIS_REAL bnrm2, nrm2, tol;
+    LIS_INT iter, maxiter, output, conv;
+    double time, ptime;
 
-	comm = LIS_COMM_WORLD;
+    LIS_DEBUG_FUNC_IN;
 
-	A       = solver->A;
-	x       = solver->x;
-	maxiter = solver->options[LIS_OPTIONS_MAXITER];
-	output  = solver->options[LIS_OPTIONS_OUTPUT];
-	conv    = solver->options[LIS_OPTIONS_CONV_COND];
-	ptime   = 0.0;
+    comm = LIS_COMM_WORLD;
 
+    A = solver->A;
+    x = solver->x;
+    maxiter = solver->options[LIS_OPTIONS_MAXITER];
+    output = solver->options[LIS_OPTIONS_OUTPUT];
+    conv = solver->options[LIS_OPTIONS_CONV_COND];
+    ptime = 0.0;
 
-	z       = solver->work[0];
-	q       = solver->work[1];
-	r       = solver->work[2];
-	p       = solver->work[3];
-	qtld    = solver->work[4];
-	az      = solver->work[5];
+    z = solver->work[0];
+    q = solver->work[1];
+    r = solver->work[2];
+    p = solver->work[3];
+    qtld = solver->work[4];
+    az = solver->work[5];
 
+    if(lis_solver_get_initial_residual(solver,NULL,NULL, r, &bnrm2)) {
+        LIS_DEBUG_FUNC_OUT;
+        return LIS_SUCCESS;
+    }
+    tol = solver->tol;
 
-	if( lis_solver_get_initial_residual(solver,NULL,NULL,r,&bnrm2) )
-	{
-		LIS_DEBUG_FUNC_OUT;
-		return LIS_SUCCESS;
-	}
-	tol     = solver->tol;
+    time = lis_wtime();
+    lis_psolve(solver, r, p);
+    ptime += lis_wtime() - time;
+    lis_matvec(A, p, q);
+    lis_vector_copy(p, z);
 
-	time = lis_wtime();
-	lis_psolve(solver,r,p);
-	ptime += lis_wtime() - time;
-	lis_matvec(A,p,q);
-	lis_vector_copy(p,z);
+    for(iter = 1; iter <= maxiter; iter++) {
+        /* qtld = M^-1 * q */
+        time = lis_wtime();
+        lis_psolve(solver, q, qtld);
+        ptime += lis_wtime() - time;
 
-	for( iter=1; iter<=maxiter; iter++ )
-	{
-		/* qtld = M^-1 * q */
-		time = lis_wtime();
-		lis_psolve(solver,q,qtld);
-		ptime += lis_wtime() - time;
+        /* rho = <qtld,q> */
+        lis_vector_dot(qtld, q, &rho);
 
-		/* rho = <qtld,q> */
-		lis_vector_dot(qtld,q,&rho);
+        /* breakdown check */
+        if(rho == 0.0) {
+            solver->retcode = LIS_BREAKDOWN;
+            solver->iter = iter;
+            solver->resid = nrm2;
+            LIS_DEBUG_FUNC_OUT;
+            return LIS_BREAKDOWN;
+        }
 
-		/* breakdown check */
-		if( rho==0.0 )
-		{
-			solver->retcode   = LIS_BREAKDOWN;
-			solver->iter      = iter;
-			solver->resid     = nrm2;
-			LIS_DEBUG_FUNC_OUT;
-			return LIS_BREAKDOWN;
-		}
-		
-		/* dot_rq = <r,qtld> */
-		lis_vector_dot(r,qtld,&dot_rq);
+        /* dot_rq = <r,qtld> */
+        lis_vector_dot(r, qtld, &dot_rq);
 
-		/* alpha = dot_rq / rho */
-		alpha = dot_rq / rho;
-		
-		/* x = x + alpha*p */
-		lis_vector_axpy(alpha,p,x);
-		
-		/* r = r - alpha*q */
-		lis_vector_axpy(-alpha,q,r);
+        /* alpha = dot_rq / rho */
+        alpha = dot_rq / rho;
 
-		/* convergence check */
-		lis_solver_get_residual[conv](r,solver,&nrm2);
-		if( output )
-		{
-			if( output & LIS_PRINT_MEM ) solver->rhistory[iter] = nrm2;
-			if( output & LIS_PRINT_OUT ) lis_print_rhistory(comm,iter,nrm2);
-		}
-		
-		if( tol >= nrm2 )
-		{
-			solver->retcode    = LIS_SUCCESS;
-			solver->iter       = iter;
-			solver->resid      = nrm2;
-			solver->ptime      = ptime;
-			LIS_DEBUG_FUNC_OUT;
-			return LIS_SUCCESS;
-		}
+        /* x = x + alpha*p */
+        lis_vector_axpy(alpha, p, x);
 
-		/* z = z - alpha*qtld       */
-		lis_vector_axpy(-alpha,qtld,z);
+        /* r = r - alpha*q */
+        lis_vector_axpy(-alpha, q, r);
 
-		/* az = Az */
-		lis_matvec(A,z,az);
+        /* convergence check */
+        lis_solver_get_residual[conv](r, solver, &nrm2);
+        if(output) {
+            if(output & LIS_PRINT_MEM) solver->rhistory[iter] = nrm2;
+            if(output & LIS_PRINT_OUT) lis_print_rhistory(comm, iter, nrm2);
+        }
 
-		/* dot_zq = <az,qtld> */
-		lis_vector_dot(az,qtld,&dot_zq);
+        if(tol >= nrm2) {
+            solver->retcode = LIS_SUCCESS;
+            solver->iter = iter;
+            solver->resid = nrm2;
+            solver->ptime = ptime;
+            LIS_DEBUG_FUNC_OUT;
+            return LIS_SUCCESS;
+        }
 
-		/* beta = -dot_zq / rho */
-		beta = -dot_zq / rho;
+        /* z = z - alpha*qtld       */
+        lis_vector_axpy(-alpha, qtld, z);
 
-		/* p = z + beta*p       */
-		lis_vector_xpay(z,beta,p);
-		
-		/* q = az + beta*q      */
-		lis_vector_xpay(az,beta,q);
-	}
+        /* az = Az */
+        lis_matvec(A, z, az);
 
-	solver->retcode   = LIS_MAXITER;
-	solver->iter      = iter;
-	solver->resid     = nrm2;
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_MAXITER;
+        /* dot_zq = <az,qtld> */
+        lis_vector_dot(az, qtld, &dot_zq);
+
+        /* beta = -dot_zq / rho */
+        beta = -dot_zq / rho;
+
+        /* p = z + beta*p       */
+        lis_vector_xpay(z, beta, p);
+
+        /* q = az + beta*q      */
+        lis_vector_xpay(az, beta, q);
+    }
+
+    solver->retcode = LIS_MAXITER;
+    solver->iter = iter;
+    solver->resid = nrm2;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_MAXITER;
 }
 
 #ifdef USE_QUAD_PRECISION
@@ -1098,178 +1060,164 @@ LIS_INT lis_cr_quad(LIS_SOLVER solver)
 #define NWORK 6
 #undef __FUNC__
 #define __FUNC__ "lis_cocr_check_params"
-LIS_INT lis_cocr_check_params(LIS_SOLVER solver)
-{
-	LIS_DEBUG_FUNC_IN;
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+
+LIS_INT lis_cocr_check_params(LIS_SOLVER solver) {
+    LIS_DEBUG_FUNC_IN;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_cocr_malloc_work"
-LIS_INT lis_cocr_malloc_work(LIS_SOLVER solver)
-{
-	LIS_VECTOR *work;
-	LIS_INT	i,j,worklen,err;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_cocr_malloc_work(LIS_SOLVER solver) {
+    LIS_VECTOR* work;
+    LIS_INT i, j, worklen, err;
 
-	worklen = NWORK;
-	work    = (LIS_VECTOR *)lis_malloc( worklen*sizeof(LIS_VECTOR),"lis_cr_malloc_work::work" );
-	if( work==NULL )
-	{
-		LIS_SETERR_MEM(worklen*sizeof(LIS_VECTOR));
-		return LIS_ERR_OUT_OF_MEMORY;
-	}
-	if( solver->precision==LIS_PRECISION_DEFAULT )
-	{
-		for(i=0;i<worklen;i++)
-		{
-			err = lis_vector_duplicate(solver->A,&work[i]);
-			if( err ) break;
-		}
-	}
-	else
-	{
-		for(i=0;i<worklen;i++)
-		{
-			err = lis_vector_duplicateex(LIS_PRECISION_QUAD,solver->A,&work[i]);
-			if( err ) break;
-		}
-	}
-	if( i<worklen )
-	{
-		for(j=0;j<i;j++) lis_vector_destroy(work[j]);
-		lis_free(work);
-		return err;
-	}
-	solver->worklen = worklen;
-	solver->work    = work;
+    LIS_DEBUG_FUNC_IN;
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    worklen = NWORK;
+    work = (LIS_VECTOR*)lis_malloc(worklen * sizeof(LIS_VECTOR), "lis_cr_malloc_work::work");
+    if(work == NULL) {
+        LIS_SETERR_MEM(worklen*sizeof(LIS_VECTOR));
+        return LIS_ERR_OUT_OF_MEMORY;
+    }
+    if(solver->precision == LIS_PRECISION_DEFAULT) {
+        for(i = 0; i < worklen; i++) {
+            err = lis_vector_duplicate(solver->A, &work[i]);
+            if(err) break;
+        }
+    }
+    else {
+        for(i = 0; i < worklen; i++) {
+            err = lis_vector_duplicateex(LIS_PRECISION_QUAD, solver->A, &work[i]);
+            if(err) break;
+        }
+    }
+    if(i < worklen) {
+        for(j = 0; j < i; j++) lis_vector_destroy(work[j]);
+        lis_free(work);
+        return err;
+    }
+    solver->worklen = worklen;
+    solver->work = work;
+
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_cocr"
-LIS_INT lis_cocr(LIS_SOLVER solver)
-{
-	LIS_Comm comm;  
-	LIS_MATRIX A;
-	LIS_VECTOR x;
-	LIS_VECTOR r,z,p,q, qtld, az;
-	LIS_SCALAR alpha, beta, rho;
-	LIS_SCALAR dot_rq, dot_zq;
-	LIS_REAL bnrm2, nrm2, tol;
-	LIS_INT iter,maxiter,output,conv;
-	double time,ptime;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_cocr(LIS_SOLVER solver) {
+    LIS_Comm comm;
+    LIS_MATRIX A;
+    LIS_VECTOR x;
+    LIS_VECTOR r, z, p, q, qtld, az;
+    LIS_SCALAR alpha, beta, rho;
+    LIS_SCALAR dot_rq, dot_zq;
+    LIS_REAL bnrm2, nrm2, tol;
+    LIS_INT iter, maxiter, output, conv;
+    double time, ptime;
 
-	comm = LIS_COMM_WORLD;
+    LIS_DEBUG_FUNC_IN;
 
-	A       = solver->A;
-	x       = solver->x;
-	maxiter = solver->options[LIS_OPTIONS_MAXITER];
-	output  = solver->options[LIS_OPTIONS_OUTPUT];
-	conv    = solver->options[LIS_OPTIONS_CONV_COND];
-	ptime   = 0.0;
+    comm = LIS_COMM_WORLD;
 
+    A = solver->A;
+    x = solver->x;
+    maxiter = solver->options[LIS_OPTIONS_MAXITER];
+    output = solver->options[LIS_OPTIONS_OUTPUT];
+    conv = solver->options[LIS_OPTIONS_CONV_COND];
+    ptime = 0.0;
 
-	z       = solver->work[0];
-	q       = solver->work[1];
-	r       = solver->work[2];
-	p       = solver->work[3];
-	qtld    = solver->work[4];
-	az      = solver->work[5];
+    z = solver->work[0];
+    q = solver->work[1];
+    r = solver->work[2];
+    p = solver->work[3];
+    qtld = solver->work[4];
+    az = solver->work[5];
 
+    if(lis_solver_get_initial_residual(solver,NULL,NULL, r, &bnrm2)) {
+        LIS_DEBUG_FUNC_OUT;
+        return LIS_SUCCESS;
+    }
+    tol = solver->tol;
 
-	if( lis_solver_get_initial_residual(solver,NULL,NULL,r,&bnrm2) )
-	{
-		LIS_DEBUG_FUNC_OUT;
-		return LIS_SUCCESS;
-	}
-	tol     = solver->tol;
+    time = lis_wtime();
+    lis_psolve(solver, r, p);
+    ptime += lis_wtime() - time;
+    lis_matvec(A, p, q);
+    lis_vector_copy(p, z);
 
-	time = lis_wtime();
-	lis_psolve(solver,r,p);
-	ptime += lis_wtime() - time;
-	lis_matvec(A,p,q);
-	lis_vector_copy(p,z);
+    for(iter = 1; iter <= maxiter; iter++) {
+        /* qtld = M^-1 * q */
+        time = lis_wtime();
+        lis_psolve(solver, q, qtld);
+        ptime += lis_wtime() - time;
 
-	for( iter=1; iter<=maxiter; iter++ )
-	{
-		/* qtld = M^-1 * q */
-		time = lis_wtime();
-		lis_psolve(solver,q,qtld);
-		ptime += lis_wtime() - time;
+        /* rho = <qtld,q> */
+        lis_vector_nhdot(qtld, q, &rho);
 
-		/* rho = <qtld,q> */
-		lis_vector_nhdot(qtld,q,&rho);
+        /* breakdown check */
+        if(rho == 0.0) {
+            solver->retcode = LIS_BREAKDOWN;
+            solver->iter = iter;
+            solver->resid = nrm2;
+            LIS_DEBUG_FUNC_OUT;
+            return LIS_BREAKDOWN;
+        }
 
-		/* breakdown check */
-		if( rho==0.0 )
-		{
-			solver->retcode   = LIS_BREAKDOWN;
-			solver->iter      = iter;
-			solver->resid     = nrm2;
-			LIS_DEBUG_FUNC_OUT;
-			return LIS_BREAKDOWN;
-		}
-		
-		/* dot_rq = <r,qtld> */
-		lis_vector_nhdot(r,qtld,&dot_rq);
+        /* dot_rq = <r,qtld> */
+        lis_vector_nhdot(r, qtld, &dot_rq);
 
-		/* alpha = dot_rq / rho */
-		alpha = dot_rq / rho;
-		
-		/* x = x + alpha*p */
-		lis_vector_axpy(alpha,p,x);
-		
-		/* r = r - alpha*q */
-		lis_vector_axpy(-alpha,q,r);
+        /* alpha = dot_rq / rho */
+        alpha = dot_rq / rho;
 
-		/* convergence check */
-		lis_solver_get_residual[conv](r,solver,&nrm2);
-		if( output )
-		{
-			if( output & LIS_PRINT_MEM ) solver->rhistory[iter] = nrm2;
-			if( output & LIS_PRINT_OUT ) lis_print_rhistory(comm,iter,nrm2);
-		}
-		
-		if( tol >= nrm2 )
-		{
-			solver->retcode    = LIS_SUCCESS;
-			solver->iter       = iter;
-			solver->resid      = nrm2;
-			solver->ptime      = ptime;
-			LIS_DEBUG_FUNC_OUT;
-			return LIS_SUCCESS;
-		}
+        /* x = x + alpha*p */
+        lis_vector_axpy(alpha, p, x);
 
-		/* z = z - alpha*qtld       */
-		lis_vector_axpy(-alpha,qtld,z);
+        /* r = r - alpha*q */
+        lis_vector_axpy(-alpha, q, r);
 
-		/* az = Az */
-		lis_matvec(A,z,az);
+        /* convergence check */
+        lis_solver_get_residual[conv](r, solver, &nrm2);
+        if(output) {
+            if(output & LIS_PRINT_MEM) solver->rhistory[iter] = nrm2;
+            if(output & LIS_PRINT_OUT) lis_print_rhistory(comm, iter, nrm2);
+        }
 
-		/* dot_zq = <az,qtld> */
-		lis_vector_nhdot(az,qtld,&dot_zq);
+        if(tol >= nrm2) {
+            solver->retcode = LIS_SUCCESS;
+            solver->iter = iter;
+            solver->resid = nrm2;
+            solver->ptime = ptime;
+            LIS_DEBUG_FUNC_OUT;
+            return LIS_SUCCESS;
+        }
 
-		/* beta = -dot_zq / rho */
-		beta = -dot_zq / rho;
+        /* z = z - alpha*qtld       */
+        lis_vector_axpy(-alpha, qtld, z);
 
-		/* p = z + beta*p       */
-		lis_vector_xpay(z,beta,p);
-		
-		/* q = az + beta*q      */
-		lis_vector_xpay(az,beta,q);
-	}
+        /* az = Az */
+        lis_matvec(A, z, az);
 
-	solver->retcode   = LIS_MAXITER;
-	solver->iter      = iter;
-	solver->resid     = nrm2;
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_MAXITER;
+        /* dot_zq = <az,qtld> */
+        lis_vector_nhdot(az, qtld, &dot_zq);
+
+        /* beta = -dot_zq / rho */
+        beta = -dot_zq / rho;
+
+        /* p = z + beta*p       */
+        lis_vector_xpay(z, beta, p);
+
+        /* q = az + beta*q      */
+        lis_vector_xpay(az, beta, q);
+    }
+
+    solver->retcode = LIS_MAXITER;
+    solver->iter = iter;
+    solver->resid = nrm2;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_MAXITER;
 }
-

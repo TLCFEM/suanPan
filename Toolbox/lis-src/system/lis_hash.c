@@ -61,134 +61,119 @@
 
 #undef __FUNC__
 #define __FUNC__ "lis_hashtable_create"
-LIS_INT lis_hashtable_create(LIS_HASHTABLE *hashtable)
-{
-	LIS_HASHTABLE table;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_hashtable_create(LIS_HASHTABLE* hashtable) {
+    LIS_HASHTABLE table;
 
-	*hashtable = NULL;
+    LIS_DEBUG_FUNC_IN;
 
-	table = (LIS_HASHTABLE)malloc(LIS_HASHTABLE_SIZE*sizeof(struct LIS_HASH_STRUCT *));
-	if( table==NULL )
-	{
-		LIS_SETERR_MEM(LIS_HASHTABLE_SIZE*sizeof(struct LIS_HASH_STRUCT *));
-		return LIS_ERR_OUT_OF_MEMORY;
-	}
-	memset(table,0,LIS_HASHTABLE_SIZE*sizeof(struct LIS_HASH_STRUCT *));
+    *hashtable = NULL;
 
-	*hashtable = table;
+    table = (LIS_HASHTABLE)malloc(LIS_HASHTABLE_SIZE * sizeof(struct LIS_HASH_STRUCT*));
+    if(table == NULL) {
+        LIS_SETERR_MEM(LIS_HASHTABLE_SIZE*sizeof(struct LIS_HASH_STRUCT *));
+        return LIS_ERR_OUT_OF_MEMORY;
+    }
+    memset(table, 0,LIS_HASHTABLE_SIZE * sizeof(struct LIS_HASH_STRUCT*));
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    *hashtable = table;
+
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_hashtable_destroy"
-LIS_INT lis_hashtable_destroy(LIS_HASHTABLE hashtable)
-{
-	LIS_INT	i;
-	LIS_HASH p,t;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_hashtable_destroy(LIS_HASHTABLE hashtable) {
+    LIS_INT i;
+    LIS_HASH p, t;
 
-	for(i=0;i<LIS_HASHTABLE_SIZE;i++)
-	{
-		p = hashtable[i];
-		while( p!=NULL )
-		{
-			t = p;
-			p = p->next;
-			free(t);
-		}
-	}
-	free(hashtable);
+    LIS_DEBUG_FUNC_IN;
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    for(i = 0; i < LIS_HASHTABLE_SIZE; i++) {
+        p = hashtable[i];
+        while(p != NULL) {
+            t = p;
+            p = p->next;
+            free(t);
+        }
+    }
+    free(hashtable);
+
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_hashtable_clear"
-LIS_INT lis_hashtable_clear(LIS_HASHTABLE hashtable)
-{
-	LIS_INT i;
-	LIS_HASH p,t;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_hashtable_clear(LIS_HASHTABLE hashtable) {
+    LIS_INT i;
+    LIS_HASH p, t;
 
-	for(i=0;i<LIS_HASHTABLE_SIZE;i++)
-	{
-		p = hashtable[i];
-		while( p!=NULL )
-		{
-			t = p;
-			p = p->next;
-			free(t);
-		}
-		hashtable[i] = NULL;
-	}
+    LIS_DEBUG_FUNC_IN;
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    for(i = 0; i < LIS_HASHTABLE_SIZE; i++) {
+        p = hashtable[i];
+        while(p != NULL) {
+            t = p;
+            p = p->next;
+            free(t);
+        }
+        hashtable[i] = NULL;
+    }
+
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_hashtable_search"
-LIS_HASH lis_hashtable_search(LIS_HASHTABLE hashtable, LIS_INT index)
-{
-	LIS_INT	hash;
-	LIS_HASH p;
 
+LIS_HASH lis_hashtable_search(LIS_HASHTABLE hashtable, LIS_INT index) {
+    LIS_INT hash;
+    LIS_HASH p;
 
-	hash = index%LIS_HASHTABLE_SIZE;
-	for(p=hashtable[hash];p!=NULL;p=p->next)
-	{
-		if( p->index==index ) return p;
-	}
+    hash = index % LIS_HASHTABLE_SIZE;
+    for(p = hashtable[hash]; p != NULL; p = p->next) { if(p->index == index) return p; }
 
-	return NULL;
+    return NULL;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_hashtable_set_value"
-LIS_INT lis_hashtable_set_value(LIS_HASHTABLE hashtable, LIS_INT index, LIS_INT value)
-{
-	LIS_INT hashval;
-	LIS_HASH p;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_hashtable_set_value(LIS_HASHTABLE hashtable, LIS_INT index, LIS_INT value) {
+    LIS_INT hashval;
+    LIS_HASH p;
 
-	p = (LIS_HASH)malloc(sizeof(struct LIS_HASH_STRUCT));
-	if( p==NULL )
-	{
-		LIS_SETERR_MEM(LIS_HASHTABLE_SIZE*sizeof(struct LIS_HASH_STRUCT *));
-		return LIS_ERR_OUT_OF_MEMORY;
-	}
-	hashval            = index%LIS_HASHTABLE_SIZE;
-	p->next            = hashtable[hashval];
-	p->index           = index;
-	p->value           = value;
-	hashtable[hashval] = p;
+    LIS_DEBUG_FUNC_IN;
 
+    p = (LIS_HASH)malloc(sizeof(struct LIS_HASH_STRUCT));
+    if(p == NULL) {
+        LIS_SETERR_MEM(LIS_HASHTABLE_SIZE*sizeof(struct LIS_HASH_STRUCT *));
+        return LIS_ERR_OUT_OF_MEMORY;
+    }
+    hashval = index % LIS_HASHTABLE_SIZE;
+    p->next = hashtable[hashval];
+    p->index = index;
+    p->value = value;
+    hashtable[hashval] = p;
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_hashtable_get_value"
-LIS_INT lis_hashtable_get_value(LIS_HASHTABLE hashtable, LIS_INT index)
-{
-	LIS_INT hashval;
-	LIS_HASH p;
 
+LIS_INT lis_hashtable_get_value(LIS_HASHTABLE hashtable, LIS_INT index) {
+    LIS_INT hashval;
+    LIS_HASH p;
 
-	hashval = index%LIS_HASHTABLE_SIZE;
-	for(p=hashtable[hashval];p!=NULL;p=p->next)
-	{
-		if( p->index==index ) return p->value;
-	}
+    hashval = index % LIS_HASHTABLE_SIZE;
+    for(p = hashtable[hashval]; p != NULL; p = p->next) { if(p->index == index) return p->value; }
 
-	return 0;
+    return 0;
 }

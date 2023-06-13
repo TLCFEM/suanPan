@@ -47,100 +47,83 @@
 #endif
 #include "lislib.h"
 
-void lis_matvec_msr(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[])
-{
-	LIS_INT i,j,js,je,jj;
-	LIS_INT n;
-	LIS_SCALAR t;
+void lis_matvec_msr(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
+    LIS_INT i, j, js, je, jj;
+    LIS_INT n;
+    LIS_SCALAR t;
 
-	n      = A->n;
-	if( A->is_splited )
-	{
-		n    = A->n;
-		#ifdef _OPENMP
+    n = A->n;
+    if(A->is_splited) {
+        n = A->n;
+#ifdef _OPENMP
 		#pragma omp parallel for private(i,j,js,je,t,jj)
-		#endif
-		for(i=0; i<n; i++)
-		{
-			t = A->D->value[i] * x[i];
-			js = A->L->index[i];
-			je = A->L->index[i+1];
-			for(j=js;j<je;j++)
-			{
-				jj = A->L->index[j];
-				t += A->L->value[j] * x[jj];
-			}
-			js = A->U->index[i];
-			je = A->U->index[i+1];
-			for(j=js;j<je;j++)
-			{
-				jj = A->U->index[j];
-				t += A->U->value[j] * x[jj];
-			}
-			y[i] = t;
-		}
-	}
-	else
-	{
-		#ifdef _OPENMP
+#endif
+        for(i = 0; i < n; i++) {
+            t = A->D->value[i] * x[i];
+            js = A->L->index[i];
+            je = A->L->index[i + 1];
+            for(j = js; j < je; j++) {
+                jj = A->L->index[j];
+                t += A->L->value[j] * x[jj];
+            }
+            js = A->U->index[i];
+            je = A->U->index[i + 1];
+            for(j = js; j < je; j++) {
+                jj = A->U->index[j];
+                t += A->U->value[j] * x[jj];
+            }
+            y[i] = t;
+        }
+    }
+    else {
+#ifdef _OPENMP
 		#pragma omp parallel for private(i,j,js,je,t,jj)
-		#endif
-		for(i=0; i<n; i++)
-		{
-			t = A->value[i] * x[i];
-			js = A->index[i];
-			je = A->index[i+1];
-			for(j=js;j<je;j++)
-			{
-				jj = A->index[j];
-				t += A->value[j] * x[jj];
-			}
-			y[i] = t;
-		}
-	}
+#endif
+        for(i = 0; i < n; i++) {
+            t = A->value[i] * x[i];
+            js = A->index[i];
+            je = A->index[i + 1];
+            for(j = js; j < je; j++) {
+                jj = A->index[j];
+                t += A->value[j] * x[jj];
+            }
+            y[i] = t;
+        }
+    }
 }
 
-void lis_matvech_msr(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[])
-{
-	LIS_INT i,j,js,je,jj;
-	LIS_INT n,np;
-	LIS_SCALAR t;
-	#ifdef _OPENMP
+void lis_matvech_msr(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
+    LIS_INT i, j, js, je, jj;
+    LIS_INT n, np;
+    LIS_SCALAR t;
+#ifdef _OPENMP
 		LIS_INT k,nprocs;
 		LIS_SCALAR *w;
-	#endif
+#endif
 
-	n    = A->n;
-	np   = A->np;
+    n = A->n;
+    np = A->np;
 
-	if( A->is_splited )
-	{
-		for(i=0; i<n; i++)
-		{
-			y[i] = conj(A->D->value[i]) * x[i];
-		}
-		for(i=0; i<n; i++)
-		{
-			t = x[i];
-			js = A->L->index[i];
-			je = A->L->index[i+1];
-			for(j=js;j<je;j++)
-			{
-				jj = A->L->index[j];
-				y[jj] += conj(A->L->value[j]) * t;
-			}
-			js = A->U->index[i];
-			je = A->U->index[i+1];
-			for(j=js;j<je;j++)
-			{
-				jj = A->U->index[j];
-				y[jj] += conj(A->U->value[j]) * t;
-			}
-		}
-	}
-	else
-	{
-		#ifdef _OPENMP
+    if(A->is_splited) {
+        for(i = 0; i < n; i++) { y[i] = conj(A->D->value[i]) * x[i]; }
+        for(i = 0; i < n; i++) {
+            t = x[i];
+            js = A->L->index[i];
+            je = A->L->index[i + 1];
+            for(j = js; j < je; j++) {
+                jj = A->L->index[j];
+                y[jj] += conj(A->L->value[j]) * t;
+            }
+            js = A->U->index[i];
+            je = A->U->index[i + 1];
+            for(j = js; j < je; j++) {
+                jj = A->U->index[j];
+                y[jj] += conj(A->U->value[j]) * t;
+            }
+        }
+    }
+    else {
+#ifdef _OPENMP
 			nprocs = omp_get_max_threads();
 			w = (LIS_SCALAR *)lis_malloc( nprocs*np*sizeof(LIS_SCALAR),"lis_matvech_msr::w" );
 			#pragma omp parallel private(i,j,js,je,t,jj,k)
@@ -176,22 +159,17 @@ void lis_matvech_msr(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[])
 				}
 			}
 			lis_free(w);
-		#else
-			for(i=0; i<n; i++)
-			{
-				y[i] = conj(A->value[i]) * x[i];
-			}
-			for(i=0; i<n; i++)
-			{
-				t = x[i];
-				js = A->index[i];
-				je = A->index[i+1];
-				for(j=js;j<je;j++)
-				{
-					jj = A->index[j];
-					y[jj] += conj(A->value[j]) * t;
-				}
-			}
-		#endif
-	}
+#else
+        for(i = 0; i < n; i++) { y[i] = conj(A->value[i]) * x[i]; }
+        for(i = 0; i < n; i++) {
+            t = x[i];
+            js = A->index[i];
+            je = A->index[i + 1];
+            for(j = js; j < je; j++) {
+                jj = A->index[j];
+                y[jj] += conj(A->value[j]) * t;
+            }
+        }
+#endif
+    }
 }

@@ -56,36 +56,34 @@
 
 #undef __FUNC__
 #define __FUNC__ "lis_precon_create_sainv"
-LIS_INT lis_precon_create_sainv(LIS_SOLVER solver, LIS_PRECON precon)
-{
-	LIS_INT	err;
-	LIS_MATRIX A,B;
 
+LIS_INT lis_precon_create_sainv(LIS_SOLVER solver, LIS_PRECON precon) {
+    LIS_INT err;
+    LIS_MATRIX A, B;
 
-	LIS_DEBUG_FUNC_IN;
+    LIS_DEBUG_FUNC_IN;
 
-	switch( solver->A->matrix_type )
-	{
-	case LIS_MATRIX_CSR:
-		err = lis_precon_create_sainv_csr(solver,precon);
-		break;
-	default:
-		A = solver->A;
-		err = lis_matrix_duplicate(A,&B);
-		if( err ) return err;
-		lis_matrix_set_type(B,LIS_MATRIX_CSR);
-		err = lis_matrix_convert(A,B);
-		if( err ) return err;
-		solver->A = B;
-		err = lis_precon_create_sainv_csr(solver,precon);
-		lis_matrix_destroy(B);
-		solver->A = A;
-		break;
-	}
+    switch(solver->A->matrix_type) {
+    case LIS_MATRIX_CSR:
+        err = lis_precon_create_sainv_csr(solver, precon);
+        break;
+    default:
+        A = solver->A;
+        err = lis_matrix_duplicate(A, &B);
+        if(err) return err;
+        lis_matrix_set_type(B,LIS_MATRIX_CSR);
+        err = lis_matrix_convert(A, B);
+        if(err) return err;
+        solver->A = B;
+        err = lis_precon_create_sainv_csr(solver, precon);
+        lis_matrix_destroy(B);
+        solver->A = A;
+        break;
+    }
 
-	#ifndef USE_QUAD_PRECISION
-		err = lis_vector_duplicate(solver->A,&precon->temp);
-	#else
+#ifndef USE_QUAD_PRECISION
+    err = lis_vector_duplicate(solver->A, &precon->temp);
+#else
 		if( solver->precision==LIS_PRECISION_DEFAULT )
 		{
 			err = lis_vector_duplicate(solver->A,&precon->temp);
@@ -94,14 +92,14 @@ LIS_INT lis_precon_create_sainv(LIS_SOLVER solver, LIS_PRECON precon)
 		{
 			err = lis_vector_duplicateex(LIS_PRECISION_QUAD,solver->A,&precon->temp);
 		}
-	#endif
-	if( err ) return err;
+#endif
+    if(err) return err;
 
-	precon->A       = solver->A;
-	precon->is_copy = LIS_FALSE;
+    precon->A = solver->A;
+    precon->is_copy = LIS_FALSE;
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 /********************************************
@@ -119,262 +117,206 @@ LIS_INT lis_precon_create_sainv(LIS_SOLVER solver, LIS_PRECON precon)
 #if 1
 #undef __FUNC__
 #define __FUNC__ "lis_precon_create_sainv_csr"
-LIS_INT lis_precon_create_sainv_csr(LIS_SOLVER solver, LIS_PRECON precon)
-{
-	LIS_INT	err;
-	LIS_INT	i,j,k,ii,jj,ik,jk;
-	LIS_INT	n,annz,cl,cu;
-	LIS_INT	*ww,*il,*iu;
-	LIS_SCALAR t,dd;
-	LIS_REAL tol,nrm;
-	LIS_SCALAR *d,*l,*u;
-	LIS_MATRIX A,B;
-	LIS_MATRIX_ILU W,Z;
-	LIS_VECTOR D;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_precon_create_sainv_csr(LIS_SOLVER solver, LIS_PRECON precon) {
+    LIS_INT err;
+    LIS_INT i, j, k, ii, jj, ik, jk;
+    LIS_INT n, annz, cl, cu;
+    LIS_INT *ww, *il, *iu;
+    LIS_SCALAR t, dd;
+    LIS_REAL tol, nrm;
+    LIS_SCALAR *d, *l, *u;
+    LIS_MATRIX A, B;
+    LIS_MATRIX_ILU W, Z;
+    LIS_VECTOR D;
 
+    LIS_DEBUG_FUNC_IN;
 
-	A      = solver->A;
-	n      = A->n;
-	tol    = solver->params[LIS_PARAMS_DROP-LIS_OPTIONS_LEN];
-	annz   = A->n / 10;
+    A = solver->A;
+    n = A->n;
+    tol = solver->params[LIS_PARAMS_DROP - LIS_OPTIONS_LEN];
+    annz = A->n / 10;
 
-	W      = NULL;
-	ww     = NULL;
-	d      = NULL;
-	l      = NULL;
-	u      = NULL;
-	il     = NULL;
-	iu     = NULL;
+    W = NULL;
+    ww = NULL;
+    d = NULL;
+    l = NULL;
+    u = NULL;
+    il = NULL;
+    iu = NULL;
 
-	err = lis_matrix_ilu_create(n,1,&W);
-	if( err ) return err;
-	err = lis_matrix_ilu_create(n,1,&Z);
-	if( err ) return err;
-	err = lis_matrix_ilu_setCR(W);
-	if( err ) return err;
-	err = lis_matrix_ilu_setCR(Z);
-	if( err ) return err;
-	err = lis_vector_duplicate(A,&D);
-	if( err ) return err;
-	d = D->value;
-	err = lis_matrix_ilu_premalloc(annz,W);
-	if( err ) return err;
-	err = lis_matrix_ilu_premalloc(annz,Z);
-	if( err ) return err;
-	l   = (LIS_SCALAR *)lis_malloc(n*sizeof(LIS_SCALAR),"lis_precon_create_sainv_csr::l");
-	if( l==NULL )
-	{
-		LIS_SETERR_MEM(n*sizeof(LIS_SCALAR));
-		return LIS_OUT_OF_MEMORY;
-	}
-	u   = (LIS_SCALAR *)lis_malloc(n*sizeof(LIS_SCALAR),"lis_precon_create_sainv_csr::u");
-	if( u==NULL )
-	{
-		LIS_SETERR_MEM(n*sizeof(LIS_SCALAR));
-		return LIS_OUT_OF_MEMORY;
-	}
-	il   = (LIS_INT *)lis_malloc(n*sizeof(LIS_INT),"lis_precon_create_sainv_csr::il");
-	if( il==NULL )
-	{
-		LIS_SETERR_MEM(n*sizeof(LIS_INT));
-		return LIS_OUT_OF_MEMORY;
-	}
-	iu   = (LIS_INT *)lis_malloc(n*sizeof(LIS_INT),"lis_precon_create_sainv_csr::iu");
-	if( iu==NULL )
-	{
-		LIS_SETERR_MEM(n*sizeof(LIS_INT));
-		return LIS_OUT_OF_MEMORY;
-	}
-	ww   = (LIS_INT *)lis_malloc(n*sizeof(LIS_INT),"lis_precon_create_sainv_csr::ww");
-	if( ww==NULL )
-	{
-		LIS_SETERR_MEM(n*sizeof(LIS_INT));
-		return LIS_OUT_OF_MEMORY;
-	}
-	err = lis_matrix_duplicate(A,&B);
-	if( err ) return err;
-	err = lis_matrix_convert_csr2csc(A,B);
-	if( err )
-	{
-		return err;
-	}
+    err = lis_matrix_ilu_create(n, 1, &W);
+    if(err) return err;
+    err = lis_matrix_ilu_create(n, 1, &Z);
+    if(err) return err;
+    err = lis_matrix_ilu_setCR(W);
+    if(err) return err;
+    err = lis_matrix_ilu_setCR(Z);
+    if(err) return err;
+    err = lis_vector_duplicate(A, &D);
+    if(err) return err;
+    d = D->value;
+    err = lis_matrix_ilu_premalloc(annz, W);
+    if(err) return err;
+    err = lis_matrix_ilu_premalloc(annz, Z);
+    if(err) return err;
+    l = (LIS_SCALAR*)lis_malloc(n * sizeof(LIS_SCALAR), "lis_precon_create_sainv_csr::l");
+    if(l == NULL) {
+        LIS_SETERR_MEM(n*sizeof(LIS_SCALAR));
+        return LIS_OUT_OF_MEMORY;
+    }
+    u = (LIS_SCALAR*)lis_malloc(n * sizeof(LIS_SCALAR), "lis_precon_create_sainv_csr::u");
+    if(u == NULL) {
+        LIS_SETERR_MEM(n*sizeof(LIS_SCALAR));
+        return LIS_OUT_OF_MEMORY;
+    }
+    il = (LIS_INT*)lis_malloc(n * sizeof(LIS_INT), "lis_precon_create_sainv_csr::il");
+    if(il == NULL) {
+        LIS_SETERR_MEM(n*sizeof(LIS_INT));
+        return LIS_OUT_OF_MEMORY;
+    }
+    iu = (LIS_INT*)lis_malloc(n * sizeof(LIS_INT), "lis_precon_create_sainv_csr::iu");
+    if(iu == NULL) {
+        LIS_SETERR_MEM(n*sizeof(LIS_INT));
+        return LIS_OUT_OF_MEMORY;
+    }
+    ww = (LIS_INT*)lis_malloc(n * sizeof(LIS_INT), "lis_precon_create_sainv_csr::ww");
+    if(ww == NULL) {
+        LIS_SETERR_MEM(n*sizeof(LIS_INT));
+        return LIS_OUT_OF_MEMORY;
+    }
+    err = lis_matrix_duplicate(A, &B);
+    if(err) return err;
+    err = lis_matrix_convert_csr2csc(A, B);
+    if(err) { return err; }
 
-	for(i=0;i<n;i++) ww[i] = 0;
-	for(i=0;i<n;i++)
-	{
-		W->value[i][0] = 1.0;
-		W->index[i][0] = i;
-		W->nnz[i]      = 1;
-		Z->value[i][0] = 1.0;
-		Z->index[i][0] = i;
-		Z->nnz[i]      = 1;
-	}
-	for(i=0; i<n; i++)
-	{
-		/* nrm_inf(A[i,:]) */
-		nrm = 0.0;
-		for(j=A->ptr[i];j<A->ptr[i+1];j++)
-		{
-			nrm = _max(nrm,fabs(A->value[j]));
-		}
-		nrm = 1.0/nrm;
+    for(i = 0; i < n; i++) ww[i] = 0;
+    for(i = 0; i < n; i++) {
+        W->value[i][0] = 1.0;
+        W->index[i][0] = i;
+        W->nnz[i] = 1;
+        Z->value[i][0] = 1.0;
+        Z->index[i][0] = i;
+        Z->nnz[i] = 1;
+    }
+    for(i = 0; i < n; i++) {
+        /* nrm_inf(A[i,:]) */
+        nrm = 0.0;
+        for(j = A->ptr[i]; j < A->ptr[i + 1]; j++) { nrm = _max(nrm, fabs(A->value[j])); }
+        nrm = 1.0 / nrm;
 
-		/* l = AZ_i */
-		cl = 0;
-		memset(l,0,n*sizeof(LIS_SCALAR));
-		for(k=0;k<Z->nnz[i];k++)
-		{
-			ii = Z->index[i][k];
-			for(j=B->ptr[ii];j<B->ptr[ii+1];j++)
-			{
-				jj     = B->index[j];
-				if( jj>i )
-				{
-					l[jj] += B->value[j]*Z->value[i][k];
-					if( ww[jj]==0 )
-					{
-						ww[jj]   = 1;
-						il[cl++] = jj;
-					}
-				}
-			}
-		}
-		for(k=0;k<cl;k++) ww[il[k]] = 0;
+        /* l = AZ_i */
+        cl = 0;
+        memset(l, 0, n * sizeof(LIS_SCALAR));
+        for(k = 0; k < Z->nnz[i]; k++) {
+            ii = Z->index[i][k];
+            for(j = B->ptr[ii]; j < B->ptr[ii + 1]; j++) {
+                jj = B->index[j];
+                if(jj > i) {
+                    l[jj] += B->value[j] * Z->value[i][k];
+                    if(ww[jj] == 0) {
+                        ww[jj] = 1;
+                        il[cl++] = jj;
+                    }
+                }
+            }
+        }
+        for(k = 0; k < cl; k++) ww[il[k]] = 0;
 
-		/* u = W_i'A */
-		cu = 0;
-		memset(u,0,n*sizeof(LIS_SCALAR));
-		for(k=0;k<W->nnz[i];k++)
-		{
-			ii = W->index[i][k];
-			for(j=A->ptr[ii];j<A->ptr[ii+1];j++)
-			{
-				jj     = A->index[j];
-				#ifdef USE_MPI
+        /* u = W_i'A */
+        cu = 0;
+        memset(u, 0, n * sizeof(LIS_SCALAR));
+        for(k = 0; k < W->nnz[i]; k++) {
+            ii = W->index[i][k];
+            for(j = A->ptr[ii]; j < A->ptr[ii + 1]; j++) {
+                jj = A->index[j];
+#ifdef USE_MPI
 					if( jj>n-1 ) continue;
-				#endif
-				u[jj] += A->value[j]*W->value[i][k];
-				if( jj>i && ww[jj]==0 )
-				{
-					ww[jj]   = 1;
-					iu[cu++] = jj;
-				}
-			}
-		}
-		for(k=0;k<cu;k++) ww[iu[k]] = 0;
+#endif
+                u[jj] += A->value[j] * W->value[i][k];
+                if(jj > i && ww[jj] == 0) {
+                    ww[jj] = 1;
+                    iu[cu++] = jj;
+                }
+            }
+        }
+        for(k = 0; k < cu; k++) ww[iu[k]] = 0;
 
-		/* d_ii = uZ_i or W_i'l  */
-		t = 0.0;
-		for(k=0;k<Z->nnz[i];k++)
-		{
-			t += u[Z->index[i][k]]*Z->value[i][k];
-		}
-		d[i] = 1.0/t;
+        /* d_ii = uZ_i or W_i'l  */
+        t = 0.0;
+        for(k = 0; k < Z->nnz[i]; k++) { t += u[Z->index[i][k]] * Z->value[i][k]; }
+        d[i] = 1.0 / t;
 
-		/* for j>i, l_j!=0            */
-		/* w_j = w_j - (l_j/d_ii)*w_i */
-		for(jj=0;jj<cl;jj++)
-		{
-			j = il[jj];
-			dd = l[j]*d[i];
-			for(k=0;k<W->nnz[j];k++)
-			{
-				ww[W->index[j][k]] = k+1;
-			}
-			for(ik=0;ik<W->nnz[i];ik++)
-			{
-				jk = ww[W->index[i][ik]];
-				if( jk!=0 )
-				{
-					t = dd*W->value[i][ik];
-					if( fabs(t)*nrm > tol )
-					{
-						W->value[j][jk-1] -= t;
-					}
-				}
-				else
-				{
-					t = dd*W->value[i][ik];
-					if( fabs(t)*nrm > tol )
-					{
-						if( W->nnz[j] == W->nnz_ma[j] )
-						{
-							W->nnz_ma[j] += annz;
-							err = lis_matrix_ilu_realloc(j,W->nnz_ma[j],W);
-							if( err ) return err;
-						}
-						jk                = W->nnz[j];
-						W->index[j][jk] = W->index[i][ik];
-						W->value[j][jk] = -t;
-						W->nnz[j]++;
-					}
-				}
-			}
-			for(k=0;k<W->nnz[j];k++)
-			{
-				ww[W->index[j][k]] = 0;
-			}
-		}
+        /* for j>i, l_j!=0            */
+        /* w_j = w_j - (l_j/d_ii)*w_i */
+        for(jj = 0; jj < cl; jj++) {
+            j = il[jj];
+            dd = l[j] * d[i];
+            for(k = 0; k < W->nnz[j]; k++) { ww[W->index[j][k]] = k + 1; }
+            for(ik = 0; ik < W->nnz[i]; ik++) {
+                jk = ww[W->index[i][ik]];
+                if(jk != 0) {
+                    t = dd * W->value[i][ik];
+                    if(fabs(t) * nrm > tol) { W->value[j][jk - 1] -= t; }
+                }
+                else {
+                    t = dd * W->value[i][ik];
+                    if(fabs(t) * nrm > tol) {
+                        if(W->nnz[j] == W->nnz_ma[j]) {
+                            W->nnz_ma[j] += annz;
+                            err = lis_matrix_ilu_realloc(j, W->nnz_ma[j], W);
+                            if(err) return err;
+                        }
+                        jk = W->nnz[j];
+                        W->index[j][jk] = W->index[i][ik];
+                        W->value[j][jk] = -t;
+                        W->nnz[j]++;
+                    }
+                }
+            }
+            for(k = 0; k < W->nnz[j]; k++) { ww[W->index[j][k]] = 0; }
+        }
 
-		/* for j>i, u_j!=0            */
-		/* z_j = z_j - (u_j/d_ii)*z_i */
-		for(jj=0;jj<cu;jj++)
-		{
-			j = iu[jj];
-			dd = u[j]*d[i];
-			for(k=0;k<Z->nnz[j];k++)
-			{
-				ww[Z->index[j][k]] = k+1;
-			}
-			for(ik=0;ik<Z->nnz[i];ik++)
-			{
-				jk = ww[Z->index[i][ik]];
-				if( jk!=0 )
-				{
-					t = dd*Z->value[i][ik];
-					if( fabs(t)*nrm > tol )
-					{
-						Z->value[j][jk-1] -= t;
-					}
-				}
-				else
-				{
-					t = dd*Z->value[i][ik];
-					if( fabs(t)*nrm > tol )
-					{
-						if( Z->nnz[j] == Z->nnz_ma[j] )
-						{
-							Z->nnz_ma[j] += annz;
-							err = lis_matrix_ilu_realloc(j,Z->nnz_ma[j],Z);
-							if( err ) return err;
-						}
-						jk                = Z->nnz[j];
-						Z->index[j][jk] = Z->index[i][ik];
-						Z->value[j][jk] = -t;
-						Z->nnz[j]++;
-					}
-				}
-			}
-			for(k=0;k<Z->nnz[j];k++)
-			{
-				ww[Z->index[j][k]] = 0;
-			}
-		}
-	}
+        /* for j>i, u_j!=0            */
+        /* z_j = z_j - (u_j/d_ii)*z_i */
+        for(jj = 0; jj < cu; jj++) {
+            j = iu[jj];
+            dd = u[j] * d[i];
+            for(k = 0; k < Z->nnz[j]; k++) { ww[Z->index[j][k]] = k + 1; }
+            for(ik = 0; ik < Z->nnz[i]; ik++) {
+                jk = ww[Z->index[i][ik]];
+                if(jk != 0) {
+                    t = dd * Z->value[i][ik];
+                    if(fabs(t) * nrm > tol) { Z->value[j][jk - 1] -= t; }
+                }
+                else {
+                    t = dd * Z->value[i][ik];
+                    if(fabs(t) * nrm > tol) {
+                        if(Z->nnz[j] == Z->nnz_ma[j]) {
+                            Z->nnz_ma[j] += annz;
+                            err = lis_matrix_ilu_realloc(j, Z->nnz_ma[j], Z);
+                            if(err) return err;
+                        }
+                        jk = Z->nnz[j];
+                        Z->index[j][jk] = Z->index[i][ik];
+                        Z->value[j][jk] = -t;
+                        Z->nnz[j]++;
+                    }
+                }
+            }
+            for(k = 0; k < Z->nnz[j]; k++) { ww[Z->index[j][k]] = 0; }
+        }
+    }
 
-	lis_matrix_destroy(B);
-	lis_free2(5,l,u,ww,il,iu);
+    lis_matrix_destroy(B);
+    lis_free2(5, l, u, ww, il, iu);
 
+    precon->L = W;
+    precon->U = Z;
+    precon->D = D;
 
-	precon->L  = W;
-	precon->U  = Z;
-	precon->D  = D;
-
-
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 #else
 /********************************************
@@ -732,136 +674,130 @@ LIS_INT lis_precon_create_sainv_csr(LIS_SOLVER solver, LIS_PRECON precon)
 
 #undef __FUNC__
 #define __FUNC__ "lis_psolve_sainv"
-LIS_INT lis_psolve_sainv(LIS_SOLVER solver, LIS_VECTOR B, LIS_VECTOR X)
-{
-	LIS_INT i,n;
-	LIS_MATRIX A;
-	LIS_MATRIX_ILU W,Z;
-	LIS_VECTOR t,d;
-	LIS_PRECON precon;
-	LIS_QUAD_DECLAR;
 
-	/*
-	 *  x  = Mb
-	 *  M  = ZD^{-1}W'
-	 */
+LIS_INT lis_psolve_sainv(LIS_SOLVER solver, LIS_VECTOR B, LIS_VECTOR X) {
+    LIS_INT i, n;
+    LIS_MATRIX A;
+    LIS_MATRIX_ILU W, Z;
+    LIS_VECTOR t, d;
+    LIS_PRECON precon;
+    LIS_QUAD_DECLAR;
 
-	LIS_DEBUG_FUNC_IN;
+    /*
+     *  x  = Mb
+     *  M  = ZD^{-1}W'
+     */
 
-	precon = solver->precon;
-	A = precon->A;
-	W = precon->L;
-	Z = precon->U;
-	d = precon->D;
-	t = precon->temp;
-	n = precon->L->n;
+    LIS_DEBUG_FUNC_IN;
 
-	#ifdef USE_QUAD_PRECISION
+    precon = solver->precon;
+    A = precon->A;
+    W = precon->L;
+    Z = precon->U;
+    d = precon->D;
+    t = precon->temp;
+    n = precon->L->n;
+
+#ifdef USE_QUAD_PRECISION
 		if( B->precision==LIS_PRECISION_DEFAULT )
 		{
-	#endif
-			lis_matvech_ilu(A,W,B,X);
-			#ifdef _OPENMP
+#endif
+    lis_matvech_ilu(A, W, B, X);
+#ifdef _OPENMP
 			#pragma omp parallel for private(i)
-			#endif
-			for(i=0;i<n;i++)
-			{
-				t->value[i] = X->value[i]*d->value[i];
-			}
-			lis_matvec_ilu(A,Z,t,X);
-	#ifdef USE_QUAD_PRECISION
+#endif
+    for(i = 0; i < n; i++) { t->value[i] = X->value[i] * d->value[i]; }
+    lis_matvec_ilu(A, Z, t, X);
+#ifdef USE_QUAD_PRECISION
 		}
 		else
 		{
 			lis_matvech_ilu(A,W,B,X);
-			#ifdef _OPENMP
-			#ifndef USE_SSE2
+#ifdef _OPENMP
+#ifndef USE_SSE2
 				#pragma omp parallel for private(i,p1,p2,tq,bhi,blo,chi,clo,sh,sl,th,tl,eh,el)
-			#else
+#else
 				#pragma omp parallel for private(i,bh,ch,sh,wh,th,bl,cl,sl,wl,tl,p1,p2,t0,t1,t2,eh)
-			#endif
-			#endif
+#endif
+#endif
 			for(i=0;i<n;i++)
 			{
-				#ifndef USE_SSE2
+#ifndef USE_SSE2
 					LIS_QUAD_MULD(t->value[i],t->value_lo[i],X->value[i],X->value_lo[i],d->value[i]);
-				#else
+#else
 					LIS_QUAD_MULD_SSE2(t->value[i],t->value_lo[i],X->value[i],X->value_lo[i],d->value[i]);
-				#endif
+#endif
 				/* t->value[i] = X->value[i]*d->value[i]; */
 			}
 			lis_matvec_ilu(A,Z,t,X);
 		}
-	#endif
+#endif
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_psolveh_sainv"
-LIS_INT lis_psolveh_sainv(LIS_SOLVER solver, LIS_VECTOR B, LIS_VECTOR X)
-{
-	LIS_INT i,n;
-	LIS_MATRIX A;
-	LIS_MATRIX_ILU W,Z;
-	LIS_VECTOR t,d;
-	LIS_PRECON precon;
-	LIS_QUAD_DECLAR;
 
-	/*
-	 *  x  = M'b
-	 *  M' = WD^{-1}Z'
-	 */
+LIS_INT lis_psolveh_sainv(LIS_SOLVER solver, LIS_VECTOR B, LIS_VECTOR X) {
+    LIS_INT i, n;
+    LIS_MATRIX A;
+    LIS_MATRIX_ILU W, Z;
+    LIS_VECTOR t, d;
+    LIS_PRECON precon;
+    LIS_QUAD_DECLAR;
 
-	LIS_DEBUG_FUNC_IN;
+    /*
+     *  x  = M'b
+     *  M' = WD^{-1}Z'
+     */
 
-	precon = solver->precon;
-	A = precon->A;
-	W = precon->L;
-	Z = precon->U;
-	d = precon->D;
-	t = precon->temp;
-	n = precon->L->n;
+    LIS_DEBUG_FUNC_IN;
 
-	#ifdef USE_QUAD_PRECISION
+    precon = solver->precon;
+    A = precon->A;
+    W = precon->L;
+    Z = precon->U;
+    d = precon->D;
+    t = precon->temp;
+    n = precon->L->n;
+
+#ifdef USE_QUAD_PRECISION
 		if( B->precision==LIS_PRECISION_DEFAULT )
 		{
-	#endif
-			lis_matvech_ilu(A,Z,B,X);
-			#ifdef _OPENMP
+#endif
+    lis_matvech_ilu(A, Z, B, X);
+#ifdef _OPENMP
 			#pragma omp parallel for private(i)
-			#endif
-			for(i=0;i<n;i++)
-			{
-				t->value[i] = X->value[i]*conj(d->value[i]);
-			}
-			lis_matvec_ilu(A,W,t,X);
-	#ifdef USE_QUAD_PRECISION
+#endif
+    for(i = 0; i < n; i++) { t->value[i] = X->value[i] * conj(d->value[i]); }
+    lis_matvec_ilu(A, W, t, X);
+#ifdef USE_QUAD_PRECISION
 		}
 		else
 		{
 			lis_matvech_ilu(A,Z,B,X);
-			#ifdef _OPENMP
-			#ifndef USE_SSE2
+#ifdef _OPENMP
+#ifndef USE_SSE2
 				#pragma omp parallel for private(i,p1,p2,tq,bhi,blo,chi,clo,sh,sl,th,tl,eh,el)
-			#else
+#else
 				#pragma omp parallel for private(i,bh,ch,sh,wh,th,bl,cl,sl,wl,tl,p1,p2,t0,t1,t2,eh)
-			#endif
-			#endif
+#endif
+#endif
 			for(i=0;i<n;i++)
 			{
-				#ifndef USE_SSE2
+#ifndef USE_SSE2
 			  		LIS_QUAD_MULD(t->value[i],t->value_lo[i],X->value[i],X->value_lo[i],conj(d->value[i]));
-				#else
+#else
 					LIS_QUAD_MULD_SSE2(t->value[i],t->value_lo[i],X->value[i],X->value_lo[i],conj(d->value[i]));
-				#endif
+#endif
 				/* t->value[i] = X->value[i]*conj(d->value[i]); */
 			}
 			lis_matvec_ilu(A,W,t,X);
 		}
-	#endif
+#endif
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }

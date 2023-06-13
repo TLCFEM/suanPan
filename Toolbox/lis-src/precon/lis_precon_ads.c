@@ -55,122 +55,104 @@
 
 #undef __FUNC__
 #define __FUNC__ "lis_precon_create_adds"
-LIS_INT lis_precon_create_adds(LIS_SOLVER solver, LIS_PRECON precon)
-{
-	LIS_INT	i,j;
-	LIS_INT	precon_type,worklen;
-	LIS_INT	err;
-	LIS_VECTOR *work;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_precon_create_adds(LIS_SOLVER solver, LIS_PRECON precon) {
+    LIS_INT i, j;
+    LIS_INT precon_type, worklen;
+    LIS_INT err;
+    LIS_VECTOR* work;
 
-	precon_type = solver->options[LIS_OPTIONS_PRECON];
-	worklen     = 2;
-	work        = (LIS_VECTOR *)lis_malloc( worklen*sizeof(LIS_VECTOR),"lis_precon_create_adds::work" );
-	if( work==NULL )
-	{
-		LIS_SETERR_MEM(worklen*sizeof(LIS_VECTOR));
-		return LIS_OUT_OF_MEMORY;
-	}
-	if( solver->precision==LIS_PRECISION_DEFAULT )
-	{
-		for(i=0;i<worklen;i++)
-		{
-			err = lis_vector_duplicate(solver->A,&work[i]);
-			if( err ) break;
-		}
-	}
-	else
-	{
-		for(i=0;i<worklen;i++)
-		{
-			err = lis_vector_duplicateex(LIS_PRECISION_QUAD,solver->A,&work[i]);
-			if( err ) break;
-		}
-	}
-	if( i<worklen )
-	{
-		for(j=0;j<i;j++) lis_vector_destroy(work[j]);
-		lis_free(work);
-		return err;
-	}
-	precon->worklen = worklen;
-	precon->work    = work;
+    LIS_DEBUG_FUNC_IN;
 
-	err = lis_precon_create_xxx[precon_type](solver,precon);
-	if( err )
-	{
-		lis_precon_destroy(precon);
-		return err;
-	}
+    precon_type = solver->options[LIS_OPTIONS_PRECON];
+    worklen = 2;
+    work = (LIS_VECTOR*)lis_malloc(worklen * sizeof(LIS_VECTOR), "lis_precon_create_adds::work");
+    if(work == NULL) {
+        LIS_SETERR_MEM(worklen*sizeof(LIS_VECTOR));
+        return LIS_OUT_OF_MEMORY;
+    }
+    if(solver->precision == LIS_PRECISION_DEFAULT) {
+        for(i = 0; i < worklen; i++) {
+            err = lis_vector_duplicate(solver->A, &work[i]);
+            if(err) break;
+        }
+    }
+    else {
+        for(i = 0; i < worklen; i++) {
+            err = lis_vector_duplicateex(LIS_PRECISION_QUAD, solver->A, &work[i]);
+            if(err) break;
+        }
+    }
+    if(i < worklen) {
+        for(j = 0; j < i; j++) lis_vector_destroy(work[j]);
+        lis_free(work);
+        return err;
+    }
+    precon->worklen = worklen;
+    precon->work = work;
 
-    precon->A       = solver->A;
+    err = lis_precon_create_xxx[precon_type](solver, precon);
+    if(err) {
+        lis_precon_destroy(precon);
+        return err;
+    }
+
+    precon->A = solver->A;
     precon->is_copy = LIS_FALSE;
 
-	LIS_DEBUG_FUNC_OUT;
-	return err;
+    LIS_DEBUG_FUNC_OUT;
+    return err;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_psolve_adds"
-LIS_INT lis_psolve_adds(LIS_SOLVER solver, LIS_VECTOR B, LIS_VECTOR X)
-{
-	LIS_INT i,k,n,np,iter,ptype;
-	LIS_SCALAR *b,*x,*w,*r,*rl;
-	LIS_VECTOR W,R;
-	LIS_PRECON precon;
-	LIS_QUAD_DECLAR;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_psolve_adds(LIS_SOLVER solver, LIS_VECTOR B, LIS_VECTOR X) {
+    LIS_INT i, k, n, np, iter, ptype;
+    LIS_SCALAR *b, *x, *w, *r, *rl;
+    LIS_VECTOR W, R;
+    LIS_PRECON precon;
+    LIS_QUAD_DECLAR;
 
-	precon = solver->precon;
-	n     = precon->A->n;
-	np    = precon->A->np;
-	W     = precon->work[0];
-	R     = precon->work[1];
-	b     = B->value;
-	x     = X->value;
-	w     = W->value;
-	r     = R->value;
-	rl    = R->value_lo;
-	iter  = solver->options[LIS_OPTIONS_ADDS_ITER];
-	ptype = solver->options[LIS_OPTIONS_PRECON];
+    LIS_DEBUG_FUNC_IN;
 
-	#ifdef USE_QUAD_PRECISION
+    precon = solver->precon;
+    n = precon->A->n;
+    np = precon->A->np;
+    W = precon->work[0];
+    R = precon->work[1];
+    b = B->value;
+    x = X->value;
+    w = W->value;
+    r = R->value;
+    rl = R->value_lo;
+    iter = solver->options[LIS_OPTIONS_ADDS_ITER];
+    ptype = solver->options[LIS_OPTIONS_PRECON];
+
+#ifdef USE_QUAD_PRECISION
 	if( solver->precision==LIS_PRECISION_DEFAULT )
 	{
-	#endif
-		lis_vector_set_all(0.0,X);
-		lis_vector_copy(B,R);
-		for(k=0;k<iter+1;k++)
-		{
-			for(i=n;i<np;i++)
-			{
-				r[i] = 0.0;
-			}
+#endif
+    lis_vector_set_all(0.0, X);
+    lis_vector_copy(B, R);
+    for(k = 0; k < iter + 1; k++) {
+        for(i = n; i < np; i++) { r[i] = 0.0; }
 
-			lis_psolve_xxx[ptype](solver,R,W);
-			#ifdef _OPENMP
+        lis_psolve_xxx[ptype](solver, R, W);
+#ifdef _OPENMP
 			#pragma omp parallel for private(i)
-			#endif
-			for(i=0;i<n;i++)
-			{
-				x[i] += w[i];
-			}
-		
-			if(k!=iter)
-			{
-				lis_matvec(precon->A,X,R);
-				#ifdef _OPENMP
+#endif
+        for(i = 0; i < n; i++) { x[i] += w[i]; }
+
+        if(k != iter) {
+            lis_matvec(precon->A, X, R);
+#ifdef _OPENMP
 				#pragma omp parallel for private(i)
-				#endif
-				for(i=0;i<n;i++)
-				{
-					r[i] = b[i] - r[i];
-				}
-			}
-		}
-	#ifdef USE_QUAD_PRECISION
+#endif
+            for(i = 0; i < n; i++) { r[i] = b[i] - r[i]; }
+        }
+    }
+#ifdef USE_QUAD_PRECISION
 		}
 		else
 		{
@@ -187,11 +169,11 @@ LIS_INT lis_psolve_adds(LIS_SOLVER solver, LIS_VECTOR B, LIS_VECTOR X)
 				lis_psolve_xxx[ptype](solver,R,W);
 				for(i=0;i<n;i++)
 				{
-					#ifndef USE_SSE2
+#ifndef USE_SSE2
 						LIS_QUAD_ADD(X->value[i],X->value_lo[i],X->value[i],X->value_lo[i],W->value[i],W->value_lo[i]);
-					#else
+#else
 						LIS_QUAD_ADD_SSE2(X->value[i],X->value_lo[i],X->value[i],X->value_lo[i],W->value[i],W->value_lo[i]);
-					#endif
+#endif
 	/*				x[i] += w[i];*/
 				}
 			
@@ -200,108 +182,83 @@ LIS_INT lis_psolve_adds(LIS_SOLVER solver, LIS_VECTOR B, LIS_VECTOR X)
 				lis_matvec(precon->A,X,R);
 				for(i=0;i<n;i++)
 				{
-					#ifndef USE_SSE2
+#ifndef USE_SSE2
 						LIS_QUAD_ADD(R->value[i],R->value_lo[i],B->value[i],B->value_lo[i],-R->value[i],-R->value_lo[i]);
-					#else
+#else
 						LIS_QUAD_ADD_SSE2(R->value[i],R->value_lo[i],B->value[i],B->value_lo[i],-R->value[i],-R->value_lo[i]);
-					#endif
+#endif
 	/*				r[i] = b[i] - r[i];*/
 				}
 			}
 		}
-	#endif
+#endif
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_psolveh_adds"
-LIS_INT lis_psolveh_adds(LIS_SOLVER solver, LIS_VECTOR B, LIS_VECTOR X)
-{
-	LIS_INT i,k,n,np,iter,ptype;
-	LIS_SCALAR *b,*x,*w,*r;
-	LIS_VECTOR W,R;
-	LIS_PRECON precon;
 
+LIS_INT lis_psolveh_adds(LIS_SOLVER solver, LIS_VECTOR B, LIS_VECTOR X) {
+    LIS_INT i, k, n, np, iter, ptype;
+    LIS_SCALAR *b, *x, *w, *r;
+    LIS_VECTOR W, R;
+    LIS_PRECON precon;
 
-	LIS_DEBUG_FUNC_IN;
+    LIS_DEBUG_FUNC_IN;
 
-	precon = solver->precon;
-	n     = precon->A->n;
-	np    = precon->A->np;
-	W     = precon->work[0];
-	R     = precon->work[1];
-	b     = B->value;
-	x     = X->value;
-	w     = W->value;
-	r     = R->value;
-	iter  = solver->options[LIS_OPTIONS_ADDS_ITER];
-	ptype = solver->options[LIS_OPTIONS_PRECON];
+    precon = solver->precon;
+    n = precon->A->n;
+    np = precon->A->np;
+    W = precon->work[0];
+    R = precon->work[1];
+    b = B->value;
+    x = X->value;
+    w = W->value;
+    r = R->value;
+    iter = solver->options[LIS_OPTIONS_ADDS_ITER];
+    ptype = solver->options[LIS_OPTIONS_PRECON];
 
-	if( solver->precision==LIS_PRECISION_DEFAULT )
-	{
-		lis_vector_set_all(0.0,X);
-		lis_vector_copy(B,R);
-		for(k=0;k<iter+1;k++)
-		{
-			for(i=n;i<np;i++)
-			{
-				r[i] = 0.0;
-			}
+    if(solver->precision == LIS_PRECISION_DEFAULT) {
+        lis_vector_set_all(0.0, X);
+        lis_vector_copy(B, R);
+        for(k = 0; k < iter + 1; k++) {
+            for(i = n; i < np; i++) { r[i] = 0.0; }
 
-			lis_psolveh_xxx[ptype](solver,R,W);
-			#ifdef _OPENMP
+            lis_psolveh_xxx[ptype](solver, R, W);
+#ifdef _OPENMP
 			#pragma omp parallel for private(i)
-			#endif
-			for(i=0;i<n;i++)
-			{
-				x[i] += w[i];
-			}
-		
-			if(k!=iter)
-			{
-				lis_matvech(precon->A,X,R);
-				#ifdef _OPENMP
+#endif
+            for(i = 0; i < n; i++) { x[i] += w[i]; }
+
+            if(k != iter) {
+                lis_matvech(precon->A, X, R);
+#ifdef _OPENMP
 				#pragma omp parallel for private(i)
-				#endif
-				for(i=0;i<n;i++)
-				{
-					r[i] = b[i] - r[i];
-				}
-			}
-		}
-	}
-	else
-	{
-		lis_vector_set_all(0.0,X);
-		lis_vector_copy(B,R);
-		for(k=0;k<iter+1;k++)
-		{
-			for(i=n;i<np;i++)
-			{
-				r[i] = 0.0;
-			}
+#endif
+                for(i = 0; i < n; i++) { r[i] = b[i] - r[i]; }
+            }
+        }
+    }
+    else {
+        lis_vector_set_all(0.0, X);
+        lis_vector_copy(B, R);
+        for(k = 0; k < iter + 1; k++) {
+            for(i = n; i < np; i++) { r[i] = 0.0; }
 
-			lis_psolveh_xxx[ptype](solver,R,W);
-			for(i=0;i<n;i++)
-			{
-				x[i] += w[i];
-			}
-		
-			if(k==iter) break;
+            lis_psolveh_xxx[ptype](solver, R, W);
+            for(i = 0; i < n; i++) { x[i] += w[i]; }
 
-			X->precision = LIS_PRECISION_DEFAULT;
-			lis_matvech(precon->A,X,R);
-			X->precision = LIS_PRECISION_QUAD;
-			for(i=0;i<n;i++)
-			{
-				r[i] = b[i] - r[i];
-			}
-		}
-	}
+            if(k == iter) break;
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+            X->precision = LIS_PRECISION_DEFAULT;
+            lis_matvech(precon->A, X, R);
+            X->precision = LIS_PRECISION_QUAD;
+            for(i = 0; i < n; i++) { r[i] = b[i] - r[i]; }
+        }
+    }
+
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
-

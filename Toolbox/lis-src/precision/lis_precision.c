@@ -70,7 +70,7 @@ void lis_quad_x87_fpu_init(LIS_UNSIGNED_INT *cw_old)
 	cw_new = (cw & ~0x0300) | 0x0200;
 	asm volatile ("fldcw %0": :"m" (cw_new));
 	*cw_old = cw;
-#endif	
+#endif
 #else
 	*cw_old = 0;
 #endif
@@ -82,12 +82,12 @@ void lis_quad_x87_fpu_finalize(LIS_UNSIGNED_INT cw)
 {
 #ifdef HAS_X87_FPU
 #ifdef _WIN32
-#ifndef _WIN64  
+#ifndef _WIN64
     _control87(cw, 0xFFFFFFFF);
 #endif
 #else
 	asm volatile ("fldcw %0": :"m" (cw));
-#endif	
+#endif
 #endif
 }
 
@@ -155,11 +155,11 @@ void lis_quad_add(LIS_QUAD *a, const LIS_QUAD *b, const LIS_QUAD *c)
 {
 	LIS_QUAD_DECLAR;
 
-	#ifndef USE_SSE2
+#ifndef USE_SSE2
 		LIS_QUAD_ADD(a->hi,a->lo,b->hi,b->lo,c->hi,c->lo);
-	#else
+#else
 		LIS_QUAD_ADD_SSE2(a->hi,a->lo,b->hi,b->lo,c->hi,c->lo);
-	#endif
+#endif
 }
 
 #undef __FUNC__
@@ -168,11 +168,11 @@ void lis_quad_sub(LIS_QUAD *a, const LIS_QUAD *b, const LIS_QUAD *c)
 {
 	LIS_QUAD_DECLAR;
 
-	#ifndef USE_SSE2
+#ifndef USE_SSE2
 		LIS_QUAD_ADD(a->hi,a->lo,b->hi,b->lo,-c->hi,-c->lo);
-	#else
+#else
 		LIS_QUAD_ADD_SSE2(a->hi,a->lo,b->hi,b->lo,-c->hi,-c->lo);
-	#endif
+#endif
 }
 
 
@@ -182,11 +182,11 @@ void lis_quad_mul(LIS_QUAD *a, const LIS_QUAD *b, const LIS_QUAD *c)
 {
 	LIS_QUAD_DECLAR;
 
-	#ifndef USE_SSE2
+#ifndef USE_SSE2
 		LIS_QUAD_MUL(a->hi,a->lo,b->hi,b->lo,c->hi,c->lo);
-	#else
+#else
 		LIS_QUAD_MUL_SSE2(a->hi,a->lo,b->hi,b->lo,c->hi,c->lo);
-	#endif
+#endif
 }
 
 #undef __FUNC__
@@ -195,11 +195,11 @@ void lis_quad_mul(LIS_QUAD *a, const LIS_QUAD *b, const LIS_QUAD *c)
 {
 	LIS_QUAD_DECLAR;
 
-	#ifndef USE_SSE2
+#ifndef USE_SSE2
 		LIS_QUAD_MULD(a->hi,a->lo,b->hi,b->lo,c);
-	#else
+#else
 		LIS_QUAD_MULD_SSE2(a->hi,a->lo,b->hi,b->lo,c);
-	#endif
+#endif
 }
 
 #undef __FUNC__
@@ -208,11 +208,11 @@ void lis_quad_sqr(LIS_QUAD *a, const LIS_QUAD *b)
 {
 	LIS_QUAD_DECLAR;
 
-	#ifndef USE_SSE2
+#ifndef USE_SSE2
 		LIS_QUAD_SQR(a->hi,a->lo,b->hi,b->lo);
-	#else
+#else
 		LIS_QUAD_SQR_SSE2(a->hi,a->lo,b->hi,b->lo);
-	#endif
+#endif
 }
 
 #undef __FUNC__
@@ -221,11 +221,11 @@ void lis_quad_div(LIS_QUAD *a, const LIS_QUAD *b, const LIS_QUAD *c)
 {
 	LIS_QUAD_DECLAR;
 
-	#ifndef USE_SSE2
+#ifndef USE_SSE2
 		LIS_QUAD_DIV(a->hi,a->lo,b->hi,b->lo,c->hi,c->lo);
-	#else
+#else
 		LIS_QUAD_DIV_SSE2(a->hi,a->lo,b->hi,b->lo,c->hi,c->lo);
-	#endif
+#endif
 }
 
 #undef __FUNC__
@@ -234,12 +234,11 @@ LIS_INT lis_quad_sqrt(LIS_QUAD *a, const LIS_QUAD *b)
 {
 	LIS_QUAD_DECLAR;
 
-	#ifndef USE_SSE2
+#ifndef USE_SSE2
 		LIS_QUAD_SQRT(a->hi,a->lo,b->hi,b->lo);
-	#else
+#else
 		LIS_QUAD_SQRT_SSE2(a->hi,a->lo,b->hi,b->lo);
-	#endif
+#endif
 	return LIS_SUCCESS;
 }
 #endif
-

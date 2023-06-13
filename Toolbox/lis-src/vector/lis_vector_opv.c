@@ -58,521 +58,452 @@
  * lis_vector_cgs		classical Gram-Schmidt
  ********************************************************/
 
-
 /********************/
 /* x <-> y          */
 /********************/
 #undef __FUNC__
 #define __FUNC__ "lis_vector_swap"
-LIS_INT lis_vector_swap(LIS_VECTOR vx, LIS_VECTOR vy)
-{
-	LIS_INT i,n;
-	LIS_SCALAR *x,*y,t;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_vector_swap(LIS_VECTOR vx, LIS_VECTOR vy) {
+    LIS_INT i, n;
+    LIS_SCALAR *x, *y, t;
 
-	n = vx->n;
-	#ifndef NO_ERROR_CHECK
-		if( n!=vy->n )
-		{
-			LIS_SETERR(LIS_ERR_ILL_ARG,"length of vector x and y is not equal\n");
-			return LIS_ERR_ILL_ARG;
-		}
-	#endif
+    LIS_DEBUG_FUNC_IN;
 
-	x = vx->value;
-	y = vy->value;
-	#ifdef USE_VEC_COMP
+    n = vx->n;
+#ifndef NO_ERROR_CHECK
+    if(n != vy->n) {
+        LIS_SETERR(LIS_ERR_ILL_ARG, "length of vector x and y is not equal\n");
+        return LIS_ERR_ILL_ARG;
+    }
+#endif
+
+    x = vx->value;
+    y = vy->value;
+#ifdef USE_VEC_COMP
 	#pragma cdir nodep
 	#pragma _NEC ivdep
-	#endif
-	#ifdef _OPENMP
+#endif
+#ifdef _OPENMP
 	#pragma omp parallel for private(i)
-	#endif
-	for(i=0; i<n; i++)
-	{
-                t = y[i];
-		y[i] = x[i];
-		x[i] = t;
-	}
+#endif
+    for(i = 0; i < n; i++) {
+        t = y[i];
+        y[i] = x[i];
+        x[i] = t;
+    }
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
-
 
 /********************/
 /* y <- x           */
 /********************/
 #undef __FUNC__
 #define __FUNC__ "lis_vector_copy"
-LIS_INT lis_vector_copy(LIS_VECTOR vx, LIS_VECTOR vy)
-{
-	LIS_INT i,n;
-	LIS_SCALAR *x,*y;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_vector_copy(LIS_VECTOR vx, LIS_VECTOR vy) {
+    LIS_INT i, n;
+    LIS_SCALAR *x, *y;
 
-	n = vx->n;
-	#ifndef NO_ERROR_CHECK
-		if( n!=vy->n )
-		{
-			LIS_SETERR(LIS_ERR_ILL_ARG,"length of vector x and y is not equal\n");
-			return LIS_ERR_ILL_ARG;
-		}
-	#endif
+    LIS_DEBUG_FUNC_IN;
 
-	x = vx->value;
-	y = vy->value;
-	#ifdef USE_VEC_COMP
+    n = vx->n;
+#ifndef NO_ERROR_CHECK
+    if(n != vy->n) {
+        LIS_SETERR(LIS_ERR_ILL_ARG, "length of vector x and y is not equal\n");
+        return LIS_ERR_ILL_ARG;
+    }
+#endif
+
+    x = vx->value;
+    y = vy->value;
+#ifdef USE_VEC_COMP
 	#pragma cdir nodep
 	#pragma _NEC ivdep
-	#endif
-	#ifdef _OPENMP
+#endif
+#ifdef _OPENMP
 	#pragma omp parallel for private(i)
-	#endif
-	for(i=0; i<n; i++)
-	{
-		y[i] = x[i];
-	}
+#endif
+    for(i = 0; i < n; i++) { y[i] = x[i]; }
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
-
 
 /**********************/
 /* y <- y + alpha * x */
 /**********************/
 #undef __FUNC__
 #define __FUNC__ "lis_vector_axpy"
-LIS_INT lis_vector_axpy(LIS_SCALAR alpha, LIS_VECTOR vx, LIS_VECTOR vy)
-{
-	LIS_INT i,n;
-	LIS_SCALAR *x,*y;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_vector_axpy(LIS_SCALAR alpha, LIS_VECTOR vx, LIS_VECTOR vy) {
+    LIS_INT i, n;
+    LIS_SCALAR *x, *y;
 
-	n    = vx->n;
-	#ifndef NO_ERROR_CHECK
-		if( n!=vy->n )
-		{
-			LIS_SETERR(LIS_ERR_ILL_ARG,"length of vector x and y is not equal\n");
-			return LIS_ERR_ILL_ARG;
-		}
-	#endif
+    LIS_DEBUG_FUNC_IN;
 
-	x    = vx->value;
-	y    = vy->value;
-	#ifdef USE_VEC_COMP
+    n = vx->n;
+#ifndef NO_ERROR_CHECK
+    if(n != vy->n) {
+        LIS_SETERR(LIS_ERR_ILL_ARG, "length of vector x and y is not equal\n");
+        return LIS_ERR_ILL_ARG;
+    }
+#endif
+
+    x = vx->value;
+    y = vy->value;
+#ifdef USE_VEC_COMP
 	#pragma cdir nodep
 	#pragma _NEC ivdep
-	#endif
-	#ifdef _OPENMP
+#endif
+#ifdef _OPENMP
 	#pragma omp parallel for private(i)
-	#endif
-	for(i=0; i<n; i++)
-	{
-		y[i] += alpha * x[i];
-	}
+#endif
+    for(i = 0; i < n; i++) { y[i] += alpha * x[i]; }
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
-
 
 /**********************/
 /* y <- x + alpha * y */
 /**********************/
 #undef __FUNC__
 #define __FUNC__ "lis_vector_xpay"
-LIS_INT lis_vector_xpay(LIS_VECTOR vx, LIS_SCALAR alpha, LIS_VECTOR vy)
-{
-	LIS_INT i,n;
-	LIS_SCALAR *x,*y;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_vector_xpay(LIS_VECTOR vx, LIS_SCALAR alpha, LIS_VECTOR vy) {
+    LIS_INT i, n;
+    LIS_SCALAR *x, *y;
 
-	n    = vx->n;
-	#ifndef NO_ERROR_CHECK
-		if( n!=vy->n )
-		{
-			LIS_SETERR(LIS_ERR_ILL_ARG,"length of vector x and y is not equal\n");
-			return LIS_ERR_ILL_ARG;
-		}
-	#endif
+    LIS_DEBUG_FUNC_IN;
 
-	x    = vx->value;
-	y    = vy->value;
-	#ifdef _OPENMP
+    n = vx->n;
+#ifndef NO_ERROR_CHECK
+    if(n != vy->n) {
+        LIS_SETERR(LIS_ERR_ILL_ARG, "length of vector x and y is not equal\n");
+        return LIS_ERR_ILL_ARG;
+    }
+#endif
+
+    x = vx->value;
+    y = vy->value;
+#ifdef _OPENMP
 	#pragma omp parallel for private(i)
-	#endif
-	#ifdef USE_VEC_COMP
+#endif
+#ifdef USE_VEC_COMP
 	#pragma cdir nodep
 	#pragma _NEC ivdep
-	#endif
-	for(i=0; i<n; i++)
-	{
-		y[i] = x[i] + alpha * y[i];
-	}
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+#endif
+    for(i = 0; i < n; i++) { y[i] = x[i] + alpha * y[i]; }
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
-
 
 /**********************/
 /* z <- y + alpha * x */
 /**********************/
 #undef __FUNC__
 #define __FUNC__ "lis_vector_axpyz"
-LIS_INT lis_vector_axpyz(LIS_SCALAR alpha, LIS_VECTOR vx, LIS_VECTOR vy, LIS_VECTOR vz)
-{
-	LIS_INT i,n;
-	LIS_SCALAR *x,*y,*z;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_vector_axpyz(LIS_SCALAR alpha, LIS_VECTOR vx, LIS_VECTOR vy, LIS_VECTOR vz) {
+    LIS_INT i, n;
+    LIS_SCALAR *x, *y, *z;
 
-	n    = vx->n;
-	#ifndef NO_ERROR_CHECK
-		if( n!=vy->n || n!=vz->n )
-		{
-			LIS_SETERR(LIS_ERR_ILL_ARG,"length of vector x and y and z is not equal\n");
-			return LIS_ERR_ILL_ARG;
-		}
-	#endif
+    LIS_DEBUG_FUNC_IN;
 
-	x    = vx->value;
-	y    = vy->value;
-	z    = vz->value;
-	#ifdef USE_VEC_COMP
+    n = vx->n;
+#ifndef NO_ERROR_CHECK
+    if(n != vy->n || n != vz->n) {
+        LIS_SETERR(LIS_ERR_ILL_ARG, "length of vector x and y and z is not equal\n");
+        return LIS_ERR_ILL_ARG;
+    }
+#endif
+
+    x = vx->value;
+    y = vy->value;
+    z = vz->value;
+#ifdef USE_VEC_COMP
 	#pragma cdir nodep
 	#pragma _NEC ivdep
-	#endif
-	#ifdef _OPENMP
+#endif
+#ifdef _OPENMP
 	#pragma omp parallel for private(i)
-	#endif
-	for(i=0; i<n; i++)
-	{
-		z[i] = alpha * x[i] + y[i];
-	}
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+#endif
+    for(i = 0; i < n; i++) { z[i] = alpha * x[i] + y[i]; }
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
-
 
 /********************/
 /* y <- alpha * x   */
 /********************/
 #undef __FUNC__
 #define __FUNC__ "lis_vector_scale"
-LIS_INT lis_vector_scale(LIS_SCALAR alpha, LIS_VECTOR vx)
-{
-	LIS_INT i,n;
-	LIS_SCALAR *x;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_vector_scale(LIS_SCALAR alpha, LIS_VECTOR vx) {
+    LIS_INT i, n;
+    LIS_SCALAR* x;
 
-	n = vx->n;
+    LIS_DEBUG_FUNC_IN;
 
-	x = vx->value;
-	#ifdef USE_VEC_COMP
+    n = vx->n;
+
+    x = vx->value;
+#ifdef USE_VEC_COMP
 	#pragma cdir nodep
 	#pragma _NEC ivdep
-	#endif
-	#ifdef _OPENMP
+#endif
+#ifdef _OPENMP
 	#pragma omp parallel for private(i)
-	#endif
-	for(i=0; i<n; i++)
-	{
-		x[i] = alpha * x[i];
-	}
+#endif
+    for(i = 0; i < n; i++) { x[i] = alpha * x[i]; }
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
-
 
 /********************/
 /* z_i <- x_i * y_i */
 /********************/
 #undef __FUNC__
 #define __FUNC__ "lis_vector_pmul"
-LIS_INT lis_vector_pmul(LIS_VECTOR vx,LIS_VECTOR vy,LIS_VECTOR vz)
-{
-	LIS_INT i,n;
-	LIS_SCALAR *x,*y,*z;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_vector_pmul(LIS_VECTOR vx, LIS_VECTOR vy, LIS_VECTOR vz) {
+    LIS_INT i, n;
+    LIS_SCALAR *x, *y, *z;
 
-	n    = vx->n;
-	#ifndef NO_ERROR_CHECK
-		if( n!=vy->n || n!=vz->n )
-		{
-			LIS_SETERR(LIS_ERR_ILL_ARG,"length of vector x and y and z is not equal\n");
-			return LIS_ERR_ILL_ARG;
-		}
-	#endif
+    LIS_DEBUG_FUNC_IN;
 
-	x    = vx->value;
-	y    = vy->value;
-	z    = vz->value;
-	#ifdef USE_VEC_COMP
+    n = vx->n;
+#ifndef NO_ERROR_CHECK
+    if(n != vy->n || n != vz->n) {
+        LIS_SETERR(LIS_ERR_ILL_ARG, "length of vector x and y and z is not equal\n");
+        return LIS_ERR_ILL_ARG;
+    }
+#endif
+
+    x = vx->value;
+    y = vy->value;
+    z = vz->value;
+#ifdef USE_VEC_COMP
 	#pragma cdir nodep
 	#pragma _NEC ivdep
-	#endif
-	#ifdef _OPENMP
+#endif
+#ifdef _OPENMP
 	#pragma omp parallel for private(i)
-	#endif
-	for(i=0; i<n; i++)
-	{
-		z[i] = x[i] * y[i];
-	}
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+#endif
+    for(i = 0; i < n; i++) { z[i] = x[i] * y[i]; }
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
-
 
 /********************/
 /* z_i <- x_i / y_i */
 /********************/
 #undef __FUNC__
 #define __FUNC__ "lis_vector_pdiv"
-LIS_INT lis_vector_pdiv(LIS_VECTOR vx,LIS_VECTOR vy,LIS_VECTOR vz)
-{
-	LIS_INT i,n;
-	LIS_SCALAR *x,*y,*z;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_vector_pdiv(LIS_VECTOR vx, LIS_VECTOR vy, LIS_VECTOR vz) {
+    LIS_INT i, n;
+    LIS_SCALAR *x, *y, *z;
 
-	n    = vx->n;	
-	#ifndef NO_ERROR_CHECK
-		if( n!=vy->n || n!=vz->n )
-		{
-			LIS_SETERR(LIS_ERR_ILL_ARG,"length of vector x and y and z is not equal\n");
-			return LIS_ERR_ILL_ARG;
-		}
-	#endif
+    LIS_DEBUG_FUNC_IN;
 
-	x    = vx->value;
-	y    = vy->value;
-	z    = vz->value;
-	#ifdef USE_VEC_COMP
+    n = vx->n;
+#ifndef NO_ERROR_CHECK
+    if(n != vy->n || n != vz->n) {
+        LIS_SETERR(LIS_ERR_ILL_ARG, "length of vector x and y and z is not equal\n");
+        return LIS_ERR_ILL_ARG;
+    }
+#endif
+
+    x = vx->value;
+    y = vy->value;
+    z = vz->value;
+#ifdef USE_VEC_COMP
 	#pragma cdir nodep
 	#pragma _NEC ivdep
-	#endif
-	#ifdef _OPENMP
+#endif
+#ifdef _OPENMP
 	#pragma omp parallel for private(i)
-	#endif
-	for(i=0; i<n; i++)
-	{
-		z[i] = x[i] / y[i];
-	}
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+#endif
+    for(i = 0; i < n; i++) { z[i] = x[i] / y[i]; }
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
-
 
 /********************/
 /* x_i <- alpha     */
 /********************/
 #undef __FUNC__
 #define __FUNC__ "lis_vector_set_all"
-LIS_INT lis_vector_set_all(LIS_SCALAR alpha, LIS_VECTOR vx)
-{
-	LIS_INT i,n;
-	LIS_SCALAR *x;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_vector_set_all(LIS_SCALAR alpha, LIS_VECTOR vx) {
+    LIS_INT i, n;
+    LIS_SCALAR* x;
 
-	n  = vx->n;
+    LIS_DEBUG_FUNC_IN;
 
-	x  = vx->value;
-	#ifdef USE_VEC_COMP
+    n = vx->n;
+
+    x = vx->value;
+#ifdef USE_VEC_COMP
 	#pragma cdir nodep
 	#pragma _NEC ivdep
-	#endif
-	#ifdef _OPENMP
+#endif
+#ifdef _OPENMP
 	#pragma omp parallel for private(i)
-	#endif
-	for(i=0; i<n; i++)
-	{
-		x[i] = alpha;
-	}
+#endif
+    for(i = 0; i < n; i++) { x[i] = alpha; }
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
-
 
 /********************/
 /* x_i <- |x_i|     */
 /********************/
 #undef __FUNC__
 #define __FUNC__ "lis_vector_abs"
-LIS_INT lis_vector_abs(LIS_VECTOR vx)
-{
-	LIS_INT i,n;
-	LIS_SCALAR *x;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_vector_abs(LIS_VECTOR vx) {
+    LIS_INT i, n;
+    LIS_SCALAR* x;
 
-	x = vx->value;
-	n = vx->n;
-	#ifdef USE_VEC_COMP
+    LIS_DEBUG_FUNC_IN;
+
+    x = vx->value;
+    n = vx->n;
+#ifdef USE_VEC_COMP
 	#pragma cdir nodep
 	#pragma _NEC ivdep
-	#endif
-	#ifdef _OPENMP
+#endif
+#ifdef _OPENMP
 	#pragma omp parallel for private(i)
-	#endif
-	for(i=0; i<n; i++)
-	{
-		x[i] = fabs(x[i]);
-	}
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+#endif
+    for(i = 0; i < n; i++) { x[i] = fabs(x[i]); }
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
-
 
 /********************/
 /* x_i <- 1 / x_i   */
 /********************/
 #undef __FUNC__
 #define __FUNC__ "lis_vector_reciprocal"
-LIS_INT lis_vector_reciprocal(LIS_VECTOR vx)
-{
-	LIS_INT i,n;
-	LIS_SCALAR *x;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_vector_reciprocal(LIS_VECTOR vx) {
+    LIS_INT i, n;
+    LIS_SCALAR* x;
 
-	x = vx->value;
-	n = vx->n;
-	#ifdef USE_VEC_COMP
+    LIS_DEBUG_FUNC_IN;
+
+    x = vx->value;
+    n = vx->n;
+#ifdef USE_VEC_COMP
 	#pragma cdir nodep
 	#pragma _NEC ivdep
-	#endif
-	#ifdef _OPENMP
+#endif
+#ifdef _OPENMP
 	#pragma omp parallel for private(i)
-	#endif
-	for(i=0; i<n; i++)
-	{
-		x[i] = 1.0 / x[i];
-	}
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+#endif
+    for(i = 0; i < n; i++) { x[i] = 1.0 / x[i]; }
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
-
 
 /********************/
 /* x_i <- conj(x_i) */
 /********************/
 #undef __FUNC__
 #define __FUNC__ "lis_vector_conjugate"
-LIS_INT lis_vector_conjugate(LIS_VECTOR vx)
-{
-	LIS_INT i,n;
-	LIS_SCALAR *x;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_vector_conjugate(LIS_VECTOR vx) {
+    LIS_INT i, n;
+    LIS_SCALAR* x;
 
-	x = vx->value;
-	n = vx->n;
-	#ifdef USE_VEC_COMP
+    LIS_DEBUG_FUNC_IN;
+
+    x = vx->value;
+    n = vx->n;
+#ifdef USE_VEC_COMP
 	#pragma cdir nodep
 	#pragma _NEC ivdep
-	#endif
-	#ifdef _OPENMP
+#endif
+#ifdef _OPENMP
 	#pragma omp parallel for private(i)
-	#endif
-	for(i=0; i<n; i++)
-	{
-#ifdef _COMPLEX	  
+#endif
+    for(i = 0; i < n; i++) {
+#ifdef _COMPLEX
 		x[i] = conj(x[i]);
 #endif
-	}
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    }
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
-
 
 /************************/
 /* x_i <- alpha + x_i   */
 /************************/
 #undef __FUNC__
 #define __FUNC__ "lis_vector_shift"
-LIS_INT lis_vector_shift(LIS_SCALAR sigma, LIS_VECTOR vx)
-{
-	LIS_INT i,n;
-	LIS_SCALAR *x;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_vector_shift(LIS_SCALAR sigma, LIS_VECTOR vx) {
+    LIS_INT i, n;
+    LIS_SCALAR* x;
 
-	x = vx->value;
-	n = vx->n;
-	#ifdef USE_VEC_COMP
+    LIS_DEBUG_FUNC_IN;
+
+    x = vx->value;
+    n = vx->n;
+#ifdef USE_VEC_COMP
 	#pragma cdir nodep
 	#pragma _NEC ivdep
-	#endif
-	#ifdef _OPENMP
+#endif
+#ifdef _OPENMP
 	#pragma omp parallel for private(i)
-	#endif
-	for(i=0; i<n; i++)
-	{
-		x[i] = x[i] - sigma;
-	}
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+#endif
+    for(i = 0; i < n; i++) { x[i] = x[i] - sigma; }
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
-
 
 /*************************************/
 /* QR <- X by Classical Gram-Schmidt */
 /*************************************/
 #undef __FUNC__
 #define __FUNC__ "lis_vector_cgs"
-LIS_INT lis_vector_cgs(LIS_INT n, LIS_VECTOR *x, LIS_VECTOR *q, LIS_VECTOR *r)
-{
-  LIS_INT i, j, k; 
-  LIS_VECTOR x_k; 
-  LIS_REAL nrm2;
-  LIS_REAL tol;
 
-  lis_vector_duplicate(x[0], &x_k);
+LIS_INT lis_vector_cgs(LIS_INT n, LIS_VECTOR* x, LIS_VECTOR* q, LIS_VECTOR* r) {
+    LIS_INT i, j, k;
+    LIS_VECTOR x_k;
+    LIS_REAL nrm2;
+    LIS_REAL tol;
 
-  tol = 1e-6;
+    lis_vector_duplicate(x[0], &x_k);
 
-  for (k=0;k<n;k++)
-    {
-      lis_vector_set_all(0.0,q[k]);
-      lis_vector_set_all(0.0,r[k]);
+    tol = 1e-6;
+
+    for(k = 0; k < n; k++) {
+        lis_vector_set_all(0.0, q[k]);
+        lis_vector_set_all(0.0, r[k]);
     }
 
-  for (k=0;k<n;k++)
-    {
-      lis_vector_copy(x[k],x_k);
-      for (j=0;j<k;j++)
-	{
-	  r[k]->value[j] = 0;
-	  for (i=0;i<n;i++)
-	    {
-	      r[k]->value[j] += q[j]->value[i] * x[k]->value[i];
-	    }
-	  for (i=0;i<n;i++)
-	    {
-	      x_k->value[i] += q[j]->value[i] * x[k]->value[i];
-	    }
-	}
-      lis_vector_nrm2(x_k, &nrm2);
-      if (nrm2<tol) break;
-      for (i=0;i<n;i++)
-	{
-	  q[k]->value[i] = x_k->value[i] / nrm2;
-	}
+    for(k = 0; k < n; k++) {
+        lis_vector_copy(x[k], x_k);
+        for(j = 0; j < k; j++) {
+            r[k]->value[j] = 0;
+            for(i = 0; i < n; i++) { r[k]->value[j] += q[j]->value[i] * x[k]->value[i]; }
+            for(i = 0; i < n; i++) { x_k->value[i] += q[j]->value[i] * x[k]->value[i]; }
+        }
+        lis_vector_nrm2(x_k, &nrm2);
+        if(nrm2 < tol) break;
+        for(i = 0; i < n; i++) { q[k]->value[i] = x_k->value[i] / nrm2; }
     }
 
-  lis_vector_destroy(x_k);
+    lis_vector_destroy(x_k);
 
-  return 0;
-} 
-
+    return 0;
+}

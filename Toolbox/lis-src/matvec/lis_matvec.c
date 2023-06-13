@@ -47,107 +47,99 @@
 #endif
 #include "lislib.h"
 
-LIS_MATVEC_FUNC LIS_MATVEC  = lis_matvec;
+LIS_MATVEC_FUNC LIS_MATVEC = lis_matvec;
 LIS_MATVEC_FUNC LIS_MATVECH = lis_matvech;
 
 #undef __FUNC__
 #define __FUNC__ "lis_matvec"
-LIS_INT lis_matvec(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
-{
-	LIS_SCALAR *x,*y;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_matvec(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y) {
+    LIS_SCALAR *x, *y;
 
-	if( X->precision==LIS_PRECISION_DEFAULT )
-	{
-		x = X->value;
-		y = Y->value;
+    LIS_DEBUG_FUNC_IN;
 
-		switch( A->matrix_type )
-		{
-		case LIS_MATRIX_CSR:
-			#ifdef USE_MPI
+    if(X->precision == LIS_PRECISION_DEFAULT) {
+        x = X->value;
+        y = Y->value;
+
+        switch(A->matrix_type) {
+        case LIS_MATRIX_CSR:
+#ifdef USE_MPI
 				LIS_MATVEC_SENDRECV;
-			#endif
-			lis_matvec_csr(A, x, y);
-			break;
-		case LIS_MATRIX_BSR:
-			#ifdef USE_MPI
+#endif
+            lis_matvec_csr(A, x, y);
+            break;
+        case LIS_MATRIX_BSR:
+#ifdef USE_MPI
 				LIS_MATVEC_SENDRECV;
-			#endif
-			if( A->bnr<=4 && A->bnc<=4 )
-			{
-				lis_matvec_bsr_xxx[A->bnr-1][A->bnc-1](A, x, y);
-			}
-			else
-			{
-				lis_matvec_bsr(A, x, y);
-			}
-			break;
-		case LIS_MATRIX_CSC:
-			#ifdef USE_MPI
+#endif
+            if(A->bnr <= 4 && A->bnc <= 4) { lis_matvec_bsr_xxx[A->bnr - 1][A->bnc - 1](A, x, y); }
+            else { lis_matvec_bsr(A, x, y); }
+            break;
+        case LIS_MATRIX_CSC:
+#ifdef USE_MPI
 				LIS_MATVEC_SENDRECV;
-			#endif
-			lis_matvec_csc(A, x, y);
-			break;
-		case LIS_MATRIX_BSC:
-			#ifdef USE_MPI
+#endif
+            lis_matvec_csc(A, x, y);
+            break;
+        case LIS_MATRIX_BSC:
+#ifdef USE_MPI
 				LIS_MATVEC_SENDRECV;
-			#endif
-			lis_matvec_bsc(A, x, y);
-			break;
-		case LIS_MATRIX_MSR:
-			#ifdef USE_MPI
+#endif
+            lis_matvec_bsc(A, x, y);
+            break;
+        case LIS_MATRIX_MSR:
+#ifdef USE_MPI
 				LIS_MATVEC_SENDRECV;
-			#endif
-			lis_matvec_msr(A, x, y);
-			break;
-		case LIS_MATRIX_ELL:
-			#ifdef USE_MPI
+#endif
+            lis_matvec_msr(A, x, y);
+            break;
+        case LIS_MATRIX_ELL:
+#ifdef USE_MPI
 				LIS_MATVEC_SENDRECV;
-			#endif
-			lis_matvec_ell(A, x, y);
-			break;
-		case LIS_MATRIX_DIA:
-			#ifdef USE_MPI
+#endif
+            lis_matvec_ell(A, x, y);
+            break;
+        case LIS_MATRIX_DIA:
+#ifdef USE_MPI
 				LIS_MATVEC_SENDRECV;
-			#endif
-			lis_matvec_dia(A, x, y);
-			break;
-		case LIS_MATRIX_JAD:
-			#ifdef USE_MPI
-				#ifndef USE_OVERLAP
+#endif
+            lis_matvec_dia(A, x, y);
+            break;
+        case LIS_MATRIX_JAD:
+#ifdef USE_MPI
+#ifndef USE_OVERLAP
 					LIS_MATVEC_SENDRECV;
-				#else
+#else
 					LIS_MATVEC_REALLOC;
-				#endif
-			#endif
-			lis_matvec_jad(A, x, y);
-			break;
-		case LIS_MATRIX_VBR:
-			#ifdef USE_MPI
+#endif
+#endif
+            lis_matvec_jad(A, x, y);
+            break;
+        case LIS_MATRIX_VBR:
+#ifdef USE_MPI
 				LIS_MATVEC_SENDRECV;
-			#endif
-			lis_matvec_vbr(A, x, y);
-			break;
-		case LIS_MATRIX_DNS:
-			#ifdef USE_MPI
+#endif
+            lis_matvec_vbr(A, x, y);
+            break;
+        case LIS_MATRIX_DNS:
+#ifdef USE_MPI
 				LIS_MATVEC_SENDRECV;
-			#endif
-			lis_matvec_dns(A, x, y);
-			break;
-		case LIS_MATRIX_COO:
-			#ifdef USE_MPI
+#endif
+            lis_matvec_dns(A, x, y);
+            break;
+        case LIS_MATRIX_COO:
+#ifdef USE_MPI
 				LIS_MATVEC_SENDRECV;
-			#endif
-			lis_matvec_coo(A, x, y);
-			break;
-		default:
-			LIS_SETERR_IMP;
-			return LIS_ERR_NOT_IMPLEMENTED;
-			break;
-		}
-	}
+#endif
+            lis_matvec_coo(A, x, y);
+            break;
+        default:
+            LIS_SETERR_IMP;
+            return LIS_ERR_NOT_IMPLEMENTED;
+            break;
+        }
+    }
 #ifdef USE_QUAD_PRECISION
 	else
 	{
@@ -155,24 +147,24 @@ LIS_INT lis_matvec(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 		switch( A->matrix_type )
 		{
 		case LIS_MATRIX_CSR:
-			#ifdef USE_MPI
+#ifdef USE_MPI
 				lis_send_recv_mp(A->commtable,X);
-			#endif
-			#ifndef USE_FMA2_SSE2
+#endif
+#ifndef USE_FMA2_SSE2
 				lis_matvec_csr_mp(A, X, Y);
-			#else
+#else
 				lis_matvec_csr_mp2(A, X, Y);
-			#endif
+#endif
 			break;
 		case LIS_MATRIX_CSC:
-			#ifdef USE_MPI
+#ifdef USE_MPI
 				lis_send_recv_mp(A->commtable,X);
-			#endif
-			#ifndef USE_FMA2_SSE2
+#endif
+#ifndef USE_FMA2_SSE2
 				lis_matvec_csc_mp(A, X, Y);
-			#else
+#else
 				lis_matvec_csc_mp2(A, X, Y);
-			#endif
+#endif
 			break;
 		default:
 			LIS_SETERR_IMP;
@@ -182,160 +174,158 @@ LIS_INT lis_matvec(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 	}
 #endif
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_matvech"
-LIS_INT lis_matvech(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
-{
-	LIS_SCALAR *x,*y;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_matvech(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y) {
+    LIS_SCALAR *x, *y;
 
-	x = X->value;
-	y = Y->value;
+    LIS_DEBUG_FUNC_IN;
 
-	if( X->precision==LIS_PRECISION_DEFAULT )
-	{
-		switch( A->matrix_type )
-		{
-		case LIS_MATRIX_CSR:
-			#ifdef USE_MPI
+    x = X->value;
+    y = Y->value;
+
+    if(X->precision == LIS_PRECISION_DEFAULT) {
+        switch(A->matrix_type) {
+        case LIS_MATRIX_CSR:
+#ifdef USE_MPI
 				LIS_MATVEC_REDUCE0;
-			#endif
-			lis_matvech_csr(A, x, y);
-			#ifdef USE_MPI
+#endif
+            lis_matvech_csr(A, x, y);
+#ifdef USE_MPI
 				LIS_MATVEC_REDUCE;
-			#endif
-			break;
-		case LIS_MATRIX_BSR:
-			#ifdef USE_MPI
+#endif
+            break;
+        case LIS_MATRIX_BSR:
+#ifdef USE_MPI
 				LIS_MATVEC_REDUCE0;
-			#endif
-			lis_matvech_bsr(A, x, y);
-			#ifdef USE_MPI
+#endif
+            lis_matvech_bsr(A, x, y);
+#ifdef USE_MPI
 				LIS_MATVEC_REDUCE;
-			#endif
-			break;
-		case LIS_MATRIX_CSC:
-			#ifdef USE_MPI
+#endif
+            break;
+        case LIS_MATRIX_CSC:
+#ifdef USE_MPI
 				LIS_MATVEC_REDUCE0;
-			#endif
-			lis_matvech_csc(A, x, y);
-			#ifdef USE_MPI
+#endif
+            lis_matvech_csc(A, x, y);
+#ifdef USE_MPI
 				LIS_MATVEC_REDUCE;
-			#endif
-			break;
-		case LIS_MATRIX_BSC:
-			#ifdef USE_MPI
+#endif
+            break;
+        case LIS_MATRIX_BSC:
+#ifdef USE_MPI
 				LIS_MATVEC_REDUCE0;
-			#endif
-			lis_matvech_bsc(A, x, y);
-			#ifdef USE_MPI
+#endif
+            lis_matvech_bsc(A, x, y);
+#ifdef USE_MPI
 				LIS_MATVEC_REDUCE;
-			#endif
-			break;
-		case LIS_MATRIX_MSR:
-			#ifdef USE_MPI
+#endif
+            break;
+        case LIS_MATRIX_MSR:
+#ifdef USE_MPI
 				LIS_MATVEC_REDUCE0;
-			#endif
-			lis_matvech_msr(A, x, y);
-			#ifdef USE_MPI
+#endif
+            lis_matvech_msr(A, x, y);
+#ifdef USE_MPI
 				LIS_MATVEC_REDUCE;
-			#endif
-			break;
-		case LIS_MATRIX_ELL:
-			#ifdef USE_MPI
+#endif
+            break;
+        case LIS_MATRIX_ELL:
+#ifdef USE_MPI
 				LIS_MATVEC_REDUCE0;
-			#endif
-			lis_matvech_ell(A, x, y);
-			#ifdef USE_MPI
+#endif
+            lis_matvech_ell(A, x, y);
+#ifdef USE_MPI
 				LIS_MATVEC_REDUCE;
-			#endif
-			break;
-		case LIS_MATRIX_JAD:
-			#ifdef USE_MPI
+#endif
+            break;
+        case LIS_MATRIX_JAD:
+#ifdef USE_MPI
 				LIS_MATVEC_REDUCE0;
-			#endif
-			lis_matvech_jad(A, x, y);
-			#ifdef USE_MPI
+#endif
+            lis_matvech_jad(A, x, y);
+#ifdef USE_MPI
 				LIS_MATVEC_REDUCE;
-			#endif
-			break;
-		case LIS_MATRIX_DIA:
-			#ifdef USE_MPI
+#endif
+            break;
+        case LIS_MATRIX_DIA:
+#ifdef USE_MPI
 				LIS_MATVEC_REDUCE0;
-			#endif
-			lis_matvech_dia(A, x, y);
-			#ifdef USE_MPI
+#endif
+            lis_matvech_dia(A, x, y);
+#ifdef USE_MPI
 				LIS_MATVEC_REDUCE;
-			#endif
-			break;
-		case LIS_MATRIX_VBR:
-			#ifdef USE_MPI
+#endif
+            break;
+        case LIS_MATRIX_VBR:
+#ifdef USE_MPI
 				LIS_MATVEC_REDUCE0;
-			#endif
-			lis_matvech_vbr(A, x, y);
-			#ifdef USE_MPI
+#endif
+            lis_matvech_vbr(A, x, y);
+#ifdef USE_MPI
 				LIS_MATVEC_REDUCE;
-			#endif
-			break;
-		case LIS_MATRIX_DNS:
-			#ifdef USE_MPI
+#endif
+            break;
+        case LIS_MATRIX_DNS:
+#ifdef USE_MPI
 				LIS_MATVEC_REDUCE0;
-			#endif
-			lis_matvech_dns(A, x, y);
-			#ifdef USE_MPI
+#endif
+            lis_matvech_dns(A, x, y);
+#ifdef USE_MPI
 				LIS_MATVEC_REDUCE;
-			#endif
-			break;
-		case LIS_MATRIX_COO:
-			#ifdef USE_MPI
+#endif
+            break;
+        case LIS_MATRIX_COO:
+#ifdef USE_MPI
 				LIS_MATVEC_REDUCE0;
-			#endif
-			lis_matvech_coo(A, x, y);
-			#ifdef USE_MPI
+#endif
+            lis_matvech_coo(A, x, y);
+#ifdef USE_MPI
 				LIS_MATVEC_REDUCE;
-			#endif
-			break;
-		default:
-			LIS_SETERR_IMP;
-			return LIS_ERR_NOT_IMPLEMENTED;
-			break;
-		}
-	}
+#endif
+            break;
+        default:
+            LIS_SETERR_IMP;
+            return LIS_ERR_NOT_IMPLEMENTED;
+            break;
+        }
+    }
 #ifdef USE_QUAD_PRECISION
 	else
 	{
 		switch( A->matrix_type )
 		{
 		case LIS_MATRIX_CSR:
-			#ifdef USE_MPI
+#ifdef USE_MPI
 				LIS_MATVEC_REDUCE0;
-			#endif
-			#ifndef USE_FMA2_SSE2
+#endif
+#ifndef USE_FMA2_SSE2
 				lis_matvech_csr_mp(A, X, Y);
-			#else
+#else
 				lis_matvech_csr_mp2(A, X, Y);
-			#endif
-			#ifdef USE_MPI
+#endif
+#ifdef USE_MPI
 				lis_reduce_mp(A->commtable,Y);
-			#endif
+#endif
 			break;
 		case LIS_MATRIX_CSC:
-			#ifdef USE_MPI
+#ifdef USE_MPI
 				LIS_MATVEC_REDUCE0;
-			#endif
-			#ifndef USE_FMA2_SSE2
+#endif
+#ifndef USE_FMA2_SSE2
 				lis_matvech_csc_mp(A, X, Y);
-			#else
+#else
 				lis_matvech_csc_mp2(A, X, Y);
-			#endif
-			#ifdef USE_MPI
+#endif
+#ifdef USE_MPI
 				lis_reduce_mp(A->commtable,Y);
-			#endif
+#endif
 			break;
 		default:
 			LIS_SETERR_IMP;
@@ -344,77 +334,73 @@ LIS_INT lis_matvech(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y)
 		}
 	}
 #endif
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
-
 
 #undef __FUNC__
 #define __FUNC__ "lis_matvec_optimize"
-LIS_INT lis_matvec_optimize(LIS_MATRIX A, LIS_INT *matrix_type_maxperf)
-{
-  int    	   nprocs,my_rank;
-  LIS_INT	   err,iter,i,matrix_type,ss,se;
-  double	   time,time2,convtime;
-  LIS_REAL         val;
-  double	   commtime,comptime,flops,flops_maxperf;
-  LIS_MATRIX       A1;
-  LIS_VECTOR       X, Y;
-  char             *lis_storagename2[]   = {"CSR", "CSC", "MSR", "DIA", "ELL", "JAD", "BSR", "BSC", "VBR", "COO", "DNS"};
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_matvec_optimize(LIS_MATRIX A, LIS_INT* matrix_type_maxperf) {
+    int nprocs, my_rank;
+    LIS_INT err, iter, i, matrix_type, ss, se;
+    double time, time2, convtime;
+    LIS_REAL val;
+    double commtime, comptime, flops, flops_maxperf;
+    LIS_MATRIX A1;
+    LIS_VECTOR X, Y;
+    char* lis_storagename2[] = {"CSR", "CSC", "MSR", "DIA", "ELL", "JAD", "BSR", "BSC", "VBR", "COO", "DNS"};
+
+    LIS_DEBUG_FUNC_IN;
 
 #ifdef USE_MPI
 	MPI_Comm_size(MPI_COMM_WORLD,&nprocs);
 	MPI_Comm_rank(MPI_COMM_WORLD,&my_rank);
 #else
-	nprocs  = 1;
-	my_rank = 0;
+    nprocs = 1;
+    my_rank = 0;
 #endif
 
-	ss = 1;
-	se = 11;
+    ss = 1;
+    se = 11;
 
-	lis_vector_duplicate(A,&X);
-	lis_vector_duplicate(A,&Y);
-	err = lis_vector_set_all(1.0,X);
+    lis_vector_duplicate(A, &X);
+    lis_vector_duplicate(A, &Y);
+    err = lis_vector_set_all(1.0, X);
 
-	printf("\nmeasuring matvec performance...\n");
-	iter = (int)(10000000 / A->nnz) + 1; 
-	flops_maxperf = 0.0;
+    printf("\nmeasuring matvec performance...\n");
+    iter = (int)(10000000 / A->nnz) + 1;
+    flops_maxperf = 0.0;
 #ifdef _LONG__LONG
 	printf("number of iterations = 1e7 / %lld + 1 = %lld\n", A->nnz, iter);
 #else
-	printf("number of iterations = 1e7 / %d + 1 = %d\n", A->nnz, iter);
+    printf("number of iterations = 1e7 / %d + 1 = %d\n", A->nnz, iter);
 #endif
-	for (matrix_type=ss;matrix_type<se;matrix_type++)
-	  {
-	    if ( nprocs>1 && matrix_type==9 ) continue;
-	    lis_matrix_duplicate(A,&A1);
-	    lis_matrix_set_type(A1,matrix_type);
-	    err = lis_matrix_convert(A,A1);
-	    if( err ) CHKERR(err);
-		    
-	    comptime = 0.0;
-	    commtime = 0.0;
+    for(matrix_type = ss; matrix_type < se; matrix_type++) {
+        if(nprocs > 1 && matrix_type == 9) continue;
+        lis_matrix_duplicate(A, &A1);
+        lis_matrix_set_type(A1, matrix_type);
+        err = lis_matrix_convert(A, A1);
+        if(err) CHKERR(err);
 
-	    for(i=0;i<iter;i++)
-	      {
+        comptime = 0.0;
+        commtime = 0.0;
+
+        for(i = 0; i < iter; i++) {
 #ifdef USE_MPI
 		MPI_Barrier(A1->comm);
 		time = lis_wtime();
 		lis_send_recv(A1->commtable,X->value);
 		commtime += lis_wtime() - time;
 #endif
-		time2 = lis_wtime();
-		lis_matvec(A1,X,Y);
-		comptime += lis_wtime() - time2;
-	      }
-	    lis_vector_nrm2(Y,&val);
+            time2 = lis_wtime();
+            lis_matvec(A1, X, Y);
+            comptime += lis_wtime() - time2;
+        }
+        lis_vector_nrm2(Y, &val);
 
-	    if( my_rank==0 )
-	      {
-		flops = 2.0*A->nnz*iter*1.0e-6 / comptime;
+        if(my_rank == 0) {
+            flops = 2.0 * A->nnz * iter * 1.0e-6 / comptime;
 #ifdef USE_MPI
 #ifdef _LONG__DOUBLE
 #ifdef _LONG__LONG
@@ -440,22 +426,21 @@ LIS_INT lis_matvec_optimize(LIS_MATRIX A, LIS_INT *matrix_type_maxperf)
 #ifdef _LONG__LONG
 		printf("matrix_type = %2lld (%s), computation = %e sec, %8.3f MFLOPS\n",matrix_type,lis_storagename2[matrix_type-1],comptime,flops);
 #else
-		printf("matrix_type = %2d (%s), computation = %e sec, %8.3f MFLOPS\n",matrix_type,lis_storagename2[matrix_type-1],comptime,flops);
+            printf("matrix_type = %2d (%s), computation = %e sec, %8.3f MFLOPS\n", matrix_type, lis_storagename2[matrix_type - 1], comptime, flops);
 #endif
 #endif
 #endif
-	      }
-	    lis_matrix_destroy(A1);
+        }
+        lis_matrix_destroy(A1);
 
-	    if ( flops > flops_maxperf )
-	      {
-		*matrix_type_maxperf=matrix_type;
-		flops_maxperf = flops;
-	      }
-	  }
+        if(flops > flops_maxperf) {
+            *matrix_type_maxperf = matrix_type;
+            flops_maxperf = flops;
+        }
+    }
 
-	printf("matrix format is set to %s\n\n", lis_storagename2[*matrix_type_maxperf-1]);
+    printf("matrix format is set to %s\n\n", lis_storagename2[*matrix_type_maxperf - 1]);
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }

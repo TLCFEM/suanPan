@@ -24,29 +24,25 @@
    POSSIBILITY OF SUCH DAMAGE.
 */
 
-
 #ifndef __LIS_MPI_H__
 #define __LIS_MPI_H__
-
-
-
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-	extern LIS_INT lis_commtable_create(LIS_MATRIX A);
-	extern void lis_commtable_destroy(LIS_COMMTABLE table);
-	extern LIS_INT lis_commtable_duplicate(LIS_COMMTABLE tin, LIS_COMMTABLE *tout);
-	extern LIS_INT lis_commtable_duplicateM(LIS_MATRIX Ain, LIS_MATRIX *Aout);
-	extern LIS_INT lis_send_recv(LIS_COMMTABLE commtable, LIS_SCALAR x[]);
-	extern LIS_INT lis_reduce(LIS_COMMTABLE commtable, LIS_SCALAR x[]);
-	extern LIS_INT lis_send_recv_mp(LIS_COMMTABLE commtable, LIS_VECTOR X);
-	extern LIS_INT lis_reduce_mp(LIS_COMMTABLE commtable, LIS_VECTOR X);
-	extern LIS_INT lis_matrix_g2l(LIS_MATRIX A);
-		extern LIS_INT lis_matrix_g2l_csr(LIS_MATRIX A);
-		extern LIS_INT lis_matrix_g2l_rco(LIS_MATRIX A);
+extern LIS_INT lis_commtable_create(LIS_MATRIX A);
+extern void lis_commtable_destroy(LIS_COMMTABLE table);
+extern LIS_INT lis_commtable_duplicate(LIS_COMMTABLE tin, LIS_COMMTABLE* tout);
+extern LIS_INT lis_commtable_duplicateM(LIS_MATRIX Ain, LIS_MATRIX* Aout);
+extern LIS_INT lis_send_recv(LIS_COMMTABLE commtable, LIS_SCALAR x[]);
+extern LIS_INT lis_reduce(LIS_COMMTABLE commtable, LIS_SCALAR x[]);
+extern LIS_INT lis_send_recv_mp(LIS_COMMTABLE commtable, LIS_VECTOR X);
+extern LIS_INT lis_reduce_mp(LIS_COMMTABLE commtable, LIS_VECTOR X);
+extern LIS_INT lis_matrix_g2l(LIS_MATRIX A);
+extern LIS_INT lis_matrix_g2l_csr(LIS_MATRIX A);
+extern LIS_INT lis_matrix_g2l_rco(LIS_MATRIX A);
 
 #ifdef __cplusplus
 }

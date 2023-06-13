@@ -24,7 +24,6 @@
    POSSIBILITY OF SUCH DAMAGE.
 */
 
-
 #ifndef __LIS_MATVEC_H__
 #define __LIS_MATVEC_H__
 
@@ -81,128 +80,128 @@ typedef LIS_INT (*LIS_MATVEC_FUNC)(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y);
 extern "C"
 {
 #endif
-	extern LIS_MATVEC_FUNC LIS_MATVEC;
-	extern LIS_MATVEC_FUNC LIS_MATVECH;  
+extern LIS_MATVEC_FUNC LIS_MATVEC;
+extern LIS_MATVEC_FUNC LIS_MATVECH;
 
 /*******************/
 /* CSR             */
 /*******************/
 
-	extern void lis_matvec_csr(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvech_csr(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);  
-	extern void lis_matvec_csr_mp(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y);
-	extern void lis_matvec_csr_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y);
-	extern void lis_matvech_csr_mp(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y);  
-	extern void lis_matvech_csr_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y);  
+extern void lis_matvec_csr(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvech_csr(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_csr_mp(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y);
+extern void lis_matvec_csr_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y);
+extern void lis_matvech_csr_mp(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y);
+extern void lis_matvech_csr_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y);
 
 /*******************/
 /* CSC             */
 /*******************/
 
-	extern void lis_matvec_csc(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvech_csc(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);  
-	extern void lis_matvec_csc_mp(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y);
-	extern void lis_matvec_csc_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y);
-	extern void lis_matvech_csc_mp(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y);  
-	extern void lis_matvech_csc_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y);  
+extern void lis_matvec_csc(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvech_csc(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_csc_mp(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y);
+extern void lis_matvec_csc_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y);
+extern void lis_matvech_csc_mp(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y);
+extern void lis_matvech_csc_mp2(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y);
 
 /*******************/
 /* MSR             */
 /*******************/
 
-	extern void lis_matvec_msr(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvech_msr(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);  
+extern void lis_matvec_msr(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvech_msr(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
 
 /*******************/
 /* ELL             */
 /*******************/
 
-	extern void lis_matvec_ell(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvech_ell(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);  
+extern void lis_matvec_ell(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvech_ell(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
 
 /*******************/
 /* DIA             */
 /*******************/
 
-	extern void lis_matvec_dia(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvech_dia(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);  
+extern void lis_matvec_dia(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvech_dia(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
 
 /*******************/
 /* JAD             */
 /*******************/
 
-	extern void lis_matvec_jad(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-       	extern void lis_matvec_jad_u7_1(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvech_jad(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);  
+extern void lis_matvec_jad(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_jad_u7_1(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvech_jad(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
 
 /*******************/
 /* DNS             */
 /*******************/
 
-	extern void lis_matvec_dns(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvech_dns(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);  
+extern void lis_matvec_dns(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvech_dns(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
 
 /*******************/
 /* COO             */
 /*******************/
 
-	extern void lis_matvec_coo(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvech_coo(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);  
+extern void lis_matvec_coo(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvech_coo(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
 
 /*******************/
 /* VBR             */
 /*******************/
 
-	extern void lis_matvec_vbr(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvech_vbr(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);  
+extern void lis_matvec_vbr(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvech_vbr(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
 
 /*******************/
 /* BSR             */
 /*******************/
 
-	extern LIS_MATVEC_XXX lis_matvec_bsr_xxx[4][4];
-	extern void lis_matvec_bsr(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvec_bsr_1x1(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvec_bsr_1x2(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvec_bsr_1x3(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvec_bsr_1x4(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvec_bsr_2x1(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvec_bsr_2x2(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvec_bsr_2x3(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvec_bsr_2x4(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvec_bsr_3x1(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvec_bsr_3x2(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvec_bsr_3x3(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvec_bsr_3x4(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvec_bsr_4x1(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvec_bsr_4x2(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvec_bsr_4x3(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvec_bsr_4x4(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvech_bsr(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);  
+extern LIS_MATVEC_XXX lis_matvec_bsr_xxx[4][4];
+extern void lis_matvec_bsr(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_bsr_1x1(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_bsr_1x2(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_bsr_1x3(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_bsr_1x4(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_bsr_2x1(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_bsr_2x2(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_bsr_2x3(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_bsr_2x4(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_bsr_3x1(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_bsr_3x2(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_bsr_3x3(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_bsr_3x4(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_bsr_4x1(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_bsr_4x2(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_bsr_4x3(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_bsr_4x4(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvech_bsr(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
 
 /*******************/
 /* BSC             */
 /*******************/
 
-	extern LIS_MATVEC_XXX lis_matvec_bsc_xxx[4][4];
-	extern void lis_matvec_bsc(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvec_bsc_1x1(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvec_bsc_1x2(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvec_bsc_1x3(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvec_bsc_1x4(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvec_bsc_2x1(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvec_bsc_2x2(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvec_bsc_2x3(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvec_bsc_2x4(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvec_bsc_3x1(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvec_bsc_3x2(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvec_bsc_3x3(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvec_bsc_3x4(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvec_bsc_4x1(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvec_bsc_4x2(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvec_bsc_4x3(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvec_bsc_4x4(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
-	extern void lis_matvech_bsc(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);  
+extern LIS_MATVEC_XXX lis_matvec_bsc_xxx[4][4];
+extern void lis_matvec_bsc(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_bsc_1x1(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_bsc_1x2(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_bsc_1x3(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_bsc_1x4(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_bsc_2x1(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_bsc_2x2(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_bsc_2x3(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_bsc_2x4(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_bsc_3x1(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_bsc_3x2(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_bsc_3x3(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_bsc_3x4(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_bsc_4x1(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_bsc_4x2(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_bsc_4x3(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvec_bsc_4x4(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
+extern void lis_matvech_bsc(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
 
 #ifdef __cplusplus
 }

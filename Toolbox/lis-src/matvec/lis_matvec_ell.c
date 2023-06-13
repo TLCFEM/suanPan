@@ -47,139 +47,104 @@
 #endif
 #include "lislib.h"
 
-void lis_matvec_ell(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[])
-{
-	LIS_INT i,j,jj,is,ie;
-	LIS_INT n,maxnzr,nprocs,my_rank;
+void lis_matvec_ell(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
+    LIS_INT i, j, jj, is, ie;
+    LIS_INT n, maxnzr, nprocs, my_rank;
 
-	n      = A->n;
-	if( A->is_splited )
-	{
-		#ifdef USE_VEC_COMP
+    n = A->n;
+    if(A->is_splited) {
+#ifdef USE_VEC_COMP
 		#pragma cdir nodep
 		#pragma _NEC ivdep
-		#endif
-		for(i=0; i<n; i++)
-		{
-			y[i] = A->D->value[i]*x[i];
-		}
-		for(j=0;j<A->L->maxnzr;j++)
-		{
-			jj = j*n;
-			#ifdef USE_VEC_COMP
+#endif
+        for(i = 0; i < n; i++) { y[i] = A->D->value[i] * x[i]; }
+        for(j = 0; j < A->L->maxnzr; j++) {
+            jj = j * n;
+#ifdef USE_VEC_COMP
 			#pragma cdir nodep
 			#pragma _NEC ivdep
-			#endif
-			for(i=0;i<n;i++)
-			{
-				y[i] += A->L->value[jj + i] * x[A->L->index[jj + i]];
-			}
-		}
-		for(j=0;j<A->U->maxnzr;j++)
-		{
-			jj = j*n;
-			#ifdef USE_VEC_COMP
+#endif
+            for(i = 0; i < n; i++) { y[i] += A->L->value[jj + i] * x[A->L->index[jj + i]]; }
+        }
+        for(j = 0; j < A->U->maxnzr; j++) {
+            jj = j * n;
+#ifdef USE_VEC_COMP
 			#pragma cdir nodep
 			#pragma _NEC ivdep
-			#endif
-			for(i=0;i<n;i++)
-			{
-				y[i] += A->U->value[jj + i] * x[A->U->index[jj + i]];
-			}
-		}
-	}
-	else
-	{
-		maxnzr = A->maxnzr;
-		#ifdef _OPENMP
+#endif
+            for(i = 0; i < n; i++) { y[i] += A->U->value[jj + i] * x[A->U->index[jj + i]]; }
+        }
+    }
+    else {
+        maxnzr = A->maxnzr;
+#ifdef _OPENMP
 			nprocs = omp_get_max_threads();
-		#else
-			nprocs = 1;
-		#endif
-		#ifdef _OPENMP
+#else
+        nprocs = 1;
+#endif
+#ifdef _OPENMP
 		#pragma omp parallel private(i,j,jj,is,ie,my_rank)
-		#endif
-		{
-			#ifdef _OPENMP
+#endif
+        {
+#ifdef _OPENMP
 				my_rank = omp_get_thread_num();
-			#else
-				my_rank = 0;
-			#endif
-			LIS_GET_ISIE(my_rank,nprocs,n,is,ie);
-			#ifdef USE_VEC_COMP
+#else
+            my_rank = 0;
+#endif
+            LIS_GET_ISIE(my_rank, nprocs, n, is, ie);
+#ifdef USE_VEC_COMP
 			#pragma cdir nodep
 			#pragma _NEC ivdep
-			#endif
-			for(i=is;i<ie;i++)
-			{
-				y[i] = 0.0;
-			}
-			for(j=0;j<maxnzr;j++)
-			{
-				jj = j*n;
-				#ifdef USE_VEC_COMP
+#endif
+            for(i = is; i < ie; i++) { y[i] = 0.0; }
+            for(j = 0; j < maxnzr; j++) {
+                jj = j * n;
+#ifdef USE_VEC_COMP
 				#pragma cdir nodep
 				#pragma _NEC ivdep
-				#endif
-				for(i=is;i<ie;i++)
-				{
-					y[i] += A->value[jj + i] * x[A->index[jj + i]];
-				}
-			}
-		}
-	}
+#endif
+                for(i = is; i < ie; i++) { y[i] += A->value[jj + i] * x[A->index[jj + i]]; }
+            }
+        }
+    }
 }
 
-void lis_matvech_ell(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[])
-{
-	LIS_INT i,j,jj;
-	LIS_INT n,np,maxnzr;
-	#ifdef _OPENMP
+void lis_matvech_ell(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
+    LIS_INT i, j, jj;
+    LIS_INT n, np, maxnzr;
+#ifdef _OPENMP
 		LIS_INT k,is,ie,nprocs;
 		LIS_SCALAR t;
 		LIS_SCALAR *w;
-	#endif
+#endif
 
-	n      = A->n;
-	np     = A->np;
-	if( A->is_splited )
-	{
-		#ifdef USE_VEC_COMP
+    n = A->n;
+    np = A->np;
+    if(A->is_splited) {
+#ifdef USE_VEC_COMP
 		#pragma cdir nodep
 		#pragma _NEC ivdep
-		#endif
-		for(i=0; i<n; i++)
-		{
-			y[i] = conj(A->D->value[i])*x[i];
-		}
-		for(j=0;j<A->L->maxnzr;j++)
-		{
-			jj = j*n;
-			#ifdef USE_VEC_COMP
+#endif
+        for(i = 0; i < n; i++) { y[i] = conj(A->D->value[i]) * x[i]; }
+        for(j = 0; j < A->L->maxnzr; j++) {
+            jj = j * n;
+#ifdef USE_VEC_COMP
 			#pragma cdir nodep
 			#pragma _NEC ivdep
-			#endif
-			for(i=0;i<n;i++)
-			{
-				y[A->L->index[jj + i]] += conj(A->L->value[jj + i]) * x[i];
-			}
-		}
-		for(j=0;j<A->U->maxnzr;j++)
-		{
-			jj = j*n;
-			#ifdef USE_VEC_COMP
+#endif
+            for(i = 0; i < n; i++) { y[A->L->index[jj + i]] += conj(A->L->value[jj + i]) * x[i]; }
+        }
+        for(j = 0; j < A->U->maxnzr; j++) {
+            jj = j * n;
+#ifdef USE_VEC_COMP
 			#pragma cdir nodep
 			#pragma _NEC ivdep
-			#endif
-			for(i=0;i<n;i++)
-			{
-				y[A->U->index[jj + i]] += conj(A->U->value[jj + i]) * x[i];
-			}
-		}
-	}
-	else
-	{
-		#ifdef _OPENMP
+#endif
+            for(i = 0; i < n; i++) { y[A->U->index[jj + i]] += conj(A->U->value[jj + i]) * x[i]; }
+        }
+    }
+    else {
+#ifdef _OPENMP
 			maxnzr = A->maxnzr;
 			nprocs = omp_get_max_threads();
 			w = (LIS_SCALAR *)lis_malloc( nprocs*np*sizeof(LIS_SCALAR),"lis_matvech_ell::w" );
@@ -195,10 +160,10 @@ void lis_matvech_ell(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[])
 				for(j=0;j<maxnzr;j++)
 				{
 					jj = j*n;
-					#ifdef USE_VEC_COMP
+#ifdef USE_VEC_COMP
 					#pragma cdir nodep
 					#pragma _NEC ivdep
-					#endif
+#endif
 					for(i=is;i<ie;i++)
 					{
 						w[k*np + A->index[jj + i]] += conj(A->value[jj + i]) * x[i];
@@ -206,10 +171,10 @@ void lis_matvech_ell(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[])
 				}
 				#pragma omp barrier
 				#pragma omp for 
-				#ifdef USE_VEC_COMP
+#ifdef USE_VEC_COMP
 				#pragma cdir nodep
 				#pragma _NEC ivdep
-				#endif
+#endif
 				for(i=0;i<np;i++)
 				{
 					t = 0.0;
@@ -221,28 +186,21 @@ void lis_matvech_ell(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[])
 				}
 			}
 			lis_free(w);
-		#else
-			maxnzr = A->maxnzr;
-			#ifdef USE_VEC_COMP
+#else
+        maxnzr = A->maxnzr;
+#ifdef USE_VEC_COMP
 			#pragma cdir nodep
 			#pragma _NEC ivdep
-			#endif
-			for(i=0; i<n; i++)
-			{
-				y[i] = 0.0;
-			}
-			for(j=0;j<maxnzr;j++)
-			{
-				jj = j*n;
-				#ifdef USE_VEC_COMP
+#endif
+        for(i = 0; i < n; i++) { y[i] = 0.0; }
+        for(j = 0; j < maxnzr; j++) {
+            jj = j * n;
+#ifdef USE_VEC_COMP
 				#pragma cdir nodep
 				#pragma _NEC ivdep
-				#endif
-				for(i=0;i<n;i++)
-				{
-					y[A->index[jj + i]] += conj(A->value[jj + i]) * x[i];
-				}
-			}
-		#endif
-	}
+#endif
+            for(i = 0; i < n; i++) { y[A->index[jj + i]] += conj(A->value[jj + i]) * x[i]; }
+        }
+#endif
+    }
 }

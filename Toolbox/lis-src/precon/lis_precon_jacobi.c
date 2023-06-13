@@ -58,236 +58,219 @@
 
 #undef __FUNC__
 #define __FUNC__ "lis_precon_create_jacobi"
-LIS_INT lis_precon_create_jacobi(LIS_SOLVER solver, LIS_PRECON precon)
-{
-	LIS_INT	err;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_precon_create_jacobi(LIS_SOLVER solver, LIS_PRECON precon) {
+    LIS_INT err;
 
-	if( solver->precision==LIS_PRECISION_DEFAULT )
-	{
-		err = lis_vector_duplicate(solver->A, &precon->D);
-	}
-	else
-	{
-		err = lis_vector_duplicateex(LIS_PRECISION_QUAD,solver->A, &precon->D);
-	}
-	if( err )
-	{
-		return err;
-	}
+    LIS_DEBUG_FUNC_IN;
 
-	lis_matrix_get_diagonal(solver->A, precon->D);
-	lis_vector_reciprocal(precon->D);
+    if(solver->precision == LIS_PRECISION_DEFAULT) { err = lis_vector_duplicate(solver->A, &precon->D); }
+    else { err = lis_vector_duplicateex(LIS_PRECISION_QUAD, solver->A, &precon->D); }
+    if(err) { return err; }
 
-	LIS_DEBUG_FUNC_OUT;
+    lis_matrix_get_diagonal(solver->A, precon->D);
+    lis_vector_reciprocal(precon->D);
+
+    LIS_DEBUG_FUNC_OUT;
     return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_psolve_jacobi"
-LIS_INT lis_psolve_jacobi(LIS_SOLVER solver, LIS_VECTOR B, LIS_VECTOR X)
-{
-	LIS_INT i,n;
-	LIS_SCALAR *b,*x,*d;
-	LIS_PRECON precon;
-	LIS_QUAD_DECLAR;
-	#ifdef USE_QUAD_PRECISION
+
+LIS_INT lis_psolve_jacobi(LIS_SOLVER solver, LIS_VECTOR B, LIS_VECTOR X) {
+    LIS_INT i, n;
+    LIS_SCALAR *b, *x, *d;
+    LIS_PRECON precon;
+    LIS_QUAD_DECLAR;
+#ifdef USE_QUAD_PRECISION
 		LIS_SCALAR *xl;
-	#endif
+#endif
 
-	LIS_DEBUG_FUNC_IN;
+    LIS_DEBUG_FUNC_IN;
 
-	/*
-	 *  Mx = b
-	 *  M  = D
-	 */
+    /*
+     *  Mx = b
+     *  M  = D
+     */
 
-	precon = solver->precon;
-	n = precon->D->n;
-	d = precon->D->value;
-	b = B->value;
-	x = X->value;
-	#ifdef USE_QUAD_PRECISION
+    precon = solver->precon;
+    n = precon->D->n;
+    d = precon->D->value;
+    b = B->value;
+    x = X->value;
+#ifdef USE_QUAD_PRECISION
 		xl = X->value_lo;
-	#endif
+#endif
 
-	#ifdef USE_QUAD_PRECISION
+#ifdef USE_QUAD_PRECISION
 		if( B->precision==LIS_PRECISION_DEFAULT )
 		{
-	#endif
-			#ifdef _OPENMP
+#endif
+#ifdef _OPENMP
 			#pragma omp parallel for private(i)
-			#endif
-			for(i=0; i<n; i++)
-			{
-				x[i] = b[i] * d[i];
-			}
-	#ifdef USE_QUAD_PRECISION
+#endif
+    for(i = 0; i < n; i++) { x[i] = b[i] * d[i]; }
+#ifdef USE_QUAD_PRECISION
 		}
 		else
 		{
-			#ifdef _OPENMP
-			#ifndef USE_SSE2
+#ifdef _OPENMP
+#ifndef USE_SSE2
 				#pragma omp parallel for private(i,p1,p2,tq,bhi,blo,chi,clo,sh,sl,th,tl,eh,el)
-			#else
+#else
 				#pragma omp parallel for private(i,bh,ch,sh,wh,th,bl,cl,sl,wl,tl,p1,p2,t0,t1,t2,eh)
-			#endif
-			#endif
+#endif
+#endif
 			for(i=0; i<n; i++)
 			{
-				#ifndef USE_SSE2
+#ifndef USE_SSE2
 					LIS_QUAD_MULD(x[i],xl[i],B->value[i],B->value_lo[i],d[i]);
-				#else
+#else
 					LIS_QUAD_MULD_SSE2(x[i],xl[i],B->value[i],B->value_lo[i],d[i]);
-				#endif
+#endif
 				/* x[i] = b[i] * d[i]; */
 			}
 		}
-	#endif
+#endif
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_psolveh_jacobi"
-LIS_INT lis_psolveh_jacobi(LIS_SOLVER solver, LIS_VECTOR B, LIS_VECTOR X)
-{
-	LIS_INT i,n;
-	LIS_SCALAR *b,*x,*d;
-	LIS_PRECON precon;
-	LIS_QUAD_DECLAR;
-	#ifdef USE_QUAD_PRECISION
+
+LIS_INT lis_psolveh_jacobi(LIS_SOLVER solver, LIS_VECTOR B, LIS_VECTOR X) {
+    LIS_INT i, n;
+    LIS_SCALAR *b, *x, *d;
+    LIS_PRECON precon;
+    LIS_QUAD_DECLAR;
+#ifdef USE_QUAD_PRECISION
 		LIS_SCALAR *xl;
-	#endif
+#endif
 
-	LIS_DEBUG_FUNC_IN;
+    LIS_DEBUG_FUNC_IN;
 
-	/*
-	 *  Mx = b
-	 *  M  = D
-	 */
+    /*
+     *  Mx = b
+     *  M  = D
+     */
 
-	precon = solver->precon;
-	n = precon->D->n;
-	d = precon->D->value;
-	b = B->value;
-	x = X->value;
-	#ifdef USE_QUAD_PRECISION
+    precon = solver->precon;
+    n = precon->D->n;
+    d = precon->D->value;
+    b = B->value;
+    x = X->value;
+#ifdef USE_QUAD_PRECISION
 		xl = X->value_lo;
-	#endif
+#endif
 
-	#ifdef USE_QUAD_PRECISION
+#ifdef USE_QUAD_PRECISION
 		if( B->precision==LIS_PRECISION_DEFAULT )
 		{
-	#endif
-			#ifdef _OPENMP
+#endif
+#ifdef _OPENMP
 			#pragma omp parallel for private(i)
-			#endif
-			for(i=0; i<n; i++)
-			{
-				x[i] = b[i] * conj(d[i]);
-			}
-	#ifdef USE_QUAD_PRECISION
+#endif
+    for(i = 0; i < n; i++) { x[i] = b[i] * conj(d[i]); }
+#ifdef USE_QUAD_PRECISION
 		}
 		else
 		{
-			#ifdef _OPENMP
-			#ifndef USE_SSE2
+#ifdef _OPENMP
+#ifndef USE_SSE2
 				#pragma omp parallel for private(i,p1,p2,tq,bhi,blo,chi,clo,sh,sl,th,tl,eh,el)
-			#else
+#else
 				#pragma omp parallel for private(i,bh,ch,sh,wh,th,bl,cl,sl,wl,tl,p1,p2,t0,t1,t2,eh)
-			#endif
-			#endif
+#endif
+#endif
 			for(i=0; i<n; i++)
 			{
-				#ifndef USE_SSE2
+#ifndef USE_SSE2
 			  		LIS_QUAD_MULD(x[i],xl[i],B->value[i],B->value_lo[i],conj(d[i]));
-				#else
+#else
 					LIS_QUAD_MULD_SSE2(x[i],xl[i],B->value[i],B->value_lo[i],conj(d[i]));
-				#endif
+#endif
 				/* x[i] = b[i] * conj(d[i]); */
 			}
 		}
-	#endif
+#endif
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_precon_create_bjacobi"
-LIS_INT lis_precon_create_bjacobi(LIS_SOLVER solver, LIS_PRECON precon)
-{
-	LIS_INT	err;
-	LIS_MATRIX A;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_precon_create_bjacobi(LIS_SOLVER solver, LIS_PRECON precon) {
+    LIS_INT err;
+    LIS_MATRIX A;
 
-	A = solver->A;
+    LIS_DEBUG_FUNC_IN;
 
-	err = lis_matrix_convert_self(solver);
-	if( err ) return err;
+    A = solver->A;
 
-	if( !A->is_block )
-	{
-		solver->options[LIS_OPTIONS_PRECON] = LIS_PRECON_TYPE_JACOBI;
-		precon->precon_type = LIS_PRECON_TYPE_JACOBI;
-		err = lis_precon_create_jacobi(solver,precon);
-		return err;
-	}
+    err = lis_matrix_convert_self(solver);
+    if(err) return err;
 
-	err = lis_matrix_split(A);
-	if( err ) return err;
-	err = lis_matrix_diag_duplicate(A->D,&precon->WD);
-	if( err ) return err;
-	lis_matrix_diag_copy(A->D,precon->WD);
-	lis_matrix_diag_inverse(precon->WD);
+    if(!A->is_block) {
+        solver->options[LIS_OPTIONS_PRECON] = LIS_PRECON_TYPE_JACOBI;
+        precon->precon_type = LIS_PRECON_TYPE_JACOBI;
+        err = lis_precon_create_jacobi(solver, precon);
+        return err;
+    }
 
+    err = lis_matrix_split(A);
+    if(err) return err;
+    err = lis_matrix_diag_duplicate(A->D, &precon->WD);
+    if(err) return err;
+    lis_matrix_diag_copy(A->D, precon->WD);
+    lis_matrix_diag_inverse(precon->WD);
 
-	LIS_DEBUG_FUNC_OUT;
+    LIS_DEBUG_FUNC_OUT;
     return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_psolve_bjacobi"
-LIS_INT lis_psolve_bjacobi(LIS_SOLVER solver, LIS_VECTOR B, LIS_VECTOR X)
-{
-	LIS_PRECON precon;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_psolve_bjacobi(LIS_SOLVER solver, LIS_VECTOR B, LIS_VECTOR X) {
+    LIS_PRECON precon;
 
-	/*
-	 *  Mx = b
-	 *  M  = D
-	 */
+    LIS_DEBUG_FUNC_IN;
 
-	precon = solver->precon;
+    /*
+     *  Mx = b
+     *  M  = D
+     */
 
-	lis_matrix_diag_matvec(precon->WD,B,X);
+    precon = solver->precon;
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    lis_matrix_diag_matvec(precon->WD, B, X);
+
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_psolveh_bjacobi"
-LIS_INT lis_psolveh_bjacobi(LIS_SOLVER solver, LIS_VECTOR B, LIS_VECTOR X)
-{
-	LIS_PRECON precon;
 
-	LIS_DEBUG_FUNC_IN;
+LIS_INT lis_psolveh_bjacobi(LIS_SOLVER solver, LIS_VECTOR B, LIS_VECTOR X) {
+    LIS_PRECON precon;
 
-	/*
-	 *  Mx = b
-	 *  M  = D
-	 */
+    LIS_DEBUG_FUNC_IN;
 
-	precon = solver->precon;
+    /*
+     *  Mx = b
+     *  M  = D
+     */
 
-	lis_matrix_diag_matvech(precon->WD,B,X);
+    precon = solver->precon;
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    lis_matrix_diag_matvech(precon->WD, B, X);
+
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }

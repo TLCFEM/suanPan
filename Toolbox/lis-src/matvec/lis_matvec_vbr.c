@@ -49,121 +49,99 @@
 
 #undef __FUNC__
 #define __FUNC__ "lis_matvec_vbr"
-void lis_matvec_vbr(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[])
-{
-	LIS_INT i,j,k;
-	LIS_INT bi,bj,bc,bn;
-	LIS_INT nr;
-	LIS_INT n;
-	LIS_SCALAR t;
 
-	n   = A->n;
-	nr  = A->nr;
-	if( A->is_splited )
-	{
-		#ifdef _OPENMP
+void lis_matvec_vbr(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
+    LIS_INT i, j, k;
+    LIS_INT bi, bj, bc, bn;
+    LIS_INT nr;
+    LIS_INT n;
+    LIS_SCALAR t;
+
+    n = A->n;
+    nr = A->nr;
+    if(A->is_splited) {
+#ifdef _OPENMP
 		#pragma omp parallel for private(bi,i,j,k,t,bn)
-		#endif
-		for(bi=0; bi<nr; bi++)
-		{
-			bn = A->D->bns[bi];
-			k  = A->L->row[bi];
-			for(i=0;i<bn;i++)
-			{
-				t = 0.0;
-				for(j=0;j<bn;j++)
-				{
-					t += A->D->v_value[bi][i*bn+j] * x[k+j];
-				}
-				y[k+i] = t;
-			}
-/*			lis_array_matvec(bn,A->D->v_value[i],&x[k],&y[k],LIS_INS_VALUE);*/
-		}
-		#ifdef _OPENMP
+#endif
+        for(bi = 0; bi < nr; bi++) {
+            bn = A->D->bns[bi];
+            k = A->L->row[bi];
+            for(i = 0; i < bn; i++) {
+                t = 0.0;
+                for(j = 0; j < bn; j++) { t += A->D->v_value[bi][i * bn + j] * x[k + j]; }
+                y[k + i] = t;
+            }
+            /*			lis_array_matvec(bn,A->D->v_value[i],&x[k],&y[k],LIS_INS_VALUE);*/
+        }
+#ifdef _OPENMP
 		#pragma omp parallel for private(i,j,k,bi,bj,bc)
-		#endif
-		for(bi=0;bi<nr;bi++)
-		{
-			for(bc=A->L->bptr[bi];bc<A->L->bptr[bi+1];bc++)
-			{
-				bj   = A->L->bindex[bc];
-				k    = A->L->ptr[bc];
-				for(j=A->L->col[bj];j<A->L->col[bj+1];j++)
-				{
-					for(i=A->L->row[bi];i<A->L->row[bi+1];i++)
-					{
-						y[i] += A->L->value[k] * x[j];
-						k++;
-					}
-				}
-			}
-			for(bc=A->U->bptr[bi];bc<A->U->bptr[bi+1];bc++)
-			{
-				bj   = A->U->bindex[bc];
-				k    = A->U->ptr[bc];
-				for(j=A->U->col[bj];j<A->U->col[bj+1];j++)
-				{
-					for(i=A->U->row[bi];i<A->U->row[bi+1];i++)
-					{
-						y[i] += A->U->value[k] * x[j];
-						k++;
-					}
-				}
-			}
-		}
-	}
-	else
-	{
-		#ifdef _OPENMP
+#endif
+        for(bi = 0; bi < nr; bi++) {
+            for(bc = A->L->bptr[bi]; bc < A->L->bptr[bi + 1]; bc++) {
+                bj = A->L->bindex[bc];
+                k = A->L->ptr[bc];
+                for(j = A->L->col[bj]; j < A->L->col[bj + 1]; j++) {
+                    for(i = A->L->row[bi]; i < A->L->row[bi + 1]; i++) {
+                        y[i] += A->L->value[k] * x[j];
+                        k++;
+                    }
+                }
+            }
+            for(bc = A->U->bptr[bi]; bc < A->U->bptr[bi + 1]; bc++) {
+                bj = A->U->bindex[bc];
+                k = A->U->ptr[bc];
+                for(j = A->U->col[bj]; j < A->U->col[bj + 1]; j++) {
+                    for(i = A->U->row[bi]; i < A->U->row[bi + 1]; i++) {
+                        y[i] += A->U->value[k] * x[j];
+                        k++;
+                    }
+                }
+            }
+        }
+    }
+    else {
+#ifdef _OPENMP
 		#pragma omp parallel for private(i)
-		#endif
-		for(i=0; i<n; i++)
-		{
-			y[i] = 0.0;
-		}
-		#ifdef _OPENMP
+#endif
+        for(i = 0; i < n; i++) { y[i] = 0.0; }
+#ifdef _OPENMP
 		#pragma omp parallel for private(i,j,k,bi,bj,bc)
-		#endif
-		for(bi=0;bi<nr;bi++)
-		{
-			for(bc=A->bptr[bi];bc<A->bptr[bi+1];bc++)
-			{
-				bj   = A->bindex[bc];
-				k    = A->ptr[bc];
-				for(j=A->col[bj];j<A->col[bj+1];j++)
-				{
-					for(i=A->row[bi];i<A->row[bi+1];i++)
-					{
-						y[i] += A->value[k] * x[j];
-						k++;
-					}
-				}
-			}
-		}
-	}
+#endif
+        for(bi = 0; bi < nr; bi++) {
+            for(bc = A->bptr[bi]; bc < A->bptr[bi + 1]; bc++) {
+                bj = A->bindex[bc];
+                k = A->ptr[bc];
+                for(j = A->col[bj]; j < A->col[bj + 1]; j++) {
+                    for(i = A->row[bi]; i < A->row[bi + 1]; i++) {
+                        y[i] += A->value[k] * x[j];
+                        k++;
+                    }
+                }
+            }
+        }
+    }
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_matvech_vbr"
-void lis_matvech_vbr(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[])
-{
-	LIS_INT i,j,k;
-	LIS_INT bi,bj,bc,bn;
-	LIS_INT nr;
-	LIS_INT n,np;
-	#ifdef _OPENMP
+
+void lis_matvech_vbr(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
+    LIS_INT i, j, k;
+    LIS_INT bi, bj, bc, bn;
+    LIS_INT nr;
+    LIS_INT n, np;
+#ifdef _OPENMP
 		LIS_INT nprocs,my_rank;
 		LIS_SCALAR t;
 		LIS_SCALAR *w;
-	#endif
+#endif
 
-	n   = A->n;
-	np  = A->np;
-	nr  = A->nr;
+    n = A->n;
+    np = A->np;
+    nr = A->nr;
 
-  	if( A->is_splited )
-	{
-		#ifdef _OPENMP
+    if(A->is_splited) {
+#ifdef _OPENMP
 			nprocs = omp_get_max_threads();
 			w = (LIS_SCALAR *)lis_malloc( nprocs*np*sizeof(LIS_SCALAR),"lis_matvech_vbr::w" );
 			#pragma omp parallel private(bi,bc,bj,i,j,k,bn,my_rank,t)
@@ -229,47 +207,38 @@ void lis_matvech_vbr(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[])
 				}
 			}
 			lis_free(w);
-		#else
-			for(i=0; i<nr; i++)
-			{
-				bn = A->D->bns[i];
-				k  = A->L->row[i];
-				lis_array_matvec(bn,A->D->v_value[i],&x[k],&y[k],LIS_INS_VALUE);
-			}
-			for(bi=0;bi<nr;bi++)
-			{
-				for(bc=A->L->bptr[bi];bc<A->L->bptr[bi+1];bc++)
-				{
-					bj   = A->L->bindex[bc];
-					k    = A->L->ptr[bc];
-					for(j=A->L->col[bj];j<A->L->col[bj+1];j++)
-					{
-						for(i=A->L->row[bi];i<A->L->row[bi+1];i++)
-						{
-							y[j] += conj(A->L->value[k]) * x[i];
-							k++;
-						}
-					}
-				}
-				for(bc=A->U->bptr[bi];bc<A->U->bptr[bi+1];bc++)
-				{
-					bj   = A->U->bindex[bc];
-					k    = A->U->ptr[bc];
-					for(j=A->U->col[bj];j<A->U->col[bj+1];j++)
-					{
-						for(i=A->U->row[bi];i<A->U->row[bi+1];i++)
-						{
-							y[j] += conj(A->U->value[k]) * x[i];
-							k++;
-						}
-					}
-				}
-			}
-		#endif
-	}
-	else
-	{
-		#ifdef _OPENMP
+#else
+        for(i = 0; i < nr; i++) {
+            bn = A->D->bns[i];
+            k = A->L->row[i];
+            lis_array_matvec(bn, A->D->v_value[i], &x[k], &y[k],LIS_INS_VALUE);
+        }
+        for(bi = 0; bi < nr; bi++) {
+            for(bc = A->L->bptr[bi]; bc < A->L->bptr[bi + 1]; bc++) {
+                bj = A->L->bindex[bc];
+                k = A->L->ptr[bc];
+                for(j = A->L->col[bj]; j < A->L->col[bj + 1]; j++) {
+                    for(i = A->L->row[bi]; i < A->L->row[bi + 1]; i++) {
+                        y[j] += conj(A->L->value[k]) * x[i];
+                        k++;
+                    }
+                }
+            }
+            for(bc = A->U->bptr[bi]; bc < A->U->bptr[bi + 1]; bc++) {
+                bj = A->U->bindex[bc];
+                k = A->U->ptr[bc];
+                for(j = A->U->col[bj]; j < A->U->col[bj + 1]; j++) {
+                    for(i = A->U->row[bi]; i < A->U->row[bi + 1]; i++) {
+                        y[j] += conj(A->U->value[k]) * x[i];
+                        k++;
+                    }
+                }
+            }
+        }
+#endif
+    }
+    else {
+#ifdef _OPENMP
 			nprocs = omp_get_max_threads();
 			w = (LIS_SCALAR *)lis_malloc( nprocs*np*sizeof(LIS_SCALAR),"lis_matvech_vbr::w" );
 			#pragma omp parallel private(bi,bc,bj,i,j,k,my_rank)
@@ -311,27 +280,20 @@ void lis_matvech_vbr(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[])
 				}
 			}
 			lis_free(w);
-		#else
-			for(i=0; i<n; i++)
-			{
-				y[i] = 0.0;
-			}
-			for(bi=0;bi<nr;bi++)
-			{
-				for(bc=A->bptr[bi];bc<A->bptr[bi+1];bc++)
-				{
-					bj   = A->bindex[bc];
-					k    = A->ptr[bc];
-					for(j=A->col[bj];j<A->col[bj+1];j++)
-					{
-						for(i=A->row[bi];i<A->row[bi+1];i++)
-						{
-							y[j] += conj(A->value[k]) * x[i];
-							k++;
-						}
-					}
-				}
-			}
-		#endif
-	}
+#else
+        for(i = 0; i < n; i++) { y[i] = 0.0; }
+        for(bi = 0; bi < nr; bi++) {
+            for(bc = A->bptr[bi]; bc < A->bptr[bi + 1]; bc++) {
+                bj = A->bindex[bc];
+                k = A->ptr[bc];
+                for(j = A->col[bj]; j < A->col[bj + 1]; j++) {
+                    for(i = A->row[bi]; i < A->row[bi + 1]; i++) {
+                        y[j] += conj(A->value[k]) * x[i];
+                        k++;
+                    }
+                }
+            }
+        }
+#endif
+    }
 }

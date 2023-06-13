@@ -14,4 +14,8 @@ if (USE_MPI)
     add_compile_definitions(USE_MPI)
 endif ()
 
+if (MSVC)
+    add_compile_options(_CRT_SECURE_NO_WARNINGS)
+endif ()
+
 add_library(lis STATIC ${lis_src})
