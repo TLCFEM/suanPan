@@ -13,7 +13,13 @@ include_directories(include)
 add_compile_definitions(USE_VEC_COMP)
 
 if (MSVC)
-    add_compile_options(_CRT_SECURE_NO_WARNINGS)
+    add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
+endif ()
+
+if (CMAKE_C_COMPILER_ID MATCHES "MSVC")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W0")
+else ()
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
 endif ()
 
 add_library(lis STATIC ${lis_src})
