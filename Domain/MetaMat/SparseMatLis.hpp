@@ -29,8 +29,9 @@
 #ifndef SPARSEMATLIS_HPP
 #define SPARSEMATLIS_HPP
 
-#include "SparseMat.hpp"
 #include <lis/lislib.h>
+#include "SparseMat.hpp"
+#include "csr_form.hpp"
 
 template<sp_d T> class SparseMatLis final : public SparseMat<T> {
 protected:
@@ -50,8 +51,8 @@ template<sp_d T> int SparseMatLis<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
 
     csr_form<double, LIS_INT> csr_mat(this->triplet_mat, SparseBase::ZERO, true);
 
-    const auto n = csr_mat.n_rows;
-    const auto nnz = csr_mat.n_elem;
+    const sp_i auto n = csr_mat.n_rows;
+    const sp_i auto nnz = csr_mat.n_elem;
 
     LIS_MATRIX A;
     LIS_VECTOR b, x;
@@ -72,6 +73,12 @@ template<sp_d T> int SparseMatLis<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
     lis_vector_set(x, (double*)X.memptr());
 
     lis_solve(A, b, x, solver);
+
+    A->ptr = nullptr;
+    A->index = nullptr;
+    A->value = nullptr;
+    b->value = nullptr;
+    x->value = nullptr;
 
     lis_matrix_destroy(A);
     lis_vector_destroy(b);

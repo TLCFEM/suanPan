@@ -34,13 +34,18 @@ int main(int argc, char** argv) {
 #endif
 
     int zero = 0;
-    lis_initialize(&zero, nullptr);
+    char** null = nullptr;
+    lis_initialize(&zero, &null);
 
 #ifdef SUANPAN_DEBUG
     argument_parser(argc, argv);
 #else
-    try { argument_parser(argc, argv); }
-    catch(const std::exception& e) { suanpan_fatal("Some unexpected error happens: {}, please file a bug report via https://github.com/TLCFEM/suanPan/issues.\n", e.what()); }
+    try {
+        argument_parser(argc, argv);
+    }
+    catch(const std::exception& e) {
+        suanpan_fatal("Some unexpected error happens: {}, please file a bug report via https://github.com/TLCFEM/suanPan/issues.\n", e.what());
+    }
 #endif
 
     lis_finalize();

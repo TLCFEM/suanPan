@@ -78,7 +78,7 @@ add_subdirectory(Toolbox)
 add_subdirectory(UnitTest)
 add_subdirectory(Toolbox/lis-src)
 
-target_link_libraries(${PROJECT_NAME} Element Material Section Solver)
+target_link_libraries(${PROJECT_NAME} Element Material Section Solver lis)
 
 if (FORTRAN_STATUS)
     add_subdirectory(Toolbox/amd-src)
