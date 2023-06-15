@@ -115,21 +115,21 @@ LIS_INT lis_initialize(int* argc, char** argv[]) {
     /*	lis_memory_init();*/
 
 #ifdef USE_MPI
-		MPI_Initialized(&lis_mpi_initialized);
-		if (!lis_mpi_initialized) MPI_Init(argc, argv);
+    MPI_Initialized(&lis_mpi_initialized);
+    if(!lis_mpi_initialized) MPI_Init(argc, argv);
 
 #ifdef USE_QUAD_PRECISION
-			MPI_Type_contiguous(LIS_MPI_MSCALAR_LEN, MPI_DOUBLE, &LIS_MPI_MSCALAR );
-			MPI_Type_commit(&LIS_MPI_MSCALAR );
-			MPI_Op_create((MPI_User_function *)lis_mpi_msum, LIS_TRUE, &LIS_MPI_MSUM);
+    MPI_Type_contiguous(LIS_MPI_MSCALAR_LEN, MPI_DOUBLE, &LIS_MPI_MSCALAR);
+    MPI_Type_commit(&LIS_MPI_MSCALAR);
+    MPI_Op_create((MPI_User_function*)lis_mpi_msum, LIS_TRUE, &LIS_MPI_MSUM);
 #endif
 #endif
 
 #ifdef _OPENMP
-		nprocs = omp_get_max_threads();
+    nprocs = omp_get_max_threads();
 #endif
 
-    lis_arg2args(*argc, *argv, &cmd_args);
+    lis_arg2args(argc, argv, &cmd_args);
     p = cmd_args->next;
     while(p != cmd_args) {
         for(i = 0; i < LIS_INIT_OPTIONS_LEN; i++) {
@@ -137,7 +137,7 @@ LIS_INT lis_initialize(int* argc, char** argv[]) {
                 switch(LIS_INIT_OPTACT[i]) {
                 case LIS_INIT_OPTIONS_OMPNUMTHREADS:
 #ifdef _LONG__LONG
-					sscanf(p->arg2, "%lld", &nprocs);
+                    sscanf(p->arg2, "%lld", &nprocs);
 #else
                     sscanf(p->arg2, "%d", &nprocs);
 #endif
@@ -168,18 +168,18 @@ LIS_INT lis_initialize(int* argc, char** argv[]) {
 		lis_quad_x87_fpu_init(&lis_x87_fpu_cw);
 #endif
 
-    for(i = 1; i < *argc; i++) {
-        if(strncmp(argv[0][i], "-help", 5) == 0) {
+        for(i = 1; i < (argc ? *argc : 0); i++) {
+            if(strncmp(argv[0][i], "-help", 5) == 0) {
             /*			lis_display();*/
             CHKERR(1);
-        }
-        else if(strncmp(argv[0][i], "-ver", 4) == 0) {
+            }
+            else if(strncmp(argv[0][i], "-ver", 4) == 0) {
             lis_version();
             CHKERR(1);
+            }
         }
-    }
 
-    LIS_DEBUG_FUNC_OUT;
+        LIS_DEBUG_FUNC_OUT;
     return LIS_SUCCESS;
 }
 
@@ -279,7 +279,7 @@ LIS_INT lis_text2args(char* text, LIS_ARGS* args) {
 #undef __FUNC__
 #define __FUNC__ "lis_arg2args"
 
-LIS_INT lis_arg2args(LIS_INT argc, char* argv[], LIS_ARGS* args) {
+LIS_INT lis_arg2args(LIS_INT* argc, char** argv[], LIS_ARGS* args) {
     char* p;
     LIS_INT i, k1, k2;
     LIS_ARGS arg_top, arg;
@@ -293,10 +293,10 @@ LIS_INT lis_arg2args(LIS_INT argc, char* argv[], LIS_ARGS* args) {
     arg_top->arg2 = NULL;
 
     i = 1;
-    while(i < argc) {
-        if(argv[i][0] == '-' && (i + 1) < argc) {
-            k1 = (LIS_INT)strlen(argv[i]);
-            k2 = (LIS_INT)strlen(argv[i + 1]);
+    while(i < (argc ? *argc : 0)) {
+        if(*argv[i][0] == '-' && (i + 1) < *argc) {
+            k1 = (LIS_INT)strlen(*argv[i]);
+            k2 = (LIS_INT)strlen(*argv[i + 1]);
             arg = (LIS_ARGS)lis_malloc(sizeof(struct LIS_ARGS_STRUCT), "lis_arg2args::arg");
             arg->arg1 = (char*)lis_malloc((k1 + 1) * sizeof(char), "lis_arg2args::arg->arg1");
             arg->arg2 = (char*)lis_malloc((k2 + 1) * sizeof(char), "lis_arg2args::arg->arg2");
@@ -304,8 +304,8 @@ LIS_INT lis_arg2args(LIS_INT argc, char* argv[], LIS_ARGS* args) {
             arg->prev = arg_top->prev;
             arg->prev->next = arg;
             arg->next->prev = arg;
-            strcpy(arg->arg1, argv[i]);
-            strcpy(arg->arg2, argv[i + 1]);
+            strcpy(arg->arg1, *argv[i]);
+            strcpy(arg->arg2, *argv[i + 1]);
             p = arg->arg1;
             while(*p != '\0') {
                 *p = (char)tolower(*p);

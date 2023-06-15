@@ -33,9 +33,7 @@ int main(int argc, char** argv) {
     SetConsoleOutputCP(CP_UTF8);
 #endif
 
-    int zero = 0;
-    char** null = nullptr;
-    lis_initialize(&zero, &null);
+    lis_initialize(nullptr, nullptr);
 
 #ifdef SUANPAN_DEBUG
     argument_parser(argc, argv);
