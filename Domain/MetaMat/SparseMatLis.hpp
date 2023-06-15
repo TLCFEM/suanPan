@@ -69,10 +69,13 @@ template<sp_d T> int SparseMatLis<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
     lis_vector_create(0, &x);
     lis_vector_set_size(b, n, 0);
     lis_vector_set_size(x, n, 0);
-    lis_vector_set(b, (double*)B.memptr());
-    lis_vector_set(x, (double*)X.memptr());
 
-    lis_solve(A, b, x, solver);
+    for(uword I = 0; I < B.n_cols; ++I) {
+        lis_vector_set(b, (double*)B.colptr(I));
+        lis_vector_set(x, (double*)X.colptr(I));
+
+        lis_solve(A, b, x, solver);
+    }
 
     A->ptr = nullptr;
     A->index = nullptr;
