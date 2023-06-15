@@ -65,7 +65,7 @@ extern int lis_mpi_initialized;
 #endif
 extern void lis_memory_init(void);
 extern void lis_free_mat(LIS_MATRIX A);
-extern LIS_INT lis_text2args(char* text, LIS_ARGS* args);
+extern LIS_INT lis_text2args(const char* text, LIS_ARGS* args);
 extern LIS_INT lis_arg2args(LIS_INT* argc, char** argv[], LIS_ARGS* args);
 extern LIS_INT lis_args_free(LIS_ARGS args);
 extern void lis_debug_set_comm(LIS_Comm comm);

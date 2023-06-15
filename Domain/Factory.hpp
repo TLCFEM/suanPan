@@ -66,7 +66,8 @@ enum class SolverType {
     CUDA,
     PARDISO,
     FGMRES,
-    MAGMA
+    MAGMA,
+    LIS
 };
 
 template<sp_d T> class Factory final {
@@ -1376,6 +1377,7 @@ template<sp_d T> unique_ptr<MetaMat<T>> Factory<T>::get_basic_container() {
         return std::make_unique<SymmPackMat<T>>(n_size);
     case StorageScheme::SPARSE:
         if(SolverType::MUMPS == solver) return std::make_unique<SparseMatMUMPS<T>>(n_size, n_size, n_elem);
+        if(SolverType::LIS == solver) return std::make_unique<SparseMatLis<T>>(n_size, n_size, n_elem);
         if(SolverType::SUPERLU == solver) return std::make_unique<SparseMatSuperLU<T>>(n_size, n_size, n_elem);
 #ifdef SUANPAN_MKL
         if(SolverType::PARDISO == solver) return std::make_unique<SparseMatPARDISO<T>>(n_size, n_size, n_elem);

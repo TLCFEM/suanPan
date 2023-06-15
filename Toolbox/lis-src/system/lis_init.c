@@ -219,7 +219,7 @@ LIS_INT lis_finalize(void) {
 #undef __FUNC__
 #define __FUNC__ "lis_text2args"
 
-LIS_INT lis_text2args(char* text, LIS_ARGS* args) {
+LIS_INT lis_text2args(const char* text, LIS_ARGS* args) {
     char buf[1024];
     char *p, *s1, *s2;
     LIS_INT k1, k2, f;

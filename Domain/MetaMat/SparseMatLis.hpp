@@ -34,14 +34,32 @@
 #include "csr_form.hpp"
 
 template<sp_d T> class SparseMatLis final : public SparseMat<T> {
+    LIS_SOLVER solver = nullptr;
+
 protected:
     using SparseMat<T>::direct_solve;
+    using SparseMat<T>::setting;
 
     int direct_solve(Mat<T>&, const Mat<T>&) override;
 
 public:
     SparseMatLis(const uword in_row, const uword in_col, const uword in_elem = 0)
-        : SparseMat<T>(in_row, in_col, in_elem) {}
+        : SparseMat<T>(in_row, in_col, in_elem) {
+        lis_solver_create(&solver);
+        lis_solver_set_option("-i fgmres -p ilu", solver);
+    }
+
+    SparseMatLis(const SparseMatLis& other)
+        : SparseMat<T>(other) {
+        lis_solver_create(&solver);
+        lis_solver_set_option("-i fgmres -p ilu", solver);
+    }
+
+    SparseMatLis(SparseMatLis&&) noexcept = delete;
+    SparseMatLis& operator=(const SparseMatLis&) = delete;
+    SparseMatLis& operator=(SparseMatLis&&) noexcept = delete;
+
+    ~SparseMatLis() override { lis_solver_destroy(solver); }
 
     unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SparseMatLis>(*this); }
 };
@@ -56,23 +74,24 @@ template<sp_d T> int SparseMatLis<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
 
     LIS_MATRIX A;
     LIS_VECTOR b, x;
-    LIS_SOLVER solver;
 
     lis_matrix_create(0, &A);
     lis_matrix_set_size(A, n, 0);
     lis_matrix_set_csr(nnz, csr_mat.row_mem(), csr_mat.col_mem(), csr_mat.val_mem(), A);
     lis_matrix_assemble(A);
 
-    lis_solver_create(&solver);
-
     lis_vector_create(0, &b);
     lis_vector_create(0, &x);
     lis_vector_set_size(b, n, 0);
     lis_vector_set_size(x, n, 0);
 
+    lis_solver_set_option(setting.lis_options.c_str(), solver);
+
     for(uword I = 0; I < B.n_cols; ++I) {
+        // ReSharper disable CppCStyleCast
         lis_vector_set(b, (double*)B.colptr(I));
         lis_vector_set(x, (double*)X.colptr(I));
+        // ReSharper restore CppCStyleCast
 
         lis_solve(A, b, x, solver);
     }
@@ -86,7 +105,6 @@ template<sp_d T> int SparseMatLis<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
     lis_matrix_destroy(A);
     lis_vector_destroy(b);
     lis_vector_destroy(x);
-    lis_solver_destroy(solver);
 
     return SUANPAN_SUCCESS;
 }

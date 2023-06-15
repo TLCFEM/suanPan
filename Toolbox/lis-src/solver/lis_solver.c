@@ -990,7 +990,7 @@ LIS_INT lis_solver_set_optionC(LIS_SOLVER solver) {
 #undef __FUNC__
 #define __FUNC__ "lis_solver_set_option"
 
-LIS_INT lis_solver_set_option(char* text, LIS_SOLVER solver) {
+LIS_INT lis_solver_set_option(const char* text, LIS_SOLVER solver) {
     LIS_INT err;
     LIS_ARGS args, p;
 

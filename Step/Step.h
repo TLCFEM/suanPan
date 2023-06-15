@@ -118,8 +118,9 @@ public:
     void set_precision(Precision);
     void set_tolerance(double);
     void set_refinement(unsigned);
+    void set_lis_option(std::string_view);
 #ifdef SUANPAN_MAGMA
-    void set_magma_setting(const magma_dopts& magma_opt) { magma_setting = magma_opt; }
+    void set_magma_option(const magma_dopts& magma_opt) { magma_setting = magma_opt; }
 #endif
 
     [[nodiscard]] double get_ini_step_size() const;

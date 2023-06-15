@@ -296,6 +296,7 @@ TEST_CASE("Large Mixed Precision", "[Matrix.Benchmark]") {
         benchmark_mat_setup<BandSymmMat<double>, double>(I);
         benchmark_mat_setup<SparseMatMUMPS<double>, double>(I);
         benchmark_mat_setup<SparseSymmMatMUMPS<double>, double>(I);
+        benchmark_mat_setup<SparseMatLis<double>, double>(I);
         benchmark_mat_setup<SparseMatSuperLU<double>, double>(I);
     }
 }

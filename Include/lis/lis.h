@@ -958,7 +958,7 @@ extern LIS_INT lis_solver_get_solver(LIS_SOLVER solver, LIS_INT* nsol);
 extern LIS_INT lis_solver_get_precon(LIS_SOLVER solver, LIS_INT* precon_type);
 extern LIS_INT lis_solver_get_status(LIS_SOLVER solver, LIS_INT* status);
 extern LIS_INT lis_solver_get_rhistory(LIS_SOLVER solver, LIS_VECTOR v);
-extern LIS_INT lis_solver_set_option(char* text, LIS_SOLVER solver);
+extern LIS_INT lis_solver_set_option(const char* text, LIS_SOLVER solver);
 extern LIS_INT lis_solver_set_optionC(LIS_SOLVER solver);
 /*NEH support for extended "solve_kernel" workflow*/
 extern LIS_INT lis_solver_set_matrix(LIS_MATRIX A, LIS_SOLVER solver);
