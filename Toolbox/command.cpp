@@ -1395,8 +1395,7 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
         else if(is_equal(value, "MUMPS")) t_step->set_system_solver(SolverType::MUMPS);
         else if(is_equal(value, "LIS")) {
             t_step->set_system_solver(SolverType::LIS);
-            const auto pos = command.tellg();
-            t_step->set_lis_option(command.str().substr(pos));
+            if(const auto pos = command.tellg(); -1 != pos) t_step->set_lis_option(command.str().substr(pos));
         }
 #ifdef SUANPAN_CUDA
         else if(is_equal(value, "CUDA")) t_step->set_system_solver(SolverType::CUDA);
