@@ -46,6 +46,7 @@ template<sp_d data_t> struct SolverSetting {
     IterativeSolver iterative_solver = IterativeSolver::NONE;
     PreconditionerType preconditioner_type = PreconditionerType::JACOBI;
     Preconditioner<data_t>* preconditioner = nullptr;
+    string lis_options{};
 };
 
 #endif

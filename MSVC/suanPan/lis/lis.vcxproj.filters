@@ -1,0 +1,304 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="SRC">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\array\lis_array.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\esolver\lis_esolver_cg.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\esolver\lis_esolver_ii.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\esolver\lis_esolver_li.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\esolver\lis_esolver_pi.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\esolver\lis_esolver_rqi.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\esolver\lis_esolver_si.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\esolver\lis_esolver.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\esolver\lis_esolver_ai.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\matrix\lis_matrix_dia.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\matrix\lis_matrix_diag.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\matrix\lis_matrix_dns.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\matrix\lis_matrix_ell.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\matrix\lis_matrix_ilu.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\matrix\lis_matrix_jad.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\matrix\lis_matrix_mpi.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\matrix\lis_matrix_msr.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\matrix\lis_matrix_ops.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\matrix\lis_matrix_rco.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\matrix\lis_matrix_vbr.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\matrix\lis_matrix.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\matrix\lis_matrix_bsc.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\matrix\lis_matrix_bsr.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\matrix\lis_matrix_coo.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\matrix\lis_matrix_csc.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\matrix\lis_matrix_csr.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\matvec\lis_matvec_csr.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\matvec\lis_matvec_dia.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\matvec\lis_matvec_dns.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\matvec\lis_matvec_ell.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\matvec\lis_matvec_jad.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\matvec\lis_matvec_msr.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\matvec\lis_matvec_vbr.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\matvec\lis_matvec.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\matvec\lis_matvec_bsc.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\matvec\lis_matvec_bsr.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\matvec\lis_matvec_coo.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\matvec\lis_matvec_csc.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\precision\lis_precision.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\precision\lis_precision_matvec.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\precision\lis_precision_vec.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\precon\lis_precon_iluc.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\precon\lis_precon_iluk.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\precon\lis_precon_ilut.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\precon\lis_precon_is.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\precon\lis_precon_jacobi.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\precon\lis_precon_saamg.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\precon\lis_precon_sainv.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\precon\lis_precon_ssor.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\precon\lis_precon.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\precon\lis_precon_ads.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\precon\lis_precon_hybrid.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\solver\lis_solver_cgs.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\solver\lis_solver_gmres.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\solver\lis_solver_gpbicg.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\solver\lis_solver_gs.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\solver\lis_solver_idrs.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\solver\lis_solver_jacobi.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\solver\lis_solver_minres.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\solver\lis_solver_orthomin.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\solver\lis_solver_qmr.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\solver\lis_solver_sor.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\solver\lis_solver.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\solver\lis_solver_bicg.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\solver\lis_solver_bicgsafe.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\solver\lis_solver_bicgstab.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\solver\lis_solver_bicgstabl.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\solver\lis_solver_cg.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\system\lis_input.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\system\lis_input_hb.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\system\lis_input_mm.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\system\lis_memory.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\system\lis_output.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\system\lis_output_mm.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\system\lis_sort.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\system\lis_time.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\system\mt19937ar.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\system\lis_error.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\system\lis_hash.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\system\lis_init.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\vector\lis_vector_ops.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\vector\lis_vector_opv.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\lis-src\vector\lis_vector.c">
+      <Filter>SRC</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Toolbox\lis-src\include\lis_fortran.h">
+      <Filter>SRC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\lis-src\include\lis_io.h">
+      <Filter>SRC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\lis-src\include\lis_matrix.h">
+      <Filter>SRC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\lis-src\include\lis_matvec.h">
+      <Filter>SRC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\lis-src\include\lis_mpi.h">
+      <Filter>SRC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\lis-src\include\lis_precision.h">
+      <Filter>SRC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\lis-src\include\lis_precon.h">
+      <Filter>SRC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\lis-src\include\lis_solver.h">
+      <Filter>SRC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\lis-src\include\lis_system.h">
+      <Filter>SRC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\lis-src\include\lis_vector.h">
+      <Filter>SRC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\lis-src\include\lislib.h">
+      <Filter>SRC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\lis-src\include\mt19937ar.h">
+      <Filter>SRC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\lis-src\include\lis.h">
+      <Filter>SRC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\lis-src\include\lis_esolver.h">
+      <Filter>SRC</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

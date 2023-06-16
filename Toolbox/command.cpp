@@ -1393,12 +1393,16 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
         else if(is_equal(value, "SPIKE")) t_step->set_system_solver(SolverType::SPIKE);
         else if(is_equal(value, "SUPERLU")) t_step->set_system_solver(SolverType::SUPERLU);
         else if(is_equal(value, "MUMPS")) t_step->set_system_solver(SolverType::MUMPS);
+        else if(is_equal(value, "LIS")) {
+            t_step->set_system_solver(SolverType::LIS);
+            if(const auto pos = command.tellg(); -1 != pos) t_step->set_lis_option(command.str().substr(pos));
+        }
 #ifdef SUANPAN_CUDA
         else if(is_equal(value, "CUDA")) t_step->set_system_solver(SolverType::CUDA);
 #ifdef SUANPAN_MAGMA
         else if(is_equal(value, "MAGMA")) {
             t_step->set_system_solver(SolverType::MAGMA);
-            t_step->set_magma_setting(magma_parse_opts<magma_dopts>(command));
+            t_step->set_magma_option(magma_parse_opts<magma_dopts>(command));
         }
 #endif
 #endif

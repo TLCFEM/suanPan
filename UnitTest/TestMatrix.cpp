@@ -160,6 +160,8 @@ template<> SparseMatSuperLU<float> create_new(const u64 N) { return {N, N}; }
 
 template<> SparseMatMUMPS<float> create_new(const u64 N) { return {N, N}; }
 
+template<> SparseMatLis<double> create_new(const u64 N) { return {N, N}; }
+
 #ifdef SUANPAN_MKL
 template<> SparseMatPARDISO<double> create_new(const u64 N) { return {N, N}; }
 
@@ -228,6 +230,7 @@ template<typename T, typename ET> void benchmark_mat_setup(const int I) {
     else if(std::is_same_v<BandSymmMat<ET>, T>) title = "BandSymm ";
     else if(std::is_same_v<SparseMatMUMPS<ET>, T>) title = "MUMPS ";
     else if(std::is_same_v<SparseSymmMatMUMPS<ET>, T>) title = "MUMPS Symm ";
+    else if(std::is_same_v<SparseMatLis<ET>, T>) title = "Lis ";
     else if(std::is_same_v<SparseMatSuperLU<ET>, T>) title = "SuperLU ";
 #ifdef SUANPAN_MKL
     else if(std::is_same_v<SparseMatPARDISO<ET>, T>) title = "PARDISO ";
@@ -293,6 +296,7 @@ TEST_CASE("Large Mixed Precision", "[Matrix.Benchmark]") {
         benchmark_mat_setup<BandSymmMat<double>, double>(I);
         benchmark_mat_setup<SparseMatMUMPS<double>, double>(I);
         benchmark_mat_setup<SparseSymmMatMUMPS<double>, double>(I);
+        benchmark_mat_setup<SparseMatLis<double>, double>(I);
         benchmark_mat_setup<SparseMatSuperLU<double>, double>(I);
     }
 }
@@ -324,6 +328,8 @@ TEST_CASE("SparseMatSuperLUFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<fl
 TEST_CASE("SparseMatMUMPS", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatMUMPS<double>>); }
 
 TEST_CASE("SparseMatMUMPSFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<float>(create_new<SparseMatMUMPS<float>>); }
+
+TEST_CASE("SparseMatLis", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatLis<double>>); }
 
 #ifdef SUANPAN_MKL
 TEST_CASE("SparseMatPARDISO", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatPARDISO<double>>); }

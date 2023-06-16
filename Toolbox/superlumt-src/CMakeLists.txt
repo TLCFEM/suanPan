@@ -12,7 +12,7 @@ add_compile_definitions(NDEBUG)
 add_compile_definitions(PRNTlevel=0)
 add_compile_definitions(Add_)
 
-if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+if (CMAKE_C_COMPILER_ID MATCHES "MSVC")
     add_compile_definitions(__OPENMP)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W0 /openmp")
     set_source_files_properties(await.c PROPERTIES COMPILE_FLAGS "/Od")

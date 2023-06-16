@@ -2896,6 +2896,9 @@
     <ClInclude Include="..\..\..\Toolbox\misc.h">
       <Filter>Toolbox</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Domain\MetaMat\SparseMatLis.hpp">
+      <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\..\Resource\suanPan.rc" />

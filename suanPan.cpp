@@ -17,17 +17,10 @@
 
 #include <Toolbox/argument.h>
 #include <suanPan.h>
+#include <lis/lislib.h>
 
 #ifdef SUANPAN_WIN
 #include <Windows.h>
-#endif
-
-#ifdef SUANPAN_MPI
-#include <mpi.h>
-#else
-int MPI_Init_thread(int*, char***, int, int*) { return 0; }
-
-int MPI_Finalize() { return 0; }
 #endif
 
 // ReSharper disable once CppParameterMayBeConst
@@ -40,8 +33,7 @@ int main(int argc, char** argv) {
     SetConsoleOutputCP(CP_UTF8);
 #endif
 
-    int provided;
-    MPI_Init_thread(nullptr, nullptr, 1, &provided);
+    lis_initialize(nullptr, nullptr);
 
 #ifdef SUANPAN_DEBUG
     argument_parser(argc, argv);
@@ -50,7 +42,7 @@ int main(int argc, char** argv) {
     catch(const std::exception& e) { suanpan_fatal("Some unexpected error happens: {}, please file a bug report via https://github.com/TLCFEM/suanPan/issues.\n", e.what()); }
 #endif
 
-    MPI_Finalize();
+    lis_finalize();
 
     return SUANPAN_SUCCESS;
 }
