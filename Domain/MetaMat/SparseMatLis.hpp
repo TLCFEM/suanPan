@@ -46,13 +46,13 @@ public:
     SparseMatLis(const uword in_row, const uword in_col, const uword in_elem = 0)
         : SparseMat<T>(in_row, in_col, in_elem) {
         lis_solver_create(&solver);
-        lis_solver_set_option("-i fgmres -p ilu", solver);
+        lis_solver_set_option("-i fgmres", solver);
     }
 
     SparseMatLis(const SparseMatLis& other)
         : SparseMat<T>(other) {
         lis_solver_create(&solver);
-        lis_solver_set_option("-i fgmres -p ilu", solver);
+        lis_solver_set_option("-i fgmres", solver);
     }
 
     SparseMatLis(SparseMatLis&&) noexcept = delete;
