@@ -203,19 +203,13 @@ template<> SparseMatMAGMA<float> create_new(const u64 N) {
 #endif
 
 template<typename T, typename ET> void benchmark_mat_setup(const int I) {
-    auto B = sprandu<SpMat<ET>>(I, I, .02);
+    auto B = sprandu<SpMat<ET>>(I, I, .2);
     B = B + B.t() + speye<SpMat<ET>>(I, I) * 1E1;
 
-    if constexpr(std::is_same_v<T, BandMat<ET>> || std::is_same_v<T, BandMatSpike<ET>> || std::is_same_v<T, BandSymmMat<ET>>
-#ifdef SUANPAN_CUDA
-        || std::is_same_v<T, BandMatCUDA<ET>>
-#endif
-    ) {
-        std::vector<std::tuple<uword, uword>> to_erase;
-        to_erase.reserve(B.n_nonzero);
-        for(auto J = B.begin(); J != B.end(); ++J) if(std::abs(static_cast<int>(J.row()) - static_cast<int>(J.col())) > 3) to_erase.emplace_back(std::tuple{J.row(), J.col()});
-        for(const auto& [row, col] : to_erase) B.at(row, col) = 0.;
-    }
+    std::vector<std::tuple<uword, uword>> to_erase;
+    to_erase.reserve(B.n_nonzero);
+    for(auto J = B.begin(); J != B.end(); ++J) if(std::abs(static_cast<int>(J.row()) - static_cast<int>(J.col())) > 3) to_erase.emplace_back(std::tuple{J.row(), J.col()});
+    for(const auto& [row, col] : to_erase) B.at(row, col) = 0.;
 
     const auto C = randu<Col<ET>>(I);
 
@@ -296,6 +290,15 @@ TEST_CASE("Large Mixed Precision", "[Matrix.Benchmark]") {
         benchmark_mat_setup<BandSymmMat<double>, double>(I);
         benchmark_mat_setup<SparseMatMUMPS<double>, double>(I);
         benchmark_mat_setup<SparseSymmMatMUMPS<double>, double>(I);
+        benchmark_mat_setup<SparseMatLis<double>, double>(I);
+        benchmark_mat_setup<SparseMatSuperLU<double>, double>(I);
+    }
+}
+
+TEST_CASE("Large Sparse Solve Type", "[Matrix.Benchmark]") {
+    for(auto I = 0x1000; I < 0x5000; I *= 2) {
+        benchmark_mat_setup<BandMat<double>, double>(I);
+        benchmark_mat_setup<SparseMatMUMPS<double>, double>(I);
         benchmark_mat_setup<SparseMatLis<double>, double>(I);
         benchmark_mat_setup<SparseMatSuperLU<double>, double>(I);
     }
