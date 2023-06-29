@@ -95,6 +95,11 @@ void ignore_whitespace(istringstream& I) {
         else break;
 }
 
+string get_remaining(istringstream& I) {
+    if(const auto pos = I.tellg(); -1 != pos) return I.str().substr(pos);
+    return {};
+}
+
 bool is_equal(const char* A, const char* B) { return _strcmpi(A, B) == 0; }
 
 bool is_equal(const char A, const char B) { return tolower(static_cast<int>(A)) == tolower(static_cast<int>(B)); }

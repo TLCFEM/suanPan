@@ -69,6 +69,8 @@ using std::ifstream;
 using std::string;
 using std::vector;
 
+unsigned SUANPAN_WARNING_COUNT = 0;
+unsigned SUANPAN_ERROR_COUNT = 0;
 int SUANPAN_NUM_THREADS = std::max(1, static_cast<int>(std::thread::hardware_concurrency()));
 int SUANPAN_NUM_NODES = 1;
 fs::path SUANPAN_OUTPUT = fs::current_path();
@@ -537,6 +539,15 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     if(is_equal(command_id, "precheck")) return model->precheck();
 
     if(is_equal(command_id, "analyze") || is_equal(command_id, "analyse")) {
+        const auto options = get_remaining(command);
+        if(SUANPAN_WARNING_COUNT > 0 && !if_contain(options, "ignore_warning") && !if_contain(options, "ignore-warning")) {
+            suanpan_warning("There are {} warnings, please fix them first or use `ignore-warning` to ignore them.\n", SUANPAN_WARNING_COUNT);
+            return SUANPAN_SUCCESS;
+        }
+        if(SUANPAN_ERROR_COUNT > 0 && !if_contain(options, "ignore_error") && !if_contain(options, "ignore-error")) {
+            suanpan_warning("There are {} errors, please fix them first or use `ignore-error` to ignore them.\n", SUANPAN_ERROR_COUNT);
+            return SUANPAN_SUCCESS;
+        }
         const auto code = model->analyze();
         suanpan_info("\n");
         return code;
@@ -1395,7 +1406,7 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
         else if(is_equal(value, "MUMPS")) t_step->set_system_solver(SolverType::MUMPS);
         else if(is_equal(value, "LIS")) {
             t_step->set_system_solver(SolverType::LIS);
-            if(const auto pos = command.tellg(); -1 != pos) t_step->set_lis_option(command.str().substr(pos));
+            if(const auto options = get_remaining(command); !options.empty()) t_step->set_lis_option(options);
         }
 #ifdef SUANPAN_CUDA
         else if(is_equal(value, "CUDA")) t_step->set_system_solver(SolverType::CUDA);
