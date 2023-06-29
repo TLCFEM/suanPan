@@ -158,10 +158,14 @@
 SUANPAN_IMPORT bool SUANPAN_PRINT;
 SUANPAN_IMPORT bool SUANPAN_VERBOSE;
 SUANPAN_IMPORT bool SUANPAN_COLOR;
+SUANPAN_IMPORT unsigned SUANPAN_WARNING_COUNT;
+SUANPAN_IMPORT unsigned SUANPAN_ERROR_COUNT;
 #else
 SUANPAN_EXPORT bool SUANPAN_PRINT;
 SUANPAN_EXPORT bool SUANPAN_VERBOSE;
 SUANPAN_EXPORT bool SUANPAN_COLOR;
+SUANPAN_EXPORT unsigned SUANPAN_WARNING_COUNT;
+SUANPAN_EXPORT unsigned SUANPAN_ERROR_COUNT;
 #endif
 
 constexpr auto SUANPAN_EXIT = 1;
@@ -220,6 +224,7 @@ namespace suanpan {
     }
 
     template<typename... T> void warning(const std::string_view file_name, const int line, const std::string_view format_str, const T&... args) {
+        SUANPAN_WARNING_COUNT += 1;
         if(!SUANPAN_PRINT) return;
         const std::scoped_lock lock(print_mutex);
         if(SUANPAN_COLOR) SUANPAN_CWRN << fmt::vformat(fg(fmt::color::slate_blue), pattern("[WARNING] ", file_name, format_str), fmt::make_format_args(line, args...));
@@ -227,6 +232,7 @@ namespace suanpan {
     }
 
     template<typename... T> void error(const std::string_view file_name, const int line, const std::string_view format_str, const T&... args) {
+        SUANPAN_ERROR_COUNT += 1;
         if(!SUANPAN_PRINT) return;
         const std::scoped_lock lock(print_mutex);
         if(SUANPAN_COLOR) SUANPAN_CERR << fmt::vformat(fg(fmt::color::orange), pattern("[ERROR] ", file_name, format_str), fmt::make_format_args(line, args...));

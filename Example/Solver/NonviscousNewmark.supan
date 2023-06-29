@@ -31,7 +31,7 @@ integrator NonviscousNewmark 1 .25 .5 8. 0 2. 0 4. 0 1. 0
 
 converger RelIncreDisp 2 1E-10 10 1
 
-analyze
+analyze --ignore-error
 
 # Node 2:
 # Coordinate:
