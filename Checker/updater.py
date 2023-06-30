@@ -34,15 +34,17 @@ def check_version(_major: int, _minor: int, _patch: int):
         version_list.append(('suanPan-win-mkl-vtk.exe', '(Installer)'))
         version_list.append(('suanPan-win-mkl-vtk.zip', '(Portable Archive)'))
         version_list.append(('suanPan-win-openblas-vtk.7z', '(Portable Archive)'))
+        version_list.append(('suanPan-win-openblas-vtk-no-avx.7z', '(Portable Archive)'))
     elif sys.platform.startswith('linux'):
         version_list.append(('suanPan-linux-mkl-vtk.tar.gz', '(Portable Archive)'))
+        version_list.append(('suanPan-linux-mkl-vtk-no-avx.tar.gz', '(Portable Archive)'))
         version_list.append(('suanPan-linux-mkl.tar.gz', '(Portable Archive)'))
-        version_list.append(('suanPan-linux-openblas-vtk.tar.gz', '(Portable Archive)'))
         version_list.append(('suanPan-linux-openblas.tar.gz', '(Portable Archive)'))
         version_list.append((f'suanPan-{new_major}.{new_minor}.{new_patch}-1.x86_64.deb', '(Debian Installer)'))
         version_list.append((f'suanPan-{new_major}.{new_minor}.{new_patch}-1.x86_64.rpm', '(Red Hat Installer)'))
     elif sys.platform.startswith('darwin'):
         version_list.append(('suanPan-macos-openblas-vtk.tar.gz', '(Portable Archive)'))
+        version_list.append(('suanPan-macos-openblas-vtk-no-avx.tar.gz', '(Portable Archive)'))
         version_list.append(('suanPan-macos-openblas.tar.gz', '(Portable Archive)'))
 
     for index, item in enumerate(version_list):
