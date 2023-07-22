@@ -134,6 +134,7 @@ if (USE_MKL)
 endif ()
 
 if (USE_EXTERNAL_CUDA)
+    cmake_policy(SET CMP0146 OLD)
     find_package(CUDA)
     if (NOT CUDA_FOUND)
         set(CUDA_PATH "" CACHE PATH "CUDA library path which contains /include folder")
