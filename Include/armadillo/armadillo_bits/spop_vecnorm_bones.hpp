@@ -16,46 +16,37 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup arma_version
+//! \addtogroup spop_vecnorm
 //! @{
 
 
-
-#define ARMA_VERSION_MAJOR 12
-#define ARMA_VERSION_MINOR 6
-#define ARMA_VERSION_PATCH 0
-#define ARMA_VERSION_NAME  "Cortisol Retox"
-
-
-
-struct arma_version
+class spop_vecnorm
+  : public traits_op_xvec
   {
-  static constexpr unsigned int major = ARMA_VERSION_MAJOR;
-  static constexpr unsigned int minor = ARMA_VERSION_MINOR;
-  static constexpr unsigned int patch = ARMA_VERSION_PATCH;
+  public:
   
-  static
-  inline
-  std::string
-  as_string()
-    {
-    const char* nickname = ARMA_VERSION_NAME;
-    
-    std::ostringstream ss;
-    
-    ss << arma_version::major
-       << '.'
-       << arma_version::minor
-       << '.'
-       << arma_version::patch
-       << " ("
-       << nickname
-       << ')';
-    
-    return ss.str();
-    }
+  template<typename T1>
+  inline static void apply(SpMat<typename T1::pod_type>& out, const mtSpOp<typename T1::pod_type,T1,spop_vecnorm>& expr);
+  
+  template<typename eT>
+  inline static void apply_direct(Mat< typename get_pod_type<eT>::result >& out, const SpMat<eT>& X, const uword k);
   };
 
+
+//
+
+
+class spop_vecnorm_ext
+  : public traits_op_xvec
+  {
+  public:
+  
+  template<typename T1>
+  inline static void apply(SpMat<typename T1::pod_type>& out, const mtSpOp<typename T1::pod_type,T1,spop_vecnorm_ext>& expr);
+  
+  template<typename eT>
+  inline static void apply_direct(Mat< typename get_pod_type<eT>::result >& out, const SpMat<eT>& X, const uword method_id);
+  };
 
 
 //! @}

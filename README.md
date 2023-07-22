@@ -253,8 +253,8 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**METIS**](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview) version 5.1.0
 - [**VTK**](https://vtk.org/) version 9.2.6
 - [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 12.0
-- [**MAGMA**](https://icl.utk.edu/magma/)
-- [**Armadillo**](http://arma.sourceforge.net/) version 12.2
+- [**MAGMA**](https://icl.utk.edu/magma/) version 2.7.1
+- [**Armadillo**](http://arma.sourceforge.net/) version 12.6
 - [**ensmallen**](https://ensmallen.org/) version 2.19.0
 - [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2023.0.0
 - [**Catch2**](https://github.com/catchorg/Catch2) version 3.3.1
