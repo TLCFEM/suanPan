@@ -147,7 +147,7 @@ arma_stop_logic_error(const char* x, const char* y)
 
 
 
-//! print a message to get_cerr_stream() and throw logic_error exception
+//! print a message to get_cerr_stream() and throw out_of_range exception
 template<typename T1>
 arma_cold
 arma_noinline
@@ -1445,6 +1445,7 @@ arma_assert_atlas_size(const T1& A, const T2& B)
         out << "@ arma_config::optimise_invexpr = " << arma_config::optimise_invexpr << '\n';
         out << "@ arma_config::check_nonfinite  = " << arma_config::check_nonfinite  << '\n';
         out << "@ arma_config::zero_init        = " << arma_config::zero_init        << '\n';
+        out << "@ arma_config::fast_math        = " << arma_config::fast_math        << '\n';
         out << "@ sizeof(void*)    = " << sizeof(void*)    << '\n';
         out << "@ sizeof(int)      = " << sizeof(int)      << '\n';
         out << "@ sizeof(long)     = " << sizeof(long)     << '\n';

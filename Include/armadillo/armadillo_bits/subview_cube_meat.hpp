@@ -1346,6 +1346,8 @@ subview_cube<eT>::is_finite() const
   {
   arma_extra_debug_sigprint();
   
+  if(arma_config::fast_math_warn)  { arma_debug_warn_level(1, "is_finite(): detection of non-finite values is not reliable in fast math mode"); }
+  
   const uword local_n_rows   = n_rows;
   const uword local_n_cols   = n_cols;
   const uword local_n_slices = n_slices;
@@ -1394,6 +1396,8 @@ subview_cube<eT>::has_inf() const
   {
   arma_extra_debug_sigprint();
   
+  if(arma_config::fast_math_warn)  { arma_debug_warn_level(1, "has_inf(): detection of non-finite values is not reliable in fast math mode"); }
+  
   const uword local_n_rows   = n_rows;
   const uword local_n_cols   = n_cols;
   const uword local_n_slices = n_slices;
@@ -1418,6 +1422,8 @@ subview_cube<eT>::has_nan() const
   {
   arma_extra_debug_sigprint();
   
+  if(arma_config::fast_math_warn)  { arma_debug_warn_level(1, "has_nan(): detection of non-finite values is not reliable in fast math mode"); }
+  
   const uword local_n_rows   = n_rows;
   const uword local_n_cols   = n_cols;
   const uword local_n_slices = n_slices;
@@ -1427,6 +1433,32 @@ subview_cube<eT>::has_nan() const
     for(uword col = 0; col < local_n_cols; ++col)
       {
       if(arrayops::has_nan(slice_colptr(slice,col), local_n_rows))  { return true; }
+      }
+    }
+  
+  return false;
+  }
+
+
+
+template<typename eT>
+inline
+bool
+subview_cube<eT>::has_nonfinite() const
+  {
+  arma_extra_debug_sigprint();
+  
+  if(arma_config::fast_math_warn)  { arma_debug_warn_level(1, "has_nonfinite(): detection of non-finite values is not reliable in fast math mode"); }
+  
+  const uword local_n_rows   = n_rows;
+  const uword local_n_cols   = n_cols;
+  const uword local_n_slices = n_slices;
+  
+  for(uword slice = 0; slice < local_n_slices; ++slice)
+    {
+    for(uword col = 0; col < local_n_cols; ++col)
+      {
+      if(arrayops::is_finite(slice_colptr(slice,col), local_n_rows) == false)  { return true; }
       }
     }
   
@@ -1680,7 +1712,7 @@ subview_cube<eT>::extract(Cube<eT>& out, const subview_cube<eT>& in)
   const uword n_cols   = in.n_cols;
   const uword n_slices = in.n_slices;
   
-  arma_extra_debug_print(arma_str::format("out.n_rows = %d   out.n_cols = %d    out.n_slices = %d    in.m.n_rows = %d   in.m.n_cols = %d   in.m.n_slices = %d") % out.n_rows % out.n_cols % out.n_slices % in.m.n_rows % in.m.n_cols % in.m.n_slices);
+  arma_extra_debug_print(arma_str::format("out.n_rows = %u   out.n_cols = %u    out.n_slices = %u    in.m.n_rows = %u   in.m.n_cols = %u   in.m.n_slices = %u") % out.n_rows % out.n_cols % out.n_slices % in.m.n_rows % in.m.n_cols % in.m.n_slices);
   
   if( (in.aux_row1 == 0) && (n_rows == in.m.n_rows) )
     {
