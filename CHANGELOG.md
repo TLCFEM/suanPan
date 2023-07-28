@@ -9,7 +9,7 @@
 ## version 3.1
 
 1. iterative solvers by the Lis library [#145](https://github.com/TLCFEM/suanPan/pull/145)
-2. update `Armadillo` to version `12.6` [#147](https://github.com/TLCFEM/suanPan/pull/147)
+2. update `Armadillo` to version `12.6.1` [#148](https://github.com/TLCFEM/suanPan/pull/147)
 
 ## version 3.0
 
