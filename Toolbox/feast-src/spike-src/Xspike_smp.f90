@@ -828,6 +828,7 @@ endif
 
 call T_ALLOC(wdeallocate_2)(A)
 call T_ALLOC(wdeallocate_2)(B)
+call wdeallocate_1i(ipiv)
 
 end subroutine
 
