@@ -225,8 +225,7 @@ if (COMPILER_IDENTIFIER MATCHES "vs")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /openmp /EHsc")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP /openmp /EHsc")
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} /MP /Qopenmp /Qparallel /fpp /names:lowercase /assume:underscore")
-
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB:MSVCRT")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} /libs:dll /threads")
 
     if (USE_AVX512)
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /arch:AVX512")
