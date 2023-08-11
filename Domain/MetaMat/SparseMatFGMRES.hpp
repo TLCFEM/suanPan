@@ -61,9 +61,7 @@ public:
     SparseMatBaseFGMRES& operator=(const SparseMatBaseFGMRES&) = delete;
     SparseMatBaseFGMRES& operator=(SparseMatBaseFGMRES&&) noexcept = delete;
 
-    ~SparseMatBaseFGMRES() override {
-        mkl_free_buffers();
-    }
+    ~SparseMatBaseFGMRES() override = default;
 };
 
 template<sp_d T> int SparseMatBaseFGMRES<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {

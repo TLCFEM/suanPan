@@ -23,6 +23,10 @@
 #include <Windows.h>
 #endif
 
+#ifdef SUANPAN_MKL
+extern "C" void mkl_free_buffers(void);
+#endif
+
 // ReSharper disable once CppParameterMayBeConst
 int main(int argc, char** argv) {
 #ifdef SUANPAN_WIN
@@ -43,6 +47,10 @@ int main(int argc, char** argv) {
 #endif
 
     lis_finalize();
+
+#ifdef SUANPAN_MKL
+    std::atexit(mkl_free_buffers);
+#endif
 
     return SUANPAN_SUCCESS;
 }
