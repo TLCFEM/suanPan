@@ -202,12 +202,14 @@ endif ()
 if (BUILD_MULTITHREAD)
     message("USING TBB LIBRARY")
     add_compile_definitions(SUANPAN_MT)
-    add_compile_definitions(ARMA_USE_TBB_ALLOC)
     if (COMPILER_IDENTIFIER MATCHES "gcc-win")
         link_libraries(tbb12)
     else ()
         link_libraries(tbb)
     endif ()
+    # for armadillo to use tbb allocator
+    add_compile_definitions(ARMA_USE_TBB_ALLOC)
+    include_directories(Include/oneapi) # because armadillo assumes oneapi be in the include path
     link_libraries(tbbmalloc tbbmalloc_proxy)
 endif ()
 
