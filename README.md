@@ -258,7 +258,7 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**ensmallen**](https://ensmallen.org/) version 2.19.0
 - [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2023.2.0
 - [**Catch2**](https://github.com/catchorg/Catch2) version 3.3.1
-- [**fmt**](https://github.com/fmtlib/fmt) version 10.0.0
+- [**fmt**](https://github.com/fmtlib/fmt) version 10.1.0
 - [**whereami**](https://github.com/gpakosz/whereami)
 - [**exprtk**](https://github.com/ArashPartow/exprtk)
 - **thread_pool** abridged version of [`thread-pool`](https://github.com/bshoshany/thread-pool)
