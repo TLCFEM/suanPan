@@ -24,7 +24,9 @@
 #endif
 
 #ifdef SUANPAN_MKL
-extern "C" void mkl_free_buffers(void);
+extern "C" void mkl_free_buffers();
+#else
+void mkl_free_buffers() {}
 #endif
 
 // ReSharper disable once CppParameterMayBeConst
@@ -48,9 +50,5 @@ int main(int argc, char** argv) {
 
     lis_finalize();
 
-#ifdef SUANPAN_MKL
-    std::atexit(mkl_free_buffers);
-#endif
-
-    return SUANPAN_SUCCESS;
+    return std::atexit(mkl_free_buffers);
 }
