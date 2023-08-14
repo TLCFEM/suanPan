@@ -37,18 +37,18 @@ include(${ROOT}/Option.cmake)
 link_directories(${PROJECT_BINARY_DIR}/Libs)
 
 add_executable(${PROJECT_NAME}
-        "suanPan.cpp"
-        "Include/fmt/src/format.cc"
-        "Include/whereami/whereami.c"
-        "Include/catch/catch_amalgamated.cpp"
-        "Constraint/CMakeLists.txt"
-        "Database/CMakeLists.txt"
-        "Domain/CMakeLists.txt"
-        "Load/CMakeLists.txt"
-        "Recorder/CMakeLists.txt"
-        "Step/CMakeLists.txt"
-        "Toolbox/CMakeLists.txt"
-        "UnitTest/CMakeLists.txt"
+        suanPan.cpp
+        Include/fmt/src/format.cc
+        Include/whereami/whereami.c
+        Include/catch/catch_amalgamated.cpp
+        Constraint/CMakeLists.txt
+        Database/CMakeLists.txt
+        Domain/CMakeLists.txt
+        Load/CMakeLists.txt
+        Recorder/CMakeLists.txt
+        Step/CMakeLists.txt
+        Toolbox/CMakeLists.txt
+        UnitTest/CMakeLists.txt
         )
 
 if (MSVC)
@@ -87,10 +87,10 @@ if (FORTRAN_STATUS)
     add_subdirectory(Toolbox/mumps-src)
     add_subdirectory(Toolbox/fext)
     target_link_libraries(${PROJECT_NAME} fext)
-    message("Linking additional amd arpack mumps feast")
+    message("Linking additional amd arpack mumps feast libraries.")
 elseif (COMPILER_IDENTIFIER MATCHES "vs")
     target_link_libraries(${PROJECT_NAME} libfext)
-    message("Linking precompiled fext (packed with amd arpack mumps feast)")
+    message("Linking precompiled fext (packed with amd arpack mumps feast) library.")
 else ()
     message(FATAL_ERROR "Please install a valid FORTRAN compiler.")
 endif ()
