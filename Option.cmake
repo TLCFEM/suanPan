@@ -19,6 +19,7 @@ option(USE_AVX "Enable AVX support." ON)
 option(USE_AVX2 "Enable AVX2 support." OFF)
 option(USE_AVX512 "Enable AVX512 support." OFF)
 option(USE_MKL "Use Intel MKL instead of OpenBLAS." OFF)
+option(USE_MIMALLOC "Use mimalloc instead of default memory allocator." OFF)
 if (USE_MKL)
     option(USE_INTEL_OPENMP "Use Intel OpenMP implementation on Linux and macOS" ON)
     option(LINK_DYNAMIC_MKL "Link dynamic Intel MKL libraries." ON)
@@ -197,6 +198,15 @@ if (USE_HDF5)
     endif ()
 else ()
     add_compile_definitions(ARMA_DONT_USE_HDF5)
+endif ()
+
+if (USE_MIMALLOC)
+    message("USING MIMALLOC LIBRARY")
+    include(FetchContent)
+    FetchContent_Declare(mimalloc
+            GIT_REPOSITORY https://github.com/microsoft/mimalloc
+            GIT_TAG v2.1.2)
+    FetchContent_MakeAvailable(mimalloc)
 endif ()
 
 if (BUILD_MULTITHREAD)

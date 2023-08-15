@@ -49,7 +49,7 @@ add_executable(${PROJECT_NAME}
         Step/CMakeLists.txt
         Toolbox/CMakeLists.txt
         UnitTest/CMakeLists.txt
-        )
+)
 
 if (MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE "/bigobj")
@@ -265,7 +265,7 @@ if (COMPILER_IDENTIFIER MATCHES "(linux|mac)")
                 ${ONEAPI_LIB}/libintlc${DECOR}*${SUFFIX}
                 ${ONEAPI_LIB}/libiomp5${DECOR}*${SUFFIX}
                 ${ONEAPI_LIB}/libsvml${DECOR}*${SUFFIX}
-                )
+        )
         install(PROGRAMS ${ONEAPI_FILES} DESTINATION lib)
     endif ()
 elseif (COMPILER_IDENTIFIER MATCHES "win")
@@ -320,6 +320,18 @@ elseif (COMPILER_IDENTIFIER MATCHES "vs")
         file(GLOB DLL_FILES Libs/win/lib*.dll)
         install(FILES ${DLL_FILES} DESTINATION bin)
     endif ()
+endif ()
+
+if (USE_MIMALLOC)
+    add_dependencies(${PROJECT_NAME} mimalloc)
+    file(GLOB MIMALLOC_LIBS ${mimalloc_BINARY_DIR}/*mimalloc*)
+    foreach (MIMALLOC_LIB ${MIMALLOC_LIBS})
+        if (MIMALLOC_LIB MATCHES "dll")
+            install(FILES ${MIMALLOC_SO} DESTINATION lib)
+        else ()
+            install(FILES ${MIMALLOC_LIB} DESTINATION bin)
+        endif ()
+    endforeach ()
 endif ()
 
 if (HAVE_VTK)

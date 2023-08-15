@@ -68,5 +68,8 @@ else
         export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CURRENT_PATH/../lib
         ;;
     esac
+    if [[ -f "$CURRENT_PATH/../lib/libmimalloc.so" ]]; then
+        export LD_PRELOAD="$CURRENT_PATH/../lib/libmimalloc.so"
+    fi
     "$CURRENT_PATH/suanPan" "$@"
 fi
