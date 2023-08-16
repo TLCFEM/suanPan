@@ -28,7 +28,7 @@
 [🧮 **suanPan**](https://tlcfem.github.io/suanPan/) is a finite element method (FEM) simulation platform for
 applications in fields such as solid mechanics and civil/structural/seismic engineering. The name **suanPan** (in some
 places such as suffix it is also abbreviated as **suPan**) comes from the term *Suan Pan* (算盤), which
-is [Chinese abacus](https://en.wikipedia.org/wiki/Suanpan). **suanPan** is written in modern high quality C++ code and
+is [Chinese abacus](https://en.wikipedia.org/wiki/Suanpan). **suanPan** is written in modern high-quality C++ code and
 is targeted to provide an efficient, concise, flexible and reliable FEM simulation platform.
 
 **suanPan** is partially influenced by popular (non-)commercial FEA packages, such
@@ -43,13 +43,14 @@ The highlights of **suanPan** are
 
 - **suanPan** is *fast*, both memory and thread safe.
 - **suanPan** is designed based on the [shared memory](https://en.wikipedia.org/wiki/Shared_memory) model and supports
-  parallelism on heterogeneous architectures, for example multithreaded CPU + optional GPU. The parallelism is available
+  parallelism on heterogeneous architectures, for example, multithreaded CPU + optional GPU. The parallelism is
+  available
   for both element state updating and global matrix assembling.
 - **suanPan** is open source and easy to be extended to incorporate user-defined elements, materials, etc.
 - **suanPan** separates the FEA model part from the linear algebra operation part, which significantly reduces the
   complexity and cost of development of new models.
 - **suanPan** utilizes the new language features shipped with the latest standards (C++11 to C++20), such as new STL
-  containers, smart pointers and many others.
+  containers, smart pointers, and many others.
 - **suanPan** supports simple visualization supported by [VTK](https://vtk.org/).
 
 ## Quick Start
@@ -98,8 +99,9 @@ details can be seen [here](https://tlcfem.gitbook.io/suanpan-manual/tutorial/obt
 
 ## Installation
 
-Only 64-bit version is compiled. It is assumed that [**AVX**](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions)
-is available thus if the program fails, please check if your CPU supports AVX.
+Only the 64-bit version is compiled.
+It is assumed that [**AVX**](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions) is available thus if the program
+fails, please check if your CPU supports AVX.
 
 ### Windows
 
@@ -154,7 +156,7 @@ Linux users are recommended to obtain the binaries via `snap` or `flatpak`.
 
 #### Snap
 
-The snap supports visualization via VTK and uses Intel MKL for linear algebra.
+The snap supports visualisation via VTK and uses Intel MKL for linear algebra.
 The edge channel is in sync with the dev branch.
 The stable channel is in sync with the master branch.
 
@@ -176,7 +178,7 @@ flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flat
 # or the beta channel
 # flatpak remote-add --if-not-exists flathub-beta https://flathub.org/beta-repo/flathub-beta.flatpakrepo
 # install
-flatpak install flathub io.github.tlcfem.suanPan
+flatpak install suanPan
 # define alias
 echo "alias suanpan=\"flatpak run io.github.tlcfem.suanPan\"" >> ~/.bashrc
 ```
@@ -189,20 +191,20 @@ package via docker, check the dockerfiles under the `Script` folder, for any que
 
 ### Other Platforms
 
-Precompiled binaries are provided via CI/CD on MacOS, Windows and Ubuntu. Please download the file from
-the [release](https://github.com/TLCFEM/suanPan/releases) page.
+Precompiled binaries are provided via CI/CD on macOS, Windows, and Ubuntu.
+Please download the file from the [release](https://github.com/TLCFEM/suanPan/releases) page.
 
 A few flavors are available:
 
-1. `vtk` --- visualization support is enabled, with this you can record VTK files for postprocessing, however, OpenGL
+1. `vtk` --- visualisation support is enabled, with this you can record VTK files for postprocessing, however, OpenGL
    may be missing on server systems
 2. `mkl` --- linear algebra operations are offloaded to MKL, which gives the optimal performance on Intel chips
 3. `openblas` --- linear algebra operations are offloaded to OpenBLAS, which may outperform MKL on AMD platforms
 
 Advanced users can compile the program from source by themselves in order to enable GPU based solvers which require
-available [CUDA](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) library.
+an available [CUDA](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) library.
 
-Since CI/CD uses `GCC 11` (on Linux) and `Clang 13.0.1` (on MacOS), it may be required to update/install
+Since CI/CD uses `GCC 11` (on Linux) and `Clang 13.0.1` (on macOS), it may be required to update/install
 proper `libstdc++` (or `libc++`) version. The easiest way is to install the same compiler. For example, on Ubuntu 22.04,
 
 ```bash
