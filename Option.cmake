@@ -5,7 +5,7 @@ include_directories(Include/fmt/include)
 
 set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Debug Release RelWithDebInfo MinSizeRel")
 
-message("CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
 
 set(BUILD_PACKAGE "" CACHE STRING "DEB OR RPM")
 
@@ -58,7 +58,7 @@ elseif (CMAKE_SYSTEM_NAME MATCHES "Linux") # LINUX PLATFORM
         set(COMPILER_IDENTIFIER "clang-linux")
     elseif (CMAKE_CXX_COMPILER_ID MATCHES "Intel") # Intel COMPILER Classic icc
         set(COMPILER_IDENTIFIER "gcc-linux")
-        message("Classic Intel compiler icc has incomplete CPP20 support, if it fails to compile please use another compiler.")
+        message(STATUS "Classic Intel compiler icc has incomplete CPP20 support, if it fails to compile please use another compiler.")
     elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang") # Clang COMPILER
         set(COMPILER_IDENTIFIER "clang-linux")
     endif ()
@@ -70,8 +70,8 @@ elseif (CMAKE_SYSTEM_NAME MATCHES "Darwin") # MAC PLATFORM
     elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         set(COMPILER_IDENTIFIER "clang-mac")
         link_directories(/usr/local/opt/libomp/lib/)
-        message("On macOS, make sure llvm and libomp are installed.")
-        message("brew install llvm libomp")
+        message(STATUS "On macOS, make sure llvm and libomp are installed.")
+        message(STATUS "brew install llvm libomp")
     endif ()
 endif ()
 
@@ -201,7 +201,7 @@ else ()
 endif ()
 
 if (USE_MIMALLOC)
-    message("USING MIMALLOC LIBRARY")
+    message(STATUS "USING MIMALLOC LIBRARY")
     include(FetchContent)
     FetchContent_Declare(mimalloc
             GIT_REPOSITORY https://github.com/microsoft/mimalloc
@@ -210,7 +210,7 @@ if (USE_MIMALLOC)
 endif ()
 
 if (BUILD_MULTITHREAD)
-    message("USING TBB LIBRARY")
+    message(STATUS "USING TBB LIBRARY")
     add_compile_definitions(SUANPAN_MT)
     if (COMPILER_IDENTIFIER MATCHES "gcc-win")
         link_libraries(tbb12)
@@ -227,10 +227,10 @@ if (BUILD_MULTITHREAD)
 endif ()
 
 if (BUILD_SHARED)
-    message("BUILD SHARED LIBRARY")
+    message(STATUS "BUILD SHARED LIBRARY")
     set(LIBRARY_TYPE SHARED)
 else ()
-    message("BUILD STATIC LIBRARY")
+    message(STATUS "BUILD STATIC LIBRARY")
     set(LIBRARY_TYPE STATIC)
 endif ()
 

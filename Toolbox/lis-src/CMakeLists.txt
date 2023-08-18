@@ -28,3 +28,5 @@ if (USE_MPI)
     add_library(lis-mpi STATIC ${lis_src})
     target_compile_definitions(lis-mpi PRIVATE USE_MPI)
 endif ()
+
+message(STATUS "LIS C_FLAGS: ${CMAKE_C_FLAGS}")
