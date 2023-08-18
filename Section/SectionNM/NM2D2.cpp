@@ -28,9 +28,3 @@ NM2D2::NM2D2(const unsigned T, const double EEA, const double EEIS, const double
     , LinearHardeningNM(T, EEA, EEIS, HH, KK, LD, vec{NP, MSP}) {}
 
 unique_ptr<Section> NM2D2::get_copy() { return make_unique<NM2D2>(*this); }
-
-void NM2D2::print() {
-    suanpan_info("A N-M based section. doi: 10.1061/JSENDH/STENG-12176\n");
-    suanpan_info("Local Deformation:", current_deformation);
-    suanpan_info("Local Resistance:", current_resistance);
-}

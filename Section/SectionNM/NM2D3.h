@@ -54,8 +54,6 @@ public:
           mat&& = {});
 
     unique_ptr<Section> get_copy() override;
-
-    void print() override;
 };
 
 #endif
