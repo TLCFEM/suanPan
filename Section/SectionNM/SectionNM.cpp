@@ -49,5 +49,5 @@ int SectionNM::reset_status() {
 }
 
 void SectionNM::print() {
-    suanpan_info("An N-M interaction based section.\n");
+    suanpan_info("A N-M interaction based section. doi: 10.1061/JSENDH/STENG-12176\n");
 }

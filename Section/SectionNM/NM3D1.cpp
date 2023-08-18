@@ -30,5 +30,5 @@ int NM3D1::update_trial_status(const vec& t_deformation) {
 }
 
 void NM3D1::print() {
-    suanpan_info("A NM3D1 section.\n");
+    suanpan_info("A NM3D1 elastic section.\n");
 }
