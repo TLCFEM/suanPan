@@ -51,6 +51,10 @@ add_executable(${PROJECT_NAME}
         UnitTest/CMakeLists.txt
 )
 
+if (COMPILER_IDENTIFIER MATCHES "vs")
+    target_link_options(${PROJECT_NAME} PRIVATE /NODEFAULTLIB:LIBCMT)
+endif ()
+
 if (MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE "/bigobj")
 elseif (MINGW)
