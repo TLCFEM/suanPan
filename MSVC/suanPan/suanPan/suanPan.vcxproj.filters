@@ -1516,6 +1516,9 @@
     <ClCompile Include="..\..\..\Toolbox\misc.cpp">
       <Filter>Toolbox</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Hoffman\TimberPD.cpp">
+      <Filter>Material\Material3D\Hoffman</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2898,6 +2901,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Domain\MetaMat\SparseMatLis.hpp">
       <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Hoffman\TimberPD.h">
+      <Filter>Material\Material3D\Hoffman</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

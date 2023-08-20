@@ -386,7 +386,10 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     auto counter = 0u;
 
     while(true) {
-        if(max_iteration == ++counter) return SUANPAN_FAIL;
+        if(max_iteration == ++counter) {
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
+            return SUANPAN_FAIL;
+        }
 
         compute_plasticity(s, p, kp, data);
 
@@ -495,25 +498,13 @@ int CDPM2::update_trial_status(const vec& t_strain) {
         trial_stress *= (1. - omegat) * (1. - omegac);
     }
     else if(DamageType::ANISOTROPIC == damage_type) {
-        const auto compute_fraction = [&](const double a, const double b) { return suanpan::approx_equal(a, b, 4) ? a + b <= 0. ? 0. : 2. : 2. * (suanpan::ramp(a) - suanpan::ramp(b)) / (a - b); };
-        const auto get_fraction = [&](const vec& p_stress) { return vec{compute_fraction(p_stress(0), p_stress(1)), compute_fraction(p_stress(1), p_stress(2)), compute_fraction(p_stress(2), p_stress(0))}; };
+        const auto get_fraction = [](const vec& p_stress) {
+            const auto compute_fraction = [](const double a, const double b) { return suanpan::approx_equal(a, b, 4) ? a + b <= 0. ? 0. : 2. : 2. * (suanpan::ramp(a) - suanpan::ramp(b)) / (a - b); };
 
-        const mat pnn = [](const mat& eig_vec) {
-            const mat n12 = eig_vec.col(0) * eig_vec.col(1).t();
-            const mat n23 = eig_vec.col(1) * eig_vec.col(2).t();
-            const mat n31 = eig_vec.col(2) * eig_vec.col(0).t();
+            return vec{compute_fraction(p_stress(0), p_stress(1)), compute_fraction(p_stress(1), p_stress(2)), compute_fraction(p_stress(2), p_stress(0))};
+        };
 
-            mat pij(6, 6);
-
-            pij.col(0) = tensor::stress::to_voigt(eig_vec.col(0) * eig_vec.col(0).t());
-            pij.col(1) = tensor::stress::to_voigt(eig_vec.col(1) * eig_vec.col(1).t());
-            pij.col(2) = tensor::stress::to_voigt(eig_vec.col(2) * eig_vec.col(2).t());
-            pij.col(3) = tensor::stress::to_voigt(.5 * (n12 + n12.t()));
-            pij.col(4) = tensor::stress::to_voigt(.5 * (n23 + n23.t()));
-            pij.col(5) = tensor::stress::to_voigt(.5 * (n31 + n31.t()));
-
-            return pij;
-        }(principal_direction);
+        const mat pnn = transform::eigen_to_tensor_base(principal_direction);
 
         mat tension_projector = pnn.cols(t_pattern) * pnn.cols(t_pattern).t();
         mat tension_derivative = tension_projector + pnn.tail_cols(3) * diagmat(get_fraction(principal_stress)) * pnn.tail_cols(3).t();

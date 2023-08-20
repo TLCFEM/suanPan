@@ -28,6 +28,7 @@ set(M3D
         Material3D/Hoffman/ExpHoffman.cpp
         Material3D/Hoffman/NonlinearHill.cpp
         Material3D/Hoffman/NonlinearHoffman.cpp
+        Material3D/Hoffman/TimberPD.cpp
         Material3D/Material3D.cpp
         Material3D/Sand/DafaliasManzari.cpp
         Material3D/Sand/SimpleSand.cpp
