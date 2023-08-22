@@ -10,6 +10,7 @@
 
 1. iterative solvers by the Lis library [#145](https://github.com/TLCFEM/suanPan/pull/145)
 2. update `Armadillo` to version `12.6.2` [#149](https://github.com/TLCFEM/suanPan/pull/149)
+3. add `TimberPD` 3D material for timber [#150](https://github.com/TLCFEM/suanPan/pull/150)
 
 ## version 3.0
 

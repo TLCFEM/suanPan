@@ -34,9 +34,16 @@ mat tensor::isotropic_stiffness(const double modulus, const double poissons_rati
 mat tensor::orthotropic_stiffness(const vec& modulus, const vec& poissons_ratio) {
     mat t_mat(3, 3);
     t_mat(0, 0) = 1. / modulus(0);
-    t_mat(1, 0) = t_mat(0, 1) = -poissons_ratio(0) * (t_mat(1, 1) = 1. / modulus(1));
-    t_mat(2, 1) = t_mat(1, 2) = -poissons_ratio(1) * (t_mat(2, 2) = 1. / modulus(2));
-    t_mat(0, 2) = t_mat(2, 0) = -poissons_ratio(2) * t_mat(2, 2);
+    t_mat(1, 0) = -poissons_ratio(0) * t_mat(0, 0);
+    t_mat(2, 0) = -poissons_ratio(2) * t_mat(0, 0);
+
+    t_mat(1, 1) = 1. / modulus(1);
+    t_mat(0, 1) = -poissons_ratio(0) * t_mat(1, 1);
+    t_mat(2, 1) = -poissons_ratio(1) * t_mat(1, 1);
+
+    t_mat(2, 2) = 1. / modulus(2);
+    t_mat(0, 2) = -poissons_ratio(2) * t_mat(2, 2);
+    t_mat(1, 2) = -poissons_ratio(1) * t_mat(2, 2);
 
     mat stiffness(6, 6, fill::zeros);
     stiffness(span(0, 2), span(0, 2)) = inv(t_mat);
@@ -514,6 +521,45 @@ mat transform::compute_jacobian_principal_to_nominal(const mat& in) {
     }
 
     throw invalid_argument("need a valid tensor");
+}
+
+mat transform::eigen_to_tensor_base(const mat& eig_vec) {
+    const mat n12 = eig_vec.col(0) * eig_vec.col(1).t();
+    const mat n23 = eig_vec.col(1) * eig_vec.col(2).t();
+    const mat n31 = eig_vec.col(2) * eig_vec.col(0).t();
+
+    mat pij(6, 6);
+
+    pij.col(0) = tensor::stress::to_voigt(eig_vec.col(0) * eig_vec.col(0).t());
+    pij.col(1) = tensor::stress::to_voigt(eig_vec.col(1) * eig_vec.col(1).t());
+    pij.col(2) = tensor::stress::to_voigt(eig_vec.col(2) * eig_vec.col(2).t());
+    pij.col(3) = tensor::stress::to_voigt(.5 * (n12 + n12.t()));
+    pij.col(4) = tensor::stress::to_voigt(.5 * (n23 + n23.t()));
+    pij.col(5) = tensor::stress::to_voigt(.5 * (n31 + n31.t()));
+
+    return pij;
+}
+
+mat transform::eigen_to_tensile_derivative(const vec& principal_stress, const mat& principal_direction) {
+    const auto get_fraction = [](const vec& p_stress) {
+        const auto compute_fraction = [](const double a, const double b) { return suanpan::approx_equal(a, b, 4) ? a + b <= 0. ? 0. : 2. : 2. * (suanpan::ramp(a) - suanpan::ramp(b)) / (a - b); };
+
+        return vec{compute_fraction(p_stress(0), p_stress(1)), compute_fraction(p_stress(1), p_stress(2)), compute_fraction(p_stress(2), p_stress(0))};
+    };
+
+    const mat pnn = eigen_to_tensor_base(principal_direction);
+
+    std::vector<uword> tp;
+    tp.reserve(principal_stress.n_elem);
+    for(auto I = 0llu; I < principal_stress.n_elem; ++I) if(principal_stress(I) > 0.) tp.emplace_back(I);
+
+    const uvec pattern = tp;
+
+    mat eigen_derivative = pnn.cols(pattern) * pnn.cols(pattern).t() + pnn.tail_cols(3) * diagmat(get_fraction(principal_stress)) * pnn.tail_cols(3).t();
+
+    eigen_derivative.tail_cols(3) *= 2.;
+
+    return eigen_derivative;
 }
 
 vec transform::triangle::to_area_coordinate(const vec& g_coord, const mat& nodes) {

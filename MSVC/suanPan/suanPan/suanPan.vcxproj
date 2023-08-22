@@ -390,6 +390,7 @@
     <ClCompile Include="..\..\..\Material\Material3D\Hoffman\ExpHoffman.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Hoffman\NonlinearHill.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Hoffman\NonlinearHoffman.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Hoffman\TimberPD.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Material3D.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Sand\DafaliasManzari.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Sand\SimpleSand.cpp" />
@@ -859,6 +860,7 @@
     <ClInclude Include="..\..\..\Material\Material3D\Hoffman\ExpHoffman.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Hoffman\NonlinearHill.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Hoffman\NonlinearHoffman.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Hoffman\TimberPD.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Material3D.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Sand\DafaliasManzari.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Sand\SimpleSand.h" />

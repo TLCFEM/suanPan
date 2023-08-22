@@ -3073,10 +3073,16 @@
       "trigger":"BilinearElastic1D"
     },
     {
-      "contents":"",
+      "contents":"material BilinearHoffman ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...19)} ${5:[20]} ${6:[21]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, E_{xy}, E_{yz}, E_{zx}\n# (8...10) double, three poissions ratios: v_{xy}, v_{yz}, v_{zx}\n# (11...19) double, nine yield stresses\n# [20] double, hardening ratio, default: 0.0\n# [21] double, density, default: 0.0",
       "details":"",
       "kind":"type",
       "trigger":"BilinearHoffman"
+    },
+    {
+      "contents":"material TimberPD ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...19)} ${5:(20...26)} ${6:[27]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, E_{xy}, E_{yz}, E_{zx}\n# (8...10) double, three poissions ratios: v_{xy}, v_{yz}, v_{zx}\n# (11...19) double, nine yield stresses\n# (20...26) double, hardening parameters\n# [27] double, density, default: 0.0",
+      "details":"",
+      "kind":"type",
+      "trigger":"TimberPD"
     },
     {
       "contents":"",
