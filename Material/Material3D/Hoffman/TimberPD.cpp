@@ -22,11 +22,10 @@
 constexpr unsigned TimberPD::max_iteration = 20u;
 
 const uword TimberPD::sa{0};
-const uword TimberPD::sb{1};
-const span TimberPD::sc{2, 7};
+const span TimberPD::sb{1, 6};
 
 TimberPD::TimberPD(const unsigned T, vec&& EE, vec&& VV, vec&& SS, vec&& HH, const double R)
-    : DataTimberPD{std::forward<vec>(EE), std::forward<vec>(VV), std::forward<vec>(SS), {}, {}, {}, {}, {}, {}, HH(0), HH(1), HH(2), HH(3), HH(4), HH(5), HH(6)}
+    : DataTimberPD{std::forward<vec>(EE), std::forward<vec>(VV), std::forward<vec>(SS), {}, {}, {}, {}, HH(0), HH(1), HH(2), HH(3), HH(4), HH(5), HH(6)}
     , Material3D(T, R) {
     // S(0) = \sigma_{11}^t    S(1) = \sigma_{11}^c
     // S(2) = \sigma_{22}^t    S(3) = \sigma_{22}^c
@@ -80,9 +79,6 @@ TimberPD::TimberPD(const unsigned T, vec&& EE, vec&& VV, vec&& SS, vec&& HH, con
 int TimberPD::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = tensor::orthotropic_stiffness(modulus, ratio);
 
-    elastic_a = initial_stiffness * proj_a;
-    elastic_b = initial_stiffness * proj_b;
-
     initial_history.zeros(3);
     initial_history(1) = ini_r_t;
     initial_history(2) = ini_r_c;
@@ -123,9 +119,8 @@ int TimberPD::update_trial_status(const vec& t_strain) {
 
     auto gamma = 0., ref_error = 1.;
 
-    vec incre, residual(8, fill::none);
-    mat jacobian(8, 8, fill::none);
-    jacobian(sb, sb) = 0.;
+    vec incre, residual(7, fill::none);
+    mat jacobian(7, 7, fill::none);
 
     auto counter = 0u;
 
@@ -138,61 +133,51 @@ int TimberPD::update_trial_status(const vec& t_strain) {
         const vec factor_a = proj_a * sigma_c;
         const auto factor_b = dot(proj_b, sigma_c);
 
-        const auto sigma_y = 1. + k * h;
+        const auto sigma_y = 1. + h * (current_k + gamma);
 
         const auto f = .5 * dot(factor_a, sigma_c) + factor_b * sigma_y - sigma_y * sigma_y;
 
-        if(1u == counter && f < 0.) break;
-
-        const vec n = factor_a + proj_b * sigma_y;
-        const auto norm_n = sqrt(dot(square(n), tensor::strain::norm_weight));
-        const vec m = n % tensor::strain::norm_weight / norm_n;
-
         if(1u == counter) {
-            const auto norm_incre = tensor::strain::norm(incre_strain);
-            k += norm_incre;
-            gamma = norm_incre / norm_n;
+            if(f < 0.) break;
+            gamma = tensor::strain::norm(incre_strain);
         }
 
-        residual(sa) = k - gamma * norm_n - current_k;
-        residual(sb) = f;
-        residual(sc) = sigma_c + elastic_a * sigma_c * gamma + elastic_b * gamma * sigma_y - trial_sigma_c;
+        const vec n = factor_a + proj_b * sigma_y;
+        const auto norm_n = tensor::strain::norm(n);
+        const vec m = n / norm_n;
+        const mat dn = (eye(6, 6) - m * (m % tensor::strain::norm_weight).t()) / norm_n;
 
-        jacobian(sa, sa) = 1. - gamma * h * dot(m, proj_b);
-        jacobian(sa, sb) = -norm_n;
-        jacobian(sa, sc) = -gamma * m.t() * proj_a;
+        residual(sa) = f;
+        residual(sb) = sigma_c + initial_stiffness * gamma * m - trial_sigma_c;
 
-        jacobian(sb, sa) = (factor_b - 2. - 2. * h * k) * h;
-        jacobian(sb, sc) = n.t();
+        jacobian(sa, sa) = (factor_b - 2. * sigma_y) * h;
+        jacobian(sa, sb) = n.t();
 
-        jacobian(sc, sa) = elastic_b * gamma * h;
-        jacobian(sc, sb) = elastic_a * sigma_c + elastic_b * sigma_y;
-        jacobian(sc, sc) = eye(6, 6) + elastic_a * gamma;
-
-        // std::cout << rcond(jacobian) << '\n';
+        jacobian(sb, sa) = initial_stiffness * (m + gamma * h * dn * proj_b);
+        jacobian(sb, sb) = eye(6, 6) + gamma * initial_stiffness * dn * proj_a;
 
         if(!solve(incre, jacobian, residual, solve_opts::refine + solve_opts::equilibrate)) return SUANPAN_FAIL;
 
         auto error = norm(residual);
         if(1u == counter && error > ref_error) ref_error = error;
-        suanpan_debug("Local plasticity iteration error: {:.5E}.\n", error);
+        suanpan_debug("Local plasticity iteration error: {:.5E}.\n", error/ref_error);
 
         if(error <= tolerance * std::max(1., ref_error)) {
-            plastic_strain += gamma * n % tensor::stress::norm_weight;
+            plastic_strain += gamma * n;
+            k = current_k + gamma;
 
-            mat left, right(8, 6, fill::zeros);
-            right.rows(sc) = stiffness_c;
+            mat left, right(7, 6, fill::zeros);
+            right.rows(sb) = stiffness_c;
 
             if(!solve(left, jacobian, right)) return SUANPAN_FAIL;
 
-            stiffness_c = left.rows(sc);
+            stiffness_c = left.rows(sb);
 
             break;
         }
 
-        k -= incre(sa);
-        gamma -= incre(sb);
-        sigma_c -= incre(sc);
+        gamma -= incre(sa);
+        sigma_c -= incre(sb);
     }
 
     // damage part

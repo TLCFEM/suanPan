@@ -34,21 +34,19 @@
 struct DataTimberPD {
     const vec modulus, ratio, yield_stress;
 
-    mat proj_a, elastic_a;
-    vec proj_b, elastic_b;
+    mat proj_a;
+    vec proj_b;
 
     mat hill_t, hill_c;
 
-    double h = 100.;
-    double ini_r_t = 1., n_t = .8, b_t = 1.5;
-    double ini_r_c = 1., m_c = .4, b_c = .85;
+    double h, ini_r_t, n_t, b_t, ini_r_c, m_c, b_c;
 };
 
 class TimberPD final : protected DataTimberPD, public Material3D {
     static const unsigned max_iteration;
 
-    static const uword sa, sb;
-    static const span sc;
+    static const uword sa;
+    static const span sb;
 
     [[nodiscard]] double compute_damage_c(double) const;
     [[nodiscard]] double compute_damage_t(double) const;
