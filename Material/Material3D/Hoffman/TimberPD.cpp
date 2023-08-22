@@ -145,7 +145,7 @@ int TimberPD::update_trial_status(const vec& t_strain) {
         const vec n = factor_a + proj_b * sigma_y;
         const auto norm_n = tensor::strain::norm(n);
         const vec m = n / norm_n;
-        const mat dn = (eye(6, 6) - m * (m % tensor::strain::norm_weight).t()) / norm_n;
+        const vec unit_m = m % tensor::strain::norm_weight;
 
         residual(sa) = f;
         residual(sb) = sigma_c + initial_stiffness * gamma * m - trial_sigma_c;
@@ -153,8 +153,8 @@ int TimberPD::update_trial_status(const vec& t_strain) {
         jacobian(sa, sa) = (factor_b - 2. * sigma_y) * h;
         jacobian(sa, sb) = n.t();
 
-        jacobian(sb, sa) = initial_stiffness * (m + gamma * h * dn * proj_b);
-        jacobian(sb, sb) = eye(6, 6) + gamma * initial_stiffness * dn * proj_a;
+        jacobian(sb, sa) = initial_stiffness * (m + gamma / norm_n * h * (proj_b - m * dot(unit_m, proj_b)));
+        jacobian(sb, sb) = eye(6, 6) + gamma / norm_n * initial_stiffness * (proj_a - m * unit_m.t() * proj_a);
 
         if(!solve(incre, jacobian, residual, solve_opts::refine + solve_opts::equilibrate)) return SUANPAN_FAIL;
 
@@ -163,7 +163,7 @@ int TimberPD::update_trial_status(const vec& t_strain) {
         suanpan_debug("Local plasticity iteration error: {:.5E}.\n", error/ref_error);
 
         if(error <= tolerance * std::max(1., ref_error)) {
-            plastic_strain += gamma * n;
+            plastic_strain += gamma * m;
             k = current_k + gamma;
 
             mat left, right(7, 6, fill::zeros);
