@@ -453,6 +453,38 @@ double tensor::stress::double_contraction(const vec& a, const vec& b) { return d
 
 double tensor::stress::double_contraction(vec&& a, vec&& b) { return dot(a % b, norm_weight); }
 
+/**
+ * \brief Generate two projection matrix based on the given yield stress according to the Hoffman yielding criterion
+ * \param yield_stress nine yield stresses
+ * \param proj_a P matrix
+ * \param proj_b q vector
+ */
+void transform::hoffman_projection(const vec& yield_stress, mat& proj_a, mat& proj_b) {
+    // S(0) = \sigma_{11}^t    S(1) = \sigma_{11}^c
+    // S(2) = \sigma_{22}^t    S(3) = \sigma_{22}^c
+    // S(4) = \sigma_{33}^t    S(5) = \sigma_{33}^c
+    // S(6) = \sigma_{12}^0    S(7) = \sigma_{23}^0    S(8) = \sigma_{13}^0
+
+    proj_a.zeros(6, 6);
+    proj_b.zeros(6, 1);
+
+    const auto T1 = 1. / yield_stress(0) / yield_stress(1);
+    const auto T2 = 1. / yield_stress(2) / yield_stress(3);
+    const auto T3 = 1. / yield_stress(4) / yield_stress(5);
+
+    proj_b(0) = (yield_stress(1) - yield_stress(0)) * (proj_a(0, 0) = T1);
+    proj_b(1) = (yield_stress(3) - yield_stress(2)) * (proj_a(1, 1) = T2);
+    proj_b(2) = (yield_stress(5) - yield_stress(4)) * (proj_a(2, 2) = T3);
+
+    proj_a(0, 1) = proj_a(1, 0) = -.5 * (T1 + T2 - T3);
+    proj_a(1, 2) = proj_a(2, 1) = -.5 * (T2 + T3 - T1);
+    proj_a(2, 0) = proj_a(0, 2) = -.5 * (T3 + T1 - T2);
+    proj_a(3, 3) = 1. / yield_stress(6) / yield_stress(6);
+    proj_a(4, 4) = 1. / yield_stress(7) / yield_stress(7);
+    proj_a(5, 5) = 1. / yield_stress(8) / yield_stress(8);
+    proj_a *= 2.;
+}
+
 double transform::atan2(const vec& direction_cosine) { return std::atan2(direction_cosine(1), direction_cosine(0)); }
 
 mat transform::compute_jacobian_nominal_to_principal(const mat& in) {
@@ -538,6 +570,13 @@ mat transform::eigen_to_tensor_base(const mat& eig_vec) {
     pij.col(5) = tensor::stress::to_voigt(.5 * (n31 + n31.t()));
 
     return pij;
+}
+
+mat transform::eigen_to_tensile_stress(const vec& principal_stress, const mat& principal_direction) {
+    vec principal_tensile_stress(principal_stress.n_elem, fill::zeros);
+    for(auto I = 0llu; I < principal_stress.n_elem; ++I) if(principal_stress(I) > 0.) principal_tensile_stress(I) = principal_stress(I);
+
+    return compute_jacobian_principal_to_nominal(principal_direction) * principal_tensile_stress;
 }
 
 mat transform::eigen_to_tensile_derivative(const vec& principal_stress, const mat& principal_direction) {

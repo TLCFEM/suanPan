@@ -17,12 +17,12 @@
 
 #include "BilinearHoffman.h"
 
-double BilinearHoffman::compute_k(const double p_strain) const { return hardening_ratio >= 0. || p_strain <= -1. / hardening_ratio ? 1. + p_strain * hardening_ratio : 0.; }
+double BilinearHoffman::compute_k(const double p_strain) const { return hardening_modulus >= 0. || p_strain <= -1. / hardening_modulus ? 1. + p_strain * hardening_modulus : 0.; }
 
-double BilinearHoffman::compute_dk(const double p_strain) const { return hardening_ratio >= 0. || p_strain <= -1. / hardening_ratio ? hardening_ratio : 0.; }
+double BilinearHoffman::compute_dk(const double p_strain) const { return hardening_modulus >= 0. || p_strain <= -1. / hardening_modulus ? hardening_modulus : 0.; }
 
 BilinearHoffman::BilinearHoffman(const unsigned T, vec&& E, vec&& V, vec&& S, const double H, const double R)
-    : NonlinearHoffman(T, std::forward<vec>(E), std::forward<vec>(V), std::forward<vec>(S), R)
-    , hardening_ratio(H) {}
+    : DataBilinearHoffman{H}
+    , NonlinearHoffman(T, std::forward<vec>(E), std::forward<vec>(V), std::forward<vec>(S), R) {}
 
 unique_ptr<Material> BilinearHoffman::get_copy() { return make_unique<BilinearHoffman>(*this); }

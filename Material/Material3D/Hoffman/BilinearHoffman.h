@@ -31,9 +31,11 @@
 
 #include "NonlinearHoffman.h"
 
-class BilinearHoffman final : public NonlinearHoffman {
-    const double hardening_ratio;
+struct DataBilinearHoffman {
+    const double hardening_modulus;
+};
 
+class BilinearHoffman : protected DataBilinearHoffman, public NonlinearHoffman {
     [[nodiscard]] double compute_k(double) const override;
     [[nodiscard]] double compute_dk(double) const override;
 
