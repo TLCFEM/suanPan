@@ -35,7 +35,7 @@ struct DataBilinearHoffman {
     const double hardening_modulus;
 };
 
-class BilinearHoffman final : protected DataBilinearHoffman, public NonlinearHoffman {
+class BilinearHoffman : protected DataBilinearHoffman, public NonlinearHoffman {
     [[nodiscard]] double compute_k(double) const override;
     [[nodiscard]] double compute_dk(double) const override;
 

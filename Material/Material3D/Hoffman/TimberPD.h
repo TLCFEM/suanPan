@@ -29,24 +29,14 @@
 #ifndef TIMBERPD_H
 #define TIMBERPD_H
 
-#include <Material/Material3D/Material3D.h>
+#include "BilinearHoffman.h"
 
 struct DataTimberPD {
-    const vec modulus, ratio, yield_stress;
-
-    mat proj_a;
-    vec proj_b;
-
-    mat hill_t, hill_c;
-
-    double h, ini_r_t, n_t, b_t, ini_r_c, m_c, b_c;
+    const double ini_r_t, n_t, b_t, ini_r_c, m_c, b_c;
 };
 
-class TimberPD final : protected DataTimberPD, public Material3D {
-    static const unsigned max_iteration;
-
-    static const uword sa;
-    static const span sb;
+class TimberPD final : protected DataTimberPD, public BilinearHoffman {
+    mat hill_t, hill_c;
 
     [[nodiscard]] double compute_damage_c(double) const;
     [[nodiscard]] double compute_damage_t(double) const;
@@ -67,10 +57,6 @@ public:
     unique_ptr<Material> get_copy() override;
 
     int update_trial_status(const vec&) override;
-
-    int clear_status() override;
-    int commit_status() override;
-    int reset_status() override;
 
     vector<vec> record(OutputType) override;
 

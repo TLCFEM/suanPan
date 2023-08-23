@@ -26,29 +26,8 @@ const span NonlinearHoffman::sb{1, 6};
 NonlinearHoffman::NonlinearHoffman(const unsigned T, vec&& EE, vec&& VV, vec&& SS, const double R)
     : DataNonlinearHoffman{std::forward<vec>(EE), std::forward<vec>(VV), std::forward<vec>(SS)}
     , Material3D(T, R) {
-    // S(0) = \sigma_{11}^t    S(1) = \sigma_{11}^c
-    // S(2) = \sigma_{22}^t    S(3) = \sigma_{22}^c
-    // S(4) = \sigma_{33}^t    S(5) = \sigma_{33}^c
-    // S(6) = \sigma_{12}^0    S(7) = \sigma_{23}^0    S(8) = \sigma_{13}^0
-
-    proj_a.zeros(6, 6);
-    proj_b.zeros(6, 1);
-
-    const auto T1 = 1. / yield_stress(0) / yield_stress(1);
-    const auto T2 = 1. / yield_stress(2) / yield_stress(3);
-    const auto T3 = 1. / yield_stress(4) / yield_stress(5);
-
-    proj_b(0) = (yield_stress(1) - yield_stress(0)) * (proj_a(0, 0) = T1);
-    proj_b(1) = (yield_stress(3) - yield_stress(2)) * (proj_a(1, 1) = T2);
-    proj_b(2) = (yield_stress(5) - yield_stress(4)) * (proj_a(2, 2) = T3);
-
-    proj_a(0, 1) = proj_a(1, 0) = -.5 * (T1 + T2 - T3);
-    proj_a(1, 2) = proj_a(2, 1) = -.5 * (T2 + T3 - T1);
-    proj_a(2, 0) = proj_a(0, 2) = -.5 * (T3 + T1 - T2);
-    proj_a(3, 3) = 1. / yield_stress(6) / yield_stress(6);
-    proj_a(4, 4) = 1. / yield_stress(7) / yield_stress(7);
-    proj_a(5, 5) = 1. / yield_stress(8) / yield_stress(8);
-    proj_a *= 2.;
+    transform::hoffman_projection(yield_stress, proj_a, proj_b);
+    access::rw(tolerance) = 1E-13;
 }
 
 int NonlinearHoffman::initialize(const shared_ptr<DomainBase>&) {
@@ -97,7 +76,7 @@ int NonlinearHoffman::update_trial_status(const vec& t_strain) {
         const auto k = compute_k(eqv_strain = current_eqv_strain + gamma * norm_n);
         const auto f = dot(trial_stress, .5 * factor_a + proj_b) - k * k;
 
-        if(1u == counter && f < tolerance) return SUANPAN_SUCCESS;
+        if(1u == counter && f < 0.) return SUANPAN_SUCCESS;
 
         const rowvec dn = 2. / 3. / norm_n * (n % tensor::strain::norm_weight).t();
         const auto factor_b = 2. * k * compute_dk(eqv_strain);
