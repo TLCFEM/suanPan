@@ -62,7 +62,7 @@ int NonlinearDruckerPrager::update_trial_status(const vec& t_strain) {
 
     auto gamma = 0., denominator = 0.;
 
-    unsigned counter = 0;
+    auto counter = 0u;
     while(++counter < max_iteration) {
         const auto incre_gamma = (yield_const - factor_a * gamma - xi * compute_c(plastic_strain)) / (denominator = factor_a + xi * xi * compute_dc(plastic_strain));
         const auto error = fabs(incre_gamma);

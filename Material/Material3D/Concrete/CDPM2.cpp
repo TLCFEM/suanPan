@@ -393,7 +393,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
 
         compute_plasticity(s, p, kp, data);
 
-        if(1 == counter && f < 0.) break;
+        if(1u == counter && f < 0.) break;
 
         residual(0) = f;
         residual(1) = s + double_shear * gamma * gs - trial_s;

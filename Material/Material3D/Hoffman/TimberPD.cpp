@@ -92,8 +92,7 @@ double TimberPD::update_damage_t(const vec& sigma_t, mat& stiffness_t) {
     const auto omega_t = compute_damage_t(r_t);
     if(new_damage_t) {
         const auto domega_t = ini_r_t / r_t / r_t * ((b_t * n_t * r_t + n_t) * exp(b_t * (ini_r_t - r_t)) - n_t + 1.);
-        const rowvec drdsigma = .5 / r_t * sigma_t.t() * hill_t;
-        stiffness_t = ((1. - omega_t) * eye(6, 6) - sigma_t * domega_t * drdsigma) * stiffness_t;
+        stiffness_t = ((1. - omega_t) * eye(6, 6) - sigma_t * domega_t * .5 / r_t * sigma_t.t() * hill_t) * stiffness_t;
     }
     else stiffness_t *= 1. - omega_t;
 
@@ -112,8 +111,7 @@ double TimberPD::update_damage_c(const vec& sigma_c, mat& stiffness_c) {
     const auto omega_c = compute_damage_c(r_c);
     if(new_damage_c) {
         const auto domega_c = m_c * ini_r_c / r_c * omega_c / (r_c - ini_r_c);
-        const rowvec drdsigma = .5 / r_c * sigma_c.t() * hill_c;
-        stiffness_c = ((1. - omega_c) * eye(6, 6) - sigma_c * domega_c * drdsigma) * stiffness_c;
+        stiffness_c = ((1. - omega_c) * eye(6, 6) - sigma_c * domega_c * .5 / r_c * sigma_c.t() * hill_c) * stiffness_c;
     }
     else stiffness_c *= 1. - omega_c;
 

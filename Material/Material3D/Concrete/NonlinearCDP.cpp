@@ -103,7 +103,6 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
 
     vec residual(3), incre;
     mat jacobian(3, 3, fill::zeros);
-    mat left(3, 6);
 
     podarray<double> t_para, c_para;
 
@@ -203,6 +202,7 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
     const rowvec prpe = drdsigma * trial_stiffness;
 
     // compute local derivatives
+    mat left(3, 6);
     left.row(0) = 3. * alpha * bulk * tensor::unit_tensor2.t() + root_three_two * double_shear * n.t();
     left.row(1) = t_para(1) * lambda * (r / g_t * trans.row(2) * dnde + dgdsigma_t * prpe);
     left.row(2) = c_para(1) * lambda * ((1. - r) / g_c * trans.row(0) * dnde - dgdsigma_c * prpe);

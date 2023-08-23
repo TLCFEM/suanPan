@@ -58,11 +58,9 @@ int NonlinearCamClay::update_trial_status(const vec& t_strain) {
     const auto p = tensor::mean3(trial_stress);
 
     auto gamma = 0., rel_error = 0.;
-    double trial_p, denom;
 
     vec residual(2), incre;
     mat jacobian(2, 2);
-    mat left(6, 2);
 
     unsigned counter = 0;
     while(true) {
@@ -74,13 +72,15 @@ int NonlinearCamClay::update_trial_status(const vec& t_strain) {
         const auto a = compute_a(alpha);
         const auto da = compute_da(alpha);
         const auto incre_alpha = alpha - current_alpha;
-        const auto rel_p = (trial_p = p - bulk * incre_alpha) - pt + a;
+        const auto trial_p = p - bulk * incre_alpha;
+        const auto rel_p = trial_p - pt + a;
         const auto square_b = rel_p >= 0. ? 1. : square_beta;
-        const auto square_qm = pow(m * trial_q / (denom = square_m + six_shear * gamma), 2.);
+        const auto denom = square_m + six_shear * gamma;
+        const auto square_qm = pow(m * trial_q / denom, 2.);
 
         residual(0) = rel_p * rel_p / square_b + square_qm - a * a;
 
-        if(1 == counter && residual(0) < 0.) return SUANPAN_SUCCESS;
+        if(1u == counter && residual(0) < 0.) return SUANPAN_SUCCESS;
 
         residual(1) = incre_alpha - 2. * gamma / square_b * rel_p;
 
@@ -92,25 +92,26 @@ int NonlinearCamClay::update_trial_status(const vec& t_strain) {
         if(!solve(incre, jacobian, residual, solve_opts::equilibrate)) return SUANPAN_FAIL;
 
         auto error = norm(residual);
-        if(1 == counter) rel_error = std::max(1., error);
+        if(1u == counter) rel_error = std::max(1., error);
         suanpan_debug("Local iteration error: {:.5E}.\n", error /= rel_error);
         if(error <= tolerance || norm(incre) <= tolerance) {
+            mat left(6, 2);
+
             rel_error = 2. * bulk / square_b; // reuse variable
             left.col(0) = rel_error * rel_p * tensor::unit_tensor2 + six_shear / denom * (trial_s *= square_m / denom);
             left.col(1) = -rel_error * gamma * tensor::unit_tensor2;
-            break;
+
+            trial_stress = trial_s + trial_p * tensor::unit_tensor2;
+
+            rel_error = six_shear / denom; // reuse variable
+            trial_stiffness -= 2. * shear * gamma * rel_error * unit_dev_tensor - join_rows(rel_error * trial_s, bulk * tensor::unit_tensor2) * solve(jacobian, left.t());
+
+            return SUANPAN_SUCCESS;
         }
 
         gamma -= incre(0);
         alpha -= incre(1);
     }
-
-    trial_stress = trial_s + trial_p * tensor::unit_tensor2;
-
-    rel_error = six_shear / denom; // reuse variable
-    trial_stiffness -= 2. * shear * gamma * rel_error * unit_dev_tensor - join_rows(rel_error * trial_s, bulk * tensor::unit_tensor2) * solve(jacobian, left.t());
-
-    return SUANPAN_SUCCESS;
 }
 
 int NonlinearCamClay::clear_status() {
