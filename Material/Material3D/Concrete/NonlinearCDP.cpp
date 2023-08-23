@@ -111,7 +111,7 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
     double r, beta;
     vec dr;
 
-    unsigned counter = 0;
+    auto counter = 0u;
     while(true) {
         if(max_iteration == ++counter) {
             suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
@@ -131,7 +131,7 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
 
         r = compute_r(new_stress);
 
-        if(1 == counter && residual(0) < 0.) {
+        if(1u == counter && residual(0) < 0.) {
             const auto damage_c = scale * d_c - 1.;
             const auto damage_t = compute_s(r) * scale * d_t - 1.;
             const auto damage = damage_c * damage_t;
@@ -167,7 +167,7 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
         auto error = norm(residual);
-        if(1 == counter) ref_error = std::max(1., error);
+        if(1u == counter) ref_error = std::max(1., error);
         suanpan_debug("Local iteration error: {:.5E}.\n", error /= ref_error);
         if(error <= tolerance || norm(incre) <= tolerance) break;
 

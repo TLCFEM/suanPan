@@ -31,8 +31,8 @@ double NonlinearHoffman::compute_yield_function(const vec& t_stress) const {
     return C1 * T1 + C2 * T2 + C3 * T3 + C4 * S4 * S4 + C5 * S5 * S5 + C6 * S6 * S6 + C7 * S1 + C8 * S2 + C9 * S3;
 }
 
-NonlinearHoffman::NonlinearHoffman(const unsigned T, vec&& EE, vec&& VV, vec&& S, const double R)
-    : DataNonlinearHoffman{std::forward<vec>(EE), std::forward<vec>(VV), {}, {}, {}}
+NonlinearHoffman::NonlinearHoffman(const unsigned T, vec&& EE, vec&& VV, vec&& SS, const double R)
+    : DataNonlinearHoffman{std::forward<vec>(EE), std::forward<vec>(VV), std::forward<vec>(SS)}
     , Material3D(T, R) {
     // S(0) = \sigma_{11}^t    S(1) = \sigma_{11}^c
     // S(2) = \sigma_{22}^t    S(3) = \sigma_{22}^c
@@ -42,20 +42,20 @@ NonlinearHoffman::NonlinearHoffman(const unsigned T, vec&& EE, vec&& VV, vec&& S
     proj_a.zeros(6, 6);
     proj_b.zeros(6, 1);
 
-    const auto T1 = 1. / S(0) / S(1);
-    const auto T2 = 1. / S(2) / S(3);
-    const auto T3 = 1. / S(4) / S(5);
+    const auto T1 = 1. / yield_stress(0) / yield_stress(1);
+    const auto T2 = 1. / yield_stress(2) / yield_stress(3);
+    const auto T3 = 1. / yield_stress(4) / yield_stress(5);
 
-    proj_b(0) = C7 = (S(1) - S(0)) * (proj_a(0, 0) = T1);
-    proj_b(1) = C8 = (S(3) - S(2)) * (proj_a(1, 1) = T2);
-    proj_b(2) = C9 = (S(5) - S(4)) * (proj_a(2, 2) = T3);
+    proj_b(0) = C7 = (yield_stress(1) - yield_stress(0)) * (proj_a(0, 0) = T1);
+    proj_b(1) = C8 = (yield_stress(3) - yield_stress(2)) * (proj_a(1, 1) = T2);
+    proj_b(2) = C9 = (yield_stress(5) - yield_stress(4)) * (proj_a(2, 2) = T3);
 
     proj_a(0, 1) = proj_a(1, 0) = -(C1 = .5 * (T1 + T2 - T3));
     proj_a(1, 2) = proj_a(2, 1) = -(C2 = .5 * (T2 + T3 - T1));
     proj_a(2, 0) = proj_a(0, 2) = -(C3 = .5 * (T3 + T1 - T2));
-    proj_a(3, 3) = C4 = 1. / S(6) / S(6);
-    proj_a(4, 4) = C5 = 1. / S(7) / S(7);
-    proj_a(5, 5) = C6 = 1. / S(8) / S(8);
+    proj_a(3, 3) = C4 = 1. / yield_stress(6) / yield_stress(6);
+    proj_a(4, 4) = C5 = 1. / yield_stress(7) / yield_stress(7);
+    proj_a(5, 5) = C6 = 1. / yield_stress(8) / yield_stress(8);
     proj_a *= 2.;
 }
 
@@ -79,58 +79,49 @@ int NonlinearHoffman::update_trial_status(const vec& t_strain) {
 
     if(norm(incre_strain) <= tolerance) return SUANPAN_SUCCESS;
 
-    trial_stress = current_stress + (trial_stiffness = initial_stiffness) * incre_strain;
-
     trial_history = current_history;
     auto& plastic_strain = trial_history(0);
     const auto& current_plastic_strain = current_history(0);
 
-    auto k = compute_k(plastic_strain);
+    const vec e_strain = incre_strain + solve(initial_stiffness, current_stress);
 
-    auto residual = compute_yield_function(trial_stress) - k * k;
+    auto gamma = 0., ref_error = 1.;
 
-    if(residual <= 0.) return SUANPAN_SUCCESS;
+    auto counter = 0u;
+    while(true) {
+        if(++counter == max_iteration) {
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
+            return SUANPAN_FAIL;
+        }
 
-    const vec e_strain = solve(initial_stiffness, trial_stress);
+        const mat hessian = inv(inv_stiffness + gamma * proj_a);
+        const vec n = proj_a * (trial_stress = hessian * (e_strain - gamma * proj_b)) + proj_b;
+        const auto eta = root_two_third * tensor::strain::norm(n);
+        const auto k = compute_k(plastic_strain = current_plastic_strain + gamma * eta);
+        const auto residual = compute_yield_function(trial_stress) - k * k;
 
-    auto gamma = 0.;
+        if(1u == counter && residual < 0.) {
+            trial_stiffness = initial_stiffness;
+            return SUANPAN_SUCCESS;
+        }
 
-    double factor;
+        const auto dk = compute_dk(plastic_strain);
+        const auto factor = 2. * k * dk * eta;
+        const auto gradient = dot(n, hessian * n) + factor;
 
-    auto hessian = initial_stiffness;
-    auto t_stress = trial_stress;
-    vec n = proj_a * trial_stress + proj_b;
-    auto eta = root_two_third * tensor::strain::norm(n);
-    auto dk = compute_dk(plastic_strain);
-    auto gradient = dot(n, initial_stiffness * n) + (factor = 2. * k * dk * eta);
+        const auto incre = residual / gradient;
 
-    unsigned counter = 0;
-    while(++counter < max_iteration) {
-        const auto incre_gamma = residual / gradient;
-        const auto error = fabs(incre_gamma);
-        suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error <= tolerance || fabs(residual) <= tolerance) break;
-        hessian = inv(inv_stiffness + (gamma += incre_gamma) * proj_a);
-        n = proj_a * (t_stress = hessian * (e_strain - gamma * proj_b)) + proj_b;
-        plastic_strain = current_plastic_strain + gamma * (eta = root_two_third * tensor::strain::norm(n));
-        k = compute_k(plastic_strain);
-        dk = compute_dk(plastic_strain);
-        residual = compute_yield_function(t_stress) - k * k;
-        gradient = dot(n, hessian * n) + (factor = 2. * k * dk * eta);
+        auto error = fabs(residual);
+        if(1u == counter) ref_error = std::max(1., error);
+        suanpan_debug("Local plasticity iteration error: {:.5E}.\n", error /= ref_error);
+        if(error <= tolerance || fabs(incre) <= tolerance) {
+            const rowvec nts = (n.t() - four_third * k * dk * gamma / eta * (n % tensor::strain::norm_weight).t() * proj_a) * hessian;
+            trial_stiffness = hessian * (eye(6, 6) - n * nts / (dot(nts, n) + factor));
+            return SUANPAN_SUCCESS;
+        }
+
+        gamma += incre;
     }
-
-    if(max_iteration == counter) {
-        suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
-        return SUANPAN_FAIL;
-    }
-
-    trial_stress = t_stress;
-
-    const rowvec nts = (n.t() - four_third * k * dk * gamma / eta * (n % tensor::strain::norm_weight).t() * proj_a) * hessian;
-
-    trial_stiffness = hessian * (eye(6, 6) - n * nts / (dot(nts, n) + factor));
-
-    return SUANPAN_SUCCESS;
 }
 
 int NonlinearHoffman::clear_status() {
