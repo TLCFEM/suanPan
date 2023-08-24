@@ -32,7 +32,7 @@
 #include "BilinearHoffman.h"
 
 struct DataTimberPD {
-    const double ini_r_t, n_t, b_t, ini_r_c, m_c, b_c;
+    const double ini_r_t, b_t, m_t, ini_r_c, b_c, m_c;
 };
 
 class TimberPD final : protected DataTimberPD, public BilinearHoffman {

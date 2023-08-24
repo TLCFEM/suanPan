@@ -91,7 +91,7 @@ double TimberPD::update_damage_t(const vec& sigma_t, mat& stiffness_t) {
 
     const auto omega_t = compute_damage_t(r_t);
     if(new_damage_t) {
-        const auto domega_t = ini_r_t / r_t / r_t * ((b_t * n_t * r_t + n_t) * exp(b_t * (ini_r_t - r_t)) - n_t + 1.);
+        const auto domega_t = ini_r_t / r_t / r_t * ((m_t * b_t * r_t + b_t) * exp(m_t * (ini_r_t - r_t)) - b_t + 1.);
         stiffness_t = ((1. - omega_t) * eye(6, 6) - sigma_t * domega_t * .5 / r_t * sigma_t.t() * hill_t) * stiffness_t;
     }
     else stiffness_t *= 1. - omega_t;
@@ -118,7 +118,7 @@ double TimberPD::update_damage_c(const vec& sigma_c, mat& stiffness_c) {
     return omega_c;
 }
 
-double TimberPD::compute_damage_t(const double r_t) const { return 1. - ini_r_t / r_t * (1. - n_t + n_t * exp(b_t * (ini_r_t - r_t))); }
+double TimberPD::compute_damage_t(const double r_t) const { return 1. - ini_r_t / r_t * (1. - b_t + b_t * exp(m_t * (ini_r_t - r_t))); }
 
 double TimberPD::compute_damage_c(const double r_c) const { return b_c * pow(std::max(datum::eps, 1. - ini_r_c / r_c), m_c); }
 
