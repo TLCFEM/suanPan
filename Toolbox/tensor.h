@@ -119,6 +119,7 @@ namespace tensor {
 
 namespace transform {
     void hoffman_projection(const vec&, mat&, mat&);
+    mat hill_projection(double, double, double, double, double, double);
 
     double atan2(const vec&);
     mat compute_jacobian_nominal_to_principal(const mat&);

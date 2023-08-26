@@ -485,6 +485,27 @@ void transform::hoffman_projection(const vec& yield_stress, mat& proj_a, mat& pr
     proj_a *= 2.;
 }
 
+mat transform::hill_projection(const double S1, const double S2, const double S3, const double S4, const double S5, const double S6) {
+    mat hill(6, 6, fill::zeros);
+
+    const auto F1 = 2. / S1 / S1;
+    const auto F2 = 2. / S2 / S2;
+    const auto F3 = 2. / S3 / S3;
+
+    hill(0, 0) = F1;
+    hill(1, 1) = F2;
+    hill(2, 2) = F3;
+
+    hill(0, 1) = hill(1, 0) = -.5 * (F1 + F2 - F3);
+    hill(1, 2) = hill(2, 1) = -.5 * (F2 + F3 - F1);
+    hill(2, 0) = hill(0, 2) = -.5 * (F3 + F1 - F2);
+    hill(3, 3) = 2. / S4 / S4;
+    hill(4, 4) = 2. / S5 / S5;
+    hill(5, 5) = 2. / S6 / S6;
+
+    return hill;
+}
+
 double transform::atan2(const vec& direction_cosine) { return std::atan2(direction_cosine(1), direction_cosine(0)); }
 
 mat transform::compute_jacobian_nominal_to_principal(const mat& in) {

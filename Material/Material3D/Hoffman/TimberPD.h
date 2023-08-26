@@ -36,7 +36,7 @@ struct DataTimberPD {
 };
 
 class TimberPD final : protected DataTimberPD, public BilinearHoffman {
-    mat hill_t, hill_c;
+    const mat hill_t, hill_c;
 
     [[nodiscard]] double compute_damage_c(double) const;
     [[nodiscard]] double compute_damage_t(double) const;

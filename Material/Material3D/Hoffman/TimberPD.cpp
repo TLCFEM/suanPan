@@ -21,29 +21,9 @@
 
 TimberPD::TimberPD(const unsigned T, vec&& EE, vec&& VV, vec&& SS, vec&& HH, const double R)
     : DataTimberPD{HH(1), HH(2), HH(3), HH(4), HH(5), HH(6)}
-    , BilinearHoffman(T, std::forward<vec>(EE), std::forward<vec>(VV), std::forward<vec>(SS), HH(0), R) {
-    const auto fill_hill = [&](mat& hill, const double S1, const double S2, const double S3) {
-        hill.zeros(6, 6);
-
-        const auto F1 = 2. / S1 / S1;
-        const auto F2 = 2. / S2 / S2;
-        const auto F3 = 2. / S3 / S3;
-
-        hill(0, 0) = F1;
-        hill(1, 1) = F2;
-        hill(2, 2) = F3;
-
-        hill(0, 1) = hill(1, 0) = -.5 * (F1 + F2 - F3);
-        hill(1, 2) = hill(2, 1) = -.5 * (F2 + F3 - F1);
-        hill(2, 0) = hill(0, 2) = -.5 * (F3 + F1 - F2);
-        hill(3, 3) = 2. / yield_stress(6) / yield_stress(6);
-        hill(4, 4) = 2. / yield_stress(7) / yield_stress(7);
-        hill(5, 5) = 2. / yield_stress(8) / yield_stress(8);
-    };
-
-    fill_hill(hill_t, yield_stress(0), yield_stress(2), yield_stress(4));
-    fill_hill(hill_c, yield_stress(1), yield_stress(3), yield_stress(5));
-}
+    , BilinearHoffman(T, std::forward<vec>(EE), std::forward<vec>(VV), std::forward<vec>(SS), HH(0), R)
+    , hill_t(transform::hill_projection(yield_stress(0), yield_stress(2), yield_stress(4), yield_stress(6), yield_stress(7), yield_stress(8)))
+    , hill_c(transform::hill_projection(yield_stress(1), yield_stress(3), yield_stress(5), yield_stress(6), yield_stress(7), yield_stress(8))) {}
 
 int TimberPD::initialize(const shared_ptr<DomainBase>&) {
     initial_history.resize(9);
