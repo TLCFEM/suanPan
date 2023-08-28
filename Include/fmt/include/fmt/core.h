@@ -18,7 +18,7 @@
 #include <type_traits>
 
 // The fmt library version in the form major * 10000 + minor * 100 + patch.
-#define FMT_VERSION 100100
+#define FMT_VERSION 100101
 
 #if defined(__clang__) && !defined(__ibmxl__)
 #  define FMT_CLANG_VERSION (__clang_major__ * 100 + __clang_minor__)
@@ -1420,9 +1420,8 @@ template <typename Context> struct arg_mapper {
       FMT_ENABLE_IF(
           std::is_pointer<T>::value || std::is_member_pointer<T>::value ||
           std::is_function<typename std::remove_pointer<T>::type>::value ||
-          (std::is_convertible<const T&, const void*>::value &&
-           !std::is_convertible<const T&, const char_type*>::value &&
-           !has_formatter<T, Context>::value))>
+          (std::is_array<T>::value &&
+           !std::is_convertible<T, const char_type*>::value))>
   FMT_CONSTEXPR auto map(const T&) -> unformattable_pointer {
     return {};
   }
@@ -1662,7 +1661,6 @@ template <typename Context> class basic_format_arg {
   \endrst
  */
 // DEPRECATED!
-FMT_EXPORT
 template <typename Visitor, typename Context>
 FMT_CONSTEXPR FMT_INLINE auto visit_format_arg(
     Visitor&& vis, const basic_format_arg<Context>& arg) -> decltype(vis(0)) {

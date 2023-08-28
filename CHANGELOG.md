@@ -9,7 +9,7 @@
 ## version 3.1
 
 1. iterative solvers by the Lis library [#145](https://github.com/TLCFEM/suanPan/pull/145)
-2. update `Armadillo` to version `12.6.2` [#149](https://github.com/TLCFEM/suanPan/pull/149)
+2. update `Armadillo` to version `12.6.3` [#149](https://github.com/TLCFEM/suanPan/pull/149)
 3. add `TimberPD` 3D material for timber [#151](https://github.com/TLCFEM/suanPan/pull/151)
 
 ## version 3.0
@@ -36,7 +36,7 @@
 
 ## version 2.8
 
-1. better on screen display with the fmt library [#99](https://github.com/TLCFEM/suanPan/pull/99)
+1. better on screen display with the `fmt` library [#99](https://github.com/TLCFEM/suanPan/pull/99)
 2. add command `overview`
 3. update `OpenBLAS` to version `0.3.21`
 4. add Euler buckling load check for `T2D2` [#104](https://github.com/TLCFEM/suanPan/pull/104)
