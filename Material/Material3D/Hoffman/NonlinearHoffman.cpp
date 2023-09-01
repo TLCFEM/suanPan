@@ -57,6 +57,7 @@ int NonlinearHoffman::update_trial_status(const vec& t_strain) {
 
     const vec predictor = (trial_stiffness = initial_stiffness) * (trial_strain - plastic_strain);
     trial_stress = predictor;
+    const vec c_stress = .5 * proj_a * initial_stiffness * (current_strain - plastic_strain);
 
     auto gamma = 0., ref_error = 1.;
 
@@ -71,23 +72,24 @@ int NonlinearHoffman::update_trial_status(const vec& t_strain) {
         }
 
         const vec factor_a = proj_a * trial_stress;
-        const vec n = factor_a + proj_b;
-        const auto norm_n = root_two_third * tensor::strain::norm(n);
-        const auto k = compute_k(eqv_strain = current_eqv_strain + gamma * norm_n);
-        const auto f = dot(trial_stress, .5 * factor_a + proj_b) - k * k;
+        const vec factor_b = .5 * factor_a + proj_b;
+        const vec n_mid = c_stress + factor_b;
+        const auto norm_n_mid = root_two_third * tensor::strain::norm(n_mid);
+        const auto k = compute_k(eqv_strain = current_eqv_strain + gamma * norm_n_mid);
+        const auto f = dot(trial_stress, factor_b) - k * k;
 
         if(1u == counter && f < 0.) return SUANPAN_SUCCESS;
 
-        const rowvec dn = 2. / 3. / norm_n * (n % tensor::strain::norm_weight).t();
-        const auto factor_b = 2. * k * compute_dk(eqv_strain);
+        const rowvec dn = two_third / norm_n_mid * (n_mid % tensor::strain::norm_weight).t();
+        const auto factor_c = k * compute_dk(eqv_strain);
 
         residual(sa) = f;
-        residual(sb) = trial_stress + gamma * initial_stiffness * n - predictor;
+        residual(sb) = trial_stress + gamma * initial_stiffness * n_mid - predictor;
 
-        jacobian(sa, sa) = -factor_b * norm_n;
-        jacobian(sa, sb) = n.t() - factor_b * gamma * dn * proj_a;
-        jacobian(sb, sa) = initial_stiffness * n;
-        jacobian(sb, sb) = eye(6, 6) + gamma * elastic_a;
+        jacobian(sa, sa) = -2. * factor_c * norm_n_mid;
+        jacobian(sa, sb) = factor_a.t() + proj_b.t() - factor_c * gamma * dn * proj_a;
+        jacobian(sb, sa) = initial_stiffness * n_mid;
+        jacobian(sb, sb) = eye(6, 6) + .5 * gamma * elastic_a;
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
@@ -96,7 +98,7 @@ int NonlinearHoffman::update_trial_status(const vec& t_strain) {
         suanpan_debug("Local plasticity iteration error: {:.5E}.\n", error / ref_error);
 
         if(error <= tolerance * std::max(1., ref_error)) {
-            plastic_strain += gamma * n;
+            plastic_strain += gamma * n_mid;
 
             mat left, right(7, 6, fill::zeros);
             right.rows(sb) = initial_stiffness;
