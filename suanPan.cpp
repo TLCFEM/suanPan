@@ -17,9 +17,16 @@
 
 #include <Toolbox/argument.h>
 #include <suanPan.h>
+#include <lis/lislib.h>
 
 #ifdef SUANPAN_WIN
 #include <Windows.h>
+#endif
+
+#ifdef SUANPAN_MKL
+extern "C" void mkl_free_buffers();
+#else
+void mkl_free_buffers() {}
 #endif
 
 // ReSharper disable once CppParameterMayBeConst
@@ -32,6 +39,8 @@ int main(int argc, char** argv) {
     SetConsoleOutputCP(CP_UTF8);
 #endif
 
+    lis_initialize(nullptr, nullptr);
+
 #ifdef SUANPAN_DEBUG
     argument_parser(argc, argv);
 #else
@@ -39,5 +48,7 @@ int main(int argc, char** argv) {
     catch(const std::exception& e) { suanpan_fatal("Some unexpected error happens: {}, please file a bug report via https://github.com/TLCFEM/suanPan/issues.\n", e.what()); }
 #endif
 
-    return SUANPAN_SUCCESS;
+    lis_finalize();
+
+    return std::atexit(mkl_free_buffers);
 }

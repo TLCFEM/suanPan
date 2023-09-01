@@ -144,6 +144,8 @@ void Step::set_tolerance(const double T) { setting.tolerance = T; }
 
 void Step::set_refinement(const unsigned T) { setting.iterative_refinement = T; }
 
+void Step::set_lis_option(const std::string_view T) { setting.lis_options = T; }
+
 double Step::get_ini_step_size() const { return ini_step_size; }
 
 double Step::get_min_step_size() const { return min_step_size; }

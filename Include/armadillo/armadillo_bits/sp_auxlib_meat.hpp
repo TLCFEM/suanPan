@@ -73,7 +73,7 @@ sp_auxlib::eigs_sym(Col<eT>& eigval, Mat<eT>& eigvec, const SpBase<eT, T1>& X, c
     if(is_cx<eT>::yes)  { arma_debug_warn_level(1, "eigs_sym(): given matrix is not hermitian"); }
     }
   
-  if(arma_config::check_nonfinite && U.M.has_nonfinite())
+  if(arma_config::check_nonfinite && U.M.internal_has_nonfinite())
     {
     arma_debug_warn_level(3, "eigs_sym(): detected non-finite elements");
     return false;
@@ -126,7 +126,7 @@ sp_auxlib::eigs_sym(Col<eT>& eigval, Mat<eT>& eigvec, const SpBase<eT, T1>& X, c
     if(is_cx<eT>::yes)  { arma_debug_warn_level(1, "eigs_sym(): given matrix is not hermitian"); }
     }
   
-  if(arma_config::check_nonfinite && U.M.has_nonfinite())
+  if(arma_config::check_nonfinite && U.M.internal_has_nonfinite())
     {
     arma_debug_warn_level(3, "eigs_sym(): detected non-finite elements");
     return false;
@@ -479,7 +479,9 @@ sp_auxlib::eigs_sym_arpack(Col<eT>& eigval, Mat<eT>& eigvec, const SpMat<eT>& X,
       }
     else
       {
-      run_aupd_plain(n_eigvals, which, X, true /* sym, not gen */, n, tol, maxiter, resid, ncv, v, ldv, iparam, ipntr, workd, workl, lworkl, rwork, info);
+      const SpMat<eT> Xst = X.st();
+      
+      run_aupd_plain(n_eigvals, which, X, Xst, true /* sym, not gen */, n, tol, maxiter, resid, ncv, v, ldv, iparam, ipntr, workd, workl, lworkl, rwork, info);
       }
     
     if(info != 0)  { return false; }
@@ -534,7 +536,7 @@ sp_auxlib::eigs_gen(Col< std::complex<T> >& eigval, Mat< std::complex<T> >& eigv
   
   arma_debug_check( (U.M.is_square() == false), "eigs_gen(): given matrix must be square sized" );
   
-  if(arma_config::check_nonfinite && U.M.has_nonfinite())
+  if(arma_config::check_nonfinite && U.M.internal_has_nonfinite())
     {
     arma_debug_warn_level(3, "eigs_gen(): detected non-finite elements");
     return false;
@@ -581,7 +583,7 @@ sp_auxlib::eigs_gen(Col< std::complex<T> >& eigval, Mat< std::complex<T> >& eigv
   
   arma_debug_check( (U.M.is_square() == false), "eigs_gen(): given matrix must be square sized" );
   
-  if(arma_config::check_nonfinite && U.M.has_nonfinite())
+  if(arma_config::check_nonfinite && U.M.internal_has_nonfinite())
     {
     arma_debug_warn_level(3, "eigs_gen(): detected non-finite elements");
     return false;
@@ -863,7 +865,9 @@ sp_auxlib::eigs_gen_arpack(Col< std::complex<T> >& eigval, Mat< std::complex<T> 
       }
     else
       {
-      run_aupd_plain(n_eigvals, which, X, false /* gen, not sym */, n, tol, maxiter, resid, ncv, v, ldv, iparam, ipntr, workd, workl, lworkl, rwork, info);
+      const SpMat<T> Xst = X.st();
+      
+      run_aupd_plain(n_eigvals, which, X, Xst, false /* gen, not sym */, n, tol, maxiter, resid, ncv, v, ldv, iparam, ipntr, workd, workl, lworkl, rwork, info);
       }
     
     if(info != 0)  { return false; }
@@ -961,7 +965,7 @@ sp_auxlib::eigs_gen(Col< std::complex<T> >& eigval, Mat< std::complex<T> >& eigv
   
   arma_debug_check( (U.M.is_square() == false), "eigs_gen(): given matrix must be square sized" );
   
-  if(arma_config::check_nonfinite && U.M.has_nonfinite())
+  if(arma_config::check_nonfinite && U.M.internal_has_nonfinite())
     {
     arma_debug_warn_level(3, "eigs_gen(): detected non-finite elements");
     return false;
@@ -986,7 +990,7 @@ sp_auxlib::eigs_gen(Col< std::complex<T> >& eigval, Mat< std::complex<T> >& eigv
   
   arma_debug_check( (U.M.is_square() == false), "eigs_gen(): given matrix must be square sized" );
   
-  if(arma_config::check_nonfinite && U.M.has_nonfinite())
+  if(arma_config::check_nonfinite && U.M.internal_has_nonfinite())
     {
     arma_debug_warn_level(3, "eigs_gen(): detected non-finite elements");
     return false;
@@ -1105,7 +1109,9 @@ sp_auxlib::eigs_gen(Col< std::complex<T> >& eigval, Mat< std::complex<T> >& eigv
       }
     else
       {
-      run_aupd_plain(n_eigvals, which, X, false /* gen, not sym */, n, tol, maxiter, resid, ncv, v, ldv, iparam, ipntr, workd, workl, lworkl, rwork, info);
+      const SpMat< std::complex<T> > Xst = X.st();
+      
+      run_aupd_plain(n_eigvals, which, X, Xst, false /* gen, not sym */, n, tol, maxiter, resid, ncv, v, ldv, iparam, ipntr, workd, workl, lworkl, rwork, info);
       }
     
     if(info != 0)  { return false; }
@@ -1190,7 +1196,7 @@ sp_auxlib::spsolve_simple(Mat<typename T1::elem_type>& X, const SpBase<typename 
     
     if(A.n_nonzero == uword(0))  { X.soft_reset(); return false; }
     
-    if(arma_config::check_nonfinite && (A.has_nonfinite() || X.has_nonfinite()))
+    if(arma_config::check_nonfinite && (A.internal_has_nonfinite() || X.internal_has_nonfinite()))
       {
       arma_debug_warn_level(3, "spsolve(): detected non-finite elements");
       return false;
@@ -1315,7 +1321,7 @@ sp_auxlib::spsolve_refine(Mat<typename T1::elem_type>& X, typename T1::pod_type&
     
     if(A.n_nonzero == uword(0))  { X.soft_reset(); return false; }
     
-    if(arma_config::check_nonfinite && (A.has_nonfinite() || X.has_nonfinite()))
+    if(arma_config::check_nonfinite && (A.internal_has_nonfinite() || B.internal_has_nonfinite()))
       {
       arma_debug_warn_level(3, "spsolve(): detected non-finite elements");
       return false;
@@ -1636,10 +1642,10 @@ sp_auxlib::spsolve_refine(Mat<typename T1::elem_type>& X, typename T1::pod_type&
     
     const uword out_n_nonzero = A.n_nonzero - n_nonzero_diag_old + n_nonzero_diag_new;
     
-    arma_extra_debug_print( arma_str::format("A.n_nonzero:        %d") % A.n_nonzero        );
-    arma_extra_debug_print( arma_str::format("n_nonzero_diag_old: %d") % n_nonzero_diag_old );
-    arma_extra_debug_print( arma_str::format("n_nonzero_diag_new: %d") % n_nonzero_diag_new );
-    arma_extra_debug_print( arma_str::format("out_n_nonzero:      %d") % out_n_nonzero      );
+    arma_extra_debug_print( arma_str::format("A.n_nonzero:        %u") % A.n_nonzero        );
+    arma_extra_debug_print( arma_str::format("n_nonzero_diag_old: %u") % n_nonzero_diag_old );
+    arma_extra_debug_print( arma_str::format("n_nonzero_diag_new: %u") % n_nonzero_diag_new );
+    arma_extra_debug_print( arma_str::format("out_n_nonzero:      %u") % out_n_nonzero      );
     
     nc->nnz    = out_n_nonzero;
     nc->nzval  = (void*)          superlu::malloc(sizeof(eT)             * out_n_nonzero );
@@ -1731,7 +1737,7 @@ sp_auxlib::spsolve_refine(Mat<typename T1::elem_type>& X, typename T1::pod_type&
       nc->colptr[j + 1] = superlu::int_t(nc->colptr[j] + nnz_col);
       }
     
-    arma_extra_debug_print( arma_str::format("count: %d") % count );
+    arma_extra_debug_print( arma_str::format("count: %u") % count );
     
     arma_check( (count != out_n_nonzero), "internal error: sp_auxlib::copy_to_supermatrix_with_shift(): count != out_n_nonzero" );
     
@@ -1893,7 +1899,7 @@ void
 sp_auxlib::run_aupd_plain
   (
   const uword n_eigvals, char* which, 
-  const SpMat<T>& X, const bool sym,
+  const SpMat<T>& X, const SpMat<T>& Xst, const bool sym,
   blas_int& n, eT& tol, blas_int& maxiter,
   podarray<T>& resid, blas_int& ncv, podarray<T>& v, blas_int& ldv,
   podarray<blas_int>& iparam, podarray<blas_int>& ipntr,
@@ -1978,30 +1984,46 @@ sp_auxlib::run_aupd_plain
           // where x is of length n and starts at workd(ipntr(0)), and y is of
           // length n and starts at workd(ipntr(1)).
           
-          // operator*(sp_mat, vec) doesn't properly put the result into the
-          // right place so we'll just reimplement it here for now...
+          // // OLD METHOD
+          // 
+          // // operator*(sp_mat, vec) doesn't properly put the result into the
+          // // right place so we'll just reimplement it here for now...
+          // 
+          // // Set the output to point at the right memory.  We have to subtract
+          // // one from FORTRAN pointers...
+          // Col<T> out(workd.memptr() + ipntr(1) - 1, n, false /* don't copy */);
+          // // Set the input to point at the right memory.
+          // Col<T>  in(workd.memptr() + ipntr(0) - 1, n, false /* don't copy */);
+          // 
+          // out.zeros();
+          // 
+          //       T* out_mem = out.memptr();
+          // const T*  in_mem =  in.memptr();
+          // 
+          // typename SpMat<T>::const_iterator X_it = X.begin();
+          // 
+          // const uword X_nnz = X.n_nonzero;
+          // 
+          // for(uword count=0; count < X_nnz; ++count, ++X_it)
+          //   {
+          //   const eT    X_it_val = (*X_it);
+          //   const uword X_it_row = X_it.row();
+          //   const uword X_it_col = X_it.col();
+          //   
+          //   out_mem[X_it_row] += X_it_val * in_mem[X_it_col];
+          //   }
+          // 
+          // // No need to modify memory further since it was all done in-place.
           
-          // Set the output to point at the right memory.  We have to subtract
-          // one from FORTRAN pointers...
-          Col<T> out(workd.memptr() + ipntr(1) - 1, n, false /* don't copy */);
-          // Set the input to point at the right memory.
-          Col<T> in(workd.memptr() + ipntr(0) - 1, n, false /* don't copy */);
           
-          out.zeros();
+          // NEW METHOD
+          // 
+          // both operator*(rowvec, sp_mat) and operator*(sp_mat, colvec) can now write to an existing object
           
-          typename SpMat<T>::const_iterator X_it     = X.begin();
-          typename SpMat<T>::const_iterator X_it_end = X.end();
+          Row<T> out(workd.memptr() + ipntr(1) - 1, n, false, true);
+          Row<T>  in(workd.memptr() + ipntr(0) - 1, n, false, true);
           
-          while(X_it != X_it_end)
-            {
-            const uword X_it_row = X_it.row();
-            const uword X_it_col = X_it.col();
-            
-            out[X_it_row] += (*X_it) * in[X_it_col];
-            ++X_it;
-            }
-          
-          // No need to modify memory further since it was all done in-place.
+          out = in * Xst;
           
           break;
           }
@@ -2233,9 +2255,6 @@ sp_auxlib::run_aupd_shiftinvert
           // We need to calculate the matrix-vector multiplication y = OP * x
           // where x is of length n and starts at workd(ipntr(0)), and y is of
           // length n and starts at workd(ipntr(1)).
-          
-          // operator*(sp_mat, vec) doesn't properly put the result into the
-          // right place so we'll just reimplement it here for now...
           
           // Set the output to point at the right memory.  We have to subtract
           // one from FORTRAN pointers...

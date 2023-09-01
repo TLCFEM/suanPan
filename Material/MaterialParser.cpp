@@ -1330,6 +1330,48 @@ void new_tanh1d(unique_ptr<Material>& return_obj, istringstream& command) {
     return_obj = make_unique<Tanh1D>(tag, elastic_modulus, density);
 }
 
+void new_timberpd(unique_ptr<Material>& return_obj, istringstream& command) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    vec modulus(6);
+    if(!get_input(command, modulus)) {
+        suanpan_error("A valid modulus is required.\n");
+        return;
+    }
+
+    vec poissons_ratio(3);
+    if(!get_input(command, poissons_ratio)) {
+        suanpan_error("A valid poisson's ratio is required.\n");
+        return;
+    }
+
+    vec stress(9);
+    if(!get_input(command, stress)) {
+        suanpan_error("A valid yield stress is required.\n");
+        return;
+    }
+
+    vec para(7);
+    if(!get_input(command, para)) {
+        suanpan_error("A valid hardening parameter is required.\n");
+        return;
+    }
+
+    auto density = 0.;
+    if(command.eof())
+        suanpan_debug("Zero density assumed.\n");
+    else if(!get_input(command, density)) {
+        suanpan_error("A valid density is required.\n");
+        return;
+    }
+
+    return_obj = make_unique<TimberPD>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), std::move(para), density);
+}
+
 void new_asymmelastic1d(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -3400,6 +3442,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "TableCDP")) new_tablecdp(new_material, command);
     else if(is_equal(material_id, "TableGurson")) new_tablegurson(new_material, command);
     else if(is_equal(material_id, "Tanh1D")) new_tanh1d(new_material, command);
+    else if(is_equal(material_id, "TimberPD")) new_timberpd(new_material, command);
     else if(is_equal(material_id, "TrilinearDegradation")) new_trilineardegradation(new_material, command);
     else if(is_equal(material_id, "Trivial")) new_trivial(new_material, command);
     else if(is_equal(material_id, "Uniaxial")) new_uniaxial(new_material, command);

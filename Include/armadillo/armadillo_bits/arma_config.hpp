@@ -223,6 +223,27 @@ struct arma_config
   #endif
   
   
+  #if defined(ARMA_FAST_MATH)
+    static constexpr bool fast_math = true;
+  #else
+    static constexpr bool fast_math = false;
+  #endif
+  
+  
+  #if defined(ARMA_FAST_MATH) && !defined(ARMA_DONT_PRINT_FAST_MATH_WARNING)
+    static constexpr bool fast_math_warn = true;
+  #else
+    static constexpr bool fast_math_warn = false;
+  #endif
+  
+  
+  #if (!defined(ARMA_DONT_TREAT_TEXT_AS_BINARY))
+    static constexpr bool text_as_binary = true;
+  #else
+    static constexpr bool text_as_binary = false;
+  #endif
+  
+  
   static constexpr uword warn_level = (sword(ARMA_WARN_LEVEL) > 0) ? uword(ARMA_WARN_LEVEL) : 0;
   };
 

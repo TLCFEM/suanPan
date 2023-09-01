@@ -28,9 +28,3 @@ NM3D3::NM3D3(const unsigned T, const double EEA, const double EEIS, const double
     , VAFNM(T, EEA, EEIS, EEIW, HH, HS, HD, std::forward<vec>(KK), std::forward<vec>(KB), LD, vec{NP, MSP, MWP}) {}
 
 unique_ptr<Section> NM3D3::get_copy() { return make_unique<NM3D3>(*this); }
-
-void NM3D3::print() {
-    suanpan_info("A N-M based section. doi: 10.1007/978-94-007-6573-3_3\n");
-    suanpan_info("Local Deformation:\t", vec{current_deformation.head(5)});
-    suanpan_info("Local Resistance:\t", vec{current_resistance.head(5)});
-}

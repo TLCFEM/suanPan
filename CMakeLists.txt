@@ -9,7 +9,9 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CMAKE_GNUtoMS ON)
+if (CMAKE_GNUtoMS_VCVARS)
+    set(CMAKE_GNUtoMS ON)
+endif ()
 
 include(CheckLanguage)
 check_language(Fortran)
@@ -37,19 +39,23 @@ include(${ROOT}/Option.cmake)
 link_directories(${PROJECT_BINARY_DIR}/Libs)
 
 add_executable(${PROJECT_NAME}
-        "suanPan.cpp"
-        "Include/fmt/src/format.cc"
-        "Include/whereami/whereami.c"
-        "Include/catch/catch_amalgamated.cpp"
-        "Constraint/CMakeLists.txt"
-        "Database/CMakeLists.txt"
-        "Domain/CMakeLists.txt"
-        "Load/CMakeLists.txt"
-        "Recorder/CMakeLists.txt"
-        "Step/CMakeLists.txt"
-        "Toolbox/CMakeLists.txt"
-        "UnitTest/CMakeLists.txt"
-        )
+        suanPan.cpp
+        Include/fmt/src/format.cc
+        Include/whereami/whereami.c
+        Include/catch/catch_amalgamated.cpp
+        Constraint/CMakeLists.txt
+        Database/CMakeLists.txt
+        Domain/CMakeLists.txt
+        Load/CMakeLists.txt
+        Recorder/CMakeLists.txt
+        Step/CMakeLists.txt
+        Toolbox/CMakeLists.txt
+        UnitTest/CMakeLists.txt
+)
+
+if (COMPILER_IDENTIFIER MATCHES "vs")
+    target_link_options(${PROJECT_NAME} PRIVATE /NODEFAULTLIB:LIBCMT)
+endif ()
 
 if (MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE "/bigobj")
@@ -80,16 +86,16 @@ add_subdirectory(UnitTest)
 target_link_libraries(${PROJECT_NAME} Element Material Section Solver)
 
 if (FORTRAN_STATUS)
+    message(STATUS "Linking additional amd arpack mumps feast libraries.")
     add_subdirectory(Toolbox/amd-src)
     add_subdirectory(Toolbox/arpack-src)
     add_subdirectory(Toolbox/feast-src)
     add_subdirectory(Toolbox/mumps-src)
     add_subdirectory(Toolbox/fext)
     target_link_libraries(${PROJECT_NAME} fext)
-    message("Linking additional amd arpack mumps feast")
 elseif (COMPILER_IDENTIFIER MATCHES "vs")
     target_link_libraries(${PROJECT_NAME} libfext)
-    message("Linking precompiled fext (packed with amd arpack mumps feast)")
+    message(STATUS "Linking precompiled fext (packed with amd arpack mumps feast) library.")
 else ()
     message(FATAL_ERROR "Please install a valid FORTRAN compiler.")
 endif ()
@@ -102,28 +108,61 @@ else ()
     target_link_libraries(${PROJECT_NAME} superlu)
 endif ()
 
+add_subdirectory(Toolbox/lis-src)
 add_subdirectory(Toolbox/metis-src)
-target_link_libraries(${PROJECT_NAME} metis)
+target_link_libraries(${PROJECT_NAME} lis metis)
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY ENABLE_EXPORTS 1)
+
+if (USE_MPI)
+    if (NOT COMPILER_IDENTIFIER MATCHES "(linux|mac)") # windows only support intel mpi
+        set(MPI_LIBS impi impicxx)
+    elseif (USE_INTEL_MPI)
+        set(MPI_LIBS mpi mpifort)
+    else ()
+        set(MPI_LIBS mpi mpi_cxx mpi_mpifh)
+    endif ()
+    add_subdirectory(MPI)
+    target_link_libraries(${PROJECT_NAME} ${MPI_LIBS})
+endif ()
 
 if (COMPILER_IDENTIFIER MATCHES "(linux|mac)")
     if (USE_MKL)
         if (LINK_DYNAMIC_MKL)
+            set(OMP_IMP "gomp")
             if (USE_INTEL_OPENMP)
-                target_link_libraries(${PROJECT_NAME} mkl_intel_lp64 mkl_intel_thread mkl_core iomp5 m)
-            else ()
-                target_link_libraries(${PROJECT_NAME} mkl_intel_lp64 mkl_gnu_thread mkl_core gomp m)
+                set(OMP_IMP "iomp5")
+            endif ()
+            target_link_libraries(${PROJECT_NAME} mkl_intel_lp64 mkl_intel_thread mkl_core ${OMP_IMP} m)
+            if (USE_MPI)
+                set(MKL_MPI_NAME mkl_blacs_intelmpi_lp64)
+                if (NOT USE_INTEL_MPI)
+                    set(MKL_MPI_NAME mkl_blacs_openmpi_lp64)
+                endif ()
+                list(APPEND MKL_MPI_NAME mkl_scalapack_lp64)
+                target_link_libraries(solver.pardiso mkl_intel_lp64 mkl_intel_thread mkl_core ${MKL_MPI_NAME} ${OMP_IMP} m)
+                target_link_libraries(tester.pardiso mkl_intel_lp64 mkl_intel_thread mkl_core ${MKL_MPI_NAME} ${OMP_IMP} m)
             endif ()
         else ()
             # cyclic dependency
-            set(MKL_CYC "")
             if (USE_INTEL_OPENMP)
                 set(MKL_CYC libmkl_intel_lp64.a libmkl_intel_thread.a libmkl_core.a iomp5)
             else ()
                 set(MKL_CYC libmkl_intel_lp64.a libmkl_gnu_thread.a libmkl_core.a gomp)
             endif ()
-            target_link_libraries(${PROJECT_NAME} ${MKL_CYC} ${MKL_CYC} ${MKL_CYC} m)
+            if (USE_MPI)
+                if (USE_INTEL_MPI)
+                    list(APPEND MKL_CYC libmkl_blacs_intelmpi_lp64.a)
+                else ()
+                    list(APPEND MKL_CYC libmkl_blacs_openmpi_lp64.a)
+                endif ()
+                list(APPEND MKL_CYC libmkl_scalapack_lp64.a)
+                target_link_libraries(solver.pardiso ${MKL_CYC} ${MKL_CYC} ${MKL_CYC} ${MKL_CYC} m)
+                target_link_libraries(tester.pardiso ${MKL_CYC} ${MKL_CYC} ${MKL_CYC} ${MKL_CYC} m)
+                target_link_libraries(${PROJECT_NAME} ${MKL_CYC} ${MKL_CYC} ${MKL_CYC} ${MKL_CYC} m)
+            else ()
+                target_link_libraries(${PROJECT_NAME} ${MKL_CYC} ${MKL_CYC} ${MKL_CYC} m)
+            endif ()
         endif ()
     else ()
         target_link_libraries(${PROJECT_NAME} openblas)
@@ -143,7 +182,17 @@ elseif (COMPILER_IDENTIFIER MATCHES "vs")
         if (BUILD_SHARED)
             set(DSUFIX "_dll")
         endif ()
-        target_link_libraries(${PROJECT_NAME} mkl_intel_lp64${DSUFIX} mkl_tbb_thread${DSUFIX} mkl_core${DSUFIX} libiomp5md libifcore svml_disp)
+        set(MKL_LIBS mkl_intel_lp64${DSUFIX} mkl_tbb_thread${DSUFIX} mkl_core${DSUFIX} libiomp5md libifcore svml_disp)
+        target_link_libraries(${PROJECT_NAME} ${MKL_LIBS})
+        if (USE_MPI)
+            if (USE_INTEL_MPI)
+                list(APPEND MKL_LIBS mkl_blacs_intelmpi_lp64)
+            else ()
+                list(APPEND MKL_LIBS mkl_blacs_openmpi_lp64)
+            endif ()
+            target_link_libraries(solver.pardiso ${MKL_LIBS})
+            target_link_libraries(tester.pardiso ${MKL_LIBS})
+        endif ()
     else ()
         target_link_libraries(${PROJECT_NAME} libopenblas)
     endif ()
@@ -222,7 +271,7 @@ if (COMPILER_IDENTIFIER MATCHES "(linux|mac)")
                 ${ONEAPI_LIB}/libintlc${DECOR}*${SUFFIX}
                 ${ONEAPI_LIB}/libiomp5${DECOR}*${SUFFIX}
                 ${ONEAPI_LIB}/libsvml${DECOR}*${SUFFIX}
-                )
+        )
         install(PROGRAMS ${ONEAPI_FILES} DESTINATION lib)
     endif ()
 elseif (COMPILER_IDENTIFIER MATCHES "win")
@@ -279,6 +328,10 @@ elseif (COMPILER_IDENTIFIER MATCHES "vs")
     endif ()
 endif ()
 
+if (USE_MIMALLOC)
+    add_dependencies(${PROJECT_NAME} mimalloc)
+endif ()
+
 if (HAVE_VTK)
     target_link_libraries(${PROJECT_NAME} ${VTK_LIBRARIES})
     if (VTK_VERSION VERSION_LESS "8.90.0")
@@ -288,20 +341,20 @@ if (HAVE_VTK)
     endif ()
 endif ()
 
+message(STATUS "Flags and Dirs:")
 message(STATUS "suanPan C_FLAGS: ${CMAKE_C_FLAGS}")
 message(STATUS "suanPan CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
-message(STATUS "suanPan LINK_LIBRARY_FLAG: ${CMAKE_LINK_LIBRARY_FLAG}")
 if (FORTRAN_STATUS)
     message(STATUS "suanPan Fortran_FLAGS: ${CMAKE_Fortran_FLAGS}")
 endif ()
 
-message(STATUS "Link Dir:")
+message(STATUS "Link Dirs:")
 get_property(SDIR DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY LINK_DIRECTORIES)
 foreach (SDIRA ${SDIR})
     message(STATUS "${SDIRA}")
 endforeach ()
 
-message(STATUS "Include Dir:")
+message(STATUS "Include Dirs:")
 get_property(SDIR DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
 foreach (SDIRA ${SDIR})
     message(STATUS "${SDIRA}")
@@ -332,7 +385,7 @@ if (CMAKE_SYSTEM_NAME MATCHES "Linux")
         set(CPACK_PACKAGE_ICON ${ROOT}/Resource/suanPan-ua.svg)
         set(CPACK_PACKAGE_RELEASE 1)
         set(CPACK_PACKAGE_VENDOR "tlcfem")
-        set(CPACK_PACKAGE_VERSION "3.0.0")
+        set(CPACK_PACKAGE_VERSION "3.1.0")
         set(CPACK_PACKAGE_DESCRIPTION "An Open Source, Parallel and Heterogeneous Finite Element Analysis Framework")
         set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/TLCFEM/suanPan")
 

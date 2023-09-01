@@ -1485,6 +1485,8 @@ subview<eT>::is_finite() const
   {
   arma_extra_debug_sigprint();
   
+  if(arma_config::fast_math_warn)  { arma_debug_warn_level(1, "is_finite(): detection of non-finite values is not reliable in fast math mode"); }
+  
   const uword local_n_rows = n_rows;
   const uword local_n_cols = n_cols;
   
@@ -1525,6 +1527,8 @@ subview<eT>::has_inf() const
   {
   arma_extra_debug_sigprint();
   
+  if(arma_config::fast_math_warn)  { arma_debug_warn_level(1, "has_inf(): detection of non-finite values is not reliable in fast math mode"); }
+  
   const uword local_n_rows = n_rows;
   const uword local_n_cols = n_cols;
   
@@ -1545,12 +1549,36 @@ subview<eT>::has_nan() const
   {
   arma_extra_debug_sigprint();
   
+  if(arma_config::fast_math_warn)  { arma_debug_warn_level(1, "has_nan(): detection of non-finite values is not reliable in fast math mode"); }
+  
   const uword local_n_rows = n_rows;
   const uword local_n_cols = n_cols;
   
   for(uword ii=0; ii<local_n_cols; ++ii)
     {
     if(arrayops::has_nan(colptr(ii), local_n_rows))  { return true; }
+    }
+  
+  return false;
+  }
+
+
+
+template<typename eT>
+inline
+bool
+subview<eT>::has_nonfinite() const
+  {
+  arma_extra_debug_sigprint();
+  
+  if(arma_config::fast_math_warn)  { arma_debug_warn_level(1, "has_nonfinite(): detection of non-finite values is not reliable in fast math mode"); }
+  
+  const uword local_n_rows = n_rows;
+  const uword local_n_cols = n_cols;
+  
+  for(uword ii=0; ii<local_n_cols; ++ii)
+    {
+    if(arrayops::is_finite(colptr(ii), local_n_rows) == false)  { return true; }
     }
   
   return false;
@@ -1572,7 +1600,7 @@ subview<eT>::extract(Mat<eT>& out, const subview<eT>& in)
   const uword n_rows = in.n_rows;  // number of rows in the subview
   const uword n_cols = in.n_cols;  // number of columns in the subview
   
-  arma_extra_debug_print(arma_str::format("out.n_rows = %d   out.n_cols = %d    in.m.n_rows = %d  in.m.n_cols = %d") % out.n_rows % out.n_cols % in.m.n_rows % in.m.n_cols );
+  arma_extra_debug_print(arma_str::format("out.n_rows = %u   out.n_cols = %u    in.m.n_rows = %u  in.m.n_cols = %u") % out.n_rows % out.n_cols % in.m.n_rows % in.m.n_cols );
   
   
   if(in.is_vec())

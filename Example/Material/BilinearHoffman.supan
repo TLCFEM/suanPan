@@ -1,4 +1,4 @@
-# A TEST MODEL FOR EXPHOFFMAN MATERAIL
+# A TEST MODEL FOR BILINEARHOFFMAN MATERAIL
 
 node 1 5 -5 -5
 node 2 5 5 -5
@@ -26,21 +26,22 @@ set fixed_step_size 1
 set ini_step_size 1E-1
 set symm_mat 0
 
-converger RelIncreDisp 1 1E-14 50 1
+converger RelIncreDisp 1 1E-14 10 1
 
 analyze
 
 peek element 1
 
 # Node 5:
-# 5.0000 -5.0000 5.0000
+# Coordinate:
+#   5.0000e+00 -5.0000e+00  5.0000e+00
 # Displacement:
-# 0 0 -0.0974
+#   0.0000e+00  0.0000e+00 -9.7442e-02
 # Resistance:
-# 2.6051e+03 -1.2345e+04 3.8586e-12
+#   2.6051e+03 -1.2345e+04 -1.5740e-12
 peek node 5
 
-# save recorder 1
+save recorder 1
 
 reset
 clear

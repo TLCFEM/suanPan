@@ -118,9 +118,16 @@ namespace tensor {
 } // namespace tensor
 
 namespace transform {
+    void hoffman_projection(const vec&, mat&, mat&);
+    mat hill_projection(double, double, double, double, double, double);
+
     double atan2(const vec&);
     mat compute_jacobian_nominal_to_principal(const mat&);
     mat compute_jacobian_principal_to_nominal(const mat&);
+
+    mat eigen_to_tensor_base(const mat&);
+    mat eigen_to_tensile_stress(const vec&, const mat&);
+    mat eigen_to_tensile_derivative(const vec&, const mat&);
 
     template<typename T> Mat<T> skew_symm(const Mat<T>& R) {
         suanpan_assert([&] { if(R.n_elem != 3) throw invalid_argument("need 3 element vector"); });

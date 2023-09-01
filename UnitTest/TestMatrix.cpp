@@ -160,10 +160,18 @@ template<> SparseMatSuperLU<float> create_new(const u64 N) { return {N, N}; }
 
 template<> SparseMatMUMPS<float> create_new(const u64 N) { return {N, N}; }
 
+template<> SparseMatLis<double> create_new(const u64 N) { return {N, N}; }
+
 #ifdef SUANPAN_MKL
 template<> SparseMatPARDISO<double> create_new(const u64 N) { return {N, N}; }
 
 template<> SparseMatPARDISO<float> create_new(const u64 N) { return {N, N}; }
+
+#ifdef SUANPAN_MPI
+template<> SparseMatMPIPARDISO<double> create_new(const u64 N) { return {N, N}; }
+
+template<> SparseMatMPIPARDISO<float> create_new(const u64 N) { return {N, N}; }
+#endif
 
 template<> SparseMatFGMRES<double> create_new(const u64 N) { return {N, N}; }
 
@@ -195,19 +203,13 @@ template<> SparseMatMAGMA<float> create_new(const u64 N) {
 #endif
 
 template<typename T, typename ET> void benchmark_mat_setup(const int I) {
-    auto B = sprandu<SpMat<ET>>(I, I, .02);
+    auto B = sprandu<SpMat<ET>>(I, I, .2);
     B = B + B.t() + speye<SpMat<ET>>(I, I) * 1E1;
 
-    if constexpr(std::is_same_v<T, BandMat<ET>> || std::is_same_v<T, BandMatSpike<ET>> || std::is_same_v<T, BandSymmMat<ET>>
-#ifdef SUANPAN_CUDA
-        || std::is_same_v<T, BandMatCUDA<ET>>
-#endif
-    ) {
-        std::vector<std::tuple<uword, uword>> to_erase;
-        to_erase.reserve(B.n_nonzero);
-        for(auto J = B.begin(); J != B.end(); ++J) if(std::abs(static_cast<int>(J.row()) - static_cast<int>(J.col())) > 3) to_erase.emplace_back(std::tuple{J.row(), J.col()});
-        for(const auto& [row, col] : to_erase) B.at(row, col) = 0.;
-    }
+    std::vector<std::tuple<uword, uword>> to_erase;
+    to_erase.reserve(B.n_nonzero);
+    for(auto J = B.begin(); J != B.end(); ++J) if(std::abs(static_cast<int>(J.row()) - static_cast<int>(J.col())) > 3) to_erase.emplace_back(std::tuple{J.row(), J.col()});
+    for(const auto& [row, col] : to_erase) B.at(row, col) = 0.;
 
     const auto C = randu<Col<ET>>(I);
 
@@ -222,9 +224,13 @@ template<typename T, typename ET> void benchmark_mat_setup(const int I) {
     else if(std::is_same_v<BandSymmMat<ET>, T>) title = "BandSymm ";
     else if(std::is_same_v<SparseMatMUMPS<ET>, T>) title = "MUMPS ";
     else if(std::is_same_v<SparseSymmMatMUMPS<ET>, T>) title = "MUMPS Symm ";
+    else if(std::is_same_v<SparseMatLis<ET>, T>) title = "Lis ";
     else if(std::is_same_v<SparseMatSuperLU<ET>, T>) title = "SuperLU ";
 #ifdef SUANPAN_MKL
     else if(std::is_same_v<SparseMatPARDISO<ET>, T>) title = "PARDISO ";
+#ifdef SUANPAN_MPI
+    else if(std::is_same_v<SparseMatMPIPARDISO<ET>, T>) title = "MPI PARDISO ";
+#endif
     else if(std::is_same_v<SparseMatFGMRES<ET>, T>) title = "FGMRES ";
     else if(std::is_same_v<SparseSymmMatFGMRES<ET>, T>) title = "FGMRES Symm ";
 #endif
@@ -272,8 +278,8 @@ TEST_CASE("Mixed Precision", "[Matrix.Benchmark]") {
 
 #ifdef SUANPAN_CUDA
 TEST_CASE("Large BandMatCUDA", "[Matrix.Benchmark]") {
-    benchmark_mat_setup<BandMatCUDA<double>, double>(0x10000);
-    benchmark_mat_setup<BandMat<double>, double>(0x10000);
+    benchmark_mat_setup<BandMatCUDA<double>, double>(0x1000);
+    benchmark_mat_setup<BandMat<double>, double>(0x1000);
 }
 #endif
 
@@ -284,6 +290,16 @@ TEST_CASE("Large Mixed Precision", "[Matrix.Benchmark]") {
         benchmark_mat_setup<BandSymmMat<double>, double>(I);
         benchmark_mat_setup<SparseMatMUMPS<double>, double>(I);
         benchmark_mat_setup<SparseSymmMatMUMPS<double>, double>(I);
+        benchmark_mat_setup<SparseMatLis<double>, double>(I);
+        benchmark_mat_setup<SparseMatSuperLU<double>, double>(I);
+    }
+}
+
+TEST_CASE("Large Sparse Solve Type", "[Matrix.Benchmark]") {
+    for(auto I = 0x1000; I < 0x5000; I *= 2) {
+        benchmark_mat_setup<BandMat<double>, double>(I);
+        benchmark_mat_setup<SparseMatMUMPS<double>, double>(I);
+        benchmark_mat_setup<SparseMatLis<double>, double>(I);
         benchmark_mat_setup<SparseMatSuperLU<double>, double>(I);
     }
 }
@@ -316,12 +332,18 @@ TEST_CASE("SparseMatMUMPS", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(c
 
 TEST_CASE("SparseMatMUMPSFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<float>(create_new<SparseMatMUMPS<float>>); }
 
+TEST_CASE("SparseMatLis", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatLis<double>>); }
+
 #ifdef SUANPAN_MKL
 TEST_CASE("SparseMatPARDISO", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatPARDISO<double>>); }
 
 TEST_CASE("SparseMatPARDISOFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<float>(create_new<SparseMatPARDISO<float>>); }
 
 TEST_CASE("SparseMatFGMRES", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatFGMRES<double>>); }
+
+#ifdef SUANPAN_MPI
+TEST_CASE("SparseMatMPIPARDISO", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatMPIPARDISO<double>>); }
+#endif
 #endif
 
 #ifdef SUANPAN_CUDA

@@ -50,10 +50,10 @@
 #include <random>
 #include <functional>
 #include <chrono>
+#include <atomic>
 
 #if !defined(ARMA_DONT_USE_STD_MUTEX)
   #include <mutex>
-  #include <atomic>
 #endif
 
 // #if defined(ARMA_HAVE_CXX17)
@@ -234,6 +234,7 @@ namespace arma
   #include "armadillo_bits/mtGlue_bones.hpp"
   #include "armadillo_bits/SpGlue_bones.hpp"
   #include "armadillo_bits/mtSpGlue_bones.hpp"
+  #include "armadillo_bits/SpToDGlue_bones.hpp"
   
   #include "armadillo_bits/GlueCube_bones.hpp"
   #include "armadillo_bits/eGlueCube_bones.hpp"
@@ -303,6 +304,8 @@ namespace arma
   #include "armadillo_bits/op_nonzeros_bones.hpp"
   #include "armadillo_bits/op_diff_bones.hpp"
   #include "armadillo_bits/op_norm_bones.hpp"
+  #include "armadillo_bits/op_vecnorm_bones.hpp"
+  #include "armadillo_bits/op_norm2est_bones.hpp"
   #include "armadillo_bits/op_sqrtmat_bones.hpp"
   #include "armadillo_bits/op_logmat_bones.hpp"
   #include "armadillo_bits/op_range_bones.hpp"
@@ -319,6 +322,7 @@ namespace arma
   #include "armadillo_bits/op_col_as_mat_bones.hpp"
   
   #include "armadillo_bits/glue_times_bones.hpp"
+  #include "armadillo_bits/glue_times_misc_bones.hpp"
   #include "armadillo_bits/glue_mixed_bones.hpp"
   #include "armadillo_bits/glue_cov_bones.hpp"
   #include "armadillo_bits/glue_cor_bones.hpp"
@@ -364,6 +368,7 @@ namespace arma
   #include "armadillo_bits/spop_repmat_bones.hpp"
   #include "armadillo_bits/spop_vectorise_bones.hpp"
   #include "armadillo_bits/spop_norm_bones.hpp"
+  #include "armadillo_bits/spop_vecnorm_bones.hpp"
   
   #include "armadillo_bits/spglue_plus_bones.hpp"
   #include "armadillo_bits/spglue_minus_bones.hpp"
@@ -487,6 +492,7 @@ namespace arma
   #include "armadillo_bits/fn_elem.hpp"
   #include "armadillo_bits/fn_approx_equal.hpp"
   #include "armadillo_bits/fn_norm.hpp"
+  #include "armadillo_bits/fn_vecnorm.hpp"
   #include "armadillo_bits/fn_dot.hpp"
   #include "armadillo_bits/fn_randu.hpp"
   #include "armadillo_bits/fn_randn.hpp"
@@ -575,6 +581,7 @@ namespace arma
   #include "armadillo_bits/fn_quantile.hpp"
   #include "armadillo_bits/fn_powmat.hpp"
   #include "armadillo_bits/fn_powext.hpp"
+  #include "armadillo_bits/fn_diags_spdiags.hpp"
   
   #include "armadillo_bits/fn_speye.hpp"
   #include "armadillo_bits/fn_spones.hpp"
@@ -621,6 +628,7 @@ namespace arma
   #include "armadillo_bits/GlueCube_meat.hpp"
   #include "armadillo_bits/SpGlue_meat.hpp"
   #include "armadillo_bits/mtSpGlue_meat.hpp"
+  #include "armadillo_bits/SpToDGlue_meat.hpp"
   
   #include "armadillo_bits/eOp_meat.hpp"
   #include "armadillo_bits/eOpCube_meat.hpp"
@@ -743,6 +751,8 @@ namespace arma
   #include "armadillo_bits/op_nonzeros_meat.hpp"
   #include "armadillo_bits/op_diff_meat.hpp"
   #include "armadillo_bits/op_norm_meat.hpp"
+  #include "armadillo_bits/op_vecnorm_meat.hpp"
+  #include "armadillo_bits/op_norm2est_meat.hpp"
   #include "armadillo_bits/op_sqrtmat_meat.hpp"
   #include "armadillo_bits/op_logmat_meat.hpp"
   #include "armadillo_bits/op_range_meat.hpp"
@@ -759,6 +769,7 @@ namespace arma
   #include "armadillo_bits/op_col_as_mat_meat.hpp"
   
   #include "armadillo_bits/glue_times_meat.hpp"
+  #include "armadillo_bits/glue_times_misc_meat.hpp"
   #include "armadillo_bits/glue_mixed_meat.hpp"
   #include "armadillo_bits/glue_cov_meat.hpp"
   #include "armadillo_bits/glue_cor_meat.hpp"
@@ -804,6 +815,7 @@ namespace arma
   #include "armadillo_bits/spop_repmat_meat.hpp"
   #include "armadillo_bits/spop_vectorise_meat.hpp"
   #include "armadillo_bits/spop_norm_meat.hpp"
+  #include "armadillo_bits/spop_vecnorm_meat.hpp"
   
   #include "armadillo_bits/spglue_plus_meat.hpp"
   #include "armadillo_bits/spglue_minus_meat.hpp"

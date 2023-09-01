@@ -24,7 +24,7 @@ jobs:
         run: |
           go build Checker/updater.go
           sudo apt-get update && sudo apt-get install mesa-common-dev mesa-utils freeglut3-dev libglvnd-dev intel-oneapi-mkl-devel dpkg-dev
-          cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.2/ -DUSE_MKL=ON -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DUSE_INTEL_OPENMP=OFF -DLINK_DYNAMIC_MKL=OFF -DCMAKE_INSTALL_PREFIX=suanPan-linux-mkl-vtk .
+          cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_MIMALLOC=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.2/ -DUSE_MKL=ON -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DUSE_INTEL_OPENMP=OFF -DLINK_DYNAMIC_MKL=OFF -DCMAKE_INSTALL_PREFIX=suanPan-linux-mkl-vtk .
           make install -j"$(nproc)"
           make package
       - name: Pack
@@ -33,7 +33,7 @@ jobs:
           tar czf suanPan-linux-mkl-vtk.tar.gz suanPan-linux-mkl-vtk
       - name: Test
         run: |
-          sudo apt-get install ./suanPan-3.0.0-1.x86_64.deb -y
+          sudo apt-get install ./suanPan-3.1.0-1.x86_64.deb -y
           suanPan -v
           export LD_LIBRARY_PATH=/home/runner/work/suanPan/suanPan/suanPan-linux-mkl-vtk/lib
           cd suanPan-linux-mkl-vtk/bin
@@ -51,8 +51,8 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: suanPan-3.0.0-1.x86_64.deb
-          asset_name: suanPan-3.0.0-1.x86_64.deb
+          file: suanPan-3.1.0-1.x86_64.deb
+          asset_name: suanPan-3.1.0-1.x86_64.deb
           tag: ${{ env.SP_TIME }}
           prerelease: true
           overwrite: true
@@ -75,7 +75,7 @@ jobs:
         run: |
           go build Checker/updater.go
           sudo apt-get update && sudo apt-get install mesa-common-dev mesa-utils freeglut3-dev libglvnd-dev intel-oneapi-mkl-devel dpkg-dev
-          cmake -DCMAKE_BUILD_TYPE=Release -DUSE_AVX=OFF -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.2/ -DUSE_MKL=ON -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DUSE_INTEL_OPENMP=OFF -DLINK_DYNAMIC_MKL=OFF -DCMAKE_INSTALL_PREFIX=suanPan-linux-mkl-vtk-no-avx .
+          cmake -DCMAKE_BUILD_TYPE=Release -DUSE_AVX=OFF -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_MIMALLOC=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.2/ -DUSE_MKL=ON -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DUSE_INTEL_OPENMP=OFF -DLINK_DYNAMIC_MKL=OFF -DCMAKE_INSTALL_PREFIX=suanPan-linux-mkl-vtk-no-avx .
           make install -j"$(nproc)"
           make package
       - name: Pack
@@ -124,14 +124,14 @@ jobs:
           make package -j"$(nproc)"
       - name: Test
         run: |
-          dnf install ./suanPan-3.0.0-1.x86_64.rpm -y
+          dnf install ./suanPan-3.1.0-1.x86_64.rpm -y
           suanPan -v
       - name: RPM
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: suanPan-3.0.0-1.x86_64.rpm
-          asset_name: suanPan-3.0.0-1.x86_64.rpm
+          file: suanPan-3.1.0-1.x86_64.rpm
+          asset_name: suanPan-3.1.0-1.x86_64.rpm
           tag: ${{ env.SP_TIME }}
           prerelease: true
           overwrite: true

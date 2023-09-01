@@ -24,10 +24,10 @@
 #include <Converger/ConvergerParser.h>
 #include <Domain/Domain.h>
 #include <Domain/ExternalModule.h>
+#include <Domain/Group/CustomNodeGroup.h>
 #include <Domain/Group/ElementGroup.h>
 #include <Domain/Group/GroupGroup.h>
 #include <Domain/Group/NodeGroup.h>
-#include <Domain/Group/CustomNodeGroup.h>
 #include <Domain/Node.h>
 #include <Element/Element.h>
 #include <Element/ElementParser.h>
@@ -41,6 +41,7 @@
 #include <Recorder/Recorder.h>
 #include <Recorder/RecorderParser.h>
 #include <Section/SectionParser.h>
+#include <Section/SectionTester.h>
 #include <Solver/Integrator/Integrator.h>
 #include <Solver/Solver.h>
 #include <Solver/SolverParser.h>
@@ -68,7 +69,10 @@ using std::ifstream;
 using std::string;
 using std::vector;
 
+unsigned SUANPAN_WARNING_COUNT = 0;
+unsigned SUANPAN_ERROR_COUNT = 0;
 int SUANPAN_NUM_THREADS = std::max(1, static_cast<int>(std::thread::hardware_concurrency()));
+int SUANPAN_NUM_NODES = 1;
 fs::path SUANPAN_OUTPUT = fs::current_path();
 extern fs::path SUANPAN_EXE;
 
@@ -503,16 +507,21 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     if(is_equal(command_id, "finiterestitutionwall") || is_equal(command_id, "finiterestitutionwallpenalty")) return constraint_handler();
     if(is_equal(command_id, "mpc")) return constraint_handler();
 
-    if(is_equal(command_id, "materialtest1d")) return test_material1d(domain, command);
-    if(is_equal(command_id, "materialtest2d")) return test_material2d(domain, command);
-    if(is_equal(command_id, "materialtest3d")) return test_material3d(domain, command);
+    if(is_equal(command_id, "materialtest1d")) return test_material(domain, command, 1);
+    if(is_equal(command_id, "materialtest2d")) return test_material(domain, command, 3);
+    if(is_equal(command_id, "materialtest3d")) return test_material(domain, command, 6);
     if(is_equal(command_id, "materialtestwithbase3d")) return test_material_with_base3d(domain, command);
-    if(is_equal(command_id, "materialtestbyload1d")) return test_material_by_load1d(domain, command);
-    if(is_equal(command_id, "materialtestbyload2d")) return test_material_by_load2d(domain, command);
-    if(is_equal(command_id, "materialtestbyload3d")) return test_material_by_load3d(domain, command);
+    if(is_equal(command_id, "materialtestbyload1d")) return test_material_by_load(domain, command, 1);
+    if(is_equal(command_id, "materialtestbyload2d")) return test_material_by_load(domain, command, 3);
+    if(is_equal(command_id, "materialtestbyload3d")) return test_material_by_load(domain, command, 6);
     if(is_equal(command_id, "materialtestbyloadwithbase3d")) return test_material_by_load_with_base3d(domain, command);
     if(is_equal(command_id, "materialtestbystrainhistory")) return test_material_by_strain_history(domain, command);
     if(is_equal(command_id, "materialtestbystresshistory")) return test_material_by_stress_history(domain, command);
+
+    if(is_equal(command_id, "sectiontest1d")) return test_section(domain, command, 1);
+    if(is_equal(command_id, "sectiontest2d")) return test_section(domain, command, 2);
+    if(is_equal(command_id, "sectiontest3d")) return test_section(domain, command, 3);
+    if(is_equal(command_id, "sectiontestbydeformationhistory")) return test_section_by_deformation_history(domain, command);
 
     if(is_equal(command_id, "qrcode")) {
         qrcode();
@@ -530,6 +539,15 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     if(is_equal(command_id, "precheck")) return model->precheck();
 
     if(is_equal(command_id, "analyze") || is_equal(command_id, "analyse")) {
+        const auto options = get_remaining(command);
+        if(SUANPAN_WARNING_COUNT > 0 && !if_contain(options, "ignore_warning") && !if_contain(options, "ignore-warning")) {
+            suanpan_warning("There are {} warnings, please fix them first or use `ignore-warning` to ignore them.\n", SUANPAN_WARNING_COUNT);
+            return SUANPAN_SUCCESS;
+        }
+        if(SUANPAN_ERROR_COUNT > 0 && !if_contain(options, "ignore_error") && !if_contain(options, "ignore-error")) {
+            suanpan_warning("There are {} errors, please fix them first or use `ignore-error` to ignore them.\n", SUANPAN_ERROR_COUNT);
+            return SUANPAN_SUCCESS;
+        }
         const auto code = model->analyze();
         suanpan_info("\n");
         return code;
@@ -1304,6 +1322,13 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
 
         return SUANPAN_SUCCESS;
     }
+    if(is_equal(property_id, "num_nodes")) {
+        if(int value; get_input(command, value)) SUANPAN_NUM_NODES = value;
+        else
+            suanpan_error("A valid value is required.\n");
+
+        return SUANPAN_SUCCESS;
+    }
     if(is_equal(property_id, "screen_output")) {
         if(string value; get_input(command, value)) SUANPAN_PRINT = is_true(value);
         else
@@ -1379,12 +1404,16 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
         else if(is_equal(value, "SPIKE")) t_step->set_system_solver(SolverType::SPIKE);
         else if(is_equal(value, "SUPERLU")) t_step->set_system_solver(SolverType::SUPERLU);
         else if(is_equal(value, "MUMPS")) t_step->set_system_solver(SolverType::MUMPS);
+        else if(is_equal(value, "LIS")) {
+            t_step->set_system_solver(SolverType::LIS);
+            if(const auto options = get_remaining(command); !options.empty()) t_step->set_lis_option(options);
+        }
 #ifdef SUANPAN_CUDA
         else if(is_equal(value, "CUDA")) t_step->set_system_solver(SolverType::CUDA);
 #ifdef SUANPAN_MAGMA
         else if(is_equal(value, "MAGMA")) {
             t_step->set_system_solver(SolverType::MAGMA);
-            t_step->set_magma_setting(magma_parse_opts<magma_dopts>(command));
+            t_step->set_magma_option(magma_parse_opts<magma_dopts>(command));
         }
 #endif
 #endif
@@ -1550,6 +1579,8 @@ int print_info(const shared_ptr<DomainBase>& domain, istringstream& command) {
         suanpan_info("{}\n", SUANPAN_OUTPUT.generic_string());
     else if(is_equal(object_type, "num_threads"))
         suanpan_info("SUANPAN_NUM_THREADS: {}\n", SUANPAN_NUM_THREADS);
+    else if(is_equal(object_type, "num_nodes"))
+        suanpan_info("SUANPAN_NUM_NODES: {}\n", SUANPAN_NUM_NODES);
     else if(is_equal(object_type, "statistics") || is_equal(object_type, "stats")) {
         suanpan_info("\nUpdating element trial status used:\n\t{:.5E} s.", domain->stats<Statistics::UpdateStatus>());
         suanpan_info("\nAssembling global vector used:\n\t{:.5E} s.", domain->stats<Statistics::AssembleVector>());
@@ -1636,7 +1667,7 @@ int print_command() {
     suanpan_info(format, "element", "define element");
     suanpan_info(format, "elementgroup", "define group containing element tags");
     suanpan_info(format, "enable", "enable objects");
-    suanpan_info(format, "example", "establish adn execute a minimum example");
+    suanpan_info(format, "example", "establish and execute a minimum example");
     suanpan_info(format, "exit/quit", "exit program");
     suanpan_info(format, "file", "load external files");
     suanpan_info(format, "finiterigidwall", "define rigid wall constraint with finite dimensions");
@@ -1659,19 +1690,20 @@ int print_command() {
     suanpan_info(format, "list", "list objects in the current domain");
     suanpan_info(format, "mass", "define point mass");
     suanpan_info(format, "material", "define material");
-    suanpan_info(format, "materialtest1d", "test independent material modal using displacement input");
-    suanpan_info(format, "materialtest2d", "test independent material modal using displacement input");
-    suanpan_info(format, "materialtest3d", "test independent material modal using displacement input");
-    suanpan_info(format, "materialtestbyload1d", "test independent material modal using force input");
-    suanpan_info(format, "materialtestbyload2d", "test independent material modal using force input");
-    suanpan_info(format, "materialtestbyload3d", "test independent material modal using force input");
-    suanpan_info(format, "materialtestbyloadwithbase3d", "test independent material modal using force input");
-    suanpan_info(format, "materialtestwithbase3d", "test independent material modal using displacement input");
-    suanpan_info(format, "modifier", "define modifier that modifies existing modal properties");
+    suanpan_info(format, "materialtest1d", "test independent material model using displacement/strain input");
+    suanpan_info(format, "materialtest2d", "test independent material model using displacement/strain input");
+    suanpan_info(format, "materialtest3d", "test independent material model using displacement/strain input");
+    suanpan_info(format, "materialtestwithbase3d", "test independent material model using displacement/strain input");
+    suanpan_info(format, "materialtestbyload1d", "test independent material model using force/stress input");
+    suanpan_info(format, "materialtestbyload2d", "test independent material model using force/stress input");
+    suanpan_info(format, "materialtestbyload3d", "test independent material model using force/stress input");
+    suanpan_info(format, "materialtestbyloadwithbase3d", "test independent material model using force/stress input");
+    suanpan_info(format, "modifier", "define modifier that modifies existing model properties");
     suanpan_info(format, "mpc", "define multi-point constraint");
     suanpan_info(format, "node", "define node");
     suanpan_info(format, "nodegroup", "define group containing node tags");
     suanpan_info(format, "orientation", "define beam section orientation");
+    suanpan_info(format, "overview", "walk thorugh a quick overview of the application");
     suanpan_info(format, "particlecollision", "define collision constraint between particles");
     suanpan_info(format, "peek", "peek current information of target object");
     suanpan_info(format, "plainrecorder", "define recorder using plain text format");
@@ -1685,6 +1717,9 @@ int print_command() {
     suanpan_info(format, "rigidwall", "define rigid wall constraint with infinite dimensions");
     suanpan_info(format, "save", "save objects");
     suanpan_info(format, "section", "define section");
+    suanpan_info(format, "sectiontest1d", "test independent section model using deformation input");
+    suanpan_info(format, "sectiontest2d", "test independent section model using deformation input");
+    suanpan_info(format, "sectiontest3d", "test independent section model using deformation input");
     suanpan_info(format, "set", "set properties of analysis");
     suanpan_info(format, "solver", "define solver");
     suanpan_info(format, "step", "define step");

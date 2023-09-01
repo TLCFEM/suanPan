@@ -32,11 +32,23 @@
 #pragma warning(disable : 4702 4996)
 #endif
 
+#ifdef SUANPAN_VTK
+#include <vtkVersion.h>
+#endif
+
+#ifdef SUANPAN_CUDA
+#include <cuda.h>
+#endif
+
+#ifdef SUANPAN_MAGMA
+#include <magma_auxiliary.h>
+#endif
+
 using std::ifstream;
 using std::ofstream;
 
 constexpr auto SUANPAN_MAJOR = 3;
-constexpr auto SUANPAN_MINOR = 0;
+constexpr auto SUANPAN_MINOR = 1;
 constexpr auto SUANPAN_PATCH = 0;
 constexpr auto SUANPAN_CODE = "Canopus";
 
@@ -271,25 +283,27 @@ void print_version() {
     suanpan_info("This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\n");
     suanpan_info("You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.\n\n\n");
     suanpan_info("suanPan is an open source FEM framework.\n");
-    suanpan_info("    The binary is compiled on {}.\n", __DATE__);
+    suanpan_info("    The binary ({}.{}.{}) is compiled on {}.\n", SUANPAN_MAJOR, SUANPAN_MINOR, SUANPAN_PATCH, __DATE__);
     suanpan_info("    The source code of suanPan is hosted on GitHub. https://github.com/TLCFEM/suanPan/\n");
     suanpan_info("    The documentation is hosted on GitHub. https://tlcfem.github.io/suanPan-manual/latest/\n");
 #ifdef SUANPAN_MKL
-    suanpan_info("    The linear algebra support is provided by Armadillo with Intel MKL. http://arma.sourceforge.net/\n");
+    suanpan_info("    The linear algebra support is provided by Armadillo ({}) with Intel MKL. http://arma.sourceforge.net/\n", arma_version::as_string());
 #else
-    suanpan_info("    The linear algebra support is provided by Armadillo with OpenBLAS. http://arma.sourceforge.net/\n");
+    suanpan_info("    The linear algebra support is provided by Armadillo ({}) with OpenBLAS. http://arma.sourceforge.net/\n", arma_version::as_string());
 #endif
 #ifdef SUANPAN_CUDA
-    suanpan_info("    The GPCPU solvers are provided by CUDA. https://developer.nvidia.com/about-cuda/\n");
+    suanpan_info("    The GPCPU solvers are provided by CUDA ({}). https://developer.nvidia.com/about-cuda/\n", CUDA_VERSION);
 #endif
 #ifdef SUANPAN_MAGMA
-    suanpan_info("    The GPCPU solvers are provided by MAGMA. https://icl.utk.edu/magma/\n");
+    int major, minor, micro;
+    magma_version(&major, &minor, &micro);
+    suanpan_info("    The GPCPU solvers are provided by MAGMA ({}.{}.{}). https://icl.utk.edu/magma/\n", major, minor, micro);
 #endif
 #ifdef SUANPAN_MT
-    suanpan_info("    The parallelisation support is implemented via TBB library. https://github.com/oneapi-src/oneTBB/\n");
+    suanpan_info("    The parallelisation support is implemented via TBB ({}) library. https://github.com/oneapi-src/oneTBB/\n", TBB_runtime_interface_version());
 #endif
 #ifdef SUANPAN_VTK
-    suanpan_info("    The visualisation support is implemented via VTK library. https://vtk.org/\n");
+    suanpan_info("    The visualisation support is implemented via VTK ({}) library. https://vtk.org/\n", vtkVersion::GetVTKVersion());
 #endif
     suanpan_info("\nPlease join gitter for any feedback. https://gitter.im/suanPan-dev/community/\n");
     suanpan_info("\n\n[From Wikipedia] Located approximately 310 light-years away from the Sun, Canopus is a bright giant with a spectral type of A9, which means that it appears white to the naked eye. It has a luminosity that is over 10,000 times that of the Sun, is eight times as massive, and has expanded to 71 times the radius of the Sun. The enlarged photosphere has an effective temperature of approximately 7,400 K. Canopus is currently in the blue loop phase of its evolution, undergoing core helium burning after exhausting the hydrogen in its core and passing through the red-giant branch. It is also a source of X-rays, which are likely being emitted from its corona.\n\n");

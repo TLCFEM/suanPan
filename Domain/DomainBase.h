@@ -366,6 +366,8 @@ public:
     virtual int initialize_load() = 0;
     virtual int initialize_constraint() = 0;
     virtual int initialize_reference() = 0;
+    virtual int initialize_material() = 0;
+    virtual int initialize_section() = 0;
 
     [[nodiscard]] virtual int process_load(bool) = 0;
     [[nodiscard]] virtual int process_constraint(bool) = 0;

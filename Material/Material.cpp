@@ -44,8 +44,7 @@ int Material::initialize_base(const shared_ptr<DomainBase>&) {
 void Material::initialize_couple(const shared_ptr<DomainBase>&) {}
 
 void Material::initialize_history(const unsigned size) {
-    if(initial_history.empty()) initial_history.zeros(size);
-    else if(static_cast<uword>(size) > initial_history.size()) initial_history.resize(size);
+    if(static_cast<uword>(size) > initial_history.size()) initial_history.resize(size);
 
     trial_history = current_history = initial_history;
 }

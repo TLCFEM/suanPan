@@ -39,7 +39,6 @@ jobs:
         run: |
           export CC=gcc-11 && export CXX=g++-11 && export FC=gfortran-11
           go build Checker/updater.go
-          brew install libomp
           cmake -DCMAKE_BUILD_TYPE=Debug -DUSE_HDF5=ON .
           make -j4
           export DYLD_LIBRARY_PATH=Libs/mac/

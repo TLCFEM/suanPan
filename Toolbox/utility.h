@@ -110,6 +110,8 @@ template<typename T, typename... U> bool get_optional_input(istringstream& I, T&
     return static_cast<bool>(I >> O) ? get_optional_input(I, R...) : false;
 }
 
+string get_remaining(istringstream&);
+
 bool is_equal(const char*, const char*);
 bool is_equal(char, char);
 bool is_equal(int, char);

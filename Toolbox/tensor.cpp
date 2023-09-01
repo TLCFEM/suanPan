@@ -34,9 +34,16 @@ mat tensor::isotropic_stiffness(const double modulus, const double poissons_rati
 mat tensor::orthotropic_stiffness(const vec& modulus, const vec& poissons_ratio) {
     mat t_mat(3, 3);
     t_mat(0, 0) = 1. / modulus(0);
-    t_mat(1, 0) = t_mat(0, 1) = -poissons_ratio(0) * (t_mat(1, 1) = 1. / modulus(1));
-    t_mat(2, 1) = t_mat(1, 2) = -poissons_ratio(1) * (t_mat(2, 2) = 1. / modulus(2));
-    t_mat(0, 2) = t_mat(2, 0) = -poissons_ratio(2) * t_mat(2, 2);
+    t_mat(1, 0) = -poissons_ratio(0) * t_mat(0, 0);
+    t_mat(2, 0) = -poissons_ratio(2) * t_mat(0, 0);
+
+    t_mat(1, 1) = 1. / modulus(1);
+    t_mat(0, 1) = -poissons_ratio(0) * t_mat(1, 1);
+    t_mat(2, 1) = -poissons_ratio(1) * t_mat(1, 1);
+
+    t_mat(2, 2) = 1. / modulus(2);
+    t_mat(0, 2) = -poissons_ratio(2) * t_mat(2, 2);
+    t_mat(1, 2) = -poissons_ratio(1) * t_mat(2, 2);
 
     mat stiffness(6, 6, fill::zeros);
     stiffness(span(0, 2), span(0, 2)) = inv(t_mat);
@@ -446,6 +453,59 @@ double tensor::stress::double_contraction(const vec& a, const vec& b) { return d
 
 double tensor::stress::double_contraction(vec&& a, vec&& b) { return dot(a % b, norm_weight); }
 
+/**
+ * \brief Generate two projection matrix based on the given yield stress according to the Hoffman yielding criterion
+ * \param yield_stress nine yield stresses
+ * \param proj_a P matrix
+ * \param proj_b q vector
+ */
+void transform::hoffman_projection(const vec& yield_stress, mat& proj_a, mat& proj_b) {
+    // S(0) = \sigma_{11}^t    S(1) = \sigma_{11}^c
+    // S(2) = \sigma_{22}^t    S(3) = \sigma_{22}^c
+    // S(4) = \sigma_{33}^t    S(5) = \sigma_{33}^c
+    // S(6) = \sigma_{12}^0    S(7) = \sigma_{23}^0    S(8) = \sigma_{13}^0
+
+    proj_a.zeros(6, 6);
+    proj_b.zeros(6, 1);
+
+    const auto T1 = 1. / yield_stress(0) / yield_stress(1);
+    const auto T2 = 1. / yield_stress(2) / yield_stress(3);
+    const auto T3 = 1. / yield_stress(4) / yield_stress(5);
+
+    proj_b(0) = (yield_stress(1) - yield_stress(0)) * (proj_a(0, 0) = T1);
+    proj_b(1) = (yield_stress(3) - yield_stress(2)) * (proj_a(1, 1) = T2);
+    proj_b(2) = (yield_stress(5) - yield_stress(4)) * (proj_a(2, 2) = T3);
+
+    proj_a(0, 1) = proj_a(1, 0) = -.5 * (T1 + T2 - T3);
+    proj_a(1, 2) = proj_a(2, 1) = -.5 * (T2 + T3 - T1);
+    proj_a(2, 0) = proj_a(0, 2) = -.5 * (T3 + T1 - T2);
+    proj_a(3, 3) = 1. / yield_stress(6) / yield_stress(6);
+    proj_a(4, 4) = 1. / yield_stress(7) / yield_stress(7);
+    proj_a(5, 5) = 1. / yield_stress(8) / yield_stress(8);
+    proj_a *= 2.;
+}
+
+mat transform::hill_projection(const double S1, const double S2, const double S3, const double S4, const double S5, const double S6) {
+    mat hill(6, 6, fill::zeros);
+
+    const auto F1 = 2. / S1 / S1;
+    const auto F2 = 2. / S2 / S2;
+    const auto F3 = 2. / S3 / S3;
+
+    hill(0, 0) = F1;
+    hill(1, 1) = F2;
+    hill(2, 2) = F3;
+
+    hill(0, 1) = hill(1, 0) = -.5 * (F1 + F2 - F3);
+    hill(1, 2) = hill(2, 1) = -.5 * (F2 + F3 - F1);
+    hill(2, 0) = hill(0, 2) = -.5 * (F3 + F1 - F2);
+    hill(3, 3) = 2. / S4 / S4;
+    hill(4, 4) = 2. / S5 / S5;
+    hill(5, 5) = 2. / S6 / S6;
+
+    return hill;
+}
+
 double transform::atan2(const vec& direction_cosine) { return std::atan2(direction_cosine(1), direction_cosine(0)); }
 
 mat transform::compute_jacobian_nominal_to_principal(const mat& in) {
@@ -514,6 +574,52 @@ mat transform::compute_jacobian_principal_to_nominal(const mat& in) {
     }
 
     throw invalid_argument("need a valid tensor");
+}
+
+mat transform::eigen_to_tensor_base(const mat& eig_vec) {
+    const mat n12 = eig_vec.col(0) * eig_vec.col(1).t();
+    const mat n23 = eig_vec.col(1) * eig_vec.col(2).t();
+    const mat n31 = eig_vec.col(2) * eig_vec.col(0).t();
+
+    mat pij(6, 6);
+
+    pij.col(0) = tensor::stress::to_voigt(eig_vec.col(0) * eig_vec.col(0).t());
+    pij.col(1) = tensor::stress::to_voigt(eig_vec.col(1) * eig_vec.col(1).t());
+    pij.col(2) = tensor::stress::to_voigt(eig_vec.col(2) * eig_vec.col(2).t());
+    pij.col(3) = tensor::stress::to_voigt(.5 * (n12 + n12.t()));
+    pij.col(4) = tensor::stress::to_voigt(.5 * (n23 + n23.t()));
+    pij.col(5) = tensor::stress::to_voigt(.5 * (n31 + n31.t()));
+
+    return pij;
+}
+
+mat transform::eigen_to_tensile_stress(const vec& principal_stress, const mat& principal_direction) {
+    vec principal_tensile_stress(principal_stress.n_elem, fill::zeros);
+    for(auto I = 0llu; I < principal_stress.n_elem; ++I) if(principal_stress(I) > 0.) principal_tensile_stress(I) = principal_stress(I);
+
+    return compute_jacobian_principal_to_nominal(principal_direction) * principal_tensile_stress;
+}
+
+mat transform::eigen_to_tensile_derivative(const vec& principal_stress, const mat& principal_direction) {
+    const auto get_fraction = [](const vec& p_stress) {
+        const auto compute_fraction = [](const double a, const double b) { return suanpan::approx_equal(a, b, 4) ? a + b <= 0. ? 0. : 2. : 2. * (suanpan::ramp(a) - suanpan::ramp(b)) / (a - b); };
+
+        return vec{compute_fraction(p_stress(0), p_stress(1)), compute_fraction(p_stress(1), p_stress(2)), compute_fraction(p_stress(2), p_stress(0))};
+    };
+
+    const mat pnn = eigen_to_tensor_base(principal_direction);
+
+    std::vector<uword> tp;
+    tp.reserve(principal_stress.n_elem);
+    for(auto I = 0llu; I < principal_stress.n_elem; ++I) if(principal_stress(I) > 0.) tp.emplace_back(I);
+
+    const uvec pattern = tp;
+
+    mat eigen_derivative = pnn.cols(pattern) * pnn.cols(pattern).t() + pnn.tail_cols(3) * diagmat(get_fraction(principal_stress)) * pnn.tail_cols(3).t();
+
+    eigen_derivative.tail_cols(3) *= 2.;
+
+    return eigen_derivative;
 }
 
 vec transform::triangle::to_area_coordinate(const vec& g_coord, const mat& nodes) {

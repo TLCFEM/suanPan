@@ -34,22 +34,20 @@
 #include <Material/Material3D/Material3D.h>
 
 struct DataNonlinearHoffman {
-    const vec modulus, ratio;
-
-    mat proj_a, proj_b, inv_stiffness;
-
-    double C1 = 0., C2 = 0., C3 = 0., C4 = 0., C5 = 0., C6 = 0., C7 = 0., C8 = 0., C9 = 0.;
+    const vec modulus, ratio, yield_stress;
 };
 
 class NonlinearHoffman : protected DataNonlinearHoffman, public Material3D {
-    static const double four_third;
+    static constexpr double two_third = 2. / 3.;
     static const double root_two_third;
     static const unsigned max_iteration;
+    static const uword sa;
+    static const span sb;
+
+    mat proj_a, proj_b, elastic_a;
 
     [[nodiscard]] virtual double compute_k(double) const = 0;
     [[nodiscard]] virtual double compute_dk(double) const = 0;
-
-    [[nodiscard]] double compute_yield_function(const vec&) const;
 
 public:
     NonlinearHoffman(unsigned,   // tag

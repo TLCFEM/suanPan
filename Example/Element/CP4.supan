@@ -160,7 +160,7 @@ fix 1 P 1 2 3 4 5
 cload 1 0 2 2 84 83 82
 cload 2 0 1 2 85 81
 
-recorder 1 hdf5 Element S 1
+recorder 2 hdf5 Element S 1
 
 step static 1
 set fixed_step_size true

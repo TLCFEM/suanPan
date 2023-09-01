@@ -83,7 +83,7 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
 
         residual(sa) = norm_eta + m * p;
 
-        if(1 == counter && residual(sa) < 0.) return SUANPAN_SUCCESS;
+        if(1u == counter && residual(sa) < 0.) return SUANPAN_SUCCESS;
 
         const auto state = state_const + lc * log(p / pc);
         alpha_d = ac * exp(nd * state);
@@ -122,7 +122,7 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
 
         auto error = norm(residual);
 
-        if(1 == counter) ref_error = std::max(1., error);
+        if(1u == counter) ref_error = std::max(1., error);
         suanpan_debug("Local iteration error: {:.5E}.\n", error /= ref_error);
         if(error <= tolerance || norm(incre) <= tolerance) break;
 

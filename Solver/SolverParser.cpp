@@ -58,6 +58,9 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
                     return SUANPAN_SUCCESS;
                 }
 
+            if(suanpan::approx_equal(sum(p), 0.))
+                suanpan_warning("It seems all parameters are zeros, either the inputs are wrong or consider use plain Newmark.\n");
+
             if(domain->insert(make_shared<RayleighNewmark>(tag, alpha, beta, p(0), p(1), p(2), p(3)))) code = 1;
         }
         else if(is_equal(integrator_type, "LeeNewmark")) {

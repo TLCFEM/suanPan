@@ -11,10 +11,12 @@
 #include "FullMatCUDA.hpp"
 #include "SparseMatCUDA.hpp"
 #include "SparseMatFGMRES.hpp"
+#include "SparseMatLis.hpp"
+#include "SparseMatMAGMA.hpp"
+#include "SparseMatMPI.hpp"
 #include "SparseMatMUMPS.hpp"
 #include "SparseMatPARDISO.hpp"
 #include "SparseMatSuperLU.hpp"
-#include "SparseMatMAGMA.hpp"
 #include "SymmPackMat.hpp"
 
 // my sparse implementation

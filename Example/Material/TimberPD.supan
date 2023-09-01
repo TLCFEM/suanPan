@@ -1,0 +1,65 @@
+# A TEST MODEL FOR TIMBERPD MATERAIL
+
+node 1 5 -5 0
+node 2 5 5 0
+node 3 -5 5 0
+node 4 -5 -5 0
+node 5 5 -5 10
+node 6 5 5 10
+node 7 -5 5 10
+node 8 -5 -5 10
+
+material TimberPD 1 \
+9936 345 345 690 125.9 690 \
+.41 .37 .41 \
+20 40 1 4 1 4 4 4 4 \
+12.9 1 .39 .4 1 .95 4.4
+
+element C3D8 1 1 2 3 4 5 6 7 8 1 G
+
+fix2 1 1 1 2 5 6
+fix2 2 2 1 4 5 8
+fix2 3 3 1 2 3 4
+
+displacement 3 0 -.4 2 2 3 6 7
+displacement 4 0 .2 3 7 8
+displacement 5 0 .3 3 5 6
+
+hdf5recorder 1 Node RF 5 6 7 8
+hdf5recorder 2 Element DC 1
+hdf5recorder 3 Element DT 1
+hdf5recorder 4 Element S 1
+
+step static 1
+set fixed_step_size 1
+set ini_step_size 1E-2
+set symm_mat 0
+
+converger RelIncreDisp 1 1E-12 10 1
+
+analyze
+
+peek element 1
+
+# Node 7:
+# Coordinate:
+#  -5.0000e+00  5.0000e+00  1.0000e+01
+# Displacement:
+#  -1.8079e-01 -4.0000e-01  2.0000e-01
+# Resistance:
+#  -2.6090e-13 -2.6482e+02 -1.6178e+02
+# 
+# Node 8:
+# Coordinate:
+#  -5.0000e+00 -5.0000e+00  1.0000e+01
+# Displacement:
+#  -1.8079e-01  0.0000e+00  2.0000e-01
+# Resistance:
+#   2.8896e-13  2.6482e+02 -1.6178e+02
+peek node 5 6 7 8
+
+# save recorder 1 2 3 4
+
+reset
+clear
+exit
