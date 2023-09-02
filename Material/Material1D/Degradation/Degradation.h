@@ -64,6 +64,8 @@ public:
     int initialize(const shared_ptr<DomainBase>&) override;
 
     int update_trial_status(const vec&) override;
+
+    vector<vec> record(OutputType) override;
 };
 
 class StressDegradation : public Degradation {
@@ -73,6 +75,8 @@ public:
     int initialize(const shared_ptr<DomainBase>&) override;
 
     int update_trial_status(const vec&) override;
+
+    vector<vec> record(OutputType) override;
 };
 
 #endif

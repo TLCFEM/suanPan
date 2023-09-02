@@ -7,9 +7,15 @@ node 3 0 -3
 material Elastic1D 1 1000
 expression SimpleVector 1 x y|2 exp
 material CustomStressDegradation 2 1 1
+expression SimpleVector 2 x y|2 y[0]:=1;y[1]=0.
+material CustomStrainDegradation 3 1 2
 
 element T2D2 1 1 2 2 10
-element T2D2 2 3 2 2 10
+element T2D2 2 3 2 3 10
+
+hdf5recorder 1 Element DT 1 2
+hdf5recorder 2 Element DC 1 2
+hdf5recorder 3 Element S 1 2
 
 fix 1 P 1 3
 
@@ -27,9 +33,9 @@ analyze
 # Coordinate:
 #   4.0000e+00  0.0000e+00
 # Displacement:
-#  -2.6332e-03  1.0000e+00
+#  -7.4966e-01  1.0000e+00
 # Resistance:
-#  -2.8422e-13  4.9372e+00
+#   2.2204e-14  3.2545e-01
 peek node 2
 
 peek element 1

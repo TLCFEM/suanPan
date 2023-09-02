@@ -17,6 +17,7 @@
 
 #include "Degradation.h"
 #include <Domain/DomainBase.h>
+#include <Recorder/OutputType.h>
 
 Degradation::Degradation(const unsigned T, const unsigned MT)
     : Material1D(T, 0.)
@@ -123,6 +124,17 @@ int StrainDegradation::update_trial_status(const vec& t_strain) {
     return SUANPAN_SUCCESS;
 }
 
+vector<vec> StrainDegradation::record(const OutputType P) {
+    vector<vec> data;
+
+    if(OutputType::DT == P) data.emplace_back(vec{compute_positive_degradation(current_history(0))(0)});
+    else if(OutputType::DC == P) data.emplace_back(vec{compute_negative_degradation(current_history(1))(0)});
+
+    if(!data.empty()) return data;
+
+    return Degradation::record(P);
+}
+
 int StressDegradation::initialize(const shared_ptr<DomainBase>& D) {
     initialize_history(2);
 
@@ -180,4 +192,15 @@ int StressDegradation::update_trial_status(const vec& t_strain) {
         }
 
     return SUANPAN_SUCCESS;
+}
+
+vector<vec> StressDegradation::record(const OutputType P) {
+    vector<vec> data;
+
+    if(OutputType::DT == P) data.emplace_back(vec{compute_positive_degradation(current_history(0))(0)});
+    else if(OutputType::DC == P) data.emplace_back(vec{compute_negative_degradation(current_history(1))(0)});
+
+    if(!data.empty()) return data;
+
+    return Degradation::record(P);
 }
