@@ -19,63 +19,62 @@
 #include <Domain/DomainBase.h>
 
 IsotropicDamage::IsotropicDamage(const unsigned T, const unsigned MT)
-    : Material3D(T, 0.)
-    , mat_tag(MT) {}
+	: Material3D(T, 0.)
+	, mat_tag(MT) {}
 
 IsotropicDamage::IsotropicDamage(const IsotropicDamage& old_obj)
-    : Material3D(old_obj)
-    , mat_tag(old_obj.mat_tag)
-    , mat_ptr(suanpan::make_copy(old_obj.mat_ptr)) {}
+	: Material3D(old_obj)
+	, mat_tag(old_obj.mat_tag)
+	, mat_ptr(suanpan::make_copy(old_obj.mat_ptr)) {}
 
 int IsotropicDamage::initialize(const shared_ptr<DomainBase>& D) {
-    mat_ptr = suanpan::initialized_material_copy(D, mat_tag);
+	mat_ptr = suanpan::initialized_material_copy(D, mat_tag);
 
-    if(nullptr == mat_ptr || mat_ptr->get_material_type() != MaterialType::D3) return SUANPAN_FAIL;
+	if(nullptr == mat_ptr || mat_ptr->get_material_type() != MaterialType::D3) return SUANPAN_FAIL;
 
-    access::rw(density) = mat_ptr->get_parameter(ParameterType::DENSITY);
+	access::rw(density) = mat_ptr->get_parameter(ParameterType::DENSITY);
 
-    trial_stiffness = current_stiffness = initial_stiffness = mat_ptr->get_initial_stiffness();
+	trial_stiffness = current_stiffness = initial_stiffness = mat_ptr->get_initial_stiffness();
 
-    return SUANPAN_SUCCESS;
+	return SUANPAN_SUCCESS;
 }
 
 double IsotropicDamage::get_parameter(const ParameterType P) const { return mat_ptr->get_parameter(P); }
 
 int IsotropicDamage::update_trial_status(const vec& t_strain) {
-    trial_strain = t_strain;
+	if(mat_ptr->update_trial_status(trial_strain = t_strain) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 
-    if(mat_ptr->update_trial_status(trial_strain) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
+	trial_stress = mat_ptr->get_trial_stress();
+	trial_stiffness = mat_ptr->get_trial_stiffness();
 
-    trial_stress = mat_ptr->get_trial_stress();
-    trial_stiffness = mat_ptr->get_trial_stiffness();
+	compute_damage();
 
-    compute_damage();
-
-    return SUANPAN_SUCCESS;
+	return SUANPAN_SUCCESS;
 }
 
 int IsotropicDamage::clear_status() {
-    current_strain.zeros();
-    trial_strain.zeros();
-    current_stress.zeros();
-    trial_stress.zeros();
-    trial_stiffness = current_stiffness = initial_stiffness;
+	trial_strain = current_strain.zeros();
+	trial_stress = current_stress.zeros();
+	trial_history = current_history = initial_history;
+	trial_stiffness = current_stiffness = initial_stiffness;
 
-    return mat_ptr->clear_status();
+	return mat_ptr->clear_status();
 }
 
 int IsotropicDamage::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_stiffness = trial_stiffness;
+	current_strain = trial_strain;
+	current_stress = trial_stress;
+	current_history = trial_history;
+	current_stiffness = trial_stiffness;
 
-    return mat_ptr->commit_status();
+	return mat_ptr->commit_status();
 }
 
 int IsotropicDamage::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_stiffness = current_stiffness;
+	trial_strain = current_strain;
+	trial_stress = current_stress;
+	trial_history = current_history;
+	trial_stiffness = current_stiffness;
 
-    return mat_ptr->reset_status();
+	return mat_ptr->reset_status();
 }
