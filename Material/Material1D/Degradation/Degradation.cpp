@@ -76,11 +76,13 @@ int StrainDegradation::initialize(const shared_ptr<DomainBase>& D) {
 int StrainDegradation::update_trial_status(const vec& t_strain) {
     if(SUANPAN_SUCCESS != base->update_trial_status(trial_strain = t_strain)) return SUANPAN_FAIL;
 
+    trial_stress = base->get_trial_stress();
+
     trial_history = current_history;
     auto& max_strain = trial_history(0);
     auto& min_strain = trial_history(1);
 
-    if(trial_strain(0) > 0.)
+    if(trial_stress(0) > 0.)
         // tension
         if(trial_strain(0) > max_strain) {
             max_strain = trial_strain(0);
