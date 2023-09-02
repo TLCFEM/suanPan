@@ -8,7 +8,7 @@
 
 ## version 3.2
 
-1. revise uniaxial universal damage models
+1. revise uniaxial universal damage models [#153](https://github.com/TLCFEM/suanPan/pull/153)
 
 ## version 3.1
 

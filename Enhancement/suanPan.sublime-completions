@@ -7396,7 +7396,7 @@
       "contents":"",
       "details":"",
       "kind":"type",
-      "trigger":"TrilinearDegradation"
+      "trigger":"TrilinearStrainDegradation"
     },
     {
       "contents":"material CustomStrainDegradation ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique material tag\n# (2) int, host material tag\n# (3) int, positive region degradation expression tag\n# [4] int, negative region degradation expression tag, default: (3)",

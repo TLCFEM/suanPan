@@ -16,7 +16,7 @@
  ******************************************************************************/
 /**
  * @class TrilinearStrainDegradation
- * @brief The TrilinearDegradation class.
+ * @brief The TrilinearStrainDegradation class.
  *
  * @author tlc
  * @date 11/05/2019

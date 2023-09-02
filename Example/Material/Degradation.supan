@@ -19,16 +19,17 @@ set fixed_step_size 1
 
 displacement 1 0 1 2 2 
 
-converger RelIncreDisp 1 1E-4 10 1
+converger RelIncreDisp 1 1E-10 10 1
 
 analyze
 
 # Node 2:
-# 4.0000 0
+# Coordinate:
+#   4.0000e+00  0.0000e+00
 # Displacement:
-# -1.8667 7.7667
+#  -2.6332e-03  1.0000e+00
 # Resistance:
-# 1.3333e-06 1.0000e+02
+#  -2.8422e-13  4.9372e+00
 peek node 2
 
 peek element 1
