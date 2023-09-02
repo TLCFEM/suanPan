@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include "TrilinearDegradation.h"
+#include "TrilinearStrainDegradation.h"
 
-podarray<double> TrilinearDegradation::compute_degradation(const double t_strain) const {
-    podarray<double> damage(2);
+vec TrilinearStrainDegradation::compute_positive_degradation(const double t_strain) const {
+    vec damage(2);
 
     if(const auto abs_e = fabs(t_strain); abs_e > e_strain) {
         damage(0) = e_damage;
@@ -36,8 +36,14 @@ podarray<double> TrilinearDegradation::compute_degradation(const double t_strain
     return damage;
 }
 
-TrilinearDegradation::TrilinearDegradation(const unsigned T, const unsigned MT, const double SE, const double EE, const double ED)
-    : DataTrilinearDegradation{fabs(SE), fabs(EE), fabs(ED)}
-    , Degradation(T, MT) {}
+vec TrilinearStrainDegradation::compute_negative_degradation(const double t_strain) const {
+    auto response = compute_positive_degradation(fabs(t_strain));
+    response(1) = -response(1);
+    return response;
+}
 
-unique_ptr<Material> TrilinearDegradation::get_copy() { return make_unique<TrilinearDegradation>(*this); }
+TrilinearStrainDegradation::TrilinearStrainDegradation(const unsigned T, const unsigned MT, const double SE, const double EE, const double ED)
+    : DataTrilinearStrainDegradation{fabs(SE), fabs(EE), fabs(ED)}
+    , StrainDegradation(T, MT) {}
+
+unique_ptr<Material> TrilinearStrainDegradation::get_copy() { return make_unique<TrilinearStrainDegradation>(*this); }

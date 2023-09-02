@@ -15,39 +15,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class TrilinearDegradation
- * @brief The TrilinearDegradation class.
+ * @class CustomStrainDegradation
+ * @brief The CustomStrainDegradation class.
  *
  * @author tlc
- * @date 11/05/2019
+ * @date 24/01/2023
  * @version 0.1.0
- * @file TrilinearDegradation.h
+ * @file CustomStrainDegradation.h
  * @addtogroup Material-1D
  * @{
  */
 
-#ifndef TRILINEARDEGRADATION_H
-#define TRILINEARDEGRADATION_H
+#ifndef CUSTOMSTRAINDEGRADATION_H
+#define CUSTOMSTRAINDEGRADATION_H
 
 #include "Degradation.h"
+#include <Toolbox/Expression.h>
+#include <Toolbox/ResourceHolder.h>
 
-struct DataTrilinearDegradation {
-    const double s_strain;
-    const double e_strain;
-    const double e_damage;
-    const double slope = (1. - e_damage) / (s_strain - e_strain);
-};
+class CustomStrainDegradation final : public StrainDegradation {
+    const unsigned positive_expression_tag, negative_expression_tag;
 
-class TrilinearDegradation final : DataTrilinearDegradation, public Degradation {
-    [[nodiscard]] podarray<double> compute_degradation(double) const override;
+    ResourceHolder<Expression> positive_expression, negative_expression;
+
+    [[nodiscard]] vec compute_positive_degradation(double) const override;
+    [[nodiscard]] vec compute_negative_degradation(double) const override;
 
 public:
-    TrilinearDegradation(unsigned, // unique tag
-                         unsigned, // material tag
-                         double,   // start strain
-                         double,   // end strain
-                         double    // end level
+    CustomStrainDegradation(unsigned, // unique tag
+                            unsigned, // material tag
+                            unsigned, // expression tag
+                            unsigned  // expression tag
     );
+
+    int initialize(const shared_ptr<DomainBase>&) override;
 
     unique_ptr<Material> get_copy() override;
 };

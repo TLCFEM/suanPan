@@ -7396,13 +7396,19 @@
       "contents":"",
       "details":"",
       "kind":"type",
-      "trigger":"TrilinearDegradation"
+      "trigger":"TrilinearStrainDegradation"
     },
     {
-      "contents":"material CustomDegradation ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique material tag\n# (2) int, host material tag\n# (3) int, degradation expression tag\n",
+      "contents":"material CustomStrainDegradation ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique material tag\n# (2) int, host material tag\n# (3) int, positive region degradation expression tag\n# [4] int, negative region degradation expression tag, default: (3)",
       "details":"Uniaxial degradation with custom rules",
       "kind":"type",
-      "trigger":"CustomDegradation"
+      "trigger":"CustomStrainDegradation"
+    },
+    {
+      "contents":"material CustomStressDegradation ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique material tag\n# (2) int, host material tag\n# (3) int, positive region degradation expression tag\n# [4] int, negative region degradation expression tag, default: (3)",
+      "details":"Uniaxial degradation with custom rules",
+      "kind":"type",
+      "trigger":"CustomStressDegradation"
     },
     {
       "contents":"",

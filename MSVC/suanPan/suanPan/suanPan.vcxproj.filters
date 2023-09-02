@@ -603,7 +603,7 @@
     <ClCompile Include="..\..\..\Material\Material1D\Degradation\Dhakal.cpp">
       <Filter>Material\Material1D\Degradation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Material\Material1D\Degradation\TrilinearDegradation.cpp">
+    <ClCompile Include="..\..\..\Material\Material1D\Degradation\TrilinearStrainDegradation.cpp">
       <Filter>Material\Material1D\Degradation</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Material\Material1D\Elastic\BilinearElastic1D.cpp">
@@ -1477,7 +1477,7 @@
     <ClCompile Include="..\..\..\Material\Material3D\vonMises\CustomGurson.cpp">
       <Filter>Material\Material3D\vonMises</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Material\Material1D\Degradation\CustomDegradation.cpp">
+    <ClCompile Include="..\..\..\Material\Material1D\Degradation\CustomStrainDegradation.cpp">
       <Filter>Material\Material1D\Degradation</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Material\Material1D\Viscosity\CustomViscosity.cpp">
@@ -1518,6 +1518,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Material\Material3D\Hoffman\TimberPD.cpp">
       <Filter>Material\Material3D\Hoffman</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Degradation\CustomStressDegradation.cpp">
+      <Filter>Material\Material1D\Degradation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1971,7 +1974,7 @@
     <ClInclude Include="..\..\..\Material\Material1D\Degradation\Dhakal.h">
       <Filter>Material\Material1D\Degradation</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Material\Material1D\Degradation\TrilinearDegradation.h">
+    <ClInclude Include="..\..\..\Material\Material1D\Degradation\TrilinearStrainDegradation.h">
       <Filter>Material\Material1D\Degradation</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material1D\Elastic\BilinearElastic1D.h">
@@ -2854,7 +2857,7 @@
     <ClInclude Include="..\..\..\Material\Material3D\vonMises\CustomGurson.h">
       <Filter>Material\Material3D\vonMises</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Material\Material1D\Degradation\CustomDegradation.h">
+    <ClInclude Include="..\..\..\Material\Material1D\Degradation\CustomStrainDegradation.h">
       <Filter>Material\Material1D\Degradation</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material1D\Viscosity\CustomViscosity.h">
@@ -2904,6 +2907,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material3D\Hoffman\TimberPD.h">
       <Filter>Material\Material3D\Hoffman</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Degradation\CustomStressDegradation.h">
+      <Filter>Material\Material1D\Degradation</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

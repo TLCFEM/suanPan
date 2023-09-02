@@ -21,10 +21,9 @@ void save_result(const mat& result) {
 #ifdef SUANPAN_HDF5
     if(!result.save("RESULT.h5", hdf5_binary_trans))
         suanpan_error("Fail to save to file.\n");
-#else
+#endif
     if(!result.save("RESULT.txt", raw_ascii))
         suanpan_error("Fail to save to file.\n");
-#endif
 }
 
 void save_gnuplot() {

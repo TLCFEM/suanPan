@@ -17,8 +17,12 @@
 
 #include "Dhakal.h"
 
-podarray<double> Dhakal::compute_degradation(const double t_strain) const {
-    podarray<double> damage(2);
+vec Dhakal::compute_positive_degradation(double) const { return {1., 0.}; }
+
+vec Dhakal::compute_negative_degradation(double t_strain) const {
+    vec damage(2);
+
+    t_strain = -fabs(t_strain);
 
     if(t_strain < final_strain) {
         damage(0) = .2;
@@ -42,6 +46,6 @@ podarray<double> Dhakal::compute_degradation(const double t_strain) const {
 
 Dhakal::Dhakal(const unsigned T, const unsigned MT, const double EY, const double PP)
     : DataDhakal{-fabs(EY), -fabs(EY) * std::max(55. - 2.3 * fabs(PP), 7.), std::min(1., std::max(1.1 - .016 * fabs(PP), .2))}
-    , Degradation(T, MT) {}
+    , StrainDegradation(T, MT) {}
 
 unique_ptr<Material> Dhakal::get_copy() { return make_unique<Dhakal>(*this); }
