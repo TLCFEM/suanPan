@@ -1,0 +1,6 @@
+material Elastic1D 1 1000
+expression SimpleVector 1 x y|2 exp
+material CustomStressDegradation 2 1 1
+materialTest1D 2 1E-3 10 20 25 30 35 40 45 50 55 60 65 70 75 80 85 90 95 100 105 110 115 120 60
+
+exit

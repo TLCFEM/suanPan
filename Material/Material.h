@@ -102,7 +102,7 @@ struct DataMaterial {
 class Material : protected DataMaterial, protected DataCoupleMaterial, public Tag {
     const bool initialized = false;
     const bool symmetric = false;
-    const bool support_couple = false;
+    const bool support_couple = false; // indicate if the material supports couple stress theory
 
     friend void ConstantStiffness(DataMaterial*);
     friend void ConstantDamping(DataMaterial*);

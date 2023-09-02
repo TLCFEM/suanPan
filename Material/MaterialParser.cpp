@@ -3038,7 +3038,7 @@ void new_tablegurson(unique_ptr<Material>& return_obj, istringstream& command) {
     return_obj = make_unique<TableGurson>(tag, para_pool(0), para_pool(1), std::move(hardening_table), para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6), para_pool(7));
 }
 
-void new_trilineardegradation(unique_ptr<Material>& return_obj, istringstream& command) {
+void new_trilinearstraindegradation(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
@@ -3065,17 +3065,24 @@ void new_trilineardegradation(unique_ptr<Material>& return_obj, istringstream& c
         return;
     }
 
-    return_obj = make_unique<TrilinearDegradation>(tag, mat_tag, s_strain, e_strain, e_damage);
+    return_obj = make_unique<TrilinearStrainDegradation>(tag, mat_tag, s_strain, e_strain, e_damage);
 }
 
-void new_customdegradation(unique_ptr<Material>& return_obj, istringstream& command) {
-    unsigned tag, mat_tag, expression_tag;
-    if(!get_input(command, tag, mat_tag, expression_tag)) {
+void new_customdegradation(unique_ptr<Material>& return_obj, istringstream& command, const bool if_strain) {
+    unsigned tag, mat_tag, p_expression_tag, n_expression_tag;
+    if(!get_input(command, tag, mat_tag, p_expression_tag)) {
         suanpan_error("A valid tag is required.\n");
         return;
     }
 
-    return_obj = make_unique<CustomDegradation>(tag, mat_tag, expression_tag);
+    if(command.eof()) n_expression_tag = p_expression_tag;
+    else if(!get_input(command, n_expression_tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    if(if_strain) return_obj = make_unique<CustomStrainDegradation>(tag, mat_tag, p_expression_tag, n_expression_tag);
+    else return_obj = make_unique<CustomStressDegradation>(tag, mat_tag, p_expression_tag, n_expression_tag);
 }
 
 void new_trivial(unique_ptr<Material>& return_obj, istringstream& command) {
@@ -3379,7 +3386,8 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "CustomCC")) new_customcc(new_material, command);
     else if(is_equal(material_id, "CustomCDP")) new_customcdp(new_material, command);
     else if(is_equal(material_id, "CustomDP")) new_customdp(new_material, command);
-    else if(is_equal(material_id, "CustomDegradation")) new_customdegradation(new_material, command);
+    else if(is_equal(material_id, "CustomStrainDegradation")) new_customdegradation(new_material, command, true);
+    else if(is_equal(material_id, "CustomStressDegradation")) new_customdegradation(new_material, command, false);
     else if(is_equal(material_id, "CustomElastic1D")) new_customelastic1d(new_material, command);
     else if(is_equal(material_id, "CustomGurson")) new_customgurson(new_material, command);
     else if(is_equal(material_id, "CustomGurson1D")) new_customgurson1d(new_material, command);
@@ -3443,7 +3451,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "TableGurson")) new_tablegurson(new_material, command);
     else if(is_equal(material_id, "Tanh1D")) new_tanh1d(new_material, command);
     else if(is_equal(material_id, "TimberPD")) new_timberpd(new_material, command);
-    else if(is_equal(material_id, "TrilinearDegradation")) new_trilineardegradation(new_material, command);
+    else if(is_equal(material_id, "TrilinearStrainDegradation")) new_trilinearstraindegradation(new_material, command);
     else if(is_equal(material_id, "Trivial")) new_trivial(new_material, command);
     else if(is_equal(material_id, "Uniaxial")) new_uniaxial(new_material, command);
     else if(is_equal(material_id, "VAFCRP")) new_vafcrp(new_material, command);

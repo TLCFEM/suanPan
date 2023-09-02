@@ -15,35 +15,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class CustomDegradation
- * @brief The CustomDegradation class.
+ * @class CustomStressDegradation
+ * @brief The CustomStressDegradation class.
  *
  * @author tlc
- * @date 24/01/2023
+ * @date 02/09/2023
  * @version 0.1.0
- * @file CustomDegradation.h
+ * @file CustomStressDegradation.h
  * @addtogroup Material-1D
  * @{
  */
 
-#ifndef CUSTOMDEGRADATION_H
-#define CUSTOMDEGRADATION_H
+#ifndef CUSTOMSTRESSDEGRADATION_H
+#define CUSTOMSTRESSDEGRADATION_H
 
 #include "Degradation.h"
 #include <Toolbox/Expression.h>
 #include <Toolbox/ResourceHolder.h>
 
-class CustomDegradation final : public Degradation {
-    const unsigned expression_tag;
+class CustomStressDegradation final : public StressDegradation {
+    const unsigned positive_expression_tag, negative_expression_tag;
 
-    ResourceHolder<Expression> expression;
+    ResourceHolder<Expression> positive_expression, negative_expression;
 
-    [[nodiscard]] podarray<double> compute_degradation(double) const override;
+    [[nodiscard]] vec compute_positive_degradation(double) const override;
+    [[nodiscard]] vec compute_negative_degradation(double) const override;
 
 public:
-    CustomDegradation(unsigned, // unique tag
-                      unsigned, // material tag
-                      unsigned  // expression tag
+    CustomStressDegradation(unsigned, // unique tag
+                            unsigned, // material tag
+                            unsigned, // expression tag
+                            unsigned  // expression tag
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

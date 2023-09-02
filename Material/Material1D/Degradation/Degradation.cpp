@@ -34,7 +34,7 @@ int Degradation::initialize(const shared_ptr<DomainBase>& D) {
 
     access::rw(density) = base->get_parameter(ParameterType::DENSITY);
 
-    const auto degrade = compute_degradation(0.);
+    const auto degrade = compute_positive_degradation(0.);
     const auto& d = degrade(0);
 
     trial_stiffness = current_stiffness = initial_stiffness = d * base->get_initial_stiffness();
@@ -42,34 +42,18 @@ int Degradation::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-int Degradation::update_trial_status(const vec& t_strain) {
-    trial_strain = t_strain;
-
-    const auto code = base->update_trial_status(t_strain);
-
-    if(SUANPAN_SUCCESS == code) {
-        const auto degrade = compute_degradation(t_strain(0));
-        const auto& d = degrade(0);
-        const auto& dd = degrade(1);
-
-        trial_stress = d * base->get_trial_stress();
-
-        trial_stiffness = d * base->get_trial_stiffness() + dd * base->get_trial_stress();
-    }
-
-    return code;
-}
-
 int Degradation::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_stiffness = initial_stiffness;
+    trial_strain = current_strain.zeros();
+    trial_stress = current_stress.zeros();
+    trial_history = current_history = initial_history;
+    trial_stiffness = current_stiffness = initial_stiffness;
     return base->clear_status();
 }
 
 int Degradation::commit_status() {
     current_strain = trial_strain;
     current_stress = trial_stress;
+    current_history = trial_history;
     current_stiffness = trial_stiffness;
     return base->commit_status();
 }
@@ -77,6 +61,123 @@ int Degradation::commit_status() {
 int Degradation::reset_status() {
     trial_strain = current_strain;
     trial_stress = current_stress;
+    trial_history = current_history;
     trial_stiffness = current_stiffness;
     return base->reset_status();
+}
+
+int StrainDegradation::initialize(const shared_ptr<DomainBase>& D) {
+    initialize_history(2);
+
+    return Degradation::initialize(D);
+}
+
+int StrainDegradation::update_trial_status(const vec& t_strain) {
+    if(SUANPAN_SUCCESS != base->update_trial_status(trial_strain = t_strain)) return SUANPAN_FAIL;
+
+    trial_history = current_history;
+    auto& max_strain = trial_history(0);
+    auto& min_strain = trial_history(1);
+
+    if(trial_strain(0) > 0.)
+        // tension
+        if(trial_strain(0) > max_strain) {
+            max_strain = trial_strain(0);
+            const auto degradation = compute_positive_degradation(max_strain);
+            const auto& d = degradation(0);
+            const auto& dd = degradation(1);
+
+            trial_stress = d * base->get_trial_stress();
+
+            trial_stiffness = d * base->get_trial_stiffness() + dd * base->get_trial_stress();
+        }
+        else {
+            const auto degrade = compute_positive_degradation(max_strain);
+            const auto& d = degrade(0);
+
+            trial_stress = d * base->get_trial_stress();
+
+            trial_stiffness = d * base->get_trial_stiffness();
+        }
+    else
+        // compression
+        if(trial_strain(0) < min_strain) {
+            min_strain = trial_strain(0);
+            const auto degradation = compute_negative_degradation(min_strain);
+            const auto& d = degradation(0);
+            const auto& dd = degradation(1);
+
+            trial_stress = d * base->get_trial_stress();
+
+            trial_stiffness = d * base->get_trial_stiffness() + dd * base->get_trial_stress();
+        }
+        else {
+            const auto degrade = compute_negative_degradation(min_strain);
+            const auto& d = degrade(0);
+
+            trial_stress = d * base->get_trial_stress();
+
+            trial_stiffness = d * base->get_trial_stiffness();
+        }
+
+    return SUANPAN_SUCCESS;
+}
+
+int StressDegradation::initialize(const shared_ptr<DomainBase>& D) {
+    initialize_history(2);
+
+    return Degradation::initialize(D);
+}
+
+int StressDegradation::update_trial_status(const vec& t_strain) {
+    if(SUANPAN_SUCCESS != base->update_trial_status(trial_strain = t_strain)) return SUANPAN_FAIL;
+
+    trial_stress = base->get_trial_stress();
+
+    trial_history = current_history;
+    auto& max_stress = trial_history(0);
+    auto& min_stress = trial_history(1);
+
+    if(trial_stress(0) > 0.)
+        // tension
+        if(trial_stress(0) > max_stress) {
+            max_stress = trial_stress(0);
+            const auto degradation = compute_positive_degradation(max_stress);
+            const auto& d = degradation(0);
+            const auto& dd = degradation(1);
+
+            trial_stress = d * base->get_trial_stress();
+
+            trial_stiffness = (d + dd * base->get_trial_stress()) * base->get_trial_stiffness();
+        }
+        else {
+            const auto degradation = compute_positive_degradation(max_stress);
+            const auto& d = degradation(0);
+
+            trial_stress = d * base->get_trial_stress();
+
+            trial_stiffness = d * base->get_trial_stiffness();
+        }
+    else
+        // compression
+        if(trial_stress(0) < min_stress) {
+            min_stress = trial_stress(0);
+            const auto degradation = compute_negative_degradation(min_stress);
+            const auto& d = degradation(0);
+            const auto& dd = degradation(1);
+
+            trial_stress = d * base->get_trial_stress();
+
+            trial_stiffness = (d + dd * base->get_trial_stress()) * base->get_trial_stiffness();
+        }
+        else {
+            const auto degradation = compute_negative_degradation(min_stress);
+            const auto& d = degradation(0);
+
+            trial_stress = d * base->get_trial_stress();
+
+            trial_stiffness = d * base->get_trial_stiffness();
+        }
+
+    return SUANPAN_SUCCESS;
 }

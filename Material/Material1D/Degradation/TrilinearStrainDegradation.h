@@ -15,37 +15,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class Dhakal
- * @brief The Dhakal class.
+ * @class TrilinearStrainDegradation
+ * @brief The TrilinearDegradation class.
  *
  * @author tlc
- * @date 14/07/2019
+ * @date 11/05/2019
  * @version 0.1.0
- * @file Dhakal.h
+ * @file TrilinearStrainDegradation.h
  * @addtogroup Material-1D
  * @{
  */
 
-#ifndef DHAKAL_H
-#define DHAKAL_H
+#ifndef TRILINEARSTRAINDEGRADATION_H
+#define TRILINEARSTRAINDEGRADATION_H
 
 #include "Degradation.h"
 
-struct DataDhakal {
-    const double yield_strain, inter_strain, inter_factor;
-    const double slope = (inter_factor - 1.) / (inter_strain - yield_strain);
-    const double final_strain = (inter_factor - .2) * 50. * yield_strain + inter_strain;
+struct DataTrilinearStrainDegradation {
+    const double s_strain;
+    const double e_strain;
+    const double e_damage;
+    const double slope = (1. - e_damage) / (s_strain - e_strain);
 };
 
-class Dhakal final : DataDhakal, public StrainDegradation {
+class TrilinearStrainDegradation final : DataTrilinearStrainDegradation, public StrainDegradation {
     [[nodiscard]] vec compute_positive_degradation(double) const override;
     [[nodiscard]] vec compute_negative_degradation(double) const override;
 
 public:
-    Dhakal(unsigned, // unique tag
-           unsigned, // material tag
-           double,   // yield strain
-           double    // parameter
+    TrilinearStrainDegradation(unsigned, // unique tag
+                               unsigned, // material tag
+                               double,   // start strain
+                               double,   // end strain
+                               double    // end level
     );
 
     unique_ptr<Material> get_copy() override;

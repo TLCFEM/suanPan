@@ -6,6 +6,10 @@
 2. The `SPIKE` solver may occasionally hang, to circumvent, try to avoid mixing compilers from different vendors.
 3. The `MUMPS` solver throws segfaults with large matrices.
 
+## version 3.2
+
+1. revise uniaxial universal damage models
+
 ## version 3.1
 
 1. iterative solvers by the Lis library [#145](https://github.com/TLCFEM/suanPan/pull/145)

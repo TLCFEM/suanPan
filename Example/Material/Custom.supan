@@ -27,8 +27,8 @@ material CustomGurson 14 1
 material CustomGurson 15 5
 
 material MPF 100 1000 5 .1
-material CustomDegradation 20 100 1
-material CustomDegradation 21 100 5
+material CustomStrainDegradation 20 100 1
+material CustomStrainDegradation 21 100 5
 
 material CustomViscosity 22 1
 material CustomViscosity 23 5
