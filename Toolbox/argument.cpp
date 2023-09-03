@@ -29,7 +29,7 @@
 #endif
 
 #ifdef SUANPAN_MSVC
-#pragma warning(disable : 4702 4996)
+#pragma warning(disable:4702 4996)
 #endif
 
 #ifdef SUANPAN_VTK
@@ -78,6 +78,25 @@ bool check_debugger() {
 #elif defined(SUANPAN_UNIX)
 #endif
     return false;
+}
+
+bool support_emoji() {
+#ifdef SUANPAN_WIN
+    NTSTATUS (WINAPI *RtlGetVersion)(LPOSVERSIONINFOEXW);
+    OSVERSIONINFOEXW osInfo;
+    const auto nt_module = GetModuleHandleA("ntdll");
+    if(nullptr == nt_module) return false;
+    // ReSharper disable once CppCStyleCast
+    *(FARPROC*)&RtlGetVersion = GetProcAddress(nt_module, "RtlGetVersion");
+    if(nullptr == RtlGetVersion) return false;
+
+    osInfo.dwOSVersionInfoSize = sizeof(osInfo);
+    // ReSharper disable once CppFunctionResultShouldBeUsed
+    RtlGetVersion(&osInfo);
+    return osInfo.dwBuildNumber >= 22000;
+#else
+    return true;
+#endif
 }
 
 void check_version(const fs::path& path_to_executable) {
@@ -156,19 +175,20 @@ void print_header() {
     suanpan_info("|  \\__/ |__| |    |__X |  |       all rights reserved |\n");
     suanpan_info("|                              10.5281/zenodo.1285221 |\n");
     suanpan_info("+-----------------------------------------------------+\n");
-#ifdef SUANPAN_WIN
-    suanpan_info("|  https://github.com/TLCFEM/suanPan                  |\n");
-    suanpan_info("|  https://tlcfem.github.io/suanPan-manual/latest     |\n");
-    suanpan_info("+-----------------------------------------------------+\n");
-    suanpan_info("|  https://gitter.im/suanPan-dev/community            |\n");
-#else
-    static constexpr std::array POOL{"\xF0\x9F\x8C\x88", "\xF0\x9F\x8C\x8F", "\xF0\x9F\x8E\xA7", "\xF0\x9F\x8E\xB1", "\xF0\x9F\x91\xB9", "\xF0\x9F\x92\xBB", "\xF0\x9F\x94\x8B", "\xF0\x9F\x94\x94", "\xF0\x9F\x9A\x80", "\xF0\x9F\xA7\xA9"};
-    arma_rng::set_seed_random();
-    suanpan_info("|  \xF0\x9F\xA7\xAE https://github.com/TLCFEM/suanPan               |\n");
-    suanpan_info("|  \xF0\x9F\x93\x9A https://tlcfem.github.io/suanPan-manual/latest  |\n");
-    suanpan_info("+-----------------------------------------------------+\n");
-    suanpan_info("|  {} https://gitter.im/suanPan-dev/community         |\n", POOL[randi() % POOL.size()]);
-#endif
+    if(support_emoji()) {
+        static const std::vector POOL{"\xF0\x9F\x8C\x88", "\xF0\x9F\x8C\x8F", "\xF0\x9F\x8E\xA7", "\xF0\x9F\x8E\xB1", "\xF0\x9F\x91\xB9", "\xF0\x9F\x92\xBB", "\xF0\x9F\x94\x8B", "\xF0\x9F\x94\x94", "\xF0\x9F\x9A\x80", "\xF0\x9F\xA7\xA9"};
+        arma_rng::set_seed_random();
+        suanpan_info("|  \xF0\x9F\xA7\xAE https://github.com/TLCFEM/suanPan               |\n");
+        suanpan_info("|  \xF0\x9F\x93\x9A https://tlcfem.github.io/suanPan-manual/latest  |\n");
+        suanpan_info("+-----------------------------------------------------+\n");
+        suanpan_info("|  {} https://gitter.im/suanPan-dev/community         |\n", POOL[randi() % POOL.size()]);
+    }
+    else {
+        suanpan_info("|  https://github.com/TLCFEM/suanPan                  |\n");
+        suanpan_info("|  https://tlcfem.github.io/suanPan-manual/latest     |\n");
+        suanpan_info("+-----------------------------------------------------+\n");
+        suanpan_info("|  https://gitter.im/suanPan-dev/community            |\n");
+    }
     suanpan_info("+-----------------------------------------------------+\n\n");
 }
 
