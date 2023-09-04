@@ -1,0 +1,68 @@
+/*******************************************************************************
+ * Copyright (C) 2017-2023 Theodore Chang
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
+/**
+ * @class ConcreteK4
+ * @brief A ConcreteK4 material class.
+ *
+ * @author tlc
+ * @date 05/09/2023
+ * @version 0.1.0
+ * @file ConcreteK4.h
+ * @addtogroup Material-1D
+ * @{
+ */
+
+#ifndef CONCRETEK4_H
+#define CONCRETEK4_H
+
+#include <Material/Material1D/Material1D.h>
+
+struct DataConcreteK4 {
+    const double elastic_modulus;
+    const double hardening_t, hardening_c, hardening_d, hardening_k;
+    const double f_t = 4, f_c = 30, k_peak = 1E-2, f_y = f_c - k_peak * hardening_c;
+};
+
+class ConcreteK4 final : protected DataConcreteK4, public Material1D {
+    void compute_tension_branch();
+    void compute_compression_branch();
+    void compute_crack_close_branch();
+
+public:
+    ConcreteK4(unsigned,   // tag
+               double,     // elastic modulus 
+               double = 0. // density
+    );
+
+    int initialize(const shared_ptr<DomainBase>&) override;
+
+    unique_ptr<Material> get_copy() override;
+
+    [[nodiscard]] double get_parameter(ParameterType) const override;
+
+    int update_trial_status(const vec&) override;
+
+    int clear_status() override;
+    int commit_status() override;
+    int reset_status() override;
+
+    void print() override;
+};
+
+#endif
+
+//! @}

@@ -1,5 +1,6 @@
 set(M1D
         Material1D/Concrete/ConcreteCM.cpp
+        Material1D/Concrete/ConcreteK4.cpp
         Material1D/Concrete/ConcreteExp.cpp
         Material1D/Concrete/ConcreteTable.cpp
         Material1D/Concrete/ConcreteTsai.cpp
