@@ -9,6 +9,7 @@
 ## version 3.2
 
 1. revise uniaxial universal damage models [#153](https://github.com/TLCFEM/suanPan/pull/153)
+2. update `OpenBLAS` to version `0.3.24`
 
 ## version 3.1
 
