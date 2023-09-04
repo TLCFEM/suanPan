@@ -36,7 +36,7 @@ struct DataYeoh {
     const vec A1;
 };
 
-class Yeoh final : DataYeoh, public Material3D {
+class Yeoh final : protected DataYeoh, public Material3D {
     static const vec weight;
     static const vec I1E;
 

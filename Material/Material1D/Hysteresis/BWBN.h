@@ -37,7 +37,7 @@ struct DataBWBN {
     const vec pool;
 };
 
-class BWBN final : DataBWBN, public Material1D {
+class BWBN final : protected DataBWBN, public Material1D {
     static constexpr unsigned max_iteration = 20;
 
     const double& elastic_modulus = pool(0);

@@ -33,7 +33,7 @@ struct DataTanh1D {
     const double elastic_modulus; // elastic modulus
 };
 
-class Tanh1D final : DataTanh1D, public Material1D {
+class Tanh1D final : protected DataTanh1D, public Material1D {
 public:
     Tanh1D(unsigned,   // tag
            double,     // elastic modulus

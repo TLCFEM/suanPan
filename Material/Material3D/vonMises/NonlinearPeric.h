@@ -40,7 +40,7 @@ struct DataNonlinearPeric {
     const double epsilon;
 };
 
-class NonlinearPeric : DataNonlinearPeric, public Material3D {
+class NonlinearPeric : protected DataNonlinearPeric, public Material3D {
     static constexpr unsigned max_iteration = 20;
     static const double root_three_two;
     static const mat unit_dev_tensor;

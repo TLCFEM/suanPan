@@ -47,7 +47,7 @@ struct DataArmstrongFrederick1D {
     const vec a, b;
 };
 
-class ArmstrongFrederick1D final : DataArmstrongFrederick1D, public Material1D {
+class ArmstrongFrederick1D final : protected DataArmstrongFrederick1D, public Material1D {
     static constexpr unsigned max_iteration = 20;
 
     const unsigned size = static_cast<unsigned>(a.size());

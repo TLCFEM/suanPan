@@ -35,7 +35,7 @@ struct DataViscosity02 {
     const double gap_a, gap_b;
 };
 
-class Viscosity02 final : DataViscosity02, public NonlinearViscosity {
+class Viscosity02 final : protected DataViscosity02, public NonlinearViscosity {
     [[nodiscard]] double compute_du(double, double) const override;
     [[nodiscard]] double compute_dv(double, double) const override;
     [[nodiscard]] double compute_damping_coefficient(double, double) const override;

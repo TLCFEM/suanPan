@@ -35,7 +35,7 @@ struct DataExpHoffman {
     const double a, b;
 };
 
-class ExpHoffman final : DataExpHoffman, public NonlinearHoffman {
+class ExpHoffman final : protected DataExpHoffman, public NonlinearHoffman {
     [[nodiscard]] double compute_k(double) const override;
     [[nodiscard]] double compute_dk(double) const override;
 

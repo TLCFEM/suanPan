@@ -41,7 +41,7 @@ struct DataGap01 {
     const double gap_strain;
 };
 
-class Gap01 final : DataGap01, public Material1D {
+class Gap01 final : protected DataGap01, public Material1D {
 public:
     Gap01(unsigned,    // tag
           double,      // elastic modulus

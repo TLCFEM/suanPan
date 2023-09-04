@@ -34,7 +34,7 @@ struct DataBilinearPeric {
     const double yield_stress, hardening_modulus;
 };
 
-class BilinearPeric final : DataBilinearPeric, public NonlinearPeric {
+class BilinearPeric final : protected DataBilinearPeric, public NonlinearPeric {
     [[nodiscard]] double compute_k(double) const override;
     [[nodiscard]] double compute_dk(double) const override;
 

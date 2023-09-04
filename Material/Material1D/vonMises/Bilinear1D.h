@@ -38,7 +38,7 @@ struct DataBilinear1D {
     const double kinematic_modulus;
 };
 
-class Bilinear1D final : DataBilinear1D, public Material1D {
+class Bilinear1D final : protected DataBilinear1D, public Material1D {
 public:
     Bilinear1D(unsigned,     // tag
                double,       // elastic modulus

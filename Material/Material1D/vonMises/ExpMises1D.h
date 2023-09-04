@@ -35,7 +35,7 @@ struct DataExpMises1D {
     const double a, b, c;
 };
 
-class ExpMises1D final : DataExpMises1D, public NonlinearMises1D {
+class ExpMises1D final : protected DataExpMises1D, public NonlinearMises1D {
     [[nodiscard]] double compute_k(double) const override;
     [[nodiscard]] double compute_dk(double) const override;
     [[nodiscard]] double compute_h(double) const override;

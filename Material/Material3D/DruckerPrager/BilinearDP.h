@@ -36,7 +36,7 @@ struct DataBilinearDP {
     const double critical = -cohesion / cohesion_slope;
 };
 
-class BilinearDP final : DataBilinearDP, public NonlinearDruckerPrager {
+class BilinearDP final : protected DataBilinearDP, public NonlinearDruckerPrager {
     [[nodiscard]] double compute_c(double) const override;
     [[nodiscard]] double compute_dc(double) const override;
 

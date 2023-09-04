@@ -48,7 +48,7 @@ struct DataNonlinearCamClay {
     const double pt;              // tensile yield hydrostatic stress
 };
 
-class NonlinearCamClay : DataNonlinearCamClay, public Material3D {
+class NonlinearCamClay : protected DataNonlinearCamClay, public Material3D {
     static constexpr unsigned max_iteration = 20;
     static const double sqrt_three_two;
     static const mat unit_dev_tensor;

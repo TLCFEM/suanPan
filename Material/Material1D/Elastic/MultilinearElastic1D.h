@@ -34,7 +34,7 @@ struct DataMultilinearElastic1D {
     const mat backbone;
 };
 
-class MultilinearElastic1D final : DataMultilinearElastic1D, public Material1D {
+class MultilinearElastic1D final : protected DataMultilinearElastic1D, public Material1D {
 public:
     MultilinearElastic1D(unsigned,   // tag
                          mat&&,      // backbone

@@ -36,7 +36,7 @@ struct DataBilinearViscosity {
     const double hardening;
 };
 
-class BilinearViscosity final : DataBilinearViscosity, public NonlinearViscosity {
+class BilinearViscosity final : protected DataBilinearViscosity, public NonlinearViscosity {
     const double yield_strain = yield_stress / damping;
 
     [[nodiscard]] double compute_du(double, double) const override;

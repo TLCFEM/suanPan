@@ -34,7 +34,7 @@ struct DataFluid {
     const double bulk_modulus; // bulk modulus
 };
 
-class Fluid final : DataFluid, public Material {
+class Fluid final : protected DataFluid, public Material {
 public:
     Fluid(unsigned, // tag
           double,   // bulk modulus

@@ -38,7 +38,7 @@ struct DataExpCC {
     const double factor = (1. + e0) * (kappa - lambda);
 };
 
-class ExpCC final : DataExpCC, public NonlinearCamClay {
+class ExpCC final : protected DataExpCC, public NonlinearCamClay {
     [[nodiscard]] double compute_a(double) const override;
     [[nodiscard]] double compute_da(double) const override;
 

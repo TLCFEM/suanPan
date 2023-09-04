@@ -40,7 +40,7 @@ struct DataBlatzKo {
     const double half_beta_two;
 };
 
-class BlatzKo final : DataBlatzKo, public Material3D {
+class BlatzKo final : protected DataBlatzKo, public Material3D {
     static const vec weight;
 
 public:

@@ -48,7 +48,7 @@ struct DataSimpleSand {
     const double v0 = 2.;
 };
 
-class SimpleSand final : DataSimpleSand, public Material3D {
+class SimpleSand final : protected DataSimpleSand, public Material3D {
     static constexpr unsigned max_iteration = 20;
     static const mat unit_dev_tensor;
 

@@ -49,7 +49,7 @@ struct DataExpJ2 {
     const double a, b;
 };
 
-class ExpJ2 final : DataExpJ2, public NonlinearJ2 {
+class ExpJ2 final : protected DataExpJ2, public NonlinearJ2 {
     [[nodiscard]] double compute_k(double) const override;
     [[nodiscard]] double compute_dk(double) const override;
     [[nodiscard]] double compute_h(double) const override;

@@ -37,7 +37,7 @@ struct DataDhakal {
     const double final_strain = (inter_factor - .2) * 50. * yield_strain + inter_strain;
 };
 
-class Dhakal final : DataDhakal, public StrainDegradation {
+class Dhakal final : protected DataDhakal, public StrainDegradation {
     [[nodiscard]] vec compute_positive_degradation(double) const override;
     [[nodiscard]] vec compute_negative_degradation(double) const override;
 

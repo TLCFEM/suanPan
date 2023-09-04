@@ -38,7 +38,7 @@ struct DataTrilinearStrainDegradation {
     const double slope = (1. - e_damage) / (s_strain - e_strain);
 };
 
-class TrilinearStrainDegradation final : DataTrilinearStrainDegradation, public StrainDegradation {
+class TrilinearStrainDegradation final : protected DataTrilinearStrainDegradation, public StrainDegradation {
     [[nodiscard]] vec compute_positive_degradation(double) const override;
     [[nodiscard]] vec compute_negative_degradation(double) const override;
 

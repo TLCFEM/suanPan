@@ -37,7 +37,7 @@ struct DataBilinearElastic1D {
     const double radius;            // radius
 };
 
-class BilinearElastic1D final : DataBilinearElastic1D, public Material1D {
+class BilinearElastic1D final : protected DataBilinearElastic1D, public Material1D {
     const double yield_strain = yield_stress / elastic_modulus;
 
 public:

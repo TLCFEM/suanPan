@@ -39,7 +39,7 @@ struct DataBilinearOO {
     const double c_hardening;
 };
 
-class BilinearOO final : DataBilinearOO, public OriginOriented {
+class BilinearOO final : protected DataBilinearOO, public OriginOriented {
     const double t_stress = elastic_modulus * t_strain;
     const double c_stress = elastic_modulus * c_strain;
 

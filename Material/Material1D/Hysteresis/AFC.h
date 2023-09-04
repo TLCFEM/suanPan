@@ -44,7 +44,7 @@ struct DataAFC {
     const double c_yield_strain = c_yield_stress / elastic_modulus;
 };
 
-class AFC final : DataAFC, public Material1D {
+class AFC final : protected DataAFC, public Material1D {
     static podarray<double> compute_transition(double, double, double, double, double, double, double);
     void compute_degradation(double, double);
 

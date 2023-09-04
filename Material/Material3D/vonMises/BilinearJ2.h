@@ -42,7 +42,7 @@ struct DataBilinearJ2 {
     const double beta;            // isotropic (1.0) / kinematic (0.0) hardening factor
 };
 
-class BilinearJ2 final : DataBilinearJ2, public Material3D {
+class BilinearJ2 final : protected DataBilinearJ2, public Material3D {
     static const double two_third;
     static const double root_two_third;
     static const mat unit_dev_tensor;

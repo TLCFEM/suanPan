@@ -36,7 +36,7 @@ struct DataRambergOsgood {
     const double offset, n;
 };
 
-class RambergOsgood final : DataRambergOsgood, public Material1D {
+class RambergOsgood final : protected DataRambergOsgood, public Material1D {
     static constexpr unsigned max_iteration = 10;
 
     const double nm = n - 1.;

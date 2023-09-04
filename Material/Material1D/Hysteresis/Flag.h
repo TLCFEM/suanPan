@@ -47,7 +47,7 @@ struct DataFlag {
     const double c_residual_strain = c_residual_stress / elastic_modulus;
 };
 
-class Flag final : DataFlag, public Material1D {
+class Flag final : protected DataFlag, public Material1D {
     enum class Status {
         NONE,
         TLOAD,

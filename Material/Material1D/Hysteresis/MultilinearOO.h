@@ -35,7 +35,7 @@ struct DataMultilinearOO {
     const mat c_backbone;
 };
 
-class MultilinearOO final : DataMultilinearOO, public OriginOriented {
+class MultilinearOO final : protected DataMultilinearOO, public OriginOriented {
     [[nodiscard]] podarray<double> compute_tension_backbone(double) const override;
     [[nodiscard]] podarray<double> compute_compression_backbone(double) const override;
 

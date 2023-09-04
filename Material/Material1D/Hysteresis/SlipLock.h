@@ -42,7 +42,7 @@ struct DataSlipLock {
     const double R0;              // model parameters
 };
 
-class SlipLock final : DataSlipLock, public Material1D {
+class SlipLock final : protected DataSlipLock, public Material1D {
     static constexpr unsigned max_iteration = 20;
 
     const double yield_stress = yield_strain * elastic_modulus; // yield strain

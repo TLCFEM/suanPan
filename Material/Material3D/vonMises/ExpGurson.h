@@ -35,7 +35,7 @@ struct DataExpGurson {
     const double yield_stress, n;
 };
 
-class ExpGurson final : DataExpGurson, public NonlinearGurson {
+class ExpGurson final : protected DataExpGurson, public NonlinearGurson {
     static const unsigned max_iteration;
 
     const double para_c = 3. * elastic_modulus / (2. + 2. * poissons_ratio) / yield_stress;

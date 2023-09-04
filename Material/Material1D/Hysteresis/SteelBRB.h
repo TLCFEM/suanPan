@@ -45,7 +45,7 @@ struct DataSteelBRB {
     const double c_exponent = .4;
 };
 
-class SteelBRB final : DataSteelBRB, public Material1D {
+class SteelBRB final : protected DataSteelBRB, public Material1D {
     static constexpr unsigned max_iteration = 20;
 
     const double s_modulus = -elastic_modulus - plastic_modulus;

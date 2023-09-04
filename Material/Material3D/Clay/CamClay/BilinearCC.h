@@ -37,7 +37,7 @@ struct DataBilinearCC {
     const double a, a_slope;
 };
 
-class BilinearCC final : DataBilinearCC, public NonlinearCamClay {
+class BilinearCC final : protected DataBilinearCC, public NonlinearCamClay {
     [[nodiscard]] double compute_a(double) const override;
     [[nodiscard]] double compute_da(double) const override;
 

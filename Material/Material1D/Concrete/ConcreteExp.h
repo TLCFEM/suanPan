@@ -36,7 +36,7 @@ struct DataConcreteExp {
     const double f_t, f_c, a_t, a_c, b_t, b_c;
 };
 
-class ConcreteExp final : DataConcreteExp, public SimpleHysteresis {
+class ConcreteExp final : protected DataConcreteExp, public SimpleHysteresis {
     static constexpr unsigned max_iteration = 20;
 
     [[nodiscard]] podarray<double> compute_compression_initial_reverse() const override;

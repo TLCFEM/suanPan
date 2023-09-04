@@ -34,7 +34,7 @@ struct DataAsymmElastic1D {
     const double c_elastic_modulus;
 };
 
-class AsymmElastic1D final : DataAsymmElastic1D, public Material1D {
+class AsymmElastic1D final : protected DataAsymmElastic1D, public Material1D {
 public:
     AsymmElastic1D(unsigned,   // tag
                    double,     // tension elastic modulus

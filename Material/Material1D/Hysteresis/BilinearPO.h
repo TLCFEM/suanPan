@@ -39,7 +39,7 @@ struct DataBilinearPO {
     const double c_hardening;
 };
 
-class BilinearPO final : DataBilinearPO, public PeakOriented {
+class BilinearPO final : protected DataBilinearPO, public PeakOriented {
     const double t_stress = elastic_modulus * t_strain;
     const double c_stress = elastic_modulus * c_strain;
 

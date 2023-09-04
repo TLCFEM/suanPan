@@ -48,7 +48,7 @@ struct DataArmstrongFrederick {
     const vec a, b;
 };
 
-class ArmstrongFrederick final : DataArmstrongFrederick, public Material3D {
+class ArmstrongFrederick final : protected DataArmstrongFrederick, public Material3D {
     static constexpr unsigned max_iteration = 20;
     static const double root_three_two;
     static const mat unit_dev_tensor;

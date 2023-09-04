@@ -36,7 +36,7 @@ struct DataCoulombFriction {
     const double factor;
 };
 
-class CoulombFriction final : DataCoulombFriction, public Material1D {
+class CoulombFriction final : protected DataCoulombFriction, public Material1D {
 public:
     CoulombFriction(unsigned, // tag
                     double,   // maximum friction force

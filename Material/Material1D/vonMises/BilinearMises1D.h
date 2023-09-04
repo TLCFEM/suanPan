@@ -35,7 +35,7 @@ struct DataBilinearMises1D {
     const double isotropic_modulus;
 };
 
-class BilinearMises1D final : DataBilinearMises1D, public NonlinearMises1D {
+class BilinearMises1D final : protected DataBilinearMises1D, public NonlinearMises1D {
     [[nodiscard]] double compute_k(double) const override;
     [[nodiscard]] double compute_dk(double) const override;
     [[nodiscard]] double compute_h(double) const override;

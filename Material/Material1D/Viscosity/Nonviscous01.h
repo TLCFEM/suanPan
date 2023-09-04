@@ -34,7 +34,7 @@ struct DataNonviscous01 {
     const cx_vec m, s;
 };
 
-class Nonviscous01 final : DataNonviscous01, public Material1D {
+class Nonviscous01 final : protected DataNonviscous01, public Material1D {
     const double* incre_time = nullptr;
 
     cx_vec complex_damping;

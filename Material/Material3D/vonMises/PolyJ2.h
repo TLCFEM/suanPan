@@ -35,7 +35,7 @@ struct DataPolyJ2 {
     const vec poly_para;
 };
 
-class PolyJ2 final : DataPolyJ2, public NonlinearJ2 {
+class PolyJ2 final : protected DataPolyJ2, public NonlinearJ2 {
     [[nodiscard]] double compute_k(double) const override;
     [[nodiscard]] double compute_dk(double) const override;
     [[nodiscard]] double compute_h(double) const override;

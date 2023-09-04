@@ -38,7 +38,7 @@ struct DataMooneyRivlin {
     const double A10, A01;
 };
 
-class MooneyRivlin final : DataMooneyRivlin, public Material3D {
+class MooneyRivlin final : protected DataMooneyRivlin, public Material3D {
     static const vec weight;
     static const vec I1E;
     static const mat I2EE;

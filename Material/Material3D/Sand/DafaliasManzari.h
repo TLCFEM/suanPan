@@ -51,7 +51,7 @@ struct DataDafaliasManzari {
     const double gr = .2;
 };
 
-class DafaliasManzari final : DataDafaliasManzari, public Material3D {
+class DafaliasManzari final : protected DataDafaliasManzari, public Material3D {
     static constexpr unsigned max_iteration = 20;
     static const mat unit_dev_tensor;
 
