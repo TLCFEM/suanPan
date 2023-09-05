@@ -1522,7 +1522,7 @@
     <ClCompile Include="..\..\..\Material\Material1D\Degradation\CustomStressDegradation.cpp">
       <Filter>Material\Material1D\Degradation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Material\Material1D\Concrete\ConcreteK4.cpp">
+    <ClCompile Include="..\..\..\Material\Material1D\Concrete\NonlinearK4.cpp">
       <Filter>Material\Material1D\Concrete</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2914,7 +2914,7 @@
     <ClInclude Include="..\..\..\Material\Material1D\Degradation\CustomStressDegradation.h">
       <Filter>Material\Material1D\Degradation</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Material\Material1D\Concrete\ConcreteK4.h">
+    <ClInclude Include="..\..\..\Material\Material1D\Concrete\NonlinearK4.h">
       <Filter>Material\Material1D\Concrete</Filter>
     </ClInclude>
   </ItemGroup>

@@ -294,7 +294,7 @@
     <ClCompile Include="..\..\..\Material\Material.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Concrete\ConcreteCM.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Concrete\ConcreteExp.cpp" />
-    <ClCompile Include="..\..\..\Material\Material1D\Concrete\ConcreteK4.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Concrete\NonlinearK4.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Concrete\ConcreteTable.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Concrete\ConcreteTsai.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Degradation\CustomStrainDegradation.cpp" />
@@ -766,7 +766,7 @@
     <ClInclude Include="..\..\..\Material\Material.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Concrete\ConcreteCM.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Concrete\ConcreteExp.h" />
-    <ClInclude Include="..\..\..\Material\Material1D\Concrete\ConcreteK4.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Concrete\NonlinearK4.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Concrete\ConcreteTable.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Concrete\ConcreteTsai.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Degradation\CustomStrainDegradation.h" />

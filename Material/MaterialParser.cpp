@@ -1130,6 +1130,30 @@ void new_concreteexp(unique_ptr<Material>& return_obj, istringstream& command) {
     return_obj = make_unique<ConcreteExp>(tag, elastic_modulus, f_t, a_t, g_t, f_c, a_c, g_c, middle_point, density);
 }
 
+void new_concretek4(unique_ptr<Material>& return_obj, istringstream& command) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    double elastic_modulus;
+    if(!get_input(command, elastic_modulus)) {
+        suanpan_error("A valid elastic modulus is required.\n");
+        return;
+    }
+
+    auto density = 0.;
+    if(command.eof())
+        suanpan_debug("Zero density assumed.\n");
+    else if(!get_input(command, density)) {
+        suanpan_error("A valid density is required.\n");
+        return;
+    }
+
+    return_obj = make_unique<ConcreteK4>(tag, elastic_modulus, density);
+}
+
 void new_concretetable(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -2120,30 +2144,6 @@ void new_lineardamage(unique_ptr<Material>& return_obj, istringstream& command) 
     }
 
     return_obj = make_unique<LinearDamage>(tag, mat_tag, value(0), value(1), value(2));
-}
-
-void new_lineark4(unique_ptr<Material>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    double elastic_modulus;
-    if(!get_input(command, elastic_modulus)) {
-        suanpan_error("A valid elastic modulus is required.\n");
-        return;
-    }
-
-    auto density = 0.;
-    if(command.eof())
-        suanpan_debug("Zero density assumed.\n");
-    else if(!get_input(command, density)) {
-        suanpan_error("A valid density is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<LinearK4>(tag, elastic_modulus, density);
 }
 
 void new_laminated(unique_ptr<Material>& return_obj, istringstream& command) {
@@ -3404,6 +3404,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "Concrete22")) new_concrete22(new_material, command);
     else if(is_equal(material_id, "ConcreteCM")) new_concretecm(new_material, command);
     else if(is_equal(material_id, "ConcreteExp")) new_concreteexp(new_material, command);
+    else if(is_equal(material_id, "ConcreteK4")) new_concretek4(new_material, command);
     else if(is_equal(material_id, "ConcreteTable")) new_concretetable(new_material, command);
     else if(is_equal(material_id, "ConcreteTsai")) new_concretetsai(new_material, command);
     else if(is_equal(material_id, "CoulombFriction")) new_coulombfriction(new_material, command);
@@ -3439,7 +3440,6 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "Kelvin")) new_kelvin(new_material, command);
     else if(is_equal(material_id, "Laminated")) new_laminated(new_material, command);
     else if(is_equal(material_id, "LinearDamage")) new_lineardamage(new_material, command);
-    else if(is_equal(material_id, "LinearK4")) new_lineark4(new_material, command);
     else if(is_equal(material_id, "Maxwell")) new_maxwell(new_material, command);
     else if(is_equal(material_id, "MooneyRivlin")) new_mooneyrivlin(new_material, command);
     else if(is_equal(material_id, "MPF")) new_mpf(new_material, command);

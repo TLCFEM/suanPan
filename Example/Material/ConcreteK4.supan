@@ -1,10 +1,10 @@
-# A TEST MODEL FOR LINEARK4 MATERIAL
+# A TEST MODEL FOR CONCRETEK4 MATERIAL
 
 node 1 0 0
 node 2 3 0
 node 3 6 0
 
-material LinearK4 1 3E4
+material ConcreteK4 1 3E4
 
 element T2D2 1 1 2 1 10
 element T2D2 2 3 2 1 10

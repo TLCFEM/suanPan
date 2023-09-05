@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class ConcreteK4
+ * @class NonlinearK4
  * @brief A ConcreteK4 material class.
  *
  * @author tlc
@@ -31,11 +31,11 @@
 
 #include <Material/Material1D/Material1D.h>
 
-struct DataConcreteK4 {
+struct DataNonlinearK4 {
     const double elastic_modulus, hardening_k;
 };
 
-class ConcreteK4 : protected DataConcreteK4, public Material1D {
+class NonlinearK4 : protected DataNonlinearK4, public Material1D {
     static constexpr unsigned max_iteration = 20;
 
     [[nodiscard]] virtual vec2 compute_tension_backbone(double) const = 0;
@@ -49,9 +49,10 @@ class ConcreteK4 : protected DataConcreteK4, public Material1D {
     int compute_crack_close_branch();
 
 public:
-    ConcreteK4(unsigned,   // tag
-               double,     // elastic modulus
-               double = 0. // density
+    NonlinearK4(unsigned,    // tag
+                double,      // elastic modulus
+                double = 0., // characteristic length
+                double = 0.  // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;
@@ -67,14 +68,14 @@ public:
     void print() override;
 };
 
-struct DataLinearK4 {
+struct DataConcreteK4 {
     const double hardening_t, hardening_d;
     const double f_t = 2, f_c = 10, k_peak = 2E-3, f_y = .6 * f_c;
-    const double e_ft = 5E-3, e_fc = 1E-2;
+    const double ref_e_t = 5E-3, ref_e_c = 1E-2;
     const double hardening_c = (f_c - f_y) / k_peak;
 };
 
-class LinearK4 final : protected DataLinearK4, public ConcreteK4 {
+class ConcreteK4 final : protected DataConcreteK4, public NonlinearK4 {
     [[nodiscard]] vec2 compute_tension_backbone(double) const override;
     [[nodiscard]] vec2 compute_compression_backbone(double) const override;
 
@@ -82,9 +83,10 @@ class LinearK4 final : protected DataLinearK4, public ConcreteK4 {
     [[nodiscard]] vec2 compute_compression_damage(double) const override;
 
 public:
-    LinearK4(unsigned,   // tag
-             double,     // elastic modulus 
-             double = 0. // density
+    ConcreteK4(unsigned,    // tag
+               double,      // elastic modulus
+               double = 0., // characteristic length
+               double = 0.  // density
     );
 
     unique_ptr<Material> get_copy() override;
