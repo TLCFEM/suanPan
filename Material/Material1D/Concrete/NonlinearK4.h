@@ -38,6 +38,8 @@ struct DataNonlinearK4 {
 class NonlinearK4 : protected DataNonlinearK4, public Material1D {
     static constexpr unsigned max_iteration = 20;
 
+    const bool no_damage = true;
+
     [[nodiscard]] virtual vec2 compute_tension_backbone(double) const = 0;
     [[nodiscard]] virtual vec2 compute_compression_backbone(double) const = 0;
 
@@ -51,6 +53,7 @@ class NonlinearK4 : protected DataNonlinearK4, public Material1D {
 public:
     NonlinearK4(unsigned,    // tag
                 double,      // elastic modulus
+                double,      // hardening parameter
                 double = 0., // characteristic length
                 double = 0.  // density
     );
@@ -70,8 +73,8 @@ public:
 
 struct DataConcreteK4 {
     const double hardening_t, hardening_d;
-    const double f_t = 2, f_c = 10, k_peak = 2E-3, f_y = .6 * f_c;
-    const double ref_e_t = 5E-3, ref_e_c = 1E-2;
+    const double f_t, f_c, k_peak, f_y;
+    const double ref_e_t, ref_e_c;
     const double hardening_c = (f_c - f_y) / k_peak;
 };
 
@@ -85,6 +88,8 @@ class ConcreteK4 final : protected DataConcreteK4, public NonlinearK4 {
 public:
     ConcreteK4(unsigned,    // tag
                double,      // elastic modulus
+               double,      // hardening parameter
+               vec&&,       // parameters
                double = 0., // characteristic length
                double = 0.  // density
     );

@@ -1137,9 +1137,23 @@ void new_concretek4(unique_ptr<Material>& return_obj, istringstream& command) {
         return;
     }
 
-    double elastic_modulus;
-    if(!get_input(command, elastic_modulus)) {
-        suanpan_error("A valid elastic modulus is required.\n");
+    double elastic_modulus, hardening;
+    if(!get_input(command, elastic_modulus, hardening)) {
+        suanpan_error("A valid modulus is required.\n");
+        return;
+    }
+
+    vec pool(8);
+    if(!get_input(command, pool)) {
+        suanpan_error("A valid parameter is required.\n");
+        return;
+    }
+
+    auto characteristic_length = 1.;
+    if(command.eof())
+        suanpan_debug("Unit characteristic length assumed.\n");
+    else if(!get_input(command, characteristic_length)) {
+        suanpan_error("A valid characteristic length is required.\n");
         return;
     }
 
@@ -1151,7 +1165,7 @@ void new_concretek4(unique_ptr<Material>& return_obj, istringstream& command) {
         return;
     }
 
-    return_obj = make_unique<ConcreteK4>(tag, elastic_modulus, density);
+    return_obj = make_unique<ConcreteK4>(tag, elastic_modulus, hardening, std::move(pool), characteristic_length, density);
 }
 
 void new_concretetable(unique_ptr<Material>& return_obj, istringstream& command) {

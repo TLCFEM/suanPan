@@ -32,6 +32,8 @@ int NonlinearK4::compute_tension_branch() {
         const auto residual = fabs(trial_stress(0)) - backbone(0);
 
         if(1u == counter && residual <= 0.) {
+            if(no_damage) return SUANPAN_SUCCESS;
+
             const auto damage = compute_tension_damage(kt);
 
             trial_stress *= 1. - damage(0);
@@ -46,6 +48,8 @@ int NonlinearK4::compute_tension_branch() {
         suanpan_debug("Local tension iteration error: {:.5E}.\n", error);
         if(error < tolerance || fabs(residual) < tolerance) {
             trial_stiffness -= elastic_modulus / jacobian * elastic_modulus;
+
+            if(no_damage) return SUANPAN_SUCCESS;
 
             const auto damage = compute_tension_damage(kt);
 
@@ -79,6 +83,8 @@ int NonlinearK4::compute_compression_branch() {
         const auto residual = fabs(trial_stress(0)) - backbone(0);
 
         if(1u == counter && residual <= 0.) {
+            if(no_damage) return SUANPAN_SUCCESS;
+
             const auto damage = compute_compression_damage(kc);
 
             trial_stress *= 1. - damage(0);
@@ -93,6 +99,8 @@ int NonlinearK4::compute_compression_branch() {
         suanpan_debug("Local compression iteration error: {:.5E}.\n", error);
         if(error < tolerance || fabs(residual) < tolerance) {
             trial_stiffness -= elastic_modulus / jacobian * elastic_modulus;
+
+            if(no_damage) return SUANPAN_SUCCESS;
 
             const auto damage = compute_compression_damage(kc);
 
@@ -118,7 +126,10 @@ int NonlinearK4::compute_crack_close_branch() {
     auto& kk = trial_history(3);
 
     const auto jacobian = elastic_modulus + hardening_k;
-    auto incre = fabs(incre_strain(0)) * elastic_modulus / jacobian;
+
+    // account for entering
+    const auto net_strain = fabs(incre_strain(0)) - std::max(0., current_stress(0)) / elastic_modulus;
+    auto incre = net_strain * elastic_modulus / jacobian;
 
     // physically, the tension plastic strain is the crack opening, closing the crack should not exceed the opening
     // ensure the crack plastic strain is bounded by the tension plastic strain
@@ -134,8 +145,8 @@ int NonlinearK4::compute_crack_close_branch() {
     return SUANPAN_SUCCESS;
 }
 
-NonlinearK4::NonlinearK4(const unsigned T, const double E, const double L, const double R)
-    : DataNonlinearK4{E, .2 * E}
+NonlinearK4::NonlinearK4(const unsigned T, const double E, const double H, const double L, const double R)
+    : DataNonlinearK4{fabs(E), std::min(1., std::max(fabs(H), 1E-4)) * fabs(E)}
     , Material1D(T, R) { characteristic_length = fabs(L); }
 
 int NonlinearK4::initialize(const shared_ptr<DomainBase>&) {
@@ -220,8 +231,8 @@ vec2 ConcreteK4::compute_compression_damage(double k) const {
     return vec2{1. - factor, factor / ref_e_c / characteristic_length};
 }
 
-ConcreteK4::ConcreteK4(const unsigned T, const double E, const double L, const double R)
-    : DataConcreteK4{.15 * E, .6 * E}
-    , NonlinearK4(T, E, L, R) {}
+ConcreteK4::ConcreteK4(const unsigned T, const double E, const double H, vec&& P, const double L, const double R)
+    : DataConcreteK4{fabs(E * P(0)), fabs(E * P(1)), perturb(fabs(P(2))), fabs(P(3)), fabs(P(4)), fabs(P(3) * P(5)), fabs(P(6)), fabs(P(7))}
+    , NonlinearK4(T, E, H, L, R) {}
 
 unique_ptr<Material> ConcreteK4::get_copy() { return make_unique<ConcreteK4>(*this); }
