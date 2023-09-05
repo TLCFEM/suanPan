@@ -26,18 +26,22 @@ int NonlinearK4::compute_tension_branch() {
 
     auto counter = 0u;
     while(true) {
-        if(max_iteration == ++counter) return SUANPAN_FAIL;
+        if(max_iteration == ++counter) {
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
+            return SUANPAN_FAIL;
+        }
 
         const auto backbone = compute_tension_backbone(kt);
         const auto residual = fabs(trial_stress(0)) - backbone(0);
 
         if(1u == counter && residual <= 0.) {
-            if(no_damage) return SUANPAN_SUCCESS;
+            if(apply_damage) {
+                const auto damage = compute_tension_damage(kt);
+                const auto damage_factor = 1. - damage(0);
 
-            const auto damage = compute_tension_damage(kt);
-
-            trial_stress *= 1. - damage(0);
-            trial_stiffness *= 1. - damage(0);
+                trial_stress *= damage_factor;
+                trial_stiffness *= damage_factor;
+            }
 
             return SUANPAN_SUCCESS;
         }
@@ -47,16 +51,18 @@ int NonlinearK4::compute_tension_branch() {
         const auto error = fabs(incre);
         suanpan_debug("Local tension iteration error: {:.5E}.\n", error);
         if(error < tolerance || fabs(residual) < tolerance) {
-            trial_stiffness -= elastic_modulus / jacobian * elastic_modulus;
+            const auto dgamma = elastic_modulus / jacobian;
+            trial_stiffness -= dgamma * elastic_modulus;
 
-            if(no_damage) return SUANPAN_SUCCESS;
+            if(apply_damage) {
+                const auto damage = compute_tension_damage(kt);
+                const auto damage_factor = 1. - damage(0);
 
-            const auto damage = compute_tension_damage(kt);
+                trial_stiffness *= damage_factor;
+                trial_stiffness -= trial_stress * damage(1) * dgamma;
 
-            trial_stiffness *= 1. - damage(0);
-            trial_stiffness -= trial_stress * damage(1) * elastic_modulus / jacobian;
-
-            trial_stress *= 1. - damage(0);
+                trial_stress *= damage_factor;
+            }
 
             return SUANPAN_SUCCESS;
         }
@@ -77,18 +83,22 @@ int NonlinearK4::compute_compression_branch() {
 
     auto counter = 0u;
     while(true) {
-        if(max_iteration == ++counter) return SUANPAN_FAIL;
+        if(max_iteration == ++counter) {
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
+            return SUANPAN_FAIL;
+        }
 
         const auto backbone = compute_compression_backbone(kc);
         const auto residual = fabs(trial_stress(0)) - backbone(0);
 
         if(1u == counter && residual <= 0.) {
-            if(no_damage) return SUANPAN_SUCCESS;
+            if(apply_damage) {
+                const auto damage = compute_compression_damage(kc);
+                const auto damage_factor = 1. - damage(0);
 
-            const auto damage = compute_compression_damage(kc);
-
-            trial_stress *= 1. - damage(0);
-            trial_stiffness *= 1. - damage(0);
+                trial_stress *= damage_factor;
+                trial_stiffness *= damage_factor;
+            }
 
             return SUANPAN_SUCCESS;
         }
@@ -98,16 +108,18 @@ int NonlinearK4::compute_compression_branch() {
         const auto error = fabs(incre);
         suanpan_debug("Local compression iteration error: {:.5E}.\n", error);
         if(error < tolerance || fabs(residual) < tolerance) {
-            trial_stiffness -= elastic_modulus / jacobian * elastic_modulus;
+            const auto dgamma = elastic_modulus / jacobian;
+            trial_stiffness -= dgamma * elastic_modulus;
 
-            if(no_damage) return SUANPAN_SUCCESS;
+            if(apply_damage) {
+                const auto damage = compute_compression_damage(kc);
+                const auto damage_factor = 1. - damage(0);
 
-            const auto damage = compute_compression_damage(kc);
+                trial_stiffness *= damage_factor;
+                trial_stiffness -= trial_stress * damage(1) * dgamma;
 
-            trial_stiffness *= 1. - damage(0);
-            trial_stiffness -= trial_stress * damage(1) * elastic_modulus / jacobian;
-
-            trial_stress *= 1. - damage(0);
+                trial_stress *= damage_factor;
+            }
 
             return SUANPAN_SUCCESS;
         }
@@ -129,12 +141,13 @@ int NonlinearK4::compute_crack_close_branch() {
 
     // account for entering
     const auto net_strain = fabs(incre_strain(0)) - std::max(0., current_stress(0)) / elastic_modulus;
-    auto incre = net_strain * elastic_modulus / jacobian;
+    const auto dgamma = elastic_modulus / jacobian;
+    auto incre = net_strain * dgamma;
 
     // physically, the tension plastic strain is the crack opening, closing the crack should not exceed the opening
     // ensure the crack plastic strain is bounded by the tension plastic strain
     if(incre > kt - kk) incre = kt - kk;
-    else trial_stiffness -= elastic_modulus / jacobian * elastic_modulus; // otherwise, the stiffness is degraded during the closing phase
+    else trial_stiffness -= dgamma * elastic_modulus; // otherwise, the stiffness is degraded during the closing phase
 
     const auto incre_ep = incre * suanpan::sign(trial_stress(0));
 
@@ -173,7 +186,7 @@ int NonlinearK4::update_trial_status(const vec& n_strain) {
     const auto& current_kt = current_history(1);
     const auto& current_kk = current_history(3);
 
-    trial_stress = elastic_modulus * (trial_strain - plastic_strain);
+    trial_stress = (trial_stiffness = elastic_modulus) * (trial_strain - plastic_strain);
 
     if(trial_stress(0) < 0. && incre_strain(0) < 0. && current_kt > current_kk && SUANPAN_SUCCESS != compute_crack_close_branch()) return SUANPAN_FAIL;
 

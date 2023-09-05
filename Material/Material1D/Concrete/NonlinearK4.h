@@ -38,7 +38,7 @@ struct DataNonlinearK4 {
 class NonlinearK4 : protected DataNonlinearK4, public Material1D {
     static constexpr unsigned max_iteration = 20;
 
-    const bool no_damage = true;
+    const bool apply_damage = true;
 
     [[nodiscard]] virtual vec2 compute_tension_backbone(double) const = 0;
     [[nodiscard]] virtual vec2 compute_compression_backbone(double) const = 0;
