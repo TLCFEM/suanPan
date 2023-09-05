@@ -32,7 +32,7 @@
 #include <Material/Material1D/Material1D.h>
 
 struct DataConcreteK4 {
-    const double elastic_modulus;
+    const double elastic_modulus, hardening_k;
 };
 
 class ConcreteK4 : protected DataConcreteK4, public Material1D {
@@ -40,7 +40,9 @@ class ConcreteK4 : protected DataConcreteK4, public Material1D {
 
     [[nodiscard]] virtual vec2 compute_tension_backbone(double) const = 0;
     [[nodiscard]] virtual vec2 compute_compression_backbone(double) const = 0;
-    [[nodiscard]] virtual vec2 compute_crack_close_backbone(double) const = 0;
+
+    [[nodiscard]] virtual vec2 compute_tension_damage(double) const = 0;
+    [[nodiscard]] virtual vec2 compute_compression_damage(double) const = 0;
 
     int compute_tension_branch();
     int compute_compression_branch();
@@ -48,7 +50,7 @@ class ConcreteK4 : protected DataConcreteK4, public Material1D {
 
 public:
     ConcreteK4(unsigned,   // tag
-               double,     // elastic modulus 
+               double,     // elastic modulus
                double = 0. // density
     );
 
@@ -66,14 +68,18 @@ public:
 };
 
 struct DataLinearK4 {
-    const double hardening_t, hardening_c, hardening_d, hardening_k;
-    const double f_t = 4, f_c = 30, k_peak = 1E-2, f_y = f_c - k_peak * hardening_c;
+    const double hardening_t, hardening_d;
+    const double f_t = 2, f_c = 10, k_peak = 2E-3, f_y = .6 * f_c;
+    const double e_ft = 5E-3, e_fc = 1E-2;
+    const double hardening_c = (f_c - f_y) / k_peak;
 };
 
 class LinearK4 final : protected DataLinearK4, public ConcreteK4 {
     [[nodiscard]] vec2 compute_tension_backbone(double) const override;
     [[nodiscard]] vec2 compute_compression_backbone(double) const override;
-    [[nodiscard]] vec2 compute_crack_close_backbone(double) const override;
+
+    [[nodiscard]] vec2 compute_tension_damage(double) const override;
+    [[nodiscard]] vec2 compute_compression_damage(double) const override;
 
 public:
     LinearK4(unsigned,   // tag

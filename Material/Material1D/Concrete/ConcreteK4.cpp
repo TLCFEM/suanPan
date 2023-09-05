@@ -24,6 +24,8 @@ int ConcreteK4::compute_tension_branch() {
 
     const auto sign_sigma = suanpan::sign(trial_stress(0));
 
+    double jacobian;
+
     auto counter = 0u;
     while(true) {
         if(max_iteration == ++counter) return SUANPAN_FAIL;
@@ -31,16 +33,20 @@ int ConcreteK4::compute_tension_branch() {
         const auto backbone = compute_tension_backbone(kt);
         const auto residual = fabs(trial_stress(0)) - backbone(0);
 
-        if(1u == counter && residual <= 0.) return SUANPAN_SUCCESS;
+        if(1u == counter && residual <= 0.) {
+            const auto damage = compute_tension_damage(kt);
 
-        const auto jacobian = elastic_modulus + backbone(1);
+            trial_stress *= 1. - damage(0);
+            trial_stiffness *= 1. - damage(0);
+
+            return SUANPAN_SUCCESS;
+        }
+
+        jacobian = elastic_modulus + backbone(1);
         const auto incre = residual / jacobian;
         const auto error = fabs(incre);
         suanpan_debug("Local tension iteration error: {:.5E}.\n", error);
-        if(error < tolerance || fabs(residual) < tolerance) {
-            trial_stiffness -= elastic_modulus / jacobian * elastic_modulus;
-            return SUANPAN_SUCCESS;
-        }
+        if(error < tolerance || fabs(residual) < tolerance) break;
 
         const auto incre_e = incre * sign_sigma;
 
@@ -48,6 +54,17 @@ int ConcreteK4::compute_tension_branch() {
         plastic_strain += incre_e;
         trial_stress -= elastic_modulus * incre_e;
     }
+
+    trial_stiffness -= elastic_modulus / jacobian * elastic_modulus;
+
+    const auto damage = compute_tension_damage(kt);
+
+    trial_stiffness *= 1. - damage(0);
+    trial_stiffness -= trial_stress * damage(1) * elastic_modulus / jacobian;
+
+    trial_stress *= 1. - damage(0);
+
+    return SUANPAN_SUCCESS;
 }
 
 int ConcreteK4::compute_compression_branch() {
@@ -56,6 +73,8 @@ int ConcreteK4::compute_compression_branch() {
 
     const auto sign_sigma = suanpan::sign(trial_stress(0));
 
+    double jacobian;
+
     auto counter = 0u;
     while(true) {
         if(max_iteration == ++counter) return SUANPAN_FAIL;
@@ -63,16 +82,20 @@ int ConcreteK4::compute_compression_branch() {
         const auto backbone = compute_compression_backbone(kc);
         const auto residual = fabs(trial_stress(0)) - backbone(0);
 
-        if(1u == counter && residual <= 0.) return SUANPAN_SUCCESS;
+        if(1u == counter && residual <= 0.) {
+            const auto damage = compute_compression_damage(kc);
 
-        const auto jacobian = elastic_modulus + backbone(1);
+            trial_stress *= 1. - damage(0);
+            trial_stiffness *= 1. - damage(0);
+
+            return SUANPAN_SUCCESS;
+        }
+
+        jacobian = elastic_modulus + backbone(1);
         const auto incre = residual / jacobian;
         const auto error = fabs(incre);
         suanpan_debug("Local compression iteration error: {:.5E}.\n", error);
-        if(error < tolerance || fabs(residual) < tolerance) {
-            trial_stiffness -= elastic_modulus / jacobian * elastic_modulus;
-            return SUANPAN_SUCCESS;
-        }
+        if(error < tolerance || fabs(residual) < tolerance) break;
 
         const auto incre_e = incre * sign_sigma;
 
@@ -80,6 +103,17 @@ int ConcreteK4::compute_compression_branch() {
         plastic_strain += incre_e;
         trial_stress -= elastic_modulus * incre_e;
     }
+
+    trial_stiffness -= elastic_modulus / jacobian * elastic_modulus;
+
+    const auto damage = compute_compression_damage(kc);
+
+    trial_stiffness *= 1. - damage(0);
+    trial_stiffness -= trial_stress * damage(1) * elastic_modulus / jacobian;
+
+    trial_stress *= 1. - damage(0);
+
+    return SUANPAN_SUCCESS;
 }
 
 int ConcreteK4::compute_crack_close_branch() {
@@ -87,44 +121,23 @@ int ConcreteK4::compute_crack_close_branch() {
     const auto& kt = trial_history(1);
     auto& kk = trial_history(3);
 
-    const auto sign_sigma = suanpan::sign(trial_stress(0));
+    const auto jacobian = elastic_modulus + hardening_k;
+    auto incre = fabs(incre_strain(0)) * elastic_modulus / jacobian;
 
-    auto counter = 0u;
-    double jacobian;
-    while(true) {
-        if(max_iteration == ++counter) return SUANPAN_FAIL;
+    if(incre > kt - kk) incre = kt - kk;
+    else trial_stiffness -= elastic_modulus / jacobian * elastic_modulus;
 
-        const auto backbone = compute_crack_close_backbone(kk);
-        const auto residual = fabs(trial_stress(0)) - backbone(0);
+    const auto incre_e = incre * suanpan::sign(trial_stress(0));
 
-        if(1u == counter && residual <= 0.) return SUANPAN_SUCCESS;
-
-        jacobian = elastic_modulus + backbone(1);
-        const auto incre = residual / jacobian;
-        const auto error = fabs(incre);
-        suanpan_debug("Local crack iteration error: {:.5E}.\n", error);
-        if(error < tolerance || fabs(residual) < tolerance) break;
-
-        const auto incre_e = incre * sign_sigma;
-
-        kk += incre;
-        plastic_strain += incre_e;
-        trial_stress -= elastic_modulus * incre_e;
-    }
-
-    if(kk > kt) {
-        const auto diff = (kt - kk) * sign_sigma;
-        kk = kt;
-        plastic_strain += diff;
-        trial_stress -= elastic_modulus * diff;
-    }
-    else trial_stiffness -= elastic_modulus / (elastic_modulus + jacobian) * elastic_modulus;
+    kk += incre;
+    plastic_strain += incre_e;
+    trial_stress -= elastic_modulus * incre_e;
 
     return SUANPAN_SUCCESS;
 }
 
 ConcreteK4::ConcreteK4(const unsigned T, const double E, const double R)
-    : DataConcreteK4{E}
+    : DataConcreteK4{E, .2 * E}
     , Material1D(T, R) {}
 
 int ConcreteK4::initialize(const shared_ptr<DomainBase>&) {
@@ -153,7 +166,7 @@ int ConcreteK4::update_trial_status(const vec& n_strain) {
 
     trial_stress = elastic_modulus * (trial_strain - plastic_strain);
 
-    if(trial_stress(0) < 0. && incre_strain(0) < 0. && current_kk < current_kt && SUANPAN_SUCCESS != compute_crack_close_branch()) return SUANPAN_FAIL;
+    if(trial_stress(0) < 0. && incre_strain(0) < 0. && current_kt > current_kk && SUANPAN_SUCCESS != compute_crack_close_branch()) return SUANPAN_FAIL;
 
     return trial_stress(0) > 0. ? compute_tension_branch() : compute_compression_branch();
 }
@@ -192,13 +205,25 @@ vec2 LinearK4::compute_tension_backbone(const double k) const { return vec2{f_t 
 vec2 LinearK4::compute_compression_backbone(const double k) const {
     if(k < k_peak) return vec2{f_y + hardening_c * k, hardening_c};
 
-    return vec2{f_y + hardening_c * k_peak + hardening_d * (k - k_peak), hardening_d};
+    return vec2{f_c + hardening_d * (k - k_peak), hardening_d};
 }
 
-vec2 LinearK4::compute_crack_close_backbone(const double k) const { return vec2{hardening_k * k, hardening_k}; }
+vec2 LinearK4::compute_tension_damage(const double k) const {
+    const auto factor = exp(-k / e_ft);
+    return vec2{1. - factor, factor / e_ft};
+}
+
+vec2 LinearK4::compute_compression_damage(double k) const {
+    if(k < k_peak) return vec2{0., 0.};
+
+    k -= k_peak;
+
+    const auto factor = exp(-k / e_fc);
+    return vec2{1. - factor, factor / e_fc};
+}
 
 LinearK4::LinearK4(const unsigned T, const double E, const double R)
-    : DataLinearK4{.1 * E, .3 * E, .1 * E, .1 * E}
+    : DataLinearK4{.15 * E, .6 * E}
     , ConcreteK4(T, E, R) {}
 
 unique_ptr<Material> LinearK4::get_copy() { return make_unique<LinearK4>(*this); }
