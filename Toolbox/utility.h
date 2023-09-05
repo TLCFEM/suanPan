@@ -136,4 +136,6 @@ bool is_false(const string&);
 
 bool is_integer(const string&);
 
+double perturb(double);
+
 #endif

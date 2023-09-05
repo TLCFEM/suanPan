@@ -3,6 +3,7 @@ set(M1D
         Material1D/Concrete/ConcreteExp.cpp
         Material1D/Concrete/ConcreteTable.cpp
         Material1D/Concrete/ConcreteTsai.cpp
+        Material1D/Concrete/NonlinearK4.cpp
         Material1D/Degradation/CustomStrainDegradation.cpp
         Material1D/Degradation/CustomStressDegradation.cpp
         Material1D/Degradation/Degradation.cpp
