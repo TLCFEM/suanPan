@@ -33,14 +33,18 @@
 
 struct DataConcreteK4 {
     const double elastic_modulus;
-    const double hardening_t, hardening_c, hardening_d, hardening_k;
-    const double f_t = 4, f_c = 30, k_peak = 1E-2, f_y = f_c - k_peak * hardening_c;
 };
 
-class ConcreteK4 final : protected DataConcreteK4, public Material1D {
-    void compute_tension_branch();
-    void compute_compression_branch();
-    void compute_crack_close_branch();
+class ConcreteK4 : protected DataConcreteK4, public Material1D {
+    static constexpr unsigned max_iteration = 20;
+
+    [[nodiscard]] virtual vec2 compute_tension_backbone(double) const = 0;
+    [[nodiscard]] virtual vec2 compute_compression_backbone(double) const = 0;
+    [[nodiscard]] virtual vec2 compute_crack_close_backbone(double) const = 0;
+
+    int compute_tension_branch();
+    int compute_compression_branch();
+    int compute_crack_close_branch();
 
 public:
     ConcreteK4(unsigned,   // tag
@@ -49,8 +53,6 @@ public:
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;
-
-    unique_ptr<Material> get_copy() override;
 
     [[nodiscard]] double get_parameter(ParameterType) const override;
 
@@ -61,6 +63,25 @@ public:
     int reset_status() override;
 
     void print() override;
+};
+
+struct DataLinearK4 {
+    const double hardening_t, hardening_c, hardening_d, hardening_k;
+    const double f_t = 4, f_c = 30, k_peak = 1E-2, f_y = f_c - k_peak * hardening_c;
+};
+
+class LinearK4 final : protected DataLinearK4, public ConcreteK4 {
+    [[nodiscard]] vec2 compute_tension_backbone(double) const override;
+    [[nodiscard]] vec2 compute_compression_backbone(double) const override;
+    [[nodiscard]] vec2 compute_crack_close_backbone(double) const override;
+
+public:
+    LinearK4(unsigned,   // tag
+             double,     // elastic modulus 
+             double = 0. // density
+    );
+
+    unique_ptr<Material> get_copy() override;
 };
 
 #endif

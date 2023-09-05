@@ -1,0 +1,5 @@
+material LinearK4 1 1E3
+
+materialTest1D 1 1E-3 40 100 110 120 130
+
+exit
