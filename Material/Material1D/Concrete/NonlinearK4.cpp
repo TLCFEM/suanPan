@@ -101,9 +101,11 @@ void NonlinearK4::compute_crack_close_branch() {
     trial_stress -= elastic_modulus * incre_ep;
 }
 
-NonlinearK4::NonlinearK4(const unsigned T, const double E, const double H, const double L, const double R)
+NonlinearK4::NonlinearK4(const unsigned T, const double E, const double H, const double R, const double L, const bool FD, const bool FC)
     : DataNonlinearK4{fabs(E), std::min(1., std::max(fabs(H), 1E-4)) * fabs(E)}
-    , Material1D(T, R) { characteristic_length = fabs(L); }
+    , Material1D(T, R)
+    , apply_damage(FD)
+    , apply_crack_closing(FC) { characteristic_length = fabs(L); }
 
 int NonlinearK4::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = elastic_modulus;
@@ -133,7 +135,7 @@ int NonlinearK4::update_trial_status(const vec& t_strain) {
 
     trial_stress = (trial_stiffness = elastic_modulus) * (trial_strain - plastic_strain);
 
-    if(trial_stress(0) < 0. && incre_strain(0) < 0. && current_kt > current_kk) compute_crack_close_branch();
+    if(apply_crack_closing && trial_stress(0) < 0. && incre_strain(0) < 0. && current_kt > current_kk) compute_crack_close_branch();
 
     return compute_plasticity(trial_stress(0) > 0. ? kt : kc);
 }
@@ -189,8 +191,8 @@ vec2 ConcreteK4::compute_compression_damage(double k) const {
     return vec2{1. - factor, factor / ref_e_c / characteristic_length};
 }
 
-ConcreteK4::ConcreteK4(const unsigned T, const double E, const double H, vec&& P, const double L, const double R)
+ConcreteK4::ConcreteK4(const unsigned T, const double E, const double H, vec&& P, const double R, const double L, const bool FD, const bool FC)
     : DataConcreteK4{fabs(E * P(0)), fabs(E * P(1)), perturb(fabs(P(2))), fabs(P(3)), fabs(P(4)), fabs(P(3) * P(5)), fabs(P(6)), fabs(P(7))}
-    , NonlinearK4(T, E, H, L, R) {}
+    , NonlinearK4(T, E, H, R, L, FD, FC) {}
 
 unique_ptr<Material> ConcreteK4::get_copy() { return make_unique<ConcreteK4>(*this); }

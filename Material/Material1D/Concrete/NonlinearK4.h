@@ -38,7 +38,7 @@ struct DataNonlinearK4 {
 class NonlinearK4 : protected DataNonlinearK4, public Material1D {
     static constexpr unsigned max_iteration = 20;
 
-    const bool apply_damage = true;
+    const bool apply_damage = true, apply_crack_closing = true;
 
     [[nodiscard]] virtual vec2 compute_tension_backbone(double) const = 0;
     [[nodiscard]] virtual vec2 compute_compression_backbone(double) const = 0;
@@ -50,11 +50,13 @@ class NonlinearK4 : protected DataNonlinearK4, public Material1D {
     void compute_crack_close_branch();
 
 public:
-    NonlinearK4(unsigned,    // tag
-                double,      // elastic modulus
-                double,      // hardening parameter
-                double = 0., // characteristic length
-                double = 0.  // density
+    NonlinearK4(unsigned, // tag
+                double,   // elastic modulus
+                double,   // hardening parameter
+                double,   // density
+                double,   // characteristic length
+                bool,     // apply damage
+                bool      // apply crack closing
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;
@@ -89,8 +91,10 @@ public:
                double,      // elastic modulus
                double,      // hardening parameter
                vec&&,       // parameters
-               double = 0., // characteristic length
-               double = 0.  // density
+               double = 0., // density
+               double = 1., // characteristic length
+               bool = true, // apply damage
+               bool = true  // apply crack closing
     );
 
     unique_ptr<Material> get_copy() override;

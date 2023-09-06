@@ -1149,14 +1149,6 @@ void new_concretek4(unique_ptr<Material>& return_obj, istringstream& command) {
         return;
     }
 
-    auto characteristic_length = 1.;
-    if(command.eof())
-        suanpan_debug("Unit characteristic length assumed.\n");
-    else if(!get_input(command, characteristic_length)) {
-        suanpan_error("A valid characteristic length is required.\n");
-        return;
-    }
-
     auto density = 0.;
     if(command.eof())
         suanpan_debug("Zero density assumed.\n");
@@ -1165,7 +1157,25 @@ void new_concretek4(unique_ptr<Material>& return_obj, istringstream& command) {
         return;
     }
 
-    return_obj = make_unique<ConcreteK4>(tag, elastic_modulus, hardening, std::move(pool), characteristic_length, density);
+    auto characteristic_length = 1.;
+    if(command.eof())
+        suanpan_debug("Unit characteristic length assumed.\n");
+    else if(!get_input(command, characteristic_length)) {
+        suanpan_error("A valid characteristic length is required.\n");
+        return;
+    }
+
+    auto enable_damage = true, enable_crack_closing = true;
+    if(!command.eof()) {
+        if(!get_input(command, enable_damage, enable_crack_closing)) {
+            suanpan_error("A valid flag is required.\n");
+            return;
+        }
+
+        suanpan_warning("Internal flags are set.\n");
+    }
+
+    return_obj = make_unique<ConcreteK4>(tag, elastic_modulus, hardening, std::move(pool), density, characteristic_length, enable_damage, enable_crack_closing);
 }
 
 void new_concretetable(unique_ptr<Material>& return_obj, istringstream& command) {
