@@ -1230,9 +1230,9 @@ void new_concretetsai(unique_ptr<Material>& return_obj, istringstream& command) 
     double input;
     while(!command.eof() && get_input(command, input)) para.emplace_back(input);
 
-    if(para.size() == 7) return_obj = make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], 0.);
+    if(para.size() == 7) return_obj = make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6]);
     else if(para.size() == 8) return_obj = make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7]);
-    else if(para.size() == 9) return_obj = make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], 0.);
+    else if(para.size() == 9) return_obj = make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8]);
     else if(para.size() == 10) return_obj = make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], para[9]);
     else
         suanpan_error("7, 8, 9 or 10 double inputs are required.\n");

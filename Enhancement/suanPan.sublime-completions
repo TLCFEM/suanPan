@@ -3445,7 +3445,7 @@
       "trigger":"ConcreteTable"
     },
     {
-      "contents":"material ConcreteTsai ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:[8]} ${9:[9]} ${10:[10]} ${11:[11]}\n# (1) int, unique material tag\n# (2) double, compression strength, should be negative but sign insensitive\n# (3) double, tension strength, should be positive but sign insensitive\n# (4) double, MC\n# (5) double, NC\n# (6) double, MT\n# (7) double, NT\n# [8] double, strain at compression strength, default: -2E-3\n# [9] double, strain at tension strength, default: 1E-4\n# [10] double, middle point, default: 0.2\n# [11] double, density, default: 0.0",
+      "contents":"material ConcreteTsai ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:(9)} ${10:(10)} ${11:[11]}\n# (1) int, unique material tag\n# (2) double, compression strength, should be negative but sign insensitive\n# (3) double, tension strength, should be positive but sign insensitive\n# (4) double, MC\n# (5) double, NC\n# (6) double, MT\n# (7) double, NT\n# (8) double, middle point, typical: 0.2\n# (9) double, strain at compression strength, typical: -2E-3\n# (10) double, strain at tension strength, typical: 1E-4\n# [11] double, density, default: 0.0",
       "details":"Uniaxial Concrete Model Using Tsai's Equation",
       "kind":"type",
       "trigger":"ConcreteTsai"
