@@ -21,13 +21,13 @@
  * @author tlc
  * @date 05/09/2023
  * @version 0.1.0
- * @file ConcreteK4.h
+ * @file NonlinearK4.h
  * @addtogroup Material-1D
  * @{
  */
 
-#ifndef CONCRETEK4_H
-#define CONCRETEK4_H
+#ifndef NONLINEARK4_H
+#define NONLINEARK4_H
 
 #include <Material/Material1D/Material1D.h>
 
@@ -46,9 +46,8 @@ class NonlinearK4 : protected DataNonlinearK4, public Material1D {
     [[nodiscard]] virtual vec2 compute_tension_damage(double) const = 0;
     [[nodiscard]] virtual vec2 compute_compression_damage(double) const = 0;
 
-    int compute_tension_branch();
-    int compute_compression_branch();
-    int compute_crack_close_branch();
+    int compute_plasticity(double&);
+    void compute_crack_close_branch();
 
 public:
     NonlinearK4(unsigned,    // tag

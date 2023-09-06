@@ -18,11 +18,13 @@
 #include "NonlinearK4.h"
 #include <Toolbox/utility.h>
 
-int NonlinearK4::compute_tension_branch() {
+int NonlinearK4::compute_plasticity(double& k) {
     auto& plastic_strain = trial_history(0);
-    auto& kt = trial_history(1);
 
     const auto sign_sigma = suanpan::sign(trial_stress(0));
+
+    const auto backbone_handle = sign_sigma > 0. ? &NonlinearK4::compute_tension_backbone : &NonlinearK4::compute_compression_backbone;
+    const auto damage_handle = sign_sigma > 0. ? &NonlinearK4::compute_tension_damage : &NonlinearK4::compute_compression_damage;
 
     auto counter = 0u;
     while(true) {
@@ -31,12 +33,12 @@ int NonlinearK4::compute_tension_branch() {
             return SUANPAN_FAIL;
         }
 
-        const auto backbone = compute_tension_backbone(kt);
+        const auto backbone = (this->*backbone_handle)(k);
         const auto residual = fabs(trial_stress(0)) - backbone(0);
 
         if(1u == counter && residual <= 0.) {
             if(apply_damage) {
-                const auto damage = compute_tension_damage(kt);
+                const auto damage = (this->*damage_handle)(k);
                 const auto damage_factor = 1. - damage(0);
 
                 trial_stress *= damage_factor;
@@ -46,16 +48,16 @@ int NonlinearK4::compute_tension_branch() {
             return SUANPAN_SUCCESS;
         }
 
-        const double jacobian = elastic_modulus + backbone(1);
+        const auto jacobian = elastic_modulus + backbone(1);
         const auto incre = residual / jacobian;
         const auto error = fabs(incre);
-        suanpan_debug("Local tension iteration error: {:.5E}.\n", error);
+        suanpan_debug("Local plasticity iteration error: {:.5E}.\n", error);
         if(error < tolerance || fabs(residual) < tolerance) {
             const auto dgamma = elastic_modulus / jacobian;
             trial_stiffness -= dgamma * elastic_modulus;
 
             if(apply_damage) {
-                const auto damage = compute_tension_damage(kt);
+                const auto damage = (this->*damage_handle)(k);
                 const auto damage_factor = 1. - damage(0);
 
                 trial_stiffness *= damage_factor;
@@ -69,70 +71,13 @@ int NonlinearK4::compute_tension_branch() {
 
         const auto incre_ep = incre * sign_sigma;
 
-        kt += incre;
+        k += incre;
         plastic_strain += incre_ep;
         trial_stress -= elastic_modulus * incre_ep;
     }
 }
 
-int NonlinearK4::compute_compression_branch() {
-    auto& plastic_strain = trial_history(0);
-    auto& kc = trial_history(2);
-
-    const auto sign_sigma = suanpan::sign(trial_stress(0));
-
-    auto counter = 0u;
-    while(true) {
-        if(max_iteration == ++counter) {
-            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
-            return SUANPAN_FAIL;
-        }
-
-        const auto backbone = compute_compression_backbone(kc);
-        const auto residual = fabs(trial_stress(0)) - backbone(0);
-
-        if(1u == counter && residual <= 0.) {
-            if(apply_damage) {
-                const auto damage = compute_compression_damage(kc);
-                const auto damage_factor = 1. - damage(0);
-
-                trial_stress *= damage_factor;
-                trial_stiffness *= damage_factor;
-            }
-
-            return SUANPAN_SUCCESS;
-        }
-
-        const double jacobian = elastic_modulus + backbone(1);
-        const auto incre = residual / jacobian;
-        const auto error = fabs(incre);
-        suanpan_debug("Local compression iteration error: {:.5E}.\n", error);
-        if(error < tolerance || fabs(residual) < tolerance) {
-            const auto dgamma = elastic_modulus / jacobian;
-            trial_stiffness -= dgamma * elastic_modulus;
-
-            if(apply_damage) {
-                const auto damage = compute_compression_damage(kc);
-                const auto damage_factor = 1. - damage(0);
-
-                trial_stiffness *= damage_factor;
-                trial_stiffness -= trial_stress * damage(1) * dgamma;
-
-                trial_stress *= damage_factor;
-            }
-
-            return SUANPAN_SUCCESS;
-        }
-
-        const auto incre_ep = incre * sign_sigma;
-
-        kc += incre;
-        plastic_strain += incre_ep;
-        trial_stress -= elastic_modulus * incre_ep;
-    }
-}
-
-int NonlinearK4::compute_crack_close_branch() {
+void NonlinearK4::compute_crack_close_branch() {
     auto& plastic_strain = trial_history(0);
     const auto& kt = trial_history(1);
     auto& kk = trial_history(3);
@@ -154,8 +99,6 @@ int NonlinearK4::compute_crack_close_branch() {
     kk += incre;
     plastic_strain += incre_ep;
     trial_stress -= elastic_modulus * incre_ep;
-
-    return SUANPAN_SUCCESS;
 }
 
 NonlinearK4::NonlinearK4(const unsigned T, const double E, const double H, const double L, const double R)
@@ -176,21 +119,23 @@ double NonlinearK4::get_parameter(const ParameterType P) const {
     return 0.;
 }
 
-int NonlinearK4::update_trial_status(const vec& n_strain) {
-    incre_strain = (trial_strain = n_strain) - current_strain;
+int NonlinearK4::update_trial_status(const vec& t_strain) {
+    incre_strain = (trial_strain = t_strain) - current_strain;
 
     if(fabs(incre_strain(0)) <= tolerance) return SUANPAN_SUCCESS;
 
     trial_history = current_history;
     const auto& plastic_strain = trial_history(0);
+    auto& kt = trial_history(1);
+    auto& kc = trial_history(2);
     const auto& current_kt = current_history(1);
     const auto& current_kk = current_history(3);
 
     trial_stress = (trial_stiffness = elastic_modulus) * (trial_strain - plastic_strain);
 
-    if(trial_stress(0) < 0. && incre_strain(0) < 0. && current_kt > current_kk && SUANPAN_SUCCESS != compute_crack_close_branch()) return SUANPAN_FAIL;
+    if(trial_stress(0) < 0. && incre_strain(0) < 0. && current_kt > current_kk) compute_crack_close_branch();
 
-    return trial_stress(0) > 0. ? compute_tension_branch() : compute_compression_branch();
+    return compute_plasticity(trial_stress(0) > 0. ? kt : kc);
 }
 
 int NonlinearK4::clear_status() {

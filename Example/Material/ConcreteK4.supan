@@ -52,7 +52,7 @@ peek node 3
 
 peek element 1 2
 
-save recorder 1 2
+# save recorder 1 2
 
 reset
 clear
