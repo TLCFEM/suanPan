@@ -20,7 +20,6 @@
 #include <Material/Material2D/Material2D.h>
 #include <Toolbox/IntegrationPlan.h>
 #include <Toolbox/shape.h>
-#include <Toolbox/utility.h>
 
 CAX4::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M)
     : coor(std::forward<vec>(C))

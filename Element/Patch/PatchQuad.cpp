@@ -20,7 +20,6 @@
 #include <Element/Utility/IGA/NURBSSurface.h>
 #include <Material/Material2D/Material2D.h>
 #include <Toolbox/IntegrationPlan.h>
-#include <Toolbox/tensor.h>
 #include <Toolbox/utility.h>
 
 PatchQuad::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M)

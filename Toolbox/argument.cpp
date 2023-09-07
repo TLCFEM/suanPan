@@ -22,7 +22,7 @@
 #include <Toolbox/command.h>
 #include <Toolbox/utility.h>
 #include <UnitTest/CatchTest.h>
-#include <iomanip>
+#include <array>
 #include "revision.h"
 #ifdef SUANPAN_WIN
 #include <Windows.h>
@@ -176,7 +176,7 @@ void print_header() {
     suanpan_info("|                              10.5281/zenodo.1285221 |\n");
     suanpan_info("+-----------------------------------------------------+\n");
     if(support_emoji() && SUANPAN_COLOR) {
-        static const std::vector POOL{"\xF0\x9F\x8C\x88", "\xF0\x9F\x8C\x8F", "\xF0\x9F\x8E\xA7", "\xF0\x9F\x8E\xB1", "\xF0\x9F\x91\xB9", "\xF0\x9F\x92\xBB", "\xF0\x9F\x94\x8B", "\xF0\x9F\x94\x94", "\xF0\x9F\x9A\x80", "\xF0\x9F\xA7\xA9"};
+        static constexpr std::array POOL{"\xF0\x9F\x8C\x88", "\xF0\x9F\x8C\x8F", "\xF0\x9F\x8E\xA7", "\xF0\x9F\x8E\xB1", "\xF0\x9F\x91\xB9", "\xF0\x9F\x92\xBB", "\xF0\x9F\x94\x8B", "\xF0\x9F\x94\x94", "\xF0\x9F\x9A\x80", "\xF0\x9F\xA7\xA9"};
         arma_rng::set_seed_random();
         suanpan_info("|  \xF0\x9F\xA7\xAE https://github.com/TLCFEM/suanPan               |\n");
         suanpan_info("|  \xF0\x9F\x93\x9A https://tlcfem.github.io/suanPan-manual/latest  |\n");

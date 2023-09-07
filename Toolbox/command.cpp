@@ -48,7 +48,6 @@
 #include <Step/Bead.h>
 #include <Step/Frequency.h>
 #include <Step/StepParser.h>
-#include <Toolbox/Expression.h>
 #include <Toolbox/ExpressionParser.h>
 #include <Toolbox/argument.h>
 #include <Toolbox/resampling.h>

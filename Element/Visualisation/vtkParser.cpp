@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+#ifdef SUANPAN_VTK
+
 // ReSharper disable StringLiteralTypo
 #include "vtkParser.h"
 #include <Domain/DomainBase.h>
 #include <Domain/Node.h>
 #include <Element/Element.h>
 #include <Toolbox/utility.h>
-
-#ifdef SUANPAN_VTK
 
 #include <vtkAutoInit.h>
 VTK_MODULE_INIT(vtkRenderingOpenGL2)  // NOLINT(cppcoreguidelines-special-member-functions, hicpp-special-member-functions)
