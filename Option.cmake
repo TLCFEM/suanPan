@@ -239,8 +239,12 @@ if (COMPILER_IDENTIFIER MATCHES "vs")
 
     link_directories(Libs/win)
 
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W4 /MP /openmp")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /MP /openmp /EHsc")
+    string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+    string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP /openmp")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /openmp /EHsc")
+
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} /nowarn /MP /Qopenmp /Qparallel /fpp /names:lowercase /assume:underscore /libs:dll /threads")
 
     if (USE_AVX512)
