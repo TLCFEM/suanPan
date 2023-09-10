@@ -1525,6 +1525,9 @@
     <ClCompile Include="..\..\..\Material\Material1D\Concrete\NonlinearK4.cpp">
       <Filter>Material\Material1D\Concrete</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Element\Utility\B3DOSL.cpp">
+      <Filter>Element\Utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2916,6 +2919,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material1D\Concrete\NonlinearK4.h">
       <Filter>Material\Material1D\Concrete</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Utility\B3DOSL.h">
+      <Filter>Element\Utility</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

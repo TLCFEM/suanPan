@@ -249,6 +249,7 @@
     <ClCompile Include="..\..\..\Element\Utility\B2DL.cpp" />
     <ClCompile Include="..\..\..\Element\Utility\B3DC.cpp" />
     <ClCompile Include="..\..\..\Element\Utility\B3DL.cpp" />
+    <ClCompile Include="..\..\..\Element\Utility\B3DOSL.cpp" />
     <ClCompile Include="..\..\..\Element\Utility\IGA\BSpline.cpp" />
     <ClCompile Include="..\..\..\Element\Utility\IGA\BSplineSurface.cpp" />
     <ClCompile Include="..\..\..\Element\Utility\IGA\BSplineVolume.cpp" />
@@ -722,6 +723,7 @@
     <ClInclude Include="..\..\..\Element\Utility\B2DL.h" />
     <ClInclude Include="..\..\..\Element\Utility\B3DC.h" />
     <ClInclude Include="..\..\..\Element\Utility\B3DL.h" />
+    <ClInclude Include="..\..\..\Element\Utility\B3DOSL.h" />
     <ClInclude Include="..\..\..\Element\Utility\IGA\BSpline.h" />
     <ClInclude Include="..\..\..\Element\Utility\IGA\BSplineSurface.h" />
     <ClInclude Include="..\..\..\Element\Utility\IGA\BSplineVolume.h" />

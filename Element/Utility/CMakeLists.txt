@@ -3,6 +3,7 @@ set(Utility
         Utility/B2DL.cpp
         Utility/B3DC.cpp
         Utility/B3DL.cpp
+        Utility/B3DOSL.cpp
         Utility/IGA/BSpline.cpp
         Utility/IGA/BSplineSurface.cpp
         Utility/IGA/BSplineVolume.cpp

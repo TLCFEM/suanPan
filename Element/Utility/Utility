@@ -2,6 +2,7 @@
 #include "B2DL.h"
 #include "B3DC.h"
 #include "B3DL.h"
+#include "B3DOSL.h"
 #include "IGA/BSpline.h"
 #include "IGA/BSplineSurface.h"
 #include "IGA/BSplineVolume.h"
