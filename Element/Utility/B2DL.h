@@ -42,6 +42,9 @@ public:
     explicit B2DL(unsigned = 0, double = 0., double = 0., double = 1.);
     B2DL(unsigned, vec&&);
 
+    [[nodiscard]] unsigned input_size() const override;
+    [[nodiscard]] unsigned output_size() const override;
+
     unique_ptr<Orientation> get_copy() override;
 
     [[nodiscard]] vec to_local_vec(const vec&) const override;

@@ -40,6 +40,9 @@ protected:
 public:
     explicit T2DL(unsigned = 0);
 
+    [[nodiscard]] unsigned input_size() const override;
+    [[nodiscard]] unsigned output_size() const override;
+
     unique_ptr<Orientation> get_copy() override;
 
     [[nodiscard]] vec to_local_vec(const vec&) const override;

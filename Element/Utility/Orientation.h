@@ -65,6 +65,15 @@ public:
 
     [[nodiscard]] virtual bool is_nlgeom() const;
 
+    /**
+     * \return the size of nodal displacement vector
+     */
+    [[nodiscard]] virtual unsigned input_size() const = 0;
+    /**
+     * \return the size of displacement vector in the local system
+     */
+    [[nodiscard]] virtual unsigned output_size() const = 0;
+
     [[nodiscard]] double get_length() const;
     [[nodiscard]] double get_inclination() const;
     [[nodiscard]] const mat& get_transformation() const;

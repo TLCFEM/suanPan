@@ -24,6 +24,10 @@ B3DL::B3DL(const unsigned T, const double X, const double Y, const double Z)
 B3DL::B3DL(const unsigned T, vec&& XYZ)
     : Orientation(T, std::forward<vec>(XYZ)) {}
 
+unsigned B3DL::input_size() const { return 6u; }
+
+unsigned B3DL::output_size() const { return 6u; }
+
 unique_ptr<Orientation> B3DL::get_copy() { return make_unique<B3DL>(*this); }
 
 void B3DL::update_transformation() {
@@ -42,9 +46,13 @@ void B3DL::update_transformation() {
 }
 
 vec B3DL::to_local_vec(const vec& g_disp) const {
-    const vec t_disp = vectorise(direction_cosine * reshape(g_disp, 3, 4));
+    vec t_disp(g_disp.n_elem, fill::none);
+    for(auto I = 0, J = 2; I < 12; I += 3, J += 3) {
+        const span sa(I, J);
+        t_disp(sa) = direction_cosine * g_disp(sa);
+    }
 
-    vec l_disp(6);
+    vec l_disp(6); // eq. 2.11
 
     l_disp(0) = t_disp(6) - t_disp(0);
     l_disp(5) = t_disp(9) - t_disp(3);
@@ -59,14 +67,19 @@ vec B3DL::to_local_vec(const vec& g_disp) const {
 }
 
 vec B3DL::to_global_vec(const vec& l_disp) const {
-    vec g_disp(12);
+    vec g_disp(12, fill::none);
 
     g_disp(0) = -(g_disp(6) = l_disp(0));
     g_disp(7) = -(g_disp(1) = ((g_disp(5) = l_disp(1)) + (g_disp(11) = l_disp(2))) / length);
     g_disp(2) = -(g_disp(8) = ((g_disp(4) = l_disp(3)) + (g_disp(10) = l_disp(4))) / length);
     g_disp(3) = -(g_disp(9) = l_disp(5));
 
-    return vectorise(direction_cosine.t() * reshape(g_disp, 3, 4));
+    for(auto I = 0, J = 2; I < 12; I += 3, J += 3) {
+        const span sa(I, J);
+        g_disp(sa) = direction_cosine.t() * g_disp(sa);
+    }
+
+    return g_disp;
 }
 
 mat B3DL::to_global_mass_mat(const mat& l_mat) const {

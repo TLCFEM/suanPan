@@ -17,6 +17,19 @@
 /**
  * @class B3DL
  * @brief A B3DL class.
+ *
+ * See Spacone's thesis.
+ *
+ * Flexibility-based finite element models for the nonlinear static and dynamic analysis of concrete frame structures
+ *
+ * Order of local quantities:
+ *   uniform axial
+ *   strong axis bending near node
+ *   strong axis bending far node
+ *   weak axis bending near node
+ *   weak axis bending far node
+ *   uniform torsion
+ *
  * @author tlc
  * @date 27/06/2018
  * @version 0.1.0
@@ -38,6 +51,9 @@ protected:
 public:
     explicit B3DL(unsigned = 0, double = 0., double = 0., double = 1.);
     B3DL(unsigned, vec&&);
+
+    [[nodiscard]] unsigned input_size() const override;
+    [[nodiscard]] unsigned output_size() const override;
 
     unique_ptr<Orientation> get_copy() override;
 

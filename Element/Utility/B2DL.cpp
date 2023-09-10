@@ -34,6 +34,10 @@ B2DL::B2DL(const unsigned T, const double X, const double Y, const double Z)
 B2DL::B2DL(const unsigned T, vec&& XYZ)
     : Orientation(T, std::forward<vec>(XYZ)) {}
 
+unsigned B2DL::input_size() const { return 3u; }
+
+unsigned B2DL::output_size() const { return 3u; }
+
 unique_ptr<Orientation> B2DL::get_copy() { return make_unique<B2DL>(*this); }
 
 void B2DL::update_transformation() {
