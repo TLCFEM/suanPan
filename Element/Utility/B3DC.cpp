@@ -40,7 +40,7 @@ mat B3DC::compute_l(const mat& a, const subview_col<double>& rk) const {
     const mat srk = transform::skew_symm(rk);
     const auto rke0 = .25 * dot(rk, e(0));
 
-    mat l(3, 12, fill::none);
+    mat l(3, 12, fill::none); // eq. 4.111
 
     l.cols(0, 2) = (2. * rke0 * eye(3, 3) + 2. * e0r0 * rk.t()) * a;                             // eq. 4.110
     l.cols(3, 5) = rke0 * transform::skew_symm(r(0)) + (e0r0 * e(0).t() - .5 * eye(3, 3)) * srk; // eq. 4.110
@@ -57,7 +57,7 @@ mat B3DC::compute_m(const mat& a, const subview_col<double>& z) const {
 }
 
 mat B3DC::compute_g(const mat& a, const subview_col<double>& rk, const subview_col<double>& z) const {
-    mat g(12, 12, fill::none);
+    mat g(12, 12, fill::none); // eq. 4.132
 
     const auto srk = transform::skew_symm(rk);
     const auto sr0 = transform::skew_symm(r(0));
@@ -69,17 +69,17 @@ mat B3DC::compute_g(const mat& a, const subview_col<double>& rk, const subview_c
 
     const auto sa = span(0, 2), sb = span(3, 5), sc = span(6, 8), sd = span(9, 11);
 
-    g(sa, sa) = -.5 * (a * (zrk + zrk.t()) * a + rke0 * compute_m(a, z) + e0r0z * compute_m(a, rk));
+    g(sa, sa) = -.5 * (a * (zrk + zrk.t()) * a + rke0 * compute_m(a, z) + e0r0z * compute_m(a, rk)); // g_11
     g(sc, sc) = g(sa, sa);
     g(sa, sc) = -g(sa, sa);
     g(sc, sa) = -g(sa, sa);
 
-    g(sb, sb) = .125 * ((srk * ze0.t() - rke0 * sz) * sr0 + (2. * sz + sr0 * ze0 - e0r0z * se(0)) * srk);
+    g(sb, sb) = .125 * ((srk * ze0.t() - rke0 * sz) * sr0 + (2. * sz + sr0 * ze0 - e0r0z * se(0)) * srk); // g_22
     g(sd, sd) = g(sb, sb);
     g(sb, sd) = g(sb, sb);
     g(sd, sb) = g(sb, sb);
 
-    g(sa, sb) = -.25 * a * ((ze0 + eye(3, 3) * e0r0z) * srk + rk * z.t() * sr0);
+    g(sa, sb) = -.25 * a * ((ze0 + eye(3, 3) * e0r0z) * srk + rk * z.t() * sr0); // g_12
     g(sa, sd) = g(sa, sb);
     g(sc, sb) = -g(sa, sb);
     g(sc, sd) = -g(sa, sb);
@@ -222,13 +222,13 @@ mat B3DC::to_global_geometry_mat(const mat& l_force) const {
 
     const mat a = compute_a();
 
-    // KA
+    // KA eq. 4.134
     geometry(sa, sa) = p1 * a;
     geometry(sc, sc) = geometry(sa, sa);
     geometry(sa, sc) = -geometry(sa, sa);
     geometry(sc, sa) = -geometry(sa, sa);
 
-    // KB
+    // KB eq. 4.135
     geometry += p2 * std::tan(theta(2)) * transformation.row(1).t() * transformation.row(1);
     geometry += p3 * std::tan(theta(5)) * transformation.row(2).t() * transformation.row(2);
     geometry += p4 * std::tan(theta(1)) * transformation.row(3).t() * transformation.row(3);
@@ -236,21 +236,21 @@ mat B3DC::to_global_geometry_mat(const mat& l_force) const {
     geometry -= p6 * std::tan(theta(0)) * t6i.t() * t6i;
     geometry += p6 * std::tan(theta(3)) * t6j.t() * t6j;
 
-    // KC
-    geometry += m2 * compute_g(a, r(1), ni(0)) + m3 * compute_g(a, r(1), nj(0)) - m4 * compute_g(a, r(2), ni(0)) - m5 * compute_g(a, r(2), nj(0)) + m6i * compute_g(a, r(2), nj(1)) - m6i * compute_g(a, r(1), nj(2)) - m6j * compute_g(a, r(2), ni(1)) + m6j * compute_g(a, r(1), ni(2));
+    // KC !!!eq. 4.136 is wrong, m6i and m6j need to be swapped!!!
+    geometry += m2 * compute_g(a, r(1), ni(0)) + m3 * compute_g(a, r(1), nj(0)) - m4 * compute_g(a, r(2), ni(0)) - m5 * compute_g(a, r(2), nj(0)) + m6j * compute_g(a, r(2), nj(1)) - m6j * compute_g(a, r(1), nj(2)) - m6i * compute_g(a, r(2), ni(1)) + m6i * compute_g(a, r(1), ni(2));
 
-    // KD
+    // KD eq. 4.137
     const mat KD2 = compute_l(a, r(2)).t() * (m4 * sni(0) + m6i * sni(1)) - compute_l(a, r(1)).t() * (m2 * sni(0) + m6i * sni(2));
     const mat KD4 = compute_l(a, r(2)).t() * (m5 * snj(0) - m6j * snj(1)) - compute_l(a, r(1)).t() * (m3 * snj(0) - m6j * snj(2));
 
     geometry.cols(sb) += KD2;
     geometry.cols(sd) += KD4;
 
-    // KE
+    // KE eq. 4.139
     geometry.rows(sb) += KD2.t();
     geometry.rows(sd) += KD4.t();
 
-    // KF
+    // KF eq. 4.140
     const mat KF11 = -m2 * compute_m(a, ni(1)) - m3 * compute_m(a, nj(1)) + m4 * compute_m(a, ni(2)) + m5 * compute_m(a, nj(2));
     geometry(sa, sa) += KF11;
     geometry(sc, sc) += KF11;
@@ -269,9 +269,9 @@ mat B3DC::to_global_geometry_mat(const mat& l_force) const {
     geometry(sc, sd) -= KF14;
     geometry(sd, sc) -= KF14.t();
 
-    // KF22
+    // KF22 eq. 4.141
     geometry(sb, sb) += m2 * (se(1) * sni(0) - se(0) * sni(1)) - m4 * (se(2) * sni(0) - se(0) * sni(2)) - m6i * (se(2) * sni(1) - se(1) * sni(2));
-    // KF44
+    // KF44 eq. 4.141
     geometry(sd, sd) += m3 * (se(1) * snj(0) - se(0) * snj(1)) - m5 * (se(2) * snj(0) - se(0) * snj(2)) + m6j * (se(2) * snj(1) - se(1) * snj(2));
 
     return geometry;

@@ -17,6 +17,13 @@
 /**
  * @class B3DC
  * @brief A B3DC class.
+ * 
+ * B3DC is a corotational transformation for 3D beam elements.
+ * 
+ * The implementation is mainly based on de Souza's thesis.
+ * 
+ * Force-based Finite Element for Large Displacement Inelastic Analysis of Frames
+ * 
  * @author tlc
  * @date 16/12/2021
  * @version 0.1.0
