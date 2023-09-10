@@ -38,15 +38,20 @@
 
 #include "B3DL.h"
 
-class B3DC final : public B3DL {
+class B3DC : public B3DL {
+    mat basic{3, 3, fill::none};
+
+    rowvec t6i, t6j;
+
+protected:
+    const span sa{0, 2}, sb{3, 5}, sc{6, 8}, sd{9, 11};
+
     double elongation = 0.;
 
-    mat trial_n, current_n;
-    mat basic{3, 3, fill::none}, reference;
+    mat trial_n, current_n, reference;
     field<mat> sn{6}, se{3};
 
     vec theta;
-    rowvec t6i, t6j;
     mat transformation;
 
     const double initial_length = 0.;
@@ -64,7 +69,6 @@ class B3DC final : public B3DL {
     [[nodiscard]] const mat& sni(uword) const;
     [[nodiscard]] const mat& snj(uword) const;
 
-protected:
     void update_transformation() override;
 
 public:

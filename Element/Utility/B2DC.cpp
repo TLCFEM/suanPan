@@ -19,8 +19,6 @@
 #include <Element/Element.h>
 #include <Toolbox/tensor.h>
 
-unique_ptr<Orientation> B2DC::get_copy() { return make_unique<B2DC>(*this); }
-
 void B2DC::update_transformation() {
     const auto coord = get_coordinate(element_ptr, 2);
     const auto t_disp = get_trial_displacement(element_ptr);
@@ -39,6 +37,8 @@ void B2DC::update_transformation() {
 }
 
 bool B2DC::is_nlgeom() const { return true; }
+
+unique_ptr<Orientation> B2DC::get_copy() { return make_unique<B2DC>(*this); }
 
 vec B2DC::to_local_vec(const vec& g_vec) const {
     const auto& initial_length = original_position(0);

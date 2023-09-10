@@ -18,8 +18,6 @@
 #include "T3DC.h"
 #include <Element/Element.h>
 
-unique_ptr<Orientation> T3DC::get_copy() { return make_unique<T3DC>(*this); }
-
 void T3DC::update_transformation() {
     const auto coord = get_coordinate(element_ptr, 3);
     const auto t_disp = get_trial_displacement(element_ptr);
@@ -38,6 +36,8 @@ T3DC::T3DC(const unsigned T)
     : T3DL(T) {}
 
 bool T3DC::is_nlgeom() const { return true; }
+
+unique_ptr<Orientation> T3DC::get_copy() { return make_unique<T3DC>(*this); }
 
 mat T3DC::to_global_geometry_mat(const mat& l_mat) const {
     auto g_mat = to_global_stiffness_mat(-l_mat);
