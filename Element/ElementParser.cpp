@@ -2768,6 +2768,7 @@ int create_new_orientation(const shared_ptr<DomainBase>& domain, istringstream& 
     if(is_equal(file_type, "B3DL")) domain->insert(make_shared<B3DL>(tag, std::move(xyz)));
     else if(is_equal(file_type, "B3DC")) domain->insert(make_shared<B3DC>(tag, std::move(xyz)));
     else if(is_equal(file_type, "B3DOSL")) domain->insert(make_shared<B3DOSL>(tag, std::move(xyz)));
+    else if(is_equal(file_type, "B3DOSC")) domain->insert(make_shared<B3DOSC>(tag, std::move(xyz)));
 
     return SUANPAN_SUCCESS;
 }

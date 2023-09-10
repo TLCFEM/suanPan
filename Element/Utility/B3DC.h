@@ -69,6 +69,10 @@ protected:
     [[nodiscard]] const mat& sni(uword) const;
     [[nodiscard]] const mat& snj(uword) const;
 
+    void update_direct_cosine(const vec&);
+    void update_e(const vec&);
+    void update_theta();
+
     void update_transformation() override;
 
 public:
