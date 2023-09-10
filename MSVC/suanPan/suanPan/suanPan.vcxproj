@@ -164,6 +164,7 @@
     <ClCompile Include="..\..\..\Element\Beam\B21H.cpp" />
     <ClCompile Include="..\..\..\Element\Beam\B31.cpp" />
     <ClCompile Include="..\..\..\Element\Beam\EB21.cpp" />
+    <ClCompile Include="..\..\..\Element\Beam\EB31OS.cpp" />
     <ClCompile Include="..\..\..\Element\Beam\F21.cpp" />
     <ClCompile Include="..\..\..\Element\Beam\F21H.cpp" />
     <ClCompile Include="..\..\..\Element\Beam\F31.cpp" />
@@ -636,6 +637,7 @@
     <ClInclude Include="..\..\..\Element\Beam\B21H.h" />
     <ClInclude Include="..\..\..\Element\Beam\B31.h" />
     <ClInclude Include="..\..\..\Element\Beam\EB21.h" />
+    <ClInclude Include="..\..\..\Element\Beam\EB31OS.h" />
     <ClInclude Include="..\..\..\Element\Beam\F21.h" />
     <ClInclude Include="..\..\..\Element\Beam\F21H.h" />
     <ClInclude Include="..\..\..\Element\Beam\F31.h" />

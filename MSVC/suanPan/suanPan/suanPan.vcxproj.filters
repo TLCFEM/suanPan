@@ -1528,6 +1528,9 @@
     <ClCompile Include="..\..\..\Element\Utility\B3DOSL.cpp">
       <Filter>Element\Utility</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Element\Beam\EB31OS.cpp">
+      <Filter>Element\Beam</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2922,6 +2925,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Element\Utility\B3DOSL.h">
       <Filter>Element\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Beam\EB31OS.h">
+      <Filter>Element\Beam</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1408,6 +1408,40 @@ void new_eb21(unique_ptr<Element>& return_obj, istringstream& command) {
     return_obj = make_unique<EB21>(tag, std::move(node_tag), area, moment_inertia, material_tag, is_true(nonlinear));
 }
 
+void new_eb31os(unique_ptr<Element>& return_obj, istringstream& command) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    uvec node_tag(2);
+    if(!get_input(command, node_tag)) {
+        suanpan_error("Two valid nodes are required.\n");
+        return;
+    }
+
+    vec property(7);
+    if(!get_input(command, property)) {
+        suanpan_error("A valid section/material property is required.\n");
+        return;
+    }
+
+    unsigned orientation;
+    if(!get_input(command, orientation)) {
+        suanpan_error("A valid orientation tag is required.\n");
+        return;
+    }
+
+    string nonlinear = "false";
+    if(command.eof())
+        suanpan_debug("Linear geometry assumed.\n");
+    else if(!get_input(command, nonlinear))
+        suanpan_error("A valid nonlinear geometry switch is required.\n");
+
+    return_obj = make_unique<EB31OS>(tag, std::move(node_tag), std::move(property), orientation, is_true(nonlinear));
+}
+
 void new_f21(unique_ptr<Element>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -2733,6 +2767,7 @@ int create_new_orientation(const shared_ptr<DomainBase>& domain, istringstream& 
 
     if(is_equal(file_type, "B3DL")) domain->insert(make_shared<B3DL>(tag, std::move(xyz)));
     else if(is_equal(file_type, "B3DC")) domain->insert(make_shared<B3DC>(tag, std::move(xyz)));
+    else if(is_equal(file_type, "B3DOSL")) domain->insert(make_shared<B3DOSL>(tag, std::move(xyz)));
 
     return SUANPAN_SUCCESS;
 }
@@ -2806,6 +2841,7 @@ int create_new_element(const shared_ptr<DomainBase>& domain, istringstream& comm
     else if(is_equal(element_id, "Embedded2D")) new_embedded(new_element, command, 2);
     else if(is_equal(element_id, "Embedded3D")) new_embedded(new_element, command, 3);
     else if(is_equal(element_id, "EB21")) new_eb21(new_element, command);
+    else if(is_equal(element_id, "EB31OS")) new_eb31os(new_element, command);
     else if(is_equal(element_id, "F21")) new_f21(new_element, command);
     else if(is_equal(element_id, "F21H")) new_f21h(new_element, command);
     else if(is_equal(element_id, "F31")) new_f31(new_element, command);
