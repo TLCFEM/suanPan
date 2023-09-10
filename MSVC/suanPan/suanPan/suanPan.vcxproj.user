@@ -4,8 +4,8 @@
     <ShowAllFiles>false</ShowAllFiles>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>-f ConcreteK4</LocalDebuggerCommandArguments>
-    <LocalDebuggerWorkingDirectory>..\..\..\Example\Material</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerCommandArguments>-f EB31OS</LocalDebuggerCommandArguments>
+    <LocalDebuggerWorkingDirectory>..\..\..\Example\Element</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

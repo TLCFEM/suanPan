@@ -102,27 +102,13 @@ mat B3DOSL::to_global_stiffness_mat(const mat& l_mat) const {
     // warping
     t_mat(7, 6) = t_mat(8, 13) = 1.;
 
-    mat g_mat = t_mat.t() * l_mat * t_mat;
+    mat g_mat(14, 14, fill::eye);
+    g_mat(sa, sa) = direction_cosine;
+    g_mat(sb, sb) = direction_cosine;
+    g_mat(sc, sc) = direction_cosine;
+    g_mat(sd, sd) = direction_cosine;
 
-    g_mat(sa, sa) = direction_cosine.t() * g_mat(sa, sa) * direction_cosine;
-    g_mat(sa, sb) = direction_cosine.t() * g_mat(sa, sb) * direction_cosine;
-    g_mat(sa, sc) = direction_cosine.t() * g_mat(sa, sc) * direction_cosine;
-    g_mat(sa, sd) = direction_cosine.t() * g_mat(sa, sd) * direction_cosine;
+    t_mat *= g_mat;
 
-    g_mat(sb, sa) = direction_cosine.t() * g_mat(sb, sa) * direction_cosine;
-    g_mat(sb, sb) = direction_cosine.t() * g_mat(sb, sb) * direction_cosine;
-    g_mat(sb, sc) = direction_cosine.t() * g_mat(sb, sc) * direction_cosine;
-    g_mat(sb, sd) = direction_cosine.t() * g_mat(sb, sd) * direction_cosine;
-
-    g_mat(sc, sa) = direction_cosine.t() * g_mat(sc, sa) * direction_cosine;
-    g_mat(sc, sb) = direction_cosine.t() * g_mat(sc, sb) * direction_cosine;
-    g_mat(sc, sc) = direction_cosine.t() * g_mat(sc, sc) * direction_cosine;
-    g_mat(sc, sd) = direction_cosine.t() * g_mat(sc, sd) * direction_cosine;
-
-    g_mat(sd, sa) = direction_cosine.t() * g_mat(sd, sa) * direction_cosine;
-    g_mat(sd, sb) = direction_cosine.t() * g_mat(sd, sb) * direction_cosine;
-    g_mat(sd, sc) = direction_cosine.t() * g_mat(sd, sc) * direction_cosine;
-    g_mat(sd, sd) = direction_cosine.t() * g_mat(sd, sd) * direction_cosine;
-
-    return g_mat;
+    return t_mat.t() * l_mat * t_mat;
 }

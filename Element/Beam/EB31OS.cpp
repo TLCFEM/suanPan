@@ -17,6 +17,7 @@
 
 #include "EB31OS.h"
 #include <Domain/DomainBase.h>
+#include <Recorder/OutputType.h>
 
 EB31OS::EB31OS(const unsigned T, uvec&& N, vec&& P, const unsigned O, const bool F)
     : MaterialElement1D(T, b_node, b_dof, std::forward<uvec>(N), uvec{}, F, {DOF::U1, DOF::U2, DOF::U3, DOF::UR1, DOF::UR2, DOF::UR3, DOF::WARP})
@@ -93,6 +94,8 @@ int EB31OS::initialize(const shared_ptr<DomainBase>& D) {
 
     trial_stiffness = current_stiffness = initial_stiffness = b_trans->to_global_stiffness_mat(local_stiff);
 
+    ConstantStiffness(this);
+
     return SUANPAN_SUCCESS;
 }
 
@@ -122,6 +125,13 @@ int EB31OS::clear_status() {
 int EB31OS::reset_status() {
     b_trans->reset_status();
     return SUANPAN_SUCCESS;
+}
+
+vector<vec> EB31OS::record(const OutputType P) {
+    if(P == OutputType::BEAME) return {b_trans->to_local_vec(get_current_displacement())};
+    if(P == OutputType::BEAMS) return {vec{local_stiff * b_trans->to_local_vec(get_current_displacement())}};
+
+    return {};
 }
 
 void EB31OS::print() {
