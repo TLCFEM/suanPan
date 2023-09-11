@@ -5,12 +5,15 @@ node 2 1 0 0
 node 3 1 1 0
 
 orientation B3DOSL 1 0. 0. 1.
+orientation B3DOSC 3 0. 0. 1.
 orientation B3DL 2 0. 0. 1.
 
 element EB31OS 1 1 2 30 10 19.5 421 98 4.85 28.5 1
 element EB31OS 2 2 3 30 10 19.5 421 98 4.85 28.5 1
 element EB31OS 3 2 3 30 10 19.5 421 98 4.85 28.5 2
 element EB31OS 4 2 3 30 10 19.5 421 98 4.85 28.5 3
+element EB31OS 5 2 3 30 10 19.5 421 98 4.85 28.5 4
+element EB31OS 6 2 3 30 10 19.5 421 98 4.85 28.5 1 1
 
 fix2 1 E 1
 fix2 2 7 1
