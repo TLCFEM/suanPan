@@ -164,6 +164,7 @@
     <ClCompile Include="..\..\..\Element\Beam\B21H.cpp" />
     <ClCompile Include="..\..\..\Element\Beam\B31.cpp" />
     <ClCompile Include="..\..\..\Element\Beam\EB21.cpp" />
+    <ClCompile Include="..\..\..\Element\Beam\EB31OS.cpp" />
     <ClCompile Include="..\..\..\Element\Beam\F21.cpp" />
     <ClCompile Include="..\..\..\Element\Beam\F21H.cpp" />
     <ClCompile Include="..\..\..\Element\Beam\F31.cpp" />
@@ -249,6 +250,8 @@
     <ClCompile Include="..\..\..\Element\Utility\B2DL.cpp" />
     <ClCompile Include="..\..\..\Element\Utility\B3DC.cpp" />
     <ClCompile Include="..\..\..\Element\Utility\B3DL.cpp" />
+    <ClCompile Include="..\..\..\Element\Utility\B3DOSC.cpp" />
+    <ClCompile Include="..\..\..\Element\Utility\B3DOSL.cpp" />
     <ClCompile Include="..\..\..\Element\Utility\IGA\BSpline.cpp" />
     <ClCompile Include="..\..\..\Element\Utility\IGA\BSplineSurface.cpp" />
     <ClCompile Include="..\..\..\Element\Utility\IGA\BSplineVolume.cpp" />
@@ -635,6 +638,7 @@
     <ClInclude Include="..\..\..\Element\Beam\B21H.h" />
     <ClInclude Include="..\..\..\Element\Beam\B31.h" />
     <ClInclude Include="..\..\..\Element\Beam\EB21.h" />
+    <ClInclude Include="..\..\..\Element\Beam\EB31OS.h" />
     <ClInclude Include="..\..\..\Element\Beam\F21.h" />
     <ClInclude Include="..\..\..\Element\Beam\F21H.h" />
     <ClInclude Include="..\..\..\Element\Beam\F31.h" />
@@ -722,6 +726,8 @@
     <ClInclude Include="..\..\..\Element\Utility\B2DL.h" />
     <ClInclude Include="..\..\..\Element\Utility\B3DC.h" />
     <ClInclude Include="..\..\..\Element\Utility\B3DL.h" />
+    <ClInclude Include="..\..\..\Element\Utility\B3DOSC.h" />
+    <ClInclude Include="..\..\..\Element\Utility\B3DOSL.h" />
     <ClInclude Include="..\..\..\Element\Utility\IGA\BSpline.h" />
     <ClInclude Include="..\..\..\Element\Utility\IGA\BSplineSurface.h" />
     <ClInclude Include="..\..\..\Element\Utility\IGA\BSplineVolume.h" />

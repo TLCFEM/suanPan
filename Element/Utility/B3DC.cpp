@@ -19,18 +19,6 @@
 #include <Element/Element.h>
 #include <Toolbox/tensor.h>
 
-unique_ptr<Orientation> B3DC::get_copy() { return make_unique<B3DC>(*this); }
-
-void B3DC::commit_status() { current_n = trial_n; }
-
-void B3DC::reset_status() { trial_n = current_n; }
-
-void B3DC::clear_status() {
-    direction_cosine.clear();
-
-    trial_n = current_n = direction_cosine;
-}
-
 mat B3DC::compute_a() const {
     return (eye(3, 3) - e(0) * e(0).t()) / length; // eq. 4.109
 }
@@ -40,13 +28,13 @@ mat B3DC::compute_l(const mat& a, const subview_col<double>& rk) const {
     const mat srk = transform::skew_symm(rk);
     const auto rke0 = .25 * dot(rk, e(0));
 
-    mat l(3, 12, fill::none); // eq. 4.111
+    mat l(3llu, 2llu * input_size(), fill::zeros); // eq. 4.111
 
-    l.cols(0, 2) = (2. * rke0 * eye(3, 3) + 2. * e0r0 * rk.t()) * a;                             // eq. 4.110
-    l.cols(3, 5) = rke0 * transform::skew_symm(r(0)) + (e0r0 * e(0).t() - .5 * eye(3, 3)) * srk; // eq. 4.110
+    l.cols(sa) = (2. * rke0 * eye(3, 3) + 2. * e0r0 * rk.t()) * a;                             // eq. 4.110
+    l.cols(sb) = rke0 * transform::skew_symm(r(0)) + (e0r0 * e(0).t() - .5 * eye(3, 3)) * srk; // eq. 4.110
 
-    l.cols(6, 8) = -l.cols(0, 2);
-    l.cols(9, 11) = l.cols(3, 5);
+    l.cols(sc) = -l.cols(sa);
+    l.cols(sd) = l.cols(sb);
 
     return l;
 }
@@ -57,7 +45,7 @@ mat B3DC::compute_m(const mat& a, const subview_col<double>& z) const {
 }
 
 mat B3DC::compute_g(const mat& a, const subview_col<double>& rk, const subview_col<double>& z) const {
-    mat g(12, 12, fill::none); // eq. 4.132
+    mat g(2llu * input_size(), 2llu * input_size(), fill::zeros); // eq. 4.132
 
     const auto srk = transform::skew_symm(rk);
     const auto sr0 = transform::skew_symm(r(0));
@@ -66,8 +54,6 @@ mat B3DC::compute_g(const mat& a, const subview_col<double>& rk, const subview_c
     const auto e0r0z = dot(e(0) + r(0), z);
     const mat zrk = z * rk.t();
     const mat ze0 = z * e(0).t();
-
-    const auto sa = span(0, 2), sb = span(3, 5), sc = span(6, 8), sd = span(9, 11);
 
     g(sa, sa) = -.5 * (a * (zrk + zrk.t()) * a + rke0 * compute_m(a, z) + e0r0z * compute_m(a, rk)); // g_11
     g(sc, sc) = g(sa, sa);
@@ -103,21 +89,39 @@ const mat& B3DC::sni(const uword I) const { return sn(I); }
 
 const mat& B3DC::snj(const uword I) const { return sn(I + 3); }
 
+void B3DC::update_direct_cosine(const vec& x_axis) {
+    if(!direction_cosine.empty()) return;
+
+    // initial undeformed frame
+    direction_cosine.resize(3, 3);
+    direction_cosine.col(0) = normalise(x_axis);
+    direction_cosine.col(1) = normalise(cross(z_axis, x_axis));
+    direction_cosine.col(2) = normalise(cross(x_axis, direction_cosine.col(1)));
+
+    trial_n = current_n = join_rows(direction_cosine, direction_cosine);
+
+    suanpan::hacker(initial_length) = norm(x_axis);
+}
+
+void B3DC::update_e(const vec& trial_cord) {
+    e(0) = normalise(trial_cord);
+    for(auto I = 1u; I < 3u; ++I) e(I) = r(I) - .5 * dot(r(I), e(0)) * (r(0) + e(0));
+    for(auto I = 0u; I < 3u; ++I) se(I) = transform::skew_symm(e(I));
+}
+
+void B3DC::update_theta() {
+    for(auto I = 0u; I < 3u; ++I) {
+        const auto J = (I + 1u) % 3u, K = (I + 2u) % 3u;
+        theta(I) = asin(.5 * (dot(e(K), ni(J)) - dot(e(J), ni(K))));
+        theta(I + 3llu) = asin(.5 * (dot(e(K), nj(J)) - dot(e(J), nj(K))));
+    }
+}
+
 void B3DC::update_transformation() {
     const mat t_coor = get_coordinate(element_ptr, 3).t();
     const vec x_axis = t_coor.col(1) - t_coor.col(0);
 
-    if(direction_cosine.empty()) {
-        // initial undeformed frame
-        direction_cosine.resize(3, 3);
-        direction_cosine.col(0) = normalise(x_axis);
-        direction_cosine.col(1) = normalise(cross(z_axis, x_axis));
-        direction_cosine.col(2) = normalise(cross(x_axis, direction_cosine.col(1)));
-
-        trial_n = current_n = join_rows(direction_cosine, direction_cosine);
-
-        suanpan::hacker(initial_length) = norm(x_axis);
-    }
+    update_direct_cosine(x_axis);
 
     const mat trial_disp = reshape(get_trial_displacement(element_ptr), 6, 2);
     const vec incre_disp = trial_disp.head_rows(3).col(1) - trial_disp.head_rows(3).col(0);
@@ -128,26 +132,18 @@ void B3DC::update_transformation() {
 
     elongation = dot(x_axis + trial_cord, incre_disp) / (length + initial_length); // eq. 4.98
 
-    const mat incre_r = reshape(get_incre_displacement(element_ptr), 6, 2).eval().tail_rows(3);
-
     // nodal frame
-    trial_n.head_cols(3) = transform::rodrigues(incre_r.col(0)) * current_n.head_cols(3);
-    trial_n.tail_cols(3) = transform::rodrigues(incre_r.col(1)) * current_n.tail_cols(3);
+    trial_n.head_cols(3) = transform::rodrigues((trial_disp.tail_rows(3).col(0) - trial_rotation.col(0)).eval()) * trial_n.head_cols(3);
+    trial_n.tail_cols(3) = transform::rodrigues((trial_disp.tail_rows(3).col(1) - trial_rotation.col(1)).eval()) * trial_n.tail_cols(3);
 
     // reference frame
-    reference = transform::rodrigues((.5 * sum(trial_disp.tail_rows(3), 1)).eval()) * direction_cosine;
+    reference = transform::rodrigues((.5 * sum(trial_rotation = trial_disp.tail_rows(3), 1)).eval()) * direction_cosine;
 
     // basic deformed frame
-    e(0) = normalise(trial_cord);
-    for(auto I = 1u; I < 3u; ++I) e(I) = r(I) - .5 * dot(r(I), e(0)) * (r(0) + e(0));
-    for(auto I = 0u; I < 3u; ++I) se(I) = transform::skew_symm(e(I));
+    update_e(trial_cord);
 
     theta.set_size(6);
-    for(auto I = 0u; I < 3u; ++I) {
-        const auto J = (I + 1u) % 3u, K = (I + 2u) % 3u;
-        theta(I) = asin(.5 * (dot(e(K), ni(J)) - dot(e(J), ni(K))));
-        theta(I + 3llu) = asin(.5 * (dot(e(K), nj(J)) - dot(e(J), nj(K))));
-    }
+    update_theta();
 
     const auto a = compute_a();
     const auto lr1 = compute_l(a, r(1)), lr2 = compute_l(a, r(2));
@@ -202,6 +198,25 @@ void B3DC::update_transformation() {
 
 bool B3DC::is_nlgeom() const { return true; }
 
+unique_ptr<Orientation> B3DC::get_copy() { return make_unique<B3DC>(*this); }
+
+void B3DC::commit_status() {
+    current_n = trial_n;
+    current_rotation = trial_rotation;
+}
+
+void B3DC::reset_status() {
+    trial_n = current_n;
+    trial_rotation = current_rotation;
+}
+
+void B3DC::clear_status() {
+    direction_cosine.clear();
+
+    trial_n = current_n = direction_cosine;
+    trial_rotation = current_rotation.zeros();
+}
+
 vec B3DC::to_local_vec(const vec&) const { return {elongation, theta(2), theta(5), theta(1), theta(4), theta(3) - theta(0)}; }
 
 vec B3DC::to_global_vec(const vec& l_resistance) const { return transformation.t() * l_resistance; }
@@ -217,8 +232,6 @@ mat B3DC::to_global_geometry_mat(const mat& l_force) const {
     const auto m5 = p5 * .5 / std::cos(theta(4));
     const auto m6i = p6 * .5 / std::cos(theta(0));
     const auto m6j = p6 * .5 / std::cos(theta(3));
-
-    const auto sa = span(0, 2), sb = span(3, 5), sc = span(6, 8), sd = span(9, 11);
 
     const mat a = compute_a();
 

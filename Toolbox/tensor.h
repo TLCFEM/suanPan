@@ -147,8 +147,6 @@ namespace transform {
 
     template<typename T> Mat<T> rodrigues(const Mat<T>& R) { return arma::expmat(transform::skew_symm(R)); }
 
-    template<typename T> Mat<T> rodrigues(const subview_col<T>& R) { return arma::expmat(transform::skew_symm(R)); }
-
     template<typename T> Quaternion<T> to_quaternion(const Mat<T>& R) {
         if(3 == R.n_elem) {
             const auto angle = arma::norm(R);

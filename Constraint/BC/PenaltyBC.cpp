@@ -50,6 +50,7 @@ PenaltyBC::PenaltyBC(const unsigned T, const unsigned S, uvec&& N, const char TP
     else if(is_equal(TP, '4')) dof_reference = uvec{4};
     else if(is_equal(TP, '5')) dof_reference = uvec{5};
     else if(is_equal(TP, '6')) dof_reference = uvec{6};
+    else if(is_equal(TP, '7')) dof_reference = uvec{7};
 
     dof_reference -= 1;
 }

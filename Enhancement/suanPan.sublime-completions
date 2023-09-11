@@ -2995,10 +2995,22 @@
       "trigger":"B31"
     },
     {
-      "contents":"",
-      "details":"",
+      "contents":"orientation B3DL ${1:(1)} ${2:(2..4)}\n# (1) int, unique orientation tag\n# (2..4) double, three components of local z axis",
+      "details":"Linear transformation for 3D beam elements",
       "kind":"type",
       "trigger":"B3DL"
+    },
+    {
+      "contents":"orientation B3DC ${1:(1)} ${2:(2..4)}\n# (1) int, unique orientation tag\n# (2..4) double, three components of local z axis",
+      "details":"Corotational transformation for 3D beam elements",
+      "kind":"type",
+      "trigger":"B3DC"
+    },
+    {
+      "contents":"orientation B3DOSL ${1:(1)} ${2:(2..4)}\n# (1) int, unique orientation tag\n# (2..4) double, three components of local z axis",
+      "details":"Linear transformation for 3D beam elements with open sections",
+      "kind":"type",
+      "trigger":"B3DOSL"
     },
     {
       "contents":"set system_solver BICGSTAB",

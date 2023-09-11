@@ -15,30 +15,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class T2DL
- * @brief A T2DL class.
+ * @class B3DOSC
+ * @brief A B3DOSC class.
+ * 
+ * B3DOSC is a corotational transformation for 3D beam elements.
+ * 
+ * The implementation is mainly based on de Souza's thesis.
+ * 
+ * Force-based Finite Element for Large Displacement Inelastic Analysis of Frames
+ * 
  * @author tlc
- * @date 27/06/2018
+ * @date 16/12/2021
  * @version 0.1.0
- * @file T2DL.h
+ * @file B3DOSC.h
  * @addtogroup Utility
  * @ingroup Element
  * @{
  */
 
-#ifndef T2DL_H
-#define T2DL_H
+#ifndef B3DOSC_H
+#define B3DOSC_H
 
-#include <Element/Utility/Orientation.h>
+#include "B3DC.h"
 
-class T2DL : public Orientation {
-    static const span IS, JS;
-
+class B3DOSC : public B3DC {
 protected:
     void update_transformation() override;
 
 public:
-    explicit T2DL(unsigned = 0);
+    B3DOSC(unsigned, vec&&);
 
     [[nodiscard]] unsigned input_size() const override;
     [[nodiscard]] unsigned output_size() const override;
@@ -46,9 +51,7 @@ public:
     unique_ptr<Orientation> get_copy() override;
 
     [[nodiscard]] vec to_local_vec(const vec&) const override;
-    [[nodiscard]] vec to_global_vec(const vec&) const override;
-    [[nodiscard]] mat to_global_mass_mat(const mat&) const override;
-    [[nodiscard]] mat to_global_stiffness_mat(const mat&) const override;
+    [[nodiscard]] mat to_global_geometry_mat(const mat&) const override;
 };
 
 #endif

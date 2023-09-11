@@ -24,6 +24,10 @@ const span T3DL::JS(3, 5);
 T3DL::T3DL(const unsigned T)
     : Orientation(T) {}
 
+unsigned T3DL::input_size() const { return 3u; }
+
+unsigned T3DL::output_size() const { return 1u; }
+
 unique_ptr<Orientation> T3DL::get_copy() { return make_unique<T3DL>(*this); }
 
 void T3DL::update_transformation() {

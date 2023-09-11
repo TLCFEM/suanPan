@@ -48,6 +48,10 @@ int F31::initialize(const shared_ptr<DomainBase>& D) {
         suanpan_warning("Element {} is assigned with an inconsistent transformation {}.\n", get_tag(), orientation_tag);
         return SUANPAN_FAIL;
     }
+    if(6u != b_trans->input_size() || 6u != b_trans->output_size()) {
+        suanpan_warning("Element {} is assigned with an inconsistent transformation {}, use B3DL or B3DC only.\n", get_tag(), orientation_tag);
+        return SUANPAN_FAIL;
+    }
 
     b_trans->set_element_ptr(this);
 

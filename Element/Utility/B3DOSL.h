@@ -15,30 +15,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class T2DL
- * @brief A T2DL class.
+ * @class B3DOSL
+ * @brief A B3DOSL class.
+ * 
+ * Order of local quantities:
+ *   uniform axial
+ *   strong axis bending near node
+ *   strong axis bending far node
+ *   weak axis bending near node
+ *   weak axis bending far node
+ *   torsion near node
+ *   torsion far node
+ *   warping near node
+ *   warping far node
+ *
  * @author tlc
- * @date 27/06/2018
+ * @date 10/09/2023
  * @version 0.1.0
- * @file T2DL.h
+ * @file B3DOSL.h
  * @addtogroup Utility
  * @ingroup Element
  * @{
  */
 
-#ifndef T2DL_H
-#define T2DL_H
+#ifndef B3DOSL_H
+#define B3DOSL_H
 
-#include <Element/Utility/Orientation.h>
+#include "B3DL.h"
 
-class T2DL : public Orientation {
-    static const span IS, JS;
-
-protected:
-    void update_transformation() override;
+class B3DOSL final : public B3DL {
+    static const span sa, sb, sc, sd;
 
 public:
-    explicit T2DL(unsigned = 0);
+    using B3DL::B3DL;
 
     [[nodiscard]] unsigned input_size() const override;
     [[nodiscard]] unsigned output_size() const override;
