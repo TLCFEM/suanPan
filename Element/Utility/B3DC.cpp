@@ -132,14 +132,12 @@ void B3DC::update_transformation() {
 
     elongation = dot(x_axis + trial_cord, incre_disp) / (length + initial_length); // eq. 4.98
 
-    const mat incre_r = reshape(get_incre_displacement(element_ptr), 6, 2).eval().tail_rows(3);
-
     // nodal frame
-    trial_n.head_cols(3) = transform::rodrigues(incre_r.col(0)) * current_n.head_cols(3);
-    trial_n.tail_cols(3) = transform::rodrigues(incre_r.col(1)) * current_n.tail_cols(3);
+    trial_n.head_cols(3) = transform::rodrigues((trial_disp.tail_rows(3).col(0) - trial_rotation.col(0)).eval()) * trial_n.head_cols(3);
+    trial_n.tail_cols(3) = transform::rodrigues((trial_disp.tail_rows(3).col(1) - trial_rotation.col(1)).eval()) * trial_n.tail_cols(3);
 
     // reference frame
-    reference = transform::rodrigues((.5 * sum(trial_disp.tail_rows(3), 1)).eval()) * direction_cosine;
+    reference = transform::rodrigues((.5 * sum(trial_rotation = trial_disp.tail_rows(3), 1)).eval()) * direction_cosine;
 
     // basic deformed frame
     update_e(trial_cord);
@@ -202,14 +200,21 @@ bool B3DC::is_nlgeom() const { return true; }
 
 unique_ptr<Orientation> B3DC::get_copy() { return make_unique<B3DC>(*this); }
 
-void B3DC::commit_status() { current_n = trial_n; }
+void B3DC::commit_status() {
+    current_n = trial_n;
+    current_rotation = trial_rotation;
+}
 
-void B3DC::reset_status() { trial_n = current_n; }
+void B3DC::reset_status() {
+    trial_n = current_n;
+    trial_rotation = current_rotation;
+}
 
 void B3DC::clear_status() {
     direction_cosine.clear();
 
     trial_n = current_n = direction_cosine;
+    trial_rotation = current_rotation.zeros();
 }
 
 vec B3DC::to_local_vec(const vec&) const { return {elongation, theta(2), theta(5), theta(1), theta(4), theta(3) - theta(0)}; }

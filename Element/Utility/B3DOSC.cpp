@@ -46,14 +46,12 @@ void B3DOSC::update_transformation() {
 
     elongation = dot(x_axis + trial_cord, incre_disp) / (length + initial_length); // eq. 4.98
 
-    const mat incre_r = reshape(get_incre_displacement(element_ptr), 7, 2).eval().rows(sb);
-
     // nodal frame
-    trial_n.head_cols(3) = transform::rodrigues(incre_r.col(0)) * current_n.head_cols(3);
-    trial_n.tail_cols(3) = transform::rodrigues(incre_r.col(1)) * current_n.tail_cols(3);
+    trial_n.head_cols(3) = transform::rodrigues((trial_disp.rows(sb).col(0) - trial_rotation.col(0)).eval()) * trial_n.head_cols(3);
+    trial_n.tail_cols(3) = transform::rodrigues((trial_disp.rows(sb).col(1) - trial_rotation.col(1)).eval()) * trial_n.tail_cols(3);
 
     // reference frame
-    reference = transform::rodrigues((.5 * sum(trial_disp.rows(sb), 1)).eval()) * direction_cosine;
+    reference = transform::rodrigues((.5 * sum(trial_rotation = trial_disp.rows(sb), 1)).eval()) * direction_cosine;
 
     // basic deformed frame
     update_e(trial_cord);
