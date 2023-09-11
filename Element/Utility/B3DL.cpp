@@ -18,9 +18,6 @@
 #include "B3DL.h"
 #include <Element/Element.h>
 
-B3DL::B3DL(const unsigned T, const double X, const double Y, const double Z)
-    : Orientation(T, vec{X, Y, Z}) {}
-
 B3DL::B3DL(const unsigned T, vec&& XYZ)
     : Orientation(T, std::forward<vec>(XYZ)) {}
 

@@ -19,12 +19,6 @@
 #include <Element/Element.h>
 #include <Toolbox/tensor.h>
 
-B3DOSC::B3DOSC(const unsigned T, const double X, const double Y, const double Z)
-    : B3DC(T, vec{X, Y, Z}) {
-    access::rw(sc) = span(7, 9);
-    access::rw(sd) = span(10, 12);
-}
-
 B3DOSC::B3DOSC(const unsigned T, vec&& XYZ)
     : B3DC(T, std::forward<vec>(XYZ)) {
     access::rw(sc) = span(7, 9);

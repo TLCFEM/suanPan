@@ -43,7 +43,6 @@ protected:
     void update_transformation() override;
 
 public:
-    explicit B3DOSC(unsigned = 0, double = 0., double = 0., double = 1.);
     B3DOSC(unsigned, vec&&);
 
     [[nodiscard]] unsigned input_size() const override;

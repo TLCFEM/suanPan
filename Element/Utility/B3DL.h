@@ -49,7 +49,6 @@ protected:
     void update_transformation() override;
 
 public:
-    explicit B3DL(unsigned = 0, double = 0., double = 0., double = 1.);
     B3DL(unsigned, vec&&);
 
     [[nodiscard]] unsigned input_size() const override;
