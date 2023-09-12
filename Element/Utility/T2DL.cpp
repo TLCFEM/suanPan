@@ -25,9 +25,9 @@ const span T2DL::JS(2, 3);
 T2DL::T2DL(const unsigned T)
     : Orientation(T) {}
 
-unsigned T2DL::input_size() const { return 2u; }
+unsigned T2DL::global_size() const { return 2u; }
 
-unsigned T2DL::output_size() const { return 1u; }
+unsigned T2DL::local_size() const { return 1u; }
 
 unique_ptr<Orientation> T2DL::get_copy() { return make_unique<T2DL>(*this); }
 

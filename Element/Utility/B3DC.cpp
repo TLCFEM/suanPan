@@ -28,7 +28,7 @@ mat B3DC::compute_l(const mat& a, const subview_col<double>& rk) const {
     const mat srk = transform::skew_symm(rk);
     const auto rke0 = .25 * dot(rk, e(0));
 
-    mat l(3llu, 2llu * input_size(), fill::zeros); // eq. 4.111
+    mat l(3llu, 2llu * global_size(), fill::zeros); // eq. 4.111
 
     l.cols(sa) = (2. * rke0 * eye(3, 3) + 2. * e0r0 * rk.t()) * a;                             // eq. 4.110
     l.cols(sb) = rke0 * transform::skew_symm(r(0)) + (e0r0 * e(0).t() - .5 * eye(3, 3)) * srk; // eq. 4.110
@@ -45,7 +45,7 @@ mat B3DC::compute_m(const mat& a, const subview_col<double>& z) const {
 }
 
 mat B3DC::compute_g(const mat& a, const subview_col<double>& rk, const subview_col<double>& z) const {
-    mat g(2llu * input_size(), 2llu * input_size(), fill::zeros); // eq. 4.132
+    mat g(2llu * global_size(), 2llu * global_size(), fill::zeros); // eq. 4.132
 
     const auto srk = transform::skew_symm(rk);
     const auto sr0 = transform::skew_symm(r(0));

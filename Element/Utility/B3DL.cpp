@@ -21,9 +21,9 @@
 B3DL::B3DL(const unsigned T, vec&& XYZ)
     : Orientation(T, std::forward<vec>(XYZ)) {}
 
-unsigned B3DL::input_size() const { return 6u; }
+unsigned B3DL::global_size() const { return 6u; }
 
-unsigned B3DL::output_size() const { return 6u; }
+unsigned B3DL::local_size() const { return 6u; }
 
 unique_ptr<Orientation> B3DL::get_copy() { return make_unique<B3DL>(*this); }
 

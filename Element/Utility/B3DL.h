@@ -51,8 +51,8 @@ protected:
 public:
     B3DL(unsigned, vec&&);
 
-    [[nodiscard]] unsigned input_size() const override;
-    [[nodiscard]] unsigned output_size() const override;
+    [[nodiscard]] unsigned global_size() const override;
+    [[nodiscard]] unsigned local_size() const override;
 
     unique_ptr<Orientation> get_copy() override;
 

@@ -109,9 +109,9 @@ void B3DOSC::update_transformation() {
     transformation(7, 6) = transformation(8, 13) = 1.;
 }
 
-unsigned B3DOSC::input_size() const { return 7u; }
+unsigned B3DOSC::global_size() const { return 7u; }
 
-unsigned B3DOSC::output_size() const { return 9u; }
+unsigned B3DOSC::local_size() const { return 9u; }
 
 unique_ptr<Orientation> B3DOSC::get_copy() { return make_unique<B3DOSC>(*this); }
 

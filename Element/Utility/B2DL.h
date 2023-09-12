@@ -42,8 +42,8 @@ public:
     explicit B2DL(unsigned = 0, double = 0., double = 0., double = 1.);
     B2DL(unsigned, vec&&);
 
-    [[nodiscard]] unsigned input_size() const override;
-    [[nodiscard]] unsigned output_size() const override;
+    [[nodiscard]] unsigned global_size() const override;
+    [[nodiscard]] unsigned local_size() const override;
 
     unique_ptr<Orientation> get_copy() override;
 
