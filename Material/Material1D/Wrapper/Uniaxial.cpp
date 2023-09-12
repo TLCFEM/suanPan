@@ -89,12 +89,9 @@ int Uniaxial::update_trial_status(const vec& t_strain) {
 }
 
 int Uniaxial::clear_status() {
-    current_full_strain.zeros(6);
-    trial_full_strain.zeros(6);
-    current_strain.zeros();
-    trial_strain.zeros();
-    current_stress.zeros();
-    trial_stress.zeros();
+    trial_full_strain = current_full_strain.zeros(6);
+    trial_strain = current_strain.zeros();
+    trial_stress = current_stress.zeros();
     trial_stiffness = current_stiffness = initial_stiffness;
     return base->clear_status();
 }

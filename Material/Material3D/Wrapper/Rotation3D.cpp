@@ -107,10 +107,8 @@ int Rotation3D::update_trial_status(const vec& t_strain) {
 }
 
 int Rotation3D::clear_status() {
-    current_strain.zeros();
-    trial_strain.zeros();
-    current_stress.zeros();
-    trial_stress.zeros();
+    trial_strain = current_strain.zeros();
+    trial_stress = current_stress.zeros();
     trial_stiffness = current_stiffness = initial_stiffness;
     return mat_obj->clear_status();
 }

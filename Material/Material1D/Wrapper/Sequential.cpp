@@ -96,10 +96,8 @@ int Sequential::update_trial_status(const vec& t_strain) {
 }
 
 int Sequential::clear_status() {
-    current_strain.zeros();
-    trial_strain.zeros();
-    current_stress.zeros();
-    trial_stress.zeros();
+    trial_strain = current_strain.zeros();
+    trial_stress = current_stress.zeros();
     trial_stiffness = current_stiffness = initial_stiffness;
     auto code = 0;
     for(const auto& I : mat_pool) code += I->clear_status();
