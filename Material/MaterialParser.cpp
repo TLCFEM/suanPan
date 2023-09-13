@@ -1834,12 +1834,8 @@ void new_expj2(unique_ptr<Material>& return_obj, istringstream& command) {
         suanpan_error("A valid yield stress is required.\n");
         return;
     }
-    if(!get_input(command, a)) {
-        suanpan_error("A valid a is required.\n");
-        return;
-    }
-    if(!get_input(command, b)) {
-        suanpan_error("A valid b is required.\n");
+    if(!get_input(command, a, b)) {
+        suanpan_error("A valid parameter is required.\n");
         return;
     }
 
