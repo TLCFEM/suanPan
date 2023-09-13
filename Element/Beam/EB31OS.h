@@ -44,7 +44,7 @@ class EB31OS final : public MaterialElement1D {
 
     unique_ptr<Orientation> b_trans;
 
-    const vec property;
+    const vec property; // [E, G, A, IZ, IY, J, IW]
 
     mat local_stiff;
 

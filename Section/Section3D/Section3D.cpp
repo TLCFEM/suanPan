@@ -33,6 +33,14 @@ Section3D::IntegrationPoint::IntegrationPoint(const IntegrationPoint& old_obj)
 Section3D::Section3D(const unsigned T, const unsigned MT, const double A, vec&& E)
     : Section(T, SectionType::D3, MT, A, std::forward<vec>(E)) {}
 
+/**
+ * \brief The deformation is assumed to contain the following.
+ *
+ *  [0]: axial strain\n
+ *  [1]: curvature about the z-axis (major)\n
+ *  [2]: curvature about the y-axis (minor).
+ *
+ */
 int Section3D::update_trial_status(const vec& t_deformation) {
     if(const vec incre_deformation = (trial_deformation = t_deformation) - current_deformation; norm(incre_deformation) <= datum::eps) return SUANPAN_SUCCESS;
 
