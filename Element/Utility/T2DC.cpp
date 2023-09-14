@@ -32,9 +32,6 @@ void T2DC::update_transformation() {
     inclination = transform::atan2(direction_cosine);
 }
 
-T2DC::T2DC(const unsigned T)
-    : T2DL(T) {}
-
 bool T2DC::is_nlgeom() const { return true; }
 
 unique_ptr<Orientation> T2DC::get_copy() { return make_unique<T2DC>(*this); }

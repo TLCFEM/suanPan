@@ -28,16 +28,6 @@ void B2DL::form_trans_mat(const vec& d_cosine) {
     trans_mat(1, 2) = trans_mat(2, 5) = 1.;
 }
 
-B2DL::B2DL(const unsigned T, const double X, const double Y, const double Z)
-    : Orientation(T, vec{X, Y, Z}) {}
-
-B2DL::B2DL(const unsigned T, vec&& XYZ)
-    : Orientation(T, std::forward<vec>(XYZ)) {}
-
-unsigned B2DL::global_size() const { return 3u; }
-
-unsigned B2DL::local_size() const { return 3u; }
-
 unique_ptr<Orientation> B2DL::get_copy() { return make_unique<B2DL>(*this); }
 
 void B2DL::update_transformation() {
@@ -53,6 +43,8 @@ void B2DL::update_transformation() {
 
     form_trans_mat(direction_cosine);
 }
+
+OrientationType B2DL::get_orientation_type() const { return OrientationType::B2D; }
 
 vec B2DL::to_local_vec(const vec& g_disp) const { return trans_mat * g_disp; }
 

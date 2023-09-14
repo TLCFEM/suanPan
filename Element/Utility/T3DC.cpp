@@ -32,9 +32,6 @@ void T3DC::update_transformation() {
     direction_cosine = x_axis / length;
 }
 
-T3DC::T3DC(const unsigned T)
-    : T3DL(T) {}
-
 bool T3DC::is_nlgeom() const { return true; }
 
 unique_ptr<Orientation> T3DC::get_copy() { return make_unique<T3DC>(*this); }

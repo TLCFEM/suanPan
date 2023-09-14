@@ -26,11 +26,11 @@ NMB21E::NMB21E(const unsigned T, const unsigned W, uvec&& N, const unsigned S, c
     , b{1 == W ? uvec{0llu, 2llu} : uvec{0llu, 1llu}} {}
 
 int NMB21E::initialize(const shared_ptr<DomainBase>& D) {
-    const auto code = NMB21::initialize(D);
+    if(SUANPAN_SUCCESS != NMB21::initialize(D)) return SUANPAN_FAIL;
 
     current_local_deformation = trial_local_deformation = b_trans->to_local_vec(get_current_displacement());
 
-    return code;
+    return SUANPAN_SUCCESS;
 }
 
 int NMB21E::update_status() {

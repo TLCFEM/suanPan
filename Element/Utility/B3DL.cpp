@@ -18,12 +18,7 @@
 #include "B3DL.h"
 #include <Element/Element.h>
 
-B3DL::B3DL(const unsigned T, vec&& XYZ)
-    : Orientation(T, std::forward<vec>(XYZ)) {}
-
-unsigned B3DL::global_size() const { return 6u; }
-
-unsigned B3DL::local_size() const { return 6u; }
+OrientationType B3DL::get_orientation_type() const { return OrientationType::B3D; }
 
 unique_ptr<Orientation> B3DL::get_copy() { return make_unique<B3DL>(*this); }
 

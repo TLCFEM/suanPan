@@ -42,11 +42,12 @@ class B3DOSC : public B3DC {
 protected:
     void update_transformation() override;
 
+    [[nodiscard]] unsigned nodal_size() const override;
+
 public:
     B3DOSC(unsigned, vec&&);
 
-    [[nodiscard]] unsigned global_size() const override;
-    [[nodiscard]] unsigned local_size() const override;
+    [[nodiscard]] OrientationType get_orientation_type() const override;
 
     unique_ptr<Orientation> get_copy() override;
 

@@ -37,6 +37,10 @@ int NMB31::initialize(const shared_ptr<DomainBase>& D) {
         suanpan_warning("Element {} is assigned with an inconsistent transformation {}.\n", get_tag(), orientation_tag);
         return SUANPAN_FAIL;
     }
+    if(OrientationType::B3D != b_trans->get_orientation_type()) {
+        suanpan_warning("Element {} is assigned with an inconsistent transformation {}, use B3DL or B3DC only.\n", get_tag(), orientation_tag);
+        return SUANPAN_FAIL;
+    }
 
     b_trans->set_element_ptr(this);
 

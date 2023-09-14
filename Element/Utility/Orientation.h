@@ -35,6 +35,14 @@
 
 #include <Domain/Tag.h>
 
+enum class OrientationType {
+    T2D,
+    T3D,
+    B2D,
+    B3D,
+    B3DOS
+};
+
 class Element;
 
 class Orientation : public Tag {
@@ -65,14 +73,7 @@ public:
 
     [[nodiscard]] virtual bool is_nlgeom() const;
 
-    /**
-     * \return the size of nodal displacement vector
-     */
-    [[nodiscard]] virtual unsigned global_size() const = 0;
-    /**
-     * \return the size of displacement vector in the local system
-     */
-    [[nodiscard]] virtual unsigned local_size() const = 0;
+    [[nodiscard]] virtual OrientationType get_orientation_type() const = 0;
 
     [[nodiscard]] double get_length() const;
     [[nodiscard]] double get_inclination() const;

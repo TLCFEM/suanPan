@@ -25,6 +25,8 @@ B3DOSC::B3DOSC(const unsigned T, vec&& XYZ)
     access::rw(sd) = span(10, 12);
 }
 
+OrientationType B3DOSC::get_orientation_type() const { return OrientationType::B3DOS; }
+
 void B3DOSC::update_transformation() {
     const mat t_coor = get_coordinate(element_ptr, 3).t();
     const vec x_axis = t_coor.col(1) - t_coor.col(0);
@@ -109,9 +111,7 @@ void B3DOSC::update_transformation() {
     transformation(7, 6) = transformation(8, 13) = 1.;
 }
 
-unsigned B3DOSC::global_size() const { return 7u; }
-
-unsigned B3DOSC::local_size() const { return 9u; }
+unsigned B3DOSC::nodal_size() const { return 7u; }
 
 unique_ptr<Orientation> B3DOSC::get_copy() { return make_unique<B3DOSC>(*this); }
 

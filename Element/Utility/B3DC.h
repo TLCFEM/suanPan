@@ -76,6 +76,8 @@ protected:
 
     void update_transformation() override;
 
+    [[nodiscard]] virtual unsigned nodal_size() const;
+
 public:
     using B3DL::B3DL;
 

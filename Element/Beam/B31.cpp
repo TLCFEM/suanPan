@@ -34,9 +34,7 @@ B31::B31(const unsigned T, uvec&& N, const unsigned S, const unsigned O, const u
     , int_pt_num(P > 20 ? 20 : P) {}
 
 int B31::initialize(const shared_ptr<DomainBase>& D) {
-    auto& sec_proto = D->get<Section>(section_tag(0));
-
-    const mat sec_stiff = sec_proto->get_initial_stiffness()(b_span, b_span);
+    auto& section_proto = D->get<Section>(section_tag(0));
 
     if(!D->find_orientation(orientation_tag)) {
         suanpan_warning("Element {} cannot find the assigned transformation {}.\n", get_tag(), orientation_tag);
@@ -49,7 +47,7 @@ int B31::initialize(const shared_ptr<DomainBase>& D) {
         suanpan_warning("Element {} is assigned with an inconsistent transformation {}.\n", get_tag(), orientation_tag);
         return SUANPAN_FAIL;
     }
-    if(6u != b_trans->global_size() || 6u != b_trans->local_size()) {
+    if(OrientationType::B3D != b_trans->get_orientation_type()) {
         suanpan_warning("Element {} is assigned with an inconsistent transformation {}, use B3DL or B3DC only.\n", get_tag(), orientation_tag);
         return SUANPAN_FAIL;
     }
@@ -60,22 +58,24 @@ int B31::initialize(const shared_ptr<DomainBase>& D) {
 
     const IntegrationPlan plan(1, int_pt_num, IntegrationType::LOBATTO);
 
+    const mat section_stiffness = section_proto->get_initial_stiffness()(b_span, b_span);
+
     mat local_stiffness(6, 6, fill::zeros);
     int_pt.clear();
     int_pt.reserve(int_pt_num);
     for(unsigned I = 0; I < int_pt_num; ++I) {
-        int_pt.emplace_back(plan(I, 0), .5 * plan(I, 1), sec_proto->get_copy());
+        int_pt.emplace_back(plan(I, 0), .5 * plan(I, 1), section_proto->get_copy());
         int_pt[I].strain_mat(0, 0) = 1.;
         int_pt[I].strain_mat(1, 1) = int_pt[I].strain_mat(2, 3) = 3. * plan(I, 0) - 1.;
         int_pt[I].strain_mat(1, 2) = int_pt[I].strain_mat(2, 4) = 3. * plan(I, 0) + 1.;
-        local_stiffness += int_pt[I].strain_mat.t() * sec_stiff * int_pt[I].strain_mat * int_pt[I].weight / length;
+        local_stiffness += int_pt[I].strain_mat.t() * section_stiffness * int_pt[I].strain_mat * int_pt[I].weight / length;
     }
     access::rw(torsion_stiff) = 1E3 * local_stiffness.max();
     local_stiffness(5, 5) = torsion_stiff;
 
     trial_stiffness = current_stiffness = initial_stiffness = b_trans->to_global_stiffness_mat(local_stiffness);
 
-    if(const auto linear_density = sec_proto->get_parameter(ParameterType::LINEARDENSITY); linear_density > 0.) trial_mass = current_mass = initial_mass = b_trans->to_global_mass_mat(linear_density);
+    if(const auto linear_density = section_proto->get_parameter(ParameterType::LINEARDENSITY); linear_density > 0.) trial_mass = current_mass = initial_mass = b_trans->to_global_mass_mat(linear_density);
 
     return SUANPAN_SUCCESS;
 }

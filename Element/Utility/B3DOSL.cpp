@@ -20,9 +20,7 @@
 
 const span B3DOSL::sa(0, 2), B3DOSL::sb(3, 5), B3DOSL::sc(7, 9), B3DOSL::sd(10, 12);
 
-unsigned B3DOSL::global_size() const { return 7u; }
-
-unsigned B3DOSL::local_size() const { return 9u; }
+OrientationType B3DOSL::get_orientation_type() const { return OrientationType::B3DOS; }
 
 unique_ptr<Orientation> B3DOSL::get_copy() { return make_unique<B3DOSL>(*this); }
 

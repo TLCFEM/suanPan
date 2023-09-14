@@ -36,7 +36,7 @@ int EB31OS::initialize(const shared_ptr<DomainBase>& D) {
         suanpan_warning("Element {} is assigned with an inconsistent transformation {}.\n", get_tag(), orientation_tag);
         return SUANPAN_FAIL;
     }
-    if(7u != b_trans->global_size() || 9u != b_trans->local_size()) {
+    if(OrientationType::B3DOS != b_trans->get_orientation_type()) {
         suanpan_warning("Element {} is assigned with an inconsistent transformation {}, use B3DOSL or B3DOSC only.\n", get_tag(), orientation_tag);
         return SUANPAN_FAIL;
     }

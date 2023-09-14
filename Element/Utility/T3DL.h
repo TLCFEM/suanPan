@@ -38,10 +38,9 @@ protected:
     void update_transformation() override;
 
 public:
-    explicit T3DL(unsigned = 0);
+    using Orientation::Orientation;
 
-    [[nodiscard]] unsigned global_size() const override;
-    [[nodiscard]] unsigned local_size() const override;
+    [[nodiscard]] OrientationType get_orientation_type() const override;
 
     unique_ptr<Orientation> get_copy() override;
 
