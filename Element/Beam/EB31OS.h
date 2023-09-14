@@ -32,10 +32,10 @@
 #ifndef EB31OS_H
 #define EB31OS_H
 
-#include <Element/MaterialElement.h>
+#include <Element/SectionElement.h>
 #include <Element/Utility/Orientation.h>
 
-class EB31OS final : public MaterialElement1D {
+class EB31OS final : public SectionOSElement3D {
     static constexpr unsigned b_node = 2u, b_dof = 7u, b_size = b_dof * b_node;
 
     const unsigned orientation_tag;

@@ -20,7 +20,7 @@
 #include <Recorder/OutputType.h>
 
 EB31OS::EB31OS(const unsigned T, uvec&& N, vec&& P, const unsigned O, const bool F)
-    : MaterialElement1D(T, b_node, b_dof, std::forward<uvec>(N), uvec{}, F, {DOF::U1, DOF::U2, DOF::U3, DOF::UR1, DOF::UR2, DOF::UR3, DOF::WARP})
+    : SectionOSElement3D(T, b_node, b_dof, std::forward<uvec>(N), uvec{}, F)
     , orientation_tag(O)
     , property(std::forward<vec>(P)) {}
 
