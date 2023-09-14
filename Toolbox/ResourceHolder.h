@@ -43,6 +43,11 @@ public:
         return *this;
     }
 
+    ResourceHolder& operator=(std::unique_ptr<T>&& original_object) {
+        object = std::forward<std::unique_ptr<T>>(original_object);
+        return *this;
+    }
+
     ResourceHolder(const ResourceHolder& old_holder)
         : object(old_holder.object ? old_holder.object->get_copy() : nullptr) {}
 

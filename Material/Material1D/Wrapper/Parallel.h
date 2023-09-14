@@ -38,6 +38,7 @@
 
 class Parallel final : public Material1D {
     const uvec mat_tag;
+
     vector<ResourceHolder<Material>> mat_pool;
 
 public:

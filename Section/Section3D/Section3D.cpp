@@ -24,12 +24,6 @@ Section3D::IntegrationPoint::IntegrationPoint(const double CY, const double CZ, 
     , weight(W)
     , s_material(std::forward<unique_ptr<Material>>(M)) {}
 
-Section3D::IntegrationPoint::IntegrationPoint(const IntegrationPoint& old_obj)
-    : coor_y(old_obj.coor_y)
-    , coor_z(old_obj.coor_z)
-    , weight(old_obj.weight)
-    , s_material(suanpan::make_copy(old_obj.s_material)) {}
-
 Section3D::Section3D(const unsigned T, const unsigned MT, const double A, vec&& E)
     : Section(T, SectionType::D3, MT, A, std::forward<vec>(E)) {}
 

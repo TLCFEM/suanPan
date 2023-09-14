@@ -7,5 +7,3 @@
 #include "ParameterType.h"
 #include "Section.h"
 #include "Fibre.h"
-
-#include <Material/Material.h>

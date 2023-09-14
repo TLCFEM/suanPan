@@ -30,20 +30,17 @@
 #define SECTION1D_H
 
 #include <Section/Section.h>
+#include <Material/Material.h>
+#include <Toolbox/ResourceHolder.h>
 
 using std::vector;
 
 class Section1D : public Section {
 protected:
-    unique_ptr<Material> s_material;
+    ResourceHolder<Material> s_material;
 
 public:
-    explicit Section1D(unsigned, unsigned, double);
-    Section1D(const Section1D&);
-    Section1D(Section1D&&) = delete;                 // move forbidden
-    Section1D& operator=(const Section1D&) = delete; // assign forbidden
-    Section1D& operator=(Section1D&&) = delete;      // assign forbidden
-    ~Section1D() override = default;
+    Section1D(unsigned, unsigned, double);
 
     int initialize(const shared_ptr<DomainBase>&) override;
 
