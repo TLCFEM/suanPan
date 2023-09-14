@@ -12,6 +12,7 @@ include(SectionShell/CMakeLists.txt)
 
 add_library(${PROJECT_NAME} STATIC
         Section.cpp
+        Fibre.cpp
         SectionParser.cpp
         SectionTester.cpp
         ${S1D} ${S2D} ${S3D} ${SNM} ${SS}

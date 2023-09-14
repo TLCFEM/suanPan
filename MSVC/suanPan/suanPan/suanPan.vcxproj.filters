@@ -1537,6 +1537,9 @@
     <ClCompile Include="..\..\..\Element\Beam\B31OS.cpp">
       <Filter>Element\Beam</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Section\Fibre.cpp">
+      <Filter>Section</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2940,6 +2943,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Element\Beam\B31OS.h">
       <Filter>Element\Beam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\Fibre.h">
+      <Filter>Section</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -15,27 +15,45 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class Fibre2D
- * @brief A Fibre2D class.
+ * @class Fibre
+ * @brief A Fibre class.
  * @author tlc
- * @date 15/09/2023
+ * @date 14/09/2023
  * @version 0.1.0
- * @file Fibre2D.h
+ * @file Fibre.h
  * @addtogroup Section-2D
  * @ingroup Section
  * @{
  */
 
-#ifndef FIBRE2D_H
-#define FIBRE2D_H
+#ifndef FIBRE_H
+#define FIBRE_H
 
-#include <Section/Fibre.h>
+#include <Section/Section.h>
+#include <Toolbox/ResourceHolder.h>
 
-class Fibre2D final : public Fibre {
+class Fibre : public Section {
+    uvec fibre_tag;
+
+    std::vector<ResourceHolder<Section>> fibre;
+
 public:
-    Fibre2D(unsigned, uvec&&);
+    Fibre(unsigned, uvec&&, SectionType);
+    Fibre(const Fibre&) = default;
+    Fibre(Fibre&&) noexcept = delete;
+    Fibre& operator=(const Fibre&) = delete;
+    Fibre& operator=(Fibre&&) noexcept = delete;
+    ~Fibre() override = default;
 
-    unique_ptr<Section> get_copy() override;
+    int initialize(const shared_ptr<DomainBase>&) override;
+
+    int update_trial_status(const vec&) override;
+
+    int clear_status() override;
+    int commit_status() override;
+    int reset_status() override;
+
+    void print() override;
 };
 
 #endif

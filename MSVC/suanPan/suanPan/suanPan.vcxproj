@@ -437,6 +437,7 @@
     <ClCompile Include="..\..\..\Recorder\RecorderParser.cpp" />
     <ClCompile Include="..\..\..\Recorder\SumRecorder.cpp" />
     <ClCompile Include="..\..\..\Recorder\VisualisationRecorder.cpp" />
+    <ClCompile Include="..\..\..\Section\Fibre.cpp" />
     <ClCompile Include="..\..\..\Section\Section.cpp" />
     <ClCompile Include="..\..\..\Section\Section1D\Circle1D.cpp" />
     <ClCompile Include="..\..\..\Section\Section1D\Fibre1D.cpp" />
@@ -913,6 +914,7 @@
     <ClInclude Include="..\..\..\Recorder\RecorderParser.h" />
     <ClInclude Include="..\..\..\Recorder\SumRecorder.h" />
     <ClInclude Include="..\..\..\Recorder\VisualisationRecorder.h" />
+    <ClInclude Include="..\..\..\Section\Fibre.h" />
     <ClInclude Include="..\..\..\Section\ParameterType.h" />
     <ClInclude Include="..\..\..\Section\Section.h" />
     <ClInclude Include="..\..\..\Section\Section1D\Circle1D.h" />
