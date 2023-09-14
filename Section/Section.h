@@ -37,7 +37,8 @@ enum class SectionType : unsigned {
     D2 = 2,
     D3 = 3,
     NM2D = 3,
-    NM3D = 6
+    NM3D = 6,
+    OS3D = 6,
 };
 
 enum class OutputType;
