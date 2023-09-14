@@ -8,6 +8,7 @@ include(Section1D/CMakeLists.txt)
 include(Section2D/CMakeLists.txt)
 include(Section3D/CMakeLists.txt)
 include(SectionNM/CMakeLists.txt)
+include(SectionOS/CMakeLists.txt)
 include(SectionShell/CMakeLists.txt)
 
 add_library(${PROJECT_NAME} STATIC
@@ -15,5 +16,5 @@ add_library(${PROJECT_NAME} STATIC
         Fibre.cpp
         SectionParser.cpp
         SectionTester.cpp
-        ${S1D} ${S2D} ${S3D} ${SNM} ${SS}
+        ${S1D} ${S2D} ${S3D} ${SNM} ${SOS} ${SS}
         )

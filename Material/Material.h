@@ -36,7 +36,8 @@ enum class MaterialType : unsigned {
     D1 = 1,
     D2 = 3,
     D3 = 6,
-    DS = 10
+    DS = 10,
+    OS = 2
 };
 
 class DomainBase;

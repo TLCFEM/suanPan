@@ -119,6 +119,8 @@ public:
 
     virtual double get_parameter(ParameterType = ParameterType::NONE);
 
+    virtual void register_elemental_deformation(const vec&) {}
+
     int update_incre_status(double);
     int update_incre_status(double, double);
     int update_trial_status(double);

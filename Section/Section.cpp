@@ -27,9 +27,21 @@ Section::Section(const unsigned T, const SectionType ST, const unsigned MT, cons
 int Section::initialize_base(const shared_ptr<DomainBase>& D) {
     if(initialized) return SUANPAN_SUCCESS;
 
-    if(0 != material_tag && (!D->find<Material>(material_tag) || MaterialType::D1 != D->get<Material>(material_tag)->get_material_type())) {
-        suanpan_warning("Section {} disabled as material {} cannot be found or wrong material type assigned.\n", get_tag(), material_tag);
-        return SUANPAN_FAIL;
+    if(0u != material_tag) {
+        if(!D->find<Material>(material_tag)) {
+            suanpan_warning("Section {} disabled as material {} cannot be found.\n", get_tag(), material_tag);
+            return SUANPAN_FAIL;
+        }
+        if(SectionType::OS3D == section_type) {
+            if(MaterialType::OS != D->get<Material>(material_tag)->get_material_type()) {
+                suanpan_warning("Section {} disabled as material {} has a wrong type, use OS type material only.\n", get_tag(), material_tag);
+                return SUANPAN_FAIL;
+            }
+        }
+        else if(MaterialType::D1 != D->get<Material>(material_tag)->get_material_type()) {
+            suanpan_warning("Section {} disabled as material {} has a wrong type, use 1D material only.\n", get_tag(), material_tag);
+            return SUANPAN_FAIL;
+        }
     }
 
     const auto size = static_cast<unsigned>(section_type);

@@ -149,9 +149,8 @@ int B31OS::update_status() {
 
     for(const auto& I : int_pt) {
         vec sec_deformation(10, fill::none);
-        sec_deformation.head(6) = I.strain_mat * local_deformation;
-        sec_deformation.tail(4) = local_deformation.subvec(1, 4);
-        if(I.b_section->update_trial_status(sec_deformation) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
+        I.b_section->register_elemental_deformation(local_deformation);
+        if(I.b_section->update_trial_status(I.strain_mat * local_deformation) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
         local_stiffness += I.strain_mat.t() * I.b_section->get_trial_stiffness() * I.strain_mat * I.weight * length;
         local_resistance += I.strain_mat.t() * I.b_section->get_trial_resistance() * I.weight * length;
         if(nlgeom) {

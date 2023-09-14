@@ -205,6 +205,9 @@
     <Filter Include="Z">
       <UniqueIdentifier>{da04bede-12e0-4fa7-8e1b-963193f71e72}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Section\SectionOS">
+      <UniqueIdentifier>{d1a891ce-e723-4078-9baa-cc286f7d6728}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Constraint\BC\GroupMultiplierBC.cpp">
@@ -1536,6 +1539,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Element\Beam\B31OS.cpp">
       <Filter>Element\Beam</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionOS\SectionOS3D.cpp">
+      <Filter>Section\SectionOS</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Section\Fibre.cpp">
       <Filter>Section</Filter>
@@ -2943,6 +2949,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Element\Beam\B31OS.h">
       <Filter>Element\Beam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionOS\SectionOS3D.h">
+      <Filter>Section\SectionOS</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Section\Fibre.h">
       <Filter>Section</Filter>

@@ -477,6 +477,7 @@
     <ClCompile Include="..\..\..\Section\SectionNM\SurfaceNM2D.cpp" />
     <ClCompile Include="..\..\..\Section\SectionNM\SurfaceNM3D.cpp" />
     <ClCompile Include="..\..\..\Section\SectionNM\VAFNM.cpp" />
+    <ClCompile Include="..\..\..\Section\SectionOS\SectionOS3D.cpp" />
     <ClCompile Include="..\..\..\Section\SectionParser.cpp" />
     <ClCompile Include="..\..\..\Section\SectionShell\Homogeneous.cpp" />
     <ClCompile Include="..\..\..\Section\SectionShell\SectionShell.cpp" />
@@ -955,6 +956,7 @@
     <ClInclude Include="..\..\..\Section\SectionNM\SurfaceNM2D.h" />
     <ClInclude Include="..\..\..\Section\SectionNM\SurfaceNM3D.h" />
     <ClInclude Include="..\..\..\Section\SectionNM\VAFNM.h" />
+    <ClInclude Include="..\..\..\Section\SectionOS\SectionOS3D.h" />
     <ClInclude Include="..\..\..\Section\SectionParser.h" />
     <ClInclude Include="..\..\..\Section\SectionShell\Homogeneous.h" />
     <ClInclude Include="..\..\..\Section\SectionShell\SectionShell.h" />
