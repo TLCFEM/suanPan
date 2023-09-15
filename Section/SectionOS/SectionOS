@@ -1,3 +1,4 @@
 #include "SectionOS3D.h"
 
 #include "Cell3DOS.h"
+#include "Fibre3DOS.h"

@@ -429,7 +429,7 @@ void new_fibre2d(unique_ptr<Section>& return_obj, istringstream& command) {
     return_obj = make_unique<Fibre2D>(tag, std::move(tag_vector));
 }
 
-void new_fibre3d(unique_ptr<Section>& return_obj, istringstream& command) {
+void new_fibre3d(unique_ptr<Section>& return_obj, istringstream& command, const bool if_os) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
@@ -444,7 +444,8 @@ void new_fibre3d(unique_ptr<Section>& return_obj, istringstream& command) {
             return;
         }
 
-    return_obj = make_unique<Fibre3D>(tag, std::move(tag_vector));
+    if(if_os) return_obj = make_unique<Fibre3DOS>(tag, std::move(tag_vector));
+    else return_obj = make_unique<Fibre3D>(tag, std::move(tag_vector));
 }
 
 void new_hsection2d(unique_ptr<Section>& return_obj, istringstream& command) {
@@ -2305,7 +2306,8 @@ int create_new_section(const shared_ptr<DomainBase>& domain, istringstream& comm
     else if(is_equal(section_id, "CircularHollow3D")) new_circularhollow3D(new_section, command);
     else if(is_equal(section_id, "Fibre1D")) new_fibre1d(new_section, command);
     else if(is_equal(section_id, "Fibre2D")) new_fibre2d(new_section, command);
-    else if(is_equal(section_id, "Fibre3D")) new_fibre3d(new_section, command);
+    else if(is_equal(section_id, "Fibre3D")) new_fibre3d(new_section, command, false);
+    else if(is_equal(section_id, "Fibre3DOS")) new_fibre3d(new_section, command, true);
     else if(is_equal(section_id, "HSection2D")) new_hsection2d(new_section, command);
     else if(is_equal(section_id, "ISection2D")) new_isection2d(new_section, command, false);
     else if(is_equal(section_id, "ISection3D")) new_isection3d(new_section, command, false);

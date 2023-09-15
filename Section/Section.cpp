@@ -21,7 +21,7 @@
 #include <Recorder/OutputType.h>
 
 Section::Section(const unsigned T, const SectionType ST, const unsigned MT, const double A, vec&& EC)
-    : DataSection{MT, ST, A, 0., {-EC(0), EC(1)}, {}, {}, {}, {}, {}, {}, {}, {}, {}}
+    : DataSection{MT, ST, A, 0., {-EC(0), EC(1)}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}}
     , Tag(T) {}
 
 int Section::initialize_base(const shared_ptr<DomainBase>& D) {
@@ -84,6 +84,8 @@ const vec& Section::get_trial_resistance() const { return trial_resistance; }
 
 const mat& Section::get_trial_stiffness() const { return trial_stiffness; }
 
+const mat& Section::get_trial_geometry() const { return trial_geometry; }
+
 const vec& Section::get_current_deformation() const { return current_deformation; }
 
 const vec& Section::get_current_deformation_rate() const { return current_deformation_rate; }
@@ -92,7 +94,11 @@ const vec& Section::get_current_resistance() const { return current_resistance; 
 
 const mat& Section::get_current_stiffness() const { return current_stiffness; }
 
+const mat& Section::get_current_geometry() const { return current_geometry; }
+
 const mat& Section::get_initial_stiffness() const { return initial_stiffness; }
+
+const mat& Section::get_initial_geometry() const { return initial_geometry; }
 
 double Section::get_parameter(const ParameterType P) {
     if(ParameterType::AREA == P) return area;

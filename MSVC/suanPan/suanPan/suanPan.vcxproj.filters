@@ -1558,6 +1558,9 @@
     <ClCompile Include="..\..\..\Material\MaterialOS\ElasticOS.cpp">
       <Filter>Material\MaterialOS</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionOS\Fibre3DOS.cpp">
+      <Filter>Section\SectionOS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2976,6 +2979,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Material\MaterialOS\ElasticOS.h">
       <Filter>Material\MaterialOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionOS\Fibre3DOS.h">
+      <Filter>Section\SectionOS</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

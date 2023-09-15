@@ -44,6 +44,8 @@ int Cell3DOS::initialize(const shared_ptr<DomainBase>& D) {
 
     trial_stiffness = current_stiffness = initial_stiffness = area * de.t() * int_pt.back().s_material->get_initial_stiffness() * de;
 
+    trial_geometry = current_geometry = initial_geometry.zeros(8, 8);
+
     return SUANPAN_SUCCESS;
 }
 

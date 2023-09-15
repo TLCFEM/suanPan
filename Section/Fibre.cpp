@@ -50,6 +50,8 @@ int Fibre::initialize(const shared_ptr<DomainBase>& D) {
 
     trial_stiffness = current_stiffness = initial_stiffness;
 
+    if(SectionType::OS3D == section_type) trial_geometry = current_geometry = initial_geometry.zeros(8, 8);
+
     return SUANPAN_SUCCESS;
 }
 
@@ -58,11 +60,13 @@ int Fibre::update_trial_status(const vec& t_deformation) {
 
     trial_stiffness.zeros();
     trial_resistance.zeros();
+    if(SectionType::OS3D == section_type) trial_geometry.zeros();
 
     for(const auto& I : fibre) {
         if(I->update_trial_status(t_deformation) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
         trial_stiffness += I->get_trial_stiffness();
         trial_resistance += I->get_trial_resistance();
+        if(SectionType::OS3D == section_type) trial_geometry += I->get_trial_geometry();
     }
 
     return SUANPAN_SUCCESS;
@@ -72,6 +76,7 @@ int Fibre::clear_status() {
     current_deformation = trial_deformation.zeros();
     current_resistance = trial_resistance.zeros();
     current_stiffness = trial_stiffness = initial_stiffness;
+    if(SectionType::OS3D == section_type) current_geometry = trial_geometry = initial_geometry;
     auto code = 0;
     for(const auto& I : fibre) code += I->clear_status();
     return code;
@@ -81,6 +86,7 @@ int Fibre::commit_status() {
     current_deformation = trial_deformation;
     current_resistance = trial_resistance;
     current_stiffness = trial_stiffness;
+    if(SectionType::OS3D == section_type) current_geometry = trial_geometry;
     auto code = 0;
     for(const auto& I : fibre) code += I->commit_status();
     return code;
@@ -90,6 +96,7 @@ int Fibre::reset_status() {
     trial_deformation = current_deformation;
     trial_resistance = current_resistance;
     trial_stiffness = current_stiffness;
+    if(SectionType::OS3D == section_type) trial_geometry = current_geometry;
     auto code = 0;
     for(const auto& I : fibre) code += I->reset_status();
     return code;

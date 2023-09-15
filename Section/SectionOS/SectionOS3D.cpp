@@ -56,6 +56,7 @@ int SectionOS3D::update_trial_status(const vec& t_deformation) {
 
     trial_stiffness.zeros();
     trial_resistance.zeros();
+    trial_geometry.zeros();
 
     for(const auto& I : int_pt) {
         const auto arm_y = I.coor_y - eccentricity(0);
@@ -76,6 +77,19 @@ int SectionOS3D::update_trial_status(const vec& t_deformation) {
 
         trial_resistance += I.weight * de.t() * I.s_material->get_trial_stress();
         trial_stiffness += I.weight * de.t() * I.s_material->get_trial_stiffness() * de;
+
+        const auto axial_force = I.weight * I.s_material->get_trial_stress().at(0);
+        const auto major_bending = -arm_y * axial_force;
+        const auto minor_bending = arm_z * axial_force;
+
+        // eq. 7.69 [u',v',w',v'',w'',f,f',f'']
+        trial_geometry(1, 1) += axial_force;
+        trial_geometry(2, 2) += axial_force;
+        trial_geometry(3, 5) += minor_bending;
+        trial_geometry(5, 3) += minor_bending;
+        trial_geometry(4, 5) += major_bending;
+        trial_geometry(5, 4) += major_bending;
+        trial_geometry(6, 6) += (arm_y * arm_y + arm_z * arm_z) * axial_force;
     }
 
     return SUANPAN_SUCCESS;
@@ -85,6 +99,7 @@ int SectionOS3D::clear_status() {
     current_deformation = trial_deformation.zeros();
     current_resistance = trial_resistance.zeros();
     current_stiffness = trial_stiffness = initial_stiffness;
+    current_geometry = trial_geometry = initial_geometry;
     auto code = 0;
     for(const auto& I : int_pt) code += I.s_material->clear_status();
     return code;
@@ -94,6 +109,7 @@ int SectionOS3D::commit_status() {
     current_deformation = trial_deformation;
     current_resistance = trial_resistance;
     current_stiffness = trial_stiffness;
+    current_geometry = trial_geometry;
     auto code = 0;
     for(const auto& I : int_pt) code += I.s_material->commit_status();
     return code;
@@ -103,6 +119,7 @@ int SectionOS3D::reset_status() {
     trial_deformation = current_deformation;
     trial_resistance = current_resistance;
     trial_stiffness = current_stiffness;
+    trial_geometry = current_geometry;
     auto code = 0;
     for(const auto& I : int_pt) code += I.s_material->reset_status();
     return code;

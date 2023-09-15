@@ -30,24 +30,22 @@ B31OS::IntegrationPoint::IntegrationPoint(const double C, const double W, const 
     // nv1=nw1=nf2
     // nv2=nw2=nf4
 
-    const auto l = L;
-
-    const auto dnu = 1. / l;
+    const auto dnu = 1. / L;
 
     const auto nf1 = .25 * (2. + coor) * xm * xm;
-    const auto nf2 = .125 * l * xm * xm * xp;
+    const auto nf2 = .125 * L * xm * xm * xp;
     const auto nf3 = .25 * (2. - coor) * xp * xp;
-    const auto nf4 = .125 * l * xm * xp * xp;
+    const auto nf4 = .125 * L * xm * xp * xp;
 
-    const auto dnf1 = 1.5 * xm * xp / l;
+    const auto dnf1 = 1.5 * xm * xp / L;
     const auto dnf2 = .25 * xm * x3p;
     const auto dnf3 = -dnf1;
     const auto dnf4 = .25 * xp * x3m;
 
-    const auto ddnf1 = 6. * coor / l / l;
-    const auto ddnf2 = x3m / l;
+    const auto ddnf1 = 6. * coor / L / L;
+    const auto ddnf2 = x3m / L;
     const auto ddnf3 = -ddnf1;
-    const auto ddnf4 = x3p / l;
+    const auto ddnf4 = x3p / L;
 
     strain_mat.zeros(8, 9);
     // u'
@@ -148,16 +146,8 @@ int B31OS::update_status() {
     for(const auto& I : int_pt) {
         if(I.b_section->update_trial_status(I.strain_mat * local_deformation) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
         local_stiffness += I.strain_mat.t() * I.b_section->get_trial_stiffness() * I.strain_mat * I.weight * length;
+        local_geometry += I.strain_mat.t() * I.b_section->get_trial_geometry() * I.strain_mat * I.weight * length;
         local_resistance += I.strain_mat.t() * I.b_section->get_trial_resistance() * I.weight * length;
-
-        // eq. 7.69 [u',v',w',v'',w'',f,f',f'']
-        const auto& sec_resistance = I.b_section->get_trial_resistance();
-        sp_mat sec_geometry(8, 8);
-        sec_geometry(1, 1) = sec_geometry(2, 2) = sec_resistance(0);
-        sec_geometry(5, 3) = sec_geometry(3, 5) = sec_resistance(2);
-        sec_geometry(5, 4) = sec_geometry(4, 5) = sec_resistance(1);
-        sec_geometry(6, 6) = sec_resistance(3);
-        local_geometry += I.strain_mat.t() * sec_geometry * I.strain_mat * I.weight * length;
     }
 
     trial_resistance = b_trans->to_global_vec(local_resistance);
