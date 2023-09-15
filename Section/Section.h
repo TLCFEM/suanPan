@@ -38,7 +38,7 @@ enum class SectionType : unsigned {
     D3 = 3,
     NM2D = 3,
     NM3D = 6,
-    OS3D = 6,
+    OS3D = 8,
 };
 
 enum class OutputType;
@@ -118,8 +118,6 @@ public:
     virtual unique_ptr<Section> get_copy() = 0;
 
     virtual double get_parameter(ParameterType = ParameterType::NONE);
-
-    virtual void register_elemental_deformation(const vec&) {}
 
     int update_incre_status(double);
     int update_incre_status(double, double);

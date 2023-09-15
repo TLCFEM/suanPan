@@ -49,36 +49,36 @@ B31OS::IntegrationPoint::IntegrationPoint(const double C, const double W, const 
     const auto ddnf3 = -ddnf1;
     const auto ddnf4 = x3p / l;
 
-    strain_mat.zeros(6, 9);
+    strain_mat.zeros(8, 9);
     // u'
     strain_mat(0, 0) = dnu;
-    // v''
-    strain_mat(1, 1) = ddnf2;
-    strain_mat(1, 2) = ddnf4;
-    // w''
-    strain_mat(2, 3) = ddnf2;
-    strain_mat(2, 4) = ddnf4;
     // v'
-    // strain_mat(3, 1) = dnf2;
-    // strain_mat(3, 2) = dnf4;
+    strain_mat(1, 1) = dnf2;
+    strain_mat(1, 2) = dnf4;
     // w'
-    // strain_mat(4, 3) = dnf2;
-    // strain_mat(4, 4) = dnf4;
+    strain_mat(2, 3) = dnf2;
+    strain_mat(2, 4) = dnf4;
+    // v''
+    strain_mat(3, 1) = ddnf2;
+    strain_mat(3, 2) = ddnf4;
+    // w''
+    strain_mat(4, 3) = ddnf2;
+    strain_mat(4, 4) = ddnf4;
     // f
-    strain_mat(3, 5) = nf1;
-    strain_mat(3, 7) = nf2;
-    strain_mat(3, 6) = nf3;
-    strain_mat(3, 8) = nf4;
+    strain_mat(5, 5) = nf1;
+    strain_mat(5, 7) = nf2;
+    strain_mat(5, 6) = nf3;
+    strain_mat(5, 8) = nf4;
     // f'
-    strain_mat(4, 5) = dnf1;
-    strain_mat(4, 7) = dnf2;
-    strain_mat(4, 6) = dnf3;
-    strain_mat(4, 8) = dnf4;
+    strain_mat(6, 5) = dnf1;
+    strain_mat(6, 7) = dnf2;
+    strain_mat(6, 6) = dnf3;
+    strain_mat(6, 8) = dnf4;
     // f''
-    strain_mat(5, 5) = ddnf1;
-    strain_mat(5, 7) = ddnf2;
-    strain_mat(5, 6) = ddnf3;
-    strain_mat(5, 8) = ddnf4;
+    strain_mat(7, 5) = ddnf1;
+    strain_mat(7, 7) = ddnf2;
+    strain_mat(7, 6) = ddnf3;
+    strain_mat(7, 8) = ddnf4;
 }
 
 B31OS::B31OS(const unsigned T, uvec&& N, const unsigned S, const unsigned O, const unsigned P, const bool F)
@@ -146,32 +146,18 @@ int B31OS::update_status() {
     vec local_resistance(9, fill::zeros);
 
     for(const auto& I : int_pt) {
-        vec sec_deformation(10, fill::none);
-        I.b_section->register_elemental_deformation(local_deformation);
         if(I.b_section->update_trial_status(I.strain_mat * local_deformation) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
         local_stiffness += I.strain_mat.t() * I.b_section->get_trial_stiffness() * I.strain_mat * I.weight * length;
         local_resistance += I.strain_mat.t() * I.b_section->get_trial_resistance() * I.weight * length;
 
-        // eq. 7.69
-        // here we separate the G matrix into two parts
-        // the first part includes [u',v'',w'',f,f',f''] related entries
+        // eq. 7.69 [u',v',w',v'',w'',f,f',f'']
         const auto& sec_resistance = I.b_section->get_trial_resistance();
-        sp_mat sec_geometry(6, 6);
-        sec_geometry(1, 3) = sec_geometry(3, 1) = sec_resistance(2);
-        sec_geometry(2, 3) = sec_geometry(3, 2) = sec_resistance(1);
-        sec_geometry(4, 4) = sec_resistance(3);
+        sp_mat sec_geometry(8, 8);
+        sec_geometry(1, 1) = sec_geometry(2, 2) = sec_resistance(0);
+        sec_geometry(5, 3) = sec_geometry(3, 5) = sec_resistance(2);
+        sec_geometry(5, 4) = sec_geometry(4, 5) = sec_resistance(1);
+        sec_geometry(6, 6) = sec_resistance(3);
         local_geometry += I.strain_mat.t() * sec_geometry * I.strain_mat * I.weight * length;
-        // the second part involves nodal rotations, which can be directly added to the matrix
-        auto axial = sec_resistance(0) * I.weight * length / 30.;
-        local_geometry(1, 2) -= axial;
-        local_geometry(2, 1) -= axial;
-        local_geometry(3, 4) -= axial;
-        local_geometry(4, 3) -= axial;
-        axial *= 4.;
-        local_geometry(1, 1) += axial;
-        local_geometry(2, 2) += axial;
-        local_geometry(3, 3) += axial;
-        local_geometry(4, 4) += axial;
     }
 
     trial_resistance = b_trans->to_global_vec(local_resistance);

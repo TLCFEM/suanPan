@@ -36,10 +36,6 @@
 using std::vector;
 
 class SectionOS3D : public Section {
-    static const mat weighing_mat;
-
-    vec elemental_deformation;
-
 protected:
     struct IntegrationPoint {
         double coor_y, coor_z, coor_s, coor_n, weight;
@@ -55,8 +51,6 @@ public:
                 double = 0.,     // area
                 vec&& = {0., 0.} // eccentricity
     );
-
-    void register_elemental_deformation(const vec&) override;
 
     int update_trial_status(const vec&) override;
 

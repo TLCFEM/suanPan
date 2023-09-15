@@ -35,12 +35,12 @@ int Cell3DOS::initialize(const shared_ptr<DomainBase>& D) {
     const auto& arm_y = eccentricity(0);
     const auto& arm_z = eccentricity(1);
 
-    mat de(2, 6, fill::zeros);
+    mat de(2, 8, fill::zeros);
     de(0, 0) = 1.;
-    de(0, 1) = arm_y;
-    de(0, 2) = arm_z;
-    de(0, 5) = omega;
-    de(1, 4) = -2. * n;
+    de(0, 3) = arm_y;
+    de(0, 4) = arm_z;
+    de(0, 7) = omega;
+    de(1, 6) = -2. * n;
 
     trial_stiffness = current_stiffness = initial_stiffness = area * de.t() * int_pt.back().s_material->get_initial_stiffness() * de;
 

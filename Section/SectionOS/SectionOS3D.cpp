@@ -18,13 +18,6 @@
 #include "SectionOS3D.h"
 #include <Material/Material.h>
 
-const mat SectionOS3D::weighing_mat = [] {
-    mat X(4, 4, fill::zeros);
-    X.diag().fill(1. / 15.);
-    X(0, 1) = X(1, 0) = X(2, 3) = X(3, 2) = -1. / 60.;
-    return X;
-}();
-
 SectionOS3D::IntegrationPoint::IntegrationPoint(const double CY, const double CZ, const double CS, const double CN, const double W, unique_ptr<Material>&& M)
     : coor_y(CY)
     , coor_z(CZ)
@@ -36,35 +29,30 @@ SectionOS3D::IntegrationPoint::IntegrationPoint(const double CY, const double CZ
 SectionOS3D::SectionOS3D(const unsigned T, const unsigned MT, const double A, vec&& E)
     : Section(T, SectionType::OS3D, MT, A, std::forward<vec>(E)) {}
 
-void SectionOS3D::register_elemental_deformation(const vec& t_deformation) { elemental_deformation = t_deformation; }
-
 /**
  * \brief The deformation is assumed to contain the following.
  *
  *  [0]: u'       \n
- *  [1]: v''      \n
- *  [2]: w''      \n
- *  [3]: f        \n
- *  [4]: f'       \n
- *  [5]: f''      \n
- *  [6]: theta_zi \n
- *  [7]: theta_zj \n
- *  [8]: theta_yi \n
- *  [9]: theta_yj \n
+ *  [1]: v'       \n
+ *  [2]: w'       \n
+ *  [3]: v''      \n
+ *  [4]: w''      \n
+ *  [5]: f        \n
+ *  [6]: f'       \n
+ *  [7]: f''      \n
  *
  */
 int SectionOS3D::update_trial_status(const vec& t_deformation) {
     if(const vec incre_deformation = (trial_deformation = t_deformation) - current_deformation; norm(incre_deformation) <= datum::eps) return SUANPAN_SUCCESS;
 
     const auto& up = trial_deformation(0);
-    const auto& vpp = trial_deformation(1);
-    const auto& wpp = trial_deformation(2);
-    const auto& f = trial_deformation(3);
-    const auto& fp = trial_deformation(4);
-    const auto& fpp = trial_deformation(5);
-
-    const auto rotation = elemental_deformation.subvec(1, 4);
-    const auto axial_base = dot(rotation, weighing_mat * rotation);
+    const auto& vp = trial_deformation(1);
+    const auto& wp = trial_deformation(2);
+    const auto& vpp = trial_deformation(3);
+    const auto& wpp = trial_deformation(4);
+    const auto& f = trial_deformation(5);
+    const auto& fp = trial_deformation(6);
+    const auto& fpp = trial_deformation(7);
 
     trial_stiffness.zeros();
     trial_resistance.zeros();
@@ -73,19 +61,18 @@ int SectionOS3D::update_trial_status(const vec& t_deformation) {
         const auto arm_y = I.coor_y - eccentricity(0);
         const auto arm_z = I.coor_z - eccentricity(1);
 
-        const auto axial_strain = axial_base + up - arm_y * vpp - arm_z * wpp + (arm_z * vpp - arm_y * wpp) * f + .5 * (arm_y * arm_y + arm_z * arm_z) * fp * fp + I.coor_s * fpp;
-        const auto shear_strain = -2. * I.coor_n * fp;
+        if(const vec os_strain{.5 * (vp * vp + wp * wp) + up - arm_y * vpp - arm_z * wpp + (arm_z * vpp - arm_y * wpp) * f + .5 * (arm_y * arm_y + arm_z * arm_z) * fp * fp + I.coor_s * fpp, -2. * I.coor_n * fp}; I.s_material->update_trial_status(os_strain) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 
-        if(I.s_material->update_trial_status(vec{axial_strain, shear_strain}) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
-
-        mat de(2, 6, fill::zeros);
+        mat de(2, 8, fill::zeros);
         de(0, 0) = 1.;
-        de(0, 1) = -arm_y + arm_z * f;
-        de(0, 2) = -arm_z - arm_y * f;
-        de(0, 3) = arm_z * vpp - arm_y * wpp;
-        de(0, 4) = (arm_y * arm_y + arm_z * arm_z) * fp;
-        de(0, 5) = I.coor_s;
-        de(1, 4) = -2. * I.coor_n;
+        de(0, 1) = -arm_y * vp;
+        de(0, 2) = arm_z * wp;
+        de(0, 3) = -arm_y + arm_z * f;
+        de(0, 4) = -arm_z - arm_y * f;
+        de(0, 5) = arm_z * vpp - arm_y * wpp;
+        de(0, 6) = (arm_y * arm_y + arm_z * arm_z) * fp;
+        de(0, 7) = I.coor_s;
+        de(1, 6) = -2. * I.coor_n;
 
         trial_resistance += I.weight * de.t() * I.s_material->get_trial_stress();
         trial_stiffness += I.weight * de.t() * I.s_material->get_trial_stiffness() * de;
