@@ -76,7 +76,7 @@ vector<vec> NMB21::record(const OutputType P) {
 
 void NMB21::print() {
     suanpan_info("A planar beam element using N-M interaction section.\n");
-    b_section->print();
+    if(b_section) b_section->print();
 }
 
 #ifdef SUANPAN_VTK
