@@ -10,10 +10,20 @@ section Cell3DOS 2 10. -1. 1. 1 -10. -10.
 section Cell3DOS 4 10. -1. 1. 1 -10. 10.
 section Fibre3DOS 3 1 2 4
 
+material Elastic1D 2 100 ! wrong material
+section Cell3DOS 5 10. -1. 1. 2 -10. 10.
+
 orientation B3DOSL 1 0. 0. 1.
 
 element B31OS 1 1 2 3 1 6
-element B31OS 2 2 3 3 1 6
+
+orientation B3DOSC 2 0. 0. 1.
+orientation B3DL 3 0. 0. 1.
+element B31OS 3 2 3 3 2 6 ! wrong transformation
+element B31OS 4 2 3 3 3 6 ! wrong transformation
+element B31OS 5 2 3 3 4 6 ! missing transformation
+
+element B31OS 8 2 3 3 2 6 1 ! nlgeom enabled, does not change the result as the formulation is always nonlinear
 
 fix2 1 E 1
 
@@ -34,9 +44,9 @@ analyze
 # Coordinate:
 # 1.0000e+00 0.0000e+00 0.0000e+00
 # Displacement:
-# 8.8337e-06 2.9378e-06 1.5717e-06 -1.8890e-04 -2.4984e-06 -5.4421e-06 -9.9989e-05
+# 8.8313e-06 -1.4610e-06 1.5714e-06 1.8891e-04 -2.4979e-06 7.9421e-06 9.9991e-05
 # Resistance:
-# -4.0585e-14 4.8294e-12 -1.4533e-12 4.9216e-13 -6.8785e-13 -2.4100e-12 -2.4097e-13
+# 1.0140e-13 3.0743e-12 -8.0003e-13 3.5261e-13 -6.7329e-13 -2.3152e-12 -2.3136e-13
 peek node 2
 
 peek element 1

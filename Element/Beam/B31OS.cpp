@@ -194,6 +194,7 @@ vector<vec> B31OS::record(const OutputType P) {
 
 void B31OS::print() {
     suanpan_info("A spatial beam element.\n");
+    for(const auto& I : int_pt) I.b_section->print();
 }
 
 #ifdef SUANPAN_VTK
