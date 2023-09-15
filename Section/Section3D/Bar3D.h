@@ -21,7 +21,8 @@
  * @date 26/07/2018
  * @version 0.1.0
  * @file Bar3D.h
- * @addtogroup Section
+ * @addtogroup Section-3D
+ * @ingroup Section
  * @{
  */
 
@@ -31,8 +32,6 @@
 #include <Section/Section3D/Section3D.h>
 
 class Bar3D final : public Section3D {
-    unique_ptr<Material> s_material;
-
 public:
     Bar3D(unsigned,    // tag
           double,      // area
@@ -40,21 +39,10 @@ public:
           double = 0., // eccentricity
           double = 0.  // eccentricity
     );
-    Bar3D(const Bar3D&);
-    Bar3D(Bar3D&&) = delete;                 // move forbidden
-    Bar3D& operator=(const Bar3D&) = delete; // assign forbidden
-    Bar3D& operator=(Bar3D&&) = delete;      // assign forbidden
-    ~Bar3D() override = default;
 
     int initialize(const shared_ptr<DomainBase>&) override;
 
     unique_ptr<Section> get_copy() override;
-
-    int update_trial_status(const vec&) override;
-
-    int clear_status() override;
-    int commit_status() override;
-    int reset_status() override;
 
     void print() override;
 };

@@ -21,7 +21,8 @@
  * @date 15/09/2017
  * @version 0.1.0
  * @file Circle3D.h
- * @addtogroup Section
+ * @addtogroup Section-3D
+ * @ingroup Section
  * @{
  */
 

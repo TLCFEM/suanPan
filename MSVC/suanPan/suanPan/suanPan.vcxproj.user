@@ -4,7 +4,7 @@
     <ShowAllFiles>false</ShowAllFiles>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>-f EB31OSNL</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-f B31OS</LocalDebuggerCommandArguments>
     <LocalDebuggerWorkingDirectory>..\..\..\Example\Element</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>

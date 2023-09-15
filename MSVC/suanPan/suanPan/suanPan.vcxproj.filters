@@ -208,6 +208,9 @@
     <Filter Include="Section\SectionOS">
       <UniqueIdentifier>{d1a891ce-e723-4078-9baa-cc286f7d6728}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Material\MaterialOS">
+      <UniqueIdentifier>{7169039f-88b8-4a06-9c1c-41a9875fce28}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Constraint\BC\GroupMultiplierBC.cpp">
@@ -1545,6 +1548,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Section\Fibre.cpp">
       <Filter>Section</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionOS\Cell3DOS.cpp">
+      <Filter>Section\SectionOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\MaterialOS\MaterialOS.cpp">
+      <Filter>Material\MaterialOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\MaterialOS\ElasticOS.cpp">
+      <Filter>Material\MaterialOS</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2955,6 +2967,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Section\Fibre.h">
       <Filter>Section</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionOS\Cell3DOS.h">
+      <Filter>Section\SectionOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\MaterialOS\MaterialOS.h">
+      <Filter>Material\MaterialOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\MaterialOS\ElasticOS.h">
+      <Filter>Material\MaterialOS</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -15,27 +15,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class Fibre3D
- * @brief A Fibre3D class.
+ * @class Cell3DOS
+ * @brief A Cell3DOS class.
  * @author tlc
  * @date 15/09/2023
  * @version 0.1.0
- * @file Fibre3D.h
- * @addtogroup Section-3D
+ * @file Cell3DOS.h
+ * @addtogroup Section-OS
  * @ingroup Section
  * @{
  */
 
-#ifndef FIBRE3D_H
-#define FIBRE3D_H
+#ifndef CELL3DOS_H
+#define CELL3DOS_H
 
-#include <Section/Fibre.h>
+#include <Section/SectionOS/SectionOS3D.h>
 
-class Fibre3D final : public Fibre {
+class Cell3DOS final : public SectionOS3D {
+    const double omega, n;
+
 public:
-    Fibre3D(unsigned, uvec&&);
+    Cell3DOS(unsigned, // tag
+             double,   // area
+             double,   // sectional coordinate
+             double,   // n
+             unsigned, // material tag
+             double,   // eccentricity
+             double    // eccentricity
+    );
+
+    int initialize(const shared_ptr<DomainBase>&) override;
 
     unique_ptr<Section> get_copy() override;
+
+    void print() override;
 };
 
 #endif

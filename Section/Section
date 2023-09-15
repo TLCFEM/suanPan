@@ -6,5 +6,3 @@
 #include "SectionShell/SectionShell"
 
 #include "ParameterType.h"
-#include "Section.h"
-#include "Fibre.h"

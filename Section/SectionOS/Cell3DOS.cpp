@@ -15,34 +15,41 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include "Bar2D.h"
+#include "Cell3DOS.h"
 #include <Domain/DomainBase.h>
 #include <Material/Material1D/Material1D.h>
 
-Bar2D::Bar2D(const unsigned T, const double AR, const unsigned MT, const double EC)
-    : Section2D(T, MT, AR, EC) {}
+Cell3DOS::Cell3DOS(const unsigned T, const double AR, const double OM, const double NN, const unsigned MT, const double EA, const double EB)
+    : SectionOS3D(T, MT, AR, vec{EA, EB})
+    , omega(OM)
+    , n(NN) {}
 
-int Bar2D::initialize(const shared_ptr<DomainBase>& D) {
+int Cell3DOS::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get_material(material_tag);
 
     access::rw(linear_density) = area * material_proto->get_parameter(ParameterType::DENSITY);
 
     int_pt.clear();
-    int_pt.emplace_back(0., area, material_proto->get_copy());
+    int_pt.emplace_back(0., 0., omega, n, area, material_proto->get_copy());
 
-    initial_stiffness.set_size(2, 2);
-    initial_stiffness(0, 0) = int_pt.back().s_material->get_initial_stiffness().at(0) * area;
-    initial_stiffness(0, 1) = initial_stiffness(1, 0) = initial_stiffness(0, 0) * eccentricity(0);
-    initial_stiffness(1, 1) = initial_stiffness(0, 1) * eccentricity(0);
+    const auto& arm_y = eccentricity(0);
+    const auto& arm_z = eccentricity(1);
 
-    trial_stiffness = current_stiffness = initial_stiffness;
+    mat de(2, 6, fill::zeros);
+    de(0, 0) = 1.;
+    de(0, 1) = arm_y;
+    de(0, 2) = arm_z;
+    de(0, 5) = omega;
+    de(1, 4) = -2. * n;
+
+    trial_stiffness = current_stiffness = initial_stiffness = area * de.t() * int_pt.back().s_material->get_initial_stiffness() * de;
 
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Section> Bar2D::get_copy() { return make_unique<Bar2D>(*this); }
+unique_ptr<Section> Cell3DOS::get_copy() { return make_unique<Cell3DOS>(*this); }
 
-void Bar2D::print() {
-    suanpan_info("A 2D section that represents for example rebar in RC section.\n");
+void Cell3DOS::print() {
+    suanpan_info("A 3D open section cell.\n");
     for(const auto& I : int_pt) I.s_material->print();
 }

@@ -142,10 +142,8 @@ int B31OS::update_status() {
     // [8]: warping far node
     const auto local_deformation = b_trans->to_local_vec(get_trial_displacement());
 
-    mat local_stiffness(9, 9, fill::zeros), local_geometry;
+    mat local_stiffness(9, 9, fill::zeros), local_geometry(9, 9, fill::zeros);
     vec local_resistance(9, fill::zeros);
-
-    if(nlgeom) local_geometry.zeros(9, 9);
 
     for(const auto& I : int_pt) {
         vec sec_deformation(10, fill::none);
@@ -153,28 +151,27 @@ int B31OS::update_status() {
         if(I.b_section->update_trial_status(I.strain_mat * local_deformation) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
         local_stiffness += I.strain_mat.t() * I.b_section->get_trial_stiffness() * I.strain_mat * I.weight * length;
         local_resistance += I.strain_mat.t() * I.b_section->get_trial_resistance() * I.weight * length;
-        if(nlgeom) {
-            // eq. 7.69
-            // here we separate the G matrix into two parts
-            // the first part includes [u',v'',w'',f,f',f''] related entries
-            const auto& sec_resistance = I.b_section->get_trial_resistance();
-            sp_mat sec_geometry(6, 6);
-            sec_geometry(1, 3) = sec_geometry(3, 1) = sec_resistance(2);
-            sec_geometry(2, 3) = sec_geometry(3, 2) = sec_resistance(1);
-            sec_geometry(4, 4) = sec_resistance(3);
-            local_geometry += I.strain_mat.t() * sec_geometry * I.strain_mat * I.weight * length;
-            // the second part involves nodal rotations, which can be directly added to the matrix
-            auto axial = sec_resistance(0) * I.weight * length / 30.;
-            local_geometry(1, 2) -= axial;
-            local_geometry(2, 1) -= axial;
-            local_geometry(3, 4) -= axial;
-            local_geometry(4, 3) -= axial;
-            axial *= 4.;
-            local_geometry(1, 1) += axial;
-            local_geometry(2, 2) += axial;
-            local_geometry(3, 3) += axial;
-            local_geometry(4, 4) += axial;
-        }
+
+        // eq. 7.69
+        // here we separate the G matrix into two parts
+        // the first part includes [u',v'',w'',f,f',f''] related entries
+        const auto& sec_resistance = I.b_section->get_trial_resistance();
+        sp_mat sec_geometry(6, 6);
+        sec_geometry(1, 3) = sec_geometry(3, 1) = sec_resistance(2);
+        sec_geometry(2, 3) = sec_geometry(3, 2) = sec_resistance(1);
+        sec_geometry(4, 4) = sec_resistance(3);
+        local_geometry += I.strain_mat.t() * sec_geometry * I.strain_mat * I.weight * length;
+        // the second part involves nodal rotations, which can be directly added to the matrix
+        auto axial = sec_resistance(0) * I.weight * length / 30.;
+        local_geometry(1, 2) -= axial;
+        local_geometry(2, 1) -= axial;
+        local_geometry(3, 4) -= axial;
+        local_geometry(4, 3) -= axial;
+        axial *= 4.;
+        local_geometry(1, 1) += axial;
+        local_geometry(2, 2) += axial;
+        local_geometry(3, 3) += axial;
+        local_geometry(4, 4) += axial;
     }
 
     trial_resistance = b_trans->to_global_vec(local_resistance);

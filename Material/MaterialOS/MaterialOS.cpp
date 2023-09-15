@@ -14,30 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-/**
- * @class Fibre3D
- * @brief A Fibre3D class.
- * @author tlc
- * @date 15/09/2023
- * @version 0.1.0
- * @file Fibre3D.h
- * @addtogroup Section-3D
- * @ingroup Section
- * @{
- */
 
-#ifndef FIBRE3D_H
-#define FIBRE3D_H
+#include "MaterialOS.h"
 
-#include <Section/Fibre.h>
-
-class Fibre3D final : public Fibre {
-public:
-    Fibre3D(unsigned, uvec&&);
-
-    unique_ptr<Section> get_copy() override;
-};
-
-#endif
-
-//! @}
+MaterialOS::MaterialOS(const unsigned T, const double R)
+    : Material(T, MaterialType::OS, R) {}

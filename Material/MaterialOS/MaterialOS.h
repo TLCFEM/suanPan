@@ -15,27 +15,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class Fibre3D
- * @brief A Fibre3D class.
+ * @class MaterialOS
+ * @brief The MaterialOS class.
+ *
  * @author tlc
  * @date 15/09/2023
  * @version 0.1.0
- * @file Fibre3D.h
- * @addtogroup Section-3D
- * @ingroup Section
+ * @file MaterialOS.h
+ * @addtogroup Material-OS
+ * @ingroup Material
  * @{
  */
 
-#ifndef FIBRE3D_H
-#define FIBRE3D_H
+#ifndef MATERIALOS_H
+#define MATERIALOS_H
 
-#include <Section/Fibre.h>
+#include <Material/Material.h>
 
-class Fibre3D final : public Fibre {
+using std::vector;
+
+class MaterialOS : public Material {
 public:
-    Fibre3D(unsigned, uvec&&);
-
-    unique_ptr<Section> get_copy() override;
+    MaterialOS(unsigned, // tag
+               double    // density
+    );
 };
 
 #endif

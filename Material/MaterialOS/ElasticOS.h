@@ -15,33 +15,51 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class Bar2D
- * @brief A Bar2D class.
+ * @class ElasticOS
+ * @brief The ElasticOS class defines a isotropic elastic material for open section
+ * problems.
+ *
+ * The Young's modulus is stored in `elastic_modulus`. The Poisson's ratio is
+ * stored in `poissons_ratio`.
+ *
+ *
  * @author tlc
  * @date 15/09/2023
- * @version 0.1.1
- * @file Bar2D.h
- * @addtogroup Section-2D
- * @ingroup Section
+ * @version 1.0.0
+ * @file ElasticOS.h
+ * @addtogroup Material-3D
  * @{
  */
 
-#ifndef BAR2D_H
-#define BAR2D_H
+#ifndef ELASTICOS_H
+#define ELASTICOS_H
 
-#include <Section/Section2D/Section2D.h>
+#include <Material/MaterialOS/MaterialOS.h>
 
-class Bar2D final : public Section2D {
+struct DataElasticOS {
+    double elastic_modulus; // elastic modulus
+    double poissons_ratio;  // poissons ratio
+};
+
+class ElasticOS final : public DataElasticOS, public MaterialOS {
 public:
-    Bar2D(unsigned,   // tag
-          double,     // area
-          unsigned,   // material tag
-          double = 0. // eccentricity
+    ElasticOS(unsigned,   // tag
+              double,     // elastic modulus
+              double,     // poissons ratio
+              double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 
-    unique_ptr<Section> get_copy() override;
+    [[nodiscard]] double get_parameter(ParameterType) const override;
+
+    unique_ptr<Material> get_copy() override;
+
+    int update_trial_status(const vec&) override;
+
+    int clear_status() override;
+    int commit_status() override;
+    int reset_status() override;
 
     void print() override;
 };

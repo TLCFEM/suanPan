@@ -21,7 +21,7 @@
  * @date 15/09/2023
  * @version 0.1.0
  * @file SectionOS3D.h
- * @addtogroup Section-3D
+ * @addtogroup Section-OS
  * @ingroup Section
  * @{
  */

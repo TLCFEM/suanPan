@@ -181,6 +181,38 @@ void new_box3d(unique_ptr<Section>& return_obj, istringstream& command) {
     return_obj = make_unique<Box3D>(tag, width, height, thickness, material_id, int_pt, eccentricity_a, eccentricity_b);
 }
 
+void new_cell3dos(unique_ptr<Section>& return_obj, istringstream& command) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    double area, omega, n;
+    if(!get_input(command, area, omega, n)) {
+        suanpan_error("A valid parameter is required.\n");
+        return;
+    }
+
+    unsigned material_id;
+    if(!get_input(command, material_id)) {
+        suanpan_error("A valid material tag is required.\n");
+        return;
+    }
+
+    auto eccentricity_a = 0., eccentricity_b = 0.;
+    if(!command.eof() && !get_input(command, eccentricity_a)) {
+        suanpan_error("A valid eccentricity is required.\n");
+        return;
+    }
+    if(!command.eof() && !get_input(command, eccentricity_b)) {
+        suanpan_error("A valid eccentricity is required.\n");
+        return;
+    }
+
+    return_obj = make_unique<Cell3DOS>(tag, area, omega, n, material_id, eccentricity_a, eccentricity_b);
+}
+
 void new_circle1d(unique_ptr<Section>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -2265,6 +2297,7 @@ int create_new_section(const shared_ptr<DomainBase>& domain, istringstream& comm
     else if(is_equal(section_id, "Bar3D")) new_bar3d(new_section, command);
     else if(is_equal(section_id, "Box2D")) new_box2d(new_section, command);
     else if(is_equal(section_id, "Box3D")) new_box3d(new_section, command);
+    else if(is_equal(section_id, "Cell3DOS")) new_cell3dos(new_section, command);
     else if(is_equal(section_id, "Circle1D")) new_circle1d(new_section, command);
     else if(is_equal(section_id, "Circle2D")) new_circle2d(new_section, command);
     else if(is_equal(section_id, "Circle3D")) new_circle3d(new_section, command);
