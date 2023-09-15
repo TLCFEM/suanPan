@@ -92,7 +92,7 @@ vector<vec> NMB31::record(const OutputType P) {
 
 void NMB31::print() {
     suanpan_info("A spatial beam element using N-M interaction section.\n");
-    b_section->print();
+    if(b_section) b_section->print();
 }
 
 #ifdef SUANPAN_VTK

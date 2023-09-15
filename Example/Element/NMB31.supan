@@ -18,6 +18,9 @@ element NMB31 2 2 3 1 1
 section NM2D1 2 12 12 0. ! wrong section
 element NMB31 3 2 3 2 1
 
+orientation B3DOSL 2 0. 0. 1.
+element NMB31 3 2 3 1 2 ! wrong transformation
+
 fix2 1 E 1
 
 cload 1 0 1 3 3
