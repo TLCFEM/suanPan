@@ -489,7 +489,7 @@ double barycenter(const vec& dim) {
         // dim(2): web height
         // dim(3): web thickness
         const auto flange_area = dim(0) * dim(1);
-        return .5 * flange_area * (dim(1) + dim(2)) / (flange_area + dim(2) * dim(3));
+        return -.5 * flange_area * (dim(1) + dim(2)) / (flange_area + dim(2) * dim(3));
     }
 
     // dim(0): top flange width
@@ -500,7 +500,7 @@ double barycenter(const vec& dim) {
     // dim(5): web thickness
     const auto top_flange_area = dim(0) * dim(1);
     const auto bottom_flange_area = dim(2) * dim(3);
-    return .5 * (top_flange_area * (dim(1) + dim(4)) + bottom_flange_area * (dim(3) + dim(4))) / (top_flange_area + bottom_flange_area + dim(4) * dim(5));
+    return -.5 * (top_flange_area * (dim(1) + dim(4)) + bottom_flange_area * (dim(3) + dim(4))) / (top_flange_area + bottom_flange_area + dim(4) * dim(5));
 }
 
 void new_isection2d(unique_ptr<Section>& return_obj, istringstream& command, const bool recenter) {

@@ -21,7 +21,7 @@
 #include <Recorder/OutputType.h>
 
 Section::Section(const unsigned T, const SectionType ST, const unsigned MT, const double A, vec&& EC)
-    : DataSection{MT, ST, A, 0., {-EC(0), EC(1)}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}}
+    : DataSection{MT, ST, A, 0., EC.head(2), {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}}
     , Tag(T) {}
 
 int Section::initialize_base(const shared_ptr<DomainBase>& D) {
