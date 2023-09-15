@@ -18,7 +18,7 @@
  * @class Fibre1D
  * @brief A Fibre1D class.
  * @author tlc
- * @date 13/10/2017
+ * @date 15/09/2023
  * @version 0.1.0
  * @file Fibre1D.h
  * @addtogroup Section-1D
@@ -29,32 +29,13 @@
 #ifndef FIBRE1D_H
 #define FIBRE1D_H
 
-#include <Section/Section1D/Section1D.h>
+#include <Section/Fibre.h>
 
-class Fibre1D final : public Section1D {
-    uvec fibre_tag;
-
-    vector<unique_ptr<Section>> fibre;
-
+class Fibre1D final : public Fibre {
 public:
     Fibre1D(unsigned, uvec&&);
-    Fibre1D(const Fibre1D&);
-    Fibre1D(Fibre1D&&) = delete;
-    Fibre1D& operator=(const Fibre1D&) = delete;
-    Fibre1D& operator=(Fibre1D&&) = delete;
-    ~Fibre1D() override = default;
-
-    int initialize(const shared_ptr<DomainBase>&) override;
 
     unique_ptr<Section> get_copy() override;
-
-    int update_trial_status(const vec&) override;
-
-    int clear_status() override;
-    int commit_status() override;
-    int reset_status() override;
-
-    void print() override;
 };
 
 #endif

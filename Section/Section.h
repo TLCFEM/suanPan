@@ -37,7 +37,8 @@ enum class SectionType : unsigned {
     D2 = 2,
     D3 = 3,
     NM2D = 3,
-    NM3D = 6
+    NM3D = 6,
+    OS3D = 8,
 };
 
 enum class OutputType;
@@ -65,9 +66,13 @@ struct DataSection {
     vec trial_resistance;   // trial resistance
     vec current_resistance; // current resistance
 
-    mat initial_stiffness; // initial stiffness matrix
+    mat initial_stiffness; // stiffness matrix
     mat current_stiffness; // stiffness matrix
     mat trial_stiffness;   // stiffness matrix
+
+    mat initial_geometry; // geometry matrix
+    mat current_geometry; // geometry matrix
+    mat trial_geometry;   // geometry matrix
 };
 
 class Section : protected DataSection, public Tag {
@@ -106,13 +111,16 @@ public:
     [[nodiscard]] virtual const vec& get_trial_deformation_rate() const;
     [[nodiscard]] virtual const vec& get_trial_resistance() const;
     [[nodiscard]] virtual const mat& get_trial_stiffness() const;
+    [[nodiscard]] virtual const mat& get_trial_geometry() const;
 
     [[nodiscard]] virtual const vec& get_current_deformation() const;
     [[nodiscard]] virtual const vec& get_current_deformation_rate() const;
     [[nodiscard]] virtual const vec& get_current_resistance() const;
     [[nodiscard]] virtual const mat& get_current_stiffness() const;
+    [[nodiscard]] virtual const mat& get_current_geometry() const;
 
     [[nodiscard]] virtual const mat& get_initial_stiffness() const;
+    [[nodiscard]] virtual const mat& get_initial_geometry() const;
 
     virtual unique_ptr<Section> get_copy() = 0;
 

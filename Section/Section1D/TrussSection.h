@@ -31,7 +31,7 @@
 
 #include <Section/Section1D/Section1D.h>
 
-class TrussSection : public Section1D {
+class TrussSection final : public Section1D {
 public:
     explicit TrussSection(unsigned, // tag
                           double,   // area

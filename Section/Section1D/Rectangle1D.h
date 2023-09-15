@@ -31,7 +31,7 @@
 
 #include <Section/Section1D/Section1D.h>
 
-class Rectangle1D : public Section1D {
+class Rectangle1D final : public Section1D {
     const double width, height;
 
 public:

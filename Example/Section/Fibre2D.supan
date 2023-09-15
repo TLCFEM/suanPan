@@ -5,6 +5,8 @@ node 1 0 0
 material ConcreteTsai 1 30. 2. 2. 2. 2. 2. .2 2E-3 1E-4
 material MPF 2 2E5 400 .01
 
+material ElasticOS 3 100 .2 ! wrong material type
+
 section Rectangle2D 2 300 500 1 9
 section Bar2D 3 1200 2 230
 section Bar2D 4 1200 2 -230
@@ -16,7 +18,11 @@ section TSection2D 9 200 25 100 25 1 6
 section EU2D HEM100 10 1
 section US2D W44X290 11 2
 
-section Fibre2D 1 2 3 4 5 6 7 8 9 10 11
+section Bar3D 12 1200 2 230 ! wrong type
+section Bar3D 13 1200 5 230 ! missing material
+section Bar3D 14 1200 3 230 ! wrong material
+
+section Fibre2D 1 2 3 4 5 6 7 8 9 10 11 12
 
 element SingleSection2D 1 1 1
 

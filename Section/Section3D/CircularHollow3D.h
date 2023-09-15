@@ -21,7 +21,8 @@
  * @date 14/03/2019
  * @version 0.1.0
  * @file CircularHollow3D.h
- * @addtogroup Section
+ * @addtogroup Section-3D
+ * @ingroup Section
  * @{
  */
 

@@ -205,6 +205,12 @@
     <Filter Include="Z">
       <UniqueIdentifier>{da04bede-12e0-4fa7-8e1b-963193f71e72}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Section\SectionOS">
+      <UniqueIdentifier>{d1a891ce-e723-4078-9baa-cc286f7d6728}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material\MaterialOS">
+      <UniqueIdentifier>{7169039f-88b8-4a06-9c1c-41a9875fce28}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Constraint\BC\GroupMultiplierBC.cpp">
@@ -1533,6 +1539,27 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Element\Utility\B3DOSC.cpp">
       <Filter>Element\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Beam\B31OS.cpp">
+      <Filter>Element\Beam</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionOS\SectionOS3D.cpp">
+      <Filter>Section\SectionOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\Fibre.cpp">
+      <Filter>Section</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionOS\Cell3DOS.cpp">
+      <Filter>Section\SectionOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\MaterialOS\MaterialOS.cpp">
+      <Filter>Material\MaterialOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\MaterialOS\ElasticOS.cpp">
+      <Filter>Material\MaterialOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionOS\Fibre3DOS.cpp">
+      <Filter>Section\SectionOS</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2934,6 +2961,27 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Element\Utility\B3DOSC.h">
       <Filter>Element\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Beam\B31OS.h">
+      <Filter>Element\Beam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionOS\SectionOS3D.h">
+      <Filter>Section\SectionOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\Fibre.h">
+      <Filter>Section</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionOS\Cell3DOS.h">
+      <Filter>Section\SectionOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\MaterialOS\MaterialOS.h">
+      <Filter>Material\MaterialOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\MaterialOS\ElasticOS.h">
+      <Filter>Material\MaterialOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionOS\Fibre3DOS.h">
+      <Filter>Section\SectionOS</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

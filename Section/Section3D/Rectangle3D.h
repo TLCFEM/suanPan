@@ -21,7 +21,7 @@
  * @date 13/10/2017
  * @version 0.1.0
  * @file Rectangle3D.h
- * @addtogroup Section-2D
+ * @addtogroup Section-3D
  * @ingroup Section
  * @{
  */

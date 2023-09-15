@@ -18,43 +18,24 @@
  * @class Fibre3D
  * @brief A Fibre3D class.
  * @author tlc
- * @date 10/06/2018
+ * @date 15/09/2023
  * @version 0.1.0
  * @file Fibre3D.h
- * @addtogroup Section-2D
+ * @addtogroup Section-3D
  * @ingroup Section
  * @{
  */
 
-#ifndef Fibre3D_H
-#define Fibre3D_H
+#ifndef FIBRE3D_H
+#define FIBRE3D_H
 
-#include <Section/Section3D/Section3D.h>
+#include <Section/Fibre.h>
 
-class Fibre3D final : public Section3D {
-    uvec fibre_tag;
-
-    vector<unique_ptr<Section>> fibre;
-
+class Fibre3D final : public Fibre {
 public:
     Fibre3D(unsigned, uvec&&);
-    Fibre3D(const Fibre3D&);
-    Fibre3D(Fibre3D&&) noexcept = delete;
-    Fibre3D& operator=(const Fibre3D&) = delete;
-    Fibre3D& operator=(Fibre3D&&) noexcept = delete;
-    ~Fibre3D() override = default;
-
-    int initialize(const shared_ptr<DomainBase>&) override;
 
     unique_ptr<Section> get_copy() override;
-
-    int update_trial_status(const vec&) override;
-
-    int clear_status() override;
-    int commit_status() override;
-    int reset_status() override;
-
-    void print() override;
 };
 
 #endif

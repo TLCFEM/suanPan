@@ -18,10 +18,11 @@
  * @class Bar2D
  * @brief A Bar2D class.
  * @author tlc
- * @date 05/06/2018
- * @version 0.1.0
+ * @date 15/09/2023
+ * @version 0.1.1
  * @file Bar2D.h
- * @addtogroup Section
+ * @addtogroup Section-2D
+ * @ingroup Section
  * @{
  */
 
@@ -31,29 +32,16 @@
 #include <Section/Section2D/Section2D.h>
 
 class Bar2D final : public Section2D {
-    unique_ptr<Material> s_material;
-
 public:
     Bar2D(unsigned,   // tag
           double,     // area
           unsigned,   // material tag
           double = 0. // eccentricity
     );
-    Bar2D(const Bar2D&);
-    Bar2D(Bar2D&&) noexcept = delete;            // move forbidden
-    Bar2D& operator=(const Bar2D&) = delete;     // assign forbidden
-    Bar2D& operator=(Bar2D&&) noexcept = delete; // assign forbidden
-    ~Bar2D() override = default;
 
     int initialize(const shared_ptr<DomainBase>&) override;
 
     unique_ptr<Section> get_copy() override;
-
-    int update_trial_status(const vec&) override;
-
-    int clear_status() override;
-    int commit_status() override;
-    int reset_status() override;
 
     void print() override;
 };

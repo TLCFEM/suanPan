@@ -107,6 +107,18 @@ public:
     );
 };
 
+class SectionOSElement3D : public SectionElement {
+public:
+    SectionOSElement3D(unsigned,                                                                            // tag
+                       unsigned,                                                                            // number of nodes
+                       unsigned,                                                                            // number of dofs
+                       uvec&&,                                                                              // node encoding
+                       uvec&&,                                                                              // section tags
+                       bool,                                                                                // nonlinear geometry switch
+                       vector<DOF>&& = {DOF::U1, DOF::U2, DOF::U3, DOF::UR1, DOF::UR2, DOF::UR3, DOF::WARP} // dof identifier
+    );
+};
+
 #endif
 
 //! @}

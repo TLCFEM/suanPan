@@ -21,15 +21,27 @@
 #include <Recorder/OutputType.h>
 
 Section::Section(const unsigned T, const SectionType ST, const unsigned MT, const double A, vec&& EC)
-    : DataSection{MT, ST, A, 0., {-EC(0), EC(1)}, {}, {}, {}, {}, {}, {}, {}, {}, {}}
+    : DataSection{MT, ST, A, 0., EC.head(2), {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}}
     , Tag(T) {}
 
 int Section::initialize_base(const shared_ptr<DomainBase>& D) {
     if(initialized) return SUANPAN_SUCCESS;
 
-    if(0 != material_tag && (!D->find<Material>(material_tag) || MaterialType::D1 != D->get<Material>(material_tag)->get_material_type())) {
-        suanpan_warning("Section {} disabled as material {} cannot be found or wrong material type assigned.\n", get_tag(), material_tag);
-        return SUANPAN_FAIL;
+    if(0u != material_tag) {
+        if(!D->find<Material>(material_tag)) {
+            suanpan_warning("Section {} disabled as material {} cannot be found.\n", get_tag(), material_tag);
+            return SUANPAN_FAIL;
+        }
+        if(SectionType::OS3D == section_type) {
+            if(MaterialType::OS != D->get<Material>(material_tag)->get_material_type()) {
+                suanpan_warning("Section {} disabled as material {} has a wrong type, use OS type material only.\n", get_tag(), material_tag);
+                return SUANPAN_FAIL;
+            }
+        }
+        else if(MaterialType::D1 != D->get<Material>(material_tag)->get_material_type()) {
+            suanpan_warning("Section {} disabled as material {} has a wrong type, use 1D material only.\n", get_tag(), material_tag);
+            return SUANPAN_FAIL;
+        }
     }
 
     const auto size = static_cast<unsigned>(section_type);
@@ -72,6 +84,8 @@ const vec& Section::get_trial_resistance() const { return trial_resistance; }
 
 const mat& Section::get_trial_stiffness() const { return trial_stiffness; }
 
+const mat& Section::get_trial_geometry() const { return trial_geometry; }
+
 const vec& Section::get_current_deformation() const { return current_deformation; }
 
 const vec& Section::get_current_deformation_rate() const { return current_deformation_rate; }
@@ -80,7 +94,11 @@ const vec& Section::get_current_resistance() const { return current_resistance; 
 
 const mat& Section::get_current_stiffness() const { return current_stiffness; }
 
+const mat& Section::get_current_geometry() const { return current_geometry; }
+
 const mat& Section::get_initial_stiffness() const { return initial_stiffness; }
+
+const mat& Section::get_initial_geometry() const { return initial_geometry; }
 
 double Section::get_parameter(const ParameterType P) {
     if(ParameterType::AREA == P) return area;

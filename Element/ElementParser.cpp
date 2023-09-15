@@ -120,7 +120,7 @@ void new_b21h(unique_ptr<Element>& return_obj, istringstream& command) {
     return_obj = make_unique<B21H>(tag, std::move(node_tag), section_id, elastic_length, is_true(nonlinear));
 }
 
-void new_b31(unique_ptr<Element>& return_obj, istringstream& command) {
+void new_b31(unique_ptr<Element>& return_obj, istringstream& command, const bool if_os) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
@@ -157,7 +157,8 @@ void new_b31(unique_ptr<Element>& return_obj, istringstream& command) {
         return;
     }
 
-    return_obj = make_unique<B31>(tag, std::move(node_tag), section_id, orientation_id, int_pt, is_true(nonlinear));
+    if(if_os) return_obj = make_unique<B31OS>(tag, std::move(node_tag), section_id, orientation_id, int_pt, is_true(nonlinear));
+    else return_obj = make_unique<B31>(tag, std::move(node_tag), section_id, orientation_id, int_pt, is_true(nonlinear));
 }
 
 void new_nmb21(unique_ptr<Element>& return_obj, istringstream& command, const unsigned which) {
@@ -2675,7 +2676,8 @@ int create_new_element(const shared_ptr<DomainBase>& domain, istringstream& comm
     else if(is_equal(element_id, "B21EL")) new_b21(new_element, command, 1);
     else if(is_equal(element_id, "B21EH")) new_b21(new_element, command, 2);
     else if(is_equal(element_id, "B21H")) new_b21h(new_element, command);
-    else if(is_equal(element_id, "B31")) new_b31(new_element, command);
+    else if(is_equal(element_id, "B31")) new_b31(new_element, command, false);
+    else if(is_equal(element_id, "B31OS")) new_b31(new_element, command, true);
     else if(is_equal(element_id, "NMB21")) new_nmb21(new_element, command, 0);
     else if(is_equal(element_id, "NMB21EL")) new_nmb21(new_element, command, 1);
     else if(is_equal(element_id, "NMB21EH")) new_nmb21(new_element, command, 2);

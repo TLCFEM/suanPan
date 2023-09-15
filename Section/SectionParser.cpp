@@ -181,6 +181,38 @@ void new_box3d(unique_ptr<Section>& return_obj, istringstream& command) {
     return_obj = make_unique<Box3D>(tag, width, height, thickness, material_id, int_pt, eccentricity_a, eccentricity_b);
 }
 
+void new_cell3dos(unique_ptr<Section>& return_obj, istringstream& command) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    double area, omega, n;
+    if(!get_input(command, area, omega, n)) {
+        suanpan_error("A valid parameter is required.\n");
+        return;
+    }
+
+    unsigned material_id;
+    if(!get_input(command, material_id)) {
+        suanpan_error("A valid material tag is required.\n");
+        return;
+    }
+
+    auto eccentricity_a = 0., eccentricity_b = 0.;
+    if(!command.eof() && !get_input(command, eccentricity_a)) {
+        suanpan_error("A valid eccentricity is required.\n");
+        return;
+    }
+    if(!command.eof() && !get_input(command, eccentricity_b)) {
+        suanpan_error("A valid eccentricity is required.\n");
+        return;
+    }
+
+    return_obj = make_unique<Cell3DOS>(tag, area, omega, n, material_id, eccentricity_a, eccentricity_b);
+}
+
 void new_circle1d(unique_ptr<Section>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -397,7 +429,7 @@ void new_fibre2d(unique_ptr<Section>& return_obj, istringstream& command) {
     return_obj = make_unique<Fibre2D>(tag, std::move(tag_vector));
 }
 
-void new_fibre3d(unique_ptr<Section>& return_obj, istringstream& command) {
+void new_fibre3d(unique_ptr<Section>& return_obj, istringstream& command, const bool if_os) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
@@ -412,7 +444,8 @@ void new_fibre3d(unique_ptr<Section>& return_obj, istringstream& command) {
             return;
         }
 
-    return_obj = make_unique<Fibre3D>(tag, std::move(tag_vector));
+    if(if_os) return_obj = make_unique<Fibre3DOS>(tag, std::move(tag_vector));
+    else return_obj = make_unique<Fibre3D>(tag, std::move(tag_vector));
 }
 
 void new_hsection2d(unique_ptr<Section>& return_obj, istringstream& command) {
@@ -456,7 +489,7 @@ double barycenter(const vec& dim) {
         // dim(2): web height
         // dim(3): web thickness
         const auto flange_area = dim(0) * dim(1);
-        return .5 * flange_area * (dim(1) + dim(2)) / (flange_area + dim(2) * dim(3));
+        return -.5 * flange_area * (dim(1) + dim(2)) / (flange_area + dim(2) * dim(3));
     }
 
     // dim(0): top flange width
@@ -467,7 +500,7 @@ double barycenter(const vec& dim) {
     // dim(5): web thickness
     const auto top_flange_area = dim(0) * dim(1);
     const auto bottom_flange_area = dim(2) * dim(3);
-    return .5 * (top_flange_area * (dim(1) + dim(4)) + bottom_flange_area * (dim(3) + dim(4))) / (top_flange_area + bottom_flange_area + dim(4) * dim(5));
+    return -.5 * (top_flange_area * (dim(1) + dim(4)) + bottom_flange_area * (dim(3) + dim(4))) / (top_flange_area + bottom_flange_area + dim(4) * dim(5));
 }
 
 void new_isection2d(unique_ptr<Section>& return_obj, istringstream& command, const bool recenter) {
@@ -2265,6 +2298,7 @@ int create_new_section(const shared_ptr<DomainBase>& domain, istringstream& comm
     else if(is_equal(section_id, "Bar3D")) new_bar3d(new_section, command);
     else if(is_equal(section_id, "Box2D")) new_box2d(new_section, command);
     else if(is_equal(section_id, "Box3D")) new_box3d(new_section, command);
+    else if(is_equal(section_id, "Cell3DOS")) new_cell3dos(new_section, command);
     else if(is_equal(section_id, "Circle1D")) new_circle1d(new_section, command);
     else if(is_equal(section_id, "Circle2D")) new_circle2d(new_section, command);
     else if(is_equal(section_id, "Circle3D")) new_circle3d(new_section, command);
@@ -2272,7 +2306,8 @@ int create_new_section(const shared_ptr<DomainBase>& domain, istringstream& comm
     else if(is_equal(section_id, "CircularHollow3D")) new_circularhollow3D(new_section, command);
     else if(is_equal(section_id, "Fibre1D")) new_fibre1d(new_section, command);
     else if(is_equal(section_id, "Fibre2D")) new_fibre2d(new_section, command);
-    else if(is_equal(section_id, "Fibre3D")) new_fibre3d(new_section, command);
+    else if(is_equal(section_id, "Fibre3D")) new_fibre3d(new_section, command, false);
+    else if(is_equal(section_id, "Fibre3DOS")) new_fibre3d(new_section, command, true);
     else if(is_equal(section_id, "HSection2D")) new_hsection2d(new_section, command);
     else if(is_equal(section_id, "ISection2D")) new_isection2d(new_section, command, false);
     else if(is_equal(section_id, "ISection3D")) new_isection3d(new_section, command, false);

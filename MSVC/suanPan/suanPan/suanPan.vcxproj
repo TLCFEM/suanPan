@@ -163,6 +163,7 @@
     <ClCompile Include="..\..\..\Element\Beam\B21E.cpp" />
     <ClCompile Include="..\..\..\Element\Beam\B21H.cpp" />
     <ClCompile Include="..\..\..\Element\Beam\B31.cpp" />
+    <ClCompile Include="..\..\..\Element\Beam\B31OS.cpp" />
     <ClCompile Include="..\..\..\Element\Beam\EB21.cpp" />
     <ClCompile Include="..\..\..\Element\Beam\EB31OS.cpp" />
     <ClCompile Include="..\..\..\Element\Beam\F21.cpp" />
@@ -416,6 +417,8 @@
     <ClCompile Include="..\..\..\Material\Material3D\Wrapper\Rotation3D.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Wrapper\Stacked.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Wrapper\Substepping.cpp" />
+    <ClCompile Include="..\..\..\Material\MaterialOS\ElasticOS.cpp" />
+    <ClCompile Include="..\..\..\Material\MaterialOS\MaterialOS.cpp" />
     <ClCompile Include="..\..\..\Material\MaterialParser.cpp" />
     <ClCompile Include="..\..\..\Material\MaterialTemplate.cpp" />
     <ClCompile Include="..\..\..\Material\MaterialTester.cpp" />
@@ -436,6 +439,7 @@
     <ClCompile Include="..\..\..\Recorder\RecorderParser.cpp" />
     <ClCompile Include="..\..\..\Recorder\SumRecorder.cpp" />
     <ClCompile Include="..\..\..\Recorder\VisualisationRecorder.cpp" />
+    <ClCompile Include="..\..\..\Section\Fibre.cpp" />
     <ClCompile Include="..\..\..\Section\Section.cpp" />
     <ClCompile Include="..\..\..\Section\Section1D\Circle1D.cpp" />
     <ClCompile Include="..\..\..\Section\Section1D\Fibre1D.cpp" />
@@ -475,6 +479,9 @@
     <ClCompile Include="..\..\..\Section\SectionNM\SurfaceNM2D.cpp" />
     <ClCompile Include="..\..\..\Section\SectionNM\SurfaceNM3D.cpp" />
     <ClCompile Include="..\..\..\Section\SectionNM\VAFNM.cpp" />
+    <ClCompile Include="..\..\..\Section\SectionOS\Cell3DOS.cpp" />
+    <ClCompile Include="..\..\..\Section\SectionOS\Fibre3DOS.cpp" />
+    <ClCompile Include="..\..\..\Section\SectionOS\SectionOS3D.cpp" />
     <ClCompile Include="..\..\..\Section\SectionParser.cpp" />
     <ClCompile Include="..\..\..\Section\SectionShell\Homogeneous.cpp" />
     <ClCompile Include="..\..\..\Section\SectionShell\SectionShell.cpp" />
@@ -637,6 +644,7 @@
     <ClInclude Include="..\..\..\Element\Beam\B21E.h" />
     <ClInclude Include="..\..\..\Element\Beam\B21H.h" />
     <ClInclude Include="..\..\..\Element\Beam\B31.h" />
+    <ClInclude Include="..\..\..\Element\Beam\B31OS.h" />
     <ClInclude Include="..\..\..\Element\Beam\EB21.h" />
     <ClInclude Include="..\..\..\Element\Beam\EB31OS.h" />
     <ClInclude Include="..\..\..\Element\Beam\F21.h" />
@@ -891,6 +899,8 @@
     <ClInclude Include="..\..\..\Material\Material3D\Wrapper\Rotation3D.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Wrapper\Stacked.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Wrapper\Substepping.h" />
+    <ClInclude Include="..\..\..\Material\MaterialOS\ElasticOS.h" />
+    <ClInclude Include="..\..\..\Material\MaterialOS\MaterialOS.h" />
     <ClInclude Include="..\..\..\Material\MaterialParser.h" />
     <ClInclude Include="..\..\..\Material\MaterialTemplate.h" />
     <ClInclude Include="..\..\..\Material\MaterialTester.h" />
@@ -911,6 +921,7 @@
     <ClInclude Include="..\..\..\Recorder\RecorderParser.h" />
     <ClInclude Include="..\..\..\Recorder\SumRecorder.h" />
     <ClInclude Include="..\..\..\Recorder\VisualisationRecorder.h" />
+    <ClInclude Include="..\..\..\Section\Fibre.h" />
     <ClInclude Include="..\..\..\Section\ParameterType.h" />
     <ClInclude Include="..\..\..\Section\Section.h" />
     <ClInclude Include="..\..\..\Section\Section1D\Circle1D.h" />
@@ -951,6 +962,9 @@
     <ClInclude Include="..\..\..\Section\SectionNM\SurfaceNM2D.h" />
     <ClInclude Include="..\..\..\Section\SectionNM\SurfaceNM3D.h" />
     <ClInclude Include="..\..\..\Section\SectionNM\VAFNM.h" />
+    <ClInclude Include="..\..\..\Section\SectionOS\Cell3DOS.h" />
+    <ClInclude Include="..\..\..\Section\SectionOS\Fibre3DOS.h" />
+    <ClInclude Include="..\..\..\Section\SectionOS\SectionOS3D.h" />
     <ClInclude Include="..\..\..\Section\SectionParser.h" />
     <ClInclude Include="..\..\..\Section\SectionShell\Homogeneous.h" />
     <ClInclude Include="..\..\..\Section\SectionShell\SectionShell.h" />

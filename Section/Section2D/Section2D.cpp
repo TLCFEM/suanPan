@@ -23,11 +23,6 @@ Section2D::IntegrationPoint::IntegrationPoint(const double C, const double W, un
     , weight(W)
     , s_material(std::forward<unique_ptr<Material>>(M)) {}
 
-Section2D::IntegrationPoint::IntegrationPoint(const IntegrationPoint& old_obj)
-    : coor(old_obj.coor)
-    , weight(old_obj.weight)
-    , s_material(suanpan::make_copy(old_obj.s_material)) {}
-
 Section2D::Section2D(const unsigned T, const unsigned MT, const double A, const double EC)
     : Section(T, SectionType::D2, MT, A, vec{EC, 0.}) {}
 
@@ -50,8 +45,6 @@ int Section2D::update_trial_status(const vec& t_deformation) {
     }
 
     trial_stiffness(1, 0) = trial_stiffness(0, 1);
-
-    suanpan_assert([&] { if(!trial_resistance.is_finite() || !trial_stiffness.is_finite()) throw invalid_argument("infinite number detected"); });
 
     return SUANPAN_SUCCESS;
 }
