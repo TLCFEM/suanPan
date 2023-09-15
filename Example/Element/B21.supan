@@ -28,8 +28,8 @@ converger RelIncreDisp 1 1E-8 5 1
 
 analyze
 
-# -0.0270 0.3272 0.4865 cload
-# -0.0069 -0.1659 -0.2483 lineudl2d
+# -2.6967e-02 3.2715e-01 4.8652e-01 cload
+# -6.8955e-03 -1.6589e-01 -2.4828e-01 lineudl2d
 peek node 2
 
 peek element 1

@@ -25,7 +25,13 @@ converger RelIncreDisp 1 1E-8 5 1
 
 analyze
 
-# -3.6624E-19 1.0233E-01 1.4156E-01
+# Node 2:
+# Coordinate:
+# 1.0000e+00 0.0000e+00
+# Displacement:
+# 9.7439e-19 1.0233e-01 1.4156e-01
+# Resistance:
+# 5.8981e-17 1.0000e+00 1.5642e-10
 peek node 2
 
 peek element 1
