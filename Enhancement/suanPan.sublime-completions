@@ -2995,6 +2995,12 @@
       "trigger":"B31"
     },
     {
+      "contents":"element B31OS ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:[6]} ${7:[7]}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, section tag\n# (5) int, orientation tag\n# [6] int, number of integration points, default: 5\n# [7] bool string, nonlinear geometry switch, default: false",
+      "details":"3D Displacement Based Beam With Open Section",
+      "kind":"type",
+      "trigger":"B31OS"
+    },
+    {
       "contents":"orientation B3DL ${1:(1)} ${2:(2..4)}\n# (1) int, unique orientation tag\n# (2..4) double, three components of local z axis",
       "details":"Linear transformation for 3D beam elements",
       "kind":"type",
@@ -3011,6 +3017,12 @@
       "details":"Linear transformation for 3D beam elements with open sections",
       "kind":"type",
       "trigger":"B3DOSL"
+    },
+    {
+      "contents":"orientation B3DOSC ${1:(1)} ${2:(2..4)}\n# (1) int, unique orientation tag\n# (2..4) double, three components of local z axis",
+      "details":"Corotational transformation for 3D beam elements with open sections",
+      "kind":"type",
+      "trigger":"B3DOSC"
     },
     {
       "contents":"set system_solver BICGSTAB",
@@ -3827,6 +3839,18 @@
       "details":"3D Fibre Section",
       "kind":"type",
       "trigger":"Fibre3D"
+    },
+    {
+      "contents":"section Fibre3DOS ${1:(1)} [${2:(2)}...]\n# (1) int, unique section tag\n# [(2)...] int, associated section tags",
+      "details":"3D Fibre Open Section",
+      "kind":"type",
+      "trigger":"Fibre3DOS"
+    },
+    {
+      "contents":"section Cell3DOS ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:[6]} ${7:[7]}\n# (1) int, unique section tag\n# (2) double, area\n# (3) double, sectional coordinate\n# (4) double, n\n# (5) int, material tag\n# [6] double, eccentricity along y-axis, default: 0\n# [7] double, eccentricity along z-axis, default: 0",
+      "details":"3D Fibre Open Section Building Block",
+      "kind":"type",
+      "trigger":"Cell3DOS"
     },
     {
       "contents":"",
@@ -5365,10 +5389,16 @@
       "trigger":"ImplicitDynamic"
     },
     {
-      "contents":"",
+      "contents":"material IsotropicElastic3D ${1:(1)} ${2:(2)} ${3:[3]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# [3] double, density, default: 0",
       "details":"",
       "kind":"type",
       "trigger":"IsotropicElastic3D"
+    },
+    {
+      "contents":"material ElasticOS ${1:(1)} ${2:(2)} ${3:[3]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# [3] double, density, default: 0",
+      "details":"",
+      "kind":"type",
+      "trigger":"ElasticOS"
     },
     {
       "contents":"",
