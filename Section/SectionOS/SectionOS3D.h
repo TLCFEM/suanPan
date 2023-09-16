@@ -40,6 +40,8 @@
 using std::vector;
 
 class SectionOS3D : public Section {
+    static const mat weighing_mat;
+
 protected:
     struct IntegrationPoint {
         double coor_y, coor_z, coor_s, coor_n, weight;

@@ -23,31 +23,39 @@ element B31OS 3 2 3 3 2 6 ! wrong transformation
 element B31OS 4 2 3 3 3 6 ! wrong transformation
 element B31OS 5 2 3 3 4 6 ! missing transformation
 
-element B31OS 8 2 3 3 2 6 1 ! nlgeom enabled, does not change the result as the formulation is always nonlinear
+element B31OS 8 2 3 3 2 6 1 ! nlgeom enabled
 
 fix2 1 E 1
 
-cload 1 0 1 3 3
+cload 1 0 100 3 3
 
 recorder 1 hdf5 Element BEAME 1
 recorder 2 hdf5 Element BEAMS 1
 
 step static 1
-set ini_step_size 1
+set ini_step_size 1E-1
 set fixed_step_size true
 
-converger RelIncreDisp 1 1E-8 5 1
+converger RelIncreDisp 1 1E-10 5 1
 
 analyze
 
 # Node 2:
 # Coordinate:
-# 1.0000e+00 0.0000e+00 0.0000e+00
+#   1.0000e+00  0.0000e+00  0.0000e+00
 # Displacement:
-# 8.8313e-06 -1.4610e-06 1.5714e-06 1.8891e-04 -2.4979e-06 7.9421e-06 9.9991e-05
+#  -2.7788e-02  1.3093e-04  2.0400e-04  1.6985e-02 -2.4198e-04  4.9327e-04  1.3371e-02
 # Resistance:
-# 1.0140e-13 3.0743e-12 -8.0003e-13 3.5261e-13 -6.7329e-13 -2.3152e-12 -2.3136e-13
-peek node 2
+#  -5.3756e-12  2.0273e-13 -6.4801e-12 -2.9274e-12  4.2999e-13  2.5517e-12  2.3981e-13
+# 
+# Node 3:
+# Coordinate:
+#   1.0000e+00  1.0000e+00  0.0000e+00
+# Displacement:
+#  -2.9622e-02  9.5842e-05  1.7399e-02  1.7276e-02  9.9635e-04  1.5486e-03  4.6030e-03
+# Resistance:
+#   5.3862e-12 -9.2593e-14  1.0000e+02 -3.3451e-12 -5.9585e-13  2.7445e-12  2.7700e-13
+peek node 2 3
 
 peek element 1
 

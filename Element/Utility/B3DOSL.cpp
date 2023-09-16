@@ -74,7 +74,7 @@ vec B3DOSL::to_global_vec(const vec& l_disp) const {
     return g_disp;
 }
 
-mat B3DOSL::to_global_mass_mat(const mat&) const { return {12, 12, fill::zeros}; }
+mat B3DOSL::to_global_mass_mat(const mat&) const { return {14, 14, fill::zeros}; }
 
 mat B3DOSL::to_global_stiffness_mat(const mat& l_mat) const {
     mat t_mat(9, 14, fill::zeros); // eq. 2.11

@@ -50,7 +50,7 @@ int Fibre::initialize(const shared_ptr<DomainBase>& D) {
 
     trial_stiffness = current_stiffness = initial_stiffness;
 
-    if(SectionType::OS3D == section_type) trial_geometry = current_geometry = initial_geometry.zeros(8, 8);
+    if(const auto os_size = static_cast<unsigned>(section_type); SectionType::OS3D == section_type) trial_geometry = current_geometry = initial_geometry.zeros(os_size, os_size);
 
     return SUANPAN_SUCCESS;
 }

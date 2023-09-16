@@ -35,7 +35,9 @@ int Cell3DOS::initialize(const shared_ptr<DomainBase>& D) {
     const auto& arm_y = eccentricity(0);
     const auto& arm_z = eccentricity(1);
 
-    mat de(2, 8, fill::zeros);
+    const auto os_size = static_cast<unsigned>(section_type);
+
+    mat de(2, os_size, fill::zeros);
     de(0, 0) = 1.;
     de(0, 3) = arm_y;
     de(0, 4) = arm_z;
@@ -44,7 +46,7 @@ int Cell3DOS::initialize(const shared_ptr<DomainBase>& D) {
 
     trial_stiffness = current_stiffness = initial_stiffness = area * de.t() * int_pt.back().s_material->get_initial_stiffness() * de;
 
-    trial_geometry = current_geometry = initial_geometry.zeros(8, 8);
+    trial_geometry = current_geometry = initial_geometry.zeros(os_size, os_size);
 
     return SUANPAN_SUCCESS;
 }

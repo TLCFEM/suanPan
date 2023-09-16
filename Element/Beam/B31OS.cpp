@@ -47,7 +47,7 @@ B31OS::IntegrationPoint::IntegrationPoint(const double C, const double W, const 
     const auto ddnf3 = -ddnf1;
     const auto ddnf4 = x3p / L;
 
-    strain_mat.zeros(8, 9);
+    strain_mat.zeros(static_cast<unsigned>(SectionType::OS3D), 9);
     // u'
     strain_mat(0, 0) = dnu;
     // v'
@@ -77,6 +77,8 @@ B31OS::IntegrationPoint::IntegrationPoint(const double C, const double W, const 
     strain_mat(7, 7) = ddnf2;
     strain_mat(7, 6) = ddnf3;
     strain_mat(7, 8) = ddnf4;
+    // theta_zi, theta_zj, theta_yi, theta_yj
+    strain_mat(8, 1) = strain_mat(9, 2) = strain_mat(10, 3) = strain_mat(11, 4) = 1.;
 }
 
 B31OS::B31OS(const unsigned T, uvec&& N, const unsigned S, const unsigned O, const unsigned P, const bool F)
