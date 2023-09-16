@@ -17,6 +17,10 @@
 /**
  * @class B31OS
  * @brief The B31OS class.
+ *
+ * Reference:
+ *   1. Distributed plasticity analysis of steel building structural systems
+ *
  * @author tlc
  * @date 15/09/2023
  * @version 0.1.0
