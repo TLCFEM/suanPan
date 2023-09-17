@@ -54,10 +54,7 @@ void Bilinear2D::initialize_couple(const shared_ptr<DomainBase>&) {
     ConstantCoupleStiffness(this);
 }
 
-double Bilinear2D::get_parameter(const ParameterType T) const {
-    if(ParameterType::PLANETYPE == T) return static_cast<double>(plane_type);
-    return base.get_parameter(T);
-}
+double Bilinear2D::get_parameter(const ParameterType T) const { return base.get_parameter(T); }
 
 unique_ptr<Material> Bilinear2D::get_copy() { return make_unique<Bilinear2D>(*this); }
 

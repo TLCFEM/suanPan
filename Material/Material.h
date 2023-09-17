@@ -40,6 +40,13 @@ enum class MaterialType : unsigned {
     OS = 2
 };
 
+enum class PlaneType : unsigned {
+    S = 1,
+    E = 2,
+    A = 3,
+    N = 0
+};
+
 class DomainBase;
 enum class OutputType;
 
@@ -64,6 +71,7 @@ struct DataMaterial {
     const double tolerance = 1E-14;
     const double density = 0.;
     const MaterialType material_type = MaterialType::D0;
+    const PlaneType plane_type = PlaneType::N;
 
     vec current_strain;      // current status
     vec current_strain_rate; // current status
@@ -142,6 +150,7 @@ public:
     [[nodiscard]] double get_characteristic_length() const;
 
     [[nodiscard]] MaterialType get_material_type() const;
+    [[nodiscard]] PlaneType get_plane_type() const;
 
     [[nodiscard]] virtual double get_parameter(ParameterType) const;
 

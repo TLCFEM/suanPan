@@ -44,7 +44,7 @@ int PCPE4DC::initialize(const shared_ptr<DomainBase>& D) {
     auto& f_mat = D->get<Material>(material_tag(1));
 
     // validate material type
-    if(PlaneType::E != static_cast<PlaneType>(s_mat->get_parameter(ParameterType::PLANETYPE))) {
+    if(PlaneType::E != s_mat->get_plane_type()) {
         suanpan_error("Only plane strain material for solid phase is supported.\n");
         return SUANPAN_FAIL;
     }

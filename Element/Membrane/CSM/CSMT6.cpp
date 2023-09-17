@@ -43,7 +43,7 @@ int CSMT6::initialize(const shared_ptr<DomainBase>& D) {
         return SUANPAN_FAIL;
     }
 
-    if(PlaneType::E == static_cast<PlaneType>(material_proto->get_parameter(ParameterType::PLANETYPE))) suanpan::hacker(thickness) = 1.;
+    if(PlaneType::E == material_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
 
     mat ele_coor(m_node, m_node, fill::none);
     ele_coor.col(0).fill(1.);

@@ -54,7 +54,6 @@ void Elastic2D::initialize_couple(const shared_ptr<DomainBase>&) {
 }
 
 double Elastic2D::get_parameter(const ParameterType P) const {
-    if(ParameterType::PLANETYPE == P) return static_cast<double>(plane_type);
     if(ParameterType::DENSITY == P) return density;
     if(ParameterType::ELASTICMODULUS == P || ParameterType::YOUNGSMODULUS == P || ParameterType::E == P) return elastic_modulus;
     if(ParameterType::SHEARMODULUS == P || ParameterType::G == P) return elastic_modulus / (2. + 2. * poissons_ratio);

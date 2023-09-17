@@ -37,10 +37,7 @@ int Concrete21::initialize(const shared_ptr<DomainBase>&) {
 
 unique_ptr<Material> Concrete21::get_copy() { return make_unique<Concrete21>(*this); }
 
-double Concrete21::get_parameter(const ParameterType P) const {
-    if(ParameterType::PLANETYPE == P) return static_cast<double>(plane_type);
-    return concrete_major.get_parameter(P);
-}
+double Concrete21::get_parameter(const ParameterType P) const { return concrete_major.get_parameter(P); }
 
 int Concrete21::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;

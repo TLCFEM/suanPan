@@ -161,7 +161,7 @@ int SGCMQ::initialize(const shared_ptr<DomainBase>& D) {
 
     auto& mat_stiff = mat_proto->get_initial_stiffness();
 
-    if(PlaneType::E == static_cast<PlaneType>(mat_proto->get_parameter(ParameterType::PLANETYPE))) suanpan::hacker(thickness) = 1.;
+    if(PlaneType::E == mat_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
 
     const auto ele_coor = get_coordinate(2);
 

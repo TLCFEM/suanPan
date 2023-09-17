@@ -35,7 +35,7 @@ GQ12::GQ12(const unsigned T, uvec&& N, const unsigned M, const double TH)
 int GQ12::initialize(const shared_ptr<DomainBase>& D) {
     auto& mat_proto = D->get<Material>(material_tag(0));
 
-    if(PlaneType::E == static_cast<PlaneType>(mat_proto->get_parameter(ParameterType::PLANETYPE))) suanpan::hacker(thickness) = 1.;
+    if(PlaneType::E == mat_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
 
     auto& mat_stiff = mat_proto->get_initial_stiffness();
 

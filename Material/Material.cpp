@@ -19,7 +19,7 @@
 #include "Domain/DomainBase.h"
 
 Material::Material(const unsigned T, const MaterialType MT, const double D)
-    : DataMaterial{1E-14, fabs(D), MT, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}}
+    : DataMaterial{1E-14, fabs(D), MT, PlaneType::N, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}}
     , DataCoupleMaterial{-1., {}, {}, {}, {}, {}, {}, {}, {}, {}}
     , Tag(T) {}
 
@@ -68,6 +68,8 @@ void Material::set_characteristic_length(const double L) { characteristic_length
 double Material::get_characteristic_length() const { return characteristic_length; }
 
 MaterialType Material::get_material_type() const { return material_type; }
+
+PlaneType Material::get_plane_type() const { return plane_type; }
 
 double Material::get_parameter(const ParameterType T) const { return T == ParameterType::DENSITY ? density : 0.; }
 

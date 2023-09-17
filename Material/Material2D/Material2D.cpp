@@ -20,8 +20,7 @@
 #include <Toolbox/tensor.h>
 
 Material2D::Material2D(const unsigned T, const PlaneType PT, const double R)
-    : Material(T, MaterialType::D2, R)
-    , plane_type(PT) {}
+    : Material(T, MaterialType::D2, R) { access::rw(plane_type) = PT; }
 
 vector<vec> Material2D::record(const OutputType P) {
     vector<vec> data;

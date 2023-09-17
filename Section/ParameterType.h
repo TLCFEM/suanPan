@@ -31,7 +31,6 @@ enum class ParameterType {
     G,
     PEAKSTRAIN,
     CRACKSTRAIN,
-    PLANETYPE,
     BULKMODULUS
 };
 

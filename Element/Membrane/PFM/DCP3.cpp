@@ -33,7 +33,7 @@ DCP3::DCP3(const unsigned T, uvec&& NT, const unsigned MT, const double CL, cons
 int DCP3::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
-    if(PlaneType::E == static_cast<PlaneType>(material_proto->get_parameter(ParameterType::PLANETYPE))) suanpan::hacker(thickness) = 1.;
+    if(PlaneType::E == material_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
 
     m_material = material_proto->get_copy();
 

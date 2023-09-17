@@ -42,7 +42,7 @@ DCP4::DCP4(const unsigned T, uvec&& N, const unsigned M, const double CL, const 
 int DCP4::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
-    if(PlaneType::E == static_cast<PlaneType>(material_proto->get_parameter(ParameterType::PLANETYPE))) suanpan::hacker(thickness) = 1.;
+    if(PlaneType::E == material_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
 
     const auto ele_coor = get_coordinate(2);
 

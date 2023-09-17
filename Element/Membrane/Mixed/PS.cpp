@@ -52,7 +52,7 @@ PS::PS(const unsigned T, uvec&& N, const unsigned M, const double TH)
 int PS::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
-    if(PlaneType::E == static_cast<PlaneType>(material_proto->get_parameter(ParameterType::PLANETYPE))) suanpan::hacker(thickness) = 1.;
+    if(PlaneType::E == material_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
 
     auto& ini_stiffness = material_proto->get_initial_stiffness();
 

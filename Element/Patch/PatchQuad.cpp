@@ -36,7 +36,7 @@ PatchQuad::PatchQuad(const unsigned T, vec&& KX, vec&& KY, uvec&& N, const unsig
 int PatchQuad::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
-    if(PlaneType::E == static_cast<PlaneType>(material_proto->get_parameter(ParameterType::PLANETYPE))) suanpan::hacker(thickness) = 1.;
+    if(PlaneType::E == material_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
 
     const NURBSSurface2D net(knot_pool[0], knot_pool[1]);
 

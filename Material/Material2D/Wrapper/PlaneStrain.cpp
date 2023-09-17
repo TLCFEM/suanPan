@@ -41,10 +41,7 @@ int PlaneStrain::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-double PlaneStrain::get_parameter(const ParameterType P) const {
-    if(ParameterType::PLANETYPE == P) return static_cast<double>(plane_type);
-    return base->get_parameter(P);
-}
+double PlaneStrain::get_parameter(const ParameterType P) const { return base->get_parameter(P); }
 
 unique_ptr<Material> PlaneStrain::get_copy() { return make_unique<PlaneStrain>(*this); }
 
