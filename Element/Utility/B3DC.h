@@ -49,7 +49,7 @@ protected:
     double elongation = 0.;
 
     mat trial_rotation{3, 2, fill::zeros}, current_rotation{3, 2, fill::zeros};
-    mat trial_n, current_n, reference;
+    mat trial_n, current_n, trial_ref, current_ref;
     field<mat> sn{6}, se{3};
 
     vec theta;
