@@ -175,8 +175,8 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
         kappa_c -= incre(2);
         new_stress -= dsigmadlambda * incre(0);
 
-        if(kappa_t > 1.) kappa_t = .999; // avoid overshoot
-        if(kappa_c > 1.) kappa_c = .999; // avoid overshoot
+        if(kappa_t > 1.) kappa_t = 1. - datum::eps; // avoid overshoot
+        if(kappa_c > 1.) kappa_c = 1. - datum::eps; // avoid overshoot
     }
 
     // update damage indices
