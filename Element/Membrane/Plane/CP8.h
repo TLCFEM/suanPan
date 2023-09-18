@@ -38,7 +38,8 @@ class CP8 final : public MaterialElement2D {
         vec coor;
         double weight;
         unique_ptr<Material> m_material;
-        mat pn_pxy, strain_mat;
+        mat pn_pxy;
+        sp_mat strain_mat;
         IntegrationPoint(vec&&, double, unique_ptr<Material>&&, mat&&);
     };
 

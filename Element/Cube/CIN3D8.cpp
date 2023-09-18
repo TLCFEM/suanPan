@@ -27,7 +27,7 @@ CIN3D8::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<M
     , weight(W)
     , c_material(std::forward<unique_ptr<Material>>(M))
     , pn_pxyz(std::forward<mat>(P))
-    , strain_mat(6, c_size, fill::zeros) {
+    , strain_mat(6, c_size) {
     for(auto I = 0u, J = 0u, K = 1u, L = 2u; I < c_node; ++I, J += c_dof, K += c_dof, L += c_dof) {
         strain_mat(0, J) = strain_mat(3, K) = strain_mat(5, L) = pn_pxyz(0, I);
         strain_mat(3, J) = strain_mat(1, K) = strain_mat(4, L) = pn_pxyz(1, I);

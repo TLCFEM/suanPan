@@ -29,7 +29,7 @@ CP5::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Mate
     , weight(W)
     , m_material(std::forward<unique_ptr<Material>>(M))
     , pn_pxy(std::forward<mat>(P))
-    , strain_mat(3, m_size, fill::zeros) {
+    , strain_mat(3, m_size) {
     for(auto I = 0u, J = 0u, K = 1u; I < m_node; ++I, J += m_dof, K += m_dof) {
         strain_mat(0, J) = strain_mat(2, K) = pn_pxy(0, I);
         strain_mat(2, J) = strain_mat(1, K) = pn_pxy(1, I);

@@ -38,7 +38,8 @@ class DC3D8 final : public MaterialElement3D {
         double weight;
         double maximum_energy = 0.;
         unique_ptr<Material> c_material;
-        mat n_mat, pn_mat, strain_mat;
+        mat n_mat, pn_mat;
+        sp_mat strain_mat;
         IntegrationPoint(vec&&, double, unique_ptr<Material>&&, mat&&, mat&&);
     };
 

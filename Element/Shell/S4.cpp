@@ -62,7 +62,7 @@ int S4::initialize(const shared_ptr<DomainBase>& D) {
 
     // Mindlin plate
     // check if proper shear modulus is available
-    // not vert vital as for multiplier any large value can be chosen
+    // not very vital as for multiplier any large value can be chosen
     auto shear_modulus = mat_proto->get_parameter(ParameterType::G);
     if(suanpan::approx_equal(0., shear_modulus)) shear_modulus = mat_proto->get_parameter(ParameterType::SHEARMODULUS);
     if(suanpan::approx_equal(0., shear_modulus)) shear_modulus = .5 * mat_proto->get_parameter(ParameterType::E) / (1. + mat_proto->get_parameter(ParameterType::POISSONSRATIO));
