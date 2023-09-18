@@ -24,12 +24,17 @@
 #include <Toolbox/tensor.h>
 #include <Toolbox/utility.h>
 
-CP7::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M, mat&& PNPXY)
+CP7::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M, mat&& P)
     : coor(std::forward<vec>(C))
     , weight(W)
     , m_material(std::forward<unique_ptr<Material>>(M))
-    , pn_pxy(std::forward<mat>(PNPXY))
-    , strain_mat(3, m_size, fill::zeros) {}
+    , pn_pxy(std::forward<mat>(P))
+    , strain_mat(3, m_size, fill::zeros) {
+    for(auto I = 0u, J = 0u, K = 1u; I < m_node; ++I, J += m_dof, K += m_dof) {
+        strain_mat(0, J) = strain_mat(2, K) = pn_pxy(0, I);
+        strain_mat(2, J) = strain_mat(1, K) = pn_pxy(1, I);
+    }
+}
 
 CP7::CP7(const unsigned T, uvec&& N, const unsigned M, const double TH, const bool F)
     : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, F, {DOF::U1, DOF::U2})
@@ -58,13 +63,8 @@ int CP7::initialize(const shared_ptr<DomainBase>& D) {
         const mat jacob = pn * ele_coor;
         int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob), material_proto->get_copy(), solve(jacob, pn));
 
-        auto& c_int_pt = int_pt.back();
-
-        for(unsigned J = 0, K = 0, L = 1; J < m_node; ++J, K += m_dof, L += m_dof) {
-            c_int_pt.strain_mat(0, K) = c_int_pt.strain_mat(2, L) = c_int_pt.pn_pxy(0, J);
-            c_int_pt.strain_mat(2, K) = c_int_pt.strain_mat(1, L) = c_int_pt.pn_pxy(1, J);
-        }
-        initial_stiffness += c_int_pt.weight * thickness * c_int_pt.strain_mat.t() * ini_stiffness * c_int_pt.strain_mat;
+        const auto& c_pt = int_pt.back();
+        initial_stiffness += c_pt.weight * thickness * c_pt.strain_mat.t() * ini_stiffness * c_pt.strain_mat;
     }
     trial_stiffness = current_stiffness = initial_stiffness;
 

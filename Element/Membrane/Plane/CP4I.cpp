@@ -22,13 +22,18 @@
 #include <Toolbox/shape.h>
 #include <Toolbox/utility.h>
 
-CP4I::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M, mat&& PNPXY)
+CP4I::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M, mat&& P)
     : coor(std::forward<vec>(C))
     , weight(W)
     , m_material(std::forward<unique_ptr<Material>>(M))
-    , pn_pxy(std::forward<mat>(PNPXY))
+    , pn_pxy(std::forward<mat>(P))
     , B1(3, m_size, fill::zeros)
-    , B2(3, 4, fill::zeros) {}
+    , B2(3, 4, fill::zeros) {
+    for(auto I = 0u, J = 0u, K = 1u; I < m_node; ++I, J += m_dof, K += m_dof) {
+        B1(0, J) = B1(2, K) = pn_pxy(0, I);
+        B1(2, J) = B1(1, K) = pn_pxy(1, I);
+    }
+}
 
 void CP4I::stack_stiffness(mat& K, const mat& D, const mat& N, const double F) {
     const auto D11 = F * D(0, 0);
@@ -261,11 +266,6 @@ int CP4I::initialize(const shared_ptr<DomainBase>& D) {
         int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob) * thickness, material_proto->get_copy(), solve(jacob, pn));
 
         auto& c_pt = int_pt.back();
-
-        for(auto J = 0u, K = 0u, L = 1u; J < m_node; ++J, K += m_dof, L += m_dof) {
-            c_pt.B1(0, K) = c_pt.B1(2, L) = c_pt.pn_pxy(0, J);
-            c_pt.B1(2, K) = c_pt.B1(1, L) = c_pt.pn_pxy(1, J);
-        }
 
         const vec pbn_pxy = solve(jacob, -2. * c_pt.coor);
         c_pt.B2(0, 0) = c_pt.B2(2, 1) = pbn_pxy(0);

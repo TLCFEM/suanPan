@@ -31,7 +31,13 @@ DC3D8::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Ma
     , c_material(std::forward<unique_ptr<Material>>(M))
     , n_mat(std::forward<mat>(N))
     , pn_mat(std::forward<mat>(P))
-    , strain_mat(6, 24, fill::zeros) {}
+    , strain_mat(6, 24, fill::zeros) {
+    for(auto I = 0u, J = 0u, K = 1u, L = 2u; I < c_node; ++I, J += 3, K += 3, L += 3) {
+        strain_mat(0, J) = strain_mat(3, K) = strain_mat(5, L) = pn_mat(0, I);
+        strain_mat(3, J) = strain_mat(1, K) = strain_mat(4, L) = pn_mat(1, I);
+        strain_mat(5, J) = strain_mat(4, K) = strain_mat(2, L) = pn_mat(2, I);
+    }
+}
 
 DC3D8::DC3D8(const unsigned T, uvec&& N, const unsigned M, const double CL, const double RR)
     : MaterialElement3D(T, c_node, c_dof, std::forward<uvec>(N), uvec{M}, false, {DOF::U1, DOF::U2, DOF::U3, DOF::DMG})
@@ -56,12 +62,7 @@ int DC3D8::initialize(const shared_ptr<DomainBase>& D) {
         const mat jacob = pn * ele_coor;
         int_pt.emplace_back(std::move(t_vec), plan(I, 3) * det(jacob), material_proto->get_copy(), shape::cube(t_vec, 0), solve(jacob, pn));
 
-        auto& c_pt = int_pt.back();
-        for(unsigned J = 0, K = 0, L = 1, M = 2; J < c_node; ++J, K += 3, L += 3, M += 3) {
-            c_pt.strain_mat(0, K) = c_pt.strain_mat(3, L) = c_pt.strain_mat(5, M) = c_pt.pn_mat(0, J);
-            c_pt.strain_mat(3, K) = c_pt.strain_mat(1, L) = c_pt.strain_mat(4, M) = c_pt.pn_mat(1, J);
-            c_pt.strain_mat(5, K) = c_pt.strain_mat(4, L) = c_pt.strain_mat(2, M) = c_pt.pn_mat(2, J);
-        }
+        const auto& c_pt = int_pt.back();
         initial_stiffness(u_dof, u_dof) += c_pt.weight * c_pt.strain_mat.t() * ini_stiffness * c_pt.strain_mat;
         initial_stiffness(d_dof, d_dof) += c_pt.weight * release_rate / characteristic_length * c_pt.n_mat.t() * c_pt.n_mat;
         initial_stiffness(d_dof, d_dof) += c_pt.weight * release_rate * characteristic_length * c_pt.pn_mat.t() * c_pt.pn_mat;

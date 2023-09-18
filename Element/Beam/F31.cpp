@@ -27,7 +27,11 @@ F31::IntegrationPoint::IntegrationPoint(const double C, const double W, unique_p
     : coor(C)
     , weight(W)
     , b_section(std::forward<unique_ptr<Section>>(M))
-    , strain_mat(3, 6, fill::zeros) {}
+    , strain_mat(3, 6, fill::zeros) {
+    strain_mat(0, 0) = 1.;
+    strain_mat(1, 1) = strain_mat(2, 3) = .5 * coor - .5;
+    strain_mat(1, 2) = strain_mat(2, 4) = .5 * coor + .5;
+}
 
 F31::F31(const unsigned T, uvec&& N, const unsigned S, const unsigned O, const unsigned P, const bool F)
     : SectionElement3D(T, b_node, b_dof, std::forward<uvec>(N), uvec{S}, F)
@@ -66,9 +70,6 @@ int F31::initialize(const shared_ptr<DomainBase>& D) {
     int_pt.reserve(int_pt_num);
     for(unsigned I = 0; I < int_pt_num; ++I) {
         int_pt.emplace_back(plan(I, 0), .5 * plan(I, 1), section_proto->get_copy());
-        int_pt[I].strain_mat(0, 0) = 1.;
-        int_pt[I].strain_mat(1, 1) = int_pt[I].strain_mat(2, 3) = .5 * plan(I, 0) - .5;
-        int_pt[I].strain_mat(1, 2) = int_pt[I].strain_mat(2, 4) = .5 * plan(I, 0) + .5;
         // factor .5 moved to weight
         initial_local_flexibility += int_pt[I].strain_mat.t() * solve(section_stiffness, int_pt[I].strain_mat * int_pt[I].weight * length);
     }

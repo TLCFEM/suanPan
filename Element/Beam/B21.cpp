@@ -25,7 +25,11 @@ B21::IntegrationPoint::IntegrationPoint(const double C, const double W, unique_p
     : coor(C)
     , weight(W)
     , b_section(std::forward<unique_ptr<Section>>(M))
-    , strain_mat(2, 3, fill::zeros) {}
+    , strain_mat(2, 3, fill::zeros) {
+    strain_mat(0, 0) = 1.;
+    strain_mat(1, 1) = 3. * coor - 1.;
+    strain_mat(1, 2) = 3. * coor + 1.;
+}
 
 B21::B21(const unsigned T, uvec&& N, const unsigned S, const unsigned P, const bool F)
     : SectionElement2D(T, b_node, b_dof, std::forward<uvec>(N), uvec{S}, F)
@@ -46,9 +50,6 @@ int B21::initialize(const shared_ptr<DomainBase>& D) {
     int_pt.reserve(int_pt_num);
     for(unsigned I = 0; I < int_pt_num; ++I) {
         int_pt.emplace_back(plan(I, 0), .5 * plan(I, 1), section_proto->get_copy());
-        int_pt[I].strain_mat(0, 0) = 1.;
-        int_pt[I].strain_mat(1, 1) = 3. * plan(I, 0) - 1.;
-        int_pt[I].strain_mat(1, 2) = 3. * plan(I, 0) + 1.;
         local_stiffness += int_pt[I].strain_mat.t() * int_pt[I].b_section->get_initial_stiffness() * int_pt[I].strain_mat * int_pt[I].weight / length;
     }
 

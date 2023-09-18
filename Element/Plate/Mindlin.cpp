@@ -62,10 +62,10 @@ int Mindlin::initialize(const shared_ptr<DomainBase>& D) {
     mat jacob = pn * ele_coor;
     mat pn_pxy = solve(jacob, pn);
     mat penalty_mat(2, p_size, fill::zeros);
-    for(uword I = 0; I < p_node; ++I) {
+    for(auto I = 0u; I < p_node; ++I) {
         penalty_mat(0, I * p_dof) = pn_pxy(1, I);
         penalty_mat(1, I * p_dof) = pn_pxy(0, I);
-        penalty_mat(0, I * p_dof + 1llu) = -(penalty_mat(1, I * p_dof + 2llu) = n(I));
+        penalty_mat(0, I * p_dof + 1u) = -(penalty_mat(1, I * p_dof + 2u) = n(I));
     }
     initial_stiffness = penalty_stiffness = 10. / 3. * shear_modulus * thickness * det(jacob) * penalty_mat.t() * penalty_mat;
 

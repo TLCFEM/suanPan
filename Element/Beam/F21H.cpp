@@ -25,7 +25,11 @@ F21H::IntegrationPoint::IntegrationPoint(const double C, const double W, unique_
     : coor(C)
     , weight(W)
     , b_section(std::forward<unique_ptr<Section>>(M))
-    , B(2, 3, fill::zeros) { B(0, 0) = 1.; }
+    , B(2, 3, fill::zeros) {
+    B(0, 0) = 1.;
+    B(1, 1) = .5 * (coor - 1.);
+    B(1, 2) = .5 * (coor + 1.);
+}
 
 F21H::F21H(const unsigned T, uvec&& N, const unsigned S, const double L, const bool F)
     : SectionElement2D(T, b_node, b_dof, std::forward<uvec>(N), uvec{S}, F)
@@ -69,9 +73,6 @@ int F21H::initialize(const shared_ptr<DomainBase>& D) {
             weight = .5 * plan(I - 1, 1) * elastic_length;
         }
         elastic_int_pt.emplace_back(coor, weight, section_proto->get_copy());
-        // first element moved to ctor
-        elastic_int_pt[I].B(1, 1) = .5 * (coor - 1.);
-        elastic_int_pt[I].B(1, 2) = .5 * (coor + 1.);
         elastic_local_flexibility += elastic_int_pt[I].B.t() * elastic_section_flexibility * elastic_int_pt[I].B * weight * length;
     }
 
@@ -81,11 +82,7 @@ int F21H::initialize(const shared_ptr<DomainBase>& D) {
     int_pt.reserve(2);
     int_pt.emplace_back(-1., hinge_length, section_proto->get_copy());
     int_pt.emplace_back(1., hinge_length, section_proto->get_copy());
-    for(auto& I : int_pt) {
-        I.B(1, 1) = .5 * (I.coor - 1.);
-        I.B(1, 2) = .5 * (I.coor + 1.);
-        initial_local_flexibility += I.B.t() * elastic_section_flexibility * I.B * I.weight * length;
-    }
+    for(auto& I : int_pt) initial_local_flexibility += I.B.t() * elastic_section_flexibility * I.B * I.weight * length;
 
     trial_local_flexibility = current_local_flexibility = initial_local_flexibility;
 
