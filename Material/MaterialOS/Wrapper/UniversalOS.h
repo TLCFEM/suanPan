@@ -42,9 +42,9 @@ public:
     void print() override;
 };
 
-class OS03 final : public UniversalOS {
+class OS14 final : public UniversalOS {
 public:
-    OS03(unsigned, // tag
+    OS14(unsigned, // tag
          unsigned, // 3D material tag
          unsigned  // max iteration
     );

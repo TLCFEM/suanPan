@@ -6373,10 +6373,10 @@
       "trigger":"PlaneStress"
     },
     {
-      "contents":"material OS03 ${1:(1)} ${2:(2)}\n# (1) int, unique tag\n# (2) int, 3D material tag",
+      "contents":"material OS14 ${1:(1)} ${2:(2)}\n# (1) int, unique tag\n# (2) int, 3D material tag",
       "details":"",
       "kind":"type",
-      "trigger":"OS03"
+      "trigger":"OS14"
     },
     {
       "contents":"",

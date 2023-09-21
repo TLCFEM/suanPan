@@ -3475,7 +3475,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "NLE3D01")) new_nle3d01(new_material, command);
     else if(is_equal(material_id, "Nonviscous01")) new_nonviscous01(new_material, command);
     else if(is_equal(material_id, "OrthotropicElastic3D")) new_orthotropicelastic3d(new_material, command);
-    else if(is_equal(material_id, "OS03")) new_wrapper<OS03>(new_material, command);
+    else if(is_equal(material_id, "OS14")) new_wrapper<OS14>(new_material, command);
     else if(is_equal(material_id, "ParabolicCC")) new_paraboliccc(new_material, command);
     else if(is_equal(material_id, "Parallel")) new_parallel(new_material, command);
     else if(is_equal(material_id, "PlaneStrain")) new_planestrain(new_material, command, 0);

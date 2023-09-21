@@ -4,7 +4,7 @@
     <ShowAllFiles>false</ShowAllFiles>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>-f OS03</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-f OS14</LocalDebuggerCommandArguments>
     <LocalDebuggerWorkingDirectory>..\..\..\Example\Material</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
