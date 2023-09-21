@@ -69,13 +69,19 @@ int NonlinearJ2::update_trial_status(const vec& t_strain) {
 
     auto yield_func = norm_rel_stress - root_two_third * k;
 
-    if(yield_func < 0.) return SUANPAN_SUCCESS;
+    if(yield_func <= 0.) return SUANPAN_SUCCESS;
 
     const auto current_h = compute_h(plastic_strain);
-    auto gamma = 0., incre_h = 0., denom = 0.;
+    auto gamma = 0., incre_h = 0.;
+    double denom;
     auto counter = 0u;
     auto ref_error = 1.;
-    while(++counter < max_iteration) {
+    while(true) {
+        if(max_iteration == ++counter) {
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
+            return SUANPAN_FAIL;
+        }
+
         denom = double_shear + two_third * (dk + compute_dh(plastic_strain));
         const auto incre_gamma = yield_func / denom;
         const auto error = fabs(incre_gamma);
@@ -85,11 +91,6 @@ int NonlinearJ2::update_trial_status(const vec& t_strain) {
         incre_h = compute_h(plastic_strain = current_history(0) + root_two_third * (gamma += incre_gamma)) - current_h;
         update_isotropic_hardening();
         yield_func = norm_rel_stress - double_shear * gamma - root_two_third * (k + incre_h);
-    }
-
-    if(max_iteration == counter) {
-        suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
-        return SUANPAN_FAIL;
     }
 
     back_stress += root_two_third * incre_h / norm_rel_stress * rel_stress;
