@@ -36,7 +36,7 @@ struct DataNonlinearK4 {
 };
 
 class NonlinearK4 : protected DataNonlinearK4, public Material1D {
-    static constexpr unsigned max_iteration = 20;
+    static constexpr unsigned max_iteration = 20u;
 
     const bool apply_damage = true, apply_crack_closing = true;
 

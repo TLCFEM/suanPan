@@ -19,11 +19,9 @@
 #include <Recorder/OutputType.h>
 #include <Toolbox/tensor.h>
 
-constexpr unsigned NonlinearGurson1D::max_iteration = 20;
-
 NonlinearGurson1D::NonlinearGurson1D(const unsigned T, const double E, const double V, const double Q1, const double Q2, const double FN, const double SN, const double EN, const double R)
     : DataNonlinearGurson1D{E, V, Q1, Q2, FN, SN, EN}
-    , Material1D(T, R) { access::rw(tolerance) = 1E-13; }
+    , Material1D(T, R) {}
 
 int NonlinearGurson1D::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = elastic_modulus;
@@ -61,7 +59,8 @@ int NonlinearGurson1D::update_trial_status(const vec& t_strain) {
     vec incre, residual(4);
     auto gamma = 0.;
 
-    unsigned counter = 0;
+    auto counter = 0u;
+    auto ref_error = 1.;
     while(true) {
         if(max_iteration == ++counter) {
             suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
@@ -104,9 +103,10 @@ int NonlinearGurson1D::update_trial_status(const vec& t_strain) {
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
-        const auto error = norm(residual);
+        const auto error = inf_norm(incre);
+        if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error <= tolerance || norm(incre) <= tolerance) break;
+        if(error < tolerance * ref_error || (inf_norm(residual) < tolerance && counter > 5u)) break;
 
         gamma -= incre(0);
         pe -= incre(1);

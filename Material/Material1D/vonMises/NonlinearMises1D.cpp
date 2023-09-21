@@ -43,11 +43,12 @@ int NonlinearMises1D::update_trial_status(const vec& t_strain) {
     const auto shifted_stress = trial_stress(0) - back_stress;
     const auto norm_shifted_stress = fabs(shifted_stress);
 
-    if(auto yield_func = norm_shifted_stress - std::max(0., compute_k(plastic_strain)); yield_func >= 0.) {
+    if(auto yield_func = norm_shifted_stress - std::max(0., compute_k(plastic_strain)); yield_func > 0.) {
         const auto current_h = compute_h(plastic_strain);
         auto gamma = 0., incre_h = 0.;
         double dkdh;
         auto counter = 0u;
+        auto ref_error = 1.;
         while(true) {
             if(max_iteration == ++counter) {
                 suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
@@ -55,9 +56,10 @@ int NonlinearMises1D::update_trial_status(const vec& t_strain) {
             }
 
             const auto incre_gamma = yield_func / (elastic_modulus + (dkdh = compute_dk(plastic_strain) + compute_dh(plastic_strain)));
-            const auto abs_error = fabs(incre_gamma);
-            suanpan_debug("Local iteration error: {:.5E}.\n", abs_error);
-            if(abs_error <= tolerance) break;
+            const auto error = fabs(incre_gamma);
+            if(1u == counter) ref_error = error;
+            suanpan_debug("Local iteration error: {:.5E}.\n", error);
+            if(error < tolerance * ref_error || (fabs(yield_func) < tolerance && counter > 5u)) break;
             incre_h = compute_h(plastic_strain = current_history(0) + (gamma += incre_gamma)) - current_h;
             yield_func = norm_shifted_stress - elastic_modulus * gamma - std::max(0., compute_k(plastic_strain)) - incre_h;
         }

@@ -291,18 +291,21 @@ int CDPM2::compute_damage_factor(const double kd, const double kd1, const double
     }
 
     auto counter = 0u;
+    auto ref_error = 1.;
     while(true) {
         if(max_iteration == ++counter) return SUANPAN_FAIL;
 
         const auto term_a = ft * exp(-(kd1 + omega * kd2) / ef);
         const auto term_b = (1. - omega) * elastic_modulus;
+        const auto residual = term_a - term_b * kd;
         const auto jacobian = elastic_modulus * kd - kd2 / ef * term_a;
-        const auto incre = (term_a - term_b * kd) / jacobian;
+        const auto incre = residual / jacobian;
 
         const auto error = fabs(incre);
+        if(1u == counter) ref_error = error;
         suanpan_debug("Local damage iteration error: {:.5E}.\n", error);
 
-        if(error <= tolerance) {
+        if(error < tolerance * ref_error || (fabs(residual) < tolerance && counter > 5u)) {
             popkd = term_b / jacobian;
             popkd1 = term_a / ef / jacobian;
             popkd2 = popkd1 * omega;
@@ -316,7 +319,7 @@ int CDPM2::compute_damage_factor(const double kd, const double kd1, const double
 CDPM2::CDPM2(const unsigned T, const double E, const double V, const double FT, const double FC, const double QH0, const double HP, const double DF, const double AH, const double BH, const double CH, const double DH, const double AS, const double EFT, const double EFC, const DamageType DT, const double R)
     : DataCDPM2{fabs(E), fabs(V), fabs(FT), fabs(FC), QH0, HP, DF, AH, BH, CH, DH, AS, fabs(EFT), fabs(EFC)}
     , Material3D(T, R)
-    , damage_type(DT) { access::rw(tolerance) = 1E-13; }
+    , damage_type(DT) {}
 
 int CDPM2::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = tensor::isotropic_stiffness(elastic_modulus, poissons_ratio);
@@ -421,11 +424,11 @@ int CDPM2::update_trial_status(const vec& t_strain) {
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
-        const auto error = norm(residual);
-        if(1u == counter && error > ref_error) ref_error = error;
+        const auto error = inf_norm(incre);
+        if(1u == counter) ref_error = error;
         suanpan_debug("Local plasticity iteration error: {:.5E}.\n", error);
 
-        if(error <= tolerance * std::max(1., ref_error)) {
+        if(error < tolerance * ref_error || (inf_norm(residual) < tolerance && counter > 5u)) {
             const vec unit_n = n % tensor::stress::norm_weight;
 
             plastic_strain += gamma * gs * unit_n + gamma * gp / 3. * tensor::unit_tensor2;

@@ -38,7 +38,7 @@ struct DataBWBN {
 };
 
 class BWBN final : protected DataBWBN, public Material1D {
-    static constexpr unsigned max_iteration = 20;
+    static constexpr unsigned max_iteration = 20u;
 
     const double& elastic_modulus = pool(0);
     const double& yield_stress = pool(1);

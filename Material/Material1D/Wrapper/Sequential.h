@@ -37,7 +37,7 @@
 #include <Toolbox/ResourceHolder.h>
 
 class Sequential final : public Material1D {
-    static const unsigned max_iteration;
+    static constexpr unsigned max_iteration = 20u;
 
     const uword mat_size;
     const uvec mat_tag;

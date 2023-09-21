@@ -32,7 +32,7 @@
 #include <Toolbox/ResourceHolder.h>
 
 class Maxwell final : public Material1D {
-    static constexpr unsigned max_iteration = 20;
+    static constexpr unsigned max_iteration = 20u;
 
     const double* incre_time = nullptr;
 

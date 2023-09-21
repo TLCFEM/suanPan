@@ -39,7 +39,7 @@ struct DataNonlinearGurson1D {
 };
 
 class NonlinearGurson1D : protected DataNonlinearGurson1D, public Material1D {
-    static const unsigned max_iteration;
+    static constexpr unsigned max_iteration = 20u;
 
     const double bulk = elastic_modulus / (3. - 6. * poissons_ratio); // bulk modulus
     const double three_bulk = 3. * bulk;

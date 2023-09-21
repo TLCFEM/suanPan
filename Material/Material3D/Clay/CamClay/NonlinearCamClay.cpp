@@ -23,7 +23,7 @@ const mat NonlinearCamClay::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 NonlinearCamClay::NonlinearCamClay(const unsigned T, const double E, const double V, const double B, const double M, const double P, const double R)
     : DataNonlinearCamClay{fabs(E), fabs(V), B * B, fabs(M), fabs(P)}
-    , Material3D(T, R) { access::rw(tolerance) = 1E-13; }
+    , Material3D(T, R) {}
 
 int NonlinearCamClay::initialize(const shared_ptr<DomainBase>&) {
     current_stiffness = trial_stiffness = initial_stiffness = tensor::isotropic_stiffness(elastic_modulus, poissons_ratio);
@@ -57,12 +57,13 @@ int NonlinearCamClay::update_trial_status(const vec& t_strain) {
     const auto trial_q = sqrt_three_two * tensor::stress::norm(trial_s);
     const auto p = tensor::mean3(trial_stress);
 
-    auto gamma = 0., rel_error = 0.;
+    auto gamma = 0.;
 
     vec residual(2), incre;
     mat jacobian(2, 2);
 
-    unsigned counter = 0;
+    auto counter = 0u;
+    auto rel_error = 1.;
     while(true) {
         if(max_iteration == ++counter) {
             suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
@@ -91,10 +92,10 @@ int NonlinearCamClay::update_trial_status(const vec& t_strain) {
 
         if(!solve(incre, jacobian, residual, solve_opts::equilibrate)) return SUANPAN_FAIL;
 
-        auto error = norm(residual);
-        if(1u == counter) rel_error = std::max(1., error);
-        suanpan_debug("Local iteration error: {:.5E}.\n", error / rel_error);
-        if(error <= tolerance * std::max(1., rel_error) || norm(incre) <= tolerance) {
+        const auto error = inf_norm(incre);
+        if(1u == counter) rel_error = error;
+        suanpan_debug("Local iteration error: {:.5E}.\n", error);
+        if(error < tolerance * rel_error || (inf_norm(residual) < tolerance && counter > 5u)) {
             mat left(6, 2);
 
             rel_error = 2. * bulk / square_b; // reuse variable

@@ -46,7 +46,7 @@ struct DataSteelBRB {
 };
 
 class SteelBRB final : protected DataSteelBRB, public Material1D {
-    static constexpr unsigned max_iteration = 20;
+    static constexpr unsigned max_iteration = 20u;
 
     const double s_modulus = -elastic_modulus - plastic_modulus;
     const double c_const = (c_saturated_stress - yield_stress) / c_scalar;

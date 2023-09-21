@@ -39,7 +39,7 @@ struct DataNonlinearJ2 {
 };
 
 class NonlinearJ2 : protected DataNonlinearJ2, public Material3D {
-    static constexpr unsigned max_iteration = 20;
+    static constexpr unsigned max_iteration = 20u;
     static constexpr double two_third = 2. / 3.;
     static const double root_two_third;
     static const mat unit_dev_tensor;

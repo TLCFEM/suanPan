@@ -40,7 +40,7 @@ struct DataNonlinearHoffman {
 class NonlinearHoffman : protected DataNonlinearHoffman, public Material3D {
     static constexpr double two_third = 2. / 3.;
     static const double root_two_third;
-    static const unsigned max_iteration;
+    static constexpr unsigned max_iteration = 20u;
     static const uword sa;
     static const span sb;
 

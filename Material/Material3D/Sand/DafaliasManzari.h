@@ -52,7 +52,7 @@ struct DataDafaliasManzari {
 };
 
 class DafaliasManzari final : protected DataDafaliasManzari, public Material3D {
-    static constexpr unsigned max_iteration = 20;
+    static constexpr unsigned max_iteration = 20u;
     static const mat unit_dev_tensor;
 
     const double pr = (2. + 2. * poissons_ratio) / (3. - 6. * poissons_ratio);

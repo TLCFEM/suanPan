@@ -60,20 +60,24 @@ int NonlinearDruckerPrager::update_trial_status(const vec& t_strain) {
 
     if(yield_const <= xi * compute_c(plastic_strain)) return SUANPAN_SUCCESS;
 
-    auto gamma = 0., denominator = 0.;
+    auto gamma = 0.;
+    double denominator;
 
     auto counter = 0u;
-    while(++counter < max_iteration) {
-        const auto incre_gamma = (yield_const - factor_a * gamma - xi * compute_c(plastic_strain)) / (denominator = factor_a + xi * xi * compute_dc(plastic_strain));
-        const auto error = fabs(incre_gamma);
-        suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error <= tolerance) break;
-        plastic_strain = current_history(0) + xi * (gamma += incre_gamma);
-    }
+    auto ref_error = 1.;
+    while(true) {
+        if(max_iteration == ++counter) {
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
+            return SUANPAN_FAIL;
+        }
 
-    if(max_iteration == counter) {
-        suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
-        return SUANPAN_FAIL;
+        const auto residual = yield_const - factor_a * gamma - xi * compute_c(plastic_strain);
+        const auto incre_gamma = residual / (denominator = factor_a + xi * xi * compute_dc(plastic_strain));
+        const auto error = fabs(incre_gamma);
+        if(1u == counter) ref_error = error;
+        suanpan_debug("Local iteration error: {:.5E}.\n", error);
+        if(error < tolerance * ref_error || (fabs(residual) < tolerance && counter > 5u)) break;
+        plastic_strain = current_history(0) + xi * (gamma += incre_gamma);
     }
 
     if(sqrt_j2 >= shear * gamma) {
@@ -94,19 +98,20 @@ int NonlinearDruckerPrager::update_trial_status(const vec& t_strain) {
         gamma = 0.; // volumetric strain reuse variable
         plastic_strain = current_history(0);
 
-        counter = 0;
-        while(++counter < max_iteration) {
+        counter = 0u;
+        while(true) {
+            if(max_iteration == ++counter) {
+                suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
+                return SUANPAN_FAIL;
+            }
+
             const auto residual = compute_c(plastic_strain) * xi / eta_flow - hydro_stress + bulk * gamma;
             const auto incre_gamma = residual / (denominator = factor_b * compute_dc(plastic_strain) + bulk);
             const auto error = fabs(incre_gamma);
+            if(1u == counter) ref_error = error;
             suanpan_debug("Local iteration error: {:.5E}.\n", error);
-            if(error <= tolerance) break;
+            if(error < tolerance * ref_error || (fabs(residual) < tolerance && counter > 5u)) break;
             plastic_strain = current_history(0) + xi / eta_yield * (gamma -= incre_gamma);
-        }
-
-        if(max_iteration == counter) {
-            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
-            return SUANPAN_FAIL;
         }
 
         trial_stress = (hydro_stress - bulk * gamma) * tensor::unit_tensor2;

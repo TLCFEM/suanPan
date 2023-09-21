@@ -26,7 +26,7 @@ Maxwell::Maxwell(const unsigned T, const unsigned DT, const unsigned ST, const b
     , spring_tag(ST)
     , proceed(PC)
     , use_matrix(UM)
-    , beta(std::min(std::max(0., std::fabs(BT)), 1.)) { access::rw(tolerance) = 1E-12; }
+    , beta(std::min(std::max(0., std::fabs(BT)), 1.)) { access::rw(tolerance) = 5E-13; }
 
 int Maxwell::initialize(const shared_ptr<DomainBase>& D) {
     damper = suanpan::initialized_material_copy(D, damper_tag);
@@ -70,9 +70,9 @@ int Maxwell::update_trial_status(const vec& t_strain, const vec& t_strain_rate) 
 
     vec solution(3, fill::zeros);
 
-    counter = 0;
+    counter = 0u;
 
-    if(double error, ref_error = 1.; use_matrix) {
+    if(double error, ref_error = 1., ref_residual = 1.; use_matrix) {
         mat inv_jacobian(3, 3);
 
         inv_jacobian(0, 2) = -factor_a;
@@ -92,9 +92,13 @@ int Maxwell::update_trial_status(const vec& t_strain, const vec& t_strain_rate) 
 
             const vec incre = inv_jacobian * residual / (factor_a * (K1 + K2) + K3);
 
-            if(1 == counter) ref_error = std::max(1., norm(residual));
-            suanpan_debug("Local iteration error: {:.5E}.\n", error = norm(residual) / ref_error);
-            if(norm(incre) <= tolerance && error <= tolerance) break;
+            error = inf_norm(incre);
+            if(1u == counter) {
+                ref_error = error;
+                ref_residual = inf_norm(residual);
+            }
+            suanpan_debug("Local iteration error: {:.5E}.\n", error);
+            if(error < tolerance * ref_error || inf_norm(residual) < tolerance * ref_residual) break;
             solution += incre;
             spring->update_incre_status(solution(0));
             damper->update_incre_status(solution(1), solution(2));
@@ -108,9 +112,13 @@ int Maxwell::update_trial_status(const vec& t_strain, const vec& t_strain_rate) 
             const auto residual = residual_a * K2 - residual_c + residual_b / factor_a * K3;
             const auto jacobian = K1 + K2 + K3 / factor_a;
             const auto incre = residual / jacobian;
-            if(1 == counter) ref_error = std::max(1., fabs(residual));
-            suanpan_debug("Local iteration error: {:.5E}.\n", error = fabs(residual) / ref_error);
-            if(fabs(incre) <= tolerance && error <= tolerance) break;
+            error = fabs(incre);
+            if(1u == counter) {
+                ref_error = error;
+                ref_residual = fabs(residual);
+            }
+            suanpan_debug("Local iteration error: {:.5E}.\n", error);
+            if(error < tolerance * ref_error || fabs(residual) < tolerance * ref_residual) break;
             solution(0) += incre;
             solution(1) += residual_a - incre;
             solution(2) += (residual_b - incre) / factor_a;

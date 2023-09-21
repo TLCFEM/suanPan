@@ -16,8 +16,6 @@
  ******************************************************************************/
 
 #include "AbsResidual.h"
-#include <Domain/DomainBase.h>
-#include <Domain/Factory.hpp>
 
 AbsResidual::AbsResidual(const unsigned T, const double E, const unsigned M, const bool P)
     : Converger(T, E, M, P) {}
@@ -25,9 +23,7 @@ AbsResidual::AbsResidual(const unsigned T, const double E, const unsigned M, con
 unique_ptr<Converger> AbsResidual::get_copy() { return make_unique<AbsResidual>(*this); }
 
 bool AbsResidual::is_converged(unsigned) {
-    auto& W = get_domain().lock()->get_factory();
-
-    set_error(norm(get_residual()) / static_cast<double>(W->get_size()));
+    set_error(inf_norm(get_residual()));
     set_conv_flag(get_tolerance() > get_error());
 
     if(is_print())

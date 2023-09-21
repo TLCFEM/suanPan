@@ -49,7 +49,7 @@ struct DataNonlinearCamClay {
 };
 
 class NonlinearCamClay : protected DataNonlinearCamClay, public Material3D {
-    static constexpr unsigned max_iteration = 20;
+    static constexpr unsigned max_iteration = 20u;
     static const double sqrt_three_two;
     static const mat unit_dev_tensor;
 

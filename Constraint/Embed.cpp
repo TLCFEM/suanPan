@@ -39,12 +39,12 @@ int Embed::initialize(const shared_ptr<DomainBase>& D) {
 
     rowvec n;
 
-    unsigned counter = 0;
+    auto counter = 0u;
     while(true) {
         if(max_iteration == ++counter) return SUANPAN_FAIL;
 
         const vec incre = solve((t_element->compute_shape_function(t_para, 1) * t_coor).t(), n_coor - ((n = t_element->compute_shape_function(t_para, 0)) * t_coor).t());
-        if(norm(incre) < 1E-14) break;
+        if(inf_norm(incre) < 1E-14) break;
         t_para += incre;
     }
 

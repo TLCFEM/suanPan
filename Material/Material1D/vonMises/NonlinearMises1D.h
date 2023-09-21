@@ -35,7 +35,7 @@ struct DataMises1D {
 };
 
 class NonlinearMises1D : protected DataMises1D, public Material1D {
-    static constexpr unsigned max_iteration = 20;
+    static constexpr unsigned max_iteration = 20u;
 
     [[nodiscard]] virtual double compute_k(double) const = 0;
     [[nodiscard]] virtual double compute_dk(double) const = 0;

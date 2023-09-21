@@ -68,25 +68,29 @@ int NonlinearPeric::update_trial_status(const vec& t_strain) {
 
     auto residual = eqv_stress - k;
 
-    if(residual < 0.) return SUANPAN_SUCCESS;
+    if(residual <= 0.) return SUANPAN_SUCCESS;
 
     auto gamma = 0., pow_term = 1., denom = *incre_time;
-    unsigned counter = 0;
-    while(++counter < max_iteration) {
+    auto counter = 0u;
+    auto ref_error = 1.;
+    while(true) {
+        if(max_iteration == ++counter) {
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
+            return SUANPAN_FAIL;
+        }
+
         const auto gradient = (triple_shear + factor_a * (eqv_stress - triple_shear * gamma) / denom) * pow_term - dk;
         const auto incre_gamma = residual / gradient;
-        suanpan_debug("Local iteration error: {:.5E}.\n", incre_gamma);
-        if(fabs(incre_gamma) <= tolerance) break;
+        const auto error = fabs(incre_gamma);
+        if(1u == counter) ref_error = error;
+        suanpan_debug("Local iteration error: {:.5E}.\n", error);
+        if(error < tolerance * ref_error || ((fabs(residual) < tolerance || error < datum::eps) && counter > 5u)) break;
+
         plastic_strain = current_history(0) + (gamma += incre_gamma);
         denom = *incre_time + mu * gamma;
         pow_term = pow(*incre_time / denom, epsilon);
         update_isotropic_hardening();
         residual = (eqv_stress - triple_shear * gamma) * pow_term - k;
-    }
-
-    if(max_iteration == counter) {
-        suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
-        return SUANPAN_FAIL;
     }
 
     trial_stress -= gamma * triple_shear / eqv_stress * dev_stress;
