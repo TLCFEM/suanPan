@@ -90,7 +90,7 @@ int NonlinearJ2::update_trial_status(const vec& t_strain) {
             ref_residual = fabs(yield_func);
         }
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || fabs(yield_func) < tolerance * ref_residual) break;
+        if(error < datum::eps || error < tolerance * ref_error || fabs(yield_func) < tolerance * ref_residual) break;
         incre_h = compute_h(plastic_strain = current_history(0) + root_two_third * (gamma += incre_gamma)) - current_h;
         update_isotropic_hardening();
         yield_func = norm_rel_stress - double_shear * gamma - root_two_third * (k + incre_h);
