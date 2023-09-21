@@ -6361,16 +6361,22 @@
       "trigger":"PenaltyBC"
     },
     {
-      "contents":"",
+      "contents":"material PlaneStrain ${1:(1)} ${2:(2)}\n# (1) int, unique tag\n# (2) int, 3D material tag",
       "details":"",
       "kind":"type",
       "trigger":"PlaneStrain"
     },
     {
-      "contents":"",
+      "contents":"material PlaneStress ${1:(1)} ${2:(2)}\n# (1) int, unique tag\n# (2) int, 3D material tag",
       "details":"",
       "kind":"type",
       "trigger":"PlaneStress"
+    },
+    {
+      "contents":"material OS03 ${1:(1)} ${2:(2)}\n# (1) int, unique tag\n# (2) int, 3D material tag",
+      "details":"",
+      "kind":"type",
+      "trigger":"OS03"
     },
     {
       "contents":"",
