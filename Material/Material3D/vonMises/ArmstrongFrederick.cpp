@@ -48,7 +48,7 @@ double ArmstrongFrederick::get_parameter(const ParameterType P) const {
 int ArmstrongFrederick::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
-    if(norm(incre_strain) <= tolerance) return SUANPAN_SUCCESS;
+    if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
 
     trial_stress = current_stress + (trial_stiffness = initial_stiffness) * incre_strain;
 
@@ -68,7 +68,8 @@ int ArmstrongFrederick::update_trial_status(const vec& t_strain) {
     auto gamma = 0.;
     double norm_xi, jacobian;
 
-    unsigned counter = 0;
+    auto counter = 0u;
+    auto ref_error = 1.;
     while(true) {
         if(max_iteration == ++counter) {
             suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
@@ -99,8 +100,10 @@ int ArmstrongFrederick::update_trial_status(const vec& t_strain) {
         jacobian = root_three_two * sum_b - three_shear - dk;
 
         const auto incre = yield_func / jacobian;
-        suanpan_debug("Local iteration error: {:.5E}.\n", fabs(incre));
-        if(fabs(incre) <= tolerance) break;
+        const auto error = fabs(incre);
+        if(1u == counter && error > ref_error) ref_error = error;
+        suanpan_debug("Local iteration error: {:.5E}.\n", error);
+        if(error <= tolerance * std::max(1., ref_error)) break;
 
         gamma -= incre;
         p -= incre;

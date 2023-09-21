@@ -44,7 +44,7 @@ double NonlinearGurson1D::get_parameter(const ParameterType P) const {
 int NonlinearGurson1D::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
-    if(norm(incre_strain) <= tolerance) return SUANPAN_SUCCESS;
+    if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
 
     trial_stress = current_stress + (trial_stiffness = initial_stiffness) * incre_strain;
 

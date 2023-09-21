@@ -52,7 +52,7 @@ double DafaliasManzari::get_parameter(const ParameterType P) const {
 int DafaliasManzari::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
-    if(norm(incre_strain) <= tolerance) return SUANPAN_SUCCESS;
+    if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
 
     const auto current_p = tensor::mean3(current_stress);
     const auto current_s = tensor::dev(current_stress);
@@ -103,8 +103,8 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
         auto error = norm(residual);
         if(1u == counter) ref_error = std::max(1., error);
-        suanpan_debug("Local elastic iteration error: {:.5E}.\n", error /= ref_error);
-        if(error <= tolerance) break;
+        suanpan_debug("Local elastic iteration error: {:.5E}.\n", error / ref_error);
+        if(error <= tolerance * std::max(1., ref_error)) break;
 
         p -= incre(sa);
         s -= incre(sb);

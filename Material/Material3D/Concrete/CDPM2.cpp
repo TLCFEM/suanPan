@@ -340,7 +340,7 @@ double CDPM2::get_parameter(const ParameterType P) const {
 int CDPM2::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
-    if(norm(incre_strain) <= tolerance) return SUANPAN_SUCCESS;
+    if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
 
     trial_history = current_history;
     const auto& current_kp = current_history(0);
@@ -384,7 +384,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     const auto& dxhdp = data(14);
 
     auto counter = 0u;
-
+    auto ref_error = 1.;
     while(true) {
         if(max_iteration == ++counter) {
             suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
@@ -422,9 +422,10 @@ int CDPM2::update_trial_status(const vec& t_strain) {
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
         const auto error = norm(residual);
+        if(1u == counter && error > ref_error) ref_error = error;
         suanpan_debug("Local plasticity iteration error: {:.5E}.\n", error);
 
-        if(error <= tolerance) {
+        if(error <= tolerance * std::max(1., ref_error)) {
             const vec unit_n = n % tensor::stress::norm_weight;
 
             plastic_strain += gamma * gs * unit_n + gamma * gp / 3. * tensor::unit_tensor2;

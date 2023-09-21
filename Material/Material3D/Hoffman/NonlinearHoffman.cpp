@@ -48,7 +48,7 @@ double NonlinearHoffman::get_parameter(const ParameterType P) const {
 int NonlinearHoffman::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
-    if(norm(incre_strain) <= tolerance) return SUANPAN_SUCCESS;
+    if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
 
     trial_history = current_history;
     auto& eqv_strain = trial_history(0);

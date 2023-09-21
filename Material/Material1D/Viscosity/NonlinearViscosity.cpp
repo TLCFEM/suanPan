@@ -41,7 +41,7 @@ int NonlinearViscosity::update_trial_status(const vec& t_strain, const vec& t_st
     incre_strain = (trial_strain = t_strain) - current_strain;
     incre_strain_rate = (trial_strain_rate = t_strain_rate) - current_strain_rate;
 
-    if(norm(incre_strain) + norm(incre_strain_rate) <= 1E-14) return SUANPAN_SUCCESS;
+    if(norm(incre_strain) + norm(incre_strain_rate) <= datum::eps) return SUANPAN_SUCCESS;
 
     const auto &u = trial_strain(0), &v = trial_strain_rate(0);
 

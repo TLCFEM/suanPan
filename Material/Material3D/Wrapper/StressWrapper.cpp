@@ -61,10 +61,9 @@ int StressWrapper::update_trial_status(const vec& t_strain) {
         auto counter = 0u;
         auto ref_error = 1.;
         while(true) {
-            if(max_iteration == ++counter) {
-                suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
-                return SUANPAN_FAIL;
-            }
+            // do not fail the analysis here
+            // some material models may have large tolerance
+            if(max_iteration == ++counter) break;
 
             if(SUANPAN_SUCCESS != base->update_trial_status(trial_full_strain)) return SUANPAN_FAIL;
 
