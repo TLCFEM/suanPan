@@ -123,7 +123,7 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
         const auto error = inf_norm(incre);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || inf_norm(residual) < tolerance) break;
+        if(error < tolerance * ref_error || (inf_norm(residual) < tolerance && counter > 5u)) break;
 
         gamma -= incre(sa);
         p -= incre(sb);

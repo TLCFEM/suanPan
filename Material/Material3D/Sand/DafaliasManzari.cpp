@@ -107,7 +107,7 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
         const auto error = inf_norm(residual);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local elastic iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || inf_norm(residual) < tolerance) break;
+        if(error < tolerance * ref_error || (inf_norm(residual) < tolerance && counter > 5u)) break;
 
         p -= incre(sa);
         s -= incre(sb);
@@ -326,7 +326,7 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
         const auto error = inf_norm(residual);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local plastic iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || inf_norm(residual) < tolerance) break;
+        if(error < tolerance * ref_error || (inf_norm(residual) < tolerance && counter > 5u)) break;
 
         gamma -= incre(si);
         p -= incre(sj);

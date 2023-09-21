@@ -60,7 +60,7 @@ podarray<double> ConcreteExp::compute_compression_backbone(const double n_strain
         const auto error = fabs(incre);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local compression iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || fabs(residual) < tolerance) break;
+        if(error < tolerance * ref_error || (fabs(residual) < tolerance && counter > 5u)) break;
 
         stress -= incre;
     }
@@ -96,7 +96,7 @@ podarray<double> ConcreteExp::compute_tension_backbone(const double n_strain) co
         const auto error = fabs(incre);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local tension iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || fabs(residual) < tolerance) break;
+        if(error < tolerance * ref_error || (fabs(residual) < tolerance && counter > 5u)) break;
 
         stress -= incre;
     }

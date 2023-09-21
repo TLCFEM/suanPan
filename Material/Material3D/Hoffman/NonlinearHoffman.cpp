@@ -93,7 +93,7 @@ int NonlinearHoffman::update_trial_status(const vec& t_strain) {
         if(1u == counter) ref_error = error;
         suanpan_debug("Local plasticity iteration error: {:.5E}.\n", error);
 
-        if(error < tolerance * ref_error || inf_norm(residual) < tolerance) {
+        if(error < tolerance * ref_error || (inf_norm(residual) < tolerance && counter > 5u)) {
             plastic_strain += gamma * n_mid;
 
             mat left, right(7, 6, fill::zeros);

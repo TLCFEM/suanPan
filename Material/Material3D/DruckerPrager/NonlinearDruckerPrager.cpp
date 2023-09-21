@@ -76,7 +76,7 @@ int NonlinearDruckerPrager::update_trial_status(const vec& t_strain) {
         const auto error = fabs(incre_gamma);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || fabs(residual) < tolerance) break;
+        if(error < tolerance * ref_error || (fabs(residual) < tolerance && counter > 5u)) break;
         plastic_strain = current_history(0) + xi * (gamma += incre_gamma);
     }
 
@@ -110,7 +110,7 @@ int NonlinearDruckerPrager::update_trial_status(const vec& t_strain) {
             const auto error = fabs(incre_gamma);
             if(1u == counter) ref_error = error;
             suanpan_debug("Local iteration error: {:.5E}.\n", error);
-            if(error < tolerance * ref_error || fabs(residual) < tolerance) break;
+            if(error < tolerance * ref_error || (fabs(residual) < tolerance && counter > 5u)) break;
             plastic_strain = current_history(0) + xi / eta_yield * (gamma -= incre_gamma);
         }
 

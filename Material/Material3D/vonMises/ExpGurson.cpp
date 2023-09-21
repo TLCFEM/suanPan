@@ -40,7 +40,7 @@ vec ExpGurson::compute_hardening(const double plastic_strain) const {
         const auto incre = residual / (1. - n * pow_term);
         const auto error = fabs(incre);
         if(1u == counter) ref_error = error;
-        if(error < tolerance * ref_error || fabs(residual) < tolerance) break;
+        if(error < tolerance * ref_error || (fabs(residual) < tolerance && counter > 5u)) break;
 
         k -= incre;
     }

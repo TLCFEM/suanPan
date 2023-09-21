@@ -54,7 +54,7 @@ int SlipLock::update_trial_status(const vec& t_strain) {
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
         const auto incre_s = incre * trial_stiffness(0);
-        if(error < tolerance * ref_error || fabs(incre_s) < tolerance) return SUANPAN_SUCCESS;
+        if(error < tolerance * ref_error || (fabs(incre_s) < tolerance && counter > 5u)) return SUANPAN_SUCCESS;
         trial_stress += incre_s;
         if(!suanpan::approx_equal(sign(trial_stress(0)), sign(trial_strain(0)))) trial_stress = 0.;
     }

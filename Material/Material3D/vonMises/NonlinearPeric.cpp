@@ -84,7 +84,7 @@ int NonlinearPeric::update_trial_status(const vec& t_strain) {
         const auto error = fabs(incre_gamma);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || error < datum::eps) break;
+        if(error < tolerance * ref_error || (fabs(residual) < tolerance && counter > 5u)) break;
 
         plastic_strain = current_history(0) + (gamma += incre_gamma);
         denom = *incre_time + mu * gamma;
