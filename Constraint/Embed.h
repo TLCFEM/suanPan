@@ -32,7 +32,7 @@
 #include "Constraint.h"
 
 class Embed : public Constraint {
-    static constexpr unsigned max_iteration = 20;
+    static constexpr unsigned max_iteration = 20u;
 
     const unsigned element_tag;
 

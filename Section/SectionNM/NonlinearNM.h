@@ -40,7 +40,7 @@ class NonlinearNM : protected DataNonlinearNM, public SectionNM {
     [[nodiscard]] virtual int compute_local_integration(vec&, mat&) = 0;
 
 protected:
-    static constexpr unsigned max_iteration = 20;
+    static constexpr unsigned max_iteration = 20u;
 
     const vec yield_diag;
 

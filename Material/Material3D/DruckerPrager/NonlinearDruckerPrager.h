@@ -43,7 +43,7 @@ struct DataNonlinearDruckerPrager {
 };
 
 class NonlinearDruckerPrager : protected DataNonlinearDruckerPrager, public Material3D {
-    static constexpr unsigned max_iteration = 20;
+    static constexpr unsigned max_iteration = 20u;
     static const mat unit_dev_tensor;
     static const mat unit_x_unit;
 

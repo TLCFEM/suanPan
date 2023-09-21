@@ -24,7 +24,7 @@ const mat SimpleSand::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 SimpleSand::SimpleSand(const unsigned T, const double E, const double V, const double M, const double A, const double H, const double AC, const double NB, const double ND, const double VC, const double PC, const double LC, const double V0, const double R)
     : DataSimpleSand{E, V, fabs(M), A, H, AC, fabs(NB), fabs(ND), fabs(VC), -fabs(PC), fabs(LC), fabs(V0)}
-    , Material3D(T, R) { access::rw(tolerance) = 1E-12; }
+    , Material3D(T, R) {}
 
 int SimpleSand::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = tensor::isotropic_stiffness(elastic_modulus, poissons_ratio);
@@ -120,11 +120,10 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
-        auto error = norm(residual);
-
-        if(1u == counter) ref_error = std::max(1., error);
-        suanpan_debug("Local iteration error: {:.5E}.\n", error /= ref_error);
-        if(error <= tolerance || norm(incre) <= tolerance) break;
+        const auto error = inf_norm(incre);
+        if(1u == counter) ref_error = error;
+        suanpan_debug("Local iteration error: {:.5E}.\n", error);
+        if(error < tolerance * ref_error || inf_norm(residual) < tolerance) break;
 
         gamma -= incre(sa);
         p -= incre(sb);

@@ -71,7 +71,8 @@ int SteelBRB::update_trial_status(const vec& t_strain) {
     const auto compute_stress = tension_flag ? std::mem_fn(&SteelBRB::compute_t_yield_stress) : std::mem_fn(&SteelBRB::compute_c_yield_stress);
 
     auto incre = .5 * incre_strain(0), incre_plastic_strain = 0.;
-    auto counter = 0;
+    auto counter = 0u;
+    auto ref_error = 1.;
     while(true) {
         if(max_iteration == ++counter) {
             suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
@@ -92,10 +93,10 @@ int SteelBRB::update_trial_status(const vec& t_strain) {
         residual += incre_plastic_strain;
 
         const auto error = fabs(incre = -residual / jacobian);
-
+        if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
 
-        if(error <= tolerance) {
+        if(error < tolerance * ref_error || fabs(residual) < tolerance) {
             trial_stiffness *= 1. - (pow_term + incre_strain(0) * elastic_modulus * exponent * pow_term / numerator) / jacobian;
 
             return SUANPAN_SUCCESS;

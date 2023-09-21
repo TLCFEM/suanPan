@@ -34,7 +34,7 @@
 #include <Element/Element.h>
 
 class Embedded : public Element {
-    static constexpr unsigned max_iteration = 20;
+    static constexpr unsigned max_iteration = 20u;
 
     const unsigned e_dof;
     const unsigned host_tag;

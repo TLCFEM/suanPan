@@ -17,8 +17,6 @@
 
 #include "ExpGurson.h"
 
-constexpr unsigned ExpGurson::max_iteration = 20;
-
 ExpGurson::ExpGurson(const unsigned T, const double E, const double V, const double YS, const double N, const double Q1, const double Q2, const double FN, const double SN, const double EN, const double R)
     : DataExpGurson{fabs(YS), std::min(1., N)}
     , NonlinearGurson(T, E, V, Q1, Q2, FN, SN, EN, R) {}
@@ -27,7 +25,8 @@ vec ExpGurson::compute_hardening(const double plastic_strain) const {
     auto k = 1.;
     double pow_term;
 
-    unsigned counter = 0;
+    auto counter = 0u;
+    auto ref_error = 1.;
     while(true) {
         if(max_iteration == ++counter) {
             suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
@@ -37,8 +36,11 @@ vec ExpGurson::compute_hardening(const double plastic_strain) const {
 
         const auto tmp_term = k + para_c * plastic_strain;
         pow_term = pow(tmp_term, n - 1.);
-        const auto incre = (k - pow_term * tmp_term) / (1. - n * pow_term);
-        if(fabs(incre) <= tolerance) break;
+        const auto residual = k - pow_term * tmp_term;
+        const auto incre = residual / (1. - n * pow_term);
+        const auto error = fabs(incre);
+        if(1u == counter) ref_error = error;
+        if(error < tolerance * ref_error || fabs(residual) < tolerance) break;
 
         k -= incre;
     }

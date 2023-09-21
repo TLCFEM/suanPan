@@ -88,7 +88,7 @@ int VAFNM::compute_local_integration(vec& q, mat& jacobian) {
         const auto norm_mi = norm(m(ni));
         const auto norm_mj = norm(m(nj));
 
-        if(1 == counter) {
+        if(1u == counter) {
             gamma = .5 * residual(ge(0)) / dot(m, z);
             q -= gamma * m;
             if(has_kinematic) {
@@ -134,10 +134,10 @@ int VAFNM::compute_local_integration(vec& q, mat& jacobian) {
 
         const vec incre = solve(jacobian += prpz * (eye(d_size, d_size) - m * m.t()) / norm(z) * dzdx, residual);
 
-        auto error = norm(residual);
-        if(2 == counter) ref_error = std::max(1., error);
-        suanpan_debug("Local iteration error: {:.5E}.\n", error /= ref_error);
-        if(norm(incre) <= tolerance && error <= tolerance) return SUANPAN_SUCCESS;
+        const auto error = inf_norm(incre);
+        if(2u == counter) ref_error = error;
+        suanpan_debug("Local iteration error: {:.5E}.\n", error);
+        if(error < tolerance * ref_error || inf_norm(residual) < tolerance) return SUANPAN_SUCCESS;
 
         q -= incre(ga);
         if(has_kinematic) beta -= incre(gb);

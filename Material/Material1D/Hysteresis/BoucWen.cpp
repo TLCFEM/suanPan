@@ -43,7 +43,8 @@ int BoucWen::update_trial_status(const vec& t_strain) {
     auto& z = trial_history(0);                 // z
 
     auto incre = .5 * n_strain;
-    unsigned counter = 0;
+    auto counter = 0u;
+    auto ref_error = 1.;
     while(true) {
         if(max_iteration == ++counter) {
             suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
@@ -59,10 +60,10 @@ int BoucWen::update_trial_status(const vec& t_strain) {
         const auto jacobian = z + n * t_term;
 
         const auto error = fabs(incre = -residual * z / jacobian);
-
+        if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
 
-        if(error <= tolerance) {
+        if(error < tolerance * ref_error || fabs(residual) < tolerance) {
             trial_stress = modulus_a * trial_strain + modulus_b * z;
             trial_stiffness = modulus_a + modulus_b / yield_strain * (1. - p_term) * z / jacobian;
 

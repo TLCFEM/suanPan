@@ -62,14 +62,24 @@ int RambergOsgood::update_trial_status(const vec& t_strain) {
 
     auto norm_stress = fabs(current_stress(0) - reverse_stress);
 
-    unsigned counter = 0;
+    auto counter = 0u;
+    auto ref_error = 1.;
     while(true) {
+        if(max_iteration == ++counter) {
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
+            return SUANPAN_FAIL;
+        }
+
         const auto pow_b = offset * pow(norm_stress, nm);
+        const auto residual = norm_stress * (pow_a + pow_b) - elastic_predictor * pow_a;
         const auto jacobian = pow_a + n * pow_b;
-        const auto incre = (norm_stress * (pow_a + pow_b) - elastic_predictor * pow_a) / jacobian;
-        const auto error = fabs(incre) / yield_stress;
+        const auto incre = residual / jacobian;
+
+        const auto error = fabs(incre);
+        if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error <= tolerance || max_iteration == ++counter) {
+
+        if(error < tolerance * ref_error || fabs(residual) < tolerance) {
             trial_stress = load_sign * norm_stress + reverse_stress;
             trial_stiffness = elastic_modulus * pow_a / jacobian;
             return SUANPAN_SUCCESS;

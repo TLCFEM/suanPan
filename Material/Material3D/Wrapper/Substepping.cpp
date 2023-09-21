@@ -93,12 +93,15 @@ int Substepping::update_trial_status(const vec& t_strain) {
 
     auto accumulated_factor = 0., incre_factor = 1.;
 
-    unsigned counter = 0, step = 0;
+    auto counter = 0u, step = 0u;
     while(true) {
-        if(++counter == max_iteration) return SUANPAN_FAIL;
+        if(max_iteration == ++counter) {
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
+            return SUANPAN_FAIL;
+        }
 
         if(SUANPAN_SUCCESS != trial_mat_obj->update_trial_status(current_mat_obj->get_current_strain() + (accumulated_factor + incre_factor) * incre_strain)) {
-            step = 0;
+            step = 0u;
             incre_factor *= .5;
             continue;
         }
@@ -107,8 +110,8 @@ int Substepping::update_trial_status(const vec& t_strain) {
 
         if(SUANPAN_SUCCESS != trial_mat_obj->commit_status()) return SUANPAN_FAIL;
 
-        if(++step == 3) {
-            step = 0;
+        if(++step == 3u) {
+            step = 0u;
             incre_factor *= 1.2;
         }
 

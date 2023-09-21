@@ -28,7 +28,7 @@ const mat DafaliasManzari::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 DafaliasManzari::DafaliasManzari(const unsigned T, const double G0, const double NU, const double AC, const double LC, const double E0, const double XI, const double M, const double H0, const double H1, const double CH, const double NB, const double A, const double ND, const double ZM, const double CZ, const double PC, const double GR, const double R)
     : DataDafaliasManzari{fabs(G0), fabs(NU), fabs(AC), fabs(LC), fabs(E0), fabs(XI), fabs(M), fabs(H0), fabs(H1), fabs(CH), fabs(NB), A, fabs(ND), fabs(ZM), fabs(CZ), -fabs(PC), fabs(GR)}
-    , Material3D(T, R) { access::rw(tolerance) = 1E-12; }
+    , Material3D(T, R) {}
 
 int DafaliasManzari::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = tensor::isotropic_stiffness(gi * (2. + 2. * poissons_ratio), poissons_ratio);
@@ -78,7 +78,10 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
     auto ref_error = 1.;
 
     while(true) {
-        if(max_iteration == ++counter) return SUANPAN_FAIL;
+        if(max_iteration == ++counter) {
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
+            return SUANPAN_FAIL;
+        }
 
         const auto sqrt_term = shear_modulus * sqrt(std::max(datum::eps, pc * p));
 
@@ -101,10 +104,10 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
-        auto error = norm(residual);
-        if(1u == counter) ref_error = std::max(1., error);
-        suanpan_debug("Local elastic iteration error: {:.5E}.\n", error / ref_error);
-        if(error <= tolerance * std::max(1., ref_error)) break;
+        const auto error = inf_norm(residual);
+        if(1u == counter) ref_error = error;
+        suanpan_debug("Local elastic iteration error: {:.5E}.\n", error);
+        if(error < tolerance * ref_error || inf_norm(residual) < tolerance) break;
 
         p -= incre(sa);
         s -= incre(sb);
@@ -159,7 +162,10 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
     auto update_ini_alpha = false;
 
     while(true) {
-        if(max_iteration == ++counter) return SUANPAN_FAIL;
+        if(max_iteration == ++counter) {
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
+            return SUANPAN_FAIL;
+        }
 
         // shear modulus
 
@@ -317,10 +323,10 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
-        auto error = norm(residual);
-        if(1u == counter) ref_error = std::max(1., error);
-        suanpan_debug("Local plastic iteration error: {:.5E}.\n", error /= ref_error);
-        if(error <= tolerance) break;
+        const auto error = inf_norm(residual);
+        if(1u == counter) ref_error = error;
+        suanpan_debug("Local plastic iteration error: {:.5E}.\n", error);
+        if(error < tolerance * ref_error || inf_norm(residual) < tolerance) break;
 
         gamma -= incre(si);
         p -= incre(sj);

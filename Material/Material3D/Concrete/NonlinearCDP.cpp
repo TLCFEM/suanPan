@@ -165,10 +165,10 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
-        auto error = norm(residual);
-        if(1u == counter) ref_error = std::max(1., error);
-        suanpan_debug("Local iteration error: {:.5E}.\n", error / ref_error);
-        if(error <= tolerance * std::max(1., ref_error) || norm(incre) <= tolerance) break;
+        const auto error = inf_norm(incre);
+        if(1u == counter) ref_error = error;
+        suanpan_debug("Local iteration error: {:.5E}.\n", error);
+        if(error < tolerance * ref_error || inf_norm(residual) < tolerance) break;
 
         lambda -= incre(0);
         kappa_t -= incre(1);

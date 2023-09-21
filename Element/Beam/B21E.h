@@ -32,8 +32,8 @@
 #include "B21.h"
 
 class B21E final : public B21 {
-    static const unsigned max_iteration;
-    static const double tolerance;
+    static constexpr unsigned max_iteration = 20u;
+    static constexpr double tolerance = 1E-13;
 
     const uvec a, b;
 

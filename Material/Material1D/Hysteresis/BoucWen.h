@@ -42,7 +42,7 @@ struct DataBoucWen {
 };
 
 class BoucWen final : protected DataBoucWen, public Material1D {
-    static constexpr unsigned max_iteration = 20;
+    static constexpr unsigned max_iteration = 20u;
 
     const double modulus_a = hardening * elastic_modulus;
     const double modulus_b = yield_stress - hardening * yield_stress;

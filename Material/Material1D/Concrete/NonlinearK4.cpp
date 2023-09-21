@@ -27,6 +27,7 @@ int NonlinearK4::compute_plasticity(double& k) {
     const auto damage_handle = sign_sigma > 0. ? &NonlinearK4::compute_tension_damage : &NonlinearK4::compute_compression_damage;
 
     auto counter = 0u;
+    auto ref_error = 1.;
     while(true) {
         if(max_iteration == ++counter) {
             suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
@@ -51,8 +52,9 @@ int NonlinearK4::compute_plasticity(double& k) {
         const auto jacobian = elastic_modulus + backbone(1);
         const auto incre = residual / jacobian;
         const auto error = fabs(incre);
+        if(1u == counter) ref_error = error;
         suanpan_debug("Local plasticity iteration error: {:.5E}.\n", error);
-        if(error < tolerance || fabs(residual) < tolerance) {
+        if(error < tolerance * ref_error || fabs(residual) < tolerance) {
             const auto dgamma = elastic_modulus / jacobian;
             trial_stiffness -= dgamma * elastic_modulus;
 

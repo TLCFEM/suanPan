@@ -24,7 +24,7 @@ const mat NonlinearGurson::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 NonlinearGurson::NonlinearGurson(const unsigned T, const double E, const double V, const double Q1, const double Q2, const double FN, const double SN, const double EN, const double R)
     : DataNonlinearGurson{E, V, Q1, Q2, FN, SN, EN}
-    , Material3D(T, R) { access::rw(tolerance) = 1E-13; }
+    , Material3D(T, R) {}
 
 int NonlinearGurson::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = tensor::isotropic_stiffness(elastic_modulus, poissons_ratio);
@@ -112,10 +112,10 @@ int NonlinearGurson::update_trial_status(const vec& t_strain) {
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
-        const auto error = norm(residual);
-        if(1u == counter && error > ref_error) ref_error = error;
+        const auto error = inf_norm(incre);
+        if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error <= tolerance * std::max(1., ref_error) || norm(incre) <= tolerance) break;
+        if(error < tolerance * ref_error || inf_norm(residual) < tolerance) break;
 
         gamma -= incre(0);
         pe -= incre(1);

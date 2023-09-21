@@ -18,8 +18,6 @@
 #include "Sequential.h"
 #include <Domain/DomainBase.h>
 
-constexpr unsigned Sequential::max_iteration = 20;
-
 Sequential::Sequential(const unsigned T, uvec&& MT)
     : Material1D(T, 0.)
     , mat_size(MT.n_elem - 1)
@@ -54,8 +52,14 @@ int Sequential::update_trial_status(const vec& t_strain) {
 
     if(fabs(incre_strain(0)) <= datum::eps) return SUANPAN_SUCCESS;
 
-    unsigned counter = 0;
-    while(++counter < max_iteration) {
+    auto counter = 0u;
+    auto ref_error = 1.;
+    while(true) {
+        if(max_iteration == ++counter) {
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
+            return SUANPAN_FAIL;
+        }
+
         vec residual(mat_tag.n_elem, fill::zeros);
         residual(0) = trial_strain(0) - mat_pool.front()->get_trial_strain().at(0) - mat_pool.back()->get_trial_strain().at(0);
         residual(1) = mat_pool.front()->get_trial_stress().at(0);
@@ -73,16 +77,12 @@ int Sequential::update_trial_status(const vec& t_strain) {
 
         const vec i_strain = solve(jacobian, residual);
 
-        for(size_t I = 0; I < mat_pool.size(); ++I) mat_pool[I]->update_trial_status(mat_pool[I]->get_trial_strain() + i_strain[I]);
-
-        const auto error = norm(i_strain);
+        const auto error = inf_norm(i_strain);
+        if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error <= tolerance) break;
-    }
+        if(error < tolerance * ref_error || inf_norm(residual) < tolerance) break;
 
-    if(max_iteration == counter) {
-        suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
-        return SUANPAN_FAIL;
+        for(size_t I = 0; I < mat_pool.size(); ++I) mat_pool[I]->update_trial_status(mat_pool[I]->get_trial_strain() + i_strain[I]);
     }
 
     trial_stress = mat_pool.front()->get_trial_stress();
