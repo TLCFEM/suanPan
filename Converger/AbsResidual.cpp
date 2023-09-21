@@ -27,7 +27,7 @@ unique_ptr<Converger> AbsResidual::get_copy() { return make_unique<AbsResidual>(
 bool AbsResidual::is_converged(unsigned) {
     auto& W = get_domain().lock()->get_factory();
 
-    set_error(norm(get_residual()) / static_cast<double>(W->get_size()));
+    set_error(inf_norm(get_residual()));
     set_conv_flag(get_tolerance() > get_error());
 
     if(is_print())
