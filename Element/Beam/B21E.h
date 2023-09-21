@@ -33,7 +33,7 @@
 
 class B21E final : public B21 {
     static constexpr unsigned max_iteration = 20u;
-    static constexpr double tolerance = 1E-13;
+    static constexpr double tolerance = 1E-14;
 
     const uvec a, b;
 
