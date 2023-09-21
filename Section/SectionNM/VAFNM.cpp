@@ -137,7 +137,7 @@ int VAFNM::compute_local_integration(vec& q, mat& jacobian) {
         const auto error = inf_norm(incre);
         if(2u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || inf_norm(residual) < tolerance) return SUANPAN_SUCCESS;
+        if(error < tolerance * ref_error || (inf_norm(residual) < tolerance && counter > 5u)) return SUANPAN_SUCCESS;
 
         q -= incre(ga);
         if(has_kinematic) beta -= incre(gb);
