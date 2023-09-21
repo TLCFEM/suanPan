@@ -28,43 +28,17 @@
 #ifndef PLANESTRESS_H
 #define PLANESTRESS_H
 
-#include <Material/Material2D/Material2D.h>
+#include <Material/Material3D/Wrapper/StressWrapper.h>
 #include <Toolbox/ResourceHolder.h>
 
-class PlaneStress final : public Material2D {
-    static const uvec F1, F2;
-
-    const unsigned base_tag;
-
-    const unsigned max_iteration;
-
-    const bool use_full_matrix;
-
-    ResourceHolder<Material> base;
-
-    vec trial_full_strain, current_full_strain;
-
-    static mat form_stiffness(const mat&);
-
+class PlaneStress final : public StressWrapper {
 public:
-    PlaneStress(unsigned,     // tag
-                unsigned,     // 3D material tag
-                unsigned = 1, // max iteration
-                bool = false);
-
-    int initialize(const shared_ptr<DomainBase>&) override;
-
-    [[nodiscard]] double get_parameter(ParameterType) const override;
+    PlaneStress(unsigned, // tag
+                unsigned, // 3D material tag
+                unsigned  // max iteration
+    );
 
     unique_ptr<Material> get_copy() override;
-
-    int update_trial_status(const vec&) override;
-
-    int clear_status() override;
-    int commit_status() override;
-    int reset_status() override;
-
-    vector<vec> record(OutputType) override;
 
     void print() override;
 };

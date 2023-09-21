@@ -40,8 +40,6 @@ class Axisymmetric final : public Material2D {
 
     ResourceHolder<Material> base;
 
-    vec full_strain;
-
 public:
     Axisymmetric(unsigned, // tag
                  unsigned  // 3D material tag

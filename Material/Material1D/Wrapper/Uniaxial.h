@@ -21,48 +21,23 @@
  * @date 22/01/2019
  * @version 0.1.0
  * @file Uniaxial.h
- * @addtogroup Material-2D
+ * @addtogroup Material-1D
  * @{
  */
 
 #ifndef UNIAXIAL_H
 #define UNIAXIAL_H
 
-#include <Material/Material1D/Material1D.h>
-#include <Toolbox/ResourceHolder.h>
+#include <Material/Material3D/Wrapper/StressWrapper.h>
 
-class Uniaxial final : public Material1D {
-    static const uvec F1, F2;
-
-    const unsigned base_tag;
-
-    const unsigned max_iteration;
-
-    ResourceHolder<Material> base;
-
-    vec trial_full_strain, current_full_strain;
-
-    static mat form_stiffness(const mat&);
-
+class Uniaxial final : public StressWrapper {
 public:
-    Uniaxial(unsigned,    // tag
-             unsigned,    // 3D material tag
-             unsigned = 1 // max iteration
+    Uniaxial(unsigned, // tag
+             unsigned, // 3D material tag
+             unsigned  // max iteration
     );
 
-    int initialize(const shared_ptr<DomainBase>&) override;
-
-    [[nodiscard]] double get_parameter(ParameterType) const override;
-
     unique_ptr<Material> get_copy() override;
-
-    int update_trial_status(const vec&) override;
-
-    int clear_status() override;
-    int commit_status() override;
-    int reset_status() override;
-
-    vector<vec> record(OutputType) override;
 
     void print() override;
 };

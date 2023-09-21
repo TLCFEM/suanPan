@@ -211,6 +211,9 @@
     <Filter Include="Material\MaterialOS">
       <UniqueIdentifier>{7169039f-88b8-4a06-9c1c-41a9875fce28}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Material\MaterialOS\Wrapper">
+      <UniqueIdentifier>{383bbae7-39ee-40f6-875e-a61aba9726da}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Constraint\BC\GroupMultiplierBC.cpp">
@@ -1560,6 +1563,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Section\SectionOS\Fibre3DOS.cpp">
       <Filter>Section\SectionOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Wrapper\StressWrapper.cpp">
+      <Filter>Material\Material3D\Wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\MaterialOS\Wrapper\UniversalOS.cpp">
+      <Filter>Material\MaterialOS\Wrapper</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2982,6 +2991,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Section\SectionOS\Fibre3DOS.h">
       <Filter>Section\SectionOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Wrapper\StressWrapper.h">
+      <Filter>Material\Material3D\Wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\MaterialOS\Wrapper\UniversalOS.h">
+      <Filter>Material\MaterialOS\Wrapper</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
