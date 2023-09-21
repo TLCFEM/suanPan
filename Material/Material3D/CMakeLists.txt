@@ -48,5 +48,6 @@ set(M3D
         Material3D/vonMises/VAFCRP.cpp
         Material3D/Wrapper/Rotation3D.cpp
         Material3D/Wrapper/Stacked.cpp
+        Material3D/Wrapper/StressWrapper.cpp
         Material3D/Wrapper/Substepping.cpp
         )

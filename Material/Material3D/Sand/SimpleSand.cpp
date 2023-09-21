@@ -48,7 +48,7 @@ double SimpleSand::get_parameter(const ParameterType P) const {
 int SimpleSand::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
-    if(norm(incre_strain) <= tolerance) return SUANPAN_SUCCESS;
+    if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
 
     trial_history = current_history;
     const vec current_alpha(&current_history(0), 6);

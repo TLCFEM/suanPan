@@ -46,7 +46,7 @@ double NonlinearGurson::get_parameter(const ParameterType P) const {
 int NonlinearGurson::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
-    if(norm(incre_strain) <= tolerance) return SUANPAN_SUCCESS;
+    if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
 
     trial_stress = current_stress + (trial_stiffness = initial_stiffness) * incre_strain;
 
@@ -66,7 +66,8 @@ int NonlinearGurson::update_trial_status(const vec& t_strain) {
     auto gamma = 0.;
     double denom;
 
-    unsigned counter = 0;
+    auto counter = 0u;
+    auto ref_error = 1.;
     while(true) {
         if(max_iteration == ++counter) {
             suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
@@ -112,8 +113,9 @@ int NonlinearGurson::update_trial_status(const vec& t_strain) {
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
         const auto error = norm(residual);
+        if(1u == counter && error > ref_error) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error <= tolerance || norm(incre) <= tolerance) break;
+        if(error <= tolerance * std::max(1., ref_error) || norm(incre) <= tolerance) break;
 
         gamma -= incre(0);
         pe -= incre(1);

@@ -2685,7 +2685,7 @@ void new_planestrain(unique_ptr<Material>& return_obj, istringstream& command, c
     return_obj = make_unique<PlaneStrain>(tag, full_tag, type);
 }
 
-void new_planestress(unique_ptr<Material>& return_obj, istringstream& command) {
+template<typename T> void new_wrapper(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
@@ -2704,13 +2704,7 @@ void new_planestress(unique_ptr<Material>& return_obj, istringstream& command) {
         return;
     }
 
-    string use_matrix = "true";
-    if(!command.eof() && !get_input(command, use_matrix)) {
-        suanpan_error("A valid flag to indicate if to use the matrix in iteration is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<PlaneStress>(tag, full_tag, max_iteration, is_true(use_matrix));
+    return_obj = make_unique<T>(tag, full_tag, max_iteration);
 }
 
 void new_polyelastic1d(unique_ptr<Material>& return_obj, istringstream& command) {
@@ -3169,28 +3163,6 @@ void new_trivial(unique_ptr<Material>& return_obj, istringstream& command) {
     return_obj = make_unique<Trivial>(tag);
 }
 
-void new_uniaxial(unique_ptr<Material>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    unsigned full_tag;
-    if(!get_input(command, full_tag)) {
-        suanpan_error("A valid reference material tag is required.\n");
-        return;
-    }
-
-    auto max_iteration = 1;
-    if(!command.eof() && !get_input(command, max_iteration)) {
-        suanpan_error("A valid number for maximum iteration is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<Uniaxial>(tag, full_tag, max_iteration);
-}
-
 void new_vafcrp(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -3503,10 +3475,11 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "NLE3D01")) new_nle3d01(new_material, command);
     else if(is_equal(material_id, "Nonviscous01")) new_nonviscous01(new_material, command);
     else if(is_equal(material_id, "OrthotropicElastic3D")) new_orthotropicelastic3d(new_material, command);
+    else if(is_equal(material_id, "OS14")) new_wrapper<OS14>(new_material, command);
     else if(is_equal(material_id, "ParabolicCC")) new_paraboliccc(new_material, command);
     else if(is_equal(material_id, "Parallel")) new_parallel(new_material, command);
     else if(is_equal(material_id, "PlaneStrain")) new_planestrain(new_material, command, 0);
-    else if(is_equal(material_id, "PlaneStress")) new_planestress(new_material, command);
+    else if(is_equal(material_id, "PlaneStress")) new_wrapper<PlaneStress>(new_material, command);
     else if(is_equal(material_id, "PlaneSymmetric13")) new_planestrain(new_material, command, 1);
     else if(is_equal(material_id, "PlaneSymmetric23")) new_planestrain(new_material, command, 2);
     else if(is_equal(material_id, "PolyElastic1D")) new_polyelastic1d(new_material, command);
@@ -3529,7 +3502,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "TimberPD")) new_timberpd(new_material, command);
     else if(is_equal(material_id, "TrilinearStrainDegradation")) new_trilinearstraindegradation(new_material, command);
     else if(is_equal(material_id, "Trivial")) new_trivial(new_material, command);
-    else if(is_equal(material_id, "Uniaxial")) new_uniaxial(new_material, command);
+    else if(is_equal(material_id, "Uniaxial")) new_wrapper<Uniaxial>(new_material, command);
     else if(is_equal(material_id, "VAFCRP")) new_vafcrp(new_material, command);
     else if(is_equal(material_id, "VAFCRP1D")) new_vafcrp1d(new_material, command);
     else if(is_equal(material_id, "Viscosity01")) new_viscosity01(new_material, command);

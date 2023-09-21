@@ -167,8 +167,8 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
 
         auto error = norm(residual);
         if(1u == counter) ref_error = std::max(1., error);
-        suanpan_debug("Local iteration error: {:.5E}.\n", error /= ref_error);
-        if(error <= tolerance || norm(incre) <= tolerance) break;
+        suanpan_debug("Local iteration error: {:.5E}.\n", error / ref_error);
+        if(error <= tolerance * std::max(1., ref_error) || norm(incre) <= tolerance) break;
 
         lambda -= incre(0);
         kappa_t -= incre(1);

@@ -22,8 +22,7 @@ const uvec Axisymmetric::F{0, 1, 2, 3};
 
 Axisymmetric::Axisymmetric(const unsigned T, const unsigned BT)
     : Material2D(T, PlaneType::A, 0.)
-    , base_tag(BT)
-    , full_strain(6, fill::zeros) {}
+    , base_tag(BT) {}
 
 int Axisymmetric::initialize(const shared_ptr<DomainBase>& D) {
     base = suanpan::initialized_material_copy(D, base_tag);
@@ -45,6 +44,8 @@ double Axisymmetric::get_parameter(const ParameterType P) const { return base->g
 unique_ptr<Material> Axisymmetric::get_copy() { return make_unique<Axisymmetric>(*this); }
 
 int Axisymmetric::update_trial_status(const vec& t_strain) {
+    vec full_strain(6, fill::zeros);
+
     full_strain(F) = trial_strain = t_strain;
 
     if(SUANPAN_SUCCESS != base->update_trial_status(full_strain)) return SUANPAN_FAIL;

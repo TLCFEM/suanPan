@@ -93,8 +93,8 @@ int NonlinearCamClay::update_trial_status(const vec& t_strain) {
 
         auto error = norm(residual);
         if(1u == counter) rel_error = std::max(1., error);
-        suanpan_debug("Local iteration error: {:.5E}.\n", error /= rel_error);
-        if(error <= tolerance || norm(incre) <= tolerance) {
+        suanpan_debug("Local iteration error: {:.5E}.\n", error / rel_error);
+        if(error <= tolerance * std::max(1., rel_error) || norm(incre) <= tolerance) {
             mat left(6, 2);
 
             rel_error = 2. * bulk / square_b; // reuse variable

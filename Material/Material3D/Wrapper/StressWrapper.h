@@ -15,45 +15,51 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class ElasticOS
- * @brief The ElasticOS class defines a isotropic elastic material for open section
- * problems.
+ * @class StressWrapper
+ * @brief A StressWrapper class.
  *
- * The Young's modulus is stored in `elastic_modulus`. The Poisson's ratio is
- * stored in `poissons_ratio`.
- *
+ *  A universal wrapper that wraps 3D material models into other models by setting some stress components to zero.
  *
  * @author tlc
- * @date 15/09/2023
- * @version 1.0.0
- * @file ElasticOS.h
- * @addtogroup Material-OS
+ * @date 22/09/2023
+ * @version 0.1.0
+ * @file StressWrapper.h
+ * @addtogroup Material-3D
  * @{
  */
 
-#ifndef ELASTICOS_H
-#define ELASTICOS_H
+#ifndef StressWrapper_H
+#define StressWrapper_H
 
-#include <Material/MaterialOS/MaterialOS.h>
+#include <Material/Material.h>
+#include <Toolbox/ResourceHolder.h>
 
-struct DataElasticOS {
-    double elastic_modulus; // elastic modulus
-    double poissons_ratio;  // poissons ratio
-};
+class StressWrapper : public Material {
+    const uvec F1, F2;
 
-class ElasticOS final : public DataElasticOS, public MaterialOS {
+    const unsigned base_tag;
+
+    const unsigned max_iteration;
+
+    vec trial_full_strain, current_full_strain;
+
+    [[nodiscard]] mat form_stiffness(const mat&) const;
+
+protected:
+    ResourceHolder<Material> base;
+
 public:
-    ElasticOS(unsigned,   // tag
-              double,     // elastic modulus
-              double,     // poissons ratio
-              double = 0. // density
+    StressWrapper(unsigned,    // tag
+                  unsigned,    // 3D material tag
+                  unsigned,    // max iteration
+                  uvec&&,      // non-trivial stress DoF
+                  uvec&&,      // trivial stress DoF
+                  MaterialType // material type
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 
     [[nodiscard]] double get_parameter(ParameterType) const override;
-
-    unique_ptr<Material> get_copy() override;
 
     int update_trial_status(const vec&) override;
 
@@ -61,7 +67,7 @@ public:
     int commit_status() override;
     int reset_status() override;
 
-    void print() override;
+    std::vector<vec> record(OutputType) override;
 };
 
 #endif

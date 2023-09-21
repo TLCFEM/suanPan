@@ -1,0 +1,43 @@
+# A TEST MODEL FOR OS14 MATERIAL
+
+node 1 0 0 0
+node 2 1 0 0
+
+material Elastic3D 1 100 .2
+material OS14 2 1
+
+section Cell3DOS 1 10. 1. 1. 2 10. 10.
+section Cell3DOS 2 10. -1. 1. 2 -10. -10.
+section Cell3DOS 4 10. -1. 1. 2 -10. 10.
+section Fibre3DOS 3 1 2 4
+
+orientation B3DOSL 1 0. 0. 1.
+
+element B31OS 1 1 2 3 1 6
+
+fix2 1 E 1
+
+cload 1 0 100 3 2
+
+step static 1
+set ini_step_size 1E-1
+set fixed_step_size true
+
+converger RelIncreDisp 1 1E-10 5 1
+
+analyze
+
+# Node 2:
+# Coordinate:
+#   1.0000e+00  0.0000e+00  0.0000e+00
+# Displacement:
+#   1.2500e-03  7.2806e-05  1.5625e-04 -4.4095e-07 -2.5000e-04  1.2485e-04 -5.7943e-08
+# Resistance:
+#   1.5697e-11 -2.3086e-10  1.0000e+02 -2.3006e-11 -6.2170e-11  6.2469e-11  6.2279e-12
+peek node 2 3
+
+peek element 1
+
+reset
+clear
+exit

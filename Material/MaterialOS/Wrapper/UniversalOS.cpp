@@ -15,17 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include "PlaneStress.h"
+#include "UniversalOS.h"
 #include <Domain/DomainBase.h>
 
-PlaneStress::PlaneStress(const unsigned T, const unsigned BT, const unsigned MI)
-    : StressWrapper(T, BT, MI, uvec{0, 1, 3}, uvec{2, 4, 5}, MaterialType::D2) { access::rw(plane_type) = PlaneType::S; }
+UniversalOS::UniversalOS(const unsigned T, const unsigned BT, const unsigned MI, uvec&& FA, uvec&& FB)
+    : StressWrapper(T, BT, MI, std::forward<uvec>(FA), std::forward<uvec>(FB), MaterialType::OS) {}
 
-unique_ptr<Material> PlaneStress::get_copy() { return make_unique<PlaneStress>(*this); }
-
-void PlaneStress::print() {
-    suanpan_info("A plane stress wrapper.\n");
+void UniversalOS::print() {
+    suanpan_info("An open section material wrapper.\n");
     suanpan_info("Strain:", current_strain);
     suanpan_info("Stress:", current_stress);
     if(base) base->print();
 }
+
+OS14::OS14(const unsigned T, const unsigned BT, const unsigned MI)
+    : UniversalOS(T, BT, MI, uvec{0, 3}, uvec{1, 2, 4, 5}) {}
+
+unique_ptr<Material> OS14::get_copy() { return make_unique<OS14>(*this); }

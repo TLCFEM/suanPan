@@ -124,7 +124,7 @@ double NonlinearK4::get_parameter(const ParameterType P) const {
 int NonlinearK4::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
-    if(fabs(incre_strain(0)) <= tolerance) return SUANPAN_SUCCESS;
+    if(fabs(incre_strain(0)) <= datum::eps) return SUANPAN_SUCCESS;
 
     trial_history = current_history;
     const auto& plastic_strain = trial_history(0);

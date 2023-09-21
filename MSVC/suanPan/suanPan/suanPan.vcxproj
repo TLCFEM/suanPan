@@ -416,9 +416,11 @@
     <ClCompile Include="..\..\..\Material\Material3D\vonMises\VAFCRP.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Wrapper\Rotation3D.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Wrapper\Stacked.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Wrapper\StressWrapper.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Wrapper\Substepping.cpp" />
     <ClCompile Include="..\..\..\Material\MaterialOS\ElasticOS.cpp" />
     <ClCompile Include="..\..\..\Material\MaterialOS\MaterialOS.cpp" />
+    <ClCompile Include="..\..\..\Material\MaterialOS\Wrapper\UniversalOS.cpp" />
     <ClCompile Include="..\..\..\Material\MaterialParser.cpp" />
     <ClCompile Include="..\..\..\Material\MaterialTemplate.cpp" />
     <ClCompile Include="..\..\..\Material\MaterialTester.cpp" />
@@ -898,9 +900,11 @@
     <ClInclude Include="..\..\..\Material\Material3D\vonMises\VAFCRP.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Wrapper\Rotation3D.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Wrapper\Stacked.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Wrapper\StressWrapper.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Wrapper\Substepping.h" />
     <ClInclude Include="..\..\..\Material\MaterialOS\ElasticOS.h" />
     <ClInclude Include="..\..\..\Material\MaterialOS\MaterialOS.h" />
+    <ClInclude Include="..\..\..\Material\MaterialOS\Wrapper\UniversalOS.h" />
     <ClInclude Include="..\..\..\Material\MaterialParser.h" />
     <ClInclude Include="..\..\..\Material\MaterialTemplate.h" />
     <ClInclude Include="..\..\..\Material\MaterialTester.h" />

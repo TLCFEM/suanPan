@@ -92,7 +92,7 @@ int AFC::update_trial_status(const vec& t_strain) {
 
     const auto& i_strain = incre_strain(0);
 
-    if(fabs(i_strain) <= tolerance) return SUANPAN_SUCCESS;
+    if(fabs(i_strain) <= datum::eps) return SUANPAN_SUCCESS;
 
     trial_history = current_history;
     auto& load_sign = trial_history(0);

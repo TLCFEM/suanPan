@@ -39,7 +39,7 @@ unique_ptr<Material> TimberPD::get_copy() { return make_unique<TimberPD>(*this);
 int TimberPD::update_trial_status(const vec& t_strain) {
     if(SUANPAN_SUCCESS != BilinearHoffman::update_trial_status(t_strain)) return SUANPAN_FAIL;
 
-    if(norm(incre_strain) <= tolerance) return SUANPAN_SUCCESS;
+    if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
 
     vec principal_stress;    // 3
     mat principal_direction; // 3x3
