@@ -67,14 +67,14 @@ int EB31OS::initialize(const shared_ptr<DomainBase>& D) {
     local_stiff(0, 0) = E * A / length;
 
     auto factor = 2. * E * IZ / length;
-    local_stiff(1, 3) = local_stiff(3, 1) = factor;
+    local_stiff(1, 2) = local_stiff(2, 1) = factor;
     factor *= 2.;
-    local_stiff(1, 1) = local_stiff(3, 3) = factor;
+    local_stiff(1, 1) = local_stiff(2, 2) = factor;
 
     factor = 2. * E * IY / length;
-    local_stiff(2, 4) = local_stiff(4, 2) = factor;
+    local_stiff(3, 4) = local_stiff(4, 3) = factor;
     factor *= 2.;
-    local_stiff(2, 2) = local_stiff(4, 4) = factor;
+    local_stiff(3, 3) = local_stiff(4, 4) = factor;
 
     factor = (12. * E * IW / length / length + 1.2 * G * J) / length;
     local_stiff(5, 5) = local_stiff(6, 6) = factor;
