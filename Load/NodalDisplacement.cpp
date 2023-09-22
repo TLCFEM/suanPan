@@ -35,11 +35,13 @@ int NodalDisplacement::initialize(const shared_ptr<DomainBase>& D) {
 }
 
 int NodalDisplacement::process(const shared_ptr<DomainBase>& D) {
-    const auto& W = D->get_factory();
+    if(!encoding.empty()) {
+        const auto& W = D->get_factory();
 
-    trial_settlement.zeros(W->get_size());
+        trial_settlement.zeros(W->get_size());
 
-    trial_settlement(encoding).fill(pattern * magnitude->get_amplitude(W->get_trial_time()));
+        trial_settlement(encoding).fill(pattern * magnitude->get_amplitude(W->get_trial_time()));
+    }
 
     return SUANPAN_SUCCESS;
 }

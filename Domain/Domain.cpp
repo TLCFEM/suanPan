@@ -1105,11 +1105,11 @@ int Domain::process_load(const bool full) {
 #else
         code += std::invoke(process_handler, t_load, shared_from_this());
 #endif
-        if(!t_load->get_trial_load().empty()) {
+        if(!t_load->get_trial_load().empty() && !trial_load.empty()) {
             std::scoped_lock trial_load_lock(factory->get_trial_load_mutex());
             trial_load += t_load->get_trial_load();
         }
-        if(!t_load->get_trial_settlement().empty()) {
+        if(!t_load->get_trial_settlement().empty() && !trial_settlement.empty()) {
             std::scoped_lock trial_settlement_lock(factory->get_trial_settlement_mutex());
             trial_settlement += t_load->get_trial_settlement();
         }

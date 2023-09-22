@@ -25,6 +25,11 @@ int MPDC::analyze() {
 
     const auto idx = to_uvec(W->get_reference_dof());
 
+    if(idx.empty()) {
+        suanpan_error("Displacement controlled algorithm is activated but no valid displacement load is applied.\n");
+        return SUANPAN_FAIL;
+    }
+
     mat disp_a;
 
     wall_clock t_clock;
