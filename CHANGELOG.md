@@ -10,6 +10,7 @@
 
 1. revise uniaxial universal damage models [#153](https://github.com/TLCFEM/suanPan/pull/153)
 2. update `OpenBLAS` to version `0.3.24`
+3. better local iteration convergence criterion [#161](https://github.com/TLCFEM/suanPan/pull/161)
 
 ## version 3.1
 
