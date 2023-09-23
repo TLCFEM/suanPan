@@ -165,7 +165,7 @@ vector<vec> F31::record(const OutputType P) {
 }
 
 void F31::print() {
-    suanpan_info("A 2D force based beam element{}.\n", nlgeom ? " and corotational formulation" : "");
+    suanpan_info("A 3D force based beam element{}.\n", nlgeom ? " and corotational formulation" : "");
     suanpan_info("The element connects nodes:", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Section:\n");
@@ -182,7 +182,7 @@ void F31::print() {
 void F31::Setup() {
     vtk_cell = vtkSmartPointer<vtkLine>::New();
     const auto ele_coor = get_coordinate(3);
-    for(unsigned I = 0; I < b_node; ++I) {
+    for(auto I = 0u; I < b_node; ++I) {
         vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
         vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), ele_coor(I, 2));
     }
@@ -195,12 +195,12 @@ void F31::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type
     else if(OutputType::V == type) t_disp = reshape(get_current_velocity(), b_dof, b_node);
     else if(OutputType::U == type) t_disp = reshape(get_current_displacement(), b_dof, b_node);
 
-    for(unsigned I = 0; I < b_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
+    for(auto I = 0u; I < b_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
 }
 
 void F31::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
     const mat ele_disp = get_coordinate(3) + amplifier * mat(reshape(get_current_displacement(), b_dof, b_node)).rows(0, 2).t();
-    for(unsigned I = 0; I < b_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), ele_disp(I, 2));
+    for(auto I = 0u; I < b_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), ele_disp(I, 2));
 }
 
 #endif

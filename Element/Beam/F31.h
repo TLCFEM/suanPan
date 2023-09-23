@@ -35,7 +35,7 @@
 #define F31_H
 
 #include <Element/SectionElement.h>
-#include <Element/Utility/B2DC.h>
+#include <Element/Utility/Orientation.h>
 
 class F31 final : public SectionElement3D {
     struct IntegrationPoint final {
