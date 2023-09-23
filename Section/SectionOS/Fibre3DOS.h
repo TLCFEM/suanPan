@@ -36,6 +36,8 @@ public:
     Fibre3DOS(unsigned, uvec&&);
 
     unique_ptr<Section> get_copy() override;
+
+    std::vector<vec> record(OutputType) override;
 };
 
 #endif

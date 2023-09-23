@@ -17,6 +17,7 @@
 
 #include "SectionOS3D.h"
 #include <Material/Material.h>
+#include <Recorder/OutputType.h>
 
 const mat SectionOS3D::weighing_mat = [] {
     mat X(4, 4, fill::zeros);
@@ -147,4 +148,28 @@ int SectionOS3D::reset_status() {
     auto code = 0;
     for(const auto& I : int_pt) code += I.s_material->reset_status();
     return code;
+}
+
+vector<vec> SectionOS3D::record(const OutputType P) {
+    if(OutputType::BEAMS == P) {
+        vec beam_force(6, fill::zeros);
+        for(const auto& I : int_pt) {
+            const auto arm_y = I.coor_y - eccentricity(0);
+            const auto arm_z = I.coor_z - eccentricity(1);
+
+            const vec force = I.weight * I.s_material->get_current_stress();
+
+            const auto& axial_force = force(0);
+
+            beam_force(0) += axial_force;
+            beam_force(1) -= axial_force * arm_y;
+            beam_force(2) += axial_force * arm_z;
+            beam_force(3) += axial_force * (arm_y * arm_y + arm_z * arm_z);
+            beam_force(4) += axial_force * I.coor_s;
+            beam_force(5) -= 2. * I.coor_n * force(1);
+        }
+        return {beam_force};
+    }
+
+    return Section::record(P);
 }

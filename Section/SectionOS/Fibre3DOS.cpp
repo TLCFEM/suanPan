@@ -16,8 +16,19 @@
  ******************************************************************************/
 
 #include "Fibre3DOS.h"
+#include <Recorder/OutputType.h>
 
 Fibre3DOS::Fibre3DOS(const unsigned T, uvec&& ST)
     : Fibre(T, std::forward<uvec>(ST), SectionType::OS3D) {}
 
 unique_ptr<Section> Fibre3DOS::get_copy() { return make_unique<Fibre3DOS>(*this); }
+
+std::vector<vec> Fibre3DOS::record(const OutputType P) {
+    if(OutputType::BEAMS == P) {
+        vec force(6, fill::zeros);
+        for(const auto& I : fibre) for(const auto& J : I->record(P)) if(!J.empty()) force += J;
+        return {force};
+    }
+
+    return Fibre::record(P);
+}

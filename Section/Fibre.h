@@ -21,7 +21,6 @@
  * @date 14/09/2023
  * @version 0.1.0
  * @file Fibre.h
- * @addtogroup Section-2D
  * @ingroup Section
  * @{
  */
@@ -33,8 +32,9 @@
 #include <Toolbox/ResourceHolder.h>
 
 class Fibre : public Section {
-    uvec fibre_tag;
+    const uvec fibre_tag;
 
+protected:
     std::vector<ResourceHolder<Section>> fibre;
 
 public:
