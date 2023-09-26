@@ -188,8 +188,8 @@ void new_cell3dos(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    double area, omega, n;
-    if(!get_input(command, area, omega, n)) {
+    double area, omega, py, pz;
+    if(!get_input(command, area, omega, py, pz)) {
         suanpan_error("A valid parameter is required.\n");
         return;
     }
@@ -210,7 +210,7 @@ void new_cell3dos(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    return_obj = make_unique<Cell3DOS>(tag, area, omega, n, material_id, eccentricity_a, eccentricity_b);
+    return_obj = make_unique<Cell3DOS>(tag, area, omega, py, pz, material_id, eccentricity_a, eccentricity_b);
 }
 
 void new_circle1d(unique_ptr<Section>& return_obj, istringstream& command) {

@@ -32,13 +32,14 @@
 #include <Section/SectionOS/SectionOS3D.h>
 
 class Cell3DOS final : public SectionOS3D {
-    const double omega, n;
+    const double omega, py, pz;
 
 public:
     Cell3DOS(unsigned, // tag
              double,   // area
              double,   // sectional coordinate
-             double,   // n
+             double,   // py
+             double,   // pz
              unsigned, // material tag
              double,   // eccentricity
              double    // eccentricity

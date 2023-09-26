@@ -22,7 +22,8 @@ ElasticOS::ElasticOS(const unsigned T, const double E, const double P, const dou
     , MaterialOS(T, R) {}
 
 int ElasticOS::initialize(const shared_ptr<DomainBase>&) {
-    initial_stiffness = diagmat(vec{elastic_modulus, elastic_modulus / (2. + 2. * poissons_ratio)});
+    const auto shear_modulus = elastic_modulus / (2. + 2. * poissons_ratio);
+    initial_stiffness = diagmat(vec{elastic_modulus, shear_modulus, shear_modulus});
 
     ConstantStiffness(this);
 

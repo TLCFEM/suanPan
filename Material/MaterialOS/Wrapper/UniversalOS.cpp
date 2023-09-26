@@ -28,7 +28,7 @@ void UniversalOS::print() {
     if(base) base->print();
 }
 
-OS14::OS14(const unsigned T, const unsigned BT, const unsigned MI)
-    : UniversalOS(T, BT, MI, uvec{0, 3}, uvec{1, 2, 4, 5}) {}
+OS146::OS146(const unsigned T, const unsigned BT, const unsigned MI)
+    : UniversalOS(T, BT, MI, uvec{0, 3, 5}, uvec{1, 2, 4}) {}
 
-unique_ptr<Material> OS14::get_copy() { return make_unique<OS14>(*this); }
+unique_ptr<Material> OS146::get_copy() { return make_unique<OS146>(*this); }

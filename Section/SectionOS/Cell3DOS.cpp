@@ -19,10 +19,11 @@
 #include <Domain/DomainBase.h>
 #include <Material/Material1D/Material1D.h>
 
-Cell3DOS::Cell3DOS(const unsigned T, const double AR, const double OM, const double NN, const unsigned MT, const double EA, const double EB)
+Cell3DOS::Cell3DOS(const unsigned T, const double AR, const double OM, const double PY, const double PZ, const unsigned MT, const double EA, const double EB)
     : SectionOS3D(T, MT, AR, vec{EA, EB})
     , omega(OM)
-    , n(NN) {}
+    , py(PY)
+    , pz(PZ) {}
 
 int Cell3DOS::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get_material(material_tag);
@@ -30,21 +31,25 @@ int Cell3DOS::initialize(const shared_ptr<DomainBase>& D) {
     access::rw(linear_density) = area * material_proto->get_parameter(ParameterType::DENSITY);
 
     int_pt.clear();
-    int_pt.emplace_back(0., 0., omega, n, area, material_proto->get_copy());
+    int_pt.emplace_back(0., 0., omega, py, pz, area, material_proto->get_copy());
 
-    const auto& arm_y = eccentricity(0);
-    const auto& arm_z = eccentricity(1);
+    const auto arm_y = -eccentricity(0);
+    const auto arm_z = -eccentricity(1);
 
     const auto os_size = static_cast<unsigned>(section_type);
 
-    sp_mat de(2, os_size);
+    sp_mat de(3, os_size);
     de(0, 0) = 1.;
-    de(0, 3) = arm_y;
-    de(0, 4) = arm_z;
+    de(0, 3) = -arm_y;
+    de(0, 4) = -arm_z;
     de(0, 7) = omega;
-    de(1, 6) = -2. * n;
+    de(1, 6) = -arm_z;
+    de(2, 6) = arm_y;
 
-    trial_stiffness = current_stiffness = initial_stiffness = area * de.t() * int_pt.back().s_material->get_initial_stiffness() * de;
+    vec shear_scale{1., 1. - py / arm_z, 1. + pz / arm_y};
+    shear_scale(find_nonfinite(shear_scale)).zeros();
+
+    trial_stiffness = current_stiffness = initial_stiffness = area * de.t() * int_pt.back().s_material->get_initial_stiffness() * diagmat(shear_scale) * de;
 
     trial_geometry = current_geometry = initial_geometry.zeros(os_size, os_size);
 

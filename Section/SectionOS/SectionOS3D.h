@@ -44,9 +44,9 @@ class SectionOS3D : public Section {
 
 protected:
     struct IntegrationPoint {
-        double coor_y, coor_z, coor_s, coor_n, weight;
+        double coor_y, coor_z, coor_s, py, pz, weight;
         ResourceHolder<Material> s_material;
-        IntegrationPoint(double, double, double, double, double, unique_ptr<Material>&&);
+        IntegrationPoint(double, double, double, double, double, double, unique_ptr<Material>&&);
     };
 
     vector<IntegrationPoint> int_pt;

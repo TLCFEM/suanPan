@@ -3847,7 +3847,7 @@
       "trigger":"Fibre3DOS"
     },
     {
-      "contents":"section Cell3DOS ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:[6]} ${7:[7]}\n# (1) int, unique section tag\n# (2) double, area\n# (3) double, sectional coordinate\n# (4) double, n\n# (5) int, material tag\n# [6] double, eccentricity along y-axis, default: 0\n# [7] double, eccentricity along z-axis, default: 0",
+      "contents":"section Cell3DOS ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:[7]} ${8:[8]}\n# (1) int, unique section tag\n# (2) double, area\n# (3) double, sectional coordinate\n# (4) double, py\n# (5) double, pz\n# (6) int, material tag\n# [7] double, eccentricity along y-axis, default: 0\n# [8] double, eccentricity along z-axis, default: 0",
       "details":"3D Fibre Open Section Building Block",
       "kind":"type",
       "trigger":"Cell3DOS"
@@ -6373,10 +6373,10 @@
       "trigger":"PlaneStress"
     },
     {
-      "contents":"material OS14 ${1:(1)} ${2:(2)}\n# (1) int, unique tag\n# (2) int, 3D material tag",
+      "contents":"material OS146 ${1:(1)} ${2:(2)}\n# (1) int, unique tag\n# (2) int, 3D material tag",
       "details":"",
       "kind":"type",
-      "trigger":"OS14"
+      "trigger":"OS146"
     },
     {
       "contents":"",

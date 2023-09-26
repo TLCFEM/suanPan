@@ -42,11 +42,11 @@ public:
     void print() override;
 };
 
-class OS14 final : public UniversalOS {
+class OS146 final : public UniversalOS {
 public:
-    OS14(unsigned, // tag
-         unsigned, // 3D material tag
-         unsigned  // max iteration
+    OS146(unsigned, // tag
+          unsigned, // 3D material tag
+          unsigned  // max iteration
     );
 
     unique_ptr<Material> get_copy() override;

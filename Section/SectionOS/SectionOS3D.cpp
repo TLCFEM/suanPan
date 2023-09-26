@@ -26,11 +26,12 @@ const mat SectionOS3D::weighing_mat = [] {
     return X;
 }();
 
-SectionOS3D::IntegrationPoint::IntegrationPoint(const double CY, const double CZ, const double CS, const double CN, const double W, unique_ptr<Material>&& M)
+SectionOS3D::IntegrationPoint::IntegrationPoint(const double CY, const double CZ, const double CS, const double PY, const double PZ, const double W, unique_ptr<Material>&& M)
     : coor_y(CY)
     , coor_z(CZ)
     , coor_s(CS)
-    , coor_n(CN)
+    , py(PY)
+    , pz(PZ)
     , weight(W)
     , s_material(std::forward<unique_ptr<Material>>(M)) {}
 
@@ -78,9 +79,9 @@ int SectionOS3D::update_trial_status(const vec& t_deformation) {
         const auto arm_y = I.coor_y - eccentricity(0);
         const auto arm_z = I.coor_z - eccentricity(1);
 
-        if(I.s_material->update_trial_status({base_strain - arm_y * vpp - arm_z * wpp + (arm_z * vpp - arm_y * wpp) * f + .5 * (arm_y * arm_y + arm_z * arm_z) * fp * fp + I.coor_s * fpp, -2. * I.coor_n * fp}) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
+        if(I.s_material->update_trial_status({base_strain - arm_y * vpp - arm_z * wpp + (arm_z * vpp - arm_y * wpp) * f + .5 * (arm_y * arm_y + arm_z * arm_z) * fp * fp + I.coor_s * fpp, (I.py - arm_z) * fp, (I.pz + arm_y) * fp}) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 
-        sp_mat de(2, 12);
+        sp_mat de(3, 12);
         de(0, 0) = 1.;
         // de(0, 1) = -arm_y * vp;
         // de(0, 2) = arm_z * wp;
@@ -93,10 +94,14 @@ int SectionOS3D::update_trial_status(const vec& t_deformation) {
         de(0, 9) = 2. * factor(1);
         de(0, 10) = 2. * factor(2);
         de(0, 11) = 2. * factor(3);
-        de(1, 6) = -2. * I.coor_n;
+        de(1, 6) = -arm_z;
+        de(2, 6) = arm_y;
+
+        vec shear_scale{1., 1. - I.py / arm_z, 1. + I.pz / arm_y};
+        shear_scale(find_nonfinite(shear_scale)).zeros();
 
         trial_resistance += I.weight * de.t() * I.s_material->get_trial_stress();
-        trial_stiffness += I.weight * de.t() * I.s_material->get_trial_stiffness() * de;
+        trial_stiffness += I.weight * de.t() * I.s_material->get_trial_stiffness() * diagmat(shear_scale) * de;
 
         auto axial_force = I.weight * I.s_material->get_trial_stress().at(0);
         const auto major_bending = -arm_y * axial_force, minor_bending = arm_z * axial_force;
@@ -170,7 +175,7 @@ vector<vec> SectionOS3D::record(const OutputType P) {
             beam_force(2) += axial_force * arm_z;
             beam_force(3) += axial_force * (arm_y * arm_y + arm_z * arm_z);
             beam_force(4) += axial_force * I.coor_s;
-            beam_force(5) -= 2. * I.coor_n * force(1);
+            beam_force(5) += arm_y * force(2) - arm_z * force(1);
         }
         return {beam_force};
     }

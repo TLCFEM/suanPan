@@ -37,7 +37,7 @@ enum class MaterialType : unsigned {
     D2 = 3,
     D3 = 6,
     DS = 10,
-    OS = 2
+    OS = 3
 };
 
 enum class PlaneType : unsigned {
