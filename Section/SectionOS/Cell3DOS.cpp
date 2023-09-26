@@ -31,10 +31,10 @@ int Cell3DOS::initialize(const shared_ptr<DomainBase>& D) {
     access::rw(linear_density) = area * material_proto->get_parameter(ParameterType::DENSITY);
 
     int_pt.clear();
-    int_pt.emplace_back(0., 0., omega, py, pz, area, material_proto->get_copy());
+    int_pt.emplace_back(omega, py, pz, area, material_proto->get_copy());
 
-    const auto arm_y = -eccentricity(0);
-    const auto arm_z = -eccentricity(1);
+    const auto& arm_y = eccentricity(0);
+    const auto& arm_z = eccentricity(1);
 
     const auto os_size = static_cast<unsigned>(section_type);
 

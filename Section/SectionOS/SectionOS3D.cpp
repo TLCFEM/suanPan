@@ -26,10 +26,8 @@ const mat SectionOS3D::weighing_mat = [] {
     return X;
 }();
 
-SectionOS3D::IntegrationPoint::IntegrationPoint(const double CY, const double CZ, const double CS, const double PY, const double PZ, const double W, unique_ptr<Material>&& M)
-    : coor_y(CY)
-    , coor_z(CZ)
-    , coor_s(CS)
+SectionOS3D::IntegrationPoint::IntegrationPoint(const double CS, const double PY, const double PZ, const double W, unique_ptr<Material>&& M)
+    : omega(CS)
     , py(PY)
     , pz(PZ)
     , weight(W)
@@ -76,10 +74,12 @@ int SectionOS3D::update_trial_status(const vec& t_deformation) {
     trial_geometry.zeros();
 
     for(const auto& I : int_pt) {
-        const auto arm_y = I.coor_y - eccentricity(0);
-        const auto arm_z = I.coor_z - eccentricity(1);
+        // note the difference here
+        // eccentricity stores location
+        const auto& arm_y = eccentricity(0);
+        const auto& arm_z = eccentricity(1);
 
-        if(I.s_material->update_trial_status({base_strain - arm_y * vpp - arm_z * wpp + (arm_z * vpp - arm_y * wpp) * f + .5 * (arm_y * arm_y + arm_z * arm_z) * fp * fp + I.coor_s * fpp, (I.py - arm_z) * fp, (I.pz + arm_y) * fp}) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
+        if(I.s_material->update_trial_status({base_strain - arm_y * vpp - arm_z * wpp + (arm_z * vpp - arm_y * wpp) * f + .5 * (arm_y * arm_y + arm_z * arm_z) * fp * fp + I.omega * fpp, (I.py - arm_z) * fp, (I.pz + arm_y) * fp}) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 
         sp_mat de(3, 12);
         de(0, 0) = 1.;
@@ -89,7 +89,7 @@ int SectionOS3D::update_trial_status(const vec& t_deformation) {
         de(0, 4) = -arm_z - arm_y * f;
         de(0, 5) = arm_z * vpp - arm_y * wpp;
         de(0, 6) = (arm_y * arm_y + arm_z * arm_z) * fp;
-        de(0, 7) = I.coor_s;
+        de(0, 7) = I.omega;
         de(0, 8) = 2. * factor(0);
         de(0, 9) = 2. * factor(1);
         de(0, 10) = 2. * factor(2);
@@ -163,8 +163,8 @@ vector<vec> SectionOS3D::record(const OutputType P) {
     if(OutputType::BEAMS == P) {
         vec beam_force(6, fill::zeros);
         for(const auto& I : int_pt) {
-            const auto arm_y = I.coor_y - eccentricity(0);
-            const auto arm_z = I.coor_z - eccentricity(1);
+            const auto& arm_y = eccentricity(0);
+            const auto& arm_z = eccentricity(1);
 
             const vec force = I.weight * I.s_material->get_current_stress();
 
@@ -174,7 +174,7 @@ vector<vec> SectionOS3D::record(const OutputType P) {
             beam_force(1) -= axial_force * arm_y;
             beam_force(2) += axial_force * arm_z;
             beam_force(3) += axial_force * (arm_y * arm_y + arm_z * arm_z);
-            beam_force(4) += axial_force * I.coor_s;
+            beam_force(4) += axial_force * I.omega;
             beam_force(5) += arm_y * force(2) - arm_z * force(1);
         }
         return {beam_force};
