@@ -2707,6 +2707,28 @@ template<typename T> void new_wrapper(unique_ptr<Material>& return_obj, istrings
     return_obj = make_unique<T>(tag, full_tag, max_iteration);
 }
 
+void new_os146s(unique_ptr<Material>& return_obj, istringstream& command) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    unsigned full_tag;
+    if(!get_input(command, full_tag)) {
+        suanpan_error("A valid reference material tag is required.\n");
+        return;
+    }
+
+    double shear_modulus;
+    if(!get_input(command, shear_modulus)) {
+        suanpan_error("A valid shear modulus is required.\n");
+        return;
+    }
+
+    return_obj = make_unique<OS146S>(tag, full_tag, shear_modulus);
+}
+
 void new_polyelastic1d(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -3476,6 +3498,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "Nonviscous01")) new_nonviscous01(new_material, command);
     else if(is_equal(material_id, "OrthotropicElastic3D")) new_orthotropicelastic3d(new_material, command);
     else if(is_equal(material_id, "OS146")) new_wrapper<OS146>(new_material, command);
+    else if(is_equal(material_id, "OS146S")) new_os146s(new_material, command);
     else if(is_equal(material_id, "ParabolicCC")) new_paraboliccc(new_material, command);
     else if(is_equal(material_id, "Parallel")) new_parallel(new_material, command);
     else if(is_equal(material_id, "PlaneStrain")) new_planestrain(new_material, command, 0);

@@ -52,6 +52,36 @@ public:
     unique_ptr<Material> get_copy() override;
 };
 
+class OS146S final : public Material {
+    const unsigned base_tag;
+
+    const double shear_modulus;
+
+    ResourceHolder<Material> base;
+
+public:
+    OS146S(unsigned, // tag
+           unsigned, // 3D material tag
+           double    // shear modulus
+    );
+
+    int initialize(const shared_ptr<DomainBase>&) override;
+
+    [[nodiscard]] double get_parameter(ParameterType) const override;
+
+    unique_ptr<Material> get_copy() override;
+
+    int update_trial_status(const vec&) override;
+
+    int clear_status() override;
+    int commit_status() override;
+    int reset_status() override;
+
+    std::vector<vec> record(OutputType) override;
+
+    void print() override;
+};
+
 #endif
 
 //! @}

@@ -6374,9 +6374,15 @@
     },
     {
       "contents":"material OS146 ${1:(1)} ${2:(2)}\n# (1) int, unique tag\n# (2) int, 3D material tag",
-      "details":"",
+      "details":"Wrapper 3D -> OS",
       "kind":"type",
       "trigger":"OS146"
+    },
+    {
+      "contents":"material OS146S ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique tag\n# (2) int, 1D material tag\n# (3) double, shear modulus",
+      "details":"Wrapper 1D -> OS",
+      "kind":"type",
+      "trigger":"OS146S"
     },
     {
       "contents":"",

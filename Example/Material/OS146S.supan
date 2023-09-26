@@ -1,0 +1,43 @@
+# A TEST MODEL FOR OS146S MATERIAL
+
+node 1 0 0 0
+node 2 1 0 0
+
+material Elastic1D 1 100
+material OS146S 2 1 60
+
+section Cell3DOS 1 10. 1. 1. 1. 2 10. 10.
+section Cell3DOS 2 10. -1. 1. 1. 2 -10. -10.
+section Cell3DOS 4 10. -1. 1. 1. 2 -10. 10.
+section Fibre3DOS 3 1 2 4
+
+orientation B3DOSL 1 0. 0. 1.
+
+element B31OS 1 1 2 3 1 6
+
+fix2 1 E 1
+
+cload 1 0 100 3 2
+
+step static 1
+set ini_step_size 1E-1
+set fixed_step_size true
+
+converger RelIncreDisp 1 1E-10 5 1
+
+analyze
+
+# Node 2:
+# Coordinate:
+#   1.0000e+00  0.0000e+00  0.0000e+00
+# Displacement:
+#   1.2500e-03  7.2915e-05  1.5625e-04 -8.0729e-09 -2.5000e-04  1.2500e-04 -8.1209e-10
+# Resistance:
+#   4.0939e-15 -3.8986e-14  1.0000e+02 -2.8238e-15 -1.7605e-14  2.4229e-16 -2.7139e-16
+peek node 2 3
+
+peek element 1
+
+reset
+clear
+exit
