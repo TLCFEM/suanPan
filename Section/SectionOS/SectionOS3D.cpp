@@ -67,6 +67,9 @@ int SectionOS3D::update_trial_status(const vec& t_deformation) {
     const auto& fpp = trial_deformation(7);
     const auto theta = trial_deformation.tail(4);
 
+    const rowvec factor = theta.t() * weighing_mat;
+    const auto base_strain = dot(factor, theta) + up;
+
     trial_stiffness.zeros();
     trial_resistance.zeros();
     trial_geometry.zeros();
@@ -75,11 +78,9 @@ int SectionOS3D::update_trial_status(const vec& t_deformation) {
         const auto arm_y = I.coor_y - eccentricity(0);
         const auto arm_z = I.coor_z - eccentricity(1);
 
-        const rowvec factor = theta.t() * weighing_mat;
+        if(I.s_material->update_trial_status({base_strain - arm_y * vpp - arm_z * wpp + (arm_z * vpp - arm_y * wpp) * f + .5 * (arm_y * arm_y + arm_z * arm_z) * fp * fp + I.coor_s * fpp, -2. * I.coor_n * fp}) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 
-        if(const vec os_strain{dot(factor, theta) + up - arm_y * vpp - arm_z * wpp + (arm_z * vpp - arm_y * wpp) * f + .5 * (arm_y * arm_y + arm_z * arm_z) * fp * fp + I.coor_s * fpp, -2. * I.coor_n * fp}; I.s_material->update_trial_status(os_strain) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
-
-        mat de(2, 12, fill::zeros);
+        sp_mat de(2, 12);
         de(0, 0) = 1.;
         // de(0, 1) = -arm_y * vp;
         // de(0, 2) = arm_z * wp;
@@ -88,7 +89,10 @@ int SectionOS3D::update_trial_status(const vec& t_deformation) {
         de(0, 5) = arm_z * vpp - arm_y * wpp;
         de(0, 6) = (arm_y * arm_y + arm_z * arm_z) * fp;
         de(0, 7) = I.coor_s;
-        de.row(0).tail(4) = 2. * factor;
+        de(0, 8) = 2. * factor(0);
+        de(0, 9) = 2. * factor(1);
+        de(0, 10) = 2. * factor(2);
+        de(0, 11) = 2. * factor(3);
         de(1, 6) = -2. * I.coor_n;
 
         trial_resistance += I.weight * de.t() * I.s_material->get_trial_stress();

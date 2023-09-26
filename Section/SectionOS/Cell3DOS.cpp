@@ -37,7 +37,7 @@ int Cell3DOS::initialize(const shared_ptr<DomainBase>& D) {
 
     const auto os_size = static_cast<unsigned>(section_type);
 
-    mat de(2, os_size, fill::zeros);
+    sp_mat de(2, os_size);
     de(0, 0) = 1.;
     de(0, 3) = arm_y;
     de(0, 4) = arm_z;

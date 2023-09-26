@@ -25,8 +25,8 @@
  * @{
  */
 
-#ifndef UniversalOS_H
-#define UniversalOS_H
+#ifndef UNIVERSALOS_H
+#define UNIVERSALOS_H
 
 #include <Material/Material3D/Wrapper/StressWrapper.h>
 
