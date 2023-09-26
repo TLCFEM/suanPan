@@ -94,14 +94,11 @@ int SectionOS3D::update_trial_status(const vec& t_deformation) {
         de(0, 9) = 2. * factor(1);
         de(0, 10) = 2. * factor(2);
         de(0, 11) = 2. * factor(3);
-        de(1, 6) = -arm_z;
-        de(2, 6) = arm_y;
-
-        vec shear_scale{1., 1. - I.py / arm_z, 1. + I.pz / arm_y};
-        shear_scale(find_nonfinite(shear_scale)).zeros();
+        de(1, 6) = I.py - arm_z;
+        de(2, 6) = I.pz + arm_y;
 
         trial_resistance += I.weight * de.t() * I.s_material->get_trial_stress();
-        trial_stiffness += I.weight * de.t() * I.s_material->get_trial_stiffness() * diagmat(shear_scale) * de;
+        trial_stiffness += I.weight * de.t() * I.s_material->get_trial_stiffness() * de;
 
         auto axial_force = I.weight * I.s_material->get_trial_stress().at(0);
         const auto major_bending = -arm_y * axial_force, minor_bending = arm_z * axial_force;

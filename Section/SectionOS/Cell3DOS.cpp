@@ -43,13 +43,10 @@ int Cell3DOS::initialize(const shared_ptr<DomainBase>& D) {
     de(0, 3) = -arm_y;
     de(0, 4) = -arm_z;
     de(0, 7) = omega;
-    de(1, 6) = -arm_z;
-    de(2, 6) = arm_y;
+    de(1, 6) = py - arm_z;
+    de(2, 6) = pz + arm_y;
 
-    vec shear_scale{1., 1. - py / arm_z, 1. + pz / arm_y};
-    shear_scale(find_nonfinite(shear_scale)).zeros();
-
-    trial_stiffness = current_stiffness = initial_stiffness = area * de.t() * int_pt.back().s_material->get_initial_stiffness() * diagmat(shear_scale) * de;
+    trial_stiffness = current_stiffness = initial_stiffness = area * de.t() * int_pt.back().s_material->get_initial_stiffness() * de;
 
     trial_geometry = current_geometry = initial_geometry.zeros(os_size, os_size);
 
