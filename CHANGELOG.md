@@ -10,7 +10,9 @@
 
 1. revise uniaxial universal damage models [#153](https://github.com/TLCFEM/suanPan/pull/153)
 2. update `OpenBLAS` to version `0.3.24`
-3. better local iteration convergence criterion [#161](https://github.com/TLCFEM/suanPan/pull/161)
+3. beam element for arbitrary thin-/thick-walled open/close section with torsion and warping `B31OS` [#159](https://github.com/TLCFEM/suanPan/pull/159)
+4. better local iteration convergence criterion [#161](https://github.com/TLCFEM/suanPan/pull/161)
+5. `B31OS` and `EB31OS` associated transformations `B3DOSL`, `B3DOSC`; sections, `Fibre3DOS`, `Cell3DOS`; material wrappers `OS146`, `OS146S`
 
 ## version 3.1
 
