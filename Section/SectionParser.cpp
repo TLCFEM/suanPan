@@ -21,7 +21,7 @@
 #include <Section/Section>
 #include <Toolbox/utility.h>
 
-void new_bar2d(unique_ptr<Section>& return_obj, istringstream& command) {
+void new_cell2d(unique_ptr<Section>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
@@ -46,10 +46,10 @@ void new_bar2d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    return_obj = make_unique<Bar2D>(tag, area, material_id, eccentricity);
+    return_obj = make_unique<Cell2D>(tag, area, material_id, eccentricity);
 }
 
-void new_bar3d(unique_ptr<Section>& return_obj, istringstream& command) {
+void new_cell3d(unique_ptr<Section>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
@@ -78,7 +78,7 @@ void new_bar3d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    return_obj = make_unique<Bar3D>(tag, area, material_id, eccentricity_a, eccentricity_b);
+    return_obj = make_unique<Cell3D>(tag, area, material_id, eccentricity_a, eccentricity_b);
 }
 
 void new_box2d(unique_ptr<Section>& return_obj, istringstream& command) {
@@ -2294,10 +2294,10 @@ int create_new_section(const shared_ptr<DomainBase>& domain, istringstream& comm
 
     unique_ptr<Section> new_section = nullptr;
 
-    if(is_equal(section_id, "Bar2D")) new_bar2d(new_section, command);
-    else if(is_equal(section_id, "Bar3D")) new_bar3d(new_section, command);
-    else if(is_equal(section_id, "Box2D")) new_box2d(new_section, command);
+    if(is_equal(section_id, "Box2D")) new_box2d(new_section, command);
     else if(is_equal(section_id, "Box3D")) new_box3d(new_section, command);
+    else if(is_equal(section_id, "Cell2D") || is_equal(section_id, "Bar2D")) new_cell2d(new_section, command);
+    else if(is_equal(section_id, "Cell3D") || is_equal(section_id, "Bar3D")) new_cell3d(new_section, command);
     else if(is_equal(section_id, "Cell3DOS")) new_cell3dos(new_section, command);
     else if(is_equal(section_id, "Circle1D")) new_circle1d(new_section, command);
     else if(is_equal(section_id, "Circle2D")) new_circle2d(new_section, command);

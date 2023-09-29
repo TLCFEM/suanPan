@@ -23,6 +23,20 @@ Section2D::IntegrationPoint::IntegrationPoint(const double C, const double W, un
     , weight(W)
     , s_material(std::forward<unique_ptr<Material>>(M)) {}
 
+void Section2D::initialize_stiffness() {
+    initial_stiffness.zeros(2, 2);
+    for(const auto& I : int_pt) {
+        auto ea = I.s_material->get_initial_stiffness().at(0) * I.weight;
+        const auto arm_y = eccentricity(0) - I.coor;
+        initial_stiffness(0, 0) += ea;
+        initial_stiffness(0, 1) += ea *= arm_y;
+        initial_stiffness(1, 1) += ea *= arm_y;
+    }
+    initial_stiffness(1, 0) = initial_stiffness(0, 1);
+
+    trial_stiffness = current_stiffness = initial_stiffness;
+}
+
 Section2D::Section2D(const unsigned T, const unsigned MT, const double A, const double EC)
     : Section(T, SectionType::D2, MT, A, vec{EC, 0.}) {}
 

@@ -57,24 +57,7 @@ int Box3D::initialize(const shared_ptr<DomainBase>& D) {
         int_pt.emplace_back(-flange_middle, .5 * plan(I, 0) * net_flange, .5 * plan(I, 1) * flange_area, material_proto->get_copy());
     }
 
-    initial_stiffness.zeros(3, 3);
-    for(const auto& I : int_pt) {
-        const auto tmp_a = I.s_material->get_initial_stiffness().at(0) * I.weight;
-        const auto arm_y = eccentricity(0) - I.coor_y;
-        const auto arm_z = I.coor_z - eccentricity(1);
-        initial_stiffness(0, 0) += tmp_a;
-        initial_stiffness(0, 1) += tmp_a * arm_y;
-        initial_stiffness(0, 2) += tmp_a * arm_z;
-        initial_stiffness(1, 1) += tmp_a * arm_y * arm_y;
-        initial_stiffness(1, 2) += tmp_a * arm_y * arm_z;
-        initial_stiffness(2, 2) += tmp_a * arm_z * arm_z;
-    }
-
-    initial_stiffness(1, 0) = initial_stiffness(0, 1);
-    initial_stiffness(2, 0) = initial_stiffness(0, 2);
-    initial_stiffness(2, 1) = initial_stiffness(1, 2);
-
-    trial_stiffness = current_stiffness = initial_stiffness;
+    initialize_stiffness();
 
     return SUANPAN_SUCCESS;
 }

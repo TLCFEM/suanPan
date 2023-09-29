@@ -45,6 +45,8 @@ protected:
 
     vector<IntegrationPoint> int_pt;
 
+    void initialize_stiffness();
+
 public:
     Section2D(unsigned,    // tag
               unsigned,    // material tag

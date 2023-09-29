@@ -15,14 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include "Bar2D.h"
+#include "Cell2D.h"
 #include <Domain/DomainBase.h>
 #include <Material/Material1D/Material1D.h>
 
-Bar2D::Bar2D(const unsigned T, const double AR, const unsigned MT, const double EC)
-    : Section2D(T, MT, AR, EC) {}
+// eccentricity should really be location and be stored in integration point
+// here we flip the sign and use eccentricity to store it
+Cell2D::Cell2D(const unsigned T, const double AR, const unsigned MT, const double EC)
+    : Section2D(T, MT, AR, -EC) {}
 
-int Bar2D::initialize(const shared_ptr<DomainBase>& D) {
+int Cell2D::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get_material(material_tag);
 
     access::rw(linear_density) = area * material_proto->get_parameter(ParameterType::DENSITY);
@@ -30,19 +32,14 @@ int Bar2D::initialize(const shared_ptr<DomainBase>& D) {
     int_pt.clear();
     int_pt.emplace_back(0., area, material_proto->get_copy());
 
-    initial_stiffness.set_size(2, 2);
-    initial_stiffness(0, 0) = int_pt.back().s_material->get_initial_stiffness().at(0) * area;
-    initial_stiffness(0, 1) = initial_stiffness(1, 0) = initial_stiffness(0, 0) * eccentricity(0);
-    initial_stiffness(1, 1) = initial_stiffness(0, 1) * eccentricity(0);
-
-    trial_stiffness = current_stiffness = initial_stiffness;
+    initialize_stiffness();
 
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Section> Bar2D::get_copy() { return make_unique<Bar2D>(*this); }
+unique_ptr<Section> Cell2D::get_copy() { return make_unique<Cell2D>(*this); }
 
-void Bar2D::print() {
-    suanpan_info("A 2D section that represents for example rebar in RC section.\n");
+void Cell2D::print() {
+    suanpan_info("A 2D section that represents a small cell.\n");
     for(const auto& I : int_pt) I.s_material->print();
 }

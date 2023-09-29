@@ -15,14 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include "Bar3D.h"
+#include "Cell3D.h"
 #include <Domain/DomainBase.h>
 #include <Material/Material1D/Material1D.h>
 
-Bar3D::Bar3D(const unsigned T, const double AR, const unsigned MT, const double EA, const double EB)
-    : Section3D(T, MT, AR, vec{EA, EB}) {}
+// eccentricity should really be location and be stored in integration point
+// here we flip the sign and use eccentricity to store it
+Cell3D::Cell3D(const unsigned T, const double AR, const unsigned MT, const double EA, const double EB)
+    : Section3D(T, MT, AR, vec{-EA, -EB}) {}
 
-int Bar3D::initialize(const shared_ptr<DomainBase>& D) {
+int Cell3D::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get_material(material_tag);
 
     access::rw(linear_density) = area * material_proto->get_parameter(ParameterType::DENSITY);
@@ -30,25 +32,14 @@ int Bar3D::initialize(const shared_ptr<DomainBase>& D) {
     int_pt.clear();
     int_pt.emplace_back(0., 0., area, material_proto->get_copy());
 
-    initial_stiffness.set_size(3, 3);
-
-    const auto ea = int_pt.back().s_material->get_initial_stiffness().at(0) * area;
-    const auto &arm_y = eccentricity(0), &arm_z = eccentricity(1);
-    initial_stiffness(0, 0) = ea;
-    initial_stiffness(1, 1) = ea * arm_y * arm_y;
-    initial_stiffness(2, 2) = ea * arm_z * arm_z;
-    initial_stiffness(1, 0) = initial_stiffness(0, 1) = ea * arm_y;
-    initial_stiffness(2, 0) = initial_stiffness(0, 2) = -ea * arm_z;
-    initial_stiffness(2, 1) = initial_stiffness(1, 2) = -ea * arm_y * arm_z;
-
-    trial_stiffness = current_stiffness = initial_stiffness;
+    initialize_stiffness();
 
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Section> Bar3D::get_copy() { return make_unique<Bar3D>(*this); }
+unique_ptr<Section> Cell3D::get_copy() { return make_unique<Cell3D>(*this); }
 
-void Bar3D::print() {
-    suanpan_info("A 3D section that represents for example rebar in RC section.\n");
+void Cell3D::print() {
+    suanpan_info("A 3D section that represents a small cell.\n");
     for(const auto& I : int_pt) I.s_material->print();
 }

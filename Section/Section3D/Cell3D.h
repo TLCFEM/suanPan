@@ -15,29 +15,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class Bar3D
- * @brief A Bar3D class.
+ * @class Cell3D
+ * @brief A Cell3D class.
  * @author tlc
  * @date 26/07/2018
  * @version 0.1.0
- * @file Bar3D.h
+ * @file Cell3D.h
  * @addtogroup Section-3D
  * @ingroup Section
  * @{
  */
 
-#ifndef BAR3D_H
-#define BAR3D_H
+#ifndef CELL3D_H
+#define CELL3D_H
 
 #include <Section/Section3D/Section3D.h>
 
-class Bar3D final : public Section3D {
+class Cell3D final : public Section3D {
 public:
-    Bar3D(unsigned,    // tag
-          double,      // area
-          unsigned,    // material tag
-          double = 0., // eccentricity
-          double = 0.  // eccentricity
+    Cell3D(unsigned,    // tag
+           double,      // area
+           unsigned,    // material tag
+           double = 0., // eccentricity
+           double = 0.  // eccentricity
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;
@@ -46,6 +46,8 @@ public:
 
     void print() override;
 };
+
+using Bar3D = Cell3D;
 
 #endif
 

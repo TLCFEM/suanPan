@@ -58,23 +58,7 @@ int ISection3D::initialize(const shared_ptr<DomainBase>& D) {
     if(b_flange_area != 0.) for(unsigned I = 0; I < plan_flange.n_rows; ++I) int_pt.emplace_back(.5 * (bottom_flange_thickness + web_height), .5 * plan_flange(I, 0) * bottom_flange_width, .5 * plan_flange(I, 1) * b_flange_area, mat_proto->get_copy());
     if(t_flange_area != 0.) for(unsigned I = 0; I < plan_flange.n_rows; ++I) int_pt.emplace_back(-.5 * (top_flange_thickness + web_height), .5 * plan_flange(I, 0) * top_flange_width, .5 * plan_flange(I, 1) * t_flange_area, mat_proto->get_copy());
 
-    initial_stiffness.zeros(3, 3);
-    for(const auto& I : int_pt) {
-        const auto tmp_a = I.s_material->get_initial_stiffness().at(0) * I.weight;
-        const auto arm_y = eccentricity(0) - I.coor_y;
-        const auto arm_z = I.coor_z - eccentricity(1);
-        initial_stiffness(0, 0) += tmp_a;
-        initial_stiffness(0, 1) += tmp_a * arm_y;
-        initial_stiffness(0, 2) += tmp_a * arm_z;
-        initial_stiffness(1, 1) += tmp_a * arm_y * arm_y;
-        initial_stiffness(1, 2) += tmp_a * arm_y * arm_z;
-        initial_stiffness(2, 2) += tmp_a * arm_z * arm_z;
-    }
-    initial_stiffness(1, 0) = initial_stiffness(0, 1);
-    initial_stiffness(2, 0) = initial_stiffness(0, 2);
-    initial_stiffness(2, 1) = initial_stiffness(1, 2);
-
-    trial_stiffness = current_stiffness = initial_stiffness;
+    initialize_stiffness();
 
     return SUANPAN_SUCCESS;
 }

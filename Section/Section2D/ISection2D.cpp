@@ -58,17 +58,7 @@ int ISection2D::initialize(const shared_ptr<DomainBase>& D) {
     if(b_flange_area != 0.) for(unsigned I = 0; I < plan_flange.n_rows; ++I) int_pt.emplace_back(.5 * (web_height + (1. + plan_flange(I, 0)) * bottom_flange_thickness), .5 * plan_flange(I, 1) * b_flange_area, mat_proto->get_copy());
     if(t_flange_area != 0.) for(unsigned I = 0; I < plan_flange.n_rows; ++I) int_pt.emplace_back(-.5 * (web_height + (1. + plan_flange(I, 0)) * top_flange_thickness), .5 * plan_flange(I, 1) * t_flange_area, mat_proto->get_copy());
 
-    initial_stiffness.zeros(2, 2);
-    for(const auto& I : int_pt) {
-        auto tmp_a = I.s_material->get_initial_stiffness().at(0) * I.weight;
-        const auto tmp_b = eccentricity(0) - I.coor;
-        initial_stiffness(0, 0) += tmp_a;
-        initial_stiffness(0, 1) += tmp_a *= tmp_b;
-        initial_stiffness(1, 1) += tmp_a *= tmp_b;
-    }
-    initial_stiffness(1, 0) = initial_stiffness(0, 1);
-
-    trial_stiffness = current_stiffness = initial_stiffness;
+    initialize_stiffness();
 
     return SUANPAN_SUCCESS;
 }

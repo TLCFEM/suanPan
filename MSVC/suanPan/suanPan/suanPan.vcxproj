@@ -448,7 +448,7 @@
     <ClCompile Include="..\..\..\Section\Section1D\Rectangle1D.cpp" />
     <ClCompile Include="..\..\..\Section\Section1D\Section1D.cpp" />
     <ClCompile Include="..\..\..\Section\Section1D\TrussSection.cpp" />
-    <ClCompile Include="..\..\..\Section\Section2D\Bar2D.cpp" />
+    <ClCompile Include="..\..\..\Section\Section2D\Cell2D.cpp" />
     <ClCompile Include="..\..\..\Section\Section2D\Box2D.cpp" />
     <ClCompile Include="..\..\..\Section\Section2D\Circle2D.cpp" />
     <ClCompile Include="..\..\..\Section\Section2D\CircularHollow2D.cpp" />
@@ -458,7 +458,7 @@
     <ClCompile Include="..\..\..\Section\Section2D\Rectangle2D.cpp" />
     <ClCompile Include="..\..\..\Section\Section2D\Section2D.cpp" />
     <ClCompile Include="..\..\..\Section\Section2D\TSection2D.cpp" />
-    <ClCompile Include="..\..\..\Section\Section3D\Bar3D.cpp" />
+    <ClCompile Include="..\..\..\Section\Section3D\Cell3D.cpp" />
     <ClCompile Include="..\..\..\Section\Section3D\Box3D.cpp" />
     <ClCompile Include="..\..\..\Section\Section3D\Circle3D.cpp" />
     <ClCompile Include="..\..\..\Section\Section3D\CircularHollow3D.cpp" />
@@ -933,7 +933,7 @@
     <ClInclude Include="..\..\..\Section\Section1D\Rectangle1D.h" />
     <ClInclude Include="..\..\..\Section\Section1D\Section1D.h" />
     <ClInclude Include="..\..\..\Section\Section1D\TrussSection.h" />
-    <ClInclude Include="..\..\..\Section\Section2D\Bar2D.h" />
+    <ClInclude Include="..\..\..\Section\Section2D\Cell2D.h" />
     <ClInclude Include="..\..\..\Section\Section2D\Box2D.h" />
     <ClInclude Include="..\..\..\Section\Section2D\Circle2D.h" />
     <ClInclude Include="..\..\..\Section\Section2D\CircularHollow2D.h" />
@@ -943,7 +943,7 @@
     <ClInclude Include="..\..\..\Section\Section2D\Rectangle2D.h" />
     <ClInclude Include="..\..\..\Section\Section2D\Section2D.h" />
     <ClInclude Include="..\..\..\Section\Section2D\TSection2D.h" />
-    <ClInclude Include="..\..\..\Section\Section3D\Bar3D.h" />
+    <ClInclude Include="..\..\..\Section\Section3D\Cell3D.h" />
     <ClInclude Include="..\..\..\Section\Section3D\Box3D.h" />
     <ClInclude Include="..\..\..\Section\Section3D\Circle3D.h" />
     <ClInclude Include="..\..\..\Section\Section3D\CircularHollow3D.h" />

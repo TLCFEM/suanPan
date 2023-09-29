@@ -1,6 +1,6 @@
 set(S3D
-        Section3D/Bar3D.cpp
         Section3D/Box3D.cpp
+        Section3D/Cell3D.cpp
         Section3D/Circle3D.cpp
         Section3D/CircularHollow3D.cpp
         Section3D/Fibre3D.cpp

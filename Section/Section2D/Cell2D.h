@@ -15,28 +15,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class Bar2D
- * @brief A Bar2D class.
+ * @class Cell2D
+ * @brief A Cell2D class.
  * @author tlc
  * @date 15/09/2023
  * @version 0.1.1
- * @file Bar2D.h
+ * @file Cell2D.h
  * @addtogroup Section-2D
  * @ingroup Section
  * @{
  */
 
-#ifndef BAR2D_H
-#define BAR2D_H
+#ifndef CELL2D_H
+#define CELL2D_H
 
 #include <Section/Section2D/Section2D.h>
 
-class Bar2D final : public Section2D {
+class Cell2D final : public Section2D {
 public:
-    Bar2D(unsigned,   // tag
-          double,     // area
-          unsigned,   // material tag
-          double = 0. // eccentricity
+    Cell2D(unsigned,   // tag
+           double,     // area
+           unsigned,   // material tag
+           double = 0. // eccentricity
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;
@@ -45,6 +45,8 @@ public:
 
     void print() override;
 };
+
+using Bar2D = Cell2D;
 
 #endif
 

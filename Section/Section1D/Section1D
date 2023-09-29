@@ -1,5 +1,4 @@
 #include "Circle1D.h"
 #include "Fibre1D.h"
 #include "Rectangle1D.h"
-#include "Section1D.h"
 #include "TrussSection.h"
