@@ -14,7 +14,7 @@ jobs:
       - name: Install VTK
         run: |
           echo "SP_TIME=daily-$(date +''%Y%m%d%H'')" >> $GITHUB_ENV
-          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.6-linux.tar.gz
+          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.6-linux.tar.gz
           tar xf VTK-9.2.6-linux.tar.gz
       - name: Golang
         uses: actions/setup-go@v3
@@ -48,7 +48,7 @@ jobs:
       - name: Install VTK
         run: |
           echo "SP_TIME=daily-$(date +''%Y%m%d%H'')" >> $GITHUB_ENV
-          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.6-macos.tar.gz
+          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.6-macos.tar.gz
           tar xf VTK-9.2.6-macos.tar.gz
       - name: Golang
         uses: actions/setup-go@v3
@@ -84,7 +84,7 @@ jobs:
       - name: Install VTK
         run: |
           echo "SP_TIME=daily-$(date +''%Y%m%d%H'')" >> $GITHUB_ENV
-          wget https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.6-macos.tar.gz
+          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.6-macos.tar.gz
           tar xf VTK-9.2.6-macos.tar.gz
       - name: Golang
         uses: actions/setup-go@v3

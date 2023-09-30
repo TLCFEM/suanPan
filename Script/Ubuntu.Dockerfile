@@ -7,14 +7,10 @@ RUN apt-get update && apt-get install -y locales && rm -rf /var/lib/apt/lists/* 
 
 ENV LANG en_US.utf8
 
-RUN apt-get update -y && apt-get install -y wget gnupg
+RUN apt-get update -y && apt-get install -y wget gnupg gcc g++ gfortran cmake git libxt-dev freeglut3-dev libxcursor-dev file dpkg-dev
 
-RUN wget -q https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
-RUN apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
-RUN echo "deb https://apt.repos.intel.com/oneapi all main" | tee /etc/apt/sources.list.d/oneAPI.list
-RUN rm GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
-
-RUN apt-get update -y && apt-get install -y gcc g++ gfortran cmake git intel-oneapi-mkl-devel libxt-dev freeglut3-dev libxcursor-dev file dpkg-dev
+RUN wget -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/adb8a02c-4ee7-4882-97d6-a524150da358/l_onemkl_p_2023.2.0.49497_offline.sh
+RUN sh ./l_onemkl_p_2023.2.0.49497_offline.sh -a --silent --eula accept && rm ./l_onemkl_p_2023.2.0.49497_offline.sh
 
 RUN mkdir vtk-build && cd vtk-build && \
     wget -q https://www.vtk.org/files/release/9.2/VTK-9.2.6.tar.gz && tar xf VTK-9.2.6.tar.gz && \
