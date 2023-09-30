@@ -3169,7 +3169,7 @@
       "trigger":"Box2D"
     },
     {
-      "contents":"section Box3D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:[6]} ${7:[7]} ${8:[8]}\n# (1) int, unique section tag\n# (2) double, width\n# (3) double, height\n# (4) double, thickness\n# (5) int, material tag\n# [6] int, number of integration points, default: 3\n# [7] double, eccentricity along y axis, default: 0.0\n# [8] double, eccentricity along z axis, default: 0.0",
+      "contents":"section Box3D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:[6]} ${7:[7]} ${8:[8]}\n# (1) int, unique section tag\n# (2) double, width\n# (3) double, height\n# (4) double, thickness\n# (5) int, material tag\n# [6] int, number of integration points, default: 6\n# [7] double, eccentricity along y axis, default: 0.0\n# [8] double, eccentricity along z axis, default: 0.0",
       "details":"3D Box Section",
       "kind":"type",
       "trigger":"Box3D"
@@ -3409,22 +3409,16 @@
       "trigger":"Circle3D"
     },
     {
-      "contents":"section CircularHollow3D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]} ${6:[6]} ${7:[7]}\n# (1) int, unique section tag\n# (2) double, radius\n# (3) double, thickness\n# (4) int, material tag\n# [5] int, number of integration points, default: 10\n# [6] double, eccentricity along y axis, default: 0.0\n# [7] double, eccentricity along z axis, default: 0.0",
-      "details":"3D Hollow Circle Section",
+      "contents":"section CircularHollow3D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]} ${6:[6]} ${7:[7]}\n# (1) int, unique section tag\n# (2) double, radius\n# (3) double, thickness\n# (4) int, material tag\n# [5] int, number of integration points, default: 6\n# [6] double, eccentricity along y axis, default: 0.0\n# [7] double, eccentricity along z axis, default: 0.0",
+      "details":"3D Hollow Circular Section",
       "kind":"type",
-      "trigger":"CircleHollow3D"
+      "trigger":"CircularHollow3D"
     },
     {
-      "contents":"section CircularHollow2D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]} ${6:[6]}\n# (1) int, unique section tag\n# (2) double, radius\n# (3) double, thickness\n# (4) int, material tag\n# [5] int, number of integration points, default: 10\n# [6] double, eccentricity, default: 0.0",
+      "contents":"section CircularHollow2D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]} ${6:[6]}\n# (1) int, unique section tag\n# (2) double, radius\n# (3) double, thickness\n# (4) int, material tag\n# [5] int, number of integration points, default: 6\n# [6] double, eccentricity, default: 0.0",
       "details":"2D Hollow Circular Section",
       "kind":"type",
       "trigger":"CircularHollow2D"
-    },
-    {
-      "contents":"",
-      "details":"",
-      "kind":"type",
-      "trigger":"CircularHollow3D"
     },
     {
       "contents":"",
@@ -5377,7 +5371,7 @@
       "trigger":"ISection2D"
     },
     {
-      "contents":"section ISection3D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:[9]} ${10:[10]} ${11:[11]}\n# (1) int, unique section tag\n# (2) double, top flange width\n# (3) double, top flange thickness\n# (4) double, bottom flange width\n# (5) double, bottom flange thickness\n# (6) double, web height\n# (7) double, web thickness\n# (8) int, material tag\n# [9] int, number of integration points, default: 3\n# [10] double, eccentricity along y axis, default: 0.0\n# [11] double, eccentricity along z axis, default: 0.0",
+      "contents":"section ISection3D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:[9]} ${10:[10]} ${11:[11]}\n# (1) int, unique section tag\n# (2) double, top flange width\n# (3) double, top flange thickness\n# (4) double, bottom flange width\n# (5) double, bottom flange thickness\n# (6) double, web height\n# (7) double, web thickness\n# (8) int, material tag\n# [9] int, number of integration points, default: 6\n# [10] double, eccentricity along y axis, default: 0.0\n# [11] double, eccentricity along z axis, default: 0.0",
       "details":"3D I-Section",
       "kind":"type",
       "trigger":"ISection3D"
@@ -7405,7 +7399,7 @@
       "trigger":"TSection2D"
     },
     {
-      "contents":"section TSection3D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:[7]} ${8:[8]} ${9:[9]}\n# (1) int, unique section tag\n# (2) double, top flange width\n# (3) double, top flange thickness\n# (4) double, web height\n# (5) double, web thickness\n# (6) int, material tag\n# [7] int, number of integration points, default: 3\n# [8] double, eccentricity along y axis, default: 0.0\n# [9] double, eccentricity along z axis, default: 0.0",
+      "contents":"section TSection3D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:[7]} ${8:[8]} ${9:[9]}\n# (1) int, unique section tag\n# (2) double, top flange width\n# (3) double, top flange thickness\n# (4) double, web height\n# (5) double, web thickness\n# (6) int, material tag\n# [7] int, number of integration points, default: 6\n# [8] double, eccentricity along y axis, default: 0.0\n# [9] double, eccentricity along z axis, default: 0.0",
       "details":"3D T-Section",
       "kind":"type",
       "trigger":"TSection3D"

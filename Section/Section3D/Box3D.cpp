@@ -21,14 +21,14 @@
 #include <Toolbox/IntegrationPlan.h>
 
 Box3D::Box3D(const unsigned T, const double B, const double H, const double TH, const unsigned M, const unsigned S, const double E1, const double E2)
-    : Section3D(T, M, 2. * TH * (B + H - 4. * TH), vec{E1, E2})
+    : Section3D(T, M, 2. * TH * (B + H), vec{E1, E2})
     , width(B)
     , height(H)
     , thickness(TH)
     , int_pt_num(S > 20 ? 20 : S) {}
 
 Box3D::Box3D(const unsigned T, vec&& D, const unsigned M, const unsigned S, vec&& EC)
-    : Section3D(T, M, 2. * D(2) * (D(0) + D(1) - 4. * D(2)), std::forward<vec>(EC))
+    : Section3D(T, M, 2. * D(2) * (D(0) + D(1)), std::forward<vec>(EC))
     , width(D(0))
     , height(D(1))
     , thickness(D(2))
@@ -41,12 +41,12 @@ int Box3D::initialize(const shared_ptr<DomainBase>& D) {
 
     const IntegrationPlan plan(1, int_pt_num, IntegrationType::GAUSS);
 
-    const auto net_flange = width - 2. * thickness;
-    const auto net_web = height - 2. * thickness;
+    const auto net_web = height - thickness;
+    const auto net_flange = width + thickness;
     const auto web_area = net_web * thickness;
     const auto flange_area = net_flange * thickness;
-    const auto web_middle = .5 * (width - thickness);
-    const auto flange_middle = .5 * (height - thickness);
+    const auto web_middle = .5 * width;
+    const auto flange_middle = .5 * height;
 
     int_pt.clear();
     int_pt.reserve(4 * static_cast<size_t>(int_pt_num));

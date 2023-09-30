@@ -112,7 +112,7 @@ void new_box2d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned int_pt = 6;
+    auto int_pt = 6u;
     if(command.eof())
         suanpan_debug("Six integration points assumed.\n");
     else if(!get_input(command, int_pt)) {
@@ -160,7 +160,7 @@ void new_box3d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned int_pt = 3;
+    auto int_pt = 6u;
     if(command.eof())
         suanpan_debug("Six integration points assumed.\n");
     else if(!get_input(command, int_pt)) {
@@ -254,7 +254,7 @@ void new_circle2d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned int_pt = 6;
+    auto int_pt = 6u;
     if(!command.eof() && !get_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
         return;
@@ -288,7 +288,7 @@ void new_circle3d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned int_pt = 6;
+    auto int_pt = 6u;
     if(!command.eof() && !get_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
         return;
@@ -333,7 +333,7 @@ void new_circularhollow2D(unique_ptr<Section>& return_obj, istringstream& comman
         return;
     }
 
-    unsigned int_pt = 10;
+    auto int_pt = 6u;
     if(!command.eof() && !get_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
         return;
@@ -373,7 +373,7 @@ void new_circularhollow3D(unique_ptr<Section>& return_obj, istringstream& comman
         return;
     }
 
-    unsigned int_pt = 10;
+    auto int_pt = 6u;
     if(!command.eof() && !get_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
         return;
@@ -467,7 +467,7 @@ void new_hsection2d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned int_pt = 6;
+    auto int_pt = 6u;
     if(!command.eof() && !get_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
         return;
@@ -522,7 +522,7 @@ void new_isection2d(unique_ptr<Section>& return_obj, istringstream& command, con
         return;
     }
 
-    unsigned int_pt = 6;
+    auto int_pt = 6u;
     if(!command.eof() && !get_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
         return;
@@ -557,7 +557,7 @@ void new_isection3d(unique_ptr<Section>& return_obj, istringstream& command, con
         return;
     }
 
-    unsigned int_pt = 6;
+    auto int_pt = 6u;
     if(!command.eof() && !get_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
         return;
@@ -632,7 +632,7 @@ void new_rectangle2d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned int_pt = 6;
+    auto int_pt = 6u;
     if(command.eof())
         suanpan_debug("Six integration points assumed.\n");
     else if(!get_input(command, int_pt)) {
@@ -674,7 +674,7 @@ void new_rectangle3d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned int_pt = 3;
+    auto int_pt = 6u;
     if(command.eof())
         suanpan_debug("Six integration points assumed.\n");
     else if(!get_input(command, int_pt)) {
@@ -736,7 +736,7 @@ void new_tsection2d(unique_ptr<Section>& return_obj, istringstream& command, con
         return;
     }
 
-    unsigned int_pt = 4;
+    auto int_pt = 6u;
     if(!command.eof() && !get_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
         return;
@@ -771,7 +771,7 @@ void new_tsection3d(unique_ptr<Section>& return_obj, istringstream& command, con
         return;
     }
 
-    unsigned int_pt = 3;
+    auto int_pt = 6u;
     if(!command.eof() && !get_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
         return;
@@ -806,7 +806,7 @@ void new_nm2d(unique_ptr<Section>& return_obj, istringstream& command, const uns
         return;
     }
 
-    if(3 == size) {
+    if(3u == size) {
         return_obj = make_unique<NM2D1>(tag, P(0), P(1), P(2));
         return;
     }
@@ -841,7 +841,7 @@ void new_nm3d(unique_ptr<Section>& return_obj, istringstream& command, const uns
         return;
     }
 
-    if(4 == size) {
+    if(4u == size) {
         return_obj = make_unique<NM3D1>(tag, P(0), P(1), P(2), P(3));
         return;
     }
@@ -880,7 +880,7 @@ void new_nmk(unique_ptr<Section>& return_obj, istringstream& command, const unsi
     double para;
     while(!command.eof() && get_input(command, para)) para_set.emplace_back(para);
 
-    const auto p_size = 13 == size ? 3 : 4;
+    const auto p_size = 13u == size ? 3 : 4;
 
     if(para_set.size() % p_size != 0) {
         suanpan_error("A valid parameter set is required.\n");
@@ -1952,7 +1952,7 @@ void new_eu2d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned int_pt = 6;
+    auto int_pt = 6u;
     if(!command.eof() && !get_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
         return;
@@ -1999,7 +1999,7 @@ void new_eu3d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned int_pt = 6;
+    auto int_pt = 6u;
     if(!command.eof() && !get_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
         return;
@@ -2052,7 +2052,7 @@ void new_nz2d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned int_pt = 6;
+    auto int_pt = 6u;
     if(!command.eof() && !get_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
         return;
@@ -2120,7 +2120,7 @@ void new_nz3d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned int_pt = 6;
+    auto int_pt = 6u;
     if(!command.eof() && !get_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
         return;
@@ -2194,7 +2194,7 @@ void new_us2d(unique_ptr<Section>& return_obj, istringstream& command, const boo
         return;
     }
 
-    unsigned int_pt = 6;
+    auto int_pt = 6u;
     if(!command.eof() && !get_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
         return;
@@ -2249,7 +2249,7 @@ void new_us3d(unique_ptr<Section>& return_obj, istringstream& command, const boo
         return;
     }
 
-    unsigned int_pt = 6;
+    auto int_pt = 6u;
     if(!command.eof() && !get_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
         return;

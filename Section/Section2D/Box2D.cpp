@@ -19,10 +19,10 @@
 #include <Material/Material1D/Material1D.h>
 
 Box2D::Box2D(const unsigned T, const double B, const double H, const double TH, const unsigned M, const unsigned S, const double EC)
-    : ISection2D(T, B, TH, B, TH, H - 2. * TH, 2. * TH, M, S, EC) {}
+    : ISection2D(T, B + TH, TH, B + TH, TH, H - TH, 2. * TH, M, S, EC) {}
 
 Box2D::Box2D(const unsigned T, vec&& D, const unsigned M, const unsigned S, const double EC)
-    : ISection2D(T, D(0), D(2), D(0), D(2), D(1) - 2. * D(2), 2. * D(2), M, S, EC) {}
+    : ISection2D(T, D(0) + D(2), D(2), D(0) + D(2), D(2), D(1) - D(2), 2. * D(2), M, S, EC) {}
 
 unique_ptr<Section> Box2D::get_copy() { return make_unique<Box2D>(*this); }
 

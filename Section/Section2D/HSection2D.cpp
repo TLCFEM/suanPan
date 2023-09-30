@@ -35,16 +35,20 @@ int HSection2D::initialize(const shared_ptr<DomainBase>& D) {
 
     access::rw(linear_density) = mat_proto->get_parameter(ParameterType::DENSITY) * area;
 
+    const auto web_area = web_width * web_thickness;
+    const auto l_flange_area = left_flange_height * left_flange_thickness;
+    const auto r_flange_area = right_flange_height * right_flange_thickness;
+
     const IntegrationPlan plan_flange(1, int_pt_num, IntegrationType::GAUSS);
     const IntegrationPlan plan_web(1, 2, IntegrationType::GAUSS);
 
     int_pt.clear();
     int_pt.reserve(2llu * int_pt_num + 2);
-    int_pt.emplace_back(.5 * plan_web(0, 0) * web_thickness, .5 * plan_web(0, 1) * web_width * web_thickness, mat_proto->get_copy());
-    int_pt.emplace_back(.5 * plan_web(1, 0) * web_thickness, .5 * plan_web(1, 1) * web_width * web_thickness, mat_proto->get_copy());
+    int_pt.emplace_back(.5 * plan_web(0, 0) * web_thickness, .5 * plan_web(0, 1) * web_area, mat_proto->get_copy());
+    int_pt.emplace_back(.5 * plan_web(1, 0) * web_thickness, .5 * plan_web(1, 1) * web_area, mat_proto->get_copy());
     for(unsigned I = 0; I < int_pt_num; ++I) {
-        int_pt.emplace_back(.5 * plan_flange(I, 0) * left_flange_height, .5 * plan_flange(I, 1) * left_flange_height * left_flange_thickness, mat_proto->get_copy());
-        int_pt.emplace_back(.5 * plan_flange(I, 0) * right_flange_height, .5 * plan_flange(I, 1) * right_flange_height * right_flange_thickness, mat_proto->get_copy());
+        int_pt.emplace_back(.5 * plan_flange(I, 0) * left_flange_height, .5 * plan_flange(I, 1) * l_flange_area, mat_proto->get_copy());
+        int_pt.emplace_back(.5 * plan_flange(I, 0) * right_flange_height, .5 * plan_flange(I, 1) * r_flange_area, mat_proto->get_copy());
     }
 
     initialize_stiffness();

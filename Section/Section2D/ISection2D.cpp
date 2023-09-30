@@ -55,8 +55,8 @@ int ISection2D::initialize(const shared_ptr<DomainBase>& D) {
     int_pt.clear();
     int_pt.reserve(int_pt_num + 2llu * plan_flange.n_rows);
     for(unsigned I = 0; I < int_pt_num; ++I) int_pt.emplace_back(.5 * plan_web(I, 0) * web_height, .5 * plan_web(I, 1) * web_area, mat_proto->get_copy());
-    if(b_flange_area != 0.) for(unsigned I = 0; I < plan_flange.n_rows; ++I) int_pt.emplace_back(.5 * (web_height + (1. + plan_flange(I, 0)) * bottom_flange_thickness), .5 * plan_flange(I, 1) * b_flange_area, mat_proto->get_copy());
-    if(t_flange_area != 0.) for(unsigned I = 0; I < plan_flange.n_rows; ++I) int_pt.emplace_back(-.5 * (web_height + (1. + plan_flange(I, 0)) * top_flange_thickness), .5 * plan_flange(I, 1) * t_flange_area, mat_proto->get_copy());
+    if(b_flange_area > 0.) for(unsigned I = 0; I < plan_flange.n_rows; ++I) int_pt.emplace_back(.5 * (web_height + (1. + plan_flange(I, 0)) * bottom_flange_thickness), .5 * plan_flange(I, 1) * b_flange_area, mat_proto->get_copy());
+    if(t_flange_area > 0.) for(unsigned I = 0; I < plan_flange.n_rows; ++I) int_pt.emplace_back(-.5 * (web_height + (1. + plan_flange(I, 0)) * top_flange_thickness), .5 * plan_flange(I, 1) * t_flange_area, mat_proto->get_copy());
 
     initialize_stiffness();
 

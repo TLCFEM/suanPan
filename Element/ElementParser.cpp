@@ -2055,7 +2055,7 @@ void new_s4(unique_ptr<Element>& return_obj, istringstream& command) {
     return_obj = make_unique<S4>(tag, std::move(node_tag), material_tag, thickness, is_true(nlgeom));
 }
 
-void new_singlesection2d(unique_ptr<Element>& return_obj, istringstream& command) {
+template<typename T> void new_singlesection(unique_ptr<Element>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
@@ -2074,29 +2074,7 @@ void new_singlesection2d(unique_ptr<Element>& return_obj, istringstream& command
         return;
     }
 
-    return_obj = make_unique<SingleSection2D>(tag, node, section_tag);
-}
-
-void new_singlesection3d(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    unsigned node;
-    if(!get_input(command, node)) {
-        suanpan_error("A valid node tag is required.\n");
-        return;
-    }
-
-    unsigned section_tag;
-    if(!get_input(command, section_tag)) {
-        suanpan_error("A valid section tag is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<SingleSection3D>(tag, node, section_tag);
+    return_obj = make_unique<T>(tag, node, section_tag);
 }
 
 void new_spring01(unique_ptr<Element>& return_obj, istringstream& command) {
@@ -2756,8 +2734,8 @@ int create_new_element(const shared_ptr<DomainBase>& domain, istringstream& comm
     else if(is_equal(element_id, "SGCMQI")) new_sgcmq(new_element, command, 'I');
     else if(is_equal(element_id, "SGCMQL")) new_sgcmq(new_element, command, 'L');
     else if(is_equal(element_id, "SGCMS")) new_sgcms(new_element, command);
-    else if(is_equal(element_id, "SingleSection2D")) new_singlesection2d(new_element, command);
-    else if(is_equal(element_id, "SingleSection3D")) new_singlesection3d(new_element, command);
+    else if(is_equal(element_id, "SingleSection2D")) new_singlesection<SingleSection2D>(new_element, command);
+    else if(is_equal(element_id, "SingleSection3D")) new_singlesection<SingleSection3D>(new_element, command);
     else if(is_equal(element_id, "Spring01")) new_spring01(new_element, command);
     else if(is_equal(element_id, "Spring02")) new_spring02(new_element, command);
     else if(is_equal(element_id, "T2D2")) new_t2d2(new_element, command);

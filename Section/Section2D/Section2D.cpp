@@ -47,15 +47,15 @@ int Section2D::update_trial_status(const vec& t_deformation) {
     trial_resistance.zeros();
 
     for(const auto& I : int_pt) {
-        const auto arm = eccentricity(0) - I.coor;
-        if(I.s_material->update_trial_status(trial_deformation(0) + trial_deformation(1) * arm) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
-        auto tmp_a = I.s_material->get_trial_stiffness().at(0) * I.weight;
-        trial_stiffness(0, 0) += tmp_a;
-        trial_stiffness(0, 1) += tmp_a *= arm;
-        trial_stiffness(1, 1) += tmp_a *= arm;
-        tmp_a = I.s_material->get_trial_stress().at(0) * I.weight;
-        trial_resistance(0) += tmp_a;
-        trial_resistance(1) += tmp_a * arm;
+        const auto arm_y = eccentricity(0) - I.coor;
+        if(I.s_material->update_trial_status(trial_deformation(0) + trial_deformation(1) * arm_y) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
+        auto ea = I.s_material->get_trial_stiffness().at(0) * I.weight;
+        trial_stiffness(0, 0) += ea;
+        trial_stiffness(0, 1) += ea *= arm_y;
+        trial_stiffness(1, 1) += ea *= arm_y;
+        ea = I.s_material->get_trial_stress().at(0) * I.weight;
+        trial_resistance(0) += ea;
+        trial_resistance(1) += ea * arm_y;
     }
 
     trial_stiffness(1, 0) = trial_stiffness(0, 1);
