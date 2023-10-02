@@ -27,7 +27,7 @@ ElementalNonviscous::ElementalNonviscous(const unsigned T, cx_vec&& M, cx_vec&& 
 int ElementalNonviscous::initialize(const shared_ptr<DomainBase>& D) {
     Modifier::initialize(D);
 
-    if(std::ranges::any_of(element_pool, [](const weak_ptr<Element>& ele_ptr) { return !ele_ptr.lock()->get_current_nonviscous_force().empty(); })) {
+    if(std::any_of(element_pool.cbegin(), element_pool.cend(), [](const weak_ptr<Element>& ele_ptr) { return !ele_ptr.lock()->get_current_nonviscous_force().empty(); })) {
         suanpan_error("Repeated element tags are detected, modifier {} is disabled.\n", get_tag());
         element_pool.clear();
     }
