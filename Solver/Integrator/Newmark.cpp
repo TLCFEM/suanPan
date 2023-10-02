@@ -30,13 +30,15 @@ void Newmark::assemble_resistance() {
 
     auto fa = std::async([&] { D->assemble_resistance(); });
     auto fb = std::async([&] { D->assemble_damping_force(); });
-    auto fc = std::async([&] { D->assemble_inertial_force(); });
+    auto fc = std::async([&] { D->assemble_nonviscous_force(); });
+    auto fd = std::async([&] { D->assemble_inertial_force(); });
 
     fa.get();
     fb.get();
     fc.get();
+    fd.get();
 
-    W->set_sushi(W->get_trial_resistance() + W->get_trial_damping_force() + W->get_trial_inertial_force());
+    W->set_sushi(W->get_trial_resistance() + W->get_trial_damping_force() + W->get_trial_nonviscous_force() + W->get_trial_inertial_force());
 }
 
 void Newmark::assemble_matrix() {
@@ -46,14 +48,16 @@ void Newmark::assemble_matrix() {
     auto fa = std::async([&] { D->assemble_trial_stiffness(); });
     auto fb = std::async([&] { D->assemble_trial_geometry(); });
     auto fc = std::async([&] { D->assemble_trial_damping(); });
-    auto fd = std::async([&] { D->assemble_trial_mass(); });
+    auto fd = std::async([&] { D->assemble_trial_nonviscous(); });
+    auto fe = std::async([&] { D->assemble_trial_mass(); });
 
     fa.get();
     fb.get();
     fc.get();
     fd.get();
+    fe.get();
 
-    W->get_stiffness() += W->get_geometry() + C0 * W->get_mass() + C1 * W->get_damping();
+    W->get_stiffness() += W->get_geometry() + C0 * W->get_mass() + C1 * (W->get_damping() + W->get_nonviscous());
 }
 
 int Newmark::update_trial_status() {

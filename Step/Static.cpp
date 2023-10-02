@@ -32,7 +32,7 @@ int Static::initialize() {
 
     factory->set_analysis_type(AnalysisType::STATICS);
 
-    const auto& t_domain = database.lock();
+    const auto t_domain = database.lock();
 
     if(SUANPAN_SUCCESS != t_domain->restart()) return SUANPAN_FAIL;
 

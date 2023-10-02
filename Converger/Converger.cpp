@@ -94,7 +94,7 @@ void Converger::set_conv_flag(const bool C) { conv_flag = C; }
 bool Converger::get_conv_flag() const { return conv_flag; }
 
 vec Converger::get_residual() const {
-    const auto& D = get_domain().lock();
+    const auto D = get_domain().lock();
     auto& W = D->get_factory();
 
     vec residual = W->get_trial_load() - W->get_sushi();

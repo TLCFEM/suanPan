@@ -43,6 +43,7 @@ class ElementBase : public Tag, public vtkBase {
     virtual void update_strain_energy() = 0;
     virtual void update_kinetic_energy() = 0;
     virtual void update_viscous_energy() = 0;
+    virtual void update_nonviscous_energy() = 0;
     virtual void update_complementary_energy() = 0;
     virtual void update_momentum() = 0;
 
@@ -60,16 +61,6 @@ protected:
     friend vec get_current_acceleration(const ElementBase*);
 
     [[nodiscard]] virtual mat get_coordinate(unsigned) const = 0;
-
-    [[nodiscard]] virtual vec get_incre_displacement() const = 0;
-    [[nodiscard]] virtual vec get_incre_velocity() const = 0;
-    [[nodiscard]] virtual vec get_incre_acceleration() const = 0;
-    [[nodiscard]] virtual vec get_trial_displacement() const = 0;
-    [[nodiscard]] virtual vec get_trial_velocity() const = 0;
-    [[nodiscard]] virtual vec get_trial_acceleration() const = 0;
-    [[nodiscard]] virtual vec get_current_displacement() const = 0;
-    [[nodiscard]] virtual vec get_current_velocity() const = 0;
-    [[nodiscard]] virtual vec get_current_acceleration() const = 0;
 
     [[nodiscard]] virtual vec get_node_incre_resistance() const = 0;
     [[nodiscard]] virtual vec get_node_trial_resistance() const = 0;
@@ -120,6 +111,16 @@ public:
 
     virtual void clear_node_ptr() = 0;
     [[nodiscard]] virtual const std::vector<weak_ptr<Node>>& get_node_ptr() const = 0;
+
+    [[nodiscard]] virtual vec get_incre_displacement() const = 0;
+    [[nodiscard]] virtual vec get_incre_velocity() const = 0;
+    [[nodiscard]] virtual vec get_incre_acceleration() const = 0;
+    [[nodiscard]] virtual vec get_trial_displacement() const = 0;
+    [[nodiscard]] virtual vec get_trial_velocity() const = 0;
+    [[nodiscard]] virtual vec get_trial_acceleration() const = 0;
+    [[nodiscard]] virtual vec get_current_displacement() const = 0;
+    [[nodiscard]] virtual vec get_current_velocity() const = 0;
+    [[nodiscard]] virtual vec get_current_acceleration() const = 0;
 
     [[nodiscard]] virtual const vec& get_trial_resistance() const = 0;
     [[nodiscard]] virtual const vec& get_current_resistance() const = 0;
@@ -173,6 +174,7 @@ public:
     [[nodiscard]] virtual double get_complementary_energy() const = 0;
     [[nodiscard]] virtual double get_kinetic_energy() const = 0;
     [[nodiscard]] virtual double get_viscous_energy() const = 0;
+    [[nodiscard]] virtual double get_nonviscous_energy() const = 0;
     [[nodiscard]] virtual const vec& get_momentum() const = 0;
     [[nodiscard]] virtual double get_momentum_component(DOF) const = 0;
 

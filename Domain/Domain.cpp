@@ -988,7 +988,7 @@ int Domain::initialize() {
     factory->set_nlgeom(nlgeom);
 
     // initialize modifier based on updated element pool
-    suanpan::for_all(modifier_pond, [&](const std::pair<unsigned, shared_ptr<Modifier>>& t_modifier) { t_modifier.second->initialize(shared_from_this()); });
+    suanpan::for_all(modifier_pond, [&](const std::pair<unsigned, shared_ptr<Modifier>>& t_modifier) { if(SUANPAN_SUCCESS != t_modifier.second->initialize(shared_from_this())) disable_modifier(t_modifier.first); });
     modifier_pond.update();
     // sort to ensure lower performs first
     if(auto& t_modifier_pool = access::rw(modifier_pond.get()); t_modifier_pool.size() > 1)

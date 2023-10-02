@@ -14,25 +14,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @class ElementalLee
+ * @brief A ElementalLee damping class.
+ * @author tlc
+ * @date 20/10/2022
+ * @version 0.1.0
+ * @file ElementalLee.h
+ * @addtogroup Modifier
+ * @{
+ */
 
-#include "Modifier.h"
-#include <Domain/DomainBase.h>
+#ifndef ELEMENTALLEE_H
+#define ELEMENTALLEE_H
 
-Modifier::Modifier(const unsigned T, uvec&& ET)
-    : Tag(T)
-    , element_tag(unique(ET)) {}
+#include <Element/Modifier/Modifier.h>
 
-int Modifier::initialize(const shared_ptr<DomainBase>& D) {
-    element_pool.clear();
+class ElementalLee final : public Modifier {
+    const double default_damping_ratio = .02;
+    const double damping_ratio;
 
-    if(element_tag.empty()) {
-        element_pool.reserve(D->get_element());
-        for(const auto& I : D->get_element_pool()) element_pool.emplace_back(I);
-    }
-    else {
-        element_pool.reserve(element_tag.size());
-        for(const auto I : element_tag) if(D->find<Element>(I) && D->get<Element>(I)->is_active()) element_pool.emplace_back(D->get<Element>(I));
-    }
+public:
+    ElementalLee(unsigned, double, uvec&& = {});
 
-    return SUANPAN_SUCCESS;
-}
+    int update_status() override;
+};
+
+#endif
+
+//! @}

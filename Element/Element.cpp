@@ -44,6 +44,12 @@ void Element::update_viscous_energy() {
     viscous_energy += .5 * (current_damping_force.is_empty() ? dot(get_incre_displacement(), trial_damping_force) : dot(get_incre_displacement(), current_damping_force + trial_damping_force));
 }
 
+void Element::update_nonviscous_energy() {
+    if(trial_nonviscous_force.is_empty()) return;
+
+    nonviscous_energy += .5 * dot(get_incre_displacement(), real(sum(current_nonviscous_force + trial_nonviscous_force, 1)));
+}
+
 void Element::update_complementary_energy() {
     if(trial_resistance.is_empty()) return;
 
@@ -291,7 +297,7 @@ Element::Element(const unsigned T, const unsigned ND, const unsigned ET, const u
 int Element::initialize_base(const shared_ptr<DomainBase>& D) {
     // initialized already, check node validity
     if(node_ptr.size() == num_node) {
-        for(const auto& I : node_ptr) if(const auto& t_node = I.lock(); nullptr == t_node || !t_node->is_active()) return SUANPAN_FAIL;
+        for(const auto& I : node_ptr) if(const auto t_node = I.lock(); nullptr == t_node || !t_node->is_active()) return SUANPAN_FAIL;
         return SUANPAN_SUCCESS;
     }
 
@@ -522,6 +528,7 @@ int Element::clear_status() {
     strain_energy = 0.;
     kinetic_energy = 0.;
     viscous_energy = 0.;
+    nonviscous_energy = 0.;
     complementary_energy = 0.;
     momentum.zeros();
 
@@ -573,6 +580,8 @@ double Element::get_complementary_energy() const { return complementary_energy; 
 double Element::get_kinetic_energy() const { return kinetic_energy; }
 
 double Element::get_viscous_energy() const { return viscous_energy; }
+
+double Element::get_nonviscous_energy() const { return nonviscous_energy; }
 
 const vec& Element::get_momentum() const { return momentum; }
 

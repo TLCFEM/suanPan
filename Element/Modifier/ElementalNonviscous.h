@@ -15,27 +15,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class LeeElementalDamping
- * @brief A LeeElementalDamping damping class.
+ * @class ElementalNonviscous
+ * @brief A ElementalNonviscous damping class.
  * @author tlc
- * @date 20/10/2022
- * @version 0.1.0
- * @file LeeElementalDamping.h
+ * @date 02/10/2023
+ * @version 0.2.0
+ * @file ElementalNonviscous.h
  * @addtogroup Modifier
  * @{
  */
 
-#ifndef LEEELEMENTALDAMPING_H
-#define LEEELEMENTALDAMPING_H
+#ifndef ELEMENTALNONVISCOUS_H
+#define ELEMENTALNONVISCOUS_H
 
 #include <Element/Modifier/Modifier.h>
 
-class LeeElementalDamping final : public Modifier {
-    const double default_damping_ratio = .02;
-    const double damping_ratio;
+class ElementalNonviscous final : public Modifier {
+    const cx_vec m, s;
+
+    const double* incre_time = nullptr;
 
 public:
-    LeeElementalDamping(unsigned, double, uvec&& = {});
+    ElementalNonviscous(unsigned, cx_vec&&, cx_vec&&, uvec&& = {});
+
+    int initialize(const shared_ptr<DomainBase>&) override;
 
     int update_status() override;
 };

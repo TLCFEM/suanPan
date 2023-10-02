@@ -27,7 +27,7 @@ Buckle::Buckle(const unsigned T)
     : Static(T, 1.) {}
 
 int Buckle::initialize() {
-    const auto& t_domain = database.lock();
+    const auto t_domain = database.lock();
 
     // converger
     if(nullptr == tester) tester = make_shared<AbsIncreDisp>();
@@ -56,7 +56,7 @@ int Buckle::initialize() {
 int Buckle::analyze() {
     if(Static::analyze() == SUANPAN_FAIL) return SUANPAN_FAIL;
 
-    const auto& D = get_domain().lock();
+    const auto D = get_domain().lock();
     auto& G = get_integrator();
     auto& W = get_factory();
 

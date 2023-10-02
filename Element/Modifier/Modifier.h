@@ -50,7 +50,7 @@ public:
 
     ~Modifier() override = default;
 
-    virtual void initialize(const shared_ptr<DomainBase>&);
+    virtual int initialize(const shared_ptr<DomainBase>&);
 
     virtual int update_status() = 0;
 };

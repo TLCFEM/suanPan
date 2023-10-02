@@ -87,6 +87,11 @@ template<sp_d T> unique_ptr<MetaMat<T>> operator+(unique_ptr<MetaMat<T>>&& B, co
     return std::forward<unique_ptr<MetaMat<T>>>(B);
 }
 
+template<sp_d T> const shared_ptr<MetaMat<T>>& operator+(const shared_ptr<MetaMat<T>>& A, const shared_ptr<MetaMat<T>>& B) {
+    B->operator+=(A);
+    return B;
+}
+
 template<sp_d T> const shared_ptr<MetaMat<T>>& operator-=(const shared_ptr<MetaMat<T>>& M, const shared_ptr<MetaMat<T>>& A) {
     M->operator-=(A);
     return M;
