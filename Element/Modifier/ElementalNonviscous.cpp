@@ -17,7 +17,6 @@
 
 #include "ElementalNonviscous.h"
 #include <Domain/DomainBase.h>
-#include <Domain/Factory.hpp>
 #include <Domain/Group/Group.h>
 
 ElementalNonviscous::ElementalNonviscous(const unsigned T, cx_vec&& M, cx_vec&& S, uvec&& ET)
@@ -38,14 +37,15 @@ int ElementalNonviscous::initialize(const shared_ptr<DomainBase>& D) {
         access::rw(t_ele->get_current_nonviscous_force()).zeros(t_ele->get_total_number(), m.n_elem);
     });
 
-    incre_time = &D->get_factory()->modify_incre_time();
+    factory = D->get_factory();
+
     return SUANPAN_SUCCESS;
 }
 
 int ElementalNonviscous::update_status() {
-    if(element_pool.empty()) return SUANPAN_SUCCESS;
+    if(element_pool.empty() || AnalysisType::DYNAMICS != factory.lock()->get_analysis_type()) return SUANPAN_SUCCESS;
 
-    const cx_vec t_para = 2. / *incre_time + s;
+    const cx_vec t_para = 2. / factory.lock()->get_incre_time() + s;
     const cx_vec s_para = (t_para - 2. * s) / t_para;
     const cx_vec m_para = m / t_para;
     const auto accu_para = accu(m_para).real();

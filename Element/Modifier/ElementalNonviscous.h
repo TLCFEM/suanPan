@@ -29,11 +29,12 @@
 #define ELEMENTALNONVISCOUS_H
 
 #include <Element/Modifier/Modifier.h>
+#include <Domain/Factory.hpp>
 
 class ElementalNonviscous : public Modifier {
     const cx_vec m, s;
 
-    const double* incre_time = nullptr;
+    weak_ptr<Factory<double>> factory;
 
 public:
     ElementalNonviscous(unsigned, cx_vec&&, cx_vec&&, uvec&& = {});
