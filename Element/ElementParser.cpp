@@ -2598,7 +2598,7 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
 
         while(!command.eof()) {
             double t_m_r, t_m_i, t_s_r, t_s_i;
-            if(!get_input(command, t_m_r, t_s_r, t_m_i, t_s_i)) {
+            if(!get_input(command, t_m_r, t_m_i, t_s_r, t_s_i)) {
                 suanpan_error("A valid damping coefficient is required.\n");
                 return SUANPAN_SUCCESS;
             }
