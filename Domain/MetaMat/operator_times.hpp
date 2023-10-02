@@ -19,7 +19,6 @@
 #define OPERATOR_TIMES_HPP
 
 #include "FullMat.hpp"
-#include "SymmPackMat.hpp"
 
 template<sp_d T> unique_ptr<MetaMat<T>> operator*(const T value, const unique_ptr<MetaMat<T>>& M) {
     if(nullptr == M) return nullptr;

@@ -116,57 +116,63 @@ template<sp_d T> class Factory final {
     T strain_energy = T(0);
     T kinetic_energy = T(0);
     T viscous_energy = T(0);
+    T nonviscous_energy = T(0);
     T complementary_energy = T(0);
     Col<T> momentum;
 
-    Col<T> trial_load_factor;    // global trial load factor
-    Col<T> trial_load;           // global trial load vector
-    Col<T> trial_settlement;     // global trial displacement load vector
-    Col<T> trial_resistance;     // global trial resistance vector
-    Col<T> trial_damping_force;  // global trial damping force vector
-    Col<T> trial_inertial_force; // global trial inertial force vector
-    Col<T> trial_displacement;   // global trial displacement vector
-    Col<T> trial_velocity;       // global trial velocity vector
-    Col<T> trial_acceleration;   // global trial acceleration vector
-    Col<T> trial_temperature;    // global trial temperature vector
+    Col<T> trial_load_factor;      // global trial load factor
+    Col<T> trial_load;             // global trial load vector
+    Col<T> trial_settlement;       // global trial displacement load vector
+    Col<T> trial_resistance;       // global trial resistance vector
+    Col<T> trial_damping_force;    // global trial damping force vector
+    Col<T> trial_nonviscous_force; // global trial nonviscous damping force vector
+    Col<T> trial_inertial_force;   // global trial inertial force vector
+    Col<T> trial_displacement;     // global trial displacement vector
+    Col<T> trial_velocity;         // global trial velocity vector
+    Col<T> trial_acceleration;     // global trial acceleration vector
+    Col<T> trial_temperature;      // global trial temperature vector
 
-    Col<T> incre_load_factor;    // global incremental load vector
-    Col<T> incre_load;           // global incremental load vector
-    Col<T> incre_settlement;     // global incremental displacement load vector
-    Col<T> incre_resistance;     // global incremental resistance vector
-    Col<T> incre_damping_force;  // global incremental damping force vector
-    Col<T> incre_inertial_force; // global incremental inertial force vector
-    Col<T> incre_displacement;   // global incremental displacement vector
-    Col<T> incre_velocity;       // global incremental velocity vector
-    Col<T> incre_acceleration;   // global incremental acceleration vector
-    Col<T> incre_temperature;    // global incremental temperature vector
+    Col<T> incre_load_factor;      // global incremental load vector
+    Col<T> incre_load;             // global incremental load vector
+    Col<T> incre_settlement;       // global incremental displacement load vector
+    Col<T> incre_resistance;       // global incremental resistance vector
+    Col<T> incre_damping_force;    // global incremental damping force vector
+    Col<T> incre_nonviscous_force; // global incremental nonviscous damping force vector
+    Col<T> incre_inertial_force;   // global incremental inertial force vector
+    Col<T> incre_displacement;     // global incremental displacement vector
+    Col<T> incre_velocity;         // global incremental velocity vector
+    Col<T> incre_acceleration;     // global incremental acceleration vector
+    Col<T> incre_temperature;      // global incremental temperature vector
 
-    Col<T> current_load_factor;    // global current load vector
-    Col<T> current_load;           // global current load vector
-    Col<T> current_settlement;     // global current displacement load vector
-    Col<T> current_resistance;     // global current resistance vector
-    Col<T> current_damping_force;  // global current damping force vector
-    Col<T> current_inertial_force; // global current inertial force vector
-    Col<T> current_displacement;   // global current displacement vector
-    Col<T> current_velocity;       // global current velocity vector
-    Col<T> current_acceleration;   // global current acceleration vector
-    Col<T> current_temperature;    // global current temperature vector
+    Col<T> current_load_factor;      // global current load vector
+    Col<T> current_load;             // global current load vector
+    Col<T> current_settlement;       // global current displacement load vector
+    Col<T> current_resistance;       // global current resistance vector
+    Col<T> current_damping_force;    // global current damping force vector
+    Col<T> current_nonviscous_force; // global current nonviscous damping force vector
+    Col<T> current_inertial_force;   // global current inertial force vector
+    Col<T> current_displacement;     // global current displacement vector
+    Col<T> current_velocity;         // global current velocity vector
+    Col<T> current_acceleration;     // global current acceleration vector
+    Col<T> current_temperature;      // global current temperature vector
 
-    Col<T> pre_load_factor;    // global previous load vector
-    Col<T> pre_load;           // global previous load vector
-    Col<T> pre_settlement;     // global previous displacement load vector
-    Col<T> pre_resistance;     // global previous resistance vector
-    Col<T> pre_damping_force;  // global previous damping force vector
-    Col<T> pre_inertial_force; // global previous inertial force vector
-    Col<T> pre_displacement;   // global previous displacement vector
-    Col<T> pre_velocity;       // global previous velocity vector
-    Col<T> pre_acceleration;   // global previous acceleration vector
-    Col<T> pre_temperature;    // global previous temperature vector
+    Col<T> pre_load_factor;      // global previous load vector
+    Col<T> pre_load;             // global previous load vector
+    Col<T> pre_settlement;       // global previous displacement load vector
+    Col<T> pre_resistance;       // global previous resistance vector
+    Col<T> pre_damping_force;    // global previous damping force vector
+    Col<T> pre_nonviscous_force; // global previous nonviscous damping force vector
+    Col<T> pre_inertial_force;   // global previous inertial force vector
+    Col<T> pre_displacement;     // global previous displacement vector
+    Col<T> pre_velocity;         // global previous velocity vector
+    Col<T> pre_acceleration;     // global previous acceleration vector
+    Col<T> pre_temperature;      // global previous temperature vector
 
-    shared_ptr<MetaMat<T>> global_mass = nullptr;      // global mass matrix
-    shared_ptr<MetaMat<T>> global_damping = nullptr;   // global damping matrix
-    shared_ptr<MetaMat<T>> global_stiffness = nullptr; // global stiffness matrix
-    shared_ptr<MetaMat<T>> global_geometry = nullptr;  // global geometry matrix
+    shared_ptr<MetaMat<T>> global_mass = nullptr;       // global mass matrix
+    shared_ptr<MetaMat<T>> global_damping = nullptr;    // global damping matrix
+    shared_ptr<MetaMat<T>> global_nonviscous = nullptr; // global nonviscous damping matrix
+    shared_ptr<MetaMat<T>> global_stiffness = nullptr;  // global stiffness matrix
+    shared_ptr<MetaMat<T>> global_geometry = nullptr;   // global geometry matrix
 
     std::vector<std::mutex> global_mutex = std::vector<std::mutex>(20);
 
@@ -236,6 +242,7 @@ public:
     void initialize_settlement();
     void initialize_resistance();
     void initialize_damping_force();
+    void initialize_nonviscous_force();
     void initialize_inertial_force();
     void initialize_displacement();
     void initialize_velocity();
@@ -245,6 +252,7 @@ public:
 
     void initialize_mass();
     void initialize_damping();
+    void initialize_nonviscous();
     void initialize_stiffness();
     void initialize_geometry();
     void initialize_eigen();
@@ -266,6 +274,7 @@ public:
     void set_trial_settlement(const Col<T>&);
     void set_trial_resistance(const Col<T>&);
     void set_trial_damping_force(const Col<T>&);
+    void set_trial_nonviscous_force(const Col<T>&);
     void set_trial_inertial_force(const Col<T>&);
     void set_trial_displacement(const Col<T>&);
     void set_trial_velocity(const Col<T>&);
@@ -278,6 +287,7 @@ public:
     void set_incre_settlement(const Col<T>&);
     void set_incre_resistance(const Col<T>&);
     void set_incre_damping_force(const Col<T>&);
+    void set_incre_nonviscous_force(const Col<T>&);
     void set_incre_inertial_force(const Col<T>&);
     void set_incre_displacement(const Col<T>&);
     void set_incre_velocity(const Col<T>&);
@@ -290,6 +300,7 @@ public:
     void set_current_settlement(const Col<T>&);
     void set_current_resistance(const Col<T>&);
     void set_current_damping_force(const Col<T>&);
+    void set_current_nonviscous_force(const Col<T>&);
     void set_current_inertial_force(const Col<T>&);
     void set_current_displacement(const Col<T>&);
     void set_current_velocity(const Col<T>&);
@@ -302,6 +313,7 @@ public:
     void set_pre_settlement(const Col<T>&);
     void set_pre_resistance(const Col<T>&);
     void set_pre_damping_force(const Col<T>&);
+    void set_pre_nonviscous_force(const Col<T>&);
     void set_pre_inertial_force(const Col<T>&);
     void set_pre_displacement(const Col<T>&);
     void set_pre_velocity(const Col<T>&);
@@ -310,6 +322,7 @@ public:
 
     void set_mass(const shared_ptr<MetaMat<T>>&);
     void set_damping(const shared_ptr<MetaMat<T>>&);
+    void set_nonviscous(const shared_ptr<MetaMat<T>>&);
     void set_stiffness(const shared_ptr<MetaMat<T>>&);
     void set_geometry(const shared_ptr<MetaMat<T>>&);
 
@@ -337,6 +350,7 @@ public:
     T get_strain_energy();
     T get_kinetic_energy();
     T get_viscous_energy();
+    T get_nonviscous_energy();
     T get_complementary_energy();
     const Col<T>& get_momentum();
 
@@ -346,6 +360,7 @@ public:
     const Col<T>& get_trial_settlement() const;
     const Col<T>& get_trial_resistance() const;
     const Col<T>& get_trial_damping_force() const;
+    const Col<T>& get_trial_nonviscous_force() const;
     const Col<T>& get_trial_inertial_force() const;
     const Col<T>& get_trial_displacement() const;
     const Col<T>& get_trial_velocity() const;
@@ -358,6 +373,7 @@ public:
     const Col<T>& get_incre_settlement() const;
     const Col<T>& get_incre_resistance() const;
     const Col<T>& get_incre_damping_force() const;
+    const Col<T>& get_incre_nonviscous_force() const;
     const Col<T>& get_incre_inertial_force() const;
     const Col<T>& get_incre_displacement() const;
     const Col<T>& get_incre_velocity() const;
@@ -370,6 +386,7 @@ public:
     const Col<T>& get_current_settlement() const;
     const Col<T>& get_current_resistance() const;
     const Col<T>& get_current_damping_force() const;
+    const Col<T>& get_current_nonviscous_force() const;
     const Col<T>& get_current_inertial_force() const;
     const Col<T>& get_current_displacement() const;
     const Col<T>& get_current_velocity() const;
@@ -382,6 +399,7 @@ public:
     const Col<T>& get_pre_settlement() const;
     const Col<T>& get_pre_resistance() const;
     const Col<T>& get_pre_damping_force() const;
+    const Col<T>& get_pre_nonviscous_force() const;
     const Col<T>& get_pre_inertial_force() const;
     const Col<T>& get_pre_displacement() const;
     const Col<T>& get_pre_velocity() const;
@@ -390,6 +408,7 @@ public:
 
     const shared_ptr<MetaMat<T>>& get_mass() const;
     const shared_ptr<MetaMat<T>>& get_damping() const;
+    const shared_ptr<MetaMat<T>>& get_nonviscous() const;
     const shared_ptr<MetaMat<T>>& get_stiffness() const;
     const shared_ptr<MetaMat<T>>& get_geometry() const;
 
@@ -405,6 +424,7 @@ public:
 
     std::mutex& get_mass_mutex();
     std::mutex& get_damping_mutex();
+    std::mutex& get_nonviscous_mutex();
     std::mutex& get_stiffness_mutex();
     std::mutex& get_geometry_mutex();
 
@@ -419,6 +439,7 @@ public:
     void update_trial_settlement(const Col<T>&);
     void update_trial_resistance(const Col<T>&);
     void update_trial_damping_force(const Col<T>&);
+    void update_trial_nonviscous_force(const Col<T>&);
     void update_trial_inertial_force(const Col<T>&);
     void update_trial_displacement(const Col<T>&);
     void update_trial_velocity(const Col<T>&);
@@ -431,6 +452,7 @@ public:
     void update_incre_settlement(const Col<T>&);
     void update_incre_resistance(const Col<T>&);
     void update_incre_damping_force(const Col<T>&);
+    void update_incre_nonviscous_force(const Col<T>&);
     void update_incre_inertial_force(const Col<T>&);
     void update_incre_displacement(const Col<T>&);
     void update_incre_velocity(const Col<T>&);
@@ -443,6 +465,7 @@ public:
     void update_current_settlement(const Col<T>&);
     void update_current_resistance(const Col<T>&);
     void update_current_damping_force(const Col<T>&);
+    void update_current_nonviscous_force(const Col<T>&);
     void update_current_inertial_force(const Col<T>&);
     void update_current_displacement(const Col<T>&);
     void update_current_velocity(const Col<T>&);
@@ -455,6 +478,7 @@ public:
     void update_trial_settlement_by(const Col<T>&);
     void update_trial_resistance_by(const Col<T>&);
     void update_trial_damping_force_by(const Col<T>&);
+    void update_trial_nonviscous_force_by(const Col<T>&);
     void update_trial_inertial_force_by(const Col<T>&);
     void update_trial_displacement_by(const Col<T>&);
     void update_trial_velocity_by(const Col<T>&);
@@ -467,6 +491,7 @@ public:
     void update_incre_settlement_by(const Col<T>&);
     void update_incre_resistance_by(const Col<T>&);
     void update_incre_damping_force_by(const Col<T>&);
+    void update_incre_nonviscous_force_by(const Col<T>&);
     void update_incre_inertial_force_by(const Col<T>&);
     void update_incre_displacement_by(const Col<T>&);
     void update_incre_velocity_by(const Col<T>&);
@@ -479,6 +504,7 @@ public:
     void update_current_settlement_by(const Col<T>&);
     void update_current_resistance_by(const Col<T>&);
     void update_current_damping_force_by(const Col<T>&);
+    void update_current_nonviscous_force_by(const Col<T>&);
     void update_current_inertial_force_by(const Col<T>&);
     void update_current_displacement_by(const Col<T>&);
     void update_current_velocity_by(const Col<T>&);
@@ -508,6 +534,7 @@ public:
     Col<T>& modify_trial_settlement();
     Col<T>& modify_trial_resistance();
     Col<T>& modify_trial_damping_force();
+    Col<T>& modify_trial_nonviscous_force();
     Col<T>& modify_trial_inertial_force();
     Col<T>& modify_trial_displacement();
     Col<T>& modify_trial_velocity();
@@ -520,6 +547,7 @@ public:
     Col<T>& modify_incre_settlement();
     Col<T>& modify_incre_resistance();
     Col<T>& modify_incre_damping_force();
+    Col<T>& modify_incre_nonviscous_force();
     Col<T>& modify_incre_inertial_force();
     Col<T>& modify_incre_displacement();
     Col<T>& modify_incre_velocity();
@@ -532,6 +560,7 @@ public:
     Col<T>& modify_current_settlement();
     Col<T>& modify_current_resistance();
     Col<T>& modify_current_damping_force();
+    Col<T>& modify_current_nonviscous_force();
     Col<T>& modify_current_inertial_force();
     Col<T>& modify_current_displacement();
     Col<T>& modify_current_velocity();
@@ -544,6 +573,7 @@ public:
     Col<T>& modify_pre_settlement();
     Col<T>& modify_pre_resistance();
     Col<T>& modify_pre_damping_force();
+    Col<T>& modify_pre_nonviscous_force();
     Col<T>& modify_pre_inertial_force();
     Col<T>& modify_pre_displacement();
     Col<T>& modify_pre_velocity();
@@ -552,6 +582,7 @@ public:
 
     shared_ptr<MetaMat<T>>& modify_mass();
     shared_ptr<MetaMat<T>>& modify_damping();
+    shared_ptr<MetaMat<T>>& modify_nonviscous();
     shared_ptr<MetaMat<T>>& modify_stiffness();
     shared_ptr<MetaMat<T>>& modify_geometry();
 
@@ -570,6 +601,7 @@ public:
     void commit_settlement();
     void commit_resistance();
     void commit_damping_force();
+    void commit_nonviscous_force();
     void commit_inertial_force();
     void commit_displacement();
     void commit_velocity();
@@ -584,6 +616,7 @@ public:
     void commit_pre_settlement();
     void commit_pre_resistance();
     void commit_pre_damping_force();
+    void commit_pre_nonviscous_force();
     void commit_pre_inertial_force();
     void commit_pre_displacement();
     void commit_pre_velocity();
@@ -597,6 +630,7 @@ public:
     void clear_settlement();
     void clear_resistance();
     void clear_damping_force();
+    void clear_nonviscous_force();
     void clear_inertial_force();
     void clear_displacement();
     void clear_velocity();
@@ -611,6 +645,7 @@ public:
     void reset_settlement();
     void reset_resistance();
     void reset_damping_force();
+    void reset_nonviscous_force();
     void reset_inertial_force();
     void reset_displacement();
     void reset_velocity();
@@ -621,6 +656,7 @@ public:
     void clear_eigen();
     void clear_mass();
     void clear_damping();
+    void clear_nonviscous();
     void clear_stiffness();
     void clear_geometry();
     void clear_auxiliary();
@@ -631,10 +667,12 @@ public:
 
     void assemble_resistance(const Mat<T>&, const uvec&);
     void assemble_damping_force(const Mat<T>&, const uvec&);
+    void assemble_nonviscous_force(const Mat<T>&, const uvec&);
     void assemble_inertial_force(const Mat<T>&, const uvec&);
 
     void assemble_mass(const Mat<T>&, const uvec&, const std::vector<MappingDOF>&);
     void assemble_damping(const Mat<T>&, const uvec&, const std::vector<MappingDOF>&);
+    void assemble_nonviscous(const Mat<T>&, const uvec&, const std::vector<MappingDOF>&);
     void assemble_stiffness(const Mat<T>&, const uvec&, const std::vector<MappingDOF>&);
     void assemble_geometry(const Mat<T>&, const uvec&, const std::vector<MappingDOF>&);
 
@@ -762,12 +800,14 @@ template<sp_d T> int Factory<T>::initialize() {
         initialize_load();
         initialize_resistance();
         initialize_damping_force();
+        initialize_nonviscous_force();
         initialize_inertial_force();
         initialize_displacement();
         initialize_velocity();
         initialize_acceleration();
         initialize_mass();
         initialize_damping();
+        initialize_nonviscous();
         initialize_stiffness();
         initialize_geometry();
         break;
@@ -816,6 +856,12 @@ template<sp_d T> void Factory<T>::initialize_damping_force() {
     current_damping_force.zeros(n_size);
 }
 
+template<sp_d T> void Factory<T>::initialize_nonviscous_force() {
+    trial_nonviscous_force.zeros(n_size);
+    incre_nonviscous_force.zeros(n_size);
+    current_nonviscous_force.zeros(n_size);
+}
+
 template<sp_d T> void Factory<T>::initialize_inertial_force() {
     trial_inertial_force.zeros(n_size);
     incre_inertial_force.zeros(n_size);
@@ -855,6 +901,8 @@ template<sp_d T> void Factory<T>::initialize_mass() { global_mass = get_matrix_c
 
 template<sp_d T> void Factory<T>::initialize_damping() { global_damping = get_matrix_container(); }
 
+template<sp_d T> void Factory<T>::initialize_nonviscous() { global_nonviscous = get_matrix_container(); }
+
 template<sp_d T> void Factory<T>::initialize_stiffness() { global_stiffness = get_matrix_container(); }
 
 template<sp_d T> void Factory<T>::initialize_geometry() {
@@ -887,6 +935,8 @@ template<sp_d T> void Factory<T>::set_reference_load(const SpMat<T>& L) { refere
 template<sp_d T> void Factory<T>::set_mass(const shared_ptr<MetaMat<T>>& M) { global_mass = M; }
 
 template<sp_d T> void Factory<T>::set_damping(const shared_ptr<MetaMat<T>>& C) { global_damping = C; }
+
+template<sp_d T> void Factory<T>::set_nonviscous(const shared_ptr<MetaMat<T>>& C) { global_nonviscous = C; }
 
 template<sp_d T> void Factory<T>::set_stiffness(const shared_ptr<MetaMat<T>>& K) { global_stiffness = K; }
 
@@ -924,6 +974,8 @@ template<sp_d T> T Factory<T>::get_kinetic_energy() { return kinetic_energy; }
 
 template<sp_d T> T Factory<T>::get_viscous_energy() { return viscous_energy; }
 
+template<sp_d T> T Factory<T>::get_nonviscous_energy() { return nonviscous_energy; }
+
 template<sp_d T> T Factory<T>::get_complementary_energy() { return complementary_energy; }
 
 template<sp_d T> const Col<T>& Factory<T>::get_momentum() { return momentum; }
@@ -931,6 +983,8 @@ template<sp_d T> const Col<T>& Factory<T>::get_momentum() { return momentum; }
 template<sp_d T> const shared_ptr<MetaMat<T>>& Factory<T>::get_mass() const { return global_mass; }
 
 template<sp_d T> const shared_ptr<MetaMat<T>>& Factory<T>::get_damping() const { return global_damping; }
+
+template<sp_d T> const shared_ptr<MetaMat<T>>& Factory<T>::get_nonviscous() const { return global_nonviscous; }
 
 template<sp_d T> const shared_ptr<MetaMat<T>>& Factory<T>::get_stiffness() const { return global_stiffness; }
 
@@ -954,9 +1008,11 @@ template<sp_d T> std::mutex& Factory<T>::get_mass_mutex() { return global_mutex.
 
 template<sp_d T> std::mutex& Factory<T>::get_damping_mutex() { return global_mutex.at(8); }
 
-template<sp_d T> std::mutex& Factory<T>::get_stiffness_mutex() { return global_mutex.at(9); }
+template<sp_d T> std::mutex& Factory<T>::get_nonviscous_mutex() { return global_mutex.at(9); }
 
-template<sp_d T> std::mutex& Factory<T>::get_geometry_mutex() { return global_mutex.at(10); }
+template<sp_d T> std::mutex& Factory<T>::get_stiffness_mutex() { return global_mutex.at(10); }
+
+template<sp_d T> std::mutex& Factory<T>::get_geometry_mutex() { return global_mutex.at(11); }
 
 template<sp_d T> const Col<T>& Factory<T>::get_eigenvalue() const { return eigenvalue; }
 
@@ -966,12 +1022,14 @@ template<sp_d T> void Factory<T>::commit_energy() {
     auto se = std::async([&] { if(!trial_resistance.empty() && !incre_displacement.empty()) strain_energy += .5 * dot(trial_resistance + current_resistance, incre_displacement); });
     auto ke = std::async([&] { if(!trial_inertial_force.empty() && !trial_velocity.empty()) kinetic_energy = .5 * dot(global_mass * trial_velocity, trial_velocity); });
     auto ve = std::async([&] { if(!trial_damping_force.empty() && !incre_displacement.empty()) viscous_energy += .5 * dot(trial_damping_force + current_damping_force, incre_displacement); });
+    auto ne = std::async([&] { if(!trial_nonviscous_force.empty() && !incre_displacement.empty()) nonviscous_energy += .5 * dot(trial_nonviscous_force + current_nonviscous_force, incre_displacement); });
     auto ce = std::async([&] { if(!trial_displacement.empty() && !incre_resistance.empty()) complementary_energy += .5 * dot(trial_displacement + current_displacement, incre_resistance); });
     auto mm = std::async([&] { if(!trial_inertial_force.empty() && !trial_velocity.empty()) momentum = global_mass * trial_velocity; });
 
     se.get();
     ke.get();
     ve.get();
+    ne.get();
     ce.get();
     mm.get();
 }
@@ -980,6 +1038,7 @@ template<sp_d T> void Factory<T>::clear_energy() {
     strain_energy = T(0);
     kinetic_energy = T(0);
     viscous_energy = T(0);
+    nonviscous_energy = T(0);
     complementary_energy = T(0);
     momentum.zeros();
 }
@@ -1038,6 +1097,12 @@ template<sp_d T> void Factory<T>::commit_damping_force() {
     incre_damping_force.zeros();
 }
 
+template<sp_d T> void Factory<T>::commit_nonviscous_force() {
+    if(trial_nonviscous_force.is_empty()) return;
+    current_nonviscous_force = trial_nonviscous_force;
+    incre_nonviscous_force.zeros();
+}
+
 template<sp_d T> void Factory<T>::commit_inertial_force() {
     if(trial_inertial_force.is_empty()) return;
     current_inertial_force = trial_inertial_force;
@@ -1080,6 +1145,7 @@ template<sp_d T> void Factory<T>::commit_pre_status() {
     commit_pre_settlement();
     commit_pre_resistance();
     commit_pre_damping_force();
+    commit_pre_nonviscous_force();
     commit_pre_inertial_force();
     commit_pre_displacement();
     commit_pre_velocity();
@@ -1098,6 +1164,8 @@ template<sp_d T> void Factory<T>::commit_pre_settlement() { if(!current_settleme
 template<sp_d T> void Factory<T>::commit_pre_resistance() { if(!current_resistance.is_empty()) pre_resistance = current_resistance; }
 
 template<sp_d T> void Factory<T>::commit_pre_damping_force() { if(!current_damping_force.is_empty()) pre_damping_force = current_damping_force; }
+
+template<sp_d T> void Factory<T>::commit_pre_nonviscous_force() { if(!current_nonviscous_force.is_empty()) pre_nonviscous_force = current_nonviscous_force; }
 
 template<sp_d T> void Factory<T>::commit_pre_inertial_force() { if(!current_inertial_force.is_empty()) pre_inertial_force = current_inertial_force; }
 
@@ -1122,6 +1190,7 @@ template<sp_d T> void Factory<T>::clear_status() {
     clear_settlement();
     clear_resistance();
     clear_damping_force();
+    clear_nonviscous_force();
     clear_inertial_force();
     clear_displacement();
     clear_velocity();
@@ -1165,6 +1234,13 @@ template<sp_d T> void Factory<T>::clear_damping_force() {
     if(!trial_damping_force.is_empty()) trial_damping_force.zeros();
     if(!incre_damping_force.is_empty()) incre_damping_force.zeros();
     if(!current_damping_force.is_empty()) current_damping_force.zeros();
+}
+
+template<sp_d T> void Factory<T>::clear_nonviscous_force() {
+    if(!pre_nonviscous_force.is_empty()) pre_nonviscous_force.zeros();
+    if(!trial_nonviscous_force.is_empty()) trial_nonviscous_force.zeros();
+    if(!incre_nonviscous_force.is_empty()) incre_nonviscous_force.zeros();
+    if(!current_nonviscous_force.is_empty()) current_nonviscous_force.zeros();
 }
 
 template<sp_d T> void Factory<T>::clear_inertial_force() {
@@ -1216,6 +1292,7 @@ template<sp_d T> void Factory<T>::reset_status() {
     reset_settlement();
     reset_resistance();
     reset_damping_force();
+    reset_nonviscous_force();
     reset_inertial_force();
     reset_displacement();
     reset_velocity();
@@ -1257,6 +1334,12 @@ template<sp_d T> void Factory<T>::reset_damping_force() {
     if(trial_damping_force.is_empty()) return;
     trial_damping_force = current_damping_force;
     incre_damping_force.zeros();
+}
+
+template<sp_d T> void Factory<T>::reset_nonviscous_force() {
+    if(trial_nonviscous_force.is_empty()) return;
+    trial_nonviscous_force = current_nonviscous_force;
+    incre_nonviscous_force.zeros();
 }
 
 template<sp_d T> void Factory<T>::reset_inertial_force() {
@@ -1303,6 +1386,8 @@ template<sp_d T> void Factory<T>::clear_mass() { if(global_mass != nullptr) glob
 
 template<sp_d T> void Factory<T>::clear_damping() { if(global_damping != nullptr) global_damping->zeros(); }
 
+template<sp_d T> void Factory<T>::clear_nonviscous() { if(global_nonviscous != nullptr) global_nonviscous->zeros(); }
+
 template<sp_d T> void Factory<T>::clear_stiffness() { if(global_stiffness != nullptr) global_stiffness->zeros(); }
 
 template<sp_d T> void Factory<T>::clear_geometry() { if(global_geometry != nullptr) global_geometry->zeros(); }
@@ -1318,6 +1403,7 @@ template<sp_d T> void Factory<T>::clear_auxiliary() {
 template<sp_d T> void Factory<T>::reset() {
     global_mass = nullptr;
     global_damping = nullptr;
+    global_nonviscous = nullptr;
     global_stiffness = nullptr;
     global_geometry = nullptr;
 }
@@ -1330,6 +1416,11 @@ template<sp_d T> void Factory<T>::assemble_resistance(const Mat<T>& ER, const uv
 template<sp_d T> void Factory<T>::assemble_damping_force(const Mat<T>& ER, const uvec& EI) {
     if(ER.is_empty()) return;
     for(auto I = 0llu; I < EI.n_elem; ++I) trial_damping_force(EI(I)) += ER(I);
+}
+
+template<sp_d T> void Factory<T>::assemble_nonviscous_force(const Mat<T>& ER, const uvec& EI) {
+    if(ER.is_empty()) return;
+    for(auto I = 0llu; I < EI.n_elem; ++I) trial_nonviscous_force(EI(I)) += ER(I);
 }
 
 template<sp_d T> void Factory<T>::assemble_inertial_force(const Mat<T>& ER, const uvec& EI) {
@@ -1347,6 +1438,8 @@ template<sp_d T> void Factory<T>::assemble_matrix_helper(shared_ptr<MetaMat<T>>&
 template<sp_d T> void Factory<T>::assemble_mass(const Mat<T>& EM, const uvec& EI, const std::vector<MappingDOF>& MAP) { this->assemble_matrix_helper(global_mass, EM, EI, MAP); }
 
 template<sp_d T> void Factory<T>::assemble_damping(const Mat<T>& EC, const uvec& EI, const std::vector<MappingDOF>& MAP) { this->assemble_matrix_helper(global_damping, EC, EI, MAP); }
+
+template<sp_d T> void Factory<T>::assemble_nonviscous(const Mat<T>& EC, const uvec& EI, const std::vector<MappingDOF>& MAP) { this->assemble_matrix_helper(global_nonviscous, EC, EI, MAP); }
 
 template<sp_d T> void Factory<T>::assemble_stiffness(const Mat<T>& EK, const uvec& EI, const std::vector<MappingDOF>& MAP) { this->assemble_matrix_helper(global_stiffness, EK, EI, MAP); }
 
@@ -1412,6 +1505,8 @@ template<sp_d T> shared_ptr<MetaMat<T>>& Factory<T>::modify_mass() { return glob
 
 template<sp_d T> shared_ptr<MetaMat<T>>& Factory<T>::modify_damping() { return global_damping; }
 
+template<sp_d T> shared_ptr<MetaMat<T>>& Factory<T>::modify_nonviscous() { return global_nonviscous; }
+
 template<sp_d T> shared_ptr<MetaMat<T>>& Factory<T>::modify_stiffness() { return global_stiffness; }
 
 template<sp_d T> shared_ptr<MetaMat<T>>& Factory<T>::modify_geometry() { return global_geometry; }
@@ -1454,6 +1549,8 @@ template<sp_d T> void Factory<T>::set_trial_resistance(const Col<T>& R) { trial_
 
 template<sp_d T> void Factory<T>::set_trial_damping_force(const Col<T>& R) { trial_damping_force = R; }
 
+template<sp_d T> void Factory<T>::set_trial_nonviscous_force(const Col<T>& R) { trial_nonviscous_force = R; }
+
 template<sp_d T> void Factory<T>::set_trial_inertial_force(const Col<T>& R) { trial_inertial_force = R; }
 
 template<sp_d T> void Factory<T>::set_trial_displacement(const Col<T>& D) { trial_displacement = D; }
@@ -1475,6 +1572,8 @@ template<sp_d T> void Factory<T>::set_incre_settlement(const Col<T>& S) { incre_
 template<sp_d T> void Factory<T>::set_incre_resistance(const Col<T>& R) { incre_resistance = R; }
 
 template<sp_d T> void Factory<T>::set_incre_damping_force(const Col<T>& R) { incre_damping_force = R; }
+
+template<sp_d T> void Factory<T>::set_incre_nonviscous_force(const Col<T>& R) { incre_nonviscous_force = R; }
 
 template<sp_d T> void Factory<T>::set_incre_inertial_force(const Col<T>& R) { incre_inertial_force = R; }
 
@@ -1498,6 +1597,8 @@ template<sp_d T> void Factory<T>::set_current_resistance(const Col<T>& R) { curr
 
 template<sp_d T> void Factory<T>::set_current_damping_force(const Col<T>& R) { current_damping_force = R; }
 
+template<sp_d T> void Factory<T>::set_current_nonviscous_force(const Col<T>& R) { current_nonviscous_force = R; }
+
 template<sp_d T> void Factory<T>::set_current_inertial_force(const Col<T>& R) { current_inertial_force = R; }
 
 template<sp_d T> void Factory<T>::set_current_displacement(const Col<T>& D) { current_displacement = D; }
@@ -1519,6 +1620,8 @@ template<sp_d T> void Factory<T>::set_pre_settlement(const Col<T>& S) { pre_sett
 template<sp_d T> void Factory<T>::set_pre_resistance(const Col<T>& R) { pre_resistance = R; }
 
 template<sp_d T> void Factory<T>::set_pre_damping_force(const Col<T>& R) { pre_damping_force = R; }
+
+template<sp_d T> void Factory<T>::set_pre_nonviscous_force(const Col<T>& R) { pre_nonviscous_force = R; }
 
 template<sp_d T> void Factory<T>::set_pre_inertial_force(const Col<T>& R) { pre_inertial_force = R; }
 
@@ -1542,6 +1645,8 @@ template<sp_d T> const Col<T>& Factory<T>::get_trial_resistance() const { return
 
 template<sp_d T> const Col<T>& Factory<T>::get_trial_damping_force() const { return trial_damping_force; }
 
+template<sp_d T> const Col<T>& Factory<T>::get_trial_nonviscous_force() const { return trial_nonviscous_force; }
+
 template<sp_d T> const Col<T>& Factory<T>::get_trial_inertial_force() const { return trial_inertial_force; }
 
 template<sp_d T> const Col<T>& Factory<T>::get_trial_displacement() const { return trial_displacement; }
@@ -1563,6 +1668,8 @@ template<sp_d T> const Col<T>& Factory<T>::get_incre_settlement() const { return
 template<sp_d T> const Col<T>& Factory<T>::get_incre_resistance() const { return incre_resistance; }
 
 template<sp_d T> const Col<T>& Factory<T>::get_incre_damping_force() const { return incre_damping_force; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_incre_nonviscous_force() const { return incre_nonviscous_force; }
 
 template<sp_d T> const Col<T>& Factory<T>::get_incre_inertial_force() const { return incre_inertial_force; }
 
@@ -1586,6 +1693,8 @@ template<sp_d T> const Col<T>& Factory<T>::get_current_resistance() const { retu
 
 template<sp_d T> const Col<T>& Factory<T>::get_current_damping_force() const { return current_damping_force; }
 
+template<sp_d T> const Col<T>& Factory<T>::get_current_nonviscous_force() const { return current_nonviscous_force; }
+
 template<sp_d T> const Col<T>& Factory<T>::get_current_inertial_force() const { return current_inertial_force; }
 
 template<sp_d T> const Col<T>& Factory<T>::get_current_displacement() const { return current_displacement; }
@@ -1607,6 +1716,8 @@ template<sp_d T> const Col<T>& Factory<T>::get_pre_settlement() const { return p
 template<sp_d T> const Col<T>& Factory<T>::get_pre_resistance() const { return pre_resistance; }
 
 template<sp_d T> const Col<T>& Factory<T>::get_pre_damping_force() const { return pre_damping_force; }
+
+template<sp_d T> const Col<T>& Factory<T>::get_pre_nonviscous_force() const { return pre_nonviscous_force; }
 
 template<sp_d T> const Col<T>& Factory<T>::get_pre_inertial_force() const { return pre_inertial_force; }
 
@@ -1630,6 +1741,8 @@ template<sp_d T> Col<T>& Factory<T>::modify_trial_resistance() { return trial_re
 
 template<sp_d T> Col<T>& Factory<T>::modify_trial_damping_force() { return trial_damping_force; }
 
+template<sp_d T> Col<T>& Factory<T>::modify_trial_nonviscous_force() { return trial_nonviscous_force; }
+
 template<sp_d T> Col<T>& Factory<T>::modify_trial_inertial_force() { return trial_inertial_force; }
 
 template<sp_d T> Col<T>& Factory<T>::modify_trial_displacement() { return trial_displacement; }
@@ -1651,6 +1764,8 @@ template<sp_d T> Col<T>& Factory<T>::modify_incre_settlement() { return incre_se
 template<sp_d T> Col<T>& Factory<T>::modify_incre_resistance() { return incre_resistance; }
 
 template<sp_d T> Col<T>& Factory<T>::modify_incre_damping_force() { return incre_damping_force; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_incre_nonviscous_force() { return incre_nonviscous_force; }
 
 template<sp_d T> Col<T>& Factory<T>::modify_incre_inertial_force() { return incre_inertial_force; }
 
@@ -1674,6 +1789,8 @@ template<sp_d T> Col<T>& Factory<T>::modify_current_resistance() { return curren
 
 template<sp_d T> Col<T>& Factory<T>::modify_current_damping_force() { return current_damping_force; }
 
+template<sp_d T> Col<T>& Factory<T>::modify_current_nonviscous_force() { return current_nonviscous_force; }
+
 template<sp_d T> Col<T>& Factory<T>::modify_current_inertial_force() { return current_inertial_force; }
 
 template<sp_d T> Col<T>& Factory<T>::modify_current_displacement() { return current_displacement; }
@@ -1695,6 +1812,8 @@ template<sp_d T> Col<T>& Factory<T>::modify_pre_settlement() { return pre_settle
 template<sp_d T> Col<T>& Factory<T>::modify_pre_resistance() { return pre_resistance; }
 
 template<sp_d T> Col<T>& Factory<T>::modify_pre_damping_force() { return pre_damping_force; }
+
+template<sp_d T> Col<T>& Factory<T>::modify_pre_nonviscous_force() { return pre_nonviscous_force; }
 
 template<sp_d T> Col<T>& Factory<T>::modify_pre_inertial_force() { return pre_inertial_force; }
 
@@ -1734,6 +1853,11 @@ template<sp_d T> void Factory<T>::update_trial_resistance(const Col<T>& R) {
 template<sp_d T> void Factory<T>::update_trial_damping_force(const Col<T>& R) {
     trial_damping_force = R;
     incre_damping_force = trial_damping_force - current_damping_force;
+}
+
+template<sp_d T> void Factory<T>::update_trial_nonviscous_force(const Col<T>& R) {
+    trial_nonviscous_force = R;
+    incre_nonviscous_force = trial_nonviscous_force - current_nonviscous_force;
 }
 
 template<sp_d T> void Factory<T>::update_trial_inertial_force(const Col<T>& R) {
@@ -1791,6 +1915,11 @@ template<sp_d T> void Factory<T>::update_incre_damping_force(const Col<T>& R) {
     trial_damping_force = current_damping_force + incre_damping_force;
 }
 
+template<sp_d T> void Factory<T>::update_incre_nonviscous_force(const Col<T>& R) {
+    incre_nonviscous_force = R;
+    trial_nonviscous_force = current_nonviscous_force + incre_nonviscous_force;
+}
+
 template<sp_d T> void Factory<T>::update_incre_inertial_force(const Col<T>& R) {
     incre_inertial_force = R;
     trial_inertial_force = current_inertial_force + incre_inertial_force;
@@ -1844,6 +1973,11 @@ template<sp_d T> void Factory<T>::update_current_resistance(const Col<T>& R) {
 template<sp_d T> void Factory<T>::update_current_damping_force(const Col<T>& R) {
     trial_damping_force = current_damping_force = R;
     incre_damping_force.zeros();
+}
+
+template<sp_d T> void Factory<T>::update_current_nonviscous_force(const Col<T>& R) {
+    trial_nonviscous_force = current_nonviscous_force = R;
+    incre_nonviscous_force.zeros();
 }
 
 template<sp_d T> void Factory<T>::update_current_inertial_force(const Col<T>& R) {
@@ -1901,6 +2035,11 @@ template<sp_d T> void Factory<T>::update_trial_damping_force_by(const Col<T>& R)
     incre_damping_force = trial_damping_force - current_damping_force;
 }
 
+template<sp_d T> void Factory<T>::update_trial_nonviscous_force_by(const Col<T>& R) {
+    trial_nonviscous_force += R;
+    incre_nonviscous_force = trial_nonviscous_force - current_nonviscous_force;
+}
+
 template<sp_d T> void Factory<T>::update_trial_inertial_force_by(const Col<T>& R) {
     trial_inertial_force += R;
     incre_inertial_force = trial_inertial_force - current_inertial_force;
@@ -1956,6 +2095,11 @@ template<sp_d T> void Factory<T>::update_incre_damping_force_by(const Col<T>& R)
     trial_damping_force = current_damping_force + incre_damping_force;
 }
 
+template<sp_d T> void Factory<T>::update_incre_nonviscous_force_by(const Col<T>& R) {
+    incre_nonviscous_force += R;
+    trial_nonviscous_force = current_nonviscous_force + incre_nonviscous_force;
+}
+
 template<sp_d T> void Factory<T>::update_incre_inertial_force_by(const Col<T>& R) {
     incre_inertial_force += R;
     trial_inertial_force = current_inertial_force + incre_inertial_force;
@@ -2009,6 +2153,11 @@ template<sp_d T> void Factory<T>::update_current_resistance_by(const Col<T>& R) 
 template<sp_d T> void Factory<T>::update_current_damping_force_by(const Col<T>& R) {
     trial_damping_force = current_damping_force += R;
     incre_damping_force.zeros();
+}
+
+template<sp_d T> void Factory<T>::update_current_nonviscous_force_by(const Col<T>& R) {
+    trial_nonviscous_force = current_nonviscous_force += R;
+    incre_nonviscous_force.zeros();
 }
 
 template<sp_d T> void Factory<T>::update_current_inertial_force_by(const Col<T>& R) {

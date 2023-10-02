@@ -150,6 +150,8 @@ void Node::set_current_resistance(const vec& R) { current_resistance = R; }
 
 void Node::set_current_damping_force(const vec& R) { current_damping_force = R; }
 
+void Node::set_current_nonviscous_force(const vec& R) { current_nonviscous_force = R; }
+
 void Node::set_current_inertial_force(const vec& R) { current_inertial_force = R; }
 
 void Node::set_current_displacement(const vec& D) { current_displacement = D; }
@@ -161,6 +163,8 @@ void Node::set_current_acceleration(const vec& A) { current_acceleration = A; }
 void Node::set_incre_resistance(const vec& R) { incre_resistance = R; }
 
 void Node::set_incre_damping_force(const vec& R) { incre_damping_force = R; }
+
+void Node::set_incre_nonviscous_force(const vec& R) { incre_nonviscous_force = R; }
 
 void Node::set_incre_inertial_force(const vec& R) { incre_inertial_force = R; }
 
@@ -174,6 +178,8 @@ void Node::set_trial_resistance(const vec& R) { trial_resistance = R; }
 
 void Node::set_trial_damping_force(const vec& R) { trial_damping_force = R; }
 
+void Node::set_trial_nonviscous_force(const vec& R) { trial_nonviscous_force = R; }
+
 void Node::set_trial_inertial_force(const vec& R) { trial_inertial_force = R; }
 
 void Node::set_trial_displacement(const vec& D) { trial_displacement = D; }
@@ -185,6 +191,8 @@ void Node::set_trial_acceleration(const vec& A) { trial_acceleration = A; }
 const vec& Node::get_current_resistance() const { return current_resistance; }
 
 const vec& Node::get_current_damping_force() const { return current_damping_force; }
+
+const vec& Node::get_current_nonviscous_force() const { return current_nonviscous_force; }
 
 const vec& Node::get_current_inertial_force() const { return current_inertial_force; }
 
@@ -198,6 +206,8 @@ const vec& Node::get_incre_resistance() const { return incre_resistance; }
 
 const vec& Node::get_incre_damping_force() const { return incre_damping_force; }
 
+const vec& Node::get_incre_nonviscous_force() const { return incre_nonviscous_force; }
+
 const vec& Node::get_incre_inertial_force() const { return incre_inertial_force; }
 
 const vec& Node::get_incre_displacement() const { return incre_displacement; }
@@ -209,6 +219,8 @@ const vec& Node::get_incre_acceleration() const { return incre_acceleration; }
 const vec& Node::get_trial_resistance() const { return trial_resistance; }
 
 const vec& Node::get_trial_damping_force() const { return trial_damping_force; }
+
+const vec& Node::get_trial_nonviscous_force() const { return trial_nonviscous_force; }
 
 const vec& Node::get_trial_inertial_force() const { return trial_inertial_force; }
 
@@ -226,6 +238,11 @@ void Node::update_current_resistance(const vec& R) {
 void Node::update_current_damping_force(const vec& R) {
     trial_damping_force = current_damping_force = R;
     incre_damping_force.zeros(R.size());
+}
+
+void Node::update_current_nonviscous_force(const vec& R) {
+    trial_nonviscous_force = current_nonviscous_force = R;
+    incre_nonviscous_force.zeros(R.size());
 }
 
 void Node::update_current_inertial_force(const vec& R) {
@@ -260,6 +277,13 @@ void Node::update_incre_damping_force(const vec& R) {
     if(current_damping_force.empty()) current_damping_force.zeros(R.size());
     else current_damping_force.resize(R.size());
     trial_damping_force = current_damping_force + incre_damping_force;
+}
+
+void Node::update_incre_nonviscous_force(const vec& R) {
+    incre_nonviscous_force = R;
+    if(current_nonviscous_force.empty()) current_nonviscous_force.zeros(R.size());
+    else current_nonviscous_force.resize(R.size());
+    trial_nonviscous_force = current_nonviscous_force + incre_nonviscous_force;
 }
 
 void Node::update_incre_inertial_force(const vec& R) {
@@ -302,6 +326,13 @@ void Node::update_trial_damping_force(const vec& R) {
     if(current_damping_force.empty()) current_damping_force.zeros(R.size());
     else current_damping_force.resize(R.size());
     incre_damping_force = trial_damping_force - current_damping_force;
+}
+
+void Node::update_trial_nonviscous_force(const vec& R) {
+    trial_nonviscous_force = R;
+    if(current_nonviscous_force.empty()) current_nonviscous_force.zeros(R.size());
+    else current_nonviscous_force.resize(R.size());
+    incre_nonviscous_force = trial_nonviscous_force - current_nonviscous_force;
 }
 
 void Node::update_trial_inertial_force(const vec& R) {
@@ -404,6 +435,10 @@ void Node::commit_status() {
         current_damping_force = trial_damping_force;
         incre_damping_force.zeros();
     }
+    if(!trial_nonviscous_force.is_empty()) {
+        current_nonviscous_force = trial_nonviscous_force;
+        incre_nonviscous_force.zeros();
+    }
     if(!trial_inertial_force.is_empty()) {
         current_inertial_force = trial_inertial_force;
         incre_inertial_force.zeros();
@@ -430,6 +465,10 @@ void Node::reset_status() {
     if(!current_damping_force.is_empty()) {
         trial_damping_force = current_damping_force;
         incre_damping_force.zeros();
+    }
+    if(!current_nonviscous_force.is_empty()) {
+        trial_nonviscous_force = current_nonviscous_force;
+        incre_nonviscous_force.zeros();
     }
     if(!current_inertial_force.is_empty()) {
         trial_inertial_force = current_inertial_force;
@@ -459,6 +498,11 @@ void Node::clear_status() {
         current_damping_force.zeros();
         incre_damping_force.zeros();
         trial_damping_force.zeros();
+    }
+    if(!current_nonviscous_force.is_empty()) {
+        current_nonviscous_force.zeros();
+        incre_nonviscous_force.zeros();
+        trial_nonviscous_force.zeros();
     }
     if(!current_inertial_force.is_empty()) {
         current_inertial_force.zeros();

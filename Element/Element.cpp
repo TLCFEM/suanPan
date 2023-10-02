@@ -251,7 +251,7 @@ Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& 
     : Element(T, NN, ND, std::forward<uvec>(NT), {}, false, MaterialType::D0, std::forward<std::vector<DOF>>(DI)) {}
 
 Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& MT, const bool F, const MaterialType MTP, std::vector<DOF>&& DI)
-    : DataElement{std::forward<uvec>(NT), std::forward<uvec>(MT), uvec{}, F, true, true, true, true, {}}
+    : DataElement{std::forward<uvec>(NT), std::forward<uvec>(MT), uvec{}, F, true, true, true, true, true, {}}
     , ElementBase(T)
     , num_node(NN)
     , num_dof(ND)
@@ -260,7 +260,7 @@ Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& 
     , dof_identifier(std::forward<std::vector<DOF>>(DI)) { suanpan_assert([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw invalid_argument("size of dof identifier must meet number of dofs"); }); }
 
 Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& ST, const bool F, const SectionType STP, std::vector<DOF>&& DI)
-    : DataElement{std::forward<uvec>(NT), uvec{}, std::forward<uvec>(ST), F, true, true, true, true, {}}
+    : DataElement{std::forward<uvec>(NT), uvec{}, std::forward<uvec>(ST), F, true, true, true, true, true, {}}
     , ElementBase(T)
     , num_node(NN)
     , num_dof(ND)
@@ -270,7 +270,7 @@ Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& 
 
 // for contact elements that use node groups
 Element::Element(const unsigned T, const unsigned ND, uvec&& GT)
-    : DataElement{std::forward<uvec>(GT), {}, {}, false, true, true, true, true, {}}
+    : DataElement{std::forward<uvec>(GT), {}, {}, false, true, true, true, true, true, {}}
     , ElementBase(T)
     , num_node(static_cast<unsigned>(-1))
     , num_dof(ND)
@@ -280,7 +280,7 @@ Element::Element(const unsigned T, const unsigned ND, uvec&& GT)
 
 // for elements that use other elements
 Element::Element(const unsigned T, const unsigned ND, const unsigned ET, const unsigned NT)
-    : DataElement{{NT}, {}, {}, false, true, true, true, true, {}}
+    : DataElement{{NT}, {}, {}, false, true, true, true, true, true, {}}
     , ElementBase(T)
     , num_node(static_cast<unsigned>(-1))
     , num_dof(ND)
@@ -407,6 +407,8 @@ bool Element::if_update_mass() const { return update_mass; }
 
 bool Element::if_update_damping() const { return update_damping; }
 
+bool Element::if_update_nonviscous() const { return update_nonviscous; }
+
 bool Element::if_update_stiffness() const { return update_stiffness; }
 
 bool Element::if_update_geometry() const { return update_geometry; }
@@ -439,6 +441,10 @@ const vec& Element::get_trial_damping_force() const { return trial_damping_force
 
 const vec& Element::get_current_damping_force() const { return current_damping_force; }
 
+const cx_mat& Element::get_trial_nonviscous_force() const { return trial_nonviscous_force; }
+
+const cx_mat& Element::get_current_nonviscous_force() const { return current_nonviscous_force; }
+
 const vec& Element::get_trial_inertial_force() {
     if(!trial_mass.empty()) trial_inertial_force = trial_mass * get_trial_acceleration();
     return trial_inertial_force;
@@ -461,6 +467,8 @@ const mat& Element::get_trial_mass() const { return trial_mass; }
 
 const mat& Element::get_trial_damping() const { return trial_damping; }
 
+const mat& Element::get_trial_nonviscous() const { return trial_nonviscous; }
+
 const mat& Element::get_trial_stiffness() const { return trial_stiffness; }
 
 const mat& Element::get_trial_geometry() const { return trial_geometry; }
@@ -471,6 +479,8 @@ const mat& Element::get_current_mass() const { return current_mass; }
 
 const mat& Element::get_current_damping() const { return current_damping; }
 
+const mat& Element::get_current_nonviscous() const { return current_nonviscous; }
+
 const mat& Element::get_current_stiffness() const { return current_stiffness; }
 
 const mat& Element::get_current_geometry() const { return current_geometry; }
@@ -480,6 +490,8 @@ const mat& Element::get_current_secant() const { return get_current_stiffness();
 const mat& Element::get_initial_mass() const { return initial_mass; }
 
 const mat& Element::get_initial_damping() const { return initial_damping; }
+
+const mat& Element::get_initial_nonviscous() const { return initial_nonviscous; }
 
 const mat& Element::get_initial_stiffness() const { return initial_stiffness; }
 
