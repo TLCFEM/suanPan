@@ -25,7 +25,7 @@ Newmark::Newmark(const unsigned T, const double A, const double B)
     , gamma(B) {}
 
 void Newmark::assemble_resistance() {
-    const auto& D = get_domain();
+    const auto D = get_domain();
     auto& W = D->get_factory();
 
     auto fa = std::async([&] { D->assemble_resistance(); });
@@ -42,7 +42,7 @@ void Newmark::assemble_resistance() {
 }
 
 void Newmark::assemble_matrix() {
-    const auto& D = get_domain();
+    const auto D = get_domain();
     auto& W = D->get_factory();
 
     auto fa = std::async([&] { D->assemble_trial_stiffness(); });
@@ -61,7 +61,7 @@ void Newmark::assemble_matrix() {
 }
 
 int Newmark::update_trial_status() {
-    const auto& D = get_domain();
+    const auto D = get_domain();
     auto& W = D->get_factory();
 
     W->update_incre_acceleration(C0 * W->get_incre_displacement() - C2 * W->get_current_velocity() - C4 * W->get_current_acceleration());

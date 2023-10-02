@@ -26,35 +26,39 @@ GSSSS::GSSSS(const unsigned T)
     , L4(1.) {}
 
 void GSSSS::assemble_resistance() {
-    const auto& D = get_domain();
+    const auto D = get_domain();
     auto& W = D->get_factory();
 
     auto fa = std::async([&] { D->assemble_resistance(); });
     auto fb = std::async([&] { D->assemble_damping_force(); });
-    auto fc = std::async([&] { D->assemble_inertial_force(); });
-
-    fa.get();
-    fb.get();
-    fc.get();
-
-    W->set_sushi(W->get_current_resistance() + W3G3 / L3 * W->get_incre_resistance() + W->get_current_damping_force() + W2G5 / L5 * W->get_incre_damping_force() + W->get_current_inertial_force() + W1G6 * W->get_incre_inertial_force());
-}
-
-void GSSSS::assemble_matrix() {
-    const auto& D = get_domain();
-    auto& W = D->get_factory();
-
-    auto fa = std::async([&] { D->assemble_trial_stiffness(); });
-    auto fb = std::async([&] { D->assemble_trial_geometry(); });
-    auto fc = std::async([&] { D->assemble_trial_damping(); });
-    auto fd = std::async([&] { D->assemble_trial_mass(); });
+    auto fc = std::async([&] { D->assemble_nonviscous_force(); });
+    auto fd = std::async([&] { D->assemble_inertial_force(); });
 
     fa.get();
     fb.get();
     fc.get();
     fd.get();
 
-    W->get_stiffness() += W->get_geometry() + XV * W->get_damping() + XA * W->get_mass();
+    W->set_sushi(W->get_current_resistance() + W3G3 / L3 * W->get_incre_resistance() + W->get_current_damping_force() + W2G5 / L5 * W->get_incre_damping_force() + W->get_current_nonviscous_force() + W2G5 / L5 * W->get_incre_nonviscous_force() + W->get_current_inertial_force() + W1G6 * W->get_incre_inertial_force());
+}
+
+void GSSSS::assemble_matrix() {
+    const auto D = get_domain();
+    auto& W = D->get_factory();
+
+    auto fa = std::async([&] { D->assemble_trial_stiffness(); });
+    auto fb = std::async([&] { D->assemble_trial_geometry(); });
+    auto fc = std::async([&] { D->assemble_trial_damping(); });
+    auto fd = std::async([&] { D->assemble_trial_nonviscous(); });
+    auto fe = std::async([&] { D->assemble_trial_mass(); });
+
+    fa.get();
+    fb.get();
+    fc.get();
+    fd.get();
+    fe.get();
+
+    W->get_stiffness() += W->get_geometry() + XV * (W->get_damping() + W->get_nonviscous()) + XA * W->get_mass();
 }
 
 vec GSSSS::get_force_residual() { return XD * ImplicitIntegrator::get_force_residual(); }
@@ -64,7 +68,7 @@ vec GSSSS::get_displacement_residual() { return XD * ImplicitIntegrator::get_dis
 sp_mat GSSSS::get_reference_load() { return XD * ImplicitIntegrator::get_reference_load(); }
 
 int GSSSS::process_load() {
-    const auto& D = get_domain();
+    const auto D = get_domain();
     auto& W = D->get_factory();
 
     const sp_d auto current_time = W->get_current_time();
@@ -80,7 +84,7 @@ int GSSSS::process_load() {
 }
 
 int GSSSS::process_constraint() {
-    const auto& D = get_domain();
+    const auto D = get_domain();
     auto& W = D->get_factory();
 
     const sp_d auto current_time = W->get_current_time();
@@ -96,7 +100,7 @@ int GSSSS::process_constraint() {
 }
 
 int GSSSS::process_load_resistance() {
-    const auto& D = get_domain();
+    const auto D = get_domain();
     auto& W = D->get_factory();
 
     const sp_d auto current_time = W->get_current_time();
@@ -112,7 +116,7 @@ int GSSSS::process_load_resistance() {
 }
 
 int GSSSS::process_constraint_resistance() {
-    const auto& D = get_domain();
+    const auto D = get_domain();
     auto& W = D->get_factory();
 
     const sp_d auto current_time = W->get_current_time();
@@ -128,7 +132,7 @@ int GSSSS::process_constraint_resistance() {
 }
 
 int GSSSS::update_trial_status() {
-    const auto& D = get_domain();
+    const auto D = get_domain();
     auto& W = D->get_factory();
 
     W->update_incre_acceleration(C0 * W->get_incre_displacement() + C1 * W->get_current_velocity() + C2 * W->get_current_acceleration());

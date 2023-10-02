@@ -29,18 +29,20 @@ BatheExplicit::BatheExplicit(const unsigned T, const double R)
 bool BatheExplicit::has_corrector() const { return true; }
 
 void BatheExplicit::assemble_resistance() {
-    const auto& D = get_domain();
+    const auto D = get_domain();
     auto& W = D->get_factory();
 
     auto fa = std::async([&] { D->assemble_resistance(); });
     auto fb = std::async([&] { D->assemble_damping_force(); });
-    auto fc = std::async([&] { D->assemble_inertial_force(); });
+    auto fc = std::async([&] { D->assemble_nonviscous_force(); });
+    auto fd = std::async([&] { D->assemble_inertial_force(); });
 
     fa.get();
     fb.get();
     fc.get();
+    fd.get();
 
-    W->set_sushi(W->get_trial_resistance() + W->get_trial_damping_force() + W->get_trial_inertial_force());
+    W->set_sushi(W->get_trial_resistance() + W->get_trial_damping_force() + W->get_trial_nonviscous_force() + W->get_trial_inertial_force());
 }
 
 void BatheExplicit::assemble_matrix() { get_domain()->assemble_trial_mass(); }
@@ -52,7 +54,7 @@ void BatheExplicit::update_incre_time(double T) {
 }
 
 int BatheExplicit::update_trial_status() {
-    const auto& D = get_domain();
+    const auto D = get_domain();
 
     if(auto& W = D->get_factory(); FLAG::FIRST == step_flag) {
         W->update_incre_velocity(A0 * W->get_current_acceleration());
@@ -67,7 +69,7 @@ int BatheExplicit::update_trial_status() {
 }
 
 int BatheExplicit::correct_trial_status() {
-    const auto& D = get_domain();
+    const auto D = get_domain();
 
     if(auto& W = D->get_factory(); FLAG::FIRST == step_flag) W->update_incre_velocity(A2 * W->get_incre_acceleration());
     else W->update_incre_velocity(A5 * W->get_pre_acceleration() + A6 * W->get_current_acceleration() + A7 * W->get_trial_acceleration());
@@ -76,7 +78,7 @@ int BatheExplicit::correct_trial_status() {
 }
 
 void BatheExplicit::commit_status() {
-    const auto& D = get_domain();
+    const auto D = get_domain();
     auto& W = D->get_factory();
 
     if(FLAG::FIRST == step_flag) {

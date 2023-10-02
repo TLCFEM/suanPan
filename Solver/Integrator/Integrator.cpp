@@ -188,7 +188,7 @@ void Integrator::update_incre_time(const double T) {
 }
 
 int Integrator::update_trial_status() {
-    const auto& D = get_domain();
+    const auto D = get_domain();
     auto& W = D->get_factory();
 
     return suanpan::approx_equal(norm(W->get_incre_displacement()), 0.) ? SUANPAN_SUCCESS : D->update_trial_status();
@@ -274,7 +274,7 @@ int Integrator::solve(mat& X, sp_mat&& B) { return database.lock()->get_factory(
  * The corresponding DoF shall be set to zero after solving the system.
  */
 void Integrator::erase_machine_error(vec& ninja) const {
-    const auto& D = get_domain();
+    const auto D = get_domain();
     auto& W = D->get_factory();
 
     D->erase_machine_error(ninja);

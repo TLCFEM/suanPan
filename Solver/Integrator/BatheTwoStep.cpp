@@ -27,39 +27,43 @@ BatheTwoStep::BatheTwoStep(const unsigned T, const double R, const double G)
     , Q0(1. - Q1 - Q2) {}
 
 void BatheTwoStep::assemble_resistance() {
-    const auto& D = get_domain();
+    const auto D = get_domain();
     auto& W = D->get_factory();
 
     auto fa = std::async([&] { D->assemble_resistance(); });
     auto fb = std::async([&] { D->assemble_damping_force(); });
-    auto fc = std::async([&] { D->assemble_inertial_force(); });
-
-    fa.get();
-    fb.get();
-    fc.get();
-
-    W->set_sushi(W->get_trial_resistance() + W->get_trial_damping_force() + W->get_trial_inertial_force());
-}
-
-void BatheTwoStep::assemble_matrix() {
-    const auto& D = get_domain();
-    auto& W = D->get_factory();
-
-    auto fa = std::async([&] { D->assemble_trial_stiffness(); });
-    auto fb = std::async([&] { D->assemble_trial_geometry(); });
-    auto fc = std::async([&] { D->assemble_trial_damping(); });
-    auto fd = std::async([&] { D->assemble_trial_mass(); });
+    auto fc = std::async([&] { D->assemble_nonviscous_force(); });
+    auto fd = std::async([&] { D->assemble_inertial_force(); });
 
     fa.get();
     fb.get();
     fc.get();
     fd.get();
 
+    W->set_sushi(W->get_trial_resistance() + W->get_trial_damping_force() + W->get_trial_nonviscous_force() + W->get_trial_inertial_force());
+}
+
+void BatheTwoStep::assemble_matrix() {
+    const auto D = get_domain();
+    auto& W = D->get_factory();
+
+    auto fa = std::async([&] { D->assemble_trial_stiffness(); });
+    auto fb = std::async([&] { D->assemble_trial_geometry(); });
+    auto fc = std::async([&] { D->assemble_trial_damping(); });
+    auto fd = std::async([&] { D->assemble_trial_nonviscous(); });
+    auto fe = std::async([&] { D->assemble_trial_mass(); });
+
+    fa.get();
+    fb.get();
+    fc.get();
+    fd.get();
+    fe.get();
+
     auto& t_stiff = W->get_stiffness();
 
     t_stiff += W->get_geometry();
 
-    t_stiff += FLAG::TRAP == step_flag ? P3 * W->get_mass() + P2 * W->get_damping() : P9 * W->get_mass() + P8 * W->get_damping();
+    t_stiff += FLAG::TRAP == step_flag ? P3 * W->get_mass() + P2 * (W->get_damping() + W->get_nonviscous()) : P9 * W->get_mass() + P8 * (W->get_damping() + W->get_nonviscous());
 }
 
 void BatheTwoStep::update_incre_time(double T) {
@@ -69,7 +73,7 @@ void BatheTwoStep::update_incre_time(double T) {
 }
 
 int BatheTwoStep::update_trial_status() {
-    const auto& D = get_domain();
+    const auto D = get_domain();
 
     if(auto& W = D->get_factory(); FLAG::TRAP == step_flag) {
         W->update_trial_acceleration(P3 * W->get_incre_displacement() - P4 * W->get_current_velocity() - W->get_current_acceleration());
@@ -84,7 +88,7 @@ int BatheTwoStep::update_trial_status() {
 }
 
 void BatheTwoStep::commit_status() {
-    const auto& D = get_domain();
+    const auto D = get_domain();
     auto& W = D->get_factory();
 
     if(FLAG::TRAP == step_flag) {
