@@ -240,6 +240,7 @@ enum class OutputType {
     CSE,
     KE,
     VE,
+    NVE,
     // momentum
     MM,
     MMX,

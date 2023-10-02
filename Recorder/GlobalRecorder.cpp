@@ -43,6 +43,11 @@ void GlobalRecorder::record(const shared_ptr<DomainBase>& D) {
         for(auto& I : D->get_pool<Element>()) viscous_energy += I->get_viscous_energy();
         insert({{viscous_energy, D->get_factory()->get_viscous_energy()}}, 0);
     }
+    else if(OutputType::NVE == get_variable_type()) {
+        auto nonviscous_energy = 0.;
+        for(auto& I : D->get_pool<Element>()) nonviscous_energy += I->get_nonviscous_energy();
+        insert({{nonviscous_energy, D->get_factory()->get_nonviscous_energy()}}, 0);
+    }
     else if(OutputType::SE == get_variable_type()) {
         auto strain_energy = 0.;
         for(auto& I : D->get_pool<Element>()) strain_energy += I->get_strain_energy();

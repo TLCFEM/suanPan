@@ -13,6 +13,9 @@ fix 2 2 1 2
 
 hdf5recorder 1 Node U1 2
 hdf5recorder 2 Node RF1 2
+hdf5recorder 3 Global KE
+hdf5recorder 4 Global SE
+hdf5recorder 5 Global NVE
 
 elementgroup 1 1
 
@@ -49,7 +52,7 @@ analyze --ignore-error
 #  -8.6931e-03  0.0000e+00
 peek node 2
 
-# save recorder 1 2
+# save recorder 1 2 3 4 5
 
 reset
 clear

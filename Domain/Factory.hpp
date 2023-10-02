@@ -1054,6 +1054,7 @@ template<sp_d T> void Factory<T>::commit_status() {
     commit_settlement();
     commit_resistance();
     commit_damping_force();
+    commit_nonviscous_force();
     commit_inertial_force();
     commit_displacement();
     commit_velocity();

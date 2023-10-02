@@ -367,6 +367,8 @@ const char* to_char(const OutputType& L) {
         return "KE";
     case OutputType::VE:
         return "VE";
+    case OutputType::NVE:
+        return "NVE";
     case OutputType::MM:
         return "MOMENTUM";
     case OutputType::MMX:
@@ -582,6 +584,7 @@ OutputType to_list(const char* L) {
     if(is_equal(L, "CSE")) return OutputType::CSE;
     if(is_equal(L, "KE")) return OutputType::KE;
     if(is_equal(L, "VE")) return OutputType::VE;
+    if(is_equal(L, "NVE")) return OutputType::NVE;
     if(is_equal(L, "MOMENTUM")) return OutputType::MM;
     if(is_equal(L, "MOMENTUMX")) return OutputType::MMX;
     if(is_equal(L, "MOMENTUMY")) return OutputType::MMY;
