@@ -34,9 +34,9 @@
 class DomainBase;
 
 class Modifier : public Tag {
+protected:
     uvec element_tag;
 
-protected:
     std::vector<weak_ptr<Element>> element_pool;
 
 public:

@@ -30,7 +30,7 @@
 
 #include <Element/Modifier/Modifier.h>
 
-class ElementalNonviscous final : public Modifier {
+class ElementalNonviscous : public Modifier {
     const cx_vec m, s;
 
     const double* incre_time = nullptr;
@@ -41,6 +41,15 @@ public:
     int initialize(const shared_ptr<DomainBase>&) override;
 
     int update_status() override;
+};
+
+class ElementalNonviscousGroup final : public ElementalNonviscous {
+    const unsigned group_tag;
+
+public:
+    ElementalNonviscousGroup(unsigned, cx_vec&&, cx_vec&&, unsigned);
+
+    int initialize(const shared_ptr<DomainBase>&) override;
 };
 
 #endif

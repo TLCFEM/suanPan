@@ -2587,7 +2587,7 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
 
         new_modifier = make_unique<ElementalModal>(tag, a, b, get_element_pool());
     }
-    else if(is_equal(modifier_type, "ElementalNonviscous")) {
+    else if(is_equal(modifier_type, "ElementalNonviscous") || is_equal(modifier_type, "ElementalNonviscousGroup")) {
         unsigned tag, ele_tag;
         if(!get_input(command, tag, ele_tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2614,7 +2614,8 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
             return SUANPAN_SUCCESS;
         }
 
-        new_modifier = make_unique<ElementalNonviscous>(tag, cx_vec{vec{m_r}, m_imag}, cx_vec{vec{s_r}, s_imag}, uvec{ele_tag});
+        if(is_equal(modifier_type, "ElementalNonviscous")) new_modifier = make_unique<ElementalNonviscous>(tag, cx_vec{vec{m_r}, m_imag}, cx_vec{vec{s_r}, s_imag}, uvec{ele_tag});
+        else new_modifier = make_unique<ElementalNonviscousGroup>(tag, cx_vec{vec{m_r}, m_imag}, cx_vec{vec{s_r}, s_imag}, ele_tag);
     }
     else {
         // check if the library is already loaded

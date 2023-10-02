@@ -18,6 +18,7 @@
 #include "ElementalNonviscous.h"
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
+#include <Domain/Group/Group.h>
 
 ElementalNonviscous::ElementalNonviscous(const unsigned T, cx_vec&& M, cx_vec&& S, uvec&& ET)
     : Modifier(T, std::forward<uvec>(ET))
@@ -28,8 +29,8 @@ int ElementalNonviscous::initialize(const shared_ptr<DomainBase>& D) {
     Modifier::initialize(D);
 
     if(std::ranges::any_of(element_pool, [](const weak_ptr<Element>& ele_ptr) { return !ele_ptr.lock()->get_current_nonviscous_force().empty(); })) {
-        suanpan_error("Repeated element tags are detected.\n");
-        return SUANPAN_FAIL;
+        suanpan_error("Repeated element tags are detected, modifier {} is disabled.\n", get_tag());
+        element_pool.clear();
     }
 
     suanpan::for_all(element_pool, [&](const weak_ptr<Element>& ele_ptr) {
@@ -42,6 +43,8 @@ int ElementalNonviscous::initialize(const shared_ptr<DomainBase>& D) {
 }
 
 int ElementalNonviscous::update_status() {
+    if(element_pool.empty()) return SUANPAN_SUCCESS;
+
     const cx_vec t_para = 2. / *incre_time + s;
     const cx_vec s_para = (t_para - 2. * s) / t_para;
     const cx_vec m_para = m / t_para;
@@ -49,6 +52,8 @@ int ElementalNonviscous::update_status() {
 
     suanpan::for_all(element_pool, [&](const weak_ptr<Element>& ele_ptr) {
         const auto t_ele = ele_ptr.lock();
+
+        if(t_ele->get_current_nonviscous_force().n_cols != s_para.n_elem) return;
 
         auto& trial_nonviscous_force = access::rw(t_ele->get_trial_nonviscous_force());
         trial_nonviscous_force = t_ele->get_current_nonviscous_force() * diagmat(s_para) + (t_ele->get_current_velocity() + t_ele->get_trial_velocity()) * m_para.t();
@@ -59,4 +64,16 @@ int ElementalNonviscous::update_status() {
     });
 
     return SUANPAN_SUCCESS;
+}
+
+ElementalNonviscousGroup::ElementalNonviscousGroup(const unsigned T, cx_vec&& M, cx_vec&& S, const unsigned GT)
+    : ElementalNonviscous(T, std::forward<cx_vec>(M), std::forward<cx_vec>(S))
+    , group_tag(GT) {}
+
+int ElementalNonviscousGroup::initialize(const shared_ptr<DomainBase>& D) {
+    if(!D->find_group(group_tag)) return SUANPAN_FAIL;
+
+    element_tag = unique(D->get_group(group_tag)->get_pool());
+
+    return ElementalNonviscous::initialize(D);
 }
