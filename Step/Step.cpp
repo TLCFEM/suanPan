@@ -35,7 +35,7 @@ Step::Step(const unsigned T, const double P)
     , time_period(P) {}
 
 int Step::initialize() {
-    const auto& t_domain = database.lock();
+    const auto t_domain = database.lock();
 
     if(sparse_mat) {
         // LAPACK and SPIKE are for dense only

@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include "LeeElementalDamping.h"
+#include "ElementalLee.h"
 
-LeeElementalDamping::LeeElementalDamping(const unsigned T, const double A, uvec&& ET)
+ElementalLee::ElementalLee(const unsigned T, const double A, uvec&& ET)
     : Modifier(T, std::forward<uvec>(ET))
     , damping_ratio(std::abs(A)) {}
 
-int LeeElementalDamping::update_status() {
+int ElementalLee::update_status() {
     const auto real_damping_ratio = damping_ratio < 0. ? default_damping_ratio : damping_ratio;
     suanpan::for_all(element_pool, [&](const weak_ptr<Element>& ele_ptr) {
         if(const auto t_ptr = ele_ptr.lock(); nullptr != t_ptr && t_ptr->if_update_damping()) {

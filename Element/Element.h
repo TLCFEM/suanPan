@@ -103,6 +103,7 @@ struct DataElement {
     double strain_energy = 0.;
     double kinetic_energy = 0.;
     double viscous_energy = 0.;
+    double nonviscous_energy = 0.;
     double complementary_energy = 0.;
     vec momentum{};
 
@@ -134,6 +135,7 @@ class Element : protected DataElement, public ElementBase {
     void update_strain_energy() override;
     void update_kinetic_energy() override;
     void update_viscous_energy() override;
+    void update_nonviscous_energy() override;
     void update_complementary_energy() override;
     void update_momentum() override;
 
@@ -141,16 +143,6 @@ protected:
     std::vector<weak_ptr<Node>> node_ptr; // node pointers
 
     [[nodiscard]] mat get_coordinate(unsigned) const override;
-
-    [[nodiscard]] vec get_incre_displacement() const override;
-    [[nodiscard]] vec get_incre_velocity() const override;
-    [[nodiscard]] vec get_incre_acceleration() const override;
-    [[nodiscard]] vec get_trial_displacement() const override;
-    [[nodiscard]] vec get_trial_velocity() const override;
-    [[nodiscard]] vec get_trial_acceleration() const override;
-    [[nodiscard]] vec get_current_displacement() const override;
-    [[nodiscard]] vec get_current_velocity() const override;
-    [[nodiscard]] vec get_current_acceleration() const override;
 
     [[nodiscard]] vec get_node_incre_resistance() const override;
     [[nodiscard]] vec get_node_trial_resistance() const override;
@@ -231,6 +223,16 @@ public:
     void clear_node_ptr() override;
     [[nodiscard]] const std::vector<weak_ptr<Node>>& get_node_ptr() const override;
 
+    [[nodiscard]] vec get_incre_displacement() const override;
+    [[nodiscard]] vec get_incre_velocity() const override;
+    [[nodiscard]] vec get_incre_acceleration() const override;
+    [[nodiscard]] vec get_trial_displacement() const override;
+    [[nodiscard]] vec get_trial_velocity() const override;
+    [[nodiscard]] vec get_trial_acceleration() const override;
+    [[nodiscard]] vec get_current_displacement() const override;
+    [[nodiscard]] vec get_current_velocity() const override;
+    [[nodiscard]] vec get_current_acceleration() const override;
+
     [[nodiscard]] const vec& get_trial_resistance() const override;
     [[nodiscard]] const vec& get_current_resistance() const override;
     [[nodiscard]] const vec& get_trial_damping_force() const override;
@@ -282,6 +284,7 @@ public:
     [[nodiscard]] double get_complementary_energy() const override;
     [[nodiscard]] double get_kinetic_energy() const override;
     [[nodiscard]] double get_viscous_energy() const override;
+    [[nodiscard]] double get_nonviscous_energy() const override;
     [[nodiscard]] const vec& get_momentum() const override;
     [[nodiscard]] double get_momentum_component(DOF) const override;
 

@@ -44,6 +44,12 @@ void Element::update_viscous_energy() {
     viscous_energy += .5 * (current_damping_force.is_empty() ? dot(get_incre_displacement(), trial_damping_force) : dot(get_incre_displacement(), current_damping_force + trial_damping_force));
 }
 
+void Element::update_nonviscous_energy() {
+    if(trial_nonviscous_force.is_empty()) return;
+
+    nonviscous_energy += .5 * dot(get_incre_displacement(), real(sum(current_nonviscous_force + trial_nonviscous_force, 1)));
+}
+
 void Element::update_complementary_energy() {
     if(trial_resistance.is_empty()) return;
 
@@ -291,7 +297,7 @@ Element::Element(const unsigned T, const unsigned ND, const unsigned ET, const u
 int Element::initialize_base(const shared_ptr<DomainBase>& D) {
     // initialized already, check node validity
     if(node_ptr.size() == num_node) {
-        for(const auto& I : node_ptr) if(const auto& t_node = I.lock(); nullptr == t_node || !t_node->is_active()) return SUANPAN_FAIL;
+        for(const auto& I : node_ptr) if(const auto t_node = I.lock(); nullptr == t_node || !t_node->is_active()) return SUANPAN_FAIL;
         return SUANPAN_SUCCESS;
     }
 
@@ -504,15 +510,18 @@ const mat& Element::get_mass_container() const { return mass_container; }
 const mat& Element::get_stiffness_container() const { return stiffness_container; }
 
 int Element::clear_status() {
-    if(update_mass && !initial_mass.is_empty()) trial_mass = current_mass = initial_mass;
-    if(update_damping && !initial_damping.is_empty()) trial_damping = current_damping = initial_damping;
-    if(update_stiffness && !initial_stiffness.is_empty()) trial_stiffness = current_stiffness = initial_stiffness;
-    if(update_geometry && !initial_geometry.is_empty()) trial_geometry = current_geometry = initial_geometry;
+    if(update_mass) trial_mass = current_mass = initial_mass;
+    if(update_damping) trial_damping = current_damping = initial_damping;
+    if(update_nonviscous) trial_nonviscous = current_nonviscous = initial_nonviscous;
+    if(update_stiffness) trial_stiffness = current_stiffness = initial_stiffness;
+    if(update_geometry) trial_geometry = current_geometry = initial_geometry;
 
     if(!trial_resistance.is_empty()) trial_resistance.zeros();
     if(!current_resistance.is_empty()) current_resistance.zeros();
     if(!trial_damping_force.is_empty()) trial_damping_force.zeros();
     if(!current_damping_force.is_empty()) current_damping_force.zeros();
+    if(!trial_nonviscous_force.is_empty()) trial_nonviscous_force.zeros();
+    if(!current_nonviscous_force.is_empty()) current_nonviscous_force.zeros();
     if(!trial_inertial_force.is_empty()) trial_inertial_force.zeros();
     if(!current_inertial_force.is_empty()) current_inertial_force.zeros();
 
@@ -522,6 +531,7 @@ int Element::clear_status() {
     strain_energy = 0.;
     kinetic_energy = 0.;
     viscous_energy = 0.;
+    nonviscous_energy = 0.;
     complementary_energy = 0.;
     momentum.zeros();
 
@@ -534,6 +544,7 @@ int Element::commit_status() {
     update_strain_energy();
     update_kinetic_energy();
     update_viscous_energy();
+    update_nonviscous_energy();
     update_complementary_energy();
     update_momentum();
 
@@ -543,6 +554,7 @@ int Element::commit_status() {
     if(update_geometry && !trial_geometry.is_empty()) current_geometry = trial_geometry;
     if(!trial_resistance.is_empty()) current_resistance = trial_resistance;
     if(!trial_damping_force.is_empty()) current_damping_force = trial_damping_force;
+    if(!trial_nonviscous_force.is_empty()) current_nonviscous_force = trial_nonviscous_force;
     if(!trial_inertial_force.is_empty()) current_inertial_force = trial_inertial_force;
 
     return SUANPAN_SUCCESS;
@@ -551,10 +563,12 @@ int Element::commit_status() {
 int Element::reset_status() {
     if(update_mass && !trial_mass.is_empty()) trial_mass = current_mass;
     if(update_damping && !trial_damping.is_empty()) trial_damping = current_damping;
+    if(update_nonviscous && !trial_nonviscous.is_empty()) trial_nonviscous = current_nonviscous;
     if(update_stiffness && !trial_stiffness.is_empty()) trial_stiffness = current_stiffness;
     if(update_geometry && !trial_geometry.is_empty()) trial_geometry = current_geometry;
     if(!trial_resistance.is_empty()) trial_resistance = current_resistance;
     if(!trial_damping_force.is_empty()) trial_damping_force = current_damping_force;
+    if(!trial_nonviscous_force.is_empty()) trial_nonviscous_force = current_nonviscous_force;
     if(!trial_inertial_force.is_empty()) trial_inertial_force = current_inertial_force;
 
     return SUANPAN_SUCCESS;
@@ -573,6 +587,8 @@ double Element::get_complementary_energy() const { return complementary_energy; 
 double Element::get_kinetic_energy() const { return kinetic_energy; }
 
 double Element::get_viscous_energy() const { return viscous_energy; }
+
+double Element::get_nonviscous_energy() const { return nonviscous_energy; }
 
 const vec& Element::get_momentum() const { return momentum; }
 

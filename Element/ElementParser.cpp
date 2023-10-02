@@ -2542,7 +2542,7 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
 
         new_modifier = make_unique<Rayleigh>(tag, a, b, c, d, get_element_pool());
     }
-    else if(is_equal(modifier_type, "LeeElementalDamping")) {
+    else if(is_equal(modifier_type, "ElementalLee")) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2555,7 +2555,7 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
             return SUANPAN_SUCCESS;
         }
 
-        new_modifier = make_unique<LeeElementalDamping>(tag, damping_ratio, get_element_pool());
+        new_modifier = make_unique<ElementalLee>(tag, damping_ratio, get_element_pool());
     }
     else if(is_equal(modifier_type, "LinearViscosity")) {
         unsigned tag;
@@ -2586,6 +2586,36 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
         }
 
         new_modifier = make_unique<ElementalModal>(tag, a, b, get_element_pool());
+    }
+    else if(is_equal(modifier_type, "ElementalNonviscous") || is_equal(modifier_type, "ElementalNonviscousGroup")) {
+        unsigned tag, ele_tag;
+        if(!get_input(command, tag, ele_tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        vector<double> m_r, s_r, m_i, s_i;
+
+        while(!command.eof()) {
+            double t_m_r, t_m_i, t_s_r, t_s_i;
+            if(!get_input(command, t_m_r, t_m_i, t_s_r, t_s_i)) {
+                suanpan_error("A valid damping coefficient is required.\n");
+                return SUANPAN_SUCCESS;
+            }
+            m_r.emplace_back(t_m_r);
+            m_i.emplace_back(t_m_i);
+            s_r.emplace_back(t_s_r);
+            s_i.emplace_back(t_s_i);
+        }
+
+        auto m_imag = vec{m_i}, s_imag = vec{s_i};
+        if(accu(m_imag) + accu(s_imag) > 1E-10) {
+            suanpan_error("Parameters should be conjugate pairs.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        if(is_equal(modifier_type, "ElementalNonviscous")) new_modifier = make_unique<ElementalNonviscous>(tag, cx_vec{vec{m_r}, m_imag}, cx_vec{vec{s_r}, s_imag}, uvec{ele_tag});
+        else new_modifier = make_unique<ElementalNonviscousGroup>(tag, cx_vec{vec{m_r}, m_imag}, cx_vec{vec{s_r}, s_imag}, ele_tag);
     }
     else {
         // check if the library is already loaded

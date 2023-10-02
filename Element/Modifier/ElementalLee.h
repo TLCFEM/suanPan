@@ -15,44 +15,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class Modifier
- * @brief A Modifier class.
+ * @class ElementalLee
+ * @brief A ElementalLee damping class.
  * @author tlc
- * @date 20/12/2018
- * @version 0.2.0
- * @file Modifier.h
+ * @date 20/10/2022
+ * @version 0.1.0
+ * @file ElementalLee.h
  * @addtogroup Modifier
  * @{
  */
 
-#ifndef MODIFIER_H
-#define MODIFIER_H
+#ifndef ELEMENTALLEE_H
+#define ELEMENTALLEE_H
 
-#include <Domain/Tag.h>
-#include <Element/Element.h>
+#include <Element/Modifier/Modifier.h>
 
-class DomainBase;
-
-class Modifier : public Tag {
-protected:
-    uvec element_tag;
-
-    std::vector<weak_ptr<Element>> element_pool;
+class ElementalLee final : public Modifier {
+    const double default_damping_ratio = .02;
+    const double damping_ratio;
 
 public:
-    explicit Modifier(unsigned = 0, // tag
-                      uvec&& = {}   // element tags
-    );
-    Modifier(const Modifier&) = delete;            // copy forbidden
-    Modifier(Modifier&&) = delete;                 // move forbidden
-    Modifier& operator=(const Modifier&) = delete; // assign forbidden
-    Modifier& operator=(Modifier&&) = delete;      // assign forbidden
+    ElementalLee(unsigned, double, uvec&& = {});
 
-    ~Modifier() override = default;
-
-    virtual int initialize(const shared_ptr<DomainBase>&);
-
-    virtual int update_status() = 0;
+    int update_status() override;
 };
 
 #endif

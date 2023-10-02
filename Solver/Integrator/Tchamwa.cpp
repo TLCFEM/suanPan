@@ -24,24 +24,26 @@ Tchamwa::Tchamwa(const unsigned T, const double R)
     , PHI(2. / (1. + std::max(0., std::min(1., R)))) {}
 
 void Tchamwa::assemble_resistance() {
-    const auto& D = get_domain();
+    const auto D = get_domain();
     auto& W = D->get_factory();
 
     auto fa = std::async([&] { D->assemble_resistance(); });
     auto fb = std::async([&] { D->assemble_damping_force(); });
-    auto fc = std::async([&] { D->assemble_inertial_force(); });
+    auto fc = std::async([&] { D->assemble_nonviscous_force(); });
+    auto fd = std::async([&] { D->assemble_inertial_force(); });
 
     fa.get();
     fb.get();
     fc.get();
+    fd.get();
 
-    W->set_sushi(W->get_trial_resistance() + W->get_trial_damping_force() + W->get_trial_inertial_force());
+    W->set_sushi(W->get_trial_resistance() + W->get_trial_damping_force() + W->get_trial_nonviscous_force() + W->get_trial_inertial_force());
 }
 
 void Tchamwa::assemble_matrix() { get_domain()->assemble_trial_mass(); }
 
 int Tchamwa::update_trial_status() {
-    const auto& D = get_domain();
+    const auto D = get_domain();
     auto& W = D->get_factory();
 
     W->update_incre_displacement(DT * W->get_current_velocity() + PHI * DT * DT * W->get_current_acceleration());

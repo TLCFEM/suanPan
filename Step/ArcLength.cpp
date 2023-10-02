@@ -30,7 +30,7 @@ ArcLength::ArcLength(const unsigned T, const unsigned NT, const unsigned DT, con
     , magnitude(MA) {}
 
 int ArcLength::initialize() {
-    const auto& t_domain = database.lock();
+    const auto t_domain = database.lock();
 
     // converger
     if(nullptr == tester) tester = make_shared<AbsIncreDisp>();

@@ -96,7 +96,7 @@ int LeeNewmark::initialize() {
 }
 
 int LeeNewmark::process_constraint() {
-    const auto& D = get_domain();
+    const auto D = get_domain();
 
     // process constraint for the first time to obtain proper stiffness
     if(SUANPAN_SUCCESS != LeeNewmarkBase::process_constraint()) return SUANPAN_FAIL;
@@ -147,13 +147,14 @@ int LeeNewmark::process_constraint_resistance() {
 }
 
 void LeeNewmark::assemble_resistance() {
-    const auto& D = get_domain();
+    const auto D = get_domain();
     const auto& W = factory;
 
     D->assemble_resistance();
     D->assemble_inertial_force();
     // consider independent viscous device
     D->assemble_damping_force();
+    D->assemble_nonviscous_force();
 
     if(nullptr != current_mass) {
         vec internal_velocity = CM * W->get_trial_velocity();
@@ -164,7 +165,7 @@ void LeeNewmark::assemble_resistance() {
         W->update_trial_damping_force_by(current_mass * internal_velocity);
     }
 
-    W->set_sushi(W->get_trial_resistance() + W->get_trial_damping_force() + W->get_trial_inertial_force());
+    W->set_sushi(W->get_trial_resistance() + W->get_trial_damping_force() + W->get_trial_nonviscous_force() + W->get_trial_inertial_force());
 }
 
 void LeeNewmark::print() {

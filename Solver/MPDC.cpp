@@ -10,7 +10,7 @@ MPDC::MPDC(const unsigned T)
 int MPDC::analyze() {
     auto& C = get_converger();
     auto& G = get_integrator();
-    const auto& D = G->get_domain();
+    const auto D = G->get_domain();
     auto& W = D->get_factory();
 
     suanpan_highlight(">> Current Analysis Time: {:.5f}.\n", W->get_trial_time());

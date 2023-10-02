@@ -28,7 +28,7 @@ BFGS::BFGS(const unsigned T, const unsigned MH)
 int BFGS::analyze() {
     auto& C = get_converger();
     auto& G = get_integrator();
-    const auto& D = C->get_domain().lock();
+    const auto D = C->get_domain().lock();
     auto& W = D->get_factory();
 
     suanpan_highlight(">> Current Analysis Time: {:.5f}.\n", W->get_trial_time());

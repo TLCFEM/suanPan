@@ -1,9 +1,10 @@
 set(Modifier
+        Modifier/ElementalLee.cpp
         Modifier/ElementalModal.cpp
+        Modifier/ElementalNonviscous.cpp
+        Modifier/LinearViscosity.cpp
         Modifier/LumpedScale.cpp
         Modifier/LumpedSimple.cpp
         Modifier/Modifier.cpp
         Modifier/Rayleigh.cpp
-        Modifier/LinearViscosity.cpp
-        Modifier/LeeElementalDamping.cpp
         )

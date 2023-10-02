@@ -27,7 +27,7 @@ WilsonPenzienNewmark::WilsonPenzienNewmark(const unsigned T, vec&& DR, const dou
 int WilsonPenzienNewmark::initialize() {
     if(SUANPAN_SUCCESS != Newmark::initialize()) return SUANPAN_FAIL;
 
-    const auto& D = get_domain();
+    const auto D = get_domain();
     auto& W = D->get_factory();
 
     theta.zeros(W->get_size(), damping_ratio.n_elem);
@@ -67,7 +67,7 @@ int WilsonPenzienNewmark::process_constraint() {
     }
 
     // the damping matrix is addressed by using the Woodbury formula
-    t_stiff += C0 * t_mass + C1 * W->get_damping();
+    t_stiff += C0 * t_mass + C1 * (W->get_damping() + W->get_nonviscous());
 
     return SUANPAN_SUCCESS;
 }
@@ -139,35 +139,39 @@ void WilsonPenzienNewmark::reset_status() {
 }
 
 void WilsonPenzienNewmark::assemble_resistance() {
-    const auto& D = get_domain();
+    const auto D = get_domain();
     auto& W = D->get_factory();
 
     auto fa = std::async([&] { D->assemble_resistance(); });
-    auto fb = std::async([&] { D->assemble_damping_force(); }); // consider independent viscous device
-    auto fc = std::async([&] { D->assemble_inertial_force(); });
-
-    fa.get();
-    fb.get();
-    fc.get();
-
-    W->update_trial_damping_force_by(theta * (beta % (theta.t() * W->get_trial_velocity())));
-
-    W->set_sushi(W->get_trial_resistance() + W->get_trial_damping_force() + W->get_trial_inertial_force());
-}
-
-void WilsonPenzienNewmark::assemble_matrix() {
-    const auto& D = get_domain();
-    auto& W = D->get_factory();
-
-    auto fa = std::async([&] { D->assemble_trial_stiffness(); });
-    auto fb = std::async([&] { D->assemble_trial_geometry(); });
-    auto fc = std::async([&] { D->assemble_trial_damping(); }); // the model may have viscous device
-    auto fd = std::async([&] { D->assemble_trial_mass(); });    // need a constant mass matrix
+    auto fb = std::async([&] { D->assemble_damping_force(); });    // consider independent viscous device
+    auto fc = std::async([&] { D->assemble_nonviscous_force(); }); // consider independent viscous device
+    auto fd = std::async([&] { D->assemble_inertial_force(); });
 
     fa.get();
     fb.get();
     fc.get();
     fd.get();
+
+    W->update_trial_damping_force_by(theta * (beta % (theta.t() * W->get_trial_velocity())));
+
+    W->set_sushi(W->get_trial_resistance() + W->get_trial_damping_force() + W->get_trial_nonviscous_force() + W->get_trial_inertial_force());
+}
+
+void WilsonPenzienNewmark::assemble_matrix() {
+    const auto D = get_domain();
+    auto& W = D->get_factory();
+
+    auto fa = std::async([&] { D->assemble_trial_stiffness(); });
+    auto fb = std::async([&] { D->assemble_trial_geometry(); });
+    auto fc = std::async([&] { D->assemble_trial_damping(); });    // the model may have viscous device
+    auto fd = std::async([&] { D->assemble_trial_nonviscous(); }); // the model may have viscous device
+    auto fe = std::async([&] { D->assemble_trial_mass(); });       // need a constant mass matrix
+
+    fa.get();
+    fb.get();
+    fc.get();
+    fd.get();
+    fe.get();
 
     auto& t_stiff = W->get_stiffness();
 

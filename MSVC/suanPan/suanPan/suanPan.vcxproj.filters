@@ -1408,7 +1408,7 @@
     <ClCompile Include="..\..\..\UnitTest\TestSampling.cpp">
       <Filter>UnitTest</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Element\Modifier\LeeElementalDamping.cpp">
+    <ClCompile Include="..\..\..\Element\Modifier\ElementalLee.cpp">
       <Filter>Element\Modifier</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Solver\Integrator\Tchamwa.cpp">
@@ -1569,6 +1569,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Material\MaterialOS\Wrapper\UniversalOS.cpp">
       <Filter>Material\MaterialOS\Wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Modifier\ElementalNonviscous.cpp">
+      <Filter>Element\Modifier</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2827,7 +2830,7 @@
     <ClInclude Include="..\..\..\Toolbox\resampling.h">
       <Filter>Toolbox</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Element\Modifier\LeeElementalDamping.h">
+    <ClInclude Include="..\..\..\Element\Modifier\ElementalLee.h">
       <Filter>Element\Modifier</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Toolbox\response_spectrum.h">
@@ -2997,6 +3000,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Material\MaterialOS\Wrapper\UniversalOS.h">
       <Filter>Material\MaterialOS\Wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Modifier\ElementalNonviscous.h">
+      <Filter>Element\Modifier</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

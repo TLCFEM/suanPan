@@ -31,7 +31,7 @@ int Frequency::initialize() {
 
     factory->set_analysis_type(AnalysisType::EIGEN);
 
-    const auto& t_domain = database.lock();
+    const auto t_domain = database.lock();
 
     // integrator
     modifier = make_shared<Integrator>();
