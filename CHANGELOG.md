@@ -14,6 +14,7 @@
 4. beam element for arbitrary thin-/thick-walled open/close section with torsion and warping `B31OS` [#159](https://github.com/TLCFEM/suanPan/pull/159)
 5. better local iteration convergence criterion [#161](https://github.com/TLCFEM/suanPan/pull/161)
 6. `B31OS` and `EB31OS` associated transformations `B3DOSL`, `B3DOSC`; sections, `Fibre3DOS`, `Cell3DOS`; material wrappers `OS146`, `OS146S`
+7. elemental damping using Lee's model
 
 ## version 3.1
 

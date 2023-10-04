@@ -5443,13 +5443,13 @@
       "trigger":"ElementalLee"
     },
     {
-      "contents":"integrator LeeElementalNewmark ${1:(1)} ${2:(2)} ${3:(3)} (${4:(4)} ${5:(5)}...)\n# (1) int, unique integrator tag\n# (2) double, alpha\n# (3) double, beta\n# (4) double, damping ratio \\zeta_p at the peak of each mode\n# (5) double, circular frequency\\omega_p at the peak of each mode",
+      "contents":"integrator LeeElementalNewmark ${1:(1)} ${2:(2)} ${3:(3)} (${4:(4)} ${5:(5)}...)\n# (1) int, unique integrator tag\n# (2) double, alpha\n# (3) double, beta\n# (4) double, reference damping ratio \\zeta_p at the peak of each mode\n# (5) double, circular frequency \\omega_p at the peak of each mode",
       "details":"",
       "kind":"type",
       "trigger":"LeeElementalNewmark"
     },
     {
-      "contents":"integrator LeeNewmark ${1:(1)} ${2:(2)} ${3:(3)} (${4:(4)} ${5:(5)}...)\n# (1) int, unique integrator tag\n# (2) double, alpha\n# (3) double, beta\n# (4) double, damping ratio \\zeta_p at the peak of each mode\n# (5) double, circular frequency\\omega_p at the peak of each mode",
+      "contents":"integrator LeeNewmark ${1:(1)} ${2:(2)} ${3:(3)} (${4:(4)} ${5:(5)}...)\n# (1) int, unique integrator tag\n# (2) double, alpha\n# (3) double, beta\n# (4) double, damping ratio \\zeta_p at the peak of each mode\n# (5) double, circular frequency \\omega_p at the peak of each mode",
       "details":"",
       "kind":"type",
       "trigger":"LeeNewmark"
