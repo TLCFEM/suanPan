@@ -56,7 +56,7 @@ bool Recorder::if_hdf5() const { return use_hdf5; }
 
 bool Recorder::if_record_time() const { return record_time; }
 
-bool Recorder::if_perform_record() { return 1 == interval || 0 == std::remainder(counter++, interval); }
+bool Recorder::if_perform_record() { return 1 == interval || 0 == counter++ % interval; }
 
 void Recorder::insert(const double T) { time_pool.emplace_back(T); }
 
@@ -87,6 +87,8 @@ void Recorder::save() {
         const auto group_id = H5Gcreate(file_id, group_name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
         for(const auto& s_data_pool : data_pool) {
+            if(s_data_pool.empty()) continue;
+
             auto max_size = 0llu;
             for(const auto& I : s_data_pool[0]) if(I.n_elem > max_size) max_size = I.n_elem;
 
@@ -112,6 +114,8 @@ void Recorder::save() {
     }
     else {
         for(const auto& s_data_pool : data_pool) {
+            if(s_data_pool.empty()) continue;
+
             auto max_size = 0llu;
             for(const auto& I : s_data_pool[0]) if(I.n_elem > max_size) max_size = I.n_elem;
 
@@ -132,6 +136,7 @@ void Recorder::save() {
     }
 #else
     for(const auto& s_data_pool : data_pool) {
+        if(s_data_pool.empty()) continue;
         auto max_size = 0llu;
         for(const auto& I : s_data_pool[0]) if(I.n_elem > max_size) max_size = I.n_elem;
 
