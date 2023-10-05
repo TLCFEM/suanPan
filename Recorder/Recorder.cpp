@@ -44,7 +44,7 @@ Recorder::Recorder(const unsigned T, uvec&& B, const OutputType L, const unsigne
 
 void Recorder::initialize(const shared_ptr<DomainBase>&) {}
 
-void Recorder::set_object_tag(const uvec& T) { object_tag = T; }
+void Recorder::set_object_tag(uvec&& T) { object_tag = std::forward<uvec>(T); }
 
 const uvec& Recorder::get_object_tag() const { return object_tag; }
 

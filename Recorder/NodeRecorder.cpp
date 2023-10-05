@@ -22,11 +22,16 @@
 #include <Domain/Node.h>
 
 void NodeRecorder::initialize(const shared_ptr<DomainBase>& D) {
+    std::vector<uword> pool;
+    pool.reserve(get_object_tag().n_elem);
     for(const auto I : get_object_tag())
-        if(!D->find<Node>(I)) {
-            D->disable_recorder(get_tag());
-            return;
-        }
+        if(!D->find<Node>(I) || !D->get<Node>(I)->is_active())
+            suanpan_warning("Node {} is not available/active, removed from recorder {}.\n", I, get_tag());
+        else pool.emplace_back(I);
+
+    set_object_tag(pool);
+
+    access::rw(get_data_pool()).resize(get_object_tag().n_elem);
 }
 
 void NodeRecorder::record(const shared_ptr<DomainBase>& D) {

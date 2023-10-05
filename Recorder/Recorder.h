@@ -63,7 +63,7 @@ public:
 
     virtual void initialize(const shared_ptr<DomainBase>&);
 
-    void set_object_tag(const uvec&);
+    void set_object_tag(uvec&&);
     [[nodiscard]] const uvec& get_object_tag() const;
 
     void set_variable_type(OutputType);
