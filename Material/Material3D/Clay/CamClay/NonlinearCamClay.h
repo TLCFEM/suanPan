@@ -26,6 +26,8 @@
  *     1. Computational Methods for Plasticity: Theory and Applications
  *        [10.1002/9780470694626](https://doi.org/10.1002/9780470694626)
  *        Chapter 10 Section 10.1
+ * 
+ * Note the definition of hardening variable alpha is different from the reference.
  *
  * @author tlc
  * @date 26/04/2019
