@@ -9,7 +9,7 @@ element T2D2 1 1 2 1 1
 element Mass 2 2 100 1
 
 fix 1 1 1
-fix 2 2 1 2
+fix2 2 2 1 2
 
 hdf5recorder 1 Node U1 2
 hdf5recorder 2 Node RF1 2
