@@ -122,8 +122,7 @@ int ConcreteExp::initialize(const shared_ptr<DomainBase>&) {
 }
 
 double ConcreteExp::get_parameter(const ParameterType P) const {
-    if(ParameterType::DENSITY == P) return density;
-    if(ParameterType::ELASTICMODULUS == P || ParameterType::YOUNGSMODULUS == P || ParameterType::E == P) return elastic_modulus;
+    if(ParameterType::ELASTICMODULUS == P) return elastic_modulus;
     if(ParameterType::PEAKSTRAIN == P) return f_c / elastic_modulus;
     if(ParameterType::CRACKSTRAIN == P) return f_t / elastic_modulus;
     return 0.;

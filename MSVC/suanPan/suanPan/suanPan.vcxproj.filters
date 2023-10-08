@@ -2343,9 +2343,6 @@
     <ClInclude Include="..\..\..\Recorder\VisualisationRecorder.h">
       <Filter>Recorder</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Section\ParameterType.h">
-      <Filter>Section</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Section\Section.h">
       <Filter>Section</Filter>
     </ClInclude>

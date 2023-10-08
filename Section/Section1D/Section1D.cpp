@@ -25,7 +25,7 @@ Section1D::Section1D(const unsigned T, const unsigned MT, const double A)
 int Section1D::initialize(const shared_ptr<DomainBase>& D) {
     s_material = suanpan::initialized_material_copy(D, material_tag);
 
-    access::rw(linear_density) = area * s_material->get_parameter(ParameterType::DENSITY);
+    access::rw(linear_density) = area * s_material->get_density();
 
     trial_stiffness = current_stiffness = initial_stiffness = area * s_material->get_initial_stiffness().at(0);
 

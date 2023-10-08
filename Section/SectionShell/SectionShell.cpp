@@ -71,8 +71,6 @@ const mat& SectionShell::get_initial_membrane_stiffness() const { return initial
 
 const mat& SectionShell::get_initial_plate_stiffness() const { return initial_plate_stiffness; }
 
-double SectionShell::get_parameter(ParameterType) { return 0.; }
-
 int SectionShell::update_incre_status(const double ME, const double PE) {
     const vec m_strain{ME}, p_strain{PE};
     return update_incre_status(m_strain, p_strain);

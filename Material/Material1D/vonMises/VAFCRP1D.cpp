@@ -39,8 +39,7 @@ int VAFCRP1D::initialize(const shared_ptr<DomainBase>& D) {
 unique_ptr<Material> VAFCRP1D::get_copy() { return make_unique<VAFCRP1D>(*this); }
 
 double VAFCRP1D::get_parameter(const ParameterType P) const {
-    if(ParameterType::DENSITY == P) return density;
-    if(ParameterType::ELASTICMODULUS == P || ParameterType::YOUNGSMODULUS == P || ParameterType::E == P) return elastic_modulus;
+    if(ParameterType::ELASTICMODULUS == P) return elastic_modulus;
     return 0.;
 }
 

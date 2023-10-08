@@ -63,11 +63,11 @@ int S4::initialize(const shared_ptr<DomainBase>& D) {
     // Mindlin plate
     // check if proper shear modulus is available
     // not very vital as for multiplier any large value can be chosen
-    auto shear_modulus = mat_proto->get_parameter(ParameterType::G);
-    if(suanpan::approx_equal(0., shear_modulus)) shear_modulus = mat_proto->get_parameter(ParameterType::SHEARMODULUS);
-    if(suanpan::approx_equal(0., shear_modulus)) shear_modulus = .5 * mat_proto->get_parameter(ParameterType::E) / (1. + mat_proto->get_parameter(ParameterType::POISSONSRATIO));
-    if(suanpan::approx_equal(0., shear_modulus)) shear_modulus = mat_stiff.at(2, 2);
-    if(suanpan::approx_equal(0., shear_modulus)) shear_modulus = mat_proto->get_parameter(ParameterType::E);
+    const auto shear_modulus = mat_proto->get_parameter(ParameterType::SHEARMODULUS);
+    if(suanpan::approx_equal(shear_modulus, 0.)) {
+        suanpan_error("A zero shear modulus is detected.\n");
+        return SUANPAN_FAIL;
+    };
 
     // reduced integration for the Kirchhoff constraint
     vec t_vec(2, fill::zeros);

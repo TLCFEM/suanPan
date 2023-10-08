@@ -76,7 +76,7 @@ int ElementExample::initialize(const shared_ptr<DomainBase>& D) {
 
     initial_mass.zeros(m_size, m_size);
     const rowvec n = mean(ele_coor) * inv_coor;
-    const mat t_mass = n.t() * n * area * thickness * m_material->get_parameter(ParameterType::DENSITY);
+    const mat t_mass = n.t() * n * area * thickness * m_material->get_density();
     initial_mass(uvec{1, 3, 5}, uvec{1, 3, 5}) = t_mass;
     initial_mass(uvec{0, 2, 4}, uvec{0, 2, 4}) = t_mass;
 

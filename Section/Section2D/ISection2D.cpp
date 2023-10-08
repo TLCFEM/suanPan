@@ -43,7 +43,7 @@ ISection2D::ISection2D(const unsigned T, vec&& D, const unsigned MT, const unsig
 int ISection2D::initialize(const shared_ptr<DomainBase>& D) {
     auto& mat_proto = D->get_material(material_tag);
 
-    access::rw(linear_density) = mat_proto->get_parameter(ParameterType::DENSITY) * area;
+    access::rw(linear_density) = mat_proto->get_density() * area;
 
     const auto web_area = web_height * web_thickness;
     const auto b_flange_area = bottom_flange_width * bottom_flange_thickness;

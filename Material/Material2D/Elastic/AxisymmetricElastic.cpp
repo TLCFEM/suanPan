@@ -29,13 +29,7 @@ int AxisymmetricElastic::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double AxisymmetricElastic::get_parameter(const ParameterType P) const {
-    if(ParameterType::DENSITY == P) return density;
-    if(ParameterType::ELASTICMODULUS == P || ParameterType::YOUNGSMODULUS == P || ParameterType::E == P) return elastic_modulus;
-    if(ParameterType::SHEARMODULUS == P || ParameterType::G == P) return elastic_modulus / (2. + 2. * poissons_ratio);
-    if(ParameterType::POISSONSRATIO == P) return poissons_ratio;
-    return 0.;
-}
+double AxisymmetricElastic::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
 
 unique_ptr<Material> AxisymmetricElastic::get_copy() { return make_unique<AxisymmetricElastic>(*this); }
 

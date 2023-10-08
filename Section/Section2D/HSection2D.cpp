@@ -33,7 +33,7 @@ HSection2D::HSection2D(const unsigned T, const double TFW, const double TFT, con
 int HSection2D::initialize(const shared_ptr<DomainBase>& D) {
     auto& mat_proto = D->get_material(material_tag);
 
-    access::rw(linear_density) = mat_proto->get_parameter(ParameterType::DENSITY) * area;
+    access::rw(linear_density) = mat_proto->get_density() * area;
 
     const auto web_area = web_width * web_thickness;
     const auto l_flange_area = left_flange_height * left_flange_thickness;

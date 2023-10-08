@@ -46,6 +46,8 @@ int OS146S::initialize(const shared_ptr<DomainBase>& D) {
         return SUANPAN_FAIL;
     }
 
+    access::rw(density) = base->get_density();
+
     trial_stiffness = current_stiffness = initial_stiffness = diagmat(vec{base->get_initial_stiffness()(0), shear_modulus, shear_modulus});
 
     return SUANPAN_SUCCESS;

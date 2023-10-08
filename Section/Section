@@ -4,5 +4,3 @@
 #include "SectionNM/SectionNM"
 #include "SectionOS/SectionOS"
 #include "SectionShell/SectionShell"
-
-#include "ParameterType.h"

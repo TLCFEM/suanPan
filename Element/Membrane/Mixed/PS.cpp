@@ -99,7 +99,7 @@ int PS::initialize(const shared_ptr<DomainBase>& D) {
 
     for(auto& I : int_pt) I.poly_strain *= NT;
 
-    if(const auto t_density = material_proto->get_parameter(ParameterType::DENSITY); t_density > 0.) {
+    if(const auto t_density = material_proto->get_density(); t_density > 0.) {
         initial_mass.zeros(m_size, m_size);
         for(const auto& I : int_pt) {
             const auto n_int = compute_shape_function(I.coor, 0);

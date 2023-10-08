@@ -23,6 +23,8 @@ Stacked::Stacked(const unsigned T, uvec&& MT)
     , mat_tag(std::forward<uvec>(MT)) {}
 
 int Stacked::initialize(const shared_ptr<DomainBase>& D) {
+    auto& t_density = access::rw(density);
+    t_density = 0.;
     initial_stiffness.zeros(6, 6);
     mat_pool.clear();
     mat_pool.reserve(mat_tag.n_elem);
@@ -32,7 +34,7 @@ int Stacked::initialize(const shared_ptr<DomainBase>& D) {
             suanpan_error("A valid 3D host material is required.\n");
             return SUANPAN_FAIL;
         }
-        access::rw(density) += mat_pool.back()->get_parameter(ParameterType::DENSITY);
+        t_density += mat_pool.back()->get_density();
         initial_stiffness += mat_pool.back()->get_initial_stiffness();
     }
 

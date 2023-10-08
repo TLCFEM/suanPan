@@ -201,7 +201,7 @@ int SGCMQ::initialize(const shared_ptr<DomainBase>& D) {
 
     for(auto&& I : int_pt) I.poly_strain *= NT;
 
-    form_mass(mat_proto->get_parameter(ParameterType::DENSITY), diff_coor);
+    form_mass(mat_proto->get_density(), diff_coor);
 
     form_body_force(diff_coor);
 

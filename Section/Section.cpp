@@ -24,6 +24,12 @@ Section::Section(const unsigned T, const SectionType ST, const unsigned MT, cons
     : DataSection{MT, ST, A, 0., EC.head(2), {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}}
     , Tag(T) {}
 
+SectionType Section::get_section_type() const { return section_type; }
+
+double Section::get_area() const { return area; }
+
+double Section::get_linear_density() const { return linear_density; }
+
 int Section::initialize_base(const shared_ptr<DomainBase>& D) {
     if(initialized) return SUANPAN_SUCCESS;
 
@@ -70,8 +76,6 @@ bool Section::is_initialized() const { return initialized; }
 
 bool Section::is_symmetric() const { return symmetric; }
 
-SectionType Section::get_section_type() const { return section_type; }
-
 void Section::set_eccentricity(const vec& E) const { access::rw(eccentricity) = E; }
 
 const vec& Section::get_eccentricity() const { return eccentricity; }
@@ -99,13 +103,6 @@ const mat& Section::get_current_geometry() const { return current_geometry; }
 const mat& Section::get_initial_stiffness() const { return initial_stiffness; }
 
 const mat& Section::get_initial_geometry() const { return initial_geometry; }
-
-double Section::get_parameter(const ParameterType P) {
-    if(ParameterType::AREA == P) return area;
-    if(ParameterType::LINEARDENSITY == P) return linear_density;
-    if(ParameterType::DENSITY == P) return linear_density / area;
-    return 0.;
-}
 
 int Section::update_incre_status(const double i_strain) {
     const vec i_vec_strain{i_strain};

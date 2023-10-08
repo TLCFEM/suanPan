@@ -118,8 +118,7 @@ int NonlinearK4::initialize(const shared_ptr<DomainBase>&) {
 }
 
 double NonlinearK4::get_parameter(const ParameterType P) const {
-    if(ParameterType::DENSITY == P) return density;
-    if(ParameterType::ELASTICMODULUS == P || ParameterType::YOUNGSMODULUS == P || ParameterType::E == P) return initial_stiffness(0);
+    if(ParameterType::ELASTICMODULUS == P) return elastic_modulus;
     return 0.;
 }
 

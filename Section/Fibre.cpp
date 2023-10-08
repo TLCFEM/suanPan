@@ -39,8 +39,8 @@ int Fibre::initialize(const shared_ptr<DomainBase>& D) {
             fibre.pop_back();
         }
         else {
-            total_area += fibre.back()->get_parameter(ParameterType::AREA);
-            total_linear_density += fibre.back()->get_parameter(ParameterType::LINEARDENSITY);
+            total_area += fibre.back()->get_area();
+            total_linear_density += fibre.back()->get_linear_density();
             initial_stiffness += fibre.back()->get_initial_stiffness();
         }
     }

@@ -23,6 +23,12 @@ Material::Material(const unsigned T, const MaterialType MT, const double D)
     , DataCoupleMaterial{-1., {}, {}, {}, {}, {}, {}, {}, {}, {}}
     , Tag(T) {}
 
+double Material::get_density() const { return density; }
+
+MaterialType Material::get_material_type() const { return material_type; }
+
+PlaneType Material::get_plane_type() const { return plane_type; }
+
 int Material::initialize_base(const shared_ptr<DomainBase>&) {
     if(initialized) return SUANPAN_SUCCESS;
 
@@ -67,11 +73,7 @@ void Material::set_characteristic_length(const double L) { characteristic_length
 
 double Material::get_characteristic_length() const { return characteristic_length; }
 
-MaterialType Material::get_material_type() const { return material_type; }
-
-PlaneType Material::get_plane_type() const { return plane_type; }
-
-double Material::get_parameter(const ParameterType T) const { return T == ParameterType::DENSITY ? density : 0.; }
+double Material::get_parameter(ParameterType) const { return 0.; }
 
 const vec& Material::get_trial_strain() { return trial_strain; }
 

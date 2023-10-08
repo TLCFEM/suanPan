@@ -35,7 +35,7 @@ int Substepping::initialize(const shared_ptr<DomainBase>& D) {
 
     PureWrapper(this);
 
-    access::rw(density) = current_mat_obj->get_parameter(ParameterType::DENSITY);
+    access::rw(density) = current_mat_obj->get_density();
     access::rw(material_type) = current_mat_obj->get_material_type();
 
     return SUANPAN_SUCCESS;

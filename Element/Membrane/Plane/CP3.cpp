@@ -174,7 +174,7 @@ int CP3::initialize(const shared_ptr<DomainBase>& D) {
 
     rowvec n = mean(ele_coor) * inv_coor;
 
-    if(const auto t_density = area * thickness * m_material->get_parameter(ParameterType::DENSITY); t_density > 0.) {
+    if(const auto t_density = area * thickness * m_material->get_density(); t_density > 0.) {
         initial_mass.zeros(m_size, m_size);
         for(auto I = 0u, K = 0u; I < m_node; ++I, K += m_dof) for(auto J = I, L = K; J < m_node; ++J, L += m_dof) initial_mass(K, L) += t_density * n(I) * n(J);
         for(auto I = 0u, K = 1u; I < m_size; I += m_dof, K += m_dof) {

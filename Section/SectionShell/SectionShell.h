@@ -29,7 +29,6 @@
 #define SECTIONSHELL_H
 
 #include <Domain/Tag.h>
-#include <Section/ParameterType.h>
 
 enum class OutputType;
 
@@ -114,8 +113,6 @@ public:
     [[nodiscard]] virtual const mat& get_initial_plate_stiffness() const;
 
     virtual unique_ptr<SectionShell> get_copy() = 0;
-
-    virtual double get_parameter(ParameterType);
 
     int update_incre_status(double, double);
     int update_incre_status(double, double, double, double);

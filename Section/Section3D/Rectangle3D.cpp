@@ -29,7 +29,7 @@ Rectangle3D::Rectangle3D(const unsigned T, const double B, const double H, const
 int Rectangle3D::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get_material(material_tag);
 
-    access::rw(linear_density) = area * material_proto->get_parameter(ParameterType::DENSITY);
+    access::rw(linear_density) = area * material_proto->get_density();
 
     const IntegrationPlan plan_y(1, int_pt_num, IntegrationType::LOBATTO);
     const IntegrationPlan plan_z(1, int_pt_num, IntegrationType::LOBATTO);

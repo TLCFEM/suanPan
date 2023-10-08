@@ -201,7 +201,7 @@ int GCMQ::initialize(const shared_ptr<DomainBase>& D) {
     trial_alpha = current_alpha.zeros(11);
     trial_q = current_q.zeros(11);
 
-    form_mass(material_proto->get_parameter(ParameterType::DENSITY), diff_coor);
+    form_mass(material_proto->get_density(), diff_coor);
 
     form_body_force(diff_coor);
 

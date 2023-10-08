@@ -35,7 +35,7 @@ CircularHollow3D::CircularHollow3D(const unsigned T, vec&& D, const unsigned M, 
 int CircularHollow3D::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get_material(material_tag);
 
-    access::rw(linear_density) = area * material_proto->get_parameter(ParameterType::DENSITY);
+    access::rw(linear_density) = area * material_proto->get_density();
 
     const IntegrationPlan plan(1, int_pt_num, IntegrationType::GAUSS);
 

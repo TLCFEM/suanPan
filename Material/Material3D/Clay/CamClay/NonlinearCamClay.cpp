@@ -33,14 +33,7 @@ int NonlinearCamClay::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double NonlinearCamClay::get_parameter(const ParameterType P) const {
-    if(ParameterType::DENSITY == P) return density;
-    if(ParameterType::ELASTICMODULUS == P || ParameterType::YOUNGSMODULUS == P || ParameterType::E == P) return elastic_modulus;
-    if(ParameterType::SHEARMODULUS == P || ParameterType::G == P) return elastic_modulus / (2. + 2. * poissons_ratio);
-    if(ParameterType::BULKMODULUS == P) return elastic_modulus / (3. - 6. * poissons_ratio);
-    if(ParameterType::POISSONSRATIO == P) return poissons_ratio;
-    return 0.;
-}
+double NonlinearCamClay::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
 
 int NonlinearCamClay::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;

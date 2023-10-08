@@ -111,7 +111,7 @@ int ElementTemplate::initialize(const shared_ptr<DomainBase>& D) {
 
     trial_stiffness = current_stiffness = initial_stiffness = strain_mat.t() * m_material->get_initial_stiffness() * strain_mat * area * thickness;
 
-    if(const auto t_density = area * thickness * m_material->get_parameter(ParameterType::DENSITY); t_density > 0.) {
+    if(const auto t_density = area * thickness * m_material->get_density(); t_density > 0.) {
         initial_mass.zeros(m_size, m_size);
         const rowvec n = mean(ele_coor) * inv_coor;
         const mat t_mass = n.t() * n * t_density * area * thickness;

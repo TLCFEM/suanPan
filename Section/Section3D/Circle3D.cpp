@@ -28,7 +28,7 @@ Circle3D::Circle3D(const unsigned T, const double R, const unsigned M, const uns
 int Circle3D::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get_material(material_tag);
 
-    access::rw(linear_density) = area * material_proto->get_parameter(ParameterType::DENSITY);
+    access::rw(linear_density) = area * material_proto->get_density();
 
     const IntegrationPlan plan(2, int_pt_num, IntegrationType::GAUSS);
 

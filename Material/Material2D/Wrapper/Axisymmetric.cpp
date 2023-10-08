@@ -32,7 +32,7 @@ int Axisymmetric::initialize(const shared_ptr<DomainBase>& D) {
         return SUANPAN_FAIL;
     }
 
-    access::rw(density) = base->get_parameter(ParameterType::DENSITY);
+    access::rw(density) = base->get_density();
 
     current_stiffness = trial_stiffness = initial_stiffness = base->get_initial_stiffness()(F, F);
 

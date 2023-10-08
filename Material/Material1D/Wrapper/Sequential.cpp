@@ -24,6 +24,8 @@ Sequential::Sequential(const unsigned T, uvec&& MT)
     , mat_tag(std::forward<uvec>(MT)) {}
 
 int Sequential::initialize(const shared_ptr<DomainBase>& D) {
+    auto& t_density = access::rw(density);
+    t_density = 0.;
     mat_pool.clear();
     mat_pool.reserve(mat_tag.n_elem);
     for(const auto I : mat_tag) {
@@ -32,7 +34,7 @@ int Sequential::initialize(const shared_ptr<DomainBase>& D) {
             suanpan_error("A valid 1D host material is required.\n");
             return SUANPAN_FAIL;
         }
-        access::rw(density) += mat_pool.back()->get_parameter(ParameterType::DENSITY);
+        t_density += mat_pool.back()->get_density();
     }
 
     jacobian.zeros(mat_tag.n_elem, mat_tag.n_elem);

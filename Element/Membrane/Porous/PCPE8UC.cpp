@@ -53,11 +53,7 @@ int PCPE8UC::initialize(const shared_ptr<DomainBase>& D) {
     const auto ks = s_mat->get_parameter(ParameterType::BULKMODULUS);
     const auto kf = f_mat->get_parameter(ParameterType::BULKMODULUS);
 
-    if(suanpan::approx_equal(ks, 0.)) {
-        suanpan_error("A zero bulk modulus is detected.\n");
-        return SUANPAN_FAIL;
-    }
-    if(suanpan::approx_equal(kf, 0.)) {
+    if(suanpan::approx_equal(ks, 0.) || suanpan::approx_equal(kf, 0.)) {
         suanpan_error("A zero bulk modulus is detected.\n");
         return SUANPAN_FAIL;
     }
@@ -107,7 +103,7 @@ int PCPE8UC::initialize(const shared_ptr<DomainBase>& D) {
     const uvec s_dof_a{0, 2, 4, 6, 8, 10, 12, 14};
     const uvec s_dof_b{1, 3, 5, 7, 9, 11, 13, 15};
     initial_mass.zeros(m_size, m_size);
-    initial_mass(s_dof_a, s_dof_a) = ((1. - porosity) * s_mat->get_parameter(ParameterType::DENSITY) + porosity * f_mat->get_parameter(ParameterType::DENSITY)) * meta_a;
+    initial_mass(s_dof_a, s_dof_a) = ((1. - porosity) * s_mat->get_density() + porosity * f_mat->get_density()) * meta_a;
     initial_mass(s_dof_b, s_dof_b) = initial_mass(s_dof_a, s_dof_a);
     ConstantMass(this);
 

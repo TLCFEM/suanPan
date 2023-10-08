@@ -25,7 +25,7 @@ int Fluid::initialize(const shared_ptr<DomainBase>&) { return SUANPAN_SUCCESS; }
 
 double Fluid::get_parameter(const ParameterType P) const {
     if(ParameterType::BULKMODULUS == P) return bulk_modulus;
-    return 0;
+    return 0.;
 }
 
 unique_ptr<Material> Fluid::get_copy() { return make_unique<Fluid>(*this); }

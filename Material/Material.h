@@ -29,7 +29,7 @@
 #define MATERIAL_H
 
 #include <Domain/Tag.h>
-#include <Section/ParameterType.h>
+#include "ParameterType.h"
 
 enum class MaterialType : unsigned {
     D0 = 0,
@@ -131,6 +131,10 @@ public:
 
     ~Material() override = default;
 
+    [[nodiscard]] double get_density() const;
+    [[nodiscard]] MaterialType get_material_type() const;
+    [[nodiscard]] PlaneType get_plane_type() const;
+
     int initialize_base(const shared_ptr<DomainBase>&);
 
     virtual int initialize(const shared_ptr<DomainBase>&) = 0;
@@ -148,9 +152,6 @@ public:
 
     void set_characteristic_length(double);
     [[nodiscard]] double get_characteristic_length() const;
-
-    [[nodiscard]] MaterialType get_material_type() const;
-    [[nodiscard]] PlaneType get_plane_type() const;
 
     [[nodiscard]] virtual double get_parameter(ParameterType) const;
 

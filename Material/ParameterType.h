@@ -19,19 +19,37 @@
 #define PARAMETERTYPE_H
 
 enum class ParameterType {
-    NONE,
-    DENSITY,
-    LINEARDENSITY,
-    POISSONSRATIO,
-    AREA,
-    YOUNGSMODULUS,
     ELASTICMODULUS,
-    E,
+    POISSONSRATIO,
     SHEARMODULUS,
-    G,
+    BULKMODULUS,
     PEAKSTRAIN,
-    CRACKSTRAIN,
-    BULKMODULUS
+    CRACKSTRAIN
+};
+
+struct material_property {
+    const double elastic_modulus, poissons_ratio;
+
+    material_property(const double E, const double P)
+        : elastic_modulus(E)
+        , poissons_ratio(P) {}
+
+    double operator()(const ParameterType P) const {
+        switch(P) {
+        case ParameterType::ELASTICMODULUS:
+            return elastic_modulus;
+        case ParameterType::POISSONSRATIO:
+            return poissons_ratio;
+        case ParameterType::SHEARMODULUS:
+            return elastic_modulus / (2. + 2. * poissons_ratio);
+        case ParameterType::BULKMODULUS:
+            return elastic_modulus / (3. - 6. * poissons_ratio);
+        case ParameterType::PEAKSTRAIN:
+        case ParameterType::CRACKSTRAIN:
+        default:
+            return 0.;
+        }
+    }
 };
 
 #endif

@@ -53,14 +53,7 @@ void Elastic2D::initialize_couple(const shared_ptr<DomainBase>&) {
     ConstantCoupleStiffness(this);
 }
 
-double Elastic2D::get_parameter(const ParameterType P) const {
-    if(ParameterType::DENSITY == P) return density;
-    if(ParameterType::ELASTICMODULUS == P || ParameterType::YOUNGSMODULUS == P || ParameterType::E == P) return elastic_modulus;
-    if(ParameterType::SHEARMODULUS == P || ParameterType::G == P) return elastic_modulus / (2. + 2. * poissons_ratio);
-    if(ParameterType::BULKMODULUS == P) return elastic_modulus / (3. - 6. * poissons_ratio);
-    if(ParameterType::POISSONSRATIO == P) return poissons_ratio;
-    return 0.;
-}
+double Elastic2D::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
 
 unique_ptr<Material> Elastic2D::get_copy() { return make_unique<Elastic2D>(*this); }
 

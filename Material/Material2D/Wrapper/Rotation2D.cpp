@@ -32,7 +32,7 @@ int Rotation2D::initialize(const shared_ptr<DomainBase>& D) {
         return SUANPAN_FAIL;
     }
 
-    access::rw(density) = mat_obj->get_parameter(ParameterType::DENSITY);
+    access::rw(density) = mat_obj->get_density();
 
     trial_stiffness = current_stiffness = initial_stiffness = trans_mat.t() * mat_obj->get_initial_stiffness() * trans_mat;
 

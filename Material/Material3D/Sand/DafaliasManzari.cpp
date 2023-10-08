@@ -40,14 +40,7 @@ int DafaliasManzari::initialize(const shared_ptr<DomainBase>&) {
 
 unique_ptr<Material> DafaliasManzari::get_copy() { return make_unique<DafaliasManzari>(*this); }
 
-double DafaliasManzari::get_parameter(const ParameterType P) const {
-    if(ParameterType::DENSITY == P) return density;
-    if(ParameterType::ELASTICMODULUS == P || ParameterType::YOUNGSMODULUS == P || ParameterType::E == P) return gi * (2. + 2. * poissons_ratio);
-    if(ParameterType::SHEARMODULUS == P || ParameterType::G == P) return gi;
-    if(ParameterType::BULKMODULUS == P) return gi * (2. + 2. * poissons_ratio) / (3. - 6. * poissons_ratio);
-    if(ParameterType::POISSONSRATIO == P) return poissons_ratio;
-    return 0.;
-}
+double DafaliasManzari::get_parameter(const ParameterType P) const { return material_property(gi * (2. + 2. * poissons_ratio), poissons_ratio)(P); }
 
 int DafaliasManzari::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;

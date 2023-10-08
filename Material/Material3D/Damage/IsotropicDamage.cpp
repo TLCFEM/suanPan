@@ -32,7 +32,7 @@ int IsotropicDamage::initialize(const shared_ptr<DomainBase>& D) {
 
     if(nullptr == mat_ptr || mat_ptr->get_material_type() != MaterialType::D3) return SUANPAN_FAIL;
 
-    access::rw(density) = mat_ptr->get_parameter(ParameterType::DENSITY);
+    access::rw(density) = mat_ptr->get_density();
 
     trial_stiffness = current_stiffness = initial_stiffness = mat_ptr->get_initial_stiffness();
 

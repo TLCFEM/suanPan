@@ -30,8 +30,8 @@ Bilinear2D::Bilinear2D(const unsigned T, const double E, const double V, const d
     , poissons_ratio(V)
     , base(0, E, V, Y, H, B, D) { set_support_couple(true); }
 
-int Bilinear2D::initialize(const shared_ptr<DomainBase>&) {
-    if(SUANPAN_SUCCESS != base.initialize_base(nullptr) || SUANPAN_SUCCESS != base.initialize(nullptr)) return SUANPAN_FAIL;
+int Bilinear2D::initialize(const shared_ptr<DomainBase>& D) {
+    if(SUANPAN_SUCCESS != base.initialize_base(D) || SUANPAN_SUCCESS != base.initialize(D)) return SUANPAN_FAIL;
 
     trial_full_strain = current_full_strain.zeros(6);
 

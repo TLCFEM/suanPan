@@ -35,6 +35,8 @@ int StressWrapper::initialize(const shared_ptr<DomainBase>& D) {
         return SUANPAN_FAIL;
     }
 
+    access::rw(density) = base->get_density();
+
     trial_full_strain = current_full_strain.zeros(6);
 
     trial_stiffness = current_stiffness = initial_stiffness = form_stiffness(base->get_initial_stiffness());

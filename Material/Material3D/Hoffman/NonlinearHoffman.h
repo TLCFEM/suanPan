@@ -59,8 +59,6 @@ public:
 
     int initialize(const shared_ptr<DomainBase>&) override;
 
-    [[nodiscard]] double get_parameter(ParameterType) const override;
-
     int update_trial_status(const vec&) override;
 
     int clear_status() override;

@@ -28,7 +28,7 @@ Cell3DOS::Cell3DOS(const unsigned T, const double AR, const double OM, const dou
 int Cell3DOS::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get_material(material_tag);
 
-    access::rw(linear_density) = area * material_proto->get_parameter(ParameterType::DENSITY);
+    access::rw(linear_density) = area * material_proto->get_density();
 
     int_pt.clear();
     int_pt.emplace_back(omega, py, pz, area, material_proto->get_copy());

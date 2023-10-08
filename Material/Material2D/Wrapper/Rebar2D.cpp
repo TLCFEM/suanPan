@@ -34,7 +34,7 @@ int Rebar2D::initialize(const shared_ptr<DomainBase>& D) {
         return SUANPAN_FAIL;
     }
 
-    access::rw(density) = ratio_x * rebar_x->get_parameter(ParameterType::DENSITY) + ratio_y * rebar_y->get_parameter(ParameterType::DENSITY);
+    access::rw(density) = ratio_x * rebar_x->get_density() + ratio_y * rebar_y->get_density();
 
     initial_stiffness.zeros(3, 3);
 

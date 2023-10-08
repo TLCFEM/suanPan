@@ -31,7 +31,7 @@ PCPE4DC::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<
     : coor(std::forward<vec>(C))
     , weight(W)
     , m_material(std::forward<unique_ptr<Material>>(M))
-    , strain_mat(3, 2 * m_node, fill::zeros) {}
+    , strain_mat(3, 2llu * m_node, fill::zeros) {}
 
 PCPE4DC::PCPE4DC(const unsigned T, uvec&& N, const unsigned MS, const unsigned MF, const double AL, const double NN, const double KK)
     : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{MS, MF}, false)
@@ -57,11 +57,7 @@ int PCPE4DC::initialize(const shared_ptr<DomainBase>& D) {
     const auto ks = s_mat->get_parameter(ParameterType::BULKMODULUS);
     const auto kf = f_mat->get_parameter(ParameterType::BULKMODULUS);
 
-    if(suanpan::approx_equal(ks, 0.)) {
-        suanpan_error("A zero bulk modulus is detected.\n");
-        return SUANPAN_FAIL;
-    }
-    if(suanpan::approx_equal(kf, 0.)) {
+    if(suanpan::approx_equal(ks, 0.) || suanpan::approx_equal(kf, 0.)) {
         suanpan_error("A zero bulk modulus is detected.\n");
         return SUANPAN_FAIL;
     }
@@ -69,8 +65,8 @@ int PCPE4DC::initialize(const shared_ptr<DomainBase>& D) {
     q = ks * kf / (porosity * ks + (alpha - porosity) * kf);
 
     // compute density ratio
-    const auto s_density = (1. - porosity) * s_mat->get_parameter(ParameterType::DENSITY);
-    const auto f_density = porosity * f_mat->get_parameter(ParameterType::DENSITY);
+    const auto s_density = (1. - porosity) * s_mat->get_density();
+    const auto f_density = porosity * f_mat->get_density();
     const auto s_ratio = s_density / (s_density + f_density);
     const auto f_ratio = f_density / (s_density + f_density);
 

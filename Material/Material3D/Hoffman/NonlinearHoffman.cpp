@@ -36,11 +36,6 @@ int NonlinearHoffman::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double NonlinearHoffman::get_parameter(const ParameterType P) const {
-    if(ParameterType::DENSITY == P) return density;
-    return 0.;
-}
-
 int NonlinearHoffman::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 

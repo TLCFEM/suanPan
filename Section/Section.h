@@ -29,7 +29,6 @@
 #define SECTION_H
 
 #include <Domain/Tag.h>
-#include <Section/ParameterType.h>
 
 enum class SectionType : unsigned {
     D0 = 0,
@@ -93,6 +92,10 @@ public:
 
     ~Section() override = default;
 
+    [[nodiscard]] SectionType get_section_type() const;
+    [[nodiscard]] double get_area() const;
+    [[nodiscard]] double get_linear_density() const;
+
     int initialize_base(const shared_ptr<DomainBase>&);
 
     virtual int initialize(const shared_ptr<DomainBase>&) = 0;
@@ -101,8 +104,6 @@ public:
     void set_symmetric(bool) const;
     [[nodiscard]] bool is_initialized() const;
     [[nodiscard]] bool is_symmetric() const;
-
-    [[nodiscard]] SectionType get_section_type() const;
 
     void set_eccentricity(const vec&) const;
     [[nodiscard]] const vec& get_eccentricity() const;
@@ -123,8 +124,6 @@ public:
     [[nodiscard]] virtual const mat& get_initial_geometry() const;
 
     virtual unique_ptr<Section> get_copy() = 0;
-
-    virtual double get_parameter(ParameterType = ParameterType::NONE);
 
     int update_incre_status(double);
     int update_incre_status(double, double);

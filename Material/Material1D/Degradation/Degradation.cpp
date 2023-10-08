@@ -33,7 +33,7 @@ int Degradation::initialize(const shared_ptr<DomainBase>& D) {
 
     if(nullptr == base) return SUANPAN_FAIL;
 
-    access::rw(density) = base->get_parameter(ParameterType::DENSITY);
+    access::rw(density) = base->get_density();
 
     const auto degrade = compute_positive_degradation(0.);
     const auto& d = degrade(0);

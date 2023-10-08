@@ -84,7 +84,7 @@ int Rotation3D::initialize(const shared_ptr<DomainBase>& D) {
         return SUANPAN_FAIL;
     }
 
-    access::rw(density) = mat_obj->get_parameter(ParameterType::DENSITY);
+    access::rw(density) = mat_obj->get_density();
 
     trial_stiffness = current_stiffness = initial_stiffness = trans_mat.t() * mat_obj->get_initial_stiffness() * trans_mat;
 
@@ -92,6 +92,8 @@ int Rotation3D::initialize(const shared_ptr<DomainBase>& D) {
 }
 
 unique_ptr<Material> Rotation3D::get_copy() { return make_unique<Rotation3D>(*this); }
+
+double Rotation3D::get_parameter(const ParameterType P) const { return mat_obj->get_parameter(P); }
 
 int Rotation3D::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;

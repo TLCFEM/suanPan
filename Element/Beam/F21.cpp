@@ -59,7 +59,7 @@ int F21::initialize(const shared_ptr<DomainBase>& D) {
 
     trial_stiffness = current_stiffness = initial_stiffness = b_trans->to_global_stiffness_mat(inv(initial_local_flexibility));
 
-    if(const auto linear_density = section_proto->get_parameter(ParameterType::LINEARDENSITY); linear_density > 0.) trial_mass = current_mass = initial_mass = b_trans->to_global_mass_mat(linear_density);
+    if(const auto linear_density = section_proto->get_linear_density(); linear_density > 0.) trial_mass = current_mass = initial_mass = b_trans->to_global_mass_mat(linear_density);
 
     trial_local_deformation = current_local_deformation.zeros(3);
     trial_local_resistance = current_local_resistance.zeros(3);

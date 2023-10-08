@@ -38,14 +38,7 @@ int NonlinearPeric::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-double NonlinearPeric::get_parameter(const ParameterType P) const {
-    if(ParameterType::DENSITY == P) return density;
-    if(ParameterType::ELASTICMODULUS == P || ParameterType::YOUNGSMODULUS == P || ParameterType::E == P) return elastic_modulus;
-    if(ParameterType::SHEARMODULUS == P || ParameterType::G == P) return shear_modulus;
-    if(ParameterType::BULKMODULUS == P) return elastic_modulus / (3. - 6. * poissons_ratio);
-    if(ParameterType::POISSONSRATIO == P) return poissons_ratio;
-    return 0.;
-}
+double NonlinearPeric::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
 
 int NonlinearPeric::update_trial_status(const vec& t_strain) {
     trial_stress = current_stress + (trial_stiffness = initial_stiffness) * (incre_strain = (trial_strain = t_strain) - current_strain);
