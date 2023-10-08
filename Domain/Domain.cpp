@@ -707,6 +707,20 @@ const shared_ptr<Integrator>& Domain::get_current_integrator() const { return ge
 
 const shared_ptr<Solver>& Domain::get_current_solver() const { return get_solver(current_solver_tag); }
 
+unique_ptr<Material> Domain::initialized_material_copy(const uword T) {
+    if(!find<Material>(T)) return nullptr;
+
+    auto copy = get<Material>(T)->get_copy();
+
+    if(copy->is_initialized()) return copy;
+
+    if(SUANPAN_SUCCESS != copy->initialize_base(shared_from_this()) || SUANPAN_SUCCESS != copy->initialize(shared_from_this())) return nullptr;
+
+    copy->set_initialized(true);
+
+    return copy;
+}
+
 /**
  * \brief concurrently safe insertion method
  */

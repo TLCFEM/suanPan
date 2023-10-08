@@ -304,6 +304,8 @@ public:
     const shared_ptr<Integrator>& get_current_integrator() const override;
     const shared_ptr<Solver>& get_current_solver() const override;
 
+    unique_ptr<Material> initialized_material_copy(uword) override;
+
     void insert_loaded_dof(const uvec&) override;
     void insert_restrained_dof(const uvec&) override;
     void insert_constrained_dof(const uvec&) override;

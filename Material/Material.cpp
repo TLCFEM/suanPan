@@ -360,23 +360,3 @@ void PureWrapper(Material* M) {
 unique_ptr<Material> suanpan::make_copy(const shared_ptr<Material>& P) { return nullptr == P ? nullptr : P->get_copy(); }
 
 unique_ptr<Material> suanpan::make_copy(const unique_ptr<Material>& P) { return nullptr == P ? nullptr : P->get_copy(); }
-
-/**
- * \brief This function checks if the corresponding material model exists, if yes make a copy and ensure all initialisations succeed, in case of any errors, it returns nullptr.
- * \param D global storage domain
- * \param T material tag
- * \return local copy of material object
- */
-unique_ptr<Material> suanpan::initialized_material_copy(const shared_ptr<DomainBase>& D, const uword T) {
-    if(!D->find<Material>(T)) return nullptr;
-
-    auto copy = D->get<Material>(T)->get_copy();
-
-    if(copy->is_initialized()) return copy;
-
-    if(SUANPAN_SUCCESS != copy->initialize_base(D) || SUANPAN_SUCCESS != copy->initialize(D)) return nullptr;
-
-    copy->set_initialized(true);
-
-    return copy;
-}

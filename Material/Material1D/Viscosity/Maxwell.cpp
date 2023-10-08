@@ -29,8 +29,8 @@ Maxwell::Maxwell(const unsigned T, const unsigned DT, const unsigned ST, const b
     , beta(std::min(std::max(0., std::fabs(BT)), 1.)) { access::rw(tolerance) = 5E-13; }
 
 int Maxwell::initialize(const shared_ptr<DomainBase>& D) {
-    damper = suanpan::initialized_material_copy(D, damper_tag);
-    spring = suanpan::initialized_material_copy(D, spring_tag);
+    damper = D->initialized_material_copy(damper_tag);
+    spring = D->initialized_material_copy(spring_tag);
 
     if(nullptr == damper || nullptr == spring) return SUANPAN_FAIL;
 

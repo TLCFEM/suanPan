@@ -22,13 +22,8 @@ IsotropicDamage::IsotropicDamage(const unsigned T, const unsigned MT)
     : Material3D(T, 0.)
     , mat_tag(MT) {}
 
-IsotropicDamage::IsotropicDamage(const IsotropicDamage& old_obj)
-    : Material3D(old_obj)
-    , mat_tag(old_obj.mat_tag)
-    , mat_ptr(suanpan::make_copy(old_obj.mat_ptr)) {}
-
 int IsotropicDamage::initialize(const shared_ptr<DomainBase>& D) {
-    mat_ptr = suanpan::initialized_material_copy(D, mat_tag);
+    mat_ptr = D->initialized_material_copy(mat_tag);
 
     if(nullptr == mat_ptr || mat_ptr->get_material_type() != MaterialType::D3) return SUANPAN_FAIL;
 
@@ -42,7 +37,7 @@ int IsotropicDamage::initialize(const shared_ptr<DomainBase>& D) {
 double IsotropicDamage::get_parameter(const ParameterType P) const { return mat_ptr->get_parameter(P); }
 
 int IsotropicDamage::update_trial_status(const vec& t_strain) {
-    if(mat_ptr->update_trial_status(trial_strain = t_strain) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
+    if(SUANPAN_SUCCESS != mat_ptr->update_trial_status(trial_strain = t_strain)) return SUANPAN_FAIL;
 
     trial_stress = mat_ptr->get_trial_stress();
     trial_stiffness = mat_ptr->get_trial_stiffness();

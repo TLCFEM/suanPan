@@ -28,7 +28,7 @@ int Parallel::initialize(const shared_ptr<DomainBase>& D) {
     mat_pool.clear();
     mat_pool.reserve(mat_tag.n_elem);
     for(const auto I : mat_tag) {
-        mat_pool.emplace_back(suanpan::initialized_material_copy(D, I));
+        mat_pool.emplace_back(D->initialized_material_copy(I));
         if(nullptr == mat_pool.back() || mat_pool.back()->get_material_type() != MaterialType::D1) {
             suanpan_error("A valid 1D host material is required.\n");
             return SUANPAN_FAIL;

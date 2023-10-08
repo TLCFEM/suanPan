@@ -317,6 +317,8 @@ public:
     [[nodiscard]] virtual const shared_ptr<Integrator>& get_current_integrator() const = 0;
     [[nodiscard]] virtual const shared_ptr<Solver>& get_current_solver() const = 0;
 
+    virtual unique_ptr<Material> initialized_material_copy(uword) = 0;
+
     /**
      * \brief concurrently safe insertion method
      */

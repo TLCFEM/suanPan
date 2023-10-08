@@ -25,8 +25,8 @@ Kelvin::Kelvin(const unsigned T, const unsigned DT, const unsigned ST)
     , spring_tag(ST) {}
 
 int Kelvin::initialize(const shared_ptr<DomainBase>& D) {
-    damper = suanpan::initialized_material_copy(D, damper_tag);
-    spring = suanpan::initialized_material_copy(D, spring_tag);
+    damper = D->initialized_material_copy(damper_tag);
+    spring = D->initialized_material_copy(spring_tag);
 
     if(nullptr == damper || nullptr == spring) return SUANPAN_FAIL;
 

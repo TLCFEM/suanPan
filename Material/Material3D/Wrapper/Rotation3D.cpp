@@ -77,7 +77,7 @@ Rotation3D::Rotation3D(const unsigned T, const unsigned MT, mat&& R)
     , mat_tag(MT) { form_transformation(std::forward<mat>(R)); }
 
 int Rotation3D::initialize(const shared_ptr<DomainBase>& D) {
-    mat_obj = suanpan::initialized_material_copy(D, mat_tag);
+    mat_obj = D->initialized_material_copy(mat_tag);
 
     if(nullptr == mat_obj || mat_obj->get_material_type() != MaterialType::D3) {
         suanpan_error("A valid 3D host material is required.\n");

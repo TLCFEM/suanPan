@@ -25,13 +25,13 @@ TimberPD::TimberPD(const unsigned T, vec&& EE, vec&& VV, vec&& SS, vec&& HH, con
     , hill_t(transform::hill_projection(yield_stress(0), yield_stress(2), yield_stress(4), yield_stress(6), yield_stress(7), yield_stress(8)))
     , hill_c(transform::hill_projection(yield_stress(1), yield_stress(3), yield_stress(5), yield_stress(6), yield_stress(7), yield_stress(8))) {}
 
-int TimberPD::initialize(const shared_ptr<DomainBase>&) {
+int TimberPD::initialize(const shared_ptr<DomainBase>& D) {
     initial_history.resize(9);
     initial_history(7) = ini_r_t;
     initial_history(8) = ini_r_c;
     initialize_history(9);
 
-    return BilinearHoffman::initialize(nullptr);
+    return BilinearHoffman::initialize(D);
 }
 
 unique_ptr<Material> TimberPD::get_copy() { return make_unique<TimberPD>(*this); }

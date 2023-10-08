@@ -18,7 +18,9 @@
  * @class Concrete21
  * @brief A Concrete21 material class.
  *
- * For plain concrete. Only monotonic load is supported at moment. Cyclic behaviour does not converge in most cases.
+ * For plain concrete.
+ * Only monotonic load is supported at the moment.
+ * Cyclic behaviour does not converge in most cases.
  *
  * algorithm validated @ 05/02/2019 by tlc
  *

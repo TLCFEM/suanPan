@@ -232,7 +232,6 @@ public:
 namespace suanpan {
     unique_ptr<Material> make_copy(const shared_ptr<Material>&);
     unique_ptr<Material> make_copy(const unique_ptr<Material>&);
-    unique_ptr<Material> initialized_material_copy(const shared_ptr<DomainBase>&, uword);
 } // namespace suanpan
 
 #endif

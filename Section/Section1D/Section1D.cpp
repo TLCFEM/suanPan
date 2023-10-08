@@ -23,7 +23,7 @@ Section1D::Section1D(const unsigned T, const unsigned MT, const double A)
     : Section(T, SectionType::D1, MT, A) {}
 
 int Section1D::initialize(const shared_ptr<DomainBase>& D) {
-    s_material = suanpan::initialized_material_copy(D, material_tag);
+    s_material = D->initialized_material_copy(material_tag);
 
     access::rw(linear_density) = area * s_material->get_density();
 

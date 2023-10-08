@@ -26,8 +26,8 @@ Rebar2D::Rebar2D(const unsigned T, const unsigned XT, const unsigned YT, const d
     , ratio_y(RY) {}
 
 int Rebar2D::initialize(const shared_ptr<DomainBase>& D) {
-    rebar_x = suanpan::initialized_material_copy(D, tag_x);
-    rebar_y = suanpan::initialized_material_copy(D, tag_y);
+    rebar_x = D->initialized_material_copy(tag_x);
+    rebar_y = D->initialized_material_copy(tag_y);
 
     if(nullptr == rebar_x || nullptr == rebar_y || rebar_x->get_material_type() != MaterialType::D1 || rebar_y->get_material_type() != MaterialType::D1) {
         suanpan_error("A valid 1D host material is required.\n");

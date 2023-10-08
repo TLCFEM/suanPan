@@ -29,7 +29,7 @@ Degradation::Degradation(const Degradation& old_obj)
     , base(suanpan::make_copy(old_obj.base)) {}
 
 int Degradation::initialize(const shared_ptr<DomainBase>& D) {
-    base = suanpan::initialized_material_copy(D, mat_tag);
+    base = D->initialized_material_copy(mat_tag);
 
     if(nullptr == base) return SUANPAN_FAIL;
 

@@ -28,7 +28,7 @@ StressWrapper::StressWrapper(const unsigned T, const unsigned BT, const unsigned
     , max_iteration(MI) {}
 
 int StressWrapper::initialize(const shared_ptr<DomainBase>& D) {
-    base = suanpan::initialized_material_copy(D, base_tag);
+    base = D->initialized_material_copy(base_tag);
 
     if(nullptr == base || base->get_material_type() != MaterialType::D3) {
         suanpan_error("A valid 3D host material is required.\n");
