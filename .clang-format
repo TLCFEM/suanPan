@@ -2,6 +2,8 @@
 Language: Cpp
 BasedOnStyle: LLVM
 AccessModifierOffset: -4
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
 AlignOperands: false
 AllowShortBlocksOnASingleLine: true
 AllowShortIfStatementsOnASingleLine: true
@@ -44,5 +46,6 @@ NamespaceIndentation: All
 PointerAlignment: Left
 SpaceAfterTemplateKeyword: false
 SpaceBeforeParens: Never
+SpacesInAngles: false
 TabWidth: 4
 ...
