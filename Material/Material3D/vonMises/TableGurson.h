@@ -32,7 +32,7 @@
 #include "NonlinearGurson.h"
 
 class TableGurson final : public NonlinearGurson {
-    mat hardening_table;
+    const mat hardening_table;
 
     [[nodiscard]] vec compute_hardening(double) const override;
 
@@ -48,8 +48,6 @@ public:
                 double,     // en
                 double = 0. // density
     );
-
-    [[nodiscard]] double get_parameter(ParameterType) const override;
 
     unique_ptr<Material> get_copy() override;
 };
