@@ -57,7 +57,11 @@ void Newmark::assemble_matrix() {
     fd.get();
     fe.get();
 
-    W->get_stiffness() += W->get_geometry() + C0 * W->get_mass() + C1 * (W->get_damping() + W->get_nonviscous());
+    if(W->is_nlgeom()) W->get_stiffness() += W->get_geometry();
+
+    W->get_stiffness() += C0 * W->get_mass();
+
+    W->get_stiffness() += W->is_nonviscous() ? C1 * (W->get_damping() + W->get_nonviscous()) : C1 * W->get_damping();
 }
 
 int Newmark::update_trial_status() {

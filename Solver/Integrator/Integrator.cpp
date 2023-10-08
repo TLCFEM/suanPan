@@ -114,7 +114,7 @@ void Integrator::assemble_matrix() {
     auto& W = D->get_factory();
     D->assemble_trial_stiffness();
     D->assemble_trial_geometry();
-    W->get_stiffness() += W->get_geometry();
+    if(W->is_nlgeom()) W->get_stiffness() += W->get_geometry();
 }
 
 /**

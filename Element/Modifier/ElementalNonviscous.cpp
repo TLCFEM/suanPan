@@ -27,17 +27,18 @@ ElementalNonviscous::ElementalNonviscous(const unsigned T, cx_vec&& M, cx_vec&& 
 int ElementalNonviscous::initialize(const shared_ptr<DomainBase>& D) {
     Modifier::initialize(D);
 
+    factory = D->get_factory();
+
     if(std::any_of(element_pool.cbegin(), element_pool.cend(), [](const weak_ptr<Element>& ele_ptr) { return !ele_ptr.lock()->get_current_nonviscous_force().empty(); })) {
         suanpan_error("Repeated element tags are detected, modifier {} is disabled.\n", get_tag());
         element_pool.clear();
+        return SUANPAN_FAIL;
     }
 
     suanpan::for_all(element_pool, [&](const weak_ptr<Element>& ele_ptr) {
         const auto t_ele = ele_ptr.lock();
         access::rw(t_ele->get_current_nonviscous_force()).zeros(t_ele->get_total_number(), m.n_elem);
     });
-
-    factory = D->get_factory();
 
     return SUANPAN_SUCCESS;
 }

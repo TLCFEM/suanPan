@@ -984,15 +984,17 @@ int Domain::initialize() {
         return SUANPAN_FAIL;
     }
 
-    // set some factory properties for later initialisation
-    factory->set_nlgeom(nlgeom);
-
     // initialize modifier based on updated element pool
-    suanpan::for_all(modifier_pond, [&](const std::pair<unsigned, shared_ptr<Modifier>>& t_modifier) { t_modifier.second->initialize(shared_from_this()); });
+    bool nonviscous = false;
+    suanpan::for_all(modifier_pond, [&](const std::pair<unsigned, shared_ptr<Modifier>>& t_modifier) { if(SUANPAN_SUCCESS == t_modifier.second->initialize(shared_from_this()) && t_modifier.second->has_nonviscous()) nonviscous = true; });
     modifier_pond.update();
     // sort to ensure lower performs first
     if(auto& t_modifier_pool = access::rw(modifier_pond.get()); t_modifier_pool.size() > 1)
         suanpan_sort(t_modifier_pool.begin(), t_modifier_pool.end(), [&](const shared_ptr<Modifier>& a, const shared_ptr<Modifier>& b) { return a->get_tag() < b->get_tag(); });
+
+    // set some factory properties for later initialisation
+    factory->set_nlgeom(nlgeom);
+    factory->set_nonviscous(nonviscous);
 
     // recorder may depend on groups, nodes, elements, etc.
     suanpan::for_all(recorder_pond, [&](const std::pair<unsigned, shared_ptr<Recorder>>& t_recorder) { t_recorder.second->initialize(shared_from_this()); });

@@ -87,11 +87,12 @@ template<sp_d T> class Factory final {
 #endif
 
     bool nlgeom = false;
+    bool nonviscous = false;
 
     SolverType solver = SolverType::LAPACK;
     SolverSetting<T> setting{};
 
-    T error = 0.; // error produced by certain solvers
+    T error = T(0); // error produced by certain solvers
 
     Col<T> ninja; // the result from A*X=B
     Col<T> sushi; // modified right-hand side B
@@ -198,6 +199,9 @@ public:
 
     void set_nlgeom(bool);
     [[nodiscard]] bool is_nlgeom() const;
+
+    void set_nonviscous(bool);
+    [[nodiscard]] bool is_nonviscous() const;
 
     void set_solver_type(SolverType);
     [[nodiscard]] SolverType get_solver_type() const;
@@ -711,6 +715,14 @@ template<sp_d T> void Factory<T>::set_nlgeom(const bool B) {
 
 template<sp_d T> bool Factory<T>::is_nlgeom() const { return nlgeom; }
 
+template<sp_d T> void Factory<T>::set_nonviscous(const bool B) {
+    if(B == nonviscous) return;
+    nonviscous = B;
+    access::rw(initialized) = false;
+}
+
+template<sp_d T> bool Factory<T>::is_nonviscous() const { return nonviscous; }
+
 template<sp_d T> void Factory<T>::set_solver_type(const SolverType E) { solver = E; }
 
 template<sp_d T> SolverType Factory<T>::get_solver_type() const { return solver; }
@@ -901,7 +913,11 @@ template<sp_d T> void Factory<T>::initialize_mass() { global_mass = get_matrix_c
 
 template<sp_d T> void Factory<T>::initialize_damping() { global_damping = get_matrix_container(); }
 
-template<sp_d T> void Factory<T>::initialize_nonviscous() { global_nonviscous = get_matrix_container(); }
+template<sp_d T> void Factory<T>::initialize_nonviscous() {
+    if(!nonviscous) return;
+
+    global_nonviscous = get_matrix_container();
+}
 
 template<sp_d T> void Factory<T>::initialize_stiffness() { global_stiffness = get_matrix_container(); }
 

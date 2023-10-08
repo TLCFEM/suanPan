@@ -59,11 +59,13 @@ void BatheTwoStep::assemble_matrix() {
     fd.get();
     fe.get();
 
-    auto& t_stiff = W->get_stiffness();
+    if(W->is_nlgeom()) W->get_stiffness() += W->get_geometry();
 
-    t_stiff += W->get_geometry();
+    W->get_stiffness() += FLAG::TRAP == step_flag ? P3 * W->get_mass() : P9 * W->get_mass();
 
-    t_stiff += FLAG::TRAP == step_flag ? P3 * W->get_mass() + P2 * (W->get_damping() + W->get_nonviscous()) : P9 * W->get_mass() + P8 * (W->get_damping() + W->get_nonviscous());
+    const auto damping_coef = FLAG::TRAP == step_flag ? P2 : P8;
+
+    W->get_stiffness() += W->is_nonviscous() ? damping_coef * (W->get_damping() + W->get_nonviscous()) : damping_coef * W->get_damping();
 }
 
 void BatheTwoStep::update_incre_time(double T) {

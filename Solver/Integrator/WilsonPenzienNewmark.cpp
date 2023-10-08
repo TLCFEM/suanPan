@@ -67,7 +67,9 @@ int WilsonPenzienNewmark::process_constraint() {
     }
 
     // the damping matrix is addressed by using the Woodbury formula
-    t_stiff += C0 * t_mass + C1 * (W->get_damping() + W->get_nonviscous());
+    t_stiff += C0 * t_mass;
+
+    t_stiff += W->is_nonviscous() ? C1 * (W->get_damping() + W->get_nonviscous()) : C1 * W->get_damping();
 
     return SUANPAN_SUCCESS;
 }
@@ -173,9 +175,7 @@ void WilsonPenzienNewmark::assemble_matrix() {
     fd.get();
     fe.get();
 
-    auto& t_stiff = W->get_stiffness();
-
-    t_stiff += W->get_geometry();
+    if(W->is_nlgeom()) W->get_stiffness() += W->get_geometry();
 }
 
 void WilsonPenzienNewmark::print() {

@@ -228,6 +228,7 @@ void Domain::assemble_trial_damping() const {
 }
 
 void Domain::assemble_initial_nonviscous() const {
+    if(!factory->is_nonviscous()) return;
     factory->clear_nonviscous();
     if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_nonviscous(I->get_initial_nonviscous(), I->get_dof_encoding(), I->get_dof_mapping());
     else
@@ -242,6 +243,7 @@ void Domain::assemble_initial_nonviscous() const {
 }
 
 void Domain::assemble_current_nonviscous() const {
+    if(!factory->is_nonviscous()) return;
     factory->clear_nonviscous();
     if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_nonviscous(I->get_current_nonviscous(), I->get_dof_encoding(), I->get_dof_mapping());
     else
@@ -256,6 +258,7 @@ void Domain::assemble_current_nonviscous() const {
 }
 
 void Domain::assemble_trial_nonviscous() const {
+    if(!factory->is_nonviscous()) return;
     factory->clear_nonviscous();
     if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_nonviscous(I->get_trial_nonviscous(), I->get_dof_encoding(), I->get_dof_mapping());
     else

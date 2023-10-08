@@ -39,6 +39,8 @@ class ElementalNonviscous : public Modifier {
 public:
     ElementalNonviscous(unsigned, cx_vec&&, cx_vec&&, uvec&& = {});
 
+    [[nodiscard]] bool has_nonviscous() const override { return true; }
+
     int initialize(const shared_ptr<DomainBase>&) override;
 
     int update_status() override;

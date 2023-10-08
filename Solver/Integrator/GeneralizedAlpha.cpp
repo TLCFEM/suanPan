@@ -79,7 +79,11 @@ void GeneralizedAlpha::assemble_matrix() {
     fd.get();
     fe.get();
 
-    W->get_stiffness() += W->get_geometry() + F5 / F2 * W->get_mass() + F6 / F2 * (W->get_damping() + W->get_nonviscous());
+    if(W->is_nlgeom()) W->get_stiffness() += W->get_geometry();
+
+    W->get_stiffness() += F5 / F2 * W->get_mass();
+
+    W->get_stiffness() += W->is_nonviscous() ? F6 / F2 * (W->get_damping() + W->get_nonviscous()) : F6 / F2 * W->get_damping();
 }
 
 vec GeneralizedAlpha::get_force_residual() { return ImplicitIntegrator::get_force_residual() / F2; }

@@ -50,6 +50,8 @@ public:
 
     ~Modifier() override = default;
 
+    [[nodiscard]] virtual bool has_nonviscous() const { return false; }
+
     virtual int initialize(const shared_ptr<DomainBase>&);
 
     virtual int update_status() = 0;

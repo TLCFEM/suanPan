@@ -58,7 +58,11 @@ void GSSSS::assemble_matrix() {
     fd.get();
     fe.get();
 
-    W->get_stiffness() += W->get_geometry() + XV * (W->get_damping() + W->get_nonviscous()) + XA * W->get_mass();
+    if(W->is_nlgeom()) W->get_stiffness() += W->get_geometry();
+
+    W->get_stiffness() += XA * W->get_mass();
+
+    W->get_stiffness() += W->is_nonviscous() ? XV * (W->get_damping() + W->get_nonviscous()) : XV * W->get_damping();
 }
 
 vec GSSSS::get_force_residual() { return XD * ImplicitIntegrator::get_force_residual(); }

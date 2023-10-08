@@ -60,6 +60,11 @@ int Buckle::analyze() {
     auto& G = get_integrator();
     auto& W = get_factory();
 
+    if(!W->is_nlgeom()) {
+        suanpan_error("Buckling analysis requires an active nlgeom model.\n");
+        return SUANPAN_FAIL;
+    }
+
     // assemble stiffness and geometry as they may be modified in solver
     D->assemble_trial_stiffness();
     D->assemble_trial_geometry();

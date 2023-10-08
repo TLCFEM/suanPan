@@ -62,8 +62,18 @@ void OALTS::assemble_matrix() {
     fd.get();
     fe.get();
 
-    if(if_starting) [[unlikely]] W->get_stiffness() += W->get_geometry() + 4. / DT / DT * W->get_mass() + 2. / DT * (W->get_damping() + W->get_nonviscous());
-    else [[likely]] W->get_stiffness() += W->get_geometry() + P1 * P1 * W->get_mass() + P1 * (W->get_damping() + W->get_nonviscous());
+    if(W->is_nlgeom()) W->get_stiffness() += W->get_geometry();
+
+    if(if_starting) [[unlikely]]
+    {
+        W->get_stiffness() += 4. / DT / DT * W->get_mass();
+        W->get_stiffness() += W->is_nonviscous() ? 2. / DT * (W->get_damping() + W->get_nonviscous()) : 2. / DT * W->get_damping();
+    }
+    else [[likely]]
+    {
+        W->get_stiffness() += P1 * P1 * W->get_mass();
+        W->get_stiffness() += W->is_nonviscous() ? P1 * (W->get_damping() + W->get_nonviscous()) : P1 * W->get_damping();
+    }
 }
 
 int OALTS::update_trial_status() {
