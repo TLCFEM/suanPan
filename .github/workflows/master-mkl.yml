@@ -14,14 +14,14 @@ jobs:
       - name: Install MKL
         run: |
           echo "SP_TIME=daily-$(date +''%Y%m%d%H'')" >> $GITHUB_ENV
-
-          wget -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/adb8a02c-4ee7-4882-97d6-a524150da358/l_onemkl_p_2023.2.0.49497_offline.sh
-          sh ./l_onemkl_p_2023.2.0.49497_offline.sh -a --silent --eula accept
+          wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
+          echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
       - name: Golang
         uses: actions/setup-go@v3
       - name: Compile
         run: |
           go build Checker/updater.go
+          sudo apt-get update && sudo apt-get install intel-oneapi-mkl-devel
           cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_MIMALLOC=ON -DUSE_MKL=ON -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DUSE_INTEL_OPENMP=OFF -DLINK_DYNAMIC_MKL=OFF -DCMAKE_INSTALL_PREFIX=suanPan-linux-mkl .
           make install -j"$(nproc)"
       - name: Pack

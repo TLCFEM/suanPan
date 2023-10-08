@@ -13,9 +13,8 @@ jobs:
         uses: actions/checkout@v3
       - name: Install VTK
         run: |
-          wget -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/adb8a02c-4ee7-4882-97d6-a524150da358/l_onemkl_p_2023.2.0.49497_offline.sh
-          sh ./l_onemkl_p_2023.2.0.49497_offline.sh -a --silent --eula accept
-
+          wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
+          echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
           wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.6-linux.tar.gz
           tar xf VTK-9.2.6-linux.tar.gz
       - name: Golang
@@ -23,8 +22,9 @@ jobs:
       - name: Compile
         run: |
           go build Checker/updater.go
-          sudo apt-get update && sudo apt-get install mesa-common-dev mesa-utils freeglut3-dev libglvnd-dev dpkg-dev xz-utils
-          cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.2/ -DUSE_MKL=OFF -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DLINK_DYNAMIC_MKL=OFF -DCMAKE_INSTALL_PREFIX=suanPan-linux-mkl-vtk .
+          sudo apt-get update && sudo apt-get install mesa-common-dev mesa-utils freeglut3-dev libglvnd-dev dpkg-dev xz-utils intel-oneapi-mkl-devel intel-oneapi-compiler-dpcpp-cpp intel-oneapi-compiler-fortran
+          source /opt/intel/oneapi/setvars.sh
+          cmake -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx -DCMAKE_Fortran_COMPILER=ifx -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_EXTERNAL_VTK=ON -DVTK_DIR=./lib/cmake/vtk-9.2/ -DUSE_MKL=ON -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DLINK_DYNAMIC_MKL=OFF -DCMAKE_INSTALL_PREFIX=suanPan-linux-mkl-vtk .
           make install -j"$(nproc)"
           make package
       - name: Test
@@ -42,17 +42,19 @@ jobs:
     steps:
       - name: Setup
         run: |
+          tee > oneAPI.repo << EOF
+          [oneAPI]
+          name=Intel oneAPI repository
+          baseurl=https://yum.repos.intel.com/oneapi
+          enabled=1
+          gpgcheck=1
+          repo_gpgcheck=1
+          gpgkey=https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+          EOF
+          mv oneAPI.repo /etc/yum.repos.d/
           dnf upgrade --refresh -y
-          dnf install libglvnd-devel gcc g++ gfortran rpm-build rpm-devel rpmdevtools cmake wget git procps -y
+          dnf install libglvnd-devel gcc g++ gfortran rpm-build rpm-devel rpmdevtools cmake wget intel-oneapi-mkl-devel intel-oneapi-compiler-dpcpp-cpp intel-oneapi-compiler-fortran git procps -y
           git config --global --add safe.directory /__w/suanPan/suanPan
-
-          wget -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/ebf5d9aa-17a7-46a4-b5df-ace004227c0e/l_dpcpp-cpp-compiler_p_2023.2.1.8_offline.sh
-          wget -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/0d65c8d4-f245-4756-80c4-6712b43cf835/l_fortran-compiler_p_2023.2.1.8_offline.sh
-          wget -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/adb8a02c-4ee7-4882-97d6-a524150da358/l_onemkl_p_2023.2.0.49497_offline.sh
-
-          sh ./l_dpcpp-cpp-compiler_p_2023.2.1.8_offline.sh -a --silent --eula accept
-          sh ./l_fortran-compiler_p_2023.2.1.8_offline.sh -a --silent --eula accept
-          sh ./l_onemkl_p_2023.2.0.49497_offline.sh -a --silent --eula accept
       - name: Clone
         uses: actions/checkout@v3
       - name: Install MKL VTK
