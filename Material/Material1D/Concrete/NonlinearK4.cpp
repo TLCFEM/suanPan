@@ -103,11 +103,11 @@ void NonlinearK4::compute_crack_close_branch() {
     trial_stress -= elastic_modulus * incre_ep;
 }
 
-NonlinearK4::NonlinearK4(const unsigned T, const double E, const double H, const double R, const double L, const bool FD, const bool FC)
+NonlinearK4::NonlinearK4(const unsigned T, const double E, const double H, const double R, const bool FD, const bool FC)
     : DataNonlinearK4{fabs(E), std::min(1., std::max(fabs(H), 1E-4)) * fabs(E)}
     , Material1D(T, R)
     , apply_damage(FD)
-    , apply_crack_closing(FC) { access::rw(characteristic_length) = fabs(L); }
+    , apply_crack_closing(FC) {}
 
 int NonlinearK4::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = elastic_modulus;
@@ -179,8 +179,8 @@ vec2 ConcreteK4::compute_compression_backbone(const double k) const {
 }
 
 vec2 ConcreteK4::compute_tension_damage(const double k) const {
-    const auto factor = exp(-k / ref_e_t / characteristic_length);
-    return vec2{1. - factor, factor / ref_e_t / characteristic_length};
+    const auto factor = exp(-k / ref_e_t);
+    return vec2{1. - factor, factor / ref_e_t};
 }
 
 vec2 ConcreteK4::compute_compression_damage(double k) const {
@@ -188,12 +188,12 @@ vec2 ConcreteK4::compute_compression_damage(double k) const {
 
     k -= k_peak;
 
-    const auto factor = exp(-k / ref_e_c / characteristic_length);
-    return vec2{1. - factor, factor / ref_e_c / characteristic_length};
+    const auto factor = exp(-k / ref_e_c);
+    return vec2{1. - factor, factor / ref_e_c};
 }
 
-ConcreteK4::ConcreteK4(const unsigned T, const double E, const double H, vec&& P, const double R, const double L, const bool FD, const bool FC)
+ConcreteK4::ConcreteK4(const unsigned T, const double E, const double H, vec&& P, const double R, const bool FD, const bool FC)
     : DataConcreteK4{fabs(E * P(0)), fabs(E * P(1)), perturb(fabs(P(2))), fabs(P(3)), fabs(P(4)), fabs(P(3) * P(5)), fabs(P(6)), fabs(P(7))}
-    , NonlinearK4(T, E, H, R, L, FD, FC) {}
+    , NonlinearK4(T, E, H, R, FD, FC) {}
 
 unique_ptr<Material> ConcreteK4::get_copy() { return make_unique<ConcreteK4>(*this); }

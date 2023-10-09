@@ -54,7 +54,6 @@ public:
                 double,   // elastic modulus
                 double,   // hardening parameter
                 double,   // density
-                double,   // characteristic length
                 bool,     // apply damage
                 bool      // apply crack closing
     );
@@ -92,7 +91,6 @@ public:
                double,      // hardening parameter
                vec&&,       // parameters
                double = 0., // density
-               double = 1., // characteristic length
                bool = true, // apply damage
                bool = true  // apply crack closing
     );
