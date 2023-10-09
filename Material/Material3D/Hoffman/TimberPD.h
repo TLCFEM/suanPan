@@ -17,6 +17,9 @@
 /**
  * @class TimberPD
  * @brief The TimberPD class.
+ * 
+ * Reference:
+ * 1. [10.1016/j.compstruc.2017.09.010](https://doi.org/10.1016/j.compstruc.2017.09.010)
  *
  * @author tlc
  * @date 24/08/2023
