@@ -179,8 +179,9 @@ vec2 ConcreteK4::compute_compression_backbone(const double k) const {
 }
 
 vec2 ConcreteK4::compute_tension_damage(const double k) const {
-    const auto factor = exp(-k / ref_e_t);
-    return vec2{1. - factor, factor / ref_e_t};
+    const auto e_t = zeta_t * f_t / hardening_t;
+    const auto factor = exp(-k / e_t);
+    return vec2{1. - factor, factor / e_t};
 }
 
 vec2 ConcreteK4::compute_compression_damage(double k) const {
@@ -188,8 +189,9 @@ vec2 ConcreteK4::compute_compression_damage(double k) const {
 
     k -= k_peak;
 
-    const auto factor = exp(-k / ref_e_c);
-    return vec2{1. - factor, factor / ref_e_c};
+    const auto e_c = zeta_c * f_c / hardening_d;
+    const auto factor = exp(-k / e_c);
+    return vec2{1. - factor, factor / e_c};
 }
 
 ConcreteK4::ConcreteK4(const unsigned T, const double E, const double H, vec&& P, const double R, const bool FD, const bool FC)

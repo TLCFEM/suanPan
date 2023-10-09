@@ -74,7 +74,7 @@ public:
 struct DataConcreteK4 {
     const double hardening_t, hardening_d;
     const double f_t, f_c, k_peak, f_y;
-    const double ref_e_t, ref_e_c;
+    const double zeta_t, zeta_c;
     const double hardening_c = (f_c - f_y) / k_peak;
 };
 

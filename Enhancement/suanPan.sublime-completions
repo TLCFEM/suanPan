@@ -3451,7 +3451,7 @@
       "trigger":"ConcreteExp"
     },
     {
-      "contents":"material ConcreteK4 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:(9)} ${10:(10)} ${11:(11)} ${12:[12]}\n# (1) int, unique material tag\n# (2) double, elastic modulus (+), typical: 30000 (in MPa)\n# (3) double, crack closing stiffness ratio (+), typical: ~0.1\n# (4) double, tensile hardening ratio (+), typical: [0,1]\n# (5) double, compressive hardening ratio (+), typical: [0,1]\n# (6) double, tensile strength (+), typical: 3 (in MPa)\n# (7) double, crush (compressive) strength (+), typical: 40 (in MPa)\n# (8) double, crush (compressive) strain (+), typical: 0.002\n# (9) double, yield (compressive) strength ratio (<1), typical: ~0.7\n# (10) double, reference tensile strain\n# (11) double, reference compressive strain\n# [12] double, density, default: 0.0",
+      "contents":"material ConcreteK4 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:(9)} ${10:(10)} ${11:(11)} ${12:[12]}\n# (1) int, unique material tag\n# (2) double, elastic modulus (+), typical: 30000 (in MPa)\n# (3) double, crack closing stiffness ratio (+), typical: ~0.1\n# (4) double, tensile hardening ratio (+), typical: [0,1]\n# (5) double, compressive hardening ratio (+), typical: [0,1]\n# (6) double, tensile strength (+), typical: 3 (in MPa)\n# (7) double, crush (compressive) strength (+), typical: 40 (in MPa)\n# (8) double, crush (compressive) strain (+), typical: 0.002\n# (9) double, yield (compressive) strength ratio (<1), typical: ~0.7\n# (10) double, reference tensile zeta\n# (11) double, reference compressive zeta\n# [12] double, density, default: 0.0",
       "details":"K4 Concrete Model",
       "kind":"type",
       "trigger":"ConcreteK4"
