@@ -4,7 +4,7 @@ node 1 0 0
 node 2 3 0
 node 3 6 0
 
-material ConcreteK4 1 3E4 .05 .01 .01 3. 30. 2E-3 .7 .2 .02
+material ConcreteK4 1 3E4 .05 .01 .01 3. 30. 2E-3 .7 .05 0.5
 element T2D2 1 1 2 1 10
 element T2D2 2 3 2 1 10
 

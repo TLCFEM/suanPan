@@ -179,7 +179,7 @@ vec2 ConcreteK4::compute_compression_backbone(const double k) const {
 }
 
 vec2 ConcreteK4::compute_tension_damage(const double k) const {
-    const auto e_t = zeta_t * f_t / hardening_t;
+    const auto e_t = f_t / zeta_t;
     const auto factor = exp(-k / e_t);
     return vec2{1. - factor, factor / e_t};
 }
@@ -189,13 +189,13 @@ vec2 ConcreteK4::compute_compression_damage(double k) const {
 
     k -= k_peak;
 
-    const auto e_c = zeta_c * f_c / hardening_d;
+    const auto e_c = f_c / zeta_c;
     const auto factor = exp(-k / e_c);
     return vec2{1. - factor, factor / e_c};
 }
 
 ConcreteK4::ConcreteK4(const unsigned T, const double E, const double H, vec&& P, const double R, const bool FD, const bool FC)
-    : DataConcreteK4{fabs(E * P(0)), fabs(E * P(1)), perturb(fabs(P(2))), fabs(P(3)), fabs(P(4)), fabs(P(3) * P(5)), fabs(P(6)), fabs(P(7))}
+    : DataConcreteK4{fabs(E * P(0)), fabs(E * P(1)), perturb(fabs(P(2))), fabs(P(3)), fabs(P(4)), fabs(P(3) * P(5)), fabs(E * P(6)), fabs(E * P(7))}
     , NonlinearK4(T, E, H, R, FD, FC) {}
 
 unique_ptr<Material> ConcreteK4::get_copy() { return make_unique<ConcreteK4>(*this); }
