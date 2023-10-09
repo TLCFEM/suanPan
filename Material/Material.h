@@ -51,61 +51,61 @@ class DomainBase;
 enum class OutputType;
 
 struct DataCoupleMaterial {
-    double characteristic_length = -1.;
+    vec current_curvature{};
+    vec current_couple_stress{};
 
-    vec current_curvature;
-    vec current_couple_stress;
+    vec trial_curvature{};
+    vec trial_couple_stress{};
 
-    vec trial_curvature;
-    vec trial_couple_stress;
+    vec incre_curvature{};
+    vec incre_couple_stress{};
 
-    vec incre_curvature;
-    vec incre_couple_stress;
-
-    mat initial_couple_stiffness; // stiffness matrix
-    mat current_couple_stiffness; // stiffness matrix
-    mat trial_couple_stiffness;   // stiffness matrix
+    mat initial_couple_stiffness{}; // stiffness matrix
+    mat current_couple_stiffness{}; // stiffness matrix
+    mat trial_couple_stiffness{};   // stiffness matrix
 };
 
 struct DataMaterial {
-    const double tolerance = 1E-14;
     const double density = 0.;
     const MaterialType material_type = MaterialType::D0;
     const PlaneType plane_type = PlaneType::N;
 
-    vec current_strain;      // current status
-    vec current_strain_rate; // current status
-    vec current_strain_acc;  // current status
-    vec current_stress;      // current status
-    // vec current_stress_rate; // current status
+    const double tolerance = 1E-14;
+    const double characteristic_length = -1.;
 
-    vec trial_strain;      // trial status
-    vec trial_strain_rate; // trial status
-    vec trial_strain_acc;  // trial status
-    vec trial_stress;      // trial status
-    // vec trial_stress_rate; // trial status
+    vec current_strain{};      // current status
+    vec current_strain_rate{}; // current status
+    vec current_strain_acc{};  // current status
+    vec current_stress{};      // current status
+    // vec current_stress_rate{}; // current status
 
-    vec incre_strain;      // incremental status
-    vec incre_strain_rate; // incremental status
-    vec incre_strain_acc;  // incremental status
-    vec incre_stress;      // incremental status
-    // vec incre_stress_rate; // incremental status
+    vec trial_strain{};      // trial status
+    vec trial_strain_rate{}; // trial status
+    vec trial_strain_acc{};  // trial status
+    vec trial_stress{};      // trial status
+    // vec trial_stress_rate{}; // trial status
 
-    vec initial_history; // initial status
-    vec current_history; // current status
-    vec trial_history;   // trial status
+    vec incre_strain{};      // incremental status
+    vec incre_strain_rate{}; // incremental status
+    vec incre_strain_acc{};  // incremental status
+    vec incre_stress{};      // incremental status
+    // vec incre_stress_rate{}; // incremental status
 
-    mat initial_stiffness; // stiffness matrix
-    mat current_stiffness; // stiffness matrix
-    mat trial_stiffness;   // stiffness matrix
+    vec initial_history{}; // initial status
+    vec current_history{}; // current status
+    vec trial_history{};   // trial status
 
-    mat initial_damping; // damping matrix
-    mat current_damping; // damping matrix
-    mat trial_damping;   // damping matrix
+    mat initial_stiffness{}; // stiffness matrix
+    mat current_stiffness{}; // stiffness matrix
+    mat trial_stiffness{};   // stiffness matrix
 
-    mat initial_inertial; // inertial matrix
-    mat current_inertial; // inertial matrix
-    mat trial_inertial;   // inertial matrix
+    mat initial_damping{}; // damping matrix
+    mat current_damping{}; // damping matrix
+    mat trial_damping{};   // damping matrix
+
+    mat initial_inertial{}; // inertial matrix
+    mat current_inertial{}; // inertial matrix
+    mat trial_inertial{};   // inertial matrix
 };
 
 class Material : protected DataMaterial, protected DataCoupleMaterial, public Tag {
@@ -150,7 +150,7 @@ public:
     [[nodiscard]] bool is_symmetric() const;
     [[nodiscard]] bool is_support_couple() const;
 
-    void set_characteristic_length(double);
+    void set_characteristic_length(double) const;
     [[nodiscard]] double get_characteristic_length() const;
 
     [[nodiscard]] virtual double get_parameter(ParameterType) const;

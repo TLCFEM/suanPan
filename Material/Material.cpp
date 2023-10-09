@@ -19,8 +19,8 @@
 #include "Domain/DomainBase.h"
 
 Material::Material(const unsigned T, const MaterialType MT, const double D)
-    : DataMaterial{1E-14, fabs(D), MT, PlaneType::N, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}}
-    , DataCoupleMaterial{-1., {}, {}, {}, {}, {}, {}, {}, {}, {}}
+    : DataMaterial{fabs(D), MT}
+    , DataCoupleMaterial{}
     , Tag(T) {}
 
 double Material::get_density() const { return density; }
@@ -69,7 +69,7 @@ bool Material::is_symmetric() const { return symmetric; }
 
 bool Material::is_support_couple() const { return support_couple; }
 
-void Material::set_characteristic_length(const double L) { characteristic_length = std::max(datum::eps, L); }
+void Material::set_characteristic_length(const double L) const { access::rw(characteristic_length) = std::max(datum::eps, L); }
 
 double Material::get_characteristic_length() const { return characteristic_length; }
 

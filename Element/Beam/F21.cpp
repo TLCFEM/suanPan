@@ -52,6 +52,7 @@ int F21::initialize(const shared_ptr<DomainBase>& D) {
     int_pt.reserve(int_pt_num);
     for(unsigned I = 0; I < int_pt_num; ++I) {
         int_pt.emplace_back(plan(I, 0), .5 * plan(I, 1), section_proto->get_copy());
+        int_pt[I].b_section->set_characteristic_length(int_pt[I].weight * length);
         // factor .5 moved to weight
         initial_local_flexibility += int_pt[I].B.t() * t_flexibility * int_pt[I].B * int_pt[I].weight * length;
     }

@@ -17,7 +17,6 @@
 
 #include "Fibre.h"
 #include <Domain/DomainBase.h>
-#include <Material/Material1D/Material1D.h>
 
 Fibre::Fibre(const unsigned T, uvec&& FT, const SectionType ST)
     : Section(T, ST, 0)
@@ -53,6 +52,11 @@ int Fibre::initialize(const shared_ptr<DomainBase>& D) {
     if(const auto os_size = static_cast<unsigned>(section_type); SectionType::OS3D == section_type) trial_geometry = current_geometry = initial_geometry.zeros(os_size, os_size);
 
     return SUANPAN_SUCCESS;
+}
+
+void Fibre::set_characteristic_length(const double L) const {
+    Section::set_characteristic_length(L);
+    for(const auto& I : fibre) I->set_characteristic_length(L);
 }
 
 int Fibre::update_trial_status(const vec& t_deformation) {

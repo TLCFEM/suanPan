@@ -47,6 +47,8 @@ public:
 
     int initialize(const shared_ptr<DomainBase>&) override;
 
+    void set_characteristic_length(double) const override;
+
     int update_trial_status(const vec&) override;
 
     int clear_status() override;

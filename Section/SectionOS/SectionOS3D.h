@@ -58,6 +58,8 @@ public:
                 vec&& = {0., 0.} // eccentricity
     );
 
+    void set_characteristic_length(double) const override;
+
     int update_trial_status(const vec&) override;
 
     int clear_status() override;

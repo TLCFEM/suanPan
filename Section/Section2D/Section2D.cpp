@@ -40,6 +40,11 @@ void Section2D::initialize_stiffness() {
 Section2D::Section2D(const unsigned T, const unsigned MT, const double A, const double EC)
     : Section(T, SectionType::D2, MT, A, vec{EC, 0.}) {}
 
+void Section2D::set_characteristic_length(const double L) const {
+    Section::set_characteristic_length(L);
+    for(const auto& I : int_pt) I.s_material->set_characteristic_length(L);
+}
+
 int Section2D::update_trial_status(const vec& t_deformation) {
     if(norm((trial_deformation = t_deformation) - current_deformation) <= datum::eps) return SUANPAN_SUCCESS;
 

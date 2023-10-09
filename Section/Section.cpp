@@ -21,7 +21,7 @@
 #include <Recorder/OutputType.h>
 
 Section::Section(const unsigned T, const SectionType ST, const unsigned MT, const double A, vec&& EC)
-    : DataSection{MT, ST, A, 0., EC.head(2), {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}}
+    : DataSection{MT, ST, EC.head(2), A}
     , Tag(T) {}
 
 SectionType Section::get_section_type() const { return section_type; }
@@ -79,6 +79,10 @@ bool Section::is_symmetric() const { return symmetric; }
 void Section::set_eccentricity(const vec& E) const { access::rw(eccentricity) = E; }
 
 const vec& Section::get_eccentricity() const { return eccentricity; }
+
+void Section::set_characteristic_length(const double L) const { access::rw(characteristic_length) = std::max(datum::eps, L); }
+
+double Section::get_characteristic_length() const { return characteristic_length; }
 
 const vec& Section::get_trial_deformation() const { return trial_deformation; }
 

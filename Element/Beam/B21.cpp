@@ -50,6 +50,7 @@ int B21::initialize(const shared_ptr<DomainBase>& D) {
     int_pt.reserve(int_pt_num);
     for(unsigned I = 0; I < int_pt_num; ++I) {
         int_pt.emplace_back(plan(I, 0), .5 * plan(I, 1), section_proto->get_copy());
+        int_pt[I].b_section->set_characteristic_length(int_pt[I].weight * length);
         local_stiffness += int_pt[I].strain_mat.t() * int_pt[I].b_section->get_initial_stiffness() * int_pt[I].strain_mat * int_pt[I].weight / length;
     }
 

@@ -41,7 +41,7 @@ int Elastic2D::initialize(const shared_ptr<DomainBase>&) {
 
 void Elastic2D::initialize_couple(const shared_ptr<DomainBase>&) {
     if(characteristic_length < 0.) {
-        characteristic_length = 1.;
+        access::rw(characteristic_length) = 1.;
         suanpan_warning("Characteristic length is set to unity.\n");
     }
 

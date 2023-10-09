@@ -107,7 +107,7 @@ NonlinearK4::NonlinearK4(const unsigned T, const double E, const double H, const
     : DataNonlinearK4{fabs(E), std::min(1., std::max(fabs(H), 1E-4)) * fabs(E)}
     , Material1D(T, R)
     , apply_damage(FD)
-    , apply_crack_closing(FC) { characteristic_length = fabs(L); }
+    , apply_crack_closing(FC) { access::rw(characteristic_length) = fabs(L); }
 
 int NonlinearK4::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = elastic_modulus;

@@ -47,6 +47,11 @@ void Section3D::initialize_stiffness() {
 Section3D::Section3D(const unsigned T, const unsigned MT, const double A, vec&& E)
     : Section(T, SectionType::D3, MT, A, std::forward<vec>(E)) {}
 
+void Section3D::set_characteristic_length(const double L) const {
+    Section::set_characteristic_length(L);
+    for(const auto& I : int_pt) I.s_material->set_characteristic_length(L);
+}
+
 /**
  * \brief The deformation is assumed to contain the following.
  *

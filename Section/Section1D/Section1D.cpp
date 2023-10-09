@@ -32,6 +32,11 @@ int Section1D::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
+void Section1D::set_characteristic_length(const double L) const {
+    Section::set_characteristic_length(L);
+    s_material->set_characteristic_length(L);
+}
+
 int Section1D::update_trial_status(const vec& t_deformation) {
     if(norm((trial_deformation = t_deformation) - current_deformation) <= datum::eps) return SUANPAN_SUCCESS;
 

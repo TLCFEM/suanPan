@@ -50,28 +50,28 @@ struct DataSection {
 
     const SectionType section_type;
 
-    const double area;
-
-    const double linear_density;
-
     const vec eccentricity;
 
-    vec trial_deformation;   // trial deformation
-    vec current_deformation; // current deformation
+    const double area;
+    const double linear_density = 0.;
+    const double characteristic_length = -1.;
 
-    vec trial_deformation_rate;   // trial deformation rate
-    vec current_deformation_rate; // current deformation rate
+    vec trial_deformation{};   // trial deformation
+    vec current_deformation{}; // current deformation
 
-    vec trial_resistance;   // trial resistance
-    vec current_resistance; // current resistance
+    vec trial_deformation_rate{};   // trial deformation rate
+    vec current_deformation_rate{}; // current deformation rate
 
-    mat initial_stiffness; // stiffness matrix
-    mat current_stiffness; // stiffness matrix
-    mat trial_stiffness;   // stiffness matrix
+    vec trial_resistance{};   // trial resistance
+    vec current_resistance{}; // current resistance
 
-    mat initial_geometry; // geometry matrix
-    mat current_geometry; // geometry matrix
-    mat trial_geometry;   // geometry matrix
+    mat initial_stiffness{}; // stiffness matrix
+    mat current_stiffness{}; // stiffness matrix
+    mat trial_stiffness{};   // stiffness matrix
+
+    mat initial_geometry{}; // geometry matrix
+    mat current_geometry{}; // geometry matrix
+    mat trial_geometry{};   // geometry matrix
 };
 
 class Section : protected DataSection, public Tag {
@@ -107,6 +107,9 @@ public:
 
     void set_eccentricity(const vec&) const;
     [[nodiscard]] const vec& get_eccentricity() const;
+
+    virtual void set_characteristic_length(double) const;
+    [[nodiscard]] double get_characteristic_length() const;
 
     [[nodiscard]] virtual const vec& get_trial_deformation() const;
     [[nodiscard]] virtual const vec& get_trial_deformation_rate() const;
