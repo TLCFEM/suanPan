@@ -26,7 +26,7 @@ set fixed_step_size 1
 set ini_step_size 1E-2
 set symm_mat 0
 
-converger RelIncreDisp 1 1E-13 50 1
+converger RelIncreDisp 1 1E-12 50 1
 
 analyze
 
