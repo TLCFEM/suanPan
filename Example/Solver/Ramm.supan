@@ -40,24 +40,30 @@ element EB21 16 16 17 1000 1 1 1
 fix 1 1 1 17
 fix 2 2 1 17
 
-# recorder 1 hdf5 Node U 11
+recorder 1 hdf5 Node U 11
 
 step arclength 1 11 2 -20
+solver Ramm 1
+set ini_step_size .1
+set min_step_size .05
+set max_step_size .2
 
 criterion MinDisplacement 1 11 2 -5.5
 
-converger RelIncreDisp 1 1E-10 4 1
+converger RelIncreDisp 1 1E-10 6 1
 
 analyze
 
 # Node 11:
 # Coordinate:
-# 2.0000 8.0000
+#   2.0000e+00  8.0000e+00
 # Displacement:
-# 5.9364 -5.5092 0.6794
+#   5.9392e+00 -5.5060e+00  6.7793e-01
 # Resistance:
-# -1.2223e-09 -1.0142e+01 1.8190e-12
+#  -2.6251e-08 -9.1406e+00  3.5243e-12
 peek node 11
+
+peek solver 1
 
 # save recorder 1
 

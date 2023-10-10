@@ -41,7 +41,7 @@ int ArcLength::initialize() {
     modifier->set_domain(t_domain);
 
     // solver
-    if(nullptr != solver) if(!dynamic_cast<Ramm*>(solver.get())) solver = nullptr;
+    if(nullptr != solver && !dynamic_cast<Ramm*>(solver.get())) solver = nullptr;
     if(nullptr == solver) solver = make_shared<Ramm>();
     solver->set_converger(tester);
     solver->set_integrator(modifier);
@@ -70,21 +70,38 @@ int ArcLength::analyze() {
     auto& S = get_solver();
     auto& G = get_integrator();
 
-    unsigned num_iteration = 0;
+    auto num_iteration = 0u;
+
+    auto arc_length = get_ini_step_size();
+    const auto min_arc_length = get_min_step_size();
+    const auto max_arc_length = get_max_step_size();
 
     while(true) {
         if(num_iteration++ > get_max_substep()) {
             suanpan_warning("The maximum sub-step number {} reached.\n", get_max_substep());
             return SUANPAN_FAIL;
         }
+        S->set_step_size(arc_length);
         if(auto code = S->analyze(); code == SUANPAN_SUCCESS) {
             G->stage_and_commit_status();
             G->record();
+            // adjust arc length, always increase
+            if(!is_fixed_step_size()) {
+                arc_length *= S->get_step_amplifier();
+                if(max_arc_length > 0. && arc_length > max_arc_length) arc_length = max_arc_length;
+            }
             // if exit is returned, the analysis shall be terminated
             code = G->process_criterion();
             if(SUANPAN_SUCCESS != code) return code;
         }
-        else if(code == SUANPAN_FAIL) G->reset_status();
+        else if(code == SUANPAN_FAIL) {
+            G->reset_status();
+            // no way to converge
+            if(is_fixed_step_size() || suanpan::approx_equal(arc_length, min_arc_length)) return SUANPAN_FAIL;
+            // decrease arc length
+            arc_length *= .5;
+            if(min_arc_length > 0. && arc_length < min_arc_length) arc_length = min_arc_length;
+        }
         else return SUANPAN_FAIL;
     }
 }

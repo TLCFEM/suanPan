@@ -102,7 +102,7 @@ int Dynamic::analyze() {
 
     while(true) {
         // check if the target time point is hit
-        if(remain_time <= 1E-7) return SUANPAN_SUCCESS;
+        if(remain_time <= 1E-10) return SUANPAN_SUCCESS;
         // check if the maximum substep number is hit
         if(++num_increment > get_max_substep()) {
             suanpan_warning("The maximum sub-step number {} reached.\n", get_max_substep());
@@ -120,7 +120,7 @@ int Dynamic::analyze() {
             G->record();
             if(G->allow_to_change_time_step()) {
                 if(!is_fixed_step_size() && ++num_converged_step > 5) {
-                    step_time = std::min(get_max_step_size(), step_time * time_step_amplification);
+                    step_time = std::min(get_max_step_size(), step_time * S->get_step_amplifier());
                     num_converged_step = 0;
                 }
                 // check if time overflows

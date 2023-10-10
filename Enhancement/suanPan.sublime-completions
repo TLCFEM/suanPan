@@ -6427,8 +6427,8 @@
       "trigger":"RambergOsgood"
     },
     {
-      "contents":"",
-      "details":"",
+      "contents":"solver Ramm (1)\n# (1) int, unique solver tag",
+      "details":"Ramm's arc-length algorithm",
       "kind":"type",
       "trigger":"Ramm"
     },

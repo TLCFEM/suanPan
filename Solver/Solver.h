@@ -39,6 +39,8 @@ class Solver : public Tag {
     shared_ptr<Converger> converger = nullptr;
     shared_ptr<Integrator> modifier = nullptr;
 
+    double step_amplifier = 1.0;
+
 public:
     explicit Solver(unsigned = 0);
     Solver(const Solver&) = default;
@@ -50,6 +52,11 @@ public:
     virtual int initialize();
 
     virtual int analyze() = 0;
+
+    virtual void set_step_size(double) {}
+
+    void set_step_amplifier(double);
+    [[nodiscard]] double get_step_amplifier() const;
 
     void set_converger(const shared_ptr<Converger>&);
     [[nodiscard]] const shared_ptr<Converger>& get_converger() const;

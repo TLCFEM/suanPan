@@ -35,9 +35,11 @@ int MPDC::analyze() {
     wall_clock t_clock;
 
     // iteration counter
-    unsigned counter = 0;
+    auto counter = 0u;
 
     while(true) {
+        set_step_amplifier(sqrt(max_iteration / (counter + 1.)));
+
         // update for nodes and elements
         t_clock.tic();
         if(SUANPAN_SUCCESS != G->update_trial_status()) return SUANPAN_FAIL;

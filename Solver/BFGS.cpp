@@ -36,7 +36,7 @@ int BFGS::analyze() {
     const auto max_iteration = C->get_max_iteration();
 
     // iteration counter
-    unsigned counter = 0;
+    auto counter = 0u;
 
     // lambda alias
     auto& aux_lambda = W->modify_auxiliary_lambda();
@@ -59,6 +59,8 @@ int BFGS::analyze() {
     };
 
     while(true) {
+        set_step_amplifier(sqrt(max_iteration / (counter + 1.)));
+
         // update for nodes and elements
         if(SUANPAN_SUCCESS != G->update_trial_status()) return SUANPAN_FAIL;
         // process modifiers
