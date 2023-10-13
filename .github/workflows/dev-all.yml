@@ -1,0 +1,251 @@
+name: Develop
+on:
+  push:
+    branches: [ dev ]
+  pull_request:
+    branches: [ dev ]
+jobs:
+  ubuntu-dev:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    strategy:
+      matrix:
+        build: [ RelWithDebInfo, Debug ]
+        compiler: [ { c: gcc, cpp: g++, fortran: gfortran }, { c: icx, cpp: icpx, fortran: ifx } ]
+        avx: [ ON, OFF ]
+        vtk: [ ON, OFF ]
+        mkl: [ ON, OFF ]
+        exclude:
+          - build: Debug
+            mkl: ON
+          - build: Debug
+            avx: ON
+          - compiler: { c: icx, cpp: icpx, fortran: ifx }
+            mkl: OFF
+    steps:
+      - name: Clone
+        uses: actions/checkout@v4
+      - name: Golang
+        uses: actions/setup-go@v4
+        with:
+          cache: false
+      - name: VTK
+        if: matrix.vtk == 'ON'
+        run: |
+          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.6-linux.tar.gz
+          tar xf VTK-9.2.6-linux.tar.gz
+      - name: MKL
+        run: |
+          if [ "${{ matrix.mkl }}" == "ON" ] || [ "${{ matrix.compiler.c }}" == "icx" ]; then
+            wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
+            echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
+          fi
+          if [ "${{ matrix.mkl }}" == "ON" ]; then
+            sudo apt-get update && sudo apt-get install intel-oneapi-mkl-devel
+          fi
+          if [ "${{ matrix.compiler.c }}" == "icx" ]; then
+            sudo apt-get update && sudo apt-get install intel-oneapi-compiler-dpcpp-cpp intel-oneapi-compiler-fortran
+            echo "IOMP=ON" >> "$GITHUB_ENV"
+          else
+            echo "IOMP=OFF" >> "$GITHUB_ENV"
+          fi
+      - name: Dependency
+        run: |
+          sudo apt-get update && sudo apt-get install mesa-common-dev mesa-utils freeglut3-dev libglvnd-dev dpkg-dev xz-utils
+          echo "COVERAGE=OFF" >> "$GITHUB_ENV"
+      - name: Flag
+        if: |
+          matrix.build == 'Debug' && 
+          matrix.compiler.c == 'gcc' &&
+          matrix.avx == 'OFF' &&
+          matrix.vtk == 'OFF'
+        run: |
+          echo "COVERAGE=ON" >> "$GITHUB_ENV"
+      - name: Compile
+        run: |
+          if [ "${{ matrix.compiler.c }}" == "icx" ]; then
+            source /opt/intel/oneapi/setvars.sh
+          fi
+          if [ "${{ matrix.build }}" == "Debug" ]; then
+            MT="OFF"
+          else
+            MT="ON"
+          fi
+          go build Checker/updater.go
+          mkdir build && cd build
+          cmake -DCMAKE_C_COMPILER=${{ matrix.compiler.c }} -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} -DCMAKE_Fortran_COMPILER=${{ matrix.compiler.fortran }} -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DTEST_COVERAGE=${{ env.COVERAGE }} -DUSE_AVX=${{ matrix.avx }} -DBUILD_MULTITHREAD=$MT -DUSE_EXTERNAL_VTK=${{ matrix.vtk }} -DVTK_DIR=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.2/ -DUSE_MKL=${{ matrix.mkl }} -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DLINK_DYNAMIC_MKL=OFF -DUSE_INTEL_OPENMP=${{ env.IOMP }} -DCMAKE_INSTALL_PREFIX=dist ..
+          make install -j"$(nproc)" && make package
+      - name: Pack
+        run: |
+          cp updater build/dist/bin
+          file_name="suanPan-linux"
+          if [ "${{ matrix.build }}" == "Debug" ]; then
+            file_name+="-debug"
+          else
+            file_name+="-release"
+          fi
+          if [ "${{ matrix.compiler.c }}" == "gcc" ]; then
+            file_name+="-gcc"
+          else
+            file_name+="-intel"
+          fi
+          if [ "${{ matrix.avx }}" == "ON" ]; then
+            file_name+="-avx"
+          else
+            file_name+="-no-avx"
+          fi
+          if [ "${{ matrix.vtk }}" == "ON" ]; then
+            file_name+="-vtk"
+          fi
+          if [ "${{ matrix.mkl }}" == "ON" ]; then
+            file_name+="-mkl"
+          else
+            file_name+="-openblas"
+          fi
+          file_name+=".tar.gz"
+          echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
+          tar czf $file_name -C build/dist .
+      - name: Upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.ARTIFACT }}
+          path: ${{ env.ARTIFACT }}
+      - name: Test
+        run: |
+          export LD_LIBRARY_PATH=/home/runner/work/suanPan/suanPan/build/dist/lib
+          ./build/dist/bin/suanPan -v
+      - name: Coverage
+        if: env.COVERAGE == 'ON'
+        run: |
+          export LD_LIBRARY_PATH=/home/runner/work/suanPan/suanPan/build/dist/lib
+          cd build
+          bash ../Script/Coverage.sh .
+          for SRC in `find . | egrep '\.o'`; do gcov -n $SRC > /dev/null; done
+      - name: Report
+        if: env.COVERAGE == 'ON'
+        uses: codecov/codecov-action@v3
+        with:
+          gcov: true
+  macos-dev:
+    runs-on: macos-11
+    timeout-minutes: 100
+    strategy:
+      matrix:
+        build: [ RelWithDebInfo, Debug ]
+        compiler: [ gcc, clang ]
+        vtk: [ ON, OFF ]
+        exclude:
+          - compiler: gcc
+            vtk: ON
+    steps:
+      - name: Clone
+        uses: actions/checkout@v4
+      - name: Golang
+        uses: actions/setup-go@v4
+        with:
+          cache: false
+      - name: VTK
+        if: matrix.vtk == 'ON'
+        run: |
+          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.6-macos.tar.gz
+          tar xf VTK-9.2.6-macos.tar.gz
+          brew install glfw glew
+      - name: Compile
+        run: |
+          go build Checker/updater.go
+          mkdir build && cd build
+          if [ "${{ matrix.compiler }}" == "clang" ]; then
+            export CC=$(brew --prefix llvm@15)/bin/clang
+            export CXX=$(brew --prefix llvm@15)/bin/clang++
+            export FC=gfortran-11
+            cmake -DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include -DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include -DCMAKE_Fortran_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DUSE_EXTERNAL_VTK=${{ matrix.vtk }} -DVTK_DIR=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.2/ -DCMAKE_INSTALL_PREFIX=dist ..
+          else
+            export CC=gcc-11
+            export CXX=g++-11
+            export FC=gfortran-11
+            cmake -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DUSE_EXTERNAL_VTK=${{ matrix.vtk }} -DVTK_DIR=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.2/ -DCMAKE_INSTALL_PREFIX=dist ..
+          fi
+          make install -j4
+      - name: Pack
+        run: |
+          cp updater build/dist/bin
+          file_name="suanPan-macos"
+          if [ "${{ matrix.build }}" == "Debug" ]; then
+            file_name+="-debug"
+          else
+            file_name+="-release"
+          fi
+          file_name+="-${{ matrix.compiler }}"
+          if [ "${{ matrix.vtk }}" == "ON" ]; then
+            file_name+="-vtk"
+          fi
+          file_name+=".tar.gz"
+          echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
+          tar czf $file_name -C build/dist .
+      - name: Test
+        run: |
+          export DYLD_LIBRARY_PATH=/Users/runner/work/suanPan/suanPan/build/dist/lib/
+          ./build/dist/bin/suanPan -v
+      - name: Upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.ARTIFACT }}
+          path: ${{ env.ARTIFACT }}
+  windows-dev:
+    runs-on: windows-2022
+    timeout-minutes: 100
+    strategy:
+      matrix:
+        build: [ Release ]
+        compiler: [ "Visual Studio 17 2022" ]
+        vtk: [ ON, OFF ]
+        avx: [ ON, OFF ]
+    steps:
+      - name: Clone
+        uses: actions/checkout@v4
+      - name: Golang
+        uses: actions/setup-go@v4
+        with:
+          cache: false
+      - name: VTK
+        if: matrix.vtk == 'ON'
+        run: |
+          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.6-win.7z
+          7z x VTK-9.2.6-win.7z
+      - name: Compile
+        run: |
+          go build Checker/updater.go
+          mkdir build && cd build
+          cmake -G "${{ matrix.compiler }}" -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DUSE_AVX=${{ matrix.avx }} -DUSE_EXTERNAL_VTK=${{ matrix.vtk }} -DVTK_DIR=D:/a/suanPan/suanPan/lib/cmake/vtk-9.2/ -DCMAKE_INSTALL_PREFIX=dist ..
+          cmake --build . --target install --config ${{ matrix.build }} -j 4
+      - name: Pack
+        shell: bash
+        run: |
+          cp updater.exe build/dist/bin
+          file_name="suanPan-win"
+          if [ "${{ matrix.build }}" == "Debug" ]; then
+            file_name+="-debug"
+          else
+            file_name+="-release"
+          fi
+          file_name+="-openblas"
+          if [ "${{ matrix.avx }}" == "ON" ]; then
+            file_name+="-avx"
+          else
+            file_name+="-no-avx"
+          fi
+          if [ "${{ matrix.vtk }}" == "ON" ]; then
+            file_name+="-vtk"
+          fi
+          file_name+=".7z"
+          echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
+          cd build/dist/bin
+          7z a ../../../$file_name ./*
+      - name: Test
+        run: |
+          build/dist/bin/suanPan.exe -v
+      - name: Upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.ARTIFACT }}
+          path: ${{ env.ARTIFACT }}
