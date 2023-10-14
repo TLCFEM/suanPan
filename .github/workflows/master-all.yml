@@ -1,7 +1,7 @@
 name: Stable
 on:
   push:
-    branches: [ master ]
+    branches: [ dev ]
   pull_request:
     branches: [ master ]
 jobs:
@@ -20,6 +20,9 @@ jobs:
         uses: actions/setup-go@v4
         with:
           cache: false
+      - name: Flag
+        run: |
+          echo "PUB=OFF" >> "$GITHUB_ENV"
       - name: VTK
         if: matrix.vtk == 'ON'
         run: |
@@ -64,15 +67,16 @@ jobs:
         with:
           name: ${{ env.ARTIFACT }}
           path: ${{ env.ARTIFACT }}
-#      - name: Release
-#        uses: svenstaro/upload-release-action@v2
-#        with:
-#          repo_token: ${{ secrets.GITHUB_TOKEN }}
-#          file: ${{ env.ARTIFACT }}
-#          asset_name: ${{ env.ARTIFACT }}
-#          tag: ${{ env.SP_TIME }}
-#          prerelease: true
-#          overwrite: true
+      - name: Release
+        if: env.PUB == 'ON'
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ env.ARTIFACT }}
+          asset_name: ${{ env.ARTIFACT }}
+          tag: ${{ env.SP_TIME }}
+          prerelease: true
+          overwrite: true
   macos-master:
     runs-on: macos-11
     timeout-minutes: 100
@@ -86,6 +90,9 @@ jobs:
         uses: actions/setup-go@v4
         with:
           cache: false
+      - name: Flag
+        run: |
+          echo "PUB=OFF" >> "$GITHUB_ENV"
       - name: VTK
         if: matrix.vtk == 'ON'
         run: |
@@ -117,15 +124,16 @@ jobs:
         with:
           name: ${{ env.ARTIFACT }}
           path: ${{ env.ARTIFACT }}
-#      - name: Release
-#        uses: svenstaro/upload-release-action@v2
-#        with:
-#          repo_token: ${{ secrets.GITHUB_TOKEN }}
-#          file: ${{ env.ARTIFACT }}
-#          asset_name: ${{ env.ARTIFACT }}
-#          tag: ${{ env.SP_TIME }}
-#          prerelease: true
-#          overwrite: true
+      - name: Release
+        if: env.PUB == 'ON'
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ env.ARTIFACT }}
+          asset_name: ${{ env.ARTIFACT }}
+          tag: ${{ env.SP_TIME }}
+          prerelease: true
+          overwrite: true
   windows-master:
     runs-on: windows-2022
     timeout-minutes: 100
@@ -140,6 +148,10 @@ jobs:
         uses: actions/setup-go@v4
         with:
           cache: false
+      - name: Flag
+        shell: bash
+        run: |
+          echo "PUB=OFF" >> "$GITHUB_ENV"
       - name: VTK
         if: matrix.vtk == 'ON'
         run: |
@@ -173,12 +185,13 @@ jobs:
         with:
           name: ${{ env.ARTIFACT }}
           path: ${{ env.ARTIFACT }}
-#      - name: Release
-#        uses: svenstaro/upload-release-action@v2
-#        with:
-#          repo_token: ${{ secrets.GITHUB_TOKEN }}
-#          file: ${{ env.ARTIFACT }}
-#          asset_name: ${{ env.ARTIFACT }}
-#          tag: ${{ env.SP_TIME }}
-#          prerelease: true
-#          overwrite: true
+      - name: Release
+        if: env.PUB == 'ON'
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ env.ARTIFACT }}
+          asset_name: ${{ env.ARTIFACT }}
+          tag: ${{ env.SP_TIME }}
+          prerelease: true
+          overwrite: true
