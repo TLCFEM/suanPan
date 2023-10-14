@@ -112,7 +112,7 @@ jobs:
       - name: Pack
         run: |
           cp updater build/dist/bin
-          file_name="suanPan-macos"
+          file_name="suanPan-macos-openblas"
           if [ "${{ matrix.vtk }}" == "ON" ]; then
             file_name+="-vtk"
           fi
@@ -136,11 +136,11 @@ jobs:
           overwrite: true
   windows-master:
     runs-on: windows-2022
-    timeout-minutes: 100
+    timeout-minutes: 120
     strategy:
       matrix:
-        vtk: [ ON, OFF ]
         avx: [ ON, OFF ]
+        vtk: [ ON, OFF ]
     steps:
       - name: Clone
         uses: actions/checkout@v4
@@ -171,9 +171,7 @@ jobs:
           if [ "${{ matrix.vtk }}" == "ON" ]; then
             file_name+="-vtk"
           fi
-          if [ "${{ matrix.avx }}" == "ON" ]; then
-            file_name+="-avx"
-          else
+          if [ "${{ matrix.avx }}" == "OFF" ]; then
             file_name+="-no-avx"
           fi
           file_name+=".7z"
