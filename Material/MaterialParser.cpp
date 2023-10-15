@@ -982,7 +982,7 @@ void new_cdpm2(unique_ptr<Material>& return_obj, istringstream& command, const u
         return;
     }
 
-    vec para_pool{3E4, .3, 3., 30., .3, .01, .85, .08, .003, 2., 1E-6, 5., 2E-4, 1E-4, 0.};
+    vec para_pool{3E4, .3, 3., 30., .3, .05, .85, .08, .003, 2., 1E-6, 5., 3E-4, 3E-3, 0.};
 
     if(!get_optional_input(command, para_pool)) {
         suanpan_error("A valid parameter is required.\n");

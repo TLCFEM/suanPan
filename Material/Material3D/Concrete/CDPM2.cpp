@@ -416,7 +416,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
         jacobian(3, 2) = gamma / gg * (gs * pgspp + gp / 3. * pgppp) + (current_kp - kp) * dxhdp;
         jacobian(3, 3) = gamma / gg * (gs * pgspkp + gp / 3. * pgppkp) - xh;
 
-        if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
+        if(!solve(incre, jacobian, residual, solve_opts::equilibrate + solve_opts::refine)) return SUANPAN_FAIL;
 
         const auto error = inf_norm(incre);
         if(1u == counter) ref_error = error;

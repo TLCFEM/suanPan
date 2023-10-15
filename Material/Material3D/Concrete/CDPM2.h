@@ -39,15 +39,15 @@ struct DataCDPM2 {
     const double ft = 3.;
     const double fc = 10.;
     const double qh0 = .3;
-    const double hp = .01;
+    const double hp = .05;
     const double df = .85;
     const double ah = .08;
     const double bh = .003;
     const double ch = 2.;
     const double dh = 1E-6;
     const double as = 5.;
-    const double eft = 2E-4;
-    const double efc = 1E-4;
+    const double eft = 3E-4;
+    const double efc = 3E-3;
 
     const double e = 1.;
     const double e0 = ft / elastic_modulus;
