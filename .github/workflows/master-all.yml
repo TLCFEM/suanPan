@@ -1,7 +1,7 @@
 name: Stable
 on:
   push:
-    branches: [ dev ]
+    branches: [ master ]
   pull_request:
     branches: [ master ]
 jobs:
@@ -22,6 +22,7 @@ jobs:
           cache: false
       - name: Flag
         run: |
+          echo "SP_TIME=daily-$(date +''%Y%m%d%H'')" >> $GITHUB_ENV
           echo "PUB=OFF" >> "$GITHUB_ENV"
       - name: VTK
         if: matrix.vtk == 'ON'
@@ -39,7 +40,6 @@ jobs:
           sudo apt-get update && sudo apt-get install mesa-common-dev mesa-utils freeglut3-dev libglvnd-dev dpkg-dev xz-utils
       - name: Compile
         run: |
-          echo "SP_TIME=daily-$(date +''%Y%m%d%H'')" >> $GITHUB_ENV
           go build Checker/updater.go
           mkdir build && cd build
           cmake -DCMAKE_BUILD_TYPE=Release -DUSE_AVX=${{ matrix.avx }} -DBUILD_MULTITHREAD=ON -DUSE_EXTERNAL_VTK=${{ matrix.vtk }} -DVTK_DIR=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.2/ -DUSE_MKL=${{ matrix.mkl }} -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DLINK_DYNAMIC_MKL=OFF -DUSE_INTEL_OPENMP=OFF -DCMAKE_INSTALL_PREFIX=dist ..
@@ -159,6 +159,7 @@ jobs:
           7z x VTK-9.2.6-win.7z
       - name: Compile
         run: |
+          echo ("SP_TIME=daily-"+(get-date -format "yyyyMMddHH")) >> $env:GITHUB_ENV
           go build Checker/updater.go
           mkdir build && cd build
           cmake -DCMAKE_BUILD_TYPE=Release -DUSE_AVX=${{ matrix.avx }} -DBUILD_MULTITHREAD=ON -DUSE_EXTERNAL_VTK=${{ matrix.vtk }} -DVTK_DIR=D:/a/suanPan/suanPan/lib/cmake/vtk-9.2/ -DCMAKE_INSTALL_PREFIX=dist ..
