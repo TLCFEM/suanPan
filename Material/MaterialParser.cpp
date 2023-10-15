@@ -989,6 +989,15 @@ void new_cdpm2(unique_ptr<Material>& return_obj, istringstream& command, const u
         return;
     }
 
+    if(para_pool(4) < 0. || para_pool(4) > 1.) {
+        suanpan_error("Initial ratio qh0 must be in [0,1].\n");
+        return;
+    }
+    if(para_pool(5) + para_pool(4) > 1.) {
+        suanpan_error("Hardeinng modulus hp must be smaller than 1-qh0.\n");
+        return;
+    }
+
     auto dt = CDPM2::DamageType::ISOTROPIC;
     if(0 == damage_type) dt = CDPM2::DamageType::NODAMAGE;
     else if(2 == damage_type) dt = CDPM2::DamageType::ANISOTROPIC;

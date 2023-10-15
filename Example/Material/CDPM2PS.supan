@@ -29,18 +29,20 @@ analyze
 # save recorder 1
 
 # Node 3:
-# 1.0000 1.0000
+# Coordinate:
+#   1.0000e+00  1.0000e+00
 # Displacement:
-# -0.0008 0.0009
+#  -8.0000e-04  9.1915e-04
 # Resistance:
-# -2.4842e-01 -1.3184e-16
+#  -2.4764e-01 -2.7409e-16
 # 
 # Node 4:
-# 0 1.0000
+# Coordinate:
+#   0.0000e+00  1.0000e+00
 # Displacement:
-# -0.0008 -0.0002
+#  -8.0000e-04 -2.0510e-04
 # Resistance:
-# -5.2314e-01 -6.9389e-18
+#  -5.2001e-01 -2.6021e-16
 peek node 3 4
 
 reset

@@ -46,8 +46,11 @@ void CDPM2::compute_plasticity(const double s, const double p, const double kp, 
     auto dqh1dkp = 0., dqh2dkp = 0.;
 
     if(kp < 1.) {
-        qh1 = qh0 + (1. - qh0) * kp * (kp * (kp - 3.) + 3.) - hp * kp * (kp - 1.) * (kp - 2.);
-        dqh1dkp = (3. - 3. * qh0) * pow(kp - 1., 2.) - hp * (3. * kp * (kp - 2.) + 2.);
+        // qh1 = qh0 + (1. - qh0) * kp * (kp * (kp - 3.) + 3.) - hp * kp * (kp - 1.) * (kp - 2.);
+        // dqh1dkp = (3. - 3. * qh0) * pow(kp - 1., 2.) - hp * (3. * kp * (kp - 2.) + 2.);
+        // to improve numerical stability
+        dqh1dkp = 1. - qh0;
+        qh1 = qh0 + dqh1dkp * kp;
     }
     else {
         qh2 = 1. + hp * (kp - 1.);
@@ -291,7 +294,6 @@ int CDPM2::compute_damage_factor(const double kd, const double kd1, const double
     }
 
     auto counter = 0u;
-    auto ref_error = 1.;
     while(true) {
         if(max_iteration == ++counter) return SUANPAN_FAIL;
 
@@ -302,10 +304,9 @@ int CDPM2::compute_damage_factor(const double kd, const double kd1, const double
         const auto incre = residual / jacobian;
 
         const auto error = fabs(incre);
-        if(1u == counter) ref_error = error;
         suanpan_debug("Local damage iteration error: {:.5E}.\n", error);
 
-        if(error < tolerance * ref_error || (fabs(residual) < tolerance && counter > 5u)) {
+        if(error < tolerance || (fabs(residual) < tolerance && counter > 5u)) {
             popkd = term_b / jacobian;
             popkd1 = term_a / ef / jacobian;
             popkd2 = popkd1 * omega;
@@ -317,7 +318,7 @@ int CDPM2::compute_damage_factor(const double kd, const double kd1, const double
 }
 
 CDPM2::CDPM2(const unsigned T, const double E, const double V, const double FT, const double FC, const double QH0, const double HP, const double DF, const double AH, const double BH, const double CH, const double DH, const double AS, const double EFT, const double EFC, const DamageType DT, const double R)
-    : DataCDPM2{fabs(E), fabs(V), fabs(FT), fabs(FC), QH0, HP, DF, AH, BH, CH, DH, AS, fabs(EFT), fabs(EFC)}
+    : DataCDPM2{fabs(E), fabs(V), fabs(FT), fabs(FC), fabs(QH0), std::max(HP, static_cast<double>(std::numeric_limits<float>::epsilon())), DF, AH, BH, CH, DH, AS, fabs(EFT), fabs(EFC)}
     , Material3D(T, R)
     , damage_type(DT) {}
 
