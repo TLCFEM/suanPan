@@ -46,11 +46,8 @@ void CDPM2::compute_plasticity(const double s, const double p, const double kp, 
     auto dqh1dkp = 0., dqh2dkp = 0.;
 
     if(kp < 1.) {
-        // qh1 = qh0 + (1. - qh0) * kp * (kp * (kp - 3.) + 3.) - hp * kp * (kp - 1.) * (kp - 2.);
-        // dqh1dkp = (3. - 3. * qh0) * pow(kp - 1., 2.) - hp * (3. * kp * (kp - 2.) + 2.);
-        // to improve numerical stability
-        dqh1dkp = 1. - qh0;
-        qh1 = qh0 + dqh1dkp * kp;
+        qh1 = qh0 + (1. - qh0) * kp * (kp * (kp - 3.) + 3.) - hp * kp * (kp - 1.) * (kp - 2.);
+        dqh1dkp = (3. - 3. * qh0) * pow(kp - 1., 2.) - hp * (3. * kp * (kp - 2.) + 2.);
     }
     else {
         qh2 = 1. + hp * (kp - 1.);
@@ -382,8 +379,42 @@ int CDPM2::update_trial_status(const vec& t_strain) {
 
     auto counter = 0u;
     auto ref_error = 1.;
+    auto try_bisection = false;
     while(true) {
         if(max_iteration == ++counter) {
+            if(!try_bisection) {
+                try_bisection = true;
+
+                const auto approx_update = [&] {
+                    s = trial_s - double_shear * gamma * gs;
+                    p = trial_p - bulk * gamma * gp;
+                    kp = current_kp + gamma * gg / xh;
+                    compute_plasticity(s, p, kp, data);
+                };
+
+                gamma = 0.;
+                approx_update();
+
+                gamma = f / (pfps * double_shear * gs + pfpp * bulk * gp + pfpkp * gg / xh);
+                while(true) {
+                    approx_update();
+                    if(f < 0.) break;
+                    gamma *= 2.;
+                }
+
+                auto low = 0., high = gamma;
+                while(true) {
+                    if(fabs(high - low) < std::numeric_limits<float>::epsilon()) break;
+                    gamma = .5 * (low + high);
+                    approx_update();
+                    (f < 0. ? high : low) = gamma;
+                }
+
+                counter = 1u; // avoid initial elastic check
+
+                continue;
+            }
+
             suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
             return SUANPAN_FAIL;
         }

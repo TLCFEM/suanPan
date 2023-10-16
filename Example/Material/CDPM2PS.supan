@@ -32,17 +32,17 @@ analyze
 # Coordinate:
 #   1.0000e+00  1.0000e+00
 # Displacement:
-#  -8.0000e-04  9.1915e-04
+#  -8.0000e-04  8.8449e-04
 # Resistance:
-#  -2.4764e-01 -2.7409e-16
+#  -2.7378e-01 -4.1633e-17
 # 
 # Node 4:
 # Coordinate:
 #   0.0000e+00  1.0000e+00
 # Displacement:
-#  -8.0000e-04 -2.0510e-04
+#  -8.0000e-04 -2.1194e-04
 # Resistance:
-#  -5.2001e-01 -2.6021e-16
+#  -6.4359e-01 -1.4572e-16
 peek node 3 4
 
 reset
