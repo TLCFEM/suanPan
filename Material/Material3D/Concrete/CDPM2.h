@@ -37,7 +37,7 @@ struct DataCDPM2 {
     const double elastic_modulus = 3E4;
     const double poissons_ratio = .3;
     const double ft = 3.;
-    const double fc = 10.;
+    const double fc = 30.;
     const double qh0 = .3;
     const double hp = .05;
     const double df = .85;

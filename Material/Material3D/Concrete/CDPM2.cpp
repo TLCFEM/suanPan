@@ -395,16 +395,18 @@ int CDPM2::update_trial_status(const vec& t_strain) {
                 gamma = 0.;
                 approx_update();
 
-                gamma = f / (pfps * double_shear * gs + pfpp * bulk * gp + pfpkp * gg / xh);
+                gamma = f / elastic_modulus;
+                auto low = 0.;
                 while(true) {
                     approx_update();
                     if(f < 0.) break;
+                    low = gamma;
                     gamma *= 2.;
                 }
 
-                auto low = 0., high = gamma;
+                auto high = gamma;
                 while(true) {
-                    if(fabs(high - low) < std::numeric_limits<float>::epsilon()) break;
+                    if(fabs(high - low) < tolerance) break;
                     gamma = .5 * (low + high);
                     approx_update();
                     (f < 0. ? high : low) = gamma;
