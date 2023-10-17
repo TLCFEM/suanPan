@@ -61,6 +61,10 @@ struct DataCDPM2 {
     const double sqrtdf = ft * sqrt(2. / (3. + 6. * df * df));
     const double eh = bh - dh;
     const double fh = ch * eh / (ah - bh);
+
+    const double ra = (1. + e) * (1. - e);
+    const double rb = pow(2. * e - 1., 2.);
+    const double rc = rb * e * (5. * e - 4.);
 };
 
 class CDPM2 final : protected DataCDPM2, public Material3D {
@@ -82,7 +86,7 @@ private:
 
     const DamageType damage_type = DamageType::ANISOTROPIC;
 
-    void compute_plasticity(double, double, double, podarray<double>&) const;
+    void compute_plasticity(double, double, double, double, podarray<double>&) const;
     int compute_damage(double, double, double, double, double, podarray<double>&);
     int compute_damage_factor(double, double, double, double, double&, podarray<double>&) const;
 

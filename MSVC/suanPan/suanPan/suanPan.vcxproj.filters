@@ -3001,6 +3001,9 @@
     <ClInclude Include="..\..\..\Element\Modifier\ElementalNonviscous.h">
       <Filter>Element\Modifier</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\ridders.hpp">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\..\Resource\suanPan.rc" />
