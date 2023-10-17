@@ -25,7 +25,7 @@ const double CDPM2::sqrt_six = std::sqrt(6.);
 const double CDPM2::sqrt_three_two = std::sqrt(1.5);
 const mat CDPM2::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
-void CDPM2::compute_plasticity(const double s, const double p, const double kp, podarray<double>& data) const {
+void CDPM2::compute_plasticity(const double lode, const double s, const double p, const double kp, podarray<double>& data) const {
     auto& f = data(0);
     auto& pfps = data(1);
     auto& pfpp = data(2);
@@ -41,6 +41,7 @@ void CDPM2::compute_plasticity(const double s, const double p, const double kp, 
     auto& pgppkp = data(12);
     auto& xh = data(13);
     auto& dxhdp = data(14);
+    auto& pfpl = data(15);
 
     auto qh1 = 1., qh2 = 1.;
     auto dqh1dkp = 0., dqh2dkp = 0.;
@@ -70,6 +71,18 @@ void CDPM2::compute_plasticity(const double s, const double p, const double kp, 
     const auto g3 = (s / sqrt_six + p) / fc;
     const auto g1 = (1. - qh1) * g3 * g3 + sqrt_three_two * s / fc;
 
+    const auto square_term = ra * lode * lode;
+    const auto sqrt_term = sqrt(rb * square_term + rc);
+    const auto numerator = square_term + rb;
+    const auto denominator = ra * lode + sqrt_term;
+    const auto r = numerator / denominator;
+    const auto drdl = ra / denominator * (2. * lode - r - r * rb * lode / sqrt_term);
+
+    const auto g4 = (r * s / sqrt_six + p) / fc;
+    const auto pg4pp = 1. / fc;
+    const auto pg4ps = r / sqrt_six / fc;
+    const auto pg4pl = s / sqrt_six / fc * drdl;
+
     const auto pg3pp = 1. / fc;
     const auto pg3ps = pg3pp / sqrt_six;
 
@@ -80,11 +93,12 @@ void CDPM2::compute_plasticity(const double s, const double p, const double kp, 
     const auto pg1ps = (2. - 2. * qh1) * g3 * pg3ps + sqrt_three_two / fc;
     const auto pg1pkp = -dqh1dkp * g3 * g3;
 
-    f = g1 * g1 + m0 * qh1 * qh1 * qh2 * g3 - qh1 * qh1 * qh2 * qh2;
+    f = g1 * g1 + m0 * qh1 * qh1 * qh2 * g4 - qh1 * qh1 * qh2 * qh2;
 
-    pfpp = 2. * g1 * pg1pp + m0 * qh1 * qh1 * qh2 * pg3pp;
-    pfps = 2. * g1 * pg1ps + m0 * qh1 * qh1 * qh2 * pg3ps;
-    pfpkp = 2. * g1 * pg1pkp + 2. * qh1 * qh2 * (m0 * g3 * dqh1dkp - qh1 * dqh2dkp - qh2 * dqh1dkp) + m0 * qh1 * qh1 * g3 * dqh2dkp;
+    pfpp = 2. * g1 * pg1pp + m0 * qh1 * qh1 * qh2 * pg4pp;
+    pfps = 2. * g1 * pg1ps + m0 * qh1 * qh1 * qh2 * pg4ps;
+    pfpkp = 2. * g1 * pg1pkp + 2. * qh1 * qh2 * (m0 * g4 * dqh1dkp - qh1 * dqh2dkp - qh2 * dqh1dkp) + m0 * qh1 * qh1 * g4 * dqh2dkp;
+    pfpl = m0 * qh1 * qh1 * qh2 * pg4pl;
 
     gp = 2. * g1 * pg1pp + qh1 * qh1 * pg2pp;
     gs = 2. * g1 * pg1ps + qh1 * qh1 * pg2ps;
@@ -353,6 +367,25 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     const auto trial_p = hydro_stress;
     const vec n = dev_stress / trial_s;
 
+    static constexpr double limit = -.95;
+    static const double slope = (2. * cos(acos(limit) / 3.) - 1.) / (1. + limit);
+
+    double lode, dlode;
+    if(const auto lode_a = tensor::stress::lode(dev_stress); lode_a < limit) {
+        // close to left boundary
+        // use linear approximation
+        lode = 1. + slope * (1. + lode_a);
+        dlode = slope;
+    }
+    else {
+        const auto lode_b = acos(lode_a) / 3.; // theta
+        lode = 2. * cos(lode_b);               // 2*cos(theta)
+        dlode = 2. / 3. * sin(lode_b) / sqrt((1. - lode_a) * (1. + lode_a));
+    }
+
+    const auto square_lode = lode * lode;
+    const rowvec dlde = dlode * double_shear * (tensor::stress::lode_der(dev_stress) % tensor::stress::norm_weight).t() * unit_dev_tensor;
+
     auto ini_f = 0.;
     auto gamma = 0., s = trial_s, p = trial_p;
 
@@ -361,7 +394,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
 
     vec residual(4), incre;
 
-    podarray<double> data(15);
+    podarray<double> data(16);
     const auto& f = data(0);
     const auto& pfps = data(1);
     const auto& pfpp = data(2);
@@ -377,6 +410,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     const auto& pgppkp = data(12);
     const auto& xh = data(13);
     const auto& dxhdp = data(14);
+    const auto& pfpl = data(15);
 
     auto counter = 0u;
     auto ref_error = 1.;
@@ -390,8 +424,8 @@ int CDPM2::update_trial_status(const vec& t_strain) {
                     gamma = gm;
                     s = trial_s - double_shear * gamma * gs;
                     p = trial_p - bulk * gamma * gp;
-                    kp = current_kp + gamma * gg / xh;
-                    compute_plasticity(s, p, kp, data);
+                    kp = current_kp + gamma * gg * square_lode / xh;
+                    compute_plasticity(lode, s, p, kp, data);
                     return f;
                 };
 
@@ -451,7 +485,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
             return SUANPAN_FAIL;
         }
 
-        compute_plasticity(s, p, kp, data);
+        compute_plasticity(lode, s, p, kp, data);
 
         if(1u == counter) {
             if(f < 0.) break;
@@ -461,7 +495,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
         residual(0) = f;
         residual(1) = s + double_shear * gamma * gs - trial_s;
         residual(2) = p + bulk * gamma * gp - trial_p;
-        residual(3) = xh * (current_kp - kp) + gamma * gg;
+        residual(3) = xh * (current_kp - kp) + gamma * gg * square_lode;
 
         jacobian(0, 1) = pfps;
         jacobian(0, 2) = pfpp;
@@ -477,10 +511,10 @@ int CDPM2::update_trial_status(const vec& t_strain) {
         jacobian(2, 2) = bulk * gamma * pgppp + 1.;
         jacobian(2, 3) = bulk * gamma * pgppkp;
 
-        jacobian(3, 0) = gg;
-        jacobian(3, 1) = gamma / gg * (gs * pgsps + gp / 3. * pgpps);
-        jacobian(3, 2) = gamma / gg * (gs * pgspp + gp / 3. * pgppp) + (current_kp - kp) * dxhdp;
-        jacobian(3, 3) = gamma / gg * (gs * pgspkp + gp / 3. * pgppkp) - xh;
+        jacobian(3, 0) = gg * square_lode;
+        jacobian(3, 1) = gamma * square_lode / gg * (gs * pgsps + gp / 3. * pgpps);
+        jacobian(3, 2) = gamma * square_lode / gg * (gs * pgspp + gp / 3. * pgppp) + (current_kp - kp) * dxhdp;
+        jacobian(3, 3) = gamma * square_lode / gg * (gs * pgspkp + gp / 3. * pgppkp) - xh;
 
         if(!solve(incre, jacobian, residual, solve_opts::equilibrate + solve_opts::refine)) return SUANPAN_FAIL;
 
@@ -497,10 +531,10 @@ int CDPM2::update_trial_status(const vec& t_strain) {
 
             mat right(4, 6, fill::none);
 
-            right.row(0).zeros();
+            right.row(0) = -pfpl * dlde;
             right.row(1) = double_shear * unit_n.t() * unit_dev_tensor;
             right.row(2) = bulk * tensor::unit_tensor2.t();
-            right.row(3).zeros();
+            right.row(3) = -2. * gamma * gg * lode * dlde;
 
             if(!solve(left, jacobian, right)) return SUANPAN_FAIL;
 
