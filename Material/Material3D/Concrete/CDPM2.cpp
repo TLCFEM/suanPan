@@ -367,15 +367,23 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     const auto trial_p = hydro_stress;
     const vec n = dev_stress / trial_s;
 
-    static constexpr double limit = -.95;
-    static const double slope = (2. * cos(acos(limit) / 3.) - 1.) / (1. + limit);
+    static constexpr double low_limit = -.95;
+    static const double low_slope = (2. * cos(acos(low_limit) / 3.) - 1.) / (low_limit + 1.);
+    static constexpr double high_limit = .95;
+    static const double high_slope = (2. * cos(acos(high_limit) / 3.) - 2.) / (high_limit - 1.);
 
     double lode, dlode;
-    if(const auto lode_a = tensor::stress::lode(dev_stress); lode_a < limit) {
+    if(const auto lode_a = tensor::stress::lode(dev_stress); lode_a < low_limit) {
         // close to left boundary
         // use linear approximation
-        lode = 1. + slope * (1. + lode_a);
-        dlode = slope;
+        lode = 1. + low_slope * (1. + lode_a);
+        dlode = low_slope;
+    }
+    else if(lode_a > high_limit) {
+        // close to right boundary
+        // use linear approximation
+        lode = 2. + high_slope * (lode_a - 1.);
+        dlode = high_slope;
     }
     else {
         const auto lode_b = acos(lode_a) / 3.; // theta
