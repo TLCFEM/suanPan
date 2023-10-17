@@ -20,6 +20,7 @@
 #include <Recorder/OutputType.h>
 #include <Toolbox/tensor.h>
 #include <Toolbox/utility.h>
+#include <Toolbox/ridders.hpp>
 
 const double CDPM2::sqrt_six = std::sqrt(6.);
 const double CDPM2::sqrt_three_two = std::sqrt(1.5);
@@ -449,40 +450,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
                     gamma *= 2.;
                 }
 
-                counter = 0u;
-                auto x2 = gamma, f2 = f;
-                while(true) {
-                    if(fabs(x2 - x1) < tolerance) break;
-
-                    counter += 2u;
-
-                    // Ridders' method
-                    const auto x3 = .5 * (x1 + x2);
-                    const auto f3 = approx_update(x3);
-                    if(fabs(f3) < tolerance) break;
-
-                    const auto dx = (x3 - x1) * f3 / sqrt(f3 * f3 - f1 * f2);
-
-                    const auto x4 = f1 > f2 ? x3 + dx : x3 - dx;
-                    const auto f4 = approx_update(x4);
-                    if(fabs(f4) < tolerance) break;
-
-                    // one end is x4
-                    // pick the other from x3, x2, x1
-                    if(f4 * f3 < 0.) {
-                        x1 = x3;
-                        f1 = f3;
-                    }
-                    else if(f4 * f2 < 0.) {
-                        x1 = x2;
-                        f1 = f2;
-                    }
-
-                    x2 = x4;
-                    f2 = f4;
-                }
-
-                suanpan_debug("Ridders' method initial guess {:.5E} with {} iterations.\n", gamma, counter);
+                ridders(approx_update, x1, f1, gamma, f, tolerance);
 
                 counter = 1u; // avoid initial elastic check
 

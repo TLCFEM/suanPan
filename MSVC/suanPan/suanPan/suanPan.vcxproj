@@ -1021,6 +1021,7 @@
     <ClInclude Include="..\..\..\Toolbox\resampling.h" />
     <ClInclude Include="..\..\..\Toolbox\ResourceHolder.h" />
     <ClInclude Include="..\..\..\Toolbox\response_spectrum.h" />
+    <ClInclude Include="..\..\..\Toolbox\ridders.hpp" />
     <ClInclude Include="..\..\..\Toolbox\shape.h" />
     <ClInclude Include="..\..\..\Toolbox\sort_color.hpp" />
     <ClInclude Include="..\..\..\Toolbox\sort_rcm.h" />
