@@ -353,6 +353,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     const auto trial_p = hydro_stress;
     const vec n = dev_stress / trial_s;
 
+    auto ini_f = 0.;
     auto gamma = 0., s = trial_s, p = trial_p;
 
     mat jacobian(4, 4, fill::none), left(4, 6, fill::zeros);
@@ -385,32 +386,61 @@ int CDPM2::update_trial_status(const vec& t_strain) {
             if(!try_bisection) {
                 try_bisection = true;
 
-                const auto approx_update = [&] {
+                const auto approx_update = [&](const double gm) {
+                    gamma = gm;
                     s = trial_s - double_shear * gamma * gs;
                     p = trial_p - bulk * gamma * gp;
                     kp = current_kp + gamma * gg / xh;
                     compute_plasticity(s, p, kp, data);
+                    return f;
                 };
 
-                gamma = 0.;
-                approx_update();
+                approx_update(0.); // clear data
 
-                gamma = f / elastic_modulus;
-                auto low = 0.;
+                gamma = ini_f / elastic_modulus;
+                auto x1 = 0., f1 = ini_f;
+                // find a proper bracket
                 while(true) {
-                    approx_update();
-                    if(f < 0.) break;
-                    low = gamma;
+                    if(approx_update(gamma) < 0.) break;
+                    x1 = gamma;
+                    f1 = f;
                     gamma *= 2.;
                 }
 
-                auto high = gamma;
+                counter = 0u;
+                auto x2 = gamma, f2 = f;
                 while(true) {
-                    if(fabs(high - low) < tolerance) break;
-                    gamma = .5 * (low + high);
-                    approx_update();
-                    (f < 0. ? high : low) = gamma;
+                    if(fabs(x2 - x1) < tolerance) break;
+
+                    counter += 2u;
+
+                    // Ridders' method
+                    const auto x3 = .5 * (x1 + x2);
+                    const auto f3 = approx_update(x3);
+                    if(fabs(f3) < tolerance) break;
+
+                    const auto dx = (x3 - x1) * f3 / sqrt(f3 * f3 - f1 * f2);
+
+                    const auto x4 = f1 > f2 ? x3 + dx : x3 - dx;
+                    const auto f4 = approx_update(x4);
+                    if(fabs(f4) < tolerance) break;
+
+                    // one end is x4
+                    // pick the other from x3, x2, x1
+                    if(f4 * f3 < 0.) {
+                        x1 = x3;
+                        f1 = f3;
+                    }
+                    else if(f4 * f2 < 0.) {
+                        x1 = x2;
+                        f1 = f2;
+                    }
+
+                    x2 = x4;
+                    f2 = f4;
                 }
+
+                suanpan_debug("Ridders' method initial guess {:.5E} with {} iterations.\n", gamma, counter);
 
                 counter = 1u; // avoid initial elastic check
 
@@ -423,7 +453,10 @@ int CDPM2::update_trial_status(const vec& t_strain) {
 
         compute_plasticity(s, p, kp, data);
 
-        if(1u == counter && f < 0.) break;
+        if(1u == counter) {
+            if(f < 0.) break;
+            ini_f = f;
+        }
 
         residual(0) = f;
         residual(1) = s + double_shear * gamma * gs - trial_s;

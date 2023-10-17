@@ -21,8 +21,8 @@
  * A 3D concrete material model that supports stiffness degradation.
  *
  * @author tlc
- * @date 04/08/2021
- * @version 1.0.0
+ * @date 17/10/2023
+ * @version 1.1.0
  * @file CDPM2.h
  * @addtogroup Material-3D
  * @{
@@ -49,7 +49,11 @@ struct DataCDPM2 {
     const double eft = 3E-4;
     const double efc = 3E-3;
 
-    const double e = 1.;
+    const double e = [&] {
+        const auto fbc = 1.16 * fc;
+        const auto factor = ft / fbc * (fbc + fc) * (fbc - fc) / (fc + ft) / (fc - ft);
+        return (1. + factor) / (2. - factor);
+    }();
     const double e0 = ft / elastic_modulus;
     const double ftfc = ft / fc;
     const double m0 = 3. * (fc / ft - ftfc) * e / (1. + e);
