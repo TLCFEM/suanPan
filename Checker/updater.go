@@ -97,35 +97,37 @@ func downloadLatestVersion(versionString string) error {
 	fmt.Printf("      For CPUs that do not support AVX, please use this version.\n")
 	fmt.Printf("\nDownload the new version:\n")
 
-	regex, _ := regexp.Compile(`suanPan-v(\d)\.(\d)\.?(\d?)`)
-
-	number := regex.FindStringSubmatch(versionString)
-
-	newMajor, _ := strconv.Atoi(number[1])
-	newMinor, _ := strconv.Atoi(number[2])
-	newPatch := 0
-
-	if len(number) == 3 {
-		newPatch, _ = strconv.Atoi(number[3])
-	}
+	var package_array []string
 
 	if cos == "windows" {
-		fmt.Printf("    [0] suanPan-win-mkl-vtk.exe (Installer)\n")
-		fmt.Printf("    [1] suanPan-win-mkl-vtk.zip (Portable Archive)\n")
-		fmt.Printf("    [2] suanPan-win-openblas-vtk.7z (Portable Archive)\n")
-		fmt.Printf("    [3] suanPan-win-openblas-vtk-no-avx.7z (Portable Archive)\n")
+		package_array = []string{
+			"suanPan-win-mkl-vtk.exe",
+			"suanPan-win-mkl-vtk.zip",
+			"suanPan-win-openblas.7z",
+			"suanPan-win-openblas-vtk.7z",
+			"suanPan-win-openblas-no-avx.7z",
+			"suanPan-win-openblas-vtk-no-avx.7z",
+		}
 	} else if cos == "linux" {
-		fmt.Printf("    [0] suanPan-linux-mkl-vtk.tar.gz (Portable Archive)\n")
-		fmt.Printf("    [1] suanPan-linux-mkl-vtk-no-avx.tar.gz (Portable Archive)\n")
-		fmt.Printf("    [2] suanPan-linux-mkl.tar.gz (Portable Archive)\n")
-		fmt.Printf("    [3] suanPan-linux-openblas-vtk.tar.gz (Portable Archive)\n")
-		fmt.Printf("    [4] suanPan-linux-openblas.tar.gz (Portable Archive)\n")
-		fmt.Printf("    [5] suanPan-%d.%d.%d-1.x86_64.deb (Debian Installer)\n", newMajor, newMinor, newPatch)
-		fmt.Printf("    [6] suanPan-%d.%d.%d-1.x86_64.rpm (Red Hat Installer)\n", newMajor, newMinor, newPatch)
+		package_array = []string{
+			"suanPan-linux-mkl.tar.gz",
+			"suanPan-linux-mkl-vtk.tar.gz",
+			"suanPan-linux-openblas.tar.gz",
+			"suanPan-linux-openblas-vtk.tar.gz",
+			"suanPan-linux-mkl-no-avx.tar.gz",
+			"suanPan-linux-mkl-vtk-no-avx.tar.gz",
+			"suanPan-linux-openblas-no-avx.tar.gz",
+			"suanPan-linux-openblas-vtk-no-avx.tar.gz",
+		}
 	} else if cos == "darwin" {
-		fmt.Printf("    [0] suanPan-macos-openblas-vtk.tar.gz (Portable Archive)\n")
-		fmt.Printf("    [1] suanPan-macos-openblas-vtk-no-avx.tar.gz (Portable Archive)\n")
-		fmt.Printf("    [2] suanPan-macos-openblas.tar.gz (Portable Archive)\n")
+		package_array = []string{
+			"suanPan-macos-openblas.tar.gz",
+			"suanPan-macos-openblas-vtk.tar.gz",
+		}
+	}
+
+	for i, v := range package_array {
+		fmt.Printf("    [%d] %s\n", i, v)
 	}
 
 	fmt.Printf("\nPlease select the version you want to download (leave empty to exit): ")
@@ -137,40 +139,8 @@ func downloadLatestVersion(versionString string) error {
 
 	link := URL + "/download/" + versionString
 	fileName := ""
-	if cos == "windows" {
-		if 0 == downloadOption {
-			fileName = "suanPan-win-mkl-vtk.exe"
-		} else if 1 == downloadOption {
-			fileName = "suanPan-win-mkl-vtk.zip"
-		} else if 2 == downloadOption {
-			fileName = "suanPan-win-openblas-vtk.7z"
-		} else if 3 == downloadOption {
-			fileName = "suanPan-win-openblas-vtk-no-avx.7z"
-		}
-	} else if cos == "linux" {
-		if 0 == downloadOption {
-			fileName = "suanPan-linux-mkl-vtk.tar.gz"
-		} else if 1 == downloadOption {
-			fileName = "suanPan-linux-mkl-vtk-no-avx.tar.gz"
-		} else if 2 == downloadOption {
-			fileName = "suanPan-linux-mkl.tar.gz"
-		} else if 3 == downloadOption {
-			fileName = "suanPan-linux-openblas-vtk.tar.gz"
-		} else if 4 == downloadOption {
-			fileName = "suanPan-linux-openblas.tar.gz"
-		} else if 5 == downloadOption {
-			fileName = fmt.Sprintf("suanPan-%d.%d.%d-1.x86_64.deb", newMajor, newMinor, newPatch)
-		} else if 6 == downloadOption {
-			fileName = fmt.Sprintf("suanPan-%d.%d.%d-1.x86_64.rpm", newMajor, newMinor, newPatch)
-		}
-	} else if cos == "darwin" {
-		if 0 == downloadOption {
-			fileName = "suanPan-macos-openblas-vtk.tar.gz"
-		} else if 1 == downloadOption {
-			fileName = "suanPan-macos-openblas-vtk-no-avx.tar.gz"
-		} else if 2 == downloadOption {
-			fileName = "suanPan-macos-openblas.tar.gz"
-		}
+	if downloadOption < len(package_array) && downloadOption >= 0 {
+		fileName = package_array[downloadOption]
 	}
 
 	if fileName == "" {

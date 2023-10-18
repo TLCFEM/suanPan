@@ -1,6 +1,7 @@
 import re
 import sys
 import urllib.request
+from os.path import abspath
 
 
 def check_version(_major: int, _minor: int, _patch: int):
@@ -21,7 +22,7 @@ def check_version(_major: int, _minor: int, _patch: int):
 
     url = f'https://github.com/TLCFEM/suanPan/releases/download/{version.group(0)}/'
 
-    result = input(f'New version {version.group(0)} available, download now? [Y/n] ')
+    result = input(f'New version {version.group(0)} available, download now? [y/N] ')
 
     if result == '' or result[0] != 'y' and result[0] != 'Y':
         return
@@ -29,26 +30,34 @@ def check_version(_major: int, _minor: int, _patch: int):
     print('\nDownload the new version:')
 
     version_list = []
-
     if sys.platform.startswith('win32'):
-        version_list.append(('suanPan-win-mkl-vtk.exe', '(Installer)'))
-        version_list.append(('suanPan-win-mkl-vtk.zip', '(Portable Archive)'))
-        version_list.append(('suanPan-win-openblas-vtk.7z', '(Portable Archive)'))
-        version_list.append(('suanPan-win-openblas-vtk-no-avx.7z', '(Portable Archive)'))
+        version_list = [
+            "suanPan-win-mkl-vtk.exe",
+            "suanPan-win-mkl-vtk.zip",
+            "suanPan-win-openblas.7z",
+            "suanPan-win-openblas-vtk.7z",
+            "suanPan-win-openblas-no-avx.7z",
+            "suanPan-win-openblas-vtk-no-avx.7z"
+        ]
     elif sys.platform.startswith('linux'):
-        version_list.append(('suanPan-linux-mkl-vtk.tar.gz', '(Portable Archive)'))
-        version_list.append(('suanPan-linux-mkl-vtk-no-avx.tar.gz', '(Portable Archive)'))
-        version_list.append(('suanPan-linux-mkl.tar.gz', '(Portable Archive)'))
-        version_list.append(('suanPan-linux-openblas.tar.gz', '(Portable Archive)'))
-        version_list.append((f'suanPan-{new_major}.{new_minor}.{new_patch}-1.x86_64.deb', '(Debian Installer)'))
-        version_list.append((f'suanPan-{new_major}.{new_minor}.{new_patch}-1.x86_64.rpm', '(Red Hat Installer)'))
+        version_list = [
+            "suanPan-linux-mkl.tar.gz",
+            "suanPan-linux-mkl-vtk.tar.gz",
+            "suanPan-linux-openblas.tar.gz",
+            "suanPan-linux-openblas-vtk.tar.gz",
+            "suanPan-linux-mkl-no-avx.tar.gz",
+            "suanPan-linux-mkl-vtk-no-avx.tar.gz",
+            "suanPan-linux-openblas-no-avx.tar.gz",
+            "suanPan-linux-openblas-vtk-no-avx.tar.gz"
+        ]
     elif sys.platform.startswith('darwin'):
-        version_list.append(('suanPan-macos-openblas-vtk.tar.gz', '(Portable Archive)'))
-        version_list.append(('suanPan-macos-openblas-vtk-no-avx.tar.gz', '(Portable Archive)'))
-        version_list.append(('suanPan-macos-openblas.tar.gz', '(Portable Archive)'))
+        version_list = [
+            "suanPan-macos-openblas.tar.gz",
+            "suanPan-macos-openblas-vtk.tar.gz"
+        ]
 
     for index, item in enumerate(version_list):
-        print(f'  [{index}] {item[0]} {item[1]}')
+        print(f'  [{index}] {item}')
 
     result = input("\nPlease select the version you want to download (leave empty to exit): ")
 
@@ -60,11 +69,11 @@ def check_version(_major: int, _minor: int, _patch: int):
     if result < 0 or result >= len(version_list):
         return
 
-    file_name = version_list[result][0]
+    file_name = version_list[result]
 
     urllib.request.urlretrieve(url + file_name, file_name)
 
-    print(f"\nDownloaded {file_name}")
+    print(f"\nDownloaded {abspath(file_name)}")
     print("You can manually extract the archive to overwrite the existing folder.")
 
 

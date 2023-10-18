@@ -102,6 +102,7 @@ details can be seen [here](https://tlcfem.gitbook.io/suanpan-manual/tutorial/obt
 Only the 64-bit version is compiled.
 It is assumed that [**AVX**](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions) is available thus if the program
 fails, please check if your CPU supports AVX.
+Alternatively, you can try the `no-avx` version.
 
 ### Windows
 
@@ -109,7 +110,7 @@ fails, please check if your CPU supports AVX.
 
 The archives of binaries are released under [Release](https://github.com/TLCFEM/suanPan/releases) page.
 
-1. `suanpan-win-mkl-vtk.zip` is the portable version.
+1. `suanpan-win-mkl-vtk.zip` is the portable archive.
 2. `suanpan-win-mkl-vtk.exe` is the installer.
 
 #### Chocolatey
@@ -157,8 +158,8 @@ Linux users are recommended to obtain the binaries via `snap` or `flatpak`.
 #### Snap
 
 The snap supports visualisation via VTK and uses Intel MKL for linear algebra.
-The edge channel is in sync with the dev branch.
-The stable channel is in sync with the master branch.
+The edge channel is in sync with the `dev` branch.
+The stable channel is in sync with the `master` branch.
 
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/suanpan)
 
@@ -167,8 +168,8 @@ The stable channel is in sync with the master branch.
 #### Flatpak
 
 Flatpak is also available if preferred.
-The beta channel is in sync with the dev branch.
-The stable channel is in sync with the master branch.
+The beta channel is in sync with the `dev` branch.
+The stable channel is in sync with the `master` branch.
 
 <a href='https://flathub.org/apps/details/io.github.tlcfem.suanPan'><img width='200' alt='Download on Flathub' src='https://flathub.org/assets/badges/flathub-badge-en.svg'/></a>
 
@@ -183,12 +184,6 @@ flatpak install suanPan
 echo "alias suanpan=\"flatpak run io.github.tlcfem.suanPan\"" >> ~/.bashrc
 ```
 
-#### Installation Packages
-
-Alternatively, download the RPM (Fedora 36) or DEB (Ubuntu 22.04) package from the release page. The packages may not be
-compatible with older distributions (due to different versions of `libstdc++`). It is also possible to compile the
-package via docker, check the dockerfiles under the `Script` folder, for any questions please open an issue.
-
 ### Other Platforms
 
 Precompiled binaries are provided via CI/CD on macOS, Windows, and Ubuntu.
@@ -200,9 +195,10 @@ A few flavors are available:
    may be missing on server systems
 2. `mkl` --- linear algebra operations are offloaded to MKL, which gives the optimal performance on Intel chips
 3. `openblas` --- linear algebra operations are offloaded to OpenBLAS, which may outperform MKL on AMD platforms
+4. `no-avx` --- AVX support is disabled, useful for older CPUs which do not support AVX instructions
 
-Advanced users can compile the program from source by themselves in order to enable GPU based solvers which require
-an available [CUDA](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) library.
+Advanced users can compile the program from source by themselves to enable GPU based solvers which require
+an available [CUDA](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) and/or MAGMA library.
 
 Since CI/CD uses `GCC 11` (on Linux) and `Clang 13.0.1` (on macOS), it may be required to update/install
 proper `libstdc++` (or `libc++`) version. The easiest way is to install the same compiler. For example, on Ubuntu 22.04,
@@ -218,6 +214,9 @@ For VTK enabled versions, it may be necessary to install OpenGL.
 # Ubuntu
 sudo apt install libglu1-mesa-dev freeglut3-dev mesa-common-dev libglvnd-dev
 ```
+
+It is also possible to compile the package via docker, check the dockerfiles under the `Script` folder, for any
+questions please open an issue.
 
 ### Automation Related
 
