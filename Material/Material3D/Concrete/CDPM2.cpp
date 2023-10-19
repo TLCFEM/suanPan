@@ -576,11 +576,14 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     const rowvec potpe = pot * left + potpac * dacde;
     const rowvec pocpe = poc * left + pocpac * dacde;
 
-    if(DamageType::ISOTROPIC == damage_type) {
-        trial_stiffness *= (1. - omegat) * (1. - omegac);
-        trial_stiffness -= trial_stress * ((1. - omegat) * pocpe + (1. - omegac) * potpe);
+    const auto damage_t = 1. - omegat;
+    const auto damage_c = 1. - omegac;
 
-        trial_stress *= (1. - omegat) * (1. - omegac);
+    if(DamageType::ISOTROPIC == damage_type) {
+        trial_stiffness *= damage_t * damage_c;
+        trial_stiffness -= trial_stress * (damage_t * pocpe + damage_c * potpe);
+
+        trial_stress *= damage_t * damage_c;
     }
     else if(DamageType::ANISOTROPIC == damage_type) {
         const auto get_fraction = [](const vec& p_stress) {
@@ -599,9 +602,9 @@ int CDPM2::update_trial_status(const vec& t_strain) {
 
         const vec tension_stress = tension_projector * trial_stress;
 
-        trial_stiffness = (1. - omegac) * trial_stiffness - trial_stress * pocpe + (omegac - omegat) * tension_derivative * trial_stiffness + tension_stress * (pocpe - potpe);
+        trial_stiffness = damage_c * trial_stiffness - trial_stress * pocpe + (omegac - omegat) * tension_derivative * trial_stiffness + tension_stress * (pocpe - potpe);
 
-        trial_stress *= 1. - omegac;
+        trial_stress *= damage_c;
         trial_stress += (omegac - omegat) * tension_stress;
     }
 
