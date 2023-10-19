@@ -586,10 +586,14 @@ int CDPM2::update_trial_status(const vec& t_strain) {
         trial_stress *= damage_t * damage_c;
     }
     else if(DamageType::ANISOTROPIC == damage_type) {
-        const auto get_fraction = [](const vec& p_stress) {
-            const auto compute_fraction = [](const double a, const double b) { return suanpan::approx_equal(a, b, 4) ? a + b <= 0. ? 0. : 2. : 2. * (suanpan::ramp(a) - suanpan::ramp(b)) / (a - b); };
+        const auto get_fraction = [](const vec& stress) {
+            const auto compute_fraction = [&stress](const unsigned i, const unsigned j) {
+                const auto &a = stress(i), &b = stress(j);
 
-            return vec{compute_fraction(p_stress(0), p_stress(1)), compute_fraction(p_stress(1), p_stress(2)), compute_fraction(p_stress(2), p_stress(0))};
+                return suanpan::approx_equal(a, b, 4) ? a + b <= 0. ? 0. : 2. : 2. * (suanpan::ramp(a) - suanpan::ramp(b)) / (a - b);
+            };
+
+            return vec{compute_fraction(0, 1), compute_fraction(1, 2), compute_fraction(2, 0)};
         };
 
         const mat pnn = transform::eigen_to_tensor_base(principal_direction);
