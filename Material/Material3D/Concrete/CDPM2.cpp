@@ -43,6 +43,8 @@ void CDPM2::compute_plasticity(const double lode, const double s, const double p
     auto& xh = data(13);
     auto& dxhdp = data(14);
     auto& pfpl = data(15);
+    auto& r = data(16);
+    auto& drdl = data(17);
 
     auto qh1 = 1., qh2 = 1.;
     auto dqh1dkp = 0., dqh2dkp = 0.;
@@ -76,8 +78,8 @@ void CDPM2::compute_plasticity(const double lode, const double s, const double p
     const auto sqrt_term = sqrt(rb * square_term + rc);
     const auto numerator = square_term + rb;
     const auto denominator = ra * lode + sqrt_term;
-    const auto r = numerator / denominator;
-    const auto drdl = ra / denominator * (2. * lode - r - r * rb * lode / sqrt_term);
+    r = numerator / denominator;
+    drdl = ra / denominator * (2. * lode - r - r * rb * lode / sqrt_term);
 
     const auto g4 = (r * s / sqrt_six + p) / fc;
     const auto pg4pp = 1. / fc;
@@ -135,15 +137,17 @@ void CDPM2::compute_plasticity(const double lode, const double s, const double p
 }
 
 int CDPM2::compute_damage(const double gamma, const double s, const double p, const double kp, const double ac, podarray<double>& data) {
-    const auto& gs = data(4);
-    const auto& gp = data(5);
-    const auto& gg = data(6);
-    const auto& pgsps = data(7);
-    const auto& pgspp = data(8);
-    const auto& pgspkp = data(9);
-    const auto& pgpps = data(10);
-    const auto& pgppp = data(11);
-    const auto& pgppkp = data(12);
+    const auto gs = data(4);
+    const auto gp = data(5);
+    const auto gg = data(6);
+    const auto pgsps = data(7);
+    const auto pgspp = data(8);
+    const auto pgspkp = data(9);
+    const auto pgpps = data(10);
+    const auto pgppp = data(11);
+    const auto pgppkp = data(12);
+    const auto r = data(16);
+    const auto drdl = data(17);
 
     const auto& current_ee = current_history(7);
     const auto& current_et = current_history(8);
@@ -166,7 +170,8 @@ int CDPM2::compute_damage(const double gamma, const double s, const double p, co
 
     // ee
     const auto ptapp = .5 * e0 * m0 / fc;
-    const auto ptaps = ptapp / sqrt_six;
+    const auto ptaps = ptapp / sqrt_six * r;
+    const auto ptapl = ptapp / sqrt_six * s * drdl;
     const auto ptbps = sqrt_three_two * e0 / fc;
     const auto term_a = ptaps * s + ptapp * p;
     const auto term_b = ptbps * s;
@@ -175,6 +180,7 @@ int CDPM2::compute_damage(const double gamma, const double s, const double p, co
     const auto incre_ee = ee - current_ee;
     const auto peeps = (ptaps * ee + term_b * ptbps) / term_c;
     const auto peepp = ptapp * ee / term_c;
+    const auto peepl = ptapl * ee / term_c;
 
     // ep
     const auto ep = gamma * gg;
@@ -194,13 +200,14 @@ int CDPM2::compute_damage(const double gamma, const double s, const double p, co
     const auto at = 1. - ac;
 
     // kdt
-    auto incre_kdt = 0., pkdtps = 0., pkdtpp = 0., pkdtpac = 0.;
+    auto incre_kdt = 0., pkdtps = 0., pkdtpp = 0., pkdtpac = 0., pkdtpl = 0.;
     if((et = current_et + at * incre_ee) > kdt) {
         incre_kdt = et - kdt;
         kdt = et;
         pkdtps = at * peeps;
         pkdtpp = at * peepp;
         pkdtpac = -incre_ee;
+        pkdtpl = at * peepl;
     }
 
     // kdt1
@@ -222,15 +229,17 @@ int CDPM2::compute_damage(const double gamma, const double s, const double p, co
     const auto pkdt2ps = (pkdtps - incre_kdt2 * pxsps) / xs;
     const auto pkdt2pp = (pkdtpp - incre_kdt2 * pxspp) / xs;
     const auto pkdt2pac = pkdtpac / xs;
+    const auto pkdt2pl = pkdtpl / xs;
 
     // kdc
-    auto incre_kdc = 0., pkdcps = 0., pkdcpp = 0., pkdcpac = 0.;
+    auto incre_kdc = 0., pkdcps = 0., pkdcpp = 0., pkdcpac = 0., pkdcpl = 0.;
     if((ec = current_ec + ac * incre_ee) > kdc) {
         incre_kdc = ec - kdc;
         kdc = ec;
         pkdcps = ac * peeps;
         pkdcpp = ac * peepp;
         pkdcpac = incre_ee;
+        pkdcpl = ac * peepl;
     }
 
     // kdc1
@@ -261,6 +270,7 @@ int CDPM2::compute_damage(const double gamma, const double s, const double p, co
     const auto pkdc2ps = (pkdcps - incre_kdc2 * pxsps) / xs;
     const auto pkdc2pp = (pkdcpp - incre_kdc2 * pxspp) / xs;
     const auto pkdc2pac = pkdcpac / xs;
+    const auto pkdc2pl = pkdcpl / xs;
 
     podarray<double> datad(3);
 
@@ -274,12 +284,14 @@ int CDPM2::compute_damage(const double gamma, const double s, const double p, co
     auto& potpq = data(2);
     auto& potpkp = data(3);
     auto& potpac = data(8);
+    auto& potpl = data(9);
 
     potpg = potpkdt1 * pkdt1pg;
     potps = potpkdt * pkdtps + potpkdt1 * pkdt1ps + potpkdt2 * pkdt2ps;
     potpq = potpkdt * pkdtpp + potpkdt1 * pkdt1pp + potpkdt2 * pkdt2pp;
     potpkp = potpkdt1 * pkdt1pkp;
     potpac = potpkdt * pkdtpac + potpkdt1 * pkdt1pac + potpkdt2 * pkdt2pac;
+    potpl = potpkdt * pkdtpl + potpkdt2 * pkdt2pl;
 
     if(SUANPAN_SUCCESS != compute_damage_factor(kdc, kdc1, kdc2, efc, omegac, datad)) return SUANPAN_FAIL;
     const auto& pocpkdc = datad(0);
@@ -290,13 +302,15 @@ int CDPM2::compute_damage(const double gamma, const double s, const double p, co
     auto& pocps = data(5);
     auto& pocpq = data(6);
     auto& pocpkp = data(7);
-    auto& pocpac = data(9);
+    auto& pocpac = data(10);
+    auto& pocpl = data(11);
 
     pocpg = pocpkdc1 * pkdc1pg;
     pocps = pocpkdc * pkdcps + pocpkdc1 * pkdc1ps + pocpkdc2 * pkdc2ps;
     pocpq = pocpkdc * pkdcpp + pocpkdc1 * pkdc1pp + pocpkdc2 * pkdc2pp;
     pocpkp = pocpkdc1 * pkdc1pkp;
     pocpac = pocpkdc * pkdcpac + pocpkdc1 * pkdc1pac + pocpkdc2 * pkdc2pac;
+    pocpl = pocpkdc * pkdcpl + pocpkdc2 * pkdc2pl;
 
     return SUANPAN_SUCCESS;
 }
@@ -312,6 +326,8 @@ int CDPM2::compute_damage_factor(const double kd, const double kd1, const double
         popkd2 = 0.;
         return SUANPAN_SUCCESS;
     }
+
+    omega = 1.; // initial guess with the maximum value to avoid convergence to the negative solution
 
     auto counter = 0u;
     while(true) {
@@ -411,7 +427,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
 
     vec residual(4), incre;
 
-    podarray<double> data(16);
+    podarray<double> data(18);
     const auto& f = data(0);
     const auto& pfps = data(1);
     const auto& pfpp = data(2);
@@ -428,6 +444,8 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     const auto& xh = data(13);
     const auto& dxhdp = data(14);
     const auto& pfpl = data(15);
+    // const auto& r = data(16);
+    // const auto& drdl = data(17);
 
     auto counter = 0u;
     auto ref_error = 1.;
@@ -559,22 +577,24 @@ int CDPM2::update_trial_status(const vec& t_strain) {
 
     if(SUANPAN_SUCCESS != compute_damage(gamma, s, p, kp, ac, data)) return SUANPAN_FAIL;
 
-    if(DamageType::NODAMAGE == damage_type) return SUANPAN_SUCCESS;
+    if(const auto &kdt = trial_history(10), &kdc = trial_history(11); DamageType::NODAMAGE == damage_type || (kdt < e0 && kdc < e0)) return SUANPAN_SUCCESS;
 
     const auto& omegat = trial_history(16);
     const auto& omegac = trial_history(17);
     const rowvec pot(&data(0), 4);
     const rowvec poc(&data(4), 4);
     const auto& potpac = data(8);
-    const auto& pocpac = data(9);
+    const auto& potpl = data(9);
+    const auto& pocpac = data(10);
+    const auto& pocpl = data(11);
 
     rowvec daca = 2. * principal_stress.t();
     daca(t_pattern).fill(0.);
     const rowvec dac = (daca - 2. * ac * principal_stress.t()) / acb;
     const rowvec dacde = dac * transform::compute_jacobian_nominal_to_principal(principal_direction) * trial_stiffness;
 
-    const rowvec potpe = pot * left + potpac * dacde;
-    const rowvec pocpe = poc * left + pocpac * dacde;
+    const rowvec potpe = pot * left + potpac * dacde + potpl * dlde;
+    const rowvec pocpe = poc * left + pocpac * dacde + pocpl * dlde;
 
     const auto damage_t = 1. - omegat;
     const auto damage_c = 1. - omegac;

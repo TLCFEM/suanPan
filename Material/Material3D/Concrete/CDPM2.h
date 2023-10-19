@@ -39,15 +39,15 @@ struct DataCDPM2 {
     const double ft = 3.;
     const double fc = 30.;
     const double qh0 = .3;
-    const double hp = .05;
+    const double hp = .01;
     const double df = .85;
     const double ah = .08;
     const double bh = .003;
     const double ch = 2.;
     const double dh = 1E-6;
     const double as = 5.;
-    const double eft = 3E-4;
-    const double efc = 3E-3;
+    const double eft = 5E-4;
+    const double efc = 5E-4;
 
     const double e = [&] {
         const auto fbc = 1.16 * fc;

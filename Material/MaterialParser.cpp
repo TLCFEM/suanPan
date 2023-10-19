@@ -975,14 +975,14 @@ void new_customcdp(unique_ptr<Material>& return_obj, istringstream& command) {
     return_obj = make_unique<CustomCDP>(tag, expressions(0), expressions(1), pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), pool(6), pool(7));
 }
 
-void new_cdpm2(unique_ptr<Material>& return_obj, istringstream& command, const unsigned damage_type) {
+void new_cdpm2(unique_ptr<Material>& return_obj, istringstream& command, const CDPM2::DamageType damage_type) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
         return;
     }
 
-    vec para_pool{3E4, .3, 3., 30., .3, .05, .85, .08, .003, 2., 1E-6, 5., 3E-4, 3E-3, 0.};
+    vec para_pool{3E4, .3, 3., 30., .3, .01, .85, .08, .003, 2., 1E-6, 5., 5E-4, 5E-4, 0.};
 
     if(!get_optional_input(command, para_pool)) {
         suanpan_error("A valid parameter is required.\n");
@@ -998,11 +998,7 @@ void new_cdpm2(unique_ptr<Material>& return_obj, istringstream& command, const u
         return;
     }
 
-    auto dt = CDPM2::DamageType::ISOTROPIC;
-    if(0 == damage_type) dt = CDPM2::DamageType::NODAMAGE;
-    else if(2 == damage_type) dt = CDPM2::DamageType::ANISOTROPIC;
-
-    return_obj = make_unique<CDPM2>(tag, para_pool(0), para_pool(1), para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6), para_pool(7), para_pool(8), para_pool(9), para_pool(10), para_pool(11), para_pool(12), para_pool(13), dt, para_pool(14));
+    return_obj = make_unique<CDPM2>(tag, para_pool(0), para_pool(1), para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6), para_pool(7), para_pool(8), para_pool(9), para_pool(10), para_pool(11), para_pool(12), para_pool(13), damage_type, para_pool(14));
 }
 
 void new_concrete21(unique_ptr<Material>& return_obj, istringstream& command) {
@@ -3440,10 +3436,10 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "BoucWen")) new_boucwen(new_material, command);
     else if(is_equal(material_id, "BWBN")) new_bwbn(new_material, command);
     else if(is_equal(material_id, "CDP")) new_cdp(new_material, command);
-    else if(is_equal(material_id, "CDPM2")) new_cdpm2(new_material, command, 1);
-    else if(is_equal(material_id, "CDPM2ANISO")) new_cdpm2(new_material, command, 2);
-    else if(is_equal(material_id, "CDPM2ISO")) new_cdpm2(new_material, command, 1);
-    else if(is_equal(material_id, "CDPM2NO")) new_cdpm2(new_material, command, 0);
+    else if(is_equal(material_id, "CDPM2")) new_cdpm2(new_material, command, CDPM2::DamageType::ISOTROPIC);
+    else if(is_equal(material_id, "CDPM2ANISO")) new_cdpm2(new_material, command, CDPM2::DamageType::ANISOTROPIC);
+    else if(is_equal(material_id, "CDPM2ISO")) new_cdpm2(new_material, command, CDPM2::DamageType::ISOTROPIC);
+    else if(is_equal(material_id, "CDPM2NO")) new_cdpm2(new_material, command, CDPM2::DamageType::NODAMAGE);
     else if(is_equal(material_id, "Concrete21")) new_concrete21(new_material, command);
     else if(is_equal(material_id, "Concrete22")) new_concrete22(new_material, command);
     else if(is_equal(material_id, "ConcreteCM")) new_concretecm(new_material, command);

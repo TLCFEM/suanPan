@@ -3229,34 +3229,28 @@
       "trigger":"CAX8"
     },
     {
-      "contents":"",
+      "contents":"material CDP ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:(9)} ${10:(10)} ${11:(11)} ${12:(12)} ${13:(13)} ${14:(14)} ${15:[15]}\n# (1) int, unique tag\n# (2) double, elastic modulus\n# (3) double, poissons ratio\n# (4) double, crack stress f_t\n# (5) double, crush stress f_c\n# (6) double, normalized crack energy g_t\n# (7) double, normalized crush energy g_c\n# (8) double, initial tension hardening a_t<1\n# (9) double, initial compression hardening a_c>1\n# (10) double, damage factor at half crack stress d_t\n# (11) double, damage factor at peak crush stress d_c\n# (12) double, dilatancy parameter\n# (13) double, biaxial compression ratio\n# (14) double, initial stiffness recovery factor\n# [15] double, density, default: 2400E-12",
       "details":"",
       "kind":"type",
       "trigger":"CDP"
     },
     {
-      "contents":"",
-      "details":"",
+      "contents":"material CDPM2 ${1:(1)} ${2:[2-16]}\n# (1) int, unique material tag\n# [2] double, elastic modulus, default: 3E4\n# [3] double, poissons ratio, default: 0.3\n# [4] double, tension strength (positive), default: 3.0\n# [5] double, compression strength (positive), default: 30.0\n# [6] double, q_h0, initial hardening factor, default: 0.3\n# [7] double, h_p hardening ratio, default: .01\n# [8] double, d_f, default: .85\n# [9] double, a_h, hardening related parameter, default: 0.08\n# [10] double, b_h, hardening related parameter, default: 0.003\n# [11] double, c_h, hardening related parameter, default: 2.0\n# [12] double, d_h, hardening related parameter, default: 1E-6\n# [13] double, a_s, ductility related parameter, default: 5.0\n# [14] double, e_ft, tension softening parameter, default: 5E-4\n# [15] double, e_fc, compression softening parameter, default: 5E-4\n# [16] double, density, default: 0.0",
+      "details":"CDPM2 Isotropic Damage",
       "kind":"type",
       "trigger":"CDPM2"
     },
     {
-      "contents":"",
-      "details":"",
+      "contents":"material CDPM2ANISO ${1:(1)} ${2:[2-16]}\n# (1) int, unique material tag\n# [2] double, elastic modulus, default: 3E4\n# [3] double, poissons ratio, default: 0.3\n# [4] double, tension strength (positive), default: 3.0\n# [5] double, compression strength (positive), default: 30.0\n# [6] double, q_h0, initial hardening factor, default: 0.3\n# [7] double, h_p hardening ratio, default: .01\n# [8] double, d_f, default: .85\n# [9] double, a_h, hardening related parameter, default: 0.08\n# [10] double, b_h, hardening related parameter, default: 0.003\n# [11] double, c_h, hardening related parameter, default: 2.0\n# [12] double, d_h, hardening related parameter, default: 1E-6\n# [13] double, a_s, ductility related parameter, default: 5.0\n# [14] double, e_ft, tension softening parameter, default: 5E-4\n# [15] double, e_fc, compression softening parameter, default: 5E-4\n# [16] double, density, default: 0.0",
+      "details":"CDPM2 Aniotropic Damage",
       "kind":"type",
       "trigger":"CDPM2ANISO"
     },
     {
-      "contents":"",
-      "details":"",
+      "contents":"material CDPM2ISO ${1:(1)} ${2:[2-16]}\n# (1) int, unique material tag\n# [2] double, elastic modulus, default: 3E4\n# [3] double, poissons ratio, default: 0.3\n# [4] double, tension strength (positive), default: 3.0\n# [5] double, compression strength (positive), default: 30.0\n# [6] double, q_h0, initial hardening factor, default: 0.3\n# [7] double, h_p hardening ratio, default: .01\n# [8] double, d_f, default: .85\n# [9] double, a_h, hardening related parameter, default: 0.08\n# [10] double, b_h, hardening related parameter, default: 0.003\n# [11] double, c_h, hardening related parameter, default: 2.0\n# [12] double, d_h, hardening related parameter, default: 1E-6\n# [13] double, a_s, ductility related parameter, default: 5.0\n# [14] double, e_ft, tension softening parameter, default: 5E-4\n# [15] double, e_fc, compression softening parameter, default: 5E-4\n# [16] double, density, default: 0.0",
+      "details":"CDPM2 Isotropic Damage",
       "kind":"type",
       "trigger":"CDPM2ISO"
-    },
-    {
-      "contents":"",
-      "details":"",
-      "kind":"type",
-      "trigger":"CDPM2NO"
     },
     {
       "contents":"",
