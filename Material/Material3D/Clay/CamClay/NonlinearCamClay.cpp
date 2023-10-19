@@ -50,7 +50,7 @@ int NonlinearCamClay::update_trial_status(const vec& t_strain) {
     const auto trial_q = sqrt_three_two * tensor::stress::norm(trial_s);
     const auto p = tensor::mean3(trial_stress);
 
-    auto gamma = 0.;
+    auto ini_f = 0., gamma = 0.;
 
     vec residual(2), incre;
     mat jacobian(2, 2);
@@ -74,7 +74,10 @@ int NonlinearCamClay::update_trial_status(const vec& t_strain) {
 
         residual(0) = rel_p * rel_p / square_b + square_qm - a * a;
 
-        if(1u == counter && residual(0) < 0.) return SUANPAN_SUCCESS;
+        if(1u == counter) {
+            if(residual(0) < 0.) return SUANPAN_SUCCESS;
+            ini_f = residual(0); // yield function can be very large, use relative error instead
+        }
 
         residual(1) = incre_alpha - 2. * gamma / square_b * rel_p;
 
@@ -88,7 +91,7 @@ int NonlinearCamClay::update_trial_status(const vec& t_strain) {
         const auto error = inf_norm(incre);
         if(1u == counter) rel_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * rel_error || (inf_norm(residual) < tolerance && counter > 5u)) {
+        if(error < tolerance * rel_error || (inf_norm(residual) < tolerance * ini_f && counter > 5u)) {
             mat left(6, 2);
 
             rel_error = 2. * bulk / square_b; // reuse variable
