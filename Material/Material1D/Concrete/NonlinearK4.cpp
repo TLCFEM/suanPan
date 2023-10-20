@@ -23,8 +23,8 @@ int NonlinearK4::compute_plasticity(double& k) {
 
     const auto sign_sigma = suanpan::sign(trial_stress(0));
 
-    const auto backbone_handle = sign_sigma > 0. ? &NonlinearK4::compute_tension_backbone : &NonlinearK4::compute_compression_backbone;
-    const auto damage_handle = sign_sigma > 0. ? &NonlinearK4::compute_tension_damage : &NonlinearK4::compute_compression_damage;
+    const auto backbone_handle = sign_sigma > 0. ? std::mem_fn(&NonlinearK4::compute_tension_backbone) : std::mem_fn(&NonlinearK4::compute_compression_backbone);
+    const auto damage_handle = sign_sigma > 0. ? std::mem_fn(&NonlinearK4::compute_tension_damage) : std::mem_fn(&NonlinearK4::compute_compression_damage);
 
     auto counter = 0u;
     auto ref_error = 1.;
@@ -34,12 +34,12 @@ int NonlinearK4::compute_plasticity(double& k) {
             return SUANPAN_FAIL;
         }
 
-        const auto backbone = (this->*backbone_handle)(k);
+        const auto backbone = backbone_handle(this, k);
         const auto residual = fabs(trial_stress(0)) - backbone(0);
 
         if(1u == counter && residual <= 0.) {
             if(apply_damage) {
-                const auto damage = (this->*damage_handle)(k);
+                const auto damage = damage_handle(this, k);
                 const auto damage_factor = 1. - damage(0);
 
                 trial_stress *= damage_factor;
@@ -59,7 +59,7 @@ int NonlinearK4::compute_plasticity(double& k) {
             trial_stiffness -= dgamma * elastic_modulus;
 
             if(apply_damage) {
-                const auto damage = (this->*damage_handle)(k);
+                const auto damage = damage_handle(this, k);
                 const auto damage_factor = 1. - damage(0);
 
                 trial_stiffness *= damage_factor;
