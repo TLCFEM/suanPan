@@ -15,6 +15,7 @@
 5. better local iteration convergence criterion [#161](https://github.com/TLCFEM/suanPan/pull/161)
 6. `B31OS` and `EB31OS` associated transformations `B3DOSL`, `B3DOSC`; sections, `Fibre3DOS`, `Cell3DOS`; material wrappers `OS146`, `OS146S`
 7. elemental damping using Lee's model
+8. support Lode angle in CDPM2 [#163](https://github.com/TLCFEM/suanPan/pull/163)
 
 ## version 3.1
 
@@ -37,7 +38,7 @@
 
 ## version 2.9
 
-1. matrix optimsation
+1. matrix optimisation
 2. update `Catch2` to version `3.3.1`
 3. update `TBB` to version `2021.8.0`
 4. add mixed precision algorithm for `MUMPS` solver [#119](https://github.com/TLCFEM/suanPan/pull/119)
