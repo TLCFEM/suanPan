@@ -86,9 +86,9 @@ private:
 
     const DamageType damage_type = DamageType::ANISOTROPIC;
 
-    void compute_plasticity(double, double, double, double, podarray<double>&) const;
-    int compute_damage(double, double, double, double, double, podarray<double>&);
-    int compute_damage_factor(double, double, double, double, double&, podarray<double>&) const;
+    void compute_plasticity(double, double, double, double, vec&) const;
+    int compute_damage(double, double, double, double, double, vec&);
+    int compute_damage_factor(double, double, double, double, double&, vec&) const;
 
 public:
     CDPM2(unsigned,   // tag

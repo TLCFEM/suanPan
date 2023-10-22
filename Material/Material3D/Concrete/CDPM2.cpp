@@ -26,7 +26,7 @@ const double CDPM2::sqrt_six = std::sqrt(6.);
 const double CDPM2::sqrt_three_two = std::sqrt(1.5);
 const mat CDPM2::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
-void CDPM2::compute_plasticity(const double lode, const double s, const double p, const double kp, podarray<double>& data) const {
+void CDPM2::compute_plasticity(const double lode, const double s, const double p, const double kp, vec& data) const {
     auto& f = data(0);
     auto& pfps = data(1);
     auto& pfpp = data(2);
@@ -136,7 +136,7 @@ void CDPM2::compute_plasticity(const double lode, const double s, const double p
     }
 }
 
-int CDPM2::compute_damage(const double gamma, const double s, const double p, const double kp, const double ac, podarray<double>& data) {
+int CDPM2::compute_damage(const double gamma, const double s, const double p, const double kp, const double ac, vec& data) {
     const auto gs = data(4);
     const auto gp = data(5);
     const auto gg = data(6);
@@ -272,7 +272,7 @@ int CDPM2::compute_damage(const double gamma, const double s, const double p, co
     const auto pkdc2pac = pkdcpac / xs;
     const auto pkdc2pl = pkdcpl / xs;
 
-    podarray<double> datad(3);
+    vec datad(3);
 
     if(SUANPAN_SUCCESS != compute_damage_factor(kdt, kdt1, kdt2, eft, omegat, datad)) return SUANPAN_FAIL;
     const auto& potpkdt = datad(0);
@@ -315,7 +315,7 @@ int CDPM2::compute_damage(const double gamma, const double s, const double p, co
     return SUANPAN_SUCCESS;
 }
 
-int CDPM2::compute_damage_factor(const double kd, const double kd1, const double kd2, const double ef, double& omega, podarray<double>& data) const {
+int CDPM2::compute_damage_factor(const double kd, const double kd1, const double kd2, const double ef, double& omega, vec& data) const {
     auto& popkd = data(0);
     auto& popkd1 = data(1);
     auto& popkd2 = data(2);
@@ -427,7 +427,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
 
     vec residual(4), incre;
 
-    podarray<double> data(18);
+    vec data(18);
     const auto& f = data(0);
     const auto& pfps = data(1);
     const auto& pfpp = data(2);
@@ -488,6 +488,11 @@ int CDPM2::update_trial_status(const vec& t_strain) {
         }
 
         compute_plasticity(lode, s, p, kp, data);
+
+        if(!data.is_finite()) {
+            suanpan_error("Non-finite value detected.\n");
+            return SUANPAN_FAIL;
+        }
 
         if(1u == counter) {
             if(f < 0.) break;
