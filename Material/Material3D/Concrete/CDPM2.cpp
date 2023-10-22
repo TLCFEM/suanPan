@@ -466,7 +466,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
 
                 approx_update(0.); // clear data
 
-                gamma = ini_f / elastic_modulus;
+                gamma = ini_f / elastic_modulus / elastic_modulus;
                 auto x1 = 0., f1 = ini_f;
                 // find a proper bracket
                 while(true) {
