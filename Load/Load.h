@@ -44,6 +44,7 @@ protected:
 
     vec trial_load;
     vec trial_settlement;
+    sp_vec reference_load;
 
     friend void set_load_multiplier(double);
 
@@ -67,6 +68,7 @@ public:
 
     [[nodiscard]] const vec& get_trial_load() const;
     [[nodiscard]] const vec& get_trial_settlement() const;
+    [[nodiscard]] const sp_vec& get_reference_load() const;
 };
 
 void set_load_multiplier(double);

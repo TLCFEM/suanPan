@@ -9,4 +9,5 @@
 #include "NodalAcceleration.h"
 #include "NodalDisplacement.h"
 #include "NodalForce.h"
+#include "ReferenceForce.h"
 #include "SupportMotion.h"

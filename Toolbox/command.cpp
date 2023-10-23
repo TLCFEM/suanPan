@@ -470,6 +470,9 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     if(is_equal(command_id, "bodyforce")) return load_handler();
     if(is_equal(command_id, "groupbodyforce")) return load_handler();
     if(is_equal(command_id, "cload")) return load_handler();
+    if(is_equal(command_id, "refload")) return load_handler();
+    if(is_equal(command_id, "refforce")) return load_handler();
+    if(is_equal(command_id, "refereceload")) return load_handler();
     if(is_equal(command_id, "groupcload")) return load_handler();
     if(is_equal(command_id, "lineudl2d")) return load_handler();
     if(is_equal(command_id, "lineudl3d")) return load_handler();

@@ -15,34 +15,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class ArcLength
- * @brief A ArcLength class.
+ * @class ReferenceForce
+ * @brief A ReferenceForce class.
  *
- * This class corresponds to the Static, Riks step in Abaqus, which handles a
- * static problem using arc-length solvers.
+ * The ReferenceForce class is in charge of handling concentrated reference load.
  *
  * @author tlc
- * @date 27/09/2017
- * @version 0.1.2
- * @file ArcLength.h
- * @addtogroup Step
+ * @date 23/10/2023
+ * @version 0.1.0
+ * @file ReferenceForce.h
+ * @addtogroup Load
  * @{
  */
 
-#ifndef ARCLENGTH_H
-#define ARCLENGTH_H
+#ifndef REFERENCEFORCE_H
+#define REFERENCEFORCE_H
 
-#include <Step/Step.h>
+#include <Load/Load.h>
 
-class ArcLength final : public Step {
+class ReferenceForce final : public Load {
 public:
-    explicit ArcLength(unsigned);
+    ReferenceForce(unsigned, // tag
+                   unsigned, // start step tag
+                   double,   // magnitude
+                   uvec&&,   // node tags
+                   unsigned  // dof tag
+    );
 
-    int initialize() override;
-
-    int analyze() override;
+    int process(const shared_ptr<DomainBase>&) override;
 };
 
-#endif // ARCLENGTH_H
+#endif
 
 //! @}

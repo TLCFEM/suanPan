@@ -23,11 +23,8 @@
 #include <Solver/Integrator/Integrator.h>
 #include <Solver/Ramm.h>
 
-ArcLength::ArcLength(const unsigned T, const unsigned NT, const unsigned DT, const double MA)
-    : Step(T, 0.)
-    , node(NT)
-    , dof(DT)
-    , magnitude(MA) {}
+ArcLength::ArcLength(const unsigned T)
+    : Step(T, 0.) {}
 
 int ArcLength::initialize() {
     const auto t_domain = database.lock();
@@ -60,8 +57,6 @@ int ArcLength::initialize() {
 
     factory->set_reference_size(1);
     factory->initialize_load_factor();
-
-    factory->modify_reference_load()(t_domain->get_node(node)->get_reordered_dof().at(dof - 1)) = magnitude;
 
     return SUANPAN_SUCCESS;
 }

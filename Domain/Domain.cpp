@@ -33,7 +33,7 @@
 #include <Section/Section.h>
 #include <Solver/Integrator/Integrator.h>
 #include <Solver/Solver.h>
-#include <Step/Step.h>
+#include <Step/ArcLength.h>
 #include <Toolbox/sort_color.hpp>
 #include <Toolbox/sort_rcm.h>
 #include <Toolbox/Expression.h>
@@ -1110,6 +1110,9 @@ int Domain::process_load(const bool full) {
     auto& trial_settlement = factory->modify_trial_settlement();
     if(!trial_settlement.empty()) trial_settlement.zeros();
 
+    auto reference_load = factory->get_reference_load();
+    if(!reference_load.empty()) reference_load.zeros();
+
     const auto process_handler = full ? std::mem_fn(&Load::process) : std::mem_fn(&Load::process_resistance);
 
     std::atomic_int code = 0;
@@ -1129,10 +1132,18 @@ int Domain::process_load(const bool full) {
             std::scoped_lock trial_settlement_lock(factory->get_trial_settlement_mutex());
             trial_settlement += t_load->get_trial_settlement();
         }
+        if(!t_load->get_reference_load().empty() && !reference_load.empty()) {
+            std::scoped_lock reference_load_lock(factory->get_reference_load_mutex());
+            reference_load += t_load->get_reference_load();
+        }
     });
 
     factory->update_trial_load(trial_load);
     factory->update_trial_settlement(trial_settlement);
+
+    // only consider custom reference load pattern in arc-length method
+    // otherwise, the reference load is automatically updated
+    if(std::dynamic_pointer_cast<ArcLength>(get_current_step())) factory->set_reference_load(reference_load);
 
     return code;
 }

@@ -425,6 +425,7 @@ public:
 
     std::mutex& get_trial_load_mutex();
     std::mutex& get_trial_settlement_mutex();
+    std::mutex& get_reference_load_mutex();
 
     std::mutex& get_mass_mutex();
     std::mutex& get_damping_mutex();
@@ -1020,15 +1021,17 @@ template<sp_d T> std::mutex& Factory<T>::get_trial_load_mutex() { return global_
 
 template<sp_d T> std::mutex& Factory<T>::get_trial_settlement_mutex() { return global_mutex.at(6); }
 
-template<sp_d T> std::mutex& Factory<T>::get_mass_mutex() { return global_mutex.at(7); }
+template<sp_d T> std::mutex& Factory<T>::get_reference_load_mutex() { return global_mutex.at(7); }
 
-template<sp_d T> std::mutex& Factory<T>::get_damping_mutex() { return global_mutex.at(8); }
+template<sp_d T> std::mutex& Factory<T>::get_mass_mutex() { return global_mutex.at(8); }
 
-template<sp_d T> std::mutex& Factory<T>::get_nonviscous_mutex() { return global_mutex.at(9); }
+template<sp_d T> std::mutex& Factory<T>::get_damping_mutex() { return global_mutex.at(9); }
 
-template<sp_d T> std::mutex& Factory<T>::get_stiffness_mutex() { return global_mutex.at(10); }
+template<sp_d T> std::mutex& Factory<T>::get_nonviscous_mutex() { return global_mutex.at(10); }
 
-template<sp_d T> std::mutex& Factory<T>::get_geometry_mutex() { return global_mutex.at(11); }
+template<sp_d T> std::mutex& Factory<T>::get_stiffness_mutex() { return global_mutex.at(11); }
+
+template<sp_d T> std::mutex& Factory<T>::get_geometry_mutex() { return global_mutex.at(12); }
 
 template<sp_d T> const Col<T>& Factory<T>::get_eigenvalue() const { return eigenvalue; }
 
