@@ -45,22 +45,20 @@ element EB21 18 18 19 100 1 1 1
 element EB21 19 19 20 100 1 1 1
 element EB21 20 20 21 100 1 1 1
 
-fix2 1 1 1 21
-fix2 2 2 1 21
+fix 1 1 1 21
+fix 2 2 1 21
 
 recorder 1 hdf5 Node U 7
 # recorder 2 hdf5 Node RF1 7
 
 refforce 1 0 -300 2 7
 
-step arclength 1 7 2 -300
-set ini_step_size 1E-2
-set max_step_size 5E-2
+step arclength 1
 set symm_mat false
 
 criterion MinDisplacement 1 7 2 -1.8
 
-converger RelIncreDisp 1 1E-10 5 1
+converger RelIncreDisp 1 1E-10 6 1
 
 analyze
 
@@ -68,9 +66,9 @@ analyze
 # Coordinate:
 #   4.0223e+00  8.3955e-01
 # Displacement:
-#   1.7097e-02 -1.8069e+00  1.6767e-01
+#   2.8077e-02 -1.8912e+00  1.5941e-01
 # Resistance:
-#   2.1757e-10 -1.8595e+02  1.9327e-12
+#  -1.2903e-10 -4.1933e+02 -1.3188e-11
 peek node 7
 
 # save recorder 1
