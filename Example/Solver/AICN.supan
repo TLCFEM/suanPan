@@ -45,6 +45,8 @@ peek element 1
 #   1.0000e+01  2.0000e+01
 peek node 3 4
 
+peek solver 1
+
 reset
 clear
 exit
