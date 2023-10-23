@@ -51,6 +51,8 @@ fix 2 2 1 21
 recorder 1 hdf5 Node U 7
 # recorder 2 hdf5 Node RF1 7
 
+refforce 1 0 -300 2 7
+
 step arclength 1 7 2 -300
 set symm_mat false
 

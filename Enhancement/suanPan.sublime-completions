@@ -2935,7 +2935,7 @@
       "trigger":"Allman"
     },
     {
-      "contents":"",
+      "contents":"step arclength ${1:(1)}\n# (1) int, unique step tag",
       "details":"",
       "kind":"type",
       "trigger":"ArcLength"

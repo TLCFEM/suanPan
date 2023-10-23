@@ -42,7 +42,9 @@ fix 2 2 1 17
 
 recorder 1 hdf5 Node U 11
 
-step arclength 1 11 2 -20
+refload 1 0 -20 2 11
+
+step arclength 1
 solver Ramm 1
 set ini_step_size .1
 set min_step_size .05
