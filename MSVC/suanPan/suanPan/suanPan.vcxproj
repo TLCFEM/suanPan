@@ -294,6 +294,7 @@
     <ClCompile Include="..\..\..\Load\NodalAcceleration.cpp" />
     <ClCompile Include="..\..\..\Load\NodalDisplacement.cpp" />
     <ClCompile Include="..\..\..\Load\NodalForce.cpp" />
+    <ClCompile Include="..\..\..\Load\ReferenceForce.cpp" />
     <ClCompile Include="..\..\..\Load\SupportMotion.cpp" />
     <ClCompile Include="..\..\..\Material\ExternalMaterial.cpp" />
     <ClCompile Include="..\..\..\Material\Material.cpp" />
@@ -778,6 +779,7 @@
     <ClInclude Include="..\..\..\Load\NodalAcceleration.h" />
     <ClInclude Include="..\..\..\Load\NodalDisplacement.h" />
     <ClInclude Include="..\..\..\Load\NodalForce.h" />
+    <ClInclude Include="..\..\..\Load\ReferenceForce.h" />
     <ClInclude Include="..\..\..\Load\SupportMotion.h" />
     <ClInclude Include="..\..\..\Material\ExternalMaterial.h" />
     <ClInclude Include="..\..\..\Material\ExternalMaterialData.h" />

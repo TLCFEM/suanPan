@@ -1110,6 +1110,9 @@ int Domain::process_load(const bool full) {
     auto& trial_settlement = factory->modify_trial_settlement();
     if(!trial_settlement.empty()) trial_settlement.zeros();
 
+    auto& reference_load = factory->modify_reference_load();
+    if(!reference_load.empty()) reference_load.zeros();
+
     const auto process_handler = full ? std::mem_fn(&Load::process) : std::mem_fn(&Load::process_resistance);
 
     std::atomic_int code = 0;
@@ -1128,6 +1131,10 @@ int Domain::process_load(const bool full) {
         if(!t_load->get_trial_settlement().empty() && !trial_settlement.empty()) {
             std::scoped_lock trial_settlement_lock(factory->get_trial_settlement_mutex());
             trial_settlement += t_load->get_trial_settlement();
+        }
+        if(!t_load->get_reference_load().empty() && !reference_load.empty()) {
+            std::scoped_lock reference_load_lock(factory->get_reference_load_mutex());
+            reference_load += t_load->get_reference_load();
         }
     });
 

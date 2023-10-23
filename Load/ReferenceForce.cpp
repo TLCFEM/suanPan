@@ -14,35 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-/**
- * @class ArcLength
- * @brief A ArcLength class.
- *
- * This class corresponds to the Static, Riks step in Abaqus, which handles a
- * static problem using arc-length solvers.
- *
- * @author tlc
- * @date 27/09/2017
- * @version 0.1.2
- * @file ArcLength.h
- * @addtogroup Step
- * @{
- */
 
-#ifndef ARCLENGTH_H
-#define ARCLENGTH_H
+#include "ReferenceForce.h"
+#include <Domain/DomainBase.h>
+#include <Domain/Factory.hpp>
 
-#include <Step/Step.h>
+ReferenceForce::ReferenceForce(const unsigned T, const unsigned S, const double L, uvec&& N, const unsigned D)
+    : Load(T, S, 0, std::forward<uvec>(N), uvec{D}, L) {}
 
-class ArcLength final : public Step {
-public:
-    explicit ArcLength(unsigned);
+int ReferenceForce::process(const shared_ptr<DomainBase>& D) {
+    const auto& W = D->get_factory();
 
-    int initialize() override;
+    reference_load.zeros(W->get_size());
 
-    int analyze() override;
-};
+    for(const auto I : get_nodal_active_dof(D)) reference_load(I) = pattern;
 
-#endif // ARCLENGTH_H
-
-//! @}
+    return SUANPAN_SUCCESS;
+}

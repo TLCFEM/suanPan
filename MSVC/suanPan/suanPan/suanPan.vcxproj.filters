@@ -1573,6 +1573,9 @@
     <ClCompile Include="..\..\..\Element\Modifier\ElementalNonviscous.cpp">
       <Filter>Element\Modifier</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Load\ReferenceForce.cpp">
+      <Filter>Load</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -3003,6 +3006,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Toolbox\ridders.hpp">
       <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Load\ReferenceForce.h">
+      <Filter>Load</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
