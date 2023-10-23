@@ -347,6 +347,15 @@ int create_new_solver(const shared_ptr<DomainBase>& domain, istringstream& comma
     auto code = 0;
     if(is_equal(solver_type, "Newton")) { if(domain->insert(make_shared<Newton>(tag))) code = 1; }
     else if(is_equal(solver_type, "modifiedNewton") || is_equal(solver_type, "mNewton")) { if(domain->insert(make_shared<Newton>(tag, true))) code = 1; }
+    else if(is_equal(solver_type, "AICN")) {
+        auto length = 1.;
+        if(!command.eof() && !get_input(command, length)) {
+            suanpan_error("A valid length is required.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        if(domain->insert(make_shared<AICN>(tag, length))) code = 1;
+    }
     else if(is_equal(solver_type, "BFGS")) { if(domain->insert(make_shared<BFGS>(tag))) code = 1; }
     else if(is_equal(solver_type, "LBFGS")) {
         auto max_history = 20;

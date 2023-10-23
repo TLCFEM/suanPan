@@ -14,6 +14,7 @@ fix2 1 P 1
 displacement 1 0 1 2 3 ! wrong node
 
 step static 1 1
+solver Newton 1
 set fixed_step_size 1
 
 converger RelIncreDisp 1 1E-12 10 1

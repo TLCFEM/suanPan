@@ -16,6 +16,7 @@
 6. `B31OS` and `EB31OS` associated transformations `B3DOSL`, `B3DOSC`; sections, `Fibre3DOS`, `Cell3DOS`; material wrappers `OS146`, `OS146S`
 7. elemental damping using Lee's model
 8. support Lode angle in CDPM2 [#163](https://github.com/TLCFEM/suanPan/pull/163)
+9. add `AICN` cubic Newton solver [#165](https://github.com/TLCFEM/suanPan/pull/165)
 
 ## version 3.1
 

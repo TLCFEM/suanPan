@@ -63,7 +63,7 @@ int Dynamic::initialize() {
 
     // solver
     // avoid arc length solver
-    if(nullptr != solver) if(dynamic_cast<Ramm*>(solver.get())) solver = nullptr;
+    if(nullptr != solver) if(std::dynamic_pointer_cast<Ramm>(solver)) solver = nullptr;
     // automatically enable displacement controlled solver
     if(nullptr == solver) {
         auto flag = false;
@@ -75,7 +75,7 @@ int Dynamic::initialize() {
         flag ? solver = make_shared<MPDC>() : solver = make_shared<Newton>();
     }
 
-    if(dynamic_cast<BFGS*>(solver.get()) && dynamic_cast<LeeNewmarkBase*>(modifier.get())) {
+    if(std::dynamic_pointer_cast<BFGS>(solver) && std::dynamic_pointer_cast<LeeNewmarkBase>(modifier)) {
         suanpan_error("BFGS solver is not supported by Lee's damping model.\n");
         return SUANPAN_FAIL;
     }

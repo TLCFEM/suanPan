@@ -5413,10 +5413,16 @@
       "trigger":"LAPACK"
     },
     {
-      "contents":"",
+      "contents":"solver LBFGS ${1:(1)} ${2:[2]}\n# (1) int, unique solver tag\n# [2] int, maximum number of history, default: 20",
       "details":"",
       "kind":"type",
       "trigger":"LBFGS"
+    },
+    {
+      "contents":"solver AICN ${1:(1)} ${2:[2]}\n# (1) int, unique solver tag\n# [2] double, approx. length, default: 1.0",
+      "details":"AICN Solver",
+      "kind":"type",
+      "trigger":"AICN"
     },
     {
       "contents":"",

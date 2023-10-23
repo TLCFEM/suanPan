@@ -46,14 +46,16 @@ int Static::initialize() {
 
     // solver
     // automatically enable displacement controlled solver
-    if(nullptr == solver) {
-        auto flag = false;
-        for(const auto& I : t_domain->get_load_pool())
-            if(I->if_displacement_control() && I->get_start_step() == get_tag()) {
-                flag = true;
-                break;
-            }
-        flag ? solver = make_shared<MPDC>() : solver = make_shared<Newton>();
+    auto flag = false;
+    for(const auto& I : t_domain->get_load_pool())
+        if(I->if_displacement_control() && I->get_start_step() == get_tag()) {
+            flag = true;
+            break;
+        }
+    if(nullptr == solver) flag ? solver = make_shared<MPDC>() : solver = make_shared<Newton>();
+    else if(flag && nullptr == std::dynamic_pointer_cast<MPDC>(solver)) {
+        suanpan_warning("Wrong solver assigned, using MPDC instead.\n");
+        solver = make_shared<MPDC>();
     }
 
     solver->set_integrator(modifier);
