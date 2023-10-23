@@ -85,11 +85,13 @@ int Newton::analyze() {
         // call solver
         t_clock.tic();
 
-        auto flag = G->solve(samurai, G->get_force_residual());
+        const auto residual = G->get_force_residual();
+
+        auto flag = G->solve(samurai, residual);
 
         suanpan_assert([&] {
             if(!samurai.is_finite()) {
-                suanpan_fatal("Infinite number detected.\n");
+                suanpan_fatal("Non-finite number detected.\n");
                 flag = SUANPAN_FAIL;
             }
         });
@@ -99,6 +101,8 @@ int Newton::analyze() {
             suanpan_error("Error code {} received.\n", flag);
             return flag;
         }
+
+        if(const auto amp = amplification(samurai, residual); amp > 0.) samurai *= amp;
 
         // deal with mpc
         if(const auto n_size = W->get_size(); 0 != W->get_mpc()) {
@@ -151,4 +155,20 @@ int Newton::analyze() {
 
 void Newton::print() {
     suanpan_info("A solver based on Newton-Raphson method{}", initial_stiffness ? " using initial stiffness for each substep.\n" : ".\n");
+}
+
+double AICN::amplification(const vec& x, const vec& r) const {
+    const auto hessian_norm = dot(x, r);
+    if(hessian_norm <= 0.) return 0.;
+    const auto root_norm = l_est * std::sqrt(hessian_norm);
+    const auto amp = (std::sqrt(1. + 2. * root_norm) - 1.) / root_norm;
+    return std::isfinite(amp) ? amp : 0.;
+}
+
+AICN::AICN(const unsigned T, const double L)
+    : Newton(T)
+    , l_est(fabs(L)) {}
+
+void AICN::print() {
+    suanpan_info("A solver based on cubic Newton method. arXiv:2211.00140\n");
 }

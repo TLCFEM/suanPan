@@ -30,13 +30,26 @@
 
 #include <Solver/Solver.h>
 
-class Newton final : public Solver {
+class Newton : public Solver {
     const bool initial_stiffness;
+
+    [[nodiscard]] virtual double amplification(const vec&, const vec&) const { return 0.; }
 
 public:
     explicit Newton(unsigned = 0, bool = false);
 
     int analyze() override;
+
+    void print() override;
+};
+
+class AICN : public Newton {
+    const double l_est;
+
+    [[nodiscard]] double amplification(const vec&, const vec&) const override;
+
+public:
+    explicit AICN(unsigned = 0, double = 1.);
 
     void print() override;
 };
