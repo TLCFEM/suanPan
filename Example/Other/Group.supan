@@ -172,6 +172,7 @@ groupcload 1 0 2 2 1
 
 plainrecorder 1 GroupSum RF2 1
 plainrecorder 2 GroupNode RF2 3
+plainrecorder 3 Sum RF2 1 2 3 4
 
 step static 1
 
@@ -189,6 +190,8 @@ peek node 117
 peek element 1
 
 peek group 4
+
+peek recorder 1 2 3
 
 reset
 clear
