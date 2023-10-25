@@ -604,3 +604,5 @@ OutputType to_list(const char* L) {
 
     return OutputType::NL;
 }
+
+OutputType to_list(const std::string& L) { return to_list(L.c_str()); }

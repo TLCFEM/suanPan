@@ -80,5 +80,5 @@ void EigenRecorder::save() {
 }
 
 void EigenRecorder::print() {
-    suanpan_info("A recorder to record eigen values and eigen vectors.\n");
+    suanpan_info("A recorder to record eigenvalues and eigenvectors.\n");
 }

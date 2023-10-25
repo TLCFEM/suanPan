@@ -436,7 +436,7 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     if(is_equal(command_id, "constraint")) return create_new_constraint(domain, command);
     if(is_equal(command_id, "criterion")) return create_new_criterion(domain, command);
     if(is_equal(command_id, "element")) return create_new_element(domain, command);
-    if(is_equal(command_id, "hdf5recorder")) return create_new_hdf5recorder(domain, command);
+    if(is_equal(command_id, "hdf5recorder")) return create_new_recorder(domain, command, true);
     if(is_equal(command_id, "import")) return create_new_external_module(domain, command);
     if(is_equal(command_id, "initial")) return create_new_initial(domain, command);
     if(is_equal(command_id, "integrator")) return create_new_integrator(domain, command);
@@ -446,7 +446,7 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     if(is_equal(command_id, "modifier")) return create_new_modifier(domain, command);
     if(is_equal(command_id, "node")) return create_new_node(domain, command);
     if(is_equal(command_id, "orientation")) return create_new_orientation(domain, command);
-    if(is_equal(command_id, "plainrecorder")) return create_new_plainrecorder(domain, command);
+    if(is_equal(command_id, "plainrecorder")) return create_new_recorder(domain, command, false);
     if(is_equal(command_id, "recorder")) return create_new_recorder(domain, command);
     if(is_equal(command_id, "section")) return create_new_section(domain, command);
     if(is_equal(command_id, "solver")) return create_new_solver(domain, command);

@@ -53,7 +53,7 @@ vtkInfo vtk_process(istringstream& command) {
         if(is_equal(keyword, "scale") && !get_input(command, config.scale)) config.scale = 1.;
         else if(is_equal(keyword, "deformed")) config.on_deformed = true;
         else if(is_equal(keyword, "undeformed")) config.on_deformed = false;
-        else if(is_equal(keyword, "type") && get_input(command, keyword)) config.type = to_list(keyword.c_str());
+        else if(is_equal(keyword, "type") && get_input(command, keyword)) config.type = to_list(keyword);
         else if(is_equal(keyword, "fontsize") && !get_input(command, config.font_size)) config.font_size = 8;
         else if(is_equal(keyword, "save") && get_input(command, config.file_name)) config.save_file = true;
         else if(is_equal(keyword, "nobar")) config.colorbar = false;

@@ -18,6 +18,8 @@
 #ifndef OUTPUTTYPE_H
 #define OUTPUTTYPE_H
 
+#include <string>
+
 enum class OutputType {
     // damper stress in Maxwell model
     SD,
@@ -268,5 +270,6 @@ enum class OutputType {
 
 const char* to_char(const OutputType&);
 OutputType to_list(const char*);
+OutputType to_list(const std::string&);
 
 #endif

@@ -504,7 +504,7 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, istringstream& co
             return SUANPAN_SUCCESS;
         }
 
-        domain->insert(make_shared<MaxHistory>(tag, step_tag, to_list(type.c_str()), limit));
+        domain->insert(make_shared<MaxHistory>(tag, step_tag, to_list(type), limit));
 
         return SUANPAN_SUCCESS;
     }
