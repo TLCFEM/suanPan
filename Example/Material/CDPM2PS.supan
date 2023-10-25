@@ -22,7 +22,7 @@ set fixed_step_size 0
 set ini_step_size 1E-2
 set symm_mat 0
 
-converger RelIncreDisp 1 1E-10 20 1
+converger AbsIncreDisp 1 1E-10 7 1
 
 analyze
 
@@ -32,17 +32,17 @@ analyze
 # Coordinate:
 #   1.0000e+00  1.0000e+00
 # Displacement:
-#  -8.0000e-04  8.4429e-04
+#  -8.0000e-04  7.8386e-04
 # Resistance:
-#  -3.1357e-01  3.3307e-16
+#  -4.4910e-01 -1.4752e-13
 # 
 # Node 4:
 # Coordinate:
 #   0.0000e+00  1.0000e+00
 # Displacement:
-#  -8.0000e-04 -2.3069e-04
+#  -8.0000e-04 -2.2095e-04
 # Resistance:
-#  -9.1624e-01 -3.3307e-16
+#  -8.4607e-01  7.0818e-14
 peek node 3 4
 
 reset
