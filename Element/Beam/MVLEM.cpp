@@ -208,8 +208,8 @@ vector<vec> MVLEM::record(const OutputType P) {
     vector<vec> data;
 
     for(const auto& I : axial_spring) {
-        for(const auto& J : I.c_material->record(P)) data.emplace_back(J);
-        for(const auto& J : I.s_material->record(P)) data.emplace_back(J);
+        append_to(data, I.c_material->record(P));
+        append_to(data, I.s_material->record(P));
     }
 
     return data;

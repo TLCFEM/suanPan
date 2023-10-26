@@ -607,6 +607,11 @@ double Element::get_characteristic_length() const { return characteristic_length
 
 mat Element::compute_shape_function(const mat&, unsigned) const { return {}; }
 
+std::vector<vec>& append_to(std::vector<vec>& a, std::vector<vec>&& b) {
+    a.insert(a.end(), std::make_move_iterator(b.begin()), std::make_move_iterator(b.end()));
+    return a;
+}
+
 void ConstantMass(DataElement* E) {
     E->update_mass = false;
     E->current_mass = mat(E->initial_mass.memptr(), E->initial_mass.n_rows, E->initial_mass.n_cols, false, true);

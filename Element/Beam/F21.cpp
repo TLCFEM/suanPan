@@ -141,7 +141,7 @@ vector<vec> F21::record(const OutputType P) {
     if(P == OutputType::BEAMS) return {current_local_resistance};
 
     vector<vec> output;
-    for(const auto& I : int_pt) for(const auto& J : I.b_section->record(P)) output.emplace_back(J);
+    for(const auto& I : int_pt) append_to(output, I.b_section->record(P));
     return output;
 }
 

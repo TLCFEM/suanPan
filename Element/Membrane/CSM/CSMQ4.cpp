@@ -205,7 +205,7 @@ vector<vec> CSMQ4::record(const OutputType P) {
         output.emplace_back(vec{dot(interpolation::linear(1., 1.), X)});
         output.emplace_back(vec{dot(interpolation::linear(-1., 1.), X)});
     }
-    else for(const auto& I : int_pt) for(const auto& J : I.m_material->record(P)) output.emplace_back(J);
+    else for(const auto& I : int_pt) append_to(output, I.m_material->record(P));
 
     return output;
 }

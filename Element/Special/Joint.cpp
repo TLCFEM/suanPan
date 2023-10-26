@@ -72,7 +72,7 @@ int Joint::reset_status() {
 
 vector<vec> Joint::record(const OutputType P) {
     vector<vec> data;
-    for(const auto& I : j_material) for(auto& J : I->record(P)) data.emplace_back(J);
+    for(const auto& I : j_material) append_to(data, I->record(P));
     return data;
 }
 

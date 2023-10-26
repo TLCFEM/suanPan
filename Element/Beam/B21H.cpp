@@ -120,11 +120,11 @@ int B21H::reset_status() {
 
 vector<vec> B21H::record(const OutputType P) {
     vector<vec> output;
-    for(const auto& I : int_pt[0].b_section->record(P)) output.emplace_back(I);
-    for(const auto& I : int_pt[1].b_section->record(P)) output.emplace_back(I);
-    for(const auto& I : elastic_int_pt) for(const auto& J : I.b_section->record(P)) output.emplace_back(J);
-    for(const auto& I : int_pt[2].b_section->record(P)) output.emplace_back(I);
-    for(const auto& I : int_pt[3].b_section->record(P)) output.emplace_back(I);
+    append_to(output, int_pt[0].b_section->record(P));
+    append_to(output, int_pt[1].b_section->record(P));
+    for(const auto& I : elastic_int_pt) append_to(output, I.b_section->record(P));
+    append_to(output, int_pt[2].b_section->record(P));
+    append_to(output, int_pt[3].b_section->record(P));
     return output;
 }
 

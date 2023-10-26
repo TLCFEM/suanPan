@@ -191,7 +191,7 @@ int B31OS::reset_status() {
 
 vector<vec> B31OS::record(const OutputType P) {
     vector<vec> output;
-    for(const auto& I : int_pt) for(const auto& J : I.b_section->record(P)) output.emplace_back(J);
+    for(const auto& I : int_pt) append_to(output, I.b_section->record(P));
     return output;
 }
 
