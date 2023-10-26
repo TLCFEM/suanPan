@@ -209,7 +209,7 @@ vector<vec> QE2::record(const OutputType T) {
 
     if(T == OutputType::E) for(const auto& I : int_pt) data.emplace_back(I.A * current_alpha);
     else if(T == OutputType::S) for(const auto& I : int_pt) data.emplace_back(I.P * current_beta);
-    else for(const auto& I : int_pt) for(const auto& J : I.m_material->record(T)) data.emplace_back(J);
+    else for(const auto& I : int_pt) append_to(data, I.m_material->record(T));
 
     return data;
 }

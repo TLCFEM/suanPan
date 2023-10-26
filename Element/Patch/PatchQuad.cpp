@@ -148,7 +148,7 @@ int PatchQuad::reset_status() {
 
 vector<vec> PatchQuad::record(const OutputType T) {
     vector<vec> data;
-    for(const auto& I : int_pt) for(const auto& J : I.m_material->record(T)) data.emplace_back(J);
+    for(const auto& I : int_pt) append_to(data, I.m_material->record(T));
     return data;
 }
 

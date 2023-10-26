@@ -263,7 +263,7 @@ vector<vec> SGCMQ::record(const OutputType T) {
     }
     else if(T == OutputType::K) data.emplace_back(vectorise(current_stiffness));
     else if(T == OutputType::M) data.emplace_back(vectorise(current_mass));
-    else for(const auto& I : int_pt) for(const auto& J : I.m_material->record(T)) data.emplace_back(J);
+    else for(const auto& I : int_pt) append_to(data, I.m_material->record(T));
 
     return data;
 }

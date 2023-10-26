@@ -204,7 +204,7 @@ vector<vec> PCPE4DC::record(const OutputType P) {
         const auto t_disp = get_current_displacement();
         for(const auto& I : int_pt) output.emplace_back(vec{q * tensor::trace2(I.strain_mat * ((porosity - alpha) * t_disp(s_dof) - porosity * t_disp(f_dof)))});
     }
-    else for(const auto& I : int_pt) for(const auto& J : I.m_material->record(P)) output.emplace_back(J);
+    else for(const auto& I : int_pt) append_to(output, I.m_material->record(P));
 
     return output;
 }

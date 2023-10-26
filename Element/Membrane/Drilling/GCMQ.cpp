@@ -310,7 +310,7 @@ vector<vec> GCMQ::record(const OutputType T) {
             const vec t_stress = I.poly_stress * current_alpha;
             data.emplace_back(vec{sqrt(t_stress(0) * t_stress(0) - t_stress(0) * t_stress(1) + t_stress(1) * t_stress(1) + 3. * t_stress(2) * t_stress(2))});
         }
-    else for(const auto& I : int_pt) for(const auto& J : I.m_material->record(T)) data.emplace_back(J);
+    else for(const auto& I : int_pt) append_to(data, I.m_material->record(T));
 
     return data;
 }

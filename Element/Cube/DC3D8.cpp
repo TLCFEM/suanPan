@@ -132,7 +132,7 @@ vector<vec> DC3D8::record(const OutputType T) {
     if(T == OutputType::DAMAGE) return {get_current_displacement()(d_dof)};
 
     vector<vec> data;
-    for(const auto& I : int_pt) for(const auto& J : I.c_material->record(T)) data.emplace_back(J);
+    for(const auto& I : int_pt) append_to(data, I.c_material->record(T));
     return data;
 }
 

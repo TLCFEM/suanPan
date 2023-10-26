@@ -179,7 +179,7 @@ mat CP8::compute_shape_function(const mat& coordinate, const unsigned order) con
 
 vector<vec> CP8::record(const OutputType P) {
     vector<vec> output;
-    for(const auto& I : int_pt) for(const auto& J : I.m_material->record(P)) output.emplace_back(J);
+    for(const auto& I : int_pt) append_to(output, I.m_material->record(P));
     return output;
 }
 

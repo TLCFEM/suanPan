@@ -293,6 +293,8 @@ public:
     [[nodiscard]] mat compute_shape_function(const mat&, unsigned) const override;
 };
 
+std::vector<vec>& append_to(std::vector<vec>&, std::vector<vec>&&);
+
 #endif
 
 //! @}
