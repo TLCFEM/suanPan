@@ -18,23 +18,22 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable IdentifierTypo
 #include "command.h"
+#include <thread>
 #include <Constraint/Constraint.h>
 #include <Constraint/ConstraintParser.h>
 #include <Converger/Converger.h>
 #include <Converger/ConvergerParser.h>
 #include <Domain/Domain.h>
 #include <Domain/ExternalModule.h>
-#include <Domain/Group/CustomNodeGroup.h>
-#include <Domain/Group/ElementGroup.h>
-#include <Domain/Group/GroupGroup.h>
-#include <Domain/Group/NodeGroup.h>
 #include <Domain/Node.h>
+#include <Domain/Group/Group.h>
+#include <Domain/Group/GroupParser.h>
 #include <Element/Element.h>
 #include <Element/ElementParser.h>
 #include <Element/Visualisation/vtkParser.h>
-#include <Load/Amplitude/Amplitude.h>
 #include <Load/Load.h>
 #include <Load/LoadParser.h>
+#include <Load/Amplitude/Amplitude.h>
 #include <Material/Material.h>
 #include <Material/MaterialParser.h>
 #include <Material/MaterialTester.h>
@@ -42,26 +41,20 @@
 #include <Recorder/RecorderParser.h>
 #include <Section/SectionParser.h>
 #include <Section/SectionTester.h>
-#include <Solver/Integrator/Integrator.h>
 #include <Solver/Solver.h>
 #include <Solver/SolverParser.h>
+#include <Solver/Integrator/Integrator.h>
 #include <Step/Bead.h>
 #include <Step/Frequency.h>
 #include <Step/StepParser.h>
-#include <Toolbox/ExpressionParser.h>
 #include <Toolbox/argument.h>
+#include <Toolbox/Expression.h>
+#include <Toolbox/ExpressionParser.h>
 #include <Toolbox/resampling.h>
 #include <Toolbox/response_spectrum.h>
 #include <Toolbox/thread_pool.hpp>
-#include <thread>
-#ifdef SUANPAN_MKL
-#include <Domain/MetaMat/SparseMatFGMRES.hpp>
-#endif
 #ifdef SUANPAN_MAGMA
 #include <Domain/MetaMat/SparseMatMAGMA.hpp>
-#endif
-#ifdef SUANPAN_WIN
-#include <Windows.h>
 #endif
 
 using std::ifstream;
@@ -433,14 +426,12 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     if(is_equal(command_id, "amplitude")) return create_new_amplitude(domain, command);
     if(is_equal(command_id, "expression")) return create_new_expression(domain, command);
     if(is_equal(command_id, "converger")) return create_new_converger(domain, command);
-    if(is_equal(command_id, "constraint")) return create_new_constraint(domain, command);
     if(is_equal(command_id, "criterion")) return create_new_criterion(domain, command);
     if(is_equal(command_id, "element")) return create_new_element(domain, command);
     if(is_equal(command_id, "hdf5recorder")) return create_new_recorder(domain, command, true);
     if(is_equal(command_id, "import")) return create_new_external_module(domain, command);
     if(is_equal(command_id, "initial")) return create_new_initial(domain, command);
     if(is_equal(command_id, "integrator")) return create_new_integrator(domain, command);
-    if(is_equal(command_id, "load")) return create_new_load(domain, command);
     if(is_equal(command_id, "mass")) return create_new_mass(domain, command);
     if(is_equal(command_id, "material")) return create_new_material(domain, command);
     if(is_equal(command_id, "modifier")) return create_new_modifier(domain, command);
@@ -452,20 +443,29 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     if(is_equal(command_id, "solver")) return create_new_solver(domain, command);
     if(is_equal(command_id, "step")) return create_new_step(domain, command);
 
-    if(is_equal(command_id, "nodegroup")) return create_new_nodegroup(domain, command);
-    if(is_equal(command_id, "customnodegroup")) return create_new_customnodegroup(domain, command);
-    if(is_equal(command_id, "elementgroup")) return create_new_elementgroup(domain, command);
-    if(is_equal(command_id, "groupgroup")) return create_new_groupgroup(domain, command);
-    if(is_equal(command_id, "generate")) return create_new_generate(domain, command);
-    if(is_equal(command_id, "generatebyrule")) return create_new_generatebyrule(domain, command);
-    if(is_equal(command_id, "generatebypoint")) return create_new_generatebypoint(domain, command);
-    if(is_equal(command_id, "generatebyplane")) return create_new_generatebyplane(domain, command);
+    // groups
+    auto group_handler = [&] {
+        command.seekg(0);
+        return create_new_group(domain, command);
+    };
 
+    if(is_equal(command_id, "group")) return create_new_group(domain, command);
+    if(is_equal(command_id, "nodegroup")) return group_handler();
+    if(is_equal(command_id, "customnodegroup")) return group_handler();
+    if(is_equal(command_id, "elementgroup")) return group_handler();
+    if(is_equal(command_id, "groupgroup")) return group_handler();
+    if(is_equal(command_id, "generate")) return group_handler();
+    if(is_equal(command_id, "generatebyrule")) return group_handler();
+    if(is_equal(command_id, "generatebypoint")) return group_handler();
+    if(is_equal(command_id, "generatebyplane")) return group_handler();
+
+    // loads
     auto load_handler = [&] {
         command.seekg(0);
         return create_new_load(domain, command);
     };
 
+    if(is_equal(command_id, "load")) return create_new_load(domain, command);
     if(is_equal(command_id, "acceleration")) return load_handler();
     if(is_equal(command_id, "bodyforce")) return load_handler();
     if(is_equal(command_id, "groupbodyforce")) return load_handler();
@@ -486,11 +486,13 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     if(is_equal(command_id, "supportvelocity")) return load_handler();
     if(is_equal(command_id, "supportacceleration")) return load_handler();
 
+    // constraints
     auto constraint_handler = [&] {
         command.seekg(0);
         return create_new_constraint(domain, command);
     };
 
+    if(is_equal(command_id, "constraint")) return create_new_constraint(domain, command);
     if(is_equal(command_id, "fix")) return constraint_handler();
     if(is_equal(command_id, "penaltybc")) return constraint_handler();
     if(is_equal(command_id, "grouppenaltybc")) return constraint_handler();
@@ -509,6 +511,7 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     if(is_equal(command_id, "finiterestitutionwall") || is_equal(command_id, "finiterestitutionwallpenalty")) return constraint_handler();
     if(is_equal(command_id, "mpc")) return constraint_handler();
 
+    // testers
     if(is_equal(command_id, "materialtest1d")) return test_material(domain, command, 1);
     if(is_equal(command_id, "materialtest2d")) return test_material(domain, command, 3);
     if(is_equal(command_id, "materialtest3d")) return test_material(domain, command, 6);
@@ -931,199 +934,6 @@ int protect_object(const shared_ptr<DomainBase>& domain, istringstream& command)
 
     if(unsigned tag; is_equal(object_type, "element")) while(!command.eof() && get_input(command, tag)) { if(domain->find<Element>(tag)) domain->get<Element>(tag)->guard(); }
     else if(is_equal(object_type, "node")) while(!command.eof() && get_input(command, tag)) { if(domain->find<Node>(tag)) domain->get<Node>(tag)->guard(); }
-
-    return SUANPAN_SUCCESS;
-}
-
-int create_new_nodegroup(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    uword value;
-    vector<uword> value_pool;
-    while(get_input(command, value)) value_pool.push_back(value);
-
-    if(!domain->insert(make_shared<NodeGroup>(tag, value_pool)))
-        suanpan_error("Fail to create new node group.\n");
-
-    return SUANPAN_SUCCESS;
-}
-
-int create_new_customnodegroup(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    unsigned tag, expression;
-    if(!get_input(command, tag, expression)) {
-        suanpan_error("A valid tag is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    if(!domain->insert(make_shared<CustomNodeGroup>(tag, expression)))
-        suanpan_error("Fail to create new custom node group.\n");
-
-    return SUANPAN_SUCCESS;
-}
-
-int create_new_elementgroup(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    uword value;
-    vector<uword> value_pool;
-    while(get_input(command, value)) value_pool.push_back(value);
-
-    if(!domain->insert(make_shared<ElementGroup>(tag, value_pool)))
-        suanpan_error("Fail to create new element group.\n");
-
-    return SUANPAN_SUCCESS;
-}
-
-int create_new_generate(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    string type;
-    if(!get_input(command, type)) {
-        suanpan_error("A valid type is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    int start, interval, end;
-    if(!get_input(command, start)) {
-        suanpan_error("A valid tag is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    if(!get_input(command, interval)) {
-        interval = 1;
-        end = start;
-    }
-    else if(!get_input(command, end)) {
-        end = interval;
-        interval = end > start ? 1 : -1;
-    }
-
-    if(0 == interval) interval = 1;
-
-    if(start == end) interval = 1;
-    else if(start < end && interval < 0 || start > end && interval > 0) interval = -interval;
-
-    vector<uword> tag_pool;
-
-    tag_pool.reserve(std::max(1, (end - start) / interval + 1));
-
-    while(start <= end) {
-        tag_pool.emplace_back(start);
-        start += interval;
-    }
-
-    if(is_equal(type, "nodegroup") && !domain->insert(make_shared<NodeGroup>(tag, tag_pool)))
-        suanpan_error("Fail to create new node group.\n");
-    else if(is_equal(type, "elementgroup") && !domain->insert(make_shared<ElementGroup>(tag, tag_pool)))
-        suanpan_error("Fail to create new element group.\n");
-
-    return SUANPAN_SUCCESS;
-}
-
-int create_new_generatebyrule(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    string type;
-    if(!get_input(command, type)) {
-        suanpan_error("A valid type is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    unsigned dof;
-    if(!get_input(command, dof)) {
-        suanpan_error("A valid dof identifier is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    double para;
-    vector<double> pool;
-    while(!command.eof() && get_input(command, para)) pool.emplace_back(para);
-
-    if(is_equal(type, "nodegroup") && !domain->insert(make_shared<NodeGroup>(tag, dof, pool)))
-        suanpan_error("Fail to create new node group.\n");
-
-    return SUANPAN_SUCCESS;
-}
-
-int create_new_generatebyplane(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    string type;
-    if(!get_input(command, type)) {
-        suanpan_error("A valid type is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    double para;
-    vector<double> pool;
-    while(!command.eof() && get_input(command, para)) pool.emplace_back(para);
-
-    if(pool.empty()) return SUANPAN_SUCCESS;
-
-    if(is_equal(type, "nodegroup") && !domain->insert(make_shared<NodeGroup>(tag, pool)))
-        suanpan_error("Fail to create new node group.\n");
-
-    return SUANPAN_SUCCESS;
-}
-
-int create_new_generatebypoint(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    string type;
-    if(!get_input(command, type)) {
-        suanpan_error("A valid type is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    double para;
-    vector<double> pool;
-    while(!command.eof() && get_input(command, para)) pool.emplace_back(para);
-
-    if(pool.size() % 2 == 0) {
-        if(const auto size = static_cast<long long>(pool.size()) / 2; is_equal(type, "nodegroup") && !domain->insert(make_shared<NodeGroup>(tag, vector(pool.begin(), pool.begin() + size), vector(pool.end() - size, pool.end()))))
-            suanpan_error("Fail to create new node group.\n");
-    }
-
-    return SUANPAN_SUCCESS;
-}
-
-int create_new_groupgroup(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    uword para;
-    vector<uword> pool;
-    while(!command.eof() && get_input(command, para)) pool.emplace_back(para);
-
-    if(!domain->insert(make_shared<GroupGroup>(tag, pool)))
-        suanpan_error("Fail to create new group of groups.\n");
 
     return SUANPAN_SUCCESS;
 }
@@ -1652,82 +1462,60 @@ int print_command() {
     suanpan_info("The available commands are listed. Please check online manual for reference. https://tlcfem.gitbook.io/suanpan-manual/\n");
 
     constexpr auto format = "    {:<30}  {}\n";
-    suanpan_info(format, "acceleration", "define acceleration");
-    suanpan_info(format, "amplitude", "define amplitude");
+    suanpan_info(format, "amplitude", "define amplitudes");
     suanpan_info(format, "analyze/analyse", "analyse the model");
-    suanpan_info(format, "benchmark", "benchmark the platform for comparison");
-    suanpan_info(format, "clear", "clear model");
-    suanpan_info(format, "cload", "define concentrated load");
+    suanpan_info(format, "benchmark", "benchmark the platform for comparisons");
+    suanpan_info(format, "clear", "clear the model");
     suanpan_info(format, "command", "list all commands");
-    suanpan_info(format, "converger", "define converger");
-    suanpan_info(format, "criterion", "define stopping criterion");
-    suanpan_info(format, "customnodegroup", "define group containing node tags");
+    suanpan_info(format, "constraint", "define constraints such as boundary conditions");
+    suanpan_info(format, "converger", "define convergers");
+    suanpan_info(format, "criterion", "define stopping criteria");
     suanpan_info(format, "delete/erase/remove", "delete objects");
     suanpan_info(format, "disable/mute", "disable objects");
-    suanpan_info(format, "disp/displacement/dispload", "define displacement load");
-    suanpan_info(format, "domain", "create/switch to domains");
-    suanpan_info(format, "element", "define element");
-    suanpan_info(format, "elementgroup", "define group containing element tags");
+    suanpan_info(format, "domain", "create/switch to other problem domains");
+    suanpan_info(format, "element", "define elements");
     suanpan_info(format, "enable", "enable objects");
     suanpan_info(format, "example", "establish and execute a minimum example");
-    suanpan_info(format, "exit/quit", "exit program");
+    suanpan_info(format, "exit/quit", "exit the program");
     suanpan_info(format, "file", "load external files");
-    suanpan_info(format, "finiterigidwall", "define rigid wall constraint with finite dimensions");
-    suanpan_info(format, "fix/penaltybc", "define boundary conditions by penalty method");
-    suanpan_info(format, "fix2/multiplierbc", "define boundary conditions by multiplier method");
     suanpan_info(format, "fullname", "print the full path of the program");
-    suanpan_info(format, "generate", "generate node or element group by fixed interval");
-    suanpan_info(format, "generatebyplane", "generate node or element group by plane");
-    suanpan_info(format, "generatebypoint", "generate node or element group by line segment");
-    suanpan_info(format, "generatebyrule", "generate node or element group by polynomial");
-    suanpan_info(format, "groupcload", "define concentrated load based on given group");
-    suanpan_info(format, "groupdisp", "define displacement load based on given group");
-    suanpan_info(format, "groupmultiplierbc", "define boundary conditions by multiplier method based on given group");
-    suanpan_info(format, "grouppenaltybc", "define boundary conditions by penalty method based on given group");
-    suanpan_info(format, "hdf5recorder", "define recorder using hdf5 format");
-    suanpan_info(format, "help", "print help information");
-    suanpan_info(format, "import", "import external module");
-    suanpan_info(format, "initial", "define initial condition");
-    suanpan_info(format, "integrator", "define time integration algorithm");
+    suanpan_info(format, "generate", "generate node or element groups by fixed interval");
+    suanpan_info(format, "generatebyplane", "generate node or element groups by plane");
+    suanpan_info(format, "generatebypoint", "generate node or element groups by line segment");
+    suanpan_info(format, "generatebyrule", "generate node or element groups by polynomial");
+    suanpan_info(format, "hdf5recorder", "define recorders using hdf5 format");
+    suanpan_info(format, "help", "print the help information");
+    suanpan_info(format, "import", "import external modules");
+    suanpan_info(format, "initial", "define initial conditions for nodes and materials");
+    suanpan_info(format, "integrator", "define time integration algorithms");
     suanpan_info(format, "list", "list objects in the current domain");
-    suanpan_info(format, "mass", "define point mass");
-    suanpan_info(format, "material", "define material");
-    suanpan_info(format, "materialtest1d", "test independent material model using displacement/strain input");
-    suanpan_info(format, "materialtest2d", "test independent material model using displacement/strain input");
-    suanpan_info(format, "materialtest3d", "test independent material model using displacement/strain input");
-    suanpan_info(format, "materialtestwithbase3d", "test independent material model using displacement/strain input");
-    suanpan_info(format, "materialtestbyload1d", "test independent material model using force/stress input");
-    suanpan_info(format, "materialtestbyload2d", "test independent material model using force/stress input");
-    suanpan_info(format, "materialtestbyload3d", "test independent material model using force/stress input");
-    suanpan_info(format, "materialtestbyloadwithbase3d", "test independent material model using force/stress input");
-    suanpan_info(format, "modifier", "define modifier that modifies existing model properties");
-    suanpan_info(format, "mpc", "define multi-point constraint");
-    suanpan_info(format, "node", "define node");
-    suanpan_info(format, "nodegroup", "define group containing node tags");
-    suanpan_info(format, "orientation", "define beam section orientation");
+    suanpan_info(format, "material", "define materials");
+    suanpan_info(format, "materialtest*", "test materials without creating a finite element model");
+    suanpan_info(format, "modifier", "define modifiers that modify the existing model properties");
+    suanpan_info(format, "node", "define nodes");
+    suanpan_info(format, "orientation", "define beam section orientations");
     suanpan_info(format, "overview", "walk thorugh a quick overview of the application");
-    suanpan_info(format, "particlecollision", "define collision constraint between particles");
-    suanpan_info(format, "peek", "peek current information of target object");
-    suanpan_info(format, "plainrecorder", "define recorder using plain text format");
-    suanpan_info(format, "plot", "plot and optionally save model");
-    suanpan_info(format, "precheck", "check the model without analyse");
+    suanpan_info(format, "peek", "peek the current information of the target object");
+    suanpan_info(format, "plainrecorder", "define recorders using plain text format");
+    suanpan_info(format, "plot", "plot and optionally save the model with VTK");
+    suanpan_info(format, "precheck", "check the model without the actual analysis");
     suanpan_info(format, "protect", "protect objects from being disabled");
-    suanpan_info(format, "pwd", "print/change current working folder");
+    suanpan_info(format, "pwd", "print/change the current working folder");
     suanpan_info(format, "qrcode", "print a qr code");
-    suanpan_info(format, "recorder", "define recorder");
-    suanpan_info(format, "reset", "reset model to the previously converged state");
-    suanpan_info(format, "rigidwall", "define rigid wall constraint with infinite dimensions");
+    suanpan_info(format, "recorder", "define recorders");
+    suanpan_info(format, "reset", "reset the model to the previously converged state");
+    suanpan_info(format, "response_spectrum", "compute the response spectrum of a given ground motion");
     suanpan_info(format, "save", "save objects");
-    suanpan_info(format, "section", "define section");
-    suanpan_info(format, "sectiontest1d", "test independent section model using deformation input");
-    suanpan_info(format, "sectiontest2d", "test independent section model using deformation input");
-    suanpan_info(format, "sectiontest3d", "test independent section model using deformation input");
-    suanpan_info(format, "set", "set properties of analysis");
-    suanpan_info(format, "solver", "define solver");
-    suanpan_info(format, "step", "define step");
-    suanpan_info(format, "summary", "print summary for the current domain");
-    suanpan_info(format, "suspend", "suspend object in current step");
-    suanpan_info(format, "terminal", "execute command in terminal");
+    suanpan_info(format, "sdof_response", "compute the sdof response of a given ground motion");
+    suanpan_info(format, "section", "define sections");
+    suanpan_info(format, "sectiontest*", "test sections without creating a finite element model");
+    suanpan_info(format, "set", "set properties of the analysis/model");
+    suanpan_info(format, "solver", "define solvers");
+    suanpan_info(format, "step", "define steps");
+    suanpan_info(format, "summary", "print summary for the current problem domain");
+    suanpan_info(format, "suspend", "suspend objects in the current step");
+    suanpan_info(format, "terminal", "execute commands in terminal");
+    suanpan_info(format, "upsampling", "upsample the given ground motion with various filters");
     suanpan_info(format, "version", "print version information");
 
     return SUANPAN_SUCCESS;

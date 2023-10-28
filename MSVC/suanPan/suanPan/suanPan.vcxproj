@@ -156,6 +156,7 @@
     <ClCompile Include="..\..\..\Domain\Group\ElementGroup.cpp" />
     <ClCompile Include="..\..\..\Domain\Group\Group.cpp" />
     <ClCompile Include="..\..\..\Domain\Group\GroupGroup.cpp" />
+    <ClCompile Include="..\..\..\Domain\Group\GroupParser.cpp" />
     <ClCompile Include="..\..\..\Domain\Group\NodeGroup.cpp" />
     <ClCompile Include="..\..\..\Domain\Node.cpp" />
     <ClCompile Include="..\..\..\Domain\Tag.cpp" />
@@ -613,6 +614,7 @@
     <ClInclude Include="..\..\..\Domain\Group\ElementGroup.h" />
     <ClInclude Include="..\..\..\Domain\Group\Group.h" />
     <ClInclude Include="..\..\..\Domain\Group\GroupGroup.h" />
+    <ClInclude Include="..\..\..\Domain\Group\GroupParser.h" />
     <ClInclude Include="..\..\..\Domain\Group\NodeGroup.h" />
     <ClInclude Include="..\..\..\Domain\MetaMat\BandMat.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\BandMatCUDA.hpp" />
