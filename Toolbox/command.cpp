@@ -1459,9 +1459,9 @@ int run_example() {
 }
 
 int print_command() {
-    suanpan_info("The available commands are listed. Please check online manual for reference. https://tlcfem.gitbook.io/suanpan-manual/\n");
+    suanpan_info("The available first-level commands are listed. Please check online manual for reference. https://tlcfem.github.io/suanPan-manual/latest/\n");
 
-    constexpr auto format = "    {:<30}  {}\n";
+    constexpr auto format = "    {:>20}  {}\n";
     suanpan_info(format, "amplitude", "define amplitudes");
     suanpan_info(format, "analyze/analyse", "analyse the model");
     suanpan_info(format, "benchmark", "benchmark the platform for comparisons");
@@ -1479,10 +1479,7 @@ int print_command() {
     suanpan_info(format, "exit/quit", "exit the program");
     suanpan_info(format, "file", "load external files");
     suanpan_info(format, "fullname", "print the full path of the program");
-    suanpan_info(format, "generate", "generate node or element groups by fixed interval");
-    suanpan_info(format, "generatebyplane", "generate node or element groups by plane");
-    suanpan_info(format, "generatebypoint", "generate node or element groups by line segment");
-    suanpan_info(format, "generatebyrule", "generate node or element groups by polynomial");
+    suanpan_info(format, "group", "define groups via various rules");
     suanpan_info(format, "hdf5recorder", "define recorders using hdf5 format");
     suanpan_info(format, "help", "print the help information");
     suanpan_info(format, "import", "import external modules");

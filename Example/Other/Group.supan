@@ -166,6 +166,8 @@ expression SimpleScalar 1 x if(x==0)1;else-1;
 
 customnodegroup 4 1
 
+groupgroup 10 1 3
+
 groupmultiplierbc 1 P 2
 
 groupcload 1 0 2 2 1
@@ -189,7 +191,7 @@ peek node 117
 
 peek element 1
 
-peek group 4
+peek group 1 3 4 10
 
 peek recorder 1 2 3
 
