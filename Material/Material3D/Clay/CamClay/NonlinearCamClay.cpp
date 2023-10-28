@@ -23,7 +23,7 @@ const mat NonlinearCamClay::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 NonlinearCamClay::NonlinearCamClay(const unsigned T, const double E, const double V, const double B, const double M, const double P, const double R)
     : DataNonlinearCamClay{fabs(E), fabs(V), B * B, fabs(M), fabs(P)}
-    , Material3D(T, R) {}
+    , Material3D(T, R) { access::rw(tolerance) = 1E-13; }
 
 int NonlinearCamClay::initialize(const shared_ptr<DomainBase>&) {
     current_stiffness = trial_stiffness = initial_stiffness = tensor::isotropic_stiffness(elastic_modulus, poissons_ratio);
@@ -76,7 +76,7 @@ int NonlinearCamClay::update_trial_status(const vec& t_strain) {
 
         if(1u == counter) {
             if(residual(0) < 0.) return SUANPAN_SUCCESS;
-            ini_f = residual(0); // yield function can be very large, use relative error instead
+            ini_f = std::max(1., residual(0)); // yield function can be very large, use relative error instead
         }
 
         residual(1) = incre_alpha - 2. * gamma / square_b * rel_p;
@@ -133,8 +133,4 @@ int NonlinearCamClay::reset_status() {
     trial_history = current_history;
     trial_stiffness = current_stiffness;
     return SUANPAN_SUCCESS;
-}
-
-void NonlinearCamClay::print() {
-    suanpan_info("A 3D nonlinear modified Cam-Clay model.\n");
 }
