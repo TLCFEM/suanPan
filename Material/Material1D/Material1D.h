@@ -39,8 +39,6 @@ public:
                double    // density
     );
 
-    const mat& get_trial_stiffness() override;
-
     vector<vec> record(OutputType) override;
 
     void print() override;

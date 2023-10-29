@@ -153,7 +153,6 @@ int NonlinearGurson1D::reset_status() {
 vector<vec> NonlinearGurson1D::record(const OutputType P) {
     if(P == OutputType::PEEQ) return {vec{current_history(0)}};
     if(P == OutputType::VF) return {vec{current_history(1)}};
-    if(P == OutputType::PE) return {vec{current_strain - current_stress / elastic_modulus}};
 
     return Material1D::record(P);
 }

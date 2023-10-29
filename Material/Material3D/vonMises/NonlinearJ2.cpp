@@ -121,12 +121,6 @@ int NonlinearJ2::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-vector<vec> NonlinearJ2::record(const OutputType P) {
-    if(P == OutputType::PEEQ) return {vec{current_history(0)}};
-
-    return Material3D::record(P);
-}
-
 void NonlinearJ2::print() {
     suanpan_info("A 3D nonlinear hardening model using von-Mises yielding criterion.\n");
 }

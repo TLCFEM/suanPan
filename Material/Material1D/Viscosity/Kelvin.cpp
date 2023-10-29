@@ -94,9 +94,11 @@ int Kelvin::reset_status() {
 vector<vec> Kelvin::record(const OutputType P) {
     vector<vec> data;
 
-    if(OutputType::SD == P || OutputType::SS == P || OutputType::S == P) data.emplace_back(current_stress);
+    if(OutputType::S == P) data.emplace_back(current_stress);
+    else if(OutputType::SD == P) data.emplace_back(damper->get_current_stress());
     else if(OutputType::ED == P) data.emplace_back(damper->get_current_strain());
     else if(OutputType::VD == P) data.emplace_back(damper->get_current_strain_rate());
+    else if(OutputType::SS == P) data.emplace_back(spring->get_current_stress());
     else if(OutputType::ES == P) data.emplace_back(spring->get_current_strain());
     else if(OutputType::VS == P) data.emplace_back(spring->get_current_strain_rate());
     else if(OutputType::E == P) data.emplace_back(current_strain);

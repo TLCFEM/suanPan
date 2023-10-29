@@ -132,12 +132,6 @@ int ArmstrongFrederick1D::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-vector<vec> ArmstrongFrederick1D::record(const OutputType P) {
-    if(P == OutputType::PEEQ) return {vec{current_history(size)}};
-
-    return Material1D::record(P);
-}
-
 void ArmstrongFrederick1D::print() {
     suanpan_info("A uniaxial nonlinear hardening model using Armstrong-Frederick kinematic hardening rule.\n");
     Material1D::print();

@@ -92,12 +92,9 @@ int Nonviscous01::reset_status() {
 }
 
 vector<vec> Nonviscous01::record(const OutputType P) {
-    vector<vec> data;
+    if(OutputType::V == P) return {current_strain_rate};
 
-    if(OutputType::S == P) data.emplace_back(current_stress);
-    else if(OutputType::V == P || OutputType::VD == P) data.emplace_back(current_strain_rate);
-
-    return data;
+    return Material1D::record(P);
 }
 
 void Nonviscous01::print() {

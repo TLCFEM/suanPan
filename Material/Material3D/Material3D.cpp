@@ -27,9 +27,11 @@ vector<vec> Material3D::record(const OutputType P) {
 
     if(P == OutputType::S) data.emplace_back(current_stress);
     else if(P == OutputType::HYDRO) data.emplace_back(vec{tensor::mean3(current_stress)});
+    else if(P == OutputType::MISES) data.emplace_back(vec{sqrt(1.5) * tensor::stress::norm(tensor::dev(current_stress))});
     else if(P == OutputType::E) data.emplace_back(current_strain);
     else if(P == OutputType::EE) data.emplace_back(solve(initial_stiffness, current_stress));
     else if(P == OutputType::PE) data.emplace_back(current_strain - solve(initial_stiffness, current_stress));
+    else if(P == OutputType::EEQ) data.emplace_back(vec{sqrt(2. / 3.) * tensor::strain::norm(current_strain)});
     else if(P == OutputType::PEEQ) data.emplace_back(vec{sqrt(2. / 3.) * tensor::strain::norm(current_strain - solve(initial_stiffness, current_stress))});
     else if(P == OutputType::SP) { if(vec principal_stress; eig_sym(principal_stress, tensor::stress::to_tensor(current_stress))) data.emplace_back(principal_stress); }
     else if(P == OutputType::EP) { if(vec principal_strain; eig_sym(principal_strain, tensor::strain::to_tensor(current_strain))) data.emplace_back(principal_strain); }
