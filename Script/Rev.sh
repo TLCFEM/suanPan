@@ -12,19 +12,17 @@ if [ ! -d ".git" ]; then
   exit
 fi
 
-if [ -f "./suanPan.cpp" ]; then
-  file_path="./Toolbox/revision.h"
-elif [ -f "../suanPan.cpp" ]; then
-  file_path="../Toolbox/revision.h"
-else
-  echo "Error: Cannot locate the root directory."
-  exit
-fi
+SCRIPT_DIR=$(realpath "$0")
+SCRIPT_DIR=$(dirname "$SCRIPT_DIR")
+SCRIPT_DIR=$(dirname "$SCRIPT_DIR")
+cd "$SCRIPT_DIR" || exit
 
 # sleep random time to avoid git conflict in parallel execution
 sleep $((RANDOM % 4)).$((((RANDOM % 10)) + 1))s
 
 git_rev=$(git rev-parse --short=8 HEAD)
+
+file_path="./Toolbox/revision.h"
 
 echo "constexpr auto SUANPAN_REVISION = \"$git_rev\";" >$file_path
 

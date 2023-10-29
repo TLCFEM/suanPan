@@ -2,14 +2,10 @@
 
 shopt -s nullglob
 
-if [ -f "suanPan.cpp" ]; then
-  cd .
-elif [ -f "../suanPan.cpp" ]; then
-  cd ..
-else
-  echo "Please invoke this script in the root folder."
-  exit 1
-fi
+SCRIPT_DIR=$(realpath "$0")
+SCRIPT_DIR=$(dirname "$SCRIPT_DIR")
+SCRIPT_DIR=$(dirname "$SCRIPT_DIR")
+cd "$SCRIPT_DIR" || exit
 
 path_array=(cmake-build*)
 path_array+=(build*)
