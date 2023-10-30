@@ -2681,20 +2681,16 @@ int create_new_element(const shared_ptr<DomainBase>& domain, istringstream& comm
 
     if(is_equal(element_id, "Allman")) new_allman(new_element, command);
     else if(is_equal(element_id, "B21")) new_b21(new_element, command, 0);
-    else if(is_equal(element_id, "B21EL")) new_b21(new_element, command, 1);
     else if(is_equal(element_id, "B21EH")) new_b21(new_element, command, 2);
+    else if(is_equal(element_id, "B21EL")) new_b21(new_element, command, 1);
     else if(is_equal(element_id, "B21H")) new_b21h(new_element, command);
     else if(is_equal(element_id, "B31")) new_b31(new_element, command, false);
     else if(is_equal(element_id, "B31OS")) new_b31(new_element, command, true);
-    else if(is_equal(element_id, "NMB21")) new_nmb21(new_element, command, 0);
-    else if(is_equal(element_id, "NMB21EL")) new_nmb21(new_element, command, 1);
-    else if(is_equal(element_id, "NMB21EH")) new_nmb21(new_element, command, 2);
-    else if(is_equal(element_id, "NMB31")) new_nmb31(new_element, command);
     else if(is_equal(element_id, "C3D20")) new_c3d20(new_element, command);
     else if(is_equal(element_id, "C3D4")) new_c3d4(new_element, command);
     else if(is_equal(element_id, "C3D8")) new_c3d8(new_element, command);
-    else if(is_equal(element_id, "C3D8R")) new_c3d8r(new_element, command);
     else if(is_equal(element_id, "C3D8I")) new_c3d8i(new_element, command);
+    else if(is_equal(element_id, "C3D8R")) new_c3d8r(new_element, command);
     else if(is_equal(element_id, "CAX3")) new_cax3(new_element, command);
     else if(is_equal(element_id, "CAX4")) new_cax4(new_element, command);
     else if(is_equal(element_id, "CAX8")) new_cax8(new_element, command);
@@ -2704,10 +2700,6 @@ int create_new_element(const shared_ptr<DomainBase>& domain, istringstream& comm
     else if(is_equal(element_id, "Contact3D")) new_contact3d(new_element, command);
     else if(is_equal(element_id, "CP3")) new_cp3(new_element, command);
     else if(is_equal(element_id, "CP4")) new_cp4(new_element, command);
-    else if(is_equal(element_id, "PCPE4DC")) new_pcpedc(new_element, command, 4);
-    else if(is_equal(element_id, "PCPE8DC")) new_pcpedc(new_element, command, 8);
-    else if(is_equal(element_id, "PCPE4UC")) new_pcpeuc(new_element, command, 4);
-    else if(is_equal(element_id, "PCPE8UC")) new_pcpeuc(new_element, command, 8);
     else if(is_equal(element_id, "CP4I")) new_cp4i(new_element, command);
     else if(is_equal(element_id, "CP4R")) new_cp4r(new_element, command);
     else if(is_equal(element_id, "CP5")) new_cp5(new_element, command);
@@ -2717,13 +2709,13 @@ int create_new_element(const shared_ptr<DomainBase>& domain, istringstream& comm
     else if(is_equal(element_id, "CPE8")) new_cpe8(new_element, command);
     else if(is_equal(element_id, "CPE8R")) new_cpe8r(new_element, command);
     else if(is_equal(element_id, "CPS8")) new_cp8(new_element, command);
-    else if(is_equal(element_id, "CSMT3")) new_csmt3(new_element, command);
-    else if(is_equal(element_id, "CSMT6")) new_csmt6(new_element, command);
     else if(is_equal(element_id, "CSMQ4")) new_csmq(new_element, command, 4);
     else if(is_equal(element_id, "CSMQ5")) new_csmq(new_element, command, 5);
     else if(is_equal(element_id, "CSMQ6")) new_csmq(new_element, command, 6);
     else if(is_equal(element_id, "CSMQ7")) new_csmq(new_element, command, 7);
     else if(is_equal(element_id, "CSMQ8")) new_csmq(new_element, command, 8);
+    else if(is_equal(element_id, "CSMT3")) new_csmt3(new_element, command);
+    else if(is_equal(element_id, "CSMT6")) new_csmt6(new_element, command);
     else if(is_equal(element_id, "Damper01")) new_damper01(new_element, command, 2);
     else if(is_equal(element_id, "Damper02")) new_damper02(new_element, command, 2);
     else if(is_equal(element_id, "Damper03")) new_damper01(new_element, command, 3);
@@ -2737,10 +2729,10 @@ int create_new_element(const shared_ptr<DomainBase>& domain, istringstream& comm
     else if(is_equal(element_id, "DKT3")) new_dkt3(new_element, command);
     else if(is_equal(element_id, "DKT4")) new_dkt4(new_element, command);
     else if(is_equal(element_id, "DKTS3")) new_dkts3(new_element, command);
-    else if(is_equal(element_id, "Embedded2D")) new_embedded(new_element, command, 2);
-    else if(is_equal(element_id, "Embedded3D")) new_embedded(new_element, command, 3);
     else if(is_equal(element_id, "EB21")) new_eb21(new_element, command);
     else if(is_equal(element_id, "EB31OS")) new_eb31os(new_element, command);
+    else if(is_equal(element_id, "Embedded2D")) new_embedded(new_element, command, 2);
+    else if(is_equal(element_id, "Embedded3D")) new_embedded(new_element, command, 3);
     else if(is_equal(element_id, "F21")) new_f21(new_element, command);
     else if(is_equal(element_id, "F21H")) new_f21h(new_element, command);
     else if(is_equal(element_id, "F31")) new_f31(new_element, command);
@@ -2750,13 +2742,23 @@ int create_new_element(const shared_ptr<DomainBase>& domain, istringstream& comm
     else if(is_equal(element_id, "GCMQL")) new_gcmq(new_element, command, 'L');
     else if(is_equal(element_id, "GQ12")) new_gq12(new_element, command);
     else if(is_equal(element_id, "Joint")) new_joint(new_element, command);
+    else if(is_equal(element_id, "Mass")) new_mass(new_element, command, 3);
     else if(is_equal(element_id, "Mass2D")) new_mass(new_element, command, 2);
     else if(is_equal(element_id, "Mass3D")) new_mass(new_element, command, 3);
-    else if(is_equal(element_id, "Mass")) new_mass(new_element, command, 3);
     else if(is_equal(element_id, "MassPoint2D")) new_masspoint(new_element, command, 2);
     else if(is_equal(element_id, "MassPoint3D")) new_masspoint(new_element, command, 3);
     else if(is_equal(element_id, "Mindlin")) new_mindlin(new_element, command);
     else if(is_equal(element_id, "MVLEM")) new_mvlem(new_element, command);
+    else if(is_equal(element_id, "NMB21")) new_nmb21(new_element, command, 0);
+    else if(is_equal(element_id, "NMB21EH")) new_nmb21(new_element, command, 2);
+    else if(is_equal(element_id, "NMB21EL")) new_nmb21(new_element, command, 1);
+    else if(is_equal(element_id, "NMB31")) new_nmb31(new_element, command);
+    else if(is_equal(element_id, "PatchCube")) new_patchcube(new_element, command);
+    else if(is_equal(element_id, "PatchQuad")) new_patchquad(new_element, command);
+    else if(is_equal(element_id, "PCPE4DC")) new_pcpedc(new_element, command, 4);
+    else if(is_equal(element_id, "PCPE4UC")) new_pcpeuc(new_element, command, 4);
+    else if(is_equal(element_id, "PCPE8DC")) new_pcpedc(new_element, command, 8);
+    else if(is_equal(element_id, "PCPE8UC")) new_pcpeuc(new_element, command, 8);
     else if(is_equal(element_id, "PS")) new_ps(new_element, command);
     else if(is_equal(element_id, "QE2")) new_qe2(new_element, command);
     else if(is_equal(element_id, "S4")) new_s4(new_element, command);
@@ -2775,8 +2777,6 @@ int create_new_element(const shared_ptr<DomainBase>& domain, istringstream& comm
     else if(is_equal(element_id, "Tie")) new_tie(new_element, command);
     else if(is_equal(element_id, "TranslationConnector2D")) new_translationconnector(new_element, command, 2u);
     else if(is_equal(element_id, "TranslationConnector3D")) new_translationconnector(new_element, command, 3u);
-    else if(is_equal(element_id, "PatchQuad")) new_patchquad(new_element, command);
-    else if(is_equal(element_id, "PatchCube")) new_patchcube(new_element, command);
     else load::object(new_element, domain, element_id, command);
 
     if(new_element == nullptr || !domain->insert(std::move(new_element)))

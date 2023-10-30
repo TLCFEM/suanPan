@@ -54,7 +54,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
             auto idx = 0llu;
             while(!command.eof() && idx < p.n_elem)
                 if(!get_input(command, p(idx++))) {
-                    suanpan_error("A valid parameter for rayleigh damping is required.\n");
+                    suanpan_error("A valid parameter for Rayleigh damping is required.\n");
                     return SUANPAN_SUCCESS;
                 }
 

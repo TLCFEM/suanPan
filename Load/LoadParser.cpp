@@ -363,17 +363,17 @@ int create_new_load(const shared_ptr<DomainBase>& domain, istringstream& command
 
     if(is_equal(load_id, "Acceleration")) new_acceleration(new_load, command);
     else if(is_equal(load_id, "BodyForce")) new_bodyforce(new_load, command, false);
-    else if(is_equal(load_id, "GroupBodyForce")) new_bodyforce(new_load, command, true);
     else if(is_equal(load_id, "Cload")) new_cload(new_load, command, false);
-    else if(is_equal(load_id, "ReferenceLoad") || is_equal(load_id, "RefLoad") || is_equal(load_id, "RefForce")) new_refload(new_load, command);
+    else if(is_equal(load_id, "Disp") || is_equal(load_id, "Displacement") || is_equal(load_id, "DispLoad")) new_displacement(new_load, command, false);
+    else if(is_equal(load_id, "GroupBodyForce")) new_bodyforce(new_load, command, true);
     else if(is_equal(load_id, "GroupCload")) new_cload(new_load, command, true);
+    else if(is_equal(load_id, "GroupDisp") || is_equal(load_id, "GroupDisplacement") || is_equal(load_id, "GroupDispLoad")) new_displacement(new_load, command, true);
     else if(is_equal(load_id, "LineUDL2D")) new_lineudl(new_load, command, 2);
     else if(is_equal(load_id, "LineUDL3D")) new_lineudl(new_load, command, 3);
-    else if(is_equal(load_id, "Disp") || is_equal(load_id, "Displacement") || is_equal(load_id, "DispLoad")) new_displacement(new_load, command, false);
-    else if(is_equal(load_id, "GroupDisp") || is_equal(load_id, "GroupDisplacement") || is_equal(load_id, "GroupDispLoad")) new_displacement(new_load, command, true);
+    else if(is_equal(load_id, "ReferenceLoad") || is_equal(load_id, "RefLoad") || is_equal(load_id, "RefForce")) new_refload(new_load, command);
+    else if(is_equal(load_id, "SupportAcceleration")) new_supportmotion(new_load, command, 2);
     else if(is_equal(load_id, "SupportDisplacement")) new_supportmotion(new_load, command, 0);
     else if(is_equal(load_id, "SupportVelocity")) new_supportmotion(new_load, command, 1);
-    else if(is_equal(load_id, "SupportAcceleration")) new_supportmotion(new_load, command, 2);
     else load::object(new_load, domain, load_id, command);
 
     if(new_load != nullptr) new_load->set_start_step(domain->get_current_step_tag());

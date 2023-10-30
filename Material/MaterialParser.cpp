@@ -3409,14 +3409,15 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
 
     unique_ptr<Material> new_material = nullptr;
 
-    if(is_equal(material_id, "AFC01")) new_afc01(new_material, command);
-    else if(is_equal(material_id, "AFC")) new_afc01(new_material, command);
+    if(is_equal(material_id, "AFC")) new_afc01(new_material, command);
+    else if(is_equal(material_id, "AFC01")) new_afc01(new_material, command);
     else if(is_equal(material_id, "AFC02")) new_afc02(new_material, command);
     else if(is_equal(material_id, "AFC03")) new_afc03(new_material, command);
     else if(is_equal(material_id, "AFCN")) new_afc03(new_material, command);
     else if(is_equal(material_id, "AFCS")) new_afc02(new_material, command);
     else if(is_equal(material_id, "ArmstrongFrederick")) new_armstrongfrederick(new_material, command);
     else if(is_equal(material_id, "ArmstrongFrederick1D")) new_armstrongfrederick1d(new_material, command);
+    else if(is_equal(material_id, "AsymmElastic1D")) new_asymmelastic1d(new_material, command);
     else if(is_equal(material_id, "Axisymmetric")) new_axisymmetric(new_material, command);
     else if(is_equal(material_id, "AxisymmetricElastic")) new_axisymmetricelastic(new_material, command);
     else if(is_equal(material_id, "Bilinear1D")) new_bilinear1d(new_material, command);
@@ -3431,7 +3432,6 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "BilinearPeric")) new_bilinearperic(new_material, command);
     else if(is_equal(material_id, "BilinearPO")) new_bilinearpo(new_material, command);
     else if(is_equal(material_id, "BilinearViscosity")) new_bilinearviscosity(new_material, command);
-    else if(is_equal(material_id, "CustomViscosity")) new_customviscosity(new_material, command);
     else if(is_equal(material_id, "BlatzKo")) new_blatzko(new_material, command);
     else if(is_equal(material_id, "BoucWen")) new_boucwen(new_material, command);
     else if(is_equal(material_id, "BWBN")) new_bwbn(new_material, command);
@@ -3451,17 +3451,17 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "CustomCC")) new_customcc(new_material, command);
     else if(is_equal(material_id, "CustomCDP")) new_customcdp(new_material, command);
     else if(is_equal(material_id, "CustomDP")) new_customdp(new_material, command);
-    else if(is_equal(material_id, "CustomStrainDegradation")) new_customdegradation(new_material, command, true);
-    else if(is_equal(material_id, "CustomStressDegradation")) new_customdegradation(new_material, command, false);
     else if(is_equal(material_id, "CustomElastic1D")) new_customelastic1d(new_material, command);
     else if(is_equal(material_id, "CustomGurson")) new_customgurson(new_material, command);
     else if(is_equal(material_id, "CustomGurson1D")) new_customgurson1d(new_material, command);
     else if(is_equal(material_id, "CustomHoffman")) new_customhoffman(new_material, command);
     else if(is_equal(material_id, "CustomJ2")) new_customj2(new_material, command);
     else if(is_equal(material_id, "CustomMises1D")) new_custommises1d(new_material, command);
+    else if(is_equal(material_id, "CustomStrainDegradation")) new_customdegradation(new_material, command, true);
+    else if(is_equal(material_id, "CustomStressDegradation")) new_customdegradation(new_material, command, false);
+    else if(is_equal(material_id, "CustomViscosity")) new_customviscosity(new_material, command);
     else if(is_equal(material_id, "DafaliasManzari")) new_dafaliasmanzari(new_material, command);
     else if(is_equal(material_id, "Dhakal")) new_dhakal(new_material, command);
-    else if(is_equal(material_id, "AsymmElastic1D")) new_asymmelastic1d(new_material, command);
     else if(is_equal(material_id, "Elastic1D")) new_elastic1d(new_material, command);
     else if(is_equal(material_id, "Elastic2D")) new_elastic2d(new_material, command);
     else if(is_equal(material_id, "Elastic3D")) new_isotropicelastic3d(new_material, command);
