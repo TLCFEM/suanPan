@@ -68,7 +68,7 @@ int NMB21::reset_status() {
 }
 
 vector<vec> NMB21::record(const OutputType P) {
-    if(P == OutputType::BEAME) return {b_trans->to_local_vec(get_current_displacement())};
+    if(P == OutputType::BEAME) return {b_section->get_current_deformation() * length};
     if(P == OutputType::BEAMS) return {b_section->get_current_resistance()};
 
     return b_section->record(P);

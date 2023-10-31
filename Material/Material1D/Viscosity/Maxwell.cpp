@@ -174,18 +174,16 @@ int Maxwell::reset_status() {
 }
 
 vector<vec> Maxwell::record(const OutputType P) {
-    vector<vec> data;
+    if(OutputType::SD == P || OutputType::SS == P || OutputType::S == P) return {current_stress};
+    if(OutputType::ED == P) return {damper->get_current_strain()};
+    if(OutputType::VD == P) return {damper->get_current_strain_rate()};
+    if(OutputType::ES == P) return {spring->get_current_strain()};
+    if(OutputType::VS == P) return {current_strain_rate - damper->get_current_strain_rate()};
+    if(OutputType::E == P) return {current_strain};
+    if(OutputType::V == P) return {current_strain_rate};
+    if(OutputType::LITR == P) return {vec{static_cast<double>(counter)}};
 
-    if(OutputType::SD == P || OutputType::SS == P || OutputType::S == P) data.emplace_back(current_stress);
-    else if(OutputType::ED == P) data.emplace_back(damper->get_current_strain());
-    else if(OutputType::VD == P) data.emplace_back(damper->get_current_strain_rate());
-    else if(OutputType::ES == P) data.emplace_back(spring->get_current_strain());
-    else if(OutputType::VS == P) data.emplace_back(current_strain_rate - damper->get_current_strain_rate());
-    else if(OutputType::E == P) data.emplace_back(current_strain);
-    else if(OutputType::V == P) data.emplace_back(current_strain_rate);
-    else if(OutputType::LITR == P) data.emplace_back(vec{static_cast<double>(counter)});
-
-    return data;
+    return {};
 }
 
 void Maxwell::print() {

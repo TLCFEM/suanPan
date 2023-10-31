@@ -240,13 +240,13 @@ int NonlinearCDP::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-vector<vec> NonlinearCDP::record(const OutputType T) {
-    if(T == OutputType::DT) return {vec{current_history(0)}};
-    if(T == OutputType::DC) return {vec{current_history(1)}};
-    if(T == OutputType::KAPPAT) return {vec{current_history(2)}};
-    if(T == OutputType::KAPPAC) return {vec{current_history(3)}};
+vector<vec> NonlinearCDP::record(const OutputType P) {
+    if(P == OutputType::DT) return {vec{current_history(0)}};
+    if(P == OutputType::DC) return {vec{current_history(1)}};
+    if(P == OutputType::KAPPAT) return {vec{current_history(2)}};
+    if(P == OutputType::KAPPAC) return {vec{current_history(3)}};
 
-    return Material3D::record(T);
+    return Material3D::record(P);
 }
 
 void NonlinearCDP::print() {

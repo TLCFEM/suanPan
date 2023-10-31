@@ -140,9 +140,9 @@ vector<vec> F21::record(const OutputType P) {
     if(P == OutputType::BEAME) return {current_local_deformation};
     if(P == OutputType::BEAMS) return {current_local_resistance};
 
-    vector<vec> output;
-    for(const auto& I : int_pt) append_to(output, I.b_section->record(P));
-    return output;
+    vector<vec> data;
+    for(const auto& I : int_pt) append_to(data, I.b_section->record(P));
+    return data;
 }
 
 void F21::print() {

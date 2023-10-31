@@ -16,7 +16,8 @@
  ******************************************************************************/
 
 #include "Material.h"
-#include "Domain/DomainBase.h"
+#include <Domain/DomainBase.h>
+#include <Recorder/OutputType.h>
 
 Material::Material(const unsigned T, const MaterialType MT, const double D)
     : DataMaterial{fabs(D), MT}
@@ -289,7 +290,16 @@ int Material::reset_couple_status() {
     return SUANPAN_SUCCESS;
 }
 
-std::vector<vec> Material::record(const OutputType) { return {}; }
+std::vector<vec> Material::record(const OutputType P) {
+    if(P == OutputType::S) return {current_stress};
+    if(P == OutputType::E) return {current_strain};
+    if(P == OutputType::EE) return {solve(initial_stiffness, current_stress)};
+    if(P == OutputType::PE) return {current_strain - solve(initial_stiffness, current_stress)};
+    if(P == OutputType::HIST) return {current_history};
+    if(P == OutputType::YF) return {vec{any(current_history > 0.) ? 1. : 0.}};
+
+    return {};
+}
 
 void ConstantStiffness(DataMaterial* M) {
     M->current_stiffness = mat(M->initial_stiffness.memptr(), M->initial_stiffness.n_rows, M->initial_stiffness.n_cols, false, true);

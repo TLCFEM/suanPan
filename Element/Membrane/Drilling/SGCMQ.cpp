@@ -242,29 +242,9 @@ int SGCMQ::reset_status() {
 
 mat SGCMQ::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
-vector<vec> SGCMQ::record(const OutputType T) {
+vector<vec> SGCMQ::record(const OutputType P) {
     vector<vec> data;
-
-    if(T == OutputType::NMISES) {
-        mat A(int_pt.size(), 9);
-        vec B(int_pt.size(), fill::zeros);
-
-        for(size_t I = 0; I < int_pt.size(); ++I) {
-            if(const auto C = int_pt[I].m_material->record(OutputType::MISES); !C.empty()) B(I) = C.cbegin()->at(0);
-            A.row(I) = interpolation::quadratic(int_pt[I].coor);
-        }
-
-        const vec X = solve(A, B);
-
-        data.emplace_back(vec{dot(interpolation::quadratic(-1., -1.), X)});
-        data.emplace_back(vec{dot(interpolation::quadratic(1., -1.), X)});
-        data.emplace_back(vec{dot(interpolation::quadratic(1., 1.), X)});
-        data.emplace_back(vec{dot(interpolation::quadratic(-1., 1.), X)});
-    }
-    else if(T == OutputType::K) data.emplace_back(vectorise(current_stiffness));
-    else if(T == OutputType::M) data.emplace_back(vectorise(current_mass));
-    else for(const auto& I : int_pt) append_to(data, I.m_material->record(T));
-
+    for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
     return data;
 }
 

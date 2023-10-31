@@ -162,7 +162,7 @@ int SectionOS3D::reset_status() {
 }
 
 vector<vec> SectionOS3D::record(const OutputType P) {
-    if(OutputType::BEAMS == P) {
+    if(OutputType::S == P) {
         vec beam_force(6, fill::zeros);
         for(const auto& I : int_pt) {
             const auto& arm_y = eccentricity(0);
@@ -182,5 +182,5 @@ vector<vec> SectionOS3D::record(const OutputType P) {
         return {beam_force};
     }
 
-    return Section::record(P);
+    return {};
 }

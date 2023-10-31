@@ -102,12 +102,12 @@ double TimberPD::compute_damage_t(const double r_t) const { return 1. - ini_r_t 
 
 double TimberPD::compute_damage_c(const double r_c) const { return b_c * pow(std::max(datum::eps, 1. - ini_r_c / r_c), m_c); }
 
-vector<vec> TimberPD::record(const OutputType T) {
-    if(T == OutputType::KAPPAP) return {vec{current_history(0)}};
-    if(T == OutputType::DT) return {vec{compute_damage_t(current_history(1))}};
-    if(T == OutputType::DC) return {vec{compute_damage_c(current_history(2))}};
+vector<vec> TimberPD::record(const OutputType P) {
+    if(P == OutputType::KAPPAP) return {vec{current_history(0)}};
+    if(P == OutputType::DT) return {vec{compute_damage_t(current_history(1))}};
+    if(P == OutputType::DC) return {vec{compute_damage_c(current_history(2))}};
 
-    return Material3D::record(T);
+    return Material3D::record(P);
 }
 
 void TimberPD::print() {

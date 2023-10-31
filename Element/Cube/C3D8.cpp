@@ -198,19 +198,14 @@ int C3D8::reset_status() {
 
 mat C3D8::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::cube(coordinate, order, c_node); }
 
-vector<vec> C3D8::record(const OutputType T) {
+vector<vec> C3D8::record(const OutputType P) {
     vector<vec> data;
-    for(const auto& I : int_pt) append_to(data, I.c_material->record(T));
+    for(const auto& I : int_pt) append_to(data, I.c_material->record(P));
     return data;
 }
 
 void C3D8::print() {
-    suanpan_info("A C3D8 element{}{}.\n", int_scheme == 'R'
-                                              ? " reduced integration"
-                                              : int_scheme == 'I'
-                                              ? " Iron's integration"
-                                              : " full integration",
-                 nlgeom ? " nonlinear geometry" : "");
+    suanpan_info("A C3D8 element{}{}.\n", int_scheme == 'R' ? " reduced integration" : int_scheme == 'I' ? " Iron's integration" : " full integration", nlgeom ? " nonlinear geometry" : "");
     suanpan_info("The element connects nodes:", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Material:\n");

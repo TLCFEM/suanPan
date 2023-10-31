@@ -119,13 +119,13 @@ int B21H::reset_status() {
 }
 
 vector<vec> B21H::record(const OutputType P) {
-    vector<vec> output;
-    append_to(output, int_pt[0].b_section->record(P));
-    append_to(output, int_pt[1].b_section->record(P));
-    for(const auto& I : elastic_int_pt) append_to(output, I.b_section->record(P));
-    append_to(output, int_pt[2].b_section->record(P));
-    append_to(output, int_pt[3].b_section->record(P));
-    return output;
+    vector<vec> data;
+    append_to(data, int_pt[0].b_section->record(P));
+    append_to(data, int_pt[1].b_section->record(P));
+    for(const auto& I : elastic_int_pt) append_to(data, I.b_section->record(P));
+    append_to(data, int_pt[2].b_section->record(P));
+    append_to(data, int_pt[3].b_section->record(P));
+    return data;
 }
 
 void B21H::print() {

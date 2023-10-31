@@ -23,18 +23,14 @@ Material2D::Material2D(const unsigned T, const PlaneType PT, const double R)
     : Material(T, MaterialType::D2, R) { access::rw(plane_type) = PT; }
 
 vector<vec> Material2D::record(const OutputType P) {
-    vector<vec> data;
+    if(P == OutputType::SP) return {transform::stress::principal(current_stress)};
+    if(P == OutputType::S11) return {vec{current_stress(0)}};
+    if(P == OutputType::S22) return {vec{current_stress(1)}};
+    if(P == OutputType::S12) return {vec{current_stress(2)}};
+    if(P == OutputType::EP) return {transform::strain::principal(current_strain)};
+    if(P == OutputType::E11) return {vec{current_strain(0)}};
+    if(P == OutputType::E22) return {vec{current_strain(1)}};
+    if(P == OutputType::E12) return {vec{current_strain(2)}};
 
-    if(P == OutputType::S) data.emplace_back(current_stress);
-    else if(P == OutputType::SP) data.emplace_back(transform::stress::principal(current_stress));
-    else if(P == OutputType::S11) data.emplace_back(vec{current_stress(0)});
-    else if(P == OutputType::S22) data.emplace_back(vec{current_stress(1)});
-    else if(P == OutputType::S12) data.emplace_back(vec{current_stress(2)});
-    else if(P == OutputType::E) data.emplace_back(current_strain);
-    else if(P == OutputType::EP) data.emplace_back(transform::strain::principal(current_strain));
-    else if(P == OutputType::E11) data.emplace_back(vec{current_strain(0)});
-    else if(P == OutputType::E22) data.emplace_back(vec{current_strain(1)});
-    else if(P == OutputType::E12) data.emplace_back(vec{current_strain(2)});
-
-    return data;
+    return Material::record(P);
 }

@@ -22,15 +22,10 @@ Material1D::Material1D(const unsigned T, const double D)
     : Material(T, MaterialType::D1, D) { set_symmetric(true); }
 
 vector<vec> Material1D::record(const OutputType P) {
-    vector<vec> data;
+    if(P == OutputType::S11) return {current_stress};
+    if(P == OutputType::E11) return {current_strain};
 
-    if(P == OutputType::S || P == OutputType::S11) data.emplace_back(current_stress);
-    else if(P == OutputType::E || P == OutputType::E11) data.emplace_back(current_strain);
-    else if(P == OutputType::EE) data.emplace_back(current_stress / initial_stiffness);
-    else if(P == OutputType::PE) data.emplace_back(current_strain - current_stress / initial_stiffness);
-    else if(P == OutputType::HIST) data.emplace_back(current_history);
-
-    return data;
+    return Material::record(P);
 }
 
 void Material1D::print() {

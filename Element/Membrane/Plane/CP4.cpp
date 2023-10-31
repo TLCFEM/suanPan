@@ -374,27 +374,9 @@ int CP4::reset_status() {
 mat CP4::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
 vector<vec> CP4::record(const OutputType P) {
-    vector<vec> output;
-
-    if(P == OutputType::NMISES) {
-        mat A(int_pt.size(), 4);
-        vec B(int_pt.size(), fill::zeros);
-
-        for(size_t I = 0; I < int_pt.size(); ++I) {
-            if(const auto C = int_pt[I].m_material->record(OutputType::MISES); !C.empty()) B(I) = C.cbegin()->at(0);
-            A.row(I) = interpolation::linear(int_pt[I].coor);
-        }
-
-        const vec X = solve(A, B);
-
-        output.emplace_back(vec{dot(interpolation::linear(-1., -1.), X)});
-        output.emplace_back(vec{dot(interpolation::linear(1., -1.), X)});
-        output.emplace_back(vec{dot(interpolation::linear(1., 1.), X)});
-        output.emplace_back(vec{dot(interpolation::linear(-1., 1.), X)});
-    }
-    else for(const auto& I : int_pt) append_to(output, I.m_material->record(P));
-
-    return output;
+    vector<vec> data;
+    for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
+    return data;
 }
 
 void CP4::print() {

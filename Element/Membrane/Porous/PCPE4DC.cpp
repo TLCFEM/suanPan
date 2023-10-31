@@ -182,31 +182,15 @@ int PCPE4DC::reset_status() {
 mat PCPE4DC::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
 vector<vec> PCPE4DC::record(const OutputType P) {
-    vector<vec> output;
+    vector<vec> data;
 
-    if(P == OutputType::NMISES) {
-        mat A(int_pt.size(), 4);
-        vec B(int_pt.size(), fill::zeros);
-
-        for(size_t I = 0; I < int_pt.size(); ++I) {
-            if(const auto C = int_pt[I].m_material->record(OutputType::MISES); !C.empty()) B(I) = C.cbegin()->at(0);
-            A.row(I) = interpolation::linear(int_pt[I].coor);
-        }
-
-        const vec X = solve(A, B);
-
-        output.emplace_back(vec{dot(interpolation::linear(-1., -1.), X)});
-        output.emplace_back(vec{dot(interpolation::linear(1., -1.), X)});
-        output.emplace_back(vec{dot(interpolation::linear(1., 1.), X)});
-        output.emplace_back(vec{dot(interpolation::linear(-1., 1.), X)});
-    }
-    else if(P == OutputType::PP) {
+    if(P == OutputType::PP) {
         const auto t_disp = get_current_displacement();
-        for(const auto& I : int_pt) output.emplace_back(vec{q * tensor::trace2(I.strain_mat * ((porosity - alpha) * t_disp(s_dof) - porosity * t_disp(f_dof)))});
+        for(const auto& I : int_pt) data.emplace_back(vec{q * tensor::trace2(I.strain_mat * ((porosity - alpha) * t_disp(s_dof) - porosity * t_disp(f_dof)))});
     }
-    else for(const auto& I : int_pt) append_to(output, I.m_material->record(P));
+    else for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
 
-    return output;
+    return data;
 }
 
 void PCPE4DC::print() {

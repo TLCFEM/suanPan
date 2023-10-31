@@ -102,13 +102,11 @@ int NonlinearViscosity::reset_status() {
 }
 
 vector<vec> NonlinearViscosity::record(const OutputType P) {
-    vector<vec> data;
+    if(OutputType::S == P) return {current_stress};
+    if(OutputType::E == P || OutputType::ED == P) return {current_strain};
+    if(OutputType::V == P || OutputType::VD == P) return {current_strain_rate};
 
-    if(OutputType::S == P) data.emplace_back(current_stress);
-    else if(OutputType::E == P || OutputType::ED == P) data.emplace_back(current_strain);
-    else if(OutputType::V == P || OutputType::VD == P) data.emplace_back(current_strain_rate);
-
-    return data;
+    return {};
 }
 
 void NonlinearViscosity::print() {

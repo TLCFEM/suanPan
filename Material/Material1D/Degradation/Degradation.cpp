@@ -127,12 +127,8 @@ int StrainDegradation::update_trial_status(const vec& t_strain) {
 }
 
 vector<vec> StrainDegradation::record(const OutputType P) {
-    vector<vec> data;
-
-    if(OutputType::DT == P) data.emplace_back(vec{compute_positive_degradation(current_history(0))(0)});
-    else if(OutputType::DC == P) data.emplace_back(vec{compute_negative_degradation(current_history(1))(0)});
-
-    if(!data.empty()) return data;
+    if(OutputType::DT == P) return {vec{compute_positive_degradation(current_history(0))(0)}};
+    if(OutputType::DC == P) return {vec{compute_negative_degradation(current_history(1))(0)}};
 
     return Degradation::record(P);
 }
@@ -197,12 +193,8 @@ int StressDegradation::update_trial_status(const vec& t_strain) {
 }
 
 vector<vec> StressDegradation::record(const OutputType P) {
-    vector<vec> data;
-
-    if(OutputType::DT == P) data.emplace_back(vec{compute_positive_degradation(current_history(0))(0)});
-    else if(OutputType::DC == P) data.emplace_back(vec{compute_negative_degradation(current_history(1))(0)});
-
-    if(!data.empty()) return data;
+    if(OutputType::DT == P) return {vec{compute_positive_degradation(current_history(0))(0)}};
+    if(OutputType::DC == P) return {vec{compute_negative_degradation(current_history(1))(0)}};
 
     return Degradation::record(P);
 }

@@ -195,9 +195,9 @@ int CSMT3::reset_status() {
     return code;
 }
 
-vector<vec> CSMT3::record(const OutputType T) {
+vector<vec> CSMT3::record(const OutputType P) {
     vector<vec> data;
-    for(const auto& I : int_pt) append_to(data, I.m_material->record(T));
+    for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
     return data;
 }
 

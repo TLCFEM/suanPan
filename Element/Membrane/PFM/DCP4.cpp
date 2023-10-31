@@ -153,28 +153,11 @@ int DCP4::reset_status() {
 }
 
 vector<vec> DCP4::record(const OutputType P) {
-    vector<vec> output;
+    if(P == OutputType::DAMAGE) return {get_current_displacement()(d_dof)};
 
-    if(P == OutputType::NMISES) {
-        mat A(int_pt.size(), 4);
-        vec B(int_pt.size(), fill::zeros);
-
-        for(size_t I = 0; I < int_pt.size(); ++I) {
-            if(const auto C = int_pt[I].m_material->record(OutputType::MISES); !C.empty()) B(I) = C.cbegin()->at(0);
-            A.row(I) = interpolation::linear(int_pt[I].coor);
-        }
-
-        const vec X = solve(A, B);
-
-        output.emplace_back(vec{dot(interpolation::linear(-1., -1.), X)});
-        output.emplace_back(vec{dot(interpolation::linear(1., -1.), X)});
-        output.emplace_back(vec{dot(interpolation::linear(1., 1.), X)});
-        output.emplace_back(vec{dot(interpolation::linear(-1., 1.), X)});
-    }
-    else if(P == OutputType::DAMAGE) output.emplace_back(get_current_displacement()(d_dof));
-    else for(const auto& I : int_pt) append_to(output, I.m_material->record(P));
-
-    return output;
+    vector<vec> data;
+    for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
+    return data;
 }
 
 void DCP4::print() {

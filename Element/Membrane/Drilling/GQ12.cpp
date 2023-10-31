@@ -165,9 +165,9 @@ int GQ12::reset_status() {
 
 mat GQ12::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
-vector<vec> GQ12::record(const OutputType T) {
+vector<vec> GQ12::record(const OutputType P) {
     vector<vec> data;
-    for(const auto& I : int_pt) append_to(data, I.m_material->record(T));
+    for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
     return data;
 }
 

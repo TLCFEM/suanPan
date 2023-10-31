@@ -664,12 +664,12 @@ int CDPM2::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-vector<vec> CDPM2::record(const OutputType T) {
-    if(T == OutputType::KAPPAP) return {vec{current_history(0)}};
-    if(T == OutputType::DT) return {vec{current_history(16)}};
-    if(T == OutputType::DC) return {vec{current_history(17)}};
+vector<vec> CDPM2::record(const OutputType P) {
+    if(P == OutputType::KAPPAP) return {vec{current_history(0)}};
+    if(P == OutputType::DT) return {vec{current_history(16)}};
+    if(P == OutputType::DC) return {vec{current_history(17)}};
 
-    return Material3D::record(T);
+    return Material3D::record(P);
 }
 
 void CDPM2::print() {

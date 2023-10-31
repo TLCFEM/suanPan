@@ -340,9 +340,9 @@ int CINP4::reset_status() {
 }
 
 vector<vec> CINP4::record(const OutputType P) {
-    vector<vec> output;
-    for(const auto& I : int_pt) append_to(output, I.m_material->record(P));
-    return output;
+    vector<vec> data;
+    for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
+    return data;
 }
 
 void CINP4::print() {

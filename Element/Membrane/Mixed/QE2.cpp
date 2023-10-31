@@ -204,12 +204,12 @@ int QE2::reset_status() {
 
 mat QE2::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
-vector<vec> QE2::record(const OutputType T) {
+vector<vec> QE2::record(const OutputType P) {
     vector<vec> data;
 
-    if(T == OutputType::E) for(const auto& I : int_pt) data.emplace_back(I.A * current_alpha);
-    else if(T == OutputType::S) for(const auto& I : int_pt) data.emplace_back(I.P * current_beta);
-    else for(const auto& I : int_pt) append_to(data, I.m_material->record(T));
+    if(P == OutputType::E) for(const auto& I : int_pt) data.emplace_back(I.A * current_alpha);
+    else if(P == OutputType::S) for(const auto& I : int_pt) data.emplace_back(I.P * current_beta);
+    else for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
 
     return data;
 }

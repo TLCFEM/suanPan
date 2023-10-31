@@ -190,9 +190,9 @@ int B31OS::reset_status() {
 }
 
 vector<vec> B31OS::record(const OutputType P) {
-    vector<vec> output;
-    for(const auto& I : int_pt) append_to(output, I.b_section->record(P));
-    return output;
+    vector<vec> data;
+    for(const auto& I : int_pt) append_to(data, I.b_section->record(P));
+    return data;
 }
 
 void B31OS::print() {

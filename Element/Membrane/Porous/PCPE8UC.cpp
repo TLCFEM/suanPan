@@ -147,15 +147,15 @@ int PCPE8UC::reset_status() {
 mat PCPE8UC::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
 vector<vec> PCPE8UC::record(const OutputType P) {
-    vector<vec> output;
+    vector<vec> data;
 
     if(P == OutputType::PP) {
         const auto t_disp = get_current_displacement();
-        for(const auto& I : int_pt) output.emplace_back(vec{-alpha * q * tensor::trace2(I.strain_mat * t_disp)});
+        for(const auto& I : int_pt) data.emplace_back(vec{-alpha * q * tensor::trace2(I.strain_mat * t_disp)});
     }
-    else for(const auto& I : int_pt) append_to(output, I.m_material->record(P));
+    else for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
 
-    return output;
+    return data;
 }
 
 void PCPE8UC::print() {

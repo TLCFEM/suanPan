@@ -118,25 +118,4 @@ void Bilinear2D::print() {
     suanpan_info("Stress:", current_stress);
 }
 
-vector<vec> Bilinear2D::record(const OutputType P) {
-    if(P == OutputType::PE) return {vec{current_strain - solve(initial_stiffness, current_stress)}};
-    if(P == OutputType::PEP) return {transform::strain::principal(current_strain - solve(initial_stiffness, current_stress))};
-    if(P == OutputType::MISES) {
-        vec trial_mises(1);
-        if(plane_type == PlaneType::S) trial_mises(0) = sqrt(current_stress(0) * current_stress(0) - current_stress(0) * current_stress(1) + current_stress(1) * current_stress(1) + 3. * current_stress(2) * current_stress(2));
-        else if(plane_type == PlaneType::E) {
-            const auto sigma_33 = elastic_modulus * poissons_ratio / (1. + poissons_ratio) / (1. - 2. * poissons_ratio) * (current_strain(0) + current_strain(1));
-            const auto sigma_mean = (current_stress(0) + current_stress(1) + sigma_33) / 3.;
-            const auto tmp_a = current_stress(0) - sigma_mean;
-            const auto tmp_b = current_stress(1) - sigma_mean;
-            const auto tmp_c = sigma_33 - sigma_mean;
-            trial_mises(0) = sqrt(1.5 * (tmp_a * tmp_a + tmp_b * tmp_b + tmp_c * tmp_c + 2. * current_stress(2) * current_stress(2)));
-        }
-
-        return {trial_mises};
-    }
-    if(P == OutputType::EEEQ) return {vec{sqrt(2. / 3.) * tensor::strain::norm(current_full_strain)}};
-    if(P == OutputType::PEEQ) return base.record(P);
-
-    return Material2D::record(P);
-}
+vector<vec> Bilinear2D::record(const OutputType P) { return base.record(P); }

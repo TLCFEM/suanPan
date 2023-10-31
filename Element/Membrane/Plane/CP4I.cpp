@@ -346,9 +346,9 @@ int CP4I::reset_status() {
 mat CP4I::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
 vector<vec> CP4I::record(const OutputType P) {
-    vector<vec> output;
-    for(const auto& I : int_pt) append_to(output, I.m_material->record(P));
-    return output;
+    vector<vec> data;
+    for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
+    return data;
 }
 
 void CP4I::print() {
