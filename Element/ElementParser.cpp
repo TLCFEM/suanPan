@@ -1257,7 +1257,7 @@ void new_dkt3(unique_ptr<Element>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned num_ip = 3;
+    auto num_ip = 3u;
     if(!get_optional_input(command, num_ip)) {
         suanpan_error("A valid number of integration points is required.\n");
         return;
@@ -1291,7 +1291,7 @@ void new_dkt4(unique_ptr<Element>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned num_ip = 3;
+    auto num_ip = 3u;
     if(!get_optional_input(command, num_ip)) {
         suanpan_error("A valid number of integration points is required.\n");
         return;
@@ -1325,7 +1325,7 @@ void new_dkts3(unique_ptr<Element>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned num_ip = 3;
+    auto num_ip = 3u;
     if(!get_optional_input(command, num_ip)) {
         suanpan_error("A valid number of integration points is required.\n");
         return;
@@ -1462,13 +1462,13 @@ void new_f21(unique_ptr<Element>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned int_pt = 6;
+    auto int_pt = 6u;
     if(!get_optional_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
         return;
     }
 
-    unsigned nonlinear = 0;
+    auto nonlinear = 0u;
     if(command.eof())
         suanpan_debug("Linear geometry assumed.\n");
     else if(!get_input(command, nonlinear))
@@ -1910,16 +1910,8 @@ void new_pcpedc(unique_ptr<Element>& return_obj, istringstream& command, const u
     }
 
     double alpha, n, k;
-    if(!get_optional_input(command, alpha)) {
-        suanpan_error("A valid alpha is required.\n");
-        return;
-    }
-    if(!get_optional_input(command, n)) {
-        suanpan_error("A valid porosity is required.\n");
-        return;
-    }
-    if(!get_optional_input(command, k)) {
-        suanpan_error("A valid permeability is required.\n");
+    if(!get_input(command, alpha, n, k)) {
+        suanpan_error("A valid parameter is required.\n");
         return;
     }
 
@@ -1952,12 +1944,8 @@ void new_pcpeuc(unique_ptr<Element>& return_obj, istringstream& command, const u
     }
 
     double alpha, n;
-    if(!get_optional_input(command, alpha)) {
-        suanpan_error("A valid alpha is required.\n");
-        return;
-    }
-    if(!get_optional_input(command, n)) {
-        suanpan_error("A valid porosity is required.\n");
+    if(!get_input(command, alpha, n)) {
+        suanpan_error("A valid parameter is required.\n");
         return;
     }
 

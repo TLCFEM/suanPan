@@ -260,7 +260,6 @@ void perform_upsampling(istringstream& command) {
     }
 
     string window_type = "Hamming";
-
     if(!get_optional_input(command, window_type)) {
         suanpan_error("A valid window type is required.\n");
         return;

@@ -243,8 +243,6 @@ int NonlinearCDP::reset_status() {
 vector<vec> NonlinearCDP::record(const OutputType P) {
     if(P == OutputType::DT) return {vec{current_history(0)}};
     if(P == OutputType::DC) return {vec{current_history(1)}};
-    if(P == OutputType::KAPPAT) return {vec{current_history(2)}};
-    if(P == OutputType::KAPPAC) return {vec{current_history(3)}};
 
     return Material3D::record(P);
 }

@@ -96,6 +96,23 @@ displacement 1 0 1 3 12
 
 recorder 1 plain Element E 1
 recorder 2 plain Element S 1
+recorder 3 plain Element EEQ 1
+recorder 4 plain Element SP 1
+recorder 5 plain Element SP1 1
+recorder 6 plain Element SP2 1
+recorder 7 plain Element SP3 1
+recorder 8 plain Element EP 1
+recorder 9 plain Element EP1 1
+recorder 10 plain Element EP2 1
+recorder 11 plain Element EP3 1
+recorder 12 plain Element EEP 1
+recorder 13 plain Element EEP1 1
+recorder 14 plain Element EEP2 1
+recorder 15 plain Element EEP3 1
+recorder 16 plain Element PEP 1
+recorder 17 plain Element PEP1 1
+recorder 18 plain Element PEP2 1
+recorder 19 plain Element PEP3 1
 
 step static 1
 set fixed_step_size 1
@@ -107,7 +124,13 @@ converger RelIncreDisp 1 1E-12 50 1
 
 analyze
 
-# -0.0714 -0.0500 1.0000
+# Node 12:
+# Coordinate:
+#   3.0000e+01  3.0000e+01  5.0000e+00
+# Displacement:
+#  -7.1440e-02 -4.9961e-02  1.0000e+00
+# Resistance:
+#   3.1732e-14  2.8803e-14  5.2365e+00
 peek node 12
 
 peek element 1

@@ -21,148 +21,126 @@
 #include <string>
 
 enum class OutputType {
-    // damper stress in Maxwell model
-    SD,
-    // damper strain in Maxwell model
-    ED,
-    // damper strain rate in Maxwell model
-    VD,
-    // spring stress in Maxwell model
-    SS,
-    // spring strain in Maxwell model
-    ES,
-    // spring strain rate in Maxwell model
-    VS,
     // stress
     S,
     S11,
-    S22,
-    S33,
     S12,
-    S23,
     S13,
-    // interpolation parameters of the stress field
-    SINT,
-    HYDRO,
-    PP,
-    // pore pressure
+    S22,
+    S23,
+    S33,
+
     // strain
     E,
     E11,
-    E22,
-    E33,
     E12,
-    E23,
     E13,
-    // eqv. strain
-    EEQ,
-    // interpolation parameters of the strain field
-    EINT,
+    E22,
+    E23,
+    E33,
+
+    // elastic strain
+    EE,
+    EE11,
+    EE12,
+    EE13,
+    EE22,
+    EE23,
+    EE33,
+
+    // plastic strain
+    PE,
+    PE11,
+    PE12,
+    PE13,
+    PE22,
+    PE23,
+    PE33,
+
     // principal stress
     SP,
     SP1,
     SP2,
     SP3,
+
     // principal strain
     EP,
     EP1,
     EP2,
     EP3,
-    // stress invariant
-    SINV,
-    // Mises stress
-    MISES,
-    // Mises stress
-    NMISES,
-    // Tresca stress
-    TRESC,
-    // elastic strain
-    EE,
-    EE11,
-    EE22,
-    EE33,
-    EE12,
-    EE23,
-    EE13,
+
     // principal elastic strain
     EEP,
     EEP1,
     EEP2,
     EEP3,
-    // equivalent elastic strain
-    EEEQ,
-    // plastic strain
-    PE,
-    PE11,
-    PE22,
-    PE33,
-    PE12,
-    PE23,
-    PE13,
+
     // principal plastic strain
     PEP,
     PEP1,
     PEP2,
     PEP3,
-    // eqv. plastic strain
-    PEEQ,
 
     // displacement
     U,
-    // translation displacement
-    UT,
-    // rotation displacement
-    UR,
     U1,
     U2,
     U3,
-    UR1,
-    UR2,
-    UR3,
     U4,
     U5,
     U6,
+    UR1,
+    UR2,
+    UR3,
+
     // velocity
     V,
-    VT,
-    VR,
     V1,
     V2,
     V3,
-    VR1,
-    VR2,
-    VR3,
     V4,
     V5,
     V6,
+    VR1,
+    VR2,
+    VR3,
+
     // acceleration
     A,
-    AT,
-    AR,
     A1,
     A2,
     A3,
-    AR1,
-    AR2,
-    AR3,
     A4,
     A5,
     A6,
+    AR1,
+    AR2,
+    AR3,
+
+    // momentum
+    MM,
+    MM1,
+    MM2,
+    MM3,
+    MM4,
+    MM5,
+    MM6,
+    MMR1,
+    MMR2,
+    MMR3,
 
     // reaction force
     RF,
-    RT,
     RF1,
     RF2,
     RF3,
     RF4,
     RF5,
     RF6,
-    // reaction moment
-    RM,
     RM1,
     RM2,
     RM3,
+
     // damping force
     DF,
     DF1,
@@ -174,6 +152,7 @@ enum class OutputType {
     DM1,
     DM2,
     DM3,
+
     // inertial force
     IF,
     IF1,
@@ -185,7 +164,8 @@ enum class OutputType {
     IM1,
     IM2,
     IM3,
-    // damping force
+
+    // global damping force
     GDF,
     GDF1,
     GDF2,
@@ -196,7 +176,8 @@ enum class OutputType {
     GDM1,
     GDM2,
     GDM3,
-    // inertial force
+
+    // global inertial force
     GIF,
     GIF1,
     GIF2,
@@ -208,68 +189,84 @@ enum class OutputType {
     GIM2,
     GIM3,
 
-    // damage variable
-    DAMAGE,
-    DT,
-    DC,
-    KAPPAT,
-    KAPPAC,
-    KAPPAP,
-    VF,
+    // hydrostatic pressure
+    HYDRO,
 
-    RESULTANT,
-    // resultant force
-    AXIAL,
-    // axial force resultant force
-    SHEAR,
-    // shear force resultant force
-    MOMENT,
-    // moment resultant force
-    TORSION,
-    // torsion resultant force
+    // von Mises stress
+    MISES,
 
-    REBARE,
-    REBARS,
+    // equivalent strain
+    EEQ,
+    // equivalent elastic strain
+    EEEQ,
+    // equivalent plastic strain
+    PEEQ,
 
-    LITR,
-    // local iteration counter
+    // kinetic energy
+    KE,
+    // strain energy
+    SE,
+    // viscous energy
+    VE,
+    // nonviscous energy
+    NVE,
+
+    // stiffness
     K,
+    // mass
     M,
 
-    // energy
-    SE,
-    TSE,
-    CSE,
-    KE,
-    VE,
-    NVE,
-    // momentum
-    MM,
-    MMX,
-    MMY,
-    MMZ,
-    MMRX,
-    MMRY,
-    MMRZ,
+    // damper strain in Maxwell/Kelvin model
+    ED,
+    // damper strain rate in Maxwell/Kelvin model
+    VD,
+    // damper force in Maxwell/Kelvin model
+    SD,
+    // spring strain in Maxwell/Kelvin model
+    ES,
+    // spring strain rate in Maxwell/Kelvin model
+    VS,
+    // spring force in Maxwell/Kelvin model
+    SS,
 
-    // history variable
+    // damage variable in phase field models
+    DAMAGE,
+    // tensile damage in material models
+    DT,
+    // compressive damage in material models
+    DC,
+
+    // pore pressure
+    PP,
+
+    // volume fraction
+    VF,
+
+    // history vector
     HIST,
+
+    // local iteration in Maxwell model
+    LITR,
+
+    // yield flag, 1 for yield, 0 for not yield
+    YF,
+
+    // beam end deformation
+    BEAME,
+    // beam end force
+    BEAMS,
 
     // amplitude
     AMP,
 
-    // yield flag
-    YF,
-
-    // beam element end forces
-    BEAME,
-    BEAMS,
-
     NL
 };
 
-const char* to_char(const OutputType&);
-OutputType to_list(const char*);
-OutputType to_list(const std::string&);
+const char* to_name(OutputType);
+OutputType to_token(const char*);
+OutputType to_token(const std::string&);
+
+const char* to_category(OutputType);
+int to_index(OutputType);
 
 #endif

@@ -43,28 +43,22 @@ recorder 1 hdf5 Element S 1
 recorder 2 hdf5 Element S11 1
 recorder 3 hdf5 Element S22 1
 recorder 4 hdf5 Element S12 1
-recorder 5 hdf5 Element SINT 1
-recorder 6 hdf5 Element E 1
-recorder 7 hdf5 Element E11 1
-recorder 8 hdf5 Element E22 1
-recorder 9 hdf5 Element E12 1
-recorder 10 hdf5 Element EINT 1
-recorder 11 hdf5 Element AXIAL 1
-recorder 12 hdf5 Element SHEAR 1
-recorder 13 hdf5 Element MOMENT 1
-recorder 14 hdf5 Element RESULTANT 1
-recorder 15 hdf5 Element MISES 1
-recorder 16 hdf5 Element K 1
-recorder 17 hdf5 Element M 1
-recorder 18 hdf5 Element SP 1
-recorder 19 hdf5 Element SP1 1
-recorder 20 hdf5 Element SP2 1
-recorder 21 hdf5 Element EP 1
-recorder 22 hdf5 Element EP1 1
-recorder 23 hdf5 Element EP2 1
-recorder 24 hdf5 Element PE 1
-recorder 25 hdf5 Element PEP 1
-recorder 26 hdf5 Element PEEQ 1
+recorder 5 hdf5 Element E 1
+recorder 6 hdf5 Element E11 1
+recorder 7 hdf5 Element E22 1
+recorder 8 hdf5 Element E12 1
+recorder 9 hdf5 Element MISES 1
+recorder 10 hdf5 Element K 1
+recorder 11 hdf5 Element M 1
+recorder 12 hdf5 Element SP 1
+recorder 13 hdf5 Element SP1 1
+recorder 14 hdf5 Element SP2 1
+recorder 15 hdf5 Element EP 1
+recorder 16 hdf5 Element EP1 1
+recorder 17 hdf5 Element EP2 1
+recorder 18 hdf5 Element PE 1
+recorder 19 hdf5 Element PEP 1
+recorder 20 hdf5 Element PEEQ 1
 
 step static 1
 

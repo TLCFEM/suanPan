@@ -15,7 +15,8 @@ hdf5recorder 1 Node U1 2
 hdf5recorder 2 Node RF1 2
 hdf5recorder 3 Global KE
 hdf5recorder 4 Global SE
-hdf5recorder 5 Global NVE
+hdf5recorder 5 Global VE
+hdf5recorder 6 Global NVE
 
 elementgroup 1 1
 

@@ -19,6 +19,7 @@ lineudl2d 2 0 10 2 1 2
 recorder 1 hdf5 Element E 1
 recorder 2 hdf5 Element S 1
 recorder 3 hdf5 Element PE 1
+recorder 4 hdf5 Element EE 1
 
 step static 1 1
 set ini_step_size .1

@@ -18,8 +18,6 @@ displacement 2 0 -3E-2 2 3 4
 
 hdf5recorder 1 Element DT 1
 hdf5recorder 2 Element DC 1
-hdf5recorder 3 Element KAPPAT 1
-hdf5recorder 4 Element KAPPAC 1
 hdf5recorder 5 Element PE 1
 hdf5recorder 6 Element PE11 1
 hdf5recorder 7 Element PE22 1

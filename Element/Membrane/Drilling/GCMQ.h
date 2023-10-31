@@ -39,25 +39,7 @@
 class IntegrationPlan;
 
 class GCMQ final : public SGCMQ {
-    struct ResultantConverter final {
-        enum class Edge {
-            A,
-            B,
-            C,
-            D
-        };
-
-        mat converter_a, converter_b;
-        mat direction_cosine;
-        ResultantConverter(Edge, double, const mat&, const IntegrationPlan&, const mat&);
-        [[nodiscard]] double F(const vec&) const;
-        [[nodiscard]] double V(const vec&) const;
-        [[nodiscard]] double M(const vec&) const;
-    };
-
     static constexpr int enhanced_mode = 2;
-
-    vector<ResultantConverter> edge;
 
     const mat mat_stiffness, iso_mapping;
 

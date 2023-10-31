@@ -20,8 +20,8 @@ fix2 2 7 1
 
 cload 1 0 1 3 3
 
-recorder 1 hdf5 Element BEAME 1
-recorder 2 hdf5 Element BEAMS 1
+recorder 1 hdf5 Element E 1
+recorder 2 hdf5 Element S 1
 
 step static 1
 set ini_step_size 1

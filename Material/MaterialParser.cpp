@@ -2899,7 +2899,7 @@ void new_substepping(unique_ptr<Material>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned max_iteration = 20;
+    auto max_iteration = 20u;
     if(!get_optional_input(command, max_iteration)) {
         suanpan_error("A valid maximum iteration is required.\n");
         return;

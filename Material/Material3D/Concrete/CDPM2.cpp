@@ -665,7 +665,6 @@ int CDPM2::reset_status() {
 }
 
 vector<vec> CDPM2::record(const OutputType P) {
-    if(P == OutputType::KAPPAP) return {vec{current_history(0)}};
     if(P == OutputType::DT) return {vec{current_history(16)}};
     if(P == OutputType::DC) return {vec{current_history(17)}};
 
