@@ -323,10 +323,10 @@ mat SGCMQ::GetData(const OutputType P) {
     }
 
     mat A(int_pt.size(), 9);
-    mat B(int_pt.size(), 6, fill::zeros);
+    mat B(6, int_pt.size(), fill::zeros);
 
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        if(const auto C = int_pt[I].m_material->record(P); !C.empty()) B(I, 0, size(C[0])) = C[0];
+        if(const auto C = int_pt[I].m_material->record(P); !C.empty()) B(0, I, size(C[0])) = C[0];
         A.row(I) = interpolation::quadratic(int_pt[I].coor);
     }
 
@@ -337,7 +337,7 @@ mat SGCMQ::GetData(const OutputType P) {
     data.row(2) = interpolation::quadratic(1., 1.);
     data.row(3) = interpolation::quadratic(-1., 1.);
 
-    return (data * solve(A, B, solve_opts::fast)).t();
+    return (data * solve(A, B.t())).t();
 }
 
 void SGCMQ::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {

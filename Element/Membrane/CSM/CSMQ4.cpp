@@ -245,10 +245,10 @@ void CSMQ4::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType ty
 
 mat CSMQ4::GetData(const OutputType P) {
     mat A(int_pt.size(), 4);
-    mat B(int_pt.size(), 6, fill::zeros);
+    mat B(6, int_pt.size(), fill::zeros);
 
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        if(const auto C = int_pt[I].m_material->record(P); !C.empty()) B(I, 0, size(C[0])) = C[0];
+        if(const auto C = int_pt[I].m_material->record(P); !C.empty()) B(0, I, size(C[0])) = C[0];
         A.row(I) = interpolation::linear(int_pt[I].coor);
     }
 
@@ -259,7 +259,7 @@ mat CSMQ4::GetData(const OutputType P) {
     data.row(2) = interpolation::linear(1., 1.);
     data.row(3) = interpolation::linear(-1., 1.);
 
-    return (data * solve(A, B)).t();
+    return (data * solve(A, B.t())).t();
 }
 
 void CSMQ4::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
