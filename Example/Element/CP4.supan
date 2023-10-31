@@ -151,9 +151,8 @@ element CP4 62 77 82 83 78 1 1
 element CP4 63 78 83 84 79 1 1
 element CP4 64 79 84 85 80 1 1
 
-recorder 1 plain Element NMISES 1
-
-material Bilinear2D 1 5000 .2 80 .05
+material BilinearJ2 2 5000 .2 80 .05
+material PlaneStress 1 2
 
 fix 1 P 1 2 3 4 5
 

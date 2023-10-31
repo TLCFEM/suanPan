@@ -10,13 +10,14 @@
 
 1. revise uniaxial universal damage models [#153](https://github.com/TLCFEM/suanPan/pull/153)
 2. update `OpenBLAS` to version `0.3.24`
-3. a new uniaxial concrete model `ConcreteK4` [#155](https://github.com/TLCFEM/suanPan/pull/155)
-4. beam element for arbitrary thin-/thick-walled open/close section with torsion and warping `B31OS` [#159](https://github.com/TLCFEM/suanPan/pull/159)
+3. add a new uniaxial concrete model `ConcreteK4` [#155](https://github.com/TLCFEM/suanPan/pull/155)
+4. add beam element for arbitrary thin-/thick-walled open/close section with torsion and warping `B31OS` [#159](https://github.com/TLCFEM/suanPan/pull/159)
 5. better local iteration convergence criterion [#161](https://github.com/TLCFEM/suanPan/pull/161)
 6. `B31OS` and `EB31OS` associated transformations `B3DOSL`, `B3DOSC`; sections, `Fibre3DOS`, `Cell3DOS`; material wrappers `OS146`, `OS146S`
-7. elemental damping using Lee's model
+7. add elemental damping using Lee's model
 8. support Lode angle in CDPM2 [#163](https://github.com/TLCFEM/suanPan/pull/163)
 9. add `AICN` cubic Newton solver [#165](https://github.com/TLCFEM/suanPan/pull/165)
+10. remove `Bilinear2D` material, use `PlaneStress` wrapper and `BilinearJ2` 3D model instead
 
 ## version 3.1
 

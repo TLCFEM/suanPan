@@ -340,64 +340,6 @@ void new_bilinear1d(unique_ptr<Material>& return_obj, istringstream& command) {
     return_obj = make_unique<Bilinear1D>(tag, elastic_modulus, yield_stress, hardening_ratio, beta, density);
 }
 
-void new_bilinear2d(unique_ptr<Material>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    double elastic_modulus;
-    if(!get_input(command, elastic_modulus)) {
-        suanpan_error("A valid elastic modulus is required.\n");
-        return;
-    }
-
-    double poissons_ratio;
-    if(!get_input(command, poissons_ratio)) {
-        suanpan_error("A valid poissons ratio is required.\n");
-        return;
-    }
-
-    double yield_stress;
-    if(!get_input(command, yield_stress)) {
-        suanpan_error("A valid yield stress is required.\n");
-        return;
-    }
-
-    auto hardening_ratio = 0.;
-    if(command.eof())
-        suanpan_debug("Zero hardening ratio assumed.\n");
-    else if(!get_input(command, hardening_ratio)) {
-        suanpan_error("A valid hardening ratio is required.\n");
-        return;
-    }
-
-    auto beta = 1.;
-    if(command.eof())
-        suanpan_debug("Isotropic hardening assumed.\n");
-    else if(!get_input(command, beta)) {
-        suanpan_error("A valid beta is required.\n");
-        return;
-    }
-
-    unsigned material_type = 0;
-    if(!command.eof() && !get_input(command, material_type)) {
-        suanpan_error("A valid material type is required.\n");
-        return;
-    }
-
-    auto density = 0.;
-    if(command.eof())
-        suanpan_debug("Zero density assumed.\n");
-    else if(!get_input(command, density)) {
-        suanpan_error("A valid density is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<Bilinear2D>(tag, elastic_modulus, poissons_ratio, yield_stress, hardening_ratio, beta, material_type == 0 ? PlaneType::S : PlaneType::E, density);
-}
-
 void new_bilinearcc(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -3421,7 +3363,6 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "Axisymmetric")) new_axisymmetric(new_material, command);
     else if(is_equal(material_id, "AxisymmetricElastic")) new_axisymmetricelastic(new_material, command);
     else if(is_equal(material_id, "Bilinear1D")) new_bilinear1d(new_material, command);
-    else if(is_equal(material_id, "Bilinear2D")) new_bilinear2d(new_material, command);
     else if(is_equal(material_id, "BilinearCC")) new_bilinearcc(new_material, command);
     else if(is_equal(material_id, "BilinearDP")) new_bilineardp(new_material, command);
     else if(is_equal(material_id, "BilinearElastic1D")) new_bilinearelastic1d(new_material, command);

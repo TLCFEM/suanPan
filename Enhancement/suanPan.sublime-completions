@@ -3079,12 +3079,6 @@
       "trigger":"Bilinear1D"
     },
     {
-      "contents":"",
-      "details":"",
-      "kind":"type",
-      "trigger":"Bilinear2D"
-    },
-    {
       "contents":"material BilinearCC ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:[9]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, poissons ratio\n# (4) double, beta, controls compression side shape\n# (5) double, m, slope of CSL\n# (6) double, p_t, initial tension strength\n# (7) double, a_0, initial a_0\n# (8) double, H\n# [9] double, density, default: 0.0",
       "details":"cam-clay model with bilinear hardening model",
       "kind":"type",

@@ -33,17 +33,10 @@ recorder 1 hdf5 Element S 1
 recorder 2 hdf5 Element S11 1
 recorder 3 hdf5 Element S22 1
 recorder 4 hdf5 Element S12 1
-recorder 5 hdf5 Element SINT 1
-recorder 6 hdf5 Element E 1
-recorder 7 hdf5 Element E11 1
-recorder 8 hdf5 Element E22 1
-recorder 9 hdf5 Element E12 1
-recorder 10 hdf5 Element EINT 1
-recorder 11 hdf5 Element AXIAL 1
-recorder 12 hdf5 Element SHEAR 1
-recorder 13 hdf5 Element MOMENT 1
-recorder 14 hdf5 Element RESULTANT 1
-recorder 15 hdf5 Element NMISES 1
+recorder 5 hdf5 Element E 1
+recorder 6 hdf5 Element E11 1
+recorder 7 hdf5 Element E22 1
+recorder 8 hdf5 Element E12 1
 
 step static 1
 

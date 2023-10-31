@@ -104,6 +104,8 @@ It is assumed that [**AVX**](https://en.wikipedia.org/wiki/Advanced_Vector_Exten
 fails, please check if your CPU supports AVX.
 Alternatively, you can try the `no-avx` version.
 
+> Check artifacts of [workflows](https://github.com/TLCFEM/suanPan/actions/workflows/dev-all.yml) for the latest binaries.
+
 ### Windows
 
 #### Binary Package

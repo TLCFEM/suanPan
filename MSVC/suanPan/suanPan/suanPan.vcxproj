@@ -358,7 +358,6 @@
     <ClCompile Include="..\..\..\Material\Material1D\Wrapper\Parallel.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Wrapper\Sequential.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Wrapper\Uniaxial.cpp" />
-    <ClCompile Include="..\..\..\Material\Material2D\Bilinear2D.cpp" />
     <ClCompile Include="..\..\..\Material\Material2D\Concrete21.cpp" />
     <ClCompile Include="..\..\..\Material\Material2D\Concrete22.cpp" />
     <ClCompile Include="..\..\..\Material\Material2D\Elastic\AxisymmetricElastic.cpp" />
@@ -845,7 +844,6 @@
     <ClInclude Include="..\..\..\Material\Material1D\Wrapper\Parallel.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Wrapper\Sequential.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Wrapper\Uniaxial.h" />
-    <ClInclude Include="..\..\..\Material\Material2D\Bilinear2D.h" />
     <ClInclude Include="..\..\..\Material\Material2D\Concrete21.h" />
     <ClInclude Include="..\..\..\Material\Material2D\Concrete22.h" />
     <ClInclude Include="..\..\..\Material\Material2D\Elastic\AxisymmetricElastic.h" />

@@ -753,9 +753,6 @@
     <ClCompile Include="..\..\..\Material\Material2D\Wrapper\Rotation2D.cpp">
       <Filter>Material\Material2D\Wrapper</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Material\Material2D\Bilinear2D.cpp">
-      <Filter>Material\Material2D</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Material\Material2D\Concrete21.cpp">
       <Filter>Material\Material2D</Filter>
     </ClCompile>
@@ -2171,9 +2168,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material2D\Wrapper\Rotation2D.h">
       <Filter>Material\Material2D\Wrapper</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Material\Material2D\Bilinear2D.h">
-      <Filter>Material\Material2D</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material2D\Concrete21.h">
       <Filter>Material\Material2D</Filter>
