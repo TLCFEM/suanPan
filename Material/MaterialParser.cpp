@@ -2399,7 +2399,7 @@ void new_multilinearj2(unique_ptr<Material>& return_obj, istringstream& command)
         return;
     }
 
-    auto density = 0.;
+    double density;
     if(!get_input(command, density)) {
         suanpan_error("A valid density is required.\n");
         return;
@@ -2436,7 +2436,7 @@ void new_multilinearmises1d(unique_ptr<Material>& return_obj, istringstream& com
         return;
     }
 
-    auto density = 0.;
+    double density;
     if(!get_input(command, density)) {
         suanpan_error("A valid density is required.\n");
         return;
