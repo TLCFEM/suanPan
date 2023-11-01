@@ -1,0 +1,60 @@
+# A TEST MODEL FOR NM3D1 SECTION
+
+node 1 0 0 0
+node 2 1 0 0
+node 3 1 2 0
+
+orientation B3DL 1 0. 0. 1.
+
+section NM3D1 1 10 200 400 0.
+element NMB31 1 1 2 1 1
+element NMB31 2 2 3 1 1
+
+fix2 1 E 1
+
+displacement 1 0 .6 3 3
+
+recorder 1 hdf5 Element E 1
+recorder 2 hdf5 Element S 1
+recorder 3 hdf5 Element PE 1
+
+step static 1
+set ini_step_size 1E-1
+set fixed_step_size true
+
+converger RelIncreDisp 1 1E-12 20 1
+
+analyze
+
+# Node 1:
+# Coordinate:
+#   0.0000e+00  0.0000e+00  0.0000e+00
+# Displacement:
+#   0.0000e+00  0.0000e+00  0.0000e+00  0.0000e+00  0.0000e+00  0.0000e+00
+# Resistance:
+#   0.0000e+00  0.0000e+00 -7.9973e+01  1.5995e+02  7.9973e+01  0.0000e+00
+#
+# Node 2:
+# Coordinate:
+#   1.0000e+00  0.0000e+00  0.0000e+00
+# Displacement:
+#   0.0000e+00  0.0000e+00  6.6644e-02 -9.9967e-05 -9.9967e-02  0.0000e+00
+# Resistance:
+#   0.0000e+00  0.0000e+00 -4.2633e-14  0.0000e+00 -5.1870e-13  0.0000e+00
+#
+# Node 3:
+# Coordinate:
+#   1.0000e+00  2.0000e+00  0.0000e+00
+# Displacement:
+#   0.0000e+00  0.0000e+00  6.0000e-01 -3.9997e-01 -9.9967e-02  0.0000e+00
+# Resistance:
+#   0.0000e+00  0.0000e+00  7.9973e+01  2.8422e-14  0.0000e+00  0.0000e+00
+peek node 1 2 3
+
+peek element 1 2
+
+# save recorder 2
+
+reset
+clear
+exit
