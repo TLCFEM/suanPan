@@ -46,37 +46,37 @@
       "trigger": "AbsDisp",
       "details": "converger absdisp",
       "kind": "keyword",
-      "contents": "converger AbsDisp ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]}\n# (1) int, unique tag\n# (2) double, tolerance\n# [3] int, maximum iteration, default: 10\n# [4] bool string, print switch, default: false\n"
+      "contents": "converger AbsDisp ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]}\n# (1) int, unique tag\n# (2) double, tolerance\n# [3] int, maximum iteration, default: 10\n# [4] bool string, print switch, default: false"
     },
     {
       "trigger": "AbsError",
       "details": "converger abserror",
       "kind": "keyword",
-      "contents": "converger AbsError ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]}\n# (1) int, unique tag\n# (2) double, tolerance\n# [3] int, maximum iteration, default: 10\n# [4] bool string, print switch, default: false\n"
+      "contents": "converger AbsError ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]}\n# (1) int, unique tag\n# (2) double, tolerance\n# [3] int, maximum iteration, default: 10\n# [4] bool string, print switch, default: false"
     },
     {
       "trigger": "AbsIncreAcc",
       "details": "converger absincreacc",
       "kind": "keyword",
-      "contents": "converger AbsIncreAcc ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]}\n# (1) int, unique tag\n# (2) double, tolerance\n# [3] int, maximum iteration, default: 10\n# [4] bool string, print switch, default: false\n"
+      "contents": "converger AbsIncreAcc ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]}\n# (1) int, unique tag\n# (2) double, tolerance\n# [3] int, maximum iteration, default: 10\n# [4] bool string, print switch, default: false"
     },
     {
       "trigger": "AbsIncreDisp",
       "details": "converger absincredisp",
       "kind": "keyword",
-      "contents": "converger AbsIncreDisp ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]}\n# (1) int, unique tag\n# (2) double, tolerance\n# [3] int, maximum iteration, default: 10\n# [4] bool string, print switch, default: false\n"
+      "contents": "converger AbsIncreDisp ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]}\n# (1) int, unique tag\n# (2) double, tolerance\n# [3] int, maximum iteration, default: 10\n# [4] bool string, print switch, default: false"
     },
     {
       "trigger": "AbsIncreEnergy",
       "details": "converger absincreenergy",
       "kind": "keyword",
-      "contents": "converger AbsIncreEnergy ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]}\n# (1) int, unique tag\n# (2) double, tolerance\n# [3] int, maximum iteration, default: 10\n# [4] bool string, print switch, default: false\n"
+      "contents": "converger AbsIncreEnergy ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]}\n# (1) int, unique tag\n# (2) double, tolerance\n# [3] int, maximum iteration, default: 10\n# [4] bool string, print switch, default: false"
     },
     {
       "trigger": "AbsResidual",
       "details": "converger absresidual",
       "kind": "keyword",
-      "contents": "converger AbsResidual ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]}\n# (1) int, unique tag\n# (2) double, tolerance\n# [3] int, maximum iteration, default: 10\n# [4] bool string, print switch, default: false\n"
+      "contents": "converger AbsResidual ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]}\n# (1) int, unique tag\n# (2) double, tolerance\n# [3] int, maximum iteration, default: 10\n# [4] bool string, print switch, default: false"
     },
     {
       "trigger": "Allman",
@@ -584,9 +584,9 @@
     },
     {
       "trigger": "ConcreteTable",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
+      "details": "concrete material with table input",
+      "kind": "type",
+      "contents": "material ConcreteTable ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]} ${5:[5]}\n# (1) int, unique material tag\n# (2) string, tension backbone file name\n# (3) string, compression backbone file name\n# [4] double, middle point parameter [0,1], default: 0.2\n# [5] double, density, default: 0.0"
     },
     {
       "trigger": "ConcreteTsai",
@@ -644,7 +644,7 @@
     },
     {
       "trigger": "CustomElastic1D",
-      "details": "",
+      "details": "uniaxial elastic material with custom function",
       "kind": "type",
       "contents": "element CustomElastic1D ${1:(1)} ${2:(2)} ${3:[3]}\n# (1) int, unique element tag\n# (2) int, expression tag\n# (3) double, density, default: 0"
     },
@@ -674,7 +674,7 @@
     },
     {
       "trigger": "CustomMises1D",
-      "details": "",
+      "details": "uniaxial j2 model with custom hardening function",
       "kind": "type",
       "contents": "element CustomMises1D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5]}\n# (1) int, unique element tag\n# (2) double, elastic modulus\n# (3) int, isotropic hardening expression tag\n# (4) int, kinematic hardening expression tag\n# (5) double, density, default: 0"
     },
@@ -1190,15 +1190,15 @@
     },
     {
       "trigger": "LineUDL2D",
-      "details": "",
+      "details": "2d linear udl",
       "kind": "keyword",
-      "contents": ""
+      "contents": "lineudl2d ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\nload lineudl2d ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) int, dof tag\n# (5...) int, node tags"
     },
     {
       "trigger": "LineUDL3D",
-      "details": "",
+      "details": "3d linear udl",
       "kind": "keyword",
-      "contents": ""
+      "contents": "lineudl3d ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\nload lineudl3d ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) int, dof tag\n# (5...) int, node tags"
     },
     {
       "trigger": "Linear",
@@ -1466,21 +1466,21 @@
     },
     {
       "trigger": "NM2D2",
-      "details": "n-m interaction elastic section",
+      "details": "n-m interaction inelastic section with linear hardening",
       "kind": "type",
       "contents": "section NM2D2 ${1:(1)} ${2:(2...9)} [${10:(10)} ${11:(11)} ${12:(12)}...]\n# (1) int, unique section tag\n# (2) double, EA\n# (3) double, EI\n# (4) double, yielding axial force\n# (5) double, yielding strong axis moment\n# (6) double, d\n# (7) double, isotropic hardening parameter H\n# (8) double, kinematic hardening parameter K\n# (9) double, linear density\n# (10) double, a_i\n# (11) double, b_i\n# (12) double, c_i"
     },
     {
       "trigger": "NM2D3",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
+      "details": "n-m interaction inelastic section with nonlinear hardening",
+      "kind": "type",
+      "contents": "section NM2D3 ${1:(1)} ${2:(2...12)} [${13:(13)} ${14:(14)} ${15:(15)}) ...]\n# (1) int, unique section tag\n# (2) double, EA\n# (3) double, EI\n# (4) double, yielding axial force\n# (5) double, yielding strong axis moment\n# (6) double, d\n# (7) double, isotropic hardening modulus, H\n# (8) double, isotropic hardening saturation, s\n# (9) double, isotropic hardening decay, m\n# (10) double, kinematic hardening modulus, K_b\n# (11) double, kinematic hardening base, K_a\n# (12) double, linear density\n# (13) double, a_i\n# (14) double, b_i\n# (15) double, c_i"
     },
     {
       "trigger": "NM2D3K",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
+      "details": "n-m interaction inelastic section with nonlinear hardening",
+      "kind": "type",
+      "contents": "section NM2D3K ${1:(1)} (2...14) [${15:(15)} ${16:(16)} ${17:(17)} ...]\n# (1) int, unique section tag\n# (2) double, EA\n# (3) double, EI\n# (4) double, yielding axial force\n# (5) double, yielding strong axis moment\n# (6) double, d\n# (7) double, isotropic hardening modulus, H\n# (8) double, isotropic hardening saturation, s\n# (9) double, isotropic hardening decay, m\n# (10) double, kinematic hardening modulus for axial force, K_b\n# (11) double, kinematic hardening modulus for strong axis moment, K_b\n# (12) double, kinematic hardening base for axial force, K_a\n# (13) double, kinematic hardening base for strong axis moment, K_a\n# (14) double, linear density\n# (15) double, a_i\n# (16) double, b_i\n# (17) double, c_i"
     },
     {
       "trigger": "NM3D1",
@@ -1490,21 +1490,21 @@
     },
     {
       "trigger": "NM3D2",
-      "details": "n-m interaction elastic section",
+      "details": "n-m interaction inelastic section with linear hardening",
       "kind": "type",
       "contents": "section NM3D2 ${1:(1)} ${2:(2...11)}\n# (1) int, unique section tag\n# (2) double, EA\n# (3) double, strong axis EI\n# (4) double, weak axis EI\n# (5) double, yielding axial force\n# (6) double, yielding strong axis moment\n# (7) double, yielding weak axis moment\n# (8) double, c\n# (9) double, isotropic hardening parameter H\n# (10) double, kinematic hardening parameter K\n# (11) double, linear density"
     },
     {
       "trigger": "NM3D3",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
+      "details": "n-m interaction inelastic section with nonlinear hardening",
+      "kind": "type",
+      "contents": "section NM3D3 ${1:(1)} (2...14) [${15:(15)} ${16:(16)} ${17:(17)} ${18:(18)}...]\n# (1) int, unique section tag\n# (2) double, EA\n# (3) double, strong axis EI\n# (4) double, weak axis EI\n# (5) double, yielding axial force\n# (6) double, yielding strong axis moment\n# (7) double, yielding weak axis moment\n# (8) double, e\n# (9) double, isotropic hardening modulus, H\n# (10) double, isotropic hardening saturation, s\n# (11) double, isotropic hardening decay, m\n# (12) double, kinematic hardening modulus, K_b\n# (13) double, kinematic hardening base, K_a\n# (14) double, linear density\n# (15) double, a_i\n# (16) double, b_i\n# (17) double, c_i\n# (18) double, d_i"
     },
     {
       "trigger": "NM3D3K",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
+      "details": "n-m interaction inelastic section with nonlinear hardening",
+      "kind": "type",
+      "contents": "section NM3D3K ${1:(1)} (2...18) [${19:(19)} ${20:(20)} ${21:(21)} ${22:(22)}...]\n# (1) int, unique section tag\n# (2) double, EA\n# (3) double, strong axis EI\n# (4) double, weak axis EI\n# (5) double, yielding axial force\n# (6) double, yielding strong axis moment\n# (7) double, yielding weak axis moment\n# (8) double, e\n# (9) double, isotropic hardening modulus, H\n# (10) double, isotropic hardening saturation, s\n# (11) double, isotropic hardening decay, m\n# (12) double, kinematic hardening modulus for axial force, K_b\n# (13) double, kinematic hardening modulus for strong axis moment, K_b\n# (14) double, kinematic hardening modulus for weak axis moment, K_b\n# (15) double, kinematic hardening base for axial force, K_a\n# (16) double, kinematic hardening base for strong axis moment, K_a\n# (17) double, kinematic hardening base for weak axis moment, K_a\n# (18) double, linear density\n# (19) double, a_i\n# (20) double, b_i\n# (21) double, c_i\n# (22) double, d_i"
     },
     {
       "trigger": "NMB21",
@@ -1633,12 +1633,6 @@
       "contents": "element PS ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0"
     },
     {
-      "trigger": "ParabolicCC",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
-    },
-    {
       "trigger": "Parallel",
       "details": "parallel wrapper for 1d material models",
       "kind": "type",
@@ -1646,15 +1640,15 @@
     },
     {
       "trigger": "ParticleCollision2D",
-      "details": "",
+      "details": "2d particle collision constraint",
       "kind": "keyword",
-      "contents": ""
+      "contents": "ParticleCollision2D ${1:(1)} ${2:(2)} ${3:(3)}\nconstraint ParticleCollision2D ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique constraint tag\n# (2) double, space\n# (3) double, penalty number"
     },
     {
       "trigger": "ParticleCollision3D",
-      "details": "",
+      "details": "3d particle collision constraint",
       "kind": "keyword",
-      "contents": ""
+      "contents": "ParticleCollision3D ${1:(1)} ${2:(2)} ${3:(3)}\nconstraint ParticleCollision3D ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique constraint tag\n# (2) double, space\n# (3) double, penalty number"
     },
     {
       "trigger": "PatchCube",
@@ -1688,15 +1682,15 @@
     },
     {
       "trigger": "PlaneSymmetric13",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
+      "details": "plane wrapper",
+      "kind": "type",
+      "contents": "material PlaneSymmetric13 ${1:(1)} ${2:(2)}\n# (1) int, unique material tag\n# (2) int, 3D reference material tag"
     },
     {
       "trigger": "PlaneSymmetric23",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
+      "details": "plane wrapper",
+      "kind": "type",
+      "contents": "material PlaneSymmetric23 ${1:(1)} ${2:(2)}\n# (1) int, unique material tag\n# (2) int, 3D reference material tag"
     },
     {
       "trigger": "PolyElastic1D",
@@ -1706,9 +1700,9 @@
     },
     {
       "trigger": "PolyJ2",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
+      "details": "j2 material with polynomial hardening",
+      "kind": "type",
+      "contents": "material PolyJ2 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} [${5:(5)}...]\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, poisson's ratio\n# (4) double, density\n# [(5)...] double, parameters in polynomial"
     },
     {
       "trigger": "QE2",
@@ -1718,15 +1712,15 @@
     },
     {
       "trigger": "R2D2",
-      "details": "",
+      "details": "2d fixed length constraint",
       "kind": "keyword",
-      "contents": ""
+      "contents": "R2D2 ${1:(1)} ${2:(2)} ${3:(3)}\nconstraint R2D2 ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique constraint tag\n# (2) int, node tag\n# (3) int, node tag"
     },
     {
       "trigger": "R3D2",
-      "details": "",
+      "details": "2d fixed length constraint",
       "kind": "keyword",
-      "contents": ""
+      "contents": "R3D2 ${1:(1)} ${2:(2)} ${3:(3)}\nconstraint R3D2 ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique constraint tag\n# (2) int, node tag\n# (3) int, node tag"
     },
     {
       "trigger": "RambergOsgood",
@@ -1754,21 +1748,21 @@
     },
     {
       "trigger": "RayleighNewmark",
-      "details": "",
+      "details": "newmark time integration with rayleigh damping model",
       "kind": "keyword",
       "contents": "integrator RayleighNewmark ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)}\n# (1) int, unique tag\n# (2) double, alpha (beta in some references) in Newmark method, normally 0.25\n# (3) double, beta (gamma in some references) in Newmark method, normally 0.5\n# (4) double, alpha\n# (5) double, beta\n# (6) double, theta\n# (7) double, eta"
     },
     {
       "trigger": "Rebar2D",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
+      "details": "2d rebar layer",
+      "kind": "type",
+      "contents": "material Rebar2D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)}\n# (1) int, unique material tag\n# (2) int, x direction steel material tag\n# (3) int, y direction steel material tag\n# (4) double, x direction reinforcement ratio\n# (5) double, y direction reinforcement ratio"
     },
     {
       "trigger": "Rebar3D",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
+      "details": "3d rebar layer",
+      "kind": "type",
+      "contents": "material Rebar3D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)}\n# (1) int, unique material tag\n# (2) int, x direction steel material tag\n# (3) int, y direction steel material tag\n# (4) int, z direction steel material tag\n# (5) double, x direction reinforcement ratio\n# (6) double, y direction reinforcement ratio\n# (7) double, z direction reinforcement ratio"
     },
     {
       "trigger": "Rectangle1D",
@@ -1792,49 +1786,49 @@
       "trigger": "RelDisp",
       "details": "converger reldisp",
       "kind": "keyword",
-      "contents": "converger RelDisp ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]}\n# (1) int, unique tag\n# (2) double, tolerance\n# [3] int, maximum iteration, default: 10\n# [4] bool string, print switch, default: false\n"
+      "contents": "converger RelDisp ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]}\n# (1) int, unique tag\n# (2) double, tolerance\n# [3] int, maximum iteration, default: 10\n# [4] bool string, print switch, default: false"
     },
     {
       "trigger": "RelError",
       "details": "converger relerror",
       "kind": "keyword",
-      "contents": "converger RelError ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]}\n# (1) int, unique tag\n# (2) double, tolerance\n# [3] int, maximum iteration, default: 10\n# [4] bool string, print switch, default: false\n"
+      "contents": "converger RelError ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]}\n# (1) int, unique tag\n# (2) double, tolerance\n# [3] int, maximum iteration, default: 10\n# [4] bool string, print switch, default: false"
     },
     {
       "trigger": "RelIncreAcc",
       "details": "converger relincreacc",
       "kind": "keyword",
-      "contents": "converger RelIncreAcc ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]}\n# (1) int, unique tag\n# (2) double, tolerance\n# [3] int, maximum iteration, default: 10\n# [4] bool string, print switch, default: false\n"
+      "contents": "converger RelIncreAcc ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]}\n# (1) int, unique tag\n# (2) double, tolerance\n# [3] int, maximum iteration, default: 10\n# [4] bool string, print switch, default: false"
     },
     {
       "trigger": "RelIncreDisp",
       "details": "converger relincredisp",
       "kind": "keyword",
-      "contents": "converger RelIncreDisp ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]}\n# (1) int, unique tag\n# (2) double, tolerance\n# [3] int, maximum iteration, default: 10\n# [4] bool string, print switch, default: false\n"
+      "contents": "converger RelIncreDisp ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]}\n# (1) int, unique tag\n# (2) double, tolerance\n# [3] int, maximum iteration, default: 10\n# [4] bool string, print switch, default: false"
     },
     {
       "trigger": "RelIncreEnergy",
       "details": "converger relincreenergy",
       "kind": "keyword",
-      "contents": "converger RelIncreEnergy ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]}\n# (1) int, unique tag\n# (2) double, tolerance\n# [3] int, maximum iteration, default: 10\n# [4] bool string, print switch, default: false\n"
+      "contents": "converger RelIncreEnergy ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]}\n# (1) int, unique tag\n# (2) double, tolerance\n# [3] int, maximum iteration, default: 10\n# [4] bool string, print switch, default: false"
     },
     {
       "trigger": "RelResidual",
       "details": "converger relresidual",
       "kind": "keyword",
-      "contents": "converger RelResidual ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]}\n# (1) int, unique tag\n# (2) double, tolerance\n# [3] int, maximum iteration, default: 10\n# [4] bool string, print switch, default: false\n"
+      "contents": "converger RelResidual ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]}\n# (1) int, unique tag\n# (2) double, tolerance\n# [3] int, maximum iteration, default: 10\n# [4] bool string, print switch, default: false"
     },
     {
       "trigger": "Rotation2D",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
+      "details": "2d rotation wrapper",
+      "kind": "type",
+      "contents": "material Rotation2D ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique material tag\n# (2) int, associated material tag\n# (3) double, angle rotated (anti-clockwise positive)"
     },
     {
       "trigger": "Rotation3D",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
+      "details": "3d rotation wrapper",
+      "kind": "type",
+      "contents": "material Rotation3D ${1:(1)} ${2:(2)} ${3:(3...5)}\n# (1) int, unique material tag\n# (2) int, associated material tag\n# (3...5) double, three components of rotation vector"
     },
     {
       "trigger": "S4",
@@ -1874,7 +1868,7 @@
     },
     {
       "trigger": "Sequential",
-      "details": "",
+      "details": "uniaxial wrapper",
       "kind": "type",
       "contents": "material Sequential ${1:(1)} ${2:(2...)}\n# (1) int, unique material tag\n# (2...) int, material tags of 1D models need to be contained"
     },
@@ -1934,13 +1928,13 @@
     },
     {
       "trigger": "Spring01",
-      "details": "",
+      "details": "spring using displacement",
       "kind": "type",
       "contents": "element Spring01 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, tag of associated material"
     },
     {
       "trigger": "Spring02",
-      "details": "",
+      "details": "spring using strain",
       "kind": "type",
       "contents": "element Spring02 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, tag of associated material"
     },
@@ -1964,9 +1958,9 @@
     },
     {
       "trigger": "StrainEnergyEvolution",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
+      "details": "strain energy evolution criterion",
+      "kind": "type",
+      "contents": "criterion StrainEnergyEvolution ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]} ${5:[5]} ${6:[6]} ${7:[7]} ${8:[8]}\n# (1) int, unique criterion tag\n# (2) int, increment of rejection level in percentage\n# (3) int, target rejection level in percentage\n# [4] double, weight of central element, used in averaging\n# [5] int, number of iterations of averaging\n# [6] int, reactivation rate in percentage\n# [7] double, propagation weight\n# [8] double, tolerance"
     },
     {
       "trigger": "Substepping",
@@ -2024,9 +2018,9 @@
     },
     {
       "trigger": "TableGurson",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
+      "details": "gurson material with table hardening",
+      "kind": "type",
+      "contents": "material TableGurson ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:(9)} ${10:[10]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, poisson's ratio\n# (4) string, table file name\n# (5) double, q1\n# (6) double, q2\n# (7) double, fn\n# (8) double, sn\n# (9) double, en\n# [10] double, density, default: 0.0"
     },
     {
       "trigger": "Tabular",
@@ -2042,19 +2036,19 @@
     },
     {
       "trigger": "Tchamwa",
-      "details": "",
+      "details": "tchamwa explicit time integration",
       "kind": "keyword",
       "contents": "integrator Tchamwa ${1:(1)} ${2:(2)}\n# (1) int, unique integrator tag\n# [2] double, spectral radius, default: 0.5"
     },
     {
       "trigger": "Tie",
-      "details": "",
+      "details": "tie constraint",
       "kind": "type",
       "contents": "element Tie ${1:(1)} ${2:(2)} ${3:(3)} [${4:(4)} ${5:(5)} ${6:(6)}...]\n# (1) int, unique element tag\n# (2) double, right hand side of the constraint equation, the constraint is homogeneous if this parameter is zero\n# (3) double, penalty number, a relatively large number\n# (4) int, node tag\n# (5) int, dof tag\n# (6) double, weight"
     },
     {
       "trigger": "TimberPD",
-      "details": "",
+      "details": "plastic damage model for timber",
       "kind": "type",
       "contents": "material TimberPD ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...19)} ${5:(20...26)} ${6:[27]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, E_{xy}, E_{yz}, E_{zx}\n# (8...10) double, three poissions ratios: v_{xy}, v_{yz}, v_{zx}\n# (11...19) double, nine yield stresses\n# (20...26) double, hardening parameters\n# [27] double, density, default: 0.0"
     },
@@ -2062,25 +2056,25 @@
       "trigger": "TranslationConnector2D",
       "details": "define 2d translation connector",
       "kind": "type",
-      "contents": "element TranslationConnector2D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) integer, unique element tag\n# (2) integer, node i\n# (3) integer, node j\n# (4) integer, node k"
+      "contents": "element TranslationConnector2D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, node k"
     },
     {
       "trigger": "TranslationConnector3D",
       "details": "define 3d translation connector",
       "kind": "type",
-      "contents": "element TranslationConnector3D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) integer, unique element tag\n# (2) integer, node i\n# (3) integer, node j\n# (4) integer, node k"
+      "contents": "element TranslationConnector3D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique element tag\n# (2) int, node i\n# (3) int, node j\n# (4) int, node k"
     },
     {
       "trigger": "TrilinearStrainDegradation",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
+      "details": "trilinear strain degradation",
+      "kind": "type",
+      "contents": "material TrilinearStrainDegradation ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)}\n# (1) int, unique material tag\n# (2) int, host material tag\n# (3) double, degradation initiation strain\n# (4) double, degradation final strain\n# (5) double, degradation final factor"
     },
     {
       "trigger": "Trivial",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
+      "details": "trivial material",
+      "kind": "type",
+      "contents": "material Trivial ${1:(1)}\n# (1) int, unique material tag"
     },
     {
       "trigger": "TrussSection",
@@ -2108,19 +2102,19 @@
     },
     {
       "trigger": "Viscosity01",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
+      "details": "linear viscosity material",
+      "kind": "type",
+      "contents": "material Viscosity01 ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique tag\n# (2) double, alpha\n# (3) double, damping coefficient"
     },
     {
       "trigger": "Viscosity02",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
+      "details": "nonlinear viscosity material",
+      "kind": "type",
+      "contents": "material Viscosity02 ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]} ${5:[5]} ${6:[6]} ${7:[7]} ${8:[8]}\n# (1) int, unique tag\n# (2) double, alpha\n# (3) double, damping coefficient \\eta_1\n# [4] double, damping coefficient \\eta_2, default: (3)\n# [5] double, damping coefficient \\eta_3, default: (3)\n# [6] double, damping coefficient \\eta_4, default: (3)\n# [7] double, steepness factor g_1, default: 1E3\n# [8] double, steepness factor g_2, default: 1E3"
     },
     {
       "trigger": "WilsonPenzienNewmark",
-      "details": "",
+      "details": "newmark time integration with wilson penzien damping model",
       "kind": "keyword",
       "contents": "integrator WilsonPenzienNewmark ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4...]}\n# (1) int, unique integrator tag\n# (2) double, alpha in Newmark algorithm\n# (3) double, beta in Newmark algorithm\n# [4...] double, damping ratios on the first n modes"
     },
@@ -2146,7 +2140,7 @@
       "trigger": "bodyforce",
       "details": "body force load",
       "kind": "keyword",
-      "contents": "bodyforce ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\nload clbodyforcead ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) int, dof tag\n# (5...) int, element tags"
+      "contents": "bodyforce ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\nload bodyforce ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) int, dof tag\n# (5...) int, element tags"
     },
     {
       "trigger": "clear",
@@ -2186,13 +2180,13 @@
     },
     {
       "trigger": "customnodegroup",
-      "details": "",
+      "details": "node group based on custom rule",
       "kind": "keyword",
-      "contents": "customnodegroup ${1:(1)} ${2:(2)}\n# (1) integer, unique tag\n# (2) integer, tag of expression"
+      "contents": "customnodegroup ${1:(1)} ${2:(2)}\n# (1) int, unique tag\n# (2) int, tag of expression"
     },
     {
       "trigger": "displacement",
-      "details": "",
+      "details": "prescribed displacement",
       "kind": "keyword",
       "contents": "displacement ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\nload displacement ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) int, dof tag\n# (5...) int, node tags"
     },
@@ -2200,7 +2194,7 @@
       "trigger": "domain",
       "details": "switch to target domain",
       "kind": "keyword",
-      "contents": "domain ${1:(1)}\n# (1) integer, domain tag"
+      "contents": "domain ${1:(1)}\n# (1) int, domain tag"
     },
     {
       "trigger": "eigen_number",
@@ -2209,16 +2203,10 @@
       "contents": "set eigen_number ${1:(1)}\n# (1) int, number of eigenvalues"
     },
     {
-      "trigger": "eigenvalue",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
-    },
-    {
       "trigger": "elementgroup",
-      "details": "",
+      "details": "element group",
       "kind": "keyword",
-      "contents": ""
+      "contents": "group ElementGroup ${1:(1)} ${2:(2...)}\n# (1) int, unique group tag\n# (2...) int, tags of elements to be included"
     },
     {
       "trigger": "exit",
@@ -2237,36 +2225,6 @@
       "details": "load external file",
       "kind": "keyword",
       "contents": "file ${1:(1)}\n# (1) string, file name with or without suffix .sp"
-    },
-    {
-      "trigger": "finiterestitutionwall",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
-    },
-    {
-      "trigger": "finiterestitutionwallpenalty",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
-    },
-    {
-      "trigger": "finiterigidwall",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
-    },
-    {
-      "trigger": "finiterigidwallmultiplier",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
-    },
-    {
-      "trigger": "finiterigidwallpenalty",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
     },
     {
       "trigger": "fix",
@@ -2294,63 +2252,57 @@
     },
     {
       "trigger": "generate",
-      "details": "",
+      "details": "generate groups",
       "kind": "keyword",
-      "contents": ""
+      "contents": "# to hold one node/element only\ngenerate nodegroup ${1:(1)} ${2:(2)}\ngenerate elementgroup ${1:(1)} ${2:(2)}\n# (1) int, unique group tag\n# (2) int, object tag\n# generate from tag (2) to tag (3) with unit increment\ngenerate nodegroup ${1:(1)} ${2:(2)} ${3:(3)}\ngenerate elementgroup ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique group tag\n# (2) int, starting object tag\n# (3) int, ending object tag\n# generate according to given increment\ngenerate nodegroup ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\ngenerate elementgroup ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique group tag\n# (2) int, starting object tag\n# (3) int, interval\n# (4) int, ending object tag"
     },
     {
       "trigger": "generatebyplane",
-      "details": "",
+      "details": "generate node groups based on plane",
       "kind": "keyword",
-      "contents": ""
+      "contents": "generatebyplane nodegroup ${1:(1)} [${2:(2)}...]\n# (1) int, unique group tag\n# [(2)...] double, parameters that define a plane"
     },
     {
       "trigger": "generatebypoint",
-      "details": "",
+      "details": "generate node groups based on the line segment",
       "kind": "keyword",
-      "contents": ""
+      "contents": "generatebypoint nodegroup ${1:(1)} [${2:(2)}...]\n# (1) int, unique group tag\n# [(2)...] double, coordinates of two end points"
     },
     {
       "trigger": "generatebyrule",
-      "details": "",
+      "details": "generate node groups by rule",
       "kind": "keyword",
-      "contents": ""
-    },
-    {
-      "trigger": "group",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
+      "contents": "generatebyrule nodegroup ${1:(1)} ${2:(2)} [${3:(3)}...]\n# (1) int, unique group tag\n# (2) int, DoF tag that polynomial shall be applied on\n# [(3)...] double, parameters a_n, a_{n-1}, a_{n-2},..., a_0"
     },
     {
       "trigger": "groupbodyforce",
-      "details": "",
+      "details": "body force load",
       "kind": "keyword",
-      "contents": ""
+      "contents": "groupbodyforce ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\nload groupbodyforce ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) int, dof tag\n# (5...) int, element group tags"
     },
     {
       "trigger": "groupcload",
-      "details": "",
+      "details": "concentrated nodal load",
       "kind": "keyword",
-      "contents": ""
+      "contents": "groupcload ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\nload groupcload ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) int, dof tag\n# (5...) int, node group tags"
     },
     {
       "trigger": "groupdisplacement",
-      "details": "",
+      "details": "prescribed displacement",
       "kind": "keyword",
-      "contents": ""
+      "contents": "groupdisplacement ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\nload groupdisplacement ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) int, dof tag\n# (5...) int, node group tags"
     },
     {
       "trigger": "groupgroup",
-      "details": "",
+      "details": "group of groups",
       "kind": "keyword",
-      "contents": ""
+      "contents": "group GroupGroup ${1:(1)} (2...)\n# (1) int, unique group tag\n# (2...) int, tags of groups to be included"
     },
     {
       "trigger": "hdf5recorder",
-      "details": "",
+      "details": "recorder in hdf5 format",
       "kind": "keyword",
-      "contents": ""
+      "contents": "recorder ${1:(1)} hdf5 ${2:(2)} ${3:(3)} ${4:[every 4]} ${5:[5...]}\n# (1) int, unique recorder tag\n# (2) string, recorder type\n# (3) string, object type that needs to be recorded\n# [4] int, optional argument with leading keyword \"every\" to indicate the interval of recording\n# [5...] int, tags of elements/nodes, etc."
     },
     {
       "trigger": "help",
@@ -2372,15 +2324,15 @@
     },
     {
       "trigger": "initial",
-      "details": "",
+      "details": "initial condition",
       "kind": "keyword",
-      "contents": ""
+      "contents": "initial displacement ${1:(1)} ${2:(2)} ${3:[3...]}\ninitial velocity ${1:(1)} ${2:(2)} ${3:[3...]}\ninitial acceleration ${1:(1)} ${2:(2)} ${3:[3...]}\n# (1) double, magnitude\n# (2) int, dof\n# [3...] int, node tags\n\ninitial history ${1:(1)} ${2:[2...]}\n# (1) int, material model tag\n# [2...] double, initial history vector"
     },
     {
       "trigger": "iterative_refinement",
       "details": "set iterative refinement number",
       "kind": "keyword",
-      "contents": "set iterative_refinement ${1:(1)}\n# (1) integer, number of refinement steps"
+      "contents": "set iterative_refinement ${1:(1)}\n# (1) int, number of refinement steps"
     },
     {
       "trigger": "load_multiplier",
@@ -2390,69 +2342,45 @@
     },
     {
       "trigger": "materialtest1d",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
+      "details": "uniaxial material tester",
+      "kind": "type",
+      "contents": "materialTest1D ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4...]}\n# (1) int, unique tag of the material model to use\n# (2) double, size of per strain increment\n# (3) int, number of steps along increment direction\n# [4...] int, optional numbers of steps for strain history"
     },
     {
       "trigger": "materialtest2d",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
+      "details": "2d material tester",
+      "kind": "type",
+      "contents": "materialTest2D ${1:(1)} (2...4) ${5:(5)} ${6:[6...]}\n# (1) int, unique tag of the material model to use\n# (2...4) double, size of per strain increment\n# (5) int, number of steps along increment direction\n# [6...] int, optional numbers of steps for strain history"
     },
     {
       "trigger": "materialtest3d",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
+      "details": "3d material tester",
+      "kind": "type",
+      "contents": "materialTest3D ${1:(1)} (2...7) ${8:(8)} ${9:[9...]}\n# (1) int, unique tag of the material model to use\n# (2...7) double, size of per strain increment\n# (8) int, number of steps along increment direction\n# [9...] int, optional numbers of steps for strain history"
     },
     {
       "trigger": "materialtestbyload1d",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
+      "details": "uniaxial material tester",
+      "kind": "type",
+      "contents": "materialTest1D ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4...]}\n# (1) int, unique tag of the material model to use\n# (2) double, size of per load increment\n# (3) int, number of steps along increment direction\n# [4...] int, optional numbers of steps for load history"
     },
     {
       "trigger": "materialtestbyload2d",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
+      "details": "2d material tester",
+      "kind": "type",
+      "contents": "materialTest2D ${1:(1)} (2...4) ${5:(5)} ${6:[6...]}\n# (1) int, unique tag of the material model to use\n# (2...4) double, size of per load increment\n# (5) int, number of steps along increment direction\n# [6...] int, optional numbers of steps for load history"
     },
     {
       "trigger": "materialtestbyload3d",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
-    },
-    {
-      "trigger": "materialtestbyloadwithbase3d",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
-    },
-    {
-      "trigger": "materialtestbystrainhistory",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
-    },
-    {
-      "trigger": "materialtestbystresshistory",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
-    },
-    {
-      "trigger": "materialtestwithbase3d",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
+      "details": "3d material tester",
+      "kind": "type",
+      "contents": "materialTest3D ${1:(1)} (2...7) ${8:(8)} ${9:[9...]}\n# (1) int, unique tag of the material model to use\n# (2...7) double, size of per load increment\n# (8) int, number of steps along increment direction\n# [9...] int, optional numbers of steps for load history"
     },
     {
       "trigger": "max_iteration",
       "details": "set maximum iteration",
       "kind": "keyword",
-      "contents": "set max_iteration ${1:(1)}\n# (1) integer, number of iterations"
+      "contents": "set max_iteration ${1:(1)}\n# (1) int, number of iterations"
     },
     {
       "trigger": "max_step_size",
@@ -2468,21 +2396,21 @@
     },
     {
       "trigger": "node",
-      "details": "",
+      "details": "define node",
       "kind": "keyword",
       "contents": "node ${1:(1)} ${2:[2...]}\n# (1) int, unique tag\n# [2...] double, coordinates"
     },
     {
       "trigger": "nodegroup",
-      "details": "",
+      "details": "define node group",
       "kind": "keyword",
-      "contents": "nodegroup ${1:(1)} ${2:(2...)}\n# (1) integer, unique tag\n# (2...) integer, tags of nodes to be included"
+      "contents": "group nodegroup ${1:(1)} ${2:(2...)}\n# (1) int, unique group tag\n# (2...) int, tags of nodes to be included"
     },
     {
       "trigger": "num_threads",
       "details": "set number of threads used by openmp",
       "kind": "keyword",
-      "contents": "set num_threads ${1:(1)}\n# (1) integer, thread number"
+      "contents": "set num_threads ${1:(1)}\n# (1) int, thread number"
     },
     {
       "trigger": "output_folder",
@@ -2494,19 +2422,19 @@
       "trigger": "peek",
       "details": "quick check",
       "kind": "keyword",
-      "contents": "peek ${1:(1)} ${2:(2...)}\n# (1) string, object type\n# (2...) integer, tags"
+      "contents": "peek ${1:(1)} ${2:(2...)}\n# (1) string, object type\n# (2...) int, tags"
     },
     {
       "trigger": "plainrecorder",
-      "details": "",
+      "details": "recorder in plain text format",
       "kind": "keyword",
-      "contents": ""
+      "contents": "recorder ${1:(1)} plain ${2:(2)} ${3:(3)} ${4:[every 4]} ${5:[5...]}\n# (1) int, unique recorder tag\n# (2) string, recorder type\n# (3) string, object type that needs to be recorded\n# [4] int, optional argument with leading keyword \"every\" to indicate the interval of recording\n# [5...] int, tags of elements/nodes, etc."
     },
     {
       "trigger": "plot",
-      "details": "",
+      "details": "plot model",
       "kind": "keyword",
-      "contents": ""
+      "contents": "plot [-keyword [-parameters]...]"
     },
     {
       "trigger": "precheck",
@@ -2527,16 +2455,10 @@
       "contents": "set preconditioner ${1:(1)}\n# (1) string, preconditioner type, one of Jacobi, ILU and None"
     },
     {
-      "trigger": "print",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
-    },
-    {
       "trigger": "protect",
-      "details": "",
+      "details": "protect node/element from being deactivated",
       "kind": "keyword",
-      "contents": ""
+      "contents": "protect [node|element] ${1:(1...)}\n# (1) int, tag"
     },
     {
       "trigger": "pwd",
@@ -2552,9 +2474,9 @@
     },
     {
       "trigger": "recorder",
-      "details": "",
+      "details": "recorder",
       "kind": "keyword",
-      "contents": ""
+      "contents": "recorder ${1:(1)} hdf5 ${2:(2)} ${3:(3)} ${4:[every 4]} ${5:[5...]}\nrecorder ${1:(1)} plain ${2:(2)} ${3:(3)} ${4:[every 4]} ${5:[5...]}\n# (1) int, unique recorder tag\n# (2) string, recorder type\n# (3) string, object type that needs to be recorded\n# [4] int, optional argument with leading keyword \"every\" to indicate the interval of recording\n# [5...] int, tags of elements/nodes, etc."
     },
     {
       "trigger": "reset",
@@ -2569,40 +2491,10 @@
       "contents": "response_spectrum ${1:(motion_file_name)} ${2:(period_file_name)} ${3:[interval]} ${4:(damping_ratio)}"
     },
     {
-      "trigger": "restitutionwall",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
-    },
-    {
-      "trigger": "restitutionwallpenalty",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
-    },
-    {
-      "trigger": "rigidwall",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
-    },
-    {
-      "trigger": "rigidwallmultiplier",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
-    },
-    {
-      "trigger": "rigidwallpenalty",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
-    },
-    {
       "trigger": "save",
       "details": "save recorded data to disk",
       "kind": "keyword",
-      "contents": "save recorder ${1:(1...)}\n# (1...) integer, tags of recorders need to be saved"
+      "contents": "save recorder ${1:(1...)}\n# (1...) int, tags of recorders need to be saved"
     },
     {
       "trigger": "screen_output",
@@ -2615,30 +2507,6 @@
       "details": "perform response history analysis on a sdof system with target natural frequency and damping ratio",
       "kind": "keyword",
       "contents": "sdof_response ${1:(motion_file_name)} ${2:[interval]} ${3:(natural_frequency)} ${4:(damping_ratio)}"
-    },
-    {
-      "trigger": "sectiontest1d",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
-    },
-    {
-      "trigger": "sectiontest2d",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
-    },
-    {
-      "trigger": "sectiontest3d",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
-    },
-    {
-      "trigger": "sectiontestbydeformationhistory",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
     },
     {
       "trigger": "sparse_mat",
@@ -2654,21 +2522,21 @@
     },
     {
       "trigger": "supportacceleration",
-      "details": "",
+      "details": "acceleration load on support",
       "kind": "keyword",
-      "contents": ""
+      "contents": "supportacceleration ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\nload supportacceleration ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) int, dof tag\n# (5...) int, node tags"
     },
     {
       "trigger": "supportdisplacement",
-      "details": "",
+      "details": "displacement load on support",
       "kind": "keyword",
-      "contents": ""
+      "contents": "supportdisplacement ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\nload supportdisplacement ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) int, dof tag\n# (5...) int, node tags"
     },
     {
       "trigger": "supportvelocity",
-      "details": "",
+      "details": "velocity load on support",
       "kind": "keyword",
-      "contents": ""
+      "contents": "supportvelocity ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\nload supportvelocity ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) int, dof tag\n# (5...) int, node tags"
     },
     {
       "trigger": "symm_mat",
@@ -2684,9 +2552,9 @@
     },
     {
       "trigger": "tabularspline",
-      "details": "",
-      "kind": "keyword",
-      "contents": ""
+      "details": "amplitude using tabular data with spline interpolation",
+      "kind": "type",
+      "contents": "amplitude TabularSpline ${1:(1)} ${2:(2)}\n# (1) int, unique amplitude tag\n# (2) string, external file name"
     },
     {
       "trigger": "terminal",
@@ -2704,7 +2572,7 @@
       "trigger": "upsampling",
       "details": "upsample a given ground motion using a specific window type",
       "kind": "keyword",
-      "contents": "upsampling ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) string, file name\n# (2) integer, upsampling ratio\n# (3) string, window type, one of Hamming, Hann, Blackman, BlackmanNuttall, BlackmanHarris and FlatTop"
+      "contents": "upsampling ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) string, file name\n# (2) int, upsampling ratio\n# (3) string, window type, one of Hamming, Hann, Blackman, BlackmanNuttall, BlackmanHarris and FlatTop"
     },
     {
       "trigger": "version",
