@@ -21,6 +21,7 @@
 #include <thread>
 #include <Constraint/Constraint.h>
 #include <Constraint/ConstraintParser.h>
+#include <Constraint/Criterion/Criterion.h>
 #include <Converger/Converger.h>
 #include <Converger/ConvergerParser.h>
 #include <Domain/Domain.h>
@@ -30,6 +31,8 @@
 #include <Domain/Group/GroupParser.h>
 #include <Element/Element.h>
 #include <Element/ElementParser.h>
+#include <Element/Modifier/Modifier.h>
+#include <Element/Utility/Orientation.h>
 #include <Element/Visualisation/vtkParser.h>
 #include <Load/Load.h>
 #include <Load/LoadParser.h>
@@ -39,6 +42,7 @@
 #include <Material/MaterialTester.h>
 #include <Recorder/Recorder.h>
 #include <Recorder/RecorderParser.h>
+#include <Section/Section.h>
 #include <Section/SectionParser.h>
 #include <Section/SectionTester.h>
 #include <Solver/Solver.h>
@@ -46,6 +50,7 @@
 #include <Solver/Integrator/Integrator.h>
 #include <Step/Bead.h>
 #include <Step/Frequency.h>
+#include <Step/Step.h>
 #include <Step/StepParser.h>
 #include <Toolbox/argument.h>
 #include <Toolbox/Expression.h>
@@ -735,13 +740,13 @@ int disable_object(const shared_ptr<Bead>& model, istringstream& command) {
         return SUANPAN_SUCCESS;
     }
 
-    if(unsigned tag; is_equal(object_type, "domain")) while(get_input(command, tag)) model->disable_domain(tag);
-    else if(is_equal(object_type, "amplitude")) while(get_input(command, tag)) domain->disable_amplitude(tag);
-    else if(is_equal(object_type, "expression")) while(get_input(command, tag)) domain->disable_expression(tag);
+    if(unsigned tag; is_equal(object_type, "amplitude")) while(get_input(command, tag)) domain->disable_amplitude(tag);
     else if(is_equal(object_type, "constraint")) while(get_input(command, tag)) domain->disable_constraint(tag);
     else if(is_equal(object_type, "converger")) while(get_input(command, tag)) domain->disable_converger(tag);
     else if(is_equal(object_type, "criterion")) while(get_input(command, tag)) domain->disable_criterion(tag);
+    else if(is_equal(object_type, "domain")) while(get_input(command, tag)) model->disable_domain(tag);
     else if(is_equal(object_type, "element")) while(get_input(command, tag)) domain->disable_element(tag);
+    else if(is_equal(object_type, "expression")) while(get_input(command, tag)) domain->disable_expression(tag);
     else if(is_equal(object_type, "group")) while(get_input(command, tag)) domain->disable_group(tag);
     else if(is_equal(object_type, "integrator")) while(get_input(command, tag)) domain->disable_integrator(tag);
     else if(is_equal(object_type, "load")) while(get_input(command, tag)) domain->disable_load(tag);
@@ -771,13 +776,13 @@ int enable_object(const shared_ptr<Bead>& model, istringstream& command) {
         return SUANPAN_SUCCESS;
     }
 
-    if(unsigned tag; is_equal(object_type, "domain")) while(get_input(command, tag)) model->enable_domain(tag);
-    else if(is_equal(object_type, "amplitude")) while(get_input(command, tag)) domain->enable_amplitude(tag);
-    else if(is_equal(object_type, "expression")) while(get_input(command, tag)) domain->enable_expression(tag);
+    if(unsigned tag; is_equal(object_type, "amplitude")) while(get_input(command, tag)) domain->enable_amplitude(tag);
     else if(is_equal(object_type, "constraint")) while(get_input(command, tag)) domain->enable_constraint(tag);
     else if(is_equal(object_type, "converger")) while(get_input(command, tag)) domain->enable_converger(tag);
     else if(is_equal(object_type, "criterion")) while(get_input(command, tag)) domain->enable_criterion(tag);
+    else if(is_equal(object_type, "domain")) while(get_input(command, tag)) model->enable_domain(tag);
     else if(is_equal(object_type, "element")) while(get_input(command, tag)) domain->enable_element(tag);
+    else if(is_equal(object_type, "expression")) while(get_input(command, tag)) domain->enable_expression(tag);
     else if(is_equal(object_type, "group")) while(get_input(command, tag)) domain->enable_group(tag);
     else if(is_equal(object_type, "integrator")) while(get_input(command, tag)) domain->enable_integrator(tag);
     else if(is_equal(object_type, "load")) while(get_input(command, tag)) domain->enable_load(tag);
@@ -808,13 +813,13 @@ int erase_object(const shared_ptr<Bead>& model, istringstream& command) {
         return SUANPAN_SUCCESS;
     }
 
-    if(unsigned tag; is_equal(object_type, "domain")) while(get_input(command, tag)) model->erase_domain(tag);
-    else if(is_equal(object_type, "amplitude")) while(get_input(command, tag)) domain->erase_amplitude(tag);
-    else if(is_equal(object_type, "expression")) while(get_input(command, tag)) domain->erase_expression(tag);
+    if(unsigned tag; is_equal(object_type, "amplitude")) while(get_input(command, tag)) domain->erase_amplitude(tag);
     else if(is_equal(object_type, "constraint")) while(get_input(command, tag)) domain->erase_constraint(tag);
     else if(is_equal(object_type, "converger")) while(get_input(command, tag)) domain->erase_converger(tag);
     else if(is_equal(object_type, "criterion")) while(get_input(command, tag)) domain->erase_criterion(tag);
+    else if(is_equal(object_type, "domain")) while(get_input(command, tag)) model->erase_domain(tag);
     else if(is_equal(object_type, "element")) while(get_input(command, tag)) domain->erase_element(tag);
+    else if(is_equal(object_type, "expression")) while(get_input(command, tag)) domain->erase_expression(tag);
     else if(is_equal(object_type, "group")) while(get_input(command, tag)) domain->erase_group(tag);
     else if(is_equal(object_type, "integrator")) while(get_input(command, tag)) domain->erase_integrator(tag);
     else if(is_equal(object_type, "load")) while(get_input(command, tag)) domain->erase_load(tag);
@@ -883,13 +888,23 @@ int list_object(const shared_ptr<DomainBase>& domain, istringstream& command) {
     }
 
     vector<unsigned> list;
-    if(is_equal(object_type, "converger")) for(const auto& I : domain->get_converger_pool()) list.emplace_back(I->get_tag());
+    if(is_equal(object_type, "amplitude")) for(const auto& I : domain->get_amplitude_pool()) list.emplace_back(I->get_tag());
     else if(is_equal(object_type, "constraint")) for(const auto& I : domain->get_constraint_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "converger")) for(const auto& I : domain->get_converger_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "criterion")) for(const auto& I : domain->get_criterion_pool()) list.emplace_back(I->get_tag());
     else if(is_equal(object_type, "element")) for(const auto& I : domain->get_element_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "expression")) for(const auto& I : domain->get_expression_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "group")) for(const auto& I : domain->get_group_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "integrator")) for(const auto& I : domain->get_integrator_pool()) list.emplace_back(I->get_tag());
     else if(is_equal(object_type, "load")) for(const auto& I : domain->get_load_pool()) list.emplace_back(I->get_tag());
     else if(is_equal(object_type, "material")) for(const auto& I : domain->get_material_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "modifier")) for(const auto& I : domain->get_modifier_pool()) list.emplace_back(I->get_tag());
     else if(is_equal(object_type, "node")) for(const auto& I : domain->get_node_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "orientation")) for(const auto& I : domain->get_orientation_pool()) list.emplace_back(I->get_tag());
     else if(is_equal(object_type, "recorder")) for(const auto& I : domain->get_recorder_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "section")) for(const auto& I : domain->get_section_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "solver")) for(const auto& I : domain->get_solver_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "step")) for(const auto& I : domain->get_step_pool()) list.emplace_back(I.second->get_tag());
 
     suanpan_info("This domain has the following {}s:", object_type);
     for(const auto I : list)

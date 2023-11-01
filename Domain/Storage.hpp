@@ -103,7 +103,7 @@ template<typename T> class Storage : public std::enable_shared_from_this<Storage
     suanpan::unordered_map<unsigned, shared_ptr<T>> pond; /**< data storage */
 
 public:
-    typedef T object_type;
+    using object_type = T;
 
     Storage() = default;
     Storage(const Storage&) = delete;
