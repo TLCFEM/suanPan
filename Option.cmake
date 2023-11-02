@@ -13,7 +13,7 @@ option(BUILD_DLL_EXAMPLE "Build dynamic linked library examples." OFF)
 option(BUILD_MULTITHREAD "Build with multi-threaded support via TBB." OFF)
 option(BUILD_SHARED "Build all libraries as shared ones." OFF)
 option(USE_SUPERLUMT "Use multi-threaded SuperLU. Note the performance may not be better than the sequential version." OFF)
-option(USE_EXTERNAL_VTK "Enable visualisation via VTK. Note external VTK libraries need to be compiled in advance." OFF)
+option(USE_VTK "Enable visualisation via VTK. Note external VTK libraries need to be compiled in advance." OFF)
 option(USE_HDF5 "Enable recording results in HDF5 format." ON)
 option(USE_AVX "Enable AVX support." ON)
 option(USE_AVX2 "Enable AVX2 support." OFF)
@@ -48,7 +48,7 @@ if (CMAKE_SYSTEM_NAME MATCHES "Windows") # WINDOWS PLATFORM
         if (FORTRAN_STATUS)
             set(BUILD_SHARED OFF CACHE BOOL "" FORCE)
         endif ()
-        option(USE_EXTERNAL_CUDA "Enable GPU based global solvers via CUDA." OFF)
+        option(USE_CUDA "Enable GPU based global solvers via CUDA." OFF)
     endif ()
 elseif (CMAKE_SYSTEM_NAME MATCHES "Linux") # LINUX PLATFORM
     set(SP_EXTERNAL_LIB_PATH "linux")
@@ -62,7 +62,7 @@ elseif (CMAKE_SYSTEM_NAME MATCHES "Linux") # LINUX PLATFORM
     elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang") # Clang COMPILER
         set(COMPILER_IDENTIFIER "clang-linux")
     endif ()
-    option(USE_EXTERNAL_CUDA "Enable GPU based global solvers via CUDA." OFF)
+    option(USE_CUDA "Enable GPU based global solvers via CUDA." OFF)
 elseif (CMAKE_SYSTEM_NAME MATCHES "Darwin") # MAC PLATFORM
     set(SP_EXTERNAL_LIB_PATH "mac")
     if (CMAKE_CXX_COMPILER_ID MATCHES "GNU") # GNU GCC COMPILER
@@ -79,7 +79,7 @@ if (COMPILER_IDENTIFIER MATCHES "unknown")
     message(FATAL_ERROR "Cannot identify the compiler available, please use GCC or MSVC or Intel.")
 endif ()
 
-if (USE_MKL AND USE_EXTERNAL_CUDA)
+if (USE_MKL AND USE_CUDA)
     option(USE_MAGMA "Enable GPU based global solvers via MAGMA." OFF)
 endif ()
 
@@ -134,7 +134,7 @@ if (USE_MKL)
     endif ()
 endif ()
 
-if (USE_EXTERNAL_CUDA)
+if (USE_CUDA)
     if (POLICY CMP0146)
         cmake_policy(SET CMP0146 OLD)
     endif ()
@@ -164,7 +164,7 @@ if (USE_MAGMA)
 endif ()
 
 set(HAVE_VTK FALSE CACHE INTERNAL "")
-if (USE_EXTERNAL_VTK)
+if (USE_VTK)
     if (VTK_PATH MATCHES "")
         find_package(VTK)
     else ()

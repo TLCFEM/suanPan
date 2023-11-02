@@ -40,7 +40,7 @@ parts:
       - -DCMAKE_BUILD_TYPE=Release
       - -DBUILD_MULTITHREAD=ON
       - -DUSE_HDF5=ON
-      - -DUSE_EXTERNAL_VTK=ON
+      - -DUSE_VTK=ON
       - -DVTK_DIR=$CRAFT_PART_BUILD/lib/cmake/vtk-9.2/
       - -DUSE_MKL=ON
       - -DMKLROOT=/opt/intel/oneapi/mkl/latest
