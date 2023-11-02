@@ -8,4 +8,4 @@ set(S3D
         Section3D/Rectangle3D.cpp
         Section3D/Section3D.cpp
         Section3D/TSection3D.cpp
-        )
+)

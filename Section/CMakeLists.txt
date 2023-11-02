@@ -17,4 +17,4 @@ add_library(${PROJECT_NAME} STATIC
         SectionParser.cpp
         SectionTester.cpp
         ${S1D} ${S2D} ${S3D} ${SNM} ${SOS} ${SS}
-        )
+)

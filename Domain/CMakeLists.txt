@@ -14,4 +14,4 @@ target_sources(${PROJECT_NAME} PRIVATE
         Node.cpp
         Storage.hpp
         Tag.cpp
-        )
+)

@@ -14,7 +14,7 @@ if (USE_MPI)
             $<TARGET_OBJECTS:mumps_mod_lib>
             $<TARGET_OBJECTS:mumps_f_lib>
             $<TARGET_OBJECTS:mumps_c_lib>
-            )
+    )
 else ()
     add_library(${PROJECT_NAME} ${LIBRARY_TYPE}
             $<TARGET_OBJECTS:amd_obj>
@@ -25,7 +25,7 @@ else ()
             $<TARGET_OBJECTS:mumps_mpi_c_lib>
             $<TARGET_OBJECTS:mumps_f_lib>
             $<TARGET_OBJECTS:mumps_c_lib>
-            )
+    )
 endif ()
 
 target_link_libraries(${PROJECT_NAME} metis)

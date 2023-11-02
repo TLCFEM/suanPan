@@ -33,7 +33,7 @@ add_library(${PROJECT_NAME} STATIC
         ${Utility}
         ${Visualisation}
         ${Patch}
-        )
+)
 
 if (HAVE_VTK)
     target_link_libraries(${PROJECT_NAME} ${VTK_LIBRARIES})

@@ -50,4 +50,4 @@ set(M3D
         Material3D/Wrapper/Stacked.cpp
         Material3D/Wrapper/StressWrapper.cpp
         Material3D/Wrapper/Substepping.cpp
-        )
+)

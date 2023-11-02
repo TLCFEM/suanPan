@@ -11,6 +11,6 @@ target_sources(${PROJECT_NAME} PRIVATE
         NodalForce.cpp
         ReferenceForce.cpp
         SupportMotion.cpp
-        )
+)
 
 add_subdirectory(Amplitude)

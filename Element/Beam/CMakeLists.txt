@@ -13,4 +13,4 @@ set(Beam
         Beam/NMB21.cpp
         Beam/NMB21E.cpp
         Beam/NMB31.cpp
-        )
+)

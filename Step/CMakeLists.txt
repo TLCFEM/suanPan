@@ -8,4 +8,4 @@ target_sources(${PROJECT_NAME} PRIVATE
         Static.cpp
         Step.cpp
         StepParser.cpp
-        )
+)

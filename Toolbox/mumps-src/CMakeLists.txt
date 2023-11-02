@@ -123,7 +123,7 @@ set(mumps_mod
         ssol_omp_m.F
         sstatic_ptr_m.F
         smumps_mpi3_mod.F
-        )
+)
 set(mumps_mpi_c elapse.c mpic.c)
 set(mumps_mpi_f mpi.F)
 
