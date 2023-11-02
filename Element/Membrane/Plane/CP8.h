@@ -52,7 +52,8 @@ class CP8 final : public MaterialElement2D {
     vector<IntegrationPoint> int_pt;
 
 public:
-    CP8(unsigned,     // tag
+    CP8(
+        unsigned,     // tag
         uvec&&,       // node tag
         unsigned,     // material tag
         double = 1.,  // thickness

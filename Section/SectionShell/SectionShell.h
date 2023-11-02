@@ -70,9 +70,10 @@ class SectionShell : protected SectionShellData, public Tag {
     const bool initialized = false;
 
 public:
-    explicit SectionShell(unsigned = 0,    // section tag
-                          unsigned = 0,    // material tag
-                          vec&& = {0., 0.} // eccentricity
+    explicit SectionShell(
+        unsigned = 0,    // section tag
+        unsigned = 0,    // material tag
+        vec&& = {0., 0.} // eccentricity
     );
     SectionShell(const SectionShell&) = default;           // default copy ctor
     SectionShell(SectionShell&&) = delete;                 // move forbidden

@@ -54,10 +54,11 @@ class NonlinearJ2 : protected DataNonlinearJ2, public Material3D {
     [[nodiscard]] virtual double compute_dh(double) const = 0;
 
 public:
-    NonlinearJ2(unsigned,   // tag
-                double,     // elastic modulus
-                double,     // poisson's ratio
-                double = 0. // density
+    NonlinearJ2(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // poisson's ratio
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

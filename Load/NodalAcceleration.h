@@ -35,24 +35,27 @@
 
 class NodalAcceleration final : public Load {
 public:
-    NodalAcceleration(unsigned, // tag
-                      unsigned, // step tag
-                      double,   // magnitude
-                      unsigned, // dof tag
-                      unsigned  // amplitude tag
+    NodalAcceleration(
+        unsigned, // tag
+        unsigned, // step tag
+        double,   // magnitude
+        unsigned, // dof tag
+        unsigned  // amplitude tag
     );
-    NodalAcceleration(unsigned,    // tag
-                      unsigned,    // step tag
-                      double,      // magnitude
-                      uvec&&,      // dof tags
-                      unsigned = 0 // amplitude tag
+    NodalAcceleration(
+        unsigned,    // tag
+        unsigned,    // step tag
+        double,      // magnitude
+        uvec&&,      // dof tags
+        unsigned = 0 // amplitude tag
     );
-    NodalAcceleration(unsigned,    // tag
-                      unsigned,    // step tag
-                      double,      // magnitude
-                      uvec&&,      // node tags
-                      unsigned,    // dof tag
-                      unsigned = 0 // amplitude tag
+    NodalAcceleration(
+        unsigned,    // tag
+        unsigned,    // step tag
+        double,      // magnitude
+        uvec&&,      // node tags
+        unsigned,    // dof tag
+        unsigned = 0 // amplitude tag
     );
 
     int process(const shared_ptr<DomainBase>&) override;

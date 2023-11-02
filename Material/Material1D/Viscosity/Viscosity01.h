@@ -40,10 +40,11 @@ class Viscosity01 final : protected DataViscosity01, public NonlinearViscosity {
     [[nodiscard]] double compute_damping_coefficient(double, double) const override;
 
 public:
-    Viscosity01(unsigned, // tag
-                double,   // alpha
-                double,   // damp coefficient
-                double    // cut-off
+    Viscosity01(
+        unsigned, // tag
+        double,   // alpha
+        double,   // damp coefficient
+        double    // cut-off
     );
 
     unique_ptr<Material> get_copy() override;

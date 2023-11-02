@@ -45,8 +45,9 @@ class Sequential final : public Material1D {
     mat jacobian;
 
 public:
-    Sequential(unsigned, // tag
-               uvec&&    // material tag pool
+    Sequential(
+        unsigned, // tag
+        uvec&&    // material tag pool
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

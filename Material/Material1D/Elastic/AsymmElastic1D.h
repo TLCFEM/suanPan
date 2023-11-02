@@ -36,10 +36,11 @@ struct DataAsymmElastic1D {
 
 class AsymmElastic1D final : protected DataAsymmElastic1D, public Material1D {
 public:
-    AsymmElastic1D(unsigned,   // tag
-                   double,     // tension elastic modulus
-                   double,     // compression elastic modulus
-                   double = 0. // density
+    AsymmElastic1D(
+        unsigned,   // tag
+        double,     // tension elastic modulus
+        double,     // compression elastic modulus
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

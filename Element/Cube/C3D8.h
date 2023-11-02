@@ -54,11 +54,12 @@ class C3D8 final : public MaterialElement3D {
     vector<IntegrationPoint> int_pt;
 
 public:
-    C3D8(unsigned,    // tag
-         uvec&&,      // node tag
-         unsigned,    // material tag
-         char = 'I',  // reduced integration
-         bool = false // nonlinear geometry switch
+    C3D8(
+        unsigned,    // tag
+        uvec&&,      // node tag
+        unsigned,    // material tag
+        char = 'I',  // reduced integration
+        bool = false // nonlinear geometry switch
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

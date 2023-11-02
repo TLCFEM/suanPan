@@ -35,10 +35,11 @@ class Rectangle1D final : public Section1D {
     const double width, height;
 
 public:
-    explicit Rectangle1D(unsigned, // tag
-                         double,   // width
-                         double,   // height
-                         unsigned  // material tag
+    explicit Rectangle1D(
+        unsigned, // tag
+        double,   // width
+        double,   // height
+        unsigned  // material tag
     );
 
     unique_ptr<Section> get_copy() override;

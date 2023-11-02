@@ -48,10 +48,11 @@ protected:
     void initialize_stiffness();
 
 public:
-    Section3D(unsigned,        // tag
-              unsigned,        // material tag
-              double = 0.,     // area
-              vec&& = {0., 0.} // eccentricity
+    Section3D(
+        unsigned,        // tag
+        unsigned,        // material tag
+        double = 0.,     // area
+        vec&& = {0., 0.} // eccentricity
     );
 
     void set_characteristic_length(double) const override;

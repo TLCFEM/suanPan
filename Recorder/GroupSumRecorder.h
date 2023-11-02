@@ -37,12 +37,13 @@ class GroupSumRecorder final : public SumRecorder {
     void update_tag(const shared_ptr<DomainBase>&);
 
 public:
-    GroupSumRecorder(unsigned,   // tag
-                     uvec&&,     // object tags
-                     OutputType, // recorder type
-                     unsigned,   // interval
-                     bool,       // if to record time
-                     bool        // if to use hdf5
+    GroupSumRecorder(
+        unsigned,   // tag
+        uvec&&,     // object tags
+        OutputType, // recorder type
+        unsigned,   // interval
+        bool,       // if to record time
+        bool        // if to use hdf5
     );
 
     void initialize(const shared_ptr<DomainBase>&) override;

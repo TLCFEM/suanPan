@@ -36,8 +36,9 @@ using std::vector;
 
 class MaterialOS : public Material {
 public:
-    MaterialOS(unsigned, // tag
-               double    // density
+    MaterialOS(
+        unsigned, // tag
+        double    // density
     );
 };
 

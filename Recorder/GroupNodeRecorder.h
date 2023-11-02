@@ -37,12 +37,13 @@ class GroupNodeRecorder final : public NodeRecorder {
     void update_tag(const shared_ptr<DomainBase>&);
 
 public:
-    GroupNodeRecorder(unsigned,   // tag
-                      uvec&&,     // object tags
-                      OutputType, // recorder type
-                      unsigned,   // interval
-                      bool,       // if to record time
-                      bool        // if to use hdf5
+    GroupNodeRecorder(
+        unsigned,   // tag
+        uvec&&,     // object tags
+        OutputType, // recorder type
+        unsigned,   // interval
+        bool,       // if to record time
+        bool        // if to use hdf5
     );
 
     void initialize(const shared_ptr<DomainBase>&) override;

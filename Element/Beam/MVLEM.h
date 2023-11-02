@@ -55,15 +55,16 @@ class MVLEM final : public MaterialElement1D {
     unique_ptr<Material> shear_spring;
 
 public:
-    MVLEM(unsigned,              // tag
-          uvec&&,                // node tag
-          const vector<double>&, // width
-          const vector<double>&, // thickness
-          const vector<double>&, // reinforcement ratio
-          uvec&&,                // concrete material tags
-          uvec&&,                // steel material tags
-          unsigned,              // shear spring tag
-          double                 // shear spring height
+    MVLEM(
+        unsigned,              // tag
+        uvec&&,                // node tag
+        const vector<double>&, // width
+        const vector<double>&, // thickness
+        const vector<double>&, // reinforcement ratio
+        uvec&&,                // concrete material tags
+        uvec&&,                // steel material tags
+        unsigned,              // shear spring tag
+        double                 // shear spring height
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

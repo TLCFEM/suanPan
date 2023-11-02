@@ -51,7 +51,8 @@ class CP7 final : public MaterialElement2D {
     vector<IntegrationPoint> int_pt;
 
 public:
-    CP7(unsigned,    // tag
+    CP7(
+        unsigned,    // tag
         uvec&&,      // node tag
         unsigned,    // material tag
         double = 1., // thickness

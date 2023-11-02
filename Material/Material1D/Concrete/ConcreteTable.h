@@ -44,11 +44,12 @@ class ConcreteTable final : public SimpleHysteresis {
     [[nodiscard]] double compute_tension_residual(double, double) const override;
 
 public:
-    ConcreteTable(unsigned,   // tag
-                  mat&&,      // compression table
-                  mat&&,      // tension table
-                  double,     // middle point
-                  double = 0. // density
+    ConcreteTable(
+        unsigned,   // tag
+        mat&&,      // compression table
+        mat&&,      // tension table
+        double,     // middle point
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

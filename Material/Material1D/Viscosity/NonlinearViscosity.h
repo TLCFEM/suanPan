@@ -46,9 +46,10 @@ class NonlinearViscosity : protected DataNonlinearViscosity, public Material1D {
     [[nodiscard]] virtual double compute_damping_coefficient(double, double) const = 0;
 
 public:
-    NonlinearViscosity(unsigned, // tag
-                       double,   // alpha
-                       double    // cut-off
+    NonlinearViscosity(
+        unsigned, // tag
+        double,   // alpha
+        double    // cut-off
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

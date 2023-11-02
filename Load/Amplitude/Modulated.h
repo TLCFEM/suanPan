@@ -39,10 +39,11 @@ class Modulated final : public Amplitude {
     const std::vector<double> freq;
 
 public:
-    Modulated(unsigned,              // tag
-              double,                // amplitude
-              std::vector<double>&&, // frequency
-              unsigned = 0           // step tag
+    Modulated(
+        unsigned,              // tag
+        double,                // amplitude
+        std::vector<double>&&, // frequency
+        unsigned = 0           // step tag
     );
 
     double get_amplitude(double) override;

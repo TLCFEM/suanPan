@@ -47,12 +47,13 @@ class TimberPD final : protected DataTimberPD, public BilinearHoffman {
     [[nodiscard]] double update_damage_c(const vec&, mat&);
 
 public:
-    TimberPD(unsigned,   // tag
-             vec&&,      // elastic modulus
-             vec&&,      // poissons ratio
-             vec&&,      // sigma
-             vec&&,      // hardening
-             double = 0. // density
+    TimberPD(
+        unsigned,   // tag
+        vec&&,      // elastic modulus
+        vec&&,      // poissons ratio
+        vec&&,      // sigma
+        vec&&,      // hardening
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

@@ -50,7 +50,8 @@ class CP6 final : public MaterialElement2D {
     vector<IntegrationPoint> int_pt;
 
 public:
-    CP6(unsigned,    // tag
+    CP6(
+        unsigned,    // tag
         uvec&&,      // node tag
         unsigned,    // material tag
         double = 1., // thickness

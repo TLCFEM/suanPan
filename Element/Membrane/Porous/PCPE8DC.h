@@ -56,13 +56,14 @@ class PCPE8DC final : public MaterialElement2D {
     vector<IntegrationPoint> int_pt;
 
 public:
-    PCPE8DC(unsigned, // tag
-            uvec&&,   // node tag
-            unsigned, // solid material tag
-            unsigned, // fluid material tag
-            double,   // alpha
-            double,   // porosity
-            double    // permeability
+    PCPE8DC(
+        unsigned, // tag
+        uvec&&,   // node tag
+        unsigned, // solid material tag
+        unsigned, // fluid material tag
+        double,   // alpha
+        double,   // porosity
+        double    // permeability
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

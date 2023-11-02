@@ -40,8 +40,9 @@ protected:
     virtual void compute_damage() = 0;
 
 public:
-    IsotropicDamage(unsigned, // tag
-                    unsigned  // mat tag
+    IsotropicDamage(
+        unsigned, // tag
+        unsigned  // mat tag
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

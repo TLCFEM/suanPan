@@ -42,9 +42,10 @@ using std::vector;
 
 class Material2D : public Material {
 public:
-    Material2D(unsigned,  // tag
-               PlaneType, // plane type
-               double     // density
+    Material2D(
+        unsigned,  // tag
+        PlaneType, // plane type
+        double     // density
     );
 
     vector<vec> record(OutputType) override;

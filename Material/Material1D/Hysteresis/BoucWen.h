@@ -50,8 +50,9 @@ class BoucWen final : protected DataBoucWen, public Material1D {
     const double gamma = 1. - beta;
 
 public:
-    BoucWen(unsigned, // tag
-            vec&&     // parameter
+    BoucWen(
+        unsigned, // tag
+        vec&&     // parameter
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

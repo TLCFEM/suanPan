@@ -44,9 +44,10 @@ class Spring02 final : public MaterialElement1D {
     unique_ptr<Material> s_material;
 
 public:
-    Spring02(unsigned, // tag
-             uvec&&,   // node tags
-             unsigned  // material tag
+    Spring02(
+        unsigned, // tag
+        uvec&&,   // node tags
+        unsigned  // material tag
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

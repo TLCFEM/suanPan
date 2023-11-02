@@ -38,11 +38,12 @@ class NMB21E final : public NMB21 {
     vec current_local_deformation;
 
 public:
-    NMB21E(unsigned,    // tag
-           unsigned,    // which
-           uvec&&,      // node tags
-           unsigned,    // section tag
-           bool = false // nonlinear geometry switch
+    NMB21E(
+        unsigned,    // tag
+        unsigned,    // which
+        uvec&&,      // node tags
+        unsigned,    // section tag
+        bool = false // nonlinear geometry switch
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

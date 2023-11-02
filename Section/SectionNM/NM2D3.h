@@ -39,19 +39,21 @@ protected:
     [[nodiscard]] mat compute_ddf(const vec&, const vec&) const override;
 
 public:
-    NM2D3(unsigned, // tag
-          double,   // EA
-          double,   // EIS
-          double,   // NP
-          double,   // MP
-          double,   // c
-          double,   // h
-          double,   // h
-          double,   // h
-          vec&&,    // k
-          vec&&,    // k
-          double,   // linear density
-          mat&& = {});
+    NM2D3(
+        unsigned, // tag
+        double,   // EA
+        double,   // EIS
+        double,   // NP
+        double,   // MP
+        double,   // c
+        double,   // h
+        double,   // h
+        double,   // h
+        vec&&,    // k
+        vec&&,    // k
+        double,   // linear density
+        mat&& = {}
+    );
 
     unique_ptr<Section> get_copy() override;
 };

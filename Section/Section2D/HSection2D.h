@@ -39,16 +39,17 @@ class HSection2D final : public Section2D {
     const unsigned int_pt_num;
 
 public:
-    HSection2D(unsigned,     // tag
-               double,       // width
-               double,       // height
-               double,       // width
-               double,       // height
-               double,       // width
-               double,       // height
-               unsigned,     // material tag
-               unsigned = 6, // number of integration points
-               double = 0.   // eccentricity
+    HSection2D(
+        unsigned,     // tag
+        double,       // width
+        double,       // height
+        double,       // width
+        double,       // height
+        double,       // width
+        double,       // height
+        unsigned,     // material tag
+        unsigned = 6, // number of integration points
+        double = 0.   // eccentricity
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

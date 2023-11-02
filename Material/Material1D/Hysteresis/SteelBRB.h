@@ -56,8 +56,9 @@ class SteelBRB final : protected DataSteelBRB, public Material1D {
     [[nodiscard]] vec compute_c_yield_stress(double) const;
 
 public:
-    SteelBRB(unsigned, // tag
-             vec&&     // parameter
+    SteelBRB(
+        unsigned, // tag
+        vec&&     // parameter
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

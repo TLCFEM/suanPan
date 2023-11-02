@@ -42,14 +42,15 @@ class CustomDP final : public NonlinearDruckerPrager {
     ResourceHolder<Expression> c_expression;
 
 public:
-    CustomDP(unsigned,   // tag
-             double,     // elastic modulus
-             double,     // poisson's ratio
-             double,     // eta_yield (hydrostatic stress related)
-             double,     // eta_flow (dilatancy angle related)
-             double,     // xi (cohesion related)
-             unsigned,   // expression tag
-             double = 0. // density
+    CustomDP(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // poisson's ratio
+        double,     // eta_yield (hydrostatic stress related)
+        double,     // eta_flow (dilatancy angle related)
+        double,     // xi (cohesion related)
+        unsigned,   // expression tag
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

@@ -33,10 +33,11 @@
 
 class Cell2D final : public Section2D {
 public:
-    Cell2D(unsigned,   // tag
-           double,     // area
-           unsigned,   // material tag
-           double = 0. // eccentricity
+    Cell2D(
+        unsigned,   // tag
+        double,     // area
+        unsigned,   // material tag
+        double = 0. // eccentricity
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

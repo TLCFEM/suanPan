@@ -47,16 +47,17 @@ class ConcreteExp final : protected DataConcreteExp, public SimpleHysteresis {
     [[nodiscard]] double compute_tension_residual(double, double) const override;
 
 public:
-    ConcreteExp(unsigned,   // tag
-                double,     // elastic modulus
-                double,     // f_t
-                double,     // a_t
-                double,     // g_t
-                double,     // f_c
-                double,     // a_c
-                double,     // g_c
-                double,     // middle point
-                double = 0. // density
+    ConcreteExp(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // f_t
+        double,     // a_t
+        double,     // g_t
+        double,     // f_c
+        double,     // a_c
+        double,     // g_c
+        double,     // middle point
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

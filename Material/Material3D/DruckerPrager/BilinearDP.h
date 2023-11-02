@@ -41,15 +41,16 @@ class BilinearDP final : protected DataBilinearDP, public NonlinearDruckerPrager
     [[nodiscard]] double compute_dc(double) const override;
 
 public:
-    BilinearDP(unsigned,   // tag
-               double,     // elastic modulus
-               double,     // poisson's ratio
-               double,     // eta_yield (hydrostatic stress related)
-               double,     // eta_flow (dilatancy angle related)
-               double,     // xi (cohesion related)
-               double,     // cohesion
-               double,     // cohesion slope
-               double = 0. // density
+    BilinearDP(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // poisson's ratio
+        double,     // eta_yield (hydrostatic stress related)
+        double,     // eta_flow (dilatancy angle related)
+        double,     // xi (cohesion related)
+        double,     // cohesion
+        double,     // cohesion slope
+        double = 0. // density
     );
 
     unique_ptr<Material> get_copy() override;

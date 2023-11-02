@@ -42,8 +42,9 @@ class Parallel final : public Material1D {
     vector<ResourceHolder<Material>> mat_pool;
 
 public:
-    Parallel(unsigned, // tag
-             uvec&&    // material tag pool
+    Parallel(
+        unsigned, // tag
+        uvec&&    // material tag pool
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

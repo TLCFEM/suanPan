@@ -62,12 +62,13 @@ class DKTS3 final : public ShellBase {
     static field<mat> form_transform(const mat&);
 
 public:
-    DKTS3(unsigned,     // tag
-          uvec&&,       // node tag
-          unsigned,     // material tag
-          double = 1.,  // thickness
-          unsigned = 3, // number of integration points
-          bool = false  // non-linear geometry switch
+    DKTS3(
+        unsigned,     // tag
+        uvec&&,       // node tag
+        unsigned,     // material tag
+        double = 1.,  // thickness
+        unsigned = 3, // number of integration points
+        bool = false  // non-linear geometry switch
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

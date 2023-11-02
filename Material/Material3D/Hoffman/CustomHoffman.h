@@ -42,12 +42,13 @@ class CustomHoffman final : public NonlinearHoffman {
     ResourceHolder<Expression> k_expression;
 
 public:
-    CustomHoffman(unsigned,   // tag
-                  vec&&,      // elastic modulus
-                  vec&&,      // poissons ratio
-                  vec&&,      // sigma
-                  unsigned,   // hardening function tag
-                  double = 0. // density
+    CustomHoffman(
+        unsigned,   // tag
+        vec&&,      // elastic modulus
+        vec&&,      // poissons ratio
+        vec&&,      // sigma
+        unsigned,   // hardening function tag
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

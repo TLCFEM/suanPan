@@ -32,11 +32,11 @@
 
 class UniversalOS : public StressWrapper {
 public:
-    UniversalOS(unsigned, // tag
-                unsigned, // 3D material tag
-                unsigned, // max iteration
-                uvec&&,
-                uvec&&
+    UniversalOS(
+        unsigned, // tag
+        unsigned, // 3D material tag
+        unsigned, // max iteration
+        uvec&&, uvec&&
     );
 
     void print() override;
@@ -44,9 +44,10 @@ public:
 
 class OS146 final : public UniversalOS {
 public:
-    OS146(unsigned, // tag
-          unsigned, // 3D material tag
-          unsigned  // max iteration
+    OS146(
+        unsigned, // tag
+        unsigned, // 3D material tag
+        unsigned  // max iteration
     );
 
     unique_ptr<Material> get_copy() override;
@@ -60,9 +61,10 @@ class OS146S final : public Material {
     ResourceHolder<Material> base;
 
 public:
-    OS146S(unsigned, // tag
-           unsigned, // 3D material tag
-           double    // shear modulus
+    OS146S(
+        unsigned, // tag
+        unsigned, // 3D material tag
+        double    // shear modulus
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

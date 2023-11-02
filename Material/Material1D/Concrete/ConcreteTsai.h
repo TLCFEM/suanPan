@@ -43,27 +43,29 @@ class ConcreteTsai final : public SimpleHysteresis {
     [[nodiscard]] double compute_tension_residual(double, double) const override;
 
 public:
-    ConcreteTsai(unsigned,   // tag
-                 double,     // peak stress in negative
-                 double,     // crack stress in positive
-                 double,     // MC
-                 double,     // NC
-                 double,     // MT
-                 double,     // NT
-                 double,     // middle point
-                 double,     // peak strain in negative
-                 double,     // crack strain in positive
-                 double = 0. // density
+    ConcreteTsai(
+        unsigned,   // tag
+        double,     // peak stress in negative
+        double,     // crack stress in positive
+        double,     // MC
+        double,     // NC
+        double,     // MT
+        double,     // NT
+        double,     // middle point
+        double,     // peak strain in negative
+        double,     // crack strain in positive
+        double = 0. // density
     );
-    ConcreteTsai(unsigned,   // tag
-                 double,     // peak stress in negative
-                 double,     // crack stress in positive
-                 double,     // M
-                 double,     // N
-                 double,     // middle point
-                 double,     // peak strain in negative
-                 double,     // crack strain in positive
-                 double = 0. // density
+    ConcreteTsai(
+        unsigned,   // tag
+        double,     // peak stress in negative
+        double,     // crack stress in positive
+        double,     // M
+        double,     // N
+        double,     // middle point
+        double,     // peak strain in negative
+        double,     // crack strain in positive
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

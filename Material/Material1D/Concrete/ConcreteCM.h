@@ -73,16 +73,17 @@ class ConcreteCM final : public Material1D {
     void update_connect();
 
 public:
-    ConcreteCM(unsigned,       // tag
-               double,         // elastic modulus
-               double,         // peak stress in negative
-               double,         // crack stress in positive
-               double,         // NC
-               double,         // NT
-               double = -2E-3, // peak strain in negative
-               double = 1E-4,  // crack strain in positive
-               bool = false,   // if to use linear transition
-               double = 0.     // density
+    ConcreteCM(
+        unsigned,       // tag
+        double,         // elastic modulus
+        double,         // peak stress in negative
+        double,         // crack stress in positive
+        double,         // NC
+        double,         // NT
+        double = -2E-3, // peak strain in negative
+        double = 1E-4,  // crack strain in positive
+        bool = false,   // if to use linear transition
+        double = 0.     // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

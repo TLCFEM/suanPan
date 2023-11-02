@@ -51,7 +51,8 @@ class CP5 final : public MaterialElement2D {
     vector<IntegrationPoint> int_pt;
 
 public:
-    CP5(unsigned,    // tag
+    CP5(
+        unsigned,    // tag
         uvec&&,      // node tag
         unsigned,    // material tag
         double = 1., // thickness

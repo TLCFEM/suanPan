@@ -49,10 +49,11 @@ class PS final : public MaterialElement2D {
     static mat form_transformation(const mat&);
 
 public:
-    PS(unsigned,   // unique tag
-       uvec&&,     // node tags
-       unsigned,   // material tag
-       double = 1. // thickness
+    PS(
+        unsigned,   // unique tag
+        uvec&&,     // node tags
+        unsigned,   // material tag
+        double = 1. // thickness
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

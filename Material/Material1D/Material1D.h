@@ -35,8 +35,9 @@ using std::vector;
 
 class Material1D : public Material {
 public:
-    Material1D(unsigned, // tag
-               double    // density
+    Material1D(
+        unsigned, // tag
+        double    // density
     );
 
     vector<vec> record(OutputType) override;

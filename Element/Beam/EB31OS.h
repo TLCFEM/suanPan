@@ -49,11 +49,12 @@ class EB31OS final : public SectionOSElement3D {
     mat local_stiff;
 
 public:
-    EB31OS(unsigned,    // tag
-           uvec&&,      // node tags
-           vec&&,       // properties
-           unsigned,    // orientation tag 
-           bool = false // nonlinear geometry switch
+    EB31OS(
+        unsigned,    // tag
+        uvec&&,      // node tags
+        vec&&,       // properties
+        unsigned,    // orientation tag 
+        bool = false // nonlinear geometry switch
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

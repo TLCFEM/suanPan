@@ -33,9 +33,10 @@
 
 class PlaneStress final : public StressWrapper {
 public:
-    PlaneStress(unsigned, // tag
-                unsigned, // 3D material tag
-                unsigned  // max iteration
+    PlaneStress(
+        unsigned, // tag
+        unsigned, // 3D material tag
+        unsigned  // max iteration
     );
 
     unique_ptr<Material> get_copy() override;

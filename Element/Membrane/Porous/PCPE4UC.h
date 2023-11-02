@@ -53,12 +53,13 @@ class PCPE4UC final : public MaterialElement2D {
     vector<IntegrationPoint> int_pt;
 
 public:
-    PCPE4UC(unsigned, // tag
-            uvec&&,   // node tag
-            unsigned, // solid material tag
-            unsigned, // fluid material tag
-            double,   // alpha
-            double    // porosity
+    PCPE4UC(
+        unsigned, // tag
+        uvec&&,   // node tag
+        unsigned, // solid material tag
+        unsigned, // fluid material tag
+        double,   // alpha
+        double    // porosity
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

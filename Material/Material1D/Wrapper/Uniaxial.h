@@ -32,9 +32,10 @@
 
 class Uniaxial final : public StressWrapper {
 public:
-    Uniaxial(unsigned, // tag
-             unsigned, // 3D material tag
-             unsigned  // max iteration
+    Uniaxial(
+        unsigned, // tag
+        unsigned, // 3D material tag
+        unsigned  // max iteration
     );
 
     unique_ptr<Material> get_copy() override;

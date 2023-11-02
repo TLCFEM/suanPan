@@ -44,10 +44,11 @@ struct DataIsotropicElastic3D {
 
 class IsotropicElastic3D final : public DataIsotropicElastic3D, public Material3D {
 public:
-    IsotropicElastic3D(unsigned,   // tag
-                       double,     // elastic modulus
-                       double,     // poissons ratio
-                       double = 0. // density
+    IsotropicElastic3D(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // poissons ratio
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

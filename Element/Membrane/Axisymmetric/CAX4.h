@@ -48,10 +48,11 @@ class CAX4 final : public MaterialElement2D {
     static vec isoparametric_mapping(const vec&);
 
 public:
-    CAX4(unsigned,    // tag
-         uvec&&,      // node tag
-         unsigned,    // material tag
-         bool = false // nonlinear geometry switch
+    CAX4(
+        unsigned,    // tag
+        uvec&&,      // node tag
+        unsigned,    // material tag
+        bool = false // nonlinear geometry switch
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

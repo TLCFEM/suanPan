@@ -33,9 +33,10 @@
 
 class TrussSection final : public Section1D {
 public:
-    explicit TrussSection(unsigned, // tag
-                          double,   // area
-                          unsigned  // material tag
+    explicit TrussSection(
+        unsigned, // tag
+        double,   // area
+        unsigned  // material tag
     );
 
     unique_ptr<Section> get_copy() override;

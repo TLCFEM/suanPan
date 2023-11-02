@@ -55,12 +55,13 @@ class B31OS final : public SectionOSElement3D {
     unique_ptr<Orientation> b_trans;
 
 public:
-    B31OS(unsigned,     // tag
-          uvec&&,       // node tags
-          unsigned,     // section tag
-          unsigned,     // orientation tag
-          unsigned = 6, // integration points
-          bool = false  // nonlinear geometry switch
+    B31OS(
+        unsigned,     // tag
+        uvec&&,       // node tags
+        unsigned,     // section tag
+        unsigned,     // orientation tag
+        unsigned = 6, // integration points
+        bool = false  // nonlinear geometry switch
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

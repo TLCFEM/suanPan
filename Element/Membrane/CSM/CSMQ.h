@@ -55,12 +55,13 @@ class CSMQ : public MaterialElement2D {
     virtual const uvec& get_rotation_dof() = 0;
 
 public:
-    CSMQ(unsigned,    // tag
-         uvec&&,      // node tag
-         unsigned,    // material tag
-         unsigned,    // number of nodes
-         double = 1., // thickness
-         double = -1. // length
+    CSMQ(
+        unsigned,    // tag
+        uvec&&,      // node tag
+        unsigned,    // material tag
+        unsigned,    // number of nodes
+        double = 1., // thickness
+        double = -1. // length
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;
@@ -93,11 +94,12 @@ class CSMQ5 final : public CSMQ {
     const uvec& get_rotation_dof() override;
 
 public:
-    CSMQ5(unsigned,    // tag
-          uvec&&,      // node tag
-          unsigned,    // material tag
-          double = 1., // thickness
-          double = -1. // length
+    CSMQ5(
+        unsigned,    // tag
+        uvec&&,      // node tag
+        unsigned,    // material tag
+        double = 1., // thickness
+        double = -1. // length
     );
 };
 
@@ -109,11 +111,12 @@ class CSMQ6 final : public CSMQ {
     const uvec& get_rotation_dof() override;
 
 public:
-    CSMQ6(unsigned,    // tag
-          uvec&&,      // node tag
-          unsigned,    // material tag
-          double = 1., // thickness
-          double = -1. // length
+    CSMQ6(
+        unsigned,    // tag
+        uvec&&,      // node tag
+        unsigned,    // material tag
+        double = 1., // thickness
+        double = -1. // length
     );
 };
 
@@ -125,11 +128,12 @@ class CSMQ7 final : public CSMQ {
     const uvec& get_rotation_dof() override;
 
 public:
-    CSMQ7(unsigned,    // tag
-          uvec&&,      // node tag
-          unsigned,    // material tag
-          double = 1., // thickness
-          double = -1. // length
+    CSMQ7(
+        unsigned,    // tag
+        uvec&&,      // node tag
+        unsigned,    // material tag
+        double = 1., // thickness
+        double = -1. // length
     );
 };
 

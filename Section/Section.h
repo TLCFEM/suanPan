@@ -79,11 +79,12 @@ class Section : protected DataSection, public Tag {
     const bool symmetric = false;
 
 public:
-    explicit Section(unsigned = 0,                  // section tag
-                     SectionType = SectionType::D0, // section type
-                     unsigned = 0,                  // material tag
-                     double = 0.,                   // area
-                     vec&& = {0., 0.}               // eccentricity
+    explicit Section(
+        unsigned = 0,                  // section tag
+        SectionType = SectionType::D0, // section type
+        unsigned = 0,                  // material tag
+        double = 0.,                   // area
+        vec&& = {0., 0.}               // eccentricity
     );
     Section(const Section&) = default;           // default copy ctor
     Section(Section&&) = delete;                 // move forbidden

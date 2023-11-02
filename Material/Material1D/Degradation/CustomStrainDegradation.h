@@ -42,10 +42,11 @@ class CustomStrainDegradation final : public StrainDegradation {
     [[nodiscard]] vec compute_negative_degradation(double) const override;
 
 public:
-    CustomStrainDegradation(unsigned, // unique tag
-                            unsigned, // material tag
-                            unsigned, // expression tag
-                            unsigned  // expression tag
+    CustomStrainDegradation(
+        unsigned, // unique tag
+        unsigned, // material tag
+        unsigned, // expression tag
+        unsigned  // expression tag
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

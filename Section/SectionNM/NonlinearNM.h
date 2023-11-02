@@ -62,20 +62,22 @@ protected:
     [[nodiscard]] virtual mat compute_ddf(const vec&, const vec&) const = 0;
 
 public:
-    NonlinearNM(unsigned, // tag
-                double,   // axial rigidity
-                double,   // flexural rigidity
-                bool,     // kinematic hardening modulus
-                double,   // linear density
-                vec&&
+    NonlinearNM(
+        unsigned, // tag
+        double,   // axial rigidity
+        double,   // flexural rigidity
+        bool,     // kinematic hardening modulus
+        double,   // linear density
+        vec&&
     );
-    NonlinearNM(unsigned, // tag
-                double,   // axial rigidity
-                double,   // flexural rigidity
-                double,   // flexural rigidity
-                bool,     // kinematic hardening modulus
-                double,   // linear density
-                vec&&
+    NonlinearNM(
+        unsigned, // tag
+        double,   // axial rigidity
+        double,   // flexural rigidity
+        double,   // flexural rigidity
+        bool,     // kinematic hardening modulus
+        double,   // linear density
+        vec&&
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

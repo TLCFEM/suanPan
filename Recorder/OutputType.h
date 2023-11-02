@@ -258,7 +258,6 @@ enum class OutputType {
 
     // amplitude
     AMP,
-
     NL
 };
 

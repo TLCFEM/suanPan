@@ -42,10 +42,11 @@ class CustomStressDegradation final : public StressDegradation {
     [[nodiscard]] vec compute_negative_degradation(double) const override;
 
 public:
-    CustomStressDegradation(unsigned, // unique tag
-                            unsigned, // material tag
-                            unsigned, // expression tag
-                            unsigned  // expression tag
+    CustomStressDegradation(
+        unsigned, // unique tag
+        unsigned, // material tag
+        unsigned, // expression tag
+        unsigned  // expression tag
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

@@ -35,15 +35,16 @@
 
 class ComplementaryEnergyEvolution final : public EnergyEvolution {
 public:
-    ComplementaryEnergyEvolution(unsigned,      // tag
-                                 unsigned,      // step tag
-                                 unsigned,      // incre level
-                                 unsigned,      // final level
-                                 double = 1.,   // centre weight
-                                 unsigned = 2,  // propagation iteration
-                                 unsigned = 10, // reactivation ratio
-                                 double = .5,   // propagation weight
-                                 double = 1E-5  // tolerance
+    ComplementaryEnergyEvolution(
+        unsigned,      // tag
+        unsigned,      // step tag
+        unsigned,      // incre level
+        unsigned,      // final level
+        double = 1.,   // centre weight
+        unsigned = 2,  // propagation iteration
+        unsigned = 10, // reactivation ratio
+        double = .5,   // propagation weight
+        double = 1E-5  // tolerance
     );
 
     unique_ptr<Criterion> get_copy() override;

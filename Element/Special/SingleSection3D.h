@@ -38,9 +38,10 @@ class SingleSection3D final : public SectionElement3D {
     unique_ptr<Section> s_section;
 
 public:
-    SingleSection3D(unsigned, // tag
-                    unsigned, // node tag
-                    unsigned  // section tag
+    SingleSection3D(
+        unsigned, // tag
+        unsigned, // node tag
+        unsigned  // section tag
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

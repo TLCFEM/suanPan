@@ -64,13 +64,14 @@ class NonlinearCamClay : protected DataNonlinearCamClay, public Material3D {
     [[nodiscard]] virtual double compute_da(double) const = 0;
 
 public:
-    NonlinearCamClay(unsigned,   // tag
-                     double,     // elastic modulus
-                     double,     // poisson's ratio
-                     double,     // beta
-                     double,     // m
-                     double,     // pt
-                     double = 0. // density
+    NonlinearCamClay(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // poisson's ratio
+        double,     // beta
+        double,     // m
+        double,     // pt
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

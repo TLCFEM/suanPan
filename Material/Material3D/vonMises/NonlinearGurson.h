@@ -52,15 +52,16 @@ class NonlinearGurson : protected DataNonlinearGurson, public Material3D {
     [[nodiscard]] virtual vec compute_hardening(double) const = 0;
 
 public:
-    NonlinearGurson(unsigned,   // tag
-                    double,     // elastic modulus
-                    double,     // poisson's ratio
-                    double,     // q1
-                    double,     // q2
-                    double,     // fn
-                    double,     // sn
-                    double,     // en
-                    double = 0. // density
+    NonlinearGurson(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // poisson's ratio
+        double,     // q1
+        double,     // q2
+        double,     // fn
+        double,     // sn
+        double,     // en
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

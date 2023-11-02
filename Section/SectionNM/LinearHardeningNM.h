@@ -42,22 +42,24 @@ protected:
     [[nodiscard]] vec compute_dh(double) const override;
 
 public:
-    LinearHardeningNM(unsigned, // tag
-                      double,   // axial rigidity
-                      double,   // flexural rigidity
-                      double,   // isotropic hardening modulus
-                      double,   // kinematic hardening modulus
-                      double,   // linear density
-                      vec&&
+    LinearHardeningNM(
+        unsigned, // tag
+        double,   // axial rigidity
+        double,   // flexural rigidity
+        double,   // isotropic hardening modulus
+        double,   // kinematic hardening modulus
+        double,   // linear density
+        vec&&
     );
-    LinearHardeningNM(unsigned, // tag
-                      double,   // axial rigidity
-                      double,   // flexural rigidity
-                      double,   // flexural rigidity
-                      double,   // isotropic hardening modulus
-                      double,   // kinematic hardening modulus
-                      double,   // linear density
-                      vec&&
+    LinearHardeningNM(
+        unsigned, // tag
+        double,   // axial rigidity
+        double,   // flexural rigidity
+        double,   // flexural rigidity
+        double,   // isotropic hardening modulus
+        double,   // kinematic hardening modulus
+        double,   // linear density
+        vec&&
     );
 };
 

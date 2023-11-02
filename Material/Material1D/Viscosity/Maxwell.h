@@ -47,12 +47,13 @@ class Maxwell final : public Material1D {
     ResourceHolder<Material> damper, spring;
 
 public:
-    Maxwell(unsigned,     // tag
-            unsigned,     // damper tag
-            unsigned,     // spring tag
-            bool = false, // if to use matrix
-            unsigned = 0, // if to process when fails to converge
-            double = 0.   // beta
+    Maxwell(
+        unsigned,     // tag
+        unsigned,     // damper tag
+        unsigned,     // spring tag
+        bool = false, // if to use matrix
+        unsigned = 0, // if to process when fails to converge
+        double = 0.   // beta
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

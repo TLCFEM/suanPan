@@ -42,11 +42,12 @@ class BilinearMises1D final : protected DataBilinearMises1D, public NonlinearMis
     [[nodiscard]] double compute_dh(double) const override;
 
 public:
-    BilinearMises1D(unsigned,   // tag
-                    double,     // elastic modulus
-                    double,     // initial yield stress
-                    double,     // hardening ratio
-                    double = 0. // density
+    BilinearMises1D(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // initial yield stress
+        double,     // hardening ratio
+        double = 0. // density
     );
 
     unique_ptr<Material> get_copy() override;

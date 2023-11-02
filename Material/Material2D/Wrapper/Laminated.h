@@ -37,8 +37,9 @@ class Laminated final : public Material2D {
     std::vector<ResourceHolder<Material>> mat_pool;
 
 public:
-    Laminated(unsigned, // tag
-              uvec&&    // mat tag
+    Laminated(
+        unsigned, // tag
+        uvec&&    // mat tag
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

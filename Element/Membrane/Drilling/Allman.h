@@ -52,10 +52,11 @@ class Allman final : public MaterialElement2D {
     static field<mat> form_transform(const mat&);
 
 public:
-    Allman(unsigned,   // tag
-           uvec&&,     // node tag
-           unsigned,   // material tag
-           double = 1. // thickness
+    Allman(
+        unsigned,   // tag
+        uvec&&,     // node tag
+        unsigned,   // material tag
+        double = 1. // thickness
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

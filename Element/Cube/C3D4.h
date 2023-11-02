@@ -44,10 +44,11 @@ class C3D4 final : public MaterialElement3D {
     mat pn_pxyz, strain_mat;
 
 public:
-    C3D4(unsigned,    // tag
-         uvec&&,      // node tag
-         unsigned,    // material tag
-         bool = false // nonlinear geometry switch
+    C3D4(
+        unsigned,    // tag
+        uvec&&,      // node tag
+        unsigned,    // material tag
+        bool = false // nonlinear geometry switch
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

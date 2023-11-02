@@ -53,12 +53,13 @@ class DCP4 final : public MaterialElement2D {
     vector<IntegrationPoint> int_pt;
 
 public:
-    DCP4(unsigned,   // tag
-         uvec&&,     // node tag
-         unsigned,   // material tag
-         double,     // characteristic length
-         double,     // energy release rate
-         double = 1. // thickness
+    DCP4(
+        unsigned,   // tag
+        uvec&&,     // node tag
+        unsigned,   // material tag
+        double,     // characteristic length
+        double,     // energy release rate
+        double = 1. // thickness
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

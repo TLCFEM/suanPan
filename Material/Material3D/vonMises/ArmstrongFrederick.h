@@ -61,16 +61,17 @@ class ArmstrongFrederick final : protected DataArmstrongFrederick, public Materi
     const double root_six_shear = sqrt(6.) * shear;
 
 public:
-    ArmstrongFrederick(unsigned,   // tag
-                       double,     // elastic modulus
-                       double,     // poissons ratio
-                       double,     // yield stress
-                       double,     // saturated stress
-                       double,     // linear hardening modulus
-                       double,     // m
-                       vec&&,      // a
-                       vec&&,      // b
-                       double = 0. // density
+    ArmstrongFrederick(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // poissons ratio
+        double,     // yield stress
+        double,     // saturated stress
+        double,     // linear hardening modulus
+        double,     // m
+        vec&&,      // a
+        vec&&,      // b
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

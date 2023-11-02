@@ -47,13 +47,14 @@ class BilinearOO final : protected DataBilinearOO, public OriginOriented {
     [[nodiscard]] podarray<double> compute_compression_backbone(double) const override;
 
 public:
-    BilinearOO(int,    // tag
-               double, // elastic modulus
-               double, // tension yield strain
-               double, // tension hardening ratio
-               double, // compression yield strain
-               double, // compression hardening ratio
-               double  // density
+    BilinearOO(
+        int,    // tag
+        double, // elastic modulus
+        double, // tension yield strain
+        double, // tension hardening ratio
+        double, // compression yield strain
+        double, // compression hardening ratio
+        double  // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

@@ -33,11 +33,12 @@
 
 class NonlinearHill : public NonlinearHoffman {
 public:
-    NonlinearHill(unsigned,   // tag
-                  vec&&,      // elastic modulus
-                  vec&&,      // poissons ratio
-                  vec&&,      // yield stress
-                  double = 0. // density
+    NonlinearHill(
+        unsigned,   // tag
+        vec&&,      // elastic modulus
+        vec&&,      // poissons ratio
+        vec&&,      // yield stress
+        double = 0. // density
     );
 };
 

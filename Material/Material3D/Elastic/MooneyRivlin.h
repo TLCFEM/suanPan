@@ -45,11 +45,12 @@ class MooneyRivlin final : protected DataMooneyRivlin, public Material3D {
     static const double one_three, two_three, four_three, five_three, eight_nine;
 
 public:
-    MooneyRivlin(unsigned,    // tag
-                 double,      // bulk modulus
-                 double = 80, // a10
-                 double = 20, // a01
-                 double = 0.  // density
+    MooneyRivlin(
+        unsigned,    // tag
+        double,      // bulk modulus
+        double = 80, // a10
+        double = 20, // a01
+        double = 0.  // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

@@ -39,9 +39,10 @@ class Rotation2D final : public Material2D {
     mat trans_mat;
 
 public:
-    Rotation2D(unsigned, // tag
-               unsigned, // mat tag
-               double    // Euler angle
+    Rotation2D(
+        unsigned, // tag
+        unsigned, // mat tag
+        double    // Euler angle
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

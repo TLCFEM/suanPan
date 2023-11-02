@@ -40,13 +40,14 @@ class ExpHoffman final : protected DataExpHoffman, public NonlinearHoffman {
     [[nodiscard]] double compute_dk(double) const override;
 
 public:
-    ExpHoffman(unsigned,   // tag
-               vec&&,      // elastic modulus
-               vec&&,      // poissons ratio
-               vec&&,      // sigma
-               double,     // a
-               double,     // b
-               double = 0. // density
+    ExpHoffman(
+        unsigned,   // tag
+        vec&&,      // elastic modulus
+        vec&&,      // poissons ratio
+        vec&&,      // sigma
+        double,     // a
+        double,     // b
+        double = 0. // density
     );
 
     unique_ptr<Material> get_copy() override;

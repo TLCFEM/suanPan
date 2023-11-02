@@ -41,8 +41,9 @@ protected:
     [[nodiscard]] virtual vec compute_negative_degradation(double) const = 0; // negative region
 
 public:
-    Degradation(unsigned, // tag
-                unsigned  // material tag
+    Degradation(
+        unsigned, // tag
+        unsigned  // material tag
     );
     Degradation(const Degradation&);
     Degradation(Degradation&&) noexcept = delete;

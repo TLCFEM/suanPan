@@ -165,9 +165,7 @@ void overview() {
     };
 
     redirect();
-    suanpan_info("Welcome to suanPan, a parallel finite element analysis software.\n\n"
-        "It can be used to solve various types of solid mechanics problems. It also provides a flexible platform for researchers to develop new numerical models and algorithms in a hassle-free manner.\n\n"
-        "The following is a quick introduction of the application, regarding its functionalities and basic usage. At any time, type in '");
+    suanpan_info("Welcome to suanPan, a parallel finite element analysis software.\n\nIt can be used to solve various types of solid mechanics problems. It also provides a flexible platform for researchers to develop new numerical models and algorithms in a hassle-free manner.\n\nThe following is a quick introduction of the application, regarding its functionalities and basic usage. At any time, type in '");
     suanpan_highlight("q");
     suanpan_info("' to quit this introduction. First of all, type in '");
     suanpan_highlight("version");
@@ -177,9 +175,7 @@ void overview() {
     if(SUANPAN_EXIT == guide_command("version")) return;
 
     redirect();
-    suanpan_info("By invoking the application without input file, you are currently in the interactive mode, which allows you to create finite element models interactively. "
-        "A numerical model typically consists of nodes, elements connecting nodes, materials attached to elements, loads applied to nodes, boundary conditions imposed on nodes, etc. "
-        "To analyze, a number of analysis steps need to be defined with the proper convergence criteria and solvers.\n\nType in '");
+    suanpan_info("By invoking the application without input file, you are currently in the interactive mode, which allows you to create finite element models interactively. A numerical model typically consists of nodes, elements connecting nodes, materials attached to elements, loads applied to nodes, boundary conditions imposed on nodes, etc. To analyze, a number of analysis steps need to be defined with the proper convergence criteria and solvers.\n\nType in '");
     suanpan_highlight("example");
     suanpan_info("' to check out a simple elastic cantilever example.\n");
     restore();
@@ -187,15 +183,11 @@ void overview() {
     if(SUANPAN_EXIT == guide_command("example")) return;
 
     redirect();
-    suanpan_info("If you have some experience with ABAQUS scripting, you may have realised that the structure resembles that of ABAQUS *.inp files. "
-        "Basically you would need to define the geometry first, then define analysis steps and finally invoke the analysis.\n\n"
-        "Once you get used to the syntax and modelling workflow, you are more likely to write some model input files in plain text and use the '");
+    suanpan_info("If you have some experience with ABAQUS scripting, you may have realised that the structure resembles that of ABAQUS *.inp files. Basically you would need to define the geometry first, then define analysis steps and finally invoke the analysis.\n\nOnce you get used to the syntax and modelling workflow, you are more likely to write some model input files in plain text and use the '");
     suanpan_highlight("-f");
     suanpan_info("' option to directly perform the analysis, for example, '");
     suanpan_highlight("suanPan -f some_text_file");
-    suanpan_info("'.\n\n"
-        "To this end, a file named as 'AddAssociation.bat' (Windows) or 'suanPan.sh' (Unix) is provided to help you setup autocompletion and syntax highlighting with Sublime Text. "
-        "It is placed in the same directory as the executable file. Type in '");
+    suanpan_info("'.\n\nTo this end, a file named as 'AddAssociation.bat' (Windows) or 'suanPan.sh' (Unix) is provided to help you setup autocompletion and syntax highlighting with Sublime Text. It is placed in the same directory as the executable file. Type in '");
     suanpan_highlight("fullname");
     suanpan_info("' to see where the file is located.\n");
     restore();
@@ -211,8 +203,7 @@ void overview() {
     if(SUANPAN_EXIT == guide_command("help")) return;
 
     redirect();
-    suanpan_info("In the current interactive mode, it is also possible to load an existing model file and run it directly. "
-        "Let's first echo a '");
+    suanpan_info("In the current interactive mode, it is also possible to load an existing model file and run it directly. Let's first echo a '");
     suanpan_highlight("benchmark");
     suanpan_info("' command to file 'benchmark.sp' using the '");
     suanpan_highlight("terminal");
@@ -236,9 +227,7 @@ void overview() {
     if(SUANPAN_EXIT == guide_command("file benchmark.sp")) return;
 
     redirect();
-    suanpan_info("In the documentation [https://tlcfem.github.io/suanPan-manual/latest/], there is an [Example] section that provides some practical examples for you to try out. "
-        "The source code repository also contains a folder named [Example] in which example usages of most models/algorithms are given. Please feel free to check that out.\n\n"
-        "Hope you will find suanPan useful. As it aims to bring the latest finite element models/algorithms to practice, you are welcome to embed your amazing research outcomes into suanPan. Type in '");
+    suanpan_info("In the documentation [https://tlcfem.github.io/suanPan-manual/latest/], there is an [Example] section that provides some practical examples for you to try out. The source code repository also contains a folder named [Example] in which example usages of most models/algorithms are given. Please feel free to check that out.\n\nHope you will find suanPan useful. As it aims to bring the latest finite element models/algorithms to practice, you are welcome to embed your amazing research outcomes into suanPan. Type in '");
     suanpan_highlight("qrcode");
     suanpan_info("' to display a QR code for sharing. (UTF-8 is required, on Windows, some modern terminal such as Windows Terminal [https://github.com/microsoft/terminal] is recommended.)\n");
     restore();

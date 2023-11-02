@@ -49,7 +49,8 @@ struct DataMPF {
 
 class MPF final : protected DataMPF, public Material1D {
 public:
-    MPF(unsigned,      // tag
+    MPF(
+        unsigned,      // tag
         double,        // elastic modulus
         double,        // yield stress
         double = .05,  // hardening ratio
