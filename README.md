@@ -23,6 +23,10 @@
 
 [![gplv3-or-later](https://www.gnu.org/graphics/gplv3-or-later.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
+[![Visual Studio Marketplace Version (including pre-releases)](https://img.shields.io/visual-studio-marketplace/v/tlc.suanpan?label=VS%20Code&color=44cc11)](https://marketplace.visualstudio.com/items?itemName=tlcfem.suanpan)
+
+***Check out the VS Code [extension](https://marketplace.visualstudio.com/items?itemName=tlcfem.suanpan) for syntax highlighting and autocompletion.***
+
 ## Introduction
 
 [🧮 **suanPan**](https://tlcfem.github.io/suanPan/) is a finite element method (FEM) simulation platform for
@@ -221,6 +225,12 @@ It is also possible to compile the package via docker, check the dockerfiles und
 questions please open an issue.
 
 ### Automation Related
+
+#### VS Code
+
+The VS Code extension is available [here](https://marketplace.visualstudio.com/items?itemName=tlcfem.suanpan).
+
+#### Sublime Text
 
 On Windows, a batch file named `AddAssociation.bat` is provided in the archive. It provides file associations and
 prepares a proper working environment (build system, autocompletion, highlighting)
