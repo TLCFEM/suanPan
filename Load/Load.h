@@ -49,12 +49,13 @@ protected:
     friend void set_load_multiplier(double);
 
 public:
-    Load(unsigned, // tag
-         unsigned, // step tag
-         unsigned, // amplitude tag
-         uvec&&,   // node tag
-         uvec&&,   // dof tag
-         double    // nominal magnitude
+    Load(
+        unsigned, // tag
+        unsigned, // step tag
+        unsigned, // amplitude tag
+        uvec&&,   // node tag
+        uvec&&,   // dof tag
+        double    // nominal magnitude
     );
     Load(const Load&) = delete;            // copy forbidden
     Load(Load&&) = delete;                 // move forbidden

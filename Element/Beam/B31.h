@@ -53,7 +53,8 @@ class B31 final : public SectionElement3D {
     unique_ptr<Orientation> b_trans;
 
 public:
-    B31(unsigned,     // tag
+    B31(
+        unsigned,     // tag
         uvec&&,       // node tags
         unsigned,     // section tag
         unsigned,     // orientation tag

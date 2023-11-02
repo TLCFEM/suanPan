@@ -42,10 +42,11 @@ class Dhakal final : protected DataDhakal, public StrainDegradation {
     [[nodiscard]] vec compute_negative_degradation(double) const override;
 
 public:
-    Dhakal(unsigned, // unique tag
-           unsigned, // material tag
-           double,   // yield strain
-           double    // parameter
+    Dhakal(
+        unsigned, // unique tag
+        unsigned, // material tag
+        double,   // yield strain
+        double    // parameter
     );
 
     unique_ptr<Material> get_copy() override;

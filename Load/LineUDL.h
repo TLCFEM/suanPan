@@ -38,13 +38,14 @@ protected:
     const uword dimension;
 
 public:
-    LineUDL(unsigned, // tag
-            unsigned, // start step tag
-            double,   // magnitude
-            uvec&&,   // node tags
-            unsigned, // dof tag
-            unsigned, // amplitude tag
-            uword     // dimension
+    LineUDL(
+        unsigned, // tag
+        unsigned, // start step tag
+        double,   // magnitude
+        uvec&&,   // node tags
+        unsigned, // dof tag
+        unsigned, // amplitude tag
+        uword     // dimension
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;
@@ -52,12 +53,13 @@ public:
 
 class LineUDL2D final : public LineUDL {
 public:
-    LineUDL2D(unsigned, // tag
-              unsigned, // start step tag
-              double,   // magnitude
-              uvec&&,   // node tags
-              unsigned, // dof tag
-              unsigned  // amplitude tag
+    LineUDL2D(
+        unsigned, // tag
+        unsigned, // start step tag
+        double,   // magnitude
+        uvec&&,   // node tags
+        unsigned, // dof tag
+        unsigned  // amplitude tag
     );
 
     int process(const shared_ptr<DomainBase>&) override;
@@ -65,12 +67,13 @@ public:
 
 class LineUDL3D final : public LineUDL {
 public:
-    LineUDL3D(unsigned, // tag
-              unsigned, // start step tag
-              double,   // magnitude
-              uvec&&,   // node tags
-              unsigned, // dof tag
-              unsigned  // amplitude tag
+    LineUDL3D(
+        unsigned, // tag
+        unsigned, // start step tag
+        double,   // magnitude
+        uvec&&,   // node tags
+        unsigned, // dof tag
+        unsigned  // amplitude tag
     );
 
     int process(const shared_ptr<DomainBase>&) override;

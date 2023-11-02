@@ -62,13 +62,14 @@ class NonlinearDruckerPrager : protected DataNonlinearDruckerPrager, public Mate
     [[nodiscard]] virtual double compute_dc(double) const = 0;
 
 public:
-    NonlinearDruckerPrager(unsigned,   // tag
-                           double,     // elastic modulus
-                           double,     // poisson's ratio
-                           double,     // eta_yield (hydrostatic stress related)
-                           double,     // eta_flow (dilatancy angle related)
-                           double,     // xi (cohesion related)
-                           double = 0. // density
+    NonlinearDruckerPrager(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // poisson's ratio
+        double,     // eta_yield (hydrostatic stress related)
+        double,     // eta_flow (dilatancy angle related)
+        double,     // xi (cohesion related)
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

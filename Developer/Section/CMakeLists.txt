@@ -29,6 +29,6 @@ add_library(${PROJECT_NAME} SHARED
         ../../Material/Material.cpp
         ../../Section/Section.cpp
         ../../Include/fmt/src/format.cc
-        )
+)
 
 message(STATUS "SectionExample CXX_FLAGS: ${CMAKE_CXX_FLAGS}")

@@ -33,11 +33,12 @@
 
 class Cell3D final : public Section3D {
 public:
-    Cell3D(unsigned,    // tag
-           double,      // area
-           unsigned,    // material tag
-           double = 0., // eccentricity
-           double = 0.  // eccentricity
+    Cell3D(
+        unsigned,    // tag
+        double,      // area
+        unsigned,    // material tag
+        double = 0., // eccentricity
+        double = 0.  // eccentricity
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

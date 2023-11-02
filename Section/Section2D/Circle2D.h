@@ -37,11 +37,12 @@ class Circle2D final : public Section2D {
     const unsigned int_pt_num;
 
 public:
-    Circle2D(unsigned,     // tag
-             double,       // radius
-             unsigned,     // material tag
-             unsigned = 6, // number of integration points
-             double = 0.   // eccentricity
+    Circle2D(
+        unsigned,     // tag
+        double,       // radius
+        unsigned,     // material tag
+        unsigned = 6, // number of integration points
+        double = 0.   // eccentricity
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

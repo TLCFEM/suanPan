@@ -37,11 +37,12 @@ class Embed : public Constraint {
     const unsigned element_tag;
 
 public:
-    Embed(unsigned, // unique constraint tag
-          unsigned, // step tag
-          unsigned, // element tag
-          unsigned, // node tag
-          unsigned  // dimension
+    Embed(
+        unsigned, // unique constraint tag
+        unsigned, // step tag
+        unsigned, // element tag
+        unsigned, // node tag
+        unsigned  // dimension
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

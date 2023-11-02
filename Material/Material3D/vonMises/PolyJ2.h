@@ -42,11 +42,12 @@ class PolyJ2 final : protected DataPolyJ2, public NonlinearJ2 {
     [[nodiscard]] double compute_dh(double) const override;
 
 public:
-    PolyJ2(unsigned,   // tag
-           double,     // elastic modulus
-           double,     // poisson's ratio
-           vec&&,      // poly parameter
-           double = 0. // density
+    PolyJ2(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // poisson's ratio
+        vec&&,      // poly parameter
+        double = 0. // density
     );
 
     unique_ptr<Material> get_copy() override;

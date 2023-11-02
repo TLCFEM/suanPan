@@ -43,17 +43,18 @@ class ExpGurson1D final : protected DataExpGurson1D, public NonlinearGurson1D {
     [[nodiscard]] vec compute_hardening(double) const override;
 
 public:
-    ExpGurson1D(unsigned,   // tag
-                double,     // elastic modulus
-                double,     // poisson's ratio
-                double,     // yield stress
-                double,     // n
-                double,     // q1
-                double,     // q2
-                double,     // fn
-                double,     // sn
-                double,     // en
-                double = 0. // density
+    ExpGurson1D(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // poisson's ratio
+        double,     // yield stress
+        double,     // n
+        double,     // q1
+        double,     // q2
+        double,     // fn
+        double,     // sn
+        double,     // en
+        double = 0. // density
     );
 
     unique_ptr<Material> get_copy() override;

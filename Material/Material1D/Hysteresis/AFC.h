@@ -49,7 +49,8 @@ class AFC final : protected DataAFC, public Material1D {
     void compute_degradation(double, double);
 
 public:
-    AFC(unsigned, // unique tag
+    AFC(
+        unsigned, // unique tag
         double,   // elastic modulus
         double,   // tension yield stress
         double,   // tension hardening modulus

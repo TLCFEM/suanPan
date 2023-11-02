@@ -35,11 +35,12 @@
 
 class ReferenceForce final : public Load {
 public:
-    ReferenceForce(unsigned, // tag
-                   unsigned, // start step tag
-                   double,   // magnitude
-                   uvec&&,   // node tags
-                   unsigned  // dof tag
+    ReferenceForce(
+        unsigned, // tag
+        unsigned, // start step tag
+        double,   // magnitude
+        uvec&&,   // node tags
+        unsigned  // dof tag
     );
 
     int process(const shared_ptr<DomainBase>&) override;

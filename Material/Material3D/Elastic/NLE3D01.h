@@ -45,12 +45,13 @@ class NLE3D01 final : protected DataNLE3D01, public IsotropicNonlinearElastic3D 
     vec compute_derivative(double, double) override;
 
 public:
-    NLE3D01(unsigned, // tag
-            double,   // bulk modulus
-            double,   // reference strain
-            double,   // reference stress
-            double,   // m
-            double    // density
+    NLE3D01(
+        unsigned, // tag
+        double,   // bulk modulus
+        double,   // reference strain
+        double,   // reference stress
+        double,   // m
+        double    // density
     );
 
     unique_ptr<Material> get_copy() override;

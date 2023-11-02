@@ -91,23 +91,24 @@ private:
     int compute_damage_factor(double, double, double, double, double&, vec&) const;
 
 public:
-    CDPM2(unsigned,   // tag
-          double,     // elastic_modulus
-          double,     // poissons_ratio
-          double,     // ft
-          double,     // fc
-          double,     // qh0
-          double,     // hp
-          double,     // df
-          double,     // ah
-          double,     // bh
-          double,     // ch
-          double,     // dh
-          double,     // as
-          double,     // eft
-          double,     // efc
-          DamageType, // damage type
-          double      // density
+    CDPM2(
+        unsigned,   // tag
+        double,     // elastic_modulus
+        double,     // poissons_ratio
+        double,     // ft
+        double,     // fc
+        double,     // qh0
+        double,     // hp
+        double,     // df
+        double,     // ah
+        double,     // bh
+        double,     // ch
+        double,     // dh
+        double,     // as
+        double,     // eft
+        double,     // efc
+        DamageType, // damage type
+        double      // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

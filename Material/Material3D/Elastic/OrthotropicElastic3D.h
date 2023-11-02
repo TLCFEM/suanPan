@@ -38,10 +38,11 @@ class OrthotropicElastic3D final : public Material3D {
     const vec modulus, poissons_ratio;
 
 public:
-    OrthotropicElastic3D(unsigned,   // tag
-                         vec&&,      // elastic modulus
-                         vec&&,      // poissons ratio
-                         double = 0. // density
+    OrthotropicElastic3D(
+        unsigned,   // tag
+        vec&&,      // elastic modulus
+        vec&&,      // poissons ratio
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

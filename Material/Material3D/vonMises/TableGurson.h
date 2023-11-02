@@ -37,16 +37,17 @@ class TableGurson final : public NonlinearGurson {
     [[nodiscard]] vec compute_hardening(double) const override;
 
 public:
-    TableGurson(unsigned,   // tag
-                double,     // elastic modulus
-                double,     // poisson's ratio
-                mat&&,      // table
-                double,     // q1
-                double,     // q2
-                double,     // fn
-                double,     // sn
-                double,     // en
-                double = 0. // density
+    TableGurson(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // poisson's ratio
+        mat&&,      // table
+        double,     // q1
+        double,     // q2
+        double,     // fn
+        double,     // sn
+        double,     // en
+        double = 0. // density
     );
 
     unique_ptr<Material> get_copy() override;

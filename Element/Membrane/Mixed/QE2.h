@@ -67,7 +67,8 @@ class QE2 final : public MaterialElement2D {
     static vec form_stress_mode(double, double);
 
 public:
-    QE2(unsigned,   // tag
+    QE2(
+        unsigned,   // tag
         uvec&&,     // node tags
         unsigned,   // material tags
         double = 1. // thickness

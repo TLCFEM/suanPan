@@ -40,8 +40,9 @@ protected:
     std::vector<weak_ptr<Element>> element_pool;
 
 public:
-    explicit Modifier(unsigned = 0, // tag
-                      uvec&& = {}   // element tags
+    explicit Modifier(
+        unsigned = 0, // tag
+        uvec&& = {}   // element tags
     );
     Modifier(const Modifier&) = delete;            // copy forbidden
     Modifier(Modifier&&) = delete;                 // move forbidden

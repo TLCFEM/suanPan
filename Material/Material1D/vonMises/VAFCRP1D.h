@@ -57,17 +57,18 @@ class VAFCRP1D final : protected DataVAFCRP1D, public Material1D {
     const unsigned size = static_cast<unsigned>(a.size());
 
 public:
-    VAFCRP1D(unsigned,   // tag
-             double,     // elastic modulus
-             double,     // yield stress
-             double,     // saturated stress
-             double,     // linear hardening modulus
-             double,     // m
-             double,     // mu
-             double,     // epsilon
-             vec&&,      // a
-             vec&&,      // b
-             double = 0. // density
+    VAFCRP1D(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // yield stress
+        double,     // saturated stress
+        double,     // linear hardening modulus
+        double,     // m
+        double,     // mu
+        double,     // epsilon
+        vec&&,      // a
+        vec&&,      // b
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

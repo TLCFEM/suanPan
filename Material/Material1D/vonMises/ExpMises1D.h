@@ -42,13 +42,14 @@ class ExpMises1D final : protected DataExpMises1D, public NonlinearMises1D {
     [[nodiscard]] double compute_dh(double) const override;
 
 public:
-    explicit ExpMises1D(unsigned,   // tag
-                        double,     // elastic modulus
-                        double,     // initial yield stress
-                        double,     // a
-                        double,     // b
-                        double,     // c
-                        double = 0. // density
+    explicit ExpMises1D(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // initial yield stress
+        double,     // a
+        double,     // b
+        double,     // c
+        double = 0. // density
     );
 
     unique_ptr<Material> get_copy() override;

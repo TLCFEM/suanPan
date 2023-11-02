@@ -40,11 +40,12 @@ class MultilinearJ2 final : public NonlinearJ2 {
     [[nodiscard]] double compute_dh(double) const override;
 
 public:
-    MultilinearJ2(unsigned,   // tag
-                  double,     // elastic modulus
-                  double,     // poisson's ratio
-                  mat&&,      // backbone
-                  double = 0. // density
+    MultilinearJ2(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // poisson's ratio
+        mat&&,      // backbone
+        double = 0. // density
     );
 
     unique_ptr<Material> get_copy() override;

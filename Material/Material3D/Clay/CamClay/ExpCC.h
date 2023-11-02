@@ -43,17 +43,18 @@ class ExpCC final : protected DataExpCC, public NonlinearCamClay {
     [[nodiscard]] double compute_da(double) const override;
 
 public:
-    ExpCC(unsigned,   // tag
-          double,     // elastic modulus
-          double,     // poisson's ratio
-          double,     // beta
-          double,     // m
-          double,     // pt
-          double,     // a_0
-          double,     // e_0
-          double,     // lambda
-          double,     // kappa
-          double = 0. // density
+    ExpCC(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // poisson's ratio
+        double,     // beta
+        double,     // m
+        double,     // pt
+        double,     // a_0
+        double,     // e_0
+        double,     // lambda
+        double,     // kappa
+        double = 0. // density
     );
 
     unique_ptr<Material> get_copy() override;

@@ -16,4 +16,4 @@ target_sources(${PROJECT_NAME} PRIVATE
         TestSurfaceNM.cpp
         TestTensor.cpp
         TestUtility.cpp
-        )
+)

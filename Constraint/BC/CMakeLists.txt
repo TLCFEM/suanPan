@@ -3,4 +3,4 @@ target_sources(${PROJECT_NAME} PRIVATE
         MultiplierBC.cpp
         GroupPenaltyBC.cpp
         GroupMultiplierBC.cpp
-        )
+)

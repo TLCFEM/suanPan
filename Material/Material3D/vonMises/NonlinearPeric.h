@@ -58,12 +58,13 @@ class NonlinearPeric : protected DataNonlinearPeric, public Material3D {
     [[nodiscard]] virtual double compute_dk(double) const = 0;
 
 public:
-    NonlinearPeric(unsigned,    // tag
-                   double,      // elastic modulus
-                   double,      // poisson's ratio
-                   double = 0., // mu
-                   double = 0., // epsilon
-                   double = 0.  // density
+    NonlinearPeric(
+        unsigned,    // tag
+        double,      // elastic modulus
+        double,      // poisson's ratio
+        double = 0., // mu
+        double = 0., // epsilon
+        double = 0.  // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

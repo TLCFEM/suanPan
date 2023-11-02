@@ -35,9 +35,10 @@ class Circle1D final : public Section1D {
     const double radius;
 
 public:
-    explicit Circle1D(unsigned, // tag
-                      double,   // radius
-                      unsigned  // material tag
+    explicit Circle1D(
+        unsigned, // tag
+        double,   // radius
+        unsigned  // material tag
     );
 
     unique_ptr<Section> get_copy() override;

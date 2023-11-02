@@ -48,11 +48,12 @@ class C3D20 final : public MaterialElement3D {
     vector<IntegrationPoint> int_pt;
 
 public:
-    C3D20(unsigned,    // tag
-          uvec&&,      // node tag
-          unsigned,    // material tag
-          bool = true, // reduced integration
-          bool = false // nonlinear geometry switch
+    C3D20(
+        unsigned,    // tag
+        uvec&&,      // node tag
+        unsigned,    // material tag
+        bool = true, // reduced integration
+        bool = false // nonlinear geometry switch
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

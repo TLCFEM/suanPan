@@ -37,9 +37,10 @@ class CustomElastic1D final : public Material1D {
     ResourceHolder<Expression> expression;
 
 public:
-    CustomElastic1D(unsigned,   // tag
-                    unsigned,   // expression tag
-                    double = 0. // density
+    CustomElastic1D(
+        unsigned,   // tag
+        unsigned,   // expression tag
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

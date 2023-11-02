@@ -43,11 +43,13 @@ class Elastic2D final : public Material2D {
     const double elastic_modulus; // elastic modulus
     const double poissons_ratio;  // poissons ratio
 public:
-    Elastic2D(unsigned,   // tag
-              double,     // elastic modulus
-              double,     // poissons ratio
-              double = 0, // density
-              PlaneType = PlaneType::S);
+    Elastic2D(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // poissons ratio
+        double = 0, // density
+        PlaneType = PlaneType::S
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
     void initialize_couple(const shared_ptr<DomainBase>&) override;

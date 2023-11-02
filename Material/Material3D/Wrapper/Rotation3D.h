@@ -41,15 +41,18 @@ class Rotation3D final : public Material3D {
     void form_transformation(mat&&);
 
 public:
-    Rotation3D(unsigned, // tag
-               unsigned, // mat tag
-               double,   // rotation vector
-               double,   // rotation vector
-               double    // rotation vector
+    Rotation3D(
+        unsigned, // tag
+        unsigned, // mat tag
+        double,   // rotation vector
+        double,   // rotation vector
+        double    // rotation vector
     );
-    Rotation3D(unsigned, // tag
-               unsigned, // mat tag
-               mat&&);
+    Rotation3D(
+        unsigned, // tag
+        unsigned, // mat tag
+        mat&&
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

@@ -9,4 +9,4 @@ set(S2D
         Section2D/Rectangle2D.cpp
         Section2D/Section2D.cpp
         Section2D/TSection2D.cpp
-        )
+)

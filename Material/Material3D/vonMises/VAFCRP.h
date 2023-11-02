@@ -67,18 +67,19 @@ class VAFCRP final : protected DataVAFCRP, public Material3D {
     const double root_six_shear = sqrt(6.) * shear;
 
 public:
-    VAFCRP(unsigned,   // tag
-           double,     // elastic modulus
-           double,     // poissons ratio
-           double,     // yield stress
-           double,     // saturated stress
-           double,     // linear hardening modulus
-           double,     // m
-           double,     // mu
-           double,     // epsilon
-           vec&&,      // a
-           vec&&,      // b
-           double = 0. // density
+    VAFCRP(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // poissons ratio
+        double,     // yield stress
+        double,     // saturated stress
+        double,     // linear hardening modulus
+        double,     // m
+        double,     // mu
+        double,     // epsilon
+        vec&&,      // a
+        vec&&,      // b
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

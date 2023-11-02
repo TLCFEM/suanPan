@@ -46,11 +46,12 @@ class VisualisationRecorder final : public Recorder {
 #endif
 
 public:
-    VisualisationRecorder(unsigned,   // tag
-                          OutputType, // recorder type
-                          unsigned,   // interval
-                          unsigned,   // output width
-                          double = 1. // scale
+    VisualisationRecorder(
+        unsigned,   // tag
+        OutputType, // recorder type
+        unsigned,   // interval
+        unsigned,   // output width
+        double = 1. // scale
     );
 
     void record(const shared_ptr<DomainBase>&) override;

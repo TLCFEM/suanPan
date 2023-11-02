@@ -37,9 +37,10 @@ class Kelvin final : public Material1D {
     ResourceHolder<Material> damper, spring;
 
 public:
-    Kelvin(unsigned, // tag
-           unsigned, // damper tag
-           unsigned  // spring tag
+    Kelvin(
+        unsigned, // tag
+        unsigned, // damper tag
+        unsigned  // spring tag
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

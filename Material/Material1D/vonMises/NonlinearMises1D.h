@@ -43,9 +43,10 @@ class NonlinearMises1D : protected DataMises1D, public Material1D {
     [[nodiscard]] virtual double compute_dh(double) const = 0;
 
 public:
-    NonlinearMises1D(unsigned,   // tag
-                     double,     // elastic modulus
-                     double = 0. // density
+    NonlinearMises1D(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

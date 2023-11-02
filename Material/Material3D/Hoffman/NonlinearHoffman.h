@@ -50,11 +50,12 @@ class NonlinearHoffman : protected DataNonlinearHoffman, public Material3D {
     [[nodiscard]] virtual double compute_dk(double) const = 0;
 
 public:
-    NonlinearHoffman(unsigned,   // tag
-                     vec&&,      // elastic modulus
-                     vec&&,      // poissons ratio
-                     vec&&,      // sigma
-                     double = 0. // density
+    NonlinearHoffman(
+        unsigned,   // tag
+        vec&&,      // elastic modulus
+        vec&&,      // poissons ratio
+        vec&&,      // sigma
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

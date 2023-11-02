@@ -42,10 +42,11 @@ protected:
     unique_ptr<Section> b_section;
 
 public:
-    NMB21(unsigned,    // tag
-          uvec&&,      // node tags
-          unsigned,    // section tag
-          bool = false // nonlinear geometry switch
+    NMB21(
+        unsigned,    // tag
+        uvec&&,      // node tags
+        unsigned,    // section tag
+        bool = false // nonlinear geometry switch
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

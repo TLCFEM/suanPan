@@ -16,7 +16,7 @@ add_library(${PROJECT_NAME} STATIC
         Solver.cpp
         SolverParser.cpp
         ${Integrator}
-        )
+)
 
 if (HAVE_VTK)
     target_link_libraries(${PROJECT_NAME} ${VTK_LIBRARIES})

@@ -63,9 +63,10 @@ class BWBN final : protected DataBWBN, public Material1D {
     const double yield_strain = yield_stress / elastic_modulus;
 
 public:
-    BWBN(unsigned, // tag
-         vec&&,    // parameter
-         double    // density
+    BWBN(
+        unsigned, // tag
+        vec&&,    // parameter
+        double    // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

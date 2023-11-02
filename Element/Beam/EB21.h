@@ -43,12 +43,13 @@ class EB21 final : public MaterialElement1D {
     mat local_stiff;
 
 public:
-    EB21(unsigned,    // tag
-         uvec&&,      // node tag
-         double,      // area
-         double,      // moment of inertia
-         unsigned,    // material tags
-         bool = false // nonlinear geometry switch
+    EB21(
+        unsigned,    // tag
+        uvec&&,      // node tag
+        double,      // area
+        double,      // moment of inertia
+        unsigned,    // material tags
+        bool = false // nonlinear geometry switch
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

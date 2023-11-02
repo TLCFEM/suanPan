@@ -49,12 +49,13 @@ protected:
     ResourceHolder<Material> base;
 
 public:
-    StressWrapper(unsigned,    // tag
-                  unsigned,    // 3D material tag
-                  unsigned,    // max iteration
-                  uvec&&,      // non-trivial stress DoF
-                  uvec&&,      // trivial stress DoF
-                  MaterialType // material type
+    StressWrapper(
+        unsigned,    // tag
+        unsigned,    // 3D material tag
+        unsigned,    // max iteration
+        uvec&&,      // non-trivial stress DoF
+        uvec&&,      // trivial stress DoF
+        MaterialType // material type
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

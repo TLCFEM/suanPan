@@ -42,9 +42,10 @@ class Joint final : public MaterialElement1D {
     std::vector<unique_ptr<Material>> j_material;
 
 public:
-    Joint(unsigned, // tag
-          uvec&&,   // node tags
-          uvec&&    // material tag
+    Joint(
+        unsigned, // tag
+        uvec&&,   // node tags
+        uvec&&    // material tag
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

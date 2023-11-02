@@ -1,7 +1,7 @@
+import hashlib
 import os
 import shutil
 import zipfile
-import hashlib
 
 fn = 'tools'
 

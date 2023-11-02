@@ -60,7 +60,8 @@ class CP4 final : public MaterialElement2D {
     static void stack_stiffness(mat&, const mat&, const sp_mat&, double);
 
 public:
-    CP4(unsigned,     // tag
+    CP4(
+        unsigned,     // tag
         uvec&&,       // node tag
         unsigned,     // material tag
         double = 1.,  // thickness

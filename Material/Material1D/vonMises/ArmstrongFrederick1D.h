@@ -53,15 +53,16 @@ class ArmstrongFrederick1D final : protected DataArmstrongFrederick1D, public Ma
     const unsigned size = static_cast<unsigned>(a.size());
 
 public:
-    ArmstrongFrederick1D(unsigned,   // tag
-                         double,     // elastic modulus
-                         double,     // yield stress
-                         double,     // saturated stress
-                         double,     // linear hardening modulus
-                         double,     // m
-                         vec&&,      // a
-                         vec&&,      // b
-                         double = 0. // density
+    ArmstrongFrederick1D(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // yield stress
+        double,     // saturated stress
+        double,     // linear hardening modulus
+        double,     // m
+        vec&&,      // a
+        vec&&,      // b
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

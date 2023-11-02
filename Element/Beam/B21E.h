@@ -41,12 +41,13 @@ class B21E final : public B21 {
     vec current_rotation = zeros(a.n_elem);
 
 public:
-    B21E(unsigned,     // tag
-         unsigned,     // which
-         uvec&&,       // node tags
-         unsigned,     // section tag
-         unsigned = 6, // integration points
-         bool = false  // nonlinear geometry switch
+    B21E(
+        unsigned,     // tag
+        unsigned,     // which
+        uvec&&,       // node tags
+        unsigned,     // section tag
+        unsigned = 6, // integration points
+        bool = false  // nonlinear geometry switch
     );
 
     int update_status() override;

@@ -35,10 +35,11 @@ class GlobalMassRecorder final : public GlobalRecorder {
     static void assemble_mass(const mat&, const uvec&, mat&);
 
 public:
-    GlobalMassRecorder(unsigned, // tag
-                       unsigned, // interval
-                       bool,     // if to record time
-                       bool      // if to use hdf5
+    GlobalMassRecorder(
+        unsigned, // tag
+        unsigned, // interval
+        bool,     // if to record time
+        bool      // if to use hdf5
     );
 
     void record(const shared_ptr<DomainBase>&) override;

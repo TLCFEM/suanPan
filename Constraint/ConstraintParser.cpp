@@ -356,8 +356,7 @@ void new_rigidwall(unique_ptr<Constraint>& return_obj, istringstream& command, c
         if(penalty) return_obj = make_unique<RigidWallPenalty3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, vec{p[3], p[4], p[5]}, vec{p[6], p[7], p[8]}, p[9]);
         else return_obj = make_unique<RigidWallMultiplier3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, vec{p[3], p[4], p[5]}, vec{p[6], p[7], p[8]}, p[9]);
         break;
-    default:
-        suanpan_error("A valid number of parameters is required.\n");
+    default: suanpan_error("A valid number of parameters is required.\n");
     }
 }
 
@@ -413,8 +412,7 @@ void new_restitutionwall(unique_ptr<Constraint>& return_obj, istringstream& comm
         // 3D origin edge edge restitution multiplier
         return_obj = make_unique<RestitutionWallPenalty3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, vec{p[3], p[4], p[5]}, vec{p[6], p[7], p[8]}, p[9], p[10]);
         break;
-    default:
-        suanpan_error("A valid number of parameters is required.\n");
+    default: suanpan_error("A valid number of parameters is required.\n");
     }
 }
 

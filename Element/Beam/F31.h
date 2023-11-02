@@ -63,7 +63,8 @@ class F31 final : public SectionElement3D {
     vec current_local_resistance, trial_local_resistance;
 
 public:
-    F31(unsigned,     // tag
+    F31(
+        unsigned,     // tag
         uvec&&,       // node tag
         unsigned,     // section tag
         unsigned,     // orientation tag

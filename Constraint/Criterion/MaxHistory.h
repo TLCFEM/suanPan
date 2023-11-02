@@ -40,10 +40,11 @@ class MaxHistory final : public Criterion {
     const double max_history;
 
 public:
-    MaxHistory(unsigned,   // tag
-               unsigned,   // step tag
-               OutputType, // history type
-               double      // maximum history
+    MaxHistory(
+        unsigned,   // tag
+        unsigned,   // step tag
+        OutputType, // history type
+        double      // maximum history
     );
 
     unique_ptr<Criterion> get_copy() override;

@@ -60,15 +60,16 @@ protected:
     std::function<double(const Element*)> get_energy;
 
 public:
-    EnergyEvolution(unsigned,      // tag
-                    unsigned,      // step tag
-                    unsigned,      // incre level
-                    unsigned,      // final level
-                    double = 1.,   // centre weight
-                    unsigned = 2,  // propagation iteration
-                    unsigned = 10, // reactivation ratio
-                    double = .5,   // propagation weight
-                    double = 1E-5  // tolerance
+    EnergyEvolution(
+        unsigned,      // tag
+        unsigned,      // step tag
+        unsigned,      // incre level
+        unsigned,      // final level
+        double = 1.,   // centre weight
+        unsigned = 2,  // propagation iteration
+        unsigned = 10, // reactivation ratio
+        double = .5,   // propagation weight
+        double = 1E-5  // tolerance
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

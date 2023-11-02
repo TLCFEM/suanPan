@@ -35,9 +35,10 @@ struct DataTanh1D {
 
 class Tanh1D final : protected DataTanh1D, public Material1D {
 public:
-    Tanh1D(unsigned,   // tag
-           double,     // elastic modulus
-           double = 0. // density
+    Tanh1D(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

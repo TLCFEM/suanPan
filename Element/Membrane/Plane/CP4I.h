@@ -51,10 +51,11 @@ class CP4I final : public MaterialElement2D {
     static void stack_stiffness_incompatible(mat&, const mat&, const mat&, double);
 
 public:
-    CP4I(unsigned,   // tag
-         uvec&&,     // node tag
-         unsigned,   // material tag
-         double = 1. // thickness
+    CP4I(
+        unsigned,   // tag
+        uvec&&,     // node tag
+        unsigned,   // material tag
+        double = 1. // thickness
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

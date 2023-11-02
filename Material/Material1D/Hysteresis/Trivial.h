@@ -35,7 +35,8 @@
 
 class Trivial final : public Material1D {
 public:
-    explicit Trivial(unsigned // tag
+    explicit Trivial(
+        unsigned // tag
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

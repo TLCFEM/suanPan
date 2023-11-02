@@ -43,9 +43,10 @@ class Nonviscous01 final : protected DataNonviscous01, public Material1D {
     cx_vec s_para, m_para;
 
 public:
-    Nonviscous01(unsigned, // tag
-                 cx_vec&&, // m
-                 cx_vec&&  // s
+    Nonviscous01(
+        unsigned, // tag
+        cx_vec&&, // m
+        cx_vec&&  // s
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

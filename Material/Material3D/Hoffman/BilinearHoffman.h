@@ -40,12 +40,13 @@ class BilinearHoffman : protected DataBilinearHoffman, public NonlinearHoffman {
     [[nodiscard]] double compute_dk(double) const override;
 
 public:
-    BilinearHoffman(unsigned,   // tag
-                    vec&&,      // elastic modulus
-                    vec&&,      // poissons ratio
-                    vec&&,      // sigma
-                    double,     // hardening ratio
-                    double = 0. // density
+    BilinearHoffman(
+        unsigned,   // tag
+        vec&&,      // elastic modulus
+        vec&&,      // poissons ratio
+        vec&&,      // sigma
+        double,     // hardening ratio
+        double = 0. // density
     );
 
     unique_ptr<Material> get_copy() override;

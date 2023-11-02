@@ -73,7 +73,7 @@ jobs:
           fi
           go build Checker/updater.go
           mkdir build && cd build
-          cmake -DCMAKE_C_COMPILER=${{ matrix.compiler.c }} -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} -DCMAKE_Fortran_COMPILER=${{ matrix.compiler.fortran }} -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DTEST_COVERAGE=${{ env.COVERAGE }} -DUSE_AVX=${{ matrix.avx }} -DBUILD_MULTITHREAD=$MT -DUSE_EXTERNAL_VTK=${{ matrix.vtk }} -DVTK_DIR=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.2/ -DUSE_MKL=${{ matrix.mkl }} -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DLINK_DYNAMIC_MKL=OFF -DUSE_INTEL_OPENMP=${{ env.IOMP }} -DCMAKE_INSTALL_PREFIX=dist ..
+          cmake -DCMAKE_C_COMPILER=${{ matrix.compiler.c }} -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} -DCMAKE_Fortran_COMPILER=${{ matrix.compiler.fortran }} -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DTEST_COVERAGE=${{ env.COVERAGE }} -DUSE_AVX=${{ matrix.avx }} -DBUILD_MULTITHREAD=$MT -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.2/ -DUSE_MKL=${{ matrix.mkl }} -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DLINK_DYNAMIC_MKL=OFF -DUSE_INTEL_OPENMP=${{ env.IOMP }} -DCMAKE_INSTALL_PREFIX=dist ..
           make install -j"$(nproc)" && make package
       - name: Pack
         run: |
@@ -158,12 +158,12 @@ jobs:
             export CC=$(brew --prefix llvm@15)/bin/clang
             export CXX=$(brew --prefix llvm@15)/bin/clang++
             export FC=gfortran-11
-            cmake -DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include -DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include -DCMAKE_Fortran_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DUSE_EXTERNAL_VTK=${{ matrix.vtk }} -DVTK_DIR=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.2/ -DCMAKE_INSTALL_PREFIX=dist ..
+            cmake -DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include -DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include -DCMAKE_Fortran_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.2/ -DCMAKE_INSTALL_PREFIX=dist ..
           else
             export CC=gcc-11
             export CXX=g++-11
             export FC=gfortran-11
-            cmake -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DUSE_EXTERNAL_VTK=${{ matrix.vtk }} -DVTK_DIR=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.2/ -DCMAKE_INSTALL_PREFIX=dist ..
+            cmake -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.2/ -DCMAKE_INSTALL_PREFIX=dist ..
           fi
           make install -j4
       - name: Pack
@@ -216,7 +216,7 @@ jobs:
         run: |
           go build Checker/updater.go
           mkdir build && cd build
-          cmake -G "${{ matrix.compiler }}" -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DUSE_AVX=${{ matrix.avx }} -DUSE_EXTERNAL_VTK=${{ matrix.vtk }} -DVTK_DIR=D:/a/suanPan/suanPan/lib/cmake/vtk-9.2/ -DCMAKE_INSTALL_PREFIX=dist ..
+          cmake -G "${{ matrix.compiler }}" -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DUSE_AVX=${{ matrix.avx }} -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=D:/a/suanPan/suanPan/lib/cmake/vtk-9.2/ -DCMAKE_INSTALL_PREFIX=dist ..
           cmake --build . --target install --config ${{ matrix.build }} -j 4
       - name: Pack
         shell: bash

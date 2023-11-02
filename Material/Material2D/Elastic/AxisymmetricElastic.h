@@ -35,10 +35,11 @@ class AxisymmetricElastic final : public Material2D {
     const double elastic_modulus; // elastic modulus
     const double poissons_ratio;  // poissons ratio
 public:
-    AxisymmetricElastic(unsigned,  // tag
-                        double,    // elastic modulus
-                        double,    // poissons ratio
-                        double = 0 // density
+    AxisymmetricElastic(
+        unsigned,  // tag
+        double,    // elastic modulus
+        double,    // poissons ratio
+        double = 0 // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

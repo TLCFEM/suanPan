@@ -48,10 +48,11 @@ protected:
     void initialize_stiffness();
 
 public:
-    Section2D(unsigned,    // tag
-              unsigned,    // material tag
-              double = 0., // area
-              double = 0.  // eccentricity
+    Section2D(
+        unsigned,    // tag
+        unsigned,    // material tag
+        double = 0., // area
+        double = 0.  // eccentricity
     );
 
     void set_characteristic_length(double) const override;

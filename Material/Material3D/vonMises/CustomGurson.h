@@ -41,16 +41,17 @@ class CustomGurson final : public NonlinearGurson {
     [[nodiscard]] vec compute_hardening(double) const override;
 
 public:
-    CustomGurson(unsigned,   // tag
-                 unsigned,   // expression tag
-                 double,     // elastic modulus
-                 double,     // poisson's ratio 
-                 double,     // q1
-                 double,     // q2
-                 double,     // fn
-                 double,     // sn
-                 double,     // en
-                 double = 0. // density
+    CustomGurson(
+        unsigned,   // tag
+        unsigned,   // expression tag
+        double,     // elastic modulus
+        double,     // poisson's ratio 
+        double,     // q1
+        double,     // q2
+        double,     // fn
+        double,     // sn
+        double,     // en
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

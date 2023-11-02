@@ -38,9 +38,10 @@ class SingleSection2D final : public SectionElement2D {
     unique_ptr<Section> s_section;
 
 public:
-    SingleSection2D(unsigned, // tag
-                    unsigned, // node tag
-                    unsigned  // section tag
+    SingleSection2D(
+        unsigned, // tag
+        unsigned, // node tag
+        unsigned  // section tag
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

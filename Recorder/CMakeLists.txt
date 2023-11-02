@@ -15,4 +15,4 @@ target_sources(${PROJECT_NAME} PRIVATE
         RecorderParser.cpp
         SumRecorder.cpp
         VisualisationRecorder.cpp
-        )
+)

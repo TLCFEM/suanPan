@@ -43,11 +43,12 @@ class NMB31 final : public SectionNMElement3D {
     unique_ptr<Section> b_section;
 
 public:
-    NMB31(unsigned, // tag
-          uvec&&,   // node tags
-          unsigned, // section tag
-          unsigned, // orientation tag
-          bool      // nlgeom
+    NMB31(
+        unsigned, // tag
+        uvec&&,   // node tags
+        unsigned, // section tag
+        unsigned, // orientation tag
+        bool      // nlgeom
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

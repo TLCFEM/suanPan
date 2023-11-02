@@ -21,4 +21,4 @@ add_library(${PROJECT_NAME} STATIC
         ${M3D}
         ${MOS}
         ${MS}
-        )
+)

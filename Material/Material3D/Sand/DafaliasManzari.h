@@ -62,25 +62,26 @@ class DafaliasManzari final : protected DataDafaliasManzari, public Material3D {
     static const span sb, sk, sl, sm;
 
 public:
-    DafaliasManzari(unsigned,   // tag
-                    double,     // g0
-                    double,     // nu
-                    double,     // ac
-                    double,     // lc
-                    double,     // e0
-                    double,     // xi
-                    double,     // m
-                    double,     // h0
-                    double,     // h1
-                    double,     // ch
-                    double,     // nb
-                    double,     // a
-                    double,     // nd
-                    double,     // zm
-                    double,     // cz
-                    double,     // pc
-                    double,     // gr
-                    double = 0. // density
+    DafaliasManzari(
+        unsigned,   // tag
+        double,     // g0
+        double,     // nu
+        double,     // ac
+        double,     // lc
+        double,     // e0
+        double,     // xi
+        double,     // m
+        double,     // h0
+        double,     // h1
+        double,     // ch
+        double,     // nb
+        double,     // a
+        double,     // nd
+        double,     // zm
+        double,     // cz
+        double,     // pc
+        double,     // gr
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

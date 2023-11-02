@@ -53,11 +53,12 @@ class B21H final : public SectionElement2D {
     mat elastic_local_stiffness;
 
 public:
-    B21H(unsigned,    // tag
-         uvec&&,      // node tags
-         unsigned,    // section tag
-         double = .2, // hinge length
-         bool = false // nonlinear geometry switch
+    B21H(
+        unsigned,    // tag
+        uvec&&,      // node tags
+        unsigned,    // section tag
+        double = .2, // hinge length
+        bool = false // nonlinear geometry switch
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

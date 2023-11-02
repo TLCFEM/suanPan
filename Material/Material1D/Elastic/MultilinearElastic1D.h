@@ -36,9 +36,10 @@ struct DataMultilinearElastic1D {
 
 class MultilinearElastic1D final : protected DataMultilinearElastic1D, public Material1D {
 public:
-    MultilinearElastic1D(unsigned,   // tag
-                         mat&&,      // backbone
-                         double = 0. // density
+    MultilinearElastic1D(
+        unsigned,   // tag
+        mat&&,      // backbone
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

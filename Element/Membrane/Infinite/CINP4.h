@@ -56,10 +56,11 @@ class CINP4 final : public MaterialElement2D {
     static void stack_stiffness(mat&, const mat&, const mat&, double);
 
 public:
-    CINP4(unsigned,   // tag
-          uvec&&,     // node tag
-          unsigned,   // material tag
-          double = 1. // thickness
+    CINP4(
+        unsigned,   // tag
+        uvec&&,     // node tag
+        unsigned,   // material tag
+        double = 1. // thickness
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

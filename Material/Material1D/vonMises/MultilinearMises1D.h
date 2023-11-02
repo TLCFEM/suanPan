@@ -41,10 +41,11 @@ class MultilinearMises1D final : protected DataMultilinearMises1D, public Nonlin
     [[nodiscard]] double compute_dh(double) const override;
 
 public:
-    MultilinearMises1D(unsigned,   // tag
-                       double,     // elastic modulus
-                       mat&&,      // backbone
-                       double = 0. // density
+    MultilinearMises1D(
+        unsigned,   // tag
+        double,     // elastic modulus
+        mat&&,      // backbone
+        double = 0. // density
     );
 
     unique_ptr<Material> get_copy() override;

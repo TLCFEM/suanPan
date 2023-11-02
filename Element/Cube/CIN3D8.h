@@ -50,9 +50,10 @@ class CIN3D8 final : public MaterialElement3D {
     static mat compute_dn(const vec&);
 
 public:
-    CIN3D8(unsigned, // tag
-           uvec&&,   // node tag
-           unsigned  // material tag
+    CIN3D8(
+        unsigned, // tag
+        uvec&&,   // node tag
+        unsigned  // material tag
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

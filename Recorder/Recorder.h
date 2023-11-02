@@ -48,12 +48,13 @@ protected:
     bool if_perform_record();
 
 public:
-    Recorder(unsigned,   // tag
-             uvec&&,     // object tags
-             OutputType, // recorder type
-             unsigned,   // interval
-             bool,       // if to record time
-             bool        // if to use hdf5
+    Recorder(
+        unsigned,   // tag
+        uvec&&,     // object tags
+        OutputType, // recorder type
+        unsigned,   // interval
+        bool,       // if to record time
+        bool        // if to use hdf5
     );
     Recorder(const Recorder&) = delete;
     Recorder(Recorder&&) = delete;                 // move forbidden

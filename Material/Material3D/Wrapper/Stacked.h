@@ -37,8 +37,9 @@ class Stacked final : public Material3D {
     std::vector<ResourceHolder<Material>> mat_pool;
 
 public:
-    Stacked(unsigned, // tag
-            uvec&&    // mat tag
+    Stacked(
+        unsigned, // tag
+        uvec&&    // mat tag
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

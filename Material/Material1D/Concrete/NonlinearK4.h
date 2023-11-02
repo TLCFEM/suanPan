@@ -50,12 +50,13 @@ class NonlinearK4 : protected DataNonlinearK4, public Material1D {
     void compute_crack_close_branch();
 
 public:
-    NonlinearK4(unsigned, // tag
-                double,   // elastic modulus
-                double,   // hardening parameter
-                double,   // density
-                bool,     // apply damage
-                bool      // apply crack closing
+    NonlinearK4(
+        unsigned, // tag
+        double,   // elastic modulus
+        double,   // hardening parameter
+        double,   // density
+        bool,     // apply damage
+        bool      // apply crack closing
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;
@@ -86,13 +87,14 @@ class ConcreteK4 final : protected DataConcreteK4, public NonlinearK4 {
     [[nodiscard]] vec2 compute_compression_damage(double) const override;
 
 public:
-    ConcreteK4(unsigned,    // tag
-               double,      // elastic modulus
-               double,      // hardening parameter
-               vec&&,       // parameters
-               double = 0., // density
-               bool = true, // apply damage
-               bool = true  // apply crack closing
+    ConcreteK4(
+        unsigned,    // tag
+        double,      // elastic modulus
+        double,      // hardening parameter
+        vec&&,       // parameters
+        double = 0., // density
+        bool = true, // apply damage
+        bool = true  // apply crack closing
     );
 
     unique_ptr<Material> get_copy() override;

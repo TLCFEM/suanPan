@@ -59,11 +59,12 @@
 
 class MassBase : public Element {
 public:
-    MassBase(unsigned,          // tag
-             unsigned,          // number of nodes
-             unsigned,          // number of dofs
-             uvec&&,            // node encoding
-             std::vector<DOF>&& // dof identifier
+    MassBase(
+        unsigned,          // tag
+        unsigned,          // number of nodes
+        unsigned,          // number of dofs
+        uvec&&,            // node encoding
+        std::vector<DOF>&& // dof identifier
     );
 
     int update_status() override;
@@ -88,10 +89,11 @@ class Mass2D final : public MassBase {
     const uvec dof_label;
 
 public:
-    Mass2D(unsigned, // element tag
-           unsigned, // node tag
-           double,   // magnitude
-           uvec&&    // dof tags
+    Mass2D(
+        unsigned, // element tag
+        unsigned, // node tag
+        double,   // magnitude
+        uvec&&    // dof tags
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;
@@ -103,10 +105,11 @@ class Mass3D final : public MassBase {
     const uvec dof_label;
 
 public:
-    Mass3D(unsigned, // element tag
-           unsigned, // node tag
-           double,   // magnitude
-           uvec&&    // dof tags
+    Mass3D(
+        unsigned, // element tag
+        unsigned, // node tag
+        double,   // magnitude
+        uvec&&    // dof tags
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;
@@ -117,14 +120,16 @@ class MassPoint2D final : public MassBase {
     const double rotational_magnitude;
 
 public:
-    MassPoint2D(unsigned, // element tag
-                unsigned, // node tag
-                double    // translational magnitude
+    MassPoint2D(
+        unsigned, // element tag
+        unsigned, // node tag
+        double    // translational magnitude
     );
-    MassPoint2D(unsigned, // element tag
-                unsigned, // node tag
-                double,   // translational magnitude
-                double    // rotational magnitude
+    MassPoint2D(
+        unsigned, // element tag
+        unsigned, // node tag
+        double,   // translational magnitude
+        double    // rotational magnitude
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;
@@ -135,14 +140,16 @@ class MassPoint3D final : public MassBase {
     const double rotational_magnitude;
 
 public:
-    MassPoint3D(unsigned, // element tag
-                unsigned, // node tag
-                double    // translational magnitude
+    MassPoint3D(
+        unsigned, // element tag
+        unsigned, // node tag
+        double    // translational magnitude
     );
-    MassPoint3D(unsigned, // element tag
-                unsigned, // node tag
-                double,   // translational magnitude
-                double    // rotational magnitude
+    MassPoint3D(
+        unsigned, // element tag
+        unsigned, // node tag
+        double,   // translational magnitude
+        double    // rotational magnitude
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

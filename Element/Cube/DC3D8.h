@@ -52,11 +52,12 @@ class DC3D8 final : public MaterialElement3D {
     vector<IntegrationPoint> int_pt;
 
 public:
-    DC3D8(unsigned, // tag
-          uvec&&,   // node tag
-          unsigned, // material tag
-          double,   // characteristic length
-          double    // release rate
+    DC3D8(
+        unsigned, // tag
+        uvec&&,   // node tag
+        unsigned, // material tag
+        double,   // characteristic length
+        double    // release rate
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

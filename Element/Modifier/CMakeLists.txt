@@ -7,4 +7,4 @@ set(Modifier
         Modifier/LumpedSimple.cpp
         Modifier/Modifier.cpp
         Modifier/Rayleigh.cpp
-        )
+)

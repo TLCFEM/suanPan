@@ -44,10 +44,11 @@ class BilinearViscosity final : protected DataBilinearViscosity, public Nonlinea
     [[nodiscard]] double compute_damping_coefficient(double, double) const override;
 
 public:
-    BilinearViscosity(unsigned, // tag
-                      double,   // damping
-                      double,   // yield stress
-                      double    // hardening ratio
+    BilinearViscosity(
+        unsigned, // tag
+        double,   // damping
+        double,   // yield stress
+        double    // hardening ratio
     );
 
     unique_ptr<Material> get_copy() override;

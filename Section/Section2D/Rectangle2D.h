@@ -37,12 +37,13 @@ class Rectangle2D final : public Section2D {
     const unsigned int_pt_num;
 
 public:
-    Rectangle2D(unsigned,     // tag
-                double,       // width
-                double,       // height
-                unsigned,     // material tag
-                unsigned = 6, // number of integration points
-                double = 0.   // eccentricity
+    Rectangle2D(
+        unsigned,     // tag
+        double,       // width
+        double,       // height
+        unsigned,     // material tag
+        unsigned = 6, // number of integration points
+        double = 0.   // eccentricity
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

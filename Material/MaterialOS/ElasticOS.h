@@ -43,10 +43,11 @@ struct DataElasticOS {
 
 class ElasticOS final : public DataElasticOS, public MaterialOS {
 public:
-    ElasticOS(unsigned,   // tag
-              double,     // elastic modulus
-              double,     // poissons ratio
-              double = 0. // density
+    ElasticOS(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // poissons ratio
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

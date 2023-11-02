@@ -37,9 +37,10 @@ class FrameRecorder final : public Recorder {
 #endif
 
 public:
-    FrameRecorder(unsigned,   // tag
-                  OutputType, // recorder type
-                  unsigned    // interval
+    FrameRecorder(
+        unsigned,   // tag
+        OutputType, // recorder type
+        unsigned    // interval
     );
     FrameRecorder(const FrameRecorder&) = delete;
     FrameRecorder(FrameRecorder&&) noexcept = delete;

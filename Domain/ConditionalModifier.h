@@ -66,11 +66,12 @@ protected:
     uvec get_all_nodal_active_dof(const shared_ptr<DomainBase>&);
 
 public:
-    ConditionalModifier(unsigned, // tag
-                        unsigned, // step tag
-                        unsigned, // amplitude tag
-                        uvec&&,   // node tag
-                        uvec&&    // dof tag
+    ConditionalModifier(
+        unsigned, // tag
+        unsigned, // step tag
+        unsigned, // amplitude tag
+        uvec&&,   // node tag
+        uvec&&    // dof tag
     );
 
     virtual int initialize(const shared_ptr<DomainBase>&);

@@ -42,12 +42,13 @@ class RambergOsgood final : protected DataRambergOsgood, public Material1D {
     const double nm = n - 1.;
 
 public:
-    RambergOsgood(unsigned,     // tag
-                  double,       // elastic modulus
-                  double,       // yield stress
-                  double = 1.,  // offset
-                  double = 20., // n
-                  double = 0.   // density
+    RambergOsgood(
+        unsigned,     // tag
+        double,       // elastic modulus
+        double,       // yield stress
+        double = 1.,  // offset
+        double = 20., // n
+        double = 0.   // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

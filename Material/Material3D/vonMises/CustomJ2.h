@@ -44,12 +44,13 @@ class CustomJ2 final : public NonlinearJ2 {
     ResourceHolder<Expression> k_expression, h_expression;
 
 public:
-    CustomJ2(unsigned,   // tag
-             double,     // elastic modulus
-             double,     // poisson's ratio
-             unsigned,   // isotropic hardening function
-             unsigned,   // kinematic hardening function
-             double = 0. // density
+    CustomJ2(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // poisson's ratio
+        unsigned,   // isotropic hardening function
+        unsigned,   // kinematic hardening function
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

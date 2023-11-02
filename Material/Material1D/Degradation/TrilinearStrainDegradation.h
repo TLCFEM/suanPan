@@ -43,11 +43,12 @@ class TrilinearStrainDegradation final : protected DataTrilinearStrainDegradatio
     [[nodiscard]] vec compute_negative_degradation(double) const override;
 
 public:
-    TrilinearStrainDegradation(unsigned, // unique tag
-                               unsigned, // material tag
-                               double,   // start strain
-                               double,   // end strain
-                               double    // end level
+    TrilinearStrainDegradation(
+        unsigned, // unique tag
+        unsigned, // material tag
+        double,   // start strain
+        double,   // end strain
+        double    // end level
     );
 
     unique_ptr<Material> get_copy() override;

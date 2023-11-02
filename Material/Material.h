@@ -120,9 +120,10 @@ class Material : protected DataMaterial, protected DataCoupleMaterial, public Ta
     friend void PureWrapper(Material*);
 
 public:
-    explicit Material(unsigned = 0,                    // tag
-                      MaterialType = MaterialType::D0, // material type
-                      double = 0.                      // density
+    explicit Material(
+        unsigned = 0,                    // tag
+        MaterialType = MaterialType::D0, // material type
+        double = 0.                      // density
     );
     Material(const Material&) = default;
     Material(Material&&) = delete;                 // move forbidden

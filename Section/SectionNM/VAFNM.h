@@ -43,28 +43,30 @@ protected:
     [[nodiscard]] vec compute_dh(double) const override;
 
 public:
-    VAFNM(unsigned, // tag
-          double,   // axial rigidity
-          double,   // flexural rigidity
-          double,   // isotropic modulus
-          double,   // isotropic saturation
-          double,   // isotropic decay
-          vec&&,    // kinematic modulus
-          vec&&,    // kinematic base
-          double,   // linear density
-          vec&&
+    VAFNM(
+        unsigned, // tag
+        double,   // axial rigidity
+        double,   // flexural rigidity
+        double,   // isotropic modulus
+        double,   // isotropic saturation
+        double,   // isotropic decay
+        vec&&,    // kinematic modulus
+        vec&&,    // kinematic base
+        double,   // linear density
+        vec&&
     );
-    VAFNM(unsigned, // tag
-          double,   // axial rigidity
-          double,   // flexural rigidity
-          double,   // flexural rigidity
-          double,   // isotropic modulus
-          double,   // isotropic saturation
-          double,   // isotropic decay
-          vec&&,    // kinematic modulus
-          vec&&,    // kinematic base
-          double,   // linear density
-          vec&&
+    VAFNM(
+        unsigned, // tag
+        double,   // axial rigidity
+        double,   // flexural rigidity
+        double,   // flexural rigidity
+        double,   // isotropic modulus
+        double,   // isotropic saturation
+        double,   // isotropic decay
+        vec&&,    // kinematic modulus
+        vec&&,    // kinematic base
+        double,   // linear density
+        vec&&
     );
 };
 

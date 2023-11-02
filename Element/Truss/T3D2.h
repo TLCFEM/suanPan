@@ -45,13 +45,14 @@ class T3D2 final : public MaterialElement1D {
     const bool log_strain;
 
 public:
-    T3D2(unsigned,     // tag
-         uvec&&,       // node tag
-         unsigned,     // material tag
-         double,       // area
-         bool = false, // nonlinear geometry switch
-         bool = true,  // update area switch
-         bool = true   // log strain switch
+    T3D2(
+        unsigned,     // tag
+        uvec&&,       // node tag
+        unsigned,     // material tag
+        double,       // area
+        bool = false, // nonlinear geometry switch
+        bool = true,  // update area switch
+        bool = true   // log strain switch
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

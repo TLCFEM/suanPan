@@ -45,69 +45,75 @@ public:
 
 class MaterialPatch : public Patch, public MaterialElement {
 public:
-    MaterialPatch(unsigned,     // tag
-                  unsigned,     // number of dofs
-                  uvec&&,       // node encoding
-                  uvec&&,       // material tags
-                  field<vec>&&, // knot pool
-                  bool,         // nonlinear geometry switch
-                  MaterialType  // material type
+    MaterialPatch(
+        unsigned,     // tag
+        unsigned,     // number of dofs
+        uvec&&,       // node encoding
+        uvec&&,       // material tags
+        field<vec>&&, // knot pool
+        bool,         // nonlinear geometry switch
+        MaterialType  // material type
     );
 };
 
 class MaterialPatch2D : public MaterialPatch {
 public:
-    MaterialPatch2D(unsigned,     // tag
-                    unsigned,     // number of dofs
-                    uvec&&,       // node encoding
-                    uvec&&,       // material tags
-                    field<vec>&&, // knot pool
-                    bool          // nonlinear geometry switch
+    MaterialPatch2D(
+        unsigned,     // tag
+        unsigned,     // number of dofs
+        uvec&&,       // node encoding
+        uvec&&,       // material tags
+        field<vec>&&, // knot pool
+        bool          // nonlinear geometry switch
     );
 };
 
 class MaterialPatch3D : public MaterialPatch {
 public:
-    MaterialPatch3D(unsigned,     // tag
-                    unsigned,     // number of dofs
-                    uvec&&,       // node encoding
-                    uvec&&,       // material tags
-                    field<vec>&&, // knot pool
-                    bool          // nonlinear geometry switch
+    MaterialPatch3D(
+        unsigned,     // tag
+        unsigned,     // number of dofs
+        uvec&&,       // node encoding
+        uvec&&,       // material tags
+        field<vec>&&, // knot pool
+        bool          // nonlinear geometry switch
     );
 };
 
 class SectionPatch : public Patch, public SectionElement {
 public:
-    SectionPatch(unsigned,     // tag
-                 unsigned,     // number of dofs
-                 uvec&&,       // node encoding
-                 uvec&&,       // section tags
-                 field<vec>&&, // knot pool
-                 bool,         // nonlinear geometry switch
-                 SectionType   // section type
+    SectionPatch(
+        unsigned,     // tag
+        unsigned,     // number of dofs
+        uvec&&,       // node encoding
+        uvec&&,       // section tags
+        field<vec>&&, // knot pool
+        bool,         // nonlinear geometry switch
+        SectionType   // section type
     );
 };
 
 class SectionPatch2D : public SectionPatch {
 public:
-    SectionPatch2D(unsigned,     // tag
-                   unsigned,     // number of dofs
-                   uvec&&,       // node encoding
-                   uvec&&,       // section tags
-                   field<vec>&&, // knot pool
-                   bool          // nonlinear geometry switch
+    SectionPatch2D(
+        unsigned,     // tag
+        unsigned,     // number of dofs
+        uvec&&,       // node encoding
+        uvec&&,       // section tags
+        field<vec>&&, // knot pool
+        bool          // nonlinear geometry switch
     );
 };
 
 class SectionPatch3D : public SectionPatch {
 public:
-    SectionPatch3D(unsigned,     // tag
-                   unsigned,     // number of dofs
-                   uvec&&,       // node encoding
-                   uvec&&,       // section tags
-                   field<vec>&&, // knot pool
-                   bool          // nonlinear geometry switch
+    SectionPatch3D(
+        unsigned,     // tag
+        unsigned,     // number of dofs
+        uvec&&,       // node encoding
+        uvec&&,       // section tags
+        field<vec>&&, // knot pool
+        bool          // nonlinear geometry switch
     );
 };
 

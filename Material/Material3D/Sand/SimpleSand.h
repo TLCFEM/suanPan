@@ -60,20 +60,21 @@ class SimpleSand final : protected DataSimpleSand, public Material3D {
     const double bulk = elastic_modulus / (3. - 6. * poissons_ratio);
 
 public:
-    SimpleSand(unsigned,   // tag
-               double,     // elastic modulus
-               double,     // poissons ratio
-               double,     // m
-               double,     // A
-               double,     // h
-               double,     // alpha_c
-               double,     // n_b
-               double,     // n_d
-               double,     // v_c
-               double,     // p_c
-               double,     // lambda_c
-               double,     // v_0
-               double = 0. // density
+    SimpleSand(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // poissons ratio
+        double,     // m
+        double,     // A
+        double,     // h
+        double,     // alpha_c
+        double,     // n_b
+        double,     // n_d
+        double,     // v_c
+        double,     // p_c
+        double,     // lambda_c
+        double,     // v_0
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

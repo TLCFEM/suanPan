@@ -58,4 +58,4 @@ set(M1D
         Material1D/Wrapper/Parallel.cpp
         Material1D/Wrapper/Sequential.cpp
         Material1D/Wrapper/Uniaxial.cpp
-        )
+)

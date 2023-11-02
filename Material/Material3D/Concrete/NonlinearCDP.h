@@ -101,15 +101,16 @@ class NonlinearCDP : protected DataNonlinearCDP, public Material3D {
     [[nodiscard]] virtual podarray<double> compute_compression_backbone(double) const = 0;
 
 public:
-    NonlinearCDP(unsigned, // tag
-                 double,   // elastic modulus
-                 double,   // poissons ratio
-                 double,   // normalized crack energy (+)
-                 double,   // normalized crush energy (+)
-                 double,   // dilatancy parameter
-                 double,   // biaxial compression strength ratio
-                 double,   // stiffness recovery
-                 double    // density
+    NonlinearCDP(
+        unsigned, // tag
+        double,   // elastic modulus
+        double,   // poissons ratio
+        double,   // normalized crack energy (+)
+        double,   // normalized crush energy (+)
+        double,   // dilatancy parameter
+        double,   // biaxial compression strength ratio
+        double,   // stiffness recovery
+        double    // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;
