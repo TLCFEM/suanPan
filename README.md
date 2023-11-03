@@ -6,6 +6,7 @@
 [![license](https://img.shields.io/github/license/TLCFEM/suanPan.svg?color=44cc11)](https://www.gnu.org/licenses/gpl-3.0)
 [![documentation](https://readthedocs.org/projects/suanpan-manual/badge/?version=latest)](https://suanpan-manual.readthedocs.io/?badge=latest)
 [![release](https://img.shields.io/github/release-pre/TLCFEM/suanPan.svg?color=44cc11)](https://github.com/TLCFEM/suanPan/releases)
+[![docker](https://img.shields.io/docker/image-size/tlcfem/suanpan/latest?label=docker&color=44cc11)](https://hub.docker.com/r/tlcfem/suanpan/tags)
 [![suanpan](https://snapcraft.io//suanpan/badge.svg)](https://snapcraft.io/suanpan)
 [![Chocolatey](https://img.shields.io/chocolatey/v/suanpan?color=44cc11)](https://chocolatey.org/packages/suanpan)
 [![Chocolatey](https://img.shields.io/chocolatey/dt/suanpan?color=44cc11&label=choco%20install)](https://chocolatey.org/packages/suanpan)
