@@ -1,14 +1,4 @@
-FROM almalinux:9 as build
-
-RUN dnf upgrade --refresh -y && dnf install -y libglvnd-devel gcc g++ gfortran rpm-build rpm-devel rpmdevtools cmake wget git
-
-RUN wget -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/adb8a02c-4ee7-4882-97d6-a524150da358/l_onemkl_p_2023.2.0.49497_offline.sh
-RUN sh ./l_onemkl_p_2023.2.0.49497_offline.sh -a --silent --eula accept && rm ./l_onemkl_p_2023.2.0.49497_offline.sh
-
-RUN mkdir vtk-build && cd vtk-build && \
-    wget -q https://www.vtk.org/files/release/9.2/VTK-9.2.6.tar.gz && tar xf VTK-9.2.6.tar.gz && \
-    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF ./VTK-9.2.6 && \
-    make install -j"$(nproc)" && cd .. && rm -r vtk-build
+FROM tlcfem/suanpan-env as build
 
 RUN git clone -b dev --depth 1 https://github.com/TLCFEM/suanPan.git
 RUN cd suanPan && mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_VTK=ON -DUSE_MKL=ON -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DUSE_INTEL_OPENMP=OFF -DLINK_DYNAMIC_MKL=OFF -DCMAKE_INSTALL_PREFIX=suanPan-linux-mkl-vtk -DBUILD_PACKAGE=RPM ..
@@ -18,7 +8,7 @@ RUN cd suanPan/build && cp suanPan*.rpm / && \
     cd suanPan-linux-mkl-vtk/bin && ./suanPan.sh -v && \
     cd / && ls -al && rm -r suanPan
 
-FROM almalinux:9 as runtime
+FROM rockylinux:9 as runtime
 
 COPY --from=build /suanPan*.rpm /
 

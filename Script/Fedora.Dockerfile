@@ -1,4 +1,4 @@
-FROM fedora:38 as build
+FROM fedora:36 as build
 
 RUN dnf upgrade --refresh -y && dnf install -y libglvnd-devel gcc g++ gfortran rpm-build rpm-devel rpmdevtools cmake wget git
 
