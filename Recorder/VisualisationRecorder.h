@@ -36,8 +36,8 @@
 #endif
 
 class VisualisationRecorder final : public Recorder {
-    unsigned total_counter = 0;
-    unsigned width = 6;
+    unsigned total_counter = 0u;
+    unsigned width = 6u;
 
 #ifdef SUANPAN_VTK
     vtkInfo config;

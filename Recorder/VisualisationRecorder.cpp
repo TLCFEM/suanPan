@@ -36,13 +36,11 @@ VisualisationRecorder::VisualisationRecorder(const unsigned T, const OutputType 
 
 void VisualisationRecorder::record([[maybe_unused]] const shared_ptr<DomainBase>& D) {
 #ifdef SUANPAN_VTK
-    if(1 != interval && counter++ != interval) return;
-
-    counter = 1;
+    if(!if_perform_record()) return;
 
     ostringstream file_name;
 
-    file_name << 'R' << get_tag() << '-' << to_name(get_variable_type()) << '-' << std::setw(width) << std::setfill('0') << ++total_counter << ".vtk";
+    file_name << 'R' << get_tag() << '-' << to_name(get_variable_type()) << '-' << std::setw(static_cast<int>(width)) << std::setfill('0') << ++total_counter << ".vtk";
 
     fs::path file_path = SUANPAN_OUTPUT;
 
