@@ -19,7 +19,7 @@ $script = {
         [int]$jobs
     )
     Set-Location $folder
-    Write-Host "Compiling $folder with $jobs jobs."
+    Write-Output "Compiling $folder with $jobs jobs."
     cmake --build . --parallel $jobs
 }
 
