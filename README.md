@@ -24,9 +24,10 @@
 
 [![gplv3-or-later](https://www.gnu.org/graphics/gplv3-or-later.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
-[![Visual Studio Marketplace Version (including pre-releases)](https://img.shields.io/visual-studio-marketplace/v/tlc.suanpan?label=VS%20Code&color=44cc11)](https://marketplace.visualstudio.com/items?itemName=tlcfem.suanpan)
+[![marketplace](https://img.shields.io/visual-studio-marketplace/v/tlc.suanpan?label=VS%20Code&color=44cc11)](https://marketplace.visualstudio.com/items?itemName=tlc.suanpan)
 
-***Check out the VS Code [extension](https://marketplace.visualstudio.com/items?itemName=tlcfem.suanpan) for syntax highlighting and autocompletion.***
+***Check out the VS Code [extension](https://marketplace.visualstudio.com/items?itemName=tlc.suanpan) for syntax
+highlighting and autocompletion.***
 
 ## Introduction
 
@@ -229,7 +230,7 @@ questions please open an issue.
 
 #### VS Code
 
-The VS Code extension is available [here](https://marketplace.visualstudio.com/items?itemName=tlcfem.suanpan).
+The VS Code extension is available [here](https://marketplace.visualstudio.com/items?itemName=tlc.suanpan).
 
 #### Sublime Text
 
