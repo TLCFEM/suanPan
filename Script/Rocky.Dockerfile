@@ -12,6 +12,6 @@ FROM rockylinux:9 as runtime
 
 COPY --from=build /suanPan*.rpm /
 
-RUN dnf upgrade --refresh -y && dnf install ./suanPan*.rpm -y
+RUN dnf install ./suanPan*.rpm -y
 
 RUN suanPan -v
