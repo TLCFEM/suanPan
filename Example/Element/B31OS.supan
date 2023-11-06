@@ -1,0 +1,64 @@
+# A TEST MODEL FOR B31OS ELEMENT
+
+node 1 0 0 0
+node 2 1 0 0
+node 3 1 1 0
+
+material ElasticOS 1 100 .2
+section Cell3DOS 1 10. 1. 1. 1. 1 10. 10.
+section Cell3DOS 2 10. -1. 1. 1. 1 -10. -10.
+section Cell3DOS 4 10. -1. 1. 1. 1 -10. 10.
+section Fibre3DOS 3 1 2 4
+
+material Elastic1D 2 100 ! wrong material
+section Cell3DOS 5 10. -1. 1. 1. 2 -10. 10.
+
+orientation B3DOSL 1 0. 0. 1.
+
+element B31OS 1 1 2 3 1 6
+
+orientation B3DOSC 2 0. 0. 1.
+orientation B3DL 3 0. 0. 1.
+element B31OS 3 2 3 3 2 6 ! wrong transformation
+element B31OS 4 2 3 3 3 6 ! wrong transformation
+element B31OS 5 2 3 3 4 6 ! missing transformation
+
+element B31OS 8 2 3 3 2 6 1 ! nlgeom enabled
+
+fix2 1 E 1
+
+cload 1 0 100 3 3
+
+recorder 1 hdf5 Element E 1
+recorder 2 hdf5 Element S 1
+
+step static 1
+set ini_step_size 1E-1
+set fixed_step_size true
+
+converger RelIncreDisp 1 1E-10 5 1
+
+analyze
+
+# Node 2:
+# Coordinate:
+#   1.0000e+00  0.0000e+00  0.0000e+00
+# Displacement:
+#   1.2355e-03  6.8692e-05  1.5621e-04  3.6613e-04 -2.4984e-04  1.3796e-04  1.9364e-04
+# Resistance:
+#  -1.9010e-13  4.3160e-15  3.1264e-13  1.4211e-13  3.4764e-15  9.7460e-14  1.3323e-14
+# 
+# Node 3:
+# Coordinate:
+#   1.0000e+00  1.0000e+00  0.0000e+00
+# Displacement:
+#   1.0063e-03  1.3455e-03  6.8006e-04  6.1770e-04 -2.2829e-04  2.7732e-04  6.4496e-05
+# Resistance:
+#   1.9048e-13  1.1449e-15  1.0000e+02  1.3013e-13 -9.5165e-15  8.4817e-14  7.7716e-15
+peek node 2 3
+
+peek element 1
+
+reset
+clear
+exit

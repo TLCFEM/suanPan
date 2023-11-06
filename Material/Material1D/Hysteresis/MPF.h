@@ -47,9 +47,10 @@ struct DataMPF {
     const double yield_strain = yield_stress / elastic_modulus; // yield strain
 };
 
-class MPF final : DataMPF, public Material1D {
+class MPF final : protected DataMPF, public Material1D {
 public:
-    MPF(unsigned,      // tag
+    MPF(
+        unsigned,      // tag
         double,        // elastic modulus
         double,        // yield stress
         double = .05,  // hardening ratio

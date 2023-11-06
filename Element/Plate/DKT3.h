@@ -62,11 +62,12 @@ class DKT3 final : public MaterialElement2D {
     static field<mat> form_transform(const mat&);
 
 public:
-    DKT3(unsigned,    // element tag
-         uvec&&,      // node tag
-         unsigned,    // material tag
-         double,      // thickness
-         unsigned = 3 // integration points along thickness
+    DKT3(
+        unsigned,    // element tag
+        uvec&&,      // node tag
+        unsigned,    // material tag
+        double,      // thickness
+        unsigned = 3 // integration points along thickness
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

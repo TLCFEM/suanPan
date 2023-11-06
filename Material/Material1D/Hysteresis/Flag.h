@@ -47,7 +47,7 @@ struct DataFlag {
     const double c_residual_strain = c_residual_stress / elastic_modulus;
 };
 
-class Flag final : DataFlag, public Material1D {
+class Flag final : protected DataFlag, public Material1D {
     enum class Status {
         NONE,
         TLOAD,
@@ -61,22 +61,24 @@ class Flag final : DataFlag, public Material1D {
     Status trial_status = Status::NONE, current_status = Status::NONE;
 
 public:
-    Flag(unsigned, // tag
-         double,   // elastic modulus
-         double,   // tension initial yield stress
-         double,   // tension residual stress
-         double,   // tension hardening ratio
-         double,   // compression initial yield stress
-         double,   // compression residual stress
-         double,   // compression hardening ratio
-         double    // density
+    Flag(
+        unsigned, // tag
+        double,   // elastic modulus
+        double,   // tension initial yield stress
+        double,   // tension residual stress
+        double,   // tension hardening ratio
+        double,   // compression initial yield stress
+        double,   // compression residual stress
+        double,   // compression hardening ratio
+        double    // density
     );
-    Flag(unsigned, // tag
-         double,   // elastic modulus
-         double,   // initial yield stress
-         double,   // residual stress
-         double,   // hardening ratio
-         double    // density
+    Flag(
+        unsigned, // tag
+        double,   // elastic modulus
+        double,   // initial yield stress
+        double,   // residual stress
+        double,   // hardening ratio
+        double    // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

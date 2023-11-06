@@ -38,7 +38,7 @@ int T2D2::initialize(const shared_ptr<DomainBase>& D) {
 
     trial_stiffness = current_stiffness = initial_stiffness = t_trans->to_global_stiffness_mat(area / length * t_material->get_initial_stiffness());
 
-    if(const auto t_density = t_material->get_parameter(ParameterType::DENSITY); t_density > 0.) trial_mass = current_mass = initial_mass = t_trans->to_global_mass_mat(t_density * area);
+    if(const auto t_density = t_material->get_density(); t_density > 0.) trial_mass = current_mass = initial_mass = t_trans->to_global_mass_mat(t_density * area);
 
     return SUANPAN_SUCCESS;
 }

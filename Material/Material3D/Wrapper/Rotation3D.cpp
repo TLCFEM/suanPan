@@ -77,14 +77,14 @@ Rotation3D::Rotation3D(const unsigned T, const unsigned MT, mat&& R)
     , mat_tag(MT) { form_transformation(std::forward<mat>(R)); }
 
 int Rotation3D::initialize(const shared_ptr<DomainBase>& D) {
-    mat_obj = suanpan::initialized_material_copy(D, mat_tag);
+    mat_obj = D->initialized_material_copy(mat_tag);
 
     if(nullptr == mat_obj || mat_obj->get_material_type() != MaterialType::D3) {
         suanpan_error("A valid 3D host material is required.\n");
         return SUANPAN_FAIL;
     }
 
-    access::rw(density) = mat_obj->get_parameter(ParameterType::DENSITY);
+    access::rw(density) = mat_obj->get_density();
 
     trial_stiffness = current_stiffness = initial_stiffness = trans_mat.t() * mat_obj->get_initial_stiffness() * trans_mat;
 
@@ -92,6 +92,8 @@ int Rotation3D::initialize(const shared_ptr<DomainBase>& D) {
 }
 
 unique_ptr<Material> Rotation3D::get_copy() { return make_unique<Rotation3D>(*this); }
+
+double Rotation3D::get_parameter(const ParameterType P) const { return mat_obj->get_parameter(P); }
 
 int Rotation3D::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
@@ -107,10 +109,8 @@ int Rotation3D::update_trial_status(const vec& t_strain) {
 }
 
 int Rotation3D::clear_status() {
-    current_strain.zeros();
-    trial_strain.zeros();
-    current_stress.zeros();
-    trial_stress.zeros();
+    trial_strain = current_strain.zeros();
+    trial_stress = current_stress.zeros();
     trial_stiffness = current_stiffness = initial_stiffness;
     return mat_obj->clear_status();
 }

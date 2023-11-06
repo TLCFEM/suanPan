@@ -45,10 +45,10 @@ int Embedded::initialize(const shared_ptr<DomainBase>& D) {
 
     auto& n = access::rw(iso_n);
 
-    unsigned counter = 0;
+    auto counter = 0u;
     while(++counter <= max_iteration) {
         const vec incre = solve((host_element->compute_shape_function(t_para, 1) * t_coor).t(), n_coor - ((n = host_element->compute_shape_function(t_para, 0)) * t_coor).t());
-        if(norm(incre) < 1E-14) break;
+        if(inf_norm(incre) < 1E-14) break;
         t_para += incre;
     }
 

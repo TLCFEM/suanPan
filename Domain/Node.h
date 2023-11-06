@@ -52,26 +52,29 @@ struct NodeData {
     uvec original_dof;  // original indices
     uvec reordered_dof; // renumbered indices
 
-    vec current_resistance;     // current resistance
-    vec current_damping_force;  // current damping force
-    vec current_inertial_force; // current inertial force
-    vec current_displacement;   // current displacement
-    vec current_velocity;       // current velocity
-    vec current_acceleration;   // current acceleration
+    vec current_resistance;       // current resistance
+    vec current_damping_force;    // current damping force
+    vec current_nonviscous_force; // current damping force
+    vec current_inertial_force;   // current inertial force
+    vec current_displacement;     // current displacement
+    vec current_velocity;         // current velocity
+    vec current_acceleration;     // current acceleration
 
-    vec incre_resistance;     // incremental resistance
-    vec incre_damping_force;  // incremental damping force
-    vec incre_inertial_force; // incremental inertial force
-    vec incre_displacement;   // incremental displacement
-    vec incre_velocity;       // incremental velocity
-    vec incre_acceleration;   // incremental acceleration
+    vec incre_resistance;       // incremental resistance
+    vec incre_damping_force;    // incremental damping force
+    vec incre_nonviscous_force; // incremental damping force
+    vec incre_inertial_force;   // incremental inertial force
+    vec incre_displacement;     // incremental displacement
+    vec incre_velocity;         // incremental velocity
+    vec incre_acceleration;     // incremental acceleration
 
-    vec trial_resistance;     // trial resistance
-    vec trial_damping_force;  // trial damping force
-    vec trial_inertial_force; // trial inertial force
-    vec trial_displacement;   // trial displacement
-    vec trial_velocity;       // trial velocity
-    vec trial_acceleration;   // trial acceleration
+    vec trial_resistance;       // trial resistance
+    vec trial_damping_force;    // trial damping force
+    vec trial_nonviscous_force; // trial damping force
+    vec trial_inertial_force;   // trial inertial force
+    vec trial_displacement;     // trial displacement
+    vec trial_velocity;         // trial velocity
+    vec trial_acceleration;     // trial acceleration
 };
 
 class Node final : protected NodeData, public Tag {
@@ -115,6 +118,7 @@ public:
 
     void set_current_resistance(const vec&);
     void set_current_damping_force(const vec&);
+    void set_current_nonviscous_force(const vec&);
     void set_current_inertial_force(const vec&);
     void set_current_displacement(const vec&);
     void set_current_velocity(const vec&);
@@ -122,6 +126,7 @@ public:
 
     void set_incre_resistance(const vec&);
     void set_incre_damping_force(const vec&);
+    void set_incre_nonviscous_force(const vec&);
     void set_incre_inertial_force(const vec&);
     void set_incre_displacement(const vec&);
     void set_incre_velocity(const vec&);
@@ -129,6 +134,7 @@ public:
 
     void set_trial_resistance(const vec&);
     void set_trial_damping_force(const vec&);
+    void set_trial_nonviscous_force(const vec&);
     void set_trial_inertial_force(const vec&);
     void set_trial_displacement(const vec&);
     void set_trial_velocity(const vec&);
@@ -136,6 +142,7 @@ public:
 
     [[nodiscard]] const vec& get_current_resistance() const;
     [[nodiscard]] const vec& get_current_damping_force() const;
+    [[nodiscard]] const vec& get_current_nonviscous_force() const;
     [[nodiscard]] const vec& get_current_inertial_force() const;
     [[nodiscard]] const vec& get_current_displacement() const;
     [[nodiscard]] const vec& get_current_velocity() const;
@@ -143,6 +150,7 @@ public:
 
     [[nodiscard]] const vec& get_incre_resistance() const;
     [[nodiscard]] const vec& get_incre_damping_force() const;
+    [[nodiscard]] const vec& get_incre_nonviscous_force() const;
     [[nodiscard]] const vec& get_incre_inertial_force() const;
     [[nodiscard]] const vec& get_incre_displacement() const;
     [[nodiscard]] const vec& get_incre_velocity() const;
@@ -150,6 +158,7 @@ public:
 
     [[nodiscard]] const vec& get_trial_resistance() const;
     [[nodiscard]] const vec& get_trial_damping_force() const;
+    [[nodiscard]] const vec& get_trial_nonviscous_force() const;
     [[nodiscard]] const vec& get_trial_inertial_force() const;
     [[nodiscard]] const vec& get_trial_displacement() const;
     [[nodiscard]] const vec& get_trial_velocity() const;
@@ -157,6 +166,7 @@ public:
 
     void update_current_resistance(const vec&);
     void update_current_damping_force(const vec&);
+    void update_current_nonviscous_force(const vec&);
     void update_current_inertial_force(const vec&);
     void update_current_displacement(const vec&);
     void update_current_velocity(const vec&);
@@ -164,6 +174,7 @@ public:
 
     void update_incre_resistance(const vec&);
     void update_incre_damping_force(const vec&);
+    void update_incre_nonviscous_force(const vec&);
     void update_incre_inertial_force(const vec&);
     void update_incre_displacement(const vec&);
     void update_incre_velocity(const vec&);
@@ -171,6 +182,7 @@ public:
 
     void update_trial_resistance(const vec&);
     void update_trial_damping_force(const vec&);
+    void update_trial_nonviscous_force(const vec&);
     void update_trial_inertial_force(const vec&);
     void update_trial_displacement(const vec&);
     void update_trial_velocity(const vec&);

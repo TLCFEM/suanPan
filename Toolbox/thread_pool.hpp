@@ -108,20 +108,19 @@ public:
     template<typename F, typename... A, typename R = std::invoke_result_t<std::decay_t<F>, std::decay_t<A>...>> [[nodiscard]] std::future<R> submit(F&& task, A&&... args) {
         std::function<R()> task_function = std::bind(std::forward<F>(task), std::forward<A>(args)...);
         std::shared_ptr<std::promise<R>> task_promise = std::make_shared<std::promise<R>>();
-        push_task(
-            [task_function, task_promise] {
-                try {
-                    if constexpr(std::is_void_v<R>) {
-                        std::invoke(task_function);
-                        task_promise->set_value();
-                    }
-                    else { task_promise->set_value(std::invoke(task_function)); }
+        push_task([task_function, task_promise] {
+            try {
+                if constexpr(std::is_void_v<R>) {
+                    std::invoke(task_function);
+                    task_promise->set_value();
                 }
-                catch(...) {
-                    try { task_promise->set_exception(std::current_exception()); }
-                    catch(...) {}
-                }
-            });
+                else { task_promise->set_value(std::invoke(task_function)); }
+            }
+            catch(...) {
+                try { task_promise->set_exception(std::current_exception()); }
+                catch(...) {}
+            }
+        });
         return task_promise->get_future();
     }
 

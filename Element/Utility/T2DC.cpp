@@ -19,8 +19,6 @@
 #include <Element/Element.h>
 #include <Toolbox/tensor.h>
 
-unique_ptr<Orientation> T2DC::get_copy() { return make_unique<T2DC>(*this); }
-
 void T2DC::update_transformation() {
     const auto coord = get_coordinate(element_ptr, 2);
     const auto t_disp = get_trial_displacement(element_ptr);
@@ -34,10 +32,9 @@ void T2DC::update_transformation() {
     inclination = transform::atan2(direction_cosine);
 }
 
-T2DC::T2DC(const unsigned T)
-    : T2DL(T) {}
-
 bool T2DC::is_nlgeom() const { return true; }
+
+unique_ptr<Orientation> T2DC::get_copy() { return make_unique<T2DC>(*this); }
 
 mat T2DC::to_global_geometry_mat(const mat& l_mat) const {
     auto g_mat = to_global_stiffness_mat(-l_mat);

@@ -65,11 +65,12 @@ protected:
     void form_body_force(const mat&);
 
 public:
-    SGCMQ(unsigned,    // element tag
-          uvec&&,      // node tag
-          unsigned,    // material tag
-          double = 1., // thickness
-          char = 'I'   // integration type
+    SGCMQ(
+        unsigned,    // element tag
+        uvec&&,      // node tag
+        unsigned,    // material tag
+        double = 1., // thickness
+        char = 'I'   // integration type
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

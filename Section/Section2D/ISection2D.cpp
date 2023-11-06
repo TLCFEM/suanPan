@@ -43,7 +43,7 @@ ISection2D::ISection2D(const unsigned T, vec&& D, const unsigned MT, const unsig
 int ISection2D::initialize(const shared_ptr<DomainBase>& D) {
     auto& mat_proto = D->get_material(material_tag);
 
-    access::rw(linear_density) = mat_proto->get_parameter(ParameterType::DENSITY) * area;
+    access::rw(linear_density) = mat_proto->get_density() * area;
 
     const auto web_area = web_height * web_thickness;
     const auto b_flange_area = bottom_flange_width * bottom_flange_thickness;
@@ -55,20 +55,10 @@ int ISection2D::initialize(const shared_ptr<DomainBase>& D) {
     int_pt.clear();
     int_pt.reserve(int_pt_num + 2llu * plan_flange.n_rows);
     for(unsigned I = 0; I < int_pt_num; ++I) int_pt.emplace_back(.5 * plan_web(I, 0) * web_height, .5 * plan_web(I, 1) * web_area, mat_proto->get_copy());
-    if(b_flange_area != 0.) for(unsigned I = 0; I < plan_flange.n_rows; ++I) int_pt.emplace_back(.5 * (web_height + (1. + plan_flange(I, 0)) * bottom_flange_thickness), .5 * plan_flange(I, 1) * b_flange_area, mat_proto->get_copy());
-    if(t_flange_area != 0.) for(unsigned I = 0; I < plan_flange.n_rows; ++I) int_pt.emplace_back(-.5 * (web_height + (1. + plan_flange(I, 0)) * top_flange_thickness), .5 * plan_flange(I, 1) * t_flange_area, mat_proto->get_copy());
+    if(b_flange_area > 0.) for(unsigned I = 0; I < plan_flange.n_rows; ++I) int_pt.emplace_back(.5 * (web_height + (1. + plan_flange(I, 0)) * bottom_flange_thickness), .5 * plan_flange(I, 1) * b_flange_area, mat_proto->get_copy());
+    if(t_flange_area > 0.) for(unsigned I = 0; I < plan_flange.n_rows; ++I) int_pt.emplace_back(-.5 * (web_height + (1. + plan_flange(I, 0)) * top_flange_thickness), .5 * plan_flange(I, 1) * t_flange_area, mat_proto->get_copy());
 
-    initial_stiffness.zeros(2, 2);
-    for(const auto& I : int_pt) {
-        auto tmp_a = I.s_material->get_initial_stiffness().at(0) * I.weight;
-        const auto tmp_b = eccentricity(0) - I.coor;
-        initial_stiffness(0, 0) += tmp_a;
-        initial_stiffness(0, 1) += tmp_a *= tmp_b;
-        initial_stiffness(1, 1) += tmp_a *= tmp_b;
-    }
-    initial_stiffness(1, 0) = initial_stiffness(0, 1);
-
-    trial_stiffness = current_stiffness = initial_stiffness;
+    initialize_stiffness();
 
     return SUANPAN_SUCCESS;
 }

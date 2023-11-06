@@ -35,7 +35,7 @@ GQ12::GQ12(const unsigned T, uvec&& N, const unsigned M, const double TH)
 int GQ12::initialize(const shared_ptr<DomainBase>& D) {
     auto& mat_proto = D->get<Material>(material_tag(0));
 
-    if(PlaneType::E == static_cast<PlaneType>(mat_proto->get_parameter(ParameterType::PLANETYPE))) suanpan::hacker(thickness) = 1.;
+    if(PlaneType::E == mat_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
 
     auto& mat_stiff = mat_proto->get_initial_stiffness();
 
@@ -108,7 +108,7 @@ int GQ12::initialize(const shared_ptr<DomainBase>& D) {
     }
     trial_stiffness = current_stiffness = initial_stiffness;
 
-    if(const auto t_density = mat_proto->get_parameter(ParameterType::DENSITY); t_density > 0.) {
+    if(const auto t_density = mat_proto->get_density(); t_density > 0.) {
         initial_mass.zeros(m_size, m_size);
         for(const auto& I : int_pt) {
             const auto n_int = compute_shape_function(I.coor, 0);
@@ -165,9 +165,9 @@ int GQ12::reset_status() {
 
 mat GQ12::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
-vector<vec> GQ12::record(const OutputType T) {
+vector<vec> GQ12::record(const OutputType P) {
     vector<vec> data;
-    for(const auto& I : int_pt) for(const auto& J : I.m_material->record(T)) data.emplace_back(J);
+    for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
     return data;
 }
 
@@ -205,10 +205,10 @@ void GQ12::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType typ
 
 mat GQ12::GetData(const OutputType P) {
     mat A(int_pt.size(), 4);
-    mat B(int_pt.size(), 6, fill::zeros);
+    mat B(6, int_pt.size(), fill::zeros);
 
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        if(const auto C = int_pt[I].m_material->record(P); !C.empty()) B(I, 0, size(C[0])) = C[0];
+        if(const auto C = int_pt[I].m_material->record(P); !C.empty()) B(0, I, size(C[0])) = C[0];
         A.row(I) = interpolation::linear(int_pt[I].coor);
     }
 
@@ -219,7 +219,7 @@ mat GQ12::GetData(const OutputType P) {
     data.row(2) = interpolation::linear(1., 1.);
     data.row(3) = interpolation::linear(-1., 1.);
 
-    return (data * solve(A, B)).t();
+    return (data * solve(A, B.t())).t();
 }
 
 void GQ12::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {

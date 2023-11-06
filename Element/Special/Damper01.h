@@ -48,10 +48,11 @@ protected:
     unique_ptr<Material> damper;
 
 public:
-    Damper01(unsigned, // tag
-             uvec&&,   // node tag
-             unsigned, // damper tag
-             unsigned  // dimension
+    Damper01(
+        unsigned, // tag
+        uvec&&,   // node tag
+        unsigned, // damper tag
+        unsigned  // dimension
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

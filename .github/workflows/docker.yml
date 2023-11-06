@@ -1,0 +1,28 @@
+name: Docker
+on:
+  push:
+    branches: [ dev ]
+  pull_request:
+    branches: [ dev ]
+jobs:
+  ubuntu-dev:
+    if: "!contains(github.event.head_commit.message, '[skip]')"
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    steps:
+      - name: Clone
+        uses: actions/checkout@v4
+      - name: Login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Script/Rocky.Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/suanpan:latest

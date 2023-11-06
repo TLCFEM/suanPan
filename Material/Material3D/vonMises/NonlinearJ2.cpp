@@ -34,19 +34,12 @@ int NonlinearJ2::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double NonlinearJ2::get_parameter(const ParameterType P) const {
-    if(ParameterType::DENSITY == P) return density;
-    if(ParameterType::ELASTICMODULUS == P || ParameterType::YOUNGSMODULUS == P || ParameterType::E == P) return elastic_modulus;
-    if(ParameterType::SHEARMODULUS == P || ParameterType::G == P) return shear_modulus;
-    if(ParameterType::BULKMODULUS == P) return elastic_modulus / (3. - 6. * poissons_ratio);
-    if(ParameterType::POISSONSRATIO == P) return poissons_ratio;
-    return 0.;
-}
+double NonlinearJ2::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
 
 int NonlinearJ2::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
-    if(norm(incre_strain) <= tolerance) return SUANPAN_SUCCESS;
+    if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
 
     trial_stress = current_stress + (trial_stiffness = initial_stiffness) * incre_strain;
 
@@ -69,25 +62,28 @@ int NonlinearJ2::update_trial_status(const vec& t_strain) {
 
     auto yield_func = norm_rel_stress - root_two_third * k;
 
-    if(yield_func < 0.) return SUANPAN_SUCCESS;
+    if(yield_func <= 0.) return SUANPAN_SUCCESS;
 
     const auto current_h = compute_h(plastic_strain);
-    auto gamma = 0., incre_h = 0., denom = 0.;
-    unsigned counter = 0;
-    while(++counter < max_iteration) {
+    auto gamma = 0., incre_h = 0.;
+    double denom;
+    auto counter = 0u;
+    auto ref_error = 1.;
+    while(true) {
+        if(max_iteration == ++counter) {
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
+            return SUANPAN_FAIL;
+        }
+
         denom = double_shear + two_third * (dk + compute_dh(plastic_strain));
         const auto incre_gamma = yield_func / denom;
-        const auto abs_error = fabs(incre_gamma);
-        suanpan_debug("Local iteration error: {:.5E}.\n", abs_error);
-        if(abs_error <= tolerance) break;
+        const auto error = fabs(incre_gamma);
+        if(1u == counter) ref_error = error;
+        suanpan_debug("Local iteration error: {:.5E}.\n", error);
+        if(error < tolerance * ref_error || ((fabs(yield_func) < tolerance || error < datum::eps) && counter > 5u)) break;
         incre_h = compute_h(plastic_strain = current_history(0) + root_two_third * (gamma += incre_gamma)) - current_h;
         update_isotropic_hardening();
         yield_func = norm_rel_stress - double_shear * gamma - root_two_third * (k + incre_h);
-    }
-
-    if(max_iteration == counter) {
-        suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
-        return SUANPAN_FAIL;
     }
 
     back_stress += root_two_third * incre_h / norm_rel_stress * rel_stress;
@@ -123,12 +119,6 @@ int NonlinearJ2::reset_status() {
     trial_history = current_history;
     trial_stiffness = current_stiffness;
     return SUANPAN_SUCCESS;
-}
-
-vector<vec> NonlinearJ2::record(const OutputType P) {
-    if(P == OutputType::PEEQ) return {vec{current_history(0)}};
-
-    return Material3D::record(P);
 }
 
 void NonlinearJ2::print() {

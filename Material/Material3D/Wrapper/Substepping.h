@@ -39,9 +39,10 @@ class Substepping final : public Material {
     ResourceHolder<Material> trial_mat_obj, current_mat_obj;
 
 public:
-    Substepping(unsigned, // tag
-                unsigned, // mat tag
-                unsigned  // max iteration
+    Substepping(
+        unsigned, // tag
+        unsigned, // mat tag
+        unsigned  // max iteration
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

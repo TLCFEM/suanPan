@@ -51,14 +51,7 @@ int NonlinearCDP::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double NonlinearCDP::get_parameter(const ParameterType P) const {
-    if(ParameterType::DENSITY == P) return density;
-    if(ParameterType::ELASTICMODULUS == P || ParameterType::YOUNGSMODULUS == P || ParameterType::E == P) return elastic_modulus;
-    if(ParameterType::SHEARMODULUS == P || ParameterType::G == P) return elastic_modulus / (2. + 2. * poissons_ratio);
-    if(ParameterType::BULKMODULUS == P) return elastic_modulus / (3. - 6. * poissons_ratio);
-    if(ParameterType::POISSONSRATIO == P) return poissons_ratio;
-    return 0.;
-}
+double NonlinearCDP::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
 
 int NonlinearCDP::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
@@ -165,18 +158,18 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
-        auto error = norm(residual);
-        if(1u == counter) ref_error = std::max(1., error);
-        suanpan_debug("Local iteration error: {:.5E}.\n", error /= ref_error);
-        if(error <= tolerance || norm(incre) <= tolerance) break;
+        const auto error = inf_norm(incre);
+        if(1u == counter) ref_error = error;
+        suanpan_debug("Local iteration error: {:.5E}.\n", error);
+        if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) break;
 
         lambda -= incre(0);
         kappa_t -= incre(1);
         kappa_c -= incre(2);
         new_stress -= dsigmadlambda * incre(0);
 
-        if(kappa_t > 1.) kappa_t = .999; // avoid overshoot
-        if(kappa_c > 1.) kappa_c = .999; // avoid overshoot
+        if(kappa_t > 1.) kappa_t = 1. - datum::eps; // avoid overshoot
+        if(kappa_c > 1.) kappa_c = 1. - datum::eps; // avoid overshoot
     }
 
     // update damage indices
@@ -247,13 +240,11 @@ int NonlinearCDP::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-vector<vec> NonlinearCDP::record(const OutputType T) {
-    if(T == OutputType::DT) return {vec{current_history(0)}};
-    if(T == OutputType::DC) return {vec{current_history(1)}};
-    if(T == OutputType::KAPPAT) return {vec{current_history(2)}};
-    if(T == OutputType::KAPPAC) return {vec{current_history(3)}};
+vector<vec> NonlinearCDP::record(const OutputType P) {
+    if(P == OutputType::DT) return {vec{current_history(0)}};
+    if(P == OutputType::DC) return {vec{current_history(1)}};
 
-    return Material3D::record(T);
+    return Material3D::record(P);
 }
 
 void NonlinearCDP::print() {

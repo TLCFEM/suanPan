@@ -33,10 +33,10 @@
 
 class NM2D1 final : public SectionNM2D {
 public:
-    NM2D1(unsigned, // tag
-          double,
-          double,
-          double);
+    NM2D1(
+        unsigned, // tag
+        double, double, double
+    );
 
     unique_ptr<Section> get_copy() override;
 

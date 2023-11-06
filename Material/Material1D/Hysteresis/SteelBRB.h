@@ -45,8 +45,8 @@ struct DataSteelBRB {
     const double c_exponent = .4;
 };
 
-class SteelBRB final : DataSteelBRB, public Material1D {
-    static constexpr unsigned max_iteration = 20;
+class SteelBRB final : protected DataSteelBRB, public Material1D {
+    static constexpr unsigned max_iteration = 20u;
 
     const double s_modulus = -elastic_modulus - plastic_modulus;
     const double c_const = (c_saturated_stress - yield_stress) / c_scalar;
@@ -56,8 +56,9 @@ class SteelBRB final : DataSteelBRB, public Material1D {
     [[nodiscard]] vec compute_c_yield_stress(double) const;
 
 public:
-    SteelBRB(unsigned, // tag
-             vec&&     // parameter
+    SteelBRB(
+        unsigned, // tag
+        vec&&     // parameter
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

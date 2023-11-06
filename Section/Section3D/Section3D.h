@@ -30,6 +30,8 @@
 #define SECTION3D_H
 
 #include <Section/Section.h>
+#include <Material/Material.h>
+#include <Toolbox/ResourceHolder.h>
 
 using std::vector;
 
@@ -37,23 +39,23 @@ class Section3D : public Section {
 protected:
     struct IntegrationPoint {
         double coor_y, coor_z, weight;
-        unique_ptr<Material> s_material;
+        ResourceHolder<Material> s_material;
         IntegrationPoint(double, double, double, unique_ptr<Material>&&);
-        IntegrationPoint(const IntegrationPoint&);
-        IntegrationPoint(IntegrationPoint&&) noexcept = default;
-        IntegrationPoint& operator=(const IntegrationPoint&) = delete;
-        IntegrationPoint& operator=(IntegrationPoint&&) noexcept = delete;
-        ~IntegrationPoint() = default;
     };
 
     vector<IntegrationPoint> int_pt;
 
+    void initialize_stiffness();
+
 public:
-    Section3D(unsigned,        // tag
-              unsigned,        // material tag
-              double = 0.,     // area
-              vec&& = {0., 0.} // eccentricity
+    Section3D(
+        unsigned,        // tag
+        unsigned,        // material tag
+        double = 0.,     // area
+        vec&& = {0., 0.} // eccentricity
     );
+
+    void set_characteristic_length(double) const override;
 
     int update_trial_status(const vec&) override;
 

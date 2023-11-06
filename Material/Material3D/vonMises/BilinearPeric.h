@@ -34,19 +34,20 @@ struct DataBilinearPeric {
     const double yield_stress, hardening_modulus;
 };
 
-class BilinearPeric final : DataBilinearPeric, public NonlinearPeric {
+class BilinearPeric final : protected DataBilinearPeric, public NonlinearPeric {
     [[nodiscard]] double compute_k(double) const override;
     [[nodiscard]] double compute_dk(double) const override;
 
 public:
-    BilinearPeric(unsigned,    // tag
-                  double,      // elastic modulus
-                  double,      // poisson's ratio
-                  double,      // initial yield stress
-                  double = 0., // hardening modulus
-                  double = 0., // mu
-                  double = 0., // epsilon
-                  double = 0.  // density
+    BilinearPeric(
+        unsigned,    // tag
+        double,      // elastic modulus
+        double,      // poisson's ratio
+        double,      // initial yield stress
+        double = 0., // hardening modulus
+        double = 0., // mu
+        double = 0., // epsilon
+        double = 0.  // density
     );
 
     unique_ptr<Material> get_copy() override;

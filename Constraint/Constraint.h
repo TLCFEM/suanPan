@@ -52,12 +52,13 @@ protected:
     friend void set_constraint_multiplier(double);
 
 public:
-    Constraint(unsigned, // tag
-               unsigned, // step tag
-               unsigned, // amplitude tag
-               uvec&&,   // node tags
-               uvec&&,   // dof tags
-               unsigned  // size of multiplier
+    Constraint(
+        unsigned, // tag
+        unsigned, // step tag
+        unsigned, // amplitude tag
+        uvec&&,   // node tags
+        uvec&&,   // dof tags
+        unsigned  // size of multiplier
     );
     Constraint(const Constraint&) = delete;            // copy forbidden
     Constraint(Constraint&&) = delete;                 // move forbidden

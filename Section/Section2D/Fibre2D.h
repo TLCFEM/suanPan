@@ -18,7 +18,7 @@
  * @class Fibre2D
  * @brief A Fibre2D class.
  * @author tlc
- * @date 13/10/2017
+ * @date 15/09/2023
  * @version 0.1.0
  * @file Fibre2D.h
  * @addtogroup Section-2D
@@ -29,32 +29,13 @@
 #ifndef FIBRE2D_H
 #define FIBRE2D_H
 
-#include <Section/Section2D/Section2D.h>
+#include <Section/Fibre.h>
 
-class Fibre2D final : public Section2D {
-    uvec fibre_tag;
-
-    vector<unique_ptr<Section>> fibre;
-
+class Fibre2D final : public Fibre {
 public:
     Fibre2D(unsigned, uvec&&);
-    Fibre2D(const Fibre2D&);
-    Fibre2D(Fibre2D&&) noexcept = delete;
-    Fibre2D& operator=(const Fibre2D&) = delete;
-    Fibre2D& operator=(Fibre2D&&) noexcept = delete;
-    ~Fibre2D() override = default;
-
-    int initialize(const shared_ptr<DomainBase>&) override;
 
     unique_ptr<Section> get_copy() override;
-
-    int update_trial_status(const vec&) override;
-
-    int clear_status() override;
-    int commit_status() override;
-    int reset_status() override;
-
-    void print() override;
 };
 
 #endif

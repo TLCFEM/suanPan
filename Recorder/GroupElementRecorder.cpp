@@ -22,7 +22,7 @@
 void GroupElementRecorder::update_tag(const shared_ptr<DomainBase>& D) {
     std::vector<uword> tag;
 
-    for(auto& I : groups) if(D->find<Group>(I)) for(auto& J : D->get<Group>(I)->get_pool()) tag.emplace_back(J);
+    for(const auto I : groups) if(D->find<Group>(I)) for(const auto J : D->get<Group>(I)->get_pool()) tag.emplace_back(J);
 
     set_object_tag(unique(uvec(tag)));
 

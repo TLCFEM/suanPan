@@ -24,7 +24,11 @@ B21H::IntegrationPoint::IntegrationPoint(const double C, const double W, unique_
     : coor(C)
     , weight(W)
     , b_section(std::forward<unique_ptr<Section>>(M))
-    , strain_mat(2, 3, fill::zeros) {}
+    , strain_mat(2, 3, fill::zeros) {
+    strain_mat(0, 0) = 1.;
+    strain_mat(1, 1) = 3. * coor - 1.;
+    strain_mat(1, 2) = 3. * coor + 1.;
+}
 
 B21H::B21H(const unsigned T, uvec&& N, const unsigned S, const double L, const bool F)
     : SectionElement2D(T, b_node, b_dof, std::forward<uvec>(N), uvec{S}, F)
@@ -56,23 +60,13 @@ int B21H::initialize(const shared_ptr<DomainBase>& D) {
     const auto& elastic_section_stiffness = section_proto->get_initial_stiffness();
     // elastic part will be reused in computation
     elastic_local_stiffness.zeros(3, 3);
-    for(auto& I : elastic_int_pt) {
-        I.strain_mat(0, 0) = 1.;
-        I.strain_mat(1, 1) = 3. * I.coor - 1.;
-        I.strain_mat(1, 2) = 3. * I.coor + 1.;
-        elastic_local_stiffness += I.strain_mat.t() * elastic_section_stiffness * I.strain_mat * I.weight / length;
-    }
+    for(auto& I : elastic_int_pt) elastic_local_stiffness += I.strain_mat.t() * elastic_section_stiffness * I.strain_mat * I.weight / length;
 
     auto local_stiffness = elastic_local_stiffness;
-    for(auto& I : int_pt) {
-        I.strain_mat(0, 0) = 1.;
-        I.strain_mat(1, 1) = 3. * I.coor - 1.;
-        I.strain_mat(1, 2) = 3. * I.coor + 1.;
-        local_stiffness += I.strain_mat.t() * I.b_section->get_initial_stiffness() * I.strain_mat * I.weight / length;
-    }
+    for(auto& I : int_pt) local_stiffness += I.strain_mat.t() * I.b_section->get_initial_stiffness() * I.strain_mat * I.weight / length;
     trial_stiffness = current_stiffness = initial_stiffness = b_trans->to_global_stiffness_mat(local_stiffness);
 
-    if(const auto linear_density = section_proto->get_parameter(ParameterType::LINEARDENSITY); linear_density > 0.) trial_mass = current_mass = initial_mass = b_trans->to_global_mass_mat(linear_density);
+    if(const auto linear_density = section_proto->get_linear_density(); linear_density > 0.) trial_mass = current_mass = initial_mass = b_trans->to_global_mass_mat(linear_density);
 
     return SUANPAN_SUCCESS;
 }
@@ -125,13 +119,13 @@ int B21H::reset_status() {
 }
 
 vector<vec> B21H::record(const OutputType P) {
-    vector<vec> output;
-    for(const auto& I : int_pt[0].b_section->record(P)) output.emplace_back(I);
-    for(const auto& I : int_pt[1].b_section->record(P)) output.emplace_back(I);
-    for(const auto& I : elastic_int_pt) for(const auto& J : I.b_section->record(P)) output.emplace_back(J);
-    for(const auto& I : int_pt[2].b_section->record(P)) output.emplace_back(I);
-    for(const auto& I : int_pt[3].b_section->record(P)) output.emplace_back(I);
-    return output;
+    vector<vec> data;
+    append_to(data, int_pt[0].b_section->record(P));
+    append_to(data, int_pt[1].b_section->record(P));
+    for(const auto& I : elastic_int_pt) append_to(data, I.b_section->record(P));
+    append_to(data, int_pt[2].b_section->record(P));
+    append_to(data, int_pt[3].b_section->record(P));
+    return data;
 }
 
 void B21H::print() {

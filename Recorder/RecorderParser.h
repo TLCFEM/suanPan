@@ -23,7 +23,6 @@
 class DomainBase;
 
 int create_new_recorder(const std::shared_ptr<DomainBase>&, std::istringstream&);
-int create_new_plainrecorder(const std::shared_ptr<DomainBase>&, std::istringstream&);
-int create_new_hdf5recorder(const std::shared_ptr<DomainBase>&, std::istringstream&);
+int create_new_recorder(const std::shared_ptr<DomainBase>&, std::istringstream&, bool);
 
 #endif

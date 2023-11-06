@@ -39,8 +39,10 @@ class SurfaceNM3D {
     [[nodiscard]] static vec differentiate(const mat&, uword, uword);
 
 public:
-    explicit SurfaceNM3D(double, // c
-                         mat&& = {});
+    explicit SurfaceNM3D(
+        double, // c
+        mat&& = {}
+    );
 
     [[nodiscard]] double compute_sf(const vec&, const vec&) const;
     [[nodiscard]] vec compute_dsf(const vec&, const vec&) const;

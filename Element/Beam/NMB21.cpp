@@ -34,7 +34,7 @@ int NMB21::initialize(const shared_ptr<DomainBase>& D) {
 
     trial_stiffness = current_stiffness = initial_stiffness = b_trans->to_global_stiffness_mat(b_section->get_initial_stiffness() / length);
 
-    if(const auto linear_density = b_section->get_parameter(ParameterType::LINEARDENSITY); linear_density > 0.) trial_mass = current_mass = initial_mass = b_trans->to_global_mass_mat(linear_density);
+    if(const auto linear_density = b_section->get_linear_density(); linear_density > 0.) trial_mass = current_mass = initial_mass = b_trans->to_global_mass_mat(linear_density);
 
     return SUANPAN_SUCCESS;
 }
@@ -68,7 +68,7 @@ int NMB21::reset_status() {
 }
 
 vector<vec> NMB21::record(const OutputType P) {
-    if(P == OutputType::BEAME) return {b_trans->to_local_vec(get_current_displacement())};
+    if(P == OutputType::BEAME) return {b_section->get_current_deformation() * length};
     if(P == OutputType::BEAMS) return {b_section->get_current_resistance()};
 
     return b_section->record(P);
@@ -76,7 +76,7 @@ vector<vec> NMB21::record(const OutputType P) {
 
 void NMB21::print() {
     suanpan_info("A planar beam element using N-M interaction section.\n");
-    b_section->print();
+    if(b_section) b_section->print();
 }
 
 #ifdef SUANPAN_VTK

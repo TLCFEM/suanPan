@@ -19,16 +19,12 @@
 #include <Toolbox/tensor.h>
 
 const double NonlinearHoffman::root_two_third = sqrt(2. / 3.);
-constexpr unsigned NonlinearHoffman::max_iteration = 20;
 const uword NonlinearHoffman::sa{0};
 const span NonlinearHoffman::sb{1, 6};
 
 NonlinearHoffman::NonlinearHoffman(const unsigned T, vec&& EE, vec&& VV, vec&& SS, const double R)
     : DataNonlinearHoffman{std::forward<vec>(EE), std::forward<vec>(VV), std::forward<vec>(SS)}
-    , Material3D(T, R) {
-    transform::hoffman_projection(yield_stress, proj_a, proj_b);
-    access::rw(tolerance) = 1E-13;
-}
+    , Material3D(T, R) { transform::hoffman_projection(yield_stress, proj_a, proj_b); }
 
 int NonlinearHoffman::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = tensor::orthotropic_stiffness(modulus, ratio);
@@ -40,15 +36,10 @@ int NonlinearHoffman::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double NonlinearHoffman::get_parameter(const ParameterType P) const {
-    if(ParameterType::DENSITY == P) return density;
-    return 0.;
-}
-
 int NonlinearHoffman::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
-    if(norm(incre_strain) <= tolerance) return SUANPAN_SUCCESS;
+    if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
 
     trial_history = current_history;
     auto& eqv_strain = trial_history(0);
@@ -78,7 +69,7 @@ int NonlinearHoffman::update_trial_status(const vec& t_strain) {
         const auto k = compute_k(eqv_strain = current_eqv_strain + gamma * norm_n_mid);
         const auto f = dot(trial_stress, factor_b) - k * k;
 
-        if(1u == counter && f < 0.) return SUANPAN_SUCCESS;
+        if(1u == counter && f <= 0.) return SUANPAN_SUCCESS;
 
         const rowvec dn = two_third / norm_n_mid * (n_mid % tensor::strain::norm_weight).t();
         const auto factor_c = k * compute_dk(eqv_strain);
@@ -93,11 +84,11 @@ int NonlinearHoffman::update_trial_status(const vec& t_strain) {
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
-        const auto error = norm(incre);
-        if(1u == counter && error > ref_error) ref_error = error;
-        suanpan_debug("Local plasticity iteration error: {:.5E}.\n", error / ref_error);
+        const auto error = inf_norm(incre);
+        if(1u == counter) ref_error = error;
+        suanpan_debug("Local plasticity iteration error: {:.5E}.\n", error);
 
-        if(error <= tolerance * std::max(1., ref_error)) {
+        if(error < tolerance * ref_error || (inf_norm(residual) < tolerance && counter > 5u)) {
             plastic_strain += gamma * n_mid;
 
             mat left, right(7, 6, fill::zeros);

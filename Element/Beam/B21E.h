@@ -32,8 +32,8 @@
 #include "B21.h"
 
 class B21E final : public B21 {
-    static const unsigned max_iteration;
-    static const double tolerance;
+    static constexpr unsigned max_iteration = 20u;
+    static constexpr double tolerance = 1E-14;
 
     const uvec a, b;
 
@@ -41,12 +41,13 @@ class B21E final : public B21 {
     vec current_rotation = zeros(a.n_elem);
 
 public:
-    B21E(unsigned,     // tag
-         unsigned,     // which
-         uvec&&,       // node tags
-         unsigned,     // section tag
-         unsigned = 6, // integration points
-         bool = false  // nonlinear geometry switch
+    B21E(
+        unsigned,     // tag
+        unsigned,     // which
+        uvec&&,       // node tags
+        unsigned,     // section tag
+        unsigned = 6, // integration points
+        bool = false  // nonlinear geometry switch
     );
 
     int update_status() override;

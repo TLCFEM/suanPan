@@ -27,7 +27,7 @@ CAX3::CAX3(const unsigned T, uvec&& NT, const unsigned MT, const bool R)
 int CAX3::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
-    if(PlaneType::A != static_cast<PlaneType>(material_proto->get_parameter(ParameterType::PLANETYPE))) {
+    if(PlaneType::A != material_proto->get_plane_type()) {
         suanpan_warning("Element {} is assigned with an inconsistent material.\n", get_tag());
         return SUANPAN_FAIL;
     }
@@ -84,7 +84,7 @@ int CAX3::clear_status() { return m_material->clear_status(); }
 
 int CAX3::reset_status() { return m_material->reset_status(); }
 
-vector<vec> CAX3::record(const OutputType T) { return m_material->record(T); }
+vector<vec> CAX3::record(const OutputType P) { return m_material->record(P); }
 
 void CAX3::print() {
     suanpan_info("CAX3 element connects:", node_encoding);

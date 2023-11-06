@@ -34,11 +34,10 @@
 #include <Step/Step.h>
 
 class Static : public Step {
-    const double time_step_amplification = 1.2;
-
 public:
-    explicit Static(unsigned = 0, // tag
-                    double = 1.   // step time period
+    explicit Static(
+        unsigned = 0, // tag
+        double = 1.   // step time period
     );
 
     int initialize() override;

@@ -49,6 +49,19 @@ void Domain::update_current_damping_force() const {
     factory->commit_damping_force();
 }
 
+void Domain::update_current_nonviscous_force() const {
+    factory->modify_trial_nonviscous_force().zeros();
+    if(color_map.empty()) for(const auto& I : element_pond.get()) factory->assemble_nonviscous_force(real(sum(I->get_current_nonviscous_force(), 1)), I->get_dof_encoding());
+    else
+        std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
+            suanpan::for_all(color, [&](const unsigned tag) {
+                const auto& I = get_element(tag);
+                factory->assemble_nonviscous_force(real(sum(I->get_current_nonviscous_force(), 1)), I->get_dof_encoding());
+            });
+        });
+    factory->commit_nonviscous_force();
+}
+
 void Domain::update_current_inertial_force() const {
     factory->modify_trial_inertial_force().zeros();
     if(color_map.empty()) for(const auto& I : element_pond.get()) factory->assemble_inertial_force(I->get_current_inertial_force(), I->get_dof_encoding());
@@ -94,6 +107,23 @@ void Domain::assemble_damping_force() const {
 
     // update to sync incre_damping_force
     factory->update_trial_damping_force(trial_damping_force);
+}
+
+void Domain::assemble_nonviscous_force() const {
+    auto& trial_nonviscous_force = factory->modify_trial_nonviscous_force().zeros();
+    if(color_map.empty()) for(const auto& I : element_pond.get()) factory->assemble_nonviscous_force(real(sum(I->get_trial_nonviscous_force(), 1)), I->get_dof_encoding());
+    else
+        std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
+            suanpan::for_all(color, [&](const unsigned tag) {
+                const auto& I = get_element(tag);
+                factory->assemble_nonviscous_force(real(sum(I->get_trial_nonviscous_force(), 1)), I->get_dof_encoding());
+            });
+        });
+
+    suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_nonviscous_force(trial_nonviscous_force(t_node->get_reordered_dof())); });
+
+    // update to sync incre_nonviscous_force
+    factory->update_trial_nonviscous_force(trial_nonviscous_force);
 }
 
 void Domain::assemble_inertial_force() const {
@@ -195,6 +225,51 @@ void Domain::assemble_trial_damping() const {
         });
 
     factory->get_damping()->csc_condense();
+}
+
+void Domain::assemble_initial_nonviscous() const {
+    if(!factory->is_nonviscous()) return;
+    factory->clear_nonviscous();
+    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_nonviscous(I->get_initial_nonviscous(), I->get_dof_encoding(), I->get_dof_mapping());
+    else
+        std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
+            suanpan::for_all(color, [&](const unsigned tag) {
+                const auto& I = get_element(tag);
+                factory->assemble_nonviscous(I->get_initial_nonviscous(), I->get_dof_encoding(), I->get_dof_mapping());
+            });
+        });
+
+    factory->get_nonviscous()->csc_condense();
+}
+
+void Domain::assemble_current_nonviscous() const {
+    if(!factory->is_nonviscous()) return;
+    factory->clear_nonviscous();
+    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_nonviscous(I->get_current_nonviscous(), I->get_dof_encoding(), I->get_dof_mapping());
+    else
+        std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
+            suanpan::for_all(color, [&](const unsigned tag) {
+                const auto& I = get_element(tag);
+                factory->assemble_nonviscous(I->get_current_nonviscous(), I->get_dof_encoding(), I->get_dof_mapping());
+            });
+        });
+
+    factory->get_nonviscous()->csc_condense();
+}
+
+void Domain::assemble_trial_nonviscous() const {
+    if(!factory->is_nonviscous()) return;
+    factory->clear_nonviscous();
+    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_nonviscous(I->get_trial_nonviscous(), I->get_dof_encoding(), I->get_dof_mapping());
+    else
+        std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
+            suanpan::for_all(color, [&](const unsigned tag) {
+                const auto& I = get_element(tag);
+                factory->assemble_nonviscous(I->get_trial_nonviscous(), I->get_dof_encoding(), I->get_dof_mapping());
+            });
+        });
+
+    factory->get_nonviscous()->csc_condense();
 }
 
 void Domain::assemble_initial_stiffness() const {

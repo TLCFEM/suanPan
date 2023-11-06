@@ -36,7 +36,7 @@ protected:
     void update_transformation() override;
 
 public:
-    explicit T3DC(unsigned = 0);
+    using T3DL::T3DL;
 
     [[nodiscard]] bool is_nlgeom() const override;
 

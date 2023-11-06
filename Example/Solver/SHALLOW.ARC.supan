@@ -51,21 +51,24 @@ fix 2 2 1 21
 recorder 1 hdf5 Node U 7
 # recorder 2 hdf5 Node RF1 7
 
-step arclength 1 7 2 -300
+refforce 1 0 -300 2 7
+
+step arclength 1
 set symm_mat false
 
 criterion MinDisplacement 1 7 2 -1.8
 
-converger RelIncreDisp 1 1E-4 4 1
+converger RelIncreDisp 1 1E-10 6 1
 
 analyze
 
 # Node 7:
-# 4.0223 0.8396
+# Coordinate:
+#   4.0223e+00  8.3955e-01
 # Displacement:
-# 0.0168 -1.8050 0.1679
+#   2.8077e-02 -1.8912e+00  1.5941e-01
 # Resistance:
-# -1.4197e-10 -1.8196e+02 -2.2510e-11
+#  -1.2903e-10 -4.1933e+02 -1.3188e-11
 peek node 7
 
 # save recorder 1

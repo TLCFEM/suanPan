@@ -117,6 +117,37 @@ void new_cload(unique_ptr<Load>& return_obj, istringstream& command, const bool 
     flag ? return_obj = make_unique<GroupNodalForce>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id) : return_obj = make_unique<NodalForce>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id);
 }
 
+void new_refload(unique_ptr<Load>& return_obj, istringstream& command) {
+    unsigned load_id;
+    if(!get_input(command, load_id)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    if(unsigned amplitude_id; !get_input(command, amplitude_id)) {
+        suanpan_error("A valid amplitude tag is required.\n");
+        return;
+    }
+
+    double magnitude;
+    if(!get_input(command, magnitude)) {
+        suanpan_error("A valid load magnitude is required.\n");
+        return;
+    }
+
+    unsigned dof_id;
+    if(!get_input(command, dof_id)) {
+        suanpan_error("A valid dof identifier is required.\n");
+        return;
+    }
+
+    unsigned node;
+    vector<uword> node_tag;
+    while(get_input(command, node)) node_tag.push_back(node);
+
+    return_obj = make_unique<ReferenceForce>(load_id, 0, magnitude, uvec(node_tag), dof_id);
+}
+
 void new_lineudl(unique_ptr<Load>& return_obj, istringstream& command, const unsigned dimension) {
     unsigned load_id;
     if(!get_input(command, load_id)) {
@@ -332,16 +363,17 @@ int create_new_load(const shared_ptr<DomainBase>& domain, istringstream& command
 
     if(is_equal(load_id, "Acceleration")) new_acceleration(new_load, command);
     else if(is_equal(load_id, "BodyForce")) new_bodyforce(new_load, command, false);
-    else if(is_equal(load_id, "GroupBodyForce")) new_bodyforce(new_load, command, true);
     else if(is_equal(load_id, "Cload")) new_cload(new_load, command, false);
+    else if(is_equal(load_id, "Disp") || is_equal(load_id, "Displacement") || is_equal(load_id, "DispLoad")) new_displacement(new_load, command, false);
+    else if(is_equal(load_id, "GroupBodyForce")) new_bodyforce(new_load, command, true);
     else if(is_equal(load_id, "GroupCload")) new_cload(new_load, command, true);
+    else if(is_equal(load_id, "GroupDisp") || is_equal(load_id, "GroupDisplacement") || is_equal(load_id, "GroupDispLoad")) new_displacement(new_load, command, true);
     else if(is_equal(load_id, "LineUDL2D")) new_lineudl(new_load, command, 2);
     else if(is_equal(load_id, "LineUDL3D")) new_lineudl(new_load, command, 3);
-    else if(is_equal(load_id, "Disp") || is_equal(load_id, "Displacement") || is_equal(load_id, "DispLoad")) new_displacement(new_load, command, false);
-    else if(is_equal(load_id, "GroupDisp") || is_equal(load_id, "GroupDisplacement") || is_equal(load_id, "GroupDispLoad")) new_displacement(new_load, command, true);
+    else if(is_equal(load_id, "ReferenceLoad") || is_equal(load_id, "RefLoad") || is_equal(load_id, "RefForce")) new_refload(new_load, command);
+    else if(is_equal(load_id, "SupportAcceleration")) new_supportmotion(new_load, command, 2);
     else if(is_equal(load_id, "SupportDisplacement")) new_supportmotion(new_load, command, 0);
     else if(is_equal(load_id, "SupportVelocity")) new_supportmotion(new_load, command, 1);
-    else if(is_equal(load_id, "SupportAcceleration")) new_supportmotion(new_load, command, 2);
     else load::object(new_load, domain, load_id, command);
 
     if(new_load != nullptr) new_load->set_start_step(domain->get_current_step_tag());

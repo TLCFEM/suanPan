@@ -118,8 +118,8 @@ template<sp_d data_t, sp_i index_t> class triplet_form final {
     }
 
 public:
-    typedef data_t data_type;
-    typedef index_t index_type;
+    using data_type = data_t;
+    using index_type = index_t;
 
     template<sp_d in_dt, sp_i in_it> friend class csc_form;
     template<sp_d in_dt, sp_i in_it> friend class csr_form;

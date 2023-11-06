@@ -13,8 +13,8 @@ mass 2 2 10 1
 
 fix 1 P 1
 
-hdf5recorder 1 Global MOMENTUMRZ
-hdf5recorder 2 Node MOMENTUMRZ 2
+hdf5recorder 1 Global MMR3
+hdf5recorder 2 Node MMR3 2
 
 amplitude Tabular 1 EZ
 # amplitude Decay 1 10 20

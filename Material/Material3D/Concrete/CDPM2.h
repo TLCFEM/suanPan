@@ -21,8 +21,8 @@
  * A 3D concrete material model that supports stiffness degradation.
  *
  * @author tlc
- * @date 04/08/2021
- * @version 1.0.0
+ * @date 17/10/2023
+ * @version 1.1.0
  * @file CDPM2.h
  * @addtogroup Material-3D
  * @{
@@ -37,7 +37,7 @@ struct DataCDPM2 {
     const double elastic_modulus = 3E4;
     const double poissons_ratio = .3;
     const double ft = 3.;
-    const double fc = 10.;
+    const double fc = 30.;
     const double qh0 = .3;
     const double hp = .01;
     const double df = .85;
@@ -46,10 +46,14 @@ struct DataCDPM2 {
     const double ch = 2.;
     const double dh = 1E-6;
     const double as = 5.;
-    const double eft = 2E-4;
-    const double efc = 1E-4;
+    const double eft = 5E-4;
+    const double efc = 5E-4;
 
-    const double e = 1.;
+    const double e = [&] {
+        const auto fbc = 1.16 * fc;
+        const auto factor = ft / fbc * (fbc + fc) * (fbc - fc) / (fc + ft) / (fc - ft);
+        return (1. + factor) / (2. - factor);
+    }();
     const double e0 = ft / elastic_modulus;
     const double ftfc = ft / fc;
     const double m0 = 3. * (fc / ft - ftfc) * e / (1. + e);
@@ -57,6 +61,10 @@ struct DataCDPM2 {
     const double sqrtdf = ft * sqrt(2. / (3. + 6. * df * df));
     const double eh = bh - dh;
     const double fh = ch * eh / (ah - bh);
+
+    const double ra = (1. + e) * (1. - e);
+    const double rb = pow(2. * e - 1., 2.);
+    const double rc = rb * e * (5. * e - 4.);
 };
 
 class CDPM2 final : protected DataCDPM2, public Material3D {
@@ -68,7 +76,7 @@ public:
     };
 
 private:
-    static constexpr unsigned max_iteration = 20;
+    static constexpr unsigned max_iteration = 20u;
     static const double sqrt_six;
     static const double sqrt_three_two;
     static const mat unit_dev_tensor;
@@ -78,28 +86,29 @@ private:
 
     const DamageType damage_type = DamageType::ANISOTROPIC;
 
-    void compute_plasticity(double, double, double, podarray<double>&) const;
-    int compute_damage(double, double, double, double, double, podarray<double>&);
-    int compute_damage_factor(double, double, double, double, double&, podarray<double>&) const;
+    void compute_plasticity(double, double, double, double, vec&) const;
+    int compute_damage(double, double, double, double, double, vec&);
+    int compute_damage_factor(double, double, double, double, double&, vec&) const;
 
 public:
-    CDPM2(unsigned,   // tag
-          double,     // elastic_modulus
-          double,     // poissons_ratio
-          double,     // ft
-          double,     // fc
-          double,     // qh0
-          double,     // hp
-          double,     // df
-          double,     // ah
-          double,     // bh
-          double,     // ch
-          double,     // dh
-          double,     // as
-          double,     // eft
-          double,     // efc
-          DamageType, // damage type
-          double      // density
+    CDPM2(
+        unsigned,   // tag
+        double,     // elastic_modulus
+        double,     // poissons_ratio
+        double,     // ft
+        double,     // fc
+        double,     // qh0
+        double,     // hp
+        double,     // df
+        double,     // ah
+        double,     // bh
+        double,     // ch
+        double,     // dh
+        double,     // as
+        double,     // eft
+        double,     // efc
+        DamageType, // damage type
+        double      // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

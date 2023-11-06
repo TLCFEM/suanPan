@@ -38,21 +38,22 @@ struct DataExpDP {
     const double cohesion, a, b;
 };
 
-class ExpDP final : DataExpDP, public NonlinearDruckerPrager {
+class ExpDP final : protected DataExpDP, public NonlinearDruckerPrager {
     [[nodiscard]] double compute_c(double) const override;
     [[nodiscard]] double compute_dc(double) const override;
 
 public:
-    ExpDP(unsigned,   // tag
-          double,     // elastic modulus
-          double,     // poisson's ratio
-          double,     // eta_yield
-          double,     // eta_flow
-          double,     // xi
-          double,     // cohesion
-          double,     // a
-          double,     // b
-          double = 0. // density
+    ExpDP(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // poisson's ratio
+        double,     // eta_yield
+        double,     // eta_flow
+        double,     // xi
+        double,     // cohesion
+        double,     // a
+        double,     // b
+        double = 0. // density
     );
 
     unique_ptr<Material> get_copy() override;

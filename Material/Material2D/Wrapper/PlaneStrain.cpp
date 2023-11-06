@@ -27,24 +27,21 @@ PlaneStrain::PlaneStrain(const unsigned T, const unsigned BT, const unsigned ST)
     , base_tag(BT) {}
 
 int PlaneStrain::initialize(const shared_ptr<DomainBase>& D) {
-    base = suanpan::initialized_material_copy(D, base_tag);
+    base = D->initialized_material_copy(base_tag);
 
     if(nullptr == base || base->get_material_type() != MaterialType::D3) {
         suanpan_error("A valid 3D host material is required.\n");
         return SUANPAN_FAIL;
     }
 
-    access::rw(density) = base->get_parameter(ParameterType::DENSITY);
+    access::rw(density) = base->get_density();
 
     current_stiffness = trial_stiffness = initial_stiffness = base->get_initial_stiffness()(F, F);
 
     return SUANPAN_SUCCESS;
 }
 
-double PlaneStrain::get_parameter(const ParameterType P) const {
-    if(ParameterType::PLANETYPE == P) return static_cast<double>(plane_type);
-    return base->get_parameter(P);
-}
+double PlaneStrain::get_parameter(const ParameterType P) const { return base->get_parameter(P); }
 
 unique_ptr<Material> PlaneStrain::get_copy() { return make_unique<PlaneStrain>(*this); }
 

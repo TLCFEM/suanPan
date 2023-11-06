@@ -12,4 +12,4 @@ target_sources(${PROJECT_NAME} PRIVATE
         Tabular.cpp
         TabularSpline.cpp
         NZStrongMotion.cpp
-        )
+)

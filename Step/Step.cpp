@@ -35,7 +35,7 @@ Step::Step(const unsigned T, const double P)
     , time_period(P) {}
 
 int Step::initialize() {
-    const auto& t_domain = database.lock();
+    const auto t_domain = database.lock();
 
     if(sparse_mat) {
         // LAPACK and SPIKE are for dense only
@@ -99,9 +99,8 @@ void Step::set_integrator(const shared_ptr<Integrator>& G) { modifier = G; }
 const shared_ptr<Integrator>& Step::get_integrator() const { return modifier; }
 
 void Step::set_time_period(const double T) {
-    if(fabs(time_period - T) < 1E-7) return;
-    time_period = T;
-    time_left = time_period;
+    if(suanpan::approx_equal(time_period, T)) return;
+    time_left = time_period = T;
     const auto t_iteration = static_cast<int>(floor(time_period / ini_step_size)) + 1;
     if(t_iteration <= static_cast<int>(max_substep) || 0 == max_substep) return;
     if(t_iteration > static_cast<int>(std::numeric_limits<unsigned>::max())) {
@@ -118,9 +117,13 @@ double Step::get_time_period() const { return time_period; }
 double Step::get_time_left() const { return time_left; }
 
 void Step::set_ini_step_size(const double T) {
-    if(fabs(ini_step_size - T) < 1E-12) return;
-    ini_step_size = T > time_period ? time_period : T;
-    if(const auto t_iteration = static_cast<int>(floor(time_period / ini_step_size)) + 1; t_iteration > static_cast<int>(max_substep) && max_substep != 0) set_max_substep(t_iteration);
+    if(suanpan::approx_equal(ini_step_size, T)) return;
+    if(time_period > 0.) {
+        // for time control
+        ini_step_size = T > time_period ? time_period : T;
+        if(const auto t_iteration = static_cast<int>(floor(time_period / ini_step_size)) + 1; t_iteration > static_cast<int>(max_substep) && max_substep != 0) set_max_substep(t_iteration);
+    }
+    else ini_step_size = fabs(T); // for arc-length control
 }
 
 void Step::set_min_step_size(const double T) { min_step_size = T; }

@@ -34,11 +34,12 @@ struct DataPolyElastic1D {
     const vec pool;
 };
 
-class PolyElastic1D final : DataPolyElastic1D, public Material1D {
+class PolyElastic1D final : protected DataPolyElastic1D, public Material1D {
 public:
-    PolyElastic1D(unsigned,   // tag
-                  vec&&,      // parameters
-                  double = 0. // density
+    PolyElastic1D(
+        unsigned,   // tag
+        vec&&,      // parameters
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

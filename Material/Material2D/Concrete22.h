@@ -40,19 +40,20 @@ class Concrete22 final : public Material2D {
     double shear_modulus = 0., shear_strain = 0.;
 
 public:
-    Concrete22(unsigned,   // tag
-               double,     // peak stress in negative
-               double,     // crack stress in positive
-               double,     // MC
-               double,     // NC
-               double,     // MT
-               double,     // NT
-               double,     // middle point
-               double,     // peak strain in negative
-               double,     // crack strain in positive
-               double,     // shear stress
-               double,     // shear retention
-               double = 0. // density
+    Concrete22(
+        unsigned,   // tag
+        double,     // peak stress in negative
+        double,     // crack stress in positive
+        double,     // MC
+        double,     // NC
+        double,     // MT
+        double,     // NT
+        double,     // middle point
+        double,     // peak strain in negative
+        double,     // crack strain in positive
+        double,     // shear stress
+        double,     // shear retention
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

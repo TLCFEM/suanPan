@@ -36,7 +36,7 @@ void new_bc(unique_ptr<Constraint>& return_obj, istringstream& command, const bo
 
     const auto bc_type = suanpan::to_lower(dof_id[0]);
 
-    if(!is_equal(bc_type, 'p') && !is_equal(bc_type, 'e') && !is_equal(bc_type, 'x') && !is_equal(bc_type, 'y') && !is_equal(bc_type, 'z') && !is_equal(bc_type, '1') && !is_equal(bc_type, '2') && !is_equal(bc_type, '3') && !is_equal(bc_type, '4') && !is_equal(bc_type, '5') && !is_equal(bc_type, '6')) {
+    if(!is_equal(bc_type, 'p') && !is_equal(bc_type, 'e') && !is_equal(bc_type, 'x') && !is_equal(bc_type, 'y') && !is_equal(bc_type, 'z') && !is_equal(bc_type, '1') && !is_equal(bc_type, '2') && !is_equal(bc_type, '3') && !is_equal(bc_type, '4') && !is_equal(bc_type, '5') && !is_equal(bc_type, '6') && !is_equal(bc_type, '7')) {
         suanpan_error("A valid dof identifier is required.\n");
         return;
     }
@@ -356,8 +356,7 @@ void new_rigidwall(unique_ptr<Constraint>& return_obj, istringstream& command, c
         if(penalty) return_obj = make_unique<RigidWallPenalty3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, vec{p[3], p[4], p[5]}, vec{p[6], p[7], p[8]}, p[9]);
         else return_obj = make_unique<RigidWallMultiplier3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, vec{p[3], p[4], p[5]}, vec{p[6], p[7], p[8]}, p[9]);
         break;
-    default:
-        suanpan_error("A valid number of parameters is required.\n");
+    default: suanpan_error("A valid number of parameters is required.\n");
     }
 }
 
@@ -413,8 +412,7 @@ void new_restitutionwall(unique_ptr<Constraint>& return_obj, istringstream& comm
         // 3D origin edge edge restitution multiplier
         return_obj = make_unique<RestitutionWallPenalty3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, vec{p[3], p[4], p[5]}, vec{p[6], p[7], p[8]}, p[9], p[10]);
         break;
-    default:
-        suanpan_error("A valid number of parameters is required.\n");
+    default: suanpan_error("A valid number of parameters is required.\n");
     }
 }
 
@@ -504,7 +502,7 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, istringstream& co
             return SUANPAN_SUCCESS;
         }
 
-        domain->insert(make_shared<MaxHistory>(tag, step_tag, to_list(type.c_str()), limit));
+        domain->insert(make_shared<MaxHistory>(tag, step_tag, to_token(type), limit));
 
         return SUANPAN_SUCCESS;
     }
@@ -546,31 +544,31 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, istringstream& c
 
     if(is_equal(constraint_id, "Embed2D")) new_embed(new_constraint, command, 2);
     else if(is_equal(constraint_id, "Embed3D")) new_embed(new_constraint, command, 3);
+    else if(is_equal(constraint_id, "FiniteRestitutionWall") || is_equal(constraint_id, "FiniteRestitutionWallPenalty")) new_restitutionwall(new_constraint, command, false);
+    else if(is_equal(constraint_id, "FiniteRigidWall") || is_equal(constraint_id, "FiniteRigidWallPenalty")) new_rigidwall(new_constraint, command, true, true);
+    else if(is_equal(constraint_id, "FiniteRigidWallMultiplier")) new_rigidwall(new_constraint, command, true, false);
+    else if(is_equal(constraint_id, "Fix") || is_equal(constraint_id, "PenaltyBC")) new_bc(new_constraint, command, true, false);
+    else if(is_equal(constraint_id, "Fix2") || is_equal(constraint_id, "MultiplierBC")) new_bc(new_constraint, command, false, false);
     else if(is_equal(constraint_id, "FixedLength2D") || is_equal(constraint_id, "R2D2")) new_fixedlength(new_constraint, command, 2);
     else if(is_equal(constraint_id, "FixedLength3D") || is_equal(constraint_id, "R3D2")) new_fixedlength(new_constraint, command, 3);
-    else if(is_equal(constraint_id, "MinimumGap2D") || is_equal(constraint_id, "MinGap2D")) new_minimumgap(new_constraint, command, 2);
-    else if(is_equal(constraint_id, "MinimumGap3D") || is_equal(constraint_id, "MinGap3D")) new_minimumgap(new_constraint, command, 3);
+    else if(is_equal(constraint_id, "GroupMultiplierBC")) new_bc(new_constraint, command, false, true);
+    else if(is_equal(constraint_id, "GroupPenaltyBC")) new_bc(new_constraint, command, true, true);
+    else if(is_equal(constraint_id, "LinearSpring2D")) new_linearspring(new_constraint, command, 2);
+    else if(is_equal(constraint_id, "LJPotential2D")) new_ljpotential(new_constraint, command, 2);
     else if(is_equal(constraint_id, "MaximumGap2D") || is_equal(constraint_id, "MaxGap2D")) new_maximumgap(new_constraint, command, 2);
     else if(is_equal(constraint_id, "MaximumGap3D") || is_equal(constraint_id, "MaxGap3D")) new_maximumgap(new_constraint, command, 3);
-    else if(is_equal(constraint_id, "Sleeve2D")) new_sleeve(new_constraint, command, 2);
-    else if(is_equal(constraint_id, "Sleeve3D")) new_sleeve(new_constraint, command, 3);
+    else if(is_equal(constraint_id, "MinimumGap2D") || is_equal(constraint_id, "MinGap2D")) new_minimumgap(new_constraint, command, 2);
+    else if(is_equal(constraint_id, "MinimumGap3D") || is_equal(constraint_id, "MinGap3D")) new_minimumgap(new_constraint, command, 3);
     else if(is_equal(constraint_id, "MPC")) new_mpc(new_constraint, command);
-    else if(is_equal(constraint_id, "NodeLine")) new_nodeline(new_constraint, command);
     else if(is_equal(constraint_id, "NodeFacet")) new_nodefacet(new_constraint, command);
+    else if(is_equal(constraint_id, "NodeLine")) new_nodeline(new_constraint, command);
     else if(is_equal(constraint_id, "ParticleCollision2D")) new_particlecollision(new_constraint, command, 2);
     else if(is_equal(constraint_id, "ParticleCollision3D")) new_particlecollision(new_constraint, command, 3);
-    else if(is_equal(constraint_id, "LJPotential2D")) new_ljpotential(new_constraint, command, 2);
-    else if(is_equal(constraint_id, "LinearSpring2D")) new_linearspring(new_constraint, command, 2);
-    else if(is_equal(constraint_id, "RigidWallMultiplier")) new_rigidwall(new_constraint, command, false, false);
-    else if(is_equal(constraint_id, "RigidWall") || is_equal(constraint_id, "RigidWallPenalty")) new_rigidwall(new_constraint, command, false, true);
-    else if(is_equal(constraint_id, "FiniteRigidWallMultiplier")) new_rigidwall(new_constraint, command, true, false);
-    else if(is_equal(constraint_id, "FiniteRigidWall") || is_equal(constraint_id, "FiniteRigidWallPenalty")) new_rigidwall(new_constraint, command, true, true);
     else if(is_equal(constraint_id, "RestitutionWall") || is_equal(constraint_id, "RestitutionWallPenalty")) new_restitutionwall(new_constraint, command, false);
-    else if(is_equal(constraint_id, "FiniteRestitutionWall") || is_equal(constraint_id, "FiniteRestitutionWallPenalty")) new_restitutionwall(new_constraint, command, false);
-    else if(is_equal(constraint_id, "Fix") || is_equal(constraint_id, "PenaltyBC")) new_bc(new_constraint, command, true, false);
-    else if(is_equal(constraint_id, "GroupPenaltyBC")) new_bc(new_constraint, command, true, true);
-    else if(is_equal(constraint_id, "Fix2") || is_equal(constraint_id, "MultiplierBC")) new_bc(new_constraint, command, false, false);
-    else if(is_equal(constraint_id, "GroupMultiplierBC")) new_bc(new_constraint, command, false, true);
+    else if(is_equal(constraint_id, "RigidWall") || is_equal(constraint_id, "RigidWallPenalty")) new_rigidwall(new_constraint, command, false, true);
+    else if(is_equal(constraint_id, "RigidWallMultiplier")) new_rigidwall(new_constraint, command, false, false);
+    else if(is_equal(constraint_id, "Sleeve2D")) new_sleeve(new_constraint, command, 2);
+    else if(is_equal(constraint_id, "Sleeve3D")) new_sleeve(new_constraint, command, 3);
     else load::object(new_constraint, domain, constraint_id, command);
 
     if(new_constraint != nullptr) new_constraint->set_start_step(domain->get_current_step_tag());

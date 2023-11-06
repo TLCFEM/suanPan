@@ -53,7 +53,8 @@ protected:
     unique_ptr<Orientation> b_trans;
 
 public:
-    B21(unsigned,     // tag
+    B21(
+        unsigned,     // tag
         uvec&&,       // node tags
         unsigned,     // section tag
         unsigned = 6, // integration points

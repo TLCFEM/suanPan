@@ -21,7 +21,7 @@
  * @date 13/10/2017
  * @version 0.1.0
  * @file Rectangle3D.h
- * @addtogroup Section-2D
+ * @addtogroup Section-3D
  * @ingroup Section
  * @{
  */
@@ -37,13 +37,14 @@ class Rectangle3D final : public Section3D {
     const unsigned int_pt_num;
 
 public:
-    Rectangle3D(unsigned,     // tag
-                double,       // width
-                double,       // height
-                unsigned,     // material tag
-                unsigned = 6, // number of integration points
-                double = 0.,  // eccentricity
-                double = 0.   // eccentricity
+    Rectangle3D(
+        unsigned,     // tag
+        double,       // width
+        double,       // height
+        unsigned,     // material tag
+        unsigned = 6, // number of integration points
+        double = 0.,  // eccentricity
+        double = 0.   // eccentricity
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

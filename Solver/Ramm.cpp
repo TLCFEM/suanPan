@@ -21,17 +21,12 @@
 #include <Domain/Factory.hpp>
 #include <Solver/Integrator/Integrator.h>
 
-Ramm::Ramm(const unsigned T, const double L, const bool F)
-    : Solver(T)
-    , arc_length(L)
-    , fixed_arc_length(F) {}
-
 int Ramm::analyze() {
     auto& C = get_converger();
     auto& G = get_integrator();
     auto& W = G->get_domain()->get_factory();
 
-    suanpan_highlight(">> Current Load Level: {:+.5f}.\n", W->get_trial_load_factor().at(0));
+    suanpan_highlight(">> Current Load Level: {:+.5f}; Arc Length {:.3e}.\n", W->get_trial_load_factor().at(0), arc_length);
 
     const auto max_iteration = C->get_max_iteration();
 
@@ -40,9 +35,11 @@ int Ramm::analyze() {
     vec samurai, disp_a, disp_ref;
 
     // iteration counter
-    unsigned counter = 0;
+    auto counter = 0u;
 
     while(true) {
+        set_step_amplifier(sqrt(max_iteration / (counter + 1.)));
+
         // update for nodes and elements
         if(SUANPAN_SUCCESS != G->update_trial_status()) return SUANPAN_FAIL;
         // process modifiers
@@ -88,15 +85,9 @@ int Ramm::analyze() {
         G->erase_machine_error(samurai);
 
         // exit if converged
-        if(C->is_converged(counter)) {
-            if(!fixed_arc_length) arc_length *= sqrt(max_iteration / static_cast<double>(counter));
-            return SUANPAN_SUCCESS;
-        }
+        if(C->is_converged(counter)) return SUANPAN_SUCCESS;
         // exit if maximum iteration is hit
-        if(++counter > max_iteration) {
-            if(!fixed_arc_length) arc_length *= .5;
-            return SUANPAN_FAIL;
-        }
+        if(++counter > max_iteration) return SUANPAN_FAIL;
 
         // update trial displacement
         G->update_from_ninja();
@@ -110,6 +101,8 @@ int Ramm::analyze() {
         G->update_constraint();
     }
 }
+
+void Ramm::set_step_size(const double S) { arc_length = S; }
 
 void Ramm::print() {
     suanpan_info("A solver using Ramm's arc length method.\n");

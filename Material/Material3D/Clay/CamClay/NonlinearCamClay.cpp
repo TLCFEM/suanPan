@@ -33,14 +33,7 @@ int NonlinearCamClay::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double NonlinearCamClay::get_parameter(const ParameterType P) const {
-    if(ParameterType::DENSITY == P) return density;
-    if(ParameterType::ELASTICMODULUS == P || ParameterType::YOUNGSMODULUS == P || ParameterType::E == P) return elastic_modulus;
-    if(ParameterType::SHEARMODULUS == P || ParameterType::G == P) return elastic_modulus / (2. + 2. * poissons_ratio);
-    if(ParameterType::BULKMODULUS == P) return elastic_modulus / (3. - 6. * poissons_ratio);
-    if(ParameterType::POISSONSRATIO == P) return poissons_ratio;
-    return 0.;
-}
+double NonlinearCamClay::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
 
 int NonlinearCamClay::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
@@ -57,12 +50,13 @@ int NonlinearCamClay::update_trial_status(const vec& t_strain) {
     const auto trial_q = sqrt_three_two * tensor::stress::norm(trial_s);
     const auto p = tensor::mean3(trial_stress);
 
-    auto gamma = 0., rel_error = 0.;
+    auto ini_f = 0., gamma = 0.;
 
     vec residual(2), incre;
     mat jacobian(2, 2);
 
-    unsigned counter = 0;
+    auto counter = 0u;
+    auto rel_error = 1.;
     while(true) {
         if(max_iteration == ++counter) {
             suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
@@ -80,7 +74,10 @@ int NonlinearCamClay::update_trial_status(const vec& t_strain) {
 
         residual(0) = rel_p * rel_p / square_b + square_qm - a * a;
 
-        if(1u == counter && residual(0) < 0.) return SUANPAN_SUCCESS;
+        if(1u == counter) {
+            if(residual(0) < 0.) return SUANPAN_SUCCESS;
+            ini_f = std::max(1., residual(0)); // yield function can be very large, use relative error instead
+        }
 
         residual(1) = incre_alpha - 2. * gamma / square_b * rel_p;
 
@@ -91,10 +88,10 @@ int NonlinearCamClay::update_trial_status(const vec& t_strain) {
 
         if(!solve(incre, jacobian, residual, solve_opts::equilibrate)) return SUANPAN_FAIL;
 
-        auto error = norm(residual);
-        if(1u == counter) rel_error = std::max(1., error);
-        suanpan_debug("Local iteration error: {:.5E}.\n", error /= rel_error);
-        if(error <= tolerance || norm(incre) <= tolerance) {
+        const auto error = inf_norm(incre);
+        if(1u == counter) rel_error = error;
+        suanpan_debug("Local iteration error: {:.5E}.\n", error);
+        if(error < tolerance * rel_error || (inf_norm(residual) < tolerance * ini_f && counter > 5u)) {
             mat left(6, 2);
 
             rel_error = 2. * bulk / square_b; // reuse variable
@@ -136,8 +133,4 @@ int NonlinearCamClay::reset_status() {
     trial_history = current_history;
     trial_stiffness = current_stiffness;
     return SUANPAN_SUCCESS;
-}
-
-void NonlinearCamClay::print() {
-    suanpan_info("A 3D nonlinear modified Cam-Clay model.\n");
 }

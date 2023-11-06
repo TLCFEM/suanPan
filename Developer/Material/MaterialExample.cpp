@@ -144,7 +144,7 @@ int MaterialExample::update_trial_status(const vec& t_strain) {
     trial_strain = t_strain;
     incre_strain = trial_strain - current_strain;
 
-    if(fabs(incre_strain(0)) <= tolerance) return 0;
+    if(fabs(incre_strain(0)) <= datum::eps) return 0;
 
     trial_back_stress = current_back_stress;
     trial_plastic_strain = current_plastic_strain;

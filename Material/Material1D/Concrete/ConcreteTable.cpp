@@ -105,8 +105,7 @@ int ConcreteTable::initialize(const shared_ptr<DomainBase>&) {
 }
 
 double ConcreteTable::get_parameter(const ParameterType P) const {
-    if(ParameterType::DENSITY == P) return density;
-    if(ParameterType::ELASTICMODULUS == P || ParameterType::YOUNGSMODULUS == P || ParameterType::E == P) return initial_stiffness(0);
+    if(ParameterType::ELASTICMODULUS == P) return initial_stiffness(0);
     if(ParameterType::PEAKSTRAIN == P) return compute_compression_initial_reverse()(0);
     if(ParameterType::CRACKSTRAIN == P) return compute_tension_initial_reverse()(0);
     return 0.;

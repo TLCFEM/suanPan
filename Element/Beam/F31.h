@@ -19,8 +19,8 @@
  * @brief The F31 class.
  *
  * Reference:
- *   1. https://doi.org/10.1016/0045-7949(95)00103-N
- *   2. https://doi.org/10.1061/(ASCE)0733-9445(1997)123:7(958)
+ *   1. [https://doi.org/10.1016/0045-7949(95)00103-N]
+ *   2. [https://doi.org/10.1061/(ASCE)0733-9445(1997)123:7(958)]
  *
  * @author tlc
  * @date 12/05/2022
@@ -35,13 +35,13 @@
 #define F31_H
 
 #include <Element/SectionElement.h>
-#include <Element/Utility/B2DC.h>
+#include <Element/Utility/Orientation.h>
 
 class F31 final : public SectionElement3D {
     struct IntegrationPoint final {
         double coor, weight;
         unique_ptr<Section> b_section;
-        mat strain_mat;
+        mat strain_mat; // axial strain, curvature about the z-axis (major), curvature about the y-axis (minor)
         IntegrationPoint(double, double, unique_ptr<Section>&&);
     };
 
@@ -63,7 +63,8 @@ class F31 final : public SectionElement3D {
     vec current_local_resistance, trial_local_resistance;
 
 public:
-    F31(unsigned,     // tag
+    F31(
+        unsigned,     // tag
         uvec&&,       // node tag
         unsigned,     // section tag
         unsigned,     // orientation tag

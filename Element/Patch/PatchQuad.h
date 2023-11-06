@@ -53,12 +53,13 @@ class PatchQuad final : public MaterialPatch2D {
     vector<IntegrationPoint> int_pt;
 
 public:
-    PatchQuad(unsigned,   // tag
-              vec&&,      // knot x
-              vec&&,      // knot y
-              uvec&&,     // node tag
-              unsigned,   // material tag
-              double = 1. // thickness
+    PatchQuad(
+        unsigned,   // tag
+        vec&&,      // knot x
+        vec&&,      // knot y
+        uvec&&,     // node tag
+        unsigned,   // material tag
+        double = 1. // thickness
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

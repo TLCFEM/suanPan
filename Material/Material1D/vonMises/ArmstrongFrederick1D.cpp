@@ -20,7 +20,7 @@
 
 ArmstrongFrederick1D::ArmstrongFrederick1D(const unsigned T, const double E, const double Y, const double S, const double H, const double M, vec&& A, vec&& B, const double R)
     : DataArmstrongFrederick1D{E, Y, S, H, M, std::forward<vec>(A), std::forward<vec>(B)}
-    , Material1D(T, R) { access::rw(tolerance) = 1E-15; }
+    , Material1D(T, R) {}
 
 int ArmstrongFrederick1D::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = elastic_modulus;
@@ -33,15 +33,14 @@ int ArmstrongFrederick1D::initialize(const shared_ptr<DomainBase>&) {
 unique_ptr<Material> ArmstrongFrederick1D::get_copy() { return make_unique<ArmstrongFrederick1D>(*this); }
 
 double ArmstrongFrederick1D::get_parameter(const ParameterType P) const {
-    if(ParameterType::DENSITY == P) return density;
-    if(ParameterType::ELASTICMODULUS == P || ParameterType::YOUNGSMODULUS == P || ParameterType::E == P) return elastic_modulus;
+    if(ParameterType::ELASTICMODULUS == P) return elastic_modulus;
     return 0.;
 }
 
 int ArmstrongFrederick1D::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
-    if(norm(incre_strain) <= tolerance) return SUANPAN_SUCCESS;
+    if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
 
     trial_stress = current_stress + (trial_stiffness = initial_stiffness) * incre_strain;
 
@@ -55,7 +54,8 @@ int ArmstrongFrederick1D::update_trial_status(const vec& t_strain) {
     auto gamma = 0.;
     double xi, jacobian;
 
-    unsigned counter = 0;
+    auto counter = 0u;
+    auto ref_error = 1.;
     while(true) {
         if(max_iteration == ++counter) {
             suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
@@ -69,7 +69,7 @@ int ArmstrongFrederick1D::update_trial_status(const vec& t_strain) {
         if(k < 0.) k = dk = 0.;
 
         auto sum_a = 0., sum_b = 0.;
-        for(unsigned I = 0; I < size; ++I) {
+        for(auto I = 0u; I < size; ++I) {
             const auto denom = 1. + b(I) * gamma;
             sum_a += trial_history(I) / denom;
             sum_b += a(I) / denom;
@@ -79,24 +79,26 @@ int ArmstrongFrederick1D::update_trial_status(const vec& t_strain) {
 
         jacobian = -elastic_modulus - dk;
 
-        if(xi > 0.) for(unsigned I = 0; I < size; ++I) jacobian += (b(I) * trial_history(I) - a(I)) * pow(1. + b(I) * gamma, -2.);
-        else for(unsigned I = 0; I < size; ++I) jacobian -= (b(I) * trial_history(I) + a(I)) * pow(1. + b(I) * gamma, -2.);
+        if(xi > 0.) for(auto I = 0u; I < size; ++I) jacobian += (b(I) * trial_history(I) - a(I)) * pow(1. + b(I) * gamma, -2.);
+        else for(auto I = 0u; I < size; ++I) jacobian -= (b(I) * trial_history(I) + a(I)) * pow(1. + b(I) * gamma, -2.);
 
         const auto incre = yield_func / jacobian;
-        suanpan_debug("Local iteration error: {:.5E}.\n", fabs(incre));
-        if(fabs(incre) <= tolerance) break;
+        const auto error = fabs(incre);
+        if(1u == counter) ref_error = error;
+        suanpan_debug("Local iteration error: {:.5E}.\n", error);
+        if(error < tolerance * ref_error || ((fabs(yield_func) < tolerance || error < datum::eps) && counter > 5u)) break;
 
         gamma -= incre;
         p -= incre;
     }
 
     if(xi > 0.) {
-        for(unsigned I = 0; I < size; ++I) trial_history(I) = (trial_history(I) + a(I) * gamma) / (1. + b(I) * gamma);
+        for(auto I = 0u; I < size; ++I) trial_history(I) = (trial_history(I) + a(I) * gamma) / (1. + b(I) * gamma);
 
         trial_stress -= elastic_modulus * gamma;
     }
     else {
-        for(unsigned I = 0; I < size; ++I) trial_history(I) = (trial_history(I) - a(I) * gamma) / (1. + b(I) * gamma);
+        for(auto I = 0u; I < size; ++I) trial_history(I) = (trial_history(I) - a(I) * gamma) / (1. + b(I) * gamma);
 
         trial_stress += elastic_modulus * gamma;
     }
@@ -128,12 +130,6 @@ int ArmstrongFrederick1D::reset_status() {
     trial_history = current_history;
     trial_stiffness = current_stiffness;
     return SUANPAN_SUCCESS;
-}
-
-vector<vec> ArmstrongFrederick1D::record(const OutputType P) {
-    if(P == OutputType::PEEQ) return {vec{current_history(size)}};
-
-    return Material1D::record(P);
 }
 
 void ArmstrongFrederick1D::print() {

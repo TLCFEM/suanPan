@@ -3,8 +3,21 @@
 ## known issues
 
 1. The `MKL` includes outdated `FEAST`, the external names in `FEAST` library are modified to avoid linking error.
-2. The `SPIKE` solver may occasionally hang, to circumvent, try to avoid mixing compilers from different vendors.
+2. The `SPIKE` solver may occasionally freeze, to circumvent, try to avoid mixing compilers from different vendors.
 3. The `MUMPS` solver throws segfaults with large matrices.
+
+## version 3.2
+
+1. revise uniaxial universal damage models [#153](https://github.com/TLCFEM/suanPan/pull/153)
+2. update `OpenBLAS` to version `0.3.24`
+3. add a new uniaxial concrete model `ConcreteK4` [#155](https://github.com/TLCFEM/suanPan/pull/155)
+4. add beam element for arbitrary thin-/thick-walled open/close section with torsion and warping `B31OS` [#159](https://github.com/TLCFEM/suanPan/pull/159)
+5. better local iteration convergence criterion [#161](https://github.com/TLCFEM/suanPan/pull/161)
+6. `B31OS` and `EB31OS` associated transformations `B3DOSL`, `B3DOSC`; sections, `Fibre3DOS`, `Cell3DOS`; material wrappers `OS146`, `OS146S`
+7. add elemental damping using Lee's model
+8. support Lode angle in CDPM2 [#163](https://github.com/TLCFEM/suanPan/pull/163)
+9. add `AICN` cubic Newton solver [#165](https://github.com/TLCFEM/suanPan/pull/165)
+10. remove `Bilinear2D` material, use `PlaneStress`/`PlaneStrain` wrapper and `BilinearJ2` 3D model instead
 
 ## version 3.1
 
@@ -27,7 +40,7 @@
 
 ## version 2.9
 
-1. matrix optimsation
+1. matrix optimisation
 2. update `Catch2` to version `3.3.1`
 3. update `TBB` to version `2021.8.0`
 4. add mixed precision algorithm for `MUMPS` solver [#119](https://github.com/TLCFEM/suanPan/pull/119)

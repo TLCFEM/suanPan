@@ -43,14 +43,15 @@ class Damper02 final : public MaterialElement1D {
     unique_ptr<Material> device;
 
 public:
-    Damper02(unsigned, // tag
-             uvec&&,   // node tag
-             unsigned, // damper tag
-             unsigned, // spring tag
-             bool,     // if to use matrix formulation
-             unsigned, // if proceed when fail to converge
-             double,   // beta
-             unsigned  // dimension
+    Damper02(
+        unsigned, // tag
+        uvec&&,   // node tag
+        unsigned, // damper tag
+        unsigned, // spring tag
+        bool,     // if to use matrix formulation
+        unsigned, // if proceed when fail to converge
+        double,   // beta
+        unsigned  // dimension
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

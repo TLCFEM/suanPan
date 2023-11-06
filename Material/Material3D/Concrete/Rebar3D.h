@@ -41,14 +41,15 @@ class Rebar3D final : public Material3D {
     ResourceHolder<Material> rebar_x, rebar_y, rebar_z;
 
 public:
-    Rebar3D(unsigned,   // tag
-            unsigned,   // material tag along x axis
-            unsigned,   // material tag along y axis
-            unsigned,   // material tag along z axis
-            double,     // reinforcement ratio along x axis
-            double,     // reinforcement ratio along y axis
-            double,     // reinforcement ratio along z axis
-            double = 0. // inclination
+    Rebar3D(
+        unsigned,   // tag
+        unsigned,   // material tag along x axis
+        unsigned,   // material tag along y axis
+        unsigned,   // material tag along z axis
+        double,     // reinforcement ratio along x axis
+        double,     // reinforcement ratio along y axis
+        double,     // reinforcement ratio along z axis
+        double = 0. // inclination
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

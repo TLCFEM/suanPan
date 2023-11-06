@@ -38,6 +38,10 @@ int Solver::initialize() {
     return SUANPAN_SUCCESS;
 }
 
+void Solver::set_step_amplifier(const double S) { step_amplifier = std::max(1., S); }
+
+double Solver::get_step_amplifier() const { return step_amplifier; }
+
 void Solver::set_converger(const shared_ptr<Converger>& C) { converger = C; }
 
 const shared_ptr<Converger>& Solver::get_converger() const { return converger; }

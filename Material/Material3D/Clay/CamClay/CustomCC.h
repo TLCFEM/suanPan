@@ -42,14 +42,15 @@ class CustomCC final : public NonlinearCamClay {
     ResourceHolder<Expression> a_expression;
 
 public:
-    CustomCC(unsigned,   // tag
-             double,     // elastic modulus
-             double,     // poisson's ratio
-             double,     // beta
-             double,     // m
-             double,     // pt
-             unsigned,   // expression tag
-             double = 0. // density
+    CustomCC(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // poisson's ratio
+        double,     // beta
+        double,     // m
+        double,     // pt
+        unsigned,   // expression tag
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

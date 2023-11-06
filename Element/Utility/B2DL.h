@@ -39,8 +39,9 @@ protected:
     void update_transformation() override;
 
 public:
-    explicit B2DL(unsigned = 0, double = 0., double = 0., double = 1.);
-    B2DL(unsigned, vec&&);
+    using Orientation::Orientation;
+
+    [[nodiscard]] OrientationType get_orientation_type() const override;
 
     unique_ptr<Orientation> get_copy() override;
 

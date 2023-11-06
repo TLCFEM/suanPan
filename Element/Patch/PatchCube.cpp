@@ -21,7 +21,6 @@
 #include <Material/Material3D/Material3D.h>
 #include <Recorder/OutputType.h>
 #include <Toolbox/IntegrationPlan.h>
-#include <Toolbox/tensor.h>
 
 PatchCube::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M)
     : coor(std::forward<vec>(C))
@@ -47,7 +46,7 @@ int PatchCube::initialize(const shared_ptr<DomainBase>& D) {
 
     auto& ini_stiffness = material_proto->get_initial_stiffness();
 
-    const auto t_density = material_proto->get_parameter(ParameterType::DENSITY);
+    const auto t_density = material_proto->get_density();
 
     const IntegrationPlan plan(3, 2, IntegrationType::GAUSS);
 
@@ -142,9 +141,9 @@ int PatchCube::reset_status() {
     return code;
 }
 
-vector<vec> PatchCube::record(const OutputType T) {
+vector<vec> PatchCube::record(const OutputType P) {
     vector<vec> data;
-    for(const auto& I : int_pt) for(const auto& J : I.c_material->record(T)) data.emplace_back(J);
+    for(const auto& I : int_pt) append_to(data, I.c_material->record(P));
     return data;
 }
 

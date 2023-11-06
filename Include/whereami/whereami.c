@@ -128,11 +128,9 @@ static int WAI_PREFIX(getModulePath_)(HMODULE module, char* out, int capacity, i
     return ok ? length : -1;
 }
 
-WAI_NOINLINE WAI_FUNCSPEC
-int WAI_PREFIX(getExecutablePath)(char* out, int capacity, int* dirname_length) { return WAI_PREFIX(getModulePath_)(NULL, out, capacity, dirname_length); }
+WAI_NOINLINE WAI_FUNCSPEC int WAI_PREFIX(getExecutablePath)(char* out, int capacity, int* dirname_length) { return WAI_PREFIX(getModulePath_)(NULL, out, capacity, dirname_length); }
 
-WAI_NOINLINE WAI_FUNCSPEC
-int WAI_PREFIX(getModulePath)(char* out, int capacity, int* dirname_length) {
+WAI_NOINLINE WAI_FUNCSPEC int WAI_PREFIX(getModulePath)(char* out, int capacity, int* dirname_length) {
     HMODULE module;
     int length = -1;
 

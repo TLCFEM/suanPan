@@ -49,11 +49,11 @@ int Mindlin::initialize(const shared_ptr<DomainBase>& D) {
 
     auto& mat_stiff = mat_proto->get_initial_stiffness();
 
-    auto shear_modulus = mat_proto->get_parameter(ParameterType::G);
-    if(suanpan::approx_equal(0., shear_modulus)) shear_modulus = mat_proto->get_parameter(ParameterType::SHEARMODULUS);
-    if(suanpan::approx_equal(0., shear_modulus)) shear_modulus = .5 * mat_proto->get_parameter(ParameterType::E) / (1. + mat_proto->get_parameter(ParameterType::POISSONSRATIO));
-    if(suanpan::approx_equal(0., shear_modulus)) shear_modulus = mat_stiff.at(2, 2);
-    if(suanpan::approx_equal(0., shear_modulus)) shear_modulus = mat_proto->get_parameter(ParameterType::E);
+    const auto shear_modulus = mat_proto->get_parameter(ParameterType::SHEARMODULUS);
+    if(suanpan::approx_equal(shear_modulus, 0.)) {
+        suanpan_error("A zero shear modulus is detected.\n");
+        return SUANPAN_FAIL;
+    }
 
     // reduced integration for the Kirchhoff constraint
     vec t_vec(2, fill::zeros);
@@ -62,10 +62,10 @@ int Mindlin::initialize(const shared_ptr<DomainBase>& D) {
     mat jacob = pn * ele_coor;
     mat pn_pxy = solve(jacob, pn);
     mat penalty_mat(2, p_size, fill::zeros);
-    for(uword I = 0; I < p_node; ++I) {
+    for(auto I = 0u; I < p_node; ++I) {
         penalty_mat(0, I * p_dof) = pn_pxy(1, I);
         penalty_mat(1, I * p_dof) = pn_pxy(0, I);
-        penalty_mat(0, I * p_dof + 1llu) = -(penalty_mat(1, I * p_dof + 2llu) = n(I));
+        penalty_mat(0, I * p_dof + 1u) = -(penalty_mat(1, I * p_dof + 2u) = n(I));
     }
     initial_stiffness = penalty_stiffness = 10. / 3. * shear_modulus * thickness * det(jacob) * penalty_mat.t() * penalty_mat;
 
@@ -139,7 +139,7 @@ int Mindlin::reset_status() {
 
 vector<vec> Mindlin::record(const OutputType P) {
     vector<vec> data;
-    for(const auto& I : int_pt) for(const auto& J : I.sec_int_pt) for(const auto& K : J.p_material->record(P)) data.emplace_back(K);
+    for(const auto& I : int_pt) for(const auto& J : I.sec_int_pt) append_to(data, J.p_material->record(P));
     return data;
 }
 

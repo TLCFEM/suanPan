@@ -322,8 +322,7 @@ int ConcreteCM::initialize(const shared_ptr<DomainBase>&) {
 unique_ptr<Material> ConcreteCM::get_copy() { return make_unique<ConcreteCM>(*this); }
 
 double ConcreteCM::get_parameter(const ParameterType P) const {
-    if(ParameterType::DENSITY == P) return density;
-    if(ParameterType::ELASTICMODULUS == P || ParameterType::YOUNGSMODULUS == P || ParameterType::E == P) return initial_stiffness(0);
+    if(ParameterType::ELASTICMODULUS == P) return elastic_modulus;
     if(ParameterType::PEAKSTRAIN == P) return c_strain;
     if(ParameterType::CRACKSTRAIN == P) return t_strain;
     return 0.;
@@ -332,7 +331,7 @@ double ConcreteCM::get_parameter(const ParameterType P) const {
 int ConcreteCM::update_trial_status(const vec& n_strain) {
     incre_strain = (trial_strain = n_strain) - current_strain;
 
-    if(fabs(incre_strain(0)) <= 1E-15) return SUANPAN_SUCCESS;
+    if(fabs(incre_strain(0)) <= datum::eps) return SUANPAN_SUCCESS;
 
     trial_load_status = current_load_status;
     trial_history = current_history;

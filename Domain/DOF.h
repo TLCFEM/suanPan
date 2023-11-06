@@ -44,7 +44,9 @@ enum class DOF : unsigned short {
     //damage
     P,
     // pressure
-    T // temperature
+    T,
+    // temperature
+    WARP // warping
 };
 
 #endif // DOF_H

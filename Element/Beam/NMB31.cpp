@@ -37,6 +37,10 @@ int NMB31::initialize(const shared_ptr<DomainBase>& D) {
         suanpan_warning("Element {} is assigned with an inconsistent transformation {}.\n", get_tag(), orientation_tag);
         return SUANPAN_FAIL;
     }
+    if(OrientationType::B3D != b_trans->get_orientation_type()) {
+        suanpan_warning("Element {} is assigned with an inconsistent transformation {}, use B3DL or B3DC only.\n", get_tag(), orientation_tag);
+        return SUANPAN_FAIL;
+    }
 
     b_trans->set_element_ptr(this);
 
@@ -46,7 +50,7 @@ int NMB31::initialize(const shared_ptr<DomainBase>& D) {
 
     trial_stiffness = current_stiffness = initial_stiffness = b_trans->to_global_stiffness_mat(b_section->get_initial_stiffness() / length);
 
-    if(const auto linear_density = b_section->get_parameter(ParameterType::LINEARDENSITY); linear_density > 0.) trial_mass = current_mass = initial_mass = b_trans->to_global_mass_mat(linear_density);
+    if(const auto linear_density = b_section->get_linear_density(); linear_density > 0.) trial_mass = current_mass = initial_mass = b_trans->to_global_mass_mat(linear_density);
 
     return SUANPAN_SUCCESS;
 }
@@ -80,7 +84,7 @@ int NMB31::reset_status() {
 }
 
 vector<vec> NMB31::record(const OutputType P) {
-    if(P == OutputType::BEAME) return {b_trans->to_local_vec(get_current_displacement())};
+    if(P == OutputType::BEAME) return {b_section->get_current_deformation() * length};
     if(P == OutputType::BEAMS) return {b_section->get_current_resistance()};
 
     return b_section->record(P);
@@ -88,7 +92,7 @@ vector<vec> NMB31::record(const OutputType P) {
 
 void NMB31::print() {
     suanpan_info("A spatial beam element using N-M interaction section.\n");
-    b_section->print();
+    if(b_section) b_section->print();
 }
 
 #ifdef SUANPAN_VTK

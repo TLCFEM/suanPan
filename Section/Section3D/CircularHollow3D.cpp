@@ -35,7 +35,7 @@ CircularHollow3D::CircularHollow3D(const unsigned T, vec&& D, const unsigned M, 
 int CircularHollow3D::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get_material(material_tag);
 
-    access::rw(linear_density) = area * material_proto->get_parameter(ParameterType::DENSITY);
+    access::rw(linear_density) = area * material_proto->get_density();
 
     const IntegrationPlan plan(1, int_pt_num, IntegrationType::GAUSS);
 
@@ -43,28 +43,13 @@ int CircularHollow3D::initialize(const shared_ptr<DomainBase>& D) {
 
     int_pt.clear();
     int_pt.reserve(2llu * int_pt_num);
-    initial_stiffness.zeros(3, 3);
     for(unsigned I = 0; I < int_pt_num; ++I) {
         const auto t_angle = .5 * plan(I, 0) * datum::pi;
         int_pt.emplace_back(cos(t_angle) * m_radius, sin(t_angle) * m_radius, .25 * plan(I, 1) * area, material_proto->get_copy());
         int_pt.emplace_back(-cos(t_angle) * m_radius, -sin(t_angle) * m_radius, .25 * plan(I, 1) * area, material_proto->get_copy());
     }
-    for(const auto& I : int_pt) {
-        const auto arm_y = eccentricity(0) - I.coor_y;
-        const auto arm_z = I.coor_z - eccentricity(1);
-        const auto tmp_a = I.s_material->get_initial_stiffness().at(0) * I.weight;
-        initial_stiffness(0, 0) += tmp_a;
-        initial_stiffness(0, 1) += tmp_a * arm_y;
-        initial_stiffness(0, 2) += tmp_a * arm_z;
-        initial_stiffness(1, 1) += tmp_a * arm_y * arm_y;
-        initial_stiffness(1, 2) += tmp_a * arm_y * arm_z;
-        initial_stiffness(2, 2) += tmp_a * arm_z * arm_z;
-    }
-    initial_stiffness(1, 0) = initial_stiffness(0, 1);
-    initial_stiffness(2, 0) = initial_stiffness(0, 2);
-    initial_stiffness(2, 1) = initial_stiffness(1, 2);
 
-    trial_stiffness = current_stiffness = initial_stiffness;
+    initialize_stiffness();
 
     return SUANPAN_SUCCESS;
 }

@@ -29,7 +29,6 @@
 #define SECTIONSHELL_H
 
 #include <Domain/Tag.h>
-#include <Section/ParameterType.h>
 
 enum class OutputType;
 
@@ -71,9 +70,10 @@ class SectionShell : protected SectionShellData, public Tag {
     const bool initialized = false;
 
 public:
-    explicit SectionShell(unsigned = 0,    // section tag
-                          unsigned = 0,    // material tag
-                          vec&& = {0., 0.} // eccentricity
+    explicit SectionShell(
+        unsigned = 0,    // section tag
+        unsigned = 0,    // material tag
+        vec&& = {0., 0.} // eccentricity
     );
     SectionShell(const SectionShell&) = default;           // default copy ctor
     SectionShell(SectionShell&&) = delete;                 // move forbidden
@@ -114,8 +114,6 @@ public:
     [[nodiscard]] virtual const mat& get_initial_plate_stiffness() const;
 
     virtual unique_ptr<SectionShell> get_copy() = 0;
-
-    virtual double get_parameter(ParameterType);
 
     int update_incre_status(double, double);
     int update_incre_status(double, double, double, double);

@@ -20,7 +20,6 @@
 #include <Material/Material2D/Material2D.h>
 #include <Toolbox/IntegrationPlan.h>
 #include <Toolbox/shape.h>
-#include <Toolbox/utility.h>
 
 CAX4::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M)
     : coor(std::forward<vec>(C))
@@ -45,7 +44,7 @@ CAX4::CAX4(const unsigned T, uvec&& N, const unsigned M, const bool F)
 int CAX4::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
-    if(PlaneType::A != static_cast<PlaneType>(material_proto->get_parameter(ParameterType::PLANETYPE))) {
+    if(PlaneType::A != material_proto->get_plane_type()) {
         suanpan_warning("Element {} is assigned with an inconsistent material.\n", get_tag());
         return SUANPAN_FAIL;
     }
@@ -128,9 +127,9 @@ int CAX4::reset_status() {
 }
 
 vector<vec> CAX4::record(const OutputType P) {
-    vector<vec> output;
-    for(const auto& I : int_pt) for(const auto& J : I.m_material->record(P)) output.emplace_back(J);
-    return output;
+    vector<vec> data;
+    for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
+    return data;
 }
 
 void CAX4::print() {

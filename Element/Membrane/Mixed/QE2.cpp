@@ -46,7 +46,7 @@ QE2::QE2(const unsigned T, uvec&& N, const unsigned M, const double TH)
 int QE2::initialize(const shared_ptr<DomainBase>& D) {
     auto& mat_proto = D->get<Material>(material_tag(0));
 
-    if(PlaneType::E == static_cast<PlaneType>(mat_proto->get_parameter(ParameterType::PLANETYPE))) suanpan::hacker(thickness) = 1.;
+    if(PlaneType::E == mat_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
 
     access::rw(mat_stiffness) = mat_proto->get_initial_stiffness();
 
@@ -110,7 +110,7 @@ int QE2::initialize(const shared_ptr<DomainBase>& D) {
     current_alpha = trial_alpha.zeros(7);
     current_beta = trial_beta.zeros(7);
 
-    if(const auto t_density = mat_proto->get_parameter(ParameterType::DENSITY); t_density > 0.) {
+    if(const auto t_density = mat_proto->get_density(); t_density > 0.) {
         initial_mass.zeros(m_size, m_size);
         for(const auto& I : int_pt) {
             const auto n_int = compute_shape_function(I.coor, 0);
@@ -204,12 +204,12 @@ int QE2::reset_status() {
 
 mat QE2::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
-vector<vec> QE2::record(const OutputType T) {
+vector<vec> QE2::record(const OutputType P) {
     vector<vec> data;
 
-    if(T == OutputType::E) for(const auto& I : int_pt) data.emplace_back(I.A * current_alpha);
-    else if(T == OutputType::S) for(const auto& I : int_pt) data.emplace_back(I.P * current_beta);
-    else for(const auto& I : int_pt) for(const auto& J : I.m_material->record(T)) data.emplace_back(J);
+    if(P == OutputType::E) for(const auto& I : int_pt) data.emplace_back(I.A * current_alpha);
+    else if(P == OutputType::S) for(const auto& I : int_pt) data.emplace_back(I.P * current_beta);
+    else for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
 
     return data;
 }
@@ -271,10 +271,10 @@ mat QE2::GetData(const OutputType P) {
     }
 
     mat A(int_pt.size(), 9);
-    mat B(int_pt.size(), 6, fill::zeros);
+    mat B(6, int_pt.size(), fill::zeros);
 
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        if(const auto C = int_pt[I].m_material->record(P); !C.empty()) B(I, 0, size(C[0])) = C[0];
+        if(const auto C = int_pt[I].m_material->record(P); !C.empty()) B(0, I, size(C[0])) = C[0];
         A.row(I) = interpolation::quadratic(int_pt[I].coor);
     }
 
@@ -285,7 +285,7 @@ mat QE2::GetData(const OutputType P) {
     data.row(2) = interpolation::quadratic(1., 1.);
     data.row(3) = interpolation::quadratic(-1., 1.);
 
-    return (data * solve(A, B)).t();
+    return (data * solve(A, B.t())).t();
 }
 
 void QE2::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {

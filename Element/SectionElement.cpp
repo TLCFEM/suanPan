@@ -35,3 +35,6 @@ SectionNMElement2D::SectionNMElement2D(const unsigned T, const unsigned NN, cons
 
 SectionNMElement3D::SectionNMElement3D(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& ST, const bool F, vector<DOF>&& DI)
     : SectionElement(T, NN, ND, std::forward<uvec>(NT), std::forward<uvec>(ST), F, SectionType::NM3D, std::forward<vector<DOF>>(DI)) {}
+
+SectionOSElement3D::SectionOSElement3D(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& ST, const bool F, vector<DOF>&& DI)
+    : SectionElement(T, NN, ND, std::forward<uvec>(NT), std::forward<uvec>(ST), F, SectionType::OS3D, std::forward<vector<DOF>>(DI)) {}

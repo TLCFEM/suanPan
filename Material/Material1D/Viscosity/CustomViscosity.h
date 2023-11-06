@@ -42,8 +42,9 @@ class CustomViscosity final : public NonlinearViscosity {
     ResourceHolder<Expression> expression;
 
 public:
-    CustomViscosity(unsigned, // tag
-                    unsigned  // expression tag
+    CustomViscosity(
+        unsigned, // tag
+        unsigned  // expression tag
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

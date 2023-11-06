@@ -39,8 +39,7 @@ int VAFCRP1D::initialize(const shared_ptr<DomainBase>& D) {
 unique_ptr<Material> VAFCRP1D::get_copy() { return make_unique<VAFCRP1D>(*this); }
 
 double VAFCRP1D::get_parameter(const ParameterType P) const {
-    if(ParameterType::DENSITY == P) return density;
-    if(ParameterType::ELASTICMODULUS == P || ParameterType::YOUNGSMODULUS == P || ParameterType::E == P) return elastic_modulus;
+    if(ParameterType::ELASTICMODULUS == P) return elastic_modulus;
     return 0.;
 }
 
@@ -55,7 +54,8 @@ int VAFCRP1D::update_trial_status(const vec& t_strain) {
     auto gamma = 0.;
     double xi, jacobian, exp_gamma;
 
-    unsigned counter = 0;
+    auto counter = 0u;
+    auto ref_error = 1.;
     while(true) {
         if(max_iteration == ++counter) {
             suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
@@ -69,7 +69,7 @@ int VAFCRP1D::update_trial_status(const vec& t_strain) {
         if(k < 0.) k = dk = 0.;
 
         auto sum_a = 0., sum_b = 0.;
-        for(unsigned I = 0; I < size; ++I) {
+        for(auto I = 0u; I < size; ++I) {
             const auto denom = 1. + b(I) * gamma;
             sum_a += trial_history(I) / denom;
             sum_b += a(I) / denom;
@@ -81,24 +81,27 @@ int VAFCRP1D::update_trial_status(const vec& t_strain) {
 
         jacobian = -elastic_modulus - epsilon * mu * q / (*incre_time + mu * gamma);
 
-        if(xi > 0.) for(unsigned I = 0; I < size; ++I) jacobian += (b(I) * trial_history(I) - a(I)) * pow(1. + b(I) * gamma, -2.);
-        else for(unsigned I = 0; I < size; ++I) jacobian -= (b(I) * trial_history(I) + a(I)) * pow(1. + b(I) * gamma, -2.);
+        if(xi > 0.) for(auto I = 0u; I < size; ++I) jacobian += (b(I) * trial_history(I) - a(I)) * pow(1. + b(I) * gamma, -2.);
+        else for(auto I = 0u; I < size; ++I) jacobian -= (b(I) * trial_history(I) + a(I)) * pow(1. + b(I) * gamma, -2.);
 
-        const auto incre = (q * exp_gamma - k) / ((jacobian *= exp_gamma) -= dk);
-        suanpan_debug("Local iteration error: {:.5E}.\n", fabs(incre));
-        if(fabs(incre) <= tolerance) break;
+        const auto residual = q * exp_gamma - k;
+        const auto incre = residual / ((jacobian *= exp_gamma) -= dk);
+        const auto error = fabs(incre);
+        if(1u == counter) ref_error = error;
+        suanpan_debug("Local iteration error: {:.5E}.\n", error);
+        if(error < tolerance * ref_error || (fabs(residual) < tolerance && counter > 5u)) break;
 
         gamma -= incre;
         p -= incre;
     }
 
     if(xi > 0.) {
-        for(unsigned I = 0; I < size; ++I) trial_history(I) = (trial_history(I) + a(I) * gamma) / (1. + b(I) * gamma);
+        for(auto I = 0u; I < size; ++I) trial_history(I) = (trial_history(I) + a(I) * gamma) / (1. + b(I) * gamma);
 
         trial_stress -= elastic_modulus * gamma;
     }
     else {
-        for(unsigned I = 0; I < size; ++I) trial_history(I) = (trial_history(I) - a(I) * gamma) / (1. + b(I) * gamma);
+        for(auto I = 0u; I < size; ++I) trial_history(I) = (trial_history(I) - a(I) * gamma) / (1. + b(I) * gamma);
 
         trial_stress += elastic_modulus * gamma;
     }
@@ -130,12 +133,6 @@ int VAFCRP1D::reset_status() {
     trial_history = current_history;
     trial_stiffness = current_stiffness;
     return SUANPAN_SUCCESS;
-}
-
-vector<vec> VAFCRP1D::record(const OutputType P) {
-    if(P == OutputType::PEEQ) return {vec{current_history(size)}};
-
-    return Material1D::record(P);
 }
 
 void VAFCRP1D::print() {

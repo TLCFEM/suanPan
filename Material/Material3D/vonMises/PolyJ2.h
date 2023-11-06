@@ -35,18 +35,19 @@ struct DataPolyJ2 {
     const vec poly_para;
 };
 
-class PolyJ2 final : DataPolyJ2, public NonlinearJ2 {
+class PolyJ2 final : protected DataPolyJ2, public NonlinearJ2 {
     [[nodiscard]] double compute_k(double) const override;
     [[nodiscard]] double compute_dk(double) const override;
     [[nodiscard]] double compute_h(double) const override;
     [[nodiscard]] double compute_dh(double) const override;
 
 public:
-    PolyJ2(unsigned,   // tag
-           double,     // elastic modulus
-           double,     // poisson's ratio
-           vec&&,      // poly parameter
-           double = 0. // density
+    PolyJ2(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // poisson's ratio
+        vec&&,      // poly parameter
+        double = 0. // density
     );
 
     unique_ptr<Material> get_copy() override;

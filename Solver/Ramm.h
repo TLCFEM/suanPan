@@ -31,13 +31,14 @@
 #include <Solver/Solver.h>
 
 class Ramm final : public Solver {
-    double arc_length;
-    bool fixed_arc_length;
+    double arc_length = 1.;
 
 public:
-    explicit Ramm(unsigned = 0, double = .1, bool = false);
+    using Solver::Solver;
 
     int analyze() override;
+
+    void set_step_size(double) override;
 
     void print() override;
 };

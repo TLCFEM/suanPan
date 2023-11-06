@@ -42,7 +42,7 @@ struct DataBilinearJ2 {
     const double beta;            // isotropic (1.0) / kinematic (0.0) hardening factor
 };
 
-class BilinearJ2 final : DataBilinearJ2, public Material3D {
+class BilinearJ2 final : protected DataBilinearJ2, public Material3D {
     static const double two_third;
     static const double root_two_third;
     static const mat unit_dev_tensor;
@@ -54,13 +54,14 @@ class BilinearJ2 final : DataBilinearJ2, public Material3D {
     const double kinematic_modulus = (1. - beta) * elastic_modulus * hardening_ratio / (1. - hardening_ratio);
 
 public:
-    BilinearJ2(unsigned,    // tag
-               double,      // elastic modulus
-               double,      // poisson's ratio
-               double,      // initial yield stress
-               double = 0., // hardening ratio
-               double = 1., // isotropic (1.0) / kinematic (0.0) hardening factor
-               double = 0.  // density
+    BilinearJ2(
+        unsigned,    // tag
+        double,      // elastic modulus
+        double,      // poisson's ratio
+        double,      // initial yield stress
+        double = 0., // hardening ratio
+        double = 1., // isotropic (1.0) / kinematic (0.0) hardening factor
+        double = 0.  // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;
@@ -74,8 +75,6 @@ public:
     int clear_status() override;
     int commit_status() override;
     int reset_status() override;
-
-    vector<vec> record(OutputType) override;
 
     void print() override;
 };

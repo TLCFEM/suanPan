@@ -67,9 +67,10 @@ class SimpleHysteresis : protected DataSimpleHysteresis, public Material1D {
     [[nodiscard]] podarray<double> compute_tension_inner(double) const;
 
 public:
-    SimpleHysteresis(unsigned,   // tag
-                     double,     // middle point
-                     double = 0. // density
+    SimpleHysteresis(
+        unsigned,   // tag
+        double,     // middle point
+        double = 0. // density
     );
 
     int update_trial_status(const vec&) override;

@@ -43,7 +43,7 @@ struct DataNonlinearDruckerPrager {
 };
 
 class NonlinearDruckerPrager : protected DataNonlinearDruckerPrager, public Material3D {
-    static constexpr unsigned max_iteration = 20;
+    static constexpr unsigned max_iteration = 20u;
     static const mat unit_dev_tensor;
     static const mat unit_x_unit;
 
@@ -62,13 +62,14 @@ class NonlinearDruckerPrager : protected DataNonlinearDruckerPrager, public Mate
     [[nodiscard]] virtual double compute_dc(double) const = 0;
 
 public:
-    NonlinearDruckerPrager(unsigned,   // tag
-                           double,     // elastic modulus
-                           double,     // poisson's ratio
-                           double,     // eta_yield (hydrostatic stress related)
-                           double,     // eta_flow (dilatancy angle related)
-                           double,     // xi (cohesion related)
-                           double = 0. // density
+    NonlinearDruckerPrager(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // poisson's ratio
+        double,     // eta_yield (hydrostatic stress related)
+        double,     // eta_flow (dilatancy angle related)
+        double,     // xi (cohesion related)
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

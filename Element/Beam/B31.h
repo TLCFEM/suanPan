@@ -36,7 +36,7 @@ class B31 final : public SectionElement3D {
     struct IntegrationPoint final {
         double coor, weight;
         unique_ptr<Section> b_section;
-        mat strain_mat;
+        mat strain_mat; // axial strain, curvature about the z-axis (major), curvature about the y-axis (minor)
         IntegrationPoint(double, double, unique_ptr<Section>&&);
     };
 
@@ -53,7 +53,8 @@ class B31 final : public SectionElement3D {
     unique_ptr<Orientation> b_trans;
 
 public:
-    B31(unsigned,     // tag
+    B31(
+        unsigned,     // tag
         uvec&&,       // node tags
         unsigned,     // section tag
         unsigned,     // orientation tag

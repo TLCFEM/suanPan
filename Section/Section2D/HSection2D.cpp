@@ -33,30 +33,25 @@ HSection2D::HSection2D(const unsigned T, const double TFW, const double TFT, con
 int HSection2D::initialize(const shared_ptr<DomainBase>& D) {
     auto& mat_proto = D->get_material(material_tag);
 
-    access::rw(linear_density) = mat_proto->get_parameter(ParameterType::DENSITY) * area;
+    access::rw(linear_density) = mat_proto->get_density() * area;
+
+    const auto web_area = web_width * web_thickness;
+    const auto l_flange_area = left_flange_height * left_flange_thickness;
+    const auto r_flange_area = right_flange_height * right_flange_thickness;
 
     const IntegrationPlan plan_flange(1, int_pt_num, IntegrationType::GAUSS);
     const IntegrationPlan plan_web(1, 2, IntegrationType::GAUSS);
 
     int_pt.clear();
     int_pt.reserve(2llu * int_pt_num + 2);
-    int_pt.emplace_back(.5 * plan_web(0, 0) * web_thickness, .5 * plan_web(0, 1) * web_width * web_thickness, mat_proto->get_copy());
-    int_pt.emplace_back(.5 * plan_web(1, 0) * web_thickness, .5 * plan_web(1, 1) * web_width * web_thickness, mat_proto->get_copy());
+    int_pt.emplace_back(.5 * plan_web(0, 0) * web_thickness, .5 * plan_web(0, 1) * web_area, mat_proto->get_copy());
+    int_pt.emplace_back(.5 * plan_web(1, 0) * web_thickness, .5 * plan_web(1, 1) * web_area, mat_proto->get_copy());
     for(unsigned I = 0; I < int_pt_num; ++I) {
-        int_pt.emplace_back(.5 * plan_flange(I, 0) * left_flange_height, .5 * plan_flange(I, 1) * left_flange_height * left_flange_thickness, mat_proto->get_copy());
-        int_pt.emplace_back(.5 * plan_flange(I, 0) * right_flange_height, .5 * plan_flange(I, 1) * right_flange_height * right_flange_thickness, mat_proto->get_copy());
+        int_pt.emplace_back(.5 * plan_flange(I, 0) * left_flange_height, .5 * plan_flange(I, 1) * l_flange_area, mat_proto->get_copy());
+        int_pt.emplace_back(.5 * plan_flange(I, 0) * right_flange_height, .5 * plan_flange(I, 1) * r_flange_area, mat_proto->get_copy());
     }
 
-    initial_stiffness.zeros(2, 2);
-    for(const auto& I : int_pt) {
-        auto tmp_a = I.s_material->get_initial_stiffness().at(0) * I.weight;
-        const auto arm = eccentricity(0) - I.coor;
-        initial_stiffness(0, 0) += tmp_a;
-        initial_stiffness(0, 1) += tmp_a *= arm;
-        initial_stiffness(1, 1) += tmp_a *= arm;
-    }
-    initial_stiffness(1, 0) = initial_stiffness(0, 1);
-    trial_stiffness = current_stiffness = initial_stiffness;
+    initialize_stiffness();
 
     return SUANPAN_SUCCESS;
 }

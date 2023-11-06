@@ -37,16 +37,17 @@ struct DataBilinearElastic1D {
     const double radius;            // radius
 };
 
-class BilinearElastic1D final : DataBilinearElastic1D, public Material1D {
+class BilinearElastic1D final : protected DataBilinearElastic1D, public Material1D {
     const double yield_strain = yield_stress / elastic_modulus;
 
 public:
-    BilinearElastic1D(unsigned, // tag
-                      double,   // elastic modulus
-                      double,   // initial yield stress
-                      double,   // hardening ratio
-                      double,   // radius
-                      double    // density
+    BilinearElastic1D(
+        unsigned, // tag
+        double,   // elastic modulus
+        double,   // initial yield stress
+        double,   // hardening ratio
+        double,   // radius
+        double    // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

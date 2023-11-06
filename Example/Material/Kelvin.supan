@@ -51,6 +51,8 @@ analyze
 # 0.0066 0
 peek node 2
 
+peek material 2 3
+
 reset
 clear
 exit

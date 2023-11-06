@@ -48,8 +48,8 @@ struct DataVAFCRP1D {
     const vec a, b;
 };
 
-class VAFCRP1D final : DataVAFCRP1D, public Material1D {
-    static constexpr unsigned max_iteration = 20;
+class VAFCRP1D final : protected DataVAFCRP1D, public Material1D {
+    static constexpr unsigned max_iteration = 20u;
     static const double unit_time;
 
     const double* incre_time = nullptr;
@@ -57,17 +57,18 @@ class VAFCRP1D final : DataVAFCRP1D, public Material1D {
     const unsigned size = static_cast<unsigned>(a.size());
 
 public:
-    VAFCRP1D(unsigned,   // tag
-             double,     // elastic modulus
-             double,     // yield stress
-             double,     // saturated stress
-             double,     // linear hardening modulus
-             double,     // m
-             double,     // mu
-             double,     // epsilon
-             vec&&,      // a
-             vec&&,      // b
-             double = 0. // density
+    VAFCRP1D(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // yield stress
+        double,     // saturated stress
+        double,     // linear hardening modulus
+        double,     // m
+        double,     // mu
+        double,     // epsilon
+        vec&&,      // a
+        vec&&,      // b
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;
@@ -81,8 +82,6 @@ public:
     int clear_status() override;
     int commit_status() override;
     int reset_status() override;
-
-    vector<vec> record(OutputType) override;
 
     void print() override;
 };

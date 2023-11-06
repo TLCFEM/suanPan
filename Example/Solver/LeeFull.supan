@@ -18,6 +18,10 @@ plainrecorder 3 Node DF1 2
 plainrecorder 4 Node IF1 2
 plainrecorder 5 Node GDF1 2
 plainrecorder 6 Node GIF1 2
+plainrecorder 7 Node GDF2 2
+plainrecorder 8 Node GIF2 2
+plainrecorder 9 Node GIF 2
+plainrecorder 10 Node GDF 2
 
 step static 1 1
 set ini_step_size .1

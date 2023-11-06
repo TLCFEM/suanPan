@@ -339,7 +339,7 @@ int test_material_with_base3d(const shared_ptr<DomainBase>& domain, istringstrea
 
     const auto material = domain->get_material(material_tag)->get_copy();
 
-    if(!initialise_material(domain, material, incre.n_elem)) return {};
+    if(!initialise_material(domain, material, incre.n_elem)) return SUANPAN_SUCCESS;
 
     save_result(material_tester(material, load_step, incre, base));
 

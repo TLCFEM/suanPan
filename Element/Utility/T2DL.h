@@ -38,7 +38,9 @@ protected:
     void update_transformation() override;
 
 public:
-    explicit T2DL(unsigned = 0);
+    using Orientation::Orientation;
+
+    [[nodiscard]] OrientationType get_orientation_type() const override;
 
     unique_ptr<Orientation> get_copy() override;
 

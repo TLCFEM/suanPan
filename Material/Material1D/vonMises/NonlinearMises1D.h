@@ -35,7 +35,7 @@ struct DataMises1D {
 };
 
 class NonlinearMises1D : protected DataMises1D, public Material1D {
-    static constexpr unsigned max_iteration = 20;
+    static constexpr unsigned max_iteration = 20u;
 
     [[nodiscard]] virtual double compute_k(double) const = 0;
     [[nodiscard]] virtual double compute_dk(double) const = 0;
@@ -43,9 +43,10 @@ class NonlinearMises1D : protected DataMises1D, public Material1D {
     [[nodiscard]] virtual double compute_dh(double) const = 0;
 
 public:
-    NonlinearMises1D(unsigned,   // tag
-                     double,     // elastic modulus
-                     double = 0. // density
+    NonlinearMises1D(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

@@ -51,7 +51,7 @@ int C3D4::initialize(const shared_ptr<DomainBase>& D) {
 
     const rowvec n = mean(ele_coor) * inv_coor;
 
-    if(const auto t_density = c_material->get_parameter(ParameterType::DENSITY) * volume; t_density > 0.) {
+    if(const auto t_density = c_material->get_density() * volume; t_density > 0.) {
         initial_mass.zeros(c_size, c_size);
         for(auto I = 0u, K = 0u; I < c_node; ++I, K += c_dof) for(auto J = I, L = K; J < c_node; ++J, L += c_dof) initial_mass(K, L) += t_density * n(I) * n(J);
         for(auto I = 0u, K = 1u; I < c_size; I += c_dof, K += c_dof) {
@@ -138,7 +138,7 @@ int C3D4::clear_status() { return c_material->clear_status(); }
 
 int C3D4::reset_status() { return c_material->reset_status(); }
 
-vector<vec> C3D4::record(const OutputType T) { return c_material->record(T); }
+vector<vec> C3D4::record(const OutputType P) { return c_material->record(P); }
 
 void C3D4::print() {
     suanpan_info("C3D4 element connects:", node_encoding);

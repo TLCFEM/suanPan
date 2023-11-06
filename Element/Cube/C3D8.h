@@ -36,7 +36,8 @@ class C3D8 final : public MaterialElement3D {
         vec coor;
         double weight;
         unique_ptr<Material> c_material;
-        mat pn_pxyz, strain_mat;
+        mat pn_pxyz;
+        sp_mat strain_mat;
         IntegrationPoint(vec&&, double, unique_ptr<Material>&&, mat&&);
     };
 
@@ -53,11 +54,12 @@ class C3D8 final : public MaterialElement3D {
     vector<IntegrationPoint> int_pt;
 
 public:
-    C3D8(unsigned,    // tag
-         uvec&&,      // node tag
-         unsigned,    // material tag
-         char = 'I',  // reduced integration
-         bool = false // nonlinear geometry switch
+    C3D8(
+        unsigned,    // tag
+        uvec&&,      // node tag
+        unsigned,    // material tag
+        char = 'I',  // reduced integration
+        bool = false // nonlinear geometry switch
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

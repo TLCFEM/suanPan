@@ -29,9 +29,9 @@ Rebar3D::Rebar3D(const unsigned T, const unsigned XT, const unsigned YT, const u
     , ratio_z(ZR) {}
 
 int Rebar3D::initialize(const shared_ptr<DomainBase>& D) {
-    rebar_x = suanpan::initialized_material_copy(D, tag_x);
-    rebar_y = suanpan::initialized_material_copy(D, tag_y);
-    rebar_z = suanpan::initialized_material_copy(D, tag_z);
+    rebar_x = D->initialized_material_copy(tag_x);
+    rebar_y = D->initialized_material_copy(tag_y);
+    rebar_z = D->initialized_material_copy(tag_z);
 
     if(nullptr == rebar_x || nullptr == rebar_y || nullptr == rebar_z || rebar_x->get_material_type() != MaterialType::D1 || rebar_y->get_material_type() != MaterialType::D1 || rebar_z->get_material_type() != MaterialType::D1) return SUANPAN_FAIL;
 
@@ -88,4 +88,12 @@ int Rebar3D::reset_status() {
     return rebar_x->reset_status() + rebar_y->reset_status() + rebar_z->reset_status();
 }
 
-vector<vec> Rebar3D::record(OutputType) { return {}; }
+vector<vec> Rebar3D::record(const OutputType P) {
+    vector<vec> data;
+
+    for(const auto& I : rebar_x->record(P)) data.emplace_back(I);
+    for(const auto& I : rebar_y->record(P)) data.emplace_back(I);
+    for(const auto& I : rebar_z->record(P)) data.emplace_back(I);
+
+    return data;
+}

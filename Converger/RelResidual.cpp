@@ -23,7 +23,7 @@ RelResidual::RelResidual(const unsigned T, const double E, const unsigned M, con
 unique_ptr<Converger> RelResidual::get_copy() { return make_unique<RelResidual>(*this); }
 
 bool RelResidual::is_converged(const unsigned counter) {
-    const auto residual = norm(get_residual());
+    const auto residual = inf_norm(get_residual());
     if(0u == counter) ref_residual = residual;
     set_error(residual / ref_residual);
     set_conv_flag(get_tolerance() > get_error());

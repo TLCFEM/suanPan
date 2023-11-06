@@ -33,11 +33,12 @@ struct DataSinh1D {
     const double elastic_modulus; // elastic modulus
 };
 
-class Sinh1D final : DataSinh1D, public Material1D {
+class Sinh1D final : protected DataSinh1D, public Material1D {
 public:
-    Sinh1D(unsigned,   // tag
-           double,     // elastic modulus
-           double = 0. // density
+    Sinh1D(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

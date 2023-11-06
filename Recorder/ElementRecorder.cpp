@@ -21,11 +21,16 @@
 #include <Element/Element.h>
 
 void ElementRecorder::initialize(const shared_ptr<DomainBase>& D) {
+    std::vector<uword> pool;
+    pool.reserve(get_object_tag().n_elem);
     for(const auto I : get_object_tag())
-        if(!D->find<Element>(I)) {
-            D->disable_recorder(get_tag());
-            return;
-        }
+        if(!D->find<Element>(I) || !D->get<Element>(I)->is_active())
+            suanpan_warning("Element {} is not available/active, removed from recorder {}.\n", I, get_tag());
+        else pool.emplace_back(I);
+
+    set_object_tag(pool);
+
+    access::rw(get_data_pool()).resize(get_object_tag().n_elem);
 }
 
 void ElementRecorder::record(const shared_ptr<DomainBase>& D) {

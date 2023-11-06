@@ -37,14 +37,16 @@ struct DataDhakal {
     const double final_strain = (inter_factor - .2) * 50. * yield_strain + inter_strain;
 };
 
-class Dhakal final : DataDhakal, public Degradation {
-    [[nodiscard]] podarray<double> compute_degradation(double) const override;
+class Dhakal final : protected DataDhakal, public StrainDegradation {
+    [[nodiscard]] vec compute_positive_degradation(double) const override;
+    [[nodiscard]] vec compute_negative_degradation(double) const override;
 
 public:
-    Dhakal(unsigned, // unique tag
-           unsigned, // material tag
-           double,   // yield strain
-           double    // parameter
+    Dhakal(
+        unsigned, // unique tag
+        unsigned, // material tag
+        double,   // yield strain
+        double    // parameter
     );
 
     unique_ptr<Material> get_copy() override;

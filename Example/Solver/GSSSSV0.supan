@@ -5,7 +5,7 @@ node 2 0 1
 
 material Elastic1D 1 100 .1
 
-element EB21 1 1 2 10 1 1 0
+element EB21 1 1 2 10 1 1 1
 
 mass 2 2 10 1
 
@@ -29,15 +29,15 @@ analyze
 
 # Node 2:
 # Coordinate:
-# 0 1.0000
+#   0.0000e+00  1.0000e+00
 # Displacement:
-# 0.0329 0 -0.0491
+#   3.2860e-02 -1.5189e-04 -4.9113e-02
 # Resistance:
-# 9.9584 0 0.0672
+#   9.9600e+00  6.0810e-02  6.6965e-02
 # Velocity:
-# 0.3755 0 -0.5750
+#   3.7549e-01 -4.8237e-03 -5.7474e-01
 # Acceleration:
-# 0.4176 0 -1.7028
+#   4.1739e-01 -8.1271e-02 -1.6983e+00
 peek node 2
 
 peek integrator 1

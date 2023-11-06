@@ -35,7 +35,7 @@ CircularHollow2D::CircularHollow2D(const unsigned T, vec&& D, const unsigned M, 
 int CircularHollow2D::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get_material(material_tag);
 
-    access::rw(linear_density) = area * material_proto->get_parameter(ParameterType::DENSITY);
+    access::rw(linear_density) = area * material_proto->get_density();
 
     const IntegrationPlan plan(1, int_pt_num, IntegrationType::GAUSS);
 
@@ -43,21 +43,12 @@ int CircularHollow2D::initialize(const shared_ptr<DomainBase>& D) {
 
     int_pt.clear();
     int_pt.reserve(2llu * int_pt_num);
-    initial_stiffness.zeros(2, 2);
     for(unsigned I = 0; I < int_pt_num; ++I) {
         int_pt.emplace_back(cos(.5 * plan(I, 0) * datum::pi) * m_radius, .25 * plan(I, 1) * area, material_proto->get_copy());
         int_pt.emplace_back(-cos(.5 * plan(I, 0) * datum::pi) * m_radius, .25 * plan(I, 1) * area, material_proto->get_copy());
     }
-    for(const auto& I : int_pt) {
-        auto tmp_a = I.s_material->get_initial_stiffness().at(0) * I.weight;
-        const auto arm = eccentricity(0) - I.coor;
-        initial_stiffness(0, 0) += tmp_a;
-        initial_stiffness(0, 1) += tmp_a *= arm;
-        initial_stiffness(1, 1) += tmp_a *= arm;
-    }
-    initial_stiffness(1, 0) = initial_stiffness(0, 1);
 
-    trial_stiffness = current_stiffness = initial_stiffness;
+    initialize_stiffness();
 
     return SUANPAN_SUCCESS;
 }

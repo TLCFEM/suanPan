@@ -21,7 +21,8 @@
  * @date 15/09/2017
  * @version 0.1.0
  * @file Circle3D.h
- * @addtogroup Section
+ * @addtogroup Section-3D
+ * @ingroup Section
  * @{
  */
 
@@ -36,11 +37,12 @@ class Circle3D final : public Section3D {
     const unsigned int_pt_num;
 
 public:
-    Circle3D(unsigned,        // tag
-             double,          // radius
-             unsigned,        // material tag
-             unsigned = 6,    // number of integration points
-             vec&& = {0., 0.} // eccentricity
+    Circle3D(
+        unsigned,        // tag
+        double,          // radius
+        unsigned,        // material tag
+        unsigned = 6,    // number of integration points
+        vec&& = {0., 0.} // eccentricity
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

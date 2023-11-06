@@ -33,11 +33,12 @@ struct DataElastic1D {
     const double elastic_modulus; // elastic modulus
 };
 
-class Elastic1D final : DataElastic1D, public Material1D {
+class Elastic1D final : protected DataElastic1D, public Material1D {
 public:
-    Elastic1D(unsigned,   // tag
-              double,     // elastic modulus
-              double = 0. // density
+    Elastic1D(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

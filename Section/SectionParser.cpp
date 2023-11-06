@@ -21,7 +21,7 @@
 #include <Section/Section>
 #include <Toolbox/utility.h>
 
-void new_bar2d(unique_ptr<Section>& return_obj, istringstream& command) {
+void new_cell2d(unique_ptr<Section>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
@@ -46,10 +46,10 @@ void new_bar2d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    return_obj = make_unique<Bar2D>(tag, area, material_id, eccentricity);
+    return_obj = make_unique<Cell2D>(tag, area, material_id, eccentricity);
 }
 
-void new_bar3d(unique_ptr<Section>& return_obj, istringstream& command) {
+void new_cell3d(unique_ptr<Section>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
@@ -78,7 +78,7 @@ void new_bar3d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    return_obj = make_unique<Bar3D>(tag, area, material_id, eccentricity_a, eccentricity_b);
+    return_obj = make_unique<Cell3D>(tag, area, material_id, eccentricity_a, eccentricity_b);
 }
 
 void new_box2d(unique_ptr<Section>& return_obj, istringstream& command) {
@@ -112,15 +112,19 @@ void new_box2d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned int_pt = 6;
+    auto int_pt = 6u;
     if(command.eof())
         suanpan_debug("Six integration points assumed.\n");
-    else if(!get_input(command, int_pt))
+    else if(!get_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
+        return;
+    }
 
     auto eccentricity = 0.;
-    if(!command.eof() && !get_input(command, eccentricity))
+    if(!command.eof() && !get_input(command, eccentricity)) {
         suanpan_error("A valid eccentricity is required.\n");
+        return;
+    }
 
     return_obj = make_unique<Box2D>(tag, width, height, thickness, material_id, int_pt, eccentricity);
 }
@@ -156,19 +160,57 @@ void new_box3d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned int_pt = 3;
+    auto int_pt = 6u;
     if(command.eof())
         suanpan_debug("Six integration points assumed.\n");
-    else if(!get_input(command, int_pt))
+    else if(!get_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
+        return;
+    }
 
     auto eccentricity_a = 0., eccentricity_b = 0.;
-    if(!command.eof() && !get_input(command, eccentricity_a))
+    if(!command.eof() && !get_input(command, eccentricity_a)) {
         suanpan_error("A valid eccentricity is required.\n");
-    if(!command.eof() && !get_input(command, eccentricity_b))
+        return;
+    }
+    if(!command.eof() && !get_input(command, eccentricity_b)) {
         suanpan_error("A valid eccentricity is required.\n");
+        return;
+    }
 
     return_obj = make_unique<Box3D>(tag, width, height, thickness, material_id, int_pt, eccentricity_a, eccentricity_b);
+}
+
+void new_cell3dos(unique_ptr<Section>& return_obj, istringstream& command) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    double area, omega, py, pz;
+    if(!get_input(command, area, omega, py, pz)) {
+        suanpan_error("A valid parameter is required.\n");
+        return;
+    }
+
+    unsigned material_id;
+    if(!get_input(command, material_id)) {
+        suanpan_error("A valid material tag is required.\n");
+        return;
+    }
+
+    auto eccentricity_a = 0., eccentricity_b = 0.;
+    if(!command.eof() && !get_input(command, eccentricity_a)) {
+        suanpan_error("A valid eccentricity is required.\n");
+        return;
+    }
+    if(!command.eof() && !get_input(command, eccentricity_b)) {
+        suanpan_error("A valid eccentricity is required.\n");
+        return;
+    }
+
+    return_obj = make_unique<Cell3DOS>(tag, area, omega, py, pz, material_id, eccentricity_a, eccentricity_b);
 }
 
 void new_circle1d(unique_ptr<Section>& return_obj, istringstream& command) {
@@ -212,7 +254,7 @@ void new_circle2d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned int_pt = 6;
+    auto int_pt = 6u;
     if(!command.eof() && !get_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
         return;
@@ -246,7 +288,7 @@ void new_circle3d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned int_pt = 6;
+    auto int_pt = 6u;
     if(!command.eof() && !get_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
         return;
@@ -291,7 +333,7 @@ void new_circularhollow2D(unique_ptr<Section>& return_obj, istringstream& comman
         return;
     }
 
-    unsigned int_pt = 10;
+    auto int_pt = 6u;
     if(!command.eof() && !get_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
         return;
@@ -331,7 +373,7 @@ void new_circularhollow3D(unique_ptr<Section>& return_obj, istringstream& comman
         return;
     }
 
-    unsigned int_pt = 10;
+    auto int_pt = 6u;
     if(!command.eof() && !get_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
         return;
@@ -387,7 +429,7 @@ void new_fibre2d(unique_ptr<Section>& return_obj, istringstream& command) {
     return_obj = make_unique<Fibre2D>(tag, std::move(tag_vector));
 }
 
-void new_fibre3d(unique_ptr<Section>& return_obj, istringstream& command) {
+void new_fibre3d(unique_ptr<Section>& return_obj, istringstream& command, const bool if_os) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
@@ -402,7 +444,8 @@ void new_fibre3d(unique_ptr<Section>& return_obj, istringstream& command) {
             return;
         }
 
-    return_obj = make_unique<Fibre3D>(tag, std::move(tag_vector));
+    if(if_os) return_obj = make_unique<Fibre3DOS>(tag, std::move(tag_vector));
+    else return_obj = make_unique<Fibre3D>(tag, std::move(tag_vector));
 }
 
 void new_hsection2d(unique_ptr<Section>& return_obj, istringstream& command) {
@@ -424,7 +467,7 @@ void new_hsection2d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned int_pt = 6;
+    auto int_pt = 6u;
     if(!command.eof() && !get_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
         return;
@@ -439,7 +482,28 @@ void new_hsection2d(unique_ptr<Section>& return_obj, istringstream& command) {
     return_obj = make_unique<HSection2D>(tag, dim(0), dim(1), dim(2), dim(3), dim(4), dim(5), material_id, int_pt, eccentricity);
 }
 
-void new_isection2d(unique_ptr<Section>& return_obj, istringstream& command) {
+double barycenter(const vec& dim) {
+    if(4llu == dim.n_elem) {
+        // dim(0): flange width
+        // dim(1): flange thickness
+        // dim(2): web height
+        // dim(3): web thickness
+        const auto flange_area = dim(0) * dim(1);
+        return -.5 * flange_area * (dim(1) + dim(2)) / (flange_area + dim(2) * dim(3));
+    }
+
+    // dim(0): top flange width
+    // dim(1): top flange thickness
+    // dim(2): bottom flange width
+    // dim(3): bottom flange thickness
+    // dim(4): web height
+    // dim(5): web thickness
+    const auto top_flange_area = dim(0) * dim(1);
+    const auto bottom_flange_area = dim(2) * dim(3);
+    return -.5 * (top_flange_area * (dim(1) + dim(4)) + bottom_flange_area * (dim(3) + dim(4))) / (top_flange_area + bottom_flange_area + dim(4) * dim(5));
+}
+
+void new_isection2d(unique_ptr<Section>& return_obj, istringstream& command, const bool recenter) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
@@ -458,14 +522,15 @@ void new_isection2d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned int_pt = 6;
+    auto int_pt = 6u;
     if(!command.eof() && !get_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
         return;
     }
 
     auto eccentricity = 0.;
-    if(!command.eof() && !get_input(command, eccentricity)) {
+    if(recenter) eccentricity = barycenter(dim);
+    else if(!command.eof() && !get_input(command, eccentricity)) {
         suanpan_error("A valid eccentricity is required.\n");
         return;
     }
@@ -473,7 +538,7 @@ void new_isection2d(unique_ptr<Section>& return_obj, istringstream& command) {
     return_obj = make_unique<ISection2D>(tag, dim(0), dim(1), dim(2), dim(3), dim(4), dim(5), material_id, int_pt, eccentricity);
 }
 
-void new_isection3d(unique_ptr<Section>& return_obj, istringstream& command) {
+void new_isection3d(unique_ptr<Section>& return_obj, istringstream& command, const bool recenter) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
@@ -492,21 +557,23 @@ void new_isection3d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned int_pt = 6;
+    auto int_pt = 6u;
     if(!command.eof() && !get_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
         return;
     }
 
-    auto eccentricity_y = 0.;
-    if(!command.eof() && !get_input(command, eccentricity_y)) {
-        suanpan_error("A valid eccentricity is required.\n");
-        return;
-    }
-    auto eccentricity_z = 0.;
-    if(!command.eof() && !get_input(command, eccentricity_z)) {
-        suanpan_error("A valid eccentricity is required.\n");
-        return;
+    auto eccentricity_y = 0., eccentricity_z = 0.;
+    if(recenter) eccentricity_y = barycenter(dim);
+    else {
+        if(!command.eof() && !get_input(command, eccentricity_y)) {
+            suanpan_error("A valid eccentricity is required.\n");
+            return;
+        }
+        if(!command.eof() && !get_input(command, eccentricity_z)) {
+            suanpan_error("A valid eccentricity is required.\n");
+            return;
+        }
     }
 
     return_obj = make_unique<ISection3D>(tag, std::move(dim), material_id, int_pt, vec{eccentricity_y, eccentricity_z});
@@ -565,15 +632,19 @@ void new_rectangle2d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned int_pt = 6;
+    auto int_pt = 6u;
     if(command.eof())
         suanpan_debug("Six integration points assumed.\n");
-    else if(!get_input(command, int_pt))
+    else if(!get_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
+        return;
+    }
 
     auto eccentricity = 0.;
-    if(!command.eof() && !get_input(command, eccentricity))
+    if(!command.eof() && !get_input(command, eccentricity)) {
         suanpan_error("A valid eccentricity is required.\n");
+        return;
+    }
 
     return_obj = make_unique<Rectangle2D>(tag, width, height, material_id, int_pt, eccentricity);
 }
@@ -603,17 +674,23 @@ void new_rectangle3d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned int_pt = 3;
+    auto int_pt = 6u;
     if(command.eof())
         suanpan_debug("Six integration points assumed.\n");
-    else if(!get_input(command, int_pt))
+    else if(!get_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
+        return;
+    }
 
     auto eccentricity_a = 0., eccentricity_b = 0.;
-    if(!command.eof() && !get_input(command, eccentricity_a))
+    if(!command.eof() && !get_input(command, eccentricity_a)) {
         suanpan_error("A valid eccentricity is required.\n");
-    if(!command.eof() && !get_input(command, eccentricity_b))
+        return;
+    }
+    if(!command.eof() && !get_input(command, eccentricity_b)) {
         suanpan_error("A valid eccentricity is required.\n");
+        return;
+    }
 
     return_obj = make_unique<Rectangle3D>(tag, width, height, material_id, int_pt, eccentricity_a, eccentricity_b);
 }
@@ -640,7 +717,7 @@ void new_trusssection(unique_ptr<Section>& return_obj, istringstream& command) {
     return_obj = make_unique<TrussSection>(tag, area, material_id);
 }
 
-void new_tsection2d(unique_ptr<Section>& return_obj, istringstream& command) {
+void new_tsection2d(unique_ptr<Section>& return_obj, istringstream& command, const bool recenter) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
@@ -659,14 +736,15 @@ void new_tsection2d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned int_pt = 4;
+    auto int_pt = 6u;
     if(!command.eof() && !get_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
         return;
     }
 
     auto eccentricity = 0.;
-    if(!command.eof() && !get_input(command, eccentricity)) {
+    if(recenter) eccentricity = barycenter(dim);
+    else if(!command.eof() && !get_input(command, eccentricity)) {
         suanpan_error("A valid eccentricity is required.\n");
         return;
     }
@@ -674,7 +752,7 @@ void new_tsection2d(unique_ptr<Section>& return_obj, istringstream& command) {
     return_obj = make_unique<TSection2D>(tag, dim(0), dim(1), dim(2), dim(3), material_id, int_pt, eccentricity);
 }
 
-void new_tsection3d(unique_ptr<Section>& return_obj, istringstream& command) {
+void new_tsection3d(unique_ptr<Section>& return_obj, istringstream& command, const bool recenter) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
@@ -693,21 +771,23 @@ void new_tsection3d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned int_pt = 3;
+    auto int_pt = 6u;
     if(!command.eof() && !get_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
         return;
     }
 
-    auto eccentricity_y = 0.;
-    if(!command.eof() && !get_input(command, eccentricity_y)) {
-        suanpan_error("A valid eccentricity is required.\n");
-        return;
-    }
-    auto eccentricity_z = 0.;
-    if(!command.eof() && !get_input(command, eccentricity_z)) {
-        suanpan_error("A valid eccentricity is required.\n");
-        return;
+    auto eccentricity_y = 0., eccentricity_z = 0.;
+    if(recenter) eccentricity_y = barycenter(dim);
+    else {
+        if(!command.eof() && !get_input(command, eccentricity_y)) {
+            suanpan_error("A valid eccentricity is required.\n");
+            return;
+        }
+        if(!command.eof() && !get_input(command, eccentricity_z)) {
+            suanpan_error("A valid eccentricity is required.\n");
+            return;
+        }
     }
 
     return_obj = make_unique<TSection3D>(tag, std::move(dim), material_id, int_pt, vec{eccentricity_y, eccentricity_z});
@@ -726,7 +806,7 @@ void new_nm2d(unique_ptr<Section>& return_obj, istringstream& command, const uns
         return;
     }
 
-    if(3 == size) {
+    if(3u == size) {
         return_obj = make_unique<NM2D1>(tag, P(0), P(1), P(2));
         return;
     }
@@ -761,7 +841,7 @@ void new_nm3d(unique_ptr<Section>& return_obj, istringstream& command, const uns
         return;
     }
 
-    if(4 == size) {
+    if(4u == size) {
         return_obj = make_unique<NM3D1>(tag, P(0), P(1), P(2), P(3));
         return;
     }
@@ -800,7 +880,7 @@ void new_nmk(unique_ptr<Section>& return_obj, istringstream& command, const unsi
     double para;
     while(!command.eof() && get_input(command, para)) para_set.emplace_back(para);
 
-    const auto p_size = 13 == size ? 3 : 4;
+    const auto p_size = 13u == size ? 3 : 4;
 
     if(para_set.size() % p_size != 0) {
         suanpan_error("A valid parameter set is required.\n");
@@ -1872,7 +1952,7 @@ void new_eu2d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned int_pt = 6;
+    auto int_pt = 6u;
     if(!command.eof() && !get_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
         return;
@@ -1919,7 +1999,7 @@ void new_eu3d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned int_pt = 6;
+    auto int_pt = 6u;
     if(!command.eof() && !get_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
         return;
@@ -1972,7 +2052,7 @@ void new_nz2d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned int_pt = 6;
+    auto int_pt = 6u;
     if(!command.eof() && !get_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
         return;
@@ -2040,7 +2120,7 @@ void new_nz3d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned int_pt = 6;
+    auto int_pt = 6u;
     if(!command.eof() && !get_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
         return;
@@ -2089,7 +2169,7 @@ void new_nz3d(unique_ptr<Section>& return_obj, istringstream& command) {
     suanpan_error("Cannot identify section type.\n");
 }
 
-void new_us2d(unique_ptr<Section>& return_obj, istringstream& command) {
+void new_us2d(unique_ptr<Section>& return_obj, istringstream& command, const bool recenter) {
     string type;
     if(!get_input(command, type)) {
         suanpan_error("A valid designation is required.\n");
@@ -2114,14 +2194,14 @@ void new_us2d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned int_pt = 6;
+    auto int_pt = 6u;
     if(!command.eof() && !get_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
         return;
     }
 
     auto eccentricity = 0.;
-    if(!command.eof() && !get_input(command, eccentricity)) {
+    if(!recenter && !command.eof() && !get_input(command, eccentricity)) {
         suanpan_error("A valid eccentricity is required.\n");
         return;
     }
@@ -2136,14 +2216,15 @@ void new_us2d(unique_ptr<Section>& return_obj, istringstream& command) {
     dim = ustsection(type);
 
     if(!dim.is_empty()) {
-        return_obj = make_unique<TSection2D>(tag, scale * dim, material_id, int_pt, eccentricity);
+        if(recenter) eccentricity = barycenter(dim *= scale);
+        return_obj = make_unique<TSection2D>(tag, std::move(dim), material_id, int_pt, eccentricity);
         return;
     }
 
     suanpan_error("Cannot identify section type.\n");
 }
 
-void new_us3d(unique_ptr<Section>& return_obj, istringstream& command) {
+void new_us3d(unique_ptr<Section>& return_obj, istringstream& command, const bool recenter) {
     string type;
     if(!get_input(command, type)) {
         suanpan_error("A valid designation is required.\n");
@@ -2168,20 +2249,20 @@ void new_us3d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned int_pt = 6;
+    auto int_pt = 6u;
     if(!command.eof() && !get_input(command, int_pt)) {
         suanpan_error("A valid number of integration points is required.\n");
         return;
     }
 
     auto eccentricity_y = 0.;
-    if(!command.eof() && !get_input(command, eccentricity_y)) {
+    if(!recenter && !command.eof() && !get_input(command, eccentricity_y)) {
         suanpan_error("A valid eccentricity is required.\n");
         return;
     }
 
     auto eccentricity_z = 0.;
-    if(!command.eof() && !get_input(command, eccentricity_z)) {
+    if(!recenter && !command.eof() && !get_input(command, eccentricity_z)) {
         suanpan_error("A valid eccentricity is required.\n");
         return;
     }
@@ -2196,7 +2277,8 @@ void new_us3d(unique_ptr<Section>& return_obj, istringstream& command) {
     dim = ustsection(type);
 
     if(!dim.is_empty()) {
-        return_obj = make_unique<TSection3D>(tag, scale * dim, material_id, int_pt, vec{eccentricity_y, eccentricity_z});
+        if(recenter) eccentricity_y = barycenter(dim *= scale);
+        return_obj = make_unique<TSection3D>(tag, std::move(dim), material_id, int_pt, vec{eccentricity_y, eccentricity_z});
         return;
     }
 
@@ -2212,10 +2294,11 @@ int create_new_section(const shared_ptr<DomainBase>& domain, istringstream& comm
 
     unique_ptr<Section> new_section = nullptr;
 
-    if(is_equal(section_id, "Bar2D")) new_bar2d(new_section, command);
-    else if(is_equal(section_id, "Bar3D")) new_bar3d(new_section, command);
-    else if(is_equal(section_id, "Box2D")) new_box2d(new_section, command);
+    if(is_equal(section_id, "Box2D")) new_box2d(new_section, command);
     else if(is_equal(section_id, "Box3D")) new_box3d(new_section, command);
+    else if(is_equal(section_id, "Cell2D") || is_equal(section_id, "Bar2D")) new_cell2d(new_section, command);
+    else if(is_equal(section_id, "Cell3D") || is_equal(section_id, "Bar3D")) new_cell3d(new_section, command);
+    else if(is_equal(section_id, "Cell3DOS")) new_cell3dos(new_section, command);
     else if(is_equal(section_id, "Circle1D")) new_circle1d(new_section, command);
     else if(is_equal(section_id, "Circle2D")) new_circle2d(new_section, command);
     else if(is_equal(section_id, "Circle3D")) new_circle3d(new_section, command);
@@ -2223,16 +2306,21 @@ int create_new_section(const shared_ptr<DomainBase>& domain, istringstream& comm
     else if(is_equal(section_id, "CircularHollow3D")) new_circularhollow3D(new_section, command);
     else if(is_equal(section_id, "Fibre1D")) new_fibre1d(new_section, command);
     else if(is_equal(section_id, "Fibre2D")) new_fibre2d(new_section, command);
-    else if(is_equal(section_id, "Fibre3D")) new_fibre3d(new_section, command);
+    else if(is_equal(section_id, "Fibre3D")) new_fibre3d(new_section, command, false);
+    else if(is_equal(section_id, "Fibre3DOS")) new_fibre3d(new_section, command, true);
     else if(is_equal(section_id, "HSection2D")) new_hsection2d(new_section, command);
-    else if(is_equal(section_id, "ISection2D")) new_isection2d(new_section, command);
-    else if(is_equal(section_id, "ISection3D")) new_isection3d(new_section, command);
+    else if(is_equal(section_id, "ISection2D")) new_isection2d(new_section, command, false);
+    else if(is_equal(section_id, "ISection3D")) new_isection3d(new_section, command, false);
+    else if(is_equal(section_id, "ISection2DC")) new_isection2d(new_section, command, true);
+    else if(is_equal(section_id, "ISection3DC")) new_isection3d(new_section, command, true);
     else if(is_equal(section_id, "Rectangle1D")) new_rectangle1d(new_section, command);
     else if(is_equal(section_id, "Rectangle2D")) new_rectangle2d(new_section, command);
     else if(is_equal(section_id, "Rectangle3D")) new_rectangle3d(new_section, command);
     else if(is_equal(section_id, "TrussSection")) new_trusssection(new_section, command);
-    else if(is_equal(section_id, "TSection2D")) new_tsection2d(new_section, command);
-    else if(is_equal(section_id, "TSection3D")) new_tsection3d(new_section, command);
+    else if(is_equal(section_id, "TSection2D")) new_tsection2d(new_section, command, false);
+    else if(is_equal(section_id, "TSection3D")) new_tsection3d(new_section, command, false);
+    else if(is_equal(section_id, "TSection2DC")) new_tsection2d(new_section, command, true);
+    else if(is_equal(section_id, "TSection3DC")) new_tsection3d(new_section, command, true);
     else if(is_equal(section_id, "NM2D1")) new_nm2d(new_section, command, 3);
     else if(is_equal(section_id, "NM2D2")) new_nm2d(new_section, command, 8);
     else if(is_equal(section_id, "NM2D3")) new_nm2d(new_section, command, 11);
@@ -2245,8 +2333,10 @@ int create_new_section(const shared_ptr<DomainBase>& domain, istringstream& comm
     else if(is_equal(section_id, "EU3D")) new_eu3d(new_section, command);
     else if(is_equal(section_id, "NZ2D")) new_nz2d(new_section, command);
     else if(is_equal(section_id, "NZ3D")) new_nz3d(new_section, command);
-    else if(is_equal(section_id, "US2D")) new_us2d(new_section, command);
-    else if(is_equal(section_id, "US3D")) new_us3d(new_section, command);
+    else if(is_equal(section_id, "US2D")) new_us2d(new_section, command, false);
+    else if(is_equal(section_id, "US3D")) new_us3d(new_section, command, false);
+    else if(is_equal(section_id, "US2DC")) new_us2d(new_section, command, true);
+    else if(is_equal(section_id, "US3DC")) new_us3d(new_section, command, true);
     else load::object(new_section, domain, section_id, command);
 
     if(new_section == nullptr || !domain->insert(std::move(new_section)))

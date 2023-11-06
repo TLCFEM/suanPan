@@ -56,17 +56,18 @@ class CustomCDP final : public NonlinearCDP {
     [[nodiscard]] podarray<double> compute_compression_backbone(double) const override;
 
 public:
-    CustomCDP(unsigned, // tag
-              unsigned, // tension expression tag
-              unsigned, // compression expression tag
-              double,   // elastic modulus
-              double,   // poissons ratio
-              double,   // normalized crack energy (+)
-              double,   // normalized crush energy (+)
-              double,   // dilatancy parameter
-              double,   // biaxial compression strength ratio
-              double,   // stiffness recovery
-              double    // density
+    CustomCDP(
+        unsigned, // tag
+        unsigned, // tension expression tag
+        unsigned, // compression expression tag
+        double,   // elastic modulus
+        double,   // poissons ratio
+        double,   // normalized crack energy (+)
+        double,   // normalized crush energy (+)
+        double,   // dilatancy parameter
+        double,   // biaxial compression strength ratio
+        double,   // stiffness recovery
+        double    // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

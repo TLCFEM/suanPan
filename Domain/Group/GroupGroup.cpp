@@ -20,7 +20,8 @@
 #include <Toolbox/utility.h>
 
 GroupGroup::GroupGroup(const unsigned T, uvec&& GT)
-    : Group(T, std::forward<uvec>(GT)) {}
+    : Group(T)
+    , group_tag(std::forward<uvec>(GT)) {}
 
 void GroupGroup::initialize(const shared_ptr<DomainBase>& D) {
     uword size = 0;

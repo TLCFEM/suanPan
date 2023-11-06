@@ -34,17 +34,18 @@ struct DataMultilinearMises1D {
     const mat backbone;
 };
 
-class MultilinearMises1D final : DataMultilinearMises1D, public NonlinearMises1D {
+class MultilinearMises1D final : protected DataMultilinearMises1D, public NonlinearMises1D {
     [[nodiscard]] double compute_k(double) const override;
     [[nodiscard]] double compute_dk(double) const override;
     [[nodiscard]] double compute_h(double) const override;
     [[nodiscard]] double compute_dh(double) const override;
 
 public:
-    MultilinearMises1D(unsigned,   // tag
-                       double,     // elastic modulus
-                       mat&&,      // backbone
-                       double = 0. // density
+    MultilinearMises1D(
+        unsigned,   // tag
+        double,     // elastic modulus
+        mat&&,      // backbone
+        double = 0. // density
     );
 
     unique_ptr<Material> get_copy() override;

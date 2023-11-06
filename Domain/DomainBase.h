@@ -317,6 +317,8 @@ public:
     [[nodiscard]] virtual const shared_ptr<Integrator>& get_current_integrator() const = 0;
     [[nodiscard]] virtual const shared_ptr<Solver>& get_current_solver() const = 0;
 
+    virtual unique_ptr<Material> initialized_material_copy(uword) = 0;
+
     /**
      * \brief concurrently safe insertion method
      */
@@ -380,10 +382,12 @@ public:
 
     virtual void update_current_resistance() const = 0;
     virtual void update_current_damping_force() const = 0;
+    virtual void update_current_nonviscous_force() const = 0;
     virtual void update_current_inertial_force() const = 0;
 
     virtual void assemble_resistance() const = 0;
     virtual void assemble_damping_force() const = 0;
+    virtual void assemble_nonviscous_force() const = 0;
     virtual void assemble_inertial_force() const = 0;
 
     virtual void assemble_initial_mass() const = 0;
@@ -392,6 +396,9 @@ public:
     virtual void assemble_initial_damping() const = 0;
     virtual void assemble_current_damping() const = 0;
     virtual void assemble_trial_damping() const = 0;
+    virtual void assemble_initial_nonviscous() const = 0;
+    virtual void assemble_current_nonviscous() const = 0;
+    virtual void assemble_trial_nonviscous() const = 0;
     virtual void assemble_initial_stiffness() const = 0;
     virtual void assemble_current_stiffness() const = 0;
     virtual void assemble_trial_stiffness() const = 0;

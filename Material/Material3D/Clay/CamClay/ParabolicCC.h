@@ -38,20 +38,21 @@ struct DataParabolicCC {
     const double limit = sqrt(fabs(a / a_slope));
 };
 
-class ParabolicCC final : DataParabolicCC, public NonlinearCamClay {
+class ParabolicCC final : protected DataParabolicCC, public NonlinearCamClay {
     [[nodiscard]] double compute_a(double) const override;
     [[nodiscard]] double compute_da(double) const override;
 
 public:
-    ParabolicCC(unsigned,   // tag
-                double,     // elastic modulus
-                double,     // poisson's ratio
-                double,     // beta
-                double,     // m
-                double,     // pt
-                double,     // a
-                double,     // a_slope
-                double = 0. // density
+    ParabolicCC(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // poisson's ratio
+        double,     // beta
+        double,     // m
+        double,     // pt
+        double,     // a
+        double,     // a_slope
+        double = 0. // density
     );
 
     unique_ptr<Material> get_copy() override;

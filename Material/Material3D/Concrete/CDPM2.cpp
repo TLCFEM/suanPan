@@ -20,12 +20,13 @@
 #include <Recorder/OutputType.h>
 #include <Toolbox/tensor.h>
 #include <Toolbox/utility.h>
+#include <Toolbox/ridders.hpp>
 
 const double CDPM2::sqrt_six = std::sqrt(6.);
 const double CDPM2::sqrt_three_two = std::sqrt(1.5);
 const mat CDPM2::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
-void CDPM2::compute_plasticity(const double s, const double p, const double kp, podarray<double>& data) const {
+void CDPM2::compute_plasticity(const double lode, const double s, const double p, const double kp, vec& data) const {
     auto& f = data(0);
     auto& pfps = data(1);
     auto& pfpp = data(2);
@@ -41,6 +42,9 @@ void CDPM2::compute_plasticity(const double s, const double p, const double kp, 
     auto& pgppkp = data(12);
     auto& xh = data(13);
     auto& dxhdp = data(14);
+    auto& pfpl = data(15);
+    auto& r = data(16);
+    auto& drdl = data(17);
 
     auto qh1 = 1., qh2 = 1.;
     auto dqh1dkp = 0., dqh2dkp = 0.;
@@ -70,6 +74,18 @@ void CDPM2::compute_plasticity(const double s, const double p, const double kp, 
     const auto g3 = (s / sqrt_six + p) / fc;
     const auto g1 = (1. - qh1) * g3 * g3 + sqrt_three_two * s / fc;
 
+    const auto square_term = ra * lode * lode;
+    const auto sqrt_term = sqrt(rb * square_term + rc);
+    const auto numerator = square_term + rb;
+    const auto denominator = ra * lode + sqrt_term;
+    r = numerator / denominator;
+    drdl = ra / denominator * (2. * lode - r - r * rb * lode / sqrt_term);
+
+    const auto g4 = (r * s / sqrt_six + p) / fc;
+    const auto pg4pp = 1. / fc;
+    const auto pg4ps = r / sqrt_six / fc;
+    const auto pg4pl = s / sqrt_six / fc * drdl;
+
     const auto pg3pp = 1. / fc;
     const auto pg3ps = pg3pp / sqrt_six;
 
@@ -80,11 +96,12 @@ void CDPM2::compute_plasticity(const double s, const double p, const double kp, 
     const auto pg1ps = (2. - 2. * qh1) * g3 * pg3ps + sqrt_three_two / fc;
     const auto pg1pkp = -dqh1dkp * g3 * g3;
 
-    f = g1 * g1 + m0 * qh1 * qh1 * qh2 * g3 - qh1 * qh1 * qh2 * qh2;
+    f = g1 * g1 + m0 * qh1 * qh1 * qh2 * g4 - qh1 * qh1 * qh2 * qh2;
 
-    pfpp = 2. * g1 * pg1pp + m0 * qh1 * qh1 * qh2 * pg3pp;
-    pfps = 2. * g1 * pg1ps + m0 * qh1 * qh1 * qh2 * pg3ps;
-    pfpkp = 2. * g1 * pg1pkp + 2. * qh1 * qh2 * (m0 * g3 * dqh1dkp - qh1 * dqh2dkp - qh2 * dqh1dkp) + m0 * qh1 * qh1 * g3 * dqh2dkp;
+    pfpp = 2. * g1 * pg1pp + m0 * qh1 * qh1 * qh2 * pg4pp;
+    pfps = 2. * g1 * pg1ps + m0 * qh1 * qh1 * qh2 * pg4ps;
+    pfpkp = 2. * g1 * pg1pkp + 2. * qh1 * qh2 * (m0 * g4 * dqh1dkp - qh1 * dqh2dkp - qh2 * dqh1dkp) + m0 * qh1 * qh1 * g4 * dqh2dkp;
+    pfpl = m0 * qh1 * qh1 * qh2 * pg4pl;
 
     gp = 2. * g1 * pg1pp + qh1 * qh1 * pg2pp;
     gs = 2. * g1 * pg1ps + qh1 * qh1 * pg2ps;
@@ -119,16 +136,18 @@ void CDPM2::compute_plasticity(const double s, const double p, const double kp, 
     }
 }
 
-int CDPM2::compute_damage(const double gamma, const double s, const double p, const double kp, const double ac, podarray<double>& data) {
-    const auto& gs = data(4);
-    const auto& gp = data(5);
-    const auto& gg = data(6);
-    const auto& pgsps = data(7);
-    const auto& pgspp = data(8);
-    const auto& pgspkp = data(9);
-    const auto& pgpps = data(10);
-    const auto& pgppp = data(11);
-    const auto& pgppkp = data(12);
+int CDPM2::compute_damage(const double gamma, const double s, const double p, const double kp, const double ac, vec& data) {
+    const auto gs = data(4);
+    const auto gp = data(5);
+    const auto gg = data(6);
+    const auto pgsps = data(7);
+    const auto pgspp = data(8);
+    const auto pgspkp = data(9);
+    const auto pgpps = data(10);
+    const auto pgppp = data(11);
+    const auto pgppkp = data(12);
+    const auto r = data(16);
+    const auto drdl = data(17);
 
     const auto& current_ee = current_history(7);
     const auto& current_et = current_history(8);
@@ -151,7 +170,8 @@ int CDPM2::compute_damage(const double gamma, const double s, const double p, co
 
     // ee
     const auto ptapp = .5 * e0 * m0 / fc;
-    const auto ptaps = ptapp / sqrt_six;
+    const auto ptaps = ptapp / sqrt_six * r;
+    const auto ptapl = ptapp / sqrt_six * s * drdl;
     const auto ptbps = sqrt_three_two * e0 / fc;
     const auto term_a = ptaps * s + ptapp * p;
     const auto term_b = ptbps * s;
@@ -160,6 +180,7 @@ int CDPM2::compute_damage(const double gamma, const double s, const double p, co
     const auto incre_ee = ee - current_ee;
     const auto peeps = (ptaps * ee + term_b * ptbps) / term_c;
     const auto peepp = ptapp * ee / term_c;
+    const auto peepl = ptapl * ee / term_c;
 
     // ep
     const auto ep = gamma * gg;
@@ -176,24 +197,30 @@ int CDPM2::compute_damage(const double gamma, const double s, const double p, co
         pxsps = -pxspp * p / s;
     }
 
+    const auto at = 1. - ac;
+
     // kdt
-    auto incre_kdt = 0., pkdtps = 0., pkdtpp = 0.;
-    if((et = current_et + incre_ee) > kdt) {
+    auto incre_kdt = 0., pkdtps = 0., pkdtpp = 0., pkdtpac = 0., pkdtpl = 0.;
+    if((et = current_et + at * incre_ee) > kdt) {
         incre_kdt = et - kdt;
         kdt = et;
-        pkdtps = peeps;
-        pkdtpp = peepp;
+        pkdtps = at * peeps;
+        pkdtpp = at * peepp;
+        pkdtpac = -incre_ee;
+        pkdtpl = at * peepl;
     }
 
     // kdt1
-    auto pkdt1pg = 0., pkdt1ps = 0., pkdt1pp = 0., pkdt1pkp = 0.;
+    auto pkdt1pg = 0., pkdt1ps = 0., pkdt1pp = 0., pkdt1pkp = 0., pkdt1pac = 0.;
     if(incre_kdt > 0. && kdt > e0) {
-        const auto incre_kdt1 = ep / xs;
+        const auto atxs = at / xs;
+        const auto incre_kdt1 = atxs * ep;
         kdt1 = current_kdt1 + incre_kdt1;
-        pkdt1pg = peppg / xs;
-        pkdt1ps = (pepps - incre_kdt1 * pxsps) / xs;
-        pkdt1pp = (peppp - incre_kdt1 * pxspp) / xs;
-        pkdt1pkp = peppkp / xs;
+        pkdt1pg = atxs * peppg;
+        pkdt1ps = atxs * (pepps - incre_kdt1 * pxsps);
+        pkdt1pp = atxs * (peppp - incre_kdt1 * pxspp);
+        pkdt1pkp = atxs * peppkp;
+        pkdt1pac = -ep / xs;
     }
 
     // kdt2
@@ -201,15 +228,18 @@ int CDPM2::compute_damage(const double gamma, const double s, const double p, co
     kdt2 = current_kdt2 + incre_kdt2;
     const auto pkdt2ps = (pkdtps - incre_kdt2 * pxsps) / xs;
     const auto pkdt2pp = (pkdtpp - incre_kdt2 * pxspp) / xs;
+    const auto pkdt2pac = pkdtpac / xs;
+    const auto pkdt2pl = pkdtpl / xs;
 
     // kdc
-    auto incre_kdc = 0., pkdcps = 0., pkdcpp = 0., pkdcpac = 0.;
+    auto incre_kdc = 0., pkdcps = 0., pkdcpp = 0., pkdcpac = 0., pkdcpl = 0.;
     if((ec = current_ec + ac * incre_ee) > kdc) {
         incre_kdc = ec - kdc;
         kdc = ec;
         pkdcps = ac * peeps;
         pkdcpp = ac * peepp;
         pkdcpac = incre_ee;
+        pkdcpl = ac * peepl;
     }
 
     // kdc1
@@ -240,8 +270,9 @@ int CDPM2::compute_damage(const double gamma, const double s, const double p, co
     const auto pkdc2ps = (pkdcps - incre_kdc2 * pxsps) / xs;
     const auto pkdc2pp = (pkdcpp - incre_kdc2 * pxspp) / xs;
     const auto pkdc2pac = pkdcpac / xs;
+    const auto pkdc2pl = pkdcpl / xs;
 
-    podarray<double> datad(3);
+    vec datad(3);
 
     if(SUANPAN_SUCCESS != compute_damage_factor(kdt, kdt1, kdt2, eft, omegat, datad)) return SUANPAN_FAIL;
     const auto& potpkdt = datad(0);
@@ -252,11 +283,15 @@ int CDPM2::compute_damage(const double gamma, const double s, const double p, co
     auto& potps = data(1);
     auto& potpq = data(2);
     auto& potpkp = data(3);
+    auto& potpac = data(8);
+    auto& potpl = data(9);
 
     potpg = potpkdt1 * pkdt1pg;
     potps = potpkdt * pkdtps + potpkdt1 * pkdt1ps + potpkdt2 * pkdt2ps;
     potpq = potpkdt * pkdtpp + potpkdt1 * pkdt1pp + potpkdt2 * pkdt2pp;
     potpkp = potpkdt1 * pkdt1pkp;
+    potpac = potpkdt * pkdtpac + potpkdt1 * pkdt1pac + potpkdt2 * pkdt2pac;
+    potpl = potpkdt * pkdtpl + potpkdt2 * pkdt2pl;
 
     if(SUANPAN_SUCCESS != compute_damage_factor(kdc, kdc1, kdc2, efc, omegac, datad)) return SUANPAN_FAIL;
     const auto& pocpkdc = datad(0);
@@ -267,18 +302,20 @@ int CDPM2::compute_damage(const double gamma, const double s, const double p, co
     auto& pocps = data(5);
     auto& pocpq = data(6);
     auto& pocpkp = data(7);
-    auto& pocpac = data(8);
+    auto& pocpac = data(10);
+    auto& pocpl = data(11);
 
     pocpg = pocpkdc1 * pkdc1pg;
     pocps = pocpkdc * pkdcps + pocpkdc1 * pkdc1ps + pocpkdc2 * pkdc2ps;
     pocpq = pocpkdc * pkdcpp + pocpkdc1 * pkdc1pp + pocpkdc2 * pkdc2pp;
     pocpkp = pocpkdc1 * pkdc1pkp;
     pocpac = pocpkdc * pkdcpac + pocpkdc1 * pkdc1pac + pocpkdc2 * pkdc2pac;
+    pocpl = pocpkdc * pkdcpl + pocpkdc2 * pkdc2pl;
 
     return SUANPAN_SUCCESS;
 }
 
-int CDPM2::compute_damage_factor(const double kd, const double kd1, const double kd2, const double ef, double& omega, podarray<double>& data) const {
+int CDPM2::compute_damage_factor(const double kd, const double kd1, const double kd2, const double ef, double& omega, vec& data) const {
     auto& popkd = data(0);
     auto& popkd1 = data(1);
     auto& popkd2 = data(2);
@@ -290,19 +327,22 @@ int CDPM2::compute_damage_factor(const double kd, const double kd1, const double
         return SUANPAN_SUCCESS;
     }
 
+    omega = 1.; // initial guess with the maximum value to avoid convergence to the negative solution
+
     auto counter = 0u;
     while(true) {
         if(max_iteration == ++counter) return SUANPAN_FAIL;
 
         const auto term_a = ft * exp(-(kd1 + omega * kd2) / ef);
         const auto term_b = (1. - omega) * elastic_modulus;
+        const auto residual = term_a - term_b * kd;
         const auto jacobian = elastic_modulus * kd - kd2 / ef * term_a;
-        const auto incre = (term_a - term_b * kd) / jacobian;
+        const auto incre = residual / jacobian;
 
         const auto error = fabs(incre);
         suanpan_debug("Local damage iteration error: {:.5E}.\n", error);
 
-        if(error <= tolerance) {
+        if(error < tolerance || (fabs(residual) < tolerance && counter > 5u)) {
             popkd = term_b / jacobian;
             popkd1 = term_a / ef / jacobian;
             popkd2 = popkd1 * omega;
@@ -314,9 +354,9 @@ int CDPM2::compute_damage_factor(const double kd, const double kd1, const double
 }
 
 CDPM2::CDPM2(const unsigned T, const double E, const double V, const double FT, const double FC, const double QH0, const double HP, const double DF, const double AH, const double BH, const double CH, const double DH, const double AS, const double EFT, const double EFC, const DamageType DT, const double R)
-    : DataCDPM2{fabs(E), fabs(V), fabs(FT), fabs(FC), QH0, HP, DF, AH, BH, CH, DH, AS, fabs(EFT), fabs(EFC)}
+    : DataCDPM2{fabs(E), fabs(V), fabs(FT), fabs(FC), fabs(QH0), std::max(HP, static_cast<double>(std::numeric_limits<float>::epsilon())), DF, AH, BH, CH, DH, AS, fabs(EFT), fabs(EFC)}
     , Material3D(T, R)
-    , damage_type(DT) { access::rw(tolerance) = 1E-13; }
+    , damage_type(DT) {}
 
 int CDPM2::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = tensor::isotropic_stiffness(elastic_modulus, poissons_ratio);
@@ -328,19 +368,12 @@ int CDPM2::initialize(const shared_ptr<DomainBase>&) {
 
 unique_ptr<Material> CDPM2::get_copy() { return make_unique<CDPM2>(*this); }
 
-double CDPM2::get_parameter(const ParameterType P) const {
-    if(ParameterType::DENSITY == P) return density;
-    if(ParameterType::ELASTICMODULUS == P || ParameterType::YOUNGSMODULUS == P || ParameterType::E == P) return elastic_modulus;
-    if(ParameterType::SHEARMODULUS == P || ParameterType::G == P) return .5 * double_shear;
-    if(ParameterType::BULKMODULUS == P) return elastic_modulus / (3. - 6. * poissons_ratio);
-    if(ParameterType::POISSONSRATIO == P) return poissons_ratio;
-    return 0.;
-}
+double CDPM2::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
 
 int CDPM2::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
-    if(norm(incre_strain) <= tolerance) return SUANPAN_SUCCESS;
+    if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
 
     trial_history = current_history;
     const auto& current_kp = current_history(0);
@@ -359,6 +392,34 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     const auto trial_p = hydro_stress;
     const vec n = dev_stress / trial_s;
 
+    static constexpr double low_limit = -.95;
+    static const double low_slope = (2. * cos(acos(low_limit) / 3.) - 1.) / (low_limit + 1.);
+    static constexpr double high_limit = .95;
+    static const double high_slope = (2. * cos(acos(high_limit) / 3.) - 2.) / (high_limit - 1.);
+
+    double lode, dlode;
+    if(const auto lode_a = tensor::stress::lode(dev_stress); lode_a < low_limit) {
+        // close to left boundary
+        // use linear approximation
+        lode = 1. + low_slope * (1. + lode_a);
+        dlode = low_slope;
+    }
+    else if(lode_a > high_limit) {
+        // close to right boundary
+        // use linear approximation
+        lode = 2. + high_slope * (lode_a - 1.);
+        dlode = high_slope;
+    }
+    else {
+        const auto lode_b = acos(lode_a) / 3.; // theta
+        lode = 2. * cos(lode_b);               // 2*cos(theta)
+        dlode = 2. / 3. * sin(lode_b) / sqrt((1. - lode_a) * (1. + lode_a));
+    }
+
+    const auto square_lode = lode * lode;
+    const rowvec dlde = dlode * double_shear * (tensor::stress::lode_der(dev_stress) % tensor::stress::norm_weight).t() * unit_dev_tensor;
+
+    auto ini_f = 0.;
     auto gamma = 0., s = trial_s, p = trial_p;
 
     mat jacobian(4, 4, fill::none), left(4, 6, fill::zeros);
@@ -366,7 +427,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
 
     vec residual(4), incre;
 
-    podarray<double> data(15);
+    vec data(18);
     const auto& f = data(0);
     const auto& pfps = data(1);
     const auto& pfpp = data(2);
@@ -382,23 +443,66 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     const auto& pgppkp = data(12);
     const auto& xh = data(13);
     const auto& dxhdp = data(14);
+    const auto& pfpl = data(15);
+    // const auto& r = data(16);
+    // const auto& drdl = data(17);
 
     auto counter = 0u;
-
+    auto ref_error = 1.;
+    auto try_bisection = false;
     while(true) {
         if(max_iteration == ++counter) {
+            if(!try_bisection) {
+                try_bisection = true;
+
+                const auto approx_update = [&](const double gm) {
+                    gamma = gm;
+                    s = trial_s - double_shear * gamma * gs;
+                    p = trial_p - bulk * gamma * gp;
+                    kp = current_kp + gamma * gg * square_lode / xh;
+                    compute_plasticity(lode, s, p, kp, data);
+                    return f;
+                };
+
+                approx_update(0.); // clear data
+
+                gamma = ini_f / elastic_modulus / elastic_modulus;
+                auto x1 = 0., f1 = ini_f;
+                // find a proper bracket
+                while(true) {
+                    if(approx_update(gamma) < 0.) break;
+                    x1 = gamma;
+                    f1 = f;
+                    gamma *= 2.;
+                }
+
+                ridders(approx_update, x1, f1, gamma, f, tolerance);
+
+                counter = 1u; // avoid initial elastic check
+
+                continue;
+            }
+
             suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
             return SUANPAN_FAIL;
         }
 
-        compute_plasticity(s, p, kp, data);
+        compute_plasticity(lode, s, p, kp, data);
 
-        if(1u == counter && f < 0.) break;
+        if(!data.is_finite()) {
+            suanpan_error("Non-finite value detected.\n");
+            return SUANPAN_FAIL;
+        }
+
+        if(1u == counter) {
+            if(f < 0.) break;
+            ini_f = f;
+        }
 
         residual(0) = f;
         residual(1) = s + double_shear * gamma * gs - trial_s;
         residual(2) = p + bulk * gamma * gp - trial_p;
-        residual(3) = xh * (current_kp - kp) + gamma * gg;
+        residual(3) = xh * (current_kp - kp) + gamma * gg * square_lode;
 
         jacobian(0, 1) = pfps;
         jacobian(0, 2) = pfpp;
@@ -414,17 +518,18 @@ int CDPM2::update_trial_status(const vec& t_strain) {
         jacobian(2, 2) = bulk * gamma * pgppp + 1.;
         jacobian(2, 3) = bulk * gamma * pgppkp;
 
-        jacobian(3, 0) = gg;
-        jacobian(3, 1) = gamma / gg * (gs * pgsps + gp / 3. * pgpps);
-        jacobian(3, 2) = gamma / gg * (gs * pgspp + gp / 3. * pgppp) + (current_kp - kp) * dxhdp;
-        jacobian(3, 3) = gamma / gg * (gs * pgspkp + gp / 3. * pgppkp) - xh;
+        jacobian(3, 0) = gg * square_lode;
+        jacobian(3, 1) = gamma * square_lode / gg * (gs * pgsps + gp / 3. * pgpps);
+        jacobian(3, 2) = gamma * square_lode / gg * (gs * pgspp + gp / 3. * pgppp) + (current_kp - kp) * dxhdp;
+        jacobian(3, 3) = gamma * square_lode / gg * (gs * pgspkp + gp / 3. * pgppkp) - xh;
 
-        if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
+        if(!solve(incre, jacobian, residual, solve_opts::equilibrate + solve_opts::refine)) return SUANPAN_FAIL;
 
-        const auto error = norm(residual);
+        const auto error = inf_norm(incre);
+        if(1u == counter) ref_error = error;
         suanpan_debug("Local plasticity iteration error: {:.5E}.\n", error);
 
-        if(error <= tolerance) {
+        if(error < tolerance * ref_error || (inf_norm(residual) < tolerance && counter > 5u)) {
             const vec unit_n = n % tensor::stress::norm_weight;
 
             plastic_strain += gamma * gs * unit_n + gamma * gp / 3. * tensor::unit_tensor2;
@@ -433,10 +538,10 @@ int CDPM2::update_trial_status(const vec& t_strain) {
 
             mat right(4, 6, fill::none);
 
-            right.row(0).zeros();
+            right.row(0) = -pfpl * dlde;
             right.row(1) = double_shear * unit_n.t() * unit_dev_tensor;
             right.row(2) = bulk * tensor::unit_tensor2.t();
-            right.row(3).zeros();
+            right.row(3) = -2. * gamma * gg * lode * dlde;
 
             if(!solve(left, jacobian, right)) return SUANPAN_FAIL;
 
@@ -474,34 +579,46 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     const auto aca = accu(square(principal_stress(c_pattern)));
     const auto acb = accu(square(principal_stress));
     const auto ac = aca / acb;
-    rowvec daca = 2. * principal_stress.t();
-    daca(t_pattern).fill(0.);
-    const rowvec dac = (daca - 2. * ac * principal_stress.t()) / acb;
 
     if(SUANPAN_SUCCESS != compute_damage(gamma, s, p, kp, ac, data)) return SUANPAN_FAIL;
 
-    if(DamageType::NODAMAGE == damage_type) return SUANPAN_SUCCESS;
+    if(const auto &kdt = trial_history(10), &kdc = trial_history(11); DamageType::NODAMAGE == damage_type || (kdt < e0 && kdc < e0)) return SUANPAN_SUCCESS;
 
     const auto& omegat = trial_history(16);
     const auto& omegac = trial_history(17);
     const rowvec pot(&data(0), 4);
     const rowvec poc(&data(4), 4);
-    const auto& pocpac = data(8);
+    const auto& potpac = data(8);
+    const auto& potpl = data(9);
+    const auto& pocpac = data(10);
+    const auto& pocpl = data(11);
 
-    const rowvec potpe = pot * left;
-    const rowvec pocpe = poc * left + pocpac * dac * transform::compute_jacobian_nominal_to_principal(principal_direction) * trial_stiffness;
+    rowvec daca = 2. * principal_stress.t();
+    daca(t_pattern).fill(0.);
+    const rowvec dac = (daca - 2. * ac * principal_stress.t()) / acb;
+    const rowvec dacde = dac * transform::compute_jacobian_nominal_to_principal(principal_direction) * trial_stiffness;
+
+    const rowvec potpe = pot * left + potpac * dacde + potpl * dlde;
+    const rowvec pocpe = poc * left + pocpac * dacde + pocpl * dlde;
+
+    const auto damage_t = 1. - omegat;
+    const auto damage_c = 1. - omegac;
 
     if(DamageType::ISOTROPIC == damage_type) {
-        trial_stiffness *= (1. - omegat) * (1. - omegac);
-        trial_stiffness -= trial_stress * ((1. - omegat) * pocpe + (1. - omegac) * potpe);
+        trial_stiffness *= damage_t * damage_c;
+        trial_stiffness -= trial_stress * (damage_t * pocpe + damage_c * potpe);
 
-        trial_stress *= (1. - omegat) * (1. - omegac);
+        trial_stress *= damage_t * damage_c;
     }
     else if(DamageType::ANISOTROPIC == damage_type) {
-        const auto get_fraction = [](const vec& p_stress) {
-            const auto compute_fraction = [](const double a, const double b) { return suanpan::approx_equal(a, b, 4) ? a + b <= 0. ? 0. : 2. : 2. * (suanpan::ramp(a) - suanpan::ramp(b)) / (a - b); };
+        const auto get_fraction = [](const vec& stress) {
+            const auto compute_fraction = [&stress](const unsigned i, const unsigned j) {
+                const auto &a = stress(i), &b = stress(j);
 
-            return vec{compute_fraction(p_stress(0), p_stress(1)), compute_fraction(p_stress(1), p_stress(2)), compute_fraction(p_stress(2), p_stress(0))};
+                return suanpan::approx_equal(a, b, 4) ? a + b <= 0. ? 0. : 2. : 2. * (suanpan::ramp(a) - suanpan::ramp(b)) / (a - b);
+            };
+
+            return vec{compute_fraction(0, 1), compute_fraction(1, 2), compute_fraction(2, 0)};
         };
 
         const mat pnn = transform::eigen_to_tensor_base(principal_direction);
@@ -514,9 +631,9 @@ int CDPM2::update_trial_status(const vec& t_strain) {
 
         const vec tension_stress = tension_projector * trial_stress;
 
-        trial_stiffness = (1. - omegac) * trial_stiffness - trial_stress * pocpe + (omegac - omegat) * tension_derivative * trial_stiffness + tension_stress * (pocpe - potpe);
+        trial_stiffness = damage_c * trial_stiffness - trial_stress * pocpe + (omegac - omegat) * tension_derivative * trial_stiffness + tension_stress * (pocpe - potpe);
 
-        trial_stress *= 1. - omegac;
+        trial_stress *= damage_c;
         trial_stress += (omegac - omegat) * tension_stress;
     }
 
@@ -547,12 +664,11 @@ int CDPM2::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-vector<vec> CDPM2::record(const OutputType T) {
-    if(T == OutputType::KAPPAP) return {vec{current_history(0)}};
-    if(T == OutputType::DT) return {vec{current_history(16)}};
-    if(T == OutputType::DC) return {vec{current_history(17)}};
+vector<vec> CDPM2::record(const OutputType P) {
+    if(P == OutputType::DT) return {vec{current_history(16)}};
+    if(P == OutputType::DC) return {vec{current_history(17)}};
 
-    return Material3D::record(T);
+    return Material3D::record(P);
 }
 
 void CDPM2::print() {

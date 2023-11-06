@@ -52,6 +52,10 @@ int MultiplierBC::process(const shared_ptr<DomainBase>& D) {
             std::scoped_lock lock(W->get_damping_mutex());
             for(const auto I : dof_encoding) t_damping->nullify(I);
         }
+        if(auto& t_nonviscous = W->get_nonviscous(); nullptr != t_nonviscous) {
+            std::scoped_lock lock(W->get_nonviscous_mutex());
+            for(const auto I : dof_encoding) t_nonviscous->nullify(I);
+        }
         if(auto& t_geometry = W->get_geometry(); nullptr != t_geometry) {
             std::scoped_lock lock(W->get_geometry_mutex());
             for(const auto I : dof_encoding) t_geometry->nullify(I);

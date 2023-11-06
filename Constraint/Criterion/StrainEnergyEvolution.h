@@ -35,15 +35,16 @@
 
 class StrainEnergyEvolution final : public EnergyEvolution {
 public:
-    StrainEnergyEvolution(unsigned,      // tag
-                          unsigned,      // step tag
-                          unsigned,      // incre level
-                          unsigned,      // final level
-                          double = 1.,   // centre weight
-                          unsigned = 2,  // propagation iteration
-                          unsigned = 10, // reactivation ratio
-                          double = .5,   // propagation weight
-                          double = 1E-5  // tolerance
+    StrainEnergyEvolution(
+        unsigned,      // tag
+        unsigned,      // step tag
+        unsigned,      // incre level
+        unsigned,      // final level
+        double = 1.,   // centre weight
+        unsigned = 2,  // propagation iteration
+        unsigned = 10, // reactivation ratio
+        double = .5,   // propagation weight
+        double = 1E-5  // tolerance
     );
 
     unique_ptr<Criterion> get_copy() override;

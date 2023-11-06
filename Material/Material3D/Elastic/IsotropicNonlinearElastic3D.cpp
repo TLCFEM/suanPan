@@ -40,7 +40,7 @@ int IsotropicNonlinearElastic3D::initialize(const shared_ptr<DomainBase>&) {
 int IsotropicNonlinearElastic3D::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
-    if(norm(incre_strain) < 1E-12) return SUANPAN_SUCCESS;
+    if(norm(incre_strain) < datum::eps) return SUANPAN_SUCCESS;
 
     const auto d_strain = tensor::dev(trial_strain);                                      // deviatoric strain
     const auto e_strain = two_third * dot(tensor::strain::norm_weight, square(d_strain)); // equivalent strain squared

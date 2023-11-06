@@ -37,19 +37,12 @@ int BilinearJ2::initialize(const shared_ptr<DomainBase>&) {
 
 unique_ptr<Material> BilinearJ2::get_copy() { return make_unique<BilinearJ2>(*this); }
 
-double BilinearJ2::get_parameter(const ParameterType P) const {
-    if(ParameterType::DENSITY == P) return density;
-    if(ParameterType::ELASTICMODULUS == P || ParameterType::YOUNGSMODULUS == P || ParameterType::E == P) return elastic_modulus;
-    if(ParameterType::SHEARMODULUS == P || ParameterType::G == P) return shear_modulus;
-    if(ParameterType::BULKMODULUS == P) return elastic_modulus / (3. - 6. * poissons_ratio);
-    if(ParameterType::POISSONSRATIO == P) return poissons_ratio;
-    return 0.;
-}
+double BilinearJ2::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
 
 int BilinearJ2::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
-    if(norm(incre_strain) <= tolerance) return SUANPAN_SUCCESS;
+    if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
 
     trial_stress = current_stress + (trial_stiffness = initial_stiffness) * incre_strain;
 
@@ -102,14 +95,6 @@ int BilinearJ2::reset_status() {
     trial_history = current_history;
     trial_stiffness = current_stiffness;
     return SUANPAN_SUCCESS;
-}
-
-vector<vec> BilinearJ2::record(const OutputType P) {
-    if(P == OutputType::MISES) return {vec{tensor::stress::norm(tensor::dev(current_stress)) / root_two_third}};
-    if(P == OutputType::EEQ) return {vec{root_two_third * tensor::strain::norm(tensor::dev(current_strain))}};
-    if(P == OutputType::PEEQ) return {vec{current_history(0)}};
-
-    return Material3D::record(P);
 }
 
 void BilinearJ2::print() {

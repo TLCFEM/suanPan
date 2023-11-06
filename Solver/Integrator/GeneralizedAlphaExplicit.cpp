@@ -28,18 +28,20 @@ GeneralizedAlphaExplicit::GeneralizedAlphaExplicit(const unsigned T, const doubl
 bool GeneralizedAlphaExplicit::has_corrector() const { return true; }
 
 void GeneralizedAlphaExplicit::assemble_resistance() {
-    const auto& D = get_domain();
+    const auto D = get_domain();
     auto& W = D->get_factory();
 
     auto fa = std::async([&] { D->assemble_resistance(); });
     auto fb = std::async([&] { D->assemble_damping_force(); });
-    auto fc = std::async([&] { D->assemble_inertial_force(); });
+    auto fc = std::async([&] { D->assemble_nonviscous_force(); });
+    auto fd = std::async([&] { D->assemble_inertial_force(); });
 
     fa.get();
     fb.get();
     fc.get();
+    fd.get();
 
-    W->set_sushi(W->get_trial_resistance() - AF * W->get_incre_resistance() + W->get_trial_damping_force() - AF * W->get_incre_damping_force() + W->get_trial_inertial_force() - AM * W->get_incre_inertial_force());
+    W->set_sushi(W->get_trial_resistance() - AF * W->get_incre_resistance() + W->get_trial_damping_force() - AF * W->get_incre_damping_force() + W->get_trial_nonviscous_force() - AF * W->get_incre_nonviscous_force() + W->get_trial_inertial_force() - AM * W->get_incre_inertial_force());
 }
 
 void GeneralizedAlphaExplicit::assemble_matrix() { get_domain()->assemble_trial_mass(); }
@@ -51,7 +53,7 @@ vec GeneralizedAlphaExplicit::get_displacement_residual() { return ExplicitInteg
 sp_mat GeneralizedAlphaExplicit::get_reference_load() { return ExplicitIntegrator::get_reference_load() / (1. - AM); }
 
 int GeneralizedAlphaExplicit::process_load() {
-    const auto& D = get_domain();
+    const auto D = get_domain();
     auto& W = D->get_factory();
 
     const sp_d auto current_time = W->get_current_time();
@@ -67,7 +69,7 @@ int GeneralizedAlphaExplicit::process_load() {
 }
 
 int GeneralizedAlphaExplicit::process_constraint() {
-    const auto& D = get_domain();
+    const auto D = get_domain();
     auto& W = D->get_factory();
 
     const sp_d auto current_time = W->get_current_time();
@@ -83,7 +85,7 @@ int GeneralizedAlphaExplicit::process_constraint() {
 }
 
 int GeneralizedAlphaExplicit::process_load_resistance() {
-    const auto& D = get_domain();
+    const auto D = get_domain();
     auto& W = D->get_factory();
 
     const sp_d auto current_time = W->get_current_time();
@@ -99,7 +101,7 @@ int GeneralizedAlphaExplicit::process_load_resistance() {
 }
 
 int GeneralizedAlphaExplicit::process_constraint_resistance() {
-    const auto& D = get_domain();
+    const auto D = get_domain();
     auto& W = D->get_factory();
 
     const sp_d auto current_time = W->get_current_time();
@@ -115,7 +117,7 @@ int GeneralizedAlphaExplicit::process_constraint_resistance() {
 }
 
 int GeneralizedAlphaExplicit::update_trial_status() {
-    const auto& D = get_domain();
+    const auto D = get_domain();
     auto& W = D->get_factory();
 
     W->update_incre_displacement(DT * W->get_current_velocity() + (.5 - B) * DT * DT * W->get_current_acceleration());
@@ -125,7 +127,7 @@ int GeneralizedAlphaExplicit::update_trial_status() {
 }
 
 int GeneralizedAlphaExplicit::correct_trial_status() {
-    const auto& D = get_domain();
+    const auto D = get_domain();
     auto& W = D->get_factory();
 
     W->update_trial_displacement_by(B * DT * DT * W->get_trial_acceleration());

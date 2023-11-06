@@ -25,8 +25,8 @@ Kelvin::Kelvin(const unsigned T, const unsigned DT, const unsigned ST)
     , spring_tag(ST) {}
 
 int Kelvin::initialize(const shared_ptr<DomainBase>& D) {
-    damper = suanpan::initialized_material_copy(D, damper_tag);
-    spring = suanpan::initialized_material_copy(D, spring_tag);
+    damper = D->initialized_material_copy(damper_tag);
+    spring = D->initialized_material_copy(spring_tag);
 
     if(nullptr == damper || nullptr == spring) return SUANPAN_FAIL;
 
@@ -92,17 +92,17 @@ int Kelvin::reset_status() {
 }
 
 vector<vec> Kelvin::record(const OutputType P) {
-    vector<vec> data;
+    if(OutputType::S == P) return {current_stress};
+    if(OutputType::E == P) return {current_strain};
+    if(OutputType::V == P) return {current_strain_rate};
+    if(OutputType::SD == P) return {damper->get_current_stress()};
+    if(OutputType::ED == P) return {damper->get_current_strain()};
+    if(OutputType::VD == P) return {damper->get_current_strain_rate()};
+    if(OutputType::SS == P) return {spring->get_current_stress()};
+    if(OutputType::ES == P) return {spring->get_current_strain()};
+    if(OutputType::VS == P) return {spring->get_current_strain_rate()};
 
-    if(OutputType::SD == P || OutputType::SS == P || OutputType::S == P) data.emplace_back(current_stress);
-    else if(OutputType::ED == P) data.emplace_back(damper->get_current_strain());
-    else if(OutputType::VD == P) data.emplace_back(damper->get_current_strain_rate());
-    else if(OutputType::ES == P) data.emplace_back(spring->get_current_strain());
-    else if(OutputType::VS == P) data.emplace_back(spring->get_current_strain_rate());
-    else if(OutputType::E == P) data.emplace_back(current_strain);
-    else if(OutputType::V == P) data.emplace_back(current_strain_rate);
-
-    return data;
+    return {};
 }
 
 void Kelvin::print() {

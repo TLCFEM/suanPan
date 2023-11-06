@@ -59,7 +59,7 @@ int Integrator::process_load() { return database.lock()->process_load(true); }
  * On exit, the global stiffness matrix should be updated, the global residual vector should be updated.
  */
 int Integrator::process_constraint() {
-    const auto& D = database.lock();
+    const auto D = database.lock();
     auto& W = D->get_factory();
 
     const auto code = D->process_constraint(true);
@@ -86,7 +86,7 @@ int Integrator::process_load_resistance() { return database.lock()->process_load
  * In this case, the factorised matrix cannot be modified.
  */
 int Integrator::process_constraint_resistance() {
-    const auto& D = database.lock();
+    const auto D = database.lock();
     auto& W = D->get_factory();
 
     const auto code = D->process_constraint(false);
@@ -99,7 +99,7 @@ int Integrator::process_constraint_resistance() {
 void Integrator::record() const { database.lock()->record(); }
 
 void Integrator::assemble_resistance() {
-    const auto& D = database.lock();
+    const auto D = database.lock();
     auto& W = D->get_factory();
     D->assemble_resistance();
     W->set_sushi(W->get_trial_resistance());
@@ -110,18 +110,18 @@ void Integrator::assemble_resistance() {
  * For FEM applications, it is often a linear combination of stiffness, mass, damping and geometry matrices.
  */
 void Integrator::assemble_matrix() {
-    const auto& D = database.lock();
+    const auto D = database.lock();
     auto& W = D->get_factory();
     D->assemble_trial_stiffness();
     D->assemble_trial_geometry();
-    W->get_stiffness() += W->get_geometry();
+    if(W->is_nlgeom()) W->get_stiffness() += W->get_geometry();
 }
 
 /**
  * Assemble the global residual vector in load-controlled solving schemes.
  */
 vec Integrator::get_force_residual() {
-    const auto& D = database.lock();
+    const auto D = database.lock();
     auto& W = D->get_factory();
 
     vec residual = W->get_trial_load() - W->get_sushi();
@@ -136,7 +136,7 @@ vec Integrator::get_force_residual() {
  * Apart from the global resistance and external load vectors, the reference load vector shall also be considered.
  */
 vec Integrator::get_displacement_residual() {
-    const auto& D = database.lock();
+    const auto D = database.lock();
     auto& W = D->get_factory();
 
     vec residual = W->get_reference_load() * W->get_trial_load_factor() + W->get_trial_load() - W->get_sushi();
@@ -188,7 +188,7 @@ void Integrator::update_incre_time(const double T) {
 }
 
 int Integrator::update_trial_status() {
-    const auto& D = get_domain();
+    const auto D = get_domain();
     auto& W = D->get_factory();
 
     return suanpan::approx_equal(norm(W->get_incre_displacement()), 0.) ? SUANPAN_SUCCESS : D->update_trial_status();
@@ -274,7 +274,7 @@ int Integrator::solve(mat& X, sp_mat&& B) { return database.lock()->get_factory(
  * The corresponding DoF shall be set to zero after solving the system.
  */
 void Integrator::erase_machine_error(vec& ninja) const {
-    const auto& D = get_domain();
+    const auto D = get_domain();
     auto& W = D->get_factory();
 
     D->erase_machine_error(ninja);

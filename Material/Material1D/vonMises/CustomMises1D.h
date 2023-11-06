@@ -43,11 +43,12 @@ class CustomMises1D final : public NonlinearMises1D {
     ResourceHolder<Expression> k_expression, h_expression;
 
 public:
-    CustomMises1D(unsigned,   // tag
-                  double,     // elastic modulus
-                  unsigned,   // isotropic hardening function
-                  unsigned,   // kinematic hardening function
-                  double = 0. // density
+    CustomMises1D(
+        unsigned,   // tag
+        double,     // elastic modulus
+        unsigned,   // isotropic hardening function
+        unsigned,   // kinematic hardening function
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

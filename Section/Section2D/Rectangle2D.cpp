@@ -29,24 +29,15 @@ Rectangle2D::Rectangle2D(const unsigned T, const double B, const double H, const
 int Rectangle2D::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get_material(material_tag);
 
-    access::rw(linear_density) = area * material_proto->get_parameter(ParameterType::DENSITY);
+    access::rw(linear_density) = area * material_proto->get_density();
 
     const IntegrationPlan plan(1, int_pt_num, IntegrationType::GAUSS);
 
     int_pt.clear();
     int_pt.reserve(int_pt_num);
-    initial_stiffness.zeros(2, 2);
-    for(unsigned I = 0; I < int_pt_num; ++I) {
-        int_pt.emplace_back(.5 * height * plan(I, 0), .5 * plan(I, 1) * area, material_proto->get_copy());
-        auto tmp_a = int_pt[I].s_material->get_initial_stiffness().at(0) * int_pt[I].weight;
-        const auto tmp_b = eccentricity(0) - int_pt[I].coor;
-        initial_stiffness(0, 0) += tmp_a;
-        initial_stiffness(0, 1) += tmp_a *= tmp_b;
-        initial_stiffness(1, 1) += tmp_a *= tmp_b;
-    }
-    initial_stiffness(1, 0) = initial_stiffness(0, 1);
+    for(unsigned I = 0; I < int_pt_num; ++I) int_pt.emplace_back(.5 * height * plan(I, 0), .5 * plan(I, 1) * area, material_proto->get_copy());
 
-    trial_stiffness = current_stiffness = initial_stiffness;
+    initialize_stiffness();
 
     return SUANPAN_SUCCESS;
 }

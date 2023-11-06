@@ -1,0 +1,40 @@
+# A TEST MODEL FOR US2D T SECTION
+
+node 1 0 0
+node 2 1 0
+
+material Elastic1D 1 10
+
+section US2DC WT12X31 1 1 1 10
+section US2DC WT20X181 2 1 1 10
+section US2DC WT20X132 3 1 1 10
+section US2DC WT18X401 4 1 1 10
+section US2DC WT18X141 5 1 1 10
+section US2DC WT18X116 6 1 1 10
+section US2DC WT18X80 7 1 1 10
+section US2DC WT15X163 8 1 1 10
+section US2DC WT15X146 9 1 1 10
+
+element B21 1 1 2 1
+element B21 2 1 2 2
+element B21 3 1 2 3
+element B21 4 1 2 4
+element B21 5 1 2 5
+element B21 6 1 2 6
+element B21 7 1 2 7
+element B21 8 1 2 8
+element B21 9 1 2 9
+
+fix2 1 E 1
+
+displacement 1 0 1 1 2
+
+step static 1
+
+analyze
+
+peek node 2
+
+reset
+clear
+exit

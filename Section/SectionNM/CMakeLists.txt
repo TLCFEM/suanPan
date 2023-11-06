@@ -13,4 +13,4 @@ set(SNM
         SectionNM/NM3D1.cpp
         SectionNM/NM3D2.cpp
         SectionNM/NM3D3.cpp
-        )
+)

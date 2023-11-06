@@ -20,9 +20,9 @@
 
 Modifier::Modifier(const unsigned T, uvec&& ET)
     : Tag(T)
-    , element_tag(std::forward<uvec>(ET)) {}
+    , element_tag(unique(ET)) {}
 
-void Modifier::initialize(const shared_ptr<DomainBase>& D) {
+int Modifier::initialize(const shared_ptr<DomainBase>& D) {
     element_pool.clear();
 
     if(element_tag.empty()) {
@@ -33,4 +33,6 @@ void Modifier::initialize(const shared_ptr<DomainBase>& D) {
         element_pool.reserve(element_tag.size());
         for(const auto I : element_tag) if(D->find<Element>(I) && D->get<Element>(I)->is_active()) element_pool.emplace_back(D->get<Element>(I));
     }
+
+    return SUANPAN_SUCCESS;
 }

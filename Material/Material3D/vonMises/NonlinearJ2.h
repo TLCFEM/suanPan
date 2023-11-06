@@ -39,7 +39,7 @@ struct DataNonlinearJ2 {
 };
 
 class NonlinearJ2 : protected DataNonlinearJ2, public Material3D {
-    static constexpr unsigned max_iteration = 20;
+    static constexpr unsigned max_iteration = 20u;
     static constexpr double two_third = 2. / 3.;
     static const double root_two_third;
     static const mat unit_dev_tensor;
@@ -54,10 +54,11 @@ class NonlinearJ2 : protected DataNonlinearJ2, public Material3D {
     [[nodiscard]] virtual double compute_dh(double) const = 0;
 
 public:
-    NonlinearJ2(unsigned,   // tag
-                double,     // elastic modulus
-                double,     // poisson's ratio
-                double = 0. // density
+    NonlinearJ2(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // poisson's ratio
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;
@@ -69,8 +70,6 @@ public:
     int clear_status() override;
     int commit_status() override;
     int reset_status() override;
-
-    vector<vec> record(OutputType) override;
 
     void print() override;
 };

@@ -49,14 +49,15 @@ class T2D2 final : public MaterialElement1D {
     const bool update_area; // flag to indicate if to update section area
     const bool log_strain;  // flag to indicate if to use log strain
 public:
-    T2D2(unsigned,     // tag
-         uvec&&,       // node tag
-         unsigned,     // material tag
-         double,       // area
-         bool = false, // nonlinear geometry switch
-         bool = true,  // update area switch
-         bool = true,  // log strain switch
-         double = -1.  // flexural rigidity
+    T2D2(
+        unsigned,     // tag
+        uvec&&,       // node tag
+        unsigned,     // material tag
+        double,       // area
+        bool = false, // nonlinear geometry switch
+        bool = true,  // update area switch
+        bool = true,  // log strain switch
+        double = -1.  // flexural rigidity
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

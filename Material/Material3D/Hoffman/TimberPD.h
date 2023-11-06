@@ -17,6 +17,9 @@
 /**
  * @class TimberPD
  * @brief The TimberPD class.
+ * 
+ * Reference:
+ * 1. [10.1016/j.compstruc.2017.09.010](https://doi.org/10.1016/j.compstruc.2017.09.010)
  *
  * @author tlc
  * @date 24/08/2023
@@ -44,12 +47,13 @@ class TimberPD final : protected DataTimberPD, public BilinearHoffman {
     [[nodiscard]] double update_damage_c(const vec&, mat&);
 
 public:
-    TimberPD(unsigned,   // tag
-             vec&&,      // elastic modulus
-             vec&&,      // poissons ratio
-             vec&&,      // sigma
-             vec&&,      // hardening
-             double = 0. // density
+    TimberPD(
+        unsigned,   // tag
+        vec&&,      // elastic modulus
+        vec&&,      // poissons ratio
+        vec&&,      // sigma
+        vec&&,      // hardening
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

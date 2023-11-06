@@ -23,15 +23,20 @@ hdf5recorder 1 Node RF 1 2 3 4
 
 step static 1
 set fixed_step_size 1
-set ini_step_size 1E-2
+set ini_step_size 1E-1
 set symm_mat 0
 
-converger AbsIncreDisp 1 1E-13 10 1
+converger AbsIncreDisp 1 1E-12 10 1
 
 analyze
 
+# Node 5:
+# Coordinate:
+#   5.0000e+00 -5.0000e+00  5.0000e+00
+# Displacement:
+#   0.0000e+00  0.0000e+00 -2.0000e-02
 # Resistance:
-# -5.8435e+03 5.8435e+03 -7.7404e+03
+#  -5.8449e+03  5.8449e+03 -7.7403e+03
 peek node 5 6 7 8
 
 peek element 1

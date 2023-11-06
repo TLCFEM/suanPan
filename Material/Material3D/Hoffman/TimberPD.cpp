@@ -25,13 +25,13 @@ TimberPD::TimberPD(const unsigned T, vec&& EE, vec&& VV, vec&& SS, vec&& HH, con
     , hill_t(transform::hill_projection(yield_stress(0), yield_stress(2), yield_stress(4), yield_stress(6), yield_stress(7), yield_stress(8)))
     , hill_c(transform::hill_projection(yield_stress(1), yield_stress(3), yield_stress(5), yield_stress(6), yield_stress(7), yield_stress(8))) {}
 
-int TimberPD::initialize(const shared_ptr<DomainBase>&) {
+int TimberPD::initialize(const shared_ptr<DomainBase>& D) {
     initial_history.resize(9);
     initial_history(7) = ini_r_t;
     initial_history(8) = ini_r_c;
     initialize_history(9);
 
-    return BilinearHoffman::initialize(nullptr);
+    return BilinearHoffman::initialize(D);
 }
 
 unique_ptr<Material> TimberPD::get_copy() { return make_unique<TimberPD>(*this); }
@@ -39,7 +39,7 @@ unique_ptr<Material> TimberPD::get_copy() { return make_unique<TimberPD>(*this);
 int TimberPD::update_trial_status(const vec& t_strain) {
     if(SUANPAN_SUCCESS != BilinearHoffman::update_trial_status(t_strain)) return SUANPAN_FAIL;
 
-    if(norm(incre_strain) <= tolerance) return SUANPAN_SUCCESS;
+    if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
 
     vec principal_stress;    // 3
     mat principal_direction; // 3x3
@@ -102,12 +102,11 @@ double TimberPD::compute_damage_t(const double r_t) const { return 1. - ini_r_t 
 
 double TimberPD::compute_damage_c(const double r_c) const { return b_c * pow(std::max(datum::eps, 1. - ini_r_c / r_c), m_c); }
 
-vector<vec> TimberPD::record(const OutputType T) {
-    if(T == OutputType::KAPPAP) return {vec{current_history(0)}};
-    if(T == OutputType::DT) return {vec{compute_damage_t(current_history(1))}};
-    if(T == OutputType::DC) return {vec{compute_damage_c(current_history(2))}};
+vector<vec> TimberPD::record(const OutputType P) {
+    if(P == OutputType::DT) return {vec{compute_damage_t(current_history(1))}};
+    if(P == OutputType::DC) return {vec{compute_damage_c(current_history(2))}};
 
-    return Material3D::record(T);
+    return Material3D::record(P);
 }
 
 void TimberPD::print() {

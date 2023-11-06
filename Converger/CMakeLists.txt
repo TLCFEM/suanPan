@@ -15,4 +15,4 @@ target_sources(${PROJECT_NAME} PRIVATE
         RelIncreAcc.cpp
         RelIncreEnergy.cpp
         RelResidual.cpp
-        )
+)

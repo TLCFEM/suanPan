@@ -41,8 +41,8 @@ struct DataBoucWen {
     const double n;
 };
 
-class BoucWen final : DataBoucWen, public Material1D {
-    static constexpr unsigned max_iteration = 20;
+class BoucWen final : protected DataBoucWen, public Material1D {
+    static constexpr unsigned max_iteration = 20u;
 
     const double modulus_a = hardening * elastic_modulus;
     const double modulus_b = yield_stress - hardening * yield_stress;
@@ -50,8 +50,9 @@ class BoucWen final : DataBoucWen, public Material1D {
     const double gamma = 1. - beta;
 
 public:
-    BoucWen(unsigned, // tag
-            vec&&     // parameter
+    BoucWen(
+        unsigned, // tag
+        vec&&     // parameter
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

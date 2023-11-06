@@ -52,7 +52,7 @@ struct DataNonlinearCDP {
 };
 
 class NonlinearCDP : protected DataNonlinearCDP, public Material3D {
-    static constexpr unsigned max_iteration = 20;
+    static constexpr unsigned max_iteration = 20u;
     static const double root_three_two;
     static constexpr double scale = .999; // to avoid overshoot
     static const mat unit_dev_tensor;
@@ -101,15 +101,16 @@ class NonlinearCDP : protected DataNonlinearCDP, public Material3D {
     [[nodiscard]] virtual podarray<double> compute_compression_backbone(double) const = 0;
 
 public:
-    NonlinearCDP(unsigned, // tag
-                 double,   // elastic modulus
-                 double,   // poissons ratio
-                 double,   // normalized crack energy (+)
-                 double,   // normalized crush energy (+)
-                 double,   // dilatancy parameter
-                 double,   // biaxial compression strength ratio
-                 double,   // stiffness recovery
-                 double    // density
+    NonlinearCDP(
+        unsigned, // tag
+        double,   // elastic modulus
+        double,   // poissons ratio
+        double,   // normalized crack energy (+)
+        double,   // normalized crush energy (+)
+        double,   // dilatancy parameter
+        double,   // biaxial compression strength ratio
+        double,   // stiffness recovery
+        double    // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

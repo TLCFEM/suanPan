@@ -49,12 +49,13 @@ class DCP3 final : public MaterialElement2D {
     double maximum_energy = 0.;
 
 public:
-    DCP3(unsigned,   // tag
-         uvec&&,     // node tag
-         unsigned,   // material tag
-         double,     // characteristic length
-         double,     // energy release rate
-         double = 1. // thickness
+    DCP3(
+        unsigned,   // tag
+        uvec&&,     // node tag
+        unsigned,   // material tag
+        double,     // characteristic length
+        double,     // energy release rate
+        double = 1. // thickness
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

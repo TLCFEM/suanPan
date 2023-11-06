@@ -28,7 +28,7 @@ BFGS::BFGS(const unsigned T, const unsigned MH)
 int BFGS::analyze() {
     auto& C = get_converger();
     auto& G = get_integrator();
-    const auto& D = C->get_domain().lock();
+    const auto D = C->get_domain().lock();
     auto& W = D->get_factory();
 
     suanpan_highlight(">> Current Analysis Time: {:.5f}.\n", W->get_trial_time());
@@ -36,7 +36,7 @@ int BFGS::analyze() {
     const auto max_iteration = C->get_max_iteration();
 
     // iteration counter
-    unsigned counter = 0;
+    auto counter = 0u;
 
     // lambda alias
     auto& aux_lambda = W->modify_auxiliary_lambda();
@@ -59,6 +59,8 @@ int BFGS::analyze() {
     };
 
     while(true) {
+        set_step_amplifier(sqrt(max_iteration / (counter + 1.)));
+
         // update for nodes and elements
         if(SUANPAN_SUCCESS != G->update_trial_status()) return SUANPAN_FAIL;
         // process modifiers

@@ -147,9 +147,9 @@ element CP4 58 72 77 78 73 1 1
 element CP4 59 73 78 79 74 1 1
 element CP4 60 74 79 80 75 1 1
 element CP4 61 76 81 82 77 1 1
-element CP4 62 77 82 83 78 5 1
+element CP4 62 77 82 83 78 4 1
 element CP4 63 78 83 84 79 4 1
-element CP4 64 79 84 85 80 3 1
+element CP4 64 79 84 85 80 1 1
 
 fix 1 P 1 2 3 4 5
 
@@ -157,16 +157,17 @@ cload 1 0 2 2 84 83 82
 cload 2 0 1 2 85 81
 
 material BilinearJ2 2 5000 .2 80 .05
-material PlaneStress 1 2 1 true
-material PlaneStress 3 2 1 false
-material PlaneStress 4 2 10 true
-material PlaneStress 5 2 10 false
+material PlaneStress 1 2 10
+material PlaneStress 4 2 1
+
+material Elastic2D 10 100 .2
+material PlaneStress 11 10
 
 step static 1
-set ini_step_size .1
+set ini_step_size 1E-2
 set fixed_step_size true
 
-converger RelIncreDisp 1 1E-10 50 1
+converger RelIncreDisp 1 1E-12 20 1
 
 analyze
 

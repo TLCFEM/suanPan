@@ -41,7 +41,7 @@ int NonlinearViscosity::update_trial_status(const vec& t_strain, const vec& t_st
     incre_strain = (trial_strain = t_strain) - current_strain;
     incre_strain_rate = (trial_strain_rate = t_strain_rate) - current_strain_rate;
 
-    if(norm(incre_strain) + norm(incre_strain_rate) <= 1E-14) return SUANPAN_SUCCESS;
+    if(norm(incre_strain) + norm(incre_strain_rate) <= datum::eps) return SUANPAN_SUCCESS;
 
     const auto &u = trial_strain(0), &v = trial_strain_rate(0);
 
@@ -102,13 +102,11 @@ int NonlinearViscosity::reset_status() {
 }
 
 vector<vec> NonlinearViscosity::record(const OutputType P) {
-    vector<vec> data;
+    if(OutputType::S == P) return {current_stress};
+    if(OutputType::E == P || OutputType::ED == P) return {current_strain};
+    if(OutputType::V == P || OutputType::VD == P) return {current_strain_rate};
 
-    if(OutputType::S == P) data.emplace_back(current_stress);
-    else if(OutputType::E == P || OutputType::ED == P) data.emplace_back(current_strain);
-    else if(OutputType::V == P || OutputType::VD == P) data.emplace_back(current_strain_rate);
-
-    return data;
+    return {};
 }
 
 void NonlinearViscosity::print() {

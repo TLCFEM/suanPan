@@ -29,7 +29,6 @@
 #define SECTION_H
 
 #include <Domain/Tag.h>
-#include <Section/ParameterType.h>
 
 enum class SectionType : unsigned {
     D0 = 0,
@@ -37,7 +36,8 @@ enum class SectionType : unsigned {
     D2 = 2,
     D3 = 3,
     NM2D = 3,
-    NM3D = 6
+    NM3D = 6,
+    OS3D = 12,
 };
 
 enum class OutputType;
@@ -50,24 +50,28 @@ struct DataSection {
 
     const SectionType section_type;
 
-    const double area;
-
-    const double linear_density;
-
     const vec eccentricity;
 
-    vec trial_deformation;   // trial deformation
-    vec current_deformation; // current deformation
+    const double area;
+    const double linear_density = 0.;
+    const double characteristic_length = -1.;
 
-    vec trial_deformation_rate;   // trial deformation rate
-    vec current_deformation_rate; // current deformation rate
+    vec trial_deformation{};   // trial deformation
+    vec current_deformation{}; // current deformation
 
-    vec trial_resistance;   // trial resistance
-    vec current_resistance; // current resistance
+    vec trial_deformation_rate{};   // trial deformation rate
+    vec current_deformation_rate{}; // current deformation rate
 
-    mat initial_stiffness; // initial stiffness matrix
-    mat current_stiffness; // stiffness matrix
-    mat trial_stiffness;   // stiffness matrix
+    vec trial_resistance{};   // trial resistance
+    vec current_resistance{}; // current resistance
+
+    mat initial_stiffness{}; // stiffness matrix
+    mat current_stiffness{}; // stiffness matrix
+    mat trial_stiffness{};   // stiffness matrix
+
+    mat initial_geometry{}; // geometry matrix
+    mat current_geometry{}; // geometry matrix
+    mat trial_geometry{};   // geometry matrix
 };
 
 class Section : protected DataSection, public Tag {
@@ -75,11 +79,12 @@ class Section : protected DataSection, public Tag {
     const bool symmetric = false;
 
 public:
-    explicit Section(unsigned = 0,                  // section tag
-                     SectionType = SectionType::D0, // section type
-                     unsigned = 0,                  // material tag
-                     double = 0.,                   // area
-                     vec&& = {0., 0.}               // eccentricity
+    explicit Section(
+        unsigned = 0,                  // section tag
+        SectionType = SectionType::D0, // section type
+        unsigned = 0,                  // material tag
+        double = 0.,                   // area
+        vec&& = {0., 0.}               // eccentricity
     );
     Section(const Section&) = default;           // default copy ctor
     Section(Section&&) = delete;                 // move forbidden
@@ -87,6 +92,10 @@ public:
     Section& operator=(Section&&) = delete;      // assign forbidden
 
     ~Section() override = default;
+
+    [[nodiscard]] SectionType get_section_type() const;
+    [[nodiscard]] double get_area() const;
+    [[nodiscard]] double get_linear_density() const;
 
     int initialize_base(const shared_ptr<DomainBase>&);
 
@@ -97,26 +106,28 @@ public:
     [[nodiscard]] bool is_initialized() const;
     [[nodiscard]] bool is_symmetric() const;
 
-    [[nodiscard]] SectionType get_section_type() const;
-
     void set_eccentricity(const vec&) const;
     [[nodiscard]] const vec& get_eccentricity() const;
+
+    virtual void set_characteristic_length(double) const;
+    [[nodiscard]] double get_characteristic_length() const;
 
     [[nodiscard]] virtual const vec& get_trial_deformation() const;
     [[nodiscard]] virtual const vec& get_trial_deformation_rate() const;
     [[nodiscard]] virtual const vec& get_trial_resistance() const;
     [[nodiscard]] virtual const mat& get_trial_stiffness() const;
+    [[nodiscard]] virtual const mat& get_trial_geometry() const;
 
     [[nodiscard]] virtual const vec& get_current_deformation() const;
     [[nodiscard]] virtual const vec& get_current_deformation_rate() const;
     [[nodiscard]] virtual const vec& get_current_resistance() const;
     [[nodiscard]] virtual const mat& get_current_stiffness() const;
+    [[nodiscard]] virtual const mat& get_current_geometry() const;
 
     [[nodiscard]] virtual const mat& get_initial_stiffness() const;
+    [[nodiscard]] virtual const mat& get_initial_geometry() const;
 
     virtual unique_ptr<Section> get_copy() = 0;
-
-    virtual double get_parameter(ParameterType = ParameterType::NONE);
 
     int update_incre_status(double);
     int update_incre_status(double, double);

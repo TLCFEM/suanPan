@@ -40,14 +40,15 @@ struct DataBlatzKo {
     const double half_beta_two;
 };
 
-class BlatzKo final : DataBlatzKo, public Material3D {
+class BlatzKo final : protected DataBlatzKo, public Material3D {
     static const vec weight;
 
 public:
-    BlatzKo(unsigned,   // tag
-            double,     // elastic modulus
-            double,     // poissons ratio
-            double = 0. // density
+    BlatzKo(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // poissons ratio
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

@@ -36,7 +36,8 @@ class CIN3D8 final : public MaterialElement3D {
         vec coor;
         double weight;
         unique_ptr<Material> c_material;
-        mat pn_pxyz, strain_mat;
+        mat pn_pxyz;
+        sp_mat strain_mat;
         IntegrationPoint(vec&&, double, unique_ptr<Material>&&, mat&&);
     };
 
@@ -49,9 +50,10 @@ class CIN3D8 final : public MaterialElement3D {
     static mat compute_dn(const vec&);
 
 public:
-    CIN3D8(unsigned, // tag
-           uvec&&,   // node tag
-           unsigned  // material tag
+    CIN3D8(
+        unsigned, // tag
+        uvec&&,   // node tag
+        unsigned  // material tag
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

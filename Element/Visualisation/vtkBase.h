@@ -53,7 +53,7 @@ public:
 
     virtual void Setup();
 
-    virtual void GetData(vtkSmartPointer<vtkDoubleArray>&, OutputType = OutputType::U);
+    virtual void GetData(vtkSmartPointer<vtkDoubleArray>&, OutputType);
     virtual mat GetData(OutputType);
 
     virtual void SetDeformation(vtkSmartPointer<vtkPoints>&, double);

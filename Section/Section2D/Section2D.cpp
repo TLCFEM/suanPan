@@ -23,13 +23,27 @@ Section2D::IntegrationPoint::IntegrationPoint(const double C, const double W, un
     , weight(W)
     , s_material(std::forward<unique_ptr<Material>>(M)) {}
 
-Section2D::IntegrationPoint::IntegrationPoint(const IntegrationPoint& old_obj)
-    : coor(old_obj.coor)
-    , weight(old_obj.weight)
-    , s_material(suanpan::make_copy(old_obj.s_material)) {}
+void Section2D::initialize_stiffness() {
+    initial_stiffness.zeros(2, 2);
+    for(const auto& I : int_pt) {
+        auto ea = I.s_material->get_initial_stiffness().at(0) * I.weight;
+        const auto arm_y = eccentricity(0) - I.coor;
+        initial_stiffness(0, 0) += ea;
+        initial_stiffness(0, 1) += ea *= arm_y;
+        initial_stiffness(1, 1) += ea *= arm_y;
+    }
+    initial_stiffness(1, 0) = initial_stiffness(0, 1);
+
+    trial_stiffness = current_stiffness = initial_stiffness;
+}
 
 Section2D::Section2D(const unsigned T, const unsigned MT, const double A, const double EC)
     : Section(T, SectionType::D2, MT, A, vec{EC, 0.}) {}
+
+void Section2D::set_characteristic_length(const double L) const {
+    Section::set_characteristic_length(L);
+    for(const auto& I : int_pt) I.s_material->set_characteristic_length(L);
+}
 
 int Section2D::update_trial_status(const vec& t_deformation) {
     if(norm((trial_deformation = t_deformation) - current_deformation) <= datum::eps) return SUANPAN_SUCCESS;
@@ -38,20 +52,18 @@ int Section2D::update_trial_status(const vec& t_deformation) {
     trial_resistance.zeros();
 
     for(const auto& I : int_pt) {
-        const auto arm = eccentricity(0) - I.coor;
-        if(I.s_material->update_trial_status(trial_deformation(0) + trial_deformation(1) * arm) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
-        auto tmp_a = I.s_material->get_trial_stiffness().at(0) * I.weight;
-        trial_stiffness(0, 0) += tmp_a;
-        trial_stiffness(0, 1) += tmp_a *= arm;
-        trial_stiffness(1, 1) += tmp_a *= arm;
-        tmp_a = I.s_material->get_trial_stress().at(0) * I.weight;
-        trial_resistance(0) += tmp_a;
-        trial_resistance(1) += tmp_a * arm;
+        const auto arm_y = eccentricity(0) - I.coor;
+        if(I.s_material->update_trial_status(trial_deformation(0) + trial_deformation(1) * arm_y) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
+        auto ea = I.s_material->get_trial_stiffness().at(0) * I.weight;
+        trial_stiffness(0, 0) += ea;
+        trial_stiffness(0, 1) += ea *= arm_y;
+        trial_stiffness(1, 1) += ea *= arm_y;
+        ea = I.s_material->get_trial_stress().at(0) * I.weight;
+        trial_resistance(0) += ea;
+        trial_resistance(1) += ea * arm_y;
     }
 
     trial_stiffness(1, 0) = trial_stiffness(0, 1);
-
-    suanpan_assert([&] { if(!trial_resistance.is_finite() || !trial_stiffness.is_finite()) throw invalid_argument("infinite number detected"); });
 
     return SUANPAN_SUCCESS;
 }

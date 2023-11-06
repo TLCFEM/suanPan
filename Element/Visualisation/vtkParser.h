@@ -56,10 +56,6 @@ void vtk_plot_node_quantity(const shared_ptr<DomainBase>&, vtkInfo);
 
 void vtk_plot_element_quantity(const shared_ptr<DomainBase>&, vtkInfo);
 
-int vtk_get_index(OutputType);
-
-const char* vtk_get_name(OutputType);
-
 #else
 
 inline int vtk_parser(const shared_ptr<DomainBase>&, istringstream&) { return 0; }

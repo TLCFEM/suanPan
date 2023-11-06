@@ -36,7 +36,8 @@ class CP6 final : public MaterialElement2D {
         vec coor;
         double weight;
         unique_ptr<Material> m_material;
-        mat pn_pxy, strain_mat;
+        mat pn_pxy;
+        sp_mat strain_mat;
         IntegrationPoint(vec&&, double, unique_ptr<Material>&&, mat&&);
     };
 
@@ -49,7 +50,8 @@ class CP6 final : public MaterialElement2D {
     vector<IntegrationPoint> int_pt;
 
 public:
-    CP6(unsigned,    // tag
+    CP6(
+        unsigned,    // tag
         uvec&&,      // node tag
         unsigned,    // material tag
         double = 1., // thickness

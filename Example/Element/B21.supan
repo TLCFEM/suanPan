@@ -19,6 +19,7 @@ lineudl2d 2 0 10 2 1 2
 recorder 1 hdf5 Element E 1
 recorder 2 hdf5 Element S 1
 recorder 3 hdf5 Element PE 1
+recorder 4 hdf5 Element EE 1
 
 step static 1 1
 set ini_step_size .1
@@ -28,8 +29,8 @@ converger RelIncreDisp 1 1E-8 5 1
 
 analyze
 
-# -0.0270 0.3272 0.4865 cload
-# -0.0069 -0.1659 -0.2483 lineudl2d
+# -2.6967e-02 3.2715e-01 4.8652e-01 cload
+# -6.8955e-03 -1.6589e-01 -2.4828e-01 lineudl2d
 peek node 2
 
 peek element 1

@@ -41,7 +41,7 @@ int CSMQ::initialize(const shared_ptr<DomainBase>& D) {
         return SUANPAN_FAIL;
     }
 
-    if(PlaneType::E == static_cast<PlaneType>(material_proto->get_parameter(ParameterType::PLANETYPE))) suanpan::hacker(thickness) = 1.;
+    if(PlaneType::E == material_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
 
     const auto ele_coor = get_coordinate(2);
 
@@ -123,7 +123,7 @@ int CSMQ::initialize(const shared_ptr<DomainBase>& D) {
         I.b3 *= T3;
     }
 
-    if(const auto t_density = material_proto->get_parameter(ParameterType::DENSITY); t_density > 0.) {
+    if(const auto t_density = material_proto->get_density(); t_density > 0.) {
         initial_mass.zeros(m_size, m_size);
         for(const auto& I : int_pt) {
             const auto n_int = compute_shape_function(I.coor, 0);
@@ -192,9 +192,9 @@ int CSMQ::reset_status() {
 mat CSMQ::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
 vector<vec> CSMQ::record(const OutputType P) {
-    vector<vec> output;
-    for(const auto& I : int_pt) for(const auto& J : I.m_material->record(P)) output.emplace_back(J);
-    return output;
+    vector<vec> data;
+    for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
+    return data;
 }
 
 void CSMQ::print() {
@@ -233,10 +233,10 @@ void CSMQ::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType typ
 
 mat CSMQ::GetData(const OutputType P) {
     mat A(int_pt.size(), 9);
-    mat B(int_pt.size(), 6, fill::zeros);
+    mat B(6, int_pt.size(), fill::zeros);
 
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        if(const auto C = int_pt[I].m_material->record(P); !C.empty()) B(I, 0, size(C[0])) = C[0];
+        if(const auto C = int_pt[I].m_material->record(P); !C.empty()) B(0, I, size(C[0])) = C[0];
         A.row(I) = interpolation::quadratic(int_pt[I].coor);
     }
 
@@ -251,7 +251,7 @@ mat CSMQ::GetData(const OutputType P) {
     data.row(6) = interpolation::quadratic(0., 1.);
     data.row(7) = interpolation::quadratic(-1., 0.);
 
-    return (data * solve(A, B)).t();
+    return (data * solve(A, B.t())).t();
 }
 
 void CSMQ::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {

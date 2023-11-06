@@ -22,18 +22,19 @@
 Section1D::Section1D(const unsigned T, const unsigned MT, const double A)
     : Section(T, SectionType::D1, MT, A) {}
 
-Section1D::Section1D(const Section1D& old_obj)
-    : Section(old_obj)
-    , s_material(suanpan::make_copy(old_obj.s_material)) {}
-
 int Section1D::initialize(const shared_ptr<DomainBase>& D) {
-    s_material = suanpan::initialized_material_copy(D, material_tag);
+    s_material = D->initialized_material_copy(material_tag);
 
-    access::rw(linear_density) = area * s_material->get_parameter(ParameterType::DENSITY);
+    access::rw(linear_density) = area * s_material->get_density();
 
     trial_stiffness = current_stiffness = initial_stiffness = area * s_material->get_initial_stiffness().at(0);
 
     return SUANPAN_SUCCESS;
+}
+
+void Section1D::set_characteristic_length(const double L) const {
+    Section::set_characteristic_length(L);
+    s_material->set_characteristic_length(L);
 }
 
 int Section1D::update_trial_status(const vec& t_deformation) {

@@ -35,6 +35,14 @@
 
 #include <Domain/Tag.h>
 
+enum class OrientationType {
+    T2D,
+    T3D,
+    B2D,
+    B3D,
+    B3DOS
+};
+
 class Element;
 
 class Orientation : public Tag {
@@ -64,6 +72,8 @@ public:
     virtual void set_element_ptr(const Element*);
 
     [[nodiscard]] virtual bool is_nlgeom() const;
+
+    [[nodiscard]] virtual OrientationType get_orientation_type() const = 0;
 
     [[nodiscard]] double get_length() const;
     [[nodiscard]] double get_inclination() const;

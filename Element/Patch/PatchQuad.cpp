@@ -20,7 +20,6 @@
 #include <Element/Utility/IGA/NURBSSurface.h>
 #include <Material/Material2D/Material2D.h>
 #include <Toolbox/IntegrationPlan.h>
-#include <Toolbox/tensor.h>
 #include <Toolbox/utility.h>
 
 PatchQuad::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M)
@@ -37,7 +36,7 @@ PatchQuad::PatchQuad(const unsigned T, vec&& KX, vec&& KY, uvec&& N, const unsig
 int PatchQuad::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
-    if(PlaneType::E == static_cast<PlaneType>(material_proto->get_parameter(ParameterType::PLANETYPE))) suanpan::hacker(thickness) = 1.;
+    if(PlaneType::E == material_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
 
     const NURBSSurface2D net(knot_pool[0], knot_pool[1]);
 
@@ -51,7 +50,7 @@ int PatchQuad::initialize(const shared_ptr<DomainBase>& D) {
 
     auto& ini_stiffness = material_proto->get_initial_stiffness();
 
-    const auto t_density = material_proto->get_parameter(ParameterType::DENSITY);
+    const auto t_density = material_proto->get_density();
 
     body_force.zeros(m_size, m_dof);
     initial_stiffness.zeros(m_size, m_size);
@@ -147,9 +146,9 @@ int PatchQuad::reset_status() {
     return code;
 }
 
-vector<vec> PatchQuad::record(const OutputType T) {
+vector<vec> PatchQuad::record(const OutputType P) {
     vector<vec> data;
-    for(const auto& I : int_pt) for(const auto& J : I.m_material->record(T)) data.emplace_back(J);
+    for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
     return data;
 }
 

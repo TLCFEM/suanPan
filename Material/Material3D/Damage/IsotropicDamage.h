@@ -29,24 +29,21 @@
 #define ISOTROPICDAMAGE_H
 
 #include <Material/Material3D/Material3D.h>
+#include <Toolbox/ResourceHolder.h>
 
 class IsotropicDamage : public Material3D {
     const unsigned mat_tag;
 
-    unique_ptr<Material> mat_ptr;
+    ResourceHolder<Material> mat_ptr;
 
 protected:
     virtual void compute_damage() = 0;
 
 public:
-    IsotropicDamage(unsigned, // tag
-                    unsigned  // mat tag
+    IsotropicDamage(
+        unsigned, // tag
+        unsigned  // mat tag
     );
-    IsotropicDamage(const IsotropicDamage&);
-    IsotropicDamage(IsotropicDamage&&) = delete;
-    IsotropicDamage& operator=(const IsotropicDamage&) = delete;
-    IsotropicDamage& operator=(IsotropicDamage&&) = delete;
-    ~IsotropicDamage() override = default;
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

@@ -12,4 +12,4 @@ target_sources(${PROJECT_NAME} PRIVATE
         Expression.cpp
         ExpressionParser.cpp
         misc.cpp
-        )
+)

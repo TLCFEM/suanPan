@@ -44,8 +44,9 @@ class IsotropicNonlinearElastic3D : public Material3D {
     virtual vec compute_derivative(double, double) = 0;
 
 public:
-    explicit IsotropicNonlinearElastic3D(unsigned,   // tag
-                                         double = 0. // density
+    explicit IsotropicNonlinearElastic3D(
+        unsigned,   // tag
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

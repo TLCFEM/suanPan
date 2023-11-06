@@ -36,7 +36,7 @@ struct DataYeoh {
     const vec A1;
 };
 
-class Yeoh final : DataYeoh, public Material3D {
+class Yeoh final : protected DataYeoh, public Material3D {
     static const vec weight;
     static const vec I1E;
 
@@ -49,10 +49,11 @@ class Yeoh final : DataYeoh, public Material3D {
     [[nodiscard]] vec compute_derivative(double, double) const;
 
 public:
-    Yeoh(unsigned,   // tag
-         vec&&,      // constants
-         vec&&,      // constants
-         double = 0. // density
+    Yeoh(
+        unsigned,   // tag
+        vec&&,      // constants
+        vec&&,      // constants
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

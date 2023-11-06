@@ -28,7 +28,7 @@ const mat DafaliasManzari::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 DafaliasManzari::DafaliasManzari(const unsigned T, const double G0, const double NU, const double AC, const double LC, const double E0, const double XI, const double M, const double H0, const double H1, const double CH, const double NB, const double A, const double ND, const double ZM, const double CZ, const double PC, const double GR, const double R)
     : DataDafaliasManzari{fabs(G0), fabs(NU), fabs(AC), fabs(LC), fabs(E0), fabs(XI), fabs(M), fabs(H0), fabs(H1), fabs(CH), fabs(NB), A, fabs(ND), fabs(ZM), fabs(CZ), -fabs(PC), fabs(GR)}
-    , Material3D(T, R) { access::rw(tolerance) = 1E-12; }
+    , Material3D(T, R) {}
 
 int DafaliasManzari::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = tensor::isotropic_stiffness(gi * (2. + 2. * poissons_ratio), poissons_ratio);
@@ -40,19 +40,12 @@ int DafaliasManzari::initialize(const shared_ptr<DomainBase>&) {
 
 unique_ptr<Material> DafaliasManzari::get_copy() { return make_unique<DafaliasManzari>(*this); }
 
-double DafaliasManzari::get_parameter(const ParameterType P) const {
-    if(ParameterType::DENSITY == P) return density;
-    if(ParameterType::ELASTICMODULUS == P || ParameterType::YOUNGSMODULUS == P || ParameterType::E == P) return gi * (2. + 2. * poissons_ratio);
-    if(ParameterType::SHEARMODULUS == P || ParameterType::G == P) return gi;
-    if(ParameterType::BULKMODULUS == P) return gi * (2. + 2. * poissons_ratio) / (3. - 6. * poissons_ratio);
-    if(ParameterType::POISSONSRATIO == P) return poissons_ratio;
-    return 0.;
-}
+double DafaliasManzari::get_parameter(const ParameterType P) const { return material_property(gi * (2. + 2. * poissons_ratio), poissons_ratio)(P); }
 
 int DafaliasManzari::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
-    if(norm(incre_strain) <= tolerance) return SUANPAN_SUCCESS;
+    if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
 
     const auto current_p = tensor::mean3(current_stress);
     const auto current_s = tensor::dev(current_stress);
@@ -78,7 +71,10 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
     auto ref_error = 1.;
 
     while(true) {
-        if(max_iteration == ++counter) return SUANPAN_FAIL;
+        if(max_iteration == ++counter) {
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
+            return SUANPAN_FAIL;
+        }
 
         const auto sqrt_term = shear_modulus * sqrt(std::max(datum::eps, pc * p));
 
@@ -101,10 +97,10 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
-        auto error = norm(residual);
-        if(1u == counter) ref_error = std::max(1., error);
-        suanpan_debug("Local elastic iteration error: {:.5E}.\n", error /= ref_error);
-        if(error <= tolerance) break;
+        const auto error = inf_norm(residual);
+        if(1u == counter) ref_error = error;
+        suanpan_debug("Local elastic iteration error: {:.5E}.\n", error);
+        if(error < tolerance * ref_error || (inf_norm(residual) < tolerance && counter > 5u)) break;
 
         p -= incre(sa);
         s -= incre(sb);
@@ -159,7 +155,10 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
     auto update_ini_alpha = false;
 
     while(true) {
-        if(max_iteration == ++counter) return SUANPAN_FAIL;
+        if(max_iteration == ++counter) {
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
+            return SUANPAN_FAIL;
+        }
 
         // shear modulus
 
@@ -317,10 +316,10 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
-        auto error = norm(residual);
-        if(1u == counter) ref_error = std::max(1., error);
-        suanpan_debug("Local plastic iteration error: {:.5E}.\n", error /= ref_error);
-        if(error <= tolerance) break;
+        const auto error = inf_norm(residual);
+        if(1u == counter) ref_error = error;
+        suanpan_debug("Local plastic iteration error: {:.5E}.\n", error);
+        if(error < tolerance * ref_error || (inf_norm(residual) < tolerance && counter > 5u)) break;
 
         gamma -= incre(si);
         p -= incre(sj);

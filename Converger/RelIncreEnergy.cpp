@@ -32,7 +32,7 @@ RelIncreEnergy::RelIncreEnergy(const unsigned T, const double E, const unsigned 
 unique_ptr<Converger> RelIncreEnergy::get_copy() { return make_unique<RelIncreEnergy>(*this); }
 
 bool RelIncreEnergy::is_converged(const unsigned counter) {
-    const auto& D = get_domain().lock();
+    const auto D = get_domain().lock();
     auto& W = D->get_factory();
 
     const auto energy = fabs(dot(W->get_ninja(), get_residual()));

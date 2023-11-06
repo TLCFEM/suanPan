@@ -27,7 +27,11 @@ F31::IntegrationPoint::IntegrationPoint(const double C, const double W, unique_p
     : coor(C)
     , weight(W)
     , b_section(std::forward<unique_ptr<Section>>(M))
-    , strain_mat(3, 6, fill::zeros) {}
+    , strain_mat(3, 6, fill::zeros) {
+    strain_mat(0, 0) = 1.;
+    strain_mat(1, 1) = strain_mat(2, 3) = .5 * coor - .5;
+    strain_mat(1, 2) = strain_mat(2, 4) = .5 * coor + .5;
+}
 
 F31::F31(const unsigned T, uvec&& N, const unsigned S, const unsigned O, const unsigned P, const bool F)
     : SectionElement3D(T, b_node, b_dof, std::forward<uvec>(N), uvec{S}, F)
@@ -35,7 +39,7 @@ F31::F31(const unsigned T, uvec&& N, const unsigned S, const unsigned O, const u
     , orientation_tag(O) {}
 
 int F31::initialize(const shared_ptr<DomainBase>& D) {
-    auto& sec_proto = D->get<Section>(section_tag(0));
+    auto& section_proto = D->get<Section>(section_tag(0));
 
     if(!D->find_orientation(orientation_tag)) {
         suanpan_warning("Element {} cannot find the assigned transformation {}.\n", get_tag(), orientation_tag);
@@ -48,12 +52,16 @@ int F31::initialize(const shared_ptr<DomainBase>& D) {
         suanpan_warning("Element {} is assigned with an inconsistent transformation {}.\n", get_tag(), orientation_tag);
         return SUANPAN_FAIL;
     }
+    if(OrientationType::B3D != b_trans->get_orientation_type()) {
+        suanpan_warning("Element {} is assigned with an inconsistent transformation {}, use B3DL or B3DC only.\n", get_tag(), orientation_tag);
+        return SUANPAN_FAIL;
+    }
 
     b_trans->set_element_ptr(this);
 
     access::rw(length) = b_trans->get_length();
 
-    const mat sec_stiff = sec_proto->get_initial_stiffness()(b_span, b_span);
+    const mat section_stiffness = section_proto->get_initial_stiffness()(b_span, b_span);
 
     const IntegrationPlan plan(1, int_pt_num, IntegrationType::LOBATTO);
 
@@ -61,12 +69,10 @@ int F31::initialize(const shared_ptr<DomainBase>& D) {
     int_pt.clear();
     int_pt.reserve(int_pt_num);
     for(unsigned I = 0; I < int_pt_num; ++I) {
-        int_pt.emplace_back(plan(I, 0), .5 * plan(I, 1), sec_proto->get_copy());
-        int_pt[I].strain_mat(0, 0) = 1.;
-        int_pt[I].strain_mat(1, 1) = int_pt[I].strain_mat(2, 3) = .5 * plan(I, 0) - .5;
-        int_pt[I].strain_mat(1, 2) = int_pt[I].strain_mat(2, 4) = .5 * plan(I, 0) + .5;
+        int_pt.emplace_back(plan(I, 0), .5 * plan(I, 1), section_proto->get_copy());
+        int_pt[I].b_section->set_characteristic_length(int_pt[I].weight * length);
         // factor .5 moved to weight
-        initial_local_flexibility += int_pt[I].strain_mat.t() * solve(sec_stiff, int_pt[I].strain_mat * int_pt[I].weight * length);
+        initial_local_flexibility += int_pt[I].strain_mat.t() * solve(section_stiffness, int_pt[I].strain_mat * int_pt[I].weight * length);
     }
     access::rw(torsion_stiff) = 1E-3 * vec(initial_local_flexibility.diag()).head(5).min();
     initial_local_flexibility(5, 5) = torsion_stiff;
@@ -74,7 +80,7 @@ int F31::initialize(const shared_ptr<DomainBase>& D) {
 
     trial_stiffness = current_stiffness = initial_stiffness = b_trans->to_global_stiffness_mat(inv(initial_local_flexibility));
 
-    if(const auto linear_density = sec_proto->get_parameter(ParameterType::LINEARDENSITY); linear_density > 0.) trial_mass = current_mass = initial_mass = b_trans->to_global_mass_mat(linear_density);
+    if(const auto linear_density = section_proto->get_linear_density(); linear_density > 0.) trial_mass = current_mass = initial_mass = b_trans->to_global_mass_mat(linear_density);
 
     trial_local_deformation = current_local_deformation.zeros(6);
     trial_local_resistance = current_local_resistance.zeros(6);
@@ -154,13 +160,13 @@ vector<vec> F31::record(const OutputType P) {
     if(P == OutputType::BEAME) return {current_local_deformation};
     if(P == OutputType::BEAMS) return {current_local_resistance};
 
-    vector<vec> output;
-    for(const auto& I : int_pt) for(const auto& J : I.b_section->record(P)) output.emplace_back(J);
-    return output;
+    vector<vec> data;
+    for(const auto& I : int_pt) append_to(data, I.b_section->record(P));
+    return data;
 }
 
 void F31::print() {
-    suanpan_info("A 2D force based beam element{}.\n", nlgeom ? " and corotational formulation" : "");
+    suanpan_info("A 3D force based beam element{}.\n", nlgeom ? " and corotational formulation" : "");
     suanpan_info("The element connects nodes:", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Section:\n");
@@ -177,7 +183,7 @@ void F31::print() {
 void F31::Setup() {
     vtk_cell = vtkSmartPointer<vtkLine>::New();
     const auto ele_coor = get_coordinate(3);
-    for(unsigned I = 0; I < b_node; ++I) {
+    for(auto I = 0u; I < b_node; ++I) {
         vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
         vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), ele_coor(I, 2));
     }
@@ -190,12 +196,12 @@ void F31::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type
     else if(OutputType::V == type) t_disp = reshape(get_current_velocity(), b_dof, b_node);
     else if(OutputType::U == type) t_disp = reshape(get_current_displacement(), b_dof, b_node);
 
-    for(unsigned I = 0; I < b_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
+    for(auto I = 0u; I < b_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
 }
 
 void F31::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
     const mat ele_disp = get_coordinate(3) + amplifier * mat(reshape(get_current_displacement(), b_dof, b_node)).rows(0, 2).t();
-    for(unsigned I = 0; I < b_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), ele_disp(I, 2));
+    for(auto I = 0u; I < b_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), ele_disp(I, 2));
 }
 
 #endif

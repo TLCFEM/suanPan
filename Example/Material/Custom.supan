@@ -3,6 +3,7 @@
 expression SimpleVector 1 x y|6 example
 expression SimpleVector 2 x y|3 y:=0
 expression SimpleVector 3 x y y:=x
+expression SimpleVector 8 x y|2 y:=0
 
 material CustomJ2 1 500 0 5 5
 material CustomJ2 2 500 0 2 5
@@ -27,11 +28,17 @@ material CustomGurson 14 1
 material CustomGurson 15 5
 
 material MPF 100 1000 5 .1
-material CustomDegradation 20 100 1
-material CustomDegradation 21 100 5
+material CustomStrainDegradation 20 100 1
+material CustomStrainDegradation 21 100 5
+material CustomStrainDegradation 22 100 1 5
+material CustomStrainDegradation 23 100 8 1
+material CustomStressDegradation 24 100 1
+material CustomStressDegradation 25 100 5
+material CustomStressDegradation 26 100 1 5
+material CustomStressDegradation 27 100 8 1
 
-material CustomViscosity 22 1
-material CustomViscosity 23 5
+material CustomViscosity 30 1
+material CustomViscosity 31 5
 
 step static 1
 

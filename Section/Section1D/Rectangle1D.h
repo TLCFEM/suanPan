@@ -31,14 +31,15 @@
 
 #include <Section/Section1D/Section1D.h>
 
-class Rectangle1D : public Section1D {
+class Rectangle1D final : public Section1D {
     const double width, height;
 
 public:
-    explicit Rectangle1D(unsigned, // tag
-                         double,   // width
-                         double,   // height
-                         unsigned  // material tag
+    explicit Rectangle1D(
+        unsigned, // tag
+        double,   // width
+        double,   // height
+        unsigned  // material tag
     );
 
     unique_ptr<Section> get_copy() override;

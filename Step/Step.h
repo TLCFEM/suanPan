@@ -41,9 +41,9 @@ class Step : public Tag {
 
     double time_left = time_period;
 
-    double max_step_size = time_period; // maximum step size
-    double min_step_size = 1E-8;        // minimum step size
-    double ini_step_size = time_period; // initial step size
+    double max_step_size = time_period;                         // maximum step size
+    double min_step_size = time_period > 0. ? 1E-8 : 0.;        // minimum step size
+    double ini_step_size = time_period > 0. ? time_period : 1.; // initial step size
 
     unsigned max_substep = 1000; // maximum increment number
 

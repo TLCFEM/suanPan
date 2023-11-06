@@ -35,7 +35,7 @@ struct DataMultilinearPO {
     const mat c_backbone;
 };
 
-class MultilinearPO final : DataMultilinearPO, public PeakOriented {
+class MultilinearPO final : protected DataMultilinearPO, public PeakOriented {
     [[nodiscard]] podarray<double> compute_tension_initial_reverse() const override;
     [[nodiscard]] podarray<double> compute_compression_initial_reverse() const override;
     [[nodiscard]] podarray<double> compute_tension_backbone(double) const override;

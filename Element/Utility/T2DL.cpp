@@ -22,9 +22,6 @@
 const span T2DL::IS(0, 1);
 const span T2DL::JS(2, 3);
 
-T2DL::T2DL(const unsigned T)
-    : Orientation(T) {}
-
 unique_ptr<Orientation> T2DL::get_copy() { return make_unique<T2DL>(*this); }
 
 void T2DL::update_transformation() {
@@ -40,6 +37,8 @@ void T2DL::update_transformation() {
     direction_cosine = x_axis / length;
     inclination = transform::atan2(direction_cosine);
 }
+
+OrientationType T2DL::get_orientation_type() const { return OrientationType::T2D; }
 
 vec T2DL::to_local_vec(const vec& g_disp) const { return vec{dot(direction_cosine, g_disp(JS) - g_disp(IS))}; }
 

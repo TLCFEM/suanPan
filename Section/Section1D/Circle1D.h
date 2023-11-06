@@ -31,13 +31,14 @@
 
 #include <Section/Section1D/Section1D.h>
 
-class Circle1D : public Section1D {
+class Circle1D final : public Section1D {
     const double radius;
 
 public:
-    explicit Circle1D(unsigned, // tag
-                      double,   // radius
-                      unsigned  // material tag
+    explicit Circle1D(
+        unsigned, // tag
+        double,   // radius
+        unsigned  // material tag
     );
 
     unique_ptr<Section> get_copy() override;

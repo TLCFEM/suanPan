@@ -19,7 +19,7 @@ set(SPIKE_SRC
         spike-src/sspike_smp.f90
         spike-src/zpivul.f
         spike-src/zspike_smp.f90
-        )
+)
 
 if (USE_MKL)
     add_definitions(-DMKL)

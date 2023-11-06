@@ -21,7 +21,8 @@
  * @date 14/03/2019
  * @version 0.1.0
  * @file CircularHollow2D.h
- * @addtogroup Section
+ * @addtogroup Section-2D
+ * @ingroup Section
  * @{
  */
 
@@ -36,18 +37,20 @@ class CircularHollow2D final : public Section2D {
     const unsigned int_pt_num;
 
 public:
-    CircularHollow2D(unsigned,      // tag
-                     double,        // radius
-                     double,        // thickness
-                     unsigned,      // material tag
-                     unsigned = 10, // number of integration points
-                     double = 0.    // eccentricity
+    CircularHollow2D(
+        unsigned,      // tag
+        double,        // radius
+        double,        // thickness
+        unsigned,      // material tag
+        unsigned = 10, // number of integration points
+        double = 0.    // eccentricity
     );
-    CircularHollow2D(unsigned,      // tag
-                     vec&&,         // dimension
-                     unsigned,      // material tag
-                     unsigned = 10, // number of integration points
-                     double = 0.    // eccentricity
+    CircularHollow2D(
+        unsigned,      // tag
+        vec&&,         // dimension
+        unsigned,      // material tag
+        unsigned = 10, // number of integration points
+        double = 0.    // eccentricity
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

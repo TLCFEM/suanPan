@@ -17,7 +17,6 @@
 
 #include "SectionShell.h"
 #include <Domain/DomainBase.h>
-#include <Material/Material.h>
 
 SectionShell::SectionShell(const unsigned T, const unsigned MT, vec&& E)
     : SectionShellData{MT, std::forward<vec>(E)}
@@ -70,8 +69,6 @@ const mat& SectionShell::get_current_plate_stiffness() const { return current_pl
 const mat& SectionShell::get_initial_membrane_stiffness() const { return initial_membrane_stiffness; }
 
 const mat& SectionShell::get_initial_plate_stiffness() const { return initial_plate_stiffness; }
-
-double SectionShell::get_parameter(ParameterType) { return 0.; }
 
 int SectionShell::update_incre_status(const double ME, const double PE) {
     const vec m_strain{ME}, p_strain{PE};

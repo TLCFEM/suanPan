@@ -39,7 +39,7 @@ struct DataNonlinearGurson {
 };
 
 class NonlinearGurson : protected DataNonlinearGurson, public Material3D {
-    static constexpr unsigned max_iteration = 20;
+    static constexpr unsigned max_iteration = 20u;
     static const double sqrt_three_two;
     static const mat unit_dev_tensor;
 
@@ -52,15 +52,16 @@ class NonlinearGurson : protected DataNonlinearGurson, public Material3D {
     [[nodiscard]] virtual vec compute_hardening(double) const = 0;
 
 public:
-    NonlinearGurson(unsigned,   // tag
-                    double,     // elastic modulus
-                    double,     // poisson's ratio
-                    double,     // q1
-                    double,     // q2
-                    double,     // fn
-                    double,     // sn
-                    double,     // en
-                    double = 0. // density
+    NonlinearGurson(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // poisson's ratio
+        double,     // q1
+        double,     // q2
+        double,     // fn
+        double,     // sn
+        double,     // en
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

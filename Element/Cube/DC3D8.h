@@ -38,7 +38,8 @@ class DC3D8 final : public MaterialElement3D {
         double weight;
         double maximum_energy = 0.;
         unique_ptr<Material> c_material;
-        mat n_mat, pn_mat, strain_mat;
+        mat n_mat, pn_mat;
+        sp_mat strain_mat;
         IntegrationPoint(vec&&, double, unique_ptr<Material>&&, mat&&, mat&&);
     };
 
@@ -51,11 +52,12 @@ class DC3D8 final : public MaterialElement3D {
     vector<IntegrationPoint> int_pt;
 
 public:
-    DC3D8(unsigned, // tag
-          uvec&&,   // node tag
-          unsigned, // material tag
-          double,   // characteristic length
-          double    // release rate
+    DC3D8(
+        unsigned, // tag
+        uvec&&,   // node tag
+        unsigned, // material tag
+        double,   // characteristic length
+        double    // release rate
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

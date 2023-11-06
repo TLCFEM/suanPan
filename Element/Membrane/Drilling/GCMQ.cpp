@@ -24,77 +24,6 @@
 #include <Toolbox/tensor.h>
 #include <Toolbox/utility.h>
 
-/**
- * \brief create converter for resultant forces
- * \param E edge label
- * \param T element thickness
- * \param EC element coordinates
- * \param IP integration plan
- * \param TRANS transformation matrix from parent to global
- */
-GCMQ::ResultantConverter::ResultantConverter(const Edge E, const double T, const mat& EC, const IntegrationPlan& IP, const mat& TRANS)
-    : direction_cosine(2, 3) {
-    const auto &X1 = IP(0, 0), &X2 = IP(1, 0);
-
-    vec node_i, node_j, pt_a, pt_b;
-
-    switch(E) {
-    case Edge::A:
-        node_i = EC.row(0).t();
-        node_j = EC.row(1).t();
-        pt_a = TRANS * form_stress_mode(X1, -1.);
-        pt_b = TRANS * form_stress_mode(X2, -1.);
-        break;
-    case Edge::B:
-        node_i = EC.row(1).t();
-        node_j = EC.row(2).t();
-        pt_a = TRANS * form_stress_mode(1., X1);
-        pt_b = TRANS * form_stress_mode(1., X2);
-        break;
-    case Edge::C:
-        node_i = EC.row(2).t();
-        node_j = EC.row(3).t();
-        pt_a = TRANS * form_stress_mode(X1, 1.);
-        pt_b = TRANS * form_stress_mode(X2, 1.);
-        break;
-    case Edge::D:
-        node_i = EC.row(3).t();
-        node_j = EC.row(0).t();
-        pt_a = TRANS * form_stress_mode(-1., X1);
-        pt_b = TRANS * form_stress_mode(-1., X2);
-        break;
-    }
-
-    const vec incre = node_j - node_i;
-
-    const auto edge_length = norm(incre);
-
-    const auto angle = 2. * atan2(incre(1), incre(0)) - datum::pi;
-
-    const auto sin_angle = sin(angle);
-    const auto cos_angle = cos(angle);
-
-    // transformation to local reference frame
-    direction_cosine(0, 0) = .5 + .5 * cos_angle;
-    direction_cosine(0, 1) = .5 - .5 * cos_angle;
-    direction_cosine(0, 2) = sin_angle;
-    direction_cosine(1, 0) = -(direction_cosine(1, 1) = .5 * sin_angle);
-    direction_cosine(1, 2) = cos_angle;
-
-    const auto weight = .5 * edge_length * T;
-
-    const mat part_a = shape::stress11(pt_a) * IP(0, 1) * weight;
-    const mat part_b = shape::stress11(pt_b) * IP(1, 1) * weight;
-    converter_a = part_a + part_b;
-    converter_b = .5 * edge_length * (part_a * X1 + part_b * X2);
-}
-
-double GCMQ::ResultantConverter::F(const vec& alpha) const { return dot(direction_cosine.row(0), converter_a * alpha); }
-
-double GCMQ::ResultantConverter::V(const vec& alpha) const { return dot(direction_cosine.row(1), converter_a * alpha); }
-
-double GCMQ::ResultantConverter::M(const vec& alpha) const { return dot(direction_cosine.row(0), converter_b * alpha); }
-
 mat GCMQ::form_transformation(const mat& jacobian) {
     mat trans_mat(3, 3);
 
@@ -134,21 +63,13 @@ int GCMQ::initialize(const shared_ptr<DomainBase>& D) {
 
     access::rw(mat_stiffness) = material_proto->get_initial_stiffness();
 
-    if(PlaneType::E == static_cast<PlaneType>(material_proto->get_parameter(ParameterType::PLANETYPE))) suanpan::hacker(thickness) = 1.;
+    if(PlaneType::E == material_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
 
     const auto ele_coor = get_coordinate(2);
 
     access::rw(characteristic_length) = sqrt(area::shoelace(ele_coor));
 
     access::rw(iso_mapping) = trans(mapping * ele_coor);
-
-    const IntegrationPlan edge_plan(1, 2, IntegrationType::GAUSS);
-    edge.clear();
-    edge.reserve(4);
-    edge.emplace_back(ResultantConverter::Edge::A, thickness, ele_coor, edge_plan, iso_mapping);
-    edge.emplace_back(ResultantConverter::Edge::B, thickness, ele_coor, edge_plan, iso_mapping);
-    edge.emplace_back(ResultantConverter::Edge::C, thickness, ele_coor, edge_plan, iso_mapping);
-    edge.emplace_back(ResultantConverter::Edge::D, thickness, ele_coor, edge_plan, iso_mapping);
 
     const IntegrationPlan plan(2, scheme == 'I' ? 2 : 3, scheme == 'I' ? IntegrationType::IRONS : scheme == 'L' ? IntegrationType::LOBATTO : IntegrationType::GAUSS);
 
@@ -201,7 +122,7 @@ int GCMQ::initialize(const shared_ptr<DomainBase>& D) {
     trial_alpha = current_alpha.zeros(11);
     trial_q = current_q.zeros(11);
 
-    form_mass(material_proto->get_parameter(ParameterType::DENSITY), diff_coor);
+    form_mass(material_proto->get_density(), diff_coor);
 
     form_body_force(diff_coor);
 
@@ -280,37 +201,26 @@ int GCMQ::reset_status() {
 
 mat GCMQ::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
-vector<vec> GCMQ::record(const OutputType T) {
+vector<vec> GCMQ::record(const OutputType P) {
     vector<vec> data;
 
-    if(T == OutputType::S) for(const auto& I : int_pt) data.emplace_back(I.poly_stress * current_alpha);
-    else if(T == OutputType::S11) for(const auto& I : int_pt) data.emplace_back(I.poly_stress.row(0) * current_alpha);
-    else if(T == OutputType::S22) for(const auto& I : int_pt) data.emplace_back(I.poly_stress.row(1) * current_alpha);
-    else if(T == OutputType::S12) for(const auto& I : int_pt) data.emplace_back(I.poly_stress.row(2) * current_alpha);
-    else if(T == OutputType::SP) for(const auto& I : int_pt) data.emplace_back(transform::stress::principal(I.poly_stress * current_alpha));
-    else if(T == OutputType::SP1) for(const auto& I : int_pt) data.emplace_back(vec{transform::stress::principal(I.poly_stress * current_alpha).at(0)});
-    else if(T == OutputType::SP2) for(const auto& I : int_pt) data.emplace_back(vec{transform::stress::principal(I.poly_stress * current_alpha).at(1)});
-    else if(T == OutputType::SINT) data.emplace_back(current_alpha);
-    else if(T == OutputType::E) for(const auto& I : int_pt) data.emplace_back(I.poly_strain * current_beta);
-    else if(T == OutputType::E11) for(const auto& I : int_pt) data.emplace_back(I.poly_strain.row(0) * current_beta);
-    else if(T == OutputType::E22) for(const auto& I : int_pt) data.emplace_back(I.poly_strain.row(1) * current_beta);
-    else if(T == OutputType::E12) for(const auto& I : int_pt) data.emplace_back(I.poly_strain.row(2) * current_beta);
-    else if(T == OutputType::EP) for(const auto& I : int_pt) data.emplace_back(transform::strain::principal(I.poly_strain * current_beta));
-    else if(T == OutputType::EP1) for(const auto& I : int_pt) data.emplace_back(vec{transform::strain::principal(I.poly_strain * current_beta).at(0)});
-    else if(T == OutputType::EP2) for(const auto& I : int_pt) data.emplace_back(vec{transform::strain::principal(I.poly_strain * current_beta).at(1)});
-    else if(T == OutputType::EINT) data.emplace_back(current_beta);
-    else if(T == OutputType::PE) for(const auto& I : int_pt) data.emplace_back(I.poly_strain * current_beta - solve(mat_stiffness, I.poly_stress * current_alpha));
-    else if(T == OutputType::PEP) for(const auto& I : int_pt) data.emplace_back(transform::strain::principal(I.poly_strain * current_beta - solve(mat_stiffness, I.poly_stress * current_alpha)));
-    else if(T == OutputType::RESULTANT) for(const auto& I : edge) data.emplace_back(vec{I.F(current_alpha), I.V(current_alpha), I.M(current_alpha)});
-    else if(T == OutputType::AXIAL) data.emplace_back(vec{edge[0].F(current_alpha), edge[1].F(current_alpha), edge[2].F(current_alpha), edge[3].F(current_alpha)});
-    else if(T == OutputType::SHEAR) data.emplace_back(vec{edge[0].V(current_alpha), edge[1].V(current_alpha), edge[2].V(current_alpha), edge[3].V(current_alpha)});
-    else if(T == OutputType::MOMENT) data.emplace_back(vec{edge[0].M(current_alpha), edge[1].M(current_alpha), edge[2].M(current_alpha), edge[3].M(current_alpha)});
-    else if(T == OutputType::MISES)
-        for(const auto& I : int_pt) {
-            const vec t_stress = I.poly_stress * current_alpha;
-            data.emplace_back(vec{sqrt(t_stress(0) * t_stress(0) - t_stress(0) * t_stress(1) + t_stress(1) * t_stress(1) + 3. * t_stress(2) * t_stress(2))});
-        }
-    else for(const auto& I : int_pt) for(const auto& J : I.m_material->record(T)) data.emplace_back(J);
+    if(P == OutputType::S) for(const auto& I : int_pt) data.emplace_back(I.poly_stress * current_alpha);
+    else if(P == OutputType::S11) for(const auto& I : int_pt) data.emplace_back(I.poly_stress.row(0) * current_alpha);
+    else if(P == OutputType::S22) for(const auto& I : int_pt) data.emplace_back(I.poly_stress.row(1) * current_alpha);
+    else if(P == OutputType::S12) for(const auto& I : int_pt) data.emplace_back(I.poly_stress.row(2) * current_alpha);
+    else if(P == OutputType::SP) for(const auto& I : int_pt) data.emplace_back(transform::stress::principal(I.poly_stress * current_alpha));
+    else if(P == OutputType::SP1) for(const auto& I : int_pt) data.emplace_back(vec{transform::stress::principal(I.poly_stress * current_alpha).at(0)});
+    else if(P == OutputType::SP2) for(const auto& I : int_pt) data.emplace_back(vec{transform::stress::principal(I.poly_stress * current_alpha).at(1)});
+    else if(P == OutputType::E) for(const auto& I : int_pt) data.emplace_back(I.poly_strain * current_beta);
+    else if(P == OutputType::E11) for(const auto& I : int_pt) data.emplace_back(I.poly_strain.row(0) * current_beta);
+    else if(P == OutputType::E22) for(const auto& I : int_pt) data.emplace_back(I.poly_strain.row(1) * current_beta);
+    else if(P == OutputType::E12) for(const auto& I : int_pt) data.emplace_back(I.poly_strain.row(2) * current_beta);
+    else if(P == OutputType::EP) for(const auto& I : int_pt) data.emplace_back(transform::strain::principal(I.poly_strain * current_beta));
+    else if(P == OutputType::EP1) for(const auto& I : int_pt) data.emplace_back(vec{transform::strain::principal(I.poly_strain * current_beta).at(0)});
+    else if(P == OutputType::EP2) for(const auto& I : int_pt) data.emplace_back(vec{transform::strain::principal(I.poly_strain * current_beta).at(1)});
+    else if(P == OutputType::PE) for(const auto& I : int_pt) { data.emplace_back(I.poly_strain * current_beta - solve(mat_stiffness, I.poly_stress * current_alpha)); }
+    else if(P == OutputType::PEP) for(const auto& I : int_pt) data.emplace_back(transform::strain::principal(I.poly_strain * current_beta - solve(mat_stiffness, I.poly_stress * current_alpha)));
+    else for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
 
     return data;
 }
@@ -355,10 +265,10 @@ mat GCMQ::GetData(const OutputType P) {
     }
 
     mat A(int_pt.size(), 9);
-    mat B(int_pt.size(), 6, fill::zeros);
+    mat B(6, int_pt.size(), fill::zeros);
 
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        if(const auto C = int_pt[I].m_material->record(P); !C.empty()) B(I, 0, size(C[0])) = C[0];
+        if(const auto C = int_pt[I].m_material->record(P); !C.empty()) B(0, I, size(C[0])) = C[0];
         A.row(I) = interpolation::quadratic(int_pt[I].coor);
     }
 
@@ -369,7 +279,7 @@ mat GCMQ::GetData(const OutputType P) {
     data.row(2) = interpolation::quadratic(1., 1.);
     data.row(3) = interpolation::quadratic(-1., 1.);
 
-    return (data * solve(A, B)).t();
+    return (data * solve(A, B.t())).t();
 }
 
 #endif

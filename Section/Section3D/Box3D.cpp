@@ -21,14 +21,14 @@
 #include <Toolbox/IntegrationPlan.h>
 
 Box3D::Box3D(const unsigned T, const double B, const double H, const double TH, const unsigned M, const unsigned S, const double E1, const double E2)
-    : Section3D(T, M, 2. * TH * (B + H - 4. * TH), vec{E1, E2})
+    : Section3D(T, M, 2. * TH * (B + H), vec{E1, E2})
     , width(B)
     , height(H)
     , thickness(TH)
     , int_pt_num(S > 20 ? 20 : S) {}
 
 Box3D::Box3D(const unsigned T, vec&& D, const unsigned M, const unsigned S, vec&& EC)
-    : Section3D(T, M, 2. * D(2) * (D(0) + D(1) - 4. * D(2)), std::forward<vec>(EC))
+    : Section3D(T, M, 2. * D(2) * (D(0) + D(1)), std::forward<vec>(EC))
     , width(D(0))
     , height(D(1))
     , thickness(D(2))
@@ -37,16 +37,16 @@ Box3D::Box3D(const unsigned T, vec&& D, const unsigned M, const unsigned S, vec&
 int Box3D::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get_material(material_tag);
 
-    access::rw(linear_density) = area * material_proto->get_parameter(ParameterType::DENSITY);
+    access::rw(linear_density) = area * material_proto->get_density();
 
     const IntegrationPlan plan(1, int_pt_num, IntegrationType::GAUSS);
 
-    const auto net_flange = width - 2. * thickness;
-    const auto net_web = height - 2. * thickness;
+    const auto net_web = height - thickness;
+    const auto net_flange = width + thickness;
     const auto web_area = net_web * thickness;
     const auto flange_area = net_flange * thickness;
-    const auto web_middle = .5 * (width - thickness);
-    const auto flange_middle = .5 * (height - thickness);
+    const auto web_middle = .5 * width;
+    const auto flange_middle = .5 * height;
 
     int_pt.clear();
     int_pt.reserve(4 * static_cast<size_t>(int_pt_num));
@@ -57,24 +57,7 @@ int Box3D::initialize(const shared_ptr<DomainBase>& D) {
         int_pt.emplace_back(-flange_middle, .5 * plan(I, 0) * net_flange, .5 * plan(I, 1) * flange_area, material_proto->get_copy());
     }
 
-    initial_stiffness.zeros(3, 3);
-    for(const auto& I : int_pt) {
-        const auto tmp_a = I.s_material->get_initial_stiffness().at(0) * I.weight;
-        const auto arm_y = eccentricity(0) - I.coor_y;
-        const auto arm_z = I.coor_z - eccentricity(1);
-        initial_stiffness(0, 0) += tmp_a;
-        initial_stiffness(0, 1) += tmp_a * arm_y;
-        initial_stiffness(0, 2) += tmp_a * arm_z;
-        initial_stiffness(1, 1) += tmp_a * arm_y * arm_y;
-        initial_stiffness(1, 2) += tmp_a * arm_y * arm_z;
-        initial_stiffness(2, 2) += tmp_a * arm_z * arm_z;
-    }
-
-    initial_stiffness(1, 0) = initial_stiffness(0, 1);
-    initial_stiffness(2, 0) = initial_stiffness(0, 2);
-    initial_stiffness(2, 1) = initial_stiffness(1, 2);
-
-    trial_stiffness = current_stiffness = initial_stiffness;
+    initialize_stiffness();
 
     return SUANPAN_SUCCESS;
 }

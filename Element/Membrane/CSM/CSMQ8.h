@@ -51,11 +51,12 @@ class CSMQ8 final : public MaterialElement2D {
     vector<IntegrationPoint> int_pt;
 
 public:
-    CSMQ8(unsigned,    // tag
-          uvec&&,      // node tag
-          unsigned,    // material tag
-          double = 1., // thickness
-          double = -1. // length
+    CSMQ8(
+        unsigned,    // tag
+        uvec&&,      // node tag
+        unsigned,    // material tag
+        double = 1., // thickness
+        double = -1. // length
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

@@ -3,11 +3,7 @@
 #include <Toolbox/utility.h>
 
 TEST_CASE("Variable Split", "[Utility.Expression]") {
-    for(const auto test_list = std::vector<std::string>{
-            "x|y|d_z",
-            "\"x|y|d_z\"",
-            R"("x""y""d_z")"
-        }; const auto& I : test_list) {
+    for(const auto test_list = std::vector<std::string>{"x|y|d_z", "\"x|y|d_z\"", R"("x""y""d_z")"}; const auto& I : test_list) {
         const auto variable_list = suanpan::expression::split(I);
 
         REQUIRE(variable_list.size() == 3);

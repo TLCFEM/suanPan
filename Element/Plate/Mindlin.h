@@ -57,11 +57,12 @@ class Mindlin final : public MaterialElement2D {
     mat penalty_stiffness;
 
 public:
-    Mindlin(unsigned,    // element tag
-            uvec&&,      // node tag
-            unsigned,    // material tag
-            double,      // thickness
-            unsigned = 2 // integration points along thickness
+    Mindlin(
+        unsigned,    // element tag
+        uvec&&,      // node tag
+        unsigned,    // material tag
+        double,      // thickness
+        unsigned = 2 // integration points along thickness
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

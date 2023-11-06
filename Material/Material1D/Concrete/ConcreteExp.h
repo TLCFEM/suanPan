@@ -36,8 +36,8 @@ struct DataConcreteExp {
     const double f_t, f_c, a_t, a_c, b_t, b_c;
 };
 
-class ConcreteExp final : DataConcreteExp, public SimpleHysteresis {
-    static constexpr unsigned max_iteration = 20;
+class ConcreteExp final : protected DataConcreteExp, public SimpleHysteresis {
+    static constexpr unsigned max_iteration = 20u;
 
     [[nodiscard]] podarray<double> compute_compression_initial_reverse() const override;
     [[nodiscard]] podarray<double> compute_tension_initial_reverse() const override;
@@ -47,16 +47,17 @@ class ConcreteExp final : DataConcreteExp, public SimpleHysteresis {
     [[nodiscard]] double compute_tension_residual(double, double) const override;
 
 public:
-    ConcreteExp(unsigned,   // tag
-                double,     // elastic modulus
-                double,     // f_t
-                double,     // a_t
-                double,     // g_t
-                double,     // f_c
-                double,     // a_c
-                double,     // g_c
-                double,     // middle point
-                double = 0. // density
+    ConcreteExp(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // f_t
+        double,     // a_t
+        double,     // g_t
+        double,     // f_c
+        double,     // a_c
+        double,     // g_c
+        double,     // middle point
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

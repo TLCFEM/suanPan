@@ -24,7 +24,7 @@ const mat ArmstrongFrederick::unit_dev_tensor = tensor::unit_deviatoric_tensor4(
 
 ArmstrongFrederick::ArmstrongFrederick(const unsigned T, const double E, const double V, const double Y, const double S, const double H, const double M, vec&& A, vec&& B, const double R)
     : DataArmstrongFrederick{E, V, Y, S, H, M, std::forward<vec>(A), std::forward<vec>(B)}
-    , Material3D(T, R) { access::rw(tolerance) = 1E-15; }
+    , Material3D(T, R) {}
 
 int ArmstrongFrederick::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = tensor::isotropic_stiffness(elastic_modulus, poissons_ratio);
@@ -36,19 +36,12 @@ int ArmstrongFrederick::initialize(const shared_ptr<DomainBase>&) {
 
 unique_ptr<Material> ArmstrongFrederick::get_copy() { return make_unique<ArmstrongFrederick>(*this); }
 
-double ArmstrongFrederick::get_parameter(const ParameterType P) const {
-    if(ParameterType::DENSITY == P) return density;
-    if(ParameterType::ELASTICMODULUS == P || ParameterType::YOUNGSMODULUS == P || ParameterType::E == P) return elastic_modulus;
-    if(ParameterType::SHEARMODULUS == P || ParameterType::G == P) return shear;
-    if(ParameterType::BULKMODULUS == P) return elastic_modulus / (3. - 6. * poissons_ratio);
-    if(ParameterType::POISSONSRATIO == P) return poissons_ratio;
-    return 0.;
-}
+double ArmstrongFrederick::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
 
 int ArmstrongFrederick::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
-    if(norm(incre_strain) <= tolerance) return SUANPAN_SUCCESS;
+    if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
 
     trial_stress = current_stress + (trial_stiffness = initial_stiffness) * incre_strain;
 
@@ -68,7 +61,8 @@ int ArmstrongFrederick::update_trial_status(const vec& t_strain) {
     auto gamma = 0.;
     double norm_xi, jacobian;
 
-    unsigned counter = 0;
+    auto counter = 0u;
+    auto ref_error = 1.;
     while(true) {
         if(max_iteration == ++counter) {
             suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
@@ -99,8 +93,10 @@ int ArmstrongFrederick::update_trial_status(const vec& t_strain) {
         jacobian = root_three_two * sum_b - three_shear - dk;
 
         const auto incre = yield_func / jacobian;
-        suanpan_debug("Local iteration error: {:.5E}.\n", fabs(incre));
-        if(fabs(incre) <= tolerance) break;
+        const auto error = fabs(incre);
+        if(1u == counter) ref_error = error;
+        suanpan_debug("Local iteration error: {:.5E}.\n", error);
+        if(error < tolerance * ref_error || (fabs(yield_func) < tolerance && counter > 5u)) break;
 
         gamma -= incre;
         p -= incre;
@@ -144,12 +140,6 @@ int ArmstrongFrederick::reset_status() {
     trial_history = current_history;
     trial_stiffness = current_stiffness;
     return SUANPAN_SUCCESS;
-}
-
-vector<vec> ArmstrongFrederick::record(const OutputType P) {
-    if(P == OutputType::PEEQ) return {vec{current_history(0)}};
-
-    return Material3D::record(P);
 }
 
 void ArmstrongFrederick::print() {

@@ -38,14 +38,15 @@ struct DataBilinear1D {
     const double kinematic_modulus;
 };
 
-class Bilinear1D final : DataBilinear1D, public Material1D {
+class Bilinear1D final : protected DataBilinear1D, public Material1D {
 public:
-    Bilinear1D(unsigned,     // tag
-               double,       // elastic modulus
-               double,       // initial yield stress
-               double = .05, // hardening ratio
-               double = 1.,  // isotropic/kinematic hardening factor
-               double = 0.   // density
+    Bilinear1D(
+        unsigned,     // tag
+        double,       // elastic modulus
+        double,       // initial yield stress
+        double = .05, // hardening ratio
+        double = 1.,  // isotropic/kinematic hardening factor
+        double = 0.   // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

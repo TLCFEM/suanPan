@@ -40,8 +40,8 @@ struct DataNonlinearPeric {
     const double epsilon;
 };
 
-class NonlinearPeric : DataNonlinearPeric, public Material3D {
-    static constexpr unsigned max_iteration = 20;
+class NonlinearPeric : protected DataNonlinearPeric, public Material3D {
+    static constexpr unsigned max_iteration = 20u;
     static const double root_three_two;
     static const mat unit_dev_tensor;
     static const double unit_time;
@@ -58,12 +58,13 @@ class NonlinearPeric : DataNonlinearPeric, public Material3D {
     [[nodiscard]] virtual double compute_dk(double) const = 0;
 
 public:
-    NonlinearPeric(unsigned,    // tag
-                   double,      // elastic modulus
-                   double,      // poisson's ratio
-                   double = 0., // mu
-                   double = 0., // epsilon
-                   double = 0.  // density
+    NonlinearPeric(
+        unsigned,    // tag
+        double,      // elastic modulus
+        double,      // poisson's ratio
+        double = 0., // mu
+        double = 0., // epsilon
+        double = 0.  // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

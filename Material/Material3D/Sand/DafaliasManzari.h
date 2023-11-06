@@ -51,8 +51,8 @@ struct DataDafaliasManzari {
     const double gr = .2;
 };
 
-class DafaliasManzari final : DataDafaliasManzari, public Material3D {
-    static constexpr unsigned max_iteration = 20;
+class DafaliasManzari final : protected DataDafaliasManzari, public Material3D {
+    static constexpr unsigned max_iteration = 20u;
     static const mat unit_dev_tensor;
 
     const double pr = (2. + 2. * poissons_ratio) / (3. - 6. * poissons_ratio);
@@ -62,25 +62,26 @@ class DafaliasManzari final : DataDafaliasManzari, public Material3D {
     static const span sb, sk, sl, sm;
 
 public:
-    DafaliasManzari(unsigned,   // tag
-                    double,     // g0
-                    double,     // nu
-                    double,     // ac
-                    double,     // lc
-                    double,     // e0
-                    double,     // xi
-                    double,     // m
-                    double,     // h0
-                    double,     // h1
-                    double,     // ch
-                    double,     // nb
-                    double,     // a
-                    double,     // nd
-                    double,     // zm
-                    double,     // cz
-                    double,     // pc
-                    double,     // gr
-                    double = 0. // density
+    DafaliasManzari(
+        unsigned,   // tag
+        double,     // g0
+        double,     // nu
+        double,     // ac
+        double,     // lc
+        double,     // e0
+        double,     // xi
+        double,     // m
+        double,     // h0
+        double,     // h1
+        double,     // ch
+        double,     // nb
+        double,     // a
+        double,     // nd
+        double,     // zm
+        double,     // cz
+        double,     // pc
+        double,     // gr
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

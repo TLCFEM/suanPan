@@ -37,12 +37,4 @@ TableGurson::TableGurson(const unsigned T, const double E, const double V, mat&&
     : NonlinearGurson(T, E, V, Q1, Q2, FN, SN, EN, R)
     , hardening_table(std::forward<mat>(HARDEN)) {}
 
-double TableGurson::get_parameter(const ParameterType P) const {
-    if(ParameterType::DENSITY == P) return density;
-    if(ParameterType::ELASTICMODULUS == P || ParameterType::YOUNGSMODULUS == P || ParameterType::E == P) return elastic_modulus;
-    if(ParameterType::SHEARMODULUS == P || ParameterType::G == P) return elastic_modulus / (2. + 2. * poissons_ratio);
-    if(ParameterType::POISSONSRATIO == P) return poissons_ratio;
-    return 0.;
-}
-
 unique_ptr<Material> TableGurson::get_copy() { return make_unique<TableGurson>(*this); }

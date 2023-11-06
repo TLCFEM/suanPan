@@ -23,15 +23,17 @@ Parallel::Parallel(const unsigned T, uvec&& MT)
     , mat_tag(std::forward<uvec>(MT)) {}
 
 int Parallel::initialize(const shared_ptr<DomainBase>& D) {
+    auto& t_density = access::rw(density);
+    t_density = 0.;
     mat_pool.clear();
     mat_pool.reserve(mat_tag.n_elem);
     for(const auto I : mat_tag) {
-        mat_pool.emplace_back(suanpan::initialized_material_copy(D, I));
+        mat_pool.emplace_back(D->initialized_material_copy(I));
         if(nullptr == mat_pool.back() || mat_pool.back()->get_material_type() != MaterialType::D1) {
             suanpan_error("A valid 1D host material is required.\n");
             return SUANPAN_FAIL;
         }
-        access::rw(density) += mat_pool.back()->get_parameter(ParameterType::DENSITY);
+        t_density += mat_pool.back()->get_density();
     }
 
     initial_stiffness.zeros(1);
@@ -84,10 +86,8 @@ int Parallel::update_trial_status(const vec& t_strain, const vec& t_strain_rate)
 }
 
 int Parallel::clear_status() {
-    current_strain.zeros();
-    trial_strain.zeros();
-    current_stress.zeros();
-    trial_stress.zeros();
+    trial_strain = current_strain.zeros();
+    trial_stress = current_stress.zeros();
     trial_stiffness = current_stiffness = initial_stiffness;
     auto code = 0;
     for(const auto& I : mat_pool) code += I->clear_status();

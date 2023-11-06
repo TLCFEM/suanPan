@@ -32,6 +32,7 @@ cp ../Example/Material/T.txt .
 cp ../Example/Material/CYCLE.txt .
 cp ../Example/Material/EHIST .
 cp ../Example/Material/example .
+cp ../Example/Material/exp .
 cp ../Example/Section/HIST .
 
 for file in $files; do

@@ -49,11 +49,12 @@ class DC3D4 final : public MaterialElement3D {
     double maximum_energy = 0.;
 
 public:
-    DC3D4(unsigned, // tag
-          uvec&&,   // node tag
-          unsigned, // material tag
-          double,   // characteristic length
-          double    // energy release rate
+    DC3D4(
+        unsigned, // tag
+        uvec&&,   // node tag
+        unsigned, // material tag
+        double,   // characteristic length
+        double    // energy release rate
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

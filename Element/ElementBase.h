@@ -43,6 +43,7 @@ class ElementBase : public Tag, public vtkBase {
     virtual void update_strain_energy() = 0;
     virtual void update_kinetic_energy() = 0;
     virtual void update_viscous_energy() = 0;
+    virtual void update_nonviscous_energy() = 0;
     virtual void update_complementary_energy() = 0;
     virtual void update_momentum() = 0;
 
@@ -60,16 +61,6 @@ protected:
     friend vec get_current_acceleration(const ElementBase*);
 
     [[nodiscard]] virtual mat get_coordinate(unsigned) const = 0;
-
-    [[nodiscard]] virtual vec get_incre_displacement() const = 0;
-    [[nodiscard]] virtual vec get_incre_velocity() const = 0;
-    [[nodiscard]] virtual vec get_incre_acceleration() const = 0;
-    [[nodiscard]] virtual vec get_trial_displacement() const = 0;
-    [[nodiscard]] virtual vec get_trial_velocity() const = 0;
-    [[nodiscard]] virtual vec get_trial_acceleration() const = 0;
-    [[nodiscard]] virtual vec get_current_displacement() const = 0;
-    [[nodiscard]] virtual vec get_current_velocity() const = 0;
-    [[nodiscard]] virtual vec get_current_acceleration() const = 0;
 
     [[nodiscard]] virtual vec get_node_incre_resistance() const = 0;
     [[nodiscard]] virtual vec get_node_trial_resistance() const = 0;
@@ -102,6 +93,7 @@ public:
 
     [[nodiscard]] virtual bool if_update_mass() const = 0;
     [[nodiscard]] virtual bool if_update_damping() const = 0;
+    [[nodiscard]] virtual bool if_update_nonviscous() const = 0;
     [[nodiscard]] virtual bool if_update_stiffness() const = 0;
     [[nodiscard]] virtual bool if_update_geometry() const = 0;
 
@@ -120,10 +112,22 @@ public:
     virtual void clear_node_ptr() = 0;
     [[nodiscard]] virtual const std::vector<weak_ptr<Node>>& get_node_ptr() const = 0;
 
+    [[nodiscard]] virtual vec get_incre_displacement() const = 0;
+    [[nodiscard]] virtual vec get_incre_velocity() const = 0;
+    [[nodiscard]] virtual vec get_incre_acceleration() const = 0;
+    [[nodiscard]] virtual vec get_trial_displacement() const = 0;
+    [[nodiscard]] virtual vec get_trial_velocity() const = 0;
+    [[nodiscard]] virtual vec get_trial_acceleration() const = 0;
+    [[nodiscard]] virtual vec get_current_displacement() const = 0;
+    [[nodiscard]] virtual vec get_current_velocity() const = 0;
+    [[nodiscard]] virtual vec get_current_acceleration() const = 0;
+
     [[nodiscard]] virtual const vec& get_trial_resistance() const = 0;
     [[nodiscard]] virtual const vec& get_current_resistance() const = 0;
     [[nodiscard]] virtual const vec& get_trial_damping_force() const = 0;
     [[nodiscard]] virtual const vec& get_current_damping_force() const = 0;
+    [[nodiscard]] virtual const cx_mat& get_trial_nonviscous_force() const = 0;
+    [[nodiscard]] virtual const cx_mat& get_current_nonviscous_force() const = 0;
     [[nodiscard]] virtual const vec& get_trial_inertial_force() = 0;
     [[nodiscard]] virtual const vec& get_current_inertial_force() = 0;
 
@@ -134,18 +138,21 @@ public:
 
     [[nodiscard]] virtual const mat& get_trial_mass() const = 0;
     [[nodiscard]] virtual const mat& get_trial_damping() const = 0;
+    [[nodiscard]] virtual const mat& get_trial_nonviscous() const = 0;
     [[nodiscard]] virtual const mat& get_trial_stiffness() const = 0;
     [[nodiscard]] virtual const mat& get_trial_geometry() const = 0;
     [[nodiscard]] virtual const mat& get_trial_secant() const = 0;
 
     [[nodiscard]] virtual const mat& get_current_mass() const = 0;
     [[nodiscard]] virtual const mat& get_current_damping() const = 0;
+    [[nodiscard]] virtual const mat& get_current_nonviscous() const = 0;
     [[nodiscard]] virtual const mat& get_current_stiffness() const = 0;
     [[nodiscard]] virtual const mat& get_current_geometry() const = 0;
     [[nodiscard]] virtual const mat& get_current_secant() const = 0;
 
     [[nodiscard]] virtual const mat& get_initial_mass() const = 0;
     [[nodiscard]] virtual const mat& get_initial_damping() const = 0;
+    [[nodiscard]] virtual const mat& get_initial_nonviscous() const = 0;
     [[nodiscard]] virtual const mat& get_initial_stiffness() const = 0;
     [[nodiscard]] virtual const mat& get_initial_geometry() const = 0;
     [[nodiscard]] virtual const mat& get_initial_secant() const = 0;
@@ -167,6 +174,7 @@ public:
     [[nodiscard]] virtual double get_complementary_energy() const = 0;
     [[nodiscard]] virtual double get_kinetic_energy() const = 0;
     [[nodiscard]] virtual double get_viscous_energy() const = 0;
+    [[nodiscard]] virtual double get_nonviscous_energy() const = 0;
     [[nodiscard]] virtual const vec& get_momentum() const = 0;
     [[nodiscard]] virtual double get_momentum_component(DOF) const = 0;
 

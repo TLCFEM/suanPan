@@ -31,7 +31,7 @@ PCPE8DC::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<
     : coor(std::forward<vec>(C))
     , weight(W)
     , m_material(std::forward<unique_ptr<Material>>(M))
-    , strain_mat(3, 2 * m_node, fill::zeros) {}
+    , strain_mat(3, 2llu * m_node, fill::zeros) {}
 
 PCPE8DC::PCPE8DC(const unsigned T, uvec&& N, const unsigned MS, const unsigned MF, const double AL, const double NN, const double KK)
     : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{MS, MF}, false)
@@ -44,7 +44,7 @@ int PCPE8DC::initialize(const shared_ptr<DomainBase>& D) {
     auto& f_mat = D->get<Material>(material_tag(1));
 
     // validate material type
-    if(PlaneType::E != static_cast<PlaneType>(s_mat->get_parameter(ParameterType::PLANETYPE))) {
+    if(PlaneType::E != s_mat->get_plane_type()) {
         suanpan_error("Only plane strain material for solid phase is supported.\n");
         return SUANPAN_FAIL;
     }
@@ -57,11 +57,7 @@ int PCPE8DC::initialize(const shared_ptr<DomainBase>& D) {
     const auto ks = s_mat->get_parameter(ParameterType::BULKMODULUS);
     const auto kf = f_mat->get_parameter(ParameterType::BULKMODULUS);
 
-    if(suanpan::approx_equal(ks, 0.)) {
-        suanpan_error("A zero bulk modulus is detected.\n");
-        return SUANPAN_FAIL;
-    }
-    if(suanpan::approx_equal(kf, 0.)) {
+    if(suanpan::approx_equal(ks, 0.) || suanpan::approx_equal(kf, 0.)) {
         suanpan_error("A zero bulk modulus is detected.\n");
         return SUANPAN_FAIL;
     }
@@ -69,8 +65,8 @@ int PCPE8DC::initialize(const shared_ptr<DomainBase>& D) {
     q = ks * kf / (porosity * ks + (alpha - porosity) * kf);
 
     // compute density ratio
-    const auto s_density = (1. - porosity) * s_mat->get_parameter(ParameterType::DENSITY);
-    const auto f_density = porosity * f_mat->get_parameter(ParameterType::DENSITY);
+    const auto s_density = (1. - porosity) * s_mat->get_density();
+    const auto f_density = porosity * f_mat->get_density();
     const auto s_ratio = s_density / (s_density + f_density);
     const auto f_ratio = f_density / (s_density + f_density);
 
@@ -186,15 +182,15 @@ int PCPE8DC::reset_status() {
 mat PCPE8DC::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
 vector<vec> PCPE8DC::record(const OutputType P) {
-    vector<vec> output;
+    vector<vec> data;
 
     if(P == OutputType::PP) {
         const auto t_disp = get_current_displacement();
-        for(const auto& I : int_pt) output.emplace_back(vec{q * tensor::trace2(I.strain_mat * ((porosity - alpha) * t_disp(s_dof) - porosity * t_disp(f_dof)))});
+        for(const auto& I : int_pt) data.emplace_back(vec{q * tensor::trace2(I.strain_mat * ((porosity - alpha) * t_disp(s_dof) - porosity * t_disp(f_dof)))});
     }
-    else for(const auto& I : int_pt) for(const auto& J : I.m_material->record(P)) output.emplace_back(J);
+    else for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
 
-    return output;
+    return data;
 }
 
 void PCPE8DC::print() {
@@ -233,10 +229,10 @@ void PCPE8DC::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType 
 
 mat PCPE8DC::GetData(const OutputType P) {
     mat A(int_pt.size(), 9);
-    mat B(int_pt.size(), 6, fill::zeros);
+    mat B(6, int_pt.size(), fill::zeros);
 
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        if(const auto C = int_pt[I].m_material->record(P); !C.empty()) B(I, 0, size(C[0])) = C[0];
+        if(const auto C = int_pt[I].m_material->record(P); !C.empty()) B(0, I, size(C[0])) = C[0];
         A.row(I) = interpolation::quadratic(int_pt[I].coor);
     }
 
@@ -251,7 +247,7 @@ mat PCPE8DC::GetData(const OutputType P) {
     data.row(6) = interpolation::quadratic(0., 1.);
     data.row(7) = interpolation::quadratic(-1., 0.);
 
-    return (data * solve(A, B)).t();
+    return (data * solve(A, B.t())).t();
 }
 
 void PCPE8DC::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {

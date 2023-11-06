@@ -54,34 +54,40 @@ struct DataElement {
 
     const bool nlgeom = false; // nonlinear geometry switch
 
-    bool update_mass = true;      // flag to indicate if update matrix
-    bool update_damping = true;   // flag to indicate if update matrix
-    bool update_stiffness = true; // flag to indicate if update matrix
-    bool update_geometry = true;  // flag to indicate if update matrix
+    bool update_mass = true;       // flag to indicate if update matrix
+    bool update_damping = true;    // flag to indicate if update matrix
+    bool update_nonviscous = true; // flag to indicate if update matrix
+    bool update_stiffness = true;  // flag to indicate if update matrix
+    bool update_geometry = true;   // flag to indicate if update matrix
 
     uvec dof_encoding; // DoF encoding vector
 
-    mat initial_mass{};      // mass matrix
-    mat initial_damping{};   // damping matrix
-    mat initial_stiffness{}; // stiffness matrix
-    mat initial_geometry{};  // geometry matrix
+    mat initial_mass{};       // mass matrix
+    mat initial_damping{};    // damping matrix
+    mat initial_nonviscous{}; // nonviscous damping matrix
+    mat initial_stiffness{};  // stiffness matrix
+    mat initial_geometry{};   // geometry matrix
 
-    mat trial_mass{};      // mass matrix
-    mat trial_damping{};   // damping matrix
-    mat trial_stiffness{}; // stiffness matrix
-    mat trial_geometry{};  // geometry matrix
+    mat trial_mass{};       // mass matrix
+    mat trial_damping{};    // damping matrix
+    mat trial_nonviscous{}; // nonviscous damping matrix
+    mat trial_stiffness{};  // stiffness matrix
+    mat trial_geometry{};   // geometry matrix
 
-    mat current_mass{};      // mass matrix
-    mat current_damping{};   // damping matrix
-    mat current_stiffness{}; // stiffness matrix
-    mat current_geometry{};  // geometry matrix
+    mat current_mass{};       // mass matrix
+    mat current_damping{};    // damping matrix
+    mat current_nonviscous{}; // nonviscous damping matrix
+    mat current_stiffness{};  // stiffness matrix
+    mat current_geometry{};   // geometry matrix
 
-    vec trial_resistance{};       // resistance vector
-    vec current_resistance{};     // resistance vector
-    vec trial_damping_force{};    // damping force
-    vec current_damping_force{};  // damping force
-    vec trial_inertial_force{};   // inertial force
-    vec current_inertial_force{}; // inertial force
+    vec trial_resistance{};            // resistance vector
+    vec current_resistance{};          // resistance vector
+    vec trial_damping_force{};         // damping force
+    vec current_damping_force{};       // damping force
+    cx_mat trial_nonviscous_force{};   // nonviscous damping force
+    cx_mat current_nonviscous_force{}; // nonviscous damping force
+    vec trial_inertial_force{};        // inertial force
+    vec current_inertial_force{};      // inertial force
 
     vec trial_body_force{};
     vec current_body_force{};
@@ -97,6 +103,7 @@ struct DataElement {
     double strain_energy = 0.;
     double kinetic_energy = 0.;
     double viscous_energy = 0.;
+    double nonviscous_energy = 0.;
     double complementary_energy = 0.;
     vec momentum{};
 
@@ -128,6 +135,7 @@ class Element : protected DataElement, public ElementBase {
     void update_strain_energy() override;
     void update_kinetic_energy() override;
     void update_viscous_energy() override;
+    void update_nonviscous_energy() override;
     void update_complementary_energy() override;
     void update_momentum() override;
 
@@ -135,16 +143,6 @@ protected:
     std::vector<weak_ptr<Node>> node_ptr; // node pointers
 
     [[nodiscard]] mat get_coordinate(unsigned) const override;
-
-    [[nodiscard]] vec get_incre_displacement() const override;
-    [[nodiscard]] vec get_incre_velocity() const override;
-    [[nodiscard]] vec get_incre_acceleration() const override;
-    [[nodiscard]] vec get_trial_displacement() const override;
-    [[nodiscard]] vec get_trial_velocity() const override;
-    [[nodiscard]] vec get_trial_acceleration() const override;
-    [[nodiscard]] vec get_current_displacement() const override;
-    [[nodiscard]] vec get_current_velocity() const override;
-    [[nodiscard]] vec get_current_acceleration() const override;
 
     [[nodiscard]] vec get_node_incre_resistance() const override;
     [[nodiscard]] vec get_node_trial_resistance() const override;
@@ -154,38 +152,43 @@ protected:
     [[nodiscard]] std::vector<shared_ptr<Section>> get_section(const shared_ptr<DomainBase>&) const override;
 
 public:
-    Element(unsigned,          // tag
-            unsigned,          // number of nodes
-            unsigned,          // number of dofs
-            uvec&&,            // node encoding
-            std::vector<DOF>&& // dof identifier
+    Element(
+        unsigned,          // tag
+        unsigned,          // number of nodes
+        unsigned,          // number of dofs
+        uvec&&,            // node encoding
+        std::vector<DOF>&& // dof identifier
     );
-    Element(unsigned,          // tag
-            unsigned,          // number of nodes
-            unsigned,          // number of dofs
-            uvec&&,            // node encoding
-            uvec&&,            // material tags
-            bool,              // nonlinear geometry switch
-            MaterialType,      // material type for internal check
-            std::vector<DOF>&& // dof identifier
+    Element(
+        unsigned,          // tag
+        unsigned,          // number of nodes
+        unsigned,          // number of dofs
+        uvec&&,            // node encoding
+        uvec&&,            // material tags
+        bool,              // nonlinear geometry switch
+        MaterialType,      // material type for internal check
+        std::vector<DOF>&& // dof identifier
     );
-    Element(unsigned,          // tag
-            unsigned,          // number of nodes
-            unsigned,          // number of dofs
-            uvec&&,            // node encoding
-            uvec&&,            // section tags
-            bool,              // nonlinear geometry switch
-            SectionType,       // section type for internal check
-            std::vector<DOF>&& // dof identifier
+    Element(
+        unsigned,          // tag
+        unsigned,          // number of nodes
+        unsigned,          // number of dofs
+        uvec&&,            // node encoding
+        uvec&&,            // section tags
+        bool,              // nonlinear geometry switch
+        SectionType,       // section type for internal check
+        std::vector<DOF>&& // dof identifier
     );
-    Element(unsigned, // tag
-            unsigned, // number of dofs
-            uvec&&    // group encoding
+    Element(
+        unsigned, // tag
+        unsigned, // number of dofs
+        uvec&&    // group encoding
     );
-    Element(unsigned, // tag
-            unsigned, // number of dofs
-            unsigned, // other element tag
-            unsigned  // node tag
+    Element(
+        unsigned, // tag
+        unsigned, // number of dofs
+        unsigned, // other element tag
+        unsigned  // node tag
     );
     Element(const Element&) = delete;            // copy forbidden
     Element(Element&&) = delete;                 // move forbidden
@@ -206,6 +209,7 @@ public:
 
     [[nodiscard]] bool if_update_mass() const override;
     [[nodiscard]] bool if_update_damping() const override;
+    [[nodiscard]] bool if_update_nonviscous() const override;
     [[nodiscard]] bool if_update_stiffness() const override;
     [[nodiscard]] bool if_update_geometry() const override;
 
@@ -224,10 +228,22 @@ public:
     void clear_node_ptr() override;
     [[nodiscard]] const std::vector<weak_ptr<Node>>& get_node_ptr() const override;
 
+    [[nodiscard]] vec get_incre_displacement() const override;
+    [[nodiscard]] vec get_incre_velocity() const override;
+    [[nodiscard]] vec get_incre_acceleration() const override;
+    [[nodiscard]] vec get_trial_displacement() const override;
+    [[nodiscard]] vec get_trial_velocity() const override;
+    [[nodiscard]] vec get_trial_acceleration() const override;
+    [[nodiscard]] vec get_current_displacement() const override;
+    [[nodiscard]] vec get_current_velocity() const override;
+    [[nodiscard]] vec get_current_acceleration() const override;
+
     [[nodiscard]] const vec& get_trial_resistance() const override;
     [[nodiscard]] const vec& get_current_resistance() const override;
     [[nodiscard]] const vec& get_trial_damping_force() const override;
     [[nodiscard]] const vec& get_current_damping_force() const override;
+    [[nodiscard]] const cx_mat& get_trial_nonviscous_force() const override;
+    [[nodiscard]] const cx_mat& get_current_nonviscous_force() const override;
     [[nodiscard]] const vec& get_trial_inertial_force() override;
     [[nodiscard]] const vec& get_current_inertial_force() override;
 
@@ -238,18 +254,21 @@ public:
 
     [[nodiscard]] const mat& get_trial_mass() const override;
     [[nodiscard]] const mat& get_trial_damping() const override;
+    [[nodiscard]] const mat& get_trial_nonviscous() const override;
     [[nodiscard]] const mat& get_trial_stiffness() const override;
     [[nodiscard]] const mat& get_trial_geometry() const override;
     [[nodiscard]] const mat& get_trial_secant() const override;
 
     [[nodiscard]] const mat& get_current_mass() const override;
     [[nodiscard]] const mat& get_current_damping() const override;
+    [[nodiscard]] const mat& get_current_nonviscous() const override;
     [[nodiscard]] const mat& get_current_stiffness() const override;
     [[nodiscard]] const mat& get_current_geometry() const override;
     [[nodiscard]] const mat& get_current_secant() const override;
 
     [[nodiscard]] const mat& get_initial_mass() const override;
     [[nodiscard]] const mat& get_initial_damping() const override;
+    [[nodiscard]] const mat& get_initial_nonviscous() const override;
     [[nodiscard]] const mat& get_initial_stiffness() const override;
     [[nodiscard]] const mat& get_initial_geometry() const override;
     [[nodiscard]] const mat& get_initial_secant() const override;
@@ -270,6 +289,7 @@ public:
     [[nodiscard]] double get_complementary_energy() const override;
     [[nodiscard]] double get_kinetic_energy() const override;
     [[nodiscard]] double get_viscous_energy() const override;
+    [[nodiscard]] double get_nonviscous_energy() const override;
     [[nodiscard]] const vec& get_momentum() const override;
     [[nodiscard]] double get_momentum_component(DOF) const override;
 
@@ -277,6 +297,8 @@ public:
 
     [[nodiscard]] mat compute_shape_function(const mat&, unsigned) const override;
 };
+
+std::vector<vec>& append_to(std::vector<vec>&, std::vector<vec>&&);
 
 #endif
 

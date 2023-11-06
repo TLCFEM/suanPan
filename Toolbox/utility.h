@@ -82,6 +82,12 @@ template<typename T> bool get_input(istringstream& I, Col<T>& O) {
     return code;
 }
 
+template<typename T> bool get_input(istringstream& I, std::vector<T>& O) {
+    T value;
+    while(get_input(I, value)) O.emplace_back(value);
+    return true;
+}
+
 template<typename T, typename... U> bool get_input(istringstream& I, T& O, U&... R) { return static_cast<bool>(I >> O) ? get_input(I, R...) : false; }
 
 template<typename T> T get_input(istringstream& I) {
@@ -135,5 +141,7 @@ bool is_true(const string&);
 bool is_false(const string&);
 
 bool is_integer(const string&);
+
+double perturb(double);
 
 #endif

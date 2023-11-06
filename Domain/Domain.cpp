@@ -33,7 +33,7 @@
 #include <Section/Section.h>
 #include <Solver/Integrator/Integrator.h>
 #include <Solver/Solver.h>
-#include <Step/Step.h>
+#include <Step/ArcLength.h>
 #include <Toolbox/sort_color.hpp>
 #include <Toolbox/sort_rcm.h>
 #include <Toolbox/Expression.h>
@@ -707,6 +707,20 @@ const shared_ptr<Integrator>& Domain::get_current_integrator() const { return ge
 
 const shared_ptr<Solver>& Domain::get_current_solver() const { return get_solver(current_solver_tag); }
 
+unique_ptr<Material> Domain::initialized_material_copy(const uword T) {
+    if(!find<Material>(T)) return nullptr;
+
+    auto copy = get<Material>(T)->get_copy();
+
+    if(copy->is_initialized()) return copy;
+
+    if(SUANPAN_SUCCESS != copy->initialize_base(shared_from_this()) || SUANPAN_SUCCESS != copy->initialize(shared_from_this())) return nullptr;
+
+    copy->set_initialized(true);
+
+    return copy;
+}
+
 /**
  * \brief concurrently safe insertion method
  */
@@ -984,15 +998,17 @@ int Domain::initialize() {
         return SUANPAN_FAIL;
     }
 
-    // set some factory properties for later initialisation
-    factory->set_nlgeom(nlgeom);
-
     // initialize modifier based on updated element pool
-    suanpan::for_all(modifier_pond, [&](const std::pair<unsigned, shared_ptr<Modifier>>& t_modifier) { t_modifier.second->initialize(shared_from_this()); });
+    bool nonviscous = false;
+    suanpan::for_all(modifier_pond, [&](const std::pair<unsigned, shared_ptr<Modifier>>& t_modifier) { if(SUANPAN_SUCCESS == t_modifier.second->initialize(shared_from_this()) && t_modifier.second->has_nonviscous()) nonviscous = true; });
     modifier_pond.update();
     // sort to ensure lower performs first
     if(auto& t_modifier_pool = access::rw(modifier_pond.get()); t_modifier_pool.size() > 1)
         suanpan_sort(t_modifier_pool.begin(), t_modifier_pool.end(), [&](const shared_ptr<Modifier>& a, const shared_ptr<Modifier>& b) { return a->get_tag() < b->get_tag(); });
+
+    // set some factory properties for later initialisation
+    factory->set_nlgeom(nlgeom);
+    factory->set_nonviscous(nonviscous);
 
     // recorder may depend on groups, nodes, elements, etc.
     suanpan::for_all(recorder_pond, [&](const std::pair<unsigned, shared_ptr<Recorder>>& t_recorder) { t_recorder.second->initialize(shared_from_this()); });
@@ -1094,6 +1110,9 @@ int Domain::process_load(const bool full) {
     auto& trial_settlement = factory->modify_trial_settlement();
     if(!trial_settlement.empty()) trial_settlement.zeros();
 
+    auto reference_load = factory->get_reference_load();
+    if(!reference_load.empty()) reference_load.zeros();
+
     const auto process_handler = full ? std::mem_fn(&Load::process) : std::mem_fn(&Load::process_resistance);
 
     std::atomic_int code = 0;
@@ -1105,18 +1124,26 @@ int Domain::process_load(const bool full) {
 #else
         code += std::invoke(process_handler, t_load, shared_from_this());
 #endif
-        if(!t_load->get_trial_load().empty()) {
+        if(!t_load->get_trial_load().empty() && !trial_load.empty()) {
             std::scoped_lock trial_load_lock(factory->get_trial_load_mutex());
             trial_load += t_load->get_trial_load();
         }
-        if(!t_load->get_trial_settlement().empty()) {
+        if(!t_load->get_trial_settlement().empty() && !trial_settlement.empty()) {
             std::scoped_lock trial_settlement_lock(factory->get_trial_settlement_mutex());
             trial_settlement += t_load->get_trial_settlement();
+        }
+        if(!t_load->get_reference_load().empty() && !reference_load.empty()) {
+            std::scoped_lock reference_load_lock(factory->get_reference_load_mutex());
+            reference_load += t_load->get_reference_load();
         }
     });
 
     factory->update_trial_load(trial_load);
     factory->update_trial_settlement(trial_settlement);
+
+    // only consider custom reference load pattern in arc-length method
+    // otherwise, the reference load is automatically updated
+    if(std::dynamic_pointer_cast<ArcLength>(get_current_step())) factory->set_reference_load(reference_load);
 
     return code;
 }

@@ -150,7 +150,7 @@ CP3::CP3(const unsigned T, uvec&& NT, const unsigned MT, const double TH, const 
 int CP3::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
-    if(PlaneType::E == static_cast<PlaneType>(material_proto->get_parameter(ParameterType::PLANETYPE))) suanpan::hacker(thickness) = 1.;
+    if(PlaneType::E == material_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
 
     m_material = material_proto->get_copy();
 
@@ -174,7 +174,7 @@ int CP3::initialize(const shared_ptr<DomainBase>& D) {
 
     rowvec n = mean(ele_coor) * inv_coor;
 
-    if(const auto t_density = area * thickness * m_material->get_parameter(ParameterType::DENSITY); t_density > 0.) {
+    if(const auto t_density = area * thickness * m_material->get_density(); t_density > 0.) {
         initial_mass.zeros(m_size, m_size);
         for(auto I = 0u, K = 0u; I < m_node; ++I, K += m_dof) for(auto J = I, L = K; J < m_node; ++J, L += m_dof) initial_mass(K, L) += t_density * n(I) * n(J);
         for(auto I = 0u, K = 1u; I < m_size; I += m_dof, K += m_dof) {
@@ -246,7 +246,7 @@ int CP3::clear_status() { return m_material->clear_status(); }
 
 int CP3::reset_status() { return m_material->reset_status(); }
 
-vector<vec> CP3::record(const OutputType T) { return m_material->record(T); }
+vector<vec> CP3::record(const OutputType P) { return m_material->record(P); }
 
 void CP3::print() {
     suanpan_info("CP3 element connects nodes:", node_encoding);

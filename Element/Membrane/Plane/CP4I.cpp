@@ -22,13 +22,18 @@
 #include <Toolbox/shape.h>
 #include <Toolbox/utility.h>
 
-CP4I::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M, mat&& PNPXY)
+CP4I::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M, mat&& P)
     : coor(std::forward<vec>(C))
     , weight(W)
     , m_material(std::forward<unique_ptr<Material>>(M))
-    , pn_pxy(std::forward<mat>(PNPXY))
+    , pn_pxy(std::forward<mat>(P))
     , B1(3, m_size, fill::zeros)
-    , B2(3, 4, fill::zeros) {}
+    , B2(3, 4, fill::zeros) {
+    for(auto I = 0u, J = 0u, K = 1u; I < m_node; ++I, J += m_dof, K += m_dof) {
+        B1(0, J) = B1(2, K) = pn_pxy(0, I);
+        B1(2, J) = B1(1, K) = pn_pxy(1, I);
+    }
+}
 
 void CP4I::stack_stiffness(mat& K, const mat& D, const mat& N, const double F) {
     const auto D11 = F * D(0, 0);
@@ -241,7 +246,7 @@ CP4I::CP4I(const unsigned T, uvec&& N, const unsigned M, const double TH)
 int CP4I::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
-    if(PlaneType::E == static_cast<PlaneType>(material_proto->get_parameter(ParameterType::PLANETYPE))) suanpan::hacker(thickness) = 1.;
+    if(PlaneType::E == material_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
 
     auto& ini_stiffness = material_proto->get_initial_stiffness();
 
@@ -262,11 +267,6 @@ int CP4I::initialize(const shared_ptr<DomainBase>& D) {
 
         auto& c_pt = int_pt.back();
 
-        for(auto J = 0u, K = 0u, L = 1u; J < m_node; ++J, K += m_dof, L += m_dof) {
-            c_pt.B1(0, K) = c_pt.B1(2, L) = c_pt.pn_pxy(0, J);
-            c_pt.B1(2, K) = c_pt.B1(1, L) = c_pt.pn_pxy(1, J);
-        }
-
         const vec pbn_pxy = solve(jacob, -2. * c_pt.coor);
         c_pt.B2(0, 0) = c_pt.B2(2, 1) = pbn_pxy(0);
         c_pt.B2(1, 3) = c_pt.B2(2, 2) = pbn_pxy(1);
@@ -278,7 +278,7 @@ int CP4I::initialize(const shared_ptr<DomainBase>& D) {
     initial_stiffness -= stiff_b * solve(stiff_a, stiff_b.t());
     trial_stiffness = current_stiffness = initial_stiffness;
 
-    if(const auto t_density = material_proto->get_parameter(ParameterType::DENSITY); t_density > 0.) {
+    if(const auto t_density = material_proto->get_density(); t_density > 0.) {
         initial_mass.zeros(m_size, m_size);
         for(const auto& I : int_pt) {
             const auto n_int = compute_shape_function(I.coor, 0);
@@ -346,9 +346,9 @@ int CP4I::reset_status() {
 mat CP4I::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
 vector<vec> CP4I::record(const OutputType P) {
-    vector<vec> output;
-    for(const auto& I : int_pt) for(const auto& J : I.m_material->record(P)) output.emplace_back(J);
-    return output;
+    vector<vec> data;
+    for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
+    return data;
 }
 
 void CP4I::print() {
@@ -387,10 +387,10 @@ void CP4I::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType typ
 
 mat CP4I::GetData(const OutputType P) {
     mat A(int_pt.size(), 4);
-    mat B(int_pt.size(), 6, fill::zeros);
+    mat B(6, int_pt.size(), fill::zeros);
 
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        if(const auto C = int_pt[I].m_material->record(P); !C.empty()) B(I, 0, size(C[0])) = C[0];
+        if(const auto C = int_pt[I].m_material->record(P); !C.empty()) B(0, I, size(C[0])) = C[0];
         A.row(I) = interpolation::linear(int_pt[I].coor);
     }
 
@@ -401,7 +401,7 @@ mat CP4I::GetData(const OutputType P) {
     data.row(2) = interpolation::linear(1., 1.);
     data.row(3) = interpolation::linear(-1., 1.);
 
-    return (data * solve(A, B)).t();
+    return (data * solve(A, B.t())).t();
 }
 
 void CP4I::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {

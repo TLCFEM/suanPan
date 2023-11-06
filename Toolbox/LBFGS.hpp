@@ -47,10 +47,8 @@
 using std::deque;
 using std::vector;
 
-template<typename T> concept Differentiable = requires(T t, const vec& x)
-{
-    t.evaluate_residual(x);
-    t.evaluate_jacobian(x);
+template<typename T> concept Differentiable = requires(T t, const vec& x) {
+    t.evaluate_residual(x); t.evaluate_jacobian(x);
 };
 
 class LBFGS final {

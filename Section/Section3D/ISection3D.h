@@ -39,22 +39,24 @@ class ISection3D : public Section3D {
     const unsigned int_pt_num;
 
 public:
-    ISection3D(unsigned,        // tag
-               double,          // width
-               double,          // height
-               double,          // width
-               double,          // height
-               double,          // width
-               double,          // height
-               unsigned,        // material tag
-               unsigned = 6,    // number of integration points
-               vec&& = {0., 0.} // eccentricity
+    ISection3D(
+        unsigned,        // tag
+        double,          // width
+        double,          // height
+        double,          // width
+        double,          // height
+        double,          // width
+        double,          // height
+        unsigned,        // material tag
+        unsigned = 6,    // number of integration points
+        vec&& = {0., 0.} // eccentricity
     );
-    ISection3D(unsigned,        // tag
-               vec&&,           // dimension
-               unsigned,        // material tag
-               unsigned = 6,    // number of integration points
-               vec&& = {0., 0.} // eccentricity
+    ISection3D(
+        unsigned,        // tag
+        vec&&,           // dimension
+        unsigned,        // material tag
+        unsigned = 6,    // number of integration points
+        vec&& = {0., 0.} // eccentricity
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

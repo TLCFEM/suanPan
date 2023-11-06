@@ -40,21 +40,12 @@
 
 using std::vector;
 
-enum class PlaneType : unsigned {
-    S = 1,
-    E = 2,
-    A = 3,
-    N = 0
-};
-
 class Material2D : public Material {
-protected:
-    const PlaneType plane_type;
-
 public:
-    Material2D(unsigned,  // tag
-               PlaneType, // plane type
-               double     // density
+    Material2D(
+        unsigned,  // tag
+        PlaneType, // plane type
+        double     // density
     );
 
     vector<vec> record(OutputType) override;

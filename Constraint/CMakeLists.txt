@@ -14,7 +14,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         RestitutionWallPenalty.cpp
         RigidWallMultiplier.cpp
         RigidWallPenalty.cpp
-        )
+)
 
 add_subdirectory(BC)
 add_subdirectory(Criterion)

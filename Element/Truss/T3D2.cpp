@@ -35,7 +35,7 @@ int T3D2::initialize(const shared_ptr<DomainBase>& D) {
 
     trial_stiffness = current_stiffness = initial_stiffness = t_trans->to_global_stiffness_mat(area / length * t_material->get_initial_stiffness());
 
-    if(const auto t_density = t_material->get_parameter(ParameterType::DENSITY); t_density > 0.) trial_mass = current_mass = initial_mass = t_trans->to_global_mass_mat(t_density * area);
+    if(const auto t_density = t_material->get_density(); t_density > 0.) trial_mass = current_mass = initial_mass = t_trans->to_global_mass_mat(t_density * area);
 
     return SUANPAN_SUCCESS;
 }
@@ -86,7 +86,7 @@ int T3D2::reset_status() {
     return t_material->reset_status();
 }
 
-vector<vec> T3D2::record(const OutputType T) { return t_material->record(T); }
+vector<vec> T3D2::record(const OutputType P) { return t_material->record(P); }
 
 void T3D2::print() {
     suanpan_info("A 3D truss element with ");

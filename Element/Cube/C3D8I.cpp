@@ -74,7 +74,7 @@ int C3D8I::initialize(const shared_ptr<DomainBase>& D) {
     initial_stiffness -= stiff_b * solve(stiff_a, stiff_b.t());
     trial_stiffness = current_stiffness = initial_stiffness;
 
-    if(const auto t_density = mat_proto->get_parameter(ParameterType::DENSITY); t_density > 0.) {
+    if(const auto t_density = mat_proto->get_density(); t_density > 0.) {
         initial_mass.zeros(c_size, c_size);
         for(const auto& I : int_pt) {
             const auto n_int = compute_shape_function(I.coor, 0);
@@ -140,9 +140,9 @@ int C3D8I::reset_status() {
 
 mat C3D8I::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::cube(coordinate, order, c_node); }
 
-vector<vec> C3D8I::record(const OutputType T) {
+vector<vec> C3D8I::record(const OutputType P) {
     vector<vec> data;
-    for(const auto& I : int_pt) for(const auto& J : I.c_material->record(T)) data.emplace_back(J);
+    for(const auto& I : int_pt) append_to(data, I.c_material->record(P));
     return data;
 }
 
@@ -171,10 +171,10 @@ void C3D8I::Setup() {
 
 mat C3D8I::GetData(const OutputType P) {
     mat A(int_pt.size(), 7);
-    mat B(int_pt.size(), 6, fill::zeros);
+    mat B(6, int_pt.size(), fill::zeros);
 
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        if(const auto C = int_pt[I].c_material->record(P); !C.empty()) B(I, 0, size(C[0])) = C[0];
+        if(const auto C = int_pt[I].c_material->record(P); !C.empty()) B(0, I, size(C[0])) = C[0];
         A.row(I) = interpolation::linear(int_pt[I].coor);
     }
 
@@ -189,7 +189,7 @@ mat C3D8I::GetData(const OutputType P) {
     data.row(6) = interpolation::linear(1., 1., 1.);
     data.row(7) = interpolation::linear(-1., 1., 1.);
 
-    return (data * solve(A, B)).t();
+    return (data * solve(A, B.t())).t();
 }
 
 void C3D8I::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {

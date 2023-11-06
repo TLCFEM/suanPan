@@ -12,6 +12,9 @@ element CP4 1 1 2 3 4 1 1
 fix 1 1 1 2
 fix 2 2 1 2
 
+recorder 1 plain Element SP 1
+recorder 2 plain Element EP 1
+
 step static 1 1
 set fixed_step_size 1
 set ini_step_size 1E-1

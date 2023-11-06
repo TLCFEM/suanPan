@@ -32,7 +32,7 @@ int Static::initialize() {
 
     factory->set_analysis_type(AnalysisType::STATICS);
 
-    const auto& t_domain = database.lock();
+    const auto t_domain = database.lock();
 
     if(SUANPAN_SUCCESS != t_domain->restart()) return SUANPAN_FAIL;
 
@@ -46,14 +46,16 @@ int Static::initialize() {
 
     // solver
     // automatically enable displacement controlled solver
-    if(nullptr == solver) {
-        auto flag = false;
-        for(const auto& I : t_domain->get_load_pool())
-            if(I->if_displacement_control() && I->get_start_step() == get_tag()) {
-                flag = true;
-                break;
-            }
-        flag ? solver = make_shared<MPDC>() : solver = make_shared<Newton>();
+    auto flag = false;
+    for(const auto& I : t_domain->get_load_pool())
+        if(I->if_displacement_control() && I->get_start_step() == get_tag()) {
+            flag = true;
+            break;
+        }
+    if(nullptr == solver) flag ? solver = make_shared<MPDC>() : solver = make_shared<Newton>();
+    else if(flag && nullptr == std::dynamic_pointer_cast<MPDC>(solver)) {
+        suanpan_warning("Wrong solver assigned, using MPDC instead.\n");
+        solver = make_shared<MPDC>();
     }
 
     solver->set_integrator(modifier);
@@ -77,7 +79,7 @@ int Static::analyze() {
 
     while(true) {
         // check if the target time point is hit
-        if(remain_time <= 1E-7) return SUANPAN_SUCCESS;
+        if(remain_time <= 1E-10) return SUANPAN_SUCCESS;
         // check if the maximum substep number is hit
         if(++num_increment > get_max_substep()) {
             suanpan_warning("The maximum sub-step number {} reached.\n", get_max_substep());
@@ -95,7 +97,7 @@ int Static::analyze() {
             // update time left which will be used in for example criterion
             set_time_left(remain_time -= step_time);
             if(!is_fixed_step_size() && ++num_converged_step > 5) {
-                step_time = std::min(get_max_step_size(), step_time * time_step_amplification);
+                step_time = std::min(get_max_step_size(), step_time * S->get_step_amplifier());
                 num_converged_step = 0;
             }
             // check if time overflows

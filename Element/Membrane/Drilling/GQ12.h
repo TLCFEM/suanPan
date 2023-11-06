@@ -57,10 +57,11 @@ class GQ12 final : public MaterialElement2D {
     vector<IntegrationPoint> int_pt;
 
 public:
-    GQ12(unsigned,   // tag
-         uvec&&,     // node tag
-         unsigned,   // material tag
-         double = 1. // thickness
+    GQ12(
+        unsigned,   // tag
+        uvec&&,     // node tag
+        unsigned,   // material tag
+        double = 1. // thickness
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

@@ -33,8 +33,6 @@
 enum class IntegratorType;
 
 class Dynamic final : public Step {
-    const double time_step_amplification = 1.2;
-
     const IntegratorType analysis_type;
 
 public:

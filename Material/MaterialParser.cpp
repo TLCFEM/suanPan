@@ -340,64 +340,6 @@ void new_bilinear1d(unique_ptr<Material>& return_obj, istringstream& command) {
     return_obj = make_unique<Bilinear1D>(tag, elastic_modulus, yield_stress, hardening_ratio, beta, density);
 }
 
-void new_bilinear2d(unique_ptr<Material>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    double elastic_modulus;
-    if(!get_input(command, elastic_modulus)) {
-        suanpan_error("A valid elastic modulus is required.\n");
-        return;
-    }
-
-    double poissons_ratio;
-    if(!get_input(command, poissons_ratio)) {
-        suanpan_error("A valid poissons ratio is required.\n");
-        return;
-    }
-
-    double yield_stress;
-    if(!get_input(command, yield_stress)) {
-        suanpan_error("A valid yield stress is required.\n");
-        return;
-    }
-
-    auto hardening_ratio = 0.;
-    if(command.eof())
-        suanpan_debug("Zero hardening ratio assumed.\n");
-    else if(!get_input(command, hardening_ratio)) {
-        suanpan_error("A valid hardening ratio is required.\n");
-        return;
-    }
-
-    auto beta = 1.;
-    if(command.eof())
-        suanpan_debug("Isotropic hardening assumed.\n");
-    else if(!get_input(command, beta)) {
-        suanpan_error("A valid beta is required.\n");
-        return;
-    }
-
-    unsigned material_type = 0;
-    if(!command.eof() && !get_input(command, material_type)) {
-        suanpan_error("A valid material type is required.\n");
-        return;
-    }
-
-    auto density = 0.;
-    if(command.eof())
-        suanpan_debug("Zero density assumed.\n");
-    else if(!get_input(command, density)) {
-        suanpan_error("A valid density is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<Bilinear2D>(tag, elastic_modulus, poissons_ratio, yield_stress, hardening_ratio, beta, material_type == 0 ? PlaneType::S : PlaneType::E, density);
-}
-
 void new_bilinearcc(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -975,25 +917,30 @@ void new_customcdp(unique_ptr<Material>& return_obj, istringstream& command) {
     return_obj = make_unique<CustomCDP>(tag, expressions(0), expressions(1), pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), pool(6), pool(7));
 }
 
-void new_cdpm2(unique_ptr<Material>& return_obj, istringstream& command, const unsigned damage_type) {
+void new_cdpm2(unique_ptr<Material>& return_obj, istringstream& command, const CDPM2::DamageType damage_type) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
         return;
     }
 
-    vec para_pool{3E4, .3, 3., 30., .3, .01, .85, .08, .003, 2., 1E-6, 5., 2E-4, 1E-4, 0.};
+    vec para_pool{3E4, .3, 3., 30., .3, .01, .85, .08, .003, 2., 1E-6, 5., 5E-4, 5E-4, 0.};
 
     if(!get_optional_input(command, para_pool)) {
         suanpan_error("A valid parameter is required.\n");
         return;
     }
 
-    auto dt = CDPM2::DamageType::ISOTROPIC;
-    if(0 == damage_type) dt = CDPM2::DamageType::NODAMAGE;
-    else if(2 == damage_type) dt = CDPM2::DamageType::ANISOTROPIC;
+    if(para_pool(4) < 0. || para_pool(4) > 1.) {
+        suanpan_error("Initial ratio qh0 must be in [0,1].\n");
+        return;
+    }
+    if(para_pool(5) + para_pool(4) > 1.) {
+        suanpan_error("Hardeinng modulus hp must be smaller than 1-qh0.\n");
+        return;
+    }
 
-    return_obj = make_unique<CDPM2>(tag, para_pool(0), para_pool(1), para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6), para_pool(7), para_pool(8), para_pool(9), para_pool(10), para_pool(11), para_pool(12), para_pool(13), dt, para_pool(14));
+    return_obj = make_unique<CDPM2>(tag, para_pool(0), para_pool(1), para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6), para_pool(7), para_pool(8), para_pool(9), para_pool(10), para_pool(11), para_pool(12), para_pool(13), damage_type, para_pool(14));
 }
 
 void new_concrete21(unique_ptr<Material>& return_obj, istringstream& command) {
@@ -1130,6 +1077,45 @@ void new_concreteexp(unique_ptr<Material>& return_obj, istringstream& command) {
     return_obj = make_unique<ConcreteExp>(tag, elastic_modulus, f_t, a_t, g_t, f_c, a_c, g_c, middle_point, density);
 }
 
+void new_concretek4(unique_ptr<Material>& return_obj, istringstream& command) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    double elastic_modulus, hardening;
+    if(!get_input(command, elastic_modulus, hardening)) {
+        suanpan_error("A valid modulus is required.\n");
+        return;
+    }
+
+    vec pool(8);
+    if(!get_input(command, pool)) {
+        suanpan_error("A valid parameter is required.\n");
+        return;
+    }
+
+    auto density = 0.;
+    if(command.eof())
+        suanpan_debug("Zero density assumed.\n");
+    else if(!get_input(command, density)) {
+        suanpan_error("A valid density is required.\n");
+        return;
+    }
+
+    auto enable_damage = true, enable_crack_closing = true;
+    if(!command.eof()) {
+        if(!get_input(command, enable_damage, enable_crack_closing)) {
+            suanpan_error("A valid flag is required.\n");
+            return;
+        }
+        suanpan_warning("Internal flags are set.\n");
+    }
+
+    return_obj = make_unique<ConcreteK4>(tag, elastic_modulus, hardening, std::move(pool), density, enable_damage, enable_crack_closing);
+}
+
 void new_concretetable(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -1182,9 +1168,9 @@ void new_concretetsai(unique_ptr<Material>& return_obj, istringstream& command) 
     double input;
     while(!command.eof() && get_input(command, input)) para.emplace_back(input);
 
-    if(para.size() == 7) return_obj = make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], 0.);
+    if(para.size() == 7) return_obj = make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6]);
     else if(para.size() == 8) return_obj = make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7]);
-    else if(para.size() == 9) return_obj = make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], 0.);
+    else if(para.size() == 9) return_obj = make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8]);
     else if(para.size() == 10) return_obj = make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], para[9]);
     else
         suanpan_error("7, 8, 9 or 10 double inputs are required.\n");
@@ -1786,12 +1772,8 @@ void new_expj2(unique_ptr<Material>& return_obj, istringstream& command) {
         suanpan_error("A valid yield stress is required.\n");
         return;
     }
-    if(!get_input(command, a)) {
-        suanpan_error("A valid a is required.\n");
-        return;
-    }
-    if(!get_input(command, b)) {
-        suanpan_error("A valid b is required.\n");
+    if(!get_input(command, a, b)) {
+        suanpan_error("A valid parameter is required.\n");
         return;
     }
 
@@ -2074,6 +2056,36 @@ void new_isotropicelastic3d(unique_ptr<Material>& return_obj, istringstream& com
     }
 
     return_obj = make_unique<IsotropicElastic3D>(tag, elastic_modulus, poissons_ratio, density);
+}
+
+void new_elasticos(unique_ptr<Material>& return_obj, istringstream& command) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    double elastic_modulus;
+    if(!get_input(command, elastic_modulus)) {
+        suanpan_error("A valid elastic modulus is required.\n");
+        return;
+    }
+
+    double poissons_ratio;
+    if(!get_input(command, poissons_ratio)) {
+        suanpan_error("A valid poissons ratio is required.\n");
+        return;
+    }
+
+    auto density = 0.;
+    if(command.eof())
+        suanpan_debug("Zero density assumed.\n");
+    else if(!get_input(command, density)) {
+        suanpan_error("A valid density is required.\n");
+        return;
+    }
+
+    return_obj = make_unique<ElasticOS>(tag, elastic_modulus, poissons_ratio, density);
 }
 
 void new_kelvin(unique_ptr<Material>& return_obj, istringstream& command) {
@@ -2387,7 +2399,7 @@ void new_multilinearj2(unique_ptr<Material>& return_obj, istringstream& command)
         return;
     }
 
-    auto density = 0.;
+    double density;
     if(!get_input(command, density)) {
         suanpan_error("A valid density is required.\n");
         return;
@@ -2424,7 +2436,7 @@ void new_multilinearmises1d(unique_ptr<Material>& return_obj, istringstream& com
         return;
     }
 
-    auto density = 0.;
+    double density;
     if(!get_input(command, density)) {
         suanpan_error("A valid density is required.\n");
         return;
@@ -2611,7 +2623,7 @@ void new_planestrain(unique_ptr<Material>& return_obj, istringstream& command, c
     return_obj = make_unique<PlaneStrain>(tag, full_tag, type);
 }
 
-void new_planestress(unique_ptr<Material>& return_obj, istringstream& command) {
+template<typename T> void new_wrapper(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
@@ -2630,13 +2642,29 @@ void new_planestress(unique_ptr<Material>& return_obj, istringstream& command) {
         return;
     }
 
-    string use_matrix = "true";
-    if(!command.eof() && !get_input(command, use_matrix)) {
-        suanpan_error("A valid flag to indicate if to use the matrix in iteration is required.\n");
+    return_obj = make_unique<T>(tag, full_tag, max_iteration);
+}
+
+void new_os146s(unique_ptr<Material>& return_obj, istringstream& command) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
         return;
     }
 
-    return_obj = make_unique<PlaneStress>(tag, full_tag, max_iteration, is_true(use_matrix));
+    unsigned full_tag;
+    if(!get_input(command, full_tag)) {
+        suanpan_error("A valid reference material tag is required.\n");
+        return;
+    }
+
+    double shear_modulus;
+    if(!get_input(command, shear_modulus)) {
+        suanpan_error("A valid shear modulus is required.\n");
+        return;
+    }
+
+    return_obj = make_unique<OS146S>(tag, full_tag, shear_modulus);
 }
 
 void new_polyelastic1d(unique_ptr<Material>& return_obj, istringstream& command) {
@@ -2871,7 +2899,7 @@ void new_substepping(unique_ptr<Material>& return_obj, istringstream& command) {
         return;
     }
 
-    unsigned max_iteration = 20;
+    auto max_iteration = 20u;
     if(!get_optional_input(command, max_iteration)) {
         suanpan_error("A valid maximum iteration is required.\n");
         return;
@@ -3038,7 +3066,7 @@ void new_tablegurson(unique_ptr<Material>& return_obj, istringstream& command) {
     return_obj = make_unique<TableGurson>(tag, para_pool(0), para_pool(1), std::move(hardening_table), para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6), para_pool(7));
 }
 
-void new_trilineardegradation(unique_ptr<Material>& return_obj, istringstream& command) {
+void new_trilinearstraindegradation(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
@@ -3065,17 +3093,24 @@ void new_trilineardegradation(unique_ptr<Material>& return_obj, istringstream& c
         return;
     }
 
-    return_obj = make_unique<TrilinearDegradation>(tag, mat_tag, s_strain, e_strain, e_damage);
+    return_obj = make_unique<TrilinearStrainDegradation>(tag, mat_tag, s_strain, e_strain, e_damage);
 }
 
-void new_customdegradation(unique_ptr<Material>& return_obj, istringstream& command) {
-    unsigned tag, mat_tag, expression_tag;
-    if(!get_input(command, tag, mat_tag, expression_tag)) {
+void new_customdegradation(unique_ptr<Material>& return_obj, istringstream& command, const bool if_strain) {
+    unsigned tag, mat_tag, p_expression_tag, n_expression_tag;
+    if(!get_input(command, tag, mat_tag, p_expression_tag)) {
         suanpan_error("A valid tag is required.\n");
         return;
     }
 
-    return_obj = make_unique<CustomDegradation>(tag, mat_tag, expression_tag);
+    if(command.eof()) n_expression_tag = p_expression_tag;
+    else if(!get_input(command, n_expression_tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    if(if_strain) return_obj = make_unique<CustomStrainDegradation>(tag, mat_tag, p_expression_tag, n_expression_tag);
+    else return_obj = make_unique<CustomStressDegradation>(tag, mat_tag, p_expression_tag, n_expression_tag);
 }
 
 void new_trivial(unique_ptr<Material>& return_obj, istringstream& command) {
@@ -3086,28 +3121,6 @@ void new_trivial(unique_ptr<Material>& return_obj, istringstream& command) {
     }
 
     return_obj = make_unique<Trivial>(tag);
-}
-
-void new_uniaxial(unique_ptr<Material>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    unsigned full_tag;
-    if(!get_input(command, full_tag)) {
-        suanpan_error("A valid reference material tag is required.\n");
-        return;
-    }
-
-    auto max_iteration = 1;
-    if(!command.eof() && !get_input(command, max_iteration)) {
-        suanpan_error("A valid number for maximum iteration is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<Uniaxial>(tag, full_tag, max_iteration);
 }
 
 void new_vafcrp(unique_ptr<Material>& return_obj, istringstream& command) {
@@ -3338,18 +3351,18 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
 
     unique_ptr<Material> new_material = nullptr;
 
-    if(is_equal(material_id, "AFC01")) new_afc01(new_material, command);
-    else if(is_equal(material_id, "AFC")) new_afc01(new_material, command);
+    if(is_equal(material_id, "AFC")) new_afc01(new_material, command);
+    else if(is_equal(material_id, "AFC01")) new_afc01(new_material, command);
     else if(is_equal(material_id, "AFC02")) new_afc02(new_material, command);
     else if(is_equal(material_id, "AFC03")) new_afc03(new_material, command);
     else if(is_equal(material_id, "AFCN")) new_afc03(new_material, command);
     else if(is_equal(material_id, "AFCS")) new_afc02(new_material, command);
     else if(is_equal(material_id, "ArmstrongFrederick")) new_armstrongfrederick(new_material, command);
     else if(is_equal(material_id, "ArmstrongFrederick1D")) new_armstrongfrederick1d(new_material, command);
+    else if(is_equal(material_id, "AsymmElastic1D")) new_asymmelastic1d(new_material, command);
     else if(is_equal(material_id, "Axisymmetric")) new_axisymmetric(new_material, command);
     else if(is_equal(material_id, "AxisymmetricElastic")) new_axisymmetricelastic(new_material, command);
     else if(is_equal(material_id, "Bilinear1D")) new_bilinear1d(new_material, command);
-    else if(is_equal(material_id, "Bilinear2D")) new_bilinear2d(new_material, command);
     else if(is_equal(material_id, "BilinearCC")) new_bilinearcc(new_material, command);
     else if(is_equal(material_id, "BilinearDP")) new_bilineardp(new_material, command);
     else if(is_equal(material_id, "BilinearElastic1D")) new_bilinearelastic1d(new_material, command);
@@ -3360,38 +3373,40 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "BilinearPeric")) new_bilinearperic(new_material, command);
     else if(is_equal(material_id, "BilinearPO")) new_bilinearpo(new_material, command);
     else if(is_equal(material_id, "BilinearViscosity")) new_bilinearviscosity(new_material, command);
-    else if(is_equal(material_id, "CustomViscosity")) new_customviscosity(new_material, command);
     else if(is_equal(material_id, "BlatzKo")) new_blatzko(new_material, command);
     else if(is_equal(material_id, "BoucWen")) new_boucwen(new_material, command);
     else if(is_equal(material_id, "BWBN")) new_bwbn(new_material, command);
     else if(is_equal(material_id, "CDP")) new_cdp(new_material, command);
-    else if(is_equal(material_id, "CDPM2")) new_cdpm2(new_material, command, 1);
-    else if(is_equal(material_id, "CDPM2ANISO")) new_cdpm2(new_material, command, 2);
-    else if(is_equal(material_id, "CDPM2ISO")) new_cdpm2(new_material, command, 1);
-    else if(is_equal(material_id, "CDPM2NO")) new_cdpm2(new_material, command, 0);
+    else if(is_equal(material_id, "CDPM2")) new_cdpm2(new_material, command, CDPM2::DamageType::ISOTROPIC);
+    else if(is_equal(material_id, "CDPM2ANISO")) new_cdpm2(new_material, command, CDPM2::DamageType::ANISOTROPIC);
+    else if(is_equal(material_id, "CDPM2ISO")) new_cdpm2(new_material, command, CDPM2::DamageType::ISOTROPIC);
+    else if(is_equal(material_id, "CDPM2NO")) new_cdpm2(new_material, command, CDPM2::DamageType::NODAMAGE);
     else if(is_equal(material_id, "Concrete21")) new_concrete21(new_material, command);
     else if(is_equal(material_id, "Concrete22")) new_concrete22(new_material, command);
     else if(is_equal(material_id, "ConcreteCM")) new_concretecm(new_material, command);
     else if(is_equal(material_id, "ConcreteExp")) new_concreteexp(new_material, command);
+    else if(is_equal(material_id, "ConcreteK4")) new_concretek4(new_material, command);
     else if(is_equal(material_id, "ConcreteTable")) new_concretetable(new_material, command);
     else if(is_equal(material_id, "ConcreteTsai")) new_concretetsai(new_material, command);
     else if(is_equal(material_id, "CoulombFriction")) new_coulombfriction(new_material, command);
     else if(is_equal(material_id, "CustomCC")) new_customcc(new_material, command);
     else if(is_equal(material_id, "CustomCDP")) new_customcdp(new_material, command);
     else if(is_equal(material_id, "CustomDP")) new_customdp(new_material, command);
-    else if(is_equal(material_id, "CustomDegradation")) new_customdegradation(new_material, command);
     else if(is_equal(material_id, "CustomElastic1D")) new_customelastic1d(new_material, command);
     else if(is_equal(material_id, "CustomGurson")) new_customgurson(new_material, command);
     else if(is_equal(material_id, "CustomGurson1D")) new_customgurson1d(new_material, command);
     else if(is_equal(material_id, "CustomHoffman")) new_customhoffman(new_material, command);
     else if(is_equal(material_id, "CustomJ2")) new_customj2(new_material, command);
     else if(is_equal(material_id, "CustomMises1D")) new_custommises1d(new_material, command);
+    else if(is_equal(material_id, "CustomStrainDegradation")) new_customdegradation(new_material, command, true);
+    else if(is_equal(material_id, "CustomStressDegradation")) new_customdegradation(new_material, command, false);
+    else if(is_equal(material_id, "CustomViscosity")) new_customviscosity(new_material, command);
     else if(is_equal(material_id, "DafaliasManzari")) new_dafaliasmanzari(new_material, command);
     else if(is_equal(material_id, "Dhakal")) new_dhakal(new_material, command);
-    else if(is_equal(material_id, "AsymmElastic1D")) new_asymmelastic1d(new_material, command);
     else if(is_equal(material_id, "Elastic1D")) new_elastic1d(new_material, command);
     else if(is_equal(material_id, "Elastic2D")) new_elastic2d(new_material, command);
     else if(is_equal(material_id, "Elastic3D")) new_isotropicelastic3d(new_material, command);
+    else if(is_equal(material_id, "ElasticOS")) new_elasticos(new_material, command);
     else if(is_equal(material_id, "ExpCC")) new_expcc(new_material, command);
     else if(is_equal(material_id, "ExpDP")) new_expdp(new_material, command);
     else if(is_equal(material_id, "ExpGurson")) new_expgurson(new_material, command);
@@ -3419,10 +3434,12 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "NLE3D01")) new_nle3d01(new_material, command);
     else if(is_equal(material_id, "Nonviscous01")) new_nonviscous01(new_material, command);
     else if(is_equal(material_id, "OrthotropicElastic3D")) new_orthotropicelastic3d(new_material, command);
+    else if(is_equal(material_id, "OS146")) new_wrapper<OS146>(new_material, command);
+    else if(is_equal(material_id, "OS146S")) new_os146s(new_material, command);
     else if(is_equal(material_id, "ParabolicCC")) new_paraboliccc(new_material, command);
     else if(is_equal(material_id, "Parallel")) new_parallel(new_material, command);
     else if(is_equal(material_id, "PlaneStrain")) new_planestrain(new_material, command, 0);
-    else if(is_equal(material_id, "PlaneStress")) new_planestress(new_material, command);
+    else if(is_equal(material_id, "PlaneStress")) new_wrapper<PlaneStress>(new_material, command);
     else if(is_equal(material_id, "PlaneSymmetric13")) new_planestrain(new_material, command, 1);
     else if(is_equal(material_id, "PlaneSymmetric23")) new_planestrain(new_material, command, 2);
     else if(is_equal(material_id, "PolyElastic1D")) new_polyelastic1d(new_material, command);
@@ -3443,9 +3460,9 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "TableGurson")) new_tablegurson(new_material, command);
     else if(is_equal(material_id, "Tanh1D")) new_tanh1d(new_material, command);
     else if(is_equal(material_id, "TimberPD")) new_timberpd(new_material, command);
-    else if(is_equal(material_id, "TrilinearDegradation")) new_trilineardegradation(new_material, command);
+    else if(is_equal(material_id, "TrilinearStrainDegradation")) new_trilinearstraindegradation(new_material, command);
     else if(is_equal(material_id, "Trivial")) new_trivial(new_material, command);
-    else if(is_equal(material_id, "Uniaxial")) new_uniaxial(new_material, command);
+    else if(is_equal(material_id, "Uniaxial")) new_wrapper<Uniaxial>(new_material, command);
     else if(is_equal(material_id, "VAFCRP")) new_vafcrp(new_material, command);
     else if(is_equal(material_id, "VAFCRP1D")) new_vafcrp1d(new_material, command);
     else if(is_equal(material_id, "Viscosity01")) new_viscosity01(new_material, command);

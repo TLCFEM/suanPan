@@ -39,7 +39,7 @@ struct DataBilinearOO {
     const double c_hardening;
 };
 
-class BilinearOO final : DataBilinearOO, public OriginOriented {
+class BilinearOO final : protected DataBilinearOO, public OriginOriented {
     const double t_stress = elastic_modulus * t_strain;
     const double c_stress = elastic_modulus * c_strain;
 
@@ -47,13 +47,14 @@ class BilinearOO final : DataBilinearOO, public OriginOriented {
     [[nodiscard]] podarray<double> compute_compression_backbone(double) const override;
 
 public:
-    BilinearOO(int,    // tag
-               double, // elastic modulus
-               double, // tension yield strain
-               double, // tension hardening ratio
-               double, // compression yield strain
-               double, // compression hardening ratio
-               double  // density
+    BilinearOO(
+        int,    // tag
+        double, // elastic modulus
+        double, // tension yield strain
+        double, // tension hardening ratio
+        double, // compression yield strain
+        double, // compression hardening ratio
+        double  // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

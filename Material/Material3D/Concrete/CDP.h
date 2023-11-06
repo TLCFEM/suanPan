@@ -55,21 +55,22 @@ class CDP final : public NonlinearCDP {
     [[nodiscard]] podarray<double> compute_compression_backbone(double) const override;
 
 public:
-    explicit CDP(unsigned = 0,     // tag
-                 double = 3E4,     // elastic modulus
-                 double = .2,      // poissons ratio
-                 double = 3.,      // crack stress (+)
-                 double = 30.,     // crush stress (-)
-                 double = 1E-3,    // normalized crack energy (+)
-                 double = 1E-1,    // normalized crush energy (+)
-                 double = .8,      // hardening after crack stress a_t
-                 double = 4.,      // hardening after crush stress a_c
-                 double = .6,      // reference damage factor at half crack stress
-                 double = .6,      // reference damage factor at crush stress
-                 double = .2,      // dilatancy parameter
-                 double = 1.16,    // biaxial compression strength ratio
-                 double = .5,      // stiffness recovery
-                 double = 2400E-12 // density
+    explicit CDP(
+        unsigned = 0,     // tag
+        double = 3E4,     // elastic modulus
+        double = .2,      // poissons ratio
+        double = 3.,      // crack stress (+)
+        double = 30.,     // crush stress (-)
+        double = 1E-3,    // normalized crack energy (+)
+        double = 1E-1,    // normalized crush energy (+)
+        double = .8,      // hardening after crack stress a_t
+        double = 4.,      // hardening after crush stress a_c
+        double = .6,      // reference damage factor at half crack stress
+        double = .6,      // reference damage factor at crush stress
+        double = .2,      // dilatancy parameter
+        double = 1.16,    // biaxial compression strength ratio
+        double = .5,      // stiffness recovery
+        double = 2400E-12 // density
     );
 
     unique_ptr<Material> get_copy() override;

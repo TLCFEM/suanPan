@@ -21,7 +21,8 @@
  * @date 14/03/2019
  * @version 0.1.0
  * @file CircularHollow3D.h
- * @addtogroup Section
+ * @addtogroup Section-3D
+ * @ingroup Section
  * @{
  */
 
@@ -36,18 +37,20 @@ class CircularHollow3D final : public Section3D {
     const unsigned int_pt_num;
 
 public:
-    CircularHollow3D(unsigned,        // tag
-                     double,          // radius
-                     double,          // thickness
-                     unsigned,        // material tag
-                     unsigned = 10,   // number of integration points
-                     vec&& = {0., 0.} // eccentricity
+    CircularHollow3D(
+        unsigned,        // tag
+        double,          // radius
+        double,          // thickness
+        unsigned,        // material tag
+        unsigned = 10,   // number of integration points
+        vec&& = {0., 0.} // eccentricity
     );
-    CircularHollow3D(unsigned,        // tag
-                     vec&&,           // dimension
-                     unsigned,        // material tag
-                     unsigned = 10,   // number of integration points
-                     vec&& = {0., 0.} // eccentricity
+    CircularHollow3D(
+        unsigned,        // tag
+        vec&&,           // dimension
+        unsigned,        // material tag
+        unsigned = 10,   // number of integration points
+        vec&& = {0., 0.} // eccentricity
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

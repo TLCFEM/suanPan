@@ -40,7 +40,7 @@ int CSMT3::initialize(const shared_ptr<DomainBase>& D) {
         return SUANPAN_FAIL;
     }
 
-    if(PlaneType::E == static_cast<PlaneType>(material_proto->get_parameter(ParameterType::PLANETYPE))) suanpan::hacker(thickness) = 1.;
+    if(PlaneType::E == material_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
 
     mat ele_coor(m_node, m_node);
     ele_coor.col(0).fill(1.);
@@ -195,9 +195,9 @@ int CSMT3::reset_status() {
     return code;
 }
 
-vector<vec> CSMT3::record(const OutputType T) {
+vector<vec> CSMT3::record(const OutputType P) {
     vector<vec> data;
-    for(const auto& I : int_pt) for(const auto& J : I.m_material->record(T)) data.emplace_back(J);
+    for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
     return data;
 }
 

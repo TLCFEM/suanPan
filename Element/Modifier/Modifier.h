@@ -34,14 +34,15 @@
 class DomainBase;
 
 class Modifier : public Tag {
+protected:
     uvec element_tag;
 
-protected:
     std::vector<weak_ptr<Element>> element_pool;
 
 public:
-    explicit Modifier(unsigned = 0, // tag
-                      uvec&& = {}   // element tags
+    explicit Modifier(
+        unsigned = 0, // tag
+        uvec&& = {}   // element tags
     );
     Modifier(const Modifier&) = delete;            // copy forbidden
     Modifier(Modifier&&) = delete;                 // move forbidden
@@ -50,7 +51,9 @@ public:
 
     ~Modifier() override = default;
 
-    virtual void initialize(const shared_ptr<DomainBase>&);
+    [[nodiscard]] virtual bool has_nonviscous() const { return false; }
+
+    virtual int initialize(const shared_ptr<DomainBase>&);
 
     virtual int update_status() = 0;
 };

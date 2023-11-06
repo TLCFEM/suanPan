@@ -20,9 +20,6 @@
 #include <Element/Utility/Orientation.h>
 #include <Section/Section.h>
 
-constexpr unsigned B21E::max_iteration = 20;
-constexpr double B21E::tolerance = 1E-13;
-
 B21E::B21E(const unsigned T, const unsigned W, uvec&& N, const unsigned S, const unsigned P, const bool F)
     : B21(T, std::forward<uvec>(N), S, P, F)
     , a{1u == W ? 1llu : 2llu}
@@ -38,9 +35,10 @@ int B21E::update_status() {
     vec local_resistance(3);
 
     auto counter = 0u;
+    auto ref_error = 1.;
     while(true) {
-        if(++counter > max_iteration) {
-            suanpan_error("Element {} fails to converge to {:.2E}.\n", get_tag(), tolerance);
+        if(max_iteration == ++counter) {
+            suanpan_error("Element {} fails to converge.\n", get_tag());
             return SUANPAN_FAIL;
         }
 
@@ -53,11 +51,12 @@ int B21E::update_status() {
             local_resistance += I.strain_mat.t() * I.b_section->get_trial_resistance() * I.weight;
         }
 
-        const auto error = norm(local_resistance(a));
         const vec incre = solve(local_stiffness(a, a), local_resistance(a));
+        const auto error = inf_norm(incre);
+        if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
 
-        if(error < tolerance && norm(incre) < tolerance) {
+        if(error < tolerance * ref_error || inf_norm(local_resistance(a)) < tolerance) {
             const mat t_mat = local_stiffness(b, b) - local_stiffness(b, a) * solve(local_stiffness(a, a), local_stiffness(a, b));
 
             local_stiffness.zeros();

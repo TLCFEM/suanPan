@@ -97,25 +97,7 @@ int create_new_step(const shared_ptr<DomainBase>& domain, istringstream& command
             suanpan_error("Cannot create new step.\n");
     }
     else if(is_equal(step_type, "ArcLength")) {
-        unsigned node;
-        if(!get_input(command, node)) {
-            suanpan_error("A valid node tag is required.\n");
-            return SUANPAN_SUCCESS;
-        }
-
-        unsigned dof;
-        if(!get_input(command, dof)) {
-            suanpan_error("A valid dof identifier is required.\n");
-            return SUANPAN_SUCCESS;
-        }
-
-        double magnitude;
-        if(!get_input(command, magnitude)) {
-            suanpan_error("A valid magnitude is required.\n");
-            return SUANPAN_SUCCESS;
-        }
-
-        if(domain->insert(make_shared<ArcLength>(tag, node, dof, magnitude))) domain->set_current_step_tag(tag);
+        if(domain->insert(make_shared<ArcLength>(tag))) domain->set_current_step_tag(tag);
         else
             suanpan_error("Fail to create new step via \"{}\".\n", command.str());
     }

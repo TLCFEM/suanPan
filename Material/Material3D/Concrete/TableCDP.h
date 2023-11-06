@@ -40,17 +40,18 @@ class TableCDP final : public NonlinearCDP {
     [[nodiscard]] podarray<double> compute_compression_backbone(double) const override;
 
 public:
-    TableCDP(unsigned,         // tag
-             double,           // elastic modulus
-             double,           // poissons ratio
-             mat&&,            // tension table
-             mat&&,            // compression table
-             mat&&,            // tension damage table
-             mat&&,            // compression damage table
-             double = .2,      // dilatancy parameter
-             double = 1.16,    // biaxial compression strength ratio
-             double = .5,      // stiffness recovery
-             double = 2400E-12 // density
+    TableCDP(
+        unsigned,         // tag
+        double,           // elastic modulus
+        double,           // poissons ratio
+        mat&&,            // tension table
+        mat&&,            // compression table
+        mat&&,            // tension damage table
+        mat&&,            // compression damage table
+        double = .2,      // dilatancy parameter
+        double = 1.16,    // biaxial compression strength ratio
+        double = .5,      // stiffness recovery
+        double = 2400E-12 // density
     );
 
     unique_ptr<Material> get_copy() override;

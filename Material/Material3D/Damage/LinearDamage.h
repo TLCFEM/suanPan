@@ -41,12 +41,15 @@ protected:
     void compute_damage() override;
 
 public:
-    LinearDamage(unsigned, // tag
-                 unsigned, // mat tag
-                 double,   // start strain
-                 double,   // end strain
-                 double    // end damage value
+    LinearDamage(
+        unsigned, // tag
+        unsigned, // mat tag
+        double,   // start strain
+        double,   // end strain
+        double    // end damage value
     );
+
+    int initialize(const shared_ptr<DomainBase>&) override;
 
     unique_ptr<Material> get_copy() override;
 };

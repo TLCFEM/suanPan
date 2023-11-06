@@ -61,7 +61,8 @@ class F21 final : public SectionElement2D {
     vec current_local_resistance, trial_local_resistance;
 
 public:
-    F21(unsigned,     // tag
+    F21(
+        unsigned,     // tag
         uvec&&,       // node tag
         unsigned,     // section tags
         unsigned = 6, // integration points

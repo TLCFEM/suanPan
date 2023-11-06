@@ -38,19 +38,20 @@ struct DataNLE3D01 {
     const double m;
 };
 
-class NLE3D01 final : DataNLE3D01, public IsotropicNonlinearElastic3D {
+class NLE3D01 final : protected DataNLE3D01, public IsotropicNonlinearElastic3D {
     const double factor_a = (.5 * m + .5) * ref_stress / (1. + m) * pow(ref_strain, -m);
     const double factor_b = (.5 * m - .5) * factor_a;
 
     vec compute_derivative(double, double) override;
 
 public:
-    NLE3D01(unsigned, // tag
-            double,   // bulk modulus
-            double,   // reference strain
-            double,   // reference stress
-            double,   // m
-            double    // density
+    NLE3D01(
+        unsigned, // tag
+        double,   // bulk modulus
+        double,   // reference strain
+        double,   // reference stress
+        double,   // m
+        double    // density
     );
 
     unique_ptr<Material> get_copy() override;

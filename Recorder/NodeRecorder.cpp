@@ -22,11 +22,16 @@
 #include <Domain/Node.h>
 
 void NodeRecorder::initialize(const shared_ptr<DomainBase>& D) {
+    std::vector<uword> pool;
+    pool.reserve(get_object_tag().n_elem);
     for(const auto I : get_object_tag())
-        if(!D->find<Node>(I)) {
-            D->disable_recorder(get_tag());
-            return;
-        }
+        if(!D->find<Node>(I) || !D->get<Node>(I)->is_active())
+            suanpan_warning("Node {} is not available/active, removed from recorder {}.\n", I, get_tag());
+        else pool.emplace_back(I);
+
+    set_object_tag(pool);
+
+    access::rw(get_data_pool()).resize(get_object_tag().n_elem);
 }
 
 void NodeRecorder::record(const shared_ptr<DomainBase>& D) {
@@ -53,7 +58,7 @@ void NodeRecorder::record(const shared_ptr<DomainBase>& D) {
         }
     };
 
-    auto get_momentum_component = [&](const DOF DI) {
+    auto insert_momentum = [&](const DOF DI) {
         for(unsigned I = 0; I < obj_tag.n_elem; ++I) {
             const auto& t_node = D->get<Node>(obj_tag(I));
             if(!t_node->is_active()) continue;
@@ -71,30 +76,36 @@ void NodeRecorder::record(const shared_ptr<DomainBase>& D) {
 
         for(unsigned I = 0; I < obj_tag.n_elem; ++I) if(const auto& t_node = D->get<Node>(obj_tag(I)); t_node->is_active()) insert({damping_force(t_node->get_reordered_dof())}, I);
     }
-    else if(OutputType::GDF1 == get_variable_type()) insert_damping_force(0);
-    else if(OutputType::GDF2 == get_variable_type()) insert_damping_force(1);
-    else if(OutputType::GDF3 == get_variable_type()) insert_damping_force(2);
-    else if(OutputType::GDF4 == get_variable_type() || OutputType::GDM1 == get_variable_type()) insert_damping_force(3);
-    else if(OutputType::GDF5 == get_variable_type() || OutputType::GDM2 == get_variable_type()) insert_damping_force(4);
-    else if(OutputType::GDF6 == get_variable_type() || OutputType::GDM3 == get_variable_type()) insert_damping_force(5);
     else if(OutputType::GIF == get_variable_type()) {
         auto& inertial_force = D->get_factory()->get_current_inertial_force();
         if(inertial_force.empty()) return;
 
         for(unsigned I = 0; I < obj_tag.n_elem; ++I) if(const auto& t_node = D->get<Node>(obj_tag(I)); t_node->is_active()) insert({inertial_force(t_node->get_reordered_dof())}, I);
     }
+    else if(OutputType::MM == get_variable_type()) {
+        auto& momentum = D->get_factory()->get_momentum();
+        if(momentum.empty()) return;
+
+        for(unsigned I = 0; I < obj_tag.n_elem; ++I) if(const auto& t_node = D->get<Node>(obj_tag(I)); t_node->is_active()) insert({momentum(t_node->get_reordered_dof())}, I);
+    }
+    else if(OutputType::GDF1 == get_variable_type()) insert_damping_force(0);
+    else if(OutputType::GDF2 == get_variable_type()) insert_damping_force(1);
+    else if(OutputType::GDF3 == get_variable_type()) insert_damping_force(2);
+    else if(OutputType::GDF4 == get_variable_type() || OutputType::GDM1 == get_variable_type()) insert_damping_force(3);
+    else if(OutputType::GDF5 == get_variable_type() || OutputType::GDM2 == get_variable_type()) insert_damping_force(4);
+    else if(OutputType::GDF6 == get_variable_type() || OutputType::GDM3 == get_variable_type()) insert_damping_force(5);
     else if(OutputType::GIF1 == get_variable_type()) insert_inertial_force(0);
     else if(OutputType::GIF2 == get_variable_type()) insert_inertial_force(1);
     else if(OutputType::GIF3 == get_variable_type()) insert_inertial_force(2);
     else if(OutputType::GIF4 == get_variable_type() || OutputType::GIM1 == get_variable_type()) insert_inertial_force(3);
     else if(OutputType::GIF5 == get_variable_type() || OutputType::GIM2 == get_variable_type()) insert_inertial_force(4);
     else if(OutputType::GIF6 == get_variable_type() || OutputType::GIM3 == get_variable_type()) insert_inertial_force(5);
-    else if(OutputType::MMX == get_variable_type()) get_momentum_component(DOF::U1);
-    else if(OutputType::MMY == get_variable_type()) get_momentum_component(DOF::U2);
-    else if(OutputType::MMZ == get_variable_type()) get_momentum_component(DOF::U3);
-    else if(OutputType::MMRX == get_variable_type()) get_momentum_component(DOF::UR1);
-    else if(OutputType::MMRY == get_variable_type()) get_momentum_component(DOF::UR2);
-    else if(OutputType::MMRZ == get_variable_type()) get_momentum_component(DOF::UR3);
+    else if(OutputType::MM1 == get_variable_type()) insert_momentum(DOF::U1);
+    else if(OutputType::MM2 == get_variable_type()) insert_momentum(DOF::U2);
+    else if(OutputType::MM3 == get_variable_type()) insert_momentum(DOF::U3);
+    else if(OutputType::MM4 == get_variable_type() || OutputType::MMR1 == get_variable_type()) insert_momentum(DOF::UR1);
+    else if(OutputType::MM5 == get_variable_type() || OutputType::MMR2 == get_variable_type()) insert_momentum(DOF::UR2);
+    else if(OutputType::MM6 == get_variable_type() || OutputType::MMR3 == get_variable_type()) insert_momentum(DOF::UR3);
     else for(unsigned I = 0; I < obj_tag.n_elem; ++I) if(const auto& t_node = D->get<Node>(obj_tag(I)); t_node->is_active()) insert(t_node->record(get_variable_type()), I);
 
     if(if_record_time()) insert(D->get_factory()->get_current_time());

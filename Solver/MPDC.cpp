@@ -10,7 +10,7 @@ MPDC::MPDC(const unsigned T)
 int MPDC::analyze() {
     auto& C = get_converger();
     auto& G = get_integrator();
-    const auto& D = G->get_domain();
+    const auto D = G->get_domain();
     auto& W = D->get_factory();
 
     suanpan_highlight(">> Current Analysis Time: {:.5f}.\n", W->get_trial_time());
@@ -25,14 +25,21 @@ int MPDC::analyze() {
 
     const auto idx = to_uvec(W->get_reference_dof());
 
+    if(idx.empty()) {
+        suanpan_error("Displacement controlled algorithm is activated but no valid displacement load is applied.\n");
+        return SUANPAN_FAIL;
+    }
+
     mat disp_a;
 
     wall_clock t_clock;
 
     // iteration counter
-    unsigned counter = 0;
+    auto counter = 0u;
 
     while(true) {
+        set_step_amplifier(sqrt(max_iteration / (counter + 1.)));
+
         // update for nodes and elements
         t_clock.tic();
         if(SUANPAN_SUCCESS != G->update_trial_status()) return SUANPAN_FAIL;

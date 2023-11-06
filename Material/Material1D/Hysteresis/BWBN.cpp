@@ -45,7 +45,8 @@ int BWBN::update_trial_status(const vec& t_strain) {
     auto& e = trial_history(1);                 // energy
 
     auto incre = .5 * n_strain;
-    unsigned counter = 0;
+    auto counter = 0u;
+    auto ref_error = 1.;
     while(true) {
         if(max_iteration == ++counter) {
             suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
@@ -99,10 +100,10 @@ int BWBN::update_trial_status(const vec& t_strain) {
         const auto jacobian = eta + (z - current_z) * petapz + (ptpz - papz * n_strain) * h + (t_term - a * n_strain) * phpz;
 
         const auto error = fabs(incre = -residual / jacobian);
-
+        if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
 
-        if(error <= tolerance) {
+        if(error < tolerance * ref_error || (fabs(residual) < tolerance && counter > 5u)) {
             trial_stress = modulus_a * trial_strain + modulus_b * z;
 
             const auto pepn = .5 * modulus_c * (z + current_z);

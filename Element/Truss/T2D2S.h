@@ -46,11 +46,12 @@ class T2D2S final : public SectionElement1D {
 
     const bool log_strain; // flag to indicate if to use log strain
 public:
-    T2D2S(unsigned,     // tag
-          uvec&&,       // node tag
-          unsigned,     // section tag
-          bool = false, // nonlinear geometry switch
-          bool = true   // log strain switch
+    T2D2S(
+        unsigned,     // tag
+        uvec&&,       // node tag
+        unsigned,     // section tag
+        bool = false, // nonlinear geometry switch
+        bool = true   // log strain switch
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

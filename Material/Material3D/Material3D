@@ -47,4 +47,5 @@
 #include "vonMises/VAFCRP.h"
 #include "Wrapper/Rotation3D.h"
 #include "Wrapper/Stacked.h"
+#include "Wrapper/StressWrapper.h"
 #include "Wrapper/Substepping.h"

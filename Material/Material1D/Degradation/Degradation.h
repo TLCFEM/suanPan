@@ -34,13 +34,16 @@
 class Degradation : public Material1D {
     const unsigned mat_tag;
 
+protected:
     unique_ptr<Material> base;
 
-    [[nodiscard]] virtual podarray<double> compute_degradation(double) const = 0;
+    [[nodiscard]] virtual vec compute_positive_degradation(double) const = 0; // positive region
+    [[nodiscard]] virtual vec compute_negative_degradation(double) const = 0; // negative region
 
 public:
-    Degradation(unsigned, // tag
-                unsigned  // material tag
+    Degradation(
+        unsigned, // tag
+        unsigned  // material tag
     );
     Degradation(const Degradation&);
     Degradation(Degradation&&) noexcept = delete;
@@ -50,11 +53,31 @@ public:
 
     int initialize(const shared_ptr<DomainBase>&) override;
 
-    int update_trial_status(const vec&) override;
-
     int clear_status() override;
     int commit_status() override;
     int reset_status() override;
+};
+
+class StrainDegradation : public Degradation {
+public:
+    using Degradation::Degradation;
+
+    int initialize(const shared_ptr<DomainBase>&) override;
+
+    int update_trial_status(const vec&) override;
+
+    vector<vec> record(OutputType) override;
+};
+
+class StressDegradation : public Degradation {
+public:
+    using Degradation::Degradation;
+
+    int initialize(const shared_ptr<DomainBase>&) override;
+
+    int update_trial_status(const vec&) override;
+
+    vector<vec> record(OutputType) override;
 };
 
 #endif

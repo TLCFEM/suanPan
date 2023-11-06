@@ -44,16 +44,18 @@ protected:
 
     vec trial_load;
     vec trial_settlement;
+    sp_vec reference_load;
 
     friend void set_load_multiplier(double);
 
 public:
-    Load(unsigned, // tag
-         unsigned, // step tag
-         unsigned, // amplitude tag
-         uvec&&,   // node tag
-         uvec&&,   // dof tag
-         double    // nominal magnitude
+    Load(
+        unsigned, // tag
+        unsigned, // step tag
+        unsigned, // amplitude tag
+        uvec&&,   // node tag
+        uvec&&,   // dof tag
+        double    // nominal magnitude
     );
     Load(const Load&) = delete;            // copy forbidden
     Load(Load&&) = delete;                 // move forbidden
@@ -67,6 +69,7 @@ public:
 
     [[nodiscard]] const vec& get_trial_load() const;
     [[nodiscard]] const vec& get_trial_settlement() const;
+    [[nodiscard]] const sp_vec& get_reference_load() const;
 };
 
 void set_load_multiplier(double);

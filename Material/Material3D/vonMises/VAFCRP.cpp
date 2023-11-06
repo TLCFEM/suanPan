@@ -26,7 +26,7 @@ const mat VAFCRP::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 VAFCRP::VAFCRP(const unsigned T, const double E, const double V, const double Y, const double S, const double H, const double M, const double MU, const double EP, vec&& A, vec&& B, const double R)
     : DataVAFCRP{E, V, Y, S, H, M, MU, EP, std::forward<vec>(A), std::forward<vec>(B)}
-    , Material3D(T, R) { access::rw(tolerance) = 1E-15; }
+    , Material3D(T, R) {}
 
 int VAFCRP::initialize(const shared_ptr<DomainBase>& D) {
     incre_time = &D->get_factory()->modify_incre_time();
@@ -40,14 +40,7 @@ int VAFCRP::initialize(const shared_ptr<DomainBase>& D) {
 
 unique_ptr<Material> VAFCRP::get_copy() { return make_unique<VAFCRP>(*this); }
 
-double VAFCRP::get_parameter(const ParameterType P) const {
-    if(ParameterType::DENSITY == P) return density;
-    if(ParameterType::ELASTICMODULUS == P || ParameterType::YOUNGSMODULUS == P || ParameterType::E == P) return elastic_modulus;
-    if(ParameterType::SHEARMODULUS == P || ParameterType::G == P) return shear;
-    if(ParameterType::BULKMODULUS == P) return elastic_modulus / (3. - 6. * poissons_ratio);
-    if(ParameterType::POISSONSRATIO == P) return poissons_ratio;
-    return 0.;
-}
+double VAFCRP::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
 
 int VAFCRP::update_trial_status(const vec& t_strain) {
     trial_stress = current_stress + (trial_stiffness = initial_stiffness) * (incre_strain = (trial_strain = t_strain) - current_strain);
@@ -68,7 +61,8 @@ int VAFCRP::update_trial_status(const vec& t_strain) {
     auto gamma = 0., exp_gamma = 1.;
     double norm_xi, jacobian;
 
-    unsigned counter = 0;
+    auto counter = 0u;
+    auto ref_error = 1.;
     while(true) {
         if(max_iteration == ++counter) {
             suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
@@ -99,9 +93,12 @@ int VAFCRP::update_trial_status(const vec& t_strain) {
 
         jacobian = exp_gamma * (root_three_two * sum_b - three_shear - q * epsilon * mu / (*incre_time + mu * gamma)) - dk;
 
-        const auto incre = (q * exp_gamma - k) / jacobian;
-        suanpan_debug("Local iteration error: {:.5E}.\n", fabs(incre));
-        if(fabs(incre) <= tolerance) break;
+        const auto residual = q * exp_gamma - k;
+        const auto incre = residual / jacobian;
+        const auto error = fabs(incre);
+        if(1u == counter) ref_error = error;
+        suanpan_debug("Local iteration error: {:.5E}.\n", error);
+        if(error < tolerance * ref_error || (fabs(residual) < tolerance && counter > 5u)) break;
 
         gamma -= incre;
         p -= incre;
@@ -145,12 +142,6 @@ int VAFCRP::reset_status() {
     trial_history = current_history;
     trial_stiffness = current_stiffness;
     return SUANPAN_SUCCESS;
-}
-
-vector<vec> VAFCRP::record(const OutputType P) {
-    if(P == OutputType::PEEQ) return {vec{current_history(0)}};
-
-    return Material3D::record(P);
 }
 
 void VAFCRP::print() {

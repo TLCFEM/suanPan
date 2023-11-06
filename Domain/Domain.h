@@ -304,6 +304,8 @@ public:
     const shared_ptr<Integrator>& get_current_integrator() const override;
     const shared_ptr<Solver>& get_current_solver() const override;
 
+    unique_ptr<Material> initialized_material_copy(uword) override;
+
     void insert_loaded_dof(const uvec&) override;
     void insert_restrained_dof(const uvec&) override;
     void insert_constrained_dof(const uvec&) override;
@@ -341,7 +343,7 @@ public:
     int initialize_constraint() override;
     // initialize constraints for each step
     int initialize_reference() override;
-    // initialize maerials for each step
+    // initialize materials for each step
     int initialize_material() override;
     // initialize sections for each step
     int initialize_section() override;
@@ -359,10 +361,12 @@ public:
 
     void update_current_resistance() const override;
     void update_current_damping_force() const override;
+    void update_current_nonviscous_force() const override;
     void update_current_inertial_force() const override;
 
     void assemble_resistance() const override;
     void assemble_damping_force() const override;
+    void assemble_nonviscous_force() const override;
     void assemble_inertial_force() const override;
 
     void assemble_initial_mass() const override;
@@ -371,6 +375,9 @@ public:
     void assemble_initial_damping() const override;
     void assemble_current_damping() const override;
     void assemble_trial_damping() const override;
+    void assemble_initial_nonviscous() const override;
+    void assemble_current_nonviscous() const override;
+    void assemble_trial_nonviscous() const override;
     void assemble_initial_stiffness() const override;
     void assemble_current_stiffness() const override;
     void assemble_trial_stiffness() const override;

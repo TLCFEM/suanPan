@@ -6,11 +6,12 @@
 [![license](https://img.shields.io/github/license/TLCFEM/suanPan.svg?color=44cc11)](https://www.gnu.org/licenses/gpl-3.0)
 [![documentation](https://readthedocs.org/projects/suanpan-manual/badge/?version=latest)](https://suanpan-manual.readthedocs.io/?badge=latest)
 [![release](https://img.shields.io/github/release-pre/TLCFEM/suanPan.svg?color=44cc11)](https://github.com/TLCFEM/suanPan/releases)
+[![docker](https://img.shields.io/docker/image-size/tlcfem/suanpan/latest?label=docker&color=44cc11)](https://hub.docker.com/r/tlcfem/suanpan/tags)
 [![suanpan](https://snapcraft.io//suanpan/badge.svg)](https://snapcraft.io/suanpan)
 [![Chocolatey](https://img.shields.io/chocolatey/v/suanpan?color=44cc11)](https://chocolatey.org/packages/suanpan)
 [![Chocolatey](https://img.shields.io/chocolatey/dt/suanpan?color=44cc11&label=choco%20install)](https://chocolatey.org/packages/suanpan)
 [![download](https://img.shields.io/github/downloads/TLCFEM/suanPan/total.svg?color=44cc11)](https://img.shields.io/github/downloads/TLCFEM/suanPan/total.svg?color=44cc11)
-[![stable build](https://github.com/TLCFEM/suanPan/workflows/Stable%20Release/badge.svg?branch=master)](https://github.com/TLCFEM/suanPan/actions)
+[![dev](https://github.com/TLCFEM/suanPan/actions/workflows/dev-all.yml/badge.svg?branch=dev)](https://github.com/TLCFEM/suanPan/actions/workflows/dev-all.yml)
 [![codecov](https://codecov.io/gh/TLCFEM/suanPan/branch/dev/graph/badge.svg?token=65BF9DF697)](https://codecov.io/gh/TLCFEM/suanPan)
 [![codacy](https://app.codacy.com/project/badge/Grade/1ea08c43edf342a8b00b21e585e63503)](https://www.codacy.com/gh/TLCFEM/suanPan/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=TLCFEM/suanPan&amp;utm_campaign=Badge_Grade)
 [![CodeFactor](https://www.codefactor.io/repository/github/tlcfem/suanpan/badge)](https://www.codefactor.io/repository/github/tlcfem/suanpan)
@@ -22,6 +23,11 @@
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FTLCFEM%2FsuanPan.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FTLCFEM%2FsuanPan?ref=badge_shield)
 
 [![gplv3-or-later](https://www.gnu.org/graphics/gplv3-or-later.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
+
+[![marketplace](https://img.shields.io/visual-studio-marketplace/v/tlc.suanpan?label=VS%20Code&color=44cc11)](https://marketplace.visualstudio.com/items?itemName=tlc.suanpan)
+
+***Check out the VS Code [extension](https://marketplace.visualstudio.com/items?itemName=tlc.suanpan) for syntax
+highlighting and autocompletion.***
 
 ## Introduction
 
@@ -102,6 +108,9 @@ details can be seen [here](https://tlcfem.gitbook.io/suanpan-manual/tutorial/obt
 Only the 64-bit version is compiled.
 It is assumed that [**AVX**](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions) is available thus if the program
 fails, please check if your CPU supports AVX.
+Alternatively, you can try the `no-avx` version.
+
+> Check artifacts of [workflows](https://github.com/TLCFEM/suanPan/actions/workflows/dev-all.yml) for the latest binaries.
 
 ### Windows
 
@@ -109,7 +118,7 @@ fails, please check if your CPU supports AVX.
 
 The archives of binaries are released under [Release](https://github.com/TLCFEM/suanPan/releases) page.
 
-1. `suanpan-win-mkl-vtk.zip` is the portable version.
+1. `suanpan-win-mkl-vtk.zip` is the portable archive.
 2. `suanpan-win-mkl-vtk.exe` is the installer.
 
 #### Chocolatey
@@ -157,8 +166,8 @@ Linux users are recommended to obtain the binaries via `snap` or `flatpak`.
 #### Snap
 
 The snap supports visualisation via VTK and uses Intel MKL for linear algebra.
-The edge channel is in sync with the dev branch.
-The stable channel is in sync with the master branch.
+The edge channel is in sync with the `dev` branch.
+The stable channel is in sync with the `master` branch.
 
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/suanpan)
 
@@ -167,8 +176,8 @@ The stable channel is in sync with the master branch.
 #### Flatpak
 
 Flatpak is also available if preferred.
-The beta channel is in sync with the dev branch.
-The stable channel is in sync with the master branch.
+The beta channel is in sync with the `dev` branch.
+The stable channel is in sync with the `master` branch.
 
 <a href='https://flathub.org/apps/details/io.github.tlcfem.suanPan'><img width='200' alt='Download on Flathub' src='https://flathub.org/assets/badges/flathub-badge-en.svg'/></a>
 
@@ -183,12 +192,6 @@ flatpak install suanPan
 echo "alias suanpan=\"flatpak run io.github.tlcfem.suanPan\"" >> ~/.bashrc
 ```
 
-#### Installation Packages
-
-Alternatively, download the RPM (Fedora 36) or DEB (Ubuntu 22.04) package from the release page. The packages may not be
-compatible with older distributions (due to different versions of `libstdc++`). It is also possible to compile the
-package via docker, check the dockerfiles under the `Script` folder, for any questions please open an issue.
-
 ### Other Platforms
 
 Precompiled binaries are provided via CI/CD on macOS, Windows, and Ubuntu.
@@ -200,9 +203,10 @@ A few flavors are available:
    may be missing on server systems
 2. `mkl` --- linear algebra operations are offloaded to MKL, which gives the optimal performance on Intel chips
 3. `openblas` --- linear algebra operations are offloaded to OpenBLAS, which may outperform MKL on AMD platforms
+4. `no-avx` --- AVX support is disabled, useful for older CPUs which do not support AVX instructions
 
-Advanced users can compile the program from source by themselves in order to enable GPU based solvers which require
-an available [CUDA](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) library.
+Advanced users can compile the program from source by themselves to enable GPU based solvers which require
+an available [CUDA](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) and/or MAGMA library.
 
 Since CI/CD uses `GCC 11` (on Linux) and `Clang 13.0.1` (on macOS), it may be required to update/install
 proper `libstdc++` (or `libc++`) version. The easiest way is to install the same compiler. For example, on Ubuntu 22.04,
@@ -219,7 +223,16 @@ For VTK enabled versions, it may be necessary to install OpenGL.
 sudo apt install libglu1-mesa-dev freeglut3-dev mesa-common-dev libglvnd-dev
 ```
 
+It is also possible to compile the package via docker, check the dockerfiles under the `Script` folder, for any
+questions please open an issue.
+
 ### Automation Related
+
+#### VS Code
+
+The VS Code extension is available [here](https://marketplace.visualstudio.com/items?itemName=tlc.suanpan).
+
+#### Sublime Text
 
 On Windows, a batch file named `AddAssociation.bat` is provided in the archive. It provides file associations and
 prepares a proper working environment (build system, autocompletion, highlighting)
@@ -247,7 +260,7 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**FEAST**](http://www.feast-solver.org/) version 4.0
 - [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 5.3.0
 - [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 3.1
-- [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.21
+- [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.24
 - [**Lis**](https://www.ssisc.org/lis/) version 2.1.3
 - [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2021.9.0
 - [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 1.10.6
@@ -256,8 +269,8 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**VTK**](https://vtk.org/) version 9.2.6
 - [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 12.0
 - [**MAGMA**](https://icl.utk.edu/magma/) version 2.7.1
-- [**Armadillo**](http://arma.sourceforge.net/) version 12.6.3
-- [**ensmallen**](https://ensmallen.org/) version 2.19.0
+- [**Armadillo**](http://arma.sourceforge.net/) version 12.6.6
+- [**ensmallen**](https://ensmallen.org/) version 2.20.0
 - [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2023.2.0
 - [**Catch2**](https://github.com/catchorg/Catch2) version 3.4.0
 - [**fmt**](https://github.com/fmtlib/fmt) version 10.1.1

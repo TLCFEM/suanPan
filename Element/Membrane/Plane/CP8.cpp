@@ -24,12 +24,17 @@
 #include <Toolbox/tensor.h>
 #include <Toolbox/utility.h>
 
-CP8::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M, mat&& PNPXY)
+CP8::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M, mat&& P)
     : coor(std::forward<vec>(C))
     , weight(W)
     , m_material(std::forward<unique_ptr<Material>>(M))
-    , pn_pxy(std::forward<mat>(PNPXY))
-    , strain_mat(3, m_size, fill::zeros) {}
+    , pn_pxy(std::forward<mat>(P))
+    , strain_mat(3, m_size) {
+    for(auto I = 0u, J = 0u, K = 1u; I < m_node; ++I, J += m_dof, K += m_dof) {
+        strain_mat(0, J) = strain_mat(2, K) = pn_pxy(0, I);
+        strain_mat(2, J) = strain_mat(1, K) = pn_pxy(1, I);
+    }
+}
 
 CP8::CP8(const unsigned T, uvec&& N, const unsigned M, const double TH, const bool R, const bool F)
     : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, F, {DOF::U1, DOF::U2})
@@ -39,7 +44,7 @@ CP8::CP8(const unsigned T, uvec&& N, const unsigned M, const double TH, const bo
 int CP8::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
-    if(PlaneType::E == static_cast<PlaneType>(material_proto->get_parameter(ParameterType::PLANETYPE))) suanpan::hacker(thickness) = 1.;
+    if(PlaneType::E == material_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
 
     const auto ele_coor = get_coordinate(m_dof);
 
@@ -59,17 +64,12 @@ int CP8::initialize(const shared_ptr<DomainBase>& D) {
         const mat jacob = pn * ele_coor;
         int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob), material_proto->get_copy(), solve(jacob, pn));
 
-        auto& c_pt = int_pt.back();
-
-        for(unsigned J = 0, K = 0, L = 1; J < m_node; ++J, K += m_dof, L += m_dof) {
-            c_pt.strain_mat(0, K) = c_pt.strain_mat(2, L) = c_pt.pn_pxy(0, J);
-            c_pt.strain_mat(2, K) = c_pt.strain_mat(1, L) = c_pt.pn_pxy(1, J);
-        }
+        const auto& c_pt = int_pt.back();
         initial_stiffness += c_pt.weight * thickness * c_pt.strain_mat.t() * ini_stiffness * c_pt.strain_mat;
     }
     trial_stiffness = current_stiffness = initial_stiffness;
 
-    if(const auto t_density = material_proto->get_parameter(ParameterType::DENSITY); t_density > 0.) {
+    if(const auto t_density = material_proto->get_density(); t_density > 0.) {
         initial_mass.zeros(m_size, m_size);
         for(const auto& I : int_pt) {
             const auto n_int = compute_shape_function(I.coor, 0);
@@ -178,9 +178,9 @@ int CP8::reset_status() {
 mat CP8::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
 vector<vec> CP8::record(const OutputType P) {
-    vector<vec> output;
-    for(const auto& I : int_pt) for(const auto& J : I.m_material->record(P)) output.emplace_back(J);
-    return output;
+    vector<vec> data;
+    for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
+    return data;
 }
 
 void CP8::print() {
@@ -215,10 +215,10 @@ void CP8::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type
 
 mat CP8::GetData(const OutputType P) {
     mat A(int_pt.size(), 9);
-    mat B(int_pt.size(), 6, fill::zeros);
+    mat B(6, int_pt.size(), fill::zeros);
 
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        if(const auto C = int_pt[I].m_material->record(P); !C.empty()) B(I, 0, size(C[0])) = C[0];
+        if(const auto C = int_pt[I].m_material->record(P); !C.empty()) B(0, I, size(C[0])) = C[0];
         A.row(I) = interpolation::quadratic(int_pt[I].coor);
     }
 
@@ -233,7 +233,7 @@ mat CP8::GetData(const OutputType P) {
     data.row(6) = interpolation::quadratic(0., 1.);
     data.row(7) = interpolation::quadratic(-1., 0.);
 
-    return (data * solve(A, B)).t();
+    return (data * solve(A, B.t())).t();
 }
 
 void CP8::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {

@@ -205,6 +205,15 @@
     <Filter Include="Z">
       <UniqueIdentifier>{da04bede-12e0-4fa7-8e1b-963193f71e72}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Section\SectionOS">
+      <UniqueIdentifier>{d1a891ce-e723-4078-9baa-cc286f7d6728}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material\MaterialOS">
+      <UniqueIdentifier>{7169039f-88b8-4a06-9c1c-41a9875fce28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material\MaterialOS\Wrapper">
+      <UniqueIdentifier>{383bbae7-39ee-40f6-875e-a61aba9726da}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Constraint\BC\GroupMultiplierBC.cpp">
@@ -603,7 +612,7 @@
     <ClCompile Include="..\..\..\Material\Material1D\Degradation\Dhakal.cpp">
       <Filter>Material\Material1D\Degradation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Material\Material1D\Degradation\TrilinearDegradation.cpp">
+    <ClCompile Include="..\..\..\Material\Material1D\Degradation\TrilinearStrainDegradation.cpp">
       <Filter>Material\Material1D\Degradation</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Material\Material1D\Elastic\BilinearElastic1D.cpp">
@@ -743,9 +752,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Material\Material2D\Wrapper\Rotation2D.cpp">
       <Filter>Material\Material2D\Wrapper</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Material\Material2D\Bilinear2D.cpp">
-      <Filter>Material\Material2D</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Material\Material2D\Concrete21.cpp">
       <Filter>Material\Material2D</Filter>
@@ -948,7 +954,7 @@
     <ClCompile Include="..\..\..\Section\Section1D\TrussSection.cpp">
       <Filter>Section\Section1D</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Section\Section2D\Bar2D.cpp">
+    <ClCompile Include="..\..\..\Section\Section2D\Cell2D.cpp">
       <Filter>Section\Section2D</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Section\Section2D\Box2D.cpp">
@@ -978,7 +984,7 @@
     <ClCompile Include="..\..\..\Section\Section2D\TSection2D.cpp">
       <Filter>Section\Section2D</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Section\Section3D\Bar3D.cpp">
+    <ClCompile Include="..\..\..\Section\Section3D\Cell3D.cpp">
       <Filter>Section\Section3D</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Section\Section3D\Box3D.cpp">
@@ -1399,7 +1405,7 @@
     <ClCompile Include="..\..\..\UnitTest\TestSampling.cpp">
       <Filter>UnitTest</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Element\Modifier\LeeElementalDamping.cpp">
+    <ClCompile Include="..\..\..\Element\Modifier\ElementalLee.cpp">
       <Filter>Element\Modifier</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Solver\Integrator\Tchamwa.cpp">
@@ -1477,7 +1483,7 @@
     <ClCompile Include="..\..\..\Material\Material3D\vonMises\CustomGurson.cpp">
       <Filter>Material\Material3D\vonMises</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Material\Material1D\Degradation\CustomDegradation.cpp">
+    <ClCompile Include="..\..\..\Material\Material1D\Degradation\CustomStrainDegradation.cpp">
       <Filter>Material\Material1D\Degradation</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Material\Material1D\Viscosity\CustomViscosity.cpp">
@@ -1518,6 +1524,57 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Material\Material3D\Hoffman\TimberPD.cpp">
       <Filter>Material\Material3D\Hoffman</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Degradation\CustomStressDegradation.cpp">
+      <Filter>Material\Material1D\Degradation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Concrete\NonlinearK4.cpp">
+      <Filter>Material\Material1D\Concrete</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Utility\B3DOSL.cpp">
+      <Filter>Element\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Beam\EB31OS.cpp">
+      <Filter>Element\Beam</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Utility\B3DOSC.cpp">
+      <Filter>Element\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Beam\B31OS.cpp">
+      <Filter>Element\Beam</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionOS\SectionOS3D.cpp">
+      <Filter>Section\SectionOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\Fibre.cpp">
+      <Filter>Section</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionOS\Cell3DOS.cpp">
+      <Filter>Section\SectionOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\MaterialOS\MaterialOS.cpp">
+      <Filter>Material\MaterialOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\MaterialOS\ElasticOS.cpp">
+      <Filter>Material\MaterialOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Section\SectionOS\Fibre3DOS.cpp">
+      <Filter>Section\SectionOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Wrapper\StressWrapper.cpp">
+      <Filter>Material\Material3D\Wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\MaterialOS\Wrapper\UniversalOS.cpp">
+      <Filter>Material\MaterialOS\Wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Modifier\ElementalNonviscous.cpp">
+      <Filter>Element\Modifier</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Load\ReferenceForce.cpp">
+      <Filter>Load</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Domain\Group\GroupParser.cpp">
+      <Filter>Domain\Group</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1971,7 +2028,7 @@
     <ClInclude Include="..\..\..\Material\Material1D\Degradation\Dhakal.h">
       <Filter>Material\Material1D\Degradation</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Material\Material1D\Degradation\TrilinearDegradation.h">
+    <ClInclude Include="..\..\..\Material\Material1D\Degradation\TrilinearStrainDegradation.h">
       <Filter>Material\Material1D\Degradation</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material1D\Elastic\BilinearElastic1D.h">
@@ -2111,9 +2168,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material2D\Wrapper\Rotation2D.h">
       <Filter>Material\Material2D\Wrapper</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Material\Material2D\Bilinear2D.h">
-      <Filter>Material\Material2D</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material2D\Concrete21.h">
       <Filter>Material\Material2D</Filter>
@@ -2289,9 +2343,6 @@
     <ClInclude Include="..\..\..\Recorder\VisualisationRecorder.h">
       <Filter>Recorder</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Section\ParameterType.h">
-      <Filter>Section</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Section\Section.h">
       <Filter>Section</Filter>
     </ClInclude>
@@ -2319,7 +2370,7 @@
     <ClInclude Include="..\..\..\Section\Section1D\TrussSection.h">
       <Filter>Section\Section1D</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Section\Section2D\Bar2D.h">
+    <ClInclude Include="..\..\..\Section\Section2D\Cell2D.h">
       <Filter>Section\Section2D</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Section\Section2D\Box2D.h">
@@ -2367,7 +2418,7 @@
     <ClInclude Include="..\..\..\Section\Section3D\TSection3D.h">
       <Filter>Section\Section3D</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Section\Section3D\Bar3D.h">
+    <ClInclude Include="..\..\..\Section\Section3D\Cell3D.h">
       <Filter>Section\Section3D</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Section\Section3D\Box3D.h">
@@ -2776,7 +2827,7 @@
     <ClInclude Include="..\..\..\Toolbox\resampling.h">
       <Filter>Toolbox</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Element\Modifier\LeeElementalDamping.h">
+    <ClInclude Include="..\..\..\Element\Modifier\ElementalLee.h">
       <Filter>Element\Modifier</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Toolbox\response_spectrum.h">
@@ -2854,7 +2905,7 @@
     <ClInclude Include="..\..\..\Material\Material3D\vonMises\CustomGurson.h">
       <Filter>Material\Material3D\vonMises</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Material\Material1D\Degradation\CustomDegradation.h">
+    <ClInclude Include="..\..\..\Material\Material1D\Degradation\CustomStrainDegradation.h">
       <Filter>Material\Material1D\Degradation</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material1D\Viscosity\CustomViscosity.h">
@@ -2904,6 +2955,60 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material3D\Hoffman\TimberPD.h">
       <Filter>Material\Material3D\Hoffman</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Degradation\CustomStressDegradation.h">
+      <Filter>Material\Material1D\Degradation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Concrete\NonlinearK4.h">
+      <Filter>Material\Material1D\Concrete</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Utility\B3DOSL.h">
+      <Filter>Element\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Beam\EB31OS.h">
+      <Filter>Element\Beam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Utility\B3DOSC.h">
+      <Filter>Element\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Beam\B31OS.h">
+      <Filter>Element\Beam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionOS\SectionOS3D.h">
+      <Filter>Section\SectionOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\Fibre.h">
+      <Filter>Section</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionOS\Cell3DOS.h">
+      <Filter>Section\SectionOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\MaterialOS\MaterialOS.h">
+      <Filter>Material\MaterialOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\MaterialOS\ElasticOS.h">
+      <Filter>Material\MaterialOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Section\SectionOS\Fibre3DOS.h">
+      <Filter>Section\SectionOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Wrapper\StressWrapper.h">
+      <Filter>Material\Material3D\Wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\MaterialOS\Wrapper\UniversalOS.h">
+      <Filter>Material\MaterialOS\Wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Modifier\ElementalNonviscous.h">
+      <Filter>Element\Modifier</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\ridders.hpp">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Load\ReferenceForce.h">
+      <Filter>Load</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Domain\Group\GroupParser.h">
+      <Filter>Domain\Group</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

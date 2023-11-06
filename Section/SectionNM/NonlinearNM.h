@@ -40,7 +40,7 @@ class NonlinearNM : protected DataNonlinearNM, public SectionNM {
     [[nodiscard]] virtual int compute_local_integration(vec&, mat&) = 0;
 
 protected:
-    static constexpr unsigned max_iteration = 20;
+    static constexpr unsigned max_iteration = 20u;
 
     const vec yield_diag;
 
@@ -62,20 +62,22 @@ protected:
     [[nodiscard]] virtual mat compute_ddf(const vec&, const vec&) const = 0;
 
 public:
-    NonlinearNM(unsigned, // tag
-                double,   // axial rigidity
-                double,   // flexural rigidity
-                bool,     // kinematic hardening modulus
-                double,   // linear density
-                vec&&
+    NonlinearNM(
+        unsigned, // tag
+        double,   // axial rigidity
+        double,   // flexural rigidity
+        bool,     // kinematic hardening modulus
+        double,   // linear density
+        vec&&
     );
-    NonlinearNM(unsigned, // tag
-                double,   // axial rigidity
-                double,   // flexural rigidity
-                double,   // flexural rigidity
-                bool,     // kinematic hardening modulus
-                double,   // linear density
-                vec&&
+    NonlinearNM(
+        unsigned, // tag
+        double,   // axial rigidity
+        double,   // flexural rigidity
+        double,   // flexural rigidity
+        bool,     // kinematic hardening modulus
+        double,   // linear density
+        vec&&
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

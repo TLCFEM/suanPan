@@ -14,4 +14,4 @@ set(Integrator
         Integrator/RayleighNewmark.cpp
         Integrator/Tchamwa.cpp
         Integrator/WilsonPenzienNewmark.cpp
-        )
+)

@@ -18,7 +18,9 @@
  * @class Concrete21
  * @brief A Concrete21 material class.
  *
- * For plain concrete. Only monotonic load is supported at moment. Cyclic behaviour does not converge in most cases.
+ * For plain concrete.
+ * Only monotonic load is supported at the moment.
+ * Cyclic behaviour does not converge in most cases.
  *
  * algorithm validated @ 05/02/2019 by tlc
  *
@@ -42,17 +44,18 @@ class Concrete21 final : public Material2D {
     double shear_modulus = 0.;
 
 public:
-    Concrete21(unsigned,   // tag
-               double,     // peak stress in negative
-               double,     // crack stress in positive
-               double,     // MC
-               double,     // NC
-               double,     // MT
-               double,     // NT
-               double,     // middle point
-               double,     // peak strain in negative
-               double,     // crack strain in positive
-               double = 0. // density
+    Concrete21(
+        unsigned,   // tag
+        double,     // peak stress in negative
+        double,     // crack stress in positive
+        double,     // MC
+        double,     // NC
+        double,     // MT
+        double,     // NT
+        double,     // middle point
+        double,     // peak strain in negative
+        double,     // crack strain in positive
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

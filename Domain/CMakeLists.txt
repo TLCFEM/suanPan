@@ -5,12 +5,13 @@ target_sources(${PROJECT_NAME} PRIVATE
         DomainState.cpp
         ExternalModule.cpp
         Factory.hpp
+        Group/CustomNodeGroup.cpp
         Group/ElementGroup.cpp
         Group/Group.cpp
         Group/GroupGroup.cpp
+        Group/GroupParser.cpp
         Group/NodeGroup.cpp
-        Group/CustomNodeGroup.cpp
         Node.cpp
         Storage.hpp
         Tag.cpp
-        )
+)

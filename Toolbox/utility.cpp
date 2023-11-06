@@ -127,3 +127,5 @@ bool is_true(const string& S) { return is_true(S.c_str()); }
 bool is_false(const string& S) { return is_false(S.c_str()); }
 
 bool is_integer(const string& S) { return !S.empty() && std::all_of(S.cbegin(), S.cend(), isdigit); }
+
+double perturb(const double input) { return input * (1. + randu<double>() * 1E-5); }

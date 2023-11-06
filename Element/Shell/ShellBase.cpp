@@ -16,7 +16,6 @@
  ******************************************************************************/
 
 #include "ShellBase.h"
-#include <Domain/Node.h>
 #include <Toolbox/tensor.h>
 
 const uvec ShellBase::m_dof{0, 1, 5};

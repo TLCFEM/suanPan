@@ -30,40 +30,54 @@ OALTS::OALTS(const unsigned T, const double R)
     , B20(B2 / B0) { set_time_step_switch(false); }
 
 void OALTS::assemble_resistance() {
-    const auto& D = get_domain();
+    const auto D = get_domain();
     auto& W = D->get_factory();
 
     auto fa = std::async([&] { D->assemble_resistance(); });
     auto fb = std::async([&] { D->assemble_damping_force(); });
-    auto fc = std::async([&] { D->assemble_inertial_force(); });
-
-    fa.get();
-    fb.get();
-    fc.get();
-
-    W->set_sushi(W->get_trial_resistance() + W->get_trial_damping_force() + W->get_trial_inertial_force());
-}
-
-void OALTS::assemble_matrix() {
-    const auto& D = get_domain();
-    auto& W = D->get_factory();
-
-    auto fa = std::async([&] { D->assemble_trial_stiffness(); });
-    auto fb = std::async([&] { D->assemble_trial_geometry(); });
-    auto fc = std::async([&] { D->assemble_trial_damping(); });
-    auto fd = std::async([&] { D->assemble_trial_mass(); });
+    auto fc = std::async([&] { D->assemble_nonviscous_force(); });
+    auto fd = std::async([&] { D->assemble_inertial_force(); });
 
     fa.get();
     fb.get();
     fc.get();
     fd.get();
 
-    if(if_starting) [[unlikely]] W->get_stiffness() += W->get_geometry() + 4. / DT / DT * W->get_mass() + 2. / DT * W->get_damping();
-    else [[likely]] W->get_stiffness() += W->get_geometry() + P1 * P1 * W->get_mass() + P1 * W->get_damping();
+    W->set_sushi(W->get_trial_resistance() + W->get_trial_damping_force() + W->get_trial_nonviscous_force() + W->get_trial_inertial_force());
+}
+
+void OALTS::assemble_matrix() {
+    const auto D = get_domain();
+    auto& W = D->get_factory();
+
+    auto fa = std::async([&] { D->assemble_trial_stiffness(); });
+    auto fb = std::async([&] { D->assemble_trial_geometry(); });
+    auto fc = std::async([&] { D->assemble_trial_damping(); });
+    auto fd = std::async([&] { D->assemble_trial_nonviscous(); });
+    auto fe = std::async([&] { D->assemble_trial_mass(); });
+
+    fa.get();
+    fb.get();
+    fc.get();
+    fd.get();
+    fe.get();
+
+    if(W->is_nlgeom()) W->get_stiffness() += W->get_geometry();
+
+    if(if_starting) [[unlikely]]
+    {
+        W->get_stiffness() += 4. / DT / DT * W->get_mass();
+        W->get_stiffness() += W->is_nonviscous() ? 2. / DT * (W->get_damping() + W->get_nonviscous()) : 2. / DT * W->get_damping();
+    }
+    else [[likely]]
+    {
+        W->get_stiffness() += P1 * P1 * W->get_mass();
+        W->get_stiffness() += W->is_nonviscous() ? P1 * (W->get_damping() + W->get_nonviscous()) : P1 * W->get_damping();
+    }
 }
 
 int OALTS::update_trial_status() {
-    const auto& D = get_domain();
+    const auto D = get_domain();
     auto& W = D->get_factory();
 
     if(if_starting) [[unlikely]]

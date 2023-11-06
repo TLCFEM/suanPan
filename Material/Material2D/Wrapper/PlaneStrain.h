@@ -41,9 +41,10 @@ class PlaneStrain final : public Material2D {
     ResourceHolder<Material> base;
 
 public:
-    PlaneStrain(unsigned, // tag
-                unsigned, // 3D material tag
-                unsigned  // type
+    PlaneStrain(
+        unsigned, // tag
+        unsigned, // 3D material tag
+        unsigned  // type
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

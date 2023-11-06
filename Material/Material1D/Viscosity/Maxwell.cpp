@@ -26,11 +26,11 @@ Maxwell::Maxwell(const unsigned T, const unsigned DT, const unsigned ST, const b
     , spring_tag(ST)
     , proceed(PC)
     , use_matrix(UM)
-    , beta(std::min(std::max(0., std::fabs(BT)), 1.)) { access::rw(tolerance) = 1E-12; }
+    , beta(std::min(std::max(0., std::fabs(BT)), 1.)) { access::rw(tolerance) = 5E-13; }
 
 int Maxwell::initialize(const shared_ptr<DomainBase>& D) {
-    damper = suanpan::initialized_material_copy(D, damper_tag);
-    spring = suanpan::initialized_material_copy(D, spring_tag);
+    damper = D->initialized_material_copy(damper_tag);
+    spring = D->initialized_material_copy(spring_tag);
 
     if(nullptr == damper || nullptr == spring) return SUANPAN_FAIL;
 
@@ -70,9 +70,9 @@ int Maxwell::update_trial_status(const vec& t_strain, const vec& t_strain_rate) 
 
     vec solution(3, fill::zeros);
 
-    counter = 0;
+    counter = 0u;
 
-    if(double error, ref_error = 1.; use_matrix) {
+    if(double error, ref_error = 1., ref_residual = 1.; use_matrix) {
         mat inv_jacobian(3, 3);
 
         inv_jacobian(0, 2) = -factor_a;
@@ -92,9 +92,13 @@ int Maxwell::update_trial_status(const vec& t_strain, const vec& t_strain_rate) 
 
             const vec incre = inv_jacobian * residual / (factor_a * (K1 + K2) + K3);
 
-            if(1 == counter) ref_error = std::max(1., norm(residual));
-            suanpan_debug("Local iteration error: {:.5E}.\n", error = norm(residual) / ref_error);
-            if(norm(incre) <= tolerance && error <= tolerance) break;
+            error = inf_norm(incre);
+            if(1u == counter) {
+                ref_error = error;
+                ref_residual = inf_norm(residual);
+            }
+            suanpan_debug("Local iteration error: {:.5E}.\n", error);
+            if(error < tolerance * ref_error || inf_norm(residual) < tolerance * ref_residual) break;
             solution += incre;
             spring->update_incre_status(solution(0));
             damper->update_incre_status(solution(1), solution(2));
@@ -108,9 +112,13 @@ int Maxwell::update_trial_status(const vec& t_strain, const vec& t_strain_rate) 
             const auto residual = residual_a * K2 - residual_c + residual_b / factor_a * K3;
             const auto jacobian = K1 + K2 + K3 / factor_a;
             const auto incre = residual / jacobian;
-            if(1 == counter) ref_error = std::max(1., fabs(residual));
-            suanpan_debug("Local iteration error: {:.5E}.\n", error = fabs(residual) / ref_error);
-            if(fabs(incre) <= tolerance && error <= tolerance) break;
+            error = fabs(incre);
+            if(1u == counter) {
+                ref_error = error;
+                ref_residual = fabs(residual);
+            }
+            suanpan_debug("Local iteration error: {:.5E}.\n", error);
+            if(error < tolerance * ref_error || fabs(residual) < tolerance * ref_residual) break;
             solution(0) += incre;
             solution(1) += residual_a - incre;
             solution(2) += (residual_b - incre) / factor_a;
@@ -166,18 +174,16 @@ int Maxwell::reset_status() {
 }
 
 vector<vec> Maxwell::record(const OutputType P) {
-    vector<vec> data;
+    if(OutputType::SD == P || OutputType::SS == P || OutputType::S == P) return {current_stress};
+    if(OutputType::ED == P) return {damper->get_current_strain()};
+    if(OutputType::VD == P) return {damper->get_current_strain_rate()};
+    if(OutputType::ES == P) return {spring->get_current_strain()};
+    if(OutputType::VS == P) return {current_strain_rate - damper->get_current_strain_rate()};
+    if(OutputType::E == P) return {current_strain};
+    if(OutputType::V == P) return {current_strain_rate};
+    if(OutputType::LITR == P) return {vec{static_cast<double>(counter)}};
 
-    if(OutputType::SD == P || OutputType::SS == P || OutputType::S == P) data.emplace_back(current_stress);
-    else if(OutputType::ED == P) data.emplace_back(damper->get_current_strain());
-    else if(OutputType::VD == P) data.emplace_back(damper->get_current_strain_rate());
-    else if(OutputType::ES == P) data.emplace_back(spring->get_current_strain());
-    else if(OutputType::VS == P) data.emplace_back(current_strain_rate - damper->get_current_strain_rate());
-    else if(OutputType::E == P) data.emplace_back(current_strain);
-    else if(OutputType::V == P) data.emplace_back(current_strain_rate);
-    else if(OutputType::LITR == P) data.emplace_back(vec{static_cast<double>(counter)});
-
-    return data;
+    return {};
 }
 
 void Maxwell::print() {

@@ -42,7 +42,7 @@ DCP4::DCP4(const unsigned T, uvec&& N, const unsigned M, const double CL, const 
 int DCP4::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
-    if(PlaneType::E == static_cast<PlaneType>(material_proto->get_parameter(ParameterType::PLANETYPE))) suanpan::hacker(thickness) = 1.;
+    if(PlaneType::E == material_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
 
     const auto ele_coor = get_coordinate(2);
 
@@ -74,7 +74,7 @@ int DCP4::initialize(const shared_ptr<DomainBase>& D) {
     }
     trial_stiffness = current_stiffness = initial_stiffness;
 
-    if(const auto t_density = material_proto->get_parameter(ParameterType::DENSITY); t_density > 0.) {
+    if(const auto t_density = material_proto->get_density(); t_density > 0.) {
         initial_mass.zeros(m_size, m_size);
         for(const auto& I : int_pt) {
             const auto t_factor = t_density * I.weight * thickness;
@@ -153,28 +153,11 @@ int DCP4::reset_status() {
 }
 
 vector<vec> DCP4::record(const OutputType P) {
-    vector<vec> output;
+    if(P == OutputType::DAMAGE) return {get_current_displacement()(d_dof)};
 
-    if(P == OutputType::NMISES) {
-        mat A(int_pt.size(), 4);
-        vec B(int_pt.size(), fill::zeros);
-
-        for(size_t I = 0; I < int_pt.size(); ++I) {
-            if(const auto C = int_pt[I].m_material->record(OutputType::MISES); !C.empty()) B(I) = C.cbegin()->at(0);
-            A.row(I) = interpolation::linear(int_pt[I].coor);
-        }
-
-        const vec X = solve(A, B);
-
-        output.emplace_back(vec{dot(interpolation::linear(-1., -1.), X)});
-        output.emplace_back(vec{dot(interpolation::linear(1., -1.), X)});
-        output.emplace_back(vec{dot(interpolation::linear(1., 1.), X)});
-        output.emplace_back(vec{dot(interpolation::linear(-1., 1.), X)});
-    }
-    else if(P == OutputType::DAMAGE) output.emplace_back(get_current_displacement()(d_dof));
-    else for(const auto& I : int_pt) for(const auto& J : I.m_material->record(P)) output.emplace_back(J);
-
-    return output;
+    vector<vec> data;
+    for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
+    return data;
 }
 
 void DCP4::print() {
@@ -219,10 +202,10 @@ mat DCP4::GetData(const OutputType P) {
     }
 
     mat A(int_pt.size(), 4);
-    mat B(int_pt.size(), 6, fill::zeros);
+    mat B(6, int_pt.size(), fill::zeros);
 
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        if(const auto C = int_pt[I].m_material->record(P); !C.empty()) B(I, 0, size(C[0])) = C[0];
+        if(const auto C = int_pt[I].m_material->record(P); !C.empty()) B(0, I, size(C[0])) = C[0];
         A.row(I) = interpolation::linear(int_pt[I].coor);
     }
 
@@ -233,7 +216,7 @@ mat DCP4::GetData(const OutputType P) {
     data.row(2) = interpolation::linear(1., 1.);
     data.row(3) = interpolation::linear(-1., 1.);
 
-    return (data * solve(A, B)).t();
+    return (data * solve(A, B.t())).t();
 }
 
 void DCP4::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {

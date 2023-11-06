@@ -44,6 +44,12 @@ void Element::update_viscous_energy() {
     viscous_energy += .5 * (current_damping_force.is_empty() ? dot(get_incre_displacement(), trial_damping_force) : dot(get_incre_displacement(), current_damping_force + trial_damping_force));
 }
 
+void Element::update_nonviscous_energy() {
+    if(trial_nonviscous_force.is_empty()) return;
+
+    nonviscous_energy += .5 * dot(get_incre_displacement(), real(sum(current_nonviscous_force + trial_nonviscous_force, 1)));
+}
+
 void Element::update_complementary_energy() {
     if(trial_resistance.is_empty()) return;
 
@@ -251,7 +257,7 @@ Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& 
     : Element(T, NN, ND, std::forward<uvec>(NT), {}, false, MaterialType::D0, std::forward<std::vector<DOF>>(DI)) {}
 
 Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& MT, const bool F, const MaterialType MTP, std::vector<DOF>&& DI)
-    : DataElement{std::forward<uvec>(NT), std::forward<uvec>(MT), uvec{}, F, true, true, true, true, {}}
+    : DataElement{std::forward<uvec>(NT), std::forward<uvec>(MT), uvec{}, F, true, true, true, true, true, {}}
     , ElementBase(T)
     , num_node(NN)
     , num_dof(ND)
@@ -260,7 +266,7 @@ Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& 
     , dof_identifier(std::forward<std::vector<DOF>>(DI)) { suanpan_assert([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw invalid_argument("size of dof identifier must meet number of dofs"); }); }
 
 Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& ST, const bool F, const SectionType STP, std::vector<DOF>&& DI)
-    : DataElement{std::forward<uvec>(NT), uvec{}, std::forward<uvec>(ST), F, true, true, true, true, {}}
+    : DataElement{std::forward<uvec>(NT), uvec{}, std::forward<uvec>(ST), F, true, true, true, true, true, {}}
     , ElementBase(T)
     , num_node(NN)
     , num_dof(ND)
@@ -270,7 +276,7 @@ Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& 
 
 // for contact elements that use node groups
 Element::Element(const unsigned T, const unsigned ND, uvec&& GT)
-    : DataElement{std::forward<uvec>(GT), {}, {}, false, true, true, true, true, {}}
+    : DataElement{std::forward<uvec>(GT), {}, {}, false, true, true, true, true, true, {}}
     , ElementBase(T)
     , num_node(static_cast<unsigned>(-1))
     , num_dof(ND)
@@ -280,7 +286,7 @@ Element::Element(const unsigned T, const unsigned ND, uvec&& GT)
 
 // for elements that use other elements
 Element::Element(const unsigned T, const unsigned ND, const unsigned ET, const unsigned NT)
-    : DataElement{{NT}, {}, {}, false, true, true, true, true, {}}
+    : DataElement{{NT}, {}, {}, false, true, true, true, true, true, {}}
     , ElementBase(T)
     , num_node(static_cast<unsigned>(-1))
     , num_dof(ND)
@@ -291,7 +297,7 @@ Element::Element(const unsigned T, const unsigned ND, const unsigned ET, const u
 int Element::initialize_base(const shared_ptr<DomainBase>& D) {
     // initialized already, check node validity
     if(node_ptr.size() == num_node) {
-        for(const auto& I : node_ptr) if(const auto& t_node = I.lock(); nullptr == t_node || !t_node->is_active()) return SUANPAN_FAIL;
+        for(const auto& I : node_ptr) if(const auto t_node = I.lock(); nullptr == t_node || !t_node->is_active()) return SUANPAN_FAIL;
         return SUANPAN_SUCCESS;
     }
 
@@ -357,7 +363,7 @@ int Element::initialize_base(const shared_ptr<DomainBase>& D) {
     if(MaterialType::D0 != mat_type)
         for(const auto& t_tag : material_tag)
             if(auto& t_material = D->get<Material>(t_tag); nullptr == t_material || !t_material->is_active() || t_material->get_material_type() != MaterialType::DS && t_material->get_material_type() != mat_type) {
-                suanpan_warning("Element {} disabled as material {} cannot be found.\n", get_tag(), t_tag);
+                suanpan_warning("Element {} disabled as material {} cannot be found or type mismatch.\n", get_tag(), t_tag);
                 return SUANPAN_FAIL;
             }
 
@@ -365,7 +371,7 @@ int Element::initialize_base(const shared_ptr<DomainBase>& D) {
     if(SectionType::D0 != sec_type)
         for(const auto& t_tag : section_tag)
             if(auto& t_section = D->get<Section>(t_tag); nullptr == t_section || !t_section->is_active() || t_section->get_section_type() != sec_type) {
-                suanpan_warning("Element {} disabled as section {} cannot be found.\n", get_tag(), t_tag);
+                suanpan_warning("Element {} disabled as section {} cannot be found or type mismatch.\n", get_tag(), t_tag);
                 return SUANPAN_FAIL;
             }
 
@@ -407,6 +413,8 @@ bool Element::if_update_mass() const { return update_mass; }
 
 bool Element::if_update_damping() const { return update_damping; }
 
+bool Element::if_update_nonviscous() const { return update_nonviscous; }
+
 bool Element::if_update_stiffness() const { return update_stiffness; }
 
 bool Element::if_update_geometry() const { return update_geometry; }
@@ -439,6 +447,10 @@ const vec& Element::get_trial_damping_force() const { return trial_damping_force
 
 const vec& Element::get_current_damping_force() const { return current_damping_force; }
 
+const cx_mat& Element::get_trial_nonviscous_force() const { return trial_nonviscous_force; }
+
+const cx_mat& Element::get_current_nonviscous_force() const { return current_nonviscous_force; }
+
 const vec& Element::get_trial_inertial_force() {
     if(!trial_mass.empty()) trial_inertial_force = trial_mass * get_trial_acceleration();
     return trial_inertial_force;
@@ -461,6 +473,8 @@ const mat& Element::get_trial_mass() const { return trial_mass; }
 
 const mat& Element::get_trial_damping() const { return trial_damping; }
 
+const mat& Element::get_trial_nonviscous() const { return trial_nonviscous; }
+
 const mat& Element::get_trial_stiffness() const { return trial_stiffness; }
 
 const mat& Element::get_trial_geometry() const { return trial_geometry; }
@@ -471,6 +485,8 @@ const mat& Element::get_current_mass() const { return current_mass; }
 
 const mat& Element::get_current_damping() const { return current_damping; }
 
+const mat& Element::get_current_nonviscous() const { return current_nonviscous; }
+
 const mat& Element::get_current_stiffness() const { return current_stiffness; }
 
 const mat& Element::get_current_geometry() const { return current_geometry; }
@@ -480,6 +496,8 @@ const mat& Element::get_current_secant() const { return get_current_stiffness();
 const mat& Element::get_initial_mass() const { return initial_mass; }
 
 const mat& Element::get_initial_damping() const { return initial_damping; }
+
+const mat& Element::get_initial_nonviscous() const { return initial_nonviscous; }
 
 const mat& Element::get_initial_stiffness() const { return initial_stiffness; }
 
@@ -492,15 +510,18 @@ const mat& Element::get_mass_container() const { return mass_container; }
 const mat& Element::get_stiffness_container() const { return stiffness_container; }
 
 int Element::clear_status() {
-    if(update_mass && !initial_mass.is_empty()) trial_mass = current_mass = initial_mass;
-    if(update_damping && !initial_damping.is_empty()) trial_damping = current_damping = initial_damping;
-    if(update_stiffness && !initial_stiffness.is_empty()) trial_stiffness = current_stiffness = initial_stiffness;
-    if(update_geometry && !initial_geometry.is_empty()) trial_geometry = current_geometry = initial_geometry;
+    if(update_mass) trial_mass = current_mass = initial_mass;
+    if(update_damping) trial_damping = current_damping = initial_damping;
+    if(update_nonviscous) trial_nonviscous = current_nonviscous = initial_nonviscous;
+    if(update_stiffness) trial_stiffness = current_stiffness = initial_stiffness;
+    if(update_geometry) trial_geometry = current_geometry = initial_geometry;
 
     if(!trial_resistance.is_empty()) trial_resistance.zeros();
     if(!current_resistance.is_empty()) current_resistance.zeros();
     if(!trial_damping_force.is_empty()) trial_damping_force.zeros();
     if(!current_damping_force.is_empty()) current_damping_force.zeros();
+    if(!trial_nonviscous_force.is_empty()) trial_nonviscous_force.zeros();
+    if(!current_nonviscous_force.is_empty()) current_nonviscous_force.zeros();
     if(!trial_inertial_force.is_empty()) trial_inertial_force.zeros();
     if(!current_inertial_force.is_empty()) current_inertial_force.zeros();
 
@@ -510,6 +531,7 @@ int Element::clear_status() {
     strain_energy = 0.;
     kinetic_energy = 0.;
     viscous_energy = 0.;
+    nonviscous_energy = 0.;
     complementary_energy = 0.;
     momentum.zeros();
 
@@ -522,6 +544,7 @@ int Element::commit_status() {
     update_strain_energy();
     update_kinetic_energy();
     update_viscous_energy();
+    update_nonviscous_energy();
     update_complementary_energy();
     update_momentum();
 
@@ -531,6 +554,7 @@ int Element::commit_status() {
     if(update_geometry && !trial_geometry.is_empty()) current_geometry = trial_geometry;
     if(!trial_resistance.is_empty()) current_resistance = trial_resistance;
     if(!trial_damping_force.is_empty()) current_damping_force = trial_damping_force;
+    if(!trial_nonviscous_force.is_empty()) current_nonviscous_force = trial_nonviscous_force;
     if(!trial_inertial_force.is_empty()) current_inertial_force = trial_inertial_force;
 
     return SUANPAN_SUCCESS;
@@ -539,10 +563,12 @@ int Element::commit_status() {
 int Element::reset_status() {
     if(update_mass && !trial_mass.is_empty()) trial_mass = current_mass;
     if(update_damping && !trial_damping.is_empty()) trial_damping = current_damping;
+    if(update_nonviscous && !trial_nonviscous.is_empty()) trial_nonviscous = current_nonviscous;
     if(update_stiffness && !trial_stiffness.is_empty()) trial_stiffness = current_stiffness;
     if(update_geometry && !trial_geometry.is_empty()) trial_geometry = current_geometry;
     if(!trial_resistance.is_empty()) trial_resistance = current_resistance;
     if(!trial_damping_force.is_empty()) trial_damping_force = current_damping_force;
+    if(!trial_nonviscous_force.is_empty()) trial_nonviscous_force = current_nonviscous_force;
     if(!trial_inertial_force.is_empty()) trial_inertial_force = current_inertial_force;
 
     return SUANPAN_SUCCESS;
@@ -562,6 +588,8 @@ double Element::get_kinetic_energy() const { return kinetic_energy; }
 
 double Element::get_viscous_energy() const { return viscous_energy; }
 
+double Element::get_nonviscous_energy() const { return nonviscous_energy; }
+
 const vec& Element::get_momentum() const { return momentum; }
 
 double Element::get_momentum_component(const DOF D) const {
@@ -578,6 +606,11 @@ double Element::get_momentum_component(const DOF D) const {
 double Element::get_characteristic_length() const { return characteristic_length; }
 
 mat Element::compute_shape_function(const mat&, unsigned) const { return {}; }
+
+std::vector<vec>& append_to(std::vector<vec>& a, std::vector<vec>&& b) {
+    a.insert(a.end(), std::make_move_iterator(b.begin()), std::make_move_iterator(b.end()));
+    return a;
+}
 
 void ConstantMass(DataElement* E) {
     E->update_mass = false;

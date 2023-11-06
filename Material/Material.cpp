@@ -16,12 +16,19 @@
  ******************************************************************************/
 
 #include "Material.h"
-#include "Domain/DomainBase.h"
+#include <Domain/DomainBase.h>
+#include <Recorder/OutputType.h>
 
 Material::Material(const unsigned T, const MaterialType MT, const double D)
-    : DataMaterial{1E-14, fabs(D), MT, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}}
-    , DataCoupleMaterial{-1., {}, {}, {}, {}, {}, {}, {}, {}, {}}
+    : DataMaterial{fabs(D), MT}
+    , DataCoupleMaterial{}
     , Tag(T) {}
+
+double Material::get_density() const { return density; }
+
+MaterialType Material::get_material_type() const { return material_type; }
+
+PlaneType Material::get_plane_type() const { return plane_type; }
 
 int Material::initialize_base(const shared_ptr<DomainBase>&) {
     if(initialized) return SUANPAN_SUCCESS;
@@ -63,13 +70,11 @@ bool Material::is_symmetric() const { return symmetric; }
 
 bool Material::is_support_couple() const { return support_couple; }
 
-void Material::set_characteristic_length(const double L) { characteristic_length = std::max(datum::eps, L); }
+void Material::set_characteristic_length(const double L) const { access::rw(characteristic_length) = std::max(datum::eps, L); }
 
 double Material::get_characteristic_length() const { return characteristic_length; }
 
-MaterialType Material::get_material_type() const { return material_type; }
-
-double Material::get_parameter(const ParameterType T) const { return T == ParameterType::DENSITY ? density : 0.; }
+double Material::get_parameter(ParameterType) const { return 0.; }
 
 const vec& Material::get_trial_strain() { return trial_strain; }
 
@@ -285,7 +290,16 @@ int Material::reset_couple_status() {
     return SUANPAN_SUCCESS;
 }
 
-std::vector<vec> Material::record(const OutputType) { return {}; }
+std::vector<vec> Material::record(const OutputType P) {
+    if(P == OutputType::S) return {current_stress};
+    if(P == OutputType::E) return {current_strain};
+    if(P == OutputType::EE) return {solve(initial_stiffness, current_stress)};
+    if(P == OutputType::PE) return {current_strain - solve(initial_stiffness, current_stress)};
+    if(P == OutputType::HIST) return {current_history};
+    if(P == OutputType::YF) return {vec{any(current_history > 0.) ? 1. : 0.}};
+
+    return {};
+}
 
 void ConstantStiffness(DataMaterial* M) {
     M->current_stiffness = mat(M->initial_stiffness.memptr(), M->initial_stiffness.n_rows, M->initial_stiffness.n_cols, false, true);
@@ -356,23 +370,3 @@ void PureWrapper(Material* M) {
 unique_ptr<Material> suanpan::make_copy(const shared_ptr<Material>& P) { return nullptr == P ? nullptr : P->get_copy(); }
 
 unique_ptr<Material> suanpan::make_copy(const unique_ptr<Material>& P) { return nullptr == P ? nullptr : P->get_copy(); }
-
-/**
- * \brief This function checks if the corresponding material model exists, if yes make a copy and ensure all initialisations succeed, in case of any errors, it returns nullptr.
- * \param D global storage domain
- * \param T material tag
- * \return local copy of material object
- */
-unique_ptr<Material> suanpan::initialized_material_copy(const shared_ptr<DomainBase>& D, const uword T) {
-    if(!D->find<Material>(T)) return nullptr;
-
-    auto copy = D->get<Material>(T)->get_copy();
-
-    if(copy->is_initialized()) return copy;
-
-    if(SUANPAN_SUCCESS != copy->initialize_base(D) || SUANPAN_SUCCESS != copy->initialize(D)) return nullptr;
-
-    copy->set_initialized(true);
-
-    return copy;
-}

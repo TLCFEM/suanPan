@@ -86,8 +86,7 @@ int ConcreteTsai::initialize(const shared_ptr<DomainBase>&) {
 }
 
 double ConcreteTsai::get_parameter(const ParameterType P) const {
-    if(ParameterType::DENSITY == P) return density;
-    if(ParameterType::ELASTICMODULUS == P || ParameterType::YOUNGSMODULUS == P || ParameterType::E == P) return initial_stiffness(0);
+    if(ParameterType::ELASTICMODULUS == P) return initial_stiffness(0);
     if(ParameterType::PEAKSTRAIN == P) return c_strain;
     if(ParameterType::CRACKSTRAIN == P) return t_strain;
     return 0.;

@@ -24,11 +24,11 @@ Concrete21::Concrete21(const unsigned T, const double CS, const double TS, const
     , concrete_major(0, CS, TS, MCC, NCC, MTT, NTT, MP, CE, TE, R)
     , concrete_minor(0, CS, TS, MCC, NCC, MTT, NTT, MP, CE, TE, R) {}
 
-int Concrete21::initialize(const shared_ptr<DomainBase>&) {
-    if(SUANPAN_SUCCESS != concrete_major.initialize_base(nullptr) || SUANPAN_SUCCESS != concrete_major.initialize(nullptr) || SUANPAN_SUCCESS != concrete_minor.initialize_base(nullptr) || SUANPAN_SUCCESS != concrete_minor.initialize(nullptr)) return SUANPAN_FAIL;
+int Concrete21::initialize(const shared_ptr<DomainBase>& D) {
+    if(SUANPAN_SUCCESS != concrete_major.initialize_base(D) || SUANPAN_SUCCESS != concrete_major.initialize(D) || SUANPAN_SUCCESS != concrete_minor.initialize_base(D) || SUANPAN_SUCCESS != concrete_minor.initialize(D)) return SUANPAN_FAIL;
 
     initial_stiffness.zeros(3, 3);
-    initial_stiffness(2, 2) = shear_modulus = .5 * (initial_stiffness(0, 0) = initial_stiffness(1, 1) = concrete_major.get_parameter(ParameterType::ELASTICMODULUS));
+    initial_stiffness(2, 2) = shear_modulus = .5 * (initial_stiffness(0, 0) = initial_stiffness(1, 1) = concrete_major.get_initial_stiffness()(0));
 
     trial_stiffness = current_stiffness = initial_stiffness;
 
@@ -37,10 +37,7 @@ int Concrete21::initialize(const shared_ptr<DomainBase>&) {
 
 unique_ptr<Material> Concrete21::get_copy() { return make_unique<Concrete21>(*this); }
 
-double Concrete21::get_parameter(const ParameterType P) const {
-    if(ParameterType::PLANETYPE == P) return static_cast<double>(plane_type);
-    return concrete_major.get_parameter(P);
-}
+double Concrete21::get_parameter(const ParameterType P) const { return concrete_major.get_parameter(P); }
 
 int Concrete21::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;

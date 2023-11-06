@@ -54,7 +54,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
             auto idx = 0llu;
             while(!command.eof() && idx < p.n_elem)
                 if(!get_input(command, p(idx++))) {
-                    suanpan_error("A valid parameter for rayleigh damping is required.\n");
+                    suanpan_error("A valid parameter for Rayleigh damping is required.\n");
                     return SUANPAN_SUCCESS;
                 }
 
@@ -347,6 +347,15 @@ int create_new_solver(const shared_ptr<DomainBase>& domain, istringstream& comma
     auto code = 0;
     if(is_equal(solver_type, "Newton")) { if(domain->insert(make_shared<Newton>(tag))) code = 1; }
     else if(is_equal(solver_type, "modifiedNewton") || is_equal(solver_type, "mNewton")) { if(domain->insert(make_shared<Newton>(tag, true))) code = 1; }
+    else if(is_equal(solver_type, "AICN")) {
+        auto length = 1.;
+        if(!command.eof() && !get_input(command, length)) {
+            suanpan_error("A valid length is required.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        if(domain->insert(make_shared<AICN>(tag, length))) code = 1;
+    }
     else if(is_equal(solver_type, "BFGS")) { if(domain->insert(make_shared<BFGS>(tag))) code = 1; }
     else if(is_equal(solver_type, "LBFGS")) {
         auto max_history = 20;
@@ -356,21 +365,6 @@ int create_new_solver(const shared_ptr<DomainBase>& domain, istringstream& comma
         }
 
         if(domain->insert(make_shared<BFGS>(tag, max_history))) code = 1;
-    }
-    else if(is_equal(solver_type, "Ramm")) {
-        auto arc_length = .1;
-        string fixed_arc_length = "False";
-
-        if(!command.eof() && !get_input(command, arc_length)) {
-            suanpan_error("A valid arc length is required.\n");
-            return SUANPAN_SUCCESS;
-        }
-        if(!command.eof() && !get_input(command, fixed_arc_length)) {
-            suanpan_error("A valid fixed arc length switch is required.\n");
-            return SUANPAN_SUCCESS;
-        }
-
-        if(domain->insert(make_shared<Ramm>(tag, arc_length, is_true(fixed_arc_length)))) code = 1;
     }
     else if(is_equal(solver_type, "FEAST") || is_equal(solver_type, "QuadraticFEAST")) {
         unsigned eigen_number;
@@ -394,6 +388,7 @@ int create_new_solver(const shared_ptr<DomainBase>& domain, istringstream& comma
         if(domain->insert(make_shared<FEAST>(tag, eigen_number, centre, radius, is_equal(solver_type, "QuadraticFEAST")))) code = 1;
     }
     else if(is_equal(solver_type, "DisplacementControl") || is_equal(solver_type, "MPDC")) { if(domain->insert(make_shared<MPDC>(tag))) code = 1; }
+    else if(is_equal(solver_type, "Ramm")) { if(domain->insert(make_shared<Ramm>(tag))) code = 1; }
     else
         suanpan_error("Cannot identify the solver type.\n");
 

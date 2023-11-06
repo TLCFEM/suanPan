@@ -25,14 +25,14 @@ Rotation2D::Rotation2D(const unsigned T, const unsigned MT, const double A)
     , trans_mat(transform::strain::trans(A)) {}
 
 int Rotation2D::initialize(const shared_ptr<DomainBase>& D) {
-    mat_obj = suanpan::initialized_material_copy(D, mat_tag);
+    mat_obj = D->initialized_material_copy(mat_tag);
 
     if(nullptr == mat_obj || mat_obj->get_material_type() != MaterialType::D2) {
         suanpan_error("A valid 2D host material is required.\n");
         return SUANPAN_FAIL;
     }
 
-    access::rw(density) = mat_obj->get_parameter(ParameterType::DENSITY);
+    access::rw(density) = mat_obj->get_density();
 
     trial_stiffness = current_stiffness = initial_stiffness = trans_mat.t() * mat_obj->get_initial_stiffness() * trans_mat;
 

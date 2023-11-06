@@ -29,80 +29,89 @@
 #define MATERIAL_H
 
 #include <Domain/Tag.h>
-#include <Section/ParameterType.h>
+#include "ParameterType.h"
 
 enum class MaterialType : unsigned {
     D0 = 0,
     D1 = 1,
     D2 = 3,
     D3 = 6,
-    DS = 10
+    DS = 10,
+    OS = 3
+};
+
+enum class PlaneType : unsigned {
+    S = 1,
+    E = 2,
+    A = 3,
+    N = 0
 };
 
 class DomainBase;
 enum class OutputType;
 
 struct DataCoupleMaterial {
-    double characteristic_length = -1.;
+    vec current_curvature{};
+    vec current_couple_stress{};
 
-    vec current_curvature;
-    vec current_couple_stress;
+    vec trial_curvature{};
+    vec trial_couple_stress{};
 
-    vec trial_curvature;
-    vec trial_couple_stress;
+    vec incre_curvature{};
+    vec incre_couple_stress{};
 
-    vec incre_curvature;
-    vec incre_couple_stress;
-
-    mat initial_couple_stiffness; // stiffness matrix
-    mat current_couple_stiffness; // stiffness matrix
-    mat trial_couple_stiffness;   // stiffness matrix
+    mat initial_couple_stiffness{}; // stiffness matrix
+    mat current_couple_stiffness{}; // stiffness matrix
+    mat trial_couple_stiffness{};   // stiffness matrix
 };
 
 struct DataMaterial {
-    const double tolerance = 1E-14;
     const double density = 0.;
     const MaterialType material_type = MaterialType::D0;
+    const PlaneType plane_type = PlaneType::N;
 
-    vec current_strain;      // current status
-    vec current_strain_rate; // current status
-    vec current_strain_acc;  // current status
-    vec current_stress;      // current status
-    // vec current_stress_rate; // current status
+    const double tolerance = 1E-14;
+    const double characteristic_length = -1.;
 
-    vec trial_strain;      // trial status
-    vec trial_strain_rate; // trial status
-    vec trial_strain_acc;  // trial status
-    vec trial_stress;      // trial status
-    // vec trial_stress_rate; // trial status
+    vec current_strain{};      // current status
+    vec current_strain_rate{}; // current status
+    vec current_strain_acc{};  // current status
+    vec current_stress{};      // current status
+    // vec current_stress_rate{}; // current status
 
-    vec incre_strain;      // incremental status
-    vec incre_strain_rate; // incremental status
-    vec incre_strain_acc;  // incremental status
-    vec incre_stress;      // incremental status
-    // vec incre_stress_rate; // incremental status
+    vec trial_strain{};      // trial status
+    vec trial_strain_rate{}; // trial status
+    vec trial_strain_acc{};  // trial status
+    vec trial_stress{};      // trial status
+    // vec trial_stress_rate{}; // trial status
 
-    vec initial_history; // initial status
-    vec current_history; // current status
-    vec trial_history;   // trial status
+    vec incre_strain{};      // incremental status
+    vec incre_strain_rate{}; // incremental status
+    vec incre_strain_acc{};  // incremental status
+    vec incre_stress{};      // incremental status
+    // vec incre_stress_rate{}; // incremental status
 
-    mat initial_stiffness; // stiffness matrix
-    mat current_stiffness; // stiffness matrix
-    mat trial_stiffness;   // stiffness matrix
+    vec initial_history{}; // initial status
+    vec current_history{}; // current status
+    vec trial_history{};   // trial status
 
-    mat initial_damping; // damping matrix
-    mat current_damping; // damping matrix
-    mat trial_damping;   // damping matrix
+    mat initial_stiffness{}; // stiffness matrix
+    mat current_stiffness{}; // stiffness matrix
+    mat trial_stiffness{};   // stiffness matrix
 
-    mat initial_inertial; // inertial matrix
-    mat current_inertial; // inertial matrix
-    mat trial_inertial;   // inertial matrix
+    mat initial_damping{}; // damping matrix
+    mat current_damping{}; // damping matrix
+    mat trial_damping{};   // damping matrix
+
+    mat initial_inertial{}; // inertial matrix
+    mat current_inertial{}; // inertial matrix
+    mat trial_inertial{};   // inertial matrix
 };
 
 class Material : protected DataMaterial, protected DataCoupleMaterial, public Tag {
     const bool initialized = false;
     const bool symmetric = false;
-    const bool support_couple = false;
+    const bool support_couple = false; // indicate if the material supports couple stress theory
 
     friend void ConstantStiffness(DataMaterial*);
     friend void ConstantDamping(DataMaterial*);
@@ -111,9 +120,10 @@ class Material : protected DataMaterial, protected DataCoupleMaterial, public Ta
     friend void PureWrapper(Material*);
 
 public:
-    explicit Material(unsigned = 0,                    // tag
-                      MaterialType = MaterialType::D0, // material type
-                      double = 0.                      // density
+    explicit Material(
+        unsigned = 0,                    // tag
+        MaterialType = MaterialType::D0, // material type
+        double = 0.                      // density
     );
     Material(const Material&) = default;
     Material(Material&&) = delete;                 // move forbidden
@@ -121,6 +131,10 @@ public:
     Material& operator=(Material&&) = delete;      // assign forbidden
 
     ~Material() override = default;
+
+    [[nodiscard]] double get_density() const;
+    [[nodiscard]] MaterialType get_material_type() const;
+    [[nodiscard]] PlaneType get_plane_type() const;
 
     int initialize_base(const shared_ptr<DomainBase>&);
 
@@ -137,10 +151,8 @@ public:
     [[nodiscard]] bool is_symmetric() const;
     [[nodiscard]] bool is_support_couple() const;
 
-    void set_characteristic_length(double);
+    void set_characteristic_length(double) const;
     [[nodiscard]] double get_characteristic_length() const;
-
-    [[nodiscard]] MaterialType get_material_type() const;
 
     [[nodiscard]] virtual double get_parameter(ParameterType) const;
 
@@ -221,7 +233,6 @@ public:
 namespace suanpan {
     unique_ptr<Material> make_copy(const shared_ptr<Material>&);
     unique_ptr<Material> make_copy(const unique_ptr<Material>&);
-    unique_ptr<Material> initialized_material_copy(const shared_ptr<DomainBase>&, uword);
 } // namespace suanpan
 
 #endif

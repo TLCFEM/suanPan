@@ -21,15 +21,33 @@
 #include <Recorder/OutputType.h>
 
 Section::Section(const unsigned T, const SectionType ST, const unsigned MT, const double A, vec&& EC)
-    : DataSection{MT, ST, A, 0., {-EC(0), EC(1)}, {}, {}, {}, {}, {}, {}, {}, {}, {}}
+    : DataSection{MT, ST, EC.head(2), A}
     , Tag(T) {}
+
+SectionType Section::get_section_type() const { return section_type; }
+
+double Section::get_area() const { return area; }
+
+double Section::get_linear_density() const { return linear_density; }
 
 int Section::initialize_base(const shared_ptr<DomainBase>& D) {
     if(initialized) return SUANPAN_SUCCESS;
 
-    if(0 != material_tag && (!D->find<Material>(material_tag) || MaterialType::D1 != D->get<Material>(material_tag)->get_material_type())) {
-        suanpan_warning("Section {} disabled as material {} cannot be found or wrong material type assigned.\n", get_tag(), material_tag);
-        return SUANPAN_FAIL;
+    if(0u != material_tag) {
+        if(!D->find<Material>(material_tag)) {
+            suanpan_warning("Section {} disabled as material {} cannot be found.\n", get_tag(), material_tag);
+            return SUANPAN_FAIL;
+        }
+        if(SectionType::OS3D == section_type) {
+            if(MaterialType::OS != D->get<Material>(material_tag)->get_material_type()) {
+                suanpan_warning("Section {} disabled as material {} has a wrong type, use OS type material only.\n", get_tag(), material_tag);
+                return SUANPAN_FAIL;
+            }
+        }
+        else if(MaterialType::D1 != D->get<Material>(material_tag)->get_material_type()) {
+            suanpan_warning("Section {} disabled as material {} has a wrong type, use 1D material only.\n", get_tag(), material_tag);
+            return SUANPAN_FAIL;
+        }
     }
 
     const auto size = static_cast<unsigned>(section_type);
@@ -58,11 +76,13 @@ bool Section::is_initialized() const { return initialized; }
 
 bool Section::is_symmetric() const { return symmetric; }
 
-SectionType Section::get_section_type() const { return section_type; }
-
 void Section::set_eccentricity(const vec& E) const { access::rw(eccentricity) = E; }
 
 const vec& Section::get_eccentricity() const { return eccentricity; }
+
+void Section::set_characteristic_length(const double L) const { access::rw(characteristic_length) = std::max(datum::eps, L); }
+
+double Section::get_characteristic_length() const { return characteristic_length; }
 
 const vec& Section::get_trial_deformation() const { return trial_deformation; }
 
@@ -72,6 +92,8 @@ const vec& Section::get_trial_resistance() const { return trial_resistance; }
 
 const mat& Section::get_trial_stiffness() const { return trial_stiffness; }
 
+const mat& Section::get_trial_geometry() const { return trial_geometry; }
+
 const vec& Section::get_current_deformation() const { return current_deformation; }
 
 const vec& Section::get_current_deformation_rate() const { return current_deformation_rate; }
@@ -80,14 +102,11 @@ const vec& Section::get_current_resistance() const { return current_resistance; 
 
 const mat& Section::get_current_stiffness() const { return current_stiffness; }
 
+const mat& Section::get_current_geometry() const { return current_geometry; }
+
 const mat& Section::get_initial_stiffness() const { return initial_stiffness; }
 
-double Section::get_parameter(const ParameterType P) {
-    if(ParameterType::AREA == P) return area;
-    if(ParameterType::LINEARDENSITY == P) return linear_density;
-    if(ParameterType::DENSITY == P) return linear_density / area;
-    return 0.;
-}
+const mat& Section::get_initial_geometry() const { return initial_geometry; }
 
 int Section::update_incre_status(const double i_strain) {
     const vec i_vec_strain{i_strain};

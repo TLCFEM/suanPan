@@ -39,11 +39,12 @@ protected:
     const double limit;
 
 public:
-    explicit NodeBasedCriterion(unsigned = 0, // tag
-                                unsigned = 0, // step tag
-                                unsigned = 0, // node tag
-                                unsigned = 0, // dof tag
-                                double = 0.   // limit
+    explicit NodeBasedCriterion(
+        unsigned = 0, // tag
+        unsigned = 0, // step tag
+        unsigned = 0, // node tag
+        unsigned = 0, // dof tag
+        double = 0.   // limit
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

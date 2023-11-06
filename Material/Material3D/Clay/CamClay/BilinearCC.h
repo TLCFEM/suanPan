@@ -37,20 +37,21 @@ struct DataBilinearCC {
     const double a, a_slope;
 };
 
-class BilinearCC final : DataBilinearCC, public NonlinearCamClay {
+class BilinearCC final : protected DataBilinearCC, public NonlinearCamClay {
     [[nodiscard]] double compute_a(double) const override;
     [[nodiscard]] double compute_da(double) const override;
 
 public:
-    BilinearCC(unsigned,   // tag
-               double,     // elastic modulus
-               double,     // poisson's ratio
-               double,     // beta
-               double,     // m
-               double,     // pt
-               double,     // a
-               double,     // a_slope
-               double = 0. // density
+    BilinearCC(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // poisson's ratio
+        double,     // beta
+        double,     // m
+        double,     // pt
+        double,     // a
+        double,     // a_slope
+        double = 0. // density
     );
 
     unique_ptr<Material> get_copy() override;

@@ -57,11 +57,12 @@ class F21H final : public SectionElement2D {
     vec current_local_resistance, trial_local_resistance;
 
 public:
-    F21H(unsigned,    // tag
-         uvec&&,      // node tag
-         unsigned,    // section tags
-         double = .2, // hinge length
-         bool = false // nonlinear geometry switch
+    F21H(
+        unsigned,    // tag
+        uvec&&,      // node tag
+        unsigned,    // section tags
+        double = .2, // hinge length
+        bool = false // nonlinear geometry switch
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

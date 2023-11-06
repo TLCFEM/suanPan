@@ -40,7 +40,8 @@ class CP4 final : public MaterialElement2D {
         vec coor;
         double weight;
         unique_ptr<Material> m_material;
-        mat pn_pxy, strain_mat;
+        mat pn_pxy;
+        sp_mat strain_mat;
         IntegrationPoint(vec&&, double, unique_ptr<Material>&&, mat&&);
     };
 
@@ -56,10 +57,11 @@ class CP4 final : public MaterialElement2D {
 
     mat hourglassing;
 
-    static void stack_stiffness(mat&, const mat&, const mat&, double);
+    static void stack_stiffness(mat&, const mat&, const sp_mat&, double);
 
 public:
-    CP4(unsigned,     // tag
+    CP4(
+        unsigned,     // tag
         uvec&&,       // node tag
         unsigned,     // material tag
         double = 1.,  // thickness

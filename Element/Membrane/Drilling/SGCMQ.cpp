@@ -161,7 +161,7 @@ int SGCMQ::initialize(const shared_ptr<DomainBase>& D) {
 
     auto& mat_stiff = mat_proto->get_initial_stiffness();
 
-    if(PlaneType::E == static_cast<PlaneType>(mat_proto->get_parameter(ParameterType::PLANETYPE))) suanpan::hacker(thickness) = 1.;
+    if(PlaneType::E == mat_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
 
     const auto ele_coor = get_coordinate(2);
 
@@ -201,7 +201,7 @@ int SGCMQ::initialize(const shared_ptr<DomainBase>& D) {
 
     for(auto&& I : int_pt) I.poly_strain *= NT;
 
-    form_mass(mat_proto->get_parameter(ParameterType::DENSITY), diff_coor);
+    form_mass(mat_proto->get_density(), diff_coor);
 
     form_body_force(diff_coor);
 
@@ -242,29 +242,9 @@ int SGCMQ::reset_status() {
 
 mat SGCMQ::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
-vector<vec> SGCMQ::record(const OutputType T) {
+vector<vec> SGCMQ::record(const OutputType P) {
     vector<vec> data;
-
-    if(T == OutputType::NMISES) {
-        mat A(int_pt.size(), 9);
-        vec B(int_pt.size(), fill::zeros);
-
-        for(size_t I = 0; I < int_pt.size(); ++I) {
-            if(const auto C = int_pt[I].m_material->record(OutputType::MISES); !C.empty()) B(I) = C.cbegin()->at(0);
-            A.row(I) = interpolation::quadratic(int_pt[I].coor);
-        }
-
-        const vec X = solve(A, B);
-
-        data.emplace_back(vec{dot(interpolation::quadratic(-1., -1.), X)});
-        data.emplace_back(vec{dot(interpolation::quadratic(1., -1.), X)});
-        data.emplace_back(vec{dot(interpolation::quadratic(1., 1.), X)});
-        data.emplace_back(vec{dot(interpolation::quadratic(-1., 1.), X)});
-    }
-    else if(T == OutputType::K) data.emplace_back(vectorise(current_stiffness));
-    else if(T == OutputType::M) data.emplace_back(vectorise(current_mass));
-    else for(const auto& I : int_pt) for(const auto& J : I.m_material->record(T)) data.emplace_back(J);
-
+    for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
     return data;
 }
 
@@ -323,10 +303,10 @@ mat SGCMQ::GetData(const OutputType P) {
     }
 
     mat A(int_pt.size(), 9);
-    mat B(int_pt.size(), 6, fill::zeros);
+    mat B(6, int_pt.size(), fill::zeros);
 
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        if(const auto C = int_pt[I].m_material->record(P); !C.empty()) B(I, 0, size(C[0])) = C[0];
+        if(const auto C = int_pt[I].m_material->record(P); !C.empty()) B(0, I, size(C[0])) = C[0];
         A.row(I) = interpolation::quadratic(int_pt[I].coor);
     }
 
@@ -337,7 +317,7 @@ mat SGCMQ::GetData(const OutputType P) {
     data.row(2) = interpolation::quadratic(1., 1.);
     data.row(3) = interpolation::quadratic(-1., 1.);
 
-    return (data * solve(A, B, solve_opts::fast)).t();
+    return (data * solve(A, B.t())).t();
 }
 
 void SGCMQ::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {

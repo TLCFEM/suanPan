@@ -37,20 +37,22 @@ class Box3D final : public Section3D {
     const unsigned int_pt_num;
 
 public:
-    Box3D(unsigned,     // tag
-          double,       // width
-          double,       // height
-          double,       // thickness
-          unsigned,     // material tag
-          unsigned = 6, // number of integration points
-          double = 0.,  // eccentricity
-          double = 0.   // eccentricity
+    Box3D(
+        unsigned,     // tag
+        double,       // width
+        double,       // height
+        double,       // thickness
+        unsigned,     // material tag
+        unsigned = 6, // number of integration points
+        double = 0.,  // eccentricity
+        double = 0.   // eccentricity
     );
-    Box3D(unsigned,        // tag
-          vec&&,           // dimension
-          unsigned,        // material tag
-          unsigned = 6,    // number of integration points
-          vec&& = {0., 0.} // eccentricity
+    Box3D(
+        unsigned,        // tag
+        vec&&,           // dimension
+        unsigned,        // material tag
+        unsigned = 6,    // number of integration points
+        vec&& = {0., 0.} // eccentricity
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

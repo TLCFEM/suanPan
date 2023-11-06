@@ -40,11 +40,10 @@ class Axisymmetric final : public Material2D {
 
     ResourceHolder<Material> base;
 
-    vec full_strain;
-
 public:
-    Axisymmetric(unsigned, // tag
-                 unsigned  // 3D material tag
+    Axisymmetric(
+        unsigned, // tag
+        unsigned  // 3D material tag
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

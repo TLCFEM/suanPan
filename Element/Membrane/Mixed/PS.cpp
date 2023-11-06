@@ -52,7 +52,7 @@ PS::PS(const unsigned T, uvec&& N, const unsigned M, const double TH)
 int PS::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
-    if(PlaneType::E == static_cast<PlaneType>(material_proto->get_parameter(ParameterType::PLANETYPE))) suanpan::hacker(thickness) = 1.;
+    if(PlaneType::E == material_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
 
     auto& ini_stiffness = material_proto->get_initial_stiffness();
 
@@ -99,7 +99,7 @@ int PS::initialize(const shared_ptr<DomainBase>& D) {
 
     for(auto& I : int_pt) I.poly_strain *= NT;
 
-    if(const auto t_density = material_proto->get_parameter(ParameterType::DENSITY); t_density > 0.) {
+    if(const auto t_density = material_proto->get_density(); t_density > 0.) {
         initial_mass.zeros(m_size, m_size);
         for(const auto& I : int_pt) {
             const auto n_int = compute_shape_function(I.coor, 0);
@@ -157,9 +157,9 @@ int PS::reset_status() {
 mat PS::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
 vector<vec> PS::record(const OutputType P) {
-    vector<vec> output;
-    for(const auto& I : int_pt) for(const auto& J : I.m_material->record(P)) output.emplace_back(J);
-    return output;
+    vector<vec> data;
+    for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
+    return data;
 }
 
 void PS::print() {

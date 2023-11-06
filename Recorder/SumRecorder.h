@@ -33,12 +33,13 @@
 
 class SumRecorder : public Recorder {
 public:
-    SumRecorder(unsigned,   // tag
-                uvec&&,     // object tags
-                OutputType, // recorder type
-                unsigned,   // interval
-                bool,       // if to record time
-                bool        // if to use hdf5
+    SumRecorder(
+        unsigned,   // tag
+        uvec&&,     // object tags
+        OutputType, // recorder type
+        unsigned,   // interval
+        bool,       // if to record time
+        bool        // if to use hdf5
     );
 
     void initialize(const shared_ptr<DomainBase>&) override;

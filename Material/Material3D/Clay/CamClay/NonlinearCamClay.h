@@ -26,6 +26,8 @@
  *     1. Computational Methods for Plasticity: Theory and Applications
  *        [10.1002/9780470694626](https://doi.org/10.1002/9780470694626)
  *        Chapter 10 Section 10.1
+ * 
+ * Note the definition of hardening variable alpha is different from the reference.
  *
  * @author tlc
  * @date 26/04/2019
@@ -48,8 +50,8 @@ struct DataNonlinearCamClay {
     const double pt;              // tensile yield hydrostatic stress
 };
 
-class NonlinearCamClay : DataNonlinearCamClay, public Material3D {
-    static constexpr unsigned max_iteration = 20;
+class NonlinearCamClay : protected DataNonlinearCamClay, public Material3D {
+    static constexpr unsigned max_iteration = 20u;
     static const double sqrt_three_two;
     static const mat unit_dev_tensor;
 
@@ -62,13 +64,14 @@ class NonlinearCamClay : DataNonlinearCamClay, public Material3D {
     [[nodiscard]] virtual double compute_da(double) const = 0;
 
 public:
-    NonlinearCamClay(unsigned,   // tag
-                     double,     // elastic modulus
-                     double,     // poisson's ratio
-                     double,     // beta
-                     double,     // m
-                     double,     // pt
-                     double = 0. // density
+    NonlinearCamClay(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // poisson's ratio
+        double,     // beta
+        double,     // m
+        double,     // pt
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;
@@ -80,8 +83,6 @@ public:
     int clear_status() override;
     int commit_status() override;
     int reset_status() override;
-
-    void print() override;
 };
 
 #endif

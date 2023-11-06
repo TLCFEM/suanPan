@@ -48,10 +48,11 @@ class Homogeneous final : public SectionShell {
     vector<IntegrationPoint> int_pt;
 
 public:
-    Homogeneous(unsigned,    // unique tag
-                unsigned,    // material tag
-                double,      // thickness
-                unsigned = 5 // number of IPs
+    Homogeneous(
+        unsigned,    // unique tag
+        unsigned,    // material tag
+        double,      // thickness
+        unsigned = 5 // number of IPs
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

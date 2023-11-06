@@ -19,10 +19,11 @@ element C3D8 1 1 2 3 4 5 6 7 8 1 G
 element C3D8 2 5 6 7 8 9 10 11 12 1 G
 
 hdf5recorder 1 Node RF3 9
-hdf5recorder 2 Element KAPPAP 1
 hdf5recorder 3 Element DT 1
 hdf5recorder 4 Element DC 1
 hdf5recorder 5 Element S 1
+hdf5recorder 6 Element YF 1
+hdf5recorder 7 Element HIST 1
 
 fix 1 1 1 2 5 6 9 10
 fix 2 2 1 4 5 8 9 12
@@ -44,35 +45,35 @@ peek element 1
 
 # Node 9:
 # Coordinate:
-# 5.0000 -5.0000 20.0000
+#   5.0000e+00 -5.0000e+00  2.0000e+01
 # Displacement:
-# 0 0 -0.1000
+#   0.0000e+00  0.0000e+00 -1.0000e-01
 # Resistance:
-# -1.1333e-13 1.5915e-13 -4.0729e+00
+#  -1.5635e-14  1.6473e-14 -3.3636e+01
 # 
 # Node 10:
 # Coordinate:
-# 5.0000 5.0000 20.0000
+#   5.0000e+00  5.0000e+00  2.0000e+01
 # Displacement:
-# 0 0.0370 -0.1000
+#   0.0000e+00  3.6742e-02 -1.0000e-01
 # Resistance:
-# -1.0423e-13 8.8103e-16 -4.0729e+00
+#  -8.4487e-15 -4.5427e-16 -3.3636e+01
 # 
 # Node 11:
 # Coordinate:
-# -5.0000 5.0000 20.0000
+#  -5.0000e+00  5.0000e+00  2.0000e+01
 # Displacement:
-# -0.0370 0.0370 -0.1000
+#  -3.6742e-02  3.6742e-02 -1.0000e-01
 # Resistance:
-# 4.5427e-16 7.5096e-16 -4.0729e+00
+#  -1.4442e-14 -4.6659e-15 -3.3636e+01
 # 
 # Node 12:
 # Coordinate:
-# -5.0000 -5.0000 20.0000
+#  -5.0000e+00 -5.0000e+00  2.0000e+01
 # Displacement:
-# -0.0370 0 -0.1000
+#  -3.6742e-02  0.0000e+00 -1.0000e-01
 # Resistance:
-# -5.9986e-16 1.4301e-13 -4.0729e+00
+#  -4.5101e-15  2.0442e-14 -3.3636e+01
 peek node 9 10 11 12
 
 # save recorder 1

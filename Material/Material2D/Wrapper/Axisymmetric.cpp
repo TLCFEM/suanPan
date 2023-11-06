@@ -22,32 +22,30 @@ const uvec Axisymmetric::F{0, 1, 2, 3};
 
 Axisymmetric::Axisymmetric(const unsigned T, const unsigned BT)
     : Material2D(T, PlaneType::A, 0.)
-    , base_tag(BT)
-    , full_strain(6, fill::zeros) {}
+    , base_tag(BT) {}
 
 int Axisymmetric::initialize(const shared_ptr<DomainBase>& D) {
-    base = suanpan::initialized_material_copy(D, base_tag);
+    base = D->initialized_material_copy(base_tag);
 
     if(nullptr == base || base->get_material_type() != MaterialType::D3) {
         suanpan_error("A valid 3D host material is required.\n");
         return SUANPAN_FAIL;
     }
 
-    access::rw(density) = base->get_parameter(ParameterType::DENSITY);
+    access::rw(density) = base->get_density();
 
     current_stiffness = trial_stiffness = initial_stiffness = base->get_initial_stiffness()(F, F);
 
     return SUANPAN_SUCCESS;
 }
 
-double Axisymmetric::get_parameter(const ParameterType P) const {
-    if(ParameterType::PLANETYPE == P) return static_cast<double>(plane_type);
-    return base->get_parameter(P);
-}
+double Axisymmetric::get_parameter(const ParameterType P) const { return base->get_parameter(P); }
 
 unique_ptr<Material> Axisymmetric::get_copy() { return make_unique<Axisymmetric>(*this); }
 
 int Axisymmetric::update_trial_status(const vec& t_strain) {
+    vec full_strain(6, fill::zeros);
+
     full_strain(F) = trial_strain = t_strain;
 
     if(SUANPAN_SUCCESS != base->update_trial_status(full_strain)) return SUANPAN_FAIL;
@@ -60,10 +58,8 @@ int Axisymmetric::update_trial_status(const vec& t_strain) {
 }
 
 int Axisymmetric::clear_status() {
-    current_strain.zeros();
-    trial_strain.zeros();
-    current_stress.zeros();
-    trial_stress.zeros();
+    trial_strain = current_strain.zeros();
+    trial_stress = current_stress.zeros();
     trial_stiffness = current_stiffness = initial_stiffness;
     return base->clear_status();
 }

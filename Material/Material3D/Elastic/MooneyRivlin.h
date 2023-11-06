@@ -38,18 +38,19 @@ struct DataMooneyRivlin {
     const double A10, A01;
 };
 
-class MooneyRivlin final : DataMooneyRivlin, public Material3D {
+class MooneyRivlin final : protected DataMooneyRivlin, public Material3D {
     static const vec weight;
     static const vec I1E;
     static const mat I2EE;
     static const double one_three, two_three, four_three, five_three, eight_nine;
 
 public:
-    MooneyRivlin(unsigned,    // tag
-                 double,      // bulk modulus
-                 double = 80, // a10
-                 double = 20, // a01
-                 double = 0.  // density
+    MooneyRivlin(
+        unsigned,    // tag
+        double,      // bulk modulus
+        double = 80, // a10
+        double = 20, // a01
+        double = 0.  // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

@@ -40,7 +40,7 @@ struct DataNonlinearHoffman {
 class NonlinearHoffman : protected DataNonlinearHoffman, public Material3D {
     static constexpr double two_third = 2. / 3.;
     static const double root_two_third;
-    static const unsigned max_iteration;
+    static constexpr unsigned max_iteration = 20u;
     static const uword sa;
     static const span sb;
 
@@ -50,16 +50,15 @@ class NonlinearHoffman : protected DataNonlinearHoffman, public Material3D {
     [[nodiscard]] virtual double compute_dk(double) const = 0;
 
 public:
-    NonlinearHoffman(unsigned,   // tag
-                     vec&&,      // elastic modulus
-                     vec&&,      // poissons ratio
-                     vec&&,      // sigma
-                     double = 0. // density
+    NonlinearHoffman(
+        unsigned,   // tag
+        vec&&,      // elastic modulus
+        vec&&,      // poissons ratio
+        vec&&,      // sigma
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;
-
-    [[nodiscard]] double get_parameter(ParameterType) const override;
 
     int update_trial_status(const vec&) override;
 

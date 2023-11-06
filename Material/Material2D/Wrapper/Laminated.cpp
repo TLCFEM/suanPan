@@ -23,16 +23,18 @@ Laminated::Laminated(const unsigned T, uvec&& MT)
     , mat_tag(std::forward<uvec>(MT)) {}
 
 int Laminated::initialize(const shared_ptr<DomainBase>& D) {
+    auto& t_density = access::rw(density);
+    t_density = 0.;
     initial_stiffness.zeros(3, 3);
     mat_pool.clear();
     mat_pool.reserve(mat_tag.n_elem);
     for(const auto I : mat_tag) {
-        mat_pool.emplace_back(suanpan::initialized_material_copy(D, I));
+        mat_pool.emplace_back(D->initialized_material_copy(I));
         if(nullptr == mat_pool.back() || mat_pool.back()->get_material_type() != MaterialType::D2) {
             suanpan_error("A valid 2D host material is required.\n");
             return SUANPAN_FAIL;
         }
-        access::rw(density) += mat_pool.back()->get_parameter(ParameterType::DENSITY);
+        t_density += mat_pool.back()->get_density();
         initial_stiffness += mat_pool.back()->get_initial_stiffness();
     }
 

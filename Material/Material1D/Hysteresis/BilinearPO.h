@@ -39,7 +39,7 @@ struct DataBilinearPO {
     const double c_hardening;
 };
 
-class BilinearPO final : DataBilinearPO, public PeakOriented {
+class BilinearPO final : protected DataBilinearPO, public PeakOriented {
     const double t_stress = elastic_modulus * t_strain;
     const double c_stress = elastic_modulus * c_strain;
 
@@ -49,13 +49,14 @@ class BilinearPO final : DataBilinearPO, public PeakOriented {
     [[nodiscard]] podarray<double> compute_compression_backbone(double) const override;
 
 public:
-    BilinearPO(int,    // tag
-               double, // elastic modulus
-               double, // tension yield strain
-               double, // tension hardening ratio
-               double, // compression yield strain
-               double, // compression hardening ratio
-               double  // density
+    BilinearPO(
+        int,    // tag
+        double, // elastic modulus
+        double, // tension yield strain
+        double, // tension hardening ratio
+        double, // compression yield strain
+        double, // compression hardening ratio
+        double  // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

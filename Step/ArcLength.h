@@ -35,15 +35,8 @@
 #include <Step/Step.h>
 
 class ArcLength final : public Step {
-    unsigned node, dof;
-    double magnitude;
-
 public:
-    explicit ArcLength(unsigned = 0, // tag
-                       unsigned = 0, // node tag
-                       unsigned = 0, // dof tag
-                       double = 0.   // magnitude
-    );
+    explicit ArcLength(unsigned);
 
     int initialize() override;
 

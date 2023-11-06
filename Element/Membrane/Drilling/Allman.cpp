@@ -79,7 +79,7 @@ Allman::Allman(const unsigned T, uvec&& NT, const unsigned MT, const double TH)
 int Allman::initialize(const shared_ptr<DomainBase>& D) {
     auto& mat_proto = D->get<Material>(material_tag(0));
 
-    if(PlaneType::E == static_cast<PlaneType>(mat_proto->get_parameter(ParameterType::PLANETYPE))) suanpan::hacker(thickness) = 1.;
+    if(PlaneType::E == mat_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
 
     auto& mat_stiff = mat_proto->get_initial_stiffness();
 
@@ -112,7 +112,7 @@ int Allman::initialize(const shared_ptr<DomainBase>& D) {
     }
     trial_stiffness = current_stiffness = initial_stiffness;
 
-    if(const auto t_density = mat_proto->get_parameter(ParameterType::DENSITY); t_density > 0.) {
+    if(const auto t_density = mat_proto->get_density(); t_density > 0.) {
         initial_mass.zeros(m_size, m_size);
         for(const auto& I : int_pt) {
             const rowvec n_int = shape::triangle(I.coor, 0) * inv_coor;
@@ -162,9 +162,9 @@ int Allman::reset_status() {
     return code;
 }
 
-vector<vec> Allman::record(const OutputType T) {
+vector<vec> Allman::record(const OutputType P) {
     vector<vec> data;
-    for(const auto& I : int_pt) for(const auto& J : I.m_material->record(T)) data.emplace_back(J);
+    for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
     return data;
 }
 

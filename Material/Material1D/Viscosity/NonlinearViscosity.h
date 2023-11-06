@@ -37,7 +37,7 @@ struct DataNonlinearViscosity {
     const double limit;
 };
 
-class NonlinearViscosity : DataNonlinearViscosity, public Material1D {
+class NonlinearViscosity : protected DataNonlinearViscosity, public Material1D {
     const double a = (.5 * alpha - .5) * pow(limit, alpha - 3.);
     const double b = (1.5 - .5 * alpha) * pow(limit, alpha - 1.);
 
@@ -46,9 +46,10 @@ class NonlinearViscosity : DataNonlinearViscosity, public Material1D {
     [[nodiscard]] virtual double compute_damping_coefficient(double, double) const = 0;
 
 public:
-    NonlinearViscosity(unsigned, // tag
-                       double,   // alpha
-                       double    // cut-off
+    NonlinearViscosity(
+        unsigned, // tag
+        double,   // alpha
+        double    // cut-off
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

@@ -49,11 +49,13 @@ class CAX8 final : public MaterialElement2D {
     static vec isoparametric_mapping(const vec&);
 
 public:
-    CAX8(unsigned,      // tag
-         uvec&&,        // node tag
-         unsigned,      // material tag
-         bool = false,  // reduced integration
-         bool = false); // nonlinear geometry switch
+    CAX8(
+        unsigned,     // tag
+        uvec&&,       // node tag
+        unsigned,     // material tag
+        bool = false, // reduced integration
+        bool = false
+    ); // nonlinear geometry switch
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

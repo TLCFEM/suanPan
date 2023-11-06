@@ -36,8 +36,8 @@
 #endif
 
 class VisualisationRecorder final : public Recorder {
-    unsigned total_counter = 0;
-    unsigned width = 6;
+    unsigned total_counter = 0u;
+    unsigned width = 6u;
 
 #ifdef SUANPAN_VTK
     vtkInfo config;
@@ -46,11 +46,12 @@ class VisualisationRecorder final : public Recorder {
 #endif
 
 public:
-    VisualisationRecorder(unsigned,   // tag
-                          OutputType, // recorder type
-                          unsigned,   // interval
-                          unsigned,   // output width
-                          double = 1. // scale
+    VisualisationRecorder(
+        unsigned,   // tag
+        OutputType, // recorder type
+        unsigned,   // interval
+        unsigned,   // output width
+        double = 1. // scale
     );
 
     void record(const shared_ptr<DomainBase>&) override;

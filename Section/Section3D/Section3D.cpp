@@ -24,15 +24,42 @@ Section3D::IntegrationPoint::IntegrationPoint(const double CY, const double CZ, 
     , weight(W)
     , s_material(std::forward<unique_ptr<Material>>(M)) {}
 
-Section3D::IntegrationPoint::IntegrationPoint(const IntegrationPoint& old_obj)
-    : coor_y(old_obj.coor_y)
-    , coor_z(old_obj.coor_z)
-    , weight(old_obj.weight)
-    , s_material(suanpan::make_copy(old_obj.s_material)) {}
+void Section3D::initialize_stiffness() {
+    initial_stiffness.zeros(3, 3);
+    for(const auto& I : int_pt) {
+        const auto ea = I.s_material->get_initial_stiffness().at(0) * I.weight;
+        const auto arm_y = eccentricity(0) - I.coor_y;
+        const auto arm_z = I.coor_z - eccentricity(1);
+        initial_stiffness(0, 0) += ea;
+        initial_stiffness(0, 1) += ea * arm_y;
+        initial_stiffness(0, 2) += ea * arm_z;
+        initial_stiffness(1, 1) += ea * arm_y * arm_y;
+        initial_stiffness(1, 2) += ea * arm_y * arm_z;
+        initial_stiffness(2, 2) += ea * arm_z * arm_z;
+    }
+    initial_stiffness(1, 0) = initial_stiffness(0, 1);
+    initial_stiffness(2, 0) = initial_stiffness(0, 2);
+    initial_stiffness(2, 1) = initial_stiffness(1, 2);
+
+    trial_stiffness = current_stiffness = initial_stiffness;
+}
 
 Section3D::Section3D(const unsigned T, const unsigned MT, const double A, vec&& E)
     : Section(T, SectionType::D3, MT, A, std::forward<vec>(E)) {}
 
+void Section3D::set_characteristic_length(const double L) const {
+    Section::set_characteristic_length(L);
+    for(const auto& I : int_pt) I.s_material->set_characteristic_length(L);
+}
+
+/**
+ * \brief The deformation is assumed to contain the following.
+ *
+ *  [0]: axial strain\n
+ *  [1]: curvature about the z-axis (major)\n
+ *  [2]: curvature about the y-axis (minor).
+ *
+ */
 int Section3D::update_trial_status(const vec& t_deformation) {
     if(const vec incre_deformation = (trial_deformation = t_deformation) - current_deformation; norm(incre_deformation) <= datum::eps) return SUANPAN_SUCCESS;
 

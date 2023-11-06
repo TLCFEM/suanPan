@@ -28,7 +28,12 @@ CP6::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Mate
     , weight(W)
     , m_material(std::forward<unique_ptr<Material>>(M))
     , pn_pxy(std::forward<mat>(P))
-    , strain_mat(3, m_size, fill::zeros) {}
+    , strain_mat(3, m_size) {
+    for(auto I = 0u, J = 0u, K = 1u; I < m_node; ++I, J += m_dof, K += m_dof) {
+        strain_mat(0, J) = strain_mat(2, K) = pn_pxy(0, I);
+        strain_mat(2, J) = strain_mat(1, K) = pn_pxy(1, I);
+    }
+}
 
 CP6::CP6(const unsigned T, uvec&& NT, const unsigned MT, const double TH, const bool R)
     : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(NT), uvec{MT}, R, {DOF::U1, DOF::U2})
@@ -37,7 +42,7 @@ CP6::CP6(const unsigned T, uvec&& NT, const unsigned MT, const double TH, const 
 int CP6::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
-    if(PlaneType::E == static_cast<PlaneType>(material_proto->get_parameter(ParameterType::PLANETYPE))) suanpan::hacker(thickness) = 1.;
+    if(PlaneType::E == material_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
 
     mat ele_coor(m_node, m_node, fill::none);
     ele_coor.col(0).fill(1.);
@@ -62,17 +67,12 @@ int CP6::initialize(const shared_ptr<DomainBase>& D) {
         vec coor{ele_coor(I + 3llu, 1), ele_coor(I + 3llu, 2)};
         int_pt.emplace_back(std::move(coor), area * thickness / 3., material_proto->get_copy(), shape::triangle(coor, 1) * inv_coor);
 
-        auto& c_pt = int_pt.back();
-
-        for(unsigned J = 0, K = 0, L = 1; J < m_node; ++J, K += m_dof, L += m_dof) {
-            c_pt.strain_mat(0, K) = c_pt.strain_mat(2, L) = c_pt.pn_pxy(0, J);
-            c_pt.strain_mat(2, K) = c_pt.strain_mat(1, L) = c_pt.pn_pxy(1, J);
-        }
+        const auto& c_pt = int_pt.back();
         initial_stiffness += c_pt.weight * c_pt.strain_mat.t() * ini_stiffness * c_pt.strain_mat;
     }
     trial_stiffness = current_stiffness = initial_stiffness;
 
-    if(const auto t_density = material_proto->get_parameter(ParameterType::DENSITY); t_density > 0.) {
+    if(const auto t_density = material_proto->get_density(); t_density > 0.) {
         initial_mass.zeros(m_size, m_size);
         for(const auto& I : int_pt) {
             const rowvec n_int = shape::triangle(I.coor, 0) * inv_coor;
@@ -176,9 +176,9 @@ int CP6::reset_status() {
     return code;
 }
 
-vector<vec> CP6::record(const OutputType T) {
+vector<vec> CP6::record(const OutputType P) {
     vector<vec> data;
-    for(const auto& I : int_pt) for(const auto& J : I.m_material->record(T)) data.emplace_back(J);
+    for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
     return data;
 }
 

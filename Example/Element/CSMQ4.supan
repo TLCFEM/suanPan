@@ -22,8 +22,7 @@ element CSMQ4 3 3 4 10 9 1 1 1E-1
 element CSMQ4 4 4 5 11 10 1 1 1E-1
 element CSMQ4 5 5 6 12 11 1 1 1E-1
 
-recorder 1 plain Element NMISES 1
-recorder 2 plain Element S 1
+recorder 1 plain Element S 1
 
 fix 1 1 1 7
 fix 2 2 1

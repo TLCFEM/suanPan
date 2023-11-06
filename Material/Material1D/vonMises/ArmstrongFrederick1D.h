@@ -47,21 +47,22 @@ struct DataArmstrongFrederick1D {
     const vec a, b;
 };
 
-class ArmstrongFrederick1D final : DataArmstrongFrederick1D, public Material1D {
-    static constexpr unsigned max_iteration = 20;
+class ArmstrongFrederick1D final : protected DataArmstrongFrederick1D, public Material1D {
+    static constexpr unsigned max_iteration = 20u;
 
     const unsigned size = static_cast<unsigned>(a.size());
 
 public:
-    ArmstrongFrederick1D(unsigned,   // tag
-                         double,     // elastic modulus
-                         double,     // yield stress
-                         double,     // saturated stress
-                         double,     // linear hardening modulus
-                         double,     // m
-                         vec&&,      // a
-                         vec&&,      // b
-                         double = 0. // density
+    ArmstrongFrederick1D(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // yield stress
+        double,     // saturated stress
+        double,     // linear hardening modulus
+        double,     // m
+        vec&&,      // a
+        vec&&,      // b
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;
@@ -75,8 +76,6 @@ public:
     int clear_status() override;
     int commit_status() override;
     int reset_status() override;
-
-    vector<vec> record(OutputType) override;
 
     void print() override;
 };

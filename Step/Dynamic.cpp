@@ -36,7 +36,7 @@ int Dynamic::initialize() {
 
     factory->set_analysis_type(AnalysisType::DYNAMICS);
 
-    const auto& t_domain = database.lock();
+    const auto t_domain = database.lock();
 
     if(SUANPAN_SUCCESS != t_domain->restart()) return SUANPAN_FAIL;
 
@@ -63,7 +63,7 @@ int Dynamic::initialize() {
 
     // solver
     // avoid arc length solver
-    if(nullptr != solver) if(dynamic_cast<Ramm*>(solver.get())) solver = nullptr;
+    if(nullptr != solver) if(std::dynamic_pointer_cast<Ramm>(solver)) solver = nullptr;
     // automatically enable displacement controlled solver
     if(nullptr == solver) {
         auto flag = false;
@@ -75,7 +75,7 @@ int Dynamic::initialize() {
         flag ? solver = make_shared<MPDC>() : solver = make_shared<Newton>();
     }
 
-    if(dynamic_cast<BFGS*>(solver.get()) && dynamic_cast<LeeNewmarkBase*>(modifier.get())) {
+    if(std::dynamic_pointer_cast<BFGS>(solver) && std::dynamic_pointer_cast<LeeNewmarkBase>(modifier)) {
         suanpan_error("BFGS solver is not supported by Lee's damping model.\n");
         return SUANPAN_FAIL;
     }
@@ -102,7 +102,7 @@ int Dynamic::analyze() {
 
     while(true) {
         // check if the target time point is hit
-        if(remain_time <= 1E-7) return SUANPAN_SUCCESS;
+        if(remain_time <= 1E-10) return SUANPAN_SUCCESS;
         // check if the maximum substep number is hit
         if(++num_increment > get_max_substep()) {
             suanpan_warning("The maximum sub-step number {} reached.\n", get_max_substep());
@@ -120,7 +120,7 @@ int Dynamic::analyze() {
             G->record();
             if(G->allow_to_change_time_step()) {
                 if(!is_fixed_step_size() && ++num_converged_step > 5) {
-                    step_time = std::min(get_max_step_size(), step_time * time_step_amplification);
+                    step_time = std::min(get_max_step_size(), step_time * S->get_step_amplifier());
                     num_converged_step = 0;
                 }
                 // check if time overflows

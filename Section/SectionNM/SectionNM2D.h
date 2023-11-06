@@ -38,10 +38,10 @@ struct DataSectionNM2D {
 
 class SectionNM2D : protected DataSectionNM2D, public SectionNM {
 public:
-    SectionNM2D(unsigned, // tag
-                double,
-                double,
-                double);
+    SectionNM2D(
+        unsigned, // tag
+        double, double, double
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 };

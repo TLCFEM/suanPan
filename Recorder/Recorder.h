@@ -48,12 +48,13 @@ protected:
     bool if_perform_record();
 
 public:
-    Recorder(unsigned,   // tag
-             uvec&&,     // object tags
-             OutputType, // recorder type
-             unsigned,   // interval
-             bool,       // if to record time
-             bool        // if to use hdf5
+    Recorder(
+        unsigned,   // tag
+        uvec&&,     // object tags
+        OutputType, // recorder type
+        unsigned,   // interval
+        bool,       // if to record time
+        bool        // if to use hdf5
     );
     Recorder(const Recorder&) = delete;
     Recorder(Recorder&&) = delete;                 // move forbidden
@@ -63,7 +64,7 @@ public:
 
     virtual void initialize(const shared_ptr<DomainBase>&);
 
-    void set_object_tag(const uvec&);
+    void set_object_tag(uvec&&);
     [[nodiscard]] const uvec& get_object_tag() const;
 
     void set_variable_type(OutputType);

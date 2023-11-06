@@ -24,7 +24,7 @@ const mat NonlinearGurson::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 NonlinearGurson::NonlinearGurson(const unsigned T, const double E, const double V, const double Q1, const double Q2, const double FN, const double SN, const double EN, const double R)
     : DataNonlinearGurson{E, V, Q1, Q2, FN, SN, EN}
-    , Material3D(T, R) { access::rw(tolerance) = 1E-13; }
+    , Material3D(T, R) {}
 
 int NonlinearGurson::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = tensor::isotropic_stiffness(elastic_modulus, poissons_ratio);
@@ -34,19 +34,12 @@ int NonlinearGurson::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double NonlinearGurson::get_parameter(const ParameterType P) const {
-    if(ParameterType::DENSITY == P) return density;
-    if(ParameterType::ELASTICMODULUS == P || ParameterType::YOUNGSMODULUS == P || ParameterType::E == P) return elastic_modulus;
-    if(ParameterType::SHEARMODULUS == P || ParameterType::G == P) return elastic_modulus / (2. + 2. * poissons_ratio);
-    if(ParameterType::BULKMODULUS == P) return elastic_modulus / (3. - 6. * poissons_ratio);
-    if(ParameterType::POISSONSRATIO == P) return poissons_ratio;
-    return 0.;
-}
+double NonlinearGurson::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
 
 int NonlinearGurson::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
-    if(norm(incre_strain) <= tolerance) return SUANPAN_SUCCESS;
+    if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
 
     trial_stress = current_stress + (trial_stiffness = initial_stiffness) * incre_strain;
 
@@ -66,7 +59,8 @@ int NonlinearGurson::update_trial_status(const vec& t_strain) {
     auto gamma = 0.;
     double denom;
 
-    unsigned counter = 0;
+    auto counter = 0u;
+    auto ref_error = 1.;
     while(true) {
         if(max_iteration == ++counter) {
             suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
@@ -111,9 +105,10 @@ int NonlinearGurson::update_trial_status(const vec& t_strain) {
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
-        const auto error = norm(residual);
+        const auto error = inf_norm(incre);
+        if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error <= tolerance || norm(incre) <= tolerance) break;
+        if(error < tolerance * ref_error || (inf_norm(residual) < tolerance && counter > 5u)) break;
 
         gamma -= incre(0);
         pe -= incre(1);
@@ -166,9 +161,7 @@ int NonlinearGurson::reset_status() {
 }
 
 vector<vec> NonlinearGurson::record(const OutputType P) {
-    if(P == OutputType::PEEQ) return {vec{current_history(0)}};
     if(P == OutputType::VF) return {vec{current_history(1)}};
-    if(P == OutputType::PE) return {vec{current_strain - solve(initial_stiffness, current_stress)}};
 
     return Material3D::record(P);
 }

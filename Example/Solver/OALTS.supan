@@ -1,0 +1,50 @@
+# A TEST MODEL FOR SUPPORTMOTION INTEGRATOR
+
+node 1 0 0
+node 2 0 1
+
+material Elastic1D 1 100 .1
+
+section Rectangle2D 1 12 1 1
+
+element B21 1 1 2 1 6 1
+
+mass 2 2 10 1
+
+fix 1 2 1
+fix 2 3 1
+
+amplitude Tabular 1 EZ
+
+supportacceleration 2 1 .2 1 1
+
+hdf5recorder 1 Node U1 1 2
+
+step dynamic 1 1
+set ini_step_size 1E-2
+set fixed_step_size true
+
+integrator OALTS 1 .8
+
+converger RelIncreDisp 1 1E-10 4 1
+
+analyze
+
+# Node 2:
+# Coordinate:
+#   0.0000e+00  1.0000e+00
+# Displacement:
+#  -1.4318e-01 -2.6075e-04  5.7910e-02
+# Resistance:
+#  -1.1802e+01  1.3240e-01 -1.0595e-01
+# Velocity:
+#  -3.0080e-01 -6.2230e-03  5.6520e-01
+# Acceleration:
+#   1.1154e+00 -1.6550e-01  1.2249e-01
+peek node 1 2
+
+peek integrator 1
+
+# save recorder 1
+
+exit

@@ -40,9 +40,10 @@ struct DataSectionNM {
 };
 
 class SectionNM : protected DataSectionNM, public Section {
-public:
-    const double tolerance = 1E-13;
+protected:
+    static constexpr double tolerance = 1E-14;
 
+public:
     using Section::Section;
 
     void initialize_history(unsigned);

@@ -49,12 +49,13 @@ class PatchCube final : public MaterialPatch3D {
     vector<IntegrationPoint> int_pt;
 
 public:
-    PatchCube(unsigned, // tag
-              vec&&,    // knot x
-              vec&&,    // knot y
-              vec&&,    // knot z
-              uvec&&,   // node tag
-              unsigned  // material tag
+    PatchCube(
+        unsigned, // tag
+        vec&&,    // knot x
+        vec&&,    // knot y
+        vec&&,    // knot z
+        uvec&&,   // node tag
+        unsigned  // material tag
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;
