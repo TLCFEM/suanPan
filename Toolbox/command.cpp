@@ -649,7 +649,7 @@ bool normalise_command(string& all_line, string& command_line) {
     auto process = true;
 
     // clear comment line
-    if('#' == command_line.front()) command_line.clear();
+    if(!command_line.empty() && '#' == command_line.front()) command_line.clear();
     // remove inline comment
     if(const auto if_comment = command_line.find('!'); string::npos != if_comment) command_line.erase(if_comment);
     // remove all delimiters
@@ -657,7 +657,7 @@ bool normalise_command(string& all_line, string& command_line) {
     while(!command_line.empty() && ' ' == command_line.back()) command_line.pop_back();
     // it is a command spanning multiple lines
     if(!command_line.empty() && '\\' == command_line.back()) {
-        while(!command_line.empty() && (' ' == command_line.back() || '\\' == command_line.back())) command_line.pop_back();
+        while(!command_line.empty() && '\\' == command_line.back()) command_line.pop_back();
         process = false;
     }
     all_line.append(command_line);
