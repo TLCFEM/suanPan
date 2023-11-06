@@ -81,14 +81,9 @@ namespace Catch {
     namespace Benchmark {
         namespace Detail {
             namespace {
-                template<typename URng, typename Estimator> static sample resample(URng& rng,
-                                                                                   unsigned int resamples,
-                                                                                   std::vector<double>::const_iterator first,
-                                                                                   std::vector<double>::const_iterator last,
-                                                                                   Estimator& estimator) {
+                template<typename URng, typename Estimator> static sample resample(URng& rng, unsigned int resamples, std::vector<double>::const_iterator first, std::vector<double>::const_iterator last, Estimator& estimator) {
                     auto n = static_cast<size_t>(last - first);
-                    std::uniform_int_distribution<decltype( n )> dist(0,
-                                                                      n - 1);
+                    std::uniform_int_distribution<decltype( n )> dist(0, n - 1);
 
                     sample out;
                     out.reserve(resamples);
@@ -98,22 +93,15 @@ namespace Catch {
                     resampled.reserve(n);
                     for(size_t i = 0; i < resamples; ++i) {
                         resampled.clear();
-                        for(size_t s = 0; s < n; ++s) {
-                            resampled.push_back(
-                                first[static_cast<std::ptrdiff_t>(
-                                    dist(rng))]);
-                        }
-                        const auto estimate =
-                            estimator(resampled.begin(), resampled.end());
+                        for(size_t s = 0; s < n; ++s) { resampled.push_back(first[static_cast<std::ptrdiff_t>(dist(rng))]); }
+                        const auto estimate = estimator(resampled.begin(), resampled.end());
                         out.push_back(estimate);
                     }
                     std::sort(out.begin(), out.end());
                     return out;
                 }
 
-                static double outlier_variance(Estimate<double> mean,
-                                               Estimate<double> stddev,
-                                               int n) {
+                static double outlier_variance(Estimate<double> mean, Estimate<double> stddev, int n) {
                     double sb = stddev.point;
                     double mn = mean.point / n;
                     double mg_min = mn / 2.;
@@ -128,8 +116,7 @@ namespace Catch {
                         double k0 = -n * nd;
                         double k1 = sb2 - n * sg2 + nd;
                         double det = k1 * k1 - 4 * sg2 * k0;
-                        return static_cast<int>(-2. * k0 /
-                            (k1 + std::sqrt(det)));
+                        return static_cast<int>(-2. * k0 / (k1 + std::sqrt(det)));
                     };
 
                     auto var_out = [n, sb2, sg2](double c) {
@@ -137,11 +124,7 @@ namespace Catch {
                         return (nc / n) * (sb2 - nc * sg2);
                     };
 
-                    return (std::min)(var_out(1),
-                                      var_out(
-                                          (std::min)(c_max(0.),
-                                                     c_max(mg_min)))) /
-                        sb2;
+                    return (std::min)(var_out(1), var_out((std::min)(c_max(0.), c_max(mg_min)))) / sb2;
                 }
 
                 static double erf_inv(double x) {
@@ -222,18 +205,12 @@ namespace Catch {
                     return p * x;
                 }
 
-                static double standard_deviation(std::vector<double>::const_iterator first,
-                                                 std::vector<double>::const_iterator last) {
+                static double standard_deviation(std::vector<double>::const_iterator first, std::vector<double>::const_iterator last) {
                     auto m = Catch::Benchmark::Detail::mean(first, last);
-                    double variance =
-                        std::accumulate(first,
-                                        last,
-                                        0.,
-                                        [m](double a, double b) {
-                                            double diff = b - m;
-                                            return a + diff * diff;
-                                        }) /
-                        (last - first);
+                    double variance = std::accumulate(first, last, 0., [m](double a, double b) {
+                        double diff = b - m;
+                        return a + diff * diff;
+                    }) / (last - first);
                     return std::sqrt(variance);
                 }
             } // namespace
@@ -266,8 +243,7 @@ namespace Catch {
                 return xj + g * (xj1 - xj);
             }
 
-            OutlierClassification classify_outliers(std::vector<double>::const_iterator first,
-                                                    std::vector<double>::const_iterator last) {
+            OutlierClassification classify_outliers(std::vector<double>::const_iterator first, std::vector<double>::const_iterator last) {
                 std::vector<double> copy(first, last);
 
                 auto q1 = weighted_average_quantile(1, 4, copy.begin(), copy.end());
@@ -290,8 +266,7 @@ namespace Catch {
                 return o;
             }
 
-            double mean(std::vector<double>::const_iterator first,
-                        std::vector<double>::const_iterator last) {
+            double mean(std::vector<double>::const_iterator first, std::vector<double>::const_iterator last) {
                 auto count = last - first;
                 double sum = 0.;
                 while(first != last) {
@@ -317,13 +292,9 @@ namespace Catch {
                 return result;
             }
 
-            bootstrap_analysis analyse_samples(double confidence_level,
-                                               unsigned int n_resamples,
-                                               std::vector<double>::iterator first,
-                                               std::vector<double>::iterator last) {
+            bootstrap_analysis analyse_samples(double confidence_level, unsigned int n_resamples, std::vector<double>::iterator first, std::vector<double>::iterator last) {
                 CATCH_INTERNAL_START_WARNINGS_SUPPRESSION
-                CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS
-                static std::random_device entropy;
+                CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS static std::random_device entropy;
                 CATCH_INTERNAL_STOP_WARNINGS_SUPPRESSION
 
                 auto n = static_cast<int>(last - first); // seriously, one can't use integral types without hell in C++
@@ -332,8 +303,7 @@ namespace Catch {
                 auto stddev = &standard_deviation;
 
 #if defined(CATCH_CONFIG_USE_ASYNC)
-                auto Estimate = [=](double (*f)(std::vector<double>::const_iterator,
-                                                std::vector<double>::const_iterator)) {
+                auto Estimate = [=](double (*f)(std::vector<double>::const_iterator, std::vector<double>::const_iterator)) {
                     auto seed = entropy();
                     return std::async(std::launch::async, [=] {
                         std::mt19937 rng(seed);
@@ -401,21 +371,16 @@ namespace Catch {
     bool Approx::equalityComparisonImpl(const double other) const {
         // First try with fixed margin, then compute margin based on epsilon, scale and Approx's value
         // Thanks to Richard Harris for his help refining the scaled margin value
-        return marginComparison(m_value, other, m_margin)
-            || marginComparison(m_value, other, m_epsilon * (m_scale + std::fabs(std::isinf(m_value) ? 0 : m_value)));
+        return marginComparison(m_value, other, m_margin) || marginComparison(m_value, other, m_epsilon * (m_scale + std::fabs(std::isinf(m_value) ? 0 : m_value)));
     }
 
     void Approx::setMargin(double newMargin) {
-        CATCH_ENFORCE(newMargin >= 0,
-                      "Invalid Approx::margin: " << newMargin << '.'
-                      << " Approx::Margin has to be non-negative.");
+        CATCH_ENFORCE(newMargin >= 0, "Invalid Approx::margin: " << newMargin << '.' << " Approx::Margin has to be non-negative.");
         m_margin = newMargin;
     }
 
     void Approx::setEpsilon(double newEpsilon) {
-        CATCH_ENFORCE(newEpsilon >= 0 && newEpsilon <= 1.0,
-                      "Invalid Approx::epsilon: " << newEpsilon << '.'
-                      << " Approx::epsilon has to be in [0, 1]");
+        CATCH_ENFORCE(newEpsilon >= 0 && newEpsilon <= 1.0, "Invalid Approx::epsilon: " << newEpsilon << '.' << " Approx::epsilon has to be in [0, 1]");
         m_epsilon = newEpsilon;
     }
 
@@ -430,8 +395,7 @@ namespace Catch {
 
 namespace Catch {
     AssertionResultData::AssertionResultData(ResultWas::OfType _resultType, LazyExpression const& _lazyExpression)
-        :
-        lazyExpression(_lazyExpression)
+        : lazyExpression(_lazyExpression)
         , resultType(_resultType) {}
 
     std::string AssertionResultData::reconstructExpression() const {
@@ -486,9 +450,7 @@ namespace Catch {
 
     std::string AssertionResult::getExpandedExpression() const {
         std::string expr = m_resultData.reconstructExpression();
-        return expr.empty()
-                   ? getExpression()
-                   : expr;
+        return expr.empty() ? getExpression() : expr;
     }
 
     StringRef AssertionResult::getMessage() const { return m_resultData.message; }
@@ -520,16 +482,11 @@ namespace Catch {
             const auto bazelShardTotal = Detail::getEnv("TEST_TOTAL_SHARDS");
             const auto bazelShardInfoFile = Detail::getEnv("TEST_SHARD_STATUS_FILE");
 
-            const bool has_all =
-                bazelShardIndex && bazelShardTotal && bazelShardInfoFile;
+            const bool has_all = bazelShardIndex && bazelShardTotal && bazelShardInfoFile;
             if(!has_all) {
                 // We provide nice warning message if the input is
                 // misconfigured.
-                auto warn = [](const char* env_var) {
-                    Catch::cerr()
-                        << "Warning: Bazel shard configuration is missing '"
-                        << env_var << "'. Shard configuration is skipped.\n";
-                };
+                auto warn = [](const char* env_var) { Catch::cerr() << "Warning: Bazel shard configuration is missing '" << env_var << "'. Shard configuration is skipped.\n"; };
                 if(!bazelShardIndex) { warn("TEST_SHARD_INDEX"); }
                 if(!bazelShardTotal) { warn("TEST_TOTAL_SHARDS"); }
                 if(!bazelShardInfoFile) { warn("TEST_SHARD_STATUS_FILE"); }
@@ -538,36 +495,23 @@ namespace Catch {
 
             auto shardIndex = parseUInt(bazelShardIndex);
             if(!shardIndex) {
-                Catch::cerr()
-                    << "Warning: could not parse 'TEST_SHARD_INDEX' ('" << bazelShardIndex
-                    << "') as unsigned int.\n";
+                Catch::cerr() << "Warning: could not parse 'TEST_SHARD_INDEX' ('" << bazelShardIndex << "') as unsigned int.\n";
                 return {};
             }
             auto shardTotal = parseUInt(bazelShardTotal);
             if(!shardTotal) {
-                Catch::cerr()
-                    << "Warning: could not parse 'TEST_TOTAL_SHARD' ('"
-                    << bazelShardTotal << "') as unsigned int.\n";
+                Catch::cerr() << "Warning: could not parse 'TEST_TOTAL_SHARD' ('" << bazelShardTotal << "') as unsigned int.\n";
                 return {};
             }
 
-            return bazelShardingOptions{
-                *shardIndex, *shardTotal, bazelShardInfoFile
-            };
+            return bazelShardingOptions{*shardIndex, *shardTotal, bazelShardInfoFile};
         }
     } // end namespace
 
-    bool operator==(ProcessedReporterSpec const& lhs,
-                    ProcessedReporterSpec const& rhs) {
-        return lhs.name == rhs.name &&
-            lhs.outputFilename == rhs.outputFilename &&
-            lhs.colourMode == rhs.colourMode &&
-            lhs.customOptions == rhs.customOptions;
-    }
+    bool operator==(ProcessedReporterSpec const& lhs, ProcessedReporterSpec const& rhs) { return lhs.name == rhs.name && lhs.outputFilename == rhs.outputFilename && lhs.colourMode == rhs.colourMode && lhs.customOptions == rhs.customOptions; }
 
     Config::Config(ConfigData const& data)
-        :
-        m_data(data) {
+        : m_data(data) {
         // We need to trim filter specs to avoid trouble with superfluous
         // whitespace (esp. important for bdd macros, as those are manually
         // aligned with whitespace).
@@ -583,7 +527,9 @@ namespace Catch {
 #else
                 "console",
 #endif
-                {}, {}, {}
+                {},
+                {},
+                {}
             });
         }
 
@@ -606,20 +552,11 @@ namespace Catch {
             // using the default output below to make the code simpler
             // and avoid superfluous copies.
             if(reporterSpec.outputFile().none()) {
-                CATCH_ENFORCE(!defaultOutputUsed,
-                              "Internal error: cannot use default output for "
-                              "multiple reporters");
+                CATCH_ENFORCE(!defaultOutputUsed, "Internal error: cannot use default output for " "multiple reporters");
                 defaultOutputUsed = true;
             }
 
-            m_processedReporterSpecs.push_back(ProcessedReporterSpec{
-                reporterSpec.name(),
-                reporterSpec.outputFile()
-                    ? *reporterSpec.outputFile()
-                    : data.defaultOutputFilename,
-                reporterSpec.colourMode().valueOr(data.defaultColourMode),
-                reporterSpec.customOptions()
-            });
+            m_processedReporterSpecs.push_back(ProcessedReporterSpec{reporterSpec.name(), reporterSpec.outputFile() ? *reporterSpec.outputFile() : data.defaultOutputFilename, reporterSpec.colourMode().valueOr(data.defaultColourMode), reporterSpec.customOptions()});
         }
     }
 
@@ -702,10 +639,7 @@ namespace Catch {
         // than what is possible otherwise.
         const auto bazelOutputFile = Detail::getEnv("XML_OUTPUT_FILE");
 
-        if(bazelOutputFile) {
-            m_data.reporterSpecifications.push_back(
-                {"junit", std::string(bazelOutputFile), {}, {}});
-        }
+        if(bazelOutputFile) { m_data.reporterSpecifications.push_back({"junit", std::string(bazelOutputFile), {}, {}}); }
 
         const auto bazelTestSpec = Detail::getEnv("TESTBRIDGE_TEST_ONLY");
         if(bazelTestSpec) {
@@ -717,8 +651,7 @@ namespace Catch {
 
         const auto bazelShardOptions = readBazelShardingOptions();
         if(bazelShardOptions) {
-            std::ofstream f(bazelShardOptions->shardFilePath,
-                            std::ios_base::out | std::ios_base::trunc);
+            std::ofstream f(bazelShardOptions->shardFilePath, std::ios_base::out | std::ios_base::trunc);
             if(f.is_open()) {
                 f << "";
                 m_data.shardIndex = bazelShardOptions->shardIndex;
@@ -739,24 +672,18 @@ namespace Catch {
     ////////////////////////////////////////////////////////////////////////////
 
     ScopedMessage::ScopedMessage(MessageBuilder&& builder)
-        :
-        m_info(CATCH_MOVE(builder.m_info)) {
+        : m_info(CATCH_MOVE(builder.m_info)) {
         m_info.message = builder.m_stream.str();
         getResultCapture().pushScopedMessage(m_info);
     }
 
     ScopedMessage::ScopedMessage(ScopedMessage&& old) noexcept
-        :
-        m_info(CATCH_MOVE(old.m_info)) { old.m_moved = true; }
+        : m_info(CATCH_MOVE(old.m_info)) { old.m_moved = true; }
 
     ScopedMessage::~ScopedMessage() { if(!uncaught_exceptions() && !m_moved) { getResultCapture().popScopedMessage(m_info); } }
 
-    Capturer::Capturer(StringRef macroName,
-                       SourceLineInfo const& lineInfo,
-                       ResultWas::OfType resultType,
-                       StringRef names)
-        :
-        m_resultCapture(getResultCapture()) {
+    Capturer::Capturer(StringRef macroName, SourceLineInfo const& lineInfo, ResultWas::OfType resultType, StringRef names)
+        : m_resultCapture(getResultCapture()) {
         auto trimmed = [&](size_t start, size_t end) {
             while(names[start] == ',' || isspace(static_cast<unsigned char>(names[start]))) { ++start; }
             while(names[end] == ',' || isspace(static_cast<unsigned char>(names[end]))) { --end; }
@@ -827,9 +754,7 @@ namespace Catch {
 
 namespace Catch {
     namespace {
-        class RegistryHub : public IRegistryHub,
-                            public IMutableRegistryHub,
-                            private Detail::NonCopyable {
+        class RegistryHub : public IRegistryHub, public IMutableRegistryHub, private Detail::NonCopyable {
         public: // IRegistryHub
             RegistryHub() = default;
 
@@ -906,15 +831,9 @@ namespace Catch {
         }
 
         IEventListenerPtr prepareReporters(Config const* config) {
-            if(Catch::getRegistryHub().getReporterRegistry().getListeners().empty()
-                && config->getProcessedReporterSpecs().size() == 1) {
+            if(Catch::getRegistryHub().getReporterRegistry().getListeners().empty() && config->getProcessedReporterSpecs().size() == 1) {
                 auto const& spec = config->getProcessedReporterSpecs()[0];
-                return createReporter(
-                    spec.name,
-                    ReporterConfig(config,
-                                   makeStream(spec.outputFilename),
-                                   spec.colourMode,
-                                   spec.customOptions));
+                return createReporter(spec.name, ReporterConfig(config, makeStream(spec.outputFilename), spec.colourMode, spec.customOptions));
             }
 
             auto multi = Detail::make_unique<MultiReporter>(config);
@@ -922,14 +841,7 @@ namespace Catch {
             auto const& listeners = Catch::getRegistryHub().getReporterRegistry().getListeners();
             for(auto const& listener : listeners) { multi->addListener(listener->create(config)); }
 
-            for(auto const& reporterSpec : config->getProcessedReporterSpecs()) {
-                multi->addReporter(createReporter(
-                    reporterSpec.name,
-                    ReporterConfig(config,
-                                   makeStream(reporterSpec.outputFilename),
-                                   reporterSpec.colourMode,
-                                   reporterSpec.customOptions)));
-            }
+            for(auto const& reporterSpec : config->getProcessedReporterSpecs()) { multi->addReporter(createReporter(reporterSpec.name, ReporterConfig(config, makeStream(reporterSpec.outputFilename), reporterSpec.colourMode, reporterSpec.customOptions))); }
 
             return multi;
         }
@@ -937,23 +849,17 @@ namespace Catch {
         class TestGroup {
         public:
             explicit TestGroup(IEventListenerPtr&& reporter, Config const* config)
-                :
-                m_reporter(reporter.get())
+                : m_reporter(reporter.get())
                 , m_config{config}
                 , m_context{config, CATCH_MOVE(reporter)} {
-                assert(m_config->testSpec().getInvalidSpecs().empty() &&
-                    "Invalid test specs should be handled before running tests");
+                assert(m_config->testSpec().getInvalidSpecs().empty() && "Invalid test specs should be handled before running tests");
 
                 auto const& allTestCases = getAllTestCasesSorted(*m_config);
                 auto const& testSpec = m_config->testSpec();
                 if(!testSpec.hasFilters()) { for(auto const& test : allTestCases) { if(!test.getTestCaseInfo().isHidden()) { m_tests.emplace(&test); } } }
                 else {
-                    m_matches =
-                        testSpec.matchesByFilter(allTestCases, *m_config);
-                    for(auto const& match : m_matches) {
-                        m_tests.insert(match.tests.begin(),
-                                       match.tests.end());
-                    }
+                    m_matches = testSpec.matchesByFilter(allTestCases, *m_config);
+                    for(auto const& match : m_matches) { m_tests.insert(match.tests.begin(), match.tests.end()); }
                 }
 
                 m_tests = createShard(m_tests, m_config->shardCount(), m_config->shardIndex());
@@ -992,10 +898,7 @@ namespace Catch {
 
     Session::Session() {
         static bool alreadyInstantiated = false;
-        if(alreadyInstantiated) {
-            CATCH_TRY { CATCH_INTERNAL_ERROR("Only one instance of Catch::Session can ever be used"); }
-            CATCH_CATCH_ALL { getMutableRegistryHub().registerStartupException(); }
-        }
+        if(alreadyInstantiated) { CATCH_TRY { CATCH_INTERNAL_ERROR("Only one instance of Catch::Session can ever be used"); } CATCH_CATCH_ALL { getMutableRegistryHub().registerStartupException(); } }
 
         // There cannot be exceptions at startup in no-exception mode.
 #if !defined(CATCH_CONFIG_DISABLE_EXCEPTIONS)
@@ -1006,8 +909,7 @@ namespace Catch {
 
             m_startupExceptions = true;
             auto errStream = makeStream("%stderr");
-            auto colourImpl = makeColourImpl(
-                ColourMode::PlatformDefault, errStream.get());
+            auto colourImpl = makeColourImpl(ColourMode::PlatformDefault, errStream.get());
             auto guard = colourImpl->guardColour(Colour::Red);
             errStream->stream() << "Errors occurred during startup!" << '\n';
             // iterate over all exceptions and notify user
@@ -1024,20 +926,9 @@ namespace Catch {
 
     Session::~Session() { Catch::cleanUp(); }
 
-    void Session::showHelp() const {
-        Catch::cout()
-            << "\nCatch2 v" << libraryVersion() << '\n'
-            << m_cli << '\n'
-            << "For more detailed usage please see the project docs\n\n" << std::flush;
-    }
+    void Session::showHelp() const { Catch::cout() << "\nCatch2 v" << libraryVersion() << '\n' << m_cli << '\n' << "For more detailed usage please see the project docs\n\n" << std::flush; }
 
-    void Session::libIdentify() {
-        Catch::cout()
-            << std::left << std::setw(16) << "description: " << "A Catch2 test executable\n"
-            << std::left << std::setw(16) << "category: " << "testframework\n"
-            << std::left << std::setw(16) << "framework: " << "Catch2\n"
-            << std::left << std::setw(16) << "version: " << libraryVersion() << '\n' << std::flush;
-    }
+    void Session::libIdentify() { Catch::cout() << std::left << std::setw(16) << "description: " << "A Catch2 test executable\n" << std::left << std::setw(16) << "category: " << "testframework\n" << std::left << std::setw(16) << "framework: " << "Catch2\n" << std::left << std::setw(16) << "version: " << libraryVersion() << '\n' << std::flush; }
 
     int Session::applyCommandLine(int argc, char const* const * argv) {
         if(m_startupExceptions) return 1;
@@ -1050,11 +941,7 @@ namespace Catch {
             auto errStream = makeStream("%stderr");
             auto colour = makeColourImpl(ColourMode::PlatformDefault, errStream.get());
 
-            errStream->stream()
-                << colour->guardColour(Colour::Red)
-                << "\nError(s) in input:\n"
-                << TextFlow::Column(result.errorMessage()).indent(2)
-                << "\n\n";
+            errStream->stream() << colour->guardColour(Colour::Red) << "\nError(s) in input:\n" << TextFlow::Column(result.errorMessage()).indent(2) << "\n\n";
             errStream->stream() << "Run with -? for usage\n\n" << std::flush;
             return MaxExitCode;
         }
@@ -1123,10 +1010,7 @@ namespace Catch {
         if(m_configData.showHelp || m_configData.libIdentify) { return 0; }
 
         if(m_configData.shardIndex >= m_configData.shardCount) {
-            Catch::cerr() << "The shard count (" << m_configData.shardCount
-                << ") must be greater than the shard index ("
-                << m_configData.shardIndex << ")\n"
-                << std::flush;
+            Catch::cerr() << "The shard count (" << m_configData.shardCount << ") must be greater than the shard index (" << m_configData.shardIndex << ")\n" << std::flush;
             return 1;
         }
 
@@ -1155,15 +1039,11 @@ namespace Catch {
             TestGroup tests{CATCH_MOVE(reporter), m_config.get()};
             auto const totals = tests.execute();
 
-            if(tests.hadUnmatchedTestSpecs()
-                && m_config->warnAboutUnmatchedTestSpecs()) { return 3; }
+            if(tests.hadUnmatchedTestSpecs() && m_config->warnAboutUnmatchedTestSpecs()) { return 3; }
 
-            if(totals.testCases.total() == 0
-                && !m_config->zeroTestsCountAsSuccess()) { return 2; }
+            if(totals.testCases.total() == 0 && !m_config->zeroTestsCountAsSuccess()) { return 2; }
 
-            if(totals.testCases.total() > 0 &&
-                totals.testCases.total() == totals.testCases.skipped
-                && !m_config->zeroTestsCountAsSuccess()) { return 4; }
+            if(totals.testCases.total() > 0 && totals.testCases.total() == totals.testCases.skipped && !m_config->zeroTestsCountAsSuccess()) { return 4; }
 
             // Note that on unices only the lower 8 bits are usually used, clamping
             // the return value to 255 prevents false negative when some multiple
@@ -1195,31 +1075,19 @@ namespace Catch {
 namespace Catch {
     namespace {
         using TCP_underlying_type = uint8_t;
-        static_assert(sizeof(TestCaseProperties) == sizeof(TCP_underlying_type),
-                      "The size of the TestCaseProperties is different from the assumed size");
+        static_assert(sizeof(TestCaseProperties) == sizeof(TCP_underlying_type), "The size of the TestCaseProperties is different from the assumed size");
 
-        TestCaseProperties operator|(TestCaseProperties lhs, TestCaseProperties rhs) {
-            return static_cast<TestCaseProperties>(
-                static_cast<TCP_underlying_type>(lhs) | static_cast<TCP_underlying_type>(rhs)
-            );
-        }
+        TestCaseProperties operator|(TestCaseProperties lhs, TestCaseProperties rhs) { return static_cast<TestCaseProperties>(static_cast<TCP_underlying_type>(lhs) | static_cast<TCP_underlying_type>(rhs)); }
 
         TestCaseProperties& operator|=(TestCaseProperties& lhs, TestCaseProperties rhs) {
-            lhs = static_cast<TestCaseProperties>(
-                static_cast<TCP_underlying_type>(lhs) | static_cast<TCP_underlying_type>(rhs)
-            );
+            lhs = static_cast<TestCaseProperties>(static_cast<TCP_underlying_type>(lhs) | static_cast<TCP_underlying_type>(rhs));
             return lhs;
         }
 
-        TestCaseProperties operator&(TestCaseProperties lhs, TestCaseProperties rhs) {
-            return static_cast<TestCaseProperties>(
-                static_cast<TCP_underlying_type>(lhs) & static_cast<TCP_underlying_type>(rhs)
-            );
-        }
+        TestCaseProperties operator&(TestCaseProperties lhs, TestCaseProperties rhs) { return static_cast<TestCaseProperties>(static_cast<TCP_underlying_type>(lhs) & static_cast<TCP_underlying_type>(rhs)); }
 
         bool applies(TestCaseProperties tcp) {
-            static_assert(static_cast<TCP_underlying_type>(TestCaseProperties::None) == 0,
-                          "TestCaseProperties::None must be equal to 0");
+            static_assert(static_cast<TCP_underlying_type>(TestCaseProperties::None) == 0, "TestCaseProperties::None must be equal to 0");
             return tcp != TestCaseProperties::None;
         }
 
@@ -1233,18 +1101,9 @@ namespace Catch {
             else return TestCaseProperties::None;
         }
 
-        bool isReservedTag(StringRef tag) {
-            return parseSpecialTag(tag) == TestCaseProperties::None
-                && tag.size() > 0
-                && !std::isalnum(static_cast<unsigned char>(tag[0]));
-        }
+        bool isReservedTag(StringRef tag) { return parseSpecialTag(tag) == TestCaseProperties::None && tag.size() > 0 && !std::isalnum(static_cast<unsigned char>(tag[0])); }
 
-        void enforceNotReservedTag(StringRef tag, SourceLineInfo const& _lineInfo) {
-            CATCH_ENFORCE(!isReservedTag(tag),
-                          "Tag name: [" << tag << "] is not allowed.\n"
-                          << "Tag names starting with non alphanumeric characters are reserved\n"
-                          << _lineInfo);
-        }
+        void enforceNotReservedTag(StringRef tag, SourceLineInfo const& _lineInfo) { CATCH_ENFORCE(!isReservedTag(tag), "Tag name: [" << tag << "] is not allowed.\n" << "Tag names starting with non alphanumeric characters are reserved\n" << _lineInfo); }
 
         std::string makeDefaultName() {
             static size_t counter = 0;
@@ -1280,15 +1139,10 @@ namespace Catch {
         return cmp(lhs.original, rhs.original);
     }
 
-    Detail::unique_ptr<TestCaseInfo> makeTestCaseInfo(StringRef _className,
-                                                      NameAndTags const& nameAndTags,
-                                                      SourceLineInfo const& _lineInfo) { return Detail::make_unique<TestCaseInfo>(_className, nameAndTags, _lineInfo); }
+    Detail::unique_ptr<TestCaseInfo> makeTestCaseInfo(StringRef _className, NameAndTags const& nameAndTags, SourceLineInfo const& _lineInfo) { return Detail::make_unique<TestCaseInfo>(_className, nameAndTags, _lineInfo); }
 
-    TestCaseInfo::TestCaseInfo(StringRef _className,
-                               NameAndTags const& _nameAndTags,
-                               SourceLineInfo const& _lineInfo)
-        :
-        name(_nameAndTags.name.empty() ? makeDefaultName() : _nameAndTags.name)
+    TestCaseInfo::TestCaseInfo(StringRef _className, NameAndTags const& _nameAndTags, SourceLineInfo const& _lineInfo)
+        : name(_nameAndTags.name.empty() ? makeDefaultName() : _nameAndTags.name)
         , className(_className)
         , lineInfo(_lineInfo) {
         StringRef originalTags = _nameAndTags.tags;
@@ -1305,19 +1159,13 @@ namespace Catch {
         for(size_t idx = 0; idx < originalTags.size(); ++idx) {
             auto c = originalTags[idx];
             if(c == '[') {
-                CATCH_ENFORCE(
-                    !inTag,
-                    "Found '[' inside a tag while registering test case '"
-                    << _nameAndTags.name << "' at " << _lineInfo);
+                CATCH_ENFORCE(!inTag, "Found '[' inside a tag while registering test case '" << _nameAndTags.name << "' at " << _lineInfo);
 
                 inTag = true;
                 tagStart = idx;
             }
             if(c == ']') {
-                CATCH_ENFORCE(
-                    inTag,
-                    "Found unmatched ']' while registering test case '"
-                    << _nameAndTags.name << "' at " << _lineInfo);
+                CATCH_ENFORCE(inTag, "Found unmatched ']' while registering test case '" << _nameAndTags.name << "' at " << _lineInfo);
 
                 inTag = false;
                 tagEnd = idx;
@@ -1327,10 +1175,7 @@ namespace Catch {
                 // it over to backing storage and actually reference the
                 // backing storage in the saved tags
                 StringRef tagStr = originalTags.substr(tagStart + 1, tagEnd - tagStart - 1);
-                CATCH_ENFORCE(!tagStr.empty(),
-                              "Found an empty tag while registering test case '"
-                              << _nameAndTags.name << "' at "
-                              << _lineInfo);
+                CATCH_ENFORCE(!tagStr.empty(), "Found an empty tag while registering test case '" << _nameAndTags.name << "' at " << _lineInfo);
 
                 enforceNotReservedTag(tagStr, lineInfo);
                 properties |= parseSpecialTag(tagStr);
@@ -1344,17 +1189,14 @@ namespace Catch {
                 internalAppendTag(tagStr);
             }
         }
-        CATCH_ENFORCE(!inTag,
-                      "Found an unclosed tag while registering test case '"
-                      << _nameAndTags.name << "' at " << _lineInfo);
+        CATCH_ENFORCE(!inTag, "Found an unclosed tag while registering test case '" << _nameAndTags.name << "' at " << _lineInfo);
 
         // Add [.] if relevant
         if(isHidden()) { internalAppendTag("."_sr); }
 
         // Sort and prepare tags
         std::sort(begin(tags), end(tags));
-        tags.erase(std::unique(begin(tags), end(tags)),
-                   end(tags));
+        tags.erase(std::unique(begin(tags), end(tags)), end(tags));
     }
 
     bool TestCaseInfo::isHidden() const { return applies(properties & TestCaseProperties::IsHidden); }
@@ -1434,11 +1276,7 @@ namespace Catch {
         : Pattern(filterString)
         , m_tag(tag) {}
 
-    bool TestSpec::TagPattern::matches(TestCaseInfo const& testCase) const {
-        return std::find(begin(testCase.tags),
-                         end(testCase.tags),
-                         Tag(m_tag)) != end(testCase.tags);
-    }
+    bool TestSpec::TagPattern::matches(TestCaseInfo const& testCase) const { return std::find(begin(testCase.tags), end(testCase.tags), Tag(m_tag)) != end(testCase.tags); }
 
     void TestSpec::TagPattern::serializeTo(std::ostream& out) const { out << name(); }
 
@@ -1481,12 +1319,8 @@ namespace Catch {
         matches.reserve(m_filters.size());
         for(auto const& filter : m_filters) {
             std::vector<TestCaseHandle const*> currentMatches;
-            for(auto const& test : testCases)
-                if(isThrowSafe(test, config) &&
-                    filter.matches(test.getTestCaseInfo()))
-                    currentMatches.emplace_back(&test);
-            matches.push_back(
-                FilterMatch{extractFilterName(filter), currentMatches});
+            for(auto const& test : testCases) if(isThrowSafe(test, config) && filter.matches(test.getTestCaseInfo())) currentMatches.emplace_back(&test);
+            matches.push_back(FilterMatch{extractFilterName(filter), currentMatches});
         }
         return matches;
     }
@@ -1545,9 +1379,7 @@ namespace Catch {
                 if(Catch::isnan(value)) { return "nan"; }
 
                 ReusableStringStream rss;
-                rss << std::setprecision(precision)
-                    << std::fixed
-                    << value;
+                rss << std::setprecision(precision) << std::fixed << value;
                 std::string d = rss.str();
                 std::size_t i = d.find_last_not_of('0');
                 if(i != std::string::npos && i != d.size() - 1) {
@@ -1762,23 +1594,14 @@ namespace Catch {
 
 namespace Catch {
     namespace Detail {
-        void registerTranslatorImpl(
-            Detail::unique_ptr<IExceptionTranslator>&& translator) {
-            getMutableRegistryHub().registerTranslator(
-                CATCH_MOVE(translator));
-        }
+        void registerTranslatorImpl(Detail::unique_ptr<IExceptionTranslator>&& translator) { getMutableRegistryHub().registerTranslator(CATCH_MOVE(translator)); }
     } // namespace Detail
 }     // namespace Catch
 
 #include <ostream>
 
 namespace Catch {
-    Version::Version
-    (unsigned int _majorVersion,
-     unsigned int _minorVersion,
-     unsigned int _patchNumber,
-     char const* const _branchName,
-     unsigned int _buildNumber)
+    Version::Version(unsigned int _majorVersion, unsigned int _minorVersion, unsigned int _patchNumber, char const* const _branchName, unsigned int _buildNumber)
         : majorVersion(_majorVersion)
         , minorVersion(_minorVersion)
         , patchNumber(_patchNumber)
@@ -1786,14 +1609,9 @@ namespace Catch {
         , buildNumber(_buildNumber) {}
 
     std::ostream& operator <<(std::ostream& os, Version const& version) {
-        os << version.majorVersion << '.'
-            << version.minorVersion << '.'
-            << version.patchNumber;
+        os << version.majorVersion << '.' << version.minorVersion << '.' << version.patchNumber;
         // branchName is never null -> 0th char is \0 if it is empty
-        if(version.branchName[0]) {
-            os << '-' << version.branchName
-                << '.' << version.buildNumber;
-        }
+        if(version.branchName[0]) { os << '-' << version.branchName << '.' << version.buildNumber; }
         return os;
     }
 
@@ -1812,20 +1630,14 @@ namespace Catch {
 
     namespace Generators {
         namespace Detail {
-            [[noreturn]]
-            void throw_generator_exception(char const* msg) { Catch::throw_exception(GeneratorException{msg}); }
+            [[noreturn]] void throw_generator_exception(char const* msg) { Catch::throw_exception(GeneratorException{msg}); }
         } // end namespace Detail
 
         GeneratorUntypedBase::~GeneratorUntypedBase() = default;
 
         IGeneratorTracker* acquireGeneratorTracker(StringRef generatorName, SourceLineInfo const& lineInfo) { return getResultCapture().acquireGeneratorTracker(generatorName, lineInfo); }
 
-        IGeneratorTracker* createGeneratorTracker(StringRef generatorName,
-                                                  SourceLineInfo lineInfo,
-                                                  GeneratorBasePtr&& generator) {
-            return getResultCapture().createGeneratorTracker(
-                generatorName, lineInfo, CATCH_MOVE(generator));
-        }
+        IGeneratorTracker* createGeneratorTracker(StringRef generatorName, SourceLineInfo lineInfo, GeneratorBasePtr&& generator) { return getResultCapture().createGeneratorTracker(generatorName, lineInfo, CATCH_MOVE(generator)); }
     } // namespace Generators
 }     // namespace Catch
 
@@ -1874,13 +1686,8 @@ namespace Catch {
 #include <iomanip>
 
 namespace Catch {
-    ReporterConfig::ReporterConfig(
-        IConfig const* _fullConfig,
-        Detail::unique_ptr<IStream> _stream,
-        ColourMode colourMode,
-        std::map<std::string, std::string> customOptions)
-        :
-        m_stream(CATCH_MOVE(_stream))
+    ReporterConfig::ReporterConfig(IConfig const* _fullConfig, Detail::unique_ptr<IStream> _stream, ColourMode colourMode, std::map<std::string, std::string> customOptions)
+        : m_stream(CATCH_MOVE(_stream))
         , m_fullConfig(_fullConfig)
         , m_colourMode(colourMode)
         , m_customOptions(CATCH_MOVE(customOptions)) {}
@@ -1898,9 +1705,7 @@ namespace Catch {
 
     ReporterConfig::~ReporterConfig() = default;
 
-    AssertionStats::AssertionStats(AssertionResult const& _assertionResult,
-                                   std::vector<MessageInfo> const& _infoMessages,
-                                   Totals const& _totals)
+    AssertionStats::AssertionStats(AssertionResult const& _assertionResult, std::vector<MessageInfo> const& _infoMessages, Totals const& _totals)
         : assertionResult(_assertionResult)
         , infoMessages(_infoMessages)
         , totals(_totals) {
@@ -1914,29 +1719,20 @@ namespace Catch {
         }
     }
 
-    SectionStats::SectionStats(SectionInfo&& _sectionInfo,
-                               Counts const& _assertions,
-                               double _durationInSeconds,
-                               bool _missingAssertions)
+    SectionStats::SectionStats(SectionInfo&& _sectionInfo, Counts const& _assertions, double _durationInSeconds, bool _missingAssertions)
         : sectionInfo(CATCH_MOVE(_sectionInfo))
         , assertions(_assertions)
         , durationInSeconds(_durationInSeconds)
         , missingAssertions(_missingAssertions) {}
 
-    TestCaseStats::TestCaseStats(TestCaseInfo const& _testInfo,
-                                 Totals const& _totals,
-                                 std::string&& _stdOut,
-                                 std::string&& _stdErr,
-                                 bool _aborting)
+    TestCaseStats::TestCaseStats(TestCaseInfo const& _testInfo, Totals const& _totals, std::string&& _stdOut, std::string&& _stdErr, bool _aborting)
         : testInfo(&_testInfo)
         , totals(_totals)
         , stdOut(CATCH_MOVE(_stdOut))
         , stdErr(CATCH_MOVE(_stdErr))
         , aborting(_aborting) {}
 
-    TestRunStats::TestRunStats(TestRunInfo const& _runInfo,
-                               Totals const& _totals,
-                               bool _aborting)
+    TestRunStats::TestRunStats(TestRunInfo const& _runInfo, Totals const& _totals, bool _aborting)
         : runInfo(_runInfo)
         , totals(_totals)
         , aborting(_aborting) {}
@@ -1954,11 +1750,7 @@ namespace Catch {
 }
 
 namespace Catch {
-    AssertionHandler::AssertionHandler
-    (StringRef macroName,
-     SourceLineInfo const& lineInfo,
-     StringRef capturedExpression,
-     ResultDisposition::Flags resultDisposition)
+    AssertionHandler::AssertionHandler(StringRef macroName, SourceLineInfo const& lineInfo, StringRef capturedExpression, ResultDisposition::Flags resultDisposition)
         : m_assertionInfo{macroName, lineInfo, capturedExpression, resultDisposition}
         , m_resultCapture(getResultCapture()) { m_resultCapture.notifyAssertionStarted(m_assertionInfo); }
 
@@ -2000,21 +1792,9 @@ namespace Catch {
 
 namespace Catch {
     namespace Detail {
-        bool CaseInsensitiveLess::operator()(StringRef lhs,
-                                             StringRef rhs) const {
-            return std::lexicographical_compare(
-                lhs.begin(), lhs.end(),
-                rhs.begin(), rhs.end(),
-                [](char l, char r) { return toLower(l) < toLower(r); });
-        }
+        bool CaseInsensitiveLess::operator()(StringRef lhs, StringRef rhs) const { return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), [](char l, char r) { return toLower(l) < toLower(r); }); }
 
-        bool CaseInsensitiveEqualTo::operator()(StringRef lhs,
-                                                StringRef rhs) const {
-            return std::equal(
-                lhs.begin(), lhs.end(),
-                rhs.begin(), rhs.end(),
-                [](char l, char r) { return toLower(l) == toLower(r); });
-        }
+        bool CaseInsensitiveEqualTo::operator()(StringRef lhs, StringRef rhs) const { return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), [](char l, char r) { return toLower(l) == toLower(r); }); }
     } // namespace Detail
 }     // namespace Catch
 
@@ -2053,46 +1833,29 @@ namespace Catch {
                     if(isOptPrefix(next[0])) {
                         auto delimiterPos = next.find_first_of(" :=");
                         if(delimiterPos != std::string::npos) {
-                            m_tokenBuffer.push_back(
-                                {
-                                    TokenType::Option,
-                                    next.substr(0, delimiterPos)
-                                });
-                            m_tokenBuffer.push_back(
-                                {
-                                    TokenType::Argument,
-                                    next.substr(delimiterPos + 1)
-                                });
+                            m_tokenBuffer.push_back({TokenType::Option, next.substr(0, delimiterPos)});
+                            m_tokenBuffer.push_back({TokenType::Argument, next.substr(delimiterPos + 1)});
                         }
                         else {
                             if(next[1] != '-' && next.size() > 2) {
                                 std::string opt = "- ";
                                 for(size_t i = 1; i < next.size(); ++i) {
                                     opt[1] = next[i];
-                                    m_tokenBuffer.push_back(
-                                        {TokenType::Option, opt});
+                                    m_tokenBuffer.push_back({TokenType::Option, opt});
                                 }
                             }
-                            else {
-                                m_tokenBuffer.push_back(
-                                    {TokenType::Option, next});
-                            }
+                            else { m_tokenBuffer.push_back({TokenType::Option, next}); }
                         }
                     }
-                    else {
-                        m_tokenBuffer.push_back(
-                            {TokenType::Argument, next});
-                    }
+                    else { m_tokenBuffer.push_back({TokenType::Argument, next}); }
                 }
             }
 
             TokenStream::TokenStream(Args const& args)
-                :
-                TokenStream(args.m_args.begin(), args.m_args.end()) {}
+                : TokenStream(args.m_args.begin(), args.m_args.end()) {}
 
             TokenStream::TokenStream(Iterator it_, Iterator itEnd_)
-                :
-                it(it_)
+                : it(it_)
                 , itEnd(itEnd_) { loadBuffer(); }
 
             TokenStream& TokenStream::operator++() {
@@ -2104,25 +1867,17 @@ namespace Catch {
                 return *this;
             }
 
-            ParserResult convertInto(std::string const& source,
-                                     std::string& target) {
+            ParserResult convertInto(std::string const& source, std::string& target) {
                 target = source;
                 return ParserResult::ok(ParseResultType::Matched);
             }
 
-            ParserResult convertInto(std::string const& source,
-                                     bool& target) {
+            ParserResult convertInto(std::string const& source, bool& target) {
                 std::string srcLC = toLower(source);
 
-                if(srcLC == "y" || srcLC == "1" || srcLC == "true" ||
-                    srcLC == "yes" || srcLC == "on") { target = true; }
-                else if(srcLC == "n" || srcLC == "0" || srcLC == "false" ||
-                    srcLC == "no" || srcLC == "off") { target = false; }
-                else {
-                    return ParserResult::runtimeError(
-                        "Expected a boolean value but did not recognise: '" +
-                        source + '\'');
-                }
+                if(srcLC == "y" || srcLC == "1" || srcLC == "true" || srcLC == "yes" || srcLC == "on") { target = true; }
+                else if(srcLC == "n" || srcLC == "0" || srcLC == "false" || srcLC == "no" || srcLC == "off") { target = false; }
+                else { return ParserResult::runtimeError("Expected a boolean value but did not recognise: '" + source + '\''); }
                 return ParserResult::ok(ParseResultType::Matched);
             }
 
@@ -2130,10 +1885,8 @@ namespace Catch {
 
             InternalParseResult ParserBase::parse(Args const& args) const { return parse(args.exeName(), TokenStream(args)); }
 
-            ParseState::ParseState(ParseResultType type,
-                                   TokenStream const& remainingTokens)
-                :
-                m_type(type)
+            ParseState::ParseState(ParseResultType type, TokenStream const& remainingTokens)
+                : m_type(type)
                 , m_remainingTokens(remainingTokens) {}
 
             ParserResult BoundFlagRef::setFlag(bool flag) {
@@ -2150,31 +1903,24 @@ namespace Catch {
             bool BoundFlagRefBase::isFlag() const { return true; }
         } // namespace Detail
 
-        Detail::InternalParseResult Arg::parse(std::string const&,
-                                               Detail::TokenStream const& tokens) const {
+        Detail::InternalParseResult Arg::parse(std::string const&, Detail::TokenStream const& tokens) const {
             auto validationResult = validate();
             if(!validationResult) return Detail::InternalParseResult(validationResult);
 
             auto remainingTokens = tokens;
             auto const& token = *remainingTokens;
-            if(token.type != Detail::TokenType::Argument)
-                return Detail::InternalParseResult::ok(Detail::ParseState(
-                    ParseResultType::NoMatch, remainingTokens));
+            if(token.type != Detail::TokenType::Argument) return Detail::InternalParseResult::ok(Detail::ParseState(ParseResultType::NoMatch, remainingTokens));
 
             assert(!m_ref->isFlag());
-            auto valueRef =
-                static_cast<Detail::BoundValueRefBase*>(m_ref.get());
+            auto valueRef = static_cast<Detail::BoundValueRefBase*>(m_ref.get());
 
             auto result = valueRef->setValue(remainingTokens->token);
             if(!result) return Detail::InternalParseResult(result);
-            else
-                return Detail::InternalParseResult::ok(Detail::ParseState(
-                    ParseResultType::Matched, ++remainingTokens));
+            else return Detail::InternalParseResult::ok(Detail::ParseState(ParseResultType::Matched, ++remainingTokens));
         }
 
         Opt::Opt(bool& ref)
-            :
-            ParserRefImpl(std::make_shared<Detail::BoundFlagRef>(ref)) {}
+            : ParserRefImpl(std::make_shared<Detail::BoundFlagRef>(ref)) {}
 
         std::vector<Detail::HelpColumns> Opt::getHelpColumns() const {
             std::ostringstream oss;
@@ -2194,66 +1940,42 @@ namespace Catch {
             return false;
         }
 
-        Detail::InternalParseResult Opt::parse(std::string const&,
-                                               Detail::TokenStream const& tokens) const {
+        Detail::InternalParseResult Opt::parse(std::string const&, Detail::TokenStream const& tokens) const {
             auto validationResult = validate();
             if(!validationResult) return Detail::InternalParseResult(validationResult);
 
             auto remainingTokens = tokens;
-            if(remainingTokens &&
-                remainingTokens->type == Detail::TokenType::Option) {
+            if(remainingTokens && remainingTokens->type == Detail::TokenType::Option) {
                 auto const& token = *remainingTokens;
                 if(isMatch(token.token)) {
                     if(m_ref->isFlag()) {
-                        auto flagRef =
-                            static_cast<Detail::BoundFlagRefBase*>(
-                                m_ref.get());
+                        auto flagRef = static_cast<Detail::BoundFlagRefBase*>(m_ref.get());
                         auto result = flagRef->setFlag(true);
                         if(!result) return Detail::InternalParseResult(result);
-                        if(result.value() ==
-                            ParseResultType::ShortCircuitAll)
-                            return Detail::InternalParseResult::ok(Detail::ParseState(
-                                result.value(), remainingTokens));
+                        if(result.value() == ParseResultType::ShortCircuitAll) return Detail::InternalParseResult::ok(Detail::ParseState(result.value(), remainingTokens));
                     }
                     else {
-                        auto valueRef =
-                            static_cast<Detail::BoundValueRefBase*>(
-                                m_ref.get());
+                        auto valueRef = static_cast<Detail::BoundValueRefBase*>(m_ref.get());
                         ++remainingTokens;
-                        if(!remainingTokens)
-                            return Detail::InternalParseResult::runtimeError(
-                                "Expected argument following " +
-                                token.token);
+                        if(!remainingTokens) return Detail::InternalParseResult::runtimeError("Expected argument following " + token.token);
                         auto const& argToken = *remainingTokens;
-                        if(argToken.type != Detail::TokenType::Argument)
-                            return Detail::InternalParseResult::runtimeError(
-                                "Expected argument following " +
-                                token.token);
+                        if(argToken.type != Detail::TokenType::Argument) return Detail::InternalParseResult::runtimeError("Expected argument following " + token.token);
                         const auto result = valueRef->setValue(argToken.token);
                         if(!result) return Detail::InternalParseResult(result);
-                        if(result.value() ==
-                            ParseResultType::ShortCircuitAll)
-                            return Detail::InternalParseResult::ok(Detail::ParseState(
-                                result.value(), remainingTokens));
+                        if(result.value() == ParseResultType::ShortCircuitAll) return Detail::InternalParseResult::ok(Detail::ParseState(result.value(), remainingTokens));
                     }
-                    return Detail::InternalParseResult::ok(Detail::ParseState(
-                        ParseResultType::Matched, ++remainingTokens));
+                    return Detail::InternalParseResult::ok(Detail::ParseState(ParseResultType::Matched, ++remainingTokens));
                 }
             }
-            return Detail::InternalParseResult::ok(
-                Detail::ParseState(ParseResultType::NoMatch, remainingTokens));
+            return Detail::InternalParseResult::ok(Detail::ParseState(ParseResultType::NoMatch, remainingTokens));
         }
 
         Detail::Result Opt::validate() const {
             if(m_optNames.empty()) return Detail::Result::logicError("No options supplied to Opt");
             for(auto const& name : m_optNames) {
-                if(name.empty())
-                    return Detail::Result::logicError(
-                        "Option name cannot be empty");
+                if(name.empty()) return Detail::Result::logicError("Option name cannot be empty");
 #ifdef CATCH_PLATFORM_WINDOWS
-                if(name[0] != '-' && name[0] != '/')
-                    return Detail::Result::logicError(
-                        "Option name must begin with '-' or '/'");
+                if(name[0] != '-' && name[0] != '/') return Detail::Result::logicError("Option name must begin with '-' or '/'");
 #else
                 if (name[0] != '-')
                     return Detail::Result::logicError(
@@ -2264,23 +1986,16 @@ namespace Catch {
         }
 
         ExeName::ExeName()
-            :
-            m_name(std::make_shared<std::string>("<executable>")) {}
+            : m_name(std::make_shared<std::string>("<executable>")) {}
 
         ExeName::ExeName(std::string& ref)
             : ExeName() { m_ref = std::make_shared<Detail::BoundValueRef<std::string>>(ref); }
 
-        Detail::InternalParseResult ExeName::parse(std::string const&,
-                                                   Detail::TokenStream const& tokens) const {
-            return Detail::InternalParseResult::ok(
-                Detail::ParseState(ParseResultType::NoMatch, tokens));
-        }
+        Detail::InternalParseResult ExeName::parse(std::string const&, Detail::TokenStream const& tokens) const { return Detail::InternalParseResult::ok(Detail::ParseState(ParseResultType::NoMatch, tokens)); }
 
         ParserResult ExeName::set(std::string const& newName) {
             auto lastSlash = newName.find_last_of("\\/");
-            auto filename = (lastSlash == std::string::npos)
-                                ? newName
-                                : newName.substr(lastSlash + 1);
+            auto filename = (lastSlash == std::string::npos) ? newName : newName.substr(lastSlash + 1);
 
             *m_name = filename;
             if(m_ref) return m_ref->setValue(filename);
@@ -2288,11 +2003,8 @@ namespace Catch {
         }
 
         Parser& Parser::operator|=(Parser const& other) {
-            m_options.insert(m_options.end(),
-                             other.m_options.begin(),
-                             other.m_options.end());
-            m_args.insert(
-                m_args.end(), other.m_args.begin(), other.m_args.end());
+            m_options.insert(m_options.end(), other.m_options.begin(), other.m_options.end());
+            m_args.insert(m_args.end(), other.m_args.begin(), other.m_args.end());
             return *this;
         }
 
@@ -2307,8 +2019,7 @@ namespace Catch {
 
         void Parser::writeToStream(std::ostream& os) const {
             if(!m_exeName.name().empty()) {
-                os << "usage:\n"
-                    << "  " << m_exeName.name() << ' ';
+                os << "usage:\n" << "  " << m_exeName.name() << ' ';
                 bool required = true, first = true;
                 for(auto const& arg : m_args) {
                     if(first) first = false;
@@ -2333,12 +2044,7 @@ namespace Catch {
             optWidth = (std::min)(optWidth, consoleWidth / 2);
 
             for(auto const& cols : rows) {
-                auto row = TextFlow::Column(cols.left)
-                           .width(optWidth)
-                           .indent(2) +
-                    TextFlow::Spacer(4) +
-                    TextFlow::Column(cols.right)
-                    .width(consoleWidth - 7 - optWidth);
+                auto row = TextFlow::Column(cols.left).width(optWidth).indent(2) + TextFlow::Spacer(4) + TextFlow::Column(cols.right).width(consoleWidth - 7 - optWidth);
                 os << row << '\n';
             }
         }
@@ -2355,8 +2061,7 @@ namespace Catch {
             return Detail::Result::ok();
         }
 
-        Detail::InternalParseResult Parser::parse(std::string const& exeName,
-                                                  Detail::TokenStream const& tokens) const {
+        Detail::InternalParseResult Parser::parse(std::string const& exeName, Detail::TokenStream const& tokens) const {
             struct ParserInfo {
                 ParserBase const* parser = nullptr;
                 size_t count = 0;
@@ -2368,19 +2073,15 @@ namespace Catch {
 
             m_exeName.set(exeName);
 
-            auto result = Detail::InternalParseResult::ok(
-                Detail::ParseState(ParseResultType::NoMatch, tokens));
+            auto result = Detail::InternalParseResult::ok(Detail::ParseState(ParseResultType::NoMatch, tokens));
             while(result.value().remainingTokens()) {
                 bool tokenParsed = false;
 
                 for(auto& parseInfo : parseInfos) {
-                    if(parseInfo.parser->cardinality() == 0 ||
-                        parseInfo.count < parseInfo.parser->cardinality()) {
-                        result = parseInfo.parser->parse(
-                            exeName, result.value().remainingTokens());
+                    if(parseInfo.parser->cardinality() == 0 || parseInfo.count < parseInfo.parser->cardinality()) {
+                        result = parseInfo.parser->parse(exeName, result.value().remainingTokens());
                         if(!result) return result;
-                        if(result.value().type() !=
-                            ParseResultType::NoMatch) {
+                        if(result.value().type() != ParseResultType::NoMatch) {
                             tokenParsed = true;
                             ++parseInfo.count;
                             break;
@@ -2389,35 +2090,25 @@ namespace Catch {
                 }
 
                 if(result.value().type() == ParseResultType::ShortCircuitAll) return result;
-                if(!tokenParsed)
-                    return Detail::InternalParseResult::runtimeError(
-                        "Unrecognised token: " +
-                        result.value().remainingTokens()->token);
+                if(!tokenParsed) return Detail::InternalParseResult::runtimeError("Unrecognised token: " + result.value().remainingTokens()->token);
             }
             // !TBD Check missing required options
             return result;
         }
 
         Args::Args(int argc, char const* const* argv)
-            :
-            m_exeName(argv[0])
+            : m_exeName(argv[0])
             , m_args(argv + 1, argv + argc) {}
 
         Args::Args(std::initializer_list<std::string> args)
-            :
-            m_exeName(*args.begin())
+            : m_exeName(*args.begin())
             , m_args(args.begin() + 1, args.end()) {}
 
         Help::Help(bool& showHelpFlag)
-            :
-            Opt([&](bool flag) {
+            : Opt([&](bool flag) {
                 showHelpFlag = flag;
                 return ParserResult::ok(ParseResultType::ShortCircuitAll);
-            }) {
-            static_cast<Opt&>(*this)(
-                    "display usage information")["-?"]["-h"]["--help"]
-                .optional();
-        }
+            }) { static_cast<Opt&>(*this)("display usage information")["-?"]["-h"]["--help"].optional(); }
     } // namespace Clara
 }     // namespace Catch
 
@@ -2438,8 +2129,7 @@ namespace Catch {
                 return ParserResult::ok(ParseResultType::Matched);
             }
 
-            return ParserResult::runtimeError(
-                "Unrecognised warning option: '" + warning + '\'');
+            return ParserResult::runtimeError("Unrecognised warning option: '" + warning + '\'');
         };
         auto const loadTestNamesFromFile = [&](std::string const& filename) {
             std::ifstream f(filename.c_str());
@@ -2485,18 +2175,9 @@ namespace Catch {
         };
         auto const setDefaultColourMode = [&](std::string const& colourMode) {
             Optional<ColourMode> maybeMode = Catch::Detail::stringToColourMode(toLower(colourMode));
-            if(!maybeMode) {
-                return ParserResult::runtimeError(
-                    "colour mode must be one of: default, ansi, win32, "
-                    "or none. '" +
-                    colourMode + "' is not recognised");
-            }
+            if(!maybeMode) { return ParserResult::runtimeError("colour mode must be one of: default, ansi, win32, " "or none. '" + colourMode + "' is not recognised"); }
             auto mode = *maybeMode;
-            if(!isColourImplAvailable(mode)) {
-                return ParserResult::runtimeError(
-                    "colour mode '" + colourMode +
-                    "' is not supported in this binary");
-            }
+            if(!isColourImplAvailable(mode)) { return ParserResult::runtimeError("colour mode '" + colourMode + "' is not supported in this binary"); }
             config.defaultColourMode = mode;
             return ParserResult::ok(ParseResultType::Matched);
         };
@@ -2520,25 +2201,15 @@ namespace Catch {
         auto const setReporter = [&](std::string const& userReporterSpec) {
             if(userReporterSpec.empty()) { return ParserResult::runtimeError("Received empty reporter spec."); }
 
-            Optional<ReporterSpec> parsed =
-                parseReporterSpec(userReporterSpec);
-            if(!parsed) {
-                return ParserResult::runtimeError(
-                    "Could not parse reporter spec '" + userReporterSpec +
-                    "'");
-            }
+            Optional<ReporterSpec> parsed = parseReporterSpec(userReporterSpec);
+            if(!parsed) { return ParserResult::runtimeError("Could not parse reporter spec '" + userReporterSpec + "'"); }
 
             auto const& reporterSpec = *parsed;
 
-            auto const& factories =
-                getRegistryHub().getReporterRegistry().getFactories();
+            auto const& factories = getRegistryHub().getReporterRegistry().getFactories();
             auto result = factories.find(reporterSpec.name());
 
-            if(result == factories.end()) {
-                return ParserResult::runtimeError(
-                    "Unrecognized reporter, '" + reporterSpec.name() +
-                    "'. Check available with --list-reporters");
-            }
+            if(result == factories.end()) { return ParserResult::runtimeError("Unrecognized reporter, '" + reporterSpec.name() + "'. Check available with --list-reporters"); }
 
             const bool hadOutputFile = reporterSpec.outputFile().some();
             config.reporterSpecifications.push_back(CATCH_MOVE(*parsed));
@@ -2556,135 +2227,20 @@ namespace Catch {
         };
         auto const setShardCount = [&](std::string const& shardCount) {
             auto parsedCount = parseUInt(shardCount);
-            if(!parsedCount) {
-                return ParserResult::runtimeError(
-                    "Could not parse '" + shardCount + "' as shard count");
-            }
-            if(*parsedCount == 0) {
-                return ParserResult::runtimeError(
-                    "Shard count must be positive");
-            }
+            if(!parsedCount) { return ParserResult::runtimeError("Could not parse '" + shardCount + "' as shard count"); }
+            if(*parsedCount == 0) { return ParserResult::runtimeError("Shard count must be positive"); }
             config.shardCount = *parsedCount;
             return ParserResult::ok(ParseResultType::Matched);
         };
 
         auto const setShardIndex = [&](std::string const& shardIndex) {
             auto parsedIndex = parseUInt(shardIndex);
-            if(!parsedIndex) {
-                return ParserResult::runtimeError(
-                    "Could not parse '" + shardIndex + "' as shard index");
-            }
+            if(!parsedIndex) { return ParserResult::runtimeError("Could not parse '" + shardIndex + "' as shard index"); }
             config.shardIndex = *parsedIndex;
             return ParserResult::ok(ParseResultType::Matched);
         };
 
-        auto cli
-            = ExeName(config.processName)
-            | Help(config.showHelp)
-            | Opt(config.showSuccessfulTests)
-            ["-s"]["--success"]
-            ("include successful tests in output")
-            | Opt(config.shouldDebugBreak)
-            ["-b"]["--break"]
-            ("break into debugger on failure")
-            | Opt(config.noThrow)
-            ["-e"]["--nothrow"]
-            ("skip exception tests")
-            | Opt(config.showInvisibles)
-            ["-i"]["--invisibles"]
-            ("show invisibles (tabs, newlines)")
-            | Opt(config.defaultOutputFilename, "filename")
-            ["-o"]["--out"]
-            ("default output filename")
-            | Opt(accept_many, setReporter, "name[::key=value]*")
-            ["-r"]["--reporter"]
-            ("reporter to use (defaults to console)")
-            | Opt(config.name, "name")
-            ["-n"]["--name"]
-            ("suite name")
-            | Opt([&](bool) { config.abortAfter = 1; })
-            ["-a"]["--abort"]
-            ("abort at first failure")
-            | Opt([&](int x) { config.abortAfter = x; }, "no. failures")
-            ["-x"]["--abortx"]
-            ("abort after x failures")
-            | Opt(accept_many, setWarning, "warning name")
-            ["-w"]["--warn"]
-            ("enable warnings")
-            | Opt([&](bool flag) { config.showDurations = flag ? ShowDurations::Always : ShowDurations::Never; }, "yes|no")
-            ["-d"]["--durations"]
-            ("show test durations")
-            | Opt(config.minDuration, "seconds")
-            ["-D"]["--min-duration"]
-            ("show test durations for tests taking at least the given number of seconds")
-            | Opt(loadTestNamesFromFile, "filename")
-            ["-f"]["--input-file"]
-            ("load test names to run from a file")
-            | Opt(config.filenamesAsTags)
-            ["-#"]["--filenames-as-tags"]
-            ("adds a tag for the filename")
-            | Opt(config.sectionsToRun, "section name")
-            ["-c"]["--section"]
-            ("specify section to run")
-            | Opt(setVerbosity, "quiet|normal|high")
-            ["-v"]["--verbosity"]
-            ("set output verbosity")
-            | Opt(config.listTests)
-            ["--list-tests"]
-            ("list all/matching test cases")
-            | Opt(config.listTags)
-            ["--list-tags"]
-            ("list all/matching tags")
-            | Opt(config.listReporters)
-            ["--list-reporters"]
-            ("list all available reporters")
-            | Opt(config.listListeners)
-            ["--list-listeners"]
-            ("list all listeners")
-            | Opt(setTestOrder, "decl|lex|rand")
-            ["--order"]
-            ("test case order (defaults to decl)")
-            | Opt(setRngSeed, "'time'|'random-device'|number")
-            ["--rng-seed"]
-            ("set a specific seed for random numbers")
-            | Opt(setDefaultColourMode, "ansi|win32|none|default")
-            ["--colour-mode"]
-            ("what color mode should be used as default")
-            | Opt(config.libIdentify)
-            ["--libidentify"]
-            ("report name and version according to libidentify standard")
-            | Opt(setWaitForKeypress, "never|start|exit|both")
-            ["--wait-for-keypress"]
-            ("waits for a keypress before exiting")
-            | Opt(config.skipBenchmarks)
-            ["--skip-benchmarks"]
-            ("disable running benchmarks")
-            | Opt(config.benchmarkSamples, "samples")
-            ["--benchmark-samples"]
-            ("number of samples to collect (default: 100)")
-            | Opt(config.benchmarkResamples, "resamples")
-            ["--benchmark-resamples"]
-            ("number of resamples for the bootstrap (default: 100000)")
-            | Opt(config.benchmarkConfidenceInterval, "confidence interval")
-            ["--benchmark-confidence-interval"]
-            ("confidence interval for the bootstrap (between 0 and 1, default: 0.95)")
-            | Opt(config.benchmarkNoAnalysis)
-            ["--benchmark-no-analysis"]
-            ("perform only measurements; do not perform any analysis")
-            | Opt(config.benchmarkWarmupTime, "benchmarkWarmupTime")
-            ["--benchmark-warmup-time"]
-            ("amount of time in milliseconds spent on warming up each test (default: 100)")
-            | Opt(setShardCount, "shard count")
-            ["--shard-count"]
-            ("split the tests to execute into this many groups")
-            | Opt(setShardIndex, "shard index")
-            ["--shard-index"]
-            ("index of the group of tests to execute (see --shard-count)") |
-            Opt(config.allowZeroTests)
-            ["--allow-running-no-tests"]
-            ("Treat 'No tests run' as a success")
-            | Arg(config.testsOrTags, "test name|pattern|tags")
-            ("which test or tests to use");
+        auto cli = ExeName(config.processName) | Help(config.showHelp) | Opt(config.showSuccessfulTests)["-s"]["--success"]("include successful tests in output") | Opt(config.shouldDebugBreak)["-b"]["--break"]("break into debugger on failure") | Opt(config.noThrow)["-e"]["--nothrow"]("skip exception tests") | Opt(config.showInvisibles)["-i"]["--invisibles"]("show invisibles (tabs, newlines)") | Opt(config.defaultOutputFilename, "filename")["-o"]["--out"]("default output filename") | Opt(accept_many, setReporter, "name[::key=value]*")["-r"]["--reporter"]("reporter to use (defaults to console)") | Opt(config.name, "name")["-n"]["--name"]("suite name") | Opt([&](bool) { config.abortAfter = 1; })["-a"]["--abort"]("abort at first failure") | Opt([&](int x) { config.abortAfter = x; }, "no. failures")["-x"]["--abortx"]("abort after x failures") | Opt(accept_many, setWarning, "warning name")["-w"]["--warn"]("enable warnings") | Opt([&](bool flag) { config.showDurations = flag ? ShowDurations::Always : ShowDurations::Never; }, "yes|no")["-d"]["--durations"]("show test durations") | Opt(config.minDuration, "seconds")["-D"]["--min-duration"]("show test durations for tests taking at least the given number of seconds") | Opt(loadTestNamesFromFile, "filename")["-f"]["--input-file"]("load test names to run from a file") | Opt(config.filenamesAsTags)["-#"]["--filenames-as-tags"]("adds a tag for the filename") | Opt(config.sectionsToRun, "section name")["-c"]["--section"]("specify section to run") | Opt(setVerbosity, "quiet|normal|high")["-v"]["--verbosity"]("set output verbosity") | Opt(config.listTests)["--list-tests"]("list all/matching test cases") | Opt(config.listTags)["--list-tags"]("list all/matching tags") | Opt(config.listReporters)["--list-reporters"]("list all available reporters") | Opt(config.listListeners)["--list-listeners"]("list all listeners") | Opt(setTestOrder, "decl|lex|rand")["--order"]("test case order (defaults to decl)") | Opt(setRngSeed, "'time'|'random-device'|number")["--rng-seed"]("set a specific seed for random numbers") | Opt(setDefaultColourMode, "ansi|win32|none|default")["--colour-mode"]("what color mode should be used as default") | Opt(config.libIdentify)["--libidentify"]("report name and version according to libidentify standard") | Opt(setWaitForKeypress, "never|start|exit|both")["--wait-for-keypress"]("waits for a keypress before exiting") | Opt(config.skipBenchmarks)["--skip-benchmarks"]("disable running benchmarks") | Opt(config.benchmarkSamples, "samples")["--benchmark-samples"]("number of samples to collect (default: 100)") | Opt(config.benchmarkResamples, "resamples")["--benchmark-resamples"]("number of resamples for the bootstrap (default: 100000)") | Opt(config.benchmarkConfidenceInterval, "confidence interval")["--benchmark-confidence-interval"]("confidence interval for the bootstrap (between 0 and 1, default: 0.95)") | Opt(config.benchmarkNoAnalysis)["--benchmark-no-analysis"]("perform only measurements; do not perform any analysis") | Opt(config.benchmarkWarmupTime, "benchmarkWarmupTime")["--benchmark-warmup-time"]("amount of time in milliseconds spent on warming up each test (default: 100)") | Opt(setShardCount, "shard count")["--shard-count"]("split the tests to execute into this many groups") | Opt(setShardIndex, "shard index")["--shard-index"]("index of the group of tests to execute (see --shard-count)") | Opt(config.allowZeroTests)["--allow-running-no-tests"]("Treat 'No tests run' as a success") | Arg(config.testsOrTags, "test name|pattern|tags")("which test or tests to use");
 
         return cli;
     }
@@ -2705,24 +2261,19 @@ namespace Catch {
     ColourImpl::ColourGuard ColourImpl::guardColour(Colour::Code colourCode) { return ColourGuard(colourCode, this); }
 
     void ColourImpl::ColourGuard::engageImpl(std::ostream& stream) {
-        assert(&stream == &m_colourImpl->m_stream->stream() &&
-            "Engaging colour guard for different stream than used by the "
-            "parent colour implementation");
+        assert(&stream == &m_colourImpl->m_stream->stream() && "Engaging colour guard for different stream than used by the " "parent colour implementation");
         static_cast<void>(stream);
 
         m_engaged = true;
         m_colourImpl->use(m_code);
     }
 
-    ColourImpl::ColourGuard::ColourGuard(Colour::Code code,
-                                         ColourImpl const* colour)
-        :
-        m_colourImpl(colour)
+    ColourImpl::ColourGuard::ColourGuard(Colour::Code code, ColourImpl const* colour)
+        : m_colourImpl(colour)
         , m_code(code) { }
 
     ColourImpl::ColourGuard::ColourGuard(ColourGuard&& rhs) noexcept
-        :
-        m_colourImpl(rhs.m_colourImpl)
+        : m_colourImpl(rhs.m_colourImpl)
         , m_code(rhs.m_code)
         , m_engaged(rhs.m_engaged) { rhs.m_engaged = false; }
 
@@ -2768,11 +2319,9 @@ namespace Catch {
         class Win32ColourImpl final : public ColourImpl {
         public:
             Win32ColourImpl(IStream* stream)
-                :
-                ColourImpl(stream) {
+                : ColourImpl(stream) {
                 CONSOLE_SCREEN_BUFFER_INFO csbiInfo;
-                GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE),
-                                           &csbiInfo);
+                GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbiInfo);
                 originalForegroundAttributes = csbiInfo.wAttributes & ~(BACKGROUND_GREEN | BACKGROUND_RED | BACKGROUND_BLUE | BACKGROUND_INTENSITY);
                 originalBackgroundAttributes = csbiInfo.wAttributes & ~(FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
             }
@@ -2817,16 +2366,11 @@ namespace Catch {
 
                 case Colour::Bright: CATCH_INTERNAL_ERROR("not a colour");
 
-                default:
-                    CATCH_ERROR("Unknown colour requested");
+                default: CATCH_ERROR("Unknown colour requested");
                 }
             }
 
-            void setTextAttribute(WORD _textAttribute) const {
-                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
-                                        _textAttribute |
-                                        originalBackgroundAttributes);
-            }
+            void setTextAttribute(WORD _textAttribute) const { SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), _textAttribute | originalBackgroundAttributes); }
 
             WORD originalForegroundAttributes;
             WORD originalBackgroundAttributes;
@@ -2871,8 +2415,7 @@ namespace Catch {
 
         private:
             void use(Colour::Code _colourCode) const override {
-                auto setColour = [&out =
-                        m_stream->stream()](char const* escapeCode) {
+                auto setColour = [&out = m_stream->stream()](char const* escapeCode) {
                     // The escape sequence must be flushed to console, otherwise
                     // if stdin and stderr are intermixed, we'd get accidentally
                     // coloured output.
@@ -2915,8 +2458,7 @@ namespace Catch {
 }     // end namespace Catch
 
 namespace Catch {
-    Detail::unique_ptr<ColourImpl> makeColourImpl(ColourMode implSelection,
-                                                  IStream* stream) {
+    Detail::unique_ptr<ColourImpl> makeColourImpl(ColourMode implSelection, IStream* stream) {
 #if defined( CATCH_CONFIG_COLOUR_WIN32 )
         if(implSelection == ColourMode::Win32) { return Detail::make_unique<Win32ColourImpl>(stream); }
 #endif
@@ -3119,10 +2661,7 @@ namespace Catch {
     ITransientExpression::~ITransientExpression() = default;
 
     void formatReconstructedExpression(std::ostream& os, std::string const& lhs, StringRef op, std::string const& rhs) {
-        if(lhs.size() + rhs.size() < 40 &&
-            lhs.find('\n') == std::string::npos &&
-            rhs.find('\n') == std::string::npos)
-            os << lhs << ' ' << op << ' ' << rhs;
+        if(lhs.size() + rhs.size() < 40 && lhs.find('\n') == std::string::npos && rhs.find('\n') == std::string::npos) os << lhs << ' ' << op << ' ' << rhs;
         else os << lhs << '\n' << op << '\n' << rhs;
     }
 }
@@ -3139,14 +2678,11 @@ namespace Catch {
     }
 #endif
 
-    [[noreturn]]
-    void throw_logic_error(std::string const& msg) { throw_exception(std::logic_error(msg)); }
+    [[noreturn]] void throw_logic_error(std::string const& msg) { throw_exception(std::logic_error(msg)); }
 
-    [[noreturn]]
-    void throw_domain_error(std::string const& msg) { throw_exception(std::domain_error(msg)); }
+    [[noreturn]] void throw_domain_error(std::string const& msg) { throw_exception(std::domain_error(msg)); }
 
-    [[noreturn]]
-    void throw_runtime_error(std::string const& msg) { throw_exception(std::runtime_error(msg)); }
+    [[noreturn]] void throw_runtime_error(std::string const& msg) { throw_exception(std::runtime_error(msg)); }
 } // namespace Catch;
 
 #include <cassert>
@@ -3216,14 +2752,9 @@ namespace Catch {
 
 namespace Catch {
     namespace {
-        static std::string tryTranslators(
-            std::vector<
-                Detail::unique_ptr<IExceptionTranslator const>> const& translators) {
+        static std::string tryTranslators(std::vector<Detail::unique_ptr<IExceptionTranslator const>> const& translators) {
             if(translators.empty()) { std::rethrow_exception(std::current_exception()); }
-            else {
-                return translators[0]->translate(translators.begin() + 1,
-                                                 translators.end());
-            }
+            else { return translators[0]->translate(translators.begin() + 1, translators.end()); }
         }
     }
 
@@ -3248,12 +2779,7 @@ namespace Catch {
         try { return tryTranslators(m_translators); }
         // To avoid having to handle TFE explicitly everywhere, we just
         // rethrow it so that it goes back up the caller.
-        catch(TestFailureException&) { std::rethrow_exception(std::current_exception()); }
-        catch(TestSkipException&) { std::rethrow_exception(std::current_exception()); }
-        catch(std::exception const& ex) { return ex.what(); }
-        catch(std::string const& msg) { return msg; }
-        catch(const char* msg) { return msg; }
-        catch(...) { return "Unknown exception"; }
+        catch(TestFailureException&) { std::rethrow_exception(std::current_exception()); } catch(TestSkipException&) { std::rethrow_exception(std::current_exception()); } catch(std::exception const& ex) { return ex.what(); } catch(std::string const& msg) { return msg; } catch(const char* msg) { return msg; } catch(...) { return "Unknown exception"; }
     }
 
 #else // ^^ Exceptions are enabled // Exceptions are disabled vv
@@ -3327,12 +2853,7 @@ namespace Catch {
     // There is no 1-1 mapping between signals and windows exceptions.
     // Windows can easily distinguish between SO and SigSegV,
     // but SigInt, SigTerm, etc are handled differently.
-    static SignalDefs signalDefs[] = {
-        {EXCEPTION_ILLEGAL_INSTRUCTION, "SIGILL - Illegal instruction signal"},
-        {EXCEPTION_STACK_OVERFLOW, "SIGSEGV - Stack overflow"},
-        {EXCEPTION_ACCESS_VIOLATION, "SIGSEGV - Segmentation violation signal"},
-        {EXCEPTION_INT_DIVIDE_BY_ZERO, "Divide by zero error"},
-    };
+    static SignalDefs signalDefs[] = {{EXCEPTION_ILLEGAL_INSTRUCTION, "SIGILL - Illegal instruction signal"}, {EXCEPTION_STACK_OVERFLOW, "SIGSEGV - Stack overflow"}, {EXCEPTION_ACCESS_VIOLATION, "SIGSEGV - Segmentation violation signal"}, {EXCEPTION_INT_DIVIDE_BY_ZERO, "Divide by zero error"},};
 
     static LONG CALLBACK topLevelExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo) {
         for(auto const& def : signalDefs) { if(ExceptionInfo->ExceptionRecord->ExceptionCode == def.id) { reportFatal(def.name); } }
@@ -3353,9 +2874,7 @@ namespace Catch {
         if(!SetThreadStackGuarantee(&guaranteeSize)) {
             // We do not want to fully error out, because needing
             // the stack reserve should be rare enough anyway.
-            Catch::cerr()
-                << "Failed to reserve piece of stack."
-                << " Stack overflows will not be reported successfully.";
+            Catch::cerr() << "Failed to reserve piece of stack." << " Stack overflows will not be reported successfully.";
         }
     }
 
@@ -3369,11 +2888,7 @@ namespace Catch {
     }
 
     void FatalConditionHandler::disengage_platform() noexcept {
-        if(SetUnhandledExceptionFilter(previousTopLevelExceptionFilter) != topLevelExceptionFilter) {
-            Catch::cerr()
-                << "Unexpected SEH unhandled exception filter on disengage."
-                << " The filter was restored, but might be rolled back unexpectedly.";
-        }
+        if(SetUnhandledExceptionFilter(previousTopLevelExceptionFilter) != topLevelExceptionFilter) { Catch::cerr() << "Unexpected SEH unhandled exception filter on disengage." << " The filter was restored, but might be rolled back unexpectedly."; }
         previousTopLevelExceptionFilter = nullptr;
     }
 } // end namespace Catch
@@ -3739,8 +3254,7 @@ namespace Catch {
         void listListeners(IEventListener& reporter) {
             std::vector<ListenerDescription> descriptions;
 
-            auto const& factories =
-                getRegistryHub().getReporterRegistry().getListeners();
+            auto const& factories = getRegistryHub().getReporterRegistry().getListeners();
             descriptions.reserve(factories.size());
             for(auto const& fac : factories) { descriptions.push_back({fac->getName(), fac->getDescription()}); }
 
@@ -3792,15 +3306,12 @@ namespace Catch {
 
 namespace Catch {
     CATCH_INTERNAL_START_WARNINGS_SUPPRESSION
-    CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS
-    static LeakDetector leakDetector;
+    CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS static LeakDetector leakDetector;
     CATCH_INTERNAL_STOP_WARNINGS_SUPPRESSION
 }
 
 namespace Catch {
-    MessageInfo::MessageInfo(StringRef _macroName,
-                             SourceLineInfo const& _lineInfo,
-                             ResultWas::OfType _type)
+    MessageInfo::MessageInfo(StringRef _macroName, SourceLineInfo const& _lineInfo, ResultWas::OfType _type)
         : macroName(_macroName)
         , lineInfo(_lineInfo)
         , type(_type)
@@ -3961,11 +3472,9 @@ namespace Catch {
             // Too large
             if(ret > std::numeric_limits<unsigned int>::max()) { return {}; }
             return static_cast<unsigned int>(ret);
-        }
-        CATCH_CATCH_ANON(std::invalid_argument const&) {
+        } CATCH_CATCH_ANON(std::invalid_argument const&) {
             // no conversion could be performed
-        }
-        CATCH_CATCH_ANON(std::out_of_range const&) {
+        } CATCH_CATCH_ANON(std::out_of_range const&) {
             // the input does not fit into an unsigned long long
         }
         return {};
@@ -4054,8 +3563,7 @@ namespace Catch {
             // 16 bits. That is still some randomness, so we don't care too much
             return static_cast<std::uint32_t>(std::random_device{}());
 
-        default:
-            CATCH_ERROR("Unknown generation method");
+        default: CATCH_ERROR("Unknown generation method");
         }
     }
 } // end namespace Catch
@@ -4063,59 +3571,40 @@ namespace Catch {
 namespace Catch {
     struct ReporterRegistry::ReporterRegistryImpl {
         std::vector<Detail::unique_ptr<EventListenerFactory>> listeners;
-        std::map<std::string, IReporterFactoryPtr, Detail::CaseInsensitiveLess>
-        factories;
+        std::map<std::string, IReporterFactoryPtr, Detail::CaseInsensitiveLess> factories;
     };
 
     ReporterRegistry::ReporterRegistry()
-        :
-        m_impl(Detail::make_unique<ReporterRegistryImpl>()) {
+        : m_impl(Detail::make_unique<ReporterRegistryImpl>()) {
         // Because it is impossible to move out of initializer list,
         // we have to add the elements manually
-        m_impl->factories["Automake"] =
-            Detail::make_unique<ReporterFactory<AutomakeReporter>>();
-        m_impl->factories["compact"] =
-            Detail::make_unique<ReporterFactory<CompactReporter>>();
-        m_impl->factories["console"] =
-            Detail::make_unique<ReporterFactory<ConsoleReporter>>();
-        m_impl->factories["JUnit"] =
-            Detail::make_unique<ReporterFactory<JunitReporter>>();
-        m_impl->factories["SonarQube"] =
-            Detail::make_unique<ReporterFactory<SonarQubeReporter>>();
-        m_impl->factories["TAP"] =
-            Detail::make_unique<ReporterFactory<TAPReporter>>();
-        m_impl->factories["TeamCity"] =
-            Detail::make_unique<ReporterFactory<TeamCityReporter>>();
-        m_impl->factories["XML"] =
-            Detail::make_unique<ReporterFactory<XmlReporter>>();
+        m_impl->factories["Automake"] = Detail::make_unique<ReporterFactory<AutomakeReporter>>();
+        m_impl->factories["compact"] = Detail::make_unique<ReporterFactory<CompactReporter>>();
+        m_impl->factories["console"] = Detail::make_unique<ReporterFactory<ConsoleReporter>>();
+        m_impl->factories["JUnit"] = Detail::make_unique<ReporterFactory<JunitReporter>>();
+        m_impl->factories["SonarQube"] = Detail::make_unique<ReporterFactory<SonarQubeReporter>>();
+        m_impl->factories["TAP"] = Detail::make_unique<ReporterFactory<TAPReporter>>();
+        m_impl->factories["TeamCity"] = Detail::make_unique<ReporterFactory<TeamCityReporter>>();
+        m_impl->factories["XML"] = Detail::make_unique<ReporterFactory<XmlReporter>>();
     }
 
     ReporterRegistry::~ReporterRegistry() = default;
 
-    IEventListenerPtr ReporterRegistry::create(std::string const& name,
-                                               ReporterConfig&& config) const {
+    IEventListenerPtr ReporterRegistry::create(std::string const& name, ReporterConfig&& config) const {
         auto it = m_impl->factories.find(name);
         if(it == m_impl->factories.end()) return nullptr;
         return it->second->create(CATCH_MOVE(config));
     }
 
-    void ReporterRegistry::registerReporter(std::string const& name,
-                                            IReporterFactoryPtr factory) {
-        CATCH_ENFORCE(name.find( "::" ) == name.npos,
-                      "'::' is not allowed in reporter name: '" + name +
-                      '\'');
+    void ReporterRegistry::registerReporter(std::string const& name, IReporterFactoryPtr factory) {
+        CATCH_ENFORCE(name.find( "::" ) == name.npos, "'::' is not allowed in reporter name: '" + name + '\'');
         auto ret = m_impl->factories.emplace(name, CATCH_MOVE(factory));
-        CATCH_ENFORCE(ret.second,
-                      "reporter using '" + name +
-                      "' as name was already registered");
+        CATCH_ENFORCE(ret.second, "reporter using '" + name + "' as name was already registered");
     }
 
-    void ReporterRegistry::registerListener(
-        Detail::unique_ptr<EventListenerFactory> factory) { m_impl->listeners.push_back(CATCH_MOVE(factory)); }
+    void ReporterRegistry::registerListener(Detail::unique_ptr<EventListenerFactory> factory) { m_impl->listeners.push_back(CATCH_MOVE(factory)); }
 
-    std::map<std::string,
-             IReporterFactoryPtr,
-             Detail::CaseInsensitiveLess> const& ReporterRegistry::getFactories() const { return m_impl->factories; }
+    std::map<std::string, IReporterFactoryPtr, Detail::CaseInsensitiveLess> const& ReporterRegistry::getFactories() const { return m_impl->factories; }
 
     std::vector<Detail::unique_ptr<EventListenerFactory>> const& ReporterRegistry::getListeners() const { return m_impl->listeners; }
 } // namespace Catch
@@ -4129,14 +3618,9 @@ namespace Catch {
         };
 
         kvPair splitKVPair(StringRef kvString) {
-            auto splitPos = static_cast<size_t>(
-                std::find(kvString.begin(), kvString.end(), '=') -
-                kvString.begin());
+            auto splitPos = static_cast<size_t>(std::find(kvString.begin(), kvString.end(), '=') - kvString.begin());
 
-            return {
-                kvString.substr(0, splitPos),
-                kvString.substr(splitPos + 1, kvString.size())
-            };
+            return {kvString.substr(0, splitPos), kvString.substr(splitPos + 1, kvString.size())};
         }
     }
 
@@ -4147,16 +3631,12 @@ namespace Catch {
 
             size_t separatorPos = 0;
             auto findNextSeparator = [&reporterSpec](size_t startPos) {
-                static_assert(
-                    separatorSize == 2,
-                    "The code below currently assumes 2 char separator");
+                static_assert(separatorSize == 2, "The code below currently assumes 2 char separator");
 
                 auto currentPos = startPos;
                 do {
-                    while(currentPos < reporterSpec.size() &&
-                        reporterSpec[currentPos] != separator[0]) { ++currentPos; }
-                    if(currentPos + 1 < reporterSpec.size() &&
-                        reporterSpec[currentPos + 1] == separator[1]) { return currentPos; }
+                    while(currentPos < reporterSpec.size() && reporterSpec[currentPos] != separator[0]) { ++currentPos; }
+                    if(currentPos + 1 < reporterSpec.size() && reporterSpec[currentPos + 1] == separator[1]) { return currentPos; }
                     ++currentPos;
                 }
                 while(currentPos < reporterSpec.size());
@@ -4168,8 +3648,7 @@ namespace Catch {
 
             while(separatorPos < reporterSpec.size()) {
                 const auto nextSeparator = findNextSeparator(separatorPos);
-                parts.push_back(static_cast<std::string>(reporterSpec.substr(
-                    separatorPos, nextSeparator - separatorPos)));
+                parts.push_back(static_cast<std::string>(reporterSpec.substr(separatorPos, nextSeparator - separatorPos)));
 
                 if(nextSeparator == static_cast<size_t>(-1)) { break; }
                 separatorPos = nextSeparator + separatorSize;
@@ -4192,12 +3671,7 @@ namespace Catch {
         }
     } // namespace Detail
 
-    bool operator==(ReporterSpec const& lhs, ReporterSpec const& rhs) {
-        return lhs.m_name == rhs.m_name &&
-            lhs.m_outputFileName == rhs.m_outputFileName &&
-            lhs.m_colourMode == rhs.m_colourMode &&
-            lhs.m_customOptions == rhs.m_customOptions;
-    }
+    bool operator==(ReporterSpec const& lhs, ReporterSpec const& rhs) { return lhs.m_name == rhs.m_name && lhs.m_outputFileName == rhs.m_outputFileName && lhs.m_colourMode == rhs.m_colourMode && lhs.m_customOptions == rhs.m_customOptions; }
 
     Optional<ReporterSpec> parseReporterSpec(StringRef reporterSpec) {
         auto parts = Detail::splitReporterSpec(reporterSpec);
@@ -4244,21 +3718,11 @@ namespace Catch {
             }
         }
 
-        return ReporterSpec{
-            CATCH_MOVE(parts[0]),
-            CATCH_MOVE(outputFileName),
-            CATCH_MOVE(colourMode),
-            CATCH_MOVE(kvPairs)
-        };
+        return ReporterSpec{CATCH_MOVE(parts[0]), CATCH_MOVE(outputFileName), CATCH_MOVE(colourMode), CATCH_MOVE(kvPairs)};
     }
 
-    ReporterSpec::ReporterSpec(
-        std::string name,
-        Optional<std::string> outputFileName,
-        Optional<ColourMode> colourMode,
-        std::map<std::string, std::string> customOptions)
-        :
-        m_name(CATCH_MOVE(name))
+    ReporterSpec::ReporterSpec(std::string name, Optional<std::string> outputFileName, Optional<ColourMode> colourMode, std::map<std::string, std::string> customOptions)
+        : m_name(CATCH_MOVE(name))
         , m_outputFileName(CATCH_MOVE(outputFileName))
         , m_colourMode(CATCH_MOVE(colourMode))
         , m_customOptions(CATCH_MOVE(customOptions)) {}
@@ -4326,22 +3790,15 @@ namespace Catch {
 namespace Catch {
     namespace Generators {
         namespace {
-            struct GeneratorTracker final : TestCaseTracking::TrackerBase,
-                                            IGeneratorTracker {
+            struct GeneratorTracker final : TestCaseTracking::TrackerBase, IGeneratorTracker {
                 GeneratorBasePtr m_generator;
 
-                GeneratorTracker(
-                    TestCaseTracking::NameAndLocation&& nameAndLocation,
-                    TrackerContext& ctx,
-                    ITracker* parent)
-                    :
-                    TrackerBase(CATCH_MOVE(nameAndLocation), ctx, parent) {}
+                GeneratorTracker(TestCaseTracking::NameAndLocation&& nameAndLocation, TrackerContext& ctx, ITracker* parent)
+                    : TrackerBase(CATCH_MOVE(nameAndLocation), ctx, parent) {}
 
                 ~GeneratorTracker() override = default;
 
-                static GeneratorTracker* acquire(TrackerContext& ctx,
-                                                 TestCaseTracking::NameAndLocationRef const&
-                                                 nameAndLocation) {
+                static GeneratorTracker* acquire(TrackerContext& ctx, TestCaseTracking::NameAndLocationRef const& nameAndLocation) {
                     GeneratorTracker* tracker;
 
                     ITracker& currentTracker = ctx.currentTracker();
@@ -4357,19 +3814,15 @@ namespace Catch {
                     //
                     // without it, the code above creates 5 nested generators.
                     if(currentTracker.nameAndLocation() == nameAndLocation) {
-                        auto thisTracker = currentTracker.parent()->findChild(
-                            nameAndLocation);
+                        auto thisTracker = currentTracker.parent()->findChild(nameAndLocation);
                         assert(thisTracker);
                         assert(thisTracker->isGeneratorTracker());
                         tracker = static_cast<GeneratorTracker*>(thisTracker);
                     }
-                    else if(ITracker* childTracker =
-                        currentTracker.findChild(
-                            nameAndLocation)) {
+                    else if(ITracker* childTracker = currentTracker.findChild(nameAndLocation)) {
                         assert(childTracker);
                         assert(childTracker->isGeneratorTracker());
-                        tracker =
-                            static_cast<GeneratorTracker*>(childTracker);
+                        tracker = static_cast<GeneratorTracker*>(childTracker);
                     }
                     else { return nullptr; }
 
@@ -4397,13 +3850,7 @@ namespace Catch {
                         // No children -> nobody to wait for
                         if(m_children.empty()) { return false; }
                         // If at least one child started executing, don't wait
-                        if(std::find_if(
-                            m_children.begin(),
-                            m_children.end(),
-                            [](TestCaseTracking::ITrackerPtr const&
-                            tracker) {
-                                return tracker->hasStarted();
-                            }) != m_children.end()) { return false; }
+                        if(std::find_if(m_children.begin(), m_children.end(), [](TestCaseTracking::ITrackerPtr const& tracker) { return tracker->hasStarted(); }) != m_children.end()) { return false; }
 
                         // No children have started. We need to check if they
                         // _can_ start, and thus we should wait for them, or
@@ -4413,24 +3860,14 @@ namespace Catch {
                         // This is safe: there is always at least one section
                         // tracker in a test case tracking tree
                         while(!parent->isSectionTracker()) { parent = parent->parent(); }
-                        assert(parent &&
-                            "Missing root (test case) level section");
+                        assert(parent && "Missing root (test case) level section");
 
-                        auto const& parentSection =
-                            static_cast<SectionTracker const&>(*parent);
+                        auto const& parentSection = static_cast<SectionTracker const&>(*parent);
                         auto const& filters = parentSection.getFilters();
                         // No filters -> no restrictions on running sections
                         if(filters.empty()) { return true; }
 
-                        for(auto const& child : m_children) {
-                            if(child->isSectionTracker() &&
-                                std::find(filters.begin(),
-                                          filters.end(),
-                                          static_cast<SectionTracker const&>(
-                                              *child)
-                                          .trimmedName()) !=
-                                filters.end()) { return true; }
-                        }
+                        for(auto const& child : m_children) { if(child->isSectionTracker() && std::find(filters.begin(), filters.end(), static_cast<SectionTracker const&>(*child).trimmedName()) != filters.end()) { return true; } }
                         return false;
                     }();
 
@@ -4439,9 +3876,7 @@ namespace Catch {
                     // value, but we do not want to invoke the side-effect if
                     // this generator is still waiting for any child to start.
                     assert(m_generator && "Tracker without generator");
-                    if(should_wait_for_child ||
-                        (m_runState == CompletedSuccessfully &&
-                            m_generator->countedNext())) {
+                    if(should_wait_for_child || (m_runState == CompletedSuccessfully && m_generator->countedNext())) {
                         m_children.clear();
                         m_runState = Executing;
                     }
@@ -4541,11 +3976,7 @@ namespace Catch {
             deltaTotals.testCases.failed++;
         }
         m_totals.testCases += deltaTotals.testCases;
-        m_reporter->testCaseEnded(TestCaseStats(testInfo,
-                                                deltaTotals,
-                                                CATCH_MOVE(redirectedCout),
-                                                CATCH_MOVE(redirectedCerr),
-                                                aborting()));
+        m_reporter->testCaseEnded(TestCaseStats(testInfo, deltaTotals, CATCH_MOVE(redirectedCout), CATCH_MOVE(redirectedCerr), aborting()));
 
         m_activeTestCase = nullptr;
         m_testCaseTracker = nullptr;
@@ -4586,13 +4017,8 @@ namespace Catch {
 
     void RunContext::notifyAssertionStarted(AssertionInfo const& info) { m_reporter->assertionStarting(info); }
 
-    bool RunContext::sectionStarted(StringRef sectionName,
-                                    SourceLineInfo const& sectionLineInfo,
-                                    Counts& assertions) {
-        ITracker& sectionTracker =
-            SectionTracker::acquire(m_trackerContext,
-                                    TestCaseTracking::NameAndLocationRef(
-                                        sectionName, sectionLineInfo));
+    bool RunContext::sectionStarted(StringRef sectionName, SourceLineInfo const& sectionLineInfo, Counts& assertions) {
+        ITracker& sectionTracker = SectionTracker::acquire(m_trackerContext, TestCaseTracking::NameAndLocationRef(sectionName, sectionLineInfo));
 
         if(!sectionTracker.isOpen()) return false;
         m_activeSections.push_back(&sectionTracker);
@@ -4607,29 +4033,19 @@ namespace Catch {
         return true;
     }
 
-    IGeneratorTracker* RunContext::acquireGeneratorTracker(StringRef generatorName,
-                                                           SourceLineInfo const& lineInfo) {
+    IGeneratorTracker* RunContext::acquireGeneratorTracker(StringRef generatorName, SourceLineInfo const& lineInfo) {
         using namespace Generators;
-        GeneratorTracker* tracker = GeneratorTracker::acquire(
-            m_trackerContext,
-            TestCaseTracking::NameAndLocationRef(
-                generatorName, lineInfo));
+        GeneratorTracker* tracker = GeneratorTracker::acquire(m_trackerContext, TestCaseTracking::NameAndLocationRef(generatorName, lineInfo));
         m_lastAssertionInfo.lineInfo = lineInfo;
         return tracker;
     }
 
-    IGeneratorTracker* RunContext::createGeneratorTracker(
-        StringRef generatorName,
-        SourceLineInfo lineInfo,
-        Generators::GeneratorBasePtr&& generator) {
+    IGeneratorTracker* RunContext::createGeneratorTracker(StringRef generatorName, SourceLineInfo lineInfo, Generators::GeneratorBasePtr&& generator) {
         auto nameAndLoc = TestCaseTracking::NameAndLocation(static_cast<std::string>(generatorName), lineInfo);
         auto& currentTracker = m_trackerContext.currentTracker();
-        assert(
-            currentTracker.nameAndLocation() != nameAndLoc &&
-            "Trying to create tracker for a genreator that already has one");
+        assert(currentTracker.nameAndLocation() != nameAndLoc && "Trying to create tracker for a genreator that already has one");
 
-        auto newTracker = Catch::Detail::make_unique<Generators::GeneratorTracker>(
-            CATCH_MOVE(nameAndLoc), m_trackerContext, &currentTracker);
+        auto newTracker = Catch::Detail::make_unique<Generators::GeneratorTracker>(CATCH_MOVE(nameAndLoc), m_trackerContext, &currentTracker);
         auto ret = newTracker.get();
         currentTracker.addChild(CATCH_MOVE(newTracker));
 
@@ -4683,11 +4099,7 @@ namespace Catch {
 
     void RunContext::emplaceUnscopedMessage(MessageBuilder&& builder) { m_messageScopes.emplace_back(CATCH_MOVE(builder)); }
 
-    std::string RunContext::getCurrentTestName() const {
-        return m_activeTestCase
-                   ? m_activeTestCase->getTestCaseInfo().name
-                   : std::string();
-    }
+    std::string RunContext::getCurrentTestName() const { return m_activeTestCase ? m_activeTestCase->getTestCaseInfo().name : std::string(); }
 
     const AssertionResult* RunContext::getLastResult() const { return &(*m_lastResult); }
 
@@ -4721,11 +4133,7 @@ namespace Catch {
         Totals deltaTotals;
         deltaTotals.testCases.failed = 1;
         deltaTotals.assertions.failed = 1;
-        m_reporter->testCaseEnded(TestCaseStats(testInfo,
-                                                deltaTotals,
-                                                std::string(),
-                                                std::string(),
-                                                false));
+        m_reporter->testCaseEnded(TestCaseStats(testInfo, deltaTotals, std::string(), std::string(), false));
         m_totals.testCases.failed++;
         m_reporter->testRunEnded(TestRunStats(m_runInfo, m_totals, false));
     }
@@ -4809,19 +4217,11 @@ namespace Catch {
     void RunContext::handleUnfinishedSections() {
         // If sections ended prematurely due to an exception we stored their
         // infos here so we can tear them down outside the unwind process.
-        for(auto it = m_unfinishedSections.rbegin(),
-                 itEnd = m_unfinishedSections.rend();
-            it != itEnd;
-            ++it)
-            sectionEnded(CATCH_MOVE(*it));
+        for(auto it = m_unfinishedSections.rbegin(), itEnd = m_unfinishedSections.rend(); it != itEnd; ++it) sectionEnded(CATCH_MOVE(*it));
         m_unfinishedSections.clear();
     }
 
-    void RunContext::handleExpr(
-        AssertionInfo const& info,
-        ITransientExpression const& expr,
-        AssertionReaction& reaction
-    ) {
+    void RunContext::handleExpr(AssertionInfo const& info, ITransientExpression const& expr, AssertionReaction& reaction) {
         bool negated = isFalseTest(info.resultDisposition);
         bool result = expr.getResult() != negated;
 
@@ -4835,11 +4235,7 @@ namespace Catch {
         }
     }
 
-    void RunContext::reportExpr(
-        AssertionInfo const& info,
-        ResultWas::OfType resultType,
-        ITransientExpression const* expr,
-        bool negated) {
+    void RunContext::reportExpr(AssertionInfo const& info, ResultWas::OfType resultType, ITransientExpression const* expr, bool negated) {
         m_lastAssertionInfo = info;
         AssertionResultData data(resultType, LazyExpression(negated));
 
@@ -4849,20 +4245,12 @@ namespace Catch {
         assertionEnded(CATCH_MOVE(assertionResult));
     }
 
-    void RunContext::handleMessage(
-        AssertionInfo const& info,
-        ResultWas::OfType resultType,
-        StringRef message,
-        AssertionReaction& reaction
-    ) {
+    void RunContext::handleMessage(AssertionInfo const& info, ResultWas::OfType resultType, StringRef message, AssertionReaction& reaction) {
         m_lastAssertionInfo = info;
 
         AssertionResultData data(resultType, LazyExpression(false));
         data.message = static_cast<std::string>(message);
-        AssertionResult assertionResult{
-            m_lastAssertionInfo,
-            CATCH_MOVE(data)
-        };
+        AssertionResult assertionResult{m_lastAssertionInfo, CATCH_MOVE(data)};
 
         const auto isOk = assertionResult.isOk();
         assertionEnded(CATCH_MOVE(assertionResult));
@@ -4874,16 +4262,9 @@ namespace Catch {
         }
     }
 
-    void RunContext::handleUnexpectedExceptionNotThrown(
-        AssertionInfo const& info,
-        AssertionReaction& reaction
-    ) { handleNonExpr(info, Catch::ResultWas::DidntThrowException, reaction); }
+    void RunContext::handleUnexpectedExceptionNotThrown(AssertionInfo const& info, AssertionReaction& reaction) { handleNonExpr(info, Catch::ResultWas::DidntThrowException, reaction); }
 
-    void RunContext::handleUnexpectedInflightException(
-        AssertionInfo const& info,
-        std::string&& message,
-        AssertionReaction& reaction
-    ) {
+    void RunContext::handleUnexpectedInflightException(AssertionInfo const& info, std::string&& message, AssertionReaction& reaction) {
         m_lastAssertionInfo = info;
 
         AssertionResultData data(ResultWas::ThrewException, LazyExpression(false));
@@ -4898,9 +4279,7 @@ namespace Catch {
         reaction.shouldThrow = aborting() || (m_lastAssertionInfo.resultDisposition & ResultDisposition::Normal);
     }
 
-    void RunContext::handleIncomplete(
-        AssertionInfo const& info
-    ) {
+    void RunContext::handleIncomplete(AssertionInfo const& info) {
         using namespace std::string_literals;
         m_lastAssertionInfo = info;
 
@@ -4910,11 +4289,7 @@ namespace Catch {
         assertionEnded(CATCH_MOVE(assertionResult));
     }
 
-    void RunContext::handleNonExpr(
-        AssertionInfo const& info,
-        ResultWas::OfType resultType,
-        AssertionReaction& reaction
-    ) {
+    void RunContext::handleNonExpr(AssertionInfo const& info, ResultWas::OfType resultType, AssertionReaction& reaction) {
         m_lastAssertionInfo = info;
 
         AssertionResultData data(resultType, LazyExpression(false));
@@ -4938,22 +4313,16 @@ namespace Catch {
 
 namespace Catch {
     Section::Section(SectionInfo&& info)
-        :
-        m_info(CATCH_MOVE(info))
-        , m_sectionIncluded(
-            getResultCapture().sectionStarted(m_info.name, m_info.lineInfo, m_assertions)) {
+        : m_info(CATCH_MOVE(info))
+        , m_sectionIncluded(getResultCapture().sectionStarted(m_info.name, m_info.lineInfo, m_assertions)) {
         // Non-"included" sections will not use the timing information
         // anyway, so don't bother with the potential syscall.
         if(m_sectionIncluded) { m_timer.start(); }
     }
 
-    Section::Section(SourceLineInfo const& _lineInfo,
-                     StringRef _name,
-                     const char* const)
-        :
-        m_info({"invalid", static_cast<std::size_t>(-1)}, std::string{})
-        , m_sectionIncluded(
-            getResultCapture().sectionStarted(_name, _lineInfo, m_assertions)) {
+    Section::Section(SourceLineInfo const& _lineInfo, StringRef _name, const char* const)
+        : m_info({"invalid", static_cast<std::size_t>(-1)}, std::string{})
+        , m_sectionIncluded(getResultCapture().sectionStarted(_name, _lineInfo, m_assertions)) {
         // We delay initialization the SectionInfo member until we know
         // this section needs it, so we avoid allocating std::string for name.
         // We also delay timer start to avoid the potential syscall unless we
@@ -5139,8 +4508,7 @@ namespace Catch {
     }
 
     int StringRef::compare(StringRef rhs) const {
-        auto cmpResult =
-            strncmp(m_start, rhs.m_start, std::min(m_size, rhs.m_size));
+        auto cmpResult = strncmp(m_start, rhs.m_start, std::min(m_size, rhs.m_size));
 
         // This means that strncmp found a difference before the strings
         // ended, and we can return it directly
@@ -5182,23 +4550,15 @@ namespace Catch {
         std::string expandedTestSpec = unexpandedTestSpec;
         for(auto const& registryKvp : m_registry) {
             std::size_t pos = expandedTestSpec.find(registryKvp.first);
-            if(pos != std::string::npos) {
-                expandedTestSpec = expandedTestSpec.substr(0, pos) +
-                    registryKvp.second.tag +
-                    expandedTestSpec.substr(pos + registryKvp.first.size());
-            }
+            if(pos != std::string::npos) { expandedTestSpec = expandedTestSpec.substr(0, pos) + registryKvp.second.tag + expandedTestSpec.substr(pos + registryKvp.first.size()); }
         }
         return expandedTestSpec;
     }
 
     void TagAliasRegistry::add(std::string const& alias, std::string const& tag, SourceLineInfo const& lineInfo) {
-        CATCH_ENFORCE(startsWith(alias, "[@") && endsWith(alias, ']'),
-                      "error: tag alias, '" << alias << "' is not of the form [@alias name].\n" << lineInfo);
+        CATCH_ENFORCE(startsWith(alias, "[@") && endsWith(alias, ']'), "error: tag alias, '" << alias << "' is not of the form [@alias name].\n" << lineInfo);
 
-        CATCH_ENFORCE(m_registry.insert(std::make_pair(alias, TagAlias(tag, lineInfo))).second,
-                      "error: tag alias, '" << alias << "' already registered.\n"
-                      << "\tFirst seen at: " << find(alias)->lineInfo << "\n"
-                      << "\tRedefined at: " << lineInfo);
+        CATCH_ENFORCE(m_registry.insert(std::make_pair(alias, TagAlias(tag, lineInfo))).second, "error: tag alias, '" << alias << "' already registered.\n" << "\tFirst seen at: " << find(alias)->lineInfo << "\n" << "\tRedefined at: " << lineInfo);
     }
 
     ITagAliasRegistry::~ITagAliasRegistry() = default;
@@ -5241,34 +4601,17 @@ namespace Catch {
 
 namespace Catch {
     namespace {
-        static void enforceNoDuplicateTestCases(
-            std::vector<TestCaseHandle> const& tests) {
-            auto testInfoCmp = [](TestCaseInfo const* lhs,
-                                  TestCaseInfo const* rhs) {
-                return *lhs < *rhs;
-            };
-            std::set<TestCaseInfo const*, decltype( testInfoCmp )&> seenTests(
-                testInfoCmp);
+        static void enforceNoDuplicateTestCases(std::vector<TestCaseHandle> const& tests) {
+            auto testInfoCmp = [](TestCaseInfo const* lhs, TestCaseInfo const* rhs) { return *lhs < *rhs; };
+            std::set<TestCaseInfo const*, decltype( testInfoCmp )&> seenTests(testInfoCmp);
             for(auto const& test : tests) {
                 const auto infoPtr = &test.getTestCaseInfo();
                 const auto prev = seenTests.insert(infoPtr);
-                CATCH_ENFORCE(prev.second,
-                              "error: test case \""
-                              << infoPtr->name << "\", with tags \""
-                              << infoPtr->tagsAsString()
-                              << "\" already defined.\n"
-                              << "\tFirst seen at "
-                              << ( *prev.first )->lineInfo << "\n"
-                              << "\tRedefined at " << infoPtr->lineInfo);
+                CATCH_ENFORCE(prev.second, "error: test case \"" << infoPtr->name << "\", with tags \"" << infoPtr->tagsAsString() << "\" already defined.\n" << "\tFirst seen at " << ( *prev.first )->lineInfo << "\n" << "\tRedefined at " << infoPtr->lineInfo);
             }
         }
 
-        static bool matchTest(TestCaseHandle const& testCase,
-                              TestSpec const& testSpec,
-                              IConfig const& config) {
-            return testSpec.matches(testCase.getTestCaseInfo()) &&
-                isThrowSafe(testCase, config);
-        }
+        static bool matchTest(TestCaseHandle const& testCase, TestSpec const& testSpec, IConfig const& config) { return testSpec.matches(testCase.getTestCaseInfo()) && isThrowSafe(testCase, config); }
     } // end unnamed namespace
 
     std::vector<TestCaseHandle> sortTests(IConfig const& config, std::vector<TestCaseHandle> const& unsortedTestCases) {
@@ -5278,11 +4621,7 @@ namespace Catch {
 
         case TestRunOrder::LexicographicallySorted: {
             std::vector<TestCaseHandle> sorted = unsortedTestCases;
-            std::sort(
-                sorted.begin(),
-                sorted.end(),
-                [](TestCaseHandle const& lhs, TestCaseHandle const& rhs) { return lhs.getTestCaseInfo() < rhs.getTestCaseInfo(); }
-            );
+            std::sort(sorted.begin(), sorted.end(), [](TestCaseHandle const& lhs, TestCaseHandle const& rhs) { return lhs.getTestCaseInfo() < rhs.getTestCaseInfo(); });
             return sorted;
         }
         case TestRunOrder::Randomized: {
@@ -5295,15 +4634,10 @@ namespace Catch {
 
             for(auto const& handle : unsortedTestCases) { indexed_tests.emplace_back(h(handle.getTestCaseInfo()), handle); }
 
-            std::sort(indexed_tests.begin(),
-                      indexed_tests.end(),
-                      [](TestWithHash const& lhs, TestWithHash const& rhs) {
-                          if(lhs.first == rhs.first) {
-                              return lhs.second.getTestCaseInfo() <
-                                  rhs.second.getTestCaseInfo();
-                          }
-                          return lhs.first < rhs.first;
-                      });
+            std::sort(indexed_tests.begin(), indexed_tests.end(), [](TestWithHash const& lhs, TestWithHash const& rhs) {
+                if(lhs.first == rhs.first) { return lhs.second.getTestCaseInfo() < rhs.second.getTestCaseInfo(); }
+                return lhs.first < rhs.first;
+            });
 
             std::vector<TestCaseHandle> randomized;
             randomized.reserve(indexed_tests.size());
@@ -5322,10 +4656,7 @@ namespace Catch {
     std::vector<TestCaseHandle> filterTests(std::vector<TestCaseHandle> const& testCases, TestSpec const& testSpec, IConfig const& config) {
         std::vector<TestCaseHandle> filtered;
         filtered.reserve(testCases.size());
-        for(auto const& testCase : testCases) {
-            if((!testSpec.hasFilters() && !testCase.getTestCaseInfo().isHidden()) ||
-                (testSpec.hasFilters() && matchTest(testCase, testSpec, config))) { filtered.push_back(testCase); }
-        }
+        for(auto const& testCase : testCases) { if((!testSpec.hasFilters() && !testCase.getTestCaseInfo().isHidden()) || (testSpec.hasFilters() && matchTest(testCase, testSpec, config))) { filtered.push_back(testCase); } }
         return createShard(filtered, config.shardCount(), config.shardIndex());
     }
 
@@ -5374,15 +4705,11 @@ namespace Catch {
         void ITracker::addChild(ITrackerPtr&& child) { m_children.push_back(CATCH_MOVE(child)); }
 
         ITracker* ITracker::findChild(NameAndLocationRef const& nameAndLocation) {
-            auto it = std::find_if(
-                m_children.begin(),
-                m_children.end(),
-                [&nameAndLocation](ITrackerPtr const& tracker) {
-                    auto const& tnameAndLoc = tracker->nameAndLocation();
-                    if(tnameAndLoc.location.line !=
-                        nameAndLocation.location.line) { return false; }
-                    return tnameAndLoc == nameAndLocation;
-                });
+            auto it = std::find_if(m_children.begin(), m_children.end(), [&nameAndLocation](ITrackerPtr const& tracker) {
+                auto const& tnameAndLoc = tracker->nameAndLocation();
+                if(tnameAndLoc.location.line != nameAndLocation.location.line) { return false; }
+                return tnameAndLoc == nameAndLocation;
+            });
             return (it != m_children.end()) ? it->get() : nullptr;
         }
 
@@ -5403,10 +4730,7 @@ namespace Catch {
 
         ITracker& TrackerContext::startRun() {
             using namespace std::string_literals;
-            m_rootTracker = Catch::Detail::make_unique<SectionTracker>(
-                NameAndLocation("{root}"s, CATCH_INTERNAL_LINEINFO),
-                *this,
-                nullptr);
+            m_rootTracker = Catch::Detail::make_unique<SectionTracker>(NameAndLocation("{root}"s, CATCH_INTERNAL_LINEINFO), *this, nullptr);
             m_currentTracker = nullptr;
             m_runState = Executing;
             return *m_rootTracker;
@@ -5419,8 +4743,7 @@ namespace Catch {
         void TrackerContext::setCurrentTracker(ITracker* tracker) { m_currentTracker = tracker; }
 
         TrackerBase::TrackerBase(NameAndLocation&& nameAndLocation, TrackerContext& ctx, ITracker* parent)
-            :
-            ITracker(CATCH_MOVE(nameAndLocation), parent)
+            : ITracker(CATCH_MOVE(nameAndLocation), parent)
             , m_ctx(ctx) {}
 
         bool TrackerBase::isComplete() const { return m_runState == CompletedSuccessfully || m_runState == Failed; }
@@ -5448,11 +4771,9 @@ namespace Catch {
 
             case NotStarted:
             case CompletedSuccessfully:
-            case Failed:
-                CATCH_INTERNAL_ERROR("Illogical state: " << m_runState);
+            case Failed: CATCH_INTERNAL_ERROR("Illogical state: " << m_runState);
 
-            default:
-                CATCH_INTERNAL_ERROR("Unknown state: " << m_runState);
+            default: CATCH_INTERNAL_ERROR("Unknown state: " << m_runState);
             }
             moveToParent();
             m_ctx.completeCycle();
@@ -5486,9 +4807,7 @@ namespace Catch {
         bool SectionTracker::isComplete() const {
             bool complete = true;
 
-            if(m_filters.empty()
-                || m_filters[0].empty()
-                || std::find(m_filters.begin(), m_filters.end(), m_trimmed_name) != m_filters.end()) { complete = TrackerBase::isComplete(); }
+            if(m_filters.empty() || m_filters[0].empty() || std::find(m_filters.begin(), m_filters.end(), m_trimmed_name) != m_filters.end()) { complete = TrackerBase::isComplete(); }
             return complete;
         }
 
@@ -5498,20 +4817,13 @@ namespace Catch {
             SectionTracker* tracker;
 
             ITracker& currentTracker = ctx.currentTracker();
-            if(ITracker* childTracker =
-                currentTracker.findChild(nameAndLocation)) {
+            if(ITracker* childTracker = currentTracker.findChild(nameAndLocation)) {
                 assert(childTracker);
                 assert(childTracker->isSectionTracker());
                 tracker = static_cast<SectionTracker*>(childTracker);
             }
             else {
-                auto newTracker = Catch::Detail::make_unique<SectionTracker>(
-                    NameAndLocation{
-                        static_cast<std::string>(nameAndLocation.name),
-                        nameAndLocation.location
-                    },
-                    ctx,
-                    &currentTracker);
+                auto newTracker = Catch::Detail::make_unique<SectionTracker>(NameAndLocation{static_cast<std::string>(nameAndLocation.name), nameAndLocation.location}, ctx, &currentTracker);
                 tracker = newTracker.get();
                 currentTracker.addChild(CATCH_MOVE(newTracker));
             }
@@ -5571,8 +4883,7 @@ namespace Catch {
             if(!startsWith(classOrMethodName, '&')) { return classOrMethodName; }
 
             // Remove the leading '&' to avoid having to special case it later
-            const auto methodName =
-                classOrMethodName.substr(1, classOrMethodName.size());
+            const auto methodName = classOrMethodName.substr(1, classOrMethodName.size());
 
             auto reverseStart = std::make_reverse_iterator(methodName.end());
             auto reverseEnd = std::make_reverse_iterator(methodName.begin());
@@ -5582,15 +4893,12 @@ namespace Catch {
             // relatively safe assumption because the input is generated
             // as stringification of type through preprocessor).
             auto lastColons = std::find(reverseStart, reverseEnd, ':') + 1;
-            auto secondLastColons =
-                std::find(lastColons + 1, reverseEnd, ':');
+            auto secondLastColons = std::find(lastColons + 1, reverseEnd, ':');
 
             auto const startIdx = reverseEnd - secondLastColons;
             auto const classNameSize = secondLastColons - lastColons - 1;
 
-            return methodName.substr(
-                static_cast<std::size_t>(startIdx),
-                static_cast<std::size_t>(classNameSize));
+            return methodName.substr(static_cast<std::size_t>(startIdx), static_cast<std::size_t>(classNameSize));
         }
 
         class TestInvokerAsFunction final : public ITestInvoker {
@@ -5599,8 +4907,7 @@ namespace Catch {
 
         public:
             TestInvokerAsFunction(TestType testAsFunction) noexcept
-                :
-                m_testAsFunction(testAsFunction) {}
+                : m_testAsFunction(testAsFunction) {}
 
             void invoke() const override { m_testAsFunction(); }
         };
@@ -5609,16 +4916,7 @@ namespace Catch {
     Detail::unique_ptr<ITestInvoker> makeTestInvoker(void (*testAsFunction)()) { return Detail::make_unique<TestInvokerAsFunction>(testAsFunction); }
 
     AutoReg::AutoReg(Detail::unique_ptr<ITestInvoker> invoker, SourceLineInfo const& lineInfo, StringRef classOrMethod, NameAndTags const& nameAndTags) noexcept {
-        CATCH_TRY {
-            getMutableRegistryHub()
-                .registerTest(
-                    makeTestCaseInfo(
-                        extractClassName(classOrMethod),
-                        nameAndTags,
-                        lineInfo),
-                    CATCH_MOVE(invoker)
-                );
-        } CATCH_CATCH_ALL {
+        CATCH_TRY { getMutableRegistryHub().registerTest(makeTestCaseInfo(extractClassName(classOrMethod), nameAndTags, lineInfo), CATCH_MOVE(invoker)); } CATCH_CATCH_ALL {
             // Do not throw when constructing global objects, instead register the exception to be processed later
             getMutableRegistryHub().registerStartupException();
         }
@@ -5672,8 +4970,7 @@ namespace Catch {
             endMode();
             addCharToPattern(c);
             return true;
-        default:
-        case Tag:
+        default: case Tag:
         case QuotedName:
             if(processOtherChar(c)) return true;
             break;
@@ -5735,8 +5032,7 @@ namespace Catch {
         case EscapedName:
             revertBackToLastMode();
             return;
-        case None:
-        default:
+        case None: default:
             return startNewMode(None);
         }
     }
@@ -5858,10 +5154,7 @@ namespace {
         assert(at > 0);
         assert(at <= line.size());
 
-        return at == line.size() ||
-            (isWhitespace(line[at]) && !isWhitespace(line[at - 1])) ||
-            isBreakableBefore(line[at]) ||
-            isBreakableAfter(line[at - 1]);
+        return at == line.size() || (isWhitespace(line[at]) && !isWhitespace(line[at - 1])) || isBreakableBefore(line[at]) || isBreakableAfter(line[at - 1]);
     }
 } // namespace
 
@@ -5876,8 +5169,7 @@ namespace Catch {
 
             const auto maxLineLength = m_column.m_width - indentSize();
             const auto maxParseTo = std::min(current_line.size(), m_lineStart + maxLineLength);
-            while(m_parsedTo < maxParseTo &&
-                current_line[m_parsedTo] != '\n') { ++m_parsedTo; }
+            while(m_parsedTo < maxParseTo && current_line[m_parsedTo] != '\n') { ++m_parsedTo; }
 
             // If we encountered a newline before the column is filled,
             // then we linebreak at the newline and consider this line
@@ -5889,8 +5181,7 @@ namespace Catch {
                 // the right one)
                 size_t newLineLength = maxLineLength;
                 while(newLineLength > 0 && !isBoundary(current_line, m_lineStart + newLineLength)) { --newLineLength; }
-                while(newLineLength > 0 &&
-                    isWhitespace(current_line[m_lineStart + newLineLength - 1])) { --newLineLength; }
+                while(newLineLength > 0 && isWhitespace(current_line[m_lineStart + newLineLength - 1])) { --newLineLength; }
 
                 // If we found one, then that is where we linebreak
                 if(newLineLength > 0) { m_lineLength = newLineLength; }
@@ -5903,13 +5194,11 @@ namespace Catch {
         }
 
         size_t Column::const_iterator::indentSize() const {
-            auto initial =
-                m_lineStart == 0 ? m_column.m_initialIndent : std::string::npos;
+            auto initial = m_lineStart == 0 ? m_column.m_initialIndent : std::string::npos;
             return initial == std::string::npos ? m_column.m_indent : initial;
         }
 
-        std::string Column::const_iterator::addIndentAndSuffix(size_t position,
-                                                               size_t length) const {
+        std::string Column::const_iterator::addIndentAndSuffix(size_t position, size_t length) const {
             std::string ret;
             const auto desired_indent = indentSize();
             ret.reserve(desired_indent + length + m_addHyphen);
@@ -5923,8 +5212,7 @@ namespace Catch {
         Column::const_iterator::const_iterator(Column const& column)
             : m_column(column) {
             assert(m_column.m_width > m_column.m_indent);
-            assert(m_column.m_initialIndent == std::string::npos ||
-                m_column.m_width > m_column.m_initialIndent);
+            assert(m_column.m_initialIndent == std::string::npos || m_column.m_width > m_column.m_initialIndent);
             calcLength();
             if(m_lineLength == 0) { m_lineStart = m_column.m_string.size(); }
         }
@@ -5938,10 +5226,7 @@ namespace Catch {
             m_lineStart += m_lineLength;
             std::string const& current_line = m_column.m_string;
             if(m_lineStart < current_line.size() && current_line[m_lineStart] == '\n') { m_lineStart += 1; }
-            else {
-                while(m_lineStart < current_line.size() &&
-                    isWhitespace(current_line[m_lineStart])) { ++m_lineStart; }
-            }
+            else { while(m_lineStart < current_line.size() && isWhitespace(current_line[m_lineStart])) { ++m_lineStart; } }
 
             if(m_lineStart != current_line.size()) { calcLength(); }
             return *this;
@@ -5970,16 +5255,14 @@ namespace Catch {
         }
 
         Columns::iterator::iterator(Columns const& columns, EndTag)
-            :
-            m_columns(columns.m_columns)
+            : m_columns(columns.m_columns)
             , m_activeIterators(0) {
             m_iterators.reserve(m_columns.size());
             for(auto const& col : m_columns) { m_iterators.push_back(col.end()); }
         }
 
         Columns::iterator::iterator(Columns const& columns)
-            :
-            m_columns(columns.m_columns)
+            : m_columns(columns.m_columns)
             , m_activeIterators(m_columns.size()) {
             m_iterators.reserve(m_columns.size());
             for(auto const& col : m_columns) { m_iterators.push_back(col.begin()); }
@@ -6059,8 +5342,7 @@ namespace Catch {
 } // end namespace Catch
 
 namespace Catch {
-    WildcardPattern::WildcardPattern(std::string const& pattern,
-                                     CaseSensitive caseSensitivity)
+    WildcardPattern::WildcardPattern(std::string const& pattern, CaseSensitive caseSensitivity)
         : m_caseSensitivity(caseSensitivity)
         , m_pattern(normaliseString(pattern)) {
         if(startsWith(m_pattern, '*')) {
@@ -6083,8 +5365,7 @@ namespace Catch {
             return startsWith(normaliseString(str), m_pattern);
         case WildcardAtBothEnds:
             return contains(normaliseString(str), m_pattern);
-        default:
-            CATCH_INTERNAL_ERROR("Unknown enum");
+        default: CATCH_INTERNAL_ERROR("Unknown enum");
         }
     }
 
@@ -6117,9 +5398,7 @@ namespace Catch {
 
         void hexEscapeChar(std::ostream& os, unsigned char c) {
             std::ios_base::fmtflags f(os.flags());
-            os << "\\x"
-                << std::uppercase << std::hex << std::setfill('0') << std::setw(2)
-                << static_cast<int>(c);
+            os << "\\x" << std::uppercase << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(c);
             os.flags(f);
         }
 
@@ -6128,19 +5407,9 @@ namespace Catch {
         bool shouldIndent(XmlFormatting fmt) { return !!(static_cast<std::underlying_type_t<XmlFormatting>>(fmt & XmlFormatting::Indent)); }
     } // anonymous namespace
 
-    XmlFormatting operator |(XmlFormatting lhs, XmlFormatting rhs) {
-        return static_cast<XmlFormatting>(
-            static_cast<std::underlying_type_t<XmlFormatting>>(lhs) |
-            static_cast<std::underlying_type_t<XmlFormatting>>(rhs)
-        );
-    }
+    XmlFormatting operator |(XmlFormatting lhs, XmlFormatting rhs) { return static_cast<XmlFormatting>(static_cast<std::underlying_type_t<XmlFormatting>>(lhs) | static_cast<std::underlying_type_t<XmlFormatting>>(rhs)); }
 
-    XmlFormatting operator &(XmlFormatting lhs, XmlFormatting rhs) {
-        return static_cast<XmlFormatting>(
-            static_cast<std::underlying_type_t<XmlFormatting>>(lhs) &
-            static_cast<std::underlying_type_t<XmlFormatting>>(rhs)
-        );
-    }
+    XmlFormatting operator &(XmlFormatting lhs, XmlFormatting rhs) { return static_cast<XmlFormatting>(static_cast<std::underlying_type_t<XmlFormatting>>(lhs) & static_cast<std::underlying_type_t<XmlFormatting>>(rhs)); }
 
     XmlEncode::XmlEncode(StringRef str, ForWhat forWhat)
         : m_str(str)
@@ -6193,8 +5462,7 @@ namespace Catch {
             // First check that this bytes is a valid lead byte:
             // This means that it is not encoded as 1111 1XXX
             // Or as 10XX XXXX
-                if(c < 0xC0 ||
-                    c >= 0xF8) {
+                if(c < 0xC0 || c >= 0xF8) {
                     hexEscapeChar(os, c);
                     break;
                 }
@@ -6220,12 +5488,9 @@ namespace Catch {
                     // Wrong bit pattern of following bytes
                     (!valid) ||
                     // Overlong encodings
-                    (value < 0x80) ||
-                    (0x80 <= value && value < 0x800 && encBytes > 2) ||
-                    (0x800 < value && value < 0x10000 && encBytes > 3) ||
+                    (value < 0x80) || (0x80 <= value && value < 0x800 && encBytes > 2) || (0x800 < value && value < 0x10000 && encBytes > 3) ||
                     // Encoded value out of range
-                    (value >= 0x110000)
-                ) {
+                    (value >= 0x110000)) {
                     hexEscapeChar(os, c);
                     break;
                 }
@@ -6270,8 +5535,7 @@ namespace Catch {
         return *this;
     }
 
-    XmlWriter::ScopedElement& XmlWriter::ScopedElement::writeAttribute(StringRef name,
-                                                                       StringRef attribute) {
+    XmlWriter::ScopedElement& XmlWriter::ScopedElement::writeAttribute(StringRef name, StringRef attribute) {
         m_writer->writeAttribute(name, attribute);
         return *this;
     }
@@ -6322,8 +5586,7 @@ namespace Catch {
         return *this;
     }
 
-    XmlWriter& XmlWriter::writeAttribute(StringRef name,
-                                         StringRef attribute) {
+    XmlWriter& XmlWriter::writeAttribute(StringRef name, StringRef attribute) {
         if(!name.empty() && !attribute.empty()) m_os << ' ' << name << "=\"" << XmlEncode(attribute, XmlEncode::ForAttributes) << '"';
         return *this;
     }
@@ -6333,8 +5596,7 @@ namespace Catch {
         return *this;
     }
 
-    XmlWriter& XmlWriter::writeAttribute(StringRef name,
-                                         char const* attribute) {
+    XmlWriter& XmlWriter::writeAttribute(StringRef name, char const* attribute) {
         writeAttribute(name, StringRef(attribute));
         return *this;
     }
@@ -6462,11 +5724,7 @@ namespace Catch {
         // But without the subtraction to allow for INFINITY in comparison
         bool marginComparison(double lhs, double rhs, double margin) { return (lhs + margin >= rhs) && (rhs + margin >= lhs); }
 
-        template<typename FloatingPoint> void write(std::ostream& out, FloatingPoint num) {
-            out << std::scientific
-                << std::setprecision(std::numeric_limits<FloatingPoint>::max_digits10 - 1)
-                << num;
-        }
+        template<typename FloatingPoint> void write(std::ostream& out, FloatingPoint num) { out << std::scientific << std::setprecision(std::numeric_limits<FloatingPoint>::max_digits10 - 1) << num; }
     } // end anonymous namespace
 
     namespace Matchers {
@@ -6479,10 +5737,7 @@ namespace Catch {
 
         WithinAbsMatcher::WithinAbsMatcher(double target, double margin)
             : m_target{target}
-            , m_margin{margin} {
-            CATCH_ENFORCE(margin >= 0, "Invalid margin: " << margin << '.'
-                          << " Margin has to be non-negative.");
-        }
+            , m_margin{margin} { CATCH_ENFORCE(margin >= 0, "Invalid margin: " << margin << '.' << " Margin has to be non-negative."); }
 
         // Performs equivalent check of std::fabs(lhs - rhs) <= margin
         // But without the subtraction to allow for INFINITY in comparison
@@ -6494,12 +5749,8 @@ namespace Catch {
             : m_target{target}
             , m_ulps{ulps}
             , m_type{baseType} {
-            CATCH_ENFORCE(m_type == Detail::FloatingPointKind::Double
-                          || m_ulps < (std::numeric_limits<uint32_t>::max)(),
-                          "Provided ULP is impossibly large for a float comparison.");
-            CATCH_ENFORCE(std::numeric_limits<double>::is_iec559,
-                          "WithinUlp matcher only supports platforms with "
-                          "IEEE-754 compatible floating point representation");
+            CATCH_ENFORCE(m_type == Detail::FloatingPointKind::Double || m_ulps < (std::numeric_limits<uint32_t>::max)(), "Provided ULP is impossibly large for a float comparison.");
+            CATCH_ENFORCE(std::numeric_limits<double>::is_iec559, "WithinUlp matcher only supports platforms with " "IEEE-754 compatible floating point representation");
         }
 
 #if defined(__clang__)
@@ -6514,8 +5765,7 @@ namespace Catch {
                 return almostEqualUlps<float>(static_cast<float>(matchee), static_cast<float>(m_target), m_ulps);
             case Detail::FloatingPointKind::Double:
                 return almostEqualUlps<double>(matchee, m_target, m_ulps);
-            default:
-                CATCH_INTERNAL_ERROR("Unknown Detail::FloatingPointKind value");
+            default: CATCH_INTERNAL_ERROR("Unknown Detail::FloatingPointKind value");
             }
         }
 
@@ -6536,27 +5786,15 @@ namespace Catch {
 
             ret << " ([";
             if(m_type == Detail::FloatingPointKind::Double) {
-                write(ret,
-                      step(m_target,
-                           -std::numeric_limits<double>::infinity(),
-                           m_ulps));
+                write(ret, step(m_target, -std::numeric_limits<double>::infinity(), m_ulps));
                 ret << ", ";
-                write(ret,
-                      step(m_target,
-                           std::numeric_limits<double>::infinity(),
-                           m_ulps));
+                write(ret, step(m_target, std::numeric_limits<double>::infinity(), m_ulps));
             }
             else {
                 // We have to cast INFINITY to float because of MinGW, see #1782
-                write(ret,
-                      step(static_cast<float>(m_target),
-                           -std::numeric_limits<float>::infinity(),
-                           m_ulps));
+                write(ret, step(static_cast<float>(m_target), -std::numeric_limits<float>::infinity(), m_ulps));
                 ret << ", ";
-                write(ret,
-                      step(static_cast<float>(m_target),
-                           std::numeric_limits<float>::infinity(),
-                           m_ulps));
+                write(ret, step(static_cast<float>(m_target), std::numeric_limits<float>::infinity(), m_ulps));
             }
             ret << "])";
 
@@ -6564,8 +5802,7 @@ namespace Catch {
         }
 
         WithinRelMatcher::WithinRelMatcher(double target, double epsilon)
-            :
-            m_target(target)
+            : m_target(target)
             , m_epsilon(epsilon) {
             CATCH_ENFORCE(m_epsilon >= 0., "Relative comparison with epsilon <  0 does not make sense.");
             CATCH_ENFORCE(m_epsilon < 1., "Relative comparison with epsilon >= 1 does not make sense.");
@@ -6573,8 +5810,7 @@ namespace Catch {
 
         bool WithinRelMatcher::match(double const& matchee) const {
             const auto relMargin = m_epsilon * (std::max)(std::fabs(matchee), std::fabs(m_target));
-            return marginComparison(matchee, m_target,
-                                    std::isinf(relMargin) ? 0 : relMargin);
+            return marginComparison(matchee, m_target, std::isinf(relMargin) ? 0 : relMargin);
         }
 
         std::string WithinRelMatcher::describe() const {
@@ -6637,17 +5873,9 @@ namespace Catch {
             : m_caseSensitivity(caseSensitivity)
             , m_str(adjustString(str)) {}
 
-        std::string CasedString::adjustString(std::string const& str) const {
-            return m_caseSensitivity == CaseSensitive::No
-                       ? toLower(str)
-                       : str;
-        }
+        std::string CasedString::adjustString(std::string const& str) const { return m_caseSensitivity == CaseSensitive::No ? toLower(str) : str; }
 
-        StringRef CasedString::caseSensitivitySuffix() const {
-            return m_caseSensitivity == CaseSensitive::Yes
-                       ? StringRef()
-                       : " (case insensitive)"_sr;
-        }
+        StringRef CasedString::caseSensitivitySuffix() const { return m_caseSensitivity == CaseSensitive::Yes ? StringRef() : " (case insensitive)"_sr; }
 
         StringMatcherBase::StringMatcherBase(StringRef operation, CasedString const& comparator)
             : m_comparator(comparator)
@@ -6655,8 +5883,7 @@ namespace Catch {
 
         std::string StringMatcherBase::describe() const {
             std::string description;
-            description.reserve(5 + m_operation.size() + m_comparator.m_str.size() +
-                m_comparator.caseSensitivitySuffix().size());
+            description.reserve(5 + m_operation.size() + m_comparator.m_str.size() + m_comparator.caseSensitivitySuffix().size());
             description += m_operation;
             description += ": \"";
             description += m_comparator.m_str;
@@ -6769,8 +5996,7 @@ namespace Catch {
 
 namespace Catch {
     ReporterBase::ReporterBase(ReporterConfig&& config)
-        :
-        IEventListener(config.fullConfig())
+        : IEventListener(config.fullConfig())
         , m_wrapped_stream(CATCH_MOVE(config).takeStream())
         , m_stream(m_wrapped_stream->stream())
         , m_colour(makeColourImpl(config.colourMode(), m_wrapped_stream.get()))
@@ -6778,19 +6004,11 @@ namespace Catch {
 
     ReporterBase::~ReporterBase() = default;
 
-    void ReporterBase::listReporters(
-        std::vector<ReporterDescription> const& descriptions) { defaultListReporters(m_stream, descriptions, m_config->verbosity()); }
+    void ReporterBase::listReporters(std::vector<ReporterDescription> const& descriptions) { defaultListReporters(m_stream, descriptions, m_config->verbosity()); }
 
-    void ReporterBase::listListeners(
-        std::vector<ListenerDescription> const& descriptions) { defaultListListeners(m_stream, descriptions); }
+    void ReporterBase::listListeners(std::vector<ListenerDescription> const& descriptions) { defaultListListeners(m_stream, descriptions); }
 
-    void ReporterBase::listTests(std::vector<TestCaseHandle> const& tests) {
-        defaultListTests(m_stream,
-                         m_colour.get(),
-                         tests,
-                         m_config->hasTestFilters(),
-                         m_config->verbosity());
-    }
+    void ReporterBase::listTests(std::vector<TestCaseHandle> const& tests) { defaultListTests(m_stream, m_colour.get(), tests, m_config->hasTestFilters(), m_config->verbosity()); }
 
     void ReporterBase::listTags(std::vector<TagInfo> const& tags) { defaultListTags(m_stream, tags, m_config->hasTestFilters()); }
 } // namespace Catch
@@ -6894,10 +6112,7 @@ namespace Catch {
             }
 
         private:
-            void printSourceInfo() const {
-                stream << colourImpl->guardColour(Colour::FileName)
-                    << result.getSourceInfo() << ':';
-            }
+            void printSourceInfo() const { stream << colourImpl->guardColour(Colour::FileName) << result.getSourceInfo() << ':'; }
 
             void printResultType(Colour::Code colour, StringRef passOrFail) const {
                 if(!passOrFail.empty()) {
@@ -6940,8 +6155,7 @@ namespace Catch {
                 const auto itEnd = messages.cend();
                 const auto N = static_cast<std::size_t>(itEnd - itMessage);
 
-                stream << colourImpl->guardColour(colour) << " with "
-                    << pluralise(N, "message"_sr) << ':';
+                stream << colourImpl->guardColour(colour) << " with " << pluralise(N, "message"_sr) << ':';
 
                 while(itMessage != itEnd) {
                     // If this assertion is a warning ignore any INFO messages
@@ -6969,12 +6183,7 @@ namespace Catch {
     void CompactReporter::noMatchingTestCases(StringRef unmatchedSpec) { m_stream << "No test cases matched '" << unmatchedSpec << "'\n"; }
 
     void CompactReporter::testRunStarting(TestRunInfo const&) {
-        if(m_config->testSpec().hasFilters()) {
-            m_stream << m_colour->guardColour(Colour::BrightYellow)
-                << "Filters: "
-                << m_config->testSpec()
-                << '\n';
-        }
+        if(m_config->testSpec().hasFilters()) { m_stream << m_colour->guardColour(Colour::BrightYellow) << "Filters: " << m_config->testSpec() << '\n'; }
         m_stream << "RNG seed: " << getSeed() << '\n';
     }
 
@@ -7127,20 +6336,12 @@ namespace Catch {
         private:
             void printResultType() const { if(!passOrFail.empty()) { stream << colourImpl->guardColour(colour) << passOrFail << ":\n"; } }
 
-            void printOriginalExpression() const {
-                if(result.hasExpression()) {
-                    stream << colourImpl->guardColour(Colour::OriginalExpression)
-                        << "  " << result.getExpressionInMacro() << '\n';
-                }
-            }
+            void printOriginalExpression() const { if(result.hasExpression()) { stream << colourImpl->guardColour(Colour::OriginalExpression) << "  " << result.getExpressionInMacro() << '\n'; } }
 
             void printReconstructedExpression() const {
                 if(result.hasExpandedExpression()) {
                     stream << "with expansion:\n";
-                    stream << colourImpl->guardColour(Colour::ReconstructedExpression)
-                        << TextFlow::Column(result.getExpandedExpression())
-                        .indent(2)
-                        << '\n';
+                    stream << colourImpl->guardColour(Colour::ReconstructedExpression) << TextFlow::Column(result.getExpandedExpression()).indent(2) << '\n';
                 }
             }
 
@@ -7152,10 +6353,7 @@ namespace Catch {
                 }
             }
 
-            void printSourceInfo() const {
-                stream << colourImpl->guardColour(Colour::FileName)
-                    << result.getSourceInfo() << ": ";
-            }
+            void printSourceInfo() const { stream << colourImpl->guardColour(Colour::FileName) << result.getSourceInfo() << ": "; }
 
             std::ostream& stream;
             AssertionStats const& stats;
@@ -7316,9 +6514,7 @@ namespace Catch {
             tp.m_currentColumn++;
 
             auto colInfo = tp.m_columnInfos[tp.m_currentColumn];
-            auto padding = (strSize + 1 < colInfo.width)
-                               ? std::string(colInfo.width - (strSize + 1), ' ')
-                               : std::string();
+            auto padding = (strSize + 1 < colInfo.width) ? std::string(colInfo.width - (strSize + 1), ' ') : std::string();
             if(colInfo.justification == Justification::Left) tp.m_os << colStr << padding << ' ';
             else tp.m_os << padding << colStr << ' ';
             return tp;
@@ -7334,27 +6530,11 @@ namespace Catch {
     };
 
     ConsoleReporter::ConsoleReporter(ReporterConfig&& config)
-        :
-        StreamingReporterBase(CATCH_MOVE(config))
-        , m_tablePrinter(Detail::make_unique<TablePrinter>(m_stream,
-                                                           [&config]() -> std::vector<ColumnInfo> {
-                                                               if(config.fullConfig()->benchmarkNoAnalysis()) {
-                                                                   return {
-                                                                       {"benchmark name", CATCH_CONFIG_CONSOLE_WIDTH - 43, Justification::Left},
-                                                                       {"     samples", 14, Justification::Right},
-                                                                       {"  iterations", 14, Justification::Right},
-                                                                       {"        mean", 14, Justification::Right}
-                                                                   };
-                                                               }
-                                                               else {
-                                                                   return {
-                                                                       {"benchmark name", CATCH_CONFIG_CONSOLE_WIDTH - 43, Justification::Left},
-                                                                       {"samples      mean       std dev", 14, Justification::Right},
-                                                                       {"iterations   low mean   low std dev", 14, Justification::Right},
-                                                                       {"estimated    high mean  high std dev", 14, Justification::Right}
-                                                                   };
-                                                               }
-                                                           }())) {}
+        : StreamingReporterBase(CATCH_MOVE(config))
+        , m_tablePrinter(Detail::make_unique<TablePrinter>(m_stream, [&config]() -> std::vector<ColumnInfo> {
+            if(config.fullConfig()->benchmarkNoAnalysis()) { return {{"benchmark name", CATCH_CONFIG_CONSOLE_WIDTH - 43, Justification::Left}, {"     samples", 14, Justification::Right}, {"  iterations", 14, Justification::Right}, {"        mean", 14, Justification::Right}}; }
+            else { return {{"benchmark name", CATCH_CONFIG_CONSOLE_WIDTH - 43, Justification::Left}, {"samples      mean       std dev", 14, Justification::Right}, {"iterations   low mean   low std dev", 14, Justification::Right}, {"estimated    high mean  high std dev", 14, Justification::Right}}; }
+        }())) {}
 
     ConsoleReporter::~ConsoleReporter() = default;
 
@@ -7392,8 +6572,7 @@ namespace Catch {
         m_tablePrinter->close();
         if(_sectionStats.missingAssertions) {
             lazyPrint();
-            auto guard =
-                m_colour->guardColour(Colour::ResultError).engage(m_stream);
+            auto guard = m_colour->guardColour(Colour::ResultError).engage(m_stream);
             if(m_sectionStack.size() > 1) m_stream << "\nNo assertions in section";
             else m_stream << "\nNo assertions in test case";
             m_stream << " '" << _sectionStats.sectionInfo.name << "'\n\n" << std::flush;
@@ -7407,8 +6586,7 @@ namespace Catch {
     void ConsoleReporter::benchmarkPreparing(StringRef name) {
         lazyPrintWithoutClosingBenchmarkTable();
 
-        auto nameCol = TextFlow::Column(static_cast<std::string>(name))
-            .width(m_tablePrinter->columnInfos()[0].width - 2);
+        auto nameCol = TextFlow::Column(static_cast<std::string>(name)).width(m_tablePrinter->columnInfos()[0].width - 2);
 
         bool firstLine = true;
         for(auto line : nameCol) {
@@ -7420,29 +6598,18 @@ namespace Catch {
     }
 
     void ConsoleReporter::benchmarkStarting(BenchmarkInfo const& info) {
-        (*m_tablePrinter) << info.samples << ColumnBreak()
-            << info.iterations << ColumnBreak();
+        (*m_tablePrinter) << info.samples << ColumnBreak() << info.iterations << ColumnBreak();
         if(!m_config->benchmarkNoAnalysis()) (*m_tablePrinter) << Duration(info.estimatedDuration) << ColumnBreak();
     }
 
     void ConsoleReporter::benchmarkEnded(BenchmarkStats<> const& stats) {
         if(m_config->benchmarkNoAnalysis()) { (*m_tablePrinter) << Duration(stats.mean.point.count()) << ColumnBreak(); }
-        else {
-            (*m_tablePrinter) << ColumnBreak()
-                << Duration(stats.mean.point.count()) << ColumnBreak()
-                << Duration(stats.mean.lower_bound.count()) << ColumnBreak()
-                << Duration(stats.mean.upper_bound.count()) << ColumnBreak() << ColumnBreak()
-                << Duration(stats.standardDeviation.point.count()) << ColumnBreak()
-                << Duration(stats.standardDeviation.lower_bound.count()) << ColumnBreak()
-                << Duration(stats.standardDeviation.upper_bound.count()) << ColumnBreak() << ColumnBreak() << ColumnBreak() << ColumnBreak() << ColumnBreak();
-        }
+        else { (*m_tablePrinter) << ColumnBreak() << Duration(stats.mean.point.count()) << ColumnBreak() << Duration(stats.mean.lower_bound.count()) << ColumnBreak() << Duration(stats.mean.upper_bound.count()) << ColumnBreak() << ColumnBreak() << Duration(stats.standardDeviation.point.count()) << ColumnBreak() << Duration(stats.standardDeviation.lower_bound.count()) << ColumnBreak() << Duration(stats.standardDeviation.upper_bound.count()) << ColumnBreak() << ColumnBreak() << ColumnBreak() << ColumnBreak() << ColumnBreak(); }
     }
 
     void ConsoleReporter::benchmarkFailed(StringRef error) {
         auto guard = m_colour->guardColour(Colour::Red).engage(m_stream);
-        (*m_tablePrinter)
-            << "Benchmark failed (" << error << ')'
-            << ColumnBreak() << RowBreak();
+        (*m_tablePrinter) << "Benchmark failed (" << error << ')' << ColumnBreak() << RowBreak();
     }
 
     void ConsoleReporter::testCaseEnded(TestCaseStats const& _testCaseStats) {
@@ -7460,10 +6627,7 @@ namespace Catch {
 
     void ConsoleReporter::testRunStarting(TestRunInfo const& _testInfo) {
         StreamingReporterBase::testRunStarting(_testInfo);
-        if(m_config->testSpec().hasFilters()) {
-            m_stream << m_colour->guardColour(Colour::BrightYellow) << "Filters: "
-                << m_config->testSpec() << '\n';
-        }
+        if(m_config->testSpec().hasFilters()) { m_stream << m_colour->guardColour(Colour::BrightYellow) << "Filters: " << m_config->testSpec() << '\n'; }
         m_stream << "Randomness seeded to: " << getSeed() << '\n';
     }
 
@@ -7481,12 +6645,7 @@ namespace Catch {
     }
 
     void ConsoleReporter::lazyPrintRunInfo() {
-        m_stream << '\n'
-            << lineOfChars('~') << '\n'
-            << m_colour->guardColour(Colour::SecondaryText)
-            << currentTestRunInfo.name << " is a Catch2 v" << libraryVersion()
-            << " host application.\n"
-            << "Run with -? for options\n\n";
+        m_stream << '\n' << lineOfChars('~') << '\n' << m_colour->guardColour(Colour::SecondaryText) << currentTestRunInfo.name << " is a Catch2 v" << libraryVersion() << " host application.\n" << "Run with -? for options\n\n";
 
         m_testRunInfoPrinted = true;
     }
@@ -7498,18 +6657,14 @@ namespace Catch {
         if(m_sectionStack.size() > 1) {
             auto guard = m_colour->guardColour(Colour::Headers).engage(m_stream);
 
-            auto
-                it = m_sectionStack.begin() + 1, // Skip first section (test case)
-                itEnd = m_sectionStack.end();
+            auto it = m_sectionStack.begin() + 1, // Skip first section (test case)
+                 itEnd = m_sectionStack.end();
             for(; it != itEnd; ++it) printHeaderString(it->name, 2);
         }
 
         SourceLineInfo lineInfo = m_sectionStack.back().lineInfo;
 
-        m_stream << lineOfChars('-') << '\n'
-            << m_colour->guardColour(Colour::FileName) << lineInfo << '\n'
-            << lineOfChars('.') << "\n\n"
-            << std::flush;
+        m_stream << lineOfChars('-') << '\n' << m_colour->guardColour(Colour::FileName) << lineInfo << '\n' << lineOfChars('.') << "\n\n" << std::flush;
     }
 
     void ConsoleReporter::printClosedHeader(std::string const& _name) {
@@ -7549,10 +6704,7 @@ namespace Catch {
         std::size_t idx = _string.find(": ");
         if(idx != std::string::npos && idx < CATCH_CONFIG_CONSOLE_WIDTH / 4) { idx += 2; }
         else { idx = 0; }
-        m_stream << TextFlow::Column(_string)
-                    .indent(indent + idx)
-                    .initialIndent(indent)
-            << '\n';
+        m_stream << TextFlow::Column(_string).indent(indent + idx).initialIndent(indent) << '\n';
     }
 
     void ConsoleReporter::printTotalsDivider(Totals const& totals) {
@@ -7564,25 +6716,12 @@ namespace Catch {
             while(failedRatio + failedButOkRatio + passedRatio + skippedRatio < CATCH_CONFIG_CONSOLE_WIDTH - 1) findMax(failedRatio, failedButOkRatio, passedRatio, skippedRatio)++;
             while(failedRatio + failedButOkRatio + passedRatio > CATCH_CONFIG_CONSOLE_WIDTH - 1) findMax(failedRatio, failedButOkRatio, passedRatio, skippedRatio)--;
 
-            m_stream << m_colour->guardColour(Colour::Error)
-                << std::string(failedRatio, '=')
-                << m_colour->guardColour(Colour::ResultExpectedFailure)
-                << std::string(failedButOkRatio, '=');
-            if(totals.testCases.allPassed()) {
-                m_stream << m_colour->guardColour(Colour::ResultSuccess)
-                    << std::string(passedRatio, '=');
-            }
-            else {
-                m_stream << m_colour->guardColour(Colour::Success)
-                    << std::string(passedRatio, '=');
-            }
-            m_stream << m_colour->guardColour(Colour::Skip)
-                << std::string(skippedRatio, '=');
+            m_stream << m_colour->guardColour(Colour::Error) << std::string(failedRatio, '=') << m_colour->guardColour(Colour::ResultExpectedFailure) << std::string(failedButOkRatio, '=');
+            if(totals.testCases.allPassed()) { m_stream << m_colour->guardColour(Colour::ResultSuccess) << std::string(passedRatio, '='); }
+            else { m_stream << m_colour->guardColour(Colour::Success) << std::string(passedRatio, '='); }
+            m_stream << m_colour->guardColour(Colour::Skip) << std::string(skippedRatio, '=');
         }
-        else {
-            m_stream << m_colour->guardColour(Colour::Warning)
-                << std::string(CATCH_CONFIG_CONSOLE_WIDTH - 1, '=');
-        }
+        else { m_stream << m_colour->guardColour(Colour::Warning) << std::string(CATCH_CONFIG_CONSOLE_WIDTH - 1, '='); }
         m_stream << '\n';
     }
 } // end namespace Catch
@@ -7605,16 +6744,9 @@ namespace Catch {
                 : m_other(other) {}
 
             BySectionInfo(BySectionInfo const& other)
-                :
-                m_other(other.m_other) {}
+                : m_other(other.m_other) {}
 
-            bool operator()(
-                Detail::unique_ptr<CumulativeReporterBase::SectionNode> const&
-                node) const {
-                return (
-                    (node->stats.sectionInfo.name == m_other.name) &&
-                    (node->stats.sectionInfo.lineInfo == m_other.lineInfo));
-            }
+            bool operator()(Detail::unique_ptr<CumulativeReporterBase::SectionNode> const& node) const { return ((node->stats.sectionInfo.name == m_other.name) && (node->stats.sectionInfo.lineInfo == m_other.lineInfo)); }
 
             void operator=(BySectionInfo const&) = delete;
 
@@ -7624,15 +6756,11 @@ namespace Catch {
     } // namespace
 
     namespace Detail {
-        AssertionOrBenchmarkResult::AssertionOrBenchmarkResult(
-            AssertionStats const& assertion)
-            :
-            m_assertion(assertion) {}
+        AssertionOrBenchmarkResult::AssertionOrBenchmarkResult(AssertionStats const& assertion)
+            : m_assertion(assertion) {}
 
-        AssertionOrBenchmarkResult::AssertionOrBenchmarkResult(
-            BenchmarkStats<> const& benchmark)
-            :
-            m_benchmark(benchmark) {}
+        AssertionOrBenchmarkResult::AssertionOrBenchmarkResult(BenchmarkStats<> const& benchmark)
+            : m_benchmark(benchmark) {}
 
         bool AssertionOrBenchmarkResult::isAssertion() const { return m_assertion.some(); }
 
@@ -7660,20 +6788,14 @@ namespace Catch {
         SectionStats incompleteStats(SectionInfo(sectionInfo), Counts(), 0, false);
         SectionNode* node;
         if(m_sectionStack.empty()) {
-            if(!m_rootSection) {
-                m_rootSection =
-                    Detail::make_unique<SectionNode>(incompleteStats);
-            }
+            if(!m_rootSection) { m_rootSection = Detail::make_unique<SectionNode>(incompleteStats); }
             node = m_rootSection.get();
         }
         else {
             SectionNode& parentNode = *m_sectionStack.back();
-            auto it = std::find_if(parentNode.childSections.begin(),
-                                   parentNode.childSections.end(),
-                                   BySectionInfo(sectionInfo));
+            auto it = std::find_if(parentNode.childSections.begin(), parentNode.childSections.end(), BySectionInfo(sectionInfo));
             if(it == parentNode.childSections.end()) {
-                auto newNode =
-                    Detail::make_unique<SectionNode>(incompleteStats);
+                auto newNode = Detail::make_unique<SectionNode>(incompleteStats);
                 node = newNode.get();
                 parentNode.childSections.push_back(CATCH_MOVE(newNode));
             }
@@ -7684,24 +6806,15 @@ namespace Catch {
         m_sectionStack.push_back(node);
     }
 
-    void CumulativeReporterBase::assertionEnded(
-        AssertionStats const& assertionStats) {
+    void CumulativeReporterBase::assertionEnded(AssertionStats const& assertionStats) {
         assert(!m_sectionStack.empty());
         // AssertionResult holds a pointer to a temporary DecomposedExpression,
         // which getExpandedExpression() calls to build the expression string.
         // Our section stack copy of the assertionResult will likely outlive the
         // temporary, so it must be expanded or discarded now to avoid calling
         // a destroyed object later.
-        if(m_shouldStoreFailedAssertions &&
-            !assertionStats.assertionResult.isOk()) {
-            static_cast<void>(
-                assertionStats.assertionResult.getExpandedExpression());
-        }
-        if(m_shouldStoreSuccesfulAssertions &&
-            assertionStats.assertionResult.isOk()) {
-            static_cast<void>(
-                assertionStats.assertionResult.getExpandedExpression());
-        }
+        if(m_shouldStoreFailedAssertions && !assertionStats.assertionResult.isOk()) { static_cast<void>(assertionStats.assertionResult.getExpandedExpression()); }
+        if(m_shouldStoreSuccesfulAssertions && assertionStats.assertionResult.isOk()) { static_cast<void>(assertionStats.assertionResult.getExpandedExpression()); }
         SectionNode& sectionNode = *m_sectionStack.back();
         sectionNode.assertionsAndBenchmarks.emplace_back(assertionStats);
     }
@@ -7713,8 +6826,7 @@ namespace Catch {
         m_sectionStack.pop_back();
     }
 
-    void CumulativeReporterBase::testCaseEnded(
-        TestCaseStats const& testCaseStats) {
+    void CumulativeReporterBase::testCaseEnded(TestCaseStats const& testCaseStats) {
         auto node = Detail::make_unique<TestCaseNode>(testCaseStats);
         assert(m_sectionStack.size() == 0);
         node->children.push_back(CATCH_MOVE(m_rootSection));
@@ -7732,12 +6844,7 @@ namespace Catch {
         testRunEndedCumulative();
     }
 
-    bool CumulativeReporterBase::SectionNode::hasAnyAssertions() const {
-        return std::any_of(
-            assertionsAndBenchmarks.begin(),
-            assertionsAndBenchmarks.end(),
-            [](Detail::AssertionOrBenchmarkResult const& res) { return res.isAssertion(); });
-    }
+    bool CumulativeReporterBase::SectionNode::hasAnyAssertions() const { return std::any_of(assertionsAndBenchmarks.begin(), assertionsAndBenchmarks.end(), [](Detail::AssertionOrBenchmarkResult const& res) { return res.isAssertion(); }); }
 } // end namespace Catch
 
 namespace Catch {
@@ -7755,11 +6862,9 @@ namespace Catch {
 
     void EventListenerBase::assertionEnded(AssertionStats const&) {}
 
-    void EventListenerBase::listReporters(
-        std::vector<ReporterDescription> const&) {}
+    void EventListenerBase::listReporters(std::vector<ReporterDescription> const&) {}
 
-    void EventListenerBase::listListeners(
-        std::vector<ListenerDescription> const&) {}
+    void EventListenerBase::listListeners(std::vector<ListenerDescription> const&) {}
 
     void EventListenerBase::listTests(std::vector<TestCaseHandle> const&) {}
 
@@ -7796,8 +6901,7 @@ namespace Catch {
 
 namespace Catch {
     namespace {
-        void listTestNamesOnly(std::ostream& out,
-                               std::vector<TestCaseHandle> const& tests) {
+        void listTestNamesOnly(std::ostream& out, std::vector<TestCaseHandle> const& tests) {
             for(auto const& test : tests) {
                 auto const& testCaseInfo = test.getTestCaseInfo();
 
@@ -7824,8 +6928,7 @@ namespace Catch {
         // Save previous errno, to prevent sprintf from overwriting it
         ErrnoGuard guard;
 #ifdef _MSC_VER
-        size_t printedLength = static_cast<size_t>(
-            sprintf_s(buffer, "%.3f", duration));
+        size_t printedLength = static_cast<size_t>(sprintf_s(buffer, "%.3f", duration));
 #else
         size_t printedLength = static_cast<size_t>(
             std::snprintf( buffer, maxDoubleSize, "%.3f", duration ) );
@@ -7863,73 +6966,30 @@ namespace Catch {
         return out;
     }
 
-    void defaultListReporters(std::ostream& out,
-                              std::vector<ReporterDescription> const& descriptions,
-                              Verbosity verbosity) {
+    void defaultListReporters(std::ostream& out, std::vector<ReporterDescription> const& descriptions, Verbosity verbosity) {
         out << "Available reporters:\n";
-        const auto maxNameLen =
-            std::max_element(descriptions.begin(),
-                             descriptions.end(),
-                             [](ReporterDescription const& lhs,
-                                ReporterDescription const& rhs) {
-                                 return lhs.name.size() < rhs.name.size();
-                             })
-            ->name.size();
+        const auto maxNameLen = std::max_element(descriptions.begin(), descriptions.end(), [](ReporterDescription const& lhs, ReporterDescription const& rhs) { return lhs.name.size() < rhs.name.size(); })->name.size();
 
         for(auto const& desc : descriptions) {
-            if(verbosity == Verbosity::Quiet) {
-                out << TextFlow::Column(desc.name)
-                       .indent(2)
-                       .width(5 + maxNameLen)
-                    << '\n';
-            }
-            else {
-                out << TextFlow::Column(desc.name + ':')
-                       .indent(2)
-                       .width(5 + maxNameLen) +
-                    TextFlow::Column(desc.description)
-                    .initialIndent(0)
-                    .indent(2)
-                    .width(CATCH_CONFIG_CONSOLE_WIDTH - maxNameLen - 8)
-                    << '\n';
-            }
+            if(verbosity == Verbosity::Quiet) { out << TextFlow::Column(desc.name).indent(2).width(5 + maxNameLen) << '\n'; }
+            else { out << TextFlow::Column(desc.name + ':').indent(2).width(5 + maxNameLen) + TextFlow::Column(desc.description).initialIndent(0).indent(2).width(CATCH_CONFIG_CONSOLE_WIDTH - maxNameLen - 8) << '\n'; }
         }
         out << '\n' << std::flush;
     }
 
-    void defaultListListeners(std::ostream& out,
-                              std::vector<ListenerDescription> const& descriptions) {
+    void defaultListListeners(std::ostream& out, std::vector<ListenerDescription> const& descriptions) {
         out << "Registered listeners:\n";
 
         if(descriptions.empty()) { return; }
 
-        const auto maxNameLen =
-            std::max_element(descriptions.begin(),
-                             descriptions.end(),
-                             [](ListenerDescription const& lhs,
-                                ListenerDescription const& rhs) {
-                                 return lhs.name.size() < rhs.name.size();
-                             })
-            ->name.size();
+        const auto maxNameLen = std::max_element(descriptions.begin(), descriptions.end(), [](ListenerDescription const& lhs, ListenerDescription const& rhs) { return lhs.name.size() < rhs.name.size(); })->name.size();
 
-        for(auto const& desc : descriptions) {
-            out << TextFlow::Column(static_cast<std::string>(desc.name) +
-                       ':')
-                   .indent(2)
-                   .width(maxNameLen + 5) +
-                TextFlow::Column(desc.description)
-                .initialIndent(0)
-                .indent(2)
-                .width(CATCH_CONFIG_CONSOLE_WIDTH - maxNameLen - 8)
-                << '\n';
-        }
+        for(auto const& desc : descriptions) { out << TextFlow::Column(static_cast<std::string>(desc.name) + ':').indent(2).width(maxNameLen + 5) + TextFlow::Column(desc.description).initialIndent(0).indent(2).width(CATCH_CONFIG_CONSOLE_WIDTH - maxNameLen - 8) << '\n'; }
 
         out << '\n' << std::flush;
     }
 
-    void defaultListTags(std::ostream& out,
-                         std::vector<TagInfo> const& tags,
-                         bool isFiltered) {
+    void defaultListTags(std::ostream& out, std::vector<TagInfo> const& tags, bool isFiltered) {
         if(isFiltered) { out << "Tags for matching test cases:\n"; }
         else { out << "All available tags:\n"; }
 
@@ -7937,10 +6997,7 @@ namespace Catch {
             ReusableStringStream rss;
             rss << "  " << std::setw(2) << tagCount.count << "  ";
             auto str = rss.str();
-            auto wrapper = TextFlow::Column(tagCount.all())
-                           .initialIndent(0)
-                           .indent(str.size())
-                           .width(CATCH_CONFIG_CONSOLE_WIDTH - 10);
+            auto wrapper = TextFlow::Column(tagCount.all()).initialIndent(0).indent(str.size()).width(CATCH_CONFIG_CONSOLE_WIDTH - 10);
             out << str << wrapper << '\n';
         }
         out << pluralise(tags.size(), "tag"_sr) << "\n\n" << std::flush;
@@ -7960,15 +7017,12 @@ namespace Catch {
 
         for(auto const& test : tests) {
             auto const& testCaseInfo = test.getTestCaseInfo();
-            Colour::Code colour = testCaseInfo.isHidden()
-                                      ? Colour::SecondaryText
-                                      : Colour::None;
+            Colour::Code colour = testCaseInfo.isHidden() ? Colour::SecondaryText : Colour::None;
             auto colourGuard = streamColour->guardColour(colour).engage(out);
 
             out << TextFlow::Column(testCaseInfo.name).indent(2) << '\n';
             if(verbosity >= Verbosity::High) { out << TextFlow::Column(Catch::Detail::stringify(testCaseInfo.lineInfo)).indent(4) << '\n'; }
-            if(!testCaseInfo.tags.empty() &&
-                verbosity > Verbosity::Quiet) { out << TextFlow::Column(testCaseInfo.tagsAsString()).indent(6) << '\n'; }
+            if(!testCaseInfo.tags.empty() && verbosity > Verbosity::Quiet) { out << TextFlow::Column(testCaseInfo.tagsAsString()).indent(6) << '\n'; }
         }
 
         if(isFiltered) { out << pluralise(tests.size(), "matching test case"_sr); }
@@ -7980,8 +7034,7 @@ namespace Catch {
         class SummaryColumn {
         public:
             SummaryColumn(std::string suffix, Colour::Code colour)
-                :
-                m_suffix(CATCH_MOVE(suffix))
+                : m_suffix(CATCH_MOVE(suffix))
                 , m_colour(colour) {}
 
             SummaryColumn&& addRow(std::uint64_t count) && {
@@ -8007,73 +7060,43 @@ namespace Catch {
             std::vector<std::string> m_rows;
         };
 
-        void printSummaryRow(std::ostream& stream,
-                             ColourImpl& colour,
-                             StringRef label,
-                             std::vector<SummaryColumn> const& cols,
-                             std::size_t row) {
+        void printSummaryRow(std::ostream& stream, ColourImpl& colour, StringRef label, std::vector<SummaryColumn> const& cols, std::size_t row) {
             for(auto const& col : cols) {
                 auto const& value = col.getRow(row);
                 auto const& suffix = col.getSuffix();
                 if(suffix.empty()) {
                     stream << label << ": ";
                     if(value != "0") { stream << value; }
-                    else {
-                        stream << colour.guardColour(Colour::Warning)
-                            << "- none -";
-                    }
+                    else { stream << colour.guardColour(Colour::Warning) << "- none -"; }
                 }
-                else if(value != "0") {
-                    stream << colour.guardColour(Colour::LightGrey) << " | "
-                        << colour.guardColour(col.getColour()) << value
-                        << ' ' << suffix;
-                }
+                else if(value != "0") { stream << colour.guardColour(Colour::LightGrey) << " | " << colour.guardColour(col.getColour()) << value << ' ' << suffix; }
             }
             stream << '\n';
         }
     } // namespace
 
-    void printTestRunTotals(std::ostream& stream,
-                            ColourImpl& streamColour,
-                            Totals const& totals) {
+    void printTestRunTotals(std::ostream& stream, ColourImpl& streamColour, Totals const& totals) {
         if(totals.testCases.total() == 0) {
-            stream << streamColour.guardColour(Colour::Warning)
-                << "No tests ran\n";
+            stream << streamColour.guardColour(Colour::Warning) << "No tests ran\n";
             return;
         }
 
         if(totals.assertions.total() > 0 && totals.testCases.allPassed()) {
-            stream << streamColour.guardColour(Colour::ResultSuccess)
-                << "All tests passed";
-            stream << " ("
-                << pluralise(totals.assertions.passed, "assertion"_sr)
-                << " in "
-                << pluralise(totals.testCases.passed, "test case"_sr)
-                << ')' << '\n';
+            stream << streamColour.guardColour(Colour::ResultSuccess) << "All tests passed";
+            stream << " (" << pluralise(totals.assertions.passed, "assertion"_sr) << " in " << pluralise(totals.testCases.passed, "test case"_sr) << ')' << '\n';
             return;
         }
 
         std::vector<SummaryColumn> columns;
         // Don't include "skipped assertions" in total count
-        const auto totalAssertionCount =
-            totals.assertions.total() - totals.assertions.skipped;
-        columns.push_back(SummaryColumn("", Colour::None)
-                          .addRow(totals.testCases.total())
-                          .addRow(totalAssertionCount));
-        columns.push_back(SummaryColumn("passed", Colour::Success)
-                          .addRow(totals.testCases.passed)
-                          .addRow(totals.assertions.passed));
-        columns.push_back(SummaryColumn("failed", Colour::ResultError)
-                          .addRow(totals.testCases.failed)
-                          .addRow(totals.assertions.failed));
-        columns.push_back(SummaryColumn("skipped", Colour::Skip)
-                          .addRow(totals.testCases.skipped)
-                          // Don't print "skipped assertions"
-                          .addRow(0));
-        columns.push_back(
-            SummaryColumn("failed as expected", Colour::ResultExpectedFailure)
-            .addRow(totals.testCases.failedButOk)
-            .addRow(totals.assertions.failedButOk));
+        const auto totalAssertionCount = totals.assertions.total() - totals.assertions.skipped;
+        columns.push_back(SummaryColumn("", Colour::None).addRow(totals.testCases.total()).addRow(totalAssertionCount));
+        columns.push_back(SummaryColumn("passed", Colour::Success).addRow(totals.testCases.passed).addRow(totals.assertions.passed));
+        columns.push_back(SummaryColumn("failed", Colour::ResultError).addRow(totals.testCases.failed).addRow(totals.assertions.failed));
+        columns.push_back(SummaryColumn("skipped", Colour::Skip).addRow(totals.testCases.skipped)
+                                                                // Don't print "skipped assertions"
+                                                                .addRow(0));
+        columns.push_back(SummaryColumn("failed as expected", Colour::ResultExpectedFailure).addRow(totals.testCases.failedButOk).addRow(totals.assertions.failedButOk));
         printSummaryRow(stream, streamColour, "test cases"_sr, columns, 0);
         printSummaryRow(stream, streamColour, "assertions"_sr, columns, 1);
     }
@@ -8111,17 +7134,8 @@ namespace Catch {
         }
 
         std::string fileNameTag(std::vector<Tag> const& tags) {
-            auto it = std::find_if(begin(tags),
-                                   end(tags),
-                                   [](Tag const& tag) {
-                                       return tag.original.size() > 0
-                                           && tag.original[0] == '#';
-                                   });
-            if(it != tags.end()) {
-                return static_cast<std::string>(
-                    it->original.substr(1, it->original.size() - 1)
-                );
-            }
+            auto it = std::find_if(begin(tags), end(tags), [](Tag const& tag) { return tag.original.size() > 0 && tag.original[0] == '#'; });
+            if(it != tags.end()) { return static_cast<std::string>(it->original.substr(1, it->original.size() - 1)); }
             return std::string();
         }
 
@@ -8200,14 +7214,8 @@ namespace Catch {
         // Write properties
         {
             auto properties = xml.scopedElement("properties");
-            xml.scopedElement("property")
-               .writeAttribute("name"_sr, "random-seed"_sr)
-               .writeAttribute("value"_sr, m_config->rngSeed());
-            if(m_config->testSpec().hasFilters()) {
-                xml.scopedElement("property")
-                   .writeAttribute("name"_sr, "filters"_sr)
-                   .writeAttribute("value"_sr, m_config->testSpec());
-            }
+            xml.scopedElement("property").writeAttribute("name"_sr, "random-seed"_sr).writeAttribute("value"_sr, m_config->rngSeed());
+            if(m_config->testSpec().hasFilters()) { xml.scopedElement("property").writeAttribute("name"_sr, "filters"_sr).writeAttribute("value"_sr, m_config->testSpec()); }
         }
 
         // Write test cases
@@ -8225,8 +7233,7 @@ namespace Catch {
         assert(testCaseNode.children.size() == 1);
         SectionNode const& rootSection = *testCaseNode.children.front();
 
-        std::string className =
-            static_cast<std::string>(stats.testInfo->className);
+        std::string className = static_cast<std::string>(stats.testInfo->className);
 
         if(className.empty()) {
             className = fileNameTag(stats.testInfo->tags);
@@ -8240,16 +7247,11 @@ namespace Catch {
         writeSection(className, "", rootSection, stats.testInfo->okToFail());
     }
 
-    void JunitReporter::writeSection(std::string const& className,
-                                     std::string const& rootName,
-                                     SectionNode const& sectionNode,
-                                     bool testOkToFail) {
+    void JunitReporter::writeSection(std::string const& className, std::string const& rootName, SectionNode const& sectionNode, bool testOkToFail) {
         std::string name = trim(sectionNode.stats.sectionInfo.name);
         if(!rootName.empty()) name = rootName + '/' + name;
 
-        if(sectionNode.hasAnyAssertions()
-            || !sectionNode.stdOut.empty()
-            || !sectionNode.stdErr.empty()) {
+        if(sectionNode.hasAnyAssertions() || !sectionNode.stdOut.empty() || !sectionNode.stdErr.empty()) {
             XmlWriter::ScopedElement e = xml.scopedElement("testcase");
             if(className.empty()) {
                 xml.writeAttribute("classname"_sr, name);
@@ -8266,10 +7268,7 @@ namespace Catch {
             // events and write those out appropriately.
             xml.writeAttribute("status"_sr, "run"_sr);
 
-            if(sectionNode.stats.assertions.failedButOk) {
-                xml.scopedElement("skipped")
-                   .writeAttribute("message", "TEST_CASE tagged with !mayfail");
-            }
+            if(sectionNode.stats.assertions.failedButOk) { xml.scopedElement("skipped").writeAttribute("message", "TEST_CASE tagged with !mayfail"); }
 
             writeAssertions(sectionNode);
 
@@ -8285,8 +7284,7 @@ namespace Catch {
 
     void JunitReporter::writeAssertion(AssertionStats const& stats) {
         AssertionResult const& result = stats.assertionResult;
-        if(!result.isOk() ||
-            result.getResultType() == ResultWas::ExplicitSkip) {
+        if(!result.isOk() || result.getResultType() == ResultWas::ExplicitSkip) {
             std::string elementName;
             switch(result.getResultType()) {
             case ResultWas::ThrewException:
@@ -8345,10 +7343,8 @@ namespace Catch {
 
 namespace Catch {
     void MultiReporter::updatePreferences(IEventListener const& reporterish) {
-        m_preferences.shouldRedirectStdOut |=
-            reporterish.getPreferences().shouldRedirectStdOut;
-        m_preferences.shouldReportAllAssertions |=
-            reporterish.getPreferences().shouldReportAllAssertions;
+        m_preferences.shouldRedirectStdOut |= reporterish.getPreferences().shouldRedirectStdOut;
+        m_preferences.shouldReportAllAssertions |= reporterish.getPreferences().shouldReportAllAssertions;
     }
 
     void MultiReporter::addListener(IEventListenerPtr&& listener) {
@@ -8390,30 +7386,22 @@ namespace Catch {
 
     void MultiReporter::testCaseStarting(TestCaseInfo const& testInfo) { for(auto& reporterish : m_reporterLikes) { reporterish->testCaseStarting(testInfo); } }
 
-    void MultiReporter::testCasePartialStarting(TestCaseInfo const& testInfo,
-                                                uint64_t partNumber) { for(auto& reporterish : m_reporterLikes) { reporterish->testCasePartialStarting(testInfo, partNumber); } }
+    void MultiReporter::testCasePartialStarting(TestCaseInfo const& testInfo, uint64_t partNumber) { for(auto& reporterish : m_reporterLikes) { reporterish->testCasePartialStarting(testInfo, partNumber); } }
 
     void MultiReporter::sectionStarting(SectionInfo const& sectionInfo) { for(auto& reporterish : m_reporterLikes) { reporterish->sectionStarting(sectionInfo); } }
 
     void MultiReporter::assertionStarting(AssertionInfo const& assertionInfo) { for(auto& reporterish : m_reporterLikes) { reporterish->assertionStarting(assertionInfo); } }
 
     void MultiReporter::assertionEnded(AssertionStats const& assertionStats) {
-        const bool reportByDefault =
-            assertionStats.assertionResult.getResultType() != ResultWas::Ok ||
-            m_config->includeSuccessfulResults();
+        const bool reportByDefault = assertionStats.assertionResult.getResultType() != ResultWas::Ok || m_config->includeSuccessfulResults();
 
-        for(auto& reporterish : m_reporterLikes) {
-            if(reportByDefault ||
-                reporterish->getPreferences().shouldReportAllAssertions) { reporterish->assertionEnded(assertionStats); }
-        }
+        for(auto& reporterish : m_reporterLikes) { if(reportByDefault || reporterish->getPreferences().shouldReportAllAssertions) { reporterish->assertionEnded(assertionStats); } }
     }
 
     void MultiReporter::sectionEnded(SectionStats const& sectionStats) { for(auto& reporterish : m_reporterLikes) { reporterish->sectionEnded(sectionStats); } }
 
-    void MultiReporter::testCasePartialEnded(TestCaseStats const& testStats,
-                                             uint64_t partNumber) {
-        if(m_preferences.shouldRedirectStdOut &&
-            m_haveNoncapturingReporters) {
+    void MultiReporter::testCasePartialEnded(TestCaseStats const& testStats, uint64_t partNumber) {
+        if(m_preferences.shouldRedirectStdOut && m_haveNoncapturingReporters) {
             if(!testStats.stdOut.empty()) { Catch::cout() << testStats.stdOut << std::flush; }
             if(!testStats.stdErr.empty()) { Catch::cerr() << testStats.stdErr << std::flush; }
         }
@@ -8429,8 +7417,7 @@ namespace Catch {
 
     void MultiReporter::listReporters(std::vector<ReporterDescription> const& descriptions) { for(auto& reporterish : m_reporterLikes) { reporterish->listReporters(descriptions); } }
 
-    void MultiReporter::listListeners(
-        std::vector<ListenerDescription> const& descriptions) { for(auto& reporterish : m_reporterLikes) { reporterish->listListeners(descriptions); } }
+    void MultiReporter::listListeners(std::vector<ListenerDescription> const& descriptions) { for(auto& reporterish : m_reporterLikes) { reporterish->listListeners(descriptions); } }
 
     void MultiReporter::listTests(std::vector<TestCaseHandle> const& tests) { for(auto& reporterish : m_reporterLikes) { reporterish->listTests(tests); } }
 
@@ -8439,13 +7426,8 @@ namespace Catch {
 
 namespace Catch {
     namespace Detail {
-        void registerReporterImpl(std::string const& name,
-                                  IReporterFactoryPtr reporterPtr) {
-            CATCH_TRY {
-                getMutableRegistryHub().registerReporter(
-                    name, CATCH_MOVE(reporterPtr));
-            }
-            CATCH_CATCH_ALL {
+        void registerReporterImpl(std::string const& name, IReporterFactoryPtr reporterPtr) {
+            CATCH_TRY { getMutableRegistryHub().registerReporter(name, CATCH_MOVE(reporterPtr)); } CATCH_CATCH_ALL {
                 // Do not throw when constructing global objects, instead
                 // register the exception to be processed later
                 getMutableRegistryHub().registerStartupException();
@@ -8462,11 +7444,7 @@ namespace Catch {
     namespace {
         std::string createMetadataString(IConfig const& config) {
             ReusableStringStream sstr;
-            if(config.testSpec().hasFilters()) {
-                sstr << "filters='"
-                    << config.testSpec()
-                    << "' ";
-            }
+            if(config.testSpec().hasFilters()) { sstr << "filters='" << config.testSpec() << "' "; }
             sstr << "rng-seed=" << config.rngSeed();
             return sstr.str();
         }
@@ -8483,10 +7461,7 @@ namespace Catch {
     void SonarQubeReporter::writeRun(TestRunNode const& runNode) {
         std::map<StringRef, std::vector<TestCaseNode const*>> testsPerFile;
 
-        for(auto const& child : runNode.children) {
-            testsPerFile[child->value.testInfo->lineInfo.file].push_back(
-                child.get());
-        }
+        for(auto const& child : runNode.children) { testsPerFile[child->value.testInfo->lineInfo.file].push_back(child.get()); }
 
         for(auto const& kv : testsPerFile) { writeTestFile(kv.first, kv.second); }
     }
@@ -8510,9 +7485,7 @@ namespace Catch {
         std::string name = trim(sectionNode.stats.sectionInfo.name);
         if(!rootName.empty()) name = rootName + '/' + name;
 
-        if(sectionNode.hasAnyAssertions()
-            || !sectionNode.stdOut.empty()
-            || !sectionNode.stdErr.empty()) {
+        if(sectionNode.hasAnyAssertions() || !sectionNode.stdOut.empty() || !sectionNode.stdErr.empty()) {
             XmlWriter::ScopedElement e = xml.scopedElement("testCase");
             xml.writeAttribute("name"_sr, name);
             xml.writeAttribute("duration"_sr, static_cast<long>(sectionNode.stats.durationInSeconds * 1000));
@@ -8527,8 +7500,7 @@ namespace Catch {
 
     void SonarQubeReporter::writeAssertion(AssertionStats const& stats, bool okToFail) {
         AssertionResult const& result = stats.assertionResult;
-        if(!result.isOk() ||
-            result.getResultType() == ResultWas::ExplicitSkip) {
+        if(!result.isOk() || result.getResultType() == ResultWas::ExplicitSkip) {
             std::string elementName;
             if(okToFail) { elementName = "skipped"; }
             else {
@@ -8691,8 +7663,7 @@ namespace Catch {
             void printExpressionWas() {
                 if(result.hasExpression()) {
                     stream << ';';
-                    stream << colourImpl->guardColour(tapDimColour)
-                        << " expression was:";
+                    stream << colourImpl->guardColour(tapDimColour) << " expression was:";
                     printOriginalExpression();
                 }
             }
@@ -8723,8 +7694,7 @@ namespace Catch {
                 std::vector<MessageInfo>::const_iterator itEnd = messages.end();
                 const std::size_t N = static_cast<std::size_t>(itEnd - itMessage);
 
-                stream << colourImpl->guardColour(colour) << " with "
-                    << pluralise(N, "message"_sr) << ':';
+                stream << colourImpl->guardColour(colour) << " with " << pluralise(N, "message"_sr) << ':';
 
                 for(; itMessage != itEnd;) {
                     // If this assertion is a warning ignore any INFO messages
@@ -8782,9 +7752,7 @@ namespace Catch {
             std::size_t i = _string.find(": ");
             if(i != std::string::npos) i += 2;
             else i = 0;
-            os << TextFlow::Column(_string)
-                  .indent(indent + i)
-                  .initialIndent(indent) << '\n';
+            os << TextFlow::Column(_string).indent(indent + i).initialIndent(indent) << '\n';
         }
 
         std::string escape(StringRef str) {
@@ -8801,20 +7769,13 @@ namespace Catch {
 
     TeamCityReporter::~TeamCityReporter() {}
 
-    void TeamCityReporter::testRunStarting(TestRunInfo const& runInfo) {
-        m_stream << "##teamcity[testSuiteStarted name='" << escape(runInfo.name)
-            << "']\n";
-    }
+    void TeamCityReporter::testRunStarting(TestRunInfo const& runInfo) { m_stream << "##teamcity[testSuiteStarted name='" << escape(runInfo.name) << "']\n"; }
 
-    void TeamCityReporter::testRunEnded(TestRunStats const& runStats) {
-        m_stream << "##teamcity[testSuiteFinished name='"
-            << escape(runStats.runInfo.name) << "']\n";
-    }
+    void TeamCityReporter::testRunEnded(TestRunStats const& runStats) { m_stream << "##teamcity[testSuiteFinished name='" << escape(runStats.runInfo.name) << "']\n"; }
 
     void TeamCityReporter::assertionEnded(AssertionStats const& assertionStats) {
         AssertionResult const& result = assertionStats.assertionResult;
-        if(!result.isOk() ||
-            result.getResultType() == ResultWas::ExplicitSkip) {
+        if(!result.isOk() || result.getResultType() == ResultWas::ExplicitSkip) {
             ReusableStringStream msg;
             if(!m_headerPrintedForThisSection) printSectionHeader(msg.get());
             m_headerPrintedForThisSection = true;
@@ -8844,24 +7805,17 @@ namespace Catch {
             // We shouldn't get here because of the isOk() test
             case ResultWas::Ok:
             case ResultWas::Info:
-            case ResultWas::Warning:
-                CATCH_ERROR("Internal error in TeamCity reporter");
+            case ResultWas::Warning: CATCH_ERROR("Internal error in TeamCity reporter");
             // These cases are here to prevent compiler warnings
             case ResultWas::Unknown:
             case ResultWas::FailureBit:
-            case ResultWas::Exception:
-                CATCH_ERROR("Not implemented");
+            case ResultWas::Exception: CATCH_ERROR("Not implemented");
             }
             if(assertionStats.infoMessages.size() == 1) msg << " with message:";
             if(assertionStats.infoMessages.size() > 1) msg << " with messages:";
             for(auto const& messageInfo : assertionStats.infoMessages) msg << "\n  \"" << messageInfo.message << '"';
 
-            if(result.hasExpression()) {
-                msg <<
-                    "\n  " << result.getExpressionInMacro() << "\n"
-                    "with expansion:\n"
-                    "  " << result.getExpandedExpression() << '\n';
-            }
+            if(result.hasExpression()) { msg << "\n  " << result.getExpressionInMacro() << "\n" "with expansion:\n" "  " << result.getExpandedExpression() << '\n'; }
 
             if(result.getResultType() == ResultWas::ExplicitSkip) { m_stream << "##teamcity[testIgnored"; }
             else if(currentTestCaseInfo->okToFail()) {
@@ -8869,8 +7823,7 @@ namespace Catch {
                 m_stream << "##teamcity[testIgnored";
             }
             else { m_stream << "##teamcity[testFailed"; }
-            m_stream << " name='" << escape(currentTestCaseInfo->name) << '\''
-                << " message='" << escape(msg.str()) << '\'' << "]\n";
+            m_stream << " name='" << escape(currentTestCaseInfo->name) << '\'' << " message='" << escape(msg.str()) << '\'' << "]\n";
         }
         m_stream.flush();
     }
@@ -8878,25 +7831,16 @@ namespace Catch {
     void TeamCityReporter::testCaseStarting(TestCaseInfo const& testInfo) {
         m_testTimer.start();
         StreamingReporterBase::testCaseStarting(testInfo);
-        m_stream << "##teamcity[testStarted name='"
-            << escape(testInfo.name) << "']\n";
+        m_stream << "##teamcity[testStarted name='" << escape(testInfo.name) << "']\n";
         m_stream.flush();
     }
 
     void TeamCityReporter::testCaseEnded(TestCaseStats const& testCaseStats) {
         StreamingReporterBase::testCaseEnded(testCaseStats);
         auto const& testCaseInfo = *testCaseStats.testInfo;
-        if(!testCaseStats.stdOut.empty())
-            m_stream << "##teamcity[testStdOut name='"
-                << escape(testCaseInfo.name)
-                << "' out='" << escape(testCaseStats.stdOut) << "']\n";
-        if(!testCaseStats.stdErr.empty())
-            m_stream << "##teamcity[testStdErr name='"
-                << escape(testCaseInfo.name)
-                << "' out='" << escape(testCaseStats.stdErr) << "']\n";
-        m_stream << "##teamcity[testFinished name='"
-            << escape(testCaseInfo.name) << "' duration='"
-            << m_testTimer.getElapsedMilliseconds() << "']\n";
+        if(!testCaseStats.stdOut.empty()) m_stream << "##teamcity[testStdOut name='" << escape(testCaseInfo.name) << "' out='" << escape(testCaseStats.stdOut) << "']\n";
+        if(!testCaseStats.stdErr.empty()) m_stream << "##teamcity[testStdErr name='" << escape(testCaseInfo.name) << "' out='" << escape(testCaseStats.stdErr) << "']\n";
+        m_stream << "##teamcity[testFinished name='" << escape(testCaseInfo.name) << "' duration='" << m_testTimer.getElapsedMilliseconds() << "']\n";
         m_stream.flush();
     }
 
@@ -8906,9 +7850,8 @@ namespace Catch {
         if(m_sectionStack.size() > 1) {
             os << lineOfChars('-') << '\n';
 
-            std::vector<SectionInfo>::const_iterator
-                it = m_sectionStack.begin() + 1, // Skip first section (test case)
-                itEnd = m_sectionStack.end();
+            std::vector<SectionInfo>::const_iterator it = m_sectionStack.begin() + 1, // Skip first section (test case)
+                                                     itEnd = m_sectionStack.end();
             for(; it != itEnd; ++it) printHeaderString(os, it->name);
             os << lineOfChars('-') << '\n';
         }
@@ -8941,29 +7884,19 @@ namespace Catch {
 
     std::string XmlReporter::getStylesheetRef() const { return std::string(); }
 
-    void XmlReporter::writeSourceInfo(SourceLineInfo const& sourceInfo) {
-        m_xml
-            .writeAttribute("filename"_sr, sourceInfo.file)
-            .writeAttribute("line"_sr, sourceInfo.line);
-    }
+    void XmlReporter::writeSourceInfo(SourceLineInfo const& sourceInfo) { m_xml.writeAttribute("filename"_sr, sourceInfo.file).writeAttribute("line"_sr, sourceInfo.line); }
 
     void XmlReporter::testRunStarting(TestRunInfo const& testInfo) {
         StreamingReporterBase::testRunStarting(testInfo);
         std::string stylesheetRef = getStylesheetRef();
         if(!stylesheetRef.empty()) m_xml.writeStylesheetRef(stylesheetRef);
-        m_xml.startElement("Catch2TestRun")
-             .writeAttribute("name"_sr, m_config->name())
-             .writeAttribute("rng-seed"_sr, m_config->rngSeed())
-             .writeAttribute("xml-format-version"_sr, 3)
-             .writeAttribute("catch2-version"_sr, libraryVersion());
+        m_xml.startElement("Catch2TestRun").writeAttribute("name"_sr, m_config->name()).writeAttribute("rng-seed"_sr, m_config->rngSeed()).writeAttribute("xml-format-version"_sr, 3).writeAttribute("catch2-version"_sr, libraryVersion());
         if(m_config->testSpec().hasFilters()) { m_xml.writeAttribute("filters"_sr, m_config->testSpec()); }
     }
 
     void XmlReporter::testCaseStarting(TestCaseInfo const& testInfo) {
         StreamingReporterBase::testCaseStarting(testInfo);
-        m_xml.startElement("TestCase")
-             .writeAttribute("name"_sr, trim(StringRef(testInfo.name)))
-             .writeAttribute("tags"_sr, testInfo.tagsAsString());
+        m_xml.startElement("TestCase").writeAttribute("name"_sr, trim(StringRef(testInfo.name))).writeAttribute("tags"_sr, testInfo.tagsAsString());
 
         writeSourceInfo(testInfo.lineInfo);
 
@@ -8974,8 +7907,7 @@ namespace Catch {
     void XmlReporter::sectionStarting(SectionInfo const& sectionInfo) {
         StreamingReporterBase::sectionStarting(sectionInfo);
         if(m_sectionDepth++ > 0) {
-            m_xml.startElement("Section")
-                 .writeAttribute("name"_sr, trim(StringRef(sectionInfo.name)));
+            m_xml.startElement("Section").writeAttribute("name"_sr, trim(StringRef(sectionInfo.name)));
             writeSourceInfo(sectionInfo.lineInfo);
             m_xml.ensureTagClosed();
         }
@@ -9005,21 +7937,16 @@ namespace Catch {
         }
 
         // Drop out if result was successful but we're not printing them.
-        if(!includeResults && result.getResultType() != ResultWas::Warning &&
-            result.getResultType() != ResultWas::ExplicitSkip) { return; }
+        if(!includeResults && result.getResultType() != ResultWas::Warning && result.getResultType() != ResultWas::ExplicitSkip) { return; }
 
         // Print the expression if there is one.
         if(result.hasExpression()) {
-            m_xml.startElement("Expression")
-                 .writeAttribute("success"_sr, result.succeeded())
-                 .writeAttribute("type"_sr, result.getTestMacroName());
+            m_xml.startElement("Expression").writeAttribute("success"_sr, result.succeeded()).writeAttribute("type"_sr, result.getTestMacroName());
 
             writeSourceInfo(result.getSourceInfo());
 
-            m_xml.scopedElement("Original")
-                 .writeText(result.getExpression());
-            m_xml.scopedElement("Expanded")
-                 .writeText(result.getExpandedExpression());
+            m_xml.scopedElement("Original").writeText(result.getExpression());
+            m_xml.scopedElement("Expanded").writeText(result.getExpandedExpression());
         }
 
         // And... Print a result applicable to each result type.
@@ -9037,8 +7964,7 @@ namespace Catch {
             m_xml.endElement();
             break;
         case ResultWas::Info:
-            m_xml.scopedElement("Info")
-                 .writeText(result.getMessage());
+            m_xml.scopedElement("Info").writeText(result.getMessage());
             break;
         case ResultWas::Warning:
             // Warning will already have been written
@@ -9094,59 +8020,27 @@ namespace Catch {
 
     void XmlReporter::testRunEnded(TestRunStats const& testRunStats) {
         StreamingReporterBase::testRunEnded(testRunStats);
-        m_xml.scopedElement("OverallResults")
-             .writeAttribute("successes"_sr, testRunStats.totals.assertions.passed)
-             .writeAttribute("failures"_sr, testRunStats.totals.assertions.failed)
-             .writeAttribute("expectedFailures"_sr, testRunStats.totals.assertions.failedButOk)
-             .writeAttribute("skips"_sr, testRunStats.totals.assertions.skipped);
-        m_xml.scopedElement("OverallResultsCases")
-             .writeAttribute("successes"_sr, testRunStats.totals.testCases.passed)
-             .writeAttribute("failures"_sr, testRunStats.totals.testCases.failed)
-             .writeAttribute("expectedFailures"_sr, testRunStats.totals.testCases.failedButOk)
-             .writeAttribute("skips"_sr, testRunStats.totals.testCases.skipped);
+        m_xml.scopedElement("OverallResults").writeAttribute("successes"_sr, testRunStats.totals.assertions.passed).writeAttribute("failures"_sr, testRunStats.totals.assertions.failed).writeAttribute("expectedFailures"_sr, testRunStats.totals.assertions.failedButOk).writeAttribute("skips"_sr, testRunStats.totals.assertions.skipped);
+        m_xml.scopedElement("OverallResultsCases").writeAttribute("successes"_sr, testRunStats.totals.testCases.passed).writeAttribute("failures"_sr, testRunStats.totals.testCases.failed).writeAttribute("expectedFailures"_sr, testRunStats.totals.testCases.failedButOk).writeAttribute("skips"_sr, testRunStats.totals.testCases.skipped);
         m_xml.endElement();
     }
 
-    void XmlReporter::benchmarkPreparing(StringRef name) {
-        m_xml.startElement("BenchmarkResults")
-             .writeAttribute("name"_sr, name);
-    }
+    void XmlReporter::benchmarkPreparing(StringRef name) { m_xml.startElement("BenchmarkResults").writeAttribute("name"_sr, name); }
 
-    void XmlReporter::benchmarkStarting(BenchmarkInfo const& info) {
-        m_xml.writeAttribute("samples"_sr, info.samples)
-             .writeAttribute("resamples"_sr, info.resamples)
-             .writeAttribute("iterations"_sr, info.iterations)
-             .writeAttribute("clockResolution"_sr, info.clockResolution)
-             .writeAttribute("estimatedDuration"_sr, info.estimatedDuration)
-             .writeComment("All values in nano seconds"_sr);
-    }
+    void XmlReporter::benchmarkStarting(BenchmarkInfo const& info) { m_xml.writeAttribute("samples"_sr, info.samples).writeAttribute("resamples"_sr, info.resamples).writeAttribute("iterations"_sr, info.iterations).writeAttribute("clockResolution"_sr, info.clockResolution).writeAttribute("estimatedDuration"_sr, info.estimatedDuration).writeComment("All values in nano seconds"_sr); }
 
     void XmlReporter::benchmarkEnded(BenchmarkStats<> const& benchmarkStats) {
-        m_xml.startElement("mean")
-             .writeAttribute("value"_sr, benchmarkStats.mean.point.count())
-             .writeAttribute("lowerBound"_sr, benchmarkStats.mean.lower_bound.count())
-             .writeAttribute("upperBound"_sr, benchmarkStats.mean.upper_bound.count())
-             .writeAttribute("ci"_sr, benchmarkStats.mean.confidence_interval);
+        m_xml.startElement("mean").writeAttribute("value"_sr, benchmarkStats.mean.point.count()).writeAttribute("lowerBound"_sr, benchmarkStats.mean.lower_bound.count()).writeAttribute("upperBound"_sr, benchmarkStats.mean.upper_bound.count()).writeAttribute("ci"_sr, benchmarkStats.mean.confidence_interval);
         m_xml.endElement();
-        m_xml.startElement("standardDeviation")
-             .writeAttribute("value"_sr, benchmarkStats.standardDeviation.point.count())
-             .writeAttribute("lowerBound"_sr, benchmarkStats.standardDeviation.lower_bound.count())
-             .writeAttribute("upperBound"_sr, benchmarkStats.standardDeviation.upper_bound.count())
-             .writeAttribute("ci"_sr, benchmarkStats.standardDeviation.confidence_interval);
+        m_xml.startElement("standardDeviation").writeAttribute("value"_sr, benchmarkStats.standardDeviation.point.count()).writeAttribute("lowerBound"_sr, benchmarkStats.standardDeviation.lower_bound.count()).writeAttribute("upperBound"_sr, benchmarkStats.standardDeviation.upper_bound.count()).writeAttribute("ci"_sr, benchmarkStats.standardDeviation.confidence_interval);
         m_xml.endElement();
-        m_xml.startElement("outliers")
-             .writeAttribute("variance"_sr, benchmarkStats.outlierVariance)
-             .writeAttribute("lowMild"_sr, benchmarkStats.outliers.low_mild)
-             .writeAttribute("lowSevere"_sr, benchmarkStats.outliers.low_severe)
-             .writeAttribute("highMild"_sr, benchmarkStats.outliers.high_mild)
-             .writeAttribute("highSevere"_sr, benchmarkStats.outliers.high_severe);
+        m_xml.startElement("outliers").writeAttribute("variance"_sr, benchmarkStats.outlierVariance).writeAttribute("lowMild"_sr, benchmarkStats.outliers.low_mild).writeAttribute("lowSevere"_sr, benchmarkStats.outliers.low_severe).writeAttribute("highMild"_sr, benchmarkStats.outliers.high_mild).writeAttribute("highSevere"_sr, benchmarkStats.outliers.high_severe);
         m_xml.endElement();
         m_xml.endElement();
     }
 
     void XmlReporter::benchmarkFailed(StringRef error) {
-        m_xml.scopedElement("failed").
-              writeAttribute("message"_sr, error);
+        m_xml.scopedElement("failed").writeAttribute("message"_sr, error);
         m_xml.endElement();
     }
 
@@ -9154,12 +8048,8 @@ namespace Catch {
         auto outerTag = m_xml.scopedElement("AvailableReporters");
         for(auto const& reporter : descriptions) {
             auto inner = m_xml.scopedElement("Reporter");
-            m_xml.startElement("Name", XmlFormatting::Indent)
-                 .writeText(reporter.name, XmlFormatting::None)
-                 .endElement(XmlFormatting::Newline);
-            m_xml.startElement("Description", XmlFormatting::Indent)
-                 .writeText(reporter.description, XmlFormatting::None)
-                 .endElement(XmlFormatting::Newline);
+            m_xml.startElement("Name", XmlFormatting::Indent).writeText(reporter.name, XmlFormatting::None).endElement(XmlFormatting::Newline);
+            m_xml.startElement("Description", XmlFormatting::Indent).writeText(reporter.description, XmlFormatting::None).endElement(XmlFormatting::Newline);
         }
     }
 
@@ -9167,12 +8057,8 @@ namespace Catch {
         auto outerTag = m_xml.scopedElement("RegisteredListeners");
         for(auto const& listener : descriptions) {
             auto inner = m_xml.scopedElement("Listener");
-            m_xml.startElement("Name", XmlFormatting::Indent)
-                 .writeText(listener.name, XmlFormatting::None)
-                 .endElement(XmlFormatting::Newline);
-            m_xml.startElement("Description", XmlFormatting::Indent)
-                 .writeText(listener.description, XmlFormatting::None)
-                 .endElement(XmlFormatting::Newline);
+            m_xml.startElement("Name", XmlFormatting::Indent).writeText(listener.name, XmlFormatting::None).endElement(XmlFormatting::Newline);
+            m_xml.startElement("Description", XmlFormatting::Indent).writeText(listener.description, XmlFormatting::None).endElement(XmlFormatting::Newline);
         }
     }
 
@@ -9181,23 +8067,13 @@ namespace Catch {
         for(auto const& test : tests) {
             auto innerTag = m_xml.scopedElement("TestCase");
             auto const& testInfo = test.getTestCaseInfo();
-            m_xml.startElement("Name", XmlFormatting::Indent)
-                 .writeText(testInfo.name, XmlFormatting::None)
-                 .endElement(XmlFormatting::Newline);
-            m_xml.startElement("ClassName", XmlFormatting::Indent)
-                 .writeText(testInfo.className, XmlFormatting::None)
-                 .endElement(XmlFormatting::Newline);
-            m_xml.startElement("Tags", XmlFormatting::Indent)
-                 .writeText(testInfo.tagsAsString(), XmlFormatting::None)
-                 .endElement(XmlFormatting::Newline);
+            m_xml.startElement("Name", XmlFormatting::Indent).writeText(testInfo.name, XmlFormatting::None).endElement(XmlFormatting::Newline);
+            m_xml.startElement("ClassName", XmlFormatting::Indent).writeText(testInfo.className, XmlFormatting::None).endElement(XmlFormatting::Newline);
+            m_xml.startElement("Tags", XmlFormatting::Indent).writeText(testInfo.tagsAsString(), XmlFormatting::None).endElement(XmlFormatting::Newline);
 
             auto sourceTag = m_xml.scopedElement("SourceInfo");
-            m_xml.startElement("File", XmlFormatting::Indent)
-                 .writeText(testInfo.lineInfo.file, XmlFormatting::None)
-                 .endElement(XmlFormatting::Newline);
-            m_xml.startElement("Line", XmlFormatting::Indent)
-                 .writeText(std::to_string(testInfo.lineInfo.line), XmlFormatting::None)
-                 .endElement(XmlFormatting::Newline);
+            m_xml.startElement("File", XmlFormatting::Indent).writeText(testInfo.lineInfo.file, XmlFormatting::None).endElement(XmlFormatting::Newline);
+            m_xml.startElement("Line", XmlFormatting::Indent).writeText(std::to_string(testInfo.lineInfo.line), XmlFormatting::None).endElement(XmlFormatting::Newline);
         }
     }
 
@@ -9205,15 +8081,9 @@ namespace Catch {
         auto outerTag = m_xml.scopedElement("TagsFromMatchingTests");
         for(auto const& tag : tags) {
             auto innerTag = m_xml.scopedElement("Tag");
-            m_xml.startElement("Count", XmlFormatting::Indent)
-                 .writeText(std::to_string(tag.count), XmlFormatting::None)
-                 .endElement(XmlFormatting::Newline);
+            m_xml.startElement("Count", XmlFormatting::Indent).writeText(std::to_string(tag.count), XmlFormatting::None).endElement(XmlFormatting::Newline);
             auto aliasTag = m_xml.scopedElement("Aliases");
-            for(auto const& alias : tag.spellings) {
-                m_xml.startElement("Alias", XmlFormatting::Indent)
-                     .writeText(alias, XmlFormatting::None)
-                     .endElement(XmlFormatting::Newline);
-            }
+            for(auto const& alias : tag.spellings) { m_xml.startElement("Alias", XmlFormatting::Indent).writeText(alias, XmlFormatting::None).endElement(XmlFormatting::Newline); }
         }
     }
 } // end namespace Catch
