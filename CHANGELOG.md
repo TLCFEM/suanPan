@@ -17,7 +17,7 @@
 7. add elemental damping using Lee's model
 8. support Lode angle in CDPM2 [#163](https://github.com/TLCFEM/suanPan/pull/163)
 9. add `AICN` cubic Newton solver [#165](https://github.com/TLCFEM/suanPan/pull/165)
-10. remove `Bilinear2D` material, use `PlaneStress` wrapper and `BilinearJ2` 3D model instead
+10. remove `Bilinear2D` material, use `PlaneStress`/`PlaneStrain` wrapper and `BilinearJ2` 3D model instead
 
 ## version 3.1
 
