@@ -644,6 +644,27 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     return SUANPAN_SUCCESS;
 }
 
+bool normalise_command(string& all_line, string& command_line) {
+    // if to parse and process immediately
+    auto process = true;
+
+    // clear comment line
+    if('#' == command_line.front()) command_line.clear();
+    // remove inline comment
+    if(const auto if_comment = command_line.find('!'); string::npos != if_comment) command_line.erase(if_comment);
+    // remove all delimiters
+    for(auto& c : command_line) if(',' == c || '\t' == c || '\r' == c || '\n' == c) c = ' ';
+    while(!command_line.empty() && ' ' == command_line.back()) command_line.pop_back();
+    // it is a command spanning multiple lines
+    if(!command_line.empty() && '\\' == command_line.back()) {
+        while(!command_line.empty() && (' ' == command_line.back() || '\\' == command_line.back())) command_line.pop_back();
+        process = false;
+    }
+    all_line.append(command_line);
+
+    return process && !all_line.empty();
+}
+
 int process_file(const shared_ptr<Bead>& model, const char* file_name) {
     std::vector<string> file_list;
     file_list.reserve(9);
@@ -676,23 +697,12 @@ int process_file(const shared_ptr<Bead>& model, const char* file_name) {
     }
 
     string all_line, command_line;
-    while(!getline(input_file, command_line).fail())
-        if(!command_line.empty() && command_line[0] != '#' && command_line[0] != '!') {
-            if(const auto if_comment = command_line.find('!'); string::npos != if_comment) command_line.erase(if_comment);
-            for(auto& c : command_line) if(',' == c || '\t' == c || '\r' == c || '\n' == c) c = ' ';
-            while(!command_line.empty() && *command_line.crbegin() == ' ') command_line.pop_back();
-            if(command_line.empty()) continue;
-            if(*command_line.crbegin() == '\\') {
-                command_line.back() = ' ';
-                all_line.append(command_line);
-            }
-            else {
-                all_line.append(command_line);
-                if(istringstream tmp_str(all_line); process_command(model, tmp_str) == SUANPAN_EXIT) return SUANPAN_EXIT;
-                all_line.clear();
-            }
-        }
-
+    while(!getline(input_file, command_line).fail()) {
+        if(!normalise_command(all_line, command_line)) continue;
+        // now process the command
+        if(istringstream tmp_str(all_line); process_command(model, tmp_str) == SUANPAN_EXIT) return SUANPAN_EXIT;
+        all_line.clear();
+    }
     return SUANPAN_SUCCESS;
 }
 

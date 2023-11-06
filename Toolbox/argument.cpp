@@ -371,22 +371,10 @@ void cli_mode(const shared_ptr<Bead>& model) {
         string command_line;
         suanpan_info("suanPan ~<> ");
         getline(std::cin, command_line);
-        if(!command_line.empty() && command_line[0] != '#' && command_line[0] != '!') {
-            if(const auto if_comment = command_line.find('!'); string::npos != if_comment) command_line.erase(if_comment);
-            for(auto& c : command_line) if(',' == c || '\t' == c || '\r' == c || '\n' == c) c = ' ';
-            while(!command_line.empty() && *command_line.crbegin() == ' ') command_line.pop_back();
-            if(command_line.empty()) continue;
-            if(*command_line.crbegin() == '\\') {
-                command_line.back() = ' ';
-                all_line.append(command_line);
-            }
-            else {
-                all_line.append(command_line);
-                istringstream tmp_str(all_line);
-                if(output_file.is_open()) output_file << all_line << '\n';
-                if(process_command(model, tmp_str) == SUANPAN_EXIT) return;
-                all_line.clear();
-            }
-        }
+        if(!normalise_command(all_line, command_line)) continue;
+        // now process the command
+        if(output_file.is_open()) output_file << all_line << '\n';
+        if(istringstream tmp_str(all_line); process_command(model, tmp_str) == SUANPAN_EXIT) return;
+        all_line.clear();
     }
 }

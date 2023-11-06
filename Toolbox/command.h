@@ -36,6 +36,8 @@ class DomainBase;
 
 int process_command(const shared_ptr<Bead>&, istringstream&);
 
+bool normalise_command(string&, string&);
+
 int process_file(const shared_ptr<Bead>&, const char*);
 
 int run_example();
