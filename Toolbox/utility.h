@@ -142,6 +142,6 @@ bool is_false(const string&);
 
 bool is_integer(const string&);
 
-double perturb(double);
+double perturb(double, double = 1E-5);
 
 #endif

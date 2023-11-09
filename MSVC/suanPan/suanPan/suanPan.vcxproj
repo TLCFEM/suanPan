@@ -322,6 +322,7 @@
     <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\BilinearPO.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\BoucWen.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\BWBN.cpp" />
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\ComplexHysteresis.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\CoulombFriction.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\Flag.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\Gap01.cpp" />
@@ -808,6 +809,7 @@
     <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\BilinearPO.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\BoucWen.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\BWBN.h" />
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\ComplexHysteresis.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\CoulombFriction.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\Flag.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\Gap01.h" />

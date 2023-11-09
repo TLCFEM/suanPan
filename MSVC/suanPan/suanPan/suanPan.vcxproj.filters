@@ -1576,6 +1576,9 @@
     <ClCompile Include="..\..\..\Domain\Group\GroupParser.cpp">
       <Filter>Domain\Group</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\ComplexHysteresis.cpp">
+      <Filter>Material\Material1D\Hysteresis</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -3009,6 +3012,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Domain\Group\GroupParser.h">
       <Filter>Domain\Group</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\ComplexHysteresis.h">
+      <Filter>Material\Material1D\Hysteresis</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
