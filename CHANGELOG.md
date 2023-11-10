@@ -6,6 +6,10 @@
 2. The `SPIKE` solver may occasionally freeze, to circumvent, try to avoid mixing compilers from different vendors.
 3. The `MUMPS` solver throws segfaults with large matrices.
 
+## version 3.3
+
+1. (breaking) revise syntaxes for `ConcreteTsai`, `Concrete21` and `Concrete22` using a more consistent definition
+
 ## version 3.2
 
 1. revise uniaxial universal damage models [#153](https://github.com/TLCFEM/suanPan/pull/153)

@@ -32,6 +32,8 @@
 #include <Material/Material1D/Hysteresis/SimpleHysteresis.h>
 
 class ConcreteTsai final : public SimpleHysteresis {
+    const double elastic_modulus;
+
     const double c_stress, c_strain, c_m, c_n;
     const double t_stress, t_strain, t_m, t_n;
 
@@ -45,23 +47,11 @@ class ConcreteTsai final : public SimpleHysteresis {
 public:
     ConcreteTsai(
         unsigned,   // tag
+        double,     // elastic modulus
         double,     // peak stress in negative
         double,     // crack stress in positive
-        double,     // MC
         double,     // NC
-        double,     // MT
         double,     // NT
-        double,     // middle point
-        double,     // peak strain in negative
-        double,     // crack strain in positive
-        double = 0. // density
-    );
-    ConcreteTsai(
-        unsigned,   // tag
-        double,     // peak stress in negative
-        double,     // crack stress in positive
-        double,     // M
-        double,     // N
         double,     // middle point
         double,     // peak strain in negative
         double,     // crack strain in positive

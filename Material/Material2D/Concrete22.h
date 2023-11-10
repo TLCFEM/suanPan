@@ -37,16 +37,17 @@ class Concrete22 final : public Material2D {
 
     const double shear_stress, shear_retention;
 
+    const double elastic_modulus;
+
     double shear_modulus = 0., shear_strain = 0.;
 
 public:
     Concrete22(
         unsigned,   // tag
+        double,     // elastic modulus
         double,     // peak stress in negative
         double,     // crack stress in positive
-        double,     // MC
         double,     // NC
-        double,     // MT
         double,     // NT
         double,     // middle point
         double,     // peak strain in negative

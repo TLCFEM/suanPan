@@ -31,11 +31,12 @@ analyze
 # save recorder 1 2
 
 # Node 3:
-# 2.0000 0
+# Coordinate:
+#   2.0000e+00  0.0000e+00
 # Displacement:
-# -0.0100 0
+#  -1.0000e-02  0.0000e+00
 # Resistance:
-# -1.6528e+03 0
+#  -1.6528e+03  0.0000e+00
 peek node 3
 
 reset

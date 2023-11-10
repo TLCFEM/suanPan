@@ -41,16 +41,16 @@
 class Concrete21 final : public Material2D {
     ConcreteTsai concrete_major, concrete_minor;
 
+    const double elastic_modulus;
     double shear_modulus = 0.;
 
 public:
     Concrete21(
         unsigned,   // tag
+        double,     // elastic modulus
         double,     // peak stress in negative
         double,     // crack stress in positive
-        double,     // MC
         double,     // NC
-        double,     // MT
         double,     // NT
         double,     // middle point
         double,     // peak strain in negative

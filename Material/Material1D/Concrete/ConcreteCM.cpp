@@ -306,9 +306,9 @@ ConcreteCM::ConcreteCM(const unsigned T, const double E, const double SC, const 
     , t_stress(perturb(fabs(ST)))
     , t_strain(perturb(fabs(ET)))
     , c_m(elastic_modulus * c_strain / c_stress)
-    , c_n(NCC)
+    , c_n(std::max(perturb(1.), NCC))
     , t_m(elastic_modulus * t_strain / t_stress)
-    , t_n(NTT)
+    , t_n(std::max(perturb(1.), NTT))
     , linear_trans(LT) {}
 
 unique_ptr<Material> ConcreteCM::get_copy() { return make_unique<ConcreteCM>(*this); }

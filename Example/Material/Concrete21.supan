@@ -5,7 +5,7 @@ node 2 1 0
 node 3 1 1
 node 4 0 1
 
-material Concrete21 1 30 20 2 2 2 2 .1 2E-3 2E-3
+material Concrete21 1 3E4 30 20 2 2 .1 2E-3 2E-3
 
 element CP4 1 1 2 3 4 1 1
 
