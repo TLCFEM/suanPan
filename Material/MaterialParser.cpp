@@ -1109,16 +1109,16 @@ void new_concretek4(unique_ptr<Material>& return_obj, istringstream& command) {
         return;
     }
 
-    auto enable_damage = true, enable_crack_closing = true;
+    auto enable_damage = true, enable_crack_closing = true, objective_damage = false;
     if(!command.eof()) {
-        if(!get_input(command, enable_damage, enable_crack_closing)) {
+        if(!get_input(command, enable_damage, enable_crack_closing, objective_damage)) {
             suanpan_error("A valid flag is required.\n");
             return;
         }
         suanpan_warning("Internal flags are set.\n");
     }
 
-    return_obj = make_unique<ConcreteK4>(tag, elastic_modulus, hardening, std::move(pool), density, enable_damage, enable_crack_closing);
+    return_obj = make_unique<ConcreteK4>(tag, elastic_modulus, hardening, std::move(pool), density, enable_damage, enable_crack_closing, objective_damage);
 }
 
 void new_concretetable(unique_ptr<Material>& return_obj, istringstream& command) {

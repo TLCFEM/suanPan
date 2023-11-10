@@ -103,11 +103,19 @@ void NonlinearK4::compute_crack_close_branch() {
     trial_stress -= elastic_modulus * incre_ep;
 }
 
-NonlinearK4::NonlinearK4(const unsigned T, const double E, const double H, const double R, const bool FD, const bool FC)
+double NonlinearK4::objective_scale(const double a, const double zeta) const {
+    if(!objective_damage) return zeta;
+
+    const auto ratio = a / zeta;
+    return 2. * a / (std::sqrt(1. + 4. / get_characteristic_length() * (ratio * ratio + ratio)) - 1.);
+}
+
+NonlinearK4::NonlinearK4(const unsigned T, const double E, const double H, const double R, const bool FD, const bool FC, const bool OD)
     : DataNonlinearK4{fabs(E), std::min(1., std::max(fabs(H), 1E-4)) * fabs(E)}
     , Material1D(T, R)
     , apply_damage(FD)
-    , apply_crack_closing(FC) {}
+    , apply_crack_closing(FC)
+    , objective_damage(OD) {}
 
 int NonlinearK4::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = elastic_modulus;
@@ -179,7 +187,7 @@ vec2 ConcreteK4::compute_compression_backbone(const double k) const {
 }
 
 vec2 ConcreteK4::compute_tension_damage(const double k) const {
-    const auto e_t = f_t / zeta_t;
+    const auto e_t = f_t / objective_scale(hardening_t, zeta_t);
     const auto factor = exp(-k / e_t);
     return vec2{1. - factor, factor / e_t};
 }
@@ -189,13 +197,13 @@ vec2 ConcreteK4::compute_compression_damage(double k) const {
 
     k -= k_peak;
 
-    const auto e_c = f_c / zeta_c;
+    const auto e_c = f_c / objective_scale(hardening_d, zeta_c);
     const auto factor = exp(-k / e_c);
     return vec2{1. - factor, factor / e_c};
 }
 
-ConcreteK4::ConcreteK4(const unsigned T, const double E, const double H, vec&& P, const double R, const bool FD, const bool FC)
+ConcreteK4::ConcreteK4(const unsigned T, const double E, const double H, vec&& P, const double R, const bool FD, const bool FC, const bool OD)
     : DataConcreteK4{fabs(E * P(0)), fabs(E * P(1)), perturb(fabs(P(2))), fabs(P(3)), fabs(P(4)), fabs(P(3) * P(5)), fabs(E * P(6)), fabs(E * P(7))}
-    , NonlinearK4(T, E, H, R, FD, FC) {}
+    , NonlinearK4(T, E, H, R, FD, FC, OD) {}
 
 unique_ptr<Material> ConcreteK4::get_copy() { return make_unique<ConcreteK4>(*this); }
