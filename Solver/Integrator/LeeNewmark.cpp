@@ -169,7 +169,7 @@ void LeeNewmark::assemble_resistance() {
 }
 
 void LeeNewmark::print() {
-    suanpan_info("A Newmark solver using Lee's damping model. doi: 10.1016/j.jsv.2020.115312\n");
+    suanpan_info("A Newmark solver using Lee's damping model. doi:10.1016/j.jsv.2020.115312\n");
     const vec X = .25 * sqrt(mass_coef % stiffness_coef);
     const vec F = sqrt(mass_coef / stiffness_coef);
     for(auto I = 0llu; I < n_damping; ++I)

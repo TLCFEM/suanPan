@@ -377,5 +377,5 @@ int DafaliasManzari::reset_status() {
 }
 
 void DafaliasManzari::print() {
-    suanpan_info("A Dafalias-Manzari sand model. doi: 10.1061/(ASCE)0733-9399(2004)130:6(622)\n");
+    suanpan_info("A Dafalias-Manzari sand model. doi:10.1061/(ASCE)0733-9399(2004)130:6(622)\n");
 }

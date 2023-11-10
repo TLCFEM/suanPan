@@ -346,7 +346,7 @@ vector<vec> CINP4::record(const OutputType P) {
 }
 
 void CINP4::print() {
-    suanpan_info("CINP4 element (doi: 10.1016/0045-7949(84)90019-1) connects: ", node_encoding);
+    suanpan_info("CINP4 element (doi:10.1016/0045-7949(84)90019-1) connects: ", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Material:\n");
     for(size_t I = 0; I < int_pt.size(); ++I) {

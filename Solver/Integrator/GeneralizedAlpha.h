@@ -24,7 +24,7 @@
  * approach applies it at somewhere in current step, i.e.,
  * \f$t=t_0+\Delta{}t-\alpha\f$, similar to the generalized midpoint concept.
  *
- * doi: 10.1115/1.2900803
+ * doi:10.1115/1.2900803
  *
  * @author tlc
  * @date 21/10/2017

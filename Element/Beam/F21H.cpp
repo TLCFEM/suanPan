@@ -176,7 +176,7 @@ vector<vec> F21H::record(const OutputType P) {
 }
 
 void F21H::print() {
-    suanpan_info("A 2D force based beam element with lumped plasticity{} doi: https://doi.org/10.1016/0045-7949(95)00103-N \n", nlgeom ? " and corotational formulation." : ".");
+    suanpan_info("A 2D force based beam element with lumped plasticity{} doi:https://doi.org/10.1016/0045-7949(95)00103-N \n", nlgeom ? " and corotational formulation." : ".");
     suanpan_info("The element connects nodes:", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Section:\n");

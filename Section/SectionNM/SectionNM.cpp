@@ -49,7 +49,7 @@ int SectionNM::reset_status() {
 }
 
 void SectionNM::print() {
-    suanpan_info("A N-M interaction based section. doi: 10.1061/JSENDH/STENG-12176\n");
+    suanpan_info("A N-M interaction based section. doi:10.1061/JSENDH.STENG-12176\n");
     suanpan_info("Local Deformation:", current_deformation);
     suanpan_info("Local Resistance:", current_resistance);
 }

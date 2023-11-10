@@ -174,7 +174,7 @@ int NonlinearK4::reset_status() {
 }
 
 void NonlinearK4::print() {
-    suanpan_info("A concrete model. doi: 10.1061/(ASCE)ST.1943-541X.000259\n");
+    suanpan_info("A concrete model. doi:10.1061/(ASCE)ST.1943-541X.000259\n");
     Material1D::print();
 }
 

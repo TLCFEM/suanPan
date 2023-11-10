@@ -129,6 +129,6 @@ int SteelBRB::reset_status() {
 }
 
 void SteelBRB::print() {
-    suanpan_info("A steel model for BRB. doi: 10.1016/j.jcsr.2011.07.017\n");
+    suanpan_info("A steel model for BRB. doi:10.1016/j.jcsr.2011.07.017\n");
     Material1D::print();
 }

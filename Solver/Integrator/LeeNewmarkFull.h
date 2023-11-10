@@ -18,8 +18,8 @@
  * @class LeeNewmarkFull
  * @brief A LeeNewmarkFull class defines a solver using Newmark algorithm with Lee damping model.
  *
- * doi: 10.1016/j.compstruc.2020.106423
- * doi: 10.1016/j.compstruc.2021.106663
+ * doi:10.1016/j.compstruc.2020.106423
+ * doi:10.1016/j.compstruc.2021.106663
  *
  * @author tlc
  * @date 26/11/2021

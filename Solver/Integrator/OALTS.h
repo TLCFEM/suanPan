@@ -18,7 +18,7 @@
  * @class OALTS
  * @brief A OALTS class defines a solver using OALTS algorithm.
  *
- * doi: 10.1002/nme.6188
+ * doi:10.1002/nme.6188
  *
  * @author tlc
  * @date 05/12/2022

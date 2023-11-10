@@ -672,5 +672,5 @@ vector<vec> CDPM2::record(const OutputType P) {
 }
 
 void CDPM2::print() {
-    suanpan_info("A concrete damage plasticity model based on the CDPM2 model. doi: 10.1016/j.ijsolstr.2013.07.008\n");
+    suanpan_info("A concrete damage plasticity model based on the CDPM2 model. doi:10.1016/j.ijsolstr.2013.07.008\n");
 }

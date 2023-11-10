@@ -110,5 +110,5 @@ vector<vec> TimberPD::record(const OutputType P) {
 }
 
 void TimberPD::print() {
-    suanpan_info("A 3D Timber Model. doi: 10.1016/j.compstruc.2017.09.010\n");
+    suanpan_info("A 3D Timber Model. doi:10.1016/j.compstruc.2017.09.010\n");
 }

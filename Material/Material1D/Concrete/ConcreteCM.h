@@ -20,7 +20,7 @@
  *
  * The ConcreteCM class represents a concrete material model based on the Chang & Mander concrete model.
  *
- * doi: 10.1061/(ASCE)0733-9445(1988)114:8(1804)
+ * doi:10.1061/(ASCE)0733-9445(1988)114:8(1804)
  *
  * @author tlc
  * @date 29/07/2020
