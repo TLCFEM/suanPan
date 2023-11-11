@@ -1115,7 +1115,7 @@ void new_concretek4(unique_ptr<Material>& return_obj, istringstream& command) {
             suanpan_error("A valid flag is required.\n");
             return;
         }
-        suanpan_warning("Internal flags are set.\n");
+        suanpan_debug("Internal flags are set.\n");
     }
 
     return_obj = make_unique<ConcreteK4>(tag, elastic_modulus, hardening, std::move(pool), density, enable_damage, enable_crack_closing, objective_damage);
