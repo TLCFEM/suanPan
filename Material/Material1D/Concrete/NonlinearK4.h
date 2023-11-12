@@ -46,7 +46,7 @@ class NonlinearK4 : protected DataNonlinearK4, public Material1D {
     [[nodiscard]] virtual vec2 compute_tension_damage(double) const = 0;
     [[nodiscard]] virtual vec2 compute_compression_damage(double) const = 0;
 
-    int compute_plasticity(double&);
+    int compute_plasticity();
     void compute_crack_close_branch();
 
 protected:
