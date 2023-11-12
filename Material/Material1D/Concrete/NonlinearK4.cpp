@@ -18,10 +18,12 @@
 #include "NonlinearK4.h"
 #include <Toolbox/utility.h>
 
-int NonlinearK4::compute_plasticity(double& k) {
+int NonlinearK4::compute_plasticity() {
     auto& plastic_strain = trial_history(0);
 
     const auto sign_sigma = suanpan::sign(trial_stress(0));
+
+    auto& k = sign_sigma > 0. ? trial_history(1) : trial_history(2);
 
     const auto backbone_handle = sign_sigma > 0. ? std::mem_fn(&NonlinearK4::compute_tension_backbone) : std::mem_fn(&NonlinearK4::compute_compression_backbone);
     const auto damage_handle = sign_sigma > 0. ? std::mem_fn(&NonlinearK4::compute_tension_damage) : std::mem_fn(&NonlinearK4::compute_compression_damage);
@@ -63,7 +65,7 @@ int NonlinearK4::compute_plasticity(double& k) {
                 const auto damage_factor = 1. - damage(0);
 
                 trial_stiffness *= damage_factor;
-                trial_stiffness -= trial_stress * damage(1) * dgamma;
+                trial_stiffness -= trial_stress * damage(1) * sign_sigma * dgamma;
 
                 trial_stress *= damage_factor;
             }
@@ -137,8 +139,8 @@ int NonlinearK4::update_trial_status(const vec& t_strain) {
 
     trial_history = current_history;
     const auto& plastic_strain = trial_history(0);
-    auto& kt = trial_history(1);
-    auto& kc = trial_history(2);
+    // auto& kt = trial_history(1);
+    // auto& kc = trial_history(2);
     const auto& current_kt = current_history(1);
     const auto& current_kk = current_history(3);
 
@@ -146,7 +148,7 @@ int NonlinearK4::update_trial_status(const vec& t_strain) {
 
     if(apply_crack_closing && trial_stress(0) < 0. && incre_strain(0) < 0. && current_kt > current_kk) compute_crack_close_branch();
 
-    return compute_plasticity(trial_stress(0) > 0. ? kt : kc);
+    return compute_plasticity();
 }
 
 int NonlinearK4::clear_status() {
