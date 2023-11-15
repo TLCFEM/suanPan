@@ -32,81 +32,78 @@ at the top-level directory.
 
 #include "slu_ddefs.h"
 
-int
-dcopy_to_ucol(
-	      int        jcol,	  /* in */
-	      int        nseg,	  /* in */
-	      int        *segrep,  /* in */
-	      int        *repfnz,  /* in */
-	      int        *perm_r,  /* in */
-	      double     *dense,   /* modified - reset to zero on return */
-	      GlobalLU_t *Glu      /* modified */
-	      )
-{
-/* 
- * Gather from SPA dense[*] to global ucol[*].
- */
+int dcopy_to_ucol(
+    int jcol,       /* in */
+    int nseg,       /* in */
+    int* segrep,    /* in */
+    int* repfnz,    /* in */
+    int* perm_r,    /* in */
+    double* dense,  /* modified - reset to zero on return */
+    GlobalLU_t* Glu /* modified */
+) {
+    /* 
+     * Gather from SPA dense[*] to global ucol[*].
+     */
     int ksub, krep, ksupno;
     int i, k, kfnz, segsze;
     int fsupc, irow, jsupno;
     int_t isub, nextu, new_next, mem_error;
-    int       *xsup, *supno;
-    int_t     *lsub, *xlsub;
-    double    *ucol;
-    int_t     *usub, *xusub;
-    int_t       nzumax;
+    int *xsup, *supno;
+    int_t *lsub, *xlsub;
+    double* ucol;
+    int_t *usub, *xusub;
+    int_t nzumax;
     double zero = 0.0;
 
-    xsup    = Glu->xsup;
-    supno   = Glu->supno;
-    lsub    = Glu->lsub;
-    xlsub   = Glu->xlsub;
-    ucol    = (double *) Glu->ucol;
-    usub    = Glu->usub;
-    xusub   = Glu->xusub;
-    nzumax  = Glu->nzumax;
-    
+    xsup = Glu->xsup;
+    supno = Glu->supno;
+    lsub = Glu->lsub;
+    xlsub = Glu->xlsub;
+    ucol = (double*)Glu->ucol;
+    usub = Glu->usub;
+    xusub = Glu->xusub;
+    nzumax = Glu->nzumax;
+
     jsupno = supno[jcol];
-    nextu  = xusub[jcol];
+    nextu = xusub[jcol];
     k = nseg - 1;
-    for (ksub = 0; ksub < nseg; ksub++) {
-	krep = segrep[k--];
-	ksupno = supno[krep];
+    for(ksub = 0; ksub < nseg; ksub++) {
+        krep = segrep[k--];
+        ksupno = supno[krep];
 
-	if ( ksupno != jsupno ) { /* Should go into ucol[] */
-	    kfnz = repfnz[krep];
-	    if ( kfnz != EMPTY ) {	/* Nonzero U-segment */
+        if(ksupno != jsupno) {
+            /* Should go into ucol[] */
+            kfnz = repfnz[krep];
+            if(kfnz != EMPTY) {
+                /* Nonzero U-segment */
 
-	    	fsupc = xsup[ksupno];
-	        isub = xlsub[fsupc] + kfnz - fsupc;
-	        segsze = krep - kfnz + 1;
+                fsupc = xsup[ksupno];
+                isub = xlsub[fsupc] + kfnz - fsupc;
+                segsze = krep - kfnz + 1;
 
-		new_next = nextu + segsze;
-		while ( new_next > nzumax ) {
-		    mem_error = dLUMemXpand(jcol, nextu, UCOL, &nzumax, Glu);
-		    if (mem_error) return (mem_error);
-		    ucol = (double *) Glu->ucol;
-		    mem_error = dLUMemXpand(jcol, nextu, USUB, &nzumax, Glu);
-		    if (mem_error) return (mem_error);
-		    usub = Glu->usub;
-		    lsub = Glu->lsub;
-		}
-		
-		for (i = 0; i < segsze; i++) {
-		    irow = lsub[isub];
-		    usub[nextu] = perm_r[irow];
-		    ucol[nextu] = dense[irow];
-		    dense[irow] = zero;
-		    nextu++;
-		    isub++;
-		} 
+                new_next = nextu + segsze;
+                while(new_next > nzumax) {
+                    mem_error = dLUMemXpand(jcol, nextu, UCOL, &nzumax, Glu);
+                    if(mem_error) return (mem_error);
+                    ucol = (double*)Glu->ucol;
+                    mem_error = dLUMemXpand(jcol, nextu, USUB, &nzumax, Glu);
+                    if(mem_error) return (mem_error);
+                    usub = Glu->usub;
+                    lsub = Glu->lsub;
+                }
 
-	    }
-
-	}
-
+                for(i = 0; i < segsze; i++) {
+                    irow = lsub[isub];
+                    usub[nextu] = perm_r[irow];
+                    ucol[nextu] = dense[irow];
+                    dense[irow] = zero;
+                    nextu++;
+                    isub++;
+                }
+            }
+        }
     } /* for each segment... */
 
-    xusub[jcol + 1] = nextu;      /* Close U[*,jcol] */
+    xusub[jcol + 1] = nextu; /* Close U[*,jcol] */
     return 0;
 }

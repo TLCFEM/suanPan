@@ -50,17 +50,13 @@ at the top-level directory.
 
    ===================================================================== 
 </pre>
-*/  
+*/
 
-int
-izmax1_slu(int *n, doublecomplex *cx, int *incx)
-{
-
-
+int izmax1_slu(int* n, doublecomplex* cx, int* incx) {
     /* System generated locals */
     int ret_val;
     double d__1;
-    
+
     /* Local variables */
     double smax;
     int i, ix;
@@ -68,50 +64,35 @@ izmax1_slu(int *n, doublecomplex *cx, int *incx)
 #define CX(I) cx[(I)-1]
 
     ret_val = 0;
-    if (*n < 1) {
-	return ret_val;
-    }
+    if(*n < 1) { return ret_val; }
     ret_val = 1;
-    if (*n == 1) {
-	return ret_val;
-    }
-    if (*incx == 1) {
-	goto L30;
-    }
+    if(*n == 1) { return ret_val; }
+    if(*incx == 1) { goto L30; }
 
-/*     CODE FOR INCREMENT NOT EQUAL TO 1 */
+    /*     CODE FOR INCREMENT NOT EQUAL TO 1 */
 
     ix = 1;
     smax = (d__1 = CX(1).r, fabs(d__1));
     ix += *incx;
-    for (i = 2; i <= *n; ++i) {
-	if ((d__1 = CX(ix).r, fabs(d__1)) <= smax) {
-	    goto L10;
-	}
-	ret_val = i;
-	smax = (d__1 = CX(ix).r, fabs(d__1));
-L10:
-	ix += *incx;
-/* L20: */
+    for(i = 2; i <= *n; ++i) {
+        if((d__1 = CX(ix).r, fabs(d__1)) <= smax) { goto L10; }
+        ret_val = i;
+        smax = (d__1 = CX(ix).r, fabs(d__1));
+    L10: ix += *incx;
+        /* L20: */
     }
     return ret_val;
 
-/*     CODE FOR INCREMENT EQUAL TO 1 */
+    /*     CODE FOR INCREMENT EQUAL TO 1 */
 
-L30:
-    smax = (d__1 = CX(1).r, fabs(d__1));
-    for (i = 2; i <= *n; ++i) {
-	if ((d__1 = CX(i).r, fabs(d__1)) <= smax) {
-	    goto L40;
-	}
-	ret_val = i;
-	smax = (d__1 = CX(i).r, fabs(d__1));
-L40:
-	;
+L30: smax = (d__1 = CX(1).r, fabs(d__1));
+    for(i = 2; i <= *n; ++i) {
+        if((d__1 = CX(i).r, fabs(d__1)) <= smax) { goto L40; }
+        ret_val = i;
+        smax = (d__1 = CX(i).r, fabs(d__1));
+    L40: ;
     }
     return ret_val;
 
-/*     End of IZMAX1 */
-
+    /*     End of IZMAX1 */
 } /* izmax1_slu */
-

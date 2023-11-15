@@ -139,56 +139,43 @@ at the top-level directory.
  * </pre>
  */
 
-void
-dgssv(superlu_options_t *options, SuperMatrix *A, int *perm_c, int *perm_r,
-      SuperMatrix *L, SuperMatrix *U, SuperMatrix *B,
-      SuperLUStat_t *stat, int_t *info )
-{
-
-    DNformat *Bstore;
-    SuperMatrix *AA;/* A in SLU_NC format used by the factorization routine.*/
-    SuperMatrix AC; /* Matrix postmultiplied by Pc */
-    int      lwork = 0, *etree, i;
+void dgssv(superlu_options_t* options, SuperMatrix* A, int* perm_c, int* perm_r, SuperMatrix* L, SuperMatrix* U, SuperMatrix* B, SuperLUStat_t* stat, int_t* info) {
+    DNformat* Bstore;
+    SuperMatrix* AA; /* A in SLU_NC format used by the factorization routine.*/
+    SuperMatrix AC;  /* Matrix postmultiplied by Pc */
+    int lwork = 0, *etree, i;
     GlobalLU_t Glu; /* Not needed on return. */
-    
+
     /* Set default values for some parameters */
-    int      panel_size;     /* panel size */
-    int      relax;          /* no of columns in a relaxed snodes */
-    int      permc_spec;
-    trans_t  trans = NOTRANS;
-    double   *utime;
-    double   t;	/* Temporary time */
+    int panel_size; /* panel size */
+    int relax;      /* no of columns in a relaxed snodes */
+    int permc_spec;
+    trans_t trans = NOTRANS;
+    double* utime;
+    double t; /* Temporary time */
 
     /* Test the input parameters ... */
     *info = 0;
     Bstore = B->Store;
-    if ( options->Fact != DOFACT ) *info = -1;
-    else if ( A->nrow != A->ncol || A->nrow < 0 ||
-	 (A->Stype != SLU_NC && A->Stype != SLU_NR) ||
-	 A->Dtype != SLU_D || A->Mtype != SLU_GE )
-	*info = -2;
-    else if ( B->ncol < 0 || Bstore->lda < SUPERLU_MAX(0, A->nrow) ||
-	B->Stype != SLU_DN || B->Dtype != SLU_D || B->Mtype != SLU_GE )
-	*info = -7;
-    if ( *info != 0 ) {
-	i = -(*info);
-	input_error("dgssv", &i);
-	return;
+    if(options->Fact != DOFACT) *info = -1;
+    else if(A->nrow != A->ncol || A->nrow < 0 || (A->Stype != SLU_NC && A->Stype != SLU_NR) || A->Dtype != SLU_D || A->Mtype != SLU_GE) *info = -2;
+    else if(B->ncol < 0 || Bstore->lda < SUPERLU_MAX(0, A->nrow) || B->Stype != SLU_DN || B->Dtype != SLU_D || B->Mtype != SLU_GE) *info = -7;
+    if(*info != 0) {
+        i = -(*info);
+        input_error("dgssv", &i);
+        return;
     }
 
     utime = stat->utime;
 
     /* Convert A to SLU_NC format when necessary. */
-    if ( A->Stype == SLU_NR ) {
-	NRformat *Astore = A->Store;
-	AA = (SuperMatrix *) SUPERLU_MALLOC( sizeof(SuperMatrix) );
-	dCreate_CompCol_Matrix(AA, A->ncol, A->nrow, Astore->nnz, 
-			       Astore->nzval, Astore->colind, Astore->rowptr,
-			       SLU_NC, A->Dtype, A->Mtype);
-	trans = TRANS;
-    } else if ( A->Stype == SLU_NC ) {
-        AA = A;
+    if(A->Stype == SLU_NR) {
+        NRformat* Astore = A->Store;
+        AA = (SuperMatrix*)SUPERLU_MALLOC(sizeof(SuperMatrix));
+        dCreate_CompCol_Matrix(AA, A->ncol, A->nrow, Astore->nnz, Astore->nzval, Astore->colind, Astore->rowptr, SLU_NC, A->Dtype, A->Mtype);
+        trans = TRANS;
     }
+    else if(A->Stype == SLU_NC) { AA = A; }
     /* A is of unsupported matrix format. */
     else {
         AA = NULL;
@@ -206,8 +193,7 @@ dgssv(superlu_options_t *options, SuperMatrix *A, int *perm_c, int *perm_r,
      *   permc_spec = MY_PERMC: the ordering already supplied in perm_c[]
      */
     permc_spec = options->ColPerm;
-    if ( permc_spec != MY_PERMC && options->Fact == DOFACT )
-      get_perm_c(permc_spec, AA, perm_c);
+    if(permc_spec != MY_PERMC && options->Fact == DOFACT) get_perm_c(permc_spec, AA, perm_c);
     utime[COLPERM] = SuperLU_timer_() - t;
 
     etree = int32Malloc(A->ncol);
@@ -221,28 +207,28 @@ dgssv(superlu_options_t *options, SuperMatrix *A, int *perm_c, int *perm_r,
 
     /*printf("Factor PA = LU ... relax %d\tw %d\tmaxsuper %d\trowblk %d\n", 
 	  relax, panel_size, sp_ienv(3), sp_ienv(4));*/
-    t = SuperLU_timer_(); 
+    t = SuperLU_timer_();
     /* Compute the LU factorization of A. */
-    dgstrf(options, &AC, relax, panel_size, etree,
-            NULL, lwork, perm_c, perm_r, L, U, &Glu, stat, info);
+    dgstrf(options, &AC, relax, panel_size, etree, NULL, lwork, perm_c, perm_r, L, U, &Glu, stat, info);
     utime[FACT] = SuperLU_timer_() - t;
 
     t = SuperLU_timer_();
-    if ( *info == 0 ) {
+    if(*info == 0) {
         /* Solve the system A*X=B, overwriting B with X. */
-	int info1;
-        dgstrs (trans, L, U, perm_c, perm_r, B, stat, &info1);
-    } else {
-        printf("dgstrf info %lld\n", (long long) *info); fflush(stdout);
+        int info1;
+        dgstrs(trans, L, U, perm_c, perm_r, B, stat, &info1);
     }
-    
+    else {
+        printf("dgstrf info %lld\n", (long long)*info);
+        fflush(stdout);
+    }
+
     utime[SOLVE] = SuperLU_timer_() - t;
 
-    SUPERLU_FREE (etree);
+    SUPERLU_FREE(etree);
     Destroy_CompCol_Permuted(&AC);
-    if ( A->Stype == SLU_NR ) {
-	Destroy_SuperMatrix_Store(AA);
-	SUPERLU_FREE(AA);
+    if(A->Stype == SLU_NR) {
+        Destroy_SuperMatrix_Store(AA);
+        SUPERLU_FREE(AA);
     }
-
 }

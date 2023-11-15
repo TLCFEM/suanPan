@@ -88,103 +88,96 @@ at the top-level directory.
 #include <stdlib.h>
 #include "slu_cdefs.h"
 
-
 /*! \brief Eat up the rest of the current line */
-int cDumpLine(FILE *fp)
-{
+int cDumpLine(FILE* fp) {
     register int c;
-    while ((c = fgetc(fp)) != '\n') ;
+    while((c = fgetc(fp)) != '\n');
     return 0;
 }
 
-int cParseIntFormat(char *buf, int *num, int *size)
-{
-    char *tmp;
+int cParseIntFormat(char* buf, int* num, int* size) {
+    char* tmp;
 
     tmp = buf;
-    while (*tmp++ != '(') ;
+    while(*tmp++ != '(');
     sscanf(tmp, "%d", num);
-    while (*tmp != 'I' && *tmp != 'i') ++tmp;
+    while(*tmp != 'I' && *tmp != 'i') ++tmp;
     ++tmp;
     sscanf(tmp, "%d", size);
     return 0;
 }
 
-int cParseFloatFormat(char *buf, int *num, int *size)
-{
+int cParseFloatFormat(char* buf, int* num, int* size) {
     char *tmp, *period;
-    
+
     tmp = buf;
-    while (*tmp++ != '(') ;
+    while(*tmp++ != '(');
     *num = atoi(tmp); /*sscanf(tmp, "%d", num);*/
-    while (*tmp != 'E' && *tmp != 'e' && *tmp != 'D' && *tmp != 'd'
-	   && *tmp != 'F' && *tmp != 'f') {
+    while(*tmp != 'E' && *tmp != 'e' && *tmp != 'D' && *tmp != 'd' && *tmp != 'F' && *tmp != 'f') {
         /* May find kP before nE/nD/nF, like (1P6F13.6). In this case the
            num picked up refers to P, which should be skipped. */
-        if (*tmp=='p' || *tmp=='P') {
-           ++tmp;
-           *num = atoi(tmp); /*sscanf(tmp, "%d", num);*/
-        } else {
-           ++tmp;
+        if(*tmp == 'p' || *tmp == 'P') {
+            ++tmp;
+            *num = atoi(tmp); /*sscanf(tmp, "%d", num);*/
         }
+        else { ++tmp; }
     }
     ++tmp;
     period = tmp;
-    while (*period != '.' && *period != ')') ++period ;
+    while(*period != '.' && *period != ')') ++period;
     *period = '\0';
     *size = atoi(tmp); /*sscanf(tmp, "%2d", size);*/
 
     return 0;
 }
 
-static int ReadVector(FILE *fp, int_t n, int_t *where, int perline, int persize)
-{
+static int ReadVector(FILE* fp, int_t n, int_t* where, int perline, int persize) {
     int_t i, j, item;
     char tmp, buf[100];
-    
+
     i = 0;
-    while (i <  n) {
-	fgets(buf, 100, fp);    /* read a line at a time */
-	for (j=0; j<perline && i<n; j++) {
-	    tmp = buf[(j+1)*persize];     /* save the char at that place */
-	    buf[(j+1)*persize] = 0;       /* null terminate */
-	    item = atoi(&buf[j*persize]); 
-	    buf[(j+1)*persize] = tmp;     /* recover the char at that place */
-	    where[i++] = item - 1;
-	}
+    while(i < n) {
+        fgets(buf, 100, fp); /* read a line at a time */
+        for(j = 0; j < perline && i < n; j++) {
+            tmp = buf[(j + 1) * persize]; /* save the char at that place */
+            buf[(j + 1) * persize] = 0;   /* null terminate */
+            item = atoi(&buf[j * persize]);
+            buf[(j + 1) * persize] = tmp; /* recover the char at that place */
+            where[i++] = item - 1;
+        }
     }
 
     return 0;
 }
 
 /*! \brief Read complex numbers as pairs of (real, imaginary) */
-int cReadValues(FILE *fp, int n, complex *destination, int perline, int persize)
-{
+int cReadValues(FILE* fp, int n, complex* destination, int perline, int persize) {
     register int i, j, k, s, pair;
     register float realpart;
     char tmp, buf[100];
-    
+
     i = pair = 0;
-    while (i < n) {
-	fgets(buf, 100, fp);    /* read a line at a time */
-	for (j=0; j<perline && i<n; j++) {
-	    tmp = buf[(j+1)*persize];     /* save the char at that place */
-	    buf[(j+1)*persize] = 0;       /* null terminate */
-	    s = j*persize;
-	    for (k = 0; k < persize; ++k) /* No D_ format in C */
-		if ( buf[s+k] == 'D' || buf[s+k] == 'd' ) buf[s+k] = 'E';
-	    if ( pair == 0 ) {
-	  	/* The value is real part */
-		realpart = atof(&buf[s]);
-		pair = 1;
-	    } else {
-		/* The value is imaginary part */
-	        destination[i].r = realpart;
-		destination[i++].i = atof(&buf[s]);
-		pair = 0;
-	    }
-	    buf[(j+1)*persize] = tmp;     /* recover the char at that place */
-	}
+    while(i < n) {
+        fgets(buf, 100, fp); /* read a line at a time */
+        for(j = 0; j < perline && i < n; j++) {
+            tmp = buf[(j + 1) * persize]; /* save the char at that place */
+            buf[(j + 1) * persize] = 0;   /* null terminate */
+            s = j * persize;
+            for(k = 0; k < persize; ++k) /* No D_ format in C */
+                if(buf[s + k] == 'D' || buf[s + k] == 'd') buf[s + k] = 'E';
+            if(pair == 0) {
+                /* The value is real part */
+                realpart = atof(&buf[s]);
+                pair = 1;
+            }
+            else {
+                /* The value is imaginary part */
+                destination[i].r = realpart;
+                destination[i++].i = atof(&buf[s]);
+                pair = 0;
+            }
+            buf[(j + 1) * persize] = tmp; /* recover the char at that place */
+        }
     }
 
     return 0;
@@ -197,83 +190,71 @@ int cReadValues(FILE *fp, int n, complex *destination, int perline, int persize)
  * matrix. On exit, it represents the full matrix with lower and upper parts.
  * </pre>
  */
-static void
-FormFullA(int n, int_t *nonz, complex **nzval, int_t **rowind, int_t **colptr)
-{
+static void FormFullA(int n, int_t* nonz, complex** nzval, int_t** rowind, int_t** colptr) {
     int_t i, j, k, col, new_nnz;
     int_t *t_rowind, *t_colptr, *al_rowind, *al_colptr, *a_rowind, *a_colptr;
-    int_t *marker;
+    int_t* marker;
     complex *t_val, *al_val, *a_val;
 
     al_rowind = *rowind;
     al_colptr = *colptr;
     al_val = *nzval;
 
-    if ( !(marker = intMalloc( (n+1) ) ) )
-	ABORT("SUPERLU_MALLOC fails for marker[]");
-    if ( !(t_colptr = intMalloc( (n+1) ) ) )
-	ABORT("SUPERLU_MALLOC t_colptr[]");
-    if ( !(t_rowind = intMalloc( *nonz ) ) )
-	ABORT("SUPERLU_MALLOC fails for t_rowind[]");
-    if ( !(t_val = (complex*) SUPERLU_MALLOC( *nonz * sizeof(complex)) ) )
-	ABORT("SUPERLU_MALLOC fails for t_val[]");
+    if(!(marker = intMalloc((n + 1)))) ABORT("SUPERLU_MALLOC fails for marker[]");
+    if(!(t_colptr = intMalloc((n + 1)))) ABORT("SUPERLU_MALLOC t_colptr[]");
+    if(!(t_rowind = intMalloc(*nonz))) ABORT("SUPERLU_MALLOC fails for t_rowind[]");
+    if(!(t_val = (complex*)SUPERLU_MALLOC(*nonz * sizeof(complex)))) ABORT("SUPERLU_MALLOC fails for t_val[]");
 
     /* Get counts of each column of T, and set up column pointers */
-    for (i = 0; i < n; ++i) marker[i] = 0;
-    for (j = 0; j < n; ++j) {
-	for (i = al_colptr[j]; i < al_colptr[j+1]; ++i)
-	    ++marker[al_rowind[i]];
-    }
+    for(i = 0; i < n; ++i) marker[i] = 0;
+    for(j = 0; j < n; ++j) { for(i = al_colptr[j]; i < al_colptr[j + 1]; ++i) ++marker[al_rowind[i]]; }
     t_colptr[0] = 0;
-    for (i = 0; i < n; ++i) {
-	t_colptr[i+1] = t_colptr[i] + marker[i];
-	marker[i] = t_colptr[i];
+    for(i = 0; i < n; ++i) {
+        t_colptr[i + 1] = t_colptr[i] + marker[i];
+        marker[i] = t_colptr[i];
     }
 
     /* Transpose matrix A to T */
-    for (j = 0; j < n; ++j)
-	for (i = al_colptr[j]; i < al_colptr[j+1]; ++i) {
-	    col = al_rowind[i];
-	    t_rowind[marker[col]] = j;
-	    t_val[marker[col]] = al_val[i];
-	    ++marker[col];
-	}
+    for(j = 0; j < n; ++j)
+        for(i = al_colptr[j]; i < al_colptr[j + 1]; ++i) {
+            col = al_rowind[i];
+            t_rowind[marker[col]] = j;
+            t_val[marker[col]] = al_val[i];
+            ++marker[col];
+        }
 
     new_nnz = *nonz * 2 - n;
-    if ( !(a_colptr = intMalloc(n+1) ) )
-	ABORT("SUPERLU_MALLOC a_colptr[]");
-    if ( !(a_rowind = intMalloc( new_nnz ) ) )
-	ABORT("SUPERLU_MALLOC fails for a_rowind[]");
-    if ( !(a_val = (complex*) SUPERLU_MALLOC( new_nnz * sizeof(complex)) ) )
-	ABORT("SUPERLU_MALLOC fails for a_val[]");
-    
+    if(!(a_colptr = intMalloc(n + 1))) ABORT("SUPERLU_MALLOC a_colptr[]");
+    if(!(a_rowind = intMalloc(new_nnz))) ABORT("SUPERLU_MALLOC fails for a_rowind[]");
+    if(!(a_val = (complex*)SUPERLU_MALLOC(new_nnz * sizeof(complex)))) ABORT("SUPERLU_MALLOC fails for a_val[]");
+
     a_colptr[0] = 0;
     k = 0;
-    for (j = 0; j < n; ++j) {
-      for (i = t_colptr[j]; i < t_colptr[j+1]; ++i) {
-	if ( t_rowind[i] != j ) { /* not diagonal */
-	  a_rowind[k] = t_rowind[i];
-	  a_val[k] = t_val[i];
-	if ( c_abs1(&a_val[k]) < 4.047e-300 )
-	    printf("%5d: %e\t%e\n", (int)k, a_val[k].r, a_val[k].i);
-	  ++k;
-	}
-      }
+    for(j = 0; j < n; ++j) {
+        for(i = t_colptr[j]; i < t_colptr[j + 1]; ++i) {
+            if(t_rowind[i] != j) {
+                /* not diagonal */
+                a_rowind[k] = t_rowind[i];
+                a_val[k] = t_val[i];
+                if(c_abs1(&a_val[k]) < 4.047e-300) printf("%5d: %e\t%e\n", (int)k, a_val[k].r, a_val[k].i);
+                ++k;
+            }
+        }
 
-      for (i = al_colptr[j]; i < al_colptr[j+1]; ++i) {
-	a_rowind[k] = al_rowind[i];
-	a_val[k] = al_val[i];
+        for(i = al_colptr[j]; i < al_colptr[j + 1]; ++i) {
+            a_rowind[k] = al_rowind[i];
+            a_val[k] = al_val[i];
 #ifdef DEBUG
 	if ( c_abs1(&a_val[k]) < 4.047e-300 )
 	    printf("%5d: %e\t%e\n", (int)k, a_val[k].r, a_val[k].i);
 #endif
-	++k;
-      }
-      
-      a_colptr[j+1] = k;
+            ++k;
+        }
+
+        a_colptr[j + 1] = k;
     }
 
-    printf("FormFullA: new_nnz = %lld\n", (long long) new_nnz);
+    printf("FormFullA: new_nnz = %lld\n", (long long)new_nnz);
 
     SUPERLU_FREE(al_val);
     SUPERLU_FREE(al_rowind);
@@ -289,11 +270,7 @@ FormFullA(int n, int_t *nonz, complex **nzval, int_t **rowind, int_t **colptr)
     *nonz = new_nnz;
 }
 
-void
-creadhb(FILE *fp, int *nrow, int *ncol, int_t *nonz,
-	complex **nzval, int_t **rowind, int_t **colptr)
-{
-
+void creadhb(FILE* fp, int* nrow, int* ncol, int_t* nonz, complex** nzval, int_t** rowind, int_t** colptr) {
     register int i, numer_lines = 0, rhscrd = 0;
     int tmp, colnum, colsize, rownum, rowsize, valnum, valsize;
     char buf[100], type[4];
@@ -304,11 +281,12 @@ creadhb(FILE *fp, int *nrow, int *ncol, int_t *nonz,
     fputs(buf, stdout);
 
     /* Line 2 */
-    for (i=0; i<5; i++) {
-	fscanf(fp, "%14c", buf); buf[14] = 0;
-	sscanf(buf, "%d", &tmp);
-	if (i == 3) numer_lines = tmp;
-	if (i == 4 && tmp) rhscrd = tmp;
+    for(i = 0; i < 5; i++) {
+        fscanf(fp, "%14c", buf);
+        buf[14] = 0;
+        sscanf(buf, "%d", &tmp);
+        if(i == 3) numer_lines = tmp;
+        if(i == 4 && tmp) rhscrd = tmp;
     }
     cDumpLine(fp);
 
@@ -319,16 +297,18 @@ creadhb(FILE *fp, int *nrow, int *ncol, int_t *nonz,
 #if ( DEBUGlevel>=1 )
     printf("Matrix type %s\n", type);
 #endif
-    
-    fscanf(fp, "%14c", buf); *nrow = atoi(buf);
-    fscanf(fp, "%14c", buf); *ncol = atoi(buf);
-    fscanf(fp, "%14c", buf); *nonz = atoi(buf);
-    fscanf(fp, "%14c", buf); tmp = atoi(buf);
-    
-    if (tmp != 0)
-	  printf("This is not an assembled matrix!\n");
-    if (*nrow != *ncol)
-	printf("Matrix is not square.\n");
+
+    fscanf(fp, "%14c", buf);
+    *nrow = atoi(buf);
+    fscanf(fp, "%14c", buf);
+    *ncol = atoi(buf);
+    fscanf(fp, "%14c", buf);
+    *nonz = atoi(buf);
+    fscanf(fp, "%14c", buf);
+    tmp = atoi(buf);
+
+    if(tmp != 0) printf("This is not an assembled matrix!\n");
+    if(*nrow != *ncol) printf("Matrix is not square.\n");
     cDumpLine(fp);
 
     /* Allocate storage for the three arrays ( nzval, rowind, colptr ) */
@@ -344,27 +324,22 @@ creadhb(FILE *fp, int *nrow, int *ncol, int_t *nonz,
     fscanf(fp, "%20c", buf);
     cDumpLine(fp);
 
-    /* Line 5: right-hand side */    
-    if ( rhscrd ) cDumpLine(fp); /* skip RHSFMT */
-    
+    /* Line 5: right-hand side */
+    if(rhscrd) cDumpLine(fp); /* skip RHSFMT */
+
 #ifdef DEBUG
     printf("%d rows, %lld nonzeros\n", *nrow, (long long) *nonz);
     printf("colnum %d, colsize %d\n", colnum, colsize);
     printf("rownum %d, rowsize %d\n", rownum, rowsize);
     printf("valnum %d, valsize %d\n", valnum, valsize);
 #endif
-    
-    ReadVector(fp, *ncol+1, *colptr, colnum, colsize);
+
+    ReadVector(fp, *ncol + 1, *colptr, colnum, colsize);
     ReadVector(fp, *nonz, *rowind, rownum, rowsize);
-    if ( numer_lines ) {
-        cReadValues(fp, *nonz, *nzval, valnum, valsize);
-    }
-    
+    if(numer_lines) { cReadValues(fp, *nonz, *nzval, valnum, valsize); }
+
     sym = (type[1] == 'S' || type[1] == 's');
-    if ( sym ) {
-	FormFullA(*ncol, nonz, nzval, rowind, colptr);
-    }
+    if(sym) { FormFullA(*ncol, nonz, nzval, rowind, colptr); }
 
     fclose(fp);
 }
-

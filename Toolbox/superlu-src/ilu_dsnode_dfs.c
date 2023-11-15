@@ -38,62 +38,54 @@ at the top-level directory.
  * </pre>
  */
 
-int
-ilu_dsnode_dfs(
-	   const int  jcol,	    /* in - start of the supernode */
-	   const int  kcol,	    /* in - end of the supernode */
-	   const int_t  *asub,	    /* in */
-	   const int_t  *xa_begin,    /* in */
-	   const int_t  *xa_end,	    /* in */
-	   int	      *marker,	    /* modified */
-	   GlobalLU_t *Glu	    /* modified */
-	   )
-{
+int ilu_dsnode_dfs(
+    const int jcol,        /* in - start of the supernode */
+    const int kcol,        /* in - end of the supernode */
+    const int_t* asub,     /* in */
+    const int_t* xa_begin, /* in */
+    const int_t* xa_end,   /* in */
+    int* marker,           /* modified */
+    GlobalLU_t* Glu        /* modified */
+) {
     int_t i, k, nextl, mem_error;
-    int   nsuper, krow, kmark;
-    int   *xsup, *supno;
+    int nsuper, krow, kmark;
+    int *xsup, *supno;
     int_t *lsub, *xlsub;
     int_t nzlmax;
 
-    xsup    = Glu->xsup;
-    supno   = Glu->supno;
-    lsub    = Glu->lsub;
-    xlsub   = Glu->xlsub;
-    nzlmax  = Glu->nzlmax;
+    xsup = Glu->xsup;
+    supno = Glu->supno;
+    lsub = Glu->lsub;
+    xlsub = Glu->xlsub;
+    nzlmax = Glu->nzlmax;
 
-    nsuper = ++supno[jcol];	/* Next available supernode number */
+    nsuper = ++supno[jcol]; /* Next available supernode number */
     nextl = xlsub[jcol];
 
-    for (i = jcol; i <= kcol; i++)
-    {
-	/* For each nonzero in A[*,i] */
-	for (k = xa_begin[i]; k < xa_end[i]; k++)
-	{
-	    krow = asub[k];
-	    kmark = marker[krow];
-	    if ( kmark != kcol )
-	    { /* First time visit krow */
-		marker[krow] = kcol;
-		lsub[nextl++] = krow;
-		if ( nextl >= nzlmax )
-		{
-		    if ( (mem_error = dLUMemXpand(jcol, nextl, LSUB, &nzlmax,
-			    Glu)) != 0)
-			return (mem_error);
-		    lsub = Glu->lsub;
-		}
-	    }
-	}
-	supno[i] = nsuper;
+    for(i = jcol; i <= kcol; i++) {
+        /* For each nonzero in A[*,i] */
+        for(k = xa_begin[i]; k < xa_end[i]; k++) {
+            krow = asub[k];
+            kmark = marker[krow];
+            if(kmark != kcol) {
+                /* First time visit krow */
+                marker[krow] = kcol;
+                lsub[nextl++] = krow;
+                if(nextl >= nzlmax) {
+                    if((mem_error = dLUMemXpand(jcol, nextl, LSUB, &nzlmax, Glu)) != 0) return (mem_error);
+                    lsub = Glu->lsub;
+                }
+            }
+        }
+        supno[i] = nsuper;
     }
 
     /* Supernode > 1 */
-    if ( jcol < kcol )
-	for (i = jcol+1; i <= kcol; i++) xlsub[i] = nextl;
+    if(jcol < kcol) for(i = jcol + 1; i <= kcol; i++) xlsub[i] = nextl;
 
-    xsup[nsuper+1] = kcol + 1;
-    supno[kcol+1]  = nsuper;
-    xlsub[kcol+1]  = nextl;
+    xsup[nsuper + 1] = kcol + 1;
+    supno[kcol + 1] = nsuper;
+    xlsub[kcol + 1] = nextl;
 
     return 0;
 }

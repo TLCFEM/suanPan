@@ -25,7 +25,7 @@ at the top-level directory.
 
 #undef USE_TIMES
 
-#ifdef SUN 
+#ifdef SUN
 /*
  * 	It uses the system call gethrtime(3C), which is accurate to 
  *	nanoseconds. 
@@ -40,12 +40,11 @@ double SuperLU_timer_() {
 
 #include <time.h>
 
-double SuperLU_timer_()
-{
+double SuperLU_timer_() {
     clock_t t;
-    t=clock();
+    t = clock();
 
-    return ((double)t)/CLOCKS_PER_SEC;
+    return ((double)t) / CLOCKS_PER_SEC;
 }
 
 #elif defined( USE_TIMES )
@@ -94,4 +93,3 @@ double SuperLU_timer_(void)
 }
 
 #endif
-

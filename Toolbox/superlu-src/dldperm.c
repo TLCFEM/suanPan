@@ -22,10 +22,7 @@ at the top-level directory.
 #include "slu_ddefs.h"
 
 extern int_t mc64id_(int_t*);
-extern int_t mc64ad_(int_t *job, int_t *n, int_t *ne, int_t *ip,
-                     int_t *irn, double *a, int_t *num, int *cperm,
-	             int_t *liw, int_t *iw, int_t *ldw, double *dw,
-		     int_t *icntl, int_t *info);
+extern int_t mc64ad_(int_t* job, int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int_t* num, int* cperm, int_t* liw, int_t* iw, int_t* ldw, double* dw, int_t* icntl, int_t* info);
 
 /*! \brief
  *
@@ -92,34 +89,30 @@ extern int_t mc64ad_(int_t *job, int_t *n, int_t *ne, int_t *ip,
  * </pre>
  */
 
-int
-dldperm(int job, int n, int_t nnz, int_t colptr[], int_t adjncy[],
-	double nzval[], int *perm, double u[], double v[])
-{
+int dldperm(int job, int n, int_t nnz, int_t colptr[], int_t adjncy[], double nzval[], int* perm, double u[], double v[]) {
     int_t i, num;
     int_t icntl[10], info[10];
     int_t liw, ldw, *iw;
-    double *dw;
+    double* dw;
 
 #if ( DEBUGlevel>=1 )
     CHECK_MALLOC("Enter dldperm()");
 #endif
-    liw = 5*n;
-    if ( job == 3 ) liw = 10*n + nnz;
-    if ( !(iw = intMalloc(liw)) ) ABORT("Malloc fails for iw[]");
-    ldw = 3*n + nnz;
-    if ( !(dw = (double*) SUPERLU_MALLOC(ldw * sizeof(double))) )
-          ABORT("Malloc fails for dw[]");
-	    
+    liw = 5 * n;
+    if(job == 3) liw = 10 * n + nnz;
+    if(!(iw = intMalloc(liw))) ABORT("Malloc fails for iw[]");
+    ldw = 3 * n + nnz;
+    if(!(dw = (double*)SUPERLU_MALLOC(ldw * sizeof(double)))) ABORT("Malloc fails for dw[]");
+
     /* Increment one to get 1-based indexing. */
-    for (i = 0; i <= n; ++i) ++colptr[i];
-    for (i = 0; i < nnz; ++i) ++adjncy[i];
+    for(i = 0; i <= n; ++i) ++colptr[i];
+    for(i = 0; i < nnz; ++i) ++adjncy[i];
 #if ( DEBUGlevel>=2 )
     printf("LDPERM(): n %d, nnz %d\n", n, nnz);
     slu_PrintInt10("colptr", n+1, colptr);
     slu_PrintInt10("adjncy", nnz, adjncy);
 #endif
-	
+
     /* 
      * NOTE:
      * =====
@@ -144,29 +137,29 @@ dldperm(int job, int n, int_t nnz, int_t colptr[], int_t adjncy[],
 #endif
 
     int_t ljob = job, ln = n;
-    
-    mc64ad_(&ljob, &ln, &nnz, colptr, adjncy, nzval, &num, perm,
-	    &liw, iw, &ldw, dw, icntl, info);
+
+    mc64ad_(&ljob, &ln, &nnz, colptr, adjncy, nzval, &num, perm, &liw, iw, &ldw, dw, icntl, info);
 
 #if ( DEBUGlevel>=2 )
     slu_PrintInt10("perm", n, perm);
     printf(".. After MC64AD info %lld\tsize of matching %d\n", (long long)info[0], num);
 #endif
-    if ( info[0] == 1 ) { /* Structurally singular */
-        printf(".. The last %d permutations:\n", (int)(n-num));
-	slu_PrintInt10("perm", n-num, &perm[num]);
+    if(info[0] == 1) {
+        /* Structurally singular */
+        printf(".. The last %d permutations:\n", (int)(n - num));
+        slu_PrintInt10("perm", n - num, &perm[num]);
     }
 
     /* Restore to 0-based indexing. */
-    for (i = 0; i <= n; ++i) --colptr[i];
-    for (i = 0; i < nnz; ++i) --adjncy[i];
-    for (i = 0; i < n; ++i) --perm[i];
+    for(i = 0; i <= n; ++i) --colptr[i];
+    for(i = 0; i < nnz; ++i) --adjncy[i];
+    for(i = 0; i < n; ++i) --perm[i];
 
-    if ( job == 5 )
-        for (i = 0; i < n; ++i) {
-	    u[i] = dw[i];
-	    v[i] = dw[n+i];
-	}
+    if(job == 5)
+        for(i = 0; i < n; ++i) {
+            u[i] = dw[i];
+            v[i] = dw[n + i];
+        }
 
     SUPERLU_FREE(iw);
     SUPERLU_FREE(dw);

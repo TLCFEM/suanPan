@@ -31,28 +31,26 @@
 */
 #include "slu_ddefs.h"
 
-void dGetDiagU(SuperMatrix *L, double *diagU)
-{
+void dGetDiagU(SuperMatrix* L, double* diagU) {
     int_t i, k, nsupers;
     int_t fsupc, nsupr, nsupc, luptr;
     double *dblock, *Lval;
-    SCformat *Lstore;
+    SCformat* Lstore;
 
     Lstore = L->Store;
     Lval = Lstore->nzval;
     nsupers = Lstore->nsuper + 1;
 
-    for (k = 0; k < nsupers; ++k) {
-      fsupc = L_FST_SUPC(k);
-      nsupc = L_FST_SUPC(k+1) - fsupc;
-      nsupr = L_SUB_START(fsupc+1) - L_SUB_START(fsupc);
-      luptr = L_NZ_START(fsupc);
+    for(k = 0; k < nsupers; ++k) {
+        fsupc = L_FST_SUPC(k);
+        nsupc = L_FST_SUPC(k+1) - fsupc;
+        nsupr = L_SUB_START(fsupc+1) - L_SUB_START(fsupc);
+        luptr = L_NZ_START(fsupc);
 
-      dblock = &diagU[fsupc];
-      for (i = 0; i < nsupc; ++i) {
-	dblock[i] = Lval[luptr];
-	luptr += nsupr + 1;
-      }
+        dblock = &diagU[fsupc];
+        for(i = 0; i < nsupc; ++i) {
+            dblock[i] = Lval[luptr];
+            luptr += nsupr + 1;
+        }
     }
 }
-

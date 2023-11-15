@@ -13,7 +13,6 @@ at the top-level directory.
  */
 #include "slu_ddefs.h"
 
-
 /*! \brief
  *
  * <pre>
@@ -68,49 +67,46 @@ at the top-level directory.
  *         Stype = SLU_NCP; Dtype = A->Dtype; Mtype = SLU_GE.
  * </pre>
  */
-void
-sp_preorder(superlu_options_t *options,  SuperMatrix *A, int *perm_c, 
-	    int *etree, SuperMatrix *AC)
-{
-    NCformat  *Astore;
-    NCPformat *ACstore;
-    int       *iwork, *post;
-    register  int n, i;
-    extern int check_perm(char *what, int n, int *perm);
-	
+void sp_preorder(superlu_options_t* options, SuperMatrix* A, int* perm_c, int* etree, SuperMatrix* AC) {
+    NCformat* Astore;
+    NCPformat* ACstore;
+    int *iwork, *post;
+    register int n, i;
+    extern int check_perm(char* what, int n, int* perm);
+
     n = A->ncol;
-    
+
     /* Apply column permutation perm_c to A's column pointers so to
        obtain NCP format in AC = A*Pc.  */
-    AC->Stype       = SLU_NCP;
-    AC->Dtype       = A->Dtype;
-    AC->Mtype       = A->Mtype;
-    AC->nrow        = A->nrow;
-    AC->ncol        = A->ncol;
-    Astore          = A->Store;
-    ACstore = AC->Store = (void *) SUPERLU_MALLOC( sizeof(NCPformat) );
-    if ( !ACstore ) ABORT("SUPERLU_MALLOC fails for ACstore");
-    ACstore->nnz    = Astore->nnz;
-    ACstore->nzval  = Astore->nzval;
+    AC->Stype = SLU_NCP;
+    AC->Dtype = A->Dtype;
+    AC->Mtype = A->Mtype;
+    AC->nrow = A->nrow;
+    AC->ncol = A->ncol;
+    Astore = A->Store;
+    ACstore = AC->Store = (void*)SUPERLU_MALLOC(sizeof(NCPformat));
+    if(!ACstore) ABORT("SUPERLU_MALLOC fails for ACstore");
+    ACstore->nnz = Astore->nnz;
+    ACstore->nzval = Astore->nzval;
     ACstore->rowind = Astore->rowind;
     ACstore->colbeg = intMalloc(n);
-    if ( !(ACstore->colbeg) ) ABORT("SUPERLU_MALLOC fails for ACstore->colbeg");
+    if(!(ACstore->colbeg)) ABORT("SUPERLU_MALLOC fails for ACstore->colbeg");
     ACstore->colend = intMalloc(n);
-    if ( !(ACstore->colend) ) ABORT("SUPERLU_MALLOC fails for ACstore->colend");
+    if(!(ACstore->colend)) ABORT("SUPERLU_MALLOC fails for ACstore->colend");
 
 #if ( DEBUGlevel>=1 )
     check_perm("Initial perm_c", n, perm_c);
-#endif      
+#endif
 #if ( DEBUGlevel>=2 )
     print_int_vec("pre_order:", n, perm_c);
-#endif      
+#endif
 
-    for (i = 0; i < n; i++) {
-	ACstore->colbeg[perm_c[i]] = Astore->colptr[i]; 
-	ACstore->colend[perm_c[i]] = Astore->colptr[i+1];
+    for(i = 0; i < n; i++) {
+        ACstore->colbeg[perm_c[i]] = Astore->colptr[i];
+        ACstore->colend[perm_c[i]] = Astore->colptr[i + 1];
     }
-	
-    if ( options->Fact == DOFACT ) {
+
+    if(options->Fact == DOFACT) {
 #undef ETREE_ATplusA
 #ifdef ETREE_ATplusA
         /*--------------------------------------------
@@ -150,46 +146,44 @@ sp_preorder(superlu_options_t *options,  SuperMatrix *A, int *perm_c,
         /*--------------------------------------------
 	  COMPUTE THE COLUMN ELIMINATION TREE.
 	  --------------------------------------------*/
-	sp_coletree(ACstore->colbeg, ACstore->colend, ACstore->rowind,
-		    A->nrow, A->ncol, etree);
+        sp_coletree(ACstore->colbeg, ACstore->colend, ACstore->rowind, A->nrow, A->ncol, etree);
 #endif
 #if ( DEBUGlevel>=2 )
 	print_int_vec("etree:", n, etree);
-#endif	
-	
-	/* In symmetric mode, do not do postorder here. */
-	if ( options->SymmetricMode == NO ) {
-	    /* Post order etree */
-	    post = (int *) TreePostorder(n, etree);
-	    /* for (i = 0; i < n+1; ++i) inv_post[post[i]] = i;
-	       iwork = post; */
+#endif
+
+        /* In symmetric mode, do not do postorder here. */
+        if(options->SymmetricMode == NO) {
+            /* Post order etree */
+            post = (int*)TreePostorder(n, etree);
+            /* for (i = 0; i < n+1; ++i) inv_post[post[i]] = i;
+               iwork = post; */
 
 #if ( DEBUGlevel>=1 )
 	    check_perm("post", n, post);	
-#endif	
+#endif
 #if ( DEBUGlevel>=2 )
 	    print_int_vec("post:", n+1, post);
-#endif	
-	    iwork = (int*) SUPERLU_MALLOC((n+1)*sizeof(int)); 
-	    if ( !iwork ) ABORT("SUPERLU_MALLOC fails for iwork[]");
+#endif
+            iwork = (int*)SUPERLU_MALLOC((n+1)*sizeof(int));
+            if(!iwork) ABORT("SUPERLU_MALLOC fails for iwork[]");
 
-	    /* Renumber etree in postorder */
-	    for (i = 0; i < n; ++i) iwork[post[i]] = post[etree[i]];
-	    for (i = 0; i < n; ++i) etree[i] = iwork[i];
+            /* Renumber etree in postorder */
+            for(i = 0; i < n; ++i) iwork[post[i]] = post[etree[i]];
+            for(i = 0; i < n; ++i) etree[i] = iwork[i];
 
 #if ( DEBUGlevel>=2 )
 	    print_int_vec("postorder etree:", n, etree);
 #endif
-	
-	    /* Postmultiply A*Pc by post[] */
-	    for (i = 0; i < n; ++i) iwork[post[i]] = ACstore->colbeg[i];
-	    for (i = 0; i < n; ++i) ACstore->colbeg[i] = iwork[i];
-	    for (i = 0; i < n; ++i) iwork[post[i]] = ACstore->colend[i];
-	    for (i = 0; i < n; ++i) ACstore->colend[i] = iwork[i];
 
-	    for (i = 0; i < n; ++i)
-	        iwork[i] = post[perm_c[i]];  /* product of perm_c and post */
-	    for (i = 0; i < n; ++i) perm_c[i] = iwork[i];
+            /* Postmultiply A*Pc by post[] */
+            for(i = 0; i < n; ++i) iwork[post[i]] = ACstore->colbeg[i];
+            for(i = 0; i < n; ++i) ACstore->colbeg[i] = iwork[i];
+            for(i = 0; i < n; ++i) iwork[post[i]] = ACstore->colend[i];
+            for(i = 0; i < n; ++i) ACstore->colend[i] = iwork[i];
+
+            for(i = 0; i < n; ++i) iwork[i] = post[perm_c[i]]; /* product of perm_c and post */
+            for(i = 0; i < n; ++i) perm_c[i] = iwork[i];
 
 #if ( DEBUGlevel>=1 )
 	    check_perm("final perm_c", n, perm_c);	
@@ -197,10 +191,8 @@ sp_preorder(superlu_options_t *options,  SuperMatrix *A, int *perm_c,
 #if ( DEBUGlevel>=2 )
 	    print_int_vec("Pc*post:", n, perm_c);
 #endif
-	    SUPERLU_FREE (post);
-	    SUPERLU_FREE (iwork);
-	} /* end postordering */
-
-    } /* if options->Fact == DOFACT ... */
-
+            SUPERLU_FREE(post);
+            SUPERLU_FREE(iwork);
+        } /* end postordering */
+    }     /* if options->Fact == DOFACT ... */
 }

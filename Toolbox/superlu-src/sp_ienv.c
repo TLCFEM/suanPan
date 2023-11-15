@@ -65,26 +65,29 @@ at the top-level directory.
     ===================================================================== 
 </pre>
 */
-int
-sp_ienv(int ispec)
-{
+int sp_ienv(int ispec) {
     int i;
-    extern int input_error(char *, int *);
+    extern int input_error(char*, int*);
 
-    switch (ispec) {
-	case 1: return (20);
-	case 2: return (10);
-	case 3: return (200);
-	case 4: return (200);
-	case 5: return (100);
-        case 6: return (30);
-        case 7: return (10);
+    switch(ispec) {
+    case 1:
+        return (20);
+    case 2:
+        return (10);
+    case 3:
+        return (200);
+    case 4:
+        return (200);
+    case 5:
+        return (100);
+    case 6:
+        return (30);
+    case 7:
+        return (10);
     }
 
     /* Invalid value for ISPEC */
     i = 1;
     input_error("sp_ienv", &i);
     return 0;
-
 } /* sp_ienv_ */
-

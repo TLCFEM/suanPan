@@ -86,85 +86,84 @@ at the top-level directory.
  * </pre>
  */
 
-int
-zlacon2_(int *n, doublecomplex *v, doublecomplex *x, double *est, int *kase, int isave[3])
-{
+int zlacon2_(int* n, doublecomplex* v, doublecomplex* x, double* est, int* kase, int isave[3]) {
     /* Table of constant values */
     int c__1 = 1;
-    doublecomplex      zero = {0.0, 0.0};
-    doublecomplex      one = {1.0, 0.0};
+    doublecomplex zero = {0.0, 0.0};
+    doublecomplex one = {1.0, 0.0};
 
     /* System generated locals */
     double d__1;
-    
+
     /* Local variables */
     int jlast;
     double altsgn, estold;
     int i;
     double temp;
     double safmin;
-    extern double dmach(char *);
-    extern int izmax1_slu(int *, doublecomplex *, int *);
-    extern double dzsum1_slu(int *, doublecomplex *, int *);
-    extern int zcopy_(int *, doublecomplex *, int *, doublecomplex *, int *);
+    extern double dmach(char*);
+    extern int izmax1_slu(int*, doublecomplex*, int*);
+    extern double dzsum1_slu(int*, doublecomplex*, int*);
+    extern int zcopy_(int*, doublecomplex*, int*, doublecomplex*, int*);
 
     safmin = dmach("Safe minimum");
-    if ( *kase == 0 ) {
-	for (i = 0; i < *n; ++i) {
-	    x[i].r = 1. / (double) (*n);
-	    x[i].i = 0.;
-	}
-	*kase = 1;
-	isave[0] = 1;	/* jump = 1; */
-	return 0;
+    if(*kase == 0) {
+        for(i = 0; i < *n; ++i) {
+            x[i].r = 1. / (double)(*n);
+            x[i].i = 0.;
+        }
+        *kase = 1;
+        isave[0] = 1; /* jump = 1; */
+        return 0;
     }
 
-    switch (isave[0]) {
-	case 1:  goto L20;
-	case 2:  goto L40;
-	case 3:  goto L70;
-	case 4:  goto L110;
-	case 5:  goto L140;
+    switch(isave[0]) {
+    case 1:
+        goto L20;
+    case 2:
+        goto L40;
+    case 3:
+        goto L70;
+    case 4:
+        goto L110;
+    case 5:
+        goto L140;
     }
 
     /*     ................ ENTRY   (isave[0] == 1)   
 	   FIRST ITERATION.  X HAS BEEN OVERWRITTEN BY A*X. */
-  L20:
-    if (*n == 1) {
-	v[0] = x[0];
-	*est = z_abs(&v[0]);
-	/*        ... QUIT */
-	goto L150;
+L20: if(*n == 1) {
+        v[0] = x[0];
+        *est = z_abs(&v[0]);
+        /*        ... QUIT */
+        goto L150;
     }
     *est = dzsum1_slu(n, x, &c__1);
 
-    for (i = 0; i < *n; ++i) {
-	d__1 = z_abs(&x[i]);
-	if (d__1 > safmin) {
-	    d__1 = 1 / d__1;
-	    x[i].r *= d__1;
-	    x[i].i *= d__1;
-	} else {
-	    x[i] = one;
-	}
+    for(i = 0; i < *n; ++i) {
+        d__1 = z_abs(&x[i]);
+        if(d__1 > safmin) {
+            d__1 = 1 / d__1;
+            x[i].r *= d__1;
+            x[i].i *= d__1;
+        }
+        else { x[i] = one; }
     }
     *kase = 2;
-    isave[0] = 2;  /* jump = 2; */
+    isave[0] = 2; /* jump = 2; */
     return 0;
 
     /*     ................ ENTRY   (isave[0] == 2)   
 	   FIRST ITERATION.  X HAS BEEN OVERWRITTEN BY TRANSPOSE(A)*X. */
-L40:
-    isave[1] = izmax1_slu(n, &x[0], &c__1);  /* j */
-    --isave[1];  /* --j; */
-    isave[2] = 2; /* iter = 2; */
+L40: isave[1] = izmax1_slu(n, &x[0], &c__1); /* j */
+    --isave[1];                              /* --j; */
+    isave[2] = 2;                            /* iter = 2; */
 
     /*     MAIN LOOP - ITERATIONS 2,3,...,ITMAX. */
-L50:
-    for (i = 0; i < *n; ++i) x[i] = zero;
+L50: for(i = 0; i < *n; ++i) x[i] = zero;
     x[isave[1]] = one;
     *kase = 1;
-    isave[0] = 3;  /* jump = 3; */
+    isave[0] = 3; /* jump = 3; */
     return 0;
 
     /*     ................ ENTRY   (isave[0] == 3)   
@@ -178,63 +177,56 @@ L70:
     estold = *est;
     *est = dzsum1_slu(n, v, &c__1);
 
-
-/* L90: */
+    /* L90: */
     /*     TEST FOR CYCLING. */
-    if (*est <= estold) goto L120;
+    if(*est <= estold) goto L120;
 
-    for (i = 0; i < *n; ++i) {
-	d__1 = z_abs(&x[i]);
-	if (d__1 > safmin) {
-	    d__1 = 1 / d__1;
-	    x[i].r *= d__1;
-	    x[i].i *= d__1;
-	} else {
-	    x[i] = one;
-	}
+    for(i = 0; i < *n; ++i) {
+        d__1 = z_abs(&x[i]);
+        if(d__1 > safmin) {
+            d__1 = 1 / d__1;
+            x[i].r *= d__1;
+            x[i].i *= d__1;
+        }
+        else { x[i] = one; }
     }
     *kase = 2;
-    isave[0] = 4;  /* jump = 4; */
+    isave[0] = 4; /* jump = 4; */
     return 0;
 
     /*     ................ ENTRY   (isave[0] == 4)
 	   X HAS BEEN OVERWRITTEN BY TRANDPOSE(A)*X. */
-L110:
-    jlast = isave[1];  /* j; */
+L110: jlast = isave[1];                     /* j; */
     isave[1] = izmax1_slu(n, &x[0], &c__1); /* j */
-    isave[1] = isave[1] - 1;  /* --j; */
-    if (x[jlast].r != (d__1 = x[isave[1]].r, fabs(d__1)) && isave[2] < 5) {
-	isave[2] = isave[2] + 1;  /* ++iter; */
-	goto L50;
+    isave[1] = isave[1] - 1;                /* --j; */
+    if(x[jlast].r != (d__1 = x[isave[1]].r, fabs(d__1)) && isave[2] < 5) {
+        isave[2] = isave[2] + 1; /* ++iter; */
+        goto L50;
     }
 
     /*     ITERATION COMPLETE.  FINAL STAGE. */
-L120:
-    altsgn = 1.;
-    for (i = 1; i <= *n; ++i) {
-	x[i-1].r = altsgn * ((double)(i - 1) / (double)(*n - 1) + 1.);
-	x[i-1].i = 0.;
-	altsgn = -altsgn;
+L120: altsgn = 1.;
+    for(i = 1; i <= *n; ++i) {
+        x[i - 1].r = altsgn * ((double)(i - 1) / (double)(*n - 1) + 1.);
+        x[i - 1].i = 0.;
+        altsgn = -altsgn;
     }
     *kase = 1;
-    isave[0] = 5;  /* jump = 5; */
+    isave[0] = 5; /* jump = 5; */
     return 0;
-    
+
     /*     ................ ENTRY   (isave[0] = 5)   
 	   X HAS BEEN OVERWRITTEN BY A*X. */
-L140:
-    temp = dzsum1_slu(n, x, &c__1) / (double)(*n * 3) * 2.;
-    if (temp > *est) {
+L140: temp = dzsum1_slu(n, x, &c__1) / (double)(*n * 3) * 2.;
+    if(temp > *est) {
 #ifdef _CRAY
 	CCOPY(n, &x[0], &c__1, &v[0], &c__1);
 #else
-	zcopy_(n, &x[0], &c__1, &v[0], &c__1);
+        zcopy_(n, &x[0], &c__1, &v[0], &c__1);
 #endif
-	*est = temp;
+        *est = temp;
     }
 
-L150:
-    *kase = 0;
+L150: *kase = 0;
     return 0;
-
 } /* zlacon2_ */

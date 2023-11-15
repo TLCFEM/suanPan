@@ -68,62 +68,52 @@ at the top-level directory.
  * </pre>
  */
 
-double dlangs(char *norm, SuperMatrix *A)
-{
-    
+double dlangs(char* norm, SuperMatrix* A) {
     /* Local variables */
-    NCformat *Astore;
-    double   *Aval;
-    int      i, j, irow;
-    double   value, sum;
-    double   *rwork;
+    NCformat* Astore;
+    double* Aval;
+    int i, j, irow;
+    double value, sum;
+    double* rwork;
 
     Astore = A->Store;
-    Aval   = Astore->nzval;
-    
-    if ( SUPERLU_MIN(A->nrow, A->ncol) == 0) {
-	value = 0.;
-	
-    } else if (strncmp(norm, "M", 1)==0) {
-	/* Find max(abs(A(i,j))). */
-	value = 0.;
-	for (j = 0; j < A->ncol; ++j)
-	    for (i = Astore->colptr[j]; i < Astore->colptr[j+1]; i++)
-		value = SUPERLU_MAX( value, fabs( Aval[i]) );
-	
-    } else if (strncmp(norm, "O", 1)==0 || *(unsigned char *)norm == '1') {
-	/* Find norm1(A). */
-	value = 0.;
-	for (j = 0; j < A->ncol; ++j) {
-	    sum = 0.;
-	    for (i = Astore->colptr[j]; i < Astore->colptr[j+1]; i++) 
-		sum += fabs(Aval[i]);
-	    value = SUPERLU_MAX(value,sum);
-	}
-	
-    } else if (strncmp(norm, "I", 1)==0) {
-	/* Find normI(A). */
-	if ( !(rwork = (double *) SUPERLU_MALLOC(A->nrow * sizeof(double))) )
-	    ABORT("SUPERLU_MALLOC fails for rwork.");
-	for (i = 0; i < A->nrow; ++i) rwork[i] = 0.;
-	for (j = 0; j < A->ncol; ++j)
-	    for (i = Astore->colptr[j]; i < Astore->colptr[j+1]; i++) {
-		irow = Astore->rowind[i];
-		rwork[irow] += fabs(Aval[i]);
-	    }
-	value = 0.;
-	for (i = 0; i < A->nrow; ++i)
-	    value = SUPERLU_MAX(value, rwork[i]);
-	
-	SUPERLU_FREE (rwork);
-	
-    } else if (strncmp(norm, "F", 1)==0 || strncmp(norm, "E", 1)==0) {
-	/* Find normF(A). */
-	ABORT("Not implemented.");
-    } else
-	ABORT("Illegal norm specified.");
+    Aval = Astore->nzval;
+
+    if(SUPERLU_MIN(A->nrow, A->ncol) == 0) { value = 0.; }
+    else if(strncmp(norm, "M", 1) == 0) {
+        /* Find max(abs(A(i,j))). */
+        value = 0.;
+        for(j = 0; j < A->ncol; ++j)
+            for(i = Astore->colptr[j]; i < Astore->colptr[j + 1]; i++) value = SUPERLU_MAX(value, fabs( Aval[i]));
+    }
+    else if(strncmp(norm, "O", 1) == 0 || *(unsigned char*)norm == '1') {
+        /* Find norm1(A). */
+        value = 0.;
+        for(j = 0; j < A->ncol; ++j) {
+            sum = 0.;
+            for(i = Astore->colptr[j]; i < Astore->colptr[j + 1]; i++) sum += fabs(Aval[i]);
+            value = SUPERLU_MAX(value, sum);
+        }
+    }
+    else if(strncmp(norm, "I", 1) == 0) {
+        /* Find normI(A). */
+        if(!(rwork = (double*)SUPERLU_MALLOC(A->nrow * sizeof(double)))) ABORT("SUPERLU_MALLOC fails for rwork.");
+        for(i = 0; i < A->nrow; ++i) rwork[i] = 0.;
+        for(j = 0; j < A->ncol; ++j)
+            for(i = Astore->colptr[j]; i < Astore->colptr[j + 1]; i++) {
+                irow = Astore->rowind[i];
+                rwork[irow] += fabs(Aval[i]);
+            }
+        value = 0.;
+        for(i = 0; i < A->nrow; ++i) value = SUPERLU_MAX(value, rwork[i]);
+
+        SUPERLU_FREE(rwork);
+    }
+    else if(strncmp(norm, "F", 1) == 0 || strncmp(norm, "E", 1) == 0) {
+        /* Find normF(A). */
+        ABORT("Not implemented.");
+    }
+    else ABORT("Illegal norm specified.");
 
     return (value);
-
 } /* dlangs */
-

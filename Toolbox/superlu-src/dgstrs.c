@@ -33,7 +33,6 @@ at the top-level directory.
 
 #include "slu_ddefs.h"
 
-
 /*! \brief
  *
  * <pre>
@@ -89,12 +88,7 @@ at the top-level directory.
  * </pre>
  */
 
-void
-dgstrs (trans_t trans, SuperMatrix *L, SuperMatrix *U,
-        int *perm_c, int *perm_r, SuperMatrix *B,
-        SuperLUStat_t *stat, int *info)
-{
-
+void dgstrs(trans_t trans, SuperMatrix* L, SuperMatrix* U, int* perm_c, int* perm_r, SuperMatrix* B, SuperLUStat_t* stat, int* info) {
 #ifdef _CRAY
     _fcd ftcs1, ftcs2, ftcs3, ftcs4;
 #endif
@@ -102,44 +96,38 @@ dgstrs (trans_t trans, SuperMatrix *L, SuperMatrix *U,
     double   alpha = 1.0, beta = 1.0;
     double   *work_col;
 #endif
-    DNformat *Bstore;
-    double   *Bmat;
-    SCformat *Lstore;
-    NCformat *Ustore;
-    double   *Lval, *Uval;
-    int      fsupc, nrow, nsupr, nsupc, irow;
-    int_t    i, j, k, luptr, istart, iptr;
-    int      jcol, n, ldb, nrhs;
-    double   *work, *rhs_work, *soln;
-    flops_t  solve_ops;
-    void dprint_soln(int n, int nrhs, double *soln);
+    DNformat* Bstore;
+    double* Bmat;
+    SCformat* Lstore;
+    NCformat* Ustore;
+    double *Lval, *Uval;
+    int fsupc, nrow, nsupr, nsupc, irow;
+    int_t i, j, k, luptr, istart, iptr;
+    int jcol, n, ldb, nrhs;
+    double *work, *rhs_work, *soln;
+    flops_t solve_ops;
+    void dprint_soln(int n, int nrhs, double* soln);
 
     /* Test input parameters ... */
     *info = 0;
     Bstore = B->Store;
     ldb = Bstore->lda;
     nrhs = B->ncol;
-    if ( trans != NOTRANS && trans != TRANS && trans != CONJ ) *info = -1;
-    else if ( L->nrow != L->ncol || L->nrow < 0 ||
-	      L->Stype != SLU_SC || L->Dtype != SLU_D || L->Mtype != SLU_TRLU )
-	*info = -2;
-    else if ( U->nrow != U->ncol || U->nrow < 0 ||
-	      U->Stype != SLU_NC || U->Dtype != SLU_D || U->Mtype != SLU_TRU )
-	*info = -3;
-    else if ( ldb < SUPERLU_MAX(0, L->nrow) ||
-	      B->Stype != SLU_DN || B->Dtype != SLU_D || B->Mtype != SLU_GE )
-	*info = -6;
-    if ( *info ) {
-	int ii = -(*info);
-	input_error("dgstrs", &ii);
-	return;
+    if(trans != NOTRANS && trans != TRANS && trans != CONJ) *info = -1;
+    else if(L->nrow != L->ncol || L->nrow < 0 || L->Stype != SLU_SC || L->Dtype != SLU_D || L->Mtype != SLU_TRLU) *info = -2;
+    else if(U->nrow != U->ncol || U->nrow < 0 || U->Stype != SLU_NC || U->Dtype != SLU_D || U->Mtype != SLU_TRU) *info = -3;
+    else if(ldb < SUPERLU_MAX(0, L->nrow) || B->Stype != SLU_DN || B->Dtype != SLU_D || B->Mtype != SLU_GE) *info = -6;
+    if(*info) {
+        int ii = -(*info);
+        input_error("dgstrs", &ii);
+        return;
     }
 
     n = L->nrow;
-    work = doubleCalloc((size_t) n * (size_t) nrhs);
-    if ( !work ) ABORT("Malloc fails for local work[].");
-    soln = doubleMalloc((size_t) n);
-    if ( !soln ) ABORT("Malloc fails for local soln[].");
+    work = doubleCalloc((size_t)n * (size_t)nrhs);
+    if(!work) ABORT("Malloc fails for local work[].");
+    soln = doubleMalloc((size_t)n);
+    if(!soln) ABORT("Malloc fails for local soln[].");
 
     Bmat = Bstore->nzval;
     Lstore = L->Store;
@@ -147,38 +135,39 @@ dgstrs (trans_t trans, SuperMatrix *L, SuperMatrix *U,
     Ustore = U->Store;
     Uval = Ustore->nzval;
     solve_ops = 0;
-    
-    if ( trans == NOTRANS ) {
-	/* Permute right hand sides to form Pr*B */
-	for (i = 0; i < nrhs; i++) {
-	    rhs_work = &Bmat[(size_t)i * (size_t)ldb];
-	    for (k = 0; k < n; k++) soln[perm_r[k]] = rhs_work[k];
-	    for (k = 0; k < n; k++) rhs_work[k] = soln[k];
-	}
-	
-	/* Forward solve PLy=Pb. */
-	for (k = 0; k <= Lstore->nsuper; k++) {
-	    fsupc = L_FST_SUPC(k);
-	    istart = L_SUB_START(fsupc);
-	    nsupr = L_SUB_START(fsupc+1) - istart;
-	    nsupc = L_FST_SUPC(k+1) - fsupc;
-	    nrow = nsupr - nsupc;
 
-	    solve_ops += nsupc * (nsupc - 1) * nrhs;
-	    solve_ops += 2 * nrow * nsupc * nrhs;
-	    
-	    if ( nsupc == 1 ) {
-		for (j = 0; j < nrhs; j++) {
-		    rhs_work = &Bmat[(size_t)j * (size_t)ldb];
-	    	    luptr = L_NZ_START(fsupc);
-		    for (iptr=istart+1; iptr < L_SUB_START(fsupc+1); iptr++){
-			irow = L_SUB(iptr);
-			++luptr;
-			rhs_work[irow] -= rhs_work[fsupc] * Lval[luptr];
-		    }
-		}
-	    } else {
-	    	luptr = L_NZ_START(fsupc);
+    if(trans == NOTRANS) {
+        /* Permute right hand sides to form Pr*B */
+        for(i = 0; i < nrhs; i++) {
+            rhs_work = &Bmat[(size_t)i * (size_t)ldb];
+            for(k = 0; k < n; k++) soln[perm_r[k]] = rhs_work[k];
+            for(k = 0; k < n; k++) rhs_work[k] = soln[k];
+        }
+
+        /* Forward solve PLy=Pb. */
+        for(k = 0; k <= Lstore->nsuper; k++) {
+            fsupc = L_FST_SUPC(k);
+            istart = L_SUB_START(fsupc);
+            nsupr = L_SUB_START(fsupc+1) - istart;
+            nsupc = L_FST_SUPC(k+1) - fsupc;
+            nrow = nsupr - nsupc;
+
+            solve_ops += nsupc * (nsupc - 1) * nrhs;
+            solve_ops += 2 * nrow * nsupc * nrhs;
+
+            if(nsupc == 1) {
+                for(j = 0; j < nrhs; j++) {
+                    rhs_work = &Bmat[(size_t)j * (size_t)ldb];
+                    luptr = L_NZ_START(fsupc);
+                    for(iptr = istart + 1; iptr < L_SUB_START(fsupc+1); iptr++) {
+                        irow = L_SUB(iptr);
+                        ++luptr;
+                        rhs_work[irow] -= rhs_work[fsupc] * Lval[luptr];
+                    }
+                }
+            }
+            else {
+                luptr = L_NZ_START(fsupc);
 #ifdef USE_VENDOR_BLAS
 #ifdef _CRAY
 		ftcs1 = _cptofcd("L", strlen("L"));
@@ -209,49 +198,49 @@ dgstrs (trans_t trans, SuperMatrix *L, SuperMatrix *U,
 			iptr++;
 		    }
 		}
-#else		
-		for (j = 0; j < nrhs; j++) {
-		    rhs_work = &Bmat[(size_t)j * (size_t)ldb];
-		    dlsolve (nsupr, nsupc, &Lval[luptr], &rhs_work[fsupc]);
-		    dmatvec (nsupr, nrow, nsupc, &Lval[luptr+nsupc],
-			    &rhs_work[fsupc], &work[0] );
+#else
+                for(j = 0; j < nrhs; j++) {
+                    rhs_work = &Bmat[(size_t)j * (size_t)ldb];
+                    dlsolve(nsupr, nsupc, &Lval[luptr], &rhs_work[fsupc]);
+                    dmatvec(nsupr, nrow, nsupc, &Lval[luptr + nsupc], &rhs_work[fsupc], &work[0]);
 
-		    iptr = istart + nsupc;
-		    for (i = 0; i < nrow; i++) {
-			irow = L_SUB(iptr);
-			rhs_work[irow] -= work[i];
-			work[i] = 0.0;
-			iptr++;
-		    }
-		}
-#endif		    
-	    } /* else ... */
-	} /* for L-solve */
+                    iptr = istart + nsupc;
+                    for(i = 0; i < nrow; i++) {
+                        irow = L_SUB(iptr);
+                        rhs_work[irow] -= work[i];
+                        work[i] = 0.0;
+                        iptr++;
+                    }
+                }
+#endif
+            } /* else ... */
+        }     /* for L-solve */
 
 #if ( DEBUGlevel>=2 )
   	printf("After L-solve: y=\n");
 	dprint_soln(n, nrhs, Bmat);
 #endif
 
-	/*
-	 * Back solve Ux=y.
-	 */
-	for (k = Lstore->nsuper; k >= 0; k--) {
-	    fsupc = L_FST_SUPC(k);
-	    istart = L_SUB_START(fsupc);
-	    nsupr = L_SUB_START(fsupc+1) - istart;
-	    nsupc = L_FST_SUPC(k+1) - fsupc;
-	    luptr = L_NZ_START(fsupc);
+        /*
+         * Back solve Ux=y.
+         */
+        for(k = Lstore->nsuper; k >= 0; k--) {
+            fsupc = L_FST_SUPC(k);
+            istart = L_SUB_START(fsupc);
+            nsupr = L_SUB_START(fsupc+1) - istart;
+            nsupc = L_FST_SUPC(k+1) - fsupc;
+            luptr = L_NZ_START(fsupc);
 
-	    solve_ops += nsupc * (nsupc + 1) * nrhs;
+            solve_ops += nsupc * (nsupc + 1) * nrhs;
 
-	    if ( nsupc == 1 ) {
-		rhs_work = &Bmat[0];
-		for (j = 0; j < nrhs; j++) {
-		    rhs_work[fsupc] /= Lval[luptr];
-		    rhs_work += ldb;
-		}
-	    } else {
+            if(nsupc == 1) {
+                rhs_work = &Bmat[0];
+                for(j = 0; j < nrhs; j++) {
+                    rhs_work[fsupc] /= Lval[luptr];
+                    rhs_work += ldb;
+                }
+            }
+            else {
 #ifdef USE_VENDOR_BLAS
 #ifdef _CRAY
 		ftcs1 = _cptofcd("L", strlen("L"));
@@ -263,64 +252,60 @@ dgstrs (trans_t trans, SuperMatrix *L, SuperMatrix *U,
 		dtrsm_("L", "U", "N", "N", &nsupc, &nrhs, &alpha,
 		       &Lval[luptr], &nsupr, &Bmat[fsupc], &ldb);
 #endif
-#else		
-		for (j = 0; j < nrhs; j++)
-		    dusolve ( nsupr, nsupc, &Lval[luptr], &Bmat[(size_t)fsupc + (size_t)j * (size_t)ldb] );
-#endif		
-	    }
+#else
+                for(j = 0; j < nrhs; j++) dusolve(nsupr, nsupc, &Lval[luptr], &Bmat[(size_t)fsupc + (size_t)j * (size_t)ldb]);
+#endif
+            }
 
-	    for (j = 0; j < nrhs; ++j) {
-		rhs_work = &Bmat[(size_t)j * (size_t)ldb];
-		for (jcol = fsupc; jcol < fsupc + nsupc; jcol++) {
-		    solve_ops += 2*(U_NZ_START(jcol+1) - U_NZ_START(jcol));
-		    for (i = U_NZ_START(jcol); i < U_NZ_START(jcol+1); i++ ){
-			irow = U_SUB(i);
-			rhs_work[irow] -= rhs_work[jcol] * Uval[i];
-		    }
-		}
-	    }
-	    
-	} /* for U-solve */
+            for(j = 0; j < nrhs; ++j) {
+                rhs_work = &Bmat[(size_t)j * (size_t)ldb];
+                for(jcol = fsupc; jcol < fsupc + nsupc; jcol++) {
+                    solve_ops += 2 * (U_NZ_START(jcol+1) - U_NZ_START(jcol));
+                    for(i = U_NZ_START(jcol); i < U_NZ_START(jcol+1); i++) {
+                        irow = U_SUB(i);
+                        rhs_work[irow] -= rhs_work[jcol] * Uval[i];
+                    }
+                }
+            }
+        } /* for U-solve */
 
 #if ( DEBUGlevel>=2 )
   	printf("After U-solve: x=\n");
 	dprint_soln(n, nrhs, Bmat);
 #endif
 
-	/* Compute the final solution X := Pc*X. */
-	for (i = 0; i < nrhs; i++) {
-	    rhs_work = &Bmat[(size_t)i * (size_t)ldb];
-	    for (k = 0; k < n; k++) soln[k] = rhs_work[perm_c[k]];
-	    for (k = 0; k < n; k++) rhs_work[k] = soln[k];
-	}
-	
+        /* Compute the final solution X := Pc*X. */
+        for(i = 0; i < nrhs; i++) {
+            rhs_work = &Bmat[(size_t)i * (size_t)ldb];
+            for(k = 0; k < n; k++) soln[k] = rhs_work[perm_c[k]];
+            for(k = 0; k < n; k++) rhs_work[k] = soln[k];
+        }
+
         stat->ops[SOLVE] = solve_ops;
+    }
+    else {
+        /* Solve A'*X=B or CONJ(A)*X=B */
+        /* Permute right hand sides to form Pc'*B. */
+        for(i = 0; i < nrhs; i++) {
+            rhs_work = &Bmat[(size_t)i * (size_t)ldb];
+            for(k = 0; k < n; k++) soln[perm_c[k]] = rhs_work[k];
+            for(k = 0; k < n; k++) rhs_work[k] = soln[k];
+        }
 
-    } else { /* Solve A'*X=B or CONJ(A)*X=B */
-	/* Permute right hand sides to form Pc'*B. */
-	for (i = 0; i < nrhs; i++) {
-	    rhs_work = &Bmat[(size_t)i * (size_t)ldb];
-	    for (k = 0; k < n; k++) soln[perm_c[k]] = rhs_work[k];
-	    for (k = 0; k < n; k++) rhs_work[k] = soln[k];
-	}
+        stat->ops[SOLVE] = 0;
+        for(k = 0; k < nrhs; ++k) {
+            /* Multiply by inv(U'). */
+            sp_dtrsv("U", "T", "N", L, U, &Bmat[(size_t)k * (size_t)ldb], stat, info);
 
-	stat->ops[SOLVE] = 0;
-	for (k = 0; k < nrhs; ++k) {
-	    
-	    /* Multiply by inv(U'). */
-	    sp_dtrsv("U", "T", "N", L, U, &Bmat[(size_t)k * (size_t)ldb], stat, info);
-	    
-	    /* Multiply by inv(L'). */
-	    sp_dtrsv("L", "T", "U", L, U, &Bmat[(size_t)k * (size_t)ldb], stat, info);
-	    
-	}
-	/* Compute the final solution X := Pr'*X (=inv(Pr)*X) */
-	for (i = 0; i < nrhs; i++) {
-	    rhs_work = &Bmat[(size_t)i * (size_t)ldb];
-	    for (k = 0; k < n; k++) soln[k] = rhs_work[perm_r[k]];
-	    for (k = 0; k < n; k++) rhs_work[k] = soln[k];
-	}
-
+            /* Multiply by inv(L'). */
+            sp_dtrsv("L", "T", "U", L, U, &Bmat[(size_t)k * (size_t)ldb], stat, info);
+        }
+        /* Compute the final solution X := Pr'*X (=inv(Pr)*X) */
+        for(i = 0; i < nrhs; i++) {
+            rhs_work = &Bmat[(size_t)i * (size_t)ldb];
+            for(k = 0; k < n; k++) soln[k] = rhs_work[perm_r[k]];
+            for(k = 0; k < n; k++) rhs_work[k] = soln[k];
+        }
     }
 
     SUPERLU_FREE(work);
@@ -330,11 +315,8 @@ dgstrs (trans_t trans, SuperMatrix *L, SuperMatrix *U,
 /*
  * Diagnostic print of the solution vector 
  */
-void
-dprint_soln(int n, int nrhs, double *soln)
-{
+void dprint_soln(int n, int nrhs, double* soln) {
     int i;
 
-    for (i = 0; i < n; i++)
-  	printf("\t%d: %.4f\n", i, soln[i]);
+    for(i = 0; i < n; i++) printf("\t%d: %.4f\n", i, soln[i]);
 }

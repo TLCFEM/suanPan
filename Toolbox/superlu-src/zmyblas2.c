@@ -36,75 +36,87 @@ at the top-level directory.
  * triangular matrix is stored in a 2D array M(1:nrow,1:ncol). 
  * The solution will be returned in the rhs vector.
  */
-void zlsolve ( int ldm, int ncol, doublecomplex *M, doublecomplex *rhs )
-{
+void zlsolve(int ldm, int ncol, doublecomplex* M, doublecomplex* rhs) {
     int k;
     doublecomplex x0, x1, x2, x3, temp;
-    doublecomplex *M0;
+    doublecomplex* M0;
     doublecomplex *Mki0, *Mki1, *Mki2, *Mki3;
     register int firstcol = 0;
 
     M0 = &M[0];
 
+    while(firstcol < ncol - 3) {
+        /* Do 4 columns */
+        Mki0 = M0 + 1;
+        Mki1 = Mki0 + ldm + 1;
+        Mki2 = Mki1 + ldm + 1;
+        Mki3 = Mki2 + ldm + 1;
 
-    while ( firstcol < ncol - 3 ) { /* Do 4 columns */
-      	Mki0 = M0 + 1;
-      	Mki1 = Mki0 + ldm + 1;
-      	Mki2 = Mki1 + ldm + 1;
-      	Mki3 = Mki2 + ldm + 1;
+        x0 = rhs[firstcol];
+        zz_mult(&temp, &x0, Mki0);
+        Mki0++;
+        z_sub(&x1, &rhs[firstcol+1], &temp);
+        zz_mult(&temp, &x0, Mki0);
+        Mki0++;
+        z_sub(&x2, &rhs[firstcol+2], &temp);
+        zz_mult(&temp, &x1, Mki1);
+        Mki1++;
+        z_sub(&x2, &x2, &temp);
+        zz_mult(&temp, &x0, Mki0);
+        Mki0++;
+        z_sub(&x3, &rhs[firstcol+3], &temp);
+        zz_mult(&temp, &x1, Mki1);
+        Mki1++;
+        z_sub(&x3, &x3, &temp);
+        zz_mult(&temp, &x2, Mki2);
+        Mki2++;
+        z_sub(&x3, &x3, &temp);
 
-      	x0 = rhs[firstcol];
-      	zz_mult(&temp, &x0, Mki0); Mki0++;
-      	z_sub(&x1, &rhs[firstcol+1], &temp);
-      	zz_mult(&temp, &x0, Mki0); Mki0++;
-	z_sub(&x2, &rhs[firstcol+2], &temp);
-	zz_mult(&temp, &x1, Mki1); Mki1++;
-	z_sub(&x2, &x2, &temp);
-      	zz_mult(&temp, &x0, Mki0); Mki0++;
-	z_sub(&x3, &rhs[firstcol+3], &temp);
-	zz_mult(&temp, &x1, Mki1); Mki1++;
-	z_sub(&x3, &x3, &temp);
-	zz_mult(&temp, &x2, Mki2); Mki2++;
-	z_sub(&x3, &x3, &temp);
+        rhs[++firstcol] = x1;
+        rhs[++firstcol] = x2;
+        rhs[++firstcol] = x3;
+        ++firstcol;
 
- 	rhs[++firstcol] = x1;
-      	rhs[++firstcol] = x2;
-      	rhs[++firstcol] = x3;
-      	++firstcol;
-    
-      	for (k = firstcol; k < ncol; k++) {
-	    zz_mult(&temp, &x0, Mki0); Mki0++;
-	    z_sub(&rhs[k], &rhs[k], &temp);
-	    zz_mult(&temp, &x1, Mki1); Mki1++;
-	    z_sub(&rhs[k], &rhs[k], &temp);
-	    zz_mult(&temp, &x2, Mki2); Mki2++;
-	    z_sub(&rhs[k], &rhs[k], &temp);
-	    zz_mult(&temp, &x3, Mki3); Mki3++;
-	    z_sub(&rhs[k], &rhs[k], &temp);
-	}
+        for(k = firstcol; k < ncol; k++) {
+            zz_mult(&temp, &x0, Mki0);
+            Mki0++;
+            z_sub(&rhs[k], &rhs[k], &temp);
+            zz_mult(&temp, &x1, Mki1);
+            Mki1++;
+            z_sub(&rhs[k], &rhs[k], &temp);
+            zz_mult(&temp, &x2, Mki2);
+            Mki2++;
+            z_sub(&rhs[k], &rhs[k], &temp);
+            zz_mult(&temp, &x3, Mki3);
+            Mki3++;
+            z_sub(&rhs[k], &rhs[k], &temp);
+        }
 
         M0 += 4 * ldm + 4;
     }
 
-    if ( firstcol < ncol - 1 ) { /* Do 2 columns */
+    if(firstcol < ncol - 1) {
+        /* Do 2 columns */
         Mki0 = M0 + 1;
         Mki1 = Mki0 + ldm + 1;
 
         x0 = rhs[firstcol];
-	zz_mult(&temp, &x0, Mki0); Mki0++;
-	z_sub(&x1, &rhs[firstcol+1], &temp);
+        zz_mult(&temp, &x0, Mki0);
+        Mki0++;
+        z_sub(&x1, &rhs[firstcol+1], &temp);
 
-      	rhs[++firstcol] = x1;
-      	++firstcol;
-    
-      	for (k = firstcol; k < ncol; k++) {
-	    zz_mult(&temp, &x0, Mki0); Mki0++;
-	    z_sub(&rhs[k], &rhs[k], &temp);
-	    zz_mult(&temp, &x1, Mki1); Mki1++;
-	    z_sub(&rhs[k], &rhs[k], &temp);
-	} 
+        rhs[++firstcol] = x1;
+        ++firstcol;
+
+        for(k = firstcol; k < ncol; k++) {
+            zz_mult(&temp, &x0, Mki0);
+            Mki0++;
+            z_sub(&rhs[k], &rhs[k], &temp);
+            zz_mult(&temp, &x1, Mki1);
+            Mki1++;
+            z_sub(&rhs[k], &rhs[k], &temp);
+        }
     }
-    
 }
 
 /*! \brief Solves a dense upper triangular system. 
@@ -113,35 +125,30 @@ void zlsolve ( int ldm, int ncol, doublecomplex *M, doublecomplex *rhs )
  * stored in a 2-dim array M(1:ldm,1:ncol). The solution will be returned
  * in the rhs vector.
  */
-void zusolve (int ldm, int ncol, doublecomplex *M, doublecomplex *rhs)
-{
+void zusolve(int ldm, int ncol, doublecomplex* M, doublecomplex* rhs) {
     doublecomplex xj, temp;
     int jcol, j, irow;
 
     jcol = ncol - 1;
 
-    for (j = 0; j < ncol; j++) {
+    for(j = 0; j < ncol; j++) {
+        z_div(&xj, &rhs[jcol], &M[jcol + jcol * ldm]); /* M(jcol, jcol) */
+        rhs[jcol] = xj;
 
-	z_div(&xj, &rhs[jcol], &M[jcol + jcol*ldm]); /* M(jcol, jcol) */
-	rhs[jcol] = xj;
-	
-	for (irow = 0; irow < jcol; irow++) {
-	    zz_mult(&temp, &xj, &M[irow+jcol*ldm]); /* M(irow, jcol) */
-	    z_sub(&rhs[irow], &rhs[irow], &temp);
-	}
+        for(irow = 0; irow < jcol; irow++) {
+            zz_mult(&temp, &xj, &M[irow+jcol*ldm]); /* M(irow, jcol) */
+            z_sub(&rhs[irow], &rhs[irow], &temp);
+        }
 
-	jcol--;
-
+        jcol--;
     }
 }
-
 
 /*! \brief Performs a dense matrix-vector multiply: Mxvec = Mxvec + M * vec.
  *
  * The input matrix is M(1:nrow,1:ncol); The product is returned in Mxvec[].
  */
-void zmatvec (int ldm, int nrow, int ncol, doublecomplex *M, doublecomplex *vec, doublecomplex *Mxvec)
-{
+void zmatvec(int ldm, int nrow, int ncol, doublecomplex* M, doublecomplex* vec, doublecomplex* Mxvec) {
     doublecomplex vi0, vi1, vi2, vi3;
     doublecomplex *M0, temp;
     doublecomplex *Mki0, *Mki1, *Mki2, *Mki3;
@@ -150,39 +157,44 @@ void zmatvec (int ldm, int nrow, int ncol, doublecomplex *M, doublecomplex *vec,
 
     M0 = &M[0];
 
-    while ( firstcol < ncol - 3 ) {	/* Do 4 columns */
-	Mki0 = M0;
-	Mki1 = Mki0 + ldm;
-	Mki2 = Mki1 + ldm;
-	Mki3 = Mki2 + ldm;
+    while(firstcol < ncol - 3) {
+        /* Do 4 columns */
+        Mki0 = M0;
+        Mki1 = Mki0 + ldm;
+        Mki2 = Mki1 + ldm;
+        Mki3 = Mki2 + ldm;
 
-	vi0 = vec[firstcol++];
-	vi1 = vec[firstcol++];
-	vi2 = vec[firstcol++];
-	vi3 = vec[firstcol++];	
-	for (k = 0; k < nrow; k++) {
-	    zz_mult(&temp, &vi0, Mki0); Mki0++;
-	    z_add(&Mxvec[k], &Mxvec[k], &temp);
-	    zz_mult(&temp, &vi1, Mki1); Mki1++;
-	    z_add(&Mxvec[k], &Mxvec[k], &temp);
-	    zz_mult(&temp, &vi2, Mki2); Mki2++;
-	    z_add(&Mxvec[k], &Mxvec[k], &temp);
-	    zz_mult(&temp, &vi3, Mki3); Mki3++;
-	    z_add(&Mxvec[k], &Mxvec[k], &temp);
-	}
+        vi0 = vec[firstcol++];
+        vi1 = vec[firstcol++];
+        vi2 = vec[firstcol++];
+        vi3 = vec[firstcol++];
+        for(k = 0; k < nrow; k++) {
+            zz_mult(&temp, &vi0, Mki0);
+            Mki0++;
+            z_add(&Mxvec[k], &Mxvec[k], &temp);
+            zz_mult(&temp, &vi1, Mki1);
+            Mki1++;
+            z_add(&Mxvec[k], &Mxvec[k], &temp);
+            zz_mult(&temp, &vi2, Mki2);
+            Mki2++;
+            z_add(&Mxvec[k], &Mxvec[k], &temp);
+            zz_mult(&temp, &vi3, Mki3);
+            Mki3++;
+            z_add(&Mxvec[k], &Mxvec[k], &temp);
+        }
 
-	M0 += 4 * ldm;
+        M0 += 4 * ldm;
     }
 
-    while ( firstcol < ncol ) {		/* Do 1 column */
- 	Mki0 = M0;
-	vi0 = vec[firstcol++];
-	for (k = 0; k < nrow; k++) {
-	    zz_mult(&temp, &vi0, Mki0); Mki0++;
-	    z_add(&Mxvec[k], &Mxvec[k], &temp);
-	}
-	M0 += ldm;
+    while(firstcol < ncol) {
+        /* Do 1 column */
+        Mki0 = M0;
+        vi0 = vec[firstcol++];
+        for(k = 0; k < nrow; k++) {
+            zz_mult(&temp, &vi0, Mki0);
+            Mki0++;
+            z_add(&Mxvec[k], &Mxvec[k], &temp);
+        }
+        M0 += ldm;
     }
-	
 }
-
