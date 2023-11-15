@@ -88,109 +88,107 @@ at the top-level directory.
  *   ===================================================================== 
  * </pre>
  */
-void cgsequ(SuperMatrix* A, float* r, float* c, float* rowcnd,
-            float* colcnd, float* amax, int* info) {
+void cgsequ(SuperMatrix* A, float* r, float* c, float* rowcnd, float* colcnd, float* amax, int* info) {
+    /* Local variables */
+    NCformat* Astore;
+    complex* Aval;
+    int_t i, j;
+    int irow;
+    float rcmin, rcmax;
+    float bignum, smlnum;
+    extern float smach(char*);
 
-	/* Local variables */
-	NCformat* Astore;
-	complex* Aval;
-	int i, j, irow;
-	float rcmin, rcmax;
-	float bignum, smlnum;
-	extern float smach(char*);
+    /* Test the input parameters. */
+    *info = 0;
+    if(A->nrow < 0 || A->ncol < 0 || A->Stype != SLU_NC || A->Dtype != SLU_C || A->Mtype != SLU_GE) *info = -1;
+    if(*info != 0) {
+        int ii = -(*info);
+        input_error("cgsequ", &ii);
+        return;
+    }
 
-	/* Test the input parameters. */
-	*info = 0;
-	if(A->nrow < 0 || A->ncol < 0 ||
-		A->Stype != SLU_NC || A->Dtype != SLU_C || A->Mtype != SLU_GE)
-		*info = -1;
-	if(*info != 0) {
-		i = -(*info);
-		input_error("cgsequ", &i);
-		return;
-	}
+    /* Quick return if possible */
+    if(A->nrow == 0 || A->ncol == 0) {
+        *rowcnd = 1.;
+        *colcnd = 1.;
+        *amax = 0.;
+        return;
+    }
 
-	/* Quick return if possible */
-	if(A->nrow == 0 || A->ncol == 0) {
-		*rowcnd = 1.;
-		*colcnd = 1.;
-		*amax = 0.;
-		return;
-	}
+    Astore = A->Store;
+    Aval = Astore->nzval;
 
-	Astore = A->Store;
-	Aval = Astore->nzval;
+    /* Get machine constants. */
+    smlnum = smach("S"); /* slamch_("S"); */
+    bignum = 1. / smlnum;
 
-	/* Get machine constants. */
-	smlnum = smach("S"); /* slamch_("S"); */
-	bignum = 1. / smlnum;
+    /* Compute row scale factors. */
+    for(i = 0; i < A->nrow; ++i) r[i] = 0.;
 
-	/* Compute row scale factors. */
-	for(i = 0; i < A->nrow; ++i) r[i] = 0.;
+    /* Find the maximum element in each row. */
+    for(j = 0; j < A->ncol; ++j)
+        for(i = Astore->colptr[j]; i < Astore->colptr[j + 1]; ++i) {
+            irow = Astore->rowind[i];
+            r[irow] = SUPERLU_MAX(r[irow], c_abs1(&Aval[i]));
+        }
 
-	/* Find the maximum element in each row. */
-	for(j = 0; j < A->ncol; ++j)
-		for(i = Astore->colptr[j]; i < Astore->colptr[j + 1]; ++i) {
-			irow = Astore->rowind[i];
-			r[irow] = SUPERLU_MAX(r[irow], c_abs1(&Aval[i]));
-		}
+    /* Find the maximum and minimum scale factors. */
+    rcmin = bignum;
+    rcmax = 0.;
+    for(i = 0; i < A->nrow; ++i) {
+        rcmax = SUPERLU_MAX(rcmax, r[i]);
+        rcmin = SUPERLU_MIN(rcmin, r[i]);
+    }
+    *amax = rcmax;
 
-	/* Find the maximum and minimum scale factors. */
-	rcmin = bignum;
-	rcmax = 0.;
-	for(i = 0; i < A->nrow; ++i) {
-		rcmax = SUPERLU_MAX(rcmax, r[i]);
-		rcmin = SUPERLU_MIN(rcmin, r[i]);
-	}
-	*amax = rcmax;
+    if(rcmin == 0.) {
+        /* Find the first zero scale factor and return an error code. */
+        for(i = 0; i < A->nrow; ++i)
+            if(r[i] == 0.) {
+                *info = i + 1;
+                return;
+            }
+    }
+    else {
+        /* Invert the scale factors. */
+        for(i = 0; i < A->nrow; ++i) r[i] = 1. / SUPERLU_MIN(SUPERLU_MAX( r[i], smlnum ), bignum);
+        /* Compute ROWCND = min(R(I)) / max(R(I)) */
+        *rowcnd = SUPERLU_MAX(rcmin, smlnum) / SUPERLU_MIN(rcmax, bignum);
+    }
 
-	if(rcmin == 0.) {
-		/* Find the first zero scale factor and return an error code. */
-		for(i = 0; i < A->nrow; ++i)
-			if(r[i] == 0.) {
-				*info = i + 1;
-				return;
-			}
-	}
-	else {
-		/* Invert the scale factors. */
-		for(i = 0; i < A->nrow; ++i) r[i] = 1. / SUPERLU_MIN(SUPERLU_MAX( r[i], smlnum ), bignum);
-		/* Compute ROWCND = min(R(I)) / max(R(I)) */
-		*rowcnd = SUPERLU_MAX(rcmin, smlnum) / SUPERLU_MIN(rcmax, bignum);
-	}
+    /* Compute column scale factors */
+    for(j = 0; j < A->ncol; ++j) c[j] = 0.;
 
-	/* Compute column scale factors */
-	for(j = 0; j < A->ncol; ++j) c[j] = 0.;
+    /* Find the maximum element in each column, assuming the row
+       scalings computed above. */
+    for(j = 0; j < A->ncol; ++j)
+        for(i = Astore->colptr[j]; i < Astore->colptr[j + 1]; ++i) {
+            irow = Astore->rowind[i];
+            c[j] = SUPERLU_MAX(c[j], c_abs1(&Aval[i]) * r[irow]);
+        }
 
-	/* Find the maximum element in each column, assuming the row
-	   scalings computed above. */
-	for(j = 0; j < A->ncol; ++j)
-		for(i = Astore->colptr[j]; i < Astore->colptr[j + 1]; ++i) {
-			irow = Astore->rowind[i];
-			c[j] = SUPERLU_MAX(c[j], c_abs1(&Aval[i]) * r[irow]);
-		}
+    /* Find the maximum and minimum scale factors. */
+    rcmin = bignum;
+    rcmax = 0.;
+    for(j = 0; j < A->ncol; ++j) {
+        rcmax = SUPERLU_MAX(rcmax, c[j]);
+        rcmin = SUPERLU_MIN(rcmin, c[j]);
+    }
 
-	/* Find the maximum and minimum scale factors. */
-	rcmin = bignum;
-	rcmax = 0.;
-	for(j = 0; j < A->ncol; ++j) {
-		rcmax = SUPERLU_MAX(rcmax, c[j]);
-		rcmin = SUPERLU_MIN(rcmin, c[j]);
-	}
+    if(rcmin == 0.) {
+        /* Find the first zero scale factor and return an error code. */
+        for(j = 0; j < A->ncol; ++j)
+            if(c[j] == 0.) {
+                *info = A->nrow + j + 1;
+                return;
+            }
+    }
+    else {
+        /* Invert the scale factors. */
+        for(j = 0; j < A->ncol; ++j) c[j] = 1. / SUPERLU_MIN(SUPERLU_MAX( c[j], smlnum ), bignum);
+        /* Compute COLCND = min(C(J)) / max(C(J)) */
+        *colcnd = SUPERLU_MAX(rcmin, smlnum) / SUPERLU_MIN(rcmax, bignum);
+    }
 
-	if(rcmin == 0.) {
-		/* Find the first zero scale factor and return an error code. */
-		for(j = 0; j < A->ncol; ++j)
-			if(c[j] == 0.) {
-				*info = A->nrow + j + 1;
-				return;
-			}
-	}
-	else {
-		/* Invert the scale factors. */
-		for(j = 0; j < A->ncol; ++j) c[j] = 1. / SUPERLU_MIN(SUPERLU_MAX( c[j], smlnum ), bignum);
-		/* Compute COLCND = min(C(J)) / max(C(J)) */
-		*colcnd = SUPERLU_MAX(rcmin, smlnum) / SUPERLU_MIN(rcmax, bignum);
-	}
-
+    return;
 } /* cgsequ */

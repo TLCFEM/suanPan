@@ -11,6 +11,7 @@
 1. (breaking) revise syntaxes for `ConcreteTsai`, `Concrete21` and `Concrete22` using a more consistent definition
 2. fix tangent stiffness in `ConcreteK4` model [#171](https://github.com/TLCFEM/suanPan/pull/171)
 3. update `OpenBLAS` to version `0.3.25`
+4. update `SuperLU` to version `6.0.1`
 
 ## version 3.2
 

@@ -122,12 +122,10 @@ at the top-level directory.
  * </pre>
  */
 
-int sp_cgemm(char* transa, char* transb, int m, int n, int k,
-             complex alpha, SuperMatrix* A, complex* b, int ldb,
-             complex beta, complex* c, int ldc) {
-	int incx = 1, incy = 1;
-	int j;
+int sp_cgemm(char* transa, char* transb, int m, int n, int k, complex alpha, SuperMatrix* A, complex* b, int ldb, complex beta, complex* c, int ldc) {
+    int incx = 1, incy = 1;
+    int j;
 
-	for(j = 0; j < n; ++j) { sp_cgemv(transa, alpha, A, &b[ldb * j], incx, beta, &c[ldc * j], incy); }
-	return 0;
+    for(j = 0; j < n; ++j) { sp_cgemv(transa, alpha, A, &b[ldb * j], incx, beta, &c[ldc * j], incy); }
+    return 0;
 }

@@ -24,12 +24,12 @@ at the top-level directory.
 #ifndef __SUPERLU_SCOMPLEX /* allow multiple inclusions */
 #define __SUPERLU_SCOMPLEX
 
-
 #ifndef SCOMPLEX_INCLUDE
 #define SCOMPLEX_INCLUDE
 
-typedef struct { float r, i; } complex;
-
+typedef struct {
+    float r, i;
+} complex;
 
 /* Macro definitions */
 
@@ -62,22 +62,19 @@ typedef struct { float r, i; } complex;
 /*! \brief Complex equality testing */
 #define c_eq(a, b)  ( (a)->r == (b)->r && (a)->i == (b)->i )
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Prototypes for functions in scomplex.c */
-void c_div(complex *, complex *, complex *);
-double c_abs(complex *);     /* exact */
-double c_abs1(complex *);    /* approximate */
-void c_exp(complex *, complex *);
-void r_cnjg(complex *, complex *);
-double r_imag(complex *);
-complex c_sgn(complex *);
-complex c_sqrt(complex *);
-
-
+void c_div(complex*, complex*, complex*);
+double c_abs(complex*);  /* exact */
+double c_abs1(complex*); /* approximate */
+void c_exp(complex*, complex*);
+void r_cnjg(complex*, complex*);
+double r_imag(complex*);
+complex c_sgn(complex*);
+complex c_sqrt(complex*);
 
 #ifdef __cplusplus
   }

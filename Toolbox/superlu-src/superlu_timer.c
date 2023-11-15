@@ -41,10 +41,10 @@ double SuperLU_timer_() {
 #include <time.h>
 
 double SuperLU_timer_() {
-	clock_t t;
-	t = clock();
+    clock_t t;
+    t = clock();
 
-	return ((double)t) / CLOCKS_PER_SEC;
+    return ((double)t) / CLOCKS_PER_SEC;
 }
 
 #elif defined( USE_TIMES )
@@ -83,7 +83,7 @@ double SuperLU_timer_()
 
 /*! \brief Timer function
  */ 
-double SuperLU_timer_()
+double SuperLU_timer_(void)
 {
     struct timeval tp;
     double tmp;
