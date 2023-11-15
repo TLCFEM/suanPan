@@ -50,48 +50,55 @@ at the top-level directory.
 
     ===================================================================== 
 </pre>
-*/
-double dzsum1_slu(int* n, doublecomplex* cx, int* incx) {
+*/  
+double dzsum1_slu(int *n, doublecomplex *cx, int *incx)
+{
 
-	/* Builtin functions */
-	double z_abs(doublecomplex*);
+    /* Builtin functions */
+    double z_abs(doublecomplex *);
+    
+    /* Local variables */
+    int i, nincx;
+    double stemp;
 
-	/* Local variables */
-	int i, nincx;
-	double stemp;
 
 #define CX(I) cx[(I)-1]
 
-	stemp = 0.;
-	if(*n <= 0) { return stemp; }
-	if(*incx == 1) { goto L20; }
-
-	/*     CODE FOR INCREMENT NOT EQUAL TO 1 */
-
-	nincx = *n * *incx;
-	for(i = 1; *incx < 0 ? i >= nincx : i <= nincx; i += *incx) {
-
-		/*        NEXT LINE MODIFIED. */
-
-		stemp += z_abs(&CX(i));
-		/* L10: */
-	}
-
+    stemp = 0.;
+    if (*n <= 0) {
 	return stemp;
+    }
+    if (*incx == 1) {
+	goto L20;
+    }
 
-	/*     CODE FOR INCREMENT EQUAL TO 1 */
+    /*     CODE FOR INCREMENT NOT EQUAL TO 1 */
+
+    nincx = *n * *incx;
+    for (i = 1; *incx < 0 ? i >= nincx : i <= nincx; i += *incx) {
+
+	/*        NEXT LINE MODIFIED. */
+
+	stemp += z_abs(&CX(i));
+/* L10: */
+    }
+    
+    return stemp;
+
+    /*     CODE FOR INCREMENT EQUAL TO 1 */
 
 L20:
-	for(i = 1; i <= *n; ++i) {
+    for (i = 1; i <= *n; ++i) {
 
-		/*        NEXT LINE MODIFIED. */
+	/*        NEXT LINE MODIFIED. */
 
-		stemp += z_abs(&CX(i));
-		/* L30: */
-	}
+	stemp += z_abs(&CX(i));
+/* L30: */
+    }
+    
+    return stemp;
 
-	return stemp;
-
-	/*     End of DZSUM1 */
+    /*     End of DZSUM1 */
 
 } /* dzsum1_slu */
+

@@ -258,7 +258,7 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**ARPACK**](https://github.com/opencollab/arpack-ng)
 - [**SPIKE**](http://www.spike-solver.org/) version 1.0
 - [**FEAST**](http://www.feast-solver.org/) version 4.0
-- [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 5.3.0
+- [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 6.0.1
 - [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 3.1
 - [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.25
 - [**Lis**](https://www.ssisc.org/lis/) version 2.1.3

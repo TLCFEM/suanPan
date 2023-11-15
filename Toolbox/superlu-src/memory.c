@@ -23,8 +23,9 @@ at the top-level directory.
 
 #include "slu_ddefs.h"
 
+
 #if ( DEBUGlevel>=1 )           /* Debug malloc/free. */
-int superlu_malloc_total = 0;
+int_t superlu_malloc_total = 0;
 
 #define PAD_FACTOR  2
 #define DWORD  (sizeof(double)) /* Be sure it's no smaller than double. */
@@ -36,12 +37,12 @@ void *superlu_malloc(size_t size)
 
     buf = (char *) malloc(size + DWORD);
     if ( !buf ) {
-	printf("superlu_malloc fails: malloc_total %.0f MB, size %ld\n",
-	       superlu_malloc_total*1e-6, size);
+	printf("superlu_malloc fails: malloc_total %.0f MB, size %lld\n",
+	       superlu_malloc_total*1e-6, (long long)size);
 	ABORT("superlu_malloc: out of memory");
     }
 
-    ((size_t_t *) buf)[0] = size;
+    ((size_t *) buf)[0] = size;
 #if 0
     superlu_malloc_total += size + DWORD;
 #else
@@ -66,7 +67,7 @@ void superlu_free(void *addr)
 	if ( !n )
 	    ABORT("superlu_free: tried to free a freed pointer");
 	*((size_t *) p) = 0; /* Set to zero to detect duplicate free's. */
-#if 0
+#if 0	
 	superlu_malloc_total -= (n + DWORD);
 #else
 	superlu_malloc_total -= n;
@@ -83,62 +84,109 @@ void superlu_free(void *addr)
 
 #else   /* production mode */
 
-void* superlu_malloc(size_t size) {
-	void* buf;
-	buf = malloc(size);
-	return (buf);
+void *superlu_malloc(size_t size)
+{
+    void *buf;
+    buf = (void *) malloc(size);
+    return (buf);
 }
 
-void superlu_free(void* addr) { free(addr); }
+void superlu_free(void *addr)
+{
+    free (addr);
+}
 
 #endif
 
+
 /*! \brief Set up pointers for integer working arrays.
  */
-void SetIWork(int m, int n, int panel_size, int* iworkptr, int** segrep,
-              int** parent, int** xplore, int** repfnz, int** panel_lsub,
-              int** xprune, int** marker) {
-	*segrep = iworkptr;
-	*parent = iworkptr + m;
-	*xplore = *parent + m;
-	*repfnz = *xplore + m;
-	*panel_lsub = *repfnz + panel_size * m;
-	*xprune = *panel_lsub + panel_size * m;
-	*marker = *xprune + n;
-	ifill(*repfnz, m * panel_size, EMPTY);
-	ifill(*panel_lsub, m * panel_size, EMPTY);
+void
+SetIWork(int m, int n, int panel_size, int *iworkptr, int **segrep,
+	 int **parent, int_t **xplore, int **repfnz, int **panel_lsub,
+	 int_t **xprune, int **marker)
+{
+    *segrep = iworkptr;
+    *parent = iworkptr + m;
+    //    *xplore = *parent + m;
+    *repfnz = *parent + m;
+    *panel_lsub = *repfnz + panel_size * m;
+    //    *xprune = *panel_lsub + panel_size * m;
+    // *marker = *xprune + n;
+    *marker = *panel_lsub + panel_size * m;
+    
+    ifill (*repfnz, m * panel_size, EMPTY);
+    ifill (*panel_lsub, m * panel_size, EMPTY);
+    
+    *xplore = intMalloc(m); /* can be 64 bit */
+    *xprune = intMalloc(n);
 }
 
-void copy_mem_int(int howmany, void* old, void* new) {
-	register int i;
-	int* iold = old;
-	int* inew = new;
-	for(i = 0; i < howmany; i++) inew[i] = iold[i];
+
+void
+copy_mem_int(int_t howmany, void *old, void *new)
+{
+    register int_t i;
+    int_t *iold = old;
+    int_t *inew = new;
+    for (i = 0; i < howmany; i++) inew[i] = iold[i];
 }
 
-void user_bcopy(char* src, char* dest, int bytes) {
-	char *s_ptr, *d_ptr;
 
-	s_ptr = src + bytes - 1;
-	d_ptr = dest + bytes - 1;
-	for(; d_ptr >= dest; --s_ptr, --d_ptr) *d_ptr = *s_ptr;
+void
+user_bcopy(char *src, char *dest, int bytes)
+{
+    char *s_ptr, *d_ptr;
+
+    s_ptr = src + bytes - 1;
+    d_ptr = dest + bytes - 1;
+    for (; d_ptr >= dest; --s_ptr, --d_ptr ) *d_ptr = *s_ptr;
 }
 
-int* intMalloc(int n) {
-	int* buf;
-	buf = (int*)SUPERLU_MALLOC((size_t) n * sizeof(int));
-	if(!buf) { ABORT("SUPERLU_MALLOC fails for buf in intMalloc()"); }
-	return (buf);
+int *int32Malloc(int n)
+{
+    int *buf;
+    buf = (int *) SUPERLU_MALLOC((size_t) n * sizeof(int));
+    if ( !buf ) {
+	ABORT("SUPERLU_MALLOC fails for buf in int32Malloc()");
+    }
+    return (buf);
 }
 
-int* intCalloc(int n) {
-	int* buf;
-	register int i;
-	buf = (int*)SUPERLU_MALLOC(n * sizeof(int));
-	if(!buf) { ABORT("SUPERLU_MALLOC fails for buf in intCalloc()"); }
-	for(i = 0; i < n; ++i) buf[i] = 0;
-	return (buf);
+int_t *intMalloc(int_t n)
+{
+    int_t *buf;
+    buf = (int_t *) SUPERLU_MALLOC((size_t) n * sizeof(int_t));
+    if ( !buf ) {
+	ABORT("SUPERLU_MALLOC fails for buf in intMalloc()");
+    }
+    return (buf);
 }
+
+int *int32Calloc(int n)
+{
+    int *buf;
+    register int i;
+    buf = (int *) SUPERLU_MALLOC(n * sizeof(int));
+    if ( !buf ) {
+	ABORT("SUPERLU_MALLOC fails for buf in intCalloc()");
+    }
+    for (i = 0; i < n; ++i) buf[i] = 0;
+    return (buf);
+}
+
+int_t *intCalloc(int_t n)
+{
+    int_t *buf;
+    register int_t i;
+    buf = (int_t *) SUPERLU_MALLOC(n * sizeof(int_t));
+    if ( !buf ) {
+	ABORT("SUPERLU_MALLOC fails for buf in intCalloc()");
+    }
+    for (i = 0; i < n; ++i) buf[i] = 0;
+    return (buf);
+}
+
 
 #if 0
 check_expanders()
@@ -191,3 +239,6 @@ PrintStack(char *msg, GlobalLU_t *Glu)
     return 0;
 }   
 #endif
+
+
+

@@ -88,60 +88,69 @@ at the top-level directory.
  * </pre>
  */
 
-void slaqgs(SuperMatrix* A, float* r, float* c,
-            float rowcnd, float colcnd, float amax, char* equed) {
+void
+slaqgs(SuperMatrix *A, float *r, float *c, 
+	float rowcnd, float colcnd, float amax, char *equed)
+{
+
 
 #define THRESH    (0.1)
+    
+    /* Local variables */
+    NCformat *Astore;
+    float   *Aval;
+    int_t i, j;
+    int   irow;
+    float large, small, cj;
 
-	/* Local variables */
-	NCformat* Astore;
-	float* Aval;
-	int i, j, irow;
-	float large, small, cj;
 
-	/* Quick return if possible */
-	if(A->nrow <= 0 || A->ncol <= 0) {
-		*(unsigned char*)equed = 'N';
-		return;
-	}
+    /* Quick return if possible */
+    if (A->nrow <= 0 || A->ncol <= 0) {
+	*(unsigned char *)equed = 'N';
+	return;
+    }
 
-	Astore = A->Store;
-	Aval = Astore->nzval;
+    Astore = A->Store;
+    Aval = Astore->nzval;
+    
+    /* Initialize LARGE and SMALL. */
+    small = smach("Safe minimum") / smach("Precision");
+    large = 1. / small;
 
-	/* Initialize LARGE and SMALL. */
-	small = smach("Safe minimum") / smach("Precision");
-	large = 1. / small;
-
-	if(rowcnd >= THRESH && amax >= small && amax <= large) {
-		if(colcnd >= THRESH) *(unsigned char*)equed = 'N';
-		else {
-			/* Column scaling */
-			for(j = 0; j < A->ncol; ++j) {
-				cj = c[j];
-				for(i = Astore->colptr[j]; i < Astore->colptr[j + 1]; ++i) { Aval[i] *= cj; }
-			}
-			*(unsigned char*)equed = 'C';
-		}
-	}
-	else if(colcnd >= THRESH) {
-		/* Row scaling, no column scaling */
-		for(j = 0; j < A->ncol; ++j)
-			for(i = Astore->colptr[j]; i < Astore->colptr[j + 1]; ++i) {
-				irow = Astore->rowind[i];
-				Aval[i] *= r[irow];
-			}
-		*(unsigned char*)equed = 'R';
-	}
+    if (rowcnd >= THRESH && amax >= small && amax <= large) {
+	if (colcnd >= THRESH)
+	    *(unsigned char *)equed = 'N';
 	else {
-		/* Row and column scaling */
-		for(j = 0; j < A->ncol; ++j) {
-			cj = c[j];
-			for(i = Astore->colptr[j]; i < Astore->colptr[j + 1]; ++i) {
-				irow = Astore->rowind[i];
-				Aval[i] *= cj * r[irow];
-			}
-		}
-		*(unsigned char*)equed = 'B';
+	    /* Column scaling */
+	    for (j = 0; j < A->ncol; ++j) {
+		cj = c[j];
+		for (i = Astore->colptr[j]; i < Astore->colptr[j+1]; ++i) {
+		    Aval[i] *= cj;
+                }
+	    }
+	    *(unsigned char *)equed = 'C';
 	}
+    } else if (colcnd >= THRESH) {
+	/* Row scaling, no column scaling */
+	for (j = 0; j < A->ncol; ++j)
+	    for (i = Astore->colptr[j]; i < Astore->colptr[j+1]; ++i) {
+		irow = Astore->rowind[i];
+		Aval[i] *= r[irow];
+	    }
+	*(unsigned char *)equed = 'R';
+    } else {
+	/* Row and column scaling */
+	for (j = 0; j < A->ncol; ++j) {
+	    cj = c[j];
+	    for (i = Astore->colptr[j]; i < Astore->colptr[j+1]; ++i) {
+		irow = Astore->rowind[i];
+		Aval[i] *= cj * r[irow];
+	    }
+	}
+	*(unsigned char *)equed = 'B';
+    }
+
+    return;
 
 } /* slaqgs */
+

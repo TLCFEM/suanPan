@@ -139,96 +139,110 @@ at the top-level directory.
  * </pre>
  */
 
-void zgssv(superlu_options_t* options, SuperMatrix* A, int* perm_c, int* perm_r,
-           SuperMatrix* L, SuperMatrix* U, SuperMatrix* B,
-           SuperLUStat_t* stat, int* info) {
+void
+zgssv(superlu_options_t *options, SuperMatrix *A, int *perm_c, int *perm_r,
+      SuperMatrix *L, SuperMatrix *U, SuperMatrix *B,
+      SuperLUStat_t *stat, int_t *info )
+{
 
-	DNformat* Bstore;
-	SuperMatrix* AA = 0; /* A in SLU_NC format used by the factorization routine.*/
-	SuperMatrix AC;      /* Matrix postmultiplied by Pc */
-	int lwork = 0, *etree, i;
-	GlobalLU_t Glu; /* Not needed on return. */
+    DNformat *Bstore;
+    SuperMatrix *AA;/* A in SLU_NC format used by the factorization routine.*/
+    SuperMatrix AC; /* Matrix postmultiplied by Pc */
+    int      lwork = 0, *etree, i;
+    GlobalLU_t Glu; /* Not needed on return. */
+    
+    /* Set default values for some parameters */
+    int      panel_size;     /* panel size */
+    int      relax;          /* no of columns in a relaxed snodes */
+    int      permc_spec;
+    trans_t  trans = NOTRANS;
+    double   *utime;
+    double   t;	/* Temporary time */
 
-	/* Set default values for some parameters */
-	int panel_size; /* panel size */
-	int relax;      /* no of columns in a relaxed snodes */
-	int permc_spec;
-	trans_t trans = NOTRANS;
-	double* utime;
-	double t; /* Temporary time */
+    /* Test the input parameters ... */
+    *info = 0;
+    Bstore = B->Store;
+    if ( options->Fact != DOFACT ) *info = -1;
+    else if ( A->nrow != A->ncol || A->nrow < 0 ||
+	 (A->Stype != SLU_NC && A->Stype != SLU_NR) ||
+	 A->Dtype != SLU_Z || A->Mtype != SLU_GE )
+	*info = -2;
+    else if ( B->ncol < 0 || Bstore->lda < SUPERLU_MAX(0, A->nrow) ||
+	B->Stype != SLU_DN || B->Dtype != SLU_Z || B->Mtype != SLU_GE )
+	*info = -7;
+    if ( *info != 0 ) {
+	i = -(*info);
+	input_error("zgssv", &i);
+	return;
+    }
 
-	/* Test the input parameters ... */
-	*info = 0;
-	Bstore = B->Store;
-	if(options->Fact != DOFACT) *info = -1;
-	else if(A->nrow != A->ncol || A->nrow < 0 ||
-		(A->Stype != SLU_NC && A->Stype != SLU_NR) ||
-		A->Dtype != SLU_Z || A->Mtype != SLU_GE)
-		*info = -2;
-	else if(B->ncol < 0 || Bstore->lda < SUPERLU_MAX(0, A->nrow) ||
-		B->Stype != SLU_DN || B->Dtype != SLU_Z || B->Mtype != SLU_GE)
-		*info = -7;
-	if(*info != 0) {
-		i = -(*info);
-		input_error("zgssv", &i);
-		return;
-	}
+    utime = stat->utime;
 
-	utime = stat->utime;
+    /* Convert A to SLU_NC format when necessary. */
+    if ( A->Stype == SLU_NR ) {
+	NRformat *Astore = A->Store;
+	AA = (SuperMatrix *) SUPERLU_MALLOC( sizeof(SuperMatrix) );
+	zCreate_CompCol_Matrix(AA, A->ncol, A->nrow, Astore->nnz, 
+			       Astore->nzval, Astore->colind, Astore->rowptr,
+			       SLU_NC, A->Dtype, A->Mtype);
+	trans = TRANS;
+    } else if ( A->Stype == SLU_NC ) {
+        AA = A;
+    }
+    /* A is of unsupported matrix format. */
+    else {
+        AA = NULL;
+        *info = 1;
+        input_error("zgssv", &i);
+    }
 
-	/* Convert A to SLU_NC format when necessary. */
-	if(A->Stype == SLU_NR) {
-		NRformat* Astore = A->Store;
-		AA = (SuperMatrix*)SUPERLU_MALLOC(sizeof(SuperMatrix));
-		zCreate_CompCol_Matrix(AA, A->ncol, A->nrow, Astore->nnz,
-		                       Astore->nzval, Astore->colind, Astore->rowptr,
-		                       SLU_NC, A->Dtype, A->Mtype);
-		trans = TRANS;
-	}
-	else { if(A->Stype == SLU_NC) AA = A; }
+    t = SuperLU_timer_();
+    /*
+     * Get column permutation vector perm_c[], according to permc_spec:
+     *   permc_spec = NATURAL:  natural ordering 
+     *   permc_spec = MMD_AT_PLUS_A: minimum degree on structure of A'+A
+     *   permc_spec = MMD_ATA:  minimum degree on structure of A'*A
+     *   permc_spec = COLAMD:   approximate minimum degree column ordering
+     *   permc_spec = MY_PERMC: the ordering already supplied in perm_c[]
+     */
+    permc_spec = options->ColPerm;
+    if ( permc_spec != MY_PERMC && options->Fact == DOFACT )
+      get_perm_c(permc_spec, AA, perm_c);
+    utime[COLPERM] = SuperLU_timer_() - t;
 
-	t = SuperLU_timer_();
-	/*
-	 * Get column permutation vector perm_c[], according to permc_spec:
-	 *   permc_spec = NATURAL:  natural ordering 
-	 *   permc_spec = MMD_AT_PLUS_A: minimum degree on structure of A'+A
-	 *   permc_spec = MMD_ATA:  minimum degree on structure of A'*A
-	 *   permc_spec = COLAMD:   approximate minimum degree column ordering
-	 *   permc_spec = MY_PERMC: the ordering already supplied in perm_c[]
-	 */
-	permc_spec = options->ColPerm;
-	if(permc_spec != MY_PERMC && options->Fact == DOFACT) get_perm_c(permc_spec, AA, perm_c);
-	utime[COLPERM] = SuperLU_timer_() - t;
+    etree = int32Malloc(A->ncol);
 
-	etree = intMalloc(A->ncol);
+    t = SuperLU_timer_();
+    sp_preorder(options, AA, perm_c, etree, &AC);
+    utime[ETREE] = SuperLU_timer_() - t;
 
-	t = SuperLU_timer_();
-	sp_preorder(options, AA, perm_c, etree, &AC);
-	utime[ETREE] = SuperLU_timer_() - t;
+    panel_size = sp_ienv(1);
+    relax = sp_ienv(2);
 
-	panel_size = sp_ienv(1);
-	relax = sp_ienv(2);
-
-	/*printf("Factor PA = LU ... relax %d\tw %d\tmaxsuper %d\trowblk %d\n", 
+    /*printf("Factor PA = LU ... relax %d\tw %d\tmaxsuper %d\trowblk %d\n", 
 	  relax, panel_size, sp_ienv(3), sp_ienv(4));*/
-	t = SuperLU_timer_();
-	/* Compute the LU factorization of A. */
-	zgstrf(options, &AC, relax, panel_size, etree,
-	       NULL, lwork, perm_c, perm_r, L, U, &Glu, stat, info);
-	utime[FACT] = SuperLU_timer_() - t;
+    t = SuperLU_timer_(); 
+    /* Compute the LU factorization of A. */
+    zgstrf(options, &AC, relax, panel_size, etree,
+            NULL, lwork, perm_c, perm_r, L, U, &Glu, stat, info);
+    utime[FACT] = SuperLU_timer_() - t;
 
-	t = SuperLU_timer_();
-	if(*info == 0) {
-		/* Solve the system A*X=B, overwriting B with X. */
-		zgstrs(trans, L, U, perm_c, perm_r, B, stat, info);
-	}
-	utime[SOLVE] = SuperLU_timer_() - t;
+    t = SuperLU_timer_();
+    if ( *info == 0 ) {
+        /* Solve the system A*X=B, overwriting B with X. */
+	int info1;
+        zgstrs (trans, L, U, perm_c, perm_r, B, stat, &info1);
+    } else {
+        printf("zgstrf info %lld\n", (long long) *info); fflush(stdout);
+    }
+    
+    utime[SOLVE] = SuperLU_timer_() - t;
 
-	SUPERLU_FREE(etree);
-	Destroy_CompCol_Permuted(&AC);
-	if(A->Stype == SLU_NR) {
-		Destroy_SuperMatrix_Store(AA);
-		SUPERLU_FREE(AA);
-	}
+    SUPERLU_FREE (etree);
+    Destroy_CompCol_Permuted(&AC);
+    if ( A->Stype == SLU_NR ) {
+	Destroy_SuperMatrix_Store(AA);
+	SUPERLU_FREE(AA);
+    }
 
 }

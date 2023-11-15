@@ -31,6 +31,7 @@ at the top-level directory.
  * </pre>
  */
 
+
 #include "slu_zdefs.h"
 
 /*! \brief
@@ -50,69 +51,72 @@ at the top-level directory.
  * </pre>
  */
 
-int zsnode_dfs(
-	const int jcol,      /* in - start of the supernode */
-	const int kcol,      /* in - end of the supernode */
-	const int* asub,     /* in */
-	const int* xa_begin, /* in */
-	const int* xa_end,   /* in */
-	int* xprune,         /* out */
-	int* marker,         /* modified */
-	GlobalLU_t* Glu      /* modified */
-) {
+int_t
+zsnode_dfs (
+	   const int   jcol,	    /* in - start of the supernode */
+	   const int   kcol, 	    /* in - end of the supernode */
+	   const int_t *asub,        /* in */
+	   const int_t *xa_begin,    /* in */
+	   const int_t *xa_end,      /* in */
+	   int_t      *xprune,      /* out */
+	   int        *marker,      /* modified */
+	   GlobalLU_t *Glu          /* modified */
+	   )
+{
 
-	register int i, k, ifrom, ito, nextl, new_next;
-	int nsuper, krow, kmark, mem_error;
-	int *xsup, *supno;
-	int *lsub, *xlsub;
-	int nzlmax;
+    int_t i, k, ifrom, ito, nextl, new_next, nzlmax;
+    int   nsuper, krow, kmark;
+    int_t mem_error;
+    int   *xsup, *supno;
+    int_t *lsub, *xlsub;
+    
+    xsup    = Glu->xsup;
+    supno   = Glu->supno;
+    lsub    = Glu->lsub;
+    xlsub   = Glu->xlsub;
+    nzlmax  = Glu->nzlmax;
 
-	xsup = Glu->xsup;
-	supno = Glu->supno;
-	lsub = Glu->lsub;
-	xlsub = Glu->xlsub;
-	nzlmax = Glu->nzlmax;
+    nsuper = ++supno[jcol];	/* Next available supernode number */
+    nextl = xlsub[jcol];
 
-	nsuper = ++supno[jcol]; /* Next available supernode number */
-	nextl = xlsub[jcol];
-
-	for(i = jcol; i <= kcol; i++) {
-		/* For each nonzero in A[*,i] */
-		for(k = xa_begin[i]; k < xa_end[i]; k++) {
-			krow = asub[k];
-			kmark = marker[krow];
-			if(kmark != kcol) {
-				/* First time visit krow */
-				marker[krow] = kcol;
-				lsub[nextl++] = krow;
-				if(nextl >= nzlmax) {
-					mem_error = zLUMemXpand(jcol, nextl, LSUB, &nzlmax, Glu);
-					if(mem_error) return (mem_error);
-					lsub = Glu->lsub;
-				}
-			}
+    for (i = jcol; i <= kcol; i++) {
+	/* For each nonzero in A[*,i] */
+	for (k = xa_begin[i]; k < xa_end[i]; k++) {	
+	    krow = asub[k];
+	    kmark = marker[krow];
+	    if ( kmark != kcol ) { /* First time visit krow */
+		marker[krow] = kcol;
+		lsub[nextl++] = krow;
+		if ( nextl >= nzlmax ) {
+		    mem_error = zLUMemXpand(jcol, nextl, LSUB, &nzlmax, Glu);
+		    if ( mem_error ) return (mem_error);
+		    lsub = Glu->lsub;
 		}
-		supno[i] = nsuper;
+	    }
+    	}
+	supno[i] = nsuper;
+    }
+
+    /* Supernode > 1, then make a copy of the subscripts for pruning */
+    if ( jcol < kcol ) {
+	new_next = nextl + (nextl - xlsub[jcol]);
+	while ( new_next > nzlmax ) {
+	    mem_error = zLUMemXpand(jcol, nextl, LSUB, &nzlmax, Glu);
+	    if ( mem_error ) return (mem_error);
+	    lsub = Glu->lsub;
 	}
+	ito = nextl;
+	for (ifrom = xlsub[jcol]; ifrom < nextl; )
+	    lsub[ito++] = lsub[ifrom++];	
+        for (i = jcol+1; i <= kcol; i++) xlsub[i] = nextl;
+	nextl = ito;
+    }
 
-	/* Supernode > 1, then make a copy of the subscripts for pruning */
-	if(jcol < kcol) {
-		new_next = nextl + (nextl - xlsub[jcol]);
-		while(new_next > nzlmax) {
-			mem_error = zLUMemXpand(jcol, nextl, LSUB, &nzlmax, Glu);
-			if(mem_error) return (mem_error);
-			lsub = Glu->lsub;
-		}
-		ito = nextl;
-		for(ifrom = xlsub[jcol]; ifrom < nextl;) lsub[ito++] = lsub[ifrom++];
-		for(i = jcol + 1; i <= kcol; i++) xlsub[i] = nextl;
-		nextl = ito;
-	}
+    xsup[nsuper+1] = kcol + 1;
+    supno[kcol+1]  = nsuper;
+    xprune[kcol]   = nextl;
+    xlsub[kcol+1]  = nextl;
 
-	xsup[nsuper + 1] = kcol + 1;
-	supno[kcol + 1] = nsuper;
-	xprune[kcol] = nextl;
-	xlsub[kcol + 1] = nextl;
-
-	return 0;
+    return 0;
 }
+

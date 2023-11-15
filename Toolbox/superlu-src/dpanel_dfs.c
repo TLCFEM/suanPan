@@ -31,6 +31,7 @@ at the top-level directory.
  * </pre>
  */
 
+
 #include "slu_ddefs.h"
 
 /*! \brief
@@ -64,194 +65,200 @@ at the top-level directory.
  * </pre>
  */
 
-void dpanel_dfs(
-	const int m,     /* in - number of rows in the matrix */
-	const int w,     /* in */
-	const int jcol,  /* in */
-	SuperMatrix* A,  /* in - original matrix */
-	int* perm_r,     /* in */
-	int* nseg,       /* out */
-	double* dense,   /* out */
-	int* panel_lsub, /* out */
-	int* segrep,     /* out */
-	int* repfnz,     /* out */
-	int* xprune,     /* out */
-	int* marker,     /* out */
-	int* parent,     /* working array */
-	int* xplore,     /* working array */
-	GlobalLU_t* Glu  /* modified */
-) {
+void
+dpanel_dfs (
+	   const int  m,           /* in - number of rows in the matrix */
+	   const int  w,           /* in */
+	   const int  jcol,        /* in */
+	   SuperMatrix *A,       /* in - original matrix */
+	   int        *perm_r,     /* in */
+	   int        *nseg,	   /* out */
+	   double     *dense,      /* out */
+	   int        *panel_lsub, /* out */
+	   int        *segrep,     /* out */
+	   int        *repfnz,     /* out */
+	   int_t      *xprune,     /* out */
+	   int        *marker,     /* out */     
+	   int        *parent,     /* working array */
+	   int_t      *xplore,     /* working array */
+	   GlobalLU_t *Glu         /* modified */
+	   )
+{
 
-	NCPformat* Astore;
-	double* a;
-	int* asub;
-	int *xa_begin, *xa_end;
-	int krep, chperm, chmark, chrep, oldrep, kchild, myfnz;
-	int k, krow, kmark, kperm;
-	int xdfs, maxdfs, kpar;
-	int jj;            /* index through each column in the panel */
-	int* marker1;      /* marker1[jj] >= jcol if vertex jj was visited 
+    NCPformat *Astore;
+    double    *a;
+    int_t     *asub;
+    int_t     *xa_begin, *xa_end, k;
+    int       krow, kmark, kperm;
+    int	      krep, chperm, chmark, chrep, oldrep, kchild, myfnz, kpar;
+    int       jj;	   /* index through each column in the panel */
+    int       *marker1;	   /* marker1[jj] >= jcol if vertex jj was visited 
 			      by a previous column within this panel.   */
-	int* repfnz_col;   /* start of each column in the panel */
-	double* dense_col; /* start of each column in the panel */
-	int nextl_col;     /* next available position in panel_lsub[*,jj] */
-	int *xsup, *supno;
-	int *lsub, *xlsub;
+    int       *repfnz_col; /* start of each column in the panel */
+    double    *dense_col;  /* start of each column in the panel */
+    int_t     nextl_col;   /* next available position in panel_lsub[*,jj] */
+    int       *xsup, *supno;
+    int_t     *lsub, *xlsub;
+    int_t      xdfs, maxdfs;
 
-	/* Initialize pointers */
-	Astore = A->Store;
-	a = Astore->nzval;
-	asub = Astore->rowind;
-	xa_begin = Astore->colbeg;
-	xa_end = Astore->colend;
-	marker1 = marker + m;
-	repfnz_col = repfnz;
-	dense_col = dense;
-	*nseg = 0;
-	xsup = Glu->xsup;
-	supno = Glu->supno;
-	lsub = Glu->lsub;
-	xlsub = Glu->xlsub;
+    /* Initialize pointers */
+    Astore     = A->Store;
+    a          = Astore->nzval;
+    asub       = Astore->rowind;
+    xa_begin   = Astore->colbeg;
+    xa_end     = Astore->colend;
+    marker1    = marker + m;
+    repfnz_col = repfnz;
+    dense_col  = dense;
+    *nseg      = 0;
+    xsup       = Glu->xsup;
+    supno      = Glu->supno;
+    lsub       = Glu->lsub;
+    xlsub      = Glu->xlsub;
 
-	/* For each column in the panel */
-	for(jj = jcol; jj < jcol + w; jj++) {
-		nextl_col = (jj - jcol) * m;
+    /* For each column in the panel */
+    for (jj = jcol; jj < jcol + w; jj++) {
+	nextl_col = (jj - jcol) * m;
 
 #ifdef CHK_DFS
 	printf("\npanel col %d: ", jj);
 #endif
 
-		/* For each nonz in A[*,jj] do dfs */
-		for(k = xa_begin[jj]; k < xa_end[jj]; k++) {
-			krow = asub[k];
-			dense_col[krow] = a[k];
-			kmark = marker[krow];
-			if(kmark == jj) continue; /* krow visited before, go to the next nonzero */
+	/* For each nonz in A[*,jj] do dfs */
+	for (k = xa_begin[jj]; k < xa_end[jj]; k++) {
+	    krow = asub[k];
+            dense_col[krow] = a[k];
+	    kmark = marker[krow];    	
+	    if ( kmark == jj ) 
+		continue;     /* krow visited before, go to the next nonzero */
 
-			/* For each unmarked nbr krow of jj
-			 * krow is in L: place it in structure of L[*,jj]
-			 */
-			marker[krow] = jj;
-			kperm = perm_r[krow];
-
-			if(kperm == EMPTY) {
-				panel_lsub[nextl_col++] = krow; /* krow is indexed into A */
-			}
-				/* 
-				 * krow is in U: if its supernode-rep krep
-				 * has been explored, update repfnz[*]
-				 */
-			else {
-				krep = xsup[supno[kperm] + 1] - 1;
-				myfnz = repfnz_col[krep];
-
+	    /* For each unmarked nbr krow of jj
+	     * krow is in L: place it in structure of L[*,jj]
+	     */
+	    marker[krow] = jj;
+	    kperm = perm_r[krow];
+	    
+	    if ( kperm == EMPTY ) {
+		panel_lsub[nextl_col++] = krow; /* krow is indexed into A */
+	    }
+	    /* 
+	     * krow is in U: if its supernode-rep krep
+	     * has been explored, update repfnz[*]
+	     */
+	    else {
+		
+		krep = xsup[supno[kperm]+1] - 1;
+		myfnz = repfnz_col[krep];
+		
 #ifdef CHK_DFS
 		printf("krep %d, myfnz %d, perm_r[%d] %d\n", krep, myfnz, krow, kperm);
 #endif
-				if(myfnz != EMPTY) {
-					/* Representative visited before */
-					if(myfnz > kperm) repfnz_col[krep] = kperm;
-					/* continue; */
-				}
-				else {
-					/* Otherwise, perform dfs starting at krep */
-					oldrep = EMPTY;
-					parent[krep] = oldrep;
-					repfnz_col[krep] = kperm;
-					xdfs = xlsub[krep];
-					maxdfs = xprune[krep];
-
-#ifdef CHK_DFS
+		if ( myfnz != EMPTY ) {	/* Representative visited before */
+		    if ( myfnz > kperm ) repfnz_col[krep] = kperm;
+		    /* continue; */
+		}
+		else {
+		    /* Otherwise, perform dfs starting at krep */
+		    oldrep = EMPTY;
+		    parent[krep] = oldrep;
+		    repfnz_col[krep] = kperm;
+		    xdfs = xlsub[krep];
+		    maxdfs = xprune[krep];
+		    
+#ifdef CHK_DFS 
 		    printf("  xdfs %d, maxdfs %d: ", xdfs, maxdfs);
 		    for (i = xdfs; i < maxdfs; i++) printf(" %d", lsub[i]);
 		    printf("\n");
 #endif
-					do {
-						/* 
-						 * For each unmarked kchild of krep 
-						 */
-						while(xdfs < maxdfs) {
-							kchild = lsub[xdfs];
-							xdfs++;
-							chmark = marker[kchild];
-
-							if(chmark != jj) {
-								/* Not reached yet */
-								marker[kchild] = jj;
-								chperm = perm_r[kchild];
-
-								/* Case kchild is in L: place it in L[*,j] */
-								if(chperm == EMPTY) { panel_lsub[nextl_col++] = kchild; }
-									/* Case kchild is in U: 
-									 *   chrep = its supernode-rep. If its rep has 
-									 *   been explored, update its repfnz[*]
-									 */
-								else {
-									chrep = xsup[supno[chperm] + 1] - 1;
-									myfnz = repfnz_col[chrep];
+		    do {
+			/* 
+			 * For each unmarked kchild of krep 
+			 */
+			while ( xdfs < maxdfs ) {
+			    
+			    kchild = lsub[xdfs];
+			    xdfs++;
+			    chmark = marker[kchild];
+			    
+			    if ( chmark != jj ) { /* Not reached yet */
+				marker[kchild] = jj;
+				chperm = perm_r[kchild];
+			      
+				/* Case kchild is in L: place it in L[*,j] */
+				if ( chperm == EMPTY ) {
+				    panel_lsub[nextl_col++] = kchild;
+				} 
+				/* Case kchild is in U: 
+				 *   chrep = its supernode-rep. If its rep has 
+				 *   been explored, update its repfnz[*]
+				 */
+				else {
+				    
+				    chrep = xsup[supno[chperm]+1] - 1;
+				    myfnz = repfnz_col[chrep];
 #ifdef CHK_DFS
 				    printf("chrep %d,myfnz %d,perm_r[%d] %d\n",chrep,myfnz,kchild,chperm);
 #endif
-									if(myfnz != EMPTY) {
-										/* Visited before */
-										if(myfnz > chperm) repfnz_col[chrep] = chperm;
-									}
-									else {
-										/* Cont. dfs at snode-rep of kchild */
-										xplore[krep] = xdfs;
-										oldrep = krep;
-										krep = chrep; /* Go deeper down G(L) */
-										parent[krep] = oldrep;
-										repfnz_col[krep] = chperm;
-										xdfs = xlsub[krep];
-										maxdfs = xprune[krep];
-#ifdef CHK_DFS
+				    if ( myfnz != EMPTY ) { /* Visited before */
+					if ( myfnz > chperm )
+					    repfnz_col[chrep] = chperm;
+				    }
+				    else {
+					/* Cont. dfs at snode-rep of kchild */
+					xplore[krep] = xdfs;	
+					oldrep = krep;
+					krep = chrep; /* Go deeper down G(L) */
+					parent[krep] = oldrep;
+					repfnz_col[krep] = chperm;
+					xdfs = xlsub[krep];     
+					maxdfs = xprune[krep];
+#ifdef CHK_DFS 
 					printf("  xdfs %d, maxdfs %d: ", xdfs, maxdfs);
 					for (i = xdfs; i < maxdfs; i++) printf(" %d", lsub[i]);	
 					printf("\n");
 #endif
-									} /* else */
-
-								} /* else */
-
-							} /* if... */
-
-						} /* while xdfs < maxdfs */
-
-						/* krow has no more unexplored nbrs:
-						 *    Place snode-rep krep in postorder DFS, if this 
-						 *    segment is seen for the first time. (Note that
-						 *    "repfnz[krep]" may change later.)
-						 *    Backtrack dfs to its parent.
-						 */
-						if(marker1[krep] < jcol) {
-							segrep[*nseg] = krep;
-							++(*nseg);
-							marker1[krep] = jj;
-						}
-
-						kpar = parent[krep];     /* Pop stack, mimic recursion */
-						if(kpar == EMPTY) break; /* dfs done */
-						krep = kpar;
-						xdfs = xplore[krep];
-						maxdfs = xprune[krep];
-
-#ifdef CHK_DFS
+				    } /* else */
+				  
+				} /* else */
+			      
+			    } /* if... */
+			    
+			} /* while xdfs < maxdfs */
+			
+			/* krow has no more unexplored nbrs:
+			 *    Place snode-rep krep in postorder DFS, if this 
+			 *    segment is seen for the first time. (Note that
+			 *    "repfnz[krep]" may change later.)
+			 *    Backtrack dfs to its parent.
+			 */
+			if ( marker1[krep] < jcol ) {
+			    segrep[*nseg] = krep;
+			    ++(*nseg);
+			    marker1[krep] = jj;
+			}
+			
+			kpar = parent[krep]; /* Pop stack, mimic recursion */
+			if ( kpar == EMPTY ) break; /* dfs done */
+			krep = kpar;
+			xdfs = xplore[krep];
+			maxdfs = xprune[krep];
+			
+#ifdef CHK_DFS 
 			printf("  pop stack: krep %d,xdfs %d,maxdfs %d: ", krep,xdfs,maxdfs);
 			for (i = xdfs; i < maxdfs; i++) printf(" %d", lsub[i]);
 			printf("\n");
 #endif
-					}
-					while(kpar != EMPTY); /* do-while - until empty stack */
-
-				} /* else */
-
-			} /* else */
-
-		} /* for each nonz in A[*,jj] */
-
-		repfnz_col += m; /* Move to next column */
-		dense_col += m;
-	} /* for jj ... */
-
+		    } while ( kpar != EMPTY ); /* do-while - until empty stack */
+		    
+		} /* else */
+		
+	    } /* else */
+	    
+	} /* for each nonz in A[*,jj] */
+	
+	repfnz_col += m;    /* Move to next column */
+        dense_col += m;
+	
+    } /* for jj ... */
+    
 }

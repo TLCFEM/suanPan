@@ -80,81 +80,91 @@ at the top-level directory.
  * </pre>
  */
 
-void dgscon(char* norm, SuperMatrix* L, SuperMatrix* U,
-            double anorm, double* rcond, SuperLUStat_t* stat, int* info) {
+void
+dgscon(char *norm, SuperMatrix *L, SuperMatrix *U,
+       double anorm, double *rcond, SuperLUStat_t *stat, int *info)
+{
 
-	/* Local variables */
-	int kase, kase1, onenrm, i;
-	double ainvnm;
-	double* work;
-	int* iwork;
-	int isave[3];
-	extern int drscl_(int*, double*, double*, int*);
 
-	extern int dlacon2_(int*, double*, double*, int*, double*, int*, int []);
+    /* Local variables */
+    int    kase, kase1, onenrm;
+    double ainvnm;
+    double *work;
+    int    *iwork;
+    int    isave[3];
+    extern int drscl_(int *, double *, double *, int *);
 
-	/* Test the input parameters. */
-	*info = 0;
-	onenrm = *(unsigned char*)norm == '1' || strncmp(norm, "O", 1) == 0;
-	if(! onenrm && strncmp(norm, "I", 1) != 0) *info = -1;
-	else if(L->nrow < 0 || L->nrow != L->ncol ||
-		L->Stype != SLU_SC || L->Dtype != SLU_D || L->Mtype != SLU_TRLU)
-		*info = -2;
-	else if(U->nrow < 0 || U->nrow != U->ncol ||
-		U->Stype != SLU_NC || U->Dtype != SLU_D || U->Mtype != SLU_TRU)
-		*info = -3;
-	if(*info != 0) {
-		i = -(*info);
-		input_error("dgscon", &i);
-		return;
+    extern int dlacon2_(int *, double *, double *, int *, double *, int *, int []);
+
+    
+    /* Test the input parameters. */
+    *info = 0;
+    onenrm = *(unsigned char *)norm == '1' || strncmp(norm, "O", 1)==0;
+    if (! onenrm && strncmp(norm, "I", 1)!=0) *info = -1;
+    else if (L->nrow < 0 || L->nrow != L->ncol ||
+             L->Stype != SLU_SC || L->Dtype != SLU_D || L->Mtype != SLU_TRLU)
+	 *info = -2;
+    else if (U->nrow < 0 || U->nrow != U->ncol ||
+             U->Stype != SLU_NC || U->Dtype != SLU_D || U->Mtype != SLU_TRU) 
+	*info = -3;
+    if (*info != 0) {
+	int ii = -(*info);
+	input_error("dgscon", &ii);
+	return;
+    }
+
+    /* Quick return if possible */
+    *rcond = 0.;
+    if ( L->nrow == 0 || U->nrow == 0) {
+	*rcond = 1.;
+	return;
+    }
+
+    work = doubleCalloc( 3*L->nrow );
+    iwork = int32Malloc( L->nrow );
+
+
+    if ( !work || !iwork )
+	ABORT("Malloc fails for work arrays in dgscon.");
+    
+    /* Estimate the norm of inv(A). */
+    ainvnm = 0.;
+    if ( onenrm ) kase1 = 1;
+    else kase1 = 2;
+    kase = 0;
+
+    int nrow = L->nrow;
+
+    do {
+	dlacon2_(&nrow, &work[L->nrow], &work[0], &iwork[0], &ainvnm, &kase, isave);
+
+	if (kase == 0) break;
+
+	if (kase == kase1) {
+	    /* Multiply by inv(L). */
+	    sp_dtrsv("L", "No trans", "Unit", L, U, &work[0], stat, info);
+
+	    /* Multiply by inv(U). */
+	    sp_dtrsv("U", "No trans", "Non-unit", L, U, &work[0], stat, info);
+	    
+	} else {
+
+	    /* Multiply by inv(U'). */
+	    sp_dtrsv("U", "Transpose", "Non-unit", L, U, &work[0], stat, info);
+
+	    /* Multiply by inv(L'). */
+	    sp_dtrsv("L", "Transpose", "Unit", L, U, &work[0], stat, info);
+	    
 	}
 
-	/* Quick return if possible */
-	*rcond = 0.;
-	if(L->nrow == 0 || U->nrow == 0) {
-		*rcond = 1.;
-		return;
-	}
+    } while ( kase != 0 );
 
-	work = doubleCalloc(3 * L->nrow);
-	iwork = intMalloc(L->nrow);
+    /* Compute the estimate of the reciprocal condition number. */
+    if (ainvnm != 0.) *rcond = (1. / ainvnm) / anorm;
 
-	if(!work || !iwork)
-		ABORT("Malloc fails for work arrays in dgscon.");
-
-	/* Estimate the norm of inv(A). */
-	ainvnm = 0.;
-	if(onenrm) kase1 = 1;
-	else kase1 = 2;
-	kase = 0;
-
-	do {
-		dlacon2_(&L->nrow, &work[L->nrow], &work[0], &iwork[0], &ainvnm, &kase, isave);
-
-		if(kase == 0) break;
-
-		if(kase == kase1) {
-			/* Multiply by inv(L). */
-			sp_dtrsv("L", "No trans", "Unit", L, U, &work[0], stat, info);
-
-			/* Multiply by inv(U). */
-			sp_dtrsv("U", "No trans", "Non-unit", L, U, &work[0], stat, info);
-		}
-		else {
-
-			/* Multiply by inv(U'). */
-			sp_dtrsv("U", "Transpose", "Non-unit", L, U, &work[0], stat, info);
-
-			/* Multiply by inv(L'). */
-			sp_dtrsv("L", "Transpose", "Unit", L, U, &work[0], stat, info);
-		}
-	}
-	while(kase != 0);
-
-	/* Compute the estimate of the reciprocal condition number. */
-	if(ainvnm != 0.) *rcond = (1. / ainvnm) / anorm;
-
-	SUPERLU_FREE(work);
-	SUPERLU_FREE(iwork);
+    SUPERLU_FREE (work);
+    SUPERLU_FREE (iwork);
+    return;
 
 } /* dgscon */
+
