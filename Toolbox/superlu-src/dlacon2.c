@@ -184,8 +184,7 @@ L70:
     *est = dasum_(n, v, &c__1);
 #endif
 
-    for(i = 0; i < *n; ++i)
-        if(i_dnnt(d_sign(one, x[i])) != isgn[i]) goto L90;
+    for(i = 0; i < *n; ++i) if(i_dnnt(d_sign(one, x[i])) != isgn[i]) goto L90;
 
     /*     REPEATED SIGN VECTOR DETECTED, HENCE ALGORITHM HAS CONVERGED. */
     goto L120;

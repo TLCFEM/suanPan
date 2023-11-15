@@ -66,13 +66,12 @@ extern "C" {
 #define DLONG
 #endif
 
-
 /* ========================================================================== */
 /* === Include files ======================================================== */
 /* ========================================================================== */
 
 #include <stdlib.h>
-    /*#include <stdint.h>*/
+/*#include <stdint.h>*/
 
 /* ========================================================================== */
 /* === COLAMD version ======================================================= */
@@ -129,7 +128,7 @@ extern "C" {
 /* stats [3]: colamd status:  zero OK, > 0 warning or notice, < 0 error */
 #define COLAMD_STATUS 3
 
-/* stats [4..6]: error info, or info on jumbled columns */ 
+/* stats [4..6]: error info, or info on jumbled columns */
 #define COLAMD_INFO1 4
 #define COLAMD_INFO2 5
 #define COLAMD_INFO3 6
@@ -149,9 +148,7 @@ extern "C" {
 #define COLAMD_ERROR_out_of_memory		(-10)
 #define COLAMD_ERROR_internal_error		(-999)
 
-
 #define SUITESPARSE_PRINTF  printf
-
 
 /* ========================================================================== */
 /* === Prototypes of user-callable routines ================================= */
@@ -188,7 +185,6 @@ extern "C" {
 #endif
 /**** end from SuiteSparse_config.h ********/
 
-
 /* ========================================================================== */
 /* === int or SuiteSparse_long ============================================== */
 /* ========================================================================== */
@@ -221,107 +217,98 @@ extern "C" {
 
 #endif
 
-
-size_t colamd_recommended	/* returns recommended value of Alen, */
-				/* or 0 if input arguments are erroneous */
+size_t colamd_recommended /* returns recommended value of Alen, */
+/* or 0 if input arguments are erroneous */
 (
-    int nnz,			/* nonzeros in A */
-    int n_row,			/* number of rows in A */
-    int n_col			/* number of columns in A */
-) ;
+    int nnz,   /* nonzeros in A */
+    int n_row, /* number of rows in A */
+    int n_col  /* number of columns in A */
+);
 
-size_t colamd_l_recommended	/* returns recommended value of Alen, */
-				/* or 0 if input arguments are erroneous */
+size_t colamd_l_recommended /* returns recommended value of Alen, */
+/* or 0 if input arguments are erroneous */
 (
-    SuiteSparse_long nnz,       /* nonzeros in A */
-    SuiteSparse_long n_row,     /* number of rows in A */
-    SuiteSparse_long n_col      /* number of columns in A */
-) ;
+    SuiteSparse_long nnz,   /* nonzeros in A */
+    SuiteSparse_long n_row, /* number of rows in A */
+    SuiteSparse_long n_col  /* number of columns in A */
+);
 
-void colamd_set_defaults	/* sets default parameters */
-(				/* knobs argument is modified on output */
-    double knobs [COLAMD_KNOBS]	/* parameter settings for colamd */
-) ;
+void colamd_set_defaults /* sets default parameters */
+(
+    /* knobs argument is modified on output */
+    double knobs[COLAMD_KNOBS] /* parameter settings for colamd */
+);
 
-void colamd_l_set_defaults	/* sets default parameters */
-(				/* knobs argument is modified on output */
-    double knobs [COLAMD_KNOBS]	/* parameter settings for colamd */
-) ;
+void colamd_l_set_defaults /* sets default parameters */
+(
+    /* knobs argument is modified on output */
+    double knobs[COLAMD_KNOBS] /* parameter settings for colamd */
+);
 
-int colamd			/* returns (1) if successful, (0) otherwise*/
-(				/* A and p arguments are modified on output */
-    int n_row,			/* number of rows in A */
-    int n_col,			/* number of columns in A */
-    int Alen,			/* size of the array A */
-    int A [],			/* row indices of A, of size Alen */
-    int p [],			/* column pointers of A, of size n_col+1 */
-    double knobs [COLAMD_KNOBS],/* parameter settings for colamd */
-    int stats [COLAMD_STATS]	/* colamd output statistics and error codes */
-) ;
+int colamd /* returns (1) if successful, (0) otherwise*/
+(
+    /* A and p arguments are modified on output */
+    int n_row,                  /* number of rows in A */
+    int n_col,                  /* number of columns in A */
+    int Alen,                   /* size of the array A */
+    int A[],                    /* row indices of A, of size Alen */
+    int p[],                    /* column pointers of A, of size n_col+1 */
+    double knobs[COLAMD_KNOBS], /* parameter settings for colamd */
+    int stats[COLAMD_STATS]     /* colamd output statistics and error codes */
+);
 
-SuiteSparse_long colamd_l       /* returns (1) if successful, (0) otherwise*/
-(				/* A and p arguments are modified on output */
-    SuiteSparse_long n_row,     /* number of rows in A */
-    SuiteSparse_long n_col,     /* number of columns in A */
-    SuiteSparse_long Alen,      /* size of the array A */
-    SuiteSparse_long A [],      /* row indices of A, of size Alen */
-    SuiteSparse_long p [],      /* column pointers of A, of size n_col+1 */
-    double knobs [COLAMD_KNOBS],/* parameter settings for colamd */
-    SuiteSparse_long stats [COLAMD_STATS]   /* colamd output statistics
+SuiteSparse_long colamd_l /* returns (1) if successful, (0) otherwise*/
+(
+    /* A and p arguments are modified on output */
+    SuiteSparse_long n_row,              /* number of rows in A */
+    SuiteSparse_long n_col,              /* number of columns in A */
+    SuiteSparse_long Alen,               /* size of the array A */
+    SuiteSparse_long A[],                /* row indices of A, of size Alen */
+    SuiteSparse_long p[],                /* column pointers of A, of size n_col+1 */
+    double knobs[COLAMD_KNOBS],          /* parameter settings for colamd */
+    SuiteSparse_long stats[COLAMD_STATS] /* colamd output statistics
                                              * and error codes */
-) ;
+);
 
-int symamd				/* return (1) if OK, (0) otherwise */
+int symamd /* return (1) if OK, (0) otherwise */
 (
-    int n,				/* number of rows and columns of A */
-    int A [],				/* row indices of A */
-    int p [],				/* column pointers of A */
-    int perm [],			/* output permutation, size n_col+1 */
-    double knobs [COLAMD_KNOBS],	/* parameters (uses defaults if NULL) */
-    int stats [COLAMD_STATS],		/* output statistics and error codes */
-    void * (*allocate) (size_t, size_t),
-    					/* pointer to calloc (ANSI C) or */
-					/* mxCalloc (for MATLAB mexFunction) */
-    void (*release) (void *)
-    					/* pointer to free (ANSI C) or */
-    					/* mxFree (for MATLAB mexFunction) */
-) ;
+    int n,                      /* number of rows and columns of A */
+    int A[],                    /* row indices of A */
+    int p[],                    /* column pointers of A */
+    int perm[],                 /* output permutation, size n_col+1 */
+    double knobs[COLAMD_KNOBS], /* parameters (uses defaults if NULL) */
+    int stats[COLAMD_STATS],    /* output statistics and error codes */
+    void* (*allocate)(size_t, size_t),
+    /* pointer to calloc (ANSI C) or */
+    /* mxCalloc (for MATLAB mexFunction) */
+    void (*release)(void*)
+    /* pointer to free (ANSI C) or */
+    /* mxFree (for MATLAB mexFunction) */
+);
 
-SuiteSparse_long symamd_l               /* return (1) if OK, (0) otherwise */
+SuiteSparse_long symamd_l /* return (1) if OK, (0) otherwise */
 (
-    SuiteSparse_long n,                 /* number of rows and columns of A */
-    SuiteSparse_long A [],              /* row indices of A */
-    SuiteSparse_long p [],              /* column pointers of A */
-    SuiteSparse_long perm [],           /* output permutation, size n_col+1 */
-    double knobs [COLAMD_KNOBS],	/* parameters (uses defaults if NULL) */
-    SuiteSparse_long stats [COLAMD_STATS],  /* output stats and error codes */
-    void * (*allocate) (size_t, size_t),
-    					/* pointer to calloc (ANSI C) or */
-					/* mxCalloc (for MATLAB mexFunction) */
-    void (*release) (void *)
-    					/* pointer to free (ANSI C) or */
-    					/* mxFree (for MATLAB mexFunction) */
-) ;
+    SuiteSparse_long n,                   /* number of rows and columns of A */
+    SuiteSparse_long A[],                 /* row indices of A */
+    SuiteSparse_long p[],                 /* column pointers of A */
+    SuiteSparse_long perm[],              /* output permutation, size n_col+1 */
+    double knobs[COLAMD_KNOBS],           /* parameters (uses defaults if NULL) */
+    SuiteSparse_long stats[COLAMD_STATS], /* output stats and error codes */
+    void* (*allocate)(size_t, size_t),
+    /* pointer to calloc (ANSI C) or */
+    /* mxCalloc (for MATLAB mexFunction) */
+    void (*release)(void*)
+    /* pointer to free (ANSI C) or */
+    /* mxFree (for MATLAB mexFunction) */
+);
 
-void colamd_report
-(
-    int stats [COLAMD_STATS]
-) ;
+void colamd_report(int stats[COLAMD_STATS]);
 
-void colamd_l_report
-(
-    SuiteSparse_long stats [COLAMD_STATS]
-) ;
+void colamd_l_report(SuiteSparse_long stats[COLAMD_STATS]);
 
-void symamd_report
-(
-    int stats [COLAMD_STATS]
-) ;
+void symamd_report(int stats[COLAMD_STATS]);
 
-void symamd_l_report
-(
-    SuiteSparse_long stats [COLAMD_STATS]
-) ;
+void symamd_l_report(SuiteSparse_long stats[COLAMD_STATS]);
 
 #ifdef __cplusplus
 }

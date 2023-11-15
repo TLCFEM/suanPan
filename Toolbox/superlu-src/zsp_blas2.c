@@ -500,8 +500,7 @@ int sp_zgemv(char* trans, doublecomplex alpha, SuperMatrix* A, doublecomplex* x,
     if(!z_eq(&beta, &comp_one)) {
         if(incy == 1) {
             if(z_eq(&beta, &comp_zero)) for(i = 0; i < leny; ++i) y[i] = comp_zero;
-            else
-                for(i = 0; i < leny; ++i) zz_mult(&y[i], &beta, &y[i]);
+            else for(i = 0; i < leny; ++i) zz_mult(&y[i], &beta, &y[i]);
         }
         else {
             iy = ky;

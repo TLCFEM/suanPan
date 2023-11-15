@@ -642,16 +642,8 @@ void dgsisx(superlu_options_t* options, SuperMatrix* A, int* perm_c, int* perm_r
 
         /* Scale and permute the right-hand side if equilibration
                and permutation from MC64 were performed. */
-        if(notran) {
-            if(rowequ) {
-                for(j = 0; j < nrhs; ++j)
-                    for(i = 0; i < n; ++i) Bmat[i + j * ldb] *= R[i];
-            }
-        }
-        else if(colequ) {
-            for(j = 0; j < nrhs; ++j)
-                for(i = 0; i < n; ++i) { Bmat[i + j * ldb] *= C[i]; }
-        }
+        if(notran) { if(rowequ) { for(j = 0; j < nrhs; ++j) for(i = 0; i < n; ++i) Bmat[i + j * ldb] *= R[i]; } }
+        else if(colequ) { for(j = 0; j < nrhs; ++j) for(i = 0; i < n; ++i) { Bmat[i + j * ldb] *= C[i]; } }
 
         /* Compute the solution matrix X. */
         for(j = 0; j < nrhs; j++) /* Save a copy of the right hand sides */
@@ -663,18 +655,10 @@ void dgsisx(superlu_options_t* options, SuperMatrix* A, int* perm_c, int* perm_r
 
         /* Transform the solution matrix X to a solution of the original
            system. */
-        if(notran) {
-            if(colequ) {
-                for(j = 0; j < nrhs; ++j)
-                    for(i = 0; i < n; ++i) { Xmat[i + j * ldx] *= C[i]; }
-            }
-        }
+        if(notran) { if(colequ) { for(j = 0; j < nrhs; ++j) for(i = 0; i < n; ++i) { Xmat[i + j * ldx] *= C[i]; } } }
         else {
             /* transposed system */
-            if(rowequ) {
-                for(j = 0; j < nrhs; ++j)
-                    for(i = 0; i < A->nrow; ++i) { Xmat[i + j * ldx] *= R[i]; }
-            }
+            if(rowequ) { for(j = 0; j < nrhs; ++j) for(i = 0; i < A->nrow; ++i) { Xmat[i + j * ldx] *= R[i]; } }
         }
     } /* end if nrhs > 0 */
 

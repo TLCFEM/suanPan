@@ -49,8 +49,7 @@ int mark_relax(
     for(i = 0; i < n && relax_fsupc[i] != EMPTY; i++) {
         jcol = relax_fsupc[i];  /* first column */
         kcol = relax_end[jcol]; /* last column */
-        for(j = jcol; j <= kcol; j++)
-            for(k = xa_begin[j]; k < xa_end[j]; k++) marker[asub[k]] = jcol;
+        for(j = jcol; j <= kcol; j++) for(k = xa_begin[j]; k < xa_end[j]; k++) marker[asub[k]] = jcol;
     }
     return i;
 }

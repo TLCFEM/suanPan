@@ -136,8 +136,7 @@ int ilu_zdrop_row(
                     zaxpy_(&n, &one, &lusup[xlusup_first + i], &m, &lusup[xlusup_first + m - 1], &m);
                     break;
                 case SMILU_3:
-                    for(j = 0; j < n; j++)
-                        lusup[xlusup_first + (m - 1) + j * m].r += z_abs1(&lusup[xlusup_first + i + j * m]);
+                    for(j = 0; j < n; j++) lusup[xlusup_first + (m - 1) + j * m].r += z_abs1(&lusup[xlusup_first + i + j * m]);
                     break;
                 case SILU: default:
                     break;
@@ -206,8 +205,7 @@ int ilu_zdrop_row(
                         zaxpy_(&n, &one, &lusup[xlusup_first + i], &m, &lusup[xlusup_first + m - 1], &m);
                         break;
                     case SMILU_3:
-                        for(j = 0; j < n; j++)
-                            lusup[xlusup_first + (m - 1) + j * m].r += z_abs1(&lusup[xlusup_first + i + j * m]);
+                        for(j = 0; j < n; j++) lusup[xlusup_first + (m - 1) + j * m].r += z_abs1(&lusup[xlusup_first + i + j * m]);
                         break;
                     case SILU: default:
                         break;

@@ -73,8 +73,7 @@ void dlsolve(int ldm, int ncol, double* M, double* rhs) {
         rhs[++firstcol] = x7;
         ++firstcol;
 
-        for(k = firstcol; k < ncol; k++)
-            rhs[k] = rhs[k] - x0 * *Mki0++ - x1 * *Mki1++ - x2 * *Mki2++ - x3 * *Mki3++ - x4 * *Mki4++ - x5 * *Mki5++ - x6 * *Mki6++ - x7 * *Mki7++;
+        for(k = firstcol; k < ncol; k++) rhs[k] = rhs[k] - x0 * *Mki0++ - x1 * *Mki1++ - x2 * *Mki2++ - x3 * *Mki3++ - x4 * *Mki4++ - x5 * *Mki5++ - x6 * *Mki6++ - x7 * *Mki7++;
 
         M0 += 8 * ldm + 8;
     }
@@ -96,8 +95,7 @@ void dlsolve(int ldm, int ncol, double* M, double* rhs) {
         rhs[++firstcol] = x3;
         ++firstcol;
 
-        for(k = firstcol; k < ncol; k++)
-            rhs[k] = rhs[k] - x0 * *Mki0++ - x1 * *Mki1++ - x2 * *Mki2++ - x3 * *Mki3++;
+        for(k = firstcol; k < ncol; k++) rhs[k] = rhs[k] - x0 * *Mki0++ - x1 * *Mki1++ - x2 * *Mki2++ - x3 * *Mki3++;
 
         M0 += 4 * ldm + 4;
     }
@@ -172,8 +170,7 @@ void dmatvec(int ldm, int nrow, int ncol, double* M, double* vec, double* Mxvec)
         vi6 = vec[firstcol++];
         vi7 = vec[firstcol++];
 
-        for(k = 0; k < nrow; k++)
-            Mxvec[k] += vi0 * *Mki0++ + vi1 * *Mki1++ + vi2 * *Mki2++ + vi3 * *Mki3++ + vi4 * *Mki4++ + vi5 * *Mki5++ + vi6 * *Mki6++ + vi7 * *Mki7++;
+        for(k = 0; k < nrow; k++) Mxvec[k] += vi0 * *Mki0++ + vi1 * *Mki1++ + vi2 * *Mki2++ + vi3 * *Mki3++ + vi4 * *Mki4++ + vi5 * *Mki5++ + vi6 * *Mki6++ + vi7 * *Mki7++;
 
         M0 += 8 * ldm;
     }
@@ -190,8 +187,7 @@ void dmatvec(int ldm, int nrow, int ncol, double* M, double* vec, double* Mxvec)
         vi1 = vec[firstcol++];
         vi2 = vec[firstcol++];
         vi3 = vec[firstcol++];
-        for(k = 0; k < nrow; k++)
-            Mxvec[k] += vi0 * *Mki0++ + vi1 * *Mki1++ + vi2 * *Mki2++ + vi3 * *Mki3++;
+        for(k = 0; k < nrow; k++) Mxvec[k] += vi0 * *Mki0++ + vi1 * *Mki1++ + vi2 * *Mki2++ + vi3 * *Mki3++;
 
         M0 += 4 * ldm;
     }

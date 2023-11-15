@@ -136,8 +136,7 @@ int ilu_sdrop_row(
                     saxpy_(&n, &one, &lusup[xlusup_first + i], &m, &lusup[xlusup_first + m - 1], &m);
                     break;
                 case SMILU_3:
-                    for(j = 0; j < n; j++)
-                        lusup[xlusup_first + (m - 1) + j * m] += fabs(lusup[xlusup_first + i + j * m]);
+                    for(j = 0; j < n; j++) lusup[xlusup_first + (m - 1) + j * m] += fabs(lusup[xlusup_first + i + j * m]);
                     break;
                 case SILU: default:
                     break;
@@ -147,8 +146,7 @@ int ilu_sdrop_row(
             else /* move to last row */
             {
                 sswap_(&n, &lusup[xlusup_first + m1], &m, &lusup[xlusup_first + i], &m);
-                if(milu == SMILU_3)
-                    for(j = 0; j < n; j++) { lusup[xlusup_first + m1 + j * m] = fabs(lusup[xlusup_first + m1 + j * m]); }
+                if(milu == SMILU_3) for(j = 0; j < n; j++) { lusup[xlusup_first + m1 + j * m] = fabs(lusup[xlusup_first + m1 + j * m]); }
             }
             lsub[xlsub_first + i] = lsub[xlsub_first + m1];
             m1--;
@@ -203,8 +201,7 @@ int ilu_sdrop_row(
                         saxpy_(&n, &one, &lusup[xlusup_first + i], &m, &lusup[xlusup_first + m - 1], &m);
                         break;
                     case SMILU_3:
-                        for(j = 0; j < n; j++)
-                            lusup[xlusup_first + (m - 1) + j * m] += fabs(lusup[xlusup_first + i + j * m]);
+                        for(j = 0; j < n; j++) lusup[xlusup_first + (m - 1) + j * m] += fabs(lusup[xlusup_first + i + j * m]);
                         break;
                     case SILU: default:
                         break;
@@ -214,8 +211,7 @@ int ilu_sdrop_row(
                 else /* move to last row */
                 {
                     sswap_(&n, &lusup[xlusup_first + m1], &m, &lusup[xlusup_first + i], &m);
-                    if(milu == SMILU_3)
-                        for(j = 0; j < n; j++) { lusup[xlusup_first + m1 + j * m] = fabs(lusup[xlusup_first + m1 + j * m]); }
+                    if(milu == SMILU_3) for(j = 0; j < n; j++) { lusup[xlusup_first + m1 + j * m] = fabs(lusup[xlusup_first + m1 + j * m]); }
                 }
                 lsub[xlsub_first + i] = lsub[xlsub_first + m1];
                 m1--;

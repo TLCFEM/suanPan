@@ -549,16 +549,8 @@ printf("dgssvx: Fact=%4d, Trans=%4d, equed=%c\n",
 
     if(nrhs > 0) {
         /* Scale the right hand side if equilibration was performed. */
-        if(notran) {
-            if(rowequ) {
-                for(j = 0; j < nrhs; ++j)
-                    for(i = 0; i < A->nrow; ++i) zd_mult(&Bmat[i+j*ldb], &Bmat[i+j*ldb], R[i]);
-            }
-        }
-        else if(colequ) {
-            for(j = 0; j < nrhs; ++j)
-                for(i = 0; i < A->nrow; ++i) zd_mult(&Bmat[i+j*ldb], &Bmat[i+j*ldb], C[i]);
-        }
+        if(notran) { if(rowequ) { for(j = 0; j < nrhs; ++j) for(i = 0; i < A->nrow; ++i) zd_mult(&Bmat[i+j*ldb], &Bmat[i+j*ldb], R[i]); } }
+        else if(colequ) { for(j = 0; j < nrhs; ++j) for(i = 0; i < A->nrow; ++i) zd_mult(&Bmat[i+j*ldb], &Bmat[i+j*ldb], C[i]); }
 
         /* Compute the solution matrix X. */
         for(j = 0; j < nrhs; j++) /* Save a copy of the right hand sides */
@@ -576,16 +568,8 @@ printf("dgssvx: Fact=%4d, Trans=%4d, equed=%c\n",
         utime[REFINE] = SuperLU_timer_() - t0;
 
         /* Transform the solution matrix X to a solution of the original system. */
-        if(notran) {
-            if(colequ) {
-                for(j = 0; j < nrhs; ++j)
-                    for(i = 0; i < A->nrow; ++i) zd_mult(&Xmat[i+j*ldx], &Xmat[i+j*ldx], C[i]);
-            }
-        }
-        else if(rowequ) {
-            for(j = 0; j < nrhs; ++j)
-                for(i = 0; i < A->nrow; ++i) zd_mult(&Xmat[i+j*ldx], &Xmat[i+j*ldx], R[i]);
-        }
+        if(notran) { if(colequ) { for(j = 0; j < nrhs; ++j) for(i = 0; i < A->nrow; ++i) zd_mult(&Xmat[i+j*ldx], &Xmat[i+j*ldx], C[i]); } }
+        else if(rowequ) { for(j = 0; j < nrhs; ++j) for(i = 0; i < A->nrow; ++i) zd_mult(&Xmat[i+j*ldx], &Xmat[i+j*ldx], R[i]); }
     } /* end if nrhs > 0 */
 
     if(options->ConditionNumber) {

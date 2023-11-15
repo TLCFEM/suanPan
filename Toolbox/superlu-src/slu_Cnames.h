@@ -29,7 +29,6 @@ at the top-level directory.
 #ifndef __SUPERLU_CNAMES /* allow multiple inclusions */
 #define __SUPERLU_CNAMES
 
-
 #define ADD_       0
 #define ADD__      1
 #define NOCHANGE   2
@@ -61,7 +60,6 @@ at the top-level directory.
 #ifndef F77_CALL_C
 #define F77_CALL_C  ADD_
 #endif
-
 
 #if (F77_CALL_C == ADD_)
 /*
@@ -262,7 +260,6 @@ at the top-level directory.
 #define c_fortran_zgssv_ C_FORTRAN_ZGSSV
 #endif
 
-
 #if (F77_CALL_C == OLD_CRAY)
 /*
  * These defines set up the naming scheme required to have a fortran 77
@@ -355,7 +352,6 @@ at the top-level directory.
 #define c_fortran_zgssv_ C_FORTRAN_ZGSSV
 #endif
 
-
 #if (F77_CALL_C == NOCHANGE)
 /*
  * These defines set up the naming scheme required to have a fortran 77
@@ -447,6 +443,5 @@ at the top-level directory.
 #define c_fortran_cgssv_ c_fortran_cgssv
 #define c_fortran_zgssv_ c_fortran_zgssv
 #endif
-
 
 #endif /* __SUPERLU_CNAMES */

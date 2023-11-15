@@ -162,10 +162,11 @@ int ilu_zpivotL(
             *pivrow = swap[icol];
 
             /* pick up the pivot row */
-            for(isub = nsupc; isub < nsupr; ++isub) if(lsub_ptr[isub] == *pivrow) {
-                pivptr = isub;
-                break;
-            }
+            for(isub = nsupc; isub < nsupr; ++isub)
+                if(lsub_ptr[isub] == *pivrow) {
+                    pivptr = isub;
+                    break;
+                }
         }
         pivmax = fill_tol;
         lu_col_ptr[pivptr].r = pivmax;

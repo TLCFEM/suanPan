@@ -24,12 +24,12 @@ at the top-level directory.
 #ifndef __SUPERLU_DCOMPLEX /* allow multiple inclusions */
 #define __SUPERLU_DCOMPLEX
 
-
 #ifndef DCOMPLEX_INCLUDE
 #define DCOMPLEX_INCLUDE
 
-typedef struct { double r, i; } doublecomplex;
-
+typedef struct {
+    double r, i;
+} doublecomplex;
 
 /* Macro definitions */
 
@@ -62,22 +62,19 @@ typedef struct { double r, i; } doublecomplex;
 /*! \brief Complex equality testing */
 #define z_eq(a, b)  ( (a)->r == (b)->r && (a)->i == (b)->i )
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Prototypes for functions in dcomplex.c */
-void z_div(doublecomplex *, doublecomplex *, doublecomplex *);
-double z_abs(doublecomplex *);     /* exact */
-double z_abs1(doublecomplex *);    /* approximate */
-void z_exp(doublecomplex *, doublecomplex *);
-void d_cnjg(doublecomplex *r, doublecomplex *z);
-double d_imag(doublecomplex *);
-doublecomplex z_sgn(doublecomplex *);
-doublecomplex z_sqrt(doublecomplex *);
-
-
+void z_div(doublecomplex*, doublecomplex*, doublecomplex*);
+double z_abs(doublecomplex*);  /* exact */
+double z_abs1(doublecomplex*); /* approximate */
+void z_exp(doublecomplex*, doublecomplex*);
+void d_cnjg(doublecomplex* r, doublecomplex* z);
+double d_imag(doublecomplex*);
+doublecomplex z_sgn(doublecomplex*);
+doublecomplex z_sqrt(doublecomplex*);
 
 #ifdef __cplusplus
   }

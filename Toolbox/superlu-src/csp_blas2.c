@@ -500,8 +500,7 @@ int sp_cgemv(char* trans, complex alpha, SuperMatrix* A, complex* x, int incx, c
     if(!c_eq(&beta, &comp_one)) {
         if(incy == 1) {
             if(c_eq(&beta, &comp_zero)) for(i = 0; i < leny; ++i) y[i] = comp_zero;
-            else
-                for(i = 0; i < leny; ++i) cc_mult(&y[i], &beta, &y[i]);
+            else for(i = 0; i < leny; ++i) cc_mult(&y[i], &beta, &y[i]);
         }
         else {
             iy = ky;

@@ -83,8 +83,7 @@ float clangs(char* norm, SuperMatrix* A) {
     else if(strncmp(norm, "M", 1) == 0) {
         /* Find max(abs(A(i,j))). */
         value = 0.;
-        for(j = 0; j < A->ncol; ++j)
-            for(i = Astore->colptr[j]; i < Astore->colptr[j + 1]; i++) value = SUPERLU_MAX(value, c_abs( &Aval[i]));
+        for(j = 0; j < A->ncol; ++j) for(i = Astore->colptr[j]; i < Astore->colptr[j + 1]; i++) value = SUPERLU_MAX(value, c_abs( &Aval[i]));
     }
     else if(strncmp(norm, "O", 1) == 0 || *(unsigned char*)norm == '1') {
         /* Find norm1(A). */

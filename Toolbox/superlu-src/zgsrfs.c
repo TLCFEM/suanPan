@@ -240,10 +240,7 @@ void zgsrfs(trans_t trans, SuperMatrix* A, SuperMatrix* L, SuperMatrix* U, int* 
 
     /* Compute the number of nonzeros in each row (or column) of A */
     for(i = 0; i < A->nrow; ++i) iwork[i] = 0;
-    if(notran) {
-        for(k = 0; k < A->ncol; ++k)
-            for(i = Astore->colptr[k]; i < Astore->colptr[k + 1]; ++i) ++iwork[Astore->rowind[i]];
-    }
+    if(notran) { for(k = 0; k < A->ncol; ++k) for(i = Astore->colptr[k]; i < Astore->colptr[k + 1]; ++i) ++iwork[Astore->rowind[i]]; }
     else { for(k = 0; k < A->ncol; ++k) iwork[k] = Astore->colptr[k + 1] - Astore->colptr[k]; }
 
     /* Copy one column of RHS B into Bjcol. */
@@ -390,10 +387,8 @@ void zgsrfs(trans_t trans, SuperMatrix* A, SuperMatrix* L, SuperMatrix* U, int* 
 
             if(kase == 1) {
                 /* Multiply by diag(W)*inv(op(A)**T)*(diag(C) or diag(R)). */
-                if(notran && colequ)
-                    for(i = 0; i < A->ncol; ++i) { zd_mult(&work[i], &work[i], C[i]); }
-                else if(!notran && rowequ)
-                    for(i = 0; i < A->nrow; ++i) { zd_mult(&work[i], &work[i], R[i]); }
+                if(notran && colequ) for(i = 0; i < A->ncol; ++i) { zd_mult(&work[i], &work[i], C[i]); }
+                else if(!notran && rowequ) for(i = 0; i < A->nrow; ++i) { zd_mult(&work[i], &work[i], R[i]); }
 
                 zgstrs(transt, L, U, perm_c, perm_r, &Bjcol, stat, info);
 
@@ -405,10 +400,8 @@ void zgsrfs(trans_t trans, SuperMatrix* A, SuperMatrix* L, SuperMatrix* U, int* 
 
                 zgstrs(trans, L, U, perm_c, perm_r, &Bjcol, stat, info);
 
-                if(notran && colequ)
-                    for(i = 0; i < A->ncol; ++i) { zd_mult(&work[i], &work[i], C[i]); }
-                else if(!notran && rowequ)
-                    for(i = 0; i < A->ncol; ++i) { zd_mult(&work[i], &work[i], R[i]); }
+                if(notran && colequ) for(i = 0; i < A->ncol; ++i) { zd_mult(&work[i], &work[i], C[i]); }
+                else if(!notran && rowequ) for(i = 0; i < A->ncol; ++i) { zd_mult(&work[i], &work[i], R[i]); }
             }
         }
         while(kase != 0);

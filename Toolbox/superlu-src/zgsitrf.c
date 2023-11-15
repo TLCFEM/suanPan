@@ -339,16 +339,14 @@ void zgsitrf(
                 int quota;
 
                 /* Compute the quota */
-                if(drop_rule & DROP_PROWS)
-                    quota = gamma * Astore->nnz / m * (m - first) / m * (last - first + 1);
+                if(drop_rule & DROP_PROWS) quota = gamma * Astore->nnz / m * (m - first) / m * (last - first + 1);
                 else if(drop_rule & DROP_COLUMN) {
                     int i;
                     quota = 0;
                     for(i = first; i <= last; i++) quota += xa_end[i] - xa_begin[i];
                     quota = gamma * quota * (m - first) / m;
                 }
-                else if(drop_rule & DROP_AREA)
-                    quota = gamma * nnzAj * (1.0 - 0.5 * (last + 1.0) / m) - nnzLj;
+                else if(drop_rule & DROP_AREA) quota = gamma * nnzAj * (1.0 - 0.5 * (last + 1.0) / m) - nnzLj;
                 else quota = m * n;
                 fill_tol = pow(fill_ini, 1.0 - 0.5 * (first + last) / min_mn);
 
@@ -482,8 +480,7 @@ void zgsitrf(
 
                 /* Computer the quota */
                 if(drop_rule & DROP_PROWS) quota = gamma * Astore->nnz / m * jj / m;
-                else if(drop_rule & DROP_COLUMN)
-                    quota = gamma * (xa_end[jj] - xa_begin[jj]) * (jj + 1) / m;
+                else if(drop_rule & DROP_COLUMN) quota = gamma * (xa_end[jj] - xa_begin[jj]) * (jj + 1) / m;
                 else if(drop_rule & DROP_AREA) quota = gamma * 0.9 * nnzAj * 0.5 - nnzUj;
                 else quota = m;
 
@@ -518,16 +515,14 @@ void zgsitrf(
                     int quota;
 
                     /* Compute the quota */
-                    if(drop_rule & DROP_PROWS)
-                        quota = gamma * Astore->nnz / m * (m - first) / m * (last - first + 1);
+                    if(drop_rule & DROP_PROWS) quota = gamma * Astore->nnz / m * (m - first) / m * (last - first + 1);
                     else if(drop_rule & DROP_COLUMN) {
                         int i;
                         quota = 0;
                         for(i = first; i <= last; i++) quota += xa_end[i] - xa_begin[i];
                         quota = gamma * quota * (m - first) / m;
                     }
-                    else if(drop_rule & DROP_AREA)
-                        quota = gamma * nnzAj * (1.0 - 0.5 * (last + 1.0) / m) - nnzLj;
+                    else if(drop_rule & DROP_AREA) quota = gamma * nnzAj * (1.0 - 0.5 * (last + 1.0) / m) - nnzLj;
                     else quota = m * n;
                     fill_tol = pow(fill_ini, 1.0 - 0.5 * (first + last) / (double)min_mn);
 

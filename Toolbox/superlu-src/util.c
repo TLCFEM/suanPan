@@ -269,8 +269,7 @@ void print_panel_seg(int n, int w, int jcol, int nseg, int* segrep, int* repfnz)
 
     for(j = jcol; j < jcol + w; j++) {
         printf("\tcol %d:\n", j);
-        for(k = 0; k < nseg; k++)
-            printf("\t\tseg %d, segrep %d, repfnz %d\n", k, segrep[k], repfnz[(j - jcol) * n + segrep[k]]);
+        for(k = 0; k < nseg; k++) printf("\t\tseg %d, segrep %d, repfnz %d\n", k, segrep[k], repfnz[(j - jcol) * n + segrep[k]]);
     }
 }
 
@@ -312,12 +311,10 @@ void StatPrint(SuperLUStat_t* stat) {
     utime = stat->utime;
     ops = stat->ops;
     printf("Factor time  = %8.5f\n", utime[FACT]);
-    if(utime[FACT] != 0.0)
-        printf("Factor flops = %e\tMflops = %8.2f\n", ops[FACT], ops[FACT] * 1e-6 / utime[FACT]);
+    if(utime[FACT] != 0.0) printf("Factor flops = %e\tMflops = %8.2f\n", ops[FACT], ops[FACT] * 1e-6 / utime[FACT]);
 
     printf("Solve time   = %8.4f\n", utime[SOLVE]);
-    if(utime[SOLVE] != 0.0)
-        printf("Solve flops = %e\tMflops = %8.2f\n", ops[SOLVE], ops[SOLVE] * 1e-6 / utime[SOLVE]);
+    if(utime[SOLVE] != 0.0) printf("Solve flops = %e\tMflops = %8.2f\n", ops[SOLVE], ops[SOLVE] * 1e-6 / utime[SOLVE]);
 
     printf("Number of memory expansions: %d\n", stat->expansions);
 }
@@ -398,8 +395,7 @@ void check_repfnz(int n, int w, int jcol, int* repfnz) {
 
 /*! \brief Print a summary of the testing results. */
 void PrintSumm(char* type, int nfail, int nrun, int nerrs) {
-    if(nfail > 0)
-        printf("%3s driver: %d out of %d tests failed to pass the threshold\n", type, nfail, nrun);
+    if(nfail > 0) printf("%3s driver: %d out of %d tests failed to pass the threshold\n", type, nfail, nrun);
     else printf("All tests for %3s driver passed the threshold (%6d tests run)\n", type, nrun);
 
     if(nerrs > 0) printf("%6d error messages recorded\n", nerrs);

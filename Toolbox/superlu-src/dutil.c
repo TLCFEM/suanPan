@@ -106,8 +106,7 @@ void dCopy_Dense_Matrix(int M, int N, double* X, int ldx, double* Y, int ldy) {
      */
     int i, j;
 
-    for(j = 0; j < N; ++j)
-        for(i = 0; i < M; ++i) Y[i + j * ldy] = X[i + j * ldx];
+    for(j = 0; j < N; ++j) for(i = 0; i < M; ++i) Y[i + j * ldy] = X[i + j * ldx];
 }
 
 void dCreate_SuperNode_Matrix(SuperMatrix* L, int m, int n, int_t nnz, double* nzval, int_t* nzval_colptr, int_t* rowind, int_t* rowind_colptr, int* col_to_sup, int* sup_to_col, Stype_t stype, Dtype_t dtype, Mtype_t mtype) {
@@ -369,11 +368,9 @@ void dPrintPerf(SuperMatrix* L, SuperMatrix* U, mem_usage_t* mem_usage, double r
     utime = stat->utime;
     ops = stat->ops;
 
-    if(utime[FACT] != 0.)
-        printf("Factor flops = %e\tMflops = %8.2f\n", ops[FACT], ops[FACT] * 1e-6 / utime[FACT]);
+    if(utime[FACT] != 0.) printf("Factor flops = %e\tMflops = %8.2f\n", ops[FACT], ops[FACT] * 1e-6 / utime[FACT]);
     printf("Identify relaxed snodes	= %8.2f\n", utime[RELAX]);
-    if(utime[SOLVE] != 0.)
-        printf("Solve flops = %.0f, Mflops = %8.2f\n", ops[SOLVE], ops[SOLVE] * 1e-6 / utime[SOLVE]);
+    if(utime[SOLVE] != 0.) printf("Solve flops = %.0f, Mflops = %8.2f\n", ops[SOLVE], ops[SOLVE] * 1e-6 / utime[SOLVE]);
 
     Lstore = (SCformat*)L->Store;
     Ustore = (NCformat*)U->Store;

@@ -1,4 +1,3 @@
-
 #ifndef SUPERLU_CONFIG_H
 #define SUPERLU_CONFIG_H
 
@@ -21,4 +20,3 @@ typedef int int_t; /* default */
 #endif
 
 #endif /* SUPERLU_CONFIG_H */
-
