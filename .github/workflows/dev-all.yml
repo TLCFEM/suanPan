@@ -6,7 +6,7 @@ on:
     branches: [ dev ]
 jobs:
   ubuntu-dev:
-    if: "!contains(github.event.head_commit.message, '[skip]')"
+    if: ${{ !contains(github.event.head_commit.message, '[skip]') }}
     runs-on: ubuntu-22.04
     timeout-minutes: 60
     strategy:
@@ -128,7 +128,7 @@ jobs:
         with:
           gcov: true
   macos-dev:
-    if: "!contains(github.event.head_commit.message, '[skip]')"
+    if: ${{ !contains(github.event.head_commit.message, '[skip]') }}
     runs-on: macos-11
     timeout-minutes: 100
     strategy:
@@ -194,7 +194,7 @@ jobs:
           name: ${{ env.ARTIFACT }}
           path: ${{ env.ARTIFACT }}
   windows-dev:
-    if: "!contains(github.event.head_commit.message, '[skip]')"
+    if: ${{ !contains(github.event.head_commit.message, '[skip]') }}
     runs-on: windows-2022
     timeout-minutes: 100
     strategy:

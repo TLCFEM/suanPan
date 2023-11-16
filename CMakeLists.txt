@@ -263,16 +263,21 @@ if (COMPILER_IDENTIFIER MATCHES "(linux|mac)")
         endif ()
     endif ()
     if (CMAKE_CXX_COMPILER_ID MATCHES "IntelLLVM")
-        set(ONEAPI_LIB $ENV{ONEAPI_ROOT}/compiler/latest/linux/compiler/lib/intel64_lin)
-        file(GLOB ONEAPI_FILES
-                ${ONEAPI_LIB}/libifcoremt${DECOR}*${SUFFIX}
-                ${ONEAPI_LIB}/libifport${DECOR}*${SUFFIX}
-                ${ONEAPI_LIB}/libimf${DECOR}*${SUFFIX}
-                ${ONEAPI_LIB}/libintlc${DECOR}*${SUFFIX}
-                ${ONEAPI_LIB}/libiomp5${DECOR}*${SUFFIX}
-                ${ONEAPI_LIB}/libsvml${DECOR}*${SUFFIX}
+        set(PATH_LIST
+                $ENV{ONEAPI_ROOT}/compiler/latest/lib #  since 2024
+                $ENV{ONEAPI_ROOT}/compiler/latest/linux/compiler/lib/intel64_lin # prior to 2024
         )
-        install(PROGRAMS ${ONEAPI_FILES} DESTINATION lib)
+        foreach (PATHA ${PATH_LIST})
+            file(GLOB ONEAPI_FILES
+                    ${PATHA}/libifcoremt${DECOR}*${SUFFIX}
+                    ${PATHA}/libifport${DECOR}*${SUFFIX}
+                    ${PATHA}/libimf${DECOR}*${SUFFIX}
+                    ${PATHA}/libintlc${DECOR}*${SUFFIX}
+                    ${PATHA}/libiomp5${DECOR}*${SUFFIX}
+                    ${PATHA}/libsvml${DECOR}*${SUFFIX}
+            )
+            install(PROGRAMS ${ONEAPI_FILES} DESTINATION lib)
+        endforeach ()
     endif ()
     if (USE_MAGMA)
         file(GLOB MAGMA_FILES ${MAGMAROOT}/lib/libmagma*.so)
