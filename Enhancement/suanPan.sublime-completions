@@ -2572,7 +2572,7 @@
       "trigger": "upsampling",
       "details": "upsample a given ground motion using a specific window type",
       "kind": "keyword",
-      "contents": "upsampling ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) string, file name\n# (2) int, upsampling ratio\n# (3) string, window type, one of Hamming, Hann, Blackman, BlackmanNuttall, BlackmanHarris and FlatTop"
+      "contents": "upsampling ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]}\n# (1) string, file name\n# (2) int, upsampling ratio\n# (3) string, window type, one of Hamming, Hann, Blackman, BlackmanNuttall, BlackmanHarris and FlatTop\n# [4] int, window length, default: 8"
     },
     {
       "trigger": "version",
