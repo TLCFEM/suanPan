@@ -276,7 +276,19 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& co
                 return SUANPAN_SUCCESS;
             }
 
-            const auto result = upsampling<WindowType::Hamming>(file_name, up_rate);
+            string window_type = "Hamming";
+            if(!get_optional_input(command, window_type)) {
+                suanpan_error("A valid window type is required.\n");
+                return SUANPAN_SUCCESS;
+            }
+
+            auto window_size = 8llu;
+            if(!get_optional_input(command, window_size)) {
+                suanpan_error("A valid window size is required.\n");
+                return SUANPAN_SUCCESS;
+            }
+
+            const auto result = upsampling(window_type, file_name, up_rate, window_size);
 
             if(result.empty()) {
                 suanpan_error("Fail to perform upsampling.\n");

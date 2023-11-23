@@ -259,14 +259,13 @@ void perform_upsampling(istringstream& command) {
         return;
     }
 
-    mat result;
+    auto window_size = 8llu;
+    if(!get_optional_input(command, window_size)) {
+        suanpan_error("A valid window size is required.\n");
+        return;
+    }
 
-    if(is_equal(window_type, "Hamming")) result = upsampling<WindowType::Hamming>(file_name, up_rate);
-    else if(is_equal(window_type, "Hann")) result = upsampling<WindowType::Hann>(file_name, up_rate);
-    else if(is_equal(window_type, "Blackman")) result = upsampling<WindowType::Blackman>(file_name, up_rate);
-    else if(is_equal(window_type, "BlackmanNuttall")) result = upsampling<WindowType::BlackmanNuttall>(file_name, up_rate);
-    else if(is_equal(window_type, "BlackmanHarris")) result = upsampling<WindowType::BlackmanHarris>(file_name, up_rate);
-    else if(is_equal(window_type, "FlatTop")) result = upsampling<WindowType::FlatTop>(file_name, up_rate);
+    const mat result = upsampling(window_type, file_name, up_rate, window_size);
 
     if(result.empty())
         suanpan_error("Fail to perform upsampling, please ensure the input is equally spaced and stored in two columns.\n");

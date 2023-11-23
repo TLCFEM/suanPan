@@ -174,3 +174,16 @@ template<> vec fir_band_stop<WindowType::BlackmanNuttall>(const uword s, const d
 template<> vec fir_band_stop<WindowType::BlackmanHarris>(const uword s, const double fa, const double fb) { return fir_band_stop(s, fa, fb, blackman_harris); }
 
 template<> vec fir_band_stop<WindowType::FlatTop>(const uword s, const double fa, const double fb) { return fir_band_stop(s, fa, fb, flat_top); }
+
+mat upsampling(const string& window_type, const string& file_name, const uword up_rate, const uword window_size) {
+    mat result;
+
+    if(is_equal(window_type, "Hamming")) result = upsampling<WindowType::Hamming>(file_name, up_rate, window_size);
+    else if(is_equal(window_type, "Hann")) result = upsampling<WindowType::Hann>(file_name, up_rate, window_size);
+    else if(is_equal(window_type, "Blackman")) result = upsampling<WindowType::Blackman>(file_name, up_rate, window_size);
+    else if(is_equal(window_type, "BlackmanNuttall")) result = upsampling<WindowType::BlackmanNuttall>(file_name, up_rate, window_size);
+    else if(is_equal(window_type, "BlackmanHarris")) result = upsampling<WindowType::BlackmanHarris>(file_name, up_rate, window_size);
+    else if(is_equal(window_type, "FlatTop")) result = upsampling<WindowType::FlatTop>(file_name, up_rate, window_size);
+
+    return result;
+}
