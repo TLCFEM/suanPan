@@ -45,7 +45,7 @@
 
 uvec sort_rcm(const std::vector<uvec>&, const uvec&);
 
-template<typename eT> uvec sort_rcm(const SpMat<eT>& MEAT) {
+template<sp_d eT> uvec sort_rcm(const SpMat<eT>& MEAT) {
     suanpan_assert([&] { if(!MEAT.is_square()) throw logic_error("can only be applied to square matrix"); });
 
     wall_clock TM;
@@ -116,11 +116,11 @@ template<typename eT> uvec sort_rcm(const SpMat<eT>& MEAT) {
     return R;
 }
 
-template<typename eT> uvec sort_rcm(const Mat<eT>& MEAT) { return sort_rcm(SpMat<eT>(MEAT)); }
+template<sp_d eT> uvec sort_rcm(const Mat<eT>& MEAT) { return sort_rcm(SpMat<eT>(MEAT)); }
 
-template<typename dt> uvec sort_rcm(const csc_form<dt, uword>& csc_mat) {
+template<sp_d dt> uvec sort_rcm(const csc_form<dt, uword>& csc_mat) {
     //! Get the size of the square matrix.
-    auto S = csc_mat.n_cols;
+    const auto S = csc_mat.n_cols;
 
     //! Collect the number of degree of each node.
     uvec E(S, fill::none);
@@ -134,11 +134,7 @@ template<typename dt> uvec sort_rcm(const csc_form<dt, uword>& csc_mat) {
     return sort_rcm(A, E);
 }
 
-template<typename dt, typename it> uvec sort_rcm(triplet_form<dt, it>& triplet_mat) {
-    csc_form<dt, uword> csc_mat(triplet_mat);
-
-    return sort_rcm(csc_mat);
-}
+template<sp_d dt, sp_i it> uvec sort_rcm(triplet_form<dt, it>& triplet_mat) { return sort_rcm(csc_form<dt, uword>(triplet_mat)); }
 
 #endif
 
