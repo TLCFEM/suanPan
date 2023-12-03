@@ -13,6 +13,7 @@
 2. fix tangent stiffness in `ConcreteK4` model [#171](https://github.com/TLCFEM/suanPan/pull/171)
 3. update `OpenBLAS` to version `0.3.25`
 4. update `SuperLU` to version `6.0.1`
+5. better `RCM` algorithm that may result in a smaller bandwidth, thus, poentially more efficient solving [#175](https://github.com/TLCFEM/suanPan/pull/175)
 
 ## version 3.2
 
