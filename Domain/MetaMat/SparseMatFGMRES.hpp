@@ -67,7 +67,9 @@ public:
 template<sp_d T> int SparseMatBaseFGMRES<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
     const auto N = static_cast<int>(B.n_rows);
 
-    work.zeros((5 * N * N + 11 * N + 2) / 2);
+    const auto restart = std::min(150, N);
+
+    work.zeros((2 * restart + 1) * N + restart * (restart + 9) / 2 + 1);
 
     X = B;
 
