@@ -40,6 +40,8 @@ int NodeLine::initialize(const shared_ptr<DomainBase>& D) {
     // need to check if sizes conform since the method does not emit error flag
     if(dof_encoding.n_elem != node_encoding.n_elem * dof_reference.n_elem) return SUANPAN_FAIL;
 
+    set_multiplier_size(0);
+
     return Constraint::initialize(D);
 }
 
