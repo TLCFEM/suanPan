@@ -56,7 +56,10 @@ public:
         , s_band(in_l + in_u)
         , m_rows(2 * in_l + in_u + 1)
         , l_band(in_l)
-        , u_band(in_u) {}
+        , u_band(in_u) {
+        if(m_rows >= in_size)
+            suanpan_warning("The storage requirement for the banded matrix is larger than that of a full matrix, consider using a full/sparse matrix instead.\n");
+    }
 
     unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<BandMat>(*this); }
 
