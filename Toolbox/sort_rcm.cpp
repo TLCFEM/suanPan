@@ -16,7 +16,7 @@
  ******************************************************************************/
 
 #include "sort_rcm.h"
-#include <unordered_set>
+#include <Toolbox/container.h>
 
 /**
  * \brief Find a pair of pseudo-peripheral vertices
@@ -38,20 +38,20 @@ uvec peripheral(const std::vector<uvec>& A, const uvec& E) {
     while(true) {
         std::vector M(E.n_elem, false);
 
-        // populate the first set
-        auto parent_set = std::unordered_set{root};
+        // ReSharper disable once CppTemplateArgumentsCanBeDeduced
+        auto parent_set = suanpan::unordered_set<decltype(root)>{root};
         M[root] = true;
         std::size_t current_depth = 1;
 
         const auto populate = [&] {
-            decltype(parent_set) child_set;
+            decltype(parent_set) child_set, neighbor_set;
 
-            for(const auto parent : parent_set)
-                for(const auto child : A[parent])
-                    if(!M[child]) {
-                        child_set.insert(child);
-                        M[child] = true;
-                    }
+            // collect all neighbors
+            suanpan::for_all(parent_set, [&](const auto parent) { neighbor_set.insert(A[parent].begin(), A[parent].end()); });
+            // find all children, i.e., neighbors that are not visited
+            suanpan::for_all(neighbor_set, [&](const auto child) { if(!M[child]) child_set.insert(child); });
+            // mask all children
+            suanpan::for_all(child_set, [&](const auto child) { M[child] = true; });
 
             return child_set;
         };

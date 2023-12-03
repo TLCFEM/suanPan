@@ -849,6 +849,8 @@ int Domain::reorder_dof() {
             else if(t_bw < up_bw) up_bw = t_bw;
         }
 
+    suanpan_debug("The global matrix has a size of {} with bandwidth {} (lower) and {} (upper).\n", dof_counter, low_bw, -up_bw);
+
     // assign new labels to active nodes
     suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->set_reordered_dof(idx_sorted(t_node->get_original_dof())); });
 
