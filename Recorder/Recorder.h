@@ -81,6 +81,8 @@ public:
 
     virtual void record(const shared_ptr<DomainBase>&) = 0;
 
+    void clear_status();
+
     virtual void save();
 
     void print() override;

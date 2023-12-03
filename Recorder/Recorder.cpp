@@ -66,6 +66,11 @@ const std::vector<std::vector<std::vector<vec>>>& Recorder::get_data_pool() cons
 
 const std::vector<double>& Recorder::get_time_pool() const { return time_pool; }
 
+void Recorder::clear_status() {
+    time_pool.clear();
+    data_pool.clear();
+}
+
 void Recorder::save() {
     if(time_pool.empty() || data_pool.empty() || data_pool.cbegin()->empty() || data_pool.cbegin()->cbegin()->empty() || data_pool.cbegin()->cbegin()->cbegin()->is_empty()) return;
 

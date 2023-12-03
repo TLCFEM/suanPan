@@ -17,10 +17,11 @@
 
 #include "Domain.h"
 #include <Constraint/Constraint.h>
+#include <Domain/Factory.hpp>
 #include <Domain/Node.h>
 #include <Element/Element.h>
 #include <Load/Load.h>
-#include <Domain/Factory.hpp>
+#include <Recorder/Recorder.h>
 
 void Domain::update_current_resistance() const {
     factory->modify_trial_resistance().zeros();
@@ -503,6 +504,8 @@ void Domain::clear_status() {
     suanpan::for_all(node_pond.get(), [](const shared_ptr<Node>& t_node) { t_node->clear_status(); });
     suanpan::for_all(load_pond.get(), [](const shared_ptr<Load>& t_load) { t_load->clear_status(); });
     suanpan::for_all(constraint_pond.get(), [](const shared_ptr<Constraint>& t_constraint) { t_constraint->clear_status(); });
+
+    suanpan::for_all(recorder_pond.get(), [](const shared_ptr<Recorder>& t_recorder) { t_recorder->clear_status(); });
 }
 
 void Domain::reset_status() const {
