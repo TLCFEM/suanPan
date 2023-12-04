@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "sort_rcm.h"
+#include <unordered_set>
 
 /**
  * \brief Find a pair of pseudo-peripheral vertices
@@ -29,28 +30,28 @@
  * \return a list of vertices beginning with the pseudo-peripheral vertex
  */
 uvec peripheral(const std::vector<uvec>& A, const uvec& E) {
-    uvec G = sort_index(E);
+    uvec order = sort_index(E);
 
     std::size_t depth = 0;
-    auto root = G(0);
+    auto root = order(0);
 
     while(true) {
-        std::vector M(E.n_elem, false);
+        std::vector mask(E.n_elem, false);
 
         // ReSharper disable once CppTemplateArgumentsCanBeDeduced
-        auto parent_set = suanpan::unordered_set<decltype(root)>{root};
-        M[root] = true;
+        std::unordered_set<decltype(root)> parent_set{root};
+        mask[root] = true;
         std::size_t current_depth = 1;
 
         const auto populate = [&] {
-            decltype(parent_set) child_set, neighbor_set;
+            decltype(parent_set) child_set;
 
-            // collect all neighbors
-            suanpan::for_all(parent_set, [&](const auto parent) { neighbor_set.insert(A[parent].begin(), A[parent].end()); });
-            // find all children, i.e., neighbors that are not visited
-            suanpan::for_all(neighbor_set, [&](const auto child) { if(!M[child]) child_set.insert(child); });
-            // mask all children
-            suanpan::for_all(child_set, [&](const auto child) { M[child] = true; });
+            for(const auto parent : parent_set)
+                for(const auto child : A[parent])
+                    if(!mask[child]) {
+                        child_set.insert(child);
+                        mask[child] = true;
+                    }
 
             return child_set;
         };
@@ -69,9 +70,9 @@ uvec peripheral(const std::vector<uvec>& A, const uvec& E) {
         depth = current_depth;
     }
 
-    std::swap(*G.begin(), *std::find(G.begin(), G.end(), root));
+    std::swap(*order.begin(), *std::find(order.begin(), order.end(), root));
 
-    return G;
+    return order;
 }
 
 uvec sort_rcm(const std::vector<uvec>& A, const uvec& E) {
