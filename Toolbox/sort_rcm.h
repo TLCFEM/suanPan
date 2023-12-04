@@ -40,10 +40,13 @@
 #ifndef RCM_H
 #define RCM_H
 
-#include <Domain/MetaMat/triplet_form.hpp>
 #include <Domain/MetaMat/csc_form.hpp>
+#include <Domain/MetaMat/triplet_form.hpp>
+#include <Toolbox/container.h>
 
 uvec sort_rcm(const std::vector<uvec>&, const uvec&);
+
+uvec sort_rcm(const std::vector<suanpan::unordered_set<uword>>&);
 
 template<sp_d eT> uvec sort_rcm(const SpMat<eT>& MEAT) {
     suanpan_assert([&] { if(!MEAT.is_square()) throw logic_error("can only be applied to square matrix"); });

@@ -56,17 +56,15 @@ Node::Node(const unsigned T, const unsigned D, vec&& C)
 /**
  * \brief This method should be called after Element objects are set. Element
  * objects will set the minimum number of DoFs for all related Node objects.
- * This method initialize all member variables with the size of `num_dof` and
- * fill `original_dof` with `-1` to indicated it should be omitted from the
- * system. Finally check if the size of `coordinate` is the same of `num_dof`,
- * if not, resize it to `num_dof`. This will be necessary for beam/plate/shell
- * problems which have more DoFs than coordinates.
+ * This method initializes all member variables with the size of `num_dof` and
+ * fills `original_dof` with `-1` to indicate it should be omitted from the
+ * system.
  */
 void Node::initialize(const shared_ptr<DomainBase>& D) {
     if(initialized || !is_active()) return;
 
-    if(num_dof != 0) {
-        original_dof.zeros(num_dof);
+    if(0u != num_dof) {
+        original_dof.set_size(num_dof);
         original_dof.fill(static_cast<uword>(-1));
 
         reordered_dof.reset();
@@ -122,7 +120,7 @@ const std::vector<DOF>& Node::get_dof_identifier() const { return dof_identifier
 void Node::set_original_dof(unsigned& F) {
     if(!is_active()) return;
 
-    for(unsigned I = 0; I < num_dof; ++I, ++F)
+    for(auto I = 0u; I < num_dof; ++I, ++F)
         if(original_dof(I) != F) {
             original_dof(I) = F;
             initialized = false;

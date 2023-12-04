@@ -417,8 +417,8 @@ void new_restitutionwall(unique_ptr<Constraint>& return_obj, istringstream& comm
 }
 
 int create_new_criterion(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    const auto& step_tag = domain->get_current_step_tag();
-    if(0 == step_tag) {
+    const auto step_tag = domain->get_current_step_tag();
+    if(0u == step_tag) {
         suanpan_error("A valid step is required.\n");
         return SUANPAN_SUCCESS;
     }

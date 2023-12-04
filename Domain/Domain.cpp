@@ -800,9 +800,9 @@ std::pair<std::vector<unsigned>, suanpan::graph<unsigned>> Domain::get_element_c
 
 int Domain::reorder_dof() {
     // assign dof label for active dof
-    unsigned dof_counter = 0;
+    auto dof_counter = 0u;
     for(const auto& t_node : node_pond.get()) t_node->set_original_dof(dof_counter);
-    if(0 == dof_counter) return SUANPAN_FAIL;
+    if(0u == dof_counter) return SUANPAN_FAIL;
     // active flag is now properly set for node and element
 
     // RCM optimization
@@ -814,31 +814,19 @@ int Domain::reorder_dof() {
     });
 
     // for nonlinear constraint
-    for(const auto& [t_tag, t_constraint] : constraint_pond) {
-        if(!t_constraint->is_connected()) continue;
+    // need to consider all constraints including inactive ones
+    suanpan::for_all(constraint_pond, [&](const dual<Constraint>& t_constraint) {
+        if(!t_constraint.second->is_connected()) return;
         std::set<uword> t_encoding;
-        for(const auto i : t_constraint->get_node_encoding())
-            if(find<Node>(i)) {
-                const auto& t_dof = get<Node>(i)->get_reordered_dof();
+        for(const auto I : t_constraint.second->get_node_encoding())
+            if(auto& t_node = get<Node>(I); nullptr != t_node && t_node->is_active()) {
+                auto& t_dof = t_node->get_original_dof();
                 t_encoding.insert(t_dof.cbegin(), t_dof.cend());
             }
         for(const auto I : t_encoding) adjacency[I].insert(t_encoding.cbegin(), t_encoding.cend());
-    }
-
-    // count number of degree
-    uvec num_degree(dof_counter);
-    suanpan_for(0u, dof_counter, [&](const unsigned i) { num_degree(i) = adjacency[i].size(); });
-
-    // sort each column according to its degree
-    std::vector<uvec> adjacency_sorted(dof_counter);
-    suanpan_for(0u, dof_counter, [&](const unsigned i) {
-        uvec t_vec(num_degree(i));
-        unsigned j = 0;
-        for(const auto k : adjacency[i]) t_vec(j++) = k;
-        adjacency_sorted[i] = t_vec(sort_index(num_degree(t_vec)));
     });
 
-    const auto idx_rcm = sort_rcm(adjacency_sorted, num_degree);
+    const auto idx_rcm = sort_rcm(adjacency);
     const uvec idx_sorted = sort_index(idx_rcm);
 
     // get bandwidth
@@ -919,18 +907,18 @@ int Domain::initialize() {
     solver_pond.update();
 
     // for restart analysis
-    suanpan::for_all(load_pond, [&](const std::pair<unsigned, shared_ptr<Load>>& t_load) { t_load.second->set_initialized(false); });
-    suanpan::for_all(constraint_pond, [&](const std::pair<unsigned, shared_ptr<Constraint>>& t_constraint) { t_constraint.second->set_initialized(false); });
+    suanpan::for_all(load_pond, [&](const dual<Load>& t_load) { t_load.second->set_initialized(false); });
+    suanpan::for_all(constraint_pond, [&](const dual<Constraint>& t_constraint) { t_constraint.second->set_initialized(false); });
 
     // amplitude should be updated before load
-    suanpan::for_all(amplitude_pond, [&](const std::pair<unsigned, shared_ptr<Amplitude>>& t_amplitude) { t_amplitude.second->initialize(shared_from_this()); });
+    suanpan::for_all(amplitude_pond, [&](const dual<Amplitude>& t_amplitude) { t_amplitude.second->initialize(shared_from_this()); });
     amplitude_pond.update();
 
     initialize_material();
     initialize_section();
 
     // set dof number to zero before first initialisation of elements
-    suanpan::for_all(node_pond, [](const std::pair<unsigned, shared_ptr<Node>>& t_node) {
+    suanpan::for_all(node_pond, [](const dual<Node>& t_node) {
         // for restart analysis that may reassign dof
         t_node.second->set_initialized(false);
         t_node.second->set_dof_number(0);
@@ -938,14 +926,14 @@ int Domain::initialize() {
     node_pond.update();
 
     // groups reply on nodes
-    suanpan::for_all(group_pond, [&](const std::pair<unsigned, shared_ptr<Group>>& t_group) { t_group.second->initialize(shared_from_this()); });
+    suanpan::for_all(group_pond, [&](const dual<Group>& t_group) { t_group.second->initialize(shared_from_this()); });
     group_pond.update();
 
     suanpan::set<unsigned> remove_list;
 
     // element may reply on groups
     remove_list.clear();
-    suanpan::for_all(element_pond, [&](const std::pair<unsigned, shared_ptr<Element>>& t_element) {
+    suanpan::for_all(element_pond, [&](const dual<Element>& t_element) {
         if(!t_element.second->is_active()) return;
         // clear node pointer array to enable initialisation
         t_element.second->clear_node_ptr();
@@ -958,7 +946,7 @@ int Domain::initialize() {
     element_pond.update();
 
     // initialise nodal variables with proper number of DoFs
-    suanpan::for_all(node_pond, [&](const std::pair<unsigned, shared_ptr<Node>>& t_node) { t_node.second->initialize(shared_from_this()); });
+    suanpan::for_all(node_pond, [&](const dual<Node>& t_node) { t_node.second->initialize(shared_from_this()); });
     node_pond.update();
 
     // order matters between element base initialization and derived method call
@@ -1002,7 +990,7 @@ int Domain::initialize() {
 
     // initialize modifier based on updated element pool
     bool nonviscous = false;
-    suanpan::for_all(modifier_pond, [&](const std::pair<unsigned, shared_ptr<Modifier>>& t_modifier) { if(SUANPAN_SUCCESS == t_modifier.second->initialize(shared_from_this()) && t_modifier.second->has_nonviscous()) nonviscous = true; });
+    suanpan::for_all(modifier_pond, [&](const dual<Modifier>& t_modifier) { if(SUANPAN_SUCCESS == t_modifier.second->initialize(shared_from_this()) && t_modifier.second->has_nonviscous()) nonviscous = true; });
     modifier_pond.update();
     // sort to ensure lower performs first
     if(auto& t_modifier_pool = access::rw(modifier_pond.get()); t_modifier_pool.size() > 1)
@@ -1013,10 +1001,10 @@ int Domain::initialize() {
     factory->set_nonviscous(nonviscous);
 
     // recorder may depend on groups, nodes, elements, etc.
-    suanpan::for_all(recorder_pond, [&](const std::pair<unsigned, shared_ptr<Recorder>>& t_recorder) { t_recorder.second->initialize(shared_from_this()); });
+    suanpan::for_all(recorder_pond, [&](const dual<Recorder>& t_recorder) { t_recorder.second->initialize(shared_from_this()); });
     recorder_pond.update();
 
-    suanpan::for_all(criterion_pond, [&](const std::pair<unsigned, shared_ptr<Criterion>>& t_criterion) { t_criterion.second->initialize(shared_from_this()); });
+    suanpan::for_all(criterion_pond, [&](const dual<Criterion>& t_criterion) { t_criterion.second->initialize(shared_from_this()); });
     criterion_pond.update();
 
     // element initialization may change the status of the domain
@@ -1024,7 +1012,7 @@ int Domain::initialize() {
 }
 
 int Domain::initialize_load() {
-    suanpan::for_all(load_pond, [&](const std::pair<unsigned, shared_ptr<Load>>& t_load) { if(t_load.second->validate_step(shared_from_this()) && !t_load.second->is_initialized() && SUANPAN_FAIL == t_load.second->initialize(shared_from_this())) disable_load(t_load.first); });
+    suanpan::for_all(load_pond, [&](const dual<Load>& t_load) { if(t_load.second->validate_step(shared_from_this()) && !t_load.second->is_initialized() && SUANPAN_FAIL == t_load.second->initialize(shared_from_this())) disable_load(t_load.first); });
     load_pond.update();
 
     factory->update_reference_size();
@@ -1033,7 +1021,7 @@ int Domain::initialize_load() {
 }
 
 int Domain::initialize_constraint() {
-    suanpan::for_all(constraint_pond, [&](const std::pair<unsigned, shared_ptr<Constraint>>& t_constraint) { if(t_constraint.second->validate_step(shared_from_this()) && !t_constraint.second->is_initialized() && SUANPAN_FAIL == t_constraint.second->initialize(shared_from_this())) disable_constraint(t_constraint.first); });
+    suanpan::for_all(constraint_pond, [&](const dual<Constraint>& t_constraint) { if(t_constraint.second->validate_step(shared_from_this()) && !t_constraint.second->is_initialized() && SUANPAN_FAIL == t_constraint.second->initialize(shared_from_this())) disable_constraint(t_constraint.first); });
     constraint_pond.update();
 
     return SUANPAN_SUCCESS;
@@ -1063,7 +1051,7 @@ int Domain::initialize_material() {
     suanpan::set<unsigned> remove_list;
 
     remove_list.clear();
-    suanpan::for_all(material_pond, [&](const std::pair<unsigned, shared_ptr<Material>>& t_material) {
+    suanpan::for_all(material_pond, [&](const dual<Material>& t_material) {
         if(t_material.second->is_initialized() || !t_material.second->is_active()) return;
 
         // if fail to initialize, the material is invalid, remove it from the model
@@ -1085,7 +1073,7 @@ int Domain::initialize_section() {
     suanpan::set<unsigned> remove_list;
 
     remove_list.clear();
-    suanpan::for_all(section_pond, [&](const std::pair<unsigned, shared_ptr<Section>>& t_section) {
+    suanpan::for_all(section_pond, [&](const dual<Section>& t_section) {
         if(t_section.second->is_initialized() || !t_section.second->is_active()) return;
 
         // if fail to initialize, the section is invalid, remove it from the model

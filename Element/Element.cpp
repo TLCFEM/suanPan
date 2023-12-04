@@ -61,9 +61,7 @@ void Element::update_complementary_energy() {
 void Element::update_momentum() {
     if(trial_mass.is_empty()) return;
 
-    const vec t_velocity = get_trial_velocity();
-
-    momentum = trial_mass * t_velocity;
+    momentum = trial_mass * get_trial_velocity();
 }
 
 /**
@@ -243,13 +241,13 @@ vec Element::get_node_current_resistance() const {
 
 std::vector<shared_ptr<Material>> Element::get_material(const shared_ptr<DomainBase>& D) const {
     std::vector<shared_ptr<Material>> material_pool;
-    for(const auto& I : material_tag) material_pool.emplace_back(D->find<Material>(I) ? D->get<Material>(I) : nullptr);
+    for(const auto I : material_tag) material_pool.emplace_back(D->get<Material>(I));
     return material_pool;
 }
 
 std::vector<shared_ptr<Section>> Element::get_section(const shared_ptr<DomainBase>& D) const {
     std::vector<shared_ptr<Section>> section_pool;
-    for(const auto& I : section_tag) section_pool.emplace_back(D->find<Section>(I) ? D->get<Section>(I) : nullptr);
+    for(const auto I : section_tag) section_pool.emplace_back(D->get<Section>(I));
     return section_pool;
 }
 
@@ -320,10 +318,10 @@ int Element::initialize_base(const shared_ptr<DomainBase>& D) {
     }
 
     // embedded elements use other elements
-    if(0 != use_other) {
+    if(0u != use_other) {
         if(!D->find<Element>(use_other)) return SUANPAN_FAIL;
 
-        unsigned size = 1;
+        auto size = 1u;
         auto& t_element = D->get<Element>(use_other);
         size += t_element->get_node_number();
         access::rw(num_node) = size;
@@ -336,7 +334,7 @@ int Element::initialize_base(const shared_ptr<DomainBase>& D) {
     // first initialization
     access::rw(num_size) = num_node * num_dof;
 
-    if(0 == num_size) return SUANPAN_FAIL;
+    if(0u == num_size) return SUANPAN_FAIL;
 
     dof_encoding.set_size(num_size);
 
@@ -394,10 +392,10 @@ bool Element::is_symmetric() const { return symmetric; }
 bool Element::is_nlgeom() const { return nlgeom; }
 
 void Element::update_dof_encoding() {
-    unsigned idx = 0;
-    for(const auto& tmp_ptr : node_ptr) {
-        auto& node_dof = tmp_ptr.lock()->get_reordered_dof();
-        for(unsigned i = 0; i < num_dof; ++i) dof_encoding(idx++) = node_dof(i);
+    auto idx = 0u;
+    for(const auto& t_ptr : node_ptr) {
+        auto& node_dof = t_ptr.lock()->get_reordered_dof();
+        for(auto i = 0u; i < num_dof; ++i) dof_encoding(idx++) = node_dof(i);
     }
 
     dof_mapping.clear();
@@ -406,7 +404,7 @@ void Element::update_dof_encoding() {
     for(auto I = 0llu; I < dof_index.n_elem; ++I) for(auto J = I; J < dof_index.n_elem; ++J) dof_mapping.emplace_back(MappingDOF{dof_reordered(J), dof_reordered(I), dof_index(J), dof_index(I)});
     std::sort(dof_mapping.begin(), dof_mapping.end(), [](const MappingDOF& A, const MappingDOF& B) { return A.l_col == B.l_col ? A.l_row < B.l_row : A.l_col < B.l_col; });
 
-    if(!dof_identifier.empty()) for(const auto& tmp_ptr : node_ptr) tmp_ptr.lock()->set_dof_identifier(dof_identifier);
+    if(!dof_identifier.empty()) for(const auto& t_ptr : node_ptr) t_ptr.lock()->set_dof_identifier(dof_identifier);
 }
 
 bool Element::if_update_mass() const { return update_mass; }

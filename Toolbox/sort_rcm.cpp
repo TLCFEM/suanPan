@@ -16,7 +16,6 @@
  ******************************************************************************/
 
 #include "sort_rcm.h"
-#include <Toolbox/container.h>
 
 /**
  * \brief Find a pair of pseudo-peripheral vertices
@@ -99,4 +98,22 @@ uvec sort_rcm(const std::vector<uvec>& A, const uvec& E) {
     suanpan_debug("RCM algorithm takes {:.5E} seconds.\n", TM.toc());
 
     return R;
+}
+
+uvec sort_rcm(const std::vector<suanpan::unordered_set<uword>>& adjacency) {
+    const auto dof_size = adjacency.size();
+
+    // count number of degree
+    uvec num_degree(dof_size, fill::none);
+    suanpan_for(static_cast<size_t>(0), dof_size, [&](const size_t I) { num_degree(I) = adjacency[I].size(); });
+
+    // sort each column according to its degree
+    std::vector<uvec> adjacency_sorted(dof_size);
+    suanpan_for(static_cast<size_t>(0), dof_size, [&](const size_t I) {
+        adjacency_sorted[I] = to_uvec(adjacency[I]);
+        auto& t_vec = adjacency_sorted[I];
+        std::sort(t_vec.begin(), t_vec.end(), [&](const uword a, const uword b) { return num_degree(a) < num_degree(b); });
+    });
+
+    return sort_rcm(adjacency_sorted, num_degree);
 }

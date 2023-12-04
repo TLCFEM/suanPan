@@ -201,6 +201,8 @@ template<typename T> typename Storage<T>::iterator begin(Storage<T>& S) { return
 
 template<typename T> typename Storage<T>::iterator end(Storage<T>& S) { return S.end(); }
 
+template<typename T> using dual = std::pair<unsigned, shared_ptr<T>>;
+
 using AmplitudeStorage = Storage<Amplitude>;
 using ExpressionStorage = Storage<Expression>;
 using ConstraintStorage = Storage<Constraint>;
